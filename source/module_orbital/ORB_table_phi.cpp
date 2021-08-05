@@ -101,8 +101,8 @@ int ORB_table_phi::get_rmesh(const double &R1, const double &R2)
 	
 	if(rmesh <= 0)
 	{
-		//ofs_warning << "\n R1 = " << R1 << " R2 = " << R2;
-		//ofs_warning << "\n rmesh = " << rmesh;
+		//GlobalV::ofs_warning << "\n R1 = " << R1 << " R2 = " << R2;
+		//GlobalV::ofs_warning << "\n rmesh = " << rmesh;
 		cout << "\n R1 = " << R1 << " R2 = " << R2;
 		cout << "\n rmesh = " << rmesh;
 		WARNING_QUIT("ORB_table_phi::get_rmesh", "rmesh <= 0");
@@ -765,10 +765,10 @@ void ORB_table_phi::init_Lmax (
 	auto cal_Lmax_Phi = [](int &Lmax)
 	{
 		//obtain maxL of all type
-		const int ntype = ORB.get_ntype();
+		const int ntype = GlobalC::ORB.get_ntype();
 		for (int it = 0; it < ntype; it++)
 		{
-			Lmax = std::max(Lmax, ORB.Phi[it].getLmax());
+			Lmax = std::max(Lmax, GlobalC::ORB.Phi[it].getLmax());
 		}
 	};
 
@@ -777,13 +777,19 @@ void ORB_table_phi::init_Lmax (
 		// fix bug.
 		// mohan add the nonlocal part.
 		// 2011-03-07
-		const int ntype = ORB.get_ntype();
+		const int ntype = GlobalC::ORB.get_ntype();
 		for(int it=0; it< ntype; it++)
 		{
-			Lmax = std::max(Lmax, ORB.Beta[it].getLmax());
+			Lmax = std::max(Lmax, GlobalC::ORB.Beta[it].getLmax());
 		}
 	};
+	auto cal_Lmax_Alpha = [](int &Lmax)
+	{
+		//caoyu add 2021-08-05 for descriptor basis
+		Lmax = std::max(Lmax, GlobalC::ORB.get_lmax_d());
+	};
 
+	
 	Lmax = -1;
 	
 	switch( orb_num )
@@ -794,6 +800,7 @@ void ORB_table_phi::init_Lmax (
 				case 1:			// used in <Phi|Phi> or <Beta|Phi>
 					cal_Lmax_Phi(Lmax);
 					cal_Lmax_Beta(Lmax);
+					cal_Lmax_Alpha(Lmax);
 					//use 2lmax+1 in dS
 					Lmax_used = 2*Lmax + 1;
 					break;
@@ -896,8 +903,8 @@ void ORB_table_phi::init_Table_Spherical_Bessel (
     goto once_again;
 */
 
-//	OUT(ofs_running,"lmax used to generate Jlq",Lmax_used);
-//	OUT(ofs_running,"kmesh",kmesh);
-//	OUT(ofs_running,"Rmesh",Rmesh);
+//	OUT(GlobalV::ofs_running,"lmax used to generate Jlq",Lmax_used);
+//	OUT(GlobalV::ofs_running,"kmesh",kmesh);
+//	OUT(GlobalV::ofs_running,"Rmesh",Rmesh);
 	Memory::record ("ORB_table_phi", "Jl(x)", (Lmax_used+1) * this->kmesh * this->Rmesh, "double");
 }

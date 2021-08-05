@@ -74,7 +74,7 @@ void BFGS_Basic::update_inverse_hessian(void)
 //      s[i] = this->pos[i] - this->pos_p[i];
 //		mohan update 2010-07-27
 		s[i] = this->check_move( pos[i], pos_p[i] );     	
-		s[i] *= ucell.lat0;
+		s[i] *= GlobalC::ucell.lat0;
 	 
 	    y[i] = this->grad[i] - this->grad_p[i];
     }
@@ -86,8 +86,8 @@ void BFGS_Basic::update_inverse_hessian(void)
     }
     if(abs(sdoty) < 1.0e-16)
     {
-        ofs_running <<" WARINIG: unexpected behaviour in update_inverse_hessian"<<endl;
-        ofs_running <<" Resetting bfgs history "<<endl;
+        GlobalV::ofs_running <<" WARINIG: unexpected behaviour in update_inverse_hessian"<<endl;
+        GlobalV::ofs_running <<" Resetting bfgs history "<<endl;
         this->reset_hessian();
         return;
     }
@@ -147,16 +147,16 @@ void BFGS_Basic::check_wolfe_conditions(void)
 	// enlarge trst radius is not good.
     bool wolfe2 = abs(dot) > - this->w2 * dot_p;
 
-	if(test_ion_dynamics)
+	if(GlobalV::test_ion_dynamics)
 	{
-		OUT(ofs_running,"etot - etot_p",etot-etot_p);
-		OUT(ofs_running,"w1 * dot_p",w1 * dot_p);
-		OUT(ofs_running,"dot",dot);
-		OUT(ofs_running,"w2 * dot_p",w2 * dot_p);	
-		OUT(ofs_running,"w1",w1);
-		OUT(ofs_running,"w2",w2);
-		OUT(ofs_running,"wolfe1",wolfe1);
-		OUT(ofs_running,"wolfe2",wolfe2);
+		OUT(GlobalV::ofs_running,"etot - etot_p",etot-etot_p);
+		OUT(GlobalV::ofs_running,"w1 * dot_p",w1 * dot_p);
+		OUT(GlobalV::ofs_running,"dot",dot);
+		OUT(GlobalV::ofs_running,"w2 * dot_p",w2 * dot_p);	
+		OUT(GlobalV::ofs_running,"w1",w1);
+		OUT(GlobalV::ofs_running,"w2",w2);
+		OUT(GlobalV::ofs_running,"wolfe1",wolfe1);
+		OUT(GlobalV::ofs_running,"wolfe2",wolfe2);
 	}
 
     this->wolfe_flag = wolfe1 && wolfe2;
@@ -173,13 +173,13 @@ void BFGS_Basic::check_wolfe_conditions(void)
 	   }
 	 */
 	 
-	OUT(ofs_running,"etot - etot_p",etot-etot_p);
-	OUT(ofs_running,"w1 * dot_p",w1 * dot_p);
-    OUT(ofs_running,"wolfe1",wolfe1);
-    OUT(ofs_running,"wolfe2",wolfe2);
-//  OUT(ofs_running,"dot = ",dot);
-//  OUT(ofs_running,"dot_p = ",dot_p);
-    OUT(ofs_running,"wolfe condition satisfied",wolfe_flag);
+	OUT(GlobalV::ofs_running,"etot - etot_p",etot-etot_p);
+	OUT(GlobalV::ofs_running,"w1 * dot_p",w1 * dot_p);
+    OUT(GlobalV::ofs_running,"wolfe1",wolfe1);
+    OUT(GlobalV::ofs_running,"wolfe2",wolfe2);
+//  OUT(GlobalV::ofs_running,"dot = ",dot);
+//  OUT(GlobalV::ofs_running,"dot_p = ",dot_p);
+    OUT(GlobalV::ofs_running,"wolfe condition satisfied",wolfe_flag);
     return;
 }
 
@@ -264,7 +264,7 @@ void BFGS_Basic::new_step(void)
 			//cout << " move after hess " << move[i] << endl;
 
 		}
-		ofs_running << " check the norm of new move " << dot_func(move, move, dim) << " (Bohr)" << endl;
+		GlobalV::ofs_running << " check the norm of new move " << dot_func(move, move, dim) << " (Bohr)" << endl;
 	}
 	else if(bfgs_ndim > 1)
 	{
@@ -281,7 +281,7 @@ void BFGS_Basic::new_step(void)
 
 	if(dot > 0.0)
 	{
-		ofs_running<<" Uphill move : resetting bfgs history"<<endl;
+		GlobalV::ofs_running<<" Uphill move : resetting bfgs history"<<endl;
 		for(int i=0;i<dim;i++)
 		{
 			move[i] = -grad[i];
@@ -322,7 +322,7 @@ void BFGS_Basic::compute_trust_radius(void)
 	// is used to compare to trust_radius_old.
     double norm_move = dot_func( this->move, this->move, dim);
     norm_move = std::sqrt(norm_move);
-    OUT(ofs_running,"move(norm)",norm_move);
+    OUT(GlobalV::ofs_running,"move(norm)",norm_move);
 
     ltest = ltest && (norm_move > trust_radius_old);
 
@@ -355,13 +355,13 @@ void BFGS_Basic::compute_trust_radius(void)
         trust_radius = std::min(trust_radius, norm_move);
     }
 
-	if(test_ion_dynamics)
+	if(GlobalV::test_ion_dynamics)
 	{
-		OUT(ofs_running,"wolfe_flag",wolfe_flag);
-		OUT(ofs_running,"trust_radius_old",trust_radius_old);
-		OUT(ofs_running,"2*a*trust_radius_old",2.0*a*trust_radius_old);
-		OUT(ofs_running,"norm_move",norm_move);
-		OUT(ofs_running,"Trust_radius (Bohr)",trust_radius);
+		OUT(GlobalV::ofs_running,"wolfe_flag",wolfe_flag);
+		OUT(GlobalV::ofs_running,"trust_radius_old",trust_radius_old);
+		OUT(GlobalV::ofs_running,"2*a*trust_radius_old",2.0*a*trust_radius_old);
+		OUT(GlobalV::ofs_running,"norm_move",norm_move);
+		OUT(GlobalV::ofs_running,"Trust_radius (Bohr)",trust_radius);
 	}
 
     if( trust_radius < trust_radius_min )
@@ -373,7 +373,7 @@ void BFGS_Basic::compute_trust_radius(void)
             //something is going wrongsomething is going wrong
             WARNING_QUIT("bfgs","bfgs history already reset at previous step, we got trapped!");
         }
-        ofs_running<<" Resetting BFGS history." << endl;
+        GlobalV::ofs_running<<" Resetting BFGS history." << endl;
         this->reset_hessian();
         for(int i =0;i<dim;i++)
         {
@@ -393,9 +393,9 @@ void BFGS_Basic::compute_trust_radius(void)
 double BFGS_Basic::check_move(const double &pos, const double &pos_p)
 {
 	// this must be careful.
-	// unit is ucell.lat0.
-	assert(ucell.lat0>0.0);
-	const double direct_move = (pos - pos_p)/ucell.lat0;
+	// unit is GlobalC::ucell.lat0.
+	assert(GlobalC::ucell.lat0>0.0);
+	const double direct_move = (pos - pos_p)/GlobalC::ucell.lat0;
 	double shortest_move = direct_move;
 	for(int cell=-1; cell<=1; ++cell)
 	{

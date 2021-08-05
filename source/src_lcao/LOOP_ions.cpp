@@ -17,7 +17,7 @@
 #include "../src_pw/vdwd2_parameters.h"
 #include "../src_pw/vdwd3_parameters.h"
 #ifdef __DEEPKS
-#include "LCAO_descriptor.h"
+#include "LCAO_descriptor.h"    //caoyu add 2021-07-26
 #endif
 
 LOOP_ions::LOOP_ions()
@@ -31,7 +31,7 @@ void LOOP_ions::opt_ions(void)
     TITLE("LOOP_ions","opt_ions");
     timer::tick("LOOP_ions","opt_ions");
 
-    if(OUT_LEVEL=="i")
+    if(GlobalV::OUT_LEVEL=="i")
     {
         cout << setprecision(12);
         cout<< " " << setw(7)<< "ISTEP"
@@ -44,7 +44,7 @@ void LOOP_ions::opt_ions(void)
     }
 
     // Geometry optimization algorithm setup.
-    if(FORCE)
+    if(GlobalV::FORCE)
     {
         //Ions_Move_Methods
         IMM.allocate();
@@ -53,7 +53,7 @@ void LOOP_ions::opt_ions(void)
     }
 
     // pengfei Li 2018-05-14
-    if(STRESS)
+    if(GlobalV::STRESS)
     {
         // allocate arrays related to changes of lattice vectors
         LCM.allocate();
@@ -65,45 +65,45 @@ void LOOP_ions::opt_ions(void)
     int force_step = 1;
     int stress_step = 1;
     bool stop = false;
-    while(istep <= NSTEP && !stop)
+    while(istep <= GlobalV::NSTEP && !stop)
     {
         time_t estart = time(NULL);
 
 		// xiaohui add "m" option, 2015-09-16
-        if(OUT_LEVEL=="ie" || OUT_LEVEL=="m")
+        if(GlobalV::OUT_LEVEL=="ie" || GlobalV::OUT_LEVEL=="m")
         {
             cout << " ---------------------------------------------------------" << endl;
-            if(CALCULATION=="relax")
+            if(GlobalV::CALCULATION=="relax")
             {
                 cout << " RELAX IONS : " << istep << endl;
             }
-            else if(CALCULATION=="cell-relax")
+            else if(GlobalV::CALCULATION=="cell-relax")
             {
                 cout << " RELAX CELL : " << stress_step << endl;
                 cout << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << endl;
             }
-            else if(CALCULATION=="scf")
+            else if(GlobalV::CALCULATION=="scf")
             {
                 cout << " SELF-CONSISTENT : " << endl;
             }
             cout << " ---------------------------------------------------------" << endl;
 
-            ofs_running << " ---------------------------------------------------------" << endl;
-            if(CALCULATION=="relax")
+            GlobalV::ofs_running << " ---------------------------------------------------------" << endl;
+            if(GlobalV::CALCULATION=="relax")
             {
-                ofs_running << " RELAX IONS : " << istep << endl;
-                ofs_running << " ---------------------------------------------------------" << endl;
+                GlobalV::ofs_running << " RELAX IONS : " << istep << endl;
+                GlobalV::ofs_running << " ---------------------------------------------------------" << endl;
             }
-            else if(CALCULATION=="cell-relax")
+            else if(GlobalV::CALCULATION=="cell-relax")
             {
-                ofs_running << " RELAX CELL : " << stress_step << endl;
-                ofs_running << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << endl;
-                ofs_running << " ---------------------------------------------------------" << endl;
+                GlobalV::ofs_running << " RELAX CELL : " << stress_step << endl;
+                GlobalV::ofs_running << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << endl;
+                GlobalV::ofs_running << " ---------------------------------------------------------" << endl;
             }
-            else if(CALCULATION=="scf")
+            else if(GlobalV::CALCULATION=="scf")
             {
-                ofs_running << " SELF-CONSISTENT" << endl;
-                ofs_running << " ---------------------------------------------------------" << endl;
+                GlobalV::ofs_running << " SELF-CONSISTENT" << endl;
+                GlobalV::ofs_running << " ---------------------------------------------------------" << endl;
             }
         }
 
@@ -113,26 +113,26 @@ void LOOP_ions::opt_ions(void)
         if(INPUT.vdw_method=="d2")
         {
             // setup vdwd2 parameters
-	        vdwd2_para.initial_parameters(INPUT);
-	        vdwd2_para.initset(ucell);
+	        GlobalC::vdwd2_para.initial_parameters(INPUT);
+	        GlobalC::vdwd2_para.initset(GlobalC::ucell);
         }
         if(INPUT.vdw_method=="d3_0" || INPUT.vdw_method=="d3_bj")
         {
-            vdwd3_para.initial_parameters(INPUT);
+            GlobalC::vdwd3_para.initial_parameters(INPUT);
         }
         // Peize Lin add 2014.04.04, update 2021.03.09
-        if(vdwd2_para.flag_vdwd2)
+        if(GlobalC::vdwd2_para.flag_vdwd2)
         {
-            Vdwd2 vdwd2(ucell,vdwd2_para);
+            Vdwd2 vdwd2(GlobalC::ucell,GlobalC::vdwd2_para);
             vdwd2.cal_energy();
-            en.evdw = vdwd2.get_energy();
+            GlobalC::en.evdw = vdwd2.get_energy();
         }
         // jiyy add 2019-05-18, update 2021.05.02
-        else if(vdwd3_para.flag_vdwd3)
+        else if(GlobalC::vdwd3_para.flag_vdwd3)
         {
-            Vdwd3 vdwd3(ucell,vdwd3_para);
+            Vdwd3 vdwd3(GlobalC::ucell,GlobalC::vdwd3_para);
             vdwd3.cal_energy();
-            en.evdw = vdwd3.get_energy();
+            GlobalC::en.evdw = vdwd3.get_energy();
         }
 
 
@@ -144,25 +144,25 @@ void LOOP_ions::opt_ions(void)
 		time_t eend = time(NULL);
 
 		//for second-order extrapolation
-        if(CALCULATION=="relax" || CALCULATION=="cell-relax")
+        if(GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
         {
-            CE.update_all_pos(ucell);
+            CE.update_all_pos(GlobalC::ucell);
         }
 
 		// PLEASE design a proper interface to output potentials,
 		// not only electrostatic potential but also others
 		// mohan add 2021-03-25
 		// we need to have a proper
-        if(pot.out_potential == 2)
+        if(GlobalC::pot.out_potential == 2)
         {
             stringstream ssp;
             stringstream ssp_ave;
-            ssp << global_out_dir << "ElecStaticPot";
-            ssp_ave << global_out_dir << "ElecStaticPot_AVE";
-            pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
+            ssp << GlobalV::global_out_dir << "ElecStaticPot";
+            ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
+            GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
         }
 
-        if(ParaO.out_hsR)
+        if(GlobalC::ParaO.out_hsR)
 		{
 			this->output_HS_R(); //LiuXh add 2019-07-15
 		}
@@ -170,27 +170,25 @@ void LOOP_ions::opt_ions(void)
 #ifdef __DEEPKS
         if (INPUT.out_descriptor)
         {
-            ld.init(ORB.get_lmax_d(), ORB.get_nchimax_d(), ucell.nat* ORB.Alpha[0].getTotal_nchi());
-            ld.build_S_descriptor(0);  //derivation not needed yet
-            ld.cal_projected_DM();
-            ld.cal_descriptor();
+            //ld.init(ORB.get_lmax_d(), ORB.get_nchimax_d(), ucell.nat* ORB.Alpha[0].getTotal_nchi());
+            //ld.build_S_descriptor(0);  //cal overlap, no need dm
+            GlobalC::ld.cal_projected_DM(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);  //need dm
+            GlobalC::ld.cal_descriptor();    //final descriptor
+            GlobalC::ld.save_npy_d();            //libnpy needed
             if (INPUT.deepks_scf)
             {
-                ld.build_S_descriptor(1);   //for F_delta calculation
-                ld.cal_v_delta(INPUT.model_file);
-                ld.print_H_V_delta();
-                ld.save_npy_d();
+                //ld.print_H_V_delta();   //final H_delta
                 if (FORCE)
                 {
-                    ld.cal_f_delta(LOC.wfc_dm_2d.dm_gamma[0]);
-                    ld.print_F_delta();
+                    GlobalC::ld.build_S_descriptor(1);   //for F_delta calculation
+                    GlobalC::ld.cal_f_delta(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
+                    GlobalC::ld.print_F_delta();
                 }
-
             }
         }
 #endif
         time_t fstart = time(NULL);
-        if (CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax")
+        if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
         {
             stop = this->force_stress(istep, force_step, stress_step);
         }
@@ -199,22 +197,22 @@ void LOOP_ions::opt_ions(void)
 		// PLEASE move the details of CE to other places
 		// mohan add 2021-03-25
         //xiaohui add 2014-07-07, for second-order extrapolation
-        if(FORCE)
+        if(GlobalV::FORCE)
         {
-            CE.save_pos_next(ucell);
+            CE.save_pos_next(GlobalC::ucell);
         }
 
-        if(OUT_LEVEL=="i")
+        if(GlobalV::OUT_LEVEL=="i")
         {
             double etime_min = difftime(eend, estart)/60.0;
             double ftime_min = difftime(fend, fstart)/60.0;
             stringstream ss;
-            ss << MOVE_IONS << istep;
+            ss << GlobalV::MOVE_IONS << istep;
 
             cout << setiosflags(ios::scientific)
             << " " << setw(7) << ss.str()
             << setw(5) << ELEC_scf::iter
-            << setw(18) << setprecision(6) << en.etot * Ry_to_eV;
+            << setw(18) << setprecision(6) << GlobalC::en.etot * Ry_to_eV;
 
             cout << setprecision(2) << setiosflags(ios::scientific)
             << setw(10) << IMM.get_ediff() * Ry_to_eV * 1000
@@ -229,21 +227,21 @@ void LOOP_ions::opt_ions(void)
 
 //#ifdef __MPI
 //    MPI_Barrier(MPI_COMM_WORLD);
-//    for (int i=0;i<ucell.ntype;i++)
+//    for (int i=0;i<GlobalC::ucell.ntype;i++)
 //    {
-//        ucell.atoms[i].bcast_atom(); // bcast tau array
+//        GlobalC::ucell.atoms[i].bcast_atom(); // bcast tau array
 //    }
 //#endif
 
         ++istep;
     }
 
-    if(CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax")
+    if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
     {
-        ofs_running << "\n\n --------------------------------------------" << endl;
-        ofs_running << setprecision(16);
-        ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl;
-        ofs_running << " --------------------------------------------\n\n" << endl;
+        GlobalV::ofs_running << "\n\n --------------------------------------------" << endl;
+        GlobalV::ofs_running << setprecision(16);
+        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << endl;
+        GlobalV::ofs_running << " --------------------------------------------\n\n" << endl;
 
     }
 
@@ -260,7 +258,7 @@ bool LOOP_ions::force_stress(
 {
     TITLE("LOOP_ions","force_stress");
 
-    if(!FORCE && !STRESS)
+    if(!GlobalV::FORCE && !GlobalV::STRESS)
     {
         return 1;
     }
@@ -272,29 +270,29 @@ bool LOOP_ions::force_stress(
 	matrix scs;
 	Force_Stress_LCAO FSL;
 	FSL.allocate ();
-	FSL.getForceStress(FORCE, STRESS, TEST_FORCE, TEST_STRESS, fcs, scs);
+	FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS, GlobalV::TEST_FORCE, GlobalV::TEST_STRESS, fcs, scs);
 
 	//--------------------------------------------------
 	// only forces are needed, no stresses are needed
 	//--------------------------------------------------
-    if(FORCE && !STRESS)
+    if(GlobalV::FORCE && !GlobalV::STRESS)
     {
 
 #ifdef __MPI
         atom_arrange::delete_vector(
-			ofs_running,
-			SEARCH_PBC,
-			GridD,
-			ucell,
-			SEARCH_RADIUS,
-			test_atom_input);
+			GlobalV::ofs_running,
+			GlobalV::SEARCH_PBC,
+			GlobalC::GridD,
+			GlobalC::ucell,
+			GlobalV::SEARCH_RADIUS,
+			GlobalV::test_atom_input);
 #endif
 
-        if(CALCULATION=="relax")
+        if(GlobalV::CALCULATION=="relax")
         {
-            IMM.cal_movement(istep, istep, fcs, en.etot);
+            IMM.cal_movement(istep, istep, fcs, GlobalC::en.etot);
 
-            if(IMM.get_converged() || (istep==NSTEP))
+            if(IMM.get_converged() || (istep==GlobalV::NSTEP))
             {
                 return 1; // 1 means converged
             }
@@ -303,12 +301,12 @@ bool LOOP_ions::force_stress(
                 CE.update_istep(istep);
                 CE.extrapolate_charge();
 
-                if(pot.extra_pot=="dm")
+                if(GlobalC::pot.extra_pot=="dm")
                 {
                 }
                 else
                 {
-                    pot.init_pot( istep, pw.strucFac );
+                    GlobalC::pot.init_pot( istep, GlobalC::pw.strucFac );
                 }
             }
             return 0;
@@ -325,20 +323,20 @@ bool LOOP_ions::force_stress(
         // force calculations.
 
         //xiaohui modify 2014-08-09
-        //pw.setup_structure_factor();
+        //GlobalC::pw.setup_structure_factor();
 
         // charge extrapolation if istep>0.
         //xiaohui modify 2014-08-09
         //CE.extrapolate_charge();
 
 /*xiaohui modify 2014-08-09
-        if(pot.extra_pot==4)
+        if(GlobalC::pot.extra_pot==4)
         {
             // done after grid technique.
         }
         else
         {
-            pot.init_pot( istep );
+            GlobalC::pot.init_pot( istep );
         }
 xiaohui modify 2014-08-09*/
     }
@@ -346,21 +344,21 @@ xiaohui modify 2014-08-09*/
 //    static bool converged_force = false;
     static bool converged_stress = false;
 
-    if(!FORCE&&STRESS)
+    if(!GlobalV::FORCE&&GlobalV::STRESS)
     {
 
 #ifdef __MPI
 		atom_arrange::delete_vector(
-			ofs_running,
-			SEARCH_PBC,
-			GridD,
-			ucell,
-			SEARCH_RADIUS,
-			test_atom_input);
+			GlobalV::ofs_running,
+			GlobalV::SEARCH_PBC,
+			GlobalC::GridD,
+			GlobalC::ucell,
+			GlobalV::SEARCH_RADIUS,
+			GlobalV::test_atom_input);
 #endif
-		if(CALCULATION=="cell-relax")
+		if(GlobalV::CALCULATION=="cell-relax")
 		{
-           	LCM.cal_lattice_change(stress_step, scs, en.etot);
+           	LCM.cal_lattice_change(stress_step, scs, GlobalC::en.etot);
            	converged_stress = LCM.get_converged();
            	if(converged_stress)
            	{
@@ -369,7 +367,7 @@ xiaohui modify 2014-08-09*/
            	else
            	{
                	Variable_Cell::init_after_vc();
-               	pot.init_pot(stress_step, pw.strucFac);
+               	GlobalC::pot.init_pot(stress_step, GlobalC::pw.strucFac);
 
                	++stress_step;
                	return 0;
@@ -381,28 +379,28 @@ xiaohui modify 2014-08-09*/
         }
 	}
 
-    if(FORCE&&STRESS)
+    if(GlobalV::FORCE&&GlobalV::STRESS)
     {
         atom_arrange::delete_vector(
-			ofs_running,
-			SEARCH_PBC,
-			GridD,
-			ucell,
-			SEARCH_RADIUS,
-			test_atom_input);
+			GlobalV::ofs_running,
+			GlobalV::SEARCH_PBC,
+			GlobalC::GridD,
+			GlobalC::ucell,
+			GlobalV::SEARCH_RADIUS,
+			GlobalV::test_atom_input);
 
-        if(CALCULATION=="relax" || CALCULATION=="cell-relax")
+        if(GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
         {
-            IMM.cal_movement(istep, force_step, fcs, en.etot);
+            IMM.cal_movement(istep, force_step, fcs, GlobalC::en.etot);
 
             if(IMM.get_converged())
             {
                 force_step = 1;
 
 
-			    if(CALCULATION=="cell-relax")
+			    if(GlobalV::CALCULATION=="cell-relax")
 			    {
-            	    LCM.cal_lattice_change(stress_step, scs, en.etot);
+            	    LCM.cal_lattice_change(stress_step, scs, GlobalC::en.etot);
             	    converged_stress = LCM.get_converged();
             	    if(converged_stress)
             	    {
@@ -411,7 +409,7 @@ xiaohui modify 2014-08-09*/
             	    else
             	    {
                 	    Variable_Cell::init_after_vc();
-                	    pot.init_pot(stress_step, pw.strucFac);
+                	    GlobalC::pot.init_pot(stress_step, GlobalC::pw.strucFac);
 
                 	    ++stress_step;
                 	    return 0;
@@ -428,12 +426,12 @@ xiaohui modify 2014-08-09*/
                 CE.update_istep(force_step);
                 CE.extrapolate_charge();
 
-                if(pot.extra_pot=="dm")
+                if(GlobalC::pot.extra_pot=="dm")
                 {
                 }
                 else
                 {
-                    pot.init_pot( istep, pw.strucFac );
+                    GlobalC::pot.init_pot( istep, GlobalC::pw.strucFac );
                 }
                 ++force_step;
                 return 0;
@@ -454,44 +452,44 @@ void LOOP_ions::final_scf(void)
 {
     TITLE("LOOP_ions","final_scf");
 
-    FINAL_SCF = true;
+    GlobalV::FINAL_SCF = true;
 
     Variable_Cell::final_calculation_after_vc();
 
 	//------------------------------------------------------------------
 	// THIS PART IS THE SAME AS LOOP_elec::set_matrix_grid
-    SEARCH_RADIUS = atom_arrange::set_sr_NL(
-		ofs_running,
-		OUT_LEVEL,
-		ORB.get_rcutmax_Phi(),
-		ORB.get_rcutmax_Beta(),
-		GAMMA_ONLY_LOCAL);
+    GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
+		GlobalV::ofs_running,
+		GlobalV::OUT_LEVEL,
+		GlobalC::ORB.get_rcutmax_Phi(),
+		GlobalC::ORB.get_rcutmax_Beta(),
+		GlobalV::GAMMA_ONLY_LOCAL);
 
     atom_arrange::search(
-		SEARCH_PBC,
-		ofs_running,
-		GridD,
-		ucell,
-		SEARCH_RADIUS,
-		test_atom_input);
+		GlobalV::SEARCH_PBC,
+		GlobalV::ofs_running,
+		GlobalC::GridD,
+		GlobalC::ucell,
+		GlobalV::SEARCH_RADIUS,
+		GlobalV::test_atom_input);
 
-    GridT.set_pbc_grid(
-        pw.ncx, pw.ncy, pw.ncz,
-        pw.bx, pw.by, pw.bz,
-        pw.nbx, pw.nby, pw.nbz,
-        pw.nbxx, pw.nbzp_start, pw.nbzp);
+    GlobalC::GridT.set_pbc_grid(
+        GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz,
+        GlobalC::pw.bx, GlobalC::pw.by, GlobalC::pw.bz,
+        GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbz,
+        GlobalC::pw.nbxx, GlobalC::pw.nbzp_start, GlobalC::pw.nbzp);
 
     // (2) If k point is used here, allocate HlocR after atom_arrange.
-    if(!GAMMA_ONLY_LOCAL)
+    if(!GlobalV::GAMMA_ONLY_LOCAL)
     {
         // For each atom, calculate the adjacent atoms in different cells
         // and allocate the space for H(R) and S(R).
-        LNNR.cal_nnr();
-        LM.allocate_HS_R(LNNR.nnr);
+        GlobalC::LNNR.cal_nnr();
+        GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
 
 		// need to first calculae lgd.
-        // using GridT.init.
-        LNNR.cal_nnrg(GridT);
+        // using GlobalC::GridT.init.
+        GlobalC::LNNR.cal_nnrg(GlobalC::GridT);
     }
 	//------------------------------------------------------------------
 
@@ -504,27 +502,27 @@ void LOOP_ions::final_scf(void)
     // after ParaO and GridT,
     // this information is used to calculate
     // the force.
-    LOWF.set_trace_aug(GridT);
+    GlobalC::LOWF.set_trace_aug(GlobalC::GridT);
 
-	LOC.allocate_dm_wfc(GridT);
+	GlobalC::LOC.allocate_dm_wfc(GlobalC::GridT);
 
-    UHM.set_lcao_matrices();
+    GlobalC::UHM.set_lcao_matrices();
 	//------------------------------------------------------------------
 
 
 
 
-    if(vdwd2_para.flag_vdwd2)							//Peize Lin add 2014-04-04, update 2021-03-09
+    if(GlobalC::vdwd2_para.flag_vdwd2)							//Peize Lin add 2014-04-04, update 2021-03-09
     {
-        Vdwd2 vdwd2(ucell,vdwd2_para);
+        Vdwd2 vdwd2(GlobalC::ucell,GlobalC::vdwd2_para);
         vdwd2.cal_energy();
-        en.evdw = vdwd2.get_energy();
+        GlobalC::en.evdw = vdwd2.get_energy();
     }
-	else if(vdwd3_para.flag_vdwd3)							//jiyy add 2019-05-18, update 2021-05-02
+	else if(GlobalC::vdwd3_para.flag_vdwd3)							//jiyy add 2019-05-18, update 2021-05-02
     {
-        Vdwd3 vdwd3(ucell,vdwd3_para);
+        Vdwd3 vdwd3(GlobalC::ucell,GlobalC::vdwd3_para);
         vdwd3.cal_energy();
-        en.evdw = vdwd3.get_energy();
+        GlobalC::en.evdw = vdwd3.get_energy();
     }
 
 
@@ -532,12 +530,12 @@ void LOOP_ions::final_scf(void)
 	ELEC_scf es;
 	es.scf(0);
 
-    if(CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax")
+    if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
     {
-        ofs_running << "\n\n --------------------------------------------" << endl;
-        ofs_running << setprecision(16);
-        ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl;
-        ofs_running << " --------------------------------------------\n\n" << endl;
+        GlobalV::ofs_running << "\n\n --------------------------------------------" << endl;
+        GlobalV::ofs_running << setprecision(16);
+        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << endl;
+        GlobalV::ofs_running << " --------------------------------------------\n\n" << endl;
     }
 
     return;

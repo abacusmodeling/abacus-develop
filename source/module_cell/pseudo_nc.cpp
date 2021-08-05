@@ -231,12 +231,12 @@ void pseudo_nc::set_pseudo_atom(const Pseudopot_upf &upf)
 	// mohan 2009-12-15
 	// mohan update again 2011-05-23, 
 	// in order to calculate more accurate Vna.
-	this->rcut = PSEUDORCUT;//(a.u.);
+	this->rcut = GlobalV::PSEUDORCUT;//(a.u.);
 	
 // remember to update here if you need it.
 //	rcut = 25.0; 
 
-	OUT(ofs_running,"PAO radial cut off (Bohr)",rcut);
+	OUT(GlobalV::ofs_running,"PAO radial cut off (Bohr)",rcut);
 	if(rcut <= 0.0)
 	{
 		WARNING_QUIT("pseudo_atom::set_pseudo_atom","PAO rcut<=0.0");

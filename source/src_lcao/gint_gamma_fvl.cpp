@@ -15,7 +15,7 @@
 void Gint_Gamma::cal_force(const double*const vlocal)
 {
     timer::tick("Gint_Gamma","cal_force");
-    this->save_atoms_on_grid(GridT);
+    this->save_atoms_on_grid(GlobalC::GridT);
     this->gamma_force(vlocal);
     timer::tick("Gint_Gamma","cal_force");
 }
@@ -26,8 +26,8 @@ inline void cal_psir_ylm_dphi(
 	const double delta_r,
 	const int*const block_index,			// block_index[na_grid+1], count total number of atomis orbitals
 	const int*const block_size,  			// block_size[na_grid],	number of columns of a band
-	bool*const*const cal_flag,		        // cal_flag[pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
-	double*const*const psir_ylm,	    	// psir_ylm[pw.bxyz][LD_pool] 
+	bool*const*const cal_flag,		        // cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+	double*const*const psir_ylm,	    	// psir_ylm[GlobalC::pw.bxyz][LD_pool] 
 	double*const*const dphix, 
 	double*const*const dphiy, 
 	double*const*const dphiz,
@@ -35,20 +35,20 @@ inline void cal_psir_ylm_dphi(
 {    
     for (int id=0; id<na_grid; id++)
     {
-        const int mcell_index = GridT.bcell_start[grid_index] + id;
-        const int imcell = GridT.which_bigcell[mcell_index];
-        int iat = GridT.which_atom[mcell_index];
-        const int it = ucell.iat2it[iat];
-        const int ia = ucell.iat2ia[iat];
-        const int start = ucell.itiaiw2iwt(it, ia, 0);
-        Atom *atom = &ucell.atoms[it];
+        const int mcell_index = GlobalC::GridT.bcell_start[grid_index] + id;
+        const int imcell = GlobalC::GridT.which_bigcell[mcell_index];
+        int iat = GlobalC::GridT.which_atom[mcell_index];
+        const int it = GlobalC::ucell.iat2it[iat];
+        const int ia = GlobalC::ucell.iat2ia[iat];
+        const int start = GlobalC::ucell.itiaiw2iwt(it, ia, 0);
+        Atom *atom = &GlobalC::ucell.atoms[it];
 
 		const double mt[3]={
-			GridT.meshball_positions[imcell][0] - GridT.tau_in_bigcell[iat][0],
-			GridT.meshball_positions[imcell][1] - GridT.tau_in_bigcell[iat][1],
-			GridT.meshball_positions[imcell][2] - GridT.tau_in_bigcell[iat][2]};
+			GlobalC::GridT.meshball_positions[imcell][0] - GlobalC::GridT.tau_in_bigcell[iat][0],
+			GlobalC::GridT.meshball_positions[imcell][1] - GlobalC::GridT.tau_in_bigcell[iat][1],
+			GlobalC::GridT.meshball_positions[imcell][2] - GlobalC::GridT.tau_in_bigcell[iat][2]};
 
-        for(int ib=0; ib<pw.bxyz; ib++)
+        for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
         {
             double*const p_psir_ylm=&psir_ylm[ib][block_index[id]];
             double*const p_dphix=&dphix[ib][block_index[id]];
@@ -56,11 +56,11 @@ inline void cal_psir_ylm_dphi(
             double*const p_dphiz=&dphiz[ib][block_index[id]];
             
 			const double dr[3]={						// vectors between atom and grid
-				GridT.meshcell_pos[ib][0] + mt[0],
-				GridT.meshcell_pos[ib][1] + mt[1],
-				GridT.meshcell_pos[ib][2] + mt[2]};
+				GlobalC::GridT.meshcell_pos[ib][0] + mt[0],
+				GlobalC::GridT.meshcell_pos[ib][1] + mt[1],
+				GlobalC::GridT.meshcell_pos[ib][2] + mt[2]};
 
-            if(STRESS)
+            if(GlobalV::STRESS)
             {
                 for(int i=0;i<3;i++) 
 				{
@@ -71,7 +71,7 @@ inline void cal_psir_ylm_dphi(
 			// distance between atom and grid
             double distance = std::sqrt(dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2]);
 
-            if(distance > ORB.Phi[it].getRcut())
+            if(distance > GlobalC::ORB.Phi[it].getRcut())
             {
                 ZEROS(p_psir_ylm, block_size[id]);
                 ZEROS(p_dphix, block_size[id]);
@@ -88,11 +88,11 @@ inline void cal_psir_ylm_dphi(
             vector<vector<double>> grly;
             // >>> the old method
             // ylma[id] = new double[nnn[it]]; // liaochen found this bug 2010/03/29
-            // Ylm::get_ylm_real(ucell.atoms[it].nwl+1, this->dr[id], ylma[id]);
+            // Ylm::get_ylm_real(GlobalC::ucell.atoms[it].nwl+1, this->dr[id], ylma[id]);
             // <<<
-            // Ylm::rlylm(ucell.atoms[it].nwl+1, dr[id].x, dr[id].y, dr[id].z, rly, grly);
-            // Ylm::rlylm(ucell.atoms[it].nwl+1, dr[id].x, dr[id].y, dr[id].z, rly, grly);
-            Ylm::grad_rl_sph_harm(ucell.atoms[it].nwl, dr[0], dr[1], dr[2], rly, grly);
+            // Ylm::rlylm(GlobalC::ucell.atoms[it].nwl+1, dr[id].x, dr[id].y, dr[id].z, rly, grly);
+            // Ylm::rlylm(GlobalC::ucell.atoms[it].nwl+1, dr[id].x, dr[id].y, dr[id].z, rly, grly);
+            Ylm::grad_rl_sph_harm(GlobalC::ucell.atoms[it].nwl, dr[0], dr[1], dr[2], rly, grly);
 
             // 1E-7 is necessary in case of R is just on one grid
             // the following code is about interpolation,
@@ -153,7 +153,7 @@ inline void cal_psir_ylm_dphi(
                 // function from interpolation method.
                 if ( atom->iw2_new[iw] )
                 {
-                    const Numerical_Orbital_Lm &philn = ORB.Phi[it].PhiLN(
+                    const Numerical_Orbital_Lm &philn = GlobalC::ORB.Phi[it].PhiLN(
                             atom->iw2l[iw],
                             atom->iw2n[iw]);
 
@@ -209,7 +209,7 @@ inline void cal_psir_ylm_dphi(
                     // and the derivative.
                     else
                     {
-                        const Numerical_Orbital_Lm &philn = ORB.Phi[it].PhiLN(atom->iw2l[iw], atom->iw2n[iw]);
+                        const Numerical_Orbital_Lm &philn = GlobalC::ORB.Phi[it].PhiLN(atom->iw2l[iw], atom->iw2n[iw]);
 
                         double Zty = philn.zty;
                         p_psir_ylm[iw] = Zty * rly[idx_lm];
@@ -250,10 +250,10 @@ inline void cal_meshball_DGridV(
 	const int*const block_index,	    	    	// block_index[na_grid+1], count total number of atomis orbitals
 	const int*const block_iw, 		    	    	// block_iw[na_grid],	index of wave functions for each block
 	const int*const block_size, 	    	    	// block_size[na_grid],	number of columns of a band
-	const bool*const*const cal_flag,		        // cal_flag[pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
-	const double*const vldr3,               	    // vldr3[pw.bxyz]
-	const double*const*const psir_ylm,		        // psir_ylm[pw.bxyz][LD_pool]
-	double*const*const psir_vlbr3,              	// psir_vlbr3[pw.bxyz][LD_pool]
+	const bool*const*const cal_flag,		        // cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+	const double*const vldr3,               	    // vldr3[GlobalC::pw.bxyz]
+	const double*const*const psir_ylm,		        // psir_ylm[GlobalC::pw.bxyz][LD_pool]
+	double*const*const psir_vlbr3,              	// psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
 	const double*const*const dphix, const double*const*const dphiy, const double*const*const dphiz, 
 	double*const*const DGridV_x,  double*const*const DGridV_y,  double*const*const DGridV_z,
 	double*const*const DGridV_11, double*const*const DGridV_12, double*const*const DGridV_13,
@@ -264,7 +264,7 @@ inline void cal_meshball_DGridV(
     const double alpha=-1.0, beta=1.0;
     
     const int allnw=block_index[na_grid];
-    for(int i=0; i<pw.bxyz; ++i)
+    for(int i=0; i<GlobalC::pw.bxyz; ++i)
     {
         for(int j=0; j<allnw; ++j)
         {
@@ -272,23 +272,23 @@ inline void cal_meshball_DGridV(
         }
     }
 
-    //OUT(ofs_running,"lgd_now", lgd_now);
-    //OUT(ofs_running,"LD_pool", LD_pool);
+    //OUT(GlobalV::ofs_running,"lgd_now", lgd_now);
+    //OUT(GlobalV::ofs_running,"LD_pool", LD_pool);
     for(int ia1=0; ia1<na_grid; ++ia1)
     {
         const int iw1_lo=block_iw[ia1];
         const int idx1=block_index[ia1];
         const int m=block_size[ia1]; 
-        // OUT(ofs_running,"ia1", ia1);
-        // OUT(ofs_running,"iw1_lo", iw1_lo);
-        // OUT(ofs_running,"m", m);
+        // OUT(GlobalV::ofs_running,"ia1", ia1);
+        // OUT(GlobalV::ofs_running,"iw1_lo", iw1_lo);
+        // OUT(GlobalV::ofs_running,"m", m);
         for(int ia2=0; ia2<na_grid; ++ia2)
         {
             const int iw2_lo=block_iw[ia2];
             const int idx2=block_index[ia2];
             const int n=block_size[ia2];
 			
-           //  for(int ib=0; ib<pw.bxyz; ++ib)
+           //  for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
            //  {
            //      if(cal_flag[ib][ia1]&&cal_flag[ib][ia2]) 
            //      {
@@ -313,42 +313,42 @@ inline void cal_meshball_DGridV(
 
             
             int cal_num=0;
-            for(int ib=0; ib<pw.bxyz; ++ib)
+            for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
             {
                 if(cal_flag[ib][ia1]&&cal_flag[ib][ia2]) ++cal_num;
             }
             //++cal_flag_true;
-            //OUT(ofs_running,"cal_num:", cal_num);
-            if (cal_num > pw.bxyz/2)
+            //OUT(GlobalV::ofs_running,"cal_num:", cal_num);
+            if (cal_num > GlobalC::pw.bxyz/2)
 //            if(0)
             {
-                int k=pw.bxyz;
-                // OUT(ofs_running,"ia2", ia2);
-                // OUT(ofs_running,"iw2_lo", iw2_lo);
-                // OUT(ofs_running,"n", n);
+                int k=GlobalC::pw.bxyz;
+                // OUT(GlobalV::ofs_running,"ia2", ia2);
+                // OUT(GlobalV::ofs_running,"iw2_lo", iw2_lo);
+                // OUT(GlobalV::ofs_running,"n", n);
                 //std::cout<<"Start calculate DGridV_x"<<endl;
-                //OUT(ofs_running,"Start calculate DGridV_x");
+                //OUT(GlobalV::ofs_running,"Start calculate DGridV_x");
                 dgemm_ (&transa, &transb, &n, &m, &k, &alpha,
                     &dphix[0][idx2], &LD_pool, 
                     &psir_vlbr3[0][idx1], &LD_pool,  
                     &beta, &DGridV_x[iw1_lo][iw2_lo], &lgd_now);
                 //std::cout<<"Start calculate DGridV_y"<<endl;
-                //OUT(ofs_running,"Start calculate DGridV_y");
+                //OUT(GlobalV::ofs_running,"Start calculate DGridV_y");
                 dgemm_ (&transa, &transb, &n, &m, &k, &alpha,
                     &dphiy[0][idx2], &LD_pool, 
                     &psir_vlbr3[0][idx1], &LD_pool,  
                     &beta, &DGridV_y[iw1_lo][iw2_lo], &lgd_now);
                 //std::cout<<"Start calculate DGridV_z"<<endl;
-                //OUT(ofs_running,"Start calculate DGridV_z");
+                //OUT(GlobalV::ofs_running,"Start calculate DGridV_z");
                 dgemm_ (&transa, &transb, &n, &m, &k, &alpha,
                     &dphiz[0][idx2], &LD_pool, 
                     &psir_vlbr3[0][idx1], &LD_pool,  
                     &beta, &DGridV_z[iw1_lo][iw2_lo], &lgd_now);
 
-                if(STRESS)
+                if(GlobalV::STRESS)
                 {
 					k=1;
-					for(int ib=0; ib<pw.bxyz; ++ib)
+					for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
 					{
 						double stress_alpha1 = alpha * drr(ia2,ib,0);
 						double stress_alpha2 = alpha * drr(ia2,ib,1);
@@ -378,40 +378,40 @@ inline void cal_meshball_DGridV(
 							&psir_vlbr3[ib][idx1], &LD_pool,
 							&beta, &DGridV_33[iw1_lo][iw2_lo], &lgd_now);
 					}
-//                DGridV_11[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][0][0];
-//                DGridV_12[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][0][1];
-//                DGridV_13[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][0][2];
-//                DGridV_22[iw1_lo*GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][0][1];
-//                DGridV_23[iw1_lo*GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][0][2];
-//                DGridV_33[iw1_lo*GridT.lgd + iw2_lo] += DGridV_z[iw1_lo][iw2_lo] * drr[ia2][0][2];
+//                DGridV_11[iw1_lo*GlobalC::GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][0][0];
+//                DGridV_12[iw1_lo*GlobalC::GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][0][1];
+//                DGridV_13[iw1_lo*GlobalC::GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][0][2];
+//                DGridV_22[iw1_lo*GlobalC::GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][0][1];
+//                DGridV_23[iw1_lo*GlobalC::GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][0][2];
+//                DGridV_33[iw1_lo*GlobalC::GridT.lgd + iw2_lo] += DGridV_z[iw1_lo][iw2_lo] * drr[ia2][0][2];
                 }
             }
             else if (cal_num > 0)
             {
                 int k=1;
-                for(int ib=0; ib<pw.bxyz; ++ib)
+                for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
                 {
                     if(cal_flag[ib][ia1]&&cal_flag[ib][ia2])
                     {
-                        //OUT(ofs_running,"Start calculate DGridV_x");
+                        //OUT(GlobalV::ofs_running,"Start calculate DGridV_x");
                         dgemm_ (&transa, &transb, &n, &m, &k, &alpha,
                             &dphix[ib][idx2], &LD_pool, 
                             &psir_vlbr3[ib][idx1], &LD_pool,  
                             &beta, &DGridV_x[iw1_lo][iw2_lo], &lgd_now);
                         //std::cout<<"Start calculate DGridV_y"<<endl;
-                        //OUT(ofs_running,"Start calculate DGridV_y");
+                        //OUT(GlobalV::ofs_running,"Start calculate DGridV_y");
                         dgemm_ (&transa, &transb, &n, &m, &k, &alpha,
                             &dphiy[ib][idx2], &LD_pool, 
                             &psir_vlbr3[ib][idx1], &LD_pool,  
                             &beta, &DGridV_y[iw1_lo][iw2_lo], &lgd_now);
                         //std::cout<<"Start calculate DGridV_z"<<endl;
-                        //OUT(ofs_running,"Start calculate DGridV_z");
+                        //OUT(GlobalV::ofs_running,"Start calculate DGridV_z");
                         dgemm_ (&transa, &transb, &n, &m, &k, &alpha,
                             &dphiz[ib][idx2], &LD_pool, 
                             &psir_vlbr3[ib][idx1], &LD_pool,  
                             &beta, &DGridV_z[iw1_lo][iw2_lo], &lgd_now);
 
-                        if(STRESS)
+                        if(GlobalV::STRESS)
 						{
 							double stress_alpha1 = alpha * drr(ia2,ib,0);
 							double stress_alpha2 = alpha * drr(ia2,ib,1);
@@ -440,14 +440,14 @@ inline void cal_meshball_DGridV(
 									&dphiz[ib][idx2], &LD_pool,
 									&psir_vlbr3[ib][idx1], &LD_pool,
 									&beta, &DGridV_33[iw1_lo][iw2_lo], &lgd_now);
-							// DGridV_11[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][ib][0];
-							// DGridV_12[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][ib][1];
-							// DGridV_13[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][ib][2];
-							// DGridV_22[iw1_lo*GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][ib][1];
-							// DGridV_23[iw1_lo*GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][ib][2];
-							// DGridV_33[iw1_lo*GridT.lgd + iw2_lo] += DGridV_z[iw1_lo][iw2_lo] * drr[ia2][ib][2];
+							// DGridV_11[iw1_lo*GlobalC::GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][ib][0];
+							// DGridV_12[iw1_lo*GlobalC::GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][ib][1];
+							// DGridV_13[iw1_lo*GlobalC::GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][ib][2];
+							// DGridV_22[iw1_lo*GlobalC::GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][ib][1];
+							// DGridV_23[iw1_lo*GlobalC::GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][ib][2];
+							// DGridV_33[iw1_lo*GlobalC::GridT.lgd + iw2_lo] += DGridV_z[iw1_lo][iw2_lo] * drr[ia2][ib][2];
 							//cout<<"DGridV: "<<iw1_lo<<" "<<iw2_lo
-							//<<" "<<iw1_lo*GridT.lgd + iw2_lo<<" "
+							//<<" "<<iw1_lo*GlobalC::GridT.lgd + iw2_lo<<" "
 							//<<DGridV_x[iw1_lo][iw2_lo]<<" "
 							//<<DGridV_y[iw1_lo][iw2_lo]<<" "
 							//<<DGridV_z[iw1_lo][iw2_lo]<<" "
@@ -465,15 +465,15 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
 {
     TITLE("Grid_Integral","gamma_force");
     timer::tick("Gint_Gamma","gamma_force");
-    // GridT.lgd: local grid dimension (sub-FFT-mesh).
-    int DGridV_Size=GridT.lgd*GridT.lgd;
-    //OUT(ofs_running,"Enter gamma_force, DGridV_Size", DGridV_Size);
+    // GlobalC::GridT.lgd: local grid dimension (sub-FFT-mesh).
+    int DGridV_Size=GlobalC::GridT.lgd*GlobalC::GridT.lgd;
+    //OUT(GlobalV::ofs_running,"Enter gamma_force, DGridV_Size", DGridV_Size);
     double *DGridV_pool=new double[3*DGridV_Size];
     ZEROS(DGridV_pool, 3*DGridV_Size);
     
-    double** DGridV_x = new double*[GridT.lgd];
-    double** DGridV_y = new double*[GridT.lgd];
-    double** DGridV_z = new double*[GridT.lgd];
+    double** DGridV_x = new double*[GlobalC::GridT.lgd];
+    double** DGridV_y = new double*[GlobalC::GridT.lgd];
+    double** DGridV_z = new double*[GlobalC::GridT.lgd];
     double* DGridV_stress_pool;
     double** DGridV_11;
     double** DGridV_12;
@@ -482,40 +482,40 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
     double** DGridV_23;
     double** DGridV_33;
 
-    if(STRESS)
+    if(GlobalV::STRESS)
     {
         DGridV_stress_pool = new double[6*DGridV_Size];
         ZEROS(DGridV_stress_pool, 6*DGridV_Size);
-        DGridV_11 = new double*[GridT.lgd];
-        DGridV_12 = new double*[GridT.lgd];
-        DGridV_13 = new double*[GridT.lgd];
-        DGridV_22 = new double*[GridT.lgd];
-        DGridV_23 = new double*[GridT.lgd];
-        DGridV_33 = new double*[GridT.lgd];
-        for (int i=0; i<GridT.lgd; ++i)
+        DGridV_11 = new double*[GlobalC::GridT.lgd];
+        DGridV_12 = new double*[GlobalC::GridT.lgd];
+        DGridV_13 = new double*[GlobalC::GridT.lgd];
+        DGridV_22 = new double*[GlobalC::GridT.lgd];
+        DGridV_23 = new double*[GlobalC::GridT.lgd];
+        DGridV_33 = new double*[GlobalC::GridT.lgd];
+        for (int i=0; i<GlobalC::GridT.lgd; ++i)
         {
-            DGridV_11[i] = &DGridV_stress_pool[i*GridT.lgd];
-            DGridV_12[i] = &DGridV_stress_pool[i*GridT.lgd+DGridV_Size];
-            DGridV_13[i] = &DGridV_stress_pool[i*GridT.lgd+2*DGridV_Size];
-            DGridV_22[i] = &DGridV_stress_pool[i*GridT.lgd+3*DGridV_Size];
-            DGridV_23[i] = &DGridV_stress_pool[i*GridT.lgd+4*DGridV_Size];
-            DGridV_33[i] = &DGridV_stress_pool[i*GridT.lgd+5*DGridV_Size];
+            DGridV_11[i] = &DGridV_stress_pool[i*GlobalC::GridT.lgd];
+            DGridV_12[i] = &DGridV_stress_pool[i*GlobalC::GridT.lgd+DGridV_Size];
+            DGridV_13[i] = &DGridV_stress_pool[i*GlobalC::GridT.lgd+2*DGridV_Size];
+            DGridV_22[i] = &DGridV_stress_pool[i*GlobalC::GridT.lgd+3*DGridV_Size];
+            DGridV_23[i] = &DGridV_stress_pool[i*GlobalC::GridT.lgd+4*DGridV_Size];
+            DGridV_33[i] = &DGridV_stress_pool[i*GlobalC::GridT.lgd+5*DGridV_Size];
         }
-        Memory::record("Gint_Gamma","DGridV_stress",6*GridT.lgd*GridT.lgd,"double");
+        Memory::record("Gint_Gamma","DGridV_stress",6*GlobalC::GridT.lgd*GlobalC::GridT.lgd,"double");
     }
-    for (int i=0; i<GridT.lgd; ++i)
+    for (int i=0; i<GlobalC::GridT.lgd; ++i)
     {
-        DGridV_x[i] = &DGridV_pool[i*GridT.lgd];
-        DGridV_y[i] = &DGridV_pool[i*GridT.lgd+DGridV_Size];
-        DGridV_z[i] = &DGridV_pool[i*GridT.lgd+2*DGridV_Size];
+        DGridV_x[i] = &DGridV_pool[i*GlobalC::GridT.lgd];
+        DGridV_y[i] = &DGridV_pool[i*GlobalC::GridT.lgd+DGridV_Size];
+        DGridV_z[i] = &DGridV_pool[i*GlobalC::GridT.lgd+2*DGridV_Size];
     }
-    Memory::record("Gint_Gamma","DGridV",3*GridT.lgd*GridT.lgd,"double");
-    //OUT(ofs_running,"DGridV was allocated");
+    Memory::record("Gint_Gamma","DGridV",3*GlobalC::GridT.lgd*GlobalC::GridT.lgd,"double");
+    //OUT(GlobalV::ofs_running,"DGridV was allocated");
 
     // it's a uniform grid to save orbital values, so the delta_r is a constant.
-    const double delta_r = ORB.dr_uniform;
+    const double delta_r = GlobalC::ORB.dr_uniform;
 
-    int LD_pool=max_size*ucell.nwmax;
+    int LD_pool=max_size*GlobalC::ucell.nwmax;
     double* dphi_pool;
     
     double** dphix;
@@ -524,66 +524,66 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
 
     bool** cal_flag;
 
-    const int ncyz=pw.ncy*pw.nczp;
+    const int ncyz=GlobalC::pw.ncy*GlobalC::pw.nczp;
 
-/*    if(max_size<=0 || GridT.lgd <= 0) 
+/*    if(max_size<=0 || GlobalC::GridT.lgd <= 0) 
     {
-      //OUT(ofs_running,"max_size", max_size);
-      //OUT(ofs_running,"GridT.lgd", GridT.lgd);
+      //OUT(GlobalV::ofs_running,"max_size", max_size);
+      //OUT(GlobalV::ofs_running,"GlobalC::GridT.lgd", GlobalC::GridT.lgd);
         goto ENDandRETURN;
     }*/
-    if(max_size>0 && GridT.lgd > 0)
+    if(max_size>0 && GlobalC::GridT.lgd > 0)
     {    
-        dphi_pool=new double [3*pw.bxyz*LD_pool];
-        ZEROS(dphi_pool, 3*pw.bxyz*LD_pool);
-        dphix = new double*[pw.bxyz];
-        dphiy = new double*[pw.bxyz];
-        dphiz = new double*[pw.bxyz];    
+        dphi_pool=new double [3*GlobalC::pw.bxyz*LD_pool];
+        ZEROS(dphi_pool, 3*GlobalC::pw.bxyz*LD_pool);
+        dphix = new double*[GlobalC::pw.bxyz];
+        dphiy = new double*[GlobalC::pw.bxyz];
+        dphiz = new double*[GlobalC::pw.bxyz];    
         
-        cal_flag=new bool*[pw.bxyz];
-        for(int i=0; i<pw.bxyz; i++)
+        cal_flag=new bool*[GlobalC::pw.bxyz];
+        for(int i=0; i<GlobalC::pw.bxyz; i++)
         {
             dphix[i] = &dphi_pool[i*LD_pool];
-            dphiy[i] = &dphi_pool[i*LD_pool+pw.bxyz*LD_pool];
-            dphiz[i] = &dphi_pool[i*LD_pool+2*pw.bxyz*LD_pool];
+            dphiy[i] = &dphi_pool[i*LD_pool+GlobalC::pw.bxyz*LD_pool];
+            dphiz[i] = &dphi_pool[i*LD_pool+2*GlobalC::pw.bxyz*LD_pool];
             cal_flag[i] = new bool[max_size];
         }
 
         realArray drr;//rewrite drr form by zhengdy-2019-04-02
-        if(STRESS)
+        if(GlobalV::STRESS)
         {
-            drr.create(max_size, pw.bxyz, 3);
+            drr.create(max_size, GlobalC::pw.bxyz, 3);
             drr.zero_out();
         }    
 /*        double ***drr;//store dr for stress calculate, added by zhengdy
-        if(STRESS)//added by zhengdy-stress
+        if(GlobalV::STRESS)//added by zhengdy-stress
         {
     		drr = new double**[max_size];
     		for(int id=0; id<max_size; id++)
     		{
-    			drr[id] = new double*[pw.bxyz];
-    			for(int ib=0; ib<pw.bxyz; ib++)
+    			drr[id] = new double*[GlobalC::pw.bxyz];
+    			for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
     			{
     				drr[id][ib] = new double[3];
     				ZEROS(drr[id][ib],3);
     			}
     		}
         }*/
-        //OUT(ofs_running,"Data were prepared");
+        //OUT(GlobalV::ofs_running,"Data were prepared");
         //timer::tick("Gint_Gamma","prepare");
-        for (int i=0; i< GridT.nbx; i++)
+        for (int i=0; i< GlobalC::GridT.nbx; i++)
         {
-            const int ibx = i*pw.bx; 
+            const int ibx = i*GlobalC::pw.bx; 
 
-            for (int j=0; j< GridT.nby; j++)
+            for (int j=0; j< GlobalC::GridT.nby; j++)
             {
-                const int jby = j*pw.by;
+                const int jby = j*GlobalC::pw.by;
 
-                for (int k= GridT.nbzp_start; k< GridT.nbzp_start+GridT.nbzp; k++)
+                for (int k= GlobalC::GridT.nbzp_start; k< GlobalC::GridT.nbzp_start+GlobalC::GridT.nbzp; k++)
                 {
-                    const int kbz = k*pw.bz-pw.nczp_start; 
-                    const int grid_index = (k-GridT.nbzp_start) + j * GridT.nbzp + i * GridT.nby * GridT.nbzp;
-                    const int na_grid = GridT.how_many_atoms[ grid_index ];
+                    const int kbz = k*GlobalC::pw.bz-GlobalC::pw.nczp_start; 
+                    const int grid_index = (k-GlobalC::GridT.nbzp_start) + j * GlobalC::GridT.nbzp + i * GlobalC::GridT.nby * GlobalC::GridT.nbzp;
+                    const int na_grid = GlobalC::GridT.how_many_atoms[ grid_index ];
                     if(na_grid==0)continue;
                     
 					//------------------------------------------------------------------
@@ -603,13 +603,13 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
 					//------------------------------------------------------------------
 					int* block_size = Gint_Tools::get_block_size(na_grid, grid_index);
 
-					Gint_Tools::Array_Pool<double> psir_vlbr3(pw.bxyz, LD_pool);
-					Gint_Tools::Array_Pool<double> psir_ylm(pw.bxyz, LD_pool);
+					Gint_Tools::Array_Pool<double> psir_vlbr3(GlobalC::pw.bxyz, LD_pool);
+					Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
     
                     cal_psir_ylm_dphi(na_grid, grid_index, delta_r, 
                             block_index, block_size, cal_flag, psir_ylm.ptr_2D, dphix, dphiy, dphiz, drr);
     
-                    cal_meshball_DGridV(na_grid, GridT.lgd, LD_pool, block_index, block_iw, block_size, cal_flag, vldr3, 
+                    cal_meshball_DGridV(na_grid, GlobalC::GridT.lgd, LD_pool, block_index, block_iw, block_size, cal_flag, vldr3, 
                                 psir_ylm.ptr_2D, psir_vlbr3.ptr_2D, dphix,  dphiy, dphiz, 
                                 DGridV_x, DGridV_y, DGridV_z,
                                 DGridV_11, DGridV_12, DGridV_13,
@@ -623,17 +623,17 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
             }// j
         }// i
     
-        //OUT(ofs_running,"DGridV was calculated");
+        //OUT(GlobalV::ofs_running,"DGridV was calculated");
         delete[] dphix;
         delete[] dphiy;
         delete[] dphiz;
         delete[] dphi_pool;
-        for(int ib=0; ib<pw.bxyz; ++ib)
+        for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
 		{
             delete[] cal_flag[ib];
 		}
         delete[] cal_flag;
-        //OUT(ofs_running,"temp variables were deleted");
+        //OUT(GlobalV::ofs_running,"temp variables were deleted");
 
     }//end if, replace goto line
 //ENDandRETURN:
@@ -646,11 +646,11 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
     timer::tick("Gint_Gamma","gamma_force2");
 
 
-    //OUT(ofs_running,"Start reduce DGridV");
+    //OUT(GlobalV::ofs_running,"Start reduce DGridV");
 
-    double* tmpx = new double[NLOCAL];
-    double* tmpy = new double[NLOCAL];
-    double* tmpz = new double[NLOCAL];
+    double* tmpx = new double[GlobalV::NLOCAL];
+    double* tmpy = new double[GlobalV::NLOCAL];
+    double* tmpz = new double[GlobalV::NLOCAL];
     double* tmp11;
     double* tmp12;
     double* tmp13;
@@ -658,46 +658,46 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
     double* tmp23;
     double* tmp33;
 
-	if(STRESS)
+	if(GlobalV::STRESS)
 	{
-		tmp11 = new double[NLOCAL];
-		tmp12 = new double[NLOCAL];
-		tmp13 = new double[NLOCAL];
-		tmp22 = new double[NLOCAL];
-		tmp23 = new double[NLOCAL];
-		tmp33 = new double[NLOCAL];
+		tmp11 = new double[GlobalV::NLOCAL];
+		tmp12 = new double[GlobalV::NLOCAL];
+		tmp13 = new double[GlobalV::NLOCAL];
+		tmp22 = new double[GlobalV::NLOCAL];
+		tmp23 = new double[GlobalV::NLOCAL];
+		tmp33 = new double[GlobalV::NLOCAL];
 	}
 
-    for (int i=0; i<NLOCAL; i++)
+    for (int i=0; i<GlobalV::NLOCAL; i++)
     {
-        ZEROS(tmpx, NLOCAL);
-        ZEROS(tmpy, NLOCAL);
-		ZEROS(tmpz, NLOCAL);
+        ZEROS(tmpx, GlobalV::NLOCAL);
+        ZEROS(tmpy, GlobalV::NLOCAL);
+		ZEROS(tmpz, GlobalV::NLOCAL);
 
-		if(STRESS)
+		if(GlobalV::STRESS)
 		{
-			ZEROS(tmp11, NLOCAL);
-			ZEROS(tmp12, NLOCAL);
-			ZEROS(tmp13, NLOCAL);
-			ZEROS(tmp22, NLOCAL);
-			ZEROS(tmp23, NLOCAL);
-			ZEROS(tmp33, NLOCAL);
+			ZEROS(tmp11, GlobalV::NLOCAL);
+			ZEROS(tmp12, GlobalV::NLOCAL);
+			ZEROS(tmp13, GlobalV::NLOCAL);
+			ZEROS(tmp22, GlobalV::NLOCAL);
+			ZEROS(tmp23, GlobalV::NLOCAL);
+			ZEROS(tmp33, GlobalV::NLOCAL);
 		}
 
-        const int mu = GridT.trace_lo[i];
+        const int mu = GlobalC::GridT.trace_lo[i];
         // mohan fix bug 2010-09-05
         // lack mu>=0 and nu>=0 in previous version.
         if(mu >=0)
         {
-            for (int j=0; j<NLOCAL; j++)
+            for (int j=0; j<GlobalV::NLOCAL; j++)
             {
-                const int nu = GridT.trace_lo[j];
+                const int nu = GlobalC::GridT.trace_lo[j];
                 if(nu>=0)
                 {
                     tmpx[j] = DGridV_x[mu][nu];
                     tmpy[j] = DGridV_y[mu][nu];
                     tmpz[j] = DGridV_z[mu][nu];
-                    if(STRESS)
+                    if(GlobalV::STRESS)
                     {
                         tmp11[j] = DGridV_11[mu][nu];
                         tmp12[j] = DGridV_12[mu][nu];
@@ -713,44 +713,44 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
         // There may be overlaps of tmpx,y,z between different
         // processors, however, the true value is the sum of it.
         // so it would be totally correct.
-        Parallel_Reduce::reduce_double_pool( tmpx, NLOCAL );
-        Parallel_Reduce::reduce_double_pool( tmpy, NLOCAL );
-        Parallel_Reduce::reduce_double_pool( tmpz, NLOCAL );
-		if(STRESS)
+        Parallel_Reduce::reduce_double_pool( tmpx, GlobalV::NLOCAL );
+        Parallel_Reduce::reduce_double_pool( tmpy, GlobalV::NLOCAL );
+        Parallel_Reduce::reduce_double_pool( tmpz, GlobalV::NLOCAL );
+		if(GlobalV::STRESS)
 		{
-			Parallel_Reduce::reduce_double_pool( tmp11, NLOCAL );
-			Parallel_Reduce::reduce_double_pool( tmp12, NLOCAL );
-			Parallel_Reduce::reduce_double_pool( tmp13, NLOCAL );
-			Parallel_Reduce::reduce_double_pool( tmp22, NLOCAL );
-			Parallel_Reduce::reduce_double_pool( tmp23, NLOCAL );
-			Parallel_Reduce::reduce_double_pool( tmp33, NLOCAL );
+			Parallel_Reduce::reduce_double_pool( tmp11, GlobalV::NLOCAL );
+			Parallel_Reduce::reduce_double_pool( tmp12, GlobalV::NLOCAL );
+			Parallel_Reduce::reduce_double_pool( tmp13, GlobalV::NLOCAL );
+			Parallel_Reduce::reduce_double_pool( tmp22, GlobalV::NLOCAL );
+			Parallel_Reduce::reduce_double_pool( tmp23, GlobalV::NLOCAL );
+			Parallel_Reduce::reduce_double_pool( tmp33, GlobalV::NLOCAL );
 		}
 
-        for (int j=0; j<NLOCAL; j++)
+        for (int j=0; j<GlobalV::NLOCAL; j++)
         {
-            if (!ParaO.in_this_processor(i,j))
+            if (!GlobalC::ParaO.in_this_processor(i,j))
             {
                 continue;
             }
-            LM.set_force (i,j,tmpx[j], tmpy[j], tmpz[j],'N');
-            if(STRESS)
+            GlobalC::LM.set_force (i,j,tmpx[j], tmpy[j], tmpz[j],'N');
+            if(GlobalV::STRESS)
             {
-                const int irr = ParaO.trace_loc_row[ i ];
-                const int icc = ParaO.trace_loc_col[ j ];
-                const int index = irr * ParaO.ncol + icc;
-                LM.DHloc_fixed_11[index] += tmp11[j];
-                LM.DHloc_fixed_12[index] += tmp12[j];
-                LM.DHloc_fixed_13[index] += tmp13[j];
-                LM.DHloc_fixed_22[index] += tmp22[j];
-                LM.DHloc_fixed_23[index] += tmp23[j];
-                LM.DHloc_fixed_33[index] += tmp33[j];
+                const int irr = GlobalC::ParaO.trace_loc_row[ i ];
+                const int icc = GlobalC::ParaO.trace_loc_col[ j ];
+                const int index = irr * GlobalC::ParaO.ncol + icc;
+                GlobalC::LM.DHloc_fixed_11[index] += tmp11[j];
+                GlobalC::LM.DHloc_fixed_12[index] += tmp12[j];
+                GlobalC::LM.DHloc_fixed_13[index] += tmp13[j];
+                GlobalC::LM.DHloc_fixed_22[index] += tmp22[j];
+                GlobalC::LM.DHloc_fixed_23[index] += tmp23[j];
+                GlobalC::LM.DHloc_fixed_33[index] += tmp33[j];
             }
         }
     }
     delete[] tmpx;
     delete[] tmpy;
     delete[] tmpz;
-    if(STRESS)
+    if(GlobalV::STRESS)
     {
         delete[] tmp11;
         delete[] tmp12;
@@ -759,26 +759,26 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
         delete[] tmp23;
         delete[] tmp33;
     }
-    //OUT(ofs_running,"DGridV was reduced");
+    //OUT(GlobalV::ofs_running,"DGridV was reduced");
 
-   //OUT(ofs_running,"Start reduce DGridV");
+   //OUT(GlobalV::ofs_running,"Start reduce DGridV");
    //Parallel_Reduce::reduce_double_pool(DGridV_pool, 3*DGridV_Size );
-    // double* tmp = new double[3*NLOCAL*NLOCAL];
-    // ZEROS(tmp, 3*NLOCAL*NLOCAL);
-    // for (int i=0; i<NLOCAL; i++)
+    // double* tmp = new double[3*GlobalV::NLOCAL*GlobalV::NLOCAL];
+    // ZEROS(tmp, 3*GlobalV::NLOCAL*GlobalV::NLOCAL);
+    // for (int i=0; i<GlobalV::NLOCAL; i++)
     // {
-    //     ZEROS(tmp, 3*NLOCAL);
-    //     double* tmpx = &tmp[i*NLOCAL];
-    //     double* tmpy = &tmp[i*NLOCAL+NLOCAL*NLOCAL];
-    //     double* tmpz = &tmp[i*NLOCAL+2*NLOCAL*NLOCAL];
+    //     ZEROS(tmp, 3*GlobalV::NLOCAL);
+    //     double* tmpx = &tmp[i*GlobalV::NLOCAL];
+    //     double* tmpy = &tmp[i*GlobalV::NLOCAL+GlobalV::NLOCAL*GlobalV::NLOCAL];
+    //     double* tmpz = &tmp[i*GlobalV::NLOCAL+2*GlobalV::NLOCAL*GlobalV::NLOCAL];
     //     if(DGridV_Size>0)
     //     {
-    //         const int mu = GridT.trace_lo[i];
+    //         const int mu = GlobalC::GridT.trace_lo[i];
     //         if(mu >=0)
     //         {
-    //             for (int j=0; j<NLOCAL; j++)
+    //             for (int j=0; j<GlobalV::NLOCAL; j++)
     //             {
-    //                 const int nu = GridT.trace_lo[j];
+    //                 const int nu = GlobalC::GridT.trace_lo[j];
     //                 if(nu>=0)
     //                 {
     //                     tmpx[j] = DGridV_x[mu][nu];
@@ -790,14 +790,14 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
     //     }
     // }
     
-    // Parallel_Reduce::reduce_double_pool(tmp, 3*NLOCAL*NLOCAL);
+    // Parallel_Reduce::reduce_double_pool(tmp, 3*GlobalV::NLOCAL*GlobalV::NLOCAL);
 
-    // for (int i=0; i<NLOCAL; i++)
+    // for (int i=0; i<GlobalV::NLOCAL; i++)
     // {
-    //     for(int j=0; j<NLOCAL; ++j)
+    //     for(int j=0; j<GlobalV::NLOCAL; ++j)
     //     {
-    //         if(ParaO.in_this_processor(i,j))
-    //             LM.set_force (i,j,DGridV_x[i][j], DGridV_y[i][j], DGridV_z[i][j],'N');
+    //         if(GlobalC::ParaO.in_this_processor(i,j))
+    //             GlobalC::LM.set_force (i,j,DGridV_x[i][j], DGridV_y[i][j], DGridV_z[i][j],'N');
     //     }
     // }
     // delete[] tmp;
@@ -807,7 +807,7 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
     delete [] DGridV_x;
     delete [] DGridV_y;
     delete [] DGridV_z;
-    if(STRESS)
+    if(GlobalV::STRESS)
     {
         delete [] DGridV_11;
         delete [] DGridV_12;

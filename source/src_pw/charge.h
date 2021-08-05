@@ -33,6 +33,9 @@ public:
     complex<double>** rhog;
     complex<double>** rhog_save;
 
+	double** kin_r; //kinetic energy density in real space, for meta-GGA
+						     //wenfei 2021-07-28
+
     double *rho_core;
 	complex<double> *rhog_core;
 
@@ -76,6 +79,9 @@ public:
 
     void write_rho(const double* rho_save, const int &is, const int &iter, const string &fn, 
 		const int &precision = 11, const bool for_plot = false);//mohan add 2007-10-17
+
+    void write_rho_cube(const double* rho_save, const int &is, const string &fn, 
+		const int &precision = 11);
 
     void write_rho_dipole(const double* rho_save, const int &is, const int &iter, const string &fn, 
 		const int &precision = 11, const bool for_plot = false);//fuxiang add 2017-3-15    

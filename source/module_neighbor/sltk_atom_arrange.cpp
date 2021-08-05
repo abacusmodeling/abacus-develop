@@ -59,11 +59,11 @@ double atom_arrange::set_sr_NL(
 		//sr = 2 * longest_orb_rcut + 0.01;
 	}
 
-	// if use build_Nonlocal_mu (not GAMMA_ONLY_LOCAL) use 2*longest_orb_rcut
+	// if use build_Nonlocal_mu (not GlobalV::GAMMA_ONLY_LOCAL) use 2*longest_orb_rcut
 	// if use build_Nonlocal_beta ( K-point used ) use 2 * (longest_orb_rcut + longest_nl_proj_rcut) 
 	return sr;			
-//	cout << " SEARCH RADIUS (BOHR) : " << SEARCH_RADIUS << endl;
-//	OUT(ofs_in,"search radius (Bohr)", SEARCH_RADIUS);
+//	cout << " SEARCH RADIUS (BOHR) : " << GlobalV::SEARCH_RADIUS << endl;
+//	OUT(ofs_in,"search radius (Bohr)", GlobalV::SEARCH_RADIUS);
 }
 /*
 // mohan update 2011-03-10
@@ -78,10 +78,10 @@ void atom_arrange::set_sr_OV(void)
 //	cout << " LONGEST ORB RCUT     : " << longest_orb_rcut << endl;
 	OUT(ofs_in,"longest orb rcut (Bohr)",longest_orb_rcut);
 	double sr = 2 * longest_orb_rcut + 0.01;
-	// if use build_Nonlocal_mu (not GAMMA_ONLY_LOCAL) use 2*longest_orb_rcut
+	// if use build_Nonlocal_mu (not GlobalV::GAMMA_ONLY_LOCAL) use 2*longest_orb_rcut
 	// if use build_Nonlocal_beta ( K-point used ) use 2 * (longest_orb_rcut + longest_nl_proj_rcut) 
-	SEARCH_RADIUS = sr;			
-//	cout << " SEARCH RADIUS (BOHR) : " << SEARCH_RADIUS << endl;
+	GlobalV::SEARCH_RADIUS = sr;			
+//	cout << " SEARCH RADIUS (BOHR) : " << GlobalV::SEARCH_RADIUS << endl;
 	return;
 }
 */
@@ -100,11 +100,11 @@ void atom_arrange::search(
 
 	assert( search_radius_bohr > 0.0 );
 
-//	OUT(ofs_in,"Atom coordinates reading from",global_atom_card);
+//	OUT(ofs_in,"Atom coordinates reading from",GlobalV::global_atom_card);
 //	OUT(ofs_in,"The coordinate type",ucell.Coordinate);
 //	OUT(ofs_in,"Use cartesian(unit:lat0) coordinate","TRUE");
-//	if(OUT_LEVEL != "m") OUT(ofs_in,"searching radius is (Bohr))", search_radius_bohr);
-//	if(OUT_LEVEL != "m") OUT(ofs_in,"searching radius unit is (Bohr))",ucell.lat0);
+//	if(GlobalV::OUT_LEVEL != "m") OUT(ofs_in,"searching radius is (Bohr))", search_radius_bohr);
+//	if(GlobalV::OUT_LEVEL != "m") OUT(ofs_in,"searching radius unit is (Bohr))",ucell.lat0);
 
 	OUT(ofs_in,"searching radius is (Bohr))", search_radius_bohr);
 	OUT(ofs_in,"searching radius unit is (Bohr))",ucell.lat0);
@@ -168,7 +168,7 @@ void atom_arrange::search(
 //2015-05-07
 void atom_arrange::delete_vector(
 	ofstream &ofs_in,
-	const bool pbc_flag, // SEARCH_PBC
+	const bool pbc_flag, // GlobalV::SEARCH_PBC
 	Grid_Driver &grid_d, 
 	const UnitCell &ucell, 
 	const double &search_radius_bohr, 

@@ -1,12 +1,18 @@
 # Download and install
 
-- [Structure of the package](#structure-of-the-package)
-  - [Structure of source code](#structure-of-source-code)
 - [Installation](#installation)
   - [Prerequisites](#prerequisites)
+  - [Build and install ABACUS with CMake](#build-and-install-abacus-with-cmake)
+  - [Build ABACUS with make](#build-abacus-with-make)
+    - [Link LIBXC](#link-libxc)
+- [Structure of the package](#structure-of-the-package)
+  - [Structure of source code](#structure-of-source-code)
+  
   - [Building the program](#building-the-program)
-
-  [back to main page](#../install.md)  
+- [Installation with DeePKS](#installation-with-deepks)
+  - [Extra prerequisites](#extra-prerequisites)
+  - [Extra settings for building](#extra-settings-for-building)
+  [back to main page](../README.md) 
 
 # Structure of the package
 Under the ABACUS directory, there are the following subdirectories:
@@ -51,11 +57,10 @@ The source directory further contains the following folders, where the source fi
 - src_pw
 - src_ri
 
-[back to top](#download-and-install)
+## Installation
 
-# Installation
+### Prerequisites
 
-## Prerequisites
 In order to compile ABACUS, users should make sure that the following prerequisites are
 present:
 
@@ -72,35 +77,70 @@ FFTW3;
 
 [back to top](#download-and-install)
 
-## Building the program
-Before starting to build the program, note that if you are using Intel MKL library, please set the following environmental variable:
+### Build and install ABACUS with CMake
+
+We recommend building ABACUS with `cmake` to avoid dependency issues.
+ABACUS requires a minimum `cmake` version of `3.18`. Check the version of `cmake`  on your machine with:
+
+```bash
+cmake --version
+```
+
+You can specify the bin path of ABACUS binary to install by `CMAKE_INSTALL_PREFIX`. If no install prefix is specified, the binary will be installed to `/usr/local/bin/abacus` by default.
+
+```bash
+cmake -B build -DCMAKE_INSTALL_PREFIX=${ABACUS_BIN_PATH}
+```
+
+You can provide path of each dependent package if the package cannot be automatically found by cmake.
+Keys `LAPACK_DIR`, `SCALAPACK_DIR`, `ELPA_DIR`, `FFTW3_DIR`, `CEREAL_INCLUDEDIR`, `BOOST_INCLUDEDIR`, `MPI_CXX_COMPILER` and `MKL_DIR` are currently available to specify.
+For example:
+
+```bash
+cmake -B build -DFFTW3_ROOT=/opt/fftw3 -DBOOST_INCLUDEDIR=/usr/include/boost
+```
+
+After configuring, start build and install by:
+
+```bash
+cmake --build build
+cmake --install build
+```
+
+[back to top](#download-and-install)
+
+### Build ABACUS with make
+
+<!-- Before starting to build the program, note that if you are using Intel MKL library, please set the following environmental variable:
 
 ```bash
 export MKL_NUM_THREAD=1
-```
+``` -->
 
-To compile the ABACUS program, go to the source directory:
+To compile the ABACUS program using legacy `make`, first edit the file `Makefile.vars` under `source` directory:
+
 ```bash
 cd source/
-```
-Then open and edit the file `Makefile.vars` using any editor tools you like, e.g., vi:
-```bash
 vi Makefile.vars
 ```
+
 Specify the location of the compiler and libraries present in your own machine:
-```
+
+```bash
 CPLUSPLUS =
 CPLUSPLUS_MPI =
 FORTRAN =
 LAPACK_DIR =
 FFTW_DIR =
-BOOST_DIR = 
+BOOST_DIR =
 ELPA_DIR =
 CEREAL_DIR =
 ```
+
 For example, below is a case where the Intel C++ compiler, Intel MPI are used, along with Intel MKL library. The file Makefile.vars can be set as
 follows:
-```
+
+```bash
 CPLUSPLUS = icpc
 CPLUSPLUS_MPI = mpiicpc
 FORTRAN = ifort
@@ -110,8 +150,10 @@ BOOST_DIR = /opt/boost/1.64.0/
 ELPA_DIR = /opt/elpa/2016.05.004/
 CEREAL_DIR = /opt/cereal/
 ```
+
 Another example is where GCC, GFORTRAN, MPICH and ScaLAPACK are used:
-```
+
+```bash
 CPLUSPLUS = g++
 CPLUSPLUS_MPI = mpicxx
 FORTRAN = gfortran
@@ -121,22 +163,97 @@ BOOST_DIR = /opt/boost/1.64.0/
 ELPA_DIR = /opt/elpa/2016.05.004/
 CEREAL_DIR = /opt/cereal/
 ```
+
 For this option, it is further required to set the parameter `LIBS` in `Makefile.system`:
-```
-LIBS = \
--lgfortran -lm \
--openmp -lpthread \
-${SCALAPACK_DIR}/lib/libscalapack.a \
-/opt/lapack/lib/liblapack.a \
-/opt/blas/lib/libblas.a \
-/opt/blacs/lib/libblacs.a \
-${FFTW_LIB} \
-${ELPA_LIB} \
-```
-After modifying the `Makefile.vars` file, to build the program, simply type
+
 ```bash
-make
+LIBS = \
+  -lgfortran -lm \
+  -openmp -lpthread \
+  ${SCALAPACK_DIR}/lib/libscalapack.a \
+  /opt/lapack/lib/liblapack.a \
+  /opt/blas/lib/libblas.a \
+  /opt/blacs/lib/libblacs.a \
+  ${FFTW_LIB} \
+  ${ELPA_LIB} \
+
 ```
-If the compilation finishes without error messages (except perhaps for some warnings), an executable program `ABACUS.mpi` will be created in directory `bin/`
+
+After modifying the `Makefile.vars` file, execute `make` to build the program.
+
+```bash
+make -j
+```
+
+After the compilation finishes without error messages (except perhaps for some warnings), an executable program `ABACUS.mpi` will be created in directory `bin/`.
+
+[back to top](#download-and-install)
+
+#### Link LIBXC
+
+The program compiled using the above instructions do not link with LIBXC and use exchange-correlation functionals as written in the ABACUS program. However, for some functionals (such as HSE hybrid functional), LIBXC is required.
+
+To compile ABACUS with LIBXC, modifications should be made in three files:
+
+First of all, in the file `Makefile.vars`, apart from the variables above, further provide the location of LIBXC:
+```bash
+LIBXC_DIR =
+```
+
+Then, in the file 'Makefile.system', add "${LIBXC_LIB}" to the `LIBS` flag, for example:
+```
+LIBS = -lifcore -lm -lpthread ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB} ${LIBXC_LIB}
+```
+
+Finally, in `Makefile`, add "-DUSE_LIBXC" to the `HONG` flag, for example:
+```
+HONG_MPI_SELINV_20210523 = -D__FP ${HONG_FFTW} ${HONG_LAPACK} -D__LCAO -D__MPI -D__OPENMP -D__SELINV -DMETIS -DEXX_DM=3 -DEXX_H_COMM=2 -DTEST_EXX_LCAO=0 -DTEST_EXX_RADIAL=1 -DUSE_CEREAL_SERIALIZATION -D__EXX -DUSE_LIBXC
+HONG=${HONG_MPI_SELINV_20210523}
+```
+
+[back to top](#download-and-install)
+
+
+# Installation with DeePKS
+
+This part of installation is based on [Installation](#installation). If DeePKS feature is requied for [DeePKS-kit](https://github.com/deepmodeling/deepks-kit), the following prerequisites and steps are needed:
+
+## Extra prerequisites
+- C++ compiler, supporting **C++14**. For example, Intel C++ compiler 18
+- [LibTorch](https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.9.0%2Bcpu.zip) for cpu, with c++11 ABI;
+- [Libnpy](https://github.com.cnpmjs.org/llohse/libnpy/);
+
+## Extra settings for building
+
+### Using Cmake
+
+```
+cmake -B build -DENABLE_DEEPKS=1
+``` 
+
+### Using Makefile
+Set `LIBTORCH_DIR`and `LIBNPY_DIR`in `Makefile.vars`. For example: 
+```
+LIBTORCH_DIR = /opt/libtorch/
+LIBNPY_DIR = /opt/libnpy/
+```
+
+In `Makefile.system`, add `LIBTORCH_LIB` to  `LIBS`, then set `-std=c++14` in `OPTS`:
+```
+LIBS = -lifcore -lm -lpthread ${LIBTORCH_LIB} ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB}	#for DeePKS
+#LIBS = -lifcore -lm -lpthread ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB}
+```
+```
+OPTS = ${INCLUDES} -Ofast -traceback -std=c++14 -simd -march=native -xHost -m64 -qopenmp -Werror -Wall -pedantic -g
+```
+
+In `Makefile`, set the Macro as `HONG_DEEPKS`:
+```
+#!!!!!!!!!!!!!!!!!!!! CHANE HERE IF YOU LIKE !!!!!!!!!!!!!!
+#! change series version or parallel version~~~
+#HONG=${HONG_MPI_SELINV_20210523}
+#HONG=${HONG_SER_SELINV}
+HONG=${HONG_DEEPKS}
+```
 
 [back to top](#download-and-install)

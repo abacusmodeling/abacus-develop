@@ -75,6 +75,8 @@ diago_cg.o\
 electrons.o \
 efield.o \
 energy.o \
+energy_dos_pw.o\
+dos.o\
 forces.o\
 global.o \
 hamilt_pw.o \
@@ -87,6 +89,7 @@ magnetism.o\
 occupy.o\
 potential.o \
 potential_libxc.o \
+potential_libxc_meta.o \
 pw_basis.o\
 pw_complement.o\
 soc.o\
@@ -137,6 +140,7 @@ read_atoms.o\
 read_cell_pseudopots.o\
 write_pot.o\
 write_rho.o\
+write_rho_cube.o\
 chi0_standard.o\
 numerical_basis.o\
 numerical_descriptor.o\

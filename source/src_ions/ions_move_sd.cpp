@@ -116,7 +116,7 @@ void Ions_Move_SD::cal_tradius_sd(void)const
 	{
 		WARNING_QUIT("Ions_Move_SD::cal_tradius_sd","istep < 1!");	
 	}
-	if(OUT_LEVEL=="ie")
+	if(GlobalV::OUT_LEVEL=="ie")
 	{
 		cout << " SD RADIUS (Bohr)     : " << trust_radius << endl;
 	}

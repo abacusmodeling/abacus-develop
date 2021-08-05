@@ -24,6 +24,7 @@ class Local_Orbital_Charge
 	void allocate_gamma(const Grid_Technique &gt);
 
 	void gamma_file(const Grid_Technique &gt);
+	void cal_dk_gamma_from_2D_pub(void);
 
 
 	//-----------------
@@ -31,6 +32,7 @@ class Local_Orbital_Charge
 	//-----------------
 	void allocate_DM_k(void);
 	
+	void kpt_file(const Grid_Technique &gt);
 
 	// liaochen modify on 2010-3-23 
 	// change its state from private to public

@@ -42,6 +42,10 @@ trust_radius_ini 0.5
 
     Broyden-Fletcher-Goldfarb-Shanno (BFGS) algorithm
 
+- `cg_bfgs`
+
+    A mixed cg-bfgs method. For detail description, check out the variable cg_threshold in the [list of input keywords](../input-main.md#cg-threshold).
+
 - `sd`
 
     steepest descend algorithm. The CG method is recommended.

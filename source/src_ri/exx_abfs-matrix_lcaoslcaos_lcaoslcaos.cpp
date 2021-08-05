@@ -13,13 +13,13 @@ void Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::init(
 	// (1) MOT: make overlap table.
 	//=========================================
 	MOT.allocate(
-		ORB.get_ntype(),							// number of atom types
-		ORB.get_lmax(),								// max L used to calculate overlap
-		static_cast<int>(ORB.get_kmesh() * kmesh_times) | 1,			// kpoints, for integration in k space
-		ORB.get_Rmax() * rmesh_times,				// max value of radial table
-		ORB.get_dR(),								// delta R, for making radial table
-//		ORB.get_dk() / kmesh_times);				// delta k, for integration in k space
-		ORB.get_dk());											// Peize Lin change 2017-04-16
+		GlobalC::ORB.get_ntype(),							// number of atom types
+		GlobalC::ORB.get_lmax(),								// max L used to calculate overlap
+		static_cast<int>(GlobalC::ORB.get_kmesh() * kmesh_times) | 1,			// kpoints, for integration in k space
+		GlobalC::ORB.get_Rmax() * rmesh_times,				// max value of radial table
+		GlobalC::ORB.get_dR(),								// delta R, for making radial table
+//		GlobalC::ORB.get_dk() / kmesh_times);				// delta k, for integration in k space
+		GlobalC::ORB.get_dk());											// Peize Lin change 2017-04-16
 	int Lmax_used, Lmax;
 	MOT.init_Table_Spherical_Bessel (4,mode, Lmax_used, Lmax, Exx_Abfs::Lmax);
 //	MOT.init_OV_Tpair();							// for MOT.OV_L2plus1
@@ -94,7 +94,7 @@ void Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::init_radial_table( map<size_t,map<s
 			set<size_t> radials;
 			for( const double &R : Rs[co1.first][co2.first] )
 			{
-				const double position = R * ucell.lat0 / MOT.dr;
+				const double position = R * GlobalC::ucell.lat0 / MOT.dr;
 				const size_t iq = static_cast<size_t>(position);
 				for( size_t i=0; i!=4; ++i )
 					radials.insert(iq+i);
@@ -113,10 +113,10 @@ void Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::init_radial_table( map<size_t,map<s
 	for( auto &co1 : center2_orb22_s )
 	{
 		const size_t T = co1.first;
-		for (size_t IA=0; IA!=ucell.atoms[T].na; ++IA)
+		for (size_t IA=0; IA!=GlobalC::ucell.atoms[T].na; ++IA)
 		{
-			const Vector3<double> &tauA( ucell.atoms[T].tau[IA] );
-			GridD.Find_atom(tauA);
+			const Vector3<double> &tauA( GlobalC::ucell.atoms[T].tau[IA] );
+			GlobalC::GridD.Find_atom(tauA);
 
 			for( auto &co2 : co1.second )
 			{
@@ -126,11 +126,11 @@ void Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::init_radial_table( map<size_t,map<s
 					for( auto &co3 : co2.second )
 					{
 
-						for (int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
+						for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ++ad)
 						{
-							if( T != GridD.getType(ad) )
+							if( T != GlobalC::GridD.getType(ad) )
 								continue;
-							const Vector3<double> &tauB( GridD.getAdjacentTau(ad) );
+							const Vector3<double> &tauB( GlobalC::GridD.getAdjacentTau(ad) );
 
 							for( auto &co4 : co3.second )
 							{
@@ -162,16 +162,16 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslca
 	for( auto &co1 : center2_orb22_s )
 	{
 		const int TA = co1.first;
-		for (int IA=0; IA!=ucell.atoms[TA].na; ++IA)
+		for (int IA=0; IA!=GlobalC::ucell.atoms[TA].na; ++IA)
 		{
-			const Vector3<double> &tauA( ucell.atoms[TA].tau[IA] );
+			const Vector3<double> &tauA( GlobalC::ucell.atoms[TA].tau[IA] );
 
 			for( auto &co2 : co1.second )
 			{
 				const size_t TB = co2.first;
-				for ( int IB=0; IB!=ucell.atoms[TB].na; ++IB )
+				for ( int IB=0; IB!=GlobalC::ucell.atoms[TB].na; ++IB )
 				{
-					const Vector3<double> &tauB( ucell.atoms[TB].tau[IB] );	
+					const Vector3<double> &tauB( GlobalC::ucell.atoms[TB].tau[IB] );	
 					
 					matrixes[TA][IA][TB][IB].create( index_r[TA].count_size, index_c[TB].count_size );			
 														
@@ -192,7 +192,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslca
 										for( int MB=0; MB!=2*LB+1; ++MB)
 										{
 											matrixes[TA][IA][TB][IB]( index_r[TA][LA][NA][MA], index_c[TB][LB][NB][MB] ) 
-											= co6.second.cal_overlap( tauA*ucell.lat0, tauB*ucell.lat0, MA, MA, MB, MB );
+											= co6.second.cal_overlap( tauA*GlobalC::ucell.lat0, tauB*GlobalC::ucell.lat0, MA, MA, MB, MB );
 											
 											// Peize Lin test
 //											cout<<TA<<"\t"<<IA<<"\t"<<TB<<"\t"<<IB<<"\t"<<LA<<"\t"<<MA<<"\t"<<NA<<"\t"<<LB<<"\t"<<MB<<"\t"<<NB<<"\t"<<endl; //co6.second.olm[0]<<endl;
@@ -224,7 +224,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslca
 	ss<<T<<endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }		
-		for (int IA=0; IA!=ucell.atoms[T].na; ++IA)
+		for (int IA=0; IA!=GlobalC::ucell.atoms[T].na; ++IA)
 		{
 // Peize Lin test 2015-04-05
 {
@@ -232,7 +232,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslca
 	ss<<" "<<IA<<endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }			
-			const Vector3<double> &tauA( ucell.atoms[T].tau[IA] );
+			const Vector3<double> &tauA( GlobalC::ucell.atoms[T].tau[IA] );
 
 			for( auto &co2 : co1.second )
 			{
@@ -259,7 +259,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslca
 	ss<<"    "<<co3.first<<endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }						
-						for (int IB=0; IB!=ucell.atoms[T].na; ++IB)
+						for (int IB=0; IB!=GlobalC::ucell.atoms[T].na; ++IB)
 						{
 // Peize Lin test 2015-04-05
 {
@@ -267,7 +267,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslca
 	ss<<"     "<<IB<<endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }							
-							const Vector3<double> &tauB( ucell.atoms[T].tau[IB] );
+							const Vector3<double> &tauB( GlobalC::ucell.atoms[T].tau[IB] );
 
 							for( auto &co4 : co3.second )
 							{

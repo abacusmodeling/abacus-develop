@@ -61,7 +61,7 @@ void energy::calculate_harris(const int &flag)
 #ifdef __LCAO
         if(INPUT.dft_plus_u) 
 		{
-			this->etot_harris += dftu.EU;  //Energy correction from DFT+U; Quxin adds on 20201029
+			this->etot_harris += GlobalC::dftu.EU;  //Energy correction from DFT+U; Quxin adds on 20201029
 		}
 #endif
 	}
@@ -101,7 +101,7 @@ void energy::calculate_etot(void)
 #ifdef __LCAO
     if(INPUT.dft_plus_u) 
 	{
-		this->etot += dftu.EU;																	  
+		this->etot += GlobalC::dftu.EU;																	  
 	}
 #endif
 	return;	
@@ -120,18 +120,18 @@ void energy::print_etot(
 	TITLE("energy","print_etot");
 	this->iter = iter_in;
 
-	ofs_running << setprecision(12);
-	ofs_running << setiosflags(ios::left);
+	GlobalV::ofs_running << setprecision(12);
+	GlobalV::ofs_running << setiosflags(ios::left);
 
-	ofs_running << "\n Density error is " << dr2 << endl;
+	GlobalV::ofs_running << "\n Density error is " << dr2 << endl;
 
-	if(OUT_LEVEL != "m") //xiaohui add "OUT_LEVEL", 2015-09-16
+	if(GlobalV::OUT_LEVEL != "m") //xiaohui add "OUT_LEVEL", 2015-09-16
 	{
-		if(BASIS_TYPE=="pw")OUT(ofs_running,"Error Threshold",ethr); //xiaohui add 2013-09-02
+		if(GlobalV::BASIS_TYPE=="pw")OUT(GlobalV::ofs_running,"Error Threshold",ethr); //xiaohui add 2013-09-02
 
-		if( this->printe>0 && ( (iter+1) % this->printe == 0 || converged || iter == NITER) )	
+		if( this->printe>0 && ( (iter+1) % this->printe == 0 || converged || iter == GlobalV::NITER) )	
 		{
-			ofs_running << "\n " << setw(12) << "Energy" << setw(30) << "Rydberg" << setw(30) << "eV" << endl;
+			GlobalV::ofs_running << "\n " << setw(12) << "Energy" << setw(30) << "Rydberg" << setw(30) << "eV" << endl;
 			this->print_format("E_KohnSham",etot);
 			this->print_format("E_Harris",etot_harris);
 			this->print_format("E_band",eband);
@@ -142,11 +142,11 @@ void energy::print_etot(
 			this->print_format("E_demet",demet); //mohan add 2011-12-02
 			this->print_format("E_descf",descf);
 			this->print_format("E_efield",Efield::etotefield);
-			if(vdwd2_para.flag_vdwd2)					//Peize Lin add 2014-04, update 2021-03-09
+			if(GlobalC::vdwd2_para.flag_vdwd2)					//Peize Lin add 2014-04, update 2021-03-09
 			{
 				this->print_format("E_vdwD2",evdw);
 			}
-			if(vdwd3_para.flag_vdwd3)					//jiyy add 2019-05, update 2021-05-02
+			if(GlobalC::vdwd3_para.flag_vdwd3)					//jiyy add 2019-05, update 2021-05-02
 			{
 				this->print_format("E_vdwD3",evdw);
 			}
@@ -154,12 +154,12 @@ void energy::print_etot(
 		}
 		else
 		{
-			ofs_running << "\n " << setw(12) << "Energy" << setw(30) << "Rydberg" << setw(30) << "eV" << endl;
+			GlobalV::ofs_running << "\n " << setw(12) << "Energy" << setw(30) << "Rydberg" << setw(30) << "eV" << endl;
 			this->print_format("E_KohnSham",etot);
 			this->print_format("E_Harris",etot_harris);
 		}
 
-		if(TWO_EFERMI)
+		if(GlobalV::TWO_EFERMI)
 		{
 			this->print_format("E_Fermi_up",ef_up);
 			this->print_format("E_Fermi_dw",ef_dw);
@@ -180,27 +180,27 @@ void energy::print_etot(
 
 	//xiaohui add 2013-09-02, Peize Lin update 2020.11.14
     string label;
-	if(KS_SOLVER=="cg")
+	if(GlobalV::KS_SOLVER=="cg")
 	{
 		label = "CG";
 	}
-	else if (KS_SOLVER=="lapack")
+	else if (GlobalV::KS_SOLVER=="lapack")
 	{
 		label = "LA";
 	}
-    else if(KS_SOLVER=="hpseps")
+    else if(GlobalV::KS_SOLVER=="hpseps")
 	{
 		label = "HP";
 	}
-    else if(KS_SOLVER=="genelpa")
+    else if(GlobalV::KS_SOLVER=="genelpa")
 	{
         label = "GE";
 	}
-	else if(KS_SOLVER=="dav")
+	else if(GlobalV::KS_SOLVER=="dav")
 	{
 		label = "DA";
 	}
-    else if(KS_SOLVER=="scalapack_gvx")
+    else if(GlobalV::KS_SOLVER=="scalapack_gvx")
 	{
         label = "GV";
 	}
@@ -217,7 +217,7 @@ void energy::print_etot(
 
 	if(!print) return;
 
-	if(OUT_LEVEL=="ie" || OUT_LEVEL=="m") //xiaohui add 'm' option, 2015-09-16
+	if(GlobalV::OUT_LEVEL=="ie" || GlobalV::OUT_LEVEL=="m") //xiaohui add 'm' option, 2015-09-16
 	{
 		cout << " " << setw(7) << ss.str();
 		//cout << setiosflags(ios::fixed);
@@ -227,53 +227,53 @@ void energy::print_etot(
 			cout << setiosflags(ios::scientific);
 		}
 
-		if(COLOUR)
+		if(GlobalV::COLOUR)
 		{
-			if(MY_RANK==0)
+			if(GlobalV::MY_RANK==0)
 			{
-				//printf( "\e[36m%-15f\e[0m", en.etot);	
-				printf( "[36m%-15f[0m", en.etot);	
-				if(NSPIN==2)
+				printf( "\e[36m%-15f\e[0m", GlobalC::en.etot);	
+				//printf( "[36m%-15f[0m", GlobalC::en.etot);	
+				if(GlobalV::NSPIN==2)
 				{
 					cout << setprecision(2);
-					cout<<setw(10)<<ucell.magnet.tot_magnetization;
-					cout<<setw(10)<<ucell.magnet.abs_magnetization;
+					cout<<setw(10)<<GlobalC::ucell.magnet.tot_magnetization;
+					cout<<setw(10)<<GlobalC::ucell.magnet.abs_magnetization;
 				}
-				else if(NSPIN==4 && NONCOLIN)
+				else if(GlobalV::NSPIN==4 && GlobalV::NONCOLIN)
 				{
 					cout << setprecision(2);
-					cout<<setw(10)<<ucell.magnet.tot_magnetization_nc[0]
-					<<setw(10)<<ucell.magnet.tot_magnetization_nc[1]
-					<<setw(10)<<ucell.magnet.tot_magnetization_nc[2];
-					cout<<setw(10)<<ucell.magnet.abs_magnetization;
+					cout<<setw(10)<<GlobalC::ucell.magnet.tot_magnetization_nc[0]
+					<<setw(10)<<GlobalC::ucell.magnet.tot_magnetization_nc[1]
+					<<setw(10)<<GlobalC::ucell.magnet.tot_magnetization_nc[2];
+					cout<<setw(10)<<GlobalC::ucell.magnet.abs_magnetization;
 				}
 				if(dr2>1.0)
 				{
 					// 31 is red
-					//printf( "\e[31m%-14e\e[0m", dr2);
-					printf( "[31m%-14e[0m", dr2);
+					printf( "\e[31m%-14e\e[0m", dr2);
+					//printf( "[31m%-14e[0m", dr2);
 				}
 				else
 				{
 					// 32 is green
-					//printf( "\e[32m%-14e\e[0m", dr2);
-					printf( "[32m%-14e[0m", dr2);
+					printf( "\e[32m%-14e\e[0m", dr2);
+					//printf( "[32m%-14e[0m", dr2);
 				}
 				// 34 is blue
-				//printf( "\e[36m%-15f\e[0m", en.etot*Ry_to_eV);	
-				printf( "[36m%-15f[0m", en.etot*Ry_to_eV);	
+				printf( "\e[36m%-15f\e[0m", GlobalC::en.etot*Ry_to_eV);	
+				//printf( "[36m%-15f[0m", GlobalC::en.etot*Ry_to_eV);	
 				cout << setprecision(3);
-	//			cout << setw(11) << en.eband;
+	//			cout << setw(11) << GlobalC::en.eband;
 	//			cout << setw(11) << H_Hartree_pw::hartree_energy;
-	//			cout << setw(11) << en.etxc - en.etxcc;
+	//			cout << setw(11) << GlobalC::en.etxc - GlobalC::en.etxcc;
 				cout << resetiosflags(ios::scientific);
-				//if(DIAGO_TYPE=="cg") xiaohui modify 2013-09-02
-				if(KS_SOLVER=="cg") //xiaohui add 2013-09-02
+				//if(GlobalV::DIAGO_TYPE=="cg") xiaohui modify 2013-09-02
+				if(GlobalV::KS_SOLVER=="cg") //xiaohui add 2013-09-02
 				{
 					cout << setw(11) << avg_iter;
 				}
 				//xiaohui modified 2013-03-23
-				//else if(DIAGO_TYPE=="selinv")
+				//else if(GlobalV::DIAGO_TYPE=="selinv")
 				//{
 					// because Selinv::iter starts from 0.
 				//	cout << setw(11) << Selinv::iter;
@@ -285,29 +285,29 @@ void energy::print_etot(
 		else
 		{
 			cout << setprecision(prec);
-			//cout << setw(15) << en.etot;
-			if(NSPIN==2)
+			//cout << setw(15) << GlobalC::en.etot;
+			if(GlobalV::NSPIN==2)
 			{
 				cout << setprecision(2);
-				cout<<setw(10)<<ucell.magnet.tot_magnetization;
-				cout<<setw(10)<<ucell.magnet.abs_magnetization;
+				cout<<setw(10)<<GlobalC::ucell.magnet.tot_magnetization;
+				cout<<setw(10)<<GlobalC::ucell.magnet.abs_magnetization;
 			}
 			cout << setprecision(6);
-			cout << setw(15) << en.etot*Ry_to_eV;
-                        cout << setw(15) << (en.etot - en.etot_old) *Ry_to_eV;  //pengfei Li added 2015-1-31
+			cout << setw(15) << GlobalC::en.etot*Ry_to_eV;
+                        cout << setw(15) << (GlobalC::en.etot - GlobalC::en.etot_old) *Ry_to_eV;  //pengfei Li added 2015-1-31
                         cout << setprecision(3);
                         cout << setw(11) << dr2;
 			cout << setprecision(3);
-	//		cout << setw(11) << en.eband;
+	//		cout << setw(11) << GlobalC::en.eband;
 	//		cout << setw(11) << H_Hartree_pw::hartree_energy;
-	//		cout << setw(11) << en.etxc - en.etxcc;
-			//if(DIAGO_TYPE=="cg") xiaohui modify 2013-09-02
-			if(KS_SOLVER=="cg") //xiaohui add 2013-09-02
+	//		cout << setw(11) << GlobalC::en.etxc - GlobalC::en.etxcc;
+			//if(GlobalV::DIAGO_TYPE=="cg") xiaohui modify 2013-09-02
+			if(GlobalV::KS_SOLVER=="cg") //xiaohui add 2013-09-02
 			{
 				cout << setw(11) << avg_iter;
 			}
 			//xiaohui modified 2013-03-23
-			//else if(DIAGO_TYPE=="selinv")
+			//else if(GlobalV::DIAGO_TYPE=="selinv")
 			//{
 				// because Selinv::iter starts from 0.
 			//	cout << setw(11) << Selinv::iter+1;
@@ -327,12 +327,12 @@ void energy::print_etot(
 
 void energy::print_format(const string &name, const double &value)
 {
-	ofs_running << setiosflags(ios::showpos);
+	GlobalV::ofs_running << setiosflags(ios::showpos);
 	stringstream name2;
 	name2 << name;
-	ofs_running << " " << setw(12) << name2.str() << setw(30) <<  value 
+	GlobalV::ofs_running << " " << setw(12) << name2.str() << setw(30) <<  value 
 	<< setw(30) << value * Ry_to_eV << endl;
-	ofs_running << resetiosflags(ios::showpos);
+	GlobalV::ofs_running << resetiosflags(ios::showpos);
 	return;
 }
 
@@ -346,23 +346,23 @@ double energy::delta_e(void)
 
     double deband_aux = 0.0;
 
-    for (int ir=0; ir<pw.nrxx; ir++) deband_aux -= CHR.rho[0][ir] * pot.vr(0, ir);
+    for (int ir=0; ir<GlobalC::pw.nrxx; ir++) deband_aux -= GlobalC::CHR.rho[0][ir] * GlobalC::pot.vr(0, ir);
 
-    if (NSPIN == 2)
+    if (GlobalV::NSPIN == 2)
     {
-        for (int ir=0; ir<pw.nrxx; ir++)
+        for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
         {
-            deband_aux -= CHR.rho[1][ir] * pot.vr(1, ir);
+            deband_aux -= GlobalC::CHR.rho[1][ir] * GlobalC::pot.vr(1, ir);
         }
 
     }
-    else if(NSPIN == 4)
+    else if(GlobalV::NSPIN == 4)
     {
-        for (int ir=0; ir<pw.nrxx; ir++)
+        for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
         {
-            deband_aux -= CHR.rho[1][ir] * pot.vr(1, ir);
-            deband_aux -= CHR.rho[2][ir] * pot.vr(2, ir);
-            deband_aux -= CHR.rho[3][ir] * pot.vr(3, ir);
+            deband_aux -= GlobalC::CHR.rho[1][ir] * GlobalC::pot.vr(1, ir);
+            deband_aux -= GlobalC::CHR.rho[2][ir] * GlobalC::pot.vr(2, ir);
+            deband_aux -= GlobalC::CHR.rho[3][ir] * GlobalC::pot.vr(3, ir);
         }
     }
 
@@ -372,7 +372,7 @@ double energy::delta_e(void)
     deband0 = deband_aux;
 #endif
 
-    deband0 *= ucell.omega / pw.ncxyz;
+    deband0 *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
 	
 	// \int rho(r) v_{exx}(r) dr = 2 E_{exx}[rho]
 	deband0 -= 2*exx;				// Peize Lin add 2017-10-16
@@ -391,31 +391,31 @@ void energy::delta_escf(void)
 	// and rho1_save is "output" charge density
 	// because in "deband" the energy is calculated from "output" charge density,
 	// so here is the correction.
-    for (int ir=0; ir<pw.nrxx; ir++) 
+    for (int ir=0; ir<GlobalC::pw.nrxx; ir++) 
 	{
-		this->descf -= ( CHR.rho[0][ir]- CHR.rho_save[0][ir] ) * pot.vr(0,ir);
+		this->descf -= ( GlobalC::CHR.rho[0][ir]- GlobalC::CHR.rho_save[0][ir] ) * GlobalC::pot.vr(0,ir);
 	}
 
-    if (NSPIN==2)
+    if (GlobalV::NSPIN==2)
     {
-        for (int ir=0; ir<pw.nrxx; ir++)
+        for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
         {
-            this->descf -= ( CHR.rho[1][ir] - CHR.rho_save[1][ir] ) * pot.vr(1, ir);
+            this->descf -= ( GlobalC::CHR.rho[1][ir] - GlobalC::CHR.rho_save[1][ir] ) * GlobalC::pot.vr(1, ir);
         }
     }
-    if (NSPIN==4)
+    if (GlobalV::NSPIN==4)
     {
-        for(int ir=0; ir<pw.nrxx; ir++)
+        for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
         {
-            this->descf -= ( CHR.rho[1][ir] - CHR.rho_save[1][ir] ) * pot.vr(1, ir);
-            this->descf -= ( CHR.rho[2][ir] - CHR.rho_save[2][ir] ) * pot.vr(2, ir);
-            this->descf -= ( CHR.rho[3][ir] - CHR.rho_save[3][ir] ) * pot.vr(3, ir);
+            this->descf -= ( GlobalC::CHR.rho[1][ir] - GlobalC::CHR.rho_save[1][ir] ) * GlobalC::pot.vr(1, ir);
+            this->descf -= ( GlobalC::CHR.rho[2][ir] - GlobalC::CHR.rho_save[2][ir] ) * GlobalC::pot.vr(2, ir);
+            this->descf -= ( GlobalC::CHR.rho[3][ir] - GlobalC::CHR.rho_save[3][ir] ) * GlobalC::pot.vr(3, ir);
         }
     }
 
     Parallel_Reduce::reduce_double_pool( descf );
 
-    this->descf *= ucell.omega / pw.ncxyz;
+    this->descf *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
     return;
 }
 
@@ -424,11 +424,11 @@ void energy::print_band(const int &ik)
 {
 	//check the band energy.
     bool wrong = false;
-	for(int ib=0; ib<NBANDS; ++ib)
+	for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 	{
-		if( abs( wf.ekb[ik][ib] ) > 1.0e10)
+		if( abs( GlobalC::wf.ekb[ik][ib] ) > 1.0e10)
 		{
-			ofs_warning << " ik=" << ik+1 << " ib=" << ib+1 << " " << wf.ekb[ik][ib] << " Ry" << endl;
+			GlobalV::ofs_warning << " ik=" << ik+1 << " ib=" << ib+1 << " " << GlobalC::wf.ekb[ik][ib] << " Ry" << endl;
 			wrong = true;
 		}
 	}
@@ -439,29 +439,29 @@ void energy::print_band(const int &ik)
 
 
 
-	if(MY_RANK==0)
+	if(GlobalV::MY_RANK==0)
 	{
-		//if( DIAGO_TYPE == "selinv" ) xiaohui modify 2013-09-02
-		if(KS_SOLVER=="selinv") //xiaohui add 2013-09-02
+		//if( GlobalV::DIAGO_TYPE == "selinv" ) xiaohui modify 2013-09-02
+		if(GlobalV::KS_SOLVER=="selinv") //xiaohui add 2013-09-02
 		{
-			ofs_running << " No eigenvalues are available for selected inversion methods." << endl;	
+			GlobalV::ofs_running << " No eigenvalues are available for selected inversion methods." << endl;	
 		}
 		else
 		{
 			if( printe>0 && ((this->iter+1) % this->printe == 0))
 			{
 				//	NEW_PART("ENERGY BANDS (Rydberg), (eV)");
-				ofs_running << setprecision(6);
-				ofs_running << " Energy (eV) & Occupations  for spin=" << CURRENT_SPIN+1 << " K-point=" << ik+1 << endl;
-				ofs_running << setiosflags(ios::showpoint);
-				for(int ib=0;ib<NBANDS;ib++)
+				GlobalV::ofs_running << setprecision(6);
+				GlobalV::ofs_running << " Energy (eV) & Occupations  for spin=" << GlobalV::CURRENT_SPIN+1 << " K-point=" << ik+1 << endl;
+				GlobalV::ofs_running << setiosflags(ios::showpoint);
+				for(int ib=0;ib<GlobalV::NBANDS;ib++)
 				{
-					ofs_running << " "<< setw(6) << ib+1  
-						<< setw(15) << wf.ekb[ik][ib] * Ry_to_eV;
+					GlobalV::ofs_running << " "<< setw(6) << ib+1  
+						<< setw(15) << GlobalC::wf.ekb[ik][ib] * Ry_to_eV;
 					// for the first electron iteration, we don't have the energy
 					// spectrum, so we can't get the occupations. 
-					ofs_running << setw(15) << wf.wg(ik,ib);
-					ofs_running << endl;
+					GlobalV::ofs_running << setw(15) << GlobalC::wf.wg(ik,ib);
+					GlobalV::ofs_running << endl;
 				}
 			}
 		}
@@ -477,30 +477,30 @@ void energy::set_exx()
 
 	auto exx_energy = []() -> double
 	{
-		if("lcao_in_pw"==BASIS_TYPE)
+		if("lcao_in_pw"==GlobalV::BASIS_TYPE)
 		{
-			return exx_lip.get_exx_energy();
+			return GlobalC::exx_lip.get_exx_energy();
 		}
-		else if("lcao"==BASIS_TYPE)
+		else if("lcao"==GlobalV::BASIS_TYPE)
 		{
-			return exx_lcao.get_energy();
+			return GlobalC::exx_lcao.get_energy();
 		}
 		else
 		{
 			throw invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 		}
 	};
-	if( 5==xcf.iexch_now && 0==xcf.igcx_now )				// HF
+	if( 5==GlobalC::xcf.iexch_now && 0==GlobalC::xcf.igcx_now )				// HF
 	{
 		this->exx = exx_energy();
 	}
-	else if( 6==xcf.iexch_now && 8==xcf.igcx_now )			// PBE0
+	else if( 6==GlobalC::xcf.iexch_now && 8==GlobalC::xcf.igcx_now )			// PBE0
 	{
-		this->exx = exx_global.info.hybrid_alpha * exx_energy();
+		this->exx = GlobalC::exx_global.info.hybrid_alpha * exx_energy();
 	}
-	else if( 9==xcf.iexch_now && 12==xcf.igcx_now )			// HSE
+	else if( 9==GlobalC::xcf.iexch_now && 12==GlobalC::xcf.igcx_now )			// HSE
 	{
-		this->exx = exx_global.info.hybrid_alpha * exx_energy();
+		this->exx = GlobalC::exx_global.info.hybrid_alpha * exx_energy();
 	}
 
 	return;

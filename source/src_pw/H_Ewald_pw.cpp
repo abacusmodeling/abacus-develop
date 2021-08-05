@@ -47,7 +47,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
     // buffer variable
     // used to optimize alpha
 
-	if(test_energy)OUT(ofs_running,"mxr",mxr);
+	if(GlobalV::test_energy)OUT(GlobalV::ofs_running,"mxr",mxr);
     r  = new Vector3<double>[mxr];
     r2 = new double[mxr];
     int* irr = new int[mxr];
@@ -58,7 +58,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
     {
         charge += cell.atoms[it].na * cell.atoms[it].zv;//mohan modify 2007-11-7
     }
-    if(test_energy)OUT(ofs_running,"Total ionic charge",charge);
+    if(GlobalV::test_energy)OUT(GlobalV::ofs_running,"Total ionic charge",charge);
 
 	// (2) calculate the converged value: alpha
     H_Ewald_pw::alpha = 2.90;
@@ -76,8 +76,8 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
                      erfc(sqrt(cell.tpiba2 * pwb.ggchg / 4.0 / alpha));
     }
     while (upperbound > 1.0e-7);
-    if(test_energy)OUT(ofs_running,"alpha",alpha);
-	if(test_energy)OUT(ofs_running,"Upper bound",upperbound);
+    if(GlobalV::test_energy)OUT(GlobalV::ofs_running,"alpha",alpha);
+	if(GlobalV::test_energy)OUT(GlobalV::ofs_running,"Upper bound",upperbound);
 
     // G-space sum here.
     // Determine if this processor contains G=0 and set the constant term
@@ -102,7 +102,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 	// but that's not the term "gamma_only" I want to use in LCAO,  
 	fact = 1.0;
 
-    //ofs_running << "\n pwb.gstart = " << pwb.gstart << endl;
+    //GlobalV::ofs_running << "\n pwb.gstart = " << pwb.gstart << endl;
 
     for (int ig=pwb.gstart; ig<pwb.ngmc; ig++)
     {
@@ -136,7 +136,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
     if (pwb.gstart == 1)
     {	
         rmax = 4.0 / sqrt(alpha) / cell.lat0;
-		if(test_energy)OUT(ofs_running,"rmax(unit lat0)",rmax);
+		if(GlobalV::test_energy)OUT(GlobalV::ofs_running,"rmax(unit lat0)",rmax);
         // with this choice terms up to ZiZj*erfc(4) are counted (erfc(4)=2x10^-8
         int nt1=0;
         int nt2=0;
@@ -156,7 +156,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
                         // at-->cell.latvec, bg-->G
                         // and sum to the real space part
 
-                        if (test_energy>1)
+                        if (GlobalV::test_energy>1)
                         {
                             OUT("dtau.x",dtau.x);
                             OUT("dtau.y",dtau.y);
@@ -170,7 +170,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
                                      erfc(sqrt(alpha) * rr) / rr;
 
                         } // enddo
-                        if (test_energy>1) OUT("ewaldr",ewaldr);
+                        if (GlobalV::test_energy>1) OUT("ewaldr",ewaldr);
                     } // enddo
                 } // enddo
             } // nt2
@@ -182,7 +182,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 	// mohan fix bug 2010-07-26
     Parallel_Reduce::reduce_double_pool( ewalds );
 
-    if (test_energy>1)
+    if (GlobalV::test_energy>1)
     {
         OUT("ewaldg",ewaldg);
         OUT("ewaldr",ewaldr);
@@ -280,7 +280,7 @@ void H_Ewald_pw::rgen(
 
     nm3 = (int)(dnrm2(3, bg1, 1) * rmax + 2);
 
-    if (test_energy>1)
+    if (GlobalV::test_energy>1)
     {
         OUT("nm1",nm1);
         OUT("nm2",nm2);

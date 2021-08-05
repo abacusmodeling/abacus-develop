@@ -67,12 +67,12 @@ void ORB_table_beta::allocate
 		++Rmesh;
 	}
 
-//	OUT(ofs_running,"lmax",lmax);
-//	OUT(ofs_running,"Rmax (Bohr)",Rmax);
-//	OUT(ofs_running,"dr (Bohr)",dr);
-//	OUT(ofs_running,"dk",dk);
-//	OUT(ofs_running,"nlm",nlm);
-//	OUT(ofs_running,"kmesh",kmesh);
+//	OUT(GlobalV::ofs_running,"lmax",lmax);
+//	OUT(GlobalV::ofs_running,"Rmax (Bohr)",Rmax);
+//	OUT(GlobalV::ofs_running,"dr (Bohr)",dr);
+//	OUT(GlobalV::ofs_running,"dk",dk);
+//	OUT(GlobalV::ofs_running,"nlm",nlm);
+//	OUT(GlobalV::ofs_running,"kmesh",kmesh);
 	
 	delete[] kpoint;
 	delete[] r;
@@ -96,7 +96,7 @@ void ORB_table_beta::allocate
 		rab[ir] = dr;
 	}
 
-//	OUT(ofs_running,"allocate kpoint, r, rab, kab","Done");
+//	OUT(GlobalV::ofs_running,"allocate kpoint, r, rab, kab","Done");
 	return;
 }
 
@@ -110,8 +110,8 @@ int ORB_table_beta::get_rmesh(const double &R1, const double &R2)
 	
 	if(rmesh <= 0)
 	{
-		//ofs_warning << "\n R1 = " << R1 << " R2 = " << R2;
-		//ofs_warning << "\n rmesh = " << rmesh;
+		//GlobalV::ofs_warning << "\n R1 = " << R1 << " R2 = " << R2;
+		//GlobalV::ofs_warning << "\n rmesh = " << rmesh;
 		cout << "\n R1 = " << R1 << " R2 = " << R2;
 		cout << "\n rmesh = " << rmesh;
 		WARNING_QUIT("ORB_table_beta::get_rmesh", "rmesh <= 0");
@@ -236,14 +236,14 @@ void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
 		{
 			// Tpair: type pair.
 			const int Tpair=this->NL_Tpair(T1,T2);
-			const int Lmax1 = ORB.Phi[T1].getLmax();			
-			const int NBeta = ORB.nproj[T2];
+			const int Lmax1 = GlobalC::ORB.Phi[T1].getLmax();			
+			const int NBeta = GlobalC::ORB.nproj[T2];
 			
 			//-------------------------------------------------------------
 			// how many <psi|beta_l>
 			// here we count all possible psi with (L,N) index for type T1.
 			//-------------------------------------------------------------
-			const int pairs_chi = ORB.Phi[T1].getTotal_nchi() * NBeta;
+			const int pairs_chi = GlobalC::ORB.Phi[T1].getTotal_nchi() * NBeta;
 
 			// CAUTION!!!
 			// no matter nchi = 0 or NBeta = 0,
@@ -256,18 +256,18 @@ void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
 
             const int T12_2Lplus1 = this->NL_L2plus1(T1,T2);
 
-			const double Rcut1 = ORB.Phi[T1].getRcut();
+			const double Rcut1 = GlobalC::ORB.Phi[T1].getRcut();
 			for (int L1 = 0; L1 < Lmax1 + 1; L1++)
             {
-                for (int N1 = 0; N1 < ORB.Phi[T1].getNchi(L1); N1++)
+                for (int N1 = 0; N1 < GlobalC::ORB.Phi[T1].getNchi(L1); N1++)
 				{
 					// number of projectors.
 					for (int nb = 0; nb < NBeta; nb ++)
 					{
-						//const int L2 = ORB.Beta[T2].getL_Beta(nb); // mohan delete the variable 2021-05-07
-						const int L2 = ORB.Beta[T2].Proj[nb].getL(); // mohan add 2021-05-07
+						//const int L2 = GlobalC::ORB.Beta[T2].getL_Beta(nb); // mohan delete the variable 2021-05-07
+						const int L2 = GlobalC::ORB.Beta[T2].Proj[nb].getL(); // mohan add 2021-05-07
 
-						const double Rcut2 = ORB.Beta[T2].Proj[nb].getRcut();
+						const double Rcut2 = GlobalC::ORB.Beta[T2].Proj[nb].getRcut();
 
 						const int Opair = this->NL_Opair(Tpair,L1,N1,nb);
 						assert( Opair < pairs_chi );
@@ -302,13 +302,13 @@ void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
 								continue;
 							}
 
-							assert(nb < ORB.nproj[T2]);	
+							assert(nb < GlobalC::ORB.nproj[T2]);	
 
 							this->cal_VNL_PhiBeta_R(
 								pSB, // mohan add 2021-03-06
 								L,
-                                ORB.Phi[T1].PhiLN(L1,N1),
-                                ORB.Beta[T2].Proj[nb], // mohan update 2011-03-07
+                                GlobalC::ORB.Phi[T1].PhiLN(L1,N1),
+                                GlobalC::ORB.Beta[T2].Proj[nb], // mohan update 2011-03-07
                                 rmesh,
 								this->Table_NR[0][Tpair][Opair][L],
 								this->Table_NR[1][Tpair][Opair][L]);
@@ -321,7 +321,7 @@ void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
 	destroy_nr = true;
 
 
-//	OUT(ofs_running,"allocate non-local potential matrix","Done");
+//	OUT(GlobalV::ofs_running,"allocate non-local potential matrix","Done");
 	timer::tick("ORB_table_beta", "init_Table_Beta");
 	return;
 }
@@ -370,7 +370,7 @@ void ORB_table_beta::init_NL_Tpair(void)
 	this->NL_Tpair.create( this->ntype, this->ntype);
 	this->NL_L2plus1.create( this->ntype, this->ntype); // mohan fix bug 2011-03-14
 
-//	OUT(ofs_running,"Number of Nonlocal Pairs",NL_nTpairs);
+//	OUT(GlobalV::ofs_running,"Number of Nonlocal Pairs",NL_nTpairs);
 
 	int index = 0;
 	for (int T1 = 0;  T1 < ntype ; T1++)
@@ -382,7 +382,7 @@ void ORB_table_beta::init_NL_Tpair(void)
 
 			 // the pair < psi | beta >
 			 // be careful! This is not a symmetry matrix.
-			 this->NL_L2plus1(T1,T0) = std::max(ORB.Phi[T1].getLmax(), ORB.Beta[T0].getLmax() )*2+1;
+			 this->NL_L2plus1(T1,T0) = std::max(GlobalC::ORB.Phi[T1].getLmax(), GlobalC::ORB.Beta[T0].getLmax() )*2+1;
 			 
 			 // there are special situations:
 			 // for example, two H atom without projector.

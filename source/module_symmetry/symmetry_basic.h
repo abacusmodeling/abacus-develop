@@ -4,9 +4,14 @@
 //==========================================================
 #ifndef SYMMETRY_BASIC_H
 #define SYMMETRY_BASIC_H
-#include "../src_pw/tools.h"
-#include "symmetry_basic.h"
-
+//#include "../src_pw/tools.h"
+//#include "symmetry_basic.h"
+#include "symm_other.h"
+#include "../module_base/mymath.h"
+#include "../module_base/ylm.h"
+#include "../module_base/matrix3.h"
+namespace ModuleSymmetry
+{
 class Symmetry_Basic
 {
 	public:
@@ -57,7 +62,7 @@ class Symmetry_Basic
 	protected:
 
 	string get_brav_name(const int ibrav);
-	void pointgroup(const int &nrot,int &pgnumber,string &pgname, const Matrix3* gmatrix);
+	void pointgroup(const int &nrot,int &pgnumber,string &pgname, const Matrix3* gmatrix, ofstream &ofs_running);
 	void atom_ordering(double *posi, const int natom, int *subindex);
 
 	private:
@@ -66,5 +71,6 @@ class Symmetry_Basic
 	void order_y(double *pos, const int &oldpos, const int &newpos);
 	void order_z(double *pos, const int &oldpos, const int &newpos);
 };
+}//end of define namespace
 
 #endif

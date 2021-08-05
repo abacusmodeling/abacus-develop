@@ -40,7 +40,7 @@ vector<vector<vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_Orbs::change_or
 //					orb_origin.getDk() / kmesh_times,
 					orb_origin.getDruniform(),
 					false,
-					true, FORCE);
+					true, GlobalV::FORCE);
 			}
 		}
 	}
@@ -274,7 +274,7 @@ vector<vector<vector<vector<double>>>> Exx_Abfs::Construct_Orbs::pca(
 	const double kmesh_times_mot,
 	const double times_threshold )
 {
-ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(MY_RANK),ofstream::app);
+ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
 	if(times_threshold>1)
 		return vector<vector<vector<vector<double>>>>(abfs.size());
 	
@@ -431,7 +431,7 @@ vector<vector<vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_Orbs::orbital(
 //					orb_info.getDk() / kmesh_times,
 					orb_info.getDruniform(),
 					false,
-					true, FORCE);
+					true, GlobalV::FORCE);
 			}
 		}
 	}	

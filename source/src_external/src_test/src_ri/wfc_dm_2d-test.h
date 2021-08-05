@@ -12,10 +12,10 @@
 
 static void os_wfc_2d(ostream &os, const Wfc_Dm_2d & wfc_dm_2d)
 {
-	if(GAMMA_ONLY_LOCAL)
+	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
 		os<<"@@@"<<endl;
-		for(int is=0; is!=NSPIN; ++is)
+		for(int is=0; is!=GlobalV::NSPIN; ++is)
 		{
 			os<<"is:\t"<<is<<endl;
 			os<<wfc_dm_2d.wfc_gamma[is]<<endl;
@@ -24,7 +24,7 @@ static void os_wfc_2d(ostream &os, const Wfc_Dm_2d & wfc_dm_2d)
 	else
 	{
 		os<<"@@@"<<endl;
-		for(int ik=0; ik!=kv.nks; ++ik)
+		for(int ik=0; ik!=GlobalC::kv.nks; ++ik)
 		{
 			os<<"ik:\t"<<ik<<endl;
 			os<<wfc_dm_2d.dm_k[ik]<<endl;
@@ -34,10 +34,10 @@ static void os_wfc_2d(ostream &os, const Wfc_Dm_2d & wfc_dm_2d)
 
 static void os_dm_2d(ostream &os, const Wfc_Dm_2d & wfc_dm_2d)
 {
-	if(GAMMA_ONLY_LOCAL)
+	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
 		os<<"@@@"<<endl;
-		for(int is=0; is!=NSPIN; ++is)
+		for(int is=0; is!=GlobalV::NSPIN; ++is)
 		{
 			os<<"is:\t"<<is<<endl;
 			os<<wfc_dm_2d.dm_gamma[is]<<endl;
@@ -46,7 +46,7 @@ static void os_dm_2d(ostream &os, const Wfc_Dm_2d & wfc_dm_2d)
 	else
 	{
 		os<<"@@@"<<endl;
-		for(int ik=0; ik!=kv.nks; ++ik)
+		for(int ik=0; ik!=GlobalC::kv.nks; ++ik)
 		{
 			os<<"ik:\t"<<ik<<endl;
 			os<<wfc_dm_2d.dm_k[ik]<<endl;
@@ -56,14 +56,14 @@ static void os_dm_2d(ostream &os, const Wfc_Dm_2d & wfc_dm_2d)
 
 static void ofs_wfc_2d(const Wfc_Dm_2d & wfc_dm_2d)
 {
-	ofstream ofs("wfc_2d_"+TO_STRING(MY_RANK), ofstream::app);
+	ofstream ofs("wfc_2d_"+TO_STRING(GlobalV::MY_RANK), ofstream::app);
 	os_wfc_2d(ofs,wfc_dm_2d);
 	ofs.close();
 }
 
 static void ofs_dm_2d(const Wfc_Dm_2d & wfc_dm_2d)
 {
-	ofstream ofs("dm_2d_"+TO_STRING(MY_RANK), ofstream::app);
+	ofstream ofs("dm_2d_"+TO_STRING(GlobalV::MY_RANK), ofstream::app);
 	os_dm_2d(ofs,wfc_dm_2d);
 	ofs.close();
 }

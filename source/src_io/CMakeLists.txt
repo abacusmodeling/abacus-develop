@@ -37,5 +37,6 @@ add_library(
     write_input.cpp
     write_pot.cpp
     write_rho.cpp
+    write_rho_cube.cpp
     write_rho_dipole.cpp
 )

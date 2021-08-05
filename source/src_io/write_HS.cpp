@@ -34,21 +34,21 @@ void HS_Matrix::save_HS_ccf(const int &iter, const int &Hnnz, const int *colptr_
 {
     TITLE("HS_Matrix","save_HS_ccf");
 
-    if(DRANK!=0)return;
+    if(GlobalV::DRANK!=0)return;
     
     stringstream ssh;
     stringstream sss;
 
     if(bit)
     {
-        ssh << global_out_dir << "H_bit.ccf";
-        sss << global_out_dir << "S_bit.ccf";
+        ssh << GlobalV::global_out_dir << "H_bit.ccf";
+        sss << GlobalV::global_out_dir << "S_bit.ccf";
     }
     else
     {
 		// mohan update 2021-02-10
-        ssh << global_out_dir << "H" << ELEC_scf::iter << "_" << iter+1 << ".ccf";
-        sss << global_out_dir << "S" << ELEC_scf::iter << "_" << iter+1 << ".ccf";
+        ssh << GlobalV::global_out_dir << "H" << ELEC_scf::iter << "_" << iter+1 << ".ccf";
+        sss << GlobalV::global_out_dir << "S" << ELEC_scf::iter << "_" << iter+1 << ".ccf";
     }
 
     if(bit)
@@ -56,9 +56,9 @@ void HS_Matrix::save_HS_ccf(const int &iter, const int &Hnnz, const int *colptr_
         FILE *g1 = fopen(ssh.str().c_str(),"wb");
         FILE *g2 = fopen(sss.str().c_str(),"wb");
 
-        fwrite(&NLOCAL,sizeof(int),1,g1);
+        fwrite(&GlobalV::NLOCAL,sizeof(int),1,g1);
         fwrite(&Hnnz,sizeof(int),1,g1);
-        fwrite(&NLOCAL,sizeof(int),1,g2);
+        fwrite(&GlobalV::NLOCAL,sizeof(int),1,g2);
         fwrite(&Hnnz,sizeof(int),1,g2);
 
         fclose(g1);
@@ -71,10 +71,10 @@ void HS_Matrix::save_HS_ccf(const int &iter, const int &Hnnz, const int *colptr_
         ofstream g1(ssh.str().c_str());
         ofstream g2(sss.str().c_str());
 
-        g1 << NLOCAL << " " << Hnnz << endl;
-        g2 << NLOCAL << " " << Hnnz << endl;
+        g1 << GlobalV::NLOCAL << " " << Hnnz << endl;
+        g2 << GlobalV::NLOCAL << " " << Hnnz << endl;
 
-        for(int i=0; i<NLOCAL+1; ++i)
+        for(int i=0; i<GlobalV::NLOCAL+1; ++i)
         {
             g1 << colptr_H[i] << " ";
             g2 << colptr_H[i] << " ";
@@ -111,20 +111,20 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
 {
     TITLE("HS_Matrix","save_HS_bit");
     timer::tick("HS_Matrix","save_HS_bit");
-    OUT(ofs_running,"Dimension of H and S",NLOCAL);
+    OUT(GlobalV::ofs_running,"Dimension of H and S",GlobalV::NLOCAL);
 
     stringstream ssh;
     stringstream sss;
 
     if(bit)
     {
-        ssh << global_out_dir << "data-H-bit";
-        sss << global_out_dir << "data-S-bit";
+        ssh << GlobalV::global_out_dir << "data-H-bit";
+        sss << GlobalV::global_out_dir << "data-S-bit";
     }
     else 
     {
-        ssh << global_out_dir << "data-H";
-        sss << global_out_dir << "data-S";
+        ssh << GlobalV::global_out_dir << "data-H";
+        sss << GlobalV::global_out_dir << "data-S";
     }
 
     if (bit)
@@ -133,42 +133,42 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
         FILE *g1 = nullptr;
         FILE *g2 = nullptr;
 
-        if (DRANK==0)
+        if (GlobalV::DRANK==0)
         {
             g1 = fopen(ssh.str().c_str(),"wb");
             g2 = fopen(sss.str().c_str(),"wb");
-            fwrite(&NLOCAL,sizeof(int),1,g1);
-            fwrite(&NLOCAL,sizeof(int),1,g2);
+            fwrite(&GlobalV::NLOCAL,sizeof(int),1,g1);
+            fwrite(&GlobalV::NLOCAL,sizeof(int),1,g2);
         }
 
         int ir,ic;
-        for (int i=0; i<NLOCAL; i++)
+        for (int i=0; i<GlobalV::NLOCAL; i++)
         {
-            double* lineH = new double[NLOCAL-i];
-            double* lineS = new double[NLOCAL-i];
-            ZEROS(lineH, NLOCAL-i);
-            ZEROS(lineS, NLOCAL-i);
+            double* lineH = new double[GlobalV::NLOCAL-i];
+            double* lineS = new double[GlobalV::NLOCAL-i];
+            ZEROS(lineH, GlobalV::NLOCAL-i);
+            ZEROS(lineS, GlobalV::NLOCAL-i);
 
-            ir = ParaO.trace_loc_row[i];
+            ir = GlobalC::ParaO.trace_loc_row[i];
             if (ir>=0)
             {
                 // data collection
-                for (int j=i; j<NLOCAL; j++)
+                for (int j=i; j<GlobalV::NLOCAL; j++)
                 {
-                    ic = ParaO.trace_loc_col[j];
+                    ic = GlobalC::ParaO.trace_loc_col[j];
                     if (ic>=0)
                     {
                         int iic;
-                        if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+                        if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                         {
-                            iic=ir+ic*ParaO.nrow;
+                            iic=ir+ic*GlobalC::ParaO.nrow;
                         }
                         else
                         {
-                            iic=ir*ParaO.ncol+ic;
+                            iic=ir*GlobalC::ParaO.ncol+ic;
                         }
-                        //lineH[j-i] = H[ir*ParaO.ncol+ic];
-                        //lineS[j-i] = S[ir*ParaO.ncol+ic];
+                        //lineH[j-i] = H[ir*GlobalC::ParaO.ncol+ic];
+                        //lineS[j-i] = S[ir*GlobalC::ParaO.ncol+ic];
                         lineH[j-i] = H[iic];
                         lineS[j-i] = S[iic];
                     }
@@ -179,12 +179,12 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
                 //do nothing
             }
 
-            Parallel_Reduce::reduce_double_all(lineH,NLOCAL-i);
-            Parallel_Reduce::reduce_double_all(lineS,NLOCAL-i);
+            Parallel_Reduce::reduce_double_all(lineH,GlobalV::NLOCAL-i);
+            Parallel_Reduce::reduce_double_all(lineS,GlobalV::NLOCAL-i);
 
-            if (DRANK==0)
+            if (GlobalV::DRANK==0)
             {
-                for (int j=i; j<NLOCAL; j++)
+                for (int j=i; j<GlobalV::NLOCAL; j++)
                 {
                     fwrite(&lineH[j-i],sizeof(double),1,g1);
                     fwrite(&lineS[j-i],sizeof(double),1,g2);
@@ -196,7 +196,7 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
             MPI_Barrier(DIAG_WORLD);
         }
 
-        if (DRANK==0)
+        if (GlobalV::DRANK==0)
         {
             fclose(g1);
             fclose(g2);
@@ -205,15 +205,15 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
         FILE *g1 = fopen(ssh.str().c_str(),"wb");
         FILE *g2 = fopen(sss.str().c_str(),"wb");
 
-        fwrite(&NLOCAL,sizeof(int),1,g1);
-        fwrite(&NLOCAL,sizeof(int),1,g2);
+        fwrite(&GlobalV::NLOCAL,sizeof(int),1,g1);
+        fwrite(&GlobalV::NLOCAL,sizeof(int),1,g2);
 
-        for (int i=0; i<NLOCAL; i++)
+        for (int i=0; i<GlobalV::NLOCAL; i++)
         {
-            for (int j=i; j<NLOCAL; j++)
+            for (int j=i; j<GlobalV::NLOCAL; j++)
             {
-                fwrite(&H[i*NLOCAL+j],sizeof(double),1,g1);
-                fwrite(&S[i*NLOCAL+j],sizeof(double),1,g2);
+                fwrite(&H[i*GlobalV::NLOCAL+j],sizeof(double),1,g1);
+                fwrite(&S[i*GlobalV::NLOCAL+j],sizeof(double),1,g2);
             }
         }
         fclose(g1);
@@ -226,42 +226,42 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
         ofstream g1;
         ofstream g2;
 
-        if (DRANK==0)
+        if (GlobalV::DRANK==0)
         {
             g1.open(ssh.str().c_str());
             g2.open(sss.str().c_str());
-            g1 << NLOCAL;
-            g2 << NLOCAL;
+            g1 << GlobalV::NLOCAL;
+            g2 << GlobalV::NLOCAL;
         }
 
         int ir,ic;
-        for (int i=0; i<NLOCAL; i++)
+        for (int i=0; i<GlobalV::NLOCAL; i++)
         {
-            double* lineH = new double[NLOCAL-i];
-            double* lineS = new double[NLOCAL-i];
-            ZEROS(lineH, NLOCAL-i);
-            ZEROS(lineS, NLOCAL-i);
+            double* lineH = new double[GlobalV::NLOCAL-i];
+            double* lineS = new double[GlobalV::NLOCAL-i];
+            ZEROS(lineH, GlobalV::NLOCAL-i);
+            ZEROS(lineS, GlobalV::NLOCAL-i);
 
-            ir = ParaO.trace_loc_row[i];
+            ir = GlobalC::ParaO.trace_loc_row[i];
             if (ir>=0)
             {
                 // data collection
-                for (int j=i; j<NLOCAL; j++)
+                for (int j=i; j<GlobalV::NLOCAL; j++)
                 {
-                    ic = ParaO.trace_loc_col[j];
+                    ic = GlobalC::ParaO.trace_loc_col[j];
                     if (ic>=0)
                     {
                         int iic;
-                        if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+                        if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                         {
-                            iic=ir+ic*ParaO.nrow;
+                            iic=ir+ic*GlobalC::ParaO.nrow;
                         }
                         else
                         {
-                            iic=ir*ParaO.ncol+ic;
+                            iic=ir*GlobalC::ParaO.ncol+ic;
                         }
-                        //lineH[j-i] = H[ir*ParaO.ncol+ic];
-                        //lineS[j-i] = S[ir*ParaO.ncol+ic];
+                        //lineH[j-i] = H[ir*GlobalC::ParaO.ncol+ic];
+                        //lineS[j-i] = S[ir*GlobalC::ParaO.ncol+ic];
                         lineH[j-i] = H[iic];
                         lineS[j-i] = S[iic];
                     }
@@ -272,12 +272,12 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
                 //do nothing
             }
 
-            Parallel_Reduce::reduce_double_all(lineH,NLOCAL-i);
-            Parallel_Reduce::reduce_double_all(lineS,NLOCAL-i);
+            Parallel_Reduce::reduce_double_all(lineH,GlobalV::NLOCAL-i);
+            Parallel_Reduce::reduce_double_all(lineS,GlobalV::NLOCAL-i);
 
-            if (DRANK==0)
+            if (GlobalV::DRANK==0)
             {
-                for (int j=i; j<NLOCAL; j++)
+                for (int j=i; j<GlobalV::NLOCAL; j++)
                 {
                     g1 << " " << lineH[j-i];
                     g2 << " " << lineS[j-i];
@@ -289,8 +289,8 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
             delete[] lineS;
         }
 
-        //if (DRANK==0);
-        if (DRANK==0)       // Peize Lin delete ; at 2020.01.31
+        //if (GlobalV::DRANK==0);
+        if (GlobalV::DRANK==0)       // Peize Lin delete ; at 2020.01.31
         {
             g1.close();
             g2.close();
@@ -304,7 +304,7 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
 
     string H_fn;
     stringstream H_fn2;
-    H_fn2<< "data-H-"  << DRANK ;
+    H_fn2<< "data-H-"  << GlobalV::DRANK ;
     H_fn=H_fn2.str();
     ofstream ofs_H;
     ofs_H.open(H_fn.c_str());
@@ -312,28 +312,28 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
 
     string S_fn;
     stringstream S_fn2;
-    S_fn2<< "data-S-"  << DRANK ;
+    S_fn2<< "data-S-"  << GlobalV::DRANK ;
     S_fn=S_fn2.str();
     ofstream ofs_S;
     ofs_S.open(S_fn.c_str());
     ofs_S<<setprecision(8) << setw(12);
 
         int irr,icc;
-        for (int i=0; i<NLOCAL; i++)
+        for (int i=0; i<GlobalV::NLOCAL; i++)
         {
-            irr = ParaO.trace_loc_row[i];
+            irr = GlobalC::ParaO.trace_loc_row[i];
             if (irr>=0)
             {
                 // data collection
-                for (int j=0; j<NLOCAL; j++)
+                for (int j=0; j<GlobalV::NLOCAL; j++)
                 {
-            icc = ParaO.trace_loc_col[j];
+            icc = GlobalC::ParaO.trace_loc_col[j];
             if (icc>=0)
             {
-                //if(abs(H[irr*ParaO.ncol+icc]) < 1.0e-10) H[irr*ParaO.ncol+icc] = 0.0;
-                //if(abs(S[irr*ParaO.ncol+icc]) < 1.0e-10) S[irr*ParaO.ncol+icc] = 0.0;
-                ofs_H << " " << H[irr*ParaO.ncol+icc];
-                ofs_S << " " << S[irr*ParaO.ncol+icc];
+                //if(abs(H[irr*GlobalC::ParaO.ncol+icc]) < 1.0e-10) H[irr*GlobalC::ParaO.ncol+icc] = 0.0;
+                //if(abs(S[irr*GlobalC::ParaO.ncol+icc]) < 1.0e-10) S[irr*GlobalC::ParaO.ncol+icc] = 0.0;
+                ofs_H << " " << H[irr*GlobalC::ParaO.ncol+icc];
+                ofs_S << " " << S[irr*GlobalC::ParaO.ncol+icc];
             }
         }
         ofs_H << endl;
@@ -345,15 +345,15 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
         ofstream g1(ssh.str().c_str());
         ofstream g2(sss.str().c_str());
 
-        g1 << NLOCAL;
-        g2 << NLOCAL;
+        g1 << GlobalV::NLOCAL;
+        g2 << GlobalV::NLOCAL;
 
-        for (int i=0; i<NLOCAL; i++)
+        for (int i=0; i<GlobalV::NLOCAL; i++)
         {
-            for (int j=i; j<NLOCAL; j++)
+            for (int j=i; j<GlobalV::NLOCAL; j++)
             {
-                g1 << " " << H[i*NLOCAL+j];
-                g2 << " " << S[i*NLOCAL+j];
+                g1 << " " << H[i*GlobalV::NLOCAL+j];
+                g2 << " " << S[i*GlobalV::NLOCAL+j];
             }
             g1 << endl;
             g2 << endl;
@@ -390,20 +390,20 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
 {
     TITLE("HS_Matrix","save_HS_bit");
     timer::tick("HS_Matrix","save_HS_bit");
-    OUT(ofs_running,"Dimension of H and S",NLOCAL);
+    OUT(GlobalV::ofs_running,"Dimension of H and S",GlobalV::NLOCAL);
 
     stringstream ssh;
     stringstream sss;
 
     if(bit)
     {
-    ssh << global_out_dir << "data-H-bit";
-    sss << global_out_dir << "data-S-bit";
+    ssh << GlobalV::global_out_dir << "data-H-bit";
+    sss << GlobalV::global_out_dir << "data-S-bit";
     }
     else
     {
-    ssh << global_out_dir << "data-H";
-    sss << global_out_dir << "data-S";
+    ssh << GlobalV::global_out_dir << "data-H";
+    sss << GlobalV::global_out_dir << "data-S";
     }
 
     if (bit)
@@ -412,42 +412,42 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
         FILE *g1 = nullptr;
         FILE *g2 = nullptr;
 
-        if (DRANK==0)
+        if (GlobalV::DRANK==0)
         {
             g1 = fopen(ssh.str().c_str(),"wb");
             g2 = fopen(sss.str().c_str(),"wb");
-            fwrite(&NLOCAL,sizeof(int),1,g1);
-            fwrite(&NLOCAL,sizeof(int),1,g2);
+            fwrite(&GlobalV::NLOCAL,sizeof(int),1,g1);
+            fwrite(&GlobalV::NLOCAL,sizeof(int),1,g2);
         }
 
         int ir,ic;
-        for (int i=0; i<NLOCAL; i++)
+        for (int i=0; i<GlobalV::NLOCAL; i++)
         {
-            complex<double>* lineH = new complex<double>[NLOCAL-i];
-            complex<double>* lineS = new complex<double>[NLOCAL-i];
-            ZEROS(lineH, NLOCAL-i);
-            ZEROS(lineS, NLOCAL-i);
+            complex<double>* lineH = new complex<double>[GlobalV::NLOCAL-i];
+            complex<double>* lineS = new complex<double>[GlobalV::NLOCAL-i];
+            ZEROS(lineH, GlobalV::NLOCAL-i);
+            ZEROS(lineS, GlobalV::NLOCAL-i);
 
-            ir = ParaO.trace_loc_row[i];
+            ir = GlobalC::ParaO.trace_loc_row[i];
             if (ir>=0)
             {
                 // data collection
-                for (int j=i; j<NLOCAL; j++)
+                for (int j=i; j<GlobalV::NLOCAL; j++)
                 {
-                    ic = ParaO.trace_loc_col[j];
+                    ic = GlobalC::ParaO.trace_loc_col[j];
                     if (ic>=0)
                     {
                         int iic;
-                        if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+                        if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                         {
-                            iic=ir+ic*ParaO.nrow;
+                            iic=ir+ic*GlobalC::ParaO.nrow;
                         }
                         else
                         {
-                            iic=ir*ParaO.ncol+ic;
+                            iic=ir*GlobalC::ParaO.ncol+ic;
                         }
-                        //lineH[j-i] = H[ir*ParaO.ncol+ic];
-                        //lineS[j-i] = S[ir*ParaO.ncol+ic];
+                        //lineH[j-i] = H[ir*GlobalC::ParaO.ncol+ic];
+                        //lineS[j-i] = S[ir*GlobalC::ParaO.ncol+ic];
                         lineH[j-i] = H[iic];
                         lineS[j-i] = S[iic];
                     }
@@ -458,12 +458,12 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
                 //do nothing
             }
 
-            Parallel_Reduce::reduce_complex_double_pool(lineH,NLOCAL-i);
-            Parallel_Reduce::reduce_complex_double_pool(lineS,NLOCAL-i);
+            Parallel_Reduce::reduce_complex_double_pool(lineH,GlobalV::NLOCAL-i);
+            Parallel_Reduce::reduce_complex_double_pool(lineS,GlobalV::NLOCAL-i);
 
-            if (DRANK==0)
+            if (GlobalV::DRANK==0)
             {
-                for (int j=i; j<NLOCAL; j++)
+                for (int j=i; j<GlobalV::NLOCAL; j++)
                 {
                     fwrite(&lineH[j-i],sizeof(complex<double>),1,g1);
                     fwrite(&lineS[j-i],sizeof(complex<double>),1,g2);
@@ -475,7 +475,7 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
             MPI_Barrier(DIAG_WORLD);
         }
 
-        if (DRANK==0)
+        if (GlobalV::DRANK==0)
         {
             fclose(g1);
             fclose(g2);
@@ -484,15 +484,15 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
         FILE *g1 = fopen(ssh.str().c_str(),"wb");
         FILE *g2 = fopen(sss.str().c_str(),"wb");
 
-        fwrite(&NLOCAL,sizeof(int),1,g1);
-        fwrite(&NLOCAL,sizeof(int),1,g2);
+        fwrite(&GlobalV::NLOCAL,sizeof(int),1,g1);
+        fwrite(&GlobalV::NLOCAL,sizeof(int),1,g2);
 
-        for (int i=0; i<NLOCAL; i++)
+        for (int i=0; i<GlobalV::NLOCAL; i++)
         {
-            for (int j=i; j<NLOCAL; j++)
+            for (int j=i; j<GlobalV::NLOCAL; j++)
             {
-                fwrite(&H[i*NLOCAL+j],sizeof(complex<double>),1,g1);
-                fwrite(&S[i*NLOCAL+j],sizeof(complex<double>),1,g2);
+                fwrite(&H[i*GlobalV::NLOCAL+j],sizeof(complex<double>),1,g1);
+                fwrite(&S[i*GlobalV::NLOCAL+j],sizeof(complex<double>),1,g2);
             }
         }
         fclose(g1);
@@ -505,42 +505,42 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
         ofstream g1;
         ofstream g2;
 
-        if (DRANK==0)
+        if (GlobalV::DRANK==0)
         {
             g1.open(ssh.str().c_str());
             g2.open(sss.str().c_str());
-            g1 << NLOCAL;
-            g2 << NLOCAL;
+            g1 << GlobalV::NLOCAL;
+            g2 << GlobalV::NLOCAL;
         }
 
         int ir,ic;
-        for (int i=0; i<NLOCAL; i++)
+        for (int i=0; i<GlobalV::NLOCAL; i++)
         {
-            complex<double>* lineH = new complex<double>[NLOCAL-i];
-            complex<double>* lineS = new complex<double>[NLOCAL-i];
-            ZEROS(lineH, NLOCAL-i);
-            ZEROS(lineS, NLOCAL-i);
+            complex<double>* lineH = new complex<double>[GlobalV::NLOCAL-i];
+            complex<double>* lineS = new complex<double>[GlobalV::NLOCAL-i];
+            ZEROS(lineH, GlobalV::NLOCAL-i);
+            ZEROS(lineS, GlobalV::NLOCAL-i);
 
-            ir = ParaO.trace_loc_row[i];
+            ir = GlobalC::ParaO.trace_loc_row[i];
             if (ir>=0)
             {
                 // data collection
-                for (int j=i; j<NLOCAL; j++)
+                for (int j=i; j<GlobalV::NLOCAL; j++)
                 {
-                    ic = ParaO.trace_loc_col[j];
+                    ic = GlobalC::ParaO.trace_loc_col[j];
                     if (ic>=0)
                     {
                         int iic;
-                        if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+                        if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                         {
-                            iic=ir+ic*ParaO.nrow;
+                            iic=ir+ic*GlobalC::ParaO.nrow;
                         }
                         else
                         {
-                            iic=ir*ParaO.ncol+ic;
+                            iic=ir*GlobalC::ParaO.ncol+ic;
                         }
-                        //lineH[j-i] = H[ir*ParaO.ncol+ic];
-                        //lineS[j-i] = S[ir*ParaO.ncol+ic];
+                        //lineH[j-i] = H[ir*GlobalC::ParaO.ncol+ic];
+                        //lineS[j-i] = S[ir*GlobalC::ParaO.ncol+ic];
                         lineH[j-i] = H[iic];
                         lineS[j-i] = S[iic];
                     }
@@ -551,12 +551,12 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
                 //do nothing
             }
 
-            Parallel_Reduce::reduce_complex_double_pool(lineH,NLOCAL-i);
-            Parallel_Reduce::reduce_complex_double_pool(lineS,NLOCAL-i);
+            Parallel_Reduce::reduce_complex_double_pool(lineH,GlobalV::NLOCAL-i);
+            Parallel_Reduce::reduce_complex_double_pool(lineS,GlobalV::NLOCAL-i);
 
-            if (DRANK==0)
+            if (GlobalV::DRANK==0)
             {
-                for (int j=i; j<NLOCAL; j++)
+                for (int j=i; j<GlobalV::NLOCAL; j++)
                 {
                     g1 << " " << lineH[j-i];
                     g2 << " " << lineS[j-i];
@@ -568,8 +568,8 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
             delete[] lineS;
         }
 
-        //if (DRANK==0);
-        if (DRANK==0)           // Peize Lin delete ; at 2020.01.31
+        //if (GlobalV::DRANK==0);
+        if (GlobalV::DRANK==0)           // Peize Lin delete ; at 2020.01.31
         {
             g1.close();
             g2.close();
@@ -583,7 +583,7 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
 
         string H_fn;
         stringstream H_fn2;
-        H_fn2<< "data-H-"  << DRANK ;
+        H_fn2<< "data-H-"  << GlobalV::DRANK ;
         H_fn=H_fn2.str();
         ofstream ofs_H;
         ofs_H.open(H_fn.c_str());
@@ -591,28 +591,28 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
 
         string S_fn;
         stringstream S_fn2;
-        S_fn2<< "data-S-"  << DRANK ;
+        S_fn2<< "data-S-"  << GlobalV::DRANK ;
         S_fn=S_fn2.str();
         ofstream ofs_S;
         ofs_S.open(S_fn.c_str());
         ofs_S<<setprecision(8) << setw(12);
 
         int irr,icc;
-        for (int i=0; i<NLOCAL; i++)
+        for (int i=0; i<GlobalV::NLOCAL; i++)
         {
-            irr = ParaO.trace_loc_row[i];
+            irr = GlobalC::ParaO.trace_loc_row[i];
             if (irr>=0)
             {
                 // data collection
-                for (int j=0; j<NLOCAL; j++)
+                for (int j=0; j<GlobalV::NLOCAL; j++)
                 {
-                        icc = ParaO.trace_loc_col[j];
+                        icc = GlobalC::ParaO.trace_loc_col[j];
                         if (icc>=0)
                         {
-                                //if(abs(H[irr*ParaO.ncol+icc]) < 1.0e-10) H[irr*ParaO.ncol+icc] = 0.0;
-                                //if(abs(S[irr*ParaO.ncol+icc]) < 1.0e-10) S[irr*ParaO.ncol+icc] = 0.0;
-                                ofs_H << " " << H[irr*ParaO.ncol+icc];
-                                ofs_S << " " << S[irr*ParaO.ncol+icc];
+                                //if(abs(H[irr*GlobalC::ParaO.ncol+icc]) < 1.0e-10) H[irr*GlobalC::ParaO.ncol+icc] = 0.0;
+                                //if(abs(S[irr*GlobalC::ParaO.ncol+icc]) < 1.0e-10) S[irr*GlobalC::ParaO.ncol+icc] = 0.0;
+                                ofs_H << " " << H[irr*GlobalC::ParaO.ncol+icc];
+                                ofs_S << " " << S[irr*GlobalC::ParaO.ncol+icc];
                         }
                 }
                 ofs_H << endl;
@@ -624,15 +624,15 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
         ofstream g1(ssh.str().c_str());
         ofstream g2(sss.str().c_str());
 
-        g1 << NLOCAL;
-        g2 << NLOCAL;
+        g1 << GlobalV::NLOCAL;
+        g2 << GlobalV::NLOCAL;
 
-        for (int i=0; i<NLOCAL; i++)
+        for (int i=0; i<GlobalV::NLOCAL; i++)
         {
-            for (int j=i; j<NLOCAL; j++)
+            for (int j=i; j<GlobalV::NLOCAL; j++)
             {
-                g1 << " " << H[i*NLOCAL+j];
-                g2 << " " << S[i*NLOCAL+j];
+                g1 << " " << H[i*GlobalV::NLOCAL+j];
+                g2 << " " << S[i*GlobalV::NLOCAL+j];
             }
             g1 << endl;
             g2 << endl;
@@ -656,34 +656,34 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
     stringstream ssh;
     stringstream sss;
 
-    ssh << global_out_dir << "data-HR-tr_SPIN"<<current_spin;
-    sss << global_out_dir << "data-SR-tr_SPIN"<<current_spin;
-    //ssh << global_out_dir << "data-HR-tr_SPIN";
-    //sss << global_out_dir << "data-SR-tr_SPIN";
+    ssh << GlobalV::global_out_dir << "data-HR-tr_SPIN"<<current_spin;
+    sss << GlobalV::global_out_dir << "data-SR-tr_SPIN"<<current_spin;
+    //ssh << GlobalV::global_out_dir << "data-HR-tr_SPIN";
+    //sss << GlobalV::global_out_dir << "data-SR-tr_SPIN";
 
 #ifdef __MPI
     ofstream g1;
     ofstream g2;
 
-    if(DRANK==0)
+    if(GlobalV::DRANK==0)
     {
         g1.open(ssh.str().c_str());
         g2.open(sss.str().c_str());
-        g1 << "Matrix Dimension of H(R): "<<NLOCAL<<endl;
-        g2 << "Matrix Dimension of S(R): "<<NLOCAL<<endl;
+        g1 << "Matrix Dimension of H(R): "<<GlobalV::NLOCAL<<endl;
+        g2 << "Matrix Dimension of S(R): "<<GlobalV::NLOCAL<<endl;
     }
 
-    int R_x = GridD.getCellX();
-    int R_y = GridD.getCellY();
-    int R_z = GridD.getCellZ();
+    int R_x = GlobalC::GridD.getCellX();
+    int R_y = GlobalC::GridD.getCellY();
+    int R_z = GlobalC::GridD.getCellZ();
 
 //cout<<"R_x: "<<R_x<<endl;
 //cout<<"R_y: "<<R_y<<endl;
 //cout<<"R_z: "<<R_z<<endl;
 
-    double R_minX = GridD.getD_minX();
-    double R_minY = GridD.getD_minY();
-    double R_minZ = GridD.getD_minZ();
+    double R_minX = GlobalC::GridD.getD_minX();
+    double R_minY = GlobalC::GridD.getD_minY();
+    double R_minZ = GlobalC::GridD.getD_minZ();
 
     //int dRx, dRy, dRz;
 
@@ -700,62 +700,62 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
 //cout<<"dRy: "<<dRy<<endl;
 //cout<<"dRz: "<<dRz<<endl;
                 int ir,ic;
-                for(int i=0; i<NLOCAL; i++)
+                for(int i=0; i<GlobalV::NLOCAL; i++)
                 {
-                    //double* lineH = new double[NLOCAL-i];
-                    //double* lineS = new double[NLOCAL-i];
+                    //double* lineH = new double[GlobalV::NLOCAL-i];
+                    //double* lineS = new double[GlobalV::NLOCAL-i];
                     double* lineH = nullptr;
                     double* lineS = nullptr;
                     complex<double>* lineH_soc = nullptr;
                     complex<double>* lineS_soc = nullptr;
-                    if(NSPIN!=4)
+                    if(GlobalV::NSPIN!=4)
                     {
-                        lineH = new double[NLOCAL];
-                        lineS = new double[NLOCAL];
-                        ZEROS(lineH, NLOCAL);
-                        ZEROS(lineS, NLOCAL);
+                        lineH = new double[GlobalV::NLOCAL];
+                        lineS = new double[GlobalV::NLOCAL];
+                        ZEROS(lineH, GlobalV::NLOCAL);
+                        ZEROS(lineS, GlobalV::NLOCAL);
                     }
                     else
                     {
-                        lineH_soc = new complex<double>[NLOCAL];
-                        lineS_soc = new complex<double>[NLOCAL];
-                        ZEROS(lineH_soc, NLOCAL);
-                        ZEROS(lineS_soc, NLOCAL);
+                        lineH_soc = new complex<double>[GlobalV::NLOCAL];
+                        lineS_soc = new complex<double>[GlobalV::NLOCAL];
+                        ZEROS(lineH_soc, GlobalV::NLOCAL);
+                        ZEROS(lineS_soc, GlobalV::NLOCAL);
                     }
-                    //ZEROS(lineH, NLOCAL-i);
-                    //ZEROS(lineS, NLOCAL-i);
-                    //ZEROS(lineH, NLOCAL);
-                    //ZEROS(lineS, NLOCAL);
+                    //ZEROS(lineH, GlobalV::NLOCAL-i);
+                    //ZEROS(lineS, GlobalV::NLOCAL-i);
+                    //ZEROS(lineH, GlobalV::NLOCAL);
+                    //ZEROS(lineS, GlobalV::NLOCAL);
 
-                    ir = ParaO.trace_loc_row[i];
+                    ir = GlobalC::ParaO.trace_loc_row[i];
                     if(ir>=0)
                     {
-                        //for(int j=i; j<NLOCAL; j++)
-                        for(int j=0; j<NLOCAL; j++)
+                        //for(int j=i; j<GlobalV::NLOCAL; j++)
+                        for(int j=0; j<GlobalV::NLOCAL; j++)
                         {
-                            ic = ParaO.trace_loc_col[j];
+                            ic = GlobalC::ParaO.trace_loc_col[j];
                             if(ic>=0)
                             {
-                                //lineH[j-i] = H[ir*ParaO.ncol+ic];
-                                //lineS[j-i] = S[ir*ParaO.ncol+ic];
+                                //lineH[j-i] = H[ir*GlobalC::ParaO.ncol+ic];
+                                //lineS[j-i] = S[ir*GlobalC::ParaO.ncol+ic];
                                 int iic;
-                                if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+                                if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                                 {
-                                    iic=ir+ic*ParaO.nrow;
+                                    iic=ir+ic*GlobalC::ParaO.nrow;
                                 }
                                 else
                                 {
-                                    iic=ir*ParaO.ncol+ic;
+                                    iic=ir*GlobalC::ParaO.ncol+ic;
                                 }
-                                if(NSPIN!=4)
+                                if(GlobalV::NSPIN!=4)
                                 {
-                                    lineH[j] = LM.HR_tr[ix][iy][iz][iic];
-                                    lineS[j] = LM.SlocR_tr[ix][iy][iz][iic];
+                                    lineH[j] = GlobalC::LM.HR_tr[ix][iy][iz][iic];
+                                    lineS[j] = GlobalC::LM.SlocR_tr[ix][iy][iz][iic];
                                 }
                                 else
                                 {
-                                    lineH_soc[j] = LM.HR_tr_soc[ix][iy][iz][iic];
-                                    lineS_soc[j] = LM.SlocR_tr_soc[ix][iy][iz][iic];
+                                    lineH_soc[j] = GlobalC::LM.HR_tr_soc[ix][iy][iz][iic];
+                                    lineS_soc[j] = GlobalC::LM.SlocR_tr_soc[ix][iy][iz][iic];
                                 }
                             }
                         }
@@ -765,23 +765,23 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
                         //do nothing
                     }
 
-                    //Parallel_Reduce::reduce_double_all(lineH,NLOCAL-i);
-                    //Parallel_Reduce::reduce_double_all(lineS,NLOCAL-i);
-                    if(NSPIN!=4)
+                    //Parallel_Reduce::reduce_double_all(lineH,GlobalV::NLOCAL-i);
+                    //Parallel_Reduce::reduce_double_all(lineS,GlobalV::NLOCAL-i);
+                    if(GlobalV::NSPIN!=4)
                     {
-                        Parallel_Reduce::reduce_double_all(lineH,NLOCAL);
-                        Parallel_Reduce::reduce_double_all(lineS,NLOCAL);
+                        Parallel_Reduce::reduce_double_all(lineH,GlobalV::NLOCAL);
+                        Parallel_Reduce::reduce_double_all(lineS,GlobalV::NLOCAL);
                     }
                     else
                     {
-                        Parallel_Reduce::reduce_complex_double_all(lineH_soc,NLOCAL);
-                        Parallel_Reduce::reduce_complex_double_all(lineS_soc,NLOCAL);
+                        Parallel_Reduce::reduce_complex_double_all(lineH_soc,GlobalV::NLOCAL);
+                        Parallel_Reduce::reduce_complex_double_all(lineS_soc,GlobalV::NLOCAL);
                     }
 
-                    if(DRANK==0)
+                    if(GlobalV::DRANK==0)
                     {
-                        //for(int j=i; j<NLOCAL; j++)
-                        for(int j=0; j<NLOCAL; j++)
+                        //for(int j=i; j<GlobalV::NLOCAL; j++)
+                        for(int j=0; j<GlobalV::NLOCAL; j++)
                         {
                             if(i==0 && j==0)
                             {
@@ -790,7 +790,7 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
                             }
                             //g1 << " " << lineH[j-i];
                             //g2 << " " << lineS[j-i];
-                            if(NSPIN!=4)
+                            if(GlobalV::NSPIN!=4)
                             {
                                 if(abs(lineH[j]) < 1.0e-12) lineH[j]=0.0;
                                 if(abs(lineS[j]) < 1.0e-12) lineS[j]=0.0;
@@ -810,7 +810,7 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
                         g1 << endl;
                         g2 << endl;
                     }
-                    if(NSPIN!=4)
+                    if(GlobalV::NSPIN!=4)
                     {
                         delete[] lineH;
                         delete[] lineS;
@@ -822,7 +822,7 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
                     }
                 }
 /*
-                if(DRANK==0);
+                if(GlobalV::DRANK==0);
                 {
                     g1.close();
                     g2.close();
@@ -831,8 +831,8 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
             }
         }
     }
-    //if(DRANK==0);
-    if(DRANK==0)                // Peize Lin delete ; at 2020.01.31
+    //if(GlobalV::DRANK==0);
+    if(GlobalV::DRANK==0)                // Peize Lin delete ; at 2020.01.31
     {
         g1.close();
         g2.close();
@@ -842,15 +842,15 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
     ofstream g1(ssh.str().c_str());
     ofstream g2(sss.str().c_str());
 
-    g1 << NLOCAL;
-    g2 << NLOCAL;
+    g1 << GlobalV::NLOCAL;
+    g2 << GlobalV::NLOCAL;
 
-    for (int i=0; i<NLOCAL; i++)
+    for (int i=0; i<GlobalV::NLOCAL; i++)
     {
-        for (int j=i; j<NLOCAL; j++)
+        for (int j=i; j<GlobalV::NLOCAL; j++)
         {
-            g1 << " " << H[i*NLOCAL+j];
-            g2 << " " << S[i*NLOCAL+j];
+            g1 << " " << H[i*GlobalV::NLOCAL+j];
+            g2 << " " << S[i*GlobalV::NLOCAL+j];
         }
     }
     g1.close();
@@ -866,18 +866,18 @@ void HS_Matrix::save_HSR_sparse(const int &current_spin, const double &sparse_th
     TITLE("HS_Matrix","save_HSR_sparse");
     timer::tick("HS_Matrix","save_HSR_sparse");
 
-    auto &HR_sparse_ptr = LM.HR_sparse;
-    auto &HR_soc_sparse_ptr = LM.HR_soc_sparse;
-    auto &SR_sparse_ptr = LM.SR_sparse;
-    auto &SR_soc_sparse_ptr = LM.SR_soc_sparse;
+    auto &HR_sparse_ptr = GlobalC::LM.HR_sparse;
+    auto &HR_soc_sparse_ptr = GlobalC::LM.HR_soc_sparse;
+    auto &SR_sparse_ptr = GlobalC::LM.SR_sparse;
+    auto &SR_soc_sparse_ptr = GlobalC::LM.SR_soc_sparse;
 
-    int R_x = GridD.getCellX();
-    int R_y = GridD.getCellY();
-    int R_z = GridD.getCellZ();
+    int R_x = GlobalC::GridD.getCellX();
+    int R_y = GlobalC::GridD.getCellY();
+    int R_z = GlobalC::GridD.getCellZ();
 
-    double R_minX = GridD.getD_minX();
-    double R_minY = GridD.getD_minY();
-    double R_minZ = GridD.getD_minZ();
+    double R_minX = GlobalC::GridD.getD_minX();
+    double R_minY = GlobalC::GridD.getD_minY();
+    double R_minZ = GlobalC::GridD.getD_minZ();
 
     int total_R_number = R_x * R_y * R_z;
     int output_R_number = 0;
@@ -892,7 +892,7 @@ void HS_Matrix::save_HSR_sparse(const int &current_spin, const double &sparse_th
             {
                 H_nonzero_number[count_n] = 0;
                 S_nonzero_number[count_n] = 0;
-                if (NSPIN != 4)
+                if (GlobalV::NSPIN != 4)
                 {
                     for (auto &iter : HR_sparse_ptr[ix][iy][iz])
                     {
@@ -937,31 +937,31 @@ void HS_Matrix::save_HSR_sparse(const int &current_spin, const double &sparse_th
 
     stringstream ssh;
     stringstream sss;
-    ssh << global_out_dir << "data-HR-sparse_SPIN" << current_spin << ".csr";
-    sss << global_out_dir << "data-SR-sparse_SPIN" << current_spin << ".csr";
+    ssh << GlobalV::global_out_dir << "data-HR-sparse_SPIN" << current_spin << ".csr";
+    sss << GlobalV::global_out_dir << "data-SR-sparse_SPIN" << current_spin << ".csr";
     ofstream g1;
     ofstream g2;
 
-    if(DRANK==0)
+    if(GlobalV::DRANK==0)
     {
         if (binary)
         {
             g1.open(ssh.str().c_str(), ios::binary);
-            g1.write(reinterpret_cast<char *>(&NLOCAL), sizeof(int));
+            g1.write(reinterpret_cast<char *>(&GlobalV::NLOCAL), sizeof(int));
             g1.write(reinterpret_cast<char *>(&output_R_number), sizeof(int));
 
             g2.open(sss.str().c_str(), ios::binary);
-            g2.write(reinterpret_cast<char *>(&NLOCAL), sizeof(int));
+            g2.write(reinterpret_cast<char *>(&GlobalV::NLOCAL), sizeof(int));
             g2.write(reinterpret_cast<char *>(&output_R_number), sizeof(int));
         }
         else
         {
             g1.open(ssh.str().c_str());
-            g1 << "Matrix Dimension of H(R): " << NLOCAL <<endl;
+            g1 << "Matrix Dimension of H(R): " << GlobalV::NLOCAL <<endl;
             g1 << "Matrix number of H(R): " << output_R_number << endl;
 
             g2.open(sss.str().c_str());
-            g2 << "Matrix Dimension of S(R): " << NLOCAL <<endl;
+            g2 << "Matrix Dimension of S(R): " << GlobalV::NLOCAL <<endl;
             g2 << "Matrix number of S(R): " << output_R_number << endl;
         }
     }
@@ -983,7 +983,7 @@ void HS_Matrix::save_HSR_sparse(const int &current_spin, const double &sparse_th
                     continue;
                 }
 
-                if (DRANK == 0) 
+                if (GlobalV::DRANK == 0) 
                 {
                     if (binary)
                     {
@@ -1006,13 +1006,13 @@ void HS_Matrix::save_HSR_sparse(const int &current_spin, const double &sparse_th
 
                 if (H_nonzero_number[count_n] == 0)
                 {
-                    // if (DRANK == 0)
+                    // if (GlobalV::DRANK == 0)
                     // {
                     //     if (!binary)
                     //     {
                     //         g1 << endl;
                     //         g1 << endl;
-                    //         for (int index = 0; index < NLOCAL+1; ++index)
+                    //         for (int index = 0; index < GlobalV::NLOCAL+1; ++index)
                     //         {
                     //             g1 << 0 << " ";
                     //         }
@@ -1022,7 +1022,7 @@ void HS_Matrix::save_HSR_sparse(const int &current_spin, const double &sparse_th
                 }
                 else
                 {
-                    if (NSPIN != 4)
+                    if (GlobalV::NSPIN != 4)
                     {
                         output_single_R(g1, HR_sparse_ptr[ix][iy][iz], sparse_threshold, binary);
                     }
@@ -1036,11 +1036,11 @@ void HS_Matrix::save_HSR_sparse(const int &current_spin, const double &sparse_th
                 {
                     // if (!binary)
                     // {
-                    //     if (DRANK == 0)
+                    //     if (GlobalV::DRANK == 0)
                     //     {
                     //         g2 << endl;
                     //         g2 << endl;
-                    //         for (int index = 0; index < NLOCAL+1; ++index)
+                    //         for (int index = 0; index < GlobalV::NLOCAL+1; ++index)
                     //         {
                     //             g2 << 0 << " ";
                     //         }
@@ -1050,7 +1050,7 @@ void HS_Matrix::save_HSR_sparse(const int &current_spin, const double &sparse_th
                 }
                 else
                 {
-                    if (NSPIN != 4)
+                    if (GlobalV::NSPIN != 4)
                     {
                         output_single_R(g2, SR_sparse_ptr[ix][iy][iz], sparse_threshold, binary);
                     }
@@ -1066,7 +1066,7 @@ void HS_Matrix::save_HSR_sparse(const int &current_spin, const double &sparse_th
         }
     }
 
-    if(DRANK==0) 
+    if(GlobalV::DRANK==0) 
     {
         g1.close();
         g2.close();
@@ -1085,15 +1085,15 @@ void HS_Matrix::output_single_R(ofstream &ofs, const map<size_t, map<size_t, dou
 {
     double *line = nullptr;
     vector<int> indptr;
-    indptr.reserve(NLOCAL + 1);
+    indptr.reserve(GlobalV::NLOCAL + 1);
     indptr.push_back(0);
 
     stringstream tem1;
-    tem1 << global_out_dir << "temp_sparse_indices.dat";
+    tem1 << GlobalV::global_out_dir << "temp_sparse_indices.dat";
     ofstream ofs_tem1;
     ifstream ifs_tem1;
 
-    if (DRANK == 0)
+    if (GlobalV::DRANK == 0)
     {
         if (binary)
         {
@@ -1105,12 +1105,12 @@ void HS_Matrix::output_single_R(ofstream &ofs, const map<size_t, map<size_t, dou
         }
     }
 
-    for(int row = 0; row < NLOCAL; ++row)
+    for(int row = 0; row < GlobalV::NLOCAL; ++row)
     {
-        line = new double[NLOCAL];
-        ZEROS(line, NLOCAL);
+        line = new double[GlobalV::NLOCAL];
+        ZEROS(line, GlobalV::NLOCAL);
 
-        if(ParaO.trace_loc_row[row] >= 0)
+        if(GlobalC::ParaO.trace_loc_row[row] >= 0)
         {
             auto iter = XR.find(row);
             if (iter != XR.end())
@@ -1122,12 +1122,12 @@ void HS_Matrix::output_single_R(ofstream &ofs, const map<size_t, map<size_t, dou
             }
         }
 
-        Parallel_Reduce::reduce_double_all(line, NLOCAL);
+        Parallel_Reduce::reduce_double_all(line, GlobalV::NLOCAL);
 
-        if(DRANK == 0)
+        if(GlobalV::DRANK == 0)
         {
             int nonzeros_count = 0;
-            for (int col = 0; col < NLOCAL; ++col)
+            for (int col = 0; col < GlobalV::NLOCAL; ++col)
             {
                 if (abs(line[col]) > sparse_threshold)
                 {
@@ -1156,7 +1156,7 @@ void HS_Matrix::output_single_R(ofstream &ofs, const map<size_t, map<size_t, dou
 
     }
 
-    if (DRANK == 0)
+    if (GlobalV::DRANK == 0)
     {
         if (binary)
         {
@@ -1194,15 +1194,15 @@ void HS_Matrix::output_soc_single_R(ofstream &ofs, const map<size_t, map<size_t,
 {
     complex<double> *line = nullptr;
     vector<int> indptr;
-    indptr.reserve(NLOCAL + 1);
+    indptr.reserve(GlobalV::NLOCAL + 1);
     indptr.push_back(0);
 
     stringstream tem1;
-    tem1 << global_out_dir << "temp_sparse_indices.dat";
+    tem1 << GlobalV::global_out_dir << "temp_sparse_indices.dat";
     ofstream ofs_tem1;
     ifstream ifs_tem1;
 
-    if (DRANK == 0)
+    if (GlobalV::DRANK == 0)
     {
         if (binary)
         {
@@ -1214,12 +1214,12 @@ void HS_Matrix::output_soc_single_R(ofstream &ofs, const map<size_t, map<size_t,
         }
     }
 
-    for(int row = 0; row < NLOCAL; ++row)
+    for(int row = 0; row < GlobalV::NLOCAL; ++row)
     {
-        line = new complex<double>[NLOCAL];
-        ZEROS(line, NLOCAL);
+        line = new complex<double>[GlobalV::NLOCAL];
+        ZEROS(line, GlobalV::NLOCAL);
 
-        if(ParaO.trace_loc_row[row] >= 0)
+        if(GlobalC::ParaO.trace_loc_row[row] >= 0)
         {
             auto iter = XR.find(row);
             if (iter != XR.end())
@@ -1231,12 +1231,12 @@ void HS_Matrix::output_soc_single_R(ofstream &ofs, const map<size_t, map<size_t,
             }
         }
 
-        Parallel_Reduce::reduce_complex_double_all(line, NLOCAL);
+        Parallel_Reduce::reduce_complex_double_all(line, GlobalV::NLOCAL);
 
-        if (DRANK == 0)
+        if (GlobalV::DRANK == 0)
         {
             int nonzeros_count = 0;
-            for (int col = 0; col < NLOCAL; ++col)
+            for (int col = 0; col < GlobalV::NLOCAL; ++col)
             {
                 if (abs(line[col]) > sparse_threshold)
                 {
@@ -1266,7 +1266,7 @@ void HS_Matrix::output_soc_single_R(ofstream &ofs, const map<size_t, map<size_t,
 
     }
 
-    if (DRANK == 0)
+    if (GlobalV::DRANK == 0)
     {
         if (binary)
         {

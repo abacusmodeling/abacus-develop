@@ -30,11 +30,11 @@ void Exx_Abfs::Screen::Cauchy::cal_norm_C_max(
 	for( const auto & Cs1 : Cs )
 	{
 		const size_t iat1 = Cs1.first;
-		const size_t it1 = ucell.iat2it[iat1];
+		const size_t it1 = GlobalC::ucell.iat2it[iat1];
 		for( const auto & Cs2 : Cs1.second )
 		{
 			const size_t iat2 = Cs2.first;
-			const size_t it2 = ucell.iat2it[iat2];
+			const size_t it2 = GlobalC::ucell.iat2it[iat2];
 			for( const auto & Cs3 : Cs2.second )
 			{
 				const Abfs::Vector3_Order<int> &box2 = Cs3.first;
@@ -132,7 +132,7 @@ void Exx_Abfs::Screen::Cauchy::cal_norm_D_max( const vector<map<size_t,map<size_
 	if(!flag_screen_cauchy)	return;
 	TITLE("Exx_Abfs::Screen::Cauchy::cal_norm_D_max");
 	
-	for( size_t is=0; is!=NSPIN; ++is )
+	for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		for( const auto & DsA : Ds[is] )
 		{
@@ -246,24 +246,24 @@ bool Exx_Abfs::Screen::Cauchy::postcalC(
 		case 1:
 			if( info_step.C1_norm2_max * DVC24_norm2_max > threshold )
 			{
-//				num_cal += 0.25/NSPIN;
+//				num_cal += 0.25/GlobalV::NSPIN;
 				return true;
 			}
 			else 
 			{
-//				num_screen3 += 0.25/NSPIN; 
+//				num_screen3 += 0.25/GlobalV::NSPIN; 
 				return false; 
 			}
 			break;
 		case 3:
 			if( info_step.C3_norm2_max * DVC24_norm2_max > threshold )	
 			{ 
-//				num_cal += 0.25/NSPIN; 
+//				num_cal += 0.25/GlobalV::NSPIN; 
 				return true; 
 			}
 			else
 			{ 
-//				num_screen3 += 0.25/NSPIN; 
+//				num_screen3 += 0.25/GlobalV::NSPIN; 
 				return false; 
 			}	
 			break;

@@ -25,6 +25,7 @@ add_library(
     occupy.cpp
     potential.cpp
     potential_libxc.cpp
+    potential_libxc_meta.cpp
     pw_basis.cpp
     pw_complement.cpp
     soc.cpp
@@ -42,9 +43,6 @@ add_library(
     stress_func_nl.cpp
     stress_func_print.cpp
     stress_pw.cpp
-    symm_other.cpp
-    symmetry.cpp
-    symmetry_basic.cpp
     symmetry_rho.cpp
     threshold_elec.cpp
     use_fft.cpp
@@ -61,4 +59,5 @@ add_library(
     xc_functional.cpp
     xc_gga_pw.cpp
     xc_type.cpp
+    run_md_pw.cpp
 )

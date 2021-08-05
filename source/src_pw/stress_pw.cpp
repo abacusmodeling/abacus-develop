@@ -63,7 +63,7 @@ void Stress_PW::cal_stress(matrix& sigmatot)
     //xc contribution: add gradient corrections(non diagonal)
     for(int i=0;i<3;i++)
 	{
-       sigmaxc(i,i) = - (H_XC_pw::etxc - H_XC_pw::vtxc) / ucell.omega;
+       sigmaxc(i,i) = - (H_XC_pw::etxc - H_XC_pw::vtxc) / GlobalC::ucell.omega;
     }
     stress_gga(sigmaxc);
 
@@ -94,27 +94,27 @@ void Stress_PW::cal_stress(matrix& sigmatot)
         }
     }
     
-	if(Symmetry::symm_flag)                          
+	if(ModuleSymmetry::Symmetry::symm_flag)                          
 	{
-		symm.stress_symmetry(sigmatot);
+		GlobalC::symm.stress_symmetry(sigmatot, GlobalC::ucell);
 	}
 
 	bool ry = false;
 	this->printstress_total(sigmatot, ry);
 
-	if(TEST_STRESS) 
+	if(GlobalV::TEST_STRESS) 
 	{               
-		ofs_running << "\n PARTS OF STRESS: " << endl;
-		ofs_running << setiosflags(ios::showpos);
-		ofs_running << setiosflags(ios::fixed) << setprecision(10) << endl;
-		this->print_stress("KINETIC    STRESS",sigmakin,TEST_STRESS,ry);
-		this->print_stress("LOCAL    STRESS",sigmaloc,TEST_STRESS,ry);
-		this->print_stress("HARTREE    STRESS",sigmahar,TEST_STRESS,ry);
-		this->print_stress("NON-LOCAL    STRESS",sigmanl,TEST_STRESS,ry);
-		this->print_stress("XC    STRESS",sigmaxc,TEST_STRESS,ry);
-		this->print_stress("EWALD    STRESS",sigmaewa,TEST_STRESS,ry);
-		this->print_stress("NLCC    STRESS",sigmaxcc,TEST_STRESS,ry);
-		this->print_stress("TOTAL    STRESS",sigmatot,TEST_STRESS,ry);
+		GlobalV::ofs_running << "\n PARTS OF STRESS: " << endl;
+		GlobalV::ofs_running << setiosflags(ios::showpos);
+		GlobalV::ofs_running << setiosflags(ios::fixed) << setprecision(10) << endl;
+		this->print_stress("KINETIC    STRESS",sigmakin,GlobalV::TEST_STRESS,ry);
+		this->print_stress("LOCAL    STRESS",sigmaloc,GlobalV::TEST_STRESS,ry);
+		this->print_stress("HARTREE    STRESS",sigmahar,GlobalV::TEST_STRESS,ry);
+		this->print_stress("NON-LOCAL    STRESS",sigmanl,GlobalV::TEST_STRESS,ry);
+		this->print_stress("XC    STRESS",sigmaxc,GlobalV::TEST_STRESS,ry);
+		this->print_stress("EWALD    STRESS",sigmaewa,GlobalV::TEST_STRESS,ry);
+		this->print_stress("NLCC    STRESS",sigmaxcc,GlobalV::TEST_STRESS,ry);
+		this->print_stress("TOTAL    STRESS",sigmatot,GlobalV::TEST_STRESS,ry);
 	}
 	return;
     
@@ -123,15 +123,15 @@ void Stress_PW::cal_stress(matrix& sigmatot)
 void Stress_PW::stress_vdw(matrix& sigma)
 {
 	matrix force;
-	if(vdwd2_para.flag_vdwd2) //Peize Lin add 2014-04-04, update 2021-03-09
+	if(GlobalC::vdwd2_para.flag_vdwd2) //Peize Lin add 2014-04-04, update 2021-03-09
 	{
-		Vdwd2 vdwd2(ucell,vdwd2_para);
+		Vdwd2 vdwd2(GlobalC::ucell,GlobalC::vdwd2_para);
 		vdwd2.cal_stress();
 		sigma = vdwd2.get_stress().to_matrix();
 	}
-	if(vdwd3_para.flag_vdwd3) //jiyy add 2019-05-18, update 2021-05-02
+	if(GlobalC::vdwd3_para.flag_vdwd3) //jiyy add 2019-05-18, update 2021-05-02
 	{
-		Vdwd3 vdwd3(ucell,vdwd3_para);
+		Vdwd3 vdwd3(GlobalC::ucell,GlobalC::vdwd3_para);
 		vdwd3.cal_stress();
 		sigma = vdwd3.get_stress().to_matrix();
 	}              

@@ -7,6 +7,7 @@
 #define NUMERICAL_BASIS_H
 #include "../src_pw/tools.h"
 #include "bessel_basis.h"
+#include <vector>
 //==========================================================
 // CLASS :
 // NAME :  Numerical_Basis 
@@ -22,33 +23,48 @@ class Numerical_Basis
 
 	private:
 
-	static bool init_label;
+	bool init_label = false;
 
-	static Bessel_Basis bessel_basis;
+	Bessel_Basis bessel_basis;
 
-	static IntArray *mu_index;
-	static void init_mu_index(void);
+	std::vector<IntArray> mu_index;
+	static std::vector<IntArray> init_mu_index(void);
 
 	void numerical_atomic_wfc(const int &ik,const int &np,ComplexMatrix &psi);
 
-	void Sq_overlap( 
-		realArray &Sq_imag,
-		realArray &Sq_real,
+	ComplexArray cal_overlap_Q(
+		const int &ik, const int &np, const ComplexMatrix &psi,
+		const int derivative_order ) const;
+		
+	ComplexArray cal_overlap_Sq(
 		const int &ik, 
-		const int &np );
+		const int &np,
+		const int derivative_order ) const;
 
-	void jlq3d_overlap(realArray &overlap_Q1, realArray &overlap_Q2,
-		const int &ik_ibz, const int &ik, const int &np, const ComplexMatrix &psi);
+	static matrix cal_overlap_V(const ComplexMatrix *psi, const int derivative_order);
 
-	void output_overlap_Sq(
+	realArray cal_flq(const int ik, const std::vector<Vector3<double>> &gk) const;
+
+	static matrix cal_ylm(const std::vector<Vector3<double>> &gk);
+	
+	static void output_info(
+		ofstream &ofs,
+		const Bessel_Basis &bessel_basis);
+
+	static void output_k(ofstream &ofs);
+
+	static void output_overlap_Q(
+		ofstream &ofs,
+		const std::vector<ComplexArray> &overlap_Q);
+
+	static void output_overlap_Sq(
 		const string &name,
 		ofstream &ofs, 
-		const realArray *Sq_real, const realArray *Sq_imag);
+		const std::vector<ComplexArray> &overlap_Sq);
 
-	void output_overlap_Q(
+	static void output_overlap_V(
 		ofstream &ofs,
-		const realArray &overlap_Q1,
-		const realArray &overlap_Q2);
+		const matrix &overlap_V);
 
 };
 

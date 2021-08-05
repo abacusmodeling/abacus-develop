@@ -9,8 +9,8 @@ void CHECK_NAME(ifstream &ifs,const string &name_in,bool quit)
     {
 		if(quit)
 		{
-			//ofs_warning << "\n name = " <<name;
-			//ofs_warning << "\n should be = " << name_in;
+			//GlobalV::ofs_warning << "\n name = " <<name;
+			//GlobalV::ofs_warning << "\n should be = " << name_in;
 			cout << "\n name = " <<name;
 			cout << "\n should be = " << name_in;
         	WARNING_QUIT("CHECK_NAME","Some parameter name is wrong!");

@@ -156,11 +156,11 @@ void Ions_Move_CG::start(const matrix& force, const double& etot_in)
 			fmax=fa;
 			sd=false;
 			
-			if(MOVE_IONS=="cg_bfgs")
+			if(GlobalV::MOVE_IONS=="cg_bfgs")
 			{
 				if(Ions_Move_Basic::largest_grad * Ry_to_eV / 0.529177 < CG_THRESHOLD )         // cg to bfgs  by pengfei 13-8-8
 				{
-					 MOVE_IONS="bfgs";
+					 GlobalV::MOVE_IONS="bfgs";
 				}
 				Ions_Move_Basic::best_xxx = steplength;
 			}

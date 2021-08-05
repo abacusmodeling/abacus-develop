@@ -10,22 +10,22 @@ Exx_Abfs::Parallel::Distribute::Kmeans::cluster( const int Nc )
 	TITLE("Exx_Abfs::Parallel::Distribute::Kmeans::cluster");
 	
 	vector<Cluster> clusters(Nc+1);						// clusters[Nc] just for atoms init
-	vector<Atom> atoms(ucell.nat);
+	vector<Atom> atoms(GlobalC::ucell.nat);
 	
-//ofstream ofs_mpi(exx_lcao.test_dir.process+"kmeans_"+TO_STRING(Nc)+"_"+TO_STRING(MY_RANK),ofstream::app);
+//ofstream ofs_mpi(exx_lcao.test_dir.process+"kmeans_"+TO_STRING(Nc)+"_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
 	
 	auto init = [&]() -> void
 	{
 //ofs_mpi<<Nc<<endl;
-		const double volumn = abs(ucell.a1.norm()*ucell.a2.norm()*ucell.a3.norm());
+		const double volumn = abs(GlobalC::ucell.a1.norm()*GlobalC::ucell.a2.norm()*GlobalC::ucell.a3.norm());
 //ofs_mpi<<volumn<<endl;
 		const double rate = pow(Nc/volumn,1.0/3.0);
 //ofs_mpi<<rate<<endl;
-//ofs_mpi<<ucell.a1<<"\t"<<ucell.a2<<"\t"<<ucell.a3<<endl;
-//ofs_mpi<<ucell.a1.norm()<<"\t"<<ucell.a2.norm()<<"\t"<<ucell.a3.norm()<<endl;
-		const int Nx = ceil(ucell.a1.norm()*rate);
-		const int Ny = ceil(ucell.a2.norm()*rate);
-		const int Nz = ceil(ucell.a3.norm()*rate);
+//ofs_mpi<<GlobalC::ucell.a1<<"\t"<<GlobalC::ucell.a2<<"\t"<<GlobalC::ucell.a3<<endl;
+//ofs_mpi<<GlobalC::ucell.a1.norm()<<"\t"<<GlobalC::ucell.a2.norm()<<"\t"<<GlobalC::ucell.a3.norm()<<endl;
+		const int Nx = ceil(GlobalC::ucell.a1.norm()*rate);
+		const int Ny = ceil(GlobalC::ucell.a2.norm()*rate);
+		const int Nz = ceil(GlobalC::ucell.a3.norm()*rate);
 //ofs_mpi<<Nx<<"\t"<<Ny<<"\t"<<Nz<<endl;
 
 		vector<bool> flag_is_center(Nx*Ny*Nz,true);
@@ -44,9 +44,9 @@ Exx_Abfs::Parallel::Distribute::Kmeans::cluster( const int Nc )
 		
 		Vector3<double> taud_max = {0,0,0},
 		                taud_min = {1,1,1};
-		for( int iat=0; iat<ucell.nat; ++iat )
+		for( int iat=0; iat<GlobalC::ucell.nat; ++iat )
 		{
-			const Vector3<double> & taud = ucell.atoms[ ucell.iat2it[iat] ].taud[ ucell.iat2ia[iat] ];
+			const Vector3<double> & taud = GlobalC::ucell.atoms[ GlobalC::ucell.iat2it[iat] ].taud[ GlobalC::ucell.iat2ia[iat] ];
 			taud_max.x = max( taud.x, taud_max.x );
 			taud_max.y = max( taud.y, taud_max.y );
 			taud_max.z = max( taud.z, taud_max.z );
@@ -65,9 +65,9 @@ Exx_Abfs::Parallel::Distribute::Kmeans::cluster( const int Nc )
 				for( int iz=0; iz<Nz; ++iz,++ic_big )
 					if(flag_is_center[ic_big])
 					{
-						clusters[ic].tau = ((ix+0.5)*taud_delta.x+taud_min.x)*ucell.a1 
-						                 + ((iy+0.5)*taud_delta.y+taud_min.y)*ucell.a2 
-						                 + ((iz+0.5)*taud_delta.z+taud_min.z)*ucell.a3;
+						clusters[ic].tau = ((ix+0.5)*taud_delta.x+taud_min.x)*GlobalC::ucell.a1 
+						                 + ((iy+0.5)*taud_delta.y+taud_min.y)*GlobalC::ucell.a2 
+						                 + ((iz+0.5)*taud_delta.z+taud_min.z)*GlobalC::ucell.a3;
 						++ic;
 					}
 /*
@@ -75,9 +75,9 @@ Exx_Abfs::Parallel::Distribute::Kmeans::cluster( const int Nc )
 		random_engine.seed(time(0));
 		std::uniform_real_distribution<double> uniform(0,1);
 		for( int ic=0; ic<Nc; ++ic )
-			clusters[ic].tau = uniform(random_engine)*ucell.a1
-			                 + uniform(random_engine)*ucell.a2
-			                 + uniform(random_engine)*ucell.a3;
+			clusters[ic].tau = uniform(random_engine)*GlobalC::ucell.a1
+			                 + uniform(random_engine)*GlobalC::ucell.a2
+			                 + uniform(random_engine)*GlobalC::ucell.a3;
 */							 
 		for( int ic=0; ic<Nc; ++ic )
 		{
@@ -85,18 +85,18 @@ Exx_Abfs::Parallel::Distribute::Kmeans::cluster( const int Nc )
 			clusters[ic].size = 0;
 		}
 		clusters[Nc].tau_sum = {0,0,0};
-		clusters[Nc].size = ucell.nat;
+		clusters[Nc].size = GlobalC::ucell.nat;
 		
-		for( int iat=0; iat<ucell.nat; ++iat )
+		for( int iat=0; iat<GlobalC::ucell.nat; ++iat )
 		{
-			atoms[iat].tau = ucell.atoms[ ucell.iat2it[iat] ].tau[ ucell.iat2ia[iat] ];
+			atoms[iat].tau = GlobalC::ucell.atoms[ GlobalC::ucell.iat2it[iat] ].tau[ GlobalC::ucell.iat2ia[iat] ];
 			atoms[iat].center = Nc;
 			atoms[iat].distance = std::numeric_limits<double>::max();
 		}
 //for( int ic=0; ic<Nc; ++ic )
 //	ofs_mpi<<clusters[ic].tau<<"\t";
 //ofs_mpi<<endl;
-//for( int iat=0; iat<ucell.nat; ++iat )
+//for( int iat=0; iat<GlobalC::ucell.nat; ++iat )
 //	ofs_mpi<<atoms[iat].center<<"\t";
 //ofs_mpi<<endl;		
 	};
@@ -106,7 +106,7 @@ Exx_Abfs::Parallel::Distribute::Kmeans::cluster( const int Nc )
 	{
 //ofs_mpi<<__FILE__<<__LINE__<<endl;
 		bool flag_atom_move = false;
-		for( int iat=0; iat<ucell.nat; ++iat )
+		for( int iat=0; iat<GlobalC::ucell.nat; ++iat )
 		{
 			for( int ic=0; ic<Nc; ++ic )
 			{
@@ -132,7 +132,7 @@ Exx_Abfs::Parallel::Distribute::Kmeans::cluster( const int Nc )
 //for( int ic=0; ic<Nc; ++ic )
 //	ofs_mpi<<clusters[ic].tau<<"\t";
 //ofs_mpi<<endl;
-//for( int iat=0; iat<ucell.nat; ++iat )
+//for( int iat=0; iat<GlobalC::ucell.nat; ++iat )
 //	ofs_mpi<<atoms[iat].center<<"\t";
 //ofs_mpi<<endl;
 
@@ -214,15 +214,15 @@ Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans2( const MPI_Comm & mpi
 			auto index = [&](const int ic1, const int ic2){ return (ic1*N2+ic2)%comm_size; };
 			
 			vector<vector<pair<size_t,size_t>>> rank_work(comm_size);
-			for( size_t iatA=0; iatA<ucell.nat; ++iatA )
+			for( size_t iatA=0; iatA<GlobalC::ucell.nat; ++iatA )
 			{
 				rank_work[index(atoms1[iatA].center, atoms2[iatA].center)].push_back({iatA,iatA});
-				for( size_t iatB=iatA+1; iatB<ucell.nat; ++iatB )
+				for( size_t iatB=iatA+1; iatB<GlobalC::ucell.nat; ++iatB )
 					if( atoms1[iatA].center==atoms1[iatB].center && atoms2[iatA].center==atoms2[iatB].center )
 						rank_work[index(atoms1[iatA].center, atoms2[iatB].center)].push_back({iatA,iatB});
 			}
-			for( size_t iatA=0; iatA<ucell.nat; ++iatA )
-				for( size_t iatB=iatA+1; iatB<ucell.nat; ++iatB )
+			for( size_t iatA=0; iatA<GlobalC::ucell.nat; ++iatA )
+				for( size_t iatB=iatA+1; iatB<GlobalC::ucell.nat; ++iatB )
 					if( atoms1[iatA].center!=atoms1[iatB].center || atoms2[iatA].center!=atoms2[iatB].center )
 					{
 						vector<pair<size_t,size_t>> & rank_work1 = rank_work[index(atoms1[iatA].center, atoms2[iatB].center)];
@@ -255,7 +255,7 @@ Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans1( const MPI_Comm & mpi
 {
 	int comm_size;	MPI_Comm_size( mpi_comm, &comm_size );
 	int my_rank;	MPI_Comm_rank( mpi_comm, &my_rank );
-ofstream ofs_mpi(exx_lcao.test_dir.process+"kmeans_"+TO_STRING(my_rank),ofstream::app);
+ofstream ofs_mpi(GlobalC::exx_lcao.test_dir.process+"kmeans_"+TO_STRING(my_rank),ofstream::app);
 
 	auto classify_atom = []( const int Ng, const vector<Exx_Abfs::Parallel::Distribute::Kmeans::Atom> &atoms ) -> vector<vector<size_t>>
 	{
@@ -283,13 +283,13 @@ for(const auto cluster : clusters)
 	vector<pair<size_t,size_t>> rank_work;
 	for(const size_t iat1 : clusters_atoms[my_rank])
 	{
-		const int it1 = ucell.iat2it[iat1];
-		const Vector3<double> tau1 = ucell.atoms[it1].tau[ucell.iat2ia[iat1]];
+		const int it1 = GlobalC::ucell.iat2it[iat1];
+		const Vector3<double> tau1 = GlobalC::ucell.atoms[it1].tau[GlobalC::ucell.iat2ia[iat1]];
 		const int ic1 = atoms[iat1].center;
-		for(size_t iat2=0; iat2!=ucell.nat; ++iat2)
+		for(size_t iat2=0; iat2!=GlobalC::ucell.nat; ++iat2)
 		{
-			const int it2 = ucell.iat2it[iat2];
-			const Vector3<double> tau2 = ucell.atoms[it2].tau[ucell.iat2ia[iat2]];
+			const int it2 = GlobalC::ucell.iat2it[iat2];
+			const Vector3<double> tau2 = GlobalC::ucell.atoms[it2].tau[GlobalC::ucell.iat2ia[iat2]];
 			const int ic2 = atoms[iat2].center;
 			
 			double R_min = std::numeric_limits<double>::max();
@@ -297,7 +297,7 @@ for(const auto cluster : clusters)
 			Vector3<int> box2_min;			// test
 			for(const Vector3<int> box2 : boxes)
 			{
-				const Vector3<double> tau2_box2 = tau2 + box2 * ucell.latvec;
+				const Vector3<double> tau2_box2 = tau2 + box2 * GlobalC::ucell.latvec;
 				const double R = (-tau1+tau2_box2).norm();
 				if(R<R_min)
 				{
@@ -307,8 +307,8 @@ for(const auto cluster : clusters)
 				}
 			}
 
-			const double Rcut = std::min( ORB.Phi[it1].getRcut()*rmesh_times+ORB.Phi[it2].getRcut(), ORB.Phi[it1].getRcut()+ORB.Phi[it2].getRcut()*rmesh_times );
-			if(R_min*ucell.lat0<Rcut)
+			const double Rcut = std::min( GlobalC::ORB.Phi[it1].getRcut()*rmesh_times+GlobalC::ORB.Phi[it2].getRcut(), GlobalC::ORB.Phi[it1].getRcut()+GlobalC::ORB.Phi[it2].getRcut()*rmesh_times );
+			if(R_min*GlobalC::ucell.lat0<Rcut)
 			{
 				if(ic1==ic2)
 				{
@@ -321,11 +321,11 @@ for(const auto cluster : clusters)
 				{
 					constexpr double epsilon = 1E-8;
 					const Vector3<double> middle = (tau1 + tau2_box2_min)/2.0;
-					if( (middle-clusters[ic1].tau).norm() < (middle-clusters[ic2].tau-box2_min*ucell.latvec).norm() - epsilon )
+					if( (middle-clusters[ic1].tau).norm() < (middle-clusters[ic2].tau-box2_min*GlobalC::ucell.latvec).norm() - epsilon )
 					{
 						rank_work.push_back({iat1,iat2});
 					}
-					else if( std::abs( (middle-clusters[ic1].tau).norm() - (middle-clusters[ic2].tau-box2_min*ucell.latvec).norm() )<=epsilon )
+					else if( std::abs( (middle-clusters[ic1].tau).norm() - (middle-clusters[ic2].tau-box2_min*GlobalC::ucell.latvec).norm() )<=epsilon )
 					{
 						if(iat1<iat2)
 						{

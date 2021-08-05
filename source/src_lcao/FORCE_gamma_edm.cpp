@@ -7,14 +7,14 @@ double Force_LCAO_gamma::set_EDM_element(
     double*** coef1, double*** coef2, const int &is)
 {
     double ene = 0.0;
-    for (int ib = 0; ib < NBANDS; ib++)
+    for (int ib = 0; ib < GlobalV::NBANDS; ib++)
     {
-        const double w1 = wf.wg(is,ib);
+        const double w1 = GlobalC::wf.wg(is,ib);
         if(w1>0.0)
         {
             if(with_energy)
             {
-                ene += w1 * wf.ekb[is][ib] * coef1[is][ib][ii] * coef2[is][ib][jj];
+                ene += w1 * GlobalC::wf.ekb[is][ib] * coef1[is][ib][ii] * coef2[is][ib][jj];
             }
             else
             {
@@ -33,7 +33,7 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 
 #ifdef __SELINV
 //xiaohui modified 2013-03-23, adding "/*"
-/*    if(DIAGO_TYPE=="selinv")
+/*    if(GlobalV::DIAGO_TYPE=="selinv")
     {
 //      cout << " set_EDM_gamma()" << endl;
 //      cout << " fill dm with density matrix or energy density matrix here." << endl;
@@ -54,7 +54,7 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
             job=2;
         }
         Selinv::dm_ptr = dm;
-        Selinv::using_SELINV(ik, job, LM.Hloc, LM.Sloc);    
+        Selinv::using_SELINV(ik, job, GlobalC::LM.Hloc, GlobalC::LM.Sloc);    
 
         return;
     }
@@ -67,40 +67,40 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
     MPI_Comm_size(DIAG_HPSEPS_WORLD,&nprocs);
     MPI_Comm_rank(DIAG_HPSEPS_WORLD,&myid);
 
-    int local_band=NBANDS/DSIZE;
-	if (DRANK<NBANDS%DSIZE) local_band=local_band+1;
+    int local_band=GlobalV::NBANDS/GlobalV::DSIZE;
+	if (GlobalV::DRANK<GlobalV::NBANDS%GlobalV::DSIZE) local_band=local_band+1;
 
 	int *local_bands;
-	local_bands = new int[DSIZE];
-	ZEROS(local_bands, DSIZE);
+	local_bands = new int[GlobalV::DSIZE];
+	ZEROS(local_bands, GlobalV::DSIZE);
 
 	int lastband_in_proc = 0;
 	//int lastband_number = 0;
 	int count_bands = 0;
-	for (int i=0; i<DSIZE; i++)
+	for (int i=0; i<GlobalV::DSIZE; i++)
 	{
-		if (i<NBANDS%DSIZE)
+		if (i<GlobalV::NBANDS%GlobalV::DSIZE)
 		{
-			local_bands[i]=NBANDS/DSIZE+1;
+			local_bands[i]=GlobalV::NBANDS/GlobalV::DSIZE+1;
 		}
 		else
 		{
-			local_bands[i]=NBANDS/DSIZE;
+			local_bands[i]=GlobalV::NBANDS/GlobalV::DSIZE;
 		}
 		count_bands += local_bands[i];
-		if (count_bands >= NBANDS)
+		if (count_bands >= GlobalV::NBANDS)
 		{
 			lastband_in_proc = i;
-			//lastband_number = NBANDS - (count_bands - local_bands[i]);
+			//lastband_number = GlobalV::NBANDS - (count_bands - local_bands[i]);
 			break;
 		}
 	}
 
-	for(int ispin=0;ispin<NSPIN;ispin++)//need to optimize later! noted by zhengdy20210303
+	for(int ispin=0;ispin<GlobalV::NSPIN;ispin++)//need to optimize later! noted by zhengdy20210303
 	{
 		double** w1;
-		w1 = new double*[NSPIN];
-		for(int is=0; is<NSPIN; is++)
+		w1 = new double*[GlobalV::NSPIN];
+		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			w1[is] = new double[local_band];
 			ZEROS(w1[is], local_band);
@@ -121,11 +121,11 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 				{
 					if(with_energy)
 					{
-						w1[ispin][ib] = wf.wg(ispin, ib + Total_Bands) * wf.ekb[ispin][ib + Total_Bands];
+						w1[ispin][ib] = GlobalC::wf.wg(ispin, ib + Total_Bands) * GlobalC::wf.ekb[ispin][ib + Total_Bands];
 					}
 					else
 					{
-						w1[ispin][ib] = wf.wg(ispin, ib + Total_Bands);
+						w1[ispin][ib] = GlobalC::wf.wg(ispin, ib + Total_Bands);
 					}
 				}
 			}
@@ -133,11 +133,11 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 		}
 
 		double** Z_wg;
-		Z_wg = new double*[NSPIN];
-		for(int is=0; is<NSPIN; is++)
+		Z_wg = new double*[GlobalV::NSPIN];
+		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
-			Z_wg[is] = new double[local_band * NLOCAL];
-			ZEROS(Z_wg[is], local_band * NLOCAL);
+			Z_wg[is] = new double[local_band * GlobalV::NLOCAL];
+			ZEROS(Z_wg[is], local_band * GlobalV::NLOCAL);
 		}
 
 		//time_t time_Z_wg_start = time(NULL);
@@ -147,14 +147,14 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 		{
 			for(int i=0; i<local_bands[myid]; i++)
 			{
-				for(int n=0; n<NLOCAL; n++)
+				for(int n=0; n<GlobalV::NLOCAL; n++)
 				{
-					Z_wg[ispin][i + n*local_bands[myid]] = ParaO.Z_LOC[ispin][i + n*local_bands[myid]]* w1[ispin][i];
+					Z_wg[ispin][i + n*local_bands[myid]] = GlobalC::ParaO.Z_LOC[ispin][i + n*local_bands[myid]]* w1[ispin][i];
 				}
 			}
 		}
 
-		for(int is=0; is<NSPIN; is++)
+		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			delete[] w1[is];
 		}
@@ -168,25 +168,25 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 		double coll_time = 0.0;
 		//double Time_Cal_Start = (double)clock();
 
-		int row_col = NLOCAL/300;
+		int row_col = GlobalV::NLOCAL/300;
 		if(row_col >= 1)
 		{
 			double** ZW_300;
-			ZW_300 = new double*[NSPIN];
-			for(int is=0; is<NSPIN; is++)
+			ZW_300 = new double*[GlobalV::NSPIN];
+			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
 				ZW_300[is] = new double[300 * local_band];
 				ZEROS(ZW_300[is], 300 * local_band);
 			}
 
 			double** Z_300;
-			Z_300 = new double*[NSPIN];
-			for(int is=0; is<NSPIN; is++)
+			Z_300 = new double*[GlobalV::NSPIN];
+			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
 				Z_300[is] = new double[300 * local_band];
 				ZEROS(Z_300[is], 300 * local_band);
 			}
-			if(NLOCAL%300 != 0) row_col += 1;
+			if(GlobalV::NLOCAL%300 != 0) row_col += 1;
 			int row_global = 0;
 			int row_index = 0;
 			int col_global = 0;
@@ -194,7 +194,7 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 			for(int row_count=1; row_count<=row_col; row_count++)
 			{
 				row_global = row_count*300;
-				if(row_global <= NLOCAL)
+				if(row_global <= GlobalV::NLOCAL)
 				{
 					for(int i_row=0; i_row<300; i_row++)
 					{
@@ -208,11 +208,11 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 					for(int col_count=1; col_count<=row_col; col_count++)
 					{
 						col_global = col_count*300;
-						if(col_global <= NLOCAL)
+						if(col_global <= GlobalV::NLOCAL)
 						{
 							double **rho_300;
-							rho_300 = new double*[NSPIN];
-							for(int is=0; is<NSPIN; is++)
+							rho_300 = new double*[GlobalV::NSPIN];
+							for(int is=0; is<GlobalV::NSPIN; is++)
 							{
 								rho_300[is] = new double[300*300];
 								ZEROS(rho_300[is], 300*300);
@@ -223,7 +223,7 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 								col_index = i_col +(col_count-1)*300;
 								for(int ib=0; ib<local_band; ib++)
 								{
-									Z_300[ispin][ib + i_col*local_band] = ParaO.Z_LOC[ispin][ib + col_index*local_band] ;
+									Z_300[ispin][ib + i_col*local_band] = GlobalC::ParaO.Z_LOC[ispin][ib + col_index*local_band] ;
 								}
 							}
 
@@ -247,26 +247,26 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 							double Time_Coll_End = (double)clock();
 
 							coll_time += (Time_Coll_End-Time_Coll_Start);
-							if(GAMMA_ONLY_LOCAL)
+							if(GlobalV::GAMMA_ONLY_LOCAL)
 								{
 								for(int i_row=0; i_row<300; i_row++)
 								{
 									row_index = i_row +(row_count-1)*300;
-									int row_mu = ParaO.trace_loc_row[row_index];
+									int row_mu = GlobalC::ParaO.trace_loc_row[row_index];
 									for(int i_col=0; i_col<300; i_col++)
 									{
 										col_index = i_col +(col_count-1)*300;
-										int col_nu = ParaO.trace_loc_col[col_index];
+										int col_nu = GlobalC::ParaO.trace_loc_col[col_index];
 										if(row_mu >= 0 && col_nu >= 0)
 										{
-											int index = row_mu * ParaO.ncol + col_nu;
+											int index = row_mu * GlobalC::ParaO.ncol + col_nu;
 											//dm[index] = rho_300[ispin][i_col + i_row*300];
 											dm(ispin, index) = rho_300[ispin][i_row + i_col*300];
 											}
 									}
 								}
 							}
-							for(int is=0; is<NSPIN; is++)
+							for(int is=0; is<GlobalV::NSPIN; is++)
 							{
 								delete[] rho_300[is];
 							}
@@ -276,18 +276,18 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 						{
 							int col_remain = 0;
 							int col_index2 = 0;
-							col_remain = NLOCAL - (col_count - 1)*300;
+							col_remain = GlobalV::NLOCAL - (col_count - 1)*300;
 							double** Z_remain;
-							Z_remain = new double*[NSPIN];
-							for(int is=0; is<NSPIN; is++)
+							Z_remain = new double*[GlobalV::NSPIN];
+							for(int is=0; is<GlobalV::NSPIN; is++)
 							{
 								Z_remain[is] = new double[col_remain * local_band];
 								ZEROS(Z_remain[is], col_remain * local_band);
 							}
 
 							double** rho_300_remain;
-							rho_300_remain = new double*[NSPIN];
-							for(int is=0; is<NSPIN; is++)
+							rho_300_remain = new double*[GlobalV::NSPIN];
+							for(int is=0; is<GlobalV::NSPIN; is++)
 							{
 								rho_300_remain[is] = new double[300*col_remain];
 								ZEROS(rho_300_remain[is], 300*col_remain);
@@ -297,7 +297,7 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 								col_index2 = i_col +(col_count-1)*300;
 								for(int ib=0; ib<local_band; ib++)
 								{
-									Z_remain[ispin][ib + i_col*local_band] = ParaO.Z_LOC[ispin][ib + col_index2*local_band] ;
+									Z_remain[ispin][ib + i_col*local_band] = GlobalC::ParaO.Z_LOC[ispin][ib + col_index2*local_band] ;
 								}
 							}
 
@@ -321,26 +321,26 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 							double Time_Coll_End = (double)clock();
 
 							coll_time += (Time_Coll_End-Time_Coll_Start);
-							if(GAMMA_ONLY_LOCAL)
+							if(GlobalV::GAMMA_ONLY_LOCAL)
 								{
 								for(int i_row=0; i_row<300; i_row++)
 								{
 									row_index = i_row +(row_count-1)*300;
-									int row_mu = ParaO.trace_loc_row[row_index];
+									int row_mu = GlobalC::ParaO.trace_loc_row[row_index];
 									for(int i_col=0; i_col<col_remain; i_col++)
 									{
 										col_index = i_col +(col_count-1)*300;
-										int col_nu = ParaO.trace_loc_col[col_index];
+										int col_nu = GlobalC::ParaO.trace_loc_col[col_index];
 										if(row_mu >= 0 && col_nu >= 0)
 										{
-											int index = row_mu * ParaO.ncol + col_nu;
+											int index = row_mu * GlobalC::ParaO.ncol + col_nu;
 											//dm[index] = rho_300_remain[ispin][i_col + i_row*col_remain];
 											dm(ispin, index) = rho_300_remain[ispin][i_row + i_col*300];
 										}
 									}
 								}
 							}
-							for(int is=0; is<NSPIN; is++)
+							for(int is=0; is<GlobalV::NSPIN; is++)
 							{
 								delete[] Z_remain[is];
 								delete[] rho_300_remain[is];
@@ -354,10 +354,10 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 				{
 					int row_remain = 0;
 					int row_index2 = 0;
-					row_remain = NLOCAL - (row_count - 1)*300;
+					row_remain = GlobalV::NLOCAL - (row_count - 1)*300;
 					double** Z_row_remain;
-					Z_row_remain = new double*[NSPIN];
-					for(int is=0; is<NSPIN; is++)
+					Z_row_remain = new double*[GlobalV::NSPIN];
+					for(int is=0; is<GlobalV::NSPIN; is++)
 					{
 						Z_row_remain[is] = new double[row_remain * local_band];
 						ZEROS(Z_row_remain[is], row_remain * local_band);
@@ -375,11 +375,11 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 					for(int col_count=1; col_count<=row_col; col_count++)
 					{
 						col_global = col_count*300;
-						if(col_global <= NLOCAL)
+						if(col_global <= GlobalV::NLOCAL)
 						{
 							double** rho_remain_300;
-							rho_remain_300 = new double*[NSPIN];
-							for(int is=0; is<NSPIN; is++)
+							rho_remain_300 = new double*[GlobalV::NSPIN];
+							for(int is=0; is<GlobalV::NSPIN; is++)
 							{
 								rho_remain_300[is] = new double[row_remain * 300];
 								ZEROS(rho_remain_300[is], row_remain * 300);
@@ -390,7 +390,7 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 								col_index = i_col +(col_count-1)*300;
 								for(int ib=0; ib<local_band; ib++)
 								{
-									Z_300[ispin][ib + i_col*local_band] = ParaO.Z_LOC[ispin][ib + col_index*local_band] ;
+									Z_300[ispin][ib + i_col*local_band] = GlobalC::ParaO.Z_LOC[ispin][ib + col_index*local_band] ;
 								}
 							}
 
@@ -414,25 +414,25 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 							double Time_Coll_End = (double)clock();
 
 							coll_time += (Time_Coll_End-Time_Coll_Start);
-							if(GAMMA_ONLY_LOCAL)
+							if(GlobalV::GAMMA_ONLY_LOCAL)
 								{
 								for(int i_row=0; i_row<row_remain; i_row++)
 								{
 									row_index = i_row +(row_count-1)*300;
-									int row_mu = ParaO.trace_loc_row[row_index];
+									int row_mu = GlobalC::ParaO.trace_loc_row[row_index];
 									for(int i_col=0; i_col<300; i_col++)
 									{
 										col_index = i_col +(col_count-1)*300;
-										int col_nu = ParaO.trace_loc_col[col_index];
+										int col_nu = GlobalC::ParaO.trace_loc_col[col_index];
 										if(row_mu >= 0 && col_nu >= 0)
 										{
-											int index = row_mu * ParaO.ncol + col_nu;
+											int index = row_mu * GlobalC::ParaO.ncol + col_nu;
 											dm(ispin, index) = rho_remain_300[ispin][i_row + i_col*row_remain];
 										}
 									}
 								}
 							}
-							for(int is=0; is<NSPIN; is++)
+							for(int is=0; is<GlobalV::NSPIN; is++)
 							{
 								delete[] rho_remain_300[is];
 							}
@@ -442,17 +442,17 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 						{
 							int col_remain = 0;
 							int col_index2 = 0;
-							col_remain = NLOCAL - (col_count - 1)*300;
+							col_remain = GlobalV::NLOCAL - (col_count - 1)*300;
 							double** Z_col_remain;
-							Z_col_remain = new double*[NSPIN];
-							for(int is=0; is<NSPIN; is++)
+							Z_col_remain = new double*[GlobalV::NSPIN];
+							for(int is=0; is<GlobalV::NSPIN; is++)
 							{
 								Z_col_remain[is] = new double[col_remain * local_band];
 								ZEROS(Z_col_remain[is], col_remain * local_band);
 							}
 							double** rho_remain_remain;
-							rho_remain_remain = new double*[NSPIN];
-							for(int is=0; is<NSPIN; is++)
+							rho_remain_remain = new double*[GlobalV::NSPIN];
+							for(int is=0; is<GlobalV::NSPIN; is++)
 							{
 								rho_remain_remain[is] = new double[row_remain * col_remain];
 								ZEROS(rho_remain_remain[is], row_remain * col_remain);
@@ -462,7 +462,7 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 								col_index2 = i_col +(col_count-1)*300;
 								for(int ib=0; ib<local_band; ib++)
 								{
-									Z_col_remain[ispin][ib + i_col*local_band] = ParaO.Z_LOC[ispin][ib + col_index2*local_band] ;
+									Z_col_remain[ispin][ib + i_col*local_band] = GlobalC::ParaO.Z_LOC[ispin][ib + col_index2*local_band] ;
 								}
 							}
 
@@ -486,25 +486,25 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 							double Time_Coll_End = (double)clock();
 
 							coll_time += (Time_Coll_End-Time_Coll_Start);
-							if(GAMMA_ONLY_LOCAL)
+							if(GlobalV::GAMMA_ONLY_LOCAL)
 								{
 								for(int i_row=0; i_row<row_remain; i_row++)
 								{
 									row_index = i_row +(row_count-1)*300;
-									int row_mu = ParaO.trace_loc_row[row_index];
+									int row_mu = GlobalC::ParaO.trace_loc_row[row_index];
 									for(int i_col=0; i_col<col_remain; i_col++)
 									{
 										col_index = i_col +(col_count-1)*300;
-										int col_nu = ParaO.trace_loc_col[col_index];
+										int col_nu = GlobalC::ParaO.trace_loc_col[col_index];
 										if(row_mu >= 0 && col_nu >= 0)
 										{
-											int index = row_mu * ParaO.ncol + col_nu;
+											int index = row_mu * GlobalC::ParaO.ncol + col_nu;
 											dm(ispin, index) = rho_remain_remain[ispin][i_row + i_col*row_remain];
 										}
 									}
 								}
 							}
-							for(int is=0; is<NSPIN; is++)
+							for(int is=0; is<GlobalV::NSPIN; is++)
 							{
 								delete[] Z_col_remain[is];
 								delete[] rho_remain_remain[is];
@@ -514,14 +514,14 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 								
 						}
 					}
-					for(int is=0; is<NSPIN; is++)
+					for(int is=0; is<GlobalV::NSPIN; is++)
 					{
 						delete[] Z_row_remain[is];
 					}
 					delete[] Z_row_remain;
 				}
 			}
-			for(int is=0; is<NSPIN; is++)
+			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
 				delete[] ZW_300[is];
 				delete[] Z_300[is];
@@ -532,51 +532,51 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 		else
 		{
 			double** rho_NLOCAL_NLOCAL;
-			rho_NLOCAL_NLOCAL = new double*[NSPIN];
-			for(int is=0; is<NSPIN; is++)
+			rho_NLOCAL_NLOCAL = new double*[GlobalV::NSPIN];
+			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
-				rho_NLOCAL_NLOCAL[is] = new double[NLOCAL*NLOCAL];
-				ZEROS(rho_NLOCAL_NLOCAL[is], NLOCAL*NLOCAL);
+				rho_NLOCAL_NLOCAL[is] = new double[GlobalV::NLOCAL*GlobalV::NLOCAL];
+				ZEROS(rho_NLOCAL_NLOCAL[is], GlobalV::NLOCAL*GlobalV::NLOCAL);
 			}
-			for(int i_row=0; i_row<NLOCAL; i_row++)
+			for(int i_row=0; i_row<GlobalV::NLOCAL; i_row++)
 			{
-				for(int i_col=0; i_col<NLOCAL; i_col++)
+				for(int i_col=0; i_col<GlobalV::NLOCAL; i_col++)
 				{
 					for(int ib=0; ib<local_band; ib++)
 					{
-						rho_NLOCAL_NLOCAL[ispin][i_col + i_row*NLOCAL] += Z_wg[ispin][ib + i_row*local_band]  * ParaO.Z_LOC[ispin][ib + i_col*local_band];
+						rho_NLOCAL_NLOCAL[ispin][i_col + i_row*GlobalV::NLOCAL] += Z_wg[ispin][ib + i_row*local_band]  * GlobalC::ParaO.Z_LOC[ispin][ib + i_col*local_band];
 					}
 				}
 			}
 			double Time_Coll_Start = (double)clock();
 			MPI_Barrier(DIAG_HPSEPS_WORLD);
-			Parallel_Reduce::reduce_double_all( rho_NLOCAL_NLOCAL[ispin], NLOCAL*NLOCAL);
+			Parallel_Reduce::reduce_double_all( rho_NLOCAL_NLOCAL[ispin], GlobalV::NLOCAL*GlobalV::NLOCAL);
 			double Time_Coll_End = (double)clock();
 			coll_time += (Time_Coll_End-Time_Coll_Start);
-			if(GAMMA_ONLY_LOCAL)
+			if(GlobalV::GAMMA_ONLY_LOCAL)
 			{
-				for(int i_row=0; i_row<NLOCAL; i_row++)
+				for(int i_row=0; i_row<GlobalV::NLOCAL; i_row++)
 				{
-					int row_mu = ParaO.trace_loc_row[i_row];
-					for(int i_col=0; i_col<NLOCAL; i_col++)
+					int row_mu = GlobalC::ParaO.trace_loc_row[i_row];
+					for(int i_col=0; i_col<GlobalV::NLOCAL; i_col++)
 					{
-						int col_nu = ParaO.trace_loc_col[i_col];
+						int col_nu = GlobalC::ParaO.trace_loc_col[i_col];
 						if(row_mu >= 0 && col_nu >= 0)
 						{
-							int index = row_mu * ParaO.ncol + col_nu;
-							dm(ispin, index) = rho_NLOCAL_NLOCAL[ispin][i_col + i_row*NLOCAL];
+							int index = row_mu * GlobalC::ParaO.ncol + col_nu;
+							dm(ispin, index) = rho_NLOCAL_NLOCAL[ispin][i_col + i_row*GlobalV::NLOCAL];
 						}
 					}
 				}
 			}
-			for(int is=0; is<NSPIN; is++)
+			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
 				delete[] rho_NLOCAL_NLOCAL[is];
 			}
 			delete[] rho_NLOCAL_NLOCAL;
 		}
 
-		for(int is=0; is<NSPIN; is++)
+		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			delete[] Z_wg[is];
 		}
@@ -585,50 +585,50 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 #endif //2015-09-06, xiaohui
 #ifndef __MPI //2015-09-06, xiaohui
     // orbital 1
-	for(int ispin=0;ispin<NSPIN;ispin++)
+	for(int ispin=0;ispin<GlobalV::NSPIN;ispin++)
 	{
-		for(int i=0; i<NLOCAL; i++)
+		for(int i=0; i<GlobalV::NLOCAL; i++)
 		{
-			const int mu = ParaO.trace_loc_row[i];
+			const int mu = GlobalC::ParaO.trace_loc_row[i];
 			if(mu<0) continue;
-			const int ii = GridT.trace_lo[i];
+			const int ii = GlobalC::GridT.trace_lo[i];
 			// orbital 2
-			for(int j=0; j<NLOCAL; j++)
+			for(int j=0; j<GlobalV::NLOCAL; j++)
 			{
-				const int nu = ParaO.trace_loc_col[j];
+				const int nu = GlobalC::ParaO.trace_loc_col[j];
 				if(nu<0) continue;
-				const int jj = GridT.trace_lo[j];
+				const int jj = GlobalC::GridT.trace_lo[j];
 				// energy density matrix
-				const int index = mu * ParaO.ncol + nu;
+				const int index = mu * GlobalC::ParaO.ncol + nu;
 				double ene = 0.0;
 
-				// (1) density matrix can be generated from LOWF.WFC_GAMMA directly.
+				// (1) density matrix can be generated from GlobalC::LOWF.WFC_GAMMA directly.
 				if(ii>=0 && jj>=0)
 				{
-					ene = this->set_EDM_element(ii, jj, with_energy, LOWF.WFC_GAMMA, LOWF.WFC_GAMMA, ispin);
+					ene = this->set_EDM_element(ii, jj, with_energy, GlobalC::LOWF.WFC_GAMMA, GlobalC::LOWF.WFC_GAMMA, ispin);
 				}
 
 				// (2)
 				else if(ii>=0 && jj<0)
 				{
-					const int a4 = LOWF.trace_aug[j];
+					const int a4 = GlobalC::LOWF.trace_aug[j];
 					assert(a4>=0);
-					ene = this->set_EDM_element(ii, a4, with_energy,  LOWF.WFC_GAMMA,  LOWF.WFC_GAMMA_aug, ispin);
+					ene = this->set_EDM_element(ii, a4, with_energy,  GlobalC::LOWF.WFC_GAMMA,  GlobalC::LOWF.WFC_GAMMA_aug, ispin);
 				}
 				else if(ii<0 && jj>=0)
 				{
-					const int a3 = LOWF.trace_aug[i];
+					const int a3 = GlobalC::LOWF.trace_aug[i];
 					assert(a3>=0);
 					// mohan fix serious bug 2011-07-01 (ii, a3) -> (a3, jj) !!!!!!!!!!!!
-					ene = this->set_EDM_element(a3, jj, with_energy, LOWF.WFC_GAMMA_aug, LOWF.WFC_GAMMA, ispin);
+					ene = this->set_EDM_element(a3, jj, with_energy, GlobalC::LOWF.WFC_GAMMA_aug, GlobalC::LOWF.WFC_GAMMA, ispin);
 				}
 				else if(ii<0 && jj<0)
 				{
-					const int a3 = LOWF.trace_aug[i];
-					const int a4 = LOWF.trace_aug[j];
+					const int a3 = GlobalC::LOWF.trace_aug[i];
+					const int a4 = GlobalC::LOWF.trace_aug[j];
 					assert(a3>=0);
 					assert(a4>=0);
-					ene = this->set_EDM_element(a3, a4, with_energy, LOWF.WFC_GAMMA_aug, LOWF.WFC_GAMMA_aug, ispin);
+					ene = this->set_EDM_element(a3, a4, with_energy, GlobalC::LOWF.WFC_GAMMA_aug, GlobalC::LOWF.WFC_GAMMA_aug, ispin);
 				}
 
 				dm(ispin, index) = ene;
@@ -659,35 +659,35 @@ void Force_LCAO_gamma::cal_foverlap(
         timer::tick("Force_LCAO_gamma","cal_edm_2d");
 
         matrix wgEkb;
-        wgEkb.create(NSPIN, NBANDS);
+        wgEkb.create(GlobalV::NSPIN, GlobalV::NBANDS);
 
-        for(int is=0; is<NSPIN; is++)
+        for(int is=0; is<GlobalV::NSPIN; is++)
         {
-            for(int ib=0; ib<NBANDS; ib++)
+            for(int ib=0; ib<GlobalV::NBANDS; ib++)
             {
-                wgEkb(is,ib) = wf.wg(is,ib) * wf.ekb[is][ib];
+                wgEkb(is,ib) = GlobalC::wf.wg(is,ib) * GlobalC::wf.ekb[is][ib];
             }
         }
 
         Wfc_Dm_2d wfc_edm_2d;
         wfc_edm_2d.init();
-        wfc_edm_2d.wfc_gamma=LOC.wfc_dm_2d.wfc_gamma;
+        wfc_edm_2d.wfc_gamma=GlobalC::LOC.wfc_dm_2d.wfc_gamma;
         wfc_edm_2d.cal_dm(wgEkb);
 
         timer::tick("Force_LCAO_gamma","cal_edm_2d");
 
-        for(int i=0; i<NLOCAL; i++)
+        for(int i=0; i<GlobalV::NLOCAL; i++)
         {
-            const int iat = ucell.iwt2iat[i];
-            for(int j=0; j<NLOCAL; j++)
+            const int iat = GlobalC::ucell.iwt2iat[i];
+            for(int j=0; j<GlobalV::NLOCAL; j++)
             {
-                const int mu = ParaO.trace_loc_row[j];
-                const int nu = ParaO.trace_loc_col[i];
+                const int mu = GlobalC::ParaO.trace_loc_row[j];
+                const int nu = GlobalC::ParaO.trace_loc_col[i];
                 if(mu>=0 && nu>=0)
                 {
-                    const int index = mu * ParaO.ncol + nu;
+                    const int index = mu * GlobalC::ParaO.ncol + nu;
                     double sum = 0.0;
-                    for(int is=0; is<NSPIN; ++is)
+                    for(int is=0; is<GlobalV::NSPIN; ++is)
                     {
                         sum += wfc_edm_2d.dm_gamma[is](nu, mu);
                     }
@@ -695,19 +695,19 @@ void Force_LCAO_gamma::cal_foverlap(
 
 					if(isforce)
 					{
-						foverlap(iat,0) += sum * LM.DSloc_x[index];
-						foverlap(iat,1) += sum * LM.DSloc_y[index];
-						foverlap(iat,2) += sum * LM.DSloc_z[index];
+						foverlap(iat,0) += sum * GlobalC::LM.DSloc_x[index];
+						foverlap(iat,1) += sum * GlobalC::LM.DSloc_y[index];
+						foverlap(iat,2) += sum * GlobalC::LM.DSloc_z[index];
 					}
 
                     if(isstress)
                     {
-                        soverlap(0,0) += sum/2.0 * LM.DSloc_11[index];
-                        soverlap(0,1) += sum/2.0 * LM.DSloc_12[index];
-                        soverlap(0,2) += sum/2.0 * LM.DSloc_13[index];
-                        soverlap(1,1) += sum/2.0 * LM.DSloc_22[index];
-                        soverlap(1,2) += sum/2.0 * LM.DSloc_23[index];
-                        soverlap(2,2) += sum/2.0 * LM.DSloc_33[index];
+                        soverlap(0,0) += sum/2.0 * GlobalC::LM.DSloc_11[index];
+                        soverlap(0,1) += sum/2.0 * GlobalC::LM.DSloc_12[index];
+                        soverlap(0,2) += sum/2.0 * GlobalC::LM.DSloc_13[index];
+                        soverlap(1,1) += sum/2.0 * GlobalC::LM.DSloc_22[index];
+                        soverlap(1,2) += sum/2.0 * GlobalC::LM.DSloc_23[index];
+                        soverlap(2,2) += sum/2.0 * GlobalC::LM.DSloc_33[index];
                     }
                 }
 
@@ -718,7 +718,7 @@ void Force_LCAO_gamma::cal_foverlap(
     {
         timer::tick("Force_LCAO_gamma","cal_edm_grid");
         matrix edm2d;
-		edm2d.create(NSPIN, ParaO.nloc);
+		edm2d.create(GlobalV::NSPIN, GlobalC::ParaO.nloc);
 
         bool with_energy = true;
 
@@ -729,19 +729,19 @@ void Force_LCAO_gamma::cal_foverlap(
         timer::tick("Force_LCAO_gamma","cal_edm_grid");
 
         //summation \sum_{i,j} E(i,j)*dS(i,j)
-        //BEGIN CALCULATION OF FORCE OF EACH ATOM
+        //BEGIN GlobalV::CALCULATION OF GlobalV::FORCE OF EACH ATOM
 
-        for(int i=0; i<NLOCAL; i++)
+        for(int i=0; i<GlobalV::NLOCAL; i++)
         {
-            const int iat = ucell.iwt2iat[i];
-            for(int j=0; j<NLOCAL; j++)
+            const int iat = GlobalC::ucell.iwt2iat[i];
+            for(int j=0; j<GlobalV::NLOCAL; j++)
             {
-                const int mu = ParaO.trace_loc_row[j];
-                const int nu = ParaO.trace_loc_col[i];
+                const int mu = GlobalC::ParaO.trace_loc_row[j];
+                const int nu = GlobalC::ParaO.trace_loc_col[i];
 
                 if (mu >= 0 && nu >= 0 )
                 {
-                    const int index = mu * ParaO.ncol + nu;
+                    const int index = mu * GlobalC::ParaO.ncol + nu;
 
                     //================================================================
                     // here is the normal order, the force of each atom is calculated
@@ -750,7 +750,7 @@ void Force_LCAO_gamma::cal_foverlap(
                     //================================================================
 
                     double sum = 0.0;
-                    for(int is=0; is<NSPIN; ++is)
+                    for(int is=0; is<GlobalV::NSPIN; ++is)
                     {
                         sum += edm2d(is,index);
                     }
@@ -758,19 +758,19 @@ void Force_LCAO_gamma::cal_foverlap(
 
                     if(isforce)
 					{
-						foverlap(iat,0) += sum * LM.DSloc_x[index];
-						foverlap(iat,1) += sum * LM.DSloc_y[index];
-						foverlap(iat,2) += sum * LM.DSloc_z[index];
+						foverlap(iat,0) += sum * GlobalC::LM.DSloc_x[index];
+						foverlap(iat,1) += sum * GlobalC::LM.DSloc_y[index];
+						foverlap(iat,2) += sum * GlobalC::LM.DSloc_z[index];
 					}
 
                     if(isstress)
                     {
-                        soverlap(0,0) += sum/2.0 * LM.DSloc_11[index];
-                        soverlap(0,1) += sum/2.0 * LM.DSloc_12[index];
-                        soverlap(0,2) += sum/2.0 * LM.DSloc_13[index];
-                        soverlap(1,1) += sum/2.0 * LM.DSloc_22[index];
-                        soverlap(1,2) += sum/2.0 * LM.DSloc_23[index];
-                        soverlap(2,2) += sum/2.0 * LM.DSloc_33[index];
+                        soverlap(0,0) += sum/2.0 * GlobalC::LM.DSloc_11[index];
+                        soverlap(0,1) += sum/2.0 * GlobalC::LM.DSloc_12[index];
+                        soverlap(0,2) += sum/2.0 * GlobalC::LM.DSloc_13[index];
+                        soverlap(1,1) += sum/2.0 * GlobalC::LM.DSloc_22[index];
+                        soverlap(1,2) += sum/2.0 * GlobalC::LM.DSloc_23[index];
+                        soverlap(2,2) += sum/2.0 * GlobalC::LM.DSloc_33[index];
 					}
                 }
             }
@@ -784,7 +784,7 @@ void Force_LCAO_gamma::cal_foverlap(
             for(int j=0;j<3;j++)
             {
                 if(i<j) soverlap(j,i) = soverlap(i,j);
-				soverlap(i,j) *=  ucell.lat0 / ucell.omega;
+				soverlap(i,j) *=  GlobalC::ucell.lat0 / GlobalC::ucell.omega;
             }
         }
     }

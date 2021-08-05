@@ -1,0 +1,12 @@
+INPUT_PARAMETERS
+#Parameters	(General)
+pseudo_dir		./
+ntype			2	
+#Parameters (Accuracy)
+ecutwfc			50
+niter			20
+sigma		  0.002
+
+basis_type		pw
+
+latname	hexagonal

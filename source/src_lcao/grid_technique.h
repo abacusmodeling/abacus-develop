@@ -79,6 +79,9 @@ class Grid_Technique : public Grid_MeshBall
 	void cal_trace_beta(void);//mohan add 2012-04-13
 };
 
+namespace GlobalC
+{
 extern Grid_Technique GridT;
+}
 
 #endif

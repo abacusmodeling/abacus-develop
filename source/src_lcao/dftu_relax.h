@@ -24,33 +24,28 @@ public:
     ~DFTU_RELAX();
 
     void force_stress();
-    void folding_dSm_soverlap();
-    void allocate_force_stress();
-    void erase_force_stress();
-    void cal_force_k(const vector<vector<complex<double>>> &VU);
-    void cal_force_gamma(const vector<vector<double>> &VU);
-    void cal_stress_k(const vector<vector<complex<double>>> &VU);
-    void cal_stress_gamma(const vector<vector<double>> &VU);
+    void cal_force_k(const int ik, complex<double>* rho_VU);
+    void cal_stress_k(const int ik, complex<double>* rho_VU);
+    void cal_force_gamma(const int spin, double* rho_VU);
+    void cal_stress_gamma(const int spin, double* rho_VU);
 
-    double get_onebody_eff_pot
-    (
-        const int T, const int iat,
+    void fold_dSR_gamma(const int dim1, const int dim2, double* dSR_gamma);
+    void fold_dSm_k(const int ik, const int dim, complex<double>* dSm_k);
+    void fold_dSR_k(const int ik, const int dim1, const int dim2, complex<double>* dSR_gamma);
+
+    void cal_VU_pot_mat_complex(const int spin, const bool newlocale, complex<double>* VU);
+    void cal_VU_pot_mat_real(const int spin, const bool newlocale, double* VU);
+
+    double get_onebody_eff_pot(
+      const int T, const int iat,
 	    const int L, const int N, const int spin, 
 	    const int m0,
-        const int m1,
-        const int type, const bool newlocale
-    );
+      const int m1,
+      const int type, const bool newlocale);
 
     //forces and stress
     vector<vector<double>> force_dftu;      //force_dftu[iat][dim] 
     vector<vector<double>> stress_dftu;
-
-    //vector<vector<vector<complex<double>>>> dSm_k;            //dSm_k[ik][dim][irc]
-    complex<double> ***dSm_k;                                   //dSm_k[ik][dim][irc]
-    //vector<vector<vector<complex<double>>>> soverlap_k;       //soverlap_k[ik][xy][irc]
-    complex<double> ***soverlap_k;                              //soverlap_k[ik][xy][irc]
-    //vector<vector<double>> soverlap_gamma;                    //soverlap_gamma[xy][irc]
-    double **soverlap_gamma;                                    //soverlap_gamma[xy][irc]
 
     //transform between iwt index and it, ia, L, N and m index
     vector<vector<vector<vector<vector<int>>>>> iatlnmipol2iwt;   //iatlnm2iwt[iat][l][n][m][ipol]
@@ -67,7 +62,6 @@ public:
     //locale_save: the input local occupation number matrix of correlated electrons in the current electronic step
     vector<vector<vector<vector<matrix>>>> locale;            // locale[iat][l][n][spin](m1,m2)
     vector<vector<vector<vector<matrix>>>> locale_save;       // locale_save[iat][l][n][spin](m1,m2)
-
 };
 
 #endif

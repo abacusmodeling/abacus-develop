@@ -3,7 +3,9 @@
 
 #include "../src_pw/tools.h"
 #include "../src_io/output.h"
+#ifndef __CMD
 #include "../src_pw/magnetism.h"
+#endif
 
 #include "atom_spec.h"
 
@@ -13,7 +15,10 @@ class UnitCell
 {
 public:
     Atom *atoms;
+
+#ifndef __CMD
     Magnetism magnet;  // magnetism Yu Liu 2021-07-03
+#endif
 
     int ntype;// number of atom species in UnitCell
     int nat; // total number of atoms of all species in unitcell

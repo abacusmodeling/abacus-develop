@@ -31,11 +31,11 @@ void DFTU_Yukawa::cal_yukawa_lambda()
 	
 	double sum_rho = 0.0;
 	double sum_rho_lambda = 0.0;	
-	for(int is=0; is<NSPIN; is++)
+	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		for(int ir=0; ir<pw.nrxx; ir++) 
+		for(int ir=0; ir<GlobalC::pw.nrxx; ir++) 
 		{
-			double rho_ir = CHR.rho[is][ir];
+			double rho_ir = GlobalC::CHR.rho[is][ir];
 			sum_rho += rho_ir;
 
 			double lambda_ir = 2*pow(3*rho_ir/PI, (double)1.0/6.0);
@@ -65,25 +65,25 @@ void DFTU_Yukawa::cal_slater_Fk(const int L, const int T)
 	{	 
 		//this->lambda = INPUT.yukawa_lambda;
 		
-		for(int chi=0; chi<ucell.atoms[T].l_nchi[L]; chi++)
+		for(int chi=0; chi<GlobalC::ucell.atoms[T].l_nchi[L]; chi++)
 		{
 		 //	if(chi!=0) continue;
-			const int mesh = ORB.Phi[T].PhiLN(L,chi).getNr();
+			const int mesh = GlobalC::ORB.Phi[T].PhiLN(L,chi).getNr();
 	
 			for(int k=0; k<=L; k++)
 			{			
 				for(int ir0=1; ir0<mesh; ir0++)
 				{
-					double r0 = ORB.Phi[T].PhiLN(L,chi).getRadial(ir0);
-					const double rab0 = ORB.Phi[T].PhiLN(L,chi).getRab(ir0);
-					const double R_L0 = ORB.Phi[T].PhiLN(L,chi).getPsi(ir0);
+					double r0 = GlobalC::ORB.Phi[T].PhiLN(L,chi).getRadial(ir0);
+					const double rab0 = GlobalC::ORB.Phi[T].PhiLN(L,chi).getRab(ir0);
+					const double R_L0 = GlobalC::ORB.Phi[T].PhiLN(L,chi).getPsi(ir0);
 	
 					for(int ir1=1; ir1<mesh; ir1++) 
 					{
 						double bslval, hnkval;
-						double r1 = ORB.Phi[T].PhiLN(L,chi).getRadial(ir1);
-						const double rab1 = ORB.Phi[T].PhiLN(L,chi).getRab(ir1);
-						const double R_L1 = ORB.Phi[T].PhiLN(L,chi).getPsi(ir1);		
+						double r1 = GlobalC::ORB.Phi[T].PhiLN(L,chi).getRadial(ir1);
+						const double rab1 = GlobalC::ORB.Phi[T].PhiLN(L,chi).getRab(ir1);
+						const double R_L1 = GlobalC::ORB.Phi[T].PhiLN(L,chi).getPsi(ir1);		
 						
 						int l = 2*k;
 						if(ir0<ir1)  //less than
@@ -115,13 +115,13 @@ void DFTU_Yukawa::cal_slater_UJ(const int istep, const int iter)
 
 	this->cal_yukawa_lambda();
 	
-	for(int it=0; it<ucell.ntype; it++)
+	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{			
-		const int NL = ucell.atoms[it].nwl + 1;
+		const int NL = GlobalC::ucell.atoms[it].nwl + 1;
 	
 		for(int l=0; l<NL; l++)
 		{
-			int N = ucell.atoms[it].l_nchi[l];
+			int N = GlobalC::ucell.atoms[it].l_nchi[l];
 			for(int n=0; n<N; n++)
 			{
 				ZEROS(VECTOR_TO_PTR(this->Fk.at(it).at(l).at(n)), l+1);
@@ -129,13 +129,13 @@ void DFTU_Yukawa::cal_slater_UJ(const int istep, const int iter)
 		}			 	
 	}
  	
-	for(int T=0; T<ucell.ntype; T++)
+	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{			
-		const int NL = ucell.atoms[T].nwl + 1;
+		const int NL = GlobalC::ucell.atoms[T].nwl + 1;
 
 		for(int L=0; L<NL; L++)
 		{
-			const int N = ucell.atoms[T].l_nchi[L];
+			const int N = GlobalC::ucell.atoms[T].l_nchi[L];
 
 			if(L>=INPUT.orbital_corr[T] && INPUT.orbital_corr[T]!=-1)
 			{
@@ -280,24 +280,24 @@ void DFTU::cal_unscreened_slater_Fk(const int L, const int T)
 {
 	TITLE("DFTU","cal_slater_Fk");
 
-	for(int chi=0; chi<ucell.atoms[T].l_nchi[L]; chi++)
+	for(int chi=0; chi<GlobalC::ucell.atoms[T].l_nchi[L]; chi++)
 	{
-		const int mesh = ORB.Phi[T].PhiLN(L,chi).getNr();
+		const int mesh = GlobalC::ORB.Phi[T].PhiLN(L,chi).getNr();
 
 		for(int k=0; k<=L; k++)
 		{			
 			for(int ir0=1; ir0<mesh; ir0++)
 			{
-				double r0 = ORB.Phi[T].PhiLN(L,chi).getRadial(ir0);
-				const double rab0 = ORB.Phi[T].PhiLN(L,chi).getRab(ir0);
-				const double R_L0 = ORB.Phi[T].PhiLN(L,chi).getPsi(ir0);
+				double r0 = GlobalC::ORB.Phi[T].PhiLN(L,chi).getRadial(ir0);
+				const double rab0 = GlobalC::ORB.Phi[T].PhiLN(L,chi).getRab(ir0);
+				const double R_L0 = GlobalC::ORB.Phi[T].PhiLN(L,chi).getPsi(ir0);
 
 				for(int ir1=1; ir1<mesh; ir1++) 
 				{
 					double numerator, denominator;
-					double r1 = ORB.Phi[T].PhiLN(L,chi).getRadial(ir1);
-					const double rab1 = ORB.Phi[T].PhiLN(L,chi).getRab(ir1);
-					const double R_L1 = ORB.Phi[T].PhiLN(L,chi).getPsi(ir1);		
+					double r1 = GlobalC::ORB.Phi[T].PhiLN(L,chi).getRadial(ir1);
+					const double rab1 = GlobalC::ORB.Phi[T].PhiLN(L,chi).getRab(ir1);
+					const double R_L1 = GlobalC::ORB.Phi[T].PhiLN(L,chi).getPsi(ir1);		
 					
 					int l = 2*k;
 					if(ir0<ir1)  //less than
@@ -327,7 +327,7 @@ void DFTU::cal_slater_Vsc(const int T, const int L)
 {
 	TITLE("DFTU", "cal_slater_Vsc");
 
-	for(int N=0; N<ucell.atoms[T].l_nchi[L]; N++)
+	for(int N=0; N<GlobalC::ucell.atoms[T].l_nchi[L]; N++)
 	{
 		if(!Yukawa && N!=0) continue;
 
@@ -356,8 +356,8 @@ void DFTU::cal_slater_Vsc(const int T, const int L)
 							{
 								int gindex = k*k + q;
 
-								double gaunt1 = UOT.get_Gaunt_coefficients(gindex0, gindex2, gindex);
-								double gaunt2 = UOT.get_Gaunt_coefficients(gindex1, gindex3, gindex);
+								double gaunt1 = GlobalC::UOT.get_Gaunt_coefficients(gindex0, gindex2, gindex);
+								double gaunt2 = GlobalC::UOT.get_Gaunt_coefficients(gindex1, gindex3, gindex);
 
 								this->Vsc.at(T).at(N)(M0, M1) += FOUR_PI*gaunt1*gaunt2*Fk.at(T).at(N).at(l)/(2.0*k+1.0);
 							}

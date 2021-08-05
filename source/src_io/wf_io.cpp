@@ -20,7 +20,7 @@
 
 void WF_io::write_wfc(const string &fn, const ComplexMatrix *psi)
 {
-    if (test_wf) TITLE("WF_io","write_wfc");
+    if (GlobalV::test_wf) TITLE("WF_io","write_wfc");
 
     ofstream ofs( fn.c_str() );
 
@@ -31,14 +31,14 @@ void WF_io::write_wfc(const string &fn, const ComplexMatrix *psi)
     //exi.out_planewave(ofs);
 
     ofs << "\n<WAVEFUNC>";
-    ofs << "\n" << NBANDS << " Number of bands." << endl;
+    ofs << "\n" << GlobalV::NBANDS << " Number of bands." << endl;
     ofs << setprecision(6);
-    for (int i=0; i<NBANDS; i++)
+    for (int i=0; i<GlobalV::NBANDS; i++)
     {
-        for (int ik=0; ik<kv.nks; ik++)
+        for (int ik=0; ik<GlobalC::kv.nks; ik++)
         {
             ofs << "\n" << ik;
-            for (int ig=0; ig<kv.ngk[ik]; ig++)
+            for (int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
             {
                 if (ig%4==0) ofs << "\n";
                 ofs << setw(15) << psi[ik](i, ig).real()
@@ -55,23 +55,23 @@ void WF_io::write_wfc(const string &fn, const ComplexMatrix *psi)
 
 void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3<double> *gkk)
 {
-    if (test_wf) TITLE("WF_io","write_wfc2"); 
+    if (GlobalV::test_wf) TITLE("WF_io","write_wfc2"); 
 
     string * wfilename;
-    wfilename=new string[kv.nkstot];
-    for(int ik=0;ik<kv.nkstot;ik++)
+    wfilename=new string[GlobalC::kv.nkstot];
+    for(int ik=0;ik<GlobalC::kv.nkstot;ik++)
     {
         stringstream wfss;
-        if(wf.out_wf==1)
+        if(GlobalC::wf.out_wf==1)
             wfss<<fn<<ik+1<<".txt";
         else
         {
             wfss<<fn<<ik+1<<".dat";
         }
         wfilename[ik]=wfss.str();
-        if ( MY_RANK == 0 )
+        if ( GlobalV::MY_RANK == 0 )
         {
-            if(wf.out_wf==1)
+            if(GlobalC::wf.out_wf==1)
             {
                 ofstream ofs(wfss.str().c_str()); //clear all wavefunc files.
                 ofs.close();
@@ -83,64 +83,64 @@ void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3
             }
         }
     }
-    //if(MY_RANK!=0) cout.clear();
+    //if(GlobalV::MY_RANK!=0) cout.clear();
     //cout<<"Hello"<<endl;
-    //if(MY_RANK!=0) cout.setstate(ios::failbit);
+    //if(GlobalV::MY_RANK!=0) cout.setstate(ios::failbit);
 #ifdef __MPI
     MPI_Barrier(MPI_COMM_WORLD);
 
 	
     // out put the wave functions in plane wave basis.
-	for(int ip=0; ip<NPOOL; ip++)
+	for(int ip=0; ip<GlobalV::NPOOL; ip++)
 	{
-        if( MY_POOL == ip )
+        if( GlobalV::MY_POOL == ip )
 		{
 #endif
-			for(int ik=0; ik<kv.nks; ik++)
+			for(int ik=0; ik<GlobalC::kv.nks; ik++)
 			{
                 int ikngtot=0; //ikngtot: the total number of plane waves of ikpoint
                 int ikstot=0;//ikstot : the index within all k-points
 #ifdef __MPI
-                MPI_Allreduce(&kv.ngk[ik],&ikngtot,1,MPI_INT,MPI_SUM,POOL_WORLD);
-                ikstot=Pkpoints.startk_pool[ip]+ik;
+                MPI_Allreduce(&GlobalC::kv.ngk[ik],&ikngtot,1,MPI_INT,MPI_SUM,POOL_WORLD);
+                ikstot=GlobalC::Pkpoints.startk_pool[ip]+ik;
 #else
-                ikngtot=kv.ngk[ik];
+                ikngtot=GlobalC::kv.ngk[ik];
                 ikstot=ik;
 #endif
 #ifdef __MPI
-                //int ikstot=getink(ik,ip,kv.nkstot,NPOOL);
-				for( int id=0; id<NPROC_IN_POOL; id++)
+                //int ikstot=getink(ik,ip,GlobalC::kv.nkstot,GlobalV::NPOOL);
+				for( int id=0; id<GlobalV::NPROC_IN_POOL; id++)
 				{
 					MPI_Barrier(POOL_WORLD);
-                    if (RANK_IN_POOL == id)
+                    if (GlobalV::RANK_IN_POOL == id)
 					{
 #else
                     int id=0;               
 #endif
-                    if(wf.out_wf==1)
+                    if(GlobalC::wf.out_wf==1)
                     {
                         ofstream ofs2( wfilename[ikstot].c_str(),ios::app);
                         if(id==0)
                         {
                             ofs2<<setprecision(6);
-                            ofs2<<setw(10)<<"Kpoint"<<setw(10)<<"nKpoint"<<setw(10)<<"kv.x"<<setw(10)
-                            <<"kv.y"<<setw(10)<<"kv.z"<<setw(10)<<"weight"<<setw(10)
+                            ofs2<<setw(10)<<"Kpoint"<<setw(10)<<"nKpoint"<<setw(10)<<"GlobalC::kv.x"<<setw(10)
+                            <<"GlobalC::kv.y"<<setw(10)<<"GlobalC::kv.z"<<setw(10)<<"weight"<<setw(10)
                             <<"ngtot"<<setw(10)<<"nband"<<setw(10)<<"ecut"<<setw(10)<<"lat0"<<setw(10)<<"2pi/lat0"<<endl;
-                            ofs2<<setw(10)<<ikstot+1<<setw(10)<<kv.nkstot<<setw(10)<<kv.kvec_c[ik].x<<setw(10)
-                            <<kv.kvec_c[ik].y<<setw(10)<<kv.kvec_c[ik].z<<setw(10)<<kv.wk[ik]<<setw(10)
-                            <<ikngtot<<setw(10)<<NBANDS<<setw(10)<<pw.ecutwfc<<setw(10)<<ucell.lat0<<setw(10)<<ucell.tpiba<<endl;
+                            ofs2<<setw(10)<<ikstot+1<<setw(10)<<GlobalC::kv.nkstot<<setw(10)<<GlobalC::kv.kvec_c[ik].x<<setw(10)
+                            <<GlobalC::kv.kvec_c[ik].y<<setw(10)<<GlobalC::kv.kvec_c[ik].z<<setw(10)<<GlobalC::kv.wk[ik]<<setw(10)
+                            <<ikngtot<<setw(10)<<GlobalV::NBANDS<<setw(10)<<GlobalC::pw.ecutwfc<<setw(10)<<GlobalC::ucell.lat0<<setw(10)<<GlobalC::ucell.tpiba<<endl;
                             ofs2<<"\n<Reciprocal Lattice Vector>"<<endl;
-                            ofs2<<setw(10)<<ucell.G.e11<<setw(10)<<ucell.G.e12<<setw(10)<<ucell.G.e13<<endl;
-                            ofs2<<setw(10)<<ucell.G.e21<<setw(10)<<ucell.G.e22<<setw(10)<<ucell.G.e23<<endl;
-                            ofs2<<setw(10)<<ucell.G.e31<<setw(10)<<ucell.G.e32<<setw(10)<<ucell.G.e33<<endl;
+                            ofs2<<setw(10)<<GlobalC::ucell.G.e11<<setw(10)<<GlobalC::ucell.G.e12<<setw(10)<<GlobalC::ucell.G.e13<<endl;
+                            ofs2<<setw(10)<<GlobalC::ucell.G.e21<<setw(10)<<GlobalC::ucell.G.e22<<setw(10)<<GlobalC::ucell.G.e23<<endl;
+                            ofs2<<setw(10)<<GlobalC::ucell.G.e31<<setw(10)<<GlobalC::ucell.G.e32<<setw(10)<<GlobalC::ucell.G.e33<<endl;
                             ofs2<<"<Reciprocal Lattice Vector>\n"<<endl;
                             ofs2<<"<G vectors>"<<endl;
                         }
-                        for (int ig=0; ig<kv.ngk[ik]; ig++)
+                        for (int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 					    {
                             ofs2<<setw(10)<<gkk[ig].x<<setw(10)<<gkk[ig].y<<setw(10)<<gkk[ig].z<<endl;
 						}
-                        if(id==NPROC_IN_POOL-1)
+                        if(id==GlobalV::NPROC_IN_POOL-1)
                         {
                             ofs2<<"<G vectors>\n"<<endl;
                         }
@@ -151,23 +151,23 @@ void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3
                         Rwstream wfs2( wfilename[ikstot],"a");
                         if(id==0)
                         {
-                            wfs2<<int(72)<<ikstot+1<<kv.nkstot<<kv.kvec_c[ik].x
-                                <<kv.kvec_c[ik].y<<kv.kvec_c[ik].z<<kv.wk[ik]
-                                <<ikngtot<<NBANDS<<pw.ecutwfc<<ucell.lat0<<ucell.tpiba<<72; //4 int + 7 double is 72B
-                            wfs2<<72<<ucell.G.e11<<ucell.G.e12<<ucell.G.e13
-                                    <<ucell.G.e21<<ucell.G.e22<<ucell.G.e23
-                                    <<ucell.G.e31<<ucell.G.e32<<ucell.G.e33<<72; //9 double is 72B
+                            wfs2<<int(72)<<ikstot+1<<GlobalC::kv.nkstot<<GlobalC::kv.kvec_c[ik].x
+                                <<GlobalC::kv.kvec_c[ik].y<<GlobalC::kv.kvec_c[ik].z<<GlobalC::kv.wk[ik]
+                                <<ikngtot<<GlobalV::NBANDS<<GlobalC::pw.ecutwfc<<GlobalC::ucell.lat0<<GlobalC::ucell.tpiba<<72; //4 int + 7 double is 72B
+                            wfs2<<72<<GlobalC::ucell.G.e11<<GlobalC::ucell.G.e12<<GlobalC::ucell.G.e13
+                                    <<GlobalC::ucell.G.e21<<GlobalC::ucell.G.e22<<GlobalC::ucell.G.e23
+                                    <<GlobalC::ucell.G.e31<<GlobalC::ucell.G.e32<<GlobalC::ucell.G.e33<<72; //9 double is 72B
                         }
                         if(id==0)
                         {
                             wfs2<<ikngtot*8*3;
                         }
                          
-                        for (int ig=0; ig<kv.ngk[ik]; ig++)
+                        for (int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 					    {
                             wfs2<<gkk[ig].x<<gkk[ig].y<<gkk[ig].z;
 						}
-                        if(id==NPROC_IN_POOL-1)
+                        if(id==GlobalV::NPROC_IN_POOL-1)
                         {
                             wfs2<<ikngtot*8*3;
                         } 
@@ -177,41 +177,41 @@ void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3
 					}
 				}// end id
 #endif
-                for(int ib=0; ib<NBANDS; ib++)
+                for(int ib=0; ib<GlobalV::NBANDS; ib++)
 				{
 #ifdef __MPI
-					for( int id=0; id<NPROC_IN_POOL; id++)
+					for( int id=0; id<GlobalV::NPROC_IN_POOL; id++)
 					{
 						MPI_Barrier(POOL_WORLD); //qianrui add
-                        if (RANK_IN_POOL == id)
+                        if (GlobalV::RANK_IN_POOL == id)
 						{
 #else
                     int id=0;
 #endif
-                        if(wf.out_wf==1)
+                        if(GlobalC::wf.out_wf==1)
                         {
                             ofstream ofs2( wfilename[ikstot].c_str(),ios::app);
                             if(id==0)   ofs2 << "\n< Band "<<ib+1 <<" >" <<endl; 
 							ofs2 << scientific;
 							
-                            for (int ig=0; ig<kv.ngk[ik]; ig++)
+                            for (int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 							{
 								if (ig%4==0&&(ig!=0||id!=0)) ofs2 << "\n";
 								ofs2 << setw(15) << psi[ik](ib, ig).real()
 									<< setw(15) << psi[ik](ib, ig).imag();
 							} // end ig
-                            if(id==NPROC_IN_POOL-1)   ofs2 << "\n< Band "<<ib+1 <<" >" <<endl; 
+                            if(id==GlobalV::NPROC_IN_POOL-1)   ofs2 << "\n< Band "<<ib+1 <<" >" <<endl; 
 							ofs2.close();
                         }
                         else
                         {
                             Rwstream wfs2(wfilename[ikstot],"a");
                             if(id==0) wfs2<<ikngtot*16;
-                            for (int ig=0; ig<kv.ngk[ik]; ig++)
+                            for (int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 							{
 								wfs2 << psi[ik](ib, ig).real() << psi[ik](ib, ig).imag();
 							}
-                            if(id==NPROC_IN_POOL-1) wfs2<<ikngtot*16;
+                            if(id==GlobalV::NPROC_IN_POOL-1) wfs2<<ikngtot*16;
                             wfs2.close();
                         }
 #ifdef __MPI                      
