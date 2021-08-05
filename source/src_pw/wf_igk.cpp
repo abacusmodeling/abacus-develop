@@ -20,8 +20,8 @@ WF_igk::~WF_igk()
 //  k point, and create indices ind_Gk(ngk,nk)
 //  between the G vectors in the
 //  k point array and the 1d Gvector array G1d[:].
-//  set npwx
-//  set igk
+//  std::set npwx
+//  std::set igk
 //========================================================
 int WF_igk::setupIndGk(const PW_Basis &pwb,const int nks)
 {

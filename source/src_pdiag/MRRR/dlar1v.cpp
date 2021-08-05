@@ -86,7 +86,7 @@ int pdlar1v(int *n, int *b1, int *bn, double *lambda, double *d__, double *l,
 	/*           w.r.t. their contribution to the residual. */
 
 	/*  Z        (input/output) DOUBLE PRECISION array, dimension (N) */
-	/*           On input, all entries of Z must be set to 0. */
+	/*           On input, all entries of Z must be std::set to 0. */
 	/*           On output, Z contains the (scaled) r-th column of the */
 	/*           inverse. The scaling is such that Z(R) equals 1. */
 
@@ -107,7 +107,7 @@ int pdlar1v(int *n, int *b1, int *bn, double *lambda, double *d__, double *l,
 	/*  R        (input/output) int */
 	/*           The twist index for the twisted factorization used to */
 	/*           compute Z. */
-	/*           On input, 0 <= R <= N. If R is input as 0, R is set to */
+	/*           On input, 0 <= R <= N. If R is input as 0, R is std::set to */
 	/*           the index where (L D L^T - sigma I)^{-1} is largest */
 	/*           in magnitude. If 1 <= R <= N, R is unchanged. */
 	/*           On output, R contains the twist index used to compute Z. */

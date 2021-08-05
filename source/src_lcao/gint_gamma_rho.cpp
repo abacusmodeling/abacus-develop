@@ -226,7 +226,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const
 						//------------------------------------------------------
 						bool **cal_flag = Gint_Tools::get_cal_flag(na_grid, grid_index);
 
-						// set up band matrix psir_ylm and psir_DM
+						// std::set up band matrix psir_ylm and psir_DM
 						const int LD_pool = max_size*GlobalC::ucell.nwmax;
 						
 						const Gint_Tools::Array_Pool<double> psir_ylm = Gint_Tools::cal_psir_ylm(

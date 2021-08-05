@@ -140,8 +140,8 @@ inline void cal_psir_ylm_dphi(
             // and know the l according to atom->iw2l[iw] function.
             // also the most important thing I always emphasis,
             // is to minimize the operations!!
-            // so for a set of differnt m of a specific l,
-            // we don't need to do interpolation for each set of (n,l,m),
+            // so for a std::set of differnt m of a specific l,
+            // we don't need to do interpolation for each std::set of (n,l,m),
             // we only need to do interpolation for each (n,l),
             // for differemtn m, only the Spherical Harmonical functions
             // are differnt, what's why we have atom->iw2_new[iw],

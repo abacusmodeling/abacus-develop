@@ -99,7 +99,7 @@ void scaled_sum(double r1, ComplexArray &cd1,
 
 void point_mult(ComplexArray &a1, ComplexArray &in2, ComplexArray &out);
 
-// set elements of u as zero which u is 1_d std::complex array
+// std::set elements of u as zero which u is 1_d std::complex array
 template <class T>
 void zeros(std::complex <T> *u, int n)
 {

@@ -93,7 +93,7 @@ void LOOP_elec::before_solver(const int &istep)
     TITLE("LOOP_elec","before_solver"); 
     timer::tick("LOOP_elec","before_solver"); 
 
-	// set the augmented orbitals index.
+	// std::set the augmented orbitals index.
 	// after ParaO and GridT, 
 	// this information is used to calculate
 	// the force.

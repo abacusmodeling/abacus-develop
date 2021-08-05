@@ -437,7 +437,7 @@ class Input
 //==========================================================
     int out_descriptor; // output descritpor for deepks. caoyu added 2020-11-24, mohan modified 2021-01-03
 	int lmax_descriptor; // lmax used in descriptor, mohan added 2021-01-03
-	int deepks_scf;	//if set 1, a trained model would be needed to cal V_delta and F_delta
+	int deepks_scf;	//if std::set 1, a trained model would be needed to cal V_delta and F_delta
 	std::string model_file;		//needed when deepks_scf=1
 
 //==========================================================
@@ -450,7 +450,7 @@ class Input
 //==========================================================
 // MEMBER FUNCTIONS :
 // NAME : Read()
-// NAME : Default(set the default value for variables)
+// NAME : Default(std::set the default value for variables)
 // NAME : Check(check the values)
 // NAME : Bcast(only used in paralle case,only read in data
 //        from first cpu, and distribute the data to the

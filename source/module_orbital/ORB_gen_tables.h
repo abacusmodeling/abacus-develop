@@ -72,7 +72,7 @@ class ORB_gen_tables
 		std::complex<double> *nlm1=NULL,
 		const int is=0)const;
 
-	/// set as public because in hamilt_linear, 
+	/// std::set as public because in hamilt_linear, 
 	/// we need to destroy the tables: SR,TR,NR
 	/// after ionic optimization is done.
 	ORB_table_phi MOT;

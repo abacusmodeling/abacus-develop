@@ -109,7 +109,7 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique &gt)
 				this->WFC_K[ik][ib] = &WFC_K_POOL[ik*page+ib*gt.lgd];
 				//std::cout<<"ik="<<ik<<" ib="<<ib<<std::endl<<"WFC_K address: "<<WFC_K[ik][ib]<<" WFC_K_POOL address: "<<&WFC_K_POOL[ik*page+ib*gt.lgd]<<std::endl;
 			}
-			//std::cout<<"set WFC_K pointer success, ik: "<<ik<<std::endl;
+			//std::cout<<"std::set WFC_K pointer success, ik: "<<ik<<std::endl;
 			Memory::record("LocalOrbital_Coef","WFC_K",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
 			//OUT(GlobalV::ofs_running,"MemoryForWaveFunctions (MB)",mem);
 			//std::cout<<"WFC_K["<<ik<<"] use "<<mem<<" MB"<<std::endl;

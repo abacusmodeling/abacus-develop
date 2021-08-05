@@ -103,7 +103,7 @@ Atom_input::Atom_input
 
 	if(test_atom_input) OUT(ofs_in,"CellLength(unit: lat0)",clength0,clength1,clength2);
 	//==============================
-	// set lattice constant
+	// std::set lattice constant
 	//==============================
 	lat_now = ucell.lat0;
 
@@ -164,7 +164,7 @@ Atom_input::Atom_input
 
 //----------------------------------------------------------
 // CALL MEMBER FUNCTION :
-// NAME : Expand_Grid (after expand grid,we set another
+// NAME : Expand_Grid (after expand grid,we std::set another
 // 6 MEMBER VARIABLES : x(y,z)_min(max)_expand,record
 // the peak cartesian value among all the cells
 //----------------------------------------------------------
@@ -612,7 +612,7 @@ void Atom_input::calculate_cells(void)
 void Atom_input::set_FAtom(const UnitCell &ucell, FAtom &a)const
 {
 //----------------------------------------------------------
-// EXPLAIN : if expand grid , set from array
+// EXPLAIN : if expand grid , std::set from array
 //----------------------------------------------------------
 	if (expand_flag)
 	{
@@ -628,7 +628,7 @@ void Atom_input::set_FAtom(const UnitCell &ucell, FAtom &a)const
 // CALL MEMBER FUNCTION :
 // NAME : load_atom
 //
-// EXPLAIN : if not expand grid , set directly
+// EXPLAIN : if not expand grid , std::set directly
 //----------------------------------------------------------
 	else
 	{

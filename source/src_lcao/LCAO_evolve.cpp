@@ -335,7 +335,7 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, std::complex<doub
 	nFull=GlobalV::NLOCAL;
 	nblk=GlobalV::NLOCAL;	
 
-	// set mpi enviroment
+	// std::set mpi enviroment
 	int argc;
 	char **argv;
 //	MPI_Init(&argc, &argv);
@@ -345,7 +345,7 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, std::complex<doub
 	mpierr=MPI_Bcast(&nFull, 1, MPI_INT, MPIROOT, MPI_COMM_WORLD);
 	mpierr=MPI_Bcast(&nblk, 1, MPI_INT, MPIROOT, MPI_COMM_WORLD);
 
-	// set blacs parameters 
+	// std::set blacs parameters 
 	for(npcols=int(sqrt(double(GlobalV::NPROC))); npcols>=2; --npcols)
     	{
         	if(GlobalV::NPROC%npcols==0) break;

@@ -21,7 +21,7 @@
 #include "exx_abfs-parallel-communicate-dm3.h"
 #endif
 
-#include<set>
+#include <set>
 #include <vector>
 #include <map>
 #include <deque>
@@ -44,7 +44,7 @@ private:
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> cal_Hexx() const;
 	double cal_energy(
 		const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &HexxR ) const;
-	void init_radial_table_ions( const set<size_t> &atom_centres_core, const std::vector<std::pair<size_t,size_t>> &atom_pairs_core );
+	void init_radial_table_ions( const std::set<size_t> &atom_centres_core, const std::vector<std::pair<size_t,size_t>> &atom_pairs_core );
 		
 public:
 	enum class Distribute_Type {Htime,Kmeans2,Kmeans1,Order};
@@ -84,7 +84,7 @@ private:
 
 	std::vector<std::pair<size_t,size_t>> atom_pairs_core_origin;
 	std::vector<std::pair<size_t,size_t>> atom_pairs_core;
-	set<std::pair<size_t,size_t>> H_atom_pairs_core;
+	std::set<std::pair<size_t,size_t>> H_atom_pairs_core;
 	Abfs::Vector3_Order<int> Born_von_Karman_period;
 
 	Exx_Abfs::Screen::Schwarz schwarz;

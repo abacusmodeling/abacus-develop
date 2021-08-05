@@ -80,7 +80,7 @@ int pdlaebz(int *ijob, int *nitmax, int *n, int *mmax, int *minp, int *nbmin,
 	/*          The maximum number of "levels" of bisection to be */
 	/*          performed, i.e., an interval of width W will not be made */
 	/*          smaller than 2^(-NITMAX) * W.  If not all intervals */
-	/*          have converged after NITMAX iterations, then INFO is set */
+	/*          have converged after NITMAX iterations, then INFO is std::set */
 	/*          to the number of non-converged intervals. */
 
 	/*  N       (input) int */
@@ -158,8 +158,8 @@ int pdlaebz(int *ijob, int *nitmax, int *n, int *mmax, int *minp, int *nbmin,
 	/*          If IJOB=3, MOUT will equal MINP. */
 
 	/*  NAB     (input/output) int array, dimension (MMAX,2) */
-	/*          If IJOB=1, then on output NAB(i,j) will be set to N(AB(i,j)). */
-	/*          If IJOB=2, then on input, NAB(i,j) should be set.  It must */
+	/*          If IJOB=1, then on output NAB(i,j) will be std::set to N(AB(i,j)). */
+	/*          If IJOB=2, then on input, NAB(i,j) should be std::set.  It must */
 	/*             satisfy the condition: */
 	/*             N(AB(i,1)) <= NAB(i,1) <= NAB(i,2) <= N(AB(i,2)), */
 	/*             which means that in interval i only eigenvalues */
@@ -177,7 +177,7 @@ int pdlaebz(int *ijob, int *nitmax, int *n, int *mmax, int *minp, int *nbmin,
 	/*             value will be the same as the input value (modulo */
 	/*             reorderings -- see NVAL and AB), or unless N(w) < NVAL(i) */
 	/*             for all search points  w , in which case NAB(i,2) will */
-	/*             not be modified.  Normally, NAB should be set to some */
+	/*             not be modified.  Normally, NAB should be std::set to some */
 	/*             distinctive value(s) before DLAEBZ is called. */
 
 	/*  WORK    (workspace) DOUBLE PRECISION array, dimension (MMAX) */
@@ -199,12 +199,12 @@ int pdlaebz(int *ijob, int *nitmax, int *n, int *mmax, int *minp, int *nbmin,
 	/*  for two purposes: */
 
 	/*  (a) finding eigenvalues.  In this case, DLAEBZ should have one or */
-	/*      more initial intervals set up in AB, and DLAEBZ should be called */
+	/*      more initial intervals std::set up in AB, and DLAEBZ should be called */
 	/*      with IJOB=1.  This sets up NAB, and also counts the eigenvalues. */
 	/*      Intervals with no eigenvalues would usually be thrown out at */
 	/*      this point.  Also, if not all the eigenvalues in an interval i */
 	/*      are desired, NAB(i,1) can be increased or NAB(i,2) decreased. */
-	/*      For example, set NAB(i,1)=NAB(i,2)-1 to get the largest */
+	/*      For example, std::set NAB(i,1)=NAB(i,2)-1 to get the largest */
 	/*      eigenvalue.  DLAEBZ is then called with IJOB=2 and MMAX */
 	/*      no smaller than the value of MOUT returned by the call with */
 	/*      IJOB=1.  After this (IJOB=2) call, eigenvalues NAB(i,1)+1 */

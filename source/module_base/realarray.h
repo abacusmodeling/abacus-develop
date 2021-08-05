@@ -71,7 +71,7 @@ private:
 };
 
 //**************************************************
-// set elements of a as zeros which a is 1_d array.
+// std::set elements of a as zeros which a is 1_d array.
 //**************************************************
 template<class T>
 void zeros(T *u,const int n)

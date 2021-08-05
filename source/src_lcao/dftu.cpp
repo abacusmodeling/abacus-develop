@@ -436,7 +436,7 @@ void DFTU::cal_occup_m_k(const int iter)
 	  		{
 	  		 	// if(!Yukawa && n!=0) continue;
 	  			if(n!=0) continue;
-	  			// set the local occupation mumber matrix of spin up and down zeros
+	  			// std::set the local occupation mumber matrix of spin up and down zeros
 
 					if(GlobalV::NSPIN==1 || GlobalV::NSPIN==4)
 					{

@@ -161,7 +161,7 @@ void Electrons::self_consistent(const int &istep)
 		// the clock is not accurate, needs to be fixed 2021-03-15 mohan
         clock_t start=std::clock();
 
-        //(1) set converged threshold, 
+        //(1) std::set converged threshold, 
         // automatically updated during self consistency.
         //this->update_ethr(iter);
         if(GlobalV::FINAL_SCF && iter==1) GlobalV::ETHR = 1.0e-2;

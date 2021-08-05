@@ -38,7 +38,7 @@ void Threshold_Elec::set_ethr(void) const
                 //======================================================
                 // if you think that the starting potential is good
                 // do not spoil it with a louly first diagonalization:
-                // set a strict ethr in the input file ()diago_the_init
+                // std::set a strict ethr in the input file ()diago_the_init
                 //======================================================
                 GlobalV::ETHR = 1.0e-5;
             }

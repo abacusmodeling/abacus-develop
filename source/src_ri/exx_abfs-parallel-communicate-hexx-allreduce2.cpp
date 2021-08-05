@@ -12,7 +12,7 @@
 
 void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::init(
 	const MPI_Comm &mpi_comm_in,
-	const set<std::pair<size_t,size_t>> &H_atom_pairs_core)
+	const std::set<std::pair<size_t,size_t>> &H_atom_pairs_core)
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::init");
 	
@@ -162,7 +162,7 @@ ofs<<"all\t\t"<<cal_time(t_all)<<std::endl;
 
 // the upper limit of size sended to each process
 std::vector<size_t> Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::get_send_size_list(
-	const set<std::pair<size_t,size_t>> &H_atom_pairs_core,
+	const std::set<std::pair<size_t,size_t>> &H_atom_pairs_core,
 	const std::vector<std::pair<std::vector<bool>,std::vector<bool>>> &atom_in_2D_list) const
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::get_send_size_list");

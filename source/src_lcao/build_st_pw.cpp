@@ -140,7 +140,7 @@ void Build_ST_pw::set_local(const int &ik)
 			}
 
 			ZEROS( psic, GlobalC::pw.nrxx);
-			// (1) set value
+			// (1) std::set value
 			for (int ig=0; ig< npw; ig++)
 			{
 				psic[ fft_index[ig]  ] = psi_one[ig];
@@ -192,7 +192,7 @@ void Build_ST_pw::set_local(const int &ik)
 
 			ZEROS( psic, GlobalC::pw.nrxx);
 			ZEROS( psic1, GlobalC::pw.nrxx);
-			// (1) set value
+			// (1) std::set value
 			for (int ig=0; ig< npw; ig++)
 			{
 				psic[ fft_index[ig]  ] = psi_one[ig];

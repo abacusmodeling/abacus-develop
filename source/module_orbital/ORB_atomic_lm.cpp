@@ -213,7 +213,7 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool
 	timer::tick("NOrbital_Lm", "extra_uniform");
 	
 	//---------------------------------------------
-	// set the dr, fixed by liaochen.
+	// std::set the dr, fixed by liaochen.
 	// calculate the number of radial mesh points.
 	//---------------------------------------------
 	assert(dr_uniform>0.0);

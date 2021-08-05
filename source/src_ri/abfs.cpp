@@ -17,7 +17,7 @@
 #include "../src_external/src_test/test_function.h"
 
 std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>>>> Abfs::cal_Cs(
-	const set<size_t> &atom_centres,
+	const std::set<size_t> &atom_centres,
 	const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
 	const Exx_Abfs::Matrix_Orbs21 &m_abfslcaos_lcaos,
 	const Element_Basis_Index::IndexLNM &index_abfs,
@@ -83,7 +83,7 @@ std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_pt
 
 /*std::map<size_t,std::map<size_t,std::shared_ptr<matrix>>> 
 	Abfs::cal_Vps(
-		const set<std::pair<size_t,size_t>> &atom_pairs,
+		const std::set<std::pair<size_t,size_t>> &atom_pairs,
 		const std::vector<Vector3_Order<int>> &Coulomb_potential_boxes,
 		const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
 		const Element_Basis_Index::Index &index_abfs,
@@ -433,11 +433,11 @@ std::vector<std::map<size_t,std::vector<Abfs::Vector3_Order<int>>>> Abfs::get_ad
 }
 
 /*
-set<std::pair<size_t,size_t>> Abfs::get_H_pairs_core( const std::vector<std::pair<size_t,size_t>> &atom_pairs )
+std::set<std::pair<size_t,size_t>> Abfs::get_H_pairs_core( const std::vector<std::pair<size_t,size_t>> &atom_pairs )
 {
 	TITLE("Exx_Lcao","allocate_Hexx");
 
-	set<std::pair<size_t,size_t>> H_atom_pairs_core;
+	std::set<std::pair<size_t,size_t>> H_atom_pairs_core;
 	for( const std::pair<size_t,size_t> & atom_pair : atom_pairs )
 	{
 		const size_t iat1 = atom_pair.first;
@@ -463,15 +463,15 @@ set<std::pair<size_t,size_t>> Abfs::get_H_pairs_core( const std::vector<std::pai
 }
 */
 
-std::map<set<size_t>,set<size_t>> Abfs::get_H_pairs_core_group( const std::vector<std::pair<size_t,size_t>> &atom_pairs )
+std::map<std::set<size_t>,std::set<size_t>> Abfs::get_H_pairs_core_group( const std::vector<std::pair<size_t,size_t>> &atom_pairs )
 {
 	TITLE("Abfs","get_H_pairs_core_group");
 	
 	const std::vector<std::map<size_t,std::vector<Abfs::Vector3_Order<int>>>> adjs = Abfs::get_adjs();
 	
-	auto get_set_adjs = [&adjs]( const set<size_t> &as ) -> set<size_t>
+	auto get_set_adjs = [&adjs]( const std::set<size_t> &as ) -> std::set<size_t>
 	{
-		set<size_t> aRs;
+		std::set<size_t> aRs;
 		for( const size_t a : as )
 			for( const auto &aR : adjs[a] )
 				aRs.insert(aR.first);
@@ -482,12 +482,12 @@ std::map<set<size_t>,set<size_t>> Abfs::get_H_pairs_core_group( const std::vecto
 	const std::vector<std::pair<size_t,size_t>> & a1_a2 = atom_pairs;
 	
 	// => {1:{0}, 5:{3,6}, 4:{0}, 8:{7}}
-	std::map<size_t,set<size_t>> a2_a1s;
+	std::map<size_t,std::set<size_t>> a2_a1s;
 	for( const auto & a1_a2_i : a1_a2 )
 		a2_a1s[ a1_a2_i.second ].insert( a1_a2_i.first );
 	
 	// => {{0}:{1,4}, {3,6}:{5}, {7}:{8}}
-	std::map<set<size_t>,set<size_t>> a1s_a2s;
+	std::map<std::set<size_t>,std::set<size_t>> a1s_a2s;
 	for( const auto & a2_a1s_i : a2_a1s )
 		a1s_a2s[ a2_a1s_i.second ].insert( a2_a1s_i.first );
 	a2_a1s.clear();
@@ -495,11 +495,11 @@ std::map<set<size_t>,set<size_t>> Abfs::get_H_pairs_core_group( const std::vecto
 	// => {R(0):R(1)UR(4), R(3)UR(6):R(5), R(7):R(8)}
 	// imaging R(0)==R(3)UR(6):   
 	// => {R(0):R(1)UR(4)UR(5), R(7):R(8)}
-	std::map<set<size_t>,set<size_t>> a1Rs_a2s;
+	std::map<std::set<size_t>,std::set<size_t>> a1Rs_a2s;
 	for( const auto & a1s_a2s_i : a1s_a2s )
 	{
-		const set<size_t> a1Rs_i = get_set_adjs(a1s_a2s_i.first);
-		const set<size_t> a2Rs_i = get_set_adjs(a1s_a2s_i.second);
+		const std::set<size_t> a1Rs_i = get_set_adjs(a1s_a2s_i.first);
+		const std::set<size_t> a2Rs_i = get_set_adjs(a1s_a2s_i.second);
 		a1Rs_a2s[a1Rs_i].insert(a2Rs_i.begin(), a2Rs_i.end());
 	}
 	a1s_a2s.clear();
@@ -507,15 +507,15 @@ std::map<set<size_t>,set<size_t>> Abfs::get_H_pairs_core_group( const std::vecto
 	return a1Rs_a2s;
 }
 
-set<std::pair<size_t,size_t>> Abfs::get_H_pairs_core( const std::vector<std::pair<size_t,size_t>> &atom_pairs )
+std::set<std::pair<size_t,size_t>> Abfs::get_H_pairs_core( const std::vector<std::pair<size_t,size_t>> &atom_pairs )
 {
 	TITLE("Exx_Lcao","get_H_pairs_core");
 	
 	const std::vector<std::map<size_t,std::vector<Abfs::Vector3_Order<int>>>> adjs = Abfs::get_adjs();
 	
-	auto get_set_adjs = [&adjs]( const set<size_t> &as ) -> set<size_t>
+	auto get_set_adjs = [&adjs]( const std::set<size_t> &as ) -> std::set<size_t>
 	{
-		set<size_t> aRs;
+		std::set<size_t> aRs;
 		for( const size_t a : as )
 			for( const auto &aR : adjs[a] )
 				aRs.insert(aR.first);
@@ -526,12 +526,12 @@ set<std::pair<size_t,size_t>> Abfs::get_H_pairs_core( const std::vector<std::pai
 	const std::vector<std::pair<size_t,size_t>> & a1_a2 = atom_pairs;
 	
 	// => {1:{0}, 5:{3,6}, 4:{0}, 8:{7}}
-	std::map<size_t,set<size_t>> a2_a1s;
+	std::map<size_t,std::set<size_t>> a2_a1s;
 	for( const auto & a1_a2_i : a1_a2 )
 		a2_a1s[ a1_a2_i.second ].insert( a1_a2_i.first );
 	
 	// => {{0}:{1,4}, {3,6}:{5}, {7}:{8}}
-	std::map<set<size_t>,set<size_t>> a1s_a2s;
+	std::map<std::set<size_t>,std::set<size_t>> a1s_a2s;
 	for( const auto & a2_a1s_i : a2_a1s )
 		a1s_a2s[ a2_a1s_i.second ].insert( a2_a1s_i.first );
 	a2_a1s.clear();
@@ -539,19 +539,19 @@ set<std::pair<size_t,size_t>> Abfs::get_H_pairs_core( const std::vector<std::pai
 	// => {R(0):{1,4}, R(3)UR(6):{5}, R(7):{8}}
 	// imaging R(0)==R(3)UR(6):   
 	// => {R(0):{1,4,5}, R(7):{8}}
-	std::map<set<size_t>,set<size_t>> a1Rs_a2s;
+	std::map<std::set<size_t>,std::set<size_t>> a1Rs_a2s;
 	for( const auto & a1s_a2s_i : a1s_a2s )
 	{
-		const set<size_t> a1Rs_i = get_set_adjs(a1s_a2s_i.first);
+		const std::set<size_t> a1Rs_i = get_set_adjs(a1s_a2s_i.first);
 		a1Rs_a2s[a1Rs_i].insert(a1s_a2s_i.second.begin(), a1s_a2s_i.second.end());
 	}
 	a1s_a2s.clear();
 	
 	// => {R(0):R(1)UR(4)UR(5), R(7):R(8)}
-	set<std::pair<size_t,size_t>> a1Rs_a2Rs;
+	std::set<std::pair<size_t,size_t>> a1Rs_a2Rs;
 	for( const auto & a1Rs_a2s_i : a1Rs_a2s )
 	{
-		const set<size_t> a2Rs_i = get_set_adjs(a1Rs_a2s_i.second);
+		const std::set<size_t> a2Rs_i = get_set_adjs(a1Rs_a2s_i.second);
 		for( const size_t a1R_i : a1Rs_a2s_i.first )
 			for( const size_t a2R_i : a2Rs_i )
 				a1Rs_a2Rs.insert({a1R_i,a2R_i});

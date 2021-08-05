@@ -8,7 +8,7 @@
 //#include <gperftools/profiler.h>
 
 /*
-void Exx_Abfs::Parallel::Communicate::DM::set_atom_in_exx( const set<std::pair<size_t,size_t>> &H_atom_pairs_core )
+void Exx_Abfs::Parallel::Communicate::DM::set_atom_in_exx( const std::set<std::pair<size_t,size_t>> &H_atom_pairs_core )
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM::set_atom_in_exx");
 	
@@ -99,7 +99,7 @@ Exx_Abfs::Parallel::Communicate::DM::f(
 
 void Exx_Abfs::Parallel::Communicate::DM::cal_DM( 
 	const Abfs::Vector3_Order<int> &Born_von_Karman_period,
-	const set<std::pair<size_t,size_t>> &H_atom_pairs_core,
+	const std::set<std::pair<size_t,size_t>> &H_atom_pairs_core,
 	const double threshold )
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM::cal_DM");

@@ -122,7 +122,7 @@ void Exx_Abfs::Matrix_Orbs11::init_radial_table()
 //ofs.close();
 }
 
-void Exx_Abfs::Matrix_Orbs11::init_radial_table( const std::map<size_t,std::map<size_t,set<double>>> &Rs )
+void Exx_Abfs::Matrix_Orbs11::init_radial_table( const std::map<size_t,std::map<size_t,std::set<double>>> &Rs )
 {	
 std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
@@ -136,7 +136,7 @@ gettimeofday( &t_start, NULL);
 			{
 timeval t_small;
 gettimeofday(&t_small, NULL);
-				set<size_t> radials;
+				std::set<size_t> radials;
 				for( const double &R : RsB.second )
 				{
 					const double position = R * GlobalC::ucell.lat0 / MOT.dr;

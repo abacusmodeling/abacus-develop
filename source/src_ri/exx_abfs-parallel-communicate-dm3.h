@@ -32,12 +32,12 @@ private:
 		public:
 			void init(
 				const MPI_Comm &mpi_comm_in,
-				const std::map<set<size_t>,set<size_t>> &H_atom_pairs_group);
+				const std::map<std::set<size_t>,std::set<size_t>> &H_atom_pairs_group);
 			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> a2D_to_exx(
 				std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local) const;
 
 		private:
-			std::vector<std::map<size_t,set<size_t>>> H_atom_pairs_group_rank;	//H_atom_pairs_group_rank[rank][iat1][iat2]
+			std::vector<std::map<size_t,std::set<size_t>>> H_atom_pairs_group_rank;	//H_atom_pairs_group_rank[rank][iat1][iat2]
 			std::vector<size_t> send_size_list;
 			size_t recv_size;
 
@@ -49,11 +49,11 @@ private:
 			enum class Flag_Recv {undo, begin_irecv, begin_iar, finish_iar};
 
 			//std::vector<std::pair<bool,bool>> get_atom_in_2D() const;
-			std::vector<std::map<size_t,set<size_t>>> get_H_atom_pairs_group_rank(
-				const std::map<set<size_t>,set<size_t>> &H_atom_pairs_group) const;
+			std::vector<std::map<size_t,std::set<size_t>>> get_H_atom_pairs_group_rank(
+				const std::map<std::set<size_t>,std::set<size_t>> &H_atom_pairs_group) const;
 			void get_send_recv_size(
-				const std::vector<std::map<size_t,set<size_t>>> &H_atom_pairs_group_rank,
-				const std::map<set<size_t>,set<size_t>> &H_atom_pairs_group,
+				const std::vector<std::map<size_t,std::set<size_t>>> &H_atom_pairs_group_rank,
+				const std::map<std::set<size_t>,std::set<size_t>> &H_atom_pairs_group,
 				std::vector<size_t> &send_size_list, size_t &recv_size) const;
 			void init_flags(
 				std::vector<std::atomic<Flag_Send>> &flags_send,

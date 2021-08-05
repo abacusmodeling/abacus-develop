@@ -8,7 +8,7 @@
 ////////////////////////////////////////////////////////////
 /// advices for reconstructions:
 /// -------------------------------
-/// each set of orbitals should have: lmax, dr, dk, rmax, lmax, etc.
+/// each std::set of orbitals should have: lmax, dr, dk, rmax, lmax, etc.
 ///
 /// the orbitals include : NAO, non-local projectors, descriptors, etc.
 ///

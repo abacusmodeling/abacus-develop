@@ -10,7 +10,7 @@
 using std::vector;
 #include <map>
 using std::map;
-#include<set>
+#include <set>
 using std::set;
 
 #include "center2_orb.h"
@@ -32,7 +32,7 @@ public:
 		const ORB_table_phi &MOT_in,
 		const ORB_gaunt_table &MGT_in	);
 	void init_radial_table();
-	void init_radial_table( const set<size_t> &radials );						// unit: Bohr/MOT.dr
+	void init_radial_table( const std::set<size_t> &radials );						// unit: Bohr/MOT.dr
 	double cal_overlap(
 		const Vector3<double> &RA, const Vector3<double> &RB,					// unit: Bohr
 		const int &mA1, const int &mA2, const int &mB1, const int &mB2) const;

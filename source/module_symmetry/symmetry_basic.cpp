@@ -385,7 +385,7 @@ bool &flag1)
 			}
 		}
 		//the latest operation is catually not used,
-		//so we must set back the std::vector t1 by the opposite operation
+		//so we must std::set back the std::vector t1 by the opposite operation
 		t1 = t1 - t2;
 	}
 }
@@ -421,7 +421,7 @@ void Symmetry_Basic::shortest_vector(
 }
 
 
-//set up the reciprocal lattice vectors b1, b2, b3 for a given set of lattice vectors a1, a2, a3
+//std::set up the reciprocal lattice vectors b1, b2, b3 for a given std::set of lattice vectors a1, a2, a3
 void Symmetry_Basic::recip(
 		const double a, 
 		const Vector3<double> &a1, 
@@ -449,8 +449,8 @@ void Symmetry_Basic::recip(
 	b3.z = volume * (a1.x * a2.y - a1.y * a2.x);
 }
 
-//convert a set of vectors (va) represented in the basis vectors old1, old2, old3 
-//to a set of vectors (vb) represented in the basis vectors new1, new2, new3
+//convert a std::set of vectors (va) represented in the basis vectors old1, old2, old3 
+//to a std::set of vectors (vb) represented in the basis vectors new1, new2, new3
 void Symmetry_Basic::veccon(
 		double *carpos, 
 		double *rotpos, 
@@ -697,7 +697,7 @@ void Symmetry_Basic::matrigen(Matrix3 *symgen, const int ngen, Matrix3* symop, i
 
 //--------------------------------------------------------------
 // SETGRP (L138 symlib.f VASP)
-// set up all possible space group operators 
+// std::set up all possible space group operators 
 // (integer rotation matrices and nontrivial translations
 // given in crystal coordinates) 
 // of a lattice with some arbitrary basis (std::atomic arrangement).
@@ -725,7 +725,7 @@ void Symmetry_Basic::setgroup(Matrix3* symop, int &nop, const int &ibrav)
 	Matrix3 r2zfc(0,1,-1,1,0,-1,0,0,-1);
 
 	//the pure translation lattice (bravais lattice) has some maximum symmetry
-	//set first up the point group operations for this symmetry.
+	//std::set first up the point group operations for this symmetry.
 	symgen[0] = inv;
 	if(ibrav == 14)
 	{

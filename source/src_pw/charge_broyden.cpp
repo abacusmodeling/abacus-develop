@@ -221,8 +221,8 @@ void Charge_Broyden::Simplified_Broyden_mixing(const int &iter)
 {
 	//It is a simplified modified broyden_mixing method.
 	//Ref: D.D. Johnson PRB 38, 12807 (1988)
-	//Here the weight w0 of the error of the inverse Jacobian is set to 0 and the weight wn of
-	//the error of each previous iteration is set to same.
+	//Here the weight w0 of the error of the inverse Jacobian is std::set to 0 and the weight wn of
+	//the error of each previous iteration is std::set to same.
 
 	// (1)
 	this->broyden_type=0;

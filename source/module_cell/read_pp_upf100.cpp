@@ -29,7 +29,7 @@ int Pseudopot_upf::read_pseudo_upf(std::ifstream &ifs)
 	
 	// Search for Header
 	// This version doesn't use the new routine SCAN_BEGIN
-	// because this search must set extra flags for
+	// because this search must std::set extra flags for
 	// compatibility with other pp format reading
 
 	ierr = 0;

@@ -12,7 +12,7 @@ class out_of_range;
 //==========================================================
 // CLASS : Adjacent
 // provide the data structure to represent the adjacent Atom
-// set of one Atom.
+// std::set of one Atom.
 //==========================================================
 
 class AdjacentSet

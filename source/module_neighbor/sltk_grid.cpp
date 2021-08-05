@@ -135,7 +135,7 @@ void Grid::setMemberVariables(
 	this->cell_z_length = input.getCellZLength();
 	if(test_grid)OUT(ofs_in,"CellLength(unit: lat0)",cell_x_length,cell_y_length,cell_z_length);
 //----------------------------------------------------------
-// set dx, dy, dz
+// std::set dx, dy, dz
 //----------------------------------------------------------
 	this->dx = input.getCellX();
 	this->dy = input.getCellY();

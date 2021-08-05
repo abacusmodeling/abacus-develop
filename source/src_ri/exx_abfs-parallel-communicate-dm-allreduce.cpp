@@ -13,7 +13,7 @@ Exx_Abfs::Parallel::Communicate::DM::Allreduce::Allreduce(
 	const MPI_Comm & mpi_comm_in, 
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local_in,
 	const Abfs::Vector3_Order<int> &Born_von_Karman_period,
-	const set<std::pair<size_t,size_t>> &H_atom_pairs_core)
+	const std::set<std::pair<size_t,size_t>> &H_atom_pairs_core)
 	:mpi_comm(mpi_comm_in),
 	 data_local(data_local_in),
 	 lock_insert(ATOMIC_FLAG_INIT),
@@ -21,7 +21,7 @@ Exx_Abfs::Parallel::Communicate::DM::Allreduce::Allreduce(
 {
 	data_all.resize(GlobalV::NSPIN);
 	
-	set<Abfs::Vector3_Order<int>> Born_Von_Karman_boxes;
+	std::set<Abfs::Vector3_Order<int>> Born_Von_Karman_boxes;
 	for( int ix=0; ix!=Born_von_Karman_period.x; ++ix )
 		for( int iy=0; iy!=Born_von_Karman_period.y; ++iy )
 			for( int iz=0; iz!=Born_von_Karman_period.z; ++iz )
@@ -453,7 +453,7 @@ timeval t_start;
 std::ofstream ofs_thread("allreduce_"+TO_STRING(GlobalV::MY_RANK)+"_"+TO_STRING(this_thread::get_id()),std::ofstream::app);
 ofs_thread<<"send\t"<<rank_asked<<std::endl;
 	
-	std::map<size_t,std::map<size_t,set<Abfs::Vector3_Order<int>>>> atom_asked;
+	std::map<size_t,std::map<size_t,std::set<Abfs::Vector3_Order<int>>>> atom_asked;
 gettimeofday(&t_start, NULL);
 	*iarps_atom_asked[rank_asked] >> atom_asked;
 ofs_thread<<"finish iarps_atom_asked >>\t"<<iarps_atom_asked[rank_asked]->size()<<std::endl;
@@ -479,7 +479,7 @@ ofs_thread.close();
 /*
 std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>>
 Exx_Abfs::Parallel::Communicate::DM::Allreduce::get_data_local_wrapper( 
-	const std::map<size_t,std::map<size_t,set<Abfs::Vector3_Order<int>>>> & atom_asked ) const
+	const std::map<size_t,std::map<size_t,std::set<Abfs::Vector3_Order<int>>>> & atom_asked ) const
 {
 //std::ofstream ofs_thread("allreduce_"+TO_STRING(GlobalV::MY_RANK)+"_"+TO_STRING(this_thread::get_id()),std::ofstream::app);
 //ofs_thread<<"get_data_local_wrapper"<<std::endl;	
@@ -521,7 +521,7 @@ Exx_Abfs::Parallel::Communicate::DM::Allreduce::get_data_local_wrapper(
 
 std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>>
 Exx_Abfs::Parallel::Communicate::DM::Allreduce::get_data_local_wrapper( 
-	const std::map<size_t,std::map<size_t,set<Abfs::Vector3_Order<int>>>> & atom_asked ) const
+	const std::map<size_t,std::map<size_t,std::set<Abfs::Vector3_Order<int>>>> & atom_asked ) const
 {
 std::ofstream ofs_thread("allreduce_"+TO_STRING(GlobalV::MY_RANK)+"_"+TO_STRING(this_thread::get_id()),std::ofstream::app);
 ofs_thread<<"get_data_local_wrapper"<<std::endl;	

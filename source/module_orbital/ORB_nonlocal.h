@@ -11,7 +11,7 @@
  * Note : contain nonlocal ps(:pseudopotential) information 
  * about atoms
  *
- * Feature : set and store information about ps infomation
+ * Feature : std::set and store information about ps infomation
  * related to atoms
  *
  * AUTHOR : liaochen

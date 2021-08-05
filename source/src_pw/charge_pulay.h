@@ -25,7 +25,7 @@ class Charge_Pulay: public Charge_Mixing
 	int idstep;
 	int totstep;
 	
-	// Peize Lin add 2018-11-01, and set new_e_iteration protected
+	// Peize Lin add 2018-11-01, and std::set new_e_iteration protected
 	const bool &get_new_e_iteration(){ return new_e_iteration; }
 	void set_new_e_iteration( const bool new_e_iteration_in );			
 

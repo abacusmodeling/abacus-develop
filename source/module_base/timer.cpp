@@ -101,7 +101,7 @@ long double timer::print_until_now(void)
 void timer::print_all(std::ofstream &ofs)
 {
 	constexpr double small = 0.1; // cpu = 10^6
-	// if want to print > 1s , set small = 10^6
+	// if want to print > 1s , std::set small = 10^6
 	
 	std::vector<std::pair<std::pair<std::string,std::string>,Timer_One>> timer_pool_order;
 	for(auto &timer_pool_A : timer_pool)
@@ -162,7 +162,7 @@ void timer::print_all(std::ofstream &ofs)
 {
 //	std::cout<<"\n timer::print_all()"<<std::endl;
 	const double small = 0.1; // cpu = 10^6
-	// if want to print > 1s , set small = 10^6
+	// if want to print > 1s , std::set small = 10^6
 
 	std::cout << setprecision(2);
 

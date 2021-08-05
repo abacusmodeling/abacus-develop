@@ -405,7 +405,7 @@ void Grid_Technique::cal_trace_beta(void)
 }
 
 
-// set 'lgd' variable
+// std::set 'lgd' variable
 void Grid_Technique::cal_trace_lo(void)
 {	
 	TITLE("Grid_Technique","cal_trace_lo");

@@ -29,9 +29,9 @@ double atom_arrange::set_sr_NL(
 		ofs_in << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
 		ofs_in << " |                                                                    |" << std::endl;
 		ofs_in << " | Search adjacent atoms:                                             |" << std::endl;
-		ofs_in << " | Set the adjacent atoms for each atom and set the periodic boundary |" << std::endl;
+		ofs_in << " | Set the adjacent atoms for each atom and std::set the periodic boundary |" << std::endl;
 		ofs_in << " | condition for the atoms on real space FFT grid. For k-dependent    |" << std::endl;  
-		ofs_in << " | algorithm, we also need to set the sparse H and S matrix element   |" << std::endl;
+		ofs_in << " | algorithm, we also need to std::set the sparse H and S matrix element   |" << std::endl;
 		ofs_in << " | for each atom.                                                     |" << std::endl; 
 		ofs_in << " |                                                                    |" << std::endl;
 		ofs_in << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;

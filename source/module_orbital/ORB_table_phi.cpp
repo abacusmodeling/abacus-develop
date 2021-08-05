@@ -249,7 +249,7 @@ void ORB_table_phi::cal_ST_Phi12_R
     const int &l,
     const Numerical_Orbital_Lm &n1,
     const Numerical_Orbital_Lm &n2,
-	const set<size_t> &radials,
+	const std::set<size_t> &radials,
     double* rs,
 	double* drs
 ) const

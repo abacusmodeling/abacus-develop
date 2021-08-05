@@ -5,7 +5,7 @@
 using std::vector;
 #include <map>
 using std::map;
-#include<set>
+#include <set>
 using std::set;
 
 #include "exx_abfs.h"
@@ -33,7 +33,7 @@ public:
 		const LCAO_Orbitals &orb_B );
 		
 	void init_radial_table();
-	void init_radial_table( std::map<size_t,std::map<size_t,set<double>>> &Rs );		// unit is GlobalC::ucell.lat0
+	void init_radial_table( std::map<size_t,std::map<size_t,std::set<double>>> &Rs );		// unit is GlobalC::ucell.lat0
 	
 	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> cal_overlap_matrix(
 		const Element_Basis_Index::IndexLNM &index_r, 

@@ -26,12 +26,12 @@
 	/*  ========= */
 
 	/*  UPLO    (input) CHARACTER*1 */
-	/*          Specifies the part of the matrix A to be set. */
-	/*          = 'U':      Upper triangular part is set; the strictly lower */
+	/*          Specifies the part of the matrix A to be std::set. */
+	/*          = 'U':      Upper triangular part is std::set; the strictly lower */
 	/*                      triangular part of A is not changed. */
-	/*          = 'L':      Lower triangular part is set; the strictly upper */
+	/*          = 'L':      Lower triangular part is std::set; the strictly upper */
 	/*                      triangular part of A is not changed. */
-	/*          Otherwise:  All of the matrix A is set. */
+	/*          Otherwise:  All of the matrix A is std::set. */
 
 	/*  M       (input) int */
 	/*          The number of rows of the matrix A.  M >= 0. */
@@ -40,13 +40,13 @@
 	/*          The number of columns of the matrix A.  N >= 0. */
 
 	/*  ALPHA   (input) DOUBLE PRECISION */
-	/*          The constant to which the offdiagonal elements are to be set. */
+	/*          The constant to which the offdiagonal elements are to be std::set. */
 
 	/*  BETA    (input) DOUBLE PRECISION */
-	/*          The constant to which the diagonal elements are to be set. */
+	/*          The constant to which the diagonal elements are to be std::set. */
 
 	/*  A       (input/output) DOUBLE PRECISION array, dimension (LDA,N) */
-	/*          On exit, the leading m-by-n submatrix of A is set as follows: */
+	/*          On exit, the leading m-by-n submatrix of A is std::set as follows: */
 
 	/*          if UPLO = 'U', A(i,j) = ALPHA, 1<=i<=j-1, 1<=j<=n, */
 	/*          if UPLO = 'L', A(i,j) = ALPHA, j+1<=i<=m, 1<=j<=n, */

@@ -183,8 +183,8 @@ inline int setBufferParameter(
     Cblacs_gridinfo(blacs_ctxt, &nprows, &npcols, &myprow, &mypcol);
 
 	//-----------------------------------------
-	// set index of current proor: myproc
-	// set number of total proors: nprocs
+	// std::set index of current proor: myproc
+	// std::set number of total proors: nprocs
 	//-----------------------------------------
     Cblacs_pinfo(&myproc, &nprocs);
 

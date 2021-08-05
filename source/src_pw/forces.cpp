@@ -659,7 +659,7 @@ void Forces::cal_force_nl(matrix& forcenl)
         }
 
         // get becp according to wave functions and vkb
-        // important here ! becp must set zero!!
+        // important here ! becp must std::set zero!!
 		// vkb: Beta(nkb,npw)
 		// becp(nkb,nbnd): <Beta(nkb,npw)|psi(nbnd,npw)>
         becp.zero_out();

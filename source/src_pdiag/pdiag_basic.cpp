@@ -28,7 +28,7 @@ void Pdiag_Basic::set_parameters(void)
 {
     TITLE("Pdiag_Basic","set_parameters");
 
-    // set loc_size
+    // std::set loc_size
 	if(GlobalV::GAMMA_ONLY_LOCAL)//xiaohui add 2014-12-21
 	{
 		loc_size=GlobalV::NBANDS/GlobalV::DSIZE;
@@ -43,7 +43,7 @@ void Pdiag_Basic::set_parameters(void)
 		if (GlobalV::DRANK<GlobalV::NBANDS%GlobalV::DSIZE) loc_size=loc_size+1;
 		if(testpb)OUT(GlobalV::ofs_running,"local size",loc_size);
 
-		// set loc_sizes
+		// std::set loc_sizes
 		delete[] loc_sizes;
 		loc_sizes = new int[GlobalV::DSIZE];
 		ZEROS(loc_sizes, GlobalV::DSIZE);
@@ -88,7 +88,7 @@ void Pdiag_Basic::set_parameters(void)
 		}
 		if(testpb) OUT(GlobalV::ofs_running,"local size",loc_size);
 
-		// set loc_sizes
+		// std::set loc_sizes
 		delete[] loc_sizes;
 		loc_sizes = new int[GlobalV::DSIZE];
 		ZEROS(loc_sizes, GlobalV::DSIZE);

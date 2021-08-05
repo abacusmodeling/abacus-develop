@@ -11,7 +11,7 @@
 #include "../src_external/src_test/src_ri/exx_abfs-dm-test.h"
 
 void Exx_Abfs::DM::cal_DM(
-	const set<std::pair<size_t,size_t>> &atom_pairs,
+	const std::set<std::pair<size_t,size_t>> &atom_pairs,
 	const std::vector<Abfs::Vector3_Order<int>> &Born_von_Karman_boxes)
 {
 	TITLE("Exx_Abfs::DM::cal_DM");
@@ -40,7 +40,7 @@ void Exx_Abfs::DM::cal_DM(
 
 void Exx_Abfs::DM::cal_DMk_mixing(
 	const Charge_Broyden &charge,
-	const set<std::pair<size_t,size_t>> &atom_pairs )
+	const std::set<std::pair<size_t,size_t>> &atom_pairs )
 {
 	TITLE("Exx_Abfs::DM::cal_DMk_mixing");
 
@@ -83,7 +83,7 @@ void Exx_Abfs::DM::cal_DMk_mixing(
 
 
 
-std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> Exx_Abfs::DM::cal_DMk_raw( const set<std::pair<size_t,size_t>> &atom_pairs ) const
+std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> Exx_Abfs::DM::cal_DMk_raw( const std::set<std::pair<size_t,size_t>> &atom_pairs ) const
 {
 	TITLE("Exx_Abfs::DM::cal_DMk_raw");
 
@@ -146,7 +146,7 @@ std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> Exx_Abfs::DM::cal_D
 
 void Exx_Abfs::DM::plain_mixing(
 	const Charge_Broyden &charge,
-	const set<std::pair<size_t,size_t>> &atom_pairs)
+	const std::set<std::pair<size_t,size_t>> &atom_pairs)
 {
 	TITLE("Exx_Abfs::DM::plain_mixing");
 
@@ -160,7 +160,7 @@ void Exx_Abfs::DM::plain_mixing(
 
 void Exx_Abfs::DM::pulay_mixing(
 	const Charge_Broyden &charge,
-	const set<std::pair<size_t,size_t>> &atom_pairs)
+	const std::set<std::pair<size_t,size_t>> &atom_pairs)
 {
 	if( 1==charge.totstep )
 	{

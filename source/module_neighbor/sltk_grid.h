@@ -121,7 +121,7 @@ private:
 // Three Main Steps:
 // NAME : setMemberVariables (read in datas from Atom_input,
 // 			init cells.)
-// NAME : setAtomLinkArray( set the AtomLinkArray twice,
+// NAME : setAtomLinkArray( std::set the AtomLinkArray twice,
 // 			first use Build_Hash,second use Fold_Hash)
 // NAME : setBoundaryAdjacent( Consider different situations,
 // 			if not_expand case : nature/periodic boundary

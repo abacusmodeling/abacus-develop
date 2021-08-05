@@ -9,13 +9,13 @@
 class Exx_Abfs_DM_Test
 {
 public:
-	static std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> cal_DMk_raw_readfile( const set<std::pair<size_t,size_t>> &atom_pairs );
+	static std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> cal_DMk_raw_readfile( const std::set<std::pair<size_t,size_t>> &atom_pairs );
 	static std::vector<std::vector<std::complex<double>>> read_wfc( const std::string &file_name );
 	static matrix read_wg( const std::string &file_name );
 };
 
 std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> 
-Exx_Abfs_DM_Test::cal_DMk_raw_readfile( const set<std::pair<size_t,size_t>> &atom_pairs )
+Exx_Abfs_DM_Test::cal_DMk_raw_readfile( const std::set<std::pair<size_t,size_t>> &atom_pairs )
 {
 	static int istep=-1;	++istep;	
 	TITLE("cal_DMk_raw_readfile_"+TO_STRING(istep));

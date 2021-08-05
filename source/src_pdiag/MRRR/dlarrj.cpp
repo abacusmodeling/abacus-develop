@@ -129,9 +129,9 @@
 	/*     Initialize unconverged intervals in [ WORK(2*I-1), WORK(2*I) ]. */
 	/*     The Sturm Count, Count( WORK(2*I-1) ) is arranged to be I-1, while */
 	/*     Count( WORK(2*I) ) is stored in IWORK( 2*I ). The int IWORK( 2*I-1 ) */
-	/*     for an unconverged interval is set to the index of the next unconverged */
+	/*     for an unconverged interval is std::set to the index of the next unconverged */
 	/*     interval, and is -1 or 0 for a converged interval. Thus a linked */
-	/*     list of unconverged intervals is set up. */
+	/*     list of unconverged intervals is std::set up. */
 
 	i1 = *ifirst;
 	i2 = *ilast;

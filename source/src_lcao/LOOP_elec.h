@@ -15,7 +15,7 @@ class LOOP_elec
 
 	private:
 
-	// set matrix and grid integral
+	// std::set matrix and grid integral
 	void set_matrix_grid(void);
 
 	void before_solver(const int &istep);

@@ -8,7 +8,7 @@
 
 #include <boost/serialization/std::vector.hpp>
 #include <boost/serialization/std::map.hpp>
-#include <boost/serialization/set.hpp>
+#include <boost/serialization/std::set.hpp>
 #include <boost/serialization/std::string.hpp>
 
 #include "../module_base/vector3.h"

@@ -416,7 +416,7 @@ void UnitCell_pseudo::cal_nwfc(void)
 	assert(nat>0);
 
 	//===========================
-	// (1) set iw2l, iw2n, iw2m
+	// (1) std::set iw2l, iw2n, iw2m
 	//===========================
 	for(int it=0; it<ntype; it++)
 	{
@@ -424,7 +424,7 @@ void UnitCell_pseudo::cal_nwfc(void)
 	}
 
 	//===========================
-	// (2) set namax and nwmax
+	// (2) std::set namax and nwmax
 	//===========================
 	this->namax = 0;
 	this->nwmax = 0;
@@ -439,7 +439,7 @@ void UnitCell_pseudo::cal_nwfc(void)
 //		OUT(GlobalV::ofs_running,"max wave function number",nwmax);	
 
 	//===========================
-	// (3) set nwfc and stapos_wf
+	// (3) std::set nwfc and stapos_wf
 	//===========================
 	GlobalV::NLOCAL = 0;
 	for(int it=0; it<ntype; it++)
@@ -463,7 +463,7 @@ void UnitCell_pseudo::cal_nwfc(void)
 	//OUT(GlobalV::ofs_running,"NLOCAL",GlobalV::NLOCAL);
 	GlobalV::ofs_running << " " << setw(40) << "NLOCAL" << " = " << GlobalV::NLOCAL <<std::endl;
 	//========================================================
-	// (4) set index for iat2it, iat2ia, itia2iat, itiaiw2iwt
+	// (4) std::set index for iat2it, iat2ia, itia2iat, itiaiw2iwt
 	//========================================================
 
 	this->set_iat2it();
@@ -500,7 +500,7 @@ void UnitCell_pseudo::cal_nwfc(void)
 	}
 
 	//========================
-	// (5) set lmax and nmax
+	// (5) std::set lmax and nmax
 	//========================
 	this->lmax = 0;	
 	this->nmax = 0;
@@ -521,7 +521,7 @@ void UnitCell_pseudo::cal_nwfc(void)
 	}
 
 	//=======================
-	// (6) set lmax_ppwf
+	// (6) std::set lmax_ppwf
 	//=======================
 	this->lmax_ppwf = 0;
 	for(int it=0; it< ntype; it++)

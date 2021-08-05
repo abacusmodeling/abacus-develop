@@ -28,7 +28,7 @@ void Use_FFT::RoundTrip(
     const int *fft_index,
     std::complex<double> *psic)
 {
-	// (1) set value
+	// (1) std::set value
     for (int ig=0; ig< GlobalC::wf.npw; ig++)
     {
         psic[ fft_index[ig]  ] = psi[ig];
@@ -48,7 +48,7 @@ void Use_FFT::RoundTrip(
 
 void Use_FFT::ToRealSpace(const int &is, const ComplexMatrix &vg, double *vr)
 {
-	// (1) set value
+	// (1) std::set value
     ZEROS( porter, GlobalC::pw.nrxx );
     for (int ig=0; ig<GlobalC::pw.ngmc; ig++)
     {
@@ -80,7 +80,7 @@ void Use_FFT::ToRealSpace_psi(const int &ik, const std::complex<double> *psig, s
 
 void Use_FFT::ToRealSpace_psi(const int &ik, const int &ib, const ComplexMatrix &evc, std::complex<double> *psir)
 {
-	// (1) set value
+	// (1) std::set value
     ZEROS( psir, GlobalC::pw.nrxx );
     for (int ig=0; ig<GlobalC::wf.npw; ig++)
     {
@@ -96,7 +96,7 @@ void Use_FFT::ToRealSpace_psi(const int &ik, const int &ib, const ComplexMatrix 
 
 void Use_FFT::ToRealSpace(const int &is, const ComplexMatrix &vg, matrix &vr)
 {
-	// (1) set value
+	// (1) std::set value
     ZEROS( porter, GlobalC::pw.nrxx);
     for (int ig=0; ig<GlobalC::pw.ngmc; ig++)
     {

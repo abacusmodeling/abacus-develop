@@ -15,7 +15,7 @@ namespace GlobalV
 
 //----------------------------------------------------------
 // EXPLAIN : Basic Global Variables
-// In practice calculation, these values are set in
+// In practice calculation, these values are std::set in
 // input.cpp.
 //----------------------------------------------------------
 int 	NBANDS = 0;

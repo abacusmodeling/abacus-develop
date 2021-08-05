@@ -115,7 +115,7 @@ void pseudo_nc::print_pseudo_nc(std::ofstream &ofs, output &outp)
 void pseudo_nc::set_pseudo_h(const Pseudopot_upf &upf)
 {
 	TITLE("pseudo_nc::set_pseudo_h");
-	// set pseudopotential for each atom type
+	// std::set pseudopotential for each atom type
 	// by using the Unified Pseudopotential Format
 
 	this->nv = upf.nv;// UPF file version number

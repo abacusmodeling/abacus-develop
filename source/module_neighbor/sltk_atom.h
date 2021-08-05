@@ -62,7 +62,7 @@ public:
 
 //==========================================================
 // MEMBER FUNCTION :
-// EXPLAIN : set value
+// EXPLAIN : std::set value
 //==========================================================
 	void setX(const double& r) { d_x = r; }
 	void setY(const double& r) { d_y = r; }

@@ -64,7 +64,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
             GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
         }
 
-        //  should not be set zero if VNA is used.
+        //  should not be std::set zero if VNA is used.
         //  ZEROS(GlobalC::LM.DHloc_fixed_x,GlobalC::ParaO.nloc);
         //  ZEROS(GlobalC::LM.DHloc_fixed_y,GlobalC::ParaO.nloc);
         //  ZEROS(GlobalC::LM.DHloc_fixed_z,GlobalC::ParaO.nloc);
@@ -203,7 +203,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
             GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
         }
 
-        //should not be set zero if VNA is used.
+        //should not be std::set zero if VNA is used.
         //ZEROS(GlobalC::LM.DHloc_fixed_x,GlobalC::ParaO.nloc);
         //ZEROS(GlobalC::LM.DHloc_fixed_y,GlobalC::ParaO.nloc);
         //ZEROS(GlobalC::LM.DHloc_fixed_z,GlobalC::ParaO.nloc);

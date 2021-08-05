@@ -35,7 +35,7 @@ void toWannier90::init_wannier()
 		else if(wannier_spin == "down") start_k_index = num_kpts/2;
 		else
 		{
-			WARNING_QUIT("toWannier90::init_wannier","Error wannier_spin set,is not \"up\" or \"down\" ");
+			WARNING_QUIT("toWannier90::init_wannier","Error wannier_spin std::set,is not \"up\" or \"down\" ");
 		}
 	}
 	
@@ -294,7 +294,7 @@ void toWannier90::read_nnkp()
 	
 	// ����exclude_bands
 	tag_cal_band = new bool[GlobalV::NBANDS];
-	if(GlobalV::NBANDS <= num_exclude_bands) WARNING_QUIT("toWannier90::read_nnkp","you set the band numer is not enough, please add bands number.");
+	if(GlobalV::NBANDS <= num_exclude_bands) WARNING_QUIT("toWannier90::read_nnkp","you std::set the band numer is not enough, please add bands number.");
 	if(num_exclude_bands == 0)
 	{
 		for(int ib = 0; ib < GlobalV::NBANDS; ib++) tag_cal_band[ib] = true;
@@ -1469,7 +1469,7 @@ void toWannier90::integral(const int meshr, const double *psir, const double *r,
 
 void toWannier90::ToRealSpace(const int &ik, const int &ib, const ComplexMatrix *evc, std::complex<double> *psir, const Vector3<double> G)
 {
-	// (1) set value
+	// (1) std::set value
 	std::complex<double> *phase = GlobalC::UFFT.porter;
     ZEROS( psir, GlobalC::pw.nrxx );
 	ZEROS( phase, GlobalC::pw.nrxx);
@@ -1525,7 +1525,7 @@ std::complex<double> toWannier90::unkdotb(const std::complex<double> *psir, cons
 
 std::complex<double> toWannier90::unkdotkb(const int &ik, const int &ikb, const int &iband_L, const int &iband_R, const Vector3<double> G, const ComplexMatrix *wfc_pw)
 {
-	// (1) set value
+	// (1) std::set value
 	std::complex<double> result(0.0,0.0);
 	std::complex<double> *psir = new std::complex<double>[GlobalC::pw.nrxx];
 	std::complex<double> *phase = GlobalC::UFFT.porter;

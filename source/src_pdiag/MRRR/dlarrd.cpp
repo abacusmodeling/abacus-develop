@@ -693,7 +693,7 @@ static int c__0 = 0;
 					/* L120: */
 				}
 			}
-			/*           Now erase all eigenvalues with IBLOCK set to zero */
+			/*           Now erase all eigenvalues with IBLOCK std::set to zero */
 			im = 0;
 			i__1 = *m;
 			for (je = 1; je <= i__1; ++je) {

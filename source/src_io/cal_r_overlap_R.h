@@ -5,7 +5,7 @@
 using std::vector;
 #include <map>
 using std::map;
-#include<set>
+#include <set>
 using std::set;
 
 #include "../src_lcao/center2_orb.h"

@@ -33,7 +33,7 @@ class Chi0_hilbert
 	bool out_chi;           // output chi or not
 	bool out_chi0;          // output chi0 or not
 	double fermi_level;     // the change the fermi level(Ry)
-	bool coulomb_cutoff;    // turn on or off the Coulomb_cutoff 0/1  (The Z axis must be set to be a vacuum layer)
+	bool coulomb_cutoff;    // turn on or off the Coulomb_cutoff 0/1  (The Z axis must be std::set to be a vacuum layer)
 	bool kmesh_interpolation;       // calculting <i,0|j,R>
 	double qcar[100][3];    // the Cartesian position of q points(unit: 2*PI/lat0) 
 	int lcao_box[3];        // the scale for searching the existence of the overlap <i,0|j,R>

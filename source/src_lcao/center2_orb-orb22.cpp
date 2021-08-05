@@ -60,7 +60,7 @@ void Center2_Orb::Orb22::init_radial_table()
 	}
 }
 
-void Center2_Orb::Orb22::init_radial_table( const set<size_t> &radials )
+void Center2_Orb::Orb22::init_radial_table( const std::set<size_t> &radials )
 {
 	const Numerical_Orbital_Lm & nB_short = (nB1.getNr()<=nB2.getNr()) ? nB1 : nB2;
 	

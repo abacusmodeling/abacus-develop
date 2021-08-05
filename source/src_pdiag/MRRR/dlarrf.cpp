@@ -208,7 +208,7 @@ static int c__1 = 1;
 	dplus[1] = d__[1] + s;
 	if (fabs(dplus[1]) < *pivmin) {
 		dplus[1] = -(*pivmin);
-		/*        Need to set SAWNAN1 because refined RRR test should not be used */
+		/*        Need to std::set SAWNAN1 because refined RRR test should not be used */
 		/*        in this case */
 		sawnan1 = true
 		;
@@ -221,7 +221,7 @@ static int c__1 = 1;
 		dplus[i__ + 1] = d__[i__ + 1] + s;
 		if ((d__1 = dplus[i__ + 1], fabs(d__1)) < *pivmin) {
 			dplus[i__ + 1] = -(*pivmin);
-			/*           Need to set SAWNAN1 because refined RRR test should not be used */
+			/*           Need to std::set SAWNAN1 because refined RRR test should not be used */
 			/*           in this case */
 			sawnan1 = true
 			;
@@ -242,7 +242,7 @@ static int c__1 = 1;
 	work[1] = d__[1] + s;
 	if (fabs(work[1]) < *pivmin) {
 		work[1] = -(*pivmin);
-		/*        Need to set SAWNAN2 because refined RRR test should not be used */
+		/*        Need to std::set SAWNAN2 because refined RRR test should not be used */
 		/*        in this case */
 		sawnan2 = true
 		;
@@ -255,7 +255,7 @@ static int c__1 = 1;
 		work[i__ + 1] = d__[i__ + 1] + s;
 		if ((d__1 = work[i__ + 1], fabs(d__1)) < *pivmin) {
 			work[i__ + 1] = -(*pivmin);
-			/*           Need to set SAWNAN2 because refined RRR test should not be used */
+			/*           Need to std::set SAWNAN2 because refined RRR test should not be used */
 			/*           in this case */
 			sawnan2 = true
 			;

@@ -21,7 +21,7 @@ public:
 	// Cws[it1,it1,0][it2,R]
 	// Vws[it1,0][it2,R]
 	static std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,std::shared_ptr<matrix>>>> cal_Cs(
-		const set<size_t> &atom_centres,
+		const std::set<size_t> &atom_centres,
 		const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
 		const Exx_Abfs::Matrix_Orbs21 &m_abfslcaos_lcaos,
 		const Element_Basis_Index::IndexLNM &index_abfs,
@@ -82,8 +82,8 @@ public:
 //	static std::map<size_t,std::vector<Abfs::Vector3_Order<int>>> get_adjs( const size_t &T, const Vector3<double> &tau_cartesian );
 	static std::map<size_t,std::vector<Abfs::Vector3_Order<int>>> get_adjs( const size_t &iat );
 	static std::vector<std::map<size_t,std::vector<Abfs::Vector3_Order<int>>>> get_adjs();
-	static std::map<set<size_t>,set<size_t>> get_H_pairs_core_group( const std::vector<std::pair<size_t,size_t>> &atom_pairs );
-	static set<std::pair<size_t,size_t>> get_H_pairs_core( const std::vector<std::pair<size_t,size_t>> &atom_pairs );
+	static std::map<std::set<size_t>,std::set<size_t>> get_H_pairs_core_group( const std::vector<std::pair<size_t,size_t>> &atom_pairs );
+	static std::set<std::pair<size_t,size_t>> get_H_pairs_core( const std::vector<std::pair<size_t,size_t>> &atom_pairs );
 	static std::vector<Vector3_Order<int>> get_Coulomb_potential_boxes( const double rmesh_times );
 	static std::vector<Vector3_Order<int>> get_Born_von_Karmen_boxes( const Abfs::Vector3_Order<int> &Born_von_Karman_period );
 

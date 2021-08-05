@@ -10,7 +10,7 @@
 using std::vector;
 #include <map>
 using std::map;
-#include<set>
+#include <set>
 using std::set;
 
 #include "exx_abfs.h"
@@ -40,7 +40,7 @@ public:
 		const LCAO_Orbitals &orb_B );	
 		
 	void init_radial_table();
-	void init_radial_table( const std::map<size_t,std::map<size_t,set<double>>> &Rs );		// unit: ucell.lat0
+	void init_radial_table( const std::map<size_t,std::map<size_t,std::set<double>>> &Rs );		// unit: ucell.lat0
 		
 	enum class Matrix_Order{A2B_A1,BA2_A1};
 	matrix cal_overlap_matrix(  

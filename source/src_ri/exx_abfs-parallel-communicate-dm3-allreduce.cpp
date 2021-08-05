@@ -18,7 +18,7 @@
 
 void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init(
 	const MPI_Comm &mpi_comm_in,
-	const std::map<set<size_t>,set<size_t>> &H_atom_pairs_group)
+	const std::map<std::set<size_t>,std::set<size_t>> &H_atom_pairs_group)
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init");
 	
@@ -195,8 +195,8 @@ std::vector<std::pair<bool,bool>> Exx_Abfs::Parallel::Communicate::DM3::Allreduc
 
 
 /*
-std::vector<std::map<size_t,std::shared_ptr<set<size_t>>>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_H_atom_pairs_group_rank(
-	const std::map<set<size_t>,set<size_t>> &H_atom_pairs_group,
+std::vector<std::map<size_t,std::shared_ptr<std::set<size_t>>>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_H_atom_pairs_group_rank(
+	const std::map<std::set<size_t>,std::set<size_t>> &H_atom_pairs_group,
 	const std::vector<std::pair<bool,bool>> &atom_in_2D) const
 {
 	std::vector<int> H_atom_pairs_group_vector;
@@ -230,7 +230,7 @@ std::vector<std::map<size_t,std::shared_ptr<set<size_t>>>> Exx_Abfs::Parallel::C
 		VECTOR_TO_PTR(H_atom_pairs_group_rank_vector), VECTOR_TO_PTR(rank_size), VECTOR_TO_PTR(rank_index), MPI_INT,
 		mpi_comm);
 
-	std::vector<std::map<size_t,std::shared_ptr<set<size_t>>>> H_atom_pairs_group_rank(comm_sz);
+	std::vector<std::map<size_t,std::shared_ptr<std::set<size_t>>>> H_atom_pairs_group_rank(comm_sz);
 	auto ptr = H_atom_pairs_group_rank_vector.begin();
 	for(int rank=0; rank!=comm_sz; ++rank)
 	{
@@ -241,7 +241,7 @@ std::vector<std::map<size_t,std::shared_ptr<set<size_t>>>> Exx_Abfs::Parallel::C
 			const size_t atoms2_size = *ptr++;
 			if(atoms1_size&&atoms2_size)
 			{
-				std::shared_ptr<set<size_t>> atoms2 = make_shared<set<size_t>>();
+				std::shared_ptr<std::set<size_t>> atoms2 = make_shared<std::set<size_t>>();
 				for(int i=0; i<atoms1_size; ++i)
 				{
 					const size_t atom_require = *ptr++;
@@ -266,8 +266,8 @@ std::vector<std::map<size_t,std::shared_ptr<set<size_t>>>> Exx_Abfs::Parallel::C
 */
 
 
-std::vector<std::map<size_t,set<size_t>>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_H_atom_pairs_group_rank(
-	const std::map<set<size_t>,set<size_t>> &H_atom_pairs_group) const
+std::vector<std::map<size_t,std::set<size_t>>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_H_atom_pairs_group_rank(
+	const std::map<std::set<size_t>,std::set<size_t>> &H_atom_pairs_group) const
 {
 	constexpr int tag = 0;
 
@@ -278,7 +278,7 @@ std::vector<std::map<size_t,set<size_t>>> Exx_Abfs::Parallel::Communicate::DM3::
 	for(int rank_tmp=my_rank; rank_tmp!=comm_sz+my_rank; ++rank_tmp)
 	{
 		const int rank = rank_tmp%comm_sz;
-		std::map<size_t,set<size_t>> atom_required;
+		std::map<size_t,std::set<size_t>> atom_required;
 		for(const auto & H_atom_pairs : H_atom_pairs_group)
 			for(const size_t iat1 : H_atom_pairs.first)
 				if(atom_in_2D_list[rank].first[iat1])
@@ -299,7 +299,7 @@ std::vector<std::map<size_t,set<size_t>>> Exx_Abfs::Parallel::Communicate::DM3::
 		if( MPI_Isend( atom_send_str[rank].c_str(), atom_send_str[rank].size(), MPI_CHAR, rank, tag, mpi_comm, &request[rank] ) !=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 	}
 
-	std::vector<std::map<size_t,set<size_t>>> H_atom_pairs_group_rank(comm_sz);
+	std::vector<std::map<size_t,std::set<size_t>>> H_atom_pairs_group_rank(comm_sz);
 	for(int i=0; i!=comm_sz; ++i)
 	{
 		MPI_Status status;
@@ -326,8 +326,8 @@ std::vector<std::map<size_t,set<size_t>>> Exx_Abfs::Parallel::Communicate::DM3::
 }
 
 void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_send_recv_size(
-	const std::vector<std::map<size_t,set<size_t>>> &H_atom_pairs_group_rank,
-	const std::map<set<size_t>,set<size_t>> &H_atom_pairs_group,
+	const std::vector<std::map<size_t,std::set<size_t>>> &H_atom_pairs_group_rank,
+	const std::map<std::set<size_t>,std::set<size_t>> &H_atom_pairs_group,
 	std::vector<size_t> &send_size_list, size_t &recv_size) const
 {
 	send_size_list.resize(comm_sz,0);

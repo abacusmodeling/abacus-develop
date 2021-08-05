@@ -15,7 +15,7 @@ std::vector<Sph_Bessel_Recursive::D1> Sph_Bessel_Recursive_Pool::D1::sb_pool;
 void Sph_Bessel_Recursive::D1::set_dx( const double dx_in )
 {
 	if(finish_set_dx && dx_in!=dx)	
-		throw std::runtime_error("Sph_Bessel_Recursive::set_dx, dx can only set once");
+		throw std::runtime_error("Sph_Bessel_Recursive::set_dx, dx can only std::set once");
 	else
 	{
 		dx = dx_in;

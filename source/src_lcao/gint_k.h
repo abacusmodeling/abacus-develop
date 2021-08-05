@@ -105,8 +105,8 @@ class Gint_k : public Gint_k_init
 	//------------------------------------------------------
 	// in gint_k.cpp 
 	//------------------------------------------------------
-	// set the orbital info 
-	// set the orbital/Ylm information on each real space grid.
+	// std::set the orbital info 
+	// std::set the orbital/Ylm information on each real space grid.
 	void set_ijk_atom(
 		const int &grid_index, 
 		const int &size,
@@ -156,8 +156,8 @@ class Gint_k : public Gint_k_init
 	//------------------------------------------------------
 	// in gint_k_fvl.cpp 
 	//------------------------------------------------------
-	// set the orbital info 
-	// set the derivative/Ylm information on each real space grid.
+	// std::set the orbital info 
+	// std::set the derivative/Ylm information on each real space grid.
 	void set_ijk_atom_force(
 		const int &grid_index, 
 		const int &size,

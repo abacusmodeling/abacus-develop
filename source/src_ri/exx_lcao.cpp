@@ -793,9 +793,9 @@ std::ofstream ofs_mpi(test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::
 timeval t_start, t_start_all;
 gettimeofday( &t_start_all, NULL);
 
-	auto cal_atom_centres_core = [](const std::vector<std::pair<size_t,size_t>> &atom_pairs_core) -> set<size_t>
+	auto cal_atom_centres_core = [](const std::vector<std::pair<size_t,size_t>> &atom_pairs_core) -> std::set<size_t>
 	{
-		set<size_t> atom_centres_core;
+		std::set<size_t> atom_centres_core;
 		for( const std::pair<size_t,size_t> & atom_pair : atom_pairs_core )
 		{
 			atom_centres_core.insert(atom_pair.first);
@@ -849,7 +849,7 @@ ofs_mpi<<"TIME@ Abfs::cal_Vps\t"<<time_during(t_start)<<std::endl;
 	atom_pairs_core = Abfs::get_atom_pair(Vps);
 ofs_mpi<<"atom_pairs_core\t"<<atom_pairs_core.size()<<std::endl;
 
-	const set<size_t> atom_centres_core = cal_atom_centres_core(atom_pairs_core);
+	const std::set<size_t> atom_centres_core = cal_atom_centres_core(atom_pairs_core);
 ofs_mpi<<"atom_centres_core\t"<<atom_centres_core.size()<<std::endl;
 
 gettimeofday( &t_start, NULL);
@@ -1169,7 +1169,7 @@ void Exx_Lcao::cal_exx_elec_nscf()
 }
 
 /*
-void Exx_Lcao::cal_Hexx_gamma( const set<std::pair<size_t,size_t>> &atom_pairs )
+void Exx_Lcao::cal_Hexx_gamma( const std::set<std::pair<size_t,size_t>> &atom_pairs )
 {
 	for( const std::pair<size_t,size_t> & atom_pair : atom_pairs )
 	{
@@ -1273,14 +1273,14 @@ void Exx_Lcao::add_Hexx( const size_t ik, const double alpha ) const
 }
 
 
-void Exx_Lcao::init_radial_table_ions( const set<size_t> &atom_centres_core, const std::vector<std::pair<size_t,size_t>> &atom_pairs_core )
+void Exx_Lcao::init_radial_table_ions( const std::set<size_t> &atom_centres_core, const std::vector<std::pair<size_t,size_t>> &atom_pairs_core )
 {
 	TITLE("Exx_Lcao::init_radial_table_ions");
 	
 std::ofstream ofs_mpi(test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 
-	std::map<size_t,std::map<size_t,set<double>>> radial_R;
+	std::map<size_t,std::map<size_t,std::set<double>>> radial_R;
 	
 	auto print_atom = [&](std::ostream &os)
 	{

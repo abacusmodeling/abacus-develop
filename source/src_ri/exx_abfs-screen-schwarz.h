@@ -16,7 +16,7 @@ public:
 		const bool flag_screen_schwarz_in,
 		const double threshold_in);
 	void cal_max_pair_fock(
-		const set<size_t> &atom_centres,
+		const std::set<size_t> &atom_centres,
 		const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
 		const Exx_Abfs::Matrix_Orbs21 &m_abfslcaos_lcaos,
 		const Element_Basis_Index::IndexLNM &index_abfs,

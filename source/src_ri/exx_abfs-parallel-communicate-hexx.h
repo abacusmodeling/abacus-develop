@@ -96,7 +96,7 @@ private:
 	public:
 		void init(
 			const MPI_Comm &mpi_comm_in,
-			const set<std::pair<size_t,size_t>> &H_atom_pairs_core);
+			const std::set<std::pair<size_t,size_t>> &H_atom_pairs_core);
 		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> exx_to_a2D(
 			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local) const;
 
@@ -106,7 +106,7 @@ private:
 		
 		//std::vector<std::pair<std::vector<bool>,std::vector<bool>>> get_atom_in_2D_list() const;
 		std::vector<size_t> get_send_size_list(
-			const set<std::pair<size_t,size_t>> &H_atom_pairs_core,
+			const std::set<std::pair<size_t,size_t>> &H_atom_pairs_core,
 			const std::vector<std::pair<std::vector<bool>,std::vector<bool>>> &atom_in_2D_list) const;
 		void init_flags(
 			std::vector<std::atomic<Flag_Send>> &flags_send,

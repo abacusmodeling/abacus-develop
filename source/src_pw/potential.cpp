@@ -273,7 +273,7 @@ void Potential::set_local_pot(
         EFID.add_efield(GlobalC::CHR.rho[0], vl_pseudo);	
     }
 
-    //GlobalV::ofs_running <<" set local pseudopotential done." << std::endl;
+    //GlobalV::ofs_running <<" std::set local pseudopotential done." << std::endl;
     timer::tick("Potential","set_local_pot");
     return;
 }
@@ -327,7 +327,7 @@ matrix Potential::v_of_rho(
 
 
 //==========================================================
-// set the effective potential vr_eff on the real space grid 
+// std::set the effective potential vr_eff on the real space grid 
 // used in h_psi, adding the (spin dependent) scf (H+xc)
 // part and the sum of all the local pseudopotential
 // contributions.

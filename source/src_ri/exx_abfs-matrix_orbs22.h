@@ -33,7 +33,7 @@ public:
 		const LCAO_Orbitals &orb_B2 );
 		
 	void init_radial_table();
-	void init_radial_table( const std::map<size_t,std::map<size_t,set<double>>> &Rs );		// unit is ucell.lat0
+	void init_radial_table( const std::map<size_t,std::map<size_t,std::set<double>>> &Rs );		// unit is ucell.lat0
 
 	enum class Matrix_Order{A1B1_A2B2};
 	matrix cal_overlap_matrix(  

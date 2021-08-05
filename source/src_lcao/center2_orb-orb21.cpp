@@ -65,7 +65,7 @@ void Center2_Orb::Orb21::init_radial_table()
 	}
 }
 
-void Center2_Orb::Orb21::init_radial_table( const set<size_t> &radials )
+void Center2_Orb::Orb21::init_radial_table( const std::set<size_t> &radials )
 {
 	const Numerical_Orbital_Lm & nA_short = (nA1.getNr()<=nA2.getNr()) ? nA1 : nA2;
 	
