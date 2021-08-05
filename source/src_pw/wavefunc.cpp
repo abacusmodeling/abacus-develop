@@ -133,7 +133,7 @@ void wavefunc::allocate(const int nks)
 
 //===================================================================
 // This routine computes an estimate of the start_ wavefunctions
-// from superposition of std::atomic wavefunctions or random wave functions.
+// from superposition of atomic wavefunctions or random wave functions.
 //===================================================================
 #include "occupy.h"
 void wavefunc::wfcinit(void)
@@ -177,15 +177,15 @@ int wavefunc::get_starting_nw(void)const
         // ... read the wavefunction into memory (if it is not done in c_bands)
         //**********************************************************************
     }
-    else if (start_wfc.substr(0,6) == "std::atomic")
+    else if (start_wfc.substr(0,6) == "atomic")
     {
         if (GlobalC::ucell.natomwfc >= GlobalV::NBANDS)
         {
-            if(GlobalV::test_wf)GlobalV::ofs_running << " Start wave functions are all pseudo std::atomic wave functions." << std::endl;
+            if(GlobalV::test_wf)GlobalV::ofs_running << " Start wave functions are all pseudo atomic wave functions." << std::endl;
         }
         else
         {
-            if(GlobalV::test_wf)GlobalV::ofs_running << " Start wave functions are std::atomic + "
+            if(GlobalV::test_wf)GlobalV::ofs_running << " Start wave functions are atomic + "
             << GlobalV::NBANDS - GlobalC::ucell.natomwfc
             << " random wave functions." << std::endl;
         }
@@ -219,7 +219,7 @@ void wavefunc::LCAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
 	{
 		this->table_local.create(GlobalC::ucell.ntype, GlobalC::ucell.nmax_total, GlobalV::NQX);
 
-		// GlobalC::ORB.orbital_file: file name of the numerical std::atomic orbitals (NAOs)
+		// GlobalC::ORB.orbital_file: file name of the numerical atomic orbitals (NAOs)
 		// table_local: generate one-dimensional table for NAOs
 		Wavefunc_in_pw::make_table_q(GlobalC::ORB.orbital_file, this->table_local);
 		ltable = true;
@@ -280,10 +280,10 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ComplexMatrix &wvf)
 
 	ComplexMatrix wfcatom(starting_nw, npwx * GlobalV::NPOL);//added by zhengdy-soc
 	if(GlobalV::test_wf)OUT(GlobalV::ofs_running, "starting_nw", starting_nw);
-	if(start_wfc.substr(0,6)=="std::atomic")
+	if(start_wfc.substr(0,6)=="atomic")
 	{
 		this->atomic_wfc(ik, this->npw, GlobalC::ucell.lmax_ppwf, wfcatom, GlobalC::ppcell.tab_at, GlobalV::NQX, GlobalV::DQ);
-		if( start_wfc == "std::atomic+random" && starting_nw == GlobalC::ucell.natomwfc )//added by qianrui 2021-5-16
+		if( start_wfc == "atomic+random" && starting_nw == GlobalC::ucell.natomwfc )//added by qianrui 2021-5-16
 		{
 			double rr, arg;
 			for(int ib = 0 ; ib < starting_nw ; ++ib )
@@ -303,7 +303,7 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ComplexMatrix &wvf)
 		}
 		
 		//====================================================
-		// If not enough std::atomic wfc are available, complete
+		// If not enough atomic wfc are available, complete
 		// with random wfcs
 		//====================================================
 		this->random(wfcatom, GlobalC::ucell.natomwfc, GlobalV::NBANDS, ik);

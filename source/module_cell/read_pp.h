@@ -40,7 +40,7 @@ public:
 	int mesh;			// header_12 // number of point in the radial mesh
 	int nwfc;			// header_13 // number of wavefunctions
 	int nbeta;			// header_14 // number of projectors
-	std::string *els;		// header_15 // els(nwfc):label for the i-th std::atomic orbital (4s, 4p, etc)
+	std::string *els;		// header_15 // els(nwfc):label for the i-th atomic orbital (4s, 4p, etc)
 	int *lchi;			// header_16 // lchi(nwfc):angular momentum
 	double *oc;			// header_17 // oc(nwfc)
 

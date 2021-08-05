@@ -330,7 +330,7 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 	return;
 }
 
-// Read std::atomic positions
+// Read atomic positions
 // return 1: no problem.
 // return 0: some problems.
 bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &ofs_running, std::ofstream &ofs_warning)

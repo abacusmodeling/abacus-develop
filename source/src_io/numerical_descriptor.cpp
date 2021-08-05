@@ -353,7 +353,7 @@ void Numerical_Descriptor::init_mu_index(void)
 	}
 
 	this->nlocal = mu;
-	GlobalV::ofs_running << " total number of std::atomic orbitals " << nlocal << std::endl;
+	GlobalV::ofs_running << " total number of atomic orbitals " << nlocal << std::endl;
 
 	return;
 }

@@ -16,7 +16,7 @@ class Potential
     ~Potential();
 
     //==========================================================
-    // start_pot : "std::atomic" or "file"
+    // start_pot : "atomic" or "file"
 	// extra_pot : extrapolation methods for potential
     // vr(nspin,ncxyz) : Hartree + xc potentials in real space
     // vr_eff(nspin,ncxyz) : effective potential in real space 

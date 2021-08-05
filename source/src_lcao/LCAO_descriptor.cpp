@@ -245,7 +245,7 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
                                         if (GlobalV::GAMMA_ONLY_LOCAL)
                                         {
                                             this->set_S_mu_alpha(
-												iw1_all,  // index of numerical std::atomic orbital mu
+												iw1_all,  // index of numerical atomic orbital mu
 												inl_index[T2](I2,L2,N2), // index of alpha (for descriptor)
 												m2, 
 												olm[0]);// overlap value

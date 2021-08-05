@@ -22,7 +22,7 @@ public:
 	Vector3<double> a1, a2, a3;	//primitive cell vectors(might be changed during the process of the program)
 	Vector3<double>	p1, p2, p3;	//primitive cell vectors
 	
-	int ntype;	//the number of std::atomic species
+	int ntype;	//the number of atomic species
 	int nat; 	//the number of all atoms
  	int *na;	//number of atoms for each species
 	int *istart; //start number of atom.

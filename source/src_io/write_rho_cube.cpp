@@ -45,7 +45,7 @@ void Charge::write_rho_cube(
 		{
 			for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 			{
-				//convert from label to std::atomic number
+				//convert from label to atomic number
 				int z = 0;
 				for(int j=0; j!=element_name.size(); j++)
 					if (GlobalC::ucell.atoms[it].label == element_name[j])

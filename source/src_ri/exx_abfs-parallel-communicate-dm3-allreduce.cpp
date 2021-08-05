@@ -55,8 +55,8 @@ std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"dm3_"+TO_STRING(my_rank), 
 	
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> data_all(GlobalV::NSPIN);
 
-	std::vector<std::atomic<Flag_Send>> flags_send(comm_sz);
-    std::vector<std::atomic<Flag_Recv>> flags_recv(comm_sz);
+	std::vector<atomic<Flag_Send>> flags_send(comm_sz);
+    std::vector<atomic<Flag_Recv>> flags_recv(comm_sz);
 	init_flags(flags_send, flags_recv);
 
 	std::vector<std::vector<double>> oarps_isend(comm_sz);
@@ -65,7 +65,7 @@ std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"dm3_"+TO_STRING(my_rank), 
 	int rank_send_now = my_rank;
 	auto rank_send_next = [&]()->int{ return (rank_send_now+1)%comm_sz; };
 
-	std::atomic_flag lock_insert = ATOMIC_FLAG_INIT;
+	atomic_flag lock_insert = ATOMIC_FLAG_INIT;
 	std::vector<thread> threads;
 	std::vector<MPI_Request>requests_isend(comm_sz);
 	std::vector<MPI_Request>requests_irecv(comm_sz);
@@ -357,24 +357,24 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_send_recv_size(
 
 
 void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init_flags(
-	std::vector<std::atomic<Flag_Send>> &flags_send,
-	std::vector<std::atomic<Flag_Recv>> &flags_recv) const
+	std::vector<atomic<Flag_Send>> &flags_send,
+	std::vector<atomic<Flag_Recv>> &flags_recv) const
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init_flags");
 	
-	for(std::atomic<Flag_Send> &flag_send : flags_send)
+	for(atomic<Flag_Send> &flag_send : flags_send)
 		flag_send = Flag_Send::undo;
 	flags_send[my_rank] = Flag_Send::finish_isend;
 	
-	for(std::atomic<Flag_Recv> &flag_recv : flags_recv)
+	for(atomic<Flag_Recv> &flag_recv : flags_recv)
 		flag_recv = Flag_Recv::undo;
 	flags_recv[my_rank] = Flag_Recv::finish_iar;
 }
 
 
 bool Exx_Abfs::Parallel::Communicate::DM3::Allreduce::finish_judge(
-	const std::vector<std::atomic<Flag_Send>> &flags_send,
-	const std::vector<std::atomic<Flag_Recv>> &flags_recv) const
+	const std::vector<atomic<Flag_Send>> &flags_send,
+	const std::vector<atomic<Flag_Recv>> &flags_recv) const
 {
 	for(int rank_send=0; rank_send!=comm_sz; ++rank_send)
 		if((flags_send[rank_send]!=Flag_Send::begin_isend) && (flags_send[rank_send]!=Flag_Send::finish_isend))
@@ -388,7 +388,7 @@ bool Exx_Abfs::Parallel::Communicate::DM3::Allreduce::finish_judge(
 
 bool Exx_Abfs::Parallel::Communicate::DM3::Allreduce::memory_enough(
 	const int rank_send_next,
-	const std::vector<std::atomic<Flag_Send>> &flags_send) const
+	const std::vector<atomic<Flag_Send>> &flags_send) const
 {
 	size_t memory_need = recv_size;
 	for(int rank_send=0; rank_send<comm_sz; ++rank_send)
@@ -404,7 +404,7 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process(
 	const int rank_send_now,
 	const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local,
 	std::vector<std::vector<double>> &oarps_isend,
-	std::vector<std::atomic<Flag_Send>> &flags_send) const
+	std::vector<atomic<Flag_Send>> &flags_send) const
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process");
 	
@@ -456,7 +456,7 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process(
 	const int rank_send_now,
 	const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local,
 	std::vector<std::vector<double>> &oarps_isend,
-	std::vector<std::atomic<Flag_Send>> &flags_send) const
+	std::vector<atomic<Flag_Send>> &flags_send) const
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process");
 	
@@ -535,8 +535,8 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::recv_data_process(
 	const int rank_recv,
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_all,
 	std::vector<std::vector<double>> &iarps_irecv,
-	std::vector<std::atomic<Flag_Recv>> &flags_recv,
-	std::atomic_flag &lock_insert) const
+	std::vector<atomic<Flag_Recv>> &flags_recv,
+	atomic_flag &lock_insert) const
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::recv_data_process");
 	

@@ -106,7 +106,7 @@ void LOOP_elec::before_solver(const int &istep)
 	// do the charge extrapolation before the density matrix is regenerated.
 	// mohan add 2011-04-08
 	// because once atoms are moving out of this processor,
-	// the density matrix will not std::map the new std::atomic configuration,
+	// the density matrix will not std::map the new atomic configuration,
 	//======================================
 	// THIS IS A BUG, BECAUSE THE INDEX GlobalC::GridT.trace_lo
 	// HAS BEEN REGENERATED, SO WE NEED TO

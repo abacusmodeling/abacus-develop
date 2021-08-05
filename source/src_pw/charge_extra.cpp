@@ -142,17 +142,17 @@ void Charge_Extra::extrapolate_charge()
 	//-------------------------------------------------------
     // charge density expolation:
     // pot_order = 0 copy the old potential(nothing is done);
-    // pot_order = 3 substrate old std::atomic charge density and
+    // pot_order = 3 substrate old atomic charge density and
     // sum the new.
     // If the dynamics is done, this routine extrapolates also
-    // the difference between the scf and the std::atomic one.
+    // the difference between the scf and the atomic one.
     // pot_order = 1 first order extrapolation:
     // rho(t+dt) = 2*rho(t) - rho(t-dt)
     // pot_order = 2 second order extrapolation:
     // rho(t+dt) = rho+
     // alpha*(rho(t) - rho(t-dt))
     // + beta*( rho(t-dt) - rho(t-2*dt) )
-	// just use std::atomic charge.
+	// just use atomic charge.
 	//-------------------------------------------------------
 
 	if(GlobalC::pot.extra_pot == "dm")//xiaohui modify 2015-02-01
@@ -166,8 +166,8 @@ void Charge_Extra::extrapolate_charge()
 			GlobalC::pw.setup_structure_factor();
 		}
 	}
-	// "std::atomic" extrapolation
-	else if(GlobalC::pot.extra_pot == "std::atomic")
+	// "atomic" extrapolation
+	else if(GlobalC::pot.extra_pot == "atomic")
 	{
 		double** rho_atom_old = new double*[GlobalV::NSPIN];
 		double** rho_atom_new = new double*[GlobalV::NSPIN];
@@ -228,7 +228,7 @@ void Charge_Extra::extrapolate_charge()
 			ZEROS(rho_atom_new[is], GlobalC::pw.nrxx);
 		}
 
-		// generate std::atomic rho
+		// generate atomic rho
 		GlobalC::CHR.atomic_rho(GlobalV::NSPIN,rho_atom_old);
 
 		for(int is=0; is<GlobalV::NSPIN; is++)
@@ -314,7 +314,7 @@ void Charge_Extra::extrapolate_charge()
 		// setup the structure factor
 		GlobalC::pw.setup_structure_factor();
 
-		// generate std::atomic rho
+		// generate atomic rho
 		GlobalC::CHR.atomic_rho(GlobalV::NSPIN,rho_atom_new);
 
 		for(int is=0; is<GlobalV::NSPIN; is++)

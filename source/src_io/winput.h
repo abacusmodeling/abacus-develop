@@ -73,14 +73,14 @@ public:
 
 //==========================================================
 // MEMBER FUNCTIONS : 
-// NAME : trial ( trial wave functions , "std::atomic" or "gauss")
+// NAME : trial ( trial wave functions , "atomic" or "gauss")
 // NAME : bs(parameters for gauss orbit)
 // NAME : bp
 // NAME : px
 // NAME : g1
 // NAME : g2
 //==========================================================
-	static std::string trial;//"std::atomic" or "gauss" 
+	static std::string trial;//"atomic" or "gauss" 
 	static double bs;//parameters for gauss orbit
 	static double bp;
 	static double px;
@@ -93,7 +93,7 @@ public:
 	static double fermi_t;
 	static double clm2_lowest;
 
-	static int sph_proj;//"1" spherical project,"2": first minus std::atomic orbitals
+	static int sph_proj;//"1" spherical project,"2": first minus atomic orbitals
 	static bool sph_type;//0:Rewrite 1:Skip
 
 	static bool b_recon;//"1" reconstruction of wannier function

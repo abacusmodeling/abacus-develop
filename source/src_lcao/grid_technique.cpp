@@ -453,7 +453,7 @@ void Grid_Technique::cal_trace_lo(void)
 			}
 			else
 			{
-				// global index of std::atomic orbitals
+				// global index of atomic orbitals
 				iw_all += GlobalC::ucell.atoms[it].nw;
 				if(GlobalV::NSPIN==4) iw_all += GlobalC::ucell.atoms[it].nw;
 			}

@@ -24,7 +24,7 @@ class Numerical_Descriptor
 
 	int lmax; // lmax for descriptor
 	int nmax; // nmax for descriptor
-	int nlocal; // total number of std::atomic orbitals
+	int nlocal; // total number of atomic orbitals
 
 	Bessel_Basis bessel_basis;
 

@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 
 	std::cout << "Hello, this is the 'base' module of ABACUS." << std::endl;
 
-	std::cout << "The module searchs for the neighboring atoms for a given std::atomic position" << std::endl;
+	std::cout << "The module searchs for the neighboring atoms for a given atomic position" << std::endl;
 
 	std::cout << "Right now, the module is still empty, soon we will have more tests." << std::endl;
 

@@ -26,7 +26,7 @@ WF_atomic::~WF_atomic()
 //==========================================================
 // MEMBER FUNCTION :
 // NAME : init_at_1(init a table with the radial Fourier
-// transform of the std::atomic WF_atomictions)
+// transform of the atomic WF_atomictions)
 //==========================================================
 void WF_atomic::init_at_1(void)
 {
@@ -47,7 +47,7 @@ void WF_atomic::init_at_1(void)
     }
 	OUT(GlobalV::ofs_running,"max mesh points in Pseudopotential",ndm);
 
-    // needed to normalize std::atomic wfcs (not a bad idea in general and
+    // needed to normalize atomic wfcs (not a bad idea in general and
     // necessary to compute correctly lda+U projections)
     GlobalC::ppcell.tab_at.zero_out();
 //----------------------------------------------------------
@@ -71,7 +71,7 @@ void WF_atomic::init_at_1(void)
     {
 		Atom* atom = &GlobalC::ucell.atoms[it];
 
-		GlobalV::ofs_running <<"\n number of pseudo std::atomic orbitals for "
+		GlobalV::ofs_running <<"\n number of pseudo atomic orbitals for "
 		<< atom->label << " is " << atom->nchi << std::endl;
 
         for (int ic=0; ic<atom->nchi ;ic++)
@@ -93,7 +93,7 @@ void WF_atomic::init_at_1(void)
             Integral::Simpson_Integral(nmesh, inner_part, atom->rab, unit);
             delete[] inner_part;
 
-			GlobalV::ofs_running << " the unit of pseudo std::atomic orbital is " << unit;
+			GlobalV::ofs_running << " the unit of pseudo atomic orbital is " << unit;
 
             //=================================
             // normalize radial wave functions
@@ -203,7 +203,7 @@ void WF_atomic::print_PAOs(void)const
 
 //===================================================================
 // This routine computes an estimate of the start_ WF_atomictions
-// from superposition of std::atomic WF_atomictions or random wave functions.
+// from superposition of atomic WF_atomictions or random wave functions.
 //===================================================================
 // from wfcinit.f90
 
@@ -240,7 +240,7 @@ void WF_atomic::atomic_wfc
     if (GlobalV::test_wf>3) TITLE("WF_atomic","atomic_wfc");
     timer::tick("WF_atomic","atomic_wfc");
     //=========================================================
-    // This routine computes the superposition of std::atomic
+    // This routine computes the superposition of atomic
     // WF_atomictions for a given k-point.
     //=========================================================
     const int total_lm = (lmax_wfc + 1) * (lmax_wfc + 1);
@@ -281,7 +281,7 @@ void WF_atomic::atomic_wfc
                     //-----------------------------------------------------
 
                       //---------------------------------------------------------
-                      // flq = radial fourier transform of std::atomic orbitals chi
+                      // flq = radial fourier transform of atomic orbitals chi
                       //---------------------------------------------------------
                     for (int ig=0; ig<np; ig++)
                     {

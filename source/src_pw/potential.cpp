@@ -109,7 +109,7 @@ void Potential::init_pot(
         OUT(GlobalV::ofs_running,"start_pot",start_pot);
 
         std::cout << " START POTENTIAL      : " << start_pot << std::endl;
-        if (this->start_pot == "std::atomic")//mohan add 2007-10-17
+        if (this->start_pot == "atomic")//mohan add 2007-10-17
         {
             start_from_atomic:
             GlobalC::CHR.atomic_rho(GlobalV::NSPIN, GlobalC::CHR.rho);
@@ -168,7 +168,7 @@ void Potential::init_pot(
 				}
 				else
                 {
-                    GlobalV::ofs_running << " Start charge density from std::atomic charge density." << std::endl;
+                    GlobalV::ofs_running << " Start charge density from atomic charge density." << std::endl;
                     goto start_from_atomic;
                 }
             }

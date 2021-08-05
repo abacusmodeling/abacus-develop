@@ -41,7 +41,7 @@ int Pseudopot_upf::read_pseudo_vwr(std::ifstream &ifs)
 	if(mesh%2==0) 
 	{
 		mesh=mesh-1;
-		GlobalV::ofs_running << " Mesh number - 1, we need odd number, \n this may affect some polar std::atomic orbitals." << std::endl;
+		GlobalV::ofs_running << " Mesh number - 1, we need odd number, \n this may affect some polar atomic orbitals." << std::endl;
 	}
 	GlobalV::ofs_running << std::setw(15) << "MESH" << std::setw(15) << mesh << std::endl;
 	// (2) read in nlcc: nonlinear core correction
@@ -74,7 +74,7 @@ int Pseudopot_upf::read_pseudo_vwr(std::ifstream &ifs)
 	ifs >> has_so;
 
 
-	// label to count the projector or std::atomic wave functions	
+	// label to count the projector or atomic wave functions	
 	getline(ifs,value);
 	int iref_s, iref_p, iref_d;
 	ifs >> iref_s >> iref_p >> iref_d;
@@ -218,7 +218,7 @@ int Pseudopot_upf::read_pseudo_vwr(std::ifstream &ifs)
 	// information, in order to make all the processors to stop
 	// the job, we need to return the error information first.
 	// we need to choose a threshold for the deviation of the
-	// norm of pseudo std::atomic orbitals, I std::set 0.2
+	// norm of pseudo atomic orbitals, I std::set 0.2
 	// mohan 2013-06-28
 	if( abs(units-1.0) > 0.2 && (iTB_s==1 || iref_s==1)) {return 3;}
 	if( abs(unitp-1.0) > 0.2 && (iTB_p==1 || iref_p==1)) {return 3;}

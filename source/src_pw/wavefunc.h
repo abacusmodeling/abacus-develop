@@ -23,7 +23,7 @@ class wavefunc : public WF_atomic
 	bool   allocate_ekb;   // flag
     matrix wg;
 
-    // start_wfc : "random",or "std::atomic" or "file"
+    // start_wfc : "random",or "atomic" or "file"
     std::string start_wfc;
 	int mem_saver; //1: save evc when doing nscf calculation.
     void wfcinit(void);// from wfcinit.f90

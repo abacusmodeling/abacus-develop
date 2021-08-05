@@ -179,7 +179,7 @@ void Exx_Lip::init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in, PW_Basis *pw_ptr_i
 			k_pack->hvec_array[ik].create(GlobalV::NLOCAL,GlobalV::NBANDS);
 		}
 
-		if (GlobalC::pot.start_pot=="std::atomic")
+		if (GlobalC::pot.start_pot=="atomic")
 		{
 			q_pack = k_pack;
 		}
@@ -300,7 +300,7 @@ Exx_Lip::~Exx_Lip()
 		delete[] k_pack->hvec_array;	k_pack->hvec_array=NULL;
 		delete k_pack;
 
-		if (GlobalC::pot.start_pot=="std::atomic")
+		if (GlobalC::pot.start_pot=="atomic")
 		{
 			q_pack = NULL;
 		}
@@ -357,7 +357,7 @@ void Exx_Lip::phi_cal(k_package *kq_pack, int ikq)
 void Exx_Lip::psi_cal()
 {
 	TITLE("Exx_Lip","psi_cal");
-	if (GlobalC::pot.start_pot=="std::atomic")
+	if (GlobalC::pot.start_pot=="atomic")
 	{
 		for( int iq = 0; iq < q_pack->kv_ptr->nks; ++iq)
 		{
@@ -413,7 +413,7 @@ void Exx_Lip::psi_cal()
 
 void Exx_Lip::judge_singularity( int ik)
 {
-	if (GlobalC::pot.start_pot=="std::atomic")
+	if (GlobalC::pot.start_pot=="atomic")
 	{
 		iq_vecik = ik;
 	}

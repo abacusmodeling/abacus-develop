@@ -1,12 +1,12 @@
 //----------------------------------------------------------
 // EXPLAIN : This routine calculates rhoa as the
-// superposition of std::atomic charges.
+// superposition of atomic charges.
 //
 // nspina is the number of spin components to be calculated
 //
-// nspina = 1 the total std::atomic charge density is calculated
-// nspina = 2 the spin up and spin down std::atomic charge
-// densities are calculated assuming an uniform std::atomic
+// nspina = 1 the total atomic charge density is calculated
+// nspina = 2 the spin up and spin down atomic charge
+// densities are calculated assuming an uniform atomic
 // spin-polarization equal to starting_magnetization(nt)
 // nspina = 4 noncollinear case. The total density is
 // calculated in the first component and the magnetization
@@ -177,7 +177,7 @@ void Charge::renormalize_rho(void)
 }
 
 //-------------------------------------------------------
-// superposition of std::atomic charges contained in the array
+// superposition of atomic charges contained in the array
 // rho_at (read from pseudopotential files)
 // allocate work space (psic must already be allocated)
 //-------------------------------------------------------
@@ -304,7 +304,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 					return rho_lgl;
 				}();
 				//----------------------------------------------------------
-				// EXPLAIN : compute the 3D std::atomic charge in reciprocal space
+				// EXPLAIN : compute the 3D atomic charge in reciprocal space
 				//----------------------------------------------------------
 				if(spin_number_need==1)
 				{
@@ -497,7 +497,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 	// occupations.
 	// GlobalC::ucell.magnet.compute_magnetization();
 
-	//GlobalV::ofs_running << " Superposition of std::atomic wave function as First-Charge done." << std::endl;
+	//GlobalV::ofs_running << " Superposition of atomic wave function as First-Charge done." << std::endl;
 	//2014-06-22
 
     timer::tick("Charge","atomic_rho");
@@ -520,7 +520,7 @@ void Charge::set_rho_core(
 //----------------------------------------------------------
 // LOCAL VARIABLES :
 // counter on mesh points
-// counter on std::atomic types
+// counter on atomic types
 // counter on g vectors
 //----------------------------------------------------------
     //int ir = 0;

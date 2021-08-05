@@ -117,7 +117,7 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique &gt)
 		}
 	}
 
-	if(GlobalC::wf.start_wfc == "std::atomic" )
+	if(GlobalC::wf.start_wfc == "atomic" )
 	{
 		
 	}

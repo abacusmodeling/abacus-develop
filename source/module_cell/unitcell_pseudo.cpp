@@ -65,11 +65,11 @@ void UnitCell_pseudo::setup_cell(
 			GlobalV::ofs_running << " | Reading atom information in unitcell:                              |" << std::endl;
 			GlobalV::ofs_running << " | From the input file and the structure file we know the number of   |" << std::endl;
 			GlobalV::ofs_running << " | different elments in this unitcell, then we list the detail        |" << std::endl;
-			GlobalV::ofs_running << " | information for each element, especially the zeta and polar std::atomic |" << std::endl;
+			GlobalV::ofs_running << " | information for each element, especially the zeta and polar atomic |" << std::endl;
 			GlobalV::ofs_running << " | orbital number for each element. The total atom number is counted. |" << std::endl;
 			GlobalV::ofs_running << " | We calculate the nearest atom distance for each atom and show the  |" << std::endl;
 			GlobalV::ofs_running << " | Cartesian and Direct coordinates for each atom. We list the file   |" << std::endl;
-			GlobalV::ofs_running << " | address for std::atomic orbitals. The volume and the lattice vectors    |" << std::endl;
+			GlobalV::ofs_running << " | address for atomic orbitals. The volume and the lattice vectors    |" << std::endl;
 			GlobalV::ofs_running << " | in real and reciprocal space is also shown.                        |" << std::endl;
 			GlobalV::ofs_running << " |                                                                    |" << std::endl;
 			GlobalV::ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
@@ -174,7 +174,7 @@ void UnitCell_pseudo::setup_cell(
 	GlobalV::ofs_running << " | file.  We also read in the 'core correction' if there exists.      |" << std::endl;
 	GlobalV::ofs_running << " | Also we can read the valence electrons number and the maximal      |" << std::endl;
 	GlobalV::ofs_running << " | angular momentum used in this pseudopotential. We also read in the |" << std::endl;
-	GlobalV::ofs_running << " | trail wave function, trail std::atomic density and local-pseudopotential|" << std::endl;
+	GlobalV::ofs_running << " | trail wave function, trail atomic density and local-pseudopotential|" << std::endl;
 	GlobalV::ofs_running << " | on logrithmic grid. The non-local pseudopotential projector is also|" << std::endl;
 	GlobalV::ofs_running << " | read in if there is any.                                           |" << std::endl;
 	GlobalV::ofs_running << " |                                                                    |" << std::endl;
@@ -603,7 +603,7 @@ void UnitCell_pseudo::cal_natomwfc(void)
 	for (int it = 0;it < ntype;it++)
 	{
 		//============================
-		// Use pseudo-std::atomic orbitals
+		// Use pseudo-atomic orbitals
 		//============================
 		int tmp=0;
 		for (int l = 0;l < atoms[it].nchi;l++)
@@ -629,7 +629,7 @@ void UnitCell_pseudo::cal_natomwfc(void)
 		}
 		natomwfc += tmp * atoms[it].na;
 	}
-	OUT(GlobalV::ofs_running,"initial pseudo std::atomic orbital number",natomwfc);
+	OUT(GlobalV::ofs_running,"initial pseudo atomic orbital number",natomwfc);
 	return;
 }
 

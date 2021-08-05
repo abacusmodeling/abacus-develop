@@ -118,11 +118,11 @@ void LCAO_Orbitals::Read_Orbitals(
 	ofs_in << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
 	ofs_in << " |                                                                    |" << std::endl;
 	ofs_in << " | Setup numerical orbitals:                                          |" << std::endl;
-	ofs_in << " | This part setup: numerical std::atomic orbitals, non-local projectors   |" << std::endl;
-	ofs_in << " | and neutral potential (1D). The std::atomic orbitals information        |" << std::endl;
+	ofs_in << " | This part setup: numerical atomic orbitals, non-local projectors   |" << std::endl;
+	ofs_in << " | and neutral potential (1D). The atomic orbitals information        |" << std::endl;
 	ofs_in << " | including the radius, angular momentum and zeta number.            |" << std::endl;
 	ofs_in << " | The neutral potential is the sum of local part of pseudopotential  |" << std::endl;
-	ofs_in << " | and potential given by std::atomic charge, they will cancel out beyond  |" << std::endl;
+	ofs_in << " | and potential given by atomic charge, they will cancel out beyond  |" << std::endl;
 	ofs_in << " | a certain radius cutoff, because the Z/r character.                |" << std::endl;
 	ofs_in << " |                                                                    |" << std::endl;
 	ofs_in << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
@@ -192,7 +192,7 @@ void LCAO_Orbitals::Read_Orbitals(
 
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	//~~~~~~~~~~~~~~~~~~~~~~   1    ~~~~~~~~~~~~~~~~~~~~~~~~~
-	// Read in numerical std::atomic orbitals for each atom type.
+	// Read in numerical atomic orbitals for each atom type.
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	delete[] this->Phi;
 

@@ -139,7 +139,7 @@ void pseudo_nc::set_pseudo_h(const Pseudopot_upf &upf)
 	this->mesh = upf.mesh;
 	
 	// mohan update 2021-02-22
-	//  max number of points in the std::atomic radial mesh
+	//  max number of points in the atomic radial mesh
 	int ndmx = 2000; 
 	if (this->mesh > ndmx)
 	{
@@ -280,7 +280,7 @@ void pseudo_nc::set_pseudo_atom(const Pseudopot_upf &upf)
 	}
 
 	// nlcc: non-linear core corrections
-	// rho_atc: core std::atomic charge
+	// rho_atc: core atomic charge
 	if (nlcc)
 	{
 		for (int i = 0;i < mesh;i++)
