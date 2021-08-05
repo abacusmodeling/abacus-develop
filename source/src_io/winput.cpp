@@ -534,7 +534,7 @@ void winput::Print(const std::string &fn)
 	if(GlobalV::MY_RANK!=0) return;
  
 	std::ofstream ofs(fn.c_str());
-	ofs << setiosflags(ios::left);
+	ofs << std::setiosflags(ios::left);
 	ofs << "WANNIER_PARAMETERS" << std::endl;
 
 	ofs << "#Parameters (General)" << std::endl;

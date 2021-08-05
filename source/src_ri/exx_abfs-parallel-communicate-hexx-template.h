@@ -163,7 +163,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D_mixing(
 				HK_m2D[ik] = pulay_mixing( HK_m2D[ik], HK_m2D_pulay_seq[ik], Ra2D_to_Km2D<Tmatrix>(HR_a2D, ik) );
 				break;
 			default:
-				throw domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	break;
+				throw std::domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	break;
 		}
 //ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D\t"<<time_during(t_start)<<std::endl;
 	}

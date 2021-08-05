@@ -103,7 +103,7 @@ std::ofstream ofs_mpi("allreduce_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::ap
 			if( flags[irank] )
 			{
 				int flag_finish;
-				if(MPI_SUCCESS!=MPI_Test( &requests[irank], &flag_finish, MPI_STATUS_IGNORE ))	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				if(MPI_SUCCESS!=MPI_Test( &requests[irank], &flag_finish, MPI_STATUS_IGNORE ))	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 				if( flag_finish )
 				{
 //ofs_mpi<<"delete_begin\t"<<s<<"\t"<<irank<<std::endl;
@@ -172,11 +172,11 @@ ofs_mpi<<"TIME@ insert_data\t"<<time_during(t_start)<<std::endl;
 	{
 		MPI_Status status;
 		int flag_message;
-		if(MPI_SUCCESS!=MPI_Iprobe( MPI_ANY_SOURCE, MPI_ANY_TAG, mpi_comm, &flag_message, &status ))	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+		if(MPI_SUCCESS!=MPI_Iprobe( MPI_ANY_SOURCE, MPI_ANY_TAG, mpi_comm, &flag_message, &status ))	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 		if(flag_message)
 		{
 			int message_size;
-			if(MPI_SUCCESS!=MPI_Get_count( &status, MPI_PACKED, &message_size ))	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+			if(MPI_SUCCESS!=MPI_Get_count( &status, MPI_PACKED, &message_size ))	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 			
 			switch(status.MPI_TAG)
 			{
@@ -186,7 +186,7 @@ ofs_mpi<<"TIME@ insert_data\t"<<time_during(t_start)<<std::endl;
 
 gettimeofday(&t_start, NULL);
 					iarps_atom_asked[rank_asked]->resize(message_size);
-					if(MPI_SUCCESS!=MPI_Recv( iarps_atom_asked[rank_asked]->address(), message_size, MPI_PACKED, rank_asked, tag_ask, mpi_comm, MPI_STATUS_IGNORE ))	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));	
+					if(MPI_SUCCESS!=MPI_Recv( iarps_atom_asked[rank_asked]->address(), message_size, MPI_PACKED, rank_asked, tag_ask, mpi_comm, MPI_STATUS_IGNORE ))	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));	
 ofs_mpi<<"TIME@ MPI_Recv tag_ask\t"<<time_during(t_start)<<std::endl;					
 
 					threads.push_back(std::thread(
@@ -201,7 +201,7 @@ ofs_mpi<<"tag_ask\t"<<rank_asked<<"\t"<<threads.back().get_id()<<std::endl;
 							
 gettimeofday(&t_start, NULL);
 					iarps_recv_data[rank_data]->resize(message_size);
-					if(MPI_SUCCESS!=MPI_Recv( iarps_recv_data[rank_data]->address(), message_size, MPI_PACKED, rank_data, tag_data, mpi_comm, MPI_STATUS_IGNORE ))	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+					if(MPI_SUCCESS!=MPI_Recv( iarps_recv_data[rank_data]->address(), message_size, MPI_PACKED, rank_data, tag_data, mpi_comm, MPI_STATUS_IGNORE ))	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 					flags_recv_data[rank_data] = true;
 ofs_mpi<<"TIME@ MPI_Recv tag_data\t"<<time_during(t_start)<<std::endl;					
 					
@@ -221,7 +221,7 @@ ofs_mpi<<"tag_data\t"<<rank_data<<"\t"<<threads.back().get_id()<<std::endl;
 			{
 ofs_mpi<<"isend oarps_atom_unset\t"<<rank_ask<<std::endl;
 gettimeofday(&t_start, NULL);
-				if(MPI_SUCCESS!=MPI_Isend( oarps_atom_unset[rank_ask]->address(), oarps_atom_unset[rank_ask]->size(), MPI_PACKED, rank_ask, tag_ask, mpi_comm, &requests_ask[rank_ask] ))	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				if(MPI_SUCCESS!=MPI_Isend( oarps_atom_unset[rank_ask]->address(), oarps_atom_unset[rank_ask]->size(), MPI_PACKED, rank_ask, tag_ask, mpi_comm, &requests_ask[rank_ask] ))	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 				flags_request_ask[rank_ask] = true;
 				*flags_ask_atom[rank_ask] = 2;
 ofs_mpi<<"TIME@ MPI_Isend atom_unset\t"<<time_during(t_start)<<std::endl;					
@@ -231,7 +231,7 @@ ofs_mpi<<"TIME@ MPI_Isend atom_unset\t"<<time_during(t_start)<<std::endl;
 			{
 ofs_mpi<<"isend oarps_isend_data\t"<<rank_asked<<std::endl;
 gettimeofday(&t_start, NULL);
-				if(MPI_SUCCESS!=MPI_Isend( oarps_isend_data[rank_asked]->address(), oarps_isend_data[rank_asked]->size(), MPI_PACKED, rank_asked, tag_data, mpi_comm, &requests_isend_data[rank_asked] ))	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				if(MPI_SUCCESS!=MPI_Isend( oarps_isend_data[rank_asked]->address(), oarps_isend_data[rank_asked]->size(), MPI_PACKED, rank_asked, tag_data, mpi_comm, &requests_isend_data[rank_asked] ))	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 				flags_request_isend_data[rank_asked] = true;
 				*flags_isend_data[rank_asked] = 2;
 ofs_mpi<<"TIME@ MPI_Isend isend_data\t"<<time_during(t_start)<<std::endl;					
@@ -247,8 +247,8 @@ ofs_mpi<<"TIME@ MPI_Isend isend_data\t"<<time_during(t_start)<<std::endl;
 	for( int i_rank=0; i_rank<comm_sz; ++i_rank )
 		if( i_rank != my_rank )
 		{
-			if(MPI_SUCCESS!=MPI_Wait( &requests_isend_data[i_rank], MPI_STATUS_IGNORE ))	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
-			if(MPI_SUCCESS!=MPI_Wait( &requests_ask[i_rank], MPI_STATUS_IGNORE ))	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+			if(MPI_SUCCESS!=MPI_Wait( &requests_isend_data[i_rank], MPI_STATUS_IGNORE ))	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+			if(MPI_SUCCESS!=MPI_Wait( &requests_ask[i_rank], MPI_STATUS_IGNORE ))	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 		}
 
 	#ifdef __MKL

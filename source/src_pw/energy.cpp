@@ -121,7 +121,7 @@ void energy::print_etot(
 	this->iter = iter_in;
 
 	GlobalV::ofs_running << setprecision(12);
-	GlobalV::ofs_running << setiosflags(ios::left);
+	GlobalV::ofs_running << std::setiosflags(ios::left);
 
 	GlobalV::ofs_running << "\n Density error is " << dr2 << std::endl;
 
@@ -220,11 +220,11 @@ void energy::print_etot(
 	if(GlobalV::OUT_LEVEL=="ie" || GlobalV::OUT_LEVEL=="m") //xiaohui add 'm' option, 2015-09-16
 	{
 		std::cout << " " << setw(7) << ss.str();
-		//std::cout << setiosflags(ios::fixed);
-		//std::cout << setiosflags(ios::showpos);
+		//std::cout << std::setiosflags(ios::fixed);
+		//std::cout << std::setiosflags(ios::showpos);
 		if(scientific)
 		{
-			std::cout << setiosflags(ios::scientific);
+			std::cout << std::setiosflags(ios::scientific);
 		}
 
 		if(GlobalV::COLOUR)
@@ -327,7 +327,7 @@ void energy::print_etot(
 
 void energy::print_format(const std::string &name, const double &value)
 {
-	GlobalV::ofs_running << setiosflags(ios::showpos);
+	GlobalV::ofs_running << std::setiosflags(ios::showpos);
 	std::stringstream name2;
 	name2 << name;
 	GlobalV::ofs_running << " " << setw(12) << name2.str() << setw(30) <<  value 
@@ -453,7 +453,7 @@ void energy::print_band(const int &ik)
 				//	NEW_PART("ENERGY BANDS (Rydberg), (eV)");
 				GlobalV::ofs_running << setprecision(6);
 				GlobalV::ofs_running << " Energy (eV) & Occupations  for spin=" << GlobalV::CURRENT_SPIN+1 << " K-point=" << ik+1 << std::endl;
-				GlobalV::ofs_running << setiosflags(ios::showpoint);
+				GlobalV::ofs_running << std::setiosflags(ios::showpoint);
 				for(int ib=0;ib<GlobalV::NBANDS;ib++)
 				{
 					GlobalV::ofs_running << " "<< setw(6) << ib+1  

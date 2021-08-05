@@ -248,5 +248,5 @@ size_t MemAvailable()
 		if(i==3)
 			return mem_sum;
 	}
-	throw runtime_error("read /proc/meminfo error in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+	throw std::runtime_error("read /proc/meminfo error in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 }

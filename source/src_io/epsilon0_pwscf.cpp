@@ -399,7 +399,7 @@ double Epsilon0_pwscf:: focc(int ib, int ik)
 	else if(GlobalV::NSPIN == 2)
 		return (GlobalC::wf.wg(ik,ib) * 1.0/ GlobalC::kv.wk[ik] );
 	else				// Peize Lin add 2019-05-01
-		throw domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw std::domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 } 
 void Epsilon0_pwscf:: Cal_dipole(int ik)
 {

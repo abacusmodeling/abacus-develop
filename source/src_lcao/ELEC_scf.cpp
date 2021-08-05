@@ -41,7 +41,7 @@ void ELEC_scf::scf(const int &istep)
 	}
 
 //	std::cout << scientific;
-//	std::cout << setiosflags(ios::fixed);
+//	std::cout << std::setiosflags(ios::fixed);
 
 	if(GlobalV::OUT_LEVEL=="ie" ||GlobalV::OUT_LEVEL=="m")
 	{

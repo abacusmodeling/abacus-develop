@@ -200,7 +200,7 @@ std::tuple<double,double,matrix> Potential_Libxc::v_xc(
 				process_vsigma();
 				break;
 			default:
-				throw domain_error("func.info->family ="+TO_STRING(func.info->family)
+				throw std::domain_error("func.info->family ="+TO_STRING(func.info->family)
 					+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 				break;
 		}
@@ -284,7 +284,7 @@ std::vector<xc_func_type> Potential_Libxc::init_func()
 	}
 	else
 	{
-		throw domain_error("iexch="+TO_STRING(GlobalC::xcf.iexch_now)+", igcx="+TO_STRING(GlobalC::xcf.igcx_now)
+		throw std::domain_error("iexch="+TO_STRING(GlobalC::xcf.iexch_now)+", igcx="+TO_STRING(GlobalC::xcf.igcx_now)
 			+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 	}
 
@@ -301,7 +301,7 @@ std::vector<xc_func_type> Potential_Libxc::init_func()
 	}
 	else
 	{
-		throw domain_error("icorr="+TO_STRING(GlobalC::xcf.icorr_now)+", igcc="+TO_STRING(GlobalC::xcf.igcc_now)
+		throw std::domain_error("icorr="+TO_STRING(GlobalC::xcf.icorr_now)+", igcc="+TO_STRING(GlobalC::xcf.igcc_now)
 			+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 	}
 
@@ -431,7 +431,7 @@ Potential_Libxc::cal_input(
 				cal_sigma();
 				break;
 			default:
-				throw domain_error("func.info->family ="+TO_STRING(func.info->family)
+				throw std::domain_error("func.info->family ="+TO_STRING(func.info->family)
 					+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 				break;
 		}

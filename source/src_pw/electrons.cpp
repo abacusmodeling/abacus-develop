@@ -460,7 +460,7 @@ void Electrons::c_bands(const int &istep)
     avg_iter = 0.0;
 
     GlobalV::ofs_running << " "  <<setw(8) << "K-point" << setw(15) << "CG iter num" << setw(15) << "Time(Sec)"<< std::endl;
-    GlobalV::ofs_running << setprecision(6) << setiosflags(ios::fixed) << setiosflags(ios::showpoint);
+    GlobalV::ofs_running << setprecision(6) << std::setiosflags(ios::fixed) << std::setiosflags(ios::showpoint);
     for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {
         GlobalC::hm.hpw.init_k(ik);

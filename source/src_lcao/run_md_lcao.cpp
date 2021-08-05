@@ -196,12 +196,12 @@ void Run_MD_LCAO::opt_ions(void)
             std::stringstream ss;
             ss << GlobalV::MOVE_IONS << istep;
 
-            std::cout << setiosflags(ios::scientific)
+            std::cout << std::setiosflags(ios::scientific)
             << " " << setw(7) << ss.str()
             << setw(5) << ELEC_scf::iter
             << setw(18) << setprecision(6) << GlobalC::en.etot * Ry_to_eV;
 
-            std::cout << setprecision(2) << setiosflags(ios::scientific)
+            std::cout << setprecision(2) << std::setiosflags(ios::scientific)
             << setw(10) << IMM.get_ediff() * Ry_to_eV * 1000
             << setw(10) << IMM.get_largest_grad() * Ry_to_eV / BOHR_TO_A;
 

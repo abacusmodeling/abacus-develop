@@ -639,7 +639,7 @@ gettimeofday( &t_start, NULL);
 		case Exx_Global::Hybrid_Type::HSE:
 			abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hse, {{"hse_omega",info.hse_omega}}, info.ccp_rmesh_times );	break;
 		default:
-			throw domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	break;
+			throw std::domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	break;
 	}
 ofs_mpi<<"TIME@ Conv_Coulomb_Pot_K::cal_orbs_ccp\t"<<time_during(t_start)<<std::endl;
 
@@ -817,8 +817,8 @@ gettimeofday( &t_start, NULL);
 			case Exx_Lcao::Distribute_Type::Order:
 				atom_pairs_core_origin = Exx_Abfs::Parallel::Distribute::Order::distribute( info.ccp_rmesh_times );	break;
 			default:
-				throw domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));  break;
-				//throw domain_error(TO_STRING(static_cast<std::underlying_type<Exx_Lcao::Distribute_Type>::type>(info.distribute_type))+"\t"+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	break;
+				throw std::domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));  break;
+				//throw std::domain_error(TO_STRING(static_cast<std::underlying_type<Exx_Lcao::Distribute_Type>::type>(info.distribute_type))+"\t"+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	break;
 		}
 ofs_mpi<<"atom_pairs_core_origin\t"<<atom_pairs_core_origin.size()<<std::endl;
 ofs_mpi<<"TIME@ Htime::distribute\t"<<time_during(t_start)<<std::endl;

@@ -1150,7 +1150,7 @@ double Mathzone_Add1::Uni_RadialF
 
   	if (newr < 0.0)
   	{  
-		throw runtime_error("newr should >= 0. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw std::runtime_error("newr should >= 0. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 
   	}
   	else if ( rmax <= newr	) 

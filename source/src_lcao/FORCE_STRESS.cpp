@@ -309,8 +309,8 @@ void Force_Stress_LCAO::getForceStress(
 			}
 
 			GlobalV::ofs_running << "\n PARTS OF FORCE: " << std::endl;
-			GlobalV::ofs_running << setiosflags(ios::showpos);
-			GlobalV::ofs_running << setiosflags(ios::fixed) << setprecision(8) << std::endl;
+			GlobalV::ofs_running << std::setiosflags(ios::showpos);
+			GlobalV::ofs_running << std::setiosflags(ios::fixed) << setprecision(8) << std::endl;
 			//-----------------------------
 			//regular force terms test.
 			//-----------------------------
@@ -344,7 +344,7 @@ void Force_Stress_LCAO::getForceStress(
 #endif
 		}
 
-		GlobalV::ofs_running << setiosflags(ios::left);
+		GlobalV::ofs_running << std::setiosflags(ios::left);
 
 		this->printforce_total(ry, istestf, fcs);
 		if(istestf)
@@ -429,8 +429,8 @@ void Force_Stress_LCAO::getForceStress(
 			}
 
 			GlobalV::ofs_running << "\n PARTS OF STRESS: " << std::endl;
-			GlobalV::ofs_running << setiosflags(ios::showpos);
-			GlobalV::ofs_running << setiosflags(ios::fixed) << setprecision(10) << std::endl;
+			GlobalV::ofs_running << std::setiosflags(ios::showpos);
+			GlobalV::ofs_running << std::setiosflags(ios::fixed) << setprecision(10) << std::endl;
 			sc_pw.print_stress("OVERLAP  STRESS",soverlap,GlobalV::TEST_STRESS,ry);
 			//test
 			sc_pw.print_stress("T        STRESS",stvnl_dphi,GlobalV::TEST_STRESS,ry);
@@ -457,7 +457,7 @@ void Force_Stress_LCAO::getForceStress(
 			sc_pw.print_stress("TOTAL    STRESS",scs,GlobalV::TEST_STRESS,ry);
 
 		}//end of test
-		GlobalV::ofs_running << setiosflags(ios::left);
+		GlobalV::ofs_running << std::setiosflags(ios::left);
 		//print total stress
 		sc_pw.printstress_total(scs, ry);
 
@@ -490,7 +490,7 @@ void Force_Stress_LCAO::print_force(const std::string &name, matrix& f, const bo
 	}
 
 	std::cout << setprecision(5);
-	std::cout << setiosflags(ios::showpos);
+	std::cout << std::setiosflags(ios::showpos);
 
 	if(screen)
 	{
@@ -551,8 +551,8 @@ void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, mat
 
     int iat=0;
 
-	//GlobalV::ofs_running << setiosflags(ios::right);
- 	GlobalV::ofs_running << setprecision(6) << setiosflags(ios::showpos) << setiosflags(ios::fixed) << std::endl;
+	//GlobalV::ofs_running << std::setiosflags(ios::right);
+ 	GlobalV::ofs_running << setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed) << std::endl;
 	NEW_PART("TOTAL-FORCE (eV/Angstrom)");
 
 	// print out forces
@@ -575,7 +575,7 @@ void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, mat
 
  	if(istestf)
 	{
-		std::cout << setprecision(6) << setiosflags(ios::showpos) << setiosflags(ios::fixed) << std::endl;
+		std::cout << setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed) << std::endl;
 		std::cout << " ------------------- TOTAL      FORCE --------------------" << std::endl;
     	std::cout << " " << setw(8) << "Atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << std::endl;
     	GlobalV::ofs_running << " " << setw(12) << "Atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << std::endl;
@@ -605,7 +605,7 @@ void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, mat
             ++iat;
         }
     }
-	GlobalV::ofs_running << setiosflags(ios::left);
+	GlobalV::ofs_running << std::setiosflags(ios::left);
 	std::cout << resetiosflags(ios::showpos);
 
     return;

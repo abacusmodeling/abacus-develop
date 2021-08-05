@@ -72,7 +72,7 @@ void Input::Init(const std::string &fn)
     GlobalV::ofs_running << "                     Website: http://abacus.ustc.edu.cn/                             " << std::endl;
 	GlobalV::ofs_running << "                                                                                     " << std::endl;
 
-	GlobalV::ofs_running << setiosflags(ios::right);
+	GlobalV::ofs_running << std::setiosflags(ios::right);
                                                                                                                              
 
 #ifdef __MPI
@@ -89,8 +89,8 @@ void Input::Init(const std::string &fn)
 	GlobalV::ofs_running << "                                                                                     " << std::endl;
 	GlobalV::ofs_running << " ------------------------------------------------------------------------------------" << std::endl;
 
-	GlobalV::ofs_running << setiosflags(ios::left);
-	std::cout << setiosflags(ios::left);
+	GlobalV::ofs_running << std::setiosflags(ios::left);
+	std::cout << std::setiosflags(ios::left);
 
 	GlobalV::ofs_running << "\n READING GENERAL INFORMATION" << std::endl;
 	OUT(GlobalV::ofs_running,"global_out_dir", GlobalV::global_out_dir);
@@ -495,7 +495,7 @@ bool Input::Read(const std::string &fn)
     char word1[80];
     int ierr = 0;
 
-    //ifs >> setiosflags(ios::uppercase);
+    //ifs >> std::setiosflags(ios::uppercase);
     ifs.rdstate();
     while (ifs.good())
     {

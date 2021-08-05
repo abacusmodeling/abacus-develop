@@ -233,7 +233,7 @@ void toWannier90::read_nnkp()
 		int numkpt_nnkp;
 		if(GlobalV::NSPIN == 1 || GlobalV::NSPIN == 4) numkpt_nnkp = GlobalC::kv.nkstot;
 		else if(GlobalV::NSPIN == 2) numkpt_nnkp = GlobalC::kv.nkstot/2;
-		else throw runtime_error("numkpt_nnkp uninitialized in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		else throw std::runtime_error("numkpt_nnkp uninitialized in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 		
 		for(int ik = 0; ik < numkpt_nnkp; ik++)
 		{
@@ -388,19 +388,19 @@ void toWannier90::writeUNK(const ComplexMatrix *wfc_pw)
 					{
 						if(!gamma_only_wannier)
 						{
-							unkfile << setw(20) << setprecision(9) << setiosflags(ios::scientific) << porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k].real()
-									<< setw(20) << setprecision(9) << setiosflags(ios::scientific) << porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k].imag() 
+							unkfile << setw(20) << setprecision(9) << std::setiosflags(ios::scientific) << porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k].real()
+									<< setw(20) << setprecision(9) << std::setiosflags(ios::scientific) << porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k].imag() 
 									//jingan test
-									//<< "       " << setw(12) << setprecision(9) << setiosflags(ios::scientific) << abs(porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k])
+									//<< "       " << setw(12) << setprecision(9) << std::setiosflags(ios::scientific) << abs(porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k])
 									<< std::endl;
 						}
 						else
 						{
 							double zero = 0.0;
-							unkfile << setw(20) << setprecision(9) << setiosflags(ios::scientific) << abs( porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k] )
-									<< setw(20) << setprecision(9) << setiosflags(ios::scientific) << zero
+							unkfile << setw(20) << setprecision(9) << std::setiosflags(ios::scientific) << abs( porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k] )
+									<< setw(20) << setprecision(9) << std::setiosflags(ios::scientific) << zero
 									//jingan test
-									//<< "       " << setw(12) << setprecision(9) << setiosflags(ios::scientific) << abs(porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k])
+									//<< "       " << setw(12) << setprecision(9) << std::setiosflags(ios::scientific) << abs(porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k])
 									<< std::endl;
 						}
 					}
@@ -539,8 +539,8 @@ void toWannier90::writeUNK(const ComplexMatrix *wfc_pw)
 						{
 							for(int ix=0; ix<GlobalC::pw.ncx; ix++)
 							{
-								unkfile << setw(20) << setprecision(9) << setiosflags(ios::scientific) << zpiece[ix*GlobalC::pw.ncy+iy].real()
-										<< setw(20) << setprecision(9) << setiosflags(ios::scientific) << zpiece[ix*GlobalC::pw.ncy+iy].imag() 
+								unkfile << setw(20) << setprecision(9) << std::setiosflags(ios::scientific) << zpiece[ix*GlobalC::pw.ncy+iy].real()
+										<< setw(20) << setprecision(9) << std::setiosflags(ios::scientific) << zpiece[ix*GlobalC::pw.ncy+iy].imag() 
 										<< std::endl;
 							}
 						}

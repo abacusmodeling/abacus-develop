@@ -753,7 +753,7 @@ void Pdiag_Double::diago_double_begin(
 
 		if(info)
 		{
-			throw runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 		}
 
 		lwork = work[0];
@@ -764,13 +764,13 @@ void Pdiag_Double::diago_double_begin(
 
 		if(info)
 		{
-			throw runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 		}
 		memcpy( ekb, ekb_tmp.data(), sizeof(double)*GlobalV::NBANDS );
 
 		if(INPUT.new_dm==0)
 		{
-			throw domain_error("INPUT.new_dm must be 1. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::domain_error("INPUT.new_dm must be 1. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 		}
 	}
 	else if(GlobalV::KS_SOLVER=="lapack_gvx")
@@ -795,7 +795,7 @@ void Pdiag_Double::diago_double_begin(
 
 		if(info)
 		{
-			throw runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 		}
 
 		lwork = work[0];
@@ -806,16 +806,16 @@ void Pdiag_Double::diago_double_begin(
 
 		if(info)
 		{
-			throw runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 		}
 		if(M!=GlobalV::NBANDS)
 		{
-			throw runtime_error("M="+TO_STRING(M)+". GlobalV::NBANDS="+TO_STRING(GlobalV::NBANDS)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::runtime_error("M="+TO_STRING(M)+". GlobalV::NBANDS="+TO_STRING(GlobalV::NBANDS)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 		}
 
 		if(INPUT.new_dm==0)
 		{
-			throw domain_error("INPUT.new_dm must be 1. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::domain_error("INPUT.new_dm must be 1. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 		}
 	}
 	else if(GlobalV::KS_SOLVER=="scalapack_gvx")
@@ -858,19 +858,19 @@ void Pdiag_Double::diago_double_begin(
 
 		if(info)
 		{
-			throw runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 		}
 		if(M!=GlobalV::NBANDS)
 		{
-			throw runtime_error("M="+TO_STRING(M)+". GlobalV::NBANDS="+TO_STRING(GlobalV::NBANDS)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::runtime_error("M="+TO_STRING(M)+". GlobalV::NBANDS="+TO_STRING(GlobalV::NBANDS)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 		}
 		if(M!=NZ)
 		{
-			throw runtime_error("M="+TO_STRING(M)+". NZ="+TO_STRING(NZ)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::runtime_error("M="+TO_STRING(M)+". NZ="+TO_STRING(NZ)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 		}
 		if(INPUT.new_dm==0)
 		{
-			throw domain_error("INPUT.new_dm must be 1. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::domain_error("INPUT.new_dm must be 1. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 		}
 	}
     //delete[] Stmp; //LiuXh 20171109
@@ -1166,14 +1166,14 @@ void Pdiag_Double::diago_complex_begin(
 		GlobalV::ofs_running<<"M="<<M<<"\t"<<"NZ="<<NZ<<std::endl;
 
 		if(info)
-			throw runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 		if(M!=GlobalV::NBANDS)
-			throw runtime_error("M="+TO_STRING(M)+". GlobalV::NBANDS="+TO_STRING(GlobalV::NBANDS)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::runtime_error("M="+TO_STRING(M)+". GlobalV::NBANDS="+TO_STRING(GlobalV::NBANDS)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 		if(M!=NZ)
-			throw runtime_error("M="+TO_STRING(M)+". NZ="+TO_STRING(NZ)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::runtime_error("M="+TO_STRING(M)+". NZ="+TO_STRING(NZ)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 
 //		if(INPUT.new_dm==0)
-//			throw domain_error("INPUT.new_dm must be 1. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+//			throw std::domain_error("INPUT.new_dm must be 1. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 		// the follow will be deleted after finish newdm
 		{
 			//change eigenvector matrix from block-cycle distribute matrix to column-divided distribute matrix

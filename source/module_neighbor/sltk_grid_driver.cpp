@@ -90,7 +90,7 @@ int Grid_Driver::Locate_offset(
 	}
 
 	// Peize Lin update 2019-05-01
-	// throw runtime_error("Locate_Atom wrong. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+	// throw std::runtime_error("Locate_Atom wrong. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 	// mohan update 2021-06-21
 	WARNING_QUIT("Locate_Atom", "something wrong!");
 

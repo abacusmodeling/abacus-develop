@@ -268,7 +268,7 @@ bool Exx_Abfs::Screen::Cauchy::postcalC(
 			}	
 			break;
 		default:
-			throw domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 	}
 }
 

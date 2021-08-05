@@ -85,7 +85,7 @@ Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::exx_to_a2D()
 			if( flags[irank] )
 			{
 				int flag_finish;
-				if(MPI_SUCCESS!=MPI_Test( &requests[irank], &flag_finish, MPI_STATUS_IGNORE ))	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				if(MPI_SUCCESS!=MPI_Test( &requests[irank], &flag_finish, MPI_STATUS_IGNORE ))	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 				if( flag_finish )
 				{
 					delete oarps[irank];
@@ -122,11 +122,11 @@ Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::exx_to_a2D()
 	{
 		MPI_Status status;
 		int flag_message;
-		if(MPI_SUCCESS!=MPI_Iprobe( MPI_ANY_SOURCE, MPI_ANY_TAG, mpi_comm, &flag_message, &status ))	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+		if(MPI_SUCCESS!=MPI_Iprobe( MPI_ANY_SOURCE, MPI_ANY_TAG, mpi_comm, &flag_message, &status ))	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 		if(flag_message)
 		{
 			int message_size;
-			if(MPI_SUCCESS!=MPI_Get_count( &status, MPI_PACKED, &message_size ))	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+			if(MPI_SUCCESS!=MPI_Get_count( &status, MPI_PACKED, &message_size ))	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 
 			switch(status.MPI_TAG)
 			{
@@ -135,7 +135,7 @@ Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::exx_to_a2D()
 					const int rank_asked = status.MPI_SOURCE;
 
 					iarps_atom_asked[rank_asked]->resize(message_size);
-					if(MPI_SUCCESS!=MPI_Recv( iarps_atom_asked[rank_asked]->address(), message_size, MPI_PACKED, rank_asked, tag_ask, mpi_comm, MPI_STATUS_IGNORE ))	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+					if(MPI_SUCCESS!=MPI_Recv( iarps_atom_asked[rank_asked]->address(), message_size, MPI_PACKED, rank_asked, tag_ask, mpi_comm, MPI_STATUS_IGNORE ))	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 
 					threads.push_back(std::thread(
 						&Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::send_data_process, this,
@@ -147,7 +147,7 @@ Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::exx_to_a2D()
 					const int rank_data = status.MPI_SOURCE;
 
 					iarps_recv_data[rank_data]->resize(message_size);
-					if(MPI_SUCCESS!=MPI_Recv( iarps_recv_data[rank_data]->address(), message_size, MPI_PACKED, rank_data, tag_data, mpi_comm, MPI_STATUS_IGNORE ))	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+					if(MPI_SUCCESS!=MPI_Recv( iarps_recv_data[rank_data]->address(), message_size, MPI_PACKED, rank_data, tag_data, mpi_comm, MPI_STATUS_IGNORE ))	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 					flags_recv_data[rank_data] = true;
 
 					threads.push_back(std::thread(
@@ -163,13 +163,13 @@ Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::exx_to_a2D()
 		for( int rank_ask=0; rank_ask!=comm_sz; ++rank_ask )
 			if( *flags_ask_atom[rank_ask] == 1 )
 			{
-				if(MPI_SUCCESS!=MPI_Isend( oarp_atom_in_2D->address(), oarp_atom_in_2D->size(), MPI_PACKED, rank_ask, tag_ask, mpi_comm, &requests_ask[rank_ask] ))	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				if(MPI_SUCCESS!=MPI_Isend( oarp_atom_in_2D->address(), oarp_atom_in_2D->size(), MPI_PACKED, rank_ask, tag_ask, mpi_comm, &requests_ask[rank_ask] ))	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 				*flags_ask_atom[rank_ask] = 2;
 			}
 		for( int rank_asked=0; rank_asked!=comm_sz; ++rank_asked )
 			if( *flags_isend_data[rank_asked] == 1 )
 			{
-				if(MPI_SUCCESS!=MPI_Isend( oarps_isend_data[rank_asked]->address(), oarps_isend_data[rank_asked]->size(), MPI_PACKED, rank_asked, tag_data, mpi_comm, &requests_isend_data[rank_asked] ))	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				if(MPI_SUCCESS!=MPI_Isend( oarps_isend_data[rank_asked]->address(), oarps_isend_data[rank_asked]->size(), MPI_PACKED, rank_asked, tag_data, mpi_comm, &requests_isend_data[rank_asked] ))	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 				flags_request_isend_data[rank_asked] = true;
 				*flags_isend_data[rank_asked] = 2;
 			}
@@ -186,8 +186,8 @@ Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::exx_to_a2D()
 	for( int i_rank=0; i_rank<comm_sz; ++i_rank )
 		if( i_rank != my_rank )
 		{
-			if(MPI_SUCCESS!=MPI_Wait( &requests_isend_data[i_rank], MPI_STATUS_IGNORE ))	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
-			if(MPI_SUCCESS!=MPI_Wait( &requests_ask[i_rank], MPI_STATUS_IGNORE ))	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+			if(MPI_SUCCESS!=MPI_Wait( &requests_isend_data[i_rank], MPI_STATUS_IGNORE ))	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+			if(MPI_SUCCESS!=MPI_Wait( &requests_ask[i_rank], MPI_STATUS_IGNORE ))	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 		}
 
 	#ifdef __MKL

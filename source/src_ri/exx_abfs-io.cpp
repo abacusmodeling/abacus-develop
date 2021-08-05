@@ -72,7 +72,7 @@ std::vector<std::vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 	
 	std::ifstream ifs( file_name.c_str() );
 	if(!ifs)
-		throw runtime_error(" Can't find the abfs ORBITAL file.");	
+		throw std::runtime_error(" Can't find the abfs ORBITAL file.");	
 	
 	while( ifs.good() )
 	{
@@ -171,7 +171,7 @@ std::vector<std::vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 		{
 			std::stringstream ss;
 			ss<<"Can't find N of L="<<L<<" in "<<file_name;
-			throw domain_error(ss.str());
+			throw std::domain_error(ss.str());
 		}
 	for( size_t L=0; L<=L_size; ++L )
 		for( size_t N=0; N!=N_size[L]; ++N )
@@ -179,7 +179,7 @@ std::vector<std::vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 			{
 				std::stringstream ss;
 				ss<<"Can't find abf of L="<<L<<" T="<<T<<" in "<<file_name;
-				throw domain_error(ss.str());
+				throw std::domain_error(ss.str());
 			}
 
 			

@@ -185,7 +185,7 @@ bool K_Vectors::read_kpoints(const std::string &fn)
 		return 0;
     }
 
-    ifk >> setiosflags(ios::uppercase);
+    ifk >> std::setiosflags(ios::uppercase);
 
     ifk.clear();
     ifk.seekg(0);

@@ -180,7 +180,7 @@ void Threshold_Elec::print_eigenvalue(std::ofstream &ofs)
 		{
 			//ofs << setw(12) << GlobalC::kv.ngk[ik] << " PWs ";
 			GlobalV::ofs_running << setprecision(6);
-			GlobalV::ofs_running << setiosflags(ios::showpoint);
+			GlobalV::ofs_running << std::setiosflags(ios::showpoint);
 			for (int ib = 0; ib < GlobalV::NBANDS; ib++)
 			{
 				ofs << " [spin" << GlobalC::kv.isk[ik]+1 << "_state] " << setw(8) << ib+1 

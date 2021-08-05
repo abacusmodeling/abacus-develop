@@ -226,7 +226,7 @@ void Diago_LCAO_Matrix::using_LAPACK(const int &ik, double** wfc)const
 	clock_end = std::clock();
 	double duration = (double)(clock_end - clock_start) / CLOCKS_PER_SEC;
 
-	GlobalV::ofs_running << setiosflags(ios::fixed) << setprecision(20);
+	GlobalV::ofs_running << std::setiosflags(ios::fixed) << setprecision(20);
 //	GlobalV::ofs_running << " clock_start = " << clock_start << std::endl;
 //	GlobalV::ofs_running << " clock_end = " << clock_end << std::endl;
 	GlobalV::ofs_running << " Time using dsygv in LAPACK (seconds) is " << duration << std::endl;

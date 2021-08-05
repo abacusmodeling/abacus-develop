@@ -92,7 +92,7 @@ void Numerical_Orbital_Lm::set_orbital_info
 				this->psik2[ik] = psi_in[ik];
 			break;
 		default:
-			throw domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 	}
 
 	switch(psi_type)
@@ -106,7 +106,7 @@ void Numerical_Orbital_Lm::set_orbital_info
 			}
 			else
 			{
-				throw domain_error("flag_sbpool false not finished in Numerical_Orbital_Lm::set_orbital_info_k. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+				throw std::domain_error("flag_sbpool false not finished in Numerical_Orbital_Lm::set_orbital_info_k. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 			}
 			break;
 		default:	break;

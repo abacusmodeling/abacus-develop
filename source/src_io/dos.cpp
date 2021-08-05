@@ -9,7 +9,7 @@ void Dos::calculate_Mulliken(const std::string &fa)
 	if(GlobalV::MY_RANK==0)
 	{
 		ofs.open(fa.c_str());
-		ofs << setiosflags(ios::left);
+		ofs << std::setiosflags(ios::left);
 	}
 
 	GlobalV::ofs_running << "\n CALCULATE THE MULLIkEN ANALYSIS FOR EACH ATOM" << std::endl;

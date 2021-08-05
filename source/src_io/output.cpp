@@ -255,7 +255,7 @@ void output::printr4_d(std::ofstream &ofs, const std::string &s,const realArray 
 void output::printM3(std::ofstream &ofs,const std::string &description, const Matrix3 &m)const
 {
     ofs << " " << description << std::endl;
-	ofs << setiosflags(ios::showpos);
+	ofs << std::setiosflags(ios::showpos);
     ofs << " " << setw(20) << m.e11 << setw(20) << m.e12 << setw(20) << m.e13 
 	<< "\n " << setw(20) << m.e21 << setw(20) << m.e22 << setw(20) << m.e23 
 	<< "\n " << setw(20) << m.e31 << setw(20) << m.e32 << setw(20) << m.e33 << std::endl;

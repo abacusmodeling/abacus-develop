@@ -75,7 +75,7 @@ std::vector<timeval>t_recv(comm_sz);
 			if( flags_send[rank_send] == Flag_Send::finish_oar )
 			{
 //ofs<<__LINE__<<"\t"<<rank_send<<std::endl;
-				if(MPI_Isend( VECTOR_TO_PTR(oarps_isend[rank_send]), oarps_isend[rank_send].size(), MPI_DOUBLE, rank_send, 0, mpi_comm, &requests_isend[rank_send] )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				if(MPI_Isend( VECTOR_TO_PTR(oarps_isend[rank_send]), oarps_isend[rank_send].size(), MPI_DOUBLE, rank_send, 0, mpi_comm, &requests_isend[rank_send] )!=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 				flags_send[rank_send] = Flag_Send::begin_isend;
 gettimeofday(&t_send[rank_send],NULL);
 			}
@@ -86,7 +86,7 @@ gettimeofday(&t_send[rank_send],NULL);
 			{
 //ofs<<__LINE__<<"\t"<<rank_send<<std::endl;
 				int flag_finish;
-				if(MPI_Test( &requests_isend[rank_send], &flag_finish, MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				if(MPI_Test( &requests_isend[rank_send], &flag_finish, MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 				if(flag_finish)
 				{
 					oarps_isend[rank_send].resize(0);
@@ -100,15 +100,15 @@ ofs<<"isend_finish\t"<<rank_send<<"\t"<<cal_time(t_send[rank_send])<<std::endl;
 		{
 			MPI_Status status;
 			int flag_message;
-			if(MPI_Iprobe( MPI_ANY_SOURCE, 0, mpi_comm, &flag_message, &status )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+			if(MPI_Iprobe( MPI_ANY_SOURCE, 0, mpi_comm, &flag_message, &status )!=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 			if(flag_message)
 			{
 				int message_size;
-				if(MPI_Get_count( &status, MPI_PACKED, &message_size )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				if(MPI_Get_count( &status, MPI_PACKED, &message_size )!=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 				const int rank_recv = status.MPI_SOURCE;
 //ofs<<__LINE__<<"\t"<<rank_recv<<std::endl;
 				iarps_irecv[rank_recv].resize(message_size);
-				if(MPI_Irecv( VECTOR_TO_PTR(iarps_irecv[rank_recv]), message_size, MPI_DOUBLE, rank_recv, 0, mpi_comm, &requests_irecv[rank_recv] )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				if(MPI_Irecv( VECTOR_TO_PTR(iarps_irecv[rank_recv]), message_size, MPI_DOUBLE, rank_recv, 0, mpi_comm, &requests_irecv[rank_recv] )!=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 				flags_recv[rank_recv] = Flag_Recv::begin_irecv;
 gettimeofday(&t_recv[rank_recv],NULL);
 			}
@@ -118,7 +118,7 @@ gettimeofday(&t_recv[rank_recv],NULL);
 			if(flags_recv[rank_recv] == Flag_Recv::begin_irecv)
 			{
 				int flag_finish;
-				if(MPI_Test( &requests_irecv[rank_recv], &flag_finish, MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				if(MPI_Test( &requests_irecv[rank_recv], &flag_finish, MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 				if(flag_finish)
 				{
 //ofs<<__LINE__<<"\t"<<rank_recv<<std::endl;
@@ -145,7 +145,7 @@ ofs<<"insert\t"<<my_rank<<"\t"<<cut_time(t)<<std::endl;
 	{
 		if( flags_send[rank_send] == Flag_Send::begin_isend )
 		{
-			if(MPI_Wait( &requests_isend[rank_send], MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+			if(MPI_Wait( &requests_isend[rank_send], MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 			oarps_isend[rank_send].resize(0);
 			flags_send[rank_send] = Flag_Send::finish_isend;
 		}

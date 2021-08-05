@@ -16,7 +16,7 @@ void Stress_Func::print_stress(const std::string &name, const matrix& f, const b
 	}
 
 	std::cout << setprecision(5);
-	std::cout << setiosflags(ios::showpos);
+	std::cout << std::setiosflags(ios::showpos);
 
 	if(screen)
 	{
@@ -67,8 +67,8 @@ void Stress_Func::printstress_total(const matrix& scs, bool ry)
 //	std::cout.setf(ios::fixed);
 
 
-	//GlobalV::ofs_running << setiosflags(ios::right);
- 	GlobalV::ofs_running << setprecision(6) << setiosflags(ios::showpos) << setiosflags(ios::fixed) << std::endl;
+	//GlobalV::ofs_running << std::setiosflags(ios::right);
+ 	GlobalV::ofs_running << setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed) << std::endl;
 	NEW_PART("TOTAL-STRESS (KBAR)");//Ryd/(a.u.)^3
     std::cout << " ><><><><><><><><><><><><><><><><><><><><><><" << std::endl;
     std::cout << " TOTAL-STRESS (KBAR):" << std::endl;
@@ -79,8 +79,8 @@ void Stress_Func::printstress_total(const matrix& scs, bool ry)
 
  	if(GlobalV::TEST_STRESS) 
 	{
-		std::cout << setiosflags(ios::fixed) << setprecision(6);
-		std::cout << setiosflags(ios::showpos);
+		std::cout << std::setiosflags(ios::fixed) << setprecision(6);
+		std::cout << std::setiosflags(ios::showpos);
 		std::cout << " ------------------- TOTAL      STRESS --------------------" << std::endl;
     	std::cout << " " << setw(8) << "STRESS" << std::endl;
     	GlobalV::ofs_running << " " << setw(12) << "STRESS" << std::endl;
@@ -98,7 +98,7 @@ void Stress_Func::printstress_total(const matrix& scs, bool ry)
 			<< scs(i,1)*unit_transform << setw(15) << scs(i,2)*unit_transform << std::endl;
 
 	}
-	GlobalV::ofs_running << setiosflags(ios::left);
+	GlobalV::ofs_running << std::setiosflags(ios::left);
 	std::cout << resetiosflags(ios::showpos);
 
     return;

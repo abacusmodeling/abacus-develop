@@ -46,7 +46,7 @@ bool Update_input::Read(const std::string &fn)
     char word1[80];
     int ierr = 0;
 
-    //ifs >> setiosflags(ios::uppercase);
+    //ifs >> std::setiosflags(ios::uppercase);
     ifs.rdstate();
     while (ifs.good())
     {

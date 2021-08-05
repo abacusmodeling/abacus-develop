@@ -164,7 +164,7 @@ void Forces::init(matrix& force)
 		
 	}
 
- 	GlobalV::ofs_running << setiosflags(ios::fixed) << setprecision(6) << std::endl;
+ 	GlobalV::ofs_running << std::setiosflags(ios::fixed) << setprecision(6) << std::endl;
 	if(GlobalV::TEST_FORCE)
 	{
 		Forces::print("LOCAL    FORCE (Ry/Bohr)", forcelc);
@@ -217,13 +217,13 @@ void Forces::print_to_files(std::ofstream &ofs, const std::string &name, const m
     int iat = 0;
     ofs << " " << name;
     ofs << setprecision(8);
-	//ofs << setiosflags(ios::showpos);
+	//ofs << std::setiosflags(ios::showpos);
    
 	double fac = Ry_to_eV / 0.529177;// (eV/A)
 
 	if(GlobalV::TEST_FORCE)
 	{
-		std::cout << setiosflags(ios::showpos);
+		std::cout << std::setiosflags(ios::showpos);
 		std::cout << " " << name;
 		std::cout << setprecision(8);
 	}
@@ -262,7 +262,7 @@ void Forces::print(const std::string &name, const matrix &f, bool ry)
 	NEW_PART(name);
 
 	GlobalV::ofs_running << " " << setw(8) << "atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << std::endl;
-	GlobalV::ofs_running << setiosflags(ios::showpos);
+	GlobalV::ofs_running << std::setiosflags(ios::showpos);
 
 	const double fac = Ry_to_eV / 0.529177;
 	
@@ -270,9 +270,9 @@ void Forces::print(const std::string &name, const matrix &f, bool ry)
 	{
 		std::cout << " --------------- " << name << " ---------------" << std::endl;
 		std::cout << " " << setw(8) << "atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << std::endl;
-		std::cout << setiosflags(ios::showpos);
+		std::cout << std::setiosflags(ios::showpos);
 		std::cout << setprecision(6);
-		std::cout << setiosflags(ios::fixed);
+		std::cout << std::setiosflags(ios::fixed);
 	}
 
     int iat = 0;
