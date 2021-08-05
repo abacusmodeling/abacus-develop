@@ -786,7 +786,7 @@ void ORB_table_phi::init_Lmax (
 	auto cal_Lmax_Alpha = [](int &Lmax)
 	{
 		//caoyu add 2021-08-05 for descriptor basis
-		Lmax = std::max(Lmax, ORB.get_lmax_d());
+		Lmax = std::max(Lmax, GlobalC::ORB.get_lmax_d());
 	};
 
 	

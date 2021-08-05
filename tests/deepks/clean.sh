@@ -56,3 +56,5 @@ for directory in `ls | grep $module`; do
 done
 
 done
+
+test -e "check_file" && rm -rf check_file

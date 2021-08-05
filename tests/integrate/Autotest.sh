@@ -80,28 +80,6 @@ check_out(){
 		deviation=`awk 'BEGIN {x='$ref';y='$cal';printf "%.'$ca'f\n",x-y}'`
 		deviation1=`awk 'BEGIN {x='$ref';y='$cal';printf "%.'$ca'f\n",y-x}'`
 
-		#--------------------------------------------------
-		# computed the deviation between the calculated
-		# and reference value for descriptors in DeePKS
-		#--------------------------------------------------
-		if [ $key == "descriptor" ]; then
-			../check_file descriptor.dat.ref descriptor.dat $threshold
-			state=`echo $?`
-			if [ $state == "0" ]; then
-				let failed++
-				break
-			fi
-		fi
-
-		if [ $key == "jle" ]; then
-			../check_file jle.orb.ref OUT.autotest/jle.orb $threshold
-			state=`echo $?`
-			if [ $state == "0" ]; then
-				let failed++
-				break
-			fi
-		fi
-
 		if [ $key == "totaltimeref" ]; then
 			# echo "time=$cal ref=$ref"
 			break
@@ -162,8 +140,6 @@ if [ "$sanitize" == true ]; then
 	echo -e "# Address Sanitizer Diagnostics\n" > ../html/README.md
 	report=$(realpath ../html/README.md)
 fi
-
-g++ check_file.cpp -o check_file
 
 for dir in $testdir; do
 	cd $dir
