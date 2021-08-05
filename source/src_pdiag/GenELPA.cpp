@@ -93,7 +93,7 @@ using namespace std;
         clock_t cur;
         cur=clock();
         double t1;
-        stringstream outlog;
+        std::stringstream outlog;
         if(t0<=0)  // t0 < 0 means this is the init call before the function
         {
             t0=double(cur);
@@ -125,7 +125,7 @@ int pdSolveGenEigen1(int nev, int nFull, int narows, int nacols, int *desc,
         int myid;
         time_t t0, t1;
         double t;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
         outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveGenEigen1"<<std::endl;
@@ -179,7 +179,7 @@ int pdSolveGenEigen2(int nev, int nFull, int narows, int nacols, int *desc,
     #ifdef _DEBUG
         int myid;
         double t;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
         outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveGenEigen2"<<std::endl;
@@ -231,7 +231,7 @@ int pdDecomposeRightMatrix1(int nFull, int narows, int nacols, int *desc,
     #ifdef _DEBUG
         int myid;
         double t=-1;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
         outlog<<"DEBUG: Process "<<myid<<" Enter pdDecomposeRightMatrix1"<<std::endl;
@@ -307,7 +307,7 @@ int pdDecomposeRightMatrix2(int nFull, int narows, int nacols, int *desc,
     #ifdef _DEBUG
         int myid;
         double t;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
         outlog<<"DEBUG: Process "<<myid<<" Enter pdDecomposeRightMatrix2"<<std::endl;
@@ -389,7 +389,7 @@ int pdCheloskyDecomposeRightMatrix(int nFull, int narows, int nacols, int *desc,
     #ifdef _DEBUG
         int myid;
         double t;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
         outlog<<"DEBUG: Process "<<myid<<" Enter pdCheloskyDecomposeRightMatrix"<<std::endl;
@@ -542,7 +542,7 @@ int pdDiagonalizeRightMatrix1(int nFull, int narows, int nacols, int *desc,
         int myid;
         double t;
         int method=3;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
         outlog<<"DEBUG: Process "<<myid<<" Enter pdDiagonalizeRightMatrix1"<<std::endl;
@@ -624,7 +624,7 @@ int pdDiagonalizeRightMatrix2(int nFull, int narows, int nacols, int *desc,
         int myid;
         double t;
         int method=3;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
         outlog<<"DEBUG: Process "<<myid<<" Enter pdDiagonalizeRightMatrix2"<<std::endl;
@@ -707,7 +707,7 @@ int pdSolveEigen1(int nev, int nFull, int narows, int nacols, int *desc,
     #ifdef _DEBUG
         int myid;
         double t;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
         outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveEigen1"<<std::endl;
@@ -878,7 +878,7 @@ int pdSolveEigen2(int nev, int nFull, int narows, int nacols, int *desc,
     #ifdef _DEBUG
         int myid;
         double t;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
         outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveEigen2"<<std::endl;
@@ -1048,7 +1048,7 @@ int pzSolveGenEigen1(int nev, int nFull, int narows, int nacols, int *desc,
         int myid;
         time_t t0, t1;
         double t;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
         outlog<<"DEBUG: Process "<<myid<<" Enter pzSolveGenEigen1"<<std::endl;
@@ -1102,7 +1102,7 @@ int pzSolveGenEigen2(int nev, int nFull, int narows, int nacols, int *desc,
     #ifdef _DEBUG
         int myid;
         double t;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
         outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveGenEigen2"<<std::endl;
@@ -1154,7 +1154,7 @@ int pzDecomposeRightMatrix1(int nFull, int narows, int nacols, int *desc,
     #ifdef _DEBUG
         int myid;
         double t=-1;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
         outlog<<"DEBUG: Process "<<myid<<" Enter pzDecomposeRightMatrix1"<<std::endl;
@@ -1230,7 +1230,7 @@ int pzDecomposeRightMatrix2(int nFull, int narows, int nacols, int *desc,
     #ifdef _DEBUG
         int myid;
         double t;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
         outlog<<"DEBUG: Process "<<myid<<" Enter pzDecomposeRightMatrix2"<<std::endl;
@@ -1317,7 +1317,7 @@ int pzCheloskyDecomposeRightMatrix(int nFull, int narows, int nacols, int *desc,
     #ifdef _DEBUG
         int myid;
         double t;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
         outlog<<"DEBUG: Process "<<myid<<" Enter pzCheloskyDecomposeRightMatrix"<<std::endl;
@@ -1470,7 +1470,7 @@ int pzDiagonalizeRightMatrix1(int nFull, int narows, int nacols, int *desc,
         int myid;
         double t;
         int method=3;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
         outlog<<"DEBUG: Process "<<myid<<" Enter pzDiagonalizeRightMatrix1"<<std::endl;
@@ -1552,7 +1552,7 @@ int pzDiagonalizeRightMatrix2(int nFull, int narows, int nacols, int *desc,
         int myid;
         double t;
         int method=3;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
         outlog<<"DEBUG: Process "<<myid<<" Enter pdDiagonalizeRightMatrix2"<<std::endl;
@@ -1635,7 +1635,7 @@ int pzSolveEigen1(int nev, int nFull, int narows, int nacols, int *desc,
     #ifdef _DEBUG
         int myid;
         double t;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
         outlog<<"DEBUG: Process "<<myid<<" Enter pzSolveEigen1"<<std::endl;
@@ -1806,7 +1806,7 @@ int pzSolveEigen2(int nev, int nFull, int narows, int nacols, int *desc,
     #ifdef _DEBUG
         int myid;
         double t;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
         outlog<<"DEBUG: Process "<<myid<<" Enter pzSolveEigen2"<<std::endl;

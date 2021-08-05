@@ -11,8 +11,8 @@ class Exx_Abfs::Parallel::Distribute::Kmeans
 {
 public:
 
-	static std::vector<pair<size_t,size_t>> distribute_kmeans2( const MPI_Comm & mpi_comm, const int multiple_core=1 );
-	static std::vector<pair<size_t,size_t>> distribute_kmeans1( const MPI_Comm & mpi_comm, const double rmesh_times );
+	static std::vector<std::pair<size_t,size_t>> distribute_kmeans2( const MPI_Comm & mpi_comm, const int multiple_core=1 );
+	static std::vector<std::pair<size_t,size_t>> distribute_kmeans1( const MPI_Comm & mpi_comm, const double rmesh_times );
 
 private:
 
@@ -30,7 +30,7 @@ private:
 		double distance;
 	};
 	
-	static pair< std::vector<Exx_Abfs::Parallel::Distribute::Kmeans::Atom>, std::vector<Exx_Abfs::Parallel::Distribute::Kmeans::Cluster> > 
+	static std::pair< std::vector<Exx_Abfs::Parallel::Distribute::Kmeans::Atom>, std::vector<Exx_Abfs::Parallel::Distribute::Kmeans::Cluster> > 
 		cluster( const int Nc );
 };
 

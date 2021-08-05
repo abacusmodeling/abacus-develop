@@ -280,7 +280,7 @@ void Forces::print(const std::string &name, const matrix &f, bool ry)
     {
         for (int ia = 0;ia < GlobalC::ucell.atoms[it].na;ia++)
         {
-			stringstream ss;
+			std::stringstream ss;
 			ss << GlobalC::ucell.atoms[it].label << ia+1;
 
 			if(ry) // output Rydberg Unit

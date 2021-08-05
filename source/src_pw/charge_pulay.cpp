@@ -260,13 +260,13 @@ void Charge_Pulay::Pulay_mixing(void)
 
     // output file name
     /*
-    stringstream ofname;
+    std::stringstream ofname;
     ofname << GlobalV::global_out_dir << "PULAY_MIXING_" << counter << ".dat";
     this->write_rho(ofname.str());
 
     for(int i=0; i<counter; i++)
     {
-    	stringstream ifname;
+    	std::stringstream ifname;
     	ifname << GlobalV::global_out_dir << "PULAY_MIXING_" << counter << ".dat";
     	this->read_rho(ifname.str());
     }

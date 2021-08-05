@@ -14,7 +14,7 @@ bool MD_func::RestartMD(const int& numIon, Vector3<double>* vel, int& step_rst)
 	double *vell=new double[numIon*3];
 	if (!GlobalV::MY_RANK)
 	{
-		stringstream ssc;
+		std::stringstream ssc;
 		ssc << GlobalV::global_readin_dir << "Restart_md.dat";
 		std::ifstream file(ssc.str().c_str());
 
@@ -87,7 +87,7 @@ void MD_func::mdRestartOut(const int& step, const int& recordFreq, const int& nu
 	if (!pass) return;
 
 	if(!GlobalV::MY_RANK){
-		stringstream ssc;
+		std::stringstream ssc;
 		ssc << GlobalV::global_out_dir << "Restart_md.dat";
 		std::ofstream file(ssc.str().c_str());
 		file<<"MD_RESTART"<<std::endl;
@@ -340,7 +340,7 @@ void MD_func::printpos(const std::string& file, const int& iter, const int& reco
 	if(GlobalV::OUT_LEVEL == "i"||GlobalV::OUT_LEVEL == "ie") unit_in.print_tau();
 	if(GlobalV::OUT_LEVEL == "i"||GlobalV::OUT_LEVEL == "ie") unit_in.print_cell_xyz(file1);
 	unit_in.print_cell_cif(file2);
-	stringstream ss;
+	std::stringstream ss;
 
 	ss << GlobalV::global_out_dir << "STRU_MD";
 

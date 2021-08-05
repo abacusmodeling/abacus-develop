@@ -82,7 +82,7 @@ void xcfunc::which_dft(const std::string *dft)
 
 	static int itype = 0;
 	++itype;
-	stringstream ss;
+	std::stringstream ss;
 	ss << " ELEMENT " << itype << " FUNCTIONAL : "; 
 //	std::cout << ss.str() << dft[0] << " " << dft[1] << " " << dft[2] << " " << dft[3] << std::endl;
 	

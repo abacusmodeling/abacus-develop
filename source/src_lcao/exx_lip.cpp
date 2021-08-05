@@ -634,7 +634,7 @@ void Exx_Lip::write_q_pack() const
 		const std::string command_kpoint = "test -f " + GlobalV::global_out_dir + exx_q_pack + GlobalV::global_kpoint_card + " || cp " + GlobalV::global_kpoint_card + " " + GlobalV::global_out_dir + exx_q_pack + GlobalV::global_kpoint_card;
 		system( command_kpoint.c_str() );	// Need to check
 
-		stringstream ss_wf_wg;
+		std::stringstream ss_wf_wg;
 		ss_wf_wg << GlobalV::global_out_dir << exx_q_pack << "wf_wg_" << GlobalV::MY_POOL;
 		std::ofstream ofs_wf_wg(ss_wf_wg.str().c_str());
 		for( int iq = 0; iq < q_pack->kv_ptr->nks; ++iq)
@@ -647,7 +647,7 @@ void Exx_Lip::write_q_pack() const
 		}
 		ofs_wf_wg.close();
 
-		stringstream ss_hvec;
+		std::stringstream ss_hvec;
 		ss_hvec	<< GlobalV::global_out_dir << exx_q_pack << "hvec_" << GlobalV::MY_POOL;
 		std::ofstream ofs_hvec(ss_hvec.str().c_str());
 		for( int iq=0; iq<q_pack->kv_ptr->nks; ++iq)
@@ -694,7 +694,7 @@ void Exx_Lip::read_q_pack()
 	q_pack->wf_wg.create(q_pack->kv_ptr->nks,GlobalV::NBANDS);
 	if(!GlobalV::RANK_IN_POOL)
 	{
-		stringstream ss_wf_wg;
+		std::stringstream ss_wf_wg;
 		ss_wf_wg << GlobalV::global_out_dir << exx_q_pack << "wf_wg_" << GlobalV::MY_POOL;
 		std::ifstream ifs_wf_wg(ss_wf_wg.str().c_str());
 		for( int iq = 0; iq < q_pack->kv_ptr->nks; ++iq)
@@ -715,7 +715,7 @@ void Exx_Lip::read_q_pack()
 	}
 	if(!GlobalV::RANK_IN_POOL)
 	{
-		stringstream ss_hvec;
+		std::stringstream ss_hvec;
 		ss_hvec	<< GlobalV::global_out_dir << exx_q_pack << "hvec_" << GlobalV::MY_POOL;
 		std::ifstream ifs_hvec(ss_hvec.str().c_str());
 		for( int iq=0; iq<q_pack->kv_ptr->nks; ++iq)
@@ -746,7 +746,7 @@ void Exx_Lip::write_q_pack() const
 
 	if( !GlobalV::RANK_IN_POOL )
 	{
-       	stringstream ssc;
+       	std::stringstream ssc;
         ssc << GlobalV::global_out_dir << "exx_q_pack_" << GlobalV::MY_POOL;
 		std::ofstream ofs(ssc.str().c_str());
     	if (!ofs)
@@ -799,7 +799,7 @@ void Exx_Lip::read_q_pack()
 	std::ifstream ifs;
 	if( !GlobalV::RANK_IN_POOL )
 	{
-       	stringstream ssc;
+       	std::stringstream ssc;
         ssc << GlobalV::global_out_dir << "exx_q_pack_" << GlobalV::MY_POOL;
 		ifs.open(ssc.str().c_str());
     	if (!ifs)
@@ -881,7 +881,7 @@ void Exx_Lip::read_q_pack()
 
 	auto test_print = [&]()
 	{
-		stringstream sss;
+		std::stringstream sss;
 		sss << GlobalV::global_out_dir << "exx_q_pack_tmp" << GlobalV::MY_RANK;
 		std::ofstream ofs(sss.str().c_str());
 		if (!ofs)

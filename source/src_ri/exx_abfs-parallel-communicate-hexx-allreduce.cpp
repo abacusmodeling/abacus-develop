@@ -329,7 +329,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::insert_data()
 
 void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::send_data_process( const int rank_asked )
 {
-	pair< std::vector<bool>, std::vector<bool> > atom_asked;
+	std::pair< std::vector<bool>, std::vector<bool> > atom_asked;
 	*iarps_atom_asked[rank_asked] >> atom_asked;
 	iarps_atom_asked[rank_asked]->resize(0);
 
@@ -341,7 +341,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::send_data_process( const 
 
 
 std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>>
-Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::get_data_local_wrapper( const pair<std::vector<bool>,std::vector<bool>> &atom_asked ) const
+Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::get_data_local_wrapper( const std::pair<std::vector<bool>,std::vector<bool>> &atom_asked ) const
 {
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> mw(GlobalV::NSPIN);
 	for( int is=0; is!=GlobalV::NSPIN; ++is )

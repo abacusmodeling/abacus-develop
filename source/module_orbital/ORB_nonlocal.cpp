@@ -3,7 +3,7 @@
 
 Numerical_Nonlocal::Numerical_Nonlocal()
 {
-	//make pair of new and delete
+	//make std::pair of new and delete
 	//question remains
 	this->type = 0;
 	this->lmax = 0;

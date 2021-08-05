@@ -44,7 +44,7 @@ private:
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> cal_Hexx() const;
 	double cal_energy(
 		const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &HexxR ) const;
-	void init_radial_table_ions( const set<size_t> &atom_centres_core, const std::vector<pair<size_t,size_t>> &atom_pairs_core );
+	void init_radial_table_ions( const set<size_t> &atom_centres_core, const std::vector<std::pair<size_t,size_t>> &atom_pairs_core );
 		
 public:
 	enum class Distribute_Type {Htime,Kmeans2,Kmeans1,Order};
@@ -75,16 +75,16 @@ private:
 	Exx_Abfs::Matrix_Orbs11 m_abfs_abfs;
 	Exx_Abfs::Matrix_Orbs21 m_abfslcaos_lcaos;	
 	
-	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,weak_ptr<matrix>>>> Cws;		// Cws[it1][it2][R]
-	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,weak_ptr<matrix>>>> Vws;		// Vws[it1][it2][R]
-	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Cs;		// Cs[iat1][iat2][box2]
-	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Cps;		// Cs[iat1][iat2][box2]
-	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Vs;		// Vs[iat1][iat2][box2]
-	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Vps;		// Vps[iat1][iat2][box2]
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,std::weak_ptr<matrix>>>> Cws;		// Cws[it1][it2][R]
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,std::weak_ptr<matrix>>>> Vws;		// Vws[it1][it2][R]
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>>>> Cs;		// Cs[iat1][iat2][box2]
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>>>> Cps;		// Cs[iat1][iat2][box2]
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>>>> Vs;		// Vs[iat1][iat2][box2]
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>>>> Vps;		// Vps[iat1][iat2][box2]
 
-	std::vector<pair<size_t,size_t>> atom_pairs_core_origin;
-	std::vector<pair<size_t,size_t>> atom_pairs_core;
-	set<pair<size_t,size_t>> H_atom_pairs_core;
+	std::vector<std::pair<size_t,size_t>> atom_pairs_core_origin;
+	std::vector<std::pair<size_t,size_t>> atom_pairs_core;
+	set<std::pair<size_t,size_t>> H_atom_pairs_core;
 	Abfs::Vector3_Order<int> Born_von_Karman_period;
 
 	Exx_Abfs::Screen::Schwarz schwarz;

@@ -163,7 +163,7 @@ void Print_Info::setup_parameters(void)
 
 			if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 			{
-				stringstream orb;
+				std::stringstream orb;
 
 				int norb = 0;
 				/*for(int L=0; L<=GlobalC::ORB.Phi[it].getLmax(); ++L)

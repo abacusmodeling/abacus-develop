@@ -119,7 +119,7 @@ void Potential::init_pot(
             GlobalV::ofs_running << " try to start potential from file : ";
             for(int is=0; is<GlobalV::NSPIN; is++)
             {
-                stringstream ssc;
+                std::stringstream ssc;
                 ssc << GlobalV::global_readin_dir << "SPIN" << is + 1 << "_CHG";
                 GlobalV::ofs_running << ssc.str() << std::endl;
                 // mohan update 2012-02-10

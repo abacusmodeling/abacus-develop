@@ -685,7 +685,7 @@ MPI_Barrier(comm);
     if(this->out_lowf)
 	{
 		// read is in ../src_algorithms/wf_local.cpp
-		stringstream ss;
+		std::stringstream ss;
 		ss << GlobalV::global_out_dir << "LOWF_GAMMA_S" << GlobalV::CURRENT_SPIN+1 << ".dat";
 		// mohan add 2012-04-03, because we need the occupations for the
 		// first iteration. 
@@ -868,7 +868,7 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **cc
 	// output the wave function if required.
 	// this is a bad position to output wave functions.
 	// but it works!
-	stringstream ss;
+	std::stringstream ss;
 	ss << GlobalV::global_out_dir << "LOWF_K_" << ik+1 << ".dat";
     if(this->out_lowf)
 	{

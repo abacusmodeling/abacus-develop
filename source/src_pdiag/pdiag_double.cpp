@@ -140,7 +140,7 @@ inline int q2ZLOC_WFC_WFCAUG(
 	double** WFCAUG)
 {
 
-    stringstream ss;
+    std::stringstream ss;
     for(int j=0; j<naroc[1]; ++j)
     {
         int igcol=globalIndex(j, nb, dim1, ipcol);
@@ -721,7 +721,7 @@ void Pdiag_Double::diago_double_begin(
 	
 		if(out_lowf && myid==0)
 		{
-			stringstream ss;
+			std::stringstream ss;
 			ss << GlobalV::global_out_dir << "LOWF_GAMMA_S" << GlobalV::CURRENT_SPIN+1 << ".dat";
 			// mohan add 2012-04-03, because we need the occupations for the
 				// first iteration.
@@ -1099,7 +1099,7 @@ void Pdiag_Double::diago_complex_begin(
 					info=q2WFC_WFCAUG_CTOT_complex(myid, naroc, nb,
 							dim0, dim1, iprow, ipcol,
 							work, wfc, GlobalC::LOWF.WFC_K_aug[ik], ctot);
-                    stringstream ss;
+                    std::stringstream ss;
 	                ss << GlobalV::global_out_dir << "LOWF_K_" << ik+1 << ".dat";
                     // mohan add 2012-04-03, because we need the occupations for the
                     // first iteration.
@@ -1218,7 +1218,7 @@ void Pdiag_Double::diago_complex_begin(
 						info=q2WFC_WFCAUG_CTOT_complex(myid, naroc, nb,
 								dim0, dim1, iprow, ipcol,
 								work, wfc, GlobalC::LOWF.WFC_K_aug[ik], ctot);
-						stringstream ss;
+						std::stringstream ss;
 						ss << GlobalV::global_out_dir << "LOWF_K_" << ik+1 << ".dat";
 						// mohan add 2012-04-03, because we need the occupations for the
 						// first iteration.

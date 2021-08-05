@@ -51,7 +51,7 @@ void Numerical_Descriptor::output_descriptor(const ComplexMatrix *psi, const int
 	// 2. Open the file
 	//-----------------------------------
     std::ofstream ofs;
-    stringstream ss;
+    std::stringstream ss;
     // the parameter 'winput::spillage_outdir' is read from INPUTw.
     ss << winput::spillage_outdir << "/" << "descriptor.dat";
     if (GlobalV::MY_RANK==0)

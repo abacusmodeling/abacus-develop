@@ -118,7 +118,7 @@ void LOOP_elec::before_solver(const int &istep)
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			ZEROS(GlobalC::CHR.rho[is], GlobalC::pw.nrxx);
-			stringstream ssd;
+			std::stringstream ssd;
 			ssd << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DM" ;
 			// reading density matrix,
 			GlobalC::LOC.read_dm(is, ssd.str() );

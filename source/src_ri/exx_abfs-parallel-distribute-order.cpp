@@ -4,7 +4,7 @@
 #include "abfs.h"
 #include <cmath>
 
-std::vector<pair<size_t,size_t>> Exx_Abfs::Parallel::Distribute::Order::distribute(
+std::vector<std::pair<size_t,size_t>> Exx_Abfs::Parallel::Distribute::Order::distribute(
 	const double rmesh_times )
 {
 	const std::vector<Abfs::Vector3_Order<int>> Coulomb_potential_boxes = Abfs::get_Coulomb_potential_boxes(rmesh_times);
@@ -24,14 +24,14 @@ std::vector<pair<size_t,size_t>> Exx_Abfs::Parallel::Distribute::Order::distribu
 		return false;
 	};
 	
-	std::vector<pair<size_t,size_t>> pairs;
+	std::vector<std::pair<size_t,size_t>> pairs;
 	for( size_t iat1=0; iat1<GlobalC::ucell.nat; ++iat1 )
 		for( size_t iat2=iat1; iat2<GlobalC::ucell.nat; ++iat2 )
 			if(neighbour(iat1,iat2))
 				pairs.push_back( {iat1,iat2} );
 			
 	const size_t work = std::ceil(static_cast<double>(pairs.size())/GlobalV::NPROC);
-	return std::vector<pair<size_t,size_t>>{ 
+	return std::vector<std::pair<size_t,size_t>>{ 
 		std::min( pairs.begin()+ GlobalV::MY_RANK   *work, pairs.end() ),
 		std::min( pairs.begin()+(GlobalV::MY_RANK+1)*work, pairs.end() )};
 }

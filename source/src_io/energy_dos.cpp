@@ -48,7 +48,7 @@ void energy::perform_dos(void)
 	{
 		if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax")
 		{
-			stringstream ss;
+			std::stringstream ss;
 			ss << GlobalV::global_out_dir << "istate.info" ;
 			std::ofstream ofsi( ss.str().c_str() );
 			*for(int ib=0; ib<GlobalV::NBANDS; ++ib)
@@ -109,7 +109,7 @@ void energy::perform_dos(void)
 	//qianrui modify 2020-10-18
 	if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax")
 	{
-		stringstream ss;
+		std::stringstream ss;
 		ss << GlobalV::global_out_dir << "istate.info" ;
 		if(GlobalV::MY_RANK==0)
 		{
@@ -459,7 +459,7 @@ void energy::perform_dos(void)
 	 delete[] waveg;
 	 if(GlobalV::MY_RANK == 0)
 	 {
-		 {  stringstream ps;
+		 {  std::stringstream ps;
 			 ps << GlobalV::global_out_dir << "TDOS";
 			 std::ofstream out(ps.str().c_str());
 			 if (GlobalV::NSPIN==1)
@@ -524,7 +524,7 @@ void energy::perform_dos(void)
 		 Name_Angular[4][7] = "g8         ";
 		 Name_Angular[4][8] = "g9         ";
 
-		 {stringstream as;
+		 {std::stringstream as;
 			 as << GlobalV::global_out_dir << "PDOS";
 			 std::ofstream out(as.str().c_str());
 
@@ -585,7 +585,7 @@ void energy::perform_dos(void)
 			 out << "<"<<"/"<<"orbital"<<">" <<std::endl;
 			 out << "<"<<"/"<<"pdos"<<">" <<std::endl;
 			 out.close();}
-		 {  stringstream os;
+		 {  std::stringstream os;
 			 os<<GlobalV::global_out_dir<<"Orbital";
 			 std::ofstream out(os.str().c_str());
 			 out<< setw(5)<<"io"<< setw(8) <<"spec" <<setw(5)<<"l"<<setw(5)<<"m"<<setw(5)<<"z"<<setw(5)<<"sym"<<std::endl;
@@ -620,7 +620,7 @@ void energy::perform_dos(void)
 	 // output the DOS file.
 	 for(int is=0; is<nspin0; ++is)
 	 {
-		 stringstream ss;
+		 std::stringstream ss;
 		 ss << GlobalV::global_out_dir << "DOS" << is+1;
 
 		 Dos::calculate_dos(
@@ -696,7 +696,7 @@ void energy::perform_dos(void)
 		 //----------------------------------------------------------
 		 // EXPLAIN : output DOS2.txt
 		 //----------------------------------------------------------
-		 stringstream sss;
+		 std::stringstream sss;
 		 sss << GlobalV::global_out_dir << "DOS" << is+1 << "_smearing" << ".dat" ;
 		 std::ofstream out(sss.str().c_str());
 		 double sum2=0.0;
@@ -728,7 +728,7 @@ void energy::perform_dos(void)
 		// GlobalV::mulliken charge analysis
 		if(out_dos == 2)
 		{
-			stringstream sp;
+			std::stringstream sp;
 			sp << GlobalV::global_out_dir << "Mulliken.dat";
 			Dos::calculate_Mulliken(sp.str());
 		}
@@ -751,7 +751,7 @@ void energy::perform_dos(void)
 
 		/*for(int is=0; is<GlobalV::NSPIN; is++)
 		{
-			stringstream ss2;
+			std::stringstream ss2;
 			ss2 << GlobalV::global_out_dir << "BANDS_" << is+1 << ".dat";
 			GlobalV::ofs_running << "\n Output bands in file: " << ss2.str() << std::endl;
 			Dos::nscf_band(is, ss2.str(), nks, GlobalV::NBANDS, this->ef, GlobalC::wf.ekb);
@@ -761,7 +761,7 @@ void energy::perform_dos(void)
 		{
 			for(int i=0; i<nspin0; i++)
 			{
-				stringstream ss3;
+				std::stringstream ss3;
 				ss3 << GlobalV::global_out_dir << "Fermi_Surface_" << i << ".bxsf";
 				Dos::nscf_fermi_surface(ss3.str(),GlobalC::kv.nks,GlobalV::NBANDS,GlobalC::wf.ekb);
 			}
@@ -781,7 +781,7 @@ void energy::perform_dos(void)
 
 		for(int is=0; is<nspin0; is++)
 		{
-			stringstream ss2;
+			std::stringstream ss2;
 			ss2 << GlobalV::global_out_dir << "BANDS_" << is+1 << ".dat";
 			GlobalV::ofs_running << "\n Output bands in file: " << ss2.str() << std::endl;
 			Dos::nscf_band(is, ss2.str(), nks, GlobalV::NBANDS, this->ef*0, GlobalC::wf.ekb);

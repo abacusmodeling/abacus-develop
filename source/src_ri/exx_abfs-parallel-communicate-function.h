@@ -12,7 +12,7 @@ using namespace std;
 class Exx_Abfs::Parallel::Communicate::Function
 {
 public:
-	static std::vector<pair<std::vector<bool>,std::vector<bool>>> get_atom_in_2D_list(const MPI_Comm &mpi_comm);
+	static std::vector<std::pair<std::vector<bool>,std::vector<bool>>> get_atom_in_2D_list(const MPI_Comm &mpi_comm);
 };
 
 #endif

@@ -674,7 +674,7 @@ void berryphase::Macroscopic_polarization()
 
 std::string berryphase::outFormat(const double polarization, const double modulus, const Vector3<double> project)
 {
-	stringstream outStr;
+	std::stringstream outStr;
 	outStr << setw(12) << fixed << setprecision(7) << polarization << "  (mod " ;
 	outStr << setw(12) << fixed << setprecision(7) << modulus << ")  (";
 	outStr << setw(12) << fixed << setprecision(7) << project.x << ",";

@@ -283,7 +283,7 @@ void Numerical_Nonlocal_Lm::plot(const int &my_rank)const
 #else
 	if(my_rank==0)
 	{
-		stringstream ssr, ssk, ssru;
+		std::stringstream ssr, ssk, ssru;
 		ssr << GlobalV::global_out_dir << this->label << "/"
 			<< this->label << "-" << orbital_type << "-proj-r.dat";
 

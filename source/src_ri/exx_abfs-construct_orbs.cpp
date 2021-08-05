@@ -278,7 +278,7 @@ std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::
 	if(times_threshold>1)
 		return std::vector<std::vector<std::vector<std::vector<double>>>>(abfs.size());
 	
-	const std::vector<std::vector<pair<std::vector<double>,matrix>>> && eig = Exx_Abfs::PCA::cal_PCA( orbs, abfs, kmesh_times_mot );
+	const std::vector<std::vector<std::pair<std::vector<double>,matrix>>> && eig = Exx_Abfs::PCA::cal_PCA( orbs, abfs, kmesh_times_mot );
 	
 	const std::vector<std::vector<std::vector<std::vector<double>>>> && psis = get_psi( abfs );
 	std::vector<std::vector<std::vector<std::vector<double>>>> psis_new( psis.size() );

@@ -62,7 +62,7 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
 	for(int derivative_order=0; derivative_order<=1; ++derivative_order)            // Peize Lin add 2020.04.23
 	{
         std::ofstream ofs;
-        stringstream ss;
+        std::stringstream ss;
         // the parameter 'winput::spillage_outdir' is read from INPUTw.
         ss << winput::spillage_outdir << "/" << GlobalC::ucell.latName << "." << derivative_order << ".dat";
         if (GlobalV::MY_RANK==0)

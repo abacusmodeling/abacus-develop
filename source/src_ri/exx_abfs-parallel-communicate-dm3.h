@@ -48,7 +48,7 @@ private:
 			enum class Flag_Send {undo, begin_oar, finish_oar, begin_isend, finish_isend};
 			enum class Flag_Recv {undo, begin_irecv, begin_iar, finish_iar};
 
-			//std::vector<pair<bool,bool>> get_atom_in_2D() const;
+			//std::vector<std::pair<bool,bool>> get_atom_in_2D() const;
 			std::vector<std::map<size_t,set<size_t>>> get_H_atom_pairs_group_rank(
 				const std::map<set<size_t>,set<size_t>> &H_atom_pairs_group) const;
 			void get_send_recv_size(
@@ -77,7 +77,7 @@ private:
 				std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_all,
 				std::vector<std::vector<double>> &iarps_irecv,
 				std::vector<atomic<Flag_Recv>> &flags_recv,
-				atomic_flag &lock_insert) const;
+				std::atomic_flag &lock_insert) const;
 			template<typename M> void insert_data(
 				std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,M>>>> &data_rank,
 				std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_all) const;

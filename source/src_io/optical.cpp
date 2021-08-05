@@ -28,7 +28,7 @@ void Optical::cal_epsilon2(const int &nbands)
 
 	if(GlobalV::MY_RANK==0)
 	{
-		stringstream ss;
+		std::stringstream ss;
 		ss << GlobalV::global_out_dir << "EPSILON2.dat";
 		ofs.open( ss.str().c_str() );
 	}

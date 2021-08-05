@@ -1092,7 +1092,7 @@ void Charge::cal_nelec(void)
 	{
 		for (int it = 0; it < GlobalC::ucell.ntype;it++)
 		{
-			stringstream ss1, ss2;
+			std::stringstream ss1, ss2;
 			ss1 << "electron number of element " << GlobalC::ucell.atoms[it].label;
 			const int nelec_it = GlobalC::ucell.atoms[it].zv * GlobalC::ucell.atoms[it].na;
 			nelec += nelec_it;

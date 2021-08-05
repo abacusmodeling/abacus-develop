@@ -31,7 +31,7 @@ timeval t_start;
 double t_probe=0, t_recv=0;
 	
 	std::vector<std::thread> threads;
-	atomic_flag insert_lock = ATOMIC_FLAG_INIT;
+	std::atomic_flag insert_lock = ATOMIC_FLAG_INIT;
 	atomic<int> rank_delta=1;
 	for( int i=0; i<2; ++i )
 		ask(rank_delta++);
@@ -140,7 +140,7 @@ void Exx_Abfs::Parallel::Communicate::Allreduce::allreduce_thread(
 	std::function<void(T&,T&)> &insert_function,
 	T &data_all,
 	atomic<int> &rank_delta,
-	atomic_flag &insert_lock )
+	std::atomic_flag &insert_lock )
 {
 std::ofstream ofs_mpi( "allreduce_"+TO_STRING(my_rank)+"_"+TO_STRING(this_thread::get_id()), std::ofstream::app );
 timeval t_start;

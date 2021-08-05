@@ -234,7 +234,7 @@ void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
 	{
 		for (int T2 = 0 ; T2 < ntype ; T2++)// type 2 is non-local projector
 		{
-			// Tpair: type pair.
+			// Tpair: type std::pair.
 			const int Tpair=this->NL_Tpair(T1,T2);
 			const int Lmax1 = GlobalC::ORB.Phi[T1].getLmax();			
 			const int NBeta = GlobalC::ORB.nproj[T2];
@@ -380,7 +380,7 @@ void ORB_table_beta::init_NL_Tpair(void)
 			 this->NL_Tpair(T1,T0) = index;
 			 ++index;
 
-			 // the pair < psi | beta >
+			 // the std::pair < psi | beta >
 			 // be careful! This is not a symmetry matrix.
 			 this->NL_L2plus1(T1,T0) = std::max(GlobalC::ORB.Phi[T1].getLmax(), GlobalC::ORB.Beta[T0].getLmax() )*2+1;
 			 

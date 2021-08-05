@@ -4,7 +4,7 @@
 
 #include "../src_external/src_test/test_function.h"
 
-pair< std::vector<Exx_Abfs::Parallel::Distribute::Kmeans::Atom>, std::vector<Exx_Abfs::Parallel::Distribute::Kmeans::Cluster> >
+std::pair< std::vector<Exx_Abfs::Parallel::Distribute::Kmeans::Atom>, std::vector<Exx_Abfs::Parallel::Distribute::Kmeans::Cluster> >
 Exx_Abfs::Parallel::Distribute::Kmeans::cluster( const int Nc )
 {
 	TITLE("Exx_Abfs::Parallel::Distribute::Kmeans::cluster");
@@ -147,7 +147,7 @@ Exx_Abfs::Parallel::Distribute::Kmeans::cluster( const int Nc )
 }
 
 
-std::vector<pair<size_t,size_t>> 
+std::vector<std::pair<size_t,size_t>> 
 Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans2( const MPI_Comm & mpi_comm, const int multiple_core )
 {
 	TITLE("Exx_Abfs::Parallel::Distribute::Kmeans::distribute");
@@ -166,17 +166,17 @@ Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans2( const MPI_Comm & mpi
 			return clusters_atoms;
 		};
 		
-		auto g_same_cluster = [](const std::vector<size_t> &cluster_atoms) -> std::vector<pair<size_t,size_t>>
+		auto g_same_cluster = [](const std::vector<size_t> &cluster_atoms) -> std::vector<std::pair<size_t,size_t>>
 		{
-			std::vector<pair<size_t,size_t>> rank_work;
+			std::vector<std::pair<size_t,size_t>> rank_work;
 			for( size_t i1=0; i1<cluster_atoms.size(); ++i1 )
 				for( size_t i2=i1; i2<cluster_atoms.size(); ++i2 )
 					rank_work.push_back({cluster_atoms[i1],cluster_atoms[i2]});
 			return rank_work;
 		};
-		auto g_different_cluster = [&]( const std::vector<size_t> &cluster_atoms1, const std::vector<size_t> &cluster_atoms2 ) -> std::vector<pair<size_t,size_t>>
+		auto g_different_cluster = [&]( const std::vector<size_t> &cluster_atoms1, const std::vector<size_t> &cluster_atoms2 ) -> std::vector<std::pair<size_t,size_t>>
 		{
-			std::vector<pair<size_t,size_t>> rank_work;
+			std::vector<std::pair<size_t,size_t>> rank_work;
 			for( const size_t iat1 : cluster_atoms1 )
 				for( const size_t iat2 : cluster_atoms2 )
 					rank_work.push_back({iat1,iat2});
@@ -187,7 +187,7 @@ Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans2( const MPI_Comm & mpi
 		if( Ng*(Ng+1)/2 == comm_size_nominal )
 		{
 											
-			std::vector<pair<size_t,size_t>> rank_work;
+			std::vector<std::pair<size_t,size_t>> rank_work;
 			const std::vector<Atom> atoms = cluster(Ng).first;
 			const std::vector<std::vector<size_t>> clusters_atoms = classify_atom(Ng,atoms);
 			for( size_t ig1=0, rank_tmp=0; ig1<Ng; ++ig1 )
@@ -195,7 +195,7 @@ Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans2( const MPI_Comm & mpi
 					if( rank_tmp%comm_size == my_rank )
 					{
 																						
-						const std::vector<pair<size_t,size_t>> rank_work_tmp = 
+						const std::vector<std::pair<size_t,size_t>> rank_work_tmp = 
 							(ig1==ig2) ?
 							g_same_cluster(clusters_atoms[ig1]) :
 							g_different_cluster(clusters_atoms[ig1],clusters_atoms[ig2]);
@@ -209,11 +209,11 @@ Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans2( const MPI_Comm & mpi
 		while(comm_size_nominal%N1)	--N1;
 		const int N2=comm_size_nominal/N1;
 		
-		auto f = [&]( const std::vector<Atom> &atoms1, const std::vector<Atom> &atoms2 ) -> std::vector<pair<size_t,size_t>>
+		auto f = [&]( const std::vector<Atom> &atoms1, const std::vector<Atom> &atoms2 ) -> std::vector<std::pair<size_t,size_t>>
 		{
 			auto index = [&](const int ic1, const int ic2){ return (ic1*N2+ic2)%comm_size; };
 			
-			std::vector<std::vector<pair<size_t,size_t>>> rank_work(comm_size);
+			std::vector<std::vector<std::pair<size_t,size_t>>> rank_work(comm_size);
 			for( size_t iatA=0; iatA<GlobalC::ucell.nat; ++iatA )
 			{
 				rank_work[index(atoms1[iatA].center, atoms2[iatA].center)].push_back({iatA,iatA});
@@ -225,8 +225,8 @@ Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans2( const MPI_Comm & mpi
 				for( size_t iatB=iatA+1; iatB<GlobalC::ucell.nat; ++iatB )
 					if( atoms1[iatA].center!=atoms1[iatB].center || atoms2[iatA].center!=atoms2[iatB].center )
 					{
-						std::vector<pair<size_t,size_t>> & rank_work1 = rank_work[index(atoms1[iatA].center, atoms2[iatB].center)];
-						std::vector<pair<size_t,size_t>> & rank_work2 = rank_work[index(atoms1[iatB].center, atoms2[iatA].center)];
+						std::vector<std::pair<size_t,size_t>> & rank_work1 = rank_work[index(atoms1[iatA].center, atoms2[iatB].center)];
+						std::vector<std::pair<size_t,size_t>> & rank_work2 = rank_work[index(atoms1[iatB].center, atoms2[iatA].center)];
 						if( rank_work1.size() < rank_work2.size() )
 							rank_work1.push_back({iatA,iatB});
 						else
@@ -250,7 +250,7 @@ Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans2( const MPI_Comm & mpi
 }
 
 
-std::vector<pair<size_t,size_t>> 
+std::vector<std::pair<size_t,size_t>> 
 Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans1( const MPI_Comm & mpi_comm, const double rmesh_times )
 {
 	int comm_size;	MPI_Comm_size( mpi_comm, &comm_size );
@@ -280,7 +280,7 @@ for(const auto cluster_atoms : clusters_atoms)
 for(const auto cluster : clusters)
 	ofs_mpi<<cluster.tau<<std::endl;
 	
-	std::vector<pair<size_t,size_t>> rank_work;
+	std::vector<std::pair<size_t,size_t>> rank_work;
 	for(const size_t iat1 : clusters_atoms[my_rank])
 	{
 		const int it1 = GlobalC::ucell.iat2it[iat1];

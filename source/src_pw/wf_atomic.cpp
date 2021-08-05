@@ -175,7 +175,7 @@ void WF_atomic::print_PAOs(void)const
                 WARNING_QUIT("WF_atomic::print_PAOs", "unknown PAO type.");
             }
 
-            stringstream ss;
+            std::stringstream ss;
             ss << GlobalV::global_out_dir
             << GlobalC::ucell.atoms[it].label << "/"
             << GlobalC::ucell.atoms[it].label << "-"

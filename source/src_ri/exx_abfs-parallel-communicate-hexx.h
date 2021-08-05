@@ -22,7 +22,7 @@ class Exx_Abfs::Parallel::Communicate::Hexx
 public:
 	void Rexx_to_Km2D(
 		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &HR_exx,
-		const pair<bool,bool> &io_HR_a2D );
+		const std::pair<bool,bool> &io_HR_a2D );
 
 private:
 //	std::map<size_t,std::map<size_t,matrix>> R_to_K(
@@ -63,13 +63,13 @@ private:
 		void insert_data();
 		void send_data_process( const int rank_asked );
 		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> get_data_local_wrapper( 
-			const pair<std::vector<bool>,std::vector<bool>> &atom_asked ) const;
+			const std::pair<std::vector<bool>,std::vector<bool>> &atom_asked ) const;
 
 	private:
 		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> data_all;
 		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local;
 
-		pair< std::vector<bool>, std::vector<bool> > atom_in_2D;
+		std::pair< std::vector<bool>, std::vector<bool> > atom_in_2D;
 
 		const MPI_Comm & mpi_comm;
 		int comm_sz;
@@ -78,7 +78,7 @@ private:
 		static constexpr int tag_ask  = 1;
 		static constexpr int tag_data = 2;
 
-		atomic_flag lock_insert;
+		std::atomic_flag lock_insert;
 		atomic<int> rank_delta;
 
 		boost::mpi::packed_oarchive *oarp_atom_in_2D;
@@ -96,7 +96,7 @@ private:
 	public:
 		void init(
 			const MPI_Comm &mpi_comm_in,
-			const set<pair<size_t,size_t>> &H_atom_pairs_core);
+			const set<std::pair<size_t,size_t>> &H_atom_pairs_core);
 		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> exx_to_a2D(
 			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local) const;
 
@@ -104,10 +104,10 @@ private:
 		enum class Flag_Send {undo, begin_oar, finish_oar, begin_isend, finish_isend};
 		enum class Flag_Recv {undo, begin_irecv, begin_iar, finish_iar};
 		
-		//std::vector<pair<std::vector<bool>,std::vector<bool>>> get_atom_in_2D_list() const;
+		//std::vector<std::pair<std::vector<bool>,std::vector<bool>>> get_atom_in_2D_list() const;
 		std::vector<size_t> get_send_size_list(
-			const set<pair<size_t,size_t>> &H_atom_pairs_core,
-			const std::vector<pair<std::vector<bool>,std::vector<bool>>> &atom_in_2D_list) const;
+			const set<std::pair<size_t,size_t>> &H_atom_pairs_core,
+			const std::vector<std::pair<std::vector<bool>,std::vector<bool>>> &atom_in_2D_list) const;
 		void init_flags(
 			std::vector<atomic<Flag_Send>> &flags_send,
 			std::vector<atomic<Flag_Recv>> &flags_recv) const;
@@ -127,7 +127,7 @@ private:
 			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_all,
 			std::vector<valarray<double>> &iarps_irecv,
 			std::vector<atomic<Flag_Recv>> &flags_recv,
-			atomic_flag &lock_insert) const;			
+			std::atomic_flag &lock_insert) const;			
 		void insert_data(
 			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_rank,
 			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_all) const;
@@ -137,7 +137,7 @@ private:
 		int comm_sz;
 		int my_rank;
 		
-		std::vector<pair<std::vector<bool>,std::vector<bool>>> atom_in_2D_list;
+		std::vector<std::pair<std::vector<bool>,std::vector<bool>>> atom_in_2D_list;
 		std::vector<size_t> send_size_list;
 		size_t recv_size;
 	};

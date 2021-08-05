@@ -176,7 +176,7 @@ void energy::print_etot(
 	}
 	
 	// mohan update 2011-02-26
-	stringstream ss;
+	std::stringstream ss;
 
 	//xiaohui add 2013-09-02, Peize Lin update 2020.11.14
     std::string label;
@@ -328,7 +328,7 @@ void energy::print_etot(
 void energy::print_format(const std::string &name, const double &value)
 {
 	GlobalV::ofs_running << setiosflags(ios::showpos);
-	stringstream name2;
+	std::stringstream name2;
 	name2 << name;
 	GlobalV::ofs_running << " " << setw(12) << name2.str() << setw(30) <<  value 
 	<< setw(30) << value * Ry_to_eV << std::endl;

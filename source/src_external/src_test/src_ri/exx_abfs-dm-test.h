@@ -9,13 +9,13 @@
 class Exx_Abfs_DM_Test
 {
 public:
-	static std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> cal_DMk_raw_readfile( const set<pair<size_t,size_t>> &atom_pairs );
+	static std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> cal_DMk_raw_readfile( const set<std::pair<size_t,size_t>> &atom_pairs );
 	static std::vector<std::vector<std::complex<double>>> read_wfc( const std::string &file_name );
 	static matrix read_wg( const std::string &file_name );
 };
 
 std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> 
-Exx_Abfs_DM_Test::cal_DMk_raw_readfile( const set<pair<size_t,size_t>> &atom_pairs )
+Exx_Abfs_DM_Test::cal_DMk_raw_readfile( const set<std::pair<size_t,size_t>> &atom_pairs )
 {
 	static int istep=-1;	++istep;	
 	TITLE("cal_DMk_raw_readfile_"+TO_STRING(istep));
@@ -28,7 +28,7 @@ Exx_Abfs_DM_Test::cal_DMk_raw_readfile( const set<pair<size_t,size_t>> &atom_pai
 	const double SPIN_multiple = 0.5*GlobalV::NSPIN;
 	
 	std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> DMk_raw;
-	for( const pair<size_t,size_t> & atom_pair : atom_pairs )
+	for( const std::pair<size_t,size_t> & atom_pair : atom_pairs )
 	{
 		const size_t iat1 = atom_pair.first;
 		const size_t iat2 = atom_pair.second;

@@ -741,9 +741,9 @@ ofs_mpi.close();
 		pthread_rwlock_t rwlock_Cw;	pthread_rwlock_init(&rwlock_Cw,NULL);
 		pthread_rwlock_t rwlock_Vw;	pthread_rwlock_init(&rwlock_Vw,NULL);
 
-		std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,weak_ptr<matrix>>>> Cws;
-		std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,weak_ptr<matrix>>>> Vws;
-		shared_ptr<matrix> C = Abfs::DPcal_C(
+		std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,std::weak_ptr<matrix>>>> Cws;
+		std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,std::weak_ptr<matrix>>>> Vws;
+		std::shared_ptr<matrix> C = Abfs::DPcal_C(
 			0,
 			0,
 			{0,0,0},
@@ -793,10 +793,10 @@ std::ofstream ofs_mpi(test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::
 timeval t_start, t_start_all;
 gettimeofday( &t_start_all, NULL);
 
-	auto cal_atom_centres_core = [](const std::vector<pair<size_t,size_t>> &atom_pairs_core) -> set<size_t>
+	auto cal_atom_centres_core = [](const std::vector<std::pair<size_t,size_t>> &atom_pairs_core) -> set<size_t>
 	{
 		set<size_t> atom_centres_core;
-		for( const pair<size_t,size_t> & atom_pair : atom_pairs_core )
+		for( const std::pair<size_t,size_t> & atom_pair : atom_pairs_core )
 		{
 			atom_centres_core.insert(atom_pair.first);
 			atom_centres_core.insert(atom_pair.second);
@@ -1169,9 +1169,9 @@ void Exx_Lcao::cal_exx_elec_nscf()
 }
 
 /*
-void Exx_Lcao::cal_Hexx_gamma( const set<pair<size_t,size_t>> &atom_pairs )
+void Exx_Lcao::cal_Hexx_gamma( const set<std::pair<size_t,size_t>> &atom_pairs )
 {
-	for( const pair<size_t,size_t> & atom_pair : atom_pairs )
+	for( const std::pair<size_t,size_t> & atom_pair : atom_pairs )
 	{
 		const size_t iat1 = atom_pair.first;
 		const size_t iat2 = atom_pair.second;
@@ -1273,7 +1273,7 @@ void Exx_Lcao::add_Hexx( const size_t ik, const double alpha ) const
 }
 
 
-void Exx_Lcao::init_radial_table_ions( const set<size_t> &atom_centres_core, const std::vector<pair<size_t,size_t>> &atom_pairs_core )
+void Exx_Lcao::init_radial_table_ions( const set<size_t> &atom_centres_core, const std::vector<std::pair<size_t,size_t>> &atom_pairs_core )
 {
 	TITLE("Exx_Lcao::init_radial_table_ions");
 	
@@ -1378,7 +1378,7 @@ ofs_mpi<<"TIME@ m_abfslcaos_lcaos.init_radial_table\t"<<time_during(t_start)<<st
 	#endif
 gettimeofday( &t_start, NULL);
 	std::vector<Abfs::Vector3_Order<int>> Coulomb_potential_boxes = Abfs::get_Coulomb_potential_boxes(info.ccp_rmesh_times);
-	for( const pair<size_t,size_t> & atom_pair : atom_pairs_core )
+	for( const std::pair<size_t,size_t> & atom_pair : atom_pairs_core )
 	{
 		const size_t iat1 = atom_pair.first;
 		const size_t iat2 = atom_pair.second;

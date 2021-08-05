@@ -371,7 +371,7 @@ void Numerical_Orbital_Lm::use_uniform(const double &dr_uniform_in)
 #else	
 	if(GlobalV::MY_RANK==0)
 	{
-		stringstream ss;
+		std::stringstream ss;
 		ss << GlobalV::global_out_dir << this->label << "/"
 			<< this->label << "-" << orbital_type << ".ORBITAL_NOR_uniform.txt";
 
@@ -717,7 +717,7 @@ void Numerical_Orbital_Lm::plot(void)const
 #else
 	if(GlobalV::MY_RANK==0)
 	{
-		stringstream ssr, ssk, ssru ,ssdru; // 2013-08-10 pengfei
+		std::stringstream ssr, ssk, ssru ,ssdru; // 2013-08-10 pengfei
 		ssr << GlobalV::global_out_dir << this->label << "/"
 			<< this->label << "-"<< orbital_type << index_chi+1 << "-orbital-r.dat";
 

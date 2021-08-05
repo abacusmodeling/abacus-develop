@@ -220,7 +220,7 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Exx_A
 
 // Peize Lin test 2015-04-05
 {
-	stringstream ss;
+	std::stringstream ss;
 	ss<<T<<std::endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }		
@@ -228,7 +228,7 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Exx_A
 		{
 // Peize Lin test 2015-04-05
 {
-	stringstream ss;
+	std::stringstream ss;
 	ss<<" "<<IA<<std::endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }			
@@ -239,7 +239,7 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Exx_A
 				const int LA = co2.first;
 // Peize Lin test 2015-04-05
 {
-	stringstream ss;
+	std::stringstream ss;
 	ss<<"  "<<LA<<std::endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }				
@@ -247,7 +247,7 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Exx_A
 				{
 // Peize Lin test 2015-04-05
 {
-	stringstream ss;
+	std::stringstream ss;
 	ss<<"   "<<MA<<std::endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }					
@@ -255,7 +255,7 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Exx_A
 					{
 // Peize Lin test 2015-04-05
 {
-	stringstream ss;
+	std::stringstream ss;
 	ss<<"    "<<co3.first<<std::endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }						
@@ -263,7 +263,7 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Exx_A
 						{
 // Peize Lin test 2015-04-05
 {
-	stringstream ss;
+	std::stringstream ss;
 	ss<<"     "<<IB<<std::endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }							
@@ -274,7 +274,7 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Exx_A
 								const int LB = co4.first;
 // Peize Lin test 2015-04-05
 {
-	stringstream ss;
+	std::stringstream ss;
 	ss<<"      "<<LB<<std::endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }								
@@ -282,7 +282,7 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Exx_A
 								{
 // Peize Lin test 2015-04-05
 {
-	stringstream ss;
+	std::stringstream ss;
 	ss<<"       "<<MB<<std::endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }								
@@ -290,7 +290,7 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Exx_A
 									{
 // Peize Lin test 2015-04-05
 {
-	stringstream ss;
+	std::stringstream ss;
 	ss<<"        "<<co5.first<<std::endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }								

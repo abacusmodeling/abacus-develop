@@ -422,7 +422,7 @@ void Chi0_hilbert::Chi()
 			//------------------------
 			// nearest.dat
 			//------------------------
-			stringstream ss;
+			std::stringstream ss;
 			ss << GlobalV::global_out_dir <<"nearest.dat";
 			std::cout << ss.str().c_str() << std::endl;
 			std::ifstream ifsn(ss.str().c_str());
@@ -514,7 +514,7 @@ void Chi0_hilbert::Chi()
 				// readin overlap_q
 				//--------------------------------
 				//std::cout << "begin overlap"<<std::endl;
-				stringstream ssq;
+				std::stringstream ssq;
 				ssq << GlobalV::global_out_dir <<"q_"<<icount;
 				std::ifstream ifso(ssq.str().c_str());
 				if (!ifso)
@@ -1883,7 +1883,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 	
 	if(out_chi)
 	{
-		stringstream sschi;
+		std::stringstream sschi;
 		sschi << GlobalV::global_out_dir << "chi_"<<iq<<".dat";
 		std::ofstream ofschi(sschi.str().c_str());
 		for(int i=0;i<nomega;i++)
@@ -1895,7 +1895,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 	
 	if(out_epsilon)
 	{
-		stringstream sseps;
+		std::stringstream sseps;
 		sseps << GlobalV::global_out_dir << "Imeps^-1_"<<iq<<".dat";
 		std::ofstream ofseps(sseps.str().c_str());
 		ofseps<<"Energy(Ry)"<<"   "<<"-Im{epsilon^-1}"<<std::endl;
@@ -2542,7 +2542,7 @@ std::complex<double> Chi0_hilbert:: Cal_g(int iq)
 //----------------------------------------------------
 void Chi0_hilbert::plot_chi0(int iq)
 {
-	stringstream ss;
+	std::stringstream ss;
 	ss << GlobalV::global_out_dir <<"chi0"<<"_"<<iq<<".dat";
 	std::ofstream ofs(ss.str().c_str());
 	for(int i=0;i<nomega;i++)

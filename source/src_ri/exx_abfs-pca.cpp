@@ -16,7 +16,7 @@
 #include <sys/time.h>			// Peize Lin test
 #include "../src_lcao/global_fp.h"		// Peize Lin test
 
-std::vector<std::vector<pair<std::vector<double>,matrix>>> Exx_Abfs::PCA::cal_PCA( 
+std::vector<std::vector<std::pair<std::vector<double>,matrix>>> Exx_Abfs::PCA::cal_PCA( 
 	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &lcaos, 
 	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &abfs,
 	const double kmesh_times )
@@ -60,7 +60,7 @@ ofs<<range_abfs<<std::endl;
 
 	Exx_Abfs::Lmax = Lmax_bak;
 	
-	std::vector<std::vector<pair<std::vector<double>,matrix>>> eig(abfs.size());
+	std::vector<std::vector<std::pair<std::vector<double>,matrix>>> eig(abfs.size());
 	for( size_t T=0; T!=abfs.size(); ++T )
 	{
 		const matrix && A = m_abfslcaos_lcaos.cal_overlap_matrix(  

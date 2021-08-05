@@ -592,13 +592,13 @@ void LCAO_Hamilt::calculate_STN_R_sparse(const double &sparse_threshold)
 								double temp_value = GlobalC::LM.SlocR[index];
 								if (abs(temp_value) > sparse_threshold)
 								{
-									GlobalC::LM.SR_sparse[R_x][R_y][R_z][iw1_all].insert(pair<size_t, double>(iw2_all, temp_value));
+									GlobalC::LM.SR_sparse[R_x][R_y][R_z][iw1_all].insert(std::pair<size_t, double>(iw2_all, temp_value));
 								}
 
 								temp_value = GlobalC::LM.Hloc_fixedR[index];
 								if (abs(temp_value) > sparse_threshold)
 								{
-									GlobalC::LM.HR_sparse[R_x][R_y][R_z][iw1_all].insert(pair<size_t, double>(iw2_all, temp_value));
+									GlobalC::LM.HR_sparse[R_x][R_y][R_z][iw1_all].insert(std::pair<size_t, double>(iw2_all, temp_value));
 								}
                             }
                             else
@@ -606,13 +606,13 @@ void LCAO_Hamilt::calculate_STN_R_sparse(const double &sparse_threshold)
 								std::complex<double> temp_value = GlobalC::LM.SlocR_soc[index];
 								if(abs(temp_value) > sparse_threshold)
 								{
-									GlobalC::LM.SR_soc_sparse[R_x][R_y][R_z][iw1_all].insert(pair<size_t, std::complex<double>>(iw2_all, temp_value));
+									GlobalC::LM.SR_soc_sparse[R_x][R_y][R_z][iw1_all].insert(std::pair<size_t, std::complex<double>>(iw2_all, temp_value));
 								}
 
 								temp_value = GlobalC::LM.Hloc_fixedR_soc[index];
 								if(abs(temp_value) > sparse_threshold)
 								{
-									GlobalC::LM.HR_soc_sparse[R_x][R_y][R_z][iw1_all].insert(pair<size_t, std::complex<double>>(iw2_all, temp_value));
+									GlobalC::LM.HR_soc_sparse[R_x][R_y][R_z][iw1_all].insert(std::pair<size_t, std::complex<double>>(iw2_all, temp_value));
 								}
                             }
 

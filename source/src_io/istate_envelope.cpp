@@ -86,7 +86,7 @@ void IState_Envelope::begin(void)
 
 
 				GlobalC::CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09
-				stringstream ss;
+				std::stringstream ss;
 				ss << GlobalV::global_out_dir << "BAND" << ib + 1 << "_ENV" << is+1 << "_CHG";
 				// 0 means definitely output charge density.
 				bool for_plot = true;

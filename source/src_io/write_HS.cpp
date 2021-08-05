@@ -36,8 +36,8 @@ void HS_Matrix::save_HS_ccf(const int &iter, const int &Hnnz, const int *colptr_
 
     if(GlobalV::DRANK!=0)return;
     
-    stringstream ssh;
-    stringstream sss;
+    std::stringstream ssh;
+    std::stringstream sss;
 
     if(bit)
     {
@@ -113,8 +113,8 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
     timer::tick("HS_Matrix","save_HS_bit");
     OUT(GlobalV::ofs_running,"Dimension of H and S",GlobalV::NLOCAL);
 
-    stringstream ssh;
-    stringstream sss;
+    std::stringstream ssh;
+    std::stringstream sss;
 
     if(bit)
     {
@@ -303,7 +303,7 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
     //MPI_Comm_rank(DIAG_HPSEPS_WORLD,&myid);
 
     std::string H_fn;
-    stringstream H_fn2;
+    std::stringstream H_fn2;
     H_fn2<< "data-H-"  << GlobalV::DRANK ;
     H_fn=H_fn2.str();
     std::ofstream ofs_H;
@@ -311,7 +311,7 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
     ofs_H<<setprecision(8) << setw(12);
 
     std::string S_fn;
-    stringstream S_fn2;
+    std::stringstream S_fn2;
     S_fn2<< "data-S-"  << GlobalV::DRANK ;
     S_fn=S_fn2.str();
     std::ofstream ofs_S;
@@ -392,8 +392,8 @@ void HS_Matrix::save_HS_complex(std::complex<double> *H, std::complex<double> *S
     timer::tick("HS_Matrix","save_HS_bit");
     OUT(GlobalV::ofs_running,"Dimension of H and S",GlobalV::NLOCAL);
 
-    stringstream ssh;
-    stringstream sss;
+    std::stringstream ssh;
+    std::stringstream sss;
 
     if(bit)
     {
@@ -582,7 +582,7 @@ void HS_Matrix::save_HS_complex(std::complex<double> *H, std::complex<double> *S
         //MPI_Comm_rank(DIAG_HPSEPS_WORLD,&myid);
 
         std::string H_fn;
-        stringstream H_fn2;
+        std::stringstream H_fn2;
         H_fn2<< "data-H-"  << GlobalV::DRANK ;
         H_fn=H_fn2.str();
         std::ofstream ofs_H;
@@ -590,7 +590,7 @@ void HS_Matrix::save_HS_complex(std::complex<double> *H, std::complex<double> *S
         ofs_H<<setprecision(8) << setw(12);
 
         std::string S_fn;
-        stringstream S_fn2;
+        std::stringstream S_fn2;
         S_fn2<< "data-S-"  << GlobalV::DRANK ;
         S_fn=S_fn2.str();
         std::ofstream ofs_S;
@@ -653,8 +653,8 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
     TITLE("HS_Matrix","save_HSR_tr");
     timer::tick("HS_Matrix","save_HSR_tr");
 
-    stringstream ssh;
-    stringstream sss;
+    std::stringstream ssh;
+    std::stringstream sss;
 
     ssh << GlobalV::global_out_dir << "data-HR-tr_SPIN"<<current_spin;
     sss << GlobalV::global_out_dir << "data-SR-tr_SPIN"<<current_spin;
@@ -935,8 +935,8 @@ void HS_Matrix::save_HSR_sparse(const int &current_spin, const double &sparse_th
         }
     }
 
-    stringstream ssh;
-    stringstream sss;
+    std::stringstream ssh;
+    std::stringstream sss;
     ssh << GlobalV::global_out_dir << "data-HR-sparse_SPIN" << current_spin << ".csr";
     sss << GlobalV::global_out_dir << "data-SR-sparse_SPIN" << current_spin << ".csr";
     std::ofstream g1;
@@ -1088,7 +1088,7 @@ void HS_Matrix::output_single_R(std::ofstream &ofs, const std::map<size_t, std::
     indptr.reserve(GlobalV::NLOCAL + 1);
     indptr.push_back(0);
 
-    stringstream tem1;
+    std::stringstream tem1;
     tem1 << GlobalV::global_out_dir << "temp_sparse_indices.dat";
     std::ofstream ofs_tem1;
     std::ifstream ifs_tem1;
@@ -1197,7 +1197,7 @@ void HS_Matrix::output_soc_single_R(std::ofstream &ofs, const std::map<size_t, s
     indptr.reserve(GlobalV::NLOCAL + 1);
     indptr.push_back(0);
 
-    stringstream tem1;
+    std::stringstream tem1;
     tem1 << GlobalV::global_out_dir << "temp_sparse_indices.dat";
     std::ofstream ofs_tem1;
     std::ifstream ifs_tem1;

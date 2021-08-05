@@ -68,7 +68,7 @@ int WF_Local::read_lowf_complex(std::complex<double> **c, const int &ik, const b
 
     std::complex<double> **ctot;
 
-    stringstream ss;
+    std::stringstream ss;
 	// read wave functions
 	// write is in ../src_pdiag/pdiag_basic.cpp
     ss << GlobalV::global_out_dir << "LOWF_K_" << ik+1 <<".dat";
@@ -232,7 +232,7 @@ int WF_Local::read_lowf(double **c, const int &is)
 
     double **ctot;
 
-    stringstream ss;
+    std::stringstream ss;
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
 		// read wave functions

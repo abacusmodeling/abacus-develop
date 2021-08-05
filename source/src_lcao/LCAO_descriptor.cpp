@@ -385,7 +385,7 @@ void LCAO_Descriptor::cal_descriptor(void)
     //==========print preparation=============
     GlobalV::ofs_running << " print out each DM_inl" << std::endl;
     std::ofstream ofs;
-    stringstream ss;
+    std::stringstream ss;
     ss << winput::spillage_outdir << "/"
        << "projected_DM.dat";
     if (GlobalV::MY_RANK == 0)
@@ -489,7 +489,7 @@ void LCAO_Descriptor::print_descriptor(void)
 {
     TITLE("LCAO_Descriptor", "print_descriptor");
     std::ofstream ofs;
-    stringstream ss;
+    std::stringstream ss;
     // the parameter 'winput::spillage_outdir' is read from INPUTw.
     ss << winput::spillage_outdir << "/"
        << "descriptor.dat";
@@ -818,7 +818,7 @@ void LCAO_Descriptor::print_H_V_delta()
 {
     TITLE("LCAO_Descriptor", "print_H_V_delta");
     std::ofstream ofs;
-    stringstream ss;
+    std::stringstream ss;
     // the parameter 'winput::spillage_outdir' is read from INPUTw.
     ss << winput::spillage_outdir << "/"
        << "H_V_delta.dat";
@@ -854,7 +854,7 @@ void LCAO_Descriptor::print_F_delta()
 {
     TITLE("LCAO_Descriptor", "print_F_delta");
     std::ofstream ofs;
-    stringstream ss;
+    std::stringstream ss;
     // the parameter 'winput::spillage_outdir' is read from INPUTw.
     ss << winput::spillage_outdir << "/"
        << "F_delta.dat";

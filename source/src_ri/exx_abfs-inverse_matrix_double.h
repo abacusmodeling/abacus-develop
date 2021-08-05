@@ -16,32 +16,32 @@ public:
 	void init( const int &dim_in);
 	
 	void input( const matrix &m );
-	void input( const shared_ptr<matrix> &pm ) { input(*pm); }
+	void input( const std::shared_ptr<matrix> &pm ) { input(*pm); }
 	void input( 
 		const matrix &m_00,
 		const matrix &m_01,
 		const matrix &m_10,
 		const matrix &m_11);
 	void input( 
-		const shared_ptr<matrix> &pm_00,
-		const shared_ptr<matrix> &pm_01,
-		const shared_ptr<matrix> &pm_10,
-		const shared_ptr<matrix> &pm_11) { input( *pm_00, *pm_01, *pm_10, *pm_11 ); }
+		const std::shared_ptr<matrix> &pm_00,
+		const std::shared_ptr<matrix> &pm_01,
+		const std::shared_ptr<matrix> &pm_10,
+		const std::shared_ptr<matrix> &pm_11) { input( *pm_00, *pm_01, *pm_10, *pm_11 ); }
 		
 	void cal_inverse( const Method &method );
 
 	void output( matrix &m ) const;
-	void output( const shared_ptr<matrix> &pm ) const { output(*pm); }
+	void output( const std::shared_ptr<matrix> &pm ) const { output(*pm); }
 	void output( 
 		matrix &m_00,
 		matrix &m_01,
 		matrix &m_10,
 		matrix &m_11) const;
 	void output( 
-		const shared_ptr<matrix> &pm_00,
-		const shared_ptr<matrix> &pm_01,
-		const shared_ptr<matrix> &pm_10,
-		const shared_ptr<matrix> &pm_11) const { output( *pm_00, *pm_01, *pm_10, *pm_11 ); }
+		const std::shared_ptr<matrix> &pm_00,
+		const std::shared_ptr<matrix> &pm_01,
+		const std::shared_ptr<matrix> &pm_10,
+		const std::shared_ptr<matrix> &pm_11) const { output( *pm_00, *pm_01, *pm_10, *pm_11 ); }
 
 private:
 

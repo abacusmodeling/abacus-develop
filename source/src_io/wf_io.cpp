@@ -61,7 +61,7 @@ void WF_io::write_wfc2(const std::string &fn, const ComplexMatrix *psi, const Ve
     wfilename=new std::string[GlobalC::kv.nkstot];
     for(int ik=0;ik<GlobalC::kv.nkstot;ik++)
     {
-        stringstream wfss;
+        std::stringstream wfss;
         if(GlobalC::wf.out_wf==1)
             wfss<<fn<<ik+1<<".txt";
         else

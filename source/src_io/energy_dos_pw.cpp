@@ -24,7 +24,7 @@ void energy::perform_dos_pw(void)
 	//qianrui modify 2020-10-18
 	if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax")
 	{
-		stringstream ss;
+		std::stringstream ss;
 		ss << GlobalV::global_out_dir << "istate.info" ;
 		if(GlobalV::MY_RANK==0)
 		{
@@ -145,7 +145,7 @@ void energy::perform_dos_pw(void)
 	 	for(int is=0; is<nspin0; ++is)
 	 	{
 //DOS_ispin contains not smoothed dos
-			 stringstream ss;
+			 std::stringstream ss;
 			 ss << GlobalV::global_out_dir << "DOS" << is+1;
 
 			 Dos::calculate_dos(
@@ -223,7 +223,7 @@ void energy::perform_dos_pw(void)
 		 //----------------------------------------------------------
 		 // EXPLAIN : output DOS2.txt
 		 //----------------------------------------------------------
-		 stringstream sss;
+		 std::stringstream sss;
 		 sss << GlobalV::global_out_dir << "DOS" << is+1 << "_smearing" << ".dat" ;
 		 std::ofstream out(sss.str().c_str());
 		 double sum2=0.0;
@@ -266,7 +266,7 @@ void energy::perform_dos_pw(void)
 
 		for(int is=0; is<nspin0; is++)
 		{
-			stringstream ss2;
+			std::stringstream ss2;
 			ss2 << GlobalV::global_out_dir << "BANDS_" << is+1 << ".dat";
 			GlobalV::ofs_running << "\n Output bands in file: " << ss2.str() << std::endl;
 			Dos::nscf_band(is, ss2.str(), nks, GlobalV::NBANDS, this->ef*0, GlobalC::wf.ekb);

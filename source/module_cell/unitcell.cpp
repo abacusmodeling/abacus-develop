@@ -173,7 +173,7 @@ void UnitCell::print_cell_cif(const std::string &fn)const
 	
 	if(GlobalV::MY_RANK!=0) return;//xiaohui add 2015-03-15
 
-	stringstream ss;
+	std::stringstream ss;
 	ss << GlobalV::global_out_dir << fn;
 	
 	std::ofstream ofs( ss.str().c_str() );
@@ -226,7 +226,7 @@ void UnitCell::print_cell_xyz(const std::string &fn)const
 
 	if(GlobalV::MY_RANK!=0) return;//xiaohui add 2015-03-15
 
-    stringstream ss;
+    std::stringstream ss;
     ss << GlobalV::global_out_dir << fn;
 
     std::ofstream ofs( ss.str().c_str() );

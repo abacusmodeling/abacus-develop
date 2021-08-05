@@ -27,7 +27,7 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 		{
 			ifa >> atom_label[i] >> atom_mass[i];
 			
-			stringstream ss;
+			std::stringstream ss;
 			ss << "atom label for species " << i+1;
 			OUT(ofs_running,ss.str(),atom_label[i]);	
 			READ_VALUE(ifa, pseudo_fn[i]);
@@ -486,7 +486,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 					{
 						READ_VALUE(ifs, this->atoms[it].l_nchi[L]);
 						this->atoms[it].nw += (2*L + 1) * this->atoms[it].l_nchi[L];
-						stringstream ss;
+						std::stringstream ss;
 						ss << "L=" << L << ", number of zeta";
 						OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
 						L++;
@@ -495,7 +495,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 					{
 						READ_VALUE(ifs, this->atoms[it].l_nchi[L]);
 						this->atoms[it].nw += (2*L + 1) * this->atoms[it].l_nchi[L];
-						stringstream ss;
+						std::stringstream ss;
 						ss << "L=" << L << ", number of zeta";
 						OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
 						L++;
@@ -504,7 +504,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 					{
 						READ_VALUE(ifs, this->atoms[it].l_nchi[L]);
 						this->atoms[it].nw += (2*L + 1) * this->atoms[it].l_nchi[L];
-						stringstream ss;
+						std::stringstream ss;
 						ss << "L=" << L << ", number of zeta";
 						OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
 						L++;
@@ -513,7 +513,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 					{
 						READ_VALUE(ifs, this->atoms[it].l_nchi[L]);
 						this->atoms[it].nw += (2*L + 1) * this->atoms[it].l_nchi[L];
-						stringstream ss;
+						std::stringstream ss;
 						ss << "L=" << L << ", number of zeta";
 						OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
 						L++;
@@ -522,7 +522,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 					{
 						READ_VALUE(ifs, this->atoms[it].l_nchi[L]);
 						this->atoms[it].nw += (2*L + 1) * this->atoms[it].l_nchi[L];
-						stringstream ss;
+						std::stringstream ss;
 						ss << "L=" << L << ", number of zeta";
 						OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
 						L++;
@@ -550,7 +550,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 					this->atoms[it].l_nchi[L] = 1;
 					// calculate the number of local basis(3D)
 					this->atoms[it].nw += (2*L + 1) * this->atoms[it].l_nchi[L];
-					stringstream ss;
+					std::stringstream ss;
 					ss << "L=" << L << ", number of zeta";
 					OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
 				}
@@ -935,7 +935,7 @@ void UnitCell_pseudo::print_tau(void)const
         {
             for (int ia = 0; ia < atoms[it].na; ia++)
             {
-                stringstream ss;
+                std::stringstream ss;
                 ss << "tauc_" << atoms[it].label << ia+1;
 
                 GlobalV::ofs_running << " " << setw(12) << ss.str()
@@ -983,7 +983,7 @@ void UnitCell_pseudo::print_tau(void)const
         {
             for (int ia = 0; ia < atoms[it].na; ia++)
             {
-                stringstream ss;
+                std::stringstream ss;
                 ss << "taud_" << atoms[it].label << ia+1;
 
                 GlobalV::ofs_running << " " << setw(12) << ss.str()

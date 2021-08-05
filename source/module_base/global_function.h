@@ -34,7 +34,7 @@ void OUT(std::ofstream &ofs,const std::string &name);
 template <class T>
 void OUT(std::ofstream &ofs,const std::string &name,const T &a)
 {
-	stringstream name2;
+	std::stringstream name2;
 	name2 << name ;
     ofs<< " " << setw(40) << name2.str() << " = " << a <<std::endl;
 //	ofs << " " << name << a << std::endl;
@@ -44,7 +44,7 @@ void OUT(std::ofstream &ofs,const std::string &name,const T &a)
 template <class T>
 void OUT(std::ofstream &ofs,const std::string &name,const T &x, const T&y)
 {
-	stringstream name2;
+	std::stringstream name2;
 	name2 << "[" << name << "]";
     ofs<< " " << setw(40) <<name2.str() << " = " << x << ", " << y << std::endl;
 //	ofs << " " << name << a << std::endl;
@@ -54,7 +54,7 @@ void OUT(std::ofstream &ofs,const std::string &name,const T &x, const T&y)
 template <class T>
 void OUT(std::ofstream &ofs,const std::string &name,const T &x, const T &y, const T &z)
 {
-	stringstream name2;
+	std::stringstream name2;
 	name2 << "[" << name << "]";
     ofs<< " " << setw(40) <<name2.str() << " = " << x << ", " << y << ", " << z << std::endl;
     return;

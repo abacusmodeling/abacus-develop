@@ -11,17 +11,17 @@
 class Exx_Abfs::Parallel::Distribute::Htime
 {
 public:
-	static std::vector<pair<size_t,size_t>> distribute( 
+	static std::vector<std::pair<size_t,size_t>> distribute( 
 		const Abfs::Vector3_Order<int> & Born_von_Karman_period,
 		const double rmesh_times );
 private:
 	static std::vector<size_t> cal_Nadj( 
 		const Abfs::Vector3_Order<int> & Born_von_Karman_period );
-	static std::vector<pair<size_t,pair<size_t,size_t>>> cal_pair_costs( 
+	static std::vector<std::pair<size_t,std::pair<size_t,size_t>>> cal_pair_costs( 
 		const std::vector<size_t> &Nadj,
 		const double rmesh_times );
-	static std::vector<std::vector<pair<size_t,size_t>>> cal_rank_work( 
-		const std::vector<pair<size_t,pair<size_t,size_t>>> & pair_costs );
+	static std::vector<std::vector<std::pair<size_t,size_t>>> cal_rank_work( 
+		const std::vector<std::pair<size_t,std::pair<size_t,size_t>>> & pair_costs );
 };
 
 #endif

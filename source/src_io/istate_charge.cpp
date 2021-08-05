@@ -74,7 +74,7 @@ void IState_Charge::begin(void)
 	else if(mode == 2)
 	{
 		bool stop = false;
-		stringstream ss;
+		std::stringstream ss;
 		ss << GlobalV::global_out_dir << "istate.info";
 		std::cout << " Open the file : " << ss.str() << std::endl; 
 		if(GlobalV::MY_RANK==0)
@@ -129,8 +129,8 @@ void IState_Charge::begin(void)
 			// band.
    			GlobalC::UHM.GG.cal_rho(GlobalC::LOC.DM);
 			GlobalC::CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09
-			stringstream ss;
-			stringstream ss1;
+			std::stringstream ss;
+			std::stringstream ss1;
 			ss << GlobalV::global_out_dir << "BAND" << ib + 1 << "_CHG";
 			// 0 means definitely output charge density.
 			for(int is=0; is<GlobalV::NSPIN; is++)

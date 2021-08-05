@@ -207,7 +207,7 @@ void Bessel_Basis::init_TableOne(
 	
 	//caoyu add 2021-3-10
 	//=========output .orb format=============
-	stringstream ss;
+	std::stringstream ss;
 	ss << GlobalV::global_out_dir << "jle.orb";
 	std::ofstream ofs(ss.str().c_str());
 	ofs << "---------------------------------------------------------------------------"<< std::endl;
@@ -278,7 +278,7 @@ void Bessel_Basis::init_TableOne(
 			}
 
 			//====== output ========
-//			stringstream ss;
+//			std::stringstream ss;
 //			ss << GlobalV::global_out_dir << l << "." << ie << ".txt";
 //			std::ofstream ofs(ss.str().c_str());
 

@@ -321,7 +321,7 @@ void Grid_BigCell::grid_expansion_index(bool f2normal, int *target)const
 	TITLE("Grid_BigCell","grid_expansion_index");
 	timer::tick("Grid_BigCell","grid_expansion_index");
 //	std::cout << " ncx=" << ncx << " ncy=" << ncy << " ncz=" << ncz << std::endl;
-//	stringstream ss;
+//	std::stringstream ss;
 //	ss << GlobalV::global_out_dir << "expand_grid.dat";
 //	std::ofstream ofs(ss.str().c_str());
 	

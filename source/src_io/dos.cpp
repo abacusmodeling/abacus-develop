@@ -64,10 +64,10 @@ void Dos::calculate_Mulliken(const std::string &fa)
 					for(int m=0; m<2*l+1; ++m)
 					{
 						if(l==0) ofs << setw(12) << "s";
-						else if(l==1){ stringstream ss;ss << "p" << m+1;ofs << setw(12) << ss.str(); }
-						else if(l==2){ stringstream ss;ss << "d" << m+1;ofs << setw(12) << ss.str(); }
-						else if(l==3){ stringstream ss;ss << "f" << m+1;ofs << setw(12) << ss.str(); }
-						else if(l==4){ stringstream ss;ss << "g" << m+1;ofs << setw(12) << ss.str(); }
+						else if(l==1){ std::stringstream ss;ss << "p" << m+1;ofs << setw(12) << ss.str(); }
+						else if(l==2){ std::stringstream ss;ss << "d" << m+1;ofs << setw(12) << ss.str(); }
+						else if(l==3){ std::stringstream ss;ss << "f" << m+1;ofs << setw(12) << ss.str(); }
+						else if(l==4){ std::stringstream ss;ss << "g" << m+1;ofs << setw(12) << ss.str(); }
 					}
 				} 
 

@@ -310,7 +310,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		// output for tmp.
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
-			stringstream ssc;
+			std::stringstream ssc;
 			ssc << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG";
 			GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, iter, ssc.str(), 3);//mohan add 2007-10-17
 		}
@@ -331,7 +331,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
         {
 			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
-        		stringstream ssc;
+        		std::stringstream ssc;
         		ssc << GlobalV::global_out_dir << "SPIN" << is + 1 << "_CHG";
         		GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, 0, ssc.str() );//mohan add 2007-10-17
 			}

@@ -421,7 +421,7 @@ void ORB_table_alpha::print_Table_DSR(void)
 	NEW_PART("Overlap table S between lcao orbital and descriptor basis : S_{I_mu_alpha}");
 
 	std::ofstream ofs;
-	stringstream ss;
+	std::stringstream ss;
 	// the parameter 'winput::spillage_outdir' is read from INPUTw.
 	ss << "./S_I_mu_alpha.dat";
 	if (GlobalV::MY_RANK == 0)

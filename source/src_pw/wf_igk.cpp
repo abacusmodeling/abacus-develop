@@ -95,7 +95,7 @@ int WF_igk::setupIndGk(const PW_Basis &pwb,const int nks)
 	bool out_gk =0; //DIY! mohan 2011-10-03
 	if(out_gk)
 	{
-		stringstream ss;
+		std::stringstream ss;
 		ss << GlobalV::global_out_dir << "PW_GK" << GlobalV::MY_RANK+1 << ".dat";
 		std::ofstream ofs( ss.str().c_str() );
 		ofs << GlobalC::pw.ggpsi << " (ggpsi, Ry)" << std::endl;

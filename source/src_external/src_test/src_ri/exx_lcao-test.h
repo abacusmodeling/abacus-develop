@@ -34,10 +34,10 @@ inline double time_cut(timeval &t)
 
 inline size_t get_sizeof( const matrix & m ){	return sizeof(double)*m.nr*m.nc; }
 inline size_t get_sizeof( const ComplexMatrix & m ){	return sizeof(double)*m.nr*m.nc; }
-inline size_t get_sizeof( const shared_ptr<matrix> & m ){	return sizeof(matrix)+sizeof(double)*m->nr*m->nc; }
-inline size_t get_sizeof( const shared_ptr<ComplexMatrix> & m ){	return sizeof(ComplexMatrix)+sizeof(double)*m->nr*m->nc; }
-inline size_t get_sizeof( const weak_ptr<matrix> & m ){	return sizeof(matrix)+sizeof(double)*m.lock()->nr*m.lock()->nc; }
-inline size_t get_sizeof( const weak_ptr<ComplexMatrix> & m ){	return sizeof(ComplexMatrix)+sizeof(double)*m.lock()->nr*m.lock()->nc; }
+inline size_t get_sizeof( const std::shared_ptr<matrix> & m ){	return sizeof(matrix)+sizeof(double)*m->nr*m->nc; }
+inline size_t get_sizeof( const std::shared_ptr<ComplexMatrix> & m ){	return sizeof(ComplexMatrix)+sizeof(double)*m->nr*m->nc; }
+inline size_t get_sizeof( const std::weak_ptr<matrix> & m ){	return sizeof(matrix)+sizeof(double)*m.lock()->nr*m.lock()->nc; }
+inline size_t get_sizeof( const std::weak_ptr<ComplexMatrix> & m ){	return sizeof(ComplexMatrix)+sizeof(double)*m.lock()->nr*m.lock()->nc; }
 template<typename T> static size_t get_sizeof( const std::vector<T> & v )
 {
 	size_t length = sizeof(T)*v.size();
@@ -84,7 +84,7 @@ static void ofs_matrixes( const std::string & file_name, const std::vector<T> &m
 	ofs.close();
 }
 template<typename T>
-static void ofs_matrixes( const std::string & file_name, const weak_ptr<T> & ms, const bool flag_print_content=true )
+static void ofs_matrixes( const std::string & file_name, const std::weak_ptr<T> & ms, const bool flag_print_content=true )
 {
 	std::ofstream ofs(file_name,std::ofstream::app);
 	if(flag_print_content)
@@ -92,7 +92,7 @@ static void ofs_matrixes( const std::string & file_name, const weak_ptr<T> & ms,
 	ofs.close();
 }
 template<typename T>
-static void ofs_matrixes( const std::string & file_name, const shared_ptr<T> & ms, const bool flag_print_content=true )
+static void ofs_matrixes( const std::string & file_name, const std::shared_ptr<T> & ms, const bool flag_print_content=true )
 {
 	std::ofstream ofs(file_name,std::ofstream::app);
 	if(flag_print_content)
@@ -116,7 +116,7 @@ static void ofs_matrixes( const std::string & file_name, const ComplexMatrix & m
 
 /*
 template<typename T1, typename T2, typename T3, typename M>
-static void ofs_matrixes( const std::string & file_name, const std::map<T1,std::map<T2,std::map<T3,weak_ptr<M>>>> & ms, const bool flag_print_content=true )
+static void ofs_matrixes( const std::string & file_name, const std::map<T1,std::map<T2,std::map<T3,std::weak_ptr<M>>>> & ms, const bool flag_print_content=true )
 {
 	std::ofstream ofs(file_name,std::ofstream::app);
 	for( const auto &m1 : ms )
@@ -142,7 +142,7 @@ static void ofs_matrixes( const std::string & file_name, const std::map<T1,std::
 }
 
 template<typename T1, typename T2, typename T3, typename M>
-static void ofs_matrixes( const std::string & file_name, const std::map<T1,std::map<T2,std::map<T3,shared_ptr<M>>>> & ms, const bool flag_print_content=true )
+static void ofs_matrixes( const std::string & file_name, const std::map<T1,std::map<T2,std::map<T3,std::shared_ptr<M>>>> & ms, const bool flag_print_content=true )
 {
 	std::ofstream ofs(file_name,std::ofstream::app);
 	for( const auto &m1 : ms )

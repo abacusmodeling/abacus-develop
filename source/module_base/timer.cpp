@@ -103,7 +103,7 @@ void timer::print_all(std::ofstream &ofs)
 	constexpr double small = 0.1; // cpu = 10^6
 	// if want to print > 1s , set small = 10^6
 	
-	std::vector<pair<pair<std::string,std::string>,Timer_One>> timer_pool_order;
+	std::vector<std::pair<std::pair<std::string,std::string>,Timer_One>> timer_pool_order;
 	for(auto &timer_pool_A : timer_pool)
 	{
 		const std::string class_name = timer_pool_A.first;
@@ -114,7 +114,7 @@ void timer::print_all(std::ofstream &ofs)
 			if(timer_pool_order.size() < timer_one.order+1)
 				timer_pool_order.resize(timer_one.order+1);
 			//timer_pool_order[timer_one.order] = {{class_name, name}, timer_one}; //qianrui change it to make it compatible with old compiler version
-			timer_pool_order[timer_one.order] = pair<pair<std::string,std::string>, Timer_One> {pair<std::string,std::string >{class_name,name}, timer_one};
+			timer_pool_order[timer_one.order] = std::pair<std::pair<std::string,std::string>, Timer_One> {std::pair<std::string,std::string >{class_name,name}, timer_one};
 		}
 	}
 	

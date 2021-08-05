@@ -27,7 +27,7 @@ void Wavefunc_in_pw::make_table_q(
 		}
 		else
 		{
-			stringstream ss;
+			std::stringstream ss;
 			ss << "Orbital of species " << GlobalC::ucell.atoms[it].label;
 			OUT(GlobalV::ofs_running,ss.str(),fn[it]);
 		}
@@ -152,7 +152,7 @@ void Wavefunc_in_pw::make_table_q(
 	{
 		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			stringstream ss;
+			std::stringstream ss;
 			ss << GlobalV::global_out_dir << GlobalC::ucell.atoms[it].label << "/LOCAL_G.dat";
 			std::ofstream ofs(ss.str().c_str());
 			for(int iq=0; iq<GlobalV::NQX; iq++)

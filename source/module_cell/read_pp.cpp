@@ -105,7 +105,7 @@ int Pseudopot_upf::set_pseudo_type(const std::string &fn) //zws add
 	{
 		getline(pptype_ifs,dummy);
 
-		stringstream wdsstream(dummy);
+		std::stringstream wdsstream(dummy);
 		getline(wdsstream,strversion,'"');
 		getline(wdsstream,strversion,'"');
 

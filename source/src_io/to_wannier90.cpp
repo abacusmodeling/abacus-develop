@@ -353,7 +353,7 @@ void toWannier90::writeUNK(const ComplexMatrix *wfc_pw)
 	
 	for(int ik = start_k_index; ik < (cal_num_kpts+start_k_index); ik++)
 	{
-		stringstream name;
+		std::stringstream name;
 		if(GlobalV::NSPIN==1 || GlobalV::NSPIN==4)
 		{
 			name << GlobalV::global_out_dir << "UNK" << setw(5) << setfill('0') << ik+1 << ".1" ;
@@ -471,7 +471,7 @@ void toWannier90::writeUNK(const ComplexMatrix *wfc_pw)
 			
 			if(GlobalV::MY_RANK == 0)
 			{
-				stringstream name;
+				std::stringstream name;
 				if(GlobalV::NSPIN==1 || GlobalV::NSPIN==4)
 				{
 					name << GlobalV::global_out_dir << "UNK" << setw(5) << setfill('0') << ik+1 << ".1" ;

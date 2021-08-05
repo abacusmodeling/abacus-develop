@@ -254,7 +254,7 @@ void DFTU::init(
 
 	if(GlobalV::CALCULATION=="nscf")
 	{
-		stringstream sst; 
+		std::stringstream sst; 
 		sst << GlobalV::global_out_dir << "onsite.dm"; 
 		this->read_occup_m( sst.str() );
 		this->local_occup_bcast();		
@@ -263,7 +263,7 @@ void DFTU::init(
 	{
 		if(INPUT.omc) 
 		{
-			stringstream sst; 
+			std::stringstream sst; 
 			sst << "initial_onsite.dm"; 
 			this->read_occup_m( sst.str() );
 			this->local_occup_bcast();

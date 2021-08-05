@@ -83,7 +83,7 @@ void Ions_Move_Basic::move_atoms(double *move, double *pos)
 		{
 			for(int ia =0;ia< GlobalC::ucell.atoms[it].na;ia++)
 			{
-				stringstream ss;
+				std::stringstream ss;
 				ss << "move_" << GlobalC::ucell.atoms[it].label << ia+1;
 				GlobalV::ofs_running << " " 
 					<< setw(12) << ss.str().c_str()

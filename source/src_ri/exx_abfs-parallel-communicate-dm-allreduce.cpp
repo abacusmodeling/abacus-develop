@@ -13,7 +13,7 @@ Exx_Abfs::Parallel::Communicate::DM::Allreduce::Allreduce(
 	const MPI_Comm & mpi_comm_in, 
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local_in,
 	const Abfs::Vector3_Order<int> &Born_von_Karman_period,
-	const set<pair<size_t,size_t>> &H_atom_pairs_core)
+	const set<std::pair<size_t,size_t>> &H_atom_pairs_core)
 	:mpi_comm(mpi_comm_in),
 	 data_local(data_local_in),
 	 lock_insert(ATOMIC_FLAG_INIT),
@@ -26,8 +26,8 @@ Exx_Abfs::Parallel::Communicate::DM::Allreduce::Allreduce(
 		for( int iy=0; iy!=Born_von_Karman_period.y; ++iy )
 			for( int iz=0; iz!=Born_von_Karman_period.z; ++iz )
 				Born_Von_Karman_boxes.insert({ix,iy,iz});
-	for( const auto pair : H_atom_pairs_core )
-		atom_unset[pair.first][pair.second] = Born_Von_Karman_boxes;
+	for( const auto std::pair : H_atom_pairs_core )
+		atom_unset[std::pair.first][std::pair.second] = Born_Von_Karman_boxes;
 
 	MPI_Comm_size( mpi_comm, &comm_sz );
 	MPI_Comm_rank( mpi_comm, &my_rank );

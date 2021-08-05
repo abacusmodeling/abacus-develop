@@ -160,8 +160,8 @@ void Run_MD_LCAO::opt_ions(void)
 
         if(GlobalC::pot.out_potential == 2)
         {
-            stringstream ssp;
-            stringstream ssp_ave;
+            std::stringstream ssp;
+            std::stringstream ssp_ave;
             ssp << GlobalV::global_out_dir << "ElecStaticPot";
             ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
             GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
@@ -193,7 +193,7 @@ void Run_MD_LCAO::opt_ions(void)
         {
             double etime_min = difftime(eend, estart)/60.0;
             double ftime_min = difftime(fend, fstart)/60.0;
-            stringstream ss;
+            std::stringstream ss;
             ss << GlobalV::MOVE_IONS << istep;
 
             std::cout << setiosflags(ios::scientific)

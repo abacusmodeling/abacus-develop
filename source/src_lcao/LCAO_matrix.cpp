@@ -568,7 +568,7 @@ void LCAO_Matrix::update_Hloc2(void)
 void LCAO_Matrix::output_HSk(const char &mtype, std::string &fn)
 {
 	TITLE("LCAO_Matrix","output_HSk");
-	stringstream ss;
+	std::stringstream ss;
 	ss << GlobalV::global_out_dir << fn;
 	std::ofstream ofs(ss.str().c_str());
 	ofs << GlobalV::NLOCAL << std::endl;

@@ -80,7 +80,7 @@ void Global_File::make_dir_out(
 	MPI_Barrier(MPI_COMM_WORLD);
 #endif
 
-    stringstream ss,ss1;
+    std::stringstream ss,ss1;
 
     // mohan add 2010-09-12
     if(out_alllog)
@@ -109,7 +109,7 @@ void Global_File::make_dir_atom(const std::string &label)
 //----------------------------------------------------------
 // EXPLAIN : generate atom dir for each type of atom
 //----------------------------------------------------------
-    stringstream ss;
+    std::stringstream ss;
     ss << GlobalV::global_out_dir << label << "/";
 
     std::string command1 = "test -d " + ss.str() + " || mkdir " + ss.str();
@@ -123,7 +123,7 @@ void Global_File::open_log(std::ofstream &ofs,const std::string &fn)
 // USE GLOBAL VARIABLE :
 // GlobalV::global_out_dir : (default dir to store "*.log" file)
 //----------------------------------------------------------
-    stringstream ss;
+    std::stringstream ss;
     ss << GlobalV::global_out_dir << fn << ".log";
 
     ofs.open( ss.str().c_str() );
@@ -154,7 +154,7 @@ void Global_File::close_all_log(const int rank, const bool out_alllog)
 //----------------------------------------------------------
 
 	// mohan update 2011-01-13
-    stringstream ss;
+    std::stringstream ss;
 	if(out_alllog)
 	{
     	ss << "running_" << GlobalV::CALCULATION << "_cpu" << rank << ".log";

@@ -12,7 +12,7 @@
 
 void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::init(
 	const MPI_Comm &mpi_comm_in,
-	const set<pair<size_t,size_t>> &H_atom_pairs_core)
+	const set<std::pair<size_t,size_t>> &H_atom_pairs_core)
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::init");
 	
@@ -50,7 +50,7 @@ timeval t_all;	gettimeofday(&t_all,NULL);
 	auto rank_send_next = [&]()->int{ return (rank_send_now+1)%comm_sz; };
 //ofs<<__LINE__<<std::endl;
 
-	atomic_flag lock_insert = ATOMIC_FLAG_INIT;
+	std::atomic_flag lock_insert = ATOMIC_FLAG_INIT;
 	std::vector<thread> threads;
 	std::vector<MPI_Request>requests_isend(comm_sz);
 	std::vector<MPI_Request>requests_irecv(comm_sz);
@@ -162,8 +162,8 @@ ofs<<"all\t\t"<<cal_time(t_all)<<std::endl;
 
 // the upper limit of size sended to each process
 std::vector<size_t> Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::get_send_size_list(
-	const set<pair<size_t,size_t>> &H_atom_pairs_core,
-	const std::vector<pair<std::vector<bool>,std::vector<bool>>> &atom_in_2D_list) const
+	const set<std::pair<size_t,size_t>> &H_atom_pairs_core,
+	const std::vector<std::pair<std::vector<bool>,std::vector<bool>>> &atom_in_2D_list) const
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::get_send_size_list");
 	std::vector<size_t> send_size_list(comm_sz,0);
@@ -286,7 +286,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::recv_data_process(
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_all,
 	std::vector<valarray<double>> &iarps_irecv,
 	std::vector<atomic<Flag_Recv>> &flags_recv,
-	atomic_flag &lock_insert) const
+	std::atomic_flag &lock_insert) const
 {
 std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"Hmpi_"+TO_STRING(my_rank), std::ofstream::app);
 timeval t;	gettimeofday(&t, NULL);	

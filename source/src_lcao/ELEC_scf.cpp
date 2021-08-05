@@ -451,11 +451,11 @@ void ELEC_scf::scf(const int &istep)
 		{
 			const int precision = 3;
 
-			stringstream ssc;
+			std::stringstream ssc;
 			ssc << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG";
 			GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, iter, ssc.str(), precision );//mohan add 2007-10-17
 
-			stringstream ssd;
+			std::stringstream ssd;
 
 			if(GlobalV::GAMMA_ONLY_LOCAL)
 			{
@@ -469,7 +469,7 @@ void ELEC_scf::scf(const int &istep)
 
 			//LiuXh modify 20200701
 			/*
-			stringstream ssp;
+			std::stringstream ssp;
 			ssp << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_POT";
 			GlobalC::pot.write_potential( is, iter, ssp.str(), GlobalC::pot.vr, precision );
 			*/
@@ -522,7 +522,7 @@ void ELEC_scf::scf(const int &istep)
 			{
 				if(GlobalC::CHR.out_charge)
 				{
-					stringstream sst;
+					std::stringstream sst;
 					sst << GlobalV::global_out_dir << "onsite.dm";
 					GlobalC::dftu.write_occup_m( sst.str() );
 				}
@@ -532,11 +532,11 @@ void ELEC_scf::scf(const int &istep)
 			{
 				const int precision = 3;
 
-				stringstream ssc;
+				std::stringstream ssc;
 				ssc << GlobalV::global_out_dir << "SPIN" << is + 1 << "_CHG";
 				GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, 0, ssc.str() );//mohan add 2007-10-17
 
-				stringstream ssd;
+				std::stringstream ssd;
 				if(GlobalV::GAMMA_ONLY_LOCAL)
 				{
 					ssd << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DM";
@@ -549,7 +549,7 @@ void ELEC_scf::scf(const int &istep)
 
 				if(GlobalC::pot.out_potential == 1) //LiuXh add 20200701
 				{
-					stringstream ssp;
+					std::stringstream ssp;
 					ssp << GlobalV::global_out_dir << "SPIN" << is + 1 << "_POT";
 					GlobalC::pot.write_potential( is, 0, ssp.str(), GlobalC::pot.vr_eff, precision );
 				}
@@ -557,7 +557,7 @@ void ELEC_scf::scf(const int &istep)
 				//LiuXh modify 20200701
 				/*
 				//fuxiang add 2017-03-15
-				stringstream sse;
+				std::stringstream sse;
 				sse << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DIPOLE_ELEC";
 				GlobalC::CHR.write_rho_dipole(GlobalC::CHR.rho_save, is, 0, sse.str());
 				*/

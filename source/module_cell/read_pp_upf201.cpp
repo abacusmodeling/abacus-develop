@@ -68,7 +68,7 @@ int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 				nlcc = false;
 		}
 		else if(name[ip]=="functional"){
-			stringstream wdsstream(val[ip]);
+			std::stringstream wdsstream(val[ip]);
 			for( int idft = 0; idft < 4; idft++ )
 			{
 				getline(wdsstream,dft[idft],'-');
@@ -431,7 +431,7 @@ int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 			READ_VALUE(ifs, word);   // comment
 
 			READ_VALUE(ifs, word);   // element
-			stringstream wdsstream(word);
+			std::stringstream wdsstream(word);
 			getline(wdsstream,this->psd,'"'); 
 			getline(wdsstream,this->psd,'"'); 
 

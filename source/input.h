@@ -284,7 +284,7 @@ class Input
 	std::string vdw_a2;             //damping function parameter 
 	double vdw_d;               //damping function parameter d
 	bool vdw_abc;               //third-order term?
-    std::string vdw_radius;          //cutoff radius for pair interactions
+    std::string vdw_radius;          //cutoff radius for std::pair interactions
 	std::string vdw_radius_unit;	    //"Bohr" or "Angstrom"
 	double vdw_cn_thr;          //cutoff radius for calculating the coordination number
 	std::string vdw_cn_thr_unit;     //"Bohr" or "Angstrom"

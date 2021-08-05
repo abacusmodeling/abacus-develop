@@ -740,7 +740,7 @@ void Symmetry::lattice_type(
                         ++at;
                 }
         }       
-        stringstream ss;
+        std::stringstream ss;
         ss << GlobalV::global_out_dir << "STRU_SIMPLE.cif";
 
         std::ofstream ofs( ss.str().c_str() );

@@ -8,16 +8,16 @@
 //#include <gperftools/profiler.h>
 
 /*
-void Exx_Abfs::Parallel::Communicate::DM::set_atom_in_exx( const set<pair<size_t,size_t>> &H_atom_pairs_core )
+void Exx_Abfs::Parallel::Communicate::DM::set_atom_in_exx( const set<std::pair<size_t,size_t>> &H_atom_pairs_core )
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM::set_atom_in_exx");
 	
 	atom_in_exx.row.resize(GlobalC::ucell.nat);
 	atom_in_exx.col.resize(GlobalC::ucell.nat);
-	for( const auto pair : H_atom_pairs_core )
+	for( const auto std::pair : H_atom_pairs_core )
 	{
-		atom_in_exx.row[pair.first]  = true;
-		atom_in_exx.col[pair.second] = true;
+		atom_in_exx.row[std::pair.first]  = true;
+		atom_in_exx.col[std::pair.second] = true;
 	}
 }
 */
@@ -99,7 +99,7 @@ Exx_Abfs::Parallel::Communicate::DM::f(
 
 void Exx_Abfs::Parallel::Communicate::DM::cal_DM( 
 	const Abfs::Vector3_Order<int> &Born_von_Karman_period,
-	const set<pair<size_t,size_t>> &H_atom_pairs_core,
+	const set<std::pair<size_t,size_t>> &H_atom_pairs_core,
 	const double threshold )
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM::cal_DM");

@@ -4,7 +4,7 @@
 #include "abfs.h"
 #include <algorithm>
 
-std::vector<pair<size_t,size_t>> Exx_Abfs::Parallel::Distribute::Htime::distribute( 
+std::vector<std::pair<size_t,size_t>> Exx_Abfs::Parallel::Distribute::Htime::distribute( 
 	const Abfs::Vector3_Order<int> & Born_von_Karman_period,
 	const double rmesh_times )
 {
@@ -15,10 +15,10 @@ std::vector<pair<size_t,size_t>> Exx_Abfs::Parallel::Distribute::Htime::distribu
 	const std::vector<size_t> Nadj = cal_Nadj(Born_von_Karman_period);
 //ofs<<Nadj<<std::endl;
 
-	const std::vector<pair<size_t,pair<size_t,size_t>>> pair_costs = cal_pair_costs(Nadj, rmesh_times);
+	const std::vector<std::pair<size_t,std::pair<size_t,size_t>>> pair_costs = cal_pair_costs(Nadj, rmesh_times);
 //ofs<<pair_costs<<std::endl;
 	
-	const std::vector<std::vector<pair<size_t,size_t>>> rank_work = cal_rank_work(pair_costs);
+	const std::vector<std::vector<std::pair<size_t,size_t>>> rank_work = cal_rank_work(pair_costs);
 //for( size_t irank=0; irank!=rank_work.size(); ++irank )
 //	ofs<<irank<<"\t"<<rank_work[irank]<<std::endl;
 //ofs.close();
@@ -48,7 +48,7 @@ std::vector<size_t> Exx_Abfs::Parallel::Distribute::Htime::cal_Nadj(
 }
 
 // { Ni*Nj, {i,j} }
-std::vector<pair<size_t,pair<size_t,size_t>>> Exx_Abfs::Parallel::Distribute::Htime::cal_pair_costs( 
+std::vector<std::pair<size_t,std::pair<size_t,size_t>>> Exx_Abfs::Parallel::Distribute::Htime::cal_pair_costs( 
 	const std::vector<size_t> &Nadj, 
 	const double rmesh_times )
 {
@@ -72,7 +72,7 @@ std::vector<pair<size_t,pair<size_t,size_t>>> Exx_Abfs::Parallel::Distribute::Ht
 		return Nadj_box;
 	};
 			
-	std::vector<pair<size_t,pair<size_t,size_t>>> pair_costs;
+	std::vector<std::pair<size_t,std::pair<size_t,size_t>>> pair_costs;
 	for( size_t iat1=0; iat1<GlobalC::ucell.nat; ++iat1 )
 		for( size_t iat2=iat1; iat2<GlobalC::ucell.nat; ++iat2 )
 		{
@@ -82,27 +82,27 @@ std::vector<pair<size_t,pair<size_t,size_t>>> Exx_Abfs::Parallel::Distribute::Ht
 		}
 		
 	auto comp = []( 
-		const pair<size_t,pair<size_t,size_t>> & pair_cost1, 
-		const pair<size_t,pair<size_t,size_t>> & pair_cost2 ) -> bool
+		const std::pair<size_t,std::pair<size_t,size_t>> & pair_cost1, 
+		const std::pair<size_t,std::pair<size_t,size_t>> & pair_cost2 ) -> bool
 	{	return pair_cost1.first > pair_cost2.first; };
 	std::sort( pair_costs.begin(), pair_costs.end(), comp );
 	return pair_costs;
 }
 
-std::vector<std::vector<pair<size_t,size_t>>> Exx_Abfs::Parallel::Distribute::Htime::cal_rank_work( 
-	const std::vector<pair<size_t,pair<size_t,size_t>>> & pair_costs )
+std::vector<std::vector<std::pair<size_t,size_t>>> Exx_Abfs::Parallel::Distribute::Htime::cal_rank_work( 
+	const std::vector<std::pair<size_t,std::pair<size_t,size_t>>> & pair_costs )
 {
 	TITLE("Exx_Abfs::Parallel::Distribute::Htime::cal_rank_work");
-	std::vector<pair<size_t,size_t>> rank_cost(GlobalV::NPROC);				// rank_cost[i] = { irank, cost }
+	std::vector<std::pair<size_t,size_t>> rank_cost(GlobalV::NPROC);				// rank_cost[i] = { irank, cost }
 	for( size_t irank=0; irank!=GlobalV::NPROC; ++irank )
 		rank_cost[irank] = { irank, 0 };
 	
 	auto comp = [](
-		const pair<size_t,size_t> & rank_cost1, 
-		const pair<size_t,size_t> & rank_cost2 )
+		const std::pair<size_t,size_t> & rank_cost1, 
+		const std::pair<size_t,size_t> & rank_cost2 )
 	{	return rank_cost1.second > rank_cost2.second;	};
 	
-	std::vector<std::vector<pair<size_t,size_t>>> rank_work(GlobalV::NPROC);		// rank_work[irank] = { {iat1,iat2}, {iat1,iat2}, ... }
+	std::vector<std::vector<std::pair<size_t,size_t>>> rank_work(GlobalV::NPROC);		// rank_work[irank] = { {iat1,iat2}, {iat1,iat2}, ... }
 	for( const auto pair_cost : pair_costs )
 	{
 		pop_heap( rank_cost.begin(), rank_cost.end(), comp );

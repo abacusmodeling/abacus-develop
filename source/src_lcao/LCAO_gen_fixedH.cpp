@@ -378,7 +378,7 @@ void LCAO_gen_fixedH::test_Nonlocal()
 		} // I1
 	} // T1
 
-	GlobalV::ofs_running << " not included Vnl pair = " << count << std::endl;
+	GlobalV::ofs_running << " not included Vnl std::pair = " << count << std::endl;
 	GlobalV::ofs_running << " sum for the correction = " << sum << std::endl;
 
 	/*
@@ -688,7 +688,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
             GlobalC::GridD.Find_atom(GlobalC::ucell, atom0->tau[I0] ,T0, I0);
 
             //(2)
-            //for each projector (T0, I0), one pair of ads are used
+            //for each projector (T0, I0), one std::pair of ads are used
             for (int ad1=0; ad1<GlobalC::GridD.getAdjacentNum()+1 ; ++ad1)
             {
                 const int T1 = GlobalC::GridD.getType(ad1);

@@ -16,7 +16,7 @@ static void of_abfs_cpp( const std::string &file_name, const std::vector<std::ve
 		for( int j=0; j!=orb[i].size(); ++j )
 			for( int k=0; k!=orb[i][j].size(); ++k )
 			{
-				stringstream ss;	ss<<file_name<<"_"<<i<<"_"<<j<<"_"<<k;
+				std::stringstream ss;	ss<<file_name<<"_"<<i<<"_"<<j<<"_"<<k;
 				std::ofstream ofs(ss.str().c_str());
 				for( const auto & c : orb[i][j][k].psi_uniform )
 					ofs<<c<<std::endl;

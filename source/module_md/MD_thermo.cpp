@@ -491,7 +491,7 @@ void MD_thermo::NHC_info_out(const int& step, const int& recordFreq, const int& 
 	if (!pass) return;
 
 	if(!GlobalV::MY_RANK){
-		stringstream ssc;
+		std::stringstream ssc;
 		ssc << GlobalV::global_out_dir << "Restart_md.dat";
 		std::ofstream file(ssc.str().c_str(), ios::app);
         file<<'\n';
@@ -524,7 +524,7 @@ void MD_thermo::NHC_restart()
     double *nhce=new double[numIon_*3*MNHC_];
     if (!GlobalV::MY_RANK)
 	{
-		stringstream ssc;
+		std::stringstream ssc;
 		ssc << GlobalV::global_readin_dir << "Restart_md.dat";
 		std::ifstream file(ssc.str().c_str());
 

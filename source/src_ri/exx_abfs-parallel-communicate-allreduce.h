@@ -34,7 +34,7 @@ private:
 		std::function<void(T&,T&)> & insert_function, 
 		T &data_all,
 		atomic<int> &rank_delta, 
-		atomic_flag &insert_lock );
+		std::atomic_flag &insert_lock );
 		
 	int comm_sz;
 	int my_rank;

@@ -503,7 +503,7 @@ void Force_Stress_LCAO::print_force(const std::string &name, matrix& f, const bo
     {
         for (int ia = 0;ia < GlobalC::ucell.atoms[it].na;ia++)
         {
-			stringstream ss;
+			std::stringstream ss;
 			ss << GlobalC::ucell.atoms[it].label << ia+1;
 
 			GlobalV::ofs_running << " " << setw(8) << ss.str();
@@ -586,7 +586,7 @@ void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, mat
     {
         for (int ia = 0; ia < GlobalC::ucell.atoms[it].na; ia++)
         {
-            stringstream ss;
+            std::stringstream ss;
             ss << GlobalC::ucell.atoms[it].label << ia+1;
 
 			if(istestf)

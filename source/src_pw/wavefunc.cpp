@@ -405,7 +405,7 @@ void wavefunc::wfcinit_k(void)
 		NR = get_R(GlobalC::chi0_hilbert.lcao_box[0],GlobalC::chi0_hilbert.lcao_box[1],GlobalC::chi0_hilbert.lcao_box[2]); 
 		
 		// store the overlap relationship to "nearest.dat"
-		stringstream ss;
+		std::stringstream ss;
 		ss << GlobalV::global_out_dir <<"nearest.dat";
 		std::ofstream ofs(ss.str().c_str());
 		ofs << NR << std::endl;
@@ -585,7 +585,7 @@ void wavefunc::wfcinit_k(void)
 			//------------------------------
 			// store the overlap in q_(iq)
 			//------------------------------
-			stringstream ss1;
+			std::stringstream ss1;
 			ss1 << GlobalV::global_out_dir <<"q_"<<iq;
 			std::ofstream ofs1(ss1.str().c_str());
 			ofs1<<NG<<std::endl;

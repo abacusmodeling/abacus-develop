@@ -16,7 +16,7 @@
 
 void Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D( 
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &HR_exx,
-	const pair<bool,bool> &io_HR_a2D )
+	const std::pair<bool,bool> &io_HR_a2D )
 {
 	/*{
 		static int istep=0;

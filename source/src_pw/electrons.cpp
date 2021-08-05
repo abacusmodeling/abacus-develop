@@ -137,7 +137,7 @@ void Electrons::self_consistent(const int &istep)
     // mohan add 2010/3/25
     // output the charge mixing data :
     // iteration && dr2.
-    // stringstream ss;
+    // std::stringstream ss;
     // ss << GlobalV::global_out_dir << "ChargeMixing.dat"; 
     // std::ofstream ofs_mix;
 
@@ -327,17 +327,17 @@ void Electrons::self_consistent(const int &istep)
             GlobalC::en.descf = 0.0;
         }
 
-        stringstream ssw;
+        std::stringstream ssw;
         ssw << GlobalV::global_out_dir << "WAVEFUNC.dat";
 
 		//qianrui add 2020-10-12
-		stringstream ssgk;
+		std::stringstream ssgk;
 		ssgk << GlobalV::global_out_dir << "GKK.dat";
 
         // output for tmp.
         for(int is=0; is<GlobalV::NSPIN; is++)
         {
-            stringstream ssc;
+            std::stringstream ssc;
             ssc << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG";
             GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, iter, ssc.str(), 3);//mohan add 2007-10-17
         }
@@ -403,7 +403,7 @@ void Electrons::self_consistent(const int &istep)
 
             for(int is=0; is<GlobalV::NSPIN; is++)
             {
-                stringstream ssc;
+                std::stringstream ssc;
                 ssc << GlobalV::global_out_dir << "SPIN" << is + 1 << "_CHG";
                 GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, 0, ssc.str() );//mohan add 2007-10-17
             }

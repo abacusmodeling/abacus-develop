@@ -210,7 +210,7 @@ void pseudopot_cell_vl::print_vloc(void)const
 	{
 		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			stringstream ss ;
+			std::stringstream ss ;
 			ss << GlobalV::global_out_dir << GlobalC::ucell.atoms[it].label << "/v_loc_g.dat" ;
 			std::ofstream ofs_vg( ss.str().c_str() );
 			for(int ig=0;ig<GlobalC::pw.nggm;ig++)

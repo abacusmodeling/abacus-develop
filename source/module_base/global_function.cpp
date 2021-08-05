@@ -57,7 +57,7 @@ void MAKE_DIR(const std::string &fn)
 //	TITLE("global_function","MAKE_DIR");
     if (GlobalV::MY_RANK==0)
     {
-        stringstream ss;
+        std::stringstream ss;
         ss << " test -d " << fn << " || mkdir " << fn ;
 //----------------------------------------------------------
 // EXPLAIN : 'system' function return '0' if success

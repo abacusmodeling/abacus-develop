@@ -295,7 +295,7 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
 
 #endif
         /*
-        stringstream ss;
+        std::stringstream ss;
         ss << "./out_data/ig2fftc.dat" << cutgg_delta;
         std::ofstream ofsc( ss.str().c_str() );
 
@@ -590,7 +590,7 @@ void PW_Basis::get_MPI_GVectors(void)
     //=====================================
     if (GlobalV::MY_RANK==0)
     {
-//        stringstream ssc,ssw;
+//        std::stringstream ssc,ssw;
 //        ssc << GlobalV::global_out_dir << "test.FFT_chg";
 //        ssw << GlobalV::global_out_dir << "test.FFT_wfc";
 //        std::ofstream charge_data( ssc.str().c_str() );

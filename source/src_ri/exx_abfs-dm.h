@@ -21,20 +21,20 @@ public:
 
 public:
 	void cal_DM(
-		const set<pair<size_t,size_t>> &atom_pairs,
+		const set<std::pair<size_t,size_t>> &atom_pairs,
 		const std::vector<Abfs::Vector3_Order<int>> &Born_von_Karman_boxes);
-	std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> cal_DMk_raw( const set<pair<size_t,size_t>> &atom_pairs ) const;
+	std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> cal_DMk_raw( const set<std::pair<size_t,size_t>> &atom_pairs ) const;
 		
 private:
 	void cal_DMk_mixing(
 		const Charge_Broyden &charge,
-		const set<pair<size_t,size_t>> &atom_pairs );
+		const set<std::pair<size_t,size_t>> &atom_pairs );
 	void plain_mixing(
 		const Charge_Broyden &charge,
-		const set<pair<size_t,size_t>> &atom_pairs);
+		const set<std::pair<size_t,size_t>> &atom_pairs);
 	void pulay_mixing(
 		const Charge_Broyden &charge,
-		const set<pair<size_t,size_t>> &atom_pairs);
+		const set<std::pair<size_t,size_t>> &atom_pairs);
 		
 //	double cal_DM_delta();
 

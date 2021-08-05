@@ -11,14 +11,14 @@
 #include "../src_external/src_test/src_ri/exx_abfs-dm-test.h"
 
 void Exx_Abfs::DM::cal_DM(
-	const set<pair<size_t,size_t>> &atom_pairs,
+	const set<std::pair<size_t,size_t>> &atom_pairs,
 	const std::vector<Abfs::Vector3_Order<int>> &Born_von_Karman_boxes)
 {
 	TITLE("Exx_Abfs::DM::cal_DM");
 	
 	cal_DMk_mixing( GlobalC::CHR, atom_pairs );
 
-	for( const pair<size_t,size_t> & atom_pair : atom_pairs )
+	for( const std::pair<size_t,size_t> & atom_pair : atom_pairs )
 	{
 		const size_t iat1 = atom_pair.first;
 		const size_t iat2 = atom_pair.second;
@@ -40,7 +40,7 @@ void Exx_Abfs::DM::cal_DM(
 
 void Exx_Abfs::DM::cal_DMk_mixing(
 	const Charge_Broyden &charge,
-	const set<pair<size_t,size_t>> &atom_pairs )
+	const set<std::pair<size_t,size_t>> &atom_pairs )
 {
 	TITLE("Exx_Abfs::DM::cal_DMk_mixing");
 
@@ -83,14 +83,14 @@ void Exx_Abfs::DM::cal_DMk_mixing(
 
 
 
-std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> Exx_Abfs::DM::cal_DMk_raw( const set<pair<size_t,size_t>> &atom_pairs ) const
+std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> Exx_Abfs::DM::cal_DMk_raw( const set<std::pair<size_t,size_t>> &atom_pairs ) const
 {
 	TITLE("Exx_Abfs::DM::cal_DMk_raw");
 
 	const double SPIN_multiple = 0.5*GlobalV::NSPIN;
 	
 	std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> DMk_raw;
-	for( const pair<size_t,size_t> & atom_pair : atom_pairs )
+	for( const std::pair<size_t,size_t> & atom_pair : atom_pairs )
 	{
 		const size_t iat1 = atom_pair.first;
 		const size_t iat2 = atom_pair.second;
@@ -146,7 +146,7 @@ std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> Exx_Abfs::DM::cal_D
 
 void Exx_Abfs::DM::plain_mixing(
 	const Charge_Broyden &charge,
-	const set<pair<size_t,size_t>> &atom_pairs)
+	const set<std::pair<size_t,size_t>> &atom_pairs)
 {
 	TITLE("Exx_Abfs::DM::plain_mixing");
 
@@ -160,7 +160,7 @@ void Exx_Abfs::DM::plain_mixing(
 
 void Exx_Abfs::DM::pulay_mixing(
 	const Charge_Broyden &charge,
-	const set<pair<size_t,size_t>> &atom_pairs)
+	const set<std::pair<size_t,size_t>> &atom_pairs)
 {
 	if( 1==charge.totstep )
 	{

@@ -4,7 +4,7 @@
 #include "abfs.h"
 
 template<typename T1,typename T2,typename T3,typename Tmatrix>
-void Abfs::delete_empty_ptrs( std::map<T1,std::map<T2,std::map<T3,weak_ptr<Tmatrix>>>> &ptrs )
+void Abfs::delete_empty_ptrs( std::map<T1,std::map<T2,std::map<T3,std::weak_ptr<Tmatrix>>>> &ptrs )
 {
 	TITLE("Abfs","delete_empty_ptrs");
 	for( auto iter1=ptrs.begin(); iter1!=ptrs.end(); )
@@ -35,7 +35,7 @@ void Abfs::delete_threshold_ptrs( std::map<Tkey,Tmatrix> &ptrs, const double thr
 }
 
 template<typename Tkey,typename Tmatrix>
-void Abfs::delete_threshold_ptrs( std::map<Tkey,shared_ptr<Tmatrix>> &ptrs, const double threshold )
+void Abfs::delete_threshold_ptrs( std::map<Tkey,std::shared_ptr<Tmatrix>> &ptrs, const double threshold )
 {
 	for( auto iter=ptrs.begin(); iter!=ptrs.end(); )
 	{
@@ -58,7 +58,7 @@ void Abfs::delete_threshold_ptrs( std::map<Tkey1,std::map<Tkey2,Tvalue>> &ptrs, 
 
 /*
 template<typename T1,typename T2,typename T3,typename Tmatrix>
-void Abfs::delete_threshold_ptrs( std::map<T1,std::map<T2,std::map<T3,shared_ptr<Tmatrix>>>> &ptrs, const double threshold)
+void Abfs::delete_threshold_ptrs( std::map<T1,std::map<T2,std::map<T3,std::shared_ptr<Tmatrix>>>> &ptrs, const double threshold)
 {
 	TITLE("Abfs","delete_threshold_ptrs");
 	for( auto iter1=ptrs.begin(); iter1!=ptrs.end(); )
@@ -101,9 +101,9 @@ void Abfs::delete_threshold_ptrs( std::map<T1,std::map<T2,std::map<T3,Tmatrix>>>
 */
 
 template<typename T1, typename T2, typename Tother>
-std::vector<pair<T1,T2>> Abfs::get_atom_pair(const std::map<T1,std::map<T2,Tother>> &m)
+std::vector<std::pair<T1,T2>> Abfs::get_atom_pair(const std::map<T1,std::map<T2,Tother>> &m)
 {
-	std::vector<pair<T1,T2>> atom_pairs;
+	std::vector<std::pair<T1,T2>> atom_pairs;
 	for(const auto &mA : m)
 		for(const auto &mB : mA.second)
 			atom_pairs.push_back({mA.first,mB.first});

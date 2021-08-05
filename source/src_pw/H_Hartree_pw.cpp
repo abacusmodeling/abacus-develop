@@ -93,7 +93,7 @@ matrix H_Hartree_pw::v_hartree(
 		int iter = 0;
 		int precision = 3;
 		std::string fn = "VH.dat";
-		stringstream ss;
+		std::stringstream ss;
 		ss << GlobalV::global_out_dir << fn;
 		matrix v;
 		v.create(1,pwb.nrxx);

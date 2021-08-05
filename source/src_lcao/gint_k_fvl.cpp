@@ -575,7 +575,7 @@ void Gint_k::evaluate_vl_stress(
                 assert(offset < GlobalC::LNNR.nad[iat]);
 
 				//--------------------------------------------------------------- 
-				// what I do above is to get 'offset' for atom pair (iat1, iat2)
+				// what I do above is to get 'offset' for atom std::pair (iat1, iat2)
 				// if I want to simplify this searching for offset,
 				// I should take advantage of gt.which_unitcell.
 				//--------------------------------------------------------------- 
@@ -850,7 +850,7 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
                 assert(offset < GlobalC::LNNR.nad[iat]);
 
                                 //--------------------------------------------------------------- 
-                                // what I do above is to get 'offset' for atom pair (iat1, iat2)
+                                // what I do above is to get 'offset' for atom std::pair (iat1, iat2)
                                 // if I want to simplify this searching for offset,
                                 // I should take advantage of gt.which_unitcell.
                                 //--------------------------------------------------------------- 

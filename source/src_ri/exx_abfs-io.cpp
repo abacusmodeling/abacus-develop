@@ -88,7 +88,7 @@ std::vector<std::vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 			
 			if( L_size>=9 )
 			{
-				stringstream ss;
+				std::stringstream ss;
 				ss<<"Lmax>=9 error in "<<__FILE__<<" line "<<__LINE__;
 				throw std::invalid_argument(ss.str());
 			}
@@ -169,7 +169,7 @@ std::vector<std::vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 	for( size_t L=0; L<=L_size; ++L )
 		if( N_size.find(L) == N_size.end() )
 		{
-			stringstream ss;
+			std::stringstream ss;
 			ss<<"Can't find N of L="<<L<<" in "<<file_name;
 			throw domain_error(ss.str());
 		}
@@ -177,7 +177,7 @@ std::vector<std::vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 		for( size_t N=0; N!=N_size[L]; ++N )
 			if( psis.find(L)==psis.end() || psis[L].find(N)==psis[L].end() )
 			{
-				stringstream ss;
+				std::stringstream ss;
 				ss<<"Can't find abf of L="<<L<<" T="<<T<<" in "<<file_name;
 				throw domain_error(ss.str());
 			}

@@ -21,7 +21,7 @@ public:
 
 	void cal_DM( 
 		const Abfs::Vector3_Order<int> &Born_von_Karman_period,
-		const set<pair<size_t,size_t>> &H_atom_pairs_core,
+		const set<std::pair<size_t,size_t>> &H_atom_pairs_core,
 		const double threshold );
 
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> DMr;
@@ -39,7 +39,7 @@ private:
 			const MPI_Comm & mpi_comm_in, 
 			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local_in,
 			const Abfs::Vector3_Order<int> &Born_von_Karman_period,
-			const set<pair<size_t,size_t>> &H_atom_pairs_core);
+			const set<std::pair<size_t,size_t>> &H_atom_pairs_core);
 		~Allreduce();
 		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> grid_to_exx();
 		
@@ -66,7 +66,7 @@ private:
 		static constexpr int tag_ask  = 1;
 		static constexpr int tag_data = 2;
 		
-		atomic_flag lock_insert;
+		std::atomic_flag lock_insert;
 		atomic<int> lock_atom_unset_read;
 		atomic<int> rank_delta;
 		
@@ -88,7 +88,7 @@ private:
 		std::vector<bool> row;
 		std::vector<bool> col;
 	}atom_in_exx;
-	void set_atom_in_exx( const set<pair<size_t,size_t>> &H_atom_pairs_core );	
+	void set_atom_in_exx( const set<std::pair<size_t,size_t>> &H_atom_pairs_core );	
 */
 };
 

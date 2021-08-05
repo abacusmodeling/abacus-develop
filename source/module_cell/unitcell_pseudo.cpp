@@ -189,7 +189,7 @@ void UnitCell_pseudo::setup_cell(
 		for(int it=0; it<this->ntype; it++)
 		{
 			Atom* atom = &atoms[it];
-			stringstream ss;
+			std::stringstream ss;
 			ss << GlobalV::global_out_dir << atom->label 
 				<< "/" << atom->label
 				<< ".NONLOCAL";
@@ -296,7 +296,7 @@ void UnitCell_pseudo::setup_cell(
 	// setup vdwd2 parameters
 	//vdwd2_para.initset(*this);		// Peize Lin add 2021.03.09
 
-//	stringstream ss;
+//	std::stringstream ss;
 //	ss << GlobalV::global_out_dir << "unitcell_pp.log";
 //	print_unitcell_pseudo( ss.str() );
 	return;
