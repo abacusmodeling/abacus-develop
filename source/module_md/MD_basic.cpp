@@ -1,9 +1,5 @@
 #include "MD_basic.h"
-#ifdef __CMD
 #include "../input.h"
-#else
-#include "../src_pw/global.h"
-#endif
 
 //define in MD_basic.h
 //class MD_basic
@@ -31,14 +27,7 @@ MD_basic::MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
 	tauDirectChange=new Vector3<double>[ucell.nat];
 	allmass=new double[ucell.nat];
 	ionmbl=new Vector3<int>[ucell.nat];
-	force=new Vector3<double>[ucell.nat];
-    stress.create(3,3);
-
-#ifdef __CMD
-    energy_=0;
-#else
-	energy_=GlobalC::en.etot/2;
-#endif
+	//force=new Vector3<double>[ucell.nat];
 
 	//MD starting setup
 	if(!mdp.rstMD){
@@ -74,16 +63,16 @@ MD_basic::MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
         
     if (ucell.set_vel)    //  Yuanbo Li 2021-08-01
     {
-    int iat=0;    //initialize velocity of atoms from STRU  Yu Liu 2021-07-14
-    for(int it=0; it<ucell.ntype; ++it)
-    {
-        for(int ia=0; ia<ucell.atoms[it].na; ++ia)
+        int iat=0;    //initialize velocity of atoms from STRU  Yu Liu 2021-07-14
+        for(int it=0; it<ucell.ntype; ++it)
         {
-            vel[iat] = ucell.atoms[it].vel[ia];
-            ++iat;
+            for(int ia=0; ia<ucell.atoms[it].na; ++ia)
+            {
+                vel[iat] = ucell.atoms[it].vel[ia];
+                ++iat;
+            }
         }
-    }
-    assert(iat==ucell.nat);
+        assert(iat==ucell.nat);
     }   
         
     mdp.Qmass=mdp.Qmass/6.02/9.109*1e5;
@@ -110,7 +99,7 @@ MD_basic::MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
 
 MD_basic::~MD_basic()
 {
-    delete []force;
+    //delete []force;
     delete []ionmbl;
     delete []cart_change;
     delete []vel;
@@ -118,7 +107,8 @@ MD_basic::~MD_basic()
     delete []allmass;
 }
 
-void MD_basic::runNVT(int step1){
+void MD_basic::runNVT(int step1, double potential, Vector3<double> *force, const matrix &stress)
+{
 //------------------------------------------------------------------------------
 // DESCRIPTION:
 // Molecular dynamics calculation with fixed Volume and slight fluctuated temperature
@@ -152,23 +142,6 @@ void MD_basic::runNVT(int step1){
 	// get the kinetic energy
 	double twiceKE = mdf.GetAtomKE(ucell.nat, vel, allmass);
 	twiceKE = twiceKE * 2;
-	
-	//Set up forces and stress
-#ifndef __CMD
-
-#ifdef __LCAO
-    if(INPUT.basis_type == "lcao")
-    {
-	    mdf.callInteraction_LCAO(ucell.nat, force, stress);
-    }
-    else if(INPUT.basis_type == "pw")
-#else
-    if(INPUT.basis_type == "pw")
-#endif
-    {
-        mdf.callInteraction_PW(ucell.nat, force, stress);
-    }
-#endif
 
 	//print total stress + stress_MD
 	if(GlobalV::STRESS)
@@ -183,11 +156,7 @@ void MD_basic::runNVT(int step1){
 	}
 	double maxForce = mdf.MAXVALF(ucell.nat, force);
 
-#ifdef __CMD
-    energy_=0;
-#else
-	energy_=GlobalC::en.etot/2;
-#endif
+	energy_=potential;
 
     double hamiltonian;
 	//----------------------------------------------
@@ -206,7 +175,6 @@ void MD_basic::runNVT(int step1){
         GlobalV::ofs_running<< " --------------------------------------------------"<<endl;
 	}
 	
-	
 	// Calculate the Mean-Square-Displacement.
 	if(step_==1&&mdp.rstMD==0)
     { 
@@ -223,11 +191,11 @@ void MD_basic::runNVT(int step1){
                 nfrozen_);
         }
         else hamiltonian = mdf.Conserved(twiceKE/2, energy_, ucell.nat-nfrozen_);
-	    this->update_half_velocity();
+	    this->update_half_velocity(force);
 	}
 	else 
     {
-		this->update_half_velocity();
+		this->update_half_velocity(force);
 		
 		twiceKE=mdf.GetAtomKE(ucell.nat, vel, allmass);
 		twiceKE = 2 * twiceKE;
@@ -242,7 +210,7 @@ void MD_basic::runNVT(int step1){
 		else hamiltonian = mdf.Conserved(twiceKE/2, energy_, ucell.nat-nfrozen_);
         //Note: side scheme position before
         //Now turn to middle scheme. 
-		this->update_half_velocity();
+		this->update_half_velocity(force);
 	}
 
 	// Update the Non-Wrapped cartesion coordinates
@@ -296,7 +264,8 @@ void MD_basic::runNVT(int step1){
     return;
 }
 
-void MD_basic::runNVE(int step1){
+void MD_basic::runNVE(int step1, double potential, Vector3<double> *force, const matrix &stress)
+{
 //-------------------------------------------------------------------------------
 // Adiabatic ensemble 
 // Molecular dynamics calculation with Verlet algorithm
@@ -333,21 +302,6 @@ void MD_basic::runNVE(int step1){
     double tempNow = twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU;
     cout<<" start temperature = "<< tempNow/K_BOLTZMAN_AU<< " (k)"<<endl;
 
-    // Set up forces
-#ifndef __CMD
-    if (INPUT.basis_type == "pw")
-    {
-        mdf.callInteraction_PW(ucell.nat, force, stress);
-    }
-#ifdef __LCAO
-    else if (INPUT.basis_type == "lcao")
-    {
-        mdf.callInteraction_LCAO(ucell.nat, force, stress);
-    }
-#endif
-
-#endif
-
     if(GlobalV::STRESS)
 	{
 		outStressMD(stress, twiceKE);
@@ -364,11 +318,7 @@ void MD_basic::runNVE(int step1){
     double maxForce = mdf.MAXVALF(ucell.nat, force);
     cout<<"maxForce: "<<sqrt(maxForce)<<endl; 
 
-#ifdef __CMD
-    energy_=0;
-#else
-	energy_=GlobalC::en.etot/2;
-#endif
+    energy_=potential;
 
     double conservedE = mdf.Conserved(twiceKE/2, energy_, ucell.nat-nfrozen_);
 
@@ -389,12 +339,12 @@ void MD_basic::runNVE(int step1){
   
     // (1) 1st step of Verlet-Velocity
     // New velocity are obtained
-	this->update_half_velocity();
+	this->update_half_velocity(force);
     // (2) 2nd step of Verlet-Velocity 
     // Update the Non-Wrapped cartesion coordinate
     twiceKE = mdf.GetAtomKE(ucell.nat, vel, allmass);
     twiceKE = 2 * twiceKE;
-    if(step_!=1||mdp.rstMD==1)this->update_half_velocity();
+    if(step_!=1||mdp.rstMD==1)this->update_half_velocity(force);
     update_half_direct(1);
     update_half_direct(0);
     // Calculate the maximal velocities.
@@ -446,7 +396,8 @@ void MD_basic::runNVE(int step1){
     return;
 }
 
-bool MD_basic::runFIRE(int step1){
+bool MD_basic::runFIRE(int step1, double potential, Vector3<double> *force, const matrix &stress)
+{
 //-------------------------------------------------------------------------------
 // REFERENCES:
 //   
@@ -485,23 +436,6 @@ bool MD_basic::runFIRE(int step1){
     double tempNow = twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU;
     cout<<" start temperature = "<< tempNow/K_BOLTZMAN_AU<< " (k)"<<endl;
 
-    // Set up forces
-#ifndef __CMD
-#ifdef __LCAO
-    if (INPUT.basis_type == "lcao")
-    {
-        mdf.callInteraction_LCAO(ucell.nat, force, stress);
-    }
-    else if (INPUT.basis_type == "pw")
-#else
-    if (INPUT.basis_type == "pw")
-#endif
-    {
-        mdf.callInteraction_PW(ucell.nat, force, stress);
-    }
-#endif
-
-
     for(int k=0;k<ucell.nat;k++)
     {
         if(ionmbl[k].x==0)force[k].x=0;
@@ -513,11 +447,7 @@ bool MD_basic::runFIRE(int step1){
     double maxForce = mdf.MAXVALF(ucell.nat, force);
     cout<<"maxForce: "<<sqrt(maxForce)<<endl; 
     
-#ifdef __CMD
-    energy_=0;
-#else
-	energy_=GlobalC::en.etot/2;
-#endif
+    energy_=potential;
 
     double conservedE = mdf.Conserved(twiceKE/2, energy_, ucell.nat-nfrozen_);
 
@@ -532,13 +462,13 @@ bool MD_basic::runFIRE(int step1){
   
     // (1) 1st step of Verlet-Velocity
     // New velocity are obtained
-	this->update_half_velocity();
+	this->update_half_velocity(force);
 
     // (2) 2nd step of Verlet-Velocity 
     // Update the Non-Wrapped cartesion coordinate
     twiceKE = mdf.GetAtomKE(ucell.nat, vel, allmass);
     twiceKE = 2 * twiceKE;
-    if(step_!=1)this->update_half_velocity();
+    if(step_!=1)this->update_half_velocity(force);
 
 	double largest_grad_FIRE = 0.0;
 	for(int i=0;i<ucell.nat;i++)
@@ -610,7 +540,7 @@ bool MD_basic::runFIRE(int step1){
 }
 
 //update velocities of ions for half MD step
-void MD_basic::update_half_velocity()
+void MD_basic::update_half_velocity(Vector3<double> *force)
 {
     for(int  ii=0;ii<ucell.nat;ii++){ 
         vel[ii] = vel[ii] + force[ii]/allmass[ii]*mdp.dt/2.0;

@@ -12,6 +12,7 @@ MD_fire.o\
 MD_func.o\
 MD_thermo.o\
 run_md_classic.o\
+LJ_potential.o\
 
 OBJS_BASE=matrix3.o\
 matrix.o\

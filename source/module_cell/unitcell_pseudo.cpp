@@ -306,7 +306,6 @@ void UnitCell_pseudo::setup_cell_classic(
 	const string &fn,
 	ofstream &ofs_running,
 	ofstream &ofs_warning)
-
 {
 	TITLE("UnitCell_pseudo","setup_cell_classic");
 
@@ -319,7 +318,7 @@ void UnitCell_pseudo::setup_cell_classic(
 	bool ok = true;
 	bool ok2 = true;
 
-	// (3) read in atom information
+	// (2) read in atom information
 	if(GlobalV::MY_RANK == 0)
 	{
 		ifstream ifa(fn.c_str(), ios::in);
@@ -354,7 +353,6 @@ void UnitCell_pseudo::setup_cell_classic(
 			// call read_atom_positions
 			//==========================
 			ok2 = this->read_atom_positions(ifa, ofs_running, ofs_warning);
-			cout << "read_atom_positions done." << endl;
 			if(ok2)
 			{
 				for(int i=0;i<this->ntype;i++)

@@ -11,6 +11,16 @@
 #include "../src_ions/variable_cell.h" // mohan add 2021-02-01
 #include "../module_md/MD_basic.h"
 
+Run_MD_PW::Run_MD_PW()
+{
+    force=new Vector3<double>[GlobalC::ucell.nat];
+}
+
+Run_MD_PW::~Run_MD_PW()
+{
+    delete []force;
+}
+
 void Run_MD_PW::md_ions_pw(void)
 {
     TITLE("Run_MD_PW", "md_ions_pw");
@@ -151,17 +161,20 @@ void Run_MD_PW::md_ions_pw(void)
         time_t eend = time(NULL);
         time_t fstart = time(NULL);
 
+        this->callInteraction_PW(GlobalC::ucell.nat, force, stress);
+        double potential = GlobalC::en.etot/2;
+
         if (mdtype == 1 || mdtype == 2)
         {
-            mdb.runNVT(istep);
+            mdb.runNVT(istep, potential, force, stress);
         }
         else if (mdtype == 0)
         {
-            mdb.runNVE(istep);
+            mdb.runNVE(istep, potential, force, stress);
         }
         else if (mdtype == -1)
         {
-            stop = mdb.runFIRE(istep);
+            stop = mdb.runFIRE(istep, potential, force, stress);
         }
         else
         {
@@ -296,4 +309,23 @@ void Run_MD_PW::md_cells_pw()
     GlobalV::ofs_running << " --------------------------------------------\n\n" << endl;
 
     timer::tick("Run_MD_PW", "md_cells_pw");
+}
+
+void Run_MD_PW::callInteraction_PW(const int& numIon, Vector3<double>* force, matrix& stress_pw)
+{
+//to call the force of each atom
+	matrix fcs;//temp force matrix
+	Forces ff;
+	ff.init(fcs);
+	for(int ion=0;ion<numIon;ion++){
+		force[ion].x =fcs(ion, 0)/2.0;
+		force[ion].y =fcs(ion, 1)/2.0;
+		force[ion].z =fcs(ion, 2)/2.0;
+	}
+	if(GlobalV::STRESS)
+	{
+		Stress_PW ss;
+		ss.cal_stress(stress_pw);
+	}
+	return;
 }

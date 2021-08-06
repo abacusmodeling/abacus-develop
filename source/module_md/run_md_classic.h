@@ -20,6 +20,8 @@ public:
     void md_allocate_ions(void);
     void update_pos_classic(void);
 
+    Vector3<double> *force;  //force of each atom
+	matrix stress;           //stress for this lattice
 
 private:
     int istep;
@@ -28,7 +30,6 @@ private:
 	double* pos_now;
 	double* pos_next;
     int pos_dim;
-   
 };
 
 #endif

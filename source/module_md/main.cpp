@@ -39,18 +39,18 @@ void calculate()
 	cout << "\n START  Time  : " << ctime(&time_start);
 	cout << " FINISH Time  : " << ctime(&time_finish);
 	cout << " TOTAL  Time  : " << difftime(time_finish, time_start) << endl;
-	cout << " SEE INFORMATION IN : " << global_out_dir << endl;
+	cout << " SEE INFORMATION IN : " << GlobalV::global_out_dir << endl;
 
-	ofs_running << "\n Start  Time  : " << ctime(&time_start);
-	ofs_running << " Finish Time  : " << ctime(&time_finish);
+	GlobalV::ofs_running << "\n Start  Time  : " << ctime(&time_start);
+	GlobalV::ofs_running << " Finish Time  : " << ctime(&time_finish);
 
 	double total_time = difftime(time_finish, time_start);
 	int hour = total_time / 3600;
 	int mins = ( total_time - 3600 * hour ) / 60;
 	int secs = total_time - 3600 * hour - 60 * mins ;
-	ofs_running << " Total  Time  : " << hour << " h "
-	            << mins << " mins "
-	            << secs << " secs " << endl;
+	GlobalV::ofs_running << " Total  Time  : " << hour << " h "
+	            		 << mins << " mins "
+	           			 << secs << " secs " << endl;
 
 #ifdef __MPI
     MPI_Finalize();

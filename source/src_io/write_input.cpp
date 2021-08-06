@@ -152,7 +152,6 @@ void Input::Print(const string &fn)const
 
 	ofs << "\n#Parameters (10.Molecular dynamics)" << endl;
 	OUTP(ofs,"md_mdtype",mdp.mdtype,"choose ensemble");
-	//OUTP(ofs,"md_potential",mdp.md_potential,"choose potential for md");
 	OUTP(ofs,"md_dt",mdp.dt,"time step");
 	OUTP(ofs,"mnhc",mdp.MNHC,"number of Nose-Hoover chains");
 	OUTP(ofs,"md_qmass",mdp.Qmass,"mass of thermostat");
@@ -166,6 +165,9 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"md_ediffg",mdp.ediffg,"parameter for constraining max force change");
 	OUTP(ofs,"NVT_tau",mdp.NVT_tau,"parameter for adjust effect of thermostat");
 	OUTP(ofs,"NVT_control",mdp.NVT_control,"choose which thermostat used in NVT ensemble");
+	OUTP(ofs,"rcut_lj",mdp.rcut_lj/ANGSTROM_AU,"cutoff radius of LJ potential");
+	OUTP(ofs,"epsilon_lj",mdp.epsilon_lj*Ry_to_eV,"the value of epsilon for LJ potential");
+	OUTP(ofs,"sigma_lj",mdp.sigma_lj/ANGSTROM_AU,"the value of sigma for LJ potential");
 
 	ofs << "\n#Parameters (11.Efield)" << endl;
 	OUTP(ofs,"efield",efield,"add electric field");
