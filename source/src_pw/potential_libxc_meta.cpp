@@ -15,6 +15,8 @@
 #include "../src_lcao/global_fp.h"
 #endif
 
+using namespace std;
+
 //the interface to libxc xc_mgga_exc_vxc(xc_func,n,rho,grho,laplrho,tau,e,v1,v2,v3,v4)
 //xc_func : LIBXC data type, contains information on xc functional
 //n: size of array, nspin*nnr
@@ -25,7 +27,7 @@
 //v1 and v2 are combined to give v; v4 goes into vofk
 
 // [etxc, vtxc, v, vofk] = Potential_Libxc::v_xc(...)
-std::tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
+tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 	const double * const * const rho_in,
 	const double * const rho_core_in,
 	const double * const * const kin_r_in)
@@ -44,220 +46,247 @@ std::tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 	// use can check on website, for example:
 	// https://www.tddft.org/programs/libxc/manual/libxc-5.1.x/
 	//----------------------------------------------------------
-	std::vector<xc_func_type> funcs = init_func();
 
-	// the type of rho_sigma_gdr is automatically set to 'tuple'
-	// [rho, sigma, gdr] = cal_input( funcs, rho_in );
-	const auto rho_sigma_gdr = cal_input( funcs, rho_in, rho_core_in );
-	const std::vector<double> &rho = std::get<0>(rho_sigma_gdr);
-	const std::vector<double> &sigma = std::get<1>(rho_sigma_gdr);
-	std::vector<double> kin_r;
-	std::vector<double> lapl_rho; //dummy input, not used in SCAN
-	
-	//kin_r : from double** to vector<double>
-	//lapl_rho : set to 0
-	kin_r.resize(GlobalC::pw.nrxx*nspin0());
-	lapl_rho.resize(GlobalC::pw.nrxx*nspin0());
+	//initialize X and C functionals
+	xc_func_type x_func;
+	xc_func_type c_func;
+	const int xc_polarized = (GlobalV::NSPIN ? XC_UNPOLARIZED : XC_POLARIZED);
 
-	if(nspin0()==1 || GlobalV::NSPIN==2)
+	//exchange
+	if(GlobalC::xcf.igcx_now == 13)
 	{
-		for( size_t is=0; is!=nspin0(); ++is )
-			for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
-			{
-				kin_r[ir*nspin0()+is] = kin_r_in[is][ir] / e2;
-				lapl_rho[ir*nspin0()+is] = 0.0;
-			}
+		xc_func_init(&x_func, 263 ,xc_polarized);
+	}
+	else
+	{
+		throw domain_error("iexch="+TO_STRING(GlobalC::xcf.iexch_now)+", igcx="+TO_STRING(GlobalC::xcf.igcx_now)
+			+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 	}
 
-	for( xc_func_type &func : funcs )
+	//correlation
+	if(GlobalC::xcf.igcc_now == 9)
 	{
-		// jiyy add for threshold
-		constexpr double rho_threshold = 1E-6;
-		constexpr double grho_threshold = 1E-10;
-		constexpr double tau_threshold = 1E-6;
-		xc_func_set_dens_threshold(&func, rho_threshold);
-		// sgn for threshold mask
-		const std::vector<double> sgn = [&]() -> std::vector<double>
-		{
-			std::vector<double> sgn( GlobalC::pw.nrxx * nspin0(), 1.0);
-			if(nspin0()==2 && func.info->family != XC_FAMILY_LDA && func.info->kind==XC_CORRELATION)
-			{
-				for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
-				{
-					double atau;
-					atau = abs(kin_r[ir*2]);
-					if ( rho[ir*2]<rho_threshold || sqrt(abs(sigma[ir*3]))<grho_threshold || atau<tau_threshold) 
-						sgn[ir*2] = 0.0;
-					atau = abs(kin_r[ir*2+1]);
-					if ( rho[ir*2+1]<rho_threshold || sqrt(abs(sigma[ir*3+2]))<grho_threshold || atau<tau_threshold) 
-						sgn[ir*2+1] = 0.0;
-				}
-			}
-			return sgn;
-		}();
+		xc_func_init(&c_func, 267 ,xc_polarized);
+	}
+    else
+	{
+		throw domain_error("icorr="+TO_STRING(GlobalC::xcf.icorr_now)+", igcc="+TO_STRING(GlobalC::xcf.igcc_now)
+			+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 
-		std::vector<double> exc    ( GlobalC::pw.nrxx                       );
-		std::vector<double> vrho   ( GlobalC::pw.nrxx * nspin0()            );
-		std::vector<double> vsigma ( GlobalC::pw.nrxx * ((1==nspin0())?1:3) );
-		std::vector<double> vlapl  ( GlobalC::pw.nrxx * nspin0()            ); //dummy output, not used in SCAN
-	    std::vector<double> kedtaur( GlobalC::pw.nrxx * nspin0()			);
+	}
 	
-		// cal etxc from rho, exc
-		auto process_exc = [&]()
-		{
-			for( size_t is=0; is!=nspin0(); ++is )
-				for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
-					etxc += e2 * exc[ir] * rho[ir*nspin0()+is] * sgn[ir*nspin0()+is];
-		};
+	//input of xc_mgga_exc_vxc 
+	vector<vector<double>> rho;
+	vector<vector<Vector3<double>>> grho;
+	vector<vector<double>> sigma;
+	vector<vector<double>> kin_r;
 
-		auto process_kedtau = [&]()
+	//output of xc_mgga_exc_vxc
+	vector<vector<double>> vrho;
+	vector<vector<Vector3<double>>> h;
+	vector<vector<double>> kedtaur;
+	
+	//rho : from double** to vector<double>
+	rho.resize(GlobalV::NSPIN);
+	for( int is=0; is!=GlobalV::NSPIN; ++is )
+	{
+		rho[is].resize(GlobalC::pw.nrxx);
+		for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 		{
-			if(nspin0()==1 || GlobalV::NSPIN==2)
-			{
-				for( size_t is=0; is!=nspin0(); ++is )
-				{
-					for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
-					{
-						vofk(is,ir) += e2 * kedtaur[ir*nspin0()+is] * sgn[ir*nspin0()+is];
-					}
-				}
-			}
-			else // may need updates for SOC
-			{
-				WARNING_QUIT("Potential_Libxc::v_xc_meta","meta-GGA: implement for nspin=1,2 first");
-			}
-		};
+			rho[is][ir] = rho_in[is][ir] + (1.0/GlobalV::NSPIN)*rho_core_in[ir]; 
+		}
+	}
 
-		// cal vtx, v from rho_in, vrho
-		auto process_vrho = [&]()
+	//grho : calculate gradient	
+	grho.resize(GlobalV::NSPIN);
+	for( int is=0; is!=GlobalV::NSPIN; ++is )
+	{
+		grho[is].resize(GlobalC::pw.nrxx);
+		
+		vector<complex<double>> rhog(GlobalC::pw.ngmc);
+		GlobalC::CHR.set_rhog(rho[is].data(), rhog.data());
+		GGA_PW::grad_rho(rhog.data(), grho[is].data());
+
+	}
+		
+	//kin_r : from double** to vector<double>
+	kin_r.resize(GlobalV::NSPIN);
+	if(GlobalV::NSPIN==1 || GlobalV::NSPIN==2)
+	{
+		for( int is=0; is!=GlobalV::NSPIN; ++is )
 		{
-			if(nspin0()==1 || GlobalV::NSPIN==2)
+			kin_r[is].resize(GlobalC::pw.nrxx);
+			for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 			{
-				for( size_t is=0; is!=nspin0(); ++is )
-				{
-					for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
-					{
-						const double v_tmp = e2 * vrho[ir*nspin0()+is] * sgn[ir*nspin0()+is];
-						v(is,ir) += v_tmp;
-						vtxc += v_tmp * rho_in[is][ir];
-					}
-				}
+				kin_r[is][ir] = kin_r_in[is][ir];
 			}
-			else // may need updates for SOC
-			{
-				constexpr double vanishing_charge = 1.0e-12;
-				for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
-				{
-					std::vector<double> v_tmp(4);
-					v_tmp[0] = e2 * (0.5 * (vrho[ir*2] + vrho[ir*2+1]));
-					const double vs = 0.5 * (vrho[ir*2] - vrho[ir*2+1]);
-					const double amag = sqrt( pow(rho_in[1][ir],2) 
-						+ pow(rho_in[2][ir],2) 
-						+ pow(rho_in[3][ir],2) );
+		}	
+	}
 
-					if(amag>vanishing_charge)
-					{
-						for(int ipol=1; ipol<4; ++ipol)
-						{
-							v_tmp[ipol] = e2 * vs * rho_in[ipol][ir] / amag;
-						}
-					}
-					for(int ipol=0; ipol<4; ++ipol)
-					{
-						v(ipol, ir) += v_tmp[ipol];
-						vtxc += v_tmp[ipol] * rho_in[ipol][ir];
-					}
-				}
-			}
+	cout << "flag 3" << endl;
+	if(GlobalV::NSPIN==1)
+	{
+		vrho.resize(GlobalV::NSPIN);
+	    h.resize(GlobalV::NSPIN);
+	    kedtaur.resize(GlobalV::NSPIN);
+
+		for( int is=0; is!=GlobalV::NSPIN; ++is )
+		{
+			vrho[is].resize(GlobalC::pw.nrxx);
+			h[is].resize(GlobalC::pw.nrxx);
+			kedtaur[is].resize(GlobalC::pw.nrxx);
+
+			double arho, grho2, atau, lapl;
+			double ex, ec, v1x, v2x, v3x, v1c, v2c, v3c, vlapl;
+			const double rho_th  = 1e-8;
+			const double grho_th = 1e-12;
+			const double tau_th  = 1e-8;
+
+			lapl = 0.0;//dummy argument, not used
+
+	cout << "flag 4" << endl;
+			for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
+			{
+				arho  = abs(rho[is][ir]);
+				grho2 = grho[0][ir]*grho[0][ir];
+				atau  = kin_r[is][ir] / e2;
 			
-		};
-
-		// cal vtxc, v from rho_in, rho, gdr, vsigma
-		auto process_vsigma = [&]()
-		{
-			const std::vector<std::vector<Vector3<double>>> &gdr = std::get<2>(rho_sigma_gdr);
-			
-			std::vector<std::vector<Vector3<double>>> h( nspin0(), std::vector<Vector3<double>>(GlobalC::pw.nrxx) );
-			if( 1==nspin0() )
-			{
-				for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
+				if(arho > rho_th && grho2 > grho_th && abs(atau) > tau_th)
 				{
-					h[0][ir] = e2 * gdr[0][ir] * vsigma[ir] * 2.0 * sgn[ir];
+					xc_mgga_exc_vxc(&x_func,1,&arho,&grho2,&lapl,&atau,&ex,&v1x,&v2x,&vlapl,&v3x);
+					xc_mgga_exc_vxc(&c_func,1,&arho,&grho2,&lapl,&atau,&ec,&v1c,&v2c,&vlapl,&v3c);
+					ex = ex * rho[is][ir];
+					ec = ec * rho[is][ir];
+					v2x = v2x * e2;
+					v2c = v2c * e2;
+
+					vrho[is][ir] = (v1x + v1c) * e2;
+					h[is][ir] = (v2x + v2c) * e2 * grho[is][ir];
+					kedtaur[is][ir] = v3x + v3c;
+				
+					etxc += (ex + ec) * e2;
+					vtxc += (v1x + v1c) * e2 * arho;	
 				}
+				else
+				{
+					vrho[is][ir] = 0.0;
+					h[is][ir] = 0.0;
+					cout << "should be 0" << h[is][ir];
+					kedtaur[is][ir] = 0.0;
+				}
+			}//loop over grid points
+	cout << "flag 5" << endl;
+		}//loop over spin
+	}//nspin=1
+	else if(GlobalV::NSPIN==2)
+	{
+		vrho.resize(GlobalV::NSPIN);
+	    h.resize(GlobalV::NSPIN);
+	    kedtaur.resize(GlobalV::NSPIN);
+
+		for( int is=0; is!=GlobalV::NSPIN; ++is )
+		{
+			vrho[is].resize(GlobalC::pw.nrxx);
+			h[is].resize(GlobalC::pw.nrxx);
+			kedtaur[is].resize(GlobalC::pw.nrxx);
+		}
+
+		double rh, ggrho2, atau, ex, ec;
+		vector<double> arho, grho2, tau, lapl;
+		vector<double> v1x, v2x, v3x, v1c, v2c, v3c, vlapl;
+		Vector3<double> v2cup, v2cdw;
+	
+		arho.resize(2);grho2.resize(3);tau.resize(2);
+		v1x.resize(2);v2x.resize(3);v3x.resize(2);
+		v1c.resize(2);v2c.resize(3);v3c.resize(2);
+		lapl.resize(6);vlapl.resize(6);
+	
+		const double rho_th  = 1e-8;
+		const double grho_th = 1e-12;
+		const double tau_th  = 1e-8;
+
+		for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
+		{
+			arho[0] = rho[0][ir]; arho[1] = rho[1][ir];
+			rh = arho[0] + arho[1];
+
+			grho2[0]=grho[0][ir]*grho[0][ir];
+			grho2[1]=grho[0][ir]*grho[1][ir];
+			grho2[2]=grho[1][ir]*grho[1][ir];
+			ggrho2 = (grho2[0] + grho2[2]) * 4.0;
+
+			tau[0] = kin_r[0][ir] / e2;tau[1] = kin_r[1][ir] / e2;
+			atau = tau[0] + tau[1];
+
+			if (rh > rho_th && ggrho2 > grho_th && abs(atau) > tau_th)
+			{
+				xc_mgga_exc_vxc(&x_func,1,arho.data(),grho2.data(),lapl.data(),tau.data(),&ex,v1x.data(),v2x.data(),vlapl.data(),v3x.data());
+				xc_mgga_exc_vxc(&c_func,1,arho.data(),grho2.data(),lapl.data(),tau.data(),&ec,v1c.data(),v2c.data(),vlapl.data(),v3c.data());
+
+				ex = ex*rh;
+				v2x[0]=v2x[0]*e2;v2x[1]=v2x[1]*e2;
+				
+				ec = ec*rh;
+				v2c[0]=v2c[0]*e2;v2c[1]=v2c[1]*e2;
+
+				v2cup=v2c[0]*grho[0][ir]*e2 + v2c[1]*grho[1][ir];
+				v2cdw=v2c[2]*grho[1][ir]*e2 + v2c[1]*grho[0][ir];
+
+				vrho[0][ir] = (v1x[0]+v1c[0]) * e2;
+				vrho[1][ir] = (v1x[1]+v1c[1]) * e2;
+
+				h[0][ir] = (v2x[0]*grho[0][ir]+v2cup)*e2;
+				h[1][ir] = (v2x[1]*grho[1][ir]+v2cdw)*e2;
+				
+				kedtaur[0][ir] = v3x[0]+v3c[0];
+				kedtaur[1][ir] = v3x[1]+v3c[1];
+
+				etxc += (ex+ec) * e2;
+				vtxc += (v1x[0]+v1x[1]+v1c[0]+v1c[1]) * e2 * rh;
 			}
 			else
 			{
-				for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
-				{
-					h[0][ir] = e2 * (gdr[0][ir] * vsigma[ir*3  ] * 2.0 * sgn[ir*2  ]
-						           + gdr[1][ir] * vsigma[ir*3+1]       * sgn[ir*2]   * sgn[ir*2+1]);
-					h[1][ir] = e2 * (gdr[1][ir] * vsigma[ir*3+2] * 2.0 * sgn[ir*2+1]
-					               + gdr[0][ir] * vsigma[ir*3+1]       * sgn[ir*2]   * sgn[ir*2+1]);
-				}
+				vrho[0][ir] = 0.0;
+				vrho[1][ir] = 0.0;
+
+				h[0][ir]=0.0;
+				h[1][ir]=0.0;
+
+				kedtaur[0][ir] = 0.0;
+				kedtaur[1][ir] = 0.0;
 			}
-
-			// define two dimensional array dh [ nspin, GlobalC::pw.nrxx ]
-			std::vector<std::vector<double>> dh(nspin0(), std::vector<double>(GlobalC::pw.nrxx));
-			for( size_t is=0; is!=nspin0(); ++is )
-				GGA_PW::grad_dot( VECTOR_TO_PTR(h[is]), VECTOR_TO_PTR(dh[is]) );
-
-			for( size_t is=0; is!=nspin0(); ++is )
-				for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
-					vtxc -= dh[is][ir] * rho[ir*nspin0()+is];
-
-			if(nspin0()==1 || GlobalV::NSPIN==2)
-			{
-				for( size_t is=0; is!=nspin0(); ++is )
-					for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
-						v(is,ir) -= dh[is][ir];
-			}
-			else // may need updates for SOC
-			{
-				constexpr double vanishing_charge = 1.0e-12;
-				for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
-				{
-					v(0,ir) -= 0.5 * (dh[0][ir] + dh[1][ir]);
-					const double amag = sqrt( pow(rho_in[1][ir],2) + pow(rho_in[2][ir],2) + pow(rho_in[3][ir],2) );
-					const double neg = (GlobalC::ucell.magnet.lsign_
-					                 && rho_in[1][ir]*GlobalC::ucell.magnet.ux_[0]+rho_in[2][ir]*GlobalC::ucell.magnet.ux_[1]+rho_in[3][ir]*GlobalC::ucell.magnet.ux_[2]<=0)
-									 ? -1 : 1;
-					if(amag > vanishing_charge)
-					{
-						for(int i=1;i<4;i++)
-							v(i,ir) -= neg * 0.5 * (dh[0][ir]-dh[1][ir]) * rho_in[i][ir] / amag;
-					}
-				}
-			}
-		};
-
-		//------------------------------------------------------------------
-		// "func.info->family" includes LDA, GGA, Hybrid functional (HYB).
-		//------------------------------------------------------------------
-		switch( func.info->family )
-		{
-			case XC_FAMILY_LDA:
-			case XC_FAMILY_GGA:
-			case XC_FAMILY_HYB_GGA:
-				WARNING_QUIT("Potential_Libxc::v_xc_meta","func.info->family should be meta-GGA");
-				break;
-			case XC_FAMILY_MGGA:
-				// call Libxc function: xc_mgga_exc_vxc
-				xc_mgga_exc_vxc( &func, GlobalC::pw.nrxx, rho.data(), sigma.data(), lapl_rho.data(),kin_r.data(),
-					exc.data(), vrho.data(), vsigma.data(), vlapl.data(), kedtaur.data());
-				process_exc();
-				process_vrho();
-				process_vsigma();
-				process_kedtau();
-				break;
-			default:
-				throw domain_error("func.info->family ="+TO_STRING(func.info->family)
-					+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
-				break;
-		}
-		// Libxc function: Deallocate memory
-		xc_func_end(&func);
+		}//end loop grid points
+	}//nspin=2
+	else
+	{
+		WARNING_QUIT("potential_libxc_meta","meta-GGA for nspin=1,2 first");
 	}
 
+	vector<double> dh;
+	dh.resize(GlobalC::pw.nrxx);
+	cout << "flag 6" << endl;
+
+	for(int is=0;is<GlobalV::NSPIN;is++)
+	{
+		GGA_PW::grad_dot(VECTOR_TO_PTR(h[is]),VECTOR_TO_PTR(dh));	
+		for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
+		{
+			vrho[is][ir]-=dh[ir];
+			vtxc-=dh[ir]*rho_in[is][ir];
+		}
+	}
+	cout << "flag 7" << endl;
+
+	for( int is=0; is!=nspin0(); ++is )
+	{
+		for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
+		{
+			v(is,ir) = vrho[is][ir];
+			vofk(is,ir) = kedtaur[is][ir];
+		}
+	}
+	cout << "flag 8" << endl;
+		
 	//-------------------------------------------------
 	// for MPI, reduce the exchange-correlation energy
 	//-------------------------------------------------
@@ -268,7 +297,8 @@ std::tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
     vtxc *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
 
     timer::tick("Potential_Libxc","v_xc_meta");
-	return std::make_tuple( etxc, vtxc, std::move(v), vofk );
+	return std::make_tuple( etxc, vtxc, move(v), move(vofk) );
+
 }
 
 #endif	//ifdef USE_LIBXC
