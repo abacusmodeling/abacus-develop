@@ -20,6 +20,7 @@
 #include "LOOP_ions.h"
 #include "LCAO_matrix.h"
 
+namespace ModuleDFTU{
 DFTU_Yukawa::DFTU_Yukawa(){}
 
 DFTU_Yukawa::~DFTU_Yukawa(){}
@@ -371,3 +372,5 @@ void DFTU::cal_slater_Vsc(const int T, const int L)
 	return;
 }
 */
+
+}

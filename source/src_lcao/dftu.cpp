@@ -62,9 +62,10 @@ extern "C"
 
 namespace GlobalC
 {
-DFTU dftu;
+ModuleDFTU::DFTU dftu;
 }
 
+namespace ModuleDFTU{
 DFTU::DFTU(){}
 
 DFTU::~DFTU(){}
@@ -121,6 +122,7 @@ void DFTU::init(
 	this->iwt2m.resize(nlocal);
 	this->iwt2ipol.resize(nlocal);	
 
+	//initialize 
 	for(int i=0; i<nlocal; i++)
 	{
 		this->iwt2it.at(i) = -1;
@@ -130,11 +132,13 @@ void DFTU::init(
 		this->iwt2m.at(i) = -1;
 		this->iwt2ipol.at(i) = -1;
 	}
-
+	//it:index of type of atom
 	for(int it=0; it<cell.ntype; ++it)
 	{				
 		for(int ia=0; ia<cell.atoms[it].na; ia++)
 		{
+			//ia:index of atoms of this type
+			//determine the size of locale
 			const int iat = cell.itia2iat(it, ia);
 			this->iat2it.at(iat) = it;
 
@@ -491,7 +495,7 @@ void DFTU::cal_occup_m_k(const int iter)
 void DFTU::cal_occup_m_gamma(const int iter)
 {
 	TITLE("DFTU", "cal_occup_m_gamma");	
-
+	timer::tick("DFTU", "cal_occup_m_gamma");
 	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
 		if(INPUT.orbital_corr[T]==-1) continue;
@@ -659,6 +663,7 @@ void DFTU::cal_occup_m_gamma(const int iter)
 	*/
 
 	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
+	timer::tick("DFTU", "cal_occup_m_gamma");
 	return;
 }
 
@@ -985,8 +990,8 @@ void DFTU::local_occup_bcast()
 void DFTU::cal_energy_correction(const int istep)
 {
 	TITLE("DFTU", "cal_energy_correction");
-
- 	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!INPUT.omc) && istep==0 && this->iter_dftu==1) return;
+	timer::tick("DFTU", "cal_energy_correction");
+	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!INPUT.omc) && istep==0 && this->iter_dftu==1) return;
 
 	this->EU = 0.0;
 	double EU_dc = 0.0;
@@ -1140,14 +1145,14 @@ void DFTU::cal_energy_correction(const int istep)
 		of_en << fixed << setprecision(8) << val << "eV" << endl;
 	}
 	*/
-
+	timer::tick("DFTU", "cal_energy_correction");
 	return;
 }
 
 void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, complex<double>* eff_pot)
 {
 	TITLE("DFTU", "cal_eff_pot_mat");
-
+	timer::tick("DFTU", "cal_eff_pot_mat");
  	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!INPUT.omc) && istep==0 && this->iter_dftu==1) return;
 	
 	int spin = GlobalC::kv.isk[ik];
@@ -1223,14 +1228,14 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, complex<double
 	*/
 
 	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
-
+	timer::tick("DFTU", "cal_eff_pot_mat");
 	return;	
 }
 
 void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 {
 	TITLE("DFTU", "cal_eff_pot_mat");
-
+	timer::tick("DFTU", "cal_eff_pot_mat");
  	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!INPUT.omc) && istep==0 && this->iter_dftu==1) return;
 	
 	int spin = GlobalC::kv.isk[ik];
@@ -1306,7 +1311,7 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 	*/
 	
 	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
-
+	timer::tick("DFTU", "cal_eff_pot_mat");
 	return;	
 }
 
@@ -1639,4 +1644,6 @@ void DFTU::folding_overlap_matrix(const int ik, complex<double>* Sk)
 
   // timer::tick("DFTU","folding_overlap_matrix");
 	return;
+}
+
 }
