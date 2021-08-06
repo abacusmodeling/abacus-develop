@@ -54,3 +54,15 @@ RUN cd /tmp \
     && cp -r libtorch/lib /usr/local \
     && cp -r libtorch/share /usr/local \
     && rm -rf libtorch
+
+RUN cd /tmp \
+    && wget https://gitlab.com/libxc/libxc/-/archive/5.1.5/libxc-5.1.5.tar.gz --no-check-certificate \
+    && tar xvzf libxc-5.1.5.tar.gz \
+    && cd libxc-5.1.5 \
+    && mkdir build \
+    && cmake -B build \
+    && cmake --build build \
+    && cmake --install build \
+    && cd /tmp \
+    && rm -rf libxc-5.1.5 \
+    && rm libxc-5.1.5.tar.gz
