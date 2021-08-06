@@ -39,9 +39,3 @@ TEST_F(matrix3, op_inequal)
 	ASSERT_FALSE(matrix_a != matrix_a1);
 	ASSERT_TRUE(matrix_a != matrix_b);
 }
-
-int main(int argc, char* argv[])
-{
-	testing::InitGoogleTest(&argc,argv);
-	return RUN_ALL_TESTS();
-}
