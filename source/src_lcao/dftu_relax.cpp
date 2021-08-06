@@ -57,7 +57,7 @@ extern "C"
     const double *beta,
     double *C, const int *IC, const int *JC, const int *DESCC);
 }
-
+namespace ModuleDFTU{
 DFTU_RELAX::DFTU_RELAX(){}
 
 
@@ -930,4 +930,6 @@ void DFTU_RELAX::fold_dSR_k(const int ik, const int dim1, const int dim2, comple
 	}// T1
 
 	return;
+}
+
 }

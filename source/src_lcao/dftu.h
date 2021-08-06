@@ -19,6 +19,8 @@ using namespace std;
 // CLASS :
 // NAME : DTFU (DFT+U)
 //==========================================================
+namespace ModuleDFTU{
+    
 class DFTU : public DFTU_RELAX
 {
 
@@ -62,10 +64,10 @@ public:
     int iter_dftu;
    
 };
-
+}
 namespace GlobalC
 {
-extern DFTU dftu;
+extern ModuleDFTU::DFTU dftu;
 }
 
 #endif
