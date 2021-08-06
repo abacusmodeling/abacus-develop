@@ -27,6 +27,11 @@ std::tuple<double,double,matrix> Potential_Libxc::v_xc(
     double vtxc = 0.0;
 	matrix v(GlobalV::NSPIN,GlobalC::pw.nrxx);
 
+	if(GlobalV::VXC_IN_H == 0 )
+	{
+    	timer::tick("Potential_Libxc","v_xc");
+		return std::make_tuple( etxc, vtxc, std::move(v) );
+	}
 	//----------------------------------------------------------
 	// xc_func_type is defined in Libxc package
 	// to understand the usage of xc_func_type,
