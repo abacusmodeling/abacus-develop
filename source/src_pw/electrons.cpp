@@ -338,8 +338,11 @@ void Electrons::self_consistent(const int &istep)
         for(int is=0; is<GlobalV::NSPIN; is++)
         {
             stringstream ssc;
+            stringstream ss1;
             ssc << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG";
             GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, iter, ssc.str(), 3);//mohan add 2007-10-17
+			ss1 << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG.cube";
+			GlobalC::CHR.write_rho_cube(GlobalC::CHR.rho_save[is], is, ssc.str(), 3);
         }
 
         if(GlobalC::wf.out_wf)
@@ -404,8 +407,11 @@ void Electrons::self_consistent(const int &istep)
             for(int is=0; is<GlobalV::NSPIN; is++)
             {
                 stringstream ssc;
+                stringstream ss1;
                 ssc << GlobalV::global_out_dir << "SPIN" << is + 1 << "_CHG";
+				ss1 << GlobalV::global_out_dir << "SPIN" << is + 1 << "_CHG.cube";
                 GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, 0, ssc.str() );//mohan add 2007-10-17
+			    GlobalC::CHR.write_rho_cube(GlobalC::CHR.rho_save[is], is, ss1.str(), 3);
             }
 
             if(conv_elec)
