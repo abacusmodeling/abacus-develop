@@ -9,7 +9,7 @@ if (OPENMP_FOUND)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include(FetchContent)
 FetchContent_Declare(
   googletest
@@ -30,6 +30,7 @@ function(AddTest)
 endfunction(AddTest)
 
 get_target_property(ABACUS_LINK_LIBRARIES ${ABACUS_BIN_NAME} LINK_LIBRARIES)
+
 AddTest(
   TARGET base_matrix3
   SOURCES ${ABACUS_TEST_DIR}/module_base/matrix3.cpp
