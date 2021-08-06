@@ -66,8 +66,16 @@ void Run_MD_CLASSIC::md_cells_classic(void)
             GlobalV::ofs_running << " -------------------------------------------" << endl;
         }
 
-		// search adjent atoms
-		atom_arrange::search(
+		double potential;
+
+		if(this->ucell_c.judge_big_cell())
+		{
+			
+		
+		}
+		else
+		{
+			atom_arrange::search(
 				GlobalV::SEARCH_PBC,
 				GlobalV::ofs_running,
 				this->grid_neigh,
@@ -76,13 +84,14 @@ void Run_MD_CLASSIC::md_cells_classic(void)
 				GlobalV::test_atom_input,
 				INPUT.test_just_neighbor);
 
-		LJ_potential LJ_CMD;
+			LJ_potential LJ_CMD;
 
-		double potential = LJ_CMD.Lennard_Jones(
-								this->ucell_c,
-								this->grid_neigh,
-								this->force,
-								this->stress);
+			potential = LJ_CMD.Lennard_Jones(
+							this->ucell_c,
+							this->grid_neigh,
+							this->force,
+							this->stress);
+		}
 
 		this->update_pos_classic();
 

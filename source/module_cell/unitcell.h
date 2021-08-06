@@ -81,6 +81,8 @@ public:
     void bcast_atoms_tau();
     void save_cartesian_position(double* pos)const;
 
+    bool judge_big_cell(void);
+
 protected:
 
     double electrons_number;
@@ -94,7 +96,7 @@ protected:
     void bcast_unitcell2(void);
 #endif
 
-	void set_iat2it(void);
+	void set_iat2itia(void);
 
 };
 
