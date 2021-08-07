@@ -2,7 +2,7 @@
 #include "../src_pw/global.h"
 
 int Ions_Move_Basic::dim=0;
-bool Ions_Move_Basic::converged=true;
+bool Ions_Move_Basic::converged=false;
 double Ions_Move_Basic::largest_grad=0.0;
 int Ions_Move_Basic::update_iter=0;
 int Ions_Move_Basic::istep=0;

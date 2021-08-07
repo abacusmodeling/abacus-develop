@@ -700,3 +700,24 @@ Parallel_Common::bcast_double( atom->taud[ia].z );
 
     return;
 }
+
+//check if any atom can be moved
+bool UnitCell_pseudo::if_atoms_can_move()const
+{
+	for(int it=0; it<this->ntype; it++)
+    {
+        Atom* atom = &atoms[it];
+        for(int ia =0;ia< atom->na;ia++)
+        {
+            if(atom->mbl[ia].x||atom->mbl[ia].y||atom->mbl[ia].z) return 1;
+		}
+	}
+	return 0;
+}
+
+//check if lattice vector can be changed
+bool UnitCell_pseudo::if_cell_can_change()const
+{
+	//need to be fixed next
+	return 1;
+}
