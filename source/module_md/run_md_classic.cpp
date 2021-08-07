@@ -1,6 +1,7 @@
 #include "run_md_classic.h"
 #include "MD_basic.h"
 #include "LJ_potential.h"
+#include "cmd_neighbor.h"
 #include "../input.h"
 #include "../module_base/global_variable.h"
 #include "../src_io/print_info.h"
@@ -70,8 +71,17 @@ void Run_MD_CLASSIC::md_cells_classic(void)
 
 		if(this->ucell_c.judge_big_cell())
 		{
-			
-		
+			//cout << "Big cell !!" << endl;
+			CMD_neighbor cmd_neigh;
+			cmd_neigh.Neighbor(this->ucell_c);
+
+			LJ_potential LJ_CMD;
+
+			potential = LJ_CMD.Lennard_Jones(
+							this->ucell_c,
+							cmd_neigh,
+							this->force,
+							this->stress);
 		}
 		else
 		{
@@ -92,6 +102,14 @@ void Run_MD_CLASSIC::md_cells_classic(void)
 							this->force,
 							this->stress);
 		}
+
+/*		ofstream force_out("force.txt", ios::app);
+		for(int i=0; i<ucell_c.nat; ++i)
+		{
+			force_out << setw(18) << setiosflags(ios::fixed) << setprecision(12) << force[i].x
+             	 		<< setw(18) << setiosflags(ios::fixed) << setprecision(12) << force[i].y
+        	 	 		<< setw(18) << setiosflags(ios::fixed) << setprecision(12) << force[i].z << endl;
+		}*/
 
 		this->update_pos_classic();
 
