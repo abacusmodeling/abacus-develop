@@ -24,10 +24,6 @@
     - [Electric field](#electric-field)
     
         [efield](#efield) | [edir](#edir) | [emaxpos](#emaxpos) | [eopreg](#eopreg) | [eamp](#eamp)
-        
-    - [DeePKS](#deepks)
-
-        [out_descriptor](#out-descriptor) | [lmax_descriptor](#lmax-descriptor) | [deepks_scf](#deepks-scf) | [model_file](#model-file)
     
     - [Exact exchange](#exact-exchange) (under tests)
     
