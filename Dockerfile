@@ -60,7 +60,7 @@ RUN cd /tmp \
     && tar xvzf libxc-5.1.5.tar.gz \
     && cd libxc-5.1.5 \
     && mkdir build \
-    && cmake -B build \
+    && cmake -B build -DBUILD_TESTING=OFF \
     && cmake --build build \
     && cmake --install build \
     && cd /tmp \
