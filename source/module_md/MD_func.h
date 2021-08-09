@@ -23,8 +23,6 @@ class MD_func
 //	void ReadNewTemp(int step);
 	string intTurnTostring(long int iter,string path);
 	int getMassMbl(const UnitCell_pseudo &unit_in, double* allmass, Vector3<int>* ionmbl);
-	void callInteraction_LCAO(const int& numIon, Vector3<double>* force, matrix& stress_lcao);
-	void callInteraction_PW(const int& numIon, Vector3<double>* force, matrix& stress_pw);
     void printpos(const string& file, const int& iter, const int& recordFreq, const UnitCell_pseudo& unit_in);
     void scalevel(
 		const int& numIon,

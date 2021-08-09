@@ -15,6 +15,7 @@ using namespace std;
 // CLASS :
 // NAME : DFTU_RELAX
 //==========================================================
+namespace ModuleDFTU{
 class DFTU_RELAX : public DFTU_Yukawa
 {
 
@@ -63,5 +64,5 @@ public:
     vector<vector<vector<vector<matrix>>>> locale;            // locale[iat][l][n][spin](m1,m2)
     vector<vector<vector<vector<matrix>>>> locale_save;       // locale_save[iat][l][n][spin](m1,m2)
 };
-
+}
 #endif

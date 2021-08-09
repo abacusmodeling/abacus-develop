@@ -17,10 +17,14 @@
 #include "../src_pw/vdwd3_parameters.h"
 
 Run_MD_LCAO::Run_MD_LCAO()
-{}
+{
+    force=new Vector3<double>[GlobalC::ucell.nat];
+}
 
 Run_MD_LCAO::~Run_MD_LCAO() 
-{}
+{
+    delete []force;
+}
 
 
 void Run_MD_LCAO::opt_cell(void)
@@ -141,17 +145,20 @@ void Run_MD_LCAO::opt_ions(void)
         //xiaohui add 2014-07-07, for second-order extrapolation
 		CE.update_all_pos(GlobalC::ucell);
 
+        this->callInteraction_LCAO(GlobalC::ucell.nat, force, stress);
+        double potential = GlobalC::en.etot/2;
+
 		if(mdtype==1||mdtype==2)   
 		{
-			mdb.runNVT(istep);
+			mdb.runNVT(istep, potential, force, stress);
 		}
 		else if(mdtype==0)  
 		{
-			mdb.runNVE(istep);
+			mdb.runNVE(istep, potential, force, stress);
 		}
         else if(mdtype==-1)
         {
-            stop = mdb.runFIRE(istep);
+            stop = mdb.runFIRE(istep, potential, force, stress);
         }
         else
         {
@@ -310,4 +317,30 @@ void Run_MD_LCAO::final_scf(void)
     GlobalV::ofs_running << " --------------------------------------------\n\n" << endl;
 
     return;
+}
+
+void Run_MD_LCAO::callInteraction_LCAO(const int& numIon, Vector3<double>* force, matrix& stress_lcao)
+{
+//to call the force of each atom
+	matrix fcs;//temp force matrix
+	Force_Stress_LCAO FSL;
+	FSL.allocate (); 
+	FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS, GlobalV::TEST_FORCE, GlobalV::TEST_STRESS, fcs, stress_lcao);
+	for(int ion=0;ion<numIon;ion++){
+		force[ion].x =fcs(ion, 0)/2.0;
+		force[ion].y =fcs(ion, 1)/2.0;
+		force[ion].z =fcs(ion, 2)/2.0;
+	}
+
+#ifdef __MPI //2015-10-01, xiaohui
+	atom_arrange::delete_vector(
+		GlobalV::ofs_running, 
+		GlobalV::SEARCH_PBC, 
+		GlobalC::GridD, 
+		GlobalC::ucell, 
+		GlobalV::SEARCH_RADIUS, 
+		GlobalV::test_atom_input);
+#endif //2015-10-01, xiaohui
+
+	return;
 }

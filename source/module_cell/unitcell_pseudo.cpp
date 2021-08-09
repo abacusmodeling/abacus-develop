@@ -306,7 +306,6 @@ void UnitCell_pseudo::setup_cell_classic(
 	const string &fn,
 	ofstream &ofs_running,
 	ofstream &ofs_warning)
-
 {
 	TITLE("UnitCell_pseudo","setup_cell_classic");
 
@@ -319,7 +318,7 @@ void UnitCell_pseudo::setup_cell_classic(
 	bool ok = true;
 	bool ok2 = true;
 
-	// (3) read in atom information
+	// (2) read in atom information
 	if(GlobalV::MY_RANK == 0)
 	{
 		ifstream ifa(fn.c_str(), ios::in);
@@ -354,7 +353,6 @@ void UnitCell_pseudo::setup_cell_classic(
 			// call read_atom_positions
 			//==========================
 			ok2 = this->read_atom_positions(ifa, ofs_running, ofs_warning);
-			cout << "read_atom_positions done." << endl;
 			if(ok2)
 			{
 				for(int i=0;i<this->ntype;i++)
@@ -701,4 +699,25 @@ Parallel_Common::bcast_double( atom->taud[ia].z );
     outp.printM3(GlobalV::ofs_running,"Reciprocal vectors: (Cartesian coordinate: in unit of 2 pi/a_0)",G);
 
     return;
+}
+
+//check if any atom can be moved
+bool UnitCell_pseudo::if_atoms_can_move()const
+{
+	for(int it=0; it<this->ntype; it++)
+    {
+        Atom* atom = &atoms[it];
+        for(int ia =0;ia< atom->na;ia++)
+        {
+            if(atom->mbl[ia].x||atom->mbl[ia].y||atom->mbl[ia].z) return 1;
+		}
+	}
+	return 0;
+}
+
+//check if lattice vector can be changed
+bool UnitCell_pseudo::if_cell_can_change()const
+{
+	//need to be fixed next
+	return 1;
 }

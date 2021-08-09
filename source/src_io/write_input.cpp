@@ -152,7 +152,6 @@ void Input::Print(const string &fn)const
 
 	ofs << "\n#Parameters (10.Molecular dynamics)" << endl;
 	OUTP(ofs,"md_mdtype",mdp.mdtype,"choose ensemble");
-	//OUTP(ofs,"md_potential",mdp.md_potential,"choose potential for md");
 	OUTP(ofs,"md_dt",mdp.dt,"time step");
 	OUTP(ofs,"mnhc",mdp.MNHC,"number of Nose-Hoover chains");
 	OUTP(ofs,"md_qmass",mdp.Qmass,"mass of thermostat");
@@ -166,6 +165,9 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"md_ediffg",mdp.ediffg,"parameter for constraining max force change");
 	OUTP(ofs,"NVT_tau",mdp.NVT_tau,"parameter for adjust effect of thermostat");
 	OUTP(ofs,"NVT_control",mdp.NVT_control,"choose which thermostat used in NVT ensemble");
+	OUTP(ofs,"rcut_lj",mdp.rcut_lj/ANGSTROM_AU,"cutoff radius of LJ potential");
+	OUTP(ofs,"epsilon_lj",mdp.epsilon_lj*Ry_to_eV,"the value of epsilon for LJ potential");
+	OUTP(ofs,"sigma_lj",mdp.sigma_lj/ANGSTROM_AU,"the value of sigma for LJ potential");
 
 	ofs << "\n#Parameters (11.Efield)" << endl;
 	OUTP(ofs,"efield",efield,"add electric field");
@@ -182,6 +184,9 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"t_in_h", t_in_h,"calculate the kinetic energy or not");
 	OUTP(ofs,"vl_in_h", vl_in_h,"calculate the local potential or not");
 	OUTP(ofs,"vnl_in_h", vnl_in_h,"calculate the nonlocal potential or not");
+	OUTP(ofs,"vh_in_h", vh_in_h,"calculate the hartree potential or not");
+	OUTP(ofs,"vxc_in_h", vxc_in_h,"calculate the xc potential or not");
+	OUTP(ofs,"vion_in_h", vion_in_h,"calculate the local ionic potential or not");
 	OUTP(ofs,"test_force", test_force, "test the force");
 	OUTP(ofs,"test_stress", test_stress, "test the force");
 	

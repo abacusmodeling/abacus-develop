@@ -13,6 +13,7 @@ using namespace std;
 // CLASS :
 // NAME : DFTU_Yukawa 
 //==========================================================
+namespace ModuleDFTU{
 class DFTU_Yukawa
 {
 public:
@@ -45,5 +46,5 @@ public:
     double Nc;           //Total nmuber of correlated electrons of the system 
 
 };
-
+}
 #endif
