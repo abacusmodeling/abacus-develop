@@ -43,7 +43,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
       - name: Build and Test
         env:
-          GTEST_COLOR: '1'
+          GTEST_COLOR: 'yes'
         run: |
           cmake -B build
           cmake --build build -j16
