@@ -346,15 +346,25 @@ double energy::delta_e(void)
 
     double deband_aux = 0.0;
 
-    for (int ir=0; ir<GlobalC::pw.nrxx; ir++) deband_aux -= GlobalC::CHR.rho[0][ir] * GlobalC::pot.vr(0, ir);
+    for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
+    {
+    	deband_aux -= GlobalC::CHR.rho[0][ir] * GlobalC::pot.vr(0, ir);
+		if(GlobalV::DFT_META)
+		{
+			deband_aux -= GlobalC::CHR.kin_r[0][ir] * GlobalC::pot.vofk(0,ir);
+		}
+	}
 
     if (GlobalV::NSPIN == 2)
     {
-        for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
-        {
-            deband_aux -= GlobalC::CHR.rho[1][ir] * GlobalC::pot.vr(1, ir);
-        }
-
+    	for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
+    	{
+    		deband_aux -= GlobalC::CHR.rho[1][ir] * GlobalC::pot.vr(1, ir);
+			if(GlobalV::DFT_META)
+			{
+				deband_aux -= GlobalC::CHR.kin_r[1][ir] * GlobalC::pot.vofk(1,ir);
+			}
+		}
     }
     else if(GlobalV::NSPIN == 4)
     {
@@ -391,17 +401,26 @@ void energy::delta_escf(void)
 	// and rho1_save is "output" charge density
 	// because in "deband" the energy is calculated from "output" charge density,
 	// so here is the correction.
-    for (int ir=0; ir<GlobalC::pw.nrxx; ir++) 
-	{
-		this->descf -= ( GlobalC::CHR.rho[0][ir]- GlobalC::CHR.rho_save[0][ir] ) * GlobalC::pot.vr(0,ir);
-	}
+
+    for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
+    {
+		this->descf -= ( GlobalC::CHR.rho[0][ir] - GlobalC::CHR.rho_save[0][ir] ) * GlobalC::pot.vr(0, ir);
+		if(GlobalV::DFT_META)
+		{
+         	this->descf -= ( GlobalC::CHR.kin_r[0][ir] - GlobalC::CHR.kin_r_save[0][ir] ) * GlobalC::pot.vofk(0, ir);
+		}
+    }
 
     if (GlobalV::NSPIN==2)
     {
-        for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
-        {
-            this->descf -= ( GlobalC::CHR.rho[1][ir] - GlobalC::CHR.rho_save[1][ir] ) * GlobalC::pot.vr(1, ir);
-        }
+       	for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
+       	{
+           	this->descf -= ( GlobalC::CHR.rho[1][ir] - GlobalC::CHR.rho_save[1][ir] ) * GlobalC::pot.vr(1, ir);
+			if(GlobalV::DFT_META)
+			{
+           		this->descf -= ( GlobalC::CHR.kin_r[1][ir] - GlobalC::CHR.kin_r_save[1][ir] ) * GlobalC::pot.vofk(1, ir);
+			}
+       	}
     }
     if (GlobalV::NSPIN==4)
     {

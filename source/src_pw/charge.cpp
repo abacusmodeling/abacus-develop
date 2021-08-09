@@ -46,6 +46,7 @@ Charge::~Charge()
 			if(GlobalV::DFT_META)
 			{
 				delete[] kin_r[i];
+				delete[] kin_r_save[i];
 			}
 		}
 		delete[] rho;
@@ -57,6 +58,7 @@ Charge::~Charge()
 		if(GlobalV::DFT_META)
 		{
 			delete[] kin_r;
+			delete[] kin_r_save;
 		}
 	}
 }
@@ -87,6 +89,7 @@ void Charge::allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_i
 	if(GlobalV::DFT_META)
 	{
 		kin_r = new double*[nspin];
+		kin_r_save = new double*[nspin];
 	}
 
 	for(int is=0; is<nspin; is++)
@@ -103,6 +106,8 @@ void Charge::allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_i
 		{
 			kin_r[is] = new double[nrxx];
 			ZEROS(kin_r[is], nrxx);
+			kin_r_save[is] = new double[nrxx];
+			ZEROS(kin_r_save[is], nrxx);
 		}
 	}
 
@@ -111,6 +116,7 @@ void Charge::allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_i
     Memory::record("Charge","rhog",nspin*ngmc,"double");
     Memory::record("Charge","rhog_save",nspin*ngmc,"double");
     Memory::record("Charge","kin_r",nspin*ngmc,"double");
+    Memory::record("Charge","kin_r_save",nspin*ngmc,"double");
 
     this->rho_core = new double[nrxx]; // core charge in real space
     ZEROS( rho_core, nrxx);
@@ -1097,6 +1103,7 @@ void Charge::save_rho_before_sum_band(void)
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
     	DCOPY( rho[is], rho_save[is], GlobalC::pw.nrxx);
+    	if(GlobalV::DFT_META) DCOPY( kin_r[is], kin_r_save[is], GlobalC::pw.nrxx);
     }
     return;
 }
