@@ -61,6 +61,8 @@ public: // member functions
 	void cal_natomwfc(); 
 	void print_unitcell_pseudo(const string &fn, output &outp);
 	bool check_tau(void)const; //mohan add 2011-03-03
+	bool if_atoms_can_move()const;
+	bool if_cell_can_change()const;
 
 #ifdef __MPI
 	void bcast_unitcell_pseudo(void);
