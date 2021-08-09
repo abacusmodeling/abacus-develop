@@ -104,8 +104,10 @@ void Stress_Func::stress_gga(matrix& sigma)
 
 					if(GlobalV::DFT_META)
 					{
+#ifdef USE_LIBXC
 						atau = GlobalC::CHR.kin_r[0][ir];
 						XC_Functional::tau_xc( arho, grho2a, atau, sx, sc, v1x, v2x, v3x, v1c, v2c, v3c);
+#endif
 					}
 					else
 					{
@@ -140,6 +142,10 @@ void Stress_Func::stress_gga(matrix& sigma)
 		double v2c = 0.0;
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
+			if(GlobalV::DFT_META)
+			{
+				WARNING_QUIT("stress_gga","stress mGGA not ready for nspin=2");
+			}
 			double rh = rhotmp1[ir] + rhotmp2[ir];
 			grho2a = gdr1[ir].norm2();;
 			grho2b = gdr2[ir].norm2();;
