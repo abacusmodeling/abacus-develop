@@ -809,6 +809,50 @@ void XC_Functional::pbec(const double &rho, const double &grho, const int &iflag
 	return;
 }
 
+#ifdef USE_LIBXC
+void XC_Functional::tau_xc(const double &rho, const double &grho, const double &atau, double &sx, double &sc,
+          double &v1x, double &v2x, double &v3x, double &v1c, double &v2c, double &v3c)
+{
+
+	double lapl_rho, vlapl_rho;
+	int func_id;
+    lapl_rho = grho;
+	
+//initialize X and C functionals
+	xc_func_type x_func;
+	xc_func_type c_func;
+	const int xc_polarized = XC_UNPOLARIZED;
+
+//exchange
+    if (GlobalC::xcf.igcx_now == 13)
+	{
+		xc_func_init(&x_func, 263 ,xc_polarized);
+		xc_mgga_exc_vxc(&x_func,1,&rho,&grho,&lapl_rho,&atau,&sx,&v1x,&v2x,&vlapl_rho,&v3x);
+		xc_func_end(&x_func);
+		sx = sx * rho;
+		v2x = v2x * 2.0;
+	}
+	else
+	{
+		WARNING_QUIT("tau_xc","functional not implemented yet");
+	}
+
+//correlation
+	if(GlobalC::xcf.igcc_now == 9)
+	{
+		xc_func_init(&c_func, 267 ,xc_polarized);
+		xc_mgga_exc_vxc(&c_func,1,&rho,&grho,&lapl_rho,&atau,&sc,&v1c,&v2c,&vlapl_rho,&v3c);
+		xc_func_end(&c_func);
+		sc = sc * rho;
+		v2c = v2c * 2.0;
+	}
+	else
+	{
+		WARNING_QUIT("tau_xc","functional not implemented yet");
+	}
+	return;
+}
+#endif
 
 void XC_Functional::gcxc(const double &rho, const double &grho, double &sx, double &sc,
           double &v1x, double &v2x, double &v1c, double &v2c)

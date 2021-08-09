@@ -5,6 +5,13 @@
 #ifndef XC_FUNCTIONAL_H
 #define XC_FUNCTIONAL_H
 
+#ifdef USE_LIBXC
+#include <xc.h>
+#ifndef POTENTIAL_LIBXC_H
+#define POTENTIAL_LIBXC_H
+#endif
+#endif	// ifdef USE_LIBXC
+
 #include "tools.h"
 class XC_Functional
 {
@@ -25,6 +32,12 @@ class XC_Functional
 	// GGA
 	static void gcxc(const double &rho, const double &grho, double &sx, double &sc,
           double &v1x, double &v2x, double &v1c, double &v2c);
+
+#ifdef USE_LIBXC
+	// mGGA
+	static void tau_xc(const double &rho, const double &grho, const double &atau, double &sx, double &sc,
+          double &v1x, double &v2x, double &v3x, double &v1c, double &v2c, double &v3c);
+#endif
 	
 	// PBEx, PBEc
 	static void pbex(const double &rho, const double &grho, const int &iflag, 

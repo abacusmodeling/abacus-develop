@@ -37,6 +37,7 @@ add_library(
     stress_func_cc.cpp
     stress_func_ewa.cpp
     stress_func_gga.cpp
+    stress_func_mgga.cpp
     stress_func_har.cpp
     stress_func_kin.cpp
     stress_func_loc.cpp
