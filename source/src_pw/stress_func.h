@@ -82,6 +82,7 @@ class Stress_Func
 
 // 6) the stress from the exchange-correlation functional term
 	void stress_gga(matrix& sigma);			//gga part in both PW and LCAO basis
+	void stress_mgga(matrix& sigma);			//gga part in PW basis
 
 // 7) the stress from the non-local pseudopotentials
 	void stress_nl(matrix& sigma);			//nonlocal part in PW basis

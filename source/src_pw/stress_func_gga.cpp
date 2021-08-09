@@ -78,12 +78,15 @@ void Stress_Func::stress_gga(matrix& sigma)
 
 	double grho2a = 0.0;
 	double grho2b = 0.0;
+	double atau = 0.0;
 	double sx = 0.0;
 	double sc = 0.0;
 	double v1x = 0.0;
 	double v2x = 0.0;
+	double v3x = 0.0;
 	double v1c = 0.0;
 	double v2c = 0.0;
+	double v3c = 0.0;
 
 	if(nspin_in==1||nspin_in==4)
 	{
@@ -99,7 +102,15 @@ void Stress_Func::stress_gga(matrix& sigma)
 					//if( rhotmp1[ir] >= 0.0 ) segno = 1.0;
 					//if( rhotmp1[ir] < 0.0 ) segno = -1.0;
 
-					XC_Functional::gcxc( arho, grho2a, sx, sc, v1x, v2x, v1c, v2c);
+					if(GlobalV::DFT_META)
+					{
+						atau = GlobalC::CHR.kin_r[0][ir];
+						XC_Functional::tau_xc( arho, grho2a, atau, sx, sc, v1x, v2x, v3x, v1c, v2c, v3c);
+					}
+					else
+					{
+						XC_Functional::gcxc( arho, grho2a, sx, sc, v1x, v2x, v1c, v2c);
+					}
 					double tt[3];
 					tt[0] = gdr1[ir].x;
 					tt[1] = gdr1[ir].y;

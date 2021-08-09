@@ -809,6 +809,11 @@ void XC_Functional::pbec(const double &rho, const double &grho, const int &iflag
 	return;
 }
 
+void XC_Functional::tau_xc(const double &rho, const double &grho, const double &atau, double &sx, double &sc,
+          double &v1x, double &v2x, double &v3x, double &v1c, double &v2c, double &v3c)
+{
+	return;
+}
 
 void XC_Functional::gcxc(const double &rho, const double &grho, double &sx, double &sc,
           double &v1x, double &v2x, double &v1c, double &v2c)

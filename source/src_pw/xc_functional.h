@@ -26,6 +26,10 @@ class XC_Functional
 	static void gcxc(const double &rho, const double &grho, double &sx, double &sc,
           double &v1x, double &v2x, double &v1c, double &v2c);
 	
+	// mGGA
+	static void tau_xc(const double &rho, const double &grho, const double &atau, double &sx, double &sc,
+          double &v1x, double &v2x, double &v3x, double &v1c, double &v2c, double &v3c);
+	
 	// PBEx, PBEc
 	static void pbex(const double &rho, const double &grho, const int &iflag, 
 		double &sx, double &v1x, double &v2x);
