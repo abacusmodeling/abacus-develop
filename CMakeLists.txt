@@ -48,7 +48,6 @@ set(ABACUS_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/${ABACUS_BIN_NAME})
 
 include_directories(${ABACUS_SOURCE_DIR})
 
-find_package(Boost REQUIRED)
 find_package(Cereal REQUIRED)
 find_package(ELPA REQUIRED)
 find_package(MPI REQUIRED)
@@ -63,7 +62,6 @@ include(FetchContent)
 
 include_directories(
   ${Cereal_INCLUDE_DIRS}
-  ${Boost_INCLUDE_DIRS}
   ${MPI_CXX_INCLUDE_PATH}
 )
 
