@@ -80,49 +80,49 @@ int pdSolveEigen2(int nev, int nFull, int narows, int nacols, int *desc,
                  bool wantEigenVector, bool wantDebug);
 
 int pzSolveGenEigen1(int nev, int nFull, int narows, int nacols, int *desc,
-                     complex<double> *a, complex<double> *b, double *ev, complex<double> *q, complex<double> *work,
+                     std::complex<double> *a, std::complex<double> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
                      MPI_Comm mpi_comm_world, int my_blacs_ctxt,
                      int &method,
                      bool wantEigenVector, bool wantDebug);
 
 int pzSolveGenEigen2(int nev, int nFull, int narows, int nacols, int *desc,
-                     complex<double> *a, complex<double> *b, double *ev, complex<double> *q, complex<double> *work,
+                     std::complex<double> *a, std::complex<double> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
                      MPI_Comm mpi_comm_world, int my_blacs_ctxt,
                      int &method, int THIS_REAL_ELPA_KERNEL_API,
                      bool wantEigenVector, bool wantDebug);
 
 int pzDecomposeRightMatrix1(int nFull, int narows, int nacols, int *desc,
-                           complex<double> *b, double *ev, complex<double> *q, complex<double> *work,
+                           std::complex<double> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
                            MPI_Comm mpi_comm_world, int mpi_comm_rows, int mpi_comm_cols,
                            int &method);
 
 int pzDecomposeRightMatrix2(int nFull, int narows, int nacols, int *desc,
-                           complex<double> *b, double *ev, complex<double> *q, complex<double> *work,
+                           std::complex<double> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
                            MPI_Comm mpi_comm_world, int mpi_comm_rows, int mpi_comm_cols,
                            int &method, int THIS_REAL_ELPA_KERNEL_API);
 
-int pzCheloskyDecomposeRightMatrix(int nFull, int narows, int nacols, int *desc, complex<double> *b,
+int pzCheloskyDecomposeRightMatrix(int nFull, int narows, int nacols, int *desc, std::complex<double> *b,
                                    MPI_Comm mpi_comm_world, int mpi_comm_rows, int mpi_comm_cols,
                                    int &method,
                                    bool wantDebug);
 
 int pzDiagonalizeRightMatrix1(int nFull, int narows, int nacols, int *desc,
-                              complex<double> *b, double *ev, complex<double> *q, complex<double> *work,
+                              std::complex<double> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
                               int mpi_comm_rows, int mpi_comm_cols);
 
 int pzDiagonalizeRightMatrix2(int nFull, int narows, int nacols, int *desc,
-                              complex<double> *b, double *ev, complex<double> *q, complex<double> *work,
+                              std::complex<double> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
                               MPI_Comm mpi_comm_world, int mpi_comm_rows, int mpi_comm_cols,
                               int THIS_REAL_ELPA_KERNEL_API);
 
 int pzSolveEigen1(int nev, int nFull, int narows, int nacols, int *desc,
-                 complex<double> *a, complex<double> *b, double *ev, complex<double> *q, complex<double> *work,
+                 std::complex<double> *a, std::complex<double> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
                  int mpi_comm_rows, int mpi_comm_cols,
                  int method,
                  bool wantEigenVector, bool wantDebug);
 
 int pzSolveEigen2(int nev, int nFull, int narows, int nacols, int *desc,
-                 complex<double> *a, complex<double> *b, double *ev, complex<double> *q, complex<double> *work,
+                 std::complex<double> *a, std::complex<double> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
                  MPI_Comm mpi_comm_world, int mpi_comm_rows, int mpi_comm_cols,
                  int method, int THIS_REAL_ELPA_KERNEL_API,
                  bool wantEigenVector, bool wantDebug);

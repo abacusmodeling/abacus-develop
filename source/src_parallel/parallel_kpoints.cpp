@@ -28,30 +28,30 @@ void Parallel_Kpoints::init_pools(void)
 /*
     if (GlobalV::MY_RANK==0)
     {
-        cout << "\n     " << setw(8) << "MY_RANK"
-             << setw(8) << "MY_POOL"
-             << setw(13) << "RANK_IN_POOL"
-             << setw(6) << "NPROC"
-             << setw(6) << "NPOOL"
-             << setw(14) << "NPROC_IN_POOL" << endl;
+        std::cout << "\n     " << std::setw(8) << "MY_RANK"
+             << std::setw(8) << "MY_POOL"
+             << std::setw(13) << "RANK_IN_POOL"
+             << std::setw(6) << "NPROC"
+             << std::setw(6) << "NPOOL"
+             << std::setw(14) << "NPROC_IN_POOL" << std::endl;
     }
     for (int i=0; i<GlobalV::NPROC; i++)
     {
         if (GlobalV::MY_RANK == i)
         {
-            cout << " I'm " << setw(8) << GlobalV::MY_RANK
-                 << setw(8) << GlobalV::MY_POOL
-                 << setw(13) << GlobalV::RANK_IN_POOL
-                 << setw(6) << GlobalV::NPROC
-                 << setw(6) << GlobalV::NPOOL
-                 << setw(14) << GlobalV::NPROC_IN_POOL << endl;
+            std::cout << " I'm " << std::setw(8) << GlobalV::MY_RANK
+                 << std::setw(8) << GlobalV::MY_POOL
+                 << std::setw(13) << GlobalV::RANK_IN_POOL
+                 << std::setw(6) << GlobalV::NPROC
+                 << std::setw(6) << GlobalV::NPOOL
+                 << std::setw(14) << GlobalV::NPROC_IN_POOL << std::endl;
         }
         MPI_Barrier(MPI_COMM_WORLD);
     }
 
     if (GlobalV::MY_RANK != 0 )
     {
-        cout.rdbuf(NULL);
+        std::cout.rdbuf(NULL);
     }
 */
 
@@ -62,16 +62,16 @@ void Parallel_Kpoints::init_pools(void)
 #ifdef __MPI
 void Parallel_Kpoints::divide_pools(void)
 {
-    //cout<<"\n ==> mpi_split()"<<endl;
+    //std::cout<<"\n ==> mpi_split()"<<std::endl;
     int i=0;
     int j=0;
     if (GlobalV::NPROC<GlobalV::NPOOL)
     {
-        cout<<"\n GlobalV::NPROC=" << GlobalV::NPROC << " NPOOL=" << GlobalV::NPOOL;
-        cout<<"Error : Too many pools !"<<endl;
+        std::cout<<"\n GlobalV::NPROC=" << GlobalV::NPROC << " NPOOL=" << GlobalV::NPOOL;
+        std::cout<<"Error : Too many pools !"<<std::endl;
         exit(0);
     }
-    //if(GlobalC::kv.nkstot<GlobalV::NPOOL) cout<<"Error !"<<endl;
+    //if(GlobalC::kv.nkstot<GlobalV::NPOOL) std::cout<<"Error !"<<std::endl;
 
     // (1) per process in each pool
     GlobalV::NPROC_IN_POOL = GlobalV::NPROC/GlobalV::NPOOL;
@@ -146,8 +146,8 @@ void Parallel_Kpoints::get_whichpool(const int &nkstot)
     this->whichpool = new int[nkstot];
     ZEROS(whichpool, nkstot);
 
-	//cout << " calculate : whichpool" << endl;
-	//cout << " nkstot is " << nkstot << endl;
+	//std::cout << " calculate : whichpool" << std::endl;
+	//std::cout << " nkstot is " << nkstot << std::endl;
 
     for (int i=0; i<GlobalV::NPOOL; i++)
     {
@@ -315,7 +315,7 @@ void Parallel_Kpoints::pool_collection(double *valuea, double *valueb, const rea
     		}
     		else if(GlobalV::MY_POOL == 0 && GlobalV::MY_RANK == 0)
     		{
-    //			cout << "\n ik = " << ik << endl;
+    //			std::cout << "\n ik = " << ik << std::endl;
     			// data transfer begin.
     			for(int i=0; i<dim; i++)
     			{

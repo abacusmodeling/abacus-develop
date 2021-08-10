@@ -15,9 +15,9 @@ class Input
 	Input();
     ~Input();
 
-    void Init(const string &fn);
+    void Init(const std::string &fn);
 
-    void Print(const string &fn)const;
+    void Print(const std::string &fn)const;
 
 	void close_log(void)const;
 
@@ -25,18 +25,18 @@ class Input
 // directories of files 
 //==========================================================
 
-    string suffix;			// suffix of out put dir
-    string atom_file;		// file contains atomic positions -- xiaohui modify 2015-02-01
-    string pseudo_dir;      // directory of pseudopotential
-	string read_file_dir;   // directory of files for reading
-    string pseudo_type;     // the type of pseudopotential, mohan add 2013-05-20, ABACUS supports
+    std::string suffix;			// suffix of out put dir
+    std::string atom_file;		// file contains atomic positions -- xiaohui modify 2015-02-01
+    std::string pseudo_dir;      // directory of pseudopotential
+	std::string read_file_dir;   // directory of files for reading
+    std::string pseudo_type;     // the type of pseudopotential, mohan add 2013-05-20, ABACUS supports
 			    			// UPF format (default) and vwr format. (xiaohui add 2013-06-23)
-    string kpoint_file;		// file contains k-points -- xiaohui modify 2015-02-01
-	string wannier_card;	// input card for wannier functions.
-    string latname;			// lattice name
+    std::string kpoint_file;		// file contains k-points -- xiaohui modify 2015-02-01
+	std::string wannier_card;	// input card for wannier functions.
+    std::string latname;			// lattice name
 
 
-    string calculation;		// "scf" : self consistent calculation.
+    std::string calculation;		// "scf" : self consistent calculation.
 						    // "nscf" : non-self consistent calculation.
 							// "relax" : cell relaxations
     double pseudo_rcut;     // cut-off radius for calculating msh
@@ -49,7 +49,7 @@ class Input
 	int seed_sto;  // random seed for sDFT
 	double emax_sto;		//Emax & Emin to normalize H
 	double emin_sto;
-	string stotype;
+	std::string stotype;
 
 	bool set_vel;           // read velocity from STRU or not  liuyu 2021-07-14
 
@@ -63,8 +63,8 @@ class Input
 // Wannier functions 
 //==========================================================
 	bool towannier90;       // add by jingan for wannier90
-	string NNKP;            // add by jingan for wannier90
-	string wannier_spin;    // add by jingan for wannier90
+	std::string NNKP;            // add by jingan for wannier90
+	std::string wannier_spin;    // add by jingan for wannier90
 
 	bool mlwf_flag; 		// add by mohan
 
@@ -87,7 +87,7 @@ class Input
 //==========================================================
 // electrons / spin
 //==========================================================
-    string dft_functional;	// input DFT functional.
+    std::string dft_functional;	// input DFT functional.
 	int nspin;				// LDA ; LSDA ; non-linear spin
     double nelec;			// total number of electrons
     int lmaxmax;
@@ -96,8 +96,8 @@ class Input
 //==========================================================
 // LCAO parameters 
 //==========================================================
-	string basis_type; 			//xiaohui add 2013-09-01, for structural adjustment
-	string ks_solver; 			//xiaohui add 2013-09-01
+	std::string basis_type; 			//xiaohui add 2013-09-01, for structural adjustment
+	std::string ks_solver; 			//xiaohui add 2013-09-01
 
 //==========================================================
 // Forces 
@@ -116,8 +116,8 @@ class Input
     double press3;
 	bool stress;			// calculate the stress
 
-	string fixed_axes;      //which axes are fixed
-	string ion_dynamics;	// methods to move_ion: sd, bfgs, cg...
+	std::string fixed_axes;      //which axes are fixed
+	std::string ion_dynamics;	// methods to move_ion: sd, bfgs, cg...
 
     double cg_threshold;    // threshold when cg to bfgs, pengfei add 2011-08-15
 
@@ -175,15 +175,15 @@ class Input
     int niter;				// number of max elec iter
     int nstep;				// number of max ionic iter
 	int out_stru;			// outut stru file each ion step
-	string out_level;		// control the output information.
+	std::string out_level;		// control the output information.
     bool out_md_control;    // internal parameter , added by zhengdy 2019-04-07
 
 //==========================================================
 // occupation
 //==========================================================
-    string occupations;		// "fixed","smearing","tetrahedra","from_input"
+    std::string occupations;		// "fixed","smearing","tetrahedra","from_input"
 
-    string smearing;		// "gaussian",
+    std::string smearing;		// "gaussian",
 						    // "mp","methfessel-paxton"
 						    // "mv","marzari-vanderbilt","cold"
 						    // "fd","fermi-dirac"
@@ -192,7 +192,7 @@ class Input
 //==========================================================
 // charge mixing
 //==========================================================
-    string mixing_mode;		// "plain","broden",...
+    std::string mixing_mode;		// "plain","broden",...
     double mixing_beta;		// 0 : no_mixing
     int mixing_ndim;		// used in Broden method
 	double mixing_gg0;      // used in kerker method. mohan add 2014-09-27
@@ -200,12 +200,12 @@ class Input
 //==========================================================
 // potential / charge / wavefunction / energy
 //==========================================================
-    string restart_mode;	//
+    std::string restart_mode;	//
 
-    string start_wfc;		// "file","atomic","random"
-    string start_pot;		// "file","atomic"
+    std::string start_wfc;		// "file","atomic","random"
+    std::string start_pot;		// "file","atomic"
 
-	string charge_extrap;	// xiaohui modify 2015-02-01
+	std::string charge_extrap;	// xiaohui modify 2015-02-01
 
 	int mem_saver;			// 1: save psi when nscf calculation.
 
@@ -267,7 +267,7 @@ class Input
 	double md_tfirst;                    //temperature begin
 	double md_tlast;                    //temperature end
 	int md_dumpmdfred;                  //The period to dump MD information for monitoring and restarting MD
-	string md_mdoutpath;                //output path for md
+	std::string md_mdoutpath;                //output path for md
 	bool md_domsd;                   //whether compute <r(t)-r(0)>
 	bool md_domsdatom;                //whether compute msd for each atom
 	int md_rstmd;                    //whether restart;
@@ -282,22 +282,22 @@ class Input
 // vdw
 // Peize Lin add 2014-03-31, jiyy update 2019-08-01
 //==========================================================
-    string vdw_method;          //the method of vdw calculation                 
-    string vdw_s6;              //scale parameter 
-	string vdw_s8;              //scale parameter 
-	string vdw_a1;             //damping function parameter 
-	string vdw_a2;             //damping function parameter 
+    std::string vdw_method;          //the method of vdw calculation                 
+    std::string vdw_s6;              //scale parameter 
+	std::string vdw_s8;              //scale parameter 
+	std::string vdw_a1;             //damping function parameter 
+	std::string vdw_a2;             //damping function parameter 
 	double vdw_d;               //damping function parameter d
 	bool vdw_abc;               //third-order term?
-    string vdw_radius;          //cutoff radius for pair interactions
-	string vdw_radius_unit;	    //"Bohr" or "Angstrom"
+    std::string vdw_radius;          //cutoff radius for std::pair interactions
+	std::string vdw_radius_unit;	    //"Bohr" or "Angstrom"
 	double vdw_cn_thr;          //cutoff radius for calculating the coordination number
-	string vdw_cn_thr_unit;     //"Bohr" or "Angstrom"
-	string vdw_C6_file;
-	string vdw_C6_unit;		    //"Bohr" or "Angstrom"
-	string vdw_R0_file;
-	string vdw_R0_unit;		    //"Bohr" or "Angstrom"
-	string vdw_model;			//"period" or "radius"
+	std::string vdw_cn_thr_unit;     //"Bohr" or "Angstrom"
+	std::string vdw_C6_file;
+	std::string vdw_C6_unit;		    //"Bohr" or "Angstrom"
+	std::string vdw_R0_file;
+	std::string vdw_R0_unit;		    //"Bohr" or "Angstrom"
+	std::string vdw_model;			//"period" or "radius"
 	Vector3<int> vdw_period;
 
 //==========================================================
@@ -305,13 +305,13 @@ class Input
 // pengfei Li add 2016-11-23
 //==========================================================    
 	//bool     epsilon;               // calculate epsilon or not
-	string   spectral_type;          // the type of the calculated spectrum
+	std::string   spectral_type;          // the type of the calculated spectrum
 	int      spectral_method;        // 0: tddft(linear response)
 	int      eels_method;            // 0: hilbert_transform method; 1: standard method
 	int      absorption_method;      // 0: vasp's method  1: pwscf's method
 	//int		 epsilon_choice;         // 0: hilbert_transform method; 1: standard method
-	string   kernel_type;           // the kernel type: rpa, tdlda ...
-	string system_type;                 // bulk or surface
+	std::string   kernel_type;           // the kernel type: rpa, tdlda ...
+	std::string system_type;                 // bulk or surface
 	double  eta;                   // unit(Ry)
 	double  domega;                // unit(Ry)
 	int     nomega;
@@ -338,7 +338,7 @@ class Input
 	double  qcar[100][3];          // the Cartesian position of q points(unit: 2*PI/lat0) 
 	int ocp;
 	//int ocp_n;
-	string ocp_set;
+	std::string ocp_set;
 	//double  ocp_kb[10000];
 	int     lcao_box[3];           // the scale for searching the existence of the overlap <i,0|j,R>
 	int    mulliken;//qifeng add 2019-9-10
@@ -356,7 +356,7 @@ class Input
 // exx
 // Peize Lin add 2018-06-20
 //==========================================================		
-	string exx_hybrid_type;		// "no", "hf", "pbe0", "hse"
+	std::string exx_hybrid_type;		// "no", "hf", "pbe0", "hse"
 
 	double exx_hybrid_alpha;
 	double exx_hse_omega;
@@ -375,7 +375,7 @@ class Input
 	double exx_ccp_threshold;
 	double exx_ccp_rmesh_times;
 	
-	string exx_distribute_type;
+	std::string exx_distribute_type;
 	
 	int exx_opt_orb_lmax;
 	double exx_opt_orb_ecut;
@@ -444,7 +444,7 @@ class Input
     int out_descriptor; // output descritpor for deepks. caoyu added 2020-11-24, mohan modified 2021-01-03
 	int lmax_descriptor; // lmax used in descriptor, mohan added 2021-01-03
 	int deepks_scf;	//if set 1, a trained model would be needed to cal V_delta and F_delta
-	string model_file;		//needed when deepks_scf=1
+	std::string model_file;		//needed when deepks_scf=1
 
 //==========================================================
 // variables for test only
@@ -463,7 +463,7 @@ class Input
 //        other processors)
 //==========================================================
 
-    bool Read(const string &fn);
+    bool Read(const std::string &fn);
 
     void Default(void);
 
@@ -478,7 +478,7 @@ class Input
 	public:
 
     template <class T>
-    static void read_value(ifstream &ifs, T &var)
+    static void read_value(std::ifstream &ifs, T &var)
     {
         ifs >> var;
         ifs.ignore(150, '\n');
@@ -486,7 +486,7 @@ class Input
     }
 
 	void strtolower(char *sa, char *sb);
-	void readbool(ifstream &ifs, bool &var);
+	void readbool(std::ifstream &ifs, bool &var);
 };
 
 extern Input INPUT;

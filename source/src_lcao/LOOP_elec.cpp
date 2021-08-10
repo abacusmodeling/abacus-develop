@@ -106,7 +106,7 @@ void LOOP_elec::before_solver(const int &istep)
 	// do the charge extrapolation before the density matrix is regenerated.
 	// mohan add 2011-04-08
 	// because once atoms are moving out of this processor,
-	// the density matrix will not map the new atomic configuration,
+	// the density matrix will not std::map the new atomic configuration,
 	//======================================
 	// THIS IS A BUG, BECAUSE THE INDEX GlobalC::GridT.trace_lo
 	// HAS BEEN REGENERATED, SO WE NEED TO
@@ -118,7 +118,7 @@ void LOOP_elec::before_solver(const int &istep)
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			ZEROS(GlobalC::CHR.rho[is], GlobalC::pw.nrxx);
-			stringstream ssd;
+			std::stringstream ssd;
 			ssd << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DM" ;
 			// reading density matrix,
 			GlobalC::LOC.read_dm(is, ssd.str() );
@@ -170,7 +170,7 @@ void LOOP_elec::solver(const int &istep)
 			case Exx_Global::Hybrid_Type::Generate_Matrix:
 				break;
 			default:
-				throw invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				throw std::invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 		}
 
 		// No exx

@@ -62,7 +62,7 @@ void AdjacentSet::set
 	this->length++;
 
 
-	//cout << "\n length = " << length << endl;
+	//std::cout << "\n length = " << length << std::endl;
 	call_times++;
 	return;
 }
@@ -106,9 +106,9 @@ void AdjacentSet::getBox
 		y = (int)fy - trueY;
 		z = (int)fz - trueZ;
 
-//		cout << "\n value=" << value << " x=" << x << " y=" << y << " z=" << z;
-//		cout << "\n fx=" << fx << " fy=" << y << " fz=" << z;
-//		cout << "\n truex=" << trueX << " truey=" << trueY << " truez=" << trueX;		
+//		std::cout << "\n value=" << value << " x=" << x << " y=" << y << " z=" << z;
+//		std::cout << "\n fx=" << fx << " fy=" << y << " fz=" << z;
+//		std::cout << "\n truex=" << trueX << " truey=" << trueY << " truez=" << trueX;		
 //		BLOCK_HERE("get box");
 	}
 
@@ -117,6 +117,6 @@ void AdjacentSet::getBox
 //2015-05-07
 void AdjacentSet::delete_vector(void)
 {
-	vector<int>().swap(box);
-	vector<int>().swap(offset);
+	std::vector<int>().swap(box);
+	std::vector<int>().swap(offset);
 }

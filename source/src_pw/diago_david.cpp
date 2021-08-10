@@ -51,15 +51,15 @@ void Diago_David::diag
     double* e = new double[nbase_x];			// the lowest N eigenvalues of hc
     assert(e != 0) ;
 
-    complex<double>* psi_m = new complex<double>[npw] ;
+    std::complex<double>* psi_m = new std::complex<double>[npw] ;
     assert(psi_m != 0) ;
-    complex<double>* hpsi = new complex<double>[npw] ;
+    std::complex<double>* hpsi = new std::complex<double>[npw] ;
     assert(hpsi != 0) ;
-    complex<double>* spsi = new complex<double>[npw] ;
+    std::complex<double>* spsi = new std::complex<double>[npw] ;
     assert(spsi != 0) ;
-    complex<double>* ppsi = new complex<double>[npw] ;
+    std::complex<double>* ppsi = new std::complex<double>[npw] ;
     assert(ppsi != 0) ;
-    complex<double>* respsi = new complex<double>[npw] ;
+    std::complex<double>* respsi = new std::complex<double>[npw] ;
     assert(respsi != 0) ;
 
     bool* convflag = new bool[nband] ;	// convflag[m] = true if the m th band is convergent
@@ -140,10 +140,10 @@ void Diago_David::diag
 
         timer::tick("Diago_David","check_update");
         /*
-        		// test_david==2 cout info of each iteration
+        		// test_david==2 std::cout info of each iteration
         		if( test_david==2 )
         		{
-        			cout << "iter = " << dav_iter << " notconv = " << notconv << endl;
+        			std::cout << "iter = " << dav_iter << " notconv = " << notconv << std::endl;
         			out.printr1_d( "energy", en, nband );
         		}
         */
@@ -187,13 +187,13 @@ void Diago_David::diag
 
     avg_iter = static_cast<double>(dav_iter);
     /*
-    	// if( test_david==3 ) cout info of davidson diag
+    	// if( test_david==3 ) std::cout info of davidson diag
     	if( test_david==3 )
     	{
-    		cout << "hamilt davidson diag output " << endl ;
-    		cout << "dav_iter = " << dav_iter <<" notconv = " << notconv << endl;
+    		std::cout << "hamilt davidson diag output " << std::endl ;
+    		std::cout << "dav_iter = " << dav_iter <<" notconv = " << notconv << std::endl;
     		this->cal_err( npw, nband, nbase, vc, hp, basis, en, respsi );
-        	cout << "hamilt davidson diag output  end " << endl ;
+        	std::cout << "hamilt davidson diag output  end " << std::endl ;
     	}
     */
     delete[] e;
@@ -221,10 +221,10 @@ void Diago_David::cal_grad
     const int* unconv,
     const double* precondition,
     const double* e,
-    complex<double>* hpsi,
-    complex<double>* spsi,
-    complex<double>* ppsi,
-    complex<double>* respsi
+    std::complex<double>* hpsi,
+    std::complex<double>* spsi,
+    std::complex<double>* ppsi,
+    std::complex<double>* respsi
 )
 {
     if ( test_david ==1 ) TITLE("DIAGO_DAVID","cal_grad");
@@ -353,8 +353,8 @@ void Diago_David::diag_zhegvx
     int lwork ;
     int info = 0;
     int mm = m;
-    string name1 = "ZHETRD";
-    string name2 = "L";
+    std::string name1 = "ZHETRD";
+    std::string name2 = "L";
 
     int nb = LapackConnector::ilaenv(1, name1.c_str(), name2.c_str(), n, -1, -1, -1);
     if (nb < 1)
@@ -369,7 +369,7 @@ void Diago_David::diag_zhegvx
     {
         lwork = (nb + 1) * n;
     }
-    complex<double> *work = new complex<double>[2*lwork];
+    std::complex<double> *work = new std::complex<double>[2*lwork];
     assert(work != 0);
     double *rwork = new double[7*n];
     assert(rwork != 0);
@@ -388,7 +388,7 @@ void Diago_David::diag_zhegvx
            0.0, 0.0, 1, m, 0.0, mm, e, vc, n,
            work, lwork, rwork, iwork, ifail, info);
 /*
-		complex<double> vc_norm = 0.0;
+		std::complex<double> vc_norm = 0.0;
 		for(int ib =0; ib < n; ib++)
 		{
 			vc_norm += conj(vc(ib, 0)) * vc(ib, 0);
@@ -475,7 +475,7 @@ void Diago_David::cal_err
     const ComplexMatrix &hp,
     const ComplexMatrix &basis,
     const double* en,
-    complex<double>* respsi
+    std::complex<double>* respsi
 )
 {
     timer::tick("Diago_David","cal_err");
@@ -497,11 +497,11 @@ void Diago_David::cal_err
         err[m] = sqrt( err[m] );
     }
 
-    cout << "i       eigenvalues       err (||*||)   " << endl ;
+    std::cout << "i       eigenvalues       err (||*||)   " << std::endl ;
 
     for (int i = 0; i < nband ; i++)
     {
-        cout << i << "\t\t"  << en[i]  << "\t\t" << err[i] << endl ;
+        std::cout << i << "\t\t"  << en[i]  << "\t\t" << err[i] << std::endl ;
     }
 
     delete[] err;
@@ -515,8 +515,8 @@ void Diago_David::SchmitOrth
     const int n_band,
     const int m,
     const ComplexMatrix &psi,
-    complex<double>* psi_m,
-    complex<double>* spsi
+    std::complex<double>* psi_m,
+    std::complex<double>* spsi
 )
 {
 //	if(test_david == 1) TITLE("Diago_David","SchmitOrth");
@@ -534,7 +534,7 @@ void Diago_David::SchmitOrth
 
     GlobalC::hm.hpw.s_1psi(npw, psi_m, spsi);
 
-    complex<double>* lagrange = new complex<double>[m+1];
+    std::complex<double>* lagrange = new std::complex<double>[m+1];
     ZEROS( lagrange, m+1 );
 
     for (int j = 0; j < m; j++)
@@ -557,7 +557,7 @@ void Diago_David::SchmitOrth
 
     double psi_norm = lagrange[m].real();
     assert(psi_norm > 0.0);
-//	cout << "m = " << m << endl;
+//	std::cout << "m = " << m << std::endl;
 
     for (int j = 0; j < m; j++)
     {
@@ -574,9 +574,9 @@ void Diago_David::SchmitOrth
 
     if (psi_norm < 1.0e-12 ) 
 	{
-        cout << "Diago_David::SchmitOrth:aborted for psi_norm <1.0e-12" << endl;
-        cout << "n_band = " << n_band << endl;
-        cout << "m = " << m << endl;
+        std::cout << "Diago_David::SchmitOrth:aborted for psi_norm <1.0e-12" << std::endl;
+        std::cout << "n_band = " << n_band << std::endl;
+        std::cout << "m = " << m << std::endl;
         exit(0);
     }
     else 

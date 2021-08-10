@@ -121,7 +121,7 @@ void Sph_Bessel_Recursive::D1::cal_jlx_recursive( const int l_size, const size_t
 /*
 void Sph_Bessel_Recursive::cal_jlx_preset(const int l_size, const size_t ix_size)
 {	
-cout<<l_size<<"\t"<<ix_size<<endl;
+std::cout<<l_size<<"\t"<<ix_size<<std::endl;
 	if(jlx.size()<l_size)
 		jlx.resize(l_size);
 	
@@ -372,7 +372,7 @@ cout<<l_size<<"\t"<<ix_size<<endl;
 			}
 		}
 //timeval t_end; gettimeofday( &t_end, NULL);
-//cout<<l<<"\t"<<(double)(t_end.tv_sec-t_start.tv_sec) + (double)(t_end.tv_usec-t_start.tv_usec)/1000000.0<<endl;
+//std::cout<<l<<"\t"<<(double)(t_end.tv_sec-t_start.tv_sec) + (double)(t_end.tv_usec-t_start.tv_usec)/1000000.0<<std::endl;
 	}
 }
 */	

@@ -7,7 +7,7 @@
 #include "../src_pw/soc.h"
 
 void Wavefunc_in_pw::make_table_q(
-	std::vector<string> &fn, 
+	std::vector<std::string> &fn, 
 	realArray &table_local)
 {
 	TITLE("Wavefunc_in_pw","make_table_q");
@@ -19,15 +19,15 @@ void Wavefunc_in_pw::make_table_q(
 
 	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		ifstream in(fn[it].c_str());
+		std::ifstream in(fn[it].c_str());
 		if(!in)
 		{
-			GlobalV::ofs_warning << " File name : " << fn[it] << endl;
+			GlobalV::ofs_warning << " File name : " << fn[it] << std::endl;
 			WARNING_QUIT("Wavefunc_in_pw::make_table_q","Can not find file.");
 		}
 		else
 		{
-			stringstream ss;
+			std::stringstream ss;
 			ss << "Orbital of species " << GlobalC::ucell.atoms[it].label;
 			OUT(GlobalV::ofs_running,ss.str(),fn[it]);
 		}
@@ -43,10 +43,10 @@ void Wavefunc_in_pw::make_table_q(
 			for(int N=0; N<GlobalC::ucell.atoms[it].l_nchi[L]; N++)
 			{
 				GlobalV::ofs_running << " L=" << L << " N=" << N;
-				ifstream in(fn[it].c_str());
+				std::ifstream in(fn[it].c_str());
 				if (!in)
 				{
-					GlobalV::ofs_warning << " File name : " << fn[it] << endl;
+					GlobalV::ofs_warning << " File name : " << fn[it] << std::endl;
 					WARNING_QUIT("Wavefunc_in_pw::make_table_q","Can not find file.");
 				}
 				int meshr=0;
@@ -89,11 +89,11 @@ void Wavefunc_in_pw::make_table_q(
 					// plus one because we can't read in r = 0 term now.
 					radial[ir] = ir*dr;  //mohan modify 2010-04-19
 				}
-				GlobalV::ofs_running << " Rmax(Angstrom)=" << radial[meshr-1] << endl;
+				GlobalV::ofs_running << " Rmax(Angstrom)=" << radial[meshr-1] << std::endl;
 
-				string name1;
-				string name2;
-				string name3;
+				std::string name1;
+				std::string name2;
+				std::string name3;
 				int tmp_it=0;
 				int tmp_l=0;
 				int tmp_n=0;
@@ -104,7 +104,7 @@ void Wavefunc_in_pw::make_table_q(
 					if(in.eof())
 					{
 						GlobalV::ofs_warning << "\n Can't find l="
-						<< L << " n=" << N << " orbital." << endl;
+						<< L << " n=" << N << " orbital." << std::endl;
 						WARNING_QUIT("Control_Overlap","Read_PAO");
 					}
 					in >> name1 >> name2 >> name3;
@@ -152,9 +152,9 @@ void Wavefunc_in_pw::make_table_q(
 	{
 		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			stringstream ss;
+			std::stringstream ss;
 			ss << GlobalV::global_out_dir << GlobalC::ucell.atoms[it].label << "/LOCAL_G.dat";
-			ofstream ofs(ss.str().c_str());
+			std::ofstream ofs(ss.str().c_str());
 			for(int iq=0; iq<GlobalV::NQX; iq++)
 			{
 				int ic=0;
@@ -168,7 +168,7 @@ void Wavefunc_in_pw::make_table_q(
 						++ic;
 					}
 				}
-				ofs << endl;
+				ofs << std::endl;
 			}
 			ofs.close();
 		}
@@ -254,7 +254,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 	const int npw = GlobalC::kv.ngk[ik];
 	const int total_lm = ( GlobalC::ucell.lmax + 1) * ( GlobalC::ucell.lmax + 1);
 	matrix ylm(total_lm, npw);
-	complex<double> *aux = new complex<double>[npw];
+	std::complex<double> *aux = new std::complex<double>[npw];
 	double *chiaux = new double[1];
 
 	Vector3<double> *gk = new Vector3<double>[npw];
@@ -272,14 +272,14 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 	{
 		for (int ia = 0;ia < GlobalC::ucell.atoms[it].na;ia++)
 		{
-			complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
+			std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
 			int ic=0;
 			for(int L = 0; L < GlobalC::ucell.atoms[it].nwl+1; L++)
 			{
-				complex<double> lphase = pow(NEG_IMAG_UNIT, L); //mohan 2010-04-19
+				std::complex<double> lphase = pow(NEG_IMAG_UNIT, L); //mohan 2010-04-19
 				for(int N=0; N < GlobalC::ucell.atoms[it].l_nchi[L]; N++)
 				{
-//					GlobalV::ofs_running << " it=" << it << " ia=" << ia << " L=" << L << " N=" << N << endl;
+//					GlobalV::ofs_running << " it=" << it << " ia=" << ia << " L=" << L << " N=" << N << std::endl;
 
 					for(int ig=0; ig<npw; ig++)
 					{
@@ -300,7 +300,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 								{//atomic_wfc_so
 									for(int m=0; m<2*L+1; m++)
 									{
-										cout<<"iwall: "<<iwall<<endl;
+										std::cout<<"iwall: "<<iwall<<std::endl;
 										const int lm = L*L+m;
 										for(int ig=0; ig<npw; ig++)
 										{
@@ -318,7 +318,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 								else
 								{//atomic_wfc_so_mag
 									double alpha, gamma;
-									complex<double> fup,fdown;
+									std::complex<double> fup,fdown;
                               		//int nc;
                               		//This routine creates two functions only in the case j=l+1/2 or exit in the other case
 									if(fabs(j-L+0.5<1e-4)) continue;
@@ -385,7 +385,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 							else
 							{//atomic_wfc_nc
 								double alpha, gamman;
-								complex<double> fup, fdown;
+								std::complex<double> fup, fdown;
 								alpha = GlobalC::ucell.magnet.angle1_[it];
 								gamman = -GlobalC::ucell.magnet.angle2_[it] + 0.5*PI;
 								for(int m = 0;m<2*L+1;m++)
@@ -451,7 +451,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 	const int npw = GlobalC::kv.ngk[ik];
 	const int total_lm = ( GlobalC::ucell.lmax + 1) * ( GlobalC::ucell.lmax + 1);
 	matrix ylm(total_lm, npw);
-	complex<double> *aux = new complex<double>[npw];
+	std::complex<double> *aux = new std::complex<double>[npw];
 	double *chiaux = new double[1];
 
 	Vector3<double> *gkq = new Vector3<double>[npw];
@@ -470,11 +470,11 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 	{
 		for (int ia = 0;ia < GlobalC::ucell.atoms[it].na;ia++)
 		{
-			complex<double> *skq = GlobalC::wf.get_skq(ik, it, ia, q);
+			std::complex<double> *skq = GlobalC::wf.get_skq(ik, it, ia, q);
 			int ic=0;
 			for(int L = 0; L < GlobalC::ucell.atoms[it].nwl+1; L++)
 			{
-				complex<double> lphase = pow(NEG_IMAG_UNIT, L); //mohan 2010-04-19
+				std::complex<double> lphase = pow(NEG_IMAG_UNIT, L); //mohan 2010-04-19
 				for(int N=0; N < GlobalC::ucell.atoms[it].l_nchi[L]; N++)
 				{
 					for(int ig=0; ig<npw; ig++)
@@ -525,7 +525,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 														psi(iwall, ig + GlobalC::wf.npwx*is ) = lphase * fact[is] * skq[ig] * aux[ig] * flq[ig];
 												}
 												else
-													for(int ig=0; ig<npw;ig++) psi(iwall,ig+ GlobalC::wf.npwx*is) = complex<double>(0.0 , 0.0);
+													for(int ig=0; ig<npw;ig++) psi(iwall,ig+ GlobalC::wf.npwx*is) = std::complex<double>(0.0 , 0.0);
 											}//is
 											iwall++;
 									}//if
@@ -535,7 +535,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 								{//atomic_wfc_so_mag
 
 									double alpha, gamma;
-									complex<double> fup,fdown;
+									std::complex<double> fup,fdown;
 									//int nc;
 									//This routine creates two functions only in the case j=l+1/2 or exit in the other case
 									if(fabs(j-L+0.5<1e-4)) continue;
@@ -602,7 +602,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 							else
 							{//atomic_wfc_nc
 								double alpha, gamman;
-								complex<double> fup, fdown;
+								std::complex<double> fup, fdown;
 								alpha = GlobalC::ucell.magnet.angle1_[it];
 								gamman = -GlobalC::ucell.magnet.angle2_[it] + 0.5*PI;
 								for(int m = 0;m<2*L+1;m++)

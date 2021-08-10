@@ -61,7 +61,7 @@ void Driver::reading(void)
     winput::Init( GlobalV::global_wannier_card );
 
     // (6) Print the parameters into INPUT file.
-    stringstream ss1;
+    std::stringstream ss1;
     ss1 << GlobalV::global_out_dir << GlobalV::global_in_card;
     INPUT.Print( ss1.str() );
     //DONE(GlobalV::ofs_running,"READING CARDS");

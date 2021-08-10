@@ -109,7 +109,7 @@ class Stress_Func
 			const double &x);	//used in get_dvnl2()
 
 	//functions for stress print
-	void print_stress(const string &name, const matrix& f, const bool screen, bool ry)const;
+	void print_stress(const std::string &name, const matrix& f, const bool screen, bool ry)const;
 
 	void printstress_total (const matrix& scs, bool ry);
 	

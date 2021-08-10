@@ -42,9 +42,9 @@ class Local_Orbital_Charge
 	// whether to printout density matrix
 	int out_dm; // output density matrix or not.
 
-	void write_dm(const int &is, const int &iter, const string &fn, const int &precision);
+	void write_dm(const int &is, const int &iter, const std::string &fn, const int &precision);
 
-	void read_dm(const int &is, const string &fn);
+	void read_dm(const int &is, const std::string &fn);
 	
 	Wfc_Dm_2d wfc_dm_2d;		// Peize Lin test 2019-01-16
 

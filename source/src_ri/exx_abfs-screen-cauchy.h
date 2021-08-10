@@ -34,11 +34,11 @@ public:
 		const double threshold_in,
 		const Abfs::Vector3_Order<int> Born_von_Karman_period_in);
 	void cal_norm_C_max( 
-		const map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> & Cs,
+		const std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>>>> & Cs,
 		const Element_Basis_Index::IndexLNM & index_lcaos,
 		const Element_Basis_Index::IndexLNM & index_abfs);
-	void cal_norm_V( const map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> & Vs );
-	void cal_norm_D_max( const vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> & Ds );
+	void cal_norm_V( const std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>>>> & Vs );
+	void cal_norm_D_max( const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> & Ds );
 		
 	Info_Step input_info(
 		const size_t iat1, const size_t iat2, const size_t iat3, const size_t iat4,
@@ -79,18 +79,18 @@ private:
 private:
 
 	// \sqrt{ || C C^+ || }		for C_{ I i \mu, K k }
-	map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,double>>> C_norm4_outer_max;		// max_i \sqrt{ || C_i C_i^+ || }
-	map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,double>>> C_norm4_inner_max;		// max_k \sqrt{ || C_k C_k^+ || }
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,double>>> C_norm4_outer_max;		// max_i \sqrt{ || C_i C_i^+ || }
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,double>>> C_norm4_inner_max;		// max_k \sqrt{ || C_k C_k^+ || }
 	
 	// \sqrt{ || V V^+ || }		for V_{ U \mu, V \nu }
-	map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,double>>> V_norm4;
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,double>>> V_norm4;
 	
 	// \sqrt{ || m m^+ || }		for D_{ K k, L l }
-	map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,double>>> D_norm4_max;	// max_is \sqrt{ || m m^+ || }
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,double>>> D_norm4_max;	// max_is \sqrt{ || m m^+ || }
 	
 	// || C ||					for C_{ I i \mu, K k }
-	map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,double>>> C_norm2_outer_max;		// max_i || C_i ||
-	map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,double>>> C_norm2_inner_max;		// max_k || C_k ||
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,double>>> C_norm2_outer_max;		// max_i || C_i ||
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,double>>> C_norm2_inner_max;		// max_k || C_k ||
 		
 //public:
 //	static double num_screen1;

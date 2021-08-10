@@ -49,7 +49,7 @@ class Numerical_Nonlocal_Lm
 	Numerical_Nonlocal_Lm& operator= (const Numerical_Nonlocal_Lm& nol );
 
 	void set_NL_proj(
- 		const string &label,
+ 		const std::string &label,
     	const int &index_atom_type_in,
     	const int &angular_momentum_l_in,
     	const int &nr_in,
@@ -69,7 +69,7 @@ class Numerical_Nonlocal_Lm
 	void extra_uniform(const double &dr_uniform);
 	void get_kradial(void);
 
-	string label;
+	std::string label;
 	int index_atom_type;
 	int angular_momentum_l;
 	int index_proj;

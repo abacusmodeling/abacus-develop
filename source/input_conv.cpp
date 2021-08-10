@@ -379,13 +379,13 @@ void Input_Conv::Convert(void)
     if(GlobalV::ocp == 1)
 	{
 		int count = 0;
-		string pattern("([0-9]+\\*[0-9.]+|[0-9,.]+)");
-		vector<string> str;
-		string::size_type pos1, pos2;
-		string c = " ";
+		std::string pattern("([0-9]+\\*[0-9.]+|[0-9,.]+)");
+		std::vector<std::string> str;
+		std::string::size_type pos1, pos2;
+		std::string c = " ";
 		pos2 = GlobalV::ocp_set.find(c);
 		pos1 = 0;
-		while(string::npos != pos2)
+		while(std::string::npos != pos2)
 		{
 			str.push_back(GlobalV::ocp_set.substr(pos1, pos2-pos1));
  
@@ -408,12 +408,12 @@ void Input_Conv::Convert(void)
 				continue;
 			}
 			int status = regexec(&reg, str[i].c_str(), nmatch, pmatch, 0);
-			string sub_str = "";
+			std::string sub_str = "";
 			for(int j=pmatch[0].rm_so; j!=pmatch[0].rm_eo; ++j)
 			{
 				sub_str += str[i][j];
 			}
-			string sub_pattern("\\*");
+			std::string sub_pattern("\\*");
 			regex_t sub_reg;
 			regcomp(&sub_reg, sub_pattern.c_str(), REG_EXTENDED);
 			regmatch_t sub_pmatch[1];
@@ -423,8 +423,8 @@ void Input_Conv::Convert(void)
 				int pos = sub_str.find("*");
 				int num = stoi(sub_str.substr(0, pos));
 				double occ = stof(sub_str.substr(pos+1, sub_str.size()));
-				vector<double> ocp_temp(num, occ);
-				const vector<double>::iterator dest = GlobalV::ocp_kb.begin()+count;
+				std::vector<double> ocp_temp(num, occ);
+				const std::vector<double>::iterator dest = GlobalV::ocp_kb.begin()+count;
 				copy(ocp_temp.begin(), ocp_temp.end(), dest);
 				count += num;
 			}
@@ -444,7 +444,7 @@ void Input_Conv::Convert(void)
 	if(INPUT.restart_save)
 	{
 		GlobalC::restart.folder = GlobalV::global_out_dir + "restart/";
-		const string command0 =  "test -d " + GlobalC::restart.folder + " || mkdir " + GlobalC::restart.folder;
+		const std::string command0 =  "test -d " + GlobalC::restart.folder + " || mkdir " + GlobalC::restart.folder;
 		if(GlobalV::MY_RANK==0)
 			system( command0.c_str() );
 		if(INPUT.exx_hybrid_type=="no")

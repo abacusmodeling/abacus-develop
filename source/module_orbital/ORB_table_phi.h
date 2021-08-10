@@ -112,7 +112,7 @@ class ORB_table_phi
 		const int &l,
 		const Numerical_Orbital_Lm &n1,
 		const Numerical_Orbital_Lm &n2,
-		const set<size_t> &radials,				// only calculate ir in radials
+		const std::set<size_t> &radials,				// only calculate ir in radials
 		double *rs,
 		double *drs) const;
 

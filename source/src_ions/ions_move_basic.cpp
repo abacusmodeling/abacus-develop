@@ -55,7 +55,7 @@ void Ions_Move_Basic::setup_gradient(double* pos, double *grad, const matrix &fo
 			if(atom->mbl[ia].z == 1)
 			{
 				grad[3*iat+2] = -force(iat, 2)*GlobalC::ucell.lat0;
-				//cout << " grad=" << grad[3*iat+2] << endl;
+				//std::cout << " grad=" << grad[3*iat+2] << std::endl;
 			}
 			++iat;
 		}
@@ -77,19 +77,19 @@ void Ions_Move_Basic::move_atoms(double *move, double *pos)
 	if(GlobalV::test_ion_dynamics)
 	{
 		int iat=0;
-		GlobalV::ofs_running << "\n movement of ions (unit is Bohr) : " << endl;
-		GlobalV::ofs_running << " " << setw(12) << "Atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << endl;
+		GlobalV::ofs_running << "\n movement of ions (unit is Bohr) : " << std::endl;
+		GlobalV::ofs_running << " " << std::setw(12) << "Atom" << std::setw(15) << "x" << std::setw(15) << "y" << std::setw(15) << "z" << std::endl;
 		for(int it = 0;it < GlobalC::ucell.ntype;it++)
 		{
 			for(int ia =0;ia< GlobalC::ucell.atoms[it].na;ia++)
 			{
-				stringstream ss;
+				std::stringstream ss;
 				ss << "move_" << GlobalC::ucell.atoms[it].label << ia+1;
 				GlobalV::ofs_running << " " 
-					<< setw(12) << ss.str().c_str()
-					<< setw(15) << move[3*iat+0] 
-					<< setw(15) << move[3*iat+1] 
-					<< setw(15) << move[3*iat+2] << endl;
+					<< std::setw(12) << ss.str().c_str()
+					<< std::setw(15) << move[3*iat+0] 
+					<< std::setw(15) << move[3*iat+1] 
+					<< std::setw(15) << move[3*iat+2] << std::endl;
 				iat++;
 			}
 		}
@@ -151,8 +151,8 @@ void Ions_Move_Basic::check_converged(const double *grad)
 
 	if(GlobalV::OUT_LEVEL=="ie")
 	{
-		cout << " ETOT DIFF (eV)       : " << Ions_Move_Basic::ediff*Ry_to_eV << endl;
-		cout << " LARGEST GRAD (eV/A)  : " << Ions_Move_Basic::largest_grad * Ry_to_eV / 0.529177 << endl;
+		std::cout << " ETOT DIFF (eV)       : " << Ions_Move_Basic::ediff*Ry_to_eV << std::endl;
+		std::cout << " LARGEST GRAD (eV/A)  : " << Ions_Move_Basic::largest_grad * Ry_to_eV / 0.529177 << std::endl;
 	}
 	
 	const double etot_diff = std::abs(Ions_Move_Basic::ediff);
@@ -162,16 +162,16 @@ void Ions_Move_Basic::check_converged(const double *grad)
 
 	if(Ions_Move_Basic::largest_grad == 0.0)
 	{
-		GlobalV::ofs_running << " largest force is 0, no movement is possible." << endl;
-		GlobalV::ofs_running << " it may converged, otherwise no movement of atom is allowed." << endl;
+		GlobalV::ofs_running << " largest force is 0, no movement is possible." << std::endl;
+		GlobalV::ofs_running << " it may converged, otherwise no movement of atom is allowed." << std::endl;
 		Ions_Move_Basic::converged = true;
 	}
 	// mohan update 2011-04-21
 	else if(etot_diff < etot_thr && Ions_Move_Basic::largest_grad < GlobalV::FORCE_THR)
 	{
-		GlobalV::ofs_running << "\n Ion relaxation is converged!" << endl;
-		GlobalV::ofs_running << "\n Energy difference (Ry) = " << etot_diff << endl;
-		GlobalV::ofs_running << "\n Largest gradient is (eV/A) = " << largest_grad * Ry_to_eV / 0.529177 << endl;
+		GlobalV::ofs_running << "\n Ion relaxation is converged!" << std::endl;
+		GlobalV::ofs_running << "\n Energy difference (Ry) = " << etot_diff << std::endl;
+		GlobalV::ofs_running << "\n Largest gradient is (eV/A) = " << largest_grad * Ry_to_eV / 0.529177 << std::endl;
 
 		Ions_Move_Basic::converged = true;
 		++ Ions_Move_Basic::update_iter;
@@ -179,9 +179,9 @@ void Ions_Move_Basic::check_converged(const double *grad)
 	else
 	{
 		GlobalV::ofs_running << "\n Ion relaxation is not converged yet (threshold is " 
-		<< GlobalV::FORCE_THR * Ry_to_eV / 0.529177 << ")" << endl;
-		//cout << "\n etot_diff=" << etot_diff << " etot_thr=" << etot_thr
-		//<< " largest_grad=" << largest_grad << " force_thr=" << GlobalV::FORCE_THR << endl;
+		<< GlobalV::FORCE_THR * Ry_to_eV / 0.529177 << ")" << std::endl;
+		//std::cout << "\n etot_diff=" << etot_diff << " etot_thr=" << etot_thr
+		//<< " largest_grad=" << largest_grad << " force_thr=" << GlobalV::FORCE_THR << std::endl;
 		Ions_Move_Basic::converged = false;
 	}
 
@@ -194,12 +194,12 @@ void Ions_Move_Basic::terminate(void)
 	TITLE("Ions_Move_Basic","terminate");
 	if(Ions_Move_Basic::converged)
 	{
-		GlobalV::ofs_running << " end of geometry optimization"<<endl;
+		GlobalV::ofs_running << " end of geometry optimization"<<std::endl;
 		OUT(GlobalV::ofs_running,"istep", Ions_Move_Basic::istep);
 		OUT(GlobalV::ofs_running,"update iteration", Ions_Move_Basic::update_iter);
 		/*
-		GlobalV::ofs_running<<"Saving the approximate inverse hessian"<<endl;
-		ofstream hess("hess.out");
+		GlobalV::ofs_running<<"Saving the approximate inverse hessian"<<std::endl;
+		std::ofstream hess("hess.out");
 		for(int i=0;i<dim;i++)
 		{
 			for(int j=0;j<dim;j++)
@@ -212,8 +212,8 @@ void Ions_Move_Basic::terminate(void)
 	}
 	else
 	{
-		GlobalV::ofs_running<<" the maximum number of steps has been reached." << endl;
-		GlobalV::ofs_running<<" end of geometry optimization." << endl;
+		GlobalV::ofs_running<<" the maximum number of steps has been reached." << std::endl;
+		GlobalV::ofs_running<<" end of geometry optimization." << std::endl;
 	}
 
 	//-----------------------------------------------------------
@@ -309,10 +309,10 @@ void Ions_Move_Basic::second_order(
 	best_x = -0.5 * b / a; 
 	best_e = a*best_x*best_x+b*best_x+e0;
 	GlobalV::ofs_running << " The next E should be ( 2nd order interpolation)" 
-	<< best_e * Ry_to_eV << " eV" << endl;
+	<< best_e * Ry_to_eV << " eV" << std::endl;
 
-	cout << " The next E should be ( 2nd order interpolation)" 
-	<< best_e * Ry_to_eV << " eV" << endl;
+	std::cout << " The next E should be ( 2nd order interpolation)" 
+	<< best_e * Ry_to_eV << " eV" << std::endl;
 	
 	return;
 }

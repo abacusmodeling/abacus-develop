@@ -7,7 +7,7 @@
 #include "../src_parallel/mcd.h"
 #endif
 
-#include<ostream>
+#include <ostream>
 #include<cassert>
 
 #include<fstream>// test

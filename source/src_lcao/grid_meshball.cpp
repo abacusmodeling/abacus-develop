@@ -54,7 +54,7 @@ void Grid_MeshBall::init_meshball(void)
 		{
 			for(int k=-dze; k<dze+1; k++)
 			{
-				// caclculate the vector away from 'zero point'.
+				// caclculate the std::vector away from 'zero point'.
 				for(int ip=0; ip<3; ip++)
 				{
 					pos[ip] = i*bigcell_vec1[ip]+j*bigcell_vec2[ip]+k*bigcell_vec3[ip];
@@ -97,7 +97,7 @@ void Grid_MeshBall::init_meshball(void)
 		{
 			for(int k=-dze; k<this->dze+1; k++)
 			{
-				// caclculate the vector away from 'zero point'.
+				// caclculate the std::vector away from 'zero point'.
 				// change to cartesian coordinates.
 				for(int ip=0; ip<3; ip++)
 				{

@@ -183,7 +183,7 @@ void pdsytrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
                             L1[i*loc_A.col_num+j]=a[i*loc_A.col_num+j];
                     }
                 }
-                /*local matrix-vector production Au*/
+                /*local matrix-std::vector production Au*/
                 transa='t';
                 lm=loc_A.row_num-loc_A.row_pos;
                 ln=loc_A.col_num-loc_A.col_pos;
@@ -393,7 +393,7 @@ void pdsytrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
                             L1[i*loc_A.col_num+j]=a[i*loc_A.col_num+j];
                     }
                 }
-                /*local matrix-vector production*/
+                /*local matrix-std::vector production*/
                 transa='t';
                 lm=loc_A.row_num-loc_A.row_pos;
                 ln=loc_A.col_num-loc_A.col_pos;

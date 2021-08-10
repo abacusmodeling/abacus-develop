@@ -24,7 +24,7 @@ void Center2_Orb::Orb22::init_radial_table()
 {
 	const Numerical_Orbital_Lm & nB_short = (nB1.getNr()<=nB2.getNr()) ? nB1 : nB2;
 	
-	vector<double> nB_tmp(nB_short.getNr());
+	std::vector<double> nB_tmp(nB_short.getNr());
 	for( size_t ir=0; ir!=nB_tmp.size(); ++ir)
 	{
 		nB_tmp[ir] = nB1.getPsi(ir) * nB2.getPsi(ir);
@@ -60,11 +60,11 @@ void Center2_Orb::Orb22::init_radial_table()
 	}
 }
 
-void Center2_Orb::Orb22::init_radial_table( const set<size_t> &radials )
+void Center2_Orb::Orb22::init_radial_table( const std::set<size_t> &radials )
 {
 	const Numerical_Orbital_Lm & nB_short = (nB1.getNr()<=nB2.getNr()) ? nB1 : nB2;
 	
-	vector<double> nB_tmp(nB_short.getNr());
+	std::vector<double> nB_tmp(nB_short.getNr());
 	for( size_t ir=0; ir!=nB_tmp.size(); ++ir)
 	{
 		nB_tmp[ir] = nB1.getPsi(ir) * nB2.getPsi(ir);

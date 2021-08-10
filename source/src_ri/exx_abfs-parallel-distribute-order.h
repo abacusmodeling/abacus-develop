@@ -11,7 +11,7 @@
 class Exx_Abfs::Parallel::Distribute::Order
 {
 public:
-	static vector<pair<size_t,size_t>> distribute(
+	static std::vector<std::pair<size_t,size_t>> distribute(
 		const double rmesh_times );
 };
 

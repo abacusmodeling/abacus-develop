@@ -31,19 +31,19 @@ public:
 		void Cal_epsilon0s();
 		void Cal_T();
 		void Cal_epsilon0();
-		void CMatrixMul(int m, int n, int l, complex<double>** A, complex<double>** B, complex<double>** C);
+		void CMatrixMul(int m, int n, int l, std::complex<double>** A, std::complex<double>** B, std::complex<double>** C);
 		
-		complex<double> **eps0;
+		std::complex<double> **eps0;
 
 private:
 		
 		bool init_finish;
-		complex<double> ***b;
-		complex<double> **psi;
-		complex<double> ***psi_nabla;
-		complex<double> ***psi_nu;
-		complex<double> **eps0s;
-		complex<double> **T;
+		std::complex<double> ***b;
+		std::complex<double> **psi;
+		std::complex<double> ***psi_nabla;
+		std::complex<double> ***psi_nu;
+		std::complex<double> **eps0s;
+		std::complex<double> **T;
 };
 
 namespace GlobalC

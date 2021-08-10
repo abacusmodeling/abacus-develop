@@ -66,7 +66,7 @@
 	/*  Purpose */
 	/*  ======= */
 
-	/*  DLARUV returns a vector of n random real numbers from a uniform (0,1) */
+	/*  DLARUV returns a std::vector of n random real numbers from a uniform (0,1) */
 	/*  distribution (n <= 128). */
 
 	/*  This is an auxiliary routine called by DLARNV and ZLARNV. */

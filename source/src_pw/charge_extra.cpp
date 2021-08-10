@@ -191,7 +191,7 @@ void Charge_Extra::extrapolate_charge()
 
 		if(GlobalV::OUT_LEVEL != "m") 
 		{
-			GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << endl;
+			GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << std::endl;
 		}
 		GlobalC::pw.setup_structure_factor();
 
@@ -243,7 +243,7 @@ void Charge_Extra::extrapolate_charge()
 
 		if(GlobalV::OUT_LEVEL != "m") 
 		{
-			GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << endl;
+			GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << std::endl;
 		}
 		GlobalC::pw.setup_structure_factor();
 
@@ -308,7 +308,7 @@ void Charge_Extra::extrapolate_charge()
 		//xiaohui add 'GlobalV::OUT_LEVEL', 2015-09-16
 		if(GlobalV::OUT_LEVEL != "m") 
 		{
-			GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << endl;
+			GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << std::endl;
 		}
 
 		// setup the structure factor

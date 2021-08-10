@@ -27,7 +27,7 @@ public:
 	void print_descriptor(void);
 
 
-	void cal_v_delta(const string& model_file);//<psi|V_delta|psi>
+	void cal_v_delta(const std::string& model_file);//<psi|V_delta|psi>
 	void cal_f_delta(matrix& dm);	//pytorch term remaining!
 	void print_H_V_delta();
 	void print_F_delta();
@@ -65,7 +65,7 @@ private:
 
 	// descriptors
     double *d;
-	vector<torch::Tensor> d_tensor;
+	std::vector<torch::Tensor> d_tensor;
 
 	//gedm:dE/dD, [tot_Inl][2l+1][2l+1]	(E: Hartree)
 	std::vector<torch::Tensor> gedm_tensor;
@@ -101,7 +101,7 @@ private:
 		const double& v);
 
     void print_projected_DM(
-		ofstream &ofs,
+		std::ofstream &ofs,
 		ComplexMatrix &des,
 		const int &it,
 		const int &ia,
@@ -117,7 +117,7 @@ private:
 	const double& vz);
 
 	void init_gdmx();
-	void load_model(const string& model_file);
+	void load_model(const std::string& model_file);
 	void cal_gedm();	//need to load model in this step
 	void cal_gdmx(matrix& dm);	//dD/dX
 	void del_gdmx();

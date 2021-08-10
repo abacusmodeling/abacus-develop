@@ -36,13 +36,13 @@ void Stress_Func::stress_gga(matrix& sigma)
 		
 	double* rhotmp1;
 	double* rhotmp2;
-	complex<double>* rhogsum1;
-	complex<double>* rhogsum2;
+	std::complex<double>* rhogsum1;
+	std::complex<double>* rhogsum2;
 	Vector3<double>* gdr1;
 	Vector3<double>* gdr2;
  
 	rhotmp1 = new double[GlobalC::pw.nrxx];
-	rhogsum1 = new complex<double>[GlobalC::pw.ngmc];
+	rhogsum1 = new std::complex<double>[GlobalC::pw.ngmc];
 	ZEROS(rhotmp1, GlobalC::pw.nrxx);
 	ZEROS(rhogsum1, GlobalC::pw.ngmc);
 	for(int ir=0; ir<GlobalC::pw.nrxx; ir++) rhotmp1[ir] = GlobalC::CHR.rho[0][ir] + fac * GlobalC::CHR.rho_core[ir];
@@ -55,7 +55,7 @@ void Stress_Func::stress_gga(matrix& sigma)
 	if(nspin_in==2)
 	{
 		rhotmp2 = new double[GlobalC::pw.nrxx];
-		rhogsum2 = new complex<double>[GlobalC::pw.ngmc];
+		rhogsum2 = new std::complex<double>[GlobalC::pw.ngmc];
 		ZEROS(rhotmp2, GlobalC::pw.nrxx);
 		ZEROS(rhogsum2, GlobalC::pw.ngmc);
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)

@@ -3,17 +3,17 @@
 #include "../module_base/blas_connector.h"
 
 
-void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
+void Local_Orbital_Charge::read_dm(const int &is, const std::string &fn)
 {
     TITLE("Local_Orbital_Charge","read_dm");
     timer::tick("Local_Orbital_Charge","read_dm");
 
-    GlobalV::ofs_running << "\n processor 0 is reading density matrix from file < " << fn << " > " << endl;
+    GlobalV::ofs_running << "\n processor 0 is reading density matrix from file < " << fn << " > " << std::endl;
     //xiaohui modify 2015-03-25
     //bool quit_mesia = false;
     bool quit_abacus = false;
 
-    ifstream ifs;
+    std::ifstream ifs;
     if(GlobalV::MY_RANK==0)
     {
         ifs.open(fn.c_str());
@@ -29,7 +29,7 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
             // quit the program or not.
             bool quit=false;
 
-            string name;
+            std::string name;
             ifs >> name;
 
             // check lattice constant, unit is Angstrom
@@ -54,7 +54,7 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
                 CHECK_DOUBLE(ifs,GlobalC::ucell.atoms[it].na,quit);
             }
 
-            string coordinate;
+            std::string coordinate;
             ifs >> coordinate;
 
             for(int it=0; it<GlobalC::ucell.ntype; it++)
@@ -71,7 +71,7 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
             if(GlobalV::NSPIN == 1||GlobalV::NSPIN == 4)
             {
                 READ_VALUE(ifs, GlobalC::en.ef);
-                GlobalV::ofs_running << " read in fermi energy = " << GlobalC::en.ef << endl;
+                GlobalV::ofs_running << " read in fermi energy = " << GlobalC::en.ef << std::endl;
             }
             else if(GlobalV::NSPIN == 2)
             {
@@ -89,7 +89,7 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
 
 
 #ifndef __MPI
-    GlobalV::ofs_running << " Read SPIN = " << is+1 << " density matrix now." << endl;
+    GlobalV::ofs_running << " Read SPIN = " << is+1 << " density matrix now." << std::endl;
 
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {
@@ -138,14 +138,14 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
 
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {
-        //GlobalV::ofs_running << " NLOCAL=" << GlobalV::NLOCAL << endl;
-        //GlobalV::ofs_running << " lgd_now=" << lgd_now << endl;
-        //GlobalV::ofs_running << " GlobalC::GridT.lgd=" << GlobalC::GridT.lgd << endl;
+        //GlobalV::ofs_running << " NLOCAL=" << GlobalV::NLOCAL << std::endl;
+        //GlobalV::ofs_running << " lgd_now=" << lgd_now << std::endl;
+        //GlobalV::ofs_running << " GlobalC::GridT.lgd=" << GlobalC::GridT.lgd << std::endl;
 
         double *tmp = new double[GlobalV::NLOCAL];
         for(int i=0; i<GlobalV::NLOCAL; ++i)
         {
-            //GlobalV::ofs_running << " i=" << i << endl;
+            //GlobalV::ofs_running << " i=" << i << std::endl;
             ZEROS(tmp, GlobalV::NLOCAL);
             if(GlobalV::MY_RANK==0)
             {
@@ -178,7 +178,7 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
 #endif
     if(GlobalV::MY_RANK==0) ifs.close();
 
-    GlobalV::ofs_running << " Finish reading density matrix." << endl;
+    GlobalV::ofs_running << " Finish reading density matrix." << std::endl;
 
     timer::tick("Local_Orbital_Charge","read_dm");
     return;

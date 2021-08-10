@@ -36,7 +36,7 @@ class Force_LCAO_gamma
 
 	void average_force(double* fm);
 
-	void test_gamma(double* mm, const string &name);
+	void test_gamma(double* mm, const std::string &name);
 
 
 	//-------------------------------------------------------------

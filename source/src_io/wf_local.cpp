@@ -28,7 +28,7 @@ inline int CTOT2q(
         for(int i=0; i<naroc[0]; ++i)
         {
             int igrow=globalIndex(i, nb, dim0, iprow);
-			//GlobalV::ofs_running << "i,j,igcol,igrow" << i<<" "<<j<<" "<<igcol<<" "<<igrow<<endl;
+			//GlobalV::ofs_running << "i,j,igcol,igrow" << i<<" "<<j<<" "<<igcol<<" "<<igrow<<std::endl;
             if(myid==0) work[j*naroc[0]+i]=CTOT[igcol][igrow];
         }
     }
@@ -43,8 +43,8 @@ inline int CTOT2q_c(
 	int dim1,
 	int iprow,
 	int ipcol,
-	complex<double>* work,
-	complex<double>** CTOT)
+	std::complex<double>* work,
+	std::complex<double>** CTOT)
 {
     for(int j=0; j<naroc[1]; ++j)
     {
@@ -53,7 +53,7 @@ inline int CTOT2q_c(
         for(int i=0; i<naroc[0]; ++i)
         {
             int igrow=globalIndex(i, nb, dim0, iprow);
-			//ofs_running << "i,j,igcol,igrow" << i<<" "<<j<<" "<<igcol<<" "<<igrow<<endl;
+			//ofs_running << "i,j,igcol,igrow" << i<<" "<<j<<" "<<igcol<<" "<<igrow<<std::endl;
             if(myid==0) work[j*naroc[0]+i]=CTOT[igcol][igrow];
         }
     }
@@ -61,20 +61,20 @@ inline int CTOT2q_c(
 }
 
 // be called in local_orbital_wfc::allocate_k
-int WF_Local::read_lowf_complex(complex<double> **c, const int &ik, const bool &newdm)
+int WF_Local::read_lowf_complex(std::complex<double> **c, const int &ik, const bool &newdm)
 {
     TITLE("WF_Local","read_lowf_complex");
     timer::tick("WF_Local","read_lowf_complex");
 
-    complex<double> **ctot;
+    std::complex<double> **ctot;
 
-    stringstream ss;
+    std::stringstream ss;
 	// read wave functions
 	// write is in ../src_pdiag/pdiag_basic.cpp
     ss << GlobalV::global_out_dir << "LOWF_K_" << ik+1 <<".dat";
-//	cout << " name is = " << ss.str() << endl;
+//	std::cout << " name is = " << ss.str() << std::endl;
 
-    ifstream ifs;
+    std::ifstream ifs;
 
     int error = 0;
 
@@ -83,7 +83,7 @@ int WF_Local::read_lowf_complex(complex<double> **c, const int &ik, const bool &
         ifs.open(ss.str().c_str());
         if (!ifs)
         {
-            GlobalV::ofs_warning << " Can't open file:" << ss.str() << endl;
+            GlobalV::ofs_warning << " Can't open file:" << ss.str() << std::endl;
             error = 1;
         }
     }
@@ -108,8 +108,8 @@ int WF_Local::read_lowf_complex(complex<double> **c, const int &ik, const bool &
 
 		if(ikr!=ik+1)
 		{
-			GlobalV::ofs_warning << " ikr=" << ikr << " ik=" << ik << endl;
-			GlobalV::ofs_warning << " k index is not correct" << endl;
+			GlobalV::ofs_warning << " ikr=" << ikr << " ik=" << ik << std::endl;
+			GlobalV::ofs_warning << " k index is not correct" << std::endl;
 			error = 4;
 		}
 		else if ( 
@@ -117,30 +117,30 @@ int WF_Local::read_lowf_complex(complex<double> **c, const int &ik, const bool &
 			abs(ky-GlobalC::kv.kvec_c[ik].y)>1.0e-5 ||
 			abs(kz-GlobalC::kv.kvec_c[ik].z)>1.0e-5 )
 		{	
-			GlobalV::ofs_warning << " k vector is not correct" << endl;
-			GlobalV::ofs_warning << " Read in kx=" << kx << " ky = " << ky << " kz = " << kz << endl;
+			GlobalV::ofs_warning << " k std::vector is not correct" << std::endl;
+			GlobalV::ofs_warning << " Read in kx=" << kx << " ky = " << ky << " kz = " << kz << std::endl;
 			GlobalV::ofs_warning << " In fact, kx=" << GlobalC::kv.kvec_c[ik].x 
 			 << " ky=" << GlobalC::kv.kvec_c[ik].y
-			 << " kz=" << GlobalC::kv.kvec_c[ik].z << endl;
+			 << " kz=" << GlobalC::kv.kvec_c[ik].z << std::endl;
 			 error = 4; 
 		}
         else if (nbands!=GlobalV::NBANDS)
         {
             GlobalV::ofs_warning << " read in nbands=" << nbands;
-            GlobalV::ofs_warning << " NBANDS=" << GlobalV::NBANDS << endl;
+            GlobalV::ofs_warning << " NBANDS=" << GlobalV::NBANDS << std::endl;
             error = 2;
         }
         else if (nlocal != GlobalV::NLOCAL)
         {
             GlobalV::ofs_warning << " read in nlocal=" << nlocal;
-            GlobalV::ofs_warning << " NLOCAL=" << GlobalV::NLOCAL << endl;
+            GlobalV::ofs_warning << " NLOCAL=" << GlobalV::NLOCAL << std::endl;
             error = 3;
         }
 
-        ctot = new complex<double>*[GlobalV::NBANDS];
+        ctot = new std::complex<double>*[GlobalV::NBANDS];
         for (int i=0; i<GlobalV::NBANDS; i++)
         {
-            ctot[i] = new complex<double>[GlobalV::NLOCAL];
+            ctot[i] = new std::complex<double>[GlobalV::NLOCAL];
         }
 
         for (int i=0; i<GlobalV::NBANDS; ++i)
@@ -159,8 +159,8 @@ int WF_Local::read_lowf_complex(complex<double> **c, const int &ik, const bool &
             for (int j=0; j<GlobalV::NLOCAL; ++j)
             {
                 ifs >> a >> b;
-				ctot[i][j]=complex<double>(a,b);
-				//cout << ctot[i][j] << " " << endl;
+				ctot[i][j]=std::complex<double>(a,b);
+				//std::cout << ctot[i][j] << " " << std::endl;
             }
         }
     }
@@ -211,12 +211,12 @@ int WF_Local::read_lowf_complex(complex<double> **c, const int &ik, const bool &
 	/*
 	for(int i=0; i<GlobalV::NBANDS; ++i)
 	{
-		cout << " c band i=" << i+1 << endl;
+		std::cout << " c band i=" << i+1 << std::endl;
 		for(int j=0; j<GlobalV::NLOCAL; ++j)
 		{
-			cout << " " << c[i][j];
+			std::cout << " " << c[i][j];
 		}
-		cout << endl;
+		std::cout << std::endl;
 	}
 	*/
 
@@ -232,20 +232,20 @@ int WF_Local::read_lowf(double **c, const int &is)
 
     double **ctot;
 
-    stringstream ss;
+    std::stringstream ss;
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
 		// read wave functions
 		// write is in ../src_pdiag/pdiag_basic.cpp
     	ss << GlobalV::global_out_dir << "LOWF_GAMMA_S" << is+1 <<".dat";
-		cout << " name is = " << ss.str() << endl;
+		std::cout << " name is = " << ss.str() << std::endl;
 	}
 	else
 	{
 		ss << GlobalV::global_out_dir << "LOWF_K.dat";
 	}
 
-    ifstream ifs;
+    std::ifstream ifs;
 
     int error = 0;
 
@@ -254,7 +254,7 @@ int WF_Local::read_lowf(double **c, const int &is)
         ifs.open(ss.str().c_str());
         if (!ifs)
         {
-            GlobalV::ofs_warning << " Can't open file:" << ss.str() << endl;
+            GlobalV::ofs_warning << " Can't open file:" << ss.str() << std::endl;
             error = 1;
         }
     }
@@ -276,13 +276,13 @@ int WF_Local::read_lowf(double **c, const int &is)
         if (nbands!=GlobalV::NBANDS)
         {
             GlobalV::ofs_warning << " read in nbands=" << nbands;
-            GlobalV::ofs_warning << " NBANDS=" << GlobalV::NBANDS << endl;
+            GlobalV::ofs_warning << " NBANDS=" << GlobalV::NBANDS << std::endl;
             error = 2;
         }
         else if (nlocal != GlobalV::NLOCAL)
         {
             GlobalV::ofs_warning << " read in nlocal=" << nlocal;
-            GlobalV::ofs_warning << " NLOCAL=" << GlobalV::NLOCAL << endl;
+            GlobalV::ofs_warning << " NLOCAL=" << GlobalV::NLOCAL << std::endl;
             error = 3;
         }
 
@@ -292,7 +292,7 @@ int WF_Local::read_lowf(double **c, const int &is)
             ctot[i] = new double[GlobalV::NLOCAL];
         }
 
-		//cout << "nbands" << GlobalV::NBANDS << endl;
+		//std::cout << "nbands" << GlobalV::NBANDS << std::endl;
         for (int i=0; i<GlobalV::NBANDS; i++)
         {
             int ib;
@@ -300,13 +300,13 @@ int WF_Local::read_lowf(double **c, const int &is)
 			READ_VALUE(ifs, GlobalC::wf.ekb[GlobalV::CURRENT_SPIN][i]);
 			READ_VALUE(ifs, GlobalC::wf.wg(GlobalV::CURRENT_SPIN,i));
             assert( (i+1)==ib);
-			//cout << " ib=" << ib << endl;
+			//std::cout << " ib=" << ib << std::endl;
             for (int j=0; j<GlobalV::NLOCAL; j++)
             {
                 ifs >> ctot[i][j];
-				//cout << ctot[i][j] << " ";
+				//std::cout << ctot[i][j] << " ";
             }
-			//cout << endl;
+			//std::cout << std::endl;
         }
     }
 
@@ -357,12 +357,12 @@ int WF_Local::read_lowf(double **c, const int &is)
     return 0;
 }
 
-void WF_Local::write_lowf(const string &name, double **ctot)
+void WF_Local::write_lowf(const std::string &name, double **ctot)
 {
     TITLE("WF_Local","write_lowf");
     timer::tick("WF_Local","write_lowf");
 
-    ofstream ofs;
+    std::ofstream ofs;
     if (GlobalV::DRANK==0)
     {
         ofs.open(name.c_str());
@@ -370,9 +370,9 @@ void WF_Local::write_lowf(const string &name, double **ctot)
         {
             WARNING("Pdiag_Basic::write_lowf","Can't write local orbital wave functions.");
         }
-        ofs << GlobalV::NBANDS << " (number of bands)" << endl;
+        ofs << GlobalV::NBANDS << " (number of bands)" << std::endl;
         ofs << GlobalV::NLOCAL << " (number of orbitals)";
-        ofs << setprecision(8);
+        ofs << std::setprecision(8);
         ofs << scientific;
 
         for (int i=0; i<GlobalV::NBANDS; i++)
@@ -395,12 +395,12 @@ void WF_Local::write_lowf(const string &name, double **ctot)
     return;
 }
 
-void WF_Local::write_lowf_complex(const string &name, complex<double> **ctot, const int &ik)
+void WF_Local::write_lowf_complex(const std::string &name, std::complex<double> **ctot, const int &ik)
 {
     TITLE("WF_Local","write_lowf_complex");
     timer::tick("WF_Local","write_lowf_complex");
 
-    ofstream ofs;
+    std::ofstream ofs;
     if (GlobalV::DRANK==0)
     {
         ofs.open(name.c_str());
@@ -408,10 +408,10 @@ void WF_Local::write_lowf_complex(const string &name, complex<double> **ctot, co
         {
             WARNING("Pdiag_Basic::write_lowf","Can't write local orbital wave functions.");
         }
-        ofs << setprecision(25);
-		ofs << ik+1 << " (index of k points)" << endl;
-		ofs << GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z << endl;
-        ofs << GlobalV::NBANDS << " (number of bands)" << endl;
+        ofs << std::setprecision(25);
+		ofs << ik+1 << " (index of k points)" << std::endl;
+		ofs << GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z << std::endl;
+        ofs << GlobalV::NBANDS << " (number of bands)" << std::endl;
         ofs << GlobalV::NLOCAL << " (number of orbitals)";
         ofs << scientific;
 
@@ -485,12 +485,12 @@ void WF_Local::distri_lowf_new(double **ctot, const int &is)
 //2.2 copy from ctot to work, then bcast work
 			info=CTOT2q(myid, naroc, nb, GlobalC::ParaO.dim0, GlobalC::ParaO.dim1, iprow, ipcol, work, ctot);
 			info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, 0, GlobalC::ParaO.comm_2D);
-			//GlobalV::ofs_running << "iprow, ipcow : " << iprow << ipcol << endl;
+			//GlobalV::ofs_running << "iprow, ipcow : " << iprow << ipcol << std::endl;
 			//for (int i=0; i<maxnloc; ++i)
 			//{
 				//GlobalV::ofs_running << *(work+i)<<" ";
 			//}
-			//GlobalV::ofs_running << endl;
+			//GlobalV::ofs_running << std::endl;
 //2.3 copy from work to wfc_gamma
 			const int inc=1;
 			if(myid==src_rank)
@@ -507,7 +507,7 @@ void WF_Local::distri_lowf_new(double **ctot, const int &is)
     return;
 }
 
-void WF_Local::distri_lowf_complex_new(complex<double> **ctot, const int &ik)
+void WF_Local::distri_lowf_complex_new(std::complex<double> **ctot, const int &ik)
 {
     TITLE("WF_Local","distri_lowf_complex_new");
 #ifdef __MPI
@@ -523,7 +523,7 @@ void WF_Local::distri_lowf_complex_new(complex<double> **ctot, const int &ik)
     MPI_Comm_size(GlobalC::ParaO.comm_2D, &nprocs);
     MPI_Comm_rank(GlobalC::ParaO.comm_2D, &myid);
 
-	complex<double> *work=new complex<double>[maxnloc]; // work/buffer matrix
+	std::complex<double> *work=new std::complex<double>[maxnloc]; // work/buffer matrix
 	int nb = 0;
 	if(GlobalV::NB2D==0)
 	{
@@ -557,12 +557,12 @@ void WF_Local::distri_lowf_complex_new(complex<double> **ctot, const int &ik)
 //2.2 copy from ctot to work, then bcast work
 			info=CTOT2q_c(myid, naroc, nb, GlobalC::ParaO.dim0, GlobalC::ParaO.dim1, iprow, ipcol, work, ctot);
 			info=MPI_Bcast(work, maxnloc, MPI_DOUBLE_COMPLEX, 0, GlobalC::ParaO.comm_2D);
-			//ofs_running << "iprow, ipcow : " << iprow << ipcol << endl;
+			//ofs_running << "iprow, ipcow : " << iprow << ipcol << std::endl;
 			//for (int i=0; i<maxnloc; ++i)
 			//{
 				//ofs_running << *(work+i)<<" ";
 			//}
-			//ofs_running << endl;
+			//ofs_running << std::endl;
 //2.3 copy from work to wfc_k
 			const int inc=1;
 			if(myid==src_rank)
@@ -662,7 +662,7 @@ void WF_Local::distri_lowf(double **ctot, double **c)
             MPI_Send(&lgdnow, 1, MPI_INT, 0, tag, DIAG_WORLD);
 
             // receive c
-			GlobalV::ofs_running << " lgdnow=" << lgdnow << endl;
+			GlobalV::ofs_running << " lgdnow=" << lgdnow << std::endl;
             double* crecv = new double[GlobalV::NBANDS*lgdnow];
             ZEROS(crecv, GlobalV::NBANDS*lgdnow);
             tag = GlobalV::DRANK * 3 + 2;
@@ -685,23 +685,23 @@ void WF_Local::distri_lowf(double **ctot, double **c)
     // for test,
     //-----------
     /*
-    GlobalV::ofs_running << " Wave Functions in local basis: " << endl;
+    GlobalV::ofs_running << " Wave Functions in local basis: " << std::endl;
     for(int i=0; i<GlobalV::NBANDS; i++)
     {
         for(int j=0; j<GlobalC::GridT.lgd; j++)
         {
-            if(j%8==0) GlobalV::ofs_running << endl;
+            if(j%8==0) GlobalV::ofs_running << std::endl;
             if( abs(c[i][j]) > 1.0e-5  )
             {
-                GlobalV::ofs_running << setw(15) << c[i][j];
+                GlobalV::ofs_running << std::setw(15) << c[i][j];
             }
             else
             {
-                GlobalV::ofs_running << setw(15) << "0";
+                GlobalV::ofs_running << std::setw(15) << "0";
             }
         }
     }
-    GlobalV::ofs_running << endl;
+    GlobalV::ofs_running << std::endl;
     */
 #else
 	WARNING_QUIT("WF_Local::distri_lowf","check the code without MPI.");
@@ -710,7 +710,7 @@ void WF_Local::distri_lowf(double **ctot, double **c)
 }
 
 
-void WF_Local::distri_lowf_complex(complex<double> **ctot, complex<double> **cc)
+void WF_Local::distri_lowf_complex(std::complex<double> **ctot, std::complex<double> **cc)
 {
     TITLE("WF_Local","distri_lowf_complex");
 #ifdef __MPI
@@ -755,9 +755,9 @@ void WF_Local::distri_lowf_complex(complex<double> **ctot, complex<double> **cc)
 					int* trace_lo2 = new int[GlobalV::NLOCAL];
 					MPI_Recv(trace_lo2, GlobalV::NLOCAL, MPI_INT, i, tag, DIAG_WORLD, &status);
 
-//					GlobalV::ofs_running << " lgd2=" << lgd2 << " proc=" << i+1 << endl;
+//					GlobalV::ofs_running << " lgd2=" << lgd2 << " proc=" << i+1 << std::endl;
 					// send csend
-					complex<double>* csend = new complex<double>[GlobalV::NBANDS*lgd2];
+					std::complex<double>* csend = new std::complex<double>[GlobalV::NBANDS*lgd2];
 					ZEROS(csend, GlobalV::NBANDS*lgd2);
 					for (int ib=0; ib<GlobalV::NBANDS; ib++)
 					{
@@ -792,7 +792,7 @@ void WF_Local::distri_lowf_complex(complex<double> **ctot, complex<double> **cc)
 				MPI_Send(GlobalC::GridT.trace_lo, GlobalV::NLOCAL, MPI_INT, 0, tag, DIAG_WORLD);
 
 				// receive cc
-				complex<double>* crecv = new complex<double>[GlobalV::NBANDS*GlobalC::GridT.lgd];
+				std::complex<double>* crecv = new std::complex<double>[GlobalV::NBANDS*GlobalC::GridT.lgd];
 				ZEROS(crecv, GlobalV::NBANDS*GlobalC::GridT.lgd);
 
 				tag = GlobalV::DRANK * 3 + 2;
@@ -817,23 +817,23 @@ void WF_Local::distri_lowf_complex(complex<double> **ctot, complex<double> **cc)
     // for test,
     //-----------
     /*
-    GlobalV::ofs_running << " Wave Functions in local basis: " << endl;
+    GlobalV::ofs_running << " Wave Functions in local basis: " << std::endl;
     for(int i=0; i<GlobalV::NBANDS; i++)
     {
         for(int j=0; j<GlobalC::GridT.lgd; j++)
         {
-            if(j%8==0) GlobalV::ofs_running << endl;
+            if(j%8==0) GlobalV::ofs_running << std::endl;
             if( abs(c[i][j]) > 1.0e-5  )
             {
-                GlobalV::ofs_running << setw(15) << c[i][j];
+                GlobalV::ofs_running << std::setw(15) << c[i][j];
             }
             else
             {
-                GlobalV::ofs_running << setw(15) << "0";
+                GlobalV::ofs_running << std::setw(15) << "0";
             }
         }
     }
-    GlobalV::ofs_running << endl;
+    GlobalV::ofs_running << std::endl;
     */
 #else
 	WARNING_QUIT("WF_Local::distri_lowf_complex","check the code without MPI.");
@@ -885,14 +885,14 @@ void WF_Local::distri_lowf_aug(double **ctot, double **c_aug)
                 int* tmp_trace = new int[GlobalV::NLOCAL];
                 MPI_Recv(tmp_trace, GlobalV::NLOCAL, MPI_INT, i, tag, DIAG_WORLD, &status);
 
-//				GlobalV::ofs_running << " Recv trace from pro " << i << endl; 
+//				GlobalV::ofs_running << " Recv trace from pro " << i << std::endl; 
 
                 // (2) receive daug
                 tag = i * 3 + 1;
                 int daug = 0;
                 MPI_Recv(&daug, 1, MPI_INT, i, tag, DIAG_WORLD, &status);
 
-//				GlobalV::ofs_running << " Recv daug from pro " << i << endl;
+//				GlobalV::ofs_running << " Recv daug from pro " << i << std::endl;
 
                 // ready to send csend, data number is GlobalV::NBANDS*daug
                 double* csend = new double[GlobalV::NBANDS*daug];
@@ -914,7 +914,7 @@ void WF_Local::distri_lowf_aug(double **ctot, double **c_aug)
                 tag = i * 3 + 2;
                 MPI_Send(csend,GlobalV::NBANDS*daug,MPI_DOUBLE,i,tag,DIAG_WORLD);
 
-//				GlobalV::ofs_running << " Send ctot to pro " << i << endl;
+//				GlobalV::ofs_running << " Send ctot to pro " << i << std::endl;
 
                 delete[] tmp_trace;
                 delete[] csend;
@@ -986,23 +986,23 @@ void WF_Local::distri_lowf_aug(double **ctot, double **c_aug)
     // for test,
     //-----------
     /*
-    GlobalV::ofs_running << " Wave Functions in local basis: " << endl;
+    GlobalV::ofs_running << " Wave Functions in local basis: " << std::endl;
     for(int i=0; i<GlobalV::NBANDS; i++)
     {
         for(int j=0; j<GlobalC::LOWF.daug; j++)
         {
-            if(j%8==0) GlobalV::ofs_running << endl;
+            if(j%8==0) GlobalV::ofs_running << std::endl;
             if( abs(c[i][j]) > 1.0e-5  )
             {
-                GlobalV::ofs_running << setw(15) << c[i][j];
+                GlobalV::ofs_running << std::setw(15) << c[i][j];
             }
             else
             {
-                GlobalV::ofs_running << setw(15) << "0";
+                GlobalV::ofs_running << std::setw(15) << "0";
             }
         }
     }
-    GlobalV::ofs_running << endl;
+    GlobalV::ofs_running << std::endl;
     */
 #else
 	WARNING_QUIT("WF_Local::distri_lowf_aug","check code without MPI.");
@@ -1011,7 +1011,7 @@ void WF_Local::distri_lowf_aug(double **ctot, double **c_aug)
 }
 
 
-void WF_Local::distri_lowf_aug_complex(complex<double> **ctot, complex<double> **c_aug)
+void WF_Local::distri_lowf_aug_complex(std::complex<double> **ctot, std::complex<double> **c_aug)
 {
     TITLE("WF_Local","distri_lowf_aug_complex");
 
@@ -1062,7 +1062,7 @@ void WF_Local::distri_lowf_aug_complex(complex<double> **ctot, complex<double> *
 				if(daug!=0)
 				{
 					// ready to send csend, data number is GlobalV::NBANDS*daug
-					complex<double>* csend = new complex<double>[GlobalV::NBANDS*daug];
+					std::complex<double>* csend = new std::complex<double>[GlobalV::NBANDS*daug];
 					ZEROS(csend, GlobalV::NBANDS*daug);
 
 					for (int ib=0; ib<GlobalV::NBANDS; ib++)
@@ -1080,7 +1080,7 @@ void WF_Local::distri_lowf_aug_complex(complex<double> **ctot, complex<double> *
 					// (3) send the data to processor i.
 					tag = i * 3 + 2;
 					MPI_Send(csend,GlobalV::NBANDS*daug,mpicomplex,i,tag,DIAG_WORLD);
-					//				GlobalV::ofs_running << " Send ctot to pro " << i << endl;
+					//				GlobalV::ofs_running << " Send ctot to pro " << i << std::endl;
 					delete[] csend;
 				}
                 delete[] tmp_trace;
@@ -1103,7 +1103,7 @@ void WF_Local::distri_lowf_aug_complex(complex<double> **ctot, complex<double> *
             MPI_Send(GlobalC::LOWF.trace_aug, GlobalV::NLOCAL, MPI_INT, 0, tag, DIAG_WORLD);
 //			for(int i=0; i<GlobalV::NLOCAL; ++i)
 //			{
-//				GlobalV::ofs_running << " trace_aug = " << GlobalC::LOWF.trace_aug[i] << endl; 
+//				GlobalV::ofs_running << " trace_aug = " << GlobalC::LOWF.trace_aug[i] << std::endl; 
 //			}
 
 			//--------------------------------------------
@@ -1118,7 +1118,7 @@ void WF_Local::distri_lowf_aug_complex(complex<double> **ctot, complex<double> *
 				//--------------------------------------------
 				// (3) receive the augmented wave functions
 				//--------------------------------------------
-				complex<double>* crecv = new complex<double>[GlobalV::NBANDS*GlobalC::LOWF.daug];
+				std::complex<double>* crecv = new std::complex<double>[GlobalV::NBANDS*GlobalC::LOWF.daug];
 				ZEROS(crecv, GlobalV::NBANDS*GlobalC::LOWF.daug);
 
 				tag = GlobalV::DRANK * 3 + 2;
@@ -1158,23 +1158,23 @@ void WF_Local::distri_lowf_aug_complex(complex<double> **ctot, complex<double> *
     // for test,
     //-----------
 	/*
-    GlobalV::ofs_running << " Wave Functions in local basis: " << endl;
+    GlobalV::ofs_running << " Wave Functions in local basis: " << std::endl;
     for(int i=0; i<GlobalV::NBANDS; i++)
     {
         for(int j=0; j<GlobalC::LOWF.daug; j++)
         {
-            if(j%8==0) GlobalV::ofs_running << endl;
+            if(j%8==0) GlobalV::ofs_running << std::endl;
             if( abs(c_aug[i][j]) > 1.0e-5  )
             {
-                GlobalV::ofs_running << setw(15) << c_aug[i][j];
+                GlobalV::ofs_running << std::setw(15) << c_aug[i][j];
             }
             else
             {
-                GlobalV::ofs_running << setw(15) << "0";
+                GlobalV::ofs_running << std::setw(15) << "0";
             }
         }
     }
-    GlobalV::ofs_running << endl;
+    GlobalV::ofs_running << std::endl;
 	*/
 #else
 	WARNING_QUIT("WF_Local::distri_lowf_aug_complex","check code without MPI.");

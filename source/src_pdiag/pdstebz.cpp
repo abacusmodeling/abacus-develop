@@ -47,7 +47,7 @@ void pdstebz(MPI_Comm comm ,double *D,double *E,double *eigen,int N)
 	for(int i=0; i<N; i++)
 	{
 		eigen[i] = D[i];
-		cout << " D[" << i << "]=" << D[i] << endl;
+		std::cout << " D[" << i << "]=" << D[i] << std::endl;
 	}
 	*/
     

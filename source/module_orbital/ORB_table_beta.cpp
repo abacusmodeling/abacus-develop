@@ -112,8 +112,8 @@ int ORB_table_beta::get_rmesh(const double &R1, const double &R2)
 	{
 		//GlobalV::ofs_warning << "\n R1 = " << R1 << " R2 = " << R2;
 		//GlobalV::ofs_warning << "\n rmesh = " << rmesh;
-		cout << "\n R1 = " << R1 << " R2 = " << R2;
-		cout << "\n rmesh = " << rmesh;
+		std::cout << "\n R1 = " << R1 << " R2 = " << R2;
+		std::cout << "\n rmesh = " << rmesh;
 		WARNING_QUIT("ORB_table_beta::get_rmesh", "rmesh <= 0");
 	}
 	return rmesh;
@@ -145,9 +145,9 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 	//previous version
 	double* integrated_func = new double[kmesh];
 	
-	const vector<vector<double>> &jlm1 = pSB->get_jlx()[l-1];
-	const vector<vector<double>> &jl = pSB->get_jlx()[l];
-	const vector<vector<double>> &jlp1 = pSB->get_jlx()[l+1];	
+	const std::vector<std::vector<double>> &jlm1 = pSB->get_jlx()[l-1];
+	const std::vector<std::vector<double>> &jl = pSB->get_jlx()[l];
+	const std::vector<std::vector<double>> &jlp1 = pSB->get_jlx()[l+1];	
 	for (int ir = 0; ir < rmesh; ir++)
 	{
 		ZEROS(integrated_func,kmesh);
@@ -234,7 +234,7 @@ void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
 	{
 		for (int T2 = 0 ; T2 < ntype ; T2++)// type 2 is non-local projector
 		{
-			// Tpair: type pair.
+			// Tpair: type std::pair.
 			const int Tpair=this->NL_Tpair(T1,T2);
 			const int Lmax1 = GlobalC::ORB.Phi[T1].getLmax();			
 			const int NBeta = GlobalC::ORB.nproj[T2];
@@ -380,7 +380,7 @@ void ORB_table_beta::init_NL_Tpair(void)
 			 this->NL_Tpair(T1,T0) = index;
 			 ++index;
 
-			 // the pair < psi | beta >
+			 // the std::pair < psi | beta >
 			 // be careful! This is not a symmetry matrix.
 			 this->NL_L2plus1(T1,T0) = std::max(GlobalC::ORB.Phi[T1].getLmax(), GlobalC::ORB.Beta[T0].getLmax() )*2+1;
 			 

@@ -102,11 +102,11 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 	// but that's not the term "gamma_only" I want to use in LCAO,  
 	fact = 1.0;
 
-    //GlobalV::ofs_running << "\n pwb.gstart = " << pwb.gstart << endl;
+    //GlobalV::ofs_running << "\n pwb.gstart = " << pwb.gstart << std::endl;
 
     for (int ig=pwb.gstart; ig<pwb.ngmc; ig++)
     {
-        complex<double> rhon = ZERO;
+        std::complex<double> rhon = ZERO;
         for (int it=0; it<cell.ntype; it++)
         {
             rhon += static_cast<double>( cell.atoms[it].zv ) * conj( pwb.strucFac(it, ig));
@@ -120,7 +120,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 
     ewaldg = FOUR_PI / cell.omega * ewaldg;
 
-//	cout << "\n ewaldg = " << ewaldg;
+//	std::cout << "\n ewaldg = " << ewaldg;
 
     //  Here add the other constant term
 	if(pwb.gstart == 1)
@@ -227,7 +227,7 @@ void H_Ewald_pw::rgen(
     // output: square modulus of vectors R+tau_s-
     // input: direct lattice vectors
     // input: reciprocal lattice vectors
-    // input: the vector tau_s-tau_s'
+    // input: the std::vector tau_s-tau_s'
     // input: the radius of the sphere in real sp
     //    and here the local variables
 
@@ -252,7 +252,7 @@ void H_Ewald_pw::rgen(
     // buffer contains the actual r
     // buffer cotains the modulus of actual r
     // used for swapping
-    // function to find the norm of a vector
+    // function to find the norm of a std::vector
     // external dnrm2, see myfunc
 
     nrm = 0;
@@ -307,7 +307,7 @@ void H_Ewald_pw::rgen(
                 {
                     if (nrm > mxr)
                     {
-                        cerr << "\n rgen, too many r-vectors," << nrm;
+                        std::cerr << "\n rgen, too many r-vectors," << nrm;
                     }
                     r[nrm] = t;
                     r2[nrm] = tt;

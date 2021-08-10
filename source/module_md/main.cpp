@@ -36,10 +36,10 @@ void calculate()
 	time_t	time_finish= std::time(NULL);
 
 	// print out information before ABACUS ends
-	cout << "\n START  Time  : " << ctime(&time_start);
-	cout << " FINISH Time  : " << ctime(&time_finish);
-	cout << " TOTAL  Time  : " << difftime(time_finish, time_start) << endl;
-	cout << " SEE INFORMATION IN : " << GlobalV::global_out_dir << endl;
+	std::cout << "\n START  Time  : " << ctime(&time_start);
+	std::cout << " FINISH Time  : " << ctime(&time_finish);
+	std::cout << " TOTAL  Time  : " << difftime(time_finish, time_start) << std::endl;
+	std::cout << " SEE INFORMATION IN : " << GlobalV::global_out_dir << std::endl;
 
 	GlobalV::ofs_running << "\n Start  Time  : " << ctime(&time_start);
 	GlobalV::ofs_running << " Finish Time  : " << ctime(&time_finish);
@@ -49,8 +49,8 @@ void calculate()
 	int mins = ( total_time - 3600 * hour ) / 60;
 	int secs = total_time - 3600 * hour - 60 * mins ;
 	GlobalV::ofs_running << " Total  Time  : " << hour << " h "
-	            		 << mins << " mins "
-	           			 << secs << " secs " << endl;
+	            << mins << " mins "
+	            << secs << " secs " << std::endl;
 
 #ifdef __MPI
     MPI_Finalize();

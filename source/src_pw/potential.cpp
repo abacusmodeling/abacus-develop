@@ -129,7 +129,7 @@ void Potential::init_pot(
     {
         OUT(GlobalV::ofs_running,"start_pot",start_pot);
 
-        cout << " START POTENTIAL      : " << start_pot << endl;
+        std::cout << " START POTENTIAL      : " << start_pot << std::endl;
         if (this->start_pot == "atomic")//mohan add 2007-10-17
         {
             start_from_atomic:
@@ -140,20 +140,20 @@ void Potential::init_pot(
             GlobalV::ofs_running << " try to start potential from file : ";
             for(int is=0; is<GlobalV::NSPIN; is++)
             {
-                stringstream ssc;
+                std::stringstream ssc;
                 ssc << GlobalV::global_readin_dir << "SPIN" << is + 1 << "_CHG";
-                GlobalV::ofs_running << ssc.str() << endl;
+                GlobalV::ofs_running << ssc.str() << std::endl;
                 // mohan update 2012-02-10
                 if(GlobalC::CHR.read_rho( is, ssc.str(), GlobalC::CHR.rho[is] )) 
                 {
-                    GlobalV::ofs_running << " Read in the charge density: " << ssc.str() << endl;
+                    GlobalV::ofs_running << " Read in the charge density: " << ssc.str() << std::endl;
 				}
 				else if(is>0 && GlobalV::NSPIN==4)
 				{
 					// read only spin (up+down)
 					if(GlobalV::PRENSPIN == 1)
 					{
-						GlobalV::ofs_running << " Didn't read in the charge density but autoset it for spin " <<is+1<< endl;
+						GlobalV::ofs_running << " Didn't read in the charge density but autoset it for spin " <<is+1<< std::endl;
 						for(int ir=0;ir<GlobalC::pw.nrxx;ir++)
 						{
 							GlobalC::CHR.rho[is][ir] = 0.0;
@@ -168,11 +168,11 @@ void Potential::init_pot(
 						}
 						else if(is==2) 
 						{
-							GlobalV::ofs_running << " Didn't read in the charge density but would rearrange it later. "<< endl;
+							GlobalV::ofs_running << " Didn't read in the charge density but would rearrange it later. "<< std::endl;
 						}
 						else if(is==3)
 						{
-							GlobalV::ofs_running << " rearrange charge density " << endl;
+							GlobalV::ofs_running << " rearrange charge density " << std::endl;
 							for(int ir=0;ir<GlobalC::pw.nrxx;ir++)
 							{
 								GlobalC::CHR.rho[3][ir] = GlobalC::CHR.rho[0][ir] - GlobalC::CHR.rho[1][ir];
@@ -189,7 +189,7 @@ void Potential::init_pot(
 				}
 				else
                 {
-                    GlobalV::ofs_running << " Start charge density from atomic charge density." << endl;
+                    GlobalV::ofs_running << " Start charge density from atomic charge density." << std::endl;
                     goto start_from_atomic;
                 }
             }
@@ -262,7 +262,7 @@ void Potential::set_local_pot(
     TITLE("Potential","set_local_pot");
     timer::tick("Potential","set_local_pot");
 
-    complex<double> *vg = new complex<double>[ngmc];
+    std::complex<double> *vg = new std::complex<double>[ngmc];
 
     ZEROS( vg, ngmc );
 
@@ -288,13 +288,13 @@ void Potential::set_local_pot(
         static bool first = true;
         if(first)
         {
-            cout << " ADD THE GlobalV::EFIELD (V/A) : " << Efield::eamp*51.44 << endl;
+            std::cout << " ADD THE GlobalV::EFIELD (V/A) : " << Efield::eamp*51.44 << std::endl;
             first = false;
         }
         EFID.add_efield(GlobalC::CHR.rho[0], vl_pseudo);	
     }
 
-    //GlobalV::ofs_running <<" set local pseudopotential done." << endl;
+    //GlobalV::ofs_running <<" set local pseudopotential done." << std::endl;
     timer::tick("Potential","set_local_pot");
     return;
 }
@@ -445,13 +445,13 @@ void Potential::newd(void)
 						}
 						else if(is==1)
 						{
-							GlobalC::ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
-							GlobalC::ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
+							GlobalC::ppcell.deeq_nc(is, iat, ih, jh) = std::complex<double>(0.0 , 0.0);
+							GlobalC::ppcell.deeq_nc(is, iat, jh, ih) = std::complex<double>(0.0 , 0.0);
 						}
 						else if(is==2)
 						{
-							GlobalC::ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
-							GlobalC::ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
+							GlobalC::ppcell.deeq_nc(is, iat, ih, jh) = std::complex<double>(0.0 , 0.0);
+							GlobalC::ppcell.deeq_nc(is, iat, jh, ih) = std::complex<double>(0.0 , 0.0);
 						}
 						else if(is==3)
 						{

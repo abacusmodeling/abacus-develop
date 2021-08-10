@@ -13,12 +13,12 @@ public:
 
      int ind1,ind4,ind5;
 
-     complex<double> *p;
+     std::complex<double> *p;
 
-     inline complex<double> &operator()(const int &i1,const int &i2,const int &i3,const int &i4,const int &i5)
+     inline std::complex<double> &operator()(const int &i1,const int &i2,const int &i3,const int &i4,const int &i5)
      { return p[ind2*ind3*ind4*ind5*i1 + ind3*ind4*ind5*i2 + ind4*ind5*i3 + ind5*i4 + i5]; }
 
-     inline const complex<double> &operator()(const int &i1,const int &i2,const int &i3,const int &i4,const int &i5)const
+     inline const std::complex<double> &operator()(const int &i1,const int &i2,const int &i3,const int &i4,const int &i5)const
      { return p[ind2*ind3*ind4*ind5*i1 + ind3*ind4*ind5*i2 + ind4*ind5*i3 + ind5*i4 + i5]; }
 
      void create(const int i1, const int i2, const int i3);
@@ -46,9 +46,9 @@ class Soc
 	int sph_ind(const int l, const double j, const int m, const int spin);
 
 	void rot_ylm(const int lmax);
-	// complex<double> **rotylm;
+	// std::complex<double> **rotylm;
 
-	const complex<double> & rotylm(const int &i1,const int &i2) const
+	const std::complex<double> & rotylm(const int &i1,const int &i2) const
 	{ return p_rot[l2plus1_*i1 + i2]; }
 
 	Fcoef fcoef;
@@ -71,7 +71,7 @@ class Soc
 
 	int l_max_;
 	int l2plus1_;
-	complex<double> *p_rot;
+	std::complex<double> *p_rot;
 
 };
 #endif
