@@ -10,7 +10,7 @@ Diago_LCAO_Matrix::~Diago_LCAO_Matrix(){}
 
 void Diago_LCAO_Matrix::solve_complex_matrix(
 	const int &ik, 
-	complex<double>** wfc, 
+	std::complex<double>** wfc, 
 	ComplexMatrix &wfc_2d)const
 {
 	TITLE("Diago_LCAO_Matrix","solve_complex_matrix");
@@ -31,7 +31,7 @@ void Diago_LCAO_Matrix::solve_complex_matrix(
 
 	time_t time_end = time(NULL);
 
-	OUT_TIME("diago(complex)", time_start, time_end);
+	OUT_TIME("diago(std::complex)", time_start, time_end);
 
 	return;
 }
@@ -59,7 +59,7 @@ void Diago_LCAO_Matrix::solve_double_matrix(
 #endif
 	else
 	{
-		cout << " Diago_LCAO_Matrix, diago_type = " << GlobalV::KS_SOLVER << endl; 
+		std::cout << " Diago_LCAO_Matrix, diago_type = " << GlobalV::KS_SOLVER << std::endl; 
 		WARNING_QUIT("Diago_LCAO_Matrix::init","Check GlobalV::KS_SOLVER.");
 	}
 
@@ -79,7 +79,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_double(const int &ik, double**wfc, matrix &
 	// save H and S matrix to disk.
 	bool bit = false;
 	HS_Matrix::saving_HS(GlobalC::LM.Hloc, GlobalC::LM.Sloc, bit, GlobalC::ParaO.out_hs);
-	GlobalV::ofs_running << setprecision(6);
+	GlobalV::ofs_running << std::setprecision(6);
 
 	// Distribution of matrix for 
 	// prallel eigensolver.
@@ -89,7 +89,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_double(const int &ik, double**wfc, matrix &
 }
 
 
-void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, complex<double>** wfc, ComplexMatrix &wfc_2d)const
+void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, std::complex<double>** wfc, ComplexMatrix &wfc_2d)const
 {
 	TITLE("Diago_LCAO_Matrix","using_HPSEPS_complex");
 
@@ -97,7 +97,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, complex<double>** wf
 	bool bit = false; //LiuXh, 2017-03-21
 	//if set bit = true, there would be error in soc-multi-core calculation, noted by zhengdy-soc
 	HS_Matrix::saving_HS_complex(GlobalC::LM.Hloc2, GlobalC::LM.Sloc2, bit, GlobalC::ParaO.out_hs); //LiuXh, 2017-03-21
-	GlobalV::ofs_running << setprecision(6); //LiuXh, 2017-03-21
+	GlobalV::ofs_running << std::setprecision(6); //LiuXh, 2017-03-21
 
 	GlobalC::ParaO.diago_complex_begin(ik, wfc, wfc_2d, GlobalC::LM.Hloc2, GlobalC::LM.Sloc2, GlobalC::wf.ekb[ik]);
 
@@ -105,7 +105,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, complex<double>** wf
 	if(GlobalV::NSPIN==4)
 	{
 		int row = GlobalC::GridT.lgd;
-		vector<complex<double>> tmp(row);
+		std::vector<std::complex<double>> tmp(row);
 		for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
 			for(int iw=0; iw<row / GlobalV::NPOL; iw++)
@@ -124,7 +124,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, complex<double>** wf
 }
 #endif
 
-void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double> **wfc)const
+void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, std::complex<double> **wfc)const
 {
 	TITLE("Diago_LCAO_Matrix","using_LAPACK_complex");
 
@@ -226,11 +226,11 @@ void Diago_LCAO_Matrix::using_LAPACK(const int &ik, double** wfc)const
 	clock_end = std::clock();
 	double duration = (double)(clock_end - clock_start) / CLOCKS_PER_SEC;
 
-	GlobalV::ofs_running << setiosflags(ios::fixed) << setprecision(20);
-//	GlobalV::ofs_running << " clock_start = " << clock_start << endl;
-//	GlobalV::ofs_running << " clock_end = " << clock_end << endl;
-	GlobalV::ofs_running << " Time using dsygv in LAPACK (seconds) is " << duration << endl;
-	GlobalV::ofs_running << resetiosflags(ios::fixed) << setprecision(10);
+	GlobalV::ofs_running << std::setiosflags(ios::fixed) << std::setprecision(20);
+//	GlobalV::ofs_running << " clock_start = " << clock_start << std::endl;
+//	GlobalV::ofs_running << " clock_end = " << clock_end << std::endl;
+	GlobalV::ofs_running << " Time using dsygv in LAPACK (seconds) is " << duration << std::endl;
+	GlobalV::ofs_running << std::resetiosflags(ios::fixed) << std::setprecision(10);
 
 	for(int i=0; i<GlobalV::NBANDS; i++)
 	{
@@ -247,16 +247,16 @@ void Diago_LCAO_Matrix::using_LAPACK(const int &ik, double** wfc)const
 	// test
 	// @@@@@@@
 	/*
-	cout << "\n Lapack, wfc after diago:" << endl;
+	std::cout << "\n Lapack, wfc after diago:" << std::endl;
 	for(int i=0; i<GlobalV::NBANDS; i++)
 	{
-		cout << " Eigenvalue from LAPACK : " << setw(5) << setw(12) << GlobalC::wf.ekb[ik][i] << endl;
-		cout << " Eigenfunctions" << endl;
+		std::cout << " Eigenvalue from LAPACK : " << std::setw(5) << std::setw(12) << GlobalC::wf.ekb[ik][i] << std::endl;
+		std::cout << " Eigenfunctions" << std::endl;
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			cout << setw(12) << wfc[i][j];
+			std::cout << std::setw(12) << wfc[i][j];
 		}
-		cout << endl;
+		std::cout << std::endl;
 	}
 	//exit(0);
 	*/

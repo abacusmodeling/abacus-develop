@@ -55,7 +55,7 @@ extern UnitCell_pseudo ucell;
 extern xcfunc xcf;
 extern Charge_Broyden CHR;
 extern Potential pot;
-extern Symmetry symm;
+extern ModuleSymmetry::Symmetry symm;
 extern Parallel_Grid Pgrid; 
 extern Parallel_Kpoints Pkpoints;
 extern Vdwd2_Parameters vdwd2_para;		// Peize Lin add 2021.03.09

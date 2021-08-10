@@ -227,11 +227,11 @@ class Gint_k : public Gint_k_init
 	double** pvpR;
 
 	double***** pvpR_tr; //LiuXh add 2019-07-15
-	complex<double>***** pvpR_tr_soc; //LiuXh add 2019-07-15
+	std::complex<double>***** pvpR_tr_soc; //LiuXh add 2019-07-15
 
 	// jingan add 2021-6-4
-	map<size_t, map<size_t, double>> ***pvpR_sparseMatrix;
-	map<size_t, map<size_t, complex<double>>> ***pvpR_soc_sparseMatrix;
+	std::map<size_t, std::map<size_t, double>> ***pvpR_sparseMatrix;
+	std::map<size_t, std::map<size_t, std::complex<double>>> ***pvpR_soc_sparseMatrix;
 
 	//----------------------------
 	// key variable 
@@ -245,8 +245,8 @@ class Gint_k : public Gint_k_init
 	//----------------------------
 	// dimension: [GridT.lgd, GridT.lgd]	
 	// used only when folding the H matrix.
-	complex<double>** pvp;
-	complex<double>** pvp_nc[4];
+	std::complex<double>** pvp;
+	std::complex<double>** pvp_nc[4];
 
 	// used only in vlocal.
 	int ik_now;

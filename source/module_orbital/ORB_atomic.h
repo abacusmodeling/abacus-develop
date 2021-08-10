@@ -30,7 +30,7 @@ public:
    	const int& getType() const { return this->type; }
 	const int& getTotal_nchi() const { return this->total_nchi; }
 	const int& getNchi(const int l) const { return this->nchi[l]; }
-	const string& getLabel() const { return this->label; }
+	const std::string& getLabel() const { return this->label; }
 	
 	const inline Numerical_Orbital_Lm& PhiLN( const int &L, const int &N)const
 	{ 	
@@ -56,7 +56,7 @@ public:
 	///
 	void set_orbital_info(
 			const int& type_in,
-			const string& label_in,
+			const std::string& label_in,
 			const int& lmax_in,
 			const int* nchi_in,
 			const int& total_nchi);
@@ -80,7 +80,7 @@ private:
 	// NAME : max_nchi( max chi for certain L)
 	// NAME : find_chi(lmax+1, max_nchi).
 	//===========================================================
-	string label;
+	std::string label;
 	
 	int type;
 	int lmax;

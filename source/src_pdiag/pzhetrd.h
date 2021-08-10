@@ -6,6 +6,6 @@
 #include "pzhetrd.h"
 
 void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
-	    complex<double> *a,double *diag,double *off_diag,complex<double>  *norm,char uplo);
+	    std::complex<double> *a,double *diag,double *off_diag,std::complex<double>  *norm,char uplo);
 
 #endif

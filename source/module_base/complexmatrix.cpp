@@ -19,7 +19,7 @@ ComplexMatrix::ComplexMatrix(const int nrows, const int ncols, const bool flag_z
 {
 	if( size )
 	{
-		c = new complex<double>[size];
+		c = new std::complex<double>[size];
 		if(flag_zero)	zero_out();
 	}
 }
@@ -27,13 +27,13 @@ ComplexMatrix::ComplexMatrix(const int nrows, const int ncols, const bool flag_z
 // zero out the ComplexMatrix
 void ComplexMatrix::zero_out(void)
 {
-	for (int i=0; i<size; i++) c[i] = complex<double>(0.0,0.0);
+	for (int i=0; i<size; i++) c[i] = std::complex<double>(0.0,0.0);
 }
 
 /*
 void need_more_memory()
 {
-	cout << "\n Sorry to crash... but the running need more momory! Exit." << endl;
+	std::cout << "\n Sorry to crash... but the running need more momory! Exit." << std::endl;
 	exit(0);
 }
 */
@@ -47,8 +47,8 @@ ComplexMatrix::ComplexMatrix(const ComplexMatrix &m1)
 {
 	if(size)
 	{
-		c = new complex<double>[size];
-		memcpy( c, m1.c, size*sizeof(complex<double>) );
+		c = new std::complex<double>[size];
+		memcpy( c, m1.c, size*sizeof(std::complex<double>) );
 	}
 }
 
@@ -72,7 +72,7 @@ ComplexMatrix::ComplexMatrix(const matrix &m)
 {
 	if( size )
 	{
-		c = new complex<double>[size];
+		c = new std::complex<double>[size];
 		for( int i=0; i<size; ++i)
 		{
 			c[i] = m.c[i];
@@ -101,12 +101,12 @@ void ComplexMatrix::create(const int nr_in, const int nc_in, const bool flag_zer
 			if( size_in!=nr*nc )
 			{
 				delete[] c;
-				c = new complex<double>[size_in];
+				c = new std::complex<double>[size_in];
 			}
 		}
 		else
 		{
-			c = new complex<double>[nr_in * nc_in];
+			c = new std::complex<double>[nr_in * nc_in];
 		}
 
 		nr = nr_in;
@@ -130,8 +130,8 @@ void ComplexMatrix::set_as_identity_matrix(void)
 	{
 		for(int j=0; j<nc; j++)
 		{
-			if(i==j) c[nc * i + j] = complex<double>(1.0, 0.0);
-			else c[nc * i + j] = complex<double>(0.0, 0.0);
+			if(i==j) c[nc * i + j] = std::complex<double>(1.0, 0.0);
+			else c[nc * i + j] = std::complex<double>(0.0, 0.0);
 		}
 	}
 	return;
@@ -168,12 +168,12 @@ ComplexMatrix operator*(const ComplexMatrix &m1, const ComplexMatrix &m2)
 
 // mohan add 2021-04-05
 #ifdef __NORMAL
-	complex<double> z;
+	std::complex<double> z;
 	for (int i = 0;i < m1.nr;i++)
 	{
 		for (int j = 0;j < m2.nc;j++)
 		{
-			z = complex<double>(0,0);
+			z = std::complex<double>(0,0);
 			for (int k = 0;k < m1.nc;k++)
 			{
 				z += m1(i, k) * m2(k, j);
@@ -192,7 +192,7 @@ ComplexMatrix operator*(const ComplexMatrix &m1, const ComplexMatrix &m2)
 }
 
 // Scale a ComplexMatrix
-ComplexMatrix operator*(const complex<double> &c,const ComplexMatrix &m)
+ComplexMatrix operator*(const std::complex<double> &c,const ComplexMatrix &m)
 {
 	ComplexMatrix sm(m);
 	for (int i=0 ;i<m.size; i++) sm.c[i] *= c;
@@ -200,7 +200,7 @@ ComplexMatrix operator*(const complex<double> &c,const ComplexMatrix &m)
 }
 
 // ComplexMatrix scalar
-ComplexMatrix operator*(const ComplexMatrix &m,const complex<double> &c)
+ComplexMatrix operator*(const ComplexMatrix &m,const std::complex<double> &c)
 {
 	ComplexMatrix sm(m);
 	for (int i = 0;i < m.size;i++) sm.c[i] *= c;
@@ -224,7 +224,7 @@ ComplexMatrix operator*(const ComplexMatrix &m,const double &r)
 ComplexMatrix& ComplexMatrix::operator=(const ComplexMatrix &m)
 {
 	this->create(m.nr, m.nc, false);
-	memcpy( c, m.c, size*sizeof(complex<double>) );
+	memcpy( c, m.c, size*sizeof(std::complex<double>) );
 	return *this;
 }
 
@@ -239,7 +239,7 @@ ComplexMatrix& ComplexMatrix::operator=( ComplexMatrix && m )
 	return *this;
 }
 
-ComplexMatrix& ComplexMatrix::operator*=(const complex<double> &s)
+ComplexMatrix& ComplexMatrix::operator*=(const std::complex<double> &s)
 {
 	for (int i = 0;i < this->size;i++) c[i] *= s;
 	return *this;
@@ -268,16 +268,16 @@ matrix ComplexMatrix::real() const
 }
 
 // Returns trace of ComplexMatrix
-complex<double> trace(const ComplexMatrix &m)
+std::complex<double> trace(const ComplexMatrix &m)
 {
-	complex<double> tr=complex<double>(0,0);
+	std::complex<double> tr=std::complex<double>(0,0);
 	assert(m.nr == m.nc);
 	for (int i=0; i<m.nr; i++) tr += m(i, i);
 	return tr;
 }
 
 // Do mout += s*min
-void scale_accumulate(const complex<double> &s,
+void scale_accumulate(const std::complex<double> &s,
                       const ComplexMatrix &min,
                       ComplexMatrix &mout)
 {
@@ -292,7 +292,7 @@ void scale_accumulate(const complex<double> &s,
 
 // Do mout[i] += s*min[i]
 void scale_accumulate(const int &nmat,
-                      const complex<double> &s,
+                      const std::complex<double> &s,
                       ComplexMatrix **min,
                       ComplexMatrix **mout)
 {
@@ -305,9 +305,9 @@ void scale_accumulate(const int &nmat,
 }
 
 // Do mout = s1*m1 + s2*m2
-void scaled_sum(const complex<double> &s1,
+void scaled_sum(const std::complex<double> &s1,
                 const ComplexMatrix &m1,
-                const complex<double> &s2,
+                const std::complex<double> &s2,
                 const ComplexMatrix &m2,
                 ComplexMatrix &mout)
 {
@@ -325,9 +325,9 @@ void scaled_sum(const complex<double> &s1,
 
 // Does mout[i] = s1*m1[i] + s2*m2[i]
 void scaled_sum(const int &nmat,
-                const complex<double> &s1,
+                const std::complex<double> &s1,
                 ComplexMatrix **m1,
-                const complex<double> &s2,
+                const std::complex<double> &s2,
                 ComplexMatrix **m2,
                 ComplexMatrix **mout)
 {
@@ -343,7 +343,7 @@ void scaled_sum(const int &nmat,
 double abs2_row(const ComplexMatrix &m,const int ir)
 {
 	double r=0.0;
-	complex<double> z;
+	std::complex<double> z;
 	for(int ic=0;ic<m.nc;ic++)
 	{
 		z = m.c[ m.nc*ir + ic];
@@ -355,7 +355,7 @@ double abs2_row(const ComplexMatrix &m,const int ir)
 double abs2_column(const ComplexMatrix &m,const int ic)
 {
 	double r=0.0;
-	complex<double> z;
+	std::complex<double> z;
 	for(int ir=0;ir<m.nr;ir++)
 	{
 		z = m.c[ m.nc*ir + ic ];
@@ -368,7 +368,7 @@ double abs2_column(const ComplexMatrix &m,const int ic)
 double abs2(const ComplexMatrix &m)
 {
 	double r=0.0;
-	complex<double> z;
+	std::complex<double> z;
 
 	for (int i = 0;i < m.size;i++)
 	{

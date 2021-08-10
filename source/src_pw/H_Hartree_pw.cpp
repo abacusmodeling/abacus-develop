@@ -15,11 +15,11 @@ matrix H_Hartree_pw::v_hartree(
     timer::tick("H_Hartree_pw","v_hartree");
 
     //  Hartree potential VH(r) from n(r)
-    vector<complex<double>> Porter(pwb.nrxx);
+    std::vector<std::complex<double>> Porter(pwb.nrxx);
     const int nspin0 = (nspin==2) ? 2 : 1;
     for(int is=0; is<nspin0; is++)
         for (int ir=0; ir<pwb.nrxx; ir++) 
-            Porter[ir] += complex<double>( rho[is][ir], 0.0 );
+            Porter[ir] += std::complex<double>( rho[is][ir], 0.0 );
     //=============================
     //  bring rho (aux) to G space
     //=============================
@@ -36,7 +36,7 @@ matrix H_Hartree_pw::v_hartree(
 
 	double ehart = 0.0;
 
-    vector<complex<double>> vh_g(pwb.ngmc);
+    std::vector<std::complex<double>> vh_g(pwb.ngmc);
     for (int ig = pwb.gstart; ig<pwb.ngmc; ig++)
     {
         const int j = pwb.ig2fftc[ig];
@@ -51,10 +51,10 @@ matrix H_Hartree_pw::v_hartree(
 
     Parallel_Reduce::reduce_double_pool( ehart );
     ehart *= 0.5 * cell.omega;
-    //cout << " ehart=" << ehart << endl;
+    //std::cout << " ehart=" << ehart << std::endl;
     H_Hartree_pw::hartree_energy = ehart;
 
-    std::fill( Porter.begin(), Porter.end(), complex<double>(0.0,0.0) );
+    std::fill( Porter.begin(), Porter.end(), std::complex<double>(0.0,0.0) );
     for (int ig = 0;ig < pwb.ngmc;ig++)
         Porter[pwb.ig2fftc[ig]] = vh_g[ig];
     //==========================================
@@ -88,12 +88,12 @@ matrix H_Hartree_pw::v_hartree(
 /*
 	if(out_potential==-2)
 	{
-		cout << " output VH" << endl;
+		std::cout << " output VH" << std::endl;
 		int is = 0;
 		int iter = 0;
 		int precision = 3;
-		string fn = "VH.dat";
-		stringstream ss;
+		std::string fn = "VH.dat";
+		std::stringstream ss;
 		ss << GlobalV::global_out_dir << fn;
 		matrix v;
 		v.create(1,pwb.nrxx);

@@ -43,21 +43,21 @@ void grad_dot(int ncx, int ncy, int ncz, int ncxyz, Vector3 < double> *a, int ng
 
 
 // myfunc5.cpp (from LPACK)
-// compute y = alpha * y where alpha is a scalar and y is an n-vector
+// compute y = alpha * y where alpha is a scalar and y is an n-std::vector
 void dscal(const int n, const double &alpha, double *y, const int incy);
 // a(i,:) = alpha * a(i,:) where a is a matrix
 void dscal(const double &alpha, const matrix &a, const int i);
 // compute y = alpha * x + y where alpha is a scalar and x and y are n-vectors
 void daxpy(const int n, const double &alpha, const double *x, const int incx, double *y, const int incy);
-void zaxpy(int n, double alpha, complex < double> *x, int incx,complex<double> *y, int incy);
-void zaxpy(int n, complex < double> alpha, complex < double> *x, int incx,complex<double> *y, int incy);
+void zaxpy(int n, double alpha, std::complex < double> *x, int incx,std::complex<double> *y, int incy);
+void zaxpy(int n, std::complex < double> alpha, std::complex < double> *x, int incx,std::complex<double> *y, int incy);
 // y(i,:) = alpha * x + y(i,:) where y is a matrix
-void zaxpy(double alpha,complex<double> *x,ComplexMatrix &y,int i);
+void zaxpy(double alpha,std::complex<double> *x,ComplexMatrix &y,int i);
 // y(i,:) = alpha * x + y(i,:)
-void zaxpy(double alpha,const ComplexMatrix &x,int i,complex<double> *y);
-void zaxpy(complex<double> alpha,const ComplexMatrix &x,int i,complex<double> *y);
+void zaxpy(double alpha,const ComplexMatrix &x,int i,std::complex<double> *y);
+void zaxpy(std::complex<double> alpha,const ComplexMatrix &x,int i,std::complex<double> *y);
 // y(j,:) = alpha * x(i,:) + y(j,:)
-void zaxpy(complex<double> alpha,const ComplexMatrix &x,int i,ComplexMatrix &y,int j);
+void zaxpy(std::complex<double> alpha,const ComplexMatrix &x,int i,ComplexMatrix &y,int j);
 // copy x to y, where x and y is n-vectors
 
 
@@ -65,17 +65,17 @@ void zaxpy(complex<double> alpha,const ComplexMatrix &x,int i,ComplexMatrix &y,i
 //*********************************************************************************
 //                             dcopy
 //*********************************************************************************
-void dcopy(int n,complex<double> *x,int incx,complex<double> *y,int incy);
+void dcopy(int n,std::complex<double> *x,int incx,std::complex<double> *y,int incy);
 void dcopy(int n,double *x,int incx,double *y,int incy);
 void dcopy(int n,int *x,int incx,int *y,int incy);
 
-// copy ith row of a to y where a is a matrix and y is a vector
-void dcopy(const ComplexMatrix &a,int i,complex<double> *y);
+// copy ith row of a to y where a is a matrix and y is a std::vector
+void dcopy(const ComplexMatrix &a,int i,std::complex<double> *y);
 void dcopy(const matrix &a,int i,double *y);
 void dcopy(const matrix &a,int i,int *y);
 
-// copy x to ith row of b where b is a matrix and x is a vector
-void dcopy(complex<double> *x,ComplexMatrix &b,int i);
+// copy x to ith row of b where b is a matrix and x is a std::vector
+void dcopy(std::complex<double> *x,ComplexMatrix &b,int i);
 void dcopy(double *x,matrix &b,int i);
 
 // b(j,:) = a(i,:)
@@ -89,10 +89,10 @@ void dcopy(int n,const ComplexMatrix &a,int inca,ComplexMatrix &b,int i,int incb
 //                             ddot
 //*********************************************************************************
 double ddot(int n,double *x,int incx,double *y,int incy);
-complex<double> ddot(int n,complex<double> *x,int incx,complex<double> *y, int incy);
-complex<double> ddot(const ComplexMatrix &a,int i,complex<double> *x);
-complex<double> ddot(complex<double> *x,const ComplexMatrix &y,int i);
-complex<double> ddot(const ComplexMatrix &x,int i,const ComplexMatrix &y,int j);
+std::complex<double> ddot(int n,std::complex<double> *x,int incx,std::complex<double> *y, int incy);
+std::complex<double> ddot(const ComplexMatrix &a,int i,std::complex<double> *x);
+std::complex<double> ddot(std::complex<double> *x,const ComplexMatrix &y,int i);
+std::complex<double> ddot(const ComplexMatrix &x,int i,const ComplexMatrix &y,int j);
 double ddot(const matrix &a,int i,double *y);
 double ddot(const matrix &x,int i,const matrix &y,int j);
 
@@ -100,12 +100,12 @@ double ddot(const matrix &x,int i,const matrix &y,int j);
 // perform one of the matrix-matrix operations
 // C = alpha * op(A) * op(B) + beta * C
 void dgemm(char tra, char trb, int m, int n, int k, double alpha,const matrix A, int lda, const matrix B, int ldb, double beta,matrix &C, int ldc);
-void zgemm(char tra,char trb,int m,int n,int k,complex<double> alpha,
+void zgemm(char tra,char trb,int m,int n,int k,std::complex<double> alpha,
            const ComplexMatrix &A,
            int lda,
            const ComplexMatrix &B,
            int ldb,
-           complex < double> beta,
+           std::complex < double> beta,
            ComplexMatrix &c,
            int ldc);
 void zgemm(char tra,
@@ -113,12 +113,12 @@ void zgemm(char tra,
            int m,
            int n,
            int k,
-           complex < double> alpha,
-           const complex<double> *A,
+           std::complex < double> alpha,
+           const std::complex<double> *A,
            int lda,
            const ComplexMatrix &B,
            int ldb,
-           complex < double> beta,
+           std::complex < double> beta,
            ComplexMatrix &c,
            int ldc);
 
@@ -127,25 +127,25 @@ void zgemm(char tra,
            int m,
            int n,
            int k,
-           complex < double> alpha,
-           const complex<double> *A,
+           std::complex < double> alpha,
+           const std::complex<double> *A,
            int lda,
            const ComplexMatrix &B,
            int ldb,
-           complex < double> beta,
-           complex <double> *c,
+           std::complex < double> beta,
+           std::complex <double> *c,
            int ldc);
 
-void zgemv(char , int , int , complex < double> alpha ,
-           ComplexMatrix overlap, int , complex < double> swfcatom , int npwx,
-           complex < double>  , ComplexMatrix work, int);//called in orthoatwfc()
+void zgemv(char , int , int , std::complex < double> alpha ,
+           ComplexMatrix overlap, int , std::complex < double> swfcatom , int npwx,
+           std::complex < double>  , ComplexMatrix work, int);//called in orthoatwfc()
 
 int ILAENV(int , char *name, char *opts,const int n1,const int n2,const int n3,const int n4);
 
-void ZHPEV(int , complex < double> *hp, double *e, ComplexMatrix &v,
-           int ldh, int n, complex < double> *aux, int naux);
+void ZHPEV(int , std::complex < double> *hp, double *e, ComplexMatrix &v,
+           int ldh, int n, std::complex < double> *aux, int naux);
 
-// compute the Euclidean length (12 norm) of vector x, with scaling of
+// compute the Euclidean length (12 norm) of std::vector x, with scaling of
 // input to avoid destructive underflow and overflow
 double dnrm2(const int n, const double *x, const int incx) ;
 double dnrm2(const matrix &a, int i) ;	// i-row of matrix a

@@ -9,7 +9,7 @@
 Evolve_LCAO_Matrix::Evolve_LCAO_Matrix(){}
 Evolve_LCAO_Matrix::~Evolve_LCAO_Matrix(){}
 
-void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, complex<double>** cc, complex<double>** cc_init)const
+void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, std::complex<double>** cc, std::complex<double>** cc_init)const
 {
 	TITLE("Evolve_LCAO_Matrix","evolve_complex_matrix");
 	time_t time_start = time(NULL);
@@ -32,12 +32,12 @@ void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, complex<double>** 
 	}
 
 	time_t time_end = time(NULL);
-	OUT_TIME("evolve(complex)", time_start, time_end);
+	OUT_TIME("evolve(std::complex)", time_start, time_end);
 	
 	return;
 }
 
-void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double>** c, complex<double>** c_init)const
+void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, std::complex<double>** c, std::complex<double>** c_init)const
 {
 	                                                                                                                     TITLE("Evolve_LCAO_Matrix","using_LAPACK_complex");
 
@@ -55,27 +55,27 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double>** c
         }
 
 /*
-	cout << " Htmp: " <<endl;
+	std::cout << " Htmp: " <<std::endl;
         for(int i=0; i<GlobalV::NLOCAL; i++)
         {
                 for(int j=0; j<GlobalV::NLOCAL; j++)
                 {
-                        cout << Htmp(i,j) <<"\t";
+                        std::cout << Htmp(i,j) <<"\t";
                 }
-                cout <<endl;
+                std::cout <<std::endl;
         }
-        cout <<endl;
+        std::cout <<std::endl;
 
-	cout << " Stmp: " <<endl;
+	std::cout << " Stmp: " <<std::endl;
         for(int i=0; i<GlobalV::NLOCAL; i++)
         {
                 for(int j=0; j<GlobalV::NLOCAL; j++)
                 {
-                        cout << Stmp(i,j) <<"\t";
+                        std::cout << Stmp(i,j) <<"\t";
                 }
-                cout <<endl;
+                std::cout <<std::endl;
         }
-        cout <<endl;
+        std::cout <<std::endl;
 */
 				
 	int INFO;
@@ -91,7 +91,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double>** c
 */
 
         int LWORK=3*GlobalV::NLOCAL-1; //tmp
-        complex<double> * WORK = new complex<double>[LWORK];
+        std::complex<double> * WORK = new std::complex<double>[LWORK];
         ZEROS(WORK, LWORK);
         int IPIV[GlobalV::NLOCAL];
 
@@ -99,32 +99,32 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double>** c
         LapackConnector::zgetri( GlobalV::NLOCAL, Stmp, GlobalV::NLOCAL, IPIV, WORK, LWORK, &INFO);
 
 /*
-        cout << " S^-1: " <<endl;
+        std::cout << " S^-1: " <<std::endl;
         for(int i=0; i<GlobalV::NLOCAL; i++)
         {
                 for(int j=0; j<GlobalV::NLOCAL; j++)
                 {
-                        cout << Stmp(i,j) <<"\t";
+                        std::cout << Stmp(i,j) <<"\t";
                 }
-                cout <<endl;
+                std::cout <<std::endl;
         }
-        cout <<endl;
+        std::cout <<std::endl;
 */
 
 	ComplexMatrix S_plus_H(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	S_plus_H = Stmp*Htmp;
 
 /*
-        cout << " S^-1*H: " <<endl;
+        std::cout << " S^-1*H: " <<std::endl;
         for(int i=0; i<GlobalV::NLOCAL; i++)
         {
                 for(int j=0; j<GlobalV::NLOCAL; j++)
                 {
-                        cout << S_plus_H(i,j) <<"\t";
+                        std::cout << S_plus_H(i,j) <<"\t";
                 }
-                cout <<endl;
+                std::cout <<std::endl;
         }
-        cout <<endl;
+        std::cout <<std::endl;
 */
 
 	ComplexMatrix Denominator(GlobalV::NLOCAL,GlobalV::NLOCAL);
@@ -143,8 +143,8 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double>** c
         {
                 for(int j=0; j<GlobalV::NLOCAL; j++)
                 {
-                        if(i==j) Idmat(i,j) = complex<double>(1.0, 0.0);
-                       	else Idmat(i,j) = complex<double>(0.0, 0.0);
+                        if(i==j) Idmat(i,j) = std::complex<double>(1.0, 0.0);
+                       	else Idmat(i,j) = std::complex<double>(0.0, 0.0);
                 }
         }
         //double delta_t;
@@ -155,7 +155,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double>** c
 
 	int info;
         int lwork=3*GlobalV::NLOCAL-1; //tmp
-        complex<double> * work = new complex<double>[lwork];
+        std::complex<double> * work = new std::complex<double>[lwork];
         ZEROS(work, lwork);
         int ipiv[GlobalV::NLOCAL];
         
@@ -164,75 +164,75 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double>** c
 
         ComplexMatrix U_operator(GlobalV::NLOCAL,GlobalV::NLOCAL);
 /*
-        cout << " Numerator: " <<endl;
+        std::cout << " Numerator: " <<std::endl;
         for(int i=0; i<GlobalV::NLOCAL; i++)
         {
                 for(int j=0; j<GlobalV::NLOCAL; j++)
                 {
-                        cout << Numerator(i,j) <<"\t";
+                        std::cout << Numerator(i,j) <<"\t";
                 }
-                cout <<endl;
+                std::cout <<std::endl;
         }
-        cout <<endl;
+        std::cout <<std::endl;
 
-        cout << " Denominator: " <<endl;
+        std::cout << " Denominator: " <<std::endl;
         for(int i=0; i<GlobalV::NLOCAL; i++)
         {
                 for(int j=0; j<GlobalV::NLOCAL; j++)
                 {
-                        cout << Denominator(i,j) <<"\t";
+                        std::cout << Denominator(i,j) <<"\t";
                 }
-                cout <<endl;
+                std::cout <<std::endl;
         }
-        cout <<endl;
+        std::cout <<std::endl;
 */
 
         U_operator = Numerator*Denominator;
 /*
-	cout << "U_operator Success!!!" <<endl;
+	std::cout << "U_operator Success!!!" <<std::endl;
         for(int i=0; i<GlobalV::NLOCAL; i++)
         {
                 for(int j=0; j<GlobalV::NLOCAL; j++)
                 {
-                        cout << U_operator(i,j) <<"\t";
+                        std::cout << U_operator(i,j) <<"\t";
                 }
-                cout <<endl;
+                std::cout <<std::endl;
         }
-	cout <<endl;
+	std::cout <<std::endl;
 */
 
 // Calculate wave function at t+delta t
 				
-//	cout << "wave function coe at t+delta t !" << endl;
+//	std::cout << "wave function coe at t+delta t !" << std::endl;
 
 /*	for(int i=0; i<GlobalV::NBANDS; i++)
 	{
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			cout << c[i][j] << "\t";
+			std::cout << c[i][j] << "\t";
 		}
-		cout <<endl;
+		std::cout <<std::endl;
 	}
-	cout << endl;
+	std::cout << std::endl;
 */
 
 /*	for(int i=0; i<GlobalV::NBANDS; i++)
 	{
                 for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			cout << GlobalC::LOWF.WFC_K[ik][i][j] << "\t";
+			std::cout << GlobalC::LOWF.WFC_K[ik][i][j] << "\t";
 		}
-		cout <<endl;
+		std::cout <<std::endl;
 	}
-	cout <<endl;
+	std::cout <<std::endl;
 */
 
 	for(int i=0; i<GlobalV::NBANDS; i++)
 	{
-		complex<double> ccc[GlobalV::NLOCAL];
+		std::complex<double> ccc[GlobalV::NLOCAL];
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{	
-			ccc[j] = complex<double>(0.0,0.0);
+			ccc[j] = std::complex<double>(0.0,0.0);
 			for(int k=0; k<GlobalV::NLOCAL; k++)
 			{
 				 ccc[j] += U_operator(j,k)*c_init[i][k];
@@ -249,33 +249,33 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double>** c
 	{
                 for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			cout << GlobalC::LOWF.WFC_K[ik][i][j] << "\t";
+			std::cout << GlobalC::LOWF.WFC_K[ik][i][j] << "\t";
 		}
-		cout <<endl;
+		std::cout <<std::endl;
 	}
 */
 
-/*      cout << " c: " <<endl;
+/*      std::cout << " c: " <<std::endl;
         for(int i=0; i<GlobalV::NLOCAL; i++)
         {
                 for(int j=0; j<GlobalV::NLOCAL; j++)
                 {
-                        cout << c[i][j] <<"\t";
+                        std::cout << c[i][j] <<"\t";
                 }
-                cout <<endl;
+                std::cout <<std::endl;
         }
-        cout <<endl;
+        std::cout <<std::endl;
 */
 /*
 	for(int i=0; i<GlobalV::NBANDS; i++)
         {
                 for(int j=0; j<GlobalV::NLOCAL; j++)
                 {
-                        cout << c[i][j] << "\t";
+                        std::cout << c[i][j] << "\t";
                 }
-                cout <<endl;
+                std::cout <<std::endl;
         }
-        cout << endl;
+        std::cout << std::endl;
 */
 
 //	delete[] work;
@@ -296,7 +296,7 @@ extern "C"
 }
 #include "../module_base/blas_connector.h"
 
-int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, complex<double>** c, complex<double>** c_init)const
+int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, std::complex<double>** c, std::complex<double>** c_init)const
 {
 	TITLE("Evolve_LCAO_Matrix", "using_scalapack_complex");
 	ComplexMatrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
@@ -314,13 +314,13 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, complex<double>**
         {
                 for(int j=0; j<GlobalV::NLOCAL; j++)
                 {
-                        cout << Stmp(i,j) <<"\t";
+                        std::cout << Stmp(i,j) <<"\t";
                 }
-                cout <<endl;
+                std::cout <<std::endl;
         }
-	cout <<endl;
+	std::cout <<std::endl;
 
-	cout << "11111" << endl;
+	std::cout << "11111" << std::endl;
 
 	int nFull, nblk;
 	int myid, nprocs, myprow, nprows, mypcol, npcols;
@@ -352,7 +352,7 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, complex<double>**
     	}
     	nprows=GlobalV::NPROC/npcols;
 	
-	cout << "22222" <<endl;
+	std::cout << "22222" <<std::endl;
 
 //	Cblacs_get(MPI_COMM_WORLD, 0, &my_blacs_ctxt);
 //    	Cblacs_gridinit(&my_blacs_ctxt, &BLACS_LAYOUT, nprows, npcols);
@@ -374,7 +374,7 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, complex<double>**
 //	int subMatrixSize=narows*nacols;
 
 	int subMatrixSize=nFull*nFull;
-	cout << "333333" << endl;
+	std::cout << "333333" << std::endl;
 
 	// start
 	int allinfo;
@@ -393,10 +393,10 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, complex<double>**
 
 	MPI_Barrier(MPI_COMM_WORLD);
 
-	cout << subMatrixSize << endl;
+	std::cout << subMatrixSize << std::endl;
 
 	for(int i=0; i<subMatrixSize; ++i) S[i]= real(GlobalC::LM.Sloc2[i]);
-//	for(int i=0; i<subMatrixSize; ++i) cout << S[i] <<endl;
+//	for(int i=0; i<subMatrixSize; ++i) std::cout << S[i] <<std::endl;
 
 	for(int i=0; i<subMatrixSize; ++i) c[i]= real(GlobalC::LM.Sloc2[i]);
 
@@ -404,20 +404,20 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, complex<double>**
 	DCOPY(&subMatrixSize, &c, &inc, S, &inc);
 
 
-	cout << "44444" << endl;
+	std::cout << "44444" << std::endl;
 
 //	pdgetrf(&nFull, &nFull, S, &isrc, &jsrc, desc, &ipiv, &info);
 
-	cout << "55555"	<<endl;
+	std::cout << "55555"	<<std::endl;
 
 	MPI_Allreduce(&info, &allinfo, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 	
-	cout << "66666" <<endl;
+	std::cout << "66666" <<std::endl;
 
 	//calculate the inverse
 //	pdgetri(&nFull, S, &isrc, &jsrc, desc, &ipiv, work, &lwork, &iwork, &liwork, &info);
 	
-	cout << "77777" << endl;
+	std::cout << "77777" << std::endl;
 
 //    	pdgemm_(&S, &Htmp, &nFull, &nFull, &nFull,
 //            	&alpha, work, &isrc, &jsrc, desc,
@@ -428,17 +428,17 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, complex<double>**
 
 	MPI_Allreduce(&info, &allinfo, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 
-	cout << "88888"	<< endl;
+	std::cout << "88888"	<< std::endl;
 
 	MPI_Barrier(MPI_COMM_WORLD);
 
-	cout << "99999" << endl;
+	std::cout << "99999" << std::endl;
 
 //	blacs_gridexit_(&my_blacs_ctxt);
 
 //    	MPI_Finalize();
 
-	cout <<"end!!!!!"<< endl;
+	std::cout <<"end!!!!!"<< std::endl;
     	return 0;
 }
 

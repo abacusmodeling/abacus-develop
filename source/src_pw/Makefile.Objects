@@ -89,6 +89,7 @@ magnetism.o\
 occupy.o\
 potential.o \
 potential_libxc.o \
+potential_libxc_meta.o \
 pw_basis.o\
 pw_complement.o\
 soc.o\
@@ -100,6 +101,7 @@ sto_che.o\
 stress_pw.o\
 stress_func_cc.o\
 stress_func_gga.o\
+stress_func_mgga.o\
 stress_func_kin.o\
 stress_func_nl.o\
 stress_func_ewa.o\

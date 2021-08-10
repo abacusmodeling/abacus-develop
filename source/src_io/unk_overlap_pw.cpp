@@ -2,24 +2,24 @@
 
 unkOverlap_pw::unkOverlap_pw()
 {
-	//GlobalV::ofs_running << "this is unkOverlap_pw()" << endl;
+	//GlobalV::ofs_running << "this is unkOverlap_pw()" << std::endl;
 }
 
 unkOverlap_pw::~unkOverlap_pw()
 {
-	//GlobalV::ofs_running << "this is ~unkOverlap_pw()" << endl;
+	//GlobalV::ofs_running << "this is ~unkOverlap_pw()" << std::endl;
 }
 
 
 
-complex<double> unkOverlap_pw::unkdotp_G(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const ComplexMatrix *evc)
+std::complex<double> unkOverlap_pw::unkdotp_G(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const ComplexMatrix *evc)
 {
 	
-	complex<double> result(0.0,0.0);
+	std::complex<double> result(0.0,0.0);
 	//波函数的平面波基组总数
 	const int number_pw = GlobalC::pw.ngmw;
-	complex<double> *unk_L = new complex<double>[number_pw];
-	complex<double> *unk_R = new complex<double>[number_pw];
+	std::complex<double> *unk_L = new std::complex<double>[number_pw];
+	std::complex<double> *unk_R = new std::complex<double>[number_pw];
 	ZEROS(unk_L,number_pw);
 	ZEROS(unk_R,number_pw);
 	
@@ -51,7 +51,7 @@ complex<double> unkOverlap_pw::unkdotp_G(const int ik_L, const int ik_R, const i
 	double out_date_imag = 0.0;
 	MPI_Allreduce(&in_date_real , &out_date_real , 1, MPI_DOUBLE , MPI_SUM , POOL_WORLD);
 	MPI_Allreduce(&in_date_imag , &out_date_imag , 1, MPI_DOUBLE , MPI_SUM , POOL_WORLD);
-	result = complex<double>(out_date_real,out_date_imag);
+	result = std::complex<double>(out_date_real,out_date_imag);
 #endif
 
 	delete[] unk_L;
@@ -63,12 +63,12 @@ complex<double> unkOverlap_pw::unkdotp_G(const int ik_L, const int ik_R, const i
 
 
 
-complex<double> unkOverlap_pw::unkdotp_G0(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const ComplexMatrix *evc, const Vector3<double> G)
+std::complex<double> unkOverlap_pw::unkdotp_G0(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const ComplexMatrix *evc, const Vector3<double> G)
 {
 	// (1) set value
-	complex<double> result(0.0,0.0);
-	complex<double> *phase = GlobalC::UFFT.porter;
-	complex<double> *psi_r = new complex<double>[GlobalC::pw.nrxx]; // 实空间的波函数
+	std::complex<double> result(0.0,0.0);
+	std::complex<double> *phase = GlobalC::UFFT.porter;
+	std::complex<double> *psi_r = new std::complex<double>[GlobalC::pw.nrxx]; // 实空间的波函数
 
 	ZEROS( phase, GlobalC::pw.nrxx);
 	ZEROS( psi_r, GlobalC::pw.nrxx );
@@ -86,7 +86,7 @@ complex<double> unkOverlap_pw::unkdotp_G0(const int ik_L, const int ik_R, const 
 	{
 		if (GlobalC::pw.gdirect[ig] == G)
 		{
-			phase[ GlobalC::pw.ig2fftw[ig] ] = complex<double>(1.0,0.0);
+			phase[ GlobalC::pw.ig2fftw[ig] ] = std::complex<double>(1.0,0.0);
 			break;
 		}
 	}
@@ -118,7 +118,7 @@ complex<double> unkOverlap_pw::unkdotp_G0(const int ik_L, const int ik_R, const 
 	double out_date_imag = 0.0;
 	MPI_Allreduce(&in_date_real , &out_date_real , 1, MPI_DOUBLE , MPI_SUM , POOL_WORLD);
 	MPI_Allreduce(&in_date_imag , &out_date_imag , 1, MPI_DOUBLE , MPI_SUM , POOL_WORLD);
-	result = complex<double>(out_date_real,out_date_imag);
+	result = std::complex<double>(out_date_real,out_date_imag);
 #endif
 	
 	delete[] psi_r;
@@ -126,14 +126,14 @@ complex<double> unkOverlap_pw::unkdotp_G0(const int ik_L, const int ik_R, const 
 }
 
 // if noncollinear = 1 or GlobalV::NSPIN = 4 , you need this routine to calculate overlap unk
-complex<double> unkOverlap_pw::unkdotp_soc_G(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const ComplexMatrix *evc)
+std::complex<double> unkOverlap_pw::unkdotp_soc_G(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const ComplexMatrix *evc)
 {
 	
-	complex<double> result(0.0,0.0);
+	std::complex<double> result(0.0,0.0);
 	//波函数的平面波基组总数
 	const int number_pw = GlobalC::pw.ngmw;
-	complex<double> *unk_L = new complex<double>[number_pw*GlobalV::NPOL];
-	complex<double> *unk_R = new complex<double>[number_pw*GlobalV::NPOL];
+	std::complex<double> *unk_L = new std::complex<double>[number_pw*GlobalV::NPOL];
+	std::complex<double> *unk_R = new std::complex<double>[number_pw*GlobalV::NPOL];
 	ZEROS(unk_L,number_pw*GlobalV::NPOL);
 	ZEROS(unk_R,number_pw*GlobalV::NPOL);
 	
@@ -166,7 +166,7 @@ complex<double> unkOverlap_pw::unkdotp_soc_G(const int ik_L, const int ik_R, con
 	double out_date_imag = 0.0;
 	MPI_Allreduce(&in_date_real , &out_date_real , 1, MPI_DOUBLE , MPI_SUM , POOL_WORLD);
 	MPI_Allreduce(&in_date_imag , &out_date_imag , 1, MPI_DOUBLE , MPI_SUM , POOL_WORLD);
-	result = complex<double>(out_date_real,out_date_imag);
+	result = std::complex<double>(out_date_real,out_date_imag);
 #endif
 
 	delete[] unk_L;
@@ -178,13 +178,13 @@ complex<double> unkOverlap_pw::unkdotp_soc_G(const int ik_L, const int ik_R, con
 
 
 //这里G矢量是direct坐标
-complex<double> unkOverlap_pw::unkdotp_soc_G0(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const ComplexMatrix *evc, const Vector3<double> G)
+std::complex<double> unkOverlap_pw::unkdotp_soc_G0(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const ComplexMatrix *evc, const Vector3<double> G)
 {
 	// (1) set value
-	complex<double> result(0.0,0.0);
-	complex<double> *phase = GlobalC::UFFT.porter;
-	complex<double> *psi_up = new complex<double>[GlobalC::pw.nrxx];
-	complex<double> *psi_down = new complex<double>[GlobalC::pw.nrxx];
+	std::complex<double> result(0.0,0.0);
+	std::complex<double> *phase = GlobalC::UFFT.porter;
+	std::complex<double> *psi_up = new std::complex<double>[GlobalC::pw.nrxx];
+	std::complex<double> *psi_down = new std::complex<double>[GlobalC::pw.nrxx];
 	ZEROS( phase, GlobalC::pw.nrxx);
 	ZEROS( psi_up, GlobalC::pw.nrxx );
 	ZEROS( psi_down, GlobalC::pw.nrxx );
@@ -203,7 +203,7 @@ complex<double> unkOverlap_pw::unkdotp_soc_G0(const int ik_L, const int ik_R, co
 	{
 		if (GlobalC::pw.gdirect[ig] == G)
 		{
-			phase[ GlobalC::pw.ig2fftw[ig] ] = complex<double>(1.0,0.0);
+			phase[ GlobalC::pw.ig2fftw[ig] ] = std::complex<double>(1.0,0.0);
 			break;
 		}
 	}
@@ -241,7 +241,7 @@ complex<double> unkOverlap_pw::unkdotp_soc_G0(const int ik_L, const int ik_R, co
 	double out_date_imag = 0.0;
 	MPI_Allreduce(&in_date_real , &out_date_real , 1, MPI_DOUBLE , MPI_SUM , POOL_WORLD);
 	MPI_Allreduce(&in_date_imag , &out_date_imag , 1, MPI_DOUBLE , MPI_SUM , POOL_WORLD);
-	result = complex<double>(out_date_real,out_date_imag);
+	result = std::complex<double>(out_date_real,out_date_imag);
 #endif
 	
 	delete[] psi_up;
@@ -253,15 +253,15 @@ void unkOverlap_pw::test_for_unkOverlap_pw()
 {
 	
 	const int number_pw = GlobalC::pw.ngmw;
-	GlobalV::ofs_running << "the GlobalC::pw.ngmw is " << number_pw << endl;
-	complex<double> *unk_L = new complex<double>[number_pw];
+	GlobalV::ofs_running << "the GlobalC::pw.ngmw is " << number_pw << std::endl;
+	std::complex<double> *unk_L = new std::complex<double>[number_pw];
 	for (int ig = 0; ig < GlobalC::kv.ngk[0]; ig++)
 	{
 		unk_L[GlobalC::wf.igk(0,ig)] = GlobalC::wf.evc[0](0, ig);
 	}
 	for (int ig = 0; ig < GlobalC::pw.ngmw; ig++)
 	{
-		GlobalV::ofs_running << GlobalC::pw.gdirect[ig].x << "," << GlobalC::pw.gdirect[ig].y << "," << GlobalC::pw.gdirect[ig].z << "  = " << unk_L[ig] << endl;
+		GlobalV::ofs_running << GlobalC::pw.gdirect[ig].x << "," << GlobalC::pw.gdirect[ig].y << "," << GlobalC::pw.gdirect[ig].z << "  = " << unk_L[ig] << std::endl;
 	}	
 	
 }

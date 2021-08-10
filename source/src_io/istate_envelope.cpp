@@ -13,7 +13,7 @@ void IState_Envelope::begin(void)
 {
 	TITLE("IState_Envelope","begin");
 
-	cout << " perform |psi(band, r)| for selected bands." << endl;
+	std::cout << " perform |psi(band, r)| for selected bands." << std::endl;
 
 	if(!GlobalV::GAMMA_ONLY_LOCAL)
 	{
@@ -35,13 +35,13 @@ void IState_Envelope::begin(void)
 	int bands_below = GlobalV::NBANDS_ISTATE;
 	int bands_above = GlobalV::NBANDS_ISTATE;
 
-	cout << " number of electrons = " << GlobalC::CHR.nelec << endl;
-	cout << " number of occupied bands = " << fermi_band << endl;
-	cout << " plot band decomposed charge density below fermi surface with " 
-	<< bands_below << " bands." << endl;
+	std::cout << " number of electrons = " << GlobalC::CHR.nelec << std::endl;
+	std::cout << " number of occupied bands = " << fermi_band << std::endl;
+	std::cout << " plot band decomposed charge density below fermi surface with " 
+	<< bands_below << " bands." << std::endl;
 	
-	cout << " plot band decomposed charge density above fermi surface with " 
-	<< bands_above << " bands." << endl;
+	std::cout << " plot band decomposed charge density above fermi surface with " 
+	<< bands_above << " bands." << std::endl;
 	
 	// (2) cicle:
 	
@@ -71,7 +71,7 @@ void IState_Envelope::begin(void)
 		{
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{
-				cout << " Perform envelope function for band " << ib+1 << endl;
+				std::cout << " Perform envelope function for band " << ib+1 << std::endl;
 				ZEROS(GlobalC::CHR.rho[is],GlobalC::pw.nrxx);	
 
 
@@ -86,7 +86,7 @@ void IState_Envelope::begin(void)
 
 
 				GlobalC::CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09
-				stringstream ss;
+				std::stringstream ss;
 				ss << GlobalV::global_out_dir << "BAND" << ib + 1 << "_ENV" << is+1 << "_CHG";
 				// 0 means definitely output charge density.
 				bool for_plot = true;

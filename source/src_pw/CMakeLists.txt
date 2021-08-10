@@ -25,6 +25,7 @@ add_library(
     occupy.cpp
     potential.cpp
     potential_libxc.cpp
+    potential_libxc_meta.cpp
     pw_basis.cpp
     pw_complement.cpp
     soc.cpp
@@ -36,6 +37,7 @@ add_library(
     stress_func_cc.cpp
     stress_func_ewa.cpp
     stress_func_gga.cpp
+    stress_func_mgga.cpp
     stress_func_har.cpp
     stress_func_kin.cpp
     stress_func_loc.cpp

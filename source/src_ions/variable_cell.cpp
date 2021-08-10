@@ -12,7 +12,7 @@ void Variable_Cell::init_after_vc(void)
     GlobalC::ucell.setup_cell_after_vc(GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
     DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
-    if(Symmetry::symm_flag)
+    if(ModuleSymmetry::Symmetry::symm_flag)
     {
         GlobalC::symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
         DONE(GlobalV::ofs_running, "SYMMETRY");
@@ -31,7 +31,7 @@ void Variable_Cell::init_after_vc(void)
         GlobalC::wf.init_at_1();
     }
 
-    GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << endl;
+    GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << std::endl;
     //=================================
     // initalize local pseudopotential
     //=================================
@@ -55,13 +55,13 @@ void Variable_Cell::final_calculation_after_vc(void)
 {
 	TITLE("Variable_Cell","final_after_vc");
 
-    cout<<" -----------------------------------------------------------------"<<endl;
+    std::cout<<" -----------------------------------------------------------------"<<std::endl;
 
-    cout<<"\n -----------------------------------------------------------------"<<endl;
-    cout<<" The structure has been fully relaxed or MD finished, and the following is a scf"<<endl;
-    cout<<" calculation at the final structure. The fft grids and G-vectors "<<endl;
-    cout<<" are recalculated for the final relaxed unit cell."<<endl;
-    cout<<" -----------------------------------------------------------------"<<endl;
+    std::cout<<"\n -----------------------------------------------------------------"<<std::endl;
+    std::cout<<" The structure has been fully relaxed or MD finished, and the following is a scf"<<std::endl;
+    std::cout<<" calculation at the final structure. The fft grids and G-vectors "<<std::endl;
+    std::cout<<" are recalculated for the final relaxed unit cell."<<std::endl;
+    std::cout<<" -----------------------------------------------------------------"<<std::endl;
 
     OUT(GlobalV::ofs_running," ------------------------------------------------------------------------------------");
 
@@ -76,7 +76,7 @@ void Variable_Cell::final_calculation_after_vc(void)
     DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     // (6) symmetry analysize.
-    if(Symmetry::symm_flag)
+    if(ModuleSymmetry::Symmetry::symm_flag)
     {
         GlobalC::symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
         DONE(GlobalV::ofs_running, "SYMMETRY");
@@ -90,8 +90,8 @@ void Variable_Cell::final_calculation_after_vc(void)
     // (1) Init the plane wave.
     GlobalC::pw.gen_pw(GlobalV::ofs_running, GlobalC::ucell, GlobalC::kv);
     DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
-    cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx <<" * " << GlobalC::pw.ny <<" * "<< GlobalC::pw.nz << endl;
-    cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx <<" * " << GlobalC::pw.nby <<" * "<< GlobalC::pw.nbz << endl;
+    std::cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx <<" * " << GlobalC::pw.ny <<" * "<< GlobalC::pw.nz << std::endl;
+    std::cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx <<" * " << GlobalC::pw.nby <<" * "<< GlobalC::pw.nbz << std::endl;
 
     // init the grid, then the charge
     // on grid can be distributed.

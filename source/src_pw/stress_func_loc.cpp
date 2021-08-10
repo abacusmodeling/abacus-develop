@@ -14,14 +14,14 @@ void Stress_Func::stress_loc(matrix& sigma, const bool is_pw)
 
     dvloc = new double[GlobalC::pw.ngmc];
 
-	complex<double> *Porter = GlobalC::UFFT.porter;
+	std::complex<double> *Porter = GlobalC::UFFT.porter;
 
 	ZEROS( Porter, GlobalC::pw.nrxx );
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			Porter[ir] += complex<double>(GlobalC::CHR.rho[is][ir], 0.0 );
+			Porter[ir] += std::complex<double>(GlobalC::CHR.rho[is][ir], 0.0 );
 		}
 	}
 	GlobalC::pw.FFT_chg.FFT3D(Porter, -1);
@@ -31,7 +31,7 @@ void Stress_Func::stress_loc(matrix& sigma, const bool is_pw)
 
 	evloc=0.0;
 
-	complex<double> *vg = new complex<double>[GlobalC::pw.ngmc];
+	std::complex<double> *vg = new std::complex<double>[GlobalC::pw.ngmc];
 	ZEROS( vg, GlobalC::pw.ngmc );
 	for (int it=0; it<GlobalC::ucell.ntype; it++)
 	{

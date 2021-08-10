@@ -17,11 +17,22 @@ std::tuple<double,double,matrix> H_XC_pw::v_xc
     TITLE("H_XC_pw","v_xc");
     timer::tick("H_XC_pw","v_xc");
 
+	#ifndef USE_LIBXC
+	if(GlobalV::DFT_META)
+	{
+		WARNING_QUIT("Potential::v_of_rho","to use metaGGA, please link LIBXC");
+	}
+	#endif
     //Exchange-Correlation potential Vxc(r) from n(r)
     double et_xc = 0.0;
     double vt_xc = 0.0;
 	matrix v(GlobalV::NSPIN, nrxx);
 
+	if(GlobalV::VXC_IN_H == 0)
+	{
+    	timer::tick("H_XC_pw","v_xc");
+    	return std::make_tuple(et_xc, vt_xc, std::move(v));
+	}
     // the square of the e charge
     // in Rydeberg unit, so * 2.0.
     double e2 = 2.0;

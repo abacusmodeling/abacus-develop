@@ -66,10 +66,10 @@ void SubGrid_oper::cal_totwfc_aug()
 		}	
 		delete[] occupy;
 
-		GlobalV::ofs_running << " Second" << endl;
+		GlobalV::ofs_running << " Second" << std::endl;
 		for(int i=0; i<GlobalV::NLOCAL; ++i)
 		{
-			GlobalV::ofs_running << " i=" << i << " trace_lo_tot=" << trace_lo_tot[i] << endl;
+			GlobalV::ofs_running << " i=" << i << " trace_lo_tot=" << trace_lo_tot[i] << std::endl;
 		}
 
 		//-----------------------------------------
@@ -119,7 +119,7 @@ void SubGrid_oper::cal_totwfc()
 	/*
 	for(int i=0; i<GlobalV::NLOCAL; ++i)
 	{
-		GlobalV::ofs_running << " i=" << i << " occupy=" << occupy[i] << endl;
+		GlobalV::ofs_running << " i=" << i << " occupy=" << occupy[i] << std::endl;
 	}
 	*/
 
@@ -152,13 +152,13 @@ void SubGrid_oper::cal_totwfc()
 	// for test
 	//------------
 	/*
-	GlobalV::ofs_running << " trace_lo_tot" << endl;
+	GlobalV::ofs_running << " trace_lo_tot" << std::endl;
 	for(int iw=0; iw<GlobalV::NLOCAL; ++iw)
 	{
 		GlobalV::ofs_running << " iw=" << iw << " trace_lo_tot=" << trace_lo_tot[iw] 
 		<< " trace_lo=" << GlobalC::GridT.trace_lo[iw] 
 		<< " occupy=" << occupy[iw] 
-		<< endl;
+		<< std::endl;
 	}
 	*/
 
@@ -243,7 +243,7 @@ void SubGrid_oper::dis_subwfc()
 
 #ifdef __MPI
 
-//	cout << " distribute the wave functions " << endl;
+//	std::cout << " distribute the wave functions " << std::endl;
 
 	//------------------------------------------
 	// bcast the eigenvalues
@@ -288,10 +288,10 @@ void SubGrid_oper::dis_subwfc()
 				MPI_Recv(trace_lo2, GlobalV::NLOCAL, MPI_INT, i, tag, GRID_WORLD, &status);
 
 /*
-				GlobalV::ofs_running << " Proc " << i << endl;
+				GlobalV::ofs_running << " Proc " << i << std::endl;
 				for(int i=0; i<GlobalV::NLOCAL; ++i)
 				{
-					GlobalV::ofs_running << setw(5) << i << setw(10) << trace_lo2[i] << endl;
+					GlobalV::ofs_running << std::setw(5) << i << std::setw(10) << trace_lo2[i] << std::endl;
 				}
 				*/
 
@@ -300,7 +300,7 @@ void SubGrid_oper::dis_subwfc()
 				tag = i * 10 + 1;
 				MPI_Recv(&lgd2, 1, MPI_INT, i, tag, GRID_WORLD, &status);
 
-//				GlobalV::ofs_running << " receive=" << tag << endl;
+//				GlobalV::ofs_running << " receive=" << tag << std::endl;
 				
 				// send csend
 				double* csend = new double[GlobalV::NBANDS*lgd2];
@@ -314,9 +314,9 @@ void SubGrid_oper::dis_subwfc()
 						const int mu2 = this->trace_lo_tot[iw]; 
 						if(mu2<0)
 						{
-							GlobalV::ofs_running << " iw = " << iw << endl;
-							GlobalV::ofs_running << " GlobalC::GridT.trace_lo=" << mu1 << endl;
-							GlobalV::ofs_running << " trace_lo_tot=" << mu2 << endl;
+							GlobalV::ofs_running << " iw = " << iw << std::endl;
+							GlobalV::ofs_running << " GlobalC::GridT.trace_lo=" << mu1 << std::endl;
+							GlobalV::ofs_running << " trace_lo_tot=" << mu2 << std::endl;
 							assert(mu2>=0);
 						}
 
@@ -328,9 +328,9 @@ void SubGrid_oper::dis_subwfc()
 				}
 
 				tag = i * 10 + 2;
-//				GlobalV::ofs_running << " send=" << tag << endl;
+//				GlobalV::ofs_running << " send=" << tag << std::endl;
 				MPI_Send(csend,GlobalV::NBANDS*lgd2,MPI_DOUBLE,i,tag,GRID_WORLD);
-//				GlobalV::ofs_running << " send done." << endl;
+//				GlobalV::ofs_running << " send done." << std::endl;
 
 				delete[] csend;
 				delete[] trace_lo2;
@@ -343,22 +343,22 @@ void SubGrid_oper::dis_subwfc()
 			tag = GlobalV::GRANK * 10;
 			MPI_Send(GlobalC::GridT.trace_lo, GlobalV::NLOCAL, MPI_INT, 0, tag, GRID_WORLD);
 
-			//GlobalV::ofs_running << " send1." << endl;
+			//GlobalV::ofs_running << " send1." << std::endl;
 
 			// send GlobalC::GridT.lgd
 			tag = GlobalV::GRANK * 10 + 1;
 			MPI_Send(&GlobalC::GridT.lgd, 1, MPI_INT, 0, tag, GRID_WORLD);
 
-			//GlobalV::ofs_running << " send2." << endl;
+			//GlobalV::ofs_running << " send2." << std::endl;
 
 			// receive c
 			double* crecv = new double[GlobalV::NBANDS*GlobalC::GridT.lgd];
 			ZEROS(crecv, GlobalV::NBANDS*GlobalC::GridT.lgd);
 
 			tag = GlobalV::GRANK * 10 + 2;
-//			GlobalV::ofs_running << " receive=" << tag << endl;
+//			GlobalV::ofs_running << " receive=" << tag << std::endl;
 			MPI_Recv(crecv, GlobalV::NBANDS*GlobalC::GridT.lgd, MPI_DOUBLE, 0, tag, GRID_WORLD, &status);
-//			GlobalV::ofs_running << " receive done." << endl;
+//			GlobalV::ofs_running << " receive done." << std::endl;
 
 
 			for(int ib=0; ib<GlobalV::NBANDS; ++ib)
@@ -380,7 +380,7 @@ void SubGrid_oper::dis_subwfc()
 	// Test
 	//-------------------
 	/*
-	GlobalV::ofs_running << " WFC " << " CURRENT_SPIN=" << GlobalV::CURRENT_SPIN << endl;
+	GlobalV::ofs_running << " WFC " << " CURRENT_SPIN=" << GlobalV::CURRENT_SPIN << std::endl;
 	for(int i=0; i<GlobalV::NBANDS; ++i)
 	{
 		for(int j=0; j<GlobalV::NLOCAL; ++j)
@@ -389,8 +389,8 @@ void SubGrid_oper::dis_subwfc()
 			if(mu>=0)
 			{
 				//				if( abs(GlobalC::LOWF.WFC_GAMMA[0][i][mu] > 1.0e-8) )
-				GlobalV::ofs_running << setw(5) << i+1 << setw(8) << j+1 
-					<< setw(15) << GlobalC::LOWF.WFC_GAMMA[GlobalV::CURRENT_SPIN][i][mu] << endl; 
+				GlobalV::ofs_running << std::setw(5) << i+1 << std::setw(8) << j+1 
+					<< std::setw(15) << GlobalC::LOWF.WFC_GAMMA[GlobalV::CURRENT_SPIN][i][mu] << std::endl; 
 			}
 		}
 	}

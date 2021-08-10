@@ -11,7 +11,7 @@ using namespace std;
 
 Pseudopot_upf::Pseudopot_upf()
 {
-	this->els = new string[1];
+	this->els = new std::string[1];
 	this->lchi = new int[1];
 	this->oc = new double[1];
 
@@ -53,11 +53,11 @@ Pseudopot_upf::~Pseudopot_upf()
 	delete [] jchi;
 }
 
-int Pseudopot_upf::init_pseudo_reader(const string &fn)
+int Pseudopot_upf::init_pseudo_reader(const std::string &fn)
 {
     TITLE("Pseudopot_upf","init");
     // First check if this pseudo-potential has spin-orbit information
-    ifstream ifs(fn.c_str(), ios::in);
+    std::ifstream ifs(fn.c_str(), ios::in);
 
 	// can't find the file.
 	if (!ifs)
@@ -95,17 +95,17 @@ int Pseudopot_upf::init_pseudo_reader(const string &fn)
 //----------------------------------------------------------
 // setting the type of the pseudopotential file
 //----------------------------------------------------------
-int Pseudopot_upf::set_pseudo_type(const string &fn) //zws add
+int Pseudopot_upf::set_pseudo_type(const std::string &fn) //zws add
 {
-    ifstream pptype_ifs(fn.c_str(), ios::in);
-    string dummy;
-	string strversion;
+    std::ifstream pptype_ifs(fn.c_str(), ios::in);
+    std::string dummy;
+	std::string strversion;
 
 	if (pptype_ifs.good())
 	{
 		getline(pptype_ifs,dummy);
 
-		stringstream wdsstream(dummy);
+		std::stringstream wdsstream(dummy);
 		getline(wdsstream,strversion,'"');
 		getline(wdsstream,strversion,'"');
 
@@ -121,167 +121,272 @@ int Pseudopot_upf::set_pseudo_type(const string &fn) //zws add
 	return 0;
 }
 
-string& Pseudopot_upf::trim(string &in_str)
+std::string& Pseudopot_upf::trim(std::string &in_str)
 {
-    static const string deltri = " \t" ; // delete tab or space
-    string::size_type position = in_str.find_first_of(deltri, 0);
-    if (position == string::npos)
+    static const std::string deltri = " \t" ; // delete tab or space
+    std::string::size_type position = in_str.find_first_of(deltri, 0);
+    if (position == std::string::npos)
 	{
         return in_str;
 	}
     return trim(in_str.erase(position, 1) );
 }
 
-string Pseudopot_upf::trimend(string &in_str)
+std::string Pseudopot_upf::trimend(std::string &in_str)
 {
-    const string &deltri =" \t" ;
-    string::size_type position = in_str.find_last_not_of(deltri)+1;
-    string tmpstr=in_str.erase(position);
+    const std::string &deltri =" \t" ;
+    std::string::size_type position = in_str.find_last_not_of(deltri)+1;
+    std::string tmpstr=in_str.erase(position);
     return tmpstr.erase(0,tmpstr.find_first_not_of(deltri));
 } //zws
 
 
-int Pseudopot_upf::average_p(void)
+int Pseudopot_upf::average_p(const double& lambda)
 {
 	int error = 0;
+	double lambda_ = lambda;
+	if(!GlobalV::LSPINORB) lambda_ = 0.0;
 	if(!this->has_so && GlobalV::LSPINORB) 
 	{
 		error++; 
-		cout<<"warning_quit! no soc upf used for lspinorb calculation, error!"<<endl; 
+		std::cout<<"warning_quit! no soc upf used for lspinorb calculation, error!"<<std::endl; 
 		return error;
 	}
 	//WARNING_QUIT("average_p", "no soc upf used for lspinorb calculation, error!");
 
-	if(!this->has_so || GlobalV::LSPINORB) 
+	if(!this->has_so || (GlobalV::LSPINORB && abs(lambda_ - 1.0) < 1.0e-8) )
 	{
 		return error; 
 	}
 
-	int new_nbeta = 0; //calculate the new nbeta
-	for(int nb=0; nb< this->nbeta; nb++)
+	//if(abs(lambda_)<1.0e-8)
+	if(!GlobalV::LSPINORB)
 	{
-		new_nbeta++;
-		if(this->lll[nb] != 0 && abs(this->jjj[nb] - this->lll[nb] - 0.5) < 1e-6) //two J = l +- 0.5 average to one
+		int new_nbeta = 0; //calculate the new nbeta
+		for(int nb=0; nb< this->nbeta; nb++)
 		{
-			new_nbeta--;
-		}
-	}
-
-	this->nbeta = new_nbeta;
-	matrix dion_new;
-	dion_new.create(this->nbeta, this->nbeta);
-
-	int old_nbeta=-1;
-	for(int nb=0; nb<this->nbeta; nb++)
-	{
-		old_nbeta++;
-		int l = this->lll[old_nbeta];
-		int ind=0, ind1=0;
-		if(l != 0)
-		{
-			if(abs(this->jjj[old_nbeta] - this->lll[old_nbeta] + 0.5) < 1e-6)
+			new_nbeta++;
+			if(this->lll[nb] != 0 && abs(this->jjj[nb] - this->lll[nb] - 0.5) < 1e-6) //two J = l +- 0.5 average to one
 			{
-				if(abs(this->jjj[old_nbeta+1]-this->lll[old_nbeta+1]-0.5)>1e-6) 
-					WARNING_QUIT("average_p", "error beta function 1 !");
-				ind = old_nbeta +1;
-				ind1 = old_nbeta;
+				new_nbeta--;
+			}
+		}
+
+		this->nbeta = new_nbeta;
+		matrix dion_new;
+		dion_new.create(this->nbeta, this->nbeta);
+
+		int old_nbeta=-1;
+		for(int nb=0; nb<this->nbeta; nb++)
+		{
+			old_nbeta++;
+			int l = this->lll[old_nbeta];
+			int ind=0, ind1=0;
+			if(l != 0)
+			{
+				if(abs(this->jjj[old_nbeta] - this->lll[old_nbeta] + 0.5) < 1e-6)
+				{
+					if(abs(this->jjj[old_nbeta+1]-this->lll[old_nbeta+1]-0.5)>1e-6) 
+					{
+						error = 1;
+						cout<<"warning_quit! error beta function 1 !" <<endl;
+						return error;
+					}
+					ind = old_nbeta +1;
+					ind1 = old_nbeta;
+				}
+				else
+				{
+					if(abs(this->jjj[old_nbeta+1]-this->lll[old_nbeta+1]+0.5)>1e-6)
+					{
+						error = 1;
+						cout<<"warning_quit! error beta function 2 !" <<endl;
+						return error;
+					}
+					ind = old_nbeta;
+					ind1 = old_nbeta +1;
+				}
+				double vion1 = ((l+1.0) * this->dion(ind,ind) + l * this->dion(ind1,ind1)) / (2.0*l+1.0);
+				//average beta (betar)
+				for(int ir = 0; ir<this->mesh;ir++)
+				{
+					this->beta(nb, ir) = 1.0 / (2.0 * l + 1.0) * 
+							( (l + 1.0) * sqrt(this->dion(ind,ind) / vion1) *
+							this->beta(ind, ir) + 
+							l * sqrt(this->dion(ind1,ind1) / vion1) *
+							this->beta(ind1, ir) ) ;
+				}
+				//average the dion matrix
+				this->dion(nb, nb) = vion1;
+				old_nbeta++;	
 			}
 			else
 			{
-				if(abs(this->jjj[old_nbeta+1]-this->lll[old_nbeta+1]+0.5)>1e-6)
-					WARNING_QUIT("average_p", "error beta function 2 !");
-				ind = old_nbeta;
-				ind1 = old_nbeta +1;
+				for(int ir = 0; ir<this->mesh;ir++)
+					this->beta(nb, ir) = this->beta(old_nbeta, ir);
+				this->dion(nb, nb) = this->dion(old_nbeta, old_nbeta);
 			}
-			double vion1 = ((l+1.0) * this->dion(ind,ind) + l * this->dion(ind1,ind1)) / (2.0*l+1.0);
-			//average beta (betar)
-			for(int ir = 0; ir<this->mesh;ir++)
-			{
-				this->beta(nb, ir) = 1.0 / (2.0 * l + 1.0) * 
-						( (l + 1.0) * sqrt(this->dion(ind,ind) / vion1) *
-						this->beta(ind, ir) + 
-						l * sqrt(this->dion(ind1,ind1) / vion1) *
-						this->beta(ind1, ir) ) ;
-			}
-			//average the dion matrix
-			this->dion(nb, nb) = vion1;
-			old_nbeta++;	
+			this->lll[nb] = this->lll[old_nbeta]; //reset the lll index, ignore jjj index
 		}
-		else
-		{
-			for(int ir = 0; ir<this->mesh;ir++)
-				this->beta(nb, ir) = this->beta(old_nbeta, ir);
-			this->dion(nb, nb) = this->dion(old_nbeta, old_nbeta);
-		}
-		this->lll[nb] = this->lll[old_nbeta]; //reset the lll index, ignore jjj index
-	}
 
-	//store the old dion and then recreate dion 
-	for(int i=0;i<this->nbeta; i++)
-	{
-		for(int j=0;j<this->nbeta;j++)
+		//store the old dion and then recreate dion 
+		for(int i=0;i<this->nbeta; i++)
 		{
-			dion_new(i,j) = this->dion(i,j);
-		}
-	}
-
-	this->dion = dion_new;
-//	this->dion.create(this->nbeta, this->nbeta);
-//	for(int i=0;i<this->nbeta; i++)
-//		for(int j=0;j<this->nbeta;j++)
-//			this->dion(i,j) = dion_new(i,j);
-	
-	int new_nwfc = 0;
-	for(int nb=0; nb<this->nwfc; nb++)
-	{
-		new_nwfc++;
-		if(this->lchi[nb] != 0 && abs(this->jchi[nb] - this->lchi[nb] - 0.5)<1e-6)
-		{
-			new_nwfc--;
-		}
-	}
-
-	this->nwfc = new_nwfc;
-	int old_nwfc=0;
-	for(int nb=0; nb<this->nwfc; nb++)
-	{
-		old_nwfc++;
-		int l = this->lchi[old_nwfc];
-		int ind=0, ind1=0;
-		if(l!=0)
-		{
-			if(abs(this->jchi[old_nwfc] - this->lchi[old_nwfc] + 0.5) < 1e-6)
+			for(int j=0;j<this->nbeta;j++)
 			{
-				if(abs(this->jchi[old_nwfc+1]-this->lchi[old_nwfc+1]-0.5)>1e-6) 
-				{error++; cout<<"warning_quit! error chi function 1 !"<<endl; return error;}
-//					WARNING_QUIT("average_p", "error chi function 1 !");
-				ind = old_nwfc +1;
-				ind1 = old_nwfc;
+				dion_new(i,j) = this->dion(i,j);
 			}
-			else
+		}
+
+		this->dion = dion_new;
+	//	this->dion.create(this->nbeta, this->nbeta);
+	//	for(int i=0;i<this->nbeta; i++)
+	//		for(int j=0;j<this->nbeta;j++)
+	//			this->dion(i,j) = dion_new(i,j);
+		
+		int new_nwfc = 0;
+		for(int nb=0; nb<this->nwfc; nb++)
+		{
+			new_nwfc++;
+			if(this->lchi[nb] != 0 && abs(this->jchi[nb] - this->lchi[nb] - 0.5)<1e-6)
 			{
-				if(abs(this->jchi[old_nwfc+1]-this->lchi[old_nwfc+1]+0.5)>1e-6)
-				{error++; cout<<"warning_quit! error chi function 2 !"<<endl; return error;}
-//					WARNING_QUIT("average_p", "error chi function 2 !");
-				ind = old_nwfc;
-				ind1 = old_nwfc +1;
+				new_nwfc--;
 			}
-			//average chi
-			for(int ir = 0; ir<this->mesh;ir++)
+		}
+
+		this->nwfc = new_nwfc;
+		int old_nwfc=0;
+		for(int nb=0; nb<this->nwfc; nb++)
+		{
+			old_nwfc++;
+			int l = this->lchi[old_nwfc];
+			int ind=0, ind1=0;
+			if(l!=0)
 			{
-				this->chi(nb, ir) = 1.0 / (2.0 * l + 1.0) *
-					( (l+1.0)*this->chi(ind,ir) + (l*this->chi(ind1,ir)) );
+				if(abs(this->jchi[old_nwfc] - this->lchi[old_nwfc] + 0.5) < 1e-6)
+				{
+					if(abs(this->jchi[old_nwfc+1]-this->lchi[old_nwfc+1]-0.5)>1e-6) 
+					{error++; cout<<"warning_quit! error chi function 1 !"<<endl; return error;}
+	//					WARNING_QUIT("average_p", "error chi function 1 !");
+					ind = old_nwfc +1;
+					ind1 = old_nwfc;
+				}
+				else
+				{
+					if(abs(this->jchi[old_nwfc+1]-this->lchi[old_nwfc+1]+0.5)>1e-6)
+					{error++; cout<<"warning_quit! error chi function 2 !"<<endl; return error;}
+	//					WARNING_QUIT("average_p", "error chi function 2 !");
+					ind = old_nwfc;
+					ind1 = old_nwfc +1;
+				}
+				//average chi
+				for(int ir = 0; ir<this->mesh;ir++)
+				{
+					this->chi(nb, ir) = 1.0 / (2.0 * l + 1.0) *
+						( (l+1.0)*this->chi(ind,ir) + (l*this->chi(ind1,ir)) );
+				}
 				old_nwfc++;
 			}
+			else{
+				for(int ir = 0; ir<this->mesh;ir++)
+					this->chi(nb, ir) = this->chi(old_nwfc, ir);
+			}
+			this->lchi[nb] = this->lchi[old_nwfc]; //reset lchi index
 		}
-		else{
-			for(int ir = 0; ir<this->mesh;ir++)
-				this->chi(nb, ir) = this->chi(old_nwfc, ir);
-		}
-		this->lchi[nb] = this->lchi[old_nwfc]; //reset lchi index
+		this->has_so = 0;	
+		return error;
 	}
-	this->has_so = 0;	
-	return error;
+	else//lambda_ != 0, modulate the soc effect in pseudopotential
+	{
+		for(int nb=0; nb<this->nbeta; nb++)
+		{
+			int l = this->lll[nb];
+			int ind=0, ind1=0;
+			if(l != 0)
+			{
+				if(abs(this->jjj[nb] - this->lll[nb] + 0.5) < 1e-6)
+				{
+					if(abs(this->jjj[nb+1]-this->lll[nb+1]-0.5)>1e-6) 
+					{
+						error = 1;
+						cout<<"warning_quit! error beta function 1 !" <<endl;
+						return error;
+					}
+					ind = nb +1;
+					ind1 = nb;
+				}
+				else
+				{
+					if(abs(this->jjj[nb+1]-this->lll[nb+1]+0.5)>1e-6)
+					{
+						error = 1;
+						cout<<"warning_quit! error beta function 2 !" <<endl;
+						return error;
+					}
+					ind = nb;
+					ind1 = nb +1;
+				}
+				double vion1 = ((l+1.0) * this->dion(ind,ind) + l * this->dion(ind1,ind1)) / (2.0*l+1.0);
+				if(abs(vion1)<1.0e-10) vion1 = 1.0e-10;
+				//average beta (betar)
+				const double sqrtDplus = sqrt(this->dion(ind,ind) / vion1);
+				const double sqrtDminus = sqrt(this->dion(ind1,ind1) / vion1);
+				this->dion(ind, ind) = vion1;
+				this->dion(ind1, ind1) = vion1;
+				for(int ir = 0; ir<this->mesh;ir++)
+				{
+					double avera = 1.0 / (2.0 * l + 1.0) * 
+							( (l + 1.0) * sqrtDplus *
+							this->beta(ind, ir) + 
+							l * sqrtDminus *
+							this->beta(ind1, ir) ) ;
+					double delta = 1.0 / (2.0 * l + 1.0) * 
+							( sqrtDplus *
+							this->beta(ind, ir) - 
+							sqrtDminus *
+							this->beta(ind1, ir) ) ;
+					this->beta(ind, ir) = (avera + l * delta * lambda_) ;
+					this->beta(ind1, ir) = (avera - (l + 1) * delta * lambda_); 
+				}
+				nb++;
+			}
+		}
+
+		for(int nb=0; nb<this->nwfc; nb++)
+		{
+			int l = this->lchi[nb];
+			int ind=0, ind1=0;
+			if(l!=0)
+			{
+				if(abs(this->jchi[nb] - this->lchi[nb] + 0.5) < 1e-6)
+				{
+					if(abs(this->jchi[nb+1]-this->lchi[nb+1]-0.5)>1e-6) 
+					{error++; cout<<"warning_quit! error chi function 1 !"<<endl; return error;}
+					ind = nb +1;
+					ind1 = nb;
+				}
+				else
+				{
+					if(abs(this->jchi[nb+1]-this->lchi[nb+1]+0.5)>1e-6)
+					{error++; cout<<"warning_quit! error chi function 2 !"<<endl; return error;}
+					ind = nb;
+					ind1 = nb +1;
+				}
+				//average chi
+				for(int ir = 0; ir<this->mesh;ir++)
+				{
+					double avera = 0.5 * 
+						( this->chi(ind,ir) + this->chi(ind1,ir) );
+					double delta = 0.5 * 
+						( this->chi(ind,ir) - this->chi(ind1,ir) );
+					this->chi(ind, ir) = avera + delta * lambda_ ; 
+					this->chi(ind1, ir) = avera - delta * lambda_ ; 
+				}
+				nb++;
+			}
+		}
+		return error;
+	}
 }
 
 // Peize Lin add for bsse 2021.04.07

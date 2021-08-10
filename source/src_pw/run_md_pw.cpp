@@ -11,6 +11,16 @@
 #include "../src_ions/variable_cell.h" // mohan add 2021-02-01
 #include "../module_md/MD_basic.h"
 
+Run_MD_PW::Run_MD_PW()
+{
+    force=new Vector3<double>[GlobalC::ucell.nat];
+}
+
+Run_MD_PW::~Run_MD_PW()
+{
+    delete []force;
+}
+
 void Run_MD_PW::md_ions_pw(void)
 {
     TITLE("Run_MD_PW", "md_ions_pw");
@@ -18,17 +28,17 @@ void Run_MD_PW::md_ions_pw(void)
 
     if (GlobalV::OUT_LEVEL == "i")
     {
-        cout << setprecision(12);
-        cout << " " << setw(7) << "ISTEP"
-             << setw(5) << "NE"
-             << setw(15) << "ETOT(eV)"
-             << setw(15) << "EDIFF(eV)"
-             << setw(15) << "MAX_F(eV/A)"
-             << setw(15) << "TRADIUS(Bohr)"
-             << setw(8) << "UPDATE"
-             << setw(11) << "ETIME(MIN)"
-             << setw(11) << "FTIME(MIN)"
-             << endl;
+        std::cout << std::setprecision(12);
+        std::cout << " " << std::setw(7) << "ISTEP"
+             << std::setw(5) << "NE"
+             << std::setw(15) << "ETOT(eV)"
+             << std::setw(15) << "EDIFF(eV)"
+             << std::setw(15) << "MAX_F(eV/A)"
+             << std::setw(15) << "TRADIUS(Bohr)"
+             << std::setw(8) << "UPDATE"
+             << std::setw(11) << "ETIME(MIN)"
+             << std::setw(11) << "FTIME(MIN)"
+             << std::endl;
     }
 
     // allocation for ion movement.
@@ -55,12 +65,12 @@ void Run_MD_PW::md_ions_pw(void)
 
         if (GlobalV::OUT_LEVEL == "ie")
         {
-            cout << " -------------------------------------------" << endl;    
-            cout << " STEP OF MOLECULAR DYNAMICS : " << istep << endl;
-            cout << " -------------------------------------------" << endl;
-            GlobalV::ofs_running << " -------------------------------------------" << endl;
-            GlobalV::ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << endl;
-            GlobalV::ofs_running << " -------------------------------------------" << endl;
+            std::cout << " -------------------------------------------" << std::endl;    
+            std::cout << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
+            std::cout << " -------------------------------------------" << std::endl;
+            GlobalV::ofs_running << " -------------------------------------------" << std::endl;
+            GlobalV::ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
+            GlobalV::ofs_running << " -------------------------------------------" << std::endl;
         }
 
     //----------------------------------------------------------
@@ -103,7 +113,7 @@ void Run_MD_PW::md_ions_pw(void)
             }
             else if (Exx_Global::Hybrid_Type::Generate_Matrix == GlobalC::exx_global.info.hybrid_type)
             {
-                throw invalid_argument(TO_STRING(__FILE__) + TO_STRING(__LINE__));
+                throw std::invalid_argument(TO_STRING(__FILE__) + TO_STRING(__LINE__));
             }
             else // Peize Lin add 2019-03-09
             {
@@ -141,8 +151,8 @@ void Run_MD_PW::md_ions_pw(void)
 
         if (GlobalC::pot.out_potential == 2)
         {
-            stringstream ssp;
-            stringstream ssp_ave;
+            std::stringstream ssp;
+            std::stringstream ssp_ave;
             ssp << GlobalV::global_out_dir << "ElecStaticPot";
             ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
             GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
@@ -151,17 +161,20 @@ void Run_MD_PW::md_ions_pw(void)
         time_t eend = time(NULL);
         time_t fstart = time(NULL);
 
+        this->callInteraction_PW(GlobalC::ucell.nat, force, stress);
+        double potential = GlobalC::en.etot/2;
+
         if (mdtype == 1 || mdtype == 2)
         {
-            mdb.runNVT(istep);
+            mdb.runNVT(istep, potential, force, stress);
         }
         else if (mdtype == 0)
         {
-            mdb.runNVE(istep);
+            mdb.runNVE(istep, potential, force, stress);
         }
         else if (mdtype == -1)
         {
-            stop = mdb.runFIRE(istep);
+            stop = mdb.runFIRE(istep, potential, force, stress);
         }
         else
         {
@@ -180,26 +193,26 @@ void Run_MD_PW::md_ions_pw(void)
 
         //reset local potential and initial wave function
         GlobalC::pot.init_pot(istep, GlobalC::pw.strucFac);
-        GlobalV::ofs_running << " Setup the new wave functions?" << endl;
+        GlobalV::ofs_running << " Setup the new wave functions?" << std::endl;
         GlobalC::wf.wfcinit();
 
         if (GlobalV::OUT_LEVEL == "i")
         {
             double etime_min = difftime(eend, estart) / 60.0;
             double ftime_min = difftime(fend, fstart) / 60.0;
-            stringstream ss;
+            std::stringstream ss;
             ss << GlobalV::MOVE_IONS << istep;
 
-            cout << " " << setw(7) << ss.str()
-                 << setw(5) << eiter
-                 << setw(15) << setprecision(6) << GlobalC::en.etot * Ry_to_eV
-                 << setw(15) << IMM.get_ediff() * Ry_to_eV
-                 << setprecision(3)
-                 << setw(15) << IMM.get_largest_grad() * Ry_to_eV / 0.529177
-                 << setw(15) << IMM.get_trust_radius()
-                 << setw(8) << IMM.get_update_iter()
-                 << setprecision(2) << setw(11) << etime_min
-                 << setw(11) << ftime_min << endl;
+            std::cout << " " << std::setw(7) << ss.str()
+                 << std::setw(5) << eiter
+                 << std::setw(15) << std::setprecision(6) << GlobalC::en.etot * Ry_to_eV
+                 << std::setw(15) << IMM.get_ediff() * Ry_to_eV
+                 << std::setprecision(3)
+                 << std::setw(15) << IMM.get_largest_grad() * Ry_to_eV / 0.529177
+                 << std::setw(15) << IMM.get_trust_radius()
+                 << std::setw(8) << IMM.get_update_iter()
+                 << std::setprecision(2) << std::setw(11) << etime_min
+                 << std::setw(11) << ftime_min << std::endl;
         }
 
         ++istep;
@@ -207,7 +220,7 @@ void Run_MD_PW::md_ions_pw(void)
 
     if (GlobalV::OUT_LEVEL == "i")
     {
-        cout << " ION DYNAMICS FINISHED :)" << endl;
+        std::cout << " ION DYNAMICS FINISHED :)" << std::endl;
     }
 
     timer::tick("Run_MD_PW", "md_ions_pw");
@@ -279,7 +292,7 @@ void Run_MD_PW::md_cells_pw()
         break;
     case Exx_Global::Hybrid_Type::Generate_Matrix:
     default:
-        throw invalid_argument(TO_STRING(__FILE__) + TO_STRING(__LINE__));
+        throw std::invalid_argument(TO_STRING(__FILE__) + TO_STRING(__LINE__));
     }
 #endif
 
@@ -290,10 +303,29 @@ void Run_MD_PW::md_cells_pw()
 
     this->md_ions_pw();
 
-    GlobalV::ofs_running << "\n\n --------------------------------------------" << endl;
-    GlobalV::ofs_running << setprecision(16);
-    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << endl;
-    GlobalV::ofs_running << " --------------------------------------------\n\n" << endl;
+    GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
+    GlobalV::ofs_running << std::setprecision(16);
+    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
+    GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
     timer::tick("Run_MD_PW", "md_cells_pw");
+}
+
+void Run_MD_PW::callInteraction_PW(const int& numIon, Vector3<double>* force, matrix& stress_pw)
+{
+//to call the force of each atom
+	matrix fcs;//temp force matrix
+	Forces ff;
+	ff.init(fcs);
+	for(int ion=0;ion<numIon;ion++){
+		force[ion].x =fcs(ion, 0)/2.0;
+		force[ion].y =fcs(ion, 1)/2.0;
+		force[ion].z =fcs(ion, 2)/2.0;
+	}
+	if(GlobalV::STRESS)
+	{
+		Stress_PW ss;
+		ss.cal_stress(stress_pw);
+	}
+	return;
 }

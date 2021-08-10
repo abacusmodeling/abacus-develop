@@ -35,7 +35,7 @@ int pdlar1v(int *n, int *b1, int *bn, double *lambda, double *d__, double *l,
 	/*  DLAR1V computes the (scaled) r-th column of the inverse of */
 	/*  the sumbmatrix in rows B1 through BN of the tridiagonal matrix */
 	/*  L D L^T - sigma I. When sigma is close to an eigenvalue, the */
-	/*  computed vector is an accurate eigenvector. Usually, r corresponds */
+	/*  computed std::vector is an accurate eigenvector. Usually, r corresponds */
 	/*  to the index where the eigenvector is largest in magnitude. */
 	/*  The following steps accomplish this computation : */
 	/*  (a) Stationary qd transform,  L D L^T - sigma I = L(+) D(+) L(+)^T, */
@@ -115,14 +115,14 @@ int pdlar1v(int *n, int *b1, int *bn, double *lambda, double *d__, double *l,
 	/*           eigenvector. */
 
 	/*  ISUPPZ   (output) int array, dimension (2) */
-	/*           The support of the vector in Z, i.e., the vector Z is */
+	/*           The support of the std::vector in Z, i.e., the std::vector Z is */
 	/*           nonzero only in elements ISUPPZ(1) through ISUPPZ( 2 ). */
 
 	/*  NRMINV   (output) DOUBLE PRECISION */
 	/*           NRMINV = 1/SQRT( ZTZ ) */
 
 	/*  RESID    (output) DOUBLE PRECISION */
-	/*           The residual of the FP vector. */
+	/*           The residual of the FP std::vector. */
 	/*           RESID = ABS( MINGMA )/SQRT( ZTZ ) */
 
 	/*  RQCORR   (output) DOUBLE PRECISION */
@@ -323,14 +323,14 @@ int pdlar1v(int *n, int *b1, int *bn, double *lambda, double *d__, double *l,
 		/* L110: */
 	}
 
-	/*     Compute the FP vector: solve N^T v = e_r */
+	/*     Compute the FP std::vector: solve N^T v = e_r */
 
 	isuppz[1] = *b1;
 	isuppz[2] = *bn;
 	z__[*r__] = 1.;
 	*ztz = 1.;
 
-	/*     Compute the FP vector upwards from R */
+	/*     Compute the FP std::vector upwards from R */
 
 	if (!sawnan1 && !sawnan2) {
 		i__1 = *b1;
@@ -368,7 +368,7 @@ int pdlar1v(int *n, int *b1, int *bn, double *lambda, double *d__, double *l,
 		}
 		L240: ;
 	}
-	/*     Compute the FP vector downwards from R in blocks of size BLKSIZ */
+	/*     Compute the FP std::vector downwards from R in blocks of size BLKSIZ */
 	if (!sawnan1 && !sawnan2) {
 		i__1 = *bn - 1;
 		for (i__ = *r__; i__ <= i__1; ++i__) {

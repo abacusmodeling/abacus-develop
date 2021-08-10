@@ -34,8 +34,8 @@ public:
 private:
 		 
 		 bool init_finish;
-		 complex<double> ***dipole_aux;
-		 complex<double> ***dipole;
+		 std::complex<double> ***dipole_aux;
+		 std::complex<double> ***dipole;
 		 
 };
 

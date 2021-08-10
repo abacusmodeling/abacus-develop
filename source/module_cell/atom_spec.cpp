@@ -78,7 +78,7 @@ void Atom::set_index(void)
     return;
 }
 
-void Atom::print_Atom(ofstream &ofs, output &outp)
+void Atom::print_Atom(std::ofstream &ofs, output &outp)
 {
     //OUT(ofs,"print_Atom()");
     OUT(ofs,"label",label);
@@ -88,7 +88,7 @@ void Atom::print_Atom(ofstream &ofs, output &outp)
     OUT(ofs,"Rcut", Rcut); // pengfei Li 16-2-29
     OUT(ofs,"nw",nw);
     OUT(ofs,"stapos_wf",stapos_wf);
-    ofs<<endl;
+    ofs<<std::endl;
 
     //===================
     // call print atom
@@ -99,12 +99,12 @@ void Atom::print_Atom(ofstream &ofs, output &outp)
     /*
     for (int i = 0;i < na;i++)
     {
-    	ofs << setw(15) << this->tau[i].x
-    		<< setw(15) << this->tau[i].y
-    		<< setw(15) << this->tau[i].z << endl;
+    	ofs << std::setw(15) << this->tau[i].x
+    		<< std::setw(15) << this->tau[i].y
+    		<< std::setw(15) << this->tau[i].z << std::endl;
     }
     */
-    ofs << endl;
+    ofs << std::endl;
 
     return;
 }

@@ -1,7 +1,8 @@
 #include "symm_other.h"
 
-
-void Symm_Other::print1(const int &ibrav, const double *cel_const, ofstream &ofs_running)
+namespace ModuleSymmetry
+{
+void Symm_Other::print1(const int &ibrav, const double *cel_const, std::ofstream &ofs_running)
 {
 	TITLE("Symm_Other","print1");
 
@@ -127,5 +128,5 @@ const Vector3<double> &b, const Vector3<double> &c)
 	return a.x * ( b.y * c.z - b.z * c.y ) + a.y * ( b.z * c.x - b.x * c.z ) 
 	+ a.z * ( b.x * c.y - b.y * c.x );
 }
-
+}
 

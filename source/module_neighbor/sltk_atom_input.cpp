@@ -8,7 +8,7 @@
 //==========================================================
 Atom_input::Atom_input
 (
-	ofstream &ofs_in,
+	std::ofstream &ofs_in,
 	const UnitCell &ucell,
 	const int amount,
 	const int ntype,
@@ -78,20 +78,20 @@ Atom_input::Atom_input
 
 	if(GlobalV::test_grid)
 	{
-		ofs_in << " Output lattice vectors now (unit:lat0):" << endl;
-		ofs_in << " " << setw(5) << "Vec1" 
-			<< setw(10) << vec1[0]
-			<< setw(10) << vec1[1]
-			<< setw(10) << vec1[2] << endl;
-		ofs_in << " " << setw(5) << "Vec2" 
-			<< setw(10) << vec2[0]
-			<< setw(10) << vec2[1]
-			<< setw(10) << vec2[2] << endl;
-		ofs_in << " " << setw(5) << "Vec3" 
-			<< setw(10) << vec3[0]
-			<< setw(10) << vec3[1]
-			<< setw(10) << vec3[2];
-		ofs_in << endl;
+		ofs_in << " Output lattice vectors now (unit:lat0):" << std::endl;
+		ofs_in << " " << std::setw(5) << "Vec1" 
+			<< std::setw(10) << vec1[0]
+			<< std::setw(10) << vec1[1]
+			<< std::setw(10) << vec1[2] << std::endl;
+		ofs_in << " " << std::setw(5) << "Vec2" 
+			<< std::setw(10) << vec2[0]
+			<< std::setw(10) << vec2[1]
+			<< std::setw(10) << vec2[2] << std::endl;
+		ofs_in << " " << std::setw(5) << "Vec3" 
+			<< std::setw(10) << vec3[0]
+			<< std::setw(10) << vec3[1]
+			<< std::setw(10) << vec3[2];
+		ofs_in << std::endl;
 	}
 
 	//=============================================
@@ -133,7 +133,7 @@ Atom_input::Atom_input
 
 	if(test_atom_input)
 	{
-		ofs_in << " Find the coordinate range of the input atom(unit:lat0)." << endl;
+		ofs_in << " Find the coordinate range of the input atom(unit:lat0)." << std::endl;
 	}
 	if(test_atom_input) OUT(ofs_in,"min_tau", x_min, y_min, z_min);
 	if(test_atom_input) OUT(ofs_in,"max_tau", x_max, y_max, z_max);
@@ -236,17 +236,17 @@ void Atom_input::Check_Expand_Condition(const UnitCell &ucell)
 
 	if(dminX<0.0)
 	{
-		cout << " dminX=" << dminX << endl;
+		std::cout << " dminX=" << dminX << std::endl;
 		WARNING_QUIT("Atom_input::Check_Expand_Condition","dminX<0.0");
 	}
 	if(dminY<0.0)
 	{
-		cout << " dminY=" << dminY << endl;
+		std::cout << " dminY=" << dminY << std::endl;
 		WARNING_QUIT("Atom_input::Check_Expand_Condition","dminY<0.0");
 	}
 	if(dminZ<0.0)
 	{
-		cout << " dminZ=" << dminZ << endl;
+		std::cout << " dminZ=" << dminZ << std::endl;
 		WARNING_QUIT("Atom_input::Check_Expand_Condition","dminZ<0.0");
 	}
 
@@ -283,7 +283,7 @@ void Atom_input::Check_Expand_Condition(const UnitCell &ucell)
 	glayerZ++;
 	if(test_atom_input)
 	{
-		GlobalV::ofs_running << " Extend distance from the (maxX,maxY,maxZ) direct position in this unitcell: " << endl;
+		GlobalV::ofs_running << " Extend distance from the (maxX,maxY,maxZ) direct position in this unitcell: " << std::endl;
 	}
 	
 	if(test_atom_input)OUT(GlobalV::ofs_running,"ExtentDim+",extent_1DX,extent_1DY,extent_1DZ);
@@ -369,7 +369,7 @@ void Atom_input::Check_Expand_Condition(const UnitCell &ucell)
 /*	
 	if(test_atom_input)
 	{
-		GlobalV::ofs_running << " Extend distance from the (minX,minY,minZ) direct position in this unitcell: " << endl;
+		GlobalV::ofs_running << " Extend distance from the (minX,minY,minZ) direct position in this unitcell: " << std::endl;
 	}
 
 	if(test_atom_input)OUT(GlobalV::ofs_running,"ExtentDim-",extent_1DX_minus,extent_1DY_minus,extent_1DZ_minus);
@@ -400,13 +400,13 @@ void Atom_input::Expand_Grid(const UnitCell &ucell, const int ntype)
 
 	if(test_atom_input)
 	{
-		GlobalV::ofs_running << " Be careful of thie grid adjacent searching program!" << endl;
-		GlobalV::ofs_running << " Here I would like to say some gudlines:" << endl;
-		GlobalV::ofs_running << " You are using Expand_Grid now, which means now you treat" << endl;
-		GlobalV::ofs_running << " your 'unitcell' as a Cell Class which defined in grid class" << endl;
-		GlobalV::ofs_running << " This Cell is diffenent from the 'Not expand' cell." << endl;
-		GlobalV::ofs_running << " In most cases, it may not be a cubic, so please do it more carefully." << endl;
-		GlobalV::ofs_running << " Good luck! " << endl;
+		GlobalV::ofs_running << " Be careful of thie grid adjacent searching program!" << std::endl;
+		GlobalV::ofs_running << " Here I would like to say some gudlines:" << std::endl;
+		GlobalV::ofs_running << " You are using Expand_Grid now, which means now you treat" << std::endl;
+		GlobalV::ofs_running << " your 'unitcell' as a Cell Class which defined in grid class" << std::endl;
+		GlobalV::ofs_running << " This Cell is diffenent from the 'Not expand' cell." << std::endl;
+		GlobalV::ofs_running << " In most cases, it may not be a cubic, so please do it more carefully." << std::endl;
+		GlobalV::ofs_running << " Good luck! " << std::endl;
 	}
 
 	double *x_old = new double[d_amount];
@@ -486,16 +486,16 @@ void Atom_input::Expand_Grid(const UnitCell &ucell, const int ntype)
 					{
 						if (d_amount_expand < 1000)
 						{
-							GlobalV::ofs_running << "\n" << setw(6) << ia_all
-							<< setw(10) << x_old[ia]
-							<< setw(10) << y_old[ia]
-							<< setw(10) << z_old[ia]
-							<< setw(10) << store_x[ia_all]
-							<< setw(10) << store_y[ia_all]
-							<< setw(10) << store_z[ia_all]
-							<< setw(6) << store_cell_x[ia_all]
-							<< setw(6) << store_cell_y[ia_all]
-							<< setw(6) << store_cell_z[ia_all];
+							GlobalV::ofs_running << "\n" << std::setw(6) << ia_all
+							<< std::setw(10) << x_old[ia]
+							<< std::setw(10) << y_old[ia]
+							<< std::setw(10) << z_old[ia]
+							<< std::setw(10) << store_x[ia_all]
+							<< std::setw(10) << store_y[ia_all]
+							<< std::setw(10) << store_z[ia_all]
+							<< std::setw(6) << store_cell_x[ia_all]
+							<< std::setw(6) << store_cell_y[ia_all]
+							<< std::setw(6) << store_cell_z[ia_all];
 						}
 					}
 
@@ -550,11 +550,11 @@ void Atom_input::Expand_Grid(const UnitCell &ucell, const int ntype)
 	{
 		GlobalV::ofs_running << " New Xmin=" << x_min_expand
 			<< " Ymin=" << y_min_expand
-			<< " Zmin=" << z_min_expand << endl;
+			<< " Zmin=" << z_min_expand << std::endl;
 
 		GlobalV::ofs_running << " New Xmax=" << x_max_expand
 			<< " Ymax=" << y_max_expand
-			<< " Zmax=" << z_max_expand << endl;
+			<< " Zmax=" << z_max_expand << std::endl;
 	}
 
 	delete[] x_old;
@@ -666,7 +666,7 @@ void Atom_input::Load_atom(const UnitCell& ucell)const
 	y = ucell.atoms[type].tau[natom].y;
 	z = ucell.atoms[type].tau[natom].z;
 
-//	cout<<" x = "<<ucell.atoms[type].tau[natom].x
+//	std::cout<<" x = "<<ucell.atoms[type].tau[natom].x
 //		<<" y = "<<ucell.atoms[type].tau[natom].y
 //		<<" z = "<<ucell.atoms[type].tau[natom].z
 //		<<" type = "<<type

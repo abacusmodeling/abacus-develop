@@ -55,7 +55,7 @@ double Polint::Lagrange3
 	if(d01 == 0.0 || d02 == 0.0 || d03 == 0.0
 			|| d12 == 0.0 || d13 == 0.0 || d23 == 0.0)
 	{
-		cout << "In Polint::Lagrange3, Two XA's are EQUAL!" << endl;
+		std::cout << "In Polint::Lagrange3, Two XA's are EQUAL!" << std::endl;
 		exit(0);
 	}
 	

@@ -29,17 +29,17 @@ public:
     ~K_Vectors();
 
     void set(
-        const Symmetry &symm,
-        const string &k_file_name,
+        const ModuleSymmetry::Symmetry &symm,
+        const std::string &k_file_name,
         const int& nspin,
         const Matrix3 &reciprocal_vec,
         const Matrix3 &latvec);
 
-    void ibz_kpoint( const Symmetry &symm);
+    void ibz_kpoint( const ModuleSymmetry::Symmetry &symm);
     //LiuXh add 20180515
     void set_after_vc(
-            const Symmetry &symm,
-            const string &k_file_name,
+            const ModuleSymmetry::Symmetry &symm,
+            const std::string &k_file_name,
             const int& nspin,
             const Matrix3 &reciprocal_vec,
             const Matrix3 &latvec);
@@ -49,13 +49,13 @@ private:
     bool kc_done;
     bool kd_done;
     double koffset[3];     			// used only in automatic k-points.
-    string k_kword; //LiuXh add 20180619
+    std::string k_kword; //LiuXh add 20180619
     int k_nkstot; //LiuXh add 20180619
 
     void renew( const int &kpoint_number );
 
     // step 1 : generate kpoints
-    bool read_kpoints(const string &fn); // return 0: something wrong.
+    bool read_kpoints(const std::string &fn); // return 0: something wrong.
     void Monkhorst_Pack(const int *nmp_in,const double *koffset_in,const int tipo);
     double Monkhorst_Pack_formula( const int &k_type, const double &offset,
                                    const int& n, const int &dim);
@@ -75,8 +75,8 @@ private:
 
     // step 5
     // print k lists.
-    void print_klists(ofstream &fn);
-    //bool read_kpoints_after_vc(const string &fn); //LiuXh add 20180515
+    void print_klists(std::ofstream &fn);
+    //bool read_kpoints_after_vc(const std::string &fn); //LiuXh add 20180515
     //void Monkhorst_Pack_after_vc(const int *nmp_in,const double *koffset_in,const int tipo); //LiuXh add 20180515
     void mpi_k_after_vc(); //LiuXh add 20180515
     void set_both_kvec_after_vc(const Matrix3 &G,const Matrix3 &R);

@@ -82,14 +82,14 @@ void Threshold_Elec::update_ethr(const int &iter)
 		else
 		{
 			GlobalV::ETHR = std::min( GlobalV::ETHR, 0.1*dr2/ std::max(1.0, GlobalC::CHR.nelec));
-			//cout << " new ethr = " << GlobalV::ETHR << endl;
+			//std::cout << " new ethr = " << GlobalV::ETHR << std::endl;
 		}
 
     }
     return;
 }
 
-void Threshold_Elec::iter_end(ofstream &ofs)
+void Threshold_Elec::iter_end(std::ofstream &ofs)
 {
 	if(GlobalV::OUT_LEVEL != "m") 
 	{
@@ -99,7 +99,7 @@ void Threshold_Elec::iter_end(ofstream &ofs)
 }
 
 
-void Threshold_Elec::print_eigenvalue(ofstream &ofs)
+void Threshold_Elec::print_eigenvalue(std::ofstream &ofs)
 {
 	bool wrong = false;
 	for(int ik=0; ik<GlobalC::kv.nks; ++ik)
@@ -108,7 +108,7 @@ void Threshold_Elec::print_eigenvalue(ofstream &ofs)
 		{
 			if( abs( GlobalC::wf.ekb[ik][ib] ) > 1.0e10)
 			{
-				GlobalV::ofs_warning << " ik=" << ik+1 << " ib=" << ib+1 << " " << GlobalC::wf.ekb[ik][ib] << " Ry" << endl;
+				GlobalV::ofs_warning << " ik=" << ik+1 << " ib=" << ib+1 << " " << GlobalC::wf.ekb[ik][ib] << " Ry" << std::endl;
 				wrong = true;
 			}
 		}
@@ -127,7 +127,7 @@ void Threshold_Elec::print_eigenvalue(ofstream &ofs)
 	TITLE("Threshold_Elec","print_eigenvalue");
 
     ofs << "\n STATE ENERGY(eV) AND OCCUPATIONS.";
-	ofs << setprecision(5);
+	ofs << std::setprecision(5);
     for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {
         if (GlobalV::NSPIN==2)
@@ -142,18 +142,18 @@ void Threshold_Elec::print_eigenvalue(ofstream &ofs)
             {
                 ofs << " " << ik+1 << "/" << GlobalC::kv.nks/2 << " kpoint (Cartesian) = "
                 << GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z
-                << " (" << GlobalC::kv.ngk[ik] << " pws)" << endl;
+                << " (" << GlobalC::kv.ngk[ik] << " pws)" << std::endl;
 
-                ofs << setprecision(6);
+                ofs << std::setprecision(6);
 
             }
             if (GlobalC::kv.isk[ik] == 1)
             {
                 ofs << " " << ik+1-GlobalC::kv.nks/2 << "/" << GlobalC::kv.nks/2 << " kpoint (Cartesian) = "
                 << GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z
-                << " (" << GlobalC::kv.ngk[ik] << " pws)" << endl;
+                << " (" << GlobalC::kv.ngk[ik] << " pws)" << std::endl;
 
-                ofs << setprecision(6);
+                ofs << std::setprecision(6);
 
 			}
 		}       // Pengfei Li  added  14-9-9
@@ -161,9 +161,9 @@ void Threshold_Elec::print_eigenvalue(ofstream &ofs)
 		{
 			ofs << " " << ik+1 << "/" << GlobalC::kv.nks << " kpoint (Cartesian) = " 
 				<< GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z 
-				<< " (" << GlobalC::kv.ngk[ik] << " pws)" << endl; 
+				<< " (" << GlobalC::kv.ngk[ik] << " pws)" << std::endl; 
 
-			ofs << setprecision(6);
+			ofs << std::setprecision(6);
 		}
 
 		//----------------------
@@ -171,22 +171,22 @@ void Threshold_Elec::print_eigenvalue(ofstream &ofs)
 		//----------------------
 		if(GlobalV::KS_SOLVER=="selinv")
 		{
-			ofs << " USING SELINV, NO BAND ENERGY IS AVAILABLE." << endl;
+			ofs << " USING SELINV, NO BAND ENERGY IS AVAILABLE." << std::endl;
 		}
 		//----------------------
 		// output energy
 		//----------------------
 		else
 		{
-			//ofs << setw(12) << GlobalC::kv.ngk[ik] << " PWs ";
-			GlobalV::ofs_running << setprecision(6);
-			GlobalV::ofs_running << setiosflags(ios::showpoint);
+			//ofs << std::setw(12) << GlobalC::kv.ngk[ik] << " PWs ";
+			GlobalV::ofs_running << std::setprecision(6);
+			GlobalV::ofs_running << std::setiosflags(ios::showpoint);
 			for (int ib = 0; ib < GlobalV::NBANDS; ib++)
 			{
-				ofs << " [spin" << GlobalC::kv.isk[ik]+1 << "_state] " << setw(8) << ib+1 
-				<< setw(15) << GlobalC::wf.ekb[ik][ib] * Ry_to_eV << setw(15) << GlobalC::wf.wg(ik, ib) << endl;
+				ofs << " [spin" << GlobalC::kv.isk[ik]+1 << "_state] " << std::setw(8) << ib+1 
+				<< std::setw(15) << GlobalC::wf.ekb[ik][ib] * Ry_to_eV << std::setw(15) << GlobalC::wf.wg(ik, ib) << std::endl;
 			}
-			ofs << endl;
+			ofs << std::endl;
 		}
     }//end ik
     return;

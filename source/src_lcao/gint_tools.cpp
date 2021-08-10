@@ -109,8 +109,8 @@ namespace Gint_Tools
 			// meshball_positions should be the bigcell position in meshball
 			// to the center of meshball.
 			// calculated in cartesian coordinates
-			// the vector from the grid which is now being operated to the atom position.
-			// in meshball language, is the vector from imcell to the center cel, plus
+			// the std::vector from the grid which is now being operated to the atom position.
+			// in meshball language, is the std::vector from imcell to the center cel, plus
 			// tau_in_bigcell.
 			const int imcell=GlobalC::GridT.which_bigcell[mcell_index];
 			const double mt[3] = {
@@ -160,8 +160,8 @@ namespace Gint_Tools
 			// meshball_positions should be the bigcell position in meshball
 			// to the center of meshball.
 			// calculated in cartesian coordinates
-			// the vector from the grid which is now being operated to the atom position.
-			// in meshball language, is the vector from imcell to the center cel, plus
+			// the std::vector from the grid which is now being operated to the atom position.
+			// in meshball language, is the std::vector from imcell to the center cel, plus
 			// tau_in_bigcell.
 			const int imcell=GlobalC::GridT.which_bigcell[mcell_index];
 			const double mt[3] = {

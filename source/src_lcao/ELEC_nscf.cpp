@@ -15,7 +15,7 @@ void ELEC_nscf::nscf(LCAO_Hamilt &uhm)
 {
 	TITLE("ELEC_nscf","nscf");
 
-	cout << " NON-SELF CONSISTENT CALCULATIONS" << endl;
+	std::cout << " NON-SELF CONSISTENT CALCULATIONS" << std::endl;
 	
 	time_t time_start= std::time(NULL);
 
@@ -46,8 +46,8 @@ void ELEC_nscf::nscf(LCAO_Hamilt &uhm)
 	time_t time_finish=std::time(NULL);
 	OUT_TIME("cal_bands",time_start, time_finish);
 
-    GlobalV::ofs_running << " end of band structure calculation " << endl;
-    GlobalV::ofs_running << " band eigenvalue in this processor (eV) :" << endl;
+    GlobalV::ofs_running << " end of band structure calculation " << std::endl;
+    GlobalV::ofs_running << " band eigenvalue in this processor (eV) :" << std::endl;
 
     for (int ik = 0; ik < GlobalC::kv.nks; ik++)
     {
@@ -55,26 +55,26 @@ void ELEC_nscf::nscf(LCAO_Hamilt &uhm)
         {
             if (ik==0) 
 			{
-				GlobalV::ofs_running << " spin up :" << endl;
+				GlobalV::ofs_running << " spin up :" << std::endl;
 			}
             if (ik==( GlobalC::kv.nks / 2)) 
 			{
-				GlobalV::ofs_running << " spin down :" << endl;
+				GlobalV::ofs_running << " spin down :" << std::endl;
 			}
         }
 
 		GlobalV::ofs_running << " k-points" 
 			<< ik+1 << "(" << GlobalC::kv.nkstot << "): " 
-			<< GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z << endl;
+			<< GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z << std::endl;
 
         for (int ib = 0; ib < GlobalV::NBANDS; ib++)
         {			
             GlobalV::ofs_running << " spin" << GlobalC::kv.isk[ik]+1 
 			<< "final_state " << ib+1 << " " 
 			<< GlobalC::wf.ekb[ik][ib] * Ry_to_eV 
-			<< " " << GlobalC::wf.wg(ik, ib)*GlobalC::kv.nks << endl;
+			<< " " << GlobalC::wf.wg(ik, ib)*GlobalC::kv.nks << std::endl;
         }
-		GlobalV::ofs_running << endl;
+		GlobalV::ofs_running << std::endl;
     }
 	
 	// add by jingan in 2018.11.7
@@ -85,7 +85,7 @@ void ELEC_nscf::nscf(LCAO_Hamilt &uhm)
     }
 	
 	// add by jingan
-	if (berryphase::berry_phase_flag && Symmetry::symm_flag == 0)
+	if (berryphase::berry_phase_flag && ModuleSymmetry::Symmetry::symm_flag == 0)
     {
     	berryphase bp;
 		bp.Macroscopic_polarization();

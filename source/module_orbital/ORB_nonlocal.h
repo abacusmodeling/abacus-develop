@@ -29,15 +29,15 @@ public:
 
    	const int& getType() const { return this->type; }
 
-	const string& getLabel() const { return this->label; }
+	const std::string& getLabel() const { return this->label; }
 
-	const string& getType_ps() const { return this->type_ps; }
+	const std::string& getType_ps() const { return this->type_ps; }
 
 
 	void set_type_info(
 			const int& type_in,
-			const string& label_in,
-			const string& type_ps_in,
+			const std::string& label_in,
+			const std::string& type_ps_in,
 			const int& lmax_in,
 			const int& nproj_in,
 			const Numerical_Nonlocal_Lm* ps_orbital_in);
@@ -48,7 +48,7 @@ public:
 
 	private:
 	
-	string label; /// <atom type
+	std::string label; /// <atom type
 
 	int type; ///< number of atom types
 
@@ -56,7 +56,7 @@ public:
 
 	double rcut_max;
 
-	string type_ps; ///<local or nonlocal
+	std::string type_ps; ///<local or nonlocal
 
 	int nproj;
 

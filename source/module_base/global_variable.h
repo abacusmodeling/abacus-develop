@@ -35,6 +35,7 @@ extern bool		DFT_META;		// whether is meta-GGA
 extern int 		NSPIN;				// 7
 extern bool		TWO_EFERMI; 		// 7.5 mohan add 2011-04-03, two fermi energy, exist if magnetization is fixed.
 extern int 		CURRENT_SPIN;		// 8
+extern int 		CURRENT_K;		// 8
 
 extern int 		FORCE;				// 8.1
 extern double	FORCE_THR;			// 8.2
@@ -86,6 +87,9 @@ extern bool GAMMA_ONLY_PW; // mohan add 2012-06-05
 extern int T_IN_H; // 23, calculate T in H or not.
 extern int VL_IN_H; // 24, calculate Vl in H or not.
 extern int VNL_IN_H; // 25, calculate Vnl in H or not.
+extern int VH_IN_H; // 26, calculate Vh in H or not.
+extern int VXC_IN_H; // 27, calculate Vxc in H or not.
+extern int VION_IN_H; // 28, calculate Vion_loc in H or not.
 extern double   STRESS_THR; //LiuXh add 20180515
 
 extern int ocp;
@@ -123,7 +127,7 @@ extern int GRANK;
 extern int GSIZE;
 
 //==========================================================
-// EXPLAIN : readin file dir, output file ofstream
+// EXPLAIN : readin file dir, output file std::ofstream
 // GLOBAL VARIABLES :
 // NAME : global_in_card
 // NAME : global_atom_card

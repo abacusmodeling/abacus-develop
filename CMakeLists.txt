@@ -13,7 +13,7 @@ project(ABACUS
 
 option(ENABLE_DEEPKS "Enable DeePKS functionality" OFF)
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
-option(BUILD_UNIT_TESTS "Build ABACUS unit tests" ON)
+option(BUILD_TESTING "Build ABACUS unit tests" ON)
 option(GENERATE_TEST_REPORTS "Enable test report generation" OFF)
 
 if(ENABLE_DEEPKS)
@@ -33,7 +33,7 @@ if(ENABLE_ASAN)
     -fsanitize=address
   )
 else()
-  add_compile_options(-O2 -g)
+  add_compile_options(-O2 -g -Wno-write-strings)
 endif()
 
 set(ABACUS_BIN_NAME abacus)
@@ -167,7 +167,8 @@ install(PROGRAMS ${ABACUS_BIN_PATH}
     #DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
+include(CTest)
 enable_testing()
-IF (BUILD_UNIT_TESTS)
+IF (BUILD_TESTING)
   add_subdirectory(tests)
 endif()

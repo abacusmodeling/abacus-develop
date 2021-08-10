@@ -17,10 +17,14 @@
 #include "../src_pw/vdwd3_parameters.h"
 
 Run_MD_LCAO::Run_MD_LCAO()
-{}
+{
+    force=new Vector3<double>[GlobalC::ucell.nat];
+}
 
 Run_MD_LCAO::~Run_MD_LCAO() 
-{}
+{
+    delete []force;
+}
 
 
 void Run_MD_LCAO::opt_cell(void)
@@ -60,14 +64,14 @@ void Run_MD_LCAO::opt_ions(void)
 		
     if(GlobalV::OUT_LEVEL=="i")
     {
-        cout << setprecision(12);
-        cout<< " " << setw(7)<< "ISTEP"
-        <<setw(5)<< "NE"
-        <<setw(18)<< "ETOT(eV)"
-        <<setw(10)<< "dE(meV)"
-        <<setw(10)<< "F(eV/A)"
-        <<setw(10)<< "T(MIN)"
-        <<endl;
+        std::cout << std::setprecision(12);
+        std::cout<< " " << std::setw(7)<< "ISTEP"
+        <<std::setw(5)<< "NE"
+        <<std::setw(18)<< "ETOT(eV)"
+        <<std::setw(10)<< "dE(meV)"
+        <<std::setw(10)<< "F(eV/A)"
+        <<std::setw(10)<< "T(MIN)"
+        <<std::endl;
     }
 
     // Geometry optimization algorithm setup.
@@ -98,9 +102,9 @@ void Run_MD_LCAO::opt_ions(void)
 		// xiaohui add "m" option, 2015-09-16
         if(GlobalV::OUT_LEVEL=="ie" || GlobalV::OUT_LEVEL=="m")
         {
-			cout << " ---------------------------------------------------------" << endl;
-			cout<<" Molecular Dynamics STEP "<< mdb.getRealStep()<<endl;
-			cout << " ---------------------------------------------------------" << endl;
+			std::cout << " ---------------------------------------------------------" << std::endl;
+			std::cout<<" Molecular Dynamics STEP "<< mdb.getRealStep()<<std::endl;
+			std::cout << " ---------------------------------------------------------" << std::endl;
         }
 		//----------------------------------------------------------
 		// about vdw, jiyy add vdwd3 and linpz add vdwd2
@@ -141,17 +145,20 @@ void Run_MD_LCAO::opt_ions(void)
         //xiaohui add 2014-07-07, for second-order extrapolation
 		CE.update_all_pos(GlobalC::ucell);
 
+        this->callInteraction_LCAO(GlobalC::ucell.nat, force, stress);
+        double potential = GlobalC::en.etot/2;
+
 		if(mdtype==1||mdtype==2)   
 		{
-			mdb.runNVT(istep);
+			mdb.runNVT(istep, potential, force, stress);
 		}
 		else if(mdtype==0)  
 		{
-			mdb.runNVE(istep);
+			mdb.runNVE(istep, potential, force, stress);
 		}
         else if(mdtype==-1)
         {
-            stop = mdb.runFIRE(istep);
+            stop = mdb.runFIRE(istep, potential, force, stress);
         }
         else
         {
@@ -160,8 +167,8 @@ void Run_MD_LCAO::opt_ions(void)
 
         if(GlobalC::pot.out_potential == 2)
         {
-            stringstream ssp;
-            stringstream ssp_ave;
+            std::stringstream ssp;
+            std::stringstream ssp_ave;
             ssp << GlobalV::global_out_dir << "ElecStaticPot";
             ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
             GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
@@ -193,21 +200,21 @@ void Run_MD_LCAO::opt_ions(void)
         {
             double etime_min = difftime(eend, estart)/60.0;
             double ftime_min = difftime(fend, fstart)/60.0;
-            stringstream ss;
+            std::stringstream ss;
             ss << GlobalV::MOVE_IONS << istep;
 
-            cout << setiosflags(ios::scientific)
-            << " " << setw(7) << ss.str()
-            << setw(5) << ELEC_scf::iter
-            << setw(18) << setprecision(6) << GlobalC::en.etot * Ry_to_eV;
+            std::cout << std::setiosflags(ios::scientific)
+            << " " << std::setw(7) << ss.str()
+            << std::setw(5) << ELEC_scf::iter
+            << std::setw(18) << std::setprecision(6) << GlobalC::en.etot * Ry_to_eV;
 
-            cout << setprecision(2) << setiosflags(ios::scientific)
-            << setw(10) << IMM.get_ediff() * Ry_to_eV * 1000
-            << setw(10) << IMM.get_largest_grad() * Ry_to_eV / BOHR_TO_A;
+            std::cout << std::setprecision(2) << std::setiosflags(ios::scientific)
+            << std::setw(10) << IMM.get_ediff() * Ry_to_eV * 1000
+            << std::setw(10) << IMM.get_largest_grad() * Ry_to_eV / BOHR_TO_A;
 
-            cout << resetiosflags(ios::scientific)
-            << setprecision(2) << setw(10) << etime_min + ftime_min;
-            cout << endl;
+            std::cout << std::resetiosflags(ios::scientific)
+            << std::setprecision(2) << std::setw(10) << etime_min + ftime_min;
+            std::cout << std::endl;
         }
 
         ++istep;
@@ -304,10 +311,36 @@ void Run_MD_LCAO::final_scf(void)
 	ELEC_scf es;
 	es.scf(0);
 
-    GlobalV::ofs_running << "\n\n --------------------------------------------" << endl;
-    GlobalV::ofs_running << setprecision(16);
-    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << endl; 
-    GlobalV::ofs_running << " --------------------------------------------\n\n" << endl;
+    GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
+    GlobalV::ofs_running << std::setprecision(16);
+    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl; 
+    GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
     return;
+}
+
+void Run_MD_LCAO::callInteraction_LCAO(const int& numIon, Vector3<double>* force, matrix& stress_lcao)
+{
+//to call the force of each atom
+	matrix fcs;//temp force matrix
+	Force_Stress_LCAO FSL;
+	FSL.allocate (); 
+	FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS, GlobalV::TEST_FORCE, GlobalV::TEST_STRESS, fcs, stress_lcao);
+	for(int ion=0;ion<numIon;ion++){
+		force[ion].x =fcs(ion, 0)/2.0;
+		force[ion].y =fcs(ion, 1)/2.0;
+		force[ion].z =fcs(ion, 2)/2.0;
+	}
+
+#ifdef __MPI //2015-10-01, xiaohui
+	atom_arrange::delete_vector(
+		GlobalV::ofs_running, 
+		GlobalV::SEARCH_PBC, 
+		GlobalC::GridD, 
+		GlobalC::ucell, 
+		GlobalV::SEARCH_RADIUS, 
+		GlobalV::test_atom_input);
+#endif //2015-10-01, xiaohui
+
+	return;
 }

@@ -81,15 +81,15 @@ private:
 
 
 	ComplexMatrix vkb;	// all beta functions in reciprocal space
-	complex<double> ***vkb1_alpha;
-	complex<double> ***vkb_alpha;
+	std::complex<double> ***vkb1_alpha;
+	std::complex<double> ***vkb_alpha;
 	
 	// other variables
-	complex<double> Cal_C(int alpha, int lu, int mu, int L, int M);
+	std::complex<double> Cal_C(int alpha, int lu, int mu, int L, int M);
 
 	double CG(int l1, int m1, int l2, int m2, int L, int M);
 
-	void print_vnl(ofstream &ofs);
+	void print_vnl(std::ofstream &ofs);
 	#ifdef __LCAO
 	ORB_gaunt_table MGT;
 	#endif

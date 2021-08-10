@@ -5,6 +5,6 @@
 #include "pdiag_common.h"
 
 void pzhtrsm(char isuplo,int b_n,MPI_Comm comm_2D,int NB,int N_A,
-	    complex<double> *A,complex<double> *B,LocalMatrix loc_A,LocalMatrix loc_B);
+	    std::complex<double> *A,std::complex<double> *B,LocalMatrix loc_A,LocalMatrix loc_B);
 
 #endif

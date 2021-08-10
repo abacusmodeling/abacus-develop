@@ -12,7 +12,7 @@ void IState_Charge::begin(void)
 {
 	TITLE("IState_Charge","begin");
 
-	cout << " Perform |psi(i)|^2 for selected bands." << endl;
+	std::cout << " Perform |psi(i)|^2 for selected bands." << std::endl;
 
 	if(!GlobalV::GAMMA_ONLY_LOCAL)
 	{
@@ -40,25 +40,25 @@ void IState_Charge::begin(void)
 
 	// (1.2) read in LOWF_GAMMA.dat
 	OUT(GlobalV::ofs_running,"GlobalC::LOWF.allocate_flag",GlobalC::LOWF.get_allocate_flag());	
-	cout << " number of electrons = " << GlobalC::CHR.nelec << endl;
+	std::cout << " number of electrons = " << GlobalC::CHR.nelec << std::endl;
 
 	// mohan update 2011-03-21
 	// if ucell is odd, it's correct,
 	// if ucell is even, it's also correct.
 	// +1.0e-8 in case like (2.999999999+1)/2
 	fermi_band = static_cast<int>( (GlobalC::CHR.nelec+1)/2 + 1.0e-8 ) ;
-	cout << " number of occupied bands = " << fermi_band << endl;
+	std::cout << " number of occupied bands = " << fermi_band << std::endl;
 
 	if(mode == 1)
 	{
 		bands_below = GlobalV::NBANDS_ISTATE;
 		bands_above = GlobalV::NBANDS_ISTATE;
 
-		cout << " plot band decomposed charge density below fermi surface with " 
-			<< bands_below << " bands." << endl;
+		std::cout << " plot band decomposed charge density below fermi surface with " 
+			<< bands_below << " bands." << std::endl;
 
-		cout << " plot band decomposed charge density above fermi surface with " 
-			<< bands_above << " bands." << endl;
+		std::cout << " plot band decomposed charge density above fermi surface with " 
+			<< bands_above << " bands." << std::endl;
 
 		for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
@@ -74,12 +74,12 @@ void IState_Charge::begin(void)
 	else if(mode == 2)
 	{
 		bool stop = false;
-		stringstream ss;
+		std::stringstream ss;
 		ss << GlobalV::global_out_dir << "istate.info";
-		cout << " Open the file : " << ss.str() << endl; 
+		std::cout << " Open the file : " << ss.str() << std::endl; 
 		if(GlobalV::MY_RANK==0)
 		{
-			ifstream ifs(ss.str().c_str());
+			std::ifstream ifs(ss.str().c_str());
 			if(!ifs)
 			{
 				stop = true;
@@ -100,7 +100,7 @@ void IState_Charge::begin(void)
 #endif
 		if(stop)
 		{
-			GlobalV::ofs_warning << " Can't find the file : " << ss.str() << endl;
+			GlobalV::ofs_warning << " Can't find the file : " << ss.str() << std::endl;
 			WARNING_QUIT("IState_Charge::begin","can't find the istate file.");
 		}
 	}
@@ -109,7 +109,7 @@ void IState_Charge::begin(void)
 	{
 		if(bands_picked[ib])
 		{
-			cout << " Perform band decomposed charge density for band " << ib+1 << endl;
+			std::cout << " Perform band decomposed charge density for band " << ib+1 << std::endl;
 			// (1)
 			// This has been done once in LOOP_ions.
 			// but here we need to done for each band.
@@ -129,8 +129,8 @@ void IState_Charge::begin(void)
 			// band.
    			GlobalC::UHM.GG.cal_rho(GlobalC::LOC.DM);
 			GlobalC::CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09
-			stringstream ss;
-			stringstream ss1;
+			std::stringstream ss;
+			std::stringstream ss1;
 			ss << GlobalV::global_out_dir << "BAND" << ib + 1 << "_CHG";
 			// 0 means definitely output charge density.
 			for(int is=0; is<GlobalV::NSPIN; is++)
@@ -227,11 +227,11 @@ void IState_Charge::idmatrix(const int &ib)
 				GlobalC::LOC.wfc_dm_2d.dm_gamma[is].c, &one_int, &one_int, GlobalC::ParaO.desc);
 		}
 
-		cout << " finished calc dm_2d : " << endl;
+		std::cout << " finished calc dm_2d : " << std::endl;
 
 		GlobalC::LOC.cal_dk_gamma_from_2D_pub();
 		
-		cout << " finished convert : " << endl;
+		std::cout << " finished convert : " << std::endl;
 
 }
 

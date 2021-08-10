@@ -24,8 +24,8 @@ public:
         const int n_band,
         const int m,
         const ComplexMatrix &psi,
-        complex<double>* psi_m,
-        complex<double>* spsi);
+        std::complex<double>* psi_m,
+        std::complex<double>* spsi);
 
     static void diag_zhegvx(
         const int& n,
@@ -63,10 +63,10 @@ private:
         const int* unconv,
         const double* precondition,
         const double* en,
-        complex<double>* hpsi,
-        complex<double>* spsi,
-        complex<double>* ppsi,
-        complex<double>* respsi);
+        std::complex<double>* hpsi,
+        std::complex<double>* spsi,
+        std::complex<double>* ppsi,
+        std::complex<double>* respsi);
 
     void cal_elem(
         const int& npw,
@@ -100,7 +100,7 @@ private:
         const ComplexMatrix &hp,
         const ComplexMatrix &basis,
         const double* en,
-        complex<double>* respsi);
+        std::complex<double>* respsi);
 
 };
 

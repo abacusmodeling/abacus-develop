@@ -34,6 +34,7 @@ bool	DFT_META = 0;
 int 	NSPIN = 1; // LDA
 bool	TWO_EFERMI = 0; // two fermi energy, exist only magnetization is fixed.
 int 	CURRENT_SPIN = 0;
+int 	CURRENT_K = 0;
 int		FORCE = 0;// if force >1, means do the grid integration 'force' times.
 double	FORCE_THR = 1.0e-3;
 bool	STRESS = false;
@@ -74,6 +75,9 @@ bool GAMMA_ONLY_PW = 0; // mohan add 2012-06-05
 int T_IN_H = 1; // mohan add 2010-11-28
 int VL_IN_H = 1;
 int VNL_IN_H = 1;
+int VH_IN_H = 1;
+int VXC_IN_H = 1;
+int VION_IN_H = 1;
 int ZEEMAN_IN_H = 1;
 double  STRESS_THR = 1.0e-2; //LiuXh add 20180515
 

@@ -118,7 +118,7 @@ void Ions_Move_SD::cal_tradius_sd(void)const
 	}
 	if(GlobalV::OUT_LEVEL=="ie")
 	{
-		cout << " SD RADIUS (Bohr)     : " << trust_radius << endl;
+		std::cout << " SD RADIUS (Bohr)     : " << trust_radius << std::endl;
 	}
 	return;
 }

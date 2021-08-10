@@ -19,7 +19,7 @@ static void matrix_mutiply_test()
 
 	C = A * B;
 
-	cout<<C<<endl;
+	std::cout<<C<<std::endl;
 }
 
 /* output:

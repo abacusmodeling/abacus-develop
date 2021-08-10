@@ -27,6 +27,11 @@ std::tuple<double,double,matrix> Potential_Libxc::v_xc(
     double vtxc = 0.0;
 	matrix v(GlobalV::NSPIN,GlobalC::pw.nrxx);
 
+	if(GlobalV::VXC_IN_H == 0 )
+	{
+    	timer::tick("Potential_Libxc","v_xc");
+		return std::make_tuple( etxc, vtxc, std::move(v) );
+	}
 	//----------------------------------------------------------
 	// xc_func_type is defined in Libxc package
 	// to understand the usage of xc_func_type,
@@ -200,7 +205,7 @@ std::tuple<double,double,matrix> Potential_Libxc::v_xc(
 				process_vsigma();
 				break;
 			default:
-				throw domain_error("func.info->family ="+TO_STRING(func.info->family)
+				throw std::domain_error("func.info->family ="+TO_STRING(func.info->family)
 					+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 				break;
 		}
@@ -282,9 +287,13 @@ std::vector<xc_func_type> Potential_Libxc::init_func()
 	{
 		add_func( XC_GGA_X_PBE );
 	}
+	else if(GlobalC::xcf.igcx_now == 13 ) //SCAN_X
+	{
+		add_func(263);
+	}
 	else
 	{
-		throw domain_error("iexch="+TO_STRING(GlobalC::xcf.iexch_now)+", igcx="+TO_STRING(GlobalC::xcf.igcx_now)
+		throw std::domain_error("iexch="+TO_STRING(GlobalC::xcf.iexch_now)+", igcx="+TO_STRING(GlobalC::xcf.igcx_now)
 			+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 	}
 
@@ -299,9 +308,13 @@ std::vector<xc_func_type> Potential_Libxc::init_func()
 	{
 		add_func( XC_GGA_C_PBE );
 	}
+	else if (GlobalC::xcf.igcc_now == 9)
+	{
+		add_func( 267 );
+	}
 	else
 	{
-		throw domain_error("icorr="+TO_STRING(GlobalC::xcf.icorr_now)+", igcc="+TO_STRING(GlobalC::xcf.igcc_now)
+		throw std::domain_error("icorr="+TO_STRING(GlobalC::xcf.icorr_now)+", igcc="+TO_STRING(GlobalC::xcf.igcc_now)
 			+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 	}
 
@@ -426,12 +439,13 @@ Potential_Libxc::cal_input(
 				break;
 			case XC_FAMILY_GGA:
 			case XC_FAMILY_HYB_GGA:
+			case XC_FAMILY_MGGA:
 				cal_rho();
 				cal_gdr();
 				cal_sigma();
 				break;
 			default:
-				throw domain_error("func.info->family ="+TO_STRING(func.info->family)
+				throw std::domain_error("func.info->family ="+TO_STRING(func.info->family)
 					+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 				break;
 		}

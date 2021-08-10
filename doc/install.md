@@ -4,6 +4,7 @@
   - [Prerequisites](#prerequisites)
   - [Build and install ABACUS with CMake](#build-and-install-abacus-with-cmake)
   - [Build ABACUS with make](#build-abacus-with-make)
+    - [Link LIBXC](#link-libxc)
 - [Structure of the package](#structure-of-the-package)
   - [Structure of source code](#structure-of-source-code)
   [back to main page](../README.md)
@@ -140,6 +141,30 @@ After the compilation finishes without error messages (except perhaps for some w
 
 [back to top](#download-and-install)
 
+#### Link LIBXC
+
+The program compiled using the above instructions do not link with LIBXC and use exchange-correlation functionals as written in the ABACUS program. However, for some functionals (such as HSE hybrid functional), LIBXC is required.
+
+To compile ABACUS with LIBXC, modifications should be made in three files:
+
+First of all, in the file `Makefile.vars`, apart from the variables above, further provide the location of LIBXC:
+```bash
+LIBXC_DIR =
+```
+
+Then, in the file 'Makefile.system', add "${LIBXC_LIB}" to the `LIBS` flag, for example:
+```
+LIBS = -lifcore -lm -lpthread ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB} ${LIBXC_LIB}
+```
+
+Finally, in `Makefile`, add "-DUSE_LIBXC" to the `HONG` flag, for example:
+```
+HONG_MPI_SELINV_20210523 = -D__FP ${HONG_FFTW} ${HONG_LAPACK} -D__LCAO -D__MPI -D__OPENMP -D__SELINV -DMETIS -DEXX_DM=3 -DEXX_H_COMM=2 -DTEST_EXX_LCAO=0 -DTEST_EXX_RADIAL=1 -DUSE_CEREAL_SERIALIZATION -D__EXX -DUSE_LIBXC
+HONG=${HONG_MPI_SELINV_20210523}
+```
+
+[back to top](#download-and-install)
+
 ## Structure of the package
 
 Under the ABACUS directory, there are the following subdirectories:
@@ -172,7 +197,7 @@ The source directory further contains the following folders, where the source fi
 - module_base
 - module_cell
 - module_grid
-- module_grid
+- module_md
 - module_neighbor
 - module_orbital
 - obj

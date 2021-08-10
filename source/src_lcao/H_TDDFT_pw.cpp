@@ -25,7 +25,7 @@ void Potential::set_vrs_tddft(const int istep)
             {
                 this->vr_eff(is, i) = this->vltot[i] + this->vr(is, i);
             }
-            cout << "vext = 0! " << endl;
+            std::cout << "vext = 0! " << std::endl;
         }
         else
         {
@@ -137,11 +137,11 @@ void Potential::set_vrs_tddft(const int istep)
 				
 					this->vr_eff(is,ir) = this->vltot[ir] + this->vr(is, ir) + this->vext[ir];
 				
-                //cout << "x: " << k <<"	" << "y: " << j <<"	"<< "z: "<< i <<"	"<< "ir: " << ir << endl;
-                //cout << "vext: " << this->vext[ir] << endl;
-                //cout << "vrs: " << vrs(is,ir) <<endl;
+                //std::cout << "x: " << k <<"	" << "y: " << j <<"	"<< "z: "<< i <<"	"<< "ir: " << ir << std::endl;
+                //std::cout << "vext: " << this->vext[ir] << std::endl;
+                //std::cout << "vrs: " << vrs(is,ir) <<std::endl;
             }
-            cout << "vext exists" << endl;
+            std::cout << "vext exists" << std::endl;
 
             delete[] this->vextold;
             delete[] this->vext;

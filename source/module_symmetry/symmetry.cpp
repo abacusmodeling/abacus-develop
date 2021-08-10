@@ -3,6 +3,8 @@
 //#include "../src_pw/global.h"
 //#include "symm_other.h"
 
+namespace ModuleSymmetry
+{
 Symmetry::Symmetry()
 {
     this->epsilon = 1e-6;
@@ -18,23 +20,23 @@ Symmetry::~Symmetry()
 bool Symmetry::symm_flag=false;
 
 
-void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, ofstream &ofs_running)
+void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, std::ofstream &ofs_running)
 {
     if (available == false) return;
     TITLE("Symmetry","init");
 	timer::tick("Symmetry","analy_sys");
 
 	ofs_running << "\n\n\n\n";
-	ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
-	ofs_running << " |                                                                    |" << endl;
-	ofs_running << " | Doing symmetry analysis:                                           |" << endl;
-	ofs_running << " | We calculate the norm of 3 vectors and the angles between them,    |" << endl;
-	ofs_running << " | the type of Bravais lattice is given. We can judge if the unticell |" << endl;
-	ofs_running << " | is a primitive cell. Finally we give the point group operation for |" << endl;
-	ofs_running << " | this unitcell. We we use the point group operations to do symmetry |" << endl;
-	ofs_running << " | analysis on given k-point mesh and the charge density.             |" << endl;
-	ofs_running << " |                                                                    |" << endl;
-	ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+	ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
+	ofs_running << " |                                                                    |" << std::endl;
+	ofs_running << " | Doing symmetry analysis:                                           |" << std::endl;
+	ofs_running << " | We calculate the norm of 3 vectors and the angles between them,    |" << std::endl;
+	ofs_running << " | the type of Bravais lattice is given. We can judge if the unticell |" << std::endl;
+	ofs_running << " | is a primitive cell. Finally we give the point group operation for |" << std::endl;
+	ofs_running << " | this unitcell. We we use the point group operations to do symmetry |" << std::endl;
+	ofs_running << " | analysis on given k-point mesh and the charge density.             |" << std::endl;
+	ofs_running << " |                                                                    |" << std::endl;
+	ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
 	ofs_running << "\n\n\n\n";
 
 
@@ -69,9 +71,9 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, ofstre
 	latvec1.e11 = a1.x; latvec1.e12 = a1.y; latvec1.e13 = a1.z;
 	latvec1.e21 = a2.x; latvec1.e22 = a2.y; latvec1.e23 = a2.z;
 	latvec1.e31 = a3.x; latvec1.e32 = a3.y; latvec1.e33 = a3.z;
-//  cout << "a1 = " << a1.x << " " << a1.y << " " << a1.z <<endl;
-//  cout << "a1 = " << a2.x << " " << a2.y << " " << a2.z <<endl;
-//  cout << "a1 = " << a3.x << " " << a3.y << " " << a3.z <<endl;
+//  std::cout << "a1 = " << a1.x << " " << a1.y << " " << a1.z <<std::endl;
+//  std::cout << "a1 = " << a2.x << " " << a2.y << " " << a2.z <<std::endl;
+//  std::cout << "a1 = " << a3.x << " " << a3.y << " " << a3.z <<std::endl;
 
 	out.printM3(ofs_running,"LATTICE VECTORS: (CARTESIAN COORDINATE: IN UNIT OF A0)",latvec1);
 
@@ -86,7 +88,7 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, ofstre
         if (it > 0) {
             istart[it] = istart[it-1] + na[it-1];
         }
-        //cout << "\n istart = " << istart[it];
+        //std::cout << "\n istart = " << istart[it];
         if (na[it] < na[itmin_type])
         {
             this->itmin_type = it;
@@ -99,7 +101,7 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, ofstre
             dirpos[3*count + 0] = atom->taud[ia].x;
             dirpos[3*count + 1] = atom->taud[ia].y;
             dirpos[3*count + 2] = atom->taud[ia].z;
-//            cout << " atom.taud = " << atom->taud[ia].x << " "<<atom->taud[ia].y<<" "<<atom->taud[ia].z<<endl;
+//            std::cout << " atom.taud = " << atom->taud[ia].x << " "<<atom->taud[ia].y<<" "<<atom->taud[ia].z<<std::endl;
             ++count;
         }
     }
@@ -110,9 +112,9 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, ofstre
 
     // find the lattice type accordiing to lattice vectors.
     this->lattice_type(a1,a2,a3,ibrav,cel_const,ilattname, ucell);
-  //      cout << "a1 = " << a1.x << " " << a1.y << " " << a1.z <<endl;
-  //      cout << "a1 = " << a2.x << " " << a2.y << " " << a2.z <<endl;
-  //      cout << "a1 = " << a3.x << " " << a3.y << " " << a3.z <<endl;
+  //      std::cout << "a1 = " << a1.x << " " << a1.y << " " << a1.z <<std::endl;
+  //      std::cout << "a1 = " << a2.x << " " << a2.y << " " << a2.z <<std::endl;
+  //      std::cout << "a1 = " << a3.x << " " << a3.y << " " << a3.z <<std::endl;
 
 
 	// the atom position coordinates are changed to 
@@ -136,15 +138,15 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, ofstre
 					new_lat.e31, new_lat.e32, new_lat.e33,
 					newpos[3*iat],newpos[3*iat+1],newpos[3*iat+2]);
 
-    	//  cout << " newpos_before = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << endl;
-		//	GlobalV::ofs_running << " newpos_before = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << endl; 
+    	//  std::cout << " newpos_before = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << std::endl;
+		//	GlobalV::ofs_running << " newpos_before = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << std::endl; 
 			for(int k=0; k<3; ++k)
 			{
 				this->check_translation( newpos[iat*3+k], -floor(newpos[iat*3+k]));
                          	this->check_boundary( this->newpos[iat*3+k] );
 			}
-      	// cout << " newpos = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << endl;
-		// GlobalV::ofs_running << " newpos = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << endl; 
+      	// std::cout << " newpos = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << std::endl;
+		// GlobalV::ofs_running << " newpos = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << std::endl; 
 			++iat;
 		}
 	}
@@ -155,7 +157,7 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, ofstre
 	this->change_lattice();
     //this->pricell();         // pengfei Li 2018-05-14 
          //for( iat =0 ; iat < ucell.nat ; iat++)   
-//         cout << " newpos_now = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << endl;
+//         std::cout << " newpos_now = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << std::endl;
 	OUT(ofs_running,"ibrav",ibrav);
     this->setgroup(this->symop, this->nop, this->ibrav);
     //now select all symmetry operations which reproduce the lattice
@@ -203,9 +205,9 @@ int Symmetry::standard_lat(
     const double aa = a * a;
     const double bb = b * b;
     const double cc = c * c;
-    const double ab = a * b; //vector: a * b * cos(alpha)
-    const double bc = b * c; //vector: b * c * cos(beta)
-    const double ca = c * a; //vector: c * a * cos(gamma)
+    const double ab = a * b; //std::vector: a * b * cos(alpha)
+    const double bc = b * c; //std::vector: b * c * cos(beta)
+    const double ca = c * a; //std::vector: c * a * cos(gamma)
     double norm_a = a.norm();
     double norm_b = b.norm();
     double norm_c = c.norm();
@@ -238,12 +240,12 @@ int Symmetry::standard_lat(
     }
 
 	
-//	cout << " a=" << norm_a << endl; 
-//	cout << " b=" << norm_b << endl; 
-//	cout << " c=" << norm_c << endl; 
-//	cout << " alpha=" << alpha << endl;
-//	cout << " beta=" << beta << endl;
-//	cout << " gamma=" << gamma << endl;
+//	std::cout << " a=" << norm_a << std::endl; 
+//	std::cout << " b=" << norm_b << std::endl; 
+//	std::cout << " c=" << norm_c << std::endl; 
+//	std::cout << " alpha=" << alpha << std::endl;
+//	std::cout << " beta=" << beta << std::endl;
+//	std::cout << " gamma=" << gamma << std::endl;
      
 
     Symm_Other::right_hand_sense(a, b, c);
@@ -489,14 +491,14 @@ void Symmetry::lattice_type(
     Vector3<double> &v3,
     int &brav,
     double *cel_const,
-    string &bravname,
+    std::string &bravname,
     const UnitCell_pseudo &ucell
 )
 {
     TITLE("Symmetry","lattice_type");
-//      cout << "v1 = " << v1.x << " " << v1.y << " " << v1.z <<endl;
-//      cout << "v2 = " << v2.x << " " << v2.y << " " << v2.z <<endl;
-//      cout << "v3 = " << v3.x << " " << v3.y << " " << v3.z <<endl;
+//      std::cout << "v1 = " << v1.x << " " << v1.y << " " << v1.z <<std::endl;
+//      std::cout << "v2 = " << v2.x << " " << v2.y << " " << v2.z <<std::endl;
+//      std::cout << "v3 = " << v3.x << " " << v3.y << " " << v3.z <<std::endl;
 
 	//----------------------------------------------
 	// (1) adjustement of the basis to right hand 
@@ -504,9 +506,9 @@ void Symmetry::lattice_type(
 	// vectors if necessary
 	//----------------------------------------------
     const bool right = Symm_Other::right_hand_sense(v1, v2, v3);
-  //    cout << "v1 = " << v1.x << " " << v1.y << " " << v1.z <<endl;
-  //    cout << "v2 = " << v2.x << " " << v2.y << " " << v2.z <<endl;
-  //    cout << "v3 = " << v3.x << " " << v3.y << " " << v3.z <<endl;
+  //    std::cout << "v1 = " << v1.x << " " << v1.y << " " << v1.z <<std::endl;
+  //    std::cout << "v2 = " << v2.x << " " << v2.y << " " << v2.z <<std::endl;
+  //    std::cout << "v3 = " << v3.x << " " << v3.y << " " << v3.z <<std::endl;
 
 	OUT(GlobalV::ofs_running,"right hand lattice",right);
 
@@ -522,39 +524,39 @@ void Symmetry::lattice_type(
 	//--------------------------------------------
     double pre_const[6];
 	ZEROS(pre_const, 6);
-//    cout << "ATTION !!!!!!" <<endl;
-//        cout << "v1 = " << v1.x << " " << v1.y << " " << v1.z <<endl;
-//        cout << "v2 = " << v2.x << " " << v2.y << " " << v2.z <<endl;
-//        cout << "v3 = " << v3.x << " " << v3.y << " " << v3.z <<endl;
+//    std::cout << "ATTION !!!!!!" <<std::endl;
+//        std::cout << "v1 = " << v1.x << " " << v1.y << " " << v1.z <<std::endl;
+//        std::cout << "v2 = " << v2.x << " " << v2.y << " " << v2.z <<std::endl;
+//        std::cout << "v3 = " << v3.x << " " << v3.y << " " << v3.z <<std::endl;
 
     int pre_brav = standard_lat(v1, v2, v3, cel_const);
 //    for ( int i = 0; i < 6; ++i)
 //    {
-//        cout << "cel = "<<cel_const[i]<<" ";
+//        std::cout << "cel = "<<cel_const[i]<<" ";
 //    }
-//    cout << endl;
+//    std::cout << std::endl;
 
-//  cout << "pre_brav = " << pre_brav <<endl;
+//  std::cout << "pre_brav = " << pre_brav <<std::endl;
 
     for ( int i = 0; i < 6; ++i)
     {
         pre_const[i] = cel_const[i];
     }
-//        cout << "v1 = " << v1.x << " " << v1.y << " " << v1.z <<endl;
-//        cout << "v2 = " << v2.x << " " << v2.y << " " << v2.z <<endl;
-//        cout << "v3 = " << v3.x << " " << v3.y << " " << v3.z <<endl;
+//        std::cout << "v1 = " << v1.x << " " << v1.y << " " << v1.z <<std::endl;
+//        std::cout << "v2 = " << v2.x << " " << v2.y << " " << v2.z <<std::endl;
+//        std::cout << "v3 = " << v3.x << " " << v3.y << " " << v3.z <<std::endl;
 
 
     //find the shortest basis vectors of the lattice
 //    shortest_vector(v1, v2, v3);
-//        cout << "a1 = " << v1.x << " " << v1.y << " " << v1.z <<endl;
-//        cout << "a1 = " << v2.x << " " << v2.y << " " << v2.z <<endl;
-//        cout << "a1 = " << v3.x << " " << v3.y << " " << v3.z <<endl;
+//        std::cout << "a1 = " << v1.x << " " << v1.y << " " << v1.z <<std::endl;
+//        std::cout << "a1 = " << v2.x << " " << v2.y << " " << v2.z <<std::endl;
+//        std::cout << "a1 = " << v3.x << " " << v3.y << " " << v3.z <<std::endl;
 
     Symm_Other::right_hand_sense(v1, v2, v3);
-//        cout << "a1 = " << v1.x << " " << v1.y << " " << v1.z <<endl;
-//        cout << "a1 = " << v2.x << " " << v2.y << " " << v2.z <<endl;
-//        cout << "a1 = " << v3.x << " " << v3.y << " " << v3.z <<endl;
+//        std::cout << "a1 = " << v1.x << " " << v1.y << " " << v1.z <<std::endl;
+//        std::cout << "a1 = " << v2.x << " " << v2.y << " " << v2.z <<std::endl;
+//        std::cout << "a1 = " << v3.x << " " << v3.y << " " << v3.z <<std::endl;
 
     int temp_brav = 15;
     double temp_const[6];
@@ -604,12 +606,12 @@ void Symmetry::lattice_type(
 									        r3.x = n31 * v1.x + n32 * v2.x + n33 * v3.x;
                                             r3.y = n31 * v1.y + n32 * v2.y + n33 * v3.y;
                                             r3.z = n31 * v1.z + n32 * v2.z + n33 * v3.z;
-                                            //cout << "mat = " << n11 <<" " <<n12<<" "<<n13<<" "<<n21<<" "<<n22<<" "<<n23<<" "<<n31<<" "<<n32<<" "<<n33<<endl;
+                                            //std::cout << "mat = " << n11 <<" " <<n12<<" "<<n13<<" "<<n21<<" "<<n22<<" "<<n23<<" "<<n31<<" "<<n32<<" "<<n33<<std::endl;
 											
                                             brav = standard_lat(r1, r2, r3, cel_const);
 //                                            if(brav == 8)
 //                                            {
-//                                               cout << "mat = " << n11 <<" " <<n12<<" "<<n13<<" "<<n21<<" "<<n22<<" "<<n23<<" "<<n31<<" "<<n32<<" "<<n33<<endl;
+//                                               std::cout << "mat = " << n11 <<" " <<n12<<" "<<n13<<" "<<n21<<" "<<n22<<" "<<n23<<" "<<n31<<" "<<n32<<" "<<n33<<std::endl;
 //                                            }
 
 /*
@@ -617,24 +619,24 @@ void Symmetry::lattice_type(
 												&& n31==-2 && n32==-2 && n33==-1)
 											{
 												++nif;
-												GlobalV::ofs_running << " " << endl;
-												GlobalV::ofs_running << setw(8) << nif << setw(5) << n11 << setw(5) << n12
-													<< setw(5) << n13 << setw(5) << n21 << setw(5) << n22
-													<< setw(5) << n23 << setw(5) << n31 << setw(5) << n32
-													<< setw(5) << n33 << setw(5) << ibrav << endl;
-												GlobalV::ofs_running << " r1: " << r1.x << " " << r1.y << " " << r1.z << endl;
-												GlobalV::ofs_running << " r2: " << r2.x << " " << r2.y << " " << r2.z << endl;
-												GlobalV::ofs_running << " r3: " << r3.x << " " << r3.y << " " << r3.z << endl;
-												GlobalV::ofs_running << " cel_const[3]=" << cel_const[3] << endl;
-												GlobalV::ofs_running << " cel_const[4]=" << cel_const[4] << endl;
-												GlobalV::ofs_running << " cel_const[5]=" << cel_const[5] << endl;
+												GlobalV::ofs_running << " " << std::endl;
+												GlobalV::ofs_running << std::setw(8) << nif << std::setw(5) << n11 << std::setw(5) << n12
+													<< std::setw(5) << n13 << std::setw(5) << n21 << std::setw(5) << n22
+													<< std::setw(5) << n23 << std::setw(5) << n31 << std::setw(5) << n32
+													<< std::setw(5) << n33 << std::setw(5) << ibrav << std::endl;
+												GlobalV::ofs_running << " r1: " << r1.x << " " << r1.y << " " << r1.z << std::endl;
+												GlobalV::ofs_running << " r2: " << r2.x << " " << r2.y << " " << r2.z << std::endl;
+												GlobalV::ofs_running << " r3: " << r3.x << " " << r3.y << " " << r3.z << std::endl;
+												GlobalV::ofs_running << " cel_const[3]=" << cel_const[3] << std::endl;
+												GlobalV::ofs_running << " cel_const[4]=" << cel_const[4] << std::endl;
+												GlobalV::ofs_running << " cel_const[5]=" << cel_const[5] << std::endl;
 											}
 											*/
 //											if(brav == 14)
 //											{
-//												GlobalV::ofs_running << " ABS(CELLDM(4))=" << fabs(cel_const[3]) << endl;
-//												GlobalV::ofs_running << " ABS(CELLDM(5))=" << fabs(cel_const[4]) << endl;
-//												GlobalV::ofs_running << " ABS(CELLDM(6))=" << fabs(cel_const[5]) << endl;
+//												GlobalV::ofs_running << " ABS(CELLDM(4))=" << fabs(cel_const[3]) << std::endl;
+//												GlobalV::ofs_running << " ABS(CELLDM(5))=" << fabs(cel_const[4]) << std::endl;
+//												GlobalV::ofs_running << " ABS(CELLDM(6))=" << fabs(cel_const[5]) << std::endl;
 //											}
 
                                             if ( brav < temp_brav || ( brav == temp_brav
@@ -644,21 +646,21 @@ void Symmetry::lattice_type(
                                                )
                                             {
 												/*
-												GlobalV::ofs_running << "\n IBRAV=" << brav << " ITYP=" << temp_brav << endl;
-												GlobalV::ofs_running << " ABS(CELLDM(4))=" << fabs(cel_const[3]) << endl;
-												GlobalV::ofs_running << " ABS(CELLDM(5))=" << fabs(cel_const[4]) << endl;
-												GlobalV::ofs_running << " ABS(CELLDM(6))=" << fabs(cel_const[5]) << endl;
-												GlobalV::ofs_running << " COS1=" << cos1 << endl;
-												GlobalV::ofs_running << " COS2=" << cos2 << endl;
-												GlobalV::ofs_running << " COS3=" << cos3 << endl;
+												GlobalV::ofs_running << "\n IBRAV=" << brav << " ITYP=" << temp_brav << std::endl;
+												GlobalV::ofs_running << " ABS(CELLDM(4))=" << fabs(cel_const[3]) << std::endl;
+												GlobalV::ofs_running << " ABS(CELLDM(5))=" << fabs(cel_const[4]) << std::endl;
+												GlobalV::ofs_running << " ABS(CELLDM(6))=" << fabs(cel_const[5]) << std::endl;
+												GlobalV::ofs_running << " COS1=" << cos1 << std::endl;
+												GlobalV::ofs_running << " COS2=" << cos2 << std::endl;
+												GlobalV::ofs_running << " COS3=" << cos3 << std::endl;
 												*/
 												/*
-												GlobalV::ofs_running << " r1: " << r1.x << " " << r1.y << " " << r1.z << endl;
-												GlobalV::ofs_running << " r2: " << r2.x << " " << r2.y << " " << r2.z << endl;
-												GlobalV::ofs_running << " r3: " << r3.x << " " << r3.y << " " << r3.z << endl;
+												GlobalV::ofs_running << " r1: " << r1.x << " " << r1.y << " " << r1.z << std::endl;
+												GlobalV::ofs_running << " r2: " << r2.x << " " << r2.y << " " << r2.z << std::endl;
+												GlobalV::ofs_running << " r3: " << r3.x << " " << r3.y << " " << r3.z << std::endl;
 												GlobalV::ofs_running << " N=" << n11 << " " << n12 << " " << n13 
 												<< " " << n21 << " " << n22 << " " << n23 
-												<< " " << n31 << " " << n32 << " " << n33 << endl; 
+												<< " " << n31 << " " << n32 << " " << n33 << std::endl; 
 												*/
 												//out.printM3("mat",mat);
                                                 temp_brav = brav;
@@ -685,19 +687,19 @@ void Symmetry::lattice_type(
             }
         }
     }
-//        cout << "a1 = " << v1.x << " " << v1.y << " " << v1.z <<endl;
-//        cout << "a1 = " << v2.x << " " << v2.y << " " << v2.z <<endl;
-//        cout << "a1 = " << v3.x << " " << v3.y << " " << v3.z <<endl;
+//        std::cout << "a1 = " << v1.x << " " << v1.y << " " << v1.z <<std::endl;
+//        std::cout << "a1 = " << v2.x << " " << v2.y << " " << v2.z <<std::endl;
+//        std::cout << "a1 = " << v3.x << " " << v3.y << " " << v3.z <<std::endl;
 
     //now, the highest symmetry of the combination of the shortest vectors has been found
     //then we compare it with the original symmetry
 	
-//	GlobalV::ofs_running << " w1" << endl;
-//	GlobalV::ofs_running << " " << setw(15) << w1.x << setw(15) << w1.y << setw(15) << w1.z << endl;
-//	GlobalV::ofs_running << " " << setw(15) << w2.x << setw(15) << w2.y << setw(15) << w2.z << endl;
-//	GlobalV::ofs_running << " " << setw(15) << w3.x << setw(15) << w3.y << setw(15) << w3.z << endl;
-//	GlobalV::ofs_running << " pre_brav=" << pre_brav << endl;
-//	GlobalV::ofs_running << " temp_brav=" << temp_brav << endl;
+//	GlobalV::ofs_running << " w1" << std::endl;
+//	GlobalV::ofs_running << " " << std::setw(15) << w1.x << std::setw(15) << w1.y << std::setw(15) << w1.z << std::endl;
+//	GlobalV::ofs_running << " " << std::setw(15) << w2.x << std::setw(15) << w2.y << std::setw(15) << w2.z << std::endl;
+//	GlobalV::ofs_running << " " << std::setw(15) << w3.x << std::setw(15) << w3.y << std::setw(15) << w3.z << std::endl;
+//	GlobalV::ofs_running << " pre_brav=" << pre_brav << std::endl;
+//	GlobalV::ofs_running << " temp_brav=" << temp_brav << std::endl;
 
     if ( temp_brav < pre_brav)
     {
@@ -711,9 +713,9 @@ void Symmetry::lattice_type(
         q2 = w2;
         q3 = w3;
         change = 1;
-        GlobalV::ofs_running <<endl;
-        GlobalV::ofs_running <<" !The lattice vectors have been changed (STRU_SIMPLE.cif)"<<endl;
-        GlobalV::ofs_running <<endl;
+        GlobalV::ofs_running <<std::endl;
+        GlobalV::ofs_running <<" !The lattice vectors have been changed (STRU_SIMPLE.cif)"<<std::endl;
+        GlobalV::ofs_running <<std::endl;
         int at=0;
         for(int it=0; it<ucell.ntype; ++it)
         {
@@ -727,30 +729,30 @@ void Symmetry::lattice_type(
                                         q3.x, q3.y, q3.z,
                                         newpos[3*at],newpos[3*at+1],newpos[3*at+2]);
 
-//                        cout << " newpos_before = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << endl;
-//                      GlobalV::ofs_running << " newpos_before = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << endl;
+//                        std::cout << " newpos_before = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << std::endl;
+//                      GlobalV::ofs_running << " newpos_before = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << std::endl;
                         for(int k=0; k<3; ++k)
                         {
                                 this->check_translation( newpos[at*3+k], -floor(newpos[at*3+k]));
                                 this->check_boundary( newpos[at*3+k] );
                         }
-//                        cout << " newpos = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << endl;
+//                        std::cout << " newpos = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << std::endl;
 
-//                      GlobalV::ofs_running << " newpos = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << endl;
+//                      GlobalV::ofs_running << " newpos = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << std::endl;
                         ++at;
                 }
         }       
-        stringstream ss;
+        std::stringstream ss;
         ss << GlobalV::global_out_dir << "STRU_SIMPLE.cif";
 
-        ofstream ofs( ss.str().c_str() );
-        ofs << "Lattice vector  : " << endl;
-        ofs << q1.x <<"   "<<q1.y<<"  "<<q1.z<< endl;
-        ofs << q2.x <<"   "<<q2.y<<"  "<<q2.z<< endl;
-        ofs << q3.x <<"   "<<q3.y<<"  "<<q3.z<< endl;
-        ofs << endl;
-        ofs << "Direct positions : " << " " << endl;
-        ofs << endl;
+        std::ofstream ofs( ss.str().c_str() );
+        ofs << "Lattice std::vector  : " << std::endl;
+        ofs << q1.x <<"   "<<q1.y<<"  "<<q1.z<< std::endl;
+        ofs << q2.x <<"   "<<q2.y<<"  "<<q2.z<< std::endl;
+        ofs << q3.x <<"   "<<q3.y<<"  "<<q3.z<< std::endl;
+        ofs << std::endl;
+        ofs << "Direct positions : " << " " << std::endl;
+        ofs << std::endl;
         at =0;
         
         for (int it=0; it<ucell.ntype; it++)
@@ -760,7 +762,7 @@ void Symmetry::lattice_type(
                  ofs << ucell.atoms[it].label
                  << " " << newpos[3*at]
                  << " " << newpos[3*at+1]
-                 << " " << newpos[3*at+2] << endl;
+                 << " " << newpos[3*at+2] << std::endl;
                  at++;
             }
         }
@@ -801,7 +803,7 @@ void Symmetry::lattice_type(
             v2 = s2;
             v3 = s3;
         	change=0;
-			GlobalV::ofs_running<<" The lattice vectors have been set back!"<<endl;
+			GlobalV::ofs_running<<" The lattice vectors have been set back!"<<std::endl;
         }
     }*/
     brav = pre_brav;
@@ -856,12 +858,12 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
             }
         }
         //order original atomic positions for current species
-        //cout << "\n -----------------------------------------";
-        //cout << "\nCarpos it=" << it << " na=" << na[it];
-        //cout << "\nBefore dirpos:" << endl;
+        //std::cout << "\n -----------------------------------------";
+        //std::cout << "\nCarpos it=" << it << " na=" << na[it];
+        //std::cout << "\nBefore dirpos:" << std::endl;
         //print_pos(dirpos+istart*3, na[it]);
         this->atom_ordering(&dirpos[istart[it]*3], na[it], index + istart[it]);
-        //cout << "\nAfter dirpos:" << endl;
+        //std::cout << "\nAfter dirpos:" << std::endl;
         //print_pos(dirpos+istart*3, na[it]);
     }
 
@@ -882,7 +884,7 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
         {
             pcel_const[k] = cel_const[k];
         }
-        GlobalV::ofs_running <<"\n The cell is a primitive cell." << endl;
+        GlobalV::ofs_running <<"\n The cell is a primitive cell." << std::endl;
         return;
     }
 
@@ -899,10 +901,10 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
     ptrans[8] = 1;
 
     //All difference vectors between the first atom and all other atoms
-    //of species ISMIN could be a translation vector that reproduces thelattice
+    //of species ISMIN could be a translation std::vector that reproduces thelattice
     //So test all possibilities:
 
-    //cout << "\n cartesian" << endl;
+    //std::cout << "\n cartesian" << std::endl;
     //print_pos(dirpos, nat);
 
     sptmin.x = dirpos[itmin_start*3];
@@ -910,15 +912,15 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
     sptmin.z = dirpos[itmin_start*3+2];
     for (int ia = itmin_start + 1; ia < itmin_start + na[itmin_type]; ia++)
     {
-        //	cout << "\n ia=" << ia;
-        //	cout << " dirpos:" << dirpos[ia*3] << " " << dirpos[ia*3+1] << " " << dirpos[ia*3+2];
-        //set up the current test vector "trans"
+        //	std::cout << "\n ia=" << ia;
+        //	std::cout << " dirpos:" << dirpos[ia*3] << " " << dirpos[ia*3+1] << " " << dirpos[ia*3+2];
+        //set up the current test std::vector "trans"
         //and "trans" could possibly contain trivial translations:
         trans[0] = this->get_translation_vector(dirpos[ia*3+0], sptmin.x);
         trans[1] = this->get_translation_vector(dirpos[ia*3+1], sptmin.y);
         trans[2] = this->get_translation_vector(dirpos[ia*3+2], sptmin.z);
 
-        //	cout << "\n Trans vector = " << trans[0] << " " << trans[1] << " " << trans[2];
+        //	std::cout << "\n Trans std::vector = " << trans[0] << " " << trans[1] << " " << trans[2];
 
         //translate all the atomic coordinates by "trans"
         for (int it = 0; it < ntype; it++)
@@ -932,11 +934,11 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
                 }
             }
             //order translated atomic positions for current species
-            //    cout << "\n rotpos it=" << it << " na=" << na[it];
-            //   cout << "\n before rotpos:" << endl;
+            //    std::cout << "\n rotpos it=" << it << " na=" << na[it];
+            //   std::cout << "\n before rotpos:" << std::endl;
             // print_pos(rotpos+istart[it]*3, na[it]);
             this->atom_ordering(&rotpos[istart[it]*3], na[it], index+istart[it]);
-            //    cout << "\n after rotpos:" << endl;
+            //    std::cout << "\n after rotpos:" << std::endl;
             // print_pos(rotpos+istart[it]*3, na[it]);
 
             //	BLOCK_HERE("type");
@@ -957,19 +959,19 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
             }
         }
 
-//        cout << "\n dirpos:" << endl;
+//        std::cout << "\n dirpos:" << std::endl;
 //        print_pos(dirpos, nat);
-//        cout << "\n rotpos:" << endl;
+//        std::cout << "\n rotpos:" << std::endl;
 //        print_pos(rotpos, nat);
 
-        //the current test vector is a 'primitive' translation, save the detected translation vector
+        //the current test std::vector is a 'primitive' translation, save the detected translation std::vector
         if (found_tvec)
         {
             ptrans[itrans*3+0] = trans[0];
             ptrans[itrans*3+1] = trans[1];
             ptrans[itrans*3+2] = trans[2];
             ++itrans;
-            //cout<<"Find "<<itrans<<" translation"<<endl;
+            //std::cout<<"Find "<<itrans<<" translation"<<std::endl;
         }
     }
 
@@ -1051,25 +1053,25 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
     p3.y = b3.x * a1.y + b3.y * a2.y + b3.z * a3.y;
     p3.z = b3.x * a1.z + b3.y * a2.z + b3.z * a3.z;
 
-    GlobalV::ofs_running << " a1:" << setw(20) << a1.x << setw(20) << a1.y << setw(20) << a1.z << endl;
-    GlobalV::ofs_running << " a2:" << setw(20) << a2.x << setw(20) << a2.y << setw(20) << a2.z << endl;
-    GlobalV::ofs_running << " a3:" << setw(20) << a3.x << setw(20) << a3.y << setw(20) << a3.z << endl;
+    GlobalV::ofs_running << " a1:" << std::setw(20) << a1.x << std::setw(20) << a1.y << std::setw(20) << a1.z << std::endl;
+    GlobalV::ofs_running << " a2:" << std::setw(20) << a2.x << std::setw(20) << a2.y << std::setw(20) << a2.z << std::endl;
+    GlobalV::ofs_running << " a3:" << std::setw(20) << a3.x << std::setw(20) << a3.y << std::setw(20) << a3.z << std::endl;
 
-    GlobalV::ofs_running << " b1:" << setw(20) << b1.x << setw(20) << b1.y << setw(20) << b1.z << endl;
-    GlobalV::ofs_running << " b2:" << setw(20) << b2.x << setw(20) << b2.y << setw(20) << b2.z << endl;
-    GlobalV::ofs_running << " b3:" << setw(20) << b3.x << setw(20) << b3.y << setw(20) << b3.z << endl;
+    GlobalV::ofs_running << " b1:" << std::setw(20) << b1.x << std::setw(20) << b1.y << std::setw(20) << b1.z << std::endl;
+    GlobalV::ofs_running << " b2:" << std::setw(20) << b2.x << std::setw(20) << b2.y << std::setw(20) << b2.z << std::endl;
+    GlobalV::ofs_running << " b3:" << std::setw(20) << b3.x << std::setw(20) << b3.y << std::setw(20) << b3.z << std::endl;
 
-    GlobalV::ofs_running << " p1:" << setw(20) << p1.x << setw(20) << p1.y << setw(20) << p1.z << endl;
-    GlobalV::ofs_running << " p2:" << setw(20) << p2.x << setw(20) << p2.y << setw(20) << p2.z << endl;
-    GlobalV::ofs_running << " p3:" << setw(20) << p3.x << setw(20) << p3.y << setw(20) << p3.z << endl;
+    GlobalV::ofs_running << " p1:" << std::setw(20) << p1.x << std::setw(20) << p1.y << std::setw(20) << p1.z << std::endl;
+    GlobalV::ofs_running << " p2:" << std::setw(20) << p2.x << std::setw(20) << p2.y << std::setw(20) << p2.z << std::endl;
+    GlobalV::ofs_running << " p3:" << std::setw(20) << p3.x << std::setw(20) << p3.y << std::setw(20) << p3.z << std::endl;
 
     //analyse the data and get the symmetry infomation
-//	cout<<"calculating the properties!"<<endl;
+//	std::cout<<"calculating the properties!"<<std::endl;
 
     Vector3<double> zero(0.0,0.0,0.0);
     if (p1 == zero || p2 == zero || p3 == zero)
     {
-		WARNING_QUIT("Symmetry::pricell","At least one of the primitive vector is (0,0,0).");
+		WARNING_QUIT("Symmetry::pricell","At least one of the primitive std::vector is (0,0,0).");
     }
 
     double celvolume = 0;
@@ -1093,35 +1095,35 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
 	OUT(GlobalV::ofs_running,"BRAVAIS OF SUPERCELL",ibrav);
 	OUT(GlobalV::ofs_running,"LATTICE NAME OF SUPERCELL",ilattname);
 
-    GlobalV::ofs_running<<" LATTICE VECTORS OF SUPERCELL" << endl;
-    GlobalV::ofs_running<<" S1:" << setw(20) << a1.x << setw(20) << a1.y << setw(20) << a1.z << endl;
-    GlobalV::ofs_running<<" S2:" << setw(20) << a2.x << setw(20) << a2.y << setw(20) << a2.z << endl;
-    GlobalV::ofs_running<<" S3:" << setw(20) << a3.x << setw(20) << a3.y << setw(20) << a3.z << endl;
+    GlobalV::ofs_running<<" LATTICE VECTORS OF SUPERCELL" << std::endl;
+    GlobalV::ofs_running<<" S1:" << std::setw(20) << a1.x << std::setw(20) << a1.y << std::setw(20) << a1.z << std::endl;
+    GlobalV::ofs_running<<" S2:" << std::setw(20) << a2.x << std::setw(20) << a2.y << std::setw(20) << a2.z << std::endl;
+    GlobalV::ofs_running<<" S3:" << std::setw(20) << a3.x << std::setw(20) << a3.y << std::setw(20) << a3.z << std::endl;
 
 	OUT(GlobalV::ofs_running,"BRAVAIS OF PRIMITIVE CELL",pbrav);
 	OUT(GlobalV::ofs_running,"LATTICE NAME OF PRIMITIVE CELL",plattname);
 
-    GlobalV::ofs_running<<" LATTICE VECTORS OF PRIMITIVE CELL:" << endl;
-    GlobalV::ofs_running<<" P1:" << setw(20) << p1.x << setw(20) << p1.y << setw(20) << p1.z << endl;
-    GlobalV::ofs_running<<" P2:" << setw(20) << p2.x << setw(20) << p2.y << setw(20) << p2.z << endl;
-    GlobalV::ofs_running<<" P3:" << setw(20) << p3.x << setw(20) << p3.y << setw(20) << p3.z << endl;
+    GlobalV::ofs_running<<" LATTICE VECTORS OF PRIMITIVE CELL:" << std::endl;
+    GlobalV::ofs_running<<" P1:" << std::setw(20) << p1.x << std::setw(20) << p1.y << std::setw(20) << p1.z << std::endl;
+    GlobalV::ofs_running<<" P2:" << std::setw(20) << p2.x << std::setw(20) << p2.y << std::setw(20) << p2.z << std::endl;
+    GlobalV::ofs_running<<" P3:" << std::setw(20) << p3.x << std::setw(20) << p3.y << std::setw(20) << p3.z << std::endl;
 
 	OUT(GlobalV::ofs_running,"PRIMITIVE CELLS",ncell);
-    GlobalV::ofs_running<<" PRIMITIVE TRANSLATION VECTORS:"<<endl;
+    GlobalV::ofs_running<<" PRIMITIVE TRANSLATION VECTORS:"<<std::endl;
     for (int i = 0; i < itrans; ++i)
     {
-        GlobalV::ofs_running << " " << setw(20) << ptrans[i*3]
-		<< " " << setw(20) << ptrans[i*3+1]
-		<< " " << setw(20) << ptrans[i*3+2]
-		<< endl;
-        //cout<<"n = "<<i*3+k<<endl;
+        GlobalV::ofs_running << " " << std::setw(20) << ptrans[i*3]
+		<< " " << std::setw(20) << ptrans[i*3+1]
+		<< " " << std::setw(20) << ptrans[i*3+2]
+		<< std::endl;
+        //std::cout<<"n = "<<i*3+k<<std::endl;
     }
-    //cout<<"pricell ends!"<<endl;
+    //std::cout<<"pricell ends!"<<std::endl;
     return;
 }*/
 
 
-void Symmetry::getgroup(int &nrot, int &nrotk, ofstream &ofs_running)
+void Symmetry::getgroup(int &nrot, int &nrotk, std::ofstream &ofs_running)
 {
     TITLE("Symmetry","getgroup");
 
@@ -1143,12 +1145,12 @@ void Symmetry::getgroup(int &nrot, int &nrotk, ofstream &ofs_running)
     //pass through the pool of (possibly allowed) symmetry operations and
     //check each operation whether it can reproduce the lattice with basis
 	//-------------------------------------------------------------------------
-    //cout << "nop = " <<nop <<endl;
+    //std::cout << "nop = " <<nop <<std::endl;
     for (int i = 0; i < nop; ++i)
     {
-    //    cout << "symop = " << symop[i].e11 <<" "<< symop[i].e12 <<" "<< symop[i].e13 <<" "<< symop[i].e21 <<" "<< symop[i].e22 <<" "<< symop[i].e23 <<" "<< symop[i].e31 <<" "<< symop[i].e32 <<" "<< symop[i].e33 << endl;
+    //    std::cout << "symop = " << symop[i].e11 <<" "<< symop[i].e12 <<" "<< symop[i].e13 <<" "<< symop[i].e21 <<" "<< symop[i].e22 <<" "<< symop[i].e23 <<" "<< symop[i].e31 <<" "<< symop[i].e32 <<" "<< symop[i].e33 << std::endl;
         this->checksym(this->symop[i], this->gtrans[i], this->newpos);
-      //  cout << "s_flag =" <<s_flag<<endl;
+      //  std::cout << "s_flag =" <<s_flag<<std::endl;
         if (s_flag == 1)
         {
 			//------------------------------
@@ -1246,12 +1248,12 @@ void Symmetry::checksym(Matrix3 &s, Vector3<double> &gtrans, double* pos)
             this->check_boundary(pos[j*3+2]);
         }
          //for( int iat =0 ; iat < ucell.nat ; iat++)
-         //cout << " newpos_now1 = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << endl;
+         //std::cout << " newpos_now1 = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << std::endl;
 
         //order original atomic positions for current species
         this->atom_ordering(pos + istart[it] * 3, na[it], index + istart[it]);
          //for( int iat =0 ; iat < ucell.nat ; iat++)
-         //cout << " newpos_now2 = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << endl;
+         //std::cout << " newpos_now2 = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << std::endl;
 
         //Rotate atoms of current species
         for (int j = istart[it]; j < istart[it] + na[it]; ++j)
@@ -1273,8 +1275,8 @@ void Symmetry::checksym(Matrix3 &s, Vector3<double> &gtrans, double* pos)
                          + pos[yy] * s.e23
                          + pos[zz] * s.e33;
 
-           // cout << "pos = " << pos[xx] <<" "<<pos[yy] << " "<<pos[zz]<<endl;
-           // cout << "rotpos = " << rotpos[xx] <<" "<<rotpos[yy] << " "<<rotpos[zz]<<endl;
+           // std::cout << "pos = " << pos[xx] <<" "<<pos[yy] << " "<<pos[zz]<<std::endl;
+           // std::cout << "rotpos = " << rotpos[xx] <<" "<<rotpos[yy] << " "<<rotpos[zz]<<std::endl;
             rotpos[xx] = fmod(rotpos[xx] + 100.5,1) - 0.5;
             rotpos[yy] = fmod(rotpos[yy] + 100.5,1) - 0.5;
             rotpos[zz] = fmod(rotpos[zz] + 100.5,1) - 0.5;
@@ -1287,14 +1289,14 @@ void Symmetry::checksym(Matrix3 &s, Vector3<double> &gtrans, double* pos)
     }
 
 	/*
-	GlobalV::ofs_running << " ============================================= " << endl;
-	GlobalV::ofs_running << " Matrix S " << endl;
-	GlobalV::ofs_running << setw(5) << s.e11 << setw(5) << s.e12 << setw(5) << s.e13 << endl;
-	GlobalV::ofs_running << setw(5) << s.e21 << setw(5) << s.e22 << setw(5) << s.e32 << endl;
-	GlobalV::ofs_running << setw(5) << s.e23 << setw(5) << s.e23 << setw(5) << s.e33 << endl;
-	GlobalV::ofs_running << " pos" << endl;
+	GlobalV::ofs_running << " ============================================= " << std::endl;
+	GlobalV::ofs_running << " Matrix S " << std::endl;
+	GlobalV::ofs_running << std::setw(5) << s.e11 << std::setw(5) << s.e12 << std::setw(5) << s.e13 << std::endl;
+	GlobalV::ofs_running << std::setw(5) << s.e21 << std::setw(5) << s.e22 << std::setw(5) << s.e32 << std::endl;
+	GlobalV::ofs_running << std::setw(5) << s.e23 << std::setw(5) << s.e23 << std::setw(5) << s.e33 << std::endl;
+	GlobalV::ofs_running << " pos" << std::endl;
 	print_pos(pos, nat);
-	GlobalV::ofs_running << " rotpos" << endl;
+	GlobalV::ofs_running << " rotpos" << std::endl;
 	print_pos(rotpos, nat);
 	*/
 
@@ -1308,7 +1310,7 @@ void Symmetry::checksym(Matrix3 &s, Vector3<double> &gtrans, double* pos)
     sptmin.z = pos[itmin_start*3+2];
     for (int i = itmin_start; i < itmin_start + na[itmin_type]; ++i)
     {
-        //set up the current test vector "gtrans"
+        //set up the current test std::vector "gtrans"
         //and "gtrans" could possibly contain trivial translations:
         gtrans.x = this->get_translation_vector( pos[i*3+0], sptmin.x);
         gtrans.y = this->get_translation_vector( pos[i*3+1], sptmin.y);
@@ -1316,7 +1318,7 @@ void Symmetry::checksym(Matrix3 &s, Vector3<double> &gtrans, double* pos)
 
         //If we had already detected some translation,
         //we must only look at the vectors with coordinates smaller than those
-        //of the previously detected vector (find the smallest)
+        //of the previously detected std::vector (find the smallest)
         if (gtrans.x > trans.x + epsilon ||
                 gtrans.y > trans.y + epsilon ||
                 gtrans.z > trans.z + epsilon
@@ -1367,10 +1369,10 @@ void Symmetry::checksym(Matrix3 &s, Vector3<double> &gtrans, double* pos)
 			
 
 		/*
-		GlobalV::ofs_running << " no_diff = " << no_diff << endl;
-		GlobalV::ofs_running << " CHECK pos " << endl;
+		GlobalV::ofs_running << " no_diff = " << no_diff << std::endl;
+		GlobalV::ofs_running << " CHECK pos " << std::endl;
 		print_pos(pos, nat);
-		GlobalV::ofs_running << " CHECK rotpos " << endl;
+		GlobalV::ofs_running << " CHECK rotpos " << std::endl;
 		print_pos(rotpos, nat);
 		*/
 		//BLOCK_HERE("check symm");
@@ -1381,7 +1383,7 @@ void Symmetry::checksym(Matrix3 &s, Vector3<double> &gtrans, double* pos)
         if (no_diff == true)
         {
             s_flag = 1;
-            //save the detected translation vector temporarily
+            //save the detected translation std::vector temporarily
             trans.x = gtrans.x;
             trans.y = gtrans.y;
             trans.z = gtrans.z;
@@ -1435,7 +1437,7 @@ void Symmetry::rho_symmetry( double *rho,
         }
     }
     nrotk = count_fft;
-	//cout << "\n nrotk = " << nrotk;
+	//std::cout << "\n nrotk = " << nrotk;
 
 
 	// get the remaining rotation matrix.
@@ -1525,7 +1527,7 @@ void Symmetry::force_symmetry(matrix &force , double* pos, const UnitCell_pseudo
 		{
 			start[it] = start[it-1] + ucell.atoms[it-1].na;
 		}
-		//cout << "na =" <<ucell.atoms[0].na<<" "<<ucell.atoms[1].na<<" "<<ucell.atoms[2].na<<endl;
+		//std::cout << "na =" <<ucell.atoms[0].na<<" "<<ucell.atoms[1].na<<" "<<ucell.atoms[2].na<<std::endl;
 		
 	}
 	for(int it = 0; it < ntype; it++)
@@ -1533,8 +1535,8 @@ void Symmetry::force_symmetry(matrix &force , double* pos, const UnitCell_pseudo
 		for(int j = start[it]; j < start[it] + ucell.atoms[it].na; ++j)
 		{
 			const int xx=j*3; const int yy=j*3+1; const int zz=j*3+2;
-			// cout << "xx = "<<xx<<" yy ="<<yy<<" zz = "<<zz<<endl;
-			// cout << "nrotk ="<<nrotk<<endl;
+			// std::cout << "xx = "<<xx<<" yy ="<<yy<<" zz = "<<zz<<std::endl;
+			// std::cout << "nrotk ="<<nrotk<<std::endl;
 			for(int k = 0 ; k < nrotk; ++k)
 			{
 				protpos[xx] = pos[xx] * gmatrix[k].e11 + pos[yy] * gmatrix[k].e21 + pos[zz] * gmatrix[k].e31 + gtrans[k].x;
@@ -1555,7 +1557,7 @@ void Symmetry::force_symmetry(matrix &force , double* pos, const UnitCell_pseudo
 					diff3 = check_diff( pos[l*3+2], protpos[zz]);
 					if (equal(diff1,0.0) && equal(diff2,0.0) && equal(diff3,0.0))
 					{
-						//cout <<"nl = " << n[l]<<endl;
+						//std::cout <<"nl = " << n[l]<<std::endl;
 						tot_force[l*3] = tot_force[l*3] + force(j,0) * gmatrix[k].e11 + force(j,1) * gmatrix[k].e21 + force(j,2) * gmatrix[k].e31;
 						tot_force[l*3+1] =  tot_force[l*3+1] + force(j,0) * gmatrix[k].e12 + force(j,1) * gmatrix[k].e22 + force(j,2) * gmatrix[k].e32;
 						tot_force[l*3+2] =  tot_force[l*3+2] + force(j,0) * gmatrix[k].e13 + force(j,1) * gmatrix[k].e23 + force(j,2) * gmatrix[k].e33;
@@ -1718,46 +1720,46 @@ void Symmetry::stress_symmetry(matrix& sigma, const UnitCell_pseudo &ucell)   //
 void Symmetry::write(void)
 {
     if (GlobalV::test_symmetry) TITLE("Symmetry","write");
-    GlobalV::ofs_running<<endl;
-    GlobalV::ofs_running<<"\n The point group serial number is "<<pgnumber<<"."<<endl;
-    GlobalV::ofs_running<<"\n Its Schoenflies name is "<<pgname<<"."<<endl;
-    GlobalV::ofs_running<<"\n There are "<<nrotk<<" rotation matrices for the pure point group symmetry:"<<endl;
-    GlobalV::ofs_running<<"    E11 E12 E13 E21 E22 E23 E31 E32 E33"<<endl;
+    GlobalV::ofs_running<<std::endl;
+    GlobalV::ofs_running<<"\n The point group serial number is "<<pgnumber<<"."<<std::endl;
+    GlobalV::ofs_running<<"\n Its Schoenflies name is "<<pgname<<"."<<std::endl;
+    GlobalV::ofs_running<<"\n There are "<<nrotk<<" rotation matrices for the pure point group symmetry:"<<std::endl;
+    GlobalV::ofs_running<<"    E11 E12 E13 E21 E22 E23 E31 E32 E33"<<std::endl;
     for (int i = 0; i < nrot; ++i)
     {
-        GlobalV::ofs_running << setw(2) <<i + 1<<" "
-        << setw(4) << gmatrix[i].e11
-        << setw(4) << gmatrix[i].e12
-        << setw(4) << gmatrix[i].e13
-        << setw(4) << gmatrix[i].e21
-        << setw(4) << gmatrix[i].e22
-        << setw(4) << gmatrix[i].e23
-        << setw(4) << gmatrix[i].e31
-        << setw(4) << gmatrix[i].e32
-        << setw(4) << gmatrix[i].e33 << endl;
+        GlobalV::ofs_running << std::setw(2) <<i + 1<<" "
+        << std::setw(4) << gmatrix[i].e11
+        << std::setw(4) << gmatrix[i].e12
+        << std::setw(4) << gmatrix[i].e13
+        << std::setw(4) << gmatrix[i].e21
+        << std::setw(4) << gmatrix[i].e22
+        << std::setw(4) << gmatrix[i].e23
+        << std::setw(4) << gmatrix[i].e31
+        << std::setw(4) << gmatrix[i].e32
+        << std::setw(4) << gmatrix[i].e33 << std::endl;
 
     }
-    GlobalV::ofs_running<<endl;
-    GlobalV::ofs_running<<"\n There are "<<nrotk<<" full space group operations:"<<endl;
-    GlobalV::ofs_running<<"    e11 e12 e13 e21 e22 e23 e31 e32 e33"<<endl;
+    GlobalV::ofs_running<<std::endl;
+    GlobalV::ofs_running<<"\n There are "<<nrotk<<" full space group operations:"<<std::endl;
+    GlobalV::ofs_running<<"    e11 e12 e13 e21 e22 e23 e31 e32 e33"<<std::endl;
     for (int i = 0; i < nrotk; ++i)
     {
-        GlobalV::ofs_running << setw(2) <<i + 1<<" "
-        << setw(4) << gmatrix[i].e11
-        << setw(4) << gmatrix[i].e12
-        << setw(4) << gmatrix[i].e13
-        << setw(4) << gmatrix[i].e21
-        << setw(4) << gmatrix[i].e22
-        << setw(4) << gmatrix[i].e23
-        << setw(4) << gmatrix[i].e31
-        << setw(4) << gmatrix[i].e32
-        << setw(4) << gmatrix[i].e33
-        << setw(4) << "+"
+        GlobalV::ofs_running << std::setw(2) <<i + 1<<" "
+        << std::setw(4) << gmatrix[i].e11
+        << std::setw(4) << gmatrix[i].e12
+        << std::setw(4) << gmatrix[i].e13
+        << std::setw(4) << gmatrix[i].e21
+        << std::setw(4) << gmatrix[i].e22
+        << std::setw(4) << gmatrix[i].e23
+        << std::setw(4) << gmatrix[i].e31
+        << std::setw(4) << gmatrix[i].e32
+        << std::setw(4) << gmatrix[i].e33
+        << std::setw(4) << "+"
         << gtrans[i].x << " "
         << gtrans[i].y << " "
-        << gtrans[i].z << endl;
+        << gtrans[i].z << std::endl;
     }
-    GlobalV::ofs_running<<endl;
+    GlobalV::ofs_running<<std::endl;
     return;
 }
 
@@ -1765,7 +1767,8 @@ void Symmetry::print_pos(const double* pos, const int &nat)
 {
     for (int i=0; i<nat; i++)
     {
-        GlobalV::ofs_running << " pos " << i+1 << ": " << pos[i*3+0] << " " << pos[i*3+1] << " " << pos[i*3+2] << endl;
+        GlobalV::ofs_running << " pos " << i+1 << ": " << pos[i*3+0] << " " << pos[i*3+1] << " " << pos[i*3+2] << std::endl;
     }
     return;
+}
 }

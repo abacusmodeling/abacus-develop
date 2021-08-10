@@ -5,13 +5,13 @@
 void Charge::write_rho_cube(
 	const double* rho_save, 
 	const int &is, 
-	const string &fn, 
+	const std::string &fn, 
 	const int &precision) 
 {
     TITLE("Charge","write_rho_cube");
 
 	time_t start, end;
-	ofstream ofs;
+	std::ofstream ofs;
 	
 	if(GlobalV::MY_RANK==0)
 	{
@@ -23,23 +23,23 @@ void Charge::write_rho_cube(
         	WARNING("Charge::write_rho","Can't create Charge File!");
     	}	
 
-		ofs << "Cubefile created from ABACUS SCF calculation" << endl;
-		ofs << "Contains the selected quantity on a FFT grid" << endl;
+		ofs << "Cubefile created from ABACUS SCF calculation" << std::endl;
+		ofs << "Contains the selected quantity on a FFT grid" << std::endl;
 
-		ofs << GlobalC::ucell.nat << " 0.0 0.0 0.0 " << endl;
+		ofs << GlobalC::ucell.nat << " 0.0 0.0 0.0 " << std::endl;
 		double fac=GlobalC::ucell.lat0;
 		ofs << GlobalC::pw.ncx 
 			<< " " << fac*GlobalC::ucell.latvec.e11/double(GlobalC::pw.ncx) 
 			<< " " << fac*GlobalC::ucell.latvec.e12/double(GlobalC::pw.ncx) 
-			<< " " << fac*GlobalC::ucell.latvec.e13/double(GlobalC::pw.ncx) << endl;
+			<< " " << fac*GlobalC::ucell.latvec.e13/double(GlobalC::pw.ncx) << std::endl;
 		ofs << GlobalC::pw.ncy 
 			<< " " << fac*GlobalC::ucell.latvec.e21/double(GlobalC::pw.ncy) 
 			<< " " << fac*GlobalC::ucell.latvec.e22/double(GlobalC::pw.ncy) 
-			<< " " << fac*GlobalC::ucell.latvec.e23/double(GlobalC::pw.ncy) << endl;
+			<< " " << fac*GlobalC::ucell.latvec.e23/double(GlobalC::pw.ncy) << std::endl;
 		ofs << GlobalC::pw.ncz 
 			<< " " << fac*GlobalC::ucell.latvec.e31/double(GlobalC::pw.ncz) 
 			<< " " << fac*GlobalC::ucell.latvec.e32/double(GlobalC::pw.ncz) 
-			<< " " << fac*GlobalC::ucell.latvec.e33/double(GlobalC::pw.ncz) << endl;
+			<< " " << fac*GlobalC::ucell.latvec.e33/double(GlobalC::pw.ncz) << std::endl;
 
 		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
@@ -56,13 +56,13 @@ void Charge::write_rho_cube(
 				ofs << " " << z << " " << z
 					<< " " << fac*GlobalC::ucell.atoms[it].taud[ia].x
 					<< " " << fac*GlobalC::ucell.atoms[it].taud[ia].y
-					<< " " << fac*GlobalC::ucell.atoms[it].taud[ia].z << endl;
+					<< " " << fac*GlobalC::ucell.atoms[it].taud[ia].z << std::endl;
 			}
 		}
 
-//		ofs << "\n  " << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz << endl;
+//		ofs << "\n  " << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz << std::endl;
 
-		ofs << setprecision(precision);
+		ofs << std::setprecision(precision);
 		ofs << scientific;
 
 	}
@@ -138,7 +138,7 @@ void Charge::write_rho_cube(
 		// save the rho one z by one z.
 		for(int iz=0; iz<GlobalC::pw.ncz; iz++)
 		{
-			//	cout << "\n iz=" << iz << endl;
+			//	std::cout << "\n iz=" << iz << std::endl;
 			// tag must be different for different iz.
 			ZEROS(zpiece, nxy);
 			int tag = iz;

@@ -25,24 +25,24 @@ public:
 
 	static double record
 	(
-	 	const string &class_name,
-		const string &name,
+	 	const std::string &class_name,
+		const std::string &name,
 		const long &n,
-		const string &type,
+		const std::string &type,
 		const bool accumulate = false
 	);
 
 	static double& get_total(void){return total;}
-	static void finish(ofstream &ofs);
-	static void print_all(ofstream &ofs);
+	static void finish(std::ofstream &ofs);
+	static void print_all(std::ofstream &ofs);
 	static void print(const int find_in);
-	static double calculate_mem(const long &n,const string &type);
+	static double calculate_mem(const long &n,const std::string &type);
 
 private:
 
 	static double total;
-	static string *name;
-	static string *class_name;
+	static std::string *name;
+	static std::string *class_name;
 	static double *consume;
 	static int n_memory;
 	static int n_now;

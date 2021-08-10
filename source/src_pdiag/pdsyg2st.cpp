@@ -14,7 +14,7 @@ void pdsyg2st(char isuplo,MPI_Comm comm_2D,double *A,LocalMatrix loc_A,double *B
  * pzheg2st transforms generalized  Hermitian eigenproblem into standard
  * eigenproblem
  * computes Cholesky factorization of an N-by-N real
- * symmetric positive definite matrix B and  L-1AL-T »òU -TAU -1 with a
+ * symmetric positive definite matrix B and  L-1AL-T or U -TAU -1 with a
  * 2D-block-cyclic in parallel. The routine introduces a new parallelization which
  * combines the Cholesky into the transformation from generalized to standard form.
  * Arguments
@@ -28,7 +28,7 @@ void pdsyg2st(char isuplo,MPI_Comm comm_2D,double *A,LocalMatrix loc_A,double *B
  *  comm_2D. (input) MPI_Comm
  *            2-D grid MPI communicator
  *  N_A  (global input) INTEGER
- *      The number of columns and rows to be operated on matrices A£¬N >= 0.
+ *      The number of columns and rows to be operated on matrices A, N >= 0.
  *  NB  (input) INTEGER
  *       blocked size of 2D blocked cyclic matrix
  *  A       (local input/local output) double precision pointer,

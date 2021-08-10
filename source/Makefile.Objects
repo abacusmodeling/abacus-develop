@@ -43,6 +43,7 @@ forces.o\
 stress_pw.o\
 stress_func_cc.o\
 stress_func_gga.o\
+stress_func_mgga.o\
 stress_func_kin.o\
 stress_func_nl.o\
 stress_func_ewa.o\
@@ -250,6 +251,7 @@ write_HS.o\
 write_HS_R.o\
 write_dm.o\
 potential_libxc.o \
+potential_libxc_meta.o \
 efield.o \
 magnetism.o\
 optical.o\
@@ -285,6 +287,7 @@ diago_david.o\
 diago_cg.o\
 output.o  \
 run_md_classic.o\
+LJ_potential.o\
 dos.o \
 inverse_matrix.o \
 energy.o \
