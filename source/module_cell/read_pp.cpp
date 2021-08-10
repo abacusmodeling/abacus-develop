@@ -326,7 +326,8 @@ int Pseudopot_upf::average_p(const double& lambda)
 					ind = nb;
 					ind1 = nb +1;
 				}
-				const double vion1 = ((l+1.0) * this->dion(ind,ind) + l * this->dion(ind1,ind1)) / (2.0*l+1.0);
+				double vion1 = ((l+1.0) * this->dion(ind,ind) + l * this->dion(ind1,ind1)) / (2.0*l+1.0);
+				if(abs(vion1)<1.0e-10) vion1 = 1.0e-10;
 				//average beta (betar)
 				const double sqrtDplus = sqrt(this->dion(ind,ind) / vion1);
 				const double sqrtDminus = sqrt(this->dion(ind1,ind1) / vion1);
