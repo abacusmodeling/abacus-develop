@@ -116,7 +116,6 @@ void DFTU::init(
 	this->iatlnmipol2iwt.resize(cell.nat);
 	this->iat2it.resize(cell.nat);
 	this->iwt2it.resize(nlocal);
-	this->iwt2iat.resize(nlocal);
 	this->iwt2l.resize(nlocal);
 	this->iwt2n.resize(nlocal);
 	this->iwt2m.resize(nlocal);
@@ -126,7 +125,6 @@ void DFTU::init(
 	for(int i=0; i<nlocal; i++)
 	{
 		this->iwt2it.at(i) = -1;
-		this->iwt2iat.at(i) = -1;
 		this->iwt2l.at(i) = -1;
 		this->iwt2n.at(i) = -1;
 		this->iwt2m.at(i) = -1;
@@ -204,7 +202,6 @@ void DFTU::init(
 								
 				this->iatlnmipol2iwt.at(iat).at(l).at(n).at(m).at(ipol) = iwt;
 				this->iwt2it.at(iwt) = it;
-				this->iwt2iat.at(iwt) = iat;
 				this->iwt2l.at(iwt) = l;
 				this->iwt2n.at(iwt) = n;
 				this->iwt2m.at(iwt) = m;
@@ -1165,27 +1162,27 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, complex<double
 	//=============================================================
 	const char transN = 'N', transT = 'T';
 	const int  one_int = 1;
-  const complex<double> alpha_c(1.0,0.0), beta_c(0.0,0.0), half_c(0.5,0.0), one_c(1.0,0.0);
+  const complex<double> zero(0.0,0.0), half(0.5,0.0), one(1.0,0.0);
 
 	vector<complex<double>> VU(GlobalC::ParaO.nloc);
-  this->cal_VU_pot_mat_complex(spin, 1, &VU[0]);
+  this->cal_VU_pot_mat_complex(spin, true, &VU[0]);
 
 	pzgemm_(&transN, &transN,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
-		&half_c, 
+		&half, 
 		VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc,
 		GlobalC::LM.Sloc2, &one_int, &one_int, GlobalC::ParaO.desc,
-		&beta_c,
+		&zero,
 		eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
 
   for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
     VU[irc] = eff_pot[irc];
   
-  // pztranc(m, n, alpha, a, ia, ja, desca, beta, c, ic, jc, descc)
+  //pztranc(m, n, alpha, a, ia, ja, desca, beta, c, ic, jc, descc)
   pztranc_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
-           &one_c, 
+           &one, 
            &VU[0], &one_int, &one_int, GlobalC::ParaO.desc, 
-           &one_c, 
+           &one, 
            eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
 
 	//code for testing whther the effective potential is Hermitian
