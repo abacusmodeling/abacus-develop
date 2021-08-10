@@ -75,6 +75,7 @@ public:
 	void save_npy_e(const double &ebase);	//Ry
 	void save_npy_f(const matrix &fbase);//Ry
 
+	double cal_e_delta_fixdm(const matrix& fixdm);	//tr[rho*H_V_delta]
 
 //-------------------
 // public variables 

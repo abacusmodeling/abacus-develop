@@ -551,13 +551,13 @@ void LCAO_Descriptor::cal_gdmx(const matrix &dm)
     {
         //dE/dD will be multiplied in cal_f_delta, here only calculate dD/dx_I
         int nm = 2 * inl_l[inl] + 1;   //1,3,5,...
-        for (int i =0; i < NLOCAL;++i) 
+        for (int mu =0; mu < NLOCAL;++mu) 
         {
-            const int iat = ucell.iwt2iat[i];//the atom whose force being calculated
-            for (int j= 0;j < NLOCAL; ++j)
+            const int iat = ucell.iwt2iat[mu];//the atom whose force being calculated
+            for (int nu= 0;nu < NLOCAL; ++nu)
             {
-                const int mu = ParaO.trace_loc_row[j];
-                const int nu = ParaO.trace_loc_col[i];
+                //const int mu = ParaO.trace_loc_row[j];
+                //const int nu = ParaO.trace_loc_col[i];
                 if (mu >= 0 && nu >= 0)
                 {
                     for (int m1 = 0;m1 < nm;++m1)
@@ -569,11 +569,11 @@ void LCAO_Descriptor::cal_gdmx(const matrix &dm)
 								//  save the matrix as column major format
                                 if (KS_SOLVER == "genelpa" || KS_SOLVER == "scalapack_gvx")
                                 {
-                                    gdmx[iat][inl][m1*nm + m2] += 
+                                    gdmx[iat][inl][m2*nm + m1] += 
 									4 * dsx[inl][m1*NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*NLOCAL + nu];
-                                    gdmy[iat][inl][m1*nm + m2] += 
+                                    gdmy[iat][inl][m2*nm + m1] += 
 									4 * dsy[inl][m1*NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*NLOCAL + nu];
-                                    gdmz[iat][inl][m1*nm + m2] += 
+                                    gdmz[iat][inl][m2*nm + m1] += 
 									4 * dsz[inl][m1*NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*NLOCAL + nu];
                                 }
                                 else
@@ -890,8 +890,8 @@ void LCAO_Descriptor::print_H_V_delta(void)
     }
 
     ofs << "E_delta(Ry) from deepks model: " << this->E_delta << endl;
-    ofs << "E_delta(eV) from deepks model: " << this->E_delta * Hartree_to_eV << endl;
-    ofs << "H_delta(Hartree)(gamma only)) from deepks model: " << endl;
+    ofs << "E_delta(eV) from deepks model: " << this->E_delta * Ry_to_eV << endl;
+    ofs << "H_delta(Ry)(gamma only)) from deepks model: " << endl;
 
     for (int i = 0;i < NLOCAL;++i)
     {
@@ -907,7 +907,7 @@ void LCAO_Descriptor::print_H_V_delta(void)
     {
         for (int j = 0;j < NLOCAL;++j)
         {
-            ofs<< setw(12)<< this->H_V_delta[i * NLOCAL + j] *Hartree_to_eV<< " ";
+            ofs<< setw(12)<< this->H_V_delta[i * NLOCAL + j] *Ry_to_eV<< " ";
         }
         ofs << endl;
     }
@@ -1009,5 +1009,20 @@ void LCAO_Descriptor::save_npy_f(const matrix &fbase)
     }
     npy::SaveArrayAsNumpy("f_base.npy", false, 2, fshape, npy_fbase);
     return;
+}
+
+double LCAO_Descriptor::cal_e_delta_fixdm(const matrix& fixdm)
+{
+    double e_delta_fixdm = 0;
+    //this->cal_v_delta(fixdm);
+    for (int i = 0; i < NLOCAL; i++)
+    {
+        for (int j = 0; j < NLOCAL; j++)
+        {
+            //e_delta_fixdm+=fixdm(i,j) *this->H_V_delta[i*NLOCAL+j];bug?
+            e_delta_fixdm += this->dm_double[i * NLOCAL + j]*this->H_V_delta[i*NLOCAL+j];
+        }
+    }
+    return e_delta_fixdm;
 }
 #endif
