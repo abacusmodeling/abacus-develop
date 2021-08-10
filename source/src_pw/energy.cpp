@@ -16,6 +16,9 @@
 #include "H_Ewald_pw.h"
 #include "H_Hartree_pw.h"
 #include "H_XC_pw.h"
+#ifdef __DEEPKS
+#include "../src_lcao/LCAO_descriptor.h"
+#endif
 
 
 energy::energy()
@@ -64,6 +67,12 @@ void energy::calculate_harris(const int &flag)
 			this->etot_harris += dftu.EU;  //Energy correction from DFT+U; Quxin adds on 20201029
 		}
 #endif
+#ifdef __DEEPKS
+        if(INPUT.deepks_scf) 
+		{
+			this->etot_harris += ld.E_delta;  //caoyu add 2021-08-10
+		}
+#endif
 	}
 	
 	return;
@@ -104,7 +113,13 @@ void energy::calculate_etot(void)
 		this->etot += dftu.EU;																	  
 	}
 #endif
-	return;	
+#ifdef __DEEPKS
+	if (INPUT.deepks_scf)
+	{
+		this->etot += ld.E_delta;
+	}
+#endif
+	return;
 }
 
 void energy::print_etot(
@@ -129,30 +144,36 @@ void energy::print_etot(
 	{
 		if(BASIS_TYPE=="pw")OUT(ofs_running,"Error Threshold",ethr); //xiaohui add 2013-09-02
 
-		if( this->printe>0 && ( (iter+1) % this->printe == 0 || converged || iter == NITER) )	
+		if (this->printe > 0 && ((iter + 1) % this->printe == 0 || converged || iter == NITER))
 		{
 			ofs_running << "\n " << setw(12) << "Energy" << setw(30) << "Rydberg" << setw(30) << "eV" << endl;
-			this->print_format("E_KohnSham",etot);
-			this->print_format("E_Harris",etot_harris);
-			this->print_format("E_band",eband);
-			this->print_format("E_one_elec",eband+deband);
-			this->print_format("E_Hartree",H_Hartree_pw::hartree_energy);
-			this->print_format("E_xc",H_XC_pw::etxc-etxcc);
-			this->print_format("E_Ewald",H_Ewald_pw::ewald_energy);
-			this->print_format("E_demet",demet); //mohan add 2011-12-02
-			this->print_format("E_descf",descf);
-			this->print_format("E_efield",Efield::etotefield);
-			if(vdwd2_para.flag_vdwd2)					//Peize Lin add 2014-04, update 2021-03-09
+			this->print_format("E_KohnSham", etot);
+			this->print_format("E_Harris", etot_harris);
+			this->print_format("E_band", eband);
+			this->print_format("E_one_elec", eband + deband);
+			this->print_format("E_Hartree", H_Hartree_pw::hartree_energy);
+			this->print_format("E_xc", H_XC_pw::etxc - etxcc);
+			this->print_format("E_Ewald", H_Ewald_pw::ewald_energy);
+			this->print_format("E_demet", demet); //mohan add 2011-12-02
+			this->print_format("E_descf", descf);
+			this->print_format("E_efield", Efield::etotefield);
+			if (vdwd2_para.flag_vdwd2)					//Peize Lin add 2014-04, update 2021-03-09
 			{
-				this->print_format("E_vdwD2",evdw);
+				this->print_format("E_vdwD2", evdw);
 			}
-			if(vdwd3_para.flag_vdwd3)					//jiyy add 2019-05, update 2021-05-02
+			if (vdwd3_para.flag_vdwd3)					//jiyy add 2019-05, update 2021-05-02
 			{
-				this->print_format("E_vdwD3",evdw);
+				this->print_format("E_vdwD3", evdw);
 			}
-			this->print_format("E_exx",exx);
+			this->print_format("E_exx", exx);
+#ifdef __DEEPKS
+			if (INPUT.deepks_scf)	//caoyu add 2021-08-10
+			{
+				this->print_format("E_DeePKS", ld.E_delta);
+			}
+#endif
 		}
-		else
+			else
 		{
 			ofs_running << "\n " << setw(12) << "Energy" << setw(30) << "Rydberg" << setw(30) << "eV" << endl;
 			this->print_format("E_KohnSham",etot);
