@@ -860,7 +860,6 @@ void Charge::sum_band_k(void)
 	Parallel_Reduce::reduce_double_all( GlobalC::en.eband );
 	}
 #endif
-	
 	// check how many electrons on this grid.
 	/*
 	double sum = 0.0;
@@ -979,7 +978,7 @@ void Charge::rho_mpi(void)
 			rho_tmp[ir] = this->rho[is][ir] / static_cast<double>(GlobalV::NPROC_IN_POOL);
 			if(GlobalV::DFT_META)
 			{
-				tau_tmp[ir] = this->rho[is][ir] / static_cast<double>(GlobalV::NPROC_IN_POOL);
+				tau_tmp[ir] = this->kin_r[is][ir] / static_cast<double>(GlobalV::NPROC_IN_POOL);
 			}
 		}
 
@@ -1052,14 +1051,14 @@ void Charge::rho_mpi(void)
 			MPI_Allreduce(rho_tot_aux,rho_tot,GlobalC::pw.ncxyz,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
 			if(GlobalV::DFT_META)
 			{
-				MPI_Allreduce(tau_tot_aux,rho_tot,GlobalC::pw.ncxyz,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
+				MPI_Allreduce(tau_tot_aux,tau_tot,GlobalC::pw.ncxyz,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
 			}
 		}
 		else
         MPI_Allreduce(rho_tot_aux,rho_tot,GlobalC::pw.ncxyz,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
 		if(GlobalV::DFT_META)
 		{
-   	    	MPI_Allreduce(tau_tot_aux,rho_tot,GlobalC::pw.ncxyz,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+   	    	MPI_Allreduce(tau_tot_aux,tau_tot,GlobalC::pw.ncxyz,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
 		}
         
 		//=====================================
