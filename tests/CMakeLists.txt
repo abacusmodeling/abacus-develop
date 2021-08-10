@@ -39,5 +39,3 @@ AddTest(
   TARGET base_blas_connector
   SOURCES ${ABACUS_TEST_DIR}/module_base/blas_connector.cpp
 )
-
-# gtest_discover_tests(base_matrix3)
