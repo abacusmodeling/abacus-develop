@@ -70,13 +70,13 @@ void Chi0_standard:: Chi()
 	}
 	else
 	{
-		cout <<"start_q = "<<start_q<<endl;
+		std::cout <<"start_q = "<<start_q<<std::endl;
 	}	
 
 	
 	int icount = 0;
-	std::vector<int> qc(GlobalC::kv.nks);		// Peize Lin change ptr to vector at 2020.01.31
-	std::vector<double> ql(GlobalC::kv.nks);		// Peize Lin change ptr to vector at 2020.01.31
+	std::vector<int> qc(GlobalC::kv.nks);		// Peize Lin change ptr to std::vector at 2020.01.31
+	std::vector<double> ql(GlobalC::kv.nks);		// Peize Lin change ptr to std::vector at 2020.01.31
 	int total_icount=0;
 	int temp1; double temp2;
 	
@@ -206,17 +206,17 @@ void Chi0_standard:: Chi()
 	}
 	
 	int temp_q = qc[total_icount-1];
-	//cout <<"temp_q = "<<temp_q<<endl;
+	//std::cout <<"temp_q = "<<temp_q<<std::endl;
 	
 	interval_q = temp_q - start_q;
-	//cout <<"interval_q = "<<interval_q<<endl;
+	//std::cout <<"interval_q = "<<interval_q<<std::endl;
 	
 	Parallel_G();
 	
 	if(system == "surface")
 	{
 		dim_para = parallel_g();
-		cout << "dim_para = "<<dim_para<<endl;
+		std::cout << "dim_para = "<<dim_para<<std::endl;
 	}
 	
 	//----------------------------------------------------------
@@ -239,7 +239,7 @@ void Chi0_standard:: Chi()
 		if(occ_flag == true)
 			occ_bands++;
 	}
-	cout <<"occ_bands = "<<occ_bands<<endl;	
+	std::cout <<"occ_bands = "<<occ_bands<<std::endl;	
 	oband = occ_bands;
 	
 	if(!init_finish)
@@ -257,29 +257,29 @@ void Chi0_standard:: Chi()
 		for(double omega=0.0; omega<(domega*nomega); omega=omega+domega)
 		{
 			Cal_chi0(iq,omega);
-			cout<<"chi0 iq= "<<iq<<" omega= "<<omega<<"  "<<chi0[0][0].real()<<" "<<chi0[0][0].imag()<<endl;
+			std::cout<<"chi0 iq= "<<iq<<" omega= "<<omega<<"  "<<chi0[0][0].real()<<" "<<chi0[0][0].imag()<<std::endl;
 			if(system == "surface")
 			{
 				chi0_para_g();
-				cout<<"chi0_para iq= "<<iq<<" omega= "<<omega<<"  "<<chi0_para[0][0].real()<<" "<<chi0_para[0][0].imag()<<endl;
+				std::cout<<"chi0_para iq= "<<iq<<" omega= "<<omega<<"  "<<chi0_para[0][0].real()<<" "<<chi0_para[0][0].imag()<<std::endl;
 			}						
 			Cal_rpa(iq);
 			Cal_chi();
-			cout<<"chi iq= "<<iq<<" omega= "<<omega<<"  "<<chi[0][0].real()<<" "<<chi[0][0].imag()<<endl;
-			cout<<"epsilon iq= "<<iq<<" omega= "<<omega<<"  "<<8*PI/q/q*chi[0][0].real()<<" "<<8*PI/q/q*chi[0][0].imag()<<endl;
+			std::cout<<"chi iq= "<<iq<<" omega= "<<omega<<"  "<<chi[0][0].real()<<" "<<chi[0][0].imag()<<std::endl;
+			std::cout<<"epsilon iq= "<<iq<<" omega= "<<omega<<"  "<<8*PI/q/q*chi[0][0].real()<<" "<<8*PI/q/q*chi[0][0].imag()<<std::endl;
 			gather[count] = -8*PI/q/q*chi[0][0].imag();		
 			count++;
 		}
 
 		if(out_epsilon)
 		{
-			stringstream sseps;
+			std::stringstream sseps;
 			sseps << GlobalV::global_out_dir << "Imeps^-1_"<<iq<<".dat";
-			ofstream ofseps(sseps.str().c_str());
-			ofseps<<"Energy(Ry)"<<"   "<<"-Im{epsilon^-1}"<<endl;
+			std::ofstream ofseps(sseps.str().c_str());
+			ofseps<<"Energy(Ry)"<<"   "<<"-Im{epsilon^-1}"<<std::endl;
 			for(int i=0; i<nomega; i++)
 			{
-				ofseps <<i*domega<<"   "<<gather[i]<<endl;
+				ofseps <<i*domega<<"   "<<gather[i]<<std::endl;
 			}
 			ofseps.close();
 		}		
@@ -367,7 +367,7 @@ void Chi0_standard::Parallel_G()
 	for(int i=0;i<GlobalC::pw.ngmc_g;i++)
 	{
 		all_gcar[i].x = Gvec[3*i]; all_gcar[i].y = Gvec[3*i+1]; all_gcar[i].z = Gvec[3*i+2];
-		//cout<<"all_gcar["<<i<<"]= "<<all_gcar[i].x<<" "<<all_gcar[i].y<<" "<<all_gcar[i].z<<endl;
+		//std::cout<<"all_gcar["<<i<<"]= "<<all_gcar[i].x<<" "<<all_gcar[i].y<<" "<<all_gcar[i].z<<std::endl;
 	}
 	
 	return;
@@ -376,77 +376,77 @@ void Chi0_standard::Parallel_G()
 void Chi0_standard:: Init()
 {
 
-	b_core = new complex<double>[GlobalC::pw.ngmc];  
+	b_core = new std::complex<double>[GlobalC::pw.ngmc];  
 	
-	b_summary = new complex<double>[GlobalC::pw.ngmc_g]; 
+	b_summary = new std::complex<double>[GlobalC::pw.ngmc_g]; 
 	
-	b_order = new complex<double>[GlobalC::pw.ngmc_g];
+	b_order = new std::complex<double>[GlobalC::pw.ngmc_g];
 
-	psi_r1 = new complex<double>*[GlobalV::NBANDS];
+	psi_r1 = new std::complex<double>*[GlobalV::NBANDS];
 	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		psi_r1[ib] = new complex<double>[GlobalC::pw.nrxx];
+		psi_r1[ib] = new std::complex<double>[GlobalC::pw.nrxx];
 	}
 		
-	psi_r2 = new complex<double>*[GlobalV::NBANDS];
+	psi_r2 = new std::complex<double>*[GlobalV::NBANDS];
 	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		psi_r2[ib] = new complex<double>[GlobalC::pw.nrxx];
+		psi_r2[ib] = new std::complex<double>[GlobalC::pw.nrxx];
 	}	
-	cout << "psi OK" <<endl;
+	std::cout << "psi OK" <<std::endl;
 	
-	b = new complex<double>*[dim];
+	b = new std::complex<double>*[dim];
 	for(int g0=0; g0<dim; g0++)
 	{
-		b[g0] = new complex<double>[oband*GlobalV::NBANDS];
+		b[g0] = new std::complex<double>[oband*GlobalV::NBANDS];
 	}
-	cout << "b ok"<<endl;
+	std::cout << "b ok"<<std::endl;
 	
-	A = new complex<double>*[dim];
+	A = new std::complex<double>*[dim];
 	for(int g0=0; g0<dim; g0++)
 	{
-		A[g0] = new complex<double>[oband*GlobalV::NBANDS];
+		A[g0] = new std::complex<double>[oband*GlobalV::NBANDS];
 	}
-	cout << "A ok"<<endl;	
+	std::cout << "A ok"<<std::endl;	
 	
-	B = new complex<double>*[oband*GlobalV::NBANDS];
+	B = new std::complex<double>*[oband*GlobalV::NBANDS];
 	for(int ib=0; ib<(oband*GlobalV::NBANDS); ib++)
 	{
-		B[ib] = new complex<double>[dim];
+		B[ib] = new std::complex<double>[dim];
 	}
-	cout << "B ok" << endl;
+	std::cout << "B ok" << std::endl;
 	
-	weight = new complex<double> [oband*GlobalV::NBANDS];
-	cout << "weight OK"<<endl;
+	weight = new std::complex<double> [oband*GlobalV::NBANDS];
+	std::cout << "weight OK"<<std::endl;
 	
-	chi0 = new complex<double>*[dim];
+	chi0 = new std::complex<double>*[dim];
 	for(int g0=0; g0<dim; g0++)
 	{
-		chi0[g0] = new complex<double>[dim];
+		chi0[g0] = new std::complex<double>[dim];
 	}
-	cout << "chi0 OK" <<endl;
+	std::cout << "chi0 OK" <<std::endl;
 	
-	chi0_para = new complex<double>*[dim_para];
+	chi0_para = new std::complex<double>*[dim_para];
 	for(int g0=0; g0<dim_para; g0++)
 	{
-		chi0_para[g0] = new complex<double>[dim_para];
+		chi0_para[g0] = new std::complex<double>[dim_para];
 	}
 
-	rpa = new complex<double>*[dim];
+	rpa = new std::complex<double>*[dim];
 	for(int g0=0; g0<dim; g0++)
 	{
-		rpa[g0] = new complex<double>[dim];
+		rpa[g0] = new std::complex<double>[dim];
 	}
-	cout << "rpa OK" <<endl;
+	std::cout << "rpa OK" <<std::endl;
 
-	chi = new complex<double>*[dim];
+	chi = new std::complex<double>*[dim];
 	for(int g0=0; g0<dim; g0++)
 	{
-		chi[g0] = new complex<double>[dim];
+		chi[g0] = new std::complex<double>[dim];
 	}
-	cout << "chi OK" <<endl;	
+	std::cout << "chi OK" <<std::endl;	
 	
-	cout << "All ok"<<endl;
+	std::cout << "All ok"<<std::endl;
 		
 	return;
 }
@@ -519,10 +519,10 @@ void Chi0_standard::Delete()
 	}
 }
 
-void Chi0_standard::Cal_Psi(int iq, complex<double> **psi_r)
+void Chi0_standard::Cal_Psi(int iq, std::complex<double> **psi_r)
 {
 	double phase_x, phase_xy, phase_xyz;
-	complex<double> exp_tmp;
+	std::complex<double> exp_tmp;
 	for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 	{
 		ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
@@ -542,7 +542,7 @@ void Chi0_standard::Cal_Psi(int iq, complex<double> **psi_r)
 				for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; iz++)
 				{
 					phase_xyz = (phase_xy + GlobalC::kv.kvec_d[iq].z*iz/GlobalC::pw.ncz) *TWO_PI;
-					exp_tmp = complex<double>( cos(phase_xyz), sin(phase_xyz) );
+					exp_tmp = std::complex<double>( cos(phase_xyz), sin(phase_xyz) );
 					psi_r[ib][ir] = GlobalC::UFFT.porter[ir]*exp_tmp;
 					ir++;
 				}
@@ -559,10 +559,10 @@ void Chi0_standard::Cal_b(int iq, int ik, int iqk)
 	TITLE("Chi0_standard","Cal_b");
 	Vector3<double> qk;
 	qk = GlobalC::kv.kvec_c[iq] + GlobalC::kv.kvec_c[ik];
-	//cout <<"qk = "<<qk.x<<" "<<qk.y<<" "<<qk.z<<endl;
+	//std::cout <<"qk = "<<qk.x<<" "<<qk.y<<" "<<qk.z<<std::endl;
 	double phase_x, phase_xy, phase_xyz;
 	Vector3<double> q = GlobalC::kv.kvec_d[iq];
-	complex<double> exp_tmp;
+	std::complex<double> exp_tmp;
 	
 	Cal_Psi(ik, psi_r1);
 	Cal_Psi(iqk, psi_r2);
@@ -581,7 +581,7 @@ void Chi0_standard::Cal_b(int iq, int ik, int iqk)
 					for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; iz++)
 					{
 						phase_xyz = (phase_xy + q.z*iz/GlobalC::pw.ncz) *TWO_PI;
-						exp_tmp = complex<double>(cos(-phase_xyz), sin(-phase_xyz));
+						exp_tmp = std::complex<double>(cos(-phase_xyz), sin(-phase_xyz));
 						GlobalC::UFFT.porter[ir] = conj(psi_r1[ib1][ir]) * psi_r2[ib2][ir] *exp_tmp;
 						ir++;
 					}
@@ -624,7 +624,7 @@ void Chi0_standard:: Cal_weight(int iq, int ik, double omega)
 	for(int ib1=0; ib1<oband; ib1++)
 		for(int ib2=0; ib2<GlobalV::NBANDS; ib2++)
 		{
-			complex<double> factor = complex<double>( (omega + GlobalC::wf.ekb[ik][ib1] - GlobalC::wf.ekb[iqk][ib2]), eta);
+			std::complex<double> factor = std::complex<double>( (omega + GlobalC::wf.ekb[ik][ib1] - GlobalC::wf.ekb[iqk][ib2]), eta);
 			weight[ib2+ib1*GlobalV::NBANDS] = ( GlobalC::wf.wg(ik,ib1)  - GlobalC::wf.wg(iqk,ib2) )/factor/GlobalC::ucell.omega;
 		}
 		
@@ -659,7 +659,7 @@ void Chi0_standard:: Cal_chi0(int iq, double omega)
 	for(int g0=0; g0<dim; g0++)
 		for(int g1=0; g1<dim; g1++)
 		{
-			chi0[g0][g1] = complex<double>(0.0,0.0);
+			chi0[g0][g1] = std::complex<double>(0.0,0.0);
 		}
 	
 	for(int ik=0; ik<GlobalC::kv.nks; ik++)
@@ -669,9 +669,9 @@ void Chi0_standard:: Cal_chi0(int iq, double omega)
 		Cal_weight(iq, ik, omega);
 		Cal_last();
 		Cal_first();
-		std::vector<std::vector<complex<double>>> A1(dim, std::vector<complex<double>>(oband*GlobalV::NBANDS));       // Peize Lin change ptr to vector at 2020.01.31
-		std::vector<std::vector<complex<double>>> B1(oband*GlobalV::NBANDS, std::vector<complex<double>>(dim));       // Peize Lin change ptr to vector at 2020.01.31
-		std::vector<std::vector<complex<double>>> C(dim, std::vector<complex<double>>(dim));                 // Peize Lin change ptr to vector at 2020.01.31
+		std::vector<std::vector<std::complex<double>>> A1(dim, std::vector<std::complex<double>>(oband*GlobalV::NBANDS));       // Peize Lin change ptr to std::vector at 2020.01.31
+		std::vector<std::vector<std::complex<double>>> B1(oband*GlobalV::NBANDS, std::vector<std::complex<double>>(dim));       // Peize Lin change ptr to std::vector at 2020.01.31
+		std::vector<std::vector<std::complex<double>>> C(dim, std::vector<std::complex<double>>(dim));                 // Peize Lin change ptr to std::vector at 2020.01.31
 		
 		for(int g0=0; g0<dim; g0++)
 			for(int ib=0; ib<(oband*GlobalV::NBANDS); ib++)
@@ -685,8 +685,8 @@ void Chi0_standard:: Cal_chi0(int iq, double omega)
 				B1[ib][g0] = B[ib][g0];
 			}
 			
-		complex<double> alpha=1;
-		complex<double> beta=0;
+		std::complex<double> alpha=1;
+		std::complex<double> beta=0;
 		char transa = 'N';
 		char transb = 'N';
 		int M = dim;
@@ -745,11 +745,11 @@ double Chi0_standard::qg2( int iq, int g0)
 	
 	return qg2;
 }
-int Chi0_standard::Cinv(int n, complex<double>** a)
+int Chi0_standard::Cinv(int n, std::complex<double>** a)
 {
 	int i,j,k,l,u,v,w;
 	double p,q,s,d,b,m;
-	complex<double> t;
+	std::complex<double> t;
 	int *is, *js;
 	is = new int[n]; 
 	js = new int[n];
@@ -771,7 +771,7 @@ int Chi0_standard::Cinv(int n, complex<double>** a)
 		{
 			delete[] is;
 			delete[] js;
-			cout << "error not inv" << endl;
+			std::cout << "error not inv" << std::endl;
 			return(0);
 		}
 		
@@ -792,7 +792,7 @@ int Chi0_standard::Cinv(int n, complex<double>** a)
 		}
 		
 		l=k*n+k;
-		a[k][k] = complex<double>( a[k][k].real()/d, -a[k][k].imag()/d);
+		a[k][k] = std::complex<double>( a[k][k].real()/d, -a[k][k].imag()/d);
 		
 		for (j=0; j<=n-1; j++)
 		{
@@ -800,7 +800,7 @@ int Chi0_standard::Cinv(int n, complex<double>** a)
 			{
 				p=a[k][j].real() *a[k][k].real(); q=a[k][j].imag() *a[k][k].imag();
 				s=(a[k][j].real() +a[k][j].imag())*(a[k][k].real() + a[k][k].imag());
-				a[k][j] = complex<double>( p-q, s-p-q);
+				a[k][j] = std::complex<double>( p-q, s-p-q);
 			}
 		}
 		
@@ -815,7 +815,7 @@ int Chi0_standard::Cinv(int n, complex<double>** a)
 						p=a[k][j].real() * a[i][k].real(); q=a[k][j].imag() *a[i][k].imag();
 						s=(a[k][j].real() +a[k][j].imag())*(a[i][k].real() +a[i][k].imag());
 						m=p-q; b=s-p-q;
-						a[i][j] = complex<double>( a[i][j].real() - m, a[i][j].imag() - b);
+						a[i][j] = std::complex<double>( a[i][j].real() - m, a[i][j].imag() - b);
 					}																				
 				}																
 			}
@@ -827,7 +827,7 @@ int Chi0_standard::Cinv(int n, complex<double>** a)
 			{
 				p=a[i][k].real() *a[k][k].real(); q=a[i][k].imag() *a[k][k].imag();
 				s=(a[i][k].real() +a[i][k].imag())*(a[k][k].real() +a[k][k].imag());
-				a[i][k] = complex<double>( q-p, p+q-s); 
+				a[i][k] = std::complex<double>( q-p, p+q-s); 
 			}
 		}
 	}
@@ -858,13 +858,13 @@ int Chi0_standard::Cinv(int n, complex<double>** a)
 }
 
 
-void Chi0_standard::CMatrixMul(int m, int n, int l, complex<double>** A, complex<double>** B, complex<double>** C)
+void Chi0_standard::CMatrixMul(int m, int n, int l, std::complex<double>** A, std::complex<double>** B, std::complex<double>** C)
 {
 	for(int i=0; i<m; i++)
 	{
 		for(int j=0; j<l; j++)
 		{
-			C[i][j] = complex<double>(0.0,0.0);
+			C[i][j] = std::complex<double>(0.0,0.0);
 			for(int k=0; k<n; k++)
 			{
 				C[i][j] = C[i][j] + A[i][k] * B[k][j] ;
@@ -931,13 +931,13 @@ int Chi0_standard::parallel_g()
 	}
 	
 	int dim1 = num;
-	//cout << "dim1 = "<<dim1<<endl;
+	//std::cout << "dim1 = "<<dim1<<std::endl;
 	for(int i=0;i<dim;i++)
 	{
-		cout <<"G["<<i<<"] = "<<all_gcar[i].x<<" "<<all_gcar[i].y<<" "<<all_gcar[i].z<<endl;
-		cout <<"G_direct["<<i<<"] = "<<GlobalC::pw.gdirect[i].x<<" "<<GlobalC::pw.gdirect[i].y<<" "<<GlobalC::pw.gdirect[i].z<<endl;
-		cout <<"flag1["<<i<<"] = "<<flag1[i]<<endl;
-		cout <<"G_para["<<i<<"] = "<<para_g[i][0]<<"  "<<para_g[i][1]<<endl;  
+		std::cout <<"G["<<i<<"] = "<<all_gcar[i].x<<" "<<all_gcar[i].y<<" "<<all_gcar[i].z<<std::endl;
+		std::cout <<"G_direct["<<i<<"] = "<<GlobalC::pw.gdirect[i].x<<" "<<GlobalC::pw.gdirect[i].y<<" "<<GlobalC::pw.gdirect[i].z<<std::endl;
+		std::cout <<"flag1["<<i<<"] = "<<flag1[i]<<std::endl;
+		std::cout <<"G_para["<<i<<"] = "<<para_g[i][0]<<"  "<<para_g[i][1]<<std::endl;  
 	}
 	
 	return dim1;

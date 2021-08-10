@@ -1,23 +1,23 @@
 #include "../src_pw/charge.h"
 #include "../src_pw/global.h"
 
-bool Charge::read_rho(const int &is, const string &fn, double* rho) //add by dwan
+bool Charge::read_rho(const int &is, const std::string &fn, double* rho) //add by dwan
 {
     TITLE("Charge","read_rho");
-    ifstream ifs(fn.c_str());
+    std::ifstream ifs(fn.c_str());
     if (!ifs) 
 	{
-		GlobalV::ofs_running << " !!! Couldn't find the charge file !!!" << endl;
+		GlobalV::ofs_running << " !!! Couldn't find the charge file !!!" << std::endl;
 		return false;
 	}
 	else
 	{
-    	GlobalV::ofs_running << " Find the file, try to read charge from file." << endl;
+    	GlobalV::ofs_running << " Find the file, try to read charge from file." << std::endl;
 	}
 
 	bool quit=false;
 
-    string name;
+    std::string name;
 	ifs >> name;
     
 	// check lattice constant, unit is Angstrom
@@ -42,7 +42,7 @@ bool Charge::read_rho(const int &is, const string &fn, double* rho) //add by dwa
 		CHECK_DOUBLE(ifs,GlobalC::ucell.atoms[it].na,quit);
 	}
 
-	string coordinate;
+	std::string coordinate;
 	ifs >> coordinate;
 
 	for(int it=0; it<GlobalC::ucell.ntype; it++)
@@ -63,7 +63,7 @@ bool Charge::read_rho(const int &is, const string &fn, double* rho) //add by dwa
 	if(GlobalV::NSPIN == 1||GlobalV::NSPIN == 4)
 	{
 		READ_VALUE(ifs, GlobalC::en.ef);
-		GlobalV::ofs_running << " read in fermi energy = " << GlobalC::en.ef << endl;
+		GlobalV::ofs_running << " read in fermi energy = " << GlobalC::en.ef << std::endl;
 	}
 	else if(GlobalV::NSPIN == 2)
 	{
@@ -79,7 +79,7 @@ bool Charge::read_rho(const int &is, const string &fn, double* rho) //add by dwa
 	CHECK_INT(ifs, GlobalC::pw.ncz);	
 
 #ifndef __MPI
-	GlobalV::ofs_running << " Read SPIN = " << is+1 << " charge now." << endl;
+	GlobalV::ofs_running << " Read SPIN = " << is+1 << " charge now." << std::endl;
 	for(int k=0; k<GlobalC::pw.ncz; k++)
 	{
 		// consistent with the write_rho, something is
@@ -101,7 +101,7 @@ bool Charge::read_rho(const int &is, const string &fn, double* rho) //add by dwa
 		ZEROS(zpiece, nxy);
 		if(GlobalV::MY_RANK==0)
 		{
-			//				GlobalV::ofs_running << " Read charge density iz=" << iz << endl;
+			//				GlobalV::ofs_running << " Read charge density iz=" << iz << std::endl;
 			for(int j=0; j<GlobalC::pw.ncy; j++)
 			{
 				for(int i=0; i<GlobalC::pw.ncx; i++)

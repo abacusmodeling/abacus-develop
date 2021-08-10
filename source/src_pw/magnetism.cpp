@@ -57,8 +57,8 @@ void Magnetism::compute_magnetization()
 			OUT(GlobalV::ofs_running,"nelec",GlobalC::CHR.nelec);
 		}
 
-//        cout << "\n tot_mag = " << setprecision(6) << this->tot_magnetization << " Bohr mag/cell" << endl;
-  //      cout << " abs_mag = " << setprecision(6) << this->abs_magnetization << " Bohr mag/cell" << endl;
+//        std::cout << "\n tot_mag = " << std::setprecision(6) << this->tot_magnetization << " Bohr mag/cell" << std::endl;
+  //      std::cout << " abs_mag = " << std::setprecision(6) << this->abs_magnetization << " Bohr mag/cell" << std::endl;
     }
 	// noncolliear :
 	else if(GlobalV::NSPIN==4)
@@ -176,8 +176,8 @@ void Magnetism::cal_ux(const int ntype)
 		{
 			ux_[i] *= 1/sqrt(uxmod);
 		}
-		//       cout<<"    Fixed quantization axis for GGA: "
-		//<<setw(10)<<ux[0]<<"  "<<setw(10)<<ux[1]<<"  "<<setw(10)<<ux[2]<<endl;
+		//       std::cout<<"    Fixed quantization axis for GGA: "
+		//<<std::setw(10)<<ux[0]<<"  "<<std::setw(10)<<ux[1]<<"  "<<std::setw(10)<<ux[2]<<std::endl;
 	}
 	return;
 }

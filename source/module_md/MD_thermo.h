@@ -21,7 +21,7 @@ class MD_thermo
         const double &NVT_tau_in, 
         const double &dt_in,
         const int &NVT_control, 
-        ofstream &ofs, 
+        std::ofstream &ofs, 
         const int &numIon,
         const double &temperature,
         const Vector3<double>* vel,
@@ -69,10 +69,10 @@ class MD_thermo
     //NVT thermostat parameters
 	const static int N_mt19937=624;
 	const static int M_mt19937=397;
-	unsigned long const MATRIX_A=0x9908b0dfUL ;  /* constant vector a */
+	unsigned long const MATRIX_A=0x9908b0dfUL ;  /* constant std::vector a */
 	unsigned long const UPPER_MASK=0x80000000UL; /* most significant w-r bits */
 	unsigned long const LOWER_MASK=0x7fffffffUL; /* least significant r bits */
-	unsigned long mt[N_mt19937]; /* the array for the state vector  */
+	unsigned long mt[N_mt19937]; /* the array for the state std::vector  */
 	int mti=625; /* mti==N+1 means mt[N] is not initialized */
 	long double gamma; //langevin friction coefficient
 	long double nu; //Andersen collision frequency

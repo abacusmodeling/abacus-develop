@@ -39,7 +39,7 @@
 void Local_Orbital_Charge::write_dm(
 	const int &is, 
 	const int &iter, 
-	const string &fn, 
+	const std::string &fn, 
 	const int &precision)
 {
     TITLE("Local_Orbital_Charge","write_dm");
@@ -55,7 +55,7 @@ void Local_Orbital_Charge::write_dm(
 	timer::tick("Local_Orbital_Charge","write_dm");
 
 	time_t start, end;
-	ofstream ofs;
+	std::ofstream ofs;
 
 	if(GlobalV::MY_RANK==0)
 	{
@@ -67,34 +67,34 @@ void Local_Orbital_Charge::write_dm(
 			WARNING("Charge::write_rho","Can't create Charge File!");
 		}
 
-		//GlobalV::ofs_running << "\n Output charge file." << endl;
+		//GlobalV::ofs_running << "\n Output charge file." << std::endl;
 
-		ofs << GlobalC::ucell.latName << endl;//1
-		ofs << " " << GlobalC::ucell.lat0 * BOHR_TO_A << endl;
-		ofs << " " << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << endl;
-		ofs << " " << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << endl;
-		ofs << " " << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << endl;
+		ofs << GlobalC::ucell.latName << std::endl;//1
+		ofs << " " << GlobalC::ucell.lat0 * BOHR_TO_A << std::endl;
+		ofs << " " << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << std::endl;
+		ofs << " " << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << std::endl;
+		ofs << " " << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << std::endl;
 		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
 			ofs << " " << GlobalC::ucell.atoms[it].label;
 		}
-		ofs << endl;
+		ofs << std::endl;
 		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
 			ofs << " " << GlobalC::ucell.atoms[it].na;
 		}
-		ofs << endl;
-		ofs << "Direct" << endl;
+		ofs << std::endl;
+		ofs << "Direct" << std::endl;
 
 		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
 			Atom* atom = &GlobalC::ucell.atoms[it];
-			ofs << setprecision(15);
+			ofs << std::setprecision(15);
 			for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 			{
 				ofs << " " << atom->taud[ia].x
 					<< " " << atom->taud[ia].y
-					<< " " << atom->taud[ia].z << endl;
+					<< " " << atom->taud[ia].z << std::endl;
 			}
 		}
 
@@ -114,14 +114,14 @@ void Local_Orbital_Charge::write_dm(
 		}
 
 
-		ofs << "\n  " << GlobalV::NLOCAL << " " << GlobalV::NLOCAL << endl;
+		ofs << "\n  " << GlobalV::NLOCAL << " " << GlobalV::NLOCAL << std::endl;
 
-		ofs << setprecision(precision);
+		ofs << std::setprecision(precision);
 		ofs << scientific;
 
 	}
 
-    //ofs << "\n " << GlobalV::GAMMA_ONLY_LOCAL << " (GAMMA ONLY LOCAL)" << endl;
+    //ofs << "\n " << GlobalV::GAMMA_ONLY_LOCAL << " (GAMMA ONLY LOCAL)" << std::endl;
 #ifndef __MPI
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {
@@ -137,7 +137,7 @@ void Local_Orbital_Charge::write_dm(
     else
     {
         WARNING_QUIT("write_dm","not ready yet");
-        ofs << " " << GlobalC::LNNR.nnrg << " (nnrg)" << endl;
+        ofs << " " << GlobalC::LNNR.nnrg << " (nnrg)" << std::endl;
         for(int i=0; i<GlobalC::LNNR.nnrg; ++i)
         {
             if(i%8==0) ofs << "\n";
@@ -179,7 +179,7 @@ void Local_Orbital_Charge::write_dm(
                     if (nu >=0)
                     {
                         tmp[j] = DM[is][mu][nu];
-                        //GlobalV::ofs_running << " dmi=" << i << " j=" << j << " " << DM[is][mu][nu] << endl;
+                        //GlobalV::ofs_running << " dmi=" << i << " j=" << j << " " << DM[is][mu][nu] << std::endl;
                     }
                 }
             }
@@ -217,7 +217,7 @@ void Local_Orbital_Charge::write_dm(
     }
     else
     {
-        ofs << " " << GlobalC::LNNR.nnrg << " (nnrg)" << endl;
+        ofs << " " << GlobalC::LNNR.nnrg << " (nnrg)" << std::endl;
         WARNING_QUIT("local_orbital_charge","not ready to output DM_R");
     }
 #endif

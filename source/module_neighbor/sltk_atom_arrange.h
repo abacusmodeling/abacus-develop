@@ -16,7 +16,7 @@ public:
 	
 	static void search(
 		const bool flag,
-		ofstream &ofs,
+		std::ofstream &ofs,
 		Grid_Driver &grid_d, 
 		const UnitCell &ucell, 
 		const double& search_radius_bohr, 
@@ -25,15 +25,15 @@ public:
 
 	//caoyu modify 2021-05-24
 	static double set_sr_NL(
-		ofstream &ofs_in,
-		string &output_level,
+		std::ofstream &ofs_in,
+		std::string &output_level,
 		const double& rcutmax_Phi, 
 		const double& rcutmax_Beta, 
 		const bool gamma_only_local);
 
 	//2015-05-07
 	static void delete_vector(
-		ofstream &ofs_in,
+		std::ofstream &ofs_in,
 		const bool pbc_flag,
 		Grid_Driver &grid_d, 
 		const UnitCell &ucell, 

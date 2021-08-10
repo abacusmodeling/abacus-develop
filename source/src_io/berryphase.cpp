@@ -9,7 +9,7 @@ berryphase::berryphase()
 
 berryphase::~berryphase()
 {
-	//GlobalV::ofs_running << "this is ~berryphase()" << endl;
+	//GlobalV::ofs_running << "this is ~berryphase()" << std::endl;
 }
 
 void berryphase::get_occupation_bands()
@@ -25,7 +25,7 @@ void berryphase::get_occupation_bands()
 	{
 		WARNING_QUIT("berryphase::get_occupation_bands","not enough bands for berryphase, increase band numbers.");
 	}
-	//GlobalV::ofs_running << "the berryphase's occ_nbands is " << occ_nbands << endl;
+	//GlobalV::ofs_running << "the berryphase's occ_nbands is " << occ_nbands << std::endl;
 }
 
 void berryphase::lcao_init()
@@ -197,17 +197,17 @@ void berryphase::set_kpoints(const int direction)
 
 	// test by jingan
 	/*
-	GlobalV::ofs_running << "direction is " << direction << endl;
-	GlobalV::ofs_running << "nppstr = " << nppstr << endl;
-	GlobalV::ofs_running << "total string is " << total_string << endl;
+	GlobalV::ofs_running << "direction is " << direction << std::endl;
+	GlobalV::ofs_running << "nppstr = " << nppstr << std::endl;
+	GlobalV::ofs_running << "total std::string is " << total_string << std::endl;
 	for(int istring = 0; istring < total_string; istring++)
 	{
-		GlobalV::ofs_running << " the string is " << istring << endl;
+		GlobalV::ofs_running << " the std::string is " << istring << std::endl;
 		for(int count = 0; count < nppstr; count++)
 		{
 			GlobalV::ofs_running << "(" << GlobalC::kv.kvec_c[ k_index[istring][count] ].x << ","
 							   << GlobalC::kv.kvec_c[ k_index[istring][count] ].y << ","
-							   << GlobalC::kv.kvec_c[ k_index[istring][count] ].z << ")" << endl;
+							   << GlobalC::kv.kvec_c[ k_index[istring][count] ].z << ")" << std::endl;
 		}
 		
 	}
@@ -219,13 +219,13 @@ void berryphase::set_kpoints(const int direction)
 
 double berryphase::stringPhase(int index_str, int nbands)
 {
-	complex<double> zeta(1.0, 0.0);
+	std::complex<double> zeta(1.0, 0.0);
 	ComplexMatrix mat(nbands,nbands);
 	int ik_1;
 	int ik_2;
 	Vector3<double> G(0.0,0.0,0.0);
 	Vector3<double> dk = GlobalC::kv.kvec_c[ k_index[index_str][1] ] - GlobalC::kv.kvec_c[ k_index[index_str][0] ];
-	//GlobalV::ofs_running << "the string index is " << index_str << endl;
+	//GlobalV::ofs_running << "the std::string index is " << index_str << std::endl;
 	
 	for(int k_start = 0; k_start < (nppstr-1); k_start++)
 	{
@@ -297,7 +297,7 @@ double berryphase::stringPhase(int index_str, int nbands)
 				
 			} // mb
 			
-			complex<double> det(1.0,0.0);
+			std::complex<double> det(1.0,0.0);
 			int info = 0;
 			int *ipiv = new int[nbands];
 			LapackConnector::zgetrf(nbands, nbands, mat, nbands, ipiv, &info);				
@@ -316,10 +316,10 @@ double berryphase::stringPhase(int index_str, int nbands)
 		{
 			if(GlobalV::NSPIN!=4)
 			{
-				//complex<double> my_det = lcao_method.det_berryphase(ik_1,ik_2,dk,nbands);
+				//std::complex<double> my_det = lcao_method.det_berryphase(ik_1,ik_2,dk,nbands);
 				zeta = zeta * lcao_method.det_berryphase(ik_1,ik_2,dk,nbands);
 				// test by jingan
-				//GlobalV::ofs_running << "methon 1: det = " << my_det << endl;
+				//GlobalV::ofs_running << "methon 1: det = " << my_det << std::endl;
 				// test by jingan
 			}
 			else
@@ -339,7 +339,7 @@ double berryphase::stringPhase(int index_str, int nbands)
 				}
 			}
 			
-			complex<double> det(1.0,0.0);
+			std::complex<double> det(1.0,0.0);
 			int info = 0;
 			int *ipiv = new int[nbands];
 			LapackConnector::zgetrf(nbands, nbands, mat, nbands, ipiv, &info);				
@@ -351,7 +351,7 @@ double berryphase::stringPhase(int index_str, int nbands)
 			
 			zeta = zeta*det;
 			
-			GlobalV::ofs_running << "methon 2: det = " << det << endl;
+			GlobalV::ofs_running << "methon 2: det = " << det << std::endl;
 			
 			delete[] ipiv;
 			*/
@@ -368,16 +368,16 @@ double berryphase::stringPhase(int index_str, int nbands)
 
 void berryphase::Berry_Phase(int nbands, double &pdl_elec_tot, int &mod_elec_tot)
 {		
-	complex<double> cave = 0.0;
+	std::complex<double> cave = 0.0;
 	double *phik = new double[total_string];
 	double phik_ave = 0.0;
-	complex<double> *cphik = new complex<double>[total_string];
+	std::complex<double> *cphik = new std::complex<double>[total_string];
 	double *wistring = new double[total_string];
 	
 	
 	// electron polarization
 	
-	// get weight of every string 
+	// get weight of every std::string 
 	for(int istring = 0; istring < total_string; istring++)
 	{
 		wistring[istring] = 1.0 / total_string;
@@ -388,8 +388,8 @@ void berryphase::Berry_Phase(int nbands, double &pdl_elec_tot, int &mod_elec_tot
 	{
 		phik[istring] = stringPhase(istring,nbands);
 		// 将相位转换成复数形式
-		cphik[istring] = complex<double>(cos(phik[istring]),sin(phik[istring]));	
-		cave = cave + complex<double>(wistring[istring],0.0) * cphik[istring];
+		cphik[istring] = std::complex<double>(cos(phik[istring]),sin(phik[istring]));	
+		cave = cave + std::complex<double>(wistring[istring],0.0) * cphik[istring];
 		
 	}
 	
@@ -402,7 +402,7 @@ void berryphase::Berry_Phase(int nbands, double &pdl_elec_tot, int &mod_elec_tot
 		phik[istring] = (theta0 + dtheta) / (2 * PI);
 		phik_ave = phik_ave + wistring[istring] * phik[istring];
 		// test by jingan
-		//GlobalV::ofs_running << "phik[" << istring << "] = " << phik[istring] << endl;
+		//GlobalV::ofs_running << "phik[" << istring << "] = " << phik[istring] << std::endl;
 		// test by jingan
 	}
 	
@@ -433,7 +433,7 @@ void berryphase::Berry_Phase(int nbands, double &pdl_elec_tot, int &mod_elec_tot
 	delete[] wistring;
 	
 	
-	//GlobalV::ofs_running << "Berry_Phase end " << endl;
+	//GlobalV::ofs_running << "Berry_Phase end " << std::endl;
 
 }
 
@@ -446,14 +446,14 @@ void berryphase::Macroscopic_polarization()
 	
 	
 	GlobalV::ofs_running << "\n\n\n\n";
-	GlobalV::ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
-	GlobalV::ofs_running << " |                                                                    |" << endl;
-	GlobalV::ofs_running << " | POLARIZATION GlobalV::CALCULATION:                                          |" << endl;
-	GlobalV::ofs_running << " |                  Modern Theory of Polarization                     |" << endl;
-	GlobalV::ofs_running << " | calculate the Macroscopic polarization of a crystalline insulator  |" << endl;
-	GlobalV::ofs_running << " | by using Berry Phase method.                                       |" << endl;
-	GlobalV::ofs_running << " |                                                                    |" << endl;
-	GlobalV::ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+	GlobalV::ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
+	GlobalV::ofs_running << " |                                                                    |" << std::endl;
+	GlobalV::ofs_running << " | POLARIZATION GlobalV::CALCULATION:                                          |" << std::endl;
+	GlobalV::ofs_running << " |                  Modern Theory of Polarization                     |" << std::endl;
+	GlobalV::ofs_running << " | calculate the Macroscopic polarization of a crystalline insulator  |" << std::endl;
+	GlobalV::ofs_running << " | by using Berry Phase method.                                       |" << std::endl;
+	GlobalV::ofs_running << " |                                                                    |" << std::endl;
+	GlobalV::ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
 	GlobalV::ofs_running << "\n\n\n\n";
 	
 	
@@ -553,7 +553,7 @@ void berryphase::Macroscopic_polarization()
 	else modulus = 1;
 	
 	// test by jingan
-	//GlobalV::ofs_running << "ion polarization end" << endl;
+	//GlobalV::ofs_running << "ion polarization end" << std::endl;
 	// test by jingan
 
 
@@ -573,11 +573,11 @@ void berryphase::Macroscopic_polarization()
 			const double unit2 = rmod / GlobalC::ucell.omega;
 			const double unit3 = ( rmod / GlobalC::ucell.omega ) * ( 1.60097e-19/pow(5.29177e-11,2) );
 			
-			GlobalV::ofs_running << " VALUES OF POLARIZATION" << endl;
-			GlobalV::ofs_running << endl;
-			GlobalV::ofs_running << "  The Ionic Phase: " << setw(10) << fixed << setprecision(5) << polarization_ion[0] << endl;
-			GlobalV::ofs_running << " Electronic Phase: " << setw(10) << fixed << setprecision(5) << pdl_elec_tot << endl;
-			//GlobalV::ofs_running << " the electronic part polarization is P(ele) = " << rmod * pdl_elec_tot << "   (e/Omega).bohr   in R1 direction" << endl;
+			GlobalV::ofs_running << " VALUES OF POLARIZATION" << std::endl;
+			GlobalV::ofs_running << std::endl;
+			GlobalV::ofs_running << "  The Ionic Phase: " << std::setw(10) << fixed << std::setprecision(5) << polarization_ion[0] << std::endl;
+			GlobalV::ofs_running << " Electronic Phase: " << std::setw(10) << fixed << std::setprecision(5) << pdl_elec_tot << std::endl;
+			//GlobalV::ofs_running << " the electronic part polarization is P(ele) = " << rmod * pdl_elec_tot << "   (e/Omega).bohr   in R1 direction" << std::endl;
 			
 			// calculate total polarization,add electron part and ions part
 			double total_polarization = pdl_elec_tot + polarization_ion[0] ;
@@ -586,11 +586,11 @@ void berryphase::Macroscopic_polarization()
 			polarization_xyz.normalize();
 			polarization_xyz = total_polarization * polarization_xyz;
 
-			GlobalV::ofs_running << "\n" << "The calculated polarization direction is in R1 direction" << endl;
-			GlobalV::ofs_running << "\n" << " P = " << outFormat(unit1*total_polarization, unit1*modulus, unit1*polarization_xyz) << "(e/Omega).bohr" << endl;
-			GlobalV::ofs_running << "\n" << " P = " << outFormat(unit2*total_polarization, unit2*modulus, unit2*polarization_xyz) << "e/bohr^2" << endl;
-			GlobalV::ofs_running << "\n" << " P = " << outFormat(unit3*total_polarization, unit3*modulus, unit3*polarization_xyz) << "C/m^2" << endl;			   
-			GlobalV::ofs_running << endl;
+			GlobalV::ofs_running << "\n" << "The calculated polarization direction is in R1 direction" << std::endl;
+			GlobalV::ofs_running << "\n" << " P = " << outFormat(unit1*total_polarization, unit1*modulus, unit1*polarization_xyz) << "(e/Omega).bohr" << std::endl;
+			GlobalV::ofs_running << "\n" << " P = " << outFormat(unit2*total_polarization, unit2*modulus, unit2*polarization_xyz) << "e/bohr^2" << std::endl;
+			GlobalV::ofs_running << "\n" << " P = " << outFormat(unit3*total_polarization, unit3*modulus, unit3*polarization_xyz) << "C/m^2" << std::endl;			   
+			GlobalV::ofs_running << std::endl;
 		
 			break;
 		
@@ -608,11 +608,11 @@ void berryphase::Macroscopic_polarization()
 			const double unit2 = rmod / GlobalC::ucell.omega;
 			const double unit3 = ( rmod / GlobalC::ucell.omega ) * ( 1.60097e-19/pow(5.29177e-11,2) );
 			
-			GlobalV::ofs_running << " VALUES OF POLARIZATION" << endl;
-			GlobalV::ofs_running << endl;
-			GlobalV::ofs_running << "  The Ionic Phase: " << setw(10) << fixed << setprecision(5) << polarization_ion[1] << endl;
-			GlobalV::ofs_running << " Electronic Phase: " << setw(10) << fixed << setprecision(5) << pdl_elec_tot << endl;
-			//GlobalV::ofs_running << " the electronic part polarization is P(ele) = " << rmod * pdl_elec_tot << "   (e/Omega).bohr   in R2 direction" << endl;
+			GlobalV::ofs_running << " VALUES OF POLARIZATION" << std::endl;
+			GlobalV::ofs_running << std::endl;
+			GlobalV::ofs_running << "  The Ionic Phase: " << std::setw(10) << fixed << std::setprecision(5) << polarization_ion[1] << std::endl;
+			GlobalV::ofs_running << " Electronic Phase: " << std::setw(10) << fixed << std::setprecision(5) << pdl_elec_tot << std::endl;
+			//GlobalV::ofs_running << " the electronic part polarization is P(ele) = " << rmod * pdl_elec_tot << "   (e/Omega).bohr   in R2 direction" << std::endl;
 		
 			// calculate total polarization,add electron part and ions part
 			double total_polarization = pdl_elec_tot + polarization_ion[1] ;
@@ -621,11 +621,11 @@ void berryphase::Macroscopic_polarization()
 			polarization_xyz.normalize();
 			polarization_xyz = total_polarization * polarization_xyz;
 		
-			GlobalV::ofs_running << "\n" << "The calculated polarization direction is in R2 direction" << endl;
-			GlobalV::ofs_running << "\n"  << " P = " << outFormat(unit1*total_polarization, unit1*modulus, unit1*polarization_xyz) << "(e/Omega).bohr" << endl;
-			GlobalV::ofs_running << "\n"  << " P = " << outFormat(unit2*total_polarization, unit2*modulus, unit2*polarization_xyz) << "e/bohr^2" << endl;
-			GlobalV::ofs_running << "\n"  << " P = " << outFormat(unit3*total_polarization, unit3*modulus, unit3*polarization_xyz) << "C/m^2" << endl;
-			GlobalV::ofs_running << endl;
+			GlobalV::ofs_running << "\n" << "The calculated polarization direction is in R2 direction" << std::endl;
+			GlobalV::ofs_running << "\n"  << " P = " << outFormat(unit1*total_polarization, unit1*modulus, unit1*polarization_xyz) << "(e/Omega).bohr" << std::endl;
+			GlobalV::ofs_running << "\n"  << " P = " << outFormat(unit2*total_polarization, unit2*modulus, unit2*polarization_xyz) << "e/bohr^2" << std::endl;
+			GlobalV::ofs_running << "\n"  << " P = " << outFormat(unit3*total_polarization, unit3*modulus, unit3*polarization_xyz) << "C/m^2" << std::endl;
+			GlobalV::ofs_running << std::endl;
 			
 			break;
 		
@@ -643,11 +643,11 @@ void berryphase::Macroscopic_polarization()
 			const double unit2 = rmod / GlobalC::ucell.omega;
 			const double unit3 = ( rmod / GlobalC::ucell.omega ) * ( 1.60097e-19/pow(5.29177e-11,2) );
 			
-			GlobalV::ofs_running << " VALUES OF POLARIZATION" << endl;
-			GlobalV::ofs_running << endl;
-			GlobalV::ofs_running << "  The Ionic Phase: " << setw(10) << fixed << setprecision(5) << polarization_ion[2] << endl;
-			GlobalV::ofs_running << " Electronic Phase: " << setw(10) << fixed << setprecision(5) << pdl_elec_tot << endl;
-			//GlobalV::ofs_running << " the electronic part polarization is P(ele) = " << rmod * pdl_elec_tot << "   (e/Omega).bohr   in R3 direction" << endl;
+			GlobalV::ofs_running << " VALUES OF POLARIZATION" << std::endl;
+			GlobalV::ofs_running << std::endl;
+			GlobalV::ofs_running << "  The Ionic Phase: " << std::setw(10) << fixed << std::setprecision(5) << polarization_ion[2] << std::endl;
+			GlobalV::ofs_running << " Electronic Phase: " << std::setw(10) << fixed << std::setprecision(5) << pdl_elec_tot << std::endl;
+			//GlobalV::ofs_running << " the electronic part polarization is P(ele) = " << rmod * pdl_elec_tot << "   (e/Omega).bohr   in R3 direction" << std::endl;
 		
 			// calculate total polarization,add electron part and ions part
 			double total_polarization = pdl_elec_tot + polarization_ion[2] ;
@@ -656,30 +656,30 @@ void berryphase::Macroscopic_polarization()
 			polarization_xyz.normalize();
 			polarization_xyz = total_polarization * polarization_xyz;
 
-			GlobalV::ofs_running << "\n" << "The calculated polarization direction is in R3 direction" << endl;
-			GlobalV::ofs_running << "\n" << " P = " << outFormat(unit1*total_polarization, unit1*modulus, unit1*polarization_xyz) << "(e/Omega).bohr" << endl;
-			GlobalV::ofs_running << "\n" << " P = " << outFormat(unit2*total_polarization, unit2*modulus, unit2*polarization_xyz) << "e/bohr^2" << endl;
-			GlobalV::ofs_running << "\n" << " P = " << outFormat(unit3*total_polarization, unit3*modulus, unit3*polarization_xyz) << "C/m^2" << endl;
-			GlobalV::ofs_running << endl;
+			GlobalV::ofs_running << "\n" << "The calculated polarization direction is in R3 direction" << std::endl;
+			GlobalV::ofs_running << "\n" << " P = " << outFormat(unit1*total_polarization, unit1*modulus, unit1*polarization_xyz) << "(e/Omega).bohr" << std::endl;
+			GlobalV::ofs_running << "\n" << " P = " << outFormat(unit2*total_polarization, unit2*modulus, unit2*polarization_xyz) << "e/bohr^2" << std::endl;
+			GlobalV::ofs_running << "\n" << " P = " << outFormat(unit3*total_polarization, unit3*modulus, unit3*polarization_xyz) << "C/m^2" << std::endl;
+			GlobalV::ofs_running << std::endl;
 		
 			break;
 		}
 	
 	}
 
-	//GlobalV::ofs_running << "the Macroscopic_polarization is over" << endl;
+	//GlobalV::ofs_running << "the Macroscopic_polarization is over" << std::endl;
 	
 	return;
 }
 
-string berryphase::outFormat(const double polarization, const double modulus, const Vector3<double> project)
+std::string berryphase::outFormat(const double polarization, const double modulus, const Vector3<double> project)
 {
-	stringstream outStr;
-	outStr << setw(12) << fixed << setprecision(7) << polarization << "  (mod " ;
-	outStr << setw(12) << fixed << setprecision(7) << modulus << ")  (";
-	outStr << setw(12) << fixed << setprecision(7) << project.x << ",";
-	outStr << setw(12) << fixed << setprecision(7) << project.y << ",";
-	outStr << setw(12) << fixed << setprecision(7) << project.z << ") ";
+	std::stringstream outStr;
+	outStr << std::setw(12) << fixed << std::setprecision(7) << polarization << "  (mod " ;
+	outStr << std::setw(12) << fixed << std::setprecision(7) << modulus << ")  (";
+	outStr << std::setw(12) << fixed << std::setprecision(7) << project.x << ",";
+	outStr << std::setw(12) << fixed << std::setprecision(7) << project.y << ",";
+	outStr << std::setw(12) << fixed << std::setprecision(7) << project.z << ") ";
 	
 	return outStr.str();
 }

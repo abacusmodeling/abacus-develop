@@ -18,7 +18,7 @@ public:
 
     static void calculate_weights(void);
 
-    static void decision(const string &name,const string &smearing,const double &degauss);
+    static void decision(const std::string &name,const std::string &smearing,const double &degauss);
 
     static const bool& gauss(void) 
 	{

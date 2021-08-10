@@ -33,7 +33,7 @@ void Driver_classic::reading(void)
 	INPUT.Init( GlobalV::global_in_card );
 
     // (2) Print the parameters into INPUT file.
-    stringstream ss1;
+    std::stringstream ss1;
     ss1 << GlobalV::global_out_dir << GlobalV::global_in_card;
     INPUT.Print( ss1.str() );
 

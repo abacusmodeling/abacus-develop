@@ -36,7 +36,7 @@ public:
 
 	void init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in, PW_Basis *pw_ptr_in, Use_FFT *UFFT_ptr_in, UnitCell_pseudo *ucell_ptr_in);
 	void cal_exx();
-	const complex<double> * const * const * get_exx_matrix() const { return exx_matrix; }
+	const std::complex<double> * const * const * get_exx_matrix() const { return exx_matrix; }
 	double get_exx_energy() const { return exx_energy; }
 	
 	void write_q_pack() const;
@@ -57,16 +57,16 @@ private:
 	
 	int iq_vecik;
 	
-	complex<double> **phi;
-	complex<double> ***psi;
+	std::complex<double> **phi;
+	std::complex<double> ***psi;
 	double *recip_qkg2;
 	double sum2_factor;
-	complex<double> *b;
-	complex<double> *b0;
-	complex<double> *sum1;
-	complex<double> **sum3;
+	std::complex<double> *b;
+	std::complex<double> *b0;
+	std::complex<double> *sum1;
+	std::complex<double> **sum3;
 	
-	complex<double> ***exx_matrix;
+	std::complex<double> ***exx_matrix;
 	double exx_energy;
 	
 	void wf_wg_cal();

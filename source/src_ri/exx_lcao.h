@@ -21,10 +21,10 @@
 #include "exx_abfs-parallel-communicate-dm3.h"
 #endif
 
-#include<set>
-#include<vector>
-#include<map>
-#include<deque>
+#include <set>
+#include <vector>
+#include <map>
+#include <deque>
 #include<memory>
 #include<limits>
 #include<omp.h>
@@ -32,7 +32,7 @@
 class Exx_Lcao
 {
 public:
-	struct{ string process; string thread; string matrix; } test_dir;	// Peize Lin test
+	struct{ std::string process; std::string thread; std::string matrix; } test_dir;	// Peize Lin test
 	Exx_Lcao( const Exx_Global::Exx_Info &info_global );				// Peize Lin test
 public:
 	void init();
@@ -41,10 +41,10 @@ public:
 	void cal_exx_elec_nscf();
 	void add_Hexx(const size_t ik, const double alpha) const;
 private:
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> cal_Hexx() const;
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> cal_Hexx() const;
 	double cal_energy(
-		const vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &HexxR ) const;
-	void init_radial_table_ions( const set<size_t> &atom_centres_core, const vector<pair<size_t,size_t>> &atom_pairs_core );
+		const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &HexxR ) const;
+	void init_radial_table_ions( const std::set<size_t> &atom_centres_core, const std::vector<std::pair<size_t,size_t>> &atom_pairs_core );
 		
 public:
 	enum class Distribute_Type {Htime,Kmeans2,Kmeans1,Order};
@@ -66,25 +66,25 @@ private:
 	Exx_Abfs::Parallel::Communicate::Hexx Hexx_para;
 	double energy = 0.0;
 	
-	vector<vector<vector<Numerical_Orbital_Lm>>> lcaos;
-	vector<vector<vector<Numerical_Orbital_Lm>>> abfs;
-	vector<vector<vector<Numerical_Orbital_Lm>>> abfs_ccp;
+	std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> lcaos;
+	std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> abfs;
+	std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> abfs_ccp;
 	Element_Basis_Index::IndexLNM index_lcaos;
 	Element_Basis_Index::IndexLNM index_abfs;
 
 	Exx_Abfs::Matrix_Orbs11 m_abfs_abfs;
 	Exx_Abfs::Matrix_Orbs21 m_abfslcaos_lcaos;	
 	
-	map<size_t,map<size_t,map<Abfs::Vector3_Order<double>,weak_ptr<matrix>>>> Cws;		// Cws[it1][it2][R]
-	map<size_t,map<size_t,map<Abfs::Vector3_Order<double>,weak_ptr<matrix>>>> Vws;		// Vws[it1][it2][R]
-	map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Cs;		// Cs[iat1][iat2][box2]
-	map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Cps;		// Cs[iat1][iat2][box2]
-	map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Vs;		// Vs[iat1][iat2][box2]
-	map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Vps;		// Vps[iat1][iat2][box2]
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,std::weak_ptr<matrix>>>> Cws;		// Cws[it1][it2][R]
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,std::weak_ptr<matrix>>>> Vws;		// Vws[it1][it2][R]
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>>>> Cs;		// Cs[iat1][iat2][box2]
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>>>> Cps;		// Cs[iat1][iat2][box2]
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>>>> Vs;		// Vs[iat1][iat2][box2]
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>>>> Vps;		// Vps[iat1][iat2][box2]
 
-	vector<pair<size_t,size_t>> atom_pairs_core_origin;
-	vector<pair<size_t,size_t>> atom_pairs_core;
-	set<pair<size_t,size_t>> H_atom_pairs_core;
+	std::vector<std::pair<size_t,size_t>> atom_pairs_core_origin;
+	std::vector<std::pair<size_t,size_t>> atom_pairs_core;
+	std::set<std::pair<size_t,size_t>> H_atom_pairs_core;
 	Abfs::Vector3_Order<int> Born_von_Karman_period;
 
 	Exx_Abfs::Screen::Schwarz schwarz;
@@ -98,7 +98,7 @@ public:
 		const double &hse_omega;
 		
 		double pca_threshold = 0;
-		vector<string> files_abfs;
+		std::vector<std::string> files_abfs;
 		double c_threshold  = 0;
 		double v_threshold  = 0;
 		double dm_threshold = 0;

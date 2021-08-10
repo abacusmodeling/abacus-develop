@@ -4,7 +4,7 @@
 
 void Center2_Orb::Orb22_Ccp::init_radial_table()
 {
-	vector<double> nB_tmp(nB1.getNr());
+	std::vector<double> nB_tmp(nB1.getNr());
 	for( size_t ir=0; ir!=nB_tmp.size(); ++ir)
 	{
 		nB_tmp[ir] = nB1.getPsi(ir) * nB2.getPsi(ir);
@@ -16,7 +16,7 @@ void Center2_Orb::Orb22_Ccp::init_radial_table()
 		if( (LB-std::abs(LB1-LB2))%2==1 )			// if LA+LB-LAB == odd, then Gaunt_Coefficients = 0
 			continue;
 
-//cout<<"LB\t"<<LB<<endl;
+//std::cout<<"LB\t"<<LB<<std::endl;
 			
 		Numerical_Orbital_Lm nB_origin;
 		nB_origin.set_orbital_info(
@@ -34,15 +34,15 @@ void Center2_Orb::Orb22_Ccp::init_radial_table()
 			false,
 			true);
 
-//cout<<"before ccp"<<endl;
+//std::cout<<"before ccp"<<std::endl;
 		Conv_Coulomb_Pot::cal_orbs_ccp( nB_origin, nB[LB], rmesh_times, 1 );		// Peize Lin test
 //		nB[LB].cal_kradial();
-//cout<<"after ccp"<<endl;
+//std::cout<<"after ccp"<<std::endl;
 
 		orb21s.insert( make_pair( LB, Center2_Orb::Orb21( nA1, nA2, nB[LB], MOT, MGT ) ) );
 
-//cout<<"before orb21s"<<endl;		
+//std::cout<<"before orb21s"<<std::endl;		
 		orb21s.at(LB).init_radial_table();
-//cout<<"after orb21s"<<endl;		
+//std::cout<<"after orb21s"<<std::endl;		
 	}
 }

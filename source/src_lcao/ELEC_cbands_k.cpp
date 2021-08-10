@@ -42,11 +42,11 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		//--------------------------------------------
 		if(GlobalV::CURRENT_SPIN == uhm.GK.get_spin() )
 		{
-			//GlobalV::ofs_running << " Same spin, same vlocal integration." << endl;
+			//GlobalV::ofs_running << " Same spin, same vlocal integration." << std::endl;
 		}
 		else
 		{
-			//GlobalV::ofs_running << " (spin change)" << endl;
+			//GlobalV::ofs_running << " (spin change)" << std::endl;
 			uhm.GK.reset_spin( GlobalV::CURRENT_SPIN );
 
 			// if you change the place of the following code,
@@ -90,7 +90,7 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		// Effective potential of DFT+U is added to total Hamiltonian here; Quxin adds on 20201029
 		if(INPUT.dft_plus_u)
 		{
-      vector<complex<double>> eff_pot(GlobalC::ParaO.nloc);
+      std::vector<std::complex<double>> eff_pot(GlobalC::ParaO.nloc);
 			GlobalC::dftu.cal_eff_pot_mat_complex(ik, istep, &eff_pot[0]);
       
 			for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)

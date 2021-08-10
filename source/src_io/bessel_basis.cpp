@@ -80,8 +80,8 @@ double Bessel_Basis::Polynomial_Interpolation2
 	/*
 	if(iq >= kmesh-4)
 	{	
-		cout << "\n iq = " << iq;
-		cout << "\n kmesh = " << kmesh;
+		std::cout << "\n iq = " << iq;
+		std::cout << "\n kmesh = " << kmesh;
 		QUIT();
 	}
 	*/
@@ -207,37 +207,37 @@ void Bessel_Basis::init_TableOne(
 	
 	//caoyu add 2021-3-10
 	//=========output .orb format=============
-	stringstream ss;
+	std::stringstream ss;
 	ss << GlobalV::global_out_dir << "jle.orb";
-	ofstream ofs(ss.str().c_str());
-	ofs << "---------------------------------------------------------------------------"<< endl;
-	ofs << setiosflags(ios::left) << setw(28) << "Energy Cutoff(Ry)" << ecut << endl;
-	ofs << setiosflags(ios::left) << setw(28) << "Radius Cutoff(a.u.)" << rcut << endl;
-	ofs << setiosflags(ios::left) << setw(28) << "Lmax" << lmax << endl;
+	std::ofstream ofs(ss.str().c_str());
+	ofs << "---------------------------------------------------------------------------"<< std::endl;
+	ofs << std::setiosflags(ios::left) << std::setw(28) << "Energy Cutoff(Ry)" << ecut << std::endl;
+	ofs << std::setiosflags(ios::left) << std::setw(28) << "Radius Cutoff(a.u.)" << rcut << std::endl;
+	ofs << std::setiosflags(ios::left) << std::setw(28) << "Lmax" << lmax << std::endl;
 	for (int l = 0; l < lmax + 1; l++) 
 	{
 		switch (l) 
 		{
 			case 0:
-			ofs << setiosflags(ios::left) << setw(28) << "Number of Sorbitals-->" << ecut_number << endl;
+			ofs << std::setiosflags(ios::left) << std::setw(28) << "Number of Sorbitals-->" << ecut_number << std::endl;
 			break;
 			case 1:
-			ofs << setiosflags(ios::left) << setw(28) << "Number of Porbitals-->" << ecut_number << endl;
+			ofs << std::setiosflags(ios::left) << std::setw(28) << "Number of Porbitals-->" << ecut_number << std::endl;
 			break;
 			case 2:
-			ofs << setiosflags(ios::left) << setw(28) << "Number of Dorbitals-->" << ecut_number << endl;
+			ofs << std::setiosflags(ios::left) << std::setw(28) << "Number of Dorbitals-->" << ecut_number << std::endl;
 			break;
 			case 3:
-			ofs << setiosflags(ios::left) << setw(28) << "Number of Forbitals-->" << ecut_number << endl;
+			ofs << std::setiosflags(ios::left) << std::setw(28) << "Number of Forbitals-->" << ecut_number << std::endl;
 			break;
 			default:
-			ofs << setiosflags(ios::left) << setw(28) << "Number of Gorbitals-->" << ecut_number << endl;
+			ofs << std::setiosflags(ios::left) << std::setw(28) << "Number of Gorbitals-->" << ecut_number << std::endl;
 		}
 	}
-	ofs << "---------------------------------------------------------------------------"<< endl;
-	ofs << "SUMMARY END" << endl << endl;
-	ofs << setiosflags(ios::left) << setw(28) << "Mesh" << rmesh << endl;
-	ofs << setiosflags(ios::left) << setw(28) << "dr" << dr << endl ;
+	ofs << "---------------------------------------------------------------------------"<< std::endl;
+	ofs << "SUMMARY END" << std::endl << std::endl;
+	ofs << std::setiosflags(ios::left) << std::setw(28) << "Mesh" << rmesh << std::endl;
+	ofs << std::setiosflags(ios::left) << std::setw(28) << "dr" << dr << std::endl ;
 	//=========output	 .orb format=============
 
 	// init eigenvalue of Jl
@@ -251,7 +251,7 @@ void Bessel_Basis::init_TableOne(
 		Sphbes::Spherical_Bessel_Roots(ecut_number, l, tolerence, en, rcut);
 //		for (int ie=0; ie<ecut_number; ie++) 
 //		{
-//			cout << "\n en[" << ie << "]=" << en[ie];
+//			std::cout << "\n en[" << ie << "]=" << en[ie];
 //		}
 
 		// for each eigenvalue
@@ -262,14 +262,14 @@ void Bessel_Basis::init_TableOne(
 
 			//caoyu add 2021-3-10
 			//=========output .orb format=============
-			ofs << setiosflags(ios::right) << setw(20) << "Type"<< setw(20) << "L" << setw(20) << "N" << endl;
-			ofs << setiosflags(ios::right) << setw(20) << "0"<< setw(20) << l << setw(20) << ie << endl;
+			ofs << std::setiosflags(ios::right) << std::setw(20) << "Type"<< std::setw(20) << "L" << std::setw(20) << "N" << std::endl;
+			ofs << std::setiosflags(ios::right) << std::setw(20) << "0"<< std::setw(20) << l << std::setw(20) << ie << std::endl;
 			for (int ir = 0; ir < rmesh; ir++) 
 			{ 
-				ofs << setiosflags(ios::scientific) 
-				<< setprecision(12) << jle[ir]<< " "; if ((ir+1) % 4 == 0) ofs << endl; 
+				ofs << std::setiosflags(ios::scientific) 
+				<< std::setprecision(12) << jle[ir]<< " "; if ((ir+1) % 4 == 0) ofs << std::endl; 
 			}
-			ofs << endl;
+			ofs << std::endl;
 			//=========output .orb format=============
 
 			for(int ir=0; ir<rmesh; ir++)
@@ -278,11 +278,11 @@ void Bessel_Basis::init_TableOne(
 			}
 
 			//====== output ========
-//			stringstream ss;
+//			std::stringstream ss;
 //			ss << GlobalV::global_out_dir << l << "." << ie << ".txt";
-//			ofstream ofs(ss.str().c_str());
+//			std::ofstream ofs(ss.str().c_str());
 
-//			for(int ir=0; ir<rmesh; ir++) ofs << r[ir] << " " << jle[ir] << " " << jle[ir]*g[ir] << endl; 
+//			for(int ir=0; ir<rmesh; ir++) ofs << r[ir] << " " << jle[ir] << " " << jle[ir]*g[ir] << std::endl; 
 
 //			ofs.close();
 			//====== output ========
@@ -331,7 +331,7 @@ void Bessel_Basis::init_TableOne(
 }
 
 void Bessel_Basis::readin_C4(
-	const string &name,
+	const std::string &name,
 	const int &ntype,
 	const int &ecut,
 	const int &rcut,
@@ -342,11 +342,11 @@ void Bessel_Basis::readin_C4(
 
 	if(GlobalV::MY_RANK != 0) return;
 
-	ifstream ifs( name.c_str() );
+	std::ifstream ifs( name.c_str() );
 
 	if(!ifs) 
 	{
-		GlobalV::ofs_warning << " File name : " << name << endl;
+		GlobalV::ofs_warning << " File name : " << name << std::endl;
 		WARNING_QUIT("Bessel_Basis::readin_C4","Can not find file.");
 	}
 
@@ -355,20 +355,20 @@ void Bessel_Basis::readin_C4(
 		// mohan modify 2009-11-29
 		for (int it = 0; it < ntype; it++)
 		{
-			string filec4;
+			std::string filec4;
 			ifs >> filec4;
 			for(int il=0; il< GlobalC::ucell.atoms[it].nwl+1; il++)
 			{
 				for(int in=0; in< GlobalC::ucell.atoms[it].l_nchi[il]; in++)
 				{
 					//for tests
-					//cout << "\n" << setw(5) << it << setw(5) << il << setw(5) << in;
-					//cout << "\n file=" << filec4;
-					ifstream inc4( filec4.c_str() );
+					//std::cout << "\n" << std::setw(5) << it << std::setw(5) << il << std::setw(5) << in;
+					//std::cout << "\n file=" << filec4;
+					std::ifstream inc4( filec4.c_str() );
 					
 					if(!inc4) 
 					{
-						GlobalV::ofs_warning << " File name : " << filec4 << endl;
+						GlobalV::ofs_warning << " File name : " << filec4 << std::endl;
 						WARNING_QUIT("Bessel_Basis::readin_C4","Can not find file.");
 					}
 
@@ -396,12 +396,12 @@ void Bessel_Basis::readin_C4(
 
 						for(int ichi=0; ichi<total_nchi; ichi++)
 						{
-							string title1, title2, title3;
+							std::string title1, title2, title3;
 							inc4 >> title1 >> title2 >> title3;
 
 							int tmp_type, tmp_l, tmp_n;
 							inc4 >> tmp_type >> tmp_l >> tmp_n;
-							//cout << "\n Find T=" << tmp_type << " L=" << tmp_l << " N=" << tmp_n;
+							//std::cout << "\n Find T=" << tmp_type << " L=" << tmp_l << " N=" << tmp_n;
 								
 							if(tmp_l == il && tmp_n == in)
 							//if(tmp_type == it && tmp_l == il && tmp_n == in) // mohan modify 2009-11-29
@@ -411,7 +411,7 @@ void Bessel_Basis::readin_C4(
 								{
 									inc4 >> this->C4(it, il, in, ie);
 									// for tests
-									//cout << "\n" << setw(5) << ie << setw(25) << this->C4(it, il, in, ie);
+									//std::cout << "\n" << std::setw(5) << ie << std::setw(25) << this->C4(it, il, in, ie);
 								}
 							}
 							else
@@ -427,7 +427,7 @@ void Bessel_Basis::readin_C4(
 					}
 					if(!find)
 					{
-						cout << "\n T=" << it << " L=" << il << " N=" << in;
+						std::cout << "\n T=" << it << " L=" << il << " N=" << in;
 						WARNING_QUIT("Bessel_Basis::readin_C4","Can't find needed c4!");
 					}
 					inc4.close();
@@ -478,16 +478,16 @@ void Bessel_Basis::bcast(void)
 #endif
 }
 
-void Bessel_Basis::readin(const string &name)
+void Bessel_Basis::readin(const std::string &name)
 {
 	TITLE("Bessel_Basis", "readin");
 	if (GlobalV::MY_RANK == 0)
 	{
-		ifstream ifs(name.c_str());
-		GlobalV::ofs_running << " File name : " << name << endl;
+		std::ifstream ifs(name.c_str());
+		GlobalV::ofs_running << " File name : " << name << std::endl;
 		if (!ifs)
 		{
-			cout << " File name : " << name << endl;
+			std::cout << " File name : " << name << std::endl;
 			WARNING_QUIT("Bessel_Basis::readin","Can not find file.");
 		}
 		CHECK_NAME(ifs, "INPUT_ORBITAL_INFORMATION");

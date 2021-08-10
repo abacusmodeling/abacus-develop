@@ -1,6 +1,6 @@
 #include "pzsteiz.h"
 
-void pzsteiz(int n,double *a,double *b,double *w,complex <double> *Z,int m)
+void pzsteiz(int n,double *a,double *b,double *w,std::complex <double> *Z,int m)
 /*
  * PSEPS routine (version 2.0) --
  * Computer Network Information Center, CAS. 
@@ -21,7 +21,7 @@ void pzsteiz(int n,double *a,double *b,double *w,complex <double> *Z,int m)
  *   The (n-1) off-diagonal elements of the tridiagonal matrix T.
  * w (local input) double array, dim (m)
  *   the first m elements of w contain the eigenvalues for which eigenvectors are to be computed.
- * Z  (local output) double precision complex array, dimension (m*n)
+ * Z  (local output) double precision std::complex array, dimension (m*n)
  *    Z contains the computed eigenvectors associated with the  specified eigenvalues. 
  */
 {

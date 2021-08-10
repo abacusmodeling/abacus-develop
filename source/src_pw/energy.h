@@ -74,7 +74,7 @@ class energy
 
 	void print_band(const int &ik);
 
-	void print_format(const string &name, const double &value);
+	void print_format(const std::string &name, const double &value);
 
 	void calculate_harris(const int &flag); //mohan add 2012-06-05
 

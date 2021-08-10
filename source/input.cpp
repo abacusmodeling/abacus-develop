@@ -27,7 +27,7 @@ Input::~Input()
 	delete[] angle2;
 }
 
-void Input::Init(const string &fn)
+void Input::Init(const std::string &fn)
 {
 	timer::tick("Input","Init");
     this->Default();
@@ -64,35 +64,35 @@ void Input::Init(const string &fn)
 	Check();
 
 	time_t  time_now = time(NULL);
-	GlobalV::ofs_running << "                                                                                     " << endl;
-	GlobalV::ofs_running << "                             WELCOME TO ABACUS                                       " << endl;
-	GlobalV::ofs_running << "                                                                                     " << endl;
-    GlobalV::ofs_running << "               'Atomic-orbital Based Ab-initio Computation at UStc'                  " << endl;
-    GlobalV::ofs_running << "                                                                                     " << endl;
-    GlobalV::ofs_running << "                     Website: http://abacus.ustc.edu.cn/                             " << endl;
-	GlobalV::ofs_running << "                                                                                     " << endl;
+	GlobalV::ofs_running << "                                                                                     " << std::endl;
+	GlobalV::ofs_running << "                             WELCOME TO ABACUS                                       " << std::endl;
+	GlobalV::ofs_running << "                                                                                     " << std::endl;
+    GlobalV::ofs_running << "               'Atomic-orbital Based Ab-initio Computation at UStc'                  " << std::endl;
+    GlobalV::ofs_running << "                                                                                     " << std::endl;
+    GlobalV::ofs_running << "                     Website: http://abacus.ustc.edu.cn/                             " << std::endl;
+	GlobalV::ofs_running << "                                                                                     " << std::endl;
 
-	GlobalV::ofs_running << setiosflags(ios::right);
+	GlobalV::ofs_running << std::setiosflags(ios::right);
                                                                                                                              
 
 #ifdef __MPI
-	//GlobalV::ofs_running << "    Version: Parallel, under ALPHA test" << endl;
-    GlobalV::ofs_running << "    Version: Parallel, in development" << endl;
-	GlobalV::ofs_running << "    Processor Number is " << GlobalV::NPROC << endl;
+	//GlobalV::ofs_running << "    Version: Parallel, under ALPHA test" << std::endl;
+    GlobalV::ofs_running << "    Version: Parallel, in development" << std::endl;
+	GlobalV::ofs_running << "    Processor Number is " << GlobalV::NPROC << std::endl;
 	TITLE("Input","init");
 	TITLE("Input","Bcast");
 #else
-	GlobalV::ofs_running << "    This is SERIES version." << endl;
+	GlobalV::ofs_running << "    This is SERIES version." << std::endl;
 	TITLE("Input","init");
 #endif
     	GlobalV::ofs_running << "    Start Time is " << ctime(&time_now);
-	GlobalV::ofs_running << "                                                                                     " << endl;
-	GlobalV::ofs_running << " ------------------------------------------------------------------------------------" << endl;
+	GlobalV::ofs_running << "                                                                                     " << std::endl;
+	GlobalV::ofs_running << " ------------------------------------------------------------------------------------" << std::endl;
 
-	GlobalV::ofs_running << setiosflags(ios::left);
-	cout << setiosflags(ios::left);
+	GlobalV::ofs_running << std::setiosflags(ios::left);
+	std::cout << std::setiosflags(ios::left);
 
-	GlobalV::ofs_running << "\n READING GENERAL INFORMATION" << endl;
+	GlobalV::ofs_running << "\n READING GENERAL INFORMATION" << std::endl;
 	OUT(GlobalV::ofs_running,"global_out_dir", GlobalV::global_out_dir);
 	OUT(GlobalV::ofs_running,"global_in_card", GlobalV::global_in_card);
 	OUT(GlobalV::ofs_running,"pseudo_dir", GlobalV::global_pseudo_dir);
@@ -478,17 +478,17 @@ void Input::Default(void)
     return;
 }
 
-bool Input::Read(const string &fn)
+bool Input::Read(const std::string &fn)
 {
     TITLE("Input","Read");
 
     if (GlobalV::MY_RANK!=0) return false;
 
-    ifstream ifs(fn.c_str(), ios::in);	// "in_datas/input_parameters"
+    std::ifstream ifs(fn.c_str(), ios::in);	// "in_datas/input_parameters"
 
     if (!ifs) 
 	{
-		cout << " Can't find the INPUT file." << endl;
+		std::cout << " Can't find the INPUT file." << std::endl;
 		return false;
 	}
 
@@ -499,7 +499,7 @@ bool Input::Read(const string &fn)
     char word1[80];
     int ierr = 0;
 
-    //ifs >> setiosflags(ios::uppercase);
+    //ifs >> std::setiosflags(ios::uppercase);
     ifs.rdstate();
     while (ifs.good())
     {
@@ -515,7 +515,7 @@ bool Input::Read(const string &fn)
 
     if (ierr == 0)
     {
-		cout << " Error parameter list." << endl;
+		std::cout << " Error parameter list." << std::endl;
 		return false;// return error : false
     }
 
@@ -1763,11 +1763,11 @@ bool Input::Read(const string &fn)
 			if(word[0] != '#' && word[0] != '/')
 			{
 				input_error = 1;
-				cout<<" THE PARAMETER NAME '" << word << "' IS NOT USED!" << endl;
+				std::cout<<" THE PARAMETER NAME '" << word << "' IS NOT USED!" << std::endl;
 			}
 // mohan screen this 2012-06-30
-//			cout << " THE PARAMETER NAME '" << word
-//			<< "' IS NOT USED!" << endl;
+//			std::cout << " THE PARAMETER NAME '" << word
+//			<< "' IS NOT USED!" << std::endl;
 			ifs.ignore(150, '\n');
         }
 
@@ -1777,7 +1777,7 @@ bool Input::Read(const string &fn)
         {
            gamma_only_local = 1;      //pengfei 2014-10-15
            gamma_only = 0;
-           cout << "gamma_only_local = " << gamma_only_local <<endl;
+           std::cout << "gamma_only_local = " << gamma_only_local <<std::endl;
         }*/
 
         if (ifs.eof() != 0)
@@ -1786,13 +1786,13 @@ bool Input::Read(const string &fn)
         }
         else if (ifs.bad() != 0)
         {
-			cout << " Bad input parameters. " << endl;
+			std::cout << " Bad input parameters. " << std::endl;
             return false;
         }
         else if (ifs.fail() != 0)
         {
-			cout << " word = " << word << endl;
-			cout << " Fail to read parameters. " << endl; 
+			std::cout << " word = " << word << std::endl;
+			std::cout << " Fail to read parameters. " << std::endl; 
             ifs.clear();
 			return false;
         }
@@ -1831,7 +1831,7 @@ bool Input::Read(const string &fn)
     	while (ifs.good())
     	{
   			ifs >> word1;
-  			strtolower(word1, word);     //convert uppercase string to lower case; word1 --> word
+  			strtolower(word1, word);     //convert uppercase std::string to lower case; word1 --> word
 	
 			if(strcmp("dftu_type",word)==0)
 			{	
@@ -1892,19 +1892,19 @@ bool Input::Read(const string &fn)
 
 			if(hubbard_u[i]<-1.0e-3)
 			{
-				cout << " WRONG ARGUMENTS OF hubbard_u " << endl;
+				std::cout << " WRONG ARGUMENTS OF hubbard_u " << std::endl;
 				exit(0);
 			}
 
 			if(hund_j[i]<-1.0e-3)
 			{
-				cout << " WRONG ARGUMENTS OF hund_j " << endl;
+				std::cout << " WRONG ARGUMENTS OF hund_j " << std::endl;
 				exit(0);
 			}
 
 			if( (orbital_corr[i]==-1) && (orbital_corr[i]==0) && (orbital_corr[i]!=1) && (orbital_corr[i]!=2) && (orbital_corr[i]!=3) )
 			{
-				cout << " WRONG ARGUMENTS OF orbital_corr " << endl;
+				std::cout << " WRONG ARGUMENTS OF orbital_corr " << std::endl;
 				exit(0);
 			}
 		}
@@ -1917,13 +1917,13 @@ bool Input::Read(const string &fn)
 
 		if(strcmp("lcao", basis_type.c_str())!=0)
 		{
-			cout << " WRONG ARGUMENTS OF basis_type, only lcao is support " << endl;
+			std::cout << " WRONG ARGUMENTS OF basis_type, only lcao is support " << std::endl;
 			exit(0);
 		}
 
 		if(strcmp("genelpa", ks_solver.c_str())!=0)
 		{
-			cout << " WRONG ARGUMENTS OF ks_solver in DFT+U routine, only genelpa is support " << endl;
+			std::cout << " WRONG ARGUMENTS OF ks_solver in DFT+U routine, only genelpa is support " << std::endl;
 			exit(0);
 		}
 
@@ -1932,12 +1932,12 @@ bool Input::Read(const string &fn)
 	if (basis_type == "pw")  // pengfei Li add 2015-1-31
 	{
 		gamma_only = 0;
-		//cout << "gamma_only =" << gamma_only << endl;
+		//std::cout << "gamma_only =" << gamma_only << std::endl;
 	}
 	else if ((basis_type == "lcao" || basis_type == "lcao_in_pw")&&(gamma_only == 1))
 	{
 		gamma_only_local = 1;
-		//cout << "gamma_only_local =" << gamma_only_local << endl;
+		//std::cout << "gamma_only_local =" << gamma_only_local << std::endl;
 	}
 
     return true;
@@ -2010,7 +2010,7 @@ void Input::Bcast()
 {
     TITLE("Input","Bcast");
 
-//	cout << "\n Bcast()" << endl;
+//	std::cout << "\n Bcast()" << std::endl;
 //----------------------------------------------------------
 // main parameters
 //----------------------------------------------------------
@@ -2400,8 +2400,8 @@ void Input::Check(void)
 	if(nb2d < 0) WARNING_QUIT("Input","nb2d must > 0");
 	if(ntype < 0) WARNING_QUIT("Input","ntype must > 0");
 
-	//cout << "diago_proc=" << diago_proc << endl;
-	//cout << " NPROC=" << GlobalV::NPROC << endl;
+	//std::cout << "diago_proc=" << diago_proc << std::endl;
+	//std::cout << " NPROC=" << GlobalV::NPROC << std::endl;
 	if(diago_proc<=0)
 	{
 		diago_proc = GlobalV::NPROC;
@@ -2480,7 +2480,7 @@ void Input::Check(void)
 		else 
 		{
 			force = 0;//modified by zhengdy-soc, can't calculate force now!
-			cout<<"sorry, can't calculate force with soc now, would be implement in next version!"<<endl;
+			std::cout<<"sorry, can't calculate force with soc now, would be implement in next version!"<<std::endl;
 		}
 */
                 nstep = 1;
@@ -2583,11 +2583,11 @@ void Input::Check(void)
         if(mdp.tlast  < 0.0) mdp.tlast = mdp.tfirst;
         if(mdp.tfirst!=mdp.tlast)
         {
-            ifstream file1;
+            std::ifstream file1;
             file1.open("ChangeTemp.dat");
             if(!file1)                      // Peize Lin fix bug 2016-08-06
            {
-                ofstream file;
+                std::ofstream file;
                 file.open("ChangeTemp.dat");
                 for(int ii=0;ii<30;ii++)
                 {
@@ -2686,11 +2686,11 @@ void Input::Check(void)
 		}
 		else if(ks_solver=="cg")
 		{
-			GlobalV::ofs_warning << " It's ok to use cg." << endl;
+			GlobalV::ofs_warning << " It's ok to use cg." << std::endl;
 		}
 		else if(ks_solver=="dav")
 		{
-			GlobalV::ofs_warning << " It's ok to use dav." << endl;
+			GlobalV::ofs_warning << " It's ok to use dav." << std::endl;
 		}
 		else if(ks_solver=="genelpa") //yshen add 2016-07-20
 		{
@@ -2731,7 +2731,7 @@ void Input::Check(void)
 			else if (ks_solver == "genelpa")
 			{
 #ifdef __MPI
-//				GlobalV::ofs_warning << "genelpa is under testing" << endl;
+//				GlobalV::ofs_warning << "genelpa is under testing" << std::endl;
 #else
 				WARNING_QUIT("Input","genelpa can not be used for series version.");
 #endif
@@ -2739,7 +2739,7 @@ void Input::Check(void)
 			else if (ks_solver == "scalapack_gvx")
 			{
 #ifdef __MPI
-				GlobalV::ofs_warning << "scalapack_gvx is under testing" << endl;
+				GlobalV::ofs_warning << "scalapack_gvx is under testing" << std::endl;
 #else
 				WARNING_QUIT("Input","scalapack_gvx can not be used for series version.");
 #endif
@@ -2747,7 +2747,7 @@ void Input::Check(void)
 			else if (ks_solver == "hpseps")
 			{
 #ifdef __MPI
-				GlobalV::ofs_warning << "It's not a good choice to use hpseps!" << endl;
+				GlobalV::ofs_warning << "It's not a good choice to use hpseps!" << std::endl;
 				if(gamma_only) WARNING_QUIT("Input","hpseps can not be used for gamma_only.");
 #else
 				WARNING_QUIT("Input","hpseps can not be used for series version.");
@@ -2758,7 +2758,7 @@ void Input::Check(void)
 #ifdef __MPI
 				WARNING_QUIT("Input","ks_solver=lapack is not an option for parallel version of ABACUS (try hpseps).");	
 #else
-				GlobalV::ofs_warning << " It's ok to use lapack." << endl;
+				GlobalV::ofs_warning << " It's ok to use lapack." << std::endl;
 #endif
 			}
 			else if (ks_solver == "selinv")
@@ -3039,7 +3039,7 @@ void Input::Check(void)
 		}
 	}
 
-	const string ss = "test -d " + read_file_dir;
+	const std::string ss = "test -d " + read_file_dir;
 	if(read_file_dir=="auto")
 	{
 		GlobalV::global_readin_dir = GlobalV::global_out_dir;
@@ -3062,9 +3062,9 @@ void Input::close_log(void)const
     Global_File::close_all_log(GlobalV::MY_RANK, this->out_alllog);
 }
 
-void Input::readbool(ifstream &ifs, bool &var)
+void Input::readbool(std::ifstream &ifs, bool &var)
 {
-    string str;
+    std::string str;
     ifs >> str;
     if (str == "true")
     {

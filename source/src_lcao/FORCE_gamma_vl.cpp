@@ -39,9 +39,9 @@ void Force_LCAO_gamma::cal_fvl_dphi(
         tmpDHx[i] = GlobalC::LM.DHloc_fixed_x[i];
         tmpDHy[i] = GlobalC::LM.DHloc_fixed_y[i];
         tmpDHz[i] = GlobalC::LM.DHloc_fixed_z[i];
-        //cout << "  GlobalC::LM.DHloc_fixed_x=" <<  GlobalC::LM.DHloc_fixed_x[i] << endl;
-        //cout << "  GlobalC::LM.DHloc_fixed_y=" <<  GlobalC::LM.DHloc_fixed_y[i] << endl;
-        //cout << "  GlobalC::LM.DHloc_fixed_z=" <<  GlobalC::LM.DHloc_fixed_z[i] << endl;
+        //std::cout << "  GlobalC::LM.DHloc_fixed_x=" <<  GlobalC::LM.DHloc_fixed_x[i] << std::endl;
+        //std::cout << "  GlobalC::LM.DHloc_fixed_y=" <<  GlobalC::LM.DHloc_fixed_y[i] << std::endl;
+        //std::cout << "  GlobalC::LM.DHloc_fixed_z=" <<  GlobalC::LM.DHloc_fixed_z[i] << std::endl;
     }
 
     //calculate dVL
@@ -101,19 +101,19 @@ void Force_LCAO_gamma::cal_fvl_dphi(
                         svl_dphi(1,2) += dm2d2 * GlobalC::LM.DHloc_fixed_23[index];
                         svl_dphi(2,2) += dm2d2 * GlobalC::LM.DHloc_fixed_33[index];
                     }
-                    //  cout << setw(5) << iat << setw(5) << iat2 
-                    //  << setw(5) << mu << setw(5) << nu
-                    //  << setw(15) << GlobalC::LM.DHloc_fixed_z[index] << endl;
+                    //  std::cout << std::setw(5) << iat << std::setw(5) << iat2 
+                    //  << std::setw(5) << mu << std::setw(5) << nu
+                    //  << std::setw(15) << GlobalC::LM.DHloc_fixed_z[index] << std::endl;
                 }
             }
         }
 
-//          cout << "fvl_dphi:" << endl;
+//          std::cout << "fvl_dphi:" << std::endl;
 //          for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
 //          {
-//              cout << setw(5) << iat << setw(15) << fvl_dphi[iat][0] 
-//              << setw(15) << fvl_dphi[iat][1]
-//              << setw(15) << fvl_dphi[iat][2] << endl;
+//              std::cout << std::setw(5) << iat << std::setw(15) << fvl_dphi[iat][0] 
+//              << std::setw(15) << fvl_dphi[iat][1]
+//              << std::setw(15) << fvl_dphi[iat][2] << std::endl;
 //          }
 
 
@@ -179,9 +179,9 @@ void Force_LCAO_gamma::cal_fvl_dphi(
         tmpDHx[i] = GlobalC::LM.DHloc_fixed_x[i];
         tmpDHy[i] = GlobalC::LM.DHloc_fixed_y[i];
         tmpDHz[i] = GlobalC::LM.DHloc_fixed_z[i];
-        //cout << "  GlobalC::LM.DHloc_fixed_x=" <<  GlobalC::LM.DHloc_fixed_x[i] << endl;
-        //cout << "  GlobalC::LM.DHloc_fixed_y=" <<  GlobalC::LM.DHloc_fixed_y[i] << endl;
-        //cout << "  GlobalC::LM.DHloc_fixed_z=" <<  GlobalC::LM.DHloc_fixed_z[i] << endl;
+        //std::cout << "  GlobalC::LM.DHloc_fixed_x=" <<  GlobalC::LM.DHloc_fixed_x[i] << std::endl;
+        //std::cout << "  GlobalC::LM.DHloc_fixed_y=" <<  GlobalC::LM.DHloc_fixed_y[i] << std::endl;
+        //std::cout << "  GlobalC::LM.DHloc_fixed_z=" <<  GlobalC::LM.DHloc_fixed_z[i] << std::endl;
     }
 
     //calculate dVL
@@ -239,19 +239,19 @@ void Force_LCAO_gamma::cal_fvl_dphi(
                         svl_dphi(1,2) += dm2d2 * GlobalC::LM.DHloc_fixed_23[index];
                         svl_dphi(2,2) += dm2d2 * GlobalC::LM.DHloc_fixed_33[index];
                     }
-                    //cout << setw(5) << iat << setw(5) << iat2 
-                    //<< setw(5) << mu << setw(5) << nu
-                    //<< setw(15) << GlobalC::LM.DHloc_fixed_z[index] << endl;
+                    //std::cout << std::setw(5) << iat << std::setw(5) << iat2 
+                    //<< std::setw(5) << mu << std::setw(5) << nu
+                    //<< std::setw(15) << GlobalC::LM.DHloc_fixed_z[index] << std::endl;
                 }
             }
         }
 
-        //cout << "fvl_dphi:" << endl;
+        //std::cout << "fvl_dphi:" << std::endl;
         //for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
         //{
-        //cout << setw(5) << iat << setw(15) << fvl_dphi[iat][0] 
-        //<< setw(15) << fvl_dphi[iat][1]
-        //<< setw(15) << fvl_dphi[iat][2] << endl;
+        //std::cout << std::setw(5) << iat << std::setw(15) << fvl_dphi[iat][0] 
+        //<< std::setw(15) << fvl_dphi[iat][1]
+        //<< std::setw(15) << fvl_dphi[iat][2] << std::endl;
         //}
 
     } // end spin

@@ -14,23 +14,23 @@ class Diago_CG
 
     static double ddot_real(
         const int & dim,
-        const complex<double>* psi_L,
-        const complex<double>* psi_R,
+        const std::complex<double>* psi_L,
+        const std::complex<double>* psi_R,
         const bool reduce = true) ;
 
-    static complex<double> ddot(
+    static std::complex<double> ddot(
         const int & dim,
-        const complex<double>* psi_L,
-        const complex<double>* psi_R ) ;
+        const std::complex<double>* psi_L,
+        const std::complex<double>* psi_R ) ;
 
 
-    static complex<double> ddot(
+    static std::complex<double> ddot(
         const int & dim,
         const ComplexMatrix &psi,
         const int & m,
-        complex<double> *psik ) ;
+        std::complex<double> *psik ) ;
 
-    static complex<double> ddot(
+    static std::complex<double> ddot(
         const int & dim,
         const ComplexMatrix &psi_L,
         const int & m,
@@ -55,8 +55,8 @@ class Diago_CG
         const int &dmx,
         const int &end,
         const ComplexMatrix &psi,
-        complex<double> *spsi,
-        complex<double> *psi_m
+        std::complex<double> *spsi,
+        std::complex<double> *psi_m
     );
 
 	private:
@@ -66,17 +66,17 @@ class Diago_CG
     void calculate_gradient(
         const double* precondition,
         const int dim,
-        const complex<double> *hpsi,
-        const complex<double> *spsi,
-        complex<double> *g,
-        complex<double> *pspsi);
+        const std::complex<double> *hpsi,
+        const std::complex<double> *spsi,
+        std::complex<double> *g,
+        std::complex<double> *pspsi);
 
     void orthogonal_gradient(
         const int &dim,
         const int &dmx,
-        complex<double> *g,
-        complex<double> *scg,
-        complex<double> *lagrange,
+        std::complex<double> *g,
+        std::complex<double> *scg,
+        std::complex<double> *lagrange,
         const ComplexMatrix &eigenfunction,
         const int m);
 
@@ -84,27 +84,27 @@ class Diago_CG
         const int iter,
         const int dim,
         const double *precondition,
-        const complex<double> *g,
-        const complex<double> *sg,
-        complex<double> *psg,
-        complex<double> *cg,
+        const std::complex<double> *g,
+        const std::complex<double> *sg,
+        std::complex<double> *psg,
+        std::complex<double> *cg,
         double &gg_last,
         const double &cg0,
         const double &theta,
-        const complex<double> *psi_m);
+        const std::complex<double> *psi_m);
 
     bool update_psi(
         const int dim,
         double &cg_norm,
         double &theta,
-        complex<double> *hcg,
-        const complex<double> *cg,
-        complex<double> *scg,
-        complex<double> *psi_m ,
+        std::complex<double> *hcg,
+        const std::complex<double> *cg,
+        std::complex<double> *scg,
+        std::complex<double> *psi_m ,
         double &eigenvalue,
         const double &threshold,
-        complex<double> *hpsi,
-        complex<double> *spsi);
+        std::complex<double> *hpsi,
+        std::complex<double> *spsi);
 
 };
 #endif

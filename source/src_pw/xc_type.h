@@ -119,12 +119,12 @@ class xcfunc
 	~xcfunc();
 
 	// there are four values of dft.
-	void which_dft(const string *dft);
-	void printdft(ofstream &ofs);
-	void ostreamdft(ostream &ofs);  // zws add 20150108
+	void which_dft(const std::string *dft);
+	void printdft(std::ofstream &ofs);
+	void ostreamdft(std::ostream &ofs);  // zws add 20150108
 private:
 	void set_dft_value(int &m,const int i);
-	bool match_one(const string* dft, const string &name)const; 
+	bool match_one(const std::string* dft, const std::string &name)const; 
 	void copy_to_now();	// Peize Lin add 2016-12-03
 	void hybrid_first();	// Peize Lin add 2016-12-03
 };

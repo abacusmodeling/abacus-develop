@@ -14,8 +14,8 @@
 
 using namespace std;
 
-void TITLE(const string &class_function_name);
-void TITLE(const string &class_name,const string &function_name);
-void TITLE(ofstream &ofs,const string &class_name,const string &function_name);
+void TITLE(const std::string &class_function_name);
+void TITLE(const std::string &class_name,const std::string &function_name);
+void TITLE(std::ofstream &ofs,const std::string &class_name,const std::string &function_name);
 
 #endif

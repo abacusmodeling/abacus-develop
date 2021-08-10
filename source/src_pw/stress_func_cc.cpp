@@ -15,7 +15,7 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 		fact = 2.0; //is_pw:PW basis, gamma_only need to double.
 	}
 
-	complex<double> sigmadiag;
+	std::complex<double> sigmadiag;
 	double* rhocg;
 
 	int judge=0;
@@ -38,7 +38,7 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 	H_XC_pw::vtxc    = std::get<1>(etxc_vtxc_v);			// may delete?
 	const matrix vxc = std::get<2>(etxc_vtxc_v);
 
-	complex<double> * psic = new complex<double> [GlobalC::pw.nrxx];
+	std::complex<double> * psic = new std::complex<double> [GlobalC::pw.nrxx];
 
 	ZEROS(psic, GlobalC::pw.nrxx);
 
@@ -47,7 +47,7 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 		for(ir=0;ir<GlobalC::pw.nrxx;ir++)
 		{
 			// psic[ir] = vxc(0,ir);
-			psic[ir] = complex<double>(vxc(0, ir),  0.0);
+			psic[ir] = std::complex<double>(vxc(0, ir),  0.0);
 		}
 	}
 	else
@@ -106,7 +106,7 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 				{
 					for (m = 0;m< 3;m++)
 					{
-						const complex<double> t = conj(psic[GlobalC::pw.ig2fftc[ng]]) * GlobalC::pw.strucFac(nt, ng) * rhocg[GlobalC::pw.ig2ngg[ng]] * GlobalC::ucell.tpiba *
+						const std::complex<double> t = conj(psic[GlobalC::pw.ig2fftc[ng]]) * GlobalC::pw.strucFac(nt, ng) * rhocg[GlobalC::pw.ig2ngg[ng]] * GlobalC::ucell.tpiba *
 												  GlobalC::pw.get_G_cartesian_projection(ng, l) * GlobalC::pw.get_G_cartesian_projection(ng, m) 
 												  / norm_g * fact;
 						//						sigmacc [l][ m] += t.real();

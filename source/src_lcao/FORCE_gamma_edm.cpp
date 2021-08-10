@@ -35,8 +35,8 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 //xiaohui modified 2013-03-23, adding "/*"
 /*    if(GlobalV::DIAGO_TYPE=="selinv")
     {
-//      cout << " set_EDM_gamma()" << endl;
-//      cout << " fill dm with density matrix or energy density matrix here." << endl;
+//      std::cout << " set_EDM_gamma()" << std::endl;
+//      std::cout << " fill dm with density matrix or energy density matrix here." << std::endl;
 
         //--------------------------------------------------
         // job=1: density matrix for charge density (grid).

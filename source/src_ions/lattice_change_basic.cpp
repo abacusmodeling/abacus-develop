@@ -66,10 +66,10 @@ void Lattice_Change_Basic::change_lattice(double *move, double *lat)
 	assert(lat!=NULL);
 
 /*
-	cout<<" LATTICE CONSTANT  OLD:"<<endl;
-	cout<<" "<<setprecision(12)<<GlobalC::ucell.latvec.e11<<"   "<<GlobalC::ucell.latvec.e12<<"   "<<GlobalC::ucell.latvec.e13<<endl;
-	cout<<" "<<setprecision(12)<<GlobalC::ucell.latvec.e21<<"   "<<GlobalC::ucell.latvec.e22<<"   "<<GlobalC::ucell.latvec.e23<<endl;
-	cout<<" "<<setprecision(12)<<GlobalC::ucell.latvec.e31<<"   "<<GlobalC::ucell.latvec.e32<<"   "<<GlobalC::ucell.latvec.e33<<endl;
+	std::cout<<" LATTICE CONSTANT  OLD:"<<std::endl;
+	std::cout<<" "<<std::setprecision(12)<<GlobalC::ucell.latvec.e11<<"   "<<GlobalC::ucell.latvec.e12<<"   "<<GlobalC::ucell.latvec.e13<<std::endl;
+	std::cout<<" "<<std::setprecision(12)<<GlobalC::ucell.latvec.e21<<"   "<<GlobalC::ucell.latvec.e22<<"   "<<GlobalC::ucell.latvec.e23<<std::endl;
+	std::cout<<" "<<std::setprecision(12)<<GlobalC::ucell.latvec.e31<<"   "<<GlobalC::ucell.latvec.e32<<"   "<<GlobalC::ucell.latvec.e33<<std::endl;
 */
 	
 	if(GlobalC::ucell.lc[0] != 0)
@@ -132,10 +132,10 @@ void Lattice_Change_Basic::change_lattice(double *move, double *lat)
     Parallel_Common::bcast_double( GlobalC::ucell.a3.z );
 #endif
 /*
-        cout<<" LATTICE CONSTANT NEW: "<<endl;
-        cout<<" "<<setprecision(12)<<GlobalC::ucell.latvec.e11<<"   "<<GlobalC::ucell.latvec.e12<<"   "<<GlobalC::ucell.latvec.e13<<endl;
-        cout<<" "<<setprecision(12)<<GlobalC::ucell.latvec.e21<<"   "<<GlobalC::ucell.latvec.e22<<"   "<<GlobalC::ucell.latvec.e23<<endl;
-        cout<<" "<<setprecision(12)<<GlobalC::ucell.latvec.e31<<"   "<<GlobalC::ucell.latvec.e32<<"   "<<GlobalC::ucell.latvec.e33<<endl;
+        std::cout<<" LATTICE CONSTANT NEW: "<<std::endl;
+        std::cout<<" "<<std::setprecision(12)<<GlobalC::ucell.latvec.e11<<"   "<<GlobalC::ucell.latvec.e12<<"   "<<GlobalC::ucell.latvec.e13<<std::endl;
+        std::cout<<" "<<std::setprecision(12)<<GlobalC::ucell.latvec.e21<<"   "<<GlobalC::ucell.latvec.e22<<"   "<<GlobalC::ucell.latvec.e23<<std::endl;
+        std::cout<<" "<<std::setprecision(12)<<GlobalC::ucell.latvec.e31<<"   "<<GlobalC::ucell.latvec.e32<<"   "<<GlobalC::ucell.latvec.e33<<std::endl;
 */
 
 	
@@ -181,8 +181,8 @@ void Lattice_Change_Basic::check_converged(matrix &stress, double *grad)
 	
 	if(Lattice_Change_Basic::largest_grad == 0.0)
 	{
-		GlobalV::ofs_running << " largest stress is 0, no movement is possible." << endl;
-		GlobalV::ofs_running << " it may converged, otherwise no movement of lattice parameters is allowed." << endl;
+		GlobalV::ofs_running << " largest stress is 0, no movement is possible." << std::endl;
+		GlobalV::ofs_running << " it may converged, otherwise no movement of lattice parameters is allowed." << std::endl;
 		Lattice_Change_Basic::converged = true;
 	}
 	else if(GlobalC::ucell.lc[0] == 1 && GlobalC::ucell.lc[1] == 1 && GlobalC::ucell.lc[2] == 1)
@@ -190,14 +190,14 @@ void Lattice_Change_Basic::check_converged(matrix &stress, double *grad)
 		//if(Lattice_Change_Basic::largest_grad < GlobalV::STRESS_THR)
 		if(Lattice_Change_Basic::largest_grad < GlobalV::STRESS_THR && stress_ii_max < GlobalV::STRESS_THR)
 		{
-			GlobalV::ofs_running << "\n Lattice relaxation is converged!" << endl;
-			GlobalV::ofs_running << "\n Largest gradient is = " << largest_grad << endl;
+			GlobalV::ofs_running << "\n Lattice relaxation is converged!" << std::endl;
+			GlobalV::ofs_running << "\n Largest gradient is = " << largest_grad << std::endl;
 			Lattice_Change_Basic::converged = true;
 			++ Lattice_Change_Basic::update_iter;
 		}
 		else
 		{
-			 GlobalV::ofs_running << "\n Lattice relaxation is not converged yet (threshold is "<< GlobalV::STRESS_THR << ")" << endl;
+			 GlobalV::ofs_running << "\n Lattice relaxation is not converged yet (threshold is "<< GlobalV::STRESS_THR << ")" << std::endl;
 			 Lattice_Change_Basic::converged = false;
 		}
 	}
@@ -205,18 +205,18 @@ void Lattice_Change_Basic::check_converged(matrix &stress, double *grad)
 	{
 		/*for(int i=0; i<9; i++)
 		{
-			cout<<"i= "<<i<<" "<<grad[i]<<endl;
+			std::cout<<"i= "<<i<<" "<<grad[i]<<std::endl;
 		}*/
 		if(Lattice_Change_Basic::largest_grad < 10 * GlobalV::STRESS_THR)
 		{
-			GlobalV::ofs_running << "\n Lattice relaxation is converged!" << endl;
-			GlobalV::ofs_running << "\n Largest gradient is = " << largest_grad << endl;
+			GlobalV::ofs_running << "\n Lattice relaxation is converged!" << std::endl;
+			GlobalV::ofs_running << "\n Largest gradient is = " << largest_grad << std::endl;
 			Lattice_Change_Basic::converged = true;
 			++ Lattice_Change_Basic::update_iter;
 		}
 		else
 		{
-			 GlobalV::ofs_running << "\n Lattice relaxation is not converged yet (threshold is "<< GlobalV::STRESS_THR << ")" << endl;
+			 GlobalV::ofs_running << "\n Lattice relaxation is not converged yet (threshold is "<< GlobalV::STRESS_THR << ")" << std::endl;
 			 Lattice_Change_Basic::converged = false;
 		}
 	}
@@ -230,12 +230,12 @@ void Lattice_Change_Basic::terminate(void)
 	TITLE("Lattice_Change_Basic","terminate");
 	if(Lattice_Change_Basic::converged)
 	{
-		GlobalV::ofs_running << " end of lattice optimization"<<endl;
+		GlobalV::ofs_running << " end of lattice optimization"<<std::endl;
 		OUT(GlobalV::ofs_running,"istep", Lattice_Change_Basic::istep);
 		OUT(GlobalV::ofs_running,"update iteration", Lattice_Change_Basic::update_iter);
 		/*
-		GlobalV::ofs_running<<"Saving the approximate inverse hessian"<<endl;
-		ofstream hess("hess.out");
+		GlobalV::ofs_running<<"Saving the approximate inverse hessian"<<std::endl;
+		std::ofstream hess("hess.out");
 		for(int i=0;i<dim;i++)
 		{
 			for(int j=0;j<dim;j++)
@@ -248,8 +248,8 @@ void Lattice_Change_Basic::terminate(void)
 	}
 	else
 	{
-		GlobalV::ofs_running<<" the maximum number of steps has been reached." << endl;
-		GlobalV::ofs_running<<" end of lattice optimization." << endl;
+		GlobalV::ofs_running<<" the maximum number of steps has been reached." << std::endl;
+		GlobalV::ofs_running<<" end of lattice optimization." << std::endl;
 	}
 
 	return;

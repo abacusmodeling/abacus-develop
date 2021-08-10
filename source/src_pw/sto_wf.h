@@ -28,7 +28,7 @@ class Stochastic_WF
 	int nchip; 				// The number of stochatic obitals in current process 
 	int nche_sto;			// number of orders for Chebyshev expansion
 	int seed_sto;  //random seed 
-	string stotype;
+	std::string stotype;
 
 	int nbands_diag; // number of bands obtained from diagonalization
 

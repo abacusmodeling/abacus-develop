@@ -15,29 +15,29 @@
 //#include <gperftools/profiler.h>
 
 void Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D( 
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &HR_exx,
-	const pair<bool,bool> &io_HR_a2D )
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &HR_exx,
+	const std::pair<bool,bool> &io_HR_a2D )
 {
 	/*{
 		static int istep=0;
-		ofstream ofs("HR_exx_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
-		ofs<<HR_exx<<endl;
+		std::ofstream ofs("HR_exx_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
+		ofs<<HR_exx<<std::endl;
 	}*/
 
 	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D");
 	
-//ofstream ofs_time("time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
+//std::ofstream ofs_time("time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 //timeval t_start;	
 
 //gettimeofday( &t_start, NULL);	
 	MPI_Barrier(MPI_COMM_WORLD);		// Peize Lin test
-//ofs_time<<"TIME@ MPI_Barrier\t"<<time_during(t_start)<<endl;
+//ofs_time<<"TIME@ MPI_Barrier\t"<<time_during(t_start)<<std::endl;
 //ofs_matrixes( exx_lcao.test_dir+"test-HR_exx_"+TO_STRING(GlobalV::MY_RANK), HR_exx );
 	
 //gettimeofday( &t_start, NULL);
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> HR_a2D;
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> HR_a2D;
 	if(io_HR_a2D.first)
-		HR_a2D = Exx_Abfs::IO::input_binary<vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>>>(
+		HR_a2D = Exx_Abfs::IO::input_binary<std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>>>(
 			GlobalV::global_out_dir+"HR_exx_"+TO_STRING(GlobalV::MY_RANK));
 	else
 	{
@@ -52,13 +52,13 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D(
 	}
 	if(io_HR_a2D.second)
 		Exx_Abfs::IO::output_binary( HR_a2D, GlobalV::global_out_dir+"HR_exx_"+TO_STRING(GlobalV::MY_RANK) );
-//ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::exx_to_a2D\t"<<time_during(t_start)<<endl;
+//ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::exx_to_a2D\t"<<time_during(t_start)<<std::endl;
 //ofs_matrixes( exx_lcao.test_dir+"test-HR_a2D_"+TO_STRING(GlobalV::MY_RANK), HR_a2D );
 
 	/*{
 		static int istep=0;
-		ofstream ofs("HR_a2D_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
-		ofs<<HR_a2D<<endl;
+		std::ofstream ofs("HR_a2D_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
+		ofs<<HR_a2D<<std::endl;
 	}*/
 
 	if(GlobalV::GAMMA_ONLY_LOCAL)
@@ -68,22 +68,22 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D(
 
 	/*{
 		static int istep=0;
-		ofstream ofs("HK_m2D_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
+		std::ofstream ofs("HK_m2D_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
 		if(GlobalV::GAMMA_ONLY_LOCAL)
-			ofs<<HK_Gamma_m2D<<endl;
+			ofs<<HK_Gamma_m2D<<std::endl;
 		else
-			ofs<<HK_K_m2D<<endl;
+			ofs<<HK_K_m2D<<std::endl;
 	}*/
 //ofs_time.close();
 }
 
 /*
-map<size_t,map<size_t,matrix>> Exx_Abfs::Parallel::Communicate::Hexx::R_to_K( 
-	map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>> & HR) const
+std::map<size_t,std::map<size_t,matrix>> Exx_Abfs::Parallel::Communicate::Hexx::R_to_K( 
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>> & HR) const
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::R_to_K");
 	
-	map<size_t,map<size_t,matrix>> HK;
+	std::map<size_t,std::map<size_t,matrix>> HK;
 	for( auto & HR1 : HR )
 	{
 		const size_t iat1 = HR1.first;
@@ -99,13 +99,13 @@ map<size_t,map<size_t,matrix>> Exx_Abfs::Parallel::Communicate::Hexx::R_to_K(
 */
 
 /*
-map<size_t,map<size_t,ComplexMatrix>> Exx_Abfs::Parallel::Communicate::Hexx::R_to_K( 
-	const map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>> & HR,
+std::map<size_t,std::map<size_t,ComplexMatrix>> Exx_Abfs::Parallel::Communicate::Hexx::R_to_K( 
+	const std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>> & HR,
 	const size_t ik) const
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::R_to_K");
 	
-	map<size_t,map<size_t,ComplexMatrix>> HK;
+	std::map<size_t,std::map<size_t,ComplexMatrix>> HK;
 	for( auto & HRA : HR )
 	{
 		const size_t iat1 = HRA.first;

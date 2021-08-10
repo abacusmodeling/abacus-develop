@@ -190,13 +190,13 @@ int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt
         {
             GlobalV::ofs_running<<receiver_size_process[i]<<" ";
         }
-        GlobalV::ofs_running<<endl;
+        GlobalV::ofs_running<<std::endl;
         GlobalV::ofs_running<<"sender_size is "<<sender_size<<" ; sender_size of each process is:\n";
         for(int i=0; i<nprocs; ++i)
         {
             GlobalV::ofs_running<<sender_size_process[i]<<" ";
         }
-        GlobalV::ofs_running<<endl;
+        GlobalV::ofs_running<<std::endl;
     }
     // OUT(GlobalV::ofs_running,"last sender_2D_index",sender_2D_index[lgd_now*lgd_now-1]);
     delete[] receiver_2D_index;
@@ -253,7 +253,7 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
 		this->init_DM = true;
         this->lgd_last = lgd_now;
         //xiaohui add 'GlobalV::OUT_LEVEL', 2015-09-16
-        if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " allocate DM , the dimension is " << lgd_now << endl;
+        if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " allocate DM , the dimension is " << lgd_now << std::endl;
     }
     else if(lgd_now == 0)
     {
@@ -281,7 +281,7 @@ void Local_Orbital_Charge::gamma_file(const Grid_Technique &gt)
 	TITLE("Local_Orbital_Charge","gamma_file");
 
 	int error;
-	cout << " Read in gamma point wave function files " << endl;
+	std::cout << " Read in gamma point wave function files " << std::endl;
 
 	double **ctot;
 
@@ -291,12 +291,12 @@ void Local_Orbital_Charge::gamma_file(const Grid_Technique &gt)
 		GlobalC::LOC.wfc_dm_2d.wfc_gamma[is].create(GlobalC::ParaO.ncol, GlobalC::ParaO.nrow);
 		GlobalC::LOC.wfc_dm_2d.wfc_gamma[is].zero_out();
 
-		GlobalV::ofs_running << " Read in wave functions " << is << endl;
+		GlobalV::ofs_running << " Read in wave functions " << is << std::endl;
 		error = WF_Local::read_lowf( ctot , is);
 #ifdef __MPI
 		Parallel_Common::bcast_int(error);
 #endif
-		GlobalV::ofs_running << " Error=" << error << endl;
+		GlobalV::ofs_running << " Error=" << error << std::endl;
 		if(error==1)
 		{
 			WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: GlobalC::LOWF.dat");
@@ -339,13 +339,13 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
             // MPI_Comm_rank(MPI_COMM_WORLD, &myid);
             // if(myid==0)
             // {
-            //     GlobalV::ofs_running<<"DM[0][0:1][0:1] before send:"<<endl;
+            //     GlobalV::ofs_running<<"DM[0][0:1][0:1] before send:"<<std::endl;
             //     GlobalV::ofs_running<<"DM(0,0)"<<wfc_dm_2d.dm_gamma[is](0,0)<<" ";
-            //     GlobalV::ofs_running<<"DM(0,1)"<<wfc_dm_2d.dm_gamma[is](1,0)<<endl;
+            //     GlobalV::ofs_running<<"DM(0,1)"<<wfc_dm_2d.dm_gamma[is](1,0)<<std::endl;
             //     GlobalV::ofs_running<<"DM(1,0)"<<wfc_dm_2d.dm_gamma[is](0,1)<<" ";
-            //     GlobalV::ofs_running<<"DM(1,1)"<<wfc_dm_2d.dm_gamma[is](1,1)<<endl;
+            //     GlobalV::ofs_running<<"DM(1,1)"<<wfc_dm_2d.dm_gamma[is](1,1)<<std::endl;
             // }
-            GlobalV::ofs_running<<"2D block parameters:\n"<<"nblk: "<<GlobalC::ParaO.nb<<endl;
+            GlobalV::ofs_running<<"2D block parameters:\n"<<"nblk: "<<GlobalC::ParaO.nb<<std::endl;
             GlobalV::ofs_running<<"DM in 2D format:\n_________________________________________\n";
             for(int i=0; i<wfc_dm_2d.dm_gamma[is].nr; ++i)
             {
@@ -353,7 +353,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
                 {
                     GlobalV::ofs_running<<wfc_dm_2d.dm_gamma[is](i,j)<<" ";
                 }
-                GlobalV::ofs_running<<endl;
+                GlobalV::ofs_running<<std::endl;
             }
             GlobalV::ofs_running<<"=========================================\n";
         }
@@ -404,7 +404,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
             OUT(GlobalV::ofs_running,"number of non-zero elements in receiver_buffer",nNONZERO);
             OUT(GlobalV::ofs_running,"receiver_size",receiver_size);
             OUT(GlobalV::ofs_running,"last receiver_buffer",receiver_buffer[receiver_size-1]);
-            // GlobalV::ofs_running<<"DM[0][0:1][0:1] after receiver:"<<endl;
+            // GlobalV::ofs_running<<"DM[0][0:1][0:1] after receiver:"<<std::endl;
             // int idx0=GlobalC::GridT.trace_lo[0];
             // int idx1=GlobalC::GridT.trace_lo[1];
             // if(idx0>=0)
@@ -413,15 +413,15 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
             // }
             // if(idx0>=0 && idx1>=0)
             // {
-            //     GlobalV::ofs_running<<"DM(0,1)"<<DM[0][idx0][idx1]<<endl;
+            //     GlobalV::ofs_running<<"DM(0,1)"<<DM[0][idx0][idx1]<<std::endl;
             //     GlobalV::ofs_running<<"DM(1,0)"<<DM[0][idx1][idx0]<<" ";
             // }
             // if(idx1>=0)
             // {
-            //     GlobalV::ofs_running<<"DM(1,1)"<<DM[0][idx1][idx1]<<endl;
+            //     GlobalV::ofs_running<<"DM(1,1)"<<DM[0][idx1][idx1]<<std::endl;
             // }
-            //GlobalV::ofs_running<<DM[0][0][0]<<" "<<DM[0][0][1]<<endl;
-            //GlobalV::ofs_running<<DM[0][1][0]<<" "<<DM[0][1][1]<<endl;
+            //GlobalV::ofs_running<<DM[0][0][0]<<" "<<DM[0][0][1]<<std::endl;
+            //GlobalV::ofs_running<<DM[0][1][0]<<" "<<DM[0][1][1]<<std::endl;
             GlobalV::ofs_running<<"DM in local grid:\n_________________________________________\n";
             for(int i=0; i<GlobalV::NLOCAL; ++i)
             {
@@ -433,7 +433,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
                     if(jj<0) continue;
                     GlobalV::ofs_running<<DM[is][ii][jj]<<" ";
                 }
-                GlobalV::ofs_running<<endl;
+                GlobalV::ofs_running<<std::endl;
             }
             GlobalV::ofs_running<<"=========================================\n";
         }
@@ -476,7 +476,7 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 
 
 	// GlobalV::DSIZE: number of processors in diag world
-	vector<int> bands_local(GlobalV::DSIZE);
+	std::vector<int> bands_local(GlobalV::DSIZE);
 	for (int id=0; id<GlobalV::DSIZE; id++)
 	{
 		bands_local[id] = (id<GlobalV::NBANDS%GlobalV::DSIZE) ? GlobalV::NBANDS/GlobalV::DSIZE+1 : GlobalV::NBANDS/GlobalV::DSIZE;
@@ -605,7 +605,7 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 			}  // end for col_count
 		}  // end for row_count
 
-		GlobalV::ofs_running<<"DM[0][0:1][0:1] in cal_dk_gamma:"<<endl;
+		GlobalV::ofs_running<<"DM[0][0:1][0:1] in cal_dk_gamma:"<<std::endl;
 
 		int idx0=GlobalC::GridT.trace_lo[0];
 		int idx1=GlobalC::GridT.trace_lo[1];
@@ -616,12 +616,12 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 		}
 		if(idx0>=0 && idx1>=0)
 		{
-			GlobalV::ofs_running<<"DM(0,1)"<<DM[is][idx0][idx1]<<endl;
+			GlobalV::ofs_running<<"DM(0,1)"<<DM[is][idx0][idx1]<<std::endl;
 			GlobalV::ofs_running<<"DM(1,0)"<<DM[is][idx1][idx0]<<"\t";
 		}
 		if(idx1>=0)
 		{
-			GlobalV::ofs_running<<"DM(1,1)"<<DM[is][idx1][idx1]<<endl;
+			GlobalV::ofs_running<<"DM(1,1)"<<DM[is][idx1][idx1]<<std::endl;
 		}
 	}  // end for is    
 #endif //2015-09-06, xiaohui

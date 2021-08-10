@@ -3,9 +3,9 @@
 
 #include<sstream>
 #include<fstream>
-#include<vector>
-#include<set>
-#include<string>
+#include <vector>
+#include <set>
+#include <string>
 #ifdef __MPI
 #include<mpi.h>
 #endif
@@ -39,7 +39,7 @@ static std::ostream & operator<<( std::ostream & os, const std::vector<T> &v )
 {
 	os<<"[";
 	for( const T &i : v )
-		os<<i<<endl;
+		os<<i<<std::endl;
 	os<<"]";
 	return os;
 }
@@ -61,7 +61,7 @@ static std::ostream & operator<<( std::ostream & os, const std::map<T1,T2> &v )
 {
 	for( const auto &i : v )
 //		os<<"{"<<i.first<<":"<<i.second<<"}"<<"\t";
-		os<<i.first<<endl<<i.second<<endl;
+		os<<i.first<<std::endl<<i.second<<std::endl;
 	return os;
 }
 
@@ -82,11 +82,11 @@ static double cut_time( timeval &t )
 }
 
 // Peize Lin add 2019-12-12
-static vector<double> get_memory(const int N)
+static std::vector<double> get_memory(const int N)
 {
-	vector<double> m;
-	string s;
-	ifstream ifs("/proc/meminfo");
+	std::vector<double> m;
+	std::string s;
+	std::ifstream ifs("/proc/meminfo");
 	ifs>>s>>s;
 	m.push_back(stoi(s)/1024);
 	for(int i=1; i<N; ++i)

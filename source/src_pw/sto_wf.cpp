@@ -54,13 +54,13 @@ void Stochastic_WF::init(void)
     if(nchi == 0)
     {
         nchi = totnpw-GlobalV::NBANDS;
-        cout<<"Using all normal bases: "<<totnpw<<endl;
+        std::cout<<"Using all normal bases: "<<totnpw<<std::endl;
         allbase = true;
     }
     nchip = int(nchi/GlobalV::NPOOL);
     if(GlobalV::NPOOL - GlobalV::MY_POOL - 1 < nchi%GlobalV::NPOOL) ++nchip;
 
-    complex<double> ui(0,1);
+    std::complex<double> ui(0,1);
 
     //We temporarily init one group of orbitals for all k points.
     delete[] chi0;

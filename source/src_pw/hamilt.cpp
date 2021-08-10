@@ -56,7 +56,7 @@ void Hamilt::diagH_pw(
 		else
 		{
 			GlobalV::ofs_warning << " The diago_type " << GlobalV::KS_SOLVER 
-				<< " not implemented yet." << endl; //xiaohui add 2013-09-02
+				<< " not implemented yet." << std::endl; //xiaohui add 2013-09-02
 			WARNING_QUIT("Hamilt::diago","no implemt yet.");
 		}
     }
@@ -130,8 +130,8 @@ void Hamilt::diagH_pw(
 
         if ( notconv > max(5, GlobalV::NBANDS/4) )
         {
-            cout << "\n notconv = " << notconv;
-            cout << "\n Hamilt::diago', too many bands are not converged! \n";
+            std::cout << "\n notconv = " << notconv;
+            std::cout << "\n Hamilt::diago', too many bands are not converged! \n";
         }
     }
 
@@ -237,7 +237,7 @@ void Hamilt::diagH_LAPACK(
         lwork = (nb + 1) * nstart;
     }
 
-    complex<double> *work = new complex<double>[lwork];
+    std::complex<double> *work = new std::complex<double>[lwork];
 	ZEROS(work, lwork);
 	
     //=====================================================================

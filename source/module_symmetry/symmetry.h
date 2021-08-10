@@ -17,7 +17,7 @@ public:
 	// mohan add 2021-02-21
 	static bool symm_flag;
 
-	void analy_sys(const UnitCell_pseudo &ucell, const output &out, ofstream &ofs_running);
+	void analy_sys(const UnitCell_pseudo &ucell, const output &out, std::ofstream &ofs_running);
 	bool available;
 
 	Vector3<double> s1, s2, s3;
@@ -51,8 +51,8 @@ public:
 	int sym_test;
 	int pbrav;
 	int ibrav;
-	string ilattname;	//the bravais lattice type of the supercell
-	string plattname;	//the bravais lattice type of the primitive cell
+	std::string ilattname;	//the bravais lattice type of the supercell
+	std::string plattname;	//the bravais lattice type of the primitive cell
 
 	Matrix3 gmatrix[48];	//the rotation matrices for all space group operations
 	Vector3<double> gtrans[48];
@@ -63,14 +63,14 @@ public:
 	int nrot;	//the number of pure point group rotations
 	int nrotk; 	//the number of all space group operations
 	int pgnumber;	//the serial number of point group
-	string pgname;	//the Schoenflies name of the point group
+	std::string pgname;	//the Schoenflies name of the point group
 
 	int tab;
 
 	int standard_lat(Vector3<double> &a,Vector3<double> &b,Vector3<double> &c,double *celconst );
 
 	void lattice_type(Vector3<double> &v1,Vector3<double> &v2,Vector3<double> &v3, 
-			int &ibrav,double *cel_const,string &bravname, const UnitCell_pseudo &ucell);
+			int &ibrav,double *cel_const,std::string &bravname, const UnitCell_pseudo &ucell);
 
 	void recip(
 			const double a,
@@ -86,7 +86,7 @@ public:
 
 	// check if the input cell is a primitive cell.
 	//void pricell(const UnitCell_pseudo &ucell);
-	void getgroup(int &nrot, int &nrotk, ofstream &ofs_running);
+	void getgroup(int &nrot, int &nrotk, std::ofstream &ofs_running);
 	void checksym(Matrix3 &s, Vector3<double> &gtrans, double *pos);
 	void rho_symmetry(double *rho, const int &nr1, const int &nr2, const int &nr3);
 	void force_symmetry(matrix &force, double* pos, const UnitCell_pseudo &ucell);

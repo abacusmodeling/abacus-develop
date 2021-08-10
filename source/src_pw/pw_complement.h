@@ -25,7 +25,7 @@ const int &bx, const int &by, const int &bz);
 // MEMBER FUNCTION :
 // NAME : PW_Basis::setup_GVectors
 // Second part of the initialization : find out all G
-// vectors that |G|^2<=G2max and map it into a one
+// vectors that |G|^2<=G2max and std::map it into a one
 // dimentional array G1d in the increase order of |G|^2.
 // Next generate the indices between the 1D array and
 // the 3D G-grid and the FFT grid.
