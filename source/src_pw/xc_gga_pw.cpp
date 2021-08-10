@@ -358,6 +358,36 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 	return;
 }
 
+void GGA_PW::grad_wfc( const std::complex<double> *rhog, std::complex<double> **grad, int npw )
+{
+	double *kplusg;
+	kplusg = new double[npw];
+	ZEROS(kplusg, npw);
+
+	std::complex<double> *Porter = GlobalC::UFFT.porter;
+
+	for(int ipol=0; ipol<3; ipol++)
+	{
+		// the formula is : rho(r)^prime = \int iG * rho(G)e^{iGr} dG
+		for(int ig=0; ig<npw; ig++)
+			kplusg[ig] = GlobalC::pw.get_G_cartesian_projection(ig, ipol) * GlobalC::ucell.tpiba;
+
+		ZEROS(Porter, GlobalC::pw.nrxx);
+
+		// calculate the charge density gradient in reciprocal space.
+		for(int ig=0; ig<npw; ig++)
+			Porter[ GlobalC::pw.ig2fftc[ig] ] = complex<double>(0.0,kplusg[ig]) * rhog[ig];
+
+		// bring the gdr from G --> R
+		GlobalC::pw.FFT_chg.FFT3D(Porter, 1);
+
+		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
+			grad[ir][ipol]= Porter[ir];
+	}//end loop ipol
+	delete[] kplusg;
+	return;
+}
+
 void GGA_PW::grad_rho( const std::complex<double> *rhog, Vector3<double> *gdr )
 {
 	std::complex<double> *gdrtmpg = new std::complex<double>[GlobalC::pw.ngmc];
