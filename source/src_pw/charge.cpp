@@ -1230,36 +1230,37 @@ void Charge::cal_nelec(void)
 	
 	if ( GlobalV::CALCULATION!="scf-sto" && GlobalV::CALCULATION!="relax-sto" && GlobalV::CALCULATION!="md-sto" ) //qianrui 2021-2-20
 	{
-	if(GlobalV::NBANDS == 0)
-	{
-		if(GlobalV::NSPIN == 1)
+		if(GlobalV::NBANDS == 0)
 		{
-			int nbands1 = static_cast<int>(occupied_bands) + 10;
-			int nbands2 = static_cast<int>(1.2 * occupied_bands);
-			GlobalV::NBANDS = max(nbands1, nbands2);
+			if(GlobalV::NSPIN == 1)
+			{
+				const int nbands1 = static_cast<int>(occupied_bands) + 10;
+				const int nbands2 = static_cast<int>(1.2 * occupied_bands);
+				GlobalV::NBANDS = max(nbands1, nbands2);
+			}
+			else if (GlobalV::NSPIN ==2 || GlobalV::NSPIN == 4)
+			{
+				const int nbands3 = nelec + 20;
+				const int nbands4 = 1.2 * nelec;
+				GlobalV::NBANDS = max(nbands3, nbands4);
+				if(GlobalV::BASIS_TYPE!="pw") GlobalV::NBANDS = min(GlobalV::NBANDS, GlobalV::NLOCAL);
+			}
+			AUTO_SET("NBANDS",GlobalV::NBANDS);
 		}
-		else if (GlobalV::NSPIN ==2 || GlobalV::NSPIN == 4)
+		//else if ( GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax") //pengfei 2014-10-13
+		else
 		{
-			int nbands3 = nelec + 20;
-			int nbands4 = 1.2 * nelec;
-			GlobalV::NBANDS = max(nbands3, nbands4);
+			if(GlobalV::NBANDS < occupied_bands) WARNING_QUIT("unitcell","Too few bands!");
+			if(GlobalV::NBANDS < GlobalC::ucell.magnet.get_nelup() ) 
+			{
+				OUT(GlobalV::ofs_running,"nelup",GlobalC::ucell.magnet.get_nelup());
+				WARNING_QUIT("unitcell","Too few spin up bands!");
+			}
+			if(GlobalV::NBANDS < GlobalC::ucell.magnet.get_neldw() )
+			{
+				WARNING_QUIT("unitcell","Too few spin down bands!");
+			}
 		}
-		AUTO_SET("NBANDS",GlobalV::NBANDS);
-	}
-	//else if ( GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax") //pengfei 2014-10-13
-	else
-	{
-		if(GlobalV::NBANDS < occupied_bands) WARNING_QUIT("unitcell","Too few bands!");
-		if(GlobalV::NBANDS < GlobalC::ucell.magnet.get_nelup() ) 
-		{
-			OUT(GlobalV::ofs_running,"nelup",GlobalC::ucell.magnet.get_nelup());
-			WARNING_QUIT("unitcell","Too few spin up bands!");
-		}
-		if(GlobalV::NBANDS < GlobalC::ucell.magnet.get_neldw() )
-        {
-            WARNING_QUIT("unitcell","Too few spin down bands!");
-        }
-	}
 	}
 
 	// mohan update 2021-02-19
@@ -1268,7 +1269,7 @@ void Charge::cal_nelec(void)
     {
         if( GlobalV::NBANDS > GlobalV::NLOCAL )
         {
-            WARNING_QUIT("UnitCell_pseudo::cal_nwfc","NLOCAL < GlobalV::NBANDS");
+            WARNING_QUIT("UnitCell_pseudo::cal_nwfc","NLOCAL < NBANDS");
         }
         else
         {

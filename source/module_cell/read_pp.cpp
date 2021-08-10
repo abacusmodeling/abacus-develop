@@ -326,24 +326,27 @@ int Pseudopot_upf::average_p(const double& lambda)
 					ind = nb;
 					ind1 = nb +1;
 				}
-				//average D (Dion)
-				{
-					double avera = 0.5 * (this->dion(ind, ind) + this->dion(ind1, ind1));
-					double delta = 0.5 * (this->dion(ind, ind) - this->dion(ind1, ind1));
-					this->dion(ind, ind) = avera + delta * lambda_;
-					this->dion(ind1, ind1) = avera - delta * lambda_;
-				}
+				double vion1 = ((l+1.0) * this->dion(ind,ind) + l * this->dion(ind1,ind1)) / (2.0*l+1.0);
+				if(abs(vion1)<1.0e-10) vion1 = 1.0e-10;
 				//average beta (betar)
+				const double sqrtDplus = sqrt(this->dion(ind,ind) / vion1);
+				const double sqrtDminus = sqrt(this->dion(ind1,ind1) / vion1);
+				this->dion(ind, ind) = vion1;
+				this->dion(ind1, ind1) = vion1;
 				for(int ir = 0; ir<this->mesh;ir++)
 				{
-					double avera = 0.5 * 
-							( this->beta(ind, ir) + 
+					double avera = 1.0 / (2.0 * l + 1.0) * 
+							( (l + 1.0) * sqrtDplus *
+							this->beta(ind, ir) + 
+							l * sqrtDminus *
 							this->beta(ind1, ir) ) ;
-					double delta = 0.5 * 
-							( this->beta(ind, ir) - 
+					double delta = 1.0 / (2.0 * l + 1.0) * 
+							( sqrtDplus *
+							this->beta(ind, ir) - 
+							sqrtDminus *
 							this->beta(ind1, ir) ) ;
-					this->beta(ind, ir) = avera + delta * lambda_;
-					this->beta(ind1, ir) = avera - delta * lambda_; 
+					this->beta(ind, ir) = (avera + l * delta * lambda_) ;
+					this->beta(ind1, ir) = (avera - (l + 1) * delta * lambda_); 
 				}
 				nb++;
 			}
