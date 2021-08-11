@@ -108,8 +108,8 @@ private:
 	int lmax;
 	int nchimax;
 
-	int lmax_d;	//caoyu add 2021-03-17
-	int nchimax_d;	//caoyu add 2021-03-17
+	int lmax_d=0;	//caoyu add 2021-03-17
+	int nchimax_d=0;	//caoyu add 2021-03-17
 
 	double rcutmax_Phi;	//caoyu add 2021-05-24
 	double rcutmax_Beta;	//caoyu add 2021-05-24
