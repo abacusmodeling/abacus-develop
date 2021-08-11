@@ -12,7 +12,7 @@ project(ABACUS
 )
 
 option(ENABLE_DEEPKS "Enable DeePKS functionality" OFF)
-option(ENABLE_LIBXC "Enable LibXC functionality" OFF)
+option(ENABLE_LIBXC "Enable LibXC functionality" ON)
 
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 option(BUILD_UNIT_TESTS "Build ABACUS unit tests" ON)
@@ -80,12 +80,17 @@ if(ENABLE_DEEPKS)
   add_definitions(-D__DEEPKS)
 endif()
 
+if(DEFINED Libxc_DIR)
+  set(ENABLE_LIBXC ON)
+endif()
 if(ENABLE_LIBXC)
   find_package(Libxc)
   if(${Libxc_FOUND})
+    message("Using Libxc.")
     add_compile_definitions(USE_LIBXC)
     # applying -DUSING_Libxc definition
     # target_compile_definitions(${ABACUS_BIN_NAME} PRIVATE $<TARGET_PROPERTY:Libxc::xc,INTERFACE_COMPILE_DEFINITIONS>)
+    include_directories(${Libxc_INCLUDE_DIRS})
   else()
     message(WARNING "Will not use Libxc.")
   endif()
@@ -174,9 +179,9 @@ if(ENABLE_DEEPKS)
     ${TORCH_LIBRARIES}
   )
 endif()
+
 if(${Libxc_FOUND})
   target_link_libraries(${ABACUS_BIN_NAME} Libxc::xc)
-  target_include_directories(${ABACUS_BIN_NAME} PRIVATE $<TARGET_PROPERTY:Libxc::xc,INTERFACE_INCLUDE_DIRECTORIES>)
 endif()
 
 install(PROGRAMS ${ABACUS_BIN_PATH}
