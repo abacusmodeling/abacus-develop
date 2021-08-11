@@ -1014,12 +1014,10 @@ void LCAO_Descriptor::save_npy_f(const matrix &fbase)
 double LCAO_Descriptor::cal_e_delta_fixdm(const matrix& fixdm)
 {
     double e_delta_fixdm = 0;
-    //this->cal_v_delta(fixdm);
     for (int i = 0; i < NLOCAL; i++)
     {
         for (int j = 0; j < NLOCAL; j++)
         {
-            //e_delta_fixdm+=fixdm(i,j) *this->H_V_delta[i*NLOCAL+j];bug?
             e_delta_fixdm += this->dm_double[i * NLOCAL + j]*this->H_V_delta[i*NLOCAL+j];
         }
     }
