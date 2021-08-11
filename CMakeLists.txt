@@ -12,15 +12,19 @@ project(ABACUS
 )
 
 option(ENABLE_DEEPKS "Enable DeePKS functionality" OFF)
+option(ENABLE_LIBXC "Enable LibXC functionality" OFF)
+
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
-option(BUILD_TESTING "Build ABACUS unit tests" ON)
+option(BUILD_UNIT_TESTS "Build ABACUS unit tests" ON)
 option(GENERATE_TEST_REPORTS "Enable test report generation" OFF)
+
 
 if(ENABLE_DEEPKS)
   set(CMAKE_CXX_STANDARD 14)
 else()
   set(CMAKE_CXX_STANDARD 11)
 endif()
+
 if(ENABLE_ASAN)
   add_compile_options(
     -O1
@@ -44,7 +48,6 @@ set(ABACUS_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/${ABACUS_BIN_NAME})
 
 include_directories(${ABACUS_SOURCE_DIR})
 
-find_package(Boost REQUIRED)
 find_package(Cereal REQUIRED)
 find_package(ELPA REQUIRED)
 find_package(MPI REQUIRED)
@@ -59,7 +62,6 @@ include(FetchContent)
 
 include_directories(
   ${Cereal_INCLUDE_DIRS}
-  ${Boost_INCLUDE_DIRS}
   ${MPI_CXX_INCLUDE_PATH}
 )
 
@@ -78,6 +80,22 @@ if(ENABLE_DEEPKS)
   add_definitions(-D__DEEPKS)
 endif()
 
+if(DEFINED Libxc_DIR)
+  set(ENABLE_LIBXC ON)
+endif()
+if(ENABLE_LIBXC)
+  find_package(Libxc)
+  if(${Libxc_FOUND})
+    message("Using Libxc.")
+    add_compile_definitions(USE_LIBXC)
+    # applying -DUSING_Libxc definition
+    # target_compile_definitions(${ABACUS_BIN_NAME} PRIVATE $<TARGET_PROPERTY:Libxc::xc,INTERFACE_COMPILE_DEFINITIONS>)
+    include_directories(${Libxc_INCLUDE_DIRS})
+  else()
+    message(WARNING "Will not use Libxc.")
+  endif()
+endif()
+
 if(DEFINED MKL_DIR_CACHE)
   find_package(IntelMKL REQUIRED)
   add_definitions(-D__MKL -DMKL_ILP64)
@@ -89,20 +107,20 @@ else()
   include_directories(${FFTW3_INCLUDE_DIRS})
 endif()
 
-add_definitions(
-    -D__EXX
-    -D__FFTW3
-    -D__FP
-    -D__MPI
-    -D__OPENMP
-    -D__SELINV
-    -D__LCAO
-    -DMETIS
-    -DEXX_DM=3
-    -DEXX_H_COMM=2
-    -DTEST_EXX_LCAO=0
-    -DTEST_EXX_RADIAL=1
-    -DUSE_CEREAL_SERIALIZATION
+add_compile_definitions(
+  __EXX
+  __FFTW3
+  __FP
+  __MPI
+  __OPENMP
+  __SELINV
+  __LCAO
+  METIS
+  EXX_DM=3
+  EXX_H_COMM=2
+  TEST_EXX_LCAO=0
+  TEST_EXX_RADIAL=1
+  USE_CEREAL_SERIALIZATION
 )
 
 add_subdirectory(source)
@@ -160,6 +178,10 @@ if(ENABLE_DEEPKS)
   target_link_libraries(${ABACUS_BIN_NAME}
     ${TORCH_LIBRARIES}
   )
+endif()
+
+if(${Libxc_FOUND})
+  target_link_libraries(${ABACUS_BIN_NAME} Libxc::xc)
 endif()
 
 install(PROGRAMS ${ABACUS_BIN_PATH}

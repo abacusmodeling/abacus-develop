@@ -19,9 +19,11 @@ void Symmetry_rho::begin(const int &spin_now, const Charge_Broyden &CHR, const P
 #ifdef __MPI
 	// parallel version
 	psymm(CHR.rho[spin_now], pw, Pgrid, symm);
+	if(GlobalV::DFT_META) psymm(CHR.kin_r[spin_now],pw,Pgrid,symm);
 #else
 	// series version.
 	symm.rho_symmetry(CHR.rho[spin_now], pw.ncx, pw.ncy, pw.ncz);
+	if(GlobalV::DFT_META) symm.rho_symmetry(CHR.kin_r[spin_now],pw.ncx, pw.ncy, pw.ncz);
 #endif
 	return;
 }
