@@ -12,7 +12,7 @@ project(ABACUS
 )
 
 option(ENABLE_DEEPKS "Enable DeePKS functionality" OFF)
-option(ENABLE_LIBXC "Enable LibXC functionality" ON)
+option(ENABLE_LIBXC "Enable LibXC functionality" OFF)
 
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 option(BUILD_UNIT_TESTS "Build ABACUS unit tests" ON)
