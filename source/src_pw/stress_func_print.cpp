@@ -79,7 +79,7 @@ void Stress_Func::printstress_total(const matrix& scs, bool ry)
 
  	if(GlobalV::TEST_STRESS) 
 	{
-		std::cout << std::setiosflags(ios::fixed) << std::setprecision(6);
+		std::cout << std::fixed << std::setprecision(6);
 		std::cout << std::setiosflags(ios::showpos);
 		std::cout << " ------------------- TOTAL      STRESS --------------------" << std::endl;
     	std::cout << " " << std::setw(8) << "STRESS" << std::endl;
