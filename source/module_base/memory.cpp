@@ -1,0 +1,215 @@
+//==========================================================
+// AUTHOR : mohan
+// DATE : 2008-11-18
+//==========================================================
+#include "memory.h"
+
+// 1024 bit  = 1 Byte
+// 1024 Byte = 1 KB
+// 1024 KB   = 1 MB
+// 1024 MB   = 1 GB
+double Memory::total = 0.0;
+double Memory::complex_matrix_memory = 16.0;//(Byte)
+double Memory::double_memory = 8.0;//(Byte)
+double Memory::int_memory = 4.0;//(Byte)
+double Memory::bool_memory = 1.0;//(Byte)
+double Memory::float_memory = 4.0;//(Byte)
+double Memory::short_memory = 2.0;//(Byte)
+
+int Memory::n_memory = 500;
+int Memory::n_now = 0;
+bool Memory::init_flag =  false;
+
+std::string *Memory::name;
+std::string *Memory::class_name;
+double *Memory::consume;
+
+Memory::Memory()
+{
+}
+
+Memory::~Memory()
+{
+}
+
+double Memory::calculate_mem(const long &n_in,const std::string &type)
+{
+	double n = static_cast<double>(n_in);
+	double mem = 0.0;
+	
+	double factor = 1.0/1024.0/1024.0;
+	double complex_matrix_mem = complex_matrix_memory * factor;
+	double double_mem = double_memory * factor;
+	double int_mem = int_memory * factor;
+	double bool_mem = bool_memory * factor;
+	double float_mem = float_memory * factor;
+	double short_mem = short_memory * factor;
+
+	if(type=="ComplexMatrix" || type=="complexmatrix" || type=="cdouble")
+	{
+		mem = complex_matrix_mem;
+	}
+	else if(type=="real" || type=="double")
+	{
+		mem = double_mem;
+	}
+	else if(type=="int")
+	{
+		mem = int_mem;
+	}
+	else if(type=="bool")
+	{
+		mem = bool_mem;
+	}
+	else if(type=="short")
+	{
+		mem = short_mem;
+	}
+	else if(type=="float")
+	{
+		mem = float_mem;
+	}
+	else if(type=="AtomLink")
+	{
+		mem =  int_mem * 2 + double_mem * 3;
+	}
+	else if(type=="Vector3<double>")
+	{
+		mem = 3 * double_mem;
+	}
+	else
+	{
+		std::cout<<"not this type in memory storage : "<<type << std::endl;
+	}
+	total += n * mem;	
+	return n*mem;
+}
+	
+
+double Memory::record
+(
+ 	const std::string &class_name_in,
+	const std::string &name_in,
+	const long &n_in,
+	const std::string &type,
+	const bool accumulate
+)
+{
+	if(!Memory::init_flag)
+	{
+		name = new std::string[n_memory];
+		class_name = new std::string[n_memory];
+		consume = new double[n_memory];
+		for(int i=0;i<n_memory;i++)
+		{
+			consume[i] = 0.0;
+		}
+		Memory::init_flag = true;
+	}
+
+	int find = 0;
+	for(find = 0; find < n_now; find++)
+	{
+		if( name_in == name[find] )
+		{
+			break;
+		}
+	}
+
+	// find == n_now : found a new record.	
+	if(find == n_now)
+	{
+		n_now++;
+		name[find] = name_in;
+		class_name[find] = class_name_in;
+	}
+	if(n_now >= n_memory)
+	{
+		std::cout<<" Error! Too many memories required.";
+		return 0.0;
+	}
+
+	consume[find] = Memory::calculate_mem(n_in,type);
+
+	if(consume[find] > 5)
+	{
+		print(find);
+	}
+	return consume[find];
+}
+
+void Memory::print(const int find)
+{
+//	std::cout <<"\n Warning_Memory_Consuming : "
+//	<<class_name[find]<<" "<<name[find]<<" "<<consume[find]<<" MB" << std::endl;
+	return;
+}
+
+
+void Memory::finish(std::ofstream &ofs)
+{
+	print_all(ofs);
+	if(init_flag)
+	{
+		delete[] name;
+		delete[] class_name;
+		delete[] consume;
+		init_flag = false;
+	}
+	return;
+}
+
+void Memory::print_all(std::ofstream &ofs)
+{
+//	std::cout<<"\n init_flag="<<init_flag;
+	if(!init_flag) return;
+
+	const double small = 1.0; 
+//    std::cout<<"\n CLASS_NAME---------|NAME---------------|MEMORY(MB)--------";
+    ofs <<"\n CLASS_NAME---------|NAME---------------|MEMORY(MB)--------" << std::endl;
+//	std::cout<<"\n"<<std::setw(41)<< " " <<std::setprecision(4)<<total;
+	ofs <<std::setw(41)<< " " <<std::setprecision(4)<<total << std::endl;
+    
+	bool *print_flag = new bool[n_memory];
+	for(int i=0; i<n_memory; i++) print_flag[i] = false;
+	
+	for (int i=0; i<n_memory; i++)
+    {
+		int k = 0;
+		double tmp = -1.0;
+		for(int j=0; j<n_memory; j++)
+		{
+			if(print_flag[j])
+			{
+				continue;
+			}
+			else if(tmp < consume[j])
+			{
+				k = j;
+				tmp = consume[j];
+			}
+		}
+		print_flag[k] = true;
+
+	    if ( consume[k] < small ) 
+        {
+            continue;
+        }
+  		else
+  		{
+        	ofs  << " "
+             << std::setw(20) << class_name[k]
+             << std::setw(20) << name[k]
+             << std::setw(15) << consume[k] << std::endl;
+
+//        	std::cout  << "\n "
+//             << std::setw(20) << class_name[k]
+//             << std::setw(20) << name[k]
+//             << std::setw(15) << consume[k];
+		}
+    }
+//    std::cout<<"\n ----------------------------------------------------------"<<std::endl;
+    ofs<<" ----------------------------------------------------------"<<std::endl;
+	delete[] print_flag; //mohan fix by valgrind at 2012-04-02
+	return;
+}

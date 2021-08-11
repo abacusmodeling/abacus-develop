@@ -1,0 +1,24 @@
+add_subdirectory(module_base)
+add_subdirectory(module_cell)
+add_subdirectory(module_symmetry)
+add_subdirectory(module_neighbor)
+add_subdirectory(module_orbital)
+add_subdirectory(module_md)
+add_subdirectory(src_io)
+add_subdirectory(src_ions)
+add_subdirectory(src_lcao)
+add_subdirectory(src_parallel)
+add_subdirectory(src_pdiag)
+add_subdirectory(src_pw)
+add_subdirectory(src_ri)
+
+add_library(
+    driver
+    OBJECT
+    driver.cpp
+    input.cpp
+    input_conv.cpp
+    input_update.cpp
+    run_lcao.cpp
+    run_pw.cpp
+)

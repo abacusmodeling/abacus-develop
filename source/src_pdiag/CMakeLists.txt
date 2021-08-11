@@ -1,0 +1,25 @@
+add_subdirectory(MRRR)
+
+add_library(
+    pdiag
+    OBJECT
+    GenELPA.cpp
+    pdgseps.cpp
+    pdiag_basic.cpp
+    pdiag_common.cpp
+    pdiag_double.cpp
+    pdst2g.cpp
+    pdstebz.cpp
+    pdsteiz.cpp
+    pdsyg2st.cpp
+    pdsytrd.cpp
+    pdt2s.cpp
+    pdtrsm.cpp
+    pzgseps.cpp
+    pzheg2st.cpp
+    pzhetrd.cpp
+    pzhtrsm.cpp
+    pzst2g.cpp
+    pzsteiz.cpp
+    pzt2s.cpp
+)
