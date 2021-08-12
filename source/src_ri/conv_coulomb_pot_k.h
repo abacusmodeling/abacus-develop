@@ -1,9 +1,9 @@
 #ifndef CONV_COULOMB_POT_K_H
 #define CONV_COULOMB_POT_K_H
 
-#include<vector>
-#include<map>
-#include<string>
+#include <vector>
+#include <map>
+#include <string>
 
 class Conv_Coulomb_Pot_K
 {

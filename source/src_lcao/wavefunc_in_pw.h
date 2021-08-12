@@ -12,7 +12,7 @@ namespace Wavefunc_in_pw
 {
 
 	void make_table_q(
-		std::vector<string> &orbital_files, 
+		std::vector<std::string> &orbital_files, 
 		realArray &table_local);
 
 	void integral(

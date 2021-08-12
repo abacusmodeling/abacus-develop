@@ -7,7 +7,7 @@ Fcoef::Fcoef()
      ind1 = 1;
      ind4 = 1;
      ind5 = 1;
-     p = new complex<double> [1];
+     p = new std::complex<double> [1];
 }
 
 Fcoef::~Fcoef()
@@ -24,12 +24,12 @@ void Fcoef::create(const int i1, const int i2, const int i3)
          ind5 = i3;
          delete[] p;
          int tot = ind1*ind2*ind3*ind4*ind5;
-         p = new complex<double> [tot];
-         for(int i=0;i<tot;i++) p[i] = complex<double>(0.0,0.0);
+         p = new std::complex<double> [tot];
+         for(int i=0;i<tot;i++) p[i] = std::complex<double>(0.0,0.0);
      }
      else
      {
-         cout<<"not allowed!"<<endl;
+         std::cout<<"not allowed!"<<std::endl;
      }
 
      return;
@@ -37,7 +37,7 @@ void Fcoef::create(const int i1, const int i2, const int i3)
 
 Soc::Soc()
 {
-	p_rot = new complex<double> [1];
+	p_rot = new std::complex<double> [1];
 }
 
 Soc::~Soc()
@@ -93,20 +93,20 @@ void Soc::rot_ylm(const int lmax)
 	l_max_ = lmax;
 	l2plus1_ = 2 * l_max_ + 1;
 	delete[] p_rot;
-	this->p_rot = new complex<double> [l2plus1_ * l2plus1_];
+	this->p_rot = new std::complex<double> [l2plus1_ * l2plus1_];
 	ZEROS(p_rot, l2plus1_ * l2plus1_);
-	this->p_rot[l_max_] = complex<double>(1.0, 0.0);
+	this->p_rot[l_max_] = std::complex<double>(1.0, 0.0);
 
 	l = l_max_;
 	for(int i=1;i<2*l+1;i += 2)
 	{
 		m = (i+1)/2;
 		n = l-m;
-		this->p_rot[l2plus1_*i + n] = complex<double>(pow(-1.0 , m) / sqrt(2) , 0.0);
-		this->p_rot[l2plus1_*(i+1) + n] = complex<double>(0.0,-pow(-1.0 , m)/sqrt(2));
+		this->p_rot[l2plus1_*i + n] = std::complex<double>(pow(-1.0 , m) / sqrt(2) , 0.0);
+		this->p_rot[l2plus1_*(i+1) + n] = std::complex<double>(0.0,-pow(-1.0 , m)/sqrt(2));
 		n = l+m;
-		this->p_rot[l2plus1_*i + n] = complex<double>(1.0/sqrt(2), 0.0);
-		this->p_rot[l2plus1_*(i+1) + n] = complex<double>(0.0, 1.0/sqrt(2));
+		this->p_rot[l2plus1_*i + n] = std::complex<double>(1.0/sqrt(2), 0.0);
+		this->p_rot[l2plus1_*(i+1) + n] = std::complex<double>(0.0, 1.0/sqrt(2));
 	}
 	return;
 }
@@ -151,7 +151,7 @@ int Soc::sph_ind(const int l, const double j, const int m, const int spin)
     }
     else 
 	{
-		cout<<"l= "<<l<<" j= "<<j<<endl;
+		std::cout<<"l= "<<l<<" j= "<<j<<std::endl;
 		WARNING_QUIT("sph_ind","l and j not suitable");
 	}
     if(sph_ind0 < -l || sph_ind0 >l )
@@ -174,7 +174,7 @@ void Soc::set_fcoef(
 	const int &ip1,
 	const int &ip2)
 {
-	complex<double> coeff = complex<double>(0.0,0.0);
+	std::complex<double> coeff = std::complex<double>(0.0,0.0);
 	for(int m=-l1-1;m<l1+1;m++)
 	{
 		const int mi = sph_ind(l1,j1,m,is1) + l_max_ ;

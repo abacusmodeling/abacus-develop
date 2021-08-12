@@ -22,7 +22,7 @@ public:
 	~FFT();
 
 	// mohan add 'const' 2021-02-25
-	void FFT3D(complex<double> *psi,const int sign);
+	void FFT3D(std::complex<double> *psi,const int sign);
 //	void FFT3D(double *psi, const int sign);
 //	void FFT3D(matrix &psi, const int sign); // just for now
 
@@ -42,13 +42,13 @@ private:
 	int nxx;
 	bool FFTWsetupwasdone;
 	int test;
-	complex<double> *aux4plan;
+	std::complex<double> *aux4plan;
 #ifdef __MPI
-	void P3DFFT(complex<double> *psi, const int sign);
-	void fftxy(complex<double> *psi, const int sign);
-	void fftz(complex<double> *psi_in, const int sign, complex<double> *psi_out);
-	void scatter(complex<double> *psi, const int sign);
-	complex<double> *aux;
+	void P3DFFT(std::complex<double> *psi, const int sign);
+	void fftxy(std::complex<double> *psi, const int sign);
+	void fftz(std::complex<double> *psi_in, const int sign, std::complex<double> *psi_out);
+	void scatter(std::complex<double> *psi, const int sign);
+	std::complex<double> *aux;
 	fftw_plan planplus_x;
 	fftw_plan planplus_y; // mohan fix bug 2009-10-10
 	fftw_plan planplus_z;
@@ -67,7 +67,7 @@ private:
 	int *rdis;
 	int *sum;
 #else
-	void SFFT3D(complex<double> *data, const int sign);
+	void SFFT3D(std::complex<double> *data, const int sign);
 
 #if defined __FFTW2
 	fftwnd_plan plus_plan;

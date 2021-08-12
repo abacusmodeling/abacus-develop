@@ -5,8 +5,8 @@
 
 template<typename T1, typename T2> 
 void Exx_Abfs::minus_matrixes(
-	map<T1,T2> &A,
-	const map<T1,T2> &B) const
+	std::map<T1,T2> &A,
+	const std::map<T1,T2> &B) const
 {
 	for( auto & a : A )
 	{
@@ -18,8 +18,8 @@ void Exx_Abfs::minus_matrixes(
 
 template<typename T>
 void Exx_Abfs::minus_matrixes(
-	vector<T> &A,
-	const vector<T> &B) const
+	std::vector<T> &A,
+	const std::vector<T> &B) const
 {
 	for( size_t i=0; i!=A.size(); ++i )
 		minus_matrixes( A[i], B[i] );
@@ -36,9 +36,9 @@ void Exx_Abfs::minus_matrixes(
 
 
 /*
-map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> &Exx_Abfs::minus_matrixes(
-	map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> &mAs, 
-	const map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> & mBs) const
+std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &Exx_Abfs::minus_matrixes(
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &mAs, 
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> & mBs) const
 {
 	for( const auto m1 : mBs )
 	{
@@ -54,14 +54,14 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> &Exx_Abfs::minus_matrixes
 					const size_t i4 = m4.first;
 					
 					// Peize Lin test
-					cout<<i1<<i2<<i3<<i4<<endl;
-					cout<<mAs[i1][i2][i3][i4]<<endl;
-					cout<<m4.second<<endl;
+					std::cout<<i1<<i2<<i3<<i4<<std::endl;
+					std::cout<<mAs[i1][i2][i3][i4]<<std::endl;
+					std::cout<<m4.second<<std::endl;
 					
 					mAs[i1][i2][i3][i4] -= m4.second;
 					
 					// Peize Lin test
-					cout<<mAs[i1][i2][i3][i4]<<endl;
+					std::cout<<mAs[i1][i2][i3][i4]<<std::endl;
 				}
 			}
 		}	

@@ -73,7 +73,7 @@ private:
 	// MEMBER FUNCTIONS :
 	// NAME : readin ( read in parameters )
 	//========================================================
-	void readin(const string &name); 
+	void readin(const std::string &name); 
 	void bcast(void);
 
 	void allocate_C4(
@@ -83,7 +83,7 @@ private:
 		const int &ecut_number);
 
 	void readin_C4(
-		const string &name,
+		const std::string &name,
 		const int &ntype,
 		const int &ecut,
 		const int &rcut,

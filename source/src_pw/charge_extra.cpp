@@ -191,7 +191,7 @@ void Charge_Extra::extrapolate_charge()
 
 		if(GlobalV::OUT_LEVEL != "m") 
 		{
-			GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << endl;
+			GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << std::endl;
 		}
 		GlobalC::pw.setup_structure_factor();
 
@@ -243,7 +243,7 @@ void Charge_Extra::extrapolate_charge()
 
 		if(GlobalV::OUT_LEVEL != "m") 
 		{
-			GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << endl;
+			GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << std::endl;
 		}
 		GlobalC::pw.setup_structure_factor();
 
@@ -308,7 +308,7 @@ void Charge_Extra::extrapolate_charge()
 		//xiaohui add 'GlobalV::OUT_LEVEL', 2015-09-16
 		if(GlobalV::OUT_LEVEL != "m") 
 		{
-			GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << endl;
+			GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << std::endl;
 		}
 
 		// setup the structure factor
@@ -426,7 +426,7 @@ void Charge_Extra::find_alpha_and_beta(void)
 
 void Charge_Extra::save_pos_next(const UnitCell_pseudo& ucell)
 {
-	GlobalC::ucell.save_cartesian_position(this->pos_next);
+	ucell.save_cartesian_position(this->pos_next);
 	return;
 }
 
@@ -438,12 +438,12 @@ void Charge_Extra::update_istep(const int &step)
 
 void Charge_Extra::update_all_pos(const UnitCell_pseudo& ucell)
 {
-	const int total_freedom = GlobalC::ucell.nat * 3;
+	const int total_freedom = ucell.nat * 3;
 	for(int i=0;i<total_freedom;i++)
 	{
 		this->pos_old2[i] = this->pos_old1[i];
 		this->pos_old1[i] = this->pos_now[i];
 	}
-	GlobalC::ucell.save_cartesian_position(this->pos_now);
+	ucell.save_cartesian_position(this->pos_now);
 	return;
 }

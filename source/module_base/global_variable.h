@@ -87,6 +87,9 @@ extern bool GAMMA_ONLY_PW; // mohan add 2012-06-05
 extern int T_IN_H; // 23, calculate T in H or not.
 extern int VL_IN_H; // 24, calculate Vl in H or not.
 extern int VNL_IN_H; // 25, calculate Vnl in H or not.
+extern int VH_IN_H; // 26, calculate Vh in H or not.
+extern int VXC_IN_H; // 27, calculate Vxc in H or not.
+extern int VION_IN_H; // 28, calculate Vion_loc in H or not.
 extern double   STRESS_THR; //LiuXh add 20180515
 
 extern int ocp;
@@ -124,7 +127,7 @@ extern int GRANK;
 extern int GSIZE;
 
 //==========================================================
-// EXPLAIN : readin file dir, output file ofstream
+// EXPLAIN : readin file dir, output file std::ofstream
 // GLOBAL VARIABLES :
 // NAME : global_in_card
 // NAME : global_atom_card

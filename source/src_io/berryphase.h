@@ -21,7 +21,7 @@ public:
 #endif
 
 	int total_string;
-	vector<vector<int>> k_index;
+	std::vector<std::vector<int>> k_index;
 	int nppstr;
 	int direction;
 	int occ_nbands;
@@ -39,7 +39,7 @@ public:
 
 	void Macroscopic_polarization();
 
-	string outFormat(const double polarization, const double modulus, const Vector3<double> project);
+	std::string outFormat(const double polarization, const double modulus, const Vector3<double> project);
 	
 };
 

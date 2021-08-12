@@ -40,8 +40,8 @@ void ELEC_scf::scf(const int &istep)
 		srho.begin(is, GlobalC::CHR,GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
 	}
 
-//	cout << scientific;
-//	cout << setiosflags(ios::fixed);
+//	std::cout << scientific;
+//	std::cout << std::setiosflags(ios::fixed);
 
 	if(GlobalV::OUT_LEVEL=="ie" ||GlobalV::OUT_LEVEL=="m")
 	{
@@ -60,18 +60,18 @@ void ELEC_scf::scf(const int &istep)
 		}
 		else
 		{
-			cout << " " << setw(7)<< "ITER";
+			std::cout << " " << std::setw(7)<< "ITER";
 
 			if(GlobalV::NSPIN==2)
 			{
-				cout<<setw(10)<<"TMAG";
-				cout<<setw(10)<<"AMAG";
+				std::cout<<std::setw(10)<<"TMAG";
+				std::cout<<std::setw(10)<<"AMAG";
 			}
 
-			cout << setw(15) << "ETOT(eV)";
-			cout << setw(15) << "EDIFF(eV)";
-			cout << setw(11) << "DRHO2";
-			cout << setw(11) << "TIME(s)" << endl;
+			std::cout << std::setw(15) << "ETOT(eV)";
+			std::cout << std::setw(15) << "EDIFF(eV)";
+			std::cout << std::setw(11) << "DRHO2";
+			std::cout << std::setw(11) << "TIME(s)" << std::endl;
 		}
 	}// end GlobalV::OUT_LEVEL
 
@@ -81,42 +81,42 @@ void ELEC_scf::scf(const int &istep)
         if(GlobalV::CALCULATION=="scf")
         {
             GlobalV::ofs_running
-            << "\n LCAO ALGORITHM ------------- ELEC=" << setw(4) << iter
+            << "\n LCAO ALGORITHM ------------- ELEC=" << std::setw(4) << iter
             << "--------------------------------\n";
 
             GlobalV::ofs_warning
-            << "\n LCAO ALGORITHM ------------- ELEC=" << setw(4) << iter
+            << "\n LCAO ALGORITHM ------------- ELEC=" << std::setw(4) << iter
             << "--------------------------------\n";
         }
         else if(GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
 		{
 			GlobalV::ofs_running
-			<< "\n LCAO ALGORITHM ------------- ION=" << setw(4) << istep+1
-			<< "  ELEC=" << setw(4) << iter
+			<< "\n LCAO ALGORITHM ------------- ION=" << std::setw(4) << istep+1
+			<< "  ELEC=" << std::setw(4) << iter
 			<< "--------------------------------\n";
 
 			GlobalV::ofs_warning
-			<< "\n LCAO ALGORITHM ------------- ION=" << setw(4) << istep+1
-			<< "  ELEC=" << setw(4) << iter
+			<< "\n LCAO ALGORITHM ------------- ION=" << std::setw(4) << istep+1
+			<< "  ELEC=" << std::setw(4) << iter
 			<< "--------------------------------\n";
 		}
 		else if(GlobalV::CALCULATION=="md")
 		{
 			GlobalV::ofs_running
-			<< "\n LCAO ALGORITHM ------------- MD=" << setw(4) << istep+1
-			<< "  ELEC=" << setw(4) << iter
+			<< "\n LCAO ALGORITHM ------------- MD=" << std::setw(4) << istep+1
+			<< "  ELEC=" << std::setw(4) << iter
 			<< "--------------------------------\n";
 
 			GlobalV::ofs_warning
-			<< "\n LCAO ALGORITHM ------------- MD=" << setw(4) << istep+1
-			<< "  ELEC=" << setw(4) << iter
+			<< "\n LCAO ALGORITHM ------------- MD=" << std::setw(4) << istep+1
+			<< "  ELEC=" << std::setw(4) << iter
 			<< "--------------------------------\n";
 		}
 
 		//time_t time_start, time_finish;
 		clock_t clock_start;
 
-		string ufile = "CHANGE";
+		std::string ufile = "CHANGE";
 		Update_input UI;
 		UI.init(ufile);
 
@@ -162,7 +162,7 @@ void ELEC_scf::scf(const int &istep)
 		{
 			if(iter==1)
 			{
-				cout << " WAVEFUN -> CHARGE " << endl;
+				std::cout << " WAVEFUN -> CHARGE " << std::endl;
 
 				// The occupation should be read in together.
 				// Occupy::calculate_weights(); //mohan add 2012-02-15
@@ -211,16 +211,16 @@ void ELEC_scf::scf(const int &istep)
 		// somewhere else
 		if(ELEC_evolve::tddft == 1 && iter == 2)
 		{
-			this->WFC_init = new complex<double>**[GlobalC::kv.nks];
+			this->WFC_init = new std::complex<double>**[GlobalC::kv.nks];
 			for(int ik=0; ik<GlobalC::kv.nks; ik++)
 			{
-				this->WFC_init[ik] = new complex<double>*[GlobalV::NBANDS];
+				this->WFC_init[ik] = new std::complex<double>*[GlobalV::NBANDS];
 			}
 			for(int ik=0; ik<GlobalC::kv.nks; ik++)
 			{
 				for(int ib=0; ib<GlobalV::NBANDS; ib++)
 				{
-					this->WFC_init[ik][ib] = new complex<double>[GlobalV::NLOCAL];
+					this->WFC_init[ik][ib] = new std::complex<double>[GlobalV::NLOCAL];
 				}
 			}
 			if(istep>=1)
@@ -244,7 +244,7 @@ void ELEC_scf::scf(const int &istep)
 					{
 						for (int i=0; i<GlobalV::NLOCAL; i++)
 						{
-							WFC_init[ik][ib][i] = complex<double>(0.0,0.0);
+							WFC_init[ik][ib][i] = std::complex<double>(0.0,0.0);
 						}
 					}
 				}
@@ -288,7 +288,7 @@ void ELEC_scf::scf(const int &istep)
 
 //		for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 //		{
-//			cout << ib+1 << " " << GlobalC::wf.ekb[0][ib] << endl;
+//			std::cout << ib+1 << " " << GlobalC::wf.ekb[0][ib] << std::endl;
 //		}
 
 		//-----------------------------------------------------------
@@ -451,11 +451,11 @@ void ELEC_scf::scf(const int &istep)
 		{
 			const int precision = 3;
 
-			stringstream ssc;
+			std::stringstream ssc;
 			ssc << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG";
 			GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, iter, ssc.str(), precision );//mohan add 2007-10-17
 
-			stringstream ssd;
+			std::stringstream ssd;
 
 			if(GlobalV::GAMMA_ONLY_LOCAL)
 			{
@@ -469,7 +469,7 @@ void ELEC_scf::scf(const int &istep)
 
 			//LiuXh modify 20200701
 			/*
-			stringstream ssp;
+			std::stringstream ssp;
 			ssp << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_POT";
 			GlobalC::pot.write_potential( is, iter, ssp.str(), GlobalC::pot.vr, precision );
 			*/
@@ -488,8 +488,8 @@ void ELEC_scf::scf(const int &istep)
 		//time_finish=std::time(NULL);
 		double duration = (double)(clock() - clock_start) / CLOCKS_PER_SEC;
 		//double duration_time = difftime(time_finish, time_start);
-		//cout<<"Time_clock\t"<<"Time_time"<<endl;
-		//cout<<duration<<"\t"<<duration_time<<endl;
+		//std::cout<<"Time_clock\t"<<"Time_time"<<std::endl;
+		//std::cout<<duration<<"\t"<<duration_time<<std::endl;
 
 		// (11) calculate the total energy.
 		GlobalC::en.calculate_etot();
@@ -509,11 +509,11 @@ void ELEC_scf::scf(const int &istep)
 			//--------------------------------------
 			if( GlobalC::chi0_hilbert.epsilon)                                    // pengfei 2016-11-23
 			{
-				cout <<"eta = "<<GlobalC::chi0_hilbert.eta<<endl;
-				cout <<"domega = "<<GlobalC::chi0_hilbert.domega<<endl;
-				cout <<"nomega = "<<GlobalC::chi0_hilbert.nomega<<endl;
-				cout <<"dim = "<<GlobalC::chi0_hilbert.dim<<endl;
-				//cout <<"oband = "<<GlobalC::chi0_hilbert.oband<<endl;
+				std::cout <<"eta = "<<GlobalC::chi0_hilbert.eta<<std::endl;
+				std::cout <<"domega = "<<GlobalC::chi0_hilbert.domega<<std::endl;
+				std::cout <<"nomega = "<<GlobalC::chi0_hilbert.nomega<<std::endl;
+				std::cout <<"dim = "<<GlobalC::chi0_hilbert.dim<<std::endl;
+				//std::cout <<"oband = "<<GlobalC::chi0_hilbert.oband<<std::endl;
 				GlobalC::chi0_hilbert.Chi();
 			}
 
@@ -522,7 +522,7 @@ void ELEC_scf::scf(const int &istep)
 			{
 				if(GlobalC::CHR.out_charge)
 				{
-					stringstream sst;
+					std::stringstream sst;
 					sst << GlobalV::global_out_dir << "onsite.dm";
 					GlobalC::dftu.write_occup_m( sst.str() );
 				}
@@ -532,11 +532,11 @@ void ELEC_scf::scf(const int &istep)
 			{
 				const int precision = 3;
 
-				stringstream ssc;
+				std::stringstream ssc;
 				ssc << GlobalV::global_out_dir << "SPIN" << is + 1 << "_CHG";
 				GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, 0, ssc.str() );//mohan add 2007-10-17
 
-				stringstream ssd;
+				std::stringstream ssd;
 				if(GlobalV::GAMMA_ONLY_LOCAL)
 				{
 					ssd << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DM";
@@ -549,7 +549,7 @@ void ELEC_scf::scf(const int &istep)
 
 				if(GlobalC::pot.out_potential == 1) //LiuXh add 20200701
 				{
-					stringstream ssp;
+					std::stringstream ssp;
 					ssp << GlobalV::global_out_dir << "SPIN" << is + 1 << "_POT";
 					GlobalC::pot.write_potential( is, 0, ssp.str(), GlobalC::pot.vr_eff, precision );
 				}
@@ -557,7 +557,7 @@ void ELEC_scf::scf(const int &istep)
 				//LiuXh modify 20200701
 				/*
 				//fuxiang add 2017-03-15
-				stringstream sse;
+				std::stringstream sse;
 				sse << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DIPOLE_ELEC";
 				GlobalC::CHR.write_rho_dipole(GlobalC::CHR.rho_save, is, 0, sse.str());
 				*/
@@ -568,11 +568,11 @@ void ELEC_scf::scf(const int &istep)
 			if(conv_elec)
 			{
  				//xiaohui add "OUT_LEVEL", 2015-09-16
-				if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << setprecision(16);
-				if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " EFERMI = " << GlobalC::en.ef * Ry_to_eV << " eV" << endl;
+				if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << std::setprecision(16);
+				if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " EFERMI = " << GlobalC::en.ef * Ry_to_eV << " eV" << std::endl;
 				if(GlobalV::OUT_LEVEL=="ie")
 				{
-					GlobalV::ofs_running << " " << GlobalV::global_out_dir << " final etot is " << GlobalC::en.etot * Ry_to_eV << " eV" << endl;
+					GlobalV::ofs_running << " " << GlobalV::global_out_dir << " final etot is " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
 				}
 #ifdef __DEEPKS
 				if (INPUT.deepks_scf)	//caoyu add 2021-06-04
@@ -583,9 +583,9 @@ void ELEC_scf::scf(const int &istep)
 			}
 			else
 			{
-				GlobalV::ofs_running << " !! convergence has not been achieved @_@" << endl;
+				GlobalV::ofs_running << " !! convergence has not been achieved @_@" << std::endl;
 				if(GlobalV::OUT_LEVEL=="ie" || GlobalV::OUT_LEVEL=="m") //xiaohui add "m" option, 2015-09-16
-				cout << " !! CONVERGENCE HAS NOT BEEN ACHIEVED !!" << endl;
+				std::cout << " !! CONVERGENCE HAS NOT BEEN ACHIEVED !!" << std::endl;
 			}
 
 //			DONE(GlobalV::ofs_running,"ELECTRONS CONVERGED!");

@@ -37,10 +37,10 @@ void pdgseps(MPI_Comm comm_2D,int n,int nb,double *A, double *B,double *Z,double
 
 	Parallel_Reduce::reduce_int_diag( wrong_input );
 
-	//GlobalV::ofs_running << "\n wrong_input = " << wrong_input << endl;
+	//GlobalV::ofs_running << "\n wrong_input = " << wrong_input << std::endl;
 	if(wrong_input > 0)
 	{
-		GlobalV::ofs_running << "\n col_num == 0 || row_num == 0" << endl;
+		GlobalV::ofs_running << "\n col_num == 0 || row_num == 0" << std::endl;
 		WARNING_QUIT("pdgseps","col_num == 0 || row_num == 0");
 	}
 //time_t s,e;
@@ -95,7 +95,7 @@ off_diag[n-1]=0.0;
         pdst2g(comm_2D,nb,n,B,Z,LM,loc_size,uplo);
     }
 
-	//GlobalV::ofs_running << "\n local_size = " << loc_size << endl;
+	//GlobalV::ofs_running << "\n local_size = " << loc_size << std::endl;
     if (uplo=='u'||(uplo=='U'))
     {
         for (i=0; i<loc_size; i++)

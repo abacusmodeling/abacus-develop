@@ -29,16 +29,16 @@ class Pdiag_Basic
 
 	void data_distribution(
 		MPI_Comm comm_2D, 
-		const string &file,
+		const std::string &file,
 		const int &n,
 		const int &NB,
 		double *A,
 		const LocalMatrix &loc_A);
 
 	void gath_eig(MPI_Comm comm,int n,double **c,double *Z);
-	void gath_eig_complex(MPI_Comm comm,int n,complex<double> **c,complex<double> *Z, const int &ik); //mohan add 2012-01-09
+	void gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **c,std::complex<double> *Z, const int &ik); //mohan add 2012-01-09
 	void gath_full_eig(MPI_Comm comm,int n,double **c,double *Z);
-	void gath_full_eig_complex(MPI_Comm comm,int n,complex<double> **c, complex<double> *Z);
+	void gath_full_eig_complex(MPI_Comm comm,int n,std::complex<double> **c, std::complex<double> *Z);
 #endif
 
 	int lastband_in_proc;

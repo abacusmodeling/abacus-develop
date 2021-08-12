@@ -71,7 +71,7 @@ void Parallel_Orbitals::set_trace(void)
     || GlobalV::KS_SOLVER=="cg"
     || GlobalV::KS_SOLVER=="dav") //xiaohui add 2013-09-02
 	{
-		cout << " common settings for trace_loc_row and dtraace_loc_col " << endl;
+		std::cout << " common settings for trace_loc_row and dtraace_loc_col " << std::endl;
 		for (int i=0; i<GlobalV::NLOCAL; i++)
 		{
 			trace_loc_row[i] = i;
@@ -84,28 +84,28 @@ void Parallel_Orbitals::set_trace(void)
     else if(GlobalV::KS_SOLVER=="scalpack" || GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="hpseps" 
 		|| GlobalV::KS_SOLVER=="selinv" || GlobalV::KS_SOLVER=="scalapack_gvx") //xiaohui add 2013-09-02
     {
-        // GlobalV::ofs_running << " nrow=" << nrow << endl;
+        // GlobalV::ofs_running << " nrow=" << nrow << std::endl;
         for (int irow=0; irow< this->nrow; irow++)
         {
             int global_row = MatrixInfo.row_set[irow];
             trace_loc_row[global_row] = irow;
 			// GlobalV::ofs_running << " global_row=" << global_row 
-			// << " trace_loc_row=" << trace_loc_row[global_row] << endl;
+			// << " trace_loc_row=" << trace_loc_row[global_row] << std::endl;
         }
 
-        // GlobalV::ofs_running << " ncol=" << ncol << endl;
+        // GlobalV::ofs_running << " ncol=" << ncol << std::endl;
         for (int icol=0; icol< this->ncol; icol++)
         {
             int global_col = MatrixInfo.col_set[icol];
             trace_loc_col[global_col] = icol;
 			// GlobalV::ofs_running << " global_col=" << global_col 
-			// << " trace_loc_col=" << trace_loc_col[global_col] << endl;
+			// << " trace_loc_col=" << trace_loc_col[global_col] << std::endl;
         }
     }
 #endif
     else 
     {
-        cout << " Parallel Orbial, GlobalV::DIAGO_TYPE = " << GlobalV::KS_SOLVER << endl;
+        std::cout << " Parallel Orbial, GlobalV::DIAGO_TYPE = " << GlobalV::KS_SOLVER << std::endl;
         WARNING_QUIT("Parallel_Orbitals::set_trace","Check GlobalV::KS_SOLVER.");
     }
 
@@ -113,17 +113,17 @@ void Parallel_Orbitals::set_trace(void)
     // print the trace for test.
     //---------------------------
     /*
-    GlobalV::ofs_running << " " << setw(10) << "GlobalRow" << setw(10) << "LocalRow" << endl;
+    GlobalV::ofs_running << " " << std::setw(10) << "GlobalRow" << std::setw(10) << "LocalRow" << std::endl;
     for(int i=0; i<GlobalV::NLOCAL; i++)
     {
-        GlobalV::ofs_running << " " << setw(10) << i << setw(10) << trace_loc_row[i] << endl;
+        GlobalV::ofs_running << " " << std::setw(10) << i << std::setw(10) << trace_loc_row[i] << std::endl;
 
     }
 
-    GlobalV::ofs_running << " " << setw(10) << "GlobalCol" << setw(10) << "LocalCol" << endl;
+    GlobalV::ofs_running << " " << std::setw(10) << "GlobalCol" << std::setw(10) << "LocalCol" << std::endl;
     for(int j=0; j<GlobalV::NLOCAL; j++)
     {
-        GlobalV::ofs_running << " " << setw(10) << j << setw(10) << trace_loc_col[j] << endl;
+        GlobalV::ofs_running << " " << std::setw(10) << j << std::setw(10) << trace_loc_col[j] << std::endl;
     }
     */
 

@@ -23,8 +23,8 @@ public:
 
 	bool flag_vdwd2;	
 
-	map<std::string,double> C6;
-	map<std::string,double> R0;	
+	std::map<std::string,double> C6;
+	std::map<std::string,double> R0;	
 	
 	double scaling;
 	double damping;

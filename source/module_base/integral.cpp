@@ -36,7 +36,7 @@ double Integral_G::Gauss_Legendre
 	//test
 //	for(ir = 0; ir < n_root; ir++)
 //	{
-//		cout << gauleg_x[ir] << " " << gauleg_w[ir] << endl;
+//		std::cout << gauleg_x[ir] << " " << gauleg_w[ir] << std::endl;
 //	}
 	if( fabs(sab) < tiny ) return 0.0;
 
@@ -47,7 +47,7 @@ double Integral_G::Gauss_Legendre
 		xgl = (sab + dab * gauleg_x[ir]) / 2;
 		ygl = Polint::RadialF(Rad, F, Msh, 0, xgl);
 		ygl = Polint::Lagrange3(Rad, F, Msh, xgl);
-//		cout << "\nxgl = " << xgl << " ygl = " << ygl << endl;
+//		std::cout << "\nxgl = " << xgl << " ygl = " << ygl << std::endl;
 
 		sum += gauleg_w[ir] * ygl;
 	}

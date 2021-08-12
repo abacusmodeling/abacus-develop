@@ -42,8 +42,8 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 	// and reciprocal space.
 	double* rhotmp1 = nullptr;
 	double* rhotmp2 = nullptr;
-	complex<double>* rhogsum1 = nullptr;
-	complex<double>* rhogsum2 = nullptr;
+	std::complex<double>* rhogsum1 = nullptr;
+	std::complex<double>* rhogsum2 = nullptr;
 	Vector3<double>* gdr1 = nullptr;
 	Vector3<double>* gdr2 = nullptr;
 	Vector3<double>* h1 = nullptr;
@@ -55,7 +55,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 	// for spin unpolarized case, 
 	// calculate the gradient of (rho_core+rho) in reciprocal space.
 	rhotmp1 = new double[GlobalC::pw.nrxx];
-	rhogsum1 = new complex<double>[GlobalC::pw.ngmc];
+	rhogsum1 = new std::complex<double>[GlobalC::pw.ngmc];
 	ZEROS(rhotmp1, GlobalC::pw.nrxx);
 	ZEROS(rhogsum1, GlobalC::pw.ngmc);
 	for(int ir=0; ir<GlobalC::pw.nrxx; ir++) rhotmp1[ir] = GlobalC::CHR.rho[0][ir] + fac * GlobalC::CHR.rho_core[ir];
@@ -71,7 +71,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 	if(GlobalV::NSPIN==2)
 	{
 		rhotmp2 = new double[GlobalC::pw.nrxx];
-		rhogsum2 = new complex<double>[GlobalC::pw.ngmc];
+		rhogsum2 = new std::complex<double>[GlobalC::pw.ngmc];
 		ZEROS(rhotmp2, GlobalC::pw.nrxx);
 		ZEROS(rhogsum2, GlobalC::pw.ngmc);
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++) rhotmp2[ir] = GlobalC::CHR.rho[1][ir] + fac * GlobalC::CHR.rho_core[ir];
@@ -104,7 +104,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 
 		noncolin_rho(rhotmp1,rhotmp2,neg);
 
-		rhogsum2 = new complex<double>[GlobalC::pw.ngmc];
+		rhogsum2 = new std::complex<double>[GlobalC::pw.ngmc];
 		ZEROS(rhogsum2, GlobalC::pw.ngmc);
 		GlobalC::CHR.set_rhog(rhotmp1, rhogsum1);
 		GlobalC::CHR.set_rhog(rhotmp2, rhogsum2);
@@ -141,8 +141,8 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 	*/
 	
 	/*
-	cout << "\n sum grad 1= " << sum[0] << " "  << sum[1] << " " << sum[2] << endl;
-	cout << " sum rho = " << sum[3] << " "  << sum[4] << endl;
+	std::cout << "\n sum grad 1= " << sum[0] << " "  << sum[1] << " " << sum[2] << std::endl;
+	std::cout << " sum rho = " << sum[3] << " "  << sum[4] << std::endl;
 	ZEROS(sum,6);
 	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 	{
@@ -152,8 +152,8 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 		sum[3] += abs(rhotmp2[ir]);	
 		sum[4] += rhotmp2[ir]*rhotmp2[ir];	
 	}
-	cout << "\n sum grad 2= " << sum[0] << " "  << sum[1] << " " << sum[2] << endl;
-	cout << " sum rho = " << sum[3] << " "  << sum[4] << endl;
+	std::cout << "\n sum grad 2= " << sum[0] << " "  << sum[1] << " " << sum[2] << std::endl;
+	std::cout << " sum rho = " << sum[3] << " "  << sum[4] << std::endl;
 	*/
 	
 	const double epsr = 1.0e-6;
@@ -270,8 +270,8 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 
 	}
 
-	//cout << "\n vtxcgc=" << vtxcgc;
-	//cout << "\n etxcgc=" << etxcgc << endl;
+	//std::cout << "\n vtxcgc=" << vtxcgc;
+	//std::cout << "\n etxcgc=" << etxcgc << std::endl;
 
 	for(int ir=0; ir<GlobalC::pw.nrxx; ir++) rhotmp1[ir] -= fac * GlobalC::CHR.rho_core[ir];
 	if(nspin0==2) for(int ir=0; ir<GlobalC::pw.nrxx; ir++) rhotmp2[ir] -= fac * GlobalC::CHR.rho_core[ir];
@@ -358,12 +358,42 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 	return;
 }
 
-void GGA_PW::grad_rho( const complex<double> *rhog, Vector3<double> *gdr )
+void GGA_PW::grad_wfc( const std::complex<double> *rhog, std::complex<double> **grad, int npw )
 {
-	complex<double> *gdrtmpg = new complex<double>[GlobalC::pw.ngmc];
+	double *kplusg;
+	kplusg = new double[npw];
+	ZEROS(kplusg, npw);
+
+	std::complex<double> *Porter = GlobalC::UFFT.porter;
+
+	for(int ipol=0; ipol<3; ipol++)
+	{
+		// the formula is : rho(r)^prime = \int iG * rho(G)e^{iGr} dG
+		for(int ig=0; ig<npw; ig++)
+			kplusg[ig] = GlobalC::pw.get_G_cartesian_projection(ig, ipol) * GlobalC::ucell.tpiba;
+
+		ZEROS(Porter, GlobalC::pw.nrxx);
+
+		// calculate the charge density gradient in reciprocal space.
+		for(int ig=0; ig<npw; ig++)
+			Porter[ GlobalC::pw.ig2fftc[ig] ] = complex<double>(0.0,kplusg[ig]) * rhog[ig];
+
+		// bring the gdr from G --> R
+		GlobalC::pw.FFT_chg.FFT3D(Porter, 1);
+
+		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
+			grad[ir][ipol]= Porter[ir];
+	}//end loop ipol
+	delete[] kplusg;
+	return;
+}
+
+void GGA_PW::grad_rho( const std::complex<double> *rhog, Vector3<double> *gdr )
+{
+	std::complex<double> *gdrtmpg = new std::complex<double>[GlobalC::pw.ngmc];
 	ZEROS(gdrtmpg, GlobalC::pw.ngmc);
 
-	complex<double> *Porter = GlobalC::UFFT.porter;
+	std::complex<double> *Porter = GlobalC::UFFT.porter;
 
 	// the formula is : rho(r)^prime = \int iG * rho(G)e^{iGr} dG
 	for(int ig=0; ig<GlobalC::pw.ngmc; ig++)
@@ -372,7 +402,7 @@ void GGA_PW::grad_rho( const complex<double> *rhog, Vector3<double> *gdr )
 	// calculate the charge density gradient in reciprocal space.
 	ZEROS(Porter, GlobalC::pw.nrxx);
 	for(int ig=0; ig<GlobalC::pw.ngmc; ig++)
-		Porter[ GlobalC::pw.ig2fftc[ig] ] = gdrtmpg[ig]* complex<double>(GlobalC::pw.get_G_cartesian_projection(ig, 0), 0.0);
+		Porter[ GlobalC::pw.ig2fftc[ig] ] = gdrtmpg[ig]* std::complex<double>(GlobalC::pw.get_G_cartesian_projection(ig, 0), 0.0);
 	// bring the gdr from G --> R
 	GlobalC::pw.FFT_chg.FFT3D(Porter, 1);
 	// remember to multily 2pi/a0, which belongs to G vectors.
@@ -382,7 +412,7 @@ void GGA_PW::grad_rho( const complex<double> *rhog, Vector3<double> *gdr )
 	// calculate the charge density gradient in reciprocal space.
 	ZEROS(Porter, GlobalC::pw.nrxx);
 	for(int ig=0; ig<GlobalC::pw.ngmc; ig++)
-		Porter[GlobalC::pw.ig2fftc[ig]] = gdrtmpg[ig] * complex<double>(GlobalC::pw.get_G_cartesian_projection(ig, 1), 0.0);
+		Porter[GlobalC::pw.ig2fftc[ig]] = gdrtmpg[ig] * std::complex<double>(GlobalC::pw.get_G_cartesian_projection(ig, 1), 0.0);
 	// bring the gdr from G --> R
 	GlobalC::pw.FFT_chg.FFT3D(Porter, 1);
 	// remember to multily 2pi/a0, which belongs to G vectors.
@@ -392,7 +422,7 @@ void GGA_PW::grad_rho( const complex<double> *rhog, Vector3<double> *gdr )
 	// calculate the charge density gradient in reciprocal space.
 	ZEROS(Porter, GlobalC::pw.nrxx);
 	for(int ig=0; ig<GlobalC::pw.ngmc; ig++)
-		Porter[GlobalC::pw.ig2fftc[ig]] = gdrtmpg[ig] * complex<double>(GlobalC::pw.get_G_cartesian_projection(ig, 2), 0.0);
+		Porter[GlobalC::pw.ig2fftc[ig]] = gdrtmpg[ig] * std::complex<double>(GlobalC::pw.get_G_cartesian_projection(ig, 2), 0.0);
 	// bring the gdr from G --> R
 	GlobalC::pw.FFT_chg.FFT3D(Porter, 1);
 	// remember to multily 2pi/a0, which belongs to G vectors.
@@ -406,13 +436,13 @@ void GGA_PW::grad_rho( const complex<double> *rhog, Vector3<double> *gdr )
 
 void GGA_PW::grad_dot(const Vector3<double> *h, double *dh)
 {
-	complex<double> *aux = new complex<double>[GlobalC::pw.nrxx];
-	complex<double> *gaux = new complex<double>[GlobalC::pw.ngmc];
+	std::complex<double> *aux = new std::complex<double>[GlobalC::pw.nrxx];
+	std::complex<double> *gaux = new std::complex<double>[GlobalC::pw.ngmc];
 	ZEROS(gaux, GlobalC::pw.ngmc);
 	
 	ZEROS(aux, GlobalC::pw.nrxx);
 	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
-		aux[ir] = complex<double>( h[ir].x, 0.0);
+		aux[ir] = std::complex<double>( h[ir].x, 0.0);
 	// bring to G space.
 	GlobalC::pw.FFT_chg.FFT3D(aux, -1);
 	for(int ig=0; ig<GlobalC::pw.ngmc; ig++)
@@ -420,7 +450,7 @@ void GGA_PW::grad_dot(const Vector3<double> *h, double *dh)
 
 	ZEROS(aux, GlobalC::pw.nrxx);
 	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
-		aux[ir] = complex<double>( h[ir].y, 0.0);
+		aux[ir] = std::complex<double>( h[ir].y, 0.0);
 	// bring to G space.
 	GlobalC::pw.FFT_chg.FFT3D(aux, -1);
 	for(int ig=0; ig<GlobalC::pw.ngmc; ig++)
@@ -428,7 +458,7 @@ void GGA_PW::grad_dot(const Vector3<double> *h, double *dh)
 
 	ZEROS(aux, GlobalC::pw.nrxx);
 	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
-		aux[ir] = complex<double>( h[ir].z, 0.0);
+		aux[ir] = std::complex<double>( h[ir].z, 0.0);
 	// bring to G space.
 	GlobalC::pw.FFT_chg.FFT3D(aux, -1);
 	for(int ig=0; ig<GlobalC::pw.ngmc; ig++)

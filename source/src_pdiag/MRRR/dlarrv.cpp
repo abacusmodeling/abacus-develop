@@ -104,7 +104,7 @@ int pdlarrv_mpi(int *il, int *iu, int *n, double *vl, double *vu, double *d__,
 		/* L5: */
 	}
 	/*     IWORK(IINDR+1:IINDR+N) hold the twist indices R for the */
-	/*     factorization used to compute the FP vector */
+	/*     factorization used to compute the FP std::vector */
 	iindr = 0;
 	/*     IWORK(IINDC1+1:IINC2+N) are used to store the clusters of the current */
 	/*     layer and the one above. */
@@ -807,7 +807,7 @@ int pdlarrv_mpi(int *il, int *iu, int *n, double *vl, double *vu, double *d__,
 							work[windex] = lambda;
 						}
 
-						/*                    Compute FP-vector support w.r.t. whole matrix */
+						/*                    Compute FP-std::vector support w.r.t. whole matrix */
 
 						isuppz[(windex << 1) - 1] += oldien;
 						isuppz[windex * 2] += oldien;
@@ -815,7 +815,7 @@ int pdlarrv_mpi(int *il, int *iu, int *n, double *vl, double *vu, double *d__,
 						zto = isuppz[windex * 2];
 						isupmn += oldien;
 						isupmx += oldien;
-						/*                    Ensure vector is ok if support in the RQI has changed */
+						/*                    Ensure std::vector is ok if support in the RQI has changed */
 						if (isupmn < zfrom) {
 							i__4 = zfrom - 1;
 							for (ii = isupmn; ii <= i__4; ++ii) {

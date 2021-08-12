@@ -16,11 +16,11 @@ int inverse_matrix_double_test()
 	I.cal_inverse( Exx_Abfs::Inverse_Matrix_Double::Method::dsyev );
 	I.output(mI);
 	
-	ofstream ofs("m_mI.dat");
-	ofs<<m*mI<<endl;
+	std::ofstream ofs("m_mI.dat");
+	ofs<<m*mI<<std::endl;
 	ofs.close();
 	ofs.open("mI_m.dat");
-	ofs<<mI*m<<endl;
+	ofs<<mI*m<<std::endl;
 	ofs.close();
 }
 

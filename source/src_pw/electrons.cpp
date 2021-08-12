@@ -36,15 +36,15 @@ void Electrons::non_self_consistent(const int &istep)
     // =======================================
     Electrons::c_bands(istep);
 
-    GlobalV::ofs_running << " End of Band Structure Calculation " << endl;
-    GlobalV::ofs_running << " Band eigenvalue (eV) :" << endl;
+    GlobalV::ofs_running << " End of Band Structure Calculation " << std::endl;
+    GlobalV::ofs_running << " Band eigenvalue (eV) :" << std::endl;
 
     for (int ik = 0; ik < GlobalC::kv.nks; ik++)
     {
         if (GlobalV::NSPIN==2)
         {
-            if (ik == 0) GlobalV::ofs_running << " spin up :" << endl;
-            if (ik == ( GlobalC::kv.nks / 2)) GlobalV::ofs_running << " spin down :" << endl;
+            if (ik == 0) GlobalV::ofs_running << " spin up :" << std::endl;
+            if (ik == ( GlobalC::kv.nks / 2)) GlobalV::ofs_running << " spin down :" << std::endl;
         }
         //out.printV3(GlobalV::ofs_running, GlobalC::kv.kvec_c[ik]);
 
@@ -52,16 +52,16 @@ void Electrons::non_self_consistent(const int &istep)
         << "(" << GlobalC::kv.nkstot << "): " 
         << GlobalC::kv.kvec_c[ik].x 
         << " " << GlobalC::kv.kvec_c[ik].y 
-        << " " << GlobalC::kv.kvec_c[ik].z << endl;
+        << " " << GlobalC::kv.kvec_c[ik].z << std::endl;
 
         for (int ib = 0; ib < GlobalV::NBANDS; ib++)
         {			
             GlobalV::ofs_running << " spin" << GlobalC::kv.isk[ik]+1 
             << "_final_band " << ib+1 
             << " " << GlobalC::wf.ekb[ik][ib] * Ry_to_eV 
-            << " " << GlobalC::wf.wg(ik, ib)*GlobalC::kv.nks << endl;
+            << " " << GlobalC::wf.wg(ik, ib)*GlobalC::kv.nks << std::endl;
         }
-        GlobalV::ofs_running << endl;
+        GlobalV::ofs_running << std::endl;
     }
 
     // add by jingan in 2018.11.7
@@ -100,24 +100,24 @@ void Electrons::self_consistent(const int &istep)
 
     if(GlobalV::OUT_LEVEL=="ie")
     {
-        cout << setprecision(12);
-        cout<< " " << setw(7)<< "ITER"; // pengfei Li added 2015-1-31 
+        std::cout << std::setprecision(12);
+        std::cout<< " " << std::setw(7)<< "ITER"; // pengfei Li added 2015-1-31 
 
         if(GlobalV::NSPIN==2)
         {
-            cout<<setw(10)<<"TMAG";
-            cout<<setw(10)<<"AMAG";
+            std::cout<<std::setw(10)<<"TMAG";
+            std::cout<<std::setw(10)<<"AMAG";
         }
 
-        cout<<setw(15)<< "ETOT(eV)"<<setw(15)<< "EDIFF(eV)"<<setw(11)<< "DRHO2"; // pengfei Li added 2015-1-31
+        std::cout<<std::setw(15)<< "ETOT(eV)"<<std::setw(15)<< "EDIFF(eV)"<<std::setw(11)<< "DRHO2"; // pengfei Li added 2015-1-31
         //if(GlobalV::DIAGO_TYPE=="cg") xiaohui modify 2013-09-02
         if(GlobalV::KS_SOLVER=="cg") //xiaohui add 2013-09-02
         {
-            cout<<setw(11)<<"CG_ITER";
+            std::cout<<std::setw(11)<<"CG_ITER";
         }
 
-        cout<<setw(11)<< "TIME(S)";
-        cout<<endl;
+        std::cout<<std::setw(11)<< "TIME(S)";
+        std::cout<<std::endl;
     }
     else
     {
@@ -137,9 +137,9 @@ void Electrons::self_consistent(const int &istep)
     // mohan add 2010/3/25
     // output the charge mixing data :
     // iteration && dr2.
-    // stringstream ss;
+    // std::stringstream ss;
     // ss << GlobalV::global_out_dir << "ChargeMixing.dat"; 
-    // ofstream ofs_mix;
+    // std::ofstream ofs_mix;
 
     // if(GlobalV::MY_RANK==0)
     // {
@@ -150,8 +150,8 @@ void Electrons::self_consistent(const int &istep)
     for (this->iter = 1;iter <= GlobalV::NITER;iter++)
     {
         GlobalV::ofs_running 
-        << "\n PW ALGORITHM --------------- ION=" << setw(4) << istep + 1
-        << "  ELEC=" << setw(4) << iter 
+        << "\n PW ALGORITHM --------------- ION=" << std::setw(4) << istep + 1
+        << "  ELEC=" << std::setw(4) << iter 
         << "--------------------------------\n";
         // mohan add 2010-07-16
         if(iter==1) GlobalC::CHR.set_new_e_iteration(true);
@@ -272,7 +272,7 @@ void Electrons::self_consistent(const int &istep)
 
             //if(GlobalV::MY_RANK==0)
             //{
-            //    ofs_mix << setw(5) << iter << setw(20) << dr2 << endl; 
+            //    ofs_mix << std::setw(5) << iter << std::setw(20) << dr2 << std::endl; 
             //}
 
             if (iter==1 && !onescf)
@@ -283,12 +283,12 @@ void Electrons::self_consistent(const int &istep)
                     GlobalV::ofs_running << " Notice: Threshold on eigenvalues was too large.\n";
 
                     WARNING("scf","Threshold on eigenvalues was too large.");
-                    GlobalV::ofs_running << " dr2=" << dr2 << " < diago_error=" << diago_error << endl;
+                    GlobalV::ofs_running << " dr2=" << dr2 << " < diago_error=" << diago_error << std::endl;
 
                     // update GlobalV::ETHR.
-                    GlobalV::ofs_running << " Origin GlobalV::ETHR = " << GlobalV::ETHR << endl;
+                    GlobalV::ofs_running << " Origin GlobalV::ETHR = " << GlobalV::ETHR << std::endl;
                     GlobalV::ETHR = 0.1 * dr2 / GlobalC::CHR.nelec;
-                    GlobalV::ofs_running << " New    GlobalV::ETHR = " << GlobalV::ETHR << endl;
+                    GlobalV::ofs_running << " New    GlobalV::ETHR = " << GlobalV::ETHR << std::endl;
                     //goto first_iter_again;
                     goto scf_step;
                 }
@@ -321,25 +321,28 @@ void Electrons::self_consistent(const int &istep)
             // mohan fix bug 2012-06-05,
             // the new potential V(PL)+V(H)+V(xc)
             GlobalC::pot.vr = GlobalC::pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
-            //cout<<"Exc = "<<GlobalC::en.etxc<<endl;
+            //std::cout<<"Exc = "<<GlobalC::en.etxc<<std::endl;
             //( vnew used later for scf correction to the forces )
             GlobalC::pot.vnew = GlobalC::pot.vr - GlobalC::pot.vnew;
             GlobalC::en.descf = 0.0;
         }
 
-        stringstream ssw;
+        std::stringstream ssw;
         ssw << GlobalV::global_out_dir << "WAVEFUNC.dat";
 
 		//qianrui add 2020-10-12
-		stringstream ssgk;
+		std::stringstream ssgk;
 		ssgk << GlobalV::global_out_dir << "GKK.dat";
 
         // output for tmp.
         for(int is=0; is<GlobalV::NSPIN; is++)
         {
-            stringstream ssc;
+            std::stringstream ssc;
+            std::stringstream ss1;
             ssc << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG";
             GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, iter, ssc.str(), 3);//mohan add 2007-10-17
+			ss1 << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG.cube";
+			GlobalC::CHR.write_rho_cube(GlobalC::CHR.rho_save[is], is, ssc.str(), 3);
         }
 
         if(GlobalC::wf.out_wf)
@@ -372,22 +375,22 @@ void Electrons::self_consistent(const int &istep)
 #ifdef __LCAO
             if(GlobalC::chi0_hilbert.epsilon)                 // pengfei 2016-11-23
             {
-                cout <<"eta = "<<GlobalC::chi0_hilbert.eta<<endl;
-                cout <<"domega = "<<GlobalC::chi0_hilbert.domega<<endl;
-                cout <<"nomega = "<<GlobalC::chi0_hilbert.nomega<<endl;
-                cout <<"dim = "<<GlobalC::chi0_hilbert.dim<<endl;
-                //cout <<"oband = "<<GlobalC::chi0_hilbert.oband<<endl;
+                std::cout <<"eta = "<<GlobalC::chi0_hilbert.eta<<std::endl;
+                std::cout <<"domega = "<<GlobalC::chi0_hilbert.domega<<std::endl;
+                std::cout <<"nomega = "<<GlobalC::chi0_hilbert.nomega<<std::endl;
+                std::cout <<"dim = "<<GlobalC::chi0_hilbert.dim<<std::endl;
+                //std::cout <<"oband = "<<GlobalC::chi0_hilbert.oband<<std::endl;
                 GlobalC::chi0_hilbert.Chi();
             }
 #endif
 
             if(GlobalC::chi0_standard.epsilon)
             {
-                cout <<"eta = "<<GlobalC::chi0_standard.eta<<endl;
-                cout <<"domega = "<<GlobalC::chi0_standard.domega<<endl;
-                cout <<"nomega = "<<GlobalC::chi0_standard.nomega<<endl;
-                cout <<"dim = "<<GlobalC::chi0_standard.dim<<endl;
-                //cout <<"oband = "<<GlobalC::chi0_standard.oband<<endl;
+                std::cout <<"eta = "<<GlobalC::chi0_standard.eta<<std::endl;
+                std::cout <<"domega = "<<GlobalC::chi0_standard.domega<<std::endl;
+                std::cout <<"nomega = "<<GlobalC::chi0_standard.nomega<<std::endl;
+                std::cout <<"dim = "<<GlobalC::chi0_standard.dim<<std::endl;
+                //std::cout <<"oband = "<<GlobalC::chi0_standard.oband<<std::endl;
                 GlobalC::chi0_standard.Chi();
             }
 
@@ -403,21 +406,24 @@ void Electrons::self_consistent(const int &istep)
 
             for(int is=0; is<GlobalV::NSPIN; is++)
             {
-                stringstream ssc;
+                std::stringstream ssc;
+                std::stringstream ss1;
                 ssc << GlobalV::global_out_dir << "SPIN" << is + 1 << "_CHG";
+				ss1 << GlobalV::global_out_dir << "SPIN" << is + 1 << "_CHG.cube";
                 GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, 0, ssc.str() );//mohan add 2007-10-17
+			    GlobalC::CHR.write_rho_cube(GlobalC::CHR.rho_save[is], is, ss1.str(), 3);
             }
 
             if(conv_elec)
             {
-                //GlobalV::ofs_running << " convergence is achieved" << endl;			
-                //GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << endl; 
-                GlobalV::ofs_running << " charge density convergence is achieved" << endl;
-                GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * Ry_to_eV << " eV" << endl;
+                //GlobalV::ofs_running << " convergence is achieved" << std::endl;			
+                //GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl; 
+                GlobalV::ofs_running << " charge density convergence is achieved" << std::endl;
+                GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
             }
             else
             {
-                GlobalV::ofs_running << " convergence has NOT been achieved!" << endl;			
+                GlobalV::ofs_running << " convergence has NOT been achieved!" << std::endl;			
             }
             iter_end(GlobalV::ofs_running);
             timer::tick("Electrons","self_consistent");
@@ -459,8 +465,8 @@ void Electrons::c_bands(const int &istep)
 
     avg_iter = 0.0;
 
-    GlobalV::ofs_running << " "  <<setw(8) << "K-point" << setw(15) << "CG iter num" << setw(15) << "Time(Sec)"<< endl;
-    GlobalV::ofs_running << setprecision(6) << setiosflags(ios::fixed) << setiosflags(ios::showpoint);
+    GlobalV::ofs_running << " "  <<std::setw(8) << "K-point" << std::setw(15) << "CG iter num" << std::setw(15) << "Time(Sec)"<< std::endl;
+    GlobalV::ofs_running << std::setprecision(6) << std::setiosflags(ios::fixed) << std::setiosflags(ios::showpoint);
     for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {
         GlobalC::hm.hpw.init_k(ik);
@@ -474,7 +480,7 @@ void Electrons::c_bands(const int &istep)
         {
             for (int ig = 0;ig < GlobalC::wf.npw; ig++)
             {
-                h_diag[ig] = max(1.0, GlobalC::wf.g2kin[ig]);
+                h_diag[ig] = std::max(1.0, GlobalC::wf.g2kin[ig]);
                 if(GlobalV::NPOL==2) h_diag[ig+GlobalC::wf.npwx] = h_diag[ig];
             }
         }
@@ -516,17 +522,17 @@ void Electrons::c_bands(const int &istep)
         clock_t finish=clock();
         const double duration = static_cast<double>(finish - start) / CLOCKS_PER_SEC;
 
-        GlobalV::ofs_running << " " << setw(8) 
-        << ik+1 << setw(15) 
-        << avg_iter_k << setw(15) << duration << endl;
+        GlobalV::ofs_running << " " << std::setw(8) 
+        << ik+1 << std::setw(15) 
+        << avg_iter_k << std::setw(15) << duration << std::endl;
     }//End K Loop
 	
     //if (!LOCAL_BASIS) xiaohui modify 2013-09-02
     if(GlobalV::BASIS_TYPE=="pw") //xiaohui add 2013-09-02
     {
-        //GlobalV::ofs_running << " avg_iteri " << avg_iter << endl;
+        //GlobalV::ofs_running << " avg_iteri " << avg_iter << std::endl;
         Parallel_Reduce::reduce_double_allpool(avg_iter); //mohan fix bug 2012-06-05
-        //GlobalV::ofs_running << " avg_iter_after " << avg_iter << endl;
+        //GlobalV::ofs_running << " avg_iter_after " << avg_iter << std::endl;
         avg_iter /= static_cast<double>(GlobalC::kv.nkstot);
     }
     delete [] h_diag;

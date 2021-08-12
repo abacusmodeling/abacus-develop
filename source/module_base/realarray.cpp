@@ -9,7 +9,7 @@ int realArray::arrayCount = 0;
 
 void realArrayAlloc()
 {
-	cout << "\n Allocation error for realArray " << endl;
+	std::cout << "\n Allocation error for realArray " << std::endl;
 	exit(0);
 }
 

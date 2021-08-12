@@ -25,13 +25,13 @@ void Occupy::calculate_weights(void)
 	TITLE("Occupy","calculate_weights");
 
 	// for test
-//	cout << " gaussian_broadening = " << use_gaussian_broadening << endl;
-//	cout << " tetrahedron_method = " << use_tetrahedron_method << endl;
-//	cout << " fixed_occupations = " << fixed_occupations << endl; 
+//	std::cout << " gaussian_broadening = " << use_gaussian_broadening << std::endl;
+//	std::cout << " tetrahedron_method = " << use_tetrahedron_method << std::endl;
+//	std::cout << " fixed_occupations = " << fixed_occupations << std::endl; 
 
 	if(GlobalV::KS_SOLVER=="selinv")
 	{
-		GlobalV::ofs_running << " Could not calculate occupation." << endl;
+		GlobalV::ofs_running << " Could not calculate occupation." << std::endl;
 		return;
 	}
 
@@ -134,7 +134,7 @@ void Occupy::calculate_weights(void)
 }
 
 
-void Occupy::decision(const string &name,const string &smearing,const double &degauss)
+void Occupy::decision(const std::string &name,const std::string &smearing,const double &degauss)
 {
 	TITLE("Occupy","decision");
     use_gaussian_broadening = false;
@@ -247,7 +247,7 @@ void Occupy::iweights
 	{
 		for(int ib=0; ib<nband && !conv; ib++)
 		{
-			//cout << " ekb=" << ekb[ik][ib] << endl;
+			//std::cout << " ekb=" << ekb[ik][ib] << std::endl;
 			int count =0;
 			ef = ekb[ik][ib];
 			for(int ik1=0; ik1<nks; ik1++)
@@ -378,7 +378,7 @@ void Occupy::efermig
 	{
 		for(int i=0; i<nband; i++)
 		{
-			cout << " ib=" << i << " ekb=" << ekb[ik][i] << endl;
+			std::cout << " ib=" << i << " ekb=" << ekb[ik][i] << std::endl;
 		}
 	}
 	*/
@@ -411,16 +411,16 @@ void Occupy::efermig
 
     if ((sumkup - nelec) < -eps || (sumklw - nelec) > eps)
     {
-		cout << " SOMETHING WRONG: " << endl;
-		cout << " is = " << is << endl;
-		cout << " eup = " << eup << endl;
-		cout << " elw = " << elw << endl;
-		cout << " nband = " << nband << endl;
-		cout << " nelec = " << nelec << endl;
-		cout << " sumkup = " << sumkup << endl;
-		cout << " sumklw = " << sumklw << endl;
-		cout << " sumkup - nelec = " << sumkup - nelec << endl;
-		cout << " sumklw - nelec = " << sumklw - nelec << endl;
+		std::cout << " SOMETHING WRONG: " << std::endl;
+		std::cout << " is = " << is << std::endl;
+		std::cout << " eup = " << eup << std::endl;
+		std::cout << " elw = " << elw << std::endl;
+		std::cout << " nband = " << nband << std::endl;
+		std::cout << " nelec = " << nelec << std::endl;
+		std::cout << " sumkup = " << sumkup << std::endl;
+		std::cout << " sumklw = " << sumklw << std::endl;
+		std::cout << " sumkup - nelec = " << sumkup - nelec << std::endl;
+		std::cout << " sumklw - nelec = " << sumklw - nelec << std::endl;
 		WARNING_QUIT("Occupy::efermig","ERROS in SMEARING");
     }
 
@@ -481,13 +481,13 @@ double Occupy::sumkg(
 		sum2 += wk [ik] * sum1;
 	}
 
-	//GlobalV::ofs_running << "\n sum2 before reduce = " << sum2 << endl;
+	//GlobalV::ofs_running << "\n sum2 before reduce = " << sum2 << std::endl;
 
 #ifdef __MPI
 	Parallel_Reduce::reduce_double_allpool(sum2);
 #endif
 
-	//GlobalV::ofs_running << "\n sum2 after reduce = " << sum2 << endl;
+	//GlobalV::ofs_running << "\n sum2 after reduce = " << sum2 << std::endl;
 
     return sum2;
 } // end function sumkg
@@ -547,7 +547,7 @@ double Occupy::wgauss(const double &x,const int n)
     //====================
     wga = 0.5 * (1 - erf(-x));
     //wga = gauss_freq(x * SQRT2);
-    //	cout<<"\n x="<<x<<" wga="<<wga;
+    //	std::cout<<"\n x="<<x<<" wga="<<wga;
     if (n == 0)
     {
         return wga;
@@ -566,7 +566,7 @@ double Occupy::wgauss(const double &x,const int n)
         a = - a / ( static_cast<double>(i+1) * 4.00);
         wga = wga + a * h1 * hp;
         ++ni;
-        //cout << " wga = " <<wga<<endl;
+        //std::cout << " wga = " <<wga<<std::endl;
         h0 = 2.00 * (-x) * h1 - 2.00 * static_cast<double>(ni) * h0 ;
         ++ni;
         
@@ -635,7 +635,7 @@ double Occupy::w1gauss(const double &x,const int n)
     const double arg = std::min(200.0, x * x);
     w1 = - 0.50 * std::exp(- arg) / sqrt(PI);
 
-	//cout << "\n x=" << x << " w1=" << w1;
+	//std::cout << "\n x=" << x << " w1=" << w1;
     if (n == 0)//specific case : gaussian smearing.
     {
         return w1;
@@ -656,9 +656,9 @@ double Occupy::w1gauss(const double &x,const int n)
 		// mohan fixed bug 2010-1-10
 		// description of bug: i should not be 0.
         a = - a / ( static_cast<double>(i+1) * 4.00);//dble(i)
-        cout << " w1 == "<<w1<<endl;
+        std::cout << " w1 == "<<w1<<std::endl;
         w1 -= a * (0.50 * hp + static_cast<double>(ni) * hpm1);//dble(ni)
-        cout << " w1 == "<<w1<<endl;
+        std::cout << " w1 == "<<w1<<std::endl;
     }*/
 
     int ni = 0;
@@ -918,7 +918,7 @@ void Occupy::efermit(double** ekb,const int nband,const int nks,const double &ne
     const double sumklw = sumkt(ekb, GlobalV::NBANDS, nks, nspin, ntetra, tetra, elw);
 
 	GlobalV::ofs_running << "\n sumkup = " << sumkup;
-	GlobalV::ofs_running << "\n sumklw = " << sumklw << endl;
+	GlobalV::ofs_running << "\n sumklw = " << sumklw << std::endl;
 
     if ((sumkup - nelec) < - eps || (sumklw - nelec) > eps)
     {
@@ -972,7 +972,7 @@ void Occupy::efermit(double** ekb,const int nband,const int nks,const double &ne
     {
         if (ef > ekb[ik][GlobalV::NBANDS-1] + 1.e-4)
         {
-            cout << "\n ef = " << ef;
+            std::cout << "\n ef = " << ef;
         }
     }
     return;

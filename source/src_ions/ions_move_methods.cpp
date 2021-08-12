@@ -66,7 +66,7 @@ void Ions_Move_Methods::cal_movement(const int &istep, const int &force_step, co
 	}
 
 	// print the atom positions for convinience.
-	stringstream ss;
+	std::stringstream ss;
 
 	ss << GlobalV::global_out_dir << "STRU_ION";
 	

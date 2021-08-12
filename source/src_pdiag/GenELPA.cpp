@@ -38,28 +38,28 @@
 //  Method  Step    Function                                    Description
 //  1   1       p?potrf                                     cholesky decomposing B to U
 //  1   2   for-cycle                                   clear_lower_part
-//  1       3       elpa_invert_trm_[real|complex]              invert U to U^-1
+//  1       3       elpa_invert_trm_[real|std::complex]              invert U to U^-1
 //  1       4       p?symm                                      calculating A*U-1
 //  1       5       p?gemm                                      calculating U-^*A*U-1
-//  1       6       elpa_solve_evp_[real|complex]_[1|2]stage    solve eigenvalue
+//  1       6       elpa_solve_evp_[real|std::complex]_[1|2]stage    solve eigenvalue
 //  1       7       p?trmm                                      calculating eigenvector
 //
-//  2       1       elpa_cholesky_[real|complex]                cholesky decomposing B to U
+//  2       1       elpa_cholesky_[real|std::complex]                cholesky decomposing B to U
 //  2   2     for-cycle                     clear_lower_part
-//  2       3       elpa_invert_trm_[real|complex]              invert U to U^-1
+//  2       3       elpa_invert_trm_[real|std::complex]              invert U to U^-1
 //  2       4       p?symm                                      calculating A*U-1
 //  2       5       p?gemm                                      calculating U-^*A*U-1
-//  2       6       elpa_solve_evp_[real|complex]_[1|2]stage    solve eigenvalue
+//  2       6       elpa_solve_evp_[real|std::complex]_[1|2]stage    solve eigenvalue
 //  2       7       p?trmm                                      calculating eigenvector
 //
-//  3       1       elpa_solve_evp_[real|complex]_[1|2]stage    calculating eigenvalue and eigenvector of B
+//  3       1       elpa_solve_evp_[real|std::complex]_[1|2]stage    calculating eigenvalue and eigenvector of B
 //  3   2       for-cycle                       calculating q*ev
 //  3       3       p?gemm                                      calculating B^-1/2
 //  3       4       p?gemm                                      calculating B*A^T
 //  3       5       p?gemm                                      calculating B*(B*A^T)^T
-//  3       6       elpa_solve_evp_[real|complex]_[1|2]stage    solve eigenvalue
+//  3       6       elpa_solve_evp_[real|std::complex]_[1|2]stage    solve eigenvalue
 //  3       7       p?gemm                                      calculating eigenvector
-// ?: d for double precision, z for double complex precision
+// ?: d for double precision, z for double std::complex precision
 //====================================8<----------------------------------------
 #include <complex>
 #include <cmath>
@@ -93,20 +93,20 @@ using namespace std;
         clock_t cur;
         cur=clock();
         double t1;
-        stringstream outlog;
+        std::stringstream outlog;
         if(t0<=0)  // t0 < 0 means this is the init call before the function
         {
             t0=double(cur);
             outlog.str("");
-            outlog<<"DEBUG: Process "<<myid<<" Call "<<function<<endl;
-            cout<<outlog.str();
+            outlog<<"DEBUG: Process "<<myid<<" Call "<<function<<std::endl;
+            std::cout<<outlog.str();
         }
         else {
             t1=double(cur);
             outlog.str("");
             outlog<<"DEBUG: Process "<<myid<<" Method "<<method<<" Step "
-                  <<step<<" "<<function<<" time: "<<(t1-t0)/CLOCKS_PER_SEC<<" s"<<endl;
-            cout<<outlog.str();
+                  <<step<<" "<<function<<" time: "<<(t1-t0)/CLOCKS_PER_SEC<<" s"<<std::endl;
+            std::cout<<outlog.str();
         }
     }
 #endif
@@ -125,12 +125,12 @@ int pdSolveGenEigen1(int nev, int nFull, int narows, int nacols, int *desc,
         int myid;
         time_t t0, t1;
         double t;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveGenEigen1"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveGenEigen1"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
 
     info=0;
@@ -179,12 +179,12 @@ int pdSolveGenEigen2(int nev, int nFull, int narows, int nacols, int *desc,
     #ifdef _DEBUG
         int myid;
         double t;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveGenEigen2"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveGenEigen2"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
 
     info=0;
@@ -231,12 +231,12 @@ int pdDecomposeRightMatrix1(int nFull, int narows, int nacols, int *desc,
     #ifdef _DEBUG
         int myid;
         double t=-1;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pdDecomposeRightMatrix1"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pdDecomposeRightMatrix1"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
     switch(method)
     {
@@ -307,12 +307,12 @@ int pdDecomposeRightMatrix2(int nFull, int narows, int nacols, int *desc,
     #ifdef _DEBUG
         int myid;
         double t;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pdDecomposeRightMatrix2"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pdDecomposeRightMatrix2"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
     switch(method)
     {
@@ -389,12 +389,12 @@ int pdCheloskyDecomposeRightMatrix(int nFull, int narows, int nacols, int *desc,
     #ifdef _DEBUG
         int myid;
         double t;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pdCheloskyDecomposeRightMatrix"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pdCheloskyDecomposeRightMatrix"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
     //info=1; // for elpa functions, 1 is for success, 0 is for failure
     my_blacs_ctxt=desc[1];
@@ -542,12 +542,12 @@ int pdDiagonalizeRightMatrix1(int nFull, int narows, int nacols, int *desc,
         int myid;
         double t;
         int method=3;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pdDiagonalizeRightMatrix1"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pdDiagonalizeRightMatrix1"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
     info=1; // for elpa functions, 1 is for success, 0 is for failure
     my_blacs_ctxt=desc[1];
@@ -624,12 +624,12 @@ int pdDiagonalizeRightMatrix2(int nFull, int narows, int nacols, int *desc,
         int myid;
         double t;
         int method=3;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pdDiagonalizeRightMatrix2"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pdDiagonalizeRightMatrix2"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
     info=1; // for elpa functions, 1 is for success, 0 is for failure
     my_blacs_ctxt=desc[1];
@@ -707,12 +707,12 @@ int pdSolveEigen1(int nev, int nFull, int narows, int nacols, int *desc,
     #ifdef _DEBUG
         int myid;
         double t;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveEigen1"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveEigen1"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
 
     info=1; // for elpa functions, 1 is for success, 0 is for failure
@@ -878,12 +878,12 @@ int pdSolveEigen2(int nev, int nFull, int narows, int nacols, int *desc,
     #ifdef _DEBUG
         int myid;
         double t;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveEigen2"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveEigen2"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
 
     info=1; // for elpa functions, 1 is for success, 0 is for failure
@@ -1035,7 +1035,7 @@ int pdSolveEigen2(int nev, int nFull, int narows, int nacols, int *desc,
 
 
 int pzSolveGenEigen1(int nev, int nFull, int narows, int nacols, int *desc,
-                     complex<double> *a, complex<double> *b, double *ev, complex<double> *q, complex<double> *work,
+                     std::complex<double> *a, std::complex<double> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
                      MPI_Comm mpi_comm_world, int my_blacs_ctxt,
                      int &method,
                      bool wantEigenVector, bool wantDebug)
@@ -1048,12 +1048,12 @@ int pzSolveGenEigen1(int nev, int nFull, int narows, int nacols, int *desc,
         int myid;
         time_t t0, t1;
         double t;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pzSolveGenEigen1"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pzSolveGenEigen1"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
 
     info=0;
@@ -1090,7 +1090,7 @@ int pzSolveGenEigen1(int nev, int nFull, int narows, int nacols, int *desc,
 }
 
 int pzSolveGenEigen2(int nev, int nFull, int narows, int nacols, int *desc,
-                     complex<double> *a, complex<double> *b, double *ev, complex<double> *q, complex<double> *work,
+                     std::complex<double> *a, std::complex<double> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
                      MPI_Comm mpi_comm_world, int my_blacs_ctxt,
                      int &method, int THIS_REAL_ELPA_KERNEL_API,
                      bool wantEigenVector, bool wantDebug)
@@ -1102,12 +1102,12 @@ int pzSolveGenEigen2(int nev, int nFull, int narows, int nacols, int *desc,
     #ifdef _DEBUG
         int myid;
         double t;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveGenEigen2"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveGenEigen2"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
 
     info=0;
@@ -1145,7 +1145,7 @@ int pzSolveGenEigen2(int nev, int nFull, int narows, int nacols, int *desc,
 }
 
 int pzDecomposeRightMatrix1(int nFull, int narows, int nacols, int *desc,
-                           complex<double> *b, double *ev, complex<double> *q, complex<double> *work,
+                           std::complex<double> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
                            MPI_Comm mpi_comm_world, int mpi_comm_rows, int mpi_comm_cols,
                            int &method)
 {
@@ -1154,12 +1154,12 @@ int pzDecomposeRightMatrix1(int nFull, int narows, int nacols, int *desc,
     #ifdef _DEBUG
         int myid;
         double t=-1;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pzDecomposeRightMatrix1"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pzDecomposeRightMatrix1"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
     switch(method)
     {
@@ -1219,7 +1219,7 @@ int pzDecomposeRightMatrix1(int nFull, int narows, int nacols, int *desc,
 }
 
 int pzDecomposeRightMatrix2(int nFull, int narows, int nacols, int *desc,
-                           complex<double> *b, double *ev, complex<double> *q, complex<double> *work,
+                           std::complex<double> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
                            MPI_Comm mpi_comm_world, int mpi_comm_rows, int mpi_comm_cols,
                            int &method, int THIS_REAL_ELPA_KERNEL_API)
 {
@@ -1230,12 +1230,12 @@ int pzDecomposeRightMatrix2(int nFull, int narows, int nacols, int *desc,
     #ifdef _DEBUG
         int myid;
         double t;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pzDecomposeRightMatrix2"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pzDecomposeRightMatrix2"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
     switch(method)
     {
@@ -1289,7 +1289,7 @@ int pzDecomposeRightMatrix2(int nFull, int narows, int nacols, int *desc,
                                            mpi_comm_world, mpi_comm_rows, mpi_comm_cols,
                                            THIS_REAL_ELPA_KERNEL_API);
 //						int pzDiagonalizeRightMatrix2(int nFull, int narows, int nacols, int *desc,
-//						                              complex<doubles> *b, double *ev, complex<double> *q, complex<double> *work,
+//						                              std::complex<doubles> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
 //						                              MPI_Comm mpi_comm_world, int mpi_comm_rows, int mpi_comm_cols,
 //						                              int THIS_REAL_ELPA_KERNEL_API);
             #ifdef _DEBUG
@@ -1302,7 +1302,7 @@ int pzDecomposeRightMatrix2(int nFull, int narows, int nacols, int *desc,
     return info;
 }
 
-int pzCheloskyDecomposeRightMatrix(int nFull, int narows, int nacols, int *desc, complex<double> *b,
+int pzCheloskyDecomposeRightMatrix(int nFull, int narows, int nacols, int *desc, std::complex<double> *b,
                                    MPI_Comm mpi_comm_world, int mpi_comm_rows, int mpi_comm_cols,
                                    int &method,
                                    bool wantDebug)
@@ -1317,12 +1317,12 @@ int pzCheloskyDecomposeRightMatrix(int nFull, int narows, int nacols, int *desc,
     #ifdef _DEBUG
         int myid;
         double t;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pzCheloskyDecomposeRightMatrix"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pzCheloskyDecomposeRightMatrix"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
     //info=1; // for elpa functions, 1 is for success, 0 is for failure
     my_blacs_ctxt=desc[1];
@@ -1455,7 +1455,7 @@ int pzCheloskyDecomposeRightMatrix(int nFull, int narows, int nacols, int *desc,
 
 
 int pzDiagonalizeRightMatrix1(int nFull, int narows, int nacols, int *desc,
-                              complex<double> *b, double *ev, complex<double> *q, complex<double> *work,
+                              std::complex<double> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
                               int mpi_comm_rows, int mpi_comm_cols)
 {
     int info;
@@ -1470,12 +1470,12 @@ int pzDiagonalizeRightMatrix1(int nFull, int narows, int nacols, int *desc,
         int myid;
         double t;
         int method=3;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pzDiagonalizeRightMatrix1"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pzDiagonalizeRightMatrix1"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
     info=1; // for elpa functions, 1 is for success, 0 is for failure
     my_blacs_ctxt=desc[1];
@@ -1536,7 +1536,7 @@ int pzDiagonalizeRightMatrix1(int nFull, int narows, int nacols, int *desc,
 }
 
 int pzDiagonalizeRightMatrix2(int nFull, int narows, int nacols, int *desc,
-                              complex<double> *b, double *ev, complex<double> *q, complex<double> *work,
+                              std::complex<double> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
                               MPI_Comm mpi_comm_world, int mpi_comm_rows, int mpi_comm_cols,
                               int THIS_REAL_ELPA_KERNEL_API)
 {
@@ -1552,12 +1552,12 @@ int pzDiagonalizeRightMatrix2(int nFull, int narows, int nacols, int *desc,
         int myid;
         double t;
         int method=3;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pdDiagonalizeRightMatrix2"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pdDiagonalizeRightMatrix2"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
     info=1; // for elpa functions, 1 is for success, 0 is for failure
     my_blacs_ctxt=desc[1];
@@ -1620,7 +1620,7 @@ int pzDiagonalizeRightMatrix2(int nFull, int narows, int nacols, int *desc,
 }
 
 int pzSolveEigen1(int nev, int nFull, int narows, int nacols, int *desc,
-                 complex<double> *a, complex<double> *b, double *ev, complex<double> *q, complex<double> *work,
+                 std::complex<double> *a, std::complex<double> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
                  int mpi_comm_rows, int mpi_comm_cols, int method,
                  bool wantEigenVector, bool wantDebug)
 {
@@ -1635,12 +1635,12 @@ int pzSolveEigen1(int nev, int nFull, int narows, int nacols, int *desc,
     #ifdef _DEBUG
         int myid;
         double t;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pzSolveEigen1"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pzSolveEigen1"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
 
     info=1; // for elpa functions, 1 is for success, 0 is for failure
@@ -1790,7 +1790,7 @@ int pzSolveEigen1(int nev, int nFull, int narows, int nacols, int *desc,
 }
 
 int pzSolveEigen2(int nev, int nFull, int narows, int nacols, int *desc,
-                 complex<double> *a, complex<double> *b, double *ev, complex<double> *q, complex<double> *work,
+                 std::complex<double> *a, std::complex<double> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
                  MPI_Comm mpi_comm_world, int mpi_comm_rows, int mpi_comm_cols, int method,
                  int THIS_REAL_ELPA_KERNEL_API,
                  bool wantEigenVector, bool wantDebug)
@@ -1806,12 +1806,12 @@ int pzSolveEigen2(int nev, int nFull, int narows, int nacols, int *desc,
     #ifdef _DEBUG
         int myid;
         double t;
-        stringstream outlog;
+        std::stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pzSolveEigen2"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pzSolveEigen2"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
 
     info=1; // for elpa functions, 1 is for success, 0 is for failure

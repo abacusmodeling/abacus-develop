@@ -47,57 +47,57 @@ public:
 
     void h_1psi(
         const int npw,
-        const complex<double> *psi1d,
-        complex<double> *hpsi,
-        complex<double> *spsi);
+        const std::complex<double> *psi1d,
+        std::complex<double> *hpsi,
+        std::complex<double> *spsi);
 
     void h_psi( 
-		const complex<double> *psi, 
-		complex<double> *hpsi, 
+		const std::complex<double> *psi, 
+		std::complex<double> *hpsi, 
 		const int m = 1); // qianrui add a default parameter 2021-3-31
 
     void s_1psi(
         const int npw,
-        const complex < double> *psi,
-        complex < double> *spsi);
+        const std::complex < double> *psi,
+        std::complex < double> *spsi);
 
 	private:
 
     int *GR_index;
 
-    complex<double> *psi_one;
+    std::complex<double> *psi_one;
 
     // hpsi and spsi
-    complex<double> *hpsi;
-    complex<double> *spsi;
-    complex<double> *Bec;
+    std::complex<double> *hpsi;
+    std::complex<double> *spsi;
+    std::complex<double> *Bec;
 
 	// add contributions of h*psi from
 	// non-local pseduopotentials
     void add_nonlocal_pp(
-		complex<double> *hpsi, 
-		const complex<double> *becp, 
+		std::complex<double> *hpsi, 
+		const std::complex<double> *becp, 
 		const int m);
 
 	private:
 
     double ddot_real( 
 		const int& npw, 
-		const complex<double>* psi_L, 
-		const complex<double>* psi_R)const;
+		const std::complex<double>* psi_L, 
+		const std::complex<double>* psi_R)const;
 
-    complex<double> ddot( const int& npw,
-                          const complex<double> * psi_L,
-                          const complex<double> * psi_R )const ;
+    std::complex<double> ddot( const int& npw,
+                          const std::complex<double> * psi_L,
+                          const std::complex<double> * psi_R )const ;
 
-    complex<double> just_ddot( const int& npw,
-                          const complex<double> * psi_L,
-                          const complex<double> * psi_R )const ;
+    std::complex<double> just_ddot( const int& npw,
+                          const std::complex<double> * psi_L,
+                          const std::complex<double> * psi_R )const ;
 
-    complex<double> ddot( const int & npw,
+    std::complex<double> ddot( const int & npw,
                           const ComplexMatrix &psi,
                           const int & m,
-                          const complex<double> *psik )const ;
+                          const std::complex<double> *psik )const ;
 
 	private:
 

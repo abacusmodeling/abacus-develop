@@ -28,10 +28,10 @@ namespace Parallel_Reduce
 	void reduce_double_allpool(double &object);
 	void reduce_double_allpool(double *object, const int n);
 
-	void reduce_complex_double_all(complex<double> &object);
-	void reduce_complex_double_all(complex<double> *object,const int n); //LiuXh add 2019-07-16
-	void reduce_complex_double_pool(complex<double> &object);
-	void reduce_complex_double_pool(complex<double> *object,const int n);
+	void reduce_complex_double_all(std::complex<double> &object);
+	void reduce_complex_double_all(std::complex<double> *object,const int n); //LiuXh add 2019-07-16
+	void reduce_complex_double_pool(std::complex<double> &object);
+	void reduce_complex_double_pool(std::complex<double> *object,const int n);
 
 	void gather_min_int_all(int &v);
 	void gather_max_double_all(double &v);

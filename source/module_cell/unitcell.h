@@ -22,8 +22,8 @@ public:
 
     int ntype;// number of atom species in UnitCell
     int nat; // total number of atoms of all species in unitcell
-    string Coordinate; // "Direct" or "Cartesian" or "Cartesian_angstrom"
-    string latName; // Lattice name
+    std::string Coordinate; // "Direct" or "Cartesian" or "Cartesian_angstrom"
+    std::string latName; // Lattice name
     double lat0; // Lattice constant(bohr)(a.u.)
     double lat0_angstrom;// Lattice constant(angstrom)
     double tpiba;// 2*pi / lat0;
@@ -33,9 +33,9 @@ public:
     Matrix3 latvec; // Unitcell lattice vectors
 	int *lc;  // Change the lattice vectors or not
 	Vector3<double> a1,a2,a3; // Same as latvec, just at another form.
-	Vector3<double> latcenter; // (a1+a2+a3)/2 the center of vector
+	Vector3<double> latcenter; // (a1+a2+a3)/2 the center of std::vector
     Matrix3 latvec_supercell; // Supercell lattice vectors
-    Matrix3 G; // reciprocal lattice vector (2pi*inv(R) )
+    Matrix3 G; // reciprocal lattice std::vector (2pi*inv(R) )
     Matrix3 GT; // traspose of G
     Matrix3 GGT; // GGT = G*GT
     Matrix3 invGGT; // inverse G
@@ -70,9 +70,9 @@ public:
 public:
     UnitCell();
     ~UnitCell();
-    void print_cell(ofstream &ofs, output &outp)const;
-    void print_cell_xyz(const string &fn)const;
-    void print_cell_cif(const string &fn)const;
+    void print_cell(std::ofstream &ofs, output &outp)const;
+    void print_cell_xyz(const std::string &fn)const;
+    void print_cell_cif(const std::string &fn)const;
     const double& getNelec(void)const {return electrons_number;}
 
     void update_pos_tau(const double* pos);
@@ -88,8 +88,8 @@ protected:
     double electrons_number;
 
     double *atom_mass;
-    string *atom_label;
-    string *pseudo_fn;
+    std::string *atom_label;
+    std::string *pseudo_fn;
 
 #ifdef __MPI
     void bcast_unitcell(void);

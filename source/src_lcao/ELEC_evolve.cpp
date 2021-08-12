@@ -27,7 +27,7 @@ int ELEC_evolve::td_dipoleout;
 void ELEC_evolve::evolve_psi(
 	const int &istep, 
 	LCAO_Hamilt &uhm, 
-	complex<double> ***wfc)
+	std::complex<double> ***wfc)
 {
 	TITLE("ELEC_evolve","eveolve_psi");
 	timer::tick("ELEC_evolve","evolve_psi");
@@ -60,7 +60,7 @@ void ELEC_evolve::evolve_psi(
 		//--------------------------------------------
 		if(GlobalV::CURRENT_SPIN == uhm.GK.get_spin() )
 		{
-			//GlobalV::ofs_running << " Same spin, same vlocal integration." << endl;
+			//GlobalV::ofs_running << " Same spin, same vlocal integration." << std::endl;
 		}
 		else
 		{
@@ -100,7 +100,7 @@ void ELEC_evolve::evolve_psi(
 		// Effective potential of DFT+U is added to total Hamiltonian here; Quxin adds on 20201029
 		if(INPUT.dft_plus_u)
 		{
-      vector<complex<double>> eff_pot(GlobalC::ParaO.nloc);
+      std::vector<std::complex<double>> eff_pot(GlobalC::ParaO.nloc);
 			GlobalC::dftu.cal_eff_pot_mat_complex(ik, istep, &eff_pot[0]);
       
 			for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
@@ -153,8 +153,8 @@ void ELEC_evolve::evolve_psi(
 
 void ELEC_evolve::evolve_complex_matrix(
 	const int &ik, 
-	complex<double>** cc, 
-	complex<double>** cc_init)const
+	std::complex<double>** cc, 
+	std::complex<double>** cc_init)const
 {
 	TITLE("Evolve_LCAO_Matrix","evolve_complex_matrix");
 	time_t time_start = time(NULL);
@@ -177,12 +177,12 @@ void ELEC_evolve::evolve_complex_matrix(
 	}
 
 	time_t time_end = time(NULL);
-	OUT_TIME("evolve(complex)", time_start, time_end);
+	OUT_TIME("evolve(std::complex)", time_start, time_end);
 	
 	return;
 }
 
-void ELEC_evolve::using_LAPACK_complex(const int &ik, complex<double>** c, complex<double>** c_init)const
+void ELEC_evolve::using_LAPACK_complex(const int &ik, std::complex<double>** c, std::complex<double>** c_init)const
 {
 	TITLE("ELEC_evolve","using_LAPACK_complex");
 
@@ -207,7 +207,7 @@ void ELEC_evolve::using_LAPACK_complex(const int &ik, complex<double>** c, compl
 	int INFO;
 
 	int LWORK=3*GlobalV::NLOCAL-1; //tmp
-	complex<double> * WORK = new complex<double>[LWORK];
+	std::complex<double> * WORK = new std::complex<double>[LWORK];
 	ZEROS(WORK, LWORK);
 	int IPIV[GlobalV::NLOCAL];
 
@@ -235,8 +235,8 @@ void ELEC_evolve::using_LAPACK_complex(const int &ik, complex<double>** c, compl
 	{
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			if(i==j) Idmat(i,j) = complex<double>(1.0, 0.0);
-			else Idmat(i,j) = complex<double>(0.0, 0.0);
+			if(i==j) Idmat(i,j) = std::complex<double>(1.0, 0.0);
+			else Idmat(i,j) = std::complex<double>(0.0, 0.0);
 		}
 	}
 	double delta_t;
@@ -247,7 +247,7 @@ void ELEC_evolve::using_LAPACK_complex(const int &ik, complex<double>** c, compl
 
 	int info;
 	int lwork=3*GlobalV::NLOCAL-1; //tmp
-	complex<double> * work = new complex<double>[lwork];
+	std::complex<double> * work = new std::complex<double>[lwork];
 	ZEROS(work, lwork);
 	int ipiv[GlobalV::NLOCAL];
 
@@ -260,7 +260,7 @@ void ELEC_evolve::using_LAPACK_complex(const int &ik, complex<double>** c, compl
 
 	for(int i=0; i<GlobalV::NBANDS; i++)
 	{
-		complex<double> ccc[GlobalV::NLOCAL];
+		std::complex<double> ccc[GlobalV::NLOCAL];
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{	
 			ccc[j] = (0.0,0.0);
@@ -284,8 +284,8 @@ void ELEC_evolve::using_LAPACK_complex(const int &ik, complex<double>** c, compl
 
 void ELEC_evolve::using_LAPACK_complex_2(
 	const int &ik, 
-	complex<double>** c, 
-	complex<double>** c_init)const
+	std::complex<double>** c, 
+	std::complex<double>** c_init)const
 {
 
 	ComplexMatrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
@@ -295,8 +295,8 @@ void ELEC_evolve::using_LAPACK_complex_2(
 	int ic=0;
 	for (int i=0; i<GlobalV::NLOCAL; i++)
 	{
-		complex<double>* lineH = new complex<double>[GlobalV::NLOCAL-i];
-		complex<double>* lineS = new complex<double>[GlobalV::NLOCAL-i];
+		std::complex<double>* lineH = new std::complex<double>[GlobalV::NLOCAL-i];
+		std::complex<double>* lineS = new std::complex<double>[GlobalV::NLOCAL-i];
 		ZEROS(lineH, GlobalV::NLOCAL-i);
 		ZEROS(lineS, GlobalV::NLOCAL-i);
 
@@ -341,7 +341,7 @@ void ELEC_evolve::using_LAPACK_complex_2(
 	int INFO=0;
 
 	int LWORK=3*GlobalV::NLOCAL-1; //tmp
-	complex<double> * WORK = new complex<double>[LWORK];
+	std::complex<double> * WORK = new std::complex<double>[LWORK];
 	ZEROS(WORK, LWORK);
 	int IPIV[GlobalV::NLOCAL];
 
@@ -369,11 +369,11 @@ void ELEC_evolve::using_LAPACK_complex_2(
 		{
 			if(i==j) 
 			{
-				Idmat(i,j) = complex<double>(1.0, 0.0);
+				Idmat(i,j) = std::complex<double>(1.0, 0.0);
 			}
 			else 
 			{
-				Idmat(i,j) = complex<double>(0.0, 0.0);
+				Idmat(i,j) = std::complex<double>(0.0, 0.0);
 			}
 		}
 	}
@@ -386,7 +386,7 @@ void ELEC_evolve::using_LAPACK_complex_2(
 
 	int info=0;
 	int lwork=3*GlobalV::NLOCAL-1; //tmp
-	complex<double>* work = new complex<double>[lwork];
+	std::complex<double>* work = new std::complex<double>[lwork];
 	ZEROS(work, lwork);
 	int ipiv[GlobalV::NLOCAL];
 
@@ -398,11 +398,11 @@ void ELEC_evolve::using_LAPACK_complex_2(
 
 	// Calculate wave function at t+delta t
 
-	//	cout << "wave function coe at t+delta t !" << endl;
+	//	std::cout << "wave function coe at t+delta t !" << std::endl;
 
 	for(int i=0; i<GlobalV::NBANDS; i++)
 	{
-		complex<double> ccc[GlobalV::NLOCAL];
+		std::complex<double> ccc[GlobalV::NLOCAL];
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{	
 			ccc[j] = (0.0,0.0);

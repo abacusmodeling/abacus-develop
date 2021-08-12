@@ -23,9 +23,9 @@ int Grid_MeshK::cal_Rindex(const int &u1, const int &u2, const int &u3)const
 	
 	if(x1<0 || x2<0 || x3<0)
 	{
-		cout << " u1=" << u1 << " minu1=" << minu1 << endl;
-		cout << " u2=" << u2 << " minu2=" << minu2 << endl;
-		cout << " u3=" << u3 << " minu3=" << minu3 << endl;
+		std::cout << " u1=" << u1 << " minu1=" << minu1 << std::endl;
+		std::cout << " u2=" << u2 << " minu2=" << minu2 << std::endl;
+		std::cout << " u3=" << u3 << " minu3=" << minu3 << std::endl;
 		WARNING_QUIT("Grid_MeshK::cal_Rindex","x1<0 || x2<0 || x3<0 !");
 	}
 
@@ -65,8 +65,8 @@ void Grid_MeshK::cal_extended_cell(const int &dxe, const int &dye, const int &dz
 	//xiaohui add 'GlobalV::OUT_LEVEL' line, 2015-09-16
 	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"UnitCellTotal",nutot);
 
-//	cout << " nu1 = " << nu1 << " nu2 = " << nu2 << " nu3 = " << nu3 << endl;
-//	cout << " nutot = " << nutot << endl;
+//	std::cout << " nu1 = " << nu1 << " nu2 = " << nu2 << " nu3 = " << nu3 << std::endl;
+//	std::cout << " nutot = " << nutot << std::endl;
 
 	delete[] ucell_index2x;
 	delete[] ucell_index2y;

@@ -1,5 +1,5 @@
 #include "pzst2g.h"
-void pzst2g(MPI_Comm comm_2D,int NB,int N_A,complex<double> *A,complex<double> *B,
+void pzst2g(MPI_Comm comm_2D,int NB,int N_A,std::complex<double> *A,std::complex<double> *B,
             LocalMatrix loc_A,int loc_size,char isuplo)
 {
 /*
@@ -38,13 +38,13 @@ void pzst2g(MPI_Comm comm_2D,int NB,int N_A,complex<double> *A,complex<double> *
     int coord[2],dim[2],period[2];
     int i,j,bi,bj,k,kj,ia,ja,km,kn;
     int cur_col,cur_row;
-    complex<double> alpha,beta;
+    std::complex<double> alpha,beta;
 
     char transa,transb,diag,side,uplo;
     int iarow,iacol,pos1,pos2;
     int myid;
     int bn;
-    complex<double>  CU[NB][NB];
+    std::complex<double>  CU[NB][NB];
     loc_A.row_pos=0;
     loc_A.col_pos=0;  
     bn=N_A/NB;  
@@ -59,7 +59,7 @@ void pzst2g(MPI_Comm comm_2D,int NB,int N_A,complex<double> *A,complex<double> *
         {
             for (i=0; i<NB; i++)
                 for (j=0; j<NB; j++)
-                    CU[i][j]=complex<double> (0.0,0.0);
+                    CU[i][j]=std::complex<double> (0.0,0.0);
             ia=bi*NB;
             km=(ia+NB-1>N_A-1)?(N_A-1):(ia+NB-1);
             m=km-ia+1;
@@ -85,8 +85,8 @@ void pzst2g(MPI_Comm comm_2D,int NB,int N_A,complex<double> *A,complex<double> *
                 transb='n';
                 k=n;
                 n=loc_size;
-                alpha=complex<double> (-1.0,0.0);
-                beta=complex<double> (1.0,0.0);
+                alpha=std::complex<double> (-1.0,0.0);
+                beta=std::complex<double> (1.0,0.0);
                 lda=loc_size;
                 ldb=loc_size;
                 ldc=NB;
@@ -118,7 +118,7 @@ void pzst2g(MPI_Comm comm_2D,int NB,int N_A,complex<double> *A,complex<double> *
 
             lda=NB;
             ldb=loc_size;
-            alpha=complex<double> (1.0,0.0);
+            alpha=std::complex<double> (1.0,0.0);
             ztrsm_(&side,&uplo,&transb,&diag,&n,&m,&alpha,&CU[0][0],&lda,&B[pos2],&ldb);
         }
     else
@@ -126,7 +126,7 @@ void pzst2g(MPI_Comm comm_2D,int NB,int N_A,complex<double> *A,complex<double> *
         {
             for (i=0; i<NB; i++)
                 for (j=0; j<NB; j++)
-                    CU[i][j]=complex<double> (0.0,0.0);
+                    CU[i][j]=std::complex<double> (0.0,0.0);
 
             ja=bi*NB;
             kn=(ja+NB-1>N_A-1)?(N_A-1):(ja+NB-1);
@@ -154,8 +154,8 @@ void pzst2g(MPI_Comm comm_2D,int NB,int N_A,complex<double> *A,complex<double> *
                 transb='n';
                 k=m;
                 m=loc_size;
-                alpha=complex<double> (-1.0,0.0);
-                beta=complex<double> (1.0,0.0);
+                alpha=std::complex<double> (-1.0,0.0);
+                beta=std::complex<double> (1.0,0.0);
                 lda=N_A;
                 ldb=N_A;
                 ldc=NB;
@@ -188,7 +188,7 @@ void pzst2g(MPI_Comm comm_2D,int NB,int N_A,complex<double> *A,complex<double> *
 
             lda=NB;
             ldb=N_A;
-            alpha=complex<double> (1.0,0.0);
+            alpha=std::complex<double> (1.0,0.0);
             ztrsm_(&side,&uplo,&transb,&diag,&n,&m,&alpha,&CU[0][0],&lda,&B[pos2],&ldb);
     }
 }

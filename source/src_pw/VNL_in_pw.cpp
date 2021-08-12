@@ -26,7 +26,7 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 	TITLE("pseudopot_cell_vnl", "init");
 	timer::tick("ppcell_vnl", "init");
 
-	GlobalV::ofs_running << "\n SETUP NONLOCAL PSEUDOPOTENTIALS IN PLANE WAVE BASIS" << endl;
+	GlobalV::ofs_running << "\n SETUP NONLOCAL PSEUDOPOTENTIALS IN PLANE WAVE BASIS" << std::endl;
 
 	int it = 0;
 //----------------------------------------------------------
@@ -36,11 +36,11 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 	this->lmaxkb = - 1;
 	for (it = 0;it < ntype; it++)
 	{
-		GlobalV::ofs_running << " " << GlobalC::ucell.atoms[it].label << " non-local projectors:" << endl;
+		GlobalV::ofs_running << " " << GlobalC::ucell.atoms[it].label << " non-local projectors:" << std::endl;
 		for (int ibeta = 0; ibeta < GlobalC::ucell.atoms[it].nbeta; ibeta++) 
 		{
-			GlobalV::ofs_running << " projector " << ibeta+1 << " L=" << GlobalC::ucell.atoms[it].lll[ibeta] <<  endl;
-			this->lmaxkb = max( this->lmaxkb, GlobalC::ucell.atoms[it].lll[ibeta]);
+			GlobalV::ofs_running << " projector " << ibeta+1 << " L=" << GlobalC::ucell.atoms[it].lll[ibeta] <<  std::endl;
+			this->lmaxkb = std::max( this->lmaxkb, GlobalC::ucell.atoms[it].lll[ibeta]);
 		}
 	}
 
@@ -200,10 +200,10 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 		// now add the structure factor and factor (-i)^l
 		for (ia=0; ia<GlobalC::ucell.atoms[it].na; ia++) 
 		{
-			complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
+			std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
 			for (ih = 0;ih < nh;ih++)
 			{
-				complex<double> pref = pow( NEG_IMAG_UNIT, nhtol(it, ih));	//?
+				std::complex<double> pref = pow( NEG_IMAG_UNIT, nhtol(it, ih));	//?
 				for (ig = 0;ig < npw;ig++)
 				{
 					this->vkb(jkb, ig) = vkb1(ih, ig) * sk [ig] * pref;
@@ -316,7 +316,7 @@ void pseudopot_cell_vnl::init_vnl(UnitCell_pseudo &cell)
 						{
 							this->dvan_so(ijs,it,ip,ip2) = cell.atoms[it].dion(ir, is) * soc.fcoef(it,is1,is2,ip,ip2);
 							++ijs;
-							if(ir != is) soc.fcoef(it,is1,is2,ip,ip2) = complex<double>(0.0,0.0);
+							if(ir != is) soc.fcoef(it,is1,is2,ip,ip2) = std::complex<double>(0.0,0.0);
 						}
 					}
 				}
@@ -392,14 +392,14 @@ void pseudopot_cell_vnl::init_vnl(UnitCell_pseudo &cell)
 		delete[] jl;
 	}
 	timer::tick("ppcell_vnl","init_vnl");
-	GlobalV::ofs_running << "\n Init Non-Local-Pseudopotential done." << endl;
+	GlobalV::ofs_running << "\n Init Non-Local-Pseudopotential done." << std::endl;
 	return;
 }
 
 #ifdef __LCAO
-complex<double> pseudopot_cell_vnl::Cal_C(int alpha, int lu, int mu, int L, int M)   // pengfei Li  2018-3-23
+std::complex<double> pseudopot_cell_vnl::Cal_C(int alpha, int lu, int mu, int L, int M)   // pengfei Li  2018-3-23
 {
-	complex<double> cf;
+	std::complex<double> cf;
 	if(alpha == 0)
 	{
 		cf = -sqrt(4*PI/3)*CG(lu,mu,1,1,L,M);
@@ -454,23 +454,23 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 		gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
 	}
 
-	vkb1_alpha = new complex<double>**[3];
+	vkb1_alpha = new std::complex<double>**[3];
 	for(int i=0; i<3; i++)
 	{
-		vkb1_alpha[i] = new complex<double>*[nhm];
+		vkb1_alpha[i] = new std::complex<double>*[nhm];
 		for(int j=0; j<nhm; j++)
 		{
-			vkb1_alpha[i][j] = new complex<double>[npw];
+			vkb1_alpha[i][j] = new std::complex<double>[npw];
 		}
 	}	
 	
-	vkb_alpha = new complex<double>**[3];
+	vkb_alpha = new std::complex<double>**[3];
 	for(int i=0; i<3; i++)
 	{
-		vkb_alpha[i] = new complex<double>*[nkb];
+		vkb_alpha[i] = new std::complex<double>*[nkb];
 		for(int j=0; j<nkb; j++)
 		{
-			vkb_alpha[i][j] = new complex<double>[GlobalC::wf.npwx];
+			vkb_alpha[i][j] = new std::complex<double>[GlobalC::wf.npwx];
 		}
 	}
 	
@@ -514,10 +514,10 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 						int lm = L*L + M;
 						for (int alpha=0; alpha<3; alpha++)
 						{
-							complex<double> c = Cal_C(alpha,lu, mu, L, M);
+							std::complex<double> c = Cal_C(alpha,lu, mu, L, M);
 							/*if(alpha == 0)
 							{
-								cout<<"lu= "<<lu<<"  mu= "<<mu<<"  L= "<<L<<"  M= "<<M<<" alpha = "<<alpha<<"  "<<c<<endl;
+								std::cout<<"lu= "<<lu<<"  mu= "<<mu<<"  L= "<<L<<"  M= "<<M<<" alpha = "<<alpha<<"  "<<c<<std::endl;
 							}*/
 							vkb1_alpha[alpha][ih][ig] += c * vq[ig] * ylm(lm, ig) * pow( NEG_IMAG_UNIT, L);
 						}	
@@ -528,7 +528,7 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 
 		for (ia=0; ia<GlobalC::ucell.atoms[it].na; ia++) 
 		{
-			complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
+			std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
 			for (ih = 0;ih < nh;ih++)
 			{
 				for (ig = 0;ig < npw;ig++)
@@ -620,13 +620,13 @@ void pseudopot_cell_vnl::init_vnl_alpha(void)          // pengfei Li 2018-3-23
 		delete[] jl;
 	}
 	timer::tick("ppcell_vnl","init_vnl_alpha");
-	GlobalV::ofs_running << "\n Init Non-Local-Pseudopotential done(including L)." << endl;
+	GlobalV::ofs_running << "\n Init Non-Local-Pseudopotential done(including L)." << std::endl;
 	return;
 }
 
 
 
-void pseudopot_cell_vnl::print_vnl(ofstream &ofs)
+void pseudopot_cell_vnl::print_vnl(std::ofstream &ofs)
 {
 	GlobalC::out.printr3_d(ofs, " tab : ", tab);
 }
@@ -636,7 +636,7 @@ void pseudopot_cell_vnl::print_vnl(ofstream &ofs)
 int pseudopot_cell_vnl::calculate_nqx(const double &ecutwfc,const double &dq)
 {
 	int points_of_table = static_cast<int>( sqrt(ecutwfc)/dq + 4 ) ;//* cell_factor;
-//	cout<<"\n nqx = "<< points_of_table;
+//	std::cout<<"\n nqx = "<< points_of_table;
 //----------------------------------------------------------
 // EXPLAIN : Plus 1 because the formula is transfered from 
 // fortran code.

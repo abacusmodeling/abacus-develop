@@ -35,11 +35,17 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
     TITLE("Potential_Libxc","v_xc");
     timer::tick("Potential_Libxc","v_xc");
 
+	//output of the subroutine
     double etxc = 0.0;
     double vtxc = 0.0;
 	matrix v(GlobalV::NSPIN,GlobalC::pw.nrxx);
 	matrix vofk(GlobalV::NSPIN,GlobalC::pw.nrxx);
 
+	if(GlobalV::VXC_IN_H == 0 )
+	{
+    	timer::tick("Potential_Libxc","v_xc_meta");
+		return std::make_tuple( etxc, vtxc, move(v), move(vofk) );
+	}
 	//----------------------------------------------------------
 	// xc_func_type is defined in Libxc package
 	// to understand the usage of xc_func_type,
@@ -75,17 +81,19 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 
 	}
 	
-	//input of xc_mgga_exc_vxc 
+	//rho,grho,tau
 	vector<vector<double>> rho;
 	vector<vector<Vector3<double>>> grho;
-	vector<vector<double>> sigma;
 	vector<vector<double>> kin_r;
 
-	//output of xc_mgga_exc_vxc
+	//dExc/d rho,grho,tau
 	vector<vector<double>> vrho;
 	vector<vector<Vector3<double>>> h;
 	vector<vector<double>> kedtaur;
-	
+
+	//ifstream ifs_rho("rho");
+	//ifstream ifs_tau("tau");
+
 	//rho : from double** to vector<double>
 	rho.resize(GlobalV::NSPIN);
 	for( int is=0; is!=GlobalV::NSPIN; ++is )
@@ -94,6 +102,7 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 		for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 		{
 			rho[is][ir] = rho_in[is][ir] + (1.0/GlobalV::NSPIN)*rho_core_in[ir]; 
+			//ifs_rho >> rho[is][ir];
 		}
 	}
 
@@ -106,7 +115,6 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 		vector<complex<double>> rhog(GlobalC::pw.ngmc);
 		GlobalC::CHR.set_rhog(rho[is].data(), rhog.data());
 		GGA_PW::grad_rho(rhog.data(), grho[is].data());
-
 	}
 		
 	//kin_r : from double** to vector<double>
@@ -119,11 +127,11 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 			for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 			{
 				kin_r[is][ir] = kin_r_in[is][ir];
+				//ifs_tau >> kin_r[is][ir];
 			}
 		}	
 	}
 
-	cout << "flag 3" << endl;
 	if(GlobalV::NSPIN==1)
 	{
 		vrho.resize(GlobalV::NSPIN);
@@ -142,14 +150,13 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 			const double grho_th = 1e-12;
 			const double tau_th  = 1e-8;
 
-			lapl = 0.0;//dummy argument, not used
 
-	cout << "flag 4" << endl;
 			for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 			{
-				arho  = abs(rho[is][ir]);
+				arho  = abs(rho_in[is][ir]);
 				grho2 = grho[0][ir]*grho[0][ir];
 				atau  = kin_r[is][ir] / e2;
+				lapl  = grho2;//dummy argument, not used
 			
 				if(arho > rho_th && grho2 > grho_th && abs(atau) > tau_th)
 				{
@@ -171,11 +178,9 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 				{
 					vrho[is][ir] = 0.0;
 					h[is][ir] = 0.0;
-					cout << "should be 0" << h[is][ir];
 					kedtaur[is][ir] = 0.0;
 				}
 			}//loop over grid points
-	cout << "flag 5" << endl;
 		}//loop over spin
 	}//nspin=1
 	else if(GlobalV::NSPIN==2)
@@ -207,7 +212,7 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 
 		for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 		{
-			arho[0] = rho[0][ir]; arho[1] = rho[1][ir];
+			arho[0] = rho_in[0][ir]; arho[1] = rho_in[1][ir];
 			rh = arho[0] + arho[1];
 
 			grho2[0]=grho[0][ir]*grho[0][ir];
@@ -264,7 +269,6 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 
 	vector<double> dh;
 	dh.resize(GlobalC::pw.nrxx);
-	cout << "flag 6" << endl;
 
 	for(int is=0;is<GlobalV::NSPIN;is++)
 	{
@@ -275,7 +279,6 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 			vtxc-=dh[ir]*rho_in[is][ir];
 		}
 	}
-	cout << "flag 7" << endl;
 
 	for( int is=0; is!=nspin0(); ++is )
 	{
@@ -285,7 +288,6 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 			vofk(is,ir) = kedtaur[is][ir];
 		}
 	}
-	cout << "flag 8" << endl;
 		
 	//-------------------------------------------------
 	// for MPI, reduce the exchange-correlation energy

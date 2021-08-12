@@ -7,7 +7,7 @@ double Numerical_Orbital::distance;
 
 Numerical_Orbital::Numerical_Orbital()
 {
-	//make pair of new and delete
+	//make std::pair of new and delete
 	//question remains
 	this->nchi = new int[1];
 	this->phiLN = new Numerical_Orbital_Lm[1];
@@ -22,7 +22,7 @@ Numerical_Orbital::~Numerical_Orbital()
 void Numerical_Orbital::set_orbital_info
 (
     const int& type_in,
-    const string& label_in,
+    const std::string& label_in,
     const int& lmax_in,
     const int* nchi_in,
     const int& total_nchi_in

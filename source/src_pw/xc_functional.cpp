@@ -119,7 +119,7 @@ void XC_Functional::xc(const double &rho, double &ex, double &ec, double &vx, do
 	//				pbesol	J.P. Perdew et al., PRL 100, 136406 (2008)
 	//				wc		Z. Wu and R. E. Cohen, PRB 73, 235116 (2006)
 	//              hse     Paier J, Marsman M, Hummer K, et al, JPC 124(15): 154709 (2006)
-	//cout << " " << GlobalC::xcf.iexch_now << " " << GlobalC::xcf.icorr_now << " " << GlobalC::xcf.igcx_now << " " << GlobalC::xcf.igcc_now << endl;
+	//std::cout << " " << GlobalC::xcf.iexch_now << " " << GlobalC::xcf.icorr_now << " " << GlobalC::xcf.igcx_now << " " << GlobalC::xcf.igcc_now << std::endl;
 
 	switch(GlobalC::xcf.iexch_now)
 	{
@@ -135,7 +135,7 @@ void XC_Functional::xc(const double &rho, double &ex, double &ec, double &vx, do
 			vx = 0.75 * vx;
 			break;
 		case 9:
-			throw domain_error("HSE unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::domain_error("HSE unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 			break;
 		default:
 			ex = vx = 0.0;
@@ -186,8 +186,8 @@ void XC_Functional::xc_spin(const double &rho, const double &zeta,
 
 	const double rs = pi34 / pow(rho, third);//wigner_sitz_radius;
 
-//	cout << " GlobalC::xcf.iexch_now=" << GlobalC::xcf.iexch_now << endl;
-//	cout << " GlobalC::xcf.icorr_now=" << GlobalC::xcf.icorr_now << endl;
+//	std::cout << " GlobalC::xcf.iexch_now=" << GlobalC::xcf.iexch_now << std::endl;
+//	std::cout << " GlobalC::xcf.icorr_now=" << GlobalC::xcf.icorr_now << std::endl;
 
 	switch(GlobalC::xcf.iexch_now)
 	{
@@ -204,7 +204,7 @@ void XC_Functional::xc_spin(const double &rho, const double &zeta,
 			vxdw = 0.75 * vxdw;
 			break;
 		case 9:
-			throw domain_error("HSE unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	break;
+			throw std::domain_error("HSE unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	break;
 		default:
 			ex = vxup = vxdw =0.0;
 	}
@@ -809,6 +809,50 @@ void XC_Functional::pbec(const double &rho, const double &grho, const int &iflag
 	return;
 }
 
+#ifdef USE_LIBXC
+void XC_Functional::tau_xc(const double &rho, const double &grho, const double &atau, double &sx, double &sc,
+          double &v1x, double &v2x, double &v3x, double &v1c, double &v2c, double &v3c)
+{
+
+	double lapl_rho, vlapl_rho;
+	int func_id;
+    lapl_rho = grho;
+	
+//initialize X and C functionals
+	xc_func_type x_func;
+	xc_func_type c_func;
+	const int xc_polarized = XC_UNPOLARIZED;
+
+//exchange
+    if (GlobalC::xcf.igcx_now == 13)
+	{
+		xc_func_init(&x_func, 263 ,xc_polarized);
+		xc_mgga_exc_vxc(&x_func,1,&rho,&grho,&lapl_rho,&atau,&sx,&v1x,&v2x,&vlapl_rho,&v3x);
+		xc_func_end(&x_func);
+		sx = sx * rho;
+		v2x = v2x * 2.0;
+	}
+	else
+	{
+		WARNING_QUIT("tau_xc","functional not implemented yet");
+	}
+
+//correlation
+	if(GlobalC::xcf.igcc_now == 9)
+	{
+		xc_func_init(&c_func, 267 ,xc_polarized);
+		xc_mgga_exc_vxc(&c_func,1,&rho,&grho,&lapl_rho,&atau,&sc,&v1c,&v2c,&vlapl_rho,&v3c);
+		xc_func_end(&c_func);
+		sc = sc * rho;
+		v2c = v2c * 2.0;
+	}
+	else
+	{
+		WARNING_QUIT("tau_xc","functional not implemented yet");
+	}
+	return;
+}
+#endif
 
 void XC_Functional::gcxc(const double &rho, const double &grho, double &sx, double &sc,
           double &v1x, double &v2x, double &v1c, double &v2c)
@@ -891,7 +935,7 @@ void XC_Functional::gcxc(const double &rho, const double &grho, double &sx, doub
 	else if (GlobalC::xcf.igcx_now == 12)
 	{
 		// HSE
-		throw domain_error("HSE unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw std::domain_error("HSE unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 	}
 	else if (GlobalC::xcf.igcx_now == 13)
 	{
@@ -906,8 +950,8 @@ void XC_Functional::gcxc(const double &rho, const double &grho, double &sx, doub
         v2x = 0.00;
     } // endif
 
-	//cout << "\n igcx = " << GlobalC::xcf.igcx_now;
-	//cout << "\n igcc = " << GlobalC::xcf.igcc_now << endl;
+	//std::cout << "\n igcx = " << GlobalC::xcf.igcx_now;
+	//std::cout << "\n igcc = " << GlobalC::xcf.igcc_now << std::endl;
 
      // correlation
     if (rho <= small)
