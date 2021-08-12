@@ -38,6 +38,48 @@ double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c,
 	return potential/2.0;
 }
 
+double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c, 
+                    CMD_neighbor &cmd_neigh,
+                    Vector3<double> *force, 
+                    matrix &stress)
+{
+    double potential = 0; //initialize
+
+	for(int i=0; i<ucell_c.nat; i++)
+	{	
+		force[i].set(0,0,0);   //initialize
+
+        int T1 = ucell_c.iat2it[i];
+        int I1 = ucell_c.iat2ia[i];
+        Vector3<double> taud1 = ucell_c.atoms[T1].taud[I1];
+
+		for(int j=0; j<cmd_neigh.nlist[i]; j++)
+		{
+            int T2 = ucell_c.iat2it[cmd_neigh.list[i][j]];
+            int I2 = ucell_c.iat2ia[cmd_neigh.list[i][j]];
+            Vector3<double> taud2 = ucell_c.atoms[T2].taud[I2];
+
+			Vector3<double> tempd = cmd_neigh.cell_periodic(taud1,taud2);
+            Vector3<double> temp;
+            Mathzone::Direct_to_Cartesian(
+			tempd.x, tempd.y, tempd.z,
+			ucell_c.latvec.e11, ucell_c.latvec.e12, ucell_c.latvec.e13,
+			ucell_c.latvec.e21, ucell_c.latvec.e22, ucell_c.latvec.e23,
+			ucell_c.latvec.e31, ucell_c.latvec.e32, ucell_c.latvec.e33,
+			temp.x, temp.y, temp.z);
+
+            double distance = temp.norm()*ucell_c.lat0;
+
+			if(distance <= INPUT.mdp.rcut_lj)
+			{
+				potential += LJ_energy(distance) - LJ_energy(INPUT.mdp.rcut_lj);
+				force[i] = force[i] + LJ_force(distance, temp*ucell_c.lat0);
+			}
+		}
+	}
+	return potential/2.0;
+}
+
 double LJ_potential::LJ_energy(const double d)
 {
 	return 4*INPUT.mdp.epsilon_lj*( pow(INPUT.mdp.sigma_lj/d, 12) - pow(INPUT.mdp.sigma_lj/d, 6) );

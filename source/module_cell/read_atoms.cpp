@@ -12,6 +12,9 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 {
 	TITLE("UnitCell_pseudo","read_atom_species");
 
+	delete[] atom_label;
+    delete[] atom_mass;
+    delete[] pseudo_fn;
 	this->atom_mass  = new double[ntype]; //atom masses
 	this->atom_label = new std::string[ntype]; //atom labels
 	this->pseudo_fn  = new std::string[ntype]; //file name of pseudopotential
