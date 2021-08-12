@@ -54,7 +54,7 @@ void UfftRoundtripKernel(const CUFFT_COMPLEX *psi, const double *vr, const int *
     kernel_set<<<block, thread>>>(GlobalC::wf.npw, psic, psi, fft_index);
 
     // cout<<"before fft1"<<endl;
-    // psic_inside = new complex<double>[15];
+    // complex<double> *psic_inside = new complex<double>[15];
     // cudaMemcpy(psic_inside, &psic[6000], 15*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
     // for(int i=0;i<15;i++)
     // {
@@ -70,16 +70,16 @@ void UfftRoundtripKernel(const CUFFT_COMPLEX *psi, const double *vr, const int *
     // }
 
 
-    cufftHandle cufftplan_gpu;
-    cufftPlan3d(&cufftplan_gpu, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
-    cufftExecZ2Z(cufftplan_gpu, psic, psic, CUFFT_INVERSE);
-    cufftDestroy(cufftplan_gpu);
+    // cufftHandle cufftplan_gpu;
+    // cufftPlan3d(&cufftplan_gpu, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
+    // cufftExecZ2Z(cufftplan_gpu, psic, psic, CUFFT_INVERSE);
+    // cufftDestroy(cufftplan_gpu);
 
-    // complex<double> *psic_cpu = new complex<double>[GlobalC::pw.nrxx];
-    // cudaMemcpy(psic_cpu, psic, GlobalC::pw.nrxx*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
-    // GlobalC::pw.FFT_wfc.FFT3D( psic_cpu, 1);
+    complex<double> *psic_cpu = new complex<double>[GlobalC::pw.nrxx];
+    cudaMemcpy(psic_cpu, psic, GlobalC::pw.nrxx*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
+    GlobalC::pw.FFT_wfc.FFT3D( psic_cpu, 1);
 
-    // cudaMemcpy(psic, psic_cpu, GlobalC::pw.nrxx*sizeof(CUFFT_COMPLEX), cudaMemcpyHostToDevice);
+    cudaMemcpy(psic, psic_cpu, GlobalC::pw.nrxx*sizeof(CUFFT_COMPLEX), cudaMemcpyHostToDevice);
 
     // cout<<"after fft1"<<endl;
     // psic_inside = new complex<double>[15];
@@ -113,11 +113,11 @@ void UfftRoundtripKernel(const CUFFT_COMPLEX *psi, const double *vr, const int *
     // cout<<"========"<<endl;
 
     // (3) fft back to G space
-    cufftHandle cufftplan_gpu2;
-    cufftPlan3d(&cufftplan_gpu2, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
-    cufftExecZ2Z(cufftplan_gpu2, psic, psic, CUFFT_FORWARD);
+    // cufftHandle cufftplan_gpu2;
+    // cufftPlan3d(&cufftplan_gpu2, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
+    // cufftExecZ2Z(cufftplan_gpu2, psic, psic, CUFFT_FORWARD);
 
-    cufftDestroy(cufftplan_gpu2);
+    // cufftDestroy(cufftplan_gpu2);
 
     // cout<<"before normalization"<<endl;
     // complex<double> *tmp2 = new complex<double>[15];
@@ -128,14 +128,14 @@ void UfftRoundtripKernel(const CUFFT_COMPLEX *psi, const double *vr, const int *
     // }
     // delete [] tmp2;
 
-    int block3 = GlobalC::pw.nrxx / thread + 1;
-    kernel_normalization<<<block3, thread>>>(GlobalC::pw.nrxx, psic, (double)(GlobalC::pw.nrxx));
+    // int block3 = GlobalC::pw.nrxx / thread + 1;
+    // kernel_normalization<<<block3, thread>>>(GlobalC::pw.nrxx, psic, (double)(GlobalC::pw.nrxx));
     
     // complex<double> *psic_cpu = new complex<double>[GlobalC::pw.nrxx];
-    // // psic_cpu = new complex<double>[GlobalC::pw.nrxx];
-    // cudaMemcpy(psic_cpu, psic, GlobalC::pw.nrxx*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
-    // GlobalC::pw.FFT_wfc.FFT3D( psic_cpu, -1);
-    // cudaMemcpy(psic, psic_cpu, GlobalC::pw.nrxx*sizeof(CUFFT_COMPLEX), cudaMemcpyHostToDevice);
+    psic_cpu = new complex<double>[GlobalC::pw.nrxx];
+    cudaMemcpy(psic_cpu, psic, GlobalC::pw.nrxx*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
+    GlobalC::pw.FFT_wfc.FFT3D( psic_cpu, -1);
+    cudaMemcpy(psic, psic_cpu, GlobalC::pw.nrxx*sizeof(CUFFT_COMPLEX), cudaMemcpyHostToDevice);
 
     // cout<<"after 2nd ufft SUCCESS"<<endl;
     // complex<double> *tmp1 = new complex<double>[15];

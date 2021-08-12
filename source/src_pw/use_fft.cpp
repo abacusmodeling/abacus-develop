@@ -14,14 +14,14 @@ Use_FFT::~Use_FFT()
 
 void Use_FFT::allocate(void)
 {
-    cout<<"before title!, pw.nrxx = "<<GlobalC::pw.nrxx<<endl;
+    // cout<<"before title!, pw.nrxx = "<<GlobalC::pw.nrxx<<endl;
     TITLE("Use_FFT","allocate");
 
     delete[] porter;
-    cout<<"before new"<<endl;
-    cout<<"pw.nrxx = "<<GlobalC::pw.nrxx<<endl;
+    // cout<<"before new"<<endl;
+    // cout<<"pw.nrxx = "<<GlobalC::pw.nrxx<<endl;
     porter = new complex<double>[GlobalC::pw.nrxx];
-    cout<<"after new"<<endl;
+    // cout<<"after new"<<endl;
     Memory::record("Use_FFT","porter",GlobalC::pw.nrxx,"complexmatrix");
 
     return;
