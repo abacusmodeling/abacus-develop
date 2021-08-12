@@ -31,6 +31,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"nbands_istate",nbands_istate,"number of bands around Fermi level for istate calulation");
 	OUTP(ofs,"nche_sto",nche_sto,"number of orders for Chebyshev expansion in stochastic DFT");
 	OUTP(ofs,"symmetry",symmetry,"turn symmetry on or off");	
+	OUTP(ofs,"symmetry_prec",symmetry_prec,"accuracy for symmetry"); // LiuXh add 2021-08-12, accuracy for symmetry
 	OUTP(ofs,"nelec",nelec,"input number of electrons");
 
 	ofs << "\n#Parameters (2.PW)" << endl;

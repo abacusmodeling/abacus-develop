@@ -44,7 +44,8 @@ string Symmetry_Basic::get_brav_name(const int ibrav)
 // Control the accuracy
 bool Symmetry_Basic::equal(const double &m,const double &n)const
 {
-	if( fabs(m-n) < 1.0e-5 )
+	//if( fabs(m-n) < 1.0e-5 )
+    if( fabs(m-n) < epsilon ) //LiuXh add 2021-08-12, use accuracy for symmetry
 	{
 		return true;
 	}

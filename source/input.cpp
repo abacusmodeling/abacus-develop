@@ -165,6 +165,7 @@ void Input::Default(void)
     search_radius=-1.0; // unit: a.u. -1.0 has no meaning.
     search_pbc=true;
     symmetry=false;
+    symmetry_prec = 1.0e-5; //LiuXh add 2021-08-12, accuracy for symmetry
 	mlwf_flag=false;
     force=0;
     force_set=false;
@@ -711,6 +712,10 @@ bool Input::Read(const string &fn)
         else if (strcmp("symmetry", word) == 0)
         {
             read_value(ifs, symmetry);
+        }
+        else if (strcmp("symmetry_prec", word) == 0) //LiuXh add 2021-08-12, accuracy for symmetry
+        {
+            read_value(ifs, symmetry_prec);
         }
         else if (strcmp("mlwf_flag", word) == 0)
         {
@@ -2023,6 +2028,7 @@ void Input::Bcast()
 	Parallel_Common::bcast_bool( search_pbc );
     Parallel_Common::bcast_double( search_radius );
     Parallel_Common::bcast_bool( symmetry );
+    Parallel_Common::bcast_double( symmetry_prec ); //LiuXh add 2021-08-12, accuracy for symmetry
     Parallel_Common::bcast_bool( mlwf_flag );
     Parallel_Common::bcast_int( force );
     Parallel_Common::bcast_bool( force_set );

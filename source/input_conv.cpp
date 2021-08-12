@@ -140,6 +140,7 @@ void Input_Conv::Convert(void)
 	Ions_Move_CG::CG_THRESHOLD = INPUT.cg_threshold; // pengfei add 2013-09-09
 
     Symmetry::symm_flag = INPUT.symmetry;						// 9
+    symm.epsilon = INPUT.symmetry_prec; //LiuXh add 2021-08-12, accuracy for symmetry
 	BASIS_TYPE = INPUT.basis_type;
 	KS_SOLVER = INPUT.ks_solver;
 	SEARCH_RADIUS = INPUT.search_radius;
