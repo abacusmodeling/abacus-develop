@@ -7,4 +7,5 @@ add_library(
     MD_thermo.cpp
     run_md_classic.cpp
     LJ_potential.cpp
+    cmd_neighbor.cpp
 )

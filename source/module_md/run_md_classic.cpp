@@ -1,6 +1,7 @@
 #include "run_md_classic.h"
 #include "MD_basic.h"
 #include "LJ_potential.h"
+#include "cmd_neighbor.h"
 #include "../input.h"
 #include "../module_base/global_variable.h"
 #include "../src_io/print_info.h"
@@ -12,7 +13,7 @@ Run_MD_CLASSIC::Run_MD_CLASSIC():grid_neigh(GlobalV::test_deconstructor, GlobalV
 	pos_old2 = new double[1];
 	pos_now = new double[1];
 	pos_next = new double[1];
-	force=new Vector3<double>[1];
+	force = new Vector3<double>[1];
 	stress.create(3,3);
 }
 
@@ -66,8 +67,25 @@ void Run_MD_CLASSIC::md_cells_classic(void)
             GlobalV::ofs_running << " -------------------------------------------" << std::endl;
         }
 
-		// search adjent atoms
-		atom_arrange::search(
+		double potential;
+
+		if(this->ucell_c.judge_big_cell())
+		{
+			//cout << "Big cell !!" << endl;
+			CMD_neighbor cmd_neigh;
+			cmd_neigh.neighbor(this->ucell_c);
+
+			LJ_potential LJ_CMD;
+
+			potential = LJ_CMD.Lennard_Jones(
+							this->ucell_c,
+							cmd_neigh,
+							this->force,
+							this->stress);
+		}
+		else
+		{
+			atom_arrange::search(
 				GlobalV::SEARCH_PBC,
 				GlobalV::ofs_running,
 				this->grid_neigh,
@@ -76,13 +94,26 @@ void Run_MD_CLASSIC::md_cells_classic(void)
 				GlobalV::test_atom_input,
 				INPUT.test_just_neighbor);
 
-		LJ_potential LJ_CMD;
+			LJ_potential LJ_CMD;
 
-		double potential = LJ_CMD.Lennard_Jones(
-								this->ucell_c,
-								this->grid_neigh,
-								this->force,
-								this->stress);
+			potential = LJ_CMD.Lennard_Jones(
+							this->ucell_c,
+							this->grid_neigh,
+							this->force,
+							this->stress);
+		}
+
+		ofstream force_out("force.txt", ios::app);
+		if(GlobalV::MY_RANK==0)
+		{
+			for(int i=0; i<ucell_c.nat; ++i)
+			{
+				force_out << setw(18) << setiosflags(ios::fixed) << setprecision(12) << force[i].x*Ry_to_eV*ANGSTROM_AU
+             	 			<< setw(18) << setiosflags(ios::fixed) << setprecision(12) << force[i].y*Ry_to_eV*ANGSTROM_AU
+        	 	 			<< setw(18) << setiosflags(ios::fixed) << setprecision(12) << force[i].z*Ry_to_eV*ANGSTROM_AU << endl;
+			}
+		}
+		force_out.close();
 
 		this->update_pos_classic();
 
