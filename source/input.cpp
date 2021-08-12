@@ -259,7 +259,7 @@ void Input::Default(void)
 	lmax_descriptor = 2; // mohan added 2021-01-03
 
     out_potential = 0;
-    out_wf = false;
+    out_wf = 0;
 	out_dos = 0;
     out_band = 0;
 	out_hs = 0;
@@ -2146,7 +2146,7 @@ void Input::Bcast()
 	Parallel_Common::bcast_string( model_file ); //  caoyu add 2021-06-03
 	
 	Parallel_Common::bcast_int(out_potential);
-    Parallel_Common::bcast_bool( out_wf );
+    Parallel_Common::bcast_int( out_wf );
 	Parallel_Common::bcast_int( out_dos );
         Parallel_Common::bcast_int( out_band );
 	Parallel_Common::bcast_int( out_hs );
