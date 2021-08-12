@@ -35,8 +35,9 @@ def print_file_pw(info,dis):
 	with open("INPUTw","w") as file:
 		file.write(textwrap.dedent(f"""\
 			WANNIER_PARAMETERS
-			rcut 10
+			rcut {info["input"]["rcut"]}
 			out_spillage 2
+			spillage_outdir	orb_matrix
 			"""))
 
 
@@ -105,7 +106,7 @@ def print_file_pw(info,dis):
 				#!/bin/bash
 				#PBS -q gold5120
 				#PBS -l nodes={info["exe"]["qsub"][0]}:ppn={info["exe"]["qsub"][1]}
-				#PBS -l walltime=1:00:00
+				#PBS -l walltime=12:00:00
 				#PBS -o job.log
 				#PBS -e job.err
 				ulimit -s unlimited

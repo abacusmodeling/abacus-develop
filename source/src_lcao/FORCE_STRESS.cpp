@@ -22,19 +22,19 @@ void Force_Stress_LCAO::allocate(void)
     TITLE("Force_Stress_LCAO","allocate");
 
     // reduce memory occupy by vlocal
-    delete[] ParaO.sender_local_index;
-    delete[] ParaO.sender_size_process;
-    delete[] ParaO.sender_displacement_process;
-    delete[] ParaO.receiver_global_index;
-    delete[] ParaO.receiver_size_process;
-    delete[] ParaO.receiver_displacement_process;
+    delete[] GlobalC::ParaO.sender_local_index;
+    delete[] GlobalC::ParaO.sender_size_process;
+    delete[] GlobalC::ParaO.sender_displacement_process;
+    delete[] GlobalC::ParaO.receiver_global_index;
+    delete[] GlobalC::ParaO.receiver_size_process;
+    delete[] GlobalC::ParaO.receiver_displacement_process;
 
-    ParaO.sender_local_index = new int[1];
-    ParaO.sender_size_process = new int[1];
-    ParaO.sender_displacement_process = new int[1];
-    ParaO.receiver_global_index = new int[1];
-    ParaO.receiver_size_process = new int[1];
-    ParaO.receiver_displacement_process = new int[1];
+    GlobalC::ParaO.sender_local_index = new int[1];
+    GlobalC::ParaO.sender_size_process = new int[1];
+    GlobalC::ParaO.sender_displacement_process = new int[1];
+    GlobalC::ParaO.receiver_global_index = new int[1];
+    GlobalC::ParaO.receiver_size_process = new int[1];
+    GlobalC::ParaO.receiver_displacement_process = new int[1];
 
     return;
 }
@@ -137,12 +137,12 @@ void Force_Stress_LCAO::getForceStress(
 	// Peize Lin add 2014-04-04, update 2021-03-09
 	matrix force_vdw;
 	matrix stress_vdw;
-	if(vdwd2_para.flag_vdwd2)
+	if(GlobalC::vdwd2_para.flag_vdwd2)
 	{
 		if(isforce)
 		{
 			force_vdw.create(nat,3);
-			Vdwd2 vdwd2(GlobalC::ucell,vdwd2_para);
+			Vdwd2 vdwd2(GlobalC::ucell,GlobalC::vdwd2_para);
 			vdwd2.cal_force();
 			for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
 			{
@@ -153,18 +153,18 @@ void Force_Stress_LCAO::getForceStress(
 		}
 		if(isstress)
 		{
-			Vdwd2 vdwd2(GlobalC::ucell,vdwd2_para);
+			Vdwd2 vdwd2(GlobalC::ucell,GlobalC::vdwd2_para);
 			vdwd2.cal_stress();
 			stress_vdw = vdwd2.get_stress().to_matrix();
 		}
 	}
 	// jiyy add 2019-05-18, update 2021-05-02
-	else if(vdwd3_para.flag_vdwd3)
+	else if(GlobalC::vdwd3_para.flag_vdwd3)
 	{
 		if(isforce)
 		{
 			force_vdw.create(nat,3);
-			Vdwd3 vdwd3(GlobalC::ucell,vdwd3_para);
+			Vdwd3 vdwd3(GlobalC::ucell,GlobalC::vdwd3_para);
 			vdwd3.cal_force();
 			for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
 			{
@@ -175,7 +175,7 @@ void Force_Stress_LCAO::getForceStress(
 		}
 		if(isstress)
 		{
-			Vdwd3 vdwd3(GlobalC::ucell,vdwd3_para);
+			Vdwd3 vdwd3(GlobalC::ucell,GlobalC::vdwd3_para);
 			vdwd3.cal_stress();
 			stress_vdw = vdwd3.get_stress().to_matrix();
 		}
@@ -206,14 +206,14 @@ void Force_Stress_LCAO::getForceStress(
 			{
 				for(int j=0; j<3; j++)
 				{
-					stress_dftu(j,i) = dftu.stress_dftu.at(j).at(i);
+					stress_dftu(j,i) = GlobalC::dftu.stress_dftu.at(j).at(i);
 				}
 			}
 			if(isforce)
 			{
 				for (int iat = 0; iat < nat; iat++)
 				{
-					force_dftu(iat, i) = dftu.force_dftu.at(iat).at(i);
+					force_dftu(iat, i) = GlobalC::dftu.force_dftu.at(iat).at(i);
 				}
 			}
 		}
@@ -247,7 +247,7 @@ void Force_Stress_LCAO::getForceStress(
 					fcs(iat, i) += force_dftu(iat, i);
 				}
 				//VDW force of vdwd2 or vdwd3
-				if(vdwd2_para.flag_vdwd2||vdwd3_para.flag_vdwd3)
+				if(GlobalC::vdwd2_para.flag_vdwd2||GlobalC::vdwd3_para.flag_vdwd3)
 				{
 					fcs(iat,i) += force_vdw(iat,i);
 				}
@@ -261,6 +261,13 @@ void Force_Stress_LCAO::getForceStress(
 				{
 					fcs(iat, i) += force_dftu(iat, i);
 				}
+#ifdef __DEEPKS
+				// mohan add 2021-08-04
+				if (INPUT.deepks_scf)
+				{
+					fcs(iat, i) += ld.F_delta(iat, i);
+				}
+#endif
 				//sum total force for correction
 				sum += fcs(iat, i);
 			}
@@ -279,15 +286,16 @@ void Force_Stress_LCAO::getForceStress(
 		}
 
 		// pengfei 2016-12-20
-		if(Symmetry::symm_flag)
+		if(ModuleSymmetry::Symmetry::symm_flag)
 		{
 			this->forceSymmetry(fcs);
 		}
+
 #ifdef __DEEPKS
 		//DeePKS force, caoyu add 2021-06-03
 		if (INPUT.deepks_scf)
 		{
-			ld.save_npy_f(fcs);	//save fbase
+			GlobalC::ld.save_npy_f(fcs);	//save fbase
 		}
 #endif
 		// print Rydberg force or not
@@ -331,7 +339,7 @@ void Force_Stress_LCAO::getForceStress(
 			{
 				this->print_force("EFIELD     FORCE",fefield,1,ry);
 			}
-			if(vdwd2_para.flag_vdwd2||vdwd3_para.flag_vdwd3)
+			if(GlobalC::vdwd2_para.flag_vdwd2||GlobalC::vdwd3_para.flag_vdwd3)
 			{
 				this->print_force("VDW        FORCE",force_vdw,1,ry);
 			}
@@ -339,7 +347,7 @@ void Force_Stress_LCAO::getForceStress(
 			//caoyu add 2021-06-03
 			if (INPUT.deepks_scf)
 			{
-				this->print_force("DeePKS 	FORCE", ld.F_delta, 1, ry);
+				this->print_force("DeePKS 	FORCE", GlobalC::ld.F_delta, 1, ry);
 			}
 #endif
 		}
@@ -390,7 +398,7 @@ void Force_Stress_LCAO::getForceStress(
 					+ sigmahar(i,j);// hartree stress
 
 					//VDW stress from linpz and jiyy
-				if(vdwd2_para.flag_vdwd2||vdwd3_para.flag_vdwd3)
+				if(GlobalC::vdwd2_para.flag_vdwd2||GlobalC::vdwd3_para.flag_vdwd3)
 				{
 					scs(i,j) += stress_vdw(i , j);
 				}
@@ -403,9 +411,9 @@ void Force_Stress_LCAO::getForceStress(
 		}
 
 
-		if(Symmetry::symm_flag)
+		if(ModuleSymmetry::Symmetry::symm_flag)
 		{
-			symm.stress_symmetry(scs, GlobalC::ucell);
+			GlobalC::symm.stress_symmetry(scs, GlobalC::ucell);
 		}//end symmetry
 
 		// print Rydberg stress or not
@@ -446,7 +454,7 @@ void Force_Stress_LCAO::getForceStress(
 			sc_pw.print_stress("cc       STRESS",sigmacc,GlobalV::TEST_STRESS,ry);
 			//		sc_pw.print_stress("NLCC       STRESS",sigmacc,GlobalV::TEST_STRESS,ry);
 			sc_pw.print_stress("XC       STRESS",sigmaxc,GlobalV::TEST_STRESS,ry);
-			if(vdwd2_para.flag_vdwd2||vdwd3_para.flag_vdwd3)
+			if(GlobalC::vdwd2_para.flag_vdwd2||GlobalC::vdwd3_para.flag_vdwd3)
 			{
 				sc_pw.print_stress("VDW      STRESS",sigmaxc,GlobalV::TEST_STRESS,ry);
 			}
@@ -575,7 +583,9 @@ void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, mat
 
  	if(istestf)
 	{
-		cout << setprecision(6) << setiosflags(ios::showpos) << setiosflags(ios::fixed) << endl;
+		cout << setprecision(6);
+		//cout << setiosflags(ios::showpos);
+		//cout << setiosflags(ios::fixed) << endl;
 		cout << " ------------------- TOTAL      FORCE --------------------" << endl;
     	cout << " " << setw(8) << "Atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << endl;
     	GlobalV::ofs_running << " " << setw(12) << "Atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << endl;
@@ -743,8 +753,8 @@ void Force_Stress_LCAO::forceSymmetry(matrix& fcs)
 			pos[3*iat+2] = GlobalC::ucell.atoms[it].taud[ia].z;
 			for(int k=0; k<3; ++k)
 			{
-				symm.check_translation( pos[iat*3+k], -floor(pos[iat*3+k]));
-				symm.check_boundary( pos[iat*3+k] );
+				GlobalC::symm.check_translation( pos[iat*3+k], -floor(pos[iat*3+k]));
+				GlobalC::symm.check_boundary( pos[iat*3+k] );
 			}
 			iat++;
 		}
@@ -760,7 +770,7 @@ void Force_Stress_LCAO::forceSymmetry(matrix& fcs)
 
 		fcs(iat,0) = d1;fcs(iat,1) = d2;fcs(iat,2) = d3;
 	}
-	symm.force_symmetry(fcs , pos, GlobalC::ucell);
+	GlobalC::symm.force_symmetry(fcs , pos, GlobalC::ucell);
 	for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 	{
 		Mathzone::Direct_to_Cartesian(fcs(iat,0),fcs(iat,1),fcs(iat,2),
@@ -771,7 +781,7 @@ void Force_Stress_LCAO::forceSymmetry(matrix& fcs)
 
 		fcs(iat,0) = d1;fcs(iat,1) = d2;fcs(iat,2) = d3;
 	}
-	//cout << "nrotk =" << symm.nrotk << endl;
+	//cout << "nrotk =" << GlobalC::symm.nrotk << endl;
 	delete[] pos;
 	return;
 }

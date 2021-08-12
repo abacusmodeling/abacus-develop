@@ -765,10 +765,10 @@ void ORB_table_phi::init_Lmax (
 	auto cal_Lmax_Phi = [](int &Lmax)
 	{
 		//obtain maxL of all type
-		const int ntype = ORB.get_ntype();
+		const int ntype = GlobalC::ORB.get_ntype();
 		for (int it = 0; it < ntype; it++)
 		{
-			Lmax = std::max(Lmax, ORB.Phi[it].getLmax());
+			Lmax = std::max(Lmax, GlobalC::ORB.Phi[it].getLmax());
 		}
 	};
 
@@ -777,13 +777,19 @@ void ORB_table_phi::init_Lmax (
 		// fix bug.
 		// mohan add the nonlocal part.
 		// 2011-03-07
-		const int ntype = ORB.get_ntype();
+		const int ntype = GlobalC::ORB.get_ntype();
 		for(int it=0; it< ntype; it++)
 		{
-			Lmax = std::max(Lmax, ORB.Beta[it].getLmax());
+			Lmax = std::max(Lmax, GlobalC::ORB.Beta[it].getLmax());
 		}
 	};
+	auto cal_Lmax_Alpha = [](int &Lmax)
+	{
+		//caoyu add 2021-08-05 for descriptor basis
+		Lmax = std::max(Lmax, GlobalC::ORB.get_lmax_d());
+	};
 
+	
 	Lmax = -1;
 	
 	switch( orb_num )
@@ -794,6 +800,7 @@ void ORB_table_phi::init_Lmax (
 				case 1:			// used in <Phi|Phi> or <Beta|Phi>
 					cal_Lmax_Phi(Lmax);
 					cal_Lmax_Beta(Lmax);
+					cal_Lmax_Alpha(Lmax);
 					//use 2lmax+1 in dS
 					Lmax_used = 2*Lmax + 1;
 					break;

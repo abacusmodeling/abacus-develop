@@ -6,10 +6,10 @@
 
 static void test_ccp()
 {
-	Conv_Coulomb_Pot ccp(ORB.Phi[0].PhiLN(0,0));
+	Conv_Coulomb_Pot ccp(GlobalC::ORB.Phi[0].PhiLN(0,0));
 	ccp.cal_conv_coulomb_pot();
 	stringstream ss;
-	for( int ir=0; ir<=4*ORB.Phi[0].PhiLN(0,0).getNr(); ++ir )
+	for( int ir=0; ir<=4*GlobalC::ORB.Phi[0].PhiLN(0,0).getNr(); ++ir )
 	{
 		ss<<ccp.get_conv_coulomb_pot(ir)<<endl;
 	}

@@ -32,8 +32,10 @@ void UnitCell_pseudo::setup_cell(
 	TITLE("UnitCell_pseudo","setup_cell");	
 	// (1) init mag
 	assert(ntype>0);
+#ifndef __CMD
 	delete[] magnet.start_magnetization;
 	magnet.start_magnetization = new double[this->ntype];
+#endif
 
 	// (2) init *Atom class array.
 	this->atoms = new Atom[this->ntype]; // atom species.
@@ -77,12 +79,12 @@ void UnitCell_pseudo::setup_cell(
 			//========================
 			// call read_atom_species
 			//========================
-			this->read_atom_species(ifa);
+			this->read_atom_species(ifa, GlobalV::ofs_running);
 
 			//==========================
 			// call read_atom_positions
 			//==========================
-			ok2 = this->read_atom_positions(ifa);
+			ok2 = this->read_atom_positions(ifa, GlobalV::ofs_running, GlobalV::ofs_warning);
 
 			if(ok2)
 			{
@@ -116,7 +118,7 @@ void UnitCell_pseudo::setup_cell(
 
 	// mohan add 2010-09-29
 	#ifdef __LCAO
-	ORB.bcast_files(ntype, GlobalV::MY_RANK);
+	GlobalC::ORB.bcast_files(ntype, GlobalV::MY_RANK);
 	#endif
 #endif
 	
@@ -277,7 +279,7 @@ void UnitCell_pseudo::setup_cell(
 	// I warn the user again for each type.
 	//for(int it=0; it<ntype; it++)
 	//{
-	//	xcf.which_dft(atoms[it].dft);
+	//	GlobalC::xcf.which_dft(atoms[it].dft);
 	//}
 
 	// setup the total number of PAOs
@@ -301,21 +303,16 @@ void UnitCell_pseudo::setup_cell(
 }
 
 void UnitCell_pseudo::setup_cell_classic(
-	const string &fn, 
-	output &outp, 
-	ofstream &ofs,
+	const string &fn,
 	ofstream &ofs_running,
 	ofstream &ofs_warning)
 
 {
 	TITLE("UnitCell_pseudo","setup_cell_classic");
 
-	// (1) init magnetization (useless for classic MD)
 	assert(ntype>0);
-	delete[] magnet.start_magnetization;
-	magnet.start_magnetization = new double[this->ntype];
 
-	// (2) init *Atom class array.
+	// (1) init *Atom class array.
 	this->atoms = new Atom[this->ntype];
 	this->set_atom_flag = true;
 
@@ -352,13 +349,12 @@ void UnitCell_pseudo::setup_cell_classic(
 			//========================
 			// call read_atom_species
 			//========================
-			this->read_atom_species(ifa);
-
+			this->read_atom_species(ifa, ofs_running);
 			//==========================
 			// call read_atom_positions
 			//==========================
-			ok2 = this->read_atom_positions(ifa);
-
+			ok2 = this->read_atom_positions(ifa, ofs_running, ofs_warning);
+			cout << "read_atom_positions done." << endl;
 			if(ok2)
 			{
 				for(int i=0;i<this->ntype;i++)
@@ -402,8 +398,6 @@ void UnitCell_pseudo::setup_cell_classic(
 	}
 
 	ofs_running << endl;
-	outp.printM3(ofs_running,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec); 
-
 }
 
 

@@ -191,14 +191,14 @@ map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::c
 		const size_t ia2 = GlobalC::ucell.iat2ia[iat2];
 		const Vector3_Order<double> tau1 = GlobalC::ucell.atoms[it1].tau[ia1];
 		const Vector3_Order<double> tau2 = GlobalC::ucell.atoms[it2].tau[ia2];
-		const double Rcut = std::min( ORB.Phi[it1].getRcut()*rmesh_times+ORB.Phi[it2].getRcut(), ORB.Phi[it1].getRcut()+ORB.Phi[it2].getRcut()*rmesh_times );
+		const double Rcut = std::min( GlobalC::ORB.Phi[it1].getRcut()*rmesh_times+GlobalC::ORB.Phi[it2].getRcut(), GlobalC::ORB.Phi[it1].getRcut()+GlobalC::ORB.Phi[it2].getRcut()*rmesh_times );
 		
 		for( const Vector3_Order<int> &box2 : Coulomb_potential_boxes )
 		{
 			const Vector3_Order<double> delta_R = -tau1+tau2+(box2*GlobalC::ucell.latvec);
 			if( delta_R.norm()*GlobalC::ucell.lat0 < Rcut )
 			{
-//				cout<<"cal_Vs\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<"\t"<<delta_R<<"\t"<<delta_R.norm()<<"\t"<<delta_R.norm()*GlobalC::ucell.lat0<<"\t"<<ORB.Phi[it1].getRcut()*rmesh_times+ORB.Phi[it2].getRcut()<<endl;
+//				cout<<"cal_Vs\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<"\t"<<delta_R<<"\t"<<delta_R.norm()<<"\t"<<delta_R.norm()*GlobalC::ucell.lat0<<"\t"<<GlobalC::ORB.Phi[it1].getRcut()*rmesh_times+GlobalC::ORB.Phi[it2].getRcut()<<endl;
 				const shared_ptr<matrix> V = DPcal_V( 
 					it1, it2, delta_R, 
 					m_abfs_abfs, index_abfs, 
@@ -409,16 +409,16 @@ map<size_t,vector<Abfs::Vector3_Order<int>>> Abfs::get_adjs( const size_t &iat )
 	const Vector3<double> &tau = GlobalC::ucell.atoms[it].tau[ia];
 	
 	map<size_t,vector<Vector3_Order<int>>> adjs;
-	GridD.Find_atom(GlobalC::ucell,  tau, it, ia );
-	for( int ad=0; ad<GridD.getAdjacentNum()+1; ++ad )
+	GlobalC::GridD.Find_atom(GlobalC::ucell,  tau, it, ia );
+	for( int ad=0; ad<GlobalC::GridD.getAdjacentNum()+1; ++ad )
 	{
-		const size_t it_ad = GridD.getType(ad);
-		const size_t ia_ad = GridD.getNatom(ad);
+		const size_t it_ad = GlobalC::GridD.getType(ad);
+		const size_t ia_ad = GlobalC::GridD.getNatom(ad);
 		const int iat_ad = GlobalC::ucell.itia2iat(it_ad,ia_ad);
-		const Vector3<int> box_ad = GridD.getBox(ad);
-		const Vector3<double> tau_ad = GridD.getAdjacentTau(ad);
+		const Vector3<int> box_ad = GlobalC::GridD.getBox(ad);
+		const Vector3<double> tau_ad = GlobalC::GridD.getAdjacentTau(ad);
 		
-		if( (tau-tau_ad).norm()*GlobalC::ucell.lat0 < ORB.Phi[it].getRcut()+ORB.Phi[it_ad].getRcut() )
+		if( (tau-tau_ad).norm()*GlobalC::ucell.lat0 < GlobalC::ORB.Phi[it].getRcut()+GlobalC::ORB.Phi[it_ad].getRcut() )
 			adjs[iat_ad].push_back(box_ad);
 	}
 	return adjs;
@@ -564,7 +564,7 @@ set<pair<size_t,size_t>> Abfs::get_H_pairs_core( const vector<pair<size_t,size_t
 vector<Abfs::Vector3_Order<int>> Abfs::get_Coulomb_potential_boxes( const double rmesh_times )
 {
 	vector<Vector3_Order<int>> Coulomb_potential_boxes;
-	const double Rcut = ORB.get_Rmax() * rmesh_times;
+	const double Rcut = GlobalC::ORB.get_Rmax() * rmesh_times;
 	const int nx = std::ceil(Rcut/std::abs((GlobalC::ucell.a2^GlobalC::ucell.a3).normalize()*GlobalC::ucell.a1*GlobalC::ucell.lat0));
 	const int ny = std::ceil(Rcut/std::abs((GlobalC::ucell.a1^GlobalC::ucell.a3).normalize()*GlobalC::ucell.a2*GlobalC::ucell.lat0));
 	const int nz = std::ceil(Rcut/std::abs((GlobalC::ucell.a1^GlobalC::ucell.a2).normalize()*GlobalC::ucell.a3*GlobalC::ucell.lat0));

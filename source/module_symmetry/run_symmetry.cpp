@@ -32,8 +32,9 @@ void calculate()
 	ofstream ofs_warning("warning.txt");
 	ifstream ifs("INPUT");
 	UnitCell_pseudo ucell;
-	Symmetry symm;
+	ModuleSymmetry::Symmetry symm;
 	ifs >> ucell.ntype;
+	ucell.latName = "test";
 	ifs.close();
 	output out;
 	ucell.setup_cell_classic(
@@ -41,7 +42,8 @@ void calculate()
 	out, 
 	ofs,
 	ofs_running,
-	ofs_warning)
+	ofs_warning);
+	cout << "set up cell classic done." << endl;
 	symm.analy_sys(ucell, out, ofs_running);
 	ofs_running.close();
 //	ooo.set_orb_tables();

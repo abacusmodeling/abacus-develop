@@ -1,0 +1,23 @@
+INPUT_PARAMETERS
+ntype      				1
+nbands     				5
+nspin      				1
+calculation				scf
+basis_type 				lcao
+ks_solver  				genelpa
+ecutwfc    				100
+dr2        				1e-8
+niter      				100
+gamma_only 				0
+smearing   				smearing
+mixing_type				pulay
+
+exx_hybrid_type			hse
+exx_separate_loop		0		
+exx_pca_threshold		1E-3
+exx_ccp_rmesh_times		10
+exx_c_threshold			1E-4	
+exx_dm_threshold		1E-3	
+exx_schwarz_threshold	1E-4	
+exx_cauchy_threshold	1E-6	
+

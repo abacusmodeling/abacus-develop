@@ -16,8 +16,6 @@
 #include "../src_pw/global.h"
 #include "global_fp.h"
 #include "../module_base/global_function.h"
-//#include "../module_base/scalapack_connector.h"
-#include "../module_base/lapack_connector.h"
 #include "../module_base/inverse_matrix.h"
 #include "LOOP_ions.h"
 #include "LCAO_matrix.h"
@@ -44,6 +42,20 @@ extern "C"
 		const double *B, const int *IB, const int *JB, const int *DESCB,
 		const double *beta,
 		double *C, const int *IC, const int *JC, const int *DESCC);
+  
+  void pztranc_(
+    const int *M, const int *N,
+    const std::complex<double> *alpha,
+    const std::complex<double> *A, const int *IA, const int *JA, const int *DESCA,
+    const std::complex<double> *beta,
+    std::complex<double> *C, const int *IC, const int *JC, const int *DESCC);
+
+  void pdtran_(
+    const int *M, const int *N,
+    const double *alpha,
+    const double *A, const int *IA, const int *JA, const int *DESCA,
+    const double *beta,
+    double *C, const int *IC, const int *JC, const int *DESCC);
 }
 
 DFTU_RELAX::DFTU_RELAX(){}
@@ -75,151 +87,101 @@ void DFTU_RELAX::force_stress()
 			this->stress_dftu.at(dim).at(1) = 0.0;
 			this->stress_dftu.at(dim).at(2) = 0.0;
 		}
+  }
+
+  if(GlobalV::GAMMA_ONLY_LOCAL)
+  {
+    const char transN = 'N', transT = 'T';
+	  const int  one_int = 1;
+	  const double alpha = 1.0, beta = 0.0;
+
+    vector<double> rho_VU(GlobalC::ParaO.nloc);
+
+    for(int ik=0; ik<GlobalC::kv.nks; ik++)
+	  {
+	  	const int spin = GlobalC::kv.isk[ik];
+
+      double* VU = new double [GlobalC::ParaO.nloc];
+      this->cal_VU_pot_mat_real(spin, false, VU);
+      pdgemm_(&transT, &transN,
+					    &GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
+					    &alpha, 
+					    GlobalC::LOC.wfc_dm_2d.dm_gamma[spin].c, &one_int, &one_int, GlobalC::ParaO.desc, 
+					    VU, &one_int, &one_int, GlobalC::ParaO.desc,
+					    &beta,
+					    &rho_VU[0], &one_int, &one_int, GlobalC::ParaO.desc); 
+
+      delete [] VU;
+
+      this->cal_force_gamma(spin, &rho_VU[0]);
+      if(GlobalV::STRESS) this->cal_stress_gamma(spin, &rho_VU[0]);
+    }//ik
+  }
+  else
+  {
+    const char transN = 'N', transT = 'T';
+	  const int  one_int = 1;
+	  const complex<double> alpha(1.0,0.0), beta(0.0,0.0);
+
+    vector<complex<double>> rho_VU(GlobalC::ParaO.nloc);
+
+    for(int ik=0; ik<GlobalC::kv.nks; ik++)
+	  {
+	  	const int spin = GlobalC::kv.isk[ik];
+
+      complex<double>* VU = new complex<double> [GlobalC::ParaO.nloc];
+      this->cal_VU_pot_mat_complex(spin, false, VU);
+      pzgemm_(&transT, &transN,
+					    &GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
+					    &alpha, 
+					    GlobalC::LOC.wfc_dm_2d.dm_k[ik].c, &one_int, &one_int, GlobalC::ParaO.desc, 
+					    VU, &one_int, &one_int, GlobalC::ParaO.desc,
+					    &beta,
+					    &rho_VU[0], &one_int, &one_int, GlobalC::ParaO.desc);
+
+      delete [] VU;
+
+      this->cal_force_k(ik, &rho_VU[0]);
+      if(GlobalV::STRESS) cal_stress_k(ik, &rho_VU[0]);
+    }//ik
+  }
+
+  for(int iat=0; iat<GlobalC::ucell.nat; iat++)
+	{
+    vector<double> tmp = this->force_dftu[iat];
+		MPI_Allreduce(&tmp[0], &this->force_dftu[iat][0], 3, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 	}
 
-    this->allocate_force_stress();
+  if(GlobalV::STRESS)
+  {
+    for(int dim1=0; dim1<3; dim1++)
+	  {
+	  	for(int dim2=dim1; dim2<3; dim2++)
+	  	{
+        double val_tmp = stress_dftu[dim1][dim2];
+        MPI_Allreduce(&val_tmp, &stress_dftu[dim1][dim2], 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      }
+    }
 
-	//=======================================================
-	// intialize single particel effective potential matrix
-	//=======================================================
-	vector<vector<complex<double>>> VU_k;
-	vector<vector<double>> VU_gamma;	
-	if(GlobalV::FORCE || GlobalV::STRESS)
-	{
-		this->folding_dSm_soverlap();
+    for(int i=0; i<3; i++)
+	  	for(int j=0; j<3; j++)
+	  		if(i>j) this->stress_dftu[i][j] = stress_dftu[j][i];
 
-		if(GlobalV::GAMMA_ONLY_LOCAL)
-		{
-			VU_gamma.resize(GlobalV::NSPIN);
-			for(int is=0; is<GlobalV::NSPIN; is++)
-			{
-				VU_gamma.at(is).resize(ParaO.nloc, 0.0);
-			}
-		}
-		else
-		{
-			if(GlobalV::NSPIN==1)
-			{
-				VU_k.resize(1);
-				VU_k.at(0).resize(ParaO.nloc, complex<double>(0.0,0.0));
-			}
-			else if(GlobalV::NSPIN==2 || GlobalV::NSPIN==4)
-			{
-				VU_k.resize(2);
-				for(int is=0; is<2; is++)
-				{
-					VU_k.at(is).resize(ParaO.nloc, complex<double>(0.0,0.0));
-				}
-			}
-		}
-
-		for(int ir=0; ir<ParaO.nrow; ir++)
-		{
-			const int iwt1 = ParaO.MatrixInfo.row_set[ir];
-			const int T1 = this->iwt2it.at(iwt1);
-			const int iat1 = this->iwt2iat.at(iwt1);
-			const int L1 = this->iwt2l.at(iwt1);
-			const int n1 = this->iwt2n.at(iwt1);
-			const int m1 = this->iwt2m.at(iwt1);
-			const int ipol1 = this->iwt2ipol.at(iwt1);			
-
-			for(int ic=0; ic<ParaO.ncol; ic++)
-			{
-				const int iwt2 = ParaO.MatrixInfo.col_set[ic];
-				const int T2 = this->iwt2it.at(iwt2);
-				const int iat2 = this->iwt2iat.at(iwt2);
-				const int L2 = this->iwt2l.at(iwt2);
-				const int n2 = this->iwt2n.at(iwt2);
-				const int m2 = this->iwt2m.at(iwt2);
-				const int ipol2 = this->iwt2ipol.at(iwt2);				
-
-				int irc = ic*ParaO.nrow + ir;
-
-				if(INPUT.orbital_corr[T1]==-1 || INPUT.orbital_corr[T2]==-1) continue;
-
-				if(iat1!=iat2) continue;
-
-				// if(Yukawa)
-				// {
-					// if(L1<INPUT.orbital_corr[T1] || L2<INPUT.orbital_corr[T2]) continue;
-				// }
-				// else
-				// {
-					if(L1!=INPUT.orbital_corr[T1] || L2!=INPUT.orbital_corr[T2] || n1!=0 || n2!=0) continue;
-				// }
-
-				if(L1!=L2 || n1!=n2) continue;
-
-				// const int m1_all = m1 + (2*L1+1)*ipol1;
-				// const int m2_all = m2 + (2*L2+1)*ipol2;
-
-				if(GlobalV::GAMMA_ONLY_LOCAL)
-				{
-					for(int is=0; is<GlobalV::NSPIN; is++) //no soc
-					{
-						double val = get_onebody_eff_pot(T1, iat1, L1, n1, is, m1, m2, cal_type, false);
-					
-						VU_gamma.at(is).at(irc) = val;
-					}
-				}
-				else
-				{
-					if(GlobalV::NSPIN==1)
-					{
-						double val = get_onebody_eff_pot(T1, iat1, L1, n1, 0, m1, m2, cal_type, false);
-						VU_k.at(0).at(irc) = complex<double>(val, 0.0);
-					}
-					else if(GlobalV::NSPIN==2)
-					{
-						for(int is=0; is<GlobalV::NSPIN; is++)
-						{
-							double val = get_onebody_eff_pot(T1, iat1, L1, n1, is, m1, m2, cal_type, false);
-							VU_k.at(is).at(irc) = complex<double>(val, 0.0);
-						}
-					}
-					else if(GlobalV::NSPIN==4)//SOC
-					{
-						if(ipol1==ipol2)
-						{
-							int is = ipol1;
-							double val = get_onebody_eff_pot(T1, iat1, L1, n1, is, m1, m2, cal_type, false);
-							VU_k.at(is).at(irc) = complex<double>(val, 0.0);
-						}
-					}
-				}					
-									
-			}//end ic
-		}//end ir
-	}
-
-	//=======================================================
-	//       calculate force
-	//=======================================================
-	if(GlobalV::FORCE) 
-	{
-		if(GlobalV::GAMMA_ONLY_LOCAL) cal_force_gamma(VU_gamma);
-		else  cal_force_k(VU_k);
-	}
-
-	if(GlobalV::STRESS)
-	{
-		if(GlobalV::GAMMA_ONLY_LOCAL) cal_stress_gamma(VU_gamma);
-		else  cal_stress_k(VU_k);
-	}			
+	  for(int i=0;i<3;i++)
+	  	for(int j=0;j<3;j++)
+	  		this->stress_dftu[i][j] *=  GlobalC::ucell.lat0 / GlobalC::ucell.omega;
+  }
 
 	return;
 }
 
-
-void DFTU_RELAX::cal_force_k(const vector<vector<complex<double>>>& VU)
+void DFTU_RELAX::cal_force_k(const int ik, complex<double>* rho_VU)
 {
 	TITLE("DFTU_RELAX", "cal_force_k");
 
 	const char transN = 'N', transT = 'T', transC='C';
 	const int  one_int = 1;
-	// const double alpha = 1.0, beta = 0.0;
-  const complex<double> alpha(1.0,0.0), beta(0.0,0.0);
-  const complex<double> zero(0.0,0.0);
+  const complex<double> zero(0.0,0.0), one(1.0,0.0), minus_one(-1.0,0.0);
 	
 	vector<vector<complex<double>>> ftmp(GlobalC::ucell.nat);
 	for(int ia=0; ia<GlobalC::ucell.nat; ia++)
@@ -227,831 +189,228 @@ void DFTU_RELAX::cal_force_k(const vector<vector<complex<double>>>& VU)
 		ftmp.at(ia).resize(3, complex<double>(0.0,0.0)); //three dimension
 	}
 
-	vector<vector<complex<double>>> dm_VU_dSm(3);
-	for(int dim=0; dim<3; dim++)
-	{
-		dm_VU_dSm.at(dim).resize(ParaO.nloc, zero);
-	}
-	
-	for(int ik=0; ik<GlobalC::kv.nks; ik++)	
-	{
-		const int spin = GlobalC::kv.isk[ik];
-
-		for(int dim=0; dim<3; dim++)
-		{
-			vector<complex<double>> mat_tmp(ParaO.nloc);
-			vector<complex<double>> force_tmp(ParaO.nloc);
-
-			if(dim==0) //dim=1,2 are same as dim=0
-			{
-				ZEROS(VECTOR_TO_PTR(mat_tmp), ParaO.nloc);
-
-				pzgemm_(&transT, &transN,
-					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
-					&alpha, 
-					LOC.wfc_dm_2d.dm_k.at(ik).c, &one_int, &one_int, ParaO.desc, 
-					VECTOR_TO_PTR(VU.at(spin)), &one_int, &one_int, ParaO.desc,
-					&beta,
-					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc);
-			}			
-
-			pzgemm_(&transN, &transN,
-				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
-				&alpha, 
-				VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc, 
-				this->dSm_k[ik][dim], &one_int, &one_int, ParaO.desc,
-				&beta,
-				VECTOR_TO_PTR(force_tmp), &one_int, &one_int, ParaO.desc);
-
-			for(int irc=0; irc<ParaO.nloc; irc++)
-			{
-				dm_VU_dSm.at(dim).at(irc) += force_tmp.at(irc);
-			}
-
-			//=========================================
-			//   the second part
-			//=========================================
-			ZEROS(VECTOR_TO_PTR(force_tmp), ParaO.nloc);
-
-			pzgemm_(&transN, &transC,
-				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
-				&alpha, 
-				this->dSm_k[ik][dim], &one_int, &one_int, ParaO.desc, 
-				VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc,
-				&beta,
-				VECTOR_TO_PTR(force_tmp), &one_int, &one_int, ParaO.desc);
-
-			for(int irc=0; irc<ParaO.nloc; irc++)
-			{
-				dm_VU_dSm.at(dim).at(irc) -= force_tmp.at(irc);
-			}
-		}//end dim
-	}//end ik
+	vector<complex<double>> dm_VU_dSm(GlobalC::ParaO.nloc);
+  vector<complex<double>> dSm_k(GlobalC::ParaO.nloc);
 
 	for(int dim=0; dim<3; dim++)
 	{
-		for(int ir=0; ir<ParaO.nrow; ir++)
+		vector<complex<double>> mat_tmp(GlobalC::ParaO.nloc);
+		vector<complex<double>> force_tmp(GlobalC::ParaO.nloc);
+
+    this->fold_dSm_k(ik, dim, &dSm_k[0]);
+
+		pzgemm_(&transN, &transN,
+			&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
+			&one, 
+			rho_VU, &one_int, &one_int, GlobalC::ParaO.desc, 
+			&dSm_k[0], &one_int, &one_int, GlobalC::ParaO.desc,
+			&zero,
+			&dm_VU_dSm[0], &one_int, &one_int, GlobalC::ParaO.desc);
+
+    for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
+        rho_VU[irc] = dm_VU_dSm[irc];
+  
+    // pdtran(m, n, alpha, a, ia, ja, desca, beta, c, ic, jc, descc)
+    pztranc_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
+            &one, 
+            &rho_VU[0], &one_int, &one_int, GlobalC::ParaO.desc, 
+            &one, 
+            &dm_VU_dSm[0], &one_int, &one_int, GlobalC::ParaO.desc);
+
+    for(int ir=0; ir<GlobalC::ParaO.nrow; ir++)
 		{
-			const int iwt1 = ParaO.MatrixInfo.row_set[ir];
+			const int iwt1 = GlobalC::ParaO.MatrixInfo.row_set[ir];
 			const int iat1 = this->iwt2iat.at(iwt1);
 
-			for(int ic=0; ic<ParaO.ncol; ic++)
+			for(int ic=0; ic<GlobalC::ParaO.ncol; ic++)
 			{
-				const int iwt2 = ParaO.MatrixInfo.col_set[ic];
+				const int iwt2 = GlobalC::ParaO.MatrixInfo.col_set[ic];
 				const int iat2 = this->iwt2iat.at(iwt2);
 
-				const int irc = ic*ParaO.nrow + ir;
+				const int irc = ic*GlobalC::ParaO.nrow + ir;
 
 				if(iat1==iat2 && iwt1==iwt2)
-				{
-					ftmp.at(iat1).at(dim) += dm_VU_dSm.at(dim).at(irc);
-				}	
+					this->force_dftu[iat1][dim] += dm_VU_dSm[irc].real();
 			}//end ic
 		}//end ir
 
-		for(int iat=0; iat<GlobalC::ucell.nat; iat++)
-		{
-			complex<double> val = ftmp.at(iat).at(dim);
-			MPI_Allreduce(&val, &ftmp.at(iat).at(dim), 1, MPI_DOUBLE_COMPLEX, MPI_SUM, MPI_COMM_WORLD);
-
-			this->force_dftu.at(iat).at(dim) = ftmp.at(iat).at(dim).real();
-		}
-	}
+	}//end dim
 
 	return;
 }
 
-
-void DFTU_RELAX::cal_stress_k(const vector<vector<complex<double>>>& VU)
+void DFTU_RELAX::cal_stress_k(const int ik, complex<double>* rho_VU)
 {
 	TITLE("DFTU_RELAX", "cal_stress_k");
 
 	const char transN = 'N', transT = 'T', transC='C';
 	const int  one_int = 1;
-	//const double alpha = 1.0, beta = 0.0;
-	const complex<double> alpha(1.0,0.0), beta(0.0,0.0);
-  const complex<double> zero(0.0,0.0);
-  
-	int count = 0;
+	const complex<double> one(1.0,0.0), minus_half(-0.5,0.0), zero(0.0,0.0);
+
+  vector<complex<double>> dm_VU_sover(GlobalC::ParaO.nloc);
+  vector<complex<double>> dSR_k(GlobalC::ParaO.nloc);
+
 	for(int dim1=0; dim1<3; dim1++)
 	{
 		for(int dim2=dim1; dim2<3; dim2++)
 		{
-			vector<complex<double>> dm_VU_sover(ParaO.nloc, zero);
+			this->fold_dSR_k(ik, dim1, dim2, &dSR_k[0]);
 
-			for(int ik=0; ik<GlobalC::kv.nks; ik++)
+			pzgemm_(&transN, &transN,
+				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
+				&minus_half, 
+				rho_VU, &one_int, &one_int, GlobalC::ParaO.desc, 
+				&dSR_k[0], &one_int, &one_int, GlobalC::ParaO.desc,
+				&zero,
+				&dm_VU_sover[0], &one_int, &one_int, GlobalC::ParaO.desc);
+
+      for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
+        rho_VU[irc] = dm_VU_sover[irc];
+  
+      // pdtran(m, n, alpha, a, ia, ja, desca, beta, c, ic, jc, descc)
+      pztranc_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
+              &one, 
+              &rho_VU[0], &one_int, &one_int, GlobalC::ParaO.desc, 
+              &one, 
+              &dm_VU_sover[0], &one_int, &one_int, GlobalC::ParaO.desc);
+
+			for(int ir=0; ir<GlobalC::ParaO.nrow; ir++)
 			{
-				const int spin = GlobalC::kv.isk[ik];
-				
-				// The first term
-				vector<complex<double>> stress_tmp(ParaO.nloc);
-
-				//Calculate mat_tmp=dm*VU
-				vector<complex<double>> mat_tmp(ParaO.nloc);
-
-				pzgemm_(&transT, &transN,
-					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
-					&alpha, 
-					LOC.wfc_dm_2d.dm_k.at(ik).c, &one_int, &one_int, ParaO.desc, 
-					VECTOR_TO_PTR(VU.at(spin)), &one_int, &one_int, ParaO.desc,
-					&beta,
-					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc);
-
-				pzgemm_(&transN, &transN,
-					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
-					&alpha, 
-					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc, 
-					this->soverlap_k[ik][count], &one_int, &one_int, ParaO.desc,
-					&beta,
-					VECTOR_TO_PTR(stress_tmp), &one_int, &one_int, ParaO.desc);
-
-				for(int irc=0; irc<ParaO.nloc; irc++)
+				const int iwt1 = GlobalC::ParaO.MatrixInfo.row_set[ir];
+				for(int ic=0; ic<GlobalC::ParaO.ncol; ic++)
 				{
-					// dm_VU_sover.at(irc) -= 0.5*stress_tmp.at(irc);
-          dm_VU_sover.at(irc) -= 0.5*stress_tmp.at(irc);
-				}
+					const int iwt2 = GlobalC::ParaO.MatrixInfo.col_set[ic];
+					const int irc = ic*GlobalC::ParaO.nrow + ir;
 
-				// The second term
-				ZEROS(VECTOR_TO_PTR(stress_tmp), ParaO.nloc);
-
-				pzgemm_(&transN, &transC,
-					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
-					&alpha, 
-					this->soverlap_k[ik][count], &one_int, &one_int, ParaO.desc, 
-					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc,
-					&beta,
-					VECTOR_TO_PTR(stress_tmp), &one_int, &one_int, ParaO.desc);
-
-				for(int irc=0; irc<ParaO.nloc; irc++)
-				{
-					// dm_VU_sover.at(irc) += 0.5*stress_tmp.at(irc);
-          dm_VU_sover.at(irc) -= 0.5*stress_tmp.at(irc);
-				}
-
-			}//end ik
-
-			complex<double> stmp(0.0, 0.0);
-			for(int ir=0; ir<ParaO.nrow; ir++)
-			{
-				const int iwt1 = ParaO.MatrixInfo.row_set[ir];
-
-				for(int ic=0; ic<ParaO.ncol; ic++)
-				{
-					const int iwt2 = ParaO.MatrixInfo.col_set[ic];
-
-					const int irc = ic*ParaO.nrow + ir;
-
-					if(iwt1==iwt2) stmp += dm_VU_sover.at(irc);
-
+					if(iwt1==iwt2) stress_dftu[dim1][dim2] += dm_VU_sover[irc].real();
 				}//end ic
-
 			}//end ir
-
-			double val = stmp.real();
-			MPI_Allreduce(&val, &stress_dftu.at(dim1).at(dim2), 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-
-			// complex<double> tmp;
-			// MPI_Allreduce(&stmp, &tmp, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-						
-			count++;
-		}//end dim2
-		
+				
+		}//end dim2	
 	}//end dim1
 	
-	for(int i=0; i<3; i++)
-	{
-		for(int j=0; j<3; j++)
-		{
-			if(i>j) this->stress_dftu.at(i).at(j) = stress_dftu.at(j).at(i);
-		}
-	}
-
-	for(int i=0;i<3;i++)
-	{
-		for(int j=0;j<3;j++)
-		{
-			this->stress_dftu.at(i).at(j) *=  GlobalC::ucell.lat0 / GlobalC::ucell.omega;
-		}
-	}
-
 	return;
 }
 
-
-void DFTU_RELAX::cal_force_gamma(const vector<vector<double>> &VU)
+void DFTU_RELAX::cal_force_gamma(const int spin, double* rho_VU)
 {
 	TITLE("DFTU_RELAX", "cal_force_gamma");
 
 	const char transN = 'N', transT = 'T';
 	const int  one_int = 1;
-	const double alpha = 1.0, beta = 0.0;
+	const double one = 1.0, zero = 0.0, minus_one=1.0;
 	
-	vector<vector<double>> dm_VU_dSm;
-	dm_VU_dSm.resize(3);
+	vector<double> dm_VU_dSm(GlobalC::ParaO.nloc);
+	
 	for(int dim=0; dim<3; dim++)
 	{
-		dm_VU_dSm.at(dim).resize(ParaO.nloc, 0.0);
-	}
+    double* tmp_ptr;
+    if(dim==0) tmp_ptr = GlobalC::LM.DSloc_x;
+    else if(dim==1) tmp_ptr = GlobalC::LM.DSloc_y;
+    else if(dim==2) tmp_ptr = GlobalC::LM.DSloc_z;
 
-	vector<double> force_tmp(ParaO.nloc, 0.0);
-	//Calculate mat_tmp=dm*VU
-	vector<double> mat_tmp(ParaO.nloc, 0.0);
-	
-	for(int ik=0; ik<GlobalC::kv.nks; ik++)
-	{
-		const int spin = GlobalC::kv.isk[ik];
+		pdgemm_(&transN, &transN,
+			&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
+			&one, 
+			rho_VU, &one_int, &one_int, GlobalC::ParaO.desc, 
+			tmp_ptr, &one_int, &one_int, GlobalC::ParaO.desc,
+			&zero,
+			&dm_VU_dSm[0], &one_int, &one_int, GlobalC::ParaO.desc);
 
-		for(int dim=0; dim<3; dim++)
+    for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
+      rho_VU[irc] = dm_VU_dSm[irc];
+  
+    // pdtran(m, n, alpha, a, ia, ja, desca, beta, c, ic, jc, descc)
+    pdtran_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
+            &one, 
+            &rho_VU[0], &one_int, &one_int, GlobalC::ParaO.desc, 
+            &one, 
+            &dm_VU_dSm[0], &one_int, &one_int, GlobalC::ParaO.desc);
+
+    for(int ir=0; ir<GlobalC::ParaO.nrow; ir++)
 		{
-			// The first part
-			if(dim==0) //dim=1,2 are same as dim=0
-			{
-				ZEROS(VECTOR_TO_PTR(mat_tmp), ParaO.nloc);
-
-				pdgemm_(&transT, &transN,
-					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
-					&alpha, 
-					LOC.wfc_dm_2d.dm_gamma.at(spin).c, &one_int, &one_int, ParaO.desc, 
-					VECTOR_TO_PTR(VU.at(spin)), &one_int, &one_int, ParaO.desc,
-					&beta,
-					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc);
-			}
-
-			if(dim==0)
-			{
-				pdgemm_(&transN, &transN,
-					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
-					&alpha, 
-					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc, 
-					LM.DSloc_x, &one_int, &one_int, ParaO.desc,
-					&beta,
-					VECTOR_TO_PTR(force_tmp), &one_int, &one_int, ParaO.desc);
-			}
-			else if(dim==1)
-			{
-				pdgemm_(&transN, &transN,
-					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
-					&alpha, 
-					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc, 
-					LM.DSloc_y, &one_int, &one_int, ParaO.desc,
-					&beta,
-					VECTOR_TO_PTR(force_tmp), &one_int, &one_int, ParaO.desc);
-			}
-			else if(dim==2)
-			{
-				pdgemm_(&transN, &transN,
-					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
-					&alpha, 
-					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc, 
-					LM.DSloc_z, &one_int, &one_int, ParaO.desc,
-					&beta,
-					VECTOR_TO_PTR(force_tmp), &one_int, &one_int, ParaO.desc);
-			}
-			
-			for(int irc=0; irc<ParaO.nloc; irc++)
-			{
-				dm_VU_dSm.at(dim).at(irc) += force_tmp.at(irc);
-			}
-
-			// The second part
-			ZEROS(VECTOR_TO_PTR(force_tmp), ParaO.nloc);
-
-			if(dim==0)
-			{
-				pdgemm_(&transN, &transT,
-					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
-					&alpha, 
-					LM.DSloc_x, &one_int, &one_int, ParaO.desc, 
-					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc,
-					&beta,
-					VECTOR_TO_PTR(force_tmp), &one_int, &one_int, ParaO.desc);
-			}
-			else if(dim==1)
-			{
-				pdgemm_(&transN, &transT,
-					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
-					&alpha, 
-					LM.DSloc_y, &one_int, &one_int, ParaO.desc, 
-					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc,
-					&beta,
-					VECTOR_TO_PTR(force_tmp), &one_int, &one_int, ParaO.desc);
-			}
-			else if(dim==2)
-			{
-				pdgemm_(&transN, &transT,
-					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
-					&alpha, 
-					LM.DSloc_z, &one_int, &one_int, ParaO.desc, 
-					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc,
-					&beta,
-					VECTOR_TO_PTR(force_tmp), &one_int, &one_int, ParaO.desc);
-			}
-
-			for(int irc=0; irc<ParaO.nloc; irc++)
-			{
-				dm_VU_dSm.at(dim).at(irc) -= force_tmp.at(irc);
-			}
-
-		}// end dim
-
-	}//end ik
-
-	vector<vector<double>> ftmp;
-	ftmp.resize(GlobalC::ucell.nat);
-	for(int iat=0; iat<GlobalC::ucell.nat; iat++)
-	{
-		ftmp.at(iat).resize(3, 0.0);
-	}
-
-	for(int dim=0; dim<3; dim++)
-	{
-		for(int ir=0; ir<ParaO.nrow; ir++)
-		{
-			const int iwt1 = ParaO.MatrixInfo.row_set[ir];
+			const int iwt1 = GlobalC::ParaO.MatrixInfo.row_set[ir];
 			const int iat1 = this->iwt2iat.at(iwt1);
 
-			for(int ic=0; ic<ParaO.ncol; ic++)
+			for(int ic=0; ic<GlobalC::ParaO.ncol; ic++)
 			{
-				const int iwt2 = ParaO.MatrixInfo.col_set[ic];
+				const int iwt2 = GlobalC::ParaO.MatrixInfo.col_set[ic];
 				const int iat2 = this->iwt2iat.at(iwt2);
 
-				const int irc = ic*ParaO.nrow + ir;
+				const int irc = ic*GlobalC::ParaO.nrow + ir;
 
 				if(iat1==iat2 && iwt1==iwt2)
-				{
-					ftmp.at(iat1).at(dim) += dm_VU_dSm.at(dim).at(irc);
-				}	
+					this->force_dftu[iat1][dim] += dm_VU_dSm[irc];
+
 			}//end ic
 		}//end ir
-	}//end dim
-
-
-	for(int iat=0; iat<GlobalC::ucell.nat; iat++)
-	{
-		for(int dim=0; dim<3; dim++)
-		{
-			double tmp = 0.0;
-			double val = ftmp.at(iat).at(dim);
-			MPI_Allreduce(&val, &tmp, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-
-			this->force_dftu.at(iat).at(dim) = tmp;
-		}
-
-	}
+	}// end dim
 
 	return;
 }
 
-
-void DFTU_RELAX::cal_stress_gamma(const vector<vector<double>> &VU)
+void DFTU_RELAX::cal_stress_gamma(const int spin, double* rho_VU)
 {
 	TITLE("DFTU_RELAX", "cal_stress_gamma");
 
 	const char transN = 'N', transT = 'T';
 	const int  one_int = 1;
-	const double alpha = 1.0, beta = 0.0;
-	
-	int count = 0;
+	const double alpha = 1.0, beta = 0.0, one=1.0, nius_one_half=-0.5;
+
+  vector<double> dSR_gamma(GlobalC::ParaO.nloc);
+  vector<double> dm_VU_sover(GlobalC::ParaO.nloc);
+
 	for(int dim1=0; dim1<3; dim1++)
 	{
 		for(int dim2=dim1; dim2<3; dim2++)
-		{
-			vector<double> dm_VU_sover(ParaO.nloc, 0.0);
+		{	
+      this->fold_dSR_gamma(dim1, dim2, &dSR_gamma[0]);
 
-			for(int ik=0; ik<GlobalC::kv.nks; ik++)
+			pdgemm_(&transN, &transN,
+				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
+				&nius_one_half, 
+				&rho_VU[0], &one_int, &one_int, GlobalC::ParaO.desc, 
+				&dSR_gamma[0], &one_int, &one_int, GlobalC::ParaO.desc,
+				&beta,
+				&dm_VU_sover[0], &one_int, &one_int, GlobalC::ParaO.desc);
+
+      for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
+        rho_VU[irc] = dm_VU_sover[irc];
+  
+      // pdtran(m, n, alpha, a, ia, ja, desca, beta, c, ic, jc, descc)
+      pdtran_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
+              &one, 
+              &rho_VU[0], &one_int, &one_int, GlobalC::ParaO.desc, 
+              &one, 
+              &dm_VU_sover[0], &one_int, &one_int, GlobalC::ParaO.desc);
+
+			for(int ir=0; ir<GlobalC::ParaO.nrow; ir++)
 			{
-				const int spin = GlobalC::kv.isk[ik];
-				
-				// The first term
-				vector<double> stress_tmp(ParaO.nloc, 0.0);
+				const int iwt1 = GlobalC::ParaO.MatrixInfo.row_set[ir];
 
-				//Calculate mat_tmp=dm*VU
-				vector<double> mat_tmp(ParaO.nloc, 0.0);
-
-				pdgemm_(&transT, &transN,
-					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
-					&alpha, 
-					LOC.wfc_dm_2d.dm_gamma.at(spin).c, &one_int, &one_int, ParaO.desc, 
-					VECTOR_TO_PTR(VU.at(spin)), &one_int, &one_int, ParaO.desc,
-					&beta,
-					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc);
-
-				pdgemm_(&transN, &transN,
-					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
-					&alpha, 
-					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc, 
-					this->soverlap_gamma[count], &one_int, &one_int, ParaO.desc,
-					&beta,
-					VECTOR_TO_PTR(stress_tmp), &one_int, &one_int, ParaO.desc);
-
-				for(int irc=0; irc<ParaO.nloc; irc++)
+				for(int ic=0; ic<GlobalC::ParaO.ncol; ic++)
 				{
-					dm_VU_sover.at(irc) -= 0.5*stress_tmp.at(irc);
-				}
+					const int iwt2 = GlobalC::ParaO.MatrixInfo.col_set[ic];
 
-				// The second term
-				ZEROS(VECTOR_TO_PTR(stress_tmp), ParaO.nloc);
+					const int irc = ic*GlobalC::ParaO.nrow + ir;
 
-				pdgemm_(&transN, &transT,
-					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
-					&alpha, 
-					this->soverlap_gamma[count], &one_int, &one_int, ParaO.desc, 
-					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc,
-					&beta,
-					VECTOR_TO_PTR(stress_tmp), &one_int, &one_int, ParaO.desc);
-
-				for(int irc=0; irc<ParaO.nloc; irc++)
-				{
-					dm_VU_sover.at(irc) -= 0.5*stress_tmp.at(irc);
-				}
-
-			}//end ik
-
-			double stmp = 0.0;
-			for(int ir=0; ir<ParaO.nrow; ir++)
-			{
-				const int iwt1 = ParaO.MatrixInfo.row_set[ir];
-
-				for(int ic=0; ic<ParaO.ncol; ic++)
-				{
-					const int iwt2 = ParaO.MatrixInfo.col_set[ic];
-
-					const int irc = ic*ParaO.nrow + ir;
-
-					if(iwt1==iwt2) stmp += dm_VU_sover.at(irc);
+					if(iwt1==iwt2) stress_dftu[dim1][dim2] += dm_VU_sover[irc];
 
 				}//end ic
-
 			}//end ir
 
-			MPI_Allreduce(&stmp, &stress_dftu.at(dim1).at(dim2), 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-			
-			
-			count++;
 		}//end dim2
-		
 	}//end dim1
 
-	
-	for(int i=0; i<3; i++)
-	{
-		for(int j=0; j<3; j++)
-		{
-			if(i>j) this->stress_dftu.at(i).at(j) = stress_dftu.at(j).at(i);
-		}
-	}
-
-	for(int i=0;i<3;i++)
-	{
-		for(int j=0;j<3;j++)
-		{
-			this->stress_dftu.at(i).at(j) *=  GlobalC::ucell.lat0 / GlobalC::ucell.omega;
-		}
-	}
-
 	return;
 }
-
-
-void DFTU_RELAX::folding_dSm_soverlap()
-{
-	TITLE("DFTU_RELAX", "folding_dSm_soverlap");
-
-	int nnr = 0;
-
-	if(GlobalV::GAMMA_ONLY_LOCAL)
-	{
-		if(GlobalV::STRESS)
-		{
-			for(int i=0; i<6; i++)
-			{
-				ZEROS(soverlap_gamma[i], ParaO.nloc);
-			}			
-		}
-	}
-	else
-	{
-		for(int ik=0; ik<GlobalC::kv.nks; ik++)
-		{
-			for(int dim=0; dim<3; dim++)
-			{
-				ZEROS(dSm_k[ik][dim], ParaO.nloc);
-			}
-		}
-
-		if(GlobalV::STRESS)
-		{
-			for(int ik=0; ik<GlobalC::kv.nks; ik++)
-			{
-				for(int i=0; i<6; i++)
-				{
-					ZEROS(soverlap_k[ik][i], ParaO.nloc);
-				}
-			}
-		}
-	}
-	
-
-	  Vector3<double> tau1, tau2, dtau;
-	  Vector3<double> dtau1, dtau2, tau0;
-    for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
-    {
-		  Atom* atom1 = &GlobalC::ucell.atoms[T1];
-      for(int I1=0; I1<atom1->na; ++I1)
-      {
-			  tau1 = atom1->tau[I1];
-        const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);    
-
-        GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
-        for(int ad=0; ad<GridD.getAdjacentNum()+1; ++ad)
-        {
-          const int T2 = GridD.getType(ad);
-				  const int I2 = GridD.getNatom(ad);
-          const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-
-				  Atom* atom2 = &GlobalC::ucell.atoms[T2];
-
-				  tau2 = GridD.getAdjacentTau(ad);
-				  dtau = tau2 - tau1;
-
-				  double distance = dtau.norm() * GlobalC::ucell.lat0;
-				  double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
-
-          bool adj = false;
-				  if(distance < rcut) adj = true;
-				  else if(distance >= rcut)
-				  {
-				  	for (int ad0 = 0; ad0 < GridD.getAdjacentNum()+1; ++ad0)
-				  	{
-				  		const int T0 = GridD.getType(ad0); 
-				  		const int I0 = GridD.getNatom(ad0); 
-				  		const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
-				  		const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
-
-				  		tau0 = GridD.getAdjacentTau(ad0);
-				  		dtau1 = tau0 - tau1;
-				  		dtau2 = tau0 - tau2;
-
-				  		double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
-				  		double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
-
-				  		double rcut1 = ORB.Phi[T1].getRcut() + ORB.Beta[T0].get_rcut_max();
-				  		double rcut2 = ORB.Phi[T2].getRcut() + ORB.Beta[T0].get_rcut_max();
-
-				  		if( distance1 < rcut1 && distance2 < rcut2 )
-				  		{
-				  			adj = true;
-				  			break;
-				  		}
-				  	}
-				  }				
-
-				  if(adj)
-				  {
-				  	for(int jj=0; jj<atom1->nw*GlobalV::NPOL; ++jj)
-				  	{
-              const int jj0 = jj/GlobalV::NPOL;
-
-              const int iw1_all = start1 + jj0; 
-              const int mu = ParaO.trace_loc_row[iw1_all];
-					    if(mu<0)continue;
-
-				  		const int L1 = atom1->iw2l[jj0];
-				  		const int N1 = atom1->iw2n[jj0];
-				  		const int m1 = atom1->iw2m[jj0];
-
-
-				  		for(int kk=0; kk<atom2->nw*GlobalV::NPOL; ++kk)
-				  		{
-                const int kk0 = kk/GlobalV::NPOL;
-
-                const int iw2_all = start2 + kk0;
-						    const int nu = ParaO.trace_loc_col[iw2_all];
-						    if(nu<0)continue;
-
-				  			const int L2 = atom2->iw2l[kk0];
-				  			const int N2 = atom2->iw2n[kk0];
-				  			const int m2 = atom2->iw2m[kk0];
-  
-				  			// if ( !ParaO.in_this_processor(iw1_all,iw2_all) )
-				  			// {
-				  				// ++iw2_all;
-				  				// continue;
-				  			// }
-
-				  			// int mu = ParaO.trace_loc_row[iw1_all];
-				  			// int nu = ParaO.trace_loc_col[iw2_all];
-				  			int irc = nu*ParaO.nrow + mu;
-  
-				  			if(GlobalV::GAMMA_ONLY_LOCAL)
-							  {
-							  	if(GlobalV::STRESS)
-							  	{
-							  		this->soverlap_gamma[0][irc] += LM.DSloc_Rx[nnr]*LM.DH_r[nnr*3+0];
-							  		this->soverlap_gamma[1][irc] += LM.DSloc_Rx[nnr]*LM.DH_r[nnr*3+1];
-							  		this->soverlap_gamma[2][irc] += LM.DSloc_Rx[nnr]*LM.DH_r[nnr*3+2];
-							  		this->soverlap_gamma[3][irc] += LM.DSloc_Ry[nnr]*LM.DH_r[nnr*3+1];
-							  		this->soverlap_gamma[4][irc] += LM.DSloc_Ry[nnr]*LM.DH_r[nnr*3+2];
-							  		this->soverlap_gamma[5][irc] += LM.DSloc_Rz[nnr]*LM.DH_r[nnr*3+2];
-							  	}
-							  }
-				  			else
-				  			{
-				  				Vector3<double> dR(GridD.getBox(ad).x, GridD.getBox(ad).y, GridD.getBox(ad).z); 
-  
-				  				for(int ik=0; ik<GlobalC::kv.nks; ik++)
-				  				{
-				  					const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * TWO_PI;
-				  					const complex<double> kphase( cos(arg),  sin(arg) );
-
-				  					this->dSm_k[ik][0][irc] += LM.DSloc_Rx[nnr]*kphase;
-				  					this->dSm_k[ik][1][irc] += LM.DSloc_Ry[nnr]*kphase;
-				  					this->dSm_k[ik][2][irc] += LM.DSloc_Rz[nnr]*kphase;
-
-				  					if(GlobalV::STRESS)
-				  					{		
-				  						this->soverlap_k[ik][0][irc] += LM.DSloc_Rx[nnr]*LM.DH_r[nnr*3+0]*kphase;
-				  						this->soverlap_k[ik][1][irc] += LM.DSloc_Rx[nnr]*LM.DH_r[nnr*3+1]*kphase;
-				  						this->soverlap_k[ik][2][irc] += LM.DSloc_Rx[nnr]*LM.DH_r[nnr*3+2]*kphase;
-				  						this->soverlap_k[ik][3][irc] += LM.DSloc_Ry[nnr]*LM.DH_r[nnr*3+1]*kphase;
-				  						this->soverlap_k[ik][4][irc] += LM.DSloc_Ry[nnr]*LM.DH_r[nnr*3+2]*kphase;
-				  						this->soverlap_k[ik][5][irc] += LM.DSloc_Rz[nnr]*LM.DH_r[nnr*3+2]*kphase;																
-				  					}
-				  				}
-				  			}
-				  			++nnr;
-				  		}// kk
-				    }// jj
-				  }// adj
-				  // else if(distance>=rcut)
-				  // {
-				  	// int start1 = GlobalC::ucell.itiaiw2iwt( T1, I1, 0);
-				  	// int start2 = GlobalC::ucell.itiaiw2iwt( T2, I2, 0);
-				  	// bool is_adj = false;
-				  	// for (int ad0=0; ad0<GridD.getAdjacentNum()+1; ++ad0)
-				  	// {
-				  	// 	const int T0 = GridD.getType(ad0);
-				  		
-				  	// 	tau0 = GridD.getAdjacentTau(ad0);
-				  	// 	dtau1 = tau0 - tau1;
-				  	// 	double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
-				  	// 	double rcut1 = ORB.Phi[T1].getRcut() + ORB.Beta[T0].get_rcut_max();
-				  	// 	dtau2 = tau0 - tau2;
-				  	// 	double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
-				  	// 	double rcut2 = ORB.Phi[T2].getRcut() + ORB.Beta[T0].get_rcut_max();
-				  	// 	if(distance1<rcut1 && distance2<rcut2)
-				  	// 	{
-				  	// 		is_adj = true;
-				  	// 		break;
-				  	// 	}
-				  	// }//ad0
-				  	// if( is_adj )
-				  	// {
-				  // 		for(int jj=0; jj<atom1->nw * GlobalV::NPOL; ++jj)
-				  // 		{
-				  // 			const int mu = ParaO.trace_loc_row[start1+jj];
-				  // 			if(mu<0) continue; 
-
-				  // 			for(int kk=0; kk<atom2->nw * GlobalV::NPOL; ++kk)
-				  // 			{
-				  // 				const int nu = ParaO.trace_loc_col[start2+kk];
-				  // 				if(nu<0) continue;
-
-				  // 				++nnr;
-				  // 			}//kk
-				  // 		}//jj
-				  // 	// }
-				  // }//distance
-			  }// ad
-		  }// I1
-	  }// T1
-
-	return;
-}
-
-
-void DFTU_RELAX::allocate_force_stress()
-{
-	TITLE("DFTU_RELAX","allocate_force_stress");
-
-	if(GlobalV::GAMMA_ONLY_LOCAL)
-	{
-		if(GlobalV::STRESS)
-		{
-			// this->soverlap_gamma.resize(6);   //xx, xy, xz, yy, yz, zz
-			// for(int i=0; i<6; i++)
-			// {				
-				// this->soverlap_gamma.at(i).resize(ParaO.nloc, 0.0);
-			// }
-			soverlap_gamma = new double* [6];
-			for(int i=0; i<6; i++)
-			{				
-				soverlap_gamma[i] = new double [ParaO.nloc];
-			}
-		}
-	}
-	else
-	{
-		dSm_k = new complex<double>** [GlobalC::kv.nks];
-		//this->dSm_k.resize(GlobalC::kv.nks);
-
-		for(int ik=0; ik<GlobalC::kv.nks; ik++)
-		{
-			//this->dSm_k.at(ik).resize(3);
-			dSm_k[ik] = new complex<double>* [3];
-			for(int dim=0; dim<3; dim++)
-			{
-				//this->dSm_k.at(ik).at(dim).resize(ParaO.nloc, ZERO);
-				dSm_k[ik][dim] = new complex<double>[ParaO.nloc];
-			}
-		}
-
-		if(GlobalV::STRESS)
-		{
-			//this->soverlap_k.resize(GlobalC::kv.nks);
-			soverlap_k = new complex<double>** [GlobalC::kv.nks];
-
-			for(int ik=0; ik<GlobalC::kv.nks; ik++)
-			{
-				//this->soverlap_k.at(ik).resize(6);   //xx, xy, xz, yy, yz, zz
-				soverlap_k[ik] = new complex<double>* [6];
-				for(int i=0; i<6; i++)
-				{				
-					//this->soverlap_k.at(ik).at(i).resize(ParaO.nloc, ZERO);
-					soverlap_k[ik][i] = new complex<double> [ParaO.nloc];
-				}
-			}
-		}
-	}
-	
-	return;
-}
-
-
-void DFTU_RELAX::erase_force_stress()
-{
-	TITLE("DFTU_RELAX","erase_force_stress");
-
-	if(GlobalV::GAMMA_ONLY_LOCAL)
-	{
-		if(GlobalV::STRESS)
-		{
-			//this->soverlap_gamma.resize(6);   //xx, xy, xz, yy, yz, zz
-			for(int i=0; i<6; i++)
-			{				
-				//this->soverlap_gamma.at(i).resize(1, 0.0);
-				delete [] soverlap_gamma[i];
-			}
-			delete [] soverlap_gamma;
-      soverlap_gamma=nullptr;
-		}
-	}
-	else
-	{
-		//this->dSm_k.resize(GlobalC::kv.nks);
-
-		for(int ik=0; ik<GlobalC::kv.nks; ik++)
-		{
-			//this->dSm_k.at(ik).resize(3);
-			for(int dim=0; dim<3; dim++)
-			{
-				//this->dSm_k.at(ik).at(dim).resize(1, ZERO);
-				delete [] dSm_k[ik][dim];
-			}
-			delete [] dSm_k[ik];
-		}
-		delete [] dSm_k;
-    dSm_k = nullptr;
-
-		if(GlobalV::STRESS)
-		{
-			//this->soverlap_k.resize(GlobalC::kv.nks);
-
-			for(int ik=0; ik<GlobalC::kv.nks; ik++)
-			{
-				//this->soverlap_k.at(ik).resize(6);   //xx, xy, xz, yy, yz, zz
-				for(int i=0; i<6; i++)
-				{		
-					//this->soverlap_k.at(ik).at(i).resize(1, ZERO);
-					delete [] soverlap_k[ik][i];
-				}
-				delete [] soverlap_k[ik];
-			}
-			delete [] soverlap_k;
-      soverlap_k = nullptr;
-		}
-	}
-			
-	return;
-}
-
 
 double DFTU_RELAX::get_onebody_eff_pot
 (
 	const int T, const int iat,
 	const int L, const int N, const int spin, 
 	const int m0, const int m1,
-    const int type, const bool newlocale 
+  const int type, const bool newlocale 
 )
 {
 	TITLE("DFTU_RELAX","get_onebody_eff_pot");
@@ -1155,4 +514,420 @@ double DFTU_RELAX::get_onebody_eff_pot
 	}
 
 	return VU;
+}
+
+void DFTU_RELAX::cal_VU_pot_mat_complex(const int spin, const bool newlocale, complex<double>* VU)
+{
+  TITLE("DFTU_RELAX","cal_VU_pot_mat_complex"); 
+	// timer::tick("DFTU","folding_overlap_matrix");
+  ZEROS(VU, GlobalC::ParaO.nloc);
+
+  for(int it=0; it<GlobalC::ucell.ntype; ++it)
+	{
+    if(INPUT.orbital_corr[it]==-1) continue;
+		for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
+		{
+      const int iat = GlobalC::ucell.itia2iat(it, ia);
+			for(int L=0; L<=GlobalC::ucell.atoms[it].nwl; L++)
+			{			
+        if(L!=INPUT.orbital_corr[it] ) continue;
+
+				for(int n=0; n<GlobalC::ucell.atoms[it].l_nchi[L]; n++)
+				{
+					// if(Yukawa)
+			    // {
+			    	// if(L1<INPUT.orbital_corr[T1] || L2<INPUT.orbital_corr[T2]) continue;
+			    // }
+			    // else
+			    // {
+			    	if(n!=0) continue;
+			    // }
+          for(int m1=0; m1<2*L+1; m1++)
+          {
+            for(int ipol1=0; ipol1<GlobalV::NPOL; ipol1++)
+		  		  {
+		  			  const int mu = GlobalC::ParaO.trace_loc_row[this->iatlnmipol2iwt[iat][L][n][m1][ipol1]];
+              if(mu<0) continue;
+
+              for(int m2=0; m2<2*L+1; m2++)
+              {
+                for(int ipol2=0; ipol2<GlobalV::NPOL; ipol2++)
+                {
+                  const int nu = GlobalC::ParaO.trace_loc_col[this->iatlnmipol2iwt[iat][L][n][m2][ipol2]];
+                  if(nu<0) continue;
+
+                  int m1_all = m1 + (2*L+1)*ipol1;
+			            int m2_all = m2 + (2*L+1)*ipol2;
+                  
+                  double val = this->get_onebody_eff_pot(it, iat, L, n, spin, m1_all, m2_all, cal_type, newlocale);
+			            VU[nu*GlobalC::ParaO.nrow + mu] = complex<double>(val, 0.0);
+                }//ipol2
+              }//m2
+            }//ipol1
+          }//m1
+				}//n
+			}//l
+		}//ia	
+	}//it
+
+  return;
+}
+
+void DFTU_RELAX::cal_VU_pot_mat_real(const int spin, const bool newlocale, double* VU)
+{
+  TITLE("DFTU_RELAX","cal_VU_pot_mat_real"); 
+	// timer::tick("DFTU","folding_overlap_matrix");
+  ZEROS(VU, GlobalC::ParaO.nloc);
+
+  for(int it=0; it<GlobalC::ucell.ntype; ++it)
+	{
+    if(INPUT.orbital_corr[it]==-1) continue;
+		for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
+		{
+      const int iat = GlobalC::ucell.itia2iat(it, ia);
+			for(int L=0; L<=GlobalC::ucell.atoms[it].nwl; L++)
+			{			
+        if(L!=INPUT.orbital_corr[it] ) continue;
+
+				for(int n=0; n<GlobalC::ucell.atoms[it].l_nchi[L]; n++)
+				{
+					// if(Yukawa)
+			    // {
+			    	// if(L1<INPUT.orbital_corr[T1] || L2<INPUT.orbital_corr[T2]) continue;
+			    // }
+			    // else
+			    // {
+			    	if(n!=0) continue;
+			    // }
+          for(int m1=0; m1<2*L+1; m1++)
+          {
+            for(int ipol1=0; ipol1<GlobalV::NPOL; ipol1++)
+		  		  {
+		  			  const int mu = GlobalC::ParaO.trace_loc_row[this->iatlnmipol2iwt[iat][L][n][m1][ipol1]];
+              if(mu<0) continue;
+              for(int m2=0; m2<2*L+1; m2++)
+              {
+                for(int ipol2=0; ipol2<GlobalV::NPOL; ipol2++)
+                {
+                  const int nu = GlobalC::ParaO.trace_loc_col[this->iatlnmipol2iwt[iat][L][n][m2][ipol2]];
+                  if(nu<0) continue;
+
+                  int m1_all = m1 + (2*L+1)*ipol1;
+			            int m2_all = m2 + (2*L+1)*ipol2;
+                  
+                  VU[nu*GlobalC::ParaO.nrow + mu] = this->get_onebody_eff_pot(it, iat, L, n, spin, m1_all, m2_all, cal_type, newlocale);
+
+                }//ipol2
+              }//m2
+            }//ipol1
+          }//m1
+				}//n
+			}//l
+		}//ia	
+	}//it
+
+  return;
+}
+
+void DFTU_RELAX::fold_dSR_gamma(const int dim1, const int dim2, double* dSR_gamma)
+{
+  TITLE("DFTU_RELAX","fold_dSR_gamma");
+
+  ZEROS(dSR_gamma, GlobalC::ParaO.nloc);
+
+  double* dS_ptr;
+  if(dim1==0) dS_ptr =  GlobalC::LM.DSloc_Rx;
+  else if(dim1==1) dS_ptr =  GlobalC::LM.DSloc_Ry;
+  else if(dim1==2) dS_ptr =  GlobalC::LM.DSloc_Rz;
+
+  int nnr = 0;
+	Vector3<double> tau1, tau2, dtau;
+	Vector3<double> dtau1, dtau2, tau0;
+  for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
+  {
+	  Atom* atom1 = &GlobalC::ucell.atoms[T1];
+    for(int I1=0; I1<atom1->na; ++I1)
+    {
+		  tau1 = atom1->tau[I1];
+      const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);    
+      GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+      for(int ad=0; ad<GlobalC::GridD.getAdjacentNum()+1; ++ad)
+      {
+        const int T2 = GlobalC::GridD.getType(ad);
+			  const int I2 = GlobalC::GridD.getNatom(ad);
+        const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
+			  Atom* atom2 = &GlobalC::ucell.atoms[T2];
+			  tau2 = GlobalC::GridD.getAdjacentTau(ad);
+			  dtau = tau2 - tau1;
+			  double distance = dtau.norm() * GlobalC::ucell.lat0;
+			  double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
+        bool adj = false;
+			  if(distance < rcut) adj = true;
+			  else if(distance >= rcut)
+			  {
+			  	for (int ad0 = 0; ad0 < GlobalC::GridD.getAdjacentNum()+1; ++ad0)
+			  	{
+			  		const int T0 = GlobalC::GridD.getType(ad0); 
+			  		const int I0 = GlobalC::GridD.getNatom(ad0); 
+			  		const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
+			  		const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
+			  		tau0 = GlobalC::GridD.getAdjacentTau(ad0);
+			  		dtau1 = tau0 - tau1;
+			  		dtau2 = tau0 - tau2;
+			  		double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
+			  		double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
+			  		double rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
+			  		double rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
+			  		if( distance1 < rcut1 && distance2 < rcut2 )
+			  		{
+			  			adj = true;
+			  			break;
+			  		}
+			  	}
+			  }	
+
+			  if(adj)
+			  {
+			  	for(int jj=0; jj<atom1->nw*GlobalV::NPOL; ++jj)
+			  	{
+            const int jj0 = jj/GlobalV::NPOL;
+            const int iw1_all = start1 + jj0; 
+            const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
+				    if(mu<0)continue;
+			  		const int L1 = atom1->iw2l[jj0];
+			  		const int N1 = atom1->iw2n[jj0];
+			  		const int m1 = atom1->iw2m[jj0];
+			  		for(int kk=0; kk<atom2->nw*GlobalV::NPOL; ++kk)
+			  		{
+              const int kk0 = kk/GlobalV::NPOL;
+              const int iw2_all = start2 + kk0;
+					    const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
+					    if(nu<0)continue;
+
+              dSR_gamma[nu*GlobalC::ParaO.nrow + mu] += dS_ptr[nnr]*GlobalC::LM.DH_r[nnr*3+dim2];
+
+			  			++nnr;
+			  		}// kk
+			    }// jj
+			  }// adj
+		  }// ad
+	  }// I1
+	}// T1
+
+	return;
+}
+
+void DFTU_RELAX::fold_dSm_k(const int ik, const int dim, complex<double>* dSm_k)
+{
+  TITLE("DFTU_RELAX","fold_dSm_k");
+
+  ZEROS(dSm_k, GlobalC::ParaO.nloc);
+
+  double* dSm_ptr;
+  if(dim==0) dSm_ptr = GlobalC::LM.DSloc_Rx;
+  else if(dim==1) dSm_ptr = GlobalC::LM.DSloc_Ry;
+  else if(dim==2) dSm_ptr = GlobalC::LM.DSloc_Rz;
+
+  int nnr = 0;
+
+	Vector3<double> tau1, tau2, dtau;
+	Vector3<double> dtau1, dtau2, tau0;
+  for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
+  {
+	  Atom* atom1 = &GlobalC::ucell.atoms[T1];
+    for(int I1=0; I1<atom1->na; ++I1)
+    {
+		  tau1 = atom1->tau[I1];
+      const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);    
+
+      GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+      for(int ad=0; ad<GlobalC::GridD.getAdjacentNum()+1; ++ad)
+      {
+        const int T2 = GlobalC::GridD.getType(ad);
+			  const int I2 = GlobalC::GridD.getNatom(ad);
+        const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
+
+			  Atom* atom2 = &GlobalC::ucell.atoms[T2];
+
+			  tau2 = GlobalC::GridD.getAdjacentTau(ad);
+			  dtau = tau2 - tau1;
+
+			  double distance = dtau.norm() * GlobalC::ucell.lat0;
+			  double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
+
+        bool adj = false;
+			  if(distance < rcut) adj = true;
+			  else if(distance >= rcut)
+			  {
+			  	for (int ad0 = 0; ad0 < GlobalC::GridD.getAdjacentNum()+1; ++ad0)
+			  	{
+			  		const int T0 = GlobalC::GridD.getType(ad0); 
+			  		const int I0 = GlobalC::GridD.getNatom(ad0); 
+			  		const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
+			  		const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
+
+			  		tau0 = GlobalC::GridD.getAdjacentTau(ad0);
+			  		dtau1 = tau0 - tau1;
+			  		dtau2 = tau0 - tau2;
+
+			  		double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
+			  		double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
+
+			  		double rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
+			  		double rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
+
+			  		if( distance1 < rcut1 && distance2 < rcut2 )
+			  		{
+			  			adj = true;
+			  			break;
+			  		}
+			  	}
+			  }				
+
+			  if(adj)
+			  {
+			  	for(int jj=0; jj<atom1->nw*GlobalV::NPOL; ++jj)
+			  	{
+            const int jj0 = jj/GlobalV::NPOL;
+
+            const int iw1_all = start1 + jj0; 
+            const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
+				    if(mu<0)continue;
+
+			  		const int L1 = atom1->iw2l[jj0];
+			  		const int N1 = atom1->iw2n[jj0];
+			  		const int m1 = atom1->iw2m[jj0];
+
+
+			  		for(int kk=0; kk<atom2->nw*GlobalV::NPOL; ++kk)
+			  		{
+              const int kk0 = kk/GlobalV::NPOL;
+
+              const int iw2_all = start2 + kk0;
+					    const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
+					    if(nu<0)continue;
+
+			  			Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
+			  			const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * TWO_PI;
+			  			const complex<double> kphase( cos(arg),  sin(arg) );
+
+			  			dSm_k[nu*GlobalC::ParaO.nrow + mu] += dSm_ptr[nnr]*kphase;
+
+			  			++nnr;
+			  		}// kk
+			    }// jj
+			  }// adj
+			
+		  }// ad
+	  }// I1
+	}// T1
+
+	return;
+}
+
+void DFTU_RELAX::fold_dSR_k(const int ik, const int dim1, const int dim2, complex<double>* dSR_k)
+{
+  TITLE("DFTU_RELAX","fold_dSR_k");
+
+  ZEROS(dSR_k, GlobalC::ParaO.nloc);
+
+  double* dSm_ptr;
+  if(dim1==0) dSm_ptr = GlobalC::LM.DSloc_Rx;
+  else if(dim1==1) dSm_ptr = GlobalC::LM.DSloc_Ry;
+  else if(dim1==2) dSm_ptr = GlobalC::LM.DSloc_Rz;
+
+  int nnr = 0;
+	Vector3<double> tau1, tau2, dtau;
+	Vector3<double> dtau1, dtau2, tau0;
+  for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
+  {
+	  Atom* atom1 = &GlobalC::ucell.atoms[T1];
+    for(int I1=0; I1<atom1->na; ++I1)
+    {
+		  tau1 = atom1->tau[I1];
+      const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);    
+
+      GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+      for(int ad=0; ad<GlobalC::GridD.getAdjacentNum()+1; ++ad)
+      {
+        const int T2 = GlobalC::GridD.getType(ad);
+			  const int I2 = GlobalC::GridD.getNatom(ad);
+        const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
+
+			  Atom* atom2 = &GlobalC::ucell.atoms[T2];
+
+			  tau2 = GlobalC::GridD.getAdjacentTau(ad);
+			  dtau = tau2 - tau1;
+
+			  double distance = dtau.norm() * GlobalC::ucell.lat0;
+			  double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
+
+        bool adj = false;
+			  if(distance < rcut) adj = true;
+			  else if(distance >= rcut)
+			  {
+			  	for (int ad0 = 0; ad0 < GlobalC::GridD.getAdjacentNum()+1; ++ad0)
+			  	{
+			  		const int T0 = GlobalC::GridD.getType(ad0); 
+			  		const int I0 = GlobalC::GridD.getNatom(ad0); 
+			  		const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
+			  		const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
+
+			  		tau0 = GlobalC::GridD.getAdjacentTau(ad0);
+			  		dtau1 = tau0 - tau1;
+			  		dtau2 = tau0 - tau2;
+
+			  		double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
+			  		double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
+
+			  		double rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
+			  		double rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
+
+			  		if( distance1 < rcut1 && distance2 < rcut2 )
+			  		{
+			  			adj = true;
+			  			break;
+			  		}
+			  	}
+			  }				
+
+			  if(adj)
+			  {
+			  	for(int jj=0; jj<atom1->nw*GlobalV::NPOL; ++jj)
+			  	{
+            const int jj0 = jj/GlobalV::NPOL;
+
+            const int iw1_all = start1 + jj0; 
+            const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
+				    if(mu<0)continue;
+
+			  		const int L1 = atom1->iw2l[jj0];
+			  		const int N1 = atom1->iw2n[jj0];
+			  		const int m1 = atom1->iw2m[jj0];
+
+
+			  		for(int kk=0; kk<atom2->nw*GlobalV::NPOL; ++kk)
+			  		{
+              const int kk0 = kk/GlobalV::NPOL;
+
+              const int iw2_all = start2 + kk0;
+					    const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
+					    if(nu<0)continue;
+              	
+			  			Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
+			  			const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * TWO_PI;
+			  			const complex<double> kphase( cos(arg),  sin(arg) );
+
+			  			dSR_k[nu*GlobalC::ParaO.nrow + mu] += dSm_ptr[nnr]*GlobalC::LM.DH_r[nnr*3+dim2]*kphase;														
+
+			  			++nnr;
+			  		}// kk
+			    }// jj
+			  }// adj
+        
+		  }// ad
+	  }// I1
+	}// T1
+
+	return;
 }

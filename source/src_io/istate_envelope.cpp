@@ -21,21 +21,21 @@ void IState_Envelope::begin(void)
 	}
 
 	// (1) 
-	// (1.1) allocate the space for LOWF.WFC_GAMMA
+	// (1.1) allocate the space for GlobalC::LOWF.WFC_GAMMA
 
 	// (1.2) read in LOWF_GAMMA.dat
 
-	OUT(GlobalV::ofs_running,"LOWF.allocate_flag",LOWF.get_allocate_flag());	
+	OUT(GlobalV::ofs_running,"GlobalC::LOWF.allocate_flag",GlobalC::LOWF.get_allocate_flag());	
 
 	// mohan update 2011-03-21
 	// if ucell is odd, it's correct,
 	// if ucell is even, it's also correct.
 	// +1.0e-8 in case like (2.999999999+1)/2
-	int fermi_band = static_cast<int>( (CHR.nelec+1)/2 + 1.0e-8 ) ;
+	int fermi_band = static_cast<int>( (GlobalC::CHR.nelec+1)/2 + 1.0e-8 ) ;
 	int bands_below = GlobalV::NBANDS_ISTATE;
 	int bands_above = GlobalV::NBANDS_ISTATE;
 
-	cout << " number of electrons = " << CHR.nelec << endl;
+	cout << " number of electrons = " << GlobalC::CHR.nelec << endl;
 	cout << " number of occupied bands = " << fermi_band << endl;
 	cout << " plot band decomposed charge density below fermi surface with " 
 	<< bands_below << " bands." << endl;
@@ -72,25 +72,25 @@ void IState_Envelope::begin(void)
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{
 				cout << " Perform envelope function for band " << ib+1 << endl;
-				ZEROS(CHR.rho[is],GlobalC::pw.nrxx);	
+				ZEROS(GlobalC::CHR.rho[is],GlobalC::pw.nrxx);	
 
 
 				//---------------------------------------------------------
-				// LOWF.WFC_GAMMA has been replaced by wfc_dm_2d.cpp 
+				// GlobalC::LOWF.WFC_GAMMA has been replaced by wfc_dm_2d.cpp 
 				// we need to fix this function in near future.
 				// -- mohan add 2021-02-09
 				//---------------------------------------------------------
-				WARNING_QUIT("IState_Charge::idmatrix","need to update LOWF.WFC_GAMMA");
+				WARNING_QUIT("IState_Charge::idmatrix","need to update GlobalC::LOWF.WFC_GAMMA");
 
-				//UHM.GG.cal_env( LOWF.WFC_GAMMA[is][ib], CHR.rho[is] );
+				//GlobalC::UHM.GG.cal_env( GlobalC::LOWF.WFC_GAMMA[is][ib], GlobalC::CHR.rho[is] );
 
 
-				CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09
+				GlobalC::CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09
 				stringstream ss;
 				ss << GlobalV::global_out_dir << "BAND" << ib + 1 << "_ENV" << is+1 << "_CHG";
 				// 0 means definitely output charge density.
 				bool for_plot = true;
-				CHR.write_rho(CHR.rho_save[is], is, 0, ss.str(), 3, for_plot );
+				GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, 0, ss.str(), 3, for_plot );
 			}
 		}
 	}

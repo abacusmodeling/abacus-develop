@@ -61,13 +61,13 @@ void Cal_Test::test_memory(void)
 	mrho_core = mrho;
 
 	// (2) memory for charge mixing
-	cout << " Mixing mode = " << CHR.mixing_mode << endl;
-	if(CHR.mixing_mode == "pulay")
+	cout << " Mixing mode = " << GlobalC::CHR.mixing_mode << endl;
+	if(GlobalC::CHR.mixing_mode == "pulay")
 	{
-		cout << " Mixing dimension = " << CHR.mixing_ndim << endl;
-		mRrho = CHR.mixing_ndim * mrho;
-		mdRrho = (CHR.mixing_ndim-1) * mrho;
-		mdrho = (CHR.mixing_ndim-1) * mrho;
+		cout << " Mixing dimension = " << GlobalC::CHR.mixing_ndim << endl;
+		mRrho = GlobalC::CHR.mixing_ndim * mrho;
+		mdRrho = (GlobalC::CHR.mixing_ndim-1) * mrho;
+		mdrho = (GlobalC::CHR.mixing_ndim-1) * mrho;
 		mrho_save2 = mrho;
 //		cout << " Memory for pulay mixing: " << mrho << " MB" << endl;	
 	}

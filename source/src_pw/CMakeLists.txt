@@ -25,6 +25,7 @@ add_library(
     occupy.cpp
     potential.cpp
     potential_libxc.cpp
+    potential_libxc_meta.cpp
     pw_basis.cpp
     pw_complement.cpp
     soc.cpp
@@ -58,4 +59,5 @@ add_library(
     xc_functional.cpp
     xc_gga_pw.cpp
     xc_type.cpp
+    run_md_pw.cpp
 )

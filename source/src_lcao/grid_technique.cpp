@@ -3,7 +3,10 @@
 
 #include "global_fp.h" // mohan add 2021-01-30
 
+namespace GlobalC
+{
 Grid_Technique GridT;
+}
 
 Grid_Technique::Grid_Technique()
 {
@@ -358,7 +361,7 @@ void Grid_Technique::cal_trace_beta(void)
 	delete[] trace_beta;
 
 	// mohan modify 2021-04-06
-	//int nkb=ORB.nkb;
+	//int nkb=GlobalC::ORB.nkb;
 	int nkb=GlobalC::ppcell.nkb;
 
 	this->trace_beta = new int[nkb];

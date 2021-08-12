@@ -28,7 +28,7 @@ jobs:
           mode: start
           github-token: ${{ secrets.PAT }}
           ec2-image-id: ami-07758124f42f794bf
-          ec2-instance-type: c5.4xlarge
+          ec2-instance-type: c5.xlarge
           subnet-id: subnet-f7edb991
           security-group-id: sg-fd5185e7
   test:

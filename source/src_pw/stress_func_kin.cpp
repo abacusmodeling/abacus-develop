@@ -128,9 +128,9 @@ void Stress_Func::stress_kin(matrix& sigma)
 		}
 	}
 	//do symmetry
-	if(Symmetry::symm_flag)
+	if(ModuleSymmetry::Symmetry::symm_flag)
 	{
-		symm.stress_symmetry(sigma, GlobalC::ucell);
+		GlobalC::symm.stress_symmetry(sigma, GlobalC::ucell);
 	}//end symmetry
 	
 	delete[] kfac;

@@ -35,9 +35,9 @@ VPATH=../module_base\
 #==========================
 # Define HONG
 #==========================
-HONG= -DMETIS -DMKL_ILP64 -D__MPI -D__CELL -D__NORMAL
+HONG= -DMETIS -DMKL_ILP64 -D__MPI -D__CELL -D__NORMAL -D__SYMMETRY
 
-FP_OBJS_0=main.o\
+FP_OBJS_0=run_symmetry.o\
 $(OBJS_IO)\
 $(OBJS_PW)\
 $(OBJS_BASE)\
@@ -50,7 +50,7 @@ FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})
 #==========================
 # MAKING OPTIONS
 #==========================
-cell : 
+symmetry : 
 	@ make init
 	@ make -j $(NP) parallel
 

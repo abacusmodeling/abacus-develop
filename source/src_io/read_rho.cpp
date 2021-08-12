@@ -110,7 +110,7 @@ bool Charge::read_rho(const int &is, const string &fn, double* rho) //add by dwa
 				}
 			}
 		}
-		Pgrid.zpiece_to_all(zpiece, iz, rho);
+		GlobalC::Pgrid.zpiece_to_all(zpiece, iz, rho);
 	}// iz
 	delete[] zpiece;
 #endif

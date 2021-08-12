@@ -129,5 +129,8 @@ private:
 /// PLEASE avoid using 'ORB' as global variable 
 ///
 ///mohan note 2021 - 03 - 23
+namespace GlobalC
+{
 extern LCAO_Orbitals ORB;
+}
 #endif

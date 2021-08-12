@@ -33,7 +33,7 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 	}
 
 	//recalculate the exchange-correlation potential
-    const auto etxc_vtxc_v = H_XC_pw::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, CHR.rho, CHR.rho_core);
+    const auto etxc_vtxc_v = H_XC_pw::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 	H_XC_pw::etxc    = std::get<0>(etxc_vtxc_v);			// may delete?
 	H_XC_pw::vtxc    = std::get<1>(etxc_vtxc_v);			// may delete?
 	const matrix vxc = std::get<2>(etxc_vtxc_v);
@@ -71,7 +71,7 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 		if(GlobalC::ucell.atoms[nt].nlcc)
 		{
 			//drhoc();
-			CHR.non_linear_core_correction(
+			GlobalC::CHR.non_linear_core_correction(
 				GlobalC::ppcell.numeric,
 				GlobalC::ucell.atoms[nt].msh,
 				GlobalC::ucell.atoms[nt].r,

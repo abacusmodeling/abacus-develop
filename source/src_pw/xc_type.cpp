@@ -12,11 +12,11 @@ xcfunc::~xcfunc()
 }
 
 // mohan update 2009-12-15
-const string exc[8] = { "NOX", "SLA", "SL1", "RXC", "OEP", "HF", "PB0X", "B3LP"};
-const string corr[11] = { "NOC", "PZ", "VWN", "LYP", "PW", "WIG", "HL", "OBZ",
-                          "OBW", "GL", "B3LP" };
-const string gradx[10] = { "NOGX", "B88", "GGX", "PBX",  "RPB", "HCTH", "OPTX", "META", "PB0X", "B3LP"};
-const string gradc[8] = { "NOGC", "P86", "GGC", "BLYP", "PBC", "HCTH", "META", "B3LP"};
+const string exc[10] = { "NOX", "SLA", "SL1", "RXC", "OEP", "HF", "PB0X", "B3LP", "KZK", "HSEX"};
+const string corr[12] = { "NOC", "PZ", "VWN", "LYP", "PW", "WIG", "HL", "OBZ",
+                          "OBW", "GL", "B3LP", "KZK"};
+const string gradx[14] = { "NOGX", "B88", "GGX", "PBX",  "RPB", "HCTH", "OPTX", "META", "PB0X", "B3LP", "PSX", "WC", "HSEX", "SCAN"};
+const string gradc[10] = { "NOGC", "P86", "GGC", "BLYP", "PBC", "HCTH", "META", "B3LP", "PSC", "SCAN"};
 
 // from function.f90
 //-----------------------------------------------------------------------
@@ -26,10 +26,10 @@ void xcfunc::which_dft(const string *dft)
 	// translates a string containing the exchange-correlation name
 	// into internal indices iexch, icorr, igcx, igcc
 
-	const int nxc = 8; // number of exchange functional
-	const int ncc = 11; // number of correlation functional
-	const int ngcx = 10; // number of gradient correction for exchange functional
-	const int ngcc = 8; // number of gradient correction for correlation functional
+	const int nxc = 10; // number of exchange functional
+	const int ncc = 12; // number of correlation functional
+	const int ngcx = 14; // number of gradient correction for exchange functional
+	const int ngcc = 10; // number of gradient correction for correlation functional
 
 	//int l=0;
 	int i=0;
@@ -76,7 +76,7 @@ void xcfunc::which_dft(const string *dft)
 			set_dft_value(igcc, i);
 		}
 	}
-
+	
 	//======================= Second Part ===============================
 	// special case : BLYP => B88 for gradient correction on exchange
 
@@ -169,6 +169,15 @@ void xcfunc::which_dft(const string *dft)
 		set_dft_value(icorr, 3);
 		set_dft_value(igcx, 6);
 		set_dft_value(igcc, 3);
+	}
+	else if ( match_one(dft, "SCAN") )
+	{
+		// special case : SCAN already contains LDA exchange and correlation
+		set_dft_value(iexch, 0);
+		set_dft_value(icorr, 0);
+		set_dft_value(igcx, 13);
+		set_dft_value(igcc, 9);
+		GlobalV::DFT_META = 1;
 	}
 
 	if (igcx == 6)

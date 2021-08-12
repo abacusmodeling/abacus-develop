@@ -16,7 +16,10 @@
 
 using namespace std;
 
+namespace GlobalC
+{
 Epsilon0_vasp epsilon0_vasp;
+}
 
 Epsilon0_vasp::Epsilon0_vasp()
                :init_finish(false)
@@ -37,7 +40,7 @@ void Epsilon0_vasp::cal_epsilon0()
 	cout << "nomega = "<<nomega<<endl;
 	cout << "eta = "<<eta<<endl;
 	
-	double occupied_bands = static_cast<double>(CHR.nelec/DEGSPIN);
+	double occupied_bands = static_cast<double>(GlobalC::CHR.nelec/DEGSPIN);
 	if( (occupied_bands - std::floor(occupied_bands)) > 0.0 )
 	{
 		occupied_bands = std::floor(occupied_bands) + 1.0;

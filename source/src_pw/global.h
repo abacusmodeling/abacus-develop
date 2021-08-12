@@ -52,17 +52,18 @@ extern pseudopot_cell_vnl ppcell;
 namespace GlobalC
 {
 extern UnitCell_pseudo ucell;
-}
 extern xcfunc xcf;
 extern Charge_Broyden CHR;
 extern Potential pot;
-extern Symmetry symm;
-//extern Magnetism mag;
+extern ModuleSymmetry::Symmetry symm;
 extern Parallel_Grid Pgrid; 
 extern Parallel_Kpoints Pkpoints;
 extern Vdwd2_Parameters vdwd2_para;		// Peize Lin add 2021.03.09
 extern Vdwd3_Parameters vdwd3_para;		// jiyy add 2021-05-02	
 extern Restart restart;	// Peize Lin add 2020.04.04
+}
+
+//extern Magnetism mag;
 
 #ifdef __LCAO
 #include "../src_lcao/global_fp.h"

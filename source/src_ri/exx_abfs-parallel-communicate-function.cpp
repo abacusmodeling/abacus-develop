@@ -14,9 +14,9 @@ Exx_Abfs::Parallel::Communicate::Function::get_atom_in_2D_list(const MPI_Comm &m
 	for(int iwt=0; iwt<GlobalV::NLOCAL; ++iwt)
 	{
 		const int iat = GlobalC::ucell.iwt2iat[iwt];
-		if( ParaO.trace_loc_row[iwt]>=0 )
+		if( GlobalC::ParaO.trace_loc_row[iwt]>=0 )
 			atom_in_2D[iat] = true;
-		if( ParaO.trace_loc_col[iwt]>=0 )
+		if( GlobalC::ParaO.trace_loc_col[iwt]>=0 )
 			atom_in_2D[GlobalC::ucell.nat+iat] = true;
 	}
 	

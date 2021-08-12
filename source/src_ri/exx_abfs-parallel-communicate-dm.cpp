@@ -32,13 +32,13 @@ Exx_Abfs::Parallel::Communicate::DM::m2D_to_a2Dexx(
 	map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>> DM_a2Dexx;
 	for( int iwt1_m2D=0; iwt1_m2D<DM_m2D.nr; ++iwt1_m2D )
 	{
-		const int iwt1 = GridT.trace_lo[iwt1_index_begin+iwt1_m2D];
+		const int iwt1 = GlobalC::GridT.trace_lo[iwt1_index_begin+iwt1_m2D];
 		const size_t iat1 = GlobalC::ucell.iwt2iat[iwt1];
 		if(!atom_in_exx.row[iat1])	continue;
 		const size_t iw1 = GlobalC::ucell.iwt2iw[iwt1];
 		for( int iwt2_m2D=0; iwt2_m2D<DM_m2D.nc; ++iwt2_m2D )
 		{
-			const int iwt1 = GridT.trace_lo[iwt2_index_begin+iwt2_m2D];
+			const int iwt1 = GlobalC::GridT.trace_lo[iwt2_index_begin+iwt2_m2D];
 			const size_t iat2 = GlobalC::ucell.iwt2iat[iwt2];
 			if(!atom_in_exx.col[iat2])	continue;
 			const size_t iw2 = GlobalC::ucell.iwt2iw[iwt2];
@@ -171,13 +171,13 @@ Exx_Abfs::Parallel::Communicate::DM::LOC_to_grid(
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
 {
-	ofstream ofs("LOC.DM_"+TO_STRING(GlobalV::MY_RANK));
+	ofstream ofs("GlobalC::LOC.DM_"+TO_STRING(GlobalV::MY_RANK));
 	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
-		for( int i1=0; i1!=GridT.lgd; ++i1 )
+		for( int i1=0; i1!=GlobalC::GridT.lgd; ++i1 )
 		{
-			for( int i2=0; i2!=GridT.lgd; ++i2 )
-				ofs<<LOC.DM[is][i1][i2]<<"\t";
+			for( int i2=0; i2!=GlobalC::GridT.lgd; ++i2 )
+				ofs<<GlobalC::LOC.DM[is][i1][i2]<<"\t";
 			ofs<<endl;
 		}
 		ofs<<endl;
@@ -188,11 +188,11 @@ Exx_Abfs::Parallel::Communicate::DM::LOC_to_grid(
 		{			
 			for( int iat1=0, iwt1_index=0; iat1!=GlobalC::ucell.nat; ++iat1 )
 			{
-				if(!GridT.in_this_processor[iat1])	continue;
+				if(!GlobalC::GridT.in_this_processor[iat1])	continue;
 				const int nw1 = GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw;
 				for( int iat2=0, iwt2_index=0; iat2!=GlobalC::ucell.nat; ++iat2 )
 				{
-					if(!GridT.in_this_processor[iat2])	continue;
+					if(!GlobalC::GridT.in_this_processor[iat2])	continue;
 					const int nw2 = GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw;
 					
 					matrix DM_grid_2D(nw1,nw2);
@@ -200,7 +200,7 @@ Exx_Abfs::Parallel::Communicate::DM::LOC_to_grid(
 					{
 						for( int iw2=0; iw2!=nw2; ++iw2 )
 						{
-							DM_grid_2D(iw1,iw2) = LOC.DM[is][iwt1_index+iw1][iwt2_index+iw2];
+							DM_grid_2D(iw1,iw2) = GlobalC::LOC.DM[is][iwt1_index+iw1][iwt2_index+iw2];
 						}
 					}
 					if( DM_grid_2D.absmax() * SPIN_multiple >= threshold )
@@ -213,28 +213,28 @@ Exx_Abfs::Parallel::Communicate::DM::LOC_to_grid(
 			}
 	
 			/*
-			for( int iwt1_grid=0; iwt1_grid<GridT.lgd; ++iwt1_grid )
+			for( int iwt1_grid=0; iwt1_grid<GlobalC::GridT.lgd; ++iwt1_grid )
 			{				
-				const int iwt1 = ParaO.MatrixInfo.row_set[iwt1_grid];
+				const int iwt1 = GlobalC::ParaO.MatrixInfo.row_set[iwt1_grid];
 				const int iat1 = GlobalC::ucell.iwt2iat[iwt1];
 				const int iw1  = GlobalC::ucell.iwt2iw[iwt1];
 cout<<iwt1_grid<<"\t"<<iwt1<<"\t"<<iat1<<"\t"<<iw1<<endl;
-				for( int iwt2_grid=0; iwt2_grid<GridT.lgd; ++iwt2_grid )
+				for( int iwt2_grid=0; iwt2_grid<GlobalC::GridT.lgd; ++iwt2_grid )
 				{				
-					const int iwt2 = ParaO.MatrixInfo.col_set[iwt2_grid];
+					const int iwt2 = GlobalC::ParaO.MatrixInfo.col_set[iwt2_grid];
 					const int iat2 = GlobalC::ucell.iwt2iat[iwt2];
 					const int iw2  = GlobalC::ucell.iwt2iw[iwt2];
 cout<<"\t"<<iwt2_grid<<"\t"<<iwt2<<"\t"<<iat2<<"\t"<<iw2<<endl;
 					try
 					{
-						DM_grid[is].at(iat1).at(iat2).at({0,0,0})(iw1,iw2) = LOC.DM[is][iwt1_grid][iwt2_grid];
+						DM_grid[is].at(iat1).at(iat2).at({0,0,0})(iw1,iw2) = GlobalC::LOC.DM[is][iwt1_grid][iwt2_grid];
 					}
 					catch(const std::out_of_range&)
 					{
 						DM_grid[is][iat1][iat2][{0,0,0}].create(
 							GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw,
 							GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw);
-						DM_grid[is][iat1][iat2][{0,0,0}](iw1,iw2) = LOC.DM[is][iwt1_grid][iwt2_grid];
+						DM_grid[is][iat1][iat2][{0,0,0}](iw1,iw2) = GlobalC::LOC.DM[is][iwt1_grid][iwt2_grid];
 					}
 				}
 			}*/
@@ -242,20 +242,20 @@ cout<<"\t"<<iwt2_grid<<"\t"<<iwt2<<"\t"<<iat2<<"\t"<<iw2<<endl;
 	}
 	else
 	{	
-ofstream ofs_LOC_DM("LOC.DM_R_"+TO_STRING(GlobalV::MY_RANK));
+ofstream ofs_LOC_DM("GlobalC::LOC.DM_R_"+TO_STRING(GlobalV::MY_RANK));
 for( int i=0; i<100; ++i )
-	ofs_LOC_DM<<LOC.DM_R[0][i]<<"\t";
+	ofs_LOC_DM<<GlobalC::LOC.DM_R[0][i]<<"\t";
 ofs_LOC_DM<<endl<<endl;
 
 		Record_adj RA;
-		RA.for_grid(GridT);
+		RA.for_grid(GlobalC::GridT);
 //cout<<__FILE__<<__LINE__<<endl;
 
 		for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 		{
 			for( size_t iat1=0; iat1<GlobalC::ucell.nat; ++iat1 )
 			{
-				if(!GridT.in_this_processor[iat1])	continue;
+				if(!GlobalC::GridT.in_this_processor[iat1])	continue;
 				int iw_index = 0;
 				for( size_t iat2_2D=0; iat2_2D<RA.na_each[iat1]; ++iat2_2D )
 				{
@@ -269,7 +269,7 @@ ofs_LOC_DM<<endl<<endl;
 	for( int iw1=0; iw1!=nw1; ++iw1 )
 	{
 		for( int iw2=0; iw2!=nw2; ++iw2 )
-			ofs_LOC_DM<<LOC.DM_R[is][LNNR.nlocstartg[iat1]+iw_index+iw1*nw2+iw2]<<"\t";
+			ofs_LOC_DM<<GlobalC::LOC.DM_R[is][GlobalC::LNNR.nlocstartg[iat1]+iw_index+iw1*nw2+iw2]<<"\t";
 		ofs_LOC_DM<<endl;
 	}
 	ofs_LOC_DM<<endl;
@@ -277,7 +277,7 @@ ofs_LOC_DM<<endl<<endl;
 					if( !MAP_EXIST( DM_grid[is], iat1, iat2, boxp2 ) )
 					{					
 						matrix DM_grid_2D(nw1,nw2,false);
-						memcpy( DM_grid_2D.c, LOC.DM_R[is]+LNNR.nlocstartg[iat1]+iw_index, sizeof(double)*(nw1*nw2) );
+						memcpy( DM_grid_2D.c, GlobalC::LOC.DM_R[is]+GlobalC::LNNR.nlocstartg[iat1]+iw_index, sizeof(double)*(nw1*nw2) );
 						if( DM_grid_2D.absmax() * SPIN_multiple >= threshold )
 							DM_grid[is][iat1][iat2][boxp2] = DM_grid_2D * SPIN_multiple;
 						else

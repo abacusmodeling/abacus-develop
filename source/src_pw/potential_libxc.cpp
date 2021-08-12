@@ -247,10 +247,10 @@ std::vector<xc_func_type> Potential_Libxc::init_func()
 	//--------------------------------------
 	// for the exchange energy 
 	//--------------------------------------
-	if( 6==xcf.iexch_now && 
-		8==xcf.igcx_now && 
-		4==xcf.icorr_now && 
-		4==xcf.igcc_now ) // GGA functional
+	if( 6==GlobalC::xcf.iexch_now && 
+		8==GlobalC::xcf.igcx_now && 
+		4==GlobalC::xcf.icorr_now && 
+		4==GlobalC::xcf.igcc_now ) // GGA functional
 	{
 		add_func( XC_HYB_GGA_XC_PBEH );		
 		double parameter_hse[3] = { GlobalC::exx_global.info.hybrid_alpha, 
@@ -259,10 +259,10 @@ std::vector<xc_func_type> Potential_Libxc::init_func()
 		xc_func_set_ext_params(&funcs.back(), parameter_hse);
 		return funcs;	
 	}
-	else if( 9==xcf.iexch_now && 
-			12==xcf.igcx_now && 
-			4==xcf.icorr_now && 
-			4==xcf.igcc_now ) // HSE06 hybrid functional
+	else if( 9==GlobalC::xcf.iexch_now && 
+			12==GlobalC::xcf.igcx_now && 
+			4==GlobalC::xcf.icorr_now && 
+			4==GlobalC::xcf.igcc_now ) // HSE06 hybrid functional
 	{
 		add_func( XC_HYB_GGA_XC_HSE06 );	
 		double parameter_hse[3] = { GlobalC::exx_global.info.hybrid_alpha, 
@@ -272,36 +272,44 @@ std::vector<xc_func_type> Potential_Libxc::init_func()
 		return funcs;	
 	}
 	
-	if( 1==xcf.iexch_now && 
-		0==xcf.igcx_now ) // LDA functional
+	if( 1==GlobalC::xcf.iexch_now && 
+		0==GlobalC::xcf.igcx_now ) // LDA functional
 	{
 		add_func( XC_LDA_X );
 	}
-	else if( 1==xcf.iexch_now && 
-		3==xcf.igcx_now ) // GGA functional
+	else if( 1==GlobalC::xcf.iexch_now && 
+		3==GlobalC::xcf.igcx_now ) // GGA functional
 	{
 		add_func( XC_GGA_X_PBE );
 	}
+	else if(GlobalC::xcf.igcx_now == 13 ) //SCAN_X
+	{
+		add_func(263);
+	}
 	else
 	{
-		throw domain_error("iexch="+TO_STRING(xcf.iexch_now)+", igcx="+TO_STRING(xcf.igcx_now)
+		throw domain_error("iexch="+TO_STRING(GlobalC::xcf.iexch_now)+", igcx="+TO_STRING(GlobalC::xcf.igcx_now)
 			+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 	}
 
 	//--------------------------------------
 	// for the correlation energy part
 	//--------------------------------------
-	if( 1==xcf.icorr_now && 0==xcf.igcc_now )
+	if( 1==GlobalC::xcf.icorr_now && 0==GlobalC::xcf.igcc_now )
 	{
 		add_func( XC_LDA_C_PZ );
 	}
-	else if( 4==xcf.icorr_now && 4==xcf.igcc_now )
+	else if( 4==GlobalC::xcf.icorr_now && 4==GlobalC::xcf.igcc_now )
 	{
 		add_func( XC_GGA_C_PBE );
 	}
+	else if (GlobalC::xcf.igcc_now == 9)
+	{
+		add_func( 267 );
+	}
 	else
 	{
-		throw domain_error("icorr="+TO_STRING(xcf.icorr_now)+", igcc="+TO_STRING(xcf.igcc_now)
+		throw domain_error("icorr="+TO_STRING(GlobalC::xcf.icorr_now)+", igcc="+TO_STRING(GlobalC::xcf.igcc_now)
 			+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 	}
 
@@ -337,7 +345,7 @@ Potential_Libxc::cal_input(
 			}
 			else // may need updates for SOC
 			{
-				if(xcf.igcx||xcf.igcc)
+				if(GlobalC::xcf.igcx||GlobalC::xcf.igcc)
 				{
 					GlobalC::ucell.magnet.cal_ux(GlobalC::ucell.ntype);
 				}
@@ -375,7 +383,7 @@ Potential_Libxc::cal_input(
 				// bring electron charge density from real space to reciprocal space
 				//------------------------------------------
 				std::vector<std::complex<double>> rhog(GlobalC::pw.ngmc);
-				CHR.set_rhog(rhor.data(), rhog.data());
+				GlobalC::CHR.set_rhog(rhor.data(), rhog.data());
 
 				//-------------------------------------------
 				// compute the gradient of charge density and
@@ -426,6 +434,7 @@ Potential_Libxc::cal_input(
 				break;
 			case XC_FAMILY_GGA:
 			case XC_FAMILY_HYB_GGA:
+			case XC_FAMILY_MGGA:
 				cal_rho();
 				cal_gdr();
 				cal_sigma();

@@ -12,7 +12,7 @@ class Local_Orbital_wfc
 	Local_Orbital_wfc();
 	~Local_Orbital_wfc();
 
-	// used to generate density matrix: LOC.DM_R,
+	// used to generate density matrix: GlobalC::LOC.DM_R,
 	// which is used to calculate the charge density. 
 	// which is got after the diagonalization of 
 	// complex Hamiltonian matrix.

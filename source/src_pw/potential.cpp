@@ -17,7 +17,7 @@ Potential::Potential()
 {
     vltot = new double[1];
     vr_eff1 = new double[1];
-    this->out_potential = 0;
+	this->out_potential = 0;
 }
 
 Potential::~Potential()
@@ -39,6 +39,12 @@ void Potential::allocate(const int nrxx)
     this->vr_eff.create(GlobalV::NSPIN,nrxx);
     Memory::record("Potential","vr",GlobalV::NSPIN*nrxx,"double");
     Memory::record("Potential","vr_eff",GlobalV::NSPIN*nrxx,"double");
+	
+	if(GlobalV::DFT_META)
+	{
+		this->vofk.create(GlobalV::NSPIN,nrxx);
+    	Memory::record("Potential","vork",GlobalV::NSPIN*nrxx,"double");
+	}
 
     delete[] this->vr_eff1;
     this->vr_eff1 = new double[nrxx];
@@ -69,6 +75,11 @@ void Potential::init_pot(
     // the vltot should and must be zero here.
     ZEROS(this->vltot, GlobalC::pw.nrxx);
 
+	if(GlobalV::DFT_META)
+	{
+		this->vofk.zero_out();
+	}
+
 	//-------------------------------------------------------------------
 	// (1) local pseudopotential + electric field (if any) in vltot
 	//-------------------------------------------------------------------
@@ -98,7 +109,7 @@ void Potential::init_pot(
 	}
 
 	// core correction potential.
-	CHR.set_rho_core( GlobalC::pw.strucFac );
+	GlobalC::CHR.set_rho_core( GlobalC::pw.strucFac );
 
 	//--------------------------------------------------------------------
 	// (2) other effective potentials need charge density,
@@ -112,7 +123,7 @@ void Potential::init_pot(
         if (this->start_pot == "atomic")//mohan add 2007-10-17
         {
             start_from_atomic:
-            CHR.atomic_rho(GlobalV::NSPIN, CHR.rho);
+            GlobalC::CHR.atomic_rho(GlobalV::NSPIN, GlobalC::CHR.rho);
         }
         else if (this->start_pot == "file")
         {
@@ -123,7 +134,7 @@ void Potential::init_pot(
                 ssc << GlobalV::global_readin_dir << "SPIN" << is + 1 << "_CHG";
                 GlobalV::ofs_running << ssc.str() << endl;
                 // mohan update 2012-02-10
-                if(CHR.read_rho( is, ssc.str(), CHR.rho[is] )) 
+                if(GlobalC::CHR.read_rho( is, ssc.str(), GlobalC::CHR.rho[is] )) 
                 {
                     GlobalV::ofs_running << " Read in the charge density: " << ssc.str() << endl;
 				}
@@ -135,7 +146,7 @@ void Potential::init_pot(
 						GlobalV::ofs_running << " Didn't read in the charge density but autoset it for spin " <<is+1<< endl;
 						for(int ir=0;ir<GlobalC::pw.nrxx;ir++)
 						{
-							CHR.rho[is][ir] = 0.0;
+							GlobalC::CHR.rho[is][ir] = 0.0;
 						}
 					}
 					// 
@@ -154,10 +165,10 @@ void Potential::init_pot(
 							GlobalV::ofs_running << " rearrange charge density " << endl;
 							for(int ir=0;ir<GlobalC::pw.nrxx;ir++)
 							{
-								CHR.rho[3][ir] = CHR.rho[0][ir] - CHR.rho[1][ir];
-								CHR.rho[0][ir] = CHR.rho[0][ir] + CHR.rho[1][ir];
-								CHR.rho[1][ir] = 0.0;
-								CHR.rho[2][ir] = 0.0;
+								GlobalC::CHR.rho[3][ir] = GlobalC::CHR.rho[0][ir] - GlobalC::CHR.rho[1][ir];
+								GlobalC::CHR.rho[0][ir] = GlobalC::CHR.rho[0][ir] + GlobalC::CHR.rho[1][ir];
+								GlobalC::CHR.rho[1][ir] = 0.0;
+								GlobalC::CHR.rho[2][ir] = 0.0;
 							}
 						}
 					}
@@ -179,13 +190,13 @@ void Potential::init_pot(
         }
 		
 		// Peize Lin add 2020.04.04
-		if(restart.info_load.load_charge && !restart.info_load.load_charge_finish)
+		if(GlobalC::restart.info_load.load_charge && !GlobalC::restart.info_load.load_charge_finish)
 		{
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{
-				restart.load_disk("charge", is);
+				GlobalC::restart.load_disk("charge", is);
 			}
-			restart.info_load.load_charge_finish = true;
+			GlobalC::restart.info_load.load_charge_finish = true;
 		}
     }
     else
@@ -194,13 +205,13 @@ void Potential::init_pot(
     }
 
 	// renormalize the charge density
-    CHR.renormalize_rho();
+    GlobalC::CHR.renormalize_rho();
 
 
     //----------------------------------------------------------
     // (3) compute Hartree and XC potentials saves in vr 
     //----------------------------------------------------------
-    this->vr = this->v_of_rho(CHR.rho, CHR.rho_core);
+    this->vr = this->v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 
     //----------------------------------------------------------
     // (4) total potentials 
@@ -260,7 +271,7 @@ void Potential::set_local_pot(
     if(GlobalV::EFIELD && !GlobalV::DIPOLE)
     {
         Efield EFID;
-        // in fact, CHR.rho is not used here.
+        // in fact, GlobalC::CHR.rho is not used here.
         // if charge correction due to Efield is considered,
         // the structure here need to be updated.
 
@@ -270,7 +281,7 @@ void Potential::set_local_pot(
             cout << " ADD THE GlobalV::EFIELD (V/A) : " << Efield::eamp*51.44 << endl;
             first = false;
         }
-        EFID.add_efield(CHR.rho[0], vl_pseudo);	
+        EFID.add_efield(GlobalC::CHR.rho[0], vl_pseudo);	
     }
 
     //GlobalV::ofs_running <<" set local pseudopotential done." << endl;
@@ -298,13 +309,28 @@ matrix Potential::v_of_rho(
 //----------------------------------------------------------
 	
 	#ifdef USE_LIBXC
-    const std::tuple<double,double,matrix> etxc_vtxc_v = Potential_Libxc::v_xc(rho_in, CHR.rho_core);
+	if(GlobalV::DFT_META)
+	{
+    	const std::tuple<double,double,matrix,matrix> etxc_vtxc_v = Potential_Libxc::v_xc_meta(rho_in, GlobalC::CHR.rho_core, GlobalC::CHR.kin_r);
+		H_XC_pw::etxc = std::get<0>(etxc_vtxc_v);
+		H_XC_pw::vtxc = std::get<1>(etxc_vtxc_v);
+		v            += std::get<2>(etxc_vtxc_v);
+		vofk		  = std::get<3>(etxc_vtxc_v);	
+	}
+	else
+	{	
+    	const std::tuple<double,double,matrix> etxc_vtxc_v = Potential_Libxc::v_xc(rho_in, GlobalC::CHR.rho_core);
+		H_XC_pw::etxc = std::get<0>(etxc_vtxc_v);
+		H_XC_pw::vtxc = std::get<1>(etxc_vtxc_v);
+		v            += std::get<2>(etxc_vtxc_v);
+	}
 	#else
-    const std::tuple<double,double,matrix> etxc_vtxc_v = H_XC_pw::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, rho_in, CHR.rho_core);
-	#endif
+	const std::tuple<double,double,matrix> etxc_vtxc_v = H_XC_pw::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, rho_in, GlobalC::CHR.rho_core);
+	
 	H_XC_pw::etxc = std::get<0>(etxc_vtxc_v);
 	H_XC_pw::vtxc = std::get<1>(etxc_vtxc_v);
 	v            += std::get<2>(etxc_vtxc_v);
+	#endif
 
 //----------------------------------------------------------
 //  calculate the Hartree potential

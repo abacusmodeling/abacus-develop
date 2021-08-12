@@ -16,7 +16,7 @@ void Exx_Abfs::DM::cal_DM(
 {
 	TITLE("Exx_Abfs::DM::cal_DM");
 	
-	cal_DMk_mixing( CHR, atom_pairs );
+	cal_DMk_mixing( GlobalC::CHR, atom_pairs );
 
 	for( const pair<size_t,size_t> & atom_pair : atom_pairs )
 	{
@@ -111,20 +111,20 @@ map<size_t,map<size_t,vector<ComplexMatrix>>> Exx_Abfs::DM::cal_DMk_raw( const s
 						if( GlobalV::GAMMA_ONLY_LOCAL )
 						{
 							//---------------------------------------------------------
-							// LOWF.WFC_GAMMA has been replaced by wfc_dm_2d.cpp 
+							// GlobalC::LOWF.WFC_GAMMA has been replaced by wfc_dm_2d.cpp 
 							// we need to fix this function in near future.
 							// -- mohan add 2021-02-09
 							//---------------------------------------------------------
-							WARNING_QUIT("Exx_Abfs::DM::cal_DMk_raw","need to update LOWF.WFC_GAMMA");
+							WARNING_QUIT("Exx_Abfs::DM::cal_DMk_raw","need to update GlobalC::LOWF.WFC_GAMMA");
 //							DMk_raw[iat1][iat2][ik](iw1,iw2) += GlobalC::wf.wg(ik,ib) 
-//								* LOWF.WFC_GAMMA[ik][ib][GlobalC::ucell.itiaiw2iwt(it1,ia1,iw1)] 
-//								* LOWF.WFC_GAMMA[ik][ib][GlobalC::ucell.itiaiw2iwt(it2,ia2,iw2)];
+//								* GlobalC::LOWF.WFC_GAMMA[ik][ib][GlobalC::ucell.itiaiw2iwt(it1,ia1,iw1)] 
+//								* GlobalC::LOWF.WFC_GAMMA[ik][ib][GlobalC::ucell.itiaiw2iwt(it2,ia2,iw2)];
 						}
 						else
 						{
 							DMk_raw[iat1][iat2][ik](iw1,iw2) += GlobalC::wf.wg(ik,ib) 
-								* LOWF.WFC_K[ik][ib][GlobalC::ucell.itiaiw2iwt(it1,ia1,iw1)] 
-								* conj(LOWF.WFC_K[ik][ib][GlobalC::ucell.itiaiw2iwt(it2,ia2,iw2)]);
+								* GlobalC::LOWF.WFC_K[ik][ib][GlobalC::ucell.itiaiw2iwt(it1,ia1,iw1)] 
+								* conj(GlobalC::LOWF.WFC_K[ik][ib][GlobalC::ucell.itiaiw2iwt(it2,ia2,iw2)]);
 						}
 					}
 				}
