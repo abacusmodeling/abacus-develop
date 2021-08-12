@@ -14,8 +14,8 @@ public:
     LJ_potential();
     ~LJ_potential();
 
-    double Lennard_Jones(UnitCell_pseudo &ucell_c, Grid_Driver &grid_neigh, Vector3<double> *force, matrix &stress);
-    double Lennard_Jones(UnitCell_pseudo &ucell_c, CMD_neighbor &cmd_neigh, Vector3<double> *force, matrix &stress);
+    static double Lennard_Jones(UnitCell_pseudo &ucell_c, Grid_Driver &grid_neigh, Vector3<double> *force);
+    static double Lennard_Jones(UnitCell_pseudo &ucell_c, CMD_neighbor &cmd_neigh, Vector3<double> *force);
     double LJ_energy(const double d);
     Vector3<double> LJ_force(const double d, const Vector3<double> dr);
 
