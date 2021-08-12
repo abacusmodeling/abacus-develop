@@ -35,6 +35,7 @@ void Input::Print(const std::string &fn)const
 	OUTP(ofs,"nche_sto",nche_sto,"number of orders for Chebyshev expansion in stochastic DFT");
 	OUTP(ofs,"symmetry",symmetry,"turn symmetry on or off");	
 	OUTP(ofs,"set_vel",set_vel,"read velocity from STRU or not");
+	OUTP(ofs,"symmetry_prec",symmetry_prec,"accuracy for symmetry"); // LiuXh add 2021-08-12, accuracy for symmetry
 	OUTP(ofs,"nelec",nelec,"input number of electrons");
 	OUTP(ofs,"tot_magnetization",tot_magnetization,"total magnetization of the system");
 
