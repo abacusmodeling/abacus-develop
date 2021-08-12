@@ -59,7 +59,7 @@ double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c,
             int I2 = ucell_c.iat2ia[cmd_neigh.list[i][j]];
             Vector3<double> taud2 = ucell_c.atoms[T2].taud[I2];
 
-			Vector3<double> tempd = cmd_neigh.Cell_periodic(taud1,taud2);
+			Vector3<double> tempd = cmd_neigh.cell_periodic(taud1,taud2);
             Vector3<double> temp;
             Mathzone::Direct_to_Cartesian(
 			tempd.x, tempd.y, tempd.z,

@@ -40,6 +40,10 @@ UnitCell::UnitCell()
     tpiba = 0.0;
     tpiba2 = 0.0;
     omega = 0.0;
+
+    atom_label = new string[1];
+    atom_mass = new double[1];
+    pseudo_fn = new string[1];
 }
 
 UnitCell::~UnitCell()

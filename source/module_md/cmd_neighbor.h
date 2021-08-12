@@ -11,8 +11,9 @@ public:
     CMD_neighbor();
     ~CMD_neighbor();
 
-    Vector3<double> Cell_periodic(const Vector3<double> a, const Vector3<double> b);
-    void Neighbor(UnitCell_pseudo &ucell_c);
+    Vector3<double> cell_periodic(const Vector3<double> a, const Vector3<double> b);
+    void neighbor(UnitCell_pseudo &ucell_c);
+    void comm_list(const int num, int *nlist_in, int **list_in, int *nlist_out, int **list_out);
 
     int **list;    // record the index of adjent atoms of every atom
     int *nlist;    // record the adjent num of every atom

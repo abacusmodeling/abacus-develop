@@ -13,7 +13,7 @@ Run_MD_CLASSIC::Run_MD_CLASSIC():grid_neigh(GlobalV::test_deconstructor, GlobalV
 	pos_old2 = new double[1];
 	pos_now = new double[1];
 	pos_next = new double[1];
-	force=new Vector3<double>[1];
+	force = new Vector3<double>[1];
 	stress.create(3,3);
 }
 
@@ -73,7 +73,7 @@ void Run_MD_CLASSIC::md_cells_classic(void)
 		{
 			//cout << "Big cell !!" << endl;
 			CMD_neighbor cmd_neigh;
-			cmd_neigh.Neighbor(this->ucell_c);
+			cmd_neigh.neighbor(this->ucell_c);
 
 			LJ_potential LJ_CMD;
 
@@ -103,13 +103,17 @@ void Run_MD_CLASSIC::md_cells_classic(void)
 							this->stress);
 		}
 
-/*		ofstream force_out("force.txt", ios::app);
-		for(int i=0; i<ucell_c.nat; ++i)
+		ofstream force_out("force.txt", ios::app);
+		if(GlobalV::MY_RANK==0)
 		{
-			force_out << setw(18) << setiosflags(ios::fixed) << setprecision(12) << force[i].x
-             	 		<< setw(18) << setiosflags(ios::fixed) << setprecision(12) << force[i].y
-        	 	 		<< setw(18) << setiosflags(ios::fixed) << setprecision(12) << force[i].z << endl;
-		}*/
+			for(int i=0; i<ucell_c.nat; ++i)
+			{
+				force_out << setw(18) << setiosflags(ios::fixed) << setprecision(12) << force[i].x*Ry_to_eV*ANGSTROM_AU
+             	 			<< setw(18) << setiosflags(ios::fixed) << setprecision(12) << force[i].y*Ry_to_eV*ANGSTROM_AU
+        	 	 			<< setw(18) << setiosflags(ios::fixed) << setprecision(12) << force[i].z*Ry_to_eV*ANGSTROM_AU << endl;
+			}
+		}
+		force_out.close();
 
 		this->update_pos_classic();
 
