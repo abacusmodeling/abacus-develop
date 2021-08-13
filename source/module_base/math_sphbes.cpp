@@ -35,7 +35,7 @@ void Sphbes::BESSJY(double x, double xnu, double *rj, double *ry, double *rjp, d
     isign = 1;
     h = xnu * xi;
 
-    if (h < FPMIN) 
+    if (h < FPMIN)
 	{
 		h = FPMIN;
 	}
@@ -68,7 +68,7 @@ void Sphbes::BESSJY(double x, double xnu, double *rj, double *ry, double *rjp, d
         if (fabs(del - 1.0) < EPS) break;
     }
 
-    if (i > MAXIT) 
+    if (i > MAXIT)
 	{
 		std::cout << "x too large in bessjy; try asymptotic expansion" << std::endl;
 	}
@@ -91,7 +91,7 @@ void Sphbes::BESSJY(double x, double xnu, double *rj, double *ry, double *rjp, d
         rjl = rjtemp;
     }
 
-    if (rjl == 0.0) 
+    if (rjl == 0.0)
 	{
 		rjl = EPS;
 	}
@@ -270,7 +270,7 @@ double Sphbes::CHEBEV(double a, double b, double c[], int m, double x)
 	double y2 = 0.0;
     int j=0;
 
-    if ((x - a)*(x - b) > 0.0) 
+    if ((x - a)*(x - b) > 0.0)
 	{
 		std::cout << "x not in range in routine chebev" << std::endl;
 	}
@@ -309,7 +309,7 @@ double Sphbes::Spherical_Bessel_7(const int n, const double &x)
     // call BESSSJY
     BESSJY(x, order, &rj, &ry, &rjp, &ryp);
 
-    const int RTPIO2=1.2533141;
+    const double RTPIO2=1.2533141;
 
     const double factor = RTPIO2 / sqrt(x);
 
@@ -327,13 +327,13 @@ void Sphbes::Spherical_Bessel_Roots
 )
 {
     //TITLE("Sphbes","Spherical_Bessel_Roots");
-    if (num<=0) 
+    if (num<=0)
 	{
 		std::cout << "Spherical_Bessel_Roots, num<=0" << std::endl;
 		//WARNING_QUIT("Sphbes::Spherical_Bessel_Roots","num<=0");
 		exit(0);
 	}
-    if (rcut<=0.0) 
+    if (rcut<=0.0)
 	{
 		std::cout << "Spherical_Bessel_Roots, rcut<=0" << std::endl;
 		//WARNING_QUIT("Sphbes::Spherical_Bessel_Roots","rcut<=0.0");
@@ -597,7 +597,7 @@ void Sphbes::Spherical_Bessel
 
 
 void Sphbes::Spherical_Bessel
-(           
+(
 	const int &msh, //number of grid points
 	const double *r,//radial grid
 	const double &q,    //
@@ -610,7 +610,7 @@ void Sphbes::Spherical_Bessel
 
 	//calculate jlx first
 	Spherical_Bessel (msh, r, q, l, sj);
-	
+
 	for (int ir = 0; ir < msh; ir++)
 	{
 		sjp[ir] = 1.0;

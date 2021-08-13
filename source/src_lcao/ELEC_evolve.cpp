@@ -25,8 +25,8 @@ int ELEC_evolve::td_dipoleout;
 
 // this routine only serves for TDDFT using LCAO basis set
 void ELEC_evolve::evolve_psi(
-	const int &istep, 
-	LCAO_Hamilt &uhm, 
+	const int &istep,
+	LCAO_Hamilt &uhm,
 	std::complex<double> ***wfc)
 {
 	TITLE("ELEC_evolve","eveolve_psi");
@@ -35,15 +35,15 @@ void ELEC_evolve::evolve_psi(
 	int start_spin = -1;
 	uhm.GK.reset_spin(start_spin);
 	uhm.GK.allocate_pvpR();
-						
+
 	// pool parallization in future -- mohan note 2021-02-09
 	for(int ik=0; ik<GlobalC::kv.nks; ik++)
-	{	
+	{
 		//-----------------------------------------
 		//(1) prepare data for this k point.
 		// copy the local potential from array.
 		//-----------------------------------------
-		if(GlobalV::NSPIN==2) 
+		if(GlobalV::NSPIN==2)
 		{
 			GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
 		}
@@ -53,9 +53,9 @@ void ELEC_evolve::evolve_psi(
 		{
 			GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
 		}
-		
+
 		//--------------------------------------------
-		//(2) check if we need to calculate 
+		//(2) check if we need to calculate
 		// pvpR = < phi0 | v(spin) | phiR> for a new spin.
 		//--------------------------------------------
 		if(GlobalV::CURRENT_SPIN == uhm.GK.get_spin() )
@@ -90,7 +90,7 @@ void ELEC_evolve::evolve_psi(
     	}
 
 		//--------------------------------------------
-		// (3) folding matrix, 
+		// (3) folding matrix,
 		// and diagonalize the H matrix (T+Vl+Vnl).
 		//--------------------------------------------
 
@@ -102,9 +102,9 @@ void ELEC_evolve::evolve_psi(
 		{
       std::vector<std::complex<double>> eff_pot(GlobalC::ParaO.nloc);
 			GlobalC::dftu.cal_eff_pot_mat_complex(ik, istep, &eff_pot[0]);
-      
+
 			for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
-				GlobalC::LM.Hloc2[irc] += eff_pot[irc];					
+				GlobalC::LM.Hloc2[irc] += eff_pot[irc];
 		}
 
 		// Peize Lin add at 2020.04.04
@@ -112,14 +112,14 @@ void ELEC_evolve::evolve_psi(
 		{
 			GlobalC::restart.load_disk("H", ik);
 			GlobalC::restart.info_load.load_H_finish = true;
-		}			
+		}
 		if(GlobalC::restart.info_save.save_H)
 		{
 			GlobalC::restart.save_disk("H", ik);
 		}
 
 		bool diago = true;
-		if (istep >= 1) 
+		if (istep >= 1)
 		{
 			diago = false;
 		}
@@ -139,7 +139,7 @@ void ELEC_evolve::evolve_psi(
 			timer::tick("Efficience","evolve_k");
 		}
 	} // end k
-			
+
 	// LiuXh modify 2019-07-15*/
 	if(!GlobalC::ParaO.out_hsR)
 	{
@@ -147,13 +147,13 @@ void ELEC_evolve::evolve_psi(
 	}
 
 	timer::tick("ELEC_evolve","evolve_psi");
-	return;	
+	return;
 }
 
 
 void ELEC_evolve::evolve_complex_matrix(
-	const int &ik, 
-	std::complex<double>** cc, 
+	const int &ik,
+	std::complex<double>** cc,
 	std::complex<double>** cc_init)const
 {
 	TITLE("Evolve_LCAO_Matrix","evolve_complex_matrix");
@@ -178,7 +178,7 @@ void ELEC_evolve::evolve_complex_matrix(
 
 	time_t time_end = time(NULL);
 	OUT_TIME("evolve(std::complex)", time_start, time_end);
-	
+
 	return;
 }
 
@@ -262,8 +262,8 @@ void ELEC_evolve::using_LAPACK_complex(const int &ik, std::complex<double>** c, 
 	{
 		std::complex<double> ccc[GlobalV::NLOCAL];
 		for(int j=0; j<GlobalV::NLOCAL; j++)
-		{	
-			ccc[j] = (0.0,0.0);
+		{
+			ccc[j] = std::complex<double>(0.0, 0.0);
 			for(int k=0; k<GlobalV::NLOCAL; k++)
 			{
 				 ccc[j] += U_operator(j,k)*c_init[i][k];
@@ -273,7 +273,7 @@ void ELEC_evolve::using_LAPACK_complex(const int &ik, std::complex<double>** c, 
 		{
 			c[i][j] = ccc[j];
 			GlobalC::LOWF.WFC_K[ik][i][j] = ccc[j];
-		}	
+		}
 	}
 
 //	delete[] work;
@@ -283,8 +283,8 @@ void ELEC_evolve::using_LAPACK_complex(const int &ik, std::complex<double>** c, 
 }
 
 void ELEC_evolve::using_LAPACK_complex_2(
-	const int &ik, 
-	std::complex<double>** c, 
+	const int &ik,
+	std::complex<double>** c,
 	std::complex<double>** c_init)const
 {
 
@@ -367,11 +367,11 @@ void ELEC_evolve::using_LAPACK_complex_2(
 	{
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			if(i==j) 
+			if(i==j)
 			{
 				Idmat(i,j) = std::complex<double>(1.0, 0.0);
 			}
-			else 
+			else
 			{
 				Idmat(i,j) = std::complex<double>(0.0, 0.0);
 			}
@@ -404,8 +404,8 @@ void ELEC_evolve::using_LAPACK_complex_2(
 	{
 		std::complex<double> ccc[GlobalV::NLOCAL];
 		for(int j=0; j<GlobalV::NLOCAL; j++)
-		{	
-			ccc[j] = (0.0,0.0);
+		{
+			ccc[j] = std::complex<double>(0.0, 0.0);
 			for(int k=0; k<GlobalV::NLOCAL; k++)
 			{
 				ccc[j] += U_operator(j,k)*c_init[i][k];
@@ -415,7 +415,7 @@ void ELEC_evolve::using_LAPACK_complex_2(
 		{
 			c[i][j] = ccc[j];
 			GlobalC::LOWF.WFC_K[ik][i][j] = ccc[j];
-		}	
+		}
 	}
 
 	delete[] work; // mohan add 2021-05-26

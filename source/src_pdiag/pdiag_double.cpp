@@ -718,7 +718,7 @@ void Pdiag_Double::diago_double_begin(
 				}
 			}//loop ipcol
 		}//loop iprow
-	
+
 		if(out_lowf && myid==0)
 		{
 			std::stringstream ss;
@@ -1150,7 +1150,8 @@ void Pdiag_Double::diago_complex_begin(
 			&M, &NZ, ekb, &orfac, wfc_2d.c, &one, &one, desc,
 			work.data(), &lwork, rwork.data(), &lrwork,
 			iwork.data(), &liwork, ifail.data(), iclustr.data(), gap.data(), &info);
-
+		if (info)
+			throw std::runtime_error("info=" + TO_STRING(info) + ". " + TO_STRING(__FILE__) + " line " + TO_STRING(__LINE__));
 		GlobalV::ofs_running<<"lwork="<<work[0]<<"\t"<<"liwork="<<iwork[0]<<std::endl;
 		lwork = work[0].real();
 		work.resize(lwork,0);
@@ -1162,7 +1163,8 @@ void Pdiag_Double::diago_complex_begin(
 			&GlobalV::NLOCAL, h_tmp.c, &one, &one, desc, s_tmp.c, &one, &one, desc,
 			NULL, NULL, &il, &iu, &abstol,
 			&M, &NZ, ekb, &orfac, wfc_2d.c, &one, &one, desc,
-			work.data(), &lwork, rwork.data(), &lrwork, iwork.data(), &liwork, ifail.data(), iclustr.data(), gap.data(), &info);
+			work.data(), &lwork, rwork.data(), &lrwork,
+			iwork.data(), &liwork, ifail.data(), iclustr.data(), gap.data(), &info);
 		GlobalV::ofs_running<<"M="<<M<<"\t"<<"NZ="<<NZ<<std::endl;
 
 		if(info)
