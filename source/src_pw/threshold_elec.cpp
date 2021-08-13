@@ -1,10 +1,10 @@
 #include "global.h"
 #include "threshold_elec.h"
 
-Threshold_Elec::Threshold_Elec() 
-{ 
-	dr2 = 0.0; 
-	conv_elec = false; 
+Threshold_Elec::Threshold_Elec()
+{
+	dr2 = 0.0;
+	conv_elec = false;
 }
 
 void Threshold_Elec::set_ethr(void) const
@@ -21,7 +21,7 @@ void Threshold_Elec::set_ethr(void) const
     //===================
     if (GlobalV::CALCULATION=="nscf")
     {
-        if (abs(GlobalV::ETHR - 1.0e-2 < 1.0e-10))
+        if (abs(GlobalV::ETHR - 1.0e-2) < 1.0e-10)
         {
             GlobalV::ETHR = 0.1 * std::min(1.0e-2, GlobalV::DRHO2 / GlobalC::CHR.nelec);
         }
@@ -31,7 +31,7 @@ void Threshold_Elec::set_ethr(void) const
     //=================
     else if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="scf-sto")//qianrui 2021-2-20
     {
-        if (abs(GlobalV::ETHR - 1.0e-2 < 1.0e-10))
+        if (abs(GlobalV::ETHR - 1.0e-2) < 1.0e-10)
         {
             if (GlobalC::pot.start_pot == "file")
             {
@@ -70,7 +70,7 @@ void Threshold_Elec::update_ethr(const int &iter)
         }
 
 		//----------------------------
-		// GlobalV::ETHR changes in CG Method. 
+		// GlobalV::ETHR changes in CG Method.
 		// mohan update 2012-03-26
 		// mohan update 2012-02-08
 		//----------------------------
@@ -91,7 +91,7 @@ void Threshold_Elec::update_ethr(const int &iter)
 
 void Threshold_Elec::iter_end(std::ofstream &ofs)
 {
-	if(GlobalV::OUT_LEVEL != "m") 
+	if(GlobalV::OUT_LEVEL != "m")
 	{
 		print_eigenvalue(ofs);
 	}
@@ -119,7 +119,7 @@ void Threshold_Elec::print_eigenvalue(std::ofstream &ofs)
 	}
 
 
-	if(GlobalV::MY_RANK!=0) 
+	if(GlobalV::MY_RANK!=0)
 	{
 		return;
 	}
@@ -135,7 +135,7 @@ void Threshold_Elec::print_eigenvalue(std::ofstream &ofs)
             if (GlobalC::kv.isk[ik] == 0)ofs << "\n spin up :";
             if (GlobalC::kv.isk[ik] == 1)ofs << "\n spin down :";
         }
-        
+
         if (GlobalV::NSPIN==2)
         {
             if (GlobalC::kv.isk[ik] == 0)
@@ -157,11 +157,11 @@ void Threshold_Elec::print_eigenvalue(std::ofstream &ofs)
 
 			}
 		}       // Pengfei Li  added  14-9-9
-		else	
+		else
 		{
-			ofs << " " << ik+1 << "/" << GlobalC::kv.nks << " kpoint (Cartesian) = " 
-				<< GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z 
-				<< " (" << GlobalC::kv.ngk[ik] << " pws)" << std::endl; 
+			ofs << " " << ik+1 << "/" << GlobalC::kv.nks << " kpoint (Cartesian) = "
+				<< GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z
+				<< " (" << GlobalC::kv.ngk[ik] << " pws)" << std::endl;
 
 			ofs << std::setprecision(6);
 		}
@@ -183,7 +183,7 @@ void Threshold_Elec::print_eigenvalue(std::ofstream &ofs)
 			GlobalV::ofs_running << std::setiosflags(ios::showpoint);
 			for (int ib = 0; ib < GlobalV::NBANDS; ib++)
 			{
-				ofs << " [spin" << GlobalC::kv.isk[ik]+1 << "_state] " << std::setw(8) << ib+1 
+				ofs << " [spin" << GlobalC::kv.isk[ik]+1 << "_state] " << std::setw(8) << ib+1
 				<< std::setw(15) << GlobalC::wf.ekb[ik][ib] * Ry_to_eV << std::setw(15) << GlobalC::wf.wg(ik, ib) << std::endl;
 			}
 			ofs << std::endl;
