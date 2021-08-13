@@ -42,6 +42,7 @@ void Input_Conv::Convert(void)
 	GlobalC::ucell.set_vel = INPUT.set_vel;
 
     GlobalV::NBANDS = INPUT.nbands;
+	GlobalC::wf.seed = INPUT.seed;
     GlobalV::NBANDS_ISTATE = INPUT.nbands_istate;
 	GlobalV::NPOOL = INPUT.npool;
 	GlobalV::CALCULATION = INPUT.calculation;

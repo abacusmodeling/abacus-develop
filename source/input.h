@@ -43,13 +43,10 @@ class Input
 	bool renormwithmesh;     // 0: use msh to normalize radial wave functions;  1: use mesh, which is used in QE.
     int ntype;				// number of atom types
     int nbands;				// number of bands
-	int nbands_sto;			// number of stochastic bands //qianrui 2021-2-5
 	int nbands_istate;		// number of bands around fermi level for istate calculation.
-	int nche_sto;			// number of orders for Chebyshev expansion in stochastic DFT //qinarui 2021-2-5
-	int seed_sto;  // random seed for sDFT
-	double emax_sto;		//Emax & Emin to normalize H
-	double emin_sto;
-	std::string stotype;
+	int seed;               // random seed for initializing wave functions qianrui 2021-8-12
+
+	
 
 	bool set_vel;           // read velocity from STRU or not  liuyu 2021-07-14
 
@@ -67,6 +64,16 @@ class Input
 	std::string wannier_spin;    // add by jingan for wannier90
 
 	bool mlwf_flag; 		// add by mohan
+
+//==========================================================
+// Stochastic DFT
+//==========================================================
+	int nche_sto;			// number of orders for Chebyshev expansion in stochastic DFT //qinarui 2021-2-5
+	int seed_sto;  // random seed for sDFT
+	double emax_sto;		//Emax & Emin to normalize H
+	double emin_sto;
+	std::string stotype;
+	int nbands_sto;			// number of stochastic bands //qianrui 2021-2-5
 
 //==========================================================
 // E field 
