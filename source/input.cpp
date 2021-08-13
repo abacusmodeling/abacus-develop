@@ -15,12 +15,6 @@
 
 Input INPUT;
 
-Input::Input()
-{
-	vector<double> angle1, angle2;
-	// all values set in Default
-}
-
 void Input::Init(const std::string &fn)
 {
 	timer::tick("Input","Init");

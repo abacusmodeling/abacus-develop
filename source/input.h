@@ -13,9 +13,6 @@ class Input
 {
 	public:
 
-	Input();
-    ~Input();
-
     void Init(const std::string &fn);
 
     void Print(const std::string &fn)const;
