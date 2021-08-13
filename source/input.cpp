@@ -11,20 +11,14 @@
 #include <iomanip>
 #include <stdio.h>
 #include <string.h>
+#include <vector>
 
 Input INPUT;
 
 Input::Input()
 {
-	angle1 = new double[1];
-	angle2 = new double[1];
-// all values set in Default
-}
-
-Input::~Input()
-{
-	delete[] angle1;
-	delete[] angle2;
+	vector<double> angle1, angle2;
+	// all values set in Default
 }
 
 void Input::Init(const std::string &fn)
@@ -414,8 +408,6 @@ void Input::Default(void)
 	noncolin = false;
 	lspinorb = false;
 	soc_lambda = 1.0;
-	angle1[0] = 0.0;
-	angle2[0] = 0.0;
 
 	//xiaohui add 2015-09-16
 	input_error = 0;
@@ -573,11 +565,15 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("ntype", word) == 0)// number of atom types
         {
             read_value(ifs, ntype);
-        }
+			if (ntype <= 0)
+				WARNING_QUIT("Input", "ntype must > 0");
+		}
         else if (strcmp("nbands", word) == 0)// number of atom bands
         {
             read_value(ifs, nbands);
-        }
+			if (nbands <= 0)
+				WARNING_QUIT("Input", "NBANDS must > 0");
+		}
 		else if (strcmp("nbands_sto", word) == 0)//number of stochastic bands
         {
             read_value(ifs, nbands_sto);
@@ -585,7 +581,10 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("nbands_istate", word) == 0)// number of atom bands
         {
             read_value(ifs, nbands_istate);
-        }
+			// Originally disabled in line 2401.
+			// if (nbands_istate < 0)
+			// 	WARNING_QUIT("Input", "NBANDS_ISTATE must > 0");
+		}
 		else if (strcmp("nche_sto", word) == 0)// Chebyshev expansion order
         {
             read_value(ifs, nche_sto);
@@ -878,7 +877,9 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("nb2d", word) == 0)
         {
             read_value(ifs, nb2d);
-        }
+			if (nb2d < 0)
+				WARNING_QUIT("Input", "nb2d must > 0");
+		}
         else if (strcmp("nurse", word) == 0)
         {
             read_value(ifs, nurse);
@@ -1699,31 +1700,15 @@ bool Input::Read(const std::string &fn)
 		}
 		else if (strcmp("angle1", word) == 0)
 		{
-			delete[] angle1;
-			if(ntype<1) angle1 = new double[1];
-			else
-			{
-				angle1 = new double[ntype];
-				ZEROS(angle1, ntype);
-				for(int i = 0;i<ntype;i++){
-					ifs>>angle1[i];
-				}
-				ifs.ignore(150, '\n');
-			}
+			angle1.resize(ntype);
+			for(auto &i:angle1)
+				read_value(ifs, i);
 		}
 		else if (strcmp("angle2", word) == 0)
 		{
-			delete[] angle2;
-			if(ntype<1) angle2 = new double[1];
-			else
-			{
-				angle2 = new double[ntype];
-				ZEROS(angle2, ntype);
-				for(int i = 0;i<ntype;i++){
-					ifs>>angle2[i];
-				}
-				ifs.ignore(150, '\n');
-			}
+			angle2.resize(ntype);
+			for (auto &i : angle2)
+				read_value(ifs, i);
 		}
         //else if (strcmp("epsilon0_choice", word) == 0)
         //{
@@ -2332,23 +2317,15 @@ void Input::Bcast()
 	{
 		if(GlobalV::MY_RANK==0)
 		{
-			if((sizeof(angle1) / sizeof(angle1[0]) != this->ntype)){
-				delete[] angle1;
-				angle1 = new double [this->ntype];
-				ZEROS(angle1, this->ntype);
-			}
-			if(sizeof(angle2) / sizeof(angle2[0]) != this->ntype){
-				delete[] angle2;
-				angle2 = new double [this->ntype];
-				ZEROS(angle2, this->ntype);
-			}
+			if (angle1.size() != this->ntype)
+				angle1.resize(this->ntype);
+			if (angle2.size() != this->ntype)
+				angle2.resize(this->ntype);
 		}
 		if(GlobalV::MY_RANK!=0)
 		{
-			delete[] angle1;
-			angle1 = new double [this->ntype];
-			delete[] angle2;
-			angle2 = new double [this->ntype];
+			angle1.resize(this->ntype);
+			angle2.resize(this->ntype);
 		}
 		for(int i = 0;i<this->ntype;i++)
 		{
@@ -2394,12 +2371,13 @@ void Input::Bcast()
 void Input::Check(void)
 {
     TITLE("Input","Check");
-
+/*
+	// Move checks on single value to read_value part, respectively.
 	if(nbands < 0) WARNING_QUIT("Input","NBANDS must > 0");
 //	if(nbands_istate < 0) WARNING_QUIT("Input","NBANDS_ISTATE must > 0");
 	if(nb2d < 0) WARNING_QUIT("Input","nb2d must > 0");
 	if(ntype < 0) WARNING_QUIT("Input","ntype must > 0");
-
+ */
 	//std::cout << "diago_proc=" << diago_proc << std::endl;
 	//std::cout << " NPROC=" << GlobalV::NPROC << std::endl;
 	if(diago_proc<=0)
