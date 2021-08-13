@@ -280,6 +280,7 @@ void DFTU::init(
 void DFTU::cal_occup_m_k(const int iter)
 {
 	TITLE("DFTU", "cal_occup_m_k");
+	timer::tick("DFTU", "cal_occup_m_k");
 
 	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
@@ -486,6 +487,8 @@ void DFTU::cal_occup_m_k(const int iter)
 	}//end it
 
 	//GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << std::endl;
+
+	timer::tick("DFTU", "cal_occup_m_k");
 	return;
 }
 
@@ -1494,7 +1497,7 @@ void DFTU::cal_eff_pot_mat_R_complex_double(
 void DFTU::folding_overlap_matrix(const int ik, std::complex<double>* Sk)
 {
   TITLE("DFTU","folding_overlap_matrix"); 
-	// timer::tick("DFTU","folding_overlap_matrix");
+	timer::tick("DFTU","folding_overlap_matrix");
 
   ZEROS(Sk, GlobalC::ParaO.nloc);
 
@@ -1638,8 +1641,8 @@ void DFTU::folding_overlap_matrix(const int ik, std::complex<double>* Sk)
 	} // end T1
 
 	assert(index==GlobalC::LNNR.nnr);
-
-  // timer::tick("DFTU","folding_overlap_matrix");
+	for(int iic=0;iic<20;icc++){cout<<"\nSk"<<Sk[iic]<<"\tSlocR"<<GlobalC::LM.SlocR[iir]<<"\n";}
+  	timer::tick("DFTU","folding_overlap_matrix");
 	return;
 }
 
