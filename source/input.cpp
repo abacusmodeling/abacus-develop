@@ -2365,13 +2365,12 @@ void Input::Bcast()
 void Input::Check(void)
 {
     TITLE("Input","Check");
-/*
-	// Move checks on single value to read_value part, respectively.
+
 	if(nbands < 0) WARNING_QUIT("Input","NBANDS must > 0");
 //	if(nbands_istate < 0) WARNING_QUIT("Input","NBANDS_ISTATE must > 0");
 	if(nb2d < 0) WARNING_QUIT("Input","nb2d must > 0");
-	if(ntype < 0) WARNING_QUIT("Input","ntype must > 0");
- */
+	if(ntype <= 0) WARNING_QUIT("Input","ntype must > 0");
+
 	//std::cout << "diago_proc=" << diago_proc << std::endl;
 	//std::cout << " NPROC=" << GlobalV::NPROC << std::endl;
 	if(diago_proc<=0)

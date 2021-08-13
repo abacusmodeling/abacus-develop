@@ -346,7 +346,7 @@ class Input
 	double soc_lambda;
 
 	//	bool starting_spin_angle;
-	vector<double> angle1, angle2;
+	vector<double> angle1={0}, angle2={0};
 
 
 //==========================================================
