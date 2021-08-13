@@ -235,3 +235,103 @@ void Print_Info::setup_parameters(void)
 
 	return;
 }
+
+void Print_Info::print_time(time_t &time_start, time_t &time_finish)
+{
+    // print out information before ABACUS ends
+	std::cout << "\n START  Time  : " << ctime(&time_start);
+	std::cout << " FINISH Time  : " << ctime(&time_finish);
+	std::cout << " TOTAL  Time  : " << difftime(time_finish, time_start) << std::endl;
+	std::cout << " SEE INFORMATION IN : " << GlobalV::global_out_dir << std::endl;
+
+	GlobalV::ofs_running << "\n Start  Time  : " << ctime(&time_start);
+	GlobalV::ofs_running << " Finish Time  : " << ctime(&time_finish);
+
+	double total_time = difftime(time_finish, time_start);
+	int hour = total_time / 3600;
+	int mins = ( total_time - 3600 * hour ) / 60;
+	int secs = total_time - 3600 * hour - 60 * mins ;
+	GlobalV::ofs_running << " Total  Time  : " << hour << " h "
+	    << mins << " mins "
+	    << secs << " secs "<< std::endl;
+}
+
+void Print_Info::print_scf(const int &istep, const int &iter)
+{
+    if(GlobalV::BASIS_TYPE=="pw")
+    {
+        GlobalV::ofs_running << "\n PW ALGORITHM ------------- ";
+    }
+    else
+    {
+        GlobalV::ofs_running << "\n LCAO ALGORITHM ------------- ";
+    }
+
+    if(GlobalV::CALCULATION=="scf")
+    {
+        GlobalV::ofs_running << "ELEC =" << std::setw(4) << iter;
+    }
+    else if(GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
+	{
+		GlobalV::ofs_running << "ION =" << std::setw(4) << istep+1
+		    << "  ELEC =" << std::setw(4) << iter;
+	}
+	else if(GlobalV::CALCULATION=="md")
+	{
+		GlobalV::ofs_running << "MD =" << std::setw(4) << istep+1
+		    << "  ELEC =" << std::setw(4) << iter;
+	}
+
+    GlobalV::ofs_running << " --------------------------------\n";
+}
+
+void Print_Info::print_screen(const int &stress_step, const int &force_step, const int &istep)
+{
+    std::cout << " -------------------------------------------" << std::endl;
+	if(GlobalV::CALCULATION=="relax") //pengfei 2014-10-13
+	{
+        std::cout << " STEP OF ION RELAXATION : " << istep << std::endl;
+	}
+    else if(GlobalV::CALCULATION=="cell-relax")
+    {
+        std::cout << " RELAX CELL : " << stress_step << std::endl;
+        std::cout << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << std::endl;
+    }
+	else if(GlobalV::CALCULATION=="scf") //add 4 lines 2015-09-06, xiaohui
+	{
+        std::cout << " SELF-CONSISTENT : " << std::endl;
+	}
+	else if(GlobalV::CALCULATION=="nscf") //add 4 lines 2015-09-06, xiaohui
+	{
+        std::cout << " NONSELF-CONSISTENT : " << std::endl;
+	}
+	else if(GlobalV::CALCULATION=="md")
+	{
+        std::cout << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
+	}
+    std::cout << " -------------------------------------------" << std::endl;
+
+    GlobalV::ofs_running << " -------------------------------------------" << std::endl;
+	if(GlobalV::CALCULATION=="relax")
+	{
+        GlobalV::ofs_running << " STEP OF ION RELAXATION : " << istep << std::endl;
+	}
+    else if(GlobalV::CALCULATION=="cell-relax")
+    {
+        GlobalV::ofs_running << " RELAX CELL : " << stress_step << std::endl;
+        GlobalV::ofs_running << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << std::endl;
+    }
+	else if(GlobalV::CALCULATION=="md")
+	{
+        GlobalV::ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
+	}
+	else if(GlobalV::CALCULATION=="scf")
+    {
+        GlobalV::ofs_running << " SELF-CONSISTENT" << std::endl;
+    }
+    else if(GlobalV::CALCULATION=="nscf")
+    {
+        GlobalV::ofs_running << " NONSELF-CONSISTENT" << std::endl;
+    }
+    GlobalV::ofs_running << " -------------------------------------------" << std::endl;
+}

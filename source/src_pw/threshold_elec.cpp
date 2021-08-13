@@ -89,16 +89,6 @@ void Threshold_Elec::update_ethr(const int &iter)
     return;
 }
 
-void Threshold_Elec::iter_end(std::ofstream &ofs)
-{
-	if(GlobalV::OUT_LEVEL != "m") 
-	{
-		print_eigenvalue(ofs);
-	}
-    return;
-}
-
-
 void Threshold_Elec::print_eigenvalue(std::ofstream &ofs)
 {
 	bool wrong = false;
@@ -126,14 +116,24 @@ void Threshold_Elec::print_eigenvalue(std::ofstream &ofs)
 
 	TITLE("Threshold_Elec","print_eigenvalue");
 
-    ofs << "\n STATE ENERGY(eV) AND OCCUPATIONS.";
+    ofs << "\n STATE ENERGY(eV) AND OCCUPATIONS ";
 	ofs << std::setprecision(5);
     for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {
-        if (GlobalV::NSPIN==2)
+        if(ik==0)
         {
-            if (GlobalC::kv.isk[ik] == 0)ofs << "\n spin up :";
-            if (GlobalC::kv.isk[ik] == 1)ofs << "\n spin down :";
+            ofs << "   NSPIN == " << GlobalV::NSPIN << std::endl;
+            if(GlobalV::NSPIN == 2)
+            {
+                ofs << "SPIN UP : " << std::endl;
+            }
+        }
+        else if(ik == GlobalC::kv.nks/2)
+        {
+            if(GlobalV::NSPIN == 2)
+            {
+                ofs << "SPIN DOWN : " << std::endl;
+            }
         }
         
         if (GlobalV::NSPIN==2)
@@ -178,13 +178,13 @@ void Threshold_Elec::print_eigenvalue(std::ofstream &ofs)
 		//----------------------
 		else
 		{
-			//ofs << std::setw(12) << GlobalC::kv.ngk[ik] << " PWs ";
 			GlobalV::ofs_running << std::setprecision(6);
 			GlobalV::ofs_running << std::setiosflags(ios::showpoint);
 			for (int ib = 0; ib < GlobalV::NBANDS; ib++)
 			{
-				ofs << " [spin" << GlobalC::kv.isk[ik]+1 << "_state] " << std::setw(8) << ib+1 
-				<< std::setw(15) << GlobalC::wf.ekb[ik][ib] * Ry_to_eV << std::setw(15) << GlobalC::wf.wg(ik, ib) << std::endl;
+				ofs << std::setw(8) << ib+1 
+				    << std::setw(15) << GlobalC::wf.ekb[ik][ib] * Ry_to_eV 
+                    << std::setw(15) << GlobalC::wf.wg(ik, ib) << std::endl;
 			}
 			ofs << std::endl;
 		}

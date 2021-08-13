@@ -46,6 +46,7 @@ public:
     void printcm_norm(const std::string &s, const ComplexMatrix &m, const double &limit)const;
     void printcm_norm(std::ofstream &ofs, const std::string &s, const ComplexMatrix &m, const double &limit)const;
 
+
     //***************
     // Template
     //***************
