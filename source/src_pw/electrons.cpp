@@ -302,7 +302,7 @@ void Electrons::self_consistent(const int &istep)
         }
 
         std::stringstream ssw;
-        ssw << GlobalV::global_out_dir << "WAVEFUNC.dat";
+        ssw << GlobalV::global_out_dir << "WAVEFUNC";
 
 		//qianrui add 2020-10-12
 		std::stringstream ssgk;
@@ -319,7 +319,7 @@ void Electrons::self_consistent(const int &istep)
 			GlobalC::CHR.write_rho_cube(GlobalC::CHR.rho_save[is], is, ssc.str(), 3);
         }
 
-        if(GlobalC::wf.out_wf)
+        if(GlobalC::wf.out_wf == 1 || GlobalC::wf.out_wf == 2)
         {
             //WF_io::write_wfc( ssw.str(), GlobalC::wf.evc );
             // mohan update 2011-02-21
