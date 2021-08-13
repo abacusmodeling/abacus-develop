@@ -66,18 +66,32 @@ class LCAO_Matrix
 	double* HlocR;
 	double* SlocR;
 	double* Hloc_fixedR;
+
 	//with soc, zhengdy-soc
+<<<<<<< HEAD
 	std::complex<double>* HlocR_soc;
 	std::complex<double>* SlocR_soc;
 	std::complex<double>* Hloc_fixedR_soc;
+=======
+	complex<double>* HlocR_soc;
+	complex<double>* SlocR_soc;
+	complex<double>* Hloc_fixedR_soc;
+
+>>>>>>> 238a6a19a355699417b9d1768fc4bf72619cd245
 	//LiuXh add 2019-07-15
 	double ****Hloc_fixedR_tr;
 	double ****SlocR_tr;
 	double ****HR_tr;
+<<<<<<< HEAD
 	std::complex<double> ****Hloc_fixedR_tr_soc;
 	std::complex<double> ****SlocR_tr_soc;
 	std::complex<double> ****HR_tr_soc;	
+=======
 
+	complex<double> ****Hloc_fixedR_tr_soc;
+	complex<double> ****SlocR_tr_soc;
+	complex<double> ****HR_tr_soc;	
+>>>>>>> 238a6a19a355699417b9d1768fc4bf72619cd245
 
 	// jingan add 2021-6-4
 	// Sparse form of HR and SR, the format is [R_x][R_y][R_z][orbit_row][orbit_col]
@@ -127,18 +141,21 @@ class LCAO_Matrix
 	// r_mu - r_nu
 	//----------------------------------------
 	double* DH_r;//zhengdy added 2017-07                        
+
 	double* stvnl11;
 	double* stvnl12;
 	double* stvnl13;
 	double* stvnl22;
 	double* stvnl23;
 	double* stvnl33;
+
 	double* DSloc_11;
 	double* DSloc_12;
 	double* DSloc_13;
 	double* DSloc_22;
 	double* DSloc_23;
 	double* DSloc_33;
+
 	double* DHloc_fixed_11;
 	double* DHloc_fixed_12;
 	double* DHloc_fixed_13;
@@ -146,6 +163,7 @@ class LCAO_Matrix
 	double* DHloc_fixed_23;
 	double* DHloc_fixed_33;
 
+<<<<<<< HEAD
 
 	void set_HSgamma(const int &iw1_all, const int &iw2_all, const double &v, const char &dtype);
 	void set_HSk(const int &iw1_all, const int &iw2_all, const std::complex<double> &v, const char &dtype, const int spin = 0);
@@ -158,6 +176,58 @@ class LCAO_Matrix
 	void set_HR_tr(const int &Rx, const int &Ry, const int &Rz, const int &iw1_all, const int &iw2_all, const double &v);
 	void set_HR_tr_soc(const int &Rx, const int &Ry, const int &Rz, 
 		const int &iw1_all, const int &iw2_all, const std::complex<double> &v); //LiuXh add 2019-07-16
+=======
+	//------------------------------------------------------
+	// DESCRIPTION:
+	// set 'dtype' matrix element (iw1_all, iw2_all) with 
+	// an input value 'v'
+	//------------------------------------------------------
+	void set_HSgamma(
+		const int &iw1_all, 
+		const int &iw2_all, 
+		const double &v, 
+		const char &dtype);
+
+	void set_HSk(
+		const int &iw1_all, 
+		const int &iw2_all, 
+		const complex<double> &v, 
+		const char &dtype, 
+		const int spin = 0);
+
+	void set_force (
+		const int& iw1_all, 
+		const int& iw2_all, 
+		const double& vx, 
+		const double& vy, 
+		const double& vz, 
+		const char &dtype);
+
+	void set_stress (
+		const int& iw1_all, 
+		const int& iw2_all, 
+		const double& vx, 
+		const double& vy,
+		const double& vz, 
+		const char &dtype, 
+		const Vector3<double> &dtau);
+
+	void set_HR_tr(
+		const int &Rx, 
+		const int &Ry, 
+		const int &Rz, 
+		const int &iw1_all, 
+		const int &iw2_all, 
+		const double &v);
+
+	void set_HR_tr_soc(
+		const int &Rx, 
+		const int &Ry, 
+		const int &Rz, 
+		const int &iw1_all, 
+		const int &iw2_all, 
+		const complex<double> &v); //LiuXh add 2019-07-16
+>>>>>>> 238a6a19a355699417b9d1768fc4bf72619cd245
 
 	void zeros_HSgamma(const char &mtype);
 	void zeros_HSk(const char &mtype);

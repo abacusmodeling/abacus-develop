@@ -34,6 +34,7 @@ public:
 	
 	friend class Diago_David;
 	friend class Diago_CG;
+    friend class Diago_CG_GPU;
 	friend class Exx_Lip;
 	friend class Hamilt;
     friend class Stochastic_Iter;

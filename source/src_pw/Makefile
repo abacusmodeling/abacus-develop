@@ -5,6 +5,7 @@
 #==========================
 CPLUSPLUS     = icpc
 CPLUSPLUS_MPI = mpiicpc
+CUDA_COMPILE = nvcc
 OBJ_DIR = pw_obj
 NP      = 12
 
@@ -13,11 +14,21 @@ NP      = 12
 ##==========================
 #FFTW_DIR = /home/qianrui/intelcompile/impi_fftw
 #FFTW_DIR = /home/mohan/1_Software/impi_fftw-3.3.8
+FFTW_DIR = /home/haosen/intel-source/fftw-3.3.4
 HONG_FFTW        = -D__FFTW3
 #FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
 FFTW_INCLUDE_DIR = ${MKLROOT}/include/fftw
 #FFTW_LIB_DIR     = ${FFTW_DIR}/lib
 #FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
+
+##==========================
+## CUDA needed 
+##==========================
+CUDA_DIR = /usr/local/cuda-11.0
+CUDA_INCLUDE_DIR	= ${CUDA_DIR}/include 
+CUDA_LIB_DIR		= ${CUDA_DIR}/lib64
+CUDA_LIB 			= -L${CUDA_LIB_DIR} -lcufft -lcublas -lcudart
+
 
 #==========================
 # LAPACK package needed 
@@ -39,16 +50,19 @@ LAPACK_LIB 			= -L${LAPACK_LIB_DIR} -Wl,--start-group -lmkl_intel_lp64 -lmkl_int
 #==========================
 # LIBS and INCLUDES
 #==========================
-LIBS = -lifcore -lm -lpthread ${FFTW_LIB} ${LAPACK_LIB}
+LIBS = -lifcore -lm -lpthread ${FFTW_LIB} ${LAPACK_LIB} ${CUDA_LIB}
+CUDA_LIBS = ${CUDA_LIB}
 
 #==========================
 # OPTIMIZE OPTIONS
 #==========================
-INCLUDES = -I. -Icommands -I${FFTW_INCLUDE_DIR} -I${LAPACK_INCLUDE_DIR}
+INCLUDES = -I. -Icommands -I${FFTW_INCLUDE_DIR} -I${LAPACK_INCLUDE_DIR} -I${CUDA_INCLUDE_DIR}
+CUDA_INCLUDES = -I. -Icommands -I${CUDA_INCLUDE_DIR}
 
 # -pedantic turns off more extensions and generates more warnings
 # -xHost generates instructions for the highest instruction set available on the compilation host processor
 OPTS = ${INCLUDES} -Ofast -std=c++11 -simd -march=native -xHost -m64 -qopenmp -Werror -Wall -pedantic -g
+OPTS_CUDA = ${INCLUDES} -std=c++11 
 
 include Makefile.Objects
 
@@ -101,6 +115,11 @@ ${OBJ_DIR}/main.o:../main.cpp
 	${CPLUSPLUS_MPI} ${OPTS} ${OPTS_MPI} -c ${HONG} ../main.cpp -o ${OBJ_DIR}/main.o
 ${OBJ_DIR}/%.o:%.cpp
 	${CPLUSPLUS_MPI} ${OPTS} ${OPTS_MPI} -c ${HONG} $< -o $@
+
+# rules of .cu files
+${OBJ_DIR}/%.o:%.cu
+	${CUDA_COMPILE} ${OPTS_CUDA} ${CUDA_LIBS} -c ${HONG_FFTW} $< -o $@
+
 
 .PHONY:clean
 clean:
