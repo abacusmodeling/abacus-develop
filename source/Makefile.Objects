@@ -288,6 +288,7 @@ diago_cg.o\
 output.o  \
 run_md_classic.o\
 LJ_potential.o\
+cmd_neighbor.o\
 dos.o \
 inverse_matrix.o \
 energy.o \

@@ -40,6 +40,10 @@ UnitCell::UnitCell()
     tpiba = 0.0;
     tpiba2 = 0.0;
     omega = 0.0;
+
+    atom_label = new string[1];
+    atom_mass = new double[1];
+    pseudo_fn = new string[1];
 }
 
 UnitCell::~UnitCell()
@@ -248,17 +252,20 @@ void UnitCell::print_cell_xyz(const std::string &fn)const
     return;
 }
 
-void UnitCell::set_iat2it(void)
+void UnitCell::set_iat2itia(void)
 {
 	assert(nat>0);
 	delete[] iat2it;
+    delete[] iat2ia;
 	this->iat2it = new int[nat];
+    this->iat2ia = new int[nat];
 	int iat=0;
 	for(int it = 0;it < ntype;it++)
 	{
 		for(int ia=0; ia<atoms[it].na; ia++)
 		{
 			this->iat2it[iat] = it;
+            this->iat2ia[iat] = ia;
 			++iat;
 		}	
 	}
@@ -377,4 +384,22 @@ void UnitCell::save_cartesian_position(double* pos)const
     }
     assert(iat == this->nat);
     return;
+}
+
+bool UnitCell::judge_big_cell(void)
+{
+	double diameter = 2*GlobalV::SEARCH_RADIUS;
+
+	double dis_x = this->omega/cross(a1*lat0, a2*lat0).norm();
+	double dis_y = this->omega/cross(a2*lat0, a3*lat0).norm();
+	double dis_z = this->omega/cross(a3*lat0, a1*lat0).norm();
+
+	if(dis_x>diameter && dis_y>diameter && dis_z>diameter)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
 }

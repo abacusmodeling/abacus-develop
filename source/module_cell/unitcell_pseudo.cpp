@@ -397,7 +397,7 @@ void UnitCell_pseudo::setup_cell_classic(
 		OUT(ofs_running,"Volume (A^3)", this->omega * pow(BOHR_TO_A, 3));
 	}
 
-	ofs_running << std::endl;
+	this->set_iat2itia();
 }
 
 
@@ -466,10 +466,10 @@ void UnitCell_pseudo::cal_nwfc(void)
 	// (4) set index for iat2it, iat2ia, itia2iat, itiaiw2iwt
 	//========================================================
 
-	this->set_iat2it();
+	this->set_iat2itia();
 	
-	delete[] iat2ia;
-	this->iat2ia = new int[nat];// bug fix 2009-3-8
+	//delete[] iat2ia;
+	//this->iat2ia = new int[nat];// bug fix 2009-3-8
 
 	// mohan add 2010-09-26
 	assert(GlobalV::NLOCAL>0);
@@ -487,7 +487,7 @@ void UnitCell_pseudo::cal_nwfc(void)
 		for(int ia=0; ia<atoms[it].na; ia++)
 		{
 			this->itia2iat(it, ia) = iat;
-			this->iat2ia[iat] = ia;
+			//this->iat2ia[iat] = ia;
 			for(int iw=0; iw<atoms[it].nw * GlobalV::NPOL; iw++)
 			{
 				this->itiaiw2iwt(it, ia, iw) = iwt;
