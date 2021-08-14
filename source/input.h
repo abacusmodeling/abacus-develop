@@ -4,6 +4,7 @@
 #include "module_base/vector3.h"
 #include <fstream>
 #include <string>
+#include <vector>
 #include "module_md/MD_parameters.h"
 
 using namespace std;
@@ -11,9 +12,6 @@ using namespace std;
 class Input
 {
 	public:
-    
-	Input();
-    ~Input();
 
     void Init(const std::string &fn);
 
@@ -22,7 +20,7 @@ class Input
 	void close_log(void)const;
 
 //==========================================================
-// directories of files 
+// directories of files
 //==========================================================
 
     std::string suffix;			// suffix of out put dir
@@ -57,7 +55,7 @@ class Input
 	int gdir;               // berry phase calculation
 
 //==========================================================
-// Wannier functions 
+// Wannier functions
 //==========================================================
 	bool towannier90;       // add by jingan for wannier90
 	std::string NNKP;            // add by jingan for wannier90
@@ -85,7 +83,7 @@ class Input
 	double eamp;
 
 //==========================================================
-// Optical properties 
+// Optical properties
 //==========================================================
 	bool opt_epsilon2;		// true : calculate the dielectric functions
 	int  opt_nbands;		// number of bands for optical transition matrix
@@ -101,13 +99,13 @@ class Input
     double tot_magnetization;
 
 //==========================================================
-// LCAO parameters 
+// LCAO parameters
 //==========================================================
 	std::string basis_type; 			//xiaohui add 2013-09-01, for structural adjustment
 	std::string ks_solver; 			//xiaohui add 2013-09-01
 
 //==========================================================
-// Forces 
+// Forces
 //==========================================================
     int force;
     bool force_set;
@@ -115,7 +113,7 @@ class Input
 	double force_thr_ev2;	// invalid force threshold, mohan add 2011-04-17
 
 //==========================================================
-// Stress 
+// Stress
 //==========================================================
     double stress_thr;      // Pengfei Li 2017-11-01 //LiuXh update 20180515
     double press1;
@@ -128,7 +126,7 @@ class Input
 
     double cg_threshold;    // threshold when cg to bfgs, pengfei add 2011-08-15
 
-	double bfgs_w1;			// wolfe condition 1	
+	double bfgs_w1;			// wolfe condition 1
 	double bfgs_w2;			// wolfe condition 2
 
 	double trust_radius_max;	// trust radius max
@@ -146,10 +144,10 @@ class Input
 
     int ncx,ncy,ncz;		// three dimension of FFT charge/grid
     int nx,ny,nz;			// three dimension of FFT wavefunc
-	int bx,by,bz;			// big mesh ball. mohan add 2011-04-21 
+	int bx,by,bz;			// big mesh ball. mohan add 2011-04-21
 
 //==========================================================
-// technique 
+// technique
 //==========================================================
 	int diago_proc;			// the number of procs used to diag. mohan add 2012-01-13
     int diago_cg_maxiter;
@@ -238,7 +236,7 @@ class Input
 
 //==========================================================
 // two center integrals in LCAO
-// mohan add 2009-11-11 
+// mohan add 2009-11-11
 //==========================================================
 	double lcao_ecut;		// ecut of two center integral
 	double lcao_dk;			// delta k used in two center integral
@@ -249,7 +247,7 @@ class Input
 
 
 //==========================================================
-// selected inversion method 
+// selected inversion method
 //==========================================================
 	// selinv method parameter (cooperate with LinLin)
 	int selinv_npole;
@@ -261,7 +259,7 @@ class Input
 	int selinv_niter;
 
 //==========================================================
-// molecular dynamics 
+// molecular dynamics
 // added by Daye Zheng
 //==========================================================
 /*    int md_mdtype;                   //choose ensemble
@@ -289,11 +287,11 @@ class Input
 // vdw
 // Peize Lin add 2014-03-31, jiyy update 2019-08-01
 //==========================================================
-    std::string vdw_method;          //the method of vdw calculation                 
-    std::string vdw_s6;              //scale parameter 
-	std::string vdw_s8;              //scale parameter 
-	std::string vdw_a1;             //damping function parameter 
-	std::string vdw_a2;             //damping function parameter 
+    std::string vdw_method;          //the method of vdw calculation
+    std::string vdw_s6;              //scale parameter
+	std::string vdw_s8;              //scale parameter
+	std::string vdw_a1;             //damping function parameter
+	std::string vdw_a2;             //damping function parameter
 	double vdw_d;               //damping function parameter d
 	bool vdw_abc;               //third-order term?
     std::string vdw_radius;          //cutoff radius for std::pair interactions
@@ -310,7 +308,7 @@ class Input
 //==========================================================
 // Spectrum
 // pengfei Li add 2016-11-23
-//==========================================================    
+//==========================================================
 	//bool     epsilon;               // calculate epsilon or not
 	std::string   spectral_type;          // the type of the calculated spectrum
 	int      spectral_method;        // 0: tddft(linear response)
@@ -322,8 +320,8 @@ class Input
 	double  eta;                   // unit(Ry)
 	double  domega;                // unit(Ry)
 	int     nomega;
-	int     ecut_chi;                   // the dimension of G 
-	//int     oband;                 // the number of "occupied" bands  
+	int     ecut_chi;                   // the dimension of G
+	//int     oband;                 // the number of "occupied" bands
 	double  q_start[3];            // the position of the first q point in direct coordinate
 	double  q_direct[3];             // the q direction
 	//int     start_q;               // the serial number of the start qpoint
@@ -342,7 +340,7 @@ class Input
 	double   eps_degauss;            // degauss
 	//int	epsilon0_choice;             // 0: vasp's method  1: pwscf's method
 	bool     kmesh_interpolation;          // calculting <i,0|j,R>
-	double  qcar[100][3];          // the Cartesian position of q points(unit: 2*PI/lat0) 
+	double  qcar[100][3];          // the Cartesian position of q points(unit: 2*PI/lat0)
 	int ocp;
 	//int ocp_n;
 	std::string ocp_set;
@@ -355,24 +353,23 @@ class Input
 	double soc_lambda;
 
 	//	bool starting_spin_angle;
-	double *angle1;
-	double *angle2;
-		
+	vector<double> angle1={0}, angle2={0};
+
 
 //==========================================================
 // exx
 // Peize Lin add 2018-06-20
-//==========================================================		
+//==========================================================
 	std::string exx_hybrid_type;		// "no", "hf", "pbe0", "hse"
 
 	double exx_hybrid_alpha;
 	double exx_hse_omega;
-	
+
 	bool exx_separate_loop;		// 0 or 1
 	int exx_hybrid_step;
-	
+
 	double exx_lambda;
-	
+
 	double exx_pca_threshold;
 	double exx_c_threshold;
 	double exx_v_threshold;
@@ -381,13 +378,13 @@ class Input
 	double exx_cauchy_threshold;
 	double exx_ccp_threshold;
 	double exx_ccp_rmesh_times;
-	
+
 	std::string exx_distribute_type;
-	
+
 	int exx_opt_orb_lmax;
 	double exx_opt_orb_ecut;
 	double exx_opt_orb_tolerence;
-	
+
 //==========================================================
 // tddft
 // Fuxiang He add 2016-10-26
@@ -407,7 +404,7 @@ class Input
 	int td_dipoleout;			// output the dipole or not
 
 
-	
+
 //==========================================================
 // restart
 // Peize Lin add 2020-04-04
@@ -417,12 +414,12 @@ class Input
 	//xiaohui add 2015-09-16
 	bool input_error;
     double cell_factor; //LiuXh add 20180619
-	
+
 //==========================================================
 // new DM algorithm test
 // add by Shen Yu @ 2019/5/9
 // newDM values:
-//  0: not use new DM algorithm; 
+//  0: not use new DM algorithm;
 //  1: use new DM algorithm and show no debug information
 //  2: use new DM algorithm and only show key debug information
 //  3: use new DM algorithm and show all detail debug information
@@ -432,10 +429,10 @@ class Input
 //==========================================================
 //    DFT+U       Xin Qu added on 2020-10-29
 //==========================================================
-    bool dft_plus_u;                //true:DFT+U correction; false：standard DFT calcullation(default)	
+    bool dft_plus_u;                //true:DFT+U correction; false：standard DFT calcullation(default)
 	int *orbital_corr;              // which correlated orbitals need corrected ; d:2 ,f:3, do not need correction:-1
     double *hubbard_u;              //Hubbard Coulomb interaction parameter U(ev)
-	double *hund_j;                 //Hund exchange parameter J(ev) 	
+	double *hund_j;                 //Hund exchange parameter J(ev)
 	bool omc;                       //whether turn on occupation matrix control method or not
 	bool yukawa_potential;          //default:false
 	double yukawa_lambda;            //default:0.0
@@ -446,7 +443,7 @@ class Input
 	int double_counting;            // 1:FLL(fully localized limit)(default); 2:AMF(around mean field)
 
 //==========================================================
-// DeepKS -- added by caoyu and mohan 
+// DeepKS -- added by caoyu and mohan
 //==========================================================
     int out_descriptor; // output descritpor for deepks. caoyu added 2020-11-24, mohan modified 2021-01-03
 	int lmax_descriptor; // lmax used in descriptor, mohan added 2021-01-03
@@ -457,7 +454,7 @@ class Input
 // variables for test only
 //==========================================================
 	bool test_just_neighbor;
-	
+
 	private:
 
 //==========================================================
@@ -474,7 +471,7 @@ class Input
 
     void Default(void);
 
-	void Default_2(void);    //jiyy add 2019-08-04											  
+	void Default_2(void);    //jiyy add 2019-08-04
 
     void Check(void);
 

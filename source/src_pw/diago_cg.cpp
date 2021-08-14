@@ -80,9 +80,9 @@ void Diago_CG::diag
         {
             this->calculate_gradient( precondition, dim, hphi, sphi, g, pphi );
             this->orthogonal_gradient( dim,dmx, g, scg, lagrange, phi, m);
-            this->calculate_gamma_cg( iter, dim, precondition, g, scg, 
+            this->calculate_gamma_cg( iter, dim, precondition, g, scg,
 			g0, cg, gg_last, cg_norm, theta, phi_m);// scg used as sg
-            converged = this->update_psi( dim, cg_norm, theta, pphi, cg, scg, phi_m , 
+            converged = this->update_psi( dim, cg_norm, theta, pphi, cg, scg, phi_m ,
 			e[m], eps, hphi, sphi); // pphi is used as hcg
             if ( converged ) break;
         }//end iter
@@ -461,7 +461,7 @@ void Diago_CG::schmit_orth
 		std::cout << " m = " << m << std::endl;
 		for(int j=0; j<=m; ++j)
 		{
-			std::cout << "\n j = " << j << " lagrange norm = " << ( conj(lagrange[j]) * lagrange[j] ).real();
+			std::cout << "j = " << j << " lagrange norm = " << ( conj(lagrange[j]) * lagrange[j] ).real()<<std::endl;
 		}
         std::cout << " in diago_cg, psi norm = " << psi_norm << std::endl;
 		std::cout << " If you use GNU compiler, it may due to the zdotc is unavailable." << std::endl;
