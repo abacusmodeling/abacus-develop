@@ -1,6 +1,5 @@
 #include "parallel_grid.h"
 #include "parallel_global.h"
-#include "../src_pw/global.h"
 
 Parallel_Grid::Parallel_Grid()
 {

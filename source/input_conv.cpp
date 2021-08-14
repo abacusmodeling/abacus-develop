@@ -43,6 +43,7 @@ void Input_Conv::Convert(void)
 
     GlobalV::NBANDS = INPUT.nbands;
 	GlobalC::wf.seed = INPUT.seed;
+	GlobalC::pw.seed = INPUT.seed;
     GlobalV::NBANDS_ISTATE = INPUT.nbands_istate;
 	GlobalV::NPOOL = INPUT.npool;
 	GlobalV::CALCULATION = INPUT.calculation;
