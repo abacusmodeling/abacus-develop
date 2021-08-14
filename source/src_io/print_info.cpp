@@ -1,13 +1,13 @@
 #include "print_info.h"
+#include "../input.h"
 #include "../module_base/global_variable.h"
-#include "../src_pw/global.h"
 
 Print_Info::Print_Info(){}
 
 Print_Info::~Print_Info(){}
 
 
-void Print_Info::setup_parameters(void)
+void Print_Info::setup_parameters(UnitCell_pseudo &ucell, K_Vectors &kv, xcfunc &xcf)
 {
 	TITLE("Print_Info","setup_parameters");
 	
@@ -85,12 +85,12 @@ void Print_Info::setup_parameters(void)
 			if(GlobalV::COLOUR && GlobalV::MY_RANK==0)
 			{
 				// zi
-				printf( "\e[35m%-16d\e[0m", GlobalC::kv.nkstot);
+				printf( "\e[35m%-16d\e[0m", kv.nkstot);
 				//printf( "[35m%-16d[0m", kv.nkstot);
 			}
 			else
 			{
-				std::cout << std::setw(16) << GlobalC::kv.nkstot;
+				std::cout << std::setw(16) << kv.nkstot;
 			}
 		}
 
@@ -150,15 +150,15 @@ void Print_Info::setup_parameters(void)
 
 
 
-		for(int it=0; it<GlobalC::ucell.ntype; ++it)
+		for(int it=0; it<ucell.ntype; ++it)
 		{
 			if(GlobalV::COLOUR && GlobalV::MY_RANK==0)
 			{
-				printf( "\e[36m%-8s\e[0m", GlobalC::ucell.atoms[it].label.c_str());
+				printf( "\e[36m%-8s\e[0m", ucell.atoms[it].label.c_str());
 			}
 			else
 			{
-				std::cout << " " << std::setw(8) << GlobalC::ucell.atoms[it].label;
+				std::cout << " " << std::setw(8) << ucell.atoms[it].label;
 			}
 
 			if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw")
@@ -166,10 +166,10 @@ void Print_Info::setup_parameters(void)
 				std::stringstream orb;
 
 				int norb = 0;
-				/*for(int L=0; L<=GlobalC::ORB.Phi[it].getLmax(); ++L)
+				/*for(int L=0; L<=ORB.Phi[it].getLmax(); ++L)
 				{
-					norb += (2*L+1)*GlobalC::ORB.Phi[it].getNchi(L);
-					orb << GlobalC::ORB.Phi[it].getNchi(L);
+					norb += (2*L+1)*ORB.Phi[it].getNchi(L);
+					orb << ORB.Phi[it].getNchi(L);
 					if(L==0) orb << "s";
 					else if(L==1) orb << "p";
 					else if(L==2) orb << "d";
@@ -178,13 +178,13 @@ void Print_Info::setup_parameters(void)
 					else if(L==5) orb << "h";
 					else if(L==6) orb << "i";
 				}
-				orb << "-" << GlobalC::ORB.Phi[it].getRcut() << "au";*/
+				orb << "-" << ORB.Phi[it].getRcut() << "au";*/
 
 
-				for(int L=0; L<=GlobalC::ucell.atoms[it].nwl; ++L)        // pengfei Li 16-2-29
+				for(int L=0; L<=ucell.atoms[it].nwl; ++L)        // pengfei Li 16-2-29
 				{
-					norb += (2*L+1)* GlobalC::ucell.atoms[it].l_nchi[L];
-					orb << GlobalC::ucell.atoms[it].l_nchi[L];
+					norb += (2*L+1)* ucell.atoms[it].l_nchi[L];
+					orb << ucell.atoms[it].l_nchi[L];
 					if(L==0) orb << "s";
 					else if(L==1) orb << "p";
 					else if(L==2) orb << "d";
@@ -193,7 +193,7 @@ void Print_Info::setup_parameters(void)
 					else if(L==5) orb << "h";
 					else if(L==6) orb << "i";
 				}
-				orb << "-" << GlobalC::ucell.atoms[it].Rcut << "au";
+				orb << "-" << ucell.atoms[it].Rcut << "au";
 
 				if(GlobalV::COLOUR && GlobalV::MY_RANK==0)
 				{
@@ -210,20 +210,22 @@ void Print_Info::setup_parameters(void)
 			}
 
 
-			std::cout << std::setw(12) << GlobalC::ucell.atoms[it].na;
+			std::cout << std::setw(12) << ucell.atoms[it].na;
 
-//				if(GlobalC::ucell.atoms[it].dft[1]=="PZ")    // pengfei Li added 2015-1-31 cancelled by zws
+//				if(ucell.atoms[it].dft[1]=="PZ")    // pengfei Li added 2015-1-31 cancelled by zws
 //				{
 //					//std::cout << std::setw(12) << "PZ-LDA";
 //
 //				}
 //				else
 //				{
-//					//std::cout << std::setw(12) << GlobalC::ucell.atoms[it].dft[0];
+//					//std::cout << std::setw(12) << ucell.atoms[it].dft[0];
 //                                        std::cout << std::setw(12) << "PBE";
 //				}
-			GlobalC::xcf.ostreamdft(std::cout); // zws add 20150108
-			//std::cout << " ( "  << std::setw(3) << GlobalC::xcf.iexch << std::setw(3) << GlobalC::xcf.icorr << std::setw(3) << GlobalC::xcf.igcx << std::setw(3) << GlobalC::xcf.igcc << ")";
+#ifndef __CMD
+			xcf.ostreamdft(std::cout); // zws add 20150108
+#endif
+			//std::cout << " ( "  << std::setw(3) << xcf.iexch << std::setw(3) << xcf.icorr << std::setw(3) << xcf.igcx << std::setw(3) << xcf.igcc << ")";
 			std::cout << std::endl;
 		}
 
@@ -251,9 +253,9 @@ void Print_Info::print_time(time_t &time_start, time_t &time_finish)
 	int hour = total_time / 3600;
 	int mins = ( total_time - 3600 * hour ) / 60;
 	int secs = total_time - 3600 * hour - 60 * mins ;
-	GlobalV::ofs_running << " Total  Time  : " << hour << " h "
-	    << mins << " mins "
-	    << secs << " secs "<< std::endl;
+	GlobalV::ofs_running << " Total  Time  : " << unsigned(hour) << " h "
+	    << unsigned(mins) << " mins "
+	    << unsigned(secs) << " secs "<< std::endl;
 }
 
 void Print_Info::print_scf(const int &istep, const int &iter)
@@ -269,17 +271,17 @@ void Print_Info::print_scf(const int &istep, const int &iter)
 
     if(GlobalV::CALCULATION=="scf")
     {
-        GlobalV::ofs_running << "ELEC =" << std::setw(4) << iter;
+        GlobalV::ofs_running << "ELEC = " << std::setw(4) << unsigned(iter);
     }
     else if(GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
 	{
-		GlobalV::ofs_running << "ION =" << std::setw(4) << istep+1
-		    << "  ELEC =" << std::setw(4) << iter;
+		GlobalV::ofs_running << "ION = " << std::setw(4) << unsigned(istep+1)
+		    				 << "  ELEC = " << std::setw(4) << unsigned(iter);
 	}
 	else if(GlobalV::CALCULATION=="md")
 	{
-		GlobalV::ofs_running << "MD =" << std::setw(4) << istep+1
-		    << "  ELEC =" << std::setw(4) << iter;
+		GlobalV::ofs_running << "MD = " << std::setw(4) << unsigned(istep+1)
+		    				 << "  ELEC = " << std::setw(4) << unsigned(iter);
 	}
 
     GlobalV::ofs_running << " --------------------------------\n";
@@ -288,50 +290,36 @@ void Print_Info::print_scf(const int &istep, const int &iter)
 void Print_Info::print_screen(const int &stress_step, const int &force_step, const int &istep)
 {
     std::cout << " -------------------------------------------" << std::endl;
+	GlobalV::ofs_running << "\n -------------------------------------------" << std::endl;
+
 	if(GlobalV::CALCULATION=="relax") //pengfei 2014-10-13
 	{
-        std::cout << " STEP OF ION RELAXATION : " << istep << std::endl;
+        std::cout << " STEP OF ION RELAXATION : " << unsigned(istep) << std::endl;
+		GlobalV::ofs_running << " STEP OF ION RELAXATION : " << unsigned(istep) << std::endl;
 	}
     else if(GlobalV::CALCULATION=="cell-relax")
     {
-        std::cout << " RELAX CELL : " << stress_step << std::endl;
-        std::cout << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << std::endl;
+        std::cout << " RELAX CELL : " << unsigned(stress_step) << std::endl;
+        std::cout << " RELAX IONS : " << unsigned(force_step) << " (in total: " << unsigned(istep) << ")" << std::endl;
+		GlobalV::ofs_running << " RELAX CELL : " << unsigned(stress_step) << std::endl;
+        GlobalV::ofs_running << " RELAX IONS : " << unsigned(force_step) << " (in total: " << unsigned(istep) << ")" << std::endl;
     }
 	else if(GlobalV::CALCULATION=="scf") //add 4 lines 2015-09-06, xiaohui
 	{
         std::cout << " SELF-CONSISTENT : " << std::endl;
+		GlobalV::ofs_running << " SELF-CONSISTENT" << std::endl;
 	}
 	else if(GlobalV::CALCULATION=="nscf") //add 4 lines 2015-09-06, xiaohui
 	{
         std::cout << " NONSELF-CONSISTENT : " << std::endl;
+		GlobalV::ofs_running << " NONSELF-CONSISTENT" << std::endl;
 	}
 	else if(GlobalV::CALCULATION=="md")
 	{
-        std::cout << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
+        std::cout << " STEP OF MOLECULAR DYNAMICS : " << unsigned(istep) << std::endl;
+		GlobalV::ofs_running << " STEP OF MOLECULAR DYNAMICS : " << unsigned(istep) << std::endl;
 	}
+		
     std::cout << " -------------------------------------------" << std::endl;
-
-    GlobalV::ofs_running << " -------------------------------------------" << std::endl;
-	if(GlobalV::CALCULATION=="relax")
-	{
-        GlobalV::ofs_running << " STEP OF ION RELAXATION : " << istep << std::endl;
-	}
-    else if(GlobalV::CALCULATION=="cell-relax")
-    {
-        GlobalV::ofs_running << " RELAX CELL : " << stress_step << std::endl;
-        GlobalV::ofs_running << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << std::endl;
-    }
-	else if(GlobalV::CALCULATION=="md")
-	{
-        GlobalV::ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
-	}
-	else if(GlobalV::CALCULATION=="scf")
-    {
-        GlobalV::ofs_running << " SELF-CONSISTENT" << std::endl;
-    }
-    else if(GlobalV::CALCULATION=="nscf")
-    {
-        GlobalV::ofs_running << " NONSELF-CONSISTENT" << std::endl;
-    }
     GlobalV::ofs_running << " -------------------------------------------" << std::endl;
 }

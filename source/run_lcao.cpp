@@ -72,8 +72,7 @@ void Run_lcao::lcao_line(void)
 
     // print information
     // mohan add 2021-01-30
-    Print_Info PI;
-    PI.setup_parameters();
+    Print_Info::setup_parameters(GlobalC::ucell, GlobalC::kv, GlobalC::xcf);
 
     // * reading the localized orbitals/projectors 
 	// * construct the interpolation tables.

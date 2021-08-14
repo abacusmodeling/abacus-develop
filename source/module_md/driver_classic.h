@@ -23,9 +23,6 @@ class Driver_classic
 	// classic MD
 	void classic_world();
 
-	void print_time(time_t &time_start, time_t &time_finish);
-
-
 };
 
 #endif

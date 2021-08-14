@@ -59,15 +59,7 @@ void Run_MD_CLASSIC::md_cells_classic(void)
     {
 		time_t fstart = time(NULL);
 
-        if (GlobalV::OUT_LEVEL == "ie")
-        {
-            std::cout << " -------------------------------------------" << std::endl;    
-            std::cout << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
-            std::cout << " -------------------------------------------" << std::endl;
-            GlobalV::ofs_running << " -------------------------------------------" << std::endl;
-            GlobalV::ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
-            GlobalV::ofs_running << " -------------------------------------------" << std::endl;
-        }
+        Print_Info::print_screen(0, 0, istep);
 
 		double potential;
 

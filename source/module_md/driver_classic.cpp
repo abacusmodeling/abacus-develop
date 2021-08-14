@@ -5,6 +5,7 @@
 #include "../module_base/timer.h"
 #include "../module_base/global_variable.h"
 #include "../module_base/memory.h"
+#include "../src_io/print_info.h"
 
 Driver_classic::Driver_classic(){}
 Driver_classic::~Driver_classic(){}
@@ -24,7 +25,7 @@ void Driver_classic::init()
 
 	// (3) output information
 	time_t	time_finish= std::time(NULL);
-	this->print_time(time_start, time_finish);
+	Print_Info::print_time(time_start, time_finish);
 
 	// (4) close all of the running logs 
 	INPUT.close_log();
@@ -95,24 +96,4 @@ void Driver_classic::classic_world(void)
 	Memory::print_all( GlobalV::ofs_running ) ;
 
 	return;
-}
-
-void Driver_classic::print_time(time_t &time_start, time_t &time_finish)
-{
-    // print out information before ABACUS-CMD ends
-	std::cout << "\n START  Time  : " << ctime(&time_start);
-	std::cout << " FINISH Time  : " << ctime(&time_finish);
-	std::cout << " TOTAL  Time  : " << difftime(time_finish, time_start) << std::endl;
-	std::cout << " SEE INFORMATION IN : " << GlobalV::global_out_dir << std::endl;
-
-	GlobalV::ofs_running << "\n Start  Time  : " << ctime(&time_start);
-	GlobalV::ofs_running << " Finish Time  : " << ctime(&time_finish);
-
-	double total_time = difftime(time_finish, time_start);
-	int hour = total_time / 3600;
-	int mins = ( total_time - 3600 * hour ) / 60;
-	int secs = total_time - 3600 * hour - 60 * mins ;
-	GlobalV::ofs_running << " Total  Time  : " << hour << " h "
-	    << mins << " mins "
-	    << secs << " secs "<< std::endl;
 }
