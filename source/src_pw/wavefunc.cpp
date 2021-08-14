@@ -7,6 +7,7 @@
 wavefunc::wavefunc()
 {
 	allocate_ekb = false;
+	out_wf = 0;
 }
 
 wavefunc::~wavefunc()
@@ -310,7 +311,7 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ComplexMatrix &wvf)
 	}
 	else if(start_wfc=="random")
 	{
-		this->random(wfcatom,0,GlobalV::NBANDS,ik);
+			this->random(wfcatom,0,GlobalV::NBANDS,ik);
 	}
 
 	// (7) Diago with cg method.
