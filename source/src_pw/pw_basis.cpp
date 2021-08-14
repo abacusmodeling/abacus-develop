@@ -401,6 +401,8 @@ void PW_Basis::setup_gg(void)
             const double tmp2 = tmp * tmp ;
             if (this->ggwfc2 < tmp2) this->ggwfc2 = tmp2;
         }
+        //qianrui add 2021-8-13 to make different npool parameters can get the same results
+        if(seed > 0)    MPI_Allreduce(MPI_IN_PLACE, &ggwfc2, 1, MPI_DOUBLE, MPI_MAX , MPI_COMM_WORLD);
     }
 
 	OUT(GlobalV::ofs_running,"energy cutoff for wavefunc (unit:Ry)",ecutwfc);

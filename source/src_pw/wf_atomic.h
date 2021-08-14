@@ -16,6 +16,8 @@ class WF_atomic : public WF_igk
     ComplexMatrix *evc;  // wavefunctions in the PW basis
 
     ComplexMatrix *wanf2; // wannier functions in the PW basis
+    
+    int seed; //random seed for wave functions qianrui add 2021-8-13
 
     void init_at_1(void);// from init_at_1.f90
 

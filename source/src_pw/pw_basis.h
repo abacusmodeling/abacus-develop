@@ -80,6 +80,8 @@ public:
 	// nrxx_start: starting nrxx in each processor 
     int nrxx_start;
 
+    int seed;
+
 private:
     void setup_FFT_dimension(void);	// set up FFT dimensions
 

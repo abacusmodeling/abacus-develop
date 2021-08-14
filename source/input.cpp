@@ -116,6 +116,7 @@ void Input::Default(void)
     nbands = 0;
 	nbands_sto = 0;
 	nbands_istate = 5;
+	seed = 0;
 	nche_sto = 0;
 	seed_sto = 0;
 	stotype = "pw";
@@ -586,6 +587,10 @@ bool Input::Read(const std::string &fn)
 		else if (strcmp("seed_sto", word) == 0)
         {
             read_value(ifs, seed_sto);
+		}
+		else if (strcmp("seed", word) == 0)
+        {
+            read_value(ifs, seed);
 		}
 		else if (strcmp("emax_sto", word) == 0)
         {
@@ -2009,6 +2014,7 @@ void Input::Bcast()
     Parallel_Common::bcast_int( nbands_istate );
 	Parallel_Common::bcast_int( nche_sto );
 	Parallel_Common::bcast_int( seed_sto );
+	Parallel_Common::bcast_int( seed );
 	Parallel_Common::bcast_double( emax_sto );
 	Parallel_Common::bcast_double( emin_sto );
 	Parallel_Common::bcast_string( stotype );
