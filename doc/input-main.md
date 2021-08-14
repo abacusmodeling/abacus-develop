@@ -7,11 +7,11 @@
 
     - [Variables related to input files](#variables-related-to-input-files)
 
-        [atom_file](#atom-file) | [kpoint_file](#kpoint-file) | [pseudo_dir](#pseudo-dir) | [read_file_dir](#read-file-dir)
+        [atom_file](#atom-file) | [kpoint_file](#kpoint-file) | [pseudo_dir](#pseudo-dir) | [orbital_dir](#orbital-dir) | [read_file_dir](#read-file-dir)
 
     - [Plane wave related variables](#plane-wave-related-variables)
     
-        [ecutwfc](#ecutwfc)| [nx,ny,nz](#nx) | [ethr](#ethr) | [diago_cg_maxiter](#diago-cg-maxiter) | [diago_david_ndim](#diago-david-ndim)
+        [ecutwfc](#ecutwfc) | [nx,ny,nz](#nx) | [ethr](#ethr) | [diago_cg_maxiter](#diago-cg-maxiter) | [diago_david_ndim](#diago-david-ndim)
 
     - [Numerical atomic orbitals related variables](#numerical-atomic-orbitals-related-variables)
 
@@ -314,6 +314,13 @@ This part of variables are used to control input files related parameters.
 - pseudo_dir<a id="pseudo-dir"></a>
     - *Type*: String
     - *Description*: This parameter specifies pseudopotential directory.
+    - *Default*: ./
+
+    [back to top](#input-file)
+
+- orbital_dir<a id="orbital-dir"></a>
+    - *Type*: String
+    - *Description*: This parameter specifies orbital file directory.
     - *Default*: ./
 
     [back to top](#input-file)

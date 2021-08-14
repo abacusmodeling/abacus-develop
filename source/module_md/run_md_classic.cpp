@@ -6,8 +6,9 @@
 #include "../module_base/global_variable.h"
 #include "../src_io/print_info.h"
 #include "../module_neighbor/sltk_atom_arrange.h"
+#include "../module_neighbor/sltk_grid_driver.h"
 
-Run_MD_CLASSIC::Run_MD_CLASSIC():grid_neigh(GlobalV::test_deconstructor, GlobalV::test_grid_driver, GlobalV::test_grid)
+Run_MD_CLASSIC::Run_MD_CLASSIC()
 {
     pos_old1 = new double[1];
 	pos_old2 = new double[1];
@@ -52,55 +53,42 @@ void Run_MD_CLASSIC::md_cells_classic(void)
 
     this->istep = 1;
     bool stop = false;
+	bool which_method = this->ucell_c.judge_big_cell();
 
     while (istep <= GlobalV::NSTEP && !stop)
     {
 		time_t fstart = time(NULL);
 
-        if (GlobalV::OUT_LEVEL == "ie")
-        {
-            std::cout << " -------------------------------------------" << std::endl;    
-            std::cout << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
-            std::cout << " -------------------------------------------" << std::endl;
-            GlobalV::ofs_running << " -------------------------------------------" << std::endl;
-            GlobalV::ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
-            GlobalV::ofs_running << " -------------------------------------------" << std::endl;
-        }
+        Print_Info::print_screen(0, 0, istep);
 
 		double potential;
 
-		if(this->ucell_c.judge_big_cell())
+		if(which_method)
 		{
-			//cout << "Big cell !!" << endl;
 			CMD_neighbor cmd_neigh;
 			cmd_neigh.neighbor(this->ucell_c);
 
-			LJ_potential LJ_CMD;
-
-			potential = LJ_CMD.Lennard_Jones(
-							this->ucell_c,
-							cmd_neigh,
-							this->force,
-							this->stress);
+			potential = LJ_potential::Lennard_Jones(
+								this->ucell_c,
+								cmd_neigh,
+								this->force);
 		}
 		else
 		{
+			Grid_Driver grid_neigh(GlobalV::test_deconstructor, GlobalV::test_grid_driver, GlobalV::test_grid);
 			atom_arrange::search(
 				GlobalV::SEARCH_PBC,
 				GlobalV::ofs_running,
-				this->grid_neigh,
+				grid_neigh,
 				this->ucell_c, 
 				GlobalV::SEARCH_RADIUS, 
 				GlobalV::test_atom_input,
 				INPUT.test_just_neighbor);
 
-			LJ_potential LJ_CMD;
-
-			potential = LJ_CMD.Lennard_Jones(
-							this->ucell_c,
-							this->grid_neigh,
-							this->force,
-							this->stress);
+			potential = LJ_potential::Lennard_Jones(
+								this->ucell_c,
+								grid_neigh,
+								this->force);
 		}
 
 		ofstream force_out("force.txt", ios::app);

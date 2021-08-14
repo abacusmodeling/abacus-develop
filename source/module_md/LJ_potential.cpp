@@ -7,9 +7,11 @@ LJ_potential::~LJ_potential(){}
 
 double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c, 
                     Grid_Driver &grid_neigh, 
-                    Vector3<double> *force, 
-                    matrix &stress)
+                    Vector3<double> *force)
 {
+    TITLE("LJ_potential", "Lennard_Jones");
+    timer::tick("LJ_potential", "Lennard_Jones");
+
     double distance, potential = 0; //initialize
     int index = 0;
     Vector3<double> tau1, tau2, dtau;
@@ -35,14 +37,17 @@ double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c,
             index++;
 	    }
     }
+    timer::tick("LJ_potential", "Lennard_Jones");
 	return potential/2.0;
 }
 
 double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c, 
                     CMD_neighbor &cmd_neigh,
-                    Vector3<double> *force, 
-                    matrix &stress)
+                    Vector3<double> *force)
 {
+    TITLE("LJ_potential", "Lennard_Jones");
+    timer::tick("LJ_potential", "Lennard_Jones");
+
     double potential = 0; //initialize
 
 	for(int i=0; i<ucell_c.nat; i++)
@@ -77,6 +82,7 @@ double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c,
 			}
 		}
 	}
+    timer::tick("LJ_potential", "Lennard_Jones");
 	return potential/2.0;
 }
 

@@ -5,7 +5,7 @@
 #==========================
 CPLUSPLUS     = icpc
 CPLUSPLUS_MPI = mpiicpc
-OBJ_DIR = obj
+OBJ_DIR = cell_obj
 NP      = 8
 
 #==========================
