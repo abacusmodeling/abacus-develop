@@ -35,6 +35,7 @@ void Input_Conv::Convert(void)
 	GlobalV::global_wannier_card = INPUT.wannier_card;
     if(INPUT.kpoint_file!= "") GlobalV::global_kpoint_card = INPUT.kpoint_file;
     if(INPUT.pseudo_dir != "") GlobalV::global_pseudo_dir = INPUT.pseudo_dir + "/";
+	if(INPUT.orbital_dir != "") GlobalV::global_orbital_dir = INPUT.orbital_dir + "/";
     GlobalV::global_pseudo_type = INPUT.pseudo_type;
 	GlobalC::ucell.latName = INPUT.latname; 
 	GlobalC::ucell.ntype = INPUT.ntype;

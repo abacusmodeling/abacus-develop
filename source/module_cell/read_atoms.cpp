@@ -65,6 +65,8 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 				//std::string nfile;
 
 				ifa >> ofile;
+
+				ofile = GlobalV::global_orbital_dir + ofile;
 				//-----------------------------------
 				// Turn off the read in NONLOCAL file
 				// function since 2013-08-02 by mohan
