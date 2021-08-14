@@ -41,6 +41,7 @@ class WF_atomic : public WF_igk
     // as trial wave functions
     //==================================
     void random(ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const;
+    void atomicrandom(ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const;
 
     void check_psi(const ComplexMatrix *psi)const;
 
