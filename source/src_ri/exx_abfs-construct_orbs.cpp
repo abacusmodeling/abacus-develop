@@ -8,12 +8,12 @@
 #include "../src_external/src_test/src_ri/exx_abfs-construct_orbs-test.h"		// Peize Lin test
 #include "../src_lcao/global_fp.h"
 
-std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_Orbs::change_orbs( 
+std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_Orbs::change_orbs(
 	const LCAO_Orbitals &orbs_in,
 	const double kmesh_times )
 {
 	TITLE("Exx_Abfs::Construct_Orbs::change_orbs");
-	
+
 	std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> orbs;
 	orbs.resize( orbs_in.get_ntype() );
 	for (int T = 0;  T < orbs_in.get_ntype() ; T++)
@@ -47,7 +47,7 @@ std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_
 	return orbs;
 }
 
-std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_Orbs::change_orbs( 
+std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_Orbs::change_orbs(
 	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orbs_in,
 	const double kmesh_times )
 {
@@ -58,37 +58,37 @@ std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_
 // P = u/r * Y
 /*
 template<typename Orbs_Type>
-std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_Orbs::abfs_same_atom( 
+std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_Orbs::abfs_same_atom(
 	const Orbs_Type &orbs,
 	const double kmesh_times,
 	const double norm_threshold )
 {
-	const std::vector<std::vector<std::vector<std::vector<double>>>> 
+	const std::vector<std::vector<std::vector<std::vector<double>>>>
 		&&abfs_same_atom_psir = psir_mult_psir( orbs );
-	const std::vector<std::vector<std::vector<std::vector<double>>>> 
+	const std::vector<std::vector<std::vector<std::vector<double>>>>
 		&&abfs_same_atom_psir_orth = orth( abfs_same_atom_psir, orbs, norm_threshold );
-	const std::vector<std::vector<std::vector<std::vector<double>>>> 
+	const std::vector<std::vector<std::vector<std::vector<double>>>>
 		&&abfs_same_atom_psi_orth = div_r( abfs_same_atom_psir_orth, orbs.get_r_radial );
-	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> 
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>>
 		&&abfs_same_atom = orbital( abfs_same_atom_psi_orth, orbs, kmesh_times );
 	return abfs_same_atom;
 }
 */
 
 // P = f * Y
-std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_Orbs::abfs_same_atom( 
+std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_Orbs::abfs_same_atom(
 	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orbs,
 	const double kmesh_times_mot,
 	const double times_threshold )
 {
 	TITLE("Exx_Abfs::Construct_Orbs::abfs_same_atom");
-	
-	const std::vector<std::vector<std::vector<std::vector<double>>>> 
+
+	const std::vector<std::vector<std::vector<std::vector<double>>>>
 		abfs_same_atom_psi = psi_mult_psi( orbs );
-		
-	const std::vector<std::vector<std::vector<std::vector<double>>>> 
+
+	const std::vector<std::vector<std::vector<std::vector<double>>>>
 		abfs_same_atom_orth_psi = orth( abfs_same_atom_psi, orbs );
-	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>>  
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>>
 		abfs_same_atom = orbital( abfs_same_atom_orth_psi, orbs, 1 );
 
 	#if TEST_EXX_LCAO==1
@@ -97,8 +97,8 @@ std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_
 	#elif TEST_EXX_LCAO==-1
 		#error "TEST_EXX_LCAO"
 	#endif
-		
-	const std::vector<std::vector<std::vector<std::vector<double>>>> 
+
+	const std::vector<std::vector<std::vector<std::vector<double>>>>
 		abfs_same_atom_pca_psi = pca( abfs_same_atom, orbs, kmesh_times_mot, times_threshold );
 
 	#if TEST_EXX_LCAO==1
@@ -107,28 +107,28 @@ std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_
 		#error "TEST_EXX_LCAO"
 	#endif
 
-	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>>  
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>>
 		&&abfs_same_atom_pca = orbital( abfs_same_atom_pca_psi, orbs, 1 );
 	return abfs_same_atom_pca;
 }
 
-std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_Orbs::orth_orbs( 
+std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_Orbs::orth_orbs(
 	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orbs,
 	const double norm_threshold )
 {
 	TITLE("Exx_Abfs::Construct_Orbs::orth_orbs");
-	const std::vector<std::vector<std::vector<std::vector<double>>>> 
+	const std::vector<std::vector<std::vector<std::vector<double>>>>
 		orbs_psi = get_psi( orbs );
-	const std::vector<std::vector<std::vector<std::vector<double>>>> 
+	const std::vector<std::vector<std::vector<std::vector<double>>>>
 		orbs_psi_orth = orth( orbs_psi, orbs, norm_threshold );
-	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> 
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>>
 		orbs_new = orbital( orbs_psi_orth, orbs, 1 );
 	return orbs_new;
 }
 
 /*
 template<>
-std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_Orbs::psi_mult_psi( 
+std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_Orbs::psi_mult_psi(
 	const LCAO_Orbitals &orbs )
 {
 	std::vector<std::vector<std::vector<std::vector<double>>>> psi_mult_psi( orbs.get_ntype() );
@@ -144,7 +144,7 @@ std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_O
 					for( int N2=((L2==L1)?N1:0); N2!=orbs.Phi[T].getNchi(L2); ++N2 )
 					{
 						assert( orbs.Phi[T].PhiLN(L1,N1).getNr()==orbs.Phi[T].PhiLN(L2,N2).getNr() );
-						
+
 						std::vector<double> mult_psir( orbs.Phi[T].PhiLN(L1,N1).getNr() );
 						for( int ir=0; ir!=orbs.Phi[T].PhiLN(L1,N1).getNr(); ++ir)
 						{
@@ -163,7 +163,7 @@ std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_O
 }
 */
 
-std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_Orbs::psi_mult_psi( 
+std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_Orbs::psi_mult_psi(
 	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orbs )
 {
 	std::vector<std::vector<std::vector<std::vector<double>>>> psi_mult_psi( orbs.size() );
@@ -179,7 +179,7 @@ std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_O
 					for( int N2=((L2==L1)?N1:0); N2!=orbs[T][L2].size(); ++N2 )
 					{
 						assert( orbs[T][L1][N1].getNr()==orbs[T][L2][N2].getNr() );
-						
+
 						std::vector<double> mult_psir( orbs[T][L1][N1].getNr() );
 						for( int ir=0; ir!=orbs[T][L1][N1].getNr(); ++ir)
 						{
@@ -199,7 +199,7 @@ std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_O
 
 /*
 template<>
-std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_Orbs::psir_mult_psir( 
+std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_Orbs::psir_mult_psir(
 	const LCAO_Orbitals &orbs )
 {
 	std::vector<std::vector<std::vector<std::vector<double>>>> psir_mult_psir( orbs.get_ntype() );
@@ -215,7 +215,7 @@ std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_O
 					for( int N2=((L2==L1)?N1:0); N2!=orbs.Phi[T].getNchi(L2); ++N2 )
 					{
 						assert( orbs.Phi[T].PhiLN(L1,N1).getNr()==orbs.Phi[T].PhiLN(L2,N2).getNr() );
-						
+
 						std::vector<double> mult_psir( orbs.Phi[T].PhiLN(L1,N1).getNr() );
 						for( int ir=0; ir!=orbs.Phi[T].PhiLN(L1,N1).getNr(); ++ir)
 						{
@@ -250,7 +250,7 @@ std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_O
 					for( int N2=((L2==L1)?N1:0); N2!=orbs[T][L2].size(); ++N2 )
 					{
 						assert( orbs[T][L1][N1].getNr()==orbs[T][L2][N2].getNr() );
-						
+
 						std::vector<double> mult_psir( orbs[T][L1][N1].getNr() );
 						for( int ir=0; ir!=orbs[T][L1][N1].getNr(); ++ir)
 						{
@@ -264,7 +264,7 @@ std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_O
 				}
 			}
 		}
-	}	
+	}
 	return psir_mult_psir;
 }
 
@@ -277,12 +277,12 @@ std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_O
 std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 	if(times_threshold>1)
 		return std::vector<std::vector<std::vector<std::vector<double>>>>(abfs.size());
-	
+
 	const std::vector<std::vector<std::pair<std::vector<double>,matrix>>> && eig = Exx_Abfs::PCA::cal_PCA( orbs, abfs, kmesh_times_mot );
-	
+
 	const std::vector<std::vector<std::vector<std::vector<double>>>> && psis = get_psi( abfs );
 	std::vector<std::vector<std::vector<std::vector<double>>>> psis_new( psis.size() );
-	
+
 	for( size_t T=0; T!=eig.size(); ++T )
 	{
 		double eig_value_max = 0;
@@ -293,15 +293,15 @@ ofs<<T<<"\t"<<L<<"\t"<<M<<"\t"<<eig[T][L].first[M]<<std::endl;
 				eig_value_max = std::max( eig_value_max, eig[T][L].first[M] );
 			}
 		const double eig_value_threshold = eig_value_max * times_threshold;
-		
+
 ofs<<"eig_value_max:\t"<<eig_value_max<<std::endl;
 ofs<<"eig_value_threshold:\t"<<eig_value_threshold<<std::endl;
-		
+
 		if(eig_value_max)
 		{
 			psis_new[T].resize( psis[T].size() );
 			for( size_t L=0; L!=eig[T].size(); ++L )
-			{			
+			{
 				const std::vector<double> &eig_value = eig[T][L].first;
 				const matrix &eig_vec = eig[T][L].second;
 				for( size_t M=0; M!=eig_value.size(); ++M )
@@ -335,7 +335,7 @@ ofs.close();
 }
 
 
-std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_Orbs::orth( 
+std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_Orbs::orth(
 	const std::vector<std::vector<std::vector<std::vector<double>>>> &psis,
 	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orbs,
 	const double norm_threshold )
@@ -344,8 +344,8 @@ std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_O
 	for( int T=0; T!=psis.size(); ++T )
 	{
 		const Numerical_Orbital_Lm &orb = orbs[T][0][0];
-		Gram_Schmidt_Orth<double,double> gso( 
-			orb.get_rab(), 
+		Gram_Schmidt_Orth<double,double> gso(
+			orb.get_rab(),
 			Gram_Schmidt_Orth<double,double>::Coordinate::Sphere );
 		psis_orth[T].resize( psis[T].size() );
 		for( int L=0; L!=psis[T].size(); ++L )
@@ -357,22 +357,22 @@ std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_O
 	return psis_orth;
 }
 
-std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_Orbs::div_r( 
+std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_Orbs::div_r(
 	const std::vector<std::vector<std::vector<std::vector<double>>>> &psirs,
 	const std::vector<double> &r_radial )
 {
 	std::vector<std::vector<std::vector<std::vector<double>>>> psis( psirs.size() );
-	for( int T=0; T!=psirs.size(); ++T )
+	for( auto T=0; T!=psirs.size(); ++T )
 	{
 		psis[T].resize( psirs[T].size() );
-		for( int L=0; L!=psirs[T].size(); ++L )
+		for( auto L=0; L!=psirs[T].size(); ++L )
 		{
 			psis[T][L].resize( psirs[T][L].size() );
-			for( int N=0; N!=psirs[T][L].size(); ++N )
+			for( auto N=0; N!=psirs[T][L].size(); ++N )
 			{
 				psis[T][L][N].resize( psirs[T][L][N].size() );
 				psis[T][L][N][0] = 0;
-				for( int ir=1; ir!=psirs[T][L][N].size(); ++ir )
+				for( auto ir=1; ir!=psirs[T][L][N].size(); ++ir )
 				{
 					psis[T][L][N][ir] = psirs[T][L][N][ir] / r_radial[ir];
 				}
@@ -415,7 +415,7 @@ std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_
 		{
 			orbs_new[T][L].resize( psis[T][L].size() );
 			for( int N=0; N!=psis[T][L].size(); ++N )
-			{				
+			{
 				orbs_new[T][L][N].set_orbital_info(
 					orb_info.getLabel(),
 					T,
@@ -434,7 +434,7 @@ std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_
 					true, GlobalV::FORCE);
 			}
 		}
-	}	
+	}
 	return orbs_new;
 }
 
