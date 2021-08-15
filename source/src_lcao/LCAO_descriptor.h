@@ -75,7 +75,7 @@ public:
 	void save_npy_e(const double &ebase);	//Ry
 	void save_npy_f(const matrix &fbase);//Ry
 
-	double cal_e_delta_fixdm(const matrix& fixdm);	//tr[rho*H_V_delta]
+	void cal_e_delta_band(const matrix &dm);	//tr[rho*H_V_delta]
 
 //-------------------
 // public variables 
@@ -83,12 +83,14 @@ public:
 public:
 
 	//------------------------------------------------------
-	//E_delta: in Ry
-	//H_V_delta: correction term to the Hamiltonian matrix 
+    //E_delta: in Ry, correction energy provided by NN
+    //e_delta_band: tr(dm*H_V_delta)
+    //H_V_delta: correction term to the Hamiltonian matrix 
 	//F_delta: in Ry/Bohr, force due to the correction term
 	//------------------------------------------------------
-	double E_delta = 0.0;
-	double* H_V_delta;
+    double E_delta = 0.0;
+    double e_delta_band=0.0;
+    double* H_V_delta;
 	matrix	F_delta;
 
 //-------------------

@@ -701,7 +701,6 @@ void LCAO_Descriptor::cal_v_delta(const matrix& dm)
     delete[] tmp_v2;
 
     ofs_running << " Finish calculating H_V_delta" << endl;
-
     return;
 }
 
@@ -752,6 +751,7 @@ void LCAO_Descriptor::cal_f_delta(const matrix &dm)
                 this->cal_gdmx(dm);
 
                 //3.multiply and sum for each atom
+                //3.1 Pulay term 
                 // \sum_{Inl}\sum_{mm'} <gedm, gdmx>_{mm'}
                 //notice: sum of multiplied corresponding element(mm') , not matrix multiplication !
                 for (int m1 = 0;m1 < nm;++m1)
@@ -765,9 +765,64 @@ void LCAO_Descriptor::cal_f_delta(const matrix &dm)
                 }
                 
             }//end inl
+            
+            //3.2 HF term
+            double** ss = this->S_mu_alpha;
+            double** dsx = this->DS_mu_alpha_x;
+            double** dsy = this->DS_mu_alpha_y;
+            double** dsz = this->DS_mu_alpha_z;
+            for (int mu = 0;mu < NLOCAL;++mu)
+            {
+                for (int nu = 0;nu < NLOCAL;++nu)
+                {
+                    for (int l = 0;l <= ORB.Alpha[0].getLmax();++l)
+                    {
+                        for (int n = 0;n < ORB.Alpha[0].getNchi(l);++n)
+                        {
+                            for (int m1 = 0;m1 < 2 * l + 1;++m1)
+                            {
+                                for (int m2 = 0;m2 < 2 * l + 1;++m2)
+                                {
+                                    if (KS_SOLVER == "genelpa" || KS_SOLVER == "scalapack_gvx")
+                                    {
+                                        this->F_delta(iat, 0) += dm(mu, nu) * dsx[inl_index[it](ia, l, n)][m1 * NLOCAL + mu]
+                                            * this->gedm[inl_index[it](ia, l, n)][m1 * (2 * l + 1) + m2] * ss[inl_index[it](ia, l, n)][m2 * NLOCAL + nu];
+                                        this->F_delta(iat, 1) += dm(mu, nu) * dsy[inl_index[it](ia, l, n)][m1 * NLOCAL + mu]
+                                            * this->gedm[inl_index[it](ia, l, n)][m1 * (2 * l + 1) + m2] * ss[inl_index[it](ia, l, n)][m2 * NLOCAL + nu];
+                                        this->F_delta(iat, 2) += dm(mu, nu) * dsz[inl_index[it](ia, l, n)][m1 * NLOCAL + mu]
+                                            * this->gedm[inl_index[it](ia, l, n)][m1 * (2 * l + 1) + m2] * ss[inl_index[it](ia, l, n)][m2 * NLOCAL + nu];
+                                    }
+                                    else
+                                    {
+                                        this->F_delta(iat, 0) -= 2*dm(mu, nu) * dsx[inl_index[it](ia, l, n)][mu* (2*l+1) + m1]
+                                            * this->gedm[inl_index[it](ia, l, n)][m1 * (2 * l + 1) + m2] * ss[inl_index[it](ia, l, n)][nu* (2*l+1) + m2];
+                                        this->F_delta(iat, 1) -= 2*dm(mu, nu) * dsy[inl_index[it](ia, l, n)][mu* (2*l+1) + m1]
+                                            * this->gedm[inl_index[it](ia, l, n)][m1 * (2 * l + 1) + m2] * ss[inl_index[it](ia, l, n)][nu* (2*l+1) + m2];
+                                        this->F_delta(iat, 2) -= 2*dm(mu, nu) * dsz[inl_index[it](ia, l, n)][mu* (2*l+1) + m1]
+                                            * this->gedm[inl_index[it](ia, l, n)][m1 * (2 * l + 1) + m2] * ss[inl_index[it](ia, l, n)][nu* (2*l+1) + m2];
+                                    }
+                                }//end m2
+                            }//end m1
+                        }//end n
+                    }//end l
+                }//end nu
+            }//end mu
             ++iat;
         }//end ia
     }//end it
+    //3.3 Overlap term
+    //somthing in NN, which not included in Hamiltonian
+    /*
+    for (int mu = 0;mu < NLOCAL;++mu)
+    {
+        const int iat = ucell.iwt2iat[mu];
+        for (int nu = 0;nu < NLOCAL;++nu)
+        {
+            this->F_delta(iat, 0) += 2*(this->E_delta - this->e_delta_band)* dm(mu, nu) * LM.DSloc_x[mu * NLOCAL + nu];
+            this->F_delta(iat, 1) += 2*(this->E_delta - this->e_delta_band) * dm(mu, nu) * LM.DSloc_y[mu * NLOCAL + nu];
+            this->F_delta(iat, 2) += 2*(this->E_delta - this->e_delta_band) * dm(mu, nu) * LM.DSloc_z[mu * NLOCAL + nu];
+        }
+    }*/
     this->del_gdmx();
     return;
 }
@@ -1011,16 +1066,16 @@ void LCAO_Descriptor::save_npy_f(const matrix &fbase)
     return;
 }
 
-double LCAO_Descriptor::cal_e_delta_fixdm(const matrix& fixdm)
+void LCAO_Descriptor::cal_e_delta_band(const matrix &dm)
 {
-    double e_delta_fixdm = 0;
-    for (int i = 0; i < NLOCAL; i++)
+    this->e_delta_band = 0;
+    for (int i = 0; i < NLOCAL; ++i)
     {
-        for (int j = 0; j < NLOCAL; j++)
+        for (int j = 0; j < NLOCAL; ++j)
         {
-            e_delta_fixdm += this->dm_double[i * NLOCAL + j]*this->H_V_delta[i*NLOCAL+j];
+            this->e_delta_band += dm(i,j)*this->H_V_delta[i*NLOCAL+j];
         }
     }
-    return e_delta_fixdm;
+    return;
 }
 #endif

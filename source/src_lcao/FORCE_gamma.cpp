@@ -1,6 +1,9 @@
 #include "FORCE_gamma.h"
 #include "../src_pw/global.h"
 #include "dftu.h"  //Quxin add for DFT+U on 20201029
+#ifdef __DEEPKS
+#include "LCAO_descriptor.h"//caoyu add for deepks on 20210813
+#endif
 
 Force_LCAO_gamma::Force_LCAO_gamma ()
 {}
@@ -72,7 +75,18 @@ void Force_LCAO_gamma::ftable_gamma (
         this->cal_fvl_dphi(dm2d, isforce, isstress, fvl_dphi, svl_dphi);
 
     }
-	if(isforce)
+    
+    //caoyu add for DeePKS
+#ifdef __DEEPKS
+    if (INPUT.deepks_scf)
+    {
+        ld.build_S_descriptor(1);   //for F_delta calculation
+        ld.cal_f_delta(LOC.wfc_dm_2d.dm_gamma[0]);
+        ld.print_F_delta();
+    }
+#endif
+    
+    if (isforce)
 	{
         Parallel_Reduce::reduce_double_pool( foverlap.c, foverlap.nr * foverlap.nc);
         Parallel_Reduce::reduce_double_pool( ftvnl_dphi.c, ftvnl_dphi.nr * ftvnl_dphi.nc);
