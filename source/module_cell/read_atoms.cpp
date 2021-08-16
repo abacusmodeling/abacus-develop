@@ -698,6 +698,12 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 		}//end for ntype
 	}// end scan_begin
 
+//check if any atom can move in MD
+	if(!this->if_atoms_can_move() && GlobalV::CALCULATION=="md")
+	{
+		WARNING("read_atoms", "no atom can move in MD!");
+		return 0;
+	} 
 
 	ofs_running << std::endl;
 	OUT(ofs_running,"TOTAL ATOM NUMBER",nat);
