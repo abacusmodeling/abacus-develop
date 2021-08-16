@@ -24,7 +24,7 @@ Exx_Lip::Exx_Lip( const Exx_Global::Exx_Info &info_global )
 
 Exx_Lip::Exx_Info::Exx_Info( const Exx_Global::Exx_Info &info_global )
 	:hybrid_type(info_global.hybrid_type),
-	 hse_omega(info_global.hse_omega){} 
+	 hse_omega(info_global.hse_omega){}
 
 void Exx_Lip::cal_exx()
 {
@@ -39,7 +39,7 @@ void Exx_Lip::cal_exx()
 	{
 		std::cout<<name<<"\t"<<t<<std::endl;
 	};
-	
+
 timeval t;
 gettimeofday(&t, NULL);
 double t_phi_cal=0, t_qkg2_exp=0, t_b_cal=0, t_sum3_cal=0, t_b_sum=0, t_sum_all=0;
@@ -55,16 +55,16 @@ t_phi_cal += my_time(t);
 		judge_singularity(ik);
 		for( int iw_l=0; iw_l<GlobalV::NLOCAL; ++iw_l)
 			for( int iw_r=0; iw_r<GlobalV::NLOCAL; ++iw_r)
-				sum1[iw_l*GlobalV::NLOCAL+iw_r] = (0.0,0.0);
+				sum1[iw_l*GlobalV::NLOCAL+iw_r] = std::complex<double> (0.0,0.0);
 		if( Exx_Global::Hybrid_Type::HF==info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==info.hybrid_type )
-		{			
+		{
 			sum2_factor = 0.0;
 			if(gzero_rank_in_pool==GlobalV::RANK_IN_POOL)
 				for( int iw_l=0; iw_l<GlobalV::NLOCAL; ++iw_l)
 					for( int iw_r=0; iw_r<GlobalV::NLOCAL; ++iw_r)
-						sum3[iw_l][iw_r] = (0.0,0.0);
+						sum3[iw_l][iw_r] = std::complex<double>(0.0, 0.0);
 		}
-		
+
 		for( int iq_tmp=iq_vecik; iq_tmp<iq_vecik+q_pack->kv_ptr->nks/GlobalV::NSPIN; ++iq_tmp)					// !!! k_point parallel incompleted. need to loop iq in other pool
 		{
 			int iq = (ik<(k_pack->kv_ptr->nks/GlobalV::NSPIN)) ? (iq_tmp%(q_pack->kv_ptr->nks/GlobalV::NSPIN)) : (iq_tmp%(q_pack->kv_ptr->nks/GlobalV::NSPIN)+(q_pack->kv_ptr->nks/GlobalV::NSPIN));
@@ -79,7 +79,7 @@ t_b_cal += my_time(t);
 						sum3_cal(iq,ib);
 t_sum3_cal += my_time(t);
 				b_sum(iq, ib);
-t_b_sum += my_time(t); 
+t_b_sum += my_time(t);
 			}
 		}
 		sum_all(ik);
@@ -123,16 +123,16 @@ void Exx_Lip::cal_exx()
 		judge_singularity(ik);
 		for( int iw_l=0; iw_l<GlobalV::NLOCAL; ++iw_l)
 			for( int iw_r=0; iw_r<GlobalV::NLOCAL; ++iw_r)
-				sum1[iw_l*GlobalV::NLOCAL+iw_r] = (0.0,0.0);
+				sum1[iw_l*GlobalV::NLOCAL+iw_r] = std::complex<double>(0.0,0.0);
 		if( Exx_Global::Hybrid_Type::HF==info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==info.hybrid_type )
-		{			
+		{
 			sum2_factor = 0.0;
 			if(gzero_rank_in_pool==GlobalV::RANK_IN_POOL)
 				for( int iw_l=0; iw_l<GlobalV::NLOCAL; ++iw_l)
 					for( int iw_r=0; iw_r<GlobalV::NLOCAL; ++iw_r)
-						sum3[iw_l][iw_r] = (0.0,0.0);
+						sum3[iw_l][iw_r] = std::complex<double>(0.0,0.0);
 		}
-		
+
 		for( int iq_tmp=iq_vecik; iq_tmp<iq_vecik+q_pack->kv_ptr->nks/GlobalV::NSPIN; ++iq_tmp)					// !!! k_point parallel incompleted. need to loop iq in other pool
 		{
 			int iq = (ik<(k_pack->kv_ptr->nks/GlobalV::NSPIN)) ? (iq_tmp%(q_pack->kv_ptr->nks/GlobalV::NSPIN)) : (iq_tmp%(q_pack->kv_ptr->nks/GlobalV::NSPIN)+(q_pack->kv_ptr->nks/GlobalV::NSPIN));
@@ -550,7 +550,7 @@ void Exx_Lip::sum_all(int ik)
 void Exx_Lip::exx_energy_cal()
 {
 	TITLE("Exx_Lip","exx_energy_cal");
-	
+
 	double exx_energy_tmp = 0.0;
 
 	for( int ik=0; ik<k_pack->kv_ptr->nks; ++ik)
@@ -927,4 +927,3 @@ void Exx_Lip::read_q_pack()
 	return;
 }
 */
-

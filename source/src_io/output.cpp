@@ -271,7 +271,3 @@ void output::printM3(const std::string &description, const Matrix3 &m)const
          << std::setw(20) << m.e31 << std::setw(20) << m.e32 << std::setw(20) << m.e33 << std::endl;
     return;
 }
-
-
-
-

@@ -1,6 +1,7 @@
 #include "ELEC_scf.h"
 #include "../src_pw/global.h"
 #include "../src_io/chi0_hilbert.h"
+#include "../src_io/print_info.h"
 #include "../src_pw/symmetry_rho.h"
 #include "dftu.h"
 #include "LCAO_evolve.h"
@@ -78,40 +79,7 @@ void ELEC_scf::scf(const int &istep)
 
 	for(iter=1; iter<=GlobalV::NITER; iter++)
 	{
-        if(GlobalV::CALCULATION=="scf")
-        {
-            GlobalV::ofs_running
-            << "\n LCAO ALGORITHM ------------- ELEC=" << std::setw(4) << iter
-            << "--------------------------------\n";
-
-            GlobalV::ofs_warning
-            << "\n LCAO ALGORITHM ------------- ELEC=" << std::setw(4) << iter
-            << "--------------------------------\n";
-        }
-        else if(GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
-		{
-			GlobalV::ofs_running
-			<< "\n LCAO ALGORITHM ------------- ION=" << std::setw(4) << istep+1
-			<< "  ELEC=" << std::setw(4) << iter
-			<< "--------------------------------\n";
-
-			GlobalV::ofs_warning
-			<< "\n LCAO ALGORITHM ------------- ION=" << std::setw(4) << istep+1
-			<< "  ELEC=" << std::setw(4) << iter
-			<< "--------------------------------\n";
-		}
-		else if(GlobalV::CALCULATION=="md")
-		{
-			GlobalV::ofs_running
-			<< "\n LCAO ALGORITHM ------------- MD=" << std::setw(4) << istep+1
-			<< "  ELEC=" << std::setw(4) << iter
-			<< "--------------------------------\n";
-
-			GlobalV::ofs_warning
-			<< "\n LCAO ALGORITHM ------------- MD=" << std::setw(4) << istep+1
-			<< "  ELEC=" << std::setw(4) << iter
-			<< "--------------------------------\n";
-		}
+        Print_Info::print_scf(istep, iter);
 
 		//time_t time_start, time_finish;
 		clock_t clock_start;
@@ -563,7 +531,16 @@ void ELEC_scf::scf(const int &istep)
 				*/
 			}
 
-			iter_end(GlobalV::ofs_running);
+			if(conv_elec)
+			{
+				GlobalV::ofs_running << "\n charge density convergence is achieved" << std::endl;
+            	GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
+			}
+
+			if(GlobalV::OUT_LEVEL != "m") 
+			{
+				print_eigenvalue(GlobalV::ofs_running);
+			}
 
 			if(conv_elec)
 			{

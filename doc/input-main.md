@@ -3,15 +3,15 @@
 - [List of keywords](#list-of-keywords)
     - [System variables](#system-variables)
 
-        [suffix](#suffix) | [ntype](#ntype) | [calculation](#calculation) | [dft_functional](#dft-functional) | [pseudo_type](#pseudo-type) | [npool](#npool) | [symmetry](#symmetry) | [pseudo_rcut](#pseudo-rcut) | [renormwithmesh](#renormwithmesh) | [nelec](#nelec) | [tot_magnetization](#tot-magnetization) | [mem_saver](#mem-saver) | [latname](#latname) | [start_wfc](#start-wfc) | [start_charge](#start-charge) | [start_pot](#start-pot) | [set_vel](#set_vel) | [diago_proc](#diago_proc) 
+        [suffix](#suffix) | [ntype](#ntype) | [calculation](#calculation) | [dft_functional](#dft-functional) | [pseudo_type](#pseudo-type) | [npool](#npool) | [symmetry](#symmetry) | [pseudo_rcut](#pseudo-rcut) | [renormwithmesh](#renormwithmesh) | [nelec](#nelec) | [tot_magnetization](#tot-magnetization) | [mem_saver](#mem-saver) | [latname](#latname) | [start_wfc](#start-wfc) | [seed](#seed) | [start_charge](#start-charge) | [start_pot](#start-pot) | [set_vel](#set_vel) | [diago_proc](#diago_proc) 
 
     - [Variables related to input files](#variables-related-to-input-files)
 
-        [atom_file](#atom-file) | [kpoint_file](#kpoint-file) | [pseudo_dir](#pseudo-dir) | [read_file_dir](#read-file-dir)
+        [atom_file](#atom-file) | [kpoint_file](#kpoint-file) | [pseudo_dir](#pseudo-dir) | [orbital_dir](#orbital-dir) | [read_file_dir](#read-file-dir)
 
     - [Plane wave related variables](#plane-wave-related-variables)
     
-        [ecutwfc](#ecutwfc)| [nx,ny,nz](#nx) | [ethr](#ethr) | [diago_cg_maxiter](#diago-cg-maxiter) | [diago_david_ndim](#diago-david-ndim)
+        [ecutwfc](#ecutwfc) | [nx,ny,nz](#nx) | [ethr](#ethr) | [diago_cg_maxiter](#diago-cg-maxiter) | [diago_david_ndim](#diago-david-ndim)
 
     - [Numerical atomic orbitals related variables](#numerical-atomic-orbitals-related-variables)
 
@@ -249,10 +249,20 @@ This part of variables are used to control general system parameters.
 
 - start_wfc<a id="start-wfc"></a>
     - *Type*: String
-    - *Description*: Only useful for plane wave basis only now. It is the name of the starting wave functions. In the future we should also make this         variable available for localized orbitals set.
-            - atomic:
-            - file:
-    - *Default*:atomic
+    - *Description*: Only useful for plane wave basis only now. It is the name of the starting wave functions. In the future we should also make this         variable available for localized orbitals set. 
+    Available options are:
+        - "atomic": from atomic pseudo wave functions. If they are not enough, other wave functions are initialized with random numbers.
+        - "atomic+random": add small random numbers on atomic pseudo-wavefunctions
+        - "file": from file
+        - "random": random numbers
+    - *Default*:"atomic"
+
+    [back to top](#input-file)
+
+- seed<a id="seed"></a>
+    - *Type*: Integer
+    - *Description*: Only useful for plane wave basis only now. It is the random seed to initialize wave functions. Only positive integers are avilable.
+    - *Default*:0
 
     [back to top](#input-file)
 
@@ -304,6 +314,13 @@ This part of variables are used to control input files related parameters.
 - pseudo_dir<a id="pseudo-dir"></a>
     - *Type*: String
     - *Description*: This parameter specifies pseudopotential directory.
+    - *Default*: ./
+
+    [back to top](#input-file)
+
+- orbital_dir<a id="orbital-dir"></a>
+    - *Type*: String
+    - *Description*: This parameter specifies orbital file directory.
     - *Default*: ./
 
     [back to top](#input-file)

@@ -347,8 +347,11 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			{
 				GlobalV::ofs_running << " convergence has NOT been achieved!" << std::endl;			
 			}
-							
-			iter_end(GlobalV::ofs_running);
+
+			if(GlobalV::OUT_LEVEL != "m") 
+			{
+				print_eigenvalue(GlobalV::ofs_running);
+			}
 			timer::tick("Elec_Stochastic","scf_stochastic");
             return;
         }

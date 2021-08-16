@@ -6,6 +6,7 @@
 #include "FORCE_STRESS.h"
 #include "../module_base/global_function.h"
 #include "../src_io/write_HS.h"
+#include "../src_io/print_info.h"
 #include "../src_io/cal_r_overlap_R.h"
 #include "../src_ions/variable_cell.h" // mohan add 2021-02-01
 #include "../src_ri/exx_abfs.h"
@@ -72,7 +73,8 @@ void LOOP_ions::opt_ions(void)
 		// xiaohui add "m" option, 2015-09-16
         if(GlobalV::OUT_LEVEL=="ie" || GlobalV::OUT_LEVEL=="m")
         {
-            std::cout << " ---------------------------------------------------------" << std::endl;
+            Print_Info::print_screen(stress_step, force_step, istep);
+/*          std::cout << " ---------------------------------------------------------" << std::endl;
             if(GlobalV::CALCULATION=="relax")
             {
                 std::cout << " RELAX IONS : " << istep << std::endl;
@@ -86,25 +88,31 @@ void LOOP_ions::opt_ions(void)
             {
                 std::cout << " SELF-CONSISTENT : " << std::endl;
             }
+            else if(GlobalV::CALCULATION=="nscf")
+            {
+                std::cout << " NONSELF-CONSISTENT : " << std::endl;
+            }
             std::cout << " ---------------------------------------------------------" << std::endl;
 
             GlobalV::ofs_running << " ---------------------------------------------------------" << std::endl;
             if(GlobalV::CALCULATION=="relax")
             {
                 GlobalV::ofs_running << " RELAX IONS : " << istep << std::endl;
-                GlobalV::ofs_running << " ---------------------------------------------------------" << std::endl;
             }
             else if(GlobalV::CALCULATION=="cell-relax")
             {
                 GlobalV::ofs_running << " RELAX CELL : " << stress_step << std::endl;
                 GlobalV::ofs_running << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << std::endl;
-                GlobalV::ofs_running << " ---------------------------------------------------------" << std::endl;
             }
             else if(GlobalV::CALCULATION=="scf")
             {
                 GlobalV::ofs_running << " SELF-CONSISTENT" << std::endl;
-                GlobalV::ofs_running << " ---------------------------------------------------------" << std::endl;
             }
+            else if(GlobalV::CALCULATION=="nscf")
+            {
+                GlobalV::ofs_running << " NONSELF-CONSISTENT" << std::endl;
+            }
+            GlobalV::ofs_running << " ---------------------------------------------------------" << std::endl;*/
         }
 
     //----------------------------------------------------------
