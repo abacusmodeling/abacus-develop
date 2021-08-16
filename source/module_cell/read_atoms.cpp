@@ -127,7 +127,7 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 	}
 
 	//===========================
-	// Read in latticies std::vector
+	// Read in latticies vector
 	//===========================
 	if(latName=="test"){	
 		if( SCAN_BEGIN(ifa, "LATTICE_VECTORS") )
