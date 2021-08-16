@@ -19,6 +19,7 @@ class Parallel_Kpoints
 
 	// collect value from each pool to overlap.
 	void pool_collection(double *valuea, double *valueb, const realArray &a, const realArray &b, const int &ik);
+	void pool_collection(std::complex<double> *value, const ComplexArray &w, const int &ik);
 
 	// information about pool
 	int *nproc_pool;

@@ -39,9 +39,9 @@ void Cell_PW::opt_cells_pw()
     //=========================================================
     // calculate the total local pseudopotential in real space
     //=========================================================
-    pot.init_pot(0, GlobalC::pw.strucFac); //atomic_rho, v_of_rho, set_vrs
+    GlobalC::pot.init_pot(0, GlobalC::pw.strucFac); //atomic_rho, v_of_rho, set_vrs
 
-    pot.newd();
+    GlobalC::pot.newd();
 
     DONE(GlobalV::ofs_running, "INIT POTENTIAL");
 

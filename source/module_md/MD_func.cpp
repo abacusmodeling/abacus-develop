@@ -108,13 +108,11 @@ double MD_func::GetAtomKE(const int& numIon, const Vector3<double>* vel, const d
 //   This function calculates the classical kinetic energy of a group of atoms.
 //----------------------------------------------------------------------------
 
-	double mass;
 	double ke = 0.0;
 
 	// kinetic energy = \sum_{i} 1/2*m_{i}*(vx^2+vy^2+vz^2)
 	for(int ion=0;ion<numIon;ion++){
-		mass = allmass[ion];
-		ke +=   0.5 * mass * (vel[ion].x*vel[ion].x+vel[ion].y*vel[ion].y+vel[ion].z*vel[ion].z);
+		ke +=   0.5 * allmass[ion] * (vel[ion].x*vel[ion].x+vel[ion].y*vel[ion].y+vel[ion].z*vel[ion].z);
 	}
 	//cout<<"in GetAtomKE KE="<< ke<<endl;
 	return ke;
@@ -273,6 +271,8 @@ int MD_func::getMassMbl(const UnitCell_pseudo &unit_in, double* allmass, Vector3
 	return nfrozen;
 }
 
+#ifndef __CMD
+
 #ifdef __LCAO
 void MD_func::callInteraction_LCAO(const int& numIon, Vector3<double>* force, matrix& stress_lcao)
 {
@@ -291,7 +291,7 @@ void MD_func::callInteraction_LCAO(const int& numIon, Vector3<double>* force, ma
 	atom_arrange::delete_vector(
 		GlobalV::ofs_running, 
 		GlobalV::SEARCH_PBC, 
-		GridD, 
+		GlobalC::GridD, 
 		GlobalC::ucell, 
 		GlobalV::SEARCH_RADIUS, 
 		GlobalV::test_atom_input);
@@ -300,6 +300,7 @@ void MD_func::callInteraction_LCAO(const int& numIon, Vector3<double>* force, ma
 	return;
 }
 #endif
+
 void MD_func::callInteraction_PW(const int& numIon, Vector3<double>* force, matrix& stress_pw)
 {
 //to call the force of each atom
@@ -318,6 +319,7 @@ void MD_func::callInteraction_PW(const int& numIon, Vector3<double>* force, matr
 	}
 	return;
 }
+#endif
 
 void MD_func::printpos(const string& file, const int& iter, const int& recordFreq, const UnitCell_pseudo& unit_in)
 {

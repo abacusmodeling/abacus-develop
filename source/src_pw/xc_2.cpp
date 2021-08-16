@@ -44,9 +44,9 @@ void gcx_spin(double rhoup, double rhodw, double grhoup2, double grhodw2,
     // exchange
     double rho = rhoup + rhodw;
 
-	//cout << " xcf.igcx_now=" << xcf.igcx_now << endl;
+	//cout << " GlobalC::xcf.igcx_now=" << GlobalC::xcf.igcx_now << endl;
 
-    if (rho <= small || xcf.igcx_now == 0)
+    if (rho <= small || GlobalC::xcf.igcx_now == 0)
     {
         sx = 0.00;
         v1xup = 0.00;
@@ -54,7 +54,7 @@ void gcx_spin(double rhoup, double rhodw, double grhoup2, double grhodw2,
         v1xdw = 0.00;
         v2xdw = 0.00;
     }
-    else if (xcf.igcx_now == 1)
+    else if (GlobalC::xcf.igcx_now == 1)
     {
         if (rhoup > small && sqrt(fabs(grhoup2)) > small)
         {
@@ -80,7 +80,7 @@ void gcx_spin(double rhoup, double rhodw, double grhoup2, double grhodw2,
 
         sx = sxup + sxdw;
     }
-    else if (xcf.igcx_now == 2)
+    else if (GlobalC::xcf.igcx_now == 2)
     {
         if (rhoup > small && sqrt(abs(grhoup2)) > small)
         {
@@ -116,13 +116,13 @@ void gcx_spin(double rhoup, double rhodw, double grhoup2, double grhodw2,
 	// igcx=4: revised PBE
 	// igcx=8: PBE0
 	// igcx=10: PBEsol
-    else if (xcf.igcx_now == 3 || xcf.igcx_now == 4 || xcf.igcx_now==8 || xcf.igcx_now == 10)
+    else if (GlobalC::xcf.igcx_now == 3 || GlobalC::xcf.igcx_now == 4 || GlobalC::xcf.igcx_now==8 || GlobalC::xcf.igcx_now == 10)
     {
-        if (xcf.igcx_now == 4)//mohan fix bug 2012-05-28
+        if (GlobalC::xcf.igcx_now == 4)//mohan fix bug 2012-05-28
         {
             iflag = 1; //minus 1 in C++
         }
-		else if(xcf.igcx_now == 10)
+		else if(GlobalC::xcf.igcx_now == 10)
 		{
 			iflag = 2;
 		}
@@ -142,7 +142,7 @@ void gcx_spin(double rhoup, double rhodw, double grhoup2, double grhodw2,
             v2xup = 0.0;
         } 
 		
-		if (xcf.igcx_now == 8)						// Peize Lin add 2017-10-23
+		if (GlobalC::xcf.igcx_now == 8)						// Peize Lin add 2017-10-23
 		{
 			sxup *= 0.75;
 			v1xup *= 0.75;
@@ -160,7 +160,7 @@ void gcx_spin(double rhoup, double rhodw, double grhoup2, double grhodw2,
             v2xdw = 0.0;
         } 
 		
-		if (xcf.igcx_now == 8)						// Peize Lin add 2017-10-23
+		if (GlobalC::xcf.igcx_now == 8)						// Peize Lin add 2017-10-23
 		{
 			sxdw *= 0.75;
 			v1xdw *= 0.75;
@@ -172,7 +172,7 @@ void gcx_spin(double rhoup, double rhodw, double grhoup2, double grhodw2,
         v2xdw = 2.0 * v2xdw;
     }
 	// igcx=12: HSE
-	else if (xcf.igcx_now == 12)
+	else if (GlobalC::xcf.igcx_now == 12)
 	{
 		throw domain_error( "HSE unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 	}
@@ -237,33 +237,33 @@ void gcc_spin(double rho, double &zeta, double grho, double &sc,
     } //endif
 
 
-//	cout << "xcf.igcc_now=" << xcf.igcc_now << endl;
+//	cout << "GlobalC::xcf.igcc_now=" << GlobalC::xcf.igcc_now << endl;
 
-    if (xcf.igcc_now == 0 || rho <= small || sqrt(abs(grho)) <= small)
+    if (GlobalC::xcf.igcc_now == 0 || rho <= small || sqrt(abs(grho)) <= small)
     {
         sc = 0.00;
         v1cup = 0.00;
         v1cdw = 0.00;
         v2c = 0.00;
     }
-    else if (xcf.igcc_now == 1)
+    else if (GlobalC::xcf.igcc_now == 1)
     {
         perdew86_spin(rho, zeta, grho, sc, v1cup, v1cdw, v2c);
     }
-    else if (xcf.igcc_now == 2)
+    else if (GlobalC::xcf.igcc_now == 2)
     {
         ggac_spin(rho, zeta, grho, sc, v1cup, v1cdw, v2c);
     }
-    else if (xcf.igcc_now == 3 || xcf.igcc_now > 4)
+    else if (GlobalC::xcf.igcc_now == 3 || GlobalC::xcf.igcc_now > 4)
     {
         cout << "\n lsda_functionals, not implemented, igcc_now = "
-             << xcf.igcc_now;
+             << GlobalC::xcf.igcc_now;
     }
-    else if (xcf.igcc_now == 4)
+    else if (GlobalC::xcf.igcc_now == 4)
     {
         pbec_spin(rho, zeta, grho, 1, sc, v1cup, v1cdw, v2c);
     }
-	else if (xcf.igcc_now == 8)//mohan add 2012-05-28
+	else if (GlobalC::xcf.igcc_now == 8)//mohan add 2012-05-28
 	{
         pbec_spin(rho, zeta, grho, 2, sc, v1cup, v1cdw, v2c);
 	}

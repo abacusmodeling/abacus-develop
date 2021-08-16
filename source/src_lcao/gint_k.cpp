@@ -45,15 +45,15 @@ void Gint_k::allocate_pvpR(void)
 
 	if(this->reduced)
 	{
-		// the number of matrix element <phi_0 | V | phi_R> is LNNR.nnrg.
+		// the number of matrix element <phi_0 | V | phi_R> is GlobalC::LNNR.nnrg.
 		this->pvpR_reduced = new double*[GlobalV::NSPIN];
 		for(int is =0;is<GlobalV::NSPIN;is++)
 		{
-			this->pvpR_reduced[is] = new double[LNNR.nnrg];	
-			ZEROS( pvpR_reduced[is], LNNR.nnrg);
+			this->pvpR_reduced[is] = new double[GlobalC::LNNR.nnrg];	
+			ZEROS( pvpR_reduced[is], GlobalC::LNNR.nnrg);
 		}
 
-		double mem = Memory::record("allocate_pvpR", "pvpR_reduced", LNNR.nnrg * GlobalV::NSPIN , "double");
+		double mem = Memory::record("allocate_pvpR", "pvpR_reduced", GlobalC::LNNR.nnrg * GlobalV::NSPIN , "double");
 
         if(GlobalV::OUT_LEVEL != "m") 
 		{
@@ -70,8 +70,8 @@ void Gint_k::allocate_pvpR(void)
 	}
 	else
 	{
-		double mem = Memory::record("allocate_pvpR", "pvpR", GridT.lgd * GridT.nutot
-				* GridT.lgd * GridT.nutot , "double");
+		double mem = Memory::record("allocate_pvpR", "pvpR", GlobalC::GridT.lgd * GlobalC::GridT.nutot
+				* GlobalC::GridT.lgd * GlobalC::GridT.nutot , "double");
 
 		if(GlobalV::OUT_LEVEL != "m") 
 		{
@@ -91,7 +91,7 @@ void Gint_k::allocate_pvpR(void)
 		// this may be very large, at least 
 		// 3*3*3 = 27.
 		//----------------------------------------------
-		const int LDIM=GridT.lgd*GridT.nutot;
+		const int LDIM=GlobalC::GridT.lgd*GlobalC::GridT.nutot;
 
 		this->pvpR_pool = new double[LDIM*LDIM];
 		ZEROS(pvpR_pool, LDIM*LDIM);
@@ -149,16 +149,16 @@ void Gint_k::folding_force(
 	timer::tick("Gint_k","folding_force");
 
 	//xiaohui modify 2013-12-17, test
-//	assert(GridT.lgd > 0); //mohan add 2012-06-10
+//	assert(GlobalC::GridT.lgd > 0); //mohan add 2012-06-10
 
 	// mohan add 2014-01-20
-	const int lgd = GridT.lgd;
+	const int lgd = GlobalC::GridT.lgd;
 
 	double** ppx;
 	double** ppy;
 	double** ppz;
 
-	if(GridT.lgd>0)
+	if(GlobalC::GridT.lgd>0)
 	{
 		ppx = new double*[lgd];
 	  	ppy = new double*[lgd];
@@ -181,39 +181,39 @@ void Gint_k::folding_force(
 		for(int I1=0; I1< atom1->na; ++I1)
 		{
 			const int iat = GlobalC::ucell.itia2iat(T1,I1);
-			if(GridT.in_this_processor[iat])
+			if(GlobalC::GridT.in_this_processor[iat])
 			{
 				assert( lgd > 0 );
 
 				const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 				// get the start positions of elements.
-				const int DM_start = LNNR.nlocstartg[iat];
+				const int DM_start = GlobalC::LNNR.nlocstartg[iat];
 				// get the coordinates of adjacent atoms.
 				tau1 = atom1->tau[I1];
-				//GridD.Find_atom(tau1);
-				GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+				//GlobalC::GridD.Find_atom(tau1);
+				GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
 				// search for the adjacent atoms.
 				int nad = 0;
-				for (int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
+				for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ++ad)
 				{
 					// get iat2
-					const int T2 = GridD.getType(ad);
-					const int I2 = GridD.getNatom(ad);
+					const int T2 = GlobalC::GridD.getType(ad);
+					const int I2 = GlobalC::GridD.getNatom(ad);
 					const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
-					if(GridT.in_this_processor[iat2])
+					if(GlobalC::GridT.in_this_processor[iat2])
 					{
 						Atom* atom2 = &GlobalC::ucell.atoms[T2];
-						dtau = GridD.getAdjacentTau(ad) - tau1;
+						dtau = GlobalC::GridD.getAdjacentTau(ad) - tau1;
 						double distance = dtau.norm() * GlobalC::ucell.lat0;
-						double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+						double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 						if(distance < rcut)
 						{
 							const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-							int ixxx = DM_start + LNNR.find_R2st[iat][nad];
+							int ixxx = DM_start + GlobalC::LNNR.find_R2st[iat][nad];
 							for(int iw=0; iw<atom1->nw; iw++)
 							{
 								const int iw_all = start1+iw;
-								const int iw_local = GridT.trace_lo[iw_all];
+								const int iw_local = GlobalC::GridT.trace_lo[iw_all];
 								// iw1_lo
 								double *vijx = ppx[iw_local];
 								double *vijy = ppy[iw_local];
@@ -223,7 +223,7 @@ void Gint_k::folding_force(
 								double *vRy = &pvdpy[ixxx];
 								double *vRz = &pvdpz[ixxx];
 
-								int* iw2_lo = &GridT.trace_lo[start2];
+								int* iw2_lo = &GlobalC::GridT.trace_lo[start2];
 								int* iw2_end = iw2_lo + atom2->nw;
 
 								for(; iw2_lo<iw2_end; ++iw2_lo, ++vRx, ++vRy, ++vRz)
@@ -248,14 +248,14 @@ void Gint_k::folding_force(
 	for(int i=0; i<GlobalV::NLOCAL; ++i)
 	{
 		ZEROS(tmp, 3*GlobalV::NLOCAL);
-		const int mug = GridT.trace_lo[i];
+		const int mug = GlobalC::GridT.trace_lo[i];
 		// if the row element is on this processor
 		if(mug>=0)
 		{
 			//GlobalV::ofs_running << " i=" << i << " mug=" << mug << endl;
 			for(int j=0; j<GlobalV::NLOCAL; ++j)
 			{
-				const int nug = GridT.trace_lo[j];
+				const int nug = GlobalC::GridT.trace_lo[j];
 				// if the col element is on this processor
 				if(nug>=0)
 				{
@@ -279,7 +279,7 @@ void Gint_k::folding_force(
 		Parallel_Reduce::reduce_double_pool( tmp, GlobalV::NLOCAL*3 );
 		for (int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			if (!ParaO.in_this_processor(i,j))
+			if (!GlobalC::ParaO.in_this_processor(i,j))
 			{
 				continue;
 			}
@@ -293,12 +293,12 @@ void Gint_k::folding_force(
 	delete[] tmp;
 
 	// mohan add 2014-01-20
-	if(GridT.lgd > 0)
+	if(GlobalC::GridT.lgd > 0)
 	{
 		//-------------------------
 		// delete the tmp matrix.
 		//-------------------------
-		for(int i=0; i<GridT.lgd; i++)
+		for(int i=0; i<GlobalC::GridT.lgd; i++)
 		{
 			delete[] ppx[i];
 			delete[] ppy[i];
@@ -330,7 +330,7 @@ void Gint_k::folding_stress(
 	TITLE("Gint_k","folding_stress");
 	timer::tick("Gint_k","folding_stress");
 
-	const int lgd = GridT.lgd;
+	const int lgd = GlobalC::GridT.lgd;
 
 	double** ppx;
 	double** ppy;
@@ -345,7 +345,7 @@ void Gint_k::folding_stress(
 
 	double r0[3],rt[3];
 
-	if(GridT.lgd>0)
+	if(GlobalC::GridT.lgd>0)
 	{
 		ppx = new double*[lgd];
 		ppy = new double*[lgd];
@@ -390,41 +390,41 @@ void Gint_k::folding_stress(
 		for (int I1 =0; I1< atom1->na; ++I1)
 		{
 			const int iat = GlobalC::ucell.itia2iat(T1,I1);
-			if(GridT.in_this_processor[iat])
+			if(GlobalC::GridT.in_this_processor[iat])
 			{
 				assert( lgd > 0 );
 
 				const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 				// get the start positions of elements.
-				const int DM_start = LNNR.nlocstartg[iat];
+				const int DM_start = GlobalC::LNNR.nlocstartg[iat];
 				// get the coordinates of adjacent atoms.
 				tau1 = atom1->tau[I1];
-				//GridD.Find_atom(tau1);
-				GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+				//GlobalC::GridD.Find_atom(tau1);
+				GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
 				// search for the adjacent atoms.
 				int nad = 0;
-				for (int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
+				for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ++ad)
 				{
 					// get iat2
-					const int T2 = GridD.getType(ad);
-					const int I2 = GridD.getNatom(ad);
+					const int T2 = GlobalC::GridD.getType(ad);
+					const int I2 = GlobalC::GridD.getNatom(ad);
 
-					const Vector3<double> tau2 = GridD.getAdjacentTau(ad);
+					const Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad);
 					const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
-					if(GridT.in_this_processor[iat2])
+					if(GlobalC::GridT.in_this_processor[iat2])
 					{
 						Atom* atom2 = &GlobalC::ucell.atoms[T2];
-						dtau = GridD.getAdjacentTau(ad) - tau1;
+						dtau = GlobalC::GridD.getAdjacentTau(ad) - tau1;
 						double distance = dtau.norm() * GlobalC::ucell.lat0;
-						double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+						double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 						if(distance < rcut)
 						{
 							const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-							int ixxx = DM_start + LNNR.find_R2st[iat][nad];
+							int ixxx = DM_start + GlobalC::LNNR.find_R2st[iat][nad];
 							for(int iw=0; iw<atom1->nw; iw++)
 							{
 								const int iw_all = start1+iw;
-								const int iw_local = GridT.trace_lo[iw_all];
+								const int iw_local = GlobalC::GridT.trace_lo[iw_all];
 								// iw1_lo
 								double *vijx = ppx[iw_local];
 								double *vijy = ppy[iw_local];
@@ -450,7 +450,7 @@ void Gint_k::folding_stress(
 								double *vR23 = &pvdp23[ixxx];
 
 
-								int* iw2_lo = &GridT.trace_lo[start2];
+								int* iw2_lo = &GlobalC::GridT.trace_lo[start2];
 								int* iw2_end = iw2_lo + atom2->nw;
 
 								for(; iw2_lo<iw2_end; ++iw2_lo, ++vRx, ++vRy, ++vRz,++vR11, 
@@ -484,14 +484,14 @@ void Gint_k::folding_stress(
 	{
 		ZEROS(tmp, 3*GlobalV::NLOCAL);
 		ZEROS(tmp1, 6*GlobalV::NLOCAL);
-		const int mug = GridT.trace_lo[i];
+		const int mug = GlobalC::GridT.trace_lo[i];
 		// if the row element is on this processor
 		if(mug>=0)
 		{
 			//GlobalV::ofs_running << " i=" << i << " mug=" << mug << endl;
 			for(int j=0; j<GlobalV::NLOCAL; ++j)
 			{
-				const int nug = GridT.trace_lo[j];
+				const int nug = GlobalC::GridT.trace_lo[j];
 				// if the col element is on this process or
 				if(nug>=0)
 				{
@@ -516,7 +516,7 @@ void Gint_k::folding_stress(
 		Parallel_Reduce::reduce_double_pool( tmp1, GlobalV::NLOCAL*6 );
 		for (int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			if (!ParaO.in_this_processor(i,j))
+			if (!GlobalC::ParaO.in_this_processor(i,j))
 			{
 				continue;
 			}
@@ -537,12 +537,12 @@ void Gint_k::folding_stress(
 	}
 	delete[] tmp;
 	delete[] tmp1;
-	if(GridT.lgd > 0)
+	if(GlobalC::GridT.lgd > 0)
 	{
 		//-------------------------
 		// delete the tmp matrix.
 		//-------------------------
-		for(int i=0; i<GridT.lgd; i++)
+		for(int i=0; i<GlobalC::GridT.lgd; i++)
 		{
 			delete[] ppx[i];
 			delete[] ppy[i];
@@ -583,8 +583,8 @@ void Gint_k::folding_vl_k(const int &ik)
 	}
 
 	//####################### EXPLAIN #################################
-	// 1. what is GridT.lgd ?
-	// GridT.lgd is the number of orbitals in each processor according
+	// 1. what is GlobalC::GridT.lgd ?
+	// GlobalC::GridT.lgd is the number of orbitals in each processor according
 	// to the division of real space FFT grid.
 	// 
 	// 2. why the folding of vlocal is different from folding of 
@@ -597,11 +597,11 @@ void Gint_k::folding_vl_k(const int &ik)
 	// matrix element < phi_0 | Vlocal | phi_R >
 	//#################################################################
 	this->ik_now = ik;
-	this->pvp = new complex<double>*[GridT.lgd];
-	for(int i=0; i<GridT.lgd; i++)
+	this->pvp = new complex<double>*[GlobalC::GridT.lgd];
+	for(int i=0; i<GlobalC::GridT.lgd; i++)
 	{
-		this->pvp[i] = new complex<double>[GridT.lgd];
-		ZEROS( this->pvp[i], GridT.lgd);
+		this->pvp[i] = new complex<double>[GlobalC::GridT.lgd];
+		ZEROS( this->pvp[i], GlobalC::GridT.lgd);
 	}
 
 	if(!reduced)
@@ -612,31 +612,31 @@ void Gint_k::folding_vl_k(const int &ik)
 		complex<double> *pp1;
 		double *pp2;
 		int count;
-		for(int k=0; k<GridT.nutot; k++)
+		for(int k=0; k<GlobalC::GridT.nutot; k++)
 		{
-			const int R1x = GridT.ucell_index2x[k];
-			const int R1y = GridT.ucell_index2y[k];
-			const int R1z = GridT.ucell_index2z[k];
+			const int R1x = GlobalC::GridT.ucell_index2x[k];
+			const int R1y = GlobalC::GridT.ucell_index2y[k];
+			const int R1z = GlobalC::GridT.ucell_index2z[k];
 
-			const int dimk = GridT.lgd*k;
-			for(int m=0; m<GridT.nutot; m++)
+			const int dimk = GlobalC::GridT.lgd*k;
+			for(int m=0; m<GlobalC::GridT.nutot; m++)
 			{
 				//------------------------------------------------
 				// exp(k dot dR)
 				// dR is the index of box in Crystal coordinates
 				//------------------------------------------------
-				dR.x = GridT.ucell_index2x[m] - R1x;
-				dR.y = GridT.ucell_index2y[m] - R1y;
-				dR.z = GridT.ucell_index2z[m] - R1z;
+				dR.x = GlobalC::GridT.ucell_index2x[m] - R1x;
+				dR.y = GlobalC::GridT.ucell_index2y[m] - R1y;
+				dR.z = GlobalC::GridT.ucell_index2z[m] - R1z;
 
 				arg = (GlobalC::kv.kvec_d[ this->ik_now ] * dR) * TWO_PI;
 				phase = complex<double>(cos(arg), sin(arg));
-				for(int i=0; i<GridT.lgd; i++)
+				for(int i=0; i<GlobalC::GridT.lgd; i++)
 				{
 					pp1 = this->pvp[i];
-					pp2 = this->pvpR[i+GridT.lgd*m];
+					pp2 = this->pvpR[i+GlobalC::GridT.lgd*m];
 					count = dimk;
-					for(int j=0; j<GridT.lgd; j++)
+					for(int j=0; j<GlobalC::GridT.lgd; j++)
 					{
 						// folding matrix
 						pp1[j] += pp2[count] * phase;
@@ -657,37 +657,37 @@ void Gint_k::folding_vl_k(const int &ik)
 				// get iat
 				const int iat = GlobalC::ucell.itia2iat(T1,I1);
 				// atom in this grid piece.
-				if(GridT.in_this_processor[iat])
+				if(GlobalC::GridT.in_this_processor[iat])
 				{
 					Atom* atom1 = &GlobalC::ucell.atoms[T1];
 					const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 
 					// get the start positions of elements.
-					const int DM_start = LNNR.nlocstartg[iat];
+					const int DM_start = GlobalC::LNNR.nlocstartg[iat];
 
 					// get the coordinates of adjacent atoms.
 					tau1 = GlobalC::ucell.atoms[T1].tau[I1];
-					//GridD.Find_atom(tau1);	
-					GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);	
+					//GlobalC::GridD.Find_atom(tau1);	
+					GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);	
 					// search for the adjacent atoms.
 					int nad = 0;
 
 
-					for (int ad = 0; ad < GridD.getAdjacentNum()+1; ad++)
+					for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ad++)
 					{
 						// get iat2
-						const int T2 = GridD.getType(ad);
-						const int I2 = GridD.getNatom(ad);
+						const int T2 = GlobalC::GridD.getType(ad);
+						const int I2 = GlobalC::GridD.getNatom(ad);
 						const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
 
 
 						// adjacent atom is also on the grid.
-						if(GridT.in_this_processor[iat2])
+						if(GlobalC::GridT.in_this_processor[iat2])
 						{
 							Atom* atom2 = &GlobalC::ucell.atoms[T2];
-							dtau = GridD.getAdjacentTau(ad) - tau1;
+							dtau = GlobalC::GridD.getAdjacentTau(ad) - tau1;
 							double distance = dtau.norm() * GlobalC::ucell.lat0;
-							double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+							double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 
 							// for the local part, only need to calculate <phi_i | phi_j> within range
 							// mohan note 2012-07-06
@@ -696,22 +696,22 @@ void Gint_k::folding_vl_k(const int &ik)
 								const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0); 
 
 								// calculate the distance between iat1 and iat2.
-								// Vector3<double> dR = GridD.getAdjacentTau(ad) - tau1;
-								dR.x = GridD.getBox(ad).x;
-								dR.y = GridD.getBox(ad).y;
-								dR.z = GridD.getBox(ad).z;
+								// Vector3<double> dR = GlobalC::GridD.getAdjacentTau(ad) - tau1;
+								dR.x = GlobalC::GridD.getBox(ad).x;
+								dR.y = GlobalC::GridD.getBox(ad).y;
+								dR.z = GlobalC::GridD.getBox(ad).z;
 
 								// calculate the phase factor exp(ikR).
 								const double arg = (GlobalC::kv.kvec_d[ this->ik_now ] * dR) * TWO_PI;
 								complex<double> phase = complex<double>(cos(arg), sin(arg));
-								int ixxx = DM_start + LNNR.find_R2st[iat][nad];
+								int ixxx = DM_start + GlobalC::LNNR.find_R2st[iat][nad];
 								for(int iw=0; iw<atom1->nw; iw++)
 								{
 									// iw1_lo
-									complex<double> *vij = this->pvp[GridT.trace_lo[start1+iw]];
+									complex<double> *vij = this->pvp[GlobalC::GridT.trace_lo[start1+iw]];
 
 
-									int* iw2_lo = &GridT.trace_lo[start2];
+									int* iw2_lo = &GlobalC::GridT.trace_lo[start2];
 									int* iw2_end = iw2_lo + atom2->nw;
 
 									// get the <phi | V | phi>(R) Hamiltonian.
@@ -737,9 +737,9 @@ void Gint_k::folding_vl_k(const int &ik)
 		// To test the pvpR
 		//------------------
 /*
-		for(int i=0; i<LNNR.nlocdimg[0]; i++)
+		for(int i=0; i<GlobalC::LNNR.nlocdimg[0]; i++)
 		{
-			const int DM_start = LNNR.nlocstartg[0];
+			const int DM_start = GlobalC::LNNR.nlocstartg[0];
 			const int j = i + DM_start;
 			if( abs(pvpR_reduced[j]) > 1.0e-5  )
 			{
@@ -755,9 +755,9 @@ void Gint_k::folding_vl_k(const int &ik)
 	//----------------------
 /*
 	cout << " pvp matrix:" << endl;
-	for(int i=0; i<GridT.lgd; i++)
+	for(int i=0; i<GlobalC::GridT.lgd; i++)
 	{
-		for(int j=0; j<GridT.lgd; j++)
+		for(int j=0; j<GlobalC::GridT.lgd; j++)
 		{
 			cout << setw(15) << pvp[i][j].real();
 		}
@@ -772,13 +772,13 @@ void Gint_k::folding_vl_k(const int &ik)
 	{
 		tmp = new complex<double>[GlobalV::NLOCAL];
 		ZEROS(tmp, GlobalV::NLOCAL);
-		const int mug = GridT.trace_lo[i];
+		const int mug = GlobalC::GridT.trace_lo[i];
 		// if the row element is on this processor.
 		if (mug >= 0)
 		{
 			for (int j=0; j<GlobalV::NLOCAL; j++)
 			{
-				const int nug = GridT.trace_lo[j];
+				const int nug = GlobalC::GridT.trace_lo[j];
 				// if the col element is on this processor.
 				if (nug >=0)
 				{
@@ -805,18 +805,18 @@ void Gint_k::folding_vl_k(const int &ik)
 		//-----------------------------------------------------
 		for (int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			if (!ParaO.in_this_processor(i,j))
+			if (!GlobalC::ParaO.in_this_processor(i,j))
 			{
 				continue;
 			}
 			// set the matrix value.
-			LM.set_HSk(i,j,tmp[j],'L');
+			GlobalC::LM.set_HSk(i,j,tmp[j],'L');
 		}
 		delete[] tmp;
 	}
 
 	// delete the tmp matrix.
-	for(int i=0; i<GridT.lgd; i++)
+	for(int i=0; i<GlobalC::GridT.lgd; i++)
 	{
 		delete[] pvp[i];
 	}
@@ -844,11 +844,11 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 //	complex<double>** pvp_nc[4];
 	for(int spin=0;spin<4;spin++)
 	{
-		pvp_nc[spin] = new complex<double>*[GridT.lgd];
-		for(int i=0; i<GridT.lgd; i++)
+		pvp_nc[spin] = new complex<double>*[GlobalC::GridT.lgd];
+		for(int i=0; i<GlobalC::GridT.lgd; i++)
 		{
-			pvp_nc[spin][i] = new complex<double>[GridT.lgd];
-			ZEROS( this->pvp_nc[spin][i], GridT.lgd);
+			pvp_nc[spin][i] = new complex<double>[GlobalC::GridT.lgd];
+			ZEROS( this->pvp_nc[spin][i], GlobalC::GridT.lgd);
 		}
 	}
 
@@ -860,31 +860,31 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 		complex<double> *pp1;
 		double *pp2;
 		int count;
-		for(int k=0; k<GridT.nutot; k++)
+		for(int k=0; k<GlobalC::GridT.nutot; k++)
 		{
-			const int R1x = GridT.ucell_index2x[k];
-			const int R1y = GridT.ucell_index2y[k];
-			const int R1z = GridT.ucell_index2z[k];
+			const int R1x = GlobalC::GridT.ucell_index2x[k];
+			const int R1y = GlobalC::GridT.ucell_index2y[k];
+			const int R1z = GlobalC::GridT.ucell_index2z[k];
 
-			const int dimk = GridT.lgd*k;
-			for(int m=0; m<GridT.nutot; m++)
+			const int dimk = GlobalC::GridT.lgd*k;
+			for(int m=0; m<GlobalC::GridT.nutot; m++)
 			{
 				//------------------------------------------------
 				// exp(k dot dR)
 				// dR is the index of box in Crystal coordinates
 				//------------------------------------------------
-				dR.x = GridT.ucell_index2x[m] - R1x;
-				dR.y = GridT.ucell_index2y[m] - R1y;
-				dR.z = GridT.ucell_index2z[m] - R1z;
+				dR.x = GlobalC::GridT.ucell_index2x[m] - R1x;
+				dR.y = GlobalC::GridT.ucell_index2y[m] - R1y;
+				dR.z = GlobalC::GridT.ucell_index2z[m] - R1z;
 
 				arg = (GlobalC::kv.kvec_d[ this->ik_now ] * dR) * TWO_PI;
 				phase = complex<double>(cos(arg), sin(arg));
-				for(int i=0; i<GridT.lgd; i++)
+				for(int i=0; i<GlobalC::GridT.lgd; i++)
 				{
 					pp1 = this->pvp_nc[0][i];
-					pp2 = this->pvpR[i+GridT.lgd*m];
+					pp2 = this->pvpR[i+GlobalC::GridT.lgd*m];
 					count = dimk;
-					for(int j=0; j<GridT.lgd; j++)
+					for(int j=0; j<GlobalC::GridT.lgd; j++)
 					{
 						// folding matrix
 						pp1[j] += pp2[count] * phase;
@@ -905,37 +905,37 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 				// get iat
 				const int iat = GlobalC::ucell.itia2iat(T1,I1);
 				// atom in this grid piece.
-				if(GridT.in_this_processor[iat])
+				if(GlobalC::GridT.in_this_processor[iat])
 				{
 					Atom* atom1 = &GlobalC::ucell.atoms[T1];
 					const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 
 					// get the start positions of elements.
-					const int DM_start = LNNR.nlocstartg[iat];
+					const int DM_start = GlobalC::LNNR.nlocstartg[iat];
 
 					// get the coordinates of adjacent atoms.
 					tau1 = GlobalC::ucell.atoms[T1].tau[I1];
-					//GridD.Find_atom(tau1);	
-					GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);	
+					//GlobalC::GridD.Find_atom(tau1);	
+					GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);	
 					// search for the adjacent atoms.
 					int nad = 0;
 
 
-					for (int ad = 0; ad < GridD.getAdjacentNum()+1; ad++)
+					for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ad++)
 					{
 						// get iat2
-						const int T2 = GridD.getType(ad);
-						const int I2 = GridD.getNatom(ad);
+						const int T2 = GlobalC::GridD.getType(ad);
+						const int I2 = GlobalC::GridD.getNatom(ad);
 						const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
 
 
 						// adjacent atom is also on the grid.
-						if(GridT.in_this_processor[iat2])
+						if(GlobalC::GridT.in_this_processor[iat2])
 						{
 							Atom* atom2 = &GlobalC::ucell.atoms[T2];
-							dtau = GridD.getAdjacentTau(ad) - tau1;
+							dtau = GlobalC::GridD.getAdjacentTau(ad) - tau1;
 							double distance = dtau.norm() * GlobalC::ucell.lat0;
-							double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+							double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 
 							// for the local part, only need to calculate <phi_i | phi_j> within range
 							// mohan note 2012-07-06
@@ -944,24 +944,24 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 								const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 
 								// calculate the distance between iat1 and iat2.
-								// Vector3<double> dR = GridD.getAdjacentTau(ad) - tau1;
-								dR.x = GridD.getBox(ad).x;
-								dR.y = GridD.getBox(ad).y;
-								dR.z = GridD.getBox(ad).z;
+								// Vector3<double> dR = GlobalC::GridD.getAdjacentTau(ad) - tau1;
+								dR.x = GlobalC::GridD.getBox(ad).x;
+								dR.y = GlobalC::GridD.getBox(ad).y;
+								dR.z = GlobalC::GridD.getBox(ad).z;
 
 								// calculate the phase factor exp(ikR).
 								const double arg = (GlobalC::kv.kvec_d[ this->ik_now ] * dR) * TWO_PI;
 								complex<double> phase = complex<double>(cos(arg), sin(arg));
-								int ixxx = DM_start + LNNR.find_R2st[iat][nad];
+								int ixxx = DM_start + GlobalC::LNNR.find_R2st[iat][nad];
 								for(int iw=0; iw<atom1->nw; iw++)
 								{
 									// iw1_lo
 									complex<double> *vij[4];
 									for(int spin=0;spin<4;spin++)
-										vij[spin] = this->pvp_nc[spin][GridT.trace_lo[start1]/GlobalV::NPOL + iw];
+										vij[spin] = this->pvp_nc[spin][GlobalC::GridT.trace_lo[start1]/GlobalV::NPOL + iw];
 
 
-									int iw2_lo = GridT.trace_lo[start2]/GlobalV::NPOL;
+									int iw2_lo = GlobalC::GridT.trace_lo[start2]/GlobalV::NPOL;
 									int iw2_end = iw2_lo + atom2->nw;
 
 									// get the <phi | V | phi>(R) Hamiltonian.
@@ -995,9 +995,9 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 		// To test the pvpR
 		//------------------
 /*
-		for(int i=0; i<LNNR.nlocdimg[0]; i++)
+		for(int i=0; i<GlobalC::LNNR.nlocdimg[0]; i++)
 		{
-			const int DM_start = LNNR.nlocstartg[0];
+			const int DM_start = GlobalC::LNNR.nlocstartg[0];
 			const int j = i + DM_start;
 			if( abs(pvpR_reduced[j]) > 1.0e-5  )
 			{
@@ -1013,9 +1013,9 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 	//----------------------
 /*
 	cout << " pvp matrix:" << endl;
-	for(int i=0; i<GridT.lgd; i++)
+	for(int i=0; i<GlobalC::GridT.lgd; i++)
 	{
-		for(int j=0; j<GridT.lgd; j++)
+		for(int j=0; j<GlobalC::GridT.lgd; j++)
 		{
 			cout << setw(15) << pvp[i][j].real();
 		}
@@ -1030,14 +1030,14 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 	{
 		tmp = new complex<double>[GlobalV::NLOCAL];
 		ZEROS(tmp, GlobalV::NLOCAL);
-		const int mug = GridT.trace_lo[i];
+		const int mug = GlobalC::GridT.trace_lo[i];
 		const int mug0 = mug/GlobalV::NPOL;
 		// if the row element is on this processor.
 		if (mug >= 0)
 		{
 			for (int j=0; j<GlobalV::NLOCAL; j++)
 			{
-				const int nug = GridT.trace_lo[j];
+				const int nug = GlobalC::GridT.trace_lo[j];
 				const int nug0 = nug/GlobalV::NPOL;
 				// if the col element is on this processor.
 				if (nug >=0)
@@ -1119,12 +1119,12 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 		//-----------------------------------------------------
 		for (int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			if (!ParaO.in_this_processor(i,j))
+			if (!GlobalC::ParaO.in_this_processor(i,j))
 			{
 				continue;
 			}
 			// set the matrix value.
-			LM.set_HSk(i,j,tmp[j],'L');
+			GlobalC::LM.set_HSk(i,j,tmp[j],'L');
 		}
 		delete[] tmp;
 	}
@@ -1132,7 +1132,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 	// delete the tmp matrix.
 	for(int spin =0;spin<4;spin++)
 	{
-		for(int i=0; i<GridT.lgd; i++)
+		for(int i=0; i<GlobalC::GridT.lgd; i++)
 		{
 			delete[] this->pvp_nc[spin][i];
 		}
@@ -1158,37 +1158,37 @@ void Gint_k::set_ijk_atom(
 	for (int id=0; id<size; id++)
 	{
 		// (2.1) get the atom type and atom index.
-		const int mcell_index = GridT.bcell_start[grid_index] + id;	
-		const int imcell = GridT.which_bigcell[mcell_index];
-		const int iat = GridT.which_atom[mcell_index];
+		const int mcell_index = GlobalC::GridT.bcell_start[grid_index] + id;	
+		const int imcell = GlobalC::GridT.which_bigcell[mcell_index];
+		const int iat = GlobalC::GridT.which_atom[mcell_index];
 		const int it = GlobalC::ucell.iat2it[ iat ];
 		const int ia = GlobalC::ucell.iat2ia[ iat ];
 
 		// (2.2) get the distance between the grid and the atom.
-		mt[0] = GridT.meshball_positions[imcell][0] - GridT.tau_in_bigcell[iat][0];
-		mt[1] = GridT.meshball_positions[imcell][1] - GridT.tau_in_bigcell[iat][1];
-		mt[2] = GridT.meshball_positions[imcell][2] - GridT.tau_in_bigcell[iat][2];
+		mt[0] = GlobalC::GridT.meshball_positions[imcell][0] - GlobalC::GridT.tau_in_bigcell[iat][0];
+		mt[1] = GlobalC::GridT.meshball_positions[imcell][1] - GlobalC::GridT.tau_in_bigcell[iat][1];
+		mt[2] = GlobalC::GridT.meshball_positions[imcell][2] - GlobalC::GridT.tau_in_bigcell[iat][2];
 
 		for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
 		{
 			// meshcell_pos: z is the fastest
-			dr[ib][id][0] = GridT.meshcell_pos[ib][0] + mt[0];
-			dr[ib][id][1] = GridT.meshcell_pos[ib][1] + mt[1];
-			dr[ib][id][2] = GridT.meshcell_pos[ib][2] + mt[2];
+			dr[ib][id][0] = GlobalC::GridT.meshcell_pos[ib][0] + mt[0];
+			dr[ib][id][1] = GlobalC::GridT.meshcell_pos[ib][1] + mt[1];
+			dr[ib][id][2] = GlobalC::GridT.meshcell_pos[ib][2] + mt[2];
 
 			distance[ib][id] = std::sqrt(dr[ib][id][0]*dr[ib][id][0] 
 			+ dr[ib][id][1]*dr[ib][id][1] + dr[ib][id][2]*dr[ib][id][2]);
 
-			//if(distance[ib][id] <= ORB.Phi[it].getRcut())
+			//if(distance[ib][id] <= GlobalC::ORB.Phi[it].getRcut())
 			// mohan reset this 2012-06-27
-			// if(distance[ib][id] < ORB.Phi[it].getRcut() )
+			// if(distance[ib][id] < GlobalC::ORB.Phi[it].getRcut() )
 			// mohan reset this 2013-07-02 in Princeton
-			// we should make absolutely sure that the distance is smaller than ORB.Phi[it].getRcut
+			// we should make absolutely sure that the distance is smaller than GlobalC::ORB.Phi[it].getRcut
 			// this should be consistant with LCAO_nnr::cal_nnrg function 
 			// typical example : 7 Bohr cutoff Si orbital in 14 Bohr length of cell.
 			// distance = 7.0000000000000000
-			// ORB.Phi[it].getRcut = 7.0000000000000008
-			if(distance[ib][id] < (ORB.Phi[it].getRcut() - 1.0e-15) )
+			// GlobalC::ORB.Phi[it].getRcut = 7.0000000000000008
+			if(distance[ib][id] < (GlobalC::ORB.Phi[it].getRcut() - 1.0e-15) )
 			{
 				cal_flag[ib][id]=true;
 			}
@@ -1230,7 +1230,7 @@ void Gint_k::set_ijk_atom(
 			{
 				if ( atom1->iw2_new[iw] )
 				{
-					pointer = &ORB.Phi[it].PhiLN(
+					pointer = &GlobalC::ORB.Phi[it].PhiLN(
 							atom1->iw2l[iw],
 							atom1->iw2n[iw]);
 
@@ -1254,14 +1254,14 @@ void Gint_k::allocate_pvpR_tr(void)
 {
     TITLE("Gint_k","allocate_pvpR_tr");
 
-    int R_x = GridD.getCellX();
-    int R_y = GridD.getCellY();
-    int R_z = GridD.getCellZ();
+    int R_x = GlobalC::GridD.getCellX();
+    int R_y = GlobalC::GridD.getCellY();
+    int R_z = GlobalC::GridD.getCellZ();
 
 //cout<<"R_x: "<<R_x<<endl;
 //cout<<"R_y: "<<R_y<<endl;
 //cout<<"R_z: "<<R_z<<endl;
-//cout<<"GridT.lgd: "<<GridT.lgd<<endl;
+//cout<<"GlobalC::GridT.lgd: "<<GlobalC::GridT.lgd<<endl;
     if(GlobalV::NSPIN!=4)
     {
         pvpR_tr = new double****[R_x];
@@ -1273,13 +1273,13 @@ void Gint_k::allocate_pvpR_tr(void)
                 pvpR_tr[ix][iy] = new double**[R_z];
                 for(int iz=0; iz<R_z; iz++)
                 {
-                    pvpR_tr[ix][iy][iz] = new double*[GridT.lgd];
-                    for(int iw=0; iw<GridT.lgd; iw++)
+                    pvpR_tr[ix][iy][iz] = new double*[GlobalC::GridT.lgd];
+                    for(int iw=0; iw<GlobalC::GridT.lgd; iw++)
                     {
-                        pvpR_tr[ix][iy][iz][iw] = new double[GridT.lgd];
-//do    uble mem = Memory::record("allocate_pvpR_tr", "pvpR_tr[ix][iy][iz][iw]", GridT.lgd , "double");
+                        pvpR_tr[ix][iy][iz][iw] = new double[GlobalC::GridT.lgd];
+//do    uble mem = Memory::record("allocate_pvpR_tr", "pvpR_tr[ix][iy][iz][iw]", GlobalC::GridT.lgd , "double");
 //co    ut<<" Memory of pvpR_tr[ix][iy][iz][iw]: "<<mem<<" MB"<<endl;
-                        ZEROS(pvpR_tr[ix][iy][iz][iw], GridT.lgd);
+                        ZEROS(pvpR_tr[ix][iy][iz][iw], GlobalC::GridT.lgd);
                     }
                 }
             }
@@ -1296,13 +1296,13 @@ void Gint_k::allocate_pvpR_tr(void)
                 pvpR_tr_soc[ix][iy] = new complex<double>**[R_z];
                 for(int iz=0; iz<R_z; iz++)
                 {
-                    pvpR_tr_soc[ix][iy][iz] = new complex<double>*[GridT.lgd];
-                    for(int iw=0; iw<GridT.lgd; iw++)
+                    pvpR_tr_soc[ix][iy][iz] = new complex<double>*[GlobalC::GridT.lgd];
+                    for(int iw=0; iw<GlobalC::GridT.lgd; iw++)
                     {
-                        pvpR_tr_soc[ix][iy][iz][iw] = new complex<double>[GridT.lgd];
-//do    uble mem = Memory::record("allocate_pvpR_tr", "pvpR_tr[ix][iy][iz][iw]", GridT.lgd , "double");
+                        pvpR_tr_soc[ix][iy][iz][iw] = new complex<double>[GlobalC::GridT.lgd];
+//do    uble mem = Memory::record("allocate_pvpR_tr", "pvpR_tr[ix][iy][iz][iw]", GlobalC::GridT.lgd , "double");
 //co    ut<<" Memory of pvpR_tr[ix][iy][iz][iw]: "<<mem<<" MB"<<endl;
-                        ZEROS(pvpR_tr_soc[ix][iy][iz][iw], GridT.lgd);
+                        ZEROS(pvpR_tr_soc[ix][iy][iz][iw], GlobalC::GridT.lgd);
                     }
                 }
             }
@@ -1316,9 +1316,9 @@ void Gint_k::destroy_pvpR_tr(void)
 {
     TITLE("Gint_k","destroy_pvpR_tr");
 
-    int R_x = GridD.getCellX();
-    int R_y = GridD.getCellY();
-    int R_z = GridD.getCellZ();
+    int R_x = GlobalC::GridD.getCellX();
+    int R_y = GlobalC::GridD.getCellY();
+    int R_z = GlobalC::GridD.getCellZ();
 
     if(GlobalV::NSPIN!=4)
     {
@@ -1328,7 +1328,7 @@ void Gint_k::destroy_pvpR_tr(void)
             {
                 for(int iz=0; iz<R_z; iz++)
                 {
-                    for(int iw=0; iw<GridT.lgd; GridT.lgd++)
+                    for(int iw=0; iw<GlobalC::GridT.lgd; GlobalC::GridT.lgd++)
                     {
                         delete[] pvpR_tr[ix][iy][iz][iw];
                     }
@@ -1348,7 +1348,7 @@ void Gint_k::destroy_pvpR_tr(void)
             {
                 for(int iz=0; iz<R_z; iz++)
                 {
-                    for(int iw=0; iw<GridT.lgd; GridT.lgd++)
+                    for(int iw=0; iw<GlobalC::GridT.lgd; GlobalC::GridT.lgd++)
                     {
                         delete[] pvpR_tr_soc[ix][iy][iz][iw];
                     }
@@ -1368,9 +1368,9 @@ void Gint_k::distribute_pvpR_tr(void)
 {
     TITLE("Gint_k","distribute_pvpR_tr");
 
-    int R_x = GridD.getCellX();
-    int R_y = GridD.getCellY();
-    int R_z = GridD.getCellZ();
+    int R_x = GlobalC::GridD.getCellX();
+    int R_y = GlobalC::GridD.getCellY();
+    int R_z = GlobalC::GridD.getCellZ();
 
     for(int ix=0; ix<R_x; ix++)
     {
@@ -1393,13 +1393,13 @@ void Gint_k::distribute_pvpR_tr(void)
                         ZEROS(tmp_soc, GlobalV::NLOCAL);
                     }
 
-                    const int mug = GridT.trace_lo[i];
+                    const int mug = GlobalC::GridT.trace_lo[i];
 //cout<<"mug: "<<mug<<endl;
                     if(mug >= 0)
                     {
                         for(int j=0; j<GlobalV::NLOCAL; j++)
                         {
-                            const int nug = GridT.trace_lo[j];
+                            const int nug = GlobalC::GridT.trace_lo[j];
 //cout<<"nug: "<<nug<<endl;
                             if(nug >= 0)
                             {
@@ -1428,15 +1428,15 @@ void Gint_k::distribute_pvpR_tr(void)
                     else Parallel_Reduce::reduce_complex_double_pool( tmp_soc, GlobalV::NLOCAL );
                     for(int j=0; j<GlobalV::NLOCAL; j++)
                     {
-                        if(!ParaO.in_this_processor(i,j))
+                        if(!GlobalC::ParaO.in_this_processor(i,j))
                         {
                             continue;
                         }
                         else
                         {
-                            //LM.set_HSk(i,j,tmp[j],'L');
-                            if(GlobalV::NSPIN!=4) LM.set_HR_tr(ix,iy,iz,i,j,tmp[j]);
-                            else LM.set_HR_tr_soc(ix,iy,iz,i,j,tmp_soc[j]);
+                            //GlobalC::LM.set_HSk(i,j,tmp[j],'L');
+                            if(GlobalV::NSPIN!=4) GlobalC::LM.set_HR_tr(ix,iy,iz,i,j,tmp[j]);
+                            else GlobalC::LM.set_HR_tr_soc(ix,iy,iz,i,j,tmp_soc[j]);
                         }
                     }
                     if(GlobalV::NSPIN!=4) delete[] tmp;
@@ -1458,9 +1458,9 @@ void Gint_k::cal_vlocal_R(const int current_spin)
 
     int lgd = 0;
 
-    double R_minX = GridD.getD_minX();
-    double R_minY = GridD.getD_minY();
-    double R_minZ = GridD.getD_minZ();
+    double R_minX = GlobalC::GridD.getD_minX();
+    double R_minY = GlobalC::GridD.getD_minY();
+    double R_minZ = GlobalC::GridD.getD_minZ();
 
     int R_x;
     int R_y;
@@ -1472,46 +1472,46 @@ void Gint_k::cal_vlocal_R(const int current_spin)
         for(int I1=0; I1<GlobalC::ucell.atoms[T1].na; ++I1)
         {
             const int iat = GlobalC::ucell.itia2iat(T1,I1);
-            if(GridT.in_this_processor[iat])
+            if(GlobalC::GridT.in_this_processor[iat])
             {
                 Atom* atom1 = &GlobalC::ucell.atoms[T1];
                 const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 
-                const int DM_start = LNNR.nlocstartg[iat];
+                const int DM_start = GlobalC::LNNR.nlocstartg[iat];
                 tau1 = GlobalC::ucell.atoms[T1].tau[I1];
-                //GridD.Find_atom(tau1);        
-                GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+                //GlobalC::GridD.Find_atom(tau1);        
+                GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
                 int nad2 = 0;
 
-                for(int ad = 0; ad < GridD.getAdjacentNum()+1; ad++)
+                for(int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ad++)
                 {
-                    const int T2 = GridD.getType(ad);
-                    const int I2 = GridD.getNatom(ad);
+                    const int T2 = GlobalC::GridD.getType(ad);
+                    const int I2 = GlobalC::GridD.getNatom(ad);
                     const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
 
-                    if(GridT.in_this_processor[iat2])
+                    if(GlobalC::GridT.in_this_processor[iat2])
                     {
                         Atom* atom2 = &GlobalC::ucell.atoms[T2];
-                        dtau = GridD.getAdjacentTau(ad) - tau1;
+                        dtau = GlobalC::GridD.getAdjacentTau(ad) - tau1;
                         double distance = dtau.norm() * GlobalC::ucell.lat0;
-                        double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+                        double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 
                         if(distance < rcut)
                         {
                             const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 
-                            dR.x = GridD.getBox(ad).x;
-                            dR.y = GridD.getBox(ad).y;
-                            dR.z = GridD.getBox(ad).z;
+                            dR.x = GlobalC::GridD.getBox(ad).x;
+                            dR.y = GlobalC::GridD.getBox(ad).y;
+                            dR.z = GlobalC::GridD.getBox(ad).z;
 
                             R_x = (int) (dR.x -R_minX);
                             R_y = (int) (dR.y -R_minY);
                             R_z = (int) (dR.z -R_minZ);
 
-                            int ixxx = DM_start + LNNR.find_R2st[iat][nad2];
+                            int ixxx = DM_start + GlobalC::LNNR.find_R2st[iat][nad2];
                             for(int iw=0; iw<atom1->nw * GlobalV::NPOL; iw++)
                             {
-                                int* iw2_lo = &GridT.trace_lo[start2];
+                                int* iw2_lo = &GlobalC::GridT.trace_lo[start2];
                                 int* iw2_end = iw2_lo + atom2->nw;
 
                                 //double *vijR = &pvpR_reduced[ixxx];
@@ -1520,8 +1520,8 @@ void Gint_k::cal_vlocal_R(const int current_spin)
 								{
                                     double *HlocR;
                                     complex<double> *HlocR_soc;
-                                    if(GlobalV::NSPIN!=4) HlocR = &pvpR_tr[R_x][R_y][R_z][GridT.trace_lo[start1+iw]][GridT.trace_lo[start2+iw2]];
-									else    HlocR_soc = &pvpR_tr_soc[R_x][R_y][R_z][GridT.trace_lo[start1+iw]][GridT.trace_lo[start2+iw2]];
+                                    if(GlobalV::NSPIN!=4) HlocR = &pvpR_tr[R_x][R_y][R_z][GlobalC::GridT.trace_lo[start1+iw]][GlobalC::GridT.trace_lo[start2+iw2]];
+									else    HlocR_soc = &pvpR_tr_soc[R_x][R_y][R_z][GlobalC::GridT.trace_lo[start1+iw]][GlobalC::GridT.trace_lo[start2+iw2]];
 									const int nw = atom2->nw;
 									const int mug0 = iw/GlobalV::NPOL;
 									const int nug0 = iw2/GlobalV::NPOL;
@@ -1564,12 +1564,12 @@ void Gint_k::cal_vlocal_R(const int current_spin)
 									else
 									{
 										HlocR[0] = pvpR_reduced[current_spin][iw_nowg];
-                                            //pvpR_tr[R_x][R_y][R_z][GridT.trace_lo[start1+iw]][iw2_lo[0]] = vijR[0];
+                                            //pvpR_tr[R_x][R_y][R_z][GlobalC::GridT.trace_lo[start1+iw]][iw2_lo[0]] = vijR[0];
 									}//endif normal
 								}
 //                               for(; iw2_lo<iw2_end; ++iw2_lo, ++vijR)
 //                               {
-//                                   pvpR_tr[R_x][R_y][R_z][GridT.trace_lo[start1+iw]][iw2_lo[0]] = vijR[0];
+//                                   pvpR_tr[R_x][R_y][R_z][GlobalC::GridT.trace_lo[start1+iw]][iw2_lo[0]] = vijR[0];
 //                               }
 //                               ixxx += atom2->nw;
                                 ++lgd;
@@ -1589,9 +1589,9 @@ void Gint_k::allocate_pvpR_sparseMatrix(void)
 {
     TITLE("Gint_k","allocate_pvpR_sparseMatrix");
 
-    int R_x = GridD.getCellX();
-    int R_y = GridD.getCellY();
-    int R_z = GridD.getCellZ();
+    int R_x = GlobalC::GridD.getCellX();
+    int R_y = GlobalC::GridD.getCellY();
+    int R_z = GlobalC::GridD.getCellZ();
 
 	if(GlobalV::NSPIN != 4)
     {
@@ -1625,8 +1625,8 @@ void Gint_k::destroy_pvpR_sparseMatrix(void)
 {
 	TITLE("Gint_k","destroy_pvpR_sparseMatrix");
 
-	int R_x = GridD.getCellX();
-    int R_y = GridD.getCellY();
+	int R_x = GlobalC::GridD.getCellX();
+    int R_y = GlobalC::GridD.getCellY();
 
 	if (GlobalV::NSPIN != 4)
 	{
@@ -1662,13 +1662,13 @@ void Gint_k::distribute_pvpR_sparseMatrix(const double &sparse_threshold)
 {
 	TITLE("Gint_k","distribute_pvpR_sparseMatrix");
 
-	int R_x = GridD.getCellX();
-    int R_y = GridD.getCellY();
-    int R_z = GridD.getCellZ();
+	int R_x = GlobalC::GridD.getCellX();
+    int R_y = GlobalC::GridD.getCellY();
+    int R_z = GlobalC::GridD.getCellZ();
 
-	double R_minX = GridD.getD_minX();
-    double R_minY = GridD.getD_minY();
-    double R_minZ = GridD.getD_minZ();
+	double R_minX = GlobalC::GridD.getD_minX();
+    double R_minY = GlobalC::GridD.getD_minY();
+    double R_minZ = GlobalC::GridD.getD_minZ();
 
 	double* tmp = nullptr;
 	complex<double>* tmp_soc = nullptr;
@@ -1712,7 +1712,7 @@ void Gint_k::distribute_pvpR_sparseMatrix(const double &sparse_threshold)
 						ZEROS(tmp_soc, GlobalV::NLOCAL);
 					}
 
-					if(GridT.trace_lo[row] >= 0)
+					if(GlobalC::GridT.trace_lo[row] >= 0)
 					{
 						if (GlobalV::NSPIN != 4)
 						{
@@ -1742,7 +1742,7 @@ void Gint_k::distribute_pvpR_sparseMatrix(const double &sparse_threshold)
 					{
 						for (int col = 0; col < row; ++col)
 						{
-							if(GridT.trace_lo[col] >= 0)
+							if(GlobalC::GridT.trace_lo[col] >= 0)
 							{
 								if (GlobalV::NSPIN != 4)
 								{
@@ -1783,21 +1783,21 @@ void Gint_k::distribute_pvpR_sparseMatrix(const double &sparse_threshold)
 						Parallel_Reduce::reduce_complex_double_pool(tmp_soc, GlobalV::NLOCAL);
 					}
 
-					if (ParaO.trace_loc_row[row] >= 0)
+					if (GlobalC::ParaO.trace_loc_row[row] >= 0)
 					{
 						for(int col = 0; col < GlobalV::NLOCAL; ++col)
 						{
-							if(ParaO.trace_loc_col[col] >= 0)
+							if(GlobalC::ParaO.trace_loc_col[col] >= 0)
 							{
 								if (GlobalV::NSPIN != 4)
 								{
 									if (abs(tmp[col]) > sparse_threshold)
 									{
-										double &value = LM.HR_sparse[ix][iy][iz][row][col];
+										double &value = GlobalC::LM.HR_sparse[ix][iy][iz][row][col];
 										value += tmp[col];
 										if (abs(value) < sparse_threshold)
 										{
-											LM.HR_sparse[ix][iy][iz][row].erase(col);
+											GlobalC::LM.HR_sparse[ix][iy][iz][row].erase(col);
 										}
 									}
 								}
@@ -1805,11 +1805,11 @@ void Gint_k::distribute_pvpR_sparseMatrix(const double &sparse_threshold)
 								{
 									if(abs(tmp_soc[col]) > sparse_threshold)
 									{
-										complex<double> &value = LM.HR_soc_sparse[ix][iy][iz][row][col];
+										complex<double> &value = GlobalC::LM.HR_soc_sparse[ix][iy][iz][row][col];
 										value += tmp_soc[col];
 										if (abs(value) < sparse_threshold)
 										{
-											LM.HR_soc_sparse[ix][iy][iz][row].erase(col);
+											GlobalC::LM.HR_soc_sparse[ix][iy][iz][row].erase(col);
 										}
 									}
 								}
@@ -1849,9 +1849,9 @@ void Gint_k::cal_vlocal_R_sparseMatrix(const int current_spin, const double &spa
 
     int lgd = 0;
 
-    double R_minX = GridD.getD_minX();
-    double R_minY = GridD.getD_minY();
-    double R_minZ = GridD.getD_minZ();
+    double R_minX = GlobalC::GridD.getD_minX();
+    double R_minY = GlobalC::GridD.getD_minY();
+    double R_minZ = GlobalC::GridD.getD_minZ();
 
     int R_x;
     int R_y;
@@ -1863,43 +1863,43 @@ void Gint_k::cal_vlocal_R_sparseMatrix(const int current_spin, const double &spa
         for(int I1=0; I1<GlobalC::ucell.atoms[T1].na; ++I1)
         {
             const int iat = GlobalC::ucell.itia2iat(T1,I1);
-            if(GridT.in_this_processor[iat])
+            if(GlobalC::GridT.in_this_processor[iat])
             {
                 Atom* atom1 = &GlobalC::ucell.atoms[T1];
                 const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 
-                const int DM_start = LNNR.nlocstartg[iat];
+                const int DM_start = GlobalC::LNNR.nlocstartg[iat];
                 tau1 = GlobalC::ucell.atoms[T1].tau[I1];
-                //GridD.Find_atom(tau1);        
-                GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+                //GlobalC::GridD.Find_atom(tau1);        
+                GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
                 int nad2 = 0;
 
-                for(int ad = 0; ad < GridD.getAdjacentNum()+1; ad++)
+                for(int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ad++)
                 {
-                    const int T2 = GridD.getType(ad);
-                    const int I2 = GridD.getNatom(ad);
+                    const int T2 = GlobalC::GridD.getType(ad);
+                    const int I2 = GlobalC::GridD.getNatom(ad);
                     const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
 
-                    if(GridT.in_this_processor[iat2])
+                    if(GlobalC::GridT.in_this_processor[iat2])
                     {
                         Atom* atom2 = &GlobalC::ucell.atoms[T2];
-                        dtau = GridD.getAdjacentTau(ad) - tau1;
+                        dtau = GlobalC::GridD.getAdjacentTau(ad) - tau1;
                         double distance = dtau.norm() * GlobalC::ucell.lat0;
-                        double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+                        double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 
                         if(distance < rcut)
                         {
                             const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 
-                            dR.x = GridD.getBox(ad).x;
-                            dR.y = GridD.getBox(ad).y;
-                            dR.z = GridD.getBox(ad).z;
+                            dR.x = GlobalC::GridD.getBox(ad).x;
+                            dR.y = GlobalC::GridD.getBox(ad).y;
+                            dR.z = GlobalC::GridD.getBox(ad).z;
 
                             R_x = (int) (dR.x -R_minX);
                             R_y = (int) (dR.y -R_minY);
                             R_z = (int) (dR.z -R_minZ);
 
-                            int ixxx = DM_start + LNNR.find_R2st[iat][nad2];
+                            int ixxx = DM_start + GlobalC::LNNR.find_R2st[iat][nad2];
                             for(int iw=0; iw<atom1->nw * GlobalV::NPOL; iw++)
                             {
 								for(int iw2=0;iw2<atom2->nw * GlobalV::NPOL; iw2++)

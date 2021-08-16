@@ -16,7 +16,7 @@ void Stress_Func::stress_har(matrix& sigma, const bool is_pw)
 	{
 		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			Porter[ir] += complex<double>( CHR.rho[is][ir], 0.0 );
+			Porter[ir] += complex<double>( GlobalC::CHR.rho[is][ir], 0.0 );
 		}
 	}
 	//=============================
@@ -29,7 +29,7 @@ void Stress_Func::stress_har(matrix& sigma, const bool is_pw)
 	ZEROS( psic0, GlobalC::pw.nrxx);
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		daxpy (GlobalC::pw.nrxx, 1.0, CHR.rho[is], 1, psic0, 2);
+		daxpy (GlobalC::pw.nrxx, 1.0, GlobalC::CHR.rho[is], 1, psic0, 2);
 		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
 			psic[ir] = complex<double>(psic0[ir], 0.0);

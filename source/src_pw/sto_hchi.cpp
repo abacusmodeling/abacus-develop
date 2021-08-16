@@ -236,7 +236,7 @@ void Stochastic_hchi::orthogonal_to_psi_reciprocal(complex<double> *wfgin, compl
 void Stochastic_hchi::hchi_real(complex<double>*chi_in, complex<double> *hchi, const int m)
 {
 	
-	double*vr = pot.vr_eff1;  //vr= pot.vrs1 temporarily use cutoff vr.
+	double*vr = GlobalC::pot.vr_eff1;  //vr= GlobalC::pot.vrs1 temporarily use cutoff vr.
 
 	//wait for init--------------------------------------	
 	double dk1,dk2,dk3;
@@ -468,7 +468,7 @@ void Stochastic_hchi:: hchi_reciprocal(complex<double> *chig, complex<double> *h
 		for(int ib = 0 ; ib < m ; ++ib)
 		{
 			ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
-			GlobalC::UFFT.RoundTrip( chibg, pot.vr_eff1, GRA_index, GlobalC::UFFT.porter );
+			GlobalC::UFFT.RoundTrip( chibg, GlobalC::pot.vr_eff1, GRA_index, GlobalC::UFFT.porter );
 			for (int ig = 0; ig < npw; ++ig)
 			{
 				hchibg[ig] += GlobalC::UFFT.porter[ GRA_index[ig] ];

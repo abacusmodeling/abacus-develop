@@ -57,7 +57,7 @@ K_Vectors::~K_Vectors()
 }
 
 void K_Vectors::set(
-    const Symmetry &symm,
+    const ModuleSymmetry::Symmetry &symm,
     const string &k_file_name,
     const int& nspin_in,
     const Matrix3 &reciprocal_vec,
@@ -96,7 +96,7 @@ void K_Vectors::set(
 	}
 
     // (2)
-	if(Symmetry::symm_flag)
+	if(ModuleSymmetry::Symmetry::symm_flag)
     {
         this->ibz_kpoint(symm);
         this->update_use_ibz();
@@ -124,7 +124,7 @@ void K_Vectors::set(
     // It's very important in parallel case,
     // firstly do the mpi_k() and then
     // do set_kup_and_kdw()
-	Pkpoints.kinfo(nkstot);
+	GlobalC::Pkpoints.kinfo(nkstot);
 #ifdef __MPI
     this->mpi_k();//2008-4-29
 #endif
@@ -284,7 +284,7 @@ bool K_Vectors::read_kpoints(const string &fn)
 		else if (kword == "Line_Cartesian" )
 		{
 			//cout << " kword = " << kword << endl;
-			if(Symmetry::symm_flag)
+			if(ModuleSymmetry::Symmetry::symm_flag)
 			{
 				WARNING("K_Vectors::read_kpoints","Line mode of k-points is open, please set symmetry to 0.");
 				return 0;
@@ -372,7 +372,7 @@ bool K_Vectors::read_kpoints(const string &fn)
 		else if (kword == "Line_Direct" || kword == "L" || kword == "Line" )
 		{
 			//cout << " kword = " << kword << endl;
-			if(Symmetry::symm_flag)
+			if(ModuleSymmetry::Symmetry::symm_flag)
 			{
 				WARNING("K_Vectors::read_kpoints","Line mode of k-points is open, please set symmetry to 0.");
 				return 0;
@@ -548,7 +548,7 @@ void K_Vectors::update_use_ibz( void )
     return;
 }
 
-void K_Vectors::ibz_kpoint(const Symmetry &symm)
+void K_Vectors::ibz_kpoint(const ModuleSymmetry::Symmetry &symm)
 {
     if (GlobalV::MY_RANK!=0) return;
     TITLE("K_Vectors", "ibz_kpoint");
@@ -843,7 +843,7 @@ void K_Vectors::mpi_k(void)
 
     Parallel_Common::bcast_double(koffset, 3);
 
-    this->nks = Pkpoints.nks_pool[GlobalV::MY_POOL];
+    this->nks = GlobalC::Pkpoints.nks_pool[GlobalV::MY_POOL];
 
 	GlobalV::ofs_running << endl;
 	OUT(GlobalV::ofs_running,"k-point number in this process",nks);
@@ -897,7 +897,7 @@ void K_Vectors::mpi_k(void)
     for (int i = 0;i < nks;i++)
     {
         // 3 is because each k point has three value:kx, ky, kz
-        k_index = i + Pkpoints.startk_pool[GlobalV::MY_POOL] ;
+        k_index = i + GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL] ;
         kvec_c[i].x = kvec_c_aux[k_index*3];
         kvec_c[i].y = kvec_c_aux[k_index*3+1];
         kvec_c[i].z = kvec_c_aux[k_index*3+2];
@@ -1018,7 +1018,7 @@ void K_Vectors::print_klists(ofstream &ofs)
 //LiuXh add a new function here,
 //20180515
 void K_Vectors::set_after_vc(
-        const Symmetry &symm,
+        const ModuleSymmetry::Symmetry &symm,
         const string &k_file_name,
         const int& nspin_in,
         const Matrix3 &reciprocal_vec,
@@ -1056,7 +1056,7 @@ void K_Vectors::mpi_k_after_vc(void)
     Parallel_Common::bcast_int(nmp, 3);
     Parallel_Common::bcast_double(koffset, 3);
 
-    this->nks = Pkpoints.nks_pool[GlobalV::MY_POOL];
+    this->nks = GlobalC::Pkpoints.nks_pool[GlobalV::MY_POOL];
     GlobalV::ofs_running << endl;
     OUT(GlobalV::ofs_running,"k-point number in this process",nks);
     int nks_minimum = this->nks;
@@ -1100,7 +1100,7 @@ void K_Vectors::mpi_k_after_vc(void)
     int k_index = 0;
     for (int i = 0;i < nks;i++)
     {
-        k_index = i + Pkpoints.startk_pool[GlobalV::MY_POOL] ;
+        k_index = i + GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL] ;
         kvec_c[i].x = kvec_c_aux[k_index*3];
         kvec_c[i].y = kvec_c_aux[k_index*3+1];
         kvec_c[i].z = kvec_c_aux[k_index*3+2];

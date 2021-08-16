@@ -33,7 +33,7 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		GlobalC::wf.npw = GlobalC::kv.ngk[ik];
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			pot.vr_eff1[ir] = pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
+			GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
 		}
 		
 		//--------------------------------------------
@@ -54,7 +54,7 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 			if(GlobalV::VL_IN_H)
 			{
 				// vlocal = Vh[rho] + Vxc[rho] + Vl(pseudo)
-				uhm.GK.cal_vlocal_k(pot.vr_eff1,GridT);
+				uhm.GK.cal_vlocal_k(GlobalC::pot.vr_eff1,GlobalC::GridT);
 				// added by zhengdy-soc, for non-collinear case
 				// integral 4 times, is there any method to simplify?
 				if(GlobalV::NSPIN==4)
@@ -63,9 +63,9 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 					{
 						for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 						{
-							pot.vr_eff1[ir] = pot.vr_eff( is, ir);
+							GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff( is, ir);
 						}
-						uhm.GK.cal_vlocal_k(pot.vr_eff1, GridT, is);
+						uhm.GK.cal_vlocal_k(GlobalC::pot.vr_eff1, GlobalC::GridT, is);
 					}
 				}
 			}
@@ -89,39 +89,38 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 
 		// Effective potential of DFT+U is added to total Hamiltonian here; Quxin adds on 20201029
 		if(INPUT.dft_plus_u)
-		{		
-			dftu.cal_eff_pot_mat(ik, istep);
-
-			for(int irc=0; irc<ParaO.nloc; irc++)
-			{
-				LM.Hloc2[irc] += dftu.pot_eff_k.at(ik).at(irc);
-			}							
+		{
+      vector<complex<double>> eff_pot(GlobalC::ParaO.nloc);
+			GlobalC::dftu.cal_eff_pot_mat_complex(ik, istep, &eff_pot[0]);
+      
+			for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
+				GlobalC::LM.Hloc2[irc] += eff_pot[irc];					
 		}
 
 		timer::tick("Efficience","H_k");
 
 		// Peize Lin add at 2020.04.04
-		if(restart.info_load.load_H && !restart.info_load.load_H_finish)
+		if(GlobalC::restart.info_load.load_H && !GlobalC::restart.info_load.load_H_finish)
 		{
-			restart.load_disk("H", ik);
-			restart.info_load.load_H_finish = true;
+			GlobalC::restart.load_disk("H", ik);
+			GlobalC::restart.info_load.load_H_finish = true;
 		}			
-		if(restart.info_save.save_H)
+		if(GlobalC::restart.info_save.save_H)
 		{
-			restart.save_disk("H", ik);
+			GlobalC::restart.save_disk("H", ik);
 		}
 
-		// write the wave functions into LOWF.WFC_K[ik].
+		// write the wave functions into GlobalC::LOWF.WFC_K[ik].
 		timer::tick("Efficience","diago_k");
 		Diago_LCAO_Matrix DLM;
-		DLM.solve_complex_matrix(ik, LOWF.WFC_K[ik], LOC.wfc_dm_2d.wfc_k[ik]);
+		DLM.solve_complex_matrix(ik, GlobalC::LOWF.WFC_K[ik], GlobalC::LOC.wfc_dm_2d.wfc_k[ik]);
 		timer::tick("Efficience","diago_k");
 
 		timer::tick("Efficience","each_k");
 	} // end k
 			
 	// LiuXh modify 2019-07-15*/
-	if(!ParaO.out_hsR)
+	if(!GlobalC::ParaO.out_hsR)
 	{
 		uhm.GK.destroy_pvpR();
 	}

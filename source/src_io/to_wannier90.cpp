@@ -1639,7 +1639,7 @@ complex<double> toWannier90::gamma_only_cal(const int &ib_L, const int &ib_R, co
 void toWannier90::lcao2pw_basis(const int ik, ComplexMatrix &orbital_in_G)
 {
 	this->table_local.create(GlobalC::ucell.ntype, GlobalC::ucell.nmax_total, GlobalV::NQX);
-	Wavefunc_in_pw::make_table_q(ORB.orbital_file, this->table_local);
+	Wavefunc_in_pw::make_table_q(GlobalC::ORB.orbital_file, this->table_local);
 	Wavefunc_in_pw::produce_local_basis_in_pw(ik, orbital_in_G, this->table_local);
 }
 
@@ -1666,7 +1666,7 @@ void toWannier90::getUnkFromLcao()
 	for(int ik = 0; ik < num_kpts; ik++)
 	{
 		// ��ȡȫ�ֵ�lcao�Ĳ�����ϵ��
-		get_lcao_wfc_global_ik(lcao_wfc_global[ik],LOWF.WFC_K[ik]);
+		get_lcao_wfc_global_ik(lcao_wfc_global[ik],GlobalC::LOWF.WFC_K[ik]);
 	
 		int npw = GlobalC::kv.ngk[ik];
 		unk_inLcao[ik].create(GlobalV::NBANDS,GlobalC::wf.npwx);
@@ -1747,7 +1747,7 @@ void toWannier90::get_lcao_wfc_global_ik(complex<double> **ctot, complex<double>
 				// save them in the matrix 'c'.
 				for (int iw=0; iw<GlobalV::NLOCAL; iw++)
 				{
-					const int mu_local = GridT.trace_lo[iw];
+					const int mu_local = GlobalC::GridT.trace_lo[iw];
 					if (mu_local >= 0)
 					{
 						for (int ib=0; ib<GlobalV::NBANDS; ib++)
@@ -1804,30 +1804,30 @@ void toWannier90::get_lcao_wfc_global_ik(complex<double> **ctot, complex<double>
 		{
 			int tag;
 
-			// send GridT.lgd
+			// send GlobalC::GridT.lgd
 			tag = GlobalV::DRANK * 3;
-			MPI_Send(&GridT.lgd, 1, MPI_INT, 0, tag, DIAG_WORLD);
+			MPI_Send(&GlobalC::GridT.lgd, 1, MPI_INT, 0, tag, DIAG_WORLD);
 
-			if(GridT.lgd != 0)
+			if(GlobalC::GridT.lgd != 0)
 			{
 				// send trace_lo
 				tag = GlobalV::DRANK * 3 + 1;
-				MPI_Send(GridT.trace_lo, GlobalV::NLOCAL, MPI_INT, 0, tag, DIAG_WORLD);
+				MPI_Send(GlobalC::GridT.trace_lo, GlobalV::NLOCAL, MPI_INT, 0, tag, DIAG_WORLD);
 
 				// send cc
-				complex<double>* csend = new complex<double>[GlobalV::NBANDS*GridT.lgd];
-				ZEROS(csend, GlobalV::NBANDS*GridT.lgd);
+				complex<double>* csend = new complex<double>[GlobalV::NBANDS*GlobalC::GridT.lgd];
+				ZEROS(csend, GlobalV::NBANDS*GlobalC::GridT.lgd);
 
 				for (int ib=0; ib<GlobalV::NBANDS; ib++)
 				{
-					for (int mu=0; mu<GridT.lgd; mu++)
+					for (int mu=0; mu<GlobalC::GridT.lgd; mu++)
 					{
 						csend[mu*GlobalV::NBANDS+ib] = cc[ib][mu];
 					}
 				}
 			
 				tag = GlobalV::DRANK * 3 + 2;
-				MPI_Send(csend, GlobalV::NBANDS*GridT.lgd, mpicomplex, 0, tag, DIAG_WORLD);
+				MPI_Send(csend, GlobalV::NBANDS*GlobalC::GridT.lgd, mpicomplex, 0, tag, DIAG_WORLD);
 
 			
 

@@ -150,10 +150,10 @@ bool Update_input::Read(const string &fn)
         else if (strcmp("mixing_beta", word) == 0)
         {
             read_value(ifs, mixing_beta);
-			if(mixing_beta!=CHR.mixing_beta)
+			if(mixing_beta!=GlobalC::CHR.mixing_beta)
 			{
-				this->change(GlobalV::ofs_warning,"mixing_beta",CHR.mixing_beta,mixing_beta);
-    			CHR.mixing_beta = mixing_beta;
+				this->change(GlobalV::ofs_warning,"mixing_beta",GlobalC::CHR.mixing_beta,mixing_beta);
+    			GlobalC::CHR.mixing_beta = mixing_beta;
 			}
         }
 		// 8
@@ -171,16 +171,16 @@ bool Update_input::Read(const string &fn)
         {
             read_value(ifs, charge_extrap);
 
-			if(charge_extrap!=pot.extra_pot)
+			if(charge_extrap!=GlobalC::pot.extra_pot)
 			{
-				this->change(GlobalV::ofs_warning,"extra_pot",pot.extra_pot,charge_extrap);
-				pot.extra_pot = this->charge_extrap;
+				this->change(GlobalV::ofs_warning,"extra_pot",GlobalC::pot.extra_pot,charge_extrap);
+				GlobalC::pot.extra_pot = this->charge_extrap;
 				if(out_dm==0) 
 				{
 					out_dm = 10000;
 #ifdef __FP
-					this->change(GlobalV::ofs_warning,"out_dm",LOC.out_dm, out_dm);
-					LOC.out_dm=out_dm;
+					this->change(GlobalV::ofs_warning,"out_dm",GlobalC::LOC.out_dm, out_dm);
+					GlobalC::LOC.out_dm=out_dm;
 #endif
 				}
 			}
@@ -190,10 +190,10 @@ bool Update_input::Read(const string &fn)
         else if (strcmp("out_charge", word) == 0)
         {
             read_value(ifs, out_charge);
-			if(out_charge!=CHR.out_charge)
+			if(out_charge!=GlobalC::CHR.out_charge)
 			{
-				this->change(GlobalV::ofs_warning,"out_charge",CHR.out_charge,out_charge);
-    			CHR.out_charge = this->out_charge;
+				this->change(GlobalV::ofs_warning,"out_charge",GlobalC::CHR.out_charge,out_charge);
+    			GlobalC::CHR.out_charge = this->out_charge;
 			}
         }
 		// 11
@@ -201,10 +201,10 @@ bool Update_input::Read(const string &fn)
         {
             read_value(ifs, out_dm);
 #ifdef __FP
-			if(out_dm!=LOC.out_dm)
+			if(out_dm!=GlobalC::LOC.out_dm)
 			{
-				this->change(GlobalV::ofs_warning,"out_dm",LOC.out_dm,out_dm);
-				LOC.out_dm = this->out_dm;
+				this->change(GlobalV::ofs_warning,"out_dm",GlobalC::LOC.out_dm,out_dm);
+				GlobalC::LOC.out_dm = this->out_dm;
 			}
 #endif
         }
@@ -224,10 +224,10 @@ bool Update_input::Read(const string &fn)
             read_value(ifs, out_lowf);
 #ifdef __FP
 			//if(out_lowf!=out_lowf)
-			if(out_lowf!=ParaO.out_lowf)		// Peize Lin change out_lowf to ParaO.out_lowf at 2020.01.31
+			if(out_lowf!=GlobalC::ParaO.out_lowf)		// Peize Lin change out_lowf to GlobalC::ParaO.out_lowf at 2020.01.31
 			{
-				this->change(GlobalV::ofs_warning,"out_lowf",ParaO.out_lowf,out_lowf);
-				ParaO.out_lowf = this->out_lowf;
+				this->change(GlobalV::ofs_warning,"out_lowf",GlobalC::ParaO.out_lowf,out_lowf);
+				GlobalC::ParaO.out_lowf = this->out_lowf;
 			}
 #endif
         }
@@ -271,18 +271,18 @@ void Update_input::Bcast()
     Parallel_Common::bcast_double( GlobalV::FORCE_THR);
 #ifdef __LCAO
     Parallel_Common::bcast_double( Force_Stress_LCAO::force_invalid_threshold_ev);
-    Parallel_Common::bcast_int( LOC.out_dm );
-    Parallel_Common::bcast_int( ParaO.out_lowf );
+    Parallel_Common::bcast_int( GlobalC::LOC.out_dm );
+    Parallel_Common::bcast_int( GlobalC::ParaO.out_lowf );
 #endif
     Parallel_Common::bcast_double( GlobalV::DRHO2 );
     Parallel_Common::bcast_int( GlobalV::NITER );
     Parallel_Common::bcast_int( GlobalV::NSTEP );
-    Parallel_Common::bcast_double( CHR.mixing_beta );
+    Parallel_Common::bcast_double( GlobalC::CHR.mixing_beta );
     Parallel_Common::bcast_int( GlobalC::en.printe );
-    Parallel_Common::bcast_string( pot.extra_pot );//xiaohui modify 2015-02-01
-    Parallel_Common::bcast_int( CHR.out_charge );
+    Parallel_Common::bcast_string( GlobalC::pot.extra_pot );//xiaohui modify 2015-02-01
+    Parallel_Common::bcast_int( GlobalC::CHR.out_charge );
 	Parallel_Common::bcast_int( GlobalC::en.out_dos );
-    Parallel_Common::bcast_double( CHR.nelec );
+    Parallel_Common::bcast_double( GlobalC::CHR.nelec );
 	
 
     return;

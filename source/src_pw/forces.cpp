@@ -36,9 +36,9 @@ void Forces::init(matrix& force)
 	matrix stress_vdw_pw;//.create(3,3);
     matrix force_vdw;
     force_vdw.create(nat, 3);
-	if(vdwd2_para.flag_vdwd2)													//Peize Lin add 2014.04.03, update 2021.03.09
+	if(GlobalC::vdwd2_para.flag_vdwd2)													//Peize Lin add 2014.04.03, update 2021.03.09
 	{
-        Vdwd2 vdwd2(GlobalC::ucell,vdwd2_para);
+        Vdwd2 vdwd2(GlobalC::ucell,GlobalC::vdwd2_para);
 		vdwd2.cal_force();
 		for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
 		{
@@ -51,9 +51,9 @@ void Forces::init(matrix& force)
 			Forces::print("VDW      FORCE (Ry/Bohr)", force_vdw);
 		}
 	}
-	else if(vdwd3_para.flag_vdwd3)													//jiyy add 2019-05-18, update 2021-05-02
+	else if(GlobalC::vdwd3_para.flag_vdwd3)													//jiyy add 2019-05-18, update 2021-05-02
 	{
-        Vdwd3 vdwd3(GlobalC::ucell,vdwd3_para);
+        Vdwd3 vdwd3(GlobalC::ucell,GlobalC::vdwd3_para);
 		vdwd3.cal_force();
 		for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
 		{
@@ -92,7 +92,7 @@ void Forces::init(matrix& force)
 					+ forcecc(iat, ipol)
 					+ forcescc(iat, ipol);
 
-				if(vdwd2_para.flag_vdwd2 || vdwd3_para.flag_vdwd3)		//linpz and jiyy added vdw force, modified by zhengdy
+				if(GlobalC::vdwd2_para.flag_vdwd2 || GlobalC::vdwd3_para.flag_vdwd3)		//linpz and jiyy added vdw force, modified by zhengdy
 				{
                     force(iat, ipol) += force_vdw(iat, ipol);
                 }																										   
@@ -115,7 +115,7 @@ void Forces::init(matrix& force)
 		}	
 	}
 	
-	if(Symmetry::symm_flag)
+	if(ModuleSymmetry::Symmetry::symm_flag)
 	{
 		double *pos;
 		double d1,d2,d3;
@@ -132,8 +132,8 @@ void Forces::init(matrix& force)
 				pos[3*iat+2] = GlobalC::ucell.atoms[it].taud[ia].z;
 				for(int k=0; k<3; ++k)
 				{
-					symm.check_translation( pos[iat*3+k], -floor(pos[iat*3+k]));
-					symm.check_boundary( pos[iat*3+k] );
+					GlobalC::symm.check_translation( pos[iat*3+k], -floor(pos[iat*3+k]));
+					GlobalC::symm.check_boundary( pos[iat*3+k] );
 				}
 				iat++;				
 			}
@@ -149,7 +149,7 @@ void Forces::init(matrix& force)
 			
 			force(iat,0) = d1;force(iat,1) = d2;force(iat,2) = d3;
 		}
-		symm.force_symmetry(force , pos, GlobalC::ucell);
+		GlobalC::symm.force_symmetry(force , pos, GlobalC::ucell);
 		for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 		{
 			Mathzone::Direct_to_Cartesian(force(iat,0),force(iat,1),force(iat,2),
@@ -159,7 +159,7 @@ void Forces::init(matrix& force)
                                         d1,d2,d3);
 			force(iat,0) = d1;force(iat,1) = d2;force(iat,2) = d3;
 		}
-		// cout << "nrotk =" << symm.nrotk << endl;
+		// cout << "nrotk =" << GlobalC::symm.nrotk << endl;
 		delete[] pos;
 		
 	}
@@ -355,7 +355,7 @@ void Forces::cal_force_loc(matrix& forcelc)
 	{
 		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-        	aux[ir] += complex<double>( CHR.rho[is][ir], 0.0 );
+        	aux[ir] += complex<double>( GlobalC::CHR.rho[is][ir], 0.0 );
 		}
 	}
 
@@ -553,7 +553,7 @@ void Forces::cal_force_ew(matrix& forceion)
 void Forces::cal_force_cc(matrix& forcecc)
 {
 	// recalculate the exchange-correlation potential.
-    const auto etxc_vtxc_v = H_XC_pw::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, CHR.rho, CHR.rho_core);
+    const auto etxc_vtxc_v = H_XC_pw::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 	H_XC_pw::etxc    = std::get<0>(etxc_vtxc_v);			// may delete?
 	H_XC_pw::vtxc    = std::get<1>(etxc_vtxc_v);			// may delete?
 	const matrix vxc = std::get<2>(etxc_vtxc_v);
@@ -587,7 +587,7 @@ void Forces::cal_force_cc(matrix& forcecc)
         if (GlobalC::ucell.atoms[T1].nlcc)
         {
             //call drhoc
-            CHR.non_linear_core_correction(
+            GlobalC::CHR.non_linear_core_correction(
                 GlobalC::ppcell.numeric,
                 GlobalC::ucell.atoms[T1].msh,
                 GlobalC::ucell.atoms[T1].r,
@@ -791,7 +791,7 @@ void Forces::cal_force_scc(matrix& forcescc)
     {
         for (int i = 0;i < GlobalC::pw.nrxx;i++)
         {
-            psic[i] = pot.vnew(0,i);
+            psic[i] = GlobalC::pot.vnew(0,i);
         }
     }
     else
@@ -800,7 +800,7 @@ void Forces::cal_force_scc(matrix& forcescc)
         int isdw = 1;
         for (int i = 0;i < GlobalC::pw.nrxx;i++)
         {
-            psic[i] = (pot.vnew(isup, i) + pot.vnew(isdw, i)) * 0.5;
+            psic[i] = (GlobalC::pot.vnew(isup, i) + GlobalC::pot.vnew(isdw, i)) * 0.5;
         }
     }
 

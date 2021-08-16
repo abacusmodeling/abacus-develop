@@ -8,6 +8,7 @@
 #include "src_lcao/LOOP_cell.h"
 #include "src_io/print_info.h"
 #include "module_symmetry/symmetry.h"
+#include "src_lcao/run_md_lcao.h"
 
 Run_lcao::Run_lcao(){}
 Run_lcao::~Run_lcao(){}
@@ -28,14 +29,14 @@ void Run_lcao::lcao_line(void)
 		GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
 			GlobalV::ofs_running,
 			GlobalV::OUT_LEVEL,
-			ORB.get_rcutmax_Phi(), 
-			ORB.get_rcutmax_Beta(), 
+			GlobalC::ORB.get_rcutmax_Phi(), 
+			GlobalC::ORB.get_rcutmax_Beta(), 
 			GlobalV::GAMMA_ONLY_LOCAL);
 
 		atom_arrange::search(
 			GlobalV::SEARCH_PBC,
 			GlobalV::ofs_running,
-			GridD, 
+			GlobalC::GridD, 
 			GlobalC::ucell, 
 			GlobalV::SEARCH_RADIUS, 
 			GlobalV::test_atom_input,
@@ -43,7 +44,7 @@ void Run_lcao::lcao_line(void)
 	}
 	// setup GlobalV::NBANDS 
 	// Yu Liu add 2021-07-03
-	CHR.cal_nelec();
+	GlobalC::CHR.cal_nelec();
 
 	// mohan add 2010-09-06
 	// Yu Liu move here 2021-06-27
@@ -52,21 +53,21 @@ void Run_lcao::lcao_line(void)
 	// I warn the user again for each type.
 	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		xcf.which_dft(GlobalC::ucell.atoms[it].dft);
+		GlobalC::xcf.which_dft(GlobalC::ucell.atoms[it].dft);
 	}
 
     //GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir , GlobalV::global_atom_card , GlobalV::ofs_running, GlobalV::NLOCAL, GlobalV::NBANDS);
     DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     // symmetry analysis should be performed every time the cell is changed
-    if (Symmetry::symm_flag)
+    if (ModuleSymmetry::Symmetry::symm_flag)
     {
-        symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
+        GlobalC::symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
         DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
     // Setup the k points according to symmetry.
-    GlobalC::kv.set(symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec );
+    GlobalC::kv.set(GlobalC::symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec );
     DONE(GlobalV::ofs_running,"INIT K-POINTS");
 
     // print information
@@ -77,10 +78,10 @@ void Run_lcao::lcao_line(void)
     // * reading the localized orbitals/projectors 
 	// * construct the interpolation tables.
 
-	LOWF.orb_con.set_orb_tables(
+	GlobalC::LOWF.orb_con.set_orb_tables(
 		GlobalV::ofs_running,
-		UOT, 
-		ORB,
+		GlobalC::UOT, 
+		GlobalC::ORB,
 		GlobalC::ucell.ntype,
 		GlobalC::ucell.lmax,
 		INPUT.lcao_ecut,
@@ -96,7 +97,7 @@ void Run_lcao::lcao_line(void)
 
 	// * allocate H and S matrices according to computational resources
 	// * set the 'trace' between local H/S and global H/S
-	LM.divide_HS_in_frag(GlobalV::GAMMA_ONLY_LOCAL, ParaO);
+	GlobalC::LM.divide_HS_in_frag(GlobalV::GAMMA_ONLY_LOCAL, GlobalC::ParaO);
 
 //--------------------------------------
 // cell relaxation should begin here
@@ -117,16 +118,16 @@ void Run_lcao::lcao_line(void)
 
     // initialize the real-space uniform grid for FFT and parallel
     // distribution of plane waves
-    Pgrid.init(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, GlobalC::pw.nczp,
+    GlobalC::Pgrid.init(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, GlobalC::pw.nczp,
         GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
 
 
 	// Inititlize the charge density.
-    CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
+    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
     DONE(GlobalV::ofs_running,"INIT CHARGE");
 
 	// Initializee the potential.
-    pot.allocate(GlobalC::pw.nrxx);
+    GlobalC::pot.allocate(GlobalC::pw.nrxx);
     DONE(GlobalV::ofs_running,"INIT POTENTIAL");
 
 
@@ -138,15 +139,23 @@ void Run_lcao::lcao_line(void)
 			case Exx_Global::Hybrid_Type::HF:
 			case Exx_Global::Hybrid_Type::PBE0:
 			case Exx_Global::Hybrid_Type::HSE:
-				GlobalC::exx_global.info.set_xcfunc(xcf);
+				GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
 				break;
 		}
 	}
 
-	LOOP_cell lc;
-	lc.opt_cell();
+	if(GlobalV::CALCULATION=="md")
+	{
+		Run_MD_LCAO run_md_lcao;
+		run_md_lcao.opt_cell();
+	}
+	else // cell relaxations
+	{
+		LOOP_cell lc;
+		lc.opt_cell();
 
-	GlobalC::en.perform_dos();
+		GlobalC::en.perform_dos();
+	}
 
 	timer::tick("Run_lcao","lcao_line");
     return;

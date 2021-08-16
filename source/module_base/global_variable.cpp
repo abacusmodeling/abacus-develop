@@ -30,9 +30,11 @@ int		EFIELD = 0; // 5: add electric field
 int		DIPOLE = 0; // 7: add dipole field
 
 std::string  DFT_FUNCTIONAL = "none";
+bool	DFT_META = 0;
 int 	NSPIN = 1; // LDA
 bool	TWO_EFERMI = 0; // two fermi energy, exist only magnetization is fixed.
 int 	CURRENT_SPIN = 0;
+int 	CURRENT_K = 0;
 int		FORCE = 0;// if force >1, means do the grid integration 'force' times.
 double	FORCE_THR = 1.0e-3;
 bool	STRESS = false;
@@ -112,7 +114,7 @@ std::string	global_in_card = "INPUT";
 std::string	global_atom_card = "STRU";
 std::string	global_kpoint_card = "KPT";
 std::string	global_wannier_card;
-std::string	global_pseudo_dir = "./";
+std::string	global_pseudo_dir = "";
 std::string  global_pseudo_type = "upf"; // mohan add 2013-05-20, default is UPF, we can also use VWR (xiaohui add 2013-06-23)
 std::string	global_epm_pseudo_card;
 std::string	global_out_dir;

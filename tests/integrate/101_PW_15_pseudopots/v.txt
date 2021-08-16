@@ -1,0 +1,1849 @@
+==18913== Memcheck, a memory error detector
+==18913== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==18913== Using Valgrind-3.17.0 and LibVEX; rerun with -h for copyright info
+==18913== Command: /home/caichun/abacus-develop/build/abacus .
+==18913== 
+==18913== Conditional jump or move depends on uninitialised value(s)
+==18913==    at 0x4C2AFFD: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x5A151BB: MPID_Init (mpid_init.c:1622)
+==18913==    by 0x59ABEBA: MPIR_Init_thread (initthread.c:717)
+==18913==    by 0x59A9B65: PMPI_Init_thread (initthread.c:1061)
+==18913==    by 0x5F1024: Parallel_Global::read_mpi_parameters(int, char**) (parallel_global.cpp:166)
+==18913==    by 0x40B098: main (main.cpp:16)
+==18913==  Uninitialised value was created by a stack allocation
+==18913==    at 0x5A150D0: MPID_Init (mpid_init.c:1557)
+==18913== 
+ *********************************************************
+ *                                                       *
+ *                  WELCOME TO ABACUS                    *
+ *                                                       *
+ *            'Atomic-orbital Based Ab-initio            *
+ *                  Computation at UStc'                 *
+ *                                                       *
+ *          Website: http://abacus.ustc.edu.cn/          *
+ *                                                       *
+ *********************************************************
+ Wed Jul  7 14:27:30 2021
+ MAKE THE DIR         : OUT.autotest/
+==18913== Invalid write of size 4
+==18913==    at 0x45B1EF: UnitCell_pseudo::read_atom_positions(std::basic_ifstream<char, std::char_traits<char> >&) (read_atoms.cpp:371)
+==18913==    by 0x451AC3: UnitCell_pseudo::setup_cell(std::string const&, output&, std::string const&, std::basic_ofstream<char, std::char_traits<char> >&) (unitcell_pseudo.cpp:85)
+==18913==    by 0x784A2D: Run_pw::plane_wave_line() (run_pw.cpp:25)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913==  Address 0x11318574 is 0 bytes after a block of size 4 alloc'd
+==18913==    at 0x4C2C866: operator new[](unsigned long) (vg_replace_malloc.c:579)
+==18913==    by 0x45B004: UnitCell_pseudo::read_atom_positions(std::basic_ifstream<char, std::char_traits<char> >&) (read_atoms.cpp:360)
+==18913==    by 0x451AC3: UnitCell_pseudo::setup_cell(std::string const&, output&, std::string const&, std::basic_ofstream<char, std::char_traits<char> >&) (unitcell_pseudo.cpp:85)
+==18913==    by 0x784A2D: Run_pw::plane_wave_line() (run_pw.cpp:25)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913== 
+==18913== Invalid read of size 4
+==18913==    at 0x45B1FA: UnitCell_pseudo::read_atom_positions(std::basic_ifstream<char, std::char_traits<char> >&) (read_atoms.cpp:373)
+==18913==    by 0x451AC3: UnitCell_pseudo::setup_cell(std::string const&, output&, std::string const&, std::basic_ofstream<char, std::char_traits<char> >&) (unitcell_pseudo.cpp:85)
+==18913==    by 0x784A2D: Run_pw::plane_wave_line() (run_pw.cpp:25)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913==  Address 0x11318574 is 0 bytes after a block of size 4 alloc'd
+==18913==    at 0x4C2C866: operator new[](unsigned long) (vg_replace_malloc.c:579)
+==18913==    by 0x45B004: UnitCell_pseudo::read_atom_positions(std::basic_ifstream<char, std::char_traits<char> >&) (read_atoms.cpp:360)
+==18913==    by 0x451AC3: UnitCell_pseudo::setup_cell(std::string const&, output&, std::string const&, std::basic_ofstream<char, std::char_traits<char> >&) (unitcell_pseudo.cpp:85)
+==18913==    by 0x784A2D: Run_pw::plane_wave_line() (run_pw.cpp:25)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913== 
+==18913== Invalid read of size 4
+==18913==    at 0x43D671: void OUT<int>(std::basic_ofstream<char, std::char_traits<char> >&, std::string const&, int const&) (global_function.h:39)
+==18913==    by 0x45B0C6: UnitCell_pseudo::read_atom_positions(std::basic_ifstream<char, std::char_traits<char> >&) (read_atoms.cpp:376)
+==18913==    by 0x451AC3: UnitCell_pseudo::setup_cell(std::string const&, output&, std::string const&, std::basic_ofstream<char, std::char_traits<char> >&) (unitcell_pseudo.cpp:85)
+==18913==    by 0x784A2D: Run_pw::plane_wave_line() (run_pw.cpp:25)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913==  Address 0x11318574 is 0 bytes after a block of size 4 alloc'd
+==18913==    at 0x4C2C866: operator new[](unsigned long) (vg_replace_malloc.c:579)
+==18913==    by 0x45B004: UnitCell_pseudo::read_atom_positions(std::basic_ifstream<char, std::char_traits<char> >&) (read_atoms.cpp:360)
+==18913==    by 0x451AC3: UnitCell_pseudo::setup_cell(std::string const&, output&, std::string const&, std::basic_ofstream<char, std::char_traits<char> >&) (unitcell_pseudo.cpp:85)
+==18913==    by 0x784A2D: Run_pw::plane_wave_line() (run_pw.cpp:25)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913== 
+==18913== Invalid read of size 4
+==18913==    at 0x43C9B2: Atom::set_index() (atom_spec.cpp:55)
+==18913==    by 0x4501D4: UnitCell_pseudo::cal_nwfc() (unitcell_pseudo.cpp:431)
+==18913==    by 0x4534BC: UnitCell_pseudo::setup_cell(std::string const&, output&, std::string const&, std::basic_ofstream<char, std::char_traits<char> >&) (unitcell_pseudo.cpp:287)
+==18913==    by 0x784A2D: Run_pw::plane_wave_line() (run_pw.cpp:25)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913==  Address 0x11318574 is 0 bytes after a block of size 4 alloc'd
+==18913==    at 0x4C2C866: operator new[](unsigned long) (vg_replace_malloc.c:579)
+==18913==    by 0x45B004: UnitCell_pseudo::read_atom_positions(std::basic_ifstream<char, std::char_traits<char> >&) (read_atoms.cpp:360)
+==18913==    by 0x451AC3: UnitCell_pseudo::setup_cell(std::string const&, output&, std::string const&, std::basic_ofstream<char, std::char_traits<char> >&) (unitcell_pseudo.cpp:85)
+==18913==    by 0x784A2D: Run_pw::plane_wave_line() (run_pw.cpp:25)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913== 
+==18913== Invalid read of size 4
+==18913==    at 0x43C98F: Atom::set_index() (atom_spec.cpp:56)
+==18913==    by 0x4501D4: UnitCell_pseudo::cal_nwfc() (unitcell_pseudo.cpp:431)
+==18913==    by 0x4534BC: UnitCell_pseudo::setup_cell(std::string const&, output&, std::string const&, std::basic_ofstream<char, std::char_traits<char> >&) (unitcell_pseudo.cpp:287)
+==18913==    by 0x784A2D: Run_pw::plane_wave_line() (run_pw.cpp:25)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913==  Address 0x11318574 is 0 bytes after a block of size 4 alloc'd
+==18913==    at 0x4C2C866: operator new[](unsigned long) (vg_replace_malloc.c:579)
+==18913==    by 0x45B004: UnitCell_pseudo::read_atom_positions(std::basic_ifstream<char, std::char_traits<char> >&) (read_atoms.cpp:360)
+==18913==    by 0x451AC3: UnitCell_pseudo::setup_cell(std::string const&, output&, std::string const&, std::basic_ofstream<char, std::char_traits<char> >&) (unitcell_pseudo.cpp:85)
+==18913==    by 0x784A2D: Run_pw::plane_wave_line() (run_pw.cpp:25)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913== 
+==18913== Invalid read of size 4
+==18913==    at 0x450688: UnitCell_pseudo::cal_nwfc() (unitcell_pseudo.cpp:518)
+==18913==    by 0x4534BC: UnitCell_pseudo::setup_cell(std::string const&, output&, std::string const&, std::basic_ofstream<char, std::char_traits<char> >&) (unitcell_pseudo.cpp:287)
+==18913==    by 0x784A2D: Run_pw::plane_wave_line() (run_pw.cpp:25)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913==  Address 0x11318574 is 0 bytes after a block of size 4 alloc'd
+==18913==    at 0x4C2C866: operator new[](unsigned long) (vg_replace_malloc.c:579)
+==18913==    by 0x45B004: UnitCell_pseudo::read_atom_positions(std::basic_ifstream<char, std::char_traits<char> >&) (read_atoms.cpp:360)
+==18913==    by 0x451AC3: UnitCell_pseudo::setup_cell(std::string const&, output&, std::string const&, std::basic_ofstream<char, std::char_traits<char> >&) (unitcell_pseudo.cpp:85)
+==18913==    by 0x784A2D: Run_pw::plane_wave_line() (run_pw.cpp:25)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913== 
+==18913== Invalid read of size 4
+==18913==    at 0x4506B0: UnitCell_pseudo::cal_nwfc() (unitcell_pseudo.cpp:526)
+==18913==    by 0x4534BC: UnitCell_pseudo::setup_cell(std::string const&, output&, std::string const&, std::basic_ofstream<char, std::char_traits<char> >&) (unitcell_pseudo.cpp:287)
+==18913==    by 0x784A2D: Run_pw::plane_wave_line() (run_pw.cpp:25)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913==  Address 0x11318574 is 0 bytes after a block of size 4 alloc'd
+==18913==    at 0x4C2C866: operator new[](unsigned long) (vg_replace_malloc.c:579)
+==18913==    by 0x45B004: UnitCell_pseudo::read_atom_positions(std::basic_ifstream<char, std::char_traits<char> >&) (read_atoms.cpp:360)
+==18913==    by 0x451AC3: UnitCell_pseudo::setup_cell(std::string const&, output&, std::string const&, std::basic_ofstream<char, std::char_traits<char> >&) (unitcell_pseudo.cpp:85)
+==18913==    by 0x784A2D: Run_pw::plane_wave_line() (run_pw.cpp:25)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913== 
+==18913== Invalid read of size 4
+==18913==    at 0x4506BA: UnitCell_pseudo::cal_nwfc() (unitcell_pseudo.cpp:524)
+==18913==    by 0x4534BC: UnitCell_pseudo::setup_cell(std::string const&, output&, std::string const&, std::basic_ofstream<char, std::char_traits<char> >&) (unitcell_pseudo.cpp:287)
+==18913==    by 0x784A2D: Run_pw::plane_wave_line() (run_pw.cpp:25)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913==  Address 0x11318578 is 4 bytes after a block of size 4 alloc'd
+==18913==    at 0x4C2C866: operator new[](unsigned long) (vg_replace_malloc.c:579)
+==18913==    by 0x45B004: UnitCell_pseudo::read_atom_positions(std::basic_ifstream<char, std::char_traits<char> >&) (read_atoms.cpp:360)
+==18913==    by 0x451AC3: UnitCell_pseudo::setup_cell(std::string const&, output&, std::string const&, std::basic_ofstream<char, std::char_traits<char> >&) (unitcell_pseudo.cpp:85)
+==18913==    by 0x784A2D: Run_pw::plane_wave_line() (run_pw.cpp:25)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913== 
+ DONE(1.76647    SEC) : SETUP UNITCELL
+ DONE(4.23596    SEC) : SYMMETRY
+ DONE(4.33668    SEC) : INIT K-POINTS
+ ---------------------------------------------------------
+ Self-consistent calculations for electrons
+ ---------------------------------------------------------
+ SPIN    KPOINTS         PROCESSORS  
+ 1       1               1           
+ ---------------------------------------------------------
+ Use plane wave basis
+ ---------------------------------------------------------
+ ELEMENT NATOM       XC          
+ Si      2           PBE
+ ---------------------------------------------------------
+ Initial plane wave basis and FFT box
+ ---------------------------------------------------------
+ DONE(5.75647    SEC) : INIT PLANEWAVE
+ UNIFORM GRID DIM     : 24 * 24 * 24
+ UNIFORM GRID DIM(BIG): 24 * 24 * 24
+==18913== Invalid read of size 4
+==18913==    at 0x5F1900: Parallel_Grid::z_distribution() (parallel_grid.cpp:174)
+==18913==    by 0x5F1DD2: Parallel_Grid::init(int const&, int const&, int const&, int const&, int const&, int const&, int const&) (parallel_grid.cpp:99)
+==18913==    by 0x784D6B: Run_pw::plane_wave_line() (run_pw.cpp:78)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913==  Address 0x121b6aac is 4 bytes before a block of size 4 alloc'd
+==18913==    at 0x4C2C866: operator new[](unsigned long) (vg_replace_malloc.c:579)
+==18913==    by 0x5F1CEA: Parallel_Grid::init(int const&, int const&, int const&, int const&, int const&, int const&, int const&) (parallel_grid.cpp:90)
+==18913==    by 0x784D6B: Run_pw::plane_wave_line() (run_pw.cpp:78)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913== 
+==18913== Invalid read of size 4
+==18913==    at 0x5F1904: Parallel_Grid::z_distribution() (parallel_grid.cpp:174)
+==18913==    by 0x5F1DD2: Parallel_Grid::init(int const&, int const&, int const&, int const&, int const&, int const&, int const&) (parallel_grid.cpp:99)
+==18913==    by 0x784D6B: Run_pw::plane_wave_line() (run_pw.cpp:78)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913==  Address 0x121b6a5c is 4 bytes before a block of size 4 alloc'd
+==18913==    at 0x4C2C866: operator new[](unsigned long) (vg_replace_malloc.c:579)
+==18913==    by 0x5F1CD6: Parallel_Grid::init(int const&, int const&, int const&, int const&, int const&, int const&, int const&) (parallel_grid.cpp:89)
+==18913==    by 0x784D6B: Run_pw::plane_wave_line() (run_pw.cpp:78)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913== 
+ MEMORY FOR PSI (MB)  : 0.0376282
+ DONE(5.98158    SEC) : LOCAL POTENTIAL
+ DONE(7.56924    SEC) : NON-LOCAL POTENTIAL
+ START POTENTIAL      : atomic
+ DONE(8.48286    SEC) : INIT POTENTIAL
+==18913== Syscall param sched_setaffinity(mask) points to unaddressable byte(s)
+==18913==    at 0xCCC5D19: syscall (in /usr/lib64/libc-2.17.so)
+==18913==    by 0xE4ED0B2: __kmp_affinity_determine_capable (z_Linux_util.cpp:185)
+==18913==    by 0xE4CE08E: __kmp_env_initialize(char const*) (kmp_settings.cpp:5351)
+==18913==    by 0xE4B96B3: _INTERNAL_25_______src_kmp_runtime_cpp_9bc76ef4::__kmp_do_serial_initialize() (kmp_runtime.cpp:6726)
+==18913==    by 0xE4AE5D4: __kmp_get_global_thread_id_reg (kmp_runtime.cpp:284)
+==18913==    by 0x7975895: gemm_omp_driver_v2 (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_thread.so)
+==18913==    by 0x7975702: mkl_blas_zgemm_host (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_thread.so)
+==18913==    by 0x799F36E: mkl_blas_zgemm (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_thread.so)
+==18913==    by 0x6D491C4: ZGEMM (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x66D65F: Hamilt_PW::h_psi(std::complex<double> const*, std::complex<double>*, int) (hamilt_pw.cpp:478)
+==18913==    by 0x66E3A9: Hamilt_PW::diagH_subspace(int, int, int, ComplexMatrix const&, ComplexMatrix&, double*) (hamilt_pw.cpp:141)
+==18913==    by 0x669D90: Hamilt::diagH_subspace(int, int, int, ComplexMatrix const&, ComplexMatrix&, double*) (hamilt.cpp:180)
+==18913==  Address 0x0 is not stack'd, malloc'd or (recently) free'd
+==18913== 
+ DONE(10.048     SEC) : INIT BASIS
+ -------------------------------------------
+ SELF-CONSISTENT : 
+ -------------------------------------------
+ ITER   ETOT(eV)       EDIFF(eV)      DRHO2      CG_ITER    TIME(S)    
+ CG1    -1.455801e+02  0.000000e+00   3.200e-01  7.333e+00  3.630e+00  
+==18913== Conditional jump or move depends on uninitialised value(s)
+==18913==    at 0x12EFE8A1: mkl_lapack_ps_avx2_xzlanhe (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x8218B39: mkl_lapack_zlanhe (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_thread.so)
+==18913==    by 0xA17A315: mkl_lapack_zheev (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0xA17FDE9: mkl_lapack_zhegv (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x6F98E4D: ZHEGV (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x66B859: zhegv (lapack_connector.h:220)
+==18913==    by 0x66B859: Hamilt::diagH_LAPACK(int, int, ComplexMatrix const&, ComplexMatrix const&, int, double*, ComplexMatrix&) (hamilt.cpp:267)
+==18913==    by 0x66E5A6: Hamilt_PW::diagH_subspace(int, int, int, ComplexMatrix const&, ComplexMatrix&, double*) (hamilt_pw.cpp:189)
+==18913==    by 0x669D90: Hamilt::diagH_subspace(int, int, int, ComplexMatrix const&, ComplexMatrix&, double*) (hamilt.cpp:180)
+==18913==    by 0x66A112: Hamilt::diagH_pw(int const&, int const&, int const&, double const*, double&) (hamilt.cpp:80)
+==18913==    by 0x65B627: Electrons::c_bands(int const&) (electrons.cpp:509)
+==18913==    by 0x65C904: Electrons::self_consistent(int const&) (electrons.cpp:203)
+==18913==    by 0x53B89F: Ions::opt_ions_pw() (ions.cpp:131)
+==18913== 
+==18913== Conditional jump or move depends on uninitialised value(s)
+==18913==    at 0x12EFE8A7: mkl_lapack_ps_avx2_xzlanhe (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x8218B39: mkl_lapack_zlanhe (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_thread.so)
+==18913==    by 0xA17A315: mkl_lapack_zheev (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0xA17FDE9: mkl_lapack_zhegv (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x6F98E4D: ZHEGV (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x66B859: zhegv (lapack_connector.h:220)
+==18913==    by 0x66B859: Hamilt::diagH_LAPACK(int, int, ComplexMatrix const&, ComplexMatrix const&, int, double*, ComplexMatrix&) (hamilt.cpp:267)
+==18913==    by 0x66E5A6: Hamilt_PW::diagH_subspace(int, int, int, ComplexMatrix const&, ComplexMatrix&, double*) (hamilt_pw.cpp:189)
+==18913==    by 0x669D90: Hamilt::diagH_subspace(int, int, int, ComplexMatrix const&, ComplexMatrix&, double*) (hamilt.cpp:180)
+==18913==    by 0x66A112: Hamilt::diagH_pw(int const&, int const&, int const&, double const*, double&) (hamilt.cpp:80)
+==18913==    by 0x65B627: Electrons::c_bands(int const&) (electrons.cpp:509)
+==18913==    by 0x65C904: Electrons::self_consistent(int const&) (electrons.cpp:203)
+==18913==    by 0x53B89F: Ions::opt_ions_pw() (ions.cpp:131)
+==18913== 
+ CG2    -1.466200e+02  -1.039867e+00  2.273e-02  4.167e+00  2.530e+00  
+==18913== Conditional jump or move depends on uninitialised value(s)
+==18913==    at 0x12EFE8A1: mkl_lapack_ps_avx2_xzlanhe (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x8218B39: mkl_lapack_zlanhe (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_thread.so)
+==18913==    by 0xA17A315: mkl_lapack_zheev (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x6F96938: ZHEEV (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x41441E: zheev (lapack_connector.h:329)
+==18913==    by 0x41441E: Inverse_Matrix_Complex::using_zheev(ComplexMatrix const&, ComplexMatrix&) (inverse_matrix.cpp:55)
+==18913==    by 0x64E78A: Charge_Pulay::inverse_preA(int const&, matrix&) const (charge_pulay.cpp:453)
+==18913==    by 0x650F60: Charge_Pulay::Pulay_mixing() (charge_pulay.cpp:123)
+==18913==    by 0x64A71D: Charge_Broyden::mix_rho(double&, double const&, double const&, int const&, bool&) (charge_broyden.cpp:181)
+==18913==    by 0x65D3A4: Electrons::self_consistent(int const&) (electrons.cpp:271)
+==18913==    by 0x53B89F: Ions::opt_ions_pw() (ions.cpp:131)
+==18913==    by 0x52B88E: Cell_PW::opt_cells_pw() (Cell_PW.cpp:78)
+==18913==    by 0x784F24: Run_pw::plane_wave_line() (run_pw.cpp:104)
+==18913== 
+==18913== Conditional jump or move depends on uninitialised value(s)
+==18913==    at 0x12EFE8A7: mkl_lapack_ps_avx2_xzlanhe (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x8218B39: mkl_lapack_zlanhe (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_thread.so)
+==18913==    by 0xA17A315: mkl_lapack_zheev (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x6F96938: ZHEEV (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x41441E: zheev (lapack_connector.h:329)
+==18913==    by 0x41441E: Inverse_Matrix_Complex::using_zheev(ComplexMatrix const&, ComplexMatrix&) (inverse_matrix.cpp:55)
+==18913==    by 0x64E78A: Charge_Pulay::inverse_preA(int const&, matrix&) const (charge_pulay.cpp:453)
+==18913==    by 0x650F60: Charge_Pulay::Pulay_mixing() (charge_pulay.cpp:123)
+==18913==    by 0x64A71D: Charge_Broyden::mix_rho(double&, double const&, double const&, int const&, bool&) (charge_broyden.cpp:181)
+==18913==    by 0x65D3A4: Electrons::self_consistent(int const&) (electrons.cpp:271)
+==18913==    by 0x53B89F: Ions::opt_ions_pw() (ions.cpp:131)
+==18913==    by 0x52B88E: Cell_PW::opt_cells_pw() (Cell_PW.cpp:78)
+==18913==    by 0x784F24: Run_pw::plane_wave_line() (run_pw.cpp:104)
+==18913== 
+ CG3    -1.490083e+02  -2.388282e+00  3.471e-02  7.667e+00  3.580e+00  
+ CG4    -1.505282e+02  -1.519944e+00  1.283e-01  4.000e+00  2.460e+00  
+ CG5    -1.555547e+02  -5.026465e+00  1.681e-01  4.167e+00  2.520e+00  
+ CG6    -1.487532e+02  6.801507e+00   4.101e-02  3.167e+00  2.290e+00  
+ CG7    -1.520152e+02  -3.262084e+00  9.711e-03  2.667e+00  2.110e+00  
+ CG8    -1.520514e+02  -3.616363e-02  1.142e-02  3.000e+00  2.150e+00  
+ CG9    -1.521140e+02  -6.258071e-02  1.142e-02  2.000e+00  1.820e+00  
+ CG10   -1.517446e+02  3.693608e-01   1.587e-01  2.167e+00  1.850e+00  
+ CG11   -1.554338e+02  -3.689203e+00  1.699e-01  2.500e+00  1.970e+00  
+ CG12   -1.554438e+02  -9.923680e-03  1.767e-01  2.000e+00  1.820e+00  
+ CG13   -1.555894e+02  -1.456164e-01  1.837e-01  3.500e+00  2.330e+00  
+ CG14   -1.527130e+02  2.876394e+00   2.188e-02  3.333e+00  2.350e+00  
+ CG15   -1.521543e+02  5.587259e-01   2.229e-02  3.000e+00  2.130e+00  
+ CG16   -1.521135e+02  4.071209e-02   2.252e-02  2.000e+00  1.800e+00  
+ CG17   -1.554310e+02  -3.317446e+00  1.759e-01  2.667e+00  1.990e+00  
+ CG18   -1.556783e+02  -2.472997e-01  1.775e-01  2.833e+00  2.070e+00  
+ CG19   -1.522149e+02  3.463375e+00   2.434e-02  3.500e+00  2.240e+00  
+ CG20   -1.555256e+02  -3.310640e+00  2.105e-01  2.833e+00  2.070e+00  
+ CG21   -1.553651e+02  1.604150e-01   2.203e-01  2.833e+00  2.060e+00  
+ CG22   -1.448389e+02  1.052624e+01   1.021e-02  3.000e+00  2.150e+00  
+ CG23   -1.556423e+02  -1.080341e+01  1.827e-01  2.333e+00  2.050e+00  
+ CG24   -1.487549e+02  6.887406e+00   8.167e-03  3.000e+00  2.190e+00  
+ CG25   -1.528586e+02  -4.103675e+00  3.041e-02  3.833e+00  2.420e+00  
+ CG26   -1.555704e+02  -2.711818e+00  2.312e-01  2.167e+00  1.920e+00  
+ CG27   -1.556314e+02  -6.095157e-02  2.423e-01  3.000e+00  2.160e+00  
+ CG28   -1.521732e+02  3.458138e+00   3.587e-02  2.000e+00  1.790e+00  
+ CG29   -1.521734e+02  -2.336446e-04  2.821e-02  2.333e+00  1.890e+00  
+ CG30   -1.521659e+02  7.529880e-03   2.939e-02  2.000e+00  1.850e+00  
+ CG31   -1.521726e+02  -6.718316e-03  2.728e-02  2.000e+00  1.840e+00  
+ CG32   -1.521576e+02  1.505723e-02   2.714e-02  2.167e+00  1.870e+00  
+ CG33   -1.560951e+02  -3.937531e+00  1.982e-01  3.000e+00  2.160e+00  
+ CG34   -1.522585e+02  3.836656e+00   2.264e-02  2.500e+00  1.960e+00  
+ CG35   -1.556852e+02  -3.426769e+00  2.409e-01  2.667e+00  2.020e+00  
+ CG36   -1.521948e+02  3.490456e+00   3.280e-02  2.000e+00  1.800e+00  
+ CG37   -1.555345e+02  -3.339742e+00  2.369e-01  2.000e+00  1.770e+00  
+ CG38   -1.521491e+02  3.385400e+00   3.238e-02  2.000e+00  1.800e+00  
+ CG39   -1.555378e+02  -3.388661e+00  2.246e-01  2.333e+00  1.900e+00  
+ CG40   -1.522354e+02  3.302392e+00   3.317e-02  2.000e+00  1.830e+00  
+ CG41   -1.523573e+02  -1.219633e-01  5.203e-02  2.333e+00  1.900e+00  
+ CG42   -1.522647e+02  9.267411e-02   5.781e-02  2.000e+00  1.810e+00  
+ CG43   -1.469645e+02  5.300200e+00   6.095e-02  2.000e+00  1.830e+00  
+ CG44   -1.530759e+02  -6.111393e+00  4.813e-02  2.333e+00  1.930e+00  
+ CG45   -1.501629e+02  2.912982e+00   3.593e-01  3.333e+00  2.200e+00  
+ CG46   -1.490775e+02  1.085390e+00   9.545e-05  3.167e+00  2.130e+00  
+ CG47   -1.639096e+02  -1.483212e+01  4.027e-01  9.500e+00  4.050e+00  
+ CG48   -1.597416e+02  4.167999e+00   1.691e-01  8.167e+00  3.570e+00  
+ CG49   -1.560119e+02  3.729737e+00   2.279e-01  8.000e+00  3.630e+00  
+ CG50   -1.533045e+02  2.707355e+00   4.184e-02  5.833e+00  2.900e+00  
+ CG51   -1.535339e+02  -2.293974e-01  3.363e-01  7.167e+00  3.280e+00  
+ CG52   -1.526895e+02  8.443601e-01   6.037e-02  5.667e+00  2.880e+00  
+ CG53   -1.574189e+02  -4.729314e+00  3.521e-01  7.500e+00  3.440e+00  
+ CG54   -1.530197e+02  4.399211e+00   9.038e-02  3.333e+00  2.180e+00  
+ CG55   -1.602245e+02  -7.204865e+00  4.182e-01  6.500e+00  3.090e+00  
+ CG56   -1.453197e+02  1.490485e+01   8.809e-03  6.833e+00  3.180e+00  
+ CG57   -1.489025e+02  -3.582803e+00  1.659e-02  8.000e+00  3.640e+00  
+ CG58   -1.572566e+02  -8.354157e+00  2.242e-01  7.167e+00  3.360e+00  
+ CG59   -1.522081e+02  5.048492e+00   3.186e-02  6.667e+00  3.160e+00  
+ CG60   -1.555144e+02  -3.306251e+00  2.221e-01  6.167e+00  3.050e+00  
+ CG61   -1.528926e+02  2.621742e+00   2.249e-02  6.833e+00  3.170e+00  
+ CG62   -1.529827e+02  -9.002023e-02  1.975e-02  6.500e+00  3.150e+00  
+ CG63   -1.557206e+02  -2.737925e+00  1.950e-01  4.167e+00  2.470e+00  
+ CG64   -1.555795e+02  1.411416e-01   2.121e-01  4.500e+00  2.530e+00  
+ CG65   -1.488210e+02  6.758501e+00   1.975e-02  2.000e+00  1.780e+00  
+ CG66   -1.525726e+02  -3.751694e+00  1.761e-02  4.667e+00  2.600e+00  
+ CG67   -1.523761e+02  1.965475e-01   9.965e-03  5.500e+00  2.830e+00  
+ CG68   -1.500089e+02  2.367206e+00   8.507e-03  3.333e+00  2.190e+00  
+ CG69   -1.556229e+02  -5.613995e+00  1.630e-01  3.667e+00  2.280e+00  
+ CG70   -1.517771e+02  3.845796e+00   1.620e-01  2.500e+00  1.940e+00  
+ CG71   -1.561909e+02  -4.413847e+00  1.759e-01  5.500e+00  2.820e+00  
+ CG72   -1.463702e+02  9.820758e+00   1.831e-01  3.167e+00  2.120e+00  
+ CG73   -1.488719e+02  -2.501742e+00  2.199e-02  3.167e+00  2.110e+00  
+ CG74   -1.556741e+02  -6.802158e+00  1.909e-01  4.000e+00  2.440e+00  
+ CG75   -1.529011e+02  2.772970e+00   1.856e-01  8.000e+00  3.530e+00  
+ CG76   -1.521611e+02  7.399783e-01   2.098e-02  3.333e+00  2.210e+00  
+ CG77   -1.531439e+02  -9.827430e-01  1.986e-01  6.167e+00  3.060e+00  
+ CG78   -1.574022e+02  -4.258326e+00  1.908e-01  4.333e+00  2.500e+00  
+ CG79   -1.521858e+02  5.216435e+00   2.080e-02  3.500e+00  2.290e+00  
+ CG80   -1.482045e+02  3.981235e+00   1.931e-01  5.000e+00  2.660e+00  
+ CG81   -1.517598e+02  -3.555231e+00  1.924e-01  5.833e+00  2.950e+00  
+ CG82   -1.521347e+02  -3.749415e-01  2.000e-02  5.167e+00  2.780e+00  
+ CG83   -1.488002e+02  3.334512e+00   2.435e-02  3.167e+00  2.140e+00  
+ CG84   -1.524946e+02  -3.694361e+00  2.064e-02  3.167e+00  2.140e+00  
+ CG85   -1.554547e+02  -2.960183e+00  1.979e-01  4.333e+00  2.470e+00  
+ CG86   -1.525844e+02  2.870300e+00   2.073e-02  3.167e+00  2.140e+00  
+ CG87   -1.560601e+02  -3.475651e+00  2.011e-01  3.000e+00  2.090e+00  
+ CG88   -1.554677e+02  5.923707e-01   2.028e-01  2.000e+00  1.830e+00  
+ CG89   -1.499340e+02  5.533753e+00   2.026e-01  2.000e+00  1.780e+00  
+ CG90   -1.490269e+02  9.071032e-01   2.157e-02  4.000e+00  2.380e+00  
+ CG91   -1.522306e+02  -3.203740e+00  2.266e-02  4.167e+00  2.430e+00  
+ CG92   -1.554447e+02  -3.214133e+00  2.017e-01  2.667e+00  2.000e+00  
+ CG93   -1.555838e+02  -1.390982e-01  1.962e-01  3.333e+00  2.190e+00  
+ CG94   -1.521631e+02  3.420692e+00   2.229e-02  2.167e+00  1.840e+00  
+ CG95   -1.490365e+02  3.126643e+00   2.110e-02  2.833e+00  2.070e+00  
+ CG96   -1.554554e+02  -6.418869e+00  1.993e-01  4.500e+00  2.590e+00  
+ CG97   -1.554510e+02  4.348037e-03   1.991e-01  3.833e+00  2.380e+00  
+ CG98   -1.554752e+02  -2.421237e-02  1.975e-01  2.333e+00  1.880e+00  
+ CG99   -1.484759e+02  6.999338e+00   2.170e-02  2.333e+00  1.910e+00  
+ CG100  -1.487556e+02  -2.796852e-01  2.277e-02  2.833e+00  2.070e+00  
+
+  |CLASS_NAME---------|NAME---------------|TIME(Sec)-----|CALLS----|AVG------|PER%-------
+ A Driver              reading             0.71535        1         0.72      0.29      %
+ B Input               Init                0.32632        1         0.33      0.13      %
+ B Run_pw              plane_wave_line     244.29         1         2.4e+02   1e+02     %
+ B PW_Basis            gen_pw              1.404          1         1.4       0.57      %
+ C Cell_PW             opt_cells_pw        239.08         1         2.4e+02   98        %
+ C ppcell_vl           init_vloc           0.13462        1         0.13      0.055     %
+ X FFT                 FFT3D               113.76         7757      0.015     46        %
+ E Potential           v_of_rho            65.163         101       0.65      27        %
+ C wavefunc            wfcinit             1.5525         1         1.6       0.63      %
+ G Hamilt_PW           diagH_subspace      35.591         100       0.36      15        %
+ H Hamilt_PW           h_psi               134.63         2422      0.056     55        %
+ H Hamilt_PW           vloc                87.966         2422      0.036     36        %
+ H Hamilt_PW           vnl                 45.829         2422      0.019     19        %
+ I Hamilt_PW           add_nonlocal_pp     22.789         2422      0.0094    9.3       %
+ C Ions                opt_ions_pw         234.81         1         2.3e+02   96        %
+ D Electrons           self_consistent     234.8          1         2.3e+02   96        %
+ E Electrons           c_bands             122.27         50        2.4       50        %
+ F Hamilt              diagH_pw            145.17         100       1.5       59        %
+ G Diago_CG            diag                111.01         100       1.1       45        %
+ E electrons           c_bands             112.58         50        2.3       46        %
+ E Charge              mix_rho             7.4068         100       0.074     3         %
+ ----------------------------------------------------------------------------------------
+
+ START  Time  : Wed Jul  7 14:27:30 2021
+ FINISH Time  : Wed Jul  7 14:31:35 2021
+ TOTAL  Time  : 2.4e+02
+ SEE INFORMATION IN : OUT.autotest/
+==18913== 
+==18913== HEAP SUMMARY:
+==18913==     in use at exit: 608,316 bytes in 429 blocks
+==18913==   total heap usage: 142,450 allocs, 142,021 frees, 318,885,816 bytes allocated
+==18913== 
+==18913== 4 bytes in 1 blocks are definitely lost in loss record 25 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x5B74250: iPMI_Init_Ext (simple_pmi.c:326)
+==18913==    by 0x5A157A0: init_pg (mpid_init.c:2124)
+==18913==    by 0x5A157A0: MPID_Init (mpid_init.c:1713)
+==18913==    by 0x59ABEBA: MPIR_Init_thread (initthread.c:717)
+==18913==    by 0x59A9B65: PMPI_Init_thread (initthread.c:1061)
+==18913==    by 0x5F1024: Parallel_Global::read_mpi_parameters(int, char**) (parallel_global.cpp:166)
+==18913==    by 0x40B098: main (main.cpp:16)
+==18913== 
+==18913== 12 (8 direct, 4 indirect) bytes in 1 blocks are definitely lost in loss record 35 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x5A14A2B: ??? (mpid_init.c:1324)
+==18913==    by 0x5A15993: MPID_Init (mpid_init.c:1733)
+==18913==    by 0x59ABEBA: MPIR_Init_thread (initthread.c:717)
+==18913==    by 0x59A9B65: PMPI_Init_thread (initthread.c:1061)
+==18913==    by 0x5F1024: Parallel_Global::read_mpi_parameters(int, char**) (parallel_global.cpp:166)
+==18913==    by 0x40B098: main (main.cpp:16)
+==18913== 
+==18913== 24 bytes in 3 blocks are definitely lost in loss record 46 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988B3E6: mkl_serv_allocate (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x12BE0155: mkl_blas_avx2_zgemm_get_bufs (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x12BE1726: mkl_blas_avx2_z_generic_fullacopybcopy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x79765F4: gemm_omp_driver_v2 (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_thread.so)
+==18913==    by 0xE4E3D42: __kmp_invoke_microtask (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/compiler/lib/intel64_lin/libiomp5.so)
+==18913==    by 0xE4B2316: __kmp_invoke_task_func (kmp_runtime.cpp:7129)
+==18913==    by 0xE4B1994: __kmp_launch_thread (kmp_runtime.cpp:5738)
+==18913==    by 0xE4E41B3: _INTERNAL_26_______src_z_Linux_util_cpp_b2df00d9::__kmp_launch_worker(void*) (z_Linux_util.cpp:585)
+==18913==    by 0x69D3EA4: start_thread (in /usr/lib64/libpthread-2.17.so)
+==18913==    by 0xCCCB9FC: clone (in /usr/lib64/libc-2.17.so)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 119 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CB0C: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF94F: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:336)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 120 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CCF9: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF94F: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:336)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 121 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13343F55: mkl_dft_avx2_Iotensor_copy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CEB4: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF94F: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:336)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 122 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13343F55: mkl_dft_avx2_Iotensor_copy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CEC6: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF94F: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:336)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 123 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CB0C: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF9B7: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:341)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 124 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CCF9: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF9B7: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:341)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 125 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13343F55: mkl_dft_avx2_Iotensor_copy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CEB4: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF9B7: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:341)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 126 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13343F55: mkl_dft_avx2_Iotensor_copy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CEC6: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF9B7: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:341)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 127 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CB0C: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA09: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:346)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 128 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CCF9: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA09: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:346)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 129 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13343F55: mkl_dft_avx2_Iotensor_copy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CEB4: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA09: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:346)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 130 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13343F55: mkl_dft_avx2_Iotensor_copy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CEC6: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA09: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:346)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 131 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CB0C: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA6A: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:351)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 132 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CCF9: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA6A: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:351)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 133 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13343F55: mkl_dft_avx2_Iotensor_copy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CEB4: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA6A: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:351)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 134 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13343F55: mkl_dft_avx2_Iotensor_copy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CEC6: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA6A: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:351)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 135 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CB0C: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFAC0: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:356)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 136 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CCF9: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFAC0: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:356)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 137 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13343F55: mkl_dft_avx2_Iotensor_copy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CEB4: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFAC0: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:356)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 138 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13343F55: mkl_dft_avx2_Iotensor_copy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CEC6: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFAC0: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:356)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 139 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CB0C: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFB16: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:361)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 140 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CCF9: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFB16: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:361)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 141 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13343F55: mkl_dft_avx2_Iotensor_copy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CEB4: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFB16: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:361)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 142 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13343F55: mkl_dft_avx2_Iotensor_copy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CEC6: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFB16: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:361)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 143 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CB0C: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF94F: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:336)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 144 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CCF9: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF94F: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:336)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 145 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13343F55: mkl_dft_avx2_Iotensor_copy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CEB4: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF94F: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:336)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 146 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13343F55: mkl_dft_avx2_Iotensor_copy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CEC6: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF94F: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:336)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 147 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CB0C: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF9B7: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:341)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 148 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CCF9: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF9B7: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:341)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 149 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13343F55: mkl_dft_avx2_Iotensor_copy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CEB4: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF9B7: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:341)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 150 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13343F55: mkl_dft_avx2_Iotensor_copy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CEC6: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF9B7: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:341)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 151 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CB0C: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA09: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:346)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 152 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CCF9: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA09: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:346)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 153 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13343F55: mkl_dft_avx2_Iotensor_copy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CEB4: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA09: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:346)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 154 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13343F55: mkl_dft_avx2_Iotensor_copy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CEC6: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA09: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:346)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 155 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CB0C: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA6A: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:351)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 156 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CCF9: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA6A: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:351)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 157 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13343F55: mkl_dft_avx2_Iotensor_copy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CEB4: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA6A: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:351)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 158 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13343F55: mkl_dft_avx2_Iotensor_copy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CEC6: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA6A: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:351)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 159 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CB0C: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFAC0: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:356)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 160 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CCF9: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFAC0: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:356)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 161 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13343F55: mkl_dft_avx2_Iotensor_copy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CEB4: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFAC0: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:356)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 162 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13343F55: mkl_dft_avx2_Iotensor_copy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CEC6: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFAC0: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:356)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 163 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CB0C: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFB16: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:361)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 164 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CCF9: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFB16: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:361)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 165 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13343F55: mkl_dft_avx2_Iotensor_copy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CEB4: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFB16: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:361)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913== 
+==18913== 144 bytes in 1 blocks are possibly lost in loss record 166 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133442CD: mkl_dft_avx2_Iotensor_create (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13343F55: mkl_dft_avx2_Iotensor_copy (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388CEC6: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFB16: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:361)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913== 
+==18913== 208 bytes in 1 blocks are possibly lost in loss record 167 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x71D83BA: new_plan (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D563A: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF94F: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:336)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913== 
+==18913== 208 bytes in 1 blocks are possibly lost in loss record 168 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x71D83BA: new_plan (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D563A: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF9B7: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:341)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913== 
+==18913== 208 bytes in 1 blocks are possibly lost in loss record 169 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x71D83BA: new_plan (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D563A: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA09: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:346)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913== 
+==18913== 208 bytes in 1 blocks are possibly lost in loss record 170 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x71D83BA: new_plan (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D563A: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA6A: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:351)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913== 
+==18913== 208 bytes in 1 blocks are possibly lost in loss record 171 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x71D83BA: new_plan (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D563A: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFAC0: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:356)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913== 
+==18913== 208 bytes in 1 blocks are possibly lost in loss record 172 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x71D83BA: new_plan (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D563A: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFB16: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:361)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913== 
+==18913== 208 bytes in 1 blocks are possibly lost in loss record 173 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x71D83BA: new_plan (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D563A: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF94F: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:336)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913== 
+==18913== 208 bytes in 1 blocks are possibly lost in loss record 174 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x71D83BA: new_plan (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D563A: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF9B7: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:341)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913== 
+==18913== 208 bytes in 1 blocks are possibly lost in loss record 175 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x71D83BA: new_plan (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D563A: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA09: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:346)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913== 
+==18913== 208 bytes in 1 blocks are possibly lost in loss record 176 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x71D83BA: new_plan (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D563A: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA6A: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:351)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913== 
+==18913== 208 bytes in 1 blocks are possibly lost in loss record 177 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x71D83BA: new_plan (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D563A: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFAC0: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:356)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913== 
+==18913== 208 bytes in 1 blocks are possibly lost in loss record 178 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x71D83BA: new_plan (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D563A: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFB16: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:361)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913== 
+==18913== 256 bytes in 1 blocks are definitely lost in loss record 180 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x5B718EA: iPMI_Get_r2h_table (simple_pmi.c:1944)
+==18913==    by 0x5B7430C: iPMI_Init_Ext (simple_pmi.c:360)
+==18913==    by 0x5A157A0: init_pg (mpid_init.c:2124)
+==18913==    by 0x5A157A0: MPID_Init (mpid_init.c:1713)
+==18913==    by 0x59ABEBA: MPIR_Init_thread (initthread.c:717)
+==18913==    by 0x59A9B65: PMPI_Init_thread (initthread.c:1061)
+==18913==    by 0x5F1024: Parallel_Global::read_mpi_parameters(int, char**) (parallel_global.cpp:166)
+==18913==    by 0x40B098: main (main.cpp:16)
+==18913== 
+==18913== 264 (8 direct, 256 indirect) bytes in 1 blocks are definitely lost in loss record 181 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x5B7426E: iPMI_Init_Ext (simple_pmi.c:333)
+==18913==    by 0x5A157A0: init_pg (mpid_init.c:2124)
+==18913==    by 0x5A157A0: MPID_Init (mpid_init.c:1713)
+==18913==    by 0x59ABEBA: MPIR_Init_thread (initthread.c:717)
+==18913==    by 0x59A9B65: PMPI_Init_thread (initthread.c:1061)
+==18913==    by 0x5F1024: Parallel_Global::read_mpi_parameters(int, char**) (parallel_global.cpp:166)
+==18913==    by 0x40B098: main (main.cpp:16)
+==18913== 
+==18913== 784 bytes in 4 blocks are possibly lost in loss record 190 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0xAEF4625: mkl_dft_ippMalloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x150AD27E: mkl_dft_avx2_ownsInitAllocDftPrimeFact_64f (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1506B02A: mkl_dft_avx2_ippsDFTInitAlloc_C_64fc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1355C883: mkl_dft_avx2_ipp_init_d_c2c (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13543C33: mkl_dft_avx2_commit_descriptor_core_d_c2c_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x8082DCF: mkl_dft_commit_node_d_c2c_1d_omp (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_thread.so)
+==18913==    by 0x1388C690: static_dfti_commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71CFF5E: DftiCommitDescriptor (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5830: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913== 
+==18913== 944 bytes in 1 blocks are possibly lost in loss record 191 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x1388CAB4: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF94F: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:336)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 944 bytes in 1 blocks are possibly lost in loss record 192 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x1388CAB4: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF9B7: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:341)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 944 bytes in 1 blocks are possibly lost in loss record 193 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x1388CAB4: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA09: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:346)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 944 bytes in 1 blocks are possibly lost in loss record 194 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x1388CAB4: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA6A: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:351)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 944 bytes in 1 blocks are possibly lost in loss record 195 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x1388CAB4: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFAC0: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:356)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 944 bytes in 1 blocks are possibly lost in loss record 196 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x1388CAB4: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFB16: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:361)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 944 bytes in 1 blocks are possibly lost in loss record 197 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x1388CAB4: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF94F: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:336)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 944 bytes in 1 blocks are possibly lost in loss record 198 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x1388CAB4: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF9B7: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:341)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 944 bytes in 1 blocks are possibly lost in loss record 199 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x1388CAB4: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA09: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:346)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 944 bytes in 1 blocks are possibly lost in loss record 200 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x1388CAB4: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA6A: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:351)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 944 bytes in 1 blocks are possibly lost in loss record 201 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x1388CAB4: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFAC0: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:356)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 944 bytes in 1 blocks are possibly lost in loss record 202 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x1388CAB4: mkl_dft_avx2_dfti_create_node (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1354FF8D: mkl_dft_avx2_dfti_create_dc1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71D0922: DftiCreateDescriptor_d_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5B5E: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFB16: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:361)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 1,920 bytes in 2 blocks are possibly lost in loss record 205 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0xAEF4625: mkl_dft_ippMalloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x1506AD1C: mkl_dft_avx2_ippsDFTInitAlloc_C_64fc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1355C883: mkl_dft_avx2_ipp_init_d_c2c (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13543C33: mkl_dft_avx2_commit_descriptor_core_d_c2c_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x8082DCF: mkl_dft_commit_node_d_c2c_1d_omp (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_thread.so)
+==18913==    by 0x1388C690: static_dfti_commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71CFF5E: DftiCommitDescriptor (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5830: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFAC0: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:356)
+==18913== 
+==18913== 1,920 bytes in 2 blocks are possibly lost in loss record 206 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0xAEF4625: mkl_dft_ippMalloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x1506AD1C: mkl_dft_avx2_ippsDFTInitAlloc_C_64fc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1355C883: mkl_dft_avx2_ipp_init_d_c2c (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13543C33: mkl_dft_avx2_commit_descriptor_core_d_c2c_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x8082DCF: mkl_dft_commit_node_d_c2c_1d_omp (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_thread.so)
+==18913==    by 0x1388C690: static_dfti_commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71CFF5E: DftiCommitDescriptor (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5830: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFB16: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:361)
+==18913== 
+==18913== 2,304 bytes in 4 blocks are possibly lost in loss record 207 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0xAEF4625: mkl_dft_ippMalloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x150AC378: mkl_dft_avx2_ownsInitAllocDftPrimeFact_64f (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1506B02A: mkl_dft_avx2_ippsDFTInitAlloc_C_64fc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1355C883: mkl_dft_avx2_ipp_init_d_c2c (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x13543C33: mkl_dft_avx2_commit_descriptor_core_d_c2c_1d (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x8082DCF: mkl_dft_commit_node_d_c2c_1d_omp (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_thread.so)
+==18913==    by 0x1388C690: static_dfti_commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71CFF5E: DftiCommitDescriptor (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5830: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913== 
+==18913== 3,456 bytes in 1 blocks are definitely lost in loss record 208 of 230
+==18913==    at 0x4C2C866: operator new[](unsigned long) (vg_replace_malloc.c:579)
+==18913==    by 0x6A2CEE: Symmetry::rho_symmetry(double*, int const&, int const&, int const&) (symmetry.cpp:1440)
+==18913==    by 0x6B092D: Symmetry_rho::psymm(double*) const (symmetry_rho.cpp:40)
+==18913==    by 0x65C781: Electrons::self_consistent(int const&) (electrons.cpp:130)
+==18913==    by 0x53B89F: Ions::opt_ions_pw() (ions.cpp:131)
+==18913==    by 0x52B88E: Cell_PW::opt_cells_pw() (Cell_PW.cpp:78)
+==18913==    by 0x784F24: Run_pw::plane_wave_line() (run_pw.cpp:104)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913== 
+==18913== 4,312 bytes in 1 blocks are possibly lost in loss record 212 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133B30F6: commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388C690: static_dfti_commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71CFF5E: DftiCommitDescriptor (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5830: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF94F: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:336)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 4,312 bytes in 1 blocks are possibly lost in loss record 213 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133B30F6: commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388C690: static_dfti_commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71CFF5E: DftiCommitDescriptor (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5830: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF9B7: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:341)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 4,312 bytes in 1 blocks are possibly lost in loss record 214 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133B30F6: commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388C690: static_dfti_commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71CFF5E: DftiCommitDescriptor (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5830: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA09: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:346)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 4,312 bytes in 1 blocks are possibly lost in loss record 215 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133B30F6: commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388C690: static_dfti_commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71CFF5E: DftiCommitDescriptor (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5830: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA6A: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:351)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 4,312 bytes in 1 blocks are possibly lost in loss record 216 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133B30F6: commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388C690: static_dfti_commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71CFF5E: DftiCommitDescriptor (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5830: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF94F: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:336)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 4,312 bytes in 1 blocks are possibly lost in loss record 217 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133B30F6: commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388C690: static_dfti_commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71CFF5E: DftiCommitDescriptor (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5830: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF9B7: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:341)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 4,312 bytes in 1 blocks are possibly lost in loss record 218 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133B30F6: commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388C690: static_dfti_commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71CFF5E: DftiCommitDescriptor (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5830: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA09: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:346)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 4,312 bytes in 1 blocks are possibly lost in loss record 219 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133B30F6: commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388C690: static_dfti_commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71CFF5E: DftiCommitDescriptor (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5830: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA6A: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:351)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 4,440 bytes in 1 blocks are possibly lost in loss record 220 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133B4064: commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388C690: static_dfti_commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71CFF5E: DftiCommitDescriptor (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5830: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF94F: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:336)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 4,440 bytes in 1 blocks are possibly lost in loss record 221 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133B4064: commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388C690: static_dfti_commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71CFF5E: DftiCommitDescriptor (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5830: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF9B7: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:341)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 4,440 bytes in 1 blocks are possibly lost in loss record 222 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133B4064: commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388C690: static_dfti_commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71CFF5E: DftiCommitDescriptor (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5830: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA09: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:346)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 4,440 bytes in 1 blocks are possibly lost in loss record 223 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133B4064: commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388C690: static_dfti_commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71CFF5E: DftiCommitDescriptor (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5830: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA6A: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:351)
+==18913==    by 0x685975: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:314)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 4,440 bytes in 1 blocks are possibly lost in loss record 224 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133B4064: commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388C690: static_dfti_commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71CFF5E: DftiCommitDescriptor (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5830: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF94F: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:336)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 4,440 bytes in 1 blocks are possibly lost in loss record 225 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133B4064: commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388C690: static_dfti_commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71CFF5E: DftiCommitDescriptor (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5830: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EF9B7: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:341)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 4,440 bytes in 1 blocks are possibly lost in loss record 226 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133B4064: commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388C690: static_dfti_commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71CFF5E: DftiCommitDescriptor (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5830: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA09: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:346)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 4,440 bytes in 1 blocks are possibly lost in loss record 227 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x988BB71: mkl_serv_malloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x9891A02: mkl_serv_calloc (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_core.so)
+==18913==    by 0x133B4064: commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x1388C690: static_dfti_commit (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_avx2.so)
+==18913==    by 0x71CFF5E: DftiCommitDescriptor (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D5830: fftw_plan_guru64_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x71D79DB: fftw_plan_many_dft (in /home/caichun/intel/compilers_and_libraries_2017.8.262/linux/mkl/lib/intel64_lin/libmkl_intel_lp64.so)
+==18913==    by 0x5EFA6A: FFT::setup_MPI_FFT3D(int, int, int, int, bool) (ft.cpp:351)
+==18913==    by 0x68599E: PW_Basis::gen_pw(std::basic_ofstream<char, std::char_traits<char> >&, UnitCell const&, K_Vectors const&) (pw_basis.cpp:315)
+==18913==    by 0x784B81: Run_pw::plane_wave_line() (run_pw.cpp:61)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913== 
+==18913== 8,720 (8,192 direct, 528 indirect) bytes in 1 blocks are definitely lost in loss record 228 of 230
+==18913==    at 0x4C2F7C8: calloc (vg_replace_malloc.c:1117)
+==18913==    by 0x113B7004: ???
+==18913==    by 0x113B78B6: ???
+==18913==    by 0x5A13E38: ??? (mpid_init.c:1207)
+==18913==    by 0x5A15993: MPID_Init (mpid_init.c:1733)
+==18913==    by 0x59ABEBA: MPIR_Init_thread (initthread.c:717)
+==18913==    by 0x59A9B65: PMPI_Init_thread (initthread.c:1061)
+==18913==    by 0x5F1024: Parallel_Global::read_mpi_parameters(int, char**) (parallel_global.cpp:166)
+==18913==    by 0x40B098: main (main.cpp:16)
+==18913== 
+==18913== 131,144 bytes in 1 blocks are possibly lost in loss record 229 of 230
+==18913==    at 0x4C2B067: malloc (vg_replace_malloc.c:380)
+==18913==    by 0x5A1EC6F: MPIDI_nem_i_mpi_Amalloc (mpid_nem_impi_extensions.c:2149)
+==18913==    by 0x57ED2B4: allocate_raw_memory_from_system (ch3u_recvq.c:123)
+==18913==    by 0x57ED2B4: MPIDI_CH3U_Recvq_init (ch3u_recvq.c:571)
+==18913==    by 0x5A15C95: MPID_Init (mpid_init.c:1836)
+==18913==    by 0x59ABEBA: MPIR_Init_thread (initthread.c:717)
+==18913==    by 0x59A9B65: PMPI_Init_thread (initthread.c:1061)
+==18913==    by 0x5F1024: Parallel_Global::read_mpi_parameters(int, char**) (parallel_global.cpp:166)
+==18913==    by 0x40B098: main (main.cpp:16)
+==18913== 
+==18913== 345,600 bytes in 100 blocks are definitely lost in loss record 230 of 230
+==18913==    at 0x4C2C866: operator new[](unsigned long) (vg_replace_malloc.c:579)
+==18913==    by 0x6A2CEE: Symmetry::rho_symmetry(double*, int const&, int const&, int const&) (symmetry.cpp:1440)
+==18913==    by 0x6B092D: Symmetry_rho::psymm(double*) const (symmetry_rho.cpp:40)
+==18913==    by 0x65C9A9: Electrons::self_consistent(int const&) (electrons.cpp:236)
+==18913==    by 0x53B89F: Ions::opt_ions_pw() (ions.cpp:131)
+==18913==    by 0x52B88E: Cell_PW::opt_cells_pw() (Cell_PW.cpp:78)
+==18913==    by 0x784F24: Run_pw::plane_wave_line() (run_pw.cpp:104)
+==18913==    by 0x7708B0: Driver::atomic_world() (driver.cpp:85)
+==18913==    by 0x771453: Driver::init() (driver.cpp:27)
+==18913==    by 0x41047C: calculate() (main.cpp:35)
+==18913==    by 0x40B09D: main (main.cpp:18)
+==18913== 
+==18913== LEAK SUMMARY:
+==18913==    definitely lost: 357,548 bytes in 109 blocks
+==18913==    indirectly lost: 788 bytes in 4 blocks
+==18913==      possibly lost: 228,824 bytes in 101 blocks
+==18913==    still reachable: 21,156 bytes in 215 blocks
+==18913==                       of which reachable via heuristic:
+==18913==                         stdstring          : 1,972 bytes in 62 blocks
+==18913==                         newarray           : 8,016 bytes in 2 blocks
+==18913==         suppressed: 0 bytes in 0 blocks
+==18913== Reachable blocks (those to which a pointer was found) are not shown.
+==18913== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==18913== 
+==18913== For lists of detected and suppressed errors, rerun with: -s
+==18913== ERROR SUMMARY: 513 errors from 117 contexts (suppressed: 0 from 0)

@@ -20,12 +20,12 @@ void ELEC_nscf::nscf(LCAO_Hamilt &uhm)
 	time_t time_start= std::time(NULL);
 
 	// Peize Lin add 2018-08-14
-	switch(exx_lcao.info.hybrid_type)
+	switch(GlobalC::exx_lcao.info.hybrid_type)
 	{
 		case Exx_Global::Hybrid_Type::HF:
 		case Exx_Global::Hybrid_Type::PBE0:
 		case Exx_Global::Hybrid_Type::HSE:
-			exx_lcao.cal_exx_elec_nscf();
+			GlobalC::exx_lcao.cal_exx_elec_nscf();
 			break;
 	}
 
@@ -85,7 +85,7 @@ void ELEC_nscf::nscf(LCAO_Hamilt &uhm)
     }
 	
 	// add by jingan
-	if (berryphase::berry_phase_flag && Symmetry::symm_flag == 0)
+	if (berryphase::berry_phase_flag && ModuleSymmetry::Symmetry::symm_flag == 0)
     {
     	berryphase bp;
 		bp.Macroscopic_polarization();

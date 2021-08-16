@@ -32,7 +32,7 @@ void LOOP_cell::opt_cell(void)
     // if ion_step==0, read in/initialize the potentials
     // this function belongs to ions LOOP
     int ion_step=0;
-    pot.init_pot(ion_step, GlobalC::pw.strucFac);
+    GlobalC::pot.init_pot(ion_step, GlobalC::pw.strucFac);
 
 
 	// PLEASE simplify the Exx_Global interface
@@ -45,7 +45,7 @@ void LOOP_cell::opt_cell(void)
 			case Exx_Global::Hybrid_Type::HF:
 			case Exx_Global::Hybrid_Type::PBE0:
 			case Exx_Global::Hybrid_Type::HSE:
-				exx_lcao.init();
+				GlobalC::exx_lcao.init();
 				break;
 			case Exx_Global::Hybrid_Type::No:
 			case Exx_Global::Hybrid_Type::Generate_Matrix:
@@ -60,14 +60,14 @@ void LOOP_cell::opt_cell(void)
 	// Quxin added for DFT+U
 	if(INPUT.dft_plus_u) 
 	{
-		dftu.init(GlobalC::ucell, ParaO);
+		GlobalC::dftu.init(GlobalC::ucell, GlobalC::ParaO);
 	}
 
 	LOOP_ions ions;
 	ions.opt_ions();
 
 	// mohan update 2021-02-10
-    LOWF.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
+    GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, INPUT.out_descriptor);
 	
 	return;
 }

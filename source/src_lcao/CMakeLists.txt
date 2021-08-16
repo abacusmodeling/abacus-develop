@@ -58,6 +58,7 @@ add_library(
     wfc_dm_2d.cpp
     wavefunc_in_pw.cpp
 	H_TDDFT_pw.cpp
+    run_md_lcao.cpp
 )
 
 if(ENABLE_DEEPKS)
