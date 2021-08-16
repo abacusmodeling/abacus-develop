@@ -21,6 +21,7 @@ void Input::Print(const std::string &fn)const
 	OUTP(ofs,"atom_file",GlobalV::global_atom_card,"the filename of file containing atom positions");
 	OUTP(ofs,"kpoint_file",GlobalV::global_kpoint_card,"the name of file containing k points");
 	OUTP(ofs,"pseudo_dir",GlobalV::global_pseudo_dir,"the directory containing pseudo files");
+	OUTP(ofs,"orbital_dir",GlobalV::global_orbital_dir,"the directory containing orbital files");
 	OUTP(ofs,"pseudo_type",GlobalV::global_pseudo_type,"the type pseudo files");
 	OUTP(ofs,"pseudo_rcut",pseudo_rcut,"cut-off radius for radial integration");
 	OUTP(ofs,"renormwithmesh",renormwithmesh,"0: use our own mesh to do radial renormalization; 1: use mesh as in QE");

@@ -7,6 +7,7 @@
 #include "../module_base/global_function.h"
 #include "../src_io/write_HS.h"
 #include "../src_io/cal_r_overlap_R.h"
+#include "../src_io/print_info.h"
 #include "../src_ions/variable_cell.h" // mohan add 2021-02-01
 #include "../src_ri/exx_abfs.h"
 #include "../src_ri/exx_opt_orb.h"
@@ -98,14 +99,9 @@ void Run_MD_LCAO::opt_ions(void)
     while(istep <= GlobalV::NSTEP && !stop)
     {
         time_t estart = time(NULL);
-	
-		// xiaohui add "m" option, 2015-09-16
-        if(GlobalV::OUT_LEVEL=="ie" || GlobalV::OUT_LEVEL=="m")
-        {
-			std::cout << " ---------------------------------------------------------" << std::endl;
-			std::cout<<" Molecular Dynamics STEP "<< mdb.getRealStep()<<std::endl;
-			std::cout << " ---------------------------------------------------------" << std::endl;
-        }
+
+        Print_Info::print_screen(0, 0, istep);
+        
 		//----------------------------------------------------------
 		// about vdw, jiyy add vdwd3 and linpz add vdwd2
 		//----------------------------------------------------------	

@@ -286,21 +286,7 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ComplexMatrix &wvf)
 		this->atomic_wfc(ik, this->npw, GlobalC::ucell.lmax_ppwf, wfcatom, GlobalC::ppcell.tab_at, GlobalV::NQX, GlobalV::DQ);
 		if( start_wfc == "atomic+random" && starting_nw == GlobalC::ucell.natomwfc )//added by qianrui 2021-5-16
 		{
-			double rr, arg;
-			for(int ib = 0 ; ib < starting_nw ; ++ib )
-			{
-				int startig = 0;
-				for(int ip = 0 ; ip < GlobalV::NPOL; ++ip)
-				{
-					for(int ig = 0 ; ig < npw ; ++ig)
-					{
-						rr = rand()/double(RAND_MAX);
-						arg = TWO_PI * rand()/double(RAND_MAX);
-						wfcatom(ib,startig+ig) *= (1.0 + 0.05 * std::complex<double>(rr * cos(arg), rr * sin(arg)));
-					}
-					startig += npwx;
-				}
-			}
+			this->atomicrandom(wfcatom,0,starting_nw,ik);
 		}
 		
 		//====================================================

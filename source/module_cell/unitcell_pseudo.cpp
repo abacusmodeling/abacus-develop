@@ -354,7 +354,6 @@ void UnitCell_pseudo::setup_cell_classic(
 			// call read_atom_positions
 			//==========================
 			ok2 = this->read_atom_positions(ifa, ofs_running, ofs_warning);
-			std::cout << "read_atom_positions done." << std::endl;
 			if(ok2)
 			{
 				for(int i=0;i<this->ntype;i++)

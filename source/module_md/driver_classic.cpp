@@ -5,6 +5,7 @@
 #include "../module_base/timer.h"
 #include "../module_base/global_variable.h"
 #include "../module_base/memory.h"
+#include "../src_io/print_info.h"
 
 Driver_classic::Driver_classic(){}
 Driver_classic::~Driver_classic(){}
@@ -13,13 +14,20 @@ void Driver_classic::init()
 {
 	TITLE("Driver_classic", "init");
 
+	time_t time_start = std::time(NULL);
+	timer::start();
+
 	// (1) read the input parameters.
 	this->reading();
 
 	// (2) welcome to the classic MD!
 	this->classic_world();
 
-	// (3) close all of the running logs 
+	// (3) output information
+	time_t	time_finish= std::time(NULL);
+	Print_Info::print_time(time_start, time_finish);
+
+	// (4) close all of the running logs 
 	INPUT.close_log();
 
 	return;
@@ -89,4 +97,3 @@ void Driver_classic::classic_world(void)
 
 	return;
 }
-

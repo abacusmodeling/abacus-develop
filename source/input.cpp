@@ -84,6 +84,7 @@ void Input::Init(const std::string &fn)
 	OUT(GlobalV::ofs_running,"global_out_dir", GlobalV::global_out_dir);
 	OUT(GlobalV::ofs_running,"global_in_card", GlobalV::global_in_card);
 	OUT(GlobalV::ofs_running,"pseudo_dir", GlobalV::global_pseudo_dir);
+	OUT(GlobalV::ofs_running,"orbital_dir", GlobalV::global_orbital_dir);
 
 	OUT(GlobalV::ofs_running,"pseudo_type", pseudo_type); // mohan add 2013-05-20 (xiaohui add 2013-06-23, GlobalV::global_pseudo_type -> pseudo_type)
 
@@ -103,6 +104,7 @@ void Input::Default(void)
     atom_file = "";//xiaohui modify 2015-02-01
     kpoint_file = "";//xiaohui modify 2015-02-01
     pseudo_dir = "";
+	orbital_dir = ""; // liuyu add 2021-08-14
 	read_file_dir = "auto";
     pseudo_type = "auto"; // mohan add 2013-05-20 (xiaohui add 2013-06-23)
 	wannier_card = "";
@@ -533,7 +535,11 @@ bool Input::Read(const std::string &fn)
 		{
 			read_value(ifs, pseudo_type);
 		}
-        else if (strcmp("kpoint_file", word) == 0)//xiaohui modify 2015-02-01
+		else if (strcmp("orbital_dir", word) == 0) // liuyu add 2021-08-14
+		{
+			read_value(ifs, orbital_dir);
+		}
+		else if (strcmp("kpoint_file", word) == 0)//xiaohui modify 2015-02-01
         {
             read_value(ifs, kpoint_file);//xiaohui modify 2015-02-01
         }
@@ -2002,6 +2008,7 @@ void Input::Bcast()
     Parallel_Common::bcast_string( atom_file );//xiaohui modify 2015-02-01
     Parallel_Common::bcast_string( pseudo_dir );
     Parallel_Common::bcast_string( pseudo_type ); // mohan add 2013-05-20 (xiaohui add 2013-06-23)
+	Parallel_Common::bcast_string( orbital_dir );
     Parallel_Common::bcast_string( kpoint_file );//xiaohui modify 2015-02-01
     Parallel_Common::bcast_string( wannier_card );
     Parallel_Common::bcast_string( latname );
