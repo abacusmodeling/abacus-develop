@@ -626,15 +626,6 @@ void Diago_CG_GPU::schmit_orth
     cublasCreate(&handle);
     cublasOperation_t trans1 = CUBLAS_OP_C; 
 
-    // cout<<"Test sphi ... "<<endl;
-    // complex<double> *test_sphi = new complex<double>[10];
-    // cudaMemcpy(test_sphi, sphi, 10*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
-    // for(int i=0;i<10;i++)
-    // {
-    //     cout<<test_sphi[i].real()<<" "<<test_sphi[i].imag()<<endl;
-    // }
-    // delete [] test_sphi;
-
     CUFFT_COMPLEX ONE, ZERO, NEG_ONE;
     ONE.y = ZERO.x = ZERO.y = 0.0;
     ONE.x = 1.0;

@@ -7,11 +7,11 @@ void Cell_PW::opt_cells_pw()
     timer::tick("Cell_PW", "opt_cells_pw");
     GlobalC::wf.allocate(GlobalC::kv.nks);
 
-    cout<<GlobalC::pw.nrxx<<endl;
-    cout<<"before ufft allocate"<<endl;
+    // cout<<GlobalC::pw.nrxx<<endl;
+    // cout<<"before ufft allocate"<<endl;
     GlobalC::UFFT.allocate();
 
-    cout<<"after ufft allocate"<<endl;
+    // cout<<"after ufft allocate"<<endl;
 
     //=======================
     // init pseudopotential
