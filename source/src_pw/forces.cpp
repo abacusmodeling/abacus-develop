@@ -165,7 +165,7 @@ void Forces::init(matrix& force)
 	}
 
  	GlobalV::ofs_running << std::setiosflags(ios::fixed) << std::setprecision(6) << std::endl;
-	if(GlobalV::TEST_FORCE)
+	/*if(GlobalV::TEST_FORCE)
 	{
 		Forces::print("LOCAL    FORCE (Ry/Bohr)", forcelc);
 		Forces::print("NONLOCAL FORCE (Ry/Bohr)", forcenl);
@@ -173,7 +173,7 @@ void Forces::init(matrix& force)
 		Forces::print("ION      FORCE (Ry/Bohr)", forceion);
 		Forces::print("SCC      FORCE (Ry/Bohr)", forcescc);
 		if(GlobalV::EFIELD) Forces::print("EFIELD   FORCE (Ry/Bohr)", force_e);
-	}
+	}*/
 	
 /*
 	Forces::print("   TOTAL-FORCE (Ry/Bohr)", force);
