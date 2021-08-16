@@ -96,13 +96,6 @@ void Run_pw::plane_wave_line(void)
     GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
     GlobalC::pot.allocate(GlobalC::pw.nrxx);
 
-<<<<<<< HEAD
-    // cout<<"before cpws success"<<endl;
-    Cell_PW cpws;
-
-    // cout<<"before cpw init nrxx = "<<GlobalC::pw.nrxx<<endl;
-    cpws.opt_cells_pw();
-=======
     if(GlobalV::CALCULATION == "md")
     {
         Run_MD_PW run_md_pw;
@@ -113,7 +106,6 @@ void Run_pw::plane_wave_line(void)
         Cell_PW cpws;
         cpws.opt_cells_pw();
     }
->>>>>>> 238a6a19a355699417b9d1768fc4bf72619cd245
 
     // cout<<"cpws SUCCESS"<<endl;
 

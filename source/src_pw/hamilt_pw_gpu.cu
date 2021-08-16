@@ -108,7 +108,7 @@ void Hamilt_PW_GPU::init_k(const int ik)
 
 	for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
 	{
-		pot.vr_eff1[ir] = pot.vr_eff(GlobalV::CURRENT_SPIN, ir);//mohan add 2007-11-12
+		GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);//mohan add 2007-11-12
 	}
 
 	// cout<<"local pp end"<<endl;
@@ -259,7 +259,7 @@ void Hamilt_PW_GPU::h_psi(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, cons
         cudaMalloc((void**)&d_porter, GlobalC::pw.nrxx * sizeof(CUFFT_COMPLEX));
 
         // cout<<GlobalC::wf.npwx<<" "<<GlobalC::pw.nrxx<<endl;
-        cudaMemcpy(d_vr_eff1, pot.vr_eff1, GlobalC::pw.nrxx*sizeof(double), cudaMemcpyHostToDevice);
+        cudaMemcpy(d_vr_eff1, GlobalC::pot.vr_eff1, GlobalC::pw.nrxx*sizeof(double), cudaMemcpyHostToDevice);
         // cout<<"NSPIN = "<<GlobalV::NSPIN<<endl;
         for(int ib = 0 ; ib < m; ++ib)
         {
