@@ -769,7 +769,7 @@ void DFTU::read_occup_m(const std::string &fn)
 	{
 		if(GlobalV::CALCULATION=="nscf") 
 		{
-			std::cout << "DFTU::read_occup_m. Can not find the file oneite.dm . Please do scf calculation first" << std::endl;
+			std::cout << "DFTU::read_occup_m. Can not find the file onsite.dm . Please do scf calculation first" << std::endl;
 		}
 		else
 		{
@@ -1641,7 +1641,7 @@ void DFTU::folding_overlap_matrix(const int ik, std::complex<double>* Sk)
 	} // end T1
 
 	assert(index==GlobalC::LNNR.nnr);
-	for(int iic=0;iic<20;icc++){cout<<"\nSk"<<Sk[iic]<<"\tSlocR"<<GlobalC::LM.SlocR[iir]<<"\n";}
+
   	timer::tick("DFTU","folding_overlap_matrix");
 	return;
 }
