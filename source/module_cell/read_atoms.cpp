@@ -127,7 +127,7 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 	}
 
 	//===========================
-	// Read in latticies std::vector
+	// Read in latticies vector
 	//===========================
 	if(latName=="test"){	
 		if( SCAN_BEGIN(ifa, "LATTICE_VECTORS") )
@@ -341,14 +341,6 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &ofs_running, std::ofstream &ofs_warning)
 {
 	TITLE("UnitCell_pseudo","read_atom_positions");
-
-	bool use_xyz = false;
-        /* LiuXh 20171109
-	if( SCAN_BEGIN(ifpos, "USE_XYZ") )
-	{
-		use_xyz = true;
-	}
-        */
 
 	if( SCAN_BEGIN(ifpos, "ATOMIC_POSITIONS"))
 	{
@@ -596,61 +588,34 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 				ZEROS(atoms[it].mag,na);
 				for (int ia = 0;ia < na; ia++)
 				{
-					if(use_xyz)
-					{
-						std::string tmpid;
-						ifpos >> tmpid;
-						if(tmpid != atoms[it].label)
-						{
-							WARNING("read_atom_positions","atom label not match");	
-							return 0;
-						} 
-						else
-						{
-							ifpos >> v.x >> v.y >> v.z;
+ // modify the reading of frozen ions and velocities  -- Yuanbo Li 2021/8/5
+					ifpos >> v.x >> v.y >> v.z;
+                                        mv.x = true ;
+                                        mv.y = true ;
+                                        mv.z = true ;
+                                        atoms[it].vel[ia].set(0,0,0);
+                                        string tmpid;
+                                        tmpid = ifpos.get();
+                                        while ( (tmpid != "\n") && (ifpos.eof()==false) && (tmpid !="#") )
+                                        {
+						tmpid = ifpos.get() ;
+                                                ofs_running << "read char : ##"<<tmpid<<"##"<<endl;
+                                                if ( tmpid == "m" )
+                                                {
+                                                        ifpos >> mv.x >> mv.y >> mv.z ;
+                                                }
+                                                else if ( tmpid == "v" )
+                                                {
+                                                        ifpos >> atoms[it].vel[ia].x >> atoms[it].vel[ia].y >> atoms[it].vel[ia].z;
+                                                }
 
-							mv.x = true;
-							mv.y = true;
-							mv.z = true;
-							
-							std::string mags;
-							std::getline( ifpos, mags );
-							// change std::string to double.
-							//atoms[it].mag[ia] = std::atof(mags.c_str());
-							atoms[it].mag[ia] = 0.0;
-						}
-					}
-					else
-					{   // modify the reading of velocities  -- Yuanbo Li 2021/08/02
-						ifpos >> v.x >> v.y >> v.z
-							>> mv.x >> mv.y >> mv.z;
-						if(set_vel)
-						{
-	                        string tmpid1,tmpid2;
-                            tmpid1 = ifpos.get();
-                            if ( tmpid1 != "/n" )
-                            {
-                                ifpos >> tmpid2;
-                                if ( tmpid2 == "v" )
-                                {
-                                    ifpos >> atoms[it].vel[ia].x >> atoms[it].vel[ia].y >> atoms[it].vel[ia].z;
-                                }
-                            }
-                            else
-                            {
-                            atoms[it].vel[ia].set(0,0,0);
-                            }
-						}
-						else
-						{
-							atoms[it].vel[ia].set(0,0,0);
-						}
-						std::string mags;
-						std::getline( ifpos, mags );
-						// change std::string to double.
-						//atoms[it].mag[ia] = std::atof(mags.c_str());
-						atoms[it].mag[ia] = 0.0;
-					}	
+                                        }
+					while ( (tmpid != "\n") && (ifpos.eof()==false) )
+                                        {
+                                                tmpid = ifpos.get();
+                                        }
+					string mags;
+					atoms[it].mag[ia] = 0.0;
 
 					if(Coordinate=="Direct")
 					{
@@ -733,6 +698,12 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 		}//end for ntype
 	}// end scan_begin
 
+//check if any atom can move in MD
+	if(!this->if_atoms_can_move() && GlobalV::CALCULATION=="md")
+	{
+		WARNING("read_atoms", "no atom can move in MD!");
+		return 0;
+	} 
 
 	ofs_running << std::endl;
 	OUT(ofs_running,"TOTAL ATOM NUMBER",nat);
