@@ -6,6 +6,7 @@
 // new
 #include "H_XC_pw.h"
 #include "../module_base/math_integral.h"
+#include "potential_libxc.h"
 
 double Forces::output_acc = 1.0e-8; // (Ryd/angstrom).	
 
@@ -553,11 +554,32 @@ void Forces::cal_force_ew(matrix& forceion)
 void Forces::cal_force_cc(matrix& forcecc)
 {
 	// recalculate the exchange-correlation potential.
+	
+    matrix v(GlobalV::NSPIN,GlobalC::pw.nrxx);
+
+	#ifdef USE_LIBXC
+	if(GlobalV::DFT_META)
+	{
+    	const auto etxc_vtxc_v = Potential_Libxc::v_xc_meta(GlobalC::CHR.rho, GlobalC::CHR.rho_core, GlobalC::CHR.kin_r);
+		H_XC_pw::etxc = std::get<0>(etxc_vtxc_v);
+		H_XC_pw::vtxc = std::get<1>(etxc_vtxc_v);
+	    v = std::get<2>(etxc_vtxc_v);
+	}
+	else
+	{	
+    	const auto etxc_vtxc_v = Potential_Libxc::v_xc(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
+		H_XC_pw::etxc = std::get<0>(etxc_vtxc_v);
+		H_XC_pw::vtxc = std::get<1>(etxc_vtxc_v);
+	    v = std::get<2>(etxc_vtxc_v);
+	}
+	#else
     const auto etxc_vtxc_v = H_XC_pw::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 	H_XC_pw::etxc    = std::get<0>(etxc_vtxc_v);			// may delete?
 	H_XC_pw::vtxc    = std::get<1>(etxc_vtxc_v);			// may delete?
-	const matrix vxc = std::get<2>(etxc_vtxc_v);
+	v = std::get<2>(etxc_vtxc_v);
+	#endif
 
+	const matrix vxc = v;
     std::complex<double> * psiv = new std::complex<double> [GlobalC::pw.nrxx];
     ZEROS(psiv, GlobalC::pw.nrxx);
     if (GlobalV::NSPIN == 1 || GlobalV::NSPIN == 4)

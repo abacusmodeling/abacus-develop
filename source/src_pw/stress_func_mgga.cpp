@@ -50,7 +50,7 @@ void Stress_Func::stress_mgga(matrix& sigma)
 			}
 			GGA_PW::grad_wfc(psi, gradwfc, npw);
 
-			int ipol = 1;
+			int ipol = 0;
 			for (int ix = 0; ix < 3; ix++)
 			{
 				for (int iy = 0; iy < ix+1; iy++)
