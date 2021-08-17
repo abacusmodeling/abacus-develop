@@ -570,11 +570,11 @@ void LCAO_Descriptor::cal_gdmx(const matrix &dm)
                                 if (KS_SOLVER == "genelpa" || KS_SOLVER == "scalapack_gvx")
                                 {
                                     gdmx[iat][inl][m2*nm + m1] += 
-									4 * dsx[inl][m1*NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*NLOCAL + nu];
+									2 * dsx[inl][m1*NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*NLOCAL + nu];
                                     gdmy[iat][inl][m2*nm + m1] += 
-									4 * dsy[inl][m1*NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*NLOCAL + nu];
+									2 * dsy[inl][m1*NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*NLOCAL + nu];
                                     gdmz[iat][inl][m2*nm + m1] += 
-									4 * dsz[inl][m1*NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*NLOCAL + nu];
+									2 * dsz[inl][m1*NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*NLOCAL + nu];
                                 }
                                 else
                                 {
