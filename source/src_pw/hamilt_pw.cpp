@@ -540,7 +540,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 				ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
 				for (int ig = 0;ig < GlobalC::kv.ngk[GlobalV::CURRENT_K] ; ig++)
 				{
-					double fact = GlobalC::pw.get_GPlusK_cartesian_projection(GlobalV::CURRENT_K,ig,j) * GlobalC::ucell.tpiba;
+					double fact = GlobalC::pw.get_GPlusK_cartesian_projection(GlobalV::CURRENT_K,GlobalC::wf.igk(GlobalV::CURRENT_K,ig),j) * GlobalC::ucell.tpiba;
 					GlobalC::UFFT.porter[ GR_index[ig] ] = tmpsi_in[ig] * complex<double>(0.0,fact);
 				}
 
@@ -554,7 +554,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 
 				for (int ig = 0;ig < GlobalC::kv.ngk[GlobalV::CURRENT_K] ; ig++)
 				{
-					double fact = GlobalC::pw.get_GPlusK_cartesian_projection(GlobalV::CURRENT_K,ig,j) * GlobalC::ucell.tpiba;
+					double fact = GlobalC::pw.get_GPlusK_cartesian_projection(GlobalV::CURRENT_K,GlobalC::wf.igk(GlobalV::CURRENT_K,ig),j) * GlobalC::ucell.tpiba;
 					tmhpsi[ig] = tmhpsi[ig] - complex<double>(0.0,fact) * GlobalC::UFFT.porter[ GR_index[ig] ];
 				}
 			}//x,y,z directions
