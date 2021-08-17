@@ -579,11 +579,11 @@ void LCAO_Descriptor::cal_gdmx(const matrix &dm)
                                 else
                                 {
                                     gdmx[iat][inl][m1*nm + m2] += 
-									4 * dsx[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
+									2 * dsx[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
                                     gdmy[iat][inl][m1*nm + m2] += 
-									4 * dsy[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
+									2 * dsy[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
                                     gdmz[iat][inl][m1*nm + m2] += 
-									4 * dsz[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
+									2 * dsz[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
                                 }
                             }
                         }//end m2
