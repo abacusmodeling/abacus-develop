@@ -3,7 +3,6 @@
 #include "LJ_potential.h"
 #include "cmd_neighbor.h"
 #include "../input.h"
-#include "../module_base/global_variable.h"
 #include "../src_io/print_info.h"
 #include "../module_neighbor/sltk_atom_arrange.h"
 #include "../module_neighbor/sltk_grid_driver.h"
