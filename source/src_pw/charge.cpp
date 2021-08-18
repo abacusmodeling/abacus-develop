@@ -963,15 +963,16 @@ void Charge::rho_mpi(void)
 
 	if(GlobalV::DFT_META)
 	{
-    	double *tau_tmp = new double[GlobalC::pw.nrxx];
-	    double *tau_tot = new double[GlobalC::pw.ncxyz];
-    	double *tau_tot_aux = new double[GlobalC::pw.ncxyz];
+    	tau_tmp = new double[GlobalC::pw.nrxx];
+	    tau_tot = new double[GlobalC::pw.ncxyz];
+    	tau_tot_aux = new double[GlobalC::pw.ncxyz];
 		ZEROS(tau_tot_aux, GlobalC::pw.ncxyz);
 	}
 
     for (int is=0; is< GlobalV::NSPIN; is++)
     {
         ZEROS(rho_tot, GlobalC::pw.ncxyz);
+		if(GlobalV::DFT_META) ZEROS(tau_tot, GlobalC::pw.ncxyz);
 
 		for (ir=0;ir<GlobalC::pw.nrxx;ir++)
 		{
