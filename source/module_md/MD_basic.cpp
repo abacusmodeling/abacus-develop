@@ -281,7 +281,7 @@ void MD_basic::runNVE(int step1, double potential, Vector3<double> *force, const
   //std::cout<<"Time interval       : "<< mdp.dt*fundamentalTime*1e15<< " (fs)"<<std::endl;
   //std::cout<<"Target temperature  : "<< temperature_/K_BOLTZMAN_AU<< " (K)"<<std::endl;
 
-    if(step_==1){
+    if((step_==1)&&(ucell.set_vel==false)){
         for(int k=0;k<ucell.nat;k++)
         {
             if(ionmbl[k].x==0)vel[k].x=0;

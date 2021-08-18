@@ -19,9 +19,9 @@ Direct //Cartesian or Direct coordinate.
 As
 0
 1
-0.300000          0.3300000          0.27000000     0 0 0
+0.300000          0.3300000          0.27000000  m   0 0 0
 
 Ga              //Element Label
 0
 1              //number of atom
-0.00000          0.00000          0.000000     0 0 0
+0.00000          0.00000          0.000000  m   0 0 0
