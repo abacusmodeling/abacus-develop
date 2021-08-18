@@ -835,7 +835,7 @@ void Charge::sum_band_k(void)
 					ZEROS( porter, GlobalC::pw.nrxx );
 					for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
 					{
-						double fact = GlobalC::pw.get_GPlusK_cartesian_projection(ik,ig,j) * GlobalC::ucell.tpiba;
+						double fact = GlobalC::pw.get_GPlusK_cartesian_projection(ik,GlobalC::wf.igk(ik,ig),j) * GlobalC::ucell.tpiba;
 						porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)] ] = GlobalC::wf.evc[ik](ibnd, ig) * complex<double>(0.0,fact);
 					}
 					GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter, 1);
@@ -963,15 +963,16 @@ void Charge::rho_mpi(void)
 
 	if(GlobalV::DFT_META)
 	{
-    	double *tau_tmp = new double[GlobalC::pw.nrxx];
-	    double *tau_tot = new double[GlobalC::pw.ncxyz];
-    	double *tau_tot_aux = new double[GlobalC::pw.ncxyz];
+    	tau_tmp = new double[GlobalC::pw.nrxx];
+	    tau_tot = new double[GlobalC::pw.ncxyz];
+    	tau_tot_aux = new double[GlobalC::pw.ncxyz];
 		ZEROS(tau_tot_aux, GlobalC::pw.ncxyz);
 	}
 
     for (int is=0; is< GlobalV::NSPIN; is++)
     {
         ZEROS(rho_tot, GlobalC::pw.ncxyz);
+		if(GlobalV::DFT_META) ZEROS(tau_tot, GlobalC::pw.ncxyz);
 
 		for (ir=0;ir<GlobalC::pw.nrxx;ir++)
 		{
