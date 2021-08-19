@@ -60,6 +60,12 @@ public:
 		complex<double> *hpsi, 
 		const complex<double> *becp, 
 		const int m);
+	
+	void add_nonlocal_pp_gpu(
+		CUFFT_COMPLEX *hpsi_in,
+		const CUFFT_COMPLEX *becp,
+		const CUFFT_COMPLEX *d_vkb_c,
+		const int m);
 
 	private:
 
