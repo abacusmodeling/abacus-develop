@@ -434,8 +434,7 @@ bool Electrons::check_stop_now(void)
 void Electrons::c_bands(const int &istep)
 {
     if (GlobalV::test_elec) TITLE("Electrons","c_bands");
-    timer::tick("Electrons", "c_bands"
-    );
+    timer::tick("Electrons", "c_bands");
 
     int precondition_type = 2;
 
@@ -449,6 +448,7 @@ void Electrons::c_bands(const int &istep)
     for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {
         GlobalC::hm.hpw.init_k(ik);
+        GlobalC::hm.hpw_gpu.init_k(ik);
 
         //===========================================
         // Conjugate-Gradient diagonalization
@@ -515,7 +515,7 @@ void Electrons::c_bands(const int &istep)
         avg_iter /= static_cast<double>(GlobalC::kv.nkstot);
     }
     delete [] h_diag;
-    timer::tick("electrons","c_bands");
+    timer::tick("Electrons","c_bands");
     return;
 } // END SUBROUTINE c_bands_k
 

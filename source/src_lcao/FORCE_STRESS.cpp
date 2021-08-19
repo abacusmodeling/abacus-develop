@@ -261,6 +261,13 @@ void Force_Stress_LCAO::getForceStress(
 				{
 					fcs(iat, i) += force_dftu(iat, i);
 				}
+#ifdef __DEEPKS
+				// mohan add 2021-08-04
+				if (INPUT.deepks_scf)
+				{
+					fcs(iat, i) += ld.F_delta(iat, i);
+				}
+#endif
 				//sum total force for correction
 				sum += fcs(iat, i);
 			}
@@ -283,6 +290,7 @@ void Force_Stress_LCAO::getForceStress(
 		{
 			this->forceSymmetry(fcs);
 		}
+
 #ifdef __DEEPKS
 		//DeePKS force, caoyu add 2021-06-03
 		if (INPUT.deepks_scf)

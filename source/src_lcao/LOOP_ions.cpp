@@ -18,7 +18,7 @@
 #include "../src_pw/vdwd2_parameters.h"
 #include "../src_pw/vdwd3_parameters.h"
 #ifdef __DEEPKS
-#include "LCAO_descriptor.h"
+#include "LCAO_descriptor.h"    //caoyu add 2021-07-26
 #endif
 
 LOOP_ions::LOOP_ions()
@@ -178,22 +178,20 @@ void LOOP_ions::opt_ions(void)
 #ifdef __DEEPKS
         if (INPUT.out_descriptor)
         {
-            GlobalC::ld.init(GlobalC::ORB.get_lmax_d(), GlobalC::ORB.get_nchimax_d(), GlobalC::ucell.nat* GlobalC::ORB.Alpha[0].getTotal_nchi());
-            GlobalC::ld.build_S_descriptor(0);  //derivation not needed yet
-            GlobalC::ld.cal_projected_DM();
-            GlobalC::ld.cal_descriptor();
+            //ld.init(ORB.get_lmax_d(), ORB.get_nchimax_d(), ucell.nat* ORB.Alpha[0].getTotal_nchi());
+            //ld.build_S_descriptor(0);  //cal overlap, no need dm
+            GlobalC::ld.cal_projected_DM(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);  //need dm
+            GlobalC::ld.cal_descriptor();    //final descriptor
+            GlobalC::ld.save_npy_d();            //libnpy needed
             if (INPUT.deepks_scf)
             {
-                GlobalC::ld.build_S_descriptor(1);   //for F_delta calculation
-                GlobalC::ld.cal_v_delta(INPUT.model_file);
-                GlobalC::ld.print_H_V_delta();
-                GlobalC::ld.save_npy_d();
-                if (GlobalV::FORCE)
+                //ld.print_H_V_delta();   //final H_delta
+                if (FORCE)
                 {
+                    GlobalC::ld.build_S_descriptor(1);   //for F_delta calculation
                     GlobalC::ld.cal_f_delta(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
                     GlobalC::ld.print_F_delta();
                 }
-
             }
         }
 #endif

@@ -80,6 +80,7 @@ dos.o\
 forces.o\
 global.o \
 hamilt_pw.o \
+hamilt_pw_gpu.o \
 hamilt.o \
 H_Ewald_pw.o\
 H_Hartree_pw.o\
@@ -114,6 +115,7 @@ symmetry_rho.o \
 symm_other.o \
 threshold_elec.o\
 use_fft.o\
+use_fft_kernel.o\
 vdwd2.o\
 vdwd2_parameters.o\
 vdwd3.o\
@@ -128,7 +130,8 @@ xc_2.o\
 xc_3.o \
 xc_gga_pw.o \
 xc_type.o \
-xc_functional.o
+xc_functional.o \
+diago_cg_gpu.o
 
 OBJS_IO=berryphase.o\
 epsilon0_pwscf.o\

@@ -66,6 +66,7 @@ class LCAO_Matrix
 	double* HlocR;
 	double* SlocR;
 	double* Hloc_fixedR;
+
 	//with soc, zhengdy-soc
 	std::complex<double>* HlocR_soc;
 	std::complex<double>* SlocR_soc;
@@ -77,7 +78,6 @@ class LCAO_Matrix
 	std::complex<double> ****Hloc_fixedR_tr_soc;
 	std::complex<double> ****SlocR_tr_soc;
 	std::complex<double> ****HR_tr_soc;	
-
 
 	// jingan add 2021-6-4
 	// Sparse form of HR and SR, the format is [R_x][R_y][R_z][orbit_row][orbit_col]
@@ -127,25 +127,27 @@ class LCAO_Matrix
 	// r_mu - r_nu
 	//----------------------------------------
 	double* DH_r;//zhengdy added 2017-07                        
+
 	double* stvnl11;
 	double* stvnl12;
 	double* stvnl13;
 	double* stvnl22;
 	double* stvnl23;
 	double* stvnl33;
+
 	double* DSloc_11;
 	double* DSloc_12;
 	double* DSloc_13;
 	double* DSloc_22;
 	double* DSloc_23;
 	double* DSloc_33;
+
 	double* DHloc_fixed_11;
 	double* DHloc_fixed_12;
 	double* DHloc_fixed_13;
 	double* DHloc_fixed_22;
 	double* DHloc_fixed_23;
 	double* DHloc_fixed_33;
-
 
 	void set_HSgamma(const int &iw1_all, const int &iw2_all, const double &v, const char &dtype);
 	void set_HSk(const int &iw1_all, const int &iw2_all, const std::complex<double> &v, const char &dtype, const int spin = 0);

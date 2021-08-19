@@ -120,6 +120,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		else
 		{
 			GlobalC::hm.hpw.init_k(0); //only GAMMA
+			GlobalC::hm.hpw_gpu.init_k(0);
 			//In fact, GlobalC::hm.hpw.init_k has been done in GlobalC::wf.wfcinit();
 		}
 		GlobalC::kv.wk[0] = 2;// GAMMA temporary
@@ -397,6 +398,7 @@ void Stochastic_Elec::c_bands(const int &istep)
 	for (int ik = 0;ik < GlobalC::kv.nks;ik++)
 	{
 		GlobalC::hm.hpw.init_k(ik);
+		GlobalC::hm.hpw_gpu.init_k(ik);
 
         //===========================================
         // Conjugate-Gradient diagonalization
