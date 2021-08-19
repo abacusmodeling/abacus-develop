@@ -17,7 +17,7 @@ sigma			0.02
 basis_type		lcao
 out_charge		1
 gamma_only		0
-nstep			2
+nstep			4
 
 stress                  1
 stress_thr              1e-6
@@ -31,5 +31,3 @@ tddft			1
 md_mdtype		0
 md_dt			0.01
 set_vel                 1
-ocp                     1
-ocp_set                 5*2 2*0 1*2 4*0

@@ -376,7 +376,9 @@ void Input_Conv::Convert(void)
 
 
 	// jiyy add 2020.10.11
-	// fix bugs of ocp_set   --  Yuanbo Li 2021/8/17
+	GlobalV::ocp = INPUT.ocp;
+     //ocp_n = INPUT.ocp_n;
+    GlobalV::ocp_set = INPUT.ocp_set;
     if(GlobalV::ocp == 1)
 	{
 		int count = 0;
