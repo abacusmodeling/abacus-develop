@@ -28,6 +28,8 @@ using namespace std;
 //v1-v4: derivative of energy density w.r.t rho, gradient, laplacian and tau
 //v1 and v2 are combined to give v; v4 goes into vofk
 
+//XC_POLARIZED, XC_UNPOLARIZED: internal flags used in LIBXC, denote the polarized(nspin=1) or unpolarized(nspin=2) calculations, definition can be found in xc.h from LIBXC
+
 // [etxc, vtxc, v, vofk] = Potential_Libxc::v_xc(...)
 tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 	const double * const * const rho_in,

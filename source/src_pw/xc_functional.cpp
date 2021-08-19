@@ -809,6 +809,8 @@ void XC_Functional::pbec(const double &rho, const double &grho, const int &iflag
 	return;
 }
 
+//tau_xc and tau_xc_spin: interface for calling xc_mgga_exc_vxc from LIBXC
+//XC_POLARIZED, XC_UNPOLARIZED: internal flags used in LIBXC, denote the polarized(nspin=1) or unpolarized(nspin=2) calculations, definition can be found in xc.h from LIBXC
 #ifdef USE_LIBXC
 void XC_Functional::tau_xc(const double &rho, const double &grho, const double &atau, double &sx, double &sc,
           double &v1x, double &v2x, double &v3x, double &v1c, double &v2c, double &v3c)
