@@ -15,6 +15,10 @@
 #include "../src_lcao/global_fp.h"
 #endif
 
+//the interfacd to libxc xc_lda_exc_vxc and xc_gga_exc_vxc
+//XC_POLARIZED, XC_UNPOLARIZED: internal flags used in LIBXC, denote the polarized(nspin=1) or unpolarized(nspin=2) calculations, definition can be found in xc.h from LIBXC
+//XC_FAMILY_LDA, XC_FAMILY_GGA, XC_FAMILY_HYB_GGA, XC_CORRELATION: internal flags used in LIBXC, denote the types of functional associated with a certain functional ID, definition can be found in xc.h from LIBXC
+
 // [etxc, vtxc, v] = Potential_Libxc::v_xc(...)
 std::tuple<double,double,matrix> Potential_Libxc::v_xc(
 	const double * const * const rho_in,

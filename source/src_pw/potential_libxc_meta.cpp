@@ -10,6 +10,8 @@
 #include "global.h"
 #include "tools.h"
 #include "xc_gga_pw.h"
+#include "./xc_functional.h"
+
 #include "../module_base/global_function.h"
 #ifdef __LCAO
 #include "../src_lcao/global_fp.h"
@@ -25,6 +27,8 @@ using namespace std;
 //e: energy density
 //v1-v4: derivative of energy density w.r.t rho, gradient, laplacian and tau
 //v1 and v2 are combined to give v; v4 goes into vofk
+
+//XC_POLARIZED, XC_UNPOLARIZED: internal flags used in LIBXC, denote the polarized(nspin=1) or unpolarized(nspin=2) calculations, definition can be found in xc.h from LIBXC
 
 // [etxc, vtxc, v, vofk] = Potential_Libxc::v_xc(...)
 tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
@@ -196,15 +200,12 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 			kedtaur[is].resize(GlobalC::pw.nrxx);
 		}
 
-		double rh, ggrho2, atau, ex, ec;
-		vector<double> arho, grho2, tau, lapl;
-		vector<double> v1x, v2x, v3x, v1c, v2c, v3c, vlapl;
-		Vector3<double> v2cup, v2cdw;
-	
-		arho.resize(2);grho2.resize(3);tau.resize(2);
-		v1x.resize(2);v2x.resize(3);v3x.resize(2);
-		v1c.resize(2);v2c.resize(3);v3c.resize(2);
-		lapl.resize(6);vlapl.resize(6);
+		double rh, ggrho2, atau;
+		double rhoup, rhodw, tauup, taudw;
+		double ex, v1xup, v1xdw, v2xup, v2xdw, v3xup, v3xdw;
+		double ec, v1cup, v1cdw, v3cup, v3cdw;
+		Vector3<double> grhoup,grhodw,v2cup,v2cdw;
+
 	
 		const double rho_th  = 1e-8;
 		const double grho_th = 1e-12;
@@ -212,42 +213,33 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 
 		for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 		{
-			arho[0] = rho_in[0][ir]; arho[1] = rho_in[1][ir];
-			rh = arho[0] + arho[1];
+			rhoup = rho_in[0][ir];
+			rhodw = rho_in[1][ir];
+			rh = rhoup + rhodw;
 
-			grho2[0]=grho[0][ir]*grho[0][ir];
-			grho2[1]=grho[0][ir]*grho[1][ir];
-			grho2[2]=grho[1][ir]*grho[1][ir];
-			ggrho2 = (grho2[0] + grho2[2]) * 4.0;
+			grhoup = grho[0][ir];
+			grhodw = grho[1][ir];
+			ggrho2 = (grhoup*grhoup + grhodw*grhodw) * 4.0;
 
-			tau[0] = kin_r[0][ir] / e2;tau[1] = kin_r[1][ir] / e2;
-			atau = tau[0] + tau[1];
+			tauup = kin_r[0][ir] / e2;
+			taudw = kin_r[1][ir] / e2;
+			atau = tauup + taudw;
 
 			if (rh > rho_th && ggrho2 > grho_th && abs(atau) > tau_th)
 			{
-				xc_mgga_exc_vxc(&x_func,1,arho.data(),grho2.data(),lapl.data(),tau.data(),&ex,v1x.data(),v2x.data(),vlapl.data(),v3x.data());
-				xc_mgga_exc_vxc(&c_func,1,arho.data(),grho2.data(),lapl.data(),tau.data(),&ec,v1c.data(),v2c.data(),vlapl.data(),v3c.data());
+				XC_Functional::tau_xc_spin(rhoup, rhodw, grhoup, grhodw, tauup, taudw, ex, ec, v1xup, v1xdw, v2xup, v2xdw, v3xup, v3xdw, v1cup, v1cdw, v2cup, v2cdw, v3cup, v3cdw );
 
-				ex = ex*rh;
-				v2x[0]=v2x[0]*e2;v2x[1]=v2x[1]*e2;
+				vrho[0][ir] = (v1xup+v1cup) * e2;
+				vrho[1][ir] = (v1xdw+v1cdw) * e2;
+
+				h[0][ir] = (v2xup*grhoup+v2cup)*e2;
+				h[1][ir] = (v2xdw*grhodw+v2cdw)*e2;
 				
-				ec = ec*rh;
-				v2c[0]=v2c[0]*e2;v2c[1]=v2c[1]*e2;
-
-				v2cup=v2c[0]*grho[0][ir]*e2 + v2c[1]*grho[1][ir];
-				v2cdw=v2c[2]*grho[1][ir]*e2 + v2c[1]*grho[0][ir];
-
-				vrho[0][ir] = (v1x[0]+v1c[0]) * e2;
-				vrho[1][ir] = (v1x[1]+v1c[1]) * e2;
-
-				h[0][ir] = (v2x[0]*grho[0][ir]+v2cup)*e2;
-				h[1][ir] = (v2x[1]*grho[1][ir]+v2cdw)*e2;
-				
-				kedtaur[0][ir] = v3x[0]+v3c[0];
-				kedtaur[1][ir] = v3x[1]+v3c[1];
+				kedtaur[0][ir] = v3xup+v3cup;
+				kedtaur[1][ir] = v3xdw+v3cdw;
 
 				etxc += (ex+ec) * e2;
-				vtxc += (v1x[0]+v1x[1]+v1c[0]+v1c[1]) * e2 * rh;
+				vtxc += (v1xup+v1xdw+v1cup+v1cdw) * e2 * rh;
 			}
 			else
 			{
