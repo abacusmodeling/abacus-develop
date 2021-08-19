@@ -599,6 +599,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
                                         while ( (tmpid != "\n") && (ifpos.eof()==false) && (tmpid !="#") )
                                         {
 						tmpid = ifpos.get() ;
+                                                ofs_running << "read char : ##"<<tmpid<<"##"<<endl;
                                                 if ( tmpid == "m" )
                                                 {
                                                         ifpos >> mv.x >> mv.y >> mv.z ;

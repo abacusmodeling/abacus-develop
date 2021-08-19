@@ -42,7 +42,7 @@ md_outputstressperiod 0
 tddft 1
 set_vel 1
 ocp 1
-ocp_set 6*2 6*0
+ocp_set 2*6 0*6
 val_elec_01 5
 vext 1
 vext_dire 2
@@ -52,7 +52,7 @@ Note: *The TDDFT simulation is based on molecular dynamics in ABACUS. Accomplish
 - tddft : 1, calculate TDDFT; 0, no calculate TDDFT.
 - set_vel : 1, set the initial velocities of the atoms in STRU; 0, do not set the initial velocities.
 - ocp : 1, set initial occupations ; 0 , do not set initial occupations.
-- ocp_set : occupations multiplies the number of the bands. For example, 6*2 6*0 means that the occupations of the lower 6 bands are 2 and the occupations of the higer 6 bands are 0.
+- ocp_set : occupations multiplies the number of the bands. For example, 2*6 0*6 means that the occupations of the lower 6 bands are 2 and the occupations of the higer 6 bands are 0.
 - vext : 1, a laser material interaction is included; 0, no extern laser field.
 - vext_dire : 1, 2, 3, the direction of the extern laser field added x, y, z.
 The results of the TDDFT calculation are dependent on what you want. Dynamics, High-order harmonic generation and occupation could be achieved when you do TDDFT calculation. Users can also do some post-processing according to the basic TDDFT calculation.
