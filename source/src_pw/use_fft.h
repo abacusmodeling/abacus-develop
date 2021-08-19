@@ -2,6 +2,10 @@
 #define USE_FFT_H
 
 #include "tools.h"
+#include "cufft.h"
+#include "use_fft_kernel.h"
+
+typedef cufftDoubleComplex CUFFT_COMPLEX;
 
 class Use_FFT
 {
@@ -33,7 +37,6 @@ class Use_FFT
 
 	// From real space to G space.
 	void ToReciSpace(const double* vr, complex<double> *vg);
-	
 
 	//---------------------------------------------------------------------
 	
@@ -42,6 +45,11 @@ class Use_FFT
 		const double *vr,
 		const int *_index,
 		complex<double> *psic);
+
+	void RoundTrip_GPU(const CUFFT_COMPLEX *psi, const double *vr, const int *fft_index, CUFFT_COMPLEX *psic)
+	{
+		UfftRoundtripKernel(psi, vr, fft_index, psic);
+	}
 
 	private:
 

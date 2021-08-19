@@ -1,6 +1,7 @@
 #include "use_fft.h"
 #include "global.h"
 
+
 Use_FFT::Use_FFT()
 {
 	porter = new complex<double>[GlobalC::pw.nrxx];	
@@ -13,10 +14,14 @@ Use_FFT::~Use_FFT()
 
 void Use_FFT::allocate(void)
 {
+    // cout<<"before title!, pw.nrxx = "<<GlobalC::pw.nrxx<<endl;
     TITLE("Use_FFT","allocate");
 
     delete[] porter;
+    // cout<<"before new"<<endl;
+    // cout<<"pw.nrxx = "<<GlobalC::pw.nrxx<<endl;
     porter = new complex<double>[GlobalC::pw.nrxx];
+    // cout<<"after new"<<endl;
     Memory::record("Use_FFT","porter",GlobalC::pw.nrxx,"complexmatrix");
 
     return;
@@ -45,6 +50,40 @@ void Use_FFT::RoundTrip(
     GlobalC::pw.FFT_wfc.FFT3D( psic, -1);
     return;
 }
+
+// void Use_FFT::RoundTrip_GPU(
+//     const CUFFT_COMPLEX *psi,
+//     const double *vr,
+//     const int *fft_index,
+//     CUFFT_COMPLEX *psic)
+// {
+//     cout<<"rounftrip on GPU!"<<endl;
+//     // (1) set value
+//     int thread = 512;
+//     int block = GlobalC::wf.npw / thread + 1;
+//     // kernel_set<<<block, thread>>>(GlobalC::wf.npw, psic, psi, fft_index);
+//     // for(int ig=0;ig<wf.npw;ig++)
+//     // {
+//     //     psic[fft_index[ig]] = psi[ig];
+//     // }
+
+//     // (2) fft to real space and do things.
+//     cufftHandle cufftplan_gpu;
+//     cufftPlan3d(&cufftplan_gpu, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
+//     cufftExecZ2Z(cufftplan_gpu, psic, psic, CUFFT_FORWARD);
+    
+//     int block2 = GlobalC::pw.nrxx / thread + 1;
+//     // kernel_roundtrip<<<block2, thread>>>(GlobalC::pw.nrxx, psic, vr);
+
+//     // (3) fft back to G space
+//     cufftPlan3d(&cufftplan_gpu, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
+//     cufftExecZ2Z(cufftplan_gpu, psic, psic, CUFFT_INVERSE);
+
+//     cufftDestroy(cufftplan_gpu);
+
+//     cout<<"rounftrip end"<<endl;
+//     return;
+// }
 
 void Use_FFT::ToRealSpace(const int &is, const ComplexMatrix &vg, double *vr)
 {
