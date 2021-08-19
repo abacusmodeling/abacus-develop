@@ -90,17 +90,23 @@ void Run_MD_CLASSIC::md_cells_classic(void)
 								this->force);
 		}
 
-		ofstream force_out("force.txt", ios::app);
-		if(GlobalV::MY_RANK==0)
-		{
-			for(int i=0; i<ucell_c.nat; ++i)
-			{
-				force_out << setw(18) << setiosflags(ios::fixed) << setprecision(12) << force[i].x*Ry_to_eV*ANGSTROM_AU
-             	 			<< setw(18) << setiosflags(ios::fixed) << setprecision(12) << force[i].y*Ry_to_eV*ANGSTROM_AU
-        	 	 			<< setw(18) << setiosflags(ios::fixed) << setprecision(12) << force[i].z*Ry_to_eV*ANGSTROM_AU << endl;
-			}
-		}
-		force_out.close();
+		// ofstream force_out("force.txt", ios::app);
+		// if(GlobalV::MY_RANK==0)
+		// {
+		// 	for(int i=0; i<ucell_c.nat; ++i)
+		// 	{
+		// 		force_out << setw(18) << setiosflags(ios::fixed) << setprecision(12) << force[i].x*Ry_to_eV*ANGSTROM_AU
+        //      	 			<< setw(18) << setiosflags(ios::fixed) << setprecision(12) << force[i].y*Ry_to_eV*ANGSTROM_AU
+        // 	 	 			<< setw(18) << setiosflags(ios::fixed) << setprecision(12) << force[i].z*Ry_to_eV*ANGSTROM_AU << endl;
+		// 	}
+		// }
+		// force_out.close();
+		// ofstream energy_out("energy.txt", ios::app);
+		// if(GlobalV::MY_RANK==0)
+		// {
+		// 	energy_out << ucell_c.lat0 << "    "  << setiosflags(ios::fixed) << setprecision(12) << potential*Ry_to_eV << endl;
+		// }
+		// energy_out.close();
 
 		this->update_pos_classic();
 

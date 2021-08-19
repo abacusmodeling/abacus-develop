@@ -511,7 +511,7 @@ calculations.
     - *Description*: It indicates which occupation and smearing method is used in the calculation.
         - fixed: use fixed occupations.
         - gauss or gaussian: use gaussian smearing method.
-        - mp: use methfessel-paxton smearing method.
+        - mp: use methfessel-paxton smearing method. The method recommends for metals. 
     - *Default*: fixed
 
     [back to top](#input-file)
