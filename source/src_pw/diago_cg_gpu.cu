@@ -99,7 +99,7 @@ void Diago_CG_GPU::diag
 
     // cout<<"begin diago fft dim"<<GlobalC::pw.nx<<" "<<GlobalC::pw.ny<<" "<<GlobalC::pw.nz<<endl;
     // cout << &GlobalC::pw << endl;
-    if (test_cg==1) TITLE("Diago_CG_GPU","ccgdiagg");
+    if (test_cg==1) TITLE("Diago_CG_GPU","diag");
     timer::tick("Diago_CG_GPU","diag");
 
     avg_iter = 0.0;
@@ -158,15 +158,6 @@ void Diago_CG_GPU::diag
     {
         if (test_cg>2) GlobalV::ofs_running << "Diagonal Band : " << m << endl;
         
-        // cout<<"Test Phi_m ... "<<endl;
-        // complex<double> *test_phim = new complex<double>[15];
-        // cudaMemcpy(test_phim, &phi[m*dmx], 15*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
-        // for(int i=0;i<15;i++)
-        // {
-        //     cout<<test_phim[i].real()<<" "<<test_phim[i].imag()<<endl;
-        // }
-        // delete [] test_phim;
-
         cudaMemcpy(phi_m, &phi[m*dmx], dim*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice);
 
         err = cudaGetLastError();
@@ -185,11 +176,7 @@ void Diago_CG_GPU::diag
         }
         
         this->schmit_orth(dim, dmx, m, phi, sphi, phi_m);
-        // pw.h_1psi(dim, phi_m, hphi, sphi);
 
-        // GlobalC::hm.hpw.h_1psi(dim, phi_m_cpu, hphi_cpu, sphi_cpu);
-        // cout<<"fft dim before hpsi: "<<GlobalC::pw.nx<<" "<<GlobalC::pw.ny<<" "<<GlobalC::pw.nz<<endl;
-        // cout<<"dim SUCCESS !!!!!!"<<dim<<endl;
         GlobalC::hm.hpw_gpu.h_1psi(dim, phi_m, hphi, sphi);
 
         err = cudaGetLastError();
@@ -198,19 +185,10 @@ void Diago_CG_GPU::diag
             cout << "Cuda error: "<< cudaGetErrorString(err) <<" in "<< __LINE__ << endl;
         }
 
-        // cout<<"hpsi end"<<endl;
-
-        // cout<<"before ddot"<<endl;
-
         double em_host = 0;
-        // cout<<"EM_host1: "<<em_host<<endl;
         em_host = ddot_real(dim, phi_m, hphi);
-        // cout<<"EM_host2: "<<em_host<<endl;
 
-        // cout<<"ddot!"<<endl;
-        // cudaMemcpyToSymbol(&e[m], &em_host, sizeof(double));
         cudaMemcpy(&e[m], &em_host, sizeof(double), cudaMemcpyHostToDevice);
-        // cout<<"ddot real end"<<endl;
 
         int iter = 0;
         double gg_last = 0.0;
@@ -233,24 +211,12 @@ void Diago_CG_GPU::diag
 
         cudaMemcpy(&phi[m*dmx], phi_m, dim*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice);
         
-        // cout<<"****************  Test m+1 iter ... ***********"<<endl;
-        // complex<double> *test_iter = new complex<double>[15];
-        // cudaMemcpy(test_iter, &phi[(m+1)*dim], 15*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
-        // for(int i=0;i<15;i++)
-        // {
-        //     cout<<test_iter[i].real()<<" "<<test_iter[i].imag()<<endl;
-        // }
-        // delete [] test_iter;
-
         if (!converged)
         {
             ++notconv;
         }
 
         avg_iter += static_cast<double>(iter) + 1.00;
-
-        // reorder eigenvalues if they are not in the right order
-        // (this CAN and WILL happen in not-so-special cases)
 
         if (m > 0 && reorder)
         {
@@ -259,12 +225,6 @@ void Diago_CG_GPU::diag
             e_host = (double*)malloc(n_band*sizeof(double));
             ZEROS(e_host, n_band);
             cudaMemcpy(e_host, e, n_band*sizeof(double), cudaMemcpyDeviceToHost);
-            
-            // cout<<"e info before reorder .. "<<endl;
-            // for(int i=0;i<10;i++)
-            // {
-            //     cout<<e_host[i]<<endl;
-            // }
             
             if (e_host[m]-e_host[m-1]<-2.0*eps)
             {
@@ -389,15 +349,10 @@ void Diago_CG_GPU::orthogonal_gradient( const int &dim, const int &dmx,
 
     // Parallel_Reduce::reduce_complex_double_pool(lagrange, m); // todo
     // (3) orthogonal |g> and |Sg> to all states (0~m-1)
-    // char trans2='N';
     cublasOperation_t trans2 = CUBLAS_OP_N;
-    // cublasZgemv(handle, trans2, dim, m, NEG_ONE, eigenfunction, dmx, lagrange, inc, ONE, g, inc);
-    // cublasZgemv(handle, trans2, dim, m, NEG_ONE, eigenfunction, dmx, lagrange, inc, ONE, sg, inc);
 
     cublasZgemv(handle, trans2, dim, m, &NEG_ONE, eigenfunction, dmx, lagrange, inc, &ONE, g, inc);
     cublasZgemv(handle, trans2, dim, m, &NEG_ONE, eigenfunction, dmx, lagrange, inc, &ONE, sg, inc);
-    // zgemv_(&trans2,&dim,&m,&NEG_ONE,eigenfunction.c,&dmx,lagrange,&inc,&ONE,g,&inc);
-    // zgemv_(&trans2,&dim,&m,&NEG_ONE,eigenfunction.c,&dmx,lagrange,&inc,&ONE,sg,&inc);
     
     /*for (int i=0; i<m; i++)
     {
@@ -565,8 +520,6 @@ bool Diago_CG_GPU::update_psi(
     }
 
     eigenvalue = min( e1, e2 );
-    // cout<<"====== Get E:========"<<endl;
-    // cout<<eigenvalue <<endl;
 
     const double cost = cos(theta);
     const double sint_norm = sin(theta)/cg_norm;
@@ -631,37 +584,19 @@ void Diago_CG_GPU::schmit_orth
     ONE.x = 1.0;
     NEG_ONE.x = -1.0;
     cublasZgemv(handle, trans1, dim, mp1, &ONE, psi, dmx, sphi, inc, &ZERO, lagrange, inc);
-
-    // cout<<"Test Lagrange ... "<<endl;
-    // complex<double> *test_lag = new complex<double>[m+1];
-    // cudaMemcpy(test_lag, lagrange, (m+1)*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
-    // for(int i=0;i<m+1;i++)
-    // {
-    //     cout<<test_lag[i].real()<<" "<<test_lag[i].imag()<<endl;
-    // }
-    // delete [] test_lag;
   
     double psi_norm;
     cudaMemcpy(&psi_norm, &lagrange[m], sizeof(double), cudaMemcpyDeviceToHost);
     cublasOperation_t trans2 = CUBLAS_OP_N;
     cublasZgemv(handle, trans2, dim, m, &NEG_ONE, psi, dmx, lagrange, inc, &ONE, psi_m, inc);
 
-    // cout<<psi_norm<<endl;
-
     psi_norm -= ddot_real(m, lagrange, lagrange); //next
-
-    // cout<<"Psi norm before sqrt:"<<psi_norm<<endl;
-
-    psi_norm = sqrt(psi_norm); // 
-
-    // cout<<"Psi norm after sqrt:"<<psi_norm<<endl;
+    psi_norm = sqrt(psi_norm); 
 
     int thread = 512;
     int block = dim / 512 + 1;
     kernel_normalization<<<block, thread>>>(psi_m, dim, psi_norm);
 
-    // pw.s_1psi(dim, psi_m, sphi);
-    // cudaMemcpy(sphi, psi_m, dim*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice);
     GlobalC::hm.hpw_gpu.s_1psi(dim, psi_m, sphi);
 
     cublasDestroy(handle);
