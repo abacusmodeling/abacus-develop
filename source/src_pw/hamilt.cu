@@ -1,5 +1,5 @@
-#include "global.h"
 #include "cufft.h"
+#include "global.h"
 #include "hamilt.h"
 #include "diago_cg.h"
 #include "diago_cg_gpu.h" // Diago_CG_GPU
@@ -33,12 +33,12 @@ void Hamilt::diagH_pw(
 		{
 			// generate PAOs first, then diagonalize to get
 			// inital wavefunctions.
-			GlobalC::wf.diago_PAO_in_pw_k2(ik, GlobalC::wf.evc[0]);	
+			GlobalC::wf.diago_PAO_in_pw_k2(ik, GlobalC::wf.evc[0]);
 		}
 #ifdef __LCAO
 		else if(GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{
-			GlobalC::wf.LCAO_in_pw_k(ik, wf.wanf2[0]);
+			GlobalC::wf.LCAO_in_pw_k(ik, GlobalC::wf.wanf2[0]);
 		}
 #endif
 		ik0 = 0;
@@ -50,16 +50,16 @@ void Hamilt::diagH_pw(
 		{
 			assert(GlobalV::NLOCAL >= GlobalV::NBANDS);
         	this->diagH_subspace(
-				ik, 
-				GlobalV::NLOCAL, 
-				GlobalV::NBANDS, 
-				GlobalC::wf.wanf2[ik0], 
-				GlobalC::wf.evc[ik0], 
+				ik,
+				GlobalV::NLOCAL,
+				GlobalV::NBANDS,
+				GlobalC::wf.wanf2[ik0],
+				GlobalC::wf.evc[ik0],
 				GlobalC::wf.ekb[ik]);
 		}
 		else
 		{
-			GlobalV::ofs_warning << " The diago_type " << GlobalV::KS_SOLVER 
+			GlobalV::ofs_warning << " The diago_type " << GlobalV::KS_SOLVER
 				<< " not implemented yet." << endl; //xiaohui add 2013-09-02
 			WARNING_QUIT("Hamilt::diago","no implemt yet.");
 		}
@@ -69,18 +69,18 @@ void Hamilt::diagH_pw(
         int ntry = 0;
         int notconv = 0;
         do
-        {	
+        {
 	   		if(GlobalV::KS_SOLVER=="cg")
-            {			
+            {
 				// qian change it, because it has been executed in diago_PAO_in_pw_k2
                 if ( iter > 1 || istep > 1 ||  ntry > 0)
                 {
-                    this->diagH_subspace( 
+                    this->diagH_subspace(
 						ik,
-						GlobalV::NBANDS, 
-						GlobalV::NBANDS, 
-						GlobalC::wf.evc[ik0], 
-						GlobalC::wf.evc[ik0], 
+						GlobalV::NBANDS,
+						GlobalV::NBANDS,
+						GlobalC::wf.evc[ik0],
+						GlobalC::wf.evc[ik0],
 						GlobalC::wf.ekb[ik]);
 
                     avg_iter += 1.0;
@@ -102,7 +102,7 @@ void Hamilt::diagH_pw(
                 // cudaMalloc((void**)&d_precondition, DIM_CG_GPU * sizeof(double));
 
                 cout << "Do diag begin ... " <<endl;
-				if(GlobalV::NPOL==1) 
+				if(GlobalV::NPOL==1)
 				{
 					// cg.diag(wf.evc[ik0], wf.ekb[ik], kv.ngk[ik], wf.npwx,
 					// 	NBANDS, precondition, ETHR,
@@ -137,18 +137,18 @@ void Hamilt::diagH_pw(
                     //     cout<<test_cuda[i].real()<<" "<<test_cuda[i].imag()<<endl;
                     // }
                     // delete [] test_cuda;
-                    
+
                     // do things
                     cout<<"pass"<<__LINE__<<endl;
 
                     clock_t test_t1, test_t2;
 
                     test_t1 = clock();
-                    cg_gpu.diag(d_wf_evc, d_wf_ekb, DIM_CG_GPU, GlobalC::wf.npwx, 
+                    cg_gpu.diag(d_wf_evc, d_wf_ekb, DIM_CG_GPU, GlobalC::wf.npwx,
                         GlobalV::NBANDS, d_precondition, GlobalV::ETHR,
                         GlobalV::DIAGO_CG_MAXITER, reorder, notconv, avg);
 
-                    
+
                     test_t2 = clock();
                     double total_time = (double)(test_t2 - test_t1) / CLOCKS_PER_SEC;
                     cout<<"Diago time ... "<<total_time<<endl;
@@ -182,7 +182,7 @@ void Hamilt::diagH_pw(
                     clock_t test_t1, test_t2;
 
                     test_t1 = clock();
-                    cg_gpu.diag(d_wf_evc, d_wf_ekb, DIM_CG_GPU2, DIM_CG_GPU2, 
+                    cg_gpu.diag(d_wf_evc, d_wf_ekb, DIM_CG_GPU2, DIM_CG_GPU2,
                         GlobalV::NBANDS, d_precondition, GlobalV::ETHR,
                         GlobalV::DIAGO_CG_MAXITER, reorder, notconv, avg);
 
@@ -209,7 +209,7 @@ void Hamilt::diagH_pw(
 	   		else if(GlobalV::KS_SOLVER=="dav")
         	{
 				Diago_David david;
-				if(GlobalV::NPOL==1) 
+				if(GlobalV::NPOL==1)
 				{
 					david.diag(GlobalC::wf.evc[ik0], GlobalC::wf.ekb[ik], GlobalC::kv.ngk[ik],
 						GlobalV::NBANDS, precondition, GlobalV::DIAGO_DAVID_NDIM,
@@ -246,7 +246,7 @@ void Hamilt::diagH_pw(
 bool Hamilt::test_exit_cond(const int &ntry, const int &notconv)
 {
     //================================================================
-    // If this logical function is true, need to do diagH_subspace 
+    // If this logical function is true, need to do diagH_subspace
 	// and cg again.
     //================================================================
 
@@ -330,7 +330,7 @@ void Hamilt::diagH_LAPACK(
     {
         nb = std::max(1, nstart);
     }
-    
+
 	if (nb == 1 || nb >= nstart)
     {
         lwork = 2 * nstart; // mohan modify 2009-08-02
@@ -342,7 +342,7 @@ void Hamilt::diagH_LAPACK(
 
     complex<double> *work = new complex<double>[lwork];
 	ZEROS(work, lwork);
-	
+
     //=====================================================================
     // input s and (see below) h are copied so that they are not destroyed
     //=====================================================================
@@ -357,7 +357,7 @@ void Hamilt::diagH_LAPACK(
     {
         rwork_dim = 7*nstart;
     }
-	
+
     double *rwork = new double[rwork_dim];
     ZEROS( rwork, rwork_dim );
 
