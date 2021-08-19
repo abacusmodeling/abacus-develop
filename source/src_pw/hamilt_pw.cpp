@@ -25,9 +25,9 @@ Hamilt_PW::~Hamilt_PW()
 
 
 void Hamilt_PW::allocate(
-	const int &npwx, 
-	const int &npol, 
-	const int &nkb, 
+	const int &npwx,
+	const int &npol,
+	const int &nkb,
 	const int &nrxx)
 {
     TITLE("Hamilt_PW","allocate");
@@ -58,7 +58,7 @@ void Hamilt_PW::allocate(
 void Hamilt_PW::init_k(const int ik)
 {
     TITLE("Hamilt_PW","init_k");
-	
+
 	// mohan add 2010-09-30
 	// (1) Which spin to use.
 	if(GlobalV::NSPIN==2)
@@ -93,7 +93,7 @@ void Hamilt_PW::init_k(const int ik)
 
 	// (7) ik
 	GlobalV::CURRENT_K = ik;
-	
+
     return;
 }
 
@@ -130,7 +130,7 @@ void Hamilt_PW::diagH_subspace(
 		dmin= npw;
 		dmax = GlobalC::wf.npwx;
 	}
-	else 
+	else
 	{
 		dmin = GlobalC::wf.npwx*GlobalV::NPOL;
 		dmax = GlobalC::wf.npwx*GlobalV::NPOL;
@@ -178,7 +178,7 @@ void Hamilt_PW::diagH_subspace(
 		}
 		else if( 9==GlobalC::xcf.iexch_now && 12==GlobalC::xcf.igcx_now )			// HSE
 		{
-			add_Hexx(GlobalC::exx_global.info.hybrid_alpha);		
+			add_Hexx(GlobalC::exx_global.info.hybrid_alpha);
 		}
 	}
 #endif
@@ -207,7 +207,7 @@ void Hamilt_PW::diagH_subspace(
 		}
 	}
 #endif
-		
+
     //=======================
     //diagonize the H-matrix
     //=======================
@@ -267,11 +267,11 @@ void Hamilt_PW::diagH_subspace(
 	{
 		GlobalV::ofs_running << " Not do zgemm to get evc." << endl;
 	}
-	else if((GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") 
+	else if((GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 		&& ( GlobalV::CALCULATION == "scf" || GlobalV::CALCULATION == "md" || GlobalV::CALCULATION == "relax")) //pengfei 2014-10-13
 	{
 		// because psi and evc are different here,
-		// I think if psi and evc are the same, 
+		// I think if psi and evc are the same,
 		// there may be problems, mohan 2011-01-01
 		char transa = 'N';
 		char transb = 'T';
@@ -311,7 +311,7 @@ void Hamilt_PW::diagH_subspace(
 //	cout << "\n bands" << endl;
 //	for(int ib=0; ib<n_band; ib++)
 //	{
-//		cout << " ib=" << ib << " " << en[ib] * Ry_to_eV << endl; 
+//		cout << " ib=" << ib << " " << en[ib] * Ry_to_eV << endl;
 //	}
 
     //out.printcm_norm("hvec",hvec,1.0e-8);
@@ -366,7 +366,7 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, cons
 	complex<double> *tmhpsi;
 	const complex<double> *tmpsi_in;
  	if(GlobalV::T_IN_H)
-	{	
+	{
 		tmhpsi = hpsi;
 		tmpsi_in = psi_in;
 		for(int ib = 0 ; ib < m; ++ib)
@@ -508,7 +508,7 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, cons
 			{
 				const complex<double>* p = &GlobalC::ppcell.vkb(i,0);
 				const complex<double>* const p_end = p + GlobalC::wf.npw;
-				const complex<double>* psip = psi_in; 
+				const complex<double>* psip = psi_in;
 				for (;p<p_end;++p,++psip)
 				{
 					if(!GlobalV::NONCOLIN) becp[i] += psip[0]* conj( p[0] );
@@ -545,13 +545,13 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, cons
 				}
 
 				GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter, 1);
-		
+
 				for (int ir = 0; ir < GlobalC::pw.nrxx; ir++)
-				{	
+				{
 					GlobalC::UFFT.porter[ir] = GlobalC::UFFT.porter[ir] * GlobalC::pot.vofk(GlobalV::CURRENT_SPIN,ir);
 				}
 				GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter, -1);
-				
+
 				for (int ig = 0;ig < GlobalC::kv.ngk[GlobalV::CURRENT_K] ; ig++)
 				{
 					double fact = GlobalC::pw.get_GPlusK_cartesian_projection(GlobalV::CURRENT_K,ig,j) * GlobalC::ucell.tpiba;
@@ -599,12 +599,12 @@ void Hamilt_PW::add_nonlocal_pp(
 					{
 						for(int ib = 0; ib < m ; ++ib)
 						{
-							ps[(sum + ip2) * m + ib] += 
-							GlobalC::ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip, ip2) 
+							ps[(sum + ip2) * m + ib] +=
+							GlobalC::ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip, ip2)
 							* becp[ib * nkb + sum + ip];
 						}//end ib
 					}// end ih
-				}//end jh 
+				}//end jh
 				sum += nproj;
 				++iat;
 			} //end na
@@ -667,16 +667,16 @@ void Hamilt_PW::add_nonlocal_pp(
 	if(GlobalV::NPOL==1 && m==1)
 	{
 		int inc = 1;
-		zgemv_(&transa, 
-			&GlobalC::wf.npw, 
-			&GlobalC::ppcell.nkb, 
-			&ONE, 
-			GlobalC::ppcell.vkb.c, 
-			&GlobalC::wf.npwx, 
-			ps, 
-			&inc, 
-			&ONE, 
-			hpsi_in, 
+		zgemv_(&transa,
+			&GlobalC::wf.npw,
+			&GlobalC::ppcell.nkb,
+			&ONE,
+			GlobalC::ppcell.vkb.c,
+			&GlobalC::wf.npwx,
+			ps,
+			&inc,
+			&ONE,
+			hpsi_in,
 			&inc);
 	}
 	else
@@ -778,9 +778,9 @@ void Hamilt_PW::diag_zheev(const int &npw_in, ComplexMatrix &psi, const int &nba
             tmp1 += conj(eta[ig]) * eta[ig] ;
         }
 
-        tmp /= tmp1 ;
+		tmp = tmp * conj(tmp1) / (norm(tmp1));
 
-        tmpen[i] = tmp.real() ;
+		tmpen[i] = tmp.real() ;
 
         for (int j = 0; j <= i; j++)
         {
@@ -999,8 +999,8 @@ complex<double> Hamilt_PW::ddot(
 	const int incx = 1;
 	const int incy = 1;
 	// mohan add 2010-10-11
-	zdotc_(&result, &dim, psi_L, &incx, psi_R, &incy); 
-    
+	zdotc_(&result, &dim, psi_L, &incx, psi_R, &incy);
+
 	if(GlobalV::NPROC_IN_POOL>1)
 	{
 		Parallel_Reduce::reduce_complex_double_pool( result );
@@ -1017,7 +1017,7 @@ complex<double> Hamilt_PW::just_ddot(
 	complex<double> result = ZERO;
 
 	// mohan add 2010-10-11
-//	zdotc_(&result, &dim, psi_L, &incx, psi_R, &incy);  
+//	zdotc_(&result, &dim, psi_L, &incx, psi_R, &incy);
 
 	// mohan update 2011-09-21
 	static int warn_about_zdotc=true;
@@ -1029,7 +1029,7 @@ complex<double> Hamilt_PW::just_ddot(
 	}
 	for(int i=0; i<dim; ++i)
 	{
-		result += conj(psi_L[i])*psi_R[i];	
+		result += conj(psi_L[i])*psi_R[i];
 	}
 
     return result;
@@ -1057,4 +1057,3 @@ complex<double> Hamilt_PW::ddot(
 
     return result;
 }  // end of ddot
-
