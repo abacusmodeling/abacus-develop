@@ -13,7 +13,7 @@ class ORB_control
 
     /// Generate the S(overlap),T,NL matrix.
     void set_orb_tables(
-		ofstream &ofs_in, // mohan add 2021-05-07
+		std::ofstream &ofs_in, // mohan add 2021-05-07
 		ORB_gen_tables &OGT, 
 		LCAO_Orbitals &orb,
 		const int &ntype, ///< number of speceies, mohan add 2021-04-26

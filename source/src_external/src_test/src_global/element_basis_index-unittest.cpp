@@ -29,10 +29,10 @@ Element_Basis_Index::Range construct_range()
 int main()
 {
 	const Element_Basis_Index::Range range = construct_range();
-	cout<<"range:"<<endl<<range<<endl;
+	std::cout<<"range:"<<std::endl<<range<<std::endl;
 	
 	const Element_Basis_Index::IndexLNM index = Element_Basis_Index::construct_index( range );
-	cout<<"index:"<<endl<<index<<endl;
+	std::cout<<"index:"<<std::endl<<index<<std::endl;
 
 	return 0;
 }

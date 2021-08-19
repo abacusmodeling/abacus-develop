@@ -17,9 +17,9 @@
 Update_input::Update_input() {}
 Update_input::~Update_input() {}
 
-void Update_input::init(const string &fn)
+void Update_input::init(const std::string &fn)
 {
-	GlobalV::ofs_warning << "\n CHECK UPDATE INPUT INFORMATION" << endl;
+	GlobalV::ofs_warning << "\n CHECK UPDATE INPUT INFORMATION" << std::endl;
     this->Read(fn);
 #ifdef __MPI
     Bcast();
@@ -28,11 +28,11 @@ void Update_input::init(const string &fn)
     return;
 }
 
-bool Update_input::Read(const string &fn)
+bool Update_input::Read(const std::string &fn)
 {
     if (GlobalV::MY_RANK!=0) return false;
 
-    ifstream ifs(fn.c_str(), ios::in);	// "in_datas/input_parameters"
+    std::ifstream ifs(fn.c_str(), ios::in);	// "in_datas/input_parameters"
 
     if (!ifs) 
 	{
@@ -46,7 +46,7 @@ bool Update_input::Read(const string &fn)
     char word1[80];
     int ierr = 0;
 
-    //ifs >> setiosflags(ios::uppercase);
+    //ifs >> std::setiosflags(ios::uppercase);
     ifs.rdstate();
     while (ifs.good())
     {
@@ -62,7 +62,7 @@ bool Update_input::Read(const string &fn)
 
     if (ierr == 0)
     {
-		cout << " Error parameter list." << endl;
+		std::cout << " Error parameter list." << std::endl;
 		return false;// return error : false
     }
 
@@ -233,8 +233,8 @@ bool Update_input::Read(const string &fn)
         }
         else
         {
-            //cout << " THE PARAMETER NAME '" << word
-            //     << "' IS NOT USED!" << endl;
+            //std::cout << " THE PARAMETER NAME '" << word
+            //     << "' IS NOT USED!" << std::endl;
             ifs.ignore(150, '\n');
         }
 
@@ -245,13 +245,13 @@ bool Update_input::Read(const string &fn)
         }
         else if (ifs.bad() != 0)
         {
-			cout << " Bad input parameters. " << endl;
+			std::cout << " Bad input parameters. " << std::endl;
             return false;
         }
         else if (ifs.fail() != 0)
         {
-			cout << " word = " << word << endl;
-			cout << " Fail to read parameters. " << endl; 
+			std::cout << " word = " << word << std::endl;
+			std::cout << " Fail to read parameters. " << std::endl; 
             ifs.clear();
 			return false;
         }

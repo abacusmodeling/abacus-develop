@@ -79,6 +79,8 @@ FFTW3;
 
 ### Build and install ABACUS with CMake
 
+#### Configure
+
 We recommend building ABACUS with `cmake` to avoid dependency issues.
 ABACUS requires a minimum `cmake` version of `3.18`. Check the version of `cmake`  on your machine with:
 
@@ -100,10 +102,24 @@ For example:
 cmake -B build -DFFTW3_ROOT=/opt/fftw3 -DBOOST_INCLUDEDIR=/usr/include/boost
 ```
 
+You can also choose to build with which components.
+
+```bash
+cmake -B build -DUSE_LIBXC=1
+```
+
+If Libxc is not installed in standard path (i.e. installed with a custom prefix path), you may add the installation prefix of `FindLibxc.cmake` to `CMAKE_MODULE_PATH` environment variable, or set `Libxc_DIR` to the directory containing the file.
+
+```bash
+cmake -B build -DLibxc_DIR=~/libxc
+```
+
+#### Build and Install
+
 After configuring, start build and install by:
 
 ```bash
-cmake --build build
+cmake --build build -j9
 cmake --install build
 ```
 
@@ -247,6 +263,24 @@ LIBS = -lifcore -lm -lpthread ${LIBTORCH_LIB} ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_L
 OPTS = ${INCLUDES} -Ofast -traceback -std=c++14 -simd -march=native -xHost -m64 -qopenmp -Werror -Wall -pedantic -g
 ```
 
+<<<<<<< HEAD
+- module_base
+- module_cell
+- module_grid
+- module_md
+- module_neighbor
+- module_orbital
+- obj
+- src_external
+- src_global
+- src_io
+- src_ions
+- src_lcao
+- src_parallel
+- src_pdiag
+- src_pw
+- src_ri
+=======
 In `Makefile`, set the Macro as `HONG_DEEPKS`:
 ```
 #!!!!!!!!!!!!!!!!!!!! CHANE HERE IF YOU LIKE !!!!!!!!!!!!!!
@@ -255,5 +289,6 @@ In `Makefile`, set the Macro as `HONG_DEEPKS`:
 #HONG=${HONG_SER_SELINV}
 HONG=${HONG_DEEPKS}
 ```
+>>>>>>> 238a6a19a355699417b9d1768fc4bf72619cd245
 
 [back to top](#download-and-install)

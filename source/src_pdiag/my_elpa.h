@@ -1,4 +1,4 @@
- #include<complex>
+ #include <complex>
  /*! \brief C old, deprecated interface, will be deleted. Use "elpa_get_communicators"
  *
  * \param mpi_comm_word    MPI global communicator (in)
@@ -49,7 +49,7 @@
  *  \result                     int: 1 if error occured, otherwise 0
 */
  int elpa_solve_evp_real_1stage(int na, int nev, double *a, int lda, double *ev, double *q, int ldq, int nblk, int matrixCols, int mpi_comm_rows, int mpi_comm_cols);
- /*! \brief C interface to solve the complex eigenvalue problem with 1-stage solver
+ /*! \brief C interface to solve the std::complex eigenvalue problem with 1-stage solver
  *
  *  \param  na                   Order of matrix a
  *  \param  nev                  Number of eigenvalues needed.
@@ -98,7 +98,7 @@
  *  \result                     int: 1 if error occured, otherwise 0
  */
  int elpa_solve_evp_real_2stage(int na, int nev, double *a, int lda, double *ev, double *q, int ldq, int nblk, int matrixCols, int mpi_comm_rows, int mpi_comm_cols, MPI_Comm mpi_comm_all, int THIS_REAL_ELPA_KERNEL_API, int useQR);
- /*! \brief C interface to solve the complex eigenvalue problem with 2-stage solver
+ /*! \brief C interface to solve the std::complex eigenvalue problem with 2-stage solver
  *
  *  \param  na                        Order of matrix a
  *  \param  nev                       Number of eigenvalues needed.
@@ -287,7 +287,7 @@
  *\result succes               int reports success (1) or failure (0)
  */
  int elpa_invert_trm_real(int na, double *a, int lda, int nblk, int matrixCols, int mpi_comm_rows, int mpi_comm_cols, int wantDebug);
- /*! \brief  C interface to elpa_invert_trm_complex: Inverts a complex upper triangular matrix
+ /*! \brief  C interface to elpa_invert_trm_complex: Inverts a std::complex upper triangular matrix
  *\details
  *\param  na                   Order of matrix
  *\param  a(lda,matrixCols)    Distributed matrix which should be inverted
@@ -321,7 +321,7 @@
  *\result succes               int reports success (1) or failure (0)
  */
  int elpa_cholesky_real(int na, double *a, int lda, int nblk, int matrixCols, int mpi_comm_rows, int mpi_comm_cols, int wantDebug);
- /*! \brief  C interface elpa_cholesky_complex: Cholesky factorization of a complex hermitian matrix
+ /*! \brief  C interface elpa_cholesky_complex: Cholesky factorization of a std::complex hermitian matrix
  *\details
  *\param  na                   Order of matrix
  *\param  a(lda,matrixCols)    Distributed matrix which should be factorized.

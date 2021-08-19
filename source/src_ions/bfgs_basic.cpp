@@ -86,8 +86,8 @@ void BFGS_Basic::update_inverse_hessian(void)
     }
     if(abs(sdoty) < 1.0e-16)
     {
-        GlobalV::ofs_running <<" WARINIG: unexpected behaviour in update_inverse_hessian"<<endl;
-        GlobalV::ofs_running <<" Resetting bfgs history "<<endl;
+        GlobalV::ofs_running <<" WARINIG: unexpected behaviour in update_inverse_hessian"<<std::endl;
+        GlobalV::ofs_running <<" Resetting bfgs history "<<std::endl;
         this->reset_hessian();
         return;
     }
@@ -164,12 +164,12 @@ void BFGS_Basic::check_wolfe_conditions(void)
 	/*
 	   for(int i=0; i<dim; i++)
 	   {
-	   cout << " grad_p[" << i << "]=" << grad_p[i] << endl;
+	   std::cout << " grad_p[" << i << "]=" << grad_p[i] << std::endl;
 	   }
 
 	   for(int i=0; i<dim; i++)
 	   {
-	   cout << " move_p[" << i << "]=" << move_p[i] << endl;
+	   std::cout << " move_p[" << i << "]=" << move_p[i] << std::endl;
 	   }
 	 */
 	 
@@ -232,7 +232,7 @@ void BFGS_Basic::new_step(void)
                 
                 Ions_Move_Basic::best_xxx = std::fabs(Ions_Move_Basic::best_xxx); 
                 
-                // cout << "best_xxx=" << " " << best_xxx <<endl;
+                // std::cout << "best_xxx=" << " " << best_xxx <<std::endl;
                 
                 trust_radius_ini = std::min( Ions_Move_Basic::best_xxx, trust_radius_ini );     //cg to bfgs initial trust_radius   13-8-10 pengfei
 	}
@@ -261,10 +261,10 @@ void BFGS_Basic::new_step(void)
 			//we have got a new direction and step length!
 			this->move[i] = -tmp;
 			
-			//cout << " move after hess " << move[i] << endl;
+			//std::cout << " move after hess " << move[i] << std::endl;
 
 		}
-		GlobalV::ofs_running << " check the norm of new move " << dot_func(move, move, dim) << " (Bohr)" << endl;
+		GlobalV::ofs_running << " check the norm of new move " << dot_func(move, move, dim) << " (Bohr)" << std::endl;
 	}
 	else if(bfgs_ndim > 1)
 	{
@@ -281,7 +281,7 @@ void BFGS_Basic::new_step(void)
 
 	if(dot > 0.0)
 	{
-		GlobalV::ofs_running<<" Uphill move : resetting bfgs history"<<endl;
+		GlobalV::ofs_running<<" Uphill move : resetting bfgs history"<<std::endl;
 		for(int i=0;i<dim;i++)
 		{
 			move[i] = -grad[i];
@@ -291,7 +291,7 @@ void BFGS_Basic::new_step(void)
 
 	//--------------------------------------------------------------------
 	// the step must done after hessian is multiplied to grad.
-        //cout<<"update_iter="<<Ions_Move_Basic::update_iter<<endl;
+        //std::cout<<"update_iter="<<Ions_Move_Basic::update_iter<<std::endl;
 	if(Ions_Move_Basic::update_iter==1)
 	{       
 		trust_radius = trust_radius_ini;
@@ -303,7 +303,7 @@ void BFGS_Basic::new_step(void)
 		trust_radius = trust_radius_old;
 		this->compute_trust_radius();
 	}
-        //cout<<"trust_radius ="<<" "<<trust_radius;
+        //std::cout<<"trust_radius ="<<" "<<trust_radius;
 	return;		
 }
 
@@ -338,10 +338,10 @@ void BFGS_Basic::compute_trust_radius(void)
     }
 
 	/*
-	cout << " a=" << a << endl;
-	cout << " norm_move=" << norm_move << endl;
-	cout << " trust_radius=" << trust_radius << endl;
-	cout << " trust_radius_old=" << trust_radius_old << endl; 
+	std::cout << " a=" << a << std::endl;
+	std::cout << " norm_move=" << norm_move << std::endl;
+	std::cout << " trust_radius=" << trust_radius << std::endl;
+	std::cout << " trust_radius_old=" << trust_radius_old << std::endl; 
 	*/
 
     if(this->wolfe_flag)
@@ -373,7 +373,7 @@ void BFGS_Basic::compute_trust_radius(void)
             //something is going wrongsomething is going wrong
             WARNING_QUIT("bfgs","bfgs history already reset at previous step, we got trapped!");
         }
-        GlobalV::ofs_running<<" Resetting BFGS history." << endl;
+        GlobalV::ofs_running<<" Resetting BFGS history." << std::endl;
         this->reset_hessian();
         for(int i =0;i<dim;i++)
         {

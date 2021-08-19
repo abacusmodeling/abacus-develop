@@ -9,7 +9,7 @@ if (OPENMP_FOUND)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include(FetchContent)
 FetchContent_Declare(
   googletest
@@ -21,7 +21,7 @@ function(AddTest)
   cmake_parse_arguments(UT "DYN" "TARGET" "LIBS;DYN_LIBS;STATIC_LIBS;SOURCES;DEPENDS" ${ARGN})
   add_executable(${UT_TARGET} ${UT_SOURCES})
   #dependencies & link library
-  target_link_libraries(${UT_TARGET} ${UT_LIBS} pthread gtest_main)
+  target_link_libraries(${UT_TARGET} ${UT_LIBS} ${ABACUS_LINK_LIBRARIES} pthread gtest_main)
   install(TARGETS ${UT_TARGET} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/tests )
   add_test(NAME ${UT_TARGET}
   COMMAND ${UT_TARGET}
@@ -30,10 +30,12 @@ function(AddTest)
 endfunction(AddTest)
 
 get_target_property(ABACUS_LINK_LIBRARIES ${ABACUS_BIN_NAME} LINK_LIBRARIES)
+
 AddTest(
   TARGET base_matrix3
   SOURCES ${ABACUS_TEST_DIR}/module_base/matrix3.cpp
-  LIBS ${ABACUS_LINK_LIBRARIES}
 )
-include(GoogleTest)
-gtest_discover_tests(base_matrix3)
+AddTest(
+  TARGET base_blas_connector
+  SOURCES ${ABACUS_TEST_DIR}/module_base/blas_connector.cpp
+)

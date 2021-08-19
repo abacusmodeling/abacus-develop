@@ -15,19 +15,19 @@ public:
 
 	enum class Coordinate { Cartesian, Sphere };
 	
-	Gram_Schmidt_Orth( const vector<R_Type> &rab, const Coordinate &coordinate );
+	Gram_Schmidt_Orth( const std::vector<R_Type> &rab, const Coordinate &coordinate );
 	
-	vector<vector<Func_Type>> cal_orth( 
-		const vector<vector<Func_Type>> &func,
+	std::vector<std::vector<Func_Type>> cal_orth( 
+		const std::vector<std::vector<Func_Type>> &func,
 		const Func_Type norm_threshold = std::numeric_limits<Func_Type>::min() );
 	
 private:
 
 	const Coordinate coordinate;
-	const vector<R_Type> &rab;
-	vector<R_Type> radial_2;	
+	const std::vector<R_Type> &rab;
+	std::vector<R_Type> radial_2;	
 
-	Func_Type cal_norm( const vector<Func_Type> &f );
+	Func_Type cal_norm( const std::vector<Func_Type> &f );
 
 };
 

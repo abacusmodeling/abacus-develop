@@ -29,7 +29,7 @@ void Grid_Base_Beta::prepare(
 	for(int T1=0; T1<GlobalC::ucell.ntype; T1++)
 	{
 		this->nnn[T1] = (GlobalC::ucell.atoms[T1].nwl+1) * (GlobalC::ucell.atoms[T1].nwl+1);
-	//	cout << "\n nnn = " << nnn[T1];
+	//	std::cout << "\n nnn = " << nnn[T1];
 	}	
 	return;
 }

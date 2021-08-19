@@ -14,7 +14,7 @@ ORB_gen_tables::~ORB_gen_tables() {}
 
 /// call in hamilt_linear::init_before_ions.
 void ORB_gen_tables::gen_tables(
-	ofstream &ofs_in,
+	std::ofstream &ofs_in,
 	const int &job0,
 	LCAO_Orbitals &orb,
 	const int &Lmax_exx,
@@ -23,7 +23,7 @@ void ORB_gen_tables::gen_tables(
 	TITLE("ORB_gen_tables", "gen_tables");
 	timer::tick("ORB_gen_tables", "gen_tables");
 
-	ofs_in << "\n SETUP THE TWO-CENTER INTEGRATION TABLES" << endl;
+	ofs_in << "\n SETUP THE TWO-CENTER INTEGRATION TABLES" << std::endl;
 
 	//////////////////////////////
 	/// (1) MOT: make overlap table.
@@ -136,7 +136,7 @@ void ORB_gen_tables::snap_psibeta(
 	int* index1_soc, // mohan add 2021-05-07
 	int* index2_soc, // mohan add 2021-05-07
 	const int &nproj_in, // mohan add 2021-05-07
-	complex<double> *nlm1,
+	std::complex<double> *nlm1,
 	const int is) const
 {
 	//TITLE ("ORB_gen_tables","snap_psibeta");
@@ -270,9 +270,9 @@ void ORB_gen_tables::snap_psibeta(
 	const int gindex2 = L2 * L2 + m2;
 
 	// Peize Lin change rlya, rlyb, grlyb 2016-08-26
-	vector<double> rlya;
-	vector<double> rlyb;
-	vector<vector<double>> grlyb;
+	std::vector<double> rlya;
+	std::vector<double> rlyb;
+	std::vector<std::vector<double>> grlyb;
 
 	Ylm::rl_sph_harm(T1_2Lplus1 - 1, dRa.x, dRa.y, dRa.z, rlya);
 	if (job == 0)
@@ -300,8 +300,8 @@ void ORB_gen_tables::snap_psibeta(
 		nprojections = nproj_in; // mohan add 2021-05-07 
 	}
 
-	vector<complex<double>> term_a_nc(nprojections, {0, 0}); // Peize Lin change ptr to vector at 2020.01.31
-	vector<complex<double>> term_b_nc(nprojections, {0, 0}); // Peize Lin change ptr to vector at 2020.01.31
+	std::vector<std::complex<double>> term_a_nc(nprojections, {0, 0}); // Peize Lin change ptr to std::vector at 2020.01.31
+	std::vector<std::complex<double>> term_b_nc(nprojections, {0, 0}); // Peize Lin change ptr to std::vector at 2020.01.31
 	int ip = -1;
 
 	for (int nb = 0; nb < nproj; nb++)
@@ -581,7 +581,7 @@ void ORB_gen_tables::snap_psipsi(
 	const int &m2,
 	const int &N2,
 	const int &nspin,
-	complex<double> *olm1) const
+	std::complex<double> *olm1) const
 {
 	//TITLE("ORB_gen_tables","snap_psipsi");
 	//timer::tick ("ORB_gen_tables", "snap_psipsi");
@@ -655,8 +655,8 @@ void ORB_gen_tables::snap_psipsi(
 	const int gindex2 = L2 * L2 + m2;
 
 	// Peize Lin change rly, grly 2016-08-26
-	vector<double> rly;
-	vector<vector<double>> grly;
+	std::vector<double> rly;
+	std::vector<std::vector<double>> grly;
 
 	//	double *ylm = new double[nlm];
 	//	dR = R1 - R2;
@@ -769,10 +769,10 @@ void ORB_gen_tables::snap_psipsi(
 					/*
 						if( abs ( tmpOlm0 * rly[ MGT.get_lm_index(L, m) ] ) > 1.0e-3 )
 						{
-						cout << " L=" << L << " m=" << m << " tmpOlm0=" << tmpOlm0
+						std::cout << " L=" << L << " m=" << m << " tmpOlm0=" << tmpOlm0
 						<< " rly=" << rly[ MGT.get_lm_index(L, m) ]
 						<< " r=" << olm[0]
-						<< endl;
+						<< std::endl;
 						}
 						*/
 					break;

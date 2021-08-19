@@ -11,7 +11,7 @@ public:
     ~Lattice_Change_CG();
 
     void allocate(void);
-    void start(matrix &stress, const double &etot);
+    void start(const matrix &stress_in, const double &etot);
 
 private:
 

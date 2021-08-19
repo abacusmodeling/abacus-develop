@@ -4,7 +4,7 @@
 #include "../src_lcao/ELEC_evolve.h"
 
 //fuxiang add 2017-03-15
-void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &iter, const string &fn, const int &precision, const bool for_plot)
+void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &iter, const std::string &fn, const int &precision, const bool for_plot)
 {
     TITLE("Charge","write_rho_dipole");
     if (out_charge==0) 
@@ -17,7 +17,7 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 	}
 	
 	time_t start, end;
-	ofstream ofs;
+	std::ofstream ofs;
 	
 	if(GlobalV::MY_RANK==0)
 	{
@@ -29,24 +29,24 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
         	WARNING("Charge::write_rho","Can't create Charge File!");
     	}	
 
-		//GlobalV::ofs_running << "\n Output charge file." << endl;
+		//GlobalV::ofs_running << "\n Output charge file." << std::endl;
 
-		ofs << GlobalC::ucell.latName << endl;//1
-		ofs << " " << GlobalC::ucell.lat0 * 0.529177 << endl;
-		ofs << " " << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << endl;
-		ofs << " " << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << endl;
-		ofs << " " << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << endl;
+		ofs << GlobalC::ucell.latName << std::endl;//1
+		ofs << " " << GlobalC::ucell.lat0 * 0.529177 << std::endl;
+		ofs << " " << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << std::endl;
+		ofs << " " << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << std::endl;
+		ofs << " " << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << std::endl;
 		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
 			ofs << " " << GlobalC::ucell.atoms[it].label;
 		}
-		ofs << endl;
+		ofs << std::endl;
 		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
 			ofs << " " << GlobalC::ucell.atoms[it].na;
 		}
-		ofs << endl;
-		ofs << "Direct" << endl;
+		ofs << std::endl;
+		ofs << "Direct" << std::endl;
 
 		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
@@ -54,7 +54,7 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 			{
 				ofs << " " << GlobalC::ucell.atoms[it].taud[ia].x
 					<< " " << GlobalC::ucell.atoms[it].taud[ia].y
-					<< " " << GlobalC::ucell.atoms[it].taud[ia].z << endl;
+					<< " " << GlobalC::ucell.atoms[it].taud[ia].z << std::endl;
 			}
 		}
 
@@ -79,17 +79,17 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 				WARNING_QUIT("write_rho","check nspin!");
 			}
 		}
-		ofs << "\n  " << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz << endl;
+		ofs << "\n  " << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz << std::endl;
 
-		ofs << setprecision(precision);
+		ofs << std::setprecision(precision);
 		ofs << scientific;
 	}
 
 #ifndef __MPI
 	double dipole_elec_x=0.0, dipole_elec_y=0.0, dipole_elec_z=0.0;
-	//cout << "GlobalC::pw.nrxx: " << GlobalC::pw.nrxx <<endl;
-	//cout << "GlobalC::pw.ncxyz: " << GlobalC::pw.ncxyz <<endl;
-	//cout << "GlobalC::pw.ncx: " << GlobalC::pw.ncx <<endl;
+	//std::cout << "GlobalC::pw.nrxx: " << GlobalC::pw.nrxx <<std::endl;
+	//std::cout << "GlobalC::pw.ncxyz: " << GlobalC::pw.ncxyz <<std::endl;
+	//std::cout << "GlobalC::pw.ncx: " << GlobalC::pw.ncx <<std::endl;
 	for(int k=0; k<GlobalC::pw.ncz; k++)
 	{
 		for(int j=0; j<GlobalC::pw.ncy; j++)
@@ -109,18 +109,18 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 	Parallel_Reduce::reduce_double_pool( dipole_elec_y );
 	Parallel_Reduce::reduce_double_pool( dipole_elec_z );
 
-	//cout << "dipole_elec_x: " << dipole_elec_x <<endl;
-	//cout << "dipole_elec_y: " << dipole_elec_y <<endl;
-	//cout << "dipole_elec_z: " << dipole_elec_z <<endl;
+	//std::cout << "dipole_elec_x: " << dipole_elec_x <<std::endl;
+	//std::cout << "dipole_elec_y: " << dipole_elec_y <<std::endl;
+	//std::cout << "dipole_elec_z: " << dipole_elec_z <<std::endl;
 
 	ofs << " " << "dipole_elec_x: " << dipole_elec_x 
 		<< " " << "dipole_elec_y: " << dipole_elec_y 
 		<< "dipole_elec_z: " << dipole_elec_z;
 #else
 	double dipole_elec_x=0.0, dipole_elec_y=0.0, dipole_elec_z=0.0;
-	//cout << "GlobalC::pw.nrxx: " << GlobalC::pw.nrxx <<endl;
-	//cout << "GlobalC::pw.ncxyz: " << GlobalC::pw.ncxyz <<endl;
-	//cout << "GlobalC::ucell.omega: " << GlobalC::ucell.omega <<endl;
+	//std::cout << "GlobalC::pw.nrxx: " << GlobalC::pw.nrxx <<std::endl;
+	//std::cout << "GlobalC::pw.ncxyz: " << GlobalC::pw.ncxyz <<std::endl;
+	//std::cout << "GlobalC::ucell.omega: " << GlobalC::ucell.omega <<std::endl;
 
 //	for(int ir=0; ir<GlobalC::pw.nrxx; ir++) chr.rho[0][ir]=1; // for testing
 //	GlobalV::ofs_running << "\n GlobalV::RANK_IN_POOL = " << GlobalV::RANK_IN_POOL;
@@ -174,7 +174,7 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 		// save the rho one z by one z.
 		for(int iz=0; iz<GlobalC::pw.ncz; iz++)
 		{
-			//	cout << "\n iz=" << iz << endl;
+			//	std::cout << "\n iz=" << iz << std::endl;
 			// tag must be different for different iz.
 			ZEROS(zpiece, nxy);
 			int tag = iz;
@@ -250,14 +250,14 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 		dipole_elec_x *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
 		dipole_elec_y *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
 		dipole_elec_z *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
-		//cout << setprecision(8) << "dipole_elec_x: " << dipole_elec_x <<endl;
-		//cout << setprecision(8) << "dipole_elec_y: " << dipole_elec_y <<endl;
-		//cout << setprecision(8) << "dipole_elec_z: " << dipole_elec_z <<endl;
+		//std::cout << std::setprecision(8) << "dipole_elec_x: " << dipole_elec_x <<std::endl;
+		//std::cout << std::setprecision(8) << "dipole_elec_y: " << dipole_elec_y <<std::endl;
+		//std::cout << std::setprecision(8) << "dipole_elec_z: " << dipole_elec_z <<std::endl;
 
 	
-		ofs << " " << "dipole_elec_x: " << dipole_elec_x << endl;
-		ofs << " " << "dipole_elec_y: " << dipole_elec_y << endl;
-		ofs << " " << "dipole_elec_z: " << dipole_elec_z << endl;
+		ofs << " " << "dipole_elec_x: " << dipole_elec_x << std::endl;
+		ofs << " " << "dipole_elec_y: " << dipole_elec_y << std::endl;
+		ofs << " " << "dipole_elec_z: " << dipole_elec_z << std::endl;
 
 		double dipole_ion_x=0.0, dipole_ion_y=0.0, dipole_ion_z=0.0;	// dipole_sum=0.0;
 		if(GlobalC::ucell.ntype == 1)
@@ -307,7 +307,7 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 		}
 		else
 		{
-			cout << "atom ntype is too large!" << endl;
+			std::cout << "atom ntype is too large!" << std::endl;
 		}
 
 
@@ -340,19 +340,19 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 
 /* 
 
-		cout << setprecision(8) << "dipole_ion_x: " << dipole_ion_x <<endl;
-		cout << setprecision(8) << "dipole_ion_y: " << dipole_ion_y <<endl;
-		cout << setprecision(8) << "dipole_ion_z: " << dipole_ion_z <<endl;
+		std::cout << std::setprecision(8) << "dipole_ion_x: " << dipole_ion_x <<std::endl;
+		std::cout << std::setprecision(8) << "dipole_ion_y: " << dipole_ion_y <<std::endl;
+		std::cout << std::setprecision(8) << "dipole_ion_z: " << dipole_ion_z <<std::endl;
 
 		double dipole_x=0.0, dipole_y=0.0, dipole_z=0.0;
 		dipole_x = dipole_ion_x - dipole_elec_x;
 		dipole_y = dipole_ion_y - dipole_elec_y;
 		dipole_z = dipole_ion_z - dipole_elec_z;
-		cout << setprecision(8) << "dipole_x: " << dipole_x <<endl;
-		cout << setprecision(8) << "dipole_y: " << dipole_y <<endl;
-		cout << setprecision(8) << "dipole_z: " << dipole_z <<endl;
+		std::cout << std::setprecision(8) << "dipole_x: " << dipole_x <<std::endl;
+		std::cout << std::setprecision(8) << "dipole_y: " << dipole_y <<std::endl;
+		std::cout << std::setprecision(8) << "dipole_z: " << dipole_z <<std::endl;
 		dipole_sum = sqrt(dipole_x*dipole_x + dipole_y*dipole_y + dipole_z*dipole_z);
-		cout << setprecision(8) << "dipole_sum: " << dipole_sum << endl;
+		std::cout << std::setprecision(8) << "dipole_sum: " << dipole_sum << std::endl;
 
 */
 

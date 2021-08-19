@@ -3,7 +3,7 @@
 
 Numerical_Nonlocal::Numerical_Nonlocal()
 {
-	//make pair of new and delete
+	//make std::pair of new and delete
 	//question remains
 	this->type = 0;
 	this->lmax = 0;
@@ -20,8 +20,8 @@ Numerical_Nonlocal::~Numerical_Nonlocal()
 void Numerical_Nonlocal::set_type_info
 (
 	const int& type_in,
-	const string& label_in,
-	const string& type_ps_in,
+	const std::string& label_in,
+	const std::string& type_ps_in,
 	const int& lmax_in,
 	const int& nproj_in,
 	const Numerical_Nonlocal_Lm* Proj_in

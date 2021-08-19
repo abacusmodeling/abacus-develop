@@ -38,10 +38,10 @@ class Force_LCAO_k : public Force_LCAO_gamma
 	void set_EDM_k(double** dm2d, const bool with_energy);
 
 	// mohan add 2012-01-09
-	complex<double> set_EDM_k_element(
-		const complex<double> &phase,
+	std::complex<double> set_EDM_k_element(
+		const std::complex<double> &phase,
 		const bool with_energy,
-		complex<double> &coef1, complex<double> &coef2,
+		std::complex<double> &coef1, std::complex<double> &coef2,
 		const double &ekb);
 	
 	// calculate the force due to < dphi | beta > < beta | phi >
@@ -57,7 +57,7 @@ class Force_LCAO_k : public Force_LCAO_gamma
 	void cal_fvnl_dbeta_k(double** dm2d, const bool isforce, const bool isstress, matrix& fvnl_dbeta, matrix& svnl_dbeta);
 
 
-	void test(double* mm, const string &name);
+	void test(double* mm, const std::string &name);
 
 };
 #endif

@@ -12,20 +12,20 @@ class Conv_Coulomb_Pot
 public:
 	Conv_Coulomb_Pot(const Numerical_Orbital_Lm &orb_in);
 
-	const vector<double> &get_conv_coulomb_pot() const { return conv_coulomb_pot; }
+	const std::vector<double> &get_conv_coulomb_pot() const { return conv_coulomb_pot; }
 	double get_conv_coulomb_pot(const size_t &ir) const;
 
 	void cal_conv_coulomb_pot();
 
 public:
-	// only for <vector ... <vector <Numerical_Orbital_Lm> > ... >
-	// the number of "vector" can be 0 to any
+	// only for <std::vector ... <std::vector <Numerical_Orbital_Lm> > ... >
+	// the number of "std::vector" can be 0 to any
 	template< typename T >
 	static void cal_orbs_ccp( const T & orb, T & orb_ccp, size_t rmesh_times=1, size_t kmesh_times=1 );
 
 private:
 	const Numerical_Orbital_Lm &orb;
-	vector<double> conv_coulomb_pot;
+	std::vector<double> conv_coulomb_pot;
 	double conv_coulomb_pot_extra;
 
 	inline double get_r_radial_outofrange( size_t ir ) const;

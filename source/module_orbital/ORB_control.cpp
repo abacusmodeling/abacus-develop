@@ -9,7 +9,7 @@ ORB_control::~ORB_control()
 {}
 
 void ORB_control::set_orb_tables(
-	ofstream &ofs_in,
+	std::ofstream &ofs_in,
 	ORB_gen_tables &OGT, 
 	LCAO_Orbitals &orb,
 	const int &ntype, // mohan add 2021-04-26

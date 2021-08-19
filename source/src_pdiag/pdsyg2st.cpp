@@ -14,7 +14,7 @@ void pdsyg2st(char isuplo,MPI_Comm comm_2D,double *A,LocalMatrix loc_A,double *B
  * pzheg2st transforms generalized  Hermitian eigenproblem into standard
  * eigenproblem
  * computes Cholesky factorization of an N-by-N real
- * symmetric positive definite matrix B and  L-1AL-T »òU -TAU -1 with a
+ * symmetric positive definite matrix B and  L-1AL-T or U -TAU -1 with a
  * 2D-block-cyclic in parallel. The routine introduces a new parallelization which
  * combines the Cholesky into the transformation from generalized to standard form.
  * Arguments
@@ -28,7 +28,7 @@ void pdsyg2st(char isuplo,MPI_Comm comm_2D,double *A,LocalMatrix loc_A,double *B
  *  comm_2D. (input) MPI_Comm
  *            2-D grid MPI communicator
  *  N_A  (global input) INTEGER
- *      The number of columns and rows to be operated on matrices A£¬N >= 0.
+ *      The number of columns and rows to be operated on matrices A, N >= 0.
  *  NB  (input) INTEGER
  *       blocked size of 2D blocked cyclic matrix
  *  A       (local input/local output) double precision pointer,
@@ -148,7 +148,7 @@ void pdsyg2st(char isuplo,MPI_Comm comm_2D,double *A,LocalMatrix loc_A,double *B
                 loc_B.col_pos=loc_B.col_pos+bm;
             }
             if (ki>=N_A-1) break;
-            if ((coord[0]==iarow))
+            if (coord[0]==iarow)
             {
                 transa='T';
                 transb='T';
@@ -165,8 +165,8 @@ void pdsyg2st(char isuplo,MPI_Comm comm_2D,double *A,LocalMatrix loc_A,double *B
 
                 //printf("(%d,%d), in pdsyg2st n=%d bm=%d, col_pos=%d, ki=%d\n",coord[0],coord[1],n,bm,loc_A.col_pos,ki);
                 //printf("(%d,%d), in pdsyg2st n=%d \n",coord[0],coord[1],n);
-				
-				
+
+
                 dtrsm_(&side,&uplo,&transa,&diag,&n,&m,&alpha,C_B,&ldc,&A[pos],&lda);
                 dtrsm_(&side,&uplo,&transb,&diag,&n,&m,&alpha,C_B,&ldc,&B[pos],&ldb);
 
@@ -268,7 +268,7 @@ void pdsyg2st(char isuplo,MPI_Comm comm_2D,double *A,LocalMatrix loc_A,double *B
                    &U_1[loc_A.row_pos*NB],&ldb,&beta,&A[pos],&ldc);
             dgemm_(&transa,&transb,&n,&m,&k,&alpha,&W_1[loc_A.col_pos],&lda,
                    &U1[loc_A.row_pos*NB],&ldb,&beta,&A[pos],&ldc);
-            if ((coord[0]==iarow))
+            if (coord[0]==iarow)
             {
                 lda=loc_A.col_num;
                 ldb=loc_A.col_num;
@@ -325,7 +325,7 @@ void pdsyg2st(char isuplo,MPI_Comm comm_2D,double *A,LocalMatrix loc_A,double *B
                 loc_B.row_pos=loc_B.row_pos+bm;
             }
             if (ki>=N_A-1) break;
-            if ((coord[1]==iacol))
+            if (coord[1]==iacol)
             {
                 transa='T';
                 transb='T';
@@ -440,7 +440,7 @@ void pdsyg2st(char isuplo,MPI_Comm comm_2D,double *A,LocalMatrix loc_A,double *B
                    &U_1[loc_A.row_pos*NB],&ldb,&beta,&A[pos],&ldc);
             dgemm_(&transa,&transb,&n,&m,&k,&alpha,&W_1[loc_A.col_pos],&lda,
                    &U1[loc_A.row_pos*NB],&ldb,&beta,&A[pos],&ldc);
-            if ((coord[1]==iacol))
+            if (coord[1]==iacol)
             {
                 lda=loc_A.col_num;
                 ldb=loc_A.col_num;
@@ -459,4 +459,3 @@ void pdsyg2st(char isuplo,MPI_Comm comm_2D,double *A,LocalMatrix loc_A,double *B
     MPI_Comm_free(&comm_col);
     MPI_Comm_free(&comm_row);
 }
-

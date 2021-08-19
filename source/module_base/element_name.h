@@ -5,8 +5,8 @@
 
 #ifndef ELEMENT_NAME_H
 #define ELEMENT_NAME_H
-#include<vector>
-#include<string>
+#include <vector>
+#include <string>
 
 const std::vector<std::string> element_name = {
 "H"	,

@@ -78,11 +78,11 @@ int piparmq(int *ispec, char *name__, char *opts, int *n, int *ilo, int *ihi,
 	/*                        IPARMQ(ISPEC=16)=2 despite the greater level of */
 	/*                        arithmetic work implied by the latter choice.) */
 
-	/*       NAME    (input) character string */
+	/*       NAME    (input) character std::string */
 	/*               Name of the calling subroutine */
 
-	/*       OPTS    (input) character string */
-	/*               This is a concatenation of the string arguments to */
+	/*       OPTS    (input) character std::string */
+	/*               This is a concatenation of the std::string arguments to */
 	/*               TTQRE. */
 
 	/*       N       (input) int scalar */

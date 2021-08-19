@@ -21,14 +21,14 @@ private:
 		size_t M;
 	};
 	
-	class Index_TL: public vector<vector<size_t>>
+	class Index_TL: public std::vector<std::vector<size_t>>
 	{
 		public:
 		size_t N;
 		size_t M;
 	};
 	
-	class Index_T: public vector<Index_TL>
+	class Index_T: public std::vector<Index_TL>
 	{
 		public:
 		size_t count_size;
@@ -36,8 +36,8 @@ private:
 	
 public:
 	
-	typedef vector<vector<NM>> Range; 								// range[T][L]
-	typedef vector<Index_T> IndexLNM;								// index[T][L][N][M]
+	typedef std::vector<std::vector<NM>> Range; 								// range[T][L]
+	typedef std::vector<Index_T> IndexLNM;								// index[T][L][N][M]
 	
 	static IndexLNM construct_index( const Range &range );
 };

@@ -30,14 +30,15 @@ public:
     double** rho;
     double** rho_save;
 
-    complex<double>** rhog;
-    complex<double>** rhog_save;
+    std::complex<double>** rhog;
+    std::complex<double>** rhog_save;
 
 	double** kin_r; //kinetic energy density in real space, for meta-GGA
+	double** kin_r_save; //kinetic energy density in real space, for meta-GGA
 						     //wenfei 2021-07-28
 
     double *rho_core;
-	complex<double> *rhog_core;
+	std::complex<double> *rhog_core;
 
 	//  output charge if out_charge > 0, and output every "out_charge" elec step.
     int out_charge;
@@ -77,16 +78,16 @@ public:
 
 	public:
 
-    void write_rho(const double* rho_save, const int &is, const int &iter, const string &fn, 
+    void write_rho(const double* rho_save, const int &is, const int &iter, const std::string &fn, 
 		const int &precision = 11, const bool for_plot = false);//mohan add 2007-10-17
 
-    void write_rho_cube(const double* rho_save, const int &is, const string &fn, 
+    void write_rho_cube(const double* rho_save, const int &is, const std::string &fn, 
 		const int &precision = 11);
 
-    void write_rho_dipole(const double* rho_save, const int &is, const int &iter, const string &fn, 
+    void write_rho_dipole(const double* rho_save, const int &is, const int &iter, const std::string &fn, 
 		const int &precision = 11, const bool for_plot = false);//fuxiang add 2017-3-15    
 
-    bool read_rho(const int &is, const string &fn, double* rho);//mohan add 2007-10-17
+    bool read_rho(const int &is, const std::string &fn, double* rho);//mohan add 2007-10-17
     void rho_mpi(void);
 
 

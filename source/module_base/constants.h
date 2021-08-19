@@ -27,13 +27,13 @@ const double SQRT2 = 1.41421356237309504880;
 const double SQRT3 = 1.73205080756887729352;
 
 //==========================================================
-// EXPLAIN : complex constants
+// EXPLAIN : std::complex constants
 //==========================================================
-const complex<double> ZERO(0.0, 0.0);
-const complex<double> ONE(1.0, 0.0);
-const complex<double> NEG_ONE(-1.0, 0.0);
-const complex<double> IMAG_UNIT(0.0,1.0);
-const complex<double> NEG_IMAG_UNIT(0.0,-1.0);
+const std::complex<double> ZERO(0.0, 0.0);
+const std::complex<double> ONE(1.0, 0.0);
+const std::complex<double> NEG_ONE(-1.0, 0.0);
+const std::complex<double> IMAG_UNIT(0.0,1.0);
+const std::complex<double> NEG_IMAG_UNIT(0.0,-1.0);
 
 //==========================================================
 // EXPLAIN : physical constants

@@ -143,8 +143,8 @@ void pseudopot_cell_vl::vloc_of_g(
 	}
 	Integral::Simpson_Integral(msh, aux, rab, vloc_1d[0] );
 	vloc_1d[0] *= 4*3.1415926;
-	cout << "  vloc_1d[0]=" <<  vloc_1d[0]/GlobalC::pw.ngmc << endl;
-	cout << "  vloc_1d[0]=" <<  vloc_1d[0]/GlobalC::pw.ncxyz << endl;
+	std::cout << "  vloc_1d[0]=" <<  vloc_1d[0]/GlobalC::pw.ngmc << std::endl;
+	std::cout << "  vloc_1d[0]=" <<  vloc_1d[0]/GlobalC::pw.ncxyz << std::endl;
 	*/
 
 	// (1)
@@ -210,13 +210,13 @@ void pseudopot_cell_vl::print_vloc(void)const
 	{
 		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			stringstream ss ;
+			std::stringstream ss ;
 			ss << GlobalV::global_out_dir << GlobalC::ucell.atoms[it].label << "/v_loc_g.dat" ;
-			ofstream ofs_vg( ss.str().c_str() );
+			std::ofstream ofs_vg( ss.str().c_str() );
 			for(int ig=0;ig<GlobalC::pw.nggm;ig++)
 			{
-				ofs_vg << setw(15) << GlobalC::pw.ggs [ig] * GlobalC::ucell.tpiba2 
-				   	<< setw(15) << this->vloc(it, ig) << endl;
+				ofs_vg << std::setw(15) << GlobalC::pw.ggs [ig] * GlobalC::ucell.tpiba2 
+				   	<< std::setw(15) << this->vloc(it, ig) << std::endl;
 			}
 			ofs_vg.close();
 		}

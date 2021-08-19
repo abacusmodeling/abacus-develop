@@ -25,8 +25,8 @@ public:
 //==========================================================
 	void write_data
 	(
-		const string &fn, // file name of output file
-		const string &type// choice : "all" "evc" "band"
+		const std::string &fn, // file name of output file
+		const std::string &type// choice : "all" "evc" "band"
 						  // "energy" "charge"
 	);
 
@@ -36,7 +36,7 @@ public:
 //==========================================================
 	void read_data
 	(
-		const string &fn // file name of input file
+		const std::string &fn // file name of input file
 	);
 
 //==========================================================
@@ -45,7 +45,7 @@ public:
 //==========================================================
 	void print_data
 	(
-		const string &fn
+		const std::string &fn
 	)const;
 	
 //==========================================================
@@ -56,7 +56,7 @@ public:
 	(
 		ComplexMatrix *wf,// address of wave functions. 
 		const int npsi, // number of wave funcs to output.
-		const string &fn // file address.
+		const std::string &fn // file address.
 	);
 
 //==========================================================
@@ -65,16 +65,16 @@ public:
 //==========================================================
 	bool sec_wf
 	(
-		complex<double> ***phi,// address of wave functions. 
+		std::complex<double> ***phi,// address of wave functions. 
 		const int npsi, // how many wave functions read in.
-		const string &fn // file address.
+		const std::string &fn // file address.
 	)const;
 
 	bool sec_wf
 	(
 		ComplexMatrix *psi,// address of wave functions.
 		const int npsi,// how many wave functions read in.
-		const string &fn// file address.
+		const std::string &fn// file address.
 	)const;
 
 //==========================================================
@@ -85,7 +85,7 @@ public:
 	(
 		const ComplexMatrix *psi,// address of wave funcs.
 		const int iw, // index of wave funs to export.
-		const string &file_name// file address.
+		const std::string &file_name// file address.
 	);
 
 //==========================================================
@@ -94,7 +94,7 @@ public:
 //==========================================================
 	void nscf_chgfile
 	(
-		const string &chr_file// file address.
+		const std::string &chr_file// file address.
 	);
 
 //==========================================================
@@ -103,7 +103,7 @@ public:
 //==========================================================
 	static void nscf_band
 	(
-		const string &out_band_dir,// file address.
+		const std::string &out_band_dir,// file address.
 		const int &nband
 	);
 
@@ -115,7 +115,7 @@ public:
 //==========================================================
 	bool calculate_dos
 	(
- 		const string &fa, // file address.
+ 		const std::string &fa, // file address.
 		const double de_ev, // delta energy in ev
 		const double emax_ev, // maximal energy in ev.
 		const double emin_ev, // minimal energy in ev.
@@ -136,19 +136,19 @@ public:
 //==========================================================
 	void out_charge_mpi
 	(
-		const string &dir,
+		const std::string &dir,
 		double* rho_in
 	);
 
 	void in_charge_mpi
 	(
-		const string &dir
+		const std::string &dir
 	);
 #endif
 
 //private:
 
-	string name;
+	std::string name;
 
 //==========================================================
 // MEMBER FUNCTION  : out_wannier
@@ -160,10 +160,10 @@ public:
 // MEMBER VARIABLES : 
 // NAME : basis( which type of basis we use )
 //==========================================================
-	void out_wannier(ofstream &out);
-	void in_wannier(ifstream &in);
+	void out_wannier(std::ofstream &out);
+	void in_wannier(std::ifstream &in);
 
-	string basis;
+	std::string basis;
 
 //==========================================================
 // MEMBER FUNCTION : out_input
@@ -186,11 +186,11 @@ public:
 // NAME : startingpot(starting potential used).
 // NAME : Mixing_beta(parameter for charge mixing);
 //==========================================================
-	void out_input(ofstream &out);
-	void in_input(ifstream &in);
+	void out_input(std::ofstream &out);
+	void in_input(std::ifstream &in);
 	
-	string latname;
-	string calculation;
+	std::string latname;
+	std::string calculation;
 	double ecutwfc;
 	int nband;
 	double tr2;
@@ -198,7 +198,7 @@ public:
 	int ny;
 	int nz;
 	int nxyz;
-	string startingpot;
+	std::string startingpot;
 	double Mixing_beta;
 
 
@@ -215,10 +215,10 @@ public:
 // NAME : kvector(cartesian coordinate of each k point)
 // NAME : qtot(number of total q points, q = K+G)
 //==========================================================
-	void out_kpoints(ofstream &out);
-	void out_planewave(ofstream &out);
-	void out_igk(ofstream &out);
-	void in_kpoints(ifstream &in);
+	void out_kpoints(std::ofstream &out);
+	void out_planewave(std::ofstream &out);
+	void out_igk(std::ofstream &out);
+	void in_kpoints(std::ifstream &in);
 
 	int nks;
 	int *ngk;
@@ -238,8 +238,8 @@ public:
 // NAME : ntype(number of atom species)
 // NAME : na(number of atoms for each type)
 //==========================================================
-	void out_unitcell(ofstream &out);
-	void in_unitcell(ifstream &in);
+	void out_unitcell(std::ofstream &out);
+	void in_unitcell(std::ifstream &in);
 
 	double lat0;	
 	double **latvec;
@@ -253,8 +253,8 @@ public:
 // MEMBER FUNCTION : in_charge
 // DO : input corresponding charge density.
 //==========================================================	
-	void out_charge(ofstream &out);
-	void in_charge(ifstream &in);
+	void out_charge(std::ofstream &out);
+	void in_charge(std::ifstream &in);
 
 //==========================================================
 // MEMBER FUNCTION : 
@@ -272,8 +272,8 @@ public:
 // NAME : rho_nc(total points of charge FFT grid,rho_nc = ncxyz)
 // NAME : rho(charge density)
 //==========================================================
-	void out_band(ofstream &out);
-	void in_band(ifstream &in);
+	void out_band(std::ofstream &out);
+	void in_band(std::ifstream &in);
 
 	double **band_energy;
 	double omega;
@@ -302,8 +302,8 @@ public:
 // NAME : xc( exchange-correlation energy in Ry)
 // NAME : ewald( ewald energy in Ry)
 //==========================================================
-	void out_energy(ofstream &out);
-	void in_energy(ifstream &in);
+	void out_energy(std::ofstream &out);
+	void in_energy(std::ifstream &in);
 	
 	int iter;
 	double etot;
@@ -324,11 +324,11 @@ public:
 // NAME : natomwfc(number fo states calcualted)
 // NAME : evc(wave functions)
 //==========================================================
-	void out_evc(ofstream &out);
-	void in_evc(ifstream &in);
+	void out_evc(std::ofstream &out);
+	void in_evc(std::ifstream &in);
 
 	int natomwfc;
-	complex <double> ***evc;
+	std::complex <double> ***evc;
 };
 
 #endif

@@ -28,6 +28,11 @@ std::tuple<double,double,matrix> H_XC_pw::v_xc
     double vt_xc = 0.0;
 	matrix v(GlobalV::NSPIN, nrxx);
 
+	if(GlobalV::VXC_IN_H == 0)
+	{
+    	timer::tick("H_XC_pw","v_xc");
+    	return std::make_tuple(et_xc, vt_xc, std::move(v));
+	}
     // the square of the e charge
     // in Rydeberg unit, so * 2.0.
     double e2 = 2.0;

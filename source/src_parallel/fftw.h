@@ -295,7 +295,7 @@ typedef struct fftw_plan_struct *fftw_plan;
                                            in fftwnd transforms */
 
 #define FFTW_NO_VECTOR_RECURSE (512)    /* internal flag, prevents use
-                                           of vector recursion */
+                                           of std::vector recursion */
 
 extern fftw_plan fftw_create_plan_specific(int n, fftw_direction dir,
 					   int flags,

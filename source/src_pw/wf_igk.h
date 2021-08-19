@@ -35,10 +35,10 @@ class WF_igk
 
     Vector3<double> get_1qvec_cartesian(const int ik,const int ig)const;
 
-    complex<double>* get_sk(const int ik, const int it, const int ia)const;
+    std::complex<double>* get_sk(const int ik, const int it, const int ia)const;
 
 	// pengfei 2016-11-23
-    complex<double>* get_skq(int ik, int it, int ia, Vector3<double> q);
+    std::complex<double>* get_skq(int ik, int it, int ia, Vector3<double> q);
 
 };
 #endif

@@ -32,8 +32,8 @@ private:
     void cal_force_nl(matrix& forcenl);
     void cal_force_scc(matrix& forcescc);
 
-    static void print( const string &name, const matrix &f, bool rv=true );
-    static void print_to_files( ofstream &ofs, const string &name, const matrix &f );
+    static void print( const std::string &name, const matrix &f, bool rv=true );
+    static void print_to_files( std::ofstream &ofs, const std::string &name, const matrix &f );
 };
 
 #endif

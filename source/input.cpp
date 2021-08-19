@@ -11,29 +11,17 @@
 #include <iomanip>
 #include <stdio.h>
 #include <string.h>
+#include <vector>
 
 Input INPUT;
 
-Input::Input() 
-{
-	angle1 = new double[1];
-	angle2 = new double[1];
-// all values set in Default	
-}
-
-Input::~Input() 
-{
-	delete[] angle1;
-	delete[] angle2;
-}
-
-void Input::Init(const string &fn)
+void Input::Init(const std::string &fn)
 {
 	timer::tick("Input","Init");
     this->Default();
 
     bool success = this->Read(fn);
-	this->Default_2();			   
+	this->Default_2();
 
 //xiaohui add 2015-09-16
 #ifdef __MPI
@@ -64,35 +52,35 @@ void Input::Init(const string &fn)
 	Check();
 
 	time_t  time_now = time(NULL);
-	GlobalV::ofs_running << "                                                                                     " << endl;
-	GlobalV::ofs_running << "                             WELCOME TO ABACUS                                       " << endl;
-	GlobalV::ofs_running << "                                                                                     " << endl;
-    GlobalV::ofs_running << "               'Atomic-orbital Based Ab-initio Computation at UStc'                  " << endl;
-    GlobalV::ofs_running << "                                                                                     " << endl;
-    GlobalV::ofs_running << "                     Website: http://abacus.ustc.edu.cn/                             " << endl;
-	GlobalV::ofs_running << "                                                                                     " << endl;
+	GlobalV::ofs_running << "                                                                                     " << std::endl;
+	GlobalV::ofs_running << "                             WELCOME TO ABACUS                                       " << std::endl;
+	GlobalV::ofs_running << "                                                                                     " << std::endl;
+    GlobalV::ofs_running << "               'Atomic-orbital Based Ab-initio Computation at UStc'                  " << std::endl;
+    GlobalV::ofs_running << "                                                                                     " << std::endl;
+    GlobalV::ofs_running << "                     Website: http://abacus.ustc.edu.cn/                             " << std::endl;
+	GlobalV::ofs_running << "                                                                                     " << std::endl;
 
-	GlobalV::ofs_running << setiosflags(ios::right);
-                                                                                                                             
+	GlobalV::ofs_running << std::setiosflags(ios::right);
+
 
 #ifdef __MPI
-	//GlobalV::ofs_running << "    Version: Parallel, under ALPHA test" << endl;
-    GlobalV::ofs_running << "    Version: Parallel, in development" << endl;
-	GlobalV::ofs_running << "    Processor Number is " << GlobalV::NPROC << endl;
+	//GlobalV::ofs_running << "    Version: Parallel, under ALPHA test" << std::endl;
+    GlobalV::ofs_running << "    Version: Parallel, in development" << std::endl;
+	GlobalV::ofs_running << "    Processor Number is " << GlobalV::NPROC << std::endl;
 	TITLE("Input","init");
 	TITLE("Input","Bcast");
 #else
-	GlobalV::ofs_running << "    This is SERIES version." << endl;
+	GlobalV::ofs_running << "    This is SERIES version." << std::endl;
 	TITLE("Input","init");
 #endif
     	GlobalV::ofs_running << "    Start Time is " << ctime(&time_now);
-	GlobalV::ofs_running << "                                                                                     " << endl;
-	GlobalV::ofs_running << " ------------------------------------------------------------------------------------" << endl;
+	GlobalV::ofs_running << "                                                                                     " << std::endl;
+	GlobalV::ofs_running << " ------------------------------------------------------------------------------------" << std::endl;
 
-	GlobalV::ofs_running << setiosflags(ios::left);
-	cout << setiosflags(ios::left);
+	GlobalV::ofs_running << std::setiosflags(ios::left);
+	std::cout << std::setiosflags(ios::left);
 
-	GlobalV::ofs_running << "\n READING GENERAL INFORMATION" << endl;
+	GlobalV::ofs_running << "\n READING GENERAL INFORMATION" << std::endl;
 	OUT(GlobalV::ofs_running,"global_out_dir", GlobalV::global_out_dir);
 	OUT(GlobalV::ofs_running,"global_in_card", GlobalV::global_in_card);
 	OUT(GlobalV::ofs_running,"pseudo_dir", GlobalV::global_pseudo_dir);
@@ -161,7 +149,7 @@ void Input::Default(void)
     //local_basis=0; xiaohui modify 2013-09-01
     //linear_scaling=false; xiaohui modify 2013-09-01
 	basis_type = "pw"; //xiaohui add 2013-09-01
-	ks_solver = "default"; //xiaohui add 2013-09-01 
+	ks_solver = "default"; //xiaohui add 2013-09-01
     search_radius=-1.0; // unit: a.u. -1.0 has no meaning.
     search_pbc=true;
     symmetry=false;
@@ -218,6 +206,9 @@ void Input::Default(void)
 	t_in_h = 1;
 	vl_in_h = 1;
 	vnl_in_h = 1;
+	vh_in_h = 1;
+	vxc_in_h = 1;
+	vion_in_h = 1;
 	test_force = 0;
 	test_stress = 0;
 //----------------------------------------------------------
@@ -270,14 +261,14 @@ void Input::Default(void)
 	dos_scale = 0.01;
     b_coef = 0.07;
 //----------------------------------------------------------
-// LCAO 
+// LCAO
 //----------------------------------------------------------
 	lcao_ecut = 0; // (Ry)
 	lcao_dk = 0.01;
 	lcao_dr = 0.01;
 	lcao_rmax = 30; // (a.u.)
 //----------------------------------------------------------
-// Selinv 
+// Selinv
 //----------------------------------------------------------
 	selinv_npole = 40;
 	selinv_temp = 2000;
@@ -287,11 +278,11 @@ void Input::Default(void)
 	selinv_threshold = 1.0e-3;
 	selinv_niter = 50;
 //----------------------------------------------------------
-// Molecular Dynamics 
+// Molecular Dynamics
 //----------------------------------------------------------
 /*
 	md_dt=20.0; //unit is 1 a.u., which is 4.8378*10e-17 s
-	md_restart=0; 
+	md_restart=0;
 	md_tolv=100.0;
 	md_thermostat="not_controlled"; //"rescaling","rescale-v","rescale-t","reduce-t"...
 	md_temp0=300; //kelvin
@@ -376,22 +367,22 @@ void Input::Default(void)
 	shift = 0.0;
 	metalcalc = false;
 	eps_degauss = 0.01;
-		
+
 	//epsilon0_choice = 0;
 
 //----------------------------------------------------------
 // exx										//Peize Lin add 2018-06-20
-//----------------------------------------------------------		
+//----------------------------------------------------------
 	exx_hybrid_type = "no";
 
 	exx_hybrid_alpha = 0.25;
 	exx_hse_omega = 0.11;
-		
+
 	exx_separate_loop = true;
 	exx_hybrid_step = 100;
-		
+
 	exx_lambda = 0.3;
-		
+
 	exx_pca_threshold = 0;
 	exx_c_threshold = 0;
 	exx_v_threshold = 0;
@@ -400,9 +391,9 @@ void Input::Default(void)
 	exx_cauchy_threshold = 0;
 	exx_ccp_threshold = 1E-8;
 	exx_ccp_rmesh_times = 10;
-		
+
 	exx_distribute_type = "htime";
-		
+
 	exx_opt_orb_lmax = 0;
 	exx_opt_orb_ecut = 0.0;
 	exx_opt_orb_tolerence = 0.0;
@@ -411,8 +402,6 @@ void Input::Default(void)
 	noncolin = false;
 	lspinorb = false;
 	soc_lambda = 1.0;
-	angle1[0] = 0.0;
-	angle2[0] = 0.0;
 
 	//xiaohui add 2015-09-16
 	input_error = 0;
@@ -429,13 +418,13 @@ void Input::Default(void)
 	td_val_elec_03=1;
 	td_vext=0;
 	td_vext_dire=1;
-	
+
 	td_timescale = 0.5;
 	td_vexttype = 1;
 	td_vextout = 0;
 	td_dipoleout =0;
 
-	
+
 //----------------------------------------------------------			//Fuxiang He add 2016-10-26
 // constrained DFT
 //----------------------------------------------------------
@@ -468,24 +457,24 @@ void Input::Default(void)
 //==========================================================
     dft_plus_u = false;                    // 1:DFT+U correction; 0：standard DFT calcullation
 	yukawa_potential = false;
-	double_counting = 1; 
+	double_counting = 1;
 	omc = false;
 	dftu_type = 2;
 
     return;
 }
 
-bool Input::Read(const string &fn)
+bool Input::Read(const std::string &fn)
 {
     TITLE("Input","Read");
 
     if (GlobalV::MY_RANK!=0) return false;
 
-    ifstream ifs(fn.c_str(), ios::in);	// "in_datas/input_parameters"
+    std::ifstream ifs(fn.c_str(), ios::in);	// "in_datas/input_parameters"
 
-    if (!ifs) 
+    if (!ifs)
 	{
-		cout << " Can't find the INPUT file." << endl;
+		std::cout << " Can't find the INPUT file." << std::endl;
 		return false;
 	}
 
@@ -496,7 +485,7 @@ bool Input::Read(const string &fn)
     char word1[80];
     int ierr = 0;
 
-    //ifs >> setiosflags(ios::uppercase);
+    //ifs >> std::setiosflags(ios::uppercase);
     ifs.rdstate();
     while (ifs.good())
     {
@@ -512,7 +501,7 @@ bool Input::Read(const string &fn)
 
     if (ierr == 0)
     {
-		cout << " Error parameter list." << endl;
+		std::cout << " Error parameter list." << std::endl;
 		return false;// return error : false
     }
 
@@ -555,11 +544,11 @@ bool Input::Read(const string &fn)
         {
             read_value(ifs, latname);
         }
-		else if (strcmp("pseudo_rcut", word) == 0)// 
+		else if (strcmp("pseudo_rcut", word) == 0)//
         {
             read_value(ifs, pseudo_rcut);
         }
-		else if (strcmp("renormwithmesh", word) == 0)// 
+		else if (strcmp("renormwithmesh", word) == 0)//
 		{
             read_value(ifs, renormwithmesh);
         }
@@ -570,11 +559,15 @@ bool Input::Read(const string &fn)
         else if (strcmp("ntype", word) == 0)// number of atom types
         {
             read_value(ifs, ntype);
-        }
+			if (ntype <= 0)
+				WARNING_QUIT("Input", "ntype must > 0");
+		}
         else if (strcmp("nbands", word) == 0)// number of atom bands
         {
             read_value(ifs, nbands);
-        }
+			if (nbands <= 0)
+				WARNING_QUIT("Input", "NBANDS must > 0");
+		}
 		else if (strcmp("nbands_sto", word) == 0)//number of stochastic bands
         {
             read_value(ifs, nbands_sto);
@@ -582,7 +575,10 @@ bool Input::Read(const string &fn)
         else if (strcmp("nbands_istate", word) == 0)// number of atom bands
         {
             read_value(ifs, nbands_istate);
-        }
+			// Originally disabled in line 2401.
+			// if (nbands_istate < 0)
+			// 	WARNING_QUIT("Input", "NBANDS_ISTATE must > 0");
+		}
 		else if (strcmp("nche_sto", word) == 0)// Chebyshev expansion order
         {
             read_value(ifs, nche_sto);
@@ -875,7 +871,9 @@ bool Input::Read(const string &fn)
         else if (strcmp("nb2d", word) == 0)
         {
             read_value(ifs, nb2d);
-        }
+			if (nb2d < 0)
+				WARNING_QUIT("Input", "nb2d must > 0");
+		}
         else if (strcmp("nurse", word) == 0)
         {
             read_value(ifs, nurse);
@@ -895,6 +893,18 @@ bool Input::Read(const string &fn)
         else if (strcmp("vnl_in_h", word) == 0)
         {
             read_value(ifs, vnl_in_h);
+        }
+        else if (strcmp("vh_in_h", word) == 0)
+        {
+            read_value(ifs, vh_in_h);
+        }
+        else if (strcmp("vxc_in_h", word) == 0)
+        {
+            read_value(ifs, vxc_in_h);
+        }
+        else if (strcmp("vion_in_h", word) == 0)
+        {
+            read_value(ifs, vion_in_h);
         }
         else if (strcmp("test_force", word) == 0)
         {
@@ -1040,7 +1050,7 @@ bool Input::Read(const string &fn)
         {
             read_value(ifs, out_band);
         }
-        
+
         else if (strcmp("out_hs", word) == 0)
         {
             read_value(ifs, out_hs);
@@ -1167,10 +1177,6 @@ bool Input::Read(const string &fn)
 		{
 			read_value(ifs, mdp.mdtype);
 		}
-		//else if (strcmp("md_potential",word) == 0)
-		//{
-		//	read_value(ifs, mdp.md_potential);
-		//}
 		else if (strcmp("NVT_tau",word) == 0)
 		{
 			read_value(ifs, mdp.NVT_tau);
@@ -1224,6 +1230,25 @@ bool Input::Read(const string &fn)
 			read_value(ifs,mdp.ediffg );
 		}
 //added by zheng daye
+//----------------------------------------------------------
+// Classic MD
+// Yu Liu add 2021-07-30
+//----------------------------------------------------------
+		else if (strcmp("rcut_lj",word) == 0)
+		{
+			read_value(ifs,mdp.rcut_lj );
+			mdp.rcut_lj*=ANGSTROM_AU;
+		}
+		else if (strcmp("epsilon_lj",word) == 0)
+		{
+			read_value(ifs,mdp.epsilon_lj );
+			mdp.epsilon_lj/=Ry_to_eV;
+		}
+		else if (strcmp("sigma_lj",word) == 0)
+		{
+			read_value(ifs,mdp.sigma_lj );
+			mdp.sigma_lj*=ANGSTROM_AU;
+		}
 //----------------------------------------------------------
 // tddft
 // Fuxiang He add 2016-10-26
@@ -1297,7 +1322,7 @@ bool Input::Read(const string &fn)
 	    else if (strcmp("vdwd2_d", word) == 0)
 	    {
 	        read_value(ifs, vdwD2_d);
-	    }		
+	    }
 	    else if (strcmp("vdwd2_c6_file", word) == 0)
 	    {
 	        read_value(ifs, vdwD2_C6_file);
@@ -1358,7 +1383,7 @@ bool Input::Read(const string &fn)
 		else if (strcmp("vdw_d", word) == 0)
         {
             read_value(ifs, vdw_d);
-        }	
+        }
         else if (strcmp("vdw_abc", word) == 0)
         {
             read_value(ifs, vdw_abc);
@@ -1370,7 +1395,7 @@ bool Input::Read(const string &fn)
         else if (strcmp("vdw_radius_unit", word) == 0)
         {
             read_value(ifs, vdw_radius_unit);
-        }	
+        }
         else if (strcmp("vdw_cn_thr", word) == 0)
         {
             read_value(ifs, vdw_cn_thr);
@@ -1378,7 +1403,7 @@ bool Input::Read(const string &fn)
         else if (strcmp("vdw_cn_thr_unit", word) == 0)
         {
             read_value(ifs, vdw_cn_thr_unit);
-        }		
+        }
         else if (strcmp("vdw_c6_file", word) == 0)
         {
             read_value(ifs, vdw_C6_file);
@@ -1406,7 +1431,7 @@ bool Input::Read(const string &fn)
         }
 //--------------------------------------------------------
 // restart           Peize Lin 2020-04-04
-//--------------------------------------------------------		
+//--------------------------------------------------------
         else if (strcmp("restart_save", word) == 0)
         {
             read_value(ifs, restart_save);
@@ -1477,7 +1502,7 @@ bool Input::Read(const string &fn)
 	    else if (strcmp("q_direction", word) == 0)
 	    {
 			ifs >> q_direct[0]; ifs >> q_direct[1]; read_value(ifs, q_direct[2]);
-	    }				
+	    }
 	    //else if (strcmp("start_q", word) == 0)
 	    //{
 	    //    read_value(ifs, start_q);
@@ -1538,7 +1563,7 @@ bool Input::Read(const string &fn)
         // {
              // for(int i=0; i<(ocp_n-1); i++)
              // {
-                 // ifs >> GlobalV::ocp_kb[i]; 
+                 // ifs >> GlobalV::ocp_kb[i];
              // }
 			// read_value(ifs, GlobalV::ocp_kb[ocp_n-1]);
         // }
@@ -1570,7 +1595,7 @@ bool Input::Read(const string &fn)
 	    else if (strcmp("metalcalc", word) == 0)
 	    {
 	        read_value(ifs, metalcalc);
-	    }	
+	    }
 	    else if (strcmp("eps_degauss", word) == 0)
 	    {
 	        read_value(ifs, eps_degauss);
@@ -1578,7 +1603,7 @@ bool Input::Read(const string &fn)
 	    //else if (strcmp("epsilon0_choice", word) == 0)
 	    //{
 	    //    read_value(ifs, epsilon0_choice);
-	    //}					
+	    //}
 //----------------------------------------------------------
 // exx
 // Peize Lin add 2018-06-20
@@ -1586,59 +1611,59 @@ bool Input::Read(const string &fn)
         else if (strcmp("exx_hybrid_type", word) == 0)
         {
             read_value(ifs, exx_hybrid_type);
-        }		
+        }
         else if (strcmp("exx_hybrid_alpha", word) == 0)
         {
             read_value(ifs, exx_hybrid_alpha);
-        }		
+        }
         else if (strcmp("exx_hse_omega", word) == 0)
         {
             read_value(ifs, exx_hse_omega);
-        }		
+        }
         else if (strcmp("exx_separate_loop", word) == 0)
         {
             read_value(ifs, exx_separate_loop);
-        }		
+        }
         else if (strcmp("exx_hybrid_step", word) == 0)
         {
             read_value(ifs, exx_hybrid_step);
-        }		
+        }
         else if (strcmp("exx_lambda", word) == 0)
         {
             read_value(ifs, exx_lambda);
-        }		
+        }
         else if (strcmp("exx_pca_threshold", word) == 0)
         {
             read_value(ifs, exx_pca_threshold);
-        }		
+        }
         else if (strcmp("exx_c_threshold", word) == 0)
         {
             read_value(ifs, exx_c_threshold);
-        }			
+        }
         else if (strcmp("exx_v_threshold", word) == 0)
         {
             read_value(ifs, exx_v_threshold);
-        }			
+        }
         else if (strcmp("exx_dm_threshold", word) == 0)
         {
             read_value(ifs, exx_dm_threshold);
-        }		
+        }
         else if (strcmp("exx_schwarz_threshold", word) == 0)
         {
             read_value(ifs, exx_schwarz_threshold);
-        }		
+        }
         else if (strcmp("exx_cauchy_threshold", word) == 0)
         {
             read_value(ifs, exx_cauchy_threshold);
-        }		
+        }
         else if (strcmp("exx_ccp_threshold", word) == 0)
         {
             read_value(ifs, exx_ccp_threshold);
-        }		
+        }
         else if (strcmp("exx_ccp_rmesh_times", word) == 0)
         {
             read_value(ifs, exx_ccp_rmesh_times);
-        }		
+        }
         else if (strcmp("exx_distribute_type", word) == 0)
         {
             read_value(ifs, exx_distribute_type);
@@ -1669,36 +1694,20 @@ bool Input::Read(const string &fn)
 		}
 		else if (strcmp("angle1", word) == 0)
 		{
-			delete[] angle1;
-			if(ntype<1) angle1 = new double[1];
-			else
-			{
-				angle1 = new double[ntype];
-				ZEROS(angle1, ntype);
-				for(int i = 0;i<ntype;i++){
-					ifs>>angle1[i];
-				}
-				ifs.ignore(150, '\n');
-			}
+			angle1.resize(ntype);
+			for(auto &i:angle1)
+				read_value(ifs, i);
 		}
 		else if (strcmp("angle2", word) == 0)
 		{
-			delete[] angle2;
-			if(ntype<1) angle2 = new double[1];
-			else
-			{
-				angle2 = new double[ntype];
-				ZEROS(angle2, ntype);
-				for(int i = 0;i<ntype;i++){
-					ifs>>angle2[i];
-				}
-				ifs.ignore(150, '\n');
-			}
+			angle2.resize(ntype);
+			for (auto &i : angle2)
+				read_value(ifs, i);
 		}
         //else if (strcmp("epsilon0_choice", word) == 0)
         //{
         //    read_value(ifs, epsilon0_choice);
-        //}					
+        //}
 		else if (strcmp("cell_factor", word) == 0)
 		{
 			read_value(ifs, cell_factor);
@@ -1713,7 +1722,7 @@ bool Input::Read(const string &fn)
 		}
 //----------------------------------------------------------------------------------
 //         Xin Qu added on 2020-10-29 for DFT+U
-//----------------------------------------------------------------------------------		
+//----------------------------------------------------------------------------------
 		else if(strcmp("dft_plus_u",word)==0)
 		{
 			ifs >> dft_plus_u;
@@ -1733,11 +1742,11 @@ bool Input::Read(const string &fn)
 			if(word[0] != '#' && word[0] != '/')
 			{
 				input_error = 1;
-				cout<<" THE PARAMETER NAME '" << word << "' IS NOT USED!" << endl;
+				std::cout<<" THE PARAMETER NAME '" << word << "' IS NOT USED!" << std::endl;
 			}
 // mohan screen this 2012-06-30
-//			cout << " THE PARAMETER NAME '" << word
-//			<< "' IS NOT USED!" << endl;
+//			std::cout << " THE PARAMETER NAME '" << word
+//			<< "' IS NOT USED!" << std::endl;
 			ifs.ignore(150, '\n');
         }
 
@@ -1747,7 +1756,7 @@ bool Input::Read(const string &fn)
         {
            gamma_only_local = 1;      //pengfei 2014-10-15
            gamma_only = 0;
-           cout << "gamma_only_local = " << gamma_only_local <<endl;
+           std::cout << "gamma_only_local = " << gamma_only_local <<std::endl;
         }*/
 
         if (ifs.eof() != 0)
@@ -1756,13 +1765,13 @@ bool Input::Read(const string &fn)
         }
         else if (ifs.bad() != 0)
         {
-			cout << " Bad input parameters. " << endl;
+			std::cout << " Bad input parameters. " << std::endl;
             return false;
         }
         else if (ifs.fail() != 0)
         {
-			cout << " word = " << word << endl;
-			cout << " Fail to read parameters. " << endl; 
+			std::cout << " word = " << word << std::endl;
+			std::cout << " Fail to read parameters. " << std::endl;
             ifs.clear();
 			return false;
         }
@@ -1777,43 +1786,43 @@ bool Input::Read(const string &fn)
 //----------------------------------------------------------
     hubbard_u= new double [ntype];
 	for(int i=0; i<ntype; i++)
-	{						
-		hubbard_u[i] = 0.0;				
+	{
+		hubbard_u[i] = 0.0;
 	}
 
-	hund_j= new double [ntype];	
+	hund_j= new double [ntype];
 	for(int i=0; i<ntype; i++)
-	{						
-		hund_j[i] = 0.0;				
+	{
+		hund_j[i] = 0.0;
 	}
 
 	orbital_corr= new int [ntype];
 	for(int i=0; i<ntype; i++)
-	{						
-		orbital_corr[i] = -1;				
+	{
+		orbital_corr[i] = -1;
 	}
 
 	if(dft_plus_u)
 	{
 		ifs.clear();
     	ifs.seekg(0);  //move to the beginning of the file
-    	ifs.rdstate(); 
+    	ifs.rdstate();
     	while (ifs.good())
     	{
   			ifs >> word1;
-  			strtolower(word1, word);     //convert uppercase string to lower case; word1 --> word
-	
+  			strtolower(word1, word);     //convert uppercase std::string to lower case; word1 --> word
+
 			if(strcmp("dftu_type",word)==0)
-			{	
-				ifs >> dftu_type;								
+			{
+				ifs >> dftu_type;
 			}
 			else if(strcmp("yukawa_potential", word)==0)
 			{
 				ifs >> yukawa_potential;
-			} 
+			}
 			else if (strcmp("yukawa_lambda",word)==0)
-			{							
-				ifs >> yukawa_lambda;			
+			{
+				ifs >> yukawa_lambda;
 			}
 			else if(strcmp("double_counting",word)==0)
 			{
@@ -1822,25 +1831,25 @@ bool Input::Read(const string &fn)
 			else if(strcmp("hubbard_u",word)==0)
 			{
 				for(int i=0; i<ntype; i++)
-				{		
-					ifs >> hubbard_u[i];				
-					hubbard_u[i] /= Ry_to_eV;				
+				{
+					ifs >> hubbard_u[i];
+					hubbard_u[i] /= Ry_to_eV;
 				}
-			} 
+			}
 			else if (strcmp("hund_j",word)==0)
 			{
 				for(int i=0;i<ntype;i++)
-				{			
+				{
 					ifs >> hund_j[i];
-					hund_j[i] /= Ry_to_eV;				
-				}		
+					hund_j[i] /= Ry_to_eV;
+				}
 			}
 			else if(strcmp("orbital_corr", word)==0)
 			{
 				for(int i=0;i<ntype;i++)
-				{			
-					ifs >> orbital_corr[i];								
-				}		
+				{
+					ifs >> orbital_corr[i];
+				}
 			}
 			else if(strcmp("omc",word)==0)
 			{
@@ -1854,32 +1863,32 @@ bool Input::Read(const string &fn)
 			if (ifs.eof() != 0)
   			{
 				break;
-  			}       
+  			}
 		}
-		
+
 		for(int i=0; i<ntype; i++)
-		{		
+		{
 
 			if(hubbard_u[i]<-1.0e-3)
 			{
-				cout << " WRONG ARGUMENTS OF hubbard_u " << endl;
+				std::cout << " WRONG ARGUMENTS OF hubbard_u " << std::endl;
 				exit(0);
 			}
 
 			if(hund_j[i]<-1.0e-3)
 			{
-				cout << " WRONG ARGUMENTS OF hund_j " << endl;
+				std::cout << " WRONG ARGUMENTS OF hund_j " << std::endl;
 				exit(0);
 			}
 
 			if( (orbital_corr[i]==-1) && (orbital_corr[i]==0) && (orbital_corr[i]!=1) && (orbital_corr[i]!=2) && (orbital_corr[i]!=3) )
 			{
-				cout << " WRONG ARGUMENTS OF orbital_corr " << endl;
+				std::cout << " WRONG ARGUMENTS OF orbital_corr " << std::endl;
 				exit(0);
 			}
 		}
 
-		dft_plus_u = 0;		
+		dft_plus_u = 0;
 		for(int i=0; i<ntype; i++)
 		{
 			if(orbital_corr[i] != -1) dft_plus_u = 1;
@@ -1887,27 +1896,27 @@ bool Input::Read(const string &fn)
 
 		if(strcmp("lcao", basis_type.c_str())!=0)
 		{
-			cout << " WRONG ARGUMENTS OF basis_type, only lcao is support " << endl;
+			std::cout << " WRONG ARGUMENTS OF basis_type, only lcao is support " << std::endl;
 			exit(0);
 		}
 
 		if(strcmp("genelpa", ks_solver.c_str())!=0)
 		{
-			cout << " WRONG ARGUMENTS OF ks_solver in DFT+U routine, only genelpa is support " << endl;
+			std::cout << " WRONG ARGUMENTS OF ks_solver in DFT+U routine, only genelpa is support " << std::endl;
 			exit(0);
 		}
 
 	}
-	
+
 	if (basis_type == "pw")  // pengfei Li add 2015-1-31
 	{
 		gamma_only = 0;
-		//cout << "gamma_only =" << gamma_only << endl;
+		//std::cout << "gamma_only =" << gamma_only << std::endl;
 	}
 	else if ((basis_type == "lcao" || basis_type == "lcao_in_pw")&&(gamma_only == 1))
 	{
 		gamma_only_local = 1;
-		//cout << "gamma_only_local =" << gamma_only_local << endl;
+		//std::cout << "gamma_only_local =" << gamma_only_local << std::endl;
 	}
 
     return true;
@@ -1974,13 +1983,13 @@ void Input::Default_2(void)          //jiyy add 2019-08-04
 			vdw_radius="95";
 		}
 	}
-}		  
+}
 #ifdef __MPI
 void Input::Bcast()
 {
     TITLE("Input","Bcast");
 
-//	cout << "\n Bcast()" << endl;
+//	std::cout << "\n Bcast()" << std::endl;
 //----------------------------------------------------------
 // main parameters
 //----------------------------------------------------------
@@ -2080,6 +2089,9 @@ void Input::Bcast()
 	Parallel_Common::bcast_int( t_in_h );
 	Parallel_Common::bcast_int( vl_in_h );
 	Parallel_Common::bcast_int( vnl_in_h );
+	Parallel_Common::bcast_int( vh_in_h );
+	Parallel_Common::bcast_int( vxc_in_h );
+	Parallel_Common::bcast_int( vion_in_h );
 
 	Parallel_Common::bcast_int( test_force );
 	Parallel_Common::bcast_int( test_stress );
@@ -2111,7 +2123,7 @@ void Input::Bcast()
     Parallel_Common::bcast_int( lmax_descriptor ); // mohan modified 2021-01-03
     Parallel_Common::bcast_int( deepks_scf ); // caoyu add 2021-06-02
 	Parallel_Common::bcast_string( model_file ); //  caoyu add 2021-06-03
-	
+
 	Parallel_Common::bcast_int(out_potential);
     Parallel_Common::bcast_bool( out_wf );
 	Parallel_Common::bcast_int( out_dos );
@@ -2154,7 +2166,6 @@ void Input::Bcast()
 */
 	//zheng daye add 2014/5/5
         Parallel_Common::bcast_int(mdp.mdtype);
-		//Parallel_Common::bcast_int(mdp.md_potential);
         Parallel_Common::bcast_double(mdp.NVT_tau);
         Parallel_Common::bcast_int(mdp.NVT_control);
         Parallel_Common::bcast_double(mdp.dt);
@@ -2168,6 +2179,9 @@ void Input::Bcast()
         Parallel_Common::bcast_int(mdp.fixTemperature);
         Parallel_Common::bcast_double(mdp.ediff);
         Parallel_Common::bcast_double(mdp.ediffg);
+		Parallel_Common::bcast_double(mdp.rcut_lj);
+		Parallel_Common::bcast_double(mdp.epsilon_lj);
+		Parallel_Common::bcast_double(mdp.sigma_lj);
 /* 	// Peize Lin add 2014-04-07
 	Parallel_Common::bcast_bool( vdwD2 );
 	Parallel_Common::bcast_double( vdwD2_scaling );
@@ -2271,20 +2285,20 @@ void Input::Bcast()
 	Parallel_Common::bcast_double( eps_degauss );
 
 	// Peize Lin add 2018-06-20
-	Parallel_Common::bcast_string( exx_hybrid_type );		
-	Parallel_Common::bcast_double( exx_hybrid_alpha );		
-	Parallel_Common::bcast_double( exx_hse_omega );		
-	Parallel_Common::bcast_bool( exx_separate_loop );		
-	Parallel_Common::bcast_int( exx_hybrid_step );		
-	Parallel_Common::bcast_double( exx_lambda );		
-	Parallel_Common::bcast_double( exx_pca_threshold );		
-	Parallel_Common::bcast_double( exx_c_threshold );		
-	Parallel_Common::bcast_double( exx_v_threshold );		
-	Parallel_Common::bcast_double( exx_dm_threshold );		
-	Parallel_Common::bcast_double( exx_schwarz_threshold );		
-	Parallel_Common::bcast_double( exx_cauchy_threshold );		
-	Parallel_Common::bcast_double( exx_ccp_threshold );		
-	Parallel_Common::bcast_double( exx_ccp_rmesh_times );		
+	Parallel_Common::bcast_string( exx_hybrid_type );
+	Parallel_Common::bcast_double( exx_hybrid_alpha );
+	Parallel_Common::bcast_double( exx_hse_omega );
+	Parallel_Common::bcast_bool( exx_separate_loop );
+	Parallel_Common::bcast_int( exx_hybrid_step );
+	Parallel_Common::bcast_double( exx_lambda );
+	Parallel_Common::bcast_double( exx_pca_threshold );
+	Parallel_Common::bcast_double( exx_c_threshold );
+	Parallel_Common::bcast_double( exx_v_threshold );
+	Parallel_Common::bcast_double( exx_dm_threshold );
+	Parallel_Common::bcast_double( exx_schwarz_threshold );
+	Parallel_Common::bcast_double( exx_cauchy_threshold );
+	Parallel_Common::bcast_double( exx_ccp_threshold );
+	Parallel_Common::bcast_double( exx_ccp_rmesh_times );
 	Parallel_Common::bcast_string( exx_distribute_type );
 	Parallel_Common::bcast_int( exx_opt_orb_lmax );
 	Parallel_Common::bcast_double( exx_opt_orb_ecut );
@@ -2297,23 +2311,15 @@ void Input::Bcast()
 	{
 		if(GlobalV::MY_RANK==0)
 		{
-			if((sizeof(angle1) / sizeof(angle1[0]) != this->ntype)){
-				delete[] angle1;
-				angle1 = new double [this->ntype];
-				ZEROS(angle1, this->ntype);
-			}
-			if(sizeof(angle2) / sizeof(angle2[0]) != this->ntype){
-				delete[] angle2;
-				angle2 = new double [this->ntype];
-				ZEROS(angle2, this->ntype);
-			}
+			if (angle1.size() != this->ntype)
+				angle1.resize(this->ntype);
+			if (angle2.size() != this->ntype)
+				angle2.resize(this->ntype);
 		}
 		if(GlobalV::MY_RANK!=0)
 		{
-			delete[] angle1;
-			angle1 = new double [this->ntype];
-			delete[] angle2;
-			angle2 = new double [this->ntype];
+			angle1.resize(this->ntype);
+			angle2.resize(this->ntype);
 		}
 		for(int i = 0;i<this->ntype;i++)
 		{
@@ -2321,7 +2327,7 @@ void Input::Bcast()
 			Parallel_Common::bcast_double(angle2[i]);
 		}
 	}
-	
+
 		//Parallel_Common::bcast_int( epsilon0_choice );
     Parallel_Common::bcast_double( cell_factor); //LiuXh add 20180619
     Parallel_Common::bcast_int( new_dm ); // Shen Yu add 2019/5/9
@@ -2343,7 +2349,7 @@ void Input::Bcast()
 		hund_j = new double [this->ntype];
 		orbital_corr = new int [this->ntype];
 	}
-	
+
 	for(int i =0; i<this->ntype; i++)
 	{
 		Parallel_Common::bcast_double(hubbard_u[i]);
@@ -2363,10 +2369,10 @@ void Input::Check(void)
 	if(nbands < 0) WARNING_QUIT("Input","NBANDS must > 0");
 //	if(nbands_istate < 0) WARNING_QUIT("Input","NBANDS_ISTATE must > 0");
 	if(nb2d < 0) WARNING_QUIT("Input","nb2d must > 0");
-	if(ntype < 0) WARNING_QUIT("Input","ntype must > 0");
+	if(ntype <= 0) WARNING_QUIT("Input","ntype must > 0");
 
-	//cout << "diago_proc=" << diago_proc << endl;
-	//cout << " NPROC=" << GlobalV::NPROC << endl;
+	//std::cout << "diago_proc=" << diago_proc << std::endl;
+	//std::cout << " NPROC=" << GlobalV::NPROC << std::endl;
 	if(diago_proc<=0)
 	{
 		diago_proc = GlobalV::NPROC;
@@ -2381,7 +2387,7 @@ void Input::Check(void)
 	//if(basis_type=="pw" && ks_solver=="lapack") xiaohui modify 2013-09-04 //xiaohui add 2013-09-01
 	//{
 	//	WARNING_QUIT("Input","lapack can not be used in plane wave basis.");
-	//} xiaohui modify 2013-09-04	
+	//} xiaohui modify 2013-09-04
 
 	//xiaohui move 4 lines, 2015-09-30
 	//if(symmetry)
@@ -2442,10 +2448,10 @@ void Input::Check(void)
 /*
 		if(!noncolin)
         	force = 1;
-		else 
+		else
 		{
 			force = 0;//modified by zhengdy-soc, can't calculate force now!
-			cout<<"sorry, can't calculate force with soc now, would be implement in next version!"<<endl;
+			std::cout<<"sorry, can't calculate force with soc now, would be implement in next version!"<<std::endl;
 		}
 */
                 nstep = 1;
@@ -2471,10 +2477,10 @@ void Input::Check(void)
 
     else if (calculation == "nscf")
     {
-		GlobalV::CALCULATION == "nscf";
+		GlobalV::CALCULATION = "nscf";
         nstep = 1;
 		out_stru = 0;
-        
+
 		//if (local_basis == 0 && linear_scaling == 0) xiaohui modify 2013-09-01
 		if (basis_type == "pw") //xiaohui add 2013-09-01. Attention! maybe there is some problem
 		{
@@ -2502,7 +2508,7 @@ void Input::Check(void)
                 out_band = 0;
 		force=0;
 		start_wfc = "file";
-		start_pot = "atomic"; // useless, 
+		start_pot = "atomic"; // useless,
 		charge_extrap = "atomic"; //xiaohui modify 2015-02-01
 		out_charge = 1; // this leads to the calculation of state charge.
 		out_dm = 0;
@@ -2532,11 +2538,11 @@ void Input::Check(void)
 		if(basis_type == "pw") //xiaohui add 2013-09-01
 		{
 			WARNING_QUIT("Input::Check","calculate = istate is only availble for LCAO.");
-		}	
+		}
 	}
 	else if(calculation == "md") // mohan add 2011-11-04
 	{
-		GlobalV::CALCULATION = "md"; 
+		GlobalV::CALCULATION = "md";
 		symmetry = false;
 		force = 1;
         if(!out_md_control) out_level = "m";//zhengdy add 2019-04-07
@@ -2548,11 +2554,11 @@ void Input::Check(void)
         if(mdp.tlast  < 0.0) mdp.tlast = mdp.tfirst;
         if(mdp.tfirst!=mdp.tlast)
         {
-            ifstream file1;
+            std::ifstream file1;
             file1.open("ChangeTemp.dat");
             if(!file1)                      // Peize Lin fix bug 2016-08-06
            {
-                ofstream file;
+                std::ofstream file;
                 file.open("ChangeTemp.dat");
                 for(int ii=0;ii<30;ii++)
                 {
@@ -2581,7 +2587,7 @@ void Input::Check(void)
     {
         WARNING_QUIT("Input","wrong 'start_pot',not 'atomic', 'file',please check");
     }
-	//xiaohui modify 2014-05-10, extra_pot value changes to 0~7	
+	//xiaohui modify 2014-05-10, extra_pot value changes to 0~7
 	//if (extra_pot <0 ||extra_pot > 7)
 	//{
 	//	WARNING_QUIT("Input","wrong 'extra_pot',neither 0~7.");
@@ -2640,7 +2646,7 @@ void Input::Check(void)
     {
         WARNING_QUIT("Input","nspin out of range!");
     }
-	
+
 
 	if(basis_type=="pw") //xiaohui add 2013-09-01
 	{
@@ -2651,19 +2657,19 @@ void Input::Check(void)
 		}
 		else if(ks_solver=="cg")
 		{
-			GlobalV::ofs_warning << " It's ok to use cg." << endl;
+			GlobalV::ofs_warning << " It's ok to use cg." << std::endl;
 		}
 		else if(ks_solver=="dav")
 		{
-			GlobalV::ofs_warning << " It's ok to use dav." << endl;
+			GlobalV::ofs_warning << " It's ok to use dav." << std::endl;
 		}
 		else if(ks_solver=="genelpa") //yshen add 2016-07-20
 		{
-			WARNING_QUIT("Input","genelpa can not be used with plane wave basis."); 
+			WARNING_QUIT("Input","genelpa can not be used with plane wave basis.");
 		}
 		else if(ks_solver=="scalapack_gvx") //Peize Lin add 2020.11.14
 		{
-			WARNING_QUIT("Input","scalapack_gvx can not be used with plane wave basis."); 
+			WARNING_QUIT("Input","scalapack_gvx can not be used with plane wave basis.");
 		}
 		else if(ks_solver=="hpseps")
 		{
@@ -2696,7 +2702,7 @@ void Input::Check(void)
 			else if (ks_solver == "genelpa")
 			{
 #ifdef __MPI
-//				GlobalV::ofs_warning << "genelpa is under testing" << endl;
+//				GlobalV::ofs_warning << "genelpa is under testing" << std::endl;
 #else
 				WARNING_QUIT("Input","genelpa can not be used for series version.");
 #endif
@@ -2704,7 +2710,7 @@ void Input::Check(void)
 			else if (ks_solver == "scalapack_gvx")
 			{
 #ifdef __MPI
-				GlobalV::ofs_warning << "scalapack_gvx is under testing" << endl;
+				GlobalV::ofs_warning << "scalapack_gvx is under testing" << std::endl;
 #else
 				WARNING_QUIT("Input","scalapack_gvx can not be used for series version.");
 #endif
@@ -2712,7 +2718,7 @@ void Input::Check(void)
 			else if (ks_solver == "hpseps")
 			{
 #ifdef __MPI
-				GlobalV::ofs_warning << "It's not a good choice to use hpseps!" << endl;
+				GlobalV::ofs_warning << "It's not a good choice to use hpseps!" << std::endl;
 				if(gamma_only) WARNING_QUIT("Input","hpseps can not be used for gamma_only.");
 #else
 				WARNING_QUIT("Input","hpseps can not be used for series version.");
@@ -2721,9 +2727,9 @@ void Input::Check(void)
 			else if (ks_solver == "lapack")
 			{
 #ifdef __MPI
-				WARNING_QUIT("Input","ks_solver=lapack is not an option for parallel version of ABACUS (try hpseps).");	
+				WARNING_QUIT("Input","ks_solver=lapack is not an option for parallel version of ABACUS (try hpseps).");
 #else
-				GlobalV::ofs_warning << " It's ok to use lapack." << endl;
+				GlobalV::ofs_warning << " It's ok to use lapack." << std::endl;
 #endif
 			}
 			else if (ks_solver == "selinv")
@@ -2824,18 +2830,18 @@ void Input::Check(void)
 	else if(bz>10)
 	{
 		WARNING_QUIT("Input","bz is too large!");
-	}	
+	}
 
 	if(basis_type=="lcao")
 	{
-		if(lcao_ecut == 0) 
+		if(lcao_ecut == 0)
 		{
-			lcao_ecut = ecutwfc; 
+			lcao_ecut = ecutwfc;
 			AUTO_SET("lcao_ecut",ecutwfc);
 		}
 	}
 
-	
+
 	// jiyy add 2019-08-04
 	if(vdw_method=="d2" || vdw_method=="d3_0" || vdw_method=="d3_bj")
 	{
@@ -2872,7 +2878,7 @@ void Input::Check(void)
 			WARNING_QUIT("Input","vdw_cn_thr_unit must be A or Bohr");
 		}
 	}
-	
+
 	if(spectral_type!="None" && spectral_type!="eels" && spectral_type!="absorption")
 	{
 		WARNING_QUIT("INPUT","spectral_type must be eels or absorption !");
@@ -2896,7 +2902,7 @@ void Input::Check(void)
 		if( q_direct[0] == 0 && q_direct[1] == 0 && q_direct[2] == 0)
 		{
 			WARNING_QUIT("INPUT","You must choose a direction!");
-		}		
+		}
 		//if( oband > nbands)
 		//{
 		//	WARNING_QUIT("INPUT","oband must <= nbands");
@@ -2904,13 +2910,13 @@ void Input::Check(void)
         //        if( oband == 1)
         //        {
         //            oband = nbands;
-        //        }		
+        //        }
 	}
 
-	if(exx_hybrid_type!="no" && 
-		exx_hybrid_type!="hf" && 
-		exx_hybrid_type!="pbe0" && 
-		exx_hybrid_type!="hse" && 
+	if(exx_hybrid_type!="no" &&
+		exx_hybrid_type!="hf" &&
+		exx_hybrid_type!="pbe0" &&
+		exx_hybrid_type!="hse" &&
 		exx_hybrid_type!="opt_orb")
 	{
 		WARNING_QUIT("INPUT","exx_hybrid_type must be no or hf or pbe0 or hse or opt_orb");
@@ -2930,9 +2936,9 @@ void Input::Check(void)
 		{
 			WARNING_QUIT("INPUT","must exx_ccp_rmesh_times >= 1");
 		}
-		if(exx_distribute_type!="htime" 
-			&& exx_distribute_type!="kmeans2" 
-			&& exx_distribute_type!="kmeans1" 
+		if(exx_distribute_type!="htime"
+			&& exx_distribute_type!="kmeans2"
+			&& exx_distribute_type!="kmeans1"
 			&& exx_distribute_type!="order")
 		{
 			WARNING_QUIT("INPUT","exx_distribute_type must be htime or kmeans2 or kmeans1");
@@ -2959,7 +2965,7 @@ void Input::Check(void)
 	{
 		WARNING("Input","To use pulay-kerker mixing method, please set mixing_type=pulay-kerker");
 	}
-	
+
 	if(berry_phase)
 	{
 		if(basis_type == "pw")
@@ -2976,13 +2982,13 @@ void Input::Check(void)
 		{
 			WARNING_QUIT("Input","calculate berry phase, please set basis_type = pw or lcao");
 		}
-		
+
 		if( !(gdir==1||gdir==2||gdir==3) )
 		{
 			WARNING_QUIT("Input","calculate berry phase, please set gdir = 1 or 2 or 3");
 		}
 	}
-	
+
 	if(towannier90)
 	{
 		if(basis_type == "pw" || basis_type == "lcao")
@@ -2994,7 +3000,7 @@ void Input::Check(void)
 		{
 			WARNING_QUIT("Input","to use towannier90, please set basis_type = pw or lcao");
 		}
-		
+
 		if(nspin == 2)
 		{
 			if( !(wannier_spin=="up"||wannier_spin=="down") )
@@ -3004,7 +3010,7 @@ void Input::Check(void)
 		}
 	}
 
-	const string ss = "test -d " + read_file_dir;
+	const std::string ss = "test -d " + read_file_dir;
 	if(read_file_dir=="auto")
 	{
 		GlobalV::global_readin_dir = GlobalV::global_out_dir;
@@ -3017,19 +3023,19 @@ void Input::Check(void)
 	{
 		GlobalV::global_readin_dir = read_file_dir + '/';
 	}
-	
+
     return;
 }
 
 void Input::close_log(void)const
 {
-	
+
     Global_File::close_all_log(GlobalV::MY_RANK, this->out_alllog);
 }
 
-void Input::readbool(ifstream &ifs, bool &var)
+void Input::readbool(std::ifstream &ifs, bool &var)
 {
-    string str;
+    std::string str;
     ifs >> str;
     if (str == "true")
     {
@@ -3054,4 +3060,3 @@ void Input::strtolower(char *sa, char *sb)
     }
     sb[len] = '\0';
 }
-

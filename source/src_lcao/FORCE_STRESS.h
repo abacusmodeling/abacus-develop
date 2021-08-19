@@ -33,7 +33,7 @@ class Force_Stress_LCAO
 	void allocate (void);
 	void destroy (void);
 	
-	void print_force(const string &name, matrix& f, const bool screen, bool ry)const;
+	void print_force(const std::string &name, matrix& f, const bool screen, bool ry)const;
 	void printforce_total (const bool ry, const bool istestf, matrix& fcs);
 	
 	void getForceStress(

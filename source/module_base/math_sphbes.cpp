@@ -20,7 +20,7 @@ void Sphbes::BESSJY(double x, double xnu, double *rj, double *ry, double *rjp, d
 
     if (x <= 0.0 || xnu < 0.0)
     {
-		cout << "Sphbes::BESSJY, bad arguments" << endl;
+		std::cout << "Sphbes::BESSJY, bad arguments" << std::endl;
         //WARNING_QUIT("Sphbes::BESSJY","bad arguments");
 		exit(0); // mohan add 2021-05-06
     }
@@ -35,7 +35,7 @@ void Sphbes::BESSJY(double x, double xnu, double *rj, double *ry, double *rjp, d
     isign = 1;
     h = xnu * xi;
 
-    if (h < FPMIN) 
+    if (h < FPMIN)
 	{
 		h = FPMIN;
 	}
@@ -68,9 +68,9 @@ void Sphbes::BESSJY(double x, double xnu, double *rj, double *ry, double *rjp, d
         if (fabs(del - 1.0) < EPS) break;
     }
 
-    if (i > MAXIT) 
+    if (i > MAXIT)
 	{
-		cout << "x too large in bessjy; try asymptotic expansion" << endl;
+		std::cout << "x too large in bessjy; try asymptotic expansion" << std::endl;
 	}
 
     rjl = isign * FPMIN;
@@ -91,7 +91,7 @@ void Sphbes::BESSJY(double x, double xnu, double *rj, double *ry, double *rjp, d
         rjl = rjtemp;
     }
 
-    if (rjl == 0.0) 
+    if (rjl == 0.0)
 	{
 		rjl = EPS;
 	}
@@ -134,7 +134,7 @@ void Sphbes::BESSJY(double x, double xnu, double *rj, double *ry, double *rjp, d
             if (fabs(del) < (1.0 + fabs(sum))*EPS) break;
         }
 
-        if (i > MAXIT) cout << "bessy series failed to converge";
+        if (i > MAXIT) std::cout << "bessy series failed to converge";
 
         rymu = -sum;
 
@@ -200,7 +200,7 @@ void Sphbes::BESSJY(double x, double xnu, double *rj, double *ry, double *rjp, d
             if (fabs(dlr - 1.0) + fabs(dli) < EPS) break;
         }
 
-        if (i > MAXIT) cout << "cf2 failed in bessjy";
+        if (i > MAXIT) std::cout << "cf2 failed in bessjy";
 
         gam = (p - f) / q;
 
@@ -270,9 +270,9 @@ double Sphbes::CHEBEV(double a, double b, double c[], int m, double x)
 	double y2 = 0.0;
     int j=0;
 
-    if ((x - a)*(x - b) > 0.0) 
+    if ((x - a)*(x - b) > 0.0)
 	{
-		cout << "x not in range in routine chebev" << endl;
+		std::cout << "x not in range in routine chebev" << std::endl;
 	}
 
     y2 = 2.0 * (y = (2.0 * x - a - b) / (b - a));
@@ -299,7 +299,7 @@ double Sphbes::Spherical_Bessel_7(const int n, const double &x)
 
     if (n < 0 || x <= 0.0)
     {
-		cout << "Spherical_Bessel_7, bad arguments in sphbes" << endl;
+		std::cout << "Spherical_Bessel_7, bad arguments in sphbes" << std::endl;
         //WARNING_QUIT("Sphbes::Spherical_Bessel_7","bad arguments in sphbes");
 		exit(0);
     }
@@ -309,7 +309,7 @@ double Sphbes::Spherical_Bessel_7(const int n, const double &x)
     // call BESSSJY
     BESSJY(x, order, &rj, &ry, &rjp, &ryp);
 
-    const int RTPIO2=1.2533141;
+    const double RTPIO2=1.2533141;
 
     const double factor = RTPIO2 / sqrt(x);
 
@@ -327,15 +327,15 @@ void Sphbes::Spherical_Bessel_Roots
 )
 {
     //TITLE("Sphbes","Spherical_Bessel_Roots");
-    if (num<=0) 
+    if (num<=0)
 	{
-		cout << "Spherical_Bessel_Roots, num<=0" << endl;
+		std::cout << "Spherical_Bessel_Roots, num<=0" << std::endl;
 		//WARNING_QUIT("Sphbes::Spherical_Bessel_Roots","num<=0");
 		exit(0);
 	}
-    if (rcut<=0.0) 
+    if (rcut<=0.0)
 	{
-		cout << "Spherical_Bessel_Roots, rcut<=0" << endl;
+		std::cout << "Spherical_Bessel_Roots, rcut<=0" << std::endl;
 		//WARNING_QUIT("Sphbes::Spherical_Bessel_Roots","rcut<=0.0");
 		exit(0);
 	}
@@ -347,12 +347,12 @@ void Sphbes::Spherical_Bessel_Roots
     // magic number !!
     // guess : only need to > 1
     const int msh = 10 * num;
-//	cout<<"\n msh = "<<msh;
+//	std::cout<<"\n msh = "<<msh;
 
     // delta don't need to be small,
     // it only needs to make sure can find the eigenstates
     const double delta = (max - min) / static_cast<double>(msh);
-//	cout<<"\n delta = "<<delta;
+//	std::cout<<"\n delta = "<<delta;
 
     double *r = new double[msh];
     for (int i=0; i<msh; i++)
@@ -413,7 +413,7 @@ void Sphbes::Spherical_Bessel
 (
     const int &msh,	 // number of grid points
     const double *r, // radial grid
-    const double &q, // wave vector
+    const double &q, // wave std::vector
     const int &l,	 // angular momentum
     double *jl		 // jl(1:msh) = j_l(q*r(i)),spherical bessel function
 )
@@ -439,7 +439,7 @@ void Sphbes::Spherical_Bessel
     {
         if (l == -1)
         {
-            cout << "\n sph_bes, j_{-1}(0) ????";
+            std::cout << "\n sph_bes, j_{-1}(0) ????";
         }
         else if (l == 0)
         {
@@ -466,7 +466,7 @@ void Sphbes::Spherical_Bessel
         {
             if (l == -1)
             {
-                cout << "\n sph_bes, j_{-1}(0) ?//?";
+                std::cout << "\n sph_bes, j_{-1}(0) ?//?";
             }
             else if (l == 0)
             {
@@ -586,7 +586,7 @@ void Sphbes::Spherical_Bessel
         }//mohan modify 2007-11-20 reduce cos , sin , q*r[ir] times;
         else
         {
-            cout << "\n error in sph_bes, l out of {-1 ... 6},l = " << l ;
+            std::cout << "\n error in sph_bes, l out of {-1 ... 6},l = " << l ;
 			exit(0);
         }
     }
@@ -597,7 +597,7 @@ void Sphbes::Spherical_Bessel
 
 
 void Sphbes::Spherical_Bessel
-(           
+(
 	const int &msh, //number of grid points
 	const double *r,//radial grid
 	const double &q,    //
@@ -610,7 +610,7 @@ void Sphbes::Spherical_Bessel
 
 	//calculate jlx first
 	Spherical_Bessel (msh, r, q, l, sj);
-	
+
 	for (int ir = 0; ir < msh; ir++)
 	{
 		sjp[ir] = 1.0;

@@ -20,24 +20,24 @@ class Stochastic_Chebychev
     
     void calcoef(double fun(double));
 
-    complex<double> sumallterms();
+    std::complex<double> sumallterms();
     
     void calfinalvec(
-		void fun(complex<double> *in, complex<double> *out, const int), 
-		complex<double> *wavein, 
-		complex<double> *waveout, 
+		void fun(std::complex<double> *in, std::complex<double> *out, const int), 
+		std::complex<double> *wavein, 
+		std::complex<double> *waveout, 
 		const int m = 1);
 
     bool checkconverge(
-		void tfun(complex<double> *in, complex<double> *out, const int), 
- 		complex<double> *wavein,
+		void tfun(std::complex<double> *in, std::complex<double> *out, const int), 
+ 		std::complex<double> *wavein,
 		double& tmax, 
 		double& tmin, 
 		double stept);
 
     void calpolyval(
-		void fun(complex<double> *in, complex<double> *out, const int), 
-		complex<double> *wavein, 
+		void fun(std::complex<double> *in, std::complex<double> *out, const int), 
+		std::complex<double> *wavein, 
 		const int m =1);
 
     int norder;
@@ -50,13 +50,13 @@ class Stochastic_Chebychev
 	// only first norder coefficients are usefull
     double* dcoef; //[norder2]
 
-	// temporary complex expansion coefficient of each order
+	// temporary std::complex expansion coefficient of each order
 	// only first norder coefficients are usefull
     fftw_complex *ccoef;  //[norder2]
 
     double *polyvalue;
 
-    complex<double> *vecn;
+    std::complex<double> *vecn;
 
     fftw_plan plancoef;
 
@@ -67,7 +67,7 @@ class Stochastic_Chebychev
 
     private:
 
-    int ndim; //dim of vector
+    int ndim; //dim of std::vector
 
     template<class T>
     void recurs(

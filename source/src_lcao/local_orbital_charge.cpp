@@ -172,7 +172,7 @@ void Local_Orbital_Charge::sum_bands(void)
 
      //GlobalV::ofs_running << " START_Charge Time : " << ctime(&time_charge_start);
      //GlobalV::ofs_running << " END_Charge  Time : " << ctime(&time_charge_end);
-     //GlobalV::ofs_running << " FINAL_Charge Time : " << difftime(time_charge_end, time_charge_start) << " (Seconds)" << endl;
+     //GlobalV::ofs_running << " FINAL_Charge Time : " << difftime(time_charge_end, time_charge_start) << " (Seconds)" << std::endl;
 
     OUT_TIME("charge grid integration", start, end);
 

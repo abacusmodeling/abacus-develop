@@ -84,7 +84,7 @@ void cal_r_overlap_R::init()
 //  if(new_kmesh%2 == 0) new_kmesh++;
 
 	int new_kmesh = GlobalC::ORB.Phi[T].PhiLN(0,0).getNk();
-//	cout << "new_kmesh = " << new_kmesh << endl;
+//	std::cout << "new_kmesh = " << new_kmesh << std::endl;
 
 
 	orb_r.set_orbital_info(
@@ -129,9 +129,9 @@ void cal_r_overlap_R::init()
 					false,
 					true);
 					
-				//cout << "getDk:   " << GlobalC::ORB.Phi[it].PhiLN(iL,iN).getDk() << endl;
-				//cout << "getDruniform:   " << GlobalC::ORB.Phi[it].PhiLN(iL,iN).getDruniform() << endl; 
-				//cout << "getNk:   " << GlobalC::ORB.Phi[it].PhiLN(iL,iN).getNk() << endl; 
+				//std::cout << "getDk:   " << GlobalC::ORB.Phi[it].PhiLN(iL,iN).getDk() << std::endl;
+				//std::cout << "getDruniform:   " << GlobalC::ORB.Phi[it].PhiLN(iL,iN).getDruniform() << std::endl; 
+				//std::cout << "getNk:   " << GlobalC::ORB.Phi[it].PhiLN(iL,iN).getNk() << std::endl; 
 			} 
 		}
 	}
@@ -332,13 +332,13 @@ center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distan
 	}
 	
 	// out r_overlap_R file
-	ofstream out_r;
-	stringstream ssh;
+	std::ofstream out_r;
+	std::stringstream ssh;
 	ssh << GlobalV::global_out_dir << "data-rR-tr_SPIN" << nspin;
 	if(GlobalV::DRANK == 0)
 	{
 		out_r.open(ssh.str().c_str());
-		out_r << "Matrix Dimension of vector r(R): " << GlobalV::NLOCAL <<endl;
+		out_r << "Matrix Dimension of std::vector r(R): " << GlobalV::NLOCAL <<std::endl;
 	}
 	
 	for(int ix = 0; ix < R_x_num; ix++)
@@ -391,13 +391,13 @@ center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distan
 							if(i==0 && j==0)
 							{
 								out_r << dRx << " " << dRy << " " << dRz  
-								<< "    //R vector(R2 - R1,unit: lattice vector)" <<endl;
+								<< "    //R std::vector(R2 - R1,unit: lattice std::vector)" <<std::endl;
 							}
 							
-							out_r << setw(20) << setprecision(9) << setiosflags(ios::scientific) << liner_x[j] << " "
-							      << setw(20) << setprecision(9) << setiosflags(ios::scientific) << liner_y[j] << " "
-								  << setw(20) << setprecision(9) << setiosflags(ios::scientific) << liner_z[j] << " "
-								  << endl;
+							out_r << std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << liner_x[j] << " "
+							      << std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << liner_y[j] << " "
+								  << std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << liner_z[j] << " "
+								  << std::endl;
 						}
 						
 					}
