@@ -220,9 +220,12 @@ if(USE_CUDA)
   )
   set_property(TARGET ${ABACUS_BIN_NAME}
   PROPERTY CUDA_ARCHITECTURES
+  60 # P100
   70 # V100
   75 # T4
   )
+endif()
+
 if(${Libxc_FOUND})
   target_link_libraries(${ABACUS_BIN_NAME} Libxc::xc)
 endif()
