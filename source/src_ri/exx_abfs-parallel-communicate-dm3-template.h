@@ -9,7 +9,7 @@ const matrix &Exx_Abfs::Parallel::Communicate::DM3::D_phase(
 }
 
 matrix Exx_Abfs::Parallel::Communicate::DM3::D_phase(
-	const ComplexMatrix &DK, const int ik, const Abfs::Vector3_Order<int> &box2) const
+	const ModuleBase::ComplexMatrix &DK, const int ik, const Abfs::Vector3_Order<int> &box2) const
 {
 	return (DK * exp( -TWO_PI*IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (box2*GlobalC::ucell.latvec)) )).real();
 }

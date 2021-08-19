@@ -18,7 +18,7 @@
     
 }*/
 
-void WF_io::write_wfc(const std::string &fn, const ComplexMatrix *psi)
+void WF_io::write_wfc(const std::string &fn, const ModuleBase::ComplexMatrix *psi)
 {
     if (GlobalV::test_wf) TITLE("WF_io","write_wfc");
 
@@ -53,7 +53,7 @@ void WF_io::write_wfc(const std::string &fn, const ComplexMatrix *psi)
     return;
 }
 
-void WF_io::write_wfc2(const std::string &fn, const ComplexMatrix *psi, const Vector3<double> *gkk)
+void WF_io::write_wfc2(const std::string &fn, const ModuleBase::ComplexMatrix *psi, const Vector3<double> *gkk)
 {
     if (GlobalV::test_wf) TITLE("WF_io","write_wfc2"); 
 

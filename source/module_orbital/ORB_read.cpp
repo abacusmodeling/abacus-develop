@@ -293,7 +293,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 	// set the nonlocal projector objects
 	Numerical_Nonlocal_Lm* tmpBeta_lm = new Numerical_Nonlocal_Lm[n_projectors];
 
-	ComplexMatrix coefficient_D_nc_in(nh*2, nh*2);//zhengdy-soc
+	ModuleBase::ComplexMatrix coefficient_D_nc_in(nh*2, nh*2);//zhengdy-soc
 
 	if(!atom->has_so)
 	{
@@ -572,7 +572,7 @@ void LCAO_Orbitals::Read_NonLocal(
 	//-------------------------------------------
 	int nproj_allowed = nlmax+1;
 	matrix coefficient_D_in(nproj_allowed, nproj_allowed);
-	ComplexMatrix coefficient_D_nc_in(nproj_allowed*2, nproj_allowed*2);
+	ModuleBase::ComplexMatrix coefficient_D_nc_in(nproj_allowed*2, nproj_allowed*2);
 
 //	OUT(GlobalV::ofs_running,"nproj_allowed",nproj_allowed);
 

@@ -411,7 +411,7 @@ void LCAO_Descriptor::cal_descriptor(void)
                     const int dim = 2 * l + 1;
                     const int inl = inl_index[it](ia, l, n);
                     // descriptor for atom (it, ia)
-                    ComplexMatrix des(dim, dim);
+                    ModuleBase::ComplexMatrix des(dim, dim);
                     for (int m = 0; m < dim; m++)
                     {
                         for (int m2 = 0; m2 < dim; m2++)
@@ -467,7 +467,7 @@ void LCAO_Descriptor::cal_descriptor(void)
 
 void LCAO_Descriptor::print_projected_DM(
 	std::ofstream& ofs, 
-	ComplexMatrix& des, 
+	ModuleBase::ComplexMatrix& des, 
 	const int& it, 
 	const int& ia, 
 	const int& l, 

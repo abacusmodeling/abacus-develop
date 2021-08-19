@@ -499,7 +499,7 @@ void Exx_Lcao::init()
 				m(ir,ic) = ir*10+ic;
 			}
 		}
-		ComplexMatrix cm = ComplexMatrix(m) * exp( -TWO_PI*IMAG_UNIT* 1.0/3.0 );
+		ModuleBase::ComplexMatrix cm = ModuleBase::ComplexMatrix(m) * exp( -TWO_PI*IMAG_UNIT* 1.0/3.0 );
 		std::cout<<m<<std::endl;
 		std::cout<<cm<<std::endl;
 	};
@@ -1264,7 +1264,7 @@ void Exx_Lcao::add_Hexx( const size_t ik, const double alpha ) const
 	}
 	else
 	{
-		const ComplexMatrix & H = Hexx_para.HK_K_m2D[ik];
+		const ModuleBase::ComplexMatrix & H = Hexx_para.HK_K_m2D[ik];
 		for( size_t i=0; i<H.nr*H.nc; ++i )
 		{
 			GlobalC::LM.Hloc2[i] += alpha * H.c[i];

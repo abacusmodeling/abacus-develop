@@ -41,7 +41,7 @@ class Potential
 
 	void init_pot(
 		const int &istep, // ionic steps
-		ComplexMatrix &sf // structure factors
+		ModuleBase::ComplexMatrix &sf // structure factors
 	);
 
     matrix v_of_rho(
@@ -70,7 +70,7 @@ class Potential
 		const int &ngmc, // number of |g|, g is plane wave
 		matrix &vloc, // local pseduopotentials
 		int* ig2ngg, // ig2ngg
-		ComplexMatrix &sf // structure factors	
+		ModuleBase::ComplexMatrix &sf // structure factors	
 	)const;
 
 	// TDDFT related, fuxiang add

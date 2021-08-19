@@ -87,7 +87,7 @@ class LapackConnector
 private:
     // Transpose the std::complex matrix to the fortran-form real-std::complex array.
     static inline
-    std::complex<double>* transpose(const ComplexMatrix& a, const int n, const int lda)
+    std::complex<double>* transpose(const ModuleBase::ComplexMatrix& a, const int n, const int lda)
     {
         std::complex<double>* aux = new std::complex<double>[lda*n];
         for (int i = 0; i < n; ++i)
@@ -117,7 +117,7 @@ private:
 
     // Transpose the fortran-form real-std::complex array to the std::complex matrix.
     static inline
-    void transpose(const std::complex<double>* aux, ComplexMatrix& a, const int n, const int lda)
+    void transpose(const std::complex<double>* aux, ModuleBase::ComplexMatrix& a, const int n, const int lda)
     {
         for (int i = 0; i < n; ++i)
         {
@@ -199,7 +199,7 @@ public:
     }
 
     static inline
-    void zgesv (const int n,const int nrhs,ComplexMatrix &A,const int lda,
+    void zgesv (const int n,const int nrhs,ModuleBase::ComplexMatrix &A,const int lda,
                 const int *ipiv,std::complex<double> *B,const int ldb,int* info)
     {
         std::complex<double> *aux = LapackConnector::transpose(A, n, lda);
@@ -209,8 +209,8 @@ public:
 
     // wrap function of fortran lapack routine zhegv.
     static inline
-    void zhegv(	const int itype,const char jobz,const char uplo,const int n,ComplexMatrix& a,
-                const int lda,ComplexMatrix& b,const int ldb,double* w,std::complex<double>* work,
+    void zhegv(	const int itype,const char jobz,const char uplo,const int n,ModuleBase::ComplexMatrix& a,
+                const int lda,ModuleBase::ComplexMatrix& b,const int ldb,double* w,std::complex<double>* work,
                 int lwork,double* rwork,int info)
     {	// Transpose the std::complex matrix to the fortran-form real-std::complex array.
         std::complex<double>* aux = LapackConnector::transpose(a, n, lda);
@@ -316,7 +316,7 @@ public:
     void zheev( const char jobz,
                 const char uplo,
                 const int n,
-                ComplexMatrix& a,
+                ModuleBase::ComplexMatrix& a,
                 const int lda,
                 double* w,
                 std::complex< double >* work,
@@ -356,9 +356,9 @@ public:
     // wrap function of fortran lapack routine zheev.
     static inline
     void zhegvx( const int itype, const char jobz, const char range, const char uplo,
-                 const int n, const ComplexMatrix& a, const int lda, const ComplexMatrix& b,
+                 const int n, const ModuleBase::ComplexMatrix& a, const int lda, const ModuleBase::ComplexMatrix& b,
                  const int ldb, const double vl, const double vu, const int il, const int iu,
-                 const double abstol, const int m, double* w, ComplexMatrix& z, const int ldz,
+                 const double abstol, const int m, double* w, ModuleBase::ComplexMatrix& z, const int ldz,
                  std::complex<double>* work, const int lwork, double* rwork, int* iwork,
                  int* ifail, int info)
     {
@@ -405,7 +405,7 @@ public:
     }
 
     static inline
-    void zpotrf(char uplo,int n,ComplexMatrix &a,const int lda,int* info)
+    void zpotrf(char uplo,int n,ModuleBase::ComplexMatrix &a,const int lda,int* info)
     {
         std::complex<double> *aux = LapackConnector::transpose(a, n, lda);
         zpotrf_( &uplo, &n, aux, &lda, info);
@@ -415,7 +415,7 @@ public:
     }
 
     static inline
-    void zpotri(char uplo,int n,ComplexMatrix &a,const int lda,int* info)
+    void zpotri(char uplo,int n,ModuleBase::ComplexMatrix &a,const int lda,int* info)
     {
         std::complex<double> *aux = LapackConnector::transpose(a, n, lda);
         zpotri_( &uplo, &n, aux, &lda, info);
@@ -448,7 +448,7 @@ public:
 		return;
 	}
     static inline
-    void zgetrf(int m, int n, ComplexMatrix &a, const int lda, int *ipiv, int *info)
+    void zgetrf(int m, int n, ModuleBase::ComplexMatrix &a, const int lda, int *ipiv, int *info)
     {
         std::complex<double> *aux = LapackConnector::transpose(a, n, lda);
         zgetrf_( &m, &n, aux, &lda, ipiv, info);
@@ -457,7 +457,7 @@ public:
                 return;
     }
     static inline
-    void zgetri(int n, ComplexMatrix &a,  int lda, int *ipiv, std::complex<double> * work, int lwork, int *info)
+    void zgetri(int n, ModuleBase::ComplexMatrix &a,  int lda, int *ipiv, std::complex<double> * work, int lwork, int *info)
     {
         std::complex<double> *aux = LapackConnector::transpose(a, n, lda);
         zgetri_( &n, aux, &lda, ipiv, work, &lwork, info);

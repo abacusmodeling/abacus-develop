@@ -46,7 +46,7 @@ void Inverse_Matrix_Complex::init(const int &dim_in)
 	return;
 }
 
-void Inverse_Matrix_Complex::using_zheev( const ComplexMatrix &Sin, ComplexMatrix &Sout)
+void Inverse_Matrix_Complex::using_zheev( const ModuleBase::ComplexMatrix &Sin, ModuleBase::ComplexMatrix &Sout)
 {
 	timer::tick("Inverse","using_zheev");
 	this->A = Sin;
@@ -67,7 +67,7 @@ void Inverse_Matrix_Complex::using_zheev( const ComplexMatrix &Sin, ComplexMatri
     return;
 }
 
-void Inverse_Matrix_Complex::using_zpotrf( const ComplexMatrix &Sin)
+void Inverse_Matrix_Complex::using_zpotrf( const ModuleBase::ComplexMatrix &Sin)
 {
 //	timer::tick("Inverse","using_zpotrf");
 

@@ -9,8 +9,8 @@
 
 WF_atomic::WF_atomic()
 {
-    evc  = new ComplexMatrix[1];
-    wanf2= new ComplexMatrix[1];
+    evc  = new ModuleBase::ComplexMatrix[1];
+    wanf2= new ModuleBase::ComplexMatrix[1];
     seed = 0;
 }
 
@@ -208,7 +208,7 @@ void WF_atomic::print_PAOs(void)const
 //===================================================================
 // from wfcinit.f90
 
-void WF_atomic::check_psi(const ComplexMatrix *evc)const
+void WF_atomic::check_psi(const ModuleBase::ComplexMatrix *evc)const
 {
     std::cout<<"\n Check psi : \n";
 
@@ -232,7 +232,7 @@ void WF_atomic::atomic_wfc
 (	const int ik,
   const int np,
   const int lmax_wfc,
-  ComplexMatrix &wfcatom,
+  ModuleBase::ComplexMatrix &wfcatom,
   const realArray &table_q,
   const int &table_dimension,
   const double &dq
@@ -471,7 +471,7 @@ void WF_atomic::atomic_wfc
     return;
 } //end subroutine atomic_wfc
 
-void WF_atomic::random(ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const
+void WF_atomic::random(ModuleBase::ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const
 {
     assert(iw_start >= 0);
     assert(psi.nr >= iw_end);
@@ -561,7 +561,7 @@ void WF_atomic::random(ComplexMatrix &psi,const int iw_start,const int iw_end,co
     return;
 }
 
-void WF_atomic::atomicrandom(ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const
+void WF_atomic::atomicrandom(ModuleBase::ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const
 {
     assert(iw_start >= 0);
     assert(psi.nr >= iw_end);

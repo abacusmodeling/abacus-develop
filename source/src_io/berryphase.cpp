@@ -220,7 +220,7 @@ void berryphase::set_kpoints(const int direction)
 double berryphase::stringPhase(int index_str, int nbands)
 {
 	std::complex<double> zeta(1.0, 0.0);
-	ComplexMatrix mat(nbands,nbands);
+	ModuleBase::ComplexMatrix mat(nbands,nbands);
 	int ik_1;
 	int ik_2;
 	Vector3<double> G(0.0,0.0,0.0);

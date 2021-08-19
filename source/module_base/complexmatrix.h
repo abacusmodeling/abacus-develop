@@ -2,14 +2,14 @@
 #define COMPLEXMATRIX_H
 
 #include <complex>
-using namespace std;
 
 #include "matrix.h"
 
 #ifdef _MCD_CHECK
 #include "../src_parallel/mcd.h"
 #endif
-
+namespace ModuleBase
+{
 class ComplexMatrix
 {
 
@@ -100,4 +100,5 @@ void scaled_sum(
 		const std::complex<double> &s2,
 		ComplexMatrix **m2, 
 		ComplexMatrix **mout);
+}
 #endif

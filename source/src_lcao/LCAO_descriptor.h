@@ -102,7 +102,7 @@ private:
 
     void print_projected_DM(
 		std::ofstream &ofs,
-		ComplexMatrix &des,
+		ModuleBase::ComplexMatrix &des,
 		const int &it,
 		const int &ia,
 		const int &l,

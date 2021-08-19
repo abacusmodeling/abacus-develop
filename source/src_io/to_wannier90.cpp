@@ -345,7 +345,7 @@ void toWannier90::outEIG()
 }
 
 
-void toWannier90::writeUNK(const ComplexMatrix *wfc_pw)
+void toWannier90::writeUNK(const ModuleBase::ComplexMatrix *wfc_pw)
 {
 
 	/*
@@ -574,7 +574,7 @@ void toWannier90::writeUNK(const ComplexMatrix *wfc_pw)
 
 
 
-void toWannier90::cal_Amn(const ComplexMatrix *wfc_pw)
+void toWannier90::cal_Amn(const ModuleBase::ComplexMatrix *wfc_pw)
 {
 	// ��һ��������ʵ��г����lm��ĳ��k���µ�ƽ�沨�����µı��񣨾���	
 	// �ڶ���������̽����ľ��򲿷���ĳ��k����ƽ�沨ͶӰ
@@ -592,7 +592,7 @@ void toWannier90::cal_Amn(const ComplexMatrix *wfc_pw)
 		Amn_file << std::setw(12) << num_bands << std::setw(12) << cal_num_kpts << std::setw(12) << num_wannier << std::endl;
 	}
 	
-	ComplexMatrix *trial_orbitals = new ComplexMatrix[cal_num_kpts];
+	ModuleBase::ComplexMatrix *trial_orbitals = new ModuleBase::ComplexMatrix[cal_num_kpts];
 	for(int ik = 0; ik < cal_num_kpts; ik++)
 	{
 		trial_orbitals[ik].create(num_wannier,pwNumberMax);
@@ -647,7 +647,7 @@ void toWannier90::cal_Amn(const ComplexMatrix *wfc_pw)
 
 
 
-void toWannier90::cal_Mmn(const ComplexMatrix *wfc_pw)
+void toWannier90::cal_Mmn(const ModuleBase::ComplexMatrix *wfc_pw)
 {	
 	// test by jingan
 	//GlobalV::ofs_running << __FILE__ << __LINE__ << " cal_num_kpts = " << cal_num_kpts << std::endl;
@@ -666,7 +666,7 @@ void toWannier90::cal_Mmn(const ComplexMatrix *wfc_pw)
 	}
 	
 	/*
-	ComplexMatrix Mmn(GlobalV::NBANDS,GlobalV::NBANDS);
+	ModuleBase::ComplexMatrix Mmn(GlobalV::NBANDS,GlobalV::NBANDS);
 	if(gamma_only_wannier)
 	{
 		for(int ib = 0; ib < nntot; ib++)
@@ -748,7 +748,7 @@ void toWannier90::cal_Mmn(const ComplexMatrix *wfc_pw)
 }
 
 
-void toWannier90::produce_trial_in_pw(const int &ik, ComplexMatrix &trial_orbitals_k)
+void toWannier90::produce_trial_in_pw(const int &ik, ModuleBase::ComplexMatrix &trial_orbitals_k)
 {
 	// �������Ƿ���ȷ
 	for(int i =0; i < num_wannier; i++)
@@ -1336,7 +1336,7 @@ void toWannier90::produce_trial_in_pw(const int &ik, ComplexMatrix &trial_orbita
 // ע����������Lֵ�����Ǵ��ڵ���0��
 void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orbital_L, const int orbital_m, matrix &ylm, 
 										matrix &dr, matrix &r, matrix &psir, const int mesh_r, 
-										Vector3<double> *gk, const int npw, ComplexMatrix &trial_orbitals_k)
+										Vector3<double> *gk, const int npw, ModuleBase::ComplexMatrix &trial_orbitals_k)
 {
 	//���㾶������ĳ��k���µ��ռ��ͶӰ
 	double *psik = new double[npw];
@@ -1467,7 +1467,7 @@ void toWannier90::integral(const int meshr, const double *psir, const double *r,
 }
 
 
-void toWannier90::ToRealSpace(const int &ik, const int &ib, const ComplexMatrix *evc, std::complex<double> *psir, const Vector3<double> G)
+void toWannier90::ToRealSpace(const int &ik, const int &ib, const ModuleBase::ComplexMatrix *evc, std::complex<double> *psir, const Vector3<double> G)
 {
 	// (1) set value
 	std::complex<double> *phase = GlobalC::UFFT.porter;
@@ -1502,7 +1502,7 @@ void toWannier90::ToRealSpace(const int &ik, const int &ib, const ComplexMatrix 
     return;
 }
 
-std::complex<double> toWannier90::unkdotb(const std::complex<double> *psir, const int ikb, const int bandindex, const ComplexMatrix *wfc_pw)
+std::complex<double> toWannier90::unkdotb(const std::complex<double> *psir, const int ikb, const int bandindex, const ModuleBase::ComplexMatrix *wfc_pw)
 {
 	std::complex<double> result(0.0,0.0);
 	int knumber = GlobalC::kv.ngk[ikb];
@@ -1523,7 +1523,7 @@ std::complex<double> toWannier90::unkdotb(const std::complex<double> *psir, cons
 	return result;
 }
 
-std::complex<double> toWannier90::unkdotkb(const int &ik, const int &ikb, const int &iband_L, const int &iband_R, const Vector3<double> G, const ComplexMatrix *wfc_pw)
+std::complex<double> toWannier90::unkdotkb(const int &ik, const int &ikb, const int &iband_L, const int &iband_R, const Vector3<double> G, const ModuleBase::ComplexMatrix *wfc_pw)
 {
 	// (1) set value
 	std::complex<double> result(0.0,0.0);
@@ -1576,7 +1576,7 @@ std::complex<double> toWannier90::unkdotkb(const int &ik, const int &ikb, const 
 	
 }
 
-std::complex<double> toWannier90::gamma_only_cal(const int &ib_L, const int &ib_R, const ComplexMatrix *wfc_pw, const Vector3<double> G)
+std::complex<double> toWannier90::gamma_only_cal(const int &ib_L, const int &ib_R, const ModuleBase::ComplexMatrix *wfc_pw, const Vector3<double> G)
 {
 	std::complex<double> *phase = new std::complex<double>[GlobalC::pw.nrxx];
 	std::complex<double> *psir = new std::complex<double>[GlobalC::pw.nrxx];
@@ -1636,7 +1636,7 @@ std::complex<double> toWannier90::gamma_only_cal(const int &ib_L, const int &ib_
 
 //ʹ��lcao_in_pw������lcao����ת��pw����
 #ifdef __LCAO
-void toWannier90::lcao2pw_basis(const int ik, ComplexMatrix &orbital_in_G)
+void toWannier90::lcao2pw_basis(const int ik, ModuleBase::ComplexMatrix &orbital_in_G)
 {
 	this->table_local.create(GlobalC::ucell.ntype, GlobalC::ucell.nmax_total, GlobalV::NQX);
 	Wavefunc_in_pw::make_table_q(GlobalC::ORB.orbital_file, this->table_local);
@@ -1660,8 +1660,8 @@ void toWannier90::getUnkFromLcao()
 	
 	
 	
-	this->unk_inLcao = new ComplexMatrix[num_kpts];
-	ComplexMatrix *orbital_in_G = new ComplexMatrix[num_kpts];
+	this->unk_inLcao = new ModuleBase::ComplexMatrix[num_kpts];
+	ModuleBase::ComplexMatrix *orbital_in_G = new ModuleBase::ComplexMatrix[num_kpts];
 
 	for(int ik = 0; ik < num_kpts; ik++)
 	{

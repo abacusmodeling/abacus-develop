@@ -20,16 +20,16 @@ void Stress_Func::stress_nl(matrix& sigma){
 	}
 	
 	// dbecp: conj( -iG * <Beta(nkb,npw)|psi(nbnd,npw)> )
-	ComplexMatrix dbecp( nkb, GlobalV::NBANDS);
-	ComplexMatrix becp( nkb, GlobalV::NBANDS);
+	ModuleBase::ComplexMatrix dbecp( nkb, GlobalV::NBANDS);
+	ModuleBase::ComplexMatrix becp( nkb, GlobalV::NBANDS);
 
 	// vkb1: |Beta(nkb,npw)><Beta(nkb,npw)|psi(nbnd,npw)>
-	ComplexMatrix vkb1( nkb, GlobalC::wf.npwx );
-	ComplexMatrix vkb0[3];
+	ModuleBase::ComplexMatrix vkb1( nkb, GlobalC::wf.npwx );
+	ModuleBase::ComplexMatrix vkb0[3];
 	for(int i=0;i<3;i++){
 		vkb0[i].create(nkb, GlobalC::wf.npwx);
 	}
-	ComplexMatrix vkb2( nkb, GlobalC::wf.npwx );
+	ModuleBase::ComplexMatrix vkb2( nkb, GlobalC::wf.npwx );
     for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {
 		for(int i=0;i<3;i++){
@@ -220,7 +220,7 @@ void Stress_Func::stress_nl(matrix& sigma){
  
 void Stress_Func::get_dvnl1
 (
-	ComplexMatrix &vkb,
+	ModuleBase::ComplexMatrix &vkb,
 	const int ik,
 	const int ipol
 )
@@ -314,7 +314,7 @@ void Stress_Func::get_dvnl1
 	return;
 }//end get_dvnl1
 
-void Stress_Func::get_dvnl2(ComplexMatrix &vkb,
+void Stress_Func::get_dvnl2(ModuleBase::ComplexMatrix &vkb,
 		const int ik)
 {
 	if(GlobalV::test_pp) TITLE("Stress","get_dvnl2");

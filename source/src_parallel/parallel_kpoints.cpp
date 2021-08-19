@@ -356,7 +356,7 @@ void Parallel_Kpoints::pool_collection(double *valuea, double *valueb, const rea
 }
 
 
-void Parallel_Kpoints::pool_collection(std::complex<double> *value, const ComplexArray &w, const int &ik)
+void Parallel_Kpoints::pool_collection(std::complex<double> *value, const ModuleBase::ComplexArray &w, const int &ik)
 {
     const int dim2 = w.getBound2();
     const int dim3 = w.getBound3();

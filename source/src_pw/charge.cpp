@@ -200,10 +200,10 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
     TITLE("Charge","atomic_rho");
     timer::tick("Charge","atomic_rho");
 
-	const ComplexMatrix rho_g3d = [&]()->ComplexMatrix
+	const ModuleBase::ComplexMatrix rho_g3d = [&]()->ModuleBase::ComplexMatrix
 	{
 		// use interpolation to get three dimension charge density.
-		ComplexMatrix rho_g3d( spin_number_need, GlobalC::pw.ngmc);
+		ModuleBase::ComplexMatrix rho_g3d( spin_number_need, GlobalC::pw.ngmc);
 		
 		// check the start magnetization
 		const int startmag_type = [&]()->int
@@ -538,7 +538,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 // computes the core charge on the real space 3D mesh.
 //==========================================================
 void Charge::set_rho_core(
-    const ComplexMatrix &structure_factor
+    const ModuleBase::ComplexMatrix &structure_factor
 )
 {
     TITLE("Charge","set_rho_core");

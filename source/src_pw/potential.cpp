@@ -61,7 +61,7 @@ void Potential::allocate(const int nrxx)
 //----------------------------------------------------------
 void Potential::init_pot(
 	const int &istep, // number of ionic steps
-	ComplexMatrix &sf // structure factors
+	ModuleBase::ComplexMatrix &sf // structure factors
 )
 {
     TITLE("Potential","init_pot");
@@ -256,7 +256,7 @@ void Potential::set_local_pot(
 	const int &ngmc, // number of |g|, g is plane wave
 	matrix &vloc, // local pseduopotentials
 	int* ig2ngg, // ig2ngg
-	ComplexMatrix &sf // structure factors	
+	ModuleBase::ComplexMatrix &sf // structure factors	
 )const
 {
     TITLE("Potential","set_local_pot");

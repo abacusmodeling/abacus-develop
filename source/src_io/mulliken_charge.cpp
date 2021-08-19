@@ -166,7 +166,7 @@ void Mulliken_Charge::cal_mulliken(void)
 		}//if
 		else
 		{   
-			std::vector<ComplexMatrix> mud;
+			std::vector<ModuleBase::ComplexMatrix> mud;
 			mud.resize(1);
 			mud[0].create(GlobalC::ParaO.ncol,GlobalC::ParaO.nrow);
 
@@ -217,7 +217,7 @@ void Mulliken_Charge::cal_mulliken(void)
 					GlobalC::LM.allocate_HS_k(GlobalC::ParaO.nloc);
 					GlobalC::LM.zeros_HSk('S');
 					GlobalC::LNNR.folding_fixedH(ik);
-					ComplexMatrix Dwf = conj(M.wfc_k[ik]);
+					ModuleBase::ComplexMatrix Dwf = conj(M.wfc_k[ik]);
 
 					for (int i=0; i<GlobalV::NBANDS; ++i)		  
 					{     

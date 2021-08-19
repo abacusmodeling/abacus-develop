@@ -99,13 +99,13 @@ std::map<size_t,std::map<size_t,matrix>> Exx_Abfs::Parallel::Communicate::Hexx::
 */
 
 /*
-std::map<size_t,std::map<size_t,ComplexMatrix>> Exx_Abfs::Parallel::Communicate::Hexx::R_to_K( 
+std::map<size_t,std::map<size_t,ModuleBase::ComplexMatrix>> Exx_Abfs::Parallel::Communicate::Hexx::R_to_K( 
 	const std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>> & HR,
 	const size_t ik) const
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::R_to_K");
 	
-	std::map<size_t,std::map<size_t,ComplexMatrix>> HK;
+	std::map<size_t,std::map<size_t,ModuleBase::ComplexMatrix>> HK;
 	for( auto & HRA : HR )
 	{
 		const size_t iat1 = HRA.first;
@@ -113,13 +113,13 @@ std::map<size_t,std::map<size_t,ComplexMatrix>> Exx_Abfs::Parallel::Communicate:
 		{
 			const size_t iat2 = HRB.first;
 			
-			ComplexMatrix HK_tmp(
+			ModuleBase::ComplexMatrix HK_tmp(
 				GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw,
 				GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw);
 			for( auto & HRC : HRB.second )
 			{
 				const Abfs::Vector3_Order<int> & box2 = HRC.first;
-				HK_tmp += ComplexMatrix(HRC.second) * exp( TWO_PI*IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (box2*GlobalC::ucell.latvec)) );
+				HK_tmp += ModuleBase::ComplexMatrix(HRC.second) * exp( TWO_PI*IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (box2*GlobalC::ucell.latvec)) );
 			}
 			HK[iat1][iat2] = std::move(HK_tmp);
 		}

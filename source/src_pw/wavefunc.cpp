@@ -93,8 +93,8 @@ void wavefunc::allocate(const int nks)
 	if(GlobalV::CALCULATION=="nscf" && GlobalC::wf.mem_saver==1)
 	{
 		// mohan add 2010-09-07
-		this->evc = new ComplexMatrix[1];
-		this->wanf2 = new ComplexMatrix[1];
+		this->evc = new ModuleBase::ComplexMatrix[1];
+		this->wanf2 = new ModuleBase::ComplexMatrix[1];
 		
 		// //added by zhengdy-soc
 		evc[0].create(GlobalV::NBANDS, npwx * GlobalV::NPOL);
@@ -110,8 +110,8 @@ void wavefunc::allocate(const int nks)
 	}
 	else
 	{
-		this->evc = new ComplexMatrix [nks2];
-		this->wanf2 = new ComplexMatrix [nks2];
+		this->evc = new ModuleBase::ComplexMatrix [nks2];
+		this->wanf2 = new ModuleBase::ComplexMatrix [nks2];
 
 		for (int ik = 0; ik < nks2; ik++)
 		{
@@ -207,7 +207,7 @@ int wavefunc::get_starting_nw(void)const
 
 
 #ifdef __LCAO
-void wavefunc::LCAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
+void wavefunc::LCAO_in_pw_k(const int &ik, ModuleBase::ComplexMatrix &wvf)
 {
 	TITLE("wavefunc","LCAO_in_pw_k");
 	timer::tick("wavefunc","LCAO_in_pw_k");
@@ -247,7 +247,7 @@ void wavefunc::LCAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
 }
 
 
-void wavefunc::LCAO_in_pw_k_q(const int &ik, ComplexMatrix &wvf, Vector3<double> q)   // pengfei  2016-11-23
+void wavefunc::LCAO_in_pw_k_q(const int &ik, ModuleBase::ComplexMatrix &wvf, Vector3<double> q)   // pengfei  2016-11-23
 {
 	TITLE("wavefunc","LCAO_in_pw_k_q");
 	timer::tick("wavefunc","LCAO_in_pw_k_q");
@@ -262,7 +262,7 @@ void wavefunc::LCAO_in_pw_k_q(const int &ik, ComplexMatrix &wvf, Vector3<double>
 #endif
 
 
-void wavefunc::diago_PAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
+void wavefunc::diago_PAO_in_pw_k(const int &ik, ModuleBase::ComplexMatrix &wvf)
 {
 	TITLE("wavefunc","diago_PAO_in_pw_k");
 
@@ -272,14 +272,14 @@ void wavefunc::diago_PAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
 	return;
 }
 
-void wavefunc::diago_PAO_in_pw_k2(const int &ik, ComplexMatrix &wvf)
+void wavefunc::diago_PAO_in_pw_k2(const int &ik, ModuleBase::ComplexMatrix &wvf)
 {
 	TITLE("wavefunc","diago_PAO_in_pw_k2");
 	// (6) Prepare for atmoic orbitals or random orbitals
 	const int starting_nw = this->get_starting_nw();
 	assert(starting_nw > 0);
 
-	ComplexMatrix wfcatom(starting_nw, npwx * GlobalV::NPOL);//added by zhengdy-soc
+	ModuleBase::ComplexMatrix wfcatom(starting_nw, npwx * GlobalV::NPOL);//added by zhengdy-soc
 	if(GlobalV::test_wf)OUT(GlobalV::ofs_running, "starting_nw", starting_nw);
 	if(start_wfc.substr(0,6)=="atomic")
 	{
@@ -431,7 +431,7 @@ void wavefunc::wfcinit_k(void)
 		double overlap_aux_I[GlobalV::NLOCAL][GlobalV::NLOCAL][NG][NR];       //imag part
 		double overlap_I[GlobalV::NLOCAL][GlobalV::NLOCAL][NG][NR];
 		
-		ComplexMatrix Mat;
+		ModuleBase::ComplexMatrix Mat;
 		Mat.create(GlobalV::NLOCAL,npwx);
 		Vector3<double> qg; // q+G
 		Vector3<double> gkqg, Rcar[GlobalV::NLOCAL][GlobalV::NLOCAL][NR];  // k+G+qg, Rcartesian
@@ -798,8 +798,8 @@ void wavefunc::init_after_vc(const int nks)
 
     if(GlobalV::CALCULATION=="nscf" && GlobalC::wf.mem_saver==1)
     {
-        this->evc = new ComplexMatrix[1];
-        this->wanf2 = new ComplexMatrix[1];
+        this->evc = new ModuleBase::ComplexMatrix[1];
+        this->wanf2 = new ModuleBase::ComplexMatrix[1];
 
         evc[0].create(GlobalV::NBANDS*prefactor, npwx);
         if(GlobalV::BASIS_TYPE=="lcao_in_pw")
@@ -813,8 +813,8 @@ void wavefunc::init_after_vc(const int nks)
     }
     else
     {
-        this->evc = new ComplexMatrix [nks2];
-        this->wanf2 = new ComplexMatrix [nks2];
+        this->evc = new ModuleBase::ComplexMatrix [nks2];
+        this->wanf2 = new ModuleBase::ComplexMatrix [nks2];
 
         for (int ik = 0; ik < nks2; ik++)
         {

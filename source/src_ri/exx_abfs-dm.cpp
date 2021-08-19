@@ -83,13 +83,13 @@ void Exx_Abfs::DM::cal_DMk_mixing(
 
 
 
-std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> Exx_Abfs::DM::cal_DMk_raw( const std::set<std::pair<size_t,size_t>> &atom_pairs ) const
+std::map<size_t,std::map<size_t,std::vector<ModuleBase::ComplexMatrix>>> Exx_Abfs::DM::cal_DMk_raw( const std::set<std::pair<size_t,size_t>> &atom_pairs ) const
 {
 	TITLE("Exx_Abfs::DM::cal_DMk_raw");
 
 	const double SPIN_multiple = 0.5*GlobalV::NSPIN;
 	
-	std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> DMk_raw;
+	std::map<size_t,std::map<size_t,std::vector<ModuleBase::ComplexMatrix>>> DMk_raw;
 	for( const std::pair<size_t,size_t> & atom_pair : atom_pairs )
 	{
 		const size_t iat1 = atom_pair.first;
@@ -99,7 +99,7 @@ std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> Exx_Abfs::DM::cal_D
 		const size_t ia1 = GlobalC::ucell.iat2ia[iat1];
 		const size_t ia2 = GlobalC::ucell.iat2ia[iat2];
 
-		DMk_raw[iat1][iat2] = std::vector<ComplexMatrix>( GlobalC::kv.nks, {GlobalC::ucell.atoms[it1].nw,GlobalC::ucell.atoms[it2].nw} );
+		DMk_raw[iat1][iat2] = std::vector<ModuleBase::ComplexMatrix>( GlobalC::kv.nks, {GlobalC::ucell.atoms[it1].nw,GlobalC::ucell.atoms[it2].nw} );
 		for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 		{
 			for( size_t iw1=0; iw1!=GlobalC::ucell.atoms[it1].nw; ++iw1 )
