@@ -52,6 +52,7 @@ void Run_MD_CLASSIC::md_cells_classic(void)
 
     this->istep = 1;
     bool stop = false;
+	double potential;
 	bool which_method = this->ucell_c.judge_big_cell();
 
     while (istep <= GlobalV::NSTEP && !stop)
@@ -59,8 +60,6 @@ void Run_MD_CLASSIC::md_cells_classic(void)
 		time_t fstart = time(NULL);
 
         Print_Info::print_screen(0, 0, istep);
-
-		double potential;
 
 		if(which_method)
 		{
@@ -90,23 +89,25 @@ void Run_MD_CLASSIC::md_cells_classic(void)
 								this->force);
 		}
 
-		// ofstream force_out("force.txt", ios::app);
-		// if(GlobalV::MY_RANK==0)
-		// {
-		// 	for(int i=0; i<ucell_c.nat; ++i)
-		// 	{
-		// 		force_out << setw(18) << setiosflags(ios::fixed) << setprecision(12) << force[i].x*Ry_to_eV*ANGSTROM_AU
-        //      	 			<< setw(18) << setiosflags(ios::fixed) << setprecision(12) << force[i].y*Ry_to_eV*ANGSTROM_AU
-        // 	 	 			<< setw(18) << setiosflags(ios::fixed) << setprecision(12) << force[i].z*Ry_to_eV*ANGSTROM_AU << endl;
-		// 	}
-		// }
-		// force_out.close();
-		// ofstream energy_out("energy.txt", ios::app);
-		// if(GlobalV::MY_RANK==0)
-		// {
-		// 	energy_out << ucell_c.lat0 << "    "  << setiosflags(ios::fixed) << setprecision(12) << potential*Ry_to_eV << endl;
-		// }
-		// energy_out.close();
+		NEW_PART("   TOTAL-FORCE (eV/Angstrom)");
+		GlobalV::ofs_running << std::endl;
+		GlobalV::ofs_running << " atom    x              y              z" << std::endl;
+		const double fac = Ry_to_eV*ANGSTROM_AU;
+		int iat = 0;
+		for(int it=0; it<ucell_c.ntype; ++it)
+		{
+			for(int ia=0; ia<ucell_c.atoms[it].na; ++ia)
+			{
+				std::stringstream ss;
+				ss << ucell_c.atoms[it].label << ia+1;
+				GlobalV::ofs_running << " " << std::left << std::setw(8) << ss.str()
+						  			<< std::setw(15) << std::setiosflags(ios::fixed) << std::setprecision(6) << force[iat].x*fac
+						  			<< std::setw(15) << std::setiosflags(ios::fixed) << std::setprecision(6) << force[iat].y*fac
+						  			<< std::setw(15) << std::setiosflags(ios::fixed) << std::setprecision(6) << force[iat].z*fac
+						  			<< std::endl;
+				iat++;
+			}
+		}
 
 		this->update_pos_classic();
 
@@ -133,6 +134,11 @@ void Run_MD_CLASSIC::md_cells_classic(void)
 
 		++istep;
     }
+
+	GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
+    GlobalV::ofs_running << std::setprecision(16);
+    GlobalV::ofs_running << " !FINAL_ETOT_IS " << potential*Ry_to_eV << " eV" << std::endl; 
+    GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
     timer::tick("Run_MD_CLASSIC", "md_cells_classic");
     return;

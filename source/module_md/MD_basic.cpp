@@ -257,8 +257,8 @@ void MD_basic::runNVT(int step1, double potential, Vector3<double> *force, const
     {
         GlobalV::ofs_running << " maxForce             : " << std::setw(10) << maxForce << std::endl;
         GlobalV::ofs_running << " maxStep              : " << std::setw(10) << maxStep << std::endl;
-        GlobalV::ofs_running << " " <<std::left<<std::setw(12)<<"MD_STEP"<<std::left<<std::setw(12)<< "SystemE"<<std::left<<std::setw(12)<< "Conserved"<<std::left<<std::setw(12)<< "DeltaE"<<std::left<<std::setw(12)<< "Temperature"<<std::endl;
-	    GlobalV::ofs_running << " " <<std::left<<std::setw(12)<<step_<<std::left<<std::setw(12)<< energy_<<std::left<<std::setw(12)<< hamiltonian<<std::left<<std::setw(12)<< energy_-oldEtot_<<std::left<<std::setw(12)<<twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU<<std::endl;
+        GlobalV::ofs_running << " " <<std::left<<std::setw(20)<<"MD_STEP"<<std::left<<std::setw(20)<< "SystemE"<<std::left<<std::setw(20)<< "Conserved"<<std::left<<std::setw(20)<< "DeltaE"<<std::left<<std::setw(20)<< "Temperature"<<std::endl;
+	    GlobalV::ofs_running << " " <<std::left<<std::setw(20)<<step_<<std::left<<std::setw(20)<< energy_<<std::left<<std::setw(20)<< hamiltonian<<std::left<<std::setw(20)<< energy_-oldEtot_<<std::left<<std::setw(20)<<twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU<<std::endl;
     }
     oldEtot_=energy_;
     //output basic restart info
