@@ -65,7 +65,7 @@ void Run_MD_PW::md_ions_pw(void)
 
         if (GlobalV::OUT_LEVEL == "ie")
         {
-            std::cout << " -------------------------------------------" << std::endl;    
+            std::cout << " -------------------------------------------" << std::endl;
             std::cout << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
             std::cout << " -------------------------------------------" << std::endl;
             GlobalV::ofs_running << " -------------------------------------------" << std::endl;
@@ -75,7 +75,7 @@ void Run_MD_PW::md_ions_pw(void)
 
     //----------------------------------------------------------
     // about vdw, jiyy add vdwd3 and linpz add vdwd2
-    //----------------------------------------------------------	
+    //----------------------------------------------------------
         if(INPUT.vdw_method=="d2")
         {
             // setup vdwd2 parameters
@@ -246,7 +246,6 @@ void Run_MD_PW::md_cells_pw()
     // only allocate in the beginning of ELEC LOOP!
     //=====================
     GlobalC::hm.hpw.allocate(GlobalC::wf.npwx, GlobalV::NPOL, GlobalC::ppcell.nkb, GlobalC::pw.nrxx);
-    GlobalC::hm.hpw_gpu.allocate(GlobalC::wf.npwx, GlobalV::NPOL, GlobalC::ppcell.nkb, GlobalC::pw.nrxx);
 
     //=================================
     // initalize local pseudopotential

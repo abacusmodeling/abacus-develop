@@ -19,7 +19,7 @@ class LCAO_Descriptor
 {
 
 //-------------------
-// public functions 
+// public functions
 //-------------------
 public:
 
@@ -63,13 +63,10 @@ public:
 	void print_H_V_delta(void);
 	void print_F_delta(void);
 
-<<<<<<< HEAD
 	void cal_v_delta(const std::string& model_file);//<psi|V_delta|psi>
 	void cal_f_delta(matrix& dm);	//pytorch term remaining!
 	void print_H_V_delta();
 	void print_F_delta();
-=======
->>>>>>> 238a6a19a355699417b9d1768fc4bf72619cd245
 
 	//----------------------------------------------------------------------
 	/*These 3 functions save the [dm_eig], [e_base], [f_base]
@@ -84,13 +81,13 @@ public:
 
 
 //-------------------
-// public variables 
+// public variables
 //-------------------
 public:
 
 	//------------------------------------------------------
 	//E_delta: in Ry
-	//H_V_delta: correction term to the Hamiltonian matrix 
+	//H_V_delta: correction term to the Hamiltonian matrix
 	//F_delta: in Ry/Bohr, force due to the correction term
 	//------------------------------------------------------
 	double E_delta = 0.0;
@@ -109,7 +106,7 @@ private:
 	// deep neural network module that provides corrected Hamiltonian term and
 	// related derivatives.
 	torch::jit::script::Module module;
-	
+
 	//density matrix: dm_gamma
 	double* dm_double;
 	// overlap between lcao and descriptor basis
@@ -171,7 +168,6 @@ private:
 		const int& n);
 
 	void set_DS_mu_alpha(
-<<<<<<< HEAD
 	const int& iw1_all,
 	const int& inl,
 	const int& im,
@@ -184,20 +180,6 @@ private:
 	void cal_gedm();	//need to load model in this step
 	void cal_gdmx(matrix& dm);	//dD/dX
 	void del_gdmx();
-=======
-		const int& iw1_all,
-		const int& inl,
-		const int& im,
-		const double& vx,
-		const double& vy,
-		const double& vz);
-
-	void init_gdmx(void);
-	void load_model(const string& model_file);
-	void cal_gedm(const matrix& dm);	//need to load model in this step
-	void cal_gdmx(const matrix& dm);	//dD/dX
-	void del_gdmx(void);
->>>>>>> 238a6a19a355699417b9d1768fc4bf72619cd245
 
 	void getdm_double(const matrix& dm);
 
