@@ -66,8 +66,7 @@ if(USE_CUDA)
 else()
     list(APPEND objects
         hamilt.cpp
-
-)
+    )
 endif()
 
 add_library(

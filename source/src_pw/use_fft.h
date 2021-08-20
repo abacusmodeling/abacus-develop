@@ -2,10 +2,10 @@
 #define USE_FFT_H
 
 #include "tools.h"
-#include "cufft.h"
-#include "use_fft_kernel.h"
+// #include "cufft.h"
+// #include "use_fft_kernel.h"
+// typedef cufftDoubleComplex CUFFT_COMPLEX;
 
-typedef cufftDoubleComplex CUFFT_COMPLEX;
 
 class Use_FFT
 {

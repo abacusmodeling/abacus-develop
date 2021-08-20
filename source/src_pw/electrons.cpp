@@ -433,7 +433,7 @@ void Electrons::self_consistent(const int &istep)
 
             }
 
-            if(GlobalV::OUT_LEVEL != "m") 
+            if(GlobalV::OUT_LEVEL != "m")
 			{
 				print_eigenvalue(GlobalV::ofs_running);
 			}
@@ -480,7 +480,7 @@ void Electrons::c_bands(const int &istep)
     for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {
         GlobalC::hm.hpw.init_k(ik);
-        GlobalC::hm.hpw_gpu.init_k(ik);
+        // GlobalC::hm.hpw_gpu.init_k(ik);
 
         //===========================================
         // Conjugate-Gradient diagonalization

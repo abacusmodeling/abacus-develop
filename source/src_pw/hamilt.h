@@ -3,7 +3,6 @@
 
 #include "tools.h"
 #include "hamilt_pw.h"
-#include "hamilt_pw_gpu.h"
 
 class Hamilt
 {
@@ -46,7 +45,7 @@ class Hamilt
 		ComplexMatrix &hvec); // output: eigenvectors
 
     Hamilt_PW hpw;
-	Hamilt_PW_GPU hpw_gpu;
+	// Hamilt_PW_GPU hpw_gpu;
 
 private:
 
