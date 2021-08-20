@@ -40,27 +40,26 @@ void Run_pw::plane_wave_line(void)
 		GlobalC::xcf.which_dft(GlobalC::ucell.atoms[it].dft);
     }
 
-    DONE(GlobalV::ofs_running, "SETUP UNITCELL");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     // symmetry analysis should be performed every time the cell is changed
     if (ModuleSymmetry::Symmetry::symm_flag)
     {
         GlobalC::symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
-        DONE(GlobalV::ofs_running, "SYMMETRY");
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
     // Setup the k points according to symmetry.
     GlobalC::kv.set( GlobalC::symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec );
-    DONE(GlobalV::ofs_running,"INIT K-POINTS");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT K-POINTS");
 
     // print information
     // mohan add 2021-01-30
-    Print_Info PI;
-    PI.setup_parameters();
+    Print_Info::setup_parameters(GlobalC::ucell, GlobalC::kv, GlobalC::xcf);
 
     // Initalize the plane wave basis set
     GlobalC::pw.gen_pw(GlobalV::ofs_running, GlobalC::ucell, GlobalC::kv);
-    DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
     std::cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx <<" * " << GlobalC::pw.ny <<" * "<< GlobalC::pw.nz << std::endl;
     std::cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx <<" * " << GlobalC::pw.nby <<" * "<< GlobalC::pw.nbz << std::endl;
 
@@ -111,7 +110,7 @@ void Run_pw::plane_wave_line(void)
     {
         Numerical_Descriptor nc;
         nc.output_descriptor(GlobalC::wf.evc, INPUT.lmax_descriptor);
-        DONE(GlobalV::ofs_running,"GENERATE DESCRIPTOR FOR DEEPKS");
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"GENERATE DESCRIPTOR FOR DEEPKS");
     }
 
 
@@ -148,7 +147,7 @@ void Run_pw::plane_wave_line(void)
         {
             Numerical_Basis numerical_basis;
             numerical_basis.output_overlap(GlobalC::wf.evc);
-            DONE(GlobalV::ofs_running,"BASIS OVERLAP (Q and S) GENERATION.");
+            ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"BASIS OVERLAP (Q and S) GENERATION.");
         }
     }
 

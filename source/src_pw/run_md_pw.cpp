@@ -10,6 +10,7 @@
 #include "pw_basis.h"
 #include "../src_ions/variable_cell.h" // mohan add 2021-02-01
 #include "../module_md/MD_basic.h"
+#include "../src_io/print_info.h"
 
 Run_MD_PW::Run_MD_PW()
 {
@@ -63,15 +64,7 @@ void Run_MD_PW::md_ions_pw(void)
     {
         time_t estart = time(NULL);
 
-        if (GlobalV::OUT_LEVEL == "ie")
-        {
-            std::cout << " -------------------------------------------" << std::endl;    
-            std::cout << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
-            std::cout << " -------------------------------------------" << std::endl;
-            GlobalV::ofs_running << " -------------------------------------------" << std::endl;
-            GlobalV::ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
-            GlobalV::ofs_running << " -------------------------------------------" << std::endl;
-        }
+        Print_Info::print_screen(0, 0, istep);
 
     //----------------------------------------------------------
     // about vdw, jiyy add vdwd3 and linpz add vdwd2
@@ -113,7 +106,7 @@ void Run_MD_PW::md_ions_pw(void)
             }
             else if (Exx_Global::Hybrid_Type::Generate_Matrix == GlobalC::exx_global.info.hybrid_type)
             {
-                throw std::invalid_argument(TO_STRING(__FILE__) + TO_STRING(__LINE__));
+                throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__) + ModuleBase::GlobalFunc::TO_STRING(__LINE__));
             }
             else // Peize Lin add 2019-03-09
             {
@@ -193,7 +186,7 @@ void Run_MD_PW::md_ions_pw(void)
 
         //reset local potential and initial wave function
         GlobalC::pot.init_pot(istep, GlobalC::pw.strucFac);
-        GlobalV::ofs_running << " Setup the new wave functions?" << std::endl;
+        //GlobalV::ofs_running << " Setup the new wave functions?\n" << std::endl;
         GlobalC::wf.wfcinit();
 
         if (GlobalV::OUT_LEVEL == "i")
@@ -251,13 +244,13 @@ void Run_MD_PW::md_cells_pw()
     // initalize local pseudopotential
     //=================================
     GlobalC::ppcell.init_vloc(GlobalC::pw.nggm, GlobalC::ppcell.vloc);
-    DONE(GlobalV::ofs_running, "LOCAL POTENTIAL");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "LOCAL POTENTIAL");
 
     //======================================
     // Initalize non local pseudopotential
     //======================================
     GlobalC::ppcell.init_vnl(GlobalC::ucell);
-    DONE(GlobalV::ofs_running, "NON-LOCAL POTENTIAL");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "NON-LOCAL POTENTIAL");
 
     //=========================================================
     // calculate the total local pseudopotential in real space
@@ -266,7 +259,7 @@ void Run_MD_PW::md_cells_pw()
 
     GlobalC::pot.newd();
 
-    DONE(GlobalV::ofs_running, "INIT POTENTIAL");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT POTENTIAL");
 
     //==================================================
     // create GlobalC::ppcell.tab_at , for trial wave functions.
@@ -292,11 +285,11 @@ void Run_MD_PW::md_cells_pw()
         break;
     case Exx_Global::Hybrid_Type::Generate_Matrix:
     default:
-        throw std::invalid_argument(TO_STRING(__FILE__) + TO_STRING(__LINE__));
+        throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__) + ModuleBase::GlobalFunc::TO_STRING(__LINE__));
     }
 #endif
 
-    DONE(GlobalV::ofs_running, "INIT BASIS");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT BASIS");
 
     // ion optimization begins
     // electron density optimization is included in ion optimization

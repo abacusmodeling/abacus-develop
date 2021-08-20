@@ -52,12 +52,12 @@ void daxpy(const int n, const double &alpha, const double *x, const int incx, do
 void zaxpy(int n, double alpha, std::complex < double> *x, int incx,std::complex<double> *y, int incy);
 void zaxpy(int n, std::complex < double> alpha, std::complex < double> *x, int incx,std::complex<double> *y, int incy);
 // y(i,:) = alpha * x + y(i,:) where y is a matrix
-void zaxpy(double alpha,std::complex<double> *x,ComplexMatrix &y,int i);
+void zaxpy(double alpha,std::complex<double> *x,ModuleBase::ComplexMatrix &y,int i);
 // y(i,:) = alpha * x + y(i,:)
-void zaxpy(double alpha,const ComplexMatrix &x,int i,std::complex<double> *y);
-void zaxpy(std::complex<double> alpha,const ComplexMatrix &x,int i,std::complex<double> *y);
+void zaxpy(double alpha,const ModuleBase::ComplexMatrix &x,int i,std::complex<double> *y);
+void zaxpy(std::complex<double> alpha,const ModuleBase::ComplexMatrix &x,int i,std::complex<double> *y);
 // y(j,:) = alpha * x(i,:) + y(j,:)
-void zaxpy(std::complex<double> alpha,const ComplexMatrix &x,int i,ComplexMatrix &y,int j);
+void zaxpy(std::complex<double> alpha,const ModuleBase::ComplexMatrix &x,int i,ModuleBase::ComplexMatrix &y,int j);
 // copy x to y, where x and y is n-vectors
 
 
@@ -70,18 +70,18 @@ void dcopy(int n,double *x,int incx,double *y,int incy);
 void dcopy(int n,int *x,int incx,int *y,int incy);
 
 // copy ith row of a to y where a is a matrix and y is a std::vector
-void dcopy(const ComplexMatrix &a,int i,std::complex<double> *y);
+void dcopy(const ModuleBase::ComplexMatrix &a,int i,std::complex<double> *y);
 void dcopy(const matrix &a,int i,double *y);
 void dcopy(const matrix &a,int i,int *y);
 
 // copy x to ith row of b where b is a matrix and x is a std::vector
-void dcopy(std::complex<double> *x,ComplexMatrix &b,int i);
+void dcopy(std::complex<double> *x,ModuleBase::ComplexMatrix &b,int i);
 void dcopy(double *x,matrix &b,int i);
 
 // b(j,:) = a(i,:)
-void dcopy(const ComplexMatrix &a,int i,ComplexMatrix &b,int j);
+void dcopy(const ModuleBase::ComplexMatrix &a,int i,ModuleBase::ComplexMatrix &b,int j);
 void dcopy(const matrix &a,       int i,matrix &b,       int j);
-void dcopy(int n,const ComplexMatrix &a,int inca,ComplexMatrix &b,int i,int incb);
+void dcopy(int n,const ModuleBase::ComplexMatrix &a,int inca,ModuleBase::ComplexMatrix &b,int i,int incb);
 
 
 
@@ -90,9 +90,9 @@ void dcopy(int n,const ComplexMatrix &a,int inca,ComplexMatrix &b,int i,int incb
 //*********************************************************************************
 double ddot(int n,double *x,int incx,double *y,int incy);
 std::complex<double> ddot(int n,std::complex<double> *x,int incx,std::complex<double> *y, int incy);
-std::complex<double> ddot(const ComplexMatrix &a,int i,std::complex<double> *x);
-std::complex<double> ddot(std::complex<double> *x,const ComplexMatrix &y,int i);
-std::complex<double> ddot(const ComplexMatrix &x,int i,const ComplexMatrix &y,int j);
+std::complex<double> ddot(const ModuleBase::ComplexMatrix &a,int i,std::complex<double> *x);
+std::complex<double> ddot(std::complex<double> *x,const ModuleBase::ComplexMatrix &y,int i);
+std::complex<double> ddot(const ModuleBase::ComplexMatrix &x,int i,const ModuleBase::ComplexMatrix &y,int j);
 double ddot(const matrix &a,int i,double *y);
 double ddot(const matrix &x,int i,const matrix &y,int j);
 
@@ -101,12 +101,12 @@ double ddot(const matrix &x,int i,const matrix &y,int j);
 // C = alpha * op(A) * op(B) + beta * C
 void dgemm(char tra, char trb, int m, int n, int k, double alpha,const matrix A, int lda, const matrix B, int ldb, double beta,matrix &C, int ldc);
 void zgemm(char tra,char trb,int m,int n,int k,std::complex<double> alpha,
-           const ComplexMatrix &A,
+           const ModuleBase::ComplexMatrix &A,
            int lda,
-           const ComplexMatrix &B,
+           const ModuleBase::ComplexMatrix &B,
            int ldb,
            std::complex < double> beta,
-           ComplexMatrix &c,
+           ModuleBase::ComplexMatrix &c,
            int ldc);
 void zgemm(char tra,
            char trb,
@@ -116,10 +116,10 @@ void zgemm(char tra,
            std::complex < double> alpha,
            const std::complex<double> *A,
            int lda,
-           const ComplexMatrix &B,
+           const ModuleBase::ComplexMatrix &B,
            int ldb,
            std::complex < double> beta,
-           ComplexMatrix &c,
+           ModuleBase::ComplexMatrix &c,
            int ldc);
 
 void zgemm(char tra,
@@ -130,19 +130,19 @@ void zgemm(char tra,
            std::complex < double> alpha,
            const std::complex<double> *A,
            int lda,
-           const ComplexMatrix &B,
+           const ModuleBase::ComplexMatrix &B,
            int ldb,
            std::complex < double> beta,
            std::complex <double> *c,
            int ldc);
 
 void zgemv(char , int , int , std::complex < double> alpha ,
-           ComplexMatrix overlap, int , std::complex < double> swfcatom , int npwx,
-           std::complex < double>  , ComplexMatrix work, int);//called in orthoatwfc()
+           ModuleBase::ComplexMatrix overlap, int , std::complex < double> swfcatom , int npwx,
+           std::complex < double>  , ModuleBase::ComplexMatrix work, int);//called in orthoatwfc()
 
 int ILAENV(int , char *name, char *opts,const int n1,const int n2,const int n3,const int n4);
 
-void ZHPEV(int , std::complex < double> *hp, double *e, ComplexMatrix &v,
+void ZHPEV(int , std::complex < double> *hp, double *e, ModuleBase::ComplexMatrix &v,
            int ldh, int n, std::complex < double> *aux, int naux);
 
 // compute the Euclidean length (12 norm) of std::vector x, with scaling of
@@ -176,10 +176,10 @@ void poolreduce(int, double eband);
 void poolscatter(int nbnd, int nkstot, matrix , int nks, matrix wg);
 void mp_bcast(double ef, int root_image, int intra_image_comm);
 void mp_bcast(double *e, int root_image, int intra_image_comm);
-void mp_bcast(ComplexMatrix, int root_image, int intra_image_comm);
+void mp_bcast(ModuleBase::ComplexMatrix, int root_image, int intra_image_comm);
 
 // not used
-void vhpsi(int lda, int n, int m, ComplexMatrix psi, ComplexMatrix hpsi);
+void vhpsi(int lda, int n, int m, ModuleBase::ComplexMatrix psi, ModuleBase::ComplexMatrix hpsi);
 
 // Later
 void c_phase();
@@ -194,7 +194,7 @@ void inquire(int unit, int opened);
 void divide(int nqxq, int startq, int lastq);
 void reduce(int, double *dr2);
 void ireduce(int , int ngkp);
-void davcio(ComplexMatrix evc, int nwordwfc, int iunwfc, int ik, int);
+void davcio(ModuleBase::ComplexMatrix evc, int nwordwfc, int iunwfc, int ik, int);
 
 void ZHEGVX(
     int itype,
@@ -202,9 +202,9 @@ void ZHEGVX(
     char range ,
     char uplo ,
     const int n,
-    const ComplexMatrix &a,
+    const ModuleBase::ComplexMatrix &a,
     const int lda,
-    const ComplexMatrix &b,
+    const ModuleBase::ComplexMatrix &b,
     const int ldb,
     double vl,
     double vu,
@@ -213,7 +213,7 @@ void ZHEGVX(
     double abstol,
     int &m,
     double *w,
-    ComplexMatrix &z,
+    ModuleBase::ComplexMatrix &z,
     const int ldz,
     double *work,
     int lwork,
@@ -224,8 +224,8 @@ void ZHEGVX(
 
 
 #endif // NYFUNC
-void DGER(int na, int nb, double , ComplexMatrix a, int lda,
-          ComplexMatrix b, int ldb, ComplexMatrix c, int ldc);
+void DGER(int na, int nb, double , ModuleBase::ComplexMatrix a, int lda,
+          ModuleBase::ComplexMatrix b, int ldb, ModuleBase::ComplexMatrix c, int ldc);
 
 void add_efield(matrix rho, double *v, double etotefield);	// no used
 

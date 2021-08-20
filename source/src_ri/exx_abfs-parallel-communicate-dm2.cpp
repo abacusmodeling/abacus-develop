@@ -73,7 +73,7 @@ void Exx_Abfs::Parallel::Communicate::DM2::set_DM_gamma( const matrix &DM_2D, co
 			
 			if( DM_local.absmax() < threshold )	continue;
 			
-			if( matrix*const DM_ptr = static_cast<matrix*const>(MAP_EXIST( DMr[is], iat1, iat2, Abfs::Vector3_Order<int>{0,0,0} )) )
+			if( matrix*const DM_ptr = static_cast<matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( DMr[is], iat1, iat2, Abfs::Vector3_Order<int>{0,0,0} )) )
 				*DM_ptr += DM_local;
 			else
 				DMr[is][iat1][iat2][{0,0,0}] = std::move(DM_local);

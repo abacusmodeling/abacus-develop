@@ -26,19 +26,19 @@ class Diago_CG
 
     static std::complex<double> ddot(
         const int & dim,
-        const ComplexMatrix &psi,
+        const ModuleBase::ComplexMatrix &psi,
         const int & m,
         std::complex<double> *psik ) ;
 
     static std::complex<double> ddot(
         const int & dim,
-        const ComplexMatrix &psi_L,
+        const ModuleBase::ComplexMatrix &psi_L,
         const int & m,
-        const ComplexMatrix &psi_R,
+        const ModuleBase::ComplexMatrix &psi_R,
         const int & n) ;
 
     void diag(
-        ComplexMatrix &phi,
+        ModuleBase::ComplexMatrix &phi,
         double *e,
         const int &dim,
         const int &dmx,
@@ -54,7 +54,7 @@ class Diago_CG
         const int &dim,
         const int &dmx,
         const int &end,
-        const ComplexMatrix &psi,
+        const ModuleBase::ComplexMatrix &psi,
         std::complex<double> *spsi,
         std::complex<double> *psi_m
     );
@@ -77,7 +77,7 @@ class Diago_CG
         std::complex<double> *g,
         std::complex<double> *scg,
         std::complex<double> *lagrange,
-        const ComplexMatrix &eigenfunction,
+        const ModuleBase::ComplexMatrix &eigenfunction,
         const int m);
 
     void calculate_gamma_cg(

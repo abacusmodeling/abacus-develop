@@ -7,6 +7,8 @@
 #define ELEMENT_NAME_H
 #include <vector>
 #include <string>
+namespace ModuleBase
+{
 
 const std::vector<std::string> element_name = {
 "H"	,
@@ -128,5 +130,7 @@ const std::vector<std::string> element_name = {
 "Uus"	,
 "Uuo"	
 };
+
+}
 
 #endif

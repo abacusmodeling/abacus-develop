@@ -45,13 +45,13 @@ void Numerical_Nonlocal_Lm::renew(void)
 	this->dbeta_uniform = new double[nr_uniform];
 	this->k_radial = new double[nk];
 	this->beta_k = new double[nk];
-	ZEROS(r_radial, nr);
-	ZEROS(rab, nr);
-	ZEROS(beta_r, nr);
-	ZEROS(beta_uniform, nr_uniform);
-	ZEROS(dbeta_uniform, nr_uniform);
-	ZEROS(k_radial, nk);
-	ZEROS(beta_k, nk);
+	ModuleBase::GlobalFunc::ZEROS(r_radial, nr);
+	ModuleBase::GlobalFunc::ZEROS(rab, nr);
+	ModuleBase::GlobalFunc::ZEROS(beta_r, nr);
+	ModuleBase::GlobalFunc::ZEROS(beta_uniform, nr_uniform);
+	ModuleBase::GlobalFunc::ZEROS(dbeta_uniform, nr_uniform);
+	ModuleBase::GlobalFunc::ZEROS(k_radial, nk);
+	ModuleBase::GlobalFunc::ZEROS(beta_k, nk);
 }
 
 void Numerical_Nonlocal_Lm::freemem(void)
@@ -177,13 +177,13 @@ void Numerical_Nonlocal_Lm::extra_uniform(const double &dr_uniform_in)
 	
 	delete[] this->beta_uniform;
 	this->beta_uniform = new double[nr_uniform];
-	ZEROS (this->beta_uniform, nr_uniform);
+	ModuleBase::GlobalFunc::ZEROS (this->beta_uniform, nr_uniform);
 
 	// mohan fix bug 2011-04-14
 	// the beta_r is beta*r.
 	// and beta is beta!!!
 	double* beta = new double[nr];
-	ZEROS(beta,nr);
+	ModuleBase::GlobalFunc::ZEROS(beta,nr);
 	for(int ir=0; ir<nr; ir++)
 	{
 		assert(r_radial[ir]>0.0);
@@ -199,7 +199,7 @@ void Numerical_Nonlocal_Lm::extra_uniform(const double &dr_uniform_in)
 
 	delete[] this->dbeta_uniform;
 	this->dbeta_uniform = new double[nr_uniform];
-	ZEROS(this->dbeta_uniform, nr_uniform);
+	ModuleBase::GlobalFunc::ZEROS(this->dbeta_uniform, nr_uniform);
 	
 	double* y2 = new double[nr];
 	Mathzone_Add1::SplineD2 (r_radial, beta_r, nr, 0.0, 0.0, y2);

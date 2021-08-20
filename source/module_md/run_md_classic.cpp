@@ -1,18 +1,20 @@
 #include "run_md_classic.h"
 #include "MD_basic.h"
 #include "LJ_potential.h"
+#include "cmd_neighbor.h"
 #include "../input.h"
 #include "../module_base/global_variable.h"
 #include "../src_io/print_info.h"
 #include "../module_neighbor/sltk_atom_arrange.h"
+#include "../module_neighbor/sltk_grid_driver.h"
 
-Run_MD_CLASSIC::Run_MD_CLASSIC():grid_neigh(GlobalV::test_deconstructor, GlobalV::test_grid_driver, GlobalV::test_grid)
+Run_MD_CLASSIC::Run_MD_CLASSIC()
 {
     pos_old1 = new double[1];
 	pos_old2 = new double[1];
 	pos_now = new double[1];
 	pos_next = new double[1];
-	force=new Vector3<double>[1];
+	force = new Vector3<double>[1];
 	stress.create(3,3);
 }
 
@@ -29,7 +31,7 @@ void Run_MD_CLASSIC::classic_md_line(void)
 {
 	// Setup the unitcell.
     ucell_c.setup_cell_classic(GlobalV::global_atom_card, GlobalV::ofs_running, GlobalV::ofs_warning);
-	DONE(GlobalV::ofs_running, "SETUP UNITCELL");
+	ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
 	//Print_Info PI;
     //PI.setup_parameters();
@@ -51,38 +53,55 @@ void Run_MD_CLASSIC::md_cells_classic(void)
 
     this->istep = 1;
     bool stop = false;
+	bool which_method = this->ucell_c.judge_big_cell();
 
     while (istep <= GlobalV::NSTEP && !stop)
     {
 		time_t fstart = time(NULL);
 
-        if (GlobalV::OUT_LEVEL == "ie")
-        {
-            std::cout << " -------------------------------------------" << std::endl;    
-            std::cout << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
-            std::cout << " -------------------------------------------" << std::endl;
-            GlobalV::ofs_running << " -------------------------------------------" << std::endl;
-            GlobalV::ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
-            GlobalV::ofs_running << " -------------------------------------------" << std::endl;
-        }
+        Print_Info::print_screen(0, 0, istep);
 
-		// search adjent atoms
-		atom_arrange::search(
+		double potential;
+
+		if(which_method)
+		{
+			CMD_neighbor cmd_neigh;
+			cmd_neigh.neighbor(this->ucell_c);
+
+			potential = LJ_potential::Lennard_Jones(
+								this->ucell_c,
+								cmd_neigh,
+								this->force);
+		}
+		else
+		{
+			Grid_Driver grid_neigh(GlobalV::test_deconstructor, GlobalV::test_grid_driver, GlobalV::test_grid);
+			atom_arrange::search(
 				GlobalV::SEARCH_PBC,
 				GlobalV::ofs_running,
-				this->grid_neigh,
+				grid_neigh,
 				this->ucell_c, 
 				GlobalV::SEARCH_RADIUS, 
 				GlobalV::test_atom_input,
 				INPUT.test_just_neighbor);
 
-		LJ_potential LJ_CMD;
-
-		double potential = LJ_CMD.Lennard_Jones(
+			potential = LJ_potential::Lennard_Jones(
 								this->ucell_c,
-								this->grid_neigh,
-								this->force,
-								this->stress);
+								grid_neigh,
+								this->force);
+		}
+
+		ofstream force_out("force.txt", ios::app);
+		if(GlobalV::MY_RANK==0)
+		{
+			for(int i=0; i<ucell_c.nat; ++i)
+			{
+				force_out << setw(18) << setiosflags(ios::fixed) << setprecision(12) << force[i].x*Ry_to_eV*ANGSTROM_AU
+             	 			<< setw(18) << setiosflags(ios::fixed) << setprecision(12) << force[i].y*Ry_to_eV*ANGSTROM_AU
+        	 	 			<< setw(18) << setiosflags(ios::fixed) << setprecision(12) << force[i].z*Ry_to_eV*ANGSTROM_AU << endl;
+			}
+		}
+		force_out.close();
 
 		this->update_pos_classic();
 
@@ -130,10 +149,10 @@ void Run_MD_CLASSIC::md_allocate_ions(void)
 	this->pos_next = new double[pos_dim];
 	this->force = new Vector3<double>[ucell_c.nat];
 
-	ZEROS(pos_old1, pos_dim);
-	ZEROS(pos_old2, pos_dim);
-	ZEROS(pos_now, pos_dim);
-	ZEROS(pos_next, pos_dim);
+	ModuleBase::GlobalFunc::ZEROS(pos_old1, pos_dim);
+	ModuleBase::GlobalFunc::ZEROS(pos_old2, pos_dim);
+	ModuleBase::GlobalFunc::ZEROS(pos_now, pos_dim);
+	ModuleBase::GlobalFunc::ZEROS(pos_next, pos_dim);
 }
 
 void Run_MD_CLASSIC::update_pos_classic(void)

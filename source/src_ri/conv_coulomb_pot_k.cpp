@@ -38,7 +38,7 @@ Numerical_Orbital_Lm Conv_Coulomb_Pot_K::cal_orbs_ccp<Numerical_Orbital_Lm>(
 		case Ccp_Type::Hse:
 			psik2_ccp = cal_psi_hse( orbs.get_psif(), orbs.get_k_radial(), parameter.at("hse_omega") );		break;
 		default:
-			throw( TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__) );		break;
+			throw( ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__) );		break;
 	}
 
 	const double dr = orbs.get_rab().back();
@@ -61,10 +61,10 @@ Numerical_Orbital_Lm Conv_Coulomb_Pot_K::cal_orbs_ccp<Numerical_Orbital_Lm>(
 		orbs.getL(),
 		orbs.getChi(),
 	    Nr,
-		VECTOR_TO_PTR(rab),
-		VECTOR_TO_PTR(r_radial),
+		ModuleBase::GlobalFunc::VECTOR_TO_PTR(rab),
+		ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial),
 		Numerical_Orbital_Lm::Psi_Type::Psik2,
-		VECTOR_TO_PTR(psik2_ccp),
+		ModuleBase::GlobalFunc::VECTOR_TO_PTR(psik2_ccp),
 		orbs.getNk(),
 		orbs.getDk(),
 		orbs.getDruniform(),

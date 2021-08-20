@@ -59,13 +59,13 @@ void Gint_Gamma::save_atoms_on_grid(const Grid_Technique &gt)
     this->x12 = new double[max_size];
     this->x03 = new double[max_size];
 
-	ZEROS(iq, max_size);
-	ZEROS(x0, max_size);
-	ZEROS(x1, max_size);
-	ZEROS(x2, max_size);
-	ZEROS(x3, max_size);
-	ZEROS(x12, max_size);
-	ZEROS(x03, max_size);
+	ModuleBase::GlobalFunc::ZEROS(iq, max_size);
+	ModuleBase::GlobalFunc::ZEROS(x0, max_size);
+	ModuleBase::GlobalFunc::ZEROS(x1, max_size);
+	ModuleBase::GlobalFunc::ZEROS(x2, max_size);
+	ModuleBase::GlobalFunc::ZEROS(x3, max_size);
+	ModuleBase::GlobalFunc::ZEROS(x12, max_size);
+	ModuleBase::GlobalFunc::ZEROS(x03, max_size);
 
 	this->vfactor = std::abs(this->latvec0.Det())/gt.ncxyz;
 

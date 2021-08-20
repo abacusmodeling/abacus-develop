@@ -128,7 +128,7 @@ void Build_ST_pw::set_local(const int &ik)
 		fft_index[ig] = GlobalC::pw.ig2fftw[ GlobalC::wf.igk(ik, ig) ];
 	}
 
-//	ComplexMatrix vij(GlobalV::NLOCAL, GlobalV::NLOCAL);
+//	ModuleBase::ComplexMatrix vij(GlobalV::NLOCAL, GlobalV::NLOCAL);
 
 	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{
@@ -139,7 +139,7 @@ void Build_ST_pw::set_local(const int &ik)
 				psi_one[ig] = GlobalC::wf.wanf2[ik](i, ig);
 			}
 
-			ZEROS( psic, GlobalC::pw.nrxx);
+			ModuleBase::GlobalFunc::ZEROS( psic, GlobalC::pw.nrxx);
 			// (1) set value
 			for (int ig=0; ig< npw; ig++)
 			{
@@ -182,7 +182,7 @@ void Build_ST_pw::set_local(const int &ik)
 			std::complex<double> *psic1 = new std::complex<double>[GlobalC::pw.nrxx];
 			delete[] hpsi;
 			hpsi = new std::complex<double> [GlobalC::wf.npwx*GlobalV::NPOL];
-			ZEROS(hpsi, GlobalC::wf.npwx*GlobalV::NPOL);
+			ModuleBase::GlobalFunc::ZEROS(hpsi, GlobalC::wf.npwx*GlobalV::NPOL);
 			
 			for(int ig=0; ig<npw; ig++)
 			{
@@ -190,8 +190,8 @@ void Build_ST_pw::set_local(const int &ik)
 				psi_down[ig] = GlobalC::wf.wanf2[ik](i, ig+ GlobalC::wf.npwx);
 			}
 
-			ZEROS( psic, GlobalC::pw.nrxx);
-			ZEROS( psic1, GlobalC::pw.nrxx);
+			ModuleBase::GlobalFunc::ZEROS( psic, GlobalC::pw.nrxx);
+			ModuleBase::GlobalFunc::ZEROS( psic1, GlobalC::pw.nrxx);
 			// (1) set value
 			for (int ig=0; ig< npw; ig++)
 			{

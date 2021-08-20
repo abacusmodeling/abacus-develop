@@ -50,15 +50,15 @@ void Gint_Gamma::gamma_envelope(const double* wfc, double* rho)
 			psir_ylm[i] = new double*[max_size];
 			cal_flag[i] = new bool[max_size];
 
-			ZEROS(distance[i], max_size);
-			ZEROS(cal_flag[i], max_size);
+			ModuleBase::GlobalFunc::ZEROS(distance[i], max_size);
+			ModuleBase::GlobalFunc::ZEROS(cal_flag[i], max_size);
 
 			for(int j=0; j<max_size; j++) 
 			{
 				dr[i][j] = new double[3];
 				psir_ylm[i][j] = new double[GlobalC::ucell.nwmax];
-				ZEROS(dr[i][j],3);
-				ZEROS(psir_ylm[i][j],GlobalC::ucell.nwmax);
+				ModuleBase::GlobalFunc::ZEROS(dr[i][j],3);
+				ModuleBase::GlobalFunc::ZEROS(psir_ylm[i][j],GlobalC::ucell.nwmax);
 			}
 		}
 	}
@@ -67,8 +67,8 @@ void Gint_Gamma::gamma_envelope(const double* wfc, double* rho)
 	double *vldr3 = new double[GlobalC::pw.bxyz];
 	double v1 = 0.0;
 	int* vindex=new int[GlobalC::pw.bxyz];
-	ZEROS(vldr3, GlobalC::pw.bxyz);
-	ZEROS(vindex, GlobalC::pw.bxyz);
+	ModuleBase::GlobalFunc::ZEROS(vldr3, GlobalC::pw.bxyz);
+	ModuleBase::GlobalFunc::ZEROS(vindex, GlobalC::pw.bxyz);
 	double phi=0.0;
 
 	const int nbx = GlobalC::GridT.nbx;

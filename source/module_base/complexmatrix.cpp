@@ -10,6 +10,8 @@
 #include "lapack_connector.h"
 #endif
 
+namespace ModuleBase
+{
 // constructor with sizes
 ComplexMatrix::ComplexMatrix(const int nrows, const int ncols, const bool flag_zero)
 	:nr(nrows),
@@ -409,4 +411,5 @@ ComplexMatrix conj(const ComplexMatrix &m)
 	for(int i=0; i!=m.size; ++i)
 		cm.c[i] = conj(m.c[i]);
 	return cm;
+}
 }

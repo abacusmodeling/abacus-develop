@@ -101,7 +101,7 @@ inline int q2ZLOC_WFC(
 	double* ZLOC,
 	double** WFC)
 {
-    //OUT(GlobalV::ofs_running,"start q2ZLOC_WFC");
+    //ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"start q2ZLOC_WFC");
     for(int j=0; j<naroc[1]; ++j)
     {
         int igcol=globalIndex(j, nb, dim1, ipcol);
@@ -121,7 +121,7 @@ inline int q2ZLOC_WFC(
             }
         }
     }
-    //OUT(GlobalV::ofs_running,"WFC was done in q2ZLOC_WFC");
+    //ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"WFC was done in q2ZLOC_WFC");
     return 0;
 }
 
@@ -145,7 +145,7 @@ inline int q2ZLOC_WFC_WFCAUG(
     {
         int igcol=globalIndex(j, nb, dim1, ipcol);
 /*        ss<<"local column "<<j<<" nb "<<nb<<" dim1 "<<dim1<<" mypcol "<<ipcol<<" global column (GlobalV::NBANDS) "<<igcol;
-		OUT(GlobalV::ofs_running,ss.str());
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,ss.str());
 		ss.str("");*/
         if(igcol>=GlobalV::NBANDS) continue;
         int zcol=igcol-pos;
@@ -153,7 +153,7 @@ inline int q2ZLOC_WFC_WFCAUG(
         {
             int igrow=globalIndex(i, nb, dim0, iprow);
 /*	        ss<<"    local row "<<i<<" nb "<<nb<<" dim0 "<<dim0<<" myprow "<<iprow<<" global row (GlobalV::NLOCAL)"<<igrow;
-			OUT(GlobalV::ofs_running,ss.str());
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,ss.str());
 			ss.str("");*/
             if(0<=zcol && zcol<loc_size)
             {
@@ -172,7 +172,7 @@ inline int q2ZLOC_WFC_WFCAUG(
         }
     }
 
-    //OUT(GlobalV::ofs_running,"WFCAUG was done in q2ZLOC_WFC_WFCAUG");
+    //ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"WFCAUG was done in q2ZLOC_WFC_WFCAUG");
     return 0;
 }
 
@@ -426,8 +426,8 @@ void Pdiag_Double::divide_HS_2d
 	assert(dim0 > 0);
 	this->dim1=GlobalV::DSIZE/dim0;
 
-	if(testpb)OUT(GlobalV::ofs_running,"dim0",dim0);
-	if(testpb)OUT(GlobalV::ofs_running,"dim1",dim1);
+	if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"dim0",dim0);
+	if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"dim1",dim1);
 
 #ifdef __MPI
 	// mohan add 2011-04-16
@@ -441,7 +441,7 @@ void Pdiag_Double::divide_HS_2d
 	{
 		this->nb = GlobalV::NB2D; // mohan add 2010-06-28
 	}
-	OUT(GlobalV::ofs_running,"nb2d",nb);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nb2d",nb);
 
 	this->set_parameters();
 
@@ -489,9 +489,9 @@ void Pdiag_Double::divide_HS_2d
 #endif
 
 	assert(nloc>0);
-	if(testpb)OUT(GlobalV::ofs_running,"MatrixInfo.row_num",MatrixInfo.row_num);
-	if(testpb)OUT(GlobalV::ofs_running,"MatrixInfo.col_num",MatrixInfo.col_num);
-	if(testpb)OUT(GlobalV::ofs_running,"nloc",nloc);
+	if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"MatrixInfo.row_num",MatrixInfo.row_num);
+	if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"MatrixInfo.col_num",MatrixInfo.col_num);
+	if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nloc",nloc);
 	return;
 }
 
@@ -508,7 +508,7 @@ void Pdiag_Double::diago_double_begin(
 		static int istep = 0;
 		auto print_matrix_C = [&](const std::string &file_name, double*m)
 		{
-			std::ofstream ofs(file_name+"-C_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
+			std::ofstream ofs(file_name+"-C_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 			for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
 			{
 				for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
@@ -524,7 +524,7 @@ void Pdiag_Double::diago_double_begin(
 		};
 		auto print_matrix_F = [&](const std::string &file_name, double*m)
 		{
-			std::ofstream ofs(file_name+"-F_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
+			std::ofstream ofs(file_name+"-F_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 			for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
 			{
 				for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
@@ -566,14 +566,14 @@ void Pdiag_Double::diago_double_begin(
 
 	double* Stmp = GlobalC::LM.Sdiag;
 
-    OUT(GlobalV::ofs_running,"start solver, GlobalV::KS_SOLVER",GlobalV::KS_SOLVER);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"start solver, GlobalV::KS_SOLVER",GlobalV::KS_SOLVER);
     if(GlobalV::KS_SOLVER=="hpseps")
     {
         double *eigen = new double[GlobalV::NLOCAL];
-        ZEROS(eigen, GlobalV::NLOCAL);
+        ModuleBase::GlobalFunc::ZEROS(eigen, GlobalV::NLOCAL);
 
         double* Z = new double[this->loc_size * GlobalV::NLOCAL];
-        ZEROS(Z, this->loc_size * GlobalV::NLOCAL);
+        ModuleBase::GlobalFunc::ZEROS(Z, this->loc_size * GlobalV::NLOCAL);
 
         Memory::record("Pdiag_Double","Z",loc_size * GlobalV::NLOCAL,"double");
         timer::tick("Diago_LCAO_Matrix","pdgseps");
@@ -611,7 +611,7 @@ void Pdiag_Double::diago_double_begin(
     else if(GlobalV::KS_SOLVER=="genelpa")
     {
         double *eigen = new double[GlobalV::NLOCAL];
-        ZEROS(eigen, GlobalV::NLOCAL);
+        ModuleBase::GlobalFunc::ZEROS(eigen, GlobalV::NLOCAL);
 
         long maxnloc; // maximum number of elements in local matrix
         MPI_Reduce(&nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, comm_2D);
@@ -648,10 +648,10 @@ void Pdiag_Double::diago_double_begin(
                           wantEigenVector, wantDebug);
         timer::tick("Diago_LCAO_Matrix","genelpa2");
 
-    	OUT(GlobalV::ofs_running,"K-S equation was solved by genelpa2");
+    	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"K-S equation was solved by genelpa2");
         LapackConnector::copy(GlobalV::NBANDS, eigen, inc, ekb, inc);
         delete[] eigen;
-	    OUT(GlobalV::ofs_running,"eigenvalues were copied to ekb");
+	    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"eigenvalues were copied to ekb");
 
 		// convert wave function to band distribution
 			// and calculate the density matrix in the tranditional way
@@ -672,7 +672,7 @@ void Pdiag_Double::diago_double_begin(
 			for (int i=0; i<GlobalV::NBANDS; i++)
 			{
 				ctot[i] = new double[GlobalV::NLOCAL];
-				ZEROS(ctot[i], GlobalV::NLOCAL);
+				ModuleBase::GlobalFunc::ZEROS(ctot[i], GlobalV::NLOCAL);
 			}
 			Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"double");
 		}
@@ -718,7 +718,7 @@ void Pdiag_Double::diago_double_begin(
 				}
 			}//loop ipcol
 		}//loop iprow
-	
+
 		if(out_lowf && myid==0)
 		{
 			std::stringstream ss;
@@ -753,7 +753,7 @@ void Pdiag_Double::diago_double_begin(
 
 		if(info)
 		{
-			throw std::runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::runtime_error("info="+ModuleBase::GlobalFunc::TO_STRING(info)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 
 		lwork = work[0];
@@ -764,13 +764,13 @@ void Pdiag_Double::diago_double_begin(
 
 		if(info)
 		{
-			throw std::runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::runtime_error("info="+ModuleBase::GlobalFunc::TO_STRING(info)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 		memcpy( ekb, ekb_tmp.data(), sizeof(double)*GlobalV::NBANDS );
 
 		if(INPUT.new_dm==0)
 		{
-			throw std::domain_error("INPUT.new_dm must be 1. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::domain_error("INPUT.new_dm must be 1. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 	}
 	else if(GlobalV::KS_SOLVER=="lapack_gvx")
@@ -795,7 +795,7 @@ void Pdiag_Double::diago_double_begin(
 
 		if(info)
 		{
-			throw std::runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::runtime_error("info="+ModuleBase::GlobalFunc::TO_STRING(info)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 
 		lwork = work[0];
@@ -806,16 +806,16 @@ void Pdiag_Double::diago_double_begin(
 
 		if(info)
 		{
-			throw std::runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::runtime_error("info="+ModuleBase::GlobalFunc::TO_STRING(info)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 		if(M!=GlobalV::NBANDS)
 		{
-			throw std::runtime_error("M="+TO_STRING(M)+". GlobalV::NBANDS="+TO_STRING(GlobalV::NBANDS)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::runtime_error("M="+ModuleBase::GlobalFunc::TO_STRING(M)+". GlobalV::NBANDS="+ModuleBase::GlobalFunc::TO_STRING(GlobalV::NBANDS)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 
 		if(INPUT.new_dm==0)
 		{
-			throw std::domain_error("INPUT.new_dm must be 1. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::domain_error("INPUT.new_dm must be 1. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 	}
 	else if(GlobalV::KS_SOLVER=="scalapack_gvx")
@@ -858,19 +858,19 @@ void Pdiag_Double::diago_double_begin(
 
 		if(info)
 		{
-			throw std::runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::runtime_error("info="+ModuleBase::GlobalFunc::TO_STRING(info)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 		if(M!=GlobalV::NBANDS)
 		{
-			throw std::runtime_error("M="+TO_STRING(M)+". GlobalV::NBANDS="+TO_STRING(GlobalV::NBANDS)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::runtime_error("M="+ModuleBase::GlobalFunc::TO_STRING(M)+". GlobalV::NBANDS="+ModuleBase::GlobalFunc::TO_STRING(GlobalV::NBANDS)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 		if(M!=NZ)
 		{
-			throw std::runtime_error("M="+TO_STRING(M)+". NZ="+TO_STRING(NZ)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::runtime_error("M="+ModuleBase::GlobalFunc::TO_STRING(M)+". NZ="+ModuleBase::GlobalFunc::TO_STRING(NZ)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 		if(INPUT.new_dm==0)
 		{
-			throw std::domain_error("INPUT.new_dm must be 1. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::domain_error("INPUT.new_dm must be 1. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 	}
     //delete[] Stmp; //LiuXh 20171109
@@ -880,18 +880,18 @@ void Pdiag_Double::diago_double_begin(
 	{
 		static int istep = 0;
 		{
-			std::ofstream ofs("ekb_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
+			std::ofstream ofs("ekb_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 			for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 			{
 				ofs<<ekb[ib]<<std::endl;
 			}
 		}
 		{
-			std::ofstream ofs("wfc-C_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
+			std::ofstream ofs("wfc-C_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 			ofs<<wfc_2d<<std::endl;
 		}
 		{
-			std::ofstream ofs("wfc-F_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
+			std::ofstream ofs("wfc-F_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 			ofs<<transpose(wfc_2d)<<std::endl;
 		}
 		++istep;
@@ -905,7 +905,7 @@ void Pdiag_Double::diago_double_begin(
 void Pdiag_Double::diago_complex_begin(
 	const int &ik,
 	std::complex<double> **wfc,
-	ComplexMatrix &wfc_2d,
+	ModuleBase::ComplexMatrix &wfc_2d,
 	std::complex<double>* ch_mat,
 	std::complex<double>* cs_mat,
 	double *ekb)
@@ -915,7 +915,7 @@ void Pdiag_Double::diago_complex_begin(
 		static int istep = 0;
 		auto print_matrix_C = [&](const std::string &file_name, std::complex<double>*m)
 		{
-			std::ofstream ofs(file_name+"-C_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
+			std::ofstream ofs(file_name+"-C_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 			for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
 			{
 				for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
@@ -942,7 +942,7 @@ void Pdiag_Double::diago_complex_begin(
 		};
 		auto print_matrix_F = [&](const std::string &file_name, std::complex<double>*m)
 		{
-			std::ofstream ofs(file_name+"-F_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
+			std::ofstream ofs(file_name+"-F_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 			for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
 			{
 				for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
@@ -997,11 +997,11 @@ void Pdiag_Double::diago_complex_begin(
 	if(GlobalV::KS_SOLVER=="hpseps")
 	{
         double *eigen = new double[GlobalV::NLOCAL];
-        ZEROS(eigen, GlobalV::NLOCAL);
+        ModuleBase::GlobalFunc::ZEROS(eigen, GlobalV::NLOCAL);
 
         assert(loc_size > 0);
         std::complex<double>* Z = new std::complex<double>[this->loc_size * GlobalV::NLOCAL];
-        ZEROS(Z, this->loc_size * GlobalV::NLOCAL);
+        ModuleBase::GlobalFunc::ZEROS(Z, this->loc_size * GlobalV::NLOCAL);
 
         Memory::record("Pdiag_Double","Z",loc_size * GlobalV::NLOCAL,"cdouble");
 		int nbands_tmp = GlobalV::NBANDS;
@@ -1023,7 +1023,7 @@ void Pdiag_Double::diago_complex_begin(
     else if(GlobalV::KS_SOLVER=="genelpa")
     {
         double *eigen = new double[GlobalV::NLOCAL];
-        ZEROS(eigen, GlobalV::NLOCAL);
+        ModuleBase::GlobalFunc::ZEROS(eigen, GlobalV::NLOCAL);
         long maxnloc; // maximum number of elements in local matrix
         MPI_Reduce(&nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, comm_2D);
         MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, comm_2D);
@@ -1091,7 +1091,7 @@ void Pdiag_Double::diago_complex_begin(
                         for (int i=0; i<GlobalV::NBANDS; i++)
                         {
                             ctot[i] = new std::complex<double>[GlobalV::NLOCAL];
-                            ZEROS(ctot[i], GlobalV::NLOCAL);
+                            ModuleBase::GlobalFunc::ZEROS(ctot[i], GlobalV::NLOCAL);
                         }
                         Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
                     }
@@ -1127,9 +1127,9 @@ void Pdiag_Double::diago_complex_begin(
     } // GenELPA method
 	else if(GlobalV::KS_SOLVER=="scalapack_gvx")
 	{
-		ComplexMatrix h_tmp(this->ncol, this->nrow, false);
+		ModuleBase::ComplexMatrix h_tmp(this->ncol, this->nrow, false);
 		memcpy( h_tmp.c, ch_mat, sizeof(std::complex<double>)*this->ncol*this->nrow );
-		ComplexMatrix s_tmp(this->ncol, this->nrow, false);
+		ModuleBase::ComplexMatrix s_tmp(this->ncol, this->nrow, false);
 		memcpy( s_tmp.c, cs_mat, sizeof(std::complex<double>)*this->ncol*this->nrow );
 		wfc_2d.create(this->ncol, this->nrow, false);
 
@@ -1150,7 +1150,8 @@ void Pdiag_Double::diago_complex_begin(
 			&M, &NZ, ekb, &orfac, wfc_2d.c, &one, &one, desc,
 			work.data(), &lwork, rwork.data(), &lrwork,
 			iwork.data(), &liwork, ifail.data(), iclustr.data(), gap.data(), &info);
-
+		if (info)
+			throw std::runtime_error("info=" + ModuleBase::GlobalFunc::TO_STRING(info) + ". " + ModuleBase::GlobalFunc::TO_STRING(__FILE__) + " line " + ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		GlobalV::ofs_running<<"lwork="<<work[0]<<"\t"<<"liwork="<<iwork[0]<<std::endl;
 		lwork = work[0].real();
 		work.resize(lwork,0);
@@ -1162,18 +1163,19 @@ void Pdiag_Double::diago_complex_begin(
 			&GlobalV::NLOCAL, h_tmp.c, &one, &one, desc, s_tmp.c, &one, &one, desc,
 			NULL, NULL, &il, &iu, &abstol,
 			&M, &NZ, ekb, &orfac, wfc_2d.c, &one, &one, desc,
-			work.data(), &lwork, rwork.data(), &lrwork, iwork.data(), &liwork, ifail.data(), iclustr.data(), gap.data(), &info);
+			work.data(), &lwork, rwork.data(), &lrwork,
+			iwork.data(), &liwork, ifail.data(), iclustr.data(), gap.data(), &info);
 		GlobalV::ofs_running<<"M="<<M<<"\t"<<"NZ="<<NZ<<std::endl;
 
 		if(info)
-			throw std::runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::runtime_error("info="+ModuleBase::GlobalFunc::TO_STRING(info)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		if(M!=GlobalV::NBANDS)
-			throw std::runtime_error("M="+TO_STRING(M)+". GlobalV::NBANDS="+TO_STRING(GlobalV::NBANDS)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::runtime_error("M="+ModuleBase::GlobalFunc::TO_STRING(M)+". GlobalV::NBANDS="+ModuleBase::GlobalFunc::TO_STRING(GlobalV::NBANDS)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		if(M!=NZ)
-			throw std::runtime_error("M="+TO_STRING(M)+". NZ="+TO_STRING(NZ)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::runtime_error("M="+ModuleBase::GlobalFunc::TO_STRING(M)+". NZ="+ModuleBase::GlobalFunc::TO_STRING(NZ)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 
 //		if(INPUT.new_dm==0)
-//			throw std::domain_error("INPUT.new_dm must be 1. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+//			throw std::domain_error("INPUT.new_dm must be 1. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		// the follow will be deleted after finish newdm
 		{
 			//change eigenvector matrix from block-cycle distribute matrix to column-divided distribute matrix
@@ -1210,7 +1212,7 @@ void Pdiag_Double::diago_complex_begin(
 							for (int i=0; i<GlobalV::NBANDS; i++)
 							{
 								ctot[i] = new std::complex<double>[GlobalV::NLOCAL];
-								ZEROS(ctot[i], GlobalV::NLOCAL);
+								ModuleBase::GlobalFunc::ZEROS(ctot[i], GlobalV::NLOCAL);
 							}
 							Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
 						}
@@ -1296,9 +1298,9 @@ void Pdiag_Double::readin(
     double *A = new double[nloc];
     double *B = new double[nloc];
     double *Z = new double[loc_size*nlocal_tot];
-    ZEROS(A, nloc);
-    ZEROS(B, nloc);
-    ZEROS(Z, loc_size * nlocal_tot);
+    ModuleBase::GlobalFunc::ZEROS(A, nloc);
+    ModuleBase::GlobalFunc::ZEROS(B, nloc);
+    ModuleBase::GlobalFunc::ZEROS(Z, loc_size * nlocal_tot);
 
     GlobalV::ofs_running << "\n Data distribution of H." << std::endl;
     this->data_distribution(comm_2D,fa,nlocal_tot,nb,A,MatrixInfo);
@@ -1310,8 +1312,8 @@ void Pdiag_Double::readin(
     char uplo = 'U';
     pdgseps(comm_2D,nlocal_tot,nb,A,B,Z,eigen,MatrixInfo,uplo,loc_size,loc_pos);
     time2=MPI_Wtime();
-    OUT(GlobalV::ofs_running,"time1",time1);
-    OUT(GlobalV::ofs_running,"time2",time2);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"time1",time1);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"time2",time2);
 
     //this->gath_eig(comm,n,eigvr,Z);
 

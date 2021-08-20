@@ -88,7 +88,7 @@ void LCAO_Descriptor::init(int lm, int nm, int tot_inl)
     for (int inl = 0;inl < this->inlmax;inl++)
     {
         this->S_mu_alpha[inl] = new double[GlobalV::NLOCAL * (2 * this->lmaxd + 1)];     //GlobalV::NLOCAL*nm
-        ZEROS(S_mu_alpha[inl], GlobalV::NLOCAL * (2 * this->lmaxd+ 1));
+        ModuleBase::GlobalFunc::ZEROS(S_mu_alpha[inl], GlobalV::NLOCAL * (2 * this->lmaxd+ 1));
     }
 
     //init F_delta
@@ -102,9 +102,9 @@ void LCAO_Descriptor::init(int lm, int nm, int tot_inl)
         this->DS_mu_alpha_x[inl] = new double[GlobalV::NLOCAL * (2 * this->lmaxd + 1)];
         this->DS_mu_alpha_y[inl] = new double[GlobalV::NLOCAL * (2 * this->lmaxd + 1)];
         this->DS_mu_alpha_z[inl] = new double[GlobalV::NLOCAL * (2 * this->lmaxd + 1)];
-        ZEROS(DS_mu_alpha_x[inl], GlobalV::NLOCAL * (2 * this->lmaxd + 1));
-        ZEROS(DS_mu_alpha_y[inl], GlobalV::NLOCAL * (2 * this->lmaxd + 1));
-        ZEROS(DS_mu_alpha_z[inl], GlobalV::NLOCAL * (2 * this->lmaxd + 1));
+        ModuleBase::GlobalFunc::ZEROS(DS_mu_alpha_x[inl], GlobalV::NLOCAL * (2 * this->lmaxd + 1));
+        ModuleBase::GlobalFunc::ZEROS(DS_mu_alpha_y[inl], GlobalV::NLOCAL * (2 * this->lmaxd + 1));
+        ModuleBase::GlobalFunc::ZEROS(DS_mu_alpha_z[inl], GlobalV::NLOCAL * (2 * this->lmaxd + 1));
     }
     //init pdm**
     const int PDM_size = (this->lmaxd * 2 + 1) * (this->lmaxd * 2 + 1);
@@ -112,14 +112,14 @@ void LCAO_Descriptor::init(int lm, int nm, int tot_inl)
     for (int inl = 0;inl < this->inlmax;inl++)
     {
         this->pdm[inl] = new double[PDM_size];
-        ZEROS(this->pdm[inl], PDM_size);
+        ModuleBase::GlobalFunc::ZEROS(this->pdm[inl], PDM_size);
     }
     //init gedm**
     this->gedm = new double* [this->inlmax];
     for (int inl = 0;inl < this->inlmax;inl++)
     {
         this->gedm[inl] = new double[PDM_size];
-        ZEROS(this->gedm[inl], PDM_size);
+        ModuleBase::GlobalFunc::ZEROS(this->gedm[inl], PDM_size);
     }
     // cal n(descriptor) per atom , related to Lmax, nchi(L) and m. (not total_nchi!)
 	this->des_per_atom=0; // mohan add 2021-04-21
@@ -144,7 +144,7 @@ void LCAO_Descriptor::init_index(void)
     this->inl_index = new IntArray[GlobalC::ucell.ntype];
     delete[] this->inl_l;
     this->inl_l = new int[this->inlmax];
-    ZEROS(this->inl_l, this->inlmax);
+    ModuleBase::GlobalFunc::ZEROS(this->inl_l, this->inlmax);
 
     int inl = 0;
     int alpha = 0;
@@ -313,7 +313,7 @@ void LCAO_Descriptor::cal_projected_DM(void)
     TITLE("LCAO_Descriptor", "cal_projected_DM");
     //step 1: get dm: the coefficient of wfc, not charge density
     double *dm = new double[GlobalV::NLOCAL * GlobalV::NLOCAL];
-    ZEROS(dm, GlobalV::NLOCAL * GlobalV::NLOCAL);
+    ModuleBase::GlobalFunc::ZEROS(dm, GlobalV::NLOCAL * GlobalV::NLOCAL);
     this->getdm(dm);
 
     //step 2: get S_alpha_mu and S_nu_beta
@@ -324,7 +324,7 @@ void LCAO_Descriptor::cal_projected_DM(void)
     //init tmp_pdm*
     const int tmp_PDM_size = GlobalV::NLOCAL * (lmaxd*2+1);
     double* tmp_pdm = new double[tmp_PDM_size];
-    ZEROS(tmp_pdm, tmp_PDM_size);
+    ModuleBase::GlobalFunc::ZEROS(tmp_pdm, tmp_PDM_size);
 
     for (int inl = 0;inl < inlmax;inl++)
     {   
@@ -411,7 +411,7 @@ void LCAO_Descriptor::cal_descriptor(void)
                     const int dim = 2 * l + 1;
                     const int inl = inl_index[it](ia, l, n);
                     // descriptor for atom (it, ia)
-                    ComplexMatrix des(dim, dim);
+                    ModuleBase::ComplexMatrix des(dim, dim);
                     for (int m = 0; m < dim; m++)
                     {
                         for (int m2 = 0; m2 < dim; m2++)
@@ -467,7 +467,7 @@ void LCAO_Descriptor::cal_descriptor(void)
 
 void LCAO_Descriptor::print_projected_DM(
 	std::ofstream& ofs, 
-	ComplexMatrix& des, 
+	ModuleBase::ComplexMatrix& des, 
 	const int& it, 
 	const int& ia, 
 	const int& l, 
@@ -626,9 +626,9 @@ void LCAO_Descriptor::init_gdmx()
             this->gdmx[iat][inl] = new double [(2 * lmaxd + 1) * (2 * lmaxd + 1)];
             this->gdmy[iat][inl] = new double [(2 * lmaxd + 1) * (2 * lmaxd + 1)];
             this->gdmz[iat][inl] = new double[(2 * lmaxd + 1) * (2 * lmaxd + 1)];
-            ZEROS(gdmx[iat][inl], (2 * lmaxd + 1) * (2 * lmaxd + 1));
-            ZEROS(gdmy[iat][inl], (2 * lmaxd + 1) * (2 * lmaxd + 1));
-            ZEROS(gdmz[iat][inl], (2 * lmaxd + 1) * (2 * lmaxd + 1));
+            ModuleBase::GlobalFunc::ZEROS(gdmx[iat][inl], (2 * lmaxd + 1) * (2 * lmaxd + 1));
+            ModuleBase::GlobalFunc::ZEROS(gdmy[iat][inl], (2 * lmaxd + 1) * (2 * lmaxd + 1));
+            ModuleBase::GlobalFunc::ZEROS(gdmz[iat][inl], (2 * lmaxd + 1) * (2 * lmaxd + 1));
         }
     }
     return;
@@ -663,9 +663,9 @@ void LCAO_Descriptor::cal_v_delta(const std::string& model_file)
 
     //2. multiply and sum
     double* tmp_v1 = new double[(2 * lmaxd + 1) * GlobalV::NLOCAL];
-    ZEROS(tmp_v1, (2 * lmaxd + 1) * GlobalV::NLOCAL);
+    ModuleBase::GlobalFunc::ZEROS(tmp_v1, (2 * lmaxd + 1) * GlobalV::NLOCAL);
     double* tmp_v2 = new double[GlobalV::NLOCAL *GlobalV::NLOCAL];
-    ZEROS(tmp_v2, GlobalV::NLOCAL * GlobalV::NLOCAL);
+    ModuleBase::GlobalFunc::ZEROS(tmp_v2, GlobalV::NLOCAL * GlobalV::NLOCAL);
     //init H_V_delta
     delete[] this->H_V_delta;
     this->H_V_delta = new double[GlobalV::NLOCAL * GlobalV::NLOCAL];

@@ -7,6 +7,7 @@
 wavefunc::wavefunc()
 {
 	allocate_ekb = false;
+	out_wf = 0;
 }
 
 wavefunc::~wavefunc()
@@ -37,7 +38,7 @@ void wavefunc::allocate_ekb_wg(const int nks)
 	for(int ik=0; ik<nks; ik++)
 	{
 		ekb[ik] = new double[GlobalV::NBANDS];
-		ZEROS(ekb[ik],GlobalV::NBANDS);
+		ModuleBase::GlobalFunc::ZEROS(ekb[ik],GlobalV::NBANDS);
 	}
 	this->allocate_ekb = true;
 
@@ -54,7 +55,7 @@ void wavefunc::allocate(const int nks)
 	TITLE("wavefunc","allocate");
 
 	this->npwx = this->setupIndGk(GlobalC::pw, nks);
-	OUT(GlobalV::ofs_running,"npwx",npwx);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"npwx",npwx);
 
 	assert(npwx > 0);
 	assert(nks > 0);
@@ -64,7 +65,7 @@ void wavefunc::allocate(const int nks)
 	// allocate for kinetic energy
 	delete[] g2kin;
 	this->g2kin = new double[npwx];
-	ZEROS(g2kin, npwx);
+	ModuleBase::GlobalFunc::ZEROS(g2kin, npwx);
 	Memory::record("wavefunc","g2kin",npwx,"double");
 
 	// if use spin orbital, do not double nks but double allocate evc and wanf2.
@@ -75,7 +76,7 @@ void wavefunc::allocate(const int nks)
 	for(int ik=0; ik<nks; ik++)
 	{
 		ekb[ik] = new double[GlobalV::NBANDS];
-		ZEROS(ekb[ik], GlobalV::NBANDS);
+		ModuleBase::GlobalFunc::ZEROS(ekb[ik], GlobalV::NBANDS);
 	}
 	this->allocate_ekb = true;
 	
@@ -92,8 +93,8 @@ void wavefunc::allocate(const int nks)
 	if(GlobalV::CALCULATION=="nscf" && GlobalC::wf.mem_saver==1)
 	{
 		// mohan add 2010-09-07
-		this->evc = new ComplexMatrix[1];
-		this->wanf2 = new ComplexMatrix[1];
+		this->evc = new ModuleBase::ComplexMatrix[1];
+		this->wanf2 = new ModuleBase::ComplexMatrix[1];
 		
 		// //added by zhengdy-soc
 		evc[0].create(GlobalV::NBANDS, npwx * GlobalV::NPOL);
@@ -109,8 +110,8 @@ void wavefunc::allocate(const int nks)
 	}
 	else
 	{
-		this->evc = new ComplexMatrix [nks2];
-		this->wanf2 = new ComplexMatrix [nks2];
+		this->evc = new ModuleBase::ComplexMatrix [nks2];
+		this->wanf2 = new ModuleBase::ComplexMatrix [nks2];
 
 		for (int ik = 0; ik < nks2; ik++)
 		{
@@ -171,7 +172,7 @@ int wavefunc::get_starting_nw(void)const
 {
     if (start_wfc == "file")
     {
-		throw std::runtime_error("wavefunc::get_starting_nw. start_ wfc from file: not implemented yet! "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__)); 	// Peize Lin change 2019-05-01
+		throw std::runtime_error("wavefunc::get_starting_nw. start_ wfc from file: not implemented yet! "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__)); 	// Peize Lin change 2019-05-01
         //WARNING_QUIT("wfcinit_k","\n start_ wfc from file: not implemented yet!");
         //**********************************************************************
         // ... read the wavefunction into memory (if it is not done in c_bands)
@@ -198,7 +199,7 @@ int wavefunc::get_starting_nw(void)const
     }
     else
     {
-		throw std::runtime_error("wavefunc::get_starting_nw. Don't know what to do! Please Check source code! "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__)); 	// Peize Lin change 2019-05-01
+		throw std::runtime_error("wavefunc::get_starting_nw. Don't know what to do! Please Check source code! "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__)); 	// Peize Lin change 2019-05-01
         //WARNING_QUIT("get_starting_nw","Don't know what to do! Please Check source code!");
     }
 }
@@ -206,7 +207,7 @@ int wavefunc::get_starting_nw(void)const
 
 
 #ifdef __LCAO
-void wavefunc::LCAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
+void wavefunc::LCAO_in_pw_k(const int &ik, ModuleBase::ComplexMatrix &wvf)
 {
 	TITLE("wavefunc","LCAO_in_pw_k");
 	timer::tick("wavefunc","LCAO_in_pw_k");
@@ -239,14 +240,14 @@ void wavefunc::LCAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
 //		std::cout << " ib=" << ib << " e=" << ekb[ik][ib] << std::endl;
 //	}
 
-//	DONE(GlobalV::ofs_running,"CONSTRUCT_LOCAL_BASIS_IN_PW");
+//	ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"CONSTRUCT_LOCAL_BASIS_IN_PW");
 
 	timer::tick("wavefunc","LCAO_in_pw_k");
 	return;
 }
 
 
-void wavefunc::LCAO_in_pw_k_q(const int &ik, ComplexMatrix &wvf, Vector3<double> q)   // pengfei  2016-11-23
+void wavefunc::LCAO_in_pw_k_q(const int &ik, ModuleBase::ComplexMatrix &wvf, Vector3<double> q)   // pengfei  2016-11-23
 {
 	TITLE("wavefunc","LCAO_in_pw_k_q");
 	timer::tick("wavefunc","LCAO_in_pw_k_q");
@@ -261,7 +262,7 @@ void wavefunc::LCAO_in_pw_k_q(const int &ik, ComplexMatrix &wvf, Vector3<double>
 #endif
 
 
-void wavefunc::diago_PAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
+void wavefunc::diago_PAO_in_pw_k(const int &ik, ModuleBase::ComplexMatrix &wvf)
 {
 	TITLE("wavefunc","diago_PAO_in_pw_k");
 
@@ -271,35 +272,21 @@ void wavefunc::diago_PAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
 	return;
 }
 
-void wavefunc::diago_PAO_in_pw_k2(const int &ik, ComplexMatrix &wvf)
+void wavefunc::diago_PAO_in_pw_k2(const int &ik, ModuleBase::ComplexMatrix &wvf)
 {
 	TITLE("wavefunc","diago_PAO_in_pw_k2");
 	// (6) Prepare for atmoic orbitals or random orbitals
 	const int starting_nw = this->get_starting_nw();
 	assert(starting_nw > 0);
 
-	ComplexMatrix wfcatom(starting_nw, npwx * GlobalV::NPOL);//added by zhengdy-soc
-	if(GlobalV::test_wf)OUT(GlobalV::ofs_running, "starting_nw", starting_nw);
+	ModuleBase::ComplexMatrix wfcatom(starting_nw, npwx * GlobalV::NPOL);//added by zhengdy-soc
+	if(GlobalV::test_wf)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "starting_nw", starting_nw);
 	if(start_wfc.substr(0,6)=="atomic")
 	{
 		this->atomic_wfc(ik, this->npw, GlobalC::ucell.lmax_ppwf, wfcatom, GlobalC::ppcell.tab_at, GlobalV::NQX, GlobalV::DQ);
 		if( start_wfc == "atomic+random" && starting_nw == GlobalC::ucell.natomwfc )//added by qianrui 2021-5-16
 		{
-			double rr, arg;
-			for(int ib = 0 ; ib < starting_nw ; ++ib )
-			{
-				int startig = 0;
-				for(int ip = 0 ; ip < GlobalV::NPOL; ++ip)
-				{
-					for(int ig = 0 ; ig < npw ; ++ig)
-					{
-						rr = rand()/double(RAND_MAX);
-						arg = TWO_PI * rand()/double(RAND_MAX);
-						wfcatom(ib,startig+ig) *= (1.0 + 0.05 * std::complex<double>(rr * cos(arg), rr * sin(arg)));
-					}
-					startig += npwx;
-				}
-			}
+			this->atomicrandom(wfcatom,0,starting_nw,ik);
 		}
 		
 		//====================================================
@@ -310,12 +297,12 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ComplexMatrix &wvf)
 	}
 	else if(start_wfc=="random")
 	{
-		this->random(wfcatom,0,GlobalV::NBANDS,ik);
+			this->random(wfcatom,0,GlobalV::NBANDS,ik);
 	}
 
 	// (7) Diago with cg method.
 	double *etatom  = new double[starting_nw];
-	ZEROS(etatom, starting_nw);
+	ModuleBase::GlobalFunc::ZEROS(etatom, starting_nw);
 	//if(GlobalV::DIAGO_TYPE == "cg") xiaohui modify 2013-09-02
 	if(GlobalV::KS_SOLVER=="cg") //xiaohui add 2013-09-02
 	{
@@ -444,7 +431,7 @@ void wavefunc::wfcinit_k(void)
 		double overlap_aux_I[GlobalV::NLOCAL][GlobalV::NLOCAL][NG][NR];       //imag part
 		double overlap_I[GlobalV::NLOCAL][GlobalV::NLOCAL][NG][NR];
 		
-		ComplexMatrix Mat;
+		ModuleBase::ComplexMatrix Mat;
 		Mat.create(GlobalV::NLOCAL,npwx);
 		Vector3<double> qg; // q+G
 		Vector3<double> gkqg, Rcar[GlobalV::NLOCAL][GlobalV::NLOCAL][NR];  // k+G+qg, Rcartesian
@@ -487,7 +474,7 @@ void wavefunc::wfcinit_k(void)
 				{
 					for(int ig=0; ig<NG; ig++)
 					{
-						ZEROS( overlap_aux[iw1][iw2][ig], NR);
+						ModuleBase::GlobalFunc::ZEROS( overlap_aux[iw1][iw2][ig], NR);
 					}
 				}
 			}
@@ -502,7 +489,7 @@ void wavefunc::wfcinit_k(void)
 				{
 					for(int ig=0; ig<NG; ig++)
 					{
-						ZEROS( overlap_aux[iw1][iw2][ig], NR);
+						ModuleBase::GlobalFunc::ZEROS( overlap_aux[iw1][iw2][ig], NR);
 					}
 				}
 			}
@@ -777,7 +764,7 @@ void wavefunc::init_after_vc(const int nks)
 
     TITLE("wavefunc","init");
     //this->npwx = this->setupIndGk(GlobalC::pw, nks);
-    OUT(GlobalV::ofs_running,"npwx",npwx);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"npwx",npwx);
 
     assert(npwx > 0);
     assert(nks > 0);
@@ -785,24 +772,24 @@ void wavefunc::init_after_vc(const int nks)
 
     delete[] g2kin;
     this->g2kin = new double[npwx];   // [npw],kinetic energy
-    ZEROS(g2kin, npwx);
+    ModuleBase::GlobalFunc::ZEROS(g2kin, npwx);
     Memory::record("wavefunc","g2kin",npwx,"double");
-    if(GlobalV::test_wf)OUT(GlobalV::ofs_running,"g2kin allocation","Done");
+    if(GlobalV::test_wf)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"g2kin allocation","Done");
 
     int prefactor = 1;
     this->ekb = new double*[nks];
     for(int ik=0; ik<nks; ik++)
     {
         ekb[ik] = new double[GlobalV::NBANDS];
-        ZEROS(ekb[ik], GlobalV::NBANDS);
+        ModuleBase::GlobalFunc::ZEROS(ekb[ik], GlobalV::NBANDS);
     }
     this->allocate_ekb = true;
 
     this->wg.create(nks, GlobalV::NBANDS);       // the weight of each k point and band
     Memory::record("wavefunc","et",nks*GlobalV::NBANDS,"double");
     Memory::record("wavefunc","wg",nks*GlobalV::NBANDS,"double");
-    if(GlobalV::test_wf)OUT(GlobalV::ofs_running, "et allocation","Done");
-    if(GlobalV::test_wf)OUT(GlobalV::ofs_running, "wg allocation","Done");
+    if(GlobalV::test_wf)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "et allocation","Done");
+    if(GlobalV::test_wf)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "wg allocation","Done");
 
     delete[] evc;
     delete[] wanf2;
@@ -811,8 +798,8 @@ void wavefunc::init_after_vc(const int nks)
 
     if(GlobalV::CALCULATION=="nscf" && GlobalC::wf.mem_saver==1)
     {
-        this->evc = new ComplexMatrix[1];
-        this->wanf2 = new ComplexMatrix[1];
+        this->evc = new ModuleBase::ComplexMatrix[1];
+        this->wanf2 = new ModuleBase::ComplexMatrix[1];
 
         evc[0].create(GlobalV::NBANDS*prefactor, npwx);
         if(GlobalV::BASIS_TYPE=="lcao_in_pw")
@@ -826,8 +813,8 @@ void wavefunc::init_after_vc(const int nks)
     }
     else
     {
-        this->evc = new ComplexMatrix [nks2];
-        this->wanf2 = new ComplexMatrix [nks2];
+        this->evc = new ModuleBase::ComplexMatrix [nks2];
+        this->wanf2 = new ModuleBase::ComplexMatrix [nks2];
 
         for (int ik = 0; ik < nks2; ik++)
         {
@@ -845,10 +832,10 @@ void wavefunc::init_after_vc(const int nks)
 
     if(GlobalV::test_wf)
     {
-        OUT(GlobalV::ofs_running,"evc allocation","Done");
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"evc allocation","Done");
         if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw")
         {
-            OUT(GlobalV::ofs_running,"wanf2 allocation","Done");
+            ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wanf2 allocation","Done");
         }
     }
 

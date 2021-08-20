@@ -32,19 +32,20 @@ public:
 
 
     //===============================
-    // print ComplexMatrix
+    // print ModuleBase::ComplexMatrix
     //===============================
-    void printcm(std::ofstream &ofs,const std::string &s, const ComplexMatrix &m) const;
+    void printcm(std::ofstream &ofs,const std::string &s, const ModuleBase::ComplexMatrix &m) const;
 
-    void printcm(const std::string &s, const ComplexMatrix &m) const;
+    void printcm(const std::string &s, const ModuleBase::ComplexMatrix &m) const;
 
-    void printcm_real(const std::string &s, const ComplexMatrix &m,const double &limit = 1.0e-15) const;
+    void printcm_real(const std::string &s, const ModuleBase::ComplexMatrix &m,const double &limit = 1.0e-15) const;
 
-    void printcm_real_limit_hermit(const std::string &s, const ComplexMatrix &m,const double &limit) const;
+    void printcm_real_limit_hermit(const std::string &s, const ModuleBase::ComplexMatrix &m,const double &limit) const;
 
-    void printcm_imag(const std::string &s, const ComplexMatrix &m,const double &limit = 1.0e-15) const;
-    void printcm_norm(const std::string &s, const ComplexMatrix &m, const double &limit)const;
-    void printcm_norm(std::ofstream &ofs, const std::string &s, const ComplexMatrix &m, const double &limit)const;
+    void printcm_imag(const std::string &s, const ModuleBase::ComplexMatrix &m,const double &limit = 1.0e-15) const;
+    void printcm_norm(const std::string &s, const ModuleBase::ComplexMatrix &m, const double &limit)const;
+    void printcm_norm(std::ofstream &ofs, const std::string &s, const ModuleBase::ComplexMatrix &m, const double &limit)const;
+
 
     //***************
     // Template

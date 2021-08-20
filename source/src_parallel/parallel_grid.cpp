@@ -88,11 +88,11 @@ void Parallel_Grid::init(
 		this->whichpro[ip] = new int[this->ncz];
 		this->numdata[ip] = new int[nproc];
 		this->startdata[ip] = new int[nproc];
-		ZEROS(this->numz[ip], nproc);
-		ZEROS(this->startz[ip], nproc);
-		ZEROS(this->whichpro[ip], this->ncz);
-		ZEROS(this->numdata[ip], nproc);
-		ZEROS(this->startdata[ip], nproc);
+		ModuleBase::GlobalFunc::ZEROS(this->numz[ip], nproc);
+		ModuleBase::GlobalFunc::ZEROS(this->startz[ip], nproc);
+		ModuleBase::GlobalFunc::ZEROS(this->whichpro[ip], this->ncz);
+		ModuleBase::GlobalFunc::ZEROS(this->numdata[ip], nproc);
+		ModuleBase::GlobalFunc::ZEROS(this->startdata[ip], nproc);
 	}
 
 	this->allocate = true;
@@ -269,7 +269,7 @@ void Parallel_Grid::reduce_to_fullrho(double *rhotot, double *rhoin)
 	{
 		const int znow = iz - this->startz[GlobalV::MY_POOL][GlobalV::RANK_IN_POOL];
 		const int proc = this->whichpro[GlobalV::MY_POOL][iz];
-		ZEROS(zpiece, this->ncxy);
+		ModuleBase::GlobalFunc::ZEROS(zpiece, this->ncxy);
 		int tag = iz;
 		MPI_Status ierror;
 
@@ -378,11 +378,11 @@ const int &nrxx_in, const int &nbz_in, const int &bz_in)
 		this->whichpro[ip] = new int[this->ncz];
 		this->numdata[ip] = new int[nproc];
 		this->startdata[ip] = new int[nproc];
-		ZEROS(this->numz[ip], nproc);
-		ZEROS(this->startz[ip], nproc);
-		ZEROS(this->whichpro[ip], this->ncz);
-		ZEROS(this->numdata[ip], nproc);
-		ZEROS(this->startdata[ip], nproc);
+		ModuleBase::GlobalFunc::ZEROS(this->numz[ip], nproc);
+		ModuleBase::GlobalFunc::ZEROS(this->startz[ip], nproc);
+		ModuleBase::GlobalFunc::ZEROS(this->whichpro[ip], this->ncz);
+		ModuleBase::GlobalFunc::ZEROS(this->numdata[ip], nproc);
+		ModuleBase::GlobalFunc::ZEROS(this->startdata[ip], nproc);
 	}
 
 	this->allocate_final_scf = true;

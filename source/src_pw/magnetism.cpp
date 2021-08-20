@@ -44,17 +44,17 @@ void Magnetism::compute_magnetization()
         this->tot_magnetization *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
         this->abs_magnetization *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
 
-		OUT(GlobalV::ofs_running,"total magnetism (Bohr mag/cell)",this->tot_magnetization);
-		OUT(GlobalV::ofs_running,"absolute magnetism (Bohr mag/cell)",this->abs_magnetization);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"total magnetism (Bohr mag/cell)",this->tot_magnetization);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"absolute magnetism (Bohr mag/cell)",this->abs_magnetization);
 		
 		if(GlobalV::TWO_EFERMI)
 		{
-			OUT(GlobalV::ofs_running,"nelup",get_nelup());
-			OUT(GlobalV::ofs_running,"neldw",get_neldw());
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nelup",get_nelup());
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"neldw",get_neldw());
 		}
 		else
 		{
-			OUT(GlobalV::ofs_running,"nelec",GlobalC::CHR.nelec);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nelec",GlobalC::CHR.nelec);
 		}
 
 //        std::cout << "\n tot_mag = " << std::setprecision(6) << this->tot_magnetization << " Bohr mag/cell" << std::endl;
@@ -78,7 +78,7 @@ void Magnetism::compute_magnetization()
 		for(int i=0;i<3;i++)this->tot_magnetization_nc[i] *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
 		this->abs_magnetization *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
 		GlobalV::ofs_running<<"total magnetism (Bohr mag/cell)"<<'\t'<<this->tot_magnetization_nc[0]<<'\t'<<this->tot_magnetization_nc[1]<<'\t'<<this->tot_magnetization_nc[2]<<'\n';
-		OUT(GlobalV::ofs_running,"absolute magnetism (Bohr mag/cell)",this->abs_magnetization);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"absolute magnetism (Bohr mag/cell)",this->abs_magnetization);
 	}
 
     return;
@@ -144,7 +144,7 @@ void Magnetism::cal_ux(const int ntype)
 	bool is_paraller;
 	//do not sign feature in teh general case
 	lsign_ = false;
-	ZEROS(ux_, 3);
+	ModuleBase::GlobalFunc::ZEROS(ux_, 3);
 
 	starting_it = 0;
 	for(int it = 0;it<ntype;it++)

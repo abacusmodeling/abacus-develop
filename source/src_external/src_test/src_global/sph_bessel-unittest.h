@@ -33,7 +33,7 @@ static void Sph_Bessel_timetest(
 		timeval t_start;	gettimeofday( &t_start, NULL);
 		for (int ir = 0; ir < Rmesh; ir++)
 		{
-			SB.jlx( kmesh, VECTOR_TO_PTR(kpoint), rpoint[ir], l, VECTOR_TO_PTR(jlx[ir]) );
+			SB.jlx( kmesh, ModuleBase::GlobalFunc::VECTOR_TO_PTR(kpoint), rpoint[ir], l, ModuleBase::GlobalFunc::VECTOR_TO_PTR(jlx[ir]) );
 		}
 		timeval t_end;	gettimeofday( &t_end, NULL);
 		std::cout<<l<<"\t"<<(double)(t_end.tv_sec-t_start.tv_sec) + (double)(t_end.tv_usec-t_start.tv_usec)/1000000.0<<std::endl;

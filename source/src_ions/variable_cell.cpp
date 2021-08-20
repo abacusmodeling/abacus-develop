@@ -10,16 +10,16 @@ void Variable_Cell::init_after_vc(void)
 	TITLE("Variable_Cell","init_after_vc");
 
     GlobalC::ucell.setup_cell_after_vc(GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
-    DONE(GlobalV::ofs_running, "SETUP UNITCELL");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     if(ModuleSymmetry::Symmetry::symm_flag)
     {
         GlobalC::symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
-        DONE(GlobalV::ofs_running, "SYMMETRY");
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
     GlobalC::kv.set_after_vc(GlobalC::symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec);
-    DONE(GlobalV::ofs_running, "INIT K-POINTS");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT K-POINTS");
 
     GlobalC::pw.update_gvectors(GlobalV::ofs_running, GlobalC::ucell);
 
@@ -36,7 +36,7 @@ void Variable_Cell::init_after_vc(void)
     // initalize local pseudopotential
     //=================================
     GlobalC::ppcell.init_vloc(GlobalC::pw.nggm, GlobalC::ppcell.vloc);
-    DONE(GlobalV::ofs_running,"LOCAL POTENTIAL");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"LOCAL POTENTIAL");
 
     //======================================
     // Initalize non local pseudopotential
@@ -44,7 +44,7 @@ void Variable_Cell::init_after_vc(void)
     if(GlobalV::BASIS_TYPE=="pw")
     {
         GlobalC::ppcell.init_vnl(GlobalC::ucell);
-        DONE(GlobalV::ofs_running,"NON-LOCAL POTENTIAL");
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"NON-LOCAL POTENTIAL");
     }
 
     return;
@@ -63,33 +63,33 @@ void Variable_Cell::final_calculation_after_vc(void)
     std::cout<<" are recalculated for the final relaxed unit cell."<<std::endl;
     std::cout<<" -----------------------------------------------------------------"<<std::endl;
 
-    OUT(GlobalV::ofs_running," ------------------------------------------------------------------------------------");
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running," ------------------------------------------------------------------------------------");
 
-    OUT(GlobalV::ofs_running,"\n ------------------------------------------------------------------------------------");
-    OUT(GlobalV::ofs_running," The structure has been fully relaxed, and the following is a scf calculation");
-    OUT(GlobalV::ofs_running," at the final structure. The fft grids and G-vectors are recalculated for the");
-    OUT(GlobalV::ofs_running," final relaxed unit cell.");
-    OUT(GlobalV::ofs_running," ------------------------------------------------------------------------------------");
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"\n ------------------------------------------------------------------------------------");
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running," The structure has been fully relaxed, and the following is a scf calculation");
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running," at the final structure. The fft grids and G-vectors are recalculated for the");
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running," final relaxed unit cell.");
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running," ------------------------------------------------------------------------------------");
 
     // (5) Setup the unitcell.
     GlobalC::ucell.setup_cell_after_vc(GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
-    DONE(GlobalV::ofs_running, "SETUP UNITCELL");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     // (6) symmetry analysize.
     if(ModuleSymmetry::Symmetry::symm_flag)
     {
         GlobalC::symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
-        DONE(GlobalV::ofs_running, "SYMMETRY");
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
 
     // (7) Setup the k points according to symmetry.
     GlobalC::kv.set( GlobalC::symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec );
-    DONE(GlobalV::ofs_running,"INIT K-POINTS");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT K-POINTS");
 
     // (1) Init the plane wave.
     GlobalC::pw.gen_pw(GlobalV::ofs_running, GlobalC::ucell, GlobalC::kv);
-    DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
     std::cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx <<" * " << GlobalC::pw.ny <<" * "<< GlobalC::pw.nz << std::endl;
     std::cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx <<" * " << GlobalC::pw.nby <<" * "<< GlobalC::pw.nbz << std::endl;
 
@@ -134,14 +134,14 @@ void Variable_Cell::final_calculation_after_vc(void)
     // initalize local pseudopotential
     //=================================
     GlobalC::ppcell.init_vloc(GlobalC::pw.nggm, GlobalC::ppcell.vloc);
-    DONE(GlobalV::ofs_running,"LOCAL POTENTIAL");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"LOCAL POTENTIAL");
     //======================================
     // Initalize non local pseudopotential
     //======================================
     if(GlobalV::BASIS_TYPE=="pw")
     {
         GlobalC::ppcell.init_vnl(GlobalC::ucell);
-        DONE(GlobalV::ofs_running,"NON-LOCAL POTENTIAL");
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"NON-LOCAL POTENTIAL");
     }
     //=========================================================
     // calculate the total local pseudopotential in real space
@@ -159,7 +159,7 @@ void Variable_Cell::final_calculation_after_vc(void)
 		GlobalC::wf.init_at_1();
 
         GlobalC::wf.wfcinit();
-        DONE(GlobalV::ofs_running,"INIT BASIS");
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT BASIS");
     }
 
 	return;

@@ -81,13 +81,13 @@ void Atom::set_index(void)
 void Atom::print_Atom(std::ofstream &ofs, output &outp)
 {
     //OUT(ofs,"print_Atom()");
-    OUT(ofs,"label",label);
-    OUT(ofs,"type", type);
-    OUT(ofs,"na",na);
-    OUT(ofs,"nwl",nwl);
-    OUT(ofs,"Rcut", Rcut); // pengfei Li 16-2-29
-    OUT(ofs,"nw",nw);
-    OUT(ofs,"stapos_wf",stapos_wf);
+    ModuleBase::GlobalFunc::OUT(ofs,"label",label);
+    ModuleBase::GlobalFunc::OUT(ofs,"type", type);
+    ModuleBase::GlobalFunc::OUT(ofs,"na",na);
+    ModuleBase::GlobalFunc::OUT(ofs,"nwl",nwl);
+    ModuleBase::GlobalFunc::OUT(ofs,"Rcut", Rcut); // pengfei Li 16-2-29
+    ModuleBase::GlobalFunc::OUT(ofs,"nw",nw);
+    ModuleBase::GlobalFunc::OUT(ofs,"stapos_wf",stapos_wf);
     ofs<<std::endl;
 
     //===================

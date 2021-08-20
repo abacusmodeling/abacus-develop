@@ -231,8 +231,8 @@ void Lattice_Change_Basic::terminate(void)
 	if(Lattice_Change_Basic::converged)
 	{
 		GlobalV::ofs_running << " end of lattice optimization"<<std::endl;
-		OUT(GlobalV::ofs_running,"istep", Lattice_Change_Basic::istep);
-		OUT(GlobalV::ofs_running,"update iteration", Lattice_Change_Basic::update_iter);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"istep", Lattice_Change_Basic::istep);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"update iteration", Lattice_Change_Basic::update_iter);
 		/*
 		GlobalV::ofs_running<<"Saving the approximate inverse hessian"<<std::endl;
 		std::ofstream hess("hess.out");

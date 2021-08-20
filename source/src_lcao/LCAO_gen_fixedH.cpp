@@ -283,7 +283,7 @@ void LCAO_gen_fixedH::test_Nonlocal()
 	double rcut = 0.0;
 
 //	double* vnltest = new double[GlobalC::ParaO.nloc];	
-//	ZEROS(vnltest, GlobalC::ParaO.nloc);
+//	ModuleBase::GlobalFunc::ZEROS(vnltest, GlobalC::ParaO.nloc);
 
 	// psi1
 	double sum = 0.0;

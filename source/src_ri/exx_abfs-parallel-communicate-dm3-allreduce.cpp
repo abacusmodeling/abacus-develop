@@ -30,7 +30,7 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init(
 	H_atom_pairs_group_rank = get_H_atom_pairs_group_rank(H_atom_pairs_group);
 	get_send_recv_size(H_atom_pairs_group_rank, H_atom_pairs_group, send_size_list, recv_size);
 
-std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"dm3_"+TO_STRING(my_rank));
+std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"dm3_"+ModuleBase::GlobalFunc::TO_STRING(my_rank));
 //ofs<<H_atom_pairs_group<<std::endl;
 //ofs<<atom_in_2D<<std::endl;
 //for(int rank=0; rank!=comm_sz; ++rank)
@@ -48,7 +48,7 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 	Exx_Abfs::Parallel::Communicate::DM3::Allreduce::a2D_to_exx(
 		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local) const
 {
-std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"dm3_"+TO_STRING(my_rank), std::ofstream::app);
+std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"dm3_"+ModuleBase::GlobalFunc::TO_STRING(my_rank), std::ofstream::app);
 //ofs<<data_local<<std::endl<<"@@@"<<std::endl;;
 
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::a2D_to_exx");
@@ -88,7 +88,7 @@ ofs<<__LINE__<<"\t"<<rank_send_now<<std::endl;
 			if( flags_send[rank_send] == Flag_Send::finish_oar )
 			{
 ofs<<__LINE__<<"\t"<<rank_send<<std::endl;
-				if(MPI_Isend( VECTOR_TO_PTR(oarps_isend[rank_send]), oarps_isend[rank_send].size(), MPI_DOUBLE, rank_send, 0, mpi_comm, &requests_isend[rank_send] )!=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				if(MPI_Isend( ModuleBase::GlobalFunc::VECTOR_TO_PTR(oarps_isend[rank_send]), oarps_isend[rank_send].size(), MPI_DOUBLE, rank_send, 0, mpi_comm, &requests_isend[rank_send] )!=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 				flags_send[rank_send] = Flag_Send::begin_isend;
 ofs<<__LINE__<<"\t"<<rank_send<<"\t"<<oarps_isend[rank_send].size()<<std::endl;
 			}
@@ -98,7 +98,7 @@ ofs<<__LINE__<<"\t"<<rank_send<<"\t"<<oarps_isend[rank_send].size()<<std::endl;
 			if( flags_send[rank_send] == Flag_Send::begin_isend )
 			{
 				int flag_finish;
-				if(MPI_Test( &requests_isend[rank_send], &flag_finish, MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				if(MPI_Test( &requests_isend[rank_send], &flag_finish, MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 				if(flag_finish)
 				{
 ofs<<__LINE__<<"\t"<<rank_send<<std::endl;
@@ -111,15 +111,15 @@ ofs<<__LINE__<<"\t"<<rank_send<<std::endl;
 		{
 			MPI_Status status;
 			int flag_message;
-			if(MPI_Iprobe( MPI_ANY_SOURCE, 0, mpi_comm, &flag_message, &status )!=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+			if(MPI_Iprobe( MPI_ANY_SOURCE, 0, mpi_comm, &flag_message, &status )!=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 			if(flag_message)
 			{
 				int message_size;
-				if(MPI_Get_count( &status, MPI_PACKED, &message_size )!=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				if(MPI_Get_count( &status, MPI_PACKED, &message_size )!=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 				const int rank_recv = status.MPI_SOURCE;
 ofs<<__LINE__<<"\t"<<rank_recv<<std::endl;
 				iarps_irecv[rank_recv].resize(message_size);
-				if(MPI_Irecv( VECTOR_TO_PTR(iarps_irecv[rank_recv]), message_size, MPI_DOUBLE, rank_recv, 0, mpi_comm, &requests_irecv[rank_recv] )!=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				if(MPI_Irecv( ModuleBase::GlobalFunc::VECTOR_TO_PTR(iarps_irecv[rank_recv]), message_size, MPI_DOUBLE, rank_recv, 0, mpi_comm, &requests_irecv[rank_recv] )!=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 				flags_recv[rank_recv] = Flag_Recv::begin_irecv;
 ofs<<__LINE__<<"\t"<<rank_recv<<"\t"<<message_size<<std::endl;
 			}
@@ -130,7 +130,7 @@ ofs<<__LINE__<<"\t"<<rank_recv<<"\t"<<message_size<<std::endl;
 			{
 				int flag_finish = 0;
 ofs<<__LINE__<<"\t"<<rank_recv<<"\t"<<flag_finish<<std::endl;
-				if(MPI_Test( &requests_irecv[rank_recv], &flag_finish, MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				if(MPI_Test( &requests_irecv[rank_recv], &flag_finish, MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 ofs<<__LINE__<<"\t"<<rank_recv<<"\t"<<flag_finish<<std::endl;
 				if(flag_finish)
 				{
@@ -156,7 +156,7 @@ ofs<<__LINE__<<std::endl;
 	{
 		if( flags_send[rank_send] == Flag_Send::begin_isend )
 		{
-			if(MPI_Wait( &requests_isend[rank_send], MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+			if(MPI_Wait( &requests_isend[rank_send], MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 			oarps_isend[rank_send].resize(0);		oarps_isend[rank_send].shrink_to_fit();
 			flags_send[rank_send] = Flag_Send::finish_isend;
 		}
@@ -187,7 +187,7 @@ std::vector<std::pair<bool,bool>> Exx_Abfs::Parallel::Communicate::DM3::Allreduc
 				atom_in_2D[iat].second = true;
 		}
 		else
-			throw std::domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::domain_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
 	return atom_in_2D;
 }
@@ -215,7 +215,7 @@ std::vector<std::map<size_t,std::shared_ptr<std::set<size_t>>>> Exx_Abfs::Parall
 	const int myrank_size = H_atom_pairs_group_vector.size();
 	MPI_Allgatherv(
 		&myrank_size, 1, MPI_INT,
-		VECTOR_TO_PTR(rank_size), VECTOR_TO_PTR(std::vector<int>(comm_sz,1)), VECTOR_TO_PTR(rank_index), MPI_INT,
+		ModuleBase::GlobalFunc::VECTOR_TO_PTR(rank_size), ModuleBase::GlobalFunc::VECTOR_TO_PTR(std::vector<int>(comm_sz,1)), ModuleBase::GlobalFunc::VECTOR_TO_PTR(rank_index), MPI_INT,
 		mpi_comm );
 
 	size_t index_accumulate = 0;
@@ -226,8 +226,8 @@ std::vector<std::map<size_t,std::shared_ptr<std::set<size_t>>>> Exx_Abfs::Parall
 	}
 	std::vector<int> H_atom_pairs_group_rank_vector(index_accumulate);
 	MPI_Allgatherv(
-		VECTOR_TO_PTR(H_atom_pairs_group_vector), H_atom_pairs_group_vector.size(), MPI_INT,
-		VECTOR_TO_PTR(H_atom_pairs_group_rank_vector), VECTOR_TO_PTR(rank_size), VECTOR_TO_PTR(rank_index), MPI_INT,
+		ModuleBase::GlobalFunc::VECTOR_TO_PTR(H_atom_pairs_group_vector), H_atom_pairs_group_vector.size(), MPI_INT,
+		ModuleBase::GlobalFunc::VECTOR_TO_PTR(H_atom_pairs_group_rank_vector), ModuleBase::GlobalFunc::VECTOR_TO_PTR(rank_size), ModuleBase::GlobalFunc::VECTOR_TO_PTR(rank_index), MPI_INT,
 		mpi_comm);
 
 	std::vector<std::map<size_t,std::shared_ptr<std::set<size_t>>>> H_atom_pairs_group_rank(comm_sz);
@@ -294,21 +294,21 @@ std::vector<std::map<size_t,std::set<size_t>>> Exx_Abfs::Parallel::Communicate::
 			atom_send_str[rank] = atom_send_ss.str();
 		}
 		#else
-			throw std::invalid_argument(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		#endif
-		if( MPI_Isend( atom_send_str[rank].c_str(), atom_send_str[rank].size(), MPI_CHAR, rank, tag, mpi_comm, &request[rank] ) !=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+		if( MPI_Isend( atom_send_str[rank].c_str(), atom_send_str[rank].size(), MPI_CHAR, rank, tag, mpi_comm, &request[rank] ) !=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
 
 	std::vector<std::map<size_t,std::set<size_t>>> H_atom_pairs_group_rank(comm_sz);
 	for(int i=0; i!=comm_sz; ++i)
 	{
 		MPI_Status status;
-		if( MPI_Probe( MPI_ANY_SOURCE, tag, mpi_comm, &status ) !=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+		if( MPI_Probe( MPI_ANY_SOURCE, tag, mpi_comm, &status ) !=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		int size_recv;
-		if( MPI_Get_count( &status, MPI_CHAR, &size_recv) !=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+		if( MPI_Get_count( &status, MPI_CHAR, &size_recv) !=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 
 		std::vector<char> ss_buffer(size_recv);
-		if( MPI_Recv( ss_buffer.data(), size_recv, MPI_CHAR, status.MPI_SOURCE, tag, mpi_comm, MPI_STATUS_IGNORE ) !=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+		if( MPI_Recv( ss_buffer.data(), size_recv, MPI_CHAR, status.MPI_SOURCE, tag, mpi_comm, MPI_STATUS_IGNORE ) !=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		std::stringstream atom_recv_ss;  
 		atom_recv_ss.rdbuf()->pubsetbuf(ss_buffer.data(),size_recv);
 		#ifdef USE_CEREAL_SERIALIZATION
@@ -317,11 +317,11 @@ std::vector<std::map<size_t,std::set<size_t>>> Exx_Abfs::Parallel::Communicate::
 			ar(H_atom_pairs_group_rank[status.MPI_SOURCE]);
 		}	
 		#else
-			throw std::invalid_argument(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		#endif
 	}
 
-	if( MPI_Waitall( comm_sz, request.data(), MPI_STATUSES_IGNORE ) !=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+	if( MPI_Waitall( comm_sz, request.data(), MPI_STATUSES_IGNORE ) !=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	return H_atom_pairs_group_rank;
 }
 
@@ -394,7 +394,7 @@ bool Exx_Abfs::Parallel::Communicate::DM3::Allreduce::memory_enough(
 	for(int rank_send=0; rank_send<comm_sz; ++rank_send)
 		if(flags_send[rank_send]==Flag_Send::begin_oar)
 			memory_need += send_size_list[rank_send];
-	const size_t memory_available = MemAvailable()*1024;
+	const size_t memory_available = ModuleBase::GlobalFunc::MemAvailable()*1024;
 	return (memory_available-memory_need>send_size_list[rank_send_next]) ? true : false;
 }
 

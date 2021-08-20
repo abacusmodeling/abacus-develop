@@ -33,9 +33,9 @@ public:
     Matrix3 latvec; // Unitcell lattice vectors
 	int *lc;  // Change the lattice vectors or not
 	Vector3<double> a1,a2,a3; // Same as latvec, just at another form.
-	Vector3<double> latcenter; // (a1+a2+a3)/2 the center of std::vector
+	Vector3<double> latcenter; // (a1+a2+a3)/2 the center of vector
     Matrix3 latvec_supercell; // Supercell lattice vectors
-    Matrix3 G; // reciprocal lattice std::vector (2pi*inv(R) )
+    Matrix3 G; // reciprocal lattice vector (2pi*inv(R) )
     Matrix3 GT; // traspose of G
     Matrix3 GGT; // GGT = G*GT
     Matrix3 invGGT; // inverse G
@@ -81,6 +81,8 @@ public:
     void bcast_atoms_tau();
     void save_cartesian_position(double* pos)const;
 
+    bool judge_big_cell(void);
+
 protected:
 
     double electrons_number;
@@ -94,7 +96,7 @@ protected:
     void bcast_unitcell2(void);
 #endif
 
-	void set_iat2it(void);
+	void set_iat2itia(void);
 
 };
 

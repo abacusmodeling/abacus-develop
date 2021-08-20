@@ -30,9 +30,9 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 	double* pvdpx = new double[nnrg];
 	double* pvdpy = new double[nnrg];
 	double* pvdpz = new double[nnrg];
-	ZEROS(pvdpx, nnrg);
-	ZEROS(pvdpy, nnrg);
-	ZEROS(pvdpz, nnrg); 
+	ModuleBase::GlobalFunc::ZEROS(pvdpx, nnrg);
+	ModuleBase::GlobalFunc::ZEROS(pvdpy, nnrg);
+	ModuleBase::GlobalFunc::ZEROS(pvdpz, nnrg); 
 
     const double delta_r = GlobalC::ORB.dr_uniform;
     // it's a uniform grid to save orbital values, so the delta_r is a constant.
@@ -65,7 +65,7 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
             nn = max(nn, (GlobalC::ucell.atoms[it].nwl+1)*(GlobalC::ucell.atoms[it].nwl+1));
         }
         ylma = new double[nn];
-        ZEROS(ylma, nn);
+        ModuleBase::GlobalFunc::ZEROS(ylma, nn);
 
         for(int i=0; i<bxyz; i++)
         {
@@ -77,8 +77,8 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 			dphi_y[i] = new double*[max_size];
 			dphi_z[i] = new double*[max_size];
 
-            ZEROS(distance[i], max_size);
-            ZEROS(cal_flag[i], max_size);
+            ModuleBase::GlobalFunc::ZEROS(distance[i], max_size);
+            ModuleBase::GlobalFunc::ZEROS(cal_flag[i], max_size);
 
             for(int j=0; j<max_size; j++)
             {
@@ -87,11 +87,11 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 				dphi_x[i][j] = new double[GlobalC::ucell.nwmax];
 				dphi_y[i][j] = new double[GlobalC::ucell.nwmax];
 				dphi_z[i][j] = new double[GlobalC::ucell.nwmax];
-                ZEROS(dr[i][j],3);
-                ZEROS(psir_ylm[i][j],GlobalC::ucell.nwmax);
-                ZEROS(dphi_x[i][j],GlobalC::ucell.nwmax);
-                ZEROS(dphi_y[i][j],GlobalC::ucell.nwmax);
-                ZEROS(dphi_z[i][j],GlobalC::ucell.nwmax);
+                ModuleBase::GlobalFunc::ZEROS(dr[i][j],3);
+                ModuleBase::GlobalFunc::ZEROS(psir_ylm[i][j],GlobalC::ucell.nwmax);
+                ModuleBase::GlobalFunc::ZEROS(dphi_x[i][j],GlobalC::ucell.nwmax);
+                ModuleBase::GlobalFunc::ZEROS(dphi_y[i][j],GlobalC::ucell.nwmax);
+                ModuleBase::GlobalFunc::ZEROS(dphi_z[i][j],GlobalC::ucell.nwmax);
             }
         }
     }
@@ -100,7 +100,7 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
     const double dv = GlobalC::ucell.omega/this->ncxyz;
     int vl_index=0;
     double* vldr3 = new double[bxyz];
-    ZEROS(vldr3, bxyz);
+    ModuleBase::GlobalFunc::ZEROS(vldr3, bxyz);
 
 	for(int i=0; i<nbx; i++)
 	{
@@ -232,15 +232,15 @@ void Gint_k::svl_k_RealSpace(
 	double* pvdp12 = new double[nnrg];
 	double* pvdp13 = new double[nnrg];
 	double* pvdp23 = new double[nnrg];
-	ZEROS(pvdpx, nnrg);
-	ZEROS(pvdpy, nnrg);
-	ZEROS(pvdpz, nnrg);
-	ZEROS(pvdp11, nnrg);
-	ZEROS(pvdp22, nnrg);
-	ZEROS(pvdp33, nnrg);
-	ZEROS(pvdp12, nnrg);
-	ZEROS(pvdp13, nnrg);
-	ZEROS(pvdp23, nnrg);
+	ModuleBase::GlobalFunc::ZEROS(pvdpx, nnrg);
+	ModuleBase::GlobalFunc::ZEROS(pvdpy, nnrg);
+	ModuleBase::GlobalFunc::ZEROS(pvdpz, nnrg);
+	ModuleBase::GlobalFunc::ZEROS(pvdp11, nnrg);
+	ModuleBase::GlobalFunc::ZEROS(pvdp22, nnrg);
+	ModuleBase::GlobalFunc::ZEROS(pvdp33, nnrg);
+	ModuleBase::GlobalFunc::ZEROS(pvdp12, nnrg);
+	ModuleBase::GlobalFunc::ZEROS(pvdp13, nnrg);
+	ModuleBase::GlobalFunc::ZEROS(pvdp23, nnrg);
 
 
 	const double delta_r = GlobalC::ORB.dr_uniform;
@@ -275,7 +275,7 @@ void Gint_k::svl_k_RealSpace(
 			nn = max(nn, (GlobalC::ucell.atoms[it].nwl+1)*(GlobalC::ucell.atoms[it].nwl+1));
 		}
 		ylma = new double[nn];
-		ZEROS(ylma, nn);
+		ModuleBase::GlobalFunc::ZEROS(ylma, nn);
 
 		for(int i=0; i<bxyz; i++)
 		{
@@ -287,8 +287,8 @@ void Gint_k::svl_k_RealSpace(
 			dphi_y[i] = new double*[max_size];
 			dphi_z[i] = new double*[max_size];
 
-			ZEROS(distance[i], max_size);
-			ZEROS(cal_flag[i], max_size);
+			ModuleBase::GlobalFunc::ZEROS(distance[i], max_size);
+			ModuleBase::GlobalFunc::ZEROS(cal_flag[i], max_size);
 
 			for(int j=0; j<max_size; j++)
 			{
@@ -297,11 +297,11 @@ void Gint_k::svl_k_RealSpace(
 				dphi_x[i][j] = new double[GlobalC::ucell.nwmax];
 				dphi_y[i][j] = new double[GlobalC::ucell.nwmax];
 				dphi_z[i][j] = new double[GlobalC::ucell.nwmax];
-				ZEROS(dr[i][j],3);
-				ZEROS(psir_ylm[i][j],GlobalC::ucell.nwmax);
-				ZEROS(dphi_x[i][j],GlobalC::ucell.nwmax);
-				ZEROS(dphi_y[i][j],GlobalC::ucell.nwmax);
-				ZEROS(dphi_z[i][j],GlobalC::ucell.nwmax);
+				ModuleBase::GlobalFunc::ZEROS(dr[i][j],3);
+				ModuleBase::GlobalFunc::ZEROS(psir_ylm[i][j],GlobalC::ucell.nwmax);
+				ModuleBase::GlobalFunc::ZEROS(dphi_x[i][j],GlobalC::ucell.nwmax);
+				ModuleBase::GlobalFunc::ZEROS(dphi_y[i][j],GlobalC::ucell.nwmax);
+				ModuleBase::GlobalFunc::ZEROS(dphi_z[i][j],GlobalC::ucell.nwmax);
 			}
 		}
 	}
@@ -310,7 +310,7 @@ void Gint_k::svl_k_RealSpace(
 	const double dv = GlobalC::ucell.omega/this->ncxyz;
 	int vl_index=0;
 	double* vldr3 = new double[bxyz];
-	ZEROS(vldr3, bxyz);
+	ModuleBase::GlobalFunc::ZEROS(vldr3, bxyz);
 
 	for(int i=0; i<nbx; i++)
 	{

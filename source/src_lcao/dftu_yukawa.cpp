@@ -125,7 +125,7 @@ void DFTU_Yukawa::cal_slater_UJ(const int istep, const int iter)
 			int N = GlobalC::ucell.atoms[it].l_nchi[l];
 			for(int n=0; n<N; n++)
 			{
-				ZEROS(VECTOR_TO_PTR(this->Fk.at(it).at(l).at(n)), l+1);
+				ModuleBase::GlobalFunc::ZEROS(ModuleBase::GlobalFunc::VECTOR_TO_PTR(this->Fk.at(it).at(l).at(n)), l+1);
 			}			
 		}			 	
 	}

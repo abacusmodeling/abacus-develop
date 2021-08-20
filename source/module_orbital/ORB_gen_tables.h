@@ -64,7 +64,7 @@ class ORB_gen_tables
 		const int &type,
 		const matrix &dion, // mohan add 2021-04-25
 		const int &nspin, // mohan add 2021-05-07
-		const ComplexArray &d_so, // mohan add 2021-04-25
+		const ModuleBase::ComplexArray &d_so, // mohan add 2021-04-25
 		const int &count_soc, // mohan add 2021-05-07
 		int* index1_soc, // mohan add 2021-05-07
 		int* index2_soc, // mohan add 2021-05-07

@@ -64,7 +64,7 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 		this->nkb += GlobalC::ucell.atoms[it].nh * GlobalC::ucell.atoms[it].na;
 	}
 
-	OUT(GlobalV::ofs_running,"TOTAL NUMBER OF NONLOCAL PROJECTORS",nkb);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"TOTAL NUMBER OF NONLOCAL PROJECTORS",nkb);
 
 	if( this->nhm > 0 )
 	{
@@ -169,11 +169,11 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 		const int nbeta = GlobalC::ucell.atoms[it].nbeta;
 		const int nh = GlobalC::ucell.atoms[it].nh;
 
-		if(GlobalV::test_pp>1) OUT("nbeta",nbeta);
+		if(GlobalV::test_pp>1) ModuleBase::GlobalFunc::OUT("nbeta",nbeta);
 
 		for (nb = 0;nb < nbeta;nb++)
 		{
-			if(GlobalV::test_pp>1) OUT("ib",nb);
+			if(GlobalV::test_pp>1) ModuleBase::GlobalFunc::OUT("ib",nb);
 			for (ig = 0;ig < npw;ig++)
 			{
 				const double gnorm = gk[ig].norm() * GlobalC::ucell.tpiba;
@@ -482,17 +482,17 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 	int jkb = 0;
 	for(int it = 0;it < GlobalC::ucell.ntype;it++)
 	{
-		if(GlobalV::test_pp>1) OUT("it",it);
+		if(GlobalV::test_pp>1) ModuleBase::GlobalFunc::OUT("it",it);
 		// calculate beta in G-space using an interpolation table
 		const int nbeta = GlobalC::ucell.atoms[it].nbeta;
 		const int nh = GlobalC::ucell.atoms[it].nh;
 
-		if(GlobalV::test_pp>1) OUT("nbeta",nbeta);
+		if(GlobalV::test_pp>1) ModuleBase::GlobalFunc::OUT("nbeta",nbeta);
 
 		for(int i=0; i<3; i++)
 			for(int j=0; j<nhm; j++)
 			{
-				ZEROS(vkb1_alpha[i][j], npw);
+				ModuleBase::GlobalFunc::ZEROS(vkb1_alpha[i][j], npw);
 			}
 			
 		for (ih = 0;ih < nh; ih++)

@@ -45,7 +45,7 @@ double Memory::calculate_mem(const long &n_in,const std::string &type)
 	double float_mem = float_memory * factor;
 	double short_mem = short_memory * factor;
 
-	if(type=="ComplexMatrix" || type=="complexmatrix" || type=="cdouble")
+	if(type=="ModuleBase::ComplexMatrix" || type=="complexmatrix" || type=="cdouble")
 	{
 		mem = complex_matrix_mem;
 	}

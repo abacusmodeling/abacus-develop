@@ -15,7 +15,10 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-using namespace std;
+namespace ModuleBase
+{
+namespace GlobalFunc
+{
 
 void NOTE(const std::string &words)
 {
@@ -249,4 +252,7 @@ size_t MemAvailable()
 			return mem_sum;
 	}
 	throw std::runtime_error("read /proc/meminfo error in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+}
+
+}
 }

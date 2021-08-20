@@ -182,7 +182,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			{
 				for(int is=0; is<GlobalV::NSPIN; is++)
 				{
-					ZEROS(GlobalC::CHR.rho[is], GlobalC::pw.nrxx);
+					ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[is], GlobalC::pw.nrxx);
 				}
 			}
 			//for(int is = 0; is < GlobalV::NSPIN; ++is)
@@ -197,7 +197,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		{
 			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
-				ZEROS(GlobalC::CHR.rho[is], GlobalC::pw.nrxx);
+				ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[is], GlobalC::pw.nrxx);
 			}
 		}
 
@@ -347,8 +347,11 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			{
 				GlobalV::ofs_running << " convergence has NOT been achieved!" << std::endl;			
 			}
-							
-			iter_end(GlobalV::ofs_running);
+
+			if(GlobalV::OUT_LEVEL != "m") 
+			{
+				print_eigenvalue(GlobalV::ofs_running);
+			}
 			timer::tick("Elec_Stochastic","scf_stochastic");
             return;
         }
@@ -384,7 +387,7 @@ void Stochastic_Elec::c_bands(const int &istep)
 	int precondition_type = 2;
 
 	double *h_diag = new double[GlobalC::wf.npwx * GlobalV::NPOL];//added by zhengdy-soc
-	ZEROS(h_diag, GlobalC::wf.npwx * GlobalV::NPOL);
+	ModuleBase::GlobalFunc::ZEROS(h_diag, GlobalC::wf.npwx * GlobalV::NPOL);
     
 	avg_iter = 0.0;
        

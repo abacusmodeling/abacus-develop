@@ -130,8 +130,8 @@ void energy::perform_dos_pw(void)
 		emax=emax+delta/2.0;
 		emin=emin-delta/2.0;
 
-				OUT(GlobalV::ofs_running,"minimal energy is (eV)", emin);
-				OUT(GlobalV::ofs_running,"maximal energy is (eV)", emax);
+				ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"minimal energy is (eV)", emin);
+				ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"maximal energy is (eV)", emax);
 		// 		atom_arrange::set_sr_NL();
 		//		atom_arrange::search( GlobalV::SEARCH_RADIUS );//qifeng-2019-01-21
 		

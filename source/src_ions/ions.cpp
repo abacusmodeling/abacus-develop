@@ -8,6 +8,7 @@
 #include "../src_pw/vdwd3_parameters.h"
 #include "../src_pw/pw_complement.h"
 #include "../src_pw/pw_basis.h"
+#include "../src_io/print_info.h"
 #include "variable_cell.h" // mohan add 2021-02-01
 
 void Ions::opt_ions_pw(void)
@@ -53,8 +54,8 @@ void Ions::opt_ions_pw(void)
 
 		if(GlobalV::OUT_LEVEL=="ie")
 		{
-	
-        	std::cout << " -------------------------------------------" << std::endl;
+			Print_Info::print_screen(stress_step, force_step, istep);
+/*        	std::cout << " -------------------------------------------" << std::endl;
 			if(GlobalV::CALCULATION=="relax") //pengfei 2014-10-13
 			{
         		std::cout << " STEP OF ION RELAXATION : " << istep << std::endl;
@@ -63,11 +64,14 @@ void Ions::opt_ions_pw(void)
             {
                 std::cout << " RELAX CELL : " << stress_step << std::endl;
                 std::cout << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << std::endl;
-                std::cout << " ---------------------------------------------------------" << std::endl;
             }
 			else if(GlobalV::CALCULATION=="scf") //add 4 lines 2015-09-06, xiaohui
 			{
         			std::cout << " SELF-CONSISTENT : " << std::endl;
+			}
+			else if(GlobalV::CALCULATION=="nscf") //add 4 lines 2015-09-06, xiaohui
+			{
+        			std::cout << " NONSELF-CONSISTENT : " << std::endl;
 			}
 			else if(GlobalV::CALCULATION=="md")
 			{
@@ -84,13 +88,20 @@ void Ions::opt_ions_pw(void)
             {
                 GlobalV::ofs_running << " RELAX CELL : " << stress_step << std::endl;
                 GlobalV::ofs_running << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << std::endl;
-                GlobalV::ofs_running << " ---------------------------------------------------------" << std::endl;
             }
 			else if(GlobalV::CALCULATION=="md")
 			{
         		GlobalV::ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
 			}
-        	GlobalV::ofs_running << " -------------------------------------------" << std::endl;
+			else if(GlobalV::CALCULATION=="scf")
+            {
+                GlobalV::ofs_running << " SELF-CONSISTENT" << std::endl;
+            }
+            else if(GlobalV::CALCULATION=="nscf")
+            {
+                GlobalV::ofs_running << " NONSELF-CONSISTENT" << std::endl;
+            }
+        	GlobalV::ofs_running << " -------------------------------------------" << std::endl;*/
 		}
 
 	//----------------------------------------------------------
@@ -134,7 +145,7 @@ void Ions::opt_ions_pw(void)
 			}
 			else if( Exx_Global::Hybrid_Type::Generate_Matrix == GlobalC::exx_global.info.hybrid_type )
 			{
-				throw std::invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 			}
 			else	// Peize Lin add 2019-03-09
 			{
