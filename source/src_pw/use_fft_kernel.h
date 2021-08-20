@@ -5,3 +5,4 @@
 typedef cufftDoubleComplex CUFFT_COMPLEX;
 
 void RoundTrip(const CUFFT_COMPLEX *psi, const double *vr, const int *fft_index, CUFFT_COMPLEX *psic);
+

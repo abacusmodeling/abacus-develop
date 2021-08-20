@@ -81,6 +81,20 @@ extern "C"
 		const double* vl, const double* vu, const int* il, const int* iu,
 		const double* abstol, int* m, int* nz, double* w, const double*orfac, std::complex<double>* Z, const int* iz, const int* jz, const int*descz,
 		std::complex<double>* work, int* lwork, double* rwork, int* lrwork, int*iwork, int*liwork, int* ifail, int*iclustr, double*gap, int* info);
+
+	void pzgetri_(
+		const int *n, 
+		const std::complex<double> *A, const int *ia, const int *ja, const int *desca,
+		int *ipiv, const std::complex<double> *work, const int *lwork, const int *iwork, const int *liwork, const int *info);
+
+    void pzgeadd_(
+		const char *transa,
+		const int *m, const int *n,
+		const std::complex<double> *alpha,
+		const std::complex<double> *a, const int *ia, const int *ja, const int *desca,
+                		const std::complex<double> *beta,
+		const std::complex<double> *c, const int *ic, const int *jc, const int *descc);
+
 }
 
 /*

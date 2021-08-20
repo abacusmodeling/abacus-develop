@@ -84,6 +84,7 @@ void Input::Init(const std::string &fn)
 	OUT(GlobalV::ofs_running,"global_out_dir", GlobalV::global_out_dir);
 	OUT(GlobalV::ofs_running,"global_in_card", GlobalV::global_in_card);
 	OUT(GlobalV::ofs_running,"pseudo_dir", GlobalV::global_pseudo_dir);
+	OUT(GlobalV::ofs_running,"orbital_dir", GlobalV::global_orbital_dir);
 
 	OUT(GlobalV::ofs_running,"pseudo_type", pseudo_type); // mohan add 2013-05-20 (xiaohui add 2013-06-23, GlobalV::global_pseudo_type -> pseudo_type)
 
@@ -103,6 +104,7 @@ void Input::Default(void)
     atom_file = "";//xiaohui modify 2015-02-01
     kpoint_file = "";//xiaohui modify 2015-02-01
     pseudo_dir = "";
+	orbital_dir = ""; // liuyu add 2021-08-14
 	read_file_dir = "auto";
     pseudo_type = "auto"; // mohan add 2013-05-20 (xiaohui add 2013-06-23)
 	wannier_card = "";
@@ -116,6 +118,7 @@ void Input::Default(void)
     nbands = 0;
 	nbands_sto = 0;
 	nbands_istate = 5;
+	seed = 0;
 	nche_sto = 0;
 	seed_sto = 0;
 	stotype = "pw";
@@ -247,7 +250,7 @@ void Input::Default(void)
 	lmax_descriptor = 2; // mohan added 2021-01-03
 
     out_potential = 0;
-    out_wf = false;
+    out_wf = 0;
 	out_dos = 0;
     out_band = 0;
 	out_hs = 0;
@@ -532,7 +535,11 @@ bool Input::Read(const std::string &fn)
 		{
 			read_value(ifs, pseudo_type);
 		}
-        else if (strcmp("kpoint_file", word) == 0)//xiaohui modify 2015-02-01
+		else if (strcmp("orbital_dir", word) == 0) // liuyu add 2021-08-14
+		{
+			read_value(ifs, orbital_dir);
+		}
+		else if (strcmp("kpoint_file", word) == 0)//xiaohui modify 2015-02-01
         {
             read_value(ifs, kpoint_file);//xiaohui modify 2015-02-01
         }
@@ -586,6 +593,10 @@ bool Input::Read(const std::string &fn)
 		else if (strcmp("seed_sto", word) == 0)
         {
             read_value(ifs, seed_sto);
+		}
+		else if (strcmp("seed", word) == 0)
+        {
+            read_value(ifs, seed);
 		}
 		else if (strcmp("emax_sto", word) == 0)
         {
@@ -1997,6 +2008,7 @@ void Input::Bcast()
     Parallel_Common::bcast_string( atom_file );//xiaohui modify 2015-02-01
     Parallel_Common::bcast_string( pseudo_dir );
     Parallel_Common::bcast_string( pseudo_type ); // mohan add 2013-05-20 (xiaohui add 2013-06-23)
+	Parallel_Common::bcast_string( orbital_dir );
     Parallel_Common::bcast_string( kpoint_file );//xiaohui modify 2015-02-01
     Parallel_Common::bcast_string( wannier_card );
     Parallel_Common::bcast_string( latname );
@@ -2009,6 +2021,7 @@ void Input::Bcast()
     Parallel_Common::bcast_int( nbands_istate );
 	Parallel_Common::bcast_int( nche_sto );
 	Parallel_Common::bcast_int( seed_sto );
+	Parallel_Common::bcast_int( seed );
 	Parallel_Common::bcast_double( emax_sto );
 	Parallel_Common::bcast_double( emin_sto );
 	Parallel_Common::bcast_string( stotype );
@@ -2125,7 +2138,7 @@ void Input::Bcast()
 	Parallel_Common::bcast_string( model_file ); //  caoyu add 2021-06-03
 
 	Parallel_Common::bcast_int(out_potential);
-    Parallel_Common::bcast_bool( out_wf );
+    Parallel_Common::bcast_int( out_wf );
 	Parallel_Common::bcast_int( out_dos );
         Parallel_Common::bcast_int( out_band );
 	Parallel_Common::bcast_int( out_hs );

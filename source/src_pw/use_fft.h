@@ -2,6 +2,10 @@
 #define USE_FFT_H
 
 #include "tools.h"
+#include "cufft.h"
+#include "use_fft_kernel.h"
+
+typedef cufftDoubleComplex CUFFT_COMPLEX;
 
 class Use_FFT
 {
@@ -43,9 +47,11 @@ class Use_FFT
 		const int *_index,
 		std::complex<double> *psic);
 
+
 	//void RoundTrip_GPU(const CUFFT_COMPLEX *psi, const double *vr, const int *fft_index, CUFFT_COMPLEX *psic);
 
 private:
+
 
 
 };

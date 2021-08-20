@@ -73,7 +73,9 @@ void Reorder_psi_minus(CUFFT_COMPLEX *dst, CUFFT_COMPLEX *src)
     }
 }
 
+
 void RoundTrip(const CUFFT_COMPLEX *psi, const double *vr, const int *fft_index, CUFFT_COMPLEX *psic)
+
 {
     // (1) set value
     int thread = 512;
@@ -85,6 +87,7 @@ void RoundTrip(const CUFFT_COMPLEX *psi, const double *vr, const int *fft_index,
     // int *d_ismap;
     // cudaMalloc((void**)&d_ismap, GlobalC::pw.FFT_wfc.nst*sizeof(int));
     // cudaMemcpy(d_ismap, GlobalC::pw.FFT_wfc.ismap, GlobalC::pw.FFT_wfc.nst*sizeof(int), cudaMemcpyHostToDevice);
+
 
     CUFFT_COMPLEX *ordered_psi;
     cudaMalloc((void**)&ordered_psi, GlobalC::pw.nrxx*sizeof(CUFFT_COMPLEX));
@@ -113,11 +116,12 @@ void RoundTrip(const CUFFT_COMPLEX *psi, const double *vr, const int *fft_index,
     kernel_normalization<<<block3, thread>>>(GlobalC::pw.nrxx, psic, (double)(GlobalC::pw.nrxx));
 
     cudaFree(ordered_psi);
+
 /*
+
     // todo: delete!
     // cout<<"size of ismap"<<GlobalC::pw.FFT_wfc.nst<<endl;
     // cout<<"nppz:"<<GlobalC::pw.FFT_wfc.npps[0]<<endl;
-
 
 
     // cout<<"before fft1"<<endl;
@@ -215,6 +219,6 @@ void RoundTrip(const CUFFT_COMPLEX *psi, const double *vr, const int *fft_index,
     // cout<<"rounftrip end"<<endl;
 
     // cout<<"fft dim: "<<GlobalC::pw.nx<<" "<<GlobalC::pw.ny<<" "<<GlobalC::pw.nz<<endl;
-*/
+
     return;
 }

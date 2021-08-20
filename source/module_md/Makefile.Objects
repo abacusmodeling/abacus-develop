@@ -13,6 +13,7 @@ MD_func.o\
 MD_thermo.o\
 run_md_classic.o\
 LJ_potential.o\
+cmd_neighbor.o\
 
 OBJS_BASE=matrix3.o\
 matrix.o\
@@ -49,6 +50,7 @@ sltk_grid_driver.o\
 
 OBJS_IO=write_input.o\
 output.o\
+print_info.o\
 
 OBJS_PARALELL=parallel_reduce.o\
 parallel_common.o\

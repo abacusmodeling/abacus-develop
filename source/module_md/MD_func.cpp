@@ -332,7 +332,10 @@ double MD_func::Conserved(const double KE, const double PE, const int number){
    	Conserved = KE + PE ;
    
 	if (!GlobalV::MY_RANK)
-	{                 
+	{               
+		GlobalV::ofs_running<< "--------------------------------------------------"<<std::endl;
+        GlobalV::ofs_running<< "            SUMMARY OF NVE CALCULATION            "<<std::endl;
+        GlobalV::ofs_running<<" --------------------------------------------------"<<std::endl;  
 		GlobalV::ofs_running<< "NVE Conservation     : "<< Conserved<<" (Hartree)"<<std::endl;
 		GlobalV::ofs_running<< "NVE Temperature      : "<< 2*KE/(3*number)/K_BOLTZMAN_AU<<" (K)"<<std::endl;
 		GlobalV::ofs_running<< "NVE Kinetic energy   : "<< KE<<" (Hartree)"<<std::endl;

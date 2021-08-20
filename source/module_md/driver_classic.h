@@ -23,7 +23,6 @@ class Driver_classic
 	// classic MD
 	void classic_world();
 
-
 };
 
 #endif

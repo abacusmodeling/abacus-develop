@@ -11,6 +11,7 @@ WF_atomic::WF_atomic()
 {
     evc  = new ComplexMatrix[1];
     wanf2= new ComplexMatrix[1];
+    seed = 0;
 }
 
 WF_atomic::~WF_atomic()
@@ -475,23 +476,174 @@ void WF_atomic::random(ComplexMatrix &psi,const int iw_start,const int iw_end,co
     assert(iw_start >= 0);
     assert(psi.nr >= iw_end);
     const int ng = GlobalC::kv.ngk[ik];
-    for (int iw = iw_start ;iw < iw_end;iw++)
+#ifdef __MPI
+    if(seed > 0)//qianrui add 2021-8-13
     {
+        srand(unsigned(seed + GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL] + ik));
+        int nxy = GlobalC::pw.ncx * GlobalC::pw.ncy;
+        int nrxx = GlobalC::pw.nrxx;
+        int nz = GlobalC::pw.ncz;
+        int *GR_index = new int [ng];
         for (int ig = 0;ig < ng;ig++)
         {
-            const double rr = std::rand()/double(RAND_MAX); //qianrui add RAND_MAX
-            const double arg= TWO_PI * std::rand()/double(RAND_MAX);
-            Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
-            psi(iw,ig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
+            GR_index[ig] = GlobalC::pw.ig2fftw[ GlobalC::wf.igk(ik, ig) ];
         }
-        if(GlobalV::NPOL==2)for (int ig = this->npwx;ig < this->npwx + ng;ig++)
+        double *stickrr = new double[nz];
+        double *stickarg = new double[nz];
+        double *tmprr = new double[nrxx];
+        double *tmparg = new double[nrxx];
+        for (int iw = iw_start ;iw < iw_end;iw++)
         {
-            const double rr = std::rand()/double(RAND_MAX);
-            const double arg= TWO_PI * std::rand()/double(RAND_MAX);
-            Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig - this->npwx));
-            psi(iw,ig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
+            int startig = 0;
+            for(int ipol = 0 ; ipol < GlobalV::NPOL ; ++ipol)
+            {
+            
+	            for(int ir=0; ir < nxy; ir++)
+	            {
+                    if(GlobalC::pw.FFT_wfc.index_ip[ir] < 0) continue;
+	            	if(GlobalV::RANK_IN_POOL==0)
+	            	{
+	            		for(int iz=0; iz<nz; iz++)
+	            		{
+	            			stickrr[ iz ] = std::rand()/double(RAND_MAX);
+                            stickarg[ iz ] = std::rand()/double(RAND_MAX);
+	            		}
+	            	}
+	            	GlobalC::pw.FFT_wfc.stick_to_pool(stickrr, ir, tmprr);
+                    GlobalC::pw.FFT_wfc.stick_to_pool(stickarg, ir, tmparg);
+	            }
+
+                for (int ig = 0;ig < ng;ig++)
+                {
+                    const double rr = tmprr[GR_index[ig]];
+                    const double arg= TWO_PI * tmparg[GR_index[ig]];
+                    Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
+                    psi(iw,ig+startig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
+                }
+                startig += npwx;
+            }
         }
+        delete[] stickrr;
+        delete[] stickarg;
+        delete[] tmprr;
+        delete[] tmparg;
+        delete[] GR_index;
     }
+    else
+    {
+#else
+        if(seed > 0)//qianrui add 2021-8-13
+        {
+            srand(unsigned(seed + GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL] + ik));
+        }
+#endif
+        for (int iw = iw_start ;iw < iw_end;iw++)
+        {
+            for (int ig = 0;ig < ng;ig++)
+            {
+                const double rr = std::rand()/double(RAND_MAX); //qianrui add RAND_MAX
+                const double arg= TWO_PI * std::rand()/double(RAND_MAX);
+                Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
+                psi(iw,ig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
+            }
+            if(GlobalV::NPOL==2)for (int ig = this->npwx;ig < this->npwx + ng;ig++)
+            {
+                const double rr = std::rand()/double(RAND_MAX);
+                const double arg= TWO_PI * std::rand()/double(RAND_MAX);
+                Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig - this->npwx));
+                psi(iw,ig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
+            }
+        }
+#ifdef __MPI
+    }
+#endif
+
     return;
 }
 
+void WF_atomic::atomicrandom(ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const
+{
+    assert(iw_start >= 0);
+    assert(psi.nr >= iw_end);
+    const int ng = GlobalC::kv.ngk[ik];
+#ifdef __MPI
+    if(seed > 0)//qianrui add 2021-8-13
+    {
+        srand(unsigned(seed + GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL] + ik));
+        int nxy = GlobalC::pw.ncx * GlobalC::pw.ncy;
+        int nrxx = GlobalC::pw.nrxx;
+        int nz = GlobalC::pw.ncz;
+        int *GR_index = new int [ng];
+        for (int ig = 0;ig < ng;ig++)
+        {
+            GR_index[ig] = GlobalC::pw.ig2fftw[ GlobalC::wf.igk(ik, ig) ];
+        }
+        double *stickrr = new double[nz];
+        double *stickarg = new double[nz];
+        double *tmprr = new double[nrxx];
+        double *tmparg = new double[nrxx];
+        for (int iw = iw_start ;iw < iw_end;iw++)
+        {
+            int startig = 0;
+            for(int ipol = 0 ; ipol < GlobalV::NPOL ; ++ipol)
+            {
+            
+	            for(int ir=0; ir < nxy; ir++)
+	            {
+                    if(GlobalC::pw.FFT_wfc.index_ip[ir] < 0) continue;
+	            	if(GlobalV::RANK_IN_POOL==0)
+	            	{
+	            		for(int iz=0; iz<nz; iz++)
+	            		{
+	            			stickrr[ iz ] = std::rand()/double(RAND_MAX);
+                            stickarg[ iz ] = std::rand()/double(RAND_MAX);
+	            		}
+	            	}
+	            	GlobalC::pw.FFT_wfc.stick_to_pool(stickrr, ir, tmprr);
+                    GlobalC::pw.FFT_wfc.stick_to_pool(stickarg, ir, tmparg);
+	            }
+
+                for (int ig = 0;ig < ng;ig++)
+                {
+                    const double rr = tmprr[GR_index[ig]];
+                    const double arg= TWO_PI * tmparg[GR_index[ig]];
+                    psi(iw,startig+ig) *= (1.0 + 0.05 * std::complex<double>(rr * cos(arg), rr * sin(arg)));
+                }
+                startig += npwx;
+            }
+        }
+        delete[] stickrr;
+        delete[] stickarg;
+        delete[] tmprr;
+        delete[] tmparg;
+        delete[] GR_index;
+    }
+    else
+    {
+#else
+        if(seed > 0)//qianrui add 2021-8-13
+        {
+            srand(unsigned(seed + GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL] + ik));
+        }
+#endif
+        double rr, arg;
+		for (int iw = iw_start ;iw < iw_end;iw++)
+		{
+			int startig = 0;
+			for(int ip = 0 ; ip < GlobalV::NPOL; ++ip)
+			{
+				for(int ig = 0 ; ig < npw ; ++ig)
+				{
+					rr = rand()/double(RAND_MAX);
+					arg = TWO_PI * rand()/double(RAND_MAX);
+					psi(iw,startig+ig) *= (1.0 + 0.05 * std::complex<double>(rr * cos(arg), rr * sin(arg)));
+				}
+				startig += npwx;
+			}
+		}
+#ifdef __MPI
+    }
+#endif
+
+    return;
+}

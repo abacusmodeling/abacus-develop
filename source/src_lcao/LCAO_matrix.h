@@ -77,6 +77,7 @@ class LCAO_Matrix
 	double ****SlocR_tr;
 	double ****HR_tr;
 
+
 	complex<double> ****Hloc_fixedR_tr_soc;
 	complex<double> ****SlocR_tr_soc;
 	complex<double> ****HR_tr_soc;
@@ -128,7 +129,9 @@ class LCAO_Matrix
 	//----------------------------------------
 	// r_mu - r_nu
 	//----------------------------------------
+
 	double* DH_r;//zhengdy added 2017-07
+
 
 	double* stvnl11;
 	double* stvnl12;
@@ -150,6 +153,7 @@ class LCAO_Matrix
 	double* DHloc_fixed_22;
 	double* DHloc_fixed_23;
 	double* DHloc_fixed_33;
+
 
 	//------------------------------------------------------
 	// DESCRIPTION:

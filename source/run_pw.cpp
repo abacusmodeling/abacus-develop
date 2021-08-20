@@ -55,8 +55,7 @@ void Run_pw::plane_wave_line(void)
 
     // print information
     // mohan add 2021-01-30
-    Print_Info PI;
-    PI.setup_parameters();
+    Print_Info::setup_parameters(GlobalC::ucell, GlobalC::kv, GlobalC::xcf);
 
     // Initalize the plane wave basis set
     GlobalC::pw.gen_pw(GlobalV::ofs_running, GlobalC::ucell, GlobalC::kv);

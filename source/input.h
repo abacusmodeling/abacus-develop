@@ -26,6 +26,7 @@ class Input
     std::string suffix;			// suffix of out put dir
     std::string atom_file;		// file contains atomic positions -- xiaohui modify 2015-02-01
     std::string pseudo_dir;      // directory of pseudopotential
+	std::string orbital_dir;      // directory of orbital file
 	std::string read_file_dir;   // directory of files for reading
     std::string pseudo_type;     // the type of pseudopotential, mohan add 2013-05-20, ABACUS supports
 			    			// UPF format (default) and vwr format. (xiaohui add 2013-06-23)
@@ -41,13 +42,10 @@ class Input
 	bool renormwithmesh;     // 0: use msh to normalize radial wave functions;  1: use mesh, which is used in QE.
     int ntype;				// number of atom types
     int nbands;				// number of bands
-	int nbands_sto;			// number of stochastic bands //qianrui 2021-2-5
 	int nbands_istate;		// number of bands around fermi level for istate calculation.
-	int nche_sto;			// number of orders for Chebyshev expansion in stochastic DFT //qinarui 2021-2-5
-	int seed_sto;  // random seed for sDFT
-	double emax_sto;		//Emax & Emin to normalize H
-	double emin_sto;
-	std::string stotype;
+	int seed;               // random seed for initializing wave functions qianrui 2021-8-12
+
+	
 
 	bool set_vel;           // read velocity from STRU or not  liuyu 2021-07-14
 
@@ -67,7 +65,17 @@ class Input
 	bool mlwf_flag; 		// add by mohan
 
 //==========================================================
-// E field
+// Stochastic DFT
+//==========================================================
+	int nche_sto;			// number of orders for Chebyshev expansion in stochastic DFT //qinarui 2021-2-5
+	int seed_sto;  // random seed for sDFT
+	double emax_sto;		//Emax & Emin to normalize H
+	double emin_sto;
+	std::string stotype;
+	int nbands_sto;			// number of stochastic bands //qianrui 2021-2-5
+
+//==========================================================
+// E field 
 //==========================================================
     int efield;				// add electrical field
 	int edir;
@@ -211,7 +219,7 @@ class Input
     int out_charge;		// output charge density.
 	int out_dm; // output density matrix.
 	int out_potential;		// yes or no
-    bool out_wf;			// yes or no
+    int out_wf;			// 0: no; 1: txt; 2: dat
 	int out_dos;			// dos calculation. mohan add 20090909
     int out_band;                   // band calculation pengfei 2014-10-13
 	int out_hs;			// output H matrix and S matrix in local basis.

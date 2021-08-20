@@ -10,6 +10,7 @@
 #include "pw_basis.h"
 #include "../src_ions/variable_cell.h" // mohan add 2021-02-01
 #include "../module_md/MD_basic.h"
+#include "../src_io/print_info.h"
 
 Run_MD_PW::Run_MD_PW()
 {
@@ -72,6 +73,7 @@ void Run_MD_PW::md_ions_pw(void)
             GlobalV::ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
             GlobalV::ofs_running << " -------------------------------------------" << std::endl;
         }
+
 
     //----------------------------------------------------------
     // about vdw, jiyy add vdwd3 and linpz add vdwd2
@@ -193,7 +195,7 @@ void Run_MD_PW::md_ions_pw(void)
 
         //reset local potential and initial wave function
         GlobalC::pot.init_pot(istep, GlobalC::pw.strucFac);
-        GlobalV::ofs_running << " Setup the new wave functions?" << std::endl;
+        //GlobalV::ofs_running << " Setup the new wave functions?\n" << std::endl;
         GlobalC::wf.wfcinit();
 
         if (GlobalV::OUT_LEVEL == "i")
@@ -246,6 +248,7 @@ void Run_MD_PW::md_cells_pw()
     // only allocate in the beginning of ELEC LOOP!
     //=====================
     GlobalC::hm.hpw.allocate(GlobalC::wf.npwx, GlobalV::NPOL, GlobalC::ppcell.nkb, GlobalC::pw.nrxx);
+    GlobalC::hm.hpw_gpu.allocate(GlobalC::wf.npwx, GlobalV::NPOL, GlobalC::ppcell.nkb, GlobalC::pw.nrxx);
 
     //=================================
     // initalize local pseudopotential

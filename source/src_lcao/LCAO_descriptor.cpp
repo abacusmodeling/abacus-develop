@@ -72,9 +72,11 @@ LCAO_Descriptor::~LCAO_Descriptor()
 
 
 void LCAO_Descriptor::init(
+
 	const int lm, // max L for descriptor
 	const int nm, // max n for descriptor
 	const int tot_inl) // total number of atomic orbital basis for all of the atoms
+
 {
     TITLE("LCAO_Descriptor", "init");
 
@@ -91,11 +93,11 @@ void LCAO_Descriptor::init(
     GlobalV::ofs_running << " lmax of descriptor = " << this->lmaxd << std::endl;
     GlobalV::ofs_running << " nmax of descriptor= " << nmaxd << std::endl;
 
-
     //initialize the density matrix (dm)
     delete[] this->dm_double;
     this->dm_double = new double[NLOCAL * NLOCAL];
     ZEROS(this->dm_double, NLOCAL * NLOCAL);
+
 
     //init S_mu_alpha**
     this->S_mu_alpha = new double* [this->inlmax];    //inl
@@ -642,11 +644,13 @@ void LCAO_Descriptor::cal_gdmx(const matrix &dm)
                                 }
                                 else
                                 {
+
                                     gdmx[iat][inl][m1*nm + m2] +=
 									4 * dsx[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
                                     gdmy[iat][inl][m1*nm + m2] +=
 									4 * dsy[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
                                     gdmz[iat][inl][m1*nm + m2] +=
+
 									4 * dsz[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
                                 }
                             }
@@ -873,11 +877,13 @@ void LCAO_Descriptor::cal_descriptor_tensor(void)
 void LCAO_Descriptor::load_model(const std::string& model_file)
 {
     TITLE("LCAO_Descriptor", "load_model");
+
     try
 	{
         this->module = torch::jit::load(model_file);
     }
     catch (const c10::Error& e)
+
 	{
         std::cerr << "error loading the model" << std::endl;
         return;

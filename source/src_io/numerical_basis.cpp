@@ -3,6 +3,7 @@
 #include "../module_symmetry/symmetry.h"
 #include "winput.h"
 #include "../module_base/math_ylmreal.h"
+#include <cstring>
 
 Numerical_Basis::Numerical_Basis() {}
 Numerical_Basis::~Numerical_Basis() {}

@@ -33,9 +33,12 @@ public:
     void fft_map_final_scf(int *ig2fft,const int ngm, const int &ngmc_g_in); //LiuXh add 20180619
 	void print_data(std::ofstream &print)const;
     void fft_map_after_vc(int *ig2fft,const int ngm, const int &ngmc_g_in, int ggchg_time); //LiuXh add 20180515
+#ifdef __MPI
+	void stick_to_pool(double *stick, const int &ir, double *out);
+#endif
 
-	int *isind;
-	int *ismap;
+	int *isind; // map ir in the x-y plane to is of sticks in current processor 
+	int *ismap; // map istot of all sticks to ir in the x-y plane
 	int *st_start;
 	int *nst_per;
 	int *npw_per;
@@ -47,7 +50,7 @@ public:
 	int nst;//number of total columns
 
 	bool *index;
-	int *index_ip;
+	int *index_ip; // map ir to ip
 	int n1;
 	int n2;
 	int n3;

@@ -2,6 +2,7 @@
 #include "global.h"
 #include "electrons.h"
 #include "../src_pw/symmetry_rho.h"
+#include "../src_io/print_info.h"
 #include "../src_io/wf_io.h"
 #include "../src_io/chi0_hilbert.h"
 #include "../src_io/chi0_standard.h"
@@ -36,8 +37,8 @@ void Electrons::non_self_consistent(const int &istep)
     // =======================================
     Electrons::c_bands(istep);
 
-    GlobalV::ofs_running << " End of Band Structure Calculation " << std::endl;
-    GlobalV::ofs_running << " Band eigenvalue (eV) :" << std::endl;
+    GlobalV::ofs_running << "\n End of Band Structure Calculation \n" << std::endl;
+
 
     for (int ik = 0; ik < GlobalC::kv.nks; ik++)
     {
@@ -63,6 +64,7 @@ void Electrons::non_self_consistent(const int &istep)
         }
         GlobalV::ofs_running << std::endl;
     }
+
 
     // add by jingan in 2018.11.7
     if(GlobalV::CALCULATION == "nscf" && INPUT.towannier90)
@@ -153,6 +155,7 @@ void Electrons::self_consistent(const int &istep)
         << "\n PW ALGORITHM --------------- ION=" << std::setw(4) << istep + 1
         << "  ELEC=" << std::setw(4) << iter
         << "--------------------------------\n";
+
         // mohan add 2010-07-16
         if(iter==1) GlobalC::CHR.set_new_e_iteration(true);
         else GlobalC::CHR.set_new_e_iteration(false);
@@ -328,7 +331,7 @@ void Electrons::self_consistent(const int &istep)
         }
 
         std::stringstream ssw;
-        ssw << GlobalV::global_out_dir << "WAVEFUNC.dat";
+        ssw << GlobalV::global_out_dir << "WAVEFUNC";
 
 		//qianrui add 2020-10-12
 		std::stringstream ssgk;
@@ -345,7 +348,7 @@ void Electrons::self_consistent(const int &istep)
 			GlobalC::CHR.write_rho_cube(GlobalC::CHR.rho_save[is], is, ssc.str(), 3);
         }
 
-        if(GlobalC::wf.out_wf)
+        if(GlobalC::wf.out_wf == 1 || GlobalC::wf.out_wf == 2)
         {
             //WF_io::write_wfc( ssw.str(), GlobalC::wf.evc );
             // mohan update 2011-02-21
@@ -416,16 +419,24 @@ void Electrons::self_consistent(const int &istep)
 
             if(conv_elec)
             {
+
                 //GlobalV::ofs_running << " convergence is achieved" << std::endl;
                 //GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
                 GlobalV::ofs_running << " charge density convergence is achieved" << std::endl;
+
                 GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
             }
             else
             {
+
                 GlobalV::ofs_running << " convergence has NOT been achieved!" << std::endl;
+
             }
-            iter_end(GlobalV::ofs_running);
+
+            if(GlobalV::OUT_LEVEL != "m") 
+			{
+				print_eigenvalue(GlobalV::ofs_running);
+			}
             timer::tick("Electrons","self_consistent");
             return;
         }
@@ -469,6 +480,7 @@ void Electrons::c_bands(const int &istep)
     for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {
         GlobalC::hm.hpw.init_k(ik);
+        GlobalC::hm.hpw_gpu.init_k(ik);
 
         //===========================================
         // Conjugate-Gradient diagonalization

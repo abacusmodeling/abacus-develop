@@ -12,7 +12,9 @@
 - [Installation with DeePKS](#installation-with-deepks)
   - [Extra prerequisites](#extra-prerequisites)
   - [Extra settings for building](#extra-settings-for-building)
+
   [back to main page](../README.md)
+
 
 # Structure of the package
 Under the ABACUS directory, there are the following subdirectories:
@@ -230,6 +232,7 @@ HONG=${HONG_MPI_SELINV_20210523}
 [back to top](#download-and-install)
 
 
+
 # Installation with DeePKS
 
 This part of installation is based on [Installation](#installation). If DeePKS feature is requied for [DeePKS-kit](https://github.com/deepmodeling/deepks-kit), the following prerequisites and steps are needed:
@@ -249,6 +252,7 @@ cmake -B build -DENABLE_DEEPKS=1
 
 ### Using Makefile
 Set `LIBTORCH_DIR`and `LIBNPY_DIR`in `Makefile.vars`. For example:
+
 ```
 LIBTORCH_DIR = /opt/libtorch/
 LIBNPY_DIR = /opt/libnpy/

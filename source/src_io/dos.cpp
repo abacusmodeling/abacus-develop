@@ -402,7 +402,7 @@ void Dos::nscf_band(
 	{
 		if( GlobalC::kv.isk[ik] == is)
 		{
-			ofs<<std::setw(12)<<ik;
+			ofs<<std::setw(12)<<ik + 1;
 			for(int ibnd = 0; ibnd < nband; ibnd++)
 			{
 				ofs <<std::setw(15) << (ekb[ik][ibnd]-fermie) * Ry_to_eV;

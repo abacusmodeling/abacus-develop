@@ -63,6 +63,15 @@ public:
 	void print_H_V_delta(void);
 	void print_F_delta(void);
 
+	//----------------------------------------------------------------------
+	// print_descriptors: print descriptors based on LCAO basis
+	// print_H_V_delta: print the deltaV matrix in LCAO basis
+	// print_F_delta: print the force related to deltaV for each atom
+	//----------------------------------------------------------------------
+	void print_descriptor(void);
+	void print_H_V_delta(void);
+	void print_F_delta(void);
+
 	void cal_v_delta(const std::string& model_file);//<psi|V_delta|psi>
 	void cal_f_delta(matrix& dm);	//pytorch term remaining!
 	void print_H_V_delta();
@@ -88,6 +97,7 @@ public:
 	//------------------------------------------------------
 	//E_delta: in Ry
 	//H_V_delta: correction term to the Hamiltonian matrix
+
 	//F_delta: in Ry/Bohr, force due to the correction term
 	//------------------------------------------------------
 	double E_delta = 0.0;
