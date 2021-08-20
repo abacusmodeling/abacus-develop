@@ -89,7 +89,7 @@ void Run_MD_CLASSIC::md_cells_classic(void)
 								this->force);
 		}
 
-		NEW_PART("   TOTAL-FORCE (eV/Angstrom)");
+		ModuleBase::GlobalFunc::NEW_PART("   TOTAL-FORCE (eV/Angstrom)");
 		GlobalV::ofs_running << std::endl;
 		GlobalV::ofs_running << " atom    x              y              z" << std::endl;
 		const double fac = Ry_to_eV*ANGSTROM_AU;
