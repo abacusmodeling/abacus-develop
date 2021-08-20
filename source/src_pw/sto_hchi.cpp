@@ -99,7 +99,7 @@ void Stochastic_hchi::get_GRA_index()
 	{
 		int ix,iy,iz;
 		int ir;
-		ZEROS(GRA_index,GlobalC::wf.npw);
+		ModuleBase::GlobalFunc::ZEROS(GRA_index,GlobalC::wf.npw);
 		for(int ig = 0 ; ig < GlobalC::wf.npw; ++ig)
 		{
 			ix = floor(GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(0, ig), 0) + 0.1);
@@ -120,7 +120,7 @@ void Stochastic_hchi::orthogonal_to_psi_real(std::complex<double> *wfin, std::co
 	TITLE("Stochastic_hchi","orthogonal_to_psi0");
 	if(!initplan) WARNING_QUIT("Stochastic_hchi", "Please init hchi first!");
 
-	DCOPY(wfin,rp_chi,nrxx);
+	ModuleBase::GlobalFunc::DCOPY(wfin,rp_chi,nrxx);
 	//LapackConnector::copy(nrxx,wfin,1,rp_chi,1);
 	fftw_execute(pf);
 	
@@ -163,7 +163,7 @@ void Stochastic_hchi::orthogonal_to_psi_real(std::complex<double> *wfin, std::co
 	{
 		rp_chi[GRA_index[ig]] = chig[ig];
 	}
-	DCOPY(rp_chi,rl_chi,nrxx);
+	ModuleBase::GlobalFunc::DCOPY(rp_chi,rl_chi,nrxx);
 	//LapackConnector::copy(nrxx,rp_chi,1,rl_chi,1);
 
 	fftw_execute(pb);
@@ -182,7 +182,7 @@ void Stochastic_hchi::orthogonal_to_psi_real(std::complex<double> *wfin, std::co
 	fftw_plan pp=fftw_plan_dft_3d(GlobalC::pw.nx,GlobalC::pw.ny,GlobalC::pw.nz,(fftw_complex *)kswf,(fftw_complex *)kswf, FFTW_BACKWARD, FFTW_ESTIMATE);
 	for(int iksb = 0; iksb < GlobalV::NBANDS; ++iksb)
 	{
-		ZEROS(kswf,nrxx);
+		ModuleBase::GlobalFunc::ZEROS(kswf,nrxx);
 		for(int ig = 0 ; ig < GlobalC::wf.npw; ++ig)
 		{
 			kswf[GRA_index[ig]] = GlobalC::wf.evc[ikk](iksb,ig);
@@ -247,13 +247,13 @@ void Stochastic_hchi::hchi_real(std::complex<double>*chi_in, std::complex<double
 	//---------------------------------------------------
 	if(!initplan) WARNING_QUIT("Stochastic_hchi", "Please init hchi first!");
 
-	ZEROS(hchi,nrxx);
-	DCOPY(chi_in, rp_chi, nrxx);
+	ModuleBase::GlobalFunc::ZEROS(hchi,nrxx);
+	ModuleBase::GlobalFunc::DCOPY(chi_in, rp_chi, nrxx);
 	//LapackConnector::copy(nrxx,chi_in,1,rp_chi,1);
 	fftw_execute(pf);
 
 	std::complex<double> * chig = new std::complex<double> [GlobalC::wf.npw];
-	ZEROS(chig,GlobalC::wf.npw);
+	ModuleBase::GlobalFunc::ZEROS(chig,GlobalC::wf.npw);
 	for(int ig = 0; ig < GlobalC::wf.npw; ++ig)
 	{
 		chig[ig] = rp_chi[GRA_index[ig]]; 
@@ -321,7 +321,7 @@ void Stochastic_hchi::hchi_real(std::complex<double>*chi_in, std::complex<double
 		if ( GlobalC::ppcell.nkb > 0)
 		{
 			std::complex<double> *becp = new std::complex<double>[ GlobalC::ppcell.nkb * GlobalV::NPOL ];
-			ZEROS(becp,GlobalC::ppcell.nkb * GlobalV::NPOL);
+			ModuleBase::GlobalFunc::ZEROS(becp,GlobalC::ppcell.nkb * GlobalV::NPOL);
 
 			for (int i=0;i< GlobalC::ppcell.nkb;++i)
 			{
@@ -335,7 +335,7 @@ void Stochastic_hchi::hchi_real(std::complex<double>*chi_in, std::complex<double
 
 			//Parallel_Reduce::reduce_complex_double_pool( becp, GlobalC::ppcell.nkb * GlobalV::NPOL);
 			std::complex<double> * Ps = new std::complex<double> [GlobalC::ppcell.nkb * GlobalV::NPOL];
-			ZEROS( Ps, GlobalC::ppcell.nkb * GlobalV::NPOL );
+			ModuleBase::GlobalFunc::ZEROS( Ps, GlobalC::ppcell.nkb * GlobalV::NPOL );
 			int sum = 0;
     		int iat = 0;
     		// this function sum up each non-local pseudopotential located in each atom,
@@ -363,7 +363,7 @@ void Stochastic_hchi::hchi_real(std::complex<double>*chi_in, std::complex<double
     		} //end nt
 
 			// use simple method.
-			ZEROS(chig, GlobalC::wf.npw);
+			ModuleBase::GlobalFunc::ZEROS(chig, GlobalC::wf.npw);
 			if(GlobalV::NSPIN!=4)
 				for(int i=0; i<GlobalC::ppcell.nkb; ++i)
 				{
@@ -467,7 +467,7 @@ void Stochastic_hchi:: hchi_reciprocal(std::complex<double> *chig, std::complex<
 		hchibg = hchig;
 		for(int ib = 0 ; ib < m ; ++ib)
 		{
-			ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
+			ModuleBase::GlobalFunc::ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
 			GlobalC::UFFT.RoundTrip( chibg, GlobalC::pot.vr_eff1, GRA_index, GlobalC::UFFT.porter );
 			for (int ig = 0; ig < npw; ++ig)
 			{
@@ -505,7 +505,7 @@ void Stochastic_hchi:: hchi_reciprocal(std::complex<double> *chig, std::complex<
 			Parallel_Reduce::reduce_complex_double_pool( becp, nkb * GlobalV::NPOL * m);
 
 			std::complex<double> *Ps  = new std::complex<double> [nkb * GlobalV::NPOL * m];
-   			ZEROS( Ps, GlobalV::NPOL * m * nkb);
+   			ModuleBase::GlobalFunc::ZEROS( Ps, GlobalV::NPOL * m * nkb);
 			
 			int sum = 0;
     		int iat = 0;

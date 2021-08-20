@@ -19,7 +19,7 @@
 {
 
 template <class T>
-void AUTO_SET(std::ofstream &ofs,const std::string &name,const T &a)
+void ModuleBase::GlobalFunc::AUTO_SET(std::ofstream &ofs,const std::string &name,const T &a)
 {
 	ofs<<" AUTO_SET "<<name<<" : "<<a << std::endl;
 	return;

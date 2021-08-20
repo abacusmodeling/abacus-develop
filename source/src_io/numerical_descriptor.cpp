@@ -24,7 +24,7 @@ Numerical_Descriptor::~Numerical_Descriptor()
 void Numerical_Descriptor::output_descriptor(const ModuleBase::ComplexMatrix *psi, const int &lmax_in)
 {
 	TITLE("Numerical_Descriptor","output_descriptor");
-	NEW_PART("DeepKS descriptor: D_{Inl}");
+	ModuleBase::GlobalFunc::NEW_PART("DeepKS descriptor: D_{Inl}");
 
 	//-----------------------------------
 	// 1. Initialize parameters
@@ -67,12 +67,12 @@ void Numerical_Descriptor::output_descriptor(const ModuleBase::ComplexMatrix *ps
     realArray overlap_Q1(nks, GlobalV::NBANDS, this->nlocal );
     realArray overlap_Q2(nks, GlobalV::NBANDS, this->nlocal );
 
-    ZEROS(overlap_Q1.ptr, overlap_Q1.getSize() );
-    ZEROS(overlap_Q2.ptr, overlap_Q2.getSize() );
+    ModuleBase::GlobalFunc::ZEROS(overlap_Q1.ptr, overlap_Q1.getSize() );
+    ModuleBase::GlobalFunc::ZEROS(overlap_Q2.ptr, overlap_Q2.getSize() );
 
-	OUT(GlobalV::ofs_running,"number of k points",overlap_Q1.getBound1());
-	OUT(GlobalV::ofs_running,"number of bands",overlap_Q1.getBound2());
-	OUT(GlobalV::ofs_running,"number of local orbitals",overlap_Q1.getBound3());
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of k points",overlap_Q1.getBound1());
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of bands",overlap_Q1.getBound2());
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of local orbitals",overlap_Q1.getBound3());
 
 
 	//-------------------------------------
@@ -89,7 +89,7 @@ void Numerical_Descriptor::output_descriptor(const ModuleBase::ComplexMatrix *ps
 		GlobalV::ofs_running << " --------------------------------------------------------" << std::endl;
         // search for all k-points.
         this->jlq3d_overlap(overlap_Q1, overlap_Q2, ik, ik, npw, psi[ik]);
-        DONE(GlobalV::ofs_running,"jlq3d_overlap");
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"jlq3d_overlap");
 	}
 
 #ifdef __MPI

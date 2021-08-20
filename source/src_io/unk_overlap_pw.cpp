@@ -20,8 +20,8 @@ std::complex<double> unkOverlap_pw::unkdotp_G(const int ik_L, const int ik_R, co
 	const int number_pw = GlobalC::pw.ngmw;
 	std::complex<double> *unk_L = new std::complex<double>[number_pw];
 	std::complex<double> *unk_R = new std::complex<double>[number_pw];
-	ZEROS(unk_L,number_pw);
-	ZEROS(unk_R,number_pw);
+	ModuleBase::GlobalFunc::ZEROS(unk_L,number_pw);
+	ModuleBase::GlobalFunc::ZEROS(unk_R,number_pw);
 	
 
 	for (int ig = 0; ig < GlobalC::kv.ngk[ik_L]; ig++)
@@ -70,8 +70,8 @@ std::complex<double> unkOverlap_pw::unkdotp_G0(const int ik_L, const int ik_R, c
 	std::complex<double> *phase = GlobalC::UFFT.porter;
 	std::complex<double> *psi_r = new std::complex<double>[GlobalC::pw.nrxx]; // 实空间的波函数
 
-	ZEROS( phase, GlobalC::pw.nrxx);
-	ZEROS( psi_r, GlobalC::pw.nrxx );
+	ModuleBase::GlobalFunc::ZEROS( phase, GlobalC::pw.nrxx);
+	ModuleBase::GlobalFunc::ZEROS( psi_r, GlobalC::pw.nrxx );
 
 
 	for (int ig = 0; ig < GlobalC::kv.ngk[ik_L]; ig++)
@@ -134,8 +134,8 @@ std::complex<double> unkOverlap_pw::unkdotp_soc_G(const int ik_L, const int ik_R
 	const int number_pw = GlobalC::pw.ngmw;
 	std::complex<double> *unk_L = new std::complex<double>[number_pw*GlobalV::NPOL];
 	std::complex<double> *unk_R = new std::complex<double>[number_pw*GlobalV::NPOL];
-	ZEROS(unk_L,number_pw*GlobalV::NPOL);
-	ZEROS(unk_R,number_pw*GlobalV::NPOL);
+	ModuleBase::GlobalFunc::ZEROS(unk_L,number_pw*GlobalV::NPOL);
+	ModuleBase::GlobalFunc::ZEROS(unk_R,number_pw*GlobalV::NPOL);
 	
 	for(int i = 0; i < GlobalV::NPOL; i++)
 	{
@@ -185,9 +185,9 @@ std::complex<double> unkOverlap_pw::unkdotp_soc_G0(const int ik_L, const int ik_
 	std::complex<double> *phase = GlobalC::UFFT.porter;
 	std::complex<double> *psi_up = new std::complex<double>[GlobalC::pw.nrxx];
 	std::complex<double> *psi_down = new std::complex<double>[GlobalC::pw.nrxx];
-	ZEROS( phase, GlobalC::pw.nrxx);
-	ZEROS( psi_up, GlobalC::pw.nrxx );
-	ZEROS( psi_down, GlobalC::pw.nrxx );
+	ModuleBase::GlobalFunc::ZEROS( phase, GlobalC::pw.nrxx);
+	ModuleBase::GlobalFunc::ZEROS( psi_up, GlobalC::pw.nrxx );
+	ModuleBase::GlobalFunc::ZEROS( psi_down, GlobalC::pw.nrxx );
 
 	for(int i = 0; i < GlobalV::NPOL; i++)
 	{

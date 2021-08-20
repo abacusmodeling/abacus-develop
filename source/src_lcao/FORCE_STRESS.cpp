@@ -563,7 +563,7 @@ void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, mat
 
 	//GlobalV::ofs_running << std::setiosflags(ios::right);
  	GlobalV::ofs_running << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed) << std::endl;
-	NEW_PART("TOTAL-FORCE (eV/Angstrom)");
+	ModuleBase::GlobalFunc::NEW_PART("TOTAL-FORCE (eV/Angstrom)");
 
 	// print out forces
 	if(INPUT.force_set == 1)
@@ -742,7 +742,7 @@ void Force_Stress_LCAO::forceSymmetry(matrix& fcs)
 	double *pos;
 	double d1,d2,d3;
 	pos = new double[GlobalC::ucell.nat*3];
-	ZEROS(pos, GlobalC::ucell.nat*3);
+	ModuleBase::GlobalFunc::ZEROS(pos, GlobalC::ucell.nat*3);
 	int iat = 0;
 	for(int it = 0;it < GlobalC::ucell.ntype;it++)
 	{

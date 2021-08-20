@@ -127,7 +127,7 @@ void energy::print_etot(
 
 	if(GlobalV::OUT_LEVEL != "m") //xiaohui add "OUT_LEVEL", 2015-09-16
 	{
-		if(GlobalV::BASIS_TYPE=="pw")OUT(GlobalV::ofs_running,"Error Threshold",ethr); //xiaohui add 2013-09-02
+		if(GlobalV::BASIS_TYPE=="pw")ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Error Threshold",ethr); //xiaohui add 2013-09-02
 
 		if( this->printe>0 && ( (iter+1) % this->printe == 0 || converged || iter == GlobalV::NITER) )	
 		{
@@ -506,7 +506,7 @@ void energy::set_exx()
 		}
 		else
 		{
-			throw std::invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+			throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 	};
 	if( 5==GlobalC::xcf.iexch_now && 0==GlobalC::xcf.igcx_now )				// HF

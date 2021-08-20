@@ -96,7 +96,7 @@ void Exx_Abfs::Screen::Schwarz::cal_max_pair_fock(
 			for( const Abfs::Vector3_Order<int> &box2 : atom2.second )
 			{
 				const Abfs::Vector3_Order<int> box2p = box2%Born_von_Karman_period;
-				if(const double*max_pair_fock_ptr=static_cast<const double*>(MAP_EXIST(max_pair_fock_DP,it1,it2,-tau1+tau2+box2p*GlobalC::ucell.latvec)))
+				if(const double*max_pair_fock_ptr=static_cast<const double*>(ModuleBase::GlobalFunc::MAP_EXIST(max_pair_fock_DP,it1,it2,-tau1+tau2+box2p*GlobalC::ucell.latvec)))
 					max_pair_fock[iat1][iat2][box2p] = *max_pair_fock_ptr;
 				else
 				{

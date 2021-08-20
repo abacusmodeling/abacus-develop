@@ -45,8 +45,8 @@ void Center2_Orb::Orb11::init_radial_table(void)
 			nA,
 			nB,
 			rmesh,
-			VECTOR_TO_PTR(Table_r[LAB]),
-			VECTOR_TO_PTR(Table_dr[LAB]));
+			ModuleBase::GlobalFunc::VECTOR_TO_PTR(Table_r[LAB]),
+			ModuleBase::GlobalFunc::VECTOR_TO_PTR(Table_dr[LAB]));
 	}
 	return;
 }
@@ -77,8 +77,8 @@ void Center2_Orb::Orb11::init_radial_table( const std::set<size_t> &radials )
 			nA,
 			nB,
 			radials_used,
-			VECTOR_TO_PTR(Table_r[LAB]),
-			VECTOR_TO_PTR(Table_dr[LAB]));
+			ModuleBase::GlobalFunc::VECTOR_TO_PTR(Table_r[LAB]),
+			ModuleBase::GlobalFunc::VECTOR_TO_PTR(Table_dr[LAB]));
 	}
 }
 
@@ -133,7 +133,7 @@ double Center2_Orb::Orb11::cal_overlap(
 			const double Interp_Tlm = 
 				(distance > tiny2) ?
 				PolyInt::Polynomial_Interpolation(
-					VECTOR_TO_PTR(tb_r.second),
+					ModuleBase::GlobalFunc::VECTOR_TO_PTR(tb_r.second),
 					MOT.get_rmesh(RcutA, RcutB),
 					MOT.dr,
 					distance ) :

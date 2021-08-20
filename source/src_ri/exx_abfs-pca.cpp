@@ -22,7 +22,7 @@ std::vector<std::vector<std::pair<std::vector<double>,matrix>>> Exx_Abfs::PCA::c
 	const double kmesh_times )
 {
 	TITLE("Exx_Abfs::PCA::cal_PCA");
-std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
+std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 	
 	const ModuleBase::Element_Basis_Index::Range
@@ -89,7 +89,7 @@ ofs<<range_abfs<<std::endl;
 			
 			int info;
 gettimeofday( &t_start, NULL);
-			LapackConnector::dsyev( 'V', 'U', mm, VECTOR_TO_PTR(eig_value), info );
+			LapackConnector::dsyev( 'V', 'U', mm, ModuleBase::GlobalFunc::VECTOR_TO_PTR(eig_value), info );
 ofs<<"TIME@LapackConnector::dsyev\t"<<time_during(t_start)<<std::endl;
 			if( info )
 			{

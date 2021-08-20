@@ -274,7 +274,7 @@ std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_O
 	const double kmesh_times_mot,
 	const double times_threshold )
 {
-std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
+std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 	if(times_threshold>1)
 		return std::vector<std::vector<std::vector<std::vector<double>>>>(abfs.size());
 
@@ -319,8 +319,8 @@ ofs<<"eig_value_threshold:\t"<<eig_value_threshold<<std::endl;
 		}
 		else
 		{
-			WARNING(TO_STRING(__FILE__),
-				"Element "+TO_STRING(T)+" , all training data (lcao[i]*lcao[j]) are all the same. So PCA randomly choose an abf as the result.");
+			WARNING(ModuleBase::GlobalFunc::TO_STRING(__FILE__),
+				"Element "+ModuleBase::GlobalFunc::TO_STRING(T)+" , all training data (lcao[i]*lcao[j]) are all the same. So PCA randomly choose an abf as the result.");
 			psis_new[T].resize( psis[T].size() );
 			for( size_t L=0; L!=psis[T].size(); ++L )
 				if( !psis[T][L].empty() )
@@ -425,7 +425,7 @@ std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_
 					orb_info.getRab(),
 					orb_info.getRadial(),
 					Numerical_Orbital_Lm::Psi_Type::Psi,
-					VECTOR_TO_PTR(psis[T][L][N]),
+					ModuleBase::GlobalFunc::VECTOR_TO_PTR(psis[T][L][N]),
 					static_cast<int>(orb_info.getNk() * kmesh_times) | 1,	// Nk must be odd
 					orb_info.getDk(),					// Peize Lin test 2017-04-16
 //					orb_info.getDk() / kmesh_times,

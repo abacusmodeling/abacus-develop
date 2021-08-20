@@ -82,7 +82,7 @@ void Parallel_Kpoints::divide_pools(void)
 
     // (2) To know how many process in pool j.
     nproc_pool = new int[GlobalV::NPOOL];
-    ZEROS(nproc_pool, GlobalV::NPOOL);
+    ModuleBase::GlobalFunc::ZEROS(nproc_pool, GlobalV::NPOOL);
     for (i=0; i<GlobalV::NPROC; i++)
     {
         j = i%GlobalV::NPOOL;
@@ -91,7 +91,7 @@ void Parallel_Kpoints::divide_pools(void)
 
     // (3) To know start proc index in each pool.
     startpro_pool = new int[GlobalV::NPOOL];
-    ZEROS(startpro_pool, GlobalV::NPOOL);
+    ModuleBase::GlobalFunc::ZEROS(startpro_pool, GlobalV::NPOOL);
     for (i=1; i<GlobalV::NPOOL; i++)
     {
         startpro_pool[i]=startpro_pool[i-1]+nproc_pool[i-1];
@@ -144,7 +144,7 @@ void Parallel_Kpoints::get_whichpool(const int &nkstot)
 {
     delete[] whichpool;
     this->whichpool = new int[nkstot];
-    ZEROS(whichpool, nkstot);
+    ModuleBase::GlobalFunc::ZEROS(whichpool, nkstot);
 
 	//std::cout << " calculate : whichpool" << std::endl;
 	//std::cout << " nkstot is " << nkstot << std::endl;
@@ -166,7 +166,7 @@ void Parallel_Kpoints::get_nks_pool(const int &nkstot)
 {
     delete[] nks_pool;
     this->nks_pool = new int[GlobalV::NPOOL];
-    ZEROS(nks_pool, GlobalV::NPOOL);
+    ModuleBase::GlobalFunc::ZEROS(nks_pool, GlobalV::NPOOL);
 
     const int nks_ave = nkstot/GlobalV::NPOOL;
     const int remain = nkstot%GlobalV::NPOOL;

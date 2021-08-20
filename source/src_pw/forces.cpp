@@ -121,7 +121,7 @@ void Forces::init(matrix& force)
 		double *pos;
 		double d1,d2,d3;
 		pos = new double[GlobalC::ucell.nat*3];
-		ZEROS(pos, GlobalC::ucell.nat*3);
+		ModuleBase::GlobalFunc::ZEROS(pos, GlobalC::ucell.nat*3);
 		int iat = 0;
 		for(int it = 0;it < GlobalC::ucell.ntype;it++)
 		{
@@ -260,7 +260,7 @@ void Forces::print_to_files(std::ofstream &ofs, const std::string &name, const m
 
 void Forces::print(const std::string &name, const matrix &f, bool ry)
 {
-	NEW_PART(name);
+	ModuleBase::GlobalFunc::NEW_PART(name);
 
 	GlobalV::ofs_running << " " << std::setw(8) << "atom" << std::setw(15) << "x" << std::setw(15) << "y" << std::setw(15) << "z" << std::endl;
 	GlobalV::ofs_running << std::setiosflags(ios::showpos);
@@ -347,7 +347,7 @@ void Forces::cal_force_loc(matrix& forcelc)
 	timer::tick("Forces","cal_force_loc");
 
     std::complex<double> *aux = new std::complex<double>[GlobalC::pw.nrxx];
-    ZEROS(aux, GlobalC::pw.nrxx);
+    ModuleBase::GlobalFunc::ZEROS(aux, GlobalC::pw.nrxx);
 
     // now, in all pools , the charge are the same,
     // so, the force calculated by each pool is equal.
@@ -404,7 +404,7 @@ void Forces::cal_force_ew(matrix& forceion)
 
     double fact = 2.0;
     std::complex<double> *aux = new std::complex<double> [GlobalC::pw.ngmc];
-    ZEROS(aux, GlobalC::pw.ngmc);
+    ModuleBase::GlobalFunc::ZEROS(aux, GlobalC::pw.ngmc);
 
     int gstart = GlobalC::pw.gstart;
 
@@ -489,9 +489,9 @@ void Forces::cal_force_ew(matrix& forceion)
         // the maximum number of R vectors included in r
         Vector3<double> *r  = new Vector3<double>[mxr];
         double *r2 = new double[mxr];
-		ZEROS(r2, mxr);
+		ModuleBase::GlobalFunc::ZEROS(r2, mxr);
         int *irr = new int[mxr];
-		ZEROS(irr, mxr);
+		ModuleBase::GlobalFunc::ZEROS(irr, mxr);
         // the square modulus of R_j-tau_s-tau_s'
 
 		int iat1 = 0;
@@ -581,7 +581,7 @@ void Forces::cal_force_cc(matrix& forcecc)
 
 	const matrix vxc = v;
     std::complex<double> * psiv = new std::complex<double> [GlobalC::pw.nrxx];
-    ZEROS(psiv, GlobalC::pw.nrxx);
+    ModuleBase::GlobalFunc::ZEROS(psiv, GlobalC::pw.nrxx);
     if (GlobalV::NSPIN == 1 || GlobalV::NSPIN == 4)
     {
         for (int ir = 0;ir < GlobalC::pw.nrxx;ir++)
@@ -602,7 +602,7 @@ void Forces::cal_force_cc(matrix& forcecc)
 
     //psiv contains now Vxc(G)
     double * rhocg = new double [GlobalC::pw.nggm];
-    ZEROS(rhocg, GlobalC::pw.nggm);
+    ModuleBase::GlobalFunc::ZEROS(rhocg, GlobalC::pw.nggm);
     int iat = 0;
     for (int T1 = 0;T1 < GlobalC::ucell.ntype;T1++)
     {
@@ -738,7 +738,7 @@ void Forces::cal_force_nl(matrix& forcenl)
 //		Parallel_Reduce::reduce_complex_double_pool( dbecp.ptr, dbecp.ndata);
 
 //		double *cf = new double[GlobalC::ucell.nat*3];
-//		ZEROS(cf, GlobalC::ucell.nat);
+//		ModuleBase::GlobalFunc::ZEROS(cf, GlobalC::ucell.nat);
 		for (int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
 			double fac = GlobalC::wf.wg(ik, ib) * 2.0 * GlobalC::ucell.tpiba;
@@ -807,7 +807,7 @@ void Forces::cal_force_nl(matrix& forcenl)
 void Forces::cal_force_scc(matrix& forcescc)
 {
     std::complex<double>* psic = new std::complex<double> [GlobalC::pw.nrxx];
-    ZEROS(psic, GlobalC::pw.nrxx);
+    ModuleBase::GlobalFunc::ZEROS(psic, GlobalC::pw.nrxx);
 
     if (GlobalV::NSPIN == 1 || GlobalV::NSPIN == 4)
     {
@@ -838,10 +838,10 @@ void Forces::cal_force_scc(matrix& forcescc)
 
     //work space
     double* aux = new double[ndm];
-    ZEROS(aux, ndm);
+    ModuleBase::GlobalFunc::ZEROS(aux, ndm);
 
     double* rhocgnt = new double[GlobalC::pw.nggm];
-    ZEROS(rhocgnt, GlobalC::pw.nggm);
+    ModuleBase::GlobalFunc::ZEROS(rhocgnt, GlobalC::pw.nggm);
 
     GlobalC::pw.FFT_chg.FFT3D(psic, -1);
 

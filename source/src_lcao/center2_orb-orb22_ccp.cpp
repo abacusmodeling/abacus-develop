@@ -27,7 +27,7 @@ void Center2_Orb::Orb22_Ccp::init_radial_table()
 			nB1.getNr(),
 			nB1.getRab(),
 			nB1.getRadial(),
-			VECTOR_TO_PTR(nB_tmp),
+			ModuleBase::GlobalFunc::VECTOR_TO_PTR(nB_tmp),
 			nB1.getNk(),
 			nB1.getDk(),
 			nB1.getDruniform(),

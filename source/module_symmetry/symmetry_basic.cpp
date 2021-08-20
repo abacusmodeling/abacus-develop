@@ -207,7 +207,7 @@ void Symmetry_Basic::order_y(double *pos1, const int &oldpos1, const int &newpos
 
 	double* tmp1 = new double[nat1];
 	int* index1 = new int[nat1];
-	ZEROS(index1, nat1);
+	ModuleBase::GlobalFunc::ZEROS(index1, nat1);
 	
 	for(int ia=0; ia<nat1; ia++)
 	{
@@ -262,7 +262,7 @@ void Symmetry_Basic::order_z(double* pos2, const int &oldpos2, const int &newpos
 //	if(nat2==1) return;
 	double* tmp2 = new double[nat2];
 	int* index2 = new int[nat2];
-	ZEROS(index2, nat2);
+	ModuleBase::GlobalFunc::ZEROS(index2, nat2);
 	for(int ia=0; ia<nat2; ia++)
 	{
 		//+2 means z
@@ -810,7 +810,7 @@ void Symmetry_Basic::setgroup(Matrix3* symop, int &nop, const int &ibrav)
 		this->matrigen(symgen, 3, symop, nop);
 	}
 
-	OUT(GlobalV::ofs_running,"ROTATION MATRICES",nop);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"ROTATION MATRICES",nop);
 	if(GlobalV::test_symmetry > 1)
 	{
 		GlobalV::ofs_running<<" THERE ARE " << nop << " ROTATION MATRICES FOR THE PURE BRAVAIS LATTICE"<<std::endl;
@@ -938,14 +938,14 @@ void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, std::string &pgn
 		else if(trace == -2 && det == -1) ++ns3; //mohan add 2012-01-15
 	}
 
-	OUT(GlobalV::ofs_running,"C2",nc2);
-	OUT(GlobalV::ofs_running,"C3",nc3);
-	OUT(GlobalV::ofs_running,"C4",nc4);
-	OUT(GlobalV::ofs_running,"C6",nc6);
-	OUT(GlobalV::ofs_running,"S1",ns1);
-	OUT(GlobalV::ofs_running,"S3",ns3);
-	OUT(GlobalV::ofs_running,"S4",ns4);
-	OUT(GlobalV::ofs_running,"S6",ns6);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"C2",nc2);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"C3",nc3);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"C4",nc4);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"C6",nc6);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"S1",ns1);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"S3",ns3);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"S4",ns4);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"S6",ns6);
 	
 	if(nrot == 2)
 	{

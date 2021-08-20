@@ -225,7 +225,7 @@ void Epsilon0_vasp:: Cal_psi(int ik)      // pengfei Li 2018-11-13
 {
 	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
+		ModuleBase::GlobalFunc::ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
 		for(int ig = 0; ig < GlobalC::kv.ngk[ik] ; ig++)
 		{
 			GlobalC::UFFT.porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik,ig)] ] = GlobalC::wf.evc[ik](ib,ig);
@@ -245,7 +245,7 @@ void Epsilon0_vasp:: Cal_psi_nabla(int ik)      // pengfei Li 2018-11-13
 {
 	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
+		ModuleBase::GlobalFunc::ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
 		for(int ig = 0; ig < GlobalC::kv.ngk[ik] ; ig++)
 		{
 			GlobalC::UFFT.porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik,ig)] ] = GlobalC::wf.evc[ik](ib,ig) * (GlobalC::pw.get_GPlusK_cartesian_projection(ik, ig, 0) * (TWO_PI/GlobalC::ucell.lat0));
@@ -257,7 +257,7 @@ void Epsilon0_vasp:: Cal_psi_nabla(int ik)      // pengfei Li 2018-11-13
 			psi_nabla[ib][ir][0] = GlobalC::UFFT.porter[ir];
 		}
 		
-		ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
+		ModuleBase::GlobalFunc::ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
 		for(int ig = 0; ig < GlobalC::kv.ngk[ik] ; ig++)
 		{
 			GlobalC::UFFT.porter[GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)]] = GlobalC::wf.evc[ik](ib, ig) * (GlobalC::pw.get_GPlusK_cartesian_projection(ik, ig, 1) * (TWO_PI / GlobalC::ucell.lat0));
@@ -268,7 +268,7 @@ void Epsilon0_vasp:: Cal_psi_nabla(int ik)      // pengfei Li 2018-11-13
 		{
 			psi_nabla[ib][ir][1] = GlobalC::UFFT.porter[ir];
 		}
-		ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
+		ModuleBase::GlobalFunc::ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
 		for(int ig = 0; ig < GlobalC::kv.ngk[ik] ; ig++)
 		{
 			GlobalC::UFFT.porter[GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)]] = GlobalC::wf.evc[ik](ib, ig) * (GlobalC::pw.get_GPlusK_cartesian_projection(ik, ig, 2) * (TWO_PI / GlobalC::ucell.lat0));
@@ -453,7 +453,7 @@ void Epsilon0_vasp:: Cal_psi_nu(int ik)
 	{
 		for(int u=0; u<GlobalC::ppcell.nkb; u++)
 		{
-			ZEROS(psi_nu[ib][u], 4);
+			ModuleBase::GlobalFunc::ZEROS(psi_nu[ib][u], 4);
 			for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 			{
 				//std::cout<<"ib = "<<ib<<" u = "<<u<<" ig = "<<ig<<" vkb_alpha = "<<GlobalC::ppcell.vkb_alpha[0][u][ig]<<std::endl;

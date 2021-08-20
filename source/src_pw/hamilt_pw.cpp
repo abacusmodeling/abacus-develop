@@ -47,9 +47,9 @@ void Hamilt_PW::allocate(
     this->GR_index = new int[nrxx];
     this->Bec = new std::complex<double> [nkb];
 
-    ZEROS(this->hpsi, npwx * npol);
-    ZEROS(this->spsi, npwx * npol);
-    ZEROS(this->GR_index, nrxx);
+    ModuleBase::GlobalFunc::ZEROS(this->hpsi, npwx * npol);
+    ModuleBase::GlobalFunc::ZEROS(this->spsi, npwx * npol);
+    ModuleBase::GlobalFunc::ZEROS(this->GR_index, nrxx);
 
     return;
 }
@@ -356,8 +356,8 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
     int j = 0;
     int ig= 0;
 
-	//if(GlobalV::NSPIN!=4) ZEROS(hpsi, GlobalC::wf.npw);
-	//else ZEROS(hpsi, GlobalC::wf.npwx * GlobalV::NPOL);//added by zhengdy-soc
+	//if(GlobalV::NSPIN!=4) ModuleBase::GlobalFunc::ZEROS(hpsi, GlobalC::wf.npw);
+	//else ModuleBase::GlobalFunc::ZEROS(hpsi, GlobalC::wf.npwx * GlobalV::NPOL);//added by zhengdy-soc
 	int dmax = GlobalC::wf.npwx * GlobalV::NPOL;
 
 	//------------------------------------
@@ -407,7 +407,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 		for(int ib = 0 ; ib < m; ++ib)
 		{
 			if(GlobalV::NSPIN!=4){
-				ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
+				ModuleBase::GlobalFunc::ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
 				GlobalC::UFFT.RoundTrip( tmpsi_in, GlobalC::pot.vr_eff1, GR_index, GlobalC::UFFT.porter );
 				for (j = 0;j < GlobalC::wf.npw;j++)
 				{
@@ -417,8 +417,8 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 			else
 			{
 				std::complex<double>* porter1 = new std::complex<double>[GlobalC::pw.nrxx];
-				ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
-				ZEROS( porter1, GlobalC::pw.nrxx);
+				ModuleBase::GlobalFunc::ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
+				ModuleBase::GlobalFunc::ZEROS( porter1, GlobalC::pw.nrxx);
 				for (int ig=0; ig< GlobalC::wf.npw; ig++)
 				{
 					GlobalC::UFFT.porter[ GR_index[ig]  ] = tmpsi_in[ig];
@@ -503,7 +503,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 			this->add_nonlocal_pp(hpsi, becp.c, m);
 			//======================================================================
 			/*std::complex<double> *becp = new std::complex<double>[ GlobalC::ppcell.nkb * GlobalV::NPOL ];
-			ZEROS(becp,GlobalC::ppcell.nkb * GlobalV::NPOL);
+			ModuleBase::GlobalFunc::ZEROS(becp,GlobalC::ppcell.nkb * GlobalV::NPOL);
 			for (i=0;i< GlobalC::ppcell.nkb;i++)
 			{
 				const std::complex<double>* p = &GlobalC::ppcell.vkb(i,0);
@@ -537,7 +537,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 		{
 			for(int j=0; j<3; j++)
 			{
-				ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
+				ModuleBase::GlobalFunc::ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
 				for (int ig = 0;ig < GlobalC::kv.ngk[GlobalV::CURRENT_K] ; ig++)
 				{
 					double fact = GlobalC::pw.get_GPlusK_cartesian_projection(GlobalV::CURRENT_K,GlobalC::wf.igk(GlobalV::CURRENT_K,ig),j) * GlobalC::ucell.tpiba;
@@ -579,7 +579,7 @@ void Hamilt_PW::add_nonlocal_pp(
 	int nkb = GlobalC::ppcell.nkb;
 
 	std::complex<double> *ps  = new std::complex<double> [nkb * GlobalV::NPOL * m];
-    ZEROS(ps, GlobalV::NPOL * m * nkb);
+    ModuleBase::GlobalFunc::ZEROS(ps, GlobalV::NPOL * m * nkb);
 
     int sum = 0;
     int iat = 0;
@@ -745,9 +745,9 @@ void Hamilt_PW::diag_zheev(const int &npw_in, ModuleBase::ComplexMatrix &psi, co
     std::complex<double> * hpsi1 =  new std::complex<double>[npw_in] ;
     std::complex<double> * spsi1 =  new std::complex<double>[npw_in] ;
 
-	ZEROS(eta, npw_in);
-	ZEROS(hpsi1, npw_in);
-	ZEROS(spsi1, npw_in);
+	ModuleBase::GlobalFunc::ZEROS(eta, npw_in);
+	ModuleBase::GlobalFunc::ZEROS(hpsi1, npw_in);
+	ModuleBase::GlobalFunc::ZEROS(spsi1, npw_in);
 
     double * tmpen = new double[nband] ;
 

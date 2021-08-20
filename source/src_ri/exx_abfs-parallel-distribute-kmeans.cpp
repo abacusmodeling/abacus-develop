@@ -12,7 +12,7 @@ Exx_Abfs::Parallel::Distribute::Kmeans::cluster( const int Nc )
 	std::vector<Cluster> clusters(Nc+1);						// clusters[Nc] just for atoms init
 	std::vector<Atom> atoms(GlobalC::ucell.nat);
 	
-//std::ofstream ofs_mpi(exx_lcao.test_dir.process+"kmeans_"+TO_STRING(Nc)+"_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
+//std::ofstream ofs_mpi(exx_lcao.test_dir.process+"kmeans_"+ModuleBase::GlobalFunc::TO_STRING(Nc)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 	
 	auto init = [&]() -> void
 	{
@@ -255,7 +255,7 @@ Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans1( const MPI_Comm & mpi
 {
 	int comm_size;	MPI_Comm_size( mpi_comm, &comm_size );
 	int my_rank;	MPI_Comm_rank( mpi_comm, &my_rank );
-std::ofstream ofs_mpi(GlobalC::exx_lcao.test_dir.process+"kmeans_"+TO_STRING(my_rank),std::ofstream::app);
+std::ofstream ofs_mpi(GlobalC::exx_lcao.test_dir.process+"kmeans_"+ModuleBase::GlobalFunc::TO_STRING(my_rank),std::ofstream::app);
 
 	auto classify_atom = []( const int Ng, const std::vector<Exx_Abfs::Parallel::Distribute::Kmeans::Atom> &atoms ) -> std::vector<std::vector<size_t>>
 	{

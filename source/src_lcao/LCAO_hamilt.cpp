@@ -50,7 +50,7 @@ void LCAO_Hamilt::set_lcao_matrices(void)
 	// initial the overlap matrix is done.	
     this->init_s = true;
 	//std::cout << " init_s=" << init_s << std::endl; //delete 2015-09-06, xiaohui
-//	OUT(GlobalV::ofs_running,"init_s",init_s);
+//	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"init_s",init_s);
 
 	timer::tick("LCAO_Hamilt","set_lcao_matrices");
 	return;
@@ -99,7 +99,7 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-
 		}
 
 		time_t time_vlocal_end = time(NULL);
-		OUT_TIME("vlocal integration",time_vlocal_start,time_vlocal_end);
+		ModuleBase::GlobalFunc::OUT_TIME("vlocal integration",time_vlocal_start,time_vlocal_end);
 	}
 
 	//add T+VNL+Vl matrix.
@@ -127,7 +127,7 @@ void LCAO_Hamilt::calculate_STNR_gamma(void)
 {
 	TITLE("LCAO_Hamilt","calculate_fixed");
 
-	OUT(GlobalV::ofs_running,"gamma_only_local",GlobalV::GAMMA_ONLY_LOCAL);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"gamma_only_local",GlobalV::GAMMA_ONLY_LOCAL);
 
 	// must be done after "setup_this_ion_iter"
 	// because some basic parameters should be initialized
@@ -160,7 +160,7 @@ void LCAO_Hamilt::calculate_STNR_gamma(void)
 	}
 	time_t time_vnl_end = time(NULL);
 
-//	OUT(GlobalV::ofs_running, "Time to calculate <psi|Vnl|psi>", std::difftime(time_vnl_end, time_vnl_start));
+//	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Time to calculate <psi|Vnl|psi>", std::difftime(time_vnl_end, time_vnl_start));
 	
 	//add kinetic energy matrix element
 	time_t time_t_start = time(NULL);
@@ -174,8 +174,8 @@ void LCAO_Hamilt::calculate_STNR_gamma(void)
 	//	GlobalV::ofs_running << " T+Vnl matrix" << std::endl;
 	//GlobalC::LM.print_HSgamma('T');
 
-	OUT_TIME("kinetical matrix",time_t_start, time_t_end);
-	OUT_TIME("vnl matrix",time_vnl_start, time_vnl_end);
+	ModuleBase::GlobalFunc::OUT_TIME("kinetical matrix",time_t_start, time_t_end);
+	ModuleBase::GlobalFunc::OUT_TIME("vnl matrix",time_vnl_start, time_vnl_end);
 
 	return;
 }
@@ -679,8 +679,8 @@ void LCAO_Hamilt::calculat_HR_dftu_sparse(const int &current_spin, const double 
 				std::map<size_t, std::map<size_t, double>> &temp_HR_sparse = GlobalC::LM.HR_sparse[ix][iy][iz];
 				std::map<size_t, std::map<size_t, double>> &temp_SR_sparse = GlobalC::LM.SR_sparse[ix][iy][iz];
 
-				ZEROS(HR_tmp, GlobalC::ParaO.nloc);
-				ZEROS(SR_tmp, GlobalC::ParaO.nloc);
+				ModuleBase::GlobalFunc::ZEROS(HR_tmp, GlobalC::ParaO.nloc);
+				ModuleBase::GlobalFunc::ZEROS(SR_tmp, GlobalC::ParaO.nloc);
 
 				for (auto &iter : temp_SR_sparse)
 				{
@@ -777,8 +777,8 @@ void LCAO_Hamilt::calculat_HR_dftu_soc_sparse(const int &current_spin, const dou
 				std::map<size_t, std::map<size_t, std::complex<double>>> &temp_HR_soc_sparse = GlobalC::LM.HR_soc_sparse[ix][iy][iz];
 				std::map<size_t, std::map<size_t, std::complex<double>>> &temp_SR_soc_sparse = GlobalC::LM.SR_soc_sparse[ix][iy][iz];
 
-				ZEROS(HR_soc_tmp, GlobalC::ParaO.nloc);
-				ZEROS(SR_soc_tmp, GlobalC::ParaO.nloc);
+				ModuleBase::GlobalFunc::ZEROS(HR_soc_tmp, GlobalC::ParaO.nloc);
+				ModuleBase::GlobalFunc::ZEROS(SR_soc_tmp, GlobalC::ParaO.nloc);
 
 				for (auto &iter : temp_SR_soc_sparse)
 				{

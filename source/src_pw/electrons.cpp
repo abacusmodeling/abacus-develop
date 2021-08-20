@@ -325,7 +325,7 @@ void Electrons::self_consistent(const int &istep)
             // mohan update 2011-02-21
 			//qianrui update 2020-10-17
             WF_io::write_wfc2( ssw.str(), GlobalC::wf.evc, GlobalC::pw.gcar);
-            //DONE(GlobalV::ofs_running,"write wave functions into file WAVEFUNC.dat");
+            //ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"write wave functions into file WAVEFUNC.dat");
         }
 
 			GlobalC::pot.set_vr_eff();
@@ -440,7 +440,7 @@ void Electrons::c_bands(const int &istep)
     int precondition_type = 2;
 
     double *h_diag = new double[GlobalC::wf.npwx * GlobalV::NPOL];//added by zhengdy-soc
-    ZEROS(h_diag, GlobalC::wf.npwx * GlobalV::NPOL);
+    ModuleBase::GlobalFunc::ZEROS(h_diag, GlobalC::wf.npwx * GlobalV::NPOL);
 
     avg_iter = 0.0;
 

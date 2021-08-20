@@ -16,7 +16,7 @@ void Stress_Func::stress_loc(matrix& sigma, const bool is_pw)
 
 	std::complex<double> *Porter = GlobalC::UFFT.porter;
 
-	ZEROS( Porter, GlobalC::pw.nrxx );
+	ModuleBase::GlobalFunc::ZEROS( Porter, GlobalC::pw.nrxx );
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
@@ -32,7 +32,7 @@ void Stress_Func::stress_loc(matrix& sigma, const bool is_pw)
 	evloc=0.0;
 
 	std::complex<double> *vg = new std::complex<double>[GlobalC::pw.ngmc];
-	ZEROS( vg, GlobalC::pw.ngmc );
+	ModuleBase::GlobalFunc::ZEROS( vg, GlobalC::pw.ngmc );
 	for (int it=0; it<GlobalC::ucell.ntype; it++)
 	{
 		if (GlobalC::pw.gstart==1) evloc += GlobalC::ppcell.vloc(it, GlobalC::pw.ig2ngg[0]) * (GlobalC::pw.strucFac(it,0) * conj(Porter[GlobalC::pw.ig2fftc[0]])).real();
@@ -132,8 +132,8 @@ double*  dvloc
 
 	aux = new double[msh];
 	aux1 = new double[msh];
-	ZEROS(aux, msh);
-	ZEROS(aux1, msh);
+	ModuleBase::GlobalFunc::ZEROS(aux, msh);
+	ModuleBase::GlobalFunc::ZEROS(aux1, msh);
 
 	// the  G=0 component is not computed
 	if (GlobalC::pw.ggs[0] < 1.0e-8)

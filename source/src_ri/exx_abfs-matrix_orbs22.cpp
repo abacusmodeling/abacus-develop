@@ -16,7 +16,7 @@ void Exx_Abfs::Matrix_Orbs22::init(
 	const double kmesh_times,
 	const double rmesh_times)
 {
-std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
+std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 gettimeofday( &t_start, NULL);
 	
@@ -56,7 +56,7 @@ void Exx_Abfs::Matrix_Orbs22::init_radial(
 	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orb_B1,
 	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orb_B2 )
 {
-std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
+std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 gettimeofday( &t_start, NULL);
 	TITLE("Exx_Abfs::Matrix_Orbs22","init_radial");
@@ -90,7 +90,7 @@ void Exx_Abfs::Matrix_Orbs22::init_radial(
 	const LCAO_Orbitals &orb_B1,
 	const LCAO_Orbitals &orb_B2 )
 {
-std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
+std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 gettimeofday( &t_start, NULL);
 	TITLE("Exx_Abfs::Matrix_Orbs22","init_radial");
@@ -120,7 +120,7 @@ ofs.close();
 
 void Exx_Abfs::Matrix_Orbs22::init_radial_table()
 {
-std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
+std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 gettimeofday( &t_start, NULL);
 	TITLE("Exx_Abfs::Matrix_Orbs22","init_radial_table");
@@ -142,7 +142,7 @@ ofs.close();
 
 void Exx_Abfs::Matrix_Orbs22::init_radial_table( const std::map<size_t,std::map<size_t,std::set<double>>> &Rs )
 {
-std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
+std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 gettimeofday( &t_start, NULL);
 	TITLE("Exx_Abfs::Matrix_Orbs22","init_radial_table_Rs");
@@ -151,7 +151,7 @@ gettimeofday( &t_start, NULL);
 		for( const auto &RsB : RsA.second )
 		{
 			if( auto* center2_orb22_sAB = static_cast<std::map<int,std::map<size_t,std::map<int,std::map<size_t,std::map<int,std::map<size_t,std::map<int,std::map<size_t,Center2_Orb::Orb22>>>>>>>>*>(
-						MAP_EXIST(center2_orb22_s, RsA.first, RsB.first)) )
+						ModuleBase::GlobalFunc::MAP_EXIST(center2_orb22_s, RsA.first, RsB.first)) )
 			{
 timeval t_small;
 gettimeofday(&t_small, NULL);
@@ -199,7 +199,7 @@ matrix Exx_Abfs::Matrix_Orbs22::cal_overlap_matrix(
 	switch(matrix_order)
 	{
 		case Matrix_Order::A1B1_A2B2:	m.create( index_A1[TA].count_size*index_B1[TB].count_size, index_A2[TA].count_size*index_B2[TB].count_size );	break;
-		default:	throw std::invalid_argument( "Matrix_Order wrong in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__) );
+		default:	throw std::invalid_argument( "Matrix_Order wrong in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__) );
 	}
 
 	for( const auto &co3 : center2_orb22_s.at(TA).at(TB) )
@@ -249,7 +249,7 @@ matrix Exx_Abfs::Matrix_Orbs22::cal_overlap_matrix(
 																	index_B2,TB,LB2,NB2,MB2 ) )
 															= overlap;
 															break;
-														default:	throw std::invalid_argument( "Matrix_Order wrong in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__) );
+														default:	throw std::invalid_argument( "Matrix_Order wrong in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__) );
 													}
 												}
 											}
@@ -273,7 +273,7 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Exx_A
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_B1,
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_B2 ) const
 {
-std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
+std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 gettimeofday( &t_start, NULL);
 	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> matrixes;

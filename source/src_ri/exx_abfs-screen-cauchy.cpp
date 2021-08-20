@@ -172,19 +172,19 @@ Exx_Abfs::Screen::Cauchy::Info_Step Exx_Abfs::Screen::Cauchy::input_info(
 
 	info_step.V_norm4 = V_norm4.at(iat1).at(iat2).at(box2);
 
-	if( const double*const D_ptr = static_cast<const double*const>(MAP_EXIST( D_norm4_max, iat3, iat4, Abfs::Vector3_Order<int>(box2-box3+box4)%Born_von_Karman_period )) )
+	if( const double*const D_ptr = static_cast<const double*const>(ModuleBase::GlobalFunc::MAP_EXIST( D_norm4_max, iat3, iat4, Abfs::Vector3_Order<int>(box2-box3+box4)%Born_von_Karman_period )) )
 		info_step.D34_norm4_max = *D_ptr;
 	else
 		info_step.D34_norm4_max = 0;
-	if( const double*const D_ptr = static_cast<const double*const>(MAP_EXIST( D_norm4_max, iat3, iat2, Abfs::Vector3_Order<int>(box2-box3     )%Born_von_Karman_period )) )
+	if( const double*const D_ptr = static_cast<const double*const>(ModuleBase::GlobalFunc::MAP_EXIST( D_norm4_max, iat3, iat2, Abfs::Vector3_Order<int>(box2-box3     )%Born_von_Karman_period )) )
 		info_step.D32_norm4_max = *D_ptr;
 	else
 		info_step.D32_norm4_max = 0;
-	if( const double*const D_ptr = static_cast<const double*const>(MAP_EXIST( D_norm4_max, iat1, iat4, Abfs::Vector3_Order<int>(box2     +box4)%Born_von_Karman_period )) )
+	if( const double*const D_ptr = static_cast<const double*const>(ModuleBase::GlobalFunc::MAP_EXIST( D_norm4_max, iat1, iat4, Abfs::Vector3_Order<int>(box2     +box4)%Born_von_Karman_period )) )
 		info_step.D14_norm4_max = *D_ptr;
 	else
 		info_step.D14_norm4_max = 0;
-	if( const double*const D_ptr = static_cast<const double*const>(MAP_EXIST( D_norm4_max, iat1, iat2, Abfs::Vector3_Order<int>(box2          )%Born_von_Karman_period )) )
+	if( const double*const D_ptr = static_cast<const double*const>(ModuleBase::GlobalFunc::MAP_EXIST( D_norm4_max, iat1, iat2, Abfs::Vector3_Order<int>(box2          )%Born_von_Karman_period )) )
 		info_step.D12_norm4_max = *D_ptr;
 	else
 		info_step.D12_norm4_max = 0;
@@ -268,7 +268,7 @@ bool Exx_Abfs::Screen::Cauchy::postcalC(
 			}	
 			break;
 		default:
-			throw std::domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::domain_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
 }
 

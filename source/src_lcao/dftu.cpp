@@ -1154,7 +1154,7 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, std::complex<d
 	
 	int spin = GlobalC::kv.isk[ik];
 
-	ZEROS(eff_pot, GlobalC::ParaO.nloc);
+	ModuleBase::GlobalFunc::ZEROS(eff_pot, GlobalC::ParaO.nloc);
 
 	//GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << std::endl;
 	//=============================================================
@@ -1170,7 +1170,7 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, std::complex<d
 	pzgemm_(&transN, &transN,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 		&half, 
-		VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc,
+		ModuleBase::GlobalFunc::VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc,
 		GlobalC::LM.Sloc2, &one_int, &one_int, GlobalC::ParaO.desc,
 		&zero,
 		eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
@@ -1237,7 +1237,7 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 	
 	int spin = GlobalC::kv.isk[ik];
 
-	ZEROS(eff_pot, GlobalC::ParaO.nloc);
+	ModuleBase::GlobalFunc::ZEROS(eff_pot, GlobalC::ParaO.nloc);
 
 	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << std::endl;
 	//=============================================================
@@ -1253,7 +1253,7 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 	pdgemm_(&transN, &transN,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 		&half, 
-		VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc, 
+		ModuleBase::GlobalFunc::VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc, 
 		GlobalC::LM.Sloc, &one_int, &one_int, GlobalC::ParaO.desc,
 		&beta,
 		eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
@@ -1441,7 +1441,7 @@ void DFTU::cal_eff_pot_mat_R_double(const int ispin, double* SR, double* HR)
 	pdgemm_(&transN, &transN,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 		&half, 
-		VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc, 
+		ModuleBase::GlobalFunc::VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc, 
 		SR, &one_int, &one_int, GlobalC::ParaO.desc,
 		&beta,
 		HR, &one_int, &one_int, GlobalC::ParaO.desc);
@@ -1474,7 +1474,7 @@ void DFTU::cal_eff_pot_mat_R_complex_double(
 	pzgemm_(&transN, &transN,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 		&half, 
-		VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc,
+		ModuleBase::GlobalFunc::VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc,
 		SR, &one_int, &one_int, GlobalC::ParaO.desc,
 		&beta,
 		HR, &one_int, &one_int, GlobalC::ParaO.desc);
@@ -1496,7 +1496,7 @@ void DFTU::folding_overlap_matrix(const int ik, std::complex<double>* Sk)
   TITLE("DFTU","folding_overlap_matrix"); 
 	// timer::tick("DFTU","folding_overlap_matrix");
 
-  ZEROS(Sk, GlobalC::ParaO.nloc);
+  ModuleBase::GlobalFunc::ZEROS(Sk, GlobalC::ParaO.nloc);
 
 	int iat = 0;
 	int index = 0;

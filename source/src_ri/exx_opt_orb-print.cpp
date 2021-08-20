@@ -195,7 +195,7 @@ void Exx_Opt_Orb::print_matrix(
 		ofs << "</OVERLAP_V>" << std::endl << std::endl;
 	};
 	
-	std::ofstream ofs(file_name+"_"+TO_STRING(TA)+"_"+TO_STRING(IA)+"_"+TO_STRING(TB)+"_"+TO_STRING(IB));
+	std::ofstream ofs(file_name+"_"+ModuleBase::GlobalFunc::TO_STRING(TA)+"_"+ModuleBase::GlobalFunc::TO_STRING(IA)+"_"+ModuleBase::GlobalFunc::TO_STRING(TB)+"_"+ModuleBase::GlobalFunc::TO_STRING(IB));
 	print_header(ofs);
 	print_Q(ofs);
 	print_S(ofs);

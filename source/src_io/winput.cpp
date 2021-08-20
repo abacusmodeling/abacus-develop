@@ -354,7 +354,7 @@ void winput::Check(void)
 		if(out_charge)
 		{
 			out_charge = false;
-			AUTO_SET("winput::out_charge",out_charge);
+			ModuleBase::GlobalFunc::AUTO_SET("winput::out_charge",out_charge);
 		}
 	}
 	//=====================
@@ -374,26 +374,26 @@ void winput::Check(void)
 	//	{
 	//		WARNING("winput::Check","Auto start reconstruction operation.");
 	//		b_recon = true;
-	//		AUTO_SET("b_recon",b_recon);
+	//		ModuleBase::GlobalFunc::AUTO_SET("b_recon",b_recon);
 	//	}
 	//	// turn off
 	//	if(before_iter)
 	//	{
 	//		WARNING("winput::Check","Auto turn down 'before_iter'.");
 	//		before_iter = false;
-	//		AUTO_SET("before_iter",before_iter);
+	//		ModuleBase::GlobalFunc::AUTO_SET("before_iter",before_iter);
 	//	}
 	//	if(after_iter)
 	//	{
 	//		WARNING("winput::Check","Auto turn down after_iter.");
 	//		after_iter = false;
-	//		AUTO_SET("after_iter",after_iter);
+	//		ModuleBase::GlobalFunc::AUTO_SET("after_iter",after_iter);
 	//	}
 	//	if(build_wf)
 	//	{
 	//		WARNING("winput::Check","Not available to build wannier functions in local basis");
 	//		build_wf = 0;
-	//		AUTO_SET("build_wf",build_wf);
+	//		ModuleBase::GlobalFunc::AUTO_SET("build_wf",build_wf);
 	//	}
 	//	// some meaning
 	//	if(sph_proj>0)
@@ -402,14 +402,14 @@ void winput::Check(void)
 	//		{
 	//			WARNING("winput::Check","Add self site wave functions during reconstruction.");
 	//			no_center = true;
-	//			AUTO_SET("no_center",no_center);
+	//			ModuleBase::GlobalFunc::AUTO_SET("no_center",no_center);
 	//		}
 	//		else if(sph_proj==1)
 	//		{
 	//			WARNING("winput::Check","Not meaning in reconstruction if sph_proj==1");
 	//		}
 	//		sph_proj=0;
-	//		AUTO_SET("sph_proj",sph_proj);
+	//		ModuleBase::GlobalFunc::AUTO_SET("sph_proj",sph_proj);
 	//	}
 	//	if(imp_pao>0)
 	//	{
@@ -421,10 +421,10 @@ void winput::Check(void)
 	//		{
 	//			WARNING("winput::Check","Use real space truncation. So we must get fft_init started.");
 	//			b_fftwan = true;
-	//			AUTO_SET("b_fftwan",b_fftwan);
+	//			ModuleBase::GlobalFunc::AUTO_SET("b_fftwan",b_fftwan);
 	//		}
 	//		clm2_lowest = 0.0;
-	//		AUTO_SET("clm2_lowest",clm2_lowest);
+	//		ModuleBase::GlobalFunc::AUTO_SET("clm2_lowest",clm2_lowest);
 	//	}
 	//}
 	//else if(LOCAL_BASIS==0)
@@ -434,13 +434,13 @@ void winput::Check(void)
 	//	if(b_recon)
 	//	{
 	//		WARNING("winput::Check","Auto turn off the reconstruction.");
-	//		AUTO_SET("b_recon",b_recon);
+	//		ModuleBase::GlobalFunc::AUTO_SET("b_recon",b_recon);
 	//		b_recon = 0;
 	//	}
 	//	if(recon_wanq)
 	//	{
 	//		WARNING("winput::Check","Auto turn off the recon_wanq");
-	//		AUTO_SET("recon_wanq",recon_wanq);
+	//		ModuleBase::GlobalFunc::AUTO_SET("recon_wanq",recon_wanq);
 	//		recon_wanq = 0;
 	//	}
 	//	// if turn on 
@@ -453,36 +453,36 @@ void winput::Check(void)
 
 	//			WARNING("winput::Check","If use imp_pao>0 ,sph_proj must be 0.");
 	//			sph_proj=0;
-	//			AUTO_SET("sph_proj",sph_proj);
+	//			ModuleBase::GlobalFunc::AUTO_SET("sph_proj",sph_proj);
 
 	//			WARNING("winput::Check","If use imp_pao>0 ,build is no need, can be 0.");
 	//			build_wf=0;
-	//			AUTO_SET("build_wf",build_wf);
+	//			ModuleBase::GlobalFunc::AUTO_SET("build_wf",build_wf);
 
 	//			if(trunc_wan > 0 && b_recon)
 	//			{
 	//				WARNING("winput::Check","Use real space truncation. So we must get fft_init started.");
 	//				b_fftwan = true;
-	//				AUTO_SET("b_fftwan",b_fftwan);
+	//				ModuleBase::GlobalFunc::AUTO_SET("b_fftwan",b_fftwan);
 	//			}
 	//			clm2_lowest = 0.0;
-	//			AUTO_SET("clm2_lowest",clm2_lowest);
+	//			ModuleBase::GlobalFunc::AUTO_SET("clm2_lowest",clm2_lowest);
 	//		}
 	//		else if(sph_proj>0)
 	//		{
 	//			WARNING("winput::Check","Auto build localized wave functions.");
 	//			build_wf = true;
-	//			AUTO_SET("build_wf",build_wf);
+	//			ModuleBase::GlobalFunc::AUTO_SET("build_wf",build_wf);
 	//			if(sph_proj == 1) 
 	//			{
 	//				no_center = false;
-	//				AUTO_SET("no_center",no_center);
+	//				ModuleBase::GlobalFunc::AUTO_SET("no_center",no_center);
 	//			}
 	//			else if(sph_proj == 2) 
 	//			{
 	//				WARNING("winput::Check","Searching Adjacent without self site.");
 	//				no_center = true;
-	//				AUTO_SET("no_center",no_center);
+	//				ModuleBase::GlobalFunc::AUTO_SET("no_center",no_center);
 	//			}
 	//			else
 	//			{
@@ -520,7 +520,7 @@ void winput::Check(void)
 		else
 		{
 			b_fftwan = true;
-			AUTO_SET("b_fftwan",b_fftwan);
+			ModuleBase::GlobalFunc::AUTO_SET("b_fftwan",b_fftwan);
 		}
 	}
 
@@ -538,86 +538,86 @@ void winput::Print(const std::string &fn)
 	ofs << "WANNIER_PARAMETERS" << std::endl;
 
 	ofs << "#Parameters (General)" << std::endl;
-	OUTP(ofs,"target",target);
-	OUTP(ofs,"wlmr_dir",wlmr_dir);
-	OUTP(ofs,"rcut",rcut);
-	OUTP(ofs,"before_iter",before_iter);
-	OUTP(ofs,"after_iter",after_iter);
-	OUTP(ofs,"begin_stop_flag",begin_stop_flag);
-	OUTP(ofs,"end_flag",end_flag);
+	ModuleBase::GlobalFunc::OUTP(ofs,"target",target);
+	ModuleBase::GlobalFunc::OUTP(ofs,"wlmr_dir",wlmr_dir);
+	ModuleBase::GlobalFunc::OUTP(ofs,"rcut",rcut);
+	ModuleBase::GlobalFunc::OUTP(ofs,"before_iter",before_iter);
+	ModuleBase::GlobalFunc::OUTP(ofs,"after_iter",after_iter);
+	ModuleBase::GlobalFunc::OUTP(ofs,"begin_stop_flag",begin_stop_flag);
+	ModuleBase::GlobalFunc::OUTP(ofs,"end_flag",end_flag);
 	
 	ofs << "#Parameters (Build Wannier Functions)" << std::endl;
-	OUTP(ofs,"wf_type",wf_type);
-	OUTP(ofs,"build_wf",build_wf);
-	OUTP(ofs,"imp_pao",imp_pao);
-	OUTP(ofs,"b_out_wf",b_out_wf);
-	OUTP(ofs,"b_fftwan",b_fftwan);
-	OUTP(ofs,"b_plot_build",b_plot_build);
-	OUTP(ofs,"b_plot_atomic",b_plot_atomic);
+	ModuleBase::GlobalFunc::OUTP(ofs,"wf_type",wf_type);
+	ModuleBase::GlobalFunc::OUTP(ofs,"build_wf",build_wf);
+	ModuleBase::GlobalFunc::OUTP(ofs,"imp_pao",imp_pao);
+	ModuleBase::GlobalFunc::OUTP(ofs,"b_out_wf",b_out_wf);
+	ModuleBase::GlobalFunc::OUTP(ofs,"b_fftwan",b_fftwan);
+	ModuleBase::GlobalFunc::OUTP(ofs,"b_plot_build",b_plot_build);
+	ModuleBase::GlobalFunc::OUTP(ofs,"b_plot_atomic",b_plot_atomic);
 	
 	ofs << "#Parameters (Select trial wave functions)" << std::endl;
-	OUTP(ofs,"trial",trial);
-	OUTP(ofs,"bs",bs);
-	OUTP(ofs,"bp",bp);
-	OUTP(ofs,"px",px);
-	OUTP(ofs,"g1",g1);
-	OUTP(ofs,"g2",g2);
+	ModuleBase::GlobalFunc::OUTP(ofs,"trial",trial);
+	ModuleBase::GlobalFunc::OUTP(ofs,"bs",bs);
+	ModuleBase::GlobalFunc::OUTP(ofs,"bp",bp);
+	ModuleBase::GlobalFunc::OUTP(ofs,"px",px);
+	ModuleBase::GlobalFunc::OUTP(ofs,"g1",g1);
+	ModuleBase::GlobalFunc::OUTP(ofs,"g2",g2);
 
 	ofs << "#Parameters (Select bands)" << std::endl;
-	OUTP(ofs,"bloch_begin",bloch_begin);
-	OUTP(ofs,"bloch_end",bloch_end);
+	ModuleBase::GlobalFunc::OUTP(ofs,"bloch_begin",bloch_begin);
+	ModuleBase::GlobalFunc::OUTP(ofs,"bloch_end",bloch_end);
 
 	ofs << "#Parameters (Spheri & recon)" << std::endl;
-	OUTP(ofs,"no_center",no_center);	
-	OUTP(ofs,"sph_proj",sph_proj);
-	OUTP(ofs,"sph_type",sph_type);
-	OUTP(ofs,"b_recon",b_recon);
-	OUTP(ofs,"speed_mode",speed_mode);
-	OUTP(ofs,"recon_wanq",recon_wanq);
-	OUTP(ofs,"b_mix_wf",b_mix_wf);
-	OUTP(ofs,"mix_wf",mix_wf);
+	ModuleBase::GlobalFunc::OUTP(ofs,"no_center",no_center);	
+	ModuleBase::GlobalFunc::OUTP(ofs,"sph_proj",sph_proj);
+	ModuleBase::GlobalFunc::OUTP(ofs,"sph_type",sph_type);
+	ModuleBase::GlobalFunc::OUTP(ofs,"b_recon",b_recon);
+	ModuleBase::GlobalFunc::OUTP(ofs,"speed_mode",speed_mode);
+	ModuleBase::GlobalFunc::OUTP(ofs,"recon_wanq",recon_wanq);
+	ModuleBase::GlobalFunc::OUTP(ofs,"b_mix_wf",b_mix_wf);
+	ModuleBase::GlobalFunc::OUTP(ofs,"mix_wf",mix_wf);
 
 	ofs << "#Parameters (Multi-center spheri)" << std::endl;
-	OUTP(ofs,"b_near_atom",b_near_atom);
-	OUTP(ofs,"range0",range0);
-	OUTP(ofs,"range1",range1);
+	ModuleBase::GlobalFunc::OUTP(ofs,"b_near_atom",b_near_atom);
+	ModuleBase::GlobalFunc::OUTP(ofs,"range0",range0);
+	ModuleBase::GlobalFunc::OUTP(ofs,"range1",range1);
 
 	ofs << "#Parameters (Select L, atom)" << std::endl;
-	OUTP(ofs,"L_start",L_start);
-	OUTP(ofs,"L_end",L_end);
-	OUTP(ofs,"atom_start",atom_start);
-	OUTP(ofs,"atom_end",atom_end);
+	ModuleBase::GlobalFunc::OUTP(ofs,"L_start",L_start);
+	ModuleBase::GlobalFunc::OUTP(ofs,"L_end",L_end);
+	ModuleBase::GlobalFunc::OUTP(ofs,"atom_start",atom_start);
+	ModuleBase::GlobalFunc::OUTP(ofs,"atom_end",atom_end);
 
 	ofs << "#Parameters (Truncation)" << std::endl;
-	OUTP(ofs,"trunc_ao",trunc_ao);
-	OUTP(ofs,"trunc_wlmr",trunc_wlmr);
-	OUTP(ofs,"trunc_wan",trunc_wan);
-	OUTP(ofs,"fermi_t",fermi_t);
-	OUTP(ofs,"clm2_lowest",clm2_lowest);
+	ModuleBase::GlobalFunc::OUTP(ofs,"trunc_ao",trunc_ao);
+	ModuleBase::GlobalFunc::OUTP(ofs,"trunc_wlmr",trunc_wlmr);
+	ModuleBase::GlobalFunc::OUTP(ofs,"trunc_wan",trunc_wan);
+	ModuleBase::GlobalFunc::OUTP(ofs,"fermi_t",fermi_t);
+	ModuleBase::GlobalFunc::OUTP(ofs,"clm2_lowest",clm2_lowest);
 
 	ofs << "#Parameters (Plot wave functions)" << std::endl;
-	OUTP(ofs,"plot_wanq",plot_wanq);
-	OUTP(ofs,"plot_option",plot_option);
-	OUTP(ofs,"n_unitcell",n_unitcell);
+	ModuleBase::GlobalFunc::OUTP(ofs,"plot_wanq",plot_wanq);
+	ModuleBase::GlobalFunc::OUTP(ofs,"plot_option",plot_option);
+	ModuleBase::GlobalFunc::OUTP(ofs,"n_unitcell",n_unitcell);
 
 	ofs << "#Parameters (out_all || out_charge)" << std::endl;
-	OUTP(ofs,"out_all",out_all);
-	OUTP(ofs,"out_charge",out_charge);
-	OUTP(ofs,"compare_atomic",compare_atomic);
+	ModuleBase::GlobalFunc::OUTP(ofs,"out_all",out_all);
+	ModuleBase::GlobalFunc::OUTP(ofs,"out_charge",out_charge);
+	ModuleBase::GlobalFunc::OUTP(ofs,"compare_atomic",compare_atomic);
 
 	ofs << "#Parameters (Other functions: bands & dos)" << std::endl;
-	OUTP(ofs,"cal_bands",cal_bands);
-	OUTP(ofs,"cal_bands2",cal_bands2);
-	OUTP(ofs,"charge_type",charge_type);
-	OUTP(ofs,"cal_dos",cal_dos);
-	OUTP(ofs,"out_spillage",out_spillage);
-	OUTP(ofs,"spillage_outdir",spillage_outdir);
+	ModuleBase::GlobalFunc::OUTP(ofs,"cal_bands",cal_bands);
+	ModuleBase::GlobalFunc::OUTP(ofs,"cal_bands2",cal_bands2);
+	ModuleBase::GlobalFunc::OUTP(ofs,"charge_type",charge_type);
+	ModuleBase::GlobalFunc::OUTP(ofs,"cal_dos",cal_dos);
+	ModuleBase::GlobalFunc::OUTP(ofs,"out_spillage",out_spillage);
+	ModuleBase::GlobalFunc::OUTP(ofs,"spillage_outdir",spillage_outdir);
 	
 	ofs << "#Parameters (Uniform mesh)" << std::endl;
-	OUTP(ofs,"mesh",mesh);
-	OUTP(ofs,"dr",dr);
+	ModuleBase::GlobalFunc::OUTP(ofs,"mesh",mesh);
+	ModuleBase::GlobalFunc::OUTP(ofs,"dr",dr);
 
-	OUTP(ofs,"sum_lm",sum_lm);	
+	ModuleBase::GlobalFunc::OUTP(ofs,"sum_lm",sum_lm);	
 
 	ofs.close();
 	return;

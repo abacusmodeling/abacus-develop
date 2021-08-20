@@ -227,7 +227,7 @@ std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>> Abfs::cal_mps(
 	#if TEST_EXX_LCAO==1
 	{
 		static int istep=0;
-		std::ofstream ofs( "mps_index_"+TO_STRING(iat1)+"_"+TO_STRING(iat2)+"_"+TO_STRING(istep++) );
+		std::ofstream ofs( "mps_index_"+ModuleBase::GlobalFunc::TO_STRING(iat1)+"_"+ModuleBase::GlobalFunc::TO_STRING(iat2)+"_"+ModuleBase::GlobalFunc::TO_STRING(istep++) );
 		for( const auto index : indexs )
 		{
 			ofs<<index.first<<std::endl;
@@ -302,7 +302,7 @@ std::shared_ptr<matrix> Abfs::DPcal_C(
 	
 //	TITLE("Abfs","DPcal_C");
 	pthread_rwlock_rdlock(&rwlock_Cw);
-	const std::weak_ptr<matrix> * const Cws_ptr   = static_cast<const std::weak_ptr<matrix> * const>( MAP_EXIST( Cws, it1, it2, R ) );
+	const std::weak_ptr<matrix> * const Cws_ptr   = static_cast<const std::weak_ptr<matrix> * const>( ModuleBase::GlobalFunc::MAP_EXIST( Cws, it1, it2, R ) );
 	pthread_rwlock_unlock(&rwlock_Cw);
 	
 	if( Cws_ptr && !Cws_ptr->expired() )
@@ -368,8 +368,8 @@ std::shared_ptr<matrix> Abfs::DPcal_V(
 {
 //	TITLE("Abfs","DPcal_V");
 	pthread_rwlock_rdlock(&rwlock_Vw);
-	const std::weak_ptr<matrix> * const Vws12_ptr = static_cast<const std::weak_ptr<matrix> * const>( MAP_EXIST( Vws, it1, it2, R ) );
-	const std::weak_ptr<matrix> * const Vws21_ptr = static_cast<const std::weak_ptr<matrix> * const>( MAP_EXIST( Vws, it2, it1, -R ) );
+	const std::weak_ptr<matrix> * const Vws12_ptr = static_cast<const std::weak_ptr<matrix> * const>( ModuleBase::GlobalFunc::MAP_EXIST( Vws, it1, it2, R ) );
+	const std::weak_ptr<matrix> * const Vws21_ptr = static_cast<const std::weak_ptr<matrix> * const>( ModuleBase::GlobalFunc::MAP_EXIST( Vws, it2, it1, -R ) );
 	pthread_rwlock_unlock(&rwlock_Vw);
 	
 	if( Vws12_ptr && !Vws12_ptr->expired() )

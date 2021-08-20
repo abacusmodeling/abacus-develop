@@ -90,7 +90,7 @@ class ORB_gaunt_table
 	
 	// Index Function
 	// Yu's mehtod
-	// Peize Lin delete void ZEROS(); 2016-08-26
+	// Peize Lin delete void ModuleBase::GlobalFunc::ZEROS(); 2016-08-26
 	
 	int P_EL(const int& L);
 

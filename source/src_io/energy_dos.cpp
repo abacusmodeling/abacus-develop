@@ -284,9 +284,9 @@ void energy::perform_dos(void)
 				matrix Dwf = D.wfc_gamma[is];
 				for (int i=0; i<GlobalV::NBANDS; ++i)		  
 				{     
-					ZEROS(waveg, GlobalV::NLOCAL);
+					ModuleBase::GlobalFunc::ZEROS(waveg, GlobalV::NLOCAL);
 
-					ZEROS(Gauss,np);
+					ModuleBase::GlobalFunc::ZEROS(Gauss,np);
 					for (int n=0; n<npoints; ++n)		  
 					{  
 						double en=emin+n * de_ev;
@@ -387,10 +387,10 @@ void energy::perform_dos(void)
 						for (int i=0; i<GlobalV::NBANDS; ++i)		  
 						{     
 
-							ZEROS(waveg, GlobalV::NLOCAL);
+							ModuleBase::GlobalFunc::ZEROS(waveg, GlobalV::NLOCAL);
 
 
-							ZEROS(Gauss,np);
+							ModuleBase::GlobalFunc::ZEROS(Gauss,np);
 							for (int n=0; n<npoints; ++n)		  
 							{  
 								double en=emin+n * de_ev;

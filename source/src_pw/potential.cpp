@@ -73,7 +73,7 @@ void Potential::init_pot(
     this->vr_eff.zero_out();
 
     // the vltot should and must be zero here.
-    ZEROS(this->vltot, GlobalC::pw.nrxx);
+    ModuleBase::GlobalFunc::ZEROS(this->vltot, GlobalC::pw.nrxx);
 
 	if(GlobalV::DFT_META)
 	{
@@ -127,7 +127,7 @@ void Potential::init_pot(
 	//--------------------------------------------------------------------
     if(istep==0)
     {
-        OUT(GlobalV::ofs_running,"start_pot",start_pot);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"start_pot",start_pot);
 
         std::cout << " START POTENTIAL      : " << start_pot << std::endl;
         if (this->start_pot == "atomic")//mohan add 2007-10-17
@@ -264,7 +264,7 @@ void Potential::set_local_pot(
 
     std::complex<double> *vg = new std::complex<double>[ngmc];
 
-    ZEROS( vg, ngmc );
+    ModuleBase::GlobalFunc::ZEROS( vg, ngmc );
 
     for (int it=0; it<ntype; it++)
     {

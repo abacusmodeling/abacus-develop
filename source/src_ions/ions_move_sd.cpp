@@ -37,9 +37,9 @@ void Ions_Move_SD::start(const matrix& force, const double& etot_in)
 	double* pos = new double[dim];
 	double* grad = new double[dim];
 	double* move =new double[dim];
-	ZEROS(pos, dim);
-	ZEROS(grad, dim);
-	ZEROS(move, dim);
+	ModuleBase::GlobalFunc::ZEROS(pos, dim);
+	ModuleBase::GlobalFunc::ZEROS(grad, dim);
+	ModuleBase::GlobalFunc::ZEROS(move, dim);
 
 	// 1: ediff = 0
 	// 0: ediff < 0

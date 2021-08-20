@@ -371,7 +371,7 @@ void Exx_Lcao::init()
 				{
 					for( int N=0; N!=GlobalC::ORB.Phi[T].getNchi(L); ++N )
 					{
-						pr_orb_all( "orb_"+TO_STRING(T)+"_"+TO_STRING(L)+"_"+TO_STRING(N), GlobalC::ORB.Phi[T].PhiLN(L,N) );
+						pr_orb_all( "orb_"+ModuleBase::GlobalFunc::TO_STRING(T)+"_"+ModuleBase::GlobalFunc::TO_STRING(L)+"_"+ModuleBase::GlobalFunc::TO_STRING(N), GlobalC::ORB.Phi[T].PhiLN(L,N) );
 					}
 				}
 			}
@@ -384,7 +384,7 @@ void Exx_Lcao::init()
 				{
 					for( int N=0; N!=GlobalC::ORB.Phi[T].getNchi(L); ++N )
 					{
-						pr_orb_all_kmesh( "orb_"+TO_STRING(T)+"_"+TO_STRING(L)+"_"+TO_STRING(N), GlobalC::ORB.Phi[T].PhiLN(L,N), 5 );
+						pr_orb_all_kmesh( "orb_"+ModuleBase::GlobalFunc::TO_STRING(T)+"_"+ModuleBase::GlobalFunc::TO_STRING(L)+"_"+ModuleBase::GlobalFunc::TO_STRING(N), GlobalC::ORB.Phi[T].PhiLN(L,N), 5 );
 					}
 				}
 			}
@@ -507,18 +507,18 @@ void Exx_Lcao::init()
 	auto test_nrm2 = []()
 	{
 		std::vector<double> x = {1,2,3};
-		std::cout<<LapackConnector::nrm2( x.size(), VECTOR_TO_PTR(x), 1 )<<std::endl;
+		std::cout<<LapackConnector::nrm2( x.size(), ModuleBase::GlobalFunc::VECTOR_TO_PTR(x), 1 )<<std::endl;
 		std::vector<std::complex<double>> y = { {1.1,2.2}, {3.3,-4.4}, {-5.5,-6.6} };
-		std::cout<<LapackConnector::nrm2( y.size(), VECTOR_TO_PTR(y), 1 )<<std::endl;
+		std::cout<<LapackConnector::nrm2( y.size(), ModuleBase::GlobalFunc::VECTOR_TO_PTR(y), 1 )<<std::endl;
 		std::vector<double> z = {1,2,3,4,5,6};
-		std::cout<<LapackConnector::nrm2( 3, VECTOR_TO_PTR(z), 2 )<<std::endl;
+		std::cout<<LapackConnector::nrm2( 3, ModuleBase::GlobalFunc::VECTOR_TO_PTR(z), 2 )<<std::endl;
 	};
 
 	TITLE("Exx_Lcao","init");
 
 mkdir_test_dir();
 
-std::ofstream ofs_mpi(test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
+std::ofstream ofs_mpi(test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start,t_start_all;
 gettimeofday( &t_start_all, NULL);
 
@@ -625,7 +625,7 @@ ofs_mpi<<"TIME@ Exx_Abfs::Construct_Orbs::abfs\t"<<time_during(t_start)<<std::en
 
 //	Conv_Coulomb_Pot::cal_orbs_ccp( abfs, abfs_ccp, info.ccp_rmesh_times, 1 );
 //{
-//	std::ofstream ofs("exx_lcao"+TO_STRING(GlobalV::MY_RANK));
+//	std::ofstream ofs("exx_lcao"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 //	ofs<<static_cast<std::underlying_type<Exx_Lcao::Hybrid_Type>::type>(exx_lcao.info.hybrid_type)<<std::endl;
 //	ofs.close();
 //}
@@ -639,7 +639,7 @@ gettimeofday( &t_start, NULL);
 		case Exx_Global::Hybrid_Type::HSE:
 			abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hse, {{"hse_omega",info.hse_omega}}, info.ccp_rmesh_times );	break;
 		default:
-			throw std::domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	break;
+			throw std::domain_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));	break;
 	}
 ofs_mpi<<"TIME@ Conv_Coulomb_Pot_K::cal_orbs_ccp\t"<<time_during(t_start)<<std::endl;
 
@@ -655,7 +655,7 @@ ofs_mpi<<"TIME@ Conv_Coulomb_Pot_K::cal_orbs_ccp\t"<<time_during(t_start)<<std::
 				for( size_t k=0; k!=orbs[i][j].size(); ++k )
 				{
 					const Numerical_Orbital_Lm & orb = orbs[i][j][k];
-					std::ofstream ofs(file_name+"_"+TO_STRING(i)+"_"+TO_STRING(j)+"_"+TO_STRING(k));
+					std::ofstream ofs(file_name+"_"+ModuleBase::GlobalFunc::TO_STRING(i)+"_"+ModuleBase::GlobalFunc::TO_STRING(j)+"_"+ModuleBase::GlobalFunc::TO_STRING(k));
 					for( size_t ik=0; ik!=orb.getNk(); ++ik )
 					{
 						ofs<<orb.getPsi_k(ik) / pow(orb.getKpoint(ik),power)<<std::endl;
@@ -667,8 +667,8 @@ ofs_mpi<<"TIME@ Conv_Coulomb_Pot_K::cal_orbs_ccp\t"<<time_during(t_start)<<std::
 	};
 
 	#if TEST_EXX_LCAO==1
-		print_psi2(test_dir.matrix+"r_abfs_"+TO_STRING(GlobalV::MY_RANK),abfs);
-		print_psi2(test_dir.matrix+"r_abfs_ccp_"+TO_STRING(GlobalV::MY_RANK),abfs_ccp);
+		print_psi2(test_dir.matrix+"r_abfs_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),abfs);
+		print_psi2(test_dir.matrix+"r_abfs_ccp_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),abfs_ccp);
 	#elif TEST_EXX_LCAO==-1
 		#error
 	#endif
@@ -789,7 +789,7 @@ ofs_mpi.close();
 void Exx_Lcao::cal_exx_ions()
 {
 	TITLE("Exx_Lcao","cal_exx_ions");
-std::ofstream ofs_mpi(test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
+std::ofstream ofs_mpi(test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start, t_start_all;
 gettimeofday( &t_start_all, NULL);
 
@@ -817,12 +817,12 @@ gettimeofday( &t_start, NULL);
 			case Exx_Lcao::Distribute_Type::Order:
 				atom_pairs_core_origin = Exx_Abfs::Parallel::Distribute::Order::distribute( info.ccp_rmesh_times );	break;
 			default:
-				throw std::domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));  break;
-				//throw std::domain_error(TO_STRING(static_cast<std::underlying_type<Exx_Lcao::Distribute_Type>::type>(info.distribute_type))+"\t"+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	break;
+				throw std::domain_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));  break;
+				//throw std::domain_error(ModuleBase::GlobalFunc::TO_STRING(static_cast<std::underlying_type<Exx_Lcao::Distribute_Type>::type>(info.distribute_type))+"\t"+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));	break;
 		}
 ofs_mpi<<"atom_pairs_core_origin\t"<<atom_pairs_core_origin.size()<<std::endl;
 ofs_mpi<<"TIME@ Htime::distribute\t"<<time_during(t_start)<<std::endl;
-//std::ofstream ofs_atom_pair("atom_pair+"+TO_STRING(GlobalV::MY_RANK));
+//std::ofstream ofs_atom_pair("atom_pair+"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 //for( const auto & i : atom_pairs_core_origin )
 //	ofs_atom_pair<<i.first<<"\t"<<i.second<<std::endl;
 //ofs_atom_pair.close();
@@ -897,12 +897,12 @@ ofs_mpi<<"sizeof_Vws:\t"<<get_sizeof(Vws)<<std::endl;
 ofs_mpi.close();
 
 	#if TEST_EXX_LCAO==1
-		ofs_matrixes(test_dir.matrix+"Cws_"+TO_STRING(GlobalV::MY_RANK),Cws);
-		ofs_matrixes(test_dir.matrix+"Vws_"+TO_STRING(GlobalV::MY_RANK),Vws);
-		ofs_matrixes(test_dir.matrix+"Cs_"+TO_STRING(GlobalV::MY_RANK),Cs);
-		ofs_matrixes(test_dir.matrix+"Cps_"+TO_STRING(GlobalV::MY_RANK),Cps);
-		ofs_matrixes(test_dir.matrix+"Vs_"+TO_STRING(GlobalV::MY_RANK),Vs);
-		ofs_matrixes(test_dir.matrix+"Vps_"+TO_STRING(GlobalV::MY_RANK),Vps);
+		ofs_matrixes(test_dir.matrix+"Cws_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),Cws);
+		ofs_matrixes(test_dir.matrix+"Vws_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),Vws);
+		ofs_matrixes(test_dir.matrix+"Cs_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),Cs);
+		ofs_matrixes(test_dir.matrix+"Cps_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),Cps);
+		ofs_matrixes(test_dir.matrix+"Vs_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),Vs);
+		ofs_matrixes(test_dir.matrix+"Vps_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),Vps);
 	#elif TEST_EXX_LCAO==-1
 		#error "TEST_EXX_LCAO"
 	#endif
@@ -914,18 +914,18 @@ void Exx_Lcao::cal_exx_elec()
 
 static int istep=0;
 	#if TEST_EXX_LCAO==1
-	//	ofs_matrixes("Cws_"+TO_STRING(istep)+"_before.dat",Cws);
-	//	ofs_matrixes("Vws_"+TO_STRING(istep)+"_before.dat",Vws);
-	//	ofs_matrixes("Cs_"+TO_STRING(istep)+"_before.dat",Cs);
-	//	ofs_matrixes("Vs_"+TO_STRING(istep)+"_before.dat",Vs);
-	//	ofs_matrixes("Vps_"+TO_STRING(istep)+"_before.dat",Vps);
+	//	ofs_matrixes("Cws_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_before.dat",Cws);
+	//	ofs_matrixes("Vws_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_before.dat",Vws);
+	//	ofs_matrixes("Cs_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_before.dat",Cs);
+	//	ofs_matrixes("Vs_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_before.dat",Vs);
+	//	ofs_matrixes("Vps_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_before.dat",Vps);
 	#elif TEST_EXX_LCAO==-1
 		#error "TEST_EXX_LCAO"
 	#endif
 
 //	if( exx_lcao.cal_DM_delta() < exx_lcao.get_DM_threshold() )	break;
 
-std::ofstream ofs_mpi(test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
+std::ofstream ofs_mpi(test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start, t_start_all;
 gettimeofday( &t_start_all, NULL);
 
@@ -971,7 +971,7 @@ ofs_mpi.close();
 
 	auto print_Hexxk = [&]()
 	{
-		std::ofstream ofs("Hexxk_"+TO_STRING(GlobalV::MY_RANK));
+		std::ofstream ofs("Hexxk_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 		for(int ik=0; ik!=Hexx_para.HK_K_m2D.size(); ++ik)
 		{
 			ofs<<"@\t"<<ik<<std::endl;
@@ -981,9 +981,9 @@ ofs_mpi.close();
 	};
 
 	#if TEST_EXX_LCAO==1
-		ofs_matrixes("DMk_"+TO_STRING(istep)+".dat",DM.DMk);
-		ofs_matrixes("DMr_"+TO_STRING(istep)+".dat",DM.DMr);
-		ofs_matrixes("Hexx_"+TO_STRING(istep)+".dat",Hexx);
+		ofs_matrixes("DMk_"+ModuleBase::GlobalFunc::TO_STRING(istep)+".dat",DM.DMk);
+		ofs_matrixes("DMr_"+ModuleBase::GlobalFunc::TO_STRING(istep)+".dat",DM.DMr);
+		ofs_matrixes("Hexx_"+ModuleBase::GlobalFunc::TO_STRING(istep)+".dat",Hexx);
 	#elif TEST_EXX_LCAO==-1
 		#error "TEST_EXX_LCAO"
 	#endif
@@ -1011,12 +1011,12 @@ ofs_mpi.close();
 		}
 		else
 		{
-			throw logic_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+			throw logic_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 			/*
 			static int istep=0;
 			for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 			{
-				std::ofstream ofs("GlobalC::LOC.DM_"+TO_STRING(istep++)+"_"+TO_STRING(is));
+				std::ofstream ofs("GlobalC::LOC.DM_"+ModuleBase::GlobalFunc::TO_STRING(istep++)+"_"+ModuleBase::GlobalFunc::TO_STRING(is));
 				for(int T1=0; T1<GlobalC::ucell.ntype; T1++)
 				{
 					for(int I1=0; I1<GlobalC::ucell.atoms[T1].na; I1++)
@@ -1056,7 +1056,7 @@ ofs_mpi.close();
 		{
 			for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 			{
-				std::ofstream ofs("GlobalC::LOWF.WFC_GAMMA_"+TO_STRING(istep)+"_"+TO_STRING(ik));
+				std::ofstream ofs("GlobalC::LOWF.WFC_GAMMA_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(ik));
 				for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
 				{
 					for( size_t iwt=0; iwt!=GlobalV::NLOCAL; ++iwt )
@@ -1078,7 +1078,7 @@ ofs_mpi.close();
 		{
 			for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 			{
-				std::ofstream ofs("GlobalC::LOWF.WFC_K_"+TO_STRING(istep)+"_"+TO_STRING(ik));
+				std::ofstream ofs("GlobalC::LOWF.WFC_K_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(ik));
 				for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
 				{
 					for( size_t iwt=0; iwt!=GlobalV::NLOCAL; ++iwt )
@@ -1096,7 +1096,7 @@ ofs_mpi.close();
 		{
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{		
-				std::ofstream ofs("Hexx_"+TO_STRING(istep)+"_"+TO_STRING(is)+"_"+TO_STRING(GlobalV::MY_RANK));
+				std::ofstream ofs("Hexx_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(is)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 				ofs<<this->Hexx_para.HK_Gamma_m2D[is]<<std::endl;
 			}
 		}
@@ -1104,7 +1104,7 @@ ofs_mpi.close();
 		{
 			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 			{
-				std::ofstream ofs("Hexx_"+TO_STRING(istep)+"_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK));
+				std::ofstream ofs("Hexx_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(ik)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 				ofs<<this->Hexx_para.HK_K_m2D[ik]<<std::endl;
 			}
 		}
@@ -1116,7 +1116,7 @@ ofs_mpi.close();
 		{
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{		
-				std::ofstream ofs("wfc_"+TO_STRING(istep)+"_"+TO_STRING(is)+"_"+TO_STRING(GlobalV::MY_RANK));
+				std::ofstream ofs("wfc_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(is)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 				ofs<<GlobalC::LOC.wfc_dm_2d.wfc_gamma[is]<<std::endl;
 			}
 		}
@@ -1124,7 +1124,7 @@ ofs_mpi.close();
 		{
 			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 			{
-				std::ofstream ofs("wfc_"+TO_STRING(istep)+"_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK));
+				std::ofstream ofs("wfc_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(ik)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 				ofs<<GlobalC::LOC.wfc_dm_2d.wfc_gamma[ik]<<std::endl;
 			}
 		}
@@ -1134,7 +1134,7 @@ ofs_mpi.close();
 	{
 		for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 		{
-			std::ofstream ofs("ekb_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK), std::ofstream::app);
+			std::ofstream ofs("ekb_"+ModuleBase::GlobalFunc::TO_STRING(ik)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK), std::ofstream::app);
 			for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 				ofs<<GlobalC::wf.ekb[ik][ib]<<"\t";
 			ofs<<std::endl;
@@ -1142,11 +1142,11 @@ ofs_mpi.close();
 	};	
 	
 	#if TEST_EXX_LCAO==1
-	//	ofs_matrixes("Cws_"+TO_STRING(istep)+"_end.dat",Cws);
-	//	ofs_matrixes("Vws_"+TO_STRING(istep)+"_end.dat",Vws);
-	//	ofs_matrixes("Cs_"+TO_STRING(istep)+"_end.dat",Cs);
-	//	ofs_matrixes("Vs_"+TO_STRING(istep)+"_end.dat",Vs);
-	//	ofs_matrixes("Vps_"+TO_STRING(istep)+"_end.dat",Vps);
+	//	ofs_matrixes("Cws_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_end.dat",Cws);
+	//	ofs_matrixes("Vws_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_end.dat",Vws);
+	//	ofs_matrixes("Cs_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_end.dat",Cs);
+	//	ofs_matrixes("Vs_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_end.dat",Vs);
+	//	ofs_matrixes("Vps_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_end.dat",Vps);
 	#elif TEST_EXX_LCAO==-1
 		#error "TEST_EXX_LCAO"
 	#endif
@@ -1212,7 +1212,7 @@ double Exx_Lcao::cal_energy(
 	const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &HexxR ) const
 {
 	TITLE("Exx_Lcao","cal_energy");
-std::ofstream ofs_mpi(test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
+std::ofstream ofs_mpi(test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 gettimeofday( &t_start, NULL);
 
@@ -1228,7 +1228,7 @@ gettimeofday( &t_start, NULL);
 				for( const auto & HC : HB.second )
 				{
 					const Abfs::Vector3_Order<int> & box2 = HC.first;
-					if( const matrix*const DMr_ptr = static_cast<const matrix*const>(MAP_EXIST( DM_para.DMr[is], iat1, iat2, box2 )) )
+					if( const matrix*const DMr_ptr = static_cast<const matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( DM_para.DMr[is], iat1, iat2, box2 )) )
 					{
 						const matrix & H = HC.second;
 						assert(DMr_ptr->nr == H.nr);
@@ -1277,7 +1277,7 @@ void Exx_Lcao::init_radial_table_ions( const std::set<size_t> &atom_centres_core
 {
 	TITLE("Exx_Lcao::init_radial_table_ions");
 	
-std::ofstream ofs_mpi(test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
+std::ofstream ofs_mpi(test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 
 	std::map<size_t,std::map<size_t,std::set<double>>> radial_R;
@@ -1505,7 +1505,7 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 						for( auto & m_tmp3 : m_tmp2.second )
 						{
 							const Abfs::Vector3_Order<int> & box2 = m_tmp3.first;
-							if( matrix*const m_all_ptr = static_cast<matrix*const>(MAP_EXIST( m_all[is], iat1, iat2, box2 )) )
+							if( matrix*const m_all_ptr = static_cast<matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( m_all[is], iat1, iat2, box2 )) )
 							{
 								*m_all_ptr += m_tmp3.second;
 							}
@@ -1600,7 +1600,7 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 									{
 										case 4:
 										{
-											const matrix * const DM_ptr = static_cast<const matrix*const>(MAP_EXIST( DM_para.DMr[is], iat3, iat4, Abfs::Vector3_Order<int>(box2-box3+box4)%Born_von_Karman_period ));
+											const matrix * const DM_ptr = static_cast<const matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( DM_para.DMr[is], iat3, iat4, Abfs::Vector3_Order<int>(box2-box3+box4)%Born_von_Karman_period ));
 											if( DM_ptr )
 											{
 												const matrix DVC_32 = gemm(								// iw3, \mu1*iw2
@@ -1624,12 +1624,12 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 														if(iat1!=iat2)
 														{
 															const matrix Hexx_21 = transpose(Hexx_12);
-															if( matrix * const HexxR_ptr = static_cast<matrix*const>(MAP_EXIST( HexxR_tmp[is], iat2, iat1, Abfs::Vector3_Order<int>(-box2)%Born_von_Karman_period )) )
+															if( matrix * const HexxR_ptr = static_cast<matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat2, iat1, Abfs::Vector3_Order<int>(-box2)%Born_von_Karman_period )) )
 																*HexxR_ptr += Hexx_21;
 															else
 																HexxR_tmp[is][iat2][iat1][Abfs::Vector3_Order<int>(-box2)%Born_von_Karman_period] = std::move(Hexx_21);
 														}
-														if( matrix * const HexxR_ptr = static_cast<matrix*const>(MAP_EXIST( HexxR_tmp[is], iat1, iat2, Abfs::Vector3_Order<int>(box2)%Born_von_Karman_period )) )
+														if( matrix * const HexxR_ptr = static_cast<matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat1, iat2, Abfs::Vector3_Order<int>(box2)%Born_von_Karman_period )) )
 															*HexxR_ptr += Hexx_12;
 														else
 															HexxR_tmp[is][iat1][iat2][Abfs::Vector3_Order<int>(box2)%Born_von_Karman_period] = std::move(Hexx_12);
@@ -1639,7 +1639,7 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 										}	// end case 4
 										case 3:
 										{
-											if( const matrix * const DM_ptr = static_cast<const matrix*const>(MAP_EXIST( DM_para.DMr[is], iat1, iat4, Abfs::Vector3_Order<int>(box2+box4)%Born_von_Karman_period )) )
+											if( const matrix * const DM_ptr = static_cast<const matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( DM_para.DMr[is], iat1, iat4, Abfs::Vector3_Order<int>(box2+box4)%Born_von_Karman_period )) )
 											{
 												const matrix DVC_12 = gemm(								// iw1, \mu1*iw2
 													'N', 'T',
@@ -1662,12 +1662,12 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 														if(iat1!=iat2)
 														{
 															const matrix Hexx_23 = transpose(Hexx_32);
-															if( matrix * const HexxR_ptr = static_cast<matrix*const>(MAP_EXIST( HexxR_tmp[is], iat2, iat3, Abfs::Vector3_Order<int>(-box2+box3)%Born_von_Karman_period )) )
+															if( matrix * const HexxR_ptr = static_cast<matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat2, iat3, Abfs::Vector3_Order<int>(-box2+box3)%Born_von_Karman_period )) )
 																*HexxR_ptr += Hexx_23;
 															else
 																HexxR_tmp[is][iat2][iat3][Abfs::Vector3_Order<int>(-box2+box3)%Born_von_Karman_period] = std::move(Hexx_23);
 														}
-														if( matrix * const HexxR_ptr = static_cast<matrix*const>(MAP_EXIST( HexxR_tmp[is], iat3, iat2, Abfs::Vector3_Order<int>(box2-box3)%Born_von_Karman_period )) )
+														if( matrix * const HexxR_ptr = static_cast<matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat3, iat2, Abfs::Vector3_Order<int>(box2-box3)%Born_von_Karman_period )) )
 															*HexxR_ptr += Hexx_32;
 														else
 															HexxR_tmp[is][iat3][iat2][Abfs::Vector3_Order<int>(box2-box3)%Born_von_Karman_period] = std::move(Hexx_32);
@@ -1677,7 +1677,7 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 										}	// end case 3
 										case 2:
 										{
-											if( const matrix * const DM_ptr = static_cast<const matrix*const>(MAP_EXIST( DM_para.DMr[is], iat3, iat2, Abfs::Vector3_Order<int>(box2-box3)%Born_von_Karman_period )) )
+											if( const matrix * const DM_ptr = static_cast<const matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( DM_para.DMr[is], iat3, iat2, Abfs::Vector3_Order<int>(box2-box3)%Born_von_Karman_period )) )
 											{
 												const matrix DVC_34 = gemm(								// iw3, \mu1*iw4
 													'N', 'N',
@@ -1700,12 +1700,12 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 														if(iat1!=iat2)
 														{
 															const matrix Hexx_41 = transpose(Hexx_14);
-															if( matrix * const HexxR_ptr = static_cast<matrix*const>(MAP_EXIST( HexxR_tmp[is], iat4, iat1, Abfs::Vector3_Order<int>(-box2-box4)%Born_von_Karman_period )) )
+															if( matrix * const HexxR_ptr = static_cast<matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat4, iat1, Abfs::Vector3_Order<int>(-box2-box4)%Born_von_Karman_period )) )
 																*HexxR_ptr += Hexx_41;
 															else
 																HexxR_tmp[is][iat4][iat1][Abfs::Vector3_Order<int>(-box2-box4)%Born_von_Karman_period] = std::move(Hexx_41);
 														}	
-														if( matrix * const HexxR_ptr = static_cast<matrix*const>(MAP_EXIST( HexxR_tmp[is], iat1, iat4, Abfs::Vector3_Order<int>(box2+box4)%Born_von_Karman_period )) )
+														if( matrix * const HexxR_ptr = static_cast<matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat1, iat4, Abfs::Vector3_Order<int>(box2+box4)%Born_von_Karman_period )) )
 															*HexxR_ptr += Hexx_14;
 														else
 															HexxR_tmp[is][iat1][iat4][Abfs::Vector3_Order<int>(box2+box4)%Born_von_Karman_period] = std::move(Hexx_14);
@@ -1715,7 +1715,7 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 										}	// end case 2
 										case 1:
 										{
-											if( const matrix * const DM_ptr = static_cast<const matrix*const>(MAP_EXIST( DM_para.DMr[is], iat1, iat2, Abfs::Vector3_Order<int>(box2)%Born_von_Karman_period )) )
+											if( const matrix * const DM_ptr = static_cast<const matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( DM_para.DMr[is], iat1, iat2, Abfs::Vector3_Order<int>(box2)%Born_von_Karman_period )) )
 											{
 												const matrix DVC_14 = gemm(								// iw1, \mu1*iw4
 													'N', 'N',
@@ -1738,12 +1738,12 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 														if(iat1!=iat2)
 														{
 															const matrix Hexx_43 = transpose(Hexx_34);
-															if( matrix * const HexxR_ptr = static_cast<matrix*const>(MAP_EXIST( HexxR_tmp[is], iat4, iat3, Abfs::Vector3_Order<int>(-box2+box3-box4)%Born_von_Karman_period )) )
+															if( matrix * const HexxR_ptr = static_cast<matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat4, iat3, Abfs::Vector3_Order<int>(-box2+box3-box4)%Born_von_Karman_period )) )
 																*HexxR_ptr += Hexx_43;
 															else
 																HexxR_tmp[is][iat4][iat3][Abfs::Vector3_Order<int>(-box2+box3-box4)%Born_von_Karman_period] = std::move(Hexx_43);
 														}	
-														if( matrix * const HexxR_ptr = static_cast<matrix*const>(MAP_EXIST( HexxR_tmp[is], iat3, iat4, Abfs::Vector3_Order<int>(box2-box3+box4)%Born_von_Karman_period )) )
+														if( matrix * const HexxR_ptr = static_cast<matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat3, iat4, Abfs::Vector3_Order<int>(box2-box3+box4)%Born_von_Karman_period )) )
 															*HexxR_ptr += Hexx_34;
 														else
 															HexxR_tmp[is][iat3][iat4][Abfs::Vector3_Order<int>(box2-box3+box4)%Born_von_Karman_period] = std::move(Hexx_34);

@@ -472,7 +472,7 @@ test_ratio();
 	std::function< void( matrix &, const matrix & ) >
 		minus_matrix = []( matrix &mA, const matrix &mB ){ mA-=mB; };
 	// ms_lcaos2_lcaos2 -= ms_lcaos2_lcaos2_proj_asa
-	FUNC_EACH_2( ms_lcaos2_lcaos2, ms_lcaos2_lcaos2_proj_abfs, minus_matrix );
+	ModuleBase::GlobalFunc::FUNC_EACH_2( ms_lcaos2_lcaos2, ms_lcaos2_lcaos2_proj_abfs, minus_matrix );
 
 ofs_ms("ms_lcaos2_lcaos2_new",ms_lcaos2_lcaos2);
 
@@ -565,7 +565,7 @@ std::cout<<"D"<<std::endl;
 			}
 		}
 		ofs.close();
-		WARNING_QUIT( TO_STRING(__FILE__), TO_STRING(__LINE__) );
+		WARNING_QUIT( ModuleBase::GlobalFunc::TO_STRING(__FILE__), ModuleBase::GlobalFunc::TO_STRING(__LINE__) );
 	};
 
 	// Peize Lin test
@@ -598,7 +598,7 @@ std::cout<<"D"<<std::endl;
 			}
 		}
 		ofs.close();
-		WARNING_QUIT( TO_STRING(__FILE__), "line "+TO_STRING(__LINE__) );
+		WARNING_QUIT( ModuleBase::GlobalFunc::TO_STRING(__FILE__), "line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__) );
 	};
 
 	// Peize Lin test

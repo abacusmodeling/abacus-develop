@@ -52,7 +52,7 @@ void Exx_Abfs::DM::cal_DMk_mixing(
 		}
 		else if ( charge.mixing_mode == "kerker" )
 		{
-			throw std::invalid_argument("mixing density matrix can't be kerker. In "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::invalid_argument("mixing density matrix can't be kerker. In "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 		else if ( charge.mixing_mode == "pulay" )
 		{
@@ -60,11 +60,11 @@ void Exx_Abfs::DM::cal_DMk_mixing(
 		}
 		else if ( charge.mixing_mode == "pulay-kerker" )
 		{
-			throw std::invalid_argument("mixing density matrix can't be pulay-kerker. In "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::invalid_argument("mixing density matrix can't be pulay-kerker. In "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 		else
 		{
-			throw std::invalid_argument("mixing density matrix error. In "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::invalid_argument("mixing density matrix error. In "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 	}
 	else
@@ -74,7 +74,7 @@ void Exx_Abfs::DM::cal_DMk_mixing(
 
 		#if TEST_EXX_LCAO==1
 			static int istep=0;
-			ofs_matrixes("DMk_"+TO_STRING(istep++)+".dat(@Exx_Abfs::DM::cal_DMk_mixing)",DMk);
+			ofs_matrixes("DMk_"+ModuleBase::GlobalFunc::TO_STRING(istep++)+".dat(@Exx_Abfs::DM::cal_DMk_mixing)",DMk);
 		#elif TEST_EXX_LCAO==-1
 			#error
 		#endif
@@ -135,7 +135,7 @@ std::map<size_t,std::map<size_t,std::vector<ModuleBase::ComplexMatrix>>> Exx_Abf
 	
 	#if TEST_EXX_LCAO==1
 		static int istep=0;
-		ofs_matrixes("DMk_raw_"+TO_STRING(istep++)+".dat(@Exx_Abfs::DM::cal_DMk_raw)",DMk_raw);
+		ofs_matrixes("DMk_raw_"+ModuleBase::GlobalFunc::TO_STRING(istep++)+".dat(@Exx_Abfs::DM::cal_DMk_raw)",DMk_raw);
 	#elif TEST_EXX_LCAO==-1
 		#error
 	#endif
@@ -216,7 +216,7 @@ void Exx_Abfs::DM::pulay_mixing(
 //	{
 //		static int istep=0;
 //		for( size_t i=0; i!=DMk_pulay_seq.size(); ++i )
-//			ofs_matrixes( "DMk_pulay_seq_"+TO_STRING(istep)+"_"+TO_STRING(i), DMk_pulay_seq[i] );
+//			ofs_matrixes( "DMk_pulay_seq_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(i), DMk_pulay_seq[i] );
 //		++istep;
 //	}
 	#elif TEST_EXX_LCAO==-1

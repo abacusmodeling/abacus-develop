@@ -31,7 +31,7 @@ void Run_MD_CLASSIC::classic_md_line(void)
 {
 	// Setup the unitcell.
     ucell_c.setup_cell_classic(GlobalV::global_atom_card, GlobalV::ofs_running, GlobalV::ofs_warning);
-	DONE(GlobalV::ofs_running, "SETUP UNITCELL");
+	ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
 	//Print_Info PI;
     //PI.setup_parameters();
@@ -149,10 +149,10 @@ void Run_MD_CLASSIC::md_allocate_ions(void)
 	this->pos_next = new double[pos_dim];
 	this->force = new Vector3<double>[ucell_c.nat];
 
-	ZEROS(pos_old1, pos_dim);
-	ZEROS(pos_old2, pos_dim);
-	ZEROS(pos_now, pos_dim);
-	ZEROS(pos_next, pos_dim);
+	ModuleBase::GlobalFunc::ZEROS(pos_old1, pos_dim);
+	ModuleBase::GlobalFunc::ZEROS(pos_old2, pos_dim);
+	ModuleBase::GlobalFunc::ZEROS(pos_now, pos_dim);
+	ModuleBase::GlobalFunc::ZEROS(pos_next, pos_dim);
 }
 
 void Run_MD_CLASSIC::update_pos_classic(void)

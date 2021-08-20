@@ -69,7 +69,7 @@ void Diago_David::diag
 
     int nbase = 0;						// the dimension of the reduced basis set
     notconv = nband;					// the number of the unconvergent bands
-    ZEROS( convflag, nband );
+    ModuleBase::GlobalFunc::ZEROS( convflag, nband );
     for ( int m = 0 ; m < nband; m++ ) unconv[m] = m;
 
     timer::tick("Diago_David","first");
@@ -236,7 +236,7 @@ void Diago_David::cal_grad
     // we define |R(psi)> as (H-ES)*|Psi>, E = <psi|H|psi>/<psi|S|psi>
     for ( int m = 0; m < notconv; m++ )
     {
-        ZEROS( respsi, npw );
+        ModuleBase::GlobalFunc::ZEROS( respsi, npw );
         for ( int i = 0; i < nbase; i++ )
         {
             for ( int ig = 0; ig < npw; ig++ )
@@ -289,8 +289,8 @@ void Diago_David::cal_elem
     // updat the reduced Hamiltonian
     int offset_h = nbase * hc.nr ;
     int offset_s = nbase * sc.nr ;
-//	ZEROS( hc.c+offset_h, notconv*hc.nr );
-//	ZEROS( sc.c+offset_s, notconv*sc.nr );
+//	ModuleBase::GlobalFunc::ZEROS( hc.c+offset_h, notconv*hc.nr );
+//	ModuleBase::GlobalFunc::ZEROS( sc.c+offset_s, notconv*sc.nr );
 
     for ( int i = nbase; i < nbase+notconv; i++ )
     {
@@ -377,10 +377,10 @@ void Diago_David::diag_zhegvx
     assert(iwork != 0);
     int *ifail = new int[n];
     assert(ifail != 0);
-    ZEROS(work,lwork); //qianrui change it, only first lwork numbers are used in zhegvx
-    ZEROS(rwork,7*n);
-    ZEROS(iwork,5*n);
-    ZEROS(ifail,n);
+    ModuleBase::GlobalFunc::ZEROS(work,lwork); //qianrui change it, only first lwork numbers are used in zhegvx
+    ModuleBase::GlobalFunc::ZEROS(rwork,7*n);
+    ModuleBase::GlobalFunc::ZEROS(iwork,5*n);
+    ModuleBase::GlobalFunc::ZEROS(ifail,n);
 
 	//WARNING_QUIT("divid","open zhegvx!");
 	
@@ -484,7 +484,7 @@ void Diago_David::cal_err
 
     for ( int m = 0; m < nband; m++ )
     {
-        ZEROS( respsi, npw );
+        ModuleBase::GlobalFunc::ZEROS( respsi, npw );
         for ( int j = 0; j < nbase; j++ )
         {
             for ( int ig=0; ig<npw; ig++ )
@@ -535,7 +535,7 @@ void Diago_David::SchmitOrth
     GlobalC::hm.hpw.s_1psi(npw, psi_m, spsi);
 
     std::complex<double>* lagrange = new std::complex<double>[m+1];
-    ZEROS( lagrange, m+1 );
+    ModuleBase::GlobalFunc::ZEROS( lagrange, m+1 );
 
     for (int j = 0; j < m; j++)
     {

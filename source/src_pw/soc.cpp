@@ -94,7 +94,7 @@ void Soc::rot_ylm(const int lmax)
 	l2plus1_ = 2 * l_max_ + 1;
 	delete[] p_rot;
 	this->p_rot = new std::complex<double> [l2plus1_ * l2plus1_];
-	ZEROS(p_rot, l2plus1_ * l2plus1_);
+	ModuleBase::GlobalFunc::ZEROS(p_rot, l2plus1_ * l2plus1_);
 	this->p_rot[l_max_] = std::complex<double>(1.0, 0.0);
 
 	l = l_max_;

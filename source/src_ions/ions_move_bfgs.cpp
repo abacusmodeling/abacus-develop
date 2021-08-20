@@ -101,7 +101,7 @@ void Ions_Move_BFGS::restart_bfgs(void)
 		
 		if(GlobalV::test_ion_dynamics)
 		{
-			OUT(GlobalV::ofs_running,"trust_radius_old (bohr)",trust_radius_old);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"trust_radius_old (bohr)",trust_radius_old);
 		}
 
 		// (2)
@@ -118,9 +118,9 @@ void Ions_Move_BFGS::restart_bfgs(void)
 	else
 	{
 		//	bfgs initialization
-		ZEROS(pos_p, dim);
-		ZEROS(grad_p, dim);
-		ZEROS(move_p, dim);
+		ModuleBase::GlobalFunc::ZEROS(pos_p, dim);
+		ModuleBase::GlobalFunc::ZEROS(grad_p, dim);
+		ModuleBase::GlobalFunc::ZEROS(move_p, dim);
 		
 		Ions_Move_Basic::update_iter = 0;
 
@@ -217,9 +217,9 @@ void Ions_Move_BFGS::bfgs_routine(void)
 			
 			if(GlobalV::test_ion_dynamics)
 			{
-				OUT(GlobalV::ofs_running,"dE0s",dE0s);
-				OUT(GlobalV::ofs_running,"den",den);
-				OUT(GlobalV::ofs_running,"interpolated trust radius",trust_radius);
+				ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"dE0s",dE0s);
+				ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"den",den);
+				ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"interpolated trust radius",trust_radius);
 			}
 			//std::cout << " Formula : " << etot << " * s^2 + " << dE0s << " * s + " << etot_p << std::endl;
 			//std::cout << " Lowest point : " << trust_radius << std::endl;
@@ -290,8 +290,8 @@ void Ions_Move_BFGS::bfgs_routine(void)
 		std::cout << " BFGS TRUST (Bohr)    : " << trust_radius << std::endl;
 	}
 	
-	OUT(GlobalV::ofs_running,"istep",Ions_Move_Basic::istep);
-	OUT(GlobalV::ofs_running,"update iteration",Ions_Move_Basic::update_iter);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"istep",Ions_Move_Basic::istep);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"update iteration",Ions_Move_Basic::update_iter);
 	
 	//combine the direction and move length now			
 	double norm = dot_func( this->move, this->move, dim);
