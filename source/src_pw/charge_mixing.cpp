@@ -7,7 +7,7 @@ Charge_Mixing::~Charge_Mixing(){}
 
 void Charge_Mixing::set_mixing
 (
-    const string &mixing_mode_in,
+    const std::string &mixing_mode_in,
     const double &mixing_beta_in,
     const int &mixing_ndim_in,
 	const double &mixing_gg0_in
@@ -28,7 +28,7 @@ void Charge_Mixing::set_mixing
 
     
 // Fourier transform of rho(g) to rho(r) in real space.
-void Charge_Mixing::set_rhor(complex<double> *rhog, double *rho)const
+void Charge_Mixing::set_rhor(std::complex<double> *rhog, double *rho)const
 {
     if (GlobalV::test_charge)TITLE("Charge_Mixing","set_rhor");
     for (int is=0; is < GlobalV::NSPIN; is++)
@@ -39,7 +39,7 @@ void Charge_Mixing::set_rhor(complex<double> *rhog, double *rho)const
 }
 
 
-void Charge_Mixing::set_rhog(const double *rho_in, complex<double> *rhog_in)const
+void Charge_Mixing::set_rhog(const double *rho_in, std::complex<double> *rhog_in)const
 {
     if (GlobalV::test_charge)TITLE("Charge_Mixing","set_rhog");
 	GlobalC::UFFT.ToReciSpace(rho_in, rhog_in);
@@ -69,7 +69,7 @@ void Charge_Mixing::plain_mixing( double *rho, double *rho_save_in ) const
 	if(this->mixing_gg0 > 0.0)
 	{
 		double* Rrho = new double[GlobalC::pw.nrxx];
-		complex<double> *kerpulay = new complex<double>[GlobalC::pw.ngmc];
+		std::complex<double> *kerpulay = new std::complex<double>[GlobalC::pw.ngmc];
 		double* kerpulayR = new double[GlobalC::pw.nrxx];
 
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
@@ -116,17 +116,17 @@ void Charge_Mixing::plain_mixing( double *rho, double *rho_save_in ) const
 }
 
 
-void Charge_Mixing::Kerker_mixing( double *rho, const complex<double> *residual_g, double *rho_save)
+void Charge_Mixing::Kerker_mixing( double *rho, const std::complex<double> *residual_g, double *rho_save)
 {
 //  TITLE("Charge_Mixing","Kerker");
     timer::tick("Charge_Mixing","Kerker");
 
-//	cout << " here is Kerker" << endl;
+//	std::cout << " here is Kerker" << std::endl;
 //	this->check_ne(rho);
 //	this->check_ne(rho_save);
 
     // (1) do kerker mixing in reciprocal space.
-    complex<double> *rhog = new complex<double>[GlobalC::pw.ngmc];
+    std::complex<double> *rhog = new std::complex<double>[GlobalC::pw.ngmc];
     ZEROS(rhog, GlobalC::pw.ngmc);
 
 	// mohan modify 2010-02-03, rhog should store the old
@@ -172,8 +172,8 @@ void Charge_Mixing::Kerker_mixing( double *rho, const complex<double> *residual_
 
 
 double Charge_Mixing::rhog_dot_product(
-	const complex<double>*const*const rhog1,
-	const complex<double>*const*const rhog2
+	const std::complex<double>*const*const rhog1,
+	const std::complex<double>*const*const rhog2
 ) const
 {
     TITLE("Charge_Mixing","rhog_dot_product");
@@ -231,7 +231,7 @@ double Charge_Mixing::rhog_dot_product(
 				mag *= 2.0;
 			}
 
-			//cout << " sum=" << sum << " mag=" << mag << endl;
+			//std::cout << " sum=" << sum << " mag=" << mag << std::endl;
 			sum2 += mag;
 			sum += sum2;
 			break;

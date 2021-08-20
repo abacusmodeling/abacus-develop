@@ -48,22 +48,22 @@ class Numerical_Basis
 	static matrix cal_ylm(const std::vector<Vector3<double>> &gk);
 	
 	static void output_info(
-		ofstream &ofs,
+		std::ofstream &ofs,
 		const Bessel_Basis &bessel_basis);
 
-	static void output_k(ofstream &ofs);
+	static void output_k(std::ofstream &ofs);
 
 	static void output_overlap_Q(
-		ofstream &ofs,
+		std::ofstream &ofs,
 		const std::vector<ComplexArray> &overlap_Q);
 
 	static void output_overlap_Sq(
-		const string &name,
-		ofstream &ofs, 
+		const std::string &name,
+		std::ofstream &ofs, 
 		const std::vector<ComplexArray> &overlap_Sq);
 
 	static void output_overlap_V(
-		ofstream &ofs,
+		std::ofstream &ofs,
 		const matrix &overlap_V);
 
 };

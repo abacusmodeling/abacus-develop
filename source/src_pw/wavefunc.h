@@ -24,7 +24,7 @@ class wavefunc : public WF_atomic
     matrix wg;
 
     // start_wfc : "random",or "atomic" or "file"
-    string start_wfc;
+    std::string start_wfc;
 	int mem_saver; //1: save evc when doing nscf calculation.
     void wfcinit(void);// from wfcinit.f90
     void wfcinit_k();

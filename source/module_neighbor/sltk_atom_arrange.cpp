@@ -15,8 +15,8 @@ atom_arrange::~atom_arrange()
 }
 
 double atom_arrange::set_sr_NL(
-	ofstream &ofs_in,
-	string &output_level,
+	std::ofstream &ofs_in,
+	std::string &output_level,
 	const double &rcutmax_Phi, 
 	const double &rcutmax_Beta, 
 	const bool gamma_only_local)
@@ -26,25 +26,25 @@ double atom_arrange::set_sr_NL(
 	if(output_level != "m") //xiaohui add 'output_level', 2015-09-16
 	{
 		ofs_in << "\n\n\n\n";
-		ofs_in << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
-		ofs_in << " |                                                                    |" << endl;
-		ofs_in << " | Search adjacent atoms:                                             |" << endl;
-		ofs_in << " | Set the adjacent atoms for each atom and set the periodic boundary |" << endl;
-		ofs_in << " | condition for the atoms on real space FFT grid. For k-dependent    |" << endl;  
-		ofs_in << " | algorithm, we also need to set the sparse H and S matrix element   |" << endl;
-		ofs_in << " | for each atom.                                                     |" << endl; 
-		ofs_in << " |                                                                    |" << endl;
-		ofs_in << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+		ofs_in << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
+		ofs_in << " |                                                                    |" << std::endl;
+		ofs_in << " | Search adjacent atoms:                                             |" << std::endl;
+		ofs_in << " | Set the adjacent atoms for each atom and set the periodic boundary |" << std::endl;
+		ofs_in << " | condition for the atoms on real space FFT grid. For k-dependent    |" << std::endl;  
+		ofs_in << " | algorithm, we also need to set the sparse H and S matrix element   |" << std::endl;
+		ofs_in << " | for each atom.                                                     |" << std::endl; 
+		ofs_in << " |                                                                    |" << std::endl;
+		ofs_in << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
 		ofs_in << "\n\n\n\n";
 	}
 
 	
 	//xiaohui add 'output_level' line, 2015-09-16
-	if(output_level != "m") ofs_in << "\n SETUP SEARCHING RADIUS FOR PROGRAM TO SEARCH ADJACENT ATOMS" << endl;
-	if(output_level != "m") ofs_in << setprecision(3);
+	if(output_level != "m") ofs_in << "\n SETUP SEARCHING RADIUS FOR PROGRAM TO SEARCH ADJACENT ATOMS" << std::endl;
+	if(output_level != "m") ofs_in << std::setprecision(3);
 	if(output_level != "m") OUT(ofs_in,"longest orb rcut (Bohr)",rcutmax_Phi);
 
-//	cout << " LONGEST NL PROJ RCUT : " << longest_nl_proj_rcut << endl;
+//	std::cout << " LONGEST NL PROJ RCUT : " << longest_nl_proj_rcut << std::endl;
 	if(output_level != "m") OUT(ofs_in,"longest nonlocal projector rcut (Bohr)", rcutmax_Beta);
 
 	// check in use_overlap_matrix, 
@@ -62,7 +62,7 @@ double atom_arrange::set_sr_NL(
 	// if use build_Nonlocal_mu (not GlobalV::GAMMA_ONLY_LOCAL) use 2*longest_orb_rcut
 	// if use build_Nonlocal_beta ( K-point used ) use 2 * (longest_orb_rcut + longest_nl_proj_rcut) 
 	return sr;			
-//	cout << " SEARCH RADIUS (BOHR) : " << GlobalV::SEARCH_RADIUS << endl;
+//	std::cout << " SEARCH RADIUS (BOHR) : " << GlobalV::SEARCH_RADIUS << std::endl;
 //	OUT(ofs_in,"search radius (Bohr)", GlobalV::SEARCH_RADIUS);
 }
 /*
@@ -75,20 +75,20 @@ void atom_arrange::set_sr_OV(void)
 	{
 		longest_orb_rcut = std::max(longest_orb_rcut, ORB.Phi[it].getRcut() );	
 	}
-//	cout << " LONGEST ORB RCUT     : " << longest_orb_rcut << endl;
+//	std::cout << " LONGEST ORB RCUT     : " << longest_orb_rcut << std::endl;
 	OUT(ofs_in,"longest orb rcut (Bohr)",longest_orb_rcut);
 	double sr = 2 * longest_orb_rcut + 0.01;
 	// if use build_Nonlocal_mu (not GlobalV::GAMMA_ONLY_LOCAL) use 2*longest_orb_rcut
 	// if use build_Nonlocal_beta ( K-point used ) use 2 * (longest_orb_rcut + longest_nl_proj_rcut) 
 	GlobalV::SEARCH_RADIUS = sr;			
-//	cout << " SEARCH RADIUS (BOHR) : " << GlobalV::SEARCH_RADIUS << endl;
+//	std::cout << " SEARCH RADIUS (BOHR) : " << GlobalV::SEARCH_RADIUS << std::endl;
 	return;
 }
 */
 
 void atom_arrange::search(
 	const bool pbc_flag,
-	ofstream &ofs_in,
+	std::ofstream &ofs_in,
 	Grid_Driver &grid_d, 
 	const UnitCell &ucell, 
 	const double &search_radius_bohr, 
@@ -128,7 +128,7 @@ void atom_arrange::search(
 	//===========================================
 	// Print important information in Atom_input
 	//===========================================
-//	at.print(cout);
+//	at.print(std::cout);
 //	at.print_xyz_format("1.xyz");
 	//=========================================
 	// Construct Grid , Cells , Adjacent atoms
@@ -138,25 +138,25 @@ void atom_arrange::search(
 	// test the adjacent atoms and the box.
 	if(test_only)
 	{
-		ofs_in << " " << setw(5) << "Type" << setw(5) << "Atom" << setw(8) << "AdjNum" << endl;
+		ofs_in << " " << std::setw(5) << "Type" << std::setw(5) << "Atom" << std::setw(8) << "AdjNum" << std::endl;
 		for (int it = 0;it < ucell.ntype;it++)
 		{
 			for (int ia = 0;ia < ucell.atoms[it].na;ia++)
 			{
 				grid_d.Find_atom(ucell, ucell.atoms[it].tau[ia], it, ia);
 				
-				ofs_in << " " << setw(5) << it << setw(5) << ia << setw(8) << grid_d.getAdjacentNum()+1 << endl;
+				ofs_in << " " << std::setw(5) << it << std::setw(5) << ia << std::setw(8) << grid_d.getAdjacentNum()+1 << std::endl;
 				
 				for(int ad=0; ad < grid_d.getAdjacentNum()+1; ad++)
 				{
 					Vector3<double> tau = grid_d.getAdjacentTau(ad);
 					Vector3<int> box = grid_d.getBox(ad);
-					cout << setw(15) << tau.x << " " << setw(15) << tau.y << " " << setw(15) << tau.z << " " 
-					<< setw(8) << box.x << setw(8) << box.y << setw(8) << box.z << endl;
+					std::cout << std::setw(15) << tau.x << " " << std::setw(15) << tau.y << " " << std::setw(15) << tau.z << " " 
+					<< std::setw(8) << box.x << std::setw(8) << box.y << std::setw(8) << box.z << std::endl;
 				}
 			}
 		}
-		ofs_in << "search neighboring atoms done." << endl;
+		ofs_in << "search neighboring atoms done." << std::endl;
 		exit(0);//just test neighboring searching!
 	}
 	
@@ -167,7 +167,7 @@ void atom_arrange::search(
 
 //2015-05-07
 void atom_arrange::delete_vector(
-	ofstream &ofs_in,
+	std::ofstream &ofs_in,
 	const bool pbc_flag, // GlobalV::SEARCH_PBC
 	Grid_Driver &grid_d, 
 	const UnitCell &ucell, 

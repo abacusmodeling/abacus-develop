@@ -33,9 +33,9 @@ void Integral::Simpson_Integral
     //	routine assumes that mesh is an odd number so run check
     if (mesh % 2 == 0)
     {
-        cout << "\n error in subroutine simpson ";
-        cout << "\n routine assumes mesh is odd but mesh = "
-             << mesh << endl;
+        std::cout << "\n error in subroutine simpson ";
+        std::cout << "\n routine assumes mesh is odd but mesh = "
+             << mesh << std::endl;
         return;
     }
 

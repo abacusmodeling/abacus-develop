@@ -51,10 +51,10 @@ public:
 private:
 
 	mutable int adj_num;
-	vector<int> ntype;
-	vector<int> natom;
-	vector<Vector3<double>> adjacent_tau;
-	vector<Vector3<int>> box;
+	std::vector<int> ntype;
+	std::vector<int> natom;
+	std::vector<Vector3<double>> adjacent_tau;
+	std::vector<Vector3<int>> box;
 
 	const int test_deconstructor;//caoyu reconst 2021-05-24
 	const int test_grid_driver;	//caoyu reconst 2021-05-24

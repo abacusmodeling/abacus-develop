@@ -15,11 +15,11 @@ FFT::FFT()
 	this->nxx = 0;
 	this->scale_xyz = 1;
 	this->FFTWsetupwasdone = 0;//mohan modify 2007-11-12
-	this->aux4plan = new complex<double>[1];
+	this->aux4plan = new std::complex<double>[1];
 
 #ifdef __MPI
 	this->plane = new int[1];
-	this->aux = new complex<double>[1];
+	this->aux = new std::complex<double>[1];
 	
 	
 	this->sentc = new int[1];
@@ -50,19 +50,19 @@ FFT::~FFT()
 #endif
 }
 
-void FFT::FFT3D(complex<double> *psi,const int sign)
+void FFT::FFT3D(std::complex<double> *psi,const int sign)
 {
 	/*
-	cout << "\n\n do fft3d()  "; // << psi[0] << endl;
-	cout << "psi size = " << sizeof(psi) << " " << sizeof( psi[0] ) ;
-	cout.setf(ios::right);
-	cout.setf(ios::scientific);
-	cout.precision(15);
-	cout << "\n before FFTW, dim: " << plan_nx <<"*"<< plan_ny <<"*"<< plan_nz <<"="<< plan_nx*plan_ny*plan_nz  << "|" << this->nxx << endl;
-	for(int i=0; i<3 ; i++) cout<<"\n"<<setw(25)<<psi[i].real()<<setw(25)<<psi[i].imag();
-	cout << "\n ... " ;
-	for(int i=nxx-3; i<(nxx) ; i++) cout<<"\n"<<setw(25)<<psi[i].real()<<setw(25)<<psi[i].imag();
-	cout << endl;
+	std::cout << "\n\n do fft3d()  "; // << psi[0] << std::endl;
+	std::cout << "psi size = " << sizeof(psi) << " " << sizeof( psi[0] ) ;
+	std::cout.setf(ios::right);
+	std::cout.setf(ios::scientific);
+	std::cout.precision(15);
+	std::cout << "\n before FFTW, dim: " << plan_nx <<"*"<< plan_ny <<"*"<< plan_nz <<"="<< plan_nx*plan_ny*plan_nz  << "|" << this->nxx << std::endl;
+	for(int i=0; i<3 ; i++) std::cout<<"\n"<<std::setw(25)<<psi[i].real()<<std::setw(25)<<psi[i].imag();
+	std::cout << "\n ... " ;
+	for(int i=nxx-3; i<(nxx) ; i++) std::cout<<"\n"<<std::setw(25)<<psi[i].real()<<std::setw(25)<<psi[i].imag();
+	std::cout << std::endl;
 	*/
 
 	timer::tick("FFT","FFT3D");
@@ -77,11 +77,11 @@ void FFT::FFT3D(complex<double> *psi,const int sign)
 	timer::tick("FFT","FFT3D");
 
 	/*
-	cout << "\n\n after FFTW:  \n ";
-	for(int i=0; i<3 ; i++) 			cout<<"\n"<<setw(25)<<psi[i].real()<<setw(25)<<psi[i].imag();
-	cout << "\n ... " ;
-	for(int i=nxx-3; i<(nxx) ; i++)  cout<<"\n"<<setw(25)<<psi[i].real()<<setw(25)<<psi[i].imag();
-	cout << "\n ---------------------- :FFT3D sign: " << sign << endl;
+	std::cout << "\n\n after FFTW:  \n ";
+	for(int i=0; i<3 ; i++) 			std::cout<<"\n"<<std::setw(25)<<psi[i].real()<<std::setw(25)<<psi[i].imag();
+	std::cout << "\n ... " ;
+	for(int i=nxx-3; i<(nxx) ; i++)  std::cout<<"\n"<<std::setw(25)<<psi[i].real()<<std::setw(25)<<psi[i].imag();
+	std::cout << "\n ---------------------- :FFT3D sign: " << sign << std::endl;
 	sleep(5);
 	*/
 
@@ -91,12 +91,12 @@ void FFT::FFT3D(complex<double> *psi,const int sign)
 /*
 void  FFT::FFT3D(double *psi, const int sign)
 {
-//    cout << "\n do nothing in fft3d() ";
+//    std::cout << "\n do nothing in fft3d() ";
 }
 
 void FFT::FFT3D(matrix &psi, const int sign)
 {
-//    cout << "\n do nothing in fft3d() ";
+//    std::cout << "\n do nothing in fft3d() ";
 }
 */
 
@@ -135,14 +135,14 @@ void FFT::setupFFT3D_2()
 #elif defined __FFTW3
 
 	delete[] aux4plan; 
-	this->aux4plan = new complex<double>[this->nxx];
+	this->aux4plan = new std::complex<double>[this->nxx];
 
 	//fftw_complex *psiout;
 	//psiout = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * this->nxx );
 	//std::complex<double>* psiout = new std::complex<double>[this->nxx];
 	//fftw_complex *psi2 = reinterpret_cast<fftw_complex*>(psi);
 	
-	//cout << "\n sign =  1, K->R space \n" ;
+	//std::cout << "\n sign =  1, K->R space \n" ;
 	this->plus_plan  = fftw_plan_dft_3d
 	(
 	//this->plan_nx,this->plan_ny,this->plan_nz, reinterpret_cast<fftw_complex*>(psi),  psiout,
@@ -150,7 +150,7 @@ void FFT::setupFFT3D_2()
 		this->plan_nx,this->plan_ny,this->plan_nz, reinterpret_cast<fftw_complex*>(aux4plan), reinterpret_cast<fftw_complex*>(aux4plan),
 		FFTW_BACKWARD, FFTW_ESTIMATE // FFTW_ESTIMATE //FFTW_MEASURE
 	);
-	//cout << "\n sign = -1, R->K space \n";
+	//std::cout << "\n sign = -1, R->K space \n";
 	this->minus_plan = fftw_plan_dft_3d
 	(
 		this->plan_nx,this->plan_ny,this->plan_nz, reinterpret_cast<fftw_complex*>(aux4plan), reinterpret_cast<fftw_complex*>(aux4plan),
@@ -161,7 +161,7 @@ void FFT::setupFFT3D_2()
 
 	if (!this->plus_plan || !this->minus_plan)
 	{
-		cout << "\nCan't create plans for FFTW in setupFFT3D()\n\n";
+		std::cout << "\nCan't create plans for FFTW in setupFFT3D()\n\n";
 	}
 	this->FFTWsetupwasdone = true;
 
@@ -170,7 +170,7 @@ void FFT::setupFFT3D_2()
 	return;
 }
 
-void FFT::SFFT3D(complex<double> *psi, const int sign)
+void FFT::SFFT3D(std::complex<double> *psi, const int sign)
 {
 	if(!FFTWsetupwasdone) 
 	{
@@ -239,10 +239,10 @@ void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nx
 	}
 
 	/*
-	cout << "\n nx = " << this->plan_nx;
-	cout << "\n ny = " << this->plan_ny;
-	cout << "\n nz = " << this->plan_nz;
-	cout << "\n nxx = " << this->nxx;
+	std::cout << "\n nx = " << this->plan_nx;
+	std::cout << "\n ny = " << this->plan_ny;
+	std::cout << "\n nz = " << this->plan_nz;
+	std::cout << "\n nxx = " << this->nxx;
 	*/
 
 	delete[] plane;
@@ -275,7 +275,7 @@ void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nx
 	*/
 
 	delete[] aux;
-	this->aux = new complex<double>[this->nxx];
+	this->aux = new std::complex<double>[this->nxx];
 
 	delete[] sentc;
 	delete[] sdis;
@@ -325,14 +325,14 @@ void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nx
 	int npy = np * this->plan_ny;
 	int ns = this->nst_per[rank_use];
 	/*
-	cout << " rank_use = " << rank_use << "\n";
-	cout << " ns  = " << ns  << "\n";
-	cout << " np  = " << np  << "\n";
-	cout << " npy = " << npy << "\n";
+	std::cout << " rank_use = " << rank_use << "\n";
+	std::cout << " ns  = " << ns  << "\n";
+	std::cout << " np  = " << np  << "\n";
+	std::cout << " npy = " << npy << "\n";
 	*/
 
 	delete[] aux4plan; 
-	this->aux4plan = new complex<double>[this->nxx];
+	this->aux4plan = new std::complex<double>[this->nxx];
 
 	//		                             (rank, *n,			howmany, *in,				  			  *inembed, istride, idist,
 	this->planplus_x  = fftw_plan_many_dft(  1, &plan_nx,	npy,	 (fftw_complex *)aux4plan, 		  &plan_nx, npy,     1,
@@ -388,7 +388,7 @@ void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nx
 
 	if (!planplus_x ||!planplus_y ||!planplus_z || !planminus_x || !planminus_y|| !planminus_z )
 	{
-		cout << "\nCan't create plans for FFTW in setupFFT3D()\n\n";
+		std::cout << "\nCan't create plans for FFTW in setupFFT3D()\n\n";
 		QUIT();
 	}
 
@@ -396,12 +396,12 @@ void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nx
 
 	//timer::tick("FFT","Setup_MPI_FFT3D");
 
-	if(GlobalV::test_fft)cout << "\n FFTW setup done";
+	if(GlobalV::test_fft)std::cout << "\n FFTW setup done";
 	return;
 }
 
 // parallel 3D FFT.
-void FFT::P3DFFT(complex<double> *psi, const int sign)
+void FFT::P3DFFT(std::complex<double> *psi, const int sign)
 {
 	
 	//timer::tick("FFT","P3DFFT_Init");
@@ -477,7 +477,7 @@ void FFT::P3DFFT(complex<double> *psi, const int sign)
 	return;
 }
 
-void FFT::fftxy(complex<double> *psi, const int sign)
+void FFT::fftxy(std::complex<double> *psi, const int sign)
 {
 	//timer::tick("FFT","fftxy");
 
@@ -490,9 +490,9 @@ void FFT::fftxy(complex<double> *psi, const int sign)
 	if (sign == 1)
 	{
 
-		//cout << "np+  = " << np << endl;
-		//cout << "npy+ = " << npy << endl;
-		//cout << "plan_nx+ = " << plan_nx << endl;
+		//std::cout << "np+  = " << np << std::endl;
+		//std::cout << "npy+ = " << npy << std::endl;
+		//std::cout << "plan_nx+ = " << plan_nx << std::endl;
 
 		for (int i=0; i<this->plan_nx; i++)
 		{
@@ -532,9 +532,9 @@ void FFT::fftxy(complex<double> *psi, const int sign)
 	else if (sign == -1)
 	{
 
-		//cout << "np-  = " << np << endl;
-		//cout << "npy- = " << npy << endl;
-		//cout << "plan_nx- = " << plan_nx << endl;
+		//std::cout << "np-  = " << np << std::endl;
+		//std::cout << "npy- = " << npy << std::endl;
+		//std::cout << "plan_nx- = " << plan_nx << std::endl;
 
 #if defined __FFTW3
 				//		                               (rank, *n,				howmany, *in,			  *inembed, istride, idist,
@@ -582,7 +582,7 @@ void FFT::fftxy(complex<double> *psi, const int sign)
 
 
 
-void FFT::fftz(complex<double> *psi_in, const int sign, complex<double> *psi_out)
+void FFT::fftz(std::complex<double> *psi_in, const int sign, std::complex<double> *psi_out)
 {
 	//timer::tick("FFT","fftz");
 	// number of sticks in this process.
@@ -592,7 +592,7 @@ void FFT::fftz(complex<double> *psi_in, const int sign, complex<double> *psi_out
 
 	if (sign == 1)
 	{
-		// cout << "ns+ = " << ns << endl;
+		// std::cout << "ns+ = " << ns << std::endl;
 		// only do ns * plan_nz(element number) fft .
 
 #if defined __FFTW3
@@ -618,7 +618,7 @@ void FFT::fftz(complex<double> *psi_in, const int sign, complex<double> *psi_out
 	else if (sign == -1)
 	{
 
-		// cout << "ns- = " << ns << endl;
+		// std::cout << "ns- = " << ns << std::endl;
 
 #if defined __FFTW3
 		//		                              (rank, *n,			 howmany, *in,					  *inembed, istride, idist,
@@ -645,7 +645,7 @@ void FFT::fftz(complex<double> *psi_in, const int sign, complex<double> *psi_out
 
 
 
-void FFT::scatter(complex<double> *psi, int sign)
+void FFT::scatter(std::complex<double> *psi, int sign)
 {
 	//timer::tick("FFT","scatter");
 

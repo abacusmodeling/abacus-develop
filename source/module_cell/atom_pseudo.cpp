@@ -43,7 +43,7 @@ void Atom_pseudo::set_d_so(
 	assert(nproj <= nproj_in+1); //LiuXh 2016-01-13, 2016-05-16
 	assert(nproj >= 0);
 
-//	cout << " has_so=" << has_so << endl;
+//	std::cout << " has_so=" << has_so << std::endl;
 
 	//2016-07-19 begin, LiuXh
 	if(!has_so)
@@ -64,7 +64,7 @@ void Atom_pseudo::set_d_so(
 			this->index2_soc[is] = new int[nproj_soc * nproj_soc];
 		}
 
-//		cout << "lmax=" << lmax << endl;
+//		std::cout << "lmax=" << lmax << std::endl;
 
 		if(this->lmax > -1)
 		{
@@ -85,8 +85,8 @@ void Atom_pseudo::set_d_so(
 								if(fabs(this->d_so(is, L1, L2).real())>1.0e-8 ||
 										fabs(this->d_so(is, L1, L2).imag())>1.0e-8 )
 								{
-//									cout << "tt in atom is=" << is << " L1=" << L1 << " L2=" 
-//									<< L2 << " " << d_so(is, L1, L2) << endl;
+//									std::cout << "tt in atom is=" << is << " L1=" << L1 << " L2=" 
+//									<< L2 << " " << d_so(is, L1, L2) << std::endl;
 
 									this->index1_soc[is][non_zero_count_soc[is]] = L1;
 									this->index2_soc[is][non_zero_count_soc[is]] = L2;
@@ -112,7 +112,7 @@ void Atom_pseudo::set_d_so(
 							{
 								if(is==1||is==2)
 								{
-									this->d_so(is, L1, L2) = complex<double>(0.0,0.0);
+									this->d_so(is, L1, L2) = std::complex<double>(0.0,0.0);
 								}
 								else
 								{
@@ -140,7 +140,7 @@ void Atom_pseudo::set_d_so(
 	return;
 }
 
-void Atom_pseudo::print_atom(ofstream &ofs)
+void Atom_pseudo::print_atom(std::ofstream &ofs)
 {
 	if(GlobalV::test_atom) TITLE("atom_pseudo","print_atom");
 
@@ -194,7 +194,7 @@ void Atom_pseudo::bcast_atom_pseudo2(void)
 	Parallel_Common::bcast_bool( nlcc );
 	Parallel_Common::bcast_bool( has_so );
 
-//string
+//std::string
 	Parallel_Common::bcast_string( psd );
 	Parallel_Common::bcast_string( pp_type );
 	Parallel_Common::bcast_string( dft, 4 );
@@ -208,7 +208,7 @@ void Atom_pseudo::bcast_atom_pseudo2(void)
 		delete[] jchi;
 		delete[] nn;
 		jjj = new double [nbeta];
-		els = new string[nchi];
+		els = new std::string[nchi];
 		lchi = new int [nchi];
 		oc = new double[nchi];
 		jchi = new double[nchi];

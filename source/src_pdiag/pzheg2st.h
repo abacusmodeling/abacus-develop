@@ -7,9 +7,9 @@
 void pzheg2st(
 	char isuplo,
 	MPI_Comm comm_2D,
-	complex<double> *A, 
+	std::complex<double> *A, 
 	LocalMatrix loc_A,
-	complex<double> *B,
+	std::complex<double> *B,
 	LocalMatrix loc_B,
 	int NB,
 	int N_A);

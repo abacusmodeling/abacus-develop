@@ -47,13 +47,13 @@ void Stress_Func::stress_ewa(matrix& sigma, const bool is_pw)
 
     double g2,g2a;
     double arg;
-    complex<double> rhostar;
+    std::complex<double> rhostar;
     double sewald;
     for(int ng=GlobalC::pw.gstart;ng<GlobalC::pw.ngmc;ng++)
 	{
 		g2 = GlobalC::pw.gg[ng]* GlobalC::ucell.tpiba2;
 		g2a = g2 /4.0/alpha;
-		rhostar=complex<double>(0.0,0.0);
+		rhostar=std::complex<double>(0.0,0.0);
 		for(int it=0; it < GlobalC::ucell.ntype; it++)
 		{
 			for(int i=0; i<GlobalC::ucell.atoms[it].na; i++)
@@ -61,7 +61,7 @@ void Stress_Func::stress_ewa(matrix& sigma, const bool is_pw)
 				arg = (GlobalC::pw.get_G_cartesian_projection(ng, 0) * GlobalC::ucell.atoms[it].tau[i].x + 
 					GlobalC::pw.get_G_cartesian_projection(ng, 1) * GlobalC::ucell.atoms[it].tau[i].y + 
 					GlobalC::pw.get_G_cartesian_projection(ng, 2) * GlobalC::ucell.atoms[it].tau[i].z) * (TWO_PI);
-				rhostar = rhostar + complex<double>(GlobalC::ucell.atoms[it].zv * cos(arg),GlobalC::ucell.atoms[it].zv * sin(arg));
+				rhostar = rhostar + std::complex<double>(GlobalC::ucell.atoms[it].zv * cos(arg),GlobalC::ucell.atoms[it].zv * sin(arg));
 			}
 		}
 		rhostar /= GlobalC::ucell.omega;

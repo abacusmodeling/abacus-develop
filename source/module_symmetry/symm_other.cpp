@@ -2,7 +2,7 @@
 
 namespace ModuleSymmetry
 {
-void Symm_Other::print1(const int &ibrav, const double *cel_const, ofstream &ofs_running)
+void Symm_Other::print1(const int &ibrav, const double *cel_const, std::ofstream &ofs_running)
 {
 	TITLE("Symm_Other","print1");
 

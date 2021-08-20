@@ -16,8 +16,8 @@ double Stochastic_hchi::Emax;
 bool Stochastic_hchi::initplan;
 bool Stochastic_hchi::ortho;
 
-complex<double>* Stochastic_hchi::rp_chi;
-complex<double>* Stochastic_hchi::rl_chi;
+std::complex<double>* Stochastic_hchi::rp_chi;
+std::complex<double>* Stochastic_hchi::rl_chi;
 
 int * Stochastic_hchi:: GRA_index;
 
@@ -26,8 +26,8 @@ Stochastic_hchi::Stochastic_hchi()
 	initplan = false;
 	ortho = false;
 	nrxx = 0;
-	rp_chi = new complex<double> [1];
-	rl_chi = new complex<double> [1];
+	rp_chi = new std::complex<double> [1];
+	rl_chi = new std::complex<double> [1];
 	GRA_index = new int [1];
 }
 
@@ -60,8 +60,8 @@ void Stochastic_hchi:: init()
 		GRA_index = new int [GlobalC::wf.npw];
 		if(GlobalC::sto_wf.stotype != "pw")
 		{
-			rp_chi = new complex<double> [nrxx];
-			rl_chi = new complex<double> [nrxx];
+			rp_chi = new std::complex<double> [nrxx];
+			rl_chi = new std::complex<double> [nrxx];
 
 			pf=fftw_plan_dft_3d(nx,ny,nz,
 				(fftw_complex *)rp_chi,
@@ -114,7 +114,7 @@ void Stochastic_hchi::get_GRA_index()
 	}
 }
 
-void Stochastic_hchi::orthogonal_to_psi_real(complex<double> *wfin, complex<double> *wfout, int &ikk)
+void Stochastic_hchi::orthogonal_to_psi_real(std::complex<double> *wfin, std::complex<double> *wfout, int &ikk)
 {
 
 	TITLE("Stochastic_hchi","orthogonal_to_psi0");
@@ -124,18 +124,18 @@ void Stochastic_hchi::orthogonal_to_psi_real(complex<double> *wfin, complex<doub
 	//LapackConnector::copy(nrxx,wfin,1,rp_chi,1);
 	fftw_execute(pf);
 	
-	complex<double> * chig = new complex<double> [GlobalC::wf.npw];
+	std::complex<double> * chig = new std::complex<double> [GlobalC::wf.npw];
 	for(int ig = 0; ig < GlobalC::wf.npw; ++ig)
 	{
 		chig[ig] = rp_chi[GRA_index[ig]]; 
 	}
 
 	//orthogonal part
-	complex<double> sum = 0;
+	std::complex<double> sum = 0;
 	int inc=1;
 	for(int iksb = 0; iksb < GlobalV::NBANDS; ++iksb)
 	{
-		complex<double> *kswf = &GlobalC::wf.evc[ikk](iksb,0); 
+		std::complex<double> *kswf = &GlobalC::wf.evc[ikk](iksb,0); 
 		zdotc_(&sum,&GlobalC::wf.npw,kswf,&inc,chig,&inc);
 
 //
@@ -147,16 +147,16 @@ void Stochastic_hchi::orthogonal_to_psi_real(complex<double> *wfin, complex<doub
 	}
 
 	//test orthogonal in reciprocal space
-	//complex<double> overlap;
+	//std::complex<double> overlap;
 	//for(int iksb = 0; iksb < GlobalV::NBANDS; ++iksb)
 	//{
-	//	complex<double> *kswf = &GlobalC::wf.evc[ikk](iksb,0); 
+	//	std::complex<double> *kswf = &GlobalC::wf.evc[ikk](iksb,0); 
 	//	overlap=0;
 	//	for(int ig = 0; ig < GlobalC::wf.npw; ++ig)
 	//	{
 	//		overlap += conj(kswf[ig]) * chig[ig];
 	//	}
-	//	cout<<"OVERLAP "<<overlap<<endl;
+	//	std::cout<<"OVERLAP "<<overlap<<std::endl;
 	//}
 
 	for(int ig = 0; ig < GlobalC::wf.npw; ++ig)
@@ -177,8 +177,8 @@ void Stochastic_hchi::orthogonal_to_psi_real(complex<double> *wfin, complex<doub
 	
 
 	/*//test orthogonal in real space
-	complex<double> overlap;
-	complex<double> * kswf = new complex<double> [nrxx];
+	std::complex<double> overlap;
+	std::complex<double> * kswf = new std::complex<double> [nrxx];
 	fftw_plan pp=fftw_plan_dft_3d(GlobalC::pw.nx,GlobalC::pw.ny,GlobalC::pw.nz,(fftw_complex *)kswf,(fftw_complex *)kswf, FFTW_BACKWARD, FFTW_ESTIMATE);
 	for(int iksb = 0; iksb < GlobalV::NBANDS; ++iksb)
 	{
@@ -193,7 +193,7 @@ void Stochastic_hchi::orthogonal_to_psi_real(complex<double> *wfin, complex<doub
 		{
 			overlap += conj(kswf[ir]) * wfout[ir];
 		}
-		cout<<"OVERLAP "<<overlap<<endl;
+		std::cout<<"OVERLAP "<<overlap<<std::endl;
 	}
 	delete [] kswf;*/
 
@@ -202,7 +202,7 @@ void Stochastic_hchi::orthogonal_to_psi_real(complex<double> *wfin, complex<doub
 	return;
 }
 
-void Stochastic_hchi::orthogonal_to_psi_reciprocal(complex<double> *wfgin, complex<double> *wfgout, int &ikk)
+void Stochastic_hchi::orthogonal_to_psi_reciprocal(std::complex<double> *wfgin, std::complex<double> *wfgout, int &ikk)
 {
 
 	TITLE("Stochastic_hchi","orthogonal_to_psi0");
@@ -215,7 +215,7 @@ void Stochastic_hchi::orthogonal_to_psi_reciprocal(complex<double> *wfgin, compl
 
 	//orthogonal part
 	
-	complex<double> *sum = new complex<double> [GlobalV::NBANDS * nchip];
+	std::complex<double> *sum = new std::complex<double> [GlobalV::NBANDS * nchip];
 	char transC='C';
 	char transN='N';
 	
@@ -233,7 +233,7 @@ void Stochastic_hchi::orthogonal_to_psi_reciprocal(complex<double> *wfgin, compl
 
 
 
-void Stochastic_hchi::hchi_real(complex<double>*chi_in, complex<double> *hchi, const int m)
+void Stochastic_hchi::hchi_real(std::complex<double>*chi_in, std::complex<double> *hchi, const int m)
 {
 	
 	double*vr = GlobalC::pot.vr_eff1;  //vr= GlobalC::pot.vrs1 temporarily use cutoff vr.
@@ -252,7 +252,7 @@ void Stochastic_hchi::hchi_real(complex<double>*chi_in, complex<double> *hchi, c
 	//LapackConnector::copy(nrxx,chi_in,1,rp_chi,1);
 	fftw_execute(pf);
 
-	complex<double> * chig = new complex<double> [GlobalC::wf.npw];
+	std::complex<double> * chig = new std::complex<double> [GlobalC::wf.npw];
 	ZEROS(chig,GlobalC::wf.npw);
 	for(int ig = 0; ig < GlobalC::wf.npw; ++ig)
 	{
@@ -271,13 +271,13 @@ void Stochastic_hchi::hchi_real(complex<double>*chi_in, complex<double> *hchi, c
 		}
 		
 	}
-	/*cout<<"HCHI-------------------------"<<endl;
+	/*std::cout<<"HCHI-------------------------"<<std::endl;
 
 		for(int ir  = 63800 ; ir < 64000; ++ir)
 		{
-			cout<<chi_in[ir] * vr[ir]<<" ";
+			std::cout<<chi_in[ir] * vr[ir]<<" ";
 		}
-		cout<<endl;*/
+		std::cout<<std::endl;*/
 	
 	
 	
@@ -320,12 +320,12 @@ void Stochastic_hchi::hchi_real(complex<double>*chi_in, complex<double> *hchi, c
 	{
 		if ( GlobalC::ppcell.nkb > 0)
 		{
-			complex<double> *becp = new complex<double>[ GlobalC::ppcell.nkb * GlobalV::NPOL ];
+			std::complex<double> *becp = new std::complex<double>[ GlobalC::ppcell.nkb * GlobalV::NPOL ];
 			ZEROS(becp,GlobalC::ppcell.nkb * GlobalV::NPOL);
 
 			for (int i=0;i< GlobalC::ppcell.nkb;++i)
 			{
-				const complex<double>* p = &GlobalC::ppcell.vkb(i,0);
+				const std::complex<double>* p = &GlobalC::ppcell.vkb(i,0);
 				zdotc_(&becp[i],&GlobalC::wf.npw,p,&inc,chig,&inc);
 				//for (int ig=0; ig< GlobalC::wf.npw; ++ig)
 				//{
@@ -334,7 +334,7 @@ void Stochastic_hchi::hchi_real(complex<double>*chi_in, complex<double> *hchi, c
 			}
 
 			//Parallel_Reduce::reduce_complex_double_pool( becp, GlobalC::ppcell.nkb * GlobalV::NPOL);
-			complex<double> * Ps = new complex<double> [GlobalC::ppcell.nkb * GlobalV::NPOL];
+			std::complex<double> * Ps = new std::complex<double> [GlobalC::ppcell.nkb * GlobalV::NPOL];
 			ZEROS( Ps, GlobalC::ppcell.nkb * GlobalV::NPOL );
 			int sum = 0;
     		int iat = 0;
@@ -367,7 +367,7 @@ void Stochastic_hchi::hchi_real(complex<double>*chi_in, complex<double> *hchi, c
 			if(GlobalV::NSPIN!=4)
 				for(int i=0; i<GlobalC::ppcell.nkb; ++i)
 				{
-					complex<double>* p = &GlobalC::ppcell.vkb(i,0);
+					std::complex<double>* p = &GlobalC::ppcell.vkb(i,0);
 					//LapackConnector::axpy(GlobalC::wf.npw,Ps[i],p,1,chig,1);
 					for(int ig=0; ig< GlobalC::wf.npw; ++ig)
 					{
@@ -415,22 +415,22 @@ void Stochastic_hchi::hchi_real(complex<double>*chi_in, complex<double> *hchi, c
 	//	sum1 += norm(chi_in[i]);
 	//	sum2 += real(conj(chi_in[i]) * hchi[i]);
 	//}
-	//cout<<setw(15)<<sum2 <<setw(15)<<sum1<<setw(15)<<sum2/sum1<<endl;
+	//std::cout<<std::setw(15)<<sum2 <<std::setw(15)<<sum1<<std::setw(15)<<sum2/sum1<<std::endl;
 	//------------------------------------------------------------
 
 	//test hermit property
 	//------------------------------------------------------------
-	//complex<double> sum=0;
+	//std::complex<double> sum=0;
 	//for(int i = 0 ; i < nrxx; ++i)
 	//{
 	//	sum+=conj(chi_in[i]) * hchi[i];
 	//}
-	//cout<<sum<<" must be real numebr."<<endl; //sum must be a real number
+	//std::cout<<sum<<" must be real numebr."<<std::endl; //sum must be a real number
 	//------------------------------------------------------------
 	return;
 }
 
-void Stochastic_hchi:: hchi_reciprocal(complex<double> *chig, complex<double> *hchig, const int m)
+void Stochastic_hchi:: hchi_reciprocal(std::complex<double> *chig, std::complex<double> *hchig, const int m)
 {
 	timer::tick("Stochastic_hchi","hchi_reciprocal");
 	
@@ -442,8 +442,8 @@ void Stochastic_hchi:: hchi_reciprocal(complex<double> *chig, complex<double> *h
 	//------------------------------------
 	//(1) the kinetical energy.
 	//------------------------------------
-	complex<double> *chibg = chig;
-	complex<double> *hchibg = hchig;
+	std::complex<double> *chibg = chig;
+	std::complex<double> *hchibg = hchig;
 	if(GlobalV::T_IN_H)
 	{
 		for (int ib = 0; ib < m ; ++ib)
@@ -490,7 +490,7 @@ void Stochastic_hchi:: hchi_reciprocal(complex<double> *chig, complex<double> *h
 		if ( GlobalC::ppcell.nkb > 0)
 		{
 			int nkb = GlobalC::ppcell.nkb;
-			complex<double> *becp = new complex<double>[ nkb * GlobalV::NPOL * m ];
+			std::complex<double> *becp = new std::complex<double>[ nkb * GlobalV::NPOL * m ];
 			char transc = 'C';
 			char transn = 'N';
 			char transt = 'T';
@@ -504,7 +504,7 @@ void Stochastic_hchi:: hchi_reciprocal(complex<double> *chig, complex<double> *h
 			}
 			Parallel_Reduce::reduce_complex_double_pool( becp, nkb * GlobalV::NPOL * m);
 
-			complex<double> *Ps  = new complex<double> [nkb * GlobalV::NPOL * m];
+			std::complex<double> *Ps  = new std::complex<double> [nkb * GlobalV::NPOL * m];
    			ZEROS( Ps, GlobalV::NPOL * m * nkb);
 			
 			int sum = 0;

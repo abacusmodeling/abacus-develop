@@ -146,20 +146,20 @@ void Parallel_Reduce::reduce_double_allpool(double *object, const int n)
 
 
 
-void Parallel_Reduce::reduce_complex_double_all(complex<double> &object)
+void Parallel_Reduce::reduce_complex_double_all(std::complex<double> &object)
 {
 #ifdef __MPI
-	complex<double> swap = object;
+	std::complex<double> swap = object;
     MPI_Allreduce(&swap, &object, 1, mpicomplex, myOp, MPI_COMM_WORLD);
 #endif
     return;
 }
 
 //LiuXh add 2019-07-16
-void Parallel_Reduce::reduce_complex_double_all(complex <double> *object, const int n)
+void Parallel_Reduce::reduce_complex_double_all(std::complex <double> *object, const int n)
 {
 #ifdef __MPI
-	complex<double> *swap = new complex<double>[n];
+	std::complex<double> *swap = new std::complex<double>[n];
 	for(int i=0;i<n;i++) swap[i] = object[i];
 	MPI_Allreduce(swap, object, n, mpicomplex, myOp, POOL_WORLD);
 	delete[] swap;
@@ -167,20 +167,20 @@ void Parallel_Reduce::reduce_complex_double_all(complex <double> *object, const 
 	return;
 }
 
-void Parallel_Reduce::reduce_complex_double_pool(complex<double> &object)
+void Parallel_Reduce::reduce_complex_double_pool(std::complex<double> &object)
 {
 #ifdef __MPI
-	complex<double> swap = object;
+	std::complex<double> swap = object;
 	MPI_Allreduce(&swap, &object, 1, mpicomplex, myOp, POOL_WORLD);
 #endif
 	return;
 }
 
-void Parallel_Reduce::reduce_complex_double_pool(complex <double> *object, const int n)
+void Parallel_Reduce::reduce_complex_double_pool(std::complex <double> *object, const int n)
 {
 #ifdef __MPI
 	if(GlobalV::NPROC_IN_POOL == 1) return;
-	complex<double> *swap = new complex<double>[n];
+	std::complex<double> *swap = new std::complex<double>[n];
 	for(int i=0;i<n;i++) swap[i] = object[i];
 	MPI_Allreduce(swap, object, n, mpicomplex, myOp, POOL_WORLD);
 	delete[] swap;
@@ -296,7 +296,7 @@ bool Parallel_Reduce::check_if_equal(double &v)
 		{
 			for(int j=0; j<GlobalV::NPROC; j++)
 			{
-				cout << "\n processor = " << j << " value = " << all[j];
+				std::cout << "\n processor = " << j << " value = " << all[j];
 			}
 			delete[] all;
 			return false;

@@ -30,7 +30,7 @@ Numerical_Orbital_Lm::~Numerical_Orbital_Lm()
 
 void Numerical_Orbital_Lm::set_orbital_info
 (
- 	const string &label_in,
+ 	const std::string &label_in,
 	const int &index_atom_type_in,
 	const int &angular_momentum_l_in,
 	const int &index_chi_in,
@@ -92,7 +92,7 @@ void Numerical_Orbital_Lm::set_orbital_info
 				this->psik2[ik] = psi_in[ik];
 			break;
 		default:
-			throw domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 	}
 
 	switch(psi_type)
@@ -106,7 +106,7 @@ void Numerical_Orbital_Lm::set_orbital_info
 			}
 			else
 			{
-				throw domain_error("flag_sbpool false not finished in Numerical_Orbital_Lm::set_orbital_info_k. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+				throw std::domain_error("flag_sbpool false not finished in Numerical_Orbital_Lm::set_orbital_info_k. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 			}
 			break;
 		default:	break;
@@ -151,7 +151,7 @@ void Numerical_Orbital_Lm::set_orbital_info
 }
 
 void Numerical_Orbital_Lm::copy_parameter(
- 	const string &label_in,
+ 	const std::string &label_in,
 	const int &index_atom_type_in,
 	const int &angular_momentum_l_in,
 	const int &index_chi_in,
@@ -249,8 +249,8 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool
 	//--------------------------------------------------------------------------
 	//Mathzone_Add1::SplineD2 (r_radial, psi, nr, 100000.0, 100000.0, y2);
 	//double yp1=(this->psi[1]-this->psi[0])/this->r_radial[1];
-	//cout<<"psi0="<<"  "<<this->psi[0]<<"  "<<"psi1="<<"  "<<this->psi[1]<<"  "<<"r1="<<"  "<<this->r_radial[1]<<endl; 
-	//cout<<"yp1="<<"  "<<yp1<<endl;
+	//std::cout<<"psi0="<<"  "<<this->psi[0]<<"  "<<"psi1="<<"  "<<this->psi[1]<<"  "<<"r1="<<"  "<<this->r_radial[1]<<std::endl; 
+	//std::cout<<"yp1="<<"  "<<yp1<<std::endl;
 	//Mathzone_Add1::SplineD2 (r_radial, psi, nr, yp1, 0.0, y2);
 	
 
@@ -266,18 +266,18 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool
 		case 3: Mathzone_Add1::SplineD2 (VECTOR_TO_PTR(r_radial), VECTOR_TO_PTR(psi), nr, 100000.0, 100000.0, y2); break;
 		case 4: Mathzone_Add1::SplineD2 (VECTOR_TO_PTR(r_radial), VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
 		default: 
-			//GlobalV::ofs_warning << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << endl;
-			//GlobalV::ofs_warning << " Check file " << __FILE__ << " line " << __LINE__ <<endl;
-			cout << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << endl;
-			cout << " Check file " << __FILE__ << " line " << __LINE__ <<endl;
+			//GlobalV::ofs_warning << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << std::endl;
+			//GlobalV::ofs_warning << " Check file " << __FILE__ << " line " << __LINE__ <<std::endl;
+			std::cout << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << std::endl;
+			std::cout << " Check file " << __FILE__ << " line " << __LINE__ <<std::endl;
 			Mathzone_Add1::SplineD2 (VECTOR_TO_PTR(r_radial), VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
 	}
 
 	//Mathzone_Add1::SplineD2 (r_radial, psi, nr, 0.0, 0.0, y2);
-	//cout<<"angular_momentum_l="<<"  "<<this->angular_momentum_l<<endl;
+	//std::cout<<"angular_momentum_l="<<"  "<<this->angular_momentum_l<<std::endl;
 	//for (int i=0; i<nr; i++)
 	//{
-	//     cout<<r_radial[i]<<"  "<<y2[i]<<endl;
+	//     std::cout<<r_radial[i]<<"  "<<y2[i]<<std::endl;
 	//}
 	//Method 1
 	//	Mathzone_Add1::Uni_Deriv_Phi (psi_uniform, nr_uniform, dr_uniform, 1, dpsi_uniform);
@@ -324,7 +324,7 @@ void Numerical_Orbital_Lm::use_uniform(const double &dr_uniform_in)
 
 	this->psi_uniform.resize(nr_uniform,0);
 
-	string orbital_type; 
+	std::string orbital_type; 
 	// Peize Lin update 2016-08-31
 	if( 0==this->angular_momentum_l )
 	{
@@ -351,7 +351,7 @@ void Numerical_Orbital_Lm::use_uniform(const double &dr_uniform_in)
 		orbital_type = "L" + TO_STRING(this->angular_momentum_l);
 	}
 		
-	cout << "===========================================================" << endl;
+	std::cout << "===========================================================" << std::endl;
 	for(int i=0; i<nr_uniform; i++)
 	{
 		this->psi_uniform[i] = 
@@ -371,15 +371,15 @@ void Numerical_Orbital_Lm::use_uniform(const double &dr_uniform_in)
 #else	
 	if(GlobalV::MY_RANK==0)
 	{
-		stringstream ss;
+		std::stringstream ss;
 		ss << GlobalV::global_out_dir << this->label << "/"
 			<< this->label << "-" << orbital_type << ".ORBITAL_NOR_uniform.txt";
 
-		ofstream ofs(ss.str().c_str());
+		std::ofstream ofs(ss.str().c_str());
 
 		for(int i=0; i<nr_uniform; i++)
 		{
-			ofs << setw(15) << i*dr_uniform << setw(20) << psi_uniform[i] << endl;
+			ofs << std::setw(15) << i*dr_uniform << std::setw(20) << psi_uniform[i] << std::endl;
 		}
 		ofs.close();
 	}
@@ -472,18 +472,18 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 	}
 	pSB->set_dx( this->dk * dr );
 	pSB->cal_jlx( this->angular_momentum_l, this->nk, this->nr );
-	const vector<vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
+	const std::vector<std::vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
 
-	vector<double> integrated_func( this->nr );
+	std::vector<double> integrated_func( this->nr );
 	const double pref = sqrt( 2.0 / PI );
 
-	vector<double> psir2(nr);
+	std::vector<double> psir2(nr);
 	for( size_t ir=0; ir!=nr; ++ir )
 		psir2[ir] = this->psir[ir] * this->r_radial[ir];
 
 	for (int ik = 0; ik < nk; ik++)
 	{
-		const vector<double> &jlk = jl[ik];
+		const std::vector<double> &jlk = jl[ik];
 		for (int ir = 0; ir < nr; ir++)
 			integrated_func[ir] = psir2[ir] * jlk[ir];
 		Integral::Simpson_Integral(
@@ -527,11 +527,11 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 	}
 	pSB->set_dx( this->dk * dr );
 	pSB->cal_jlx( this->angular_momentum_l, this->nk, this->nr );
-	const vector<vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
+	const std::vector<std::vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
 
 	const double pref = sqrt( 2.0 / PI );
 
-	vector<double> r_tmp(nr);
+	std::vector<double> r_tmp(nr);
 	for( int ir=0; ir!=nr; ++ir )
 	{
 		r_tmp[ir] = this->psir[ir] * this->r_radial[ir] * this->rab[ir];
@@ -604,11 +604,11 @@ void Numerical_Orbital_Lm::cal_rradial_sbpool(void)
 	pSB->set_dx( dr * dk );
 	pSB->cal_jlx( this->angular_momentum_l, this->nr, this->nk );
 
-	const vector<vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
+	const std::vector<std::vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
 
 	const double pref = sqrt(2.0/PI);
 
-	vector<double> k_tmp(nk);
+	std::vector<double> k_tmp(nk);
 
 	for( int ik=0; ik!=nk; ++ik )
 	{
@@ -674,7 +674,7 @@ void Numerical_Orbital_Lm::norm_test(void)const
 //	Integral::Simpson_Integral(this->nk, f, this->k_radial, sumk);
 	
 	//means nothing.
-	//GlobalV::ofs_running << setw(12) << sumk << endl;
+	//GlobalV::ofs_running << std::setw(12) << sumk << std::endl;
 
 	delete[] f;
 	return;
@@ -684,7 +684,7 @@ void Numerical_Orbital_Lm::plot(void)const
 {
 	TITLE("Numerical_Orbital_Lm","plot");
 	
-	string orbital_type;
+	std::string orbital_type;
 	// Peize Lin update 2016-08-31
 	if( 0==this->angular_momentum_l )
 	{
@@ -717,7 +717,7 @@ void Numerical_Orbital_Lm::plot(void)const
 #else
 	if(GlobalV::MY_RANK==0)
 	{
-		stringstream ssr, ssk, ssru ,ssdru; // 2013-08-10 pengfei
+		std::stringstream ssr, ssk, ssru ,ssdru; // 2013-08-10 pengfei
 		ssr << GlobalV::global_out_dir << this->label << "/"
 			<< this->label << "-"<< orbital_type << index_chi+1 << "-orbital-r.dat";
 
@@ -730,10 +730,10 @@ void Numerical_Orbital_Lm::plot(void)const
 		ssdru << GlobalV::global_out_dir << this->label << "/"  // 2013-08-10 pengfei
 			<< this->label << "-" << orbital_type << index_chi+1 << "-orbital-dru.dat";
 
-		ofstream ofsr(ssr.str().c_str());
-		ofstream ofsk(ssk.str().c_str());
-		ofstream ofsru(ssru.str().c_str());
-		ofstream ofsdru(ssdru.str().c_str()); // 2013-08-10 pengfei
+		std::ofstream ofsr(ssr.str().c_str());
+		std::ofstream ofsk(ssk.str().c_str());
+		std::ofstream ofsru(ssru.str().c_str());
+		std::ofstream ofsdru(ssdru.str().c_str()); // 2013-08-10 pengfei
 
 		if (!ofsk || !ofsr || !ofsru || !ofsdru) // 2013-08-10 pengfei
 		{
@@ -742,22 +742,22 @@ void Numerical_Orbital_Lm::plot(void)const
 
 		for (int i = 0; i < this->nr; i++)
 		{
-			ofsr << this->r_radial[i] << " " << psi[i] << endl;
+			ofsr << this->r_radial[i] << " " << psi[i] << std::endl;
 		}
 
 		for (int i = 0; i < this->nk; i++)
 		{
-			ofsk << this->k_radial[i] << " " << psik[i] << endl;
+			ofsk << this->k_radial[i] << " " << psik[i] << std::endl;
 		}
 
 		for (int i = 0; i < this->nr_uniform; i++)
 		{
-			ofsru << this->dr_uniform * i << " " << psi_uniform[i] << endl;
+			ofsru << this->dr_uniform * i << " " << psi_uniform[i] << std::endl;
 		}
 
 		for (int i = 0; i < this->nr_uniform; i++)
 		{
-			ofsdru << this->dr_uniform * i << " " << dpsi_uniform[i] << endl;// output dphi/dr 2013-08-10  pengfei
+			ofsdru << this->dr_uniform * i << " " << dpsi_uniform[i] << std::endl;// output dphi/dr 2013-08-10  pengfei
 		}
 		ofsr.close();
 		ofsk.close();

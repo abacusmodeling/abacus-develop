@@ -2,7 +2,7 @@
 #include "../src_pw/global.h"
 #include "../src_lcao/global_fp.h"
 
-vector<pair<vector<bool>,vector<bool>>>
+std::vector<std::pair<std::vector<bool>,std::vector<bool>>>
 Exx_Abfs::Parallel::Communicate::Function::get_atom_in_2D_list(const MPI_Comm &mpi_comm)
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::Functions::get_atom_in_2D_list");
@@ -21,9 +21,9 @@ Exx_Abfs::Parallel::Communicate::Function::get_atom_in_2D_list(const MPI_Comm &m
 	}
 	
 	bool atom_in_2D_list_tmp[GlobalC::ucell.nat*2*comm_sz];
-	if(MPI_Allgather( atom_in_2D, GlobalC::ucell.nat*2, MPI_BYTE, atom_in_2D_list_tmp, GlobalC::ucell.nat*2, MPI_BYTE, mpi_comm )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+	if(MPI_Allgather( atom_in_2D, GlobalC::ucell.nat*2, MPI_BYTE, atom_in_2D_list_tmp, GlobalC::ucell.nat*2, MPI_BYTE, mpi_comm )!=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 
-	vector<pair<vector<bool>,vector<bool>>> atom_in_2D_list(comm_sz, {vector<bool>(GlobalC::ucell.nat),vector<bool>(GlobalC::ucell.nat)});
+	std::vector<std::pair<std::vector<bool>,std::vector<bool>>> atom_in_2D_list(comm_sz, {std::vector<bool>(GlobalC::ucell.nat),std::vector<bool>(GlobalC::ucell.nat)});
 	for(int rank=0; rank<comm_sz; ++rank)
 		for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
 		{

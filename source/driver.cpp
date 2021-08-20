@@ -1,14 +1,16 @@
 #include "driver.h"
-#include "run_pw.h"
 #include "input.h"
 #include "input_conv.h"
+#include "run_pw.h"
+#include "src_pw/global.h"
 #ifdef __LCAO
 #include "run_lcao.h"
 #include "src_lcao/global_fp.h"
 #endif
-#include "src_pw/global.h"
 #include "src_io/cal_test.h"
 #include "src_io/winput.h"
+#include "src_io/print_info.h"
+#include "module_base/timer.h"
 
 Driver::Driver(){}
 
@@ -20,15 +22,20 @@ void Driver::init()
 {
 	TITLE("Driver","init");
 
+	time_t time_start = std::time(NULL);
+	timer::start();
+
 	// (1) read the input parameters.
 	this->reading();
 
 	// (2) welcome to the atomic world!
 	this->atomic_world();
 
-	cout<<"Atomic SUCCESS"<<endl;
+	// (3) output information
+	time_t	time_finish= std::time(NULL);
+	Print_Info::print_time(time_start, time_finish);
 
-	// (3) close all of the running logs 
+	// (4) close all of the running logs 
 	INPUT.close_log();
 
 	return;
@@ -63,7 +70,7 @@ void Driver::reading(void)
     winput::Init( GlobalV::global_wannier_card );
 
     // (6) Print the parameters into INPUT file.
-    stringstream ss1;
+    std::stringstream ss1;
     ss1 << GlobalV::global_out_dir << GlobalV::global_in_card;
     INPUT.Print( ss1.str() );
     //DONE(GlobalV::ofs_running,"READING CARDS");

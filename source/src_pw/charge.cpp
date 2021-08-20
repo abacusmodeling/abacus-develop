@@ -10,7 +10,7 @@
 // spin-polarization equal to starting_magnetization(nt)
 // nspina = 4 noncollinear case. The total density is
 // calculated in the first component and the magnetization
-// vector in the other three.
+// std::vector in the other three.
 //
 // NB: nspina may not be equal to nspin because in some cases
 // (as in update) the total charge only could be needed,
@@ -46,6 +46,7 @@ Charge::~Charge()
 			if(GlobalV::DFT_META)
 			{
 				delete[] kin_r[i];
+				delete[] kin_r_save[i];
 			}
 		}
 		delete[] rho;
@@ -57,6 +58,7 @@ Charge::~Charge()
 		if(GlobalV::DFT_META)
 		{
 			delete[] kin_r;
+			delete[] kin_r_save;
 		}
 	}
 }
@@ -75,26 +77,27 @@ void Charge::allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_i
 
     if (GlobalV::test_charge > 1)
     {
-        cout << "\n spin_number = " << nspin
+        std::cout << "\n spin_number = " << nspin
              << " real_point_number = " << nrxx;
     }
 
 	// allocate memory
 	rho = new double*[nspin];
-	rhog = new complex<double>*[nspin];
+	rhog = new std::complex<double>*[nspin];
 	rho_save = new double*[nspin];
-	rhog_save = new complex<double>*[nspin];
+	rhog_save = new std::complex<double>*[nspin];
 	if(GlobalV::DFT_META)
 	{
 		kin_r = new double*[nspin];
+		kin_r_save = new double*[nspin];
 	}
 
 	for(int is=0; is<nspin; is++)
 	{
 		rho[is] = new double[nrxx];
-		rhog[is] = new complex<double>[ngmc];
+		rhog[is] = new std::complex<double>[ngmc];
 		rho_save[is] = new double[nrxx];
-		rhog_save[is] = new complex<double>[ngmc];			
+		rhog_save[is] = new std::complex<double>[ngmc];			
 		ZEROS(rho[is], nrxx);
 		ZEROS(rhog[is], ngmc);
 		ZEROS(rho_save[is], nrxx);
@@ -103,6 +106,8 @@ void Charge::allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_i
 		{
 			kin_r[is] = new double[nrxx];
 			ZEROS(kin_r[is], nrxx);
+			kin_r_save[is] = new double[nrxx];
+			ZEROS(kin_r_save[is], nrxx);
 		}
 	}
 
@@ -111,11 +116,12 @@ void Charge::allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_i
     Memory::record("Charge","rhog",nspin*ngmc,"double");
     Memory::record("Charge","rhog_save",nspin*ngmc,"double");
     Memory::record("Charge","kin_r",nspin*ngmc,"double");
+    Memory::record("Charge","kin_r_save",nspin*ngmc,"double");
 
     this->rho_core = new double[nrxx]; // core charge in real space
     ZEROS( rho_core, nrxx);
 
-	this->rhog_core = new complex<double>[ngmc]; // reciprocal core charge
+	this->rhog_core = new std::complex<double>[ngmc]; // reciprocal core charge
 	ZEROS( rhog_core, ngmc);
 
     Memory::record("Charge","rho_core",nrxx,"double");
@@ -153,7 +159,7 @@ double Charge::sum_rho(void) const
 	// sum_rho may be smaller than 1, like Na bcc.
     if (sum_rho <= 0.1)
     {
-		GlobalV::ofs_warning << " sum_rho=" << sum_rho << endl;
+		GlobalV::ofs_warning << " sum_rho=" << sum_rho << std::endl;
         WARNING_QUIT("Charge::renormalize_rho","Can't find even an electron!");
     }
 
@@ -166,7 +172,7 @@ void Charge::renormalize_rho(void)
     TITLE("Charge","renormalize_rho");
 
     const double sr = this->sum_rho();
-	GlobalV::ofs_warning << setprecision(15);
+	GlobalV::ofs_warning << std::setprecision(15);
 	OUT(GlobalV::ofs_warning,"charge before normalized",sr);
     const double normalize_factor = nelec / sr;
 
@@ -180,7 +186,7 @@ void Charge::renormalize_rho(void)
 
 	OUT(GlobalV::ofs_warning,"charge after normalized",this->sum_rho());
 
-	GlobalV::ofs_running << setprecision(6);
+	GlobalV::ofs_running << std::setprecision(6);
     return;
 }
 
@@ -262,7 +268,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 					}();
 
 					assert(GlobalC::ucell.meshx>0);
-					vector<double> rho1d(GlobalC::ucell.meshx);
+					std::vector<double> rho1d(GlobalC::ucell.meshx);
 					//----------------------------------------------------------
 					// Here we compute the G=0 term
 					//----------------------------------------------------------
@@ -275,7 +281,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 						}
 						Integral::Simpson_Integral(mesh, rho1d.data(), atom->rab, rho_lgl[0]);
 					}
-					if (GlobalV::test_charge>0) cout<<"\n |G|=0 term done." <<endl;
+					if (GlobalV::test_charge>0) std::cout<<"\n |G|=0 term done." <<std::endl;
 					//----------------------------------------------------------
 					// Here we compute the G<>0 term
 					// But if in parallel case
@@ -302,7 +308,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 						Integral::Simpson_Integral(mesh, rho1d.data(), atom->rab, rho_lgl[ig]);
 					}
 					
-					if (GlobalV::test_charge>0) cout<<" |G|>0 term done." <<endl;
+					if (GlobalV::test_charge>0) std::cout<<" |G|>0 term done." <<std::endl;
 					//----------------------------------------------------------
 					// EXPLAIN : Complete the transfer of rho from real space to
 					// reciprocal space
@@ -328,7 +334,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 					{
 						for (int ig = 0; ig < GlobalC::pw.ngmc ; ig++)
 						{
-							const complex<double> swap = GlobalC::pw.strucFac(it, ig)* rho_lgl[GlobalC::pw.ig2ngg[ig]];
+							const std::complex<double> swap = GlobalC::pw.strucFac(it, ig)* rho_lgl[GlobalC::pw.ig2ngg[ig]];
 							//rho_g3d(0, ig) += swap * GlobalC::ucell.magnet.nelup_percent(it);
 							//rho_g3d(1, ig) += swap * GlobalC::ucell.magnet.neldw_percent(it);
 							const double up = 0.5 * ( 1 + GlobalC::ucell.magnet.start_magnetization[it] / atom->zv );
@@ -340,15 +346,15 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 					// mohan add 2011-06-14
 					else if(startmag_type==2)
 					{
-						complex<double> swap = ZERO;
-						complex<double> ci_tpi = NEG_IMAG_UNIT * TWO_PI;
+						std::complex<double> swap = ZERO;
+						std::complex<double> ci_tpi = NEG_IMAG_UNIT * TWO_PI;
 						for (int ia = 0; ia < atom->na; ia++)
 						{
 							//const double up = 0.5 * ( 1 + atom->mag[ia] );
 							//const double dw = 0.5 * ( 1 - atom->mag[ia] );
 							const double up = 0.5 * ( 1 + atom->mag[ia] / atom->zv );
 							const double dw = 0.5 * ( 1 - atom->mag[ia] / atom->zv );
-							//cout << " atom " << ia << " up=" << up << " dw=" << dw << endl;
+							//std::cout << " atom " << ia << " up=" << up << " dw=" << dw << std::endl;
 
 							for (int ig = 0; ig < GlobalC::pw.ngmc ; ig++)
 							{
@@ -372,7 +378,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 					{
 						for (int ig = 0; ig < GlobalC::pw.ngmc ; ig++)
 						{
-							const complex<double> swap = GlobalC::pw.strucFac(it, ig)* rho_lgl[GlobalC::pw.ig2ngg[ig]];
+							const std::complex<double> swap = GlobalC::pw.strucFac(it, ig)* rho_lgl[GlobalC::pw.ig2ngg[ig]];
 							rho_g3d(0, ig) += swap ;
 							if(GlobalV::DOMAG)
 							{
@@ -392,8 +398,8 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 					}
 					else if(startmag_type == 2)
 					{//zdy-warning-not-available
-						complex<double> swap = ZERO;
-						complex<double> ci_tpi = NEG_IMAG_UNIT * TWO_PI;
+						std::complex<double> swap = ZERO;
+						std::complex<double> ci_tpi = NEG_IMAG_UNIT * TWO_PI;
 						for(int ia = 0;ia<atom->na;ia++)
 						{
 							for (int ig = 0; ig < GlobalC::pw.ngmc ; ig++)
@@ -433,7 +439,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 	}();
 
 	assert( spin_number_need > 0 );
-	vector<double> ne(spin_number_need);
+	std::vector<double> ne(spin_number_need);
     for (int is = 0; is < spin_number_need;is++)
     {
         GlobalC::UFFT.ToRealSpace( is, rho_g3d, rho_in[is]);
@@ -470,18 +476,18 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
             GlobalV::ofs_warning << " Warning: negative or imaginary starting charge : " ;
             GlobalV::ofs_warning << " neg = " << neg
                  << " ima = " << ima
-                 << " SPIN = " << is << endl;
+                 << " SPIN = " << is << std::endl;
         }
 
-//		cout << " sum rho for spin " << is << " = " << sumrea << endl;
-//		cout << " sum rho for spin " << is << " = " << sumrea << endl;
+//		std::cout << " sum rho for spin " << is << " = " << sumrea << std::endl;
+//		std::cout << " sum rho for spin " << is << " = " << sumrea << std::endl;
 
     }//end is
 
 //	for(int it=0; it<GlobalC::ucell.ntype; it++)
 //	{
-		//cout << " nelup_percent = " << GlobalC::ucell.magnet.nelup_percent(it) << endl;
-		//cout << " neldw_percent = " << GlobalC::ucell.magnet.neldw_percent(it) << endl;
+		//std::cout << " nelup_percent = " << GlobalC::ucell.magnet.nelup_percent(it) << std::endl;
+		//std::cout << " neldw_percent = " << GlobalC::ucell.magnet.neldw_percent(it) << std::endl;
 //	}
 
 
@@ -490,7 +496,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 	if(spin_number_need == 2) spin0 = spin_number_need;
 	for(int is=0; is<spin0; ++is)
 	{
-		GlobalV::ofs_warning << "\n SETUP ATOMIC RHO FOR SPIN " << is+1 << endl;
+		GlobalV::ofs_warning << "\n SETUP ATOMIC RHO FOR SPIN " << is+1 << std::endl;
 		OUT(GlobalV::ofs_warning,"Electron number from rho",ne[is]);
 		ne_tot += ne[is];
 	}
@@ -520,7 +526,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 	// occupations.
 	// GlobalC::ucell.magnet.compute_magnetization();
 
-	//GlobalV::ofs_running << " Superposition of atomic wave function as First-Charge done." << endl;
+	//GlobalV::ofs_running << " Superposition of atomic wave function as First-Charge done." << std::endl;
 	//2014-06-22
 
     timer::tick("Charge","atomic_rho");
@@ -571,7 +577,7 @@ void Charge::set_rho_core(
     ZEROS(rhocg, GlobalC::pw.nggm );
 
 	// three dimension.
-    complex<double> *vg = new complex<double>[GlobalC::pw.ngmc];	
+    std::complex<double> *vg = new std::complex<double>[GlobalC::pw.ngmc];	
 
     for (int it = 0; it < GlobalC::ucell.ntype;it++)
     {
@@ -733,13 +739,13 @@ void Charge::sum_band_k(void)
 	TITLE("Charge","sum_band_k");
 	GlobalC::en.eband = 0.0;
 
-	complex<double>* porter = GlobalC::UFFT.porter;
-	complex<double>* porter1 = nullptr;
-	if(GlobalV::NSPIN==4) porter1 = new complex<double>[GlobalC::pw.nrxx];//added by zhengdy-soc
+	std::complex<double>* porter = GlobalC::UFFT.porter;
+	std::complex<double>* porter1 = nullptr;
+	if(GlobalV::NSPIN==4) porter1 = new std::complex<double>[GlobalC::pw.nrxx];//added by zhengdy-soc
 
 	for (int ik = 0;ik < GlobalC::kv.nks;ik++)
 	{
-		//cout << "\n ik=" << ik;
+		//std::cout << "\n ik=" << ik;
 		if (GlobalV::NSPIN==2) GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
 		
 		//  here we compute the band energy: the sum of the eigenvalues
@@ -802,7 +808,7 @@ void Charge::sum_band_k(void)
 		for (int ibnd = 0;ibnd < GlobalV::NBANDS;ibnd++)
 		{
 			GlobalC::en.eband += GlobalC::wf.ekb[ik][ibnd] * GlobalC::wf.wg(ik, ibnd);
-			//cout << "\n ekb = " << GlobalC::wf.ekb[ik][ibnd] << " wg = " << GlobalC::wf.wg(ik, ibnd);
+			//std::cout << "\n ekb = " << GlobalC::wf.ekb[ik][ibnd] << " wg = " << GlobalC::wf.wg(ik, ibnd);
 
 			ZEROS( porter, GlobalC::pw.nrxx );
 			for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
@@ -829,7 +835,7 @@ void Charge::sum_band_k(void)
 					ZEROS( porter, GlobalC::pw.nrxx );
 					for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
 					{
-						double fact = GlobalC::pw.get_GPlusK_cartesian_projection(ik,ig,j) * GlobalC::ucell.tpiba;
+						double fact = GlobalC::pw.get_GPlusK_cartesian_projection(ik,GlobalC::wf.igk(ik,ig),j) * GlobalC::ucell.tpiba;
 						porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)] ] = GlobalC::wf.evc[ik](ibnd, ig) * complex<double>(0.0,fact);
 					}
 					GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter, 1);
@@ -854,7 +860,6 @@ void Charge::sum_band_k(void)
 	Parallel_Reduce::reduce_double_all( GlobalC::en.eband );
 	}
 #endif
-	
 	// check how many electrons on this grid.
 	/*
 	double sum = 0.0;
@@ -862,7 +867,7 @@ void Charge::sum_band_k(void)
 	{
 		sum += rho1[ir];
 	}
-	cout << "\n sum=" << sum * GlobalC::ucell.omega / GlobalC::pw.nrxx << endl;
+	std::cout << "\n sum=" << sum * GlobalC::ucell.omega / GlobalC::pw.nrxx << std::endl;
 	*/
 
     return;
@@ -958,22 +963,23 @@ void Charge::rho_mpi(void)
 
 	if(GlobalV::DFT_META)
 	{
-    	double *tau_tmp = new double[GlobalC::pw.nrxx];
-	    double *tau_tot = new double[GlobalC::pw.ncxyz];
-    	double *tau_tot_aux = new double[GlobalC::pw.ncxyz];
+    	tau_tmp = new double[GlobalC::pw.nrxx];
+	    tau_tot = new double[GlobalC::pw.ncxyz];
+    	tau_tot_aux = new double[GlobalC::pw.ncxyz];
 		ZEROS(tau_tot_aux, GlobalC::pw.ncxyz);
 	}
 
     for (int is=0; is< GlobalV::NSPIN; is++)
     {
         ZEROS(rho_tot, GlobalC::pw.ncxyz);
+		if(GlobalV::DFT_META) ZEROS(tau_tot, GlobalC::pw.ncxyz);
 
 		for (ir=0;ir<GlobalC::pw.nrxx;ir++)
 		{
 			rho_tmp[ir] = this->rho[is][ir] / static_cast<double>(GlobalV::NPROC_IN_POOL);
 			if(GlobalV::DFT_META)
 			{
-				tau_tmp[ir] = this->rho[is][ir] / static_cast<double>(GlobalV::NPROC_IN_POOL);
+				tau_tmp[ir] = this->kin_r[is][ir] / static_cast<double>(GlobalV::NPROC_IN_POOL);
 			}
 		}
 
@@ -1046,14 +1052,14 @@ void Charge::rho_mpi(void)
 			MPI_Allreduce(rho_tot_aux,rho_tot,GlobalC::pw.ncxyz,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
 			if(GlobalV::DFT_META)
 			{
-				MPI_Allreduce(tau_tot_aux,rho_tot,GlobalC::pw.ncxyz,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
+				MPI_Allreduce(tau_tot_aux,tau_tot,GlobalC::pw.ncxyz,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
 			}
 		}
 		else
         MPI_Allreduce(rho_tot_aux,rho_tot,GlobalC::pw.ncxyz,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
 		if(GlobalV::DFT_META)
 		{
-   	    	MPI_Allreduce(tau_tot_aux,rho_tot,GlobalC::pw.ncxyz,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+   	    	MPI_Allreduce(tau_tot_aux,tau_tot,GlobalC::pw.ncxyz,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
 		}
         
 		//=====================================
@@ -1097,6 +1103,7 @@ void Charge::save_rho_before_sum_band(void)
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
     	DCOPY( rho[is], rho_save[is], GlobalC::pw.nrxx);
+    	if(GlobalV::DFT_META) DCOPY( kin_r[is], kin_r_save[is], GlobalC::pw.nrxx);
     }
     return;
 }
@@ -1111,9 +1118,9 @@ double Charge::check_ne(const double *rho_in) const
 	}
 	Parallel_Reduce::reduce_double_pool( ne );
 	ne = ne * GlobalC::ucell.omega / (double)GlobalC::pw.ncxyz;
-	cout << setprecision(10);
-	cout << " check the electrons number from rho, ne =" << ne << endl;
-	cout << setprecision(6);
+	std::cout << std::setprecision(10);
+	std::cout << " check the electrons number from rho, ne =" << ne << std::endl;
+	std::cout << std::setprecision(6);
 	return ne;
 }
 
@@ -1127,22 +1134,22 @@ void Charge::init_final_scf()
 
     if (GlobalV::test_charge > 1)
     {
-        cout << "\n spin_number = " << GlobalV::NSPIN
+        std::cout << "\n spin_number = " << GlobalV::NSPIN
              << " real_point_number = " << GlobalC::pw.nrxx;
     }
 
 	// allocate memory
 	rho = new double*[GlobalV::NSPIN];
-	rhog = new complex<double>*[GlobalV::NSPIN];
+	rhog = new std::complex<double>*[GlobalV::NSPIN];
 	rho_save = new double*[GlobalV::NSPIN];
-	rhog_save = new complex<double>*[GlobalV::NSPIN];
+	rhog_save = new std::complex<double>*[GlobalV::NSPIN];
 
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		rho[is] = new double[GlobalC::pw.nrxx];
-		rhog[is] = new complex<double>[GlobalC::pw.ngmc];
+		rhog[is] = new std::complex<double>[GlobalC::pw.ngmc];
 		rho_save[is] = new double[GlobalC::pw.nrxx];
-		rhog_save[is] = new complex<double>[GlobalC::pw.ngmc];			
+		rhog_save[is] = new std::complex<double>[GlobalC::pw.ngmc];			
 		ZEROS(rho[is], GlobalC::pw.nrxx);
 		ZEROS(rhog[is], GlobalC::pw.ngmc);
 		ZEROS(rho_save[is], GlobalC::pw.nrxx);
@@ -1157,7 +1164,7 @@ void Charge::init_final_scf()
     this->rho_core = new double[GlobalC::pw.nrxx]; // core charge in real space
     ZEROS( rho_core, GlobalC::pw.nrxx);
 
-	this->rhog_core = new complex<double>[GlobalC::pw.ngmc]; // reciprocal core charge
+	this->rhog_core = new std::complex<double>[GlobalC::pw.ngmc]; // reciprocal core charge
 	ZEROS( rhog_core, GlobalC::pw.ngmc);
 
     Memory::record("Charge","rho_core",GlobalC::pw.nrxx,"double");
@@ -1180,13 +1187,13 @@ void Charge::cal_nelec(void)
 	// if nelec <>0; use input number (setup.f90)
 	//=======================================================
 
-	GlobalV::ofs_running << "\n SETUP THE ELECTRONS NUMBER" << endl;
+	GlobalV::ofs_running << "\n SETUP THE ELECTRONS NUMBER" << std::endl;
 
 	if (nelec == 0)
 	{
 		for (int it = 0; it < GlobalC::ucell.ntype;it++)
 		{
-			stringstream ss1, ss2;
+			std::stringstream ss1, ss2;
 			ss1 << "electron number of element " << GlobalC::ucell.atoms[it].label;
 			const int nelec_it = GlobalC::ucell.atoms[it].zv * GlobalC::ucell.atoms[it].na;
 			nelec += nelec_it;
@@ -1212,7 +1219,7 @@ void Charge::cal_nelec(void)
 	OUT(GlobalV::ofs_running,"occupied bands",occupied_bands);
 	
 	// mohan add 2010-09-04
-    //cout << "nbands(GlobalC::ucell) = " <<GlobalV::NBANDS <<endl;
+    //std::cout << "nbands(GlobalC::ucell) = " <<GlobalV::NBANDS <<std::endl;
 	if(GlobalV::NBANDS==occupied_bands)
 	{
 		if( Occupy::gauss() || Occupy::tetra() )
@@ -1223,36 +1230,37 @@ void Charge::cal_nelec(void)
 	
 	if ( GlobalV::CALCULATION!="scf-sto" && GlobalV::CALCULATION!="relax-sto" && GlobalV::CALCULATION!="md-sto" ) //qianrui 2021-2-20
 	{
-	if(GlobalV::NBANDS == 0)
-	{
-		if(GlobalV::NSPIN == 1)
+		if(GlobalV::NBANDS == 0)
 		{
-			int nbands1 = static_cast<int>(occupied_bands) + 10;
-			int nbands2 = static_cast<int>(1.2 * occupied_bands);
-			GlobalV::NBANDS = max(nbands1, nbands2);
+			if(GlobalV::NSPIN == 1)
+			{
+				const int nbands1 = static_cast<int>(occupied_bands) + 10;
+				const int nbands2 = static_cast<int>(1.2 * occupied_bands);
+				GlobalV::NBANDS = max(nbands1, nbands2);
+			}
+			else if (GlobalV::NSPIN ==2 || GlobalV::NSPIN == 4)
+			{
+				const int nbands3 = nelec + 20;
+				const int nbands4 = 1.2 * nelec;
+				GlobalV::NBANDS = max(nbands3, nbands4);
+				if(GlobalV::BASIS_TYPE!="pw") GlobalV::NBANDS = min(GlobalV::NBANDS, GlobalV::NLOCAL);
+			}
+			AUTO_SET("NBANDS",GlobalV::NBANDS);
 		}
-		else if (GlobalV::NSPIN ==2 || GlobalV::NSPIN == 4)
+		//else if ( GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax") //pengfei 2014-10-13
+		else
 		{
-			int nbands3 = nelec + 20;
-			int nbands4 = 1.2 * nelec;
-			GlobalV::NBANDS = max(nbands3, nbands4);
+			if(GlobalV::NBANDS < occupied_bands) WARNING_QUIT("unitcell","Too few bands!");
+			if(GlobalV::NBANDS < GlobalC::ucell.magnet.get_nelup() ) 
+			{
+				OUT(GlobalV::ofs_running,"nelup",GlobalC::ucell.magnet.get_nelup());
+				WARNING_QUIT("unitcell","Too few spin up bands!");
+			}
+			if(GlobalV::NBANDS < GlobalC::ucell.magnet.get_neldw() )
+			{
+				WARNING_QUIT("unitcell","Too few spin down bands!");
+			}
 		}
-		AUTO_SET("NBANDS",GlobalV::NBANDS);
-	}
-	//else if ( GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax") //pengfei 2014-10-13
-	else
-	{
-		if(GlobalV::NBANDS < occupied_bands) WARNING_QUIT("unitcell","Too few bands!");
-		if(GlobalV::NBANDS < GlobalC::ucell.magnet.get_nelup() ) 
-		{
-			OUT(GlobalV::ofs_running,"nelup",GlobalC::ucell.magnet.get_nelup());
-			WARNING_QUIT("unitcell","Too few spin up bands!");
-		}
-		if(GlobalV::NBANDS < GlobalC::ucell.magnet.get_neldw() )
-        {
-            WARNING_QUIT("unitcell","Too few spin down bands!");
-        }
-	}
 	}
 
 	// mohan update 2021-02-19
@@ -1261,7 +1269,7 @@ void Charge::cal_nelec(void)
     {
         if( GlobalV::NBANDS > GlobalV::NLOCAL )
         {
-            WARNING_QUIT("UnitCell_pseudo::cal_nwfc","NLOCAL < GlobalV::NBANDS");
+            WARNING_QUIT("UnitCell_pseudo::cal_nwfc","NLOCAL < NBANDS");
         }
         else
         {

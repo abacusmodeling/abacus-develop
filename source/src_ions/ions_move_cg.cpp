@@ -92,7 +92,7 @@ void Ions_Move_CG::start(const matrix& force, const double& etot_in)
 	if( Ions_Move_Basic::istep == 1 )
 	{
 		steplength=Ions_Move_Basic::trust_radius_ini;          // read in the init trust radius
-		//cout<<"Ions_Move_Basic::trust_radius_ini = "<<Ions_Move_Basic::trust_radius_ini<<endl;
+		//std::cout<<"Ions_Move_Basic::trust_radius_ini = "<<Ions_Move_Basic::trust_radius_ini<<std::endl;
 		sd = true;
 		trial = true;
 		ncggrad = 0;
@@ -107,11 +107,11 @@ void Ions_Move_CG::start(const matrix& force, const double& etot_in)
 	// use gradient and etot and etot_old to check
 	// if the result is converged.
 	
-	//cout<<"sd = "<<sd<<"  trial = "<<trial<<"  istep = "<<istep<<endl;
+	//std::cout<<"sd = "<<sd<<"  trial = "<<trial<<"  istep = "<<istep<<std::endl;
 	if(flag == 0)
 	{
 		Ions_Move_Basic::check_converged(grad);
-		//cout<<"Ions_Move_Basic::converged = "<<Ions_Move_Basic::converged<<endl; 
+		//std::cout<<"Ions_Move_Basic::converged = "<<Ions_Move_Basic::converged<<std::endl; 
 	}
 	
 	if(Ions_Move_Basic::converged)
@@ -224,8 +224,8 @@ void Ions_Move_CG::start(const matrix& force, const double& etot_in)
 				
 				fmin = abs(fc);
 				nbrent++;
-				//cout<<"nbrent = "<<nbrent<<endl;
-				//cout<<"xa = "<<xa<<" xb = "<<xb<<" xc = "<<xc<<" fa = "<<fa<<" fb = "<<fb<<" fc = "<<fc<<endl;
+				//std::cout<<"nbrent = "<<nbrent<<std::endl;
+				//std::cout<<"xa = "<<xa<<" xb = "<<xb<<" xc = "<<xc<<" fa = "<<fa<<" fb = "<<fb<<" fc = "<<fc<<std::endl;
 				
 				if((fmin<abs((fmax)/10.0)) || (nbrent >3) )
 				{
@@ -239,7 +239,7 @@ void Ions_Move_CG::start(const matrix& force, const double& etot_in)
 				else
 				{
 					Brent(fa,fb,fc,xa,xb,xc,best_x,xpt);  //Brent method
-					//cout<<"xc = "<<xc<<endl;
+					//std::cout<<"xc = "<<xc<<std::endl;
 					if(xc < 0)
 					{
 						sd = true;

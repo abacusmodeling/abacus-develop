@@ -55,14 +55,14 @@ Local_Orbital_wfc::~Local_Orbital_wfc()
 			//	delete[] this->WFC_K[i][j];
 			//}
 			delete[] this->WFC_K[i];
-			//cout<<"delete WFC_K["<<i<<"] success"<<endl;
+			//std::cout<<"delete WFC_K["<<i<<"] success"<<std::endl;
 		}
 		delete[] this->WFC_K;
-		//cout<<"delete WFC_K success"<<endl;
+		//std::cout<<"delete WFC_K success"<<std::endl;
 		if(GlobalV::NLOCAL!= 0 )
 		{
 			delete[] this->WFC_K_POOL;
-			//cout<<"delete WFC_K_POOL success"<<endl;
+			//std::cout<<"delete WFC_K_POOL success"<<std::endl;
 		}
 	}
 
@@ -73,17 +73,17 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique &gt)
 	TITLE("Local_Orbital_wfc","allocate_k");
 	if(GlobalV::NLOCAL < GlobalV::NBANDS)
 	{
-		WARNING_QUIT("Local_Orbital_wfc::allocate","NLOCAL<GlobalV::NBANDS");
+		WARNING_QUIT("Local_Orbital_wfc::allocate","NLOCAL<NBANDS");
 	}
 
 	// mohan add the flag 2011-03-02
 	// allocate the first part (only once!).
 	if(this->wfck_flag == false)
 	{
-		this->WFC_K = new complex<double>**[GlobalC::kv.nks];
+		this->WFC_K = new std::complex<double>**[GlobalC::kv.nks];
 		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
-			this->WFC_K[ik] = new complex<double>*[GlobalV::NBANDS];
+			this->WFC_K[ik] = new std::complex<double>*[GlobalV::NBANDS];
 		}
 		this->wfck_flag = true;
 	}
@@ -98,21 +98,21 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique &gt)
 	//if(gt.lgd != 0 && this->complex_flag == false)
 	if(gt.lgd != 0)
 	{
-		//cout<<"gt.lgd="<<gt.lgd<<" ; GlobalV::NLOCAL="<<GlobalV::NLOCAL<<endl; //delete 2015-09-06, xiaohui
+		//std::cout<<"gt.lgd="<<gt.lgd<<" ; GlobalV::NLOCAL="<<GlobalV::NLOCAL<<std::endl; //delete 2015-09-06, xiaohui
 		const int page=GlobalV::NBANDS*gt.lgd;
-		this->WFC_K_POOL=new complex<double> [GlobalC::kv.nks*page];
+		this->WFC_K_POOL=new std::complex<double> [GlobalC::kv.nks*page];
 		ZEROS(WFC_K_POOL, GlobalC::kv.nks*page);
 		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
 			for(int ib=0; ib<GlobalV::NBANDS; ib++)
 			{
 				this->WFC_K[ik][ib] = &WFC_K_POOL[ik*page+ib*gt.lgd];
-				//cout<<"ik="<<ik<<" ib="<<ib<<endl<<"WFC_K address: "<<WFC_K[ik][ib]<<" WFC_K_POOL address: "<<&WFC_K_POOL[ik*page+ib*gt.lgd]<<endl;
+				//std::cout<<"ik="<<ik<<" ib="<<ib<<std::endl<<"WFC_K address: "<<WFC_K[ik][ib]<<" WFC_K_POOL address: "<<&WFC_K_POOL[ik*page+ib*gt.lgd]<<std::endl;
 			}
-			//cout<<"set WFC_K pointer success, ik: "<<ik<<endl;
+			//std::cout<<"set WFC_K pointer success, ik: "<<ik<<std::endl;
 			Memory::record("LocalOrbital_Coef","WFC_K",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
 			//OUT(GlobalV::ofs_running,"MemoryForWaveFunctions (MB)",mem);
-			//cout<<"WFC_K["<<ik<<"] use "<<mem<<" MB"<<endl;
+			//std::cout<<"WFC_K["<<ik<<"] use "<<mem<<" MB"<<std::endl;
 			this->complex_flag = true;
 		}
 	}
@@ -124,16 +124,16 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique &gt)
 	else if(GlobalC::wf.start_wfc == "file")
 	{
 		int error;
-		cout << " Read in wave functions files: " << GlobalC::kv.nkstot << endl;
+		std::cout << " Read in wave functions files: " << GlobalC::kv.nkstot << std::endl;
 		for(int ik=0; ik<GlobalC::kv.nkstot; ++ik)
 		{
-			GlobalV::ofs_running << " Read in wave functions " << ik + 1 << endl;
+			GlobalV::ofs_running << " Read in wave functions " << ik + 1 << std::endl;
 			error = WF_Local::read_lowf_complex( this->WFC_K[ik], ik , 0);
 		}
 #ifdef __MPI
 		Parallel_Common::bcast_int(error);
 #endif
-		GlobalV::ofs_running << " Error=" << error << endl;
+		GlobalV::ofs_running << " Error=" << error << std::endl;
 		if(error==1)
 		{
 			WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: GlobalC::LOWF.dat");
@@ -169,7 +169,7 @@ void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
 
 	if(GlobalV::OUT_LEVEL != "m") 
 	{
-		GlobalV::ofs_running << "\n SETUP ARRAY FOR EXTRA WAVE FUNCTIONS" << endl;
+		GlobalV::ofs_running << "\n SETUP ARRAY FOR EXTRA WAVE FUNCTIONS" << std::endl;
 	}
 
 	bool* occ2d = new bool[GlobalV::NLOCAL];
@@ -231,10 +231,10 @@ void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
 		}
 		else //mohan add 2012-01-08
 		{
-			this->WFC_K_aug = new complex<double>**[GlobalC::kv.nks];
+			this->WFC_K_aug = new std::complex<double>**[GlobalC::kv.nks];
 			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 			{
-				this->WFC_K_aug[ik] = new complex<double>*[GlobalV::NBANDS];
+				this->WFC_K_aug[ik] = new std::complex<double>*[GlobalV::NBANDS];
 			}
 		}
 		first=false;
@@ -289,7 +289,7 @@ void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
 			{
 				for(int i=0; i<GlobalV::NBANDS; ++i)
 				{
-					this->WFC_K_aug[ik][i] = new complex<double>[daug];
+					this->WFC_K_aug[ik][i] = new std::complex<double>[daug];
 					ZEROS(this->WFC_K_aug[ik][i], daug);
 				}
 			}

@@ -8,7 +8,7 @@ int IntArray::arrayCount = 0;
 
 void IntArrayAlloc()
 {
-	cout << "\n Allocation error for IntArray " << endl;
+	std::cout << "\n Allocation error for IntArray " << std::endl;
 	exit(0);
 }
 

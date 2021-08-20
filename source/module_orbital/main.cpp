@@ -7,9 +7,9 @@ void calculate();
 int main(int argc, char **argv)
 {
 
-	cout << "Hello, this is the ORB module of ABACUS." << endl;
+	std::cout << "Hello, this is the ORB module of ABACUS." << std::endl;
 
-	cout << "Right now, the module is still empty, soon we will have more tests." << endl;
+	std::cout << "Right now, the module is still empty, soon we will have more tests." << std::endl;
 
     calculate();
 
@@ -21,15 +21,15 @@ void calculate()
 {
 	ORB_control ooo;
 
-	ofstream ofs("log.txt");
+	std::ofstream ofs("log.txt");
 
 //	ooo.set_orb_tables();
 
 	ofs.close();
 
-	cout << "--------------------" << endl;
-	cout << " Have a great day! " << endl;
-	cout << "--------------------" << endl;
+	std::cout << "--------------------" << std::endl;
+	std::cout << " Have a great day! " << std::endl;
+	std::cout << "--------------------" << std::endl;
 
 /*
 	time_t time_start = std::time(NULL);
@@ -45,17 +45,17 @@ void calculate()
 	time_t	time_finish= std::time(NULL);
 
 	// print out information before ABACUS ends
-	cout << "\n START  Time  : " << ctime(&time_start);
-	cout << " FINISH Time  : " << ctime(&time_finish);
-	cout << " TOTAL  Time  : " << difftime(time_finish, time_start) << endl;
+	std::cout << "\n START  Time  : " << ctime(&time_start);
+	std::cout << " FINISH Time  : " << ctime(&time_finish);
+	std::cout << " TOTAL  Time  : " << difftime(time_finish, time_start) << std::endl;
 
 	double total_time = difftime(time_finish, time_start);
 	int hour = total_time / 3600;
 	int mins = ( total_time - 3600 * hour ) / 60;
 	int secs = total_time - 3600 * hour - 60 * mins ;
-	cout << " Total  Time  : " << hour << " h "
+	std::cout << " Total  Time  : " << hour << " h "
 	            << mins << " mins "
-	            << secs << " secs "<< endl;
+	            << secs << " secs "<< std::endl;
 */
 
     return;

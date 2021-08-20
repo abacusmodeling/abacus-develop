@@ -51,14 +51,14 @@ void Center2_Orb::Orb11::init_radial_table(void)
 	return;
 }
 
-void Center2_Orb::Orb11::init_radial_table( const set<size_t> &radials )
+void Center2_Orb::Orb11::init_radial_table( const std::set<size_t> &radials )
 {
 	const int LA = nA.getL();
 	const int LB = nB.getL();
 	
 	const size_t rmesh = MOT.get_rmesh(nA.getRcut(),nB.getRcut());
 	
-	set<size_t> radials_used;
+	std::set<size_t> radials_used;
 	for( const size_t &ir : radials )
 		if( ir<rmesh )
 			radials_used.insert(ir);
@@ -99,7 +99,7 @@ double Center2_Orb::Orb11::cal_overlap(
 	const int LA = nA.getL();
 	const int LB = nB.getL();
 
-	vector<double> rly;
+	std::vector<double> rly;
 	Ylm::rl_sph_harm (
 		LA+LB,											// max LAB
 		delta_R.x, delta_R.y, delta_R.z,

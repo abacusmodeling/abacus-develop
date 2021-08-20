@@ -63,6 +63,10 @@ public:
 	void print_H_V_delta(void);
 	void print_F_delta(void);
 
+	void cal_v_delta(const std::string& model_file);//<psi|V_delta|psi>
+	void cal_f_delta(matrix& dm);	//pytorch term remaining!
+	void print_H_V_delta();
+	void print_F_delta();
 
 	//----------------------------------------------------------------------
 	/*These 3 functions save the [dm_eig], [e_base], [f_base]
@@ -156,7 +160,7 @@ private:
 		const double& v);
 
     void print_projected_DM(
-		ofstream &ofs,
+		std::ofstream &ofs,
 		ComplexMatrix &des,
 		const int &it,
 		const int &ia,
@@ -164,18 +168,18 @@ private:
 		const int& n);
 
 	void set_DS_mu_alpha(
-		const int& iw1_all,
-		const int& inl,
-		const int& im,
-		const double& vx,
-		const double& vy,
-		const double& vz);
+	const int& iw1_all,
+	const int& inl,
+	const int& im,
+	const double& vx,
+	const double& vy,
+	const double& vz);
 
-	void init_gdmx(void);
-	void load_model(const string& model_file);
-	void cal_gedm(const matrix& dm);	//need to load model in this step
-	void cal_gdmx(const matrix& dm);	//dD/dX
-	void del_gdmx(void);
+	void init_gdmx();
+	void load_model(const std::string& model_file);
+	void cal_gedm();	//need to load model in this step
+	void cal_gdmx(matrix& dm);	//dD/dX
+	void del_gdmx();
 
 	void getdm_double(const matrix& dm);
 

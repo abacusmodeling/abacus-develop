@@ -70,7 +70,7 @@ void Cell_PW::opt_cells_pw()
         break;
     case Exx_Global::Hybrid_Type::Generate_Matrix:
     default:
-        throw invalid_argument(TO_STRING(__FILE__) + TO_STRING(__LINE__));
+        throw std::invalid_argument(TO_STRING(__FILE__) + TO_STRING(__LINE__));
     }
 #endif
 

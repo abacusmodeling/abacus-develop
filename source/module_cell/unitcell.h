@@ -22,8 +22,8 @@ public:
 
     int ntype;// number of atom species in UnitCell
     int nat; // total number of atoms of all species in unitcell
-    string Coordinate; // "Direct" or "Cartesian" or "Cartesian_angstrom"
-    string latName; // Lattice name
+    std::string Coordinate; // "Direct" or "Cartesian" or "Cartesian_angstrom"
+    std::string latName; // Lattice name
     double lat0; // Lattice constant(bohr)(a.u.)
     double lat0_angstrom;// Lattice constant(angstrom)
     double tpiba;// 2*pi / lat0;
@@ -70,9 +70,9 @@ public:
 public:
     UnitCell();
     ~UnitCell();
-    void print_cell(ofstream &ofs, output &outp)const;
-    void print_cell_xyz(const string &fn)const;
-    void print_cell_cif(const string &fn)const;
+    void print_cell(std::ofstream &ofs, output &outp)const;
+    void print_cell_xyz(const std::string &fn)const;
+    void print_cell_cif(const std::string &fn)const;
     const double& getNelec(void)const {return electrons_number;}
 
     void update_pos_tau(const double* pos);
@@ -81,20 +81,22 @@ public:
     void bcast_atoms_tau();
     void save_cartesian_position(double* pos)const;
 
+    bool judge_big_cell(void);
+
 protected:
 
     double electrons_number;
 
     double *atom_mass;
-    string *atom_label;
-    string *pseudo_fn;
+    std::string *atom_label;
+    std::string *pseudo_fn;
 
 #ifdef __MPI
     void bcast_unitcell(void);
     void bcast_unitcell2(void);
 #endif
 
-	void set_iat2it(void);
+	void set_iat2itia(void);
 
 };
 

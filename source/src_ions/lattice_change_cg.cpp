@@ -59,10 +59,10 @@ void Lattice_Change_CG::allocate(void)
 	this->e0 = 0.0;	
 }
 
-void Lattice_Change_CG::start(matrix &stress, const double& etot_in)
+void Lattice_Change_CG::start(const matrix &stress_in, const double& etot_in)
 {
 	TITLE("Lattice_Change_CG","start");
-	
+
 	assert(lat0!=0);
 	assert(grad0!=0);
 	assert(cg_grad0!=0);
@@ -80,8 +80,8 @@ void Lattice_Change_CG::start(matrix &stress, const double& etot_in)
 	double* cg_gradn = new double[dim];
 	double* move =new double[dim];
 	double* cg_grad = new double[dim];
-	double best_x;
-	double fmin;
+	double best_x = 0.0;
+	double fmin = 0.0;
 	
 	int flag = 0;  
 	
@@ -105,6 +105,7 @@ void Lattice_Change_CG::start(matrix &stress, const double& etot_in)
 		nbrent = 0;
 	}
 	
+	matrix stress(stress_in);
 	Lattice_Change_Basic::setup_gradient(lat, grad, stress);
 	// use energy_in and istep to setup etot and etot_old.
 	Lattice_Change_Basic::setup_etot(etot_in, 0);

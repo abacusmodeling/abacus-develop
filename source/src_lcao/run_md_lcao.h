@@ -20,6 +20,8 @@ class Run_MD_LCAO
 	void opt_cell(void);
 	void opt_ions(void);
 
+	void callInteraction_LCAO(const int& numIon, Vector3<double>* force, matrix& stress_lcao);
+
 	private:
 
 	Ions_Move_Methods IMM;
@@ -33,6 +35,9 @@ class Run_MD_LCAO
 	Charge_Extra CE;
 
 	void final_scf(void);
+
+	Vector3<double> *force;  //force of each atom
+	matrix stress;           //stress for this lattice
 
 };
 

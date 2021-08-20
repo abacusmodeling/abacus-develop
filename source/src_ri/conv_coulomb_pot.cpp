@@ -30,8 +30,8 @@ double Conv_Coulomb_Pot::get_conv_coulomb_pot(const size_t &ir) const
 
 void Conv_Coulomb_Pot::cal_conv_coulomb_pot()
 {
-	vector<double> tmp_func( orb.getNr() );
-	vector<double> tmp_integral( orb.getNr() );
+	std::vector<double> tmp_func( orb.getNr() );
+	std::vector<double> tmp_integral( orb.getNr() );
 
 	// \int_{r'=0}^{r} dr' f(r') * r'^{L+2} / r^{L+1}
 	for( size_t ir=0; ir!=orb.getNr(); ++ir )
@@ -81,13 +81,13 @@ void Conv_Coulomb_Pot::cal_orbs_ccp<Numerical_Orbital_Lm>(
 	ccp.cal_conv_coulomb_pot();
 
 	const size_t mesh = (rmesh_times * orbs.getNr()) | 1;		// mesh must be odd for simspon integral
-	vector<double> psi( mesh );
+	std::vector<double> psi( mesh );
 	for( size_t ir=0; ir!=mesh ; ++ir)
 	{
 		psi[ir] = ccp.get_conv_coulomb_pot(ir);
 	}
 
-	vector<double> rab( mesh );
+	std::vector<double> rab( mesh );
 	for( size_t ir=0; ir!=mesh ; ++ir)
 	{
 		if( ir<orbs.getNr() )
@@ -96,7 +96,7 @@ void Conv_Coulomb_Pot::cal_orbs_ccp<Numerical_Orbital_Lm>(
 			rab[ir] = orbs.getRab(orbs.getNr()-1);
 	}
 
-	vector<double> r_radial( mesh );
+	std::vector<double> r_radial( mesh );
 	for( size_t ir=0; ir!=mesh ; ++ir)
 	{
 		if( ir<orbs.getNr() )

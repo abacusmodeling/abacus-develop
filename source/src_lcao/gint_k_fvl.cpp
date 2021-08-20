@@ -17,7 +17,7 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 
 	int nnrg = GlobalC::LNNR.nnrg;
  	//xiaohui add "OUT_LEVEL", 2015-09-16
-	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " GlobalC::LNNR.nnrg in cal_force_k = " << GlobalC::LNNR.nnrg << endl;
+	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " GlobalC::LNNR.nnrg in cal_force_k = " << GlobalC::LNNR.nnrg << std::endl;
 	assert(nnrg>=0);
 
 	// just because to make thea arrys meaningful.
@@ -213,7 +213,7 @@ void Gint_k::svl_k_RealSpace(
 
 	int nnrg = GlobalC::LNNR.nnrg;
 
-	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " GlobalC::LNNR.nnrg in cal_force_k = " << GlobalC::LNNR.nnrg << endl;
+	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " GlobalC::LNNR.nnrg in cal_force_k = " << GlobalC::LNNR.nnrg << std::endl;
 	assert(nnrg>=0);
 
 	// just because to make thea arrys meaningful.
@@ -350,7 +350,7 @@ void Gint_k::svl_k_RealSpace(
 						}
 					}
 				}
-				//cout<<"loop  "<<i<<" "<<j<<" "<<k<<endl;//test
+				//std::cout<<"loop  "<<i<<" "<<j<<" "<<k<<std::endl;//test
 
 				this->evaluate_vl_stress(grid_index, size,i,j,k,
 						psir_ylm, cal_flag, vldr3, distance,
@@ -508,7 +508,7 @@ void Gint_k::evaluate_vl_stress(
 			{
 				if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
 				{
-				//	cout << " same flag is = " << ib << endl;
+				//	std::cout << " same flag is = " << ib << std::endl;
 					same_flag = true;
 					break;
 				}
@@ -575,7 +575,7 @@ void Gint_k::evaluate_vl_stress(
                 assert(offset < GlobalC::LNNR.nad[iat]);
 
 				//--------------------------------------------------------------- 
-				// what I do above is to get 'offset' for atom pair (iat1, iat2)
+				// what I do above is to get 'offset' for atom std::pair (iat1, iat2)
 				// if I want to simplify this searching for offset,
 				// I should take advantage of gt.which_unitcell.
 				//--------------------------------------------------------------- 
@@ -790,7 +790,7 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
                         {
                                 if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
                                 {
-                                //      cout << " same flag is = " << ib << endl;
+                                //      std::cout << " same flag is = " << ib << std::endl;
                                         same_flag = true;
                                         break;
                                 }
@@ -850,7 +850,7 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
                 assert(offset < GlobalC::LNNR.nad[iat]);
 
                                 //--------------------------------------------------------------- 
-                                // what I do above is to get 'offset' for atom pair (iat1, iat2)
+                                // what I do above is to get 'offset' for atom std::pair (iat1, iat2)
                                 // if I want to simplify this searching for offset,
                                 // I should take advantage of gt.which_unitcell.
                                 //--------------------------------------------------------------- 
@@ -990,8 +990,8 @@ void Gint_k::set_ijk_atom_force(
 	const Numerical_Orbital_Lm* pointer;
 	double mt[3];
     // Peize Lin change rly, grly 2016-08-26
-    static vector<double> rly;
-    static vector<vector<double>> grly;
+    static std::vector<double> rly;
+    static std::vector<std::vector<double>> grly;
 	for (int id=0; id<size; ++id)
 	{
 		// (2.1) get the atom type and atom index.

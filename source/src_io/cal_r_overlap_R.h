@@ -1,12 +1,9 @@
 #ifndef CAL_R_OVERLAP_R_H
 #define CAL_R_OVERLAP_R_H
 
-#include<vector>
-using std::vector;
-#include<map>
-using std::map;
-#include<set>
-using std::set;
+#include <vector>
+#include <map>
+#include <set>
 
 #include "../src_lcao/center2_orb.h"
 #include "../src_lcao/center2_orb-orb11.h"
@@ -39,7 +36,7 @@ class cal_r_overlap_R
 
 	Numerical_Orbital_Lm orb_r;
 
-	vector<vector<vector<Numerical_Orbital_Lm>>> orbital_phi;
+	std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> orbital_phi;
 	
 	int R_x_num;
     int R_y_num;
@@ -51,20 +48,20 @@ class cal_r_overlap_R
 	Vector3<double> ****psi_r_psi;
 	bool allocate_psi_r_psi = false;
 
-	map<size_t,
-		map<size_t,
-			map<size_t,
-				map<size_t,
-					map<size_t,
-						map<size_t,
+	std::map<size_t,
+		std::map<size_t,
+			std::map<size_t,
+				std::map<size_t,
+					std::map<size_t,
+						std::map<size_t,
 						Center2_Orb::Orb11>>>>>> center2_orb11;
 	
-	map<size_t,
-		map<size_t,
-			map<size_t,
-				map<size_t,
-					map<size_t,
-						map<size_t,
+	std::map<size_t,
+		std::map<size_t,
+			std::map<size_t,
+				std::map<size_t,
+					std::map<size_t,
+						std::map<size_t,
 						Center2_Orb::Orb21>>>>>> center2_orb21_r;
 						
 	void init();

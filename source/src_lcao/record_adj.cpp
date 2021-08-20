@@ -47,7 +47,7 @@ void Record_adj::for_2d(void)
 	int irr = 0;
 
 	
-//	cout << " in for_2d" << endl;
+//	std::cout << " in for_2d" << std::endl;
 
 	for (int T1 = 0; T1 < GlobalC::ucell.ntype; ++T1)
 	{
@@ -138,7 +138,7 @@ void Record_adj::for_2d(void)
 	this->info = new int**[na_proc];
 	for(int i=0; i<na_proc; i++)
 	{
-//		GlobalV::ofs_running << " atom" << setw(5) << i << setw(10) << na_each[i] << endl;
+//		GlobalV::ofs_running << " atom" << std::setw(5) << i << std::setw(10) << na_each[i] << std::endl;
 		if( na_each[i] > 0)
 		{
 			info[i] = new int*[ na_each[i] ];
@@ -211,7 +211,7 @@ void Record_adj::for_2d(void)
 					++cb;
 				}
 			}//end ad
-//			GlobalV::ofs_running << " nadj = " << cb << endl;
+//			GlobalV::ofs_running << " nadj = " << cb << std::endl;
 			++iat;
 		}//end I1
 	}//end T1
@@ -419,7 +419,7 @@ void Record_adj::for_grid(const Grid_Technique &gt)
 	assert(ca==na_proc);
 	timer::tick("Record_adj","for_grid");
 
-//	cout << " after for_grid" << endl;
+//	std::cout << " after for_grid" << std::endl;
 	return;
 }
 

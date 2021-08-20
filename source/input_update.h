@@ -20,7 +20,7 @@ public:
     
 	Update_input();
     ~Update_input();
-    void init(const string &fn);
+    void init(const std::string &fn);
 
 private:
 	
@@ -33,25 +33,25 @@ private:
     double mixing_beta;		// 0 : no_mixing
 	int printe;
 	//int extra_pot;	// mohan add 2011-03-13, xiaohui modify 2015-02-01
-	string charge_extrap;	//xiaohui add 2015-02-01
+	std::string charge_extrap;	//xiaohui add 2015-02-01
     int out_charge;		// output charge density.
 	int out_dm; // output density matrix.
 	int out_dos;			// dos calculation. mohan add 20090909
 	int	out_lowf;			// output the wave functions in local basis.
     
-	bool Read(const string &fn);
+	bool Read(const std::string &fn);
 #ifdef __MPI
     void Bcast(void);
 #endif
 
 	template <class T>
-	static void change(ofstream &ofs, const string &name, T &v1, T &v2)
+	static void change(std::ofstream &ofs, const std::string &name, T &v1, T &v2)
 	{
-		ofs << " " << name << " change from " << v1 << " to " << v2 << endl;
+		ofs << " " << name << " change from " << v1 << " to " << v2 << std::endl;
 	}
 
     template <class T>
-    static void read_value(ifstream &ifs, T &var)
+    static void read_value(std::ifstream &ifs, T &var)
     {
         ifs >> var;
         ifs.ignore(150, '\n');

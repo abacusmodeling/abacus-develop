@@ -55,14 +55,13 @@ void Run_pw::plane_wave_line(void)
 
     // print information
     // mohan add 2021-01-30
-    Print_Info PI;
-    PI.setup_parameters();
+    Print_Info::setup_parameters(GlobalC::ucell, GlobalC::kv, GlobalC::xcf);
 
     // Initalize the plane wave basis set
     GlobalC::pw.gen_pw(GlobalV::ofs_running, GlobalC::ucell, GlobalC::kv);
     DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
-    cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx <<" * " << GlobalC::pw.ny <<" * "<< GlobalC::pw.nz << endl;
-    cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx <<" * " << GlobalC::pw.nby <<" * "<< GlobalC::pw.nbz << endl;
+    std::cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx <<" * " << GlobalC::pw.ny <<" * "<< GlobalC::pw.nz << std::endl;
+    std::cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx <<" * " << GlobalC::pw.nby <<" * "<< GlobalC::pw.nbz << std::endl;
 
     // mohan add 2010-10-10, just to test the symmetry of a variety
     // of systems.
@@ -82,7 +81,7 @@ void Run_pw::plane_wave_line(void)
 
 //----------------------------------------------------------
 // 1 read in initial data:
-//   a lattice structure:atom_species,atom_positions,lattice vector
+//   a lattice structure:atom_species,atom_positions,lattice std::vector
 //   b k_points
 //   c pseudopotential
 // 2 setup planeware basis, FFT,structure factor, ...
@@ -121,20 +120,20 @@ void Run_pw::plane_wave_line(void)
 
     if(GlobalV::BASIS_TYPE=="pw" && winput::out_spillage) //xiaohui add 2013-09-01
     {
-        //cout << "\n Output Spillage Information : " << endl;
+        //std::cout << "\n Output Spillage Information : " << std::endl;
         // calculate spillage value.
 #ifdef __LCAO
         if ( winput::out_spillage == 3)
         {
             GlobalV::BASIS_TYPE="pw"; 
-            cout << " NLOCAL = " << GlobalV::NLOCAL << endl;
+            std::cout << " NLOCAL = " << GlobalV::NLOCAL << std::endl;
 
             for (int ik=0; ik<GlobalC::kv.nks; ik++)
             {
                 GlobalC::wf.wanf2[ik].create(GlobalV::NLOCAL, GlobalC::wf.npwx);
 				if(GlobalV::BASIS_TYPE=="pw")
                 {
-					cout << " ik=" << ik + 1 << endl;
+					std::cout << " ik=" << ik + 1 << std::endl;
 
                     GlobalV::BASIS_TYPE="lcao_in_pw";
 					GlobalC::wf.LCAO_in_pw_k(ik, GlobalC::wf.wanf2[ik]);

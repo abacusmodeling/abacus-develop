@@ -1,4 +1,5 @@
 #include "unitcell_pseudo.h"
+#include "../input.h"
 #ifdef __LCAO
 //#include "../module_orbital/ORB_read.h" // to use 'ORB' -- mohan 2021-01-30
 #endif
@@ -12,15 +13,15 @@
 //==========================================================
 // Read pseudopotential according to the dir
 //==========================================================
-void UnitCell_pseudo::read_cell_pseudopots(const string &pp_dir)
+void UnitCell_pseudo::read_cell_pseudopots(const std::string &pp_dir)
 {
 	TITLE("UnitCell_pseudo","read_cell_pseudopots");
 	// setup reading log for pseudopot_upf
-	stringstream ss;
+	std::stringstream ss;
 	ss << GlobalV::global_out_dir << "atom_pseudo.log";
 	
 	// Read in the atomic pseudo potentials
-	string pp_address;
+	std::string pp_address;
 	for (int i = 0;i < ntype;i++)
 	{
 		Pseudopot_upf upf;
@@ -57,8 +58,8 @@ void UnitCell_pseudo::read_cell_pseudopots(const string &pp_dir)
 
 		if(error==1)
 		{
-			cout << " Pseudopotential directory now is : " << pp_address << endl;
-			GlobalV::ofs_warning << " Pseudopotential directory now is : " << pp_address << endl;
+			std::cout << " Pseudopotential directory now is : " << pp_address << std::endl;
+			GlobalV::ofs_warning << " Pseudopotential directory now is : " << pp_address << std::endl;
 			WARNING_QUIT("read_pseudopot","Couldn't find pseudopotential file.");
 		}
 		else if(error==2)
@@ -81,7 +82,7 @@ void UnitCell_pseudo::read_cell_pseudopots(const string &pp_dir)
 //			upf.print_pseudo_upf( ofs );
 			atoms[i].set_pseudo_nc( upf );
 
-			GlobalV::ofs_running << "\n Read in pseudopotential file is " << pseudo_fn[i] << endl;
+			GlobalV::ofs_running << "\n Read in pseudopotential file is " << pseudo_fn[i] << std::endl;
 			OUT(GlobalV::ofs_running,"pseudopotential type",atoms[i].pp_type);
 			OUT(GlobalV::ofs_running,"functional Ex", atoms[i].dft[0]);
 			OUT(GlobalV::ofs_running,"functional Ec", atoms[i].dft[1]);
@@ -101,8 +102,8 @@ void UnitCell_pseudo::read_cell_pseudopots(const string &pp_dir)
 		}
 		if(upf.functional_error == 1)
 		{
-			cout << "In Pseudopot_upf::read_pseudo_header : input xc functional does not match that in pseudopot file" << endl;
-			cout << "Please make sure this is what you need" << endl;
+			std::cout << "In Pseudopot_upf::read_pseudo_header : input xc functional does not match that in pseudopot file" << std::endl;
+			std::cout << "Please make sure this is what you need" << std::endl;
 			atoms[i].dft[0] = GlobalV::DFT_FUNCTIONAL;
 			transform(atoms[i].dft[0].begin(), atoms[i].dft[0].end(), atoms[i].dft[0].begin(), (::toupper));
 			atoms[i].dft[1].clear();
@@ -110,7 +111,7 @@ void UnitCell_pseudo::read_cell_pseudopots(const string &pp_dir)
 			atoms[i].dft[3].clear();
 			if(GlobalV::MY_RANK==0)
 			{
-				GlobalV::ofs_running << "\n XC functional updated to : " << endl;
+				GlobalV::ofs_running << "\n XC functional updated to : " << std::endl;
 				OUT(GlobalV::ofs_running,"functional Ex", atoms[i].dft[0]);
 				OUT(GlobalV::ofs_running,"functional Ec", atoms[i].dft[1]);
 				OUT(GlobalV::ofs_running,"functional GCEx", atoms[i].dft[2]);
@@ -129,10 +130,10 @@ void UnitCell_pseudo::read_cell_pseudopots(const string &pp_dir)
 }
 
 
-void UnitCell_pseudo::print_unitcell_pseudo(const string &fn, output &outp)
+void UnitCell_pseudo::print_unitcell_pseudo(const std::string &fn, output &outp)
 {
 	if(GlobalV::test_pseudo_cell) TITLE("UnitCell_pseudo","print_unitcell_pseudo");
-	ofstream ofs( fn.c_str() );
+	std::ofstream ofs( fn.c_str() );
 
 	this->print_cell(ofs, outp);
 	for (int i = 0;i < ntype;i++)

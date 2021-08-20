@@ -16,13 +16,13 @@
 #include <sys/time.h>			// Peize Lin test
 #include "../src_lcao/global_fp.h"		// Peize Lin test
 
-vector<vector<pair<vector<double>,matrix>>> Exx_Abfs::PCA::cal_PCA( 
-	const vector<vector<vector<Numerical_Orbital_Lm>>> &lcaos, 
-	const vector<vector<vector<Numerical_Orbital_Lm>>> &abfs,
+std::vector<std::vector<std::pair<std::vector<double>,matrix>>> Exx_Abfs::PCA::cal_PCA( 
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &lcaos, 
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &abfs,
 	const double kmesh_times )
 {
 	TITLE("Exx_Abfs::PCA::cal_PCA");
-ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
+std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 	
 	const Element_Basis_Index::Range
@@ -35,8 +35,8 @@ timeval t_start;
 	const Element_Basis_Index::IndexLNM
 		&& index_abfs = Element_Basis_Index::construct_index( range_abfs );
 		
-ofs<<range_lcaos<<endl;
-ofs<<range_abfs<<endl;
+ofs<<range_lcaos<<std::endl;
+ofs<<range_abfs<<std::endl;
 
 	const int Lmax_bak = Exx_Abfs::Lmax;
 	Exx_Abfs::Lmax = std::numeric_limits<int>::min();
@@ -46,21 +46,21 @@ ofs<<range_abfs<<endl;
 	Exx_Abfs::Matrix_Orbs21 m_abfslcaos_lcaos;
 //gettimeofday( &t_start, NULL);
 	m_abfslcaos_lcaos.init( 1, kmesh_times, 1 );
-//ofs<<"TIME@m_abfslcaos_lcaos.init\t"<<time_during(t_start)<<endl;
+//ofs<<"TIME@m_abfslcaos_lcaos.init\t"<<time_during(t_start)<<std::endl;
 //gettimeofday( &t_start, NULL);
 	m_abfslcaos_lcaos.init_radial( abfs, lcaos, lcaos );
-//ofs<<"TIME@m_abfslcaos_lcaos.init_radial\t"<<time_during(t_start)<<endl;
+//ofs<<"TIME@m_abfslcaos_lcaos.init_radial\t"<<time_during(t_start)<<std::endl;
 
-	map<size_t,map<size_t,set<double>>> delta_R;
+	std::map<size_t,std::map<size_t,set<double>>> delta_R;
 	for( size_t it=0; it!=abfs.size(); ++it )
 		delta_R[it][it] = {0.0};
 //gettimeofday( &t_start, NULL);
 	m_abfslcaos_lcaos.init_radial_table(delta_R);
-//ofs<<"TIME@m_abfslcaos_lcaos.init_radial_table\t"<<time_during(t_start)<<endl;
+//ofs<<"TIME@m_abfslcaos_lcaos.init_radial_table\t"<<time_during(t_start)<<std::endl;
 
 	Exx_Abfs::Lmax = Lmax_bak;
 	
-	vector<vector<pair<vector<double>,matrix>>> eig(abfs.size());
+	std::vector<std::vector<std::pair<std::vector<double>,matrix>>> eig(abfs.size());
 	for( size_t T=0; T!=abfs.size(); ++T )
 	{
 		const matrix && A = m_abfslcaos_lcaos.cal_overlap_matrix(  
@@ -72,37 +72,37 @@ ofs<<range_abfs<<endl;
 			index_lcaos,
 			index_lcaos,
 			Exx_Abfs::Matrix_Orbs21::Matrix_Order::A2B_A1);
-//ofs<<"A:"<<endl<<A<<endl;
+//ofs<<"A:"<<std::endl<<A<<std::endl;
 		
 		eig[T].resize(abfs[T].size());
 		for( size_t L=0; L!=abfs[T].size(); ++L )
 		{
-//ofs<<"get_sub_matrix:"<<endl<<get_sub_matrix( A, T, L, range_abfs, index_abfs )<<endl;
+//ofs<<"get_sub_matrix:"<<std::endl<<get_sub_matrix( A, T, L, range_abfs, index_abfs )<<std::endl;
 //			const matrix A_sub = get_column_mean0_matrix( get_sub_matrix( A, T, L, range_abfs, index_abfs ) );
 			const matrix A_sub = get_sub_matrix( A, T, L, range_abfs, index_abfs );
-//ofs<<"A_sub:"<<endl<<A_sub<<endl;
-//ofs<<"transpose:"<<endl<<transpose(A_sub)<<endl;
-//ofs<<"mul:"<<endl<<transpose(A_sub) * A_sub<<endl;
+//ofs<<"A_sub:"<<std::endl<<A_sub<<std::endl;
+//ofs<<"transpose:"<<std::endl<<transpose(A_sub)<<std::endl;
+//ofs<<"mul:"<<std::endl<<transpose(A_sub) * A_sub<<std::endl;
 			matrix mm = transpose(A_sub) * A_sub;
-//ofs<<"mm:"<<endl<<mm<<endl;
-			vector<double> eig_value(mm.nr);
+//ofs<<"mm:"<<std::endl<<mm<<std::endl;
+			std::vector<double> eig_value(mm.nr);
 			
 			int info;
 gettimeofday( &t_start, NULL);
 			LapackConnector::dsyev( 'V', 'U', mm, VECTOR_TO_PTR(eig_value), info );
-ofs<<"TIME@LapackConnector::dsyev\t"<<time_during(t_start)<<endl;
+ofs<<"TIME@LapackConnector::dsyev\t"<<time_during(t_start)<<std::endl;
 			if( info )
 			{
-				cout<<endl<<"info_dsyev = "<<info<<endl;
-				GlobalV::ofs_warning<<mm<<endl;
-				cout<<"in file "<<__FILE__<<" line "<<__LINE__<<endl;
+				std::cout<<std::endl<<"info_dsyev = "<<info<<std::endl;
+				GlobalV::ofs_warning<<mm<<std::endl;
+				std::cout<<"in file "<<__FILE__<<" line "<<__LINE__<<std::endl;
 				QUIT();
 			}
 			eig[T][L] = make_pair( eig_value, mm );
 //for( const auto v : eig_value )
 //	ofs<<v<<"\t";
-//ofs<<endl;
-//ofs<<"mm:"<<endl<<mm<<endl;
+//ofs<<std::endl;
+//ofs<<"mm:"<<std::endl<<mm<<std::endl;
 		}
 	}
 ofs.close();
@@ -140,6 +140,6 @@ matrix Exx_Abfs::PCA::get_column_mean0_matrix( const matrix & m )
 		for( size_t ir=0; ir!=m.nr; ++ir )
 			m_new(ir,ic) = m(ir,ic) - mean;
 	}
-//ofs<<endl;
+//ofs<<std::endl;
 	return m_new;
 }

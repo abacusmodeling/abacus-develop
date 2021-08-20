@@ -12,7 +12,7 @@ public:
 	  ~Chi0_standard();
 	  
 	  bool epsilon;
-	  string system;
+	  std::string system;
 	  double eta;
 	  double domega;
 	  int nomega;
@@ -29,7 +29,7 @@ public:
 	  void Parallel_G();
 	  void Init();
 	  void Delete();
-	  void Cal_Psi(int iq, complex<double> **psi_r);
+	  void Cal_Psi(int iq, std::complex<double> **psi_r);
 	  void Cal_b(int iq, int ik, int iqk);
 	  void Cal_weight(int iq, int ik, double omega);
 	  void Cal_last();
@@ -38,32 +38,32 @@ public:
 	  void Cal_rpa(int iq);
 	  void Cal_chi();
 	  double qg2( int iq, int g0);
-	  int Cinv(int n, complex<double>** a);
-	  void CMatrixMul(int m, int n, int l, complex<double>** A, complex<double>** B, complex<double>** C);
+	  int Cinv(int n, std::complex<double>** a);
+	  void CMatrixMul(int m, int n, int l, std::complex<double>** A, std::complex<double>** B, std::complex<double>** C);
 	  int Cal_iq(int ik, int iq, int a, int b, int c);
 	  int parallel_g();
 	  void chi0_para_g();
 	  
 	  Vector3<double> *all_gcar;	  
-	  complex<double> **chi0;
-	  complex<double> **chi;
+	  std::complex<double> **chi0;
+	  std::complex<double> **chi;
 	  
 	  
 private:
 	  
 	  bool init_finish;
-	  complex<double> **psi_r1;
-	  complex<double> **psi_r2;
-	  complex<double> **b;
-	  complex<double> **A;
-	  complex<double> **B;
-	  complex<double> *weight;
-	  complex<double> **rpa;
-	  complex<double> *b_core;
+	  std::complex<double> **psi_r1;
+	  std::complex<double> **psi_r2;
+	  std::complex<double> **b;
+	  std::complex<double> **A;
+	  std::complex<double> **B;
+	  std::complex<double> *weight;
+	  std::complex<double> **rpa;
+	  std::complex<double> *b_core;
 	  int *num_G_core;
 	  int *num_G_dis;
-	  complex<double> *b_summary;
-	  complex<double> *b_order;
+	  std::complex<double> *b_summary;
+	  std::complex<double> *b_order;
 	  double *G_r_core;
 	  int *num_Gvector_core;
 	  int *num_Gvector_dis;
@@ -74,7 +74,7 @@ private:
 	  int *flag1;
 	  double **para_g;
 	  int dim_para;
-	  complex<double> **chi0_para;
+	  std::complex<double> **chi0_para;
 	  	
 };
 

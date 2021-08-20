@@ -4,7 +4,7 @@
 
 Use_FFT::Use_FFT()
 {
-	porter = new complex<double>[GlobalC::pw.nrxx];	
+	porter = new std::complex<double>[GlobalC::pw.nrxx];	
 }
 
 Use_FFT::~Use_FFT()
@@ -18,20 +18,17 @@ void Use_FFT::allocate(void)
     TITLE("Use_FFT","allocate");
 
     delete[] porter;
-    // cout<<"before new"<<endl;
-    // cout<<"pw.nrxx = "<<GlobalC::pw.nrxx<<endl;
-    porter = new complex<double>[GlobalC::pw.nrxx];
-    // cout<<"after new"<<endl;
+    porter = new std::complex<double>[GlobalC::pw.nrxx];
     Memory::record("Use_FFT","porter",GlobalC::pw.nrxx,"complexmatrix");
 
     return;
 }
 
 void Use_FFT::RoundTrip(
-    const complex<double> *psi,
+    const std::complex<double> *psi,
     const double *vr,
     const int *fft_index,
-    complex<double> *psic)
+    std::complex<double> *psic)
 {
 	// (1) set value
     for (int ig=0; ig< GlobalC::wf.npw; ig++)
@@ -103,7 +100,7 @@ void Use_FFT::ToRealSpace(const int &is, const ComplexMatrix &vg, double *vr)
     return;
 }
 
-void Use_FFT::ToRealSpace_psi(const int &ik, const complex<double> *psig, complex<double> *psir)
+void Use_FFT::ToRealSpace_psi(const int &ik, const std::complex<double> *psig, std::complex<double> *psir)
 {
 	ZEROS(psir, GlobalC::pw.nrxx);
 	for(int ig=0; ig<GlobalC::wf.npw; ig++)
@@ -117,7 +114,7 @@ void Use_FFT::ToRealSpace_psi(const int &ik, const complex<double> *psig, comple
 }
 
 
-void Use_FFT::ToRealSpace_psi(const int &ik, const int &ib, const ComplexMatrix &evc, complex<double> *psir)
+void Use_FFT::ToRealSpace_psi(const int &ik, const int &ib, const ComplexMatrix &evc, std::complex<double> *psir)
 {
 	// (1) set value
     ZEROS( psir, GlobalC::pw.nrxx );
@@ -154,7 +151,7 @@ void Use_FFT::ToRealSpace(const int &is, const ComplexMatrix &vg, matrix &vr)
 
 // Fourer transform of vg, 
 // then put vg into vr.
-void Use_FFT::ToRealSpace(const complex<double> *vg, double *vr)
+void Use_FFT::ToRealSpace(const std::complex<double> *vg, double *vr)
 {
     ZEROS( porter, GlobalC::pw.nrxx);
     for (int ig=0; ig<GlobalC::pw.ngmc; ig++)
@@ -169,12 +166,12 @@ void Use_FFT::ToRealSpace(const complex<double> *vg, double *vr)
     return;
 }
 
-void Use_FFT::ToReciSpace(const double* vr, complex<double> *vg)
+void Use_FFT::ToReciSpace(const double* vr, std::complex<double> *vg)
 {
 	ZEROS( porter, GlobalC::pw.nrxx);
 	for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
 	{
-		porter[ir] = complex<double>(vr[ir], 0.0);
+		porter[ir] = std::complex<double>(vr[ir], 0.0);
 	}
 	GlobalC::pw.FFT_chg.FFT3D( porter, -1);
 	for (int ig=0; ig<GlobalC::pw.ngmc; ig++)

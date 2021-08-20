@@ -51,7 +51,7 @@ void Parallel_Grid::init(
 
 	if(nczp<0)
 	{
-		GlobalV::ofs_warning << " nczp = " << nczp << endl;
+		GlobalV::ofs_warning << " nczp = " << nczp << std::endl;
 		WARNING_QUIT("Parallel_Grid::init","nczp<0");
 	}
 
@@ -232,7 +232,7 @@ void Parallel_Grid::zpiece_to_all(double *zpiece, const int &iz, double *rho)
 	}// GlobalV::MY_POOL == 0
 	else
 	{
-		//GlobalV::ofs_running << "\n Receive charge density iz=" << iz << endl;
+		//GlobalV::ofs_running << "\n Receive charge density iz=" << iz << std::endl;
 		// the processors in other pools always receive rho from
 		// processor 0. the tag is 'iz'
 		if(proc == GlobalV::MY_RANK )
@@ -341,7 +341,7 @@ const int &nrxx_in, const int &nbz_in, const int &bz_in)
 
 	if(nczp<0)
 	{
-		GlobalV::ofs_warning << " nczp = " << nczp << endl;
+		GlobalV::ofs_warning << " nczp = " << nczp << std::endl;
 		WARNING_QUIT("Parallel_Grid::init","nczp<0");
 	}
 

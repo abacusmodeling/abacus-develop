@@ -17,7 +17,7 @@ public:
 	~Atom_pseudo();
 
 	Vector3<int> *mbl; // whether the atoms can move or not
-	string pseudo_fn; // File name of pseudopotentials
+	std::string pseudo_fn; // File name of pseudopotentials
 	double mass; // the mass of atom
 	bool flag_empty_element = false; // whether is the empty element for bsse.	Peize Lin add 2021.04.07
 
@@ -37,7 +37,7 @@ public:
 	
 protected:
 
-	void print_atom(ofstream &ofs);
+	void print_atom(std::ofstream &ofs);
 
 #ifdef __MPI
 	void bcast_atom_pseudo(const int &na);

@@ -33,7 +33,7 @@ public:
 // 		  stop at the very beginning ).
 // NAME : end_flag ( output data, etc. )
 //==========================================================
-	static string target;
+	static std::string target;
 	static bool before_iter;
 	static bool after_iter;
 	static bool begin_stop_flag;
@@ -62,8 +62,8 @@ public:
 // NAME : b_plot_build
 // NAME : b_plot_atomic
 //==========================================================
-	static string wlmr_dir;
-	static string wf_type;
+	static std::string wlmr_dir;
+	static std::string wf_type;
 	static bool build_wf;
 	static int imp_pao;
 	static bool b_out_wf;
@@ -80,7 +80,7 @@ public:
 // NAME : g1
 // NAME : g2
 //==========================================================
-	static string trial;//"atomic" or "gauss" 
+	static std::string trial;//"atomic" or "gauss" 
 	static double bs;//parameters for gauss orbit
 	static double bp;
 	static double px;
@@ -113,11 +113,11 @@ public:
 	static int atom_end;
 
 	static bool plot_wanq;//add 2008-01-26
-	static string plot_option;//(110),[110] etc.
+	static std::string plot_option;//(110),[110] etc.
 	static int n_unitcell;//number of unitcell to plot
 	static bool out_all;
 	static bool out_charge;
-	static string charge_type;
+	static std::string charge_type;
 	static bool cal_bands; //for wan  	   wan basis + wan charge
 	static bool cal_bands2;//for semi-wan ;pw basis + wan charge add 2008-4-11
 	static bool cal_dos;
@@ -129,21 +129,21 @@ public:
 	static bool compare_atomic;
 
 	static int out_spillage; // output spillage file.
-	static string spillage_outdir;
+	static std::string spillage_outdir;
 	
-	static void Init(const string &fn);
-	static void Print(const string &fn);
+	static void Init(const std::string &fn);
+	static void Print(const std::string &fn);
 private:
 
 	template <class T>
-	static void read_value(ifstream &ifs, T &var)
+	static void read_value(std::ifstream &ifs, T &var)
 	{
 		ifs >> var;
 		ifs.ignore(75, '\n');
 		return;
 	}
 
-	static void Read(const string &fn);
+	static void Read(const std::string &fn);
 	static void Default();
 	static void Check(void);
 #ifdef __MPI
