@@ -4,4 +4,4 @@
 
 typedef cufftDoubleComplex CUFFT_COMPLEX;
 
-void UfftRoundtripKernel(const CUFFT_COMPLEX *psi, const double *vr, const int *fft_index, CUFFT_COMPLEX *psic);
+void RoundTrip(const CUFFT_COMPLEX *psi, const double *vr, const int *fft_index, CUFFT_COMPLEX *psic);
