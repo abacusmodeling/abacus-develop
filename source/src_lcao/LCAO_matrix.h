@@ -48,10 +48,10 @@ class LCAO_Matrix
 	std::complex<double> *Hloc_fixed2;
 	std::complex<double> *Sdiag2; // used in pdiag_double.cpp
 	//with soc, zhengdy-soc
-/*	ComplexMatrix Hloc2_soc;
-	ComplexMatrix Sloc2_soc;
-	ComplexMatrix Hloc_fixed2_soc;
-	ComplexMatrix Sdiag2_soc;*/
+/*	ModuleBase::ComplexMatrix Hloc2_soc;
+	ModuleBase::ComplexMatrix Sloc2_soc;
+	ModuleBase::ComplexMatrix Hloc_fixed2_soc;
+	ModuleBase::ComplexMatrix Sdiag2_soc;*/
 
 
 	//------------------------------

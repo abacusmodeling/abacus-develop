@@ -124,7 +124,7 @@ void MD_basic::runNVT(int step1, double potential, Vector3<double> *force, const
 	//change target temperature
 //	if (step_!=1)mdf.ReadNewTemp( step_ );
 	
-	std::cout << " ---------------------------------------------------------" << std::endl;
+	std::cout << " ------------------------------------------------------------" << std::endl;
 	
 	std::cout<< " Target temperature  : "<< temperature_/K_BOLTZMAN_AU<< " (K)"<<std::endl;
 	
@@ -163,15 +163,15 @@ void MD_basic::runNVT(int step1, double potential, Vector3<double> *force, const
 	// big loop
 	//-----------------------------------------------
 	std::cout<<" "<<std::left<<std::setw(12)<<"MD_STEP"<<std::left<<std::setw(12)<< "SystemE"<<std::left<<std::setw(12)<< "Conserved"<<std::left<<std::setw(12)<< "DeltaE"<<std::left<<std::setw(12)<< "Temperature"<<std::endl;
-	
 	std::cout<<" "<<std::left<<std::setw(12)<<step_<<std::left<<std::setw(12)<< energy_<<std::left<<std::setw(12)<< hamiltonian<<std::left<<std::setw(12)<< energy_-oldEtot_<<std::left<<std::setw(12)<<twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU<<std::endl;
-	
+	std::cout << " ------------------------------------------------------------" << std::endl;
+
 	oldEtot_=energy_;
 
 	if (!GlobalV::MY_RANK)
     {
-        GlobalV::ofs_running<<" --------------------------------------------------"<<std::endl;
-        GlobalV::ofs_running<<" Molecular Dynamics (NVT) STEP "<< step_<<std::endl;
+        GlobalV::ofs_running<<"\n --------------------------------------------------"<<std::endl;
+        GlobalV::ofs_running<<" Molecular Dynamics (NVT) STEP "<< unsigned(step_) <<std::endl;
         GlobalV::ofs_running<< " --------------------------------------------------"<<std::endl;
 	}
 	
@@ -240,10 +240,12 @@ void MD_basic::runNVT(int step1, double potential, Vector3<double> *force, const
 	save_output_position();
 	maxStep = sqrt(maxStep)*mdp.dt;
 
-    if (!GlobalV::MY_RANK){
-        GlobalV::ofs_running<<std::setw(15)<<"maxForce=     "<<std::setw(15)<<"maxstep=      "<<std::setw(15)<<"step=     "<<std::endl;
-        GlobalV::ofs_running<<std::setw(15)<<maxForce<<std::setw(15)<<maxStep<<std::setw(15)<<step_<<std::endl;
-        GlobalV::ofs_running<<step_<<" "<< energy_<<" "<< hamiltonian<<" "<< energy_-oldEtot_<<" "<< twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU<<std::endl;
+    if (!GlobalV::MY_RANK)
+    {
+        GlobalV::ofs_running << " maxForce             : " << std::setw(10) << maxForce << std::endl;
+        GlobalV::ofs_running << " maxStep              : " << std::setw(10) << maxStep << std::endl;
+        GlobalV::ofs_running << " " <<std::left<<std::setw(12)<<"MD_STEP"<<std::left<<std::setw(12)<< "SystemE"<<std::left<<std::setw(12)<< "Conserved"<<std::left<<std::setw(12)<< "DeltaE"<<std::left<<std::setw(12)<< "Temperature"<<std::endl;
+	    GlobalV::ofs_running << " " <<std::left<<std::setw(12)<<step_<<std::left<<std::setw(12)<< energy_<<std::left<<std::setw(12)<< hamiltonian<<std::left<<std::setw(12)<< energy_-oldEtot_<<std::left<<std::setw(12)<<twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU<<std::endl;
     }
     oldEtot_=energy_;
     //output basic restart info
@@ -274,18 +276,10 @@ void MD_basic::runNVE(int step1, double potential, Vector3<double> *force, const
     TITLE("MD_basic","runNVE");
     timer::tick("MD_basic","runNVE");
     step_=step1+step_rst_;
-    if(step_==1)
-    {
-        std::cout<<" (NVE) Start."<<std::endl;
-    }
-    else 
-    {
-        std::cout<<" (NVE) step: "<<step_<<std::endl;
-    }
 
   // Set up extra output to ion optimizer / MD header
-  std::cout<<"Time interval       : "<< mdp.dt*fundamentalTime*1e15<< " (fs)"<<std::endl;
-  std::cout<<"Target temperature  : "<< temperature_/K_BOLTZMAN_AU<< " (K)"<<std::endl;
+  //std::cout<<"Time interval       : "<< mdp.dt*fundamentalTime*1e15<< " (fs)"<<std::endl;
+  //std::cout<<"Target temperature  : "<< temperature_/K_BOLTZMAN_AU<< " (K)"<<std::endl;
 
     if(step_==1){
         for(int k=0;k<ucell.nat;k++)
@@ -300,7 +294,7 @@ void MD_basic::runNVE(int step1, double potential, Vector3<double> *force, const
     twiceKE = twiceKE * 2;
 
     double tempNow = twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU;
-    std::cout<<" start temperature = "<< tempNow/K_BOLTZMAN_AU<< " (k)"<<std::endl;
+    //std::cout<<" start temperature = "<< tempNow/K_BOLTZMAN_AU<< " (k)"<<std::endl;
 
     if(GlobalV::STRESS)
 	{
@@ -316,26 +310,17 @@ void MD_basic::runNVE(int step1, double potential, Vector3<double> *force, const
 
     //std::cout<<"begin maxForce"<<std::endl;
     double maxForce = mdf.MAXVALF(ucell.nat, force);
-    std::cout<<"maxForce: "<<sqrt(maxForce)<<std::endl; 
+    //std::cout<<"maxForce: "<<sqrt(maxForce)<<std::endl; 
 
     energy_=potential;
 
     double conservedE = mdf.Conserved(twiceKE/2, energy_, ucell.nat-nfrozen_);
 
-    std::cout<< "NVE_STEP "<<" "<<"SystemEnergy"<<" "<< "Conserved"<<" "<< "DeltaE"<<" "<< "Temperature"<<std::endl;
-
     // Output the message to the screen.
-    std::cout<<step_<<" "<< energy_<<" "<< conservedE<<" "
-        << energy_-oldEtot_<<" "<< twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU<<std::endl;
-
-    std::cout<<"------------------------------------------------------------------------------"<<std::endl;
-    std::cout<< "MD(NVE) STEP "<< step_<<std::endl;
-    std::cout<<"------------------------------------------------------------------------------"<<std::endl;
-    if (!GlobalV::MY_RANK){
-        GlobalV::ofs_running<<"------------------------------------------------------------------------------"<<std::endl;
-        GlobalV::ofs_running<< "MD(NVE) STEP "<< step_<<std::endl;
-        GlobalV::ofs_running<<"------------------------------------------------------------------------------"<<std::endl;
-    }
+    std::cout << " ------------------------------------------------------------" << std::endl;
+    std::cout<<" "<<std::left<<std::setw(12)<<"NVE_STEP"<<std::left<<std::setw(12)<< "SystemE"<<std::left<<std::setw(12)<< "Conserved"<<std::left<<std::setw(12)<< "DeltaE"<<std::left<<std::setw(12)<< "Temperature"<<std::endl;
+	std::cout<<" "<<std::left<<std::setw(12)<<step_<<std::left<<std::setw(12)<< energy_<<std::left<<std::setw(12)<< conservedE <<std::left<<std::setw(12)<< energy_-oldEtot_<<std::left<<std::setw(12)<<twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU<<std::endl;
+	std::cout << " ------------------------------------------------------------" << std::endl;
   
     // (1) 1st step of Verlet-Velocity
     // New velocity are obtained
@@ -365,7 +350,7 @@ void MD_basic::runNVE(int step1, double potential, Vector3<double> *force, const
     // calculate the conserved quantity during MD 
     double hamiltonian = mdf.Conserved(twiceKE/2, energy_, ucell.nat-nfrozen_);
 
-    std::cout<< std::setprecision (9)<<hamiltonian<<" "<< std::setprecision (9)<<twiceKE/2<<std::endl;
+    //std::cout<< std::setprecision (9)<<hamiltonian<<" "<< std::setprecision (9)<<twiceKE/2<<std::endl;
 
     
     // Output the message to the screen.
@@ -377,11 +362,11 @@ void MD_basic::runNVE(int step1, double potential, Vector3<double> *force, const
     oldEtot_=energy_;
     mdf.mdRestartOut(step_, mdp.recordFreq, ucell.nat, vel);
 
-    std::cout<<"(NVE): this step finished."<<std::endl;
-    if (!GlobalV::MY_RANK)
-    {
-        GlobalV::ofs_running<<"(NVE): this step finished."<<std::endl;
-    }
+    //std::cout<<"(NVE): this step finished."<<std::endl;
+    // if (!GlobalV::MY_RANK)
+    // {
+    //     GlobalV::ofs_running<<"(NVE): this step finished."<<std::endl;
+    // }
 //2015-09-25, xiaohui
 #ifdef __MPI
     if(step_%100==0)
@@ -404,20 +389,20 @@ bool MD_basic::runFIRE(int step1, double potential, Vector3<double> *force, cons
     TITLE("MD_basic","runFIRE");
     timer::tick("MD_basic","runFIRE");
     step_ = step1;
-    if(step_==1)
-    {
-        std::cout<<" FIRE Start."<<std::endl;
-    }
-    else 
-    {
-        std::cout<<" FIRE step: "<<step_<<std::endl;
-    }
+    // if(step_==1)
+    // {
+    //     std::cout<<" FIRE Start."<<std::endl;
+    // }
+    // else 
+    // {
+    //     std::cout<<" FIRE step: "<<step_<<std::endl;
+    // }
   
-    std::cout<<" FIRE Fronzen Atom Number : "<<nfrozen_<<std::endl;
+    //std::cout<<" FIRE Fronzen Atom Number : "<<nfrozen_<<std::endl;
     
 
     // Set up extra output to ion optimizer / MD header
-    std::cout<<"Time interval       : "<< mdp.dt*fundamentalTime*1e15<< " (fs)"<<std::endl;
+    //std::cout<<"Time interval       : "<< mdp.dt*fundamentalTime*1e15<< " (fs)"<<std::endl;
 
     if(step_==1)
     {
@@ -434,7 +419,7 @@ bool MD_basic::runFIRE(int step1, double potential, Vector3<double> *force, cons
     twiceKE = twiceKE * 2;
 
     double tempNow = twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU;
-    std::cout<<" start temperature = "<< tempNow/K_BOLTZMAN_AU<< " (k)"<<std::endl;
+    //std::cout<<" start temperature = "<< tempNow/K_BOLTZMAN_AU<< " (k)"<<std::endl;
 
     for(int k=0;k<ucell.nat;k++)
     {
@@ -445,20 +430,26 @@ bool MD_basic::runFIRE(int step1, double potential, Vector3<double> *force, cons
 
     //std::cout<<"begin maxForce"<<std::endl;
     double maxForce = mdf.MAXVALF(ucell.nat, force);
-    std::cout<<"maxForce: "<<sqrt(maxForce)<<std::endl; 
+    //std::cout<<"maxForce: "<<sqrt(maxForce)<<std::endl; 
     
     energy_=potential;
 
     double conservedE = mdf.Conserved(twiceKE/2, energy_, ucell.nat-nfrozen_);
 
-    std::cout<<"------------------------------------------------------------------------------"<<std::endl;
-    std::cout<< "FIRE STEP "<< step_<<std::endl;
-    std::cout<<"------------------------------------------------------------------------------"<<std::endl;
-    if (!GlobalV::MY_RANK){
-         GlobalV::ofs_running<<"------------------------------------------------------------------------------"<<std::endl;
-         GlobalV::ofs_running<< "FIRE STEP "<< step_<<std::endl;
-         GlobalV::ofs_running<<"------------------------------------------------------------------------------"<<std::endl;
-    }
+    std::cout << " ------------------------------------------------------------" << std::endl;
+    std::cout << " "<<std::left<<std::setw(12)<<"FIRE_STEP"<<std::left<<std::setw(12)<< "SystemE"<<std::left<<std::setw(12)<< "Conserved"<<std::left<<std::setw(12)<< "DeltaE"<<std::left<<std::setw(12)<< "Temperature"<<std::endl;
+	std::cout << " "<<std::left<<std::setw(12)<<step_<<std::left<<std::setw(12)<< energy_<<std::left<<std::setw(12)<< conservedE <<std::left<<std::setw(12)<< energy_-oldEtot_<<std::left<<std::setw(12)<<twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU<<std::endl;
+	std::cout << " FIRE Fronzen Atom Number : "<<nfrozen_<<std::endl;
+    std::cout << " ------------------------------------------------------------" << std::endl;
+
+    // std::cout<<"------------------------------------------------------------------------------"<<std::endl;
+    // std::cout<< "FIRE STEP "<< step_<<std::endl;
+    // std::cout<<"------------------------------------------------------------------------------"<<std::endl;
+    // if (!GlobalV::MY_RANK){
+    //      GlobalV::ofs_running<<"------------------------------------------------------------------------------"<<std::endl;
+    //      GlobalV::ofs_running<< "FIRE STEP "<< step_<<std::endl;
+    //      GlobalV::ofs_running<<"------------------------------------------------------------------------------"<<std::endl;
+    // }
   
     // (1) 1st step of Verlet-Velocity
     // New velocity are obtained
@@ -524,10 +515,10 @@ bool MD_basic::runFIRE(int step1, double potential, Vector3<double> *force, cons
     // Output the message to the screen.
     oldEtot_=energy_;
 
-    std::cout<<"(NVE): this step finished."<<std::endl;
-    if (!GlobalV::MY_RANK){
-        GlobalV::ofs_running<<"(NVE): this step finished."<<std::endl;
-    }
+    // std::cout<<"(NVE): this step finished."<<std::endl;
+    // if (!GlobalV::MY_RANK){
+    //     GlobalV::ofs_running<<"(NVE): this step finished."<<std::endl;
+    // }
 //2015-09-25, xiaohui
 #ifdef __MPI
     if(step1%100==0){
@@ -583,7 +574,7 @@ int MD_basic::getRealStep()
 //output pressure of total MD system, P = tr(stress) + P_kin
 void MD_basic::outStressMD(const matrix& stress, const double& twiceKE)
 {
-    GlobalV::ofs_running<<"output Pressure for check!"<<std::endl;
+    GlobalV::ofs_running<<"\noutput Pressure for check!"<<std::endl;
     double press = 0.0;
     for(int i=0;i<3;i++)
     {

@@ -36,7 +36,7 @@ void Gint_Gamma::cal_band_rho(
     for(int is=0; is<GlobalV::NSPIN; ++is)
     {
         Gint_Tools::Array_Pool<double> psir_DM(GlobalC::pw.bxyz, LD_pool);
-        ZEROS(psir_DM.ptr_1D, GlobalC::pw.bxyz*LD_pool);
+        ModuleBase::GlobalFunc::ZEROS(psir_DM.ptr_1D, GlobalC::pw.bxyz*LD_pool);
 
         for (int ia1=0; ia1<na_grid; ++ia1)
         {
@@ -92,7 +92,7 @@ void Gint_Gamma::cal_band_rho(
                 }
             }
             
-            //OUT(GlobalV::ofs_running, "diagonal part of psir_DM done");
+            //ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "diagonal part of psir_DM done");
             for (int ia2=ia1+1; ia2<na_grid; ++ia2)
             {
                 int first_ib=0, last_ib=0;
@@ -141,7 +141,7 @@ void Gint_Gamma::cal_band_rho(
                         }
                     }
                 }
-                //OUT(GlobalV::ofs_running, "upper triangle part of psir_DM done, atom2", ia2);
+                //ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "upper triangle part of psir_DM done, atom2", ia2);
             }// ia2
         } // ia1
     
@@ -164,7 +164,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const
     timer::tick("Gint_Gamma","gamma_charge");   
 
 	Gint_Tools::Array_Pool<double> rho(GlobalV::NSPIN, GlobalC::pw.nrxx);
-	ZEROS(rho.ptr_1D, GlobalV::NSPIN*GlobalC::pw.nrxx);
+	ModuleBase::GlobalFunc::ZEROS(rho.ptr_1D, GlobalV::NSPIN*GlobalC::pw.nrxx);
 
 	if(max_size)
     {
@@ -278,18 +278,18 @@ double sum_up_rho(const Gint_Tools::Array_Pool<double> &rho)
 			sum += GlobalC::CHR.rho[is][ir];
 		}
 	}
-    if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running, "sum", sum);
+    if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "sum", sum);
 
     timer::tick("Gint_Gamma","reduce_charge");
 #ifdef __MPI
     Parallel_Reduce::reduce_double_pool( sum );
 #endif
     timer::tick("Gint_Gamma","reduce_charge");
-    OUT(GlobalV::ofs_warning,"charge density sumed from grid", sum * GlobalC::ucell.omega/ GlobalC::pw.ncxyz);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_warning,"charge density sumed from grid", sum * GlobalC::ucell.omega/ GlobalC::pw.ncxyz);
 
     const double ne = sum * GlobalC::ucell.omega / GlobalC::pw.ncxyz;
     //xiaohui add 'GlobalV::OUT_LEVEL', 2015-09-16
-    if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running, "ne", ne);
+    if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "ne", ne);
     timer::tick("Gint_Gamma","gamma_charge");
 	return ne;
 }

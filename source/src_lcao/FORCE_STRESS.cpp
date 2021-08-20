@@ -314,26 +314,35 @@ void Force_Stress_LCAO::getForceStress(
 			//-----------------------------
 			//regular force terms test.
 			//-----------------------------
-			this->print_force("OVERLAP    FORCE",foverlap,1,ry);
+			//this->print_force("OVERLAP    FORCE",foverlap,1,ry);
+			f_pw.print("OVERLAP    FORCE", fcs,0);
 			//  this->print_force("TVNL_DPHI  force",ftvnl_dphi,GlobalV::TEST_FORCE);
 			//  this->print_force("VNL_DBETA  force",fvnl_dbeta,GlobalV::TEST_FORCE);
-			this->print_force("T_VNL      FORCE",ftvnl,1,ry);
-			this->print_force("VL_dPHI    FORCE",fvl_dphi,1,ry);
-			this->print_force("VL_dVL     FORCE",fvl_dvl,1,ry);
+			//this->print_force("T_VNL      FORCE",ftvnl,1,ry);
+			f_pw.print("T_VNL      FORCE", fcs,0);
+			f_pw.print("VL_dPHI    FORCE", fcs,0);
+			//this->print_force("VL_dPHI    FORCE",fvl_dphi,1,ry);
+			//this->print_force("VL_dVL     FORCE",fvl_dvl,1,ry);
+			f_pw.print("VL_dVL     FORCE", fcs,0);
+			f_pw.print("EWALD      FORCE", fcs,0);
 			// 	this->print_force("VLOCAL     FORCE",fvlocal,GlobalV::TEST_FORCE);
-			this->print_force("EWALD      FORCE",fewalds,1,ry);
-			this->print_force("NLCC       FORCE",fcc,1,ry);
-			this->print_force("SCC        FORCE",fscc,1,ry);
+			//this->print_force("EWALD      FORCE",fewalds,1,ry);
+			f_pw.print("NLCC       FORCE", fcs,0);
+			f_pw.print("SCC        FORCE", fcs,0);
+			//this->print_force("NLCC       FORCE",fcc,1,ry);
+			//this->print_force("SCC        FORCE",fscc,1,ry);
 			//-------------------------------
 			//put extra force here for test!
 			//-------------------------------
 			if(GlobalV::EFIELD)
 			{
-				this->print_force("EFIELD     FORCE",fefield,1,ry);
+				f_pw.print("EFIELD     FORCE", fcs,0);
+				//this->print_force("EFIELD     FORCE",fefield,1,ry);
 			}
 			if(GlobalC::vdwd2_para.flag_vdwd2||GlobalC::vdwd3_para.flag_vdwd3)
 			{
-				this->print_force("VDW        FORCE",force_vdw,1,ry);
+				f_pw.print("VDW        FORCE", fcs,0);
+				//this->print_force("VDW        FORCE",force_vdw,1,ry);
 			}
 #ifdef __DEEPKS
 			//caoyu add 2021-06-03
@@ -346,7 +355,8 @@ void Force_Stress_LCAO::getForceStress(
 
 		GlobalV::ofs_running << std::setiosflags(ios::left);
 
-		this->printforce_total(ry, istestf, fcs);
+		//this->printforce_total(ry, istestf, fcs);
+		f_pw.print("   TOTAL-FORCE (eV/Angstrom)", fcs,0);
 		if(istestf)
 		{
 			GlobalV::ofs_running << "\n FORCE INVALID TABLE." << std::endl;
@@ -553,7 +563,7 @@ void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, mat
 
 	//GlobalV::ofs_running << std::setiosflags(ios::right);
  	GlobalV::ofs_running << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed) << std::endl;
-	NEW_PART("TOTAL-FORCE (eV/Angstrom)");
+	ModuleBase::GlobalFunc::NEW_PART("TOTAL-FORCE (eV/Angstrom)");
 
 	// print out forces
 	if(INPUT.force_set == 1)
@@ -732,7 +742,7 @@ void Force_Stress_LCAO::forceSymmetry(matrix& fcs)
 	double *pos;
 	double d1,d2,d3;
 	pos = new double[GlobalC::ucell.nat*3];
-	ZEROS(pos, GlobalC::ucell.nat*3);
+	ModuleBase::GlobalFunc::ZEROS(pos, GlobalC::ucell.nat*3);
 	int iat = 0;
 	for(int it = 0;it < GlobalC::ucell.ntype;it++)
 	{

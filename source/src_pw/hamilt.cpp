@@ -166,8 +166,8 @@ void Hamilt::diagH_subspace(
     const int ik,
     const int nstart,
     const int n_band,
-    const ComplexMatrix &psi,
-    ComplexMatrix &evc,
+    const ModuleBase::ComplexMatrix &psi,
+    ModuleBase::ComplexMatrix &evc,
     double *en)
 {
 	if(nstart < n_band)
@@ -197,11 +197,11 @@ void Hamilt::diagH_subspace(
 void Hamilt::diagH_LAPACK(
 	const int nstart,
 	const int nbands,
-	const ComplexMatrix &hc,
-	const ComplexMatrix &sc,
+	const ModuleBase::ComplexMatrix &hc,
+	const ModuleBase::ComplexMatrix &sc,
 	const int ldh, // nstart
 	double *e,
-	ComplexMatrix &hvec)
+	ModuleBase::ComplexMatrix &hvec)
 {
     TITLE("Hamilt","diagH_LAPACK");
 	timer::tick("Hamilt","diagH_LAPACK");
@@ -212,8 +212,8 @@ void Hamilt::diagH_LAPACK(
     // ILAENV returns optimal block size "nb"
     //========================================
 
-    ComplexMatrix sdum(nstart, ldh);
-    ComplexMatrix hdum;
+    ModuleBase::ComplexMatrix sdum(nstart, ldh);
+    ModuleBase::ComplexMatrix hdum;
 
     sdum = sc;
 
@@ -238,7 +238,7 @@ void Hamilt::diagH_LAPACK(
     }
 
     std::complex<double> *work = new std::complex<double>[lwork];
-	ZEROS(work, lwork);
+	ModuleBase::GlobalFunc::ZEROS(work, lwork);
 	
     //=====================================================================
     // input s and (see below) h are copied so that they are not destroyed
@@ -256,7 +256,7 @@ void Hamilt::diagH_LAPACK(
     }
 	
     double *rwork = new double[rwork_dim];
-    ZEROS( rwork, rwork_dim );
+    ModuleBase::GlobalFunc::ZEROS( rwork, rwork_dim );
 
     if (all_eigenvalues)
     {
@@ -274,9 +274,9 @@ void Hamilt::diagH_LAPACK(
         int *iwork = new int [5*nstart];
         int *ifail = new int[nstart];
 
-        ZEROS(rwork,7*nstart);
-        ZEROS(iwork,5*nstart);
-        ZEROS(ifail,nstart);
+        ModuleBase::GlobalFunc::ZEROS(rwork,7*nstart);
+        ModuleBase::GlobalFunc::ZEROS(iwork,5*nstart);
+        ModuleBase::GlobalFunc::ZEROS(ifail,nstart);
 
         hdum.create(nstart, ldh);
         hdum = hc;

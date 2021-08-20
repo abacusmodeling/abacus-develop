@@ -80,7 +80,7 @@ void LCAO_Matrix::allocate_HS_gamma(const long &nloc)
 {
 	TITLE("LCAO_Matrix","allocate_HS_gamma");
 
-	OUT(GlobalV::ofs_running,"nloc",nloc);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nloc",nloc);
 	if(nloc==0) return; //mohan fix bug 2012-05-25
 
 	// because we initilize in the constructor function
@@ -96,10 +96,10 @@ void LCAO_Matrix::allocate_HS_gamma(const long &nloc)
 	this->Hloc = new double[nloc];
 	this->Sdiag = new double[nloc];
 
-	ZEROS(Sloc,nloc);
-	ZEROS(Hloc_fixed,nloc);
-	ZEROS(Hloc,nloc);
-	ZEROS(Sdiag,nloc); // mohan add 2021-01-30
+	ModuleBase::GlobalFunc::ZEROS(Sloc,nloc);
+	ModuleBase::GlobalFunc::ZEROS(Hloc_fixed,nloc);
+	ModuleBase::GlobalFunc::ZEROS(Hloc,nloc);
+	ModuleBase::GlobalFunc::ZEROS(Sdiag,nloc); // mohan add 2021-01-30
 
 	return;
 }
@@ -109,7 +109,7 @@ void LCAO_Matrix::allocate_HS_k(const long &nloc)
 {
 	TITLE("LCAO_Matrix","allocate_HS_k");
 
-	OUT(GlobalV::ofs_running,"nloc",nloc);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nloc",nloc);
 	if(nloc==0) return; //mohan fix bug 2012-05-25
 
 	// because we initilize in the constructor function
@@ -125,9 +125,9 @@ void LCAO_Matrix::allocate_HS_k(const long &nloc)
 	this->Hloc2 = new std::complex<double>[nloc];
 	this->Sdiag2 = new std::complex<double>[nloc];
 
-	ZEROS(Sloc2,nloc);
-	ZEROS(Hloc_fixed2,nloc);
-	ZEROS(Hloc2,nloc);
+	ModuleBase::GlobalFunc::ZEROS(Sloc2,nloc);
+	ModuleBase::GlobalFunc::ZEROS(Hloc_fixed2,nloc);
+	ModuleBase::GlobalFunc::ZEROS(Hloc2,nloc);
 	
 	return;
 }
@@ -144,9 +144,9 @@ void LCAO_Matrix::allocate_HS_R(const int &nnR)
 		this->SlocR = new double[nnR];
 		this->Hloc_fixedR = new double[nnR];
 
-		ZEROS(HlocR, nnR);
-		ZEROS(SlocR, nnR);
-		ZEROS(Hloc_fixedR, nnR);
+		ModuleBase::GlobalFunc::ZEROS(HlocR, nnR);
+		ModuleBase::GlobalFunc::ZEROS(SlocR, nnR);
+		ModuleBase::GlobalFunc::ZEROS(Hloc_fixedR, nnR);
 	}
 	else
 	{
@@ -158,9 +158,9 @@ void LCAO_Matrix::allocate_HS_R(const int &nnR)
 		this->SlocR_soc = new std::complex<double>[nnR];
 		this->Hloc_fixedR_soc = new std::complex<double>[nnR];
 		
-		ZEROS(HlocR_soc, nnR);
-		ZEROS(SlocR_soc, nnR);
-		ZEROS(Hloc_fixedR_soc, nnR);
+		ModuleBase::GlobalFunc::ZEROS(HlocR_soc, nnR);
+		ModuleBase::GlobalFunc::ZEROS(SlocR_soc, nnR);
+		ModuleBase::GlobalFunc::ZEROS(Hloc_fixedR_soc, nnR);
 		
 	}
 
@@ -364,17 +364,17 @@ void LCAO_Matrix::set_stress
 
 void LCAO_Matrix::zeros_HSgamma(const char &mtype)
 {
-	if (mtype=='S') ZEROS(Sloc,GlobalC::ParaO.nloc);
-	else if (mtype=='T') ZEROS(Hloc_fixed,GlobalC::ParaO.nloc);
-	else if (mtype=='H') ZEROS(Hloc,GlobalC::ParaO.nloc);
+	if (mtype=='S') ModuleBase::GlobalFunc::ZEROS(Sloc,GlobalC::ParaO.nloc);
+	else if (mtype=='T') ModuleBase::GlobalFunc::ZEROS(Hloc_fixed,GlobalC::ParaO.nloc);
+	else if (mtype=='H') ModuleBase::GlobalFunc::ZEROS(Hloc,GlobalC::ParaO.nloc);
 	return;
 }
 
 void LCAO_Matrix::zeros_HSk(const char &mtype)
 {
-	if (mtype=='S') ZEROS(Sloc2,GlobalC::ParaO.nloc);
-	else if (mtype=='T') ZEROS(Hloc_fixed2,GlobalC::ParaO.nloc);
-	else if (mtype=='H') ZEROS(Hloc2,GlobalC::ParaO.nloc);
+	if (mtype=='S') ModuleBase::GlobalFunc::ZEROS(Sloc2,GlobalC::ParaO.nloc);
+	else if (mtype=='T') ModuleBase::GlobalFunc::ZEROS(Hloc_fixed2,GlobalC::ParaO.nloc);
+	else if (mtype=='H') ModuleBase::GlobalFunc::ZEROS(Hloc2,GlobalC::ParaO.nloc);
 	return;
 }
 
@@ -382,15 +382,15 @@ void LCAO_Matrix::zeros_HSR(const char &mtype, const int &nnr)
 {
 	if(GlobalV::NSPIN!=4)
 	{
-		if (mtype=='S') ZEROS(SlocR, nnr);
-		else if (mtype=='T') ZEROS(Hloc_fixedR, nnr);
-		else if (mtype=='H') ZEROS(HlocR, nnr);
+		if (mtype=='S') ModuleBase::GlobalFunc::ZEROS(SlocR, nnr);
+		else if (mtype=='T') ModuleBase::GlobalFunc::ZEROS(Hloc_fixedR, nnr);
+		else if (mtype=='H') ModuleBase::GlobalFunc::ZEROS(HlocR, nnr);
 	}
 	else
 	{
-		if (mtype=='H') ZEROS(this->HlocR_soc, nnr);
-		else if (mtype=='S') ZEROS(this->SlocR_soc, nnr);
-		else if (mtype=='T') ZEROS(this->Hloc_fixedR_soc, nnr);
+		if (mtype=='H') ModuleBase::GlobalFunc::ZEROS(this->HlocR_soc, nnr);
+		else if (mtype=='S') ModuleBase::GlobalFunc::ZEROS(this->SlocR_soc, nnr);
+		else if (mtype=='T') ModuleBase::GlobalFunc::ZEROS(this->Hloc_fixedR_soc, nnr);
 	}
 	return;
 }
@@ -617,9 +617,9 @@ void LCAO_Matrix::allocate_Hloc_fixedR_tr(void)
                     Hloc_fixedR_tr[ix][iy][iz] = new double[GlobalC::ParaO.nloc];
                     //HR_tr[ix][iy][iz] = new double[GlobalC::ParaO.nloc];
                     //SlocR_tr[ix][iy][iz] = new double[GlobalC::ParaO.nloc];
-                    ZEROS(Hloc_fixedR_tr[ix][iy][iz], GlobalC::ParaO.nloc);
-                    //ZEROS(HR_tr[ix][iy][iz], GlobalC::ParaO.nloc);
-                    //ZEROS(SlocR_tr[ix][iy][iz], GlobalC::ParaO.nloc);
+                    ModuleBase::GlobalFunc::ZEROS(Hloc_fixedR_tr[ix][iy][iz], GlobalC::ParaO.nloc);
+                    //ModuleBase::GlobalFunc::ZEROS(HR_tr[ix][iy][iz], GlobalC::ParaO.nloc);
+                    //ModuleBase::GlobalFunc::ZEROS(SlocR_tr[ix][iy][iz], GlobalC::ParaO.nloc);
                 }
             }
         }
@@ -644,9 +644,9 @@ void LCAO_Matrix::allocate_Hloc_fixedR_tr(void)
                     Hloc_fixedR_tr_soc[ix][iy][iz] = new std::complex<double>[GlobalC::ParaO.nloc];
                     //HR_tr[ix][iy][iz] = new double[GlobalC::ParaO.nloc];
                     //SlocR_tr[ix][iy][iz] = new double[GlobalC::ParaO.nloc];
-                    ZEROS(Hloc_fixedR_tr_soc[ix][iy][iz], GlobalC::ParaO.nloc);
-                    //ZEROS(HR_tr[ix][iy][iz], GlobalC::ParaO.nloc);
-                    //ZEROS(SlocR_tr[ix][iy][iz], GlobalC::ParaO.nloc);
+                    ModuleBase::GlobalFunc::ZEROS(Hloc_fixedR_tr_soc[ix][iy][iz], GlobalC::ParaO.nloc);
+                    //ModuleBase::GlobalFunc::ZEROS(HR_tr[ix][iy][iz], GlobalC::ParaO.nloc);
+                    //ModuleBase::GlobalFunc::ZEROS(SlocR_tr[ix][iy][iz], GlobalC::ParaO.nloc);
                 }
             }
         }
@@ -684,7 +684,7 @@ void LCAO_Matrix::allocate_HR_tr(void)
                 for(int iz=0; iz<R_z; iz++)
                 {
                     HR_tr[ix][iy][iz] = new double[GlobalC::ParaO.nloc];
-                    ZEROS(HR_tr[ix][iy][iz], GlobalC::ParaO.nloc);
+                    ModuleBase::GlobalFunc::ZEROS(HR_tr[ix][iy][iz], GlobalC::ParaO.nloc);
                 }
             }
         }
@@ -701,7 +701,7 @@ void LCAO_Matrix::allocate_HR_tr(void)
                 for(int iz=0; iz<R_z; iz++)
                 {
                     HR_tr_soc[ix][iy][iz] = new std::complex<double>[GlobalC::ParaO.nloc];
-                    ZEROS(HR_tr_soc[ix][iy][iz], GlobalC::ParaO.nloc);
+                    ModuleBase::GlobalFunc::ZEROS(HR_tr_soc[ix][iy][iz], GlobalC::ParaO.nloc);
                 }
             }
         }
@@ -733,7 +733,7 @@ void LCAO_Matrix::allocate_SlocR_tr(void)
                 for(int iz=0; iz<R_z; iz++)
                 {
                     SlocR_tr[ix][iy][iz] = new double[GlobalC::ParaO.nloc];
-                    ZEROS(SlocR_tr[ix][iy][iz], GlobalC::ParaO.nloc);
+                    ModuleBase::GlobalFunc::ZEROS(SlocR_tr[ix][iy][iz], GlobalC::ParaO.nloc);
                 }
             }
         }
@@ -750,7 +750,7 @@ void LCAO_Matrix::allocate_SlocR_tr(void)
                 for(int iz=0; iz<R_z; iz++)
                 {
                     SlocR_tr_soc[ix][iy][iz] = new std::complex<double>[GlobalC::ParaO.nloc];
-                    ZEROS(SlocR_tr_soc[ix][iy][iz], GlobalC::ParaO.nloc);
+                    ModuleBase::GlobalFunc::ZEROS(SlocR_tr_soc[ix][iy][iz], GlobalC::ParaO.nloc);
                 }
             }
         }

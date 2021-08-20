@@ -69,18 +69,18 @@ private:
 	matrix nhtoj;		// new added
 
 	realArray dvan;		//(:,:,:),  the D functions of the solid
-	ComplexArray dvan_so;	//(:,:,:),  spin-orbit case,  added by zhengdy-soc
+	ModuleBase::ComplexArray dvan_so;	//(:,:,:),  spin-orbit case,  added by zhengdy-soc
 
 	realArray tab;		//(:,:,:), interpolation table for PPs
 	realArray tab_alpha;
 	realArray tab_at;	//(:,:,:), interpolation table for atomic wfc
 
 	realArray deeq;		//(:,:,:,:), the integral of V_eff and Q_{nm}
-	ComplexArray deeq_nc;	//(:,:,:,:), the spin-orbit case
+	ModuleBase::ComplexArray deeq_nc;	//(:,:,:,:), the spin-orbit case
 	realArray becsum;	//(:,:,:,:), \sum_i  f(i) <psi(i)/beta_1><beta_m/psi(i)> //used in charge
 
 
-	ComplexMatrix vkb;	// all beta functions in reciprocal space
+	ModuleBase::ComplexMatrix vkb;	// all beta functions in reciprocal space
 	std::complex<double> ***vkb1_alpha;
 	std::complex<double> ***vkb_alpha;
 	

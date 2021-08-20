@@ -111,7 +111,7 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
 {
     TITLE("HS_Matrix","save_HS_bit");
     timer::tick("HS_Matrix","save_HS_bit");
-    OUT(GlobalV::ofs_running,"Dimension of H and S",GlobalV::NLOCAL);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Dimension of H and S",GlobalV::NLOCAL);
 
     std::stringstream ssh;
     std::stringstream sss;
@@ -146,8 +146,8 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
         {
             double* lineH = new double[GlobalV::NLOCAL-i];
             double* lineS = new double[GlobalV::NLOCAL-i];
-            ZEROS(lineH, GlobalV::NLOCAL-i);
-            ZEROS(lineS, GlobalV::NLOCAL-i);
+            ModuleBase::GlobalFunc::ZEROS(lineH, GlobalV::NLOCAL-i);
+            ModuleBase::GlobalFunc::ZEROS(lineS, GlobalV::NLOCAL-i);
 
             ir = GlobalC::ParaO.trace_loc_row[i];
             if (ir>=0)
@@ -239,8 +239,8 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
         {
             double* lineH = new double[GlobalV::NLOCAL-i];
             double* lineS = new double[GlobalV::NLOCAL-i];
-            ZEROS(lineH, GlobalV::NLOCAL-i);
-            ZEROS(lineS, GlobalV::NLOCAL-i);
+            ModuleBase::GlobalFunc::ZEROS(lineH, GlobalV::NLOCAL-i);
+            ModuleBase::GlobalFunc::ZEROS(lineS, GlobalV::NLOCAL-i);
 
             ir = GlobalC::ParaO.trace_loc_row[i];
             if (ir>=0)
@@ -390,7 +390,7 @@ void HS_Matrix::save_HS_complex(std::complex<double> *H, std::complex<double> *S
 {
     TITLE("HS_Matrix","save_HS_bit");
     timer::tick("HS_Matrix","save_HS_bit");
-    OUT(GlobalV::ofs_running,"Dimension of H and S",GlobalV::NLOCAL);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Dimension of H and S",GlobalV::NLOCAL);
 
     std::stringstream ssh;
     std::stringstream sss;
@@ -425,8 +425,8 @@ void HS_Matrix::save_HS_complex(std::complex<double> *H, std::complex<double> *S
         {
             std::complex<double>* lineH = new std::complex<double>[GlobalV::NLOCAL-i];
             std::complex<double>* lineS = new std::complex<double>[GlobalV::NLOCAL-i];
-            ZEROS(lineH, GlobalV::NLOCAL-i);
-            ZEROS(lineS, GlobalV::NLOCAL-i);
+            ModuleBase::GlobalFunc::ZEROS(lineH, GlobalV::NLOCAL-i);
+            ModuleBase::GlobalFunc::ZEROS(lineS, GlobalV::NLOCAL-i);
 
             ir = GlobalC::ParaO.trace_loc_row[i];
             if (ir>=0)
@@ -518,8 +518,8 @@ void HS_Matrix::save_HS_complex(std::complex<double> *H, std::complex<double> *S
         {
             std::complex<double>* lineH = new std::complex<double>[GlobalV::NLOCAL-i];
             std::complex<double>* lineS = new std::complex<double>[GlobalV::NLOCAL-i];
-            ZEROS(lineH, GlobalV::NLOCAL-i);
-            ZEROS(lineS, GlobalV::NLOCAL-i);
+            ModuleBase::GlobalFunc::ZEROS(lineH, GlobalV::NLOCAL-i);
+            ModuleBase::GlobalFunc::ZEROS(lineS, GlobalV::NLOCAL-i);
 
             ir = GlobalC::ParaO.trace_loc_row[i];
             if (ir>=0)
@@ -712,20 +712,20 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
                     {
                         lineH = new double[GlobalV::NLOCAL];
                         lineS = new double[GlobalV::NLOCAL];
-                        ZEROS(lineH, GlobalV::NLOCAL);
-                        ZEROS(lineS, GlobalV::NLOCAL);
+                        ModuleBase::GlobalFunc::ZEROS(lineH, GlobalV::NLOCAL);
+                        ModuleBase::GlobalFunc::ZEROS(lineS, GlobalV::NLOCAL);
                     }
                     else
                     {
                         lineH_soc = new std::complex<double>[GlobalV::NLOCAL];
                         lineS_soc = new std::complex<double>[GlobalV::NLOCAL];
-                        ZEROS(lineH_soc, GlobalV::NLOCAL);
-                        ZEROS(lineS_soc, GlobalV::NLOCAL);
+                        ModuleBase::GlobalFunc::ZEROS(lineH_soc, GlobalV::NLOCAL);
+                        ModuleBase::GlobalFunc::ZEROS(lineS_soc, GlobalV::NLOCAL);
                     }
-                    //ZEROS(lineH, GlobalV::NLOCAL-i);
-                    //ZEROS(lineS, GlobalV::NLOCAL-i);
-                    //ZEROS(lineH, GlobalV::NLOCAL);
-                    //ZEROS(lineS, GlobalV::NLOCAL);
+                    //ModuleBase::GlobalFunc::ZEROS(lineH, GlobalV::NLOCAL-i);
+                    //ModuleBase::GlobalFunc::ZEROS(lineS, GlobalV::NLOCAL-i);
+                    //ModuleBase::GlobalFunc::ZEROS(lineH, GlobalV::NLOCAL);
+                    //ModuleBase::GlobalFunc::ZEROS(lineS, GlobalV::NLOCAL);
 
                     ir = GlobalC::ParaO.trace_loc_row[i];
                     if(ir>=0)
@@ -1108,7 +1108,7 @@ void HS_Matrix::output_single_R(std::ofstream &ofs, const std::map<size_t, std::
     for(int row = 0; row < GlobalV::NLOCAL; ++row)
     {
         line = new double[GlobalV::NLOCAL];
-        ZEROS(line, GlobalV::NLOCAL);
+        ModuleBase::GlobalFunc::ZEROS(line, GlobalV::NLOCAL);
 
         if(GlobalC::ParaO.trace_loc_row[row] >= 0)
         {
@@ -1217,7 +1217,7 @@ void HS_Matrix::output_soc_single_R(std::ofstream &ofs, const std::map<size_t, s
     for(int row = 0; row < GlobalV::NLOCAL; ++row)
     {
         line = new std::complex<double>[GlobalV::NLOCAL];
-        ZEROS(line, GlobalV::NLOCAL);
+        ModuleBase::GlobalFunc::ZEROS(line, GlobalV::NLOCAL);
 
         if(GlobalC::ParaO.trace_loc_row[row] >= 0)
         {

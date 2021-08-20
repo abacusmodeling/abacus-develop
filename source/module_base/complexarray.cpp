@@ -5,10 +5,11 @@
 #include <cstdlib>
 #include <cassert>
 
-using namespace std;
+
 
 #include "complexarray.h"
-
+namespace ModuleBase
+{
 const std::complex <double> ZERO(0.0, 0.0), ONE(1.0, 0.0);
 
 void complexArrayxAlloc()
@@ -454,3 +455,4 @@ std::complex<double>& ComplexArray::operator()
 	return ptr[ind];
 }
 
+}

@@ -90,7 +90,7 @@ void MD_thermo::init_NHC(
 		G[0*numIon_+k].y=pow(vel[k].y,2)*allmass[k]-1.0 * temperature;
 		G[0*numIon_+k].z=pow(vel[k].z,2)*allmass[k]-1.0 * temperature;
 	}
-	ofs << "finish NHC thermostat define" << std::endl; //zifei
+	//ofs << "finish NHC thermostat define" << std::endl; //zifei
 }
 
 double MD_thermo::NHChamiltonian(
@@ -116,8 +116,8 @@ double MD_thermo::NHChamiltonian(
 
 	if (!GlobalV::MY_RANK)
     {
-        GlobalV::ofs_running<< " --------------------------------------------------"<<std::endl;
-        GlobalV::ofs_running<< " SUMMARY OF NVT GlobalV::CALCULATION"<<std::endl;
+        GlobalV::ofs_running<< "--------------------------------------------------"<<std::endl;
+        GlobalV::ofs_running<< "            SUMMARY OF NVT CALCULATION            "<<std::endl;
         GlobalV::ofs_running<<" --------------------------------------------------"<<std::endl;
         GlobalV::ofs_running<<" NVT Conservation     : "<<std::setw(10)<< NHChamiltonian0*2<<" (Rydberg)"<<std::endl;
         GlobalV::ofs_running<<" NVT Temperature      : "<<std::setw(10)<< KE*2/(3*double(numIon_-nfrozen))/K_BOLTZMAN_AU<<" (K)"<<std::endl;

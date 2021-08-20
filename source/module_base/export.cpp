@@ -10,8 +10,8 @@
 // =============================================================================
 
 #include "export.h"
-
-void IF_MATCH(const std::string &name,const std::string &name2)
+/*
+void ModuleBase::IF_MATCH(const std::string &name,const std::string &name2)
 {
 	if(name!=name2)
 	{
@@ -27,7 +27,7 @@ void IF_MATCH(const std::string &name,const std::string &name2)
 	
 //	std::cout<<std::setw(12)<<name<<std::endl;
 	return;
-}
+}*/
 
 
 

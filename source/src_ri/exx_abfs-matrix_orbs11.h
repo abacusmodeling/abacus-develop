@@ -38,11 +38,11 @@ public:
 		const size_t TB,
 		const Vector3<double> &tauA,											// unit: ucell.lat0
 		const Vector3<double> &tauB,											// unit: ucell.lat0
-		const Element_Basis_Index::IndexLNM &index_r,
-		const Element_Basis_Index::IndexLNM &index_c ) const;
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_r,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_c ) const;
 	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> cal_overlap_matrix(
-		const Element_Basis_Index::IndexLNM &index_r,
-		const Element_Basis_Index::IndexLNM &index_c ) const;
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_r,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_c ) const;
 
 protected:
 	ORB_table_phi MOT;

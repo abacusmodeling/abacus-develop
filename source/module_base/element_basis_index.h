@@ -8,7 +8,8 @@
 
 #include <cstddef>
 #include <vector>
-using std::vector;
+namespace ModuleBase
+{
 
 class Element_Basis_Index
 {
@@ -41,5 +42,7 @@ public:
 	
 	static IndexLNM construct_index( const Range &range );
 };
+
+}
 
 #endif

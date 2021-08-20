@@ -25,7 +25,7 @@ void IState_Envelope::begin(void)
 
 	// (1.2) read in LOWF_GAMMA.dat
 
-	OUT(GlobalV::ofs_running,"GlobalC::LOWF.allocate_flag",GlobalC::LOWF.get_allocate_flag());	
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"GlobalC::LOWF.allocate_flag",GlobalC::LOWF.get_allocate_flag());	
 
 	// mohan update 2011-03-21
 	// if ucell is odd, it's correct,
@@ -53,7 +53,7 @@ void IState_Envelope::begin(void)
 
 	// (2.3) output the charge density in .cub format.
 	this->bands_picked = new bool[GlobalV::NBANDS];
-	ZEROS(bands_picked, GlobalV::NBANDS);
+	ModuleBase::GlobalFunc::ZEROS(bands_picked, GlobalV::NBANDS);
 	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
 		if( ib >= fermi_band - bands_below ) 
@@ -72,7 +72,7 @@ void IState_Envelope::begin(void)
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{
 				std::cout << " Perform envelope function for band " << ib+1 << std::endl;
-				ZEROS(GlobalC::CHR.rho[is],GlobalC::pw.nrxx);	
+				ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[is],GlobalC::pw.nrxx);	
 
 
 				//---------------------------------------------------------

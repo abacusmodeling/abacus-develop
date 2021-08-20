@@ -10,8 +10,8 @@ void Local_Orbital_Charge::allocate_DM_k(void)
 
     this->nnrg_now = GlobalC::LNNR.nnrg;
     //xiaohui add 'GlobalV::OUT_LEVEL' line, 2015-09-16
-    if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"nnrg_last",nnrg_last);
-    if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"nnrg_now",nnrg_now);
+    if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nnrg_last",nnrg_last);
+    if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nnrg_now",nnrg_now);
 
     if(this->init_DM_R)
     {
@@ -30,7 +30,7 @@ void Local_Orbital_Charge::allocate_DM_k(void)
         for(int is=0; is<GlobalV::NSPIN; is++)
         {
             this->DM_R[is] = new double[nnrg_now];
-            ZEROS(DM_R[is], nnrg_now);
+            ModuleBase::GlobalFunc::ZEROS(DM_R[is], nnrg_now);
         }
         this->nnrg_last = nnrg_now;
         this->init_DM_R = true;
@@ -137,7 +137,7 @@ inline void cal_DM_ATOM(
                         GlobalC::kv.kvec_d[ik].z * RA.info[ia1][ia2][2]  
                         ) );
             
-            //ZEROS(WFC_PHASE, GlobalV::NBANDS*nw1);
+            //ModuleBase::GlobalFunc::ZEROS(WFC_PHASE, GlobalV::NBANDS*nw1);
             int ibStart=0;
             int nRow=0;
             for(int ib=0; ib<GlobalV::NBANDS; ++ib)
@@ -218,7 +218,7 @@ inline void cal_DM_ATOM_nc(
                                 GlobalC::kv.kvec_d[ik].z * RA.info[ia1][ia2][2]  
                                 ) );
             
-            		//ZEROS(WFC_PHASE, GlobalV::NBANDS*nw1);
+            		//ModuleBase::GlobalFunc::ZEROS(WFC_PHASE, GlobalV::NBANDS*nw1);
                     int ibStart=0;
                     int nRow=0;
                     for(int ib=0; ib<GlobalV::NBANDS; ++ib)
@@ -278,7 +278,7 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
     for(int is=0; is<GlobalV::NSPIN; ++is)
     {
         DM_ATOM[is]=new std::complex<double>[DM_ATOM_SIZE];
-        ZEROS(DM_ATOM[is], DM_ATOM_SIZE);
+        ModuleBase::GlobalFunc::ZEROS(DM_ATOM[is], DM_ATOM_SIZE);
     }
     for(int T1=0; T1<GlobalC::ucell.ntype; T1++)
     {
@@ -308,9 +308,9 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
                 }
                 for(int is=0; is<GlobalV::NSPIN; ++is)
 				{
-                    ZEROS(DM_ATOM[is], ng);
+                    ModuleBase::GlobalFunc::ZEROS(DM_ATOM[is], ng);
 				}
-                ZEROS(WFC_PHASE, GlobalV::NBANDS*nw1);
+                ModuleBase::GlobalFunc::ZEROS(WFC_PHASE, GlobalV::NBANDS*nw1);
                 if(GlobalV::NSPIN!=4)
 				{
 					cal_DM_ATOM(gt, fac, RA, ca, iw1_lo, nw1, gstart, WFC_PHASE, DM_ATOM);

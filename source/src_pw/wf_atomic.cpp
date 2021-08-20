@@ -9,8 +9,9 @@
 
 WF_atomic::WF_atomic()
 {
-    evc  = new ComplexMatrix[1];
-    wanf2= new ComplexMatrix[1];
+    evc  = new ModuleBase::ComplexMatrix[1];
+    wanf2= new ModuleBase::ComplexMatrix[1];
+    seed = 0;
 }
 
 WF_atomic::~WF_atomic()
@@ -45,7 +46,7 @@ void WF_atomic::init_at_1(void)
     {
         ndm = (GlobalC::ucell.atoms[it].msh > ndm) ? GlobalC::ucell.atoms[it].msh : ndm;
     }
-	OUT(GlobalV::ofs_running,"max mesh points in Pseudopotential",ndm);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"max mesh points in Pseudopotential",ndm);
 
     // needed to normalize atomic wfcs (not a bad idea in general and
     // necessary to compute correctly lda+U projections)
@@ -64,8 +65,8 @@ void WF_atomic::init_at_1(void)
     double *aux = new double[ndm];
     double *vchi = new double[ndm];
 
-	OUT(GlobalV::ofs_running,"dq(describe PAO in reciprocal space)",GlobalV::DQ);
-	OUT(GlobalV::ofs_running,"max q",GlobalV::NQX);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"dq(describe PAO in reciprocal space)",GlobalV::DQ);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"max q",GlobalV::NQX);
 
     for (int it=0; it<GlobalC::ucell.ntype; it++)
     {
@@ -207,22 +208,22 @@ void WF_atomic::print_PAOs(void)const
 //===================================================================
 // from wfcinit.f90
 
-void WF_atomic::check_psi(const ComplexMatrix *evc)const
+void WF_atomic::check_psi(const ModuleBase::ComplexMatrix *evc)const
 {
     std::cout<<"\n Check psi : \n";
 
     for (int iw=0;iw<GlobalV::NBANDS;iw++)
     {
         double sum_evc = abs2_row(this->evc[0],iw);
-        OUT("iw",iw);
-        OUT("sum_evc",sum_evc);
+        ModuleBase::GlobalFunc::OUT("iw",iw);
+        ModuleBase::GlobalFunc::OUT("sum_evc",sum_evc);
     }
 
     for (int ik=0;ik<GlobalC::kv.nks;ik++)
     {
         double sum_evc = abs2(this->evc[ik]);
-        OUT("ik",ik);
-        OUT("sum_evc2",sum_evc);
+        ModuleBase::GlobalFunc::OUT("ik",ik);
+        ModuleBase::GlobalFunc::OUT("sum_evc2",sum_evc);
     }
     //QUIT();
 }
@@ -231,7 +232,7 @@ void WF_atomic::atomic_wfc
 (	const int ik,
   const int np,
   const int lmax_wfc,
-  ComplexMatrix &wfcatom,
+  ModuleBase::ComplexMatrix &wfcatom,
   const realArray &table_q,
   const int &table_dimension,
   const double &dq
@@ -311,7 +312,7 @@ void WF_atomic::atomic_wfc
                                           if(fabs(fact[is])>1e-8)
                                           {
                                               const int ind = GlobalC::ppcell.lmaxkb + soc.sph_ind(l,j,m,is);
-                                              ZEROS(aux, np);
+                                              ModuleBase::GlobalFunc::ZEROS(aux, np);
                                               for(int n1=0;n1<2*l+1;n1++){
                                                  const int lm = l*l +n1;
                                                  if(abs(soc.rotylm(n1,ind))>1e-8)
@@ -456,7 +457,7 @@ void WF_atomic::atomic_wfc
         } //end ia //mohan modify 2007-11-7
     } // end nt
 
-	if(GlobalV::test_wf)OUT(GlobalV::ofs_running,"wf_index",index);
+	if(GlobalV::test_wf)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wf_index",index);
 
     if (index != GlobalC::ucell.natomwfc)
     {
@@ -470,28 +471,179 @@ void WF_atomic::atomic_wfc
     return;
 } //end subroutine atomic_wfc
 
-void WF_atomic::random(ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const
+void WF_atomic::random(ModuleBase::ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const
 {
     assert(iw_start >= 0);
     assert(psi.nr >= iw_end);
     const int ng = GlobalC::kv.ngk[ik];
-    for (int iw = iw_start ;iw < iw_end;iw++)
+#ifdef __MPI
+    if(seed > 0)//qianrui add 2021-8-13
     {
+        srand(unsigned(seed + GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL] + ik));
+        int nxy = GlobalC::pw.ncx * GlobalC::pw.ncy;
+        int nrxx = GlobalC::pw.nrxx;
+        int nz = GlobalC::pw.ncz;
+        int *GR_index = new int [ng];
         for (int ig = 0;ig < ng;ig++)
         {
-            const double rr = std::rand()/double(RAND_MAX); //qianrui add RAND_MAX
-            const double arg= TWO_PI * std::rand()/double(RAND_MAX);
-            Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
-            psi(iw,ig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
+            GR_index[ig] = GlobalC::pw.ig2fftw[ GlobalC::wf.igk(ik, ig) ];
         }
-        if(GlobalV::NPOL==2)for (int ig = this->npwx;ig < this->npwx + ng;ig++)
+        double *stickrr = new double[nz];
+        double *stickarg = new double[nz];
+        double *tmprr = new double[nrxx];
+        double *tmparg = new double[nrxx];
+        for (int iw = iw_start ;iw < iw_end;iw++)
         {
-            const double rr = std::rand()/double(RAND_MAX);
-            const double arg= TWO_PI * std::rand()/double(RAND_MAX);
-            Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig - this->npwx));
-            psi(iw,ig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
+            int startig = 0;
+            for(int ipol = 0 ; ipol < GlobalV::NPOL ; ++ipol)
+            {
+            
+	            for(int ir=0; ir < nxy; ir++)
+	            {
+                    if(GlobalC::pw.FFT_wfc.index_ip[ir] < 0) continue;
+	            	if(GlobalV::RANK_IN_POOL==0)
+	            	{
+	            		for(int iz=0; iz<nz; iz++)
+	            		{
+	            			stickrr[ iz ] = std::rand()/double(RAND_MAX);
+                            stickarg[ iz ] = std::rand()/double(RAND_MAX);
+	            		}
+	            	}
+	            	GlobalC::pw.FFT_wfc.stick_to_pool(stickrr, ir, tmprr);
+                    GlobalC::pw.FFT_wfc.stick_to_pool(stickarg, ir, tmparg);
+	            }
+
+                for (int ig = 0;ig < ng;ig++)
+                {
+                    const double rr = tmprr[GR_index[ig]];
+                    const double arg= TWO_PI * tmparg[GR_index[ig]];
+                    Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
+                    psi(iw,ig+startig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
+                }
+                startig += npwx;
+            }
         }
+        delete[] stickrr;
+        delete[] stickarg;
+        delete[] tmprr;
+        delete[] tmparg;
+        delete[] GR_index;
     }
+    else
+    {
+#else
+        if(seed > 0)//qianrui add 2021-8-13
+        {
+            srand(unsigned(seed + GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL] + ik));
+        }
+#endif
+        for (int iw = iw_start ;iw < iw_end;iw++)
+        {
+            for (int ig = 0;ig < ng;ig++)
+            {
+                const double rr = std::rand()/double(RAND_MAX); //qianrui add RAND_MAX
+                const double arg= TWO_PI * std::rand()/double(RAND_MAX);
+                Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
+                psi(iw,ig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
+            }
+            if(GlobalV::NPOL==2)for (int ig = this->npwx;ig < this->npwx + ng;ig++)
+            {
+                const double rr = std::rand()/double(RAND_MAX);
+                const double arg= TWO_PI * std::rand()/double(RAND_MAX);
+                Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig - this->npwx));
+                psi(iw,ig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
+            }
+        }
+#ifdef __MPI
+    }
+#endif
+
     return;
 }
 
+void WF_atomic::atomicrandom(ModuleBase::ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const
+{
+    assert(iw_start >= 0);
+    assert(psi.nr >= iw_end);
+    const int ng = GlobalC::kv.ngk[ik];
+#ifdef __MPI
+    if(seed > 0)//qianrui add 2021-8-13
+    {
+        srand(unsigned(seed + GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL] + ik));
+        int nxy = GlobalC::pw.ncx * GlobalC::pw.ncy;
+        int nrxx = GlobalC::pw.nrxx;
+        int nz = GlobalC::pw.ncz;
+        int *GR_index = new int [ng];
+        for (int ig = 0;ig < ng;ig++)
+        {
+            GR_index[ig] = GlobalC::pw.ig2fftw[ GlobalC::wf.igk(ik, ig) ];
+        }
+        double *stickrr = new double[nz];
+        double *stickarg = new double[nz];
+        double *tmprr = new double[nrxx];
+        double *tmparg = new double[nrxx];
+        for (int iw = iw_start ;iw < iw_end;iw++)
+        {
+            int startig = 0;
+            for(int ipol = 0 ; ipol < GlobalV::NPOL ; ++ipol)
+            {
+            
+	            for(int ir=0; ir < nxy; ir++)
+	            {
+                    if(GlobalC::pw.FFT_wfc.index_ip[ir] < 0) continue;
+	            	if(GlobalV::RANK_IN_POOL==0)
+	            	{
+	            		for(int iz=0; iz<nz; iz++)
+	            		{
+	            			stickrr[ iz ] = std::rand()/double(RAND_MAX);
+                            stickarg[ iz ] = std::rand()/double(RAND_MAX);
+	            		}
+	            	}
+	            	GlobalC::pw.FFT_wfc.stick_to_pool(stickrr, ir, tmprr);
+                    GlobalC::pw.FFT_wfc.stick_to_pool(stickarg, ir, tmparg);
+	            }
+
+                for (int ig = 0;ig < ng;ig++)
+                {
+                    const double rr = tmprr[GR_index[ig]];
+                    const double arg= TWO_PI * tmparg[GR_index[ig]];
+                    psi(iw,startig+ig) *= (1.0 + 0.05 * std::complex<double>(rr * cos(arg), rr * sin(arg)));
+                }
+                startig += npwx;
+            }
+        }
+        delete[] stickrr;
+        delete[] stickarg;
+        delete[] tmprr;
+        delete[] tmparg;
+        delete[] GR_index;
+    }
+    else
+    {
+#else
+        if(seed > 0)//qianrui add 2021-8-13
+        {
+            srand(unsigned(seed + GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL] + ik));
+        }
+#endif
+        double rr, arg;
+		for (int iw = iw_start ;iw < iw_end;iw++)
+		{
+			int startig = 0;
+			for(int ip = 0 ; ip < GlobalV::NPOL; ++ip)
+			{
+				for(int ig = 0 ; ig < npw ; ++ig)
+				{
+					rr = rand()/double(RAND_MAX);
+					arg = TWO_PI * rand()/double(RAND_MAX);
+					psi(iw,startig+ig) *= (1.0 + 0.05 * std::complex<double>(rr * cos(arg), rr * sin(arg)));
+				}
+				startig += npwx;
+			}
+		}
+#ifdef __MPI
+    }
+#endif
+
+    return;
+}

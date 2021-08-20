@@ -158,7 +158,7 @@ void eximport::print_data(const std::string &fn) const
 	ofs.close();
 }
 
-void eximport::fir_wf(ComplexMatrix *psi, const int npsi, const std::string &fn)
+void eximport::fir_wf(ModuleBase::ComplexMatrix *psi, const int npsi, const std::string &fn)
 {
 	if(GlobalV::MY_RANK!=0)
 	{
@@ -200,7 +200,7 @@ void eximport::fir_wf(ComplexMatrix *psi, const int npsi, const std::string &fn)
 	return;
 }
 
-void eximport::out_gspace_wan(const ComplexMatrix *psi,const int iw,const std::string &file_name)
+void eximport::out_gspace_wan(const ModuleBase::ComplexMatrix *psi,const int iw,const std::string &file_name)
 {
 	//std::cout<<"\n ==> ei.wanG_for_fit";
 	std::ofstream out_gwan(file_name.c_str());
@@ -236,7 +236,7 @@ void eximport::out_gspace_wan(const ComplexMatrix *psi,const int iw,const std::s
 	return;
 }
 
-bool eximport::sec_wf(ComplexMatrix *psi, const int wf_num, const std::string &fn)const
+bool eximport::sec_wf(ModuleBase::ComplexMatrix *psi, const int wf_num, const std::string &fn)const
 {
 	std::cout<<"\n ==> ei.sec_wf()_1";
 	std::ifstream sec(fn.c_str());

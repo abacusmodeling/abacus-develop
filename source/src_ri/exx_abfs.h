@@ -52,7 +52,7 @@ public:
 	
 	static std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>> cal_I( 
 		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &ms, 
-		const Element_Basis_Index::IndexLNM &index );
+		const ModuleBase::Element_Basis_Index::IndexLNM &index );
 	
 	static std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> cal_C( 
 		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &matrix_A, 
@@ -65,8 +65,8 @@ public:
 	static std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> cal_lcaos2_lcaos2_proj_asa( 
 		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &ms_lcaos2_asa, 
 		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>> &ms_asa_asa_I,
-		const Element_Basis_Index::Range &range,
-		const Element_Basis_Index::IndexLNM &index);
+		const ModuleBase::Element_Basis_Index::Range &range,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index);
 		
 	static std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> cal_lcaos2_jys_proj_asa(
 		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &ms_lcaos2_asa,

@@ -33,13 +33,13 @@ void IState_Charge::begin(void)
 	// (2.2) carry out the grid integration to
 	// get the charge density.
 	this->bands_picked = new int[GlobalV::NBANDS];
-	ZEROS(bands_picked, GlobalV::NBANDS);
+	ModuleBase::GlobalFunc::ZEROS(bands_picked, GlobalV::NBANDS);
 
 	// (1) 
 	// (1.1) allocate the space for GlobalC::LOWF.WFC_GAMMA
 
 	// (1.2) read in LOWF_GAMMA.dat
-	OUT(GlobalV::ofs_running,"GlobalC::LOWF.allocate_flag",GlobalC::LOWF.get_allocate_flag());	
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"GlobalC::LOWF.allocate_flag",GlobalC::LOWF.get_allocate_flag());	
 	std::cout << " number of electrons = " << GlobalC::CHR.nelec << std::endl;
 
 	// mohan update 2011-03-21
@@ -89,7 +89,7 @@ void IState_Charge::begin(void)
 				//int band_index;
 				for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 				{
-					READ_VALUE(ifs, bands_picked[ib]);
+					ModuleBase::GlobalFunc::READ_VALUE(ifs, bands_picked[ib]);
 				}
 			}
 		}
@@ -122,7 +122,7 @@ void IState_Charge::begin(void)
 			// (3) zero out of charge density array. 
 			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
-				ZEROS( GlobalC::CHR.rho[is], GlobalC::pw.nrxx );
+				ModuleBase::GlobalFunc::ZEROS( GlobalC::CHR.rho[is], GlobalC::pw.nrxx );
 			}
 			
 			// (4) calculate charge density for a particular 

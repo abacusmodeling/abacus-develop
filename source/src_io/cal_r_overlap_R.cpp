@@ -358,9 +358,9 @@ center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distan
 					liner_x = new double[GlobalV::NLOCAL];
 					liner_y = new double[GlobalV::NLOCAL];
 					liner_z = new double[GlobalV::NLOCAL];
-					ZEROS(liner_x,GlobalV::NLOCAL);
-					ZEROS(liner_y,GlobalV::NLOCAL);
-					ZEROS(liner_z,GlobalV::NLOCAL);
+					ModuleBase::GlobalFunc::ZEROS(liner_x,GlobalV::NLOCAL);
+					ModuleBase::GlobalFunc::ZEROS(liner_y,GlobalV::NLOCAL);
+					ModuleBase::GlobalFunc::ZEROS(liner_z,GlobalV::NLOCAL);
 					
 					ir = GlobalC::ParaO.trace_loc_row[i];
 					

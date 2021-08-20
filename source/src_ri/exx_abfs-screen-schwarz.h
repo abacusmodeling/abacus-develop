@@ -19,8 +19,8 @@ public:
 		const std::set<size_t> &atom_centres,
 		const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
 		const Exx_Abfs::Matrix_Orbs21 &m_abfslcaos_lcaos,
-		const Element_Basis_Index::IndexLNM &index_abfs,
-		const Element_Basis_Index::IndexLNM &index_lcaos,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_abfs,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_lcaos,
 		const Abfs::Vector3_Order<int> &Born_von_Karman_period,
 		std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,std::weak_ptr<matrix>>>> &Cws,
 		std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,std::weak_ptr<matrix>>>> &Vws );

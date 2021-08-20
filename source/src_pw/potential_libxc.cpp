@@ -15,6 +15,10 @@
 #include "../src_lcao/global_fp.h"
 #endif
 
+//the interfacd to libxc xc_lda_exc_vxc and xc_gga_exc_vxc
+//XC_POLARIZED, XC_UNPOLARIZED: internal flags used in LIBXC, denote the polarized(nspin=1) or unpolarized(nspin=2) calculations, definition can be found in xc.h from LIBXC
+//XC_FAMILY_LDA, XC_FAMILY_GGA, XC_FAMILY_HYB_GGA, XC_CORRELATION: internal flags used in LIBXC, denote the types of functional associated with a certain functional ID, definition can be found in xc.h from LIBXC
+
 // [etxc, vtxc, v] = Potential_Libxc::v_xc(...)
 std::tuple<double,double,matrix> Potential_Libxc::v_xc(
 	const double * const * const rho_in,
@@ -152,7 +156,7 @@ std::tuple<double,double,matrix> Potential_Libxc::v_xc(
 			// define two dimensional array dh [ nspin, GlobalC::pw.nrxx ]
 			std::vector<std::vector<double>> dh(nspin0(), std::vector<double>(GlobalC::pw.nrxx));
 			for( size_t is=0; is!=nspin0(); ++is )
-				GGA_PW::grad_dot( VECTOR_TO_PTR(h[is]), VECTOR_TO_PTR(dh[is]) );
+				GGA_PW::grad_dot( ModuleBase::GlobalFunc::VECTOR_TO_PTR(h[is]), ModuleBase::GlobalFunc::VECTOR_TO_PTR(dh[is]) );
 
 			for( size_t is=0; is!=nspin0(); ++is )
 				for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
@@ -205,8 +209,8 @@ std::tuple<double,double,matrix> Potential_Libxc::v_xc(
 				process_vsigma();
 				break;
 			default:
-				throw std::domain_error("func.info->family ="+TO_STRING(func.info->family)
-					+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+				throw std::domain_error("func.info->family ="+ModuleBase::GlobalFunc::TO_STRING(func.info->family)
+					+" unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 				break;
 		}
 		// Libxc function: Deallocate memory
@@ -293,8 +297,8 @@ std::vector<xc_func_type> Potential_Libxc::init_func()
 	}
 	else
 	{
-		throw std::domain_error("iexch="+TO_STRING(GlobalC::xcf.iexch_now)+", igcx="+TO_STRING(GlobalC::xcf.igcx_now)
-			+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw std::domain_error("iexch="+ModuleBase::GlobalFunc::TO_STRING(GlobalC::xcf.iexch_now)+", igcx="+ModuleBase::GlobalFunc::TO_STRING(GlobalC::xcf.igcx_now)
+			+" unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
 
 	//--------------------------------------
@@ -314,8 +318,8 @@ std::vector<xc_func_type> Potential_Libxc::init_func()
 	}
 	else
 	{
-		throw std::domain_error("icorr="+TO_STRING(GlobalC::xcf.icorr_now)+", igcc="+TO_STRING(GlobalC::xcf.igcc_now)
-			+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw std::domain_error("icorr="+ModuleBase::GlobalFunc::TO_STRING(GlobalC::xcf.icorr_now)+", igcc="+ModuleBase::GlobalFunc::TO_STRING(GlobalC::xcf.igcc_now)
+			+" unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
 
 	return funcs;
@@ -445,8 +449,8 @@ Potential_Libxc::cal_input(
 				cal_sigma();
 				break;
 			default:
-				throw std::domain_error("func.info->family ="+TO_STRING(func.info->family)
-					+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+				throw std::domain_error("func.info->family ="+ModuleBase::GlobalFunc::TO_STRING(func.info->family)
+					+" unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 				break;
 		}
 	}

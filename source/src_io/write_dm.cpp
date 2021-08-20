@@ -154,7 +154,7 @@ void Local_Orbital_Charge::write_dm(
         for (int i=0; i<GlobalV::NLOCAL; ++i)
         {
             // when reduce, there may be 'redundance', we need to count them.
-            ZEROS(count, GlobalV::NLOCAL);
+            ModuleBase::GlobalFunc::ZEROS(count, GlobalV::NLOCAL);
             const int mu = GlobalC::GridT.trace_lo[i];
             if (mu >= 0)
             {
@@ -170,7 +170,7 @@ void Local_Orbital_Charge::write_dm(
             Parallel_Reduce::reduce_int_all( count, GlobalV::NLOCAL );
 
             // reduce the density matrix for 'i' line.
-            ZEROS(tmp, GlobalV::NLOCAL);
+            ModuleBase::GlobalFunc::ZEROS(tmp, GlobalV::NLOCAL);
             if (mu >= 0)
             {
                 for (int j=0; j<GlobalV::NLOCAL; j++)
@@ -224,7 +224,7 @@ void Local_Orbital_Charge::write_dm(
 	if(GlobalV::MY_RANK==0)
 	{
 		end = time(NULL);
-		OUT_TIME("write_rho",start,end);
+		ModuleBase::GlobalFunc::OUT_TIME("write_rho",start,end);
 		ofs.close();
 	}
 	timer::tick("Local_Orbital_Charge","write_dm");
