@@ -254,8 +254,8 @@ matrix Exx_Abfs::Matrix_Orbs11::cal_overlap_matrix(
 	const size_t TB, 
 	const Vector3<double> &tauA,
 	const Vector3<double> &tauB, 
-	const Element_Basis_Index::IndexLNM &index_r, 
-	const Element_Basis_Index::IndexLNM &index_c ) const
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_r, 
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_c ) const
 {
 //	TITLE("Exx_Abfs::Matrix_Orbs11","cal_overlap_matrix");
 	
@@ -291,8 +291,8 @@ matrix Exx_Abfs::Matrix_Orbs11::cal_overlap_matrix(
 }
 
 std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Exx_Abfs::Matrix_Orbs11::cal_overlap_matrix( 
-	const Element_Basis_Index::IndexLNM &index_r, 
-	const Element_Basis_Index::IndexLNM &index_c ) const
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_r, 
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_c ) const
 {
 std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;

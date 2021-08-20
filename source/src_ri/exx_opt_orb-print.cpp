@@ -8,8 +8,8 @@ void Exx_Opt_Orb::print_matrix(
 	const std::vector<std::vector<matrix>> &matrix_S,
 	const matrix &matrix_V,
 	const size_t TA, const size_t IA, const size_t TB, const size_t IB,
-	const Element_Basis_Index::Range &range_jles, 
-	const Element_Basis_Index::IndexLNM &index_jles) const
+	const ModuleBase::Element_Basis_Index::Range &range_jles, 
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_jles) const
 {
 	auto print_header = [&]( std::ofstream &ofs )
 	{

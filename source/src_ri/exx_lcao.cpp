@@ -680,13 +680,13 @@ ofs_mpi<<"TIME@ Conv_Coulomb_Pot_K::cal_orbs_ccp\t"<<time_during(t_start)<<std::
 
 ofs_mpi<<"Exx_Abfs::Lmax:\t"<<Exx_Abfs::Lmax<<std::endl;
 
-	const Element_Basis_Index::Range
+	const ModuleBase::Element_Basis_Index::Range
 		&&range_lcaos = Exx_Abfs::Abfs_Index::construct_range( lcaos );
-	index_lcaos = Element_Basis_Index::construct_index( range_lcaos );
+	index_lcaos = ModuleBase::Element_Basis_Index::construct_index( range_lcaos );
 
-	const Element_Basis_Index::Range
+	const ModuleBase::Element_Basis_Index::Range
 		&&range_abfs = Exx_Abfs::Abfs_Index::construct_range( abfs );
-	index_abfs = Element_Basis_Index::construct_index( range_abfs );
+	index_abfs = ModuleBase::Element_Basis_Index::construct_index( range_abfs );
 
 ofs_mpi<<range_lcaos<<std::endl;
 ofs_mpi<<range_abfs<<std::endl;

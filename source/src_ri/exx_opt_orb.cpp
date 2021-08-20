@@ -38,14 +38,14 @@ ofs_mpi<<"memory:\t"<<get_memory(10)<<std::endl;
 	for( size_t T=0; T!=abfs.size(); ++T )
 		Exx_Abfs::Lmax = std::max( Exx_Abfs::Lmax, static_cast<int>(abfs[T].size())-1 );
 
-	const Element_Basis_Index::Range    range_lcaos = Exx_Abfs::Abfs_Index::construct_range( lcaos );
-	const Element_Basis_Index::IndexLNM index_lcaos = Element_Basis_Index::construct_index( range_lcaos );
+	const ModuleBase::Element_Basis_Index::Range    range_lcaos = Exx_Abfs::Abfs_Index::construct_range( lcaos );
+	const ModuleBase::Element_Basis_Index::IndexLNM index_lcaos = ModuleBase::Element_Basis_Index::construct_index( range_lcaos );
 
-	const Element_Basis_Index::Range    range_abfs = Exx_Abfs::Abfs_Index::construct_range( abfs );
-	const Element_Basis_Index::IndexLNM index_abfs = Element_Basis_Index::construct_index( range_abfs );
+	const ModuleBase::Element_Basis_Index::Range    range_abfs = Exx_Abfs::Abfs_Index::construct_range( abfs );
+	const ModuleBase::Element_Basis_Index::IndexLNM index_abfs = ModuleBase::Element_Basis_Index::construct_index( range_abfs );
 
-	const Element_Basis_Index::Range    range_jys = Exx_Abfs::Abfs_Index::construct_range( jle.jle );
-	const Element_Basis_Index::IndexLNM index_jys = Element_Basis_Index::construct_index( range_jys );
+	const ModuleBase::Element_Basis_Index::Range    range_jys = Exx_Abfs::Abfs_Index::construct_range( jle.jle );
+	const ModuleBase::Element_Basis_Index::IndexLNM index_jys = ModuleBase::Element_Basis_Index::construct_index( range_jys );
 
 ofs_mpi<<range_lcaos<<std::endl;
 ofs_mpi<<range_abfs<<std::endl;

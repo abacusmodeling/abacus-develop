@@ -187,10 +187,10 @@ matrix Exx_Abfs::Matrix_Orbs22::cal_overlap_matrix(
 	const size_t TB,
 	const Vector3<double> &tauA,
 	const Vector3<double> &tauB,
-	const Element_Basis_Index::IndexLNM &index_A1,
-	const Element_Basis_Index::IndexLNM &index_A2,
-	const Element_Basis_Index::IndexLNM &index_B1,
-	const Element_Basis_Index::IndexLNM &index_B2,
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_A1,
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_A2,
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_B1,
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_B2,
 	const Matrix_Order &matrix_order) const
 {
 	TITLE("Exx_Abfs::Matrix_Orbs22","cal_overlap_matrix");
@@ -268,10 +268,10 @@ matrix Exx_Abfs::Matrix_Orbs22::cal_overlap_matrix(
 
 
 std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Exx_Abfs::Matrix_Orbs22::cal_overlap_matrix(
-	const Element_Basis_Index::IndexLNM &index_A1,
-	const Element_Basis_Index::IndexLNM &index_A2,
-	const Element_Basis_Index::IndexLNM &index_B1,
-	const Element_Basis_Index::IndexLNM &index_B2 ) const
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_A1,
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_A2,
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_B1,
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_B2 ) const
 {
 std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;

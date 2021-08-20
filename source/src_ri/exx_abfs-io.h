@@ -19,10 +19,10 @@ public:
 		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &matrixes_Q, 
 		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &matrixes_S,
 		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &matrixes_V,
-		const Element_Basis_Index::Range &range_jles, 
-		const Element_Basis_Index::IndexLNM &index_jles, 
-		const Element_Basis_Index::Range &range_lcaos,
-		const Element_Basis_Index::IndexLNM &index_lcaos );
+		const ModuleBase::Element_Basis_Index::Range &range_jles, 
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_jles, 
+		const ModuleBase::Element_Basis_Index::Range &range_lcaos,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_lcaos );
 		
 	static std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> construct_abfs( 
 		const LCAO_Orbitals &orbs,

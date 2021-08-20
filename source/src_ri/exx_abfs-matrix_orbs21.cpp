@@ -259,9 +259,9 @@ matrix Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
 	const size_t TB,
 	const Vector3<double> &tauA,
 	const Vector3<double> &tauB,
-	const Element_Basis_Index::IndexLNM &index_A1,
-	const Element_Basis_Index::IndexLNM &index_A2,
-	const Element_Basis_Index::IndexLNM &index_B,
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_A1,
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_A2,
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_B,
 	const Matrix_Order &matrix_order) const
 {
 	matrix m;
@@ -335,9 +335,9 @@ std::vector<matrix> Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
 	const size_t TB,
 	const Vector3<double> &tauA,
 	const Vector3<double> &tauB,
-	const Element_Basis_Index::IndexLNM &index_A1,
-	const Element_Basis_Index::IndexLNM &index_A2,
-	const Element_Basis_Index::IndexLNM &index_B) const
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_A1,
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_A2,
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_B) const
 {
 	matrix m_A2B_A1( index_A2[TA].count_size*index_B[TB].count_size, index_A1[TA].count_size );
 	matrix m_BA2_A1( index_B[TB].count_size*index_A2[TA].count_size, index_A1[TA].count_size );
@@ -392,9 +392,9 @@ std::vector<matrix> Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
 }
 
 std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
-	const Element_Basis_Index::IndexLNM &index_A1,
-	const Element_Basis_Index::IndexLNM &index_A2,
-	const Element_Basis_Index::IndexLNM &index_B) const
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_A1,
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_A2,
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_B) const
 {
 //std::ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 //timeval t_start;

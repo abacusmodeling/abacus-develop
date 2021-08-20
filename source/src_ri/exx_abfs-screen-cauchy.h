@@ -35,8 +35,8 @@ public:
 		const Abfs::Vector3_Order<int> Born_von_Karman_period_in);
 	void cal_norm_C_max( 
 		const std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>>>> & Cs,
-		const Element_Basis_Index::IndexLNM & index_lcaos,
-		const Element_Basis_Index::IndexLNM & index_abfs);
+		const ModuleBase::Element_Basis_Index::IndexLNM & index_lcaos,
+		const ModuleBase::Element_Basis_Index::IndexLNM & index_abfs);
 	void cal_norm_V( const std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>>>> & Vs );
 	void cal_norm_D_max( const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> & Ds );
 		

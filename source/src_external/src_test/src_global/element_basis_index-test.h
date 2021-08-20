@@ -9,7 +9,7 @@
 #include <iostream>
 using namespace std;
 
-static std::ostream & operator << (std::ostream & os, const Element_Basis_Index::Range & range)
+static std::ostream & operator << (std::ostream & os, const ModuleBase::Element_Basis_Index::Range & range)
 {
 	for( size_t T=0; T!=range.size(); ++T )
 	{	
@@ -22,7 +22,7 @@ static std::ostream & operator << (std::ostream & os, const Element_Basis_Index:
 	return os;
 }
 
-static std::ostream & operator << (std::ostream & os, const Element_Basis_Index::IndexLNM & index)
+static std::ostream & operator << (std::ostream & os, const ModuleBase::Element_Basis_Index::IndexLNM & index)
 {
 	for( size_t T=0; T!=index.size(); ++T )
 	{

@@ -259,10 +259,10 @@ void Exx_Abfs::IO::print_matrix(
 		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &matrixes_Q, 
 		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &matrixes_S,
 		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &matrixes_V,
-		const Element_Basis_Index::Range &range_jles, 
-		const Element_Basis_Index::IndexLNM &index_jles, 
-		const Element_Basis_Index::Range &range_lcaos,
-		const Element_Basis_Index::IndexLNM &index_lcaos )
+		const ModuleBase::Element_Basis_Index::Range &range_jles, 
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_jles, 
+		const ModuleBase::Element_Basis_Index::Range &range_lcaos,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_lcaos )
 {
 	auto print_header = [&]( std::ofstream &ofs, size_t TA, size_t IA, size_t TB, size_t IB )
 	{

@@ -21,8 +21,8 @@ void Exx_Abfs::Screen::Cauchy::init(
 
 void Exx_Abfs::Screen::Cauchy::cal_norm_C_max( 
 	const std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>>>> & Cs,
-	const Element_Basis_Index::IndexLNM & index_lcaos,
-	const Element_Basis_Index::IndexLNM & index_abfs)
+	const ModuleBase::Element_Basis_Index::IndexLNM & index_lcaos,
+	const ModuleBase::Element_Basis_Index::IndexLNM & index_abfs)
 {
 	if(!flag_screen_cauchy)	return;
 	TITLE("Exx_Abfs::Screen::Cauchy::cal_norm_C_max");
