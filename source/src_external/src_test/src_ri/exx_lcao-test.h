@@ -33,11 +33,11 @@ inline double time_cut(timeval &t)
 
 
 inline size_t get_sizeof( const matrix & m ){	return sizeof(double)*m.nr*m.nc; }
-inline size_t get_sizeof( const ComplexMatrix & m ){	return sizeof(double)*m.nr*m.nc; }
+inline size_t get_sizeof( const ModuleBase::ComplexMatrix & m ){	return sizeof(double)*m.nr*m.nc; }
 inline size_t get_sizeof( const std::shared_ptr<matrix> & m ){	return sizeof(matrix)+sizeof(double)*m->nr*m->nc; }
-inline size_t get_sizeof( const std::shared_ptr<ComplexMatrix> & m ){	return sizeof(ComplexMatrix)+sizeof(double)*m->nr*m->nc; }
+inline size_t get_sizeof( const std::shared_ptr<ModuleBase::ComplexMatrix> & m ){	return sizeof(ModuleBase::ComplexMatrix)+sizeof(double)*m->nr*m->nc; }
 inline size_t get_sizeof( const std::weak_ptr<matrix> & m ){	return sizeof(matrix)+sizeof(double)*m.lock()->nr*m.lock()->nc; }
-inline size_t get_sizeof( const std::weak_ptr<ComplexMatrix> & m ){	return sizeof(ComplexMatrix)+sizeof(double)*m.lock()->nr*m.lock()->nc; }
+inline size_t get_sizeof( const std::weak_ptr<ModuleBase::ComplexMatrix> & m ){	return sizeof(ModuleBase::ComplexMatrix)+sizeof(double)*m.lock()->nr*m.lock()->nc; }
 template<typename T> static size_t get_sizeof( const std::vector<T> & v )
 {
 	size_t length = sizeof(T)*v.size();
@@ -106,7 +106,7 @@ static void ofs_matrixes( const std::string & file_name, const matrix & ms, cons
 		ofs<<ms<<std::endl;	
 	ofs.close();
 }
-static void ofs_matrixes( const std::string & file_name, const ComplexMatrix & ms, const bool flag_print_content=true )
+static void ofs_matrixes( const std::string & file_name, const ModuleBase::ComplexMatrix & ms, const bool flag_print_content=true )
 {
 	std::ofstream ofs(file_name,std::ofstream::app);
 	if(flag_print_content)

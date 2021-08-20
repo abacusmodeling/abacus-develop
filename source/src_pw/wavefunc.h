@@ -31,21 +31,21 @@ class wavefunc : public WF_atomic
     int get_starting_nw(void)const;
 
 	// wanf2: save PAO orbitals,
-	//void PAO_in_pw_k(const int &ik, ComplexMatrix &wvf);
+	//void PAO_in_pw_k(const int &ik, ModuleBase::ComplexMatrix &wvf);
 
 	// wanf2: save given localized orbitals. 
 	// mohan_to_qianrui: move the LCAO_in_pw_k and LCAO_in_pw_k_q to wavefunc_in_pw.h 
-	void LCAO_in_pw_k(const int &ik, ComplexMatrix &wvf);
-	void LCAO_in_pw_k_q(const int &ik, ComplexMatrix &wvf, Vector3<double> q);   // pengfei 2016-11-23
+	void LCAO_in_pw_k(const int &ik, ModuleBase::ComplexMatrix &wvf);
+	void LCAO_in_pw_k_q(const int &ik, ModuleBase::ComplexMatrix &wvf, Vector3<double> q);   // pengfei 2016-11-23
 
 	// evc: get the initial wave functions from diagnalized the PAO
 	// orbitals first.
-	void diago_PAO_in_pw_k(const int &ik, ComplexMatrix &wvf);
+	void diago_PAO_in_pw_k(const int &ik, ModuleBase::ComplexMatrix &wvf);
 
 	// used if k dependent staff is ready.
 	void prepare_k(void);
 
-	void diago_PAO_in_pw_k2(const int &ik, ComplexMatrix &wvf);
+	void diago_PAO_in_pw_k2(const int &ik, ModuleBase::ComplexMatrix &wvf);
 
     int get_R(int ix, int iy, int iz);     // pengfei 2016-11-23
 

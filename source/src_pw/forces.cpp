@@ -663,12 +663,12 @@ void Forces::cal_force_nl(matrix& forcenl)
 	if(nkb == 0) return; // mohan add 2010-07-25
 	
 	// dbecp: conj( -iG * <Beta(nkb,npw)|psi(nbnd,npw)> )
-	ComplexArray dbecp( nkb, GlobalV::NBANDS, 3);
-    ComplexMatrix becp( nkb, GlobalV::NBANDS);
+	ModuleBase::ComplexArray dbecp( nkb, GlobalV::NBANDS, 3);
+    ModuleBase::ComplexMatrix becp( nkb, GlobalV::NBANDS);
     
 	
 	// vkb1: |Beta(nkb,npw)><Beta(nkb,npw)|psi(nbnd,npw)>
-	ComplexMatrix vkb1( nkb, GlobalC::wf.npwx );
+	ModuleBase::ComplexMatrix vkb1( nkb, GlobalC::wf.npwx );
 
     for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {

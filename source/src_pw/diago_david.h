@@ -23,21 +23,21 @@ public:
         const int& npw,
         const int n_band,
         const int m,
-        const ComplexMatrix &psi,
+        const ModuleBase::ComplexMatrix &psi,
         std::complex<double>* psi_m,
         std::complex<double>* spsi);
 
     static void diag_zhegvx(
         const int& n,
         const int& m,
-        const ComplexMatrix &hc,
-        const ComplexMatrix &sc,
+        const ModuleBase::ComplexMatrix &hc,
+        const ModuleBase::ComplexMatrix &sc,
         const int& ldh,
         double* e,
-        ComplexMatrix &vc);
+        ModuleBase::ComplexMatrix &vc);
 
     void diag(
-        ComplexMatrix &psi,
+        ModuleBase::ComplexMatrix &psi,
         double *en,
         const int &npw,
         const int &nband,
@@ -56,10 +56,10 @@ private:
         const int& npw,
         const int& nbase,
         const int& notconv,
-        ComplexMatrix &basis,
-        ComplexMatrix &hp,
-        ComplexMatrix &sp,
-        const ComplexMatrix &vc,
+        ModuleBase::ComplexMatrix &basis,
+        ModuleBase::ComplexMatrix &hp,
+        ModuleBase::ComplexMatrix &sp,
+        const ModuleBase::ComplexMatrix &vc,
         const int* unconv,
         const double* precondition,
         const double* en,
@@ -72,11 +72,11 @@ private:
         const int& npw,
         int& nbase,
         const int& notconv,
-        const ComplexMatrix &basis,
-        const ComplexMatrix &hp,
-        const ComplexMatrix &sp,
-        ComplexMatrix &hc,
-        ComplexMatrix &sc);
+        const ModuleBase::ComplexMatrix &basis,
+        const ModuleBase::ComplexMatrix &hp,
+        const ModuleBase::ComplexMatrix &sp,
+        ModuleBase::ComplexMatrix &hc,
+        ModuleBase::ComplexMatrix &sc);
 
 
     void refresh(
@@ -84,21 +84,21 @@ private:
         const int& nband,
         int& nbase,
         const double* en,
-        const ComplexMatrix &psi,
-        ComplexMatrix &basis,
-        ComplexMatrix &hp,
-        ComplexMatrix &sp,
-        ComplexMatrix &hc,
-        ComplexMatrix &sc,
-        ComplexMatrix &vc);
+        const ModuleBase::ComplexMatrix &psi,
+        ModuleBase::ComplexMatrix &basis,
+        ModuleBase::ComplexMatrix &hp,
+        ModuleBase::ComplexMatrix &sp,
+        ModuleBase::ComplexMatrix &hc,
+        ModuleBase::ComplexMatrix &sc,
+        ModuleBase::ComplexMatrix &vc);
 
     void cal_err(
         const int& npw,
         const int& nband,
         const int& nbase,
-        const ComplexMatrix &vc,
-        const ComplexMatrix &hp,
-        const ComplexMatrix &basis,
+        const ModuleBase::ComplexMatrix &vc,
+        const ModuleBase::ComplexMatrix &hp,
+        const ModuleBase::ComplexMatrix &basis,
         const double* en,
         std::complex<double>* respsi);
 

@@ -46,7 +46,7 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<matrix> &DK_2D, c
 
 /*
 template<> std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>>
-Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<ComplexMatrix> &DK_2D, const double threshold_D) const
+Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<ModuleBase::ComplexMatrix> &DK_2D, const double threshold_D) const
 {
 	{
 		static int istep=0;

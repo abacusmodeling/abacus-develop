@@ -150,14 +150,14 @@ std::cout<<"cal_Vs\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<std::endl;
 			Vs[iat1][iat2][box2] = Vs_tmp[0];	Vs[iat2][iat1][-box2] = Vs_tmp[1];
 		}
 		
-		std::vector<ComplexMatrix> Vkps( GlobalC::kv.nks/GlobalV::NSPIN, {Vs[iat1][iat2][{0,0,0}]->nr, Vs[iat1][iat2][{0,0,0}]->nc} );
+		std::vector<ModuleBase::ComplexMatrix> Vkps( GlobalC::kv.nks/GlobalV::NSPIN, {Vs[iat1][iat2][{0,0,0}]->nr, Vs[iat1][iat2][{0,0,0}]->nc} );
 		for( size_t ik=0; ik!=GlobalC::kv.nks/GlobalV::NSPIN; ++ik )
 			for( const Vector3_Order<int> &box2 : Coulomb_potential_boxes )
-				Vkps[ik] += static_cast<ComplexMatrix>(*Vs[iat1][iat2][box2]) * exp(-TWO_PI*IMAG_UNIT*(GlobalC::kv.kvec_c[ik]*(box2*GlobalC::ucell.latvec)));
+				Vkps[ik] += static_cast<ModuleBase::ComplexMatrix>(*Vs[iat1][iat2][box2]) * exp(-TWO_PI*IMAG_UNIT*(GlobalC::kv.kvec_c[ik]*(box2*GlobalC::ucell.latvec)));
 		
 		for( const Vector3_Order<int> &box2 : Born_von_Karman_boxes )
 		{
-			ComplexMatrix Vps_tmp ( Vkps[0].nr, Vkps[0].nc );
+			ModuleBase::ComplexMatrix Vps_tmp ( Vkps[0].nr, Vkps[0].nc );
 			for( size_t ik=0; ik!=GlobalC::kv.nks/GlobalV::NSPIN; ++ik )
 				Vps_tmp += Vkps[ik] * GlobalC::kv.wk[ik]*(0.5*GlobalV::NSPIN) * exp(TWO_PI*IMAG_UNIT*(GlobalC::kv.kvec_c[ik]*(box2*GlobalC::ucell.latvec)));
 			Vps[iat1][iat2][box2] = make_shared<matrix>( Vps_tmp.real() );

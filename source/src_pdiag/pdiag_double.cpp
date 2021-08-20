@@ -905,7 +905,7 @@ void Pdiag_Double::diago_double_begin(
 void Pdiag_Double::diago_complex_begin(
 	const int &ik,
 	std::complex<double> **wfc,
-	ComplexMatrix &wfc_2d,
+	ModuleBase::ComplexMatrix &wfc_2d,
 	std::complex<double>* ch_mat,
 	std::complex<double>* cs_mat,
 	double *ekb)
@@ -1127,9 +1127,9 @@ void Pdiag_Double::diago_complex_begin(
     } // GenELPA method
 	else if(GlobalV::KS_SOLVER=="scalapack_gvx")
 	{
-		ComplexMatrix h_tmp(this->ncol, this->nrow, false);
+		ModuleBase::ComplexMatrix h_tmp(this->ncol, this->nrow, false);
 		memcpy( h_tmp.c, ch_mat, sizeof(std::complex<double>)*this->ncol*this->nrow );
-		ComplexMatrix s_tmp(this->ncol, this->nrow, false);
+		ModuleBase::ComplexMatrix s_tmp(this->ncol, this->nrow, false);
 		memcpy( s_tmp.c, cs_mat, sizeof(std::complex<double>)*this->ncol*this->nrow );
 		wfc_2d.create(this->ncol, this->nrow, false);
 

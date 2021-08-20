@@ -21,7 +21,7 @@ Numerical_Descriptor::~Numerical_Descriptor()
 }
 
 
-void Numerical_Descriptor::output_descriptor(const ComplexMatrix *psi, const int &lmax_in)
+void Numerical_Descriptor::output_descriptor(const ModuleBase::ComplexMatrix *psi, const int &lmax_in)
 {
 	TITLE("Numerical_Descriptor","output_descriptor");
 	NEW_PART("DeepKS descriptor: D_{Inl}");
@@ -170,7 +170,7 @@ const int &it, const int &ia, double *d, const int &nd)
 		{
 				const int dim = 2*l+1;
 				// descriptor for atom (it, ia)
-				ComplexMatrix des(dim, dim);
+				ModuleBase::ComplexMatrix des(dim, dim);
 				for (int m=0; m<2*l+1; m++)
 				{
 						const int ii=mu_index[it](ia,l,n,m);
@@ -231,7 +231,7 @@ void Numerical_Descriptor::jlq3d_overlap(
     const int &ik_ibz,
     const int &ik,
     const int &np,
-    const ComplexMatrix &psi)
+    const ModuleBase::ComplexMatrix &psi)
 {
     TITLE("Numerical_Descriptor","jlq3d_overlap");
     timer::tick("Numerical_Descriptor","jlq3d_overlap");

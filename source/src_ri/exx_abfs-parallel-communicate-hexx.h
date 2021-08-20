@@ -27,7 +27,7 @@ public:
 private:
 //	std::map<size_t,std::map<size_t,matrix>> R_to_K(
 //		std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>> & HR) const;
-//	std::map<size_t,std::map<size_t,ComplexMatrix>> R_to_K(
+//	std::map<size_t,std::map<size_t,ModuleBase::ComplexMatrix>> R_to_K(
 //		const std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>> & HR,
 //		const size_t ik) const;
 //	template< typename T >
@@ -145,9 +145,9 @@ private:
 
 public:
 	std::vector<matrix>        HK_Gamma_m2D;
-	std::vector<ComplexMatrix> HK_K_m2D;
+	std::vector<ModuleBase::ComplexMatrix> HK_K_m2D;
 	std::vector<std::deque<matrix>>        HK_Gamma_m2D_pulay_seq;
-	std::vector<std::deque<ComplexMatrix>> HK_K_m2D_pulay_seq;
+	std::vector<std::deque<ModuleBase::ComplexMatrix>> HK_K_m2D_pulay_seq;
 
 	enum class Mixing_Mode{ No, Plain, Pulay };
 	Mixing_Mode mixing_mode;

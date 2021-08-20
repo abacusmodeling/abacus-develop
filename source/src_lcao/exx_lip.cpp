@@ -173,7 +173,7 @@ void Exx_Lip::init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in, PW_Basis *pw_ptr_i
 
 		k_pack->wf_wg.create(k_pack->kv_ptr->nks,GlobalV::NBANDS);
 
-		k_pack->hvec_array = new ComplexMatrix [k_pack->kv_ptr->nks];
+		k_pack->hvec_array = new ModuleBase::ComplexMatrix [k_pack->kv_ptr->nks];
 		for( int ik=0; ik<k_pack->kv_ptr->nks; ++ik)
 		{
 			k_pack->hvec_array[ik].create(GlobalV::NLOCAL,GlobalV::NBANDS);
@@ -708,7 +708,7 @@ void Exx_Lip::read_q_pack()
 	}
 	MPI_Bcast( q_pack->wf_wg.c, q_pack->kv_ptr->nks*GlobalV::NBANDS, MPI_DOUBLE, 0, POOL_WORLD);
 
-	q_pack->hvec_array = new ComplexMatrix [q_pack->kv_ptr->nks];
+	q_pack->hvec_array = new ModuleBase::ComplexMatrix [q_pack->kv_ptr->nks];
 	for( int iq=0; iq<q_pack->kv_ptr->nks; ++iq)
 	{
 		q_pack->hvec_array[iq].create(GlobalV::NLOCAL,GlobalV::NBANDS);
@@ -821,7 +821,7 @@ void Exx_Lip::read_q_pack()
 	{
 		q_pack.wf_wg[iq] = new double[GlobalV::NBANDS];
 	}
-	q_pack.hvec_array = new ComplexMatrix [q_pack->kv_ptr->nks];
+	q_pack.hvec_array = new ModuleBase::ComplexMatrix [q_pack->kv_ptr->nks];
 	for( int iq=0; iq<q_pack->kv_ptr->nks; ++iq)
 	{
 		q_pack.hvec_array[iq].create(GlobalV::NLOCAL,GlobalV::NBANDS);

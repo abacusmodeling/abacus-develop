@@ -24,7 +24,7 @@ Numerical_Basis::~Numerical_Basis() {}
 // to generate TableOne
 // Secondly output overlap, use psi(evc) and jlq3d.
 //============================================================
-void Numerical_Basis::start_from_file_k( const int &ik, ComplexMatrix &psi)
+void Numerical_Basis::start_from_file_k( const int &ik, ModuleBase::ComplexMatrix &psi)
 {
     TITLE("Numerical_Basis","start_from_file_k");
 
@@ -39,7 +39,7 @@ void Numerical_Basis::start_from_file_k( const int &ik, ComplexMatrix &psi)
 }
 
 // The function is called in run_fp.cpp.
-void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
+void Numerical_Basis::output_overlap( const ModuleBase::ComplexMatrix *psi)
 {
     TITLE("Numerical_Basis","output_overlap");
     NEW_PART("Overlap Data For Spillage Minimization");
@@ -72,10 +72,10 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
         }
 
         // OVERLAP : < J_mu | Psi >
-        std::vector<ComplexArray> overlap_Q(GlobalC::kv.nks);
+        std::vector<ModuleBase::ComplexArray> overlap_Q(GlobalC::kv.nks);
 
         // OVERLAP : < J_mu | J_nu >
-        std::vector<ComplexArray> overlap_Sq(GlobalC::kv.nks);
+        std::vector<ModuleBase::ComplexArray> overlap_Sq(GlobalC::kv.nks);
 
         OUT(GlobalV::ofs_running,"number of k points", GlobalC::kv.nks);
         OUT(GlobalV::ofs_running,"number of bands", GlobalV::NBANDS);
@@ -133,10 +133,10 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
     return;
 }
 
-ComplexArray Numerical_Basis::cal_overlap_Q(
+ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Q(
     const int &ik,
     const int &np,
-    const ComplexMatrix &psi,
+    const ModuleBase::ComplexMatrix &psi,
 	const int derivative_order) const
 {
     TITLE("Numerical_Basis","cal_overlap_Q");
@@ -145,7 +145,7 @@ ComplexArray Numerical_Basis::cal_overlap_Q(
 	GlobalV::ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS AND BLOCH WAVE FUNCTIONS" << std::endl;
 	GlobalV::ofs_running << " Q = < J_mu, q | Psi_n, k > " << std::endl;
 
-    ComplexArray overlap_Q(GlobalV::NBANDS, GlobalV::NLOCAL, this->bessel_basis.get_ecut_number() );
+    ModuleBase::ComplexArray overlap_Q(GlobalV::NBANDS, GlobalV::NLOCAL, this->bessel_basis.get_ecut_number() );
     overlap_Q.zero_out();
 
 	const double normalization = (4 * PI) / sqrt(GlobalC::ucell.omega);			// Peize Lin add normalization 2015-12-29
@@ -209,7 +209,7 @@ ComplexArray Numerical_Basis::cal_overlap_Q(
     return overlap_Q;
 }
 
-ComplexArray Numerical_Basis::cal_overlap_Sq(
+ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Sq(
     const int &ik,
     const int &np,
 	const int derivative_order) const
@@ -221,7 +221,7 @@ ComplexArray Numerical_Basis::cal_overlap_Sq(
 	GlobalV::ofs_running << " S = < J_mu,q1 | J_nu,q2 >" << std::endl; 
 
     const int enumber = this->bessel_basis.get_ecut_number();
-    ComplexArray overlap_Sq( GlobalV::NLOCAL, GlobalV::NLOCAL, enumber, enumber );
+    ModuleBase::ComplexArray overlap_Sq( GlobalV::NLOCAL, GlobalV::NLOCAL, enumber, enumber );
     overlap_Sq.zero_out();
 
 	const double normalization = (4 * PI) * (4 * PI) / GlobalC::ucell.omega;			// Peize Lin add normalization 2015-12-29
@@ -319,7 +319,7 @@ ComplexArray Numerical_Basis::cal_overlap_Sq(
 
 // Peize Lin add for dpsi 2020.04.23
 matrix Numerical_Basis::cal_overlap_V(
-	const ComplexMatrix *psi,
+	const ModuleBase::ComplexMatrix *psi,
 	const int derivative_order)
 {
 	matrix overlap_V(GlobalC::kv.nks, GlobalV::NBANDS);
@@ -400,7 +400,7 @@ std::vector<IntArray> Numerical_Basis::init_mu_index(void)
 void Numerical_Basis::numerical_atomic_wfc(
     const int &ik,
     const int &np,
-    ComplexMatrix &psi)
+    ModuleBase::ComplexMatrix &psi)
 {
     TITLE("Numerical_Basis", "numerical_atomic_wfc");
 
@@ -580,7 +580,7 @@ void Numerical_Basis::output_k(
 
 void Numerical_Basis::output_overlap_Q(
     std::ofstream &ofs,
-    const std::vector<ComplexArray> &overlap_Q)
+    const std::vector<ModuleBase::ComplexArray> &overlap_Q)
 {
     // (3)
     if (GlobalV::MY_RANK==0)
@@ -604,7 +604,7 @@ void Numerical_Basis::output_overlap_Q(
     // It's better to refactor to Pkpoints.pool_collection(overlap_Q) in the future.
     // Peize Lin comments 2021.07.25
     assert(GlobalC::kv.nks>0);
-    ComplexArray overlap_Q_k(GlobalC::kv.nks, overlap_Q[0].getBound1(), overlap_Q[0].getBound2(), overlap_Q[0].getBound3());
+    ModuleBase::ComplexArray overlap_Q_k(GlobalC::kv.nks, overlap_Q[0].getBound1(), overlap_Q[0].getBound2(), overlap_Q[0].getBound3());
     for(int ik=0; ik<GlobalC::kv.nks; ++ik)
     {
         std::memcpy(
@@ -616,7 +616,7 @@ void Numerical_Basis::output_overlap_Q(
     int count = 0;
     for (int ik=0; ik<GlobalC::kv.nkstot; ik++)
     {
-        ComplexArray Qtmp(overlap_Q[ik].getBound1(), overlap_Q[ik].getBound2(), overlap_Q[ik].getBound3());
+        ModuleBase::ComplexArray Qtmp(overlap_Q[ik].getBound1(), overlap_Q[ik].getBound2(), overlap_Q[ik].getBound3());
         Qtmp.zero_out();
         GlobalC::Pkpoints.pool_collection(Qtmp.ptr, overlap_Q_k, ik);
         if (GlobalV::MY_RANK==0)
@@ -647,7 +647,7 @@ void Numerical_Basis::output_overlap_Q(
 void Numerical_Basis::output_overlap_Sq(
     const std::string &name,
     std::ofstream &ofs,
-    const std::vector<ComplexArray> &overlap_Sq)
+    const std::vector<ModuleBase::ComplexArray> &overlap_Sq)
 {
     if (GlobalV::MY_RANK==0)
     {

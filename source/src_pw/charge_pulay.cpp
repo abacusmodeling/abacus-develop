@@ -439,8 +439,8 @@ void Charge_Pulay::generate_Abar(const int &scheme, matrix &A)const
 
 void Charge_Pulay::inverse_preA(const int &dim, matrix &preA)const
 {
-	ComplexMatrix B(dim, dim);
-	ComplexMatrix C(dim, dim);
+	ModuleBase::ComplexMatrix B(dim, dim);
+	ModuleBase::ComplexMatrix C(dim, dim);
 	for(int i=0; i<dim; i++)
 	{
 		for(int j=0; j<dim; j++)
@@ -473,8 +473,8 @@ void Charge_Pulay::inverse_real_symmetry_matrix(const int &scheme, matrix &A)con
 
 	// Notice that it's a symmetry matrix!!!
 //	out.printrm("Abar",Abar);	
-	ComplexMatrix B(step,step);
-	ComplexMatrix C(step,step);
+	ModuleBase::ComplexMatrix B(step,step);
+	ModuleBase::ComplexMatrix C(step,step);
 	for(int i=0; i<step; i++)
 	{
 		for(int j=0; j<step; j++)

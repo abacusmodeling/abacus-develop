@@ -18,8 +18,8 @@ class Numerical_Basis
 	Numerical_Basis();
 	~Numerical_Basis();
 
-	void start_from_file_k( const int &ik, ComplexMatrix &psi);
-	void output_overlap( const ComplexMatrix *psi);
+	void start_from_file_k( const int &ik, ModuleBase::ComplexMatrix &psi);
+	void output_overlap( const ModuleBase::ComplexMatrix *psi);
 
 	private:
 
@@ -30,18 +30,18 @@ class Numerical_Basis
 	std::vector<IntArray> mu_index;
 	static std::vector<IntArray> init_mu_index(void);
 
-	void numerical_atomic_wfc(const int &ik,const int &np,ComplexMatrix &psi);
+	void numerical_atomic_wfc(const int &ik,const int &np,ModuleBase::ComplexMatrix &psi);
 
-	ComplexArray cal_overlap_Q(
-		const int &ik, const int &np, const ComplexMatrix &psi,
+	ModuleBase::ComplexArray cal_overlap_Q(
+		const int &ik, const int &np, const ModuleBase::ComplexMatrix &psi,
 		const int derivative_order ) const;
 		
-	ComplexArray cal_overlap_Sq(
+	ModuleBase::ComplexArray cal_overlap_Sq(
 		const int &ik, 
 		const int &np,
 		const int derivative_order ) const;
 
-	static matrix cal_overlap_V(const ComplexMatrix *psi, const int derivative_order);
+	static matrix cal_overlap_V(const ModuleBase::ComplexMatrix *psi, const int derivative_order);
 
 	realArray cal_flq(const int ik, const std::vector<Vector3<double>> &gk) const;
 
@@ -55,12 +55,12 @@ class Numerical_Basis
 
 	static void output_overlap_Q(
 		std::ofstream &ofs,
-		const std::vector<ComplexArray> &overlap_Q);
+		const std::vector<ModuleBase::ComplexArray> &overlap_Q);
 
 	static void output_overlap_Sq(
 		const std::string &name,
 		std::ofstream &ofs, 
-		const std::vector<ComplexArray> &overlap_Sq);
+		const std::vector<ModuleBase::ComplexArray> &overlap_Sq);
 
 	static void output_overlap_V(
 		std::ofstream &ofs,

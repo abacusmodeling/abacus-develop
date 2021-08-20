@@ -22,7 +22,7 @@ Atom_pseudo::~Atom_pseudo()
 
 // mohan add 2021-05-07
 void Atom_pseudo::set_d_so(
-	ComplexMatrix &d_so_in,
+	ModuleBase::ComplexMatrix &d_so_in,
 	const int &nproj_in,
 	const int &nproj_in_so,
 	const bool has_so)

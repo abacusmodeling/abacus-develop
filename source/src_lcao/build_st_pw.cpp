@@ -128,7 +128,7 @@ void Build_ST_pw::set_local(const int &ik)
 		fft_index[ig] = GlobalC::pw.ig2fftw[ GlobalC::wf.igk(ik, ig) ];
 	}
 
-//	ComplexMatrix vij(GlobalV::NLOCAL, GlobalV::NLOCAL);
+//	ModuleBase::ComplexMatrix vij(GlobalV::NLOCAL, GlobalV::NLOCAL);
 
 	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{

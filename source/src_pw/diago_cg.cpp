@@ -13,7 +13,7 @@ Diago_CG::~Diago_CG() {}
 
 void Diago_CG::diag
 (
-    ComplexMatrix &phi,
+    ModuleBase::ComplexMatrix &phi,
     double *e,
     const int &dim,
     const int &dmx,
@@ -203,7 +203,7 @@ void Diago_CG::calculate_gradient(
 
 void Diago_CG::orthogonal_gradient( const int &dim, const int &dmx,
                                     std::complex<double> *g, std::complex<double> *sg, std::complex<double> *lagrange,
-                                    const ComplexMatrix &eigenfunction, const int m)
+                                    const ModuleBase::ComplexMatrix &eigenfunction, const int m)
 {
     if (test_cg==1) TITLE("Diago_CG","orthogonal_gradient");
     //timer::tick("Diago_CG","orth_grad");
@@ -401,7 +401,7 @@ void Diago_CG::schmit_orth
     const int& dim,
     const int& dmx,
     const int& m,     //end
-    const ComplexMatrix &psi,
+    const ModuleBase::ComplexMatrix &psi,
     std::complex<double> *sphi,
     std::complex<double> *psi_m
 )
@@ -531,7 +531,7 @@ std::complex<double> Diago_CG::ddot
 std::complex<double> Diago_CG::ddot
 (
     const int & dim,
-    const ComplexMatrix &psi,
+    const ModuleBase::ComplexMatrix &psi,
     const int & m,
     std::complex<double> *psik
 )
@@ -554,9 +554,9 @@ std::complex<double> Diago_CG::ddot
 std::complex<double> Diago_CG::ddot
 (
     const int & dim,
-    const ComplexMatrix &psi_L,
+    const ModuleBase::ComplexMatrix &psi_L,
     const int & m,
-    const ComplexMatrix &psi_R,
+    const ModuleBase::ComplexMatrix &psi_R,
     const int & n
 )
 {

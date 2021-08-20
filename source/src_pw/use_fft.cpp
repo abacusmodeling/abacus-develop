@@ -46,7 +46,7 @@ void Use_FFT::RoundTrip(
     return;
 }
 
-void Use_FFT::ToRealSpace(const int &is, const ComplexMatrix &vg, double *vr)
+void Use_FFT::ToRealSpace(const int &is, const ModuleBase::ComplexMatrix &vg, double *vr)
 {
 	// (1) set value
     ZEROS( porter, GlobalC::pw.nrxx );
@@ -78,7 +78,7 @@ void Use_FFT::ToRealSpace_psi(const int &ik, const std::complex<double> *psig, s
 }
 
 
-void Use_FFT::ToRealSpace_psi(const int &ik, const int &ib, const ComplexMatrix &evc, std::complex<double> *psir)
+void Use_FFT::ToRealSpace_psi(const int &ik, const int &ib, const ModuleBase::ComplexMatrix &evc, std::complex<double> *psir)
 {
 	// (1) set value
     ZEROS( psir, GlobalC::pw.nrxx );
@@ -94,7 +94,7 @@ void Use_FFT::ToRealSpace_psi(const int &ik, const int &ib, const ComplexMatrix 
 
 
 
-void Use_FFT::ToRealSpace(const int &is, const ComplexMatrix &vg, matrix &vr)
+void Use_FFT::ToRealSpace(const int &is, const ModuleBase::ComplexMatrix &vg, matrix &vr)
 {
 	// (1) set value
     ZEROS( porter, GlobalC::pw.nrxx);
