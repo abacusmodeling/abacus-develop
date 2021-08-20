@@ -36,8 +36,8 @@ CUDA_LIB 			= -L${CUDA_LIB_DIR} -lcufft -lcublas -lcudart
 LAPACK_DIR    		= $(MKLROOT)
 LAPACK_INCLUDE_DIR	= ${LAPACK_DIR}/include 
 LAPACK_LIB_DIR		= ${LAPACK_DIR}/lib/intel64
-LAPACK_LIB 			= -L${LAPACK_LIB_DIR} -Wl,--start-group -lmkl_intel_lp64 -lmkl_intel_thread\
-					  -lmkl_core -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64 -Wl,--end-group -Wl,-rpath=${LAPACK_LIB_DIR}
+LAPACK_LIB 			= -L${LAPACK_LIB_DIR} -lmkl_intel_lp64 -lmkl_intel_thread\
+					  -lmkl_core -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64 #-Wl,--end-group -Wl,-rpath=${LAPACK_LIB_DIR}
 
 ##==========================
 ## LIBXC package needed 
@@ -118,7 +118,7 @@ ${OBJ_DIR}/%.o:%.cpp
 
 # rules of .cu files
 ${OBJ_DIR}/%.o:%.cu
-	${CUDA_COMPILE} ${OPTS_CUDA} ${CUDA_LIBS} -c ${HONG_FFTW} $< -o $@
+	${CUDA_COMPILE} ${OPTS_CUDA} ${LIBS} -I/home/haosen/intel/compilers_and_libraries_2017.8.262/linux/mpi/intel64/include -c ${HONG} $< -o $@
 
 
 .PHONY:clean
