@@ -310,7 +310,7 @@ void UnitCell::update_pos_taud(const Vector3<double>* posd_in)
         Atom* atom = &this->atoms[it];
         for(int ia =0;ia< atom->na;ia++)
         {
-            this->atoms[it].taud[ia] += posd_in[ia];
+            this->atoms[it].taud[ia] += posd_in[iat];
             iat++;
         }
     }

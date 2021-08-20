@@ -1188,11 +1188,11 @@ bool Input::Read(const std::string &fn)
 		{
 			read_value(ifs, mdp.mdtype);
 		}
-		else if (strcmp("NVT_tau",word) == 0)
+		else if (strcmp("nvt_tau",word) == 0)
 		{
 			read_value(ifs, mdp.NVT_tau);
 		}
-		else if (strcmp("NVT_control",word) == 0)
+		else if (strcmp("nvt_control",word) == 0)
 		{
 			read_value(ifs,mdp.NVT_control );
 		}
