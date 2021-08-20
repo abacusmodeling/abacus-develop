@@ -86,9 +86,9 @@ void Charge_Pulay::Pulay_mixing(void)
     if (irstep==rstep) irstep=0;
 	if (idstep==dstep) idstep=0;
 
-	if(GlobalV::test_charge)OUT(GlobalV::ofs_running,"irstep",irstep);
-	if(GlobalV::test_charge)OUT(GlobalV::ofs_running,"idstep",idstep);
-	if(GlobalV::test_charge)OUT(GlobalV::ofs_running,"totstep",totstep);
+	if(GlobalV::test_charge)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"irstep",irstep);
+	if(GlobalV::test_charge)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"idstep",idstep);
+	if(GlobalV::test_charge)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"totstep",totstep);
 
 	//----------------------------------------------
 	// calculate "dR^{i} = R^{i+1} - R^{i}"
@@ -239,7 +239,7 @@ void Charge_Pulay::Pulay_mixing(void)
 		if(optimal_rnorm > rnorm)
 		{
 		optimal_rnorm = rnorm;
-		DCOPY(atmp, alpha, rstep);
+		ModuleBase::GlobalFunc::DCOPY(atmp, alpha, rstep);
 		}
 		}
 
@@ -302,10 +302,10 @@ void Charge_Pulay::allocate_pulay(const int &scheme)
 	if(!this->initp)
 	{
 		TITLE("Charge_Pulay","allocate_pulay");
-		NOTE("rstep is used to record Rrho");
-		if(GlobalV::test_charge)OUT(GlobalV::ofs_running,"rstep",rstep);
-		NOTE("dstep is used to record dRrho, drho");
-		if(GlobalV::test_charge)OUT(GlobalV::ofs_running,"dstep",dstep);
+		ModuleBase::GlobalFunc::NOTE("rstep is used to record Rrho");
+		if(GlobalV::test_charge)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"rstep",rstep);
+		ModuleBase::GlobalFunc::NOTE("dstep is used to record dRrho, drho");
+		if(GlobalV::test_charge)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"dstep",dstep);
 		assert(rstep>1);
 		dstep = rstep - 1;
 		
@@ -317,7 +317,7 @@ void Charge_Pulay::allocate_pulay(const int &scheme)
         	for (int i=0; i<rstep; i++)
         	{
             	Rrho[is][i] = new double[GlobalC::pw.nrxx];
-				ZEROS( Rrho[is][i], GlobalC::pw.nrxx );
+				ModuleBase::GlobalFunc::ZEROS( Rrho[is][i], GlobalC::pw.nrxx );
         	}
 		}
     	Memory::record("Charge_Pulay","Rrho", GlobalV::NSPIN*rstep*GlobalC::pw.nrxx,"double");
@@ -334,21 +334,21 @@ void Charge_Pulay::allocate_pulay(const int &scheme)
 			dRrho[is] = new double*[dstep];
 			drho[is] = new double*[dstep];
 			rho_save2[is] = new double[GlobalC::pw.nrxx];
-			ZEROS( rho_save2[is], GlobalC::pw.nrxx);
+			ModuleBase::GlobalFunc::ZEROS( rho_save2[is], GlobalC::pw.nrxx);
 
 			for (int i=0; i<dstep; i++)
 			{
 				dRrho[is][i] = new double[GlobalC::pw.nrxx];	
 				drho[is][i] = new double[GlobalC::pw.nrxx];
-				ZEROS( dRrho[is][i], GlobalC::pw.nrxx );
-				ZEROS( drho[is][i], GlobalC::pw.nrxx);
+				ModuleBase::GlobalFunc::ZEROS( dRrho[is][i], GlobalC::pw.nrxx );
+				ModuleBase::GlobalFunc::ZEROS( drho[is][i], GlobalC::pw.nrxx);
 			}
 		}
     	Memory::record("Charge_Pulay","dRrho", GlobalV::NSPIN*dstep*GlobalC::pw.nrxx,"double");
     	Memory::record("Charge_Pulay","drho", GlobalV::NSPIN*dstep*GlobalC::pw.nrxx,"double");
     	Memory::record("Charge_Pulay","rho_save2", GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
 
-		NOTE("Allocate Abar = <dRrho_j | dRrho_i >, dimension = dstep.");
+		ModuleBase::GlobalFunc::NOTE("Allocate Abar = <dRrho_j | dRrho_i >, dimension = dstep.");
 		if(scheme==1)
 		{
 			this->Abar.create(dstep, dstep);
@@ -361,14 +361,14 @@ void Charge_Pulay::allocate_pulay(const int &scheme)
 		}
 
 		// (4) allocate dRR = <delta R|R>
-		NOTE("Allocate dRR = < dR | R >, dimension = dstep");
+		ModuleBase::GlobalFunc::NOTE("Allocate dRR = < dR | R >, dimension = dstep");
 		this->dRR = new double[dstep];
-		ZEROS(dRR, dstep);
+		ModuleBase::GlobalFunc::ZEROS(dRR, dstep);
 
 		// (5) allocate alpha
-		NOTE("Allocate alpha, dimension = dstep");
+		ModuleBase::GlobalFunc::NOTE("Allocate alpha, dimension = dstep");
 		this->alpha = new double[dstep];
-		ZEROS(alpha, dstep);
+		ModuleBase::GlobalFunc::ZEROS(alpha, dstep);
 
 		this->initp = true;
     }
@@ -380,22 +380,22 @@ void Charge_Pulay::allocate_pulay(const int &scheme)
 		{
 			for(int j=0; j<rstep; j++)
 			{
-				ZEROS(Rrho[i][j], GlobalC::pw.nrxx);
+				ModuleBase::GlobalFunc::ZEROS(Rrho[i][j], GlobalC::pw.nrxx);
 			}
 		}
 		
 		for(int i=0; i<GlobalV::NSPIN; i++)
 		{
-			ZEROS(rho_save2[i], GlobalC::pw.nrxx);
+			ModuleBase::GlobalFunc::ZEROS(rho_save2[i], GlobalC::pw.nrxx);
 			for(int j=0; j<dstep; j++)
 			{
-				ZEROS( dRrho[i][j], GlobalC::pw.nrxx );
-				ZEROS( drho[i][j], GlobalC::pw.nrxx);
+				ModuleBase::GlobalFunc::ZEROS( dRrho[i][j], GlobalC::pw.nrxx );
+				ModuleBase::GlobalFunc::ZEROS( drho[i][j], GlobalC::pw.nrxx);
 			}
 		}
 
-		ZEROS(dRR, dstep);
-		ZEROS(alpha, dstep);
+		ModuleBase::GlobalFunc::ZEROS(dRR, dstep);
+		ModuleBase::GlobalFunc::ZEROS(alpha, dstep);
 	}
 	return;
 }
@@ -515,7 +515,7 @@ void Charge_Pulay::inverse_real_symmetry_matrix(const int &scheme, matrix &A)con
 
 void Charge_Pulay::generate_dRR(const int &m)
 {
-	ZEROS(dRR, dstep);
+	ModuleBase::GlobalFunc::ZEROS(dRR, dstep);
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		for(int i=0; i<dstep; i++)
@@ -533,7 +533,7 @@ void Charge_Pulay::generate_alpha(const int &scheme)
 {
 //	TITLE("Charge_Pulay","generate_alpha");
 
-	ZEROS(alpha, dstep);
+	ModuleBase::GlobalFunc::ZEROS(alpha, dstep);
 	if(scheme==1)
 	{
 		for(int i=0; i<dstep; i++)
@@ -590,7 +590,7 @@ void Charge_Pulay::generate_new_rho(const int &is, const int &m)
 	
 	// rho tmp
 	double* rhonew = new double[GlobalC::pw.nrxx];
-	ZEROS(rhonew, GlobalC::pw.nrxx);
+	ModuleBase::GlobalFunc::ZEROS(rhonew, GlobalC::pw.nrxx);
 	
 	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 	{
@@ -601,10 +601,10 @@ void Charge_Pulay::generate_new_rho(const int &is, const int &m)
 		}
 	}
 
-	DCOPY(rhonew, rho[is], GlobalC::pw.nrxx);
+	ModuleBase::GlobalFunc::DCOPY(rhonew, rho[is], GlobalC::pw.nrxx);
 	
 	// this is done in save_rho_before_sum_bands
-//	DCOPY(rho[is], rho_save[is], GlobalC::pw.nrxx);
+//	ModuleBase::GlobalFunc::DCOPY(rho[is], rho_save[is], GlobalC::pw.nrxx);
 
 
 	delete[] rhonew;
@@ -647,7 +647,7 @@ void Charge_Pulay::generate_datas(const int &irstep, const int &idstep, const in
 	// which Rrho to be update now? answer: irstep
 	//===============================================
 
-	NOTE("Generate Residual std::vector from rho and rho_save.");
+	ModuleBase::GlobalFunc::NOTE("Generate Residual std::vector from rho and rho_save.");
     for (int is=0; is<GlobalV::NSPIN; is++)
     {
 //		std::cout << " generate datas , spin=" << is << std::endl;
@@ -695,8 +695,8 @@ void Charge_Pulay::generate_datas(const int &irstep, const int &idstep, const in
 		const int nowR = irstep;
 		int lastR = irstep - 1;
 
-		if(GlobalV::test_charge)OUT(GlobalV::ofs_running, "now irstep", nowR);
-		if(GlobalV::test_charge)OUT(GlobalV::ofs_running, "last irstep",lastR); 
+		if(GlobalV::test_charge)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "now irstep", nowR);
+		if(GlobalV::test_charge)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "last irstep",lastR); 
 
 		if(lastR < 0) lastR += rstep;
 		//std::cout << "\n nowR(irstep) = " << nowR;
@@ -718,10 +718,10 @@ void Charge_Pulay::generate_datas(const int &irstep, const int &idstep, const in
 	// mohan fix the bug 2010/03/26.
 	// save 'rho_save2' in order to calculate drho in
 	// the next iteration.
-	NOTE("Calculate drho = rho_{in}^{i+1} - rho_{in}^{i}");
+	ModuleBase::GlobalFunc::NOTE("Calculate drho = rho_{in}^{i+1} - rho_{in}^{i}");
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		DCOPY(this->rho_save[is], this->rho_save2[is], GlobalC::pw.nrxx);
+		ModuleBase::GlobalFunc::DCOPY(this->rho_save[is], this->rho_save2[is], GlobalC::pw.nrxx);
 	}
 	return;
 }

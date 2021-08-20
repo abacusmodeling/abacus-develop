@@ -602,11 +602,11 @@ void ORB_gen_tables::snap_psipsi(
 
 	if (job == 0)
 	{
-		ZEROS(olm, 1);
+		ModuleBase::GlobalFunc::ZEROS(olm, 1);
 	}
 	else if (job == 1)
 	{
-		ZEROS(olm, 3);
+		ModuleBase::GlobalFunc::ZEROS(olm, 3);
 	}
 
 	if (distance > (Rcut1 + Rcut2))

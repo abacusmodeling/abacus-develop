@@ -40,7 +40,7 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 
 	std::complex<double> * psic = new std::complex<double> [GlobalC::pw.nrxx];
 
-	ZEROS(psic, GlobalC::pw.nrxx);
+	ModuleBase::GlobalFunc::ZEROS(psic, GlobalC::pw.nrxx);
 
 	if(GlobalV::NSPIN==1||GlobalV::NSPIN==4)
 	{
@@ -63,7 +63,7 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 
 	//psic cantains now Vxc(G)
 	rhocg= new double [GlobalC::pw.nggm];
-	ZEROS(rhocg, GlobalC::pw.nggm);
+	ModuleBase::GlobalFunc::ZEROS(rhocg, GlobalC::pw.nggm);
 
 	sigmadiag=0.0;
 	for(nt=0;nt<GlobalC::ucell.ntype;nt++)

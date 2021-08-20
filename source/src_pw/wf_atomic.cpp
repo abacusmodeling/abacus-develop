@@ -46,7 +46,7 @@ void WF_atomic::init_at_1(void)
     {
         ndm = (GlobalC::ucell.atoms[it].msh > ndm) ? GlobalC::ucell.atoms[it].msh : ndm;
     }
-	OUT(GlobalV::ofs_running,"max mesh points in Pseudopotential",ndm);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"max mesh points in Pseudopotential",ndm);
 
     // needed to normalize atomic wfcs (not a bad idea in general and
     // necessary to compute correctly lda+U projections)
@@ -65,8 +65,8 @@ void WF_atomic::init_at_1(void)
     double *aux = new double[ndm];
     double *vchi = new double[ndm];
 
-	OUT(GlobalV::ofs_running,"dq(describe PAO in reciprocal space)",GlobalV::DQ);
-	OUT(GlobalV::ofs_running,"max q",GlobalV::NQX);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"dq(describe PAO in reciprocal space)",GlobalV::DQ);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"max q",GlobalV::NQX);
 
     for (int it=0; it<GlobalC::ucell.ntype; it++)
     {
@@ -215,15 +215,15 @@ void WF_atomic::check_psi(const ModuleBase::ComplexMatrix *evc)const
     for (int iw=0;iw<GlobalV::NBANDS;iw++)
     {
         double sum_evc = abs2_row(this->evc[0],iw);
-        OUT("iw",iw);
-        OUT("sum_evc",sum_evc);
+        ModuleBase::GlobalFunc::OUT("iw",iw);
+        ModuleBase::GlobalFunc::OUT("sum_evc",sum_evc);
     }
 
     for (int ik=0;ik<GlobalC::kv.nks;ik++)
     {
         double sum_evc = abs2(this->evc[ik]);
-        OUT("ik",ik);
-        OUT("sum_evc2",sum_evc);
+        ModuleBase::GlobalFunc::OUT("ik",ik);
+        ModuleBase::GlobalFunc::OUT("sum_evc2",sum_evc);
     }
     //QUIT();
 }
@@ -312,7 +312,7 @@ void WF_atomic::atomic_wfc
                                           if(fabs(fact[is])>1e-8)
                                           {
                                               const int ind = GlobalC::ppcell.lmaxkb + soc.sph_ind(l,j,m,is);
-                                              ZEROS(aux, np);
+                                              ModuleBase::GlobalFunc::ZEROS(aux, np);
                                               for(int n1=0;n1<2*l+1;n1++){
                                                  const int lm = l*l +n1;
                                                  if(abs(soc.rotylm(n1,ind))>1e-8)
@@ -457,7 +457,7 @@ void WF_atomic::atomic_wfc
         } //end ia //mohan modify 2007-11-7
     } // end nt
 
-	if(GlobalV::test_wf)OUT(GlobalV::ofs_running,"wf_index",index);
+	if(GlobalV::test_wf)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wf_index",index);
 
     if (index != GlobalC::ucell.natomwfc)
     {

@@ -69,8 +69,8 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 	}
 	else
 	{
-		throw domain_error("iexch="+TO_STRING(GlobalC::xcf.iexch_now)+", igcx="+TO_STRING(GlobalC::xcf.igcx_now)
-			+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw domain_error("iexch="+ModuleBase::GlobalFunc::TO_STRING(GlobalC::xcf.iexch_now)+", igcx="+ModuleBase::GlobalFunc::TO_STRING(GlobalC::xcf.igcx_now)
+			+" unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
 
 	//correlation
@@ -80,8 +80,8 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 	}
     else
 	{
-		throw domain_error("icorr="+TO_STRING(GlobalC::xcf.icorr_now)+", igcc="+TO_STRING(GlobalC::xcf.igcc_now)
-			+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw domain_error("icorr="+ModuleBase::GlobalFunc::TO_STRING(GlobalC::xcf.icorr_now)+", igcc="+ModuleBase::GlobalFunc::TO_STRING(GlobalC::xcf.igcc_now)
+			+" unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 
 	}
 	
@@ -264,7 +264,7 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 
 	for(int is=0;is<GlobalV::NSPIN;is++)
 	{
-		GGA_PW::grad_dot(VECTOR_TO_PTR(h[is]),VECTOR_TO_PTR(dh));	
+		GGA_PW::grad_dot(ModuleBase::GlobalFunc::VECTOR_TO_PTR(h[is]),ModuleBase::GlobalFunc::VECTOR_TO_PTR(dh));	
 		for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 		{
 			vrho[is][ir]-=dh[ir];

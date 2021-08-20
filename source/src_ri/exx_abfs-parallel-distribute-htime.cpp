@@ -8,7 +8,7 @@ std::vector<std::pair<size_t,size_t>> Exx_Abfs::Parallel::Distribute::Htime::dis
 	const Abfs::Vector3_Order<int> & Born_von_Karman_period,
 	const double rmesh_times )
 {
-//std::ofstream ofs("htime_"+TO_STRING(GlobalV::MY_RANK));
+//std::ofstream ofs("htime_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 //ofs<<rmesh_times<<std::endl;
 
 	TITLE("Exx_Abfs::Parallel::Distribute::Htime::distribute");

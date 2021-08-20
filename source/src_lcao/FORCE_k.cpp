@@ -39,7 +39,7 @@ void Force_LCAO_k::ftable_k (
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		dm2d[is] = new double[GlobalC::LNNR.nnr];
-		ZEROS(dm2d[is], GlobalC::LNNR.nnr);
+		ModuleBase::GlobalFunc::ZEROS(dm2d[is], GlobalC::LNNR.nnr);
 	}
 	Memory::record ("Force_LCAO_k", "dm2d", GlobalV::NSPIN*GlobalC::LNNR.nnr, "double");	
 	bool with_energy = false;
@@ -112,26 +112,26 @@ void Force_LCAO_k::allocate_k(void)
 	GlobalC::LM.DSloc_Rx = new double [nnr];
     GlobalC::LM.DSloc_Ry = new double [nnr];
     GlobalC::LM.DSloc_Rz = new double [nnr];
-    ZEROS(GlobalC::LM.DSloc_Rx, nnr);
-    ZEROS(GlobalC::LM.DSloc_Ry, nnr);
-    ZEROS(GlobalC::LM.DSloc_Rz, nnr);
+    ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_Rx, nnr);
+    ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_Ry, nnr);
+    ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_Rz, nnr);
 	Memory::record("force_lo", "dS", nnr*3, "double");
     
 	if(GlobalV::STRESS){
 		GlobalC::LM.DH_r = new double [3* nnr];
-		ZEROS(GlobalC::LM.DH_r, 3 * nnr);
+		ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DH_r, 3 * nnr);
 		GlobalC::LM.stvnl11 = new double [nnr];
 		GlobalC::LM.stvnl12 = new double [nnr];
 		GlobalC::LM.stvnl13 = new double [nnr];
 		GlobalC::LM.stvnl22 = new double [nnr];
 		GlobalC::LM.stvnl23 = new double [nnr];
 		GlobalC::LM.stvnl33 = new double [nnr];
-		ZEROS(GlobalC::LM.stvnl11,  nnr);
-		ZEROS(GlobalC::LM.stvnl12,  nnr);
-		ZEROS(GlobalC::LM.stvnl13,  nnr);
-		ZEROS(GlobalC::LM.stvnl22,  nnr);
-		ZEROS(GlobalC::LM.stvnl23,  nnr);
-		ZEROS(GlobalC::LM.stvnl33,  nnr);
+		ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.stvnl11,  nnr);
+		ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.stvnl12,  nnr);
+		ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.stvnl13,  nnr);
+		ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.stvnl22,  nnr);
+		ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.stvnl23,  nnr);
+		ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.stvnl33,  nnr);
 		Memory::record("stress_lo", "dSR", nnr*6, "double");
 	}
 
@@ -148,9 +148,9 @@ void Force_LCAO_k::allocate_k(void)
     GlobalC::LM.DHloc_fixedR_x = new double [nnr];
     GlobalC::LM.DHloc_fixedR_y = new double [nnr];
     GlobalC::LM.DHloc_fixedR_z = new double [nnr];
-    ZEROS (GlobalC::LM.DHloc_fixedR_x, nnr);
-    ZEROS (GlobalC::LM.DHloc_fixedR_y, nnr);
-    ZEROS (GlobalC::LM.DHloc_fixedR_z, nnr);
+    ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixedR_x, nnr);
+    ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixedR_y, nnr);
+    ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixedR_z, nnr);
 	Memory::record("force_lo", "dTVNL", nnr*3, "double");
     
     // calculate dT=<phi|kin|dphi> in LCAO
@@ -227,7 +227,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
    			for(int is=0; is<GlobalV::NSPIN; is++)
 			   {
 				   vvv[is] = new std::complex<double>[ irr ];
-				   ZEROS(vvv[is], irr );
+				   ModuleBase::GlobalFunc::ZEROS(vvv[is], irr );
 			   }
          }
 
@@ -403,7 +403,7 @@ void Force_LCAO_k::cal_foverlap_k(
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		edm2d[is] = new double[GlobalC::LNNR.nnr];
-		ZEROS(edm2d[is], GlobalC::LNNR.nnr);
+		ModuleBase::GlobalFunc::ZEROS(edm2d[is], GlobalC::LNNR.nnr);
 	}
 	bool with_energy = true;
 
@@ -509,8 +509,8 @@ void Force_LCAO_k::cal_foverlap_k(
 
 	if(irr!=GlobalC::LNNR.nnr)
 	{
-		OUT(GlobalV::ofs_running,"wrong irr",irr);
-		OUT(GlobalV::ofs_running,"wrong GlobalC::LNNR.nnr",GlobalC::LNNR.nnr);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wrong irr",irr);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wrong GlobalC::LNNR.nnr",GlobalC::LNNR.nnr);
 		WARNING_QUIT("Force_LCAO_k::cal_foverlap_k","irr!=GlobalC::LNNR.nnr");
 	}
 	
@@ -633,7 +633,7 @@ void Force_LCAO_k::test(double* mmm, const std::string &name)
 	
 	double *test;
 	test = new double[GlobalV::NLOCAL * GlobalV::NLOCAL];
-	ZEROS(test, GlobalV::NLOCAL *GlobalV::NLOCAL);
+	ModuleBase::GlobalFunc::ZEROS(test, GlobalV::NLOCAL *GlobalV::NLOCAL);
 	
 	for(int T1=0; T1<GlobalC::ucell.ntype; T1++)
     {

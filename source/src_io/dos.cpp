@@ -20,7 +20,7 @@ void Dos::calculate_Mulliken(const std::string &fa)
 		for(int is=0; is<GlobalV::NSPIN; ++is)
 		{
 			mulliken[is] = new double[GlobalV::NLOCAL];
-			ZEROS(mulliken[is], GlobalV::NLOCAL);
+			ModuleBase::GlobalFunc::ZEROS(mulliken[is], GlobalV::NLOCAL);
 		}
 		
 		GlobalC::UHM.GG.cal_mulliken( mulliken );	
@@ -88,7 +88,7 @@ void Dos::calculate_Mulliken(const std::string &fa)
 						{
 							// sum up the multi-zeta charge.
 							double *mmm = new double[2*l+1];
-							ZEROS(mmm, 2*l+1);
+							ModuleBase::GlobalFunc::ZEROS(mmm, 2*l+1);
 							for(int n=0; n<atom->l_nchi[l]; ++n)
 							{
 								for(int m=0; m<2*l+1; ++m)
@@ -180,7 +180,7 @@ bool Dos::calculate_dos
 	const int npoints = static_cast<int>(std::floor ( ( emax_ev - emin_ev ) / de_ev )) ;
 	if(npoints <= 0)
 	{
-		OUT(GlobalV::ofs_running,"npoints",npoints);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"npoints",npoints);
 		WARNING("calculate_dos","npoints < 0");
 		return 0;
 	}
@@ -191,12 +191,12 @@ bool Dos::calculate_dos
 	}
 
 	GlobalV::ofs_running << "\n OUTPUT DOS FILE IN: " << fa << std::endl;
-	OUT(GlobalV::ofs_running,"min state energy (eV)",emin_ev);
-	OUT(GlobalV::ofs_running,"max state energy (eV)",emax_ev);
-	OUT(GlobalV::ofs_running,"delta energy interval (eV)",  de_ev);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"min state energy (eV)",emin_ev);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"max state energy (eV)",emax_ev);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"delta energy interval (eV)",  de_ev);
 	
 	double *e_mod = new double[npoints];
-	ZEROS(e_mod, npoints);
+	ModuleBase::GlobalFunc::ZEROS(e_mod, npoints);
 
 	double sum   = 0.0;
 	double e_new = emin_ev;
@@ -239,8 +239,8 @@ bool Dos::calculate_dos
 	{
 		ofs.close();
 	}
-	OUT(GlobalV::ofs_running,"number of bands",nbands);
-	OUT(GlobalV::ofs_running,"sum up the states", sum);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of bands",nbands);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"sum up the states", sum);
 	delete[] e_mod;
 
 	return 1;

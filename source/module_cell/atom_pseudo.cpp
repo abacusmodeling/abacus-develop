@@ -48,7 +48,7 @@ void Atom_pseudo::set_d_so(
 	//2016-07-19 begin, LiuXh
 	if(!has_so)
 	{
-		ZEROS(this->non_zero_count_soc, 4);
+		ModuleBase::GlobalFunc::ZEROS(this->non_zero_count_soc, 4);
 	}
 	else //zhengdy-soc
 	{
@@ -144,8 +144,8 @@ void Atom_pseudo::print_atom(std::ofstream &ofs)
 {
 	if(GlobalV::test_atom) TITLE("atom_pseudo","print_atom");
 
-	OUT(ofs,"mass",mass);
-	OUT(ofs,"pseudo_fn",pseudo_fn);
+	ModuleBase::GlobalFunc::OUT(ofs,"mass",mass);
+	ModuleBase::GlobalFunc::OUT(ofs,"pseudo_fn",pseudo_fn);
 
 	return;
 }

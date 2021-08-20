@@ -42,7 +42,7 @@ void Numerical_Basis::start_from_file_k( const int &ik, ModuleBase::ComplexMatri
 void Numerical_Basis::output_overlap( const ModuleBase::ComplexMatrix *psi)
 {
     TITLE("Numerical_Basis","output_overlap");
-    NEW_PART("Overlap Data For Spillage Minimization");
+    ModuleBase::GlobalFunc::NEW_PART("Overlap Data For Spillage Minimization");
     
 	//---------------------------------------------------------
 	// if the numerical_basis hasn't been initialized yet,
@@ -77,10 +77,10 @@ void Numerical_Basis::output_overlap( const ModuleBase::ComplexMatrix *psi)
         // OVERLAP : < J_mu | J_nu >
         std::vector<ModuleBase::ComplexArray> overlap_Sq(GlobalC::kv.nks);
 
-        OUT(GlobalV::ofs_running,"number of k points", GlobalC::kv.nks);
-        OUT(GlobalV::ofs_running,"number of bands", GlobalV::NBANDS);
-        OUT(GlobalV::ofs_running,"number of local orbitals", GlobalV::NLOCAL);
-        OUT(GlobalV::ofs_running,"number of eigenvalues of Jl(x)", this->bessel_basis.get_ecut_number());
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of k points", GlobalC::kv.nks);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of bands", GlobalV::NBANDS);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of local orbitals", GlobalV::NLOCAL);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of eigenvalues of Jl(x)", this->bessel_basis.get_ecut_number());
 
         // nks now is the reduced k-points.
         for (int ik=0; ik<GlobalC::kv.nks; ik++)
@@ -94,13 +94,13 @@ void Numerical_Basis::output_overlap( const ModuleBase::ComplexMatrix *psi)
 
             // search for all k-points.
             overlap_Q[ik] = this->cal_overlap_Q(ik, npw, psi[ik], derivative_order);
-            DONE(GlobalV::ofs_running,"cal_overlap_Q");
+            ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"cal_overlap_Q");
 
             // (2) generate Sq matrix if necessary.
             if (winput::out_spillage == 2)
             {
                 overlap_Sq[ik] = this->cal_overlap_Sq( ik, npw, derivative_order );
-                DONE(GlobalV::ofs_running,"cal_overlap_Sq");
+                ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"cal_overlap_Sq");
             }
         }
 

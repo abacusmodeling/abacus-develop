@@ -236,7 +236,7 @@ void pseudo_nc::set_pseudo_atom(const Pseudopot_upf &upf)
 // remember to update here if you need it.
 //	rcut = 25.0; 
 
-	OUT(GlobalV::ofs_running,"PAO radial cut off (Bohr)",rcut);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"PAO radial cut off (Bohr)",rcut);
 	if(rcut <= 0.0)
 	{
 		WARNING_QUIT("pseudo_atom::set_pseudo_atom","PAO rcut<=0.0");
@@ -247,22 +247,22 @@ void pseudo_nc::set_pseudo_atom(const Pseudopot_upf &upf)
 	delete[] r;
 	r = new double[mesh];
 	assert(r != 0);
-	ZEROS(r, mesh);
+	ModuleBase::GlobalFunc::ZEROS(r, mesh);
 
 	delete[] rab;
 	rab = new double[mesh];
 	assert(rab != 0);
-	ZEROS(rab, mesh);
+	ModuleBase::GlobalFunc::ZEROS(rab, mesh);
 
 	delete[] rho_at;
 	rho_at  = new double[mesh];
 	assert(rho_at != 0);
-	ZEROS(rho_at,mesh);
+	ModuleBase::GlobalFunc::ZEROS(rho_at,mesh);
 
 	delete[] rho_atc;
 	rho_atc = new double[mesh];
 	assert(rho_atc != 0);
-	ZEROS(rho_atc, mesh);
+	ModuleBase::GlobalFunc::ZEROS(rho_atc, mesh);
 
 	for (int i = 0;i < nchi;i++)
 	{

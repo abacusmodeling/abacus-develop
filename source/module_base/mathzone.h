@@ -24,7 +24,7 @@ class Mathzone
         if (a>=b && a>=c) return a;
         else if (b>=a && b>=c) return b;
         else if (c>=a && c>=b) return c;
-		else throw std::runtime_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		else throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
     }
 
     // be careful, this can only be used for plane wave

@@ -141,10 +141,10 @@ void LCAO_Orbitals::Read_Orbitals(
 
 
 	//OUT(ofs_in,"ecutwfc for kmesh",ecutwfc);
-	OUT(ofs_in,"delta k  (1/Bohr)",dk);
-	OUT(ofs_in,"delta r    (Bohr)",dR);
-	OUT(ofs_in,"dr_uniform (Bohr)",dr_uniform);
-	OUT(ofs_in,"rmax       (Bohr)",Rmax);
+	ModuleBase::GlobalFunc::OUT(ofs_in,"delta k  (1/Bohr)",dk);
+	ModuleBase::GlobalFunc::OUT(ofs_in,"delta r    (Bohr)",dR);
+	ModuleBase::GlobalFunc::OUT(ofs_in,"dr_uniform (Bohr)",dr_uniform);
+	ModuleBase::GlobalFunc::OUT(ofs_in,"rmax       (Bohr)",Rmax);
 
 	// check the read in data.
     assert(dk > 0.0);
@@ -186,7 +186,7 @@ void LCAO_Orbitals::Read_Orbitals(
 
 	//	this->kmesh = static_cast<int> (PI / 0.01 / 4 / this->dk);
 	if(kmesh%2==0) kmesh++;
-	OUT(ofs_in,"kmesh",kmesh);
+	ModuleBase::GlobalFunc::OUT(ofs_in,"kmesh",kmesh);
 	//-----------------------------------------------------------------
 
 
@@ -218,7 +218,7 @@ void LCAO_Orbitals::Read_Orbitals(
 
 	delete[] nproj;
 	this->nproj = new int[ntype];
-	ZEROS(nproj, ntype);
+	ModuleBase::GlobalFunc::ZEROS(nproj, ntype);
 	
 	this->nprojmax = 0;
 	
@@ -315,7 +315,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 
 //		std::cout << " cut_mesh=" << cut_mesh << std::endl;
 			double* beta_r = new double[cut_mesh];
-			ZEROS(beta_r, cut_mesh);
+			ModuleBase::GlobalFunc::ZEROS(beta_r, cut_mesh);
 			for(int ir=0; ir<cut_mesh; ++ir)
 			{
 				beta_r[ir] = atom->betar(p1,ir);
@@ -425,7 +425,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 			}
 
 			double* beta_r = new double[cut_mesh];
-			ZEROS(beta_r, cut_mesh);
+			ModuleBase::GlobalFunc::ZEROS(beta_r, cut_mesh);
 			for(int ir=0; ir<cut_mesh; ++ir)
 			{
 				beta_r[ir] = atom->betar(p1,ir);
@@ -512,18 +512,18 @@ void LCAO_Orbitals::Read_NonLocal(
 
 	if(my_rank==0)
 	{
-		if(SCAN_BEGIN(ifs, "<HEADER>"))
+		if(ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<HEADER>"))
 		{
-			READ_VALUE(ifs, label);
-			READ_VALUE(ifs, ps_type);
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, label);
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, ps_type);
 			if(ps_type != "NC")
 			{
 				WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","Only available for NC nonlocal pseudopotential");
 			}
-			READ_VALUE(ifs, nlmax);
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, nlmax);
 //			std::cout << " " << label << " " << ps_type << " " << nlmax << std::endl; 
 			assert(nlmax >= -1);
-			SCAN_END(ifs,"</HEADER>");
+			ModuleBase::GlobalFunc::SCAN_END(ifs,"</HEADER>");
 		}
 	}
 
@@ -562,9 +562,9 @@ void LCAO_Orbitals::Read_NonLocal(
 
 
 //	OUT(GlobalV::ofs_running,"Type",it);
-	OUT(GlobalV::ofs_running,"label",label);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"label",label);
 //	OUT(GlobalV::ofs_running,"ps_type",ps_type);
-	OUT(GlobalV::ofs_running,"nlmax",nlmax);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nlmax",nlmax);
 
 	//-------------------------------------------
 	// if each L has projectors more than once,
@@ -578,13 +578,13 @@ void LCAO_Orbitals::Read_NonLocal(
 
 	if(my_rank==0)
 	{
-		if(SCAN_BEGIN(ifs, "<DIJ>"))
+		if(ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<DIJ>"))
 		{
 			//--------------------------------------
 			// this parameter is very important!!!
 			//--------------------------------------
-			READ_VALUE(ifs, n_projectors);
-			OUT(GlobalV::ofs_running,"n_projectors",n_projectors);
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, n_projectors);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"n_projectors",n_projectors);
 			
 			for (int p1 = 0; p1 < n_projectors; p1++)
         	{
@@ -602,7 +602,7 @@ void LCAO_Orbitals::Read_NonLocal(
 //					GlobalV::ofs_running << " L1=" << L1_read << " L2=" << L2_read << " Coef=" << coefficient_D_in(L1_read,L2_read) << std::endl;
             	}
         	}
-			SCAN_END(ifs,"</DIJ>");
+			ModuleBase::GlobalFunc::SCAN_END(ifs,"</DIJ>");
 		}
 	}
 
@@ -613,28 +613,28 @@ void LCAO_Orbitals::Read_NonLocal(
 
 	Numerical_Nonlocal_Lm* tmpBeta_lm = new Numerical_Nonlocal_Lm[n_projectors];
 	int* LfromBeta = new int[n_projectors];
-	ZEROS(LfromBeta, n_projectors);
+	ModuleBase::GlobalFunc::ZEROS(LfromBeta, n_projectors);
 
 	for(int p1 = 0; p1<n_projectors; p1++)
 	{
 		int meshr_ps = 0;
 		if(my_rank==0)
 		{
-			if(SCAN_BEGIN(ifs, "<PP_BETA>", 0))
+			if(ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_BETA>", 0))
 			{
 				int iproj;
-				READ_VALUE(ifs, iproj);
+				ModuleBase::GlobalFunc::READ_VALUE(ifs, iproj);
 				if(iproj!=p1)
 				{
 					std::cout << " iproj=" << iproj << " p1=" << p1 << std::endl;
 					WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","Check non-local projector index.");
 				}
 				
-				READ_VALUE(ifs, LfromBeta[p1]);
+				ModuleBase::GlobalFunc::READ_VALUE(ifs, LfromBeta[p1]);
 				assert( LfromBeta[p1] >= 0 );
 				assert( LfromBeta[p1] <= nlmax );
 
-				READ_VALUE(ifs, meshr_ps);
+				ModuleBase::GlobalFunc::READ_VALUE(ifs, meshr_ps);
 				if(meshr_ps%2==0)
 				{
 					std::cout << " meshr_ps = " << meshr_ps << std::endl;
@@ -657,9 +657,9 @@ void LCAO_Orbitals::Read_NonLocal(
 		double* radial_ps = new double[meshr_ps];
 		double* rab_ps = new double[meshr_ps];
 		double* beta_r = new double[meshr_ps];
-		ZEROS(radial_ps, meshr_ps);
-		ZEROS(rab_ps, meshr_ps);
-		ZEROS(beta_r, meshr_ps);
+		ModuleBase::GlobalFunc::ZEROS(radial_ps, meshr_ps);
+		ModuleBase::GlobalFunc::ZEROS(rab_ps, meshr_ps);
+		ModuleBase::GlobalFunc::ZEROS(beta_r, meshr_ps);
 
 		if(my_rank==0)
 		{
@@ -700,7 +700,7 @@ void LCAO_Orbitals::Read_NonLocal(
 		
 		if(my_rank==0)
 		{
-			SCAN_END(ifs,"</PP_BETA>");
+			ModuleBase::GlobalFunc::SCAN_END(ifs,"</PP_BETA>");
 		}
 	}// end projectors.
 	

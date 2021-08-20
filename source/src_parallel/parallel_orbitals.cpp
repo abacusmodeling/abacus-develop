@@ -52,8 +52,8 @@ void Parallel_Orbitals::set_trace(void)
     delete[] trace_loc_row;
     delete[] trace_loc_col;
 
-    OUT(GlobalV::ofs_running,"trace_loc_row dimension",GlobalV::NLOCAL);
-    OUT(GlobalV::ofs_running,"trace_loc_col dimension",GlobalV::NLOCAL);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"trace_loc_row dimension",GlobalV::NLOCAL);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"trace_loc_col dimension",GlobalV::NLOCAL);
 
     trace_loc_row = new int[GlobalV::NLOCAL];
     trace_loc_col = new int[GlobalV::NLOCAL];

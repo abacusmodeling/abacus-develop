@@ -20,8 +20,8 @@ std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_pt
 	const set<size_t> &atom_centres,
 	const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
 	const Exx_Abfs::Matrix_Orbs21 &m_abfslcaos_lcaos,
-	const Element_Basis_Index::IndexLNM &index_abfs,
-	const Element_Basis_Index::IndexLNM &index_lcaos,
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_abfs,
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_lcaos,
 	const double threshold,
 	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<matrix>>>> &Cws,
 	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<matrix>>>> &Vws )
@@ -86,7 +86,7 @@ std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_pt
 		const set<std::pair<size_t,size_t>> &atom_pairs,
 		const std::vector<Vector3_Order<int>> &Coulomb_potential_boxes,
 		const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
-		const Element_Basis_Index::Index &index_abfs,
+		const ModuleBase::Element_Basis_Index::Index &index_abfs,
 		std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,std::shared_ptr<matrix>>>> &Vs,
 		std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<matrix>>>> &Vws )
 {
@@ -124,7 +124,7 @@ std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_pt
 		const std::vector<Vector3_Order<int>> &Coulomb_potential_boxes,
 		const std::vector<Vector3_Order<int>> &Born_von_Karman_boxes,
 		const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
-		const Element_Basis_Index::IndexLNM &index_abfs,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_abfs,
 		std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,std::shared_ptr<matrix>>>> &Vs,
 		std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<matrix>>>> &Vws )
 {
@@ -170,7 +170,7 @@ std::cout<<"cal_Vs\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<std::endl;
 std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>>>> Abfs::cal_Vs(
 	const std::vector<std::pair<size_t,size_t>> &atom_pairs,
 	const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
-	const Element_Basis_Index::IndexLNM &index_abfs,
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_abfs,
 	const double rmesh_times,
 	const double threshold,
 	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<matrix>>>> &Vws )
@@ -227,7 +227,7 @@ std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>> Abfs::cal_mps(
 	#if TEST_EXX_LCAO==1
 	{
 		static int istep=0;
-		std::ofstream ofs( "mps_index_"+TO_STRING(iat1)+"_"+TO_STRING(iat2)+"_"+TO_STRING(istep++) );
+		std::ofstream ofs( "mps_index_"+ModuleBase::GlobalFunc::TO_STRING(iat1)+"_"+ModuleBase::GlobalFunc::TO_STRING(iat2)+"_"+ModuleBase::GlobalFunc::TO_STRING(istep++) );
 		for( const auto index : indexs )
 		{
 			ofs<<index.first<<std::endl;
@@ -277,8 +277,8 @@ std::shared_ptr<matrix> Abfs::DPcal_C(
 	const Vector3_Order<double> &R, 
 	const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
 	const Exx_Abfs::Matrix_Orbs21 &m_abfslcaos_lcaos,
-	const Element_Basis_Index::IndexLNM &index_abfs,
-	const Element_Basis_Index::IndexLNM &index_lcaos,
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_abfs,
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_lcaos,
 	const double threshold,
 	const bool writable,
 	pthread_rwlock_t &rwlock_Cw,
@@ -302,7 +302,7 @@ std::shared_ptr<matrix> Abfs::DPcal_C(
 	
 //	TITLE("Abfs","DPcal_C");
 	pthread_rwlock_rdlock(&rwlock_Cw);
-	const std::weak_ptr<matrix> * const Cws_ptr   = static_cast<const std::weak_ptr<matrix> * const>( MAP_EXIST( Cws, it1, it2, R ) );
+	const std::weak_ptr<matrix> * const Cws_ptr   = static_cast<const std::weak_ptr<matrix> * const>( ModuleBase::GlobalFunc::MAP_EXIST( Cws, it1, it2, R ) );
 	pthread_rwlock_unlock(&rwlock_Cw);
 	
 	if( Cws_ptr && !Cws_ptr->expired() )
@@ -360,7 +360,7 @@ std::shared_ptr<matrix> Abfs::DPcal_V(
 	const size_t &it2, 
 	const Vector3_Order<double> &R, 
 	const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
-	const Element_Basis_Index::IndexLNM &index_abfs,
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_abfs,
 	const double threshold,
 	const bool writable,
 	pthread_rwlock_t &rwlock_Vw,
@@ -368,8 +368,8 @@ std::shared_ptr<matrix> Abfs::DPcal_V(
 {
 //	TITLE("Abfs","DPcal_V");
 	pthread_rwlock_rdlock(&rwlock_Vw);
-	const std::weak_ptr<matrix> * const Vws12_ptr = static_cast<const std::weak_ptr<matrix> * const>( MAP_EXIST( Vws, it1, it2, R ) );
-	const std::weak_ptr<matrix> * const Vws21_ptr = static_cast<const std::weak_ptr<matrix> * const>( MAP_EXIST( Vws, it2, it1, -R ) );
+	const std::weak_ptr<matrix> * const Vws12_ptr = static_cast<const std::weak_ptr<matrix> * const>( ModuleBase::GlobalFunc::MAP_EXIST( Vws, it1, it2, R ) );
+	const std::weak_ptr<matrix> * const Vws21_ptr = static_cast<const std::weak_ptr<matrix> * const>( ModuleBase::GlobalFunc::MAP_EXIST( Vws, it2, it1, -R ) );
 	pthread_rwlock_unlock(&rwlock_Vw);
 	
 	if( Vws12_ptr && !Vws12_ptr->expired() )

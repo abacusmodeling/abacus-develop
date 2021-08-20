@@ -16,6 +16,8 @@
 //==========================================================
 // namespace : Global_File_Operation
 //==========================================================
+namespace ModuleBase
+{
 namespace Global_File
 {
 	// called in input.cpp, after reading parameters.
@@ -31,6 +33,6 @@ namespace Global_File
 	void close_log( std::ofstream &ofs, const std::string &fn);
 	void close_all_log(const int rank, const bool out_alllog = false);
 }
-
+}
 #endif
 

@@ -175,7 +175,7 @@ namespace Gint_Tools
 				double *p=&psir_ylm.ptr_2D[ib][block_index[id]];
 				if(!cal_flag[ib][id]) 
 				{
-					ZEROS(p, block_size[id]);
+					ModuleBase::GlobalFunc::ZEROS(p, block_size[id]);
 				}
 				else
 				{

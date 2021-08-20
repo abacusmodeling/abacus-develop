@@ -82,20 +82,20 @@ void Grid_Base::init(
 
 	this->get_rcut_max();
 
-	OUT(GlobalV::ofs_running,"lat0 = ", lat0);
-	OUT(GlobalV::ofs_running,"|a1| = ", a1_len);
-	OUT(GlobalV::ofs_running,"|a2| = ", a2_len);
-	OUT(GlobalV::ofs_running,"|a3| = ", a3_len);
-	OUT(GlobalV::ofs_running,"da_d.x = ", da_d.x);
-	OUT(GlobalV::ofs_running,"da_d.y = ", da_d.y);
-	OUT(GlobalV::ofs_running,"da_d.z = ", da_d.z);
-	OUT(GlobalV::ofs_running,"nx = ", nx);
-	OUT(GlobalV::ofs_running,"ny = ", ny);
-	OUT(GlobalV::ofs_running,"nz = ", nz);
-	OUT(GlobalV::ofs_running,"nxyz = ", nxyz);
-	OUT(GlobalV::ofs_running,"da1 = ", da1);
-	OUT(GlobalV::ofs_running,"da2 = ", da2);
-	OUT(GlobalV::ofs_running,"da3 = ", da3);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"lat0 = ", lat0);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"|a1| = ", a1_len);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"|a2| = ", a2_len);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"|a3| = ", a3_len);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"da_d.x = ", da_d.x);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"da_d.y = ", da_d.y);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"da_d.z = ", da_d.z);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nx = ", nx);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"ny = ", ny);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nz = ", nz);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nxyz = ", nxyz);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"da1 = ", da1);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"da2 = ", da2);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"da3 = ", da3);
 
 	delete[] this->cartesian;
 	this->cartesian = new Vector3<double>[ this->nxyz ];
@@ -138,7 +138,7 @@ void Grid_Base::init(
 			}
 		}
 	}
-	OUT(GlobalV::ofs_running,"total atom pairs = ",tot_pairs);	
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"total atom pairs = ",tot_pairs);	
 
 	return;
 }

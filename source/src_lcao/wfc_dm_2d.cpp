@@ -35,7 +35,7 @@ void Wfc_Dm_2d::cal_dm(const matrix &wg)
 	#ifdef TEST_DIAG
 	{
 		static int istep=0;
-		std::ofstream ofs("wfc_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
+		std::ofstream ofs("wfc_"+ModuleBase::GlobalFunc::TO_STRING(istep++)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
 			ofs<<wfc_gamma<<std::endl;
@@ -128,7 +128,7 @@ void Wfc_Dm_2d::cal_dm(const matrix &wg)
 	#ifdef TEST_DIAG
 	{
 		static int istep=0;
-		std::ofstream ofs("dm_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
+		std::ofstream ofs("dm_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
 			ofs<<dm_gamma<<std::endl;

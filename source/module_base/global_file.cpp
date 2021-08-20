@@ -13,8 +13,9 @@
 //----------------------------------------------------------
 // EXPLAIN : Be Called in input.cpp
 //----------------------------------------------------------
-
-void Global_File::make_dir_out(
+namespace ModuleBase
+{
+void ModuleBase::Global_File::make_dir_out(
     const std::string &suffix,
 	const std::string &calculation,
     const int rank,
@@ -104,7 +105,7 @@ void Global_File::make_dir_out(
     return;
 }
 
-void Global_File::make_dir_atom(const std::string &label)
+void ModuleBase::Global_File::make_dir_atom(const std::string &label)
 {
 //----------------------------------------------------------
 // EXPLAIN : generate atom dir for each type of atom
@@ -117,7 +118,7 @@ void Global_File::make_dir_atom(const std::string &label)
     return;
 }
 
-void Global_File::open_log(std::ofstream &ofs,const std::string &fn)
+void ModuleBase::Global_File::open_log(std::ofstream &ofs,const std::string &fn)
 {
 //----------------------------------------------------------
 // USE GLOBAL VARIABLE :
@@ -132,7 +133,7 @@ void Global_File::open_log(std::ofstream &ofs,const std::string &fn)
     return;
 }
 
-void Global_File::close_log( std::ofstream &ofs,const std::string &fn)
+void ModuleBase::Global_File::close_log( std::ofstream &ofs,const std::string &fn)
 {
 	if(ofs)
 	{
@@ -142,7 +143,7 @@ void Global_File::close_log( std::ofstream &ofs,const std::string &fn)
     return;
 }
 
-void Global_File::close_all_log(const int rank, const bool out_alllog)
+void ModuleBase::Global_File::close_all_log(const int rank, const bool out_alllog)
 {
 //----------------------------------------------------------
 // USE GLOBAL VARIABLES :
@@ -175,4 +176,4 @@ void Global_File::close_all_log(const int rank, const bool out_alllog)
     }
     return;
 }
-
+}

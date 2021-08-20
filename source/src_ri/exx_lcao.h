@@ -69,8 +69,8 @@ private:
 	std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> lcaos;
 	std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> abfs;
 	std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> abfs_ccp;
-	Element_Basis_Index::IndexLNM index_lcaos;
-	Element_Basis_Index::IndexLNM index_abfs;
+	ModuleBase::Element_Basis_Index::IndexLNM index_lcaos;
+	ModuleBase::Element_Basis_Index::IndexLNM index_abfs;
 
 	Exx_Abfs::Matrix_Orbs11 m_abfs_abfs;
 	Exx_Abfs::Matrix_Orbs21 m_abfslcaos_lcaos;	

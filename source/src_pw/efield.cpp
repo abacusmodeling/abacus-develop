@@ -40,7 +40,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 	}
 	else
 	{
-		throw range_error("Efield::add_efield, edir is < 1 or > 3. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw range_error("Efield::add_efield, edir is < 1 or > 3. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		//WARNING_QUIT("Efield::add_efield","edir is < 1 or > 3.");
 	}
 //	std::cout << " bvec=" << bvec[0] << " " << bvec[1] << " " << bvec[2] << std::endl;
@@ -136,9 +136,9 @@ void Efield::add_efield(const double*const rho, double* v_in)
 
 	if( abs(eamp) > 0.0) 
 	{
-		OUT(GlobalV::ofs_running,"Amplitute of Efield (Hartree)",eamp);
-		OUT(GlobalV::ofs_running,"Potential amplitute is (Ry)",vamp);
-		OUT(GlobalV::ofs_running,"Total length is (Bohr)",length);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Amplitute of Efield (Hartree)",eamp);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Potential amplitute is (Ry)",vamp);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Total length is (Bohr)",length);
 	}
 	
 	//-----------------------------------------------------------
@@ -160,7 +160,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 		if(edir==1) npoi = GlobalC::pw.ncx;
 		else if(edir == 2) npoi = GlobalC::pw.ncy;
 		else if(edir == 3) npoi = GlobalC::pw.ncz;
-		else throw range_error("Efield::add_efield, edir is < 1 or > 3. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		else throw range_error("Efield::add_efield, edir is < 1 or > 3. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 
 		for(int ip=0; ip<npoi; ++ip)
 		{
@@ -186,7 +186,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 		if (edir == 1) sawarg = (double)i/(double)GlobalC::pw.ncx;
 		else if (edir == 2) sawarg = (double)j/(double)GlobalC::pw.ncy;
 		else if (edir == 3) sawarg = (double)k/(double)GlobalC::pw.ncz;
-		else throw range_error("Efield::add_efield, edir is < 1 or > 3. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		else throw range_error("Efield::add_efield, edir is < 1 or > 3. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 
      	value = e2 * (eamp - tot_dipole) * 
 			saw(emaxpos, eopreg, sawarg) * (GlobalC::ucell.lat0/bmod);

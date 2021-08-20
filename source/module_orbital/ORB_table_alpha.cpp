@@ -153,7 +153,7 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 
 	for (int ir = 0; ir < rmesh; ir++)
 	{
-		ZEROS(integrated_func, kmesh);
+		ModuleBase::GlobalFunc::ZEROS(integrated_func, kmesh);
 		double temp = 0.0;
 
 		for (int ik = 0; ik < kmesh; ik++)
@@ -199,7 +199,7 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 	//we store Slm(R) / R**l at the fisrt point, rather than Slm(R)
 	if (l > 0)
 	{
-		ZEROS(integrated_func, kmesh);
+		ModuleBase::GlobalFunc::ZEROS(integrated_func, kmesh);
 		double temp = 0.0;
 
 		for (int ik = 0; ik < kmesh; ik++)
@@ -296,8 +296,8 @@ void ORB_table_alpha::init_Table_Alpha(
 							//assign every element in Table_DSR as zero
 							if ((L > AL) || (L < SL) || ((L - SL) % 2 == 1))
 							{
-								ZEROS(Table_DSR[0][T1][Opair][L], rmesh);
-								ZEROS(Table_DSR[1][T1][Opair][L], rmesh);
+								ModuleBase::GlobalFunc::ZEROS(Table_DSR[0][T1][Opair][L], rmesh);
+								ModuleBase::GlobalFunc::ZEROS(Table_DSR[1][T1][Opair][L], rmesh);
 
 								continue;
 							}

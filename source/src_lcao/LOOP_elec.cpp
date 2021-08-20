@@ -61,7 +61,7 @@ void LOOP_elec::set_matrix_grid(void)
 		GlobalV::SEARCH_RADIUS, 
 		GlobalV::test_atom_input);
 
-	//DONE(GlobalV::ofs_running,"SEARCH ADJACENT ATOMS");
+	//ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"SEARCH ADJACENT ATOMS");
 
 	// (3) Periodic condition search for each grid.
 	GlobalC::GridT.set_pbc_grid(
@@ -117,7 +117,7 @@ void LOOP_elec::before_solver(const int &istep)
 	{
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
-			ZEROS(GlobalC::CHR.rho[is], GlobalC::pw.nrxx);
+			ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[is], GlobalC::pw.nrxx);
 			std::stringstream ssd;
 			ssd << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DM" ;
 			// reading density matrix,
@@ -170,7 +170,7 @@ void LOOP_elec::solver(const int &istep)
 			case Exx_Global::Hybrid_Type::Generate_Matrix:
 				break;
 			default:
-				throw std::invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 
 		// No exx

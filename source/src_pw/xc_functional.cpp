@@ -135,7 +135,7 @@ void XC_Functional::xc(const double &rho, double &ex, double &ec, double &vx, do
 			vx = 0.75 * vx;
 			break;
 		case 9:
-			throw std::domain_error("HSE unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::domain_error("HSE unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 			break;
 		default:
 			ex = vx = 0.0;
@@ -204,7 +204,7 @@ void XC_Functional::xc_spin(const double &rho, const double &zeta,
 			vxdw = 0.75 * vxdw;
 			break;
 		case 9:
-			throw std::domain_error("HSE unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	break;
+			throw std::domain_error("HSE unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));	break;
 		default:
 			ex = vxup = vxdw =0.0;
 	}
@@ -1000,13 +1000,13 @@ void XC_Functional::gcxc(const double &rho, const double &grho, double &sx, doub
 	else if (GlobalC::xcf.igcx_now == 12)
 	{
 		// HSE
-		throw std::domain_error("HSE unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw std::domain_error("HSE unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
 	else if (GlobalC::xcf.igcx_now == 13)
 	{
 		//SCAN
 		cout << "to use SCAN, please link LIBXC" << endl;
-		throw domain_error("Check "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw domain_error("Check "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
     else
     {
@@ -1050,7 +1050,7 @@ void XC_Functional::gcxc(const double &rho, const double &grho, double &sx, doub
 	{
 		//SCAN
 		cout << "to use SCAN, please link LIBXC" << endl;
-		throw domain_error("Check "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw domain_error("Check "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
     else
     {

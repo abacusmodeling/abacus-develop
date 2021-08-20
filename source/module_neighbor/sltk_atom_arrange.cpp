@@ -42,10 +42,10 @@ double atom_arrange::set_sr_NL(
 	//xiaohui add 'output_level' line, 2015-09-16
 	if(output_level != "m") ofs_in << "\n SETUP SEARCHING RADIUS FOR PROGRAM TO SEARCH ADJACENT ATOMS" << std::endl;
 	if(output_level != "m") ofs_in << std::setprecision(3);
-	if(output_level != "m") OUT(ofs_in,"longest orb rcut (Bohr)",rcutmax_Phi);
+	if(output_level != "m") ModuleBase::GlobalFunc::OUT(ofs_in,"longest orb rcut (Bohr)",rcutmax_Phi);
 
 //	std::cout << " LONGEST NL PROJ RCUT : " << longest_nl_proj_rcut << std::endl;
-	if(output_level != "m") OUT(ofs_in,"longest nonlocal projector rcut (Bohr)", rcutmax_Beta);
+	if(output_level != "m") ModuleBase::GlobalFunc::OUT(ofs_in,"longest nonlocal projector rcut (Bohr)", rcutmax_Beta);
 
 	// check in use_overlap_matrix, 
 	double sr = 0.0;
@@ -106,8 +106,8 @@ void atom_arrange::search(
 //	if(GlobalV::OUT_LEVEL != "m") OUT(ofs_in,"searching radius is (Bohr))", search_radius_bohr);
 //	if(GlobalV::OUT_LEVEL != "m") OUT(ofs_in,"searching radius unit is (Bohr))",ucell.lat0);
 
-	OUT(ofs_in,"searching radius is (Bohr))", search_radius_bohr);
-	OUT(ofs_in,"searching radius unit is (Bohr))",ucell.lat0);
+	ModuleBase::GlobalFunc::OUT(ofs_in,"searching radius is (Bohr))", search_radius_bohr);
+	ModuleBase::GlobalFunc::OUT(ofs_in,"searching radius unit is (Bohr))",ucell.lat0);
 
 	assert(ucell.nat > 0);
 	//=============================

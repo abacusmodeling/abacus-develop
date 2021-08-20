@@ -31,10 +31,10 @@ Charge_Extra::Charge_Extra()
 		// for second-order extrapolation
 		delta_rho3[is] = new double[GlobalC::pw.nrxx];
 
-		ZEROS(delta_rho1[is], GlobalC::pw.nrxx);
-		ZEROS(delta_rho2[is], GlobalC::pw.nrxx);
-		ZEROS(delta_rho[is], GlobalC::pw.nrxx);
-		ZEROS(delta_rho3[is], GlobalC::pw.nrxx);
+		ModuleBase::GlobalFunc::ZEROS(delta_rho1[is], GlobalC::pw.nrxx);
+		ModuleBase::GlobalFunc::ZEROS(delta_rho2[is], GlobalC::pw.nrxx);
+		ModuleBase::GlobalFunc::ZEROS(delta_rho[is], GlobalC::pw.nrxx);
+		ModuleBase::GlobalFunc::ZEROS(delta_rho3[is], GlobalC::pw.nrxx);
 	}
 
 	pos_old1 = new double[1];
@@ -102,10 +102,10 @@ void Charge_Extra::allocate_ions(void)
 	this->pos_now = new double[pos_dim];
 	this->pos_next = new double[pos_dim];
 
-	ZEROS(pos_old1, pos_dim);
-	ZEROS(pos_old2, pos_dim);
-	ZEROS(pos_now, pos_dim);
-	ZEROS(pos_next, pos_dim);
+	ModuleBase::GlobalFunc::ZEROS(pos_old1, pos_dim);
+	ModuleBase::GlobalFunc::ZEROS(pos_old2, pos_dim);
+	ModuleBase::GlobalFunc::ZEROS(pos_now, pos_dim);
+	ModuleBase::GlobalFunc::ZEROS(pos_next, pos_dim);
 
 	if(init_rho)
 	{
@@ -177,8 +177,8 @@ void Charge_Extra::extrapolate_charge()
 			rho_atom_old[is] = new double[GlobalC::pw.nrxx];
 			rho_atom_new[is] = new double[GlobalC::pw.nrxx];
 
-			ZEROS(rho_atom_old[is], GlobalC::pw.nrxx);
-			ZEROS(rho_atom_new[is], GlobalC::pw.nrxx);
+			ModuleBase::GlobalFunc::ZEROS(rho_atom_old[is], GlobalC::pw.nrxx);
+			ModuleBase::GlobalFunc::ZEROS(rho_atom_new[is], GlobalC::pw.nrxx);
 		}
 		GlobalC::CHR.atomic_rho(GlobalV::NSPIN,rho_atom_old);
 		for(int is=0; is<GlobalV::NSPIN; is++)
@@ -224,8 +224,8 @@ void Charge_Extra::extrapolate_charge()
 			rho_atom_old[is] = new double[GlobalC::pw.nrxx];
 			rho_atom_new[is] = new double[GlobalC::pw.nrxx];
 
-			ZEROS(rho_atom_old[is], GlobalC::pw.nrxx);
-			ZEROS(rho_atom_new[is], GlobalC::pw.nrxx);
+			ModuleBase::GlobalFunc::ZEROS(rho_atom_old[is], GlobalC::pw.nrxx);
+			ModuleBase::GlobalFunc::ZEROS(rho_atom_new[is], GlobalC::pw.nrxx);
 		}
 
 		// generate atomic rho
@@ -282,8 +282,8 @@ void Charge_Extra::extrapolate_charge()
 			rho_atom_old[is] = new double[GlobalC::pw.nrxx];
 			rho_atom_new[is] = new double[GlobalC::pw.nrxx];
 
-			ZEROS(rho_atom_old[is], GlobalC::pw.nrxx);
-			ZEROS(rho_atom_new[is], GlobalC::pw.nrxx);
+			ModuleBase::GlobalFunc::ZEROS(rho_atom_old[is], GlobalC::pw.nrxx);
+			ModuleBase::GlobalFunc::ZEROS(rho_atom_new[is], GlobalC::pw.nrxx);
 		}
 
 		// generate atomic_rho

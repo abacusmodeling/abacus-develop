@@ -238,7 +238,7 @@ void Hamilt::diagH_LAPACK(
     }
 
     std::complex<double> *work = new std::complex<double>[lwork];
-	ZEROS(work, lwork);
+	ModuleBase::GlobalFunc::ZEROS(work, lwork);
 	
     //=====================================================================
     // input s and (see below) h are copied so that they are not destroyed
@@ -256,7 +256,7 @@ void Hamilt::diagH_LAPACK(
     }
 	
     double *rwork = new double[rwork_dim];
-    ZEROS( rwork, rwork_dim );
+    ModuleBase::GlobalFunc::ZEROS( rwork, rwork_dim );
 
     if (all_eigenvalues)
     {
@@ -274,9 +274,9 @@ void Hamilt::diagH_LAPACK(
         int *iwork = new int [5*nstart];
         int *ifail = new int[nstart];
 
-        ZEROS(rwork,7*nstart);
-        ZEROS(iwork,5*nstart);
-        ZEROS(ifail,nstart);
+        ModuleBase::GlobalFunc::ZEROS(rwork,7*nstart);
+        ModuleBase::GlobalFunc::ZEROS(iwork,5*nstart);
+        ModuleBase::GlobalFunc::ZEROS(ifail,nstart);
 
         hdum.create(nstart, ldh);
         hdum = hc;

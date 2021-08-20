@@ -38,7 +38,7 @@ void wavefunc::allocate_ekb_wg(const int nks)
 	for(int ik=0; ik<nks; ik++)
 	{
 		ekb[ik] = new double[GlobalV::NBANDS];
-		ZEROS(ekb[ik],GlobalV::NBANDS);
+		ModuleBase::GlobalFunc::ZEROS(ekb[ik],GlobalV::NBANDS);
 	}
 	this->allocate_ekb = true;
 
@@ -55,7 +55,7 @@ void wavefunc::allocate(const int nks)
 	TITLE("wavefunc","allocate");
 
 	this->npwx = this->setupIndGk(GlobalC::pw, nks);
-	OUT(GlobalV::ofs_running,"npwx",npwx);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"npwx",npwx);
 
 	assert(npwx > 0);
 	assert(nks > 0);
@@ -65,7 +65,7 @@ void wavefunc::allocate(const int nks)
 	// allocate for kinetic energy
 	delete[] g2kin;
 	this->g2kin = new double[npwx];
-	ZEROS(g2kin, npwx);
+	ModuleBase::GlobalFunc::ZEROS(g2kin, npwx);
 	Memory::record("wavefunc","g2kin",npwx,"double");
 
 	// if use spin orbital, do not double nks but double allocate evc and wanf2.
@@ -76,7 +76,7 @@ void wavefunc::allocate(const int nks)
 	for(int ik=0; ik<nks; ik++)
 	{
 		ekb[ik] = new double[GlobalV::NBANDS];
-		ZEROS(ekb[ik], GlobalV::NBANDS);
+		ModuleBase::GlobalFunc::ZEROS(ekb[ik], GlobalV::NBANDS);
 	}
 	this->allocate_ekb = true;
 	
@@ -172,7 +172,7 @@ int wavefunc::get_starting_nw(void)const
 {
     if (start_wfc == "file")
     {
-		throw std::runtime_error("wavefunc::get_starting_nw. start_ wfc from file: not implemented yet! "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__)); 	// Peize Lin change 2019-05-01
+		throw std::runtime_error("wavefunc::get_starting_nw. start_ wfc from file: not implemented yet! "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__)); 	// Peize Lin change 2019-05-01
         //WARNING_QUIT("wfcinit_k","\n start_ wfc from file: not implemented yet!");
         //**********************************************************************
         // ... read the wavefunction into memory (if it is not done in c_bands)
@@ -199,7 +199,7 @@ int wavefunc::get_starting_nw(void)const
     }
     else
     {
-		throw std::runtime_error("wavefunc::get_starting_nw. Don't know what to do! Please Check source code! "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__)); 	// Peize Lin change 2019-05-01
+		throw std::runtime_error("wavefunc::get_starting_nw. Don't know what to do! Please Check source code! "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__)); 	// Peize Lin change 2019-05-01
         //WARNING_QUIT("get_starting_nw","Don't know what to do! Please Check source code!");
     }
 }
@@ -240,7 +240,7 @@ void wavefunc::LCAO_in_pw_k(const int &ik, ModuleBase::ComplexMatrix &wvf)
 //		std::cout << " ib=" << ib << " e=" << ekb[ik][ib] << std::endl;
 //	}
 
-//	DONE(GlobalV::ofs_running,"CONSTRUCT_LOCAL_BASIS_IN_PW");
+//	ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"CONSTRUCT_LOCAL_BASIS_IN_PW");
 
 	timer::tick("wavefunc","LCAO_in_pw_k");
 	return;
@@ -280,7 +280,7 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ModuleBase::ComplexMatrix &wvf)
 	assert(starting_nw > 0);
 
 	ModuleBase::ComplexMatrix wfcatom(starting_nw, npwx * GlobalV::NPOL);//added by zhengdy-soc
-	if(GlobalV::test_wf)OUT(GlobalV::ofs_running, "starting_nw", starting_nw);
+	if(GlobalV::test_wf)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "starting_nw", starting_nw);
 	if(start_wfc.substr(0,6)=="atomic")
 	{
 		this->atomic_wfc(ik, this->npw, GlobalC::ucell.lmax_ppwf, wfcatom, GlobalC::ppcell.tab_at, GlobalV::NQX, GlobalV::DQ);
@@ -302,7 +302,7 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ModuleBase::ComplexMatrix &wvf)
 
 	// (7) Diago with cg method.
 	double *etatom  = new double[starting_nw];
-	ZEROS(etatom, starting_nw);
+	ModuleBase::GlobalFunc::ZEROS(etatom, starting_nw);
 	//if(GlobalV::DIAGO_TYPE == "cg") xiaohui modify 2013-09-02
 	if(GlobalV::KS_SOLVER=="cg") //xiaohui add 2013-09-02
 	{
@@ -474,7 +474,7 @@ void wavefunc::wfcinit_k(void)
 				{
 					for(int ig=0; ig<NG; ig++)
 					{
-						ZEROS( overlap_aux[iw1][iw2][ig], NR);
+						ModuleBase::GlobalFunc::ZEROS( overlap_aux[iw1][iw2][ig], NR);
 					}
 				}
 			}
@@ -489,7 +489,7 @@ void wavefunc::wfcinit_k(void)
 				{
 					for(int ig=0; ig<NG; ig++)
 					{
-						ZEROS( overlap_aux[iw1][iw2][ig], NR);
+						ModuleBase::GlobalFunc::ZEROS( overlap_aux[iw1][iw2][ig], NR);
 					}
 				}
 			}
@@ -764,7 +764,7 @@ void wavefunc::init_after_vc(const int nks)
 
     TITLE("wavefunc","init");
     //this->npwx = this->setupIndGk(GlobalC::pw, nks);
-    OUT(GlobalV::ofs_running,"npwx",npwx);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"npwx",npwx);
 
     assert(npwx > 0);
     assert(nks > 0);
@@ -772,24 +772,24 @@ void wavefunc::init_after_vc(const int nks)
 
     delete[] g2kin;
     this->g2kin = new double[npwx];   // [npw],kinetic energy
-    ZEROS(g2kin, npwx);
+    ModuleBase::GlobalFunc::ZEROS(g2kin, npwx);
     Memory::record("wavefunc","g2kin",npwx,"double");
-    if(GlobalV::test_wf)OUT(GlobalV::ofs_running,"g2kin allocation","Done");
+    if(GlobalV::test_wf)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"g2kin allocation","Done");
 
     int prefactor = 1;
     this->ekb = new double*[nks];
     for(int ik=0; ik<nks; ik++)
     {
         ekb[ik] = new double[GlobalV::NBANDS];
-        ZEROS(ekb[ik], GlobalV::NBANDS);
+        ModuleBase::GlobalFunc::ZEROS(ekb[ik], GlobalV::NBANDS);
     }
     this->allocate_ekb = true;
 
     this->wg.create(nks, GlobalV::NBANDS);       // the weight of each k point and band
     Memory::record("wavefunc","et",nks*GlobalV::NBANDS,"double");
     Memory::record("wavefunc","wg",nks*GlobalV::NBANDS,"double");
-    if(GlobalV::test_wf)OUT(GlobalV::ofs_running, "et allocation","Done");
-    if(GlobalV::test_wf)OUT(GlobalV::ofs_running, "wg allocation","Done");
+    if(GlobalV::test_wf)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "et allocation","Done");
+    if(GlobalV::test_wf)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "wg allocation","Done");
 
     delete[] evc;
     delete[] wanf2;
@@ -832,10 +832,10 @@ void wavefunc::init_after_vc(const int nks)
 
     if(GlobalV::test_wf)
     {
-        OUT(GlobalV::ofs_running,"evc allocation","Done");
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"evc allocation","Done");
         if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw")
         {
-            OUT(GlobalV::ofs_running,"wanf2 allocation","Done");
+            ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wanf2 allocation","Done");
         }
     }
 

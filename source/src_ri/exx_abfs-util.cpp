@@ -12,7 +12,7 @@ void Exx_Abfs::Util::bcast( std::vector<std::string> &v, const int rank_src, con
 		
 		std::vector<int> size_s(size_v);
 		transform( v.begin(), v.end(), size_s.begin(), [](const std::string &s){return s.size();} );
-		MPI_Bcast( VECTOR_TO_PTR(size_s), size_s.size(), MPI_INT, rank_src, mpi_comm );
+		MPI_Bcast( ModuleBase::GlobalFunc::VECTOR_TO_PTR(size_s), size_s.size(), MPI_INT, rank_src, mpi_comm );
 		
 		std::string s_all = accumulate( v.begin(), v.end(), std::string() );
 		MPI_Bcast( const_cast<char*>(s_all.c_str()), s_all.size(), MPI_CHAR, rank_src, mpi_comm );
@@ -24,7 +24,7 @@ void Exx_Abfs::Util::bcast( std::vector<std::string> &v, const int rank_src, con
 		v.resize(size_v);
 		
 		std::vector<int> size_s(size_v);
-		MPI_Bcast( VECTOR_TO_PTR(size_s), size_s.size(), MPI_INT, rank_src, mpi_comm );
+		MPI_Bcast( ModuleBase::GlobalFunc::VECTOR_TO_PTR(size_s), size_s.size(), MPI_INT, rank_src, mpi_comm );
 		
 		const int size_all = accumulate( size_s.begin(), size_s.end(), 0 );
 		char *s_all_tmp = new char[size_all];

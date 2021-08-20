@@ -150,7 +150,7 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 	const std::vector<std::vector<double>> &jlp1 = pSB->get_jlx()[l+1];	
 	for (int ir = 0; ir < rmesh; ir++)
 	{
-		ZEROS(integrated_func,kmesh);
+		ModuleBase::GlobalFunc::ZEROS(integrated_func,kmesh);
 		double temp = 0.0;
 		
 		for (int ik = 0; ik < kmesh; ik++)
@@ -197,7 +197,7 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 	//we store Slm(R) / R**l at the fisrt point, rather than Slm(R)
 	if (l > 0)
 	{
-		ZEROS(integrated_func,kmesh);
+		ModuleBase::GlobalFunc::ZEROS(integrated_func,kmesh);
 		double temp = 0.0;
 	
 		for (int ik = 0; ik < kmesh; ik++)
@@ -296,8 +296,8 @@ void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
 							//assign every element in Table_NR as zero
 							if ((L > AL) || (L < SL) || ((L-SL) % 2 == 1)) 
 							{
-								ZEROS (Table_NR[0][Tpair][Opair][L], rmesh);
-								ZEROS (Table_NR[1][Tpair][Opair][L], rmesh);
+								ModuleBase::GlobalFunc::ZEROS (Table_NR[0][Tpair][Opair][L], rmesh);
+								ModuleBase::GlobalFunc::ZEROS (Table_NR[1][Tpair][Opair][L], rmesh);
 								
 								continue;
 							}

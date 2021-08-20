@@ -148,7 +148,7 @@ void Stress_Func::stress_nl(matrix& sigma){
 //              Parallel_Reduce::reduce_complex_double_pool( dbecp.ptr, dbecp.ndata);
 
 //              double *cf = new double[GlobalC::ucell.nat*3];
-//              ZEROS(cf, GlobalC::ucell.nat);
+//              ModuleBase::GlobalFunc::ZEROS(cf, GlobalC::ucell.nat);
 				for (int ib=0; ib<GlobalV::NBANDS; ib++)
 				{
 					double fac = GlobalC::wf.wg(ik, ib) * 1.0;
@@ -253,16 +253,16 @@ void Stress_Func::get_dvnl1
 	int jkb = 0;
 	for(int it = 0;it < GlobalC::ucell.ntype;it++)
 	{
-		if(GlobalV::test_pp>1) OUT("it",it);
+		if(GlobalV::test_pp>1) ModuleBase::GlobalFunc::OUT("it",it);
 		// calculate beta in G-space using an interpolation table
 		const int nbeta = GlobalC::ucell.atoms[it].nbeta;
 		const int nh = GlobalC::ucell.atoms[it].nh;
 
-		if(GlobalV::test_pp>1) OUT("nbeta",nbeta);
+		if(GlobalV::test_pp>1) ModuleBase::GlobalFunc::OUT("nbeta",nbeta);
 
 		for (nb = 0;nb < nbeta;nb++)
 		{
-			if(GlobalV::test_pp>1) OUT("ib",nb);
+			if(GlobalV::test_pp>1) ModuleBase::GlobalFunc::OUT("ib",nb);
 			for (ig = 0;ig < npw;ig++)
 			{
 				const double gnorm = gk[ig].norm() * GlobalC::ucell.tpiba;
@@ -344,16 +344,16 @@ void Stress_Func::get_dvnl2(ModuleBase::ComplexMatrix &vkb,
 	int jkb = 0;
 	for(int it = 0;it < GlobalC::ucell.ntype;it++)
 	{
-		if(GlobalV::test_pp>1) OUT("it",it);
+		if(GlobalV::test_pp>1) ModuleBase::GlobalFunc::OUT("it",it);
 		// calculate beta in G-space using an interpolation table
 		const int nbeta = GlobalC::ucell.atoms[it].nbeta;
 		const int nh = GlobalC::ucell.atoms[it].nh;
 
-		if(GlobalV::test_pp>1) OUT("nbeta",nbeta);
+		if(GlobalV::test_pp>1) ModuleBase::GlobalFunc::OUT("nbeta",nbeta);
 
 		for (nb = 0;nb < nbeta;nb++)
 		{
-			if(GlobalV::test_pp>1) OUT("ib",nb);
+			if(GlobalV::test_pp>1) ModuleBase::GlobalFunc::OUT("ib",nb);
 			for (ig = 0;ig < npw;ig++)
 			{
 				const double gnorm = gk[ig].norm() * GlobalC::ucell.tpiba;

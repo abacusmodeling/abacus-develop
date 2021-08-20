@@ -42,7 +42,7 @@ void Record_adj::for_2d(void)
 
 	// number of adjacents for each atom.	
 	this->na_each = new int[na_proc];
-	ZEROS(na_each, na_proc);
+	ModuleBase::GlobalFunc::ZEROS(na_each, na_proc);
 	int iat = 0;
 	int irr = 0;
 
@@ -127,8 +127,8 @@ void Record_adj::for_2d(void)
 	}//end T1
 
  	//xiaohui add "OUT_LEVEL", 2015-09-16
-	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"irr",irr);
-	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"GlobalC::LNNR.nnr",GlobalC::LNNR.nnr);
+	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"irr",irr);
+	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"GlobalC::LNNR.nnr",GlobalC::LNNR.nnr);
 
 
 
@@ -146,7 +146,7 @@ void Record_adj::for_2d(void)
 			{
 				// (Rx, Ry, Rz, T, I)
 				info[i][j] = new int[5];
-				ZEROS(info[i][j],5);
+				ModuleBase::GlobalFunc::ZEROS(info[i][j],5);
 			}
 		}
 	}
@@ -248,7 +248,7 @@ void Record_adj::for_grid(const Grid_Technique &gt)
 
 	// number of adjacents for each atom.	
 	this->na_each = new int[na_proc];
-	ZEROS(na_each, na_proc);
+	ModuleBase::GlobalFunc::ZEROS(na_each, na_proc);
 
 	int ca = 0;
 	for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
@@ -330,7 +330,7 @@ void Record_adj::for_grid(const Grid_Technique &gt)
 		{
 			// (Rx, Ry, Rz, T, I)
 			info[i][j] = new int[5];
-			ZEROS(info[i][j],5);
+			ModuleBase::GlobalFunc::ZEROS(info[i][j],5);
 		}
 	}
 

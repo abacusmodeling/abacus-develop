@@ -177,7 +177,7 @@ void ELEC_evolve::evolve_complex_matrix(
 	}
 
 	time_t time_end = time(NULL);
-	OUT_TIME("evolve(std::complex)", time_start, time_end);
+	ModuleBase::GlobalFunc::OUT_TIME("evolve(std::complex)", time_start, time_end);
 
 	return;
 }
@@ -208,7 +208,7 @@ void ELEC_evolve::using_LAPACK_complex(const int &ik, std::complex<double>** c, 
 
 	int LWORK=3*GlobalV::NLOCAL-1; //tmp
 	std::complex<double> * WORK = new std::complex<double>[LWORK];
-	ZEROS(WORK, LWORK);
+	ModuleBase::GlobalFunc::ZEROS(WORK, LWORK);
 	int IPIV[GlobalV::NLOCAL];
 
 	LapackConnector::zgetrf( GlobalV::NLOCAL, GlobalV::NLOCAL, Stmp, GlobalV::NLOCAL, IPIV, &INFO);
@@ -248,7 +248,7 @@ void ELEC_evolve::using_LAPACK_complex(const int &ik, std::complex<double>** c, 
 	int info;
 	int lwork=3*GlobalV::NLOCAL-1; //tmp
 	std::complex<double> * work = new std::complex<double>[lwork];
-	ZEROS(work, lwork);
+	ModuleBase::GlobalFunc::ZEROS(work, lwork);
 	int ipiv[GlobalV::NLOCAL];
 
 	LapackConnector::zgetrf( GlobalV::NLOCAL, GlobalV::NLOCAL, Denominator, GlobalV::NLOCAL, ipiv, &info);
@@ -297,8 +297,8 @@ void ELEC_evolve::using_LAPACK_complex_2(
 	{
 		std::complex<double>* lineH = new std::complex<double>[GlobalV::NLOCAL-i];
 		std::complex<double>* lineS = new std::complex<double>[GlobalV::NLOCAL-i];
-		ZEROS(lineH, GlobalV::NLOCAL-i);
-		ZEROS(lineS, GlobalV::NLOCAL-i);
+		ModuleBase::GlobalFunc::ZEROS(lineH, GlobalV::NLOCAL-i);
+		ModuleBase::GlobalFunc::ZEROS(lineS, GlobalV::NLOCAL-i);
 
 		ir = GlobalC::ParaO.trace_loc_row[i];
 		if (ir>=0)
@@ -342,7 +342,7 @@ void ELEC_evolve::using_LAPACK_complex_2(
 
 	int LWORK=3*GlobalV::NLOCAL-1; //tmp
 	std::complex<double> * WORK = new std::complex<double>[LWORK];
-	ZEROS(WORK, LWORK);
+	ModuleBase::GlobalFunc::ZEROS(WORK, LWORK);
 	int IPIV[GlobalV::NLOCAL];
 
 	LapackConnector::zgetrf( GlobalV::NLOCAL, GlobalV::NLOCAL, Stmp, GlobalV::NLOCAL, IPIV, &INFO);
@@ -387,7 +387,7 @@ void ELEC_evolve::using_LAPACK_complex_2(
 	int info=0;
 	int lwork=3*GlobalV::NLOCAL-1; //tmp
 	std::complex<double>* work = new std::complex<double>[lwork];
-	ZEROS(work, lwork);
+	ModuleBase::GlobalFunc::ZEROS(work, lwork);
 	int ipiv[GlobalV::NLOCAL];
 
 	LapackConnector::zgetrf( GlobalV::NLOCAL, GlobalV::NLOCAL, Denominator, GlobalV::NLOCAL, ipiv, &info);
