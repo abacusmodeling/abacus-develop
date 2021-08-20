@@ -17,7 +17,7 @@ void Exx_Abfs::Inverse_Matrix_Double::cal_inverse( const Method &method )
 {
 	#if TEST_EXX_LCAO==1
 		static int i=0;
-		std::ofstream ofs("inverse_matrix_"+TO_STRING(i));
+		std::ofstream ofs("inverse_matrix_"+ModuleBase::GlobalFunc::TO_STRING(i));
 		ofs<<A<<std::endl;
 		ofs.close();
 		++i;
@@ -58,7 +58,7 @@ void Exx_Abfs::Inverse_Matrix_Double::using_dpotrf()
 void Exx_Abfs::Inverse_Matrix_Double::using_dsyev( const double &threshold_condition_number )
 {
 	std::vector<double> eigen_value(A.nr);
-	LapackConnector::dsyev('V','U',A,VECTOR_TO_PTR(eigen_value),info);
+	LapackConnector::dsyev('V','U',A,ModuleBase::GlobalFunc::VECTOR_TO_PTR(eigen_value),info);
 	
 	#if TEST_EXX_LCAO==1
 		for( const double &ie : eigen_value )

@@ -6,6 +6,7 @@
 // new
 #include "H_XC_pw.h"
 #include "../module_base/math_integral.h"
+#include "potential_libxc.h"
 
 double Forces::output_acc = 1.0e-8; // (Ryd/angstrom).	
 
@@ -120,7 +121,7 @@ void Forces::init(matrix& force)
 		double *pos;
 		double d1,d2,d3;
 		pos = new double[GlobalC::ucell.nat*3];
-		ZEROS(pos, GlobalC::ucell.nat*3);
+		ModuleBase::GlobalFunc::ZEROS(pos, GlobalC::ucell.nat*3);
 		int iat = 0;
 		for(int it = 0;it < GlobalC::ucell.ntype;it++)
 		{
@@ -165,7 +166,7 @@ void Forces::init(matrix& force)
 	}
 
  	GlobalV::ofs_running << std::setiosflags(ios::fixed) << std::setprecision(6) << std::endl;
-	if(GlobalV::TEST_FORCE)
+	/*if(GlobalV::TEST_FORCE)
 	{
 		Forces::print("LOCAL    FORCE (Ry/Bohr)", forcelc);
 		Forces::print("NONLOCAL FORCE (Ry/Bohr)", forcenl);
@@ -173,7 +174,7 @@ void Forces::init(matrix& force)
 		Forces::print("ION      FORCE (Ry/Bohr)", forceion);
 		Forces::print("SCC      FORCE (Ry/Bohr)", forcescc);
 		if(GlobalV::EFIELD) Forces::print("EFIELD   FORCE (Ry/Bohr)", force_e);
-	}
+	}*/
 	
 /*
 	Forces::print("   TOTAL-FORCE (Ry/Bohr)", force);
@@ -259,7 +260,7 @@ void Forces::print_to_files(std::ofstream &ofs, const std::string &name, const m
 
 void Forces::print(const std::string &name, const matrix &f, bool ry)
 {
-	NEW_PART(name);
+	ModuleBase::GlobalFunc::NEW_PART(name);
 
 	GlobalV::ofs_running << " " << std::setw(8) << "atom" << std::setw(15) << "x" << std::setw(15) << "y" << std::setw(15) << "z" << std::endl;
 	GlobalV::ofs_running << std::setiosflags(ios::showpos);
@@ -346,7 +347,7 @@ void Forces::cal_force_loc(matrix& forcelc)
 	timer::tick("Forces","cal_force_loc");
 
     std::complex<double> *aux = new std::complex<double>[GlobalC::pw.nrxx];
-    ZEROS(aux, GlobalC::pw.nrxx);
+    ModuleBase::GlobalFunc::ZEROS(aux, GlobalC::pw.nrxx);
 
     // now, in all pools , the charge are the same,
     // so, the force calculated by each pool is equal.
@@ -403,7 +404,7 @@ void Forces::cal_force_ew(matrix& forceion)
 
     double fact = 2.0;
     std::complex<double> *aux = new std::complex<double> [GlobalC::pw.ngmc];
-    ZEROS(aux, GlobalC::pw.ngmc);
+    ModuleBase::GlobalFunc::ZEROS(aux, GlobalC::pw.ngmc);
 
     int gstart = GlobalC::pw.gstart;
 
@@ -488,9 +489,9 @@ void Forces::cal_force_ew(matrix& forceion)
         // the maximum number of R vectors included in r
         Vector3<double> *r  = new Vector3<double>[mxr];
         double *r2 = new double[mxr];
-		ZEROS(r2, mxr);
+		ModuleBase::GlobalFunc::ZEROS(r2, mxr);
         int *irr = new int[mxr];
-		ZEROS(irr, mxr);
+		ModuleBase::GlobalFunc::ZEROS(irr, mxr);
         // the square modulus of R_j-tau_s-tau_s'
 
 		int iat1 = 0;
@@ -553,13 +554,34 @@ void Forces::cal_force_ew(matrix& forceion)
 void Forces::cal_force_cc(matrix& forcecc)
 {
 	// recalculate the exchange-correlation potential.
+	
+    matrix v(GlobalV::NSPIN,GlobalC::pw.nrxx);
+
+	#ifdef USE_LIBXC
+	if(GlobalV::DFT_META)
+	{
+    	const auto etxc_vtxc_v = Potential_Libxc::v_xc_meta(GlobalC::CHR.rho, GlobalC::CHR.rho_core, GlobalC::CHR.kin_r);
+		H_XC_pw::etxc = std::get<0>(etxc_vtxc_v);
+		H_XC_pw::vtxc = std::get<1>(etxc_vtxc_v);
+	    v = std::get<2>(etxc_vtxc_v);
+	}
+	else
+	{	
+    	const auto etxc_vtxc_v = Potential_Libxc::v_xc(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
+		H_XC_pw::etxc = std::get<0>(etxc_vtxc_v);
+		H_XC_pw::vtxc = std::get<1>(etxc_vtxc_v);
+	    v = std::get<2>(etxc_vtxc_v);
+	}
+	#else
     const auto etxc_vtxc_v = H_XC_pw::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 	H_XC_pw::etxc    = std::get<0>(etxc_vtxc_v);			// may delete?
 	H_XC_pw::vtxc    = std::get<1>(etxc_vtxc_v);			// may delete?
-	const matrix vxc = std::get<2>(etxc_vtxc_v);
+	v = std::get<2>(etxc_vtxc_v);
+	#endif
 
+	const matrix vxc = v;
     std::complex<double> * psiv = new std::complex<double> [GlobalC::pw.nrxx];
-    ZEROS(psiv, GlobalC::pw.nrxx);
+    ModuleBase::GlobalFunc::ZEROS(psiv, GlobalC::pw.nrxx);
     if (GlobalV::NSPIN == 1 || GlobalV::NSPIN == 4)
     {
         for (int ir = 0;ir < GlobalC::pw.nrxx;ir++)
@@ -580,7 +602,7 @@ void Forces::cal_force_cc(matrix& forcecc)
 
     //psiv contains now Vxc(G)
     double * rhocg = new double [GlobalC::pw.nggm];
-    ZEROS(rhocg, GlobalC::pw.nggm);
+    ModuleBase::GlobalFunc::ZEROS(rhocg, GlobalC::pw.nggm);
     int iat = 0;
     for (int T1 = 0;T1 < GlobalC::ucell.ntype;T1++)
     {
@@ -641,12 +663,12 @@ void Forces::cal_force_nl(matrix& forcenl)
 	if(nkb == 0) return; // mohan add 2010-07-25
 	
 	// dbecp: conj( -iG * <Beta(nkb,npw)|psi(nbnd,npw)> )
-	ComplexArray dbecp( nkb, GlobalV::NBANDS, 3);
-    ComplexMatrix becp( nkb, GlobalV::NBANDS);
+	ModuleBase::ComplexArray dbecp( nkb, GlobalV::NBANDS, 3);
+    ModuleBase::ComplexMatrix becp( nkb, GlobalV::NBANDS);
     
 	
 	// vkb1: |Beta(nkb,npw)><Beta(nkb,npw)|psi(nbnd,npw)>
-	ComplexMatrix vkb1( nkb, GlobalC::wf.npwx );
+	ModuleBase::ComplexMatrix vkb1( nkb, GlobalC::wf.npwx );
 
     for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {
@@ -716,7 +738,7 @@ void Forces::cal_force_nl(matrix& forcenl)
 //		Parallel_Reduce::reduce_complex_double_pool( dbecp.ptr, dbecp.ndata);
 
 //		double *cf = new double[GlobalC::ucell.nat*3];
-//		ZEROS(cf, GlobalC::ucell.nat);
+//		ModuleBase::GlobalFunc::ZEROS(cf, GlobalC::ucell.nat);
 		for (int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
 			double fac = GlobalC::wf.wg(ik, ib) * 2.0 * GlobalC::ucell.tpiba;
@@ -785,7 +807,7 @@ void Forces::cal_force_nl(matrix& forcenl)
 void Forces::cal_force_scc(matrix& forcescc)
 {
     std::complex<double>* psic = new std::complex<double> [GlobalC::pw.nrxx];
-    ZEROS(psic, GlobalC::pw.nrxx);
+    ModuleBase::GlobalFunc::ZEROS(psic, GlobalC::pw.nrxx);
 
     if (GlobalV::NSPIN == 1 || GlobalV::NSPIN == 4)
     {
@@ -816,10 +838,10 @@ void Forces::cal_force_scc(matrix& forcescc)
 
     //work space
     double* aux = new double[ndm];
-    ZEROS(aux, ndm);
+    ModuleBase::GlobalFunc::ZEROS(aux, ndm);
 
     double* rhocgnt = new double[GlobalC::pw.nggm];
-    ZEROS(rhocgnt, GlobalC::pw.nggm);
+    ModuleBase::GlobalFunc::ZEROS(rhocgnt, GlobalC::pw.nggm);
 
     GlobalC::pw.FFT_chg.FFT3D(psic, -1);
 

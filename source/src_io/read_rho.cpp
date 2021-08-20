@@ -58,17 +58,17 @@ bool Charge::read_rho(const int &is, const std::string &fn, double* rho) //add b
 	if(GlobalV::NSPIN != 4) CHECK_INT(ifs, GlobalV::NSPIN);
 	else
 	{
-		READ_VALUE(ifs, GlobalV::PRENSPIN);
+		ModuleBase::GlobalFunc::READ_VALUE(ifs, GlobalV::PRENSPIN);
 	}
 	if(GlobalV::NSPIN == 1||GlobalV::NSPIN == 4)
 	{
-		READ_VALUE(ifs, GlobalC::en.ef);
+		ModuleBase::GlobalFunc::READ_VALUE(ifs, GlobalC::en.ef);
 		GlobalV::ofs_running << " read in fermi energy = " << GlobalC::en.ef << std::endl;
 	}
 	else if(GlobalV::NSPIN == 2)
 	{
-		if(is==0)READ_VALUE(ifs, GlobalC::en.ef_up);
-		else if(is==1)READ_VALUE(ifs, GlobalC::en.ef_dw);
+		if(is==0)ModuleBase::GlobalFunc::READ_VALUE(ifs, GlobalC::en.ef_up);
+		else if(is==1)ModuleBase::GlobalFunc::READ_VALUE(ifs, GlobalC::en.ef_dw);
 	}
 	else 
 	{
@@ -98,7 +98,7 @@ bool Charge::read_rho(const int &is, const std::string &fn, double* rho) //add b
 	double *zpiece = new double[nxy];
 	for(int iz=0; iz<GlobalC::pw.ncz; iz++)
 	{
-		ZEROS(zpiece, nxy);
+		ModuleBase::GlobalFunc::ZEROS(zpiece, nxy);
 		if(GlobalV::MY_RANK==0)
 		{
 			//				GlobalV::ofs_running << " Read charge density iz=" << iz << std::endl;

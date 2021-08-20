@@ -49,19 +49,19 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, std::o
     this->istart = new int[ntype];
     this->ptrans = new double[(nat + 2) * 3];
     this->index = new int [nat + 2];
-    ZEROS(na, ntype);
-    ZEROS(istart, ntype);
-    ZEROS(ptrans, (nat+2)*3);
-    ZEROS(index, nat+2);
+    ModuleBase::GlobalFunc::ZEROS(na, ntype);
+    ModuleBase::GlobalFunc::ZEROS(istart, ntype);
+    ModuleBase::GlobalFunc::ZEROS(ptrans, (nat+2)*3);
+    ModuleBase::GlobalFunc::ZEROS(index, nat+2);
 
     // atom positions
     // used in checksym.
     dirpos = new double[3*nat];
 	newpos = new double[3*nat];
     rotpos = new double[3*nat];
-    ZEROS(dirpos, 3*nat);
-	ZEROS(newpos, 3*nat);
-    ZEROS(rotpos, 3*nat);
+    ModuleBase::GlobalFunc::ZEROS(dirpos, 3*nat);
+	ModuleBase::GlobalFunc::ZEROS(newpos, 3*nat);
+    ModuleBase::GlobalFunc::ZEROS(rotpos, 3*nat);
 
     this->a1 = ucell.a1;
     this->a2 = ucell.a2;
@@ -158,14 +158,14 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, std::o
     //this->pricell();         // pengfei Li 2018-05-14 
          //for( iat =0 ; iat < ucell.nat ; iat++)   
 //         std::cout << " newpos_now = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << std::endl;
-	OUT(ofs_running,"ibrav",ibrav);
+	ModuleBase::GlobalFunc::OUT(ofs_running,"ibrav",ibrav);
     this->setgroup(this->symop, this->nop, this->ibrav);
     //now select all symmetry operations which reproduce the lattice
     //to find those symmetry operations which reproduce the entire crystal
     this->getgroup(this->nrot, this->nrotk, ofs_running);
     // find the name of point group
     this->pointgroup(this->nrot, this->pgnumber, this->pgname, this->gmatrix, ofs_running);
-    OUT(ofs_running,"POINT GROUP", this->pgname);
+    ModuleBase::GlobalFunc::OUT(ofs_running,"POINT GROUP", this->pgname);
     //write();
 
     delete[] dirpos;
@@ -227,15 +227,15 @@ int Symmetry::standard_lat(
 
 	if (first)
     {
-        OUT(GlobalV::ofs_running,"NORM_A",norm_a);
-        OUT(GlobalV::ofs_running,"NORM_B",norm_b);
-        OUT(GlobalV::ofs_running,"NORM_C",norm_c);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"NORM_A",norm_a);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"NORM_B",norm_b);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"NORM_C",norm_c);
 //		OUT(GlobalV::ofs_running,"alpha  = ", alpha );
 //		OUT(GlobalV::ofs_running,"beta   = " ,beta  );
 //		OUT(GlobalV::ofs_running,"gamma  = " ,gamma );
-        OUT(GlobalV::ofs_running,"ALPHA (DEGREE)", acos(alpha)/PI*180.0 );
-        OUT(GlobalV::ofs_running,"BETA  (DEGREE)" ,acos(beta)/PI*180.0  );
-        OUT(GlobalV::ofs_running,"GAMMA (DEGREE)" ,acos(gamma)/PI*180.0 );
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"ALPHA (DEGREE)", acos(alpha)/PI*180.0 );
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"BETA  (DEGREE)" ,acos(beta)/PI*180.0  );
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"GAMMA (DEGREE)" ,acos(gamma)/PI*180.0 );
         first = false;
     }
 
@@ -249,7 +249,7 @@ int Symmetry::standard_lat(
      
 
     Symm_Other::right_hand_sense(a, b, c);
-	ZEROS(cel_const, 6);
+	ModuleBase::GlobalFunc::ZEROS(cel_const, 6);
 	const double small = 1.0e-5;
 
 	//---------------------------	
@@ -510,7 +510,7 @@ void Symmetry::lattice_type(
   //    std::cout << "v2 = " << v2.x << " " << v2.y << " " << v2.z <<std::endl;
   //    std::cout << "v3 = " << v3.x << " " << v3.y << " " << v3.z <<std::endl;
 
-	OUT(GlobalV::ofs_running,"right hand lattice",right);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"right hand lattice",right);
 
 	//-------------------------------------------------
 	// (2) save and copy the original lattice vectors.
@@ -523,7 +523,7 @@ void Symmetry::lattice_type(
 	// (3) calculate the 'pre_const'
 	//--------------------------------------------
     double pre_const[6];
-	ZEROS(pre_const, 6);
+	ModuleBase::GlobalFunc::ZEROS(pre_const, 6);
 //    std::cout << "ATTION !!!!!!" <<std::endl;
 //        std::cout << "v1 = " << v1.x << " " << v1.y << " " << v1.z <<std::endl;
 //        std::cout << "v2 = " << v2.x << " " << v2.y << " " << v2.z <<std::endl;
@@ -809,8 +809,8 @@ void Symmetry::lattice_type(
     brav = pre_brav;
     bravname = get_brav_name(brav);
 
-    OUT(GlobalV::ofs_running,"BRAVAIS TYPE",brav);
-    OUT(GlobalV::ofs_running,"BRAVAIS LATTICE NAME",bravname);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"BRAVAIS TYPE",brav);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"BRAVAIS LATTICE NAME",bravname);
     return;
 }
 
@@ -1205,8 +1205,8 @@ void Symmetry::getgroup(int &nrot, int &nrotk, std::ofstream &ofs_running)
     //total number of space group operations
 	//-----------------------------------------------------
     nrotk += nrot;
-	OUT(ofs_running,"PURE POINT GROUP OPERATIONS",nrot);
-    OUT(ofs_running,"SPACE GROUP OPERATIONS",nrotk);
+	ModuleBase::GlobalFunc::OUT(ofs_running,"PURE POINT GROUP OPERATIONS",nrot);
+    ModuleBase::GlobalFunc::OUT(ofs_running,"SPACE GROUP OPERATIONS",nrotk);
 
 	//-----------------------------------------------------
     //fill the rest of matrices and vectors with zeros
@@ -1515,9 +1515,9 @@ void Symmetry::force_symmetry(matrix &force , double* pos, const UnitCell_pseudo
 	int *n;
 	int *start;
 	double diff1,diff2,diff3;
-	protpos = new double[nat*3]; ZEROS(protpos, nat*3);
-	tot_force = new double[nat*3]; ZEROS(tot_force, nat*3);
-	n = new int[nat]; ZEROS(n, nat);
+	protpos = new double[nat*3]; ModuleBase::GlobalFunc::ZEROS(protpos, nat*3);
+	tot_force = new double[nat*3]; ModuleBase::GlobalFunc::ZEROS(tot_force, nat*3);
+	n = new int[nat]; ModuleBase::GlobalFunc::ZEROS(n, nat);
 	start = new int[ntype]; start[0] = 0;
 	for(int it = 0; it < ntype; ++it)
 	{
@@ -1592,8 +1592,8 @@ void Symmetry::stress_symmetry(matrix& sigma, const UnitCell_pseudo &ucell)   //
 	double *tot_sigma, *temp;
 	tot_sigma = new double[9];
 	temp = new double[9];
-	ZEROS(temp, 9);
-	ZEROS(tot_sigma, 9);
+	ModuleBase::GlobalFunc::ZEROS(temp, 9);
+	ModuleBase::GlobalFunc::ZEROS(tot_sigma, 9);
 
 	temp[0]=ucell.a1.x;
 	temp[1]=ucell.a1.y;
@@ -1627,8 +1627,8 @@ void Symmetry::stress_symmetry(matrix& sigma, const UnitCell_pseudo &ucell)   //
 		}
 	}
 
-	ZEROS(temp, 9);
-	ZEROS(tot_sigma, 9);
+	ModuleBase::GlobalFunc::ZEROS(temp, 9);
+	ModuleBase::GlobalFunc::ZEROS(tot_sigma, 9);
 
 	for ( int k = 0 ; k < nrotk; ++k)
 	{
@@ -1665,8 +1665,8 @@ void Symmetry::stress_symmetry(matrix& sigma, const UnitCell_pseudo &ucell)   //
 		}
 	}
 
-	ZEROS(temp, 9);
-	ZEROS(tot_sigma, 9);
+	ModuleBase::GlobalFunc::ZEROS(temp, 9);
+	ModuleBase::GlobalFunc::ZEROS(tot_sigma, 9);
 
 	double det = ucell.a1.x*ucell.a2.y*ucell.a3.z -
 		ucell.a1.x*ucell.a3.y*ucell.a2.z +

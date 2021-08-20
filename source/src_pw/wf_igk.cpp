@@ -63,7 +63,7 @@ int WF_igk::setupIndGk(const PW_Basis &pwb,const int nks)
 //		GlobalV::ofs_running << " " << std::setw(8) << ik << std::setw(10) << GlobalC::kv.ngk[ik] << std::endl;
     }
 
-    if (GlobalV::test_wf > 1) OUT("npw_max",npw_max);
+    if (GlobalV::test_wf > 1) ModuleBase::GlobalFunc::OUT("npw_max",npw_max);
 //----------------------------------------------------------
 // EXPLAIN : correspondence K + G <- -> G
 //----------------------------------------------------------

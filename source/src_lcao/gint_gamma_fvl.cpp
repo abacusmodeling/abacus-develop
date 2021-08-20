@@ -73,10 +73,10 @@ inline void cal_psir_ylm_dphi(
 
             if(distance > GlobalC::ORB.Phi[it].getRcut())
             {
-                ZEROS(p_psir_ylm, block_size[id]);
-                ZEROS(p_dphix, block_size[id]);
-                ZEROS(p_dphiy, block_size[id]);
-                ZEROS(p_dphiz, block_size[id]);
+                ModuleBase::GlobalFunc::ZEROS(p_psir_ylm, block_size[id]);
+                ModuleBase::GlobalFunc::ZEROS(p_dphix, block_size[id]);
+                ModuleBase::GlobalFunc::ZEROS(p_dphiy, block_size[id]);
+                ModuleBase::GlobalFunc::ZEROS(p_dphiz, block_size[id]);
                 cal_flag[ib][id]=false;
                 continue;
             }
@@ -469,7 +469,7 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
     int DGridV_Size=GlobalC::GridT.lgd*GlobalC::GridT.lgd;
     //OUT(GlobalV::ofs_running,"Enter gamma_force, DGridV_Size", DGridV_Size);
     double *DGridV_pool=new double[3*DGridV_Size];
-    ZEROS(DGridV_pool, 3*DGridV_Size);
+    ModuleBase::GlobalFunc::ZEROS(DGridV_pool, 3*DGridV_Size);
     
     double** DGridV_x = new double*[GlobalC::GridT.lgd];
     double** DGridV_y = new double*[GlobalC::GridT.lgd];
@@ -485,7 +485,7 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
     if(GlobalV::STRESS)
     {
         DGridV_stress_pool = new double[6*DGridV_Size];
-        ZEROS(DGridV_stress_pool, 6*DGridV_Size);
+        ModuleBase::GlobalFunc::ZEROS(DGridV_stress_pool, 6*DGridV_Size);
         DGridV_11 = new double*[GlobalC::GridT.lgd];
         DGridV_12 = new double*[GlobalC::GridT.lgd];
         DGridV_13 = new double*[GlobalC::GridT.lgd];
@@ -535,7 +535,7 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
     if(max_size>0 && GlobalC::GridT.lgd > 0)
     {    
         dphi_pool=new double [3*GlobalC::pw.bxyz*LD_pool];
-        ZEROS(dphi_pool, 3*GlobalC::pw.bxyz*LD_pool);
+        ModuleBase::GlobalFunc::ZEROS(dphi_pool, 3*GlobalC::pw.bxyz*LD_pool);
         dphix = new double*[GlobalC::pw.bxyz];
         dphiy = new double*[GlobalC::pw.bxyz];
         dphiz = new double*[GlobalC::pw.bxyz];    
@@ -565,7 +565,7 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
     			for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
     			{
     				drr[id][ib] = new double[3];
-    				ZEROS(drr[id][ib],3);
+    				ModuleBase::GlobalFunc::ZEROS(drr[id][ib],3);
     			}
     		}
         }*/
@@ -670,18 +670,18 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
 
     for (int i=0; i<GlobalV::NLOCAL; i++)
     {
-        ZEROS(tmpx, GlobalV::NLOCAL);
-        ZEROS(tmpy, GlobalV::NLOCAL);
-		ZEROS(tmpz, GlobalV::NLOCAL);
+        ModuleBase::GlobalFunc::ZEROS(tmpx, GlobalV::NLOCAL);
+        ModuleBase::GlobalFunc::ZEROS(tmpy, GlobalV::NLOCAL);
+		ModuleBase::GlobalFunc::ZEROS(tmpz, GlobalV::NLOCAL);
 
 		if(GlobalV::STRESS)
 		{
-			ZEROS(tmp11, GlobalV::NLOCAL);
-			ZEROS(tmp12, GlobalV::NLOCAL);
-			ZEROS(tmp13, GlobalV::NLOCAL);
-			ZEROS(tmp22, GlobalV::NLOCAL);
-			ZEROS(tmp23, GlobalV::NLOCAL);
-			ZEROS(tmp33, GlobalV::NLOCAL);
+			ModuleBase::GlobalFunc::ZEROS(tmp11, GlobalV::NLOCAL);
+			ModuleBase::GlobalFunc::ZEROS(tmp12, GlobalV::NLOCAL);
+			ModuleBase::GlobalFunc::ZEROS(tmp13, GlobalV::NLOCAL);
+			ModuleBase::GlobalFunc::ZEROS(tmp22, GlobalV::NLOCAL);
+			ModuleBase::GlobalFunc::ZEROS(tmp23, GlobalV::NLOCAL);
+			ModuleBase::GlobalFunc::ZEROS(tmp33, GlobalV::NLOCAL);
 		}
 
         const int mu = GlobalC::GridT.trace_lo[i];
@@ -764,10 +764,10 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
    //OUT(GlobalV::ofs_running,"Start reduce DGridV");
    //Parallel_Reduce::reduce_double_pool(DGridV_pool, 3*DGridV_Size );
     // double* tmp = new double[3*GlobalV::NLOCAL*GlobalV::NLOCAL];
-    // ZEROS(tmp, 3*GlobalV::NLOCAL*GlobalV::NLOCAL);
+    // ModuleBase::GlobalFunc::ZEROS(tmp, 3*GlobalV::NLOCAL*GlobalV::NLOCAL);
     // for (int i=0; i<GlobalV::NLOCAL; i++)
     // {
-    //     ZEROS(tmp, 3*GlobalV::NLOCAL);
+    //     ModuleBase::GlobalFunc::ZEROS(tmp, 3*GlobalV::NLOCAL);
     //     double* tmpx = &tmp[i*GlobalV::NLOCAL];
     //     double* tmpy = &tmp[i*GlobalV::NLOCAL+GlobalV::NLOCAL*GlobalV::NLOCAL];
     //     double* tmpz = &tmp[i*GlobalV::NLOCAL+2*GlobalV::NLOCAL*GlobalV::NLOCAL];

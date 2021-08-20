@@ -18,7 +18,10 @@
 #include "global_variable.h"
 #include "global_function-func_each_2.h"		// Peize Lin add 2016-09-07
 
-using namespace std;
+namespace ModuleBase
+{
+namespace GlobalFunc
+{
 
 void NOTE(const std::string &words);
 void NEW_PART(const std::string &words);
@@ -315,5 +318,8 @@ static inline void FREE_MUL_PTR(T_element* v, const T_N_first N_first, const T_N
 	free(v);
 	v = nullptr;
 }
+
+}//namespace GlobalFunc
+}//namespace ModuleBase
 
 #endif

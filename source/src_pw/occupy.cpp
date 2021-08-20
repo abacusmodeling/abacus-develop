@@ -149,7 +149,7 @@ void Occupy::decision(const std::string &name,const std::string &smearing,const 
         if ( gaussian_parameter!=0.0 )
         {
             WARNING("smearing_decision","Fixed occupations,gauss broadening ignored");
-            AUTO_SET("gaussian_parameter",0.0);
+            ModuleBase::GlobalFunc::AUTO_SET("gaussian_parameter",0.0);
             gaussian_parameter = 0.0;
         }
     }
@@ -158,7 +158,7 @@ void Occupy::decision(const std::string &name,const std::string &smearing,const 
         if ( gaussian_parameter!=0.0 )
         {
             WARNING("smearing_decision","Fixed occupations,gauss broadening ignored");
-            AUTO_SET("gaussian_parameter",0.0);
+            ModuleBase::GlobalFunc::AUTO_SET("gaussian_parameter",0.0);
             gaussian_parameter = 0.0;
         }
     }

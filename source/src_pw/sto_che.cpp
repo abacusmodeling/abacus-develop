@@ -43,7 +43,7 @@ void Stochastic_Chebychev::init(int &dim, int &chetype)
     if(chetype==2)
     {
         vecn = new std::complex<double> [norder * dim];
-        ZEROS(vecn,norder * dim);
+        ModuleBase::GlobalFunc::ZEROS(vecn,norder * dim);
     }
     fftw_free(ccoef);
     fftw_free(dcoef);
@@ -147,14 +147,14 @@ void Stochastic_Chebychev::calpolyval(
     arrayn = new std::complex<double> [ndmx];
     arrayn_1 = new std::complex<double> [ndmx];
 
-    DCOPY(wavein, arrayn_1, ndmx);
+    ModuleBase::GlobalFunc::DCOPY(wavein, arrayn_1, ndmx);
 
     tfun(arrayn_1, arrayn,m);
 
     polyvalue[0] = Diago_CG::ddot_real(ndmx,wavein,wavein, false);
     polyvalue[1] = Diago_CG::ddot_real(ndmx,wavein,arrayn, false);
     
-    //ZEROS(polyvalue,norder);
+    //ModuleBase::GlobalFunc::ZEROS(polyvalue,norder);
     ////0- & 1-st order
     //for(int i = 0; i < ndim; ++i) 
     //{
@@ -205,7 +205,7 @@ void Stochastic_Chebychev::calfinalvec(
     arrayn = new std::complex<double> [ndmx];
     arrayn_1 = new std::complex<double> [ndmx];
   
-    DCOPY(wavein, arrayn_1, ndmx);
+    ModuleBase::GlobalFunc::DCOPY(wavein, arrayn_1, ndmx);
     
     tfun(arrayn_1, arrayn,m);
     
@@ -251,7 +251,7 @@ bool Stochastic_Chebychev::checkconverge(
     arrayn = new std::complex<double> [ndim];
     arrayn_1 = new std::complex<double> [ndim];
 
-    DCOPY(wavein, arrayn_1, ndim);
+    ModuleBase::GlobalFunc::DCOPY(wavein, arrayn_1, ndim);
     //LapackConnector::copy(ndim,wavein,1,arrayn_1,1); 
     if(tmin == tmax) 
 	{

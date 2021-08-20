@@ -177,7 +177,7 @@ void ELEC_evolve::evolve_complex_matrix(
 	}
 
 	time_t time_end = time(NULL);
-	OUT_TIME("evolve(std::complex)", time_start, time_end);
+	ModuleBase::GlobalFunc::OUT_TIME("evolve(std::complex)", time_start, time_end);
 
 	return;
 }
@@ -191,8 +191,8 @@ void ELEC_evolve::using_LAPACK_complex(const int &ik, std::complex<double>** c, 
 	bool bit = false;
 	//HS_Matrix::saving_HS_complex(GlobalC::LM.Hloc2, GlobalC::LM.Sloc2, bit, GlobalC::ParaO.out_hs);
 
-	ComplexMatrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
-	ComplexMatrix Stmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	ModuleBase::ComplexMatrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	ModuleBase::ComplexMatrix Stmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
 
 	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{
@@ -208,18 +208,18 @@ void ELEC_evolve::using_LAPACK_complex(const int &ik, std::complex<double>** c, 
 
 	int LWORK=3*GlobalV::NLOCAL-1; //tmp
 	std::complex<double> * WORK = new std::complex<double>[LWORK];
-	ZEROS(WORK, LWORK);
+	ModuleBase::GlobalFunc::ZEROS(WORK, LWORK);
 	int IPIV[GlobalV::NLOCAL];
 
 	LapackConnector::zgetrf( GlobalV::NLOCAL, GlobalV::NLOCAL, Stmp, GlobalV::NLOCAL, IPIV, &INFO);
 	LapackConnector::zgetri( GlobalV::NLOCAL, Stmp, GlobalV::NLOCAL, IPIV, WORK, LWORK, &INFO);
 
 
-	ComplexMatrix S_plus_H(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	ModuleBase::ComplexMatrix S_plus_H(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	S_plus_H = Stmp*Htmp;
 
 
-	ComplexMatrix Denominator(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	ModuleBase::ComplexMatrix Denominator(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	for (int i=0; i<GlobalV::NLOCAL; i++)
 	{
 		for (int j=0; j<GlobalV::NLOCAL; j++)
@@ -230,7 +230,7 @@ void ELEC_evolve::using_LAPACK_complex(const int &ik, std::complex<double>** c, 
 		}
 	}
 
-	ComplexMatrix Idmat(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	ModuleBase::ComplexMatrix Idmat(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{
 		for(int j=0; j<GlobalV::NLOCAL; j++)
@@ -241,20 +241,20 @@ void ELEC_evolve::using_LAPACK_complex(const int &ik, std::complex<double>** c, 
 	}
 	double delta_t;
 	//      delta_t = 0.2;	//identity: fs;
-	ComplexMatrix Numerator(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	ModuleBase::ComplexMatrix Numerator(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	Numerator = Idmat - 0.5*INPUT.mdp.dt*41.34*Denominator;
 	Denominator = Idmat + 0.5*INPUT.mdp.dt*41.34*Denominator;
 
 	int info;
 	int lwork=3*GlobalV::NLOCAL-1; //tmp
 	std::complex<double> * work = new std::complex<double>[lwork];
-	ZEROS(work, lwork);
+	ModuleBase::GlobalFunc::ZEROS(work, lwork);
 	int ipiv[GlobalV::NLOCAL];
 
 	LapackConnector::zgetrf( GlobalV::NLOCAL, GlobalV::NLOCAL, Denominator, GlobalV::NLOCAL, ipiv, &info);
 	LapackConnector::zgetri( GlobalV::NLOCAL, Denominator, GlobalV::NLOCAL, ipiv, work, lwork, &info);
 
-	ComplexMatrix U_operator(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	ModuleBase::ComplexMatrix U_operator(GlobalV::NLOCAL,GlobalV::NLOCAL);
 
 	U_operator = Numerator*Denominator;
 
@@ -288,8 +288,8 @@ void ELEC_evolve::using_LAPACK_complex_2(
 	std::complex<double>** c_init)const
 {
 
-	ComplexMatrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
-	ComplexMatrix Stmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	ModuleBase::ComplexMatrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	ModuleBase::ComplexMatrix Stmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
 
 	int ir=0;
 	int ic=0;
@@ -297,8 +297,8 @@ void ELEC_evolve::using_LAPACK_complex_2(
 	{
 		std::complex<double>* lineH = new std::complex<double>[GlobalV::NLOCAL-i];
 		std::complex<double>* lineS = new std::complex<double>[GlobalV::NLOCAL-i];
-		ZEROS(lineH, GlobalV::NLOCAL-i);
-		ZEROS(lineS, GlobalV::NLOCAL-i);
+		ModuleBase::GlobalFunc::ZEROS(lineH, GlobalV::NLOCAL-i);
+		ModuleBase::GlobalFunc::ZEROS(lineS, GlobalV::NLOCAL-i);
 
 		ir = GlobalC::ParaO.trace_loc_row[i];
 		if (ir>=0)
@@ -342,16 +342,16 @@ void ELEC_evolve::using_LAPACK_complex_2(
 
 	int LWORK=3*GlobalV::NLOCAL-1; //tmp
 	std::complex<double> * WORK = new std::complex<double>[LWORK];
-	ZEROS(WORK, LWORK);
+	ModuleBase::GlobalFunc::ZEROS(WORK, LWORK);
 	int IPIV[GlobalV::NLOCAL];
 
 	LapackConnector::zgetrf( GlobalV::NLOCAL, GlobalV::NLOCAL, Stmp, GlobalV::NLOCAL, IPIV, &INFO);
 	LapackConnector::zgetri( GlobalV::NLOCAL, Stmp, GlobalV::NLOCAL, IPIV, WORK, LWORK, &INFO);
 
-	ComplexMatrix S_plus_H(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	ModuleBase::ComplexMatrix S_plus_H(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	S_plus_H = Stmp*Htmp;
 
-	ComplexMatrix Denominator(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	ModuleBase::ComplexMatrix Denominator(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	for (int i=0; i<GlobalV::NLOCAL; i++)
 	{
 		for (int j=0; j<GlobalV::NLOCAL; j++)
@@ -362,7 +362,7 @@ void ELEC_evolve::using_LAPACK_complex_2(
 		}
 	}
 
-	ComplexMatrix Idmat(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	ModuleBase::ComplexMatrix Idmat(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{
 		for(int j=0; j<GlobalV::NLOCAL; j++)
@@ -380,20 +380,20 @@ void ELEC_evolve::using_LAPACK_complex_2(
 
 	double delta_t=0.0;
 
-	ComplexMatrix Numerator(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	ModuleBase::ComplexMatrix Numerator(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	Numerator = Idmat - 0.5*INPUT.mdp.dt*41.34*Denominator;
 	Denominator = Idmat + 0.5*INPUT.mdp.dt*41.34*Denominator;
 
 	int info=0;
 	int lwork=3*GlobalV::NLOCAL-1; //tmp
 	std::complex<double>* work = new std::complex<double>[lwork];
-	ZEROS(work, lwork);
+	ModuleBase::GlobalFunc::ZEROS(work, lwork);
 	int ipiv[GlobalV::NLOCAL];
 
 	LapackConnector::zgetrf( GlobalV::NLOCAL, GlobalV::NLOCAL, Denominator, GlobalV::NLOCAL, ipiv, &info);
 	LapackConnector::zgetri( GlobalV::NLOCAL, Denominator, GlobalV::NLOCAL, ipiv, work, lwork, &info);
 
-	ComplexMatrix U_operator(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	ModuleBase::ComplexMatrix U_operator(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	U_operator = Numerator*Denominator;
 
 	// Calculate wave function at t+delta t

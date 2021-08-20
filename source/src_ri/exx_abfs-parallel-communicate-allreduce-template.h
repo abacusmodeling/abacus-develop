@@ -26,7 +26,7 @@ T Exx_Abfs::Parallel::Communicate::Allreduce::allreduce(
 	T & data_local,
 	std::function<void(T&,T&)> & insert_function)
 {
-std::ofstream ofs_mpi( "allreduce_"+TO_STRING(my_rank), std::ofstream::app );
+std::ofstream ofs_mpi( "allreduce_"+ModuleBase::GlobalFunc::TO_STRING(my_rank), std::ofstream::app );
 timeval t_start;
 double t_probe=0, t_recv=0;
 	
@@ -103,7 +103,7 @@ ofs_mpi<<rank_recv<<"\t"<<threads.back().get_id()<<std::endl;
 				break;
 			}
 			default:
-				throw std::invalid_argument(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+				throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 for( int i=0; i<flag_isends.size(); ++i )
 	ofs_mpi<<flag_isends[i];	ofs_mpi<<std::endl;
@@ -142,7 +142,7 @@ void Exx_Abfs::Parallel::Communicate::Allreduce::allreduce_thread(
 	atomic<int> &rank_delta,
 	atomic_flag &insert_lock )
 {
-std::ofstream ofs_mpi( "allreduce_"+TO_STRING(my_rank)+"_"+TO_STRING(this_thread::get_id()), std::ofstream::app );
+std::ofstream ofs_mpi( "allreduce_"+ModuleBase::GlobalFunc::TO_STRING(my_rank)+"_"+ModuleBase::GlobalFunc::TO_STRING(this_thread::get_id()), std::ofstream::app );
 timeval t_start;
 
 ofs_mpi<<"sizeof_iar:\t"<<iar.size()<<"\t";

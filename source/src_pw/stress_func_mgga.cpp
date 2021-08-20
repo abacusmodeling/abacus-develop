@@ -27,11 +27,11 @@ void Stress_Func::stress_mgga(matrix& sigma)
 	{
 		crosstaus[ir] = new double*[6];
 		gradwfc[ir] = new std::complex<double>[3];
-		ZEROS(gradwfc[ir],3);
+		ModuleBase::GlobalFunc::ZEROS(gradwfc[ir],3);
 		for(int j = 0;j<6;j++)
 		{
 			crosstaus[ir][j] = new double [GlobalV::NSPIN];
-			ZEROS(crosstaus[ir][j],GlobalV::NSPIN);
+			ModuleBase::GlobalFunc::ZEROS(crosstaus[ir][j],GlobalV::NSPIN);
 		}
 	}
 
@@ -50,7 +50,7 @@ void Stress_Func::stress_mgga(matrix& sigma)
 			}
 			GGA_PW::grad_wfc(psi, gradwfc, npw);
 
-			int ipol = 1;
+			int ipol = 0;
 			for (int ix = 0; ix < 3; ix++)
 			{
 				for (int iy = 0; iy < ix+1; iy++)

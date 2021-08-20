@@ -565,7 +565,7 @@ void ELEC_scf::scf(const int &istep)
 				std::cout << " !! CONVERGENCE HAS NOT BEEN ACHIEVED !!" << std::endl;
 			}
 
-//			DONE(GlobalV::ofs_running,"ELECTRONS CONVERGED!");
+//			ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"ELECTRONS CONVERGED!");
 			timer::tick("ELEC_scf","scf");
 			return;
 		}

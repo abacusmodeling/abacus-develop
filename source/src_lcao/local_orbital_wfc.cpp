@@ -101,7 +101,7 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique &gt)
 		//std::cout<<"gt.lgd="<<gt.lgd<<" ; GlobalV::NLOCAL="<<GlobalV::NLOCAL<<std::endl; //delete 2015-09-06, xiaohui
 		const int page=GlobalV::NBANDS*gt.lgd;
 		this->WFC_K_POOL=new std::complex<double> [GlobalC::kv.nks*page];
-		ZEROS(WFC_K_POOL, GlobalC::kv.nks*page);
+		ModuleBase::GlobalFunc::ZEROS(WFC_K_POOL, GlobalC::kv.nks*page);
 		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
 			for(int ib=0; ib<GlobalV::NBANDS; ib++)
@@ -111,7 +111,7 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique &gt)
 			}
 			//std::cout<<"set WFC_K pointer success, ik: "<<ik<<std::endl;
 			Memory::record("LocalOrbital_Coef","WFC_K",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
-			//OUT(GlobalV::ofs_running,"MemoryForWaveFunctions (MB)",mem);
+			//ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"MemoryForWaveFunctions (MB)",mem);
 			//std::cout<<"WFC_K["<<ik<<"] use "<<mem<<" MB"<<std::endl;
 			this->complex_flag = true;
 		}
@@ -278,7 +278,7 @@ void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
 				for(int i=0; i<GlobalV::NBANDS; ++i)
 				{
 					this->WFC_GAMMA_aug[is][i] = new double[daug];
-					ZEROS(this->WFC_GAMMA_aug[is][i], daug);
+					ModuleBase::GlobalFunc::ZEROS(this->WFC_GAMMA_aug[is][i], daug);
 				}
 			}
 			Memory::record("LocalOrbital_Coef","WFC_GAMMA_aug",GlobalV::NSPIN*GlobalV::NBANDS*daug,"double");
@@ -290,7 +290,7 @@ void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
 				for(int i=0; i<GlobalV::NBANDS; ++i)
 				{
 					this->WFC_K_aug[ik][i] = new std::complex<double>[daug];
-					ZEROS(this->WFC_K_aug[ik][i], daug);
+					ModuleBase::GlobalFunc::ZEROS(this->WFC_K_aug[ik][i], daug);
 				}
 			}
 		}
@@ -299,7 +299,7 @@ void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
 
 	if(GlobalV::OUT_LEVEL != "m") 
 	{
-		OUT(GlobalV::ofs_running,"daug",daug);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"daug",daug);
 	}
 
 	timer::tick("Local_Orbital_wfc","set_trace_aug");

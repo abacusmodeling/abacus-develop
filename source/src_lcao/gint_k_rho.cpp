@@ -86,7 +86,7 @@ inline void cal_psir_ylm(
 			if(distance > (GlobalC::ORB.Phi[it].getRcut() - 1.0e-15)) 
 			{
 				cal_flag[ib][id]=false;
-				ZEROS(p, block_size[id]);
+				ModuleBase::GlobalFunc::ZEROS(p, block_size[id]);
 				continue;
 			}
 
@@ -157,7 +157,7 @@ inline void cal_band_rho(
 
 	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
-		ZEROS(psir_DM_pool, GlobalC::pw.bxyz*LD_pool);
+		ModuleBase::GlobalFunc::ZEROS(psir_DM_pool, GlobalC::pw.bxyz*LD_pool);
 		for (int ia1=0; ia1<size; ++ia1)
 		{
 			const int iw1_lo=block_iw[ia1];
@@ -416,10 +416,10 @@ void Gint_k::cal_rho_k(void)
     if(max_size!=0)
     {
 		psir_ylm_pool=new double[GlobalC::pw.bxyz*LD_pool];
-		ZEROS(psir_ylm_pool, GlobalC::pw.bxyz*LD_pool);
+		ModuleBase::GlobalFunc::ZEROS(psir_ylm_pool, GlobalC::pw.bxyz*LD_pool);
 		psir_ylm=new double *[GlobalC::pw.bxyz];
 		psir_DM_pool=new double[GlobalC::pw.bxyz*LD_pool];
-		ZEROS(psir_DM_pool, GlobalC::pw.bxyz*LD_pool);
+		ModuleBase::GlobalFunc::ZEROS(psir_DM_pool, GlobalC::pw.bxyz*LD_pool);
 		psir_DM=new double *[GlobalC::pw.bxyz];
 		block_iw=new int[max_size];
 		block_size=new int[max_size];
@@ -435,7 +435,7 @@ void Gint_k::cal_rho_k(void)
 		}
 
 		vindex = new int[GlobalC::pw.bxyz];
-		ZEROS(vindex, GlobalC::pw.bxyz);
+		ModuleBase::GlobalFunc::ZEROS(vindex, GlobalC::pw.bxyz);
 		
         cal_flag = new bool*[GlobalC::pw.bxyz];
 
@@ -530,7 +530,7 @@ void Gint_k::evaluate_pDMp(
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		tchg[is] = new double[GlobalC::pw.bxyz];
-		ZEROS(tchg[is], GlobalC::pw.bxyz);
+		ModuleBase::GlobalFunc::ZEROS(tchg[is], GlobalC::pw.bxyz);
 	}
 
 	bool *all_out_of_range = new bool[size];

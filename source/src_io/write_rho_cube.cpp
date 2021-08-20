@@ -47,8 +47,8 @@ void Charge::write_rho_cube(
 			{
 				//convert from label to atomic number
 				int z = 0;
-				for(int j=0; j!=element_name.size(); j++)
-					if (GlobalC::ucell.atoms[it].label == element_name[j])
+				for(int j=0; j!=ModuleBase::element_name.size(); j++)
+					if (GlobalC::ucell.atoms[it].label == ModuleBase::element_name[j])
 					{
 						z=j+1;
 						break;
@@ -91,11 +91,11 @@ void Charge::write_rho_cube(
 	{
 		int nxyz = GlobalC::pw.ncx * GlobalC::pw.ncy * GlobalC::pw.ncz;
 		double* wfc = new double[nxyz];
-		ZEROS(wfc, nxyz);
+		ModuleBase::GlobalFunc::ZEROS(wfc, nxyz);
 
 		// num_z: how many planes on processor 'ip'
     	int *num_z = new int[GlobalV::NPROC_IN_POOL];
-    	ZEROS(num_z, GlobalV::NPROC_IN_POOL);
+    	ModuleBase::GlobalFunc::ZEROS(num_z, GlobalV::NPROC_IN_POOL);
     	for (int iz=0;iz<GlobalC::pw.nbz;iz++)
     	{
         	int ip = iz % GlobalV::NPROC_IN_POOL;
@@ -105,7 +105,7 @@ void Charge::write_rho_cube(
 		// start_z: start position of z in 
 		// processor ip.
     	int *start_z = new int[GlobalV::NPROC_IN_POOL];
-    	ZEROS(start_z, GlobalV::NPROC_IN_POOL);
+    	ModuleBase::GlobalFunc::ZEROS(start_z, GlobalV::NPROC_IN_POOL);
     	for (int ip=1;ip<GlobalV::NPROC_IN_POOL;ip++)
     	{
         	start_z[ip] = start_z[ip-1]+num_z[ip-1];
@@ -113,7 +113,7 @@ void Charge::write_rho_cube(
 
 		// which_ip: found iz belongs to which ip.
 		int *which_ip = new int[GlobalC::pw.ncz];
-		ZEROS(which_ip, GlobalC::pw.ncz);
+		ModuleBase::GlobalFunc::ZEROS(which_ip, GlobalC::pw.ncz);
 		for(int iz=0; iz<GlobalC::pw.ncz; iz++)
 		{
 			for(int ip=0; ip<GlobalV::NPROC_IN_POOL; ip++)
@@ -140,7 +140,7 @@ void Charge::write_rho_cube(
 		{
 			//	std::cout << "\n iz=" << iz << std::endl;
 			// tag must be different for different iz.
-			ZEROS(zpiece, nxy);
+			ModuleBase::GlobalFunc::ZEROS(zpiece, nxy);
 			int tag = iz;
 			MPI_Status ierror;
 
@@ -216,7 +216,7 @@ void Charge::write_rho_cube(
 	if(GlobalV::MY_RANK==0) 
 	{
 		end = time(NULL);
-		OUT_TIME("write_rho",start,end);
+		ModuleBase::GlobalFunc::OUT_TIME("write_rho",start,end);
 		ofs.close();
 	}
 

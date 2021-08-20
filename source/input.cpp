@@ -48,7 +48,7 @@ void Input::Init(const std::string &fn)
 // OTHRE CLASS MEMBER FUNCTION :
 // NAME : Run::make_dir( dir name : OUT.suffix)
 //----------------------------------------------------------
-	Global_File::make_dir_out( this->suffix , this->calculation, GlobalV::MY_RANK, this->out_alllog); //xiaohui add 2013-09-01
+	ModuleBase::Global_File::make_dir_out( this->suffix , this->calculation, GlobalV::MY_RANK, this->out_alllog); //xiaohui add 2013-09-01
 	Check();
 
 	time_t  time_now = time(NULL);
@@ -81,12 +81,12 @@ void Input::Init(const std::string &fn)
 	std::cout << std::setiosflags(ios::left);
 
 	GlobalV::ofs_running << "\n READING GENERAL INFORMATION" << std::endl;
-	OUT(GlobalV::ofs_running,"global_out_dir", GlobalV::global_out_dir);
-	OUT(GlobalV::ofs_running,"global_in_card", GlobalV::global_in_card);
-	OUT(GlobalV::ofs_running,"pseudo_dir", GlobalV::global_pseudo_dir);
-	OUT(GlobalV::ofs_running,"orbital_dir", GlobalV::global_orbital_dir);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"global_out_dir", GlobalV::global_out_dir);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"global_in_card", GlobalV::global_in_card);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"pseudo_dir", GlobalV::global_pseudo_dir);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"orbital_dir", GlobalV::global_orbital_dir);
 
-	OUT(GlobalV::ofs_running,"pseudo_type", pseudo_type); // mohan add 2013-05-20 (xiaohui add 2013-06-23, GlobalV::global_pseudo_type -> pseudo_type)
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"pseudo_type", pseudo_type); // mohan add 2013-05-20 (xiaohui add 2013-06-23, GlobalV::global_pseudo_type -> pseudo_type)
 
 	timer::tick("Input","Init");
     return;
@@ -1188,11 +1188,11 @@ bool Input::Read(const std::string &fn)
 		{
 			read_value(ifs, mdp.mdtype);
 		}
-		else if (strcmp("NVT_tau",word) == 0)
+		else if (strcmp("nvt_tau",word) == 0)
 		{
 			read_value(ifs, mdp.NVT_tau);
 		}
-		else if (strcmp("NVT_control",word) == 0)
+		else if (strcmp("nvt_control",word) == 0)
 		{
 			read_value(ifs,mdp.NVT_control );
 		}
@@ -2454,7 +2454,7 @@ void Input::Check(void)
 		if(mem_saver == 1)
 		{
 			mem_saver = 0;
-			AUTO_SET("mem_savre","0");
+			ModuleBase::GlobalFunc::AUTO_SET("mem_savre","0");
 		}
 		//xiaohui modify 2015-09-15, 0 -> 1
         //force = 0;
@@ -2475,7 +2475,7 @@ void Input::Check(void)
                 if(mem_saver == 1)
                 {
                         mem_saver = 0;
-                        AUTO_SET("mem_savre","0");
+                        ModuleBase::GlobalFunc::AUTO_SET("mem_savre","0");
                 }
     }
     else if (calculation == "relax")  // pengfei 2014-10-13
@@ -2483,7 +2483,7 @@ void Input::Check(void)
                 if(mem_saver == 1)
                 {
                         mem_saver = 0;
-                        AUTO_SET("mem_savre","0");
+                        ModuleBase::GlobalFunc::AUTO_SET("mem_savre","0");
                 }
                 force = 1;
     }
@@ -2505,7 +2505,7 @@ void Input::Check(void)
 		if(force) // mohan add 2010-09-07
 		{
 			force = false;
-			AUTO_SET("force","false");
+			ModuleBase::GlobalFunc::AUTO_SET("force","false");
 		}
 		if (out_dos == 3 && symmetry)
 		{
@@ -2638,7 +2638,7 @@ void Input::Check(void)
     if (GlobalV::CALCULATION=="nscf" && start_pot != "file")
     {
         start_pot = "file";
-        AUTO_SET("start_pot",start_pot);
+        ModuleBase::GlobalFunc::AUTO_SET("start_pot",start_pot);
     }
 
     if (start_wfc != "atomic" && start_wfc != "atomic+random" && start_wfc != "random" &&
@@ -2666,7 +2666,7 @@ void Input::Check(void)
 		if(ks_solver=="default") //xiaohui add 2013-09-01
 		{
 			ks_solver = "cg";
-			AUTO_SET("ks_solver","cg");
+			ModuleBase::GlobalFunc::AUTO_SET("ks_solver","cg");
 		}
 		else if(ks_solver=="cg")
 		{
@@ -2706,7 +2706,7 @@ void Input::Check(void)
 			if(ks_solver == "default")
 			{
 				ks_solver = "genelpa";
-				AUTO_SET("ks_solver","genelpa");
+				ModuleBase::GlobalFunc::AUTO_SET("ks_solver","genelpa");
 			}
 			else if (ks_solver == "cg")
 			{
@@ -2781,7 +2781,7 @@ void Input::Check(void)
 		{
 			// means you can use > 1 number of k points.
 			gamma_only_local = 0;
-			AUTO_SET("gamma_only_local","0");
+			ModuleBase::GlobalFunc::AUTO_SET("gamma_only_local","0");
 		}
 	}
 
@@ -2850,7 +2850,7 @@ void Input::Check(void)
 		if(lcao_ecut == 0)
 		{
 			lcao_ecut = ecutwfc;
-			AUTO_SET("lcao_ecut",ecutwfc);
+			ModuleBase::GlobalFunc::AUTO_SET("lcao_ecut",ecutwfc);
 		}
 	}
 
@@ -3043,7 +3043,7 @@ void Input::Check(void)
 void Input::close_log(void)const
 {
 
-    Global_File::close_all_log(GlobalV::MY_RANK, this->out_alllog);
+    ModuleBase::Global_File::close_all_log(GlobalV::MY_RANK, this->out_alllog);
 }
 
 void Input::readbool(std::ifstream &ifs, bool &var)

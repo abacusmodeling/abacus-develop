@@ -152,18 +152,18 @@ void UnitCell::print_cell(std::ofstream &ofs, output &outp)const
 {
     if (GlobalV::test_unitcell) TITLE("UnitCell","print_cell");
 
-    OUT(ofs,"print_unitcell()");
+    ModuleBase::GlobalFunc::OUT(ofs,"print_unitcell()");
 
-    OUT(ofs,"latName",latName);
-    OUT(ofs,"ntype",ntype);
-    OUT(ofs,"nat",nat);
-    OUT(ofs,"lat0",lat0);
-    OUT(ofs,"lat0_angstrom",lat0_angstrom);
-    OUT(ofs,"tpiba",tpiba);
-    OUT(ofs,"omega",omega);
+    ModuleBase::GlobalFunc::OUT(ofs,"latName",latName);
+    ModuleBase::GlobalFunc::OUT(ofs,"ntype",ntype);
+    ModuleBase::GlobalFunc::OUT(ofs,"nat",nat);
+    ModuleBase::GlobalFunc::OUT(ofs,"lat0",lat0);
+    ModuleBase::GlobalFunc::OUT(ofs,"lat0_angstrom",lat0_angstrom);
+    ModuleBase::GlobalFunc::OUT(ofs,"tpiba",tpiba);
+    ModuleBase::GlobalFunc::OUT(ofs,"omega",omega);
 
     outp.printM3(ofs,"Lattices Vector (R) : ", latvec);
-    outp.printM3(ofs ,"Supercell lattice std::vector : ", latvec_supercell);
+    outp.printM3(ofs ,"Supercell lattice vector : ", latvec_supercell);
     outp.printM3(ofs, "Reciprocal lattice Vector (G): ", G);
     outp.printM3(ofs, "GGT : ", GGT);
 
@@ -310,7 +310,7 @@ void UnitCell::update_pos_taud(const Vector3<double>* posd_in)
         Atom* atom = &this->atoms[it];
         for(int ia =0;ia< atom->na;ia++)
         {
-            this->atoms[it].taud[ia] += posd_in[ia];
+            this->atoms[it].taud[ia] += posd_in[iat];
             iat++;
         }
     }

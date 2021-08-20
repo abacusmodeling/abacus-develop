@@ -90,7 +90,7 @@ void UnitCell_pseudo::setup_cell(
 			{
 				for(int i=0;i<this->ntype;i++)
 				{
-					Global_File::make_dir_atom( this->atoms[i].label );
+					ModuleBase::Global_File::make_dir_atom( this->atoms[i].label );
 				}
 			}
 		}
@@ -136,8 +136,8 @@ void UnitCell_pseudo::setup_cell(
 	else
 	{
 		GlobalV::ofs_running << std::endl;
-		OUT(GlobalV::ofs_running,"Volume (Bohr^3)", this->omega);
-		OUT(GlobalV::ofs_running,"Volume (A^3)", this->omega * pow(BOHR_TO_A, 3));
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Volume (Bohr^3)", this->omega);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Volume (A^3)", this->omega * pow(BOHR_TO_A, 3));
 	}
 		
 	//==========================================================
@@ -358,7 +358,7 @@ void UnitCell_pseudo::setup_cell_classic(
 			{
 				for(int i=0;i<this->ntype;i++)
 				{
-					Global_File::make_dir_atom( this->atoms[i].label );
+					ModuleBase::Global_File::make_dir_atom( this->atoms[i].label );
 				}
 			}
 		}
@@ -392,8 +392,8 @@ void UnitCell_pseudo::setup_cell_classic(
 	else
 	{
 		ofs_running << std::endl;
-		OUT(ofs_running,"Volume (Bohr^3)", this->omega);
-		OUT(ofs_running,"Volume (A^3)", this->omega * pow(BOHR_TO_A, 3));
+		ModuleBase::GlobalFunc::OUT(ofs_running,"Volume (Bohr^3)", this->omega);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"Volume (A^3)", this->omega * pow(BOHR_TO_A, 3));
 	}
 
 	this->set_iat2itia();
@@ -552,7 +552,7 @@ void UnitCell_pseudo::cal_nwfc(void)
 	//=====================
 	if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02
 	{
-		AUTO_SET("NBANDS",GlobalV::NBANDS);
+		ModuleBase::GlobalFunc::AUTO_SET("NBANDS",GlobalV::NBANDS);
 	}
 	else // plane wave basis
 	{
@@ -628,7 +628,7 @@ void UnitCell_pseudo::cal_natomwfc(void)
 		}
 		natomwfc += tmp * atoms[it].na;
 	}
-	OUT(GlobalV::ofs_running,"initial pseudo atomic orbital number",natomwfc);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"initial pseudo atomic orbital number",natomwfc);
 	return;
 }
 
@@ -656,8 +656,8 @@ void UnitCell_pseudo::setup_cell_after_vc(
     else
     {
         GlobalV::ofs_running << std::endl;
-        OUT(GlobalV::ofs_running, "Volume (Bohr^3)", this->omega);
-        OUT(GlobalV::ofs_running, "Volume (A^3))", this->omega * pow(BOHR_TO_A, 3));
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Volume (Bohr^3)", this->omega);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Volume (A^3))", this->omega * pow(BOHR_TO_A, 3));
     }
 
     //==========================================================

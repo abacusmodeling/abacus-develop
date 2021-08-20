@@ -9,8 +9,8 @@
 
 WF_atomic::WF_atomic()
 {
-    evc  = new ComplexMatrix[1];
-    wanf2= new ComplexMatrix[1];
+    evc  = new ModuleBase::ComplexMatrix[1];
+    wanf2= new ModuleBase::ComplexMatrix[1];
     seed = 0;
 }
 
@@ -46,7 +46,7 @@ void WF_atomic::init_at_1(void)
     {
         ndm = (GlobalC::ucell.atoms[it].msh > ndm) ? GlobalC::ucell.atoms[it].msh : ndm;
     }
-	OUT(GlobalV::ofs_running,"max mesh points in Pseudopotential",ndm);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"max mesh points in Pseudopotential",ndm);
 
     // needed to normalize atomic wfcs (not a bad idea in general and
     // necessary to compute correctly lda+U projections)
@@ -65,8 +65,8 @@ void WF_atomic::init_at_1(void)
     double *aux = new double[ndm];
     double *vchi = new double[ndm];
 
-	OUT(GlobalV::ofs_running,"dq(describe PAO in reciprocal space)",GlobalV::DQ);
-	OUT(GlobalV::ofs_running,"max q",GlobalV::NQX);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"dq(describe PAO in reciprocal space)",GlobalV::DQ);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"max q",GlobalV::NQX);
 
     for (int it=0; it<GlobalC::ucell.ntype; it++)
     {
@@ -208,22 +208,22 @@ void WF_atomic::print_PAOs(void)const
 //===================================================================
 // from wfcinit.f90
 
-void WF_atomic::check_psi(const ComplexMatrix *evc)const
+void WF_atomic::check_psi(const ModuleBase::ComplexMatrix *evc)const
 {
     std::cout<<"\n Check psi : \n";
 
     for (int iw=0;iw<GlobalV::NBANDS;iw++)
     {
         double sum_evc = abs2_row(this->evc[0],iw);
-        OUT("iw",iw);
-        OUT("sum_evc",sum_evc);
+        ModuleBase::GlobalFunc::OUT("iw",iw);
+        ModuleBase::GlobalFunc::OUT("sum_evc",sum_evc);
     }
 
     for (int ik=0;ik<GlobalC::kv.nks;ik++)
     {
         double sum_evc = abs2(this->evc[ik]);
-        OUT("ik",ik);
-        OUT("sum_evc2",sum_evc);
+        ModuleBase::GlobalFunc::OUT("ik",ik);
+        ModuleBase::GlobalFunc::OUT("sum_evc2",sum_evc);
     }
     //QUIT();
 }
@@ -232,7 +232,7 @@ void WF_atomic::atomic_wfc
 (	const int ik,
   const int np,
   const int lmax_wfc,
-  ComplexMatrix &wfcatom,
+  ModuleBase::ComplexMatrix &wfcatom,
   const realArray &table_q,
   const int &table_dimension,
   const double &dq
@@ -312,7 +312,7 @@ void WF_atomic::atomic_wfc
                                           if(fabs(fact[is])>1e-8)
                                           {
                                               const int ind = GlobalC::ppcell.lmaxkb + soc.sph_ind(l,j,m,is);
-                                              ZEROS(aux, np);
+                                              ModuleBase::GlobalFunc::ZEROS(aux, np);
                                               for(int n1=0;n1<2*l+1;n1++){
                                                  const int lm = l*l +n1;
                                                  if(abs(soc.rotylm(n1,ind))>1e-8)
@@ -457,7 +457,7 @@ void WF_atomic::atomic_wfc
         } //end ia //mohan modify 2007-11-7
     } // end nt
 
-	if(GlobalV::test_wf)OUT(GlobalV::ofs_running,"wf_index",index);
+	if(GlobalV::test_wf)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wf_index",index);
 
     if (index != GlobalC::ucell.natomwfc)
     {
@@ -471,7 +471,7 @@ void WF_atomic::atomic_wfc
     return;
 } //end subroutine atomic_wfc
 
-void WF_atomic::random(ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const
+void WF_atomic::random(ModuleBase::ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const
 {
     assert(iw_start >= 0);
     assert(psi.nr >= iw_end);
@@ -561,7 +561,7 @@ void WF_atomic::random(ComplexMatrix &psi,const int iw_start,const int iw_end,co
     return;
 }
 
-void WF_atomic::atomicrandom(ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const
+void WF_atomic::atomicrandom(ModuleBase::ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const
 {
     assert(iw_start >= 0);
     assert(psi.nr >= iw_end);

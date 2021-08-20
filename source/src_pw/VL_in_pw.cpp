@@ -26,7 +26,7 @@ void pseudopot_cell_vl::init_vloc(const int &nggm, matrix &vloc_in)
 	timer::tick("ppcell_vl","init_vloc");
 
 	double *vloc1d = new double[nggm];
-	ZEROS(vloc1d, nggm);
+	ModuleBase::GlobalFunc::ZEROS(vloc1d, nggm);
 
 	this->allocate();
 	
@@ -34,7 +34,7 @@ void pseudopot_cell_vl::init_vloc(const int &nggm, matrix &vloc_in)
 	{
 		const Atom* atom = &GlobalC::ucell.atoms[it];
 
-		ZEROS(vloc1d, nggm);
+		ModuleBase::GlobalFunc::ZEROS(vloc1d, nggm);
 
 		this->zp[it] = atom->zv;
 
@@ -74,7 +74,7 @@ void pseudopot_cell_vl::allocate(void)
 
 	delete[] numeric;
 	this->numeric = new bool[GlobalC::ucell.ntype];
-	ZEROS(numeric, GlobalC::ucell.ntype);
+	ModuleBase::GlobalFunc::ZEROS(numeric, GlobalC::ucell.ntype);
 
 	for (int it = 0; it < GlobalC::ucell.ntype; it++)
 	{ 
@@ -87,7 +87,7 @@ void pseudopot_cell_vl::allocate(void)
 	int npsx = 50;
 	delete[] zp; 
 	this->zp = new double[npsx];
-	ZEROS(zp, npsx);
+	ModuleBase::GlobalFunc::ZEROS(zp, npsx);
 
 	return;
 }
@@ -132,8 +132,8 @@ void pseudopot_cell_vl::vloc_of_g(
 
 	double *aux = new double[msh];
 	double *aux1 = new double[msh];
-	ZEROS(aux, msh);
-	ZEROS(aux1, msh);
+	ModuleBase::GlobalFunc::ZEROS(aux, msh);
+	ModuleBase::GlobalFunc::ZEROS(aux1, msh);
 
 	// for tests
 	/*

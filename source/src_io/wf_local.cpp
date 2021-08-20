@@ -101,10 +101,10 @@ int WF_Local::read_lowf_complex(std::complex<double> **c, const int &ik, const b
 		int ikr;
 		double kx,ky,kz;
         int nbands, nlocal;
-		READ_VALUE(ifs, ikr);
+		ModuleBase::GlobalFunc::READ_VALUE(ifs, ikr);
 		ifs >> kx >> ky >> kz;
-        READ_VALUE(ifs, nbands);
-        READ_VALUE(ifs, nlocal);
+        ModuleBase::GlobalFunc::READ_VALUE(ifs, nbands);
+        ModuleBase::GlobalFunc::READ_VALUE(ifs, nlocal);
 
 		if(ikr!=ik+1)
 		{
@@ -146,14 +146,14 @@ int WF_Local::read_lowf_complex(std::complex<double> **c, const int &ik, const b
         for (int i=0; i<GlobalV::NBANDS; ++i)
         {
             int ib;
-            READ_VALUE(ifs, ib);
+            ModuleBase::GlobalFunc::READ_VALUE(ifs, ib);
 			ib -= 1; // because in C++, ib should start from 0
 			//------------------------------------------------
 			// read the eigenvalues!
 			// very important to determine the occupations.
 			//------------------------------------------------
-			READ_VALUE(ifs, GlobalC::wf.ekb[ik][ib]);
-			READ_VALUE(ifs, GlobalC::wf.wg(ik,ib));
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, GlobalC::wf.ekb[ik][ib]);
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, GlobalC::wf.wg(ik,ib));
             assert( i==ib );
 			double a, b;
             for (int j=0; j<GlobalV::NLOCAL; ++j)
@@ -270,8 +270,8 @@ int WF_Local::read_lowf(double **c, const int &is)
     if (GlobalV::MY_RANK==0)
     {
         int nbands, nlocal;
-        READ_VALUE(ifs, nbands);
-        READ_VALUE(ifs, nlocal);
+        ModuleBase::GlobalFunc::READ_VALUE(ifs, nbands);
+        ModuleBase::GlobalFunc::READ_VALUE(ifs, nlocal);
 
         if (nbands!=GlobalV::NBANDS)
         {
@@ -296,9 +296,9 @@ int WF_Local::read_lowf(double **c, const int &is)
         for (int i=0; i<GlobalV::NBANDS; i++)
         {
             int ib;
-            READ_VALUE(ifs, ib);
-			READ_VALUE(ifs, GlobalC::wf.ekb[GlobalV::CURRENT_SPIN][i]);
-			READ_VALUE(ifs, GlobalC::wf.wg(GlobalV::CURRENT_SPIN,i));
+            ModuleBase::GlobalFunc::READ_VALUE(ifs, ib);
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, GlobalC::wf.ekb[GlobalV::CURRENT_SPIN][i]);
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, GlobalC::wf.wg(GlobalV::CURRENT_SPIN,i));
             assert( (i+1)==ib);
 			//std::cout << " ib=" << ib << std::endl;
             for (int j=0; j<GlobalV::NLOCAL; j++)
@@ -623,7 +623,7 @@ void WF_Local::distri_lowf(double **ctot, double **c)
 
                 // send csend
                 double* csend = new double[GlobalV::NBANDS*lgd2];
-                ZEROS(csend, GlobalV::NBANDS*lgd2);
+                ModuleBase::GlobalFunc::ZEROS(csend, GlobalV::NBANDS*lgd2);
 
                 for (int ib=0; ib<GlobalV::NBANDS; ib++)
                 {
@@ -664,7 +664,7 @@ void WF_Local::distri_lowf(double **ctot, double **c)
             // receive c
 			GlobalV::ofs_running << " lgdnow=" << lgdnow << std::endl;
             double* crecv = new double[GlobalV::NBANDS*lgdnow];
-            ZEROS(crecv, GlobalV::NBANDS*lgdnow);
+            ModuleBase::GlobalFunc::ZEROS(crecv, GlobalV::NBANDS*lgdnow);
             tag = GlobalV::DRANK * 3 + 2;
             MPI_Recv(crecv, GlobalV::NBANDS*lgdnow, MPI_DOUBLE, 0, tag, DIAG_WORLD, &status);
 
@@ -758,7 +758,7 @@ void WF_Local::distri_lowf_complex(std::complex<double> **ctot, std::complex<dou
 //					GlobalV::ofs_running << " lgd2=" << lgd2 << " proc=" << i+1 << std::endl;
 					// send csend
 					std::complex<double>* csend = new std::complex<double>[GlobalV::NBANDS*lgd2];
-					ZEROS(csend, GlobalV::NBANDS*lgd2);
+					ModuleBase::GlobalFunc::ZEROS(csend, GlobalV::NBANDS*lgd2);
 					for (int ib=0; ib<GlobalV::NBANDS; ib++)
 					{
 						for (int iw=0; iw<GlobalV::NLOCAL; iw++)
@@ -793,7 +793,7 @@ void WF_Local::distri_lowf_complex(std::complex<double> **ctot, std::complex<dou
 
 				// receive cc
 				std::complex<double>* crecv = new std::complex<double>[GlobalV::NBANDS*GlobalC::GridT.lgd];
-				ZEROS(crecv, GlobalV::NBANDS*GlobalC::GridT.lgd);
+				ModuleBase::GlobalFunc::ZEROS(crecv, GlobalV::NBANDS*GlobalC::GridT.lgd);
 
 				tag = GlobalV::DRANK * 3 + 2;
 				MPI_Recv(crecv, GlobalV::NBANDS*GlobalC::GridT.lgd, mpicomplex, 0, tag, DIAG_WORLD, &status);
@@ -896,7 +896,7 @@ void WF_Local::distri_lowf_aug(double **ctot, double **c_aug)
 
                 // ready to send csend, data number is GlobalV::NBANDS*daug
                 double* csend = new double[GlobalV::NBANDS*daug];
-                ZEROS(csend, GlobalV::NBANDS*daug);
+                ModuleBase::GlobalFunc::ZEROS(csend, GlobalV::NBANDS*daug);
 
                 for (int ib=0; ib<GlobalV::NBANDS; ib++)
                 {
@@ -948,7 +948,7 @@ void WF_Local::distri_lowf_aug(double **ctot, double **c_aug)
             // (3) receive the augmented wave functions
 			//--------------------------------------------
             double* crecv = new double[GlobalV::NBANDS*GlobalC::LOWF.daug];
-            ZEROS(crecv, GlobalV::NBANDS*GlobalC::LOWF.daug);
+            ModuleBase::GlobalFunc::ZEROS(crecv, GlobalV::NBANDS*GlobalC::LOWF.daug);
 
             tag = GlobalV::DRANK * 3 + 2;
             MPI_Recv(crecv, GlobalV::NBANDS*GlobalC::LOWF.daug, MPI_DOUBLE, 0, tag, DIAG_WORLD, &status);
@@ -1063,7 +1063,7 @@ void WF_Local::distri_lowf_aug_complex(std::complex<double> **ctot, std::complex
 				{
 					// ready to send csend, data number is GlobalV::NBANDS*daug
 					std::complex<double>* csend = new std::complex<double>[GlobalV::NBANDS*daug];
-					ZEROS(csend, GlobalV::NBANDS*daug);
+					ModuleBase::GlobalFunc::ZEROS(csend, GlobalV::NBANDS*daug);
 
 					for (int ib=0; ib<GlobalV::NBANDS; ib++)
 					{
@@ -1119,7 +1119,7 @@ void WF_Local::distri_lowf_aug_complex(std::complex<double> **ctot, std::complex
 				// (3) receive the augmented wave functions
 				//--------------------------------------------
 				std::complex<double>* crecv = new std::complex<double>[GlobalV::NBANDS*GlobalC::LOWF.daug];
-				ZEROS(crecv, GlobalV::NBANDS*GlobalC::LOWF.daug);
+				ModuleBase::GlobalFunc::ZEROS(crecv, GlobalV::NBANDS*GlobalC::LOWF.daug);
 
 				tag = GlobalV::DRANK * 3 + 2;
 				MPI_Recv(crecv, GlobalV::NBANDS*GlobalC::LOWF.daug, mpicomplex, 0, tag, DIAG_WORLD, &status);

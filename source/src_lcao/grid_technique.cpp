@@ -111,7 +111,7 @@ void Grid_Technique::init_atoms_on_grid(void)
 	// values on the bigcell.
 	delete[] this->how_many_atoms;
 	this->how_many_atoms = new int[nbxx];
-	ZEROS(how_many_atoms, nbxx);
+	ModuleBase::GlobalFunc::ZEROS(how_many_atoms, nbxx);
 	Memory::record("atoms_on_grid","how_many_atoms",nbxx,"int");
 
 	// (2) start z and ended z,
@@ -119,8 +119,8 @@ void Grid_Technique::init_atoms_on_grid(void)
 	// mohan add 2010-07-01
 	const int zstart = nbzp_start;
 	const int zend = nbzp + zstart;
-	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"zstart",zstart);
-	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"zend",zend);
+	if(GlobalV::test_gridt)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"zstart",zstart);
+	if(GlobalV::test_gridt)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"zend",zend);
 	int iz_now = -1;
 	
 	// (3) information about gloabl grid
@@ -194,7 +194,7 @@ void Grid_Technique::init_atoms_on_grid(void)
 		}
 	}
 
-	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"Total_atoms_on_grid",total_atoms_on_grid);
+	if(GlobalV::test_gridt)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Total_atoms_on_grid",total_atoms_on_grid);
 	
 	int stop = 0;
 	if(total_atoms_on_grid == 0)
@@ -261,7 +261,7 @@ void Grid_Technique::init_atoms_on_grid2(const int* index2normal)
 	// grid, and record each grid's atom position.
 	int count = 0;
 	int iat = 0;
-	ZEROS(this->how_many_atoms, nbxx);
+	ModuleBase::GlobalFunc::ZEROS(this->how_many_atoms, nbxx);
 	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
 		for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
@@ -338,7 +338,7 @@ void Grid_Technique::cal_grid_integration_index(void)
 
 #ifdef __MPI
 	int* all = new int[GlobalV::NPROC];
-	ZEROS(all, GlobalV::NPROC);
+	ModuleBase::GlobalFunc::ZEROS(all, GlobalV::NPROC);
 	Parallel_Reduce::gather_int_all(max_atom,all);
 	if(GlobalV::MY_RANK==0)
 	{
@@ -351,7 +351,7 @@ void Grid_Technique::cal_grid_integration_index(void)
 	delete[] all;
 #endif
 
-	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"Max atom on bigcell",max_atom);
+	if(GlobalV::test_gridt)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Max atom on bigcell",max_atom);
 	return;
 }
 
@@ -399,7 +399,7 @@ void Grid_Technique::cal_trace_beta(void)
 	}
 	this->lgbeta = ih_local;
 	assert(lgbeta>=0);
-	OUT(GlobalV::ofs_running,"lgbeta",lgbeta);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"lgbeta",lgbeta);
 
 	return;
 }
@@ -471,8 +471,8 @@ void Grid_Technique::cal_trace_lo(void)
 
 	if(GlobalV::OUT_LEVEL != "m") 
 	{
-		OUT(GlobalV::ofs_running,"Atom number in sub-FFT-grid",lnat);
-		OUT(GlobalV::ofs_running,"Local orbitals number in sub-FFT-grid",lgd);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Atom number in sub-FFT-grid",lnat);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Local orbitals number in sub-FFT-grid",lgd);
 	}
 
 	assert(iw_local == lgd);

@@ -13,7 +13,7 @@ Diago_CG::~Diago_CG() {}
 
 void Diago_CG::diag
 (
-    ComplexMatrix &phi,
+    ModuleBase::ComplexMatrix &phi,
     double *e,
     const int &dim,
     const int &dmx,
@@ -31,7 +31,7 @@ void Diago_CG::diag
 
     avg_iter = 0.0;
     notconv = 0;
-    ZEROS(e, n_band);
+    ModuleBase::GlobalFunc::ZEROS(e, n_band);
 
     //-------------------------------------------------------------------
     // "poor man" iterative diagonalization of a std::complex hermitian matrix
@@ -49,15 +49,15 @@ void Diago_CG::diag
     std::complex<double> *pphi = new std::complex<double>[dim]();
     std::complex<double> *lagrange = new std::complex<double>[n_band]();
     std::complex<double> *phi_m= new std::complex<double>[dim]();
-	ZEROS(sphi, dim);
-	ZEROS(scg, dim);
-	ZEROS(hphi, dim);
-	ZEROS(g, dim);
-	ZEROS(cg, dim);
-	ZEROS(g0, dim);
-	ZEROS(pphi, dim);
-	ZEROS(lagrange, n_band);
-	ZEROS(phi_m, dim);
+	ModuleBase::GlobalFunc::ZEROS(sphi, dim);
+	ModuleBase::GlobalFunc::ZEROS(scg, dim);
+	ModuleBase::GlobalFunc::ZEROS(hphi, dim);
+	ModuleBase::GlobalFunc::ZEROS(g, dim);
+	ModuleBase::GlobalFunc::ZEROS(cg, dim);
+	ModuleBase::GlobalFunc::ZEROS(g0, dim);
+	ModuleBase::GlobalFunc::ZEROS(pphi, dim);
+	ModuleBase::GlobalFunc::ZEROS(lagrange, n_band);
+	ModuleBase::GlobalFunc::ZEROS(phi_m, dim);
 
     for (int m=0; m<n_band; m++)
     {
@@ -103,7 +103,7 @@ void Diago_CG::diag
 
         if (m > 0 && reorder)
         {
-			NOTE("reorder bands!");
+			ModuleBase::GlobalFunc::NOTE("reorder bands!");
             if (e[m]-e[m-1]<-2.0*eps)
             {
                 // if the last calculated eigenvalue is not the largest...
@@ -203,7 +203,7 @@ void Diago_CG::calculate_gradient(
 
 void Diago_CG::orthogonal_gradient( const int &dim, const int &dmx,
                                     std::complex<double> *g, std::complex<double> *sg, std::complex<double> *lagrange,
-                                    const ComplexMatrix &eigenfunction, const int m)
+                                    const ModuleBase::ComplexMatrix &eigenfunction, const int m)
 {
     if (test_cg==1) TITLE("Diago_CG","orthogonal_gradient");
     //timer::tick("Diago_CG","orth_grad");
@@ -401,7 +401,7 @@ void Diago_CG::schmit_orth
     const int& dim,
     const int& dmx,
     const int& m,     //end
-    const ComplexMatrix &psi,
+    const ModuleBase::ComplexMatrix &psi,
     std::complex<double> *sphi,
     std::complex<double> *psi_m
 )
@@ -417,7 +417,7 @@ void Diago_CG::schmit_orth
     assert( psi.nr >= m );
 
     std::complex<double> *lagrange = new std::complex<double>[ m+1 ];
-    ZEROS(lagrange, m+1);
+    ModuleBase::GlobalFunc::ZEROS(lagrange, m+1);
 
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     //qianrui replace 2021-3-15
@@ -531,7 +531,7 @@ std::complex<double> Diago_CG::ddot
 std::complex<double> Diago_CG::ddot
 (
     const int & dim,
-    const ComplexMatrix &psi,
+    const ModuleBase::ComplexMatrix &psi,
     const int & m,
     std::complex<double> *psik
 )
@@ -554,9 +554,9 @@ std::complex<double> Diago_CG::ddot
 std::complex<double> Diago_CG::ddot
 (
     const int & dim,
-    const ComplexMatrix &psi_L,
+    const ModuleBase::ComplexMatrix &psi_L,
     const int & m,
-    const ComplexMatrix &psi_R,
+    const ModuleBase::ComplexMatrix &psi_R,
     const int & n
 )
 {

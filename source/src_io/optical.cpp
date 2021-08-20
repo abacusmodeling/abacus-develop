@@ -67,16 +67,16 @@ void Optical::cal_epsilon2(const int &nbands)
 	std::cout << " energy range = " << maxe - mine << std::endl;
 	std::cout << " de = " << de << " points = " << np << std::endl;
 
-	OUT(GlobalV::ofs_running,"n_occ",n_occ);
-	OUT(GlobalV::ofs_running,"nbands for optical",opt_nbands);
-	OUT(GlobalV::ofs_running,"max energy",maxe);
-	OUT(GlobalV::ofs_running,"min energy",mine);
-	OUT(GlobalV::ofs_running,"energy range",maxe-mine);
-	OUT(GlobalV::ofs_running,"de",de);
-	OUT(GlobalV::ofs_running,"points",np);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"n_occ",n_occ);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nbands for optical",opt_nbands);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"max energy",maxe);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"min energy",mine);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"energy range",maxe-mine);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"de",de);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"points",np);
 
 	double *epsilon2 = new double[np];
-	ZEROS(epsilon2, np);
+	ModuleBase::GlobalFunc::ZEROS(epsilon2, np);
 
 	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
@@ -119,7 +119,7 @@ double Optical::element_cvk(const int &ik, const int &iv, const int &ic)
 	double v=0.0;
 
 	std::complex<double> tmp[3];
-	ZEROS(tmp, 3);
+	ModuleBase::GlobalFunc::ZEROS(tmp, 3);
 	for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 	{
 		const std::complex<double> uvc = conj( GlobalC::wf.evc[ik](ic,ig) ) * GlobalC::wf.evc[ik](iv, ig);

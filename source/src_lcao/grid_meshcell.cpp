@@ -60,9 +60,9 @@ void Grid_MeshCell::set_grid_dim(
 	}
 
 	//xiaohui add 'GlobalV::OUT_LEVEL' line, 2015-09-16
-	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"real space grid",ncx,ncy,ncz); // real space uniform grid
-	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"big cell numbers in grid",nbx,nby,nbz); // reduced by BIG_CELL
-	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"meshcell numbers in big cell",bx,by,bz); // is small integer, typical number 2*2*2
+	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"real space grid",ncx,ncy,ncz); // real space uniform grid
+	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"big cell numbers in grid",nbx,nby,nbz); // reduced by BIG_CELL
+	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"meshcell numbers in big cell",bx,by,bz); // is small integer, typical number 2*2*2
 
 	//std::cout << " bx=" << bx << " by=" << by << " bz=" << bz << std::endl;
 	//std::cout << " nbx=" << nbx << " nby=" << nby << " nbz=" << nbz << std::endl; 

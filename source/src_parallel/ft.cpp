@@ -245,7 +245,7 @@ void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nx
 
 	delete[] plane;
 	this->plane = new int[nx];// number of y-z plane
-	ZEROS(plane, nx);
+	ModuleBase::GlobalFunc::ZEROS(plane, nx);
 
 	// Searching in all y-z planes
 	int i;
@@ -404,7 +404,7 @@ void FFT::P3DFFT(std::complex<double> *psi, const int sign)
 	
 	//timer::tick("FFT","P3DFFT_Init");
 
-	ZEROS(this->aux, this->nxx);
+	ModuleBase::GlobalFunc::ZEROS(this->aux, this->nxx);
 
 	// number of z in this cpu.
 	const int npps_now = this->npps[rank_use];
@@ -421,7 +421,7 @@ void FFT::P3DFFT(std::complex<double> *psi, const int sign)
 		this->scatter(psi, sign);
 		
 		//timer::tick("FFT","P3DFFT_Map+");
-		ZEROS(psi, this->nxx);
+		ModuleBase::GlobalFunc::ZEROS(psi, this->nxx);
 		int ii = 0;
 		for (int ip = 0;ip < nproc_use;ip++)
 		{
@@ -684,7 +684,7 @@ void FFT::scatter(std::complex<double> *psi, int sign)
 			}
 		}
 
-		ZEROS(this->aux, nxx);
+		ModuleBase::GlobalFunc::ZEROS(this->aux, nxx);
 
 		if (in_pool)
 		{
@@ -708,7 +708,7 @@ void FFT::scatter(std::complex<double> *psi, int sign)
 			MPI_Alltoallv(this->aux, recvc, rdis, mpicomplex, psi, sentc, sdis, mpicomplex, MPI_COMM_WORLD);
 		}
 
-		ZEROS(this->aux, nxx);
+		ModuleBase::GlobalFunc::ZEROS(this->aux, nxx);
 
 		for (int i = 0;i < nproc_use;i++)
 		{

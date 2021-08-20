@@ -52,10 +52,10 @@ void Lattice_Change_CG::allocate(void)
 	this->cg_grad0 = new double[dim];
 	this->move0 = new double[dim];
 
-	ZEROS(lat0, dim);
-	ZEROS(grad0, dim);
-	ZEROS(cg_grad0, dim);
-	ZEROS(move0, dim);
+	ModuleBase::GlobalFunc::ZEROS(lat0, dim);
+	ModuleBase::GlobalFunc::ZEROS(grad0, dim);
+	ModuleBase::GlobalFunc::ZEROS(cg_grad0, dim);
+	ModuleBase::GlobalFunc::ZEROS(move0, dim);
 	this->e0 = 0.0;	
 }
 
@@ -85,11 +85,11 @@ void Lattice_Change_CG::start(const matrix &stress_in, const double& etot_in)
 	
 	int flag = 0;  
 	
-	ZEROS(lat, dim);
-	ZEROS(grad, dim);
-	ZEROS(cg_gradn, dim);
-	ZEROS(move, dim);
-	ZEROS(cg_grad, dim);
+	ModuleBase::GlobalFunc::ZEROS(lat, dim);
+	ModuleBase::GlobalFunc::ZEROS(grad, dim);
+	ModuleBase::GlobalFunc::ZEROS(cg_gradn, dim);
+	ModuleBase::GlobalFunc::ZEROS(move, dim);
+	ModuleBase::GlobalFunc::ZEROS(cg_grad, dim);
 	
 	CG_begin:
 	

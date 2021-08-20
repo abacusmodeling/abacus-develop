@@ -45,22 +45,22 @@ public:
 		const size_t TB, 
 		const Vector3<double> &tauA,											// unit: ucell.lat0
 		const Vector3<double> &tauB,											// unit: ucell.lat0  
-		const Element_Basis_Index::IndexLNM &index_A1, 
-		const Element_Basis_Index::IndexLNM &index_A2,
-		const Element_Basis_Index::IndexLNM &index_B,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_A1, 
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_A2,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_B,
 		const Matrix_Order &matrix_order) const;
 	std::vector<matrix> cal_overlap_matrix(  
 		const size_t TA, 
 		const size_t TB, 
 		const Vector3<double> &tauA,											// unit: ucell.lat0
 		const Vector3<double> &tauB,											// unit: ucell.lat0  
-		const Element_Basis_Index::IndexLNM &index_A1, 
-		const Element_Basis_Index::IndexLNM &index_A2,
-		const Element_Basis_Index::IndexLNM &index_B) const;
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_A1, 
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_A2,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_B) const;
 	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> cal_overlap_matrix(  
-		const Element_Basis_Index::IndexLNM &index_A1, 
-		const Element_Basis_Index::IndexLNM &index_A2,
-		const Element_Basis_Index::IndexLNM &index_B) const;
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_A1, 
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_A2,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_B) const;
 	
 protected:
 	ORB_table_phi MOT;

@@ -66,7 +66,7 @@ void test_pblas()
 
 		auto ofs_pro = [&]()
 		{
-			std::ofstream ofs("ofs_"+TO_STRING(my_rank));
+			std::ofstream ofs("ofs_"+ModuleBase::GlobalFunc::TO_STRING(my_rank));
 			ofs<<comm_sz<<"\t"<<dim[0]<<"\t"<<dim[1]<<"\t"<<nprow<<"\t"<<npcol<<"\t"<<myprow<<"\t"<<mypcol<<"\t"<<std::endl;
 			ofs.close();
 		};
@@ -78,7 +78,7 @@ void test_pblas()
 			const int nlld = ScalapackConnector::numroc( n, nb, mypcol, icsrc, npcol );
 			int info;
 			std::vector<int> descv(9);
-			ScalapackConnector::descinit(VECTOR_TO_PTR(descv), m, n, mb, nb, irsrc, icsrc, ictxt, mlld, info);
+			ScalapackConnector::descinit(ModuleBase::GlobalFunc::VECTOR_TO_PTR(descv), m, n, mb, nb, irsrc, icsrc, ictxt, mlld, info);
 			return descv;
 		};		
 //		return init_desc;
@@ -86,14 +86,14 @@ void test_pblas()
 
 	auto ofs_matrix = [&](const std::vector<double>& v)
 	{
-		std::ofstream ofs("matrix_"+TO_STRING(my_rank));
+		std::ofstream ofs("matrix_"+ModuleBase::GlobalFunc::TO_STRING(my_rank));
 		for(const double i : v )
 			ofs<<i<<std::endl;
 		ofs.close();
 	};
 	auto ofs_desc = [&](const std::vector<int> &descv)
 	{
-		std::ofstream ofs("desc_"+TO_STRING(my_rank));
+		std::ofstream ofs("desc_"+ModuleBase::GlobalFunc::TO_STRING(my_rank));
 		for(int i=0; i<9; ++i)
 			ofs<<descv[i]<<"\t";
 		ofs<<std::endl;
@@ -102,29 +102,29 @@ void test_pblas()
 	
 /*
 	std::vector<int> descv_5321_32 = init_ictxt('R',true)(5,3,2,1,0,0);
-	int *desc_5321_32 = VECTOR_TO_PTR(descv_5321_32);
+	int *desc_5321_32 = ModuleBase::GlobalFunc::VECTOR_TO_PTR(descv_5321_32);
 	
 	std::vector<int> descv_5521_32 = init_ictxt('R',true)(5,5,2,1,0,0);
-	int *desc_5521_32 = VECTOR_TO_PTR(descv_5521_32);
+	int *desc_5521_32 = ModuleBase::GlobalFunc::VECTOR_TO_PTR(descv_5521_32);
 	
 	std::vector<int> descv_5522_32 = init_ictxt('R',true)(5,5,2,2,0,0);
-	int *desc_5522_32 = VECTOR_TO_PTR(descv_5522_32);
+	int *desc_5522_32 = ModuleBase::GlobalFunc::VECTOR_TO_PTR(descv_5522_32);
 	
 	std::vector<int> descv_5511_32 = init_ictxt('R',true)(5,5,1,1,0,0);
-	int *desc_5511_32 = VECTOR_TO_PTR(descv_5511_32);
+	int *desc_5511_32 = ModuleBase::GlobalFunc::VECTOR_TO_PTR(descv_5511_32);
 	ofs_desc(descv_5511_32);
 */
 	std::vector<int> descv_5321_32 = init_desc(5,3,2,1,0,0);
-	int *desc_5321_32 = VECTOR_TO_PTR(descv_5321_32);
+	int *desc_5321_32 = ModuleBase::GlobalFunc::VECTOR_TO_PTR(descv_5321_32);
 	
 	std::vector<int> descv_5521_32 = init_desc(5,5,2,1,0,0);
-	int *desc_5521_32 = VECTOR_TO_PTR(descv_5521_32);
+	int *desc_5521_32 = ModuleBase::GlobalFunc::VECTOR_TO_PTR(descv_5521_32);
 	
 	std::vector<int> descv_5522_32 = init_desc(5,5,2,2,0,0);
-	int *desc_5522_32 = VECTOR_TO_PTR(descv_5522_32);
+	int *desc_5522_32 = ModuleBase::GlobalFunc::VECTOR_TO_PTR(descv_5522_32);
 	
 	std::vector<int> descv_5511_32 = init_desc(5,5,1,1,0,0);
-	int *desc_5511_32 = VECTOR_TO_PTR(descv_5511_32);
+	int *desc_5511_32 = ModuleBase::GlobalFunc::VECTOR_TO_PTR(descv_5511_32);
 	
 	/*
 	auto init_matrix_A5624_32 = [&]()
@@ -348,7 +348,7 @@ void test_pblas()
 	std::vector<double> mI5511_32 = init_matrix_I5511_32();
 	std::vector<double> mI5521_32 = init_matrix_I5521_32();
 	std::vector<double> mC(100);
-	ScalapackConnector::pgemm( 'T','N', 3,5,5, 1, VECTOR_TO_PTR(mA5321_32),1,1,desc_5321_32, VECTOR_TO_PTR(mI5511_32),1,1,desc_5511_32, 0, VECTOR_TO_PTR(mC),1,1,desc_5522_32 );
+	ScalapackConnector::pgemm( 'T','N', 3,5,5, 1, ModuleBase::GlobalFunc::VECTOR_TO_PTR(mA5321_32),1,1,desc_5321_32, ModuleBase::GlobalFunc::VECTOR_TO_PTR(mI5511_32),1,1,desc_5511_32, 0, ModuleBase::GlobalFunc::VECTOR_TO_PTR(mC),1,1,desc_5522_32 );
 	
 	auto check_matrix = [&](const std::vector<double> &v1, const std::vector<double> &v2)
 	{

@@ -451,7 +451,7 @@ void DFTU_RELAX::cal_VU_pot_mat_complex(const int spin, const bool newlocale, st
 {
   TITLE("DFTU_RELAX","cal_VU_pot_mat_complex"); 
 	// timer::tick("DFTU","folding_overlap_matrix");
-  ZEROS(VU, GlobalC::ParaO.nloc);
+  ModuleBase::GlobalFunc::ZEROS(VU, GlobalC::ParaO.nloc);
 
   for(int it=0; it<GlobalC::ucell.ntype; ++it)
 	{
@@ -508,7 +508,7 @@ void DFTU_RELAX::cal_VU_pot_mat_real(const int spin, const bool newlocale, doubl
 {
   TITLE("DFTU_RELAX","cal_VU_pot_mat_real"); 
 	// timer::tick("DFTU","folding_overlap_matrix");
-  ZEROS(VU, GlobalC::ParaO.nloc);
+  ModuleBase::GlobalFunc::ZEROS(VU, GlobalC::ParaO.nloc);
 
   for(int it=0; it<GlobalC::ucell.ntype; ++it)
 	{
@@ -564,7 +564,7 @@ void DFTU_RELAX::fold_dSR_gamma(const int dim1, const int dim2, double* dSR_gamm
 {
   TITLE("DFTU_RELAX","fold_dSR_gamma");
 
-  ZEROS(dSR_gamma, GlobalC::ParaO.nloc);
+  ModuleBase::GlobalFunc::ZEROS(dSR_gamma, GlobalC::ParaO.nloc);
 
   double* dS_ptr;
   if(dim1==0) dS_ptr =  GlobalC::LM.DSloc_x;
@@ -650,7 +650,7 @@ void DFTU_RELAX::fold_dSm_k(const int ik, const int dim, std::complex<double>* d
 {
   TITLE("DFTU_RELAX","fold_dSm_k");
 
-  ZEROS(dSm_k, GlobalC::ParaO.nloc);
+  ModuleBase::GlobalFunc::ZEROS(dSm_k, GlobalC::ParaO.nloc);
 
   double* dSm_ptr;
   if(dim==0) dSm_ptr = GlobalC::LM.DSloc_Rx;
@@ -750,7 +750,7 @@ void DFTU_RELAX::fold_dSR_k(const int ik, const int dim1, const int dim2, std::c
 {
   TITLE("DFTU_RELAX","fold_dSR_k");
 
-  ZEROS(dSR_k, GlobalC::ParaO.nloc);
+  ModuleBase::GlobalFunc::ZEROS(dSR_k, GlobalC::ParaO.nloc);
 
   double* dSm_ptr;
   if(dim1==0) dSm_ptr = GlobalC::LM.DSloc_Rx;
