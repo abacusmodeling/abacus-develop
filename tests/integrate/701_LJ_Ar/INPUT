@@ -1,0 +1,17 @@
+INPUT_PARAMETERS
+#Parameters	(General)
+suffix          autotest
+ntype			1	
+calculation     md
+basis_type      pw
+nstep           1
+
+rcut_lj         8.5
+epsilon_lj      0.01062
+sigma_lj        3.360
+
+force           1
+
+md_mdtype       1
+md_dt           10
+md_tfirst       120
