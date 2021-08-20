@@ -23,17 +23,17 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 	//==========================================
 	// read in information of each type of atom
 	//==========================================
-	if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "ATOMIC_SPECIES") )
+	if( SCAN_BEGIN(ifa, "ATOMIC_SPECIES") )
 	{	
-		ModuleBase::GlobalFunc::OUT(ofs_running,"ntype",ntype);
+		OUT(ofs_running,"ntype",ntype);
 		for (int i = 0;i < ntype;i++)
 		{
 			ifa >> atom_label[i] >> atom_mass[i];
 			
 			std::stringstream ss;
 			ss << "atom label for species " << i+1;
-			ModuleBase::GlobalFunc::OUT(ofs_running,ss.str(),atom_label[i]);	
-			ModuleBase::GlobalFunc::READ_VALUE(ifa, pseudo_fn[i]);
+			OUT(ofs_running,ss.str(),atom_label[i]);	
+			READ_VALUE(ifa, pseudo_fn[i]);
 			if(GlobalV::test_pseudo_cell==2) 
 			{
 				ofs_running << "\n" << std::setw(6) << atom_label[i] 
@@ -51,7 +51,7 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 #ifdef __LCAO
 	if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 	{
-		if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "NUMERICAL_ORBITAL") )
+		if( SCAN_BEGIN(ifa, "NUMERICAL_ORBITAL") )
 		{
 			GlobalC::ORB.read_in_flag = true;
 			for(int i=0; i<ntype; i++)
@@ -71,7 +71,7 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 				// Turn off the read in NONLOCAL file
 				// function since 2013-08-02 by mohan
 				//-----------------------------------
-				//ModuleBase::GlobalFunc::READ_VALUE(ifa, nfile);
+				//READ_VALUE(ifa, nfile);
 				
 				GlobalC::ORB.orbital_file.push_back(ofile);
 
@@ -88,7 +88,7 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 			}
 		}	
 		// caoyu add 2021-03-16
-		if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "NUMERICAL_DESCRIPTOR")) {
+		if (SCAN_BEGIN(ifa, "NUMERICAL_DESCRIPTOR")) {
 			ifa >> GlobalC::ORB.descriptor_file;
 		}
 	}
@@ -98,7 +98,7 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 	    Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type || 
 		Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type )
 	{
-		if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "ABFS_ORBITAL") )
+		if( SCAN_BEGIN(ifa, "ABFS_ORBITAL") )
 		{
 			for(int i=0; i<ntype; i++)
 			{
@@ -112,16 +112,16 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 	//==========================
 	// read in lattice constant
 	//==========================
-	if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "LATTICE_CONSTANT") )
+	if( SCAN_BEGIN(ifa, "LATTICE_CONSTANT") )
 	{
-		ModuleBase::GlobalFunc::READ_VALUE(ifa, lat0);
+		READ_VALUE(ifa, lat0);
 		if(lat0<=0.0)
 		{
 			WARNING_QUIT("read_atom_species","lat0<=0.0");
 		}
 		lat0_angstrom = lat0 * 0.529177 ;
-		ModuleBase::GlobalFunc::OUT(ofs_running,"lattice constant (Bohr)",lat0);
-		ModuleBase::GlobalFunc::OUT(ofs_running,"lattice constant (Angstrom)",lat0_angstrom);
+		OUT(ofs_running,"lattice constant (Bohr)",lat0);
+		OUT(ofs_running,"lattice constant (Angstrom)",lat0_angstrom);
 		this->tpiba  = TWO_PI / lat0;
 		this->tpiba2 = tpiba * tpiba;
 	}
@@ -130,25 +130,25 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 	// Read in latticies vector
 	//===========================
 	if(latName=="test"){	
-		if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "LATTICE_VECTORS") )
+		if( SCAN_BEGIN(ifa, "LATTICE_VECTORS") )
 		{
 			// Reading lattice vectors. notice
 			// here that only one cpu read these
 			// parameters.
 			ifa >> latvec.e11 >> latvec.e12;
-			ModuleBase::GlobalFunc::READ_VALUE(ifa, latvec.e13);
+			READ_VALUE(ifa, latvec.e13);
 			ifa >> latvec.e21 >> latvec.e22;
-			ModuleBase::GlobalFunc::READ_VALUE(ifa, latvec.e23);
+			READ_VALUE(ifa, latvec.e23);
 			ifa >> latvec.e31 >> latvec.e32;
-			ModuleBase::GlobalFunc::READ_VALUE(ifa, latvec.e33);
+			READ_VALUE(ifa, latvec.e33);
 		}
-		if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+		if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
 		{
 			WARNING_QUIT("UnitCell_pseudo::read_atom_species","do not use LATTICE_PARAMETERS without explicit specification of lattice type");
 		}
 	}//supply lattice vectors
 	else{
-		if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "LATTICE_VECTORS") )
+		if( SCAN_BEGIN(ifa, "LATTICE_VECTORS") )
 		{
 			WARNING_QUIT("UnitCell_pseudo::read_atom_species","do not use LATTICE_VECTORS along with explicit specification of lattice type");
 		}
@@ -172,18 +172,18 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 			latvec.e11 = 1.0; latvec.e12 = 0.0; latvec.e13 = 0.0;
 			latvec.e21 =-0.5; latvec.e22 = e22; latvec.e23 = 0.0;
 			latvec.e31 = 0.0; latvec.e32 = 0.0;	latvec.e33 = 0.0;
-			if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
 			{
-				ModuleBase::GlobalFunc::READ_VALUE(ifa, latvec.e33);
+				READ_VALUE(ifa, latvec.e33);
 			}
 		}
 		else if(latName=="trigonal"){//trigonal
 			double t1 = 0.0;
 			double t2 = 0.0;
-			if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
 			{
 				double cosab=0.0;
-				ModuleBase::GlobalFunc::READ_VALUE(ifa, cosab);
+				READ_VALUE(ifa, cosab);
 				t1 = sqrt(1.0 + 2.0*cosab);
 				t2 = sqrt(1.0 - cosab);
 			}
@@ -200,16 +200,16 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 			latvec.e11 = 1.0; latvec.e12 = 0.0; latvec.e13 = 0.0;
 			latvec.e21 = 0.0; latvec.e22 = 1.0; latvec.e23 = 0.0;
 			latvec.e31 = 0.0; latvec.e32 = 0.0;	latvec.e33 = 0.0;
-			if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
 			{
-				ModuleBase::GlobalFunc::READ_VALUE(ifa, latvec.e33);
+				READ_VALUE(ifa, latvec.e33);
 			}
 		}
 		else if(latName=="bct"){//body-centered tetragonal
 			double cba = 0.0;
-			if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
 			{
-				ModuleBase::GlobalFunc::READ_VALUE(ifa, cba);
+				READ_VALUE(ifa, cba);
 				cba = cba / 2.0;
 			}
 			latvec.e11 = 0.5; latvec.e12 =-0.5; latvec.e13 = cba;
@@ -220,30 +220,30 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 			latvec.e11 = 1.0; latvec.e12 = 0.0; latvec.e13 = 0.0;
 			latvec.e21 = 0.0; latvec.e22 = 0.0;	latvec.e23 = 0.0;
 			latvec.e31 = 0.0; latvec.e32 = 0.0;	latvec.e33 = 0.0;
-			if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
 			{
 				ifa >> latvec.e22;
-				ModuleBase::GlobalFunc::READ_VALUE(ifa, latvec.e33);
+				READ_VALUE(ifa, latvec.e33);
 			}
 		}
 		else if(latName=="baco"){//base-centered orthorhombic
 			latvec.e11 = 0.5; latvec.e12 = 0.0; latvec.e13 = 0.0;
 			latvec.e21 =-0.5; latvec.e22 = 0.0;	latvec.e23 = 0.0;
 			latvec.e31 = 0.0; latvec.e32 = 0.0;	latvec.e33 = 0.0;
-			if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
 			{
 				ifa >> latvec.e12;
 				latvec.e12 = latvec.e12 / 2.0;
 				latvec.e22 = latvec.e12;
-				ModuleBase::GlobalFunc::READ_VALUE(ifa, latvec.e33);
+				READ_VALUE(ifa, latvec.e33);
 			}
 		}
 		else if(latName=="fco"){//face-centered orthorhombic
 			double bba = 0.0; double cba = 0.0;
-			if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
 			{
 				ifa >> bba;
-				ModuleBase::GlobalFunc::READ_VALUE(ifa, cba);
+				READ_VALUE(ifa, cba);
 				bba = bba / 2.0; cba = cba / 2.0;
 			}
 			latvec.e11 = 0.5; latvec.e12 = 0.0; latvec.e13 = cba;
@@ -252,10 +252,10 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 		}
 		else if(latName=="bco"){//body-centered orthorhombic
 			double bba = 0.0; double cba = 0.0;
-			if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
 			{
 				ifa >> bba;
-				ModuleBase::GlobalFunc::READ_VALUE(ifa, cba);
+				READ_VALUE(ifa, cba);
 				bba = bba / 2.0; cba = cba / 2.0;
 			}
 			latvec.e11 = 0.5; latvec.e12 = bba; latvec.e13 = cba;
@@ -266,10 +266,10 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 			double bba = 0.0; double cba = 0.0;
 			double cosab = 0.0;
 			double e21 = 0.0; double e22 = 0.0;
-			if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
 			{
 				ifa >> bba >> cba;
-				ModuleBase::GlobalFunc::READ_VALUE(ifa, cosab);
+				READ_VALUE(ifa, cosab);
 				e21 = bba * cosab;
 				e22 = bba * sqrt(1.0-cosab*cosab);
 			}
@@ -281,10 +281,10 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 			double bba = 0.0; double cba = 0.0;
 			double cosab = 0.0;
 			double e21 = 0.0; double e22 = 0.0;
-			if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
 			{
 				ifa >> bba >> cba;
-				ModuleBase::GlobalFunc::READ_VALUE(ifa, cosab);
+				READ_VALUE(ifa, cosab);
 				e21 = bba * cosab;
 				e22 = bba * sqrt(1.0-cosab*cosab);
 				cba = cba / 2.0;
@@ -298,10 +298,10 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 			double cosab = 0.0; double cosac = 0.0;
 			double cosbc = 0.0; double sinab = 0.0;
 			double term = 0.0;
-			if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
 			{
 				ifa >> bba >> cba >> cosab >> cosac;
-				ModuleBase::GlobalFunc::READ_VALUE(ifa, cosbc);
+				READ_VALUE(ifa, cosbc);
 				sinab = sqrt(1.0-cosab*cosab);
 			}
 			latvec.e11 = 1.0; latvec.e12 = 0.0; latvec.e13 = 0.0;
@@ -342,9 +342,9 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 {
 	TITLE("UnitCell_pseudo","read_atom_positions");
 
-	if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifpos, "ATOMIC_POSITIONS"))
+	if( SCAN_BEGIN(ifpos, "ATOMIC_POSITIONS"))
 	{
-		ModuleBase::GlobalFunc::READ_VALUE( ifpos, Coordinate);
+		READ_VALUE( ifpos, Coordinate);
 		if(Coordinate != "Cartesian" 
 			&& Coordinate != "Direct" 
 			&& Coordinate != "Cartesian_angstrom"
@@ -385,7 +385,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 			// (1) read in atom label
 			// start magnetization
 			//=======================================
-			ModuleBase::GlobalFunc::READ_VALUE(ifpos, atoms[it].label);
+			READ_VALUE(ifpos, atoms[it].label);
 			bool found = false;
 			for(int it2=0; it2<ntype; it2++)
 			{
@@ -400,10 +400,10 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 				ofs_warning << " Lable from ATOMIC_SPECIES is " << this->atom_label[it] << std::endl;
 				return 0;
 			}
-			ModuleBase::GlobalFunc::OUT(ofs_running, "atom label",atoms[it].label);
+			OUT(ofs_running, "atom label",atoms[it].label);
 
 #ifndef __CMD
-			ModuleBase::GlobalFunc::READ_VALUE(ifpos, magnet.start_magnetization[it] );
+			READ_VALUE(ifpos, magnet.start_magnetization[it] );
 
 #ifndef __SYMMETRY
 			if(GlobalV::NSPIN==4)//added by zhengdy-soc
@@ -424,20 +424,20 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 					magnet.m_loc_[it].z = magnet.start_magnetization[it];
 				}
 
-				ModuleBase::GlobalFunc::OUT(ofs_running, "noncollinear magnetization_x",magnet.m_loc_[it].x);
-				ModuleBase::GlobalFunc::OUT(ofs_running, "noncollinear magnetization_y",magnet.m_loc_[it].y);
-				ModuleBase::GlobalFunc::OUT(ofs_running, "noncollinear magnetization_z",magnet.m_loc_[it].z);
+				OUT(ofs_running, "noncollinear magnetization_x",magnet.m_loc_[it].x);
+				OUT(ofs_running, "noncollinear magnetization_y",magnet.m_loc_[it].y);
+				OUT(ofs_running, "noncollinear magnetization_z",magnet.m_loc_[it].z);
 
-				ModuleBase::GlobalFunc::ZEROS(magnet.ux_ ,3);
+				ZEROS(magnet.ux_ ,3);
 			}
 			else if(GlobalV::NSPIN==2)
 			{
 				magnet.m_loc_[it].x = magnet.start_magnetization[it];
-				ModuleBase::GlobalFunc::OUT(ofs_running, "start magnetization",magnet.start_magnetization[it]);
+				OUT(ofs_running, "start magnetization",magnet.start_magnetization[it]);
 			}
 			else if(GlobalV::NSPIN==1)
 			{
-				ModuleBase::GlobalFunc::OUT(ofs_running, "start magnetization","FALSE");
+				OUT(ofs_running, "start magnetization","FALSE");
 			}
 
 			//===========================================
@@ -468,7 +468,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 					ifs >> word;
 					if (strcmp("Lmax", word) == 0)
 					{
-						ModuleBase::GlobalFunc::READ_VALUE(ifs, this->atoms[it].nwl);
+						READ_VALUE(ifs, this->atoms[it].nwl);
 						delete[] this->atoms[it].l_nchi;
 						this->atoms[it].l_nchi = new int[ this->atoms[it].nwl+1];
 					}
@@ -476,52 +476,52 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 
 					if (strcmp("Cutoff(a.u.)", word) == 0)         // pengfei Li 16-2-29
 					{
-						ModuleBase::GlobalFunc::READ_VALUE(ifs, this->atoms[it].Rcut);
+						READ_VALUE(ifs, this->atoms[it].Rcut);
 					}
 
 					if (strcmp("Sorbital-->", word) == 0)
 					{
-						ModuleBase::GlobalFunc::READ_VALUE(ifs, this->atoms[it].l_nchi[L]);
+						READ_VALUE(ifs, this->atoms[it].l_nchi[L]);
 						this->atoms[it].nw += (2*L + 1) * this->atoms[it].l_nchi[L];
 						std::stringstream ss;
 						ss << "L=" << L << ", number of zeta";
-						ModuleBase::GlobalFunc::OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
+						OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
 						L++;
 					}
 					if (strcmp("Porbital-->", word) == 0)
 					{
-						ModuleBase::GlobalFunc::READ_VALUE(ifs, this->atoms[it].l_nchi[L]);
+						READ_VALUE(ifs, this->atoms[it].l_nchi[L]);
 						this->atoms[it].nw += (2*L + 1) * this->atoms[it].l_nchi[L];
 						std::stringstream ss;
 						ss << "L=" << L << ", number of zeta";
-						ModuleBase::GlobalFunc::OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
+						OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
 						L++;
 					}
 					if (strcmp("Dorbital-->", word) == 0)
 					{
-						ModuleBase::GlobalFunc::READ_VALUE(ifs, this->atoms[it].l_nchi[L]);
+						READ_VALUE(ifs, this->atoms[it].l_nchi[L]);
 						this->atoms[it].nw += (2*L + 1) * this->atoms[it].l_nchi[L];
 						std::stringstream ss;
 						ss << "L=" << L << ", number of zeta";
-						ModuleBase::GlobalFunc::OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
+						OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
 						L++;
 					}
 					if (strcmp("Forbital-->", word) == 0)
 					{
-						ModuleBase::GlobalFunc::READ_VALUE(ifs, this->atoms[it].l_nchi[L]);
+						READ_VALUE(ifs, this->atoms[it].l_nchi[L]);
 						this->atoms[it].nw += (2*L + 1) * this->atoms[it].l_nchi[L];
 						std::stringstream ss;
 						ss << "L=" << L << ", number of zeta";
-						ModuleBase::GlobalFunc::OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
+						OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
 						L++;
 					}
 					if (strcmp("Gorbital-->", word) == 0)
 					{
-						ModuleBase::GlobalFunc::READ_VALUE(ifs, this->atoms[it].l_nchi[L]);
+						READ_VALUE(ifs, this->atoms[it].l_nchi[L]);
 						this->atoms[it].nw += (2*L + 1) * this->atoms[it].l_nchi[L];
 						std::stringstream ss;
 						ss << "L=" << L << ", number of zeta";
-						ModuleBase::GlobalFunc::OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
+						OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
 						L++;
 					}
 				}
@@ -549,7 +549,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 					this->atoms[it].nw += (2*L + 1) * this->atoms[it].l_nchi[L];
 					std::stringstream ss;
 					ss << "L=" << L << ", number of zeta";
-					ModuleBase::GlobalFunc::OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
+					OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
 				}
 			} // end basis type
 #endif
@@ -561,10 +561,10 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 			//=========================
 			// (3) read in atom number
 			//=========================
-			ModuleBase::GlobalFunc::READ_VALUE(ifpos, na);
+			READ_VALUE(ifpos, na);
 			this->atoms[it].na = na;
 
-			ModuleBase::GlobalFunc::OUT(ofs_running,"number of atom for this type",na);
+			OUT(ofs_running,"number of atom for this type",na);
 
 			this->nat += na;
 			if (na <= 0) 
@@ -585,10 +585,10 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
        			atoms[it].mbl = new Vector3<int>[na];
 				atoms[it].mag = new double[na];
 				atoms[it].mass = this->atom_mass[it]; //mohan add 2011-11-07 
-				ModuleBase::GlobalFunc::ZEROS(atoms[it].mag,na);
+				ZEROS(atoms[it].mag,na);
 				for (int ia = 0;ia < na; ia++)
 				{
- // modify the reading of frozen ions and velocities  -- Yuanbo Li 2021/8/5
+ // modify the reading of frozen ions and velocities  -- Yuanbo Li 2021/8/20
 					ifpos >> v.x >> v.y >> v.z;
                                         mv.x = true ;
                                         mv.y = true ;
@@ -596,27 +596,34 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
                                         atoms[it].vel[ia].set(0,0,0);
                                         string tmpid;
                                         tmpid = ifpos.get();
-                                        while ( (tmpid != "\n") && (ifpos.eof()==false) && (tmpid !="#") )
-                                        {
+                                       	while ( (tmpid != "\n") && (ifpos.eof()==false) && (tmpid !="#") )
+                                       	{
 						tmpid = ifpos.get() ;
-                                                ofs_running << "read char : ##"<<tmpid<<"##"<<endl;
-                                                if ( tmpid == "m" )
-                                                {
-                                                        ifpos >> mv.x >> mv.y >> mv.z ;
-                                                }
+						// old method of reading frozen ions
+						int tmp = (int)tmpid[0];
+						if ( tmp >= 48 && tmp <= 57 )
+						{
+							mv.x = std::stoi(tmpid);
+							ifpos >> mv.y >> mv.z ;
+						}
+						// new method of reading frozen ions and velocities
+                                               	if ( tmpid == "m" )
+                                               	{
+                                                  	ifpos >> mv.x >> mv.y >> mv.z ;
+                                               	}
                                                 else if ( tmpid == "v" )
-                                                {
-                                                        ifpos >> atoms[it].vel[ia].x >> atoms[it].vel[ia].y >> atoms[it].vel[ia].z;
-                                                }
-
+                                               	{
+                                                       	ifpos >> atoms[it].vel[ia].x >> atoms[it].vel[ia].y >> atoms[it].vel[ia].z;
+                                               	}
                                         }
+					
 					while ( (tmpid != "\n") && (ifpos.eof()==false) )
                                         {
                                                 tmpid = ifpos.get();
                                         }
 					string mags;
 					atoms[it].mag[ia] = 0.0;
-
+					
 					if(Coordinate=="Direct")
 					{
 						// change v from direct to cartesian,
@@ -706,7 +713,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 	} 
 
 	ofs_running << std::endl;
-	ModuleBase::GlobalFunc::OUT(ofs_running,"TOTAL ATOM NUMBER",nat);
+	OUT(ofs_running,"TOTAL ATOM NUMBER",nat);
 
 	// mohan add 2010-06-30	
 	//xiaohui modify 2015-03-15, cancel outputfile "STRU_READIN.xyz"
