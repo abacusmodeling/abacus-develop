@@ -19,7 +19,7 @@ class LCAO_Descriptor
 {
 
 //-------------------
-// public functions 
+// public functions
 //-------------------
 public:
 
@@ -63,6 +63,15 @@ public:
 	void print_H_V_delta(void);
 	void print_F_delta(void);
 
+	//----------------------------------------------------------------------
+	// print_descriptors: print descriptors based on LCAO basis
+	// print_H_V_delta: print the deltaV matrix in LCAO basis
+	// print_F_delta: print the force related to deltaV for each atom
+	//----------------------------------------------------------------------
+	void print_descriptor(void);
+	void print_H_V_delta(void);
+	void print_F_delta(void);
+
 	void cal_v_delta(const std::string& model_file);//<psi|V_delta|psi>
 	void cal_f_delta(matrix& dm);	//pytorch term remaining!
 	void print_H_V_delta();
@@ -81,13 +90,14 @@ public:
 
 
 //-------------------
-// public variables 
+// public variables
 //-------------------
 public:
 
 	//------------------------------------------------------
 	//E_delta: in Ry
-	//H_V_delta: correction term to the Hamiltonian matrix 
+	//H_V_delta: correction term to the Hamiltonian matrix
+
 	//F_delta: in Ry/Bohr, force due to the correction term
 	//------------------------------------------------------
 	double E_delta = 0.0;
@@ -106,7 +116,7 @@ private:
 	// deep neural network module that provides corrected Hamiltonian term and
 	// related derivatives.
 	torch::jit::script::Module module;
-	
+
 	//density matrix: dm_gamma
 	double* dm_double;
 	// overlap between lcao and descriptor basis

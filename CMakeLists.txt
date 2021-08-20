@@ -17,7 +17,9 @@ option(ENABLE_LIBXC "Enable LibXC functionality" OFF)
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 option(BUILD_UNIT_TESTS "Build ABACUS unit tests" OFF)
 option(GENERATE_TEST_REPORTS "Enable test report generation" OFF)
-option(USE_CUDA "Enable support to CUDA." ON)
+
+option(USE_CUDA "Enable support to CUDA." OFF)
+
 
 include(CheckLanguage)
 check_language(CUDA)
@@ -209,6 +211,20 @@ target_link_libraries(${ABACUS_BIN_NAME}
 if(ENABLE_DEEPKS)
   target_link_libraries(${ABACUS_BIN_NAME}
     ${TORCH_LIBRARIES}
+  )
+endif()
+
+if(USE_CUDA)
+  target_link_libraries(${ABACUS_BIN_NAME}
+    -lcufft
+    -lcublas
+    -lcudart
+  )
+  set_property(TARGET ${ABACUS_BIN_NAME}
+  PROPERTY CUDA_ARCHITECTURES
+  60 # P100
+  70 # V100
+  75 # T4
   )
 endif()
 

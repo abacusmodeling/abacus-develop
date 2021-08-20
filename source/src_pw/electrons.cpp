@@ -39,7 +39,32 @@ void Electrons::non_self_consistent(const int &istep)
 
     GlobalV::ofs_running << "\n End of Band Structure Calculation \n" << std::endl;
 
-    print_eigenvalue(GlobalV::ofs_running);
+
+    for (int ik = 0; ik < GlobalC::kv.nks; ik++)
+    {
+        if (GlobalV::NSPIN==2)
+        {
+            if (ik == 0) GlobalV::ofs_running << " spin up :" << std::endl;
+            if (ik == ( GlobalC::kv.nks / 2)) GlobalV::ofs_running << " spin down :" << std::endl;
+        }
+        //out.printV3(GlobalV::ofs_running, GlobalC::kv.kvec_c[ik]);
+
+        GlobalV::ofs_running << " k-points" << ik+1
+        << "(" << GlobalC::kv.nkstot << "): "
+        << GlobalC::kv.kvec_c[ik].x
+        << " " << GlobalC::kv.kvec_c[ik].y
+        << " " << GlobalC::kv.kvec_c[ik].z << std::endl;
+
+        for (int ib = 0; ib < GlobalV::NBANDS; ib++)
+        {
+            GlobalV::ofs_running << " spin" << GlobalC::kv.isk[ik]+1
+            << "_final_band " << ib+1
+            << " " << GlobalC::wf.ekb[ik][ib] * Ry_to_eV
+            << " " << GlobalC::wf.wg(ik, ib)*GlobalC::kv.nks << std::endl;
+        }
+        GlobalV::ofs_running << std::endl;
+    }
+
 
     // add by jingan in 2018.11.7
     if(GlobalV::CALCULATION == "nscf" && INPUT.towannier90)
@@ -69,7 +94,7 @@ void Electrons::self_consistent(const int &istep)
     timer::tick("Electrons","self_consistent");
 
 	// mohan update 2021-02-25
-	H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw); 
+	H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw);
 
     set_ethr();
 
@@ -78,7 +103,7 @@ void Electrons::self_consistent(const int &istep)
     if(GlobalV::OUT_LEVEL=="ie")
     {
         std::cout << std::setprecision(12);
-        std::cout<< " " << std::setw(7)<< "ITER"; // pengfei Li added 2015-1-31 
+        std::cout<< " " << std::setw(7)<< "ITER"; // pengfei Li added 2015-1-31
 
         if(GlobalV::NSPIN==2)
         {
@@ -115,7 +140,7 @@ void Electrons::self_consistent(const int &istep)
     // output the charge mixing data :
     // iteration && dr2.
     // std::stringstream ss;
-    // ss << GlobalV::global_out_dir << "ChargeMixing.dat"; 
+    // ss << GlobalV::global_out_dir << "ChargeMixing.dat";
     // std::ofstream ofs_mix;
 
     // if(GlobalV::MY_RANK==0)
@@ -126,7 +151,11 @@ void Electrons::self_consistent(const int &istep)
 
     for (this->iter = 1;iter <= GlobalV::NITER;iter++)
     {
-        Print_Info::print_scf(istep, iter);
+        GlobalV::ofs_running
+        << "\n PW ALGORITHM --------------- ION=" << std::setw(4) << istep + 1
+        << "  ELEC=" << std::setw(4) << iter
+        << "--------------------------------\n";
+
         // mohan add 2010-07-16
         if(iter==1) GlobalC::CHR.set_new_e_iteration(true);
         else GlobalC::CHR.set_new_e_iteration(false);
@@ -135,7 +164,7 @@ void Electrons::self_consistent(const int &istep)
 		// the clock is not accurate, needs to be fixed 2021-03-15 mohan
         clock_t start=std::clock();
 
-        //(1) set converged threshold, 
+        //(1) set converged threshold,
         // automatically updated during self consistency.
         //this->update_ethr(iter);
         if(GlobalV::FINAL_SCF && iter==1) GlobalV::ETHR = 1.0e-2;
@@ -151,17 +180,17 @@ void Electrons::self_consistent(const int &istep)
 		// mohan move harris functional to here, 2012-06-05
 		// use 'rho(in)' and 'v_h and v_xc'(in)
 		GlobalC::en.calculate_harris(1);
-	
+
 		// first_iter_again:					// Peize Lin delete 2019-05-01
-		
+
 		// calculate exact-exchange
 #ifdef __LCAO
 		switch(GlobalC::xcf.iexch_now)						// Peize Lin add 2019-03-09
 		{
 			case 5:    case 6:   case 9:
-				if( !GlobalC::exx_global.info.separate_loop )				
+				if( !GlobalC::exx_global.info.separate_loop )
 				{
-					GlobalC::exx_lip.cal_exx();			
+					GlobalC::exx_lip.cal_exx();
 				}
 				break;
 		}
@@ -170,7 +199,7 @@ void Electrons::self_consistent(const int &istep)
         // prepared fox mixing.
         GlobalC::CHR.save_rho_before_sum_band();
 
-		bool onescf = false; 
+		bool onescf = false;
     scf_step:
 		//(3) calculate band energy using cg or davidson method.
 		// output the new eigenvalues and wave functions.
@@ -192,14 +221,14 @@ void Electrons::self_consistent(const int &istep)
 
         // calculate the new eband here.
         GlobalC::CHR.sum_band();
-        
+
 
 		// add exx
 #ifdef __LCAO
 		GlobalC::en.set_exx();		// Peize Lin add 2019-03-09
 #endif
 
-		//(6) calculate the delta_harris energy 
+		//(6) calculate the delta_harris energy
 		// according to new charge density.
 		// mohan add 2009-01-23
 		GlobalC::en.calculate_harris(2);
@@ -213,7 +242,7 @@ void Electrons::self_consistent(const int &istep)
         //(7) compute magnetization, only for LSDA(spin==2)
         GlobalC::ucell.magnet.compute_magnetization();
 
-        //(8) deband is calculated from "output" charge density calculated 
+        //(8) deband is calculated from "output" charge density calculated
         // in sum_band
         // need 'rho(out)' and 'vr (v_h(in) and v_xc(in))'
         GlobalC::en.deband = GlobalC::en.delta_e();
@@ -227,7 +256,7 @@ void Electrons::self_consistent(const int &istep)
         {
             // tr2_min used only in first scf iteraton
             double diago_error = 0.0;
-            if(iter==1) 
+            if(iter==1)
             {
                 // if 'dr2 < GlobalV::ETHR * nelec' happen,
                 // in other word, 'dr2 < diago_error'
@@ -238,7 +267,7 @@ void Electrons::self_consistent(const int &istep)
             // if converged is achieved, or the self-consistent error(dr2)
             // is samller than the estimated error due to diagonalization(diago_error)
             // rhoin and rho are unchanged:
-            // rhoin contain the input charge density and 
+            // rhoin contain the input charge density and
             // rho contain the output charge density.
             // in other cases rhoin contains the mixed charge density
             // (the new input density) while rho is unchanged.
@@ -246,12 +275,12 @@ void Electrons::self_consistent(const int &istep)
 
             //if(GlobalV::MY_RANK==0)
             //{
-            //    ofs_mix << std::setw(5) << iter << std::setw(20) << dr2 << std::endl; 
+            //    ofs_mix << std::setw(5) << iter << std::setw(20) << dr2 << std::endl;
             //}
 
             if (iter==1 && !onescf)
             {
-                onescf = true;   
+                onescf = true;
                 if (dr2 < diago_error)
                 {
                     GlobalV::ofs_running << " Notice: Threshold on eigenvalues was too large.\n";
@@ -278,7 +307,7 @@ void Electrons::self_consistent(const int &istep)
             // band, using output charge density.
             // but E_Hartree and Exc(GlobalC::en.etxc) are calculated in v_of_rho above,
             // using the mixed charge density.
-            // so delta_escf corrects for this difference at first order. 
+            // so delta_escf corrects for this difference at first order.
             GlobalC::en.delta_escf();
         }
         else
@@ -341,7 +370,7 @@ void Electrons::self_consistent(const int &istep)
 
         if (conv_elec || iter==GlobalV::NITER)
         {
-            
+
             //--------------------------------------
             // output charge density for converged,
             // 0 means don't need to consider iter,
@@ -390,15 +419,18 @@ void Electrons::self_consistent(const int &istep)
 
             if(conv_elec)
             {
-                //GlobalV::ofs_running << " convergence is achieved" << std::endl;			
-                //GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl; 
-                GlobalV::ofs_running << "\n charge density convergence is achieved" << std::endl;
+
+                //GlobalV::ofs_running << " convergence is achieved" << std::endl;
+                //GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
+                GlobalV::ofs_running << " charge density convergence is achieved" << std::endl;
+
                 GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
             }
             else
             {
-                GlobalV::ofs_running << std::endl;
-                GlobalV::ofs_running << " convergence has NOT been achieved!" << std::endl;			
+
+                GlobalV::ofs_running << " convergence has NOT been achieved!" << std::endl;
+
             }
 
             if(GlobalV::OUT_LEVEL != "m") 
@@ -501,11 +533,11 @@ void Electrons::c_bands(const int &istep)
         clock_t finish=clock();
         const double duration = static_cast<double>(finish - start) / CLOCKS_PER_SEC;
 
-        GlobalV::ofs_running << " " << std::setw(8) 
-        << ik+1 << std::setw(15) 
+        GlobalV::ofs_running << " " << std::setw(8)
+        << ik+1 << std::setw(15)
         << avg_iter_k << std::setw(15) << duration << std::endl;
     }//End K Loop
-	
+
     //if (!LOCAL_BASIS) xiaohui modify 2013-09-02
     if(GlobalV::BASIS_TYPE=="pw") //xiaohui add 2013-09-02
     {

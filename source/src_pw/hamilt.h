@@ -28,7 +28,7 @@ class Hamilt
 
 	// generate H and S then call diagH_subspace
     void diagH_subspace(
-		const int ik, 
+		const int ik,
 		const int nstart,
 		const int nbnd,
 		const ComplexMatrix &psi,

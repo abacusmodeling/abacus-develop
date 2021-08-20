@@ -55,7 +55,7 @@ void Hamilt::diagH_pw(
 		}
 		else
 		{
-			GlobalV::ofs_warning << " The diago_type " << GlobalV::KS_SOLVER 
+			GlobalV::ofs_warning << " The diago_type " << GlobalV::KS_SOLVER
 				<< " not implemented yet." << std::endl; //xiaohui add 2013-09-02
 			WARNING_QUIT("Hamilt::diago","no implemt yet.");
 		}

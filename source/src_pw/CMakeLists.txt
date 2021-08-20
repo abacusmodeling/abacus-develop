@@ -59,13 +59,14 @@ list(APPEND objects
     xc_type.cpp
     run_md_pw.cpp)
 if(USE_CUDA)
-list(APPEND objects
-    diago_cg_gpu.cu
-    hamilt.cu
-)
+    list(APPEND objects
+        diago_cg_gpu.cu
+        hamilt.cu
+    )
 else()
-list(APPEND objects
-    hamilt.cpp
+    list(APPEND objects
+        hamilt.cpp
+
 )
 endif()
 

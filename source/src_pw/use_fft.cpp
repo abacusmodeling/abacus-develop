@@ -4,12 +4,12 @@
 
 Use_FFT::Use_FFT()
 {
-	porter = new std::complex<double>[GlobalC::pw.nrxx];	
+	porter = new std::complex<double>[GlobalC::pw.nrxx];
 }
 
 Use_FFT::~Use_FFT()
 {
-	delete[] porter;	
+	delete[] porter;
 }
 
 void Use_FFT::allocate(void)
@@ -68,7 +68,7 @@ void Use_FFT::RoundTrip(
 //     cufftHandle cufftplan_gpu;
 //     cufftPlan3d(&cufftplan_gpu, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
 //     cufftExecZ2Z(cufftplan_gpu, psic, psic, CUFFT_FORWARD);
-    
+
 //     int block2 = GlobalC::pw.nrxx / thread + 1;
 //     // kernel_roundtrip<<<block2, thread>>>(GlobalC::pw.nrxx, psic, vr);
 
@@ -149,7 +149,7 @@ void Use_FFT::ToRealSpace(const int &is, const ComplexMatrix &vg, matrix &vr)
 }
 
 
-// Fourer transform of vg, 
+// Fourer transform of vg,
 // then put vg into vr.
 void Use_FFT::ToRealSpace(const std::complex<double> *vg, double *vr)
 {
@@ -180,4 +180,3 @@ void Use_FFT::ToReciSpace(const double* vr, std::complex<double> *vg)
 	}
 	return;
 }
-

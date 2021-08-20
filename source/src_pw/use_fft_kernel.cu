@@ -73,7 +73,9 @@ void Reorder_psi_minus(CUFFT_COMPLEX *dst, CUFFT_COMPLEX *src)
     }
 }
 
-void UfftRoundtripKernel(const CUFFT_COMPLEX *psi, const double *vr, const int *fft_index, CUFFT_COMPLEX *psic)
+
+void RoundTrip(const CUFFT_COMPLEX *psi, const double *vr, const int *fft_index, CUFFT_COMPLEX *psic)
+
 {
     // (1) set value
     int thread = 512;
@@ -85,11 +87,12 @@ void UfftRoundtripKernel(const CUFFT_COMPLEX *psi, const double *vr, const int *
     // int *d_ismap;
     // cudaMalloc((void**)&d_ismap, GlobalC::pw.FFT_wfc.nst*sizeof(int));
     // cudaMemcpy(d_ismap, GlobalC::pw.FFT_wfc.ismap, GlobalC::pw.FFT_wfc.nst*sizeof(int), cudaMemcpyHostToDevice);
-    
+
+
     CUFFT_COMPLEX *ordered_psi;
     cudaMalloc((void**)&ordered_psi, GlobalC::pw.nrxx*sizeof(CUFFT_COMPLEX));
     cudaMemset(ordered_psi, 0, GlobalC::pw.nrxx*sizeof(CUFFT_COMPLEX));
-    
+
     Reorder_psi_plus(ordered_psi, psic);
 
     cufftHandle cufftplan_gpu;
@@ -106,20 +109,21 @@ void UfftRoundtripKernel(const CUFFT_COMPLEX *psi, const double *vr, const int *
     cufftPlan3d(&cufftplan_gpu2, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
     cufftExecZ2Z(cufftplan_gpu2, ordered_psi, ordered_psi, CUFFT_FORWARD);
     cufftDestroy(cufftplan_gpu2);
-    
+
     Reorder_psi_minus(psic, ordered_psi);
 
     int block3 = GlobalC::pw.nrxx / thread + 1;
     kernel_normalization<<<block3, thread>>>(GlobalC::pw.nrxx, psic, (double)(GlobalC::pw.nrxx));
 
     cudaFree(ordered_psi);
-/* 
+
+/*
+
     // todo: delete!
     // cout<<"size of ismap"<<GlobalC::pw.FFT_wfc.nst<<endl;
     // cout<<"nppz:"<<GlobalC::pw.FFT_wfc.npps[0]<<endl;
 
 
-    
     // cout<<"before fft1"<<endl;
     // complex<double> *psic_inside = new complex<double>[15];
     // cudaMemcpy(psic_inside, &psic[6000], 15*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
@@ -165,7 +169,7 @@ void UfftRoundtripKernel(const CUFFT_COMPLEX *psi, const double *vr, const int *
     //     cout<<vr_cpu[i]<<endl;
     // }
     // cout<<"==========="<<endl;
- 
+
     // kernel_roundtrip<<<block2, thread>>>(GlobalC::pw.nrxx, psic, vr);
 
     // cout<<"before fft2"<<endl;
@@ -196,7 +200,7 @@ void UfftRoundtripKernel(const CUFFT_COMPLEX *psi, const double *vr, const int *
 
     // int block3 = GlobalC::pw.nrxx / thread + 1;
     // kernel_normalization<<<block3, thread>>>(GlobalC::pw.nrxx, psic, (double)(GlobalC::pw.nrxx));
-    
+
     // complex<double> *psic_cpu = new complex<double>[GlobalC::pw.nrxx];
     // psic_cpu = new complex<double>[GlobalC::pw.nrxx];
     // cudaMemcpy(psic_cpu, psic, GlobalC::pw.nrxx*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
@@ -215,6 +219,6 @@ void UfftRoundtripKernel(const CUFFT_COMPLEX *psi, const double *vr, const int *
     // cout<<"rounftrip end"<<endl;
 
     // cout<<"fft dim: "<<GlobalC::pw.nx<<" "<<GlobalC::pw.ny<<" "<<GlobalC::pw.nz<<endl;
-*/    
+
     return;
 }

@@ -23,7 +23,7 @@ void Cell_PW::opt_cells_pw()
     // only allocate in the beginning of ELEC LOOP!
     //=====================
     GlobalC::hm.hpw.allocate(GlobalC::wf.npwx, GlobalV::NPOL, GlobalC::ppcell.nkb, GlobalC::pw.nrxx);
-    GlobalC::hm.hpw_gpu.allocate(GlobalC::wf.npwx, GlobalV::NPOL, GlobalC::ppcell.nkb, GlobalC::pw.nrxx);
+
     //=================================
     // initalize local pseudopotential
     //=================================
@@ -57,7 +57,7 @@ void Cell_PW::opt_cells_pw()
     {
         GlobalC::wf.wfcinit();
     }
-    
+
 #ifdef __LCAO
     switch (GlobalC::exx_global.info.hybrid_type) // Peize Lin add 2019-03-09
     {
@@ -81,6 +81,6 @@ void Cell_PW::opt_cells_pw()
 
     Ions ions;
     ions.opt_ions_pw();
-    
+
     timer::tick("Cell_PW", "opt_cells_pw");
 }
