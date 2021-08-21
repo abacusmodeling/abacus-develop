@@ -118,7 +118,7 @@ void Input::Default(void)
     nbands = 0;
 	nbands_sto = 0;
 	nbands_istate = 5;
-	seed = 0;
+	seed = 1;
 	nche_sto = 0;
 	seed_sto = 0;
 	stotype = "pw";
