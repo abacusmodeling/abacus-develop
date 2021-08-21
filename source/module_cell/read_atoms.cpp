@@ -588,8 +588,8 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 				ModuleBase::GlobalFunc::ZEROS(atoms[it].mag,na);
 				for (int ia = 0;ia < na; ia++)
 				{
- // modify the reading of frozen ions and velocities  -- Yuanbo Li 2021/8/5
-					ifpos >> v.x >> v.y >> v.z;
+ // modify the reading of frozen ions and velocities  -- Yuanbo Li 2021/8/20
+                                        ifpos >> v.x >> v.y >> v.z;
                                         mv.x = true ;
                                         mv.y = true ;
                                         mv.z = true ;
@@ -598,8 +598,15 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
                                         tmpid = ifpos.get();
                                         while ( (tmpid != "\n") && (ifpos.eof()==false) && (tmpid !="#") )
                                         {
-						tmpid = ifpos.get() ;
-                                                ofs_running << "read char : ##"<<tmpid<<"##"<<endl;
+                                                tmpid = ifpos.get() ;
+                                                // old method of reading frozen ions
+                                                int tmp = (int)tmpid[0];
+                                                if ( tmp >= 48 && tmp <= 57 )
+                                                {
+                                                        mv.x = std::stoi(tmpid);
+                                                        ifpos >> mv.y >> mv.z ;
+                                                }
+                                                // new method of reading frozen ions and velocities
                                                 if ( tmpid == "m" )
                                                 {
                                                         ifpos >> mv.x >> mv.y >> mv.z ;
@@ -608,7 +615,6 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
                                                 {
                                                         ifpos >> atoms[it].vel[ia].x >> atoms[it].vel[ia].y >> atoms[it].vel[ia].z;
                                                 }
-
                                         }
 					while ( (tmpid != "\n") && (ifpos.eof()==false) )
                                         {

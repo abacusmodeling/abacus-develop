@@ -301,7 +301,10 @@ void MD_basic::runNVE(int step1, double potential, Vector3<double> *force, const
             if(ionmbl[k].y==0)vel[k].y=0;
             if(ionmbl[k].z==0)vel[k].z=0;
         }
-        mdf.scalevel(ucell.nat, nfrozen_, temperature_, vel, allmass);
+	if (ucell.set_vel==false)   // Yuanbo Li 2021/8/20
+	{
+	mdf.scalevel(ucell.nat, nfrozen_, temperature_, vel, allmass);
+	}
     }
     double twiceKE=mdf.GetAtomKE(ucell.nat, vel, allmass);
     twiceKE = twiceKE * 2;
