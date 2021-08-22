@@ -358,10 +358,10 @@ matrix Numerical_Basis::cal_ylm(const std::vector<Vector3<double>> &gk)
     return ylm;
 }
 
-std::vector<IntArray> Numerical_Basis::init_mu_index(void)
+std::vector<ModuleBase::IntArray> Numerical_Basis::init_mu_index(void)
 {
 	GlobalV::ofs_running << " Initialize the mu index" << std::endl;
-    std::vector<IntArray> mu_index_(GlobalC::ucell.ntype);
+    std::vector<ModuleBase::IntArray> mu_index_(GlobalC::ucell.ntype);
 
     int mu = 0;
     for (int it=0; it<GlobalC::ucell.ntype; it++)

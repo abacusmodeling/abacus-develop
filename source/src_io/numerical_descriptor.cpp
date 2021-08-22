@@ -315,7 +315,7 @@ void Numerical_Descriptor::init_mu_index(void)
 	GlobalV::ofs_running << " Initialize the mu index for deepks" << std::endl;
 	GlobalV::ofs_running << " lmax = " << this->lmax << std::endl;
 	GlobalV::ofs_running << " nmax = " << this->nmax << std::endl;
-    Numerical_Descriptor::mu_index = new IntArray[GlobalC::ucell.ntype];
+    Numerical_Descriptor::mu_index = new ModuleBase::IntArray[GlobalC::ucell.ntype];
 
 	assert(lmax>=0);
 	assert(nmax>0);

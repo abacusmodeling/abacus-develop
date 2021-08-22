@@ -87,7 +87,7 @@ private:
 	int* nchi;
 	int total_nchi;
 	int max_nchi;
-	IntArray find_chi;
+	ModuleBase::IntArray find_chi;
 	double rcut;
 
 	Numerical_Orbital_Lm* phiLN;// length: total_nchi (only store radial function )

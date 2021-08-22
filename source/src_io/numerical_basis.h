@@ -27,8 +27,8 @@ class Numerical_Basis
 
 	Bessel_Basis bessel_basis;
 
-	std::vector<IntArray> mu_index;
-	static std::vector<IntArray> init_mu_index(void);
+	std::vector<ModuleBase::IntArray> mu_index;
+	static std::vector<ModuleBase::IntArray> init_mu_index(void);
 
 	void numerical_atomic_wfc(const int &ik,const int &np,ModuleBase::ComplexMatrix &psi);
 

@@ -31,7 +31,7 @@ public:
 
 	void init_DS_2Lplus1(void);
 
-	IntArray DS_Opair;
+	ModuleBase::IntArray DS_Opair;
 
 	int *DS_2Lplus1;
 

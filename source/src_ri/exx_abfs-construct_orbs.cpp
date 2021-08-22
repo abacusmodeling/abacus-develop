@@ -344,9 +344,9 @@ std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_O
 	for( int T=0; T!=psis.size(); ++T )
 	{
 		const Numerical_Orbital_Lm &orb = orbs[T][0][0];
-		Gram_Schmidt_Orth<double,double> gso(
+		ModuleBase::Gram_Schmidt_Orth<double,double> gso(
 			orb.get_rab(),
-			Gram_Schmidt_Orth<double,double>::Coordinate::Sphere );
+			ModuleBase::Gram_Schmidt_Orth<double,double>::Coordinate::Sphere );
 		psis_orth[T].resize( psis[T].size() );
 		for( int L=0; L!=psis[T].size(); ++L )
 		{

@@ -19,7 +19,7 @@ class WF_igk
 	//---------------------------------------------------
     int npwx;
     int npw;
-    IntArray igk;
+    ModuleBase::IntArray igk;
     double *g2kin;
 
 	public:

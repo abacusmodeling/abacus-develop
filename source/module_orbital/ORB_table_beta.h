@@ -33,9 +33,9 @@ class ORB_table_beta
     void init_NL_Opair(LCAO_Orbitals &orb);
 
 	int NL_nTpairs;
-	IntArray NL_Tpair;
-	IntArray NL_Opair;
-	IntArray NL_L2plus1;
+	ModuleBase::IntArray NL_Tpair;
+	ModuleBase::IntArray NL_Opair;
+	ModuleBase::IntArray NL_L2plus1;
 
 	void init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB);
 
