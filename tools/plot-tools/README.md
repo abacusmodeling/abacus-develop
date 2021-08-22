@@ -31,12 +31,12 @@ First, prepare a json file e.g. band-input.json:
 ```
 |Property|Type|Note|
 |:--:|:--:|:--:|
-|*filename*|`str | List[str]`|Bands data file output from ABACUS|
-|*efermi*|`float | List[float]`|Fermi level in eV|
+|*filename*|`str` or `List[str]`|Bands data file output from ABACUS|
+|*efermi*|`float` or `List[float]`|Fermi level in eV|
 |*energy_range*|`list`| Range of energy in eV|
 |*kptfile*|`str`|K-points file in ABACUS format|
-|*label*|`str | List[str]`|Label of band structure|
-|*color*|`str | List[str]`|Color of band structure|
+|*label*|`str` or `List[str]`|Label of band structure|
+|*color*|`str` or `List[str]`|Color of band structure|
 The *kptfile* should be as follows, and notes after `#` will be set as k-points label automatically.
 ```shell
 K_POINTS
@@ -95,7 +95,7 @@ If you only want to plot total DOS, you can modify `pdosfile` to `tdosfile` and 
 |*pdosfile*|`str`|Partial DOS data file output from ABACUS in xml format|
 |*efermi*|`float`|Fermi level in eV|
 |*energy_range*|`list`| Range of energy in eV|
-|*species*|`List[str] | Dict[str, List[int]] | Dict[str, Dict[str, List[int]]]]`| Three ways to plot partial DOS e.g. ["C", "Si"], {"C":[0, 1], "Si":[0]}, ["C":{"0":[0]}, "Si":{"1":[0, 1]}]|
+|*species*|`List[str]` or `Dict[str, List[int]]` or `Dict[str, Dict[str, List[int]]]]`| Three ways to plot partial DOS e.g. ["C", "Si"], {"C":[0, 1], "Si":[0]}, ["C":{"0":[0]}, "Si":{"1":[0, 1]}]|
 |*tdosfig*|`str`|Output picture of total DOS|
 |*pdosfig*|`str`|Output picture of partial DOS|
 Then, the following command will plot both total DOS and partial DOS:
