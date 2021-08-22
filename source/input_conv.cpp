@@ -21,6 +21,7 @@
 #include "src_lcao/FORCE_STRESS.h"
 #include "src_lcao/local_orbital_charge.h"
 #include "src_lcao/ELEC_evolve.h"
+#include "src_lcao/dftu.h"
 #endif
 
 void Input_Conv::Convert(void)
@@ -302,6 +303,19 @@ void Input_Conv::Convert(void)
 		GlobalC::epsilon0_vasp.domega = INPUT.domega;
 		GlobalC::epsilon0_vasp.nomega = INPUT.nomega;
 		GlobalC::epsilon0_vasp.eta = INPUT.eta;
+	}
+
+	if(INPUT.dft_plus_u)
+	{
+		GlobalC::dftu.dftu_type = INPUT.dftu_type;
+		GlobalC::dftu.double_counting = INPUT.double_counting;
+		GlobalC::dftu.Yukawa = INPUT.yukawa_potential;
+		GlobalC::dftu.omc=INPUT.omc;
+		if(!INPUT.yukawa_potential)
+		{
+			GlobalC::dftu.U = INPUT.hubbard_u;            //Hubbard Coulomb interaction parameter U(ev)
+			GlobalC::dftu.J = INPUT.hund_j;               //Hund exchange parameter J(ev)
+		}
 	}
 
 //--------------------------------------------

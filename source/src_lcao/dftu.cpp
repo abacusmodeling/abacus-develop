@@ -84,8 +84,7 @@ void DFTU::init(
 	const int nlocal = GlobalV::NLOCAL; // number of total local orbitals
 	const int nks = GlobalC::kv.nks; // number of k-points
 	const int nspin = GlobalV::NSPIN; // number of spins
-	const int dftu_type = INPUT.dftu_type;
-	const int double_counting = INPUT.double_counting;
+	
 	
 
 	if(dftu_type==1 && double_counting==1) cal_type = 1;
@@ -210,7 +209,7 @@ void DFTU::init(
 		}	
 	}
 
-	this->Yukawa = INPUT.yukawa_potential;
+	
  	if(Yukawa)
  	{
 		this->Fk.resize(cell.ntype);
@@ -247,11 +246,6 @@ void DFTU::init(
 			}			 	
 		}
  	}
-	else
-	{
-		this->U = INPUT.hubbard_u;            //Hubbard Coulomb interaction parameter U(ev)
-		this->J = INPUT.hund_j;               //Hund exchange parameter J(ev)
-	}
 
 	if(GlobalV::CALCULATION=="nscf")
 	{
@@ -262,7 +256,7 @@ void DFTU::init(
 	}
 	else
 	{
-		if(INPUT.omc) 
+		if(omc) 
 		{
 			std::stringstream sst; 
 			sst << "initial_onsite.dm"; 
@@ -270,7 +264,7 @@ void DFTU::init(
 			this->local_occup_bcast();
 		}
 	}
-
+	Memory::record("DFTU","locale",GlobalV::NLOCAL*GlobalV::NLOCAL,"double");
 	//this->out_numorb();
 
   //GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__ << std::endl;
