@@ -18,7 +18,7 @@
     
 }*/
 
-void WF_io::write_wfc(const std::string &fn, const ComplexMatrix *psi)
+void WF_io::write_wfc(const std::string &fn, const ModuleBase::ComplexMatrix *psi)
 {
     if (GlobalV::test_wf) TITLE("WF_io","write_wfc");
 
@@ -53,7 +53,7 @@ void WF_io::write_wfc(const std::string &fn, const ComplexMatrix *psi)
     return;
 }
 
-void WF_io::write_wfc2(const std::string &fn, const ComplexMatrix *psi, const Vector3<double> *gkk)
+void WF_io::write_wfc2(const std::string &fn, const ModuleBase::ComplexMatrix *psi, const Vector3<double> *gkk)
 {
     if (GlobalV::test_wf) TITLE("WF_io","write_wfc2"); 
 
@@ -64,7 +64,7 @@ void WF_io::write_wfc2(const std::string &fn, const ComplexMatrix *psi, const Ve
         std::stringstream wfss;
         if(GlobalC::wf.out_wf==1)
             wfss<<fn<<ik+1<<".txt";
-        else
+        else if(GlobalC::wf.out_wf==2)
         {
             wfss<<fn<<ik+1<<".dat";
         }
@@ -76,7 +76,7 @@ void WF_io::write_wfc2(const std::string &fn, const ComplexMatrix *psi, const Ve
                 std::ofstream ofs(wfss.str().c_str()); //clear all wavefunc files.
                 ofs.close();
             }
-            else
+            else if(GlobalC::wf.out_wf==2)
             {
                 Rwstream wfs(wfss.str(),"w");
                 wfs.close();
@@ -146,7 +146,7 @@ void WF_io::write_wfc2(const std::string &fn, const ComplexMatrix *psi, const Ve
                         }
 						ofs2.close();
                     }
-                    else
+                    else if(GlobalC::wf.out_wf==2)
                     {
                         Rwstream wfs2( wfilename[ikstot],"a");
                         if(id==0)
@@ -203,7 +203,7 @@ void WF_io::write_wfc2(const std::string &fn, const ComplexMatrix *psi, const Ve
                             if(id==GlobalV::NPROC_IN_POOL-1)   ofs2 << "\n< Band "<<ib+1 <<" >" <<std::endl; 
 							ofs2.close();
                         }
-                        else
+                        else if(GlobalC::wf.out_wf==2)
                         {
                             Rwstream wfs2(wfilename[ikstot],"a");
                             if(id==0) wfs2<<ikngtot*16;

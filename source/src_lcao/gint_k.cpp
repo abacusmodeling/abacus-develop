@@ -50,7 +50,7 @@ void Gint_k::allocate_pvpR(void)
 		for(int is =0;is<GlobalV::NSPIN;is++)
 		{
 			this->pvpR_reduced[is] = new double[GlobalC::LNNR.nnrg];	
-			ZEROS( pvpR_reduced[is], GlobalC::LNNR.nnrg);
+			ModuleBase::GlobalFunc::ZEROS( pvpR_reduced[is], GlobalC::LNNR.nnrg);
 		}
 
 		double mem = Memory::record("allocate_pvpR", "pvpR_reduced", GlobalC::LNNR.nnrg * GlobalV::NSPIN , "double");
@@ -94,7 +94,7 @@ void Gint_k::allocate_pvpR(void)
 		const int LDIM=GlobalC::GridT.lgd*GlobalC::GridT.nutot;
 
 		this->pvpR_pool = new double[LDIM*LDIM];
-		ZEROS(pvpR_pool, LDIM*LDIM);
+		ModuleBase::GlobalFunc::ZEROS(pvpR_pool, LDIM*LDIM);
 
 		this->pvpR = new double*[LDIM];
 		for(int i=0; i<LDIM; i++)
@@ -168,9 +168,9 @@ void Gint_k::folding_force(
 			ppx[i] = new double[lgd];
 			ppy[i] = new double[lgd];
 			ppz[i] = new double[lgd];
-			ZEROS( ppx[i], lgd);
-			ZEROS( ppy[i], lgd);
-			ZEROS( ppz[i], lgd);
+			ModuleBase::GlobalFunc::ZEROS( ppx[i], lgd);
+			ModuleBase::GlobalFunc::ZEROS( ppy[i], lgd);
+			ModuleBase::GlobalFunc::ZEROS( ppz[i], lgd);
 		}
 	}
 	
@@ -247,7 +247,7 @@ void Gint_k::folding_force(
 	double* tmp = new double[GlobalV::NLOCAL*3];
 	for(int i=0; i<GlobalV::NLOCAL; ++i)
 	{
-		ZEROS(tmp, 3*GlobalV::NLOCAL);
+		ModuleBase::GlobalFunc::ZEROS(tmp, 3*GlobalV::NLOCAL);
 		const int mug = GlobalC::GridT.trace_lo[i];
 		// if the row element is on this processor
 		if(mug>=0)
@@ -363,22 +363,22 @@ void Gint_k::folding_stress(
 			ppx[i] = new double[lgd];
 			ppy[i] = new double[lgd];
 			ppz[i] = new double[lgd];
-			ZEROS( ppx[i], lgd);
-			ZEROS( ppy[i], lgd);
-			ZEROS( ppz[i], lgd);
+			ModuleBase::GlobalFunc::ZEROS( ppx[i], lgd);
+			ModuleBase::GlobalFunc::ZEROS( ppy[i], lgd);
+			ModuleBase::GlobalFunc::ZEROS( ppz[i], lgd);
 
 			pp11[i] = new double[lgd];
 			pp22[i] = new double[lgd];
 			pp33[i] = new double[lgd];
-			ZEROS( pp11[i], lgd);
-			ZEROS( pp22[i], lgd);
-			ZEROS( pp33[i], lgd);
+			ModuleBase::GlobalFunc::ZEROS( pp11[i], lgd);
+			ModuleBase::GlobalFunc::ZEROS( pp22[i], lgd);
+			ModuleBase::GlobalFunc::ZEROS( pp33[i], lgd);
 			pp12[i] = new double[lgd];
 			pp13[i] = new double[lgd];
 			pp23[i] = new double[lgd];
-			ZEROS( pp12[i], lgd);
-			ZEROS( pp13[i], lgd);
-			ZEROS( pp23[i], lgd);
+			ModuleBase::GlobalFunc::ZEROS( pp12[i], lgd);
+			ModuleBase::GlobalFunc::ZEROS( pp13[i], lgd);
+			ModuleBase::GlobalFunc::ZEROS( pp23[i], lgd);
 
 		}
 	}
@@ -482,8 +482,8 @@ void Gint_k::folding_stress(
 	double* tmp1 = new double[GlobalV::NLOCAL*6];
 	for(int i=0; i<GlobalV::NLOCAL; ++i)
 	{
-		ZEROS(tmp, 3*GlobalV::NLOCAL);
-		ZEROS(tmp1, 6*GlobalV::NLOCAL);
+		ModuleBase::GlobalFunc::ZEROS(tmp, 3*GlobalV::NLOCAL);
+		ModuleBase::GlobalFunc::ZEROS(tmp1, 6*GlobalV::NLOCAL);
 		const int mug = GlobalC::GridT.trace_lo[i];
 		// if the row element is on this processor
 		if(mug>=0)
@@ -601,7 +601,7 @@ void Gint_k::folding_vl_k(const int &ik)
 	for(int i=0; i<GlobalC::GridT.lgd; i++)
 	{
 		this->pvp[i] = new std::complex<double>[GlobalC::GridT.lgd];
-		ZEROS( this->pvp[i], GlobalC::GridT.lgd);
+		ModuleBase::GlobalFunc::ZEROS( this->pvp[i], GlobalC::GridT.lgd);
 	}
 
 	if(!reduced)
@@ -771,7 +771,7 @@ void Gint_k::folding_vl_k(const int &ik)
 	for (int i=0; i<GlobalV::NLOCAL; i++)
 	{
 		tmp = new std::complex<double>[GlobalV::NLOCAL];
-		ZEROS(tmp, GlobalV::NLOCAL);
+		ModuleBase::GlobalFunc::ZEROS(tmp, GlobalV::NLOCAL);
 		const int mug = GlobalC::GridT.trace_lo[i];
 		// if the row element is on this processor.
 		if (mug >= 0)
@@ -848,7 +848,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 		for(int i=0; i<GlobalC::GridT.lgd; i++)
 		{
 			pvp_nc[spin][i] = new std::complex<double>[GlobalC::GridT.lgd];
-			ZEROS( this->pvp_nc[spin][i], GlobalC::GridT.lgd);
+			ModuleBase::GlobalFunc::ZEROS( this->pvp_nc[spin][i], GlobalC::GridT.lgd);
 		}
 	}
 
@@ -1029,7 +1029,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 	for (int i=0; i<GlobalV::NLOCAL; i++)
 	{
 		tmp = new std::complex<double>[GlobalV::NLOCAL];
-		ZEROS(tmp, GlobalV::NLOCAL);
+		ModuleBase::GlobalFunc::ZEROS(tmp, GlobalV::NLOCAL);
 		const int mug = GlobalC::GridT.trace_lo[i];
 		const int mug0 = mug/GlobalV::NPOL;
 		// if the row element is on this processor.
@@ -1279,7 +1279,7 @@ void Gint_k::allocate_pvpR_tr(void)
                         pvpR_tr[ix][iy][iz][iw] = new double[GlobalC::GridT.lgd];
 //do    uble mem = Memory::record("allocate_pvpR_tr", "pvpR_tr[ix][iy][iz][iw]", GlobalC::GridT.lgd , "double");
 //co    ut<<" Memory of pvpR_tr[ix][iy][iz][iw]: "<<mem<<" MB"<<std::endl;
-                        ZEROS(pvpR_tr[ix][iy][iz][iw], GlobalC::GridT.lgd);
+                        ModuleBase::GlobalFunc::ZEROS(pvpR_tr[ix][iy][iz][iw], GlobalC::GridT.lgd);
                     }
                 }
             }
@@ -1302,7 +1302,7 @@ void Gint_k::allocate_pvpR_tr(void)
                         pvpR_tr_soc[ix][iy][iz][iw] = new std::complex<double>[GlobalC::GridT.lgd];
 //do    uble mem = Memory::record("allocate_pvpR_tr", "pvpR_tr[ix][iy][iz][iw]", GlobalC::GridT.lgd , "double");
 //co    ut<<" Memory of pvpR_tr[ix][iy][iz][iw]: "<<mem<<" MB"<<std::endl;
-                        ZEROS(pvpR_tr_soc[ix][iy][iz][iw], GlobalC::GridT.lgd);
+                        ModuleBase::GlobalFunc::ZEROS(pvpR_tr_soc[ix][iy][iz][iw], GlobalC::GridT.lgd);
                     }
                 }
             }
@@ -1385,12 +1385,12 @@ void Gint_k::distribute_pvpR_tr(void)
                     if(GlobalV::NSPIN!=4)
                     {
                         tmp = new double[GlobalV::NLOCAL];
-                        ZEROS(tmp, GlobalV::NLOCAL);
+                        ModuleBase::GlobalFunc::ZEROS(tmp, GlobalV::NLOCAL);
                     }
                     else
                     {
                         tmp_soc = new std::complex<double>[GlobalV::NLOCAL];
-                        ZEROS(tmp_soc, GlobalV::NLOCAL);
+                        ModuleBase::GlobalFunc::ZEROS(tmp_soc, GlobalV::NLOCAL);
                     }
 
                     const int mug = GlobalC::GridT.trace_lo[i];
@@ -1704,12 +1704,12 @@ void Gint_k::distribute_pvpR_sparseMatrix(const double &sparse_threshold)
 					if (GlobalV::NSPIN != 4)
 					{
 						tmp = new double[GlobalV::NLOCAL];
-						ZEROS(tmp, GlobalV::NLOCAL);
+						ModuleBase::GlobalFunc::ZEROS(tmp, GlobalV::NLOCAL);
 					}
 					else
 					{
 						tmp_soc = new std::complex<double>[GlobalV::NLOCAL];
-						ZEROS(tmp_soc, GlobalV::NLOCAL);
+						ModuleBase::GlobalFunc::ZEROS(tmp_soc, GlobalV::NLOCAL);
 					}
 
 					if(GlobalC::GridT.trace_lo[row] >= 0)

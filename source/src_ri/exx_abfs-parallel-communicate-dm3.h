@@ -21,7 +21,7 @@ private:
 	template<typename Tmatrix> std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>>
 		K_to_R(const std::vector<Tmatrix> &DK_2D, const double threshold_D) const;
 	const matrix &D_phase( const matrix &DK, const int ik, const Abfs::Vector3_Order<int> &box2) const;	
-	matrix D_phase( const ComplexMatrix &DK, const int ik, const Abfs::Vector3_Order<int> &box2) const;	
+	matrix D_phase( const ModuleBase::ComplexMatrix &DK, const int ik, const Abfs::Vector3_Order<int> &box2) const;	
 //	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>>
 //		allreduce(const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &DR_a2D);
 

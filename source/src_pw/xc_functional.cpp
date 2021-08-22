@@ -135,7 +135,7 @@ void XC_Functional::xc(const double &rho, double &ex, double &ec, double &vx, do
 			vx = 0.75 * vx;
 			break;
 		case 9:
-			throw std::domain_error("HSE unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::domain_error("HSE unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 			break;
 		default:
 			ex = vx = 0.0;
@@ -204,7 +204,7 @@ void XC_Functional::xc_spin(const double &rho, const double &zeta,
 			vxdw = 0.75 * vxdw;
 			break;
 		case 9:
-			throw std::domain_error("HSE unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	break;
+			throw std::domain_error("HSE unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));	break;
 		default:
 			ex = vxup = vxdw =0.0;
 	}
@@ -809,6 +809,8 @@ void XC_Functional::pbec(const double &rho, const double &grho, const int &iflag
 	return;
 }
 
+//tau_xc and tau_xc_spin: interface for calling xc_mgga_exc_vxc from LIBXC
+//XC_POLARIZED, XC_UNPOLARIZED: internal flags used in LIBXC, denote the polarized(nspin=1) or unpolarized(nspin=2) calculations, definition can be found in xc.h from LIBXC
 #ifdef USE_LIBXC
 void XC_Functional::tau_xc(const double &rho, const double &grho, const double &atau, double &sx, double &sc,
           double &v1x, double &v2x, double &v3x, double &v1c, double &v2c, double &v3c)
@@ -850,6 +852,69 @@ void XC_Functional::tau_xc(const double &rho, const double &grho, const double &
 	{
 		WARNING_QUIT("tau_xc","functional not implemented yet");
 	}
+	return;
+}
+
+void XC_Functional::tau_xc_spin(const double &rhoup, const double &rhodw, const Vector3<double> &grhoup, const Vector3<double> &grhodw, const double &tauup, const double &taudw, double &sx, double &sc,
+          double &v1xup, double &v1xdw, double &v2xup, double &v2xdw, double &v3xup, double &v3xdw, double &v1cup, double &v1cdw, Vector3<double> &v2cup, Vector3<double> &v2cdw, double &v3cup, double &v3cdw)
+{
+//initialize X and C functionals
+	xc_func_type x_func;
+	xc_func_type c_func;
+	const int xc_polarized = XC_POLARIZED;
+
+	vector<double> rho, grho2, tau, v1x, v2x, v3x;
+	vector<double> v1c, v2c, v3c, lapl_rho, vlapl_rho;
+
+	rho.resize(2); grho2.resize(3); tau.resize(2);
+	v1x.resize(2); v2x.resize(3); v3x.resize(2);
+	v1c.resize(3); v2c.resize(3); v3c.resize(2);
+	lapl_rho.resize(6); vlapl_rho.resize(6);
+
+	rho[0]=rhoup; rho[1]=rhodw;
+	grho2[0]=grhoup*grhoup; grho2[1]=grhoup*grhodw; grho2[2]=grhodw*grhodw;
+	tau[0]=tauup; tau[1]=taudw;
+
+//exchange
+    if (GlobalC::xcf.igcx_now == 13)
+	{
+		xc_func_init(&x_func, 263 ,xc_polarized);
+		xc_mgga_exc_vxc(&x_func,1,rho.data(),grho2.data(),lapl_rho.data(),tau.data(),&sx,v1x.data(),v2x.data(),vlapl_rho.data(),v3x.data());
+		xc_func_end(&x_func);
+	}
+	else
+	{
+		WARNING_QUIT("tau_xc_spin","functional not implemented yet");
+	}
+
+//correlation
+	if(GlobalC::xcf.igcc_now == 9)
+	{
+		xc_func_init(&c_func, 267 ,xc_polarized);
+		xc_mgga_exc_vxc(&c_func,1,rho.data(),grho2.data(),lapl_rho.data(),tau.data(),&sc,v1c.data(),v2c.data(),vlapl_rho.data(),v3c.data());
+		xc_func_end(&c_func);
+	}
+	else
+	{
+		WARNING_QUIT("tau_xc_spin","functional not implemented yet");
+	}
+
+	sx = sx * (rho[0]+rho[1]);
+	v1xup = v1x[0];
+	v2xup = v2x[0] * 2.0;
+	v3xup = v3x[0];
+	v1xdw = v1x[1];
+	v2xdw = v2x[2] * 2.0;
+	v3xdw = v3x[1];
+
+	sc = sc * (rho[0]+rho[1]);
+	v1cup = v1c[0];
+	v3cup = v3c[0];
+	v1cdw = v1c[1];
+	v3cdw = v3c[1];
+
+	v2cup = v2c[0]*grhoup*2.0 + v2c[1]*grhodw;
+	v2cdw = v2c[2]*grhodw*2.0 + v2c[1]*grhoup;
 	return;
 }
 #endif
@@ -935,13 +1000,13 @@ void XC_Functional::gcxc(const double &rho, const double &grho, double &sx, doub
 	else if (GlobalC::xcf.igcx_now == 12)
 	{
 		// HSE
-		throw std::domain_error("HSE unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw std::domain_error("HSE unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
 	else if (GlobalC::xcf.igcx_now == 13)
 	{
 		//SCAN
 		cout << "to use SCAN, please link LIBXC" << endl;
-		throw domain_error("Check "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw domain_error("Check "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
     else
     {
@@ -985,7 +1050,7 @@ void XC_Functional::gcxc(const double &rho, const double &grho, double &sx, doub
 	{
 		//SCAN
 		cout << "to use SCAN, please link LIBXC" << endl;
-		throw domain_error("Check "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw domain_error("Check "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
     else
     {

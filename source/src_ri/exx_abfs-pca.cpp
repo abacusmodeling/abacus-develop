@@ -22,18 +22,18 @@ std::vector<std::vector<std::pair<std::vector<double>,matrix>>> Exx_Abfs::PCA::c
 	const double kmesh_times )
 {
 	TITLE("Exx_Abfs::PCA::cal_PCA");
-std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
+std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 	
-	const Element_Basis_Index::Range
+	const ModuleBase::Element_Basis_Index::Range
 		&& range_lcaos = Exx_Abfs::Abfs_Index::construct_range( lcaos );
-	const Element_Basis_Index::IndexLNM
-		&& index_lcaos = Element_Basis_Index::construct_index( range_lcaos );
+	const ModuleBase::Element_Basis_Index::IndexLNM
+		&& index_lcaos = ModuleBase::Element_Basis_Index::construct_index( range_lcaos );
 
-	const Element_Basis_Index::Range
+	const ModuleBase::Element_Basis_Index::Range
 		&& range_abfs = Exx_Abfs::Abfs_Index::construct_range( abfs );
-	const Element_Basis_Index::IndexLNM
-		&& index_abfs = Element_Basis_Index::construct_index( range_abfs );
+	const ModuleBase::Element_Basis_Index::IndexLNM
+		&& index_abfs = ModuleBase::Element_Basis_Index::construct_index( range_abfs );
 		
 ofs<<range_lcaos<<std::endl;
 ofs<<range_abfs<<std::endl;
@@ -89,7 +89,7 @@ ofs<<range_abfs<<std::endl;
 			
 			int info;
 gettimeofday( &t_start, NULL);
-			LapackConnector::dsyev( 'V', 'U', mm, VECTOR_TO_PTR(eig_value), info );
+			LapackConnector::dsyev( 'V', 'U', mm, ModuleBase::GlobalFunc::VECTOR_TO_PTR(eig_value), info );
 ofs<<"TIME@LapackConnector::dsyev\t"<<time_during(t_start)<<std::endl;
 			if( info )
 			{
@@ -114,8 +114,8 @@ matrix Exx_Abfs::PCA::get_sub_matrix(
 	const matrix & m,
 	const size_t & T,
 	const size_t & L,
-	const Element_Basis_Index::Range & range,
-	const Element_Basis_Index::IndexLNM & index )
+	const ModuleBase::Element_Basis_Index::Range & range,
+	const ModuleBase::Element_Basis_Index::IndexLNM & index )
 {
 	TITLE("Exx_Abfs::PCA::get_sub_matrix");
 	

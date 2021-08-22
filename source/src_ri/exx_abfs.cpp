@@ -46,10 +46,10 @@ void Exx_Abfs::test_all() const
 		for( size_t T=0; T!=abfs.size(); ++T )
 			Lmax = std::max( Lmax, static_cast<int>(abfs[T].size())-1 );
 
-		const Element_Basis_Index::Range
+		const ModuleBase::Element_Basis_Index::Range
 			&&range_abfs = Abfs_Index::construct_range( abfs );
-		const Element_Basis_Index::IndexLNM
-			&&index_abfs = Element_Basis_Index::construct_index( range_abfs );
+		const ModuleBase::Element_Basis_Index::IndexLNM
+			&&index_abfs = ModuleBase::Element_Basis_Index::construct_index( range_abfs );
 
 		Matrix_Orbs11 m_abfs_abfs;
 		std::cout<<"D1"<<std::endl;
@@ -74,15 +74,15 @@ void Exx_Abfs::test_all() const
 		for( size_t T=0; T!=abfs.size(); ++T )
 			Lmax = std::max( Lmax, static_cast<int>(abfs[T].size())-1 );
 
-		const Element_Basis_Index::Range
+		const ModuleBase::Element_Basis_Index::Range
 			&&range_abfs = Abfs_Index::construct_range( abfs );
-		const Element_Basis_Index::IndexLNM
-			&&index_abfs = Element_Basis_Index::construct_index( range_abfs );
+		const ModuleBase::Element_Basis_Index::IndexLNM
+			&&index_abfs = ModuleBase::Element_Basis_Index::construct_index( range_abfs );
 
-		const Element_Basis_Index::Range
+		const ModuleBase::Element_Basis_Index::Range
 			&&range_lcaos = Abfs_Index::construct_range( GlobalC::ORB );
-		const Element_Basis_Index::IndexLNM
-			&&index_lcaos = Element_Basis_Index::construct_index( range_lcaos );
+		const ModuleBase::Element_Basis_Index::IndexLNM
+			&&index_lcaos = ModuleBase::Element_Basis_Index::construct_index( range_lcaos );
 
 		Matrix_Orbs21 m_abfslcaos_lcaos;
 		m_abfslcaos_lcaos.init( 1, 1, 1 );
@@ -198,22 +198,22 @@ std::cout<<"D3"<<std::endl;
 
 std::cout<<"E"<<std::endl;
 
-	const Element_Basis_Index::Range
+	const ModuleBase::Element_Basis_Index::Range
 		&&range_lcaos = Abfs_Index::construct_range( GlobalC::ORB );
-	const Element_Basis_Index::IndexLNM
-		&&index_lcaos = Element_Basis_Index::construct_index( range_lcaos );
+	const ModuleBase::Element_Basis_Index::IndexLNM
+		&&index_lcaos = ModuleBase::Element_Basis_Index::construct_index( range_lcaos );
 
 std::cout<<"F"<<std::endl;
 
-	const Element_Basis_Index::Range
+	const ModuleBase::Element_Basis_Index::Range
 		&&range_jys = Abfs_Index::construct_range( jle.jle );
-	const Element_Basis_Index::IndexLNM
-		&&index_jys = Element_Basis_Index::construct_index( range_jys );
+	const ModuleBase::Element_Basis_Index::IndexLNM
+		&&index_jys = ModuleBase::Element_Basis_Index::construct_index( range_jys );
 
-//	const Element_Basis_Index::Range
+//	const ModuleBase::Element_Basis_Index::Range
 //		&&range_asa = Abfs_Index::construct_range( abfs_same_atom );
-//	const Element_Basis_Index::Index
-//		&&index_asa = Element_Basis_Index::construct_index( range_asa );
+//	const ModuleBase::Element_Basis_Index::Index
+//		&&index_asa = ModuleBase::Element_Basis_Index::construct_index( range_asa );
 
 std::cout<<"G"<<std::endl;
 
@@ -321,7 +321,7 @@ std::cout<<"A1"<<std::endl;
 //		if( abfs_same_atom[T].size()>4 )
 //			abfs_same_atom[T].resize(4);
 
-const Element_Basis_Index::Range
+const ModuleBase::Element_Basis_Index::Range
 	&&range_asa = Abfs_Index::construct_range( abfs_same_atom );
 std::cout<<range_asa<<std::endl;
 std::cout<<__FILE__<<__LINE__<<std::endl;
@@ -388,17 +388,17 @@ std::cout<<"D3"<<std::endl;
 
 std::cout<<"E"<<std::endl;
 
-	const Element_Basis_Index::Range
+	const ModuleBase::Element_Basis_Index::Range
 		&&range_lcaos = Abfs_Index::construct_range( GlobalC::ORB );
-	const Element_Basis_Index::IndexLNM
-		&&index_lcaos = Element_Basis_Index::construct_index( range_lcaos );
+	const ModuleBase::Element_Basis_Index::IndexLNM
+		&&index_lcaos = ModuleBase::Element_Basis_Index::construct_index( range_lcaos );
 
 std::cout<<"F"<<std::endl;
 
-	const Element_Basis_Index::Range
+	const ModuleBase::Element_Basis_Index::Range
 		&&range_abfs = Abfs_Index::construct_range( abfs );
-	const Element_Basis_Index::IndexLNM
-		&&index_abfs = Element_Basis_Index::construct_index( range_abfs );
+	const ModuleBase::Element_Basis_Index::IndexLNM
+		&&index_abfs = ModuleBase::Element_Basis_Index::construct_index( range_abfs );
 
 //std::cout<<range_asa<<std::endl;
 //std::cout<<index_asa<<std::endl;
@@ -472,7 +472,7 @@ test_ratio();
 	std::function< void( matrix &, const matrix & ) >
 		minus_matrix = []( matrix &mA, const matrix &mB ){ mA-=mB; };
 	// ms_lcaos2_lcaos2 -= ms_lcaos2_lcaos2_proj_asa
-	FUNC_EACH_2( ms_lcaos2_lcaos2, ms_lcaos2_lcaos2_proj_abfs, minus_matrix );
+	ModuleBase::GlobalFunc::FUNC_EACH_2( ms_lcaos2_lcaos2, ms_lcaos2_lcaos2_proj_abfs, minus_matrix );
 
 ofs_ms("ms_lcaos2_lcaos2_new",ms_lcaos2_lcaos2);
 
@@ -519,17 +519,17 @@ std::cout<<"A4"<<std::endl;
 
 std::cout<<"B"<<std::endl;
 
-	const Element_Basis_Index::Range
+	const ModuleBase::Element_Basis_Index::Range
 		&&range_lcaos = Abfs_Index::construct_range( lcaos );
-	const Element_Basis_Index::IndexLNM
-		&&index_lcaos = Element_Basis_Index::construct_index( range_lcaos );
+	const ModuleBase::Element_Basis_Index::IndexLNM
+		&&index_lcaos = ModuleBase::Element_Basis_Index::construct_index( range_lcaos );
 
 std::cout<<"C"<<std::endl;
 
-	const Element_Basis_Index::Range
+	const ModuleBase::Element_Basis_Index::Range
 		&&range_abfs = Abfs_Index::construct_range( abfs );
-	const Element_Basis_Index::IndexLNM
-		&&index_abfs = Element_Basis_Index::construct_index( range_abfs );
+	const ModuleBase::Element_Basis_Index::IndexLNM
+		&&index_abfs = ModuleBase::Element_Basis_Index::construct_index( range_abfs );
 
 std::cout<<range_abfs<<std::endl;
 
@@ -565,7 +565,7 @@ std::cout<<"D"<<std::endl;
 			}
 		}
 		ofs.close();
-		WARNING_QUIT( TO_STRING(__FILE__), TO_STRING(__LINE__) );
+		WARNING_QUIT( ModuleBase::GlobalFunc::TO_STRING(__FILE__), ModuleBase::GlobalFunc::TO_STRING(__LINE__) );
 	};
 
 	// Peize Lin test
@@ -598,7 +598,7 @@ std::cout<<"D"<<std::endl;
 			}
 		}
 		ofs.close();
-		WARNING_QUIT( TO_STRING(__FILE__), "line "+TO_STRING(__LINE__) );
+		WARNING_QUIT( ModuleBase::GlobalFunc::TO_STRING(__FILE__), "line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__) );
 	};
 
 	// Peize Lin test
@@ -683,7 +683,7 @@ void Exx_Abfs::test_abfs2() const{}
 // <b|a> <b|b> .I
 std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>> Exx_Abfs::cal_I(
 	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &ms,
-	const Element_Basis_Index::IndexLNM &index )
+	const ModuleBase::Element_Basis_Index::IndexLNM &index )
 {
 	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>> ms_I;
 
@@ -900,8 +900,8 @@ void Exx_Abfs::cal_CVC(
 std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Exx_Abfs::cal_lcaos2_lcaos2_proj_asa(
 	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &ms_lcaos2_asa,
 	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>> &ms_asa_asa_I,
-	const Element_Basis_Index::Range &range,
-	const Element_Basis_Index::IndexLNM &index)
+	const ModuleBase::Element_Basis_Index::Range &range,
+	const ModuleBase::Element_Basis_Index::IndexLNM &index)
 {
 	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> ms_lcaos2_lcaos2_proj_asa;
 	for( const auto &m1 : ms_lcaos2_asa )

@@ -46,11 +46,11 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<matrix> &DK_2D, c
 
 /*
 template<> std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>>
-Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<ComplexMatrix> &DK_2D, const double threshold_D) const
+Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<ModuleBase::ComplexMatrix> &DK_2D, const double threshold_D) const
 {
 	{
 		static int istep=0;
-		std::ofstream ofs("DK_2D_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
+		std::ofstream ofs("DK_2D_"+ModuleBase::GlobalFunc::TO_STRING(istep++)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 		ofs<<DK_2D<<std::endl;
 	}
 	
@@ -87,7 +87,7 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<ComplexMatrix> &D
 	
 	{
 		static int istep=0;
-		std::ofstream ofs("DR_a2D_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
+		std::ofstream ofs("DR_a2D_"+ModuleBase::GlobalFunc::TO_STRING(istep++)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 		ofs<<DR_a2D<<std::endl;
 	}	
 	return DR_a2D;
@@ -105,7 +105,7 @@ void Exx_Abfs::Parallel::Communicate::DM3::cal_DM(const double threshold_D)
 
 	/*{
 		static int istep=0;
-		std::ofstream ofs("DMr_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
+		std::ofstream ofs("DMr_"+ModuleBase::GlobalFunc::TO_STRING(istep++)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 		ofs<<DMr<<std::endl;
 	}*/	
 }

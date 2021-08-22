@@ -29,7 +29,7 @@ void Wavefunc_in_pw::make_table_q(
 		{
 			std::stringstream ss;
 			ss << "Orbital of species " << GlobalC::ucell.atoms[it].label;
-			OUT(GlobalV::ofs_running,ss.str(),fn[it]);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,ss.str(),fn[it]);
 		}
 		in.close();
 	}
@@ -79,10 +79,10 @@ void Wavefunc_in_pw::make_table_q(
 				double* psir = new double[meshr];
 				double* rab = new double[meshr];
 
-				ZEROS(radial, meshr);
-				ZEROS(psi, meshr);
-				ZEROS(psir, meshr);
-				ZEROS(rab, meshr);
+				ModuleBase::GlobalFunc::ZEROS(radial, meshr);
+				ModuleBase::GlobalFunc::ZEROS(psi, meshr);
+				ModuleBase::GlobalFunc::ZEROS(psir, meshr);
+				ModuleBase::GlobalFunc::ZEROS(rab, meshr);
 				for(int ir=0; ir<meshr; ir++)
 				{
 					rab[ir] = dr;
@@ -223,7 +223,7 @@ const double *rab, const int &l, double* table)
 	double unit = 0.0;
 	Integral::Simpson_Integral(meshr, inner_part, rab, unit);
 	delete[] inner_part;
-	OUT(GlobalV::ofs_running,"normalize unit",unit);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"normalize unit",unit);
 
 	double *aux = new double[meshr];
 	double *vchi = new double[meshr];
@@ -247,7 +247,7 @@ const double *rab, const int &l, double* table)
 }
 
 
-void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi, const realArray &table_local)
+void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ModuleBase::ComplexMatrix &psi, const realArray &table_local)
 {
 	TITLE("Wavefunc_in_pw","produce_local_basis_in_pw");
 	assert(ik>=0);
@@ -444,7 +444,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 }
 
 
-void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &psi, const realArray &table_local, Vector3<double> q)   // pengfei 2016-11-23
+void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ModuleBase::ComplexMatrix &psi, const realArray &table_local, Vector3<double> q)   // pengfei 2016-11-23
 {
 	TITLE("Wavefunc_in_pw","produce_local_basis_in_pw");
 	assert(ik>=0);
@@ -514,7 +514,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 												if(fabs(fact[is])>1e-8)
 												{
 													const int ind = GlobalC::ppcell.lmaxkb + soc.sph_ind(L,j,m,is);
-													ZEROS(aux, npw);
+													ModuleBase::GlobalFunc::ZEROS(aux, npw);
 													for(int n1=0;n1<2*L+1;n1++){
 														const int lm = L*L +n1;
 														if(abs(soc.rotylm(n1,ind))>1e-8)

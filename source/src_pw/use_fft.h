@@ -16,10 +16,10 @@ class Use_FFT
 
 	//---------------------------------------------------------------------
 	
-	// From G space to real space. ComplexMatrix
-	void ToRealSpace(const int &is, const ComplexMatrix &vg, double *vr);
+	// From G space to real space. ModuleBase::ComplexMatrix
+	void ToRealSpace(const int &is, const ModuleBase::ComplexMatrix &vg, double *vr);
 	void ToRealSpace_psi(const int &ik, const std::complex<double> *psig, std::complex<double> *psir);
-	void ToRealSpace_psi(const int &ik, const int &ib, const ComplexMatrix &evc, std::complex<double> *psir);
+	void ToRealSpace_psi(const int &ik, const int &ib, const ModuleBase::ComplexMatrix &evc, std::complex<double> *psir);
 	
 	// From G space to real space. charge/MLWF
 	void ToRealSpace(const std::complex<double> *vg, double *vr);
@@ -27,7 +27,7 @@ class Use_FFT
 	// From G space to real space. wave functions.
 	void ToRealSpace(const std::complex<double> *vg, std::complex<double> *vr);
 
-	void ToRealSpace(const int &is, const ComplexMatrix &vg, matrix &v);
+	void ToRealSpace(const int &is, const ModuleBase::ComplexMatrix &vg, matrix &v);
 
 	//---------------------------------------------------------------------
 

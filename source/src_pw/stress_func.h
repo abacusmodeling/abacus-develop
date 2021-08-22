@@ -89,7 +89,7 @@ class Stress_Func
 
 
 	void get_dvnl1(
-			ComplexMatrix &vkb,
+			ModuleBase::ComplexMatrix &vkb,
 			const int ik,
 			const int ipol);	//used in nonlocal part in PW basis
 	void dylmr2 (
@@ -99,7 +99,7 @@ class Stress_Func
 			matrix &dylm,
 			const int ipol);	//used in get_dvnl1()
 	void get_dvnl2(
-			ComplexMatrix &vkb,
+			ModuleBase::ComplexMatrix &vkb,
 			const int ik);		//used in nonlocal part in PW basis
 	double Polynomial_Interpolation_nl(
 			const realArray &table,

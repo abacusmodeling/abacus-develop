@@ -24,8 +24,8 @@ public:
 		const std::set<size_t> &atom_centres,
 		const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
 		const Exx_Abfs::Matrix_Orbs21 &m_abfslcaos_lcaos,
-		const Element_Basis_Index::IndexLNM &index_abfs,
-		const Element_Basis_Index::IndexLNM &index_lcaos,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_abfs,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_lcaos,
 		const double threshold,
 		std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<matrix>>>> &Cws,
 		std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<matrix>>>> &Vws );
@@ -35,7 +35,7 @@ public:
 	static std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,std::shared_ptr<matrix>>>> cal_Vs(
 		const std::vector<std::pair<size_t,size_t>> &atom_pairs,
 		const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
-		const Element_Basis_Index::IndexLNM &index_abfs,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_abfs,
 		const double rmesh_times,
 		const double threshold,
 		std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<matrix>>>> &Vws );	
@@ -58,8 +58,8 @@ public:
 		const Vector3_Order<double> &R, 												// unit: ucell.lat0
 		const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
 		const Exx_Abfs::Matrix_Orbs21 &m_abfslcaos_lcaos,
-		const Element_Basis_Index::IndexLNM &index_abfs,
-		const Element_Basis_Index::IndexLNM &index_lcaos,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_abfs,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_lcaos,
 		const double threshold,
 		const bool writable,
 		pthread_rwlock_t &rwlock_Cw,
@@ -73,7 +73,7 @@ public:
 		const size_t &it2, 
 		const Vector3_Order<double> &R, 												// unit: ucell.lat0
 		const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
-		const Element_Basis_Index::IndexLNM &index_abfs,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_abfs,
 		const double threshold,
 		const bool writable,
 		pthread_rwlock_t &rwlock_Vw,

@@ -131,7 +131,7 @@ void ORB_gen_tables::snap_psibeta(
 	const int &T0,
 	const matrix &dion, // mohan add 2021-04-25
 	const int &nspin,
-	const ComplexArray &d_so, // mohan add 2021-05-07
+	const ModuleBase::ComplexArray &d_so, // mohan add 2021-05-07
 	const int &count_soc, // mohan add 2021-05-07
 	int* index1_soc, // mohan add 2021-05-07
 	int* index2_soc, // mohan add 2021-05-07
@@ -602,11 +602,11 @@ void ORB_gen_tables::snap_psipsi(
 
 	if (job == 0)
 	{
-		ZEROS(olm, 1);
+		ModuleBase::GlobalFunc::ZEROS(olm, 1);
 	}
 	else if (job == 1)
 	{
-		ZEROS(olm, 3);
+		ModuleBase::GlobalFunc::ZEROS(olm, 3);
 	}
 
 	if (distance > (Rcut1 + Rcut2))

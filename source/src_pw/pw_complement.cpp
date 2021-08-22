@@ -212,10 +212,10 @@ void PW_complement::get_FFT_dimension(
 
     if (GlobalV::test_pw > 1)
     {
-        OUT(GlobalV::ofs_running,"nx",nx_tmp);
-        OUT(GlobalV::ofs_running,"ny",ny_tmp);
-        OUT(GlobalV::ofs_running,"nz",nz_tmp);
-        OUT(GlobalV::ofs_running,"nxyz",nxyz_tmp);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nx",nx_tmp);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"ny",ny_tmp);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nz",nz_tmp);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nxyz",nxyz_tmp);
     }
     return;
 }
@@ -242,7 +242,7 @@ void PW_complement::setup_GVectors(
     timer::tick("PW_complement","setup_GVectors");
 
     int *ind = new int[ngmc_g_in];// auxiliary array for the 1d G std::vector index
-    ZEROS( ind, ngmc_g_in );
+    ModuleBase::GlobalFunc::ZEROS( ind, ngmc_g_in );
     ind[0] = 0;//ind[0]=0, meaning ind[] is not initialized.
 
     //----------------------------------------------------------
@@ -327,7 +327,7 @@ void PW_complement::get_ngmw(const int &ngmc, const double& ggwfc2, const double
         }
     }
     ngmw = ng;
-	OUT(GlobalV::ofs_running,"ngmw",ngmw);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"ngmw",ngmw);
     return;
 }
 
@@ -364,10 +364,10 @@ void PW_complement::get_ig2fftc(const int &ngmc, const int &ncx, const int &ncy,
     if (GlobalV::test_pw) TITLE("PW_Basis","get_ig2fftc");
     // see ggen.f90, set ig2fftc ith the correct fft correspondence Page 4/6
 
-    ZEROS(ig2fftc, ngmc);
-    ZEROS(ig1, ngmc);
-    ZEROS(ig2, ngmc);
-    ZEROS(ig3, ngmc);
+    ModuleBase::GlobalFunc::ZEROS(ig2fftc, ngmc);
+    ModuleBase::GlobalFunc::ZEROS(ig1, ngmc);
+    ModuleBase::GlobalFunc::ZEROS(ig2, ngmc);
+    ModuleBase::GlobalFunc::ZEROS(ig3, ngmc);
 
     Memory::record("PW_complement","ig2fftc",ngmc,"int");
     Memory::record("PW_complement","ig1",ngmc,"int");

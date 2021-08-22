@@ -29,7 +29,7 @@ CellSet::CellSet()
 int Grid::Hash_one_hit = 0;
 const double Grid::TOLERATE_ERROR = 1.0E-5;
 
-const std::hash<int> Grid::INT_HASHER;
+const std::hash<int> Grid::INT_HASHER=std::hash<int>();
 
 const char* const Grid::ERROR[3] =
 {
@@ -87,13 +87,13 @@ void Grid::setMemberVariables(
 	AdjacentSet::call_times = 0;
 
 	this->natom = input.getAmount();
-	if(test_grid)OUT(ofs_in, "natom", natom);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in, "natom", natom);
 
 	this->pbc = input.getBoundary();
-	if(test_grid)OUT(ofs_in, "PeriodicBoundary", this->pbc);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in, "PeriodicBoundary", this->pbc);
 
 	this->sradius = input.getRadius();
-	if(test_grid)OUT(ofs_in, "Radius(unit:lat0)", sradius);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in, "Radius(unit:lat0)", sradius);
 
 	for (int i = 0;i < 3;i++)
 	{
@@ -103,22 +103,22 @@ void Grid::setMemberVariables(
 	}
 
 	this->lat_now = input.getLatNow();
-	if(test_grid)OUT(ofs_in,"lat0(unit:Bohr)", lat_now);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in,"lat0(unit:Bohr)", lat_now);
 
 	this->expand_flag = input.getExpandFlag();
-	if(test_grid)OUT(ofs_in,"Expand_flag", expand_flag);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in,"Expand_flag", expand_flag);
 	
 	// output std::vector
-	if(test_grid)OUT(ofs_in,"Vec1",vec1[0],vec1[1],vec1[2]);
-	if(test_grid)OUT(ofs_in,"Vec2",vec2[0],vec2[1],vec2[2]);
-	if(test_grid)OUT(ofs_in,"Vec3",vec3[0],vec3[1],vec3[2]);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in,"Vec1",vec1[0],vec1[1],vec1[2]);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in,"Vec2",vec2[0],vec2[1],vec2[2]);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in,"Vec3",vec3[0],vec3[1],vec3[2]);
 
 	// output grid length
 	this->grid_length[0] = input.Clength0();
 	this->grid_length[1] = input.Clength1();
 	this->grid_length[2] = input.Clength2();
 
-	if(test_grid)OUT(ofs_in,"Grid_length",grid_length[0],grid_length[1],grid_length[2]);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in,"Grid_length",grid_length[0],grid_length[1],grid_length[2]);
 //----------------------------------------------------------
 // EXPLAIN : (d_minX,d_minY,d_minZ)minimal value of
 // x[] ,y[] , z[]
@@ -126,21 +126,21 @@ void Grid::setMemberVariables(
 	this->d_minX = input.minX();
 	this->d_minY = input.minY();
 	this->d_minZ = input.minZ();
-	if(test_grid)OUT(ofs_in,"MinCoordinate",d_minX,d_minY,d_minZ);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in,"MinCoordinate",d_minX,d_minY,d_minZ);
 //----------------------------------------------------------
 //layer: grid layer after expand
 //----------------------------------------------------------
 	this->cell_x_length = input.getCellXLength();
 	this->cell_y_length = input.getCellYLength();
 	this->cell_z_length = input.getCellZLength();
-	if(test_grid)OUT(ofs_in,"CellLength(unit: lat0)",cell_x_length,cell_y_length,cell_z_length);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in,"CellLength(unit: lat0)",cell_x_length,cell_y_length,cell_z_length);
 //----------------------------------------------------------
 // set dx, dy, dz
 //----------------------------------------------------------
 	this->dx = input.getCellX();
 	this->dy = input.getCellY();
 	this->dz = input.getCellZ();
-	if(test_grid)OUT(ofs_in,"CellNumber",dx,dy,dz);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in,"CellNumber",dx,dy,dz);
 
 	Cell = new CellSet**[dx];
 	for (int i = 0;i < dx;i++)
@@ -189,7 +189,7 @@ void Grid::setAtomLinkArray(const UnitCell &ucell, const Atom_input &input)
 		}
 	*/
 
-//	if (test_grid) DONE(ofs_running, "Build_Cache");
+//	if (test_grid) ModuleBase::GlobalFunc::DONE(ofs_running, "Build_Cache");
 
 //----------------------------------------------------------
 // CALL MEMBER FUNCTION :
@@ -197,11 +197,11 @@ void Grid::setAtomLinkArray(const UnitCell &ucell, const Atom_input &input)
 //----------------------------------------------------------
 	this->Build_Cell();
 
-//	if (test_grid) DONE(ofs_running, "Build_Cell");
+//	if (test_grid) ModuleBase::GlobalFunc::DONE(ofs_running, "Build_Cell");
 
 	this->Build_Hash_Table(ucell, pointCache);
 
-//	if (test_grid) DONE(ofs_running, "Build_Hash_Table");
+//	if (test_grid) ModuleBase::GlobalFunc::DONE(ofs_running, "Build_Hash_Table");
 
 //----------------------------------------------------------
 // WARNING : Don't Deleete this testing code.
@@ -231,7 +231,7 @@ void Grid::setAtomLinkArray(const UnitCell &ucell, const Atom_input &input)
 
 	this->Fold_Hash_Table();
 
-//	if (test_grid) DONE(ofs_running, "Fold_Hash_Table");
+//	if (test_grid) ModuleBase::GlobalFunc::DONE(ofs_running, "Fold_Hash_Table");
 
 //----------------------------------------------------------
 // EXPLAIN : Don't Deleete this testing code.
@@ -266,7 +266,7 @@ void Grid::setBoundaryAdjacent(
 		this->Construct_Adjacent_begin();
 	}
 
-	if(test_grid)OUT(ofs_in,"Adjacent_set call times",AdjacentSet::call_times);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in,"Adjacent_set call times",AdjacentSet::call_times);
 
 	if (!expand_flag)
 	{
@@ -288,7 +288,7 @@ void Grid::setBoundaryAdjacent(
 	Memory::record("AdjacentSet", "offset", AdjacentSet::call_times, "short");
 	Memory::record("AdjacentSet", "box", AdjacentSet::call_times, "short");
 
-	//if (test_grid)DONE(ofs_in, "Construct_Adjacent");
+	//if (test_grid)ModuleBase::GlobalFunc::DONE(ofs_in, "Construct_Adjacent");
 
 	return;
 }

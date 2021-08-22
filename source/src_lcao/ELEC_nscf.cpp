@@ -44,7 +44,7 @@ void ELEC_nscf::nscf(LCAO_Hamilt &uhm)
 	}
 
 	time_t time_finish=std::time(NULL);
-	OUT_TIME("cal_bands",time_start, time_finish);
+	ModuleBase::GlobalFunc::OUT_TIME("cal_bands",time_start, time_finish);
 
     GlobalV::ofs_running << " end of band structure calculation " << std::endl;
     GlobalV::ofs_running << " band eigenvalue in this processor (eV) :" << std::endl;

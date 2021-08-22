@@ -7,9 +7,6 @@
 
 #ifdef USE_LIBXC
 #include <xc.h>
-#ifndef POTENTIAL_LIBXC_H
-#define POTENTIAL_LIBXC_H
-#endif
 #endif	// ifdef USE_LIBXC
 
 #include "tools.h"
@@ -20,7 +17,7 @@ class XC_Functional
 	XC_Functional();
 	~XC_Functional();
 
-	// LDA 
+	// LDA
 	static void xc(const double &rho, double &ex, double &ec, double &vx, double &vc);
 
 	// LSDA
@@ -37,17 +34,19 @@ class XC_Functional
 	// mGGA
 	static void tau_xc(const double &rho, const double &grho, const double &atau, double &sx, double &sc,
           double &v1x, double &v2x, double &v3x, double &v1c, double &v2c, double &v3c);
+	static void tau_xc_spin(const double &rhoup, const double &rhodw, const Vector3<double> &grhoup, const Vector3<double> &grhodw, const double &tauup, const double &taudw, double &sx, double &sc,
+          double &v1xup, double &v1xdw, double &v2xup, double &v2xdw, double &v3xup, double &v3xdw, double &v1cup, double &v1cdw, Vector3<double> &v2cup, Vector3<double> &v2cdw, double &v3cup, double &v3cdw);
 #endif
-	
+
 	// PBEx, PBEc
-	static void pbex(const double &rho, const double &grho, const int &iflag, 
+	static void pbex(const double &rho, const double &grho, const int &iflag,
 		double &sx, double &v1x, double &v2x);
 
 	static void pbec(const double &rho, const double &grho, const int &flag,
 		double &sc, double &v1c, double &v2c);
 
 
-			
+
 	private:
 
 	// For LDA exchange energy
@@ -56,11 +55,11 @@ class XC_Functional
 	static void slater_rxc(const double &rs, double &ex, double &vx);
 
 	// For LSDA exchange energy
-	static void slater_spin( const double &rho, const double &zeta, 
+	static void slater_spin( const double &rho, const double &zeta,
 		double &ex, double &vxup, double &vxdw);
-	static void slater1_spin( const double &rho, const double &zeta, 
+	static void slater1_spin( const double &rho, const double &zeta,
 		double &ex, double &vxup, double &vxdw);
-	static void slater_rxc_spin( const double &rho, const double &z, 
+	static void slater_rxc_spin( const double &rho, const double &z,
 		double &ex, double &vxup, double &vxdw);
 
 	// For LDA correlation energy

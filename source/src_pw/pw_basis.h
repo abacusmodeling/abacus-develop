@@ -80,6 +80,8 @@ public:
 	// nrxx_start: starting nrxx in each processor 
     int nrxx_start;
 
+    int seed;
+
 private:
     void setup_FFT_dimension(void);	// set up FFT dimensions
 
@@ -122,7 +124,7 @@ public:
     int *ig2fftw; // dimension: [ngmw]
 
 	// structure factor (ntype, ngmc)
-    ComplexMatrix strucFac;
+    ModuleBase::ComplexMatrix strucFac;
     void setup_structure_factor(void); 		// Calculate structur factors
 
 private:
@@ -241,9 +243,9 @@ private:
 //===============================================
 public:
 	// phase of e^{-iG*tau_s}
-    ComplexMatrix eigts1; // dimension: [Ucell->nat, 2*this->ncx + 1] 
-    ComplexMatrix eigts2; // dimension: [Ucell->nat, 2*this->ncy + 1] 
-    ComplexMatrix eigts3; // dimension: [Ucell->nat, 2*this->ncz + 1]
+    ModuleBase::ComplexMatrix eigts1; // dimension: [Ucell->nat, 2*this->ncx + 1] 
+    ModuleBase::ComplexMatrix eigts2; // dimension: [Ucell->nat, 2*this->ncy + 1] 
+    ModuleBase::ComplexMatrix eigts3; // dimension: [Ucell->nat, 2*this->ncz + 1]
 
 
 

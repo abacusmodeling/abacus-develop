@@ -79,7 +79,7 @@ void Parallel_PW::init(const double &gcut_in, const int &n1_in, const int &n2_in
 	//==========================================================
 	delete[] this->npps;
 	this->npps = new int[nproc_use];
-	ZEROS(npps, nproc_use);
+	ModuleBase::GlobalFunc::ZEROS(npps, nproc_use);
 
 	const int nb3 = this->n3 / bz;
 	
@@ -97,7 +97,7 @@ void Parallel_PW::init(const double &gcut_in, const int &n1_in, const int &n2_in
 
 	delete[] this->ngm_i_number;
 	this->ngm_i_number = new int[10];
-	ZEROS(ngm_i_number, 10);
+	ModuleBase::GlobalFunc::ZEROS(ngm_i_number, 10);
 
 	return;
 }
@@ -182,8 +182,8 @@ void Parallel_PW::columns_map(void)
 		}
 	}
 
-	OUT(GlobalV::ofs_running,"number of plane waves",ng);
-	OUT(GlobalV::ofs_running,"number of sticks", nst);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of plane waves",ng);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of sticks", nst);
 
 	timer::tick("Parallel_PW","columns_map");
 	return;
@@ -245,11 +245,11 @@ void Parallel_PW::columns_and_pw_distribution(void)
 	// number of sticks of each processor in one pool.
 	delete[] nst_per;
 	this->nst_per = new int[nproc_use];
-	ZEROS(nst_per, nproc_use);
+	ModuleBase::GlobalFunc::ZEROS(nst_per, nproc_use);
 	// number of planewaves of each processor in one pool.
 	delete[] npw_per;
 	this->npw_per = new int[nproc_use];
-	ZEROS(npw_per, nproc_use);
+	ModuleBase::GlobalFunc::ZEROS(npw_per, nproc_use);
 
 	//******************************************************
 	// Two choices  
@@ -260,7 +260,7 @@ void Parallel_PW::columns_and_pw_distribution(void)
 	//******************************************************
 	delete[] index;
 	this->index = new bool[this->nst];
-	ZEROS(index,nst);
+	ModuleBase::GlobalFunc::ZEROS(index,nst);
 
 	delete[] index_ip;
 	this->index_ip = new int[this->n1*this->n2];
@@ -318,7 +318,7 @@ void Parallel_PW::fft_dlay_set(void)
 	int ip = 0;//index of processors
 	delete[] st_start;
 	this->st_start = new int[nproc_use];
-	ZEROS(st_start, nproc_use);
+	ModuleBase::GlobalFunc::ZEROS(st_start, nproc_use);
 
 	// calculate start stick index in each
 	// processor in this pool.
@@ -337,7 +337,7 @@ void Parallel_PW::fft_dlay_set(void)
 	delete[] ismap;
 	this->isind = new int[nxy];
 	this->ismap = new int[this->nst];
-	ZEROS(ismap, nst);
+	ModuleBase::GlobalFunc::ZEROS(ismap, nst);
 
 	for (i = 0;i < nxy;i++)
 	{
@@ -350,7 +350,7 @@ void Parallel_PW::fft_dlay_set(void)
 //	std::cout << std::setw(12) << "ismap dim" << std::setw(12) << this->nst << std::endl;
 
 	int *st_move = new int[nproc_use];
-	ZEROS(st_move,nproc_use);
+	ModuleBase::GlobalFunc::ZEROS(st_move,nproc_use);
 	
 	for (i = 0;i < nxy;i++)
 	{
@@ -665,3 +665,37 @@ void Parallel_PW::fft_map_final_scf(
 
 	return;
 }
+
+#ifdef __MPI
+void Parallel_PW:: stick_to_pool(double *stick, const int &ir, double *out)
+{	
+	//TITLE("Parallel_Grid","zpiece_to_all");
+	MPI_Status ierror;
+
+	const int is = isind[ir];
+	const int ip = index_ip[ir];
+
+	if(ip == 0 && GlobalV::RANK_IN_POOL ==0)
+	{
+		for(int iz=0; iz<n3; iz++)
+		{
+			out[is*n3+iz] = stick[iz];
+		}
+	}
+	else if(ip == GlobalV::RANK_IN_POOL )
+	{
+		MPI_Recv(stick, n3, MPI_DOUBLE, 0, ir, POOL_WORLD,&ierror);
+		for(int iz=0; iz<n3; iz++)
+		{
+			out[is*n3+iz] = stick[iz];
+		}
+	}
+	else if(GlobalV::RANK_IN_POOL==0)
+	{
+		MPI_Send(stick, n3, MPI_DOUBLE, ip, ir, POOL_WORLD);
+	}
+	
+
+	return;	
+}
+#endif

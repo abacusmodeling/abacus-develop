@@ -139,7 +139,7 @@ void Local_Orbital_Charge::sum_bands(void)
     }
     else
     {
-        NOTE("Calculate the density matrix.");
+        ModuleBase::GlobalFunc::NOTE("Calculate the density matrix.");
         this->cal_dk_k( GlobalC::GridT );
         if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")        // Peize Lin test 2019-05-15
 		{
@@ -150,7 +150,7 @@ void Local_Orbital_Charge::sum_bands(void)
 
     for(int is=0; is<GlobalV::NSPIN; is++)
     {
-        ZEROS( GlobalC::CHR.rho[is], GlobalC::pw.nrxx ); // mohan 2009-11-10
+        ModuleBase::GlobalFunc::ZEROS( GlobalC::CHR.rho[is], GlobalC::pw.nrxx ); // mohan 2009-11-10
     }
 
     //------------------------------------------------------------
@@ -164,7 +164,7 @@ void Local_Orbital_Charge::sum_bands(void)
     }
     else
     {
-        NOTE("Calculate the charge on real space grid!");
+        ModuleBase::GlobalFunc::NOTE("Calculate the charge on real space grid!");
         GlobalC::UHM.GK.cal_rho_k();
     }
 
@@ -174,7 +174,7 @@ void Local_Orbital_Charge::sum_bands(void)
      //GlobalV::ofs_running << " END_Charge  Time : " << ctime(&time_charge_end);
      //GlobalV::ofs_running << " FINAL_Charge Time : " << difftime(time_charge_end, time_charge_start) << " (Seconds)" << std::endl;
 
-    OUT_TIME("charge grid integration", start, end);
+    ModuleBase::GlobalFunc::OUT_TIME("charge grid integration", start, end);
 
 	//BLOCK_HERE("sum_bands::before renormalize rho");  
 

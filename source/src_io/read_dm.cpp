@@ -70,13 +70,13 @@ void Local_Orbital_Charge::read_dm(const int &is, const std::string &fn)
             CHECK_INT(ifs, GlobalV::NSPIN);
             if(GlobalV::NSPIN == 1||GlobalV::NSPIN == 4)
             {
-                READ_VALUE(ifs, GlobalC::en.ef);
+                ModuleBase::GlobalFunc::READ_VALUE(ifs, GlobalC::en.ef);
                 GlobalV::ofs_running << " read in fermi energy = " << GlobalC::en.ef << std::endl;
             }
             else if(GlobalV::NSPIN == 2)
             {
-                if(is==0)READ_VALUE(ifs, GlobalC::en.ef_up);
-                else if(is==1)READ_VALUE(ifs, GlobalC::en.ef_dw);
+                if(is==0)ModuleBase::GlobalFunc::READ_VALUE(ifs, GlobalC::en.ef_up);
+                else if(is==1)ModuleBase::GlobalFunc::READ_VALUE(ifs, GlobalC::en.ef_dw);
             }
             else
             {
@@ -146,7 +146,7 @@ void Local_Orbital_Charge::read_dm(const int &is, const std::string &fn)
         for(int i=0; i<GlobalV::NLOCAL; ++i)
         {
             //GlobalV::ofs_running << " i=" << i << std::endl;
-            ZEROS(tmp, GlobalV::NLOCAL);
+            ModuleBase::GlobalFunc::ZEROS(tmp, GlobalV::NLOCAL);
             if(GlobalV::MY_RANK==0)
             {
                 for(int j=0; j<GlobalV::NLOCAL; ++j)

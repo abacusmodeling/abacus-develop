@@ -70,7 +70,7 @@ void Grid_MeshBall::init_meshball(void)
 			}
 		}
 	}
-	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running, "how many cells in meshball",this->meshball_ncells);
+	if(GlobalV::test_gridt)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "how many cells in meshball",this->meshball_ncells);
 
 	// prepare for the second calculation.
 	if(!flag_mp)
@@ -87,7 +87,7 @@ void Grid_MeshBall::init_meshball(void)
 
 	delete[] index_ball;
 	this->index_ball = new int[meshball_ncells];
-	ZEROS(index_ball, meshball_ncells);
+	ModuleBase::GlobalFunc::ZEROS(index_ball, meshball_ncells);
 
 	// second time.
 	int count = 0;

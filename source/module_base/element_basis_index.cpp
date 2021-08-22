@@ -4,6 +4,8 @@
 //==========================================================
 
 #include "element_basis_index.h"
+namespace ModuleBase
+{
 
 Element_Basis_Index::IndexLNM Element_Basis_Index::construct_index( const Range &range )
 {
@@ -31,4 +33,6 @@ Element_Basis_Index::IndexLNM Element_Basis_Index::construct_index( const Range 
 		index[T].count_size = count;
 	}
 	return index;
+}
+
 }

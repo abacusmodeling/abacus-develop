@@ -308,7 +308,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
     timer::tick("Gint_Gamma","gamma_vlocal");
 
 	Gint_Tools::Array_Pool<double> GridVlocal(GlobalC::GridT.lgd, GlobalC::GridT.lgd);
-	ZEROS(GridVlocal.ptr_1D, GlobalC::GridT.lgd*GlobalC::GridT.lgd);
+	ModuleBase::GlobalFunc::ZEROS(GridVlocal.ptr_1D, GlobalC::GridT.lgd*GlobalC::GridT.lgd);
     Memory::record("Gint_Gamma","GridVlocal",GlobalC::GridT.lgd*GlobalC::GridT.lgd,"double");
 
 #ifdef __MKL
@@ -339,7 +339,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 			// <phi | V_local | phi>
 			//------------------------------------------------------
 			Gint_Tools::Array_Pool<double> GridVlocal_thread(lgd_now, lgd_now);
-			ZEROS(GridVlocal_thread.ptr_1D, lgd_now*lgd_now);
+			ModuleBase::GlobalFunc::ZEROS(GridVlocal_thread.ptr_1D, lgd_now*lgd_now);
 			Memory::record("Gint_Gamma","GridVlocal_therad",lgd_now*lgd_now,"double");
 
 			const int LD_pool = max_size*GlobalC::ucell.nwmax;
@@ -438,7 +438,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
     mkl_set_num_threads(mkl_threads);
 #endif
 
-    OUT(GlobalV::ofs_running, "temp variables are deleted");
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "temp variables are deleted");
     timer::tick("Gint_Gamma","gamma_vlocal");
     MPI_Barrier(MPI_COMM_WORLD);
     timer::tick("Gint_Gamma","distri_vl");
@@ -460,9 +460,9 @@ void vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal)
                            GlobalC::ParaO.receiver_index_size, GlobalC::ParaO.receiver_global_index,
                            GlobalC::ParaO.receiver_size_process, GlobalC::ParaO.receiver_displacement_process,
                            GlobalC::ParaO.receiver_size, GlobalC::ParaO.receiver_buffer);
-        OUT(GlobalV::ofs_running, "vlocal exchange index is built");
-        OUT(GlobalV::ofs_running, "buffer size(M):", (GlobalC::ParaO.sender_size+GlobalC::ParaO.receiver_size)*sizeof(double)/1024/1024);
-        OUT(GlobalV::ofs_running, "buffer index size(M):", (GlobalC::ParaO.sender_index_size+GlobalC::ParaO.receiver_index_size)*sizeof(int)/1024/1024);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "vlocal exchange index is built");
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "buffer size(M):", (GlobalC::ParaO.sender_size+GlobalC::ParaO.receiver_size)*sizeof(double)/1024/1024);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "buffer index size(M):", (GlobalC::ParaO.sender_index_size+GlobalC::ParaO.receiver_index_size)*sizeof(int)/1024/1024);
         timer::tick("Gint_Gamma","distri_vl_index");
     }
 
@@ -482,14 +482,14 @@ void vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal)
             GlobalC::ParaO.sender_buffer[i/2]=GridVlocal.ptr_2D[icol][irow];
 		}
     }
-    OUT(GlobalV::ofs_running, "vlocal data are put in sender_buffer, size(M):", GlobalC::ParaO.sender_size*8/1024/1024);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "vlocal data are put in sender_buffer, size(M):", GlobalC::ParaO.sender_size*8/1024/1024);
 
     // use mpi_alltoall to get local data
     MPI_Alltoallv(GlobalC::ParaO.sender_buffer, GlobalC::ParaO.sender_size_process, GlobalC::ParaO.sender_displacement_process, MPI_DOUBLE,
                   GlobalC::ParaO.receiver_buffer, GlobalC::ParaO.receiver_size_process,
 					GlobalC::ParaO.receiver_displacement_process, MPI_DOUBLE, GlobalC::ParaO.comm_2D);
 
-    OUT(GlobalV::ofs_running, "vlocal data are exchanged, received size(M):", GlobalC::ParaO.receiver_size*8/1024/1024);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "vlocal data are exchanged, received size(M):", GlobalC::ParaO.receiver_size*8/1024/1024);
 
     // put local data to H matrix
     for(int i=0; i<GlobalC::ParaO.receiver_index_size; i+=2)

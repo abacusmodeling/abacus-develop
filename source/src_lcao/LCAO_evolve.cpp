@@ -4,6 +4,7 @@
 #include "../src_io/write_HS.h"
 #include"../input.h"
 #include <complex>
+#include "../module_base/scalapack_connector.h"
 //fuxiang add 2016-10-28
 
 Evolve_LCAO_Matrix::Evolve_LCAO_Matrix(){}
@@ -24,7 +25,8 @@ void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, std::complex<doubl
 		this->using_LAPACK_complex(ik, cc, cc_init);
 #endif
 */
-		this->using_LAPACK_complex(ik, cc, cc_init);
+		//this->using_LAPACK_complex(ik, cc, cc_init);
+		this->using_ScaLAPACK_complex_3(ik, cc, cc_init);
 	}
 	else
 	{
@@ -32,7 +34,7 @@ void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, std::complex<doubl
 	}
 
 	time_t time_end = time(NULL);
-	OUT_TIME("evolve(std::complex)", time_start, time_end);
+	ModuleBase::GlobalFunc::OUT_TIME("evolve(std::complex)", time_start, time_end);
 	
 	return;
 }
@@ -43,8 +45,8 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, std::complex<double
 
 //	Calculate the U operator
 
-	ComplexMatrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
-	ComplexMatrix Stmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	ModuleBase::ComplexMatrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	ModuleBase::ComplexMatrix Stmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	for(int i=0; i<GlobalV::NLOCAL; i++)
         {
         	for(int j=0; j<GlobalV::NLOCAL; j++)
@@ -92,7 +94,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, std::complex<double
 
         int LWORK=3*GlobalV::NLOCAL-1; //tmp
         std::complex<double> * WORK = new std::complex<double>[LWORK];
-        ZEROS(WORK, LWORK);
+        ModuleBase::GlobalFunc::ZEROS(WORK, LWORK);
         int IPIV[GlobalV::NLOCAL];
 
         LapackConnector::zgetrf( GlobalV::NLOCAL, GlobalV::NLOCAL, Stmp, GlobalV::NLOCAL, IPIV, &INFO);
@@ -111,7 +113,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, std::complex<double
         std::cout <<std::endl;
 */
 
-	ComplexMatrix S_plus_H(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	ModuleBase::ComplexMatrix S_plus_H(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	S_plus_H = Stmp*Htmp;
 
 /*
@@ -127,7 +129,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, std::complex<double
         std::cout <<std::endl;
 */
 
-	ComplexMatrix Denominator(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	ModuleBase::ComplexMatrix Denominator(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	for (int i=0; i<GlobalV::NLOCAL; i++)
        	{
                	for (int j=0; j<GlobalV::NLOCAL; j++)
@@ -138,7 +140,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, std::complex<double
                 }
         }
         
-        ComplexMatrix Idmat(GlobalV::NLOCAL,GlobalV::NLOCAL);
+        ModuleBase::ComplexMatrix Idmat(GlobalV::NLOCAL,GlobalV::NLOCAL);
         for(int i=0; i<GlobalV::NLOCAL; i++)
         {
                 for(int j=0; j<GlobalV::NLOCAL; j++)
@@ -149,20 +151,20 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, std::complex<double
         }
         //double delta_t;
 //      delta_t = 0.2;	//identity: fs;
-        ComplexMatrix Numerator(GlobalV::NLOCAL,GlobalV::NLOCAL);
+        ModuleBase::ComplexMatrix Numerator(GlobalV::NLOCAL,GlobalV::NLOCAL);
         Numerator = Idmat - 0.5*INPUT.mdp.dt*41.34*Denominator;
         Denominator = Idmat + 0.5*INPUT.mdp.dt*41.34*Denominator;
 
 	int info;
         int lwork=3*GlobalV::NLOCAL-1; //tmp
         std::complex<double> * work = new std::complex<double>[lwork];
-        ZEROS(work, lwork);
+        ModuleBase::GlobalFunc::ZEROS(work, lwork);
         int ipiv[GlobalV::NLOCAL];
         
         LapackConnector::zgetrf( GlobalV::NLOCAL, GlobalV::NLOCAL, Denominator, GlobalV::NLOCAL, ipiv, &info);
         LapackConnector::zgetri( GlobalV::NLOCAL, Denominator, GlobalV::NLOCAL, ipiv, work, lwork, &info);
 
-        ComplexMatrix U_operator(GlobalV::NLOCAL,GlobalV::NLOCAL);
+        ModuleBase::ComplexMatrix U_operator(GlobalV::NLOCAL,GlobalV::NLOCAL);
 /*
         std::cout << " Numerator: " <<std::endl;
         for(int i=0; i<GlobalV::NLOCAL; i++)
@@ -299,8 +301,8 @@ extern "C"
 int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, std::complex<double>** c, std::complex<double>** c_init)const
 {
 	TITLE("Evolve_LCAO_Matrix", "using_scalapack_complex");
-	ComplexMatrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
-	ComplexMatrix Stmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	ModuleBase::ComplexMatrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	ModuleBase::ComplexMatrix Stmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	for(int i=0; i<GlobalV::NLOCAL; i++)
         {
         		for(int j=0; j<GlobalV::NLOCAL; j++)
@@ -401,7 +403,7 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, std::complex<doub
 	for(int i=0; i<subMatrixSize; ++i) c[i]= real(GlobalC::LM.Sloc2[i]);
 
 	int inc=1;
-	DCOPY(&subMatrixSize, &c, &inc, S, &inc);
+	ModuleBase::GlobalFunc::DCOPY(&subMatrixSize, &c, &inc, S, &inc);
 
 
 	std::cout << "44444" << std::endl;
@@ -458,3 +460,176 @@ int localIndex(int globalIndex, int nblk, int nprocs, int& myproc)
 }
 
 */
+
+int Evolve_LCAO_Matrix::using_ScaLAPACK_complex_3(const int &ik, complex<double>** c, complex<double>** c_init)const
+{
+	TITLE("Evolve_LCAO_Matrix","using_ScaLAPACK_complex");
+
+	//inverse of matrix
+	//pzgetrf (int *m, int *n, Complex16 *a, int ia, int ja, int *desca, int *ipiv, int info);
+	//pzgetri (int *n, Complex16 *a, int *ia, int ja, int *desca, int *ipiv, Complex16 *Work, int *lwork, int *iwork, int *liwork, int *info);
+
+	//product of vector and matrix
+	//pzgemv(const char *trans, const int *m, const int *n, const Complex16 *alpha, const Complex16 *a, 
+	//	const int *ia, const int *ja, const int *desca, const Complex16*x, const int *ix, const int *jx,
+	//	const int *descx, const int *incx, const Complex16 *beta, Complex16 *y, const int *iy, 
+	//	const int *jy, const int *descy, const int *incy);
+
+	//matrix-matrix sum
+	//pzgeadd (const char *trans, const int *m, const int *n, const Complex16 *alpha, const Complex16 *a, const int *ia,
+	//	const int *ja, const int *desca, const Complex16 *beta, Complex16 *c, const int *ic, const int *jc, const int *descc);
+
+	//matrix-matrix product
+	//pzgemm
+
+	//cout << "begin1: " <<endl;
+
+	char uplo = 'U';
+	const int inc = 1;
+
+	const int  one_int = 1;
+	
+	//int nprocs, myid;
+	//MPI_status status;
+	//MPI_Comm_size(comm_2D, &nprocs);
+	//MPI_Comm_rank(comm_2D, &myid);
+
+	int loc_pos;
+	//complex<double>* Stmp = GlobalC::LM.Sdiag2;
+	//complex<double>* Htmp1 = GlobalC::LM.Hdiag2;
+	//complex<double>* Htmp2 = GlobalC::LM.Sdiag2;
+	//complex<double>* Htmp3 = GlobalC::LM.Sdiag2;
+
+	complex<double>* Stmp = new complex<double> [GlobalC::ParaO.nloc];
+	complex<double>* Htmp1 = new complex<double> [GlobalC::ParaO.nloc];
+	complex<double>* Htmp2 = new complex<double> [GlobalC::ParaO.nloc];
+	complex<double>* Htmp3 = new complex<double> [GlobalC::ParaO.nloc];
+	ModuleBase::GlobalFunc::ZEROS(Stmp,GlobalC::ParaO.nloc);
+	ModuleBase::GlobalFunc::ZEROS(Htmp1,GlobalC::ParaO.nloc);
+	ModuleBase::GlobalFunc::ZEROS(Htmp2,GlobalC::ParaO.nloc);
+	ModuleBase::GlobalFunc::ZEROS(Htmp3,GlobalC::ParaO.nloc);
+	
+	//cout << "GlobalC::LM.Hloc2" << *GlobalC::LM.Hloc2 << endl;
+	//cout << "*Htmp2: " << *Htmp2 << endl;
+
+        double *eigen = new double[GlobalV::NLOCAL];
+        ModuleBase::GlobalFunc::ZEROS(eigen, GlobalV::NLOCAL);
+
+	//cout << "GlobalV::NLOCAL : " << GlobalV::NLOCAL << endl;
+	//cout << "GlobalC::ParaO.nloc : " << GlobalC::ParaO.nloc << endl;
+
+	//cout << "begin02:" <<endl;
+
+        //assert(loc_size > 0);
+        //complex<double>* Z = new complex<double>[this->loc_size * NLOCAL];
+        //ModuleBase::GlobalFunc::ZEROS(Z, this->loc_size * NLOCAL);
+
+	zcopy_(&GlobalC::ParaO.nloc, GlobalC::LM.Sloc2, &inc, Stmp, &inc);
+	zcopy_(&GlobalC::ParaO.nloc, GlobalC::LM.Hloc2, &inc, Htmp1, &inc);
+	zcopy_(&GlobalC::ParaO.nloc, GlobalC::LM.Hloc2, &inc, Htmp2, &inc);
+	zcopy_(&GlobalC::ParaO.nloc, GlobalC::LM.Hloc2, &inc, Htmp3, &inc);
+
+	//cout << "*Htmp2: " << *Htmp2 << endl;
+
+	complex<double> alpha = (1.0, 0.0);
+	char transa = 'N';
+	int desca = 0; 
+	complex<double> beta = (0.0, -0.5)*0.02*41.34;  // this need modify
+	int descc = 0;
+
+	//cout << "begin03:" << endl;
+
+        pzgeadd_(
+		&transa,
+		&GlobalV::NLOCAL, &GlobalV::NLOCAL,
+		&alpha,
+		Stmp, &one_int, &one_int, GlobalC::ParaO.desc,
+                &beta,
+		Htmp1, &one_int, &one_int, GlobalC::ParaO.desc);
+
+	//beta = (0.0, 0.5)*INPUT.md_dt;
+	beta = (0.0, 0.5)*0.02*41.34; // this need modify
+
+	//cout << "*Htmp1: " << *Htmp1 << endl;
+	//cout << "Htmp2: " << *Htmp2 << endl;
+
+	pzgeadd_(
+		&transa,
+		&GlobalV::NLOCAL, &GlobalV::NLOCAL,
+		&alpha,
+		Stmp, &one_int, &one_int, GlobalC::ParaO.desc, 
+		&beta,
+		Htmp2, &one_int, &one_int, GlobalC::ParaO.desc);
+
+	//Next, invert the denominator
+	int *ipiv = new int[ GlobalC::ParaO.nloc ];
+	int info;
+
+	//cout << "*Htmp2: " << *Htmp2 << endl;
+	//cout << "begin04:" << endl;
+
+	pzgetrf_(
+		&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
+		Htmp2, &one_int, &one_int, GlobalC::ParaO.desc,
+		ipiv,  &info);
+
+        int LWORK=3*GlobalV::NLOCAL-1; //tmp
+        complex<double> * WORK = new complex<double>[LWORK];
+	int iWORK=3*GlobalV::NLOCAL-1;
+	int liWORK=3*GlobalV::NLOCAL-1;
+        ModuleBase::GlobalFunc::ZEROS(WORK, LWORK);
+
+	//cout << "begin05:" << endl;
+
+	pzgetri_(
+		&GlobalV::NLOCAL, 
+		Htmp2, &one_int, &one_int, GlobalC::ParaO.desc,
+		ipiv,  WORK,  &LWORK, &iWORK, &liWORK, &info);
+
+	//alpha = (1.0, 0.0);
+	//beta = (0.0, 0.0);
+	char transb = 'T';
+	int descb = 0; 
+
+	double alpha_1 = 1.0;
+	double beta_1 = 0.0;
+
+	//cout << "*Htmp2: " << *Htmp2 << endl;
+	//cout << "begin06:" << endl;
+	
+/*
+	pzgemm_(
+		&transa, &transb,
+		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
+		&alpha_1,
+		Htmp1, &one_int, &one_int, GlobalC::ParaO.desc,
+		Htmp2, &one_int, &one_int, GlobalC::ParaO.desc, 
+		&beta_1,
+		Htmp3, &one_int, &one_int, GlobalC::ParaO.desc);
+*/
+	
+
+	//cout << "U_operator Success!!!" <<endl;
+
+/*
+	pzgemv_(
+		&transa,
+		&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
+		&alpha_1,
+		Htmp2, &one_int, &one_int, GlobalC::ParaO.desc,
+		&wfc_2d, &one_int, &one_int, GlobalC::ParaO.desc, &nloc, 
+		&beta_1,
+		&wfc_2d, &one_int, &one_int, GlobalC::ParaO.desc, &one_int
+                );
+*/
+
+
+        // the eigenvalues.
+        //dcopy_(&NBANDS, eigen, &inc, ekb, &inc);
+        delete[] eigen;
+
+        // Z is delete in gath_eig
+        //timer::tick("Evolve_LCAO_Matrix","gath_eig_complex",'G');
+	return 0;
+
+}

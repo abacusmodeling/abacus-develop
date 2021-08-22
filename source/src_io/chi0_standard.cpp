@@ -311,10 +311,10 @@ void Chi0_standard::Parallel_G()
 		flag[i] = i;
 	}
 	
-	ZEROS( num_G_dis, GlobalV::DSIZE);
-	ZEROS( num_G_core, GlobalV::DSIZE);
-	ZEROS( num_Gvector_dis, GlobalV::DSIZE);
-	ZEROS( num_Gvector_core, GlobalV::DSIZE);
+	ModuleBase::GlobalFunc::ZEROS( num_G_dis, GlobalV::DSIZE);
+	ModuleBase::GlobalFunc::ZEROS( num_G_core, GlobalV::DSIZE);
+	ModuleBase::GlobalFunc::ZEROS( num_Gvector_dis, GlobalV::DSIZE);
+	ModuleBase::GlobalFunc::ZEROS( num_Gvector_core, GlobalV::DSIZE);
 	
 #ifdef __MPI
 	MPI_Allgather( &GlobalC::pw.ngmc, 1, MPI_INT, num_G_core, 1, MPI_INT, POOL_WORLD);
@@ -525,7 +525,7 @@ void Chi0_standard::Cal_Psi(int iq, std::complex<double> **psi_r)
 	std::complex<double> exp_tmp;
 	for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 	{
-		ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
+		ModuleBase::GlobalFunc::ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
 		for(int ig = 0; ig < GlobalC::kv.ngk[iq] ; ig++)
 		{
 			GlobalC::UFFT.porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(iq,ig)] ] = GlobalC::wf.evc[iq](ib,ig);
@@ -695,7 +695,7 @@ void Chi0_standard:: Cal_chi0(int iq, double omega)
 		int lda = dim;
 		int ldb = oband*GlobalV::NBANDS;
 		int ldc = dim;
-		zgemm_(&transa, &transb, &M, &N, &K, &alpha, VECTOR_TO_PTR(B1[0]), &lda, VECTOR_TO_PTR(A1[0]), &ldb, &beta, VECTOR_TO_PTR(C[0]), &ldc);
+		zgemm_(&transa, &transb, &M, &N, &K, &alpha, ModuleBase::GlobalFunc::VECTOR_TO_PTR(B1[0]), &lda, ModuleBase::GlobalFunc::VECTOR_TO_PTR(A1[0]), &ldb, &beta, ModuleBase::GlobalFunc::VECTOR_TO_PTR(C[0]), &ldc);
 		
 		for(int g0=0; g0<dim; g0++)
 			for(int g1=0; g1<dim; g1++)
@@ -894,7 +894,7 @@ int Chi0_standard::Cal_iq(int ik, int iq, int a, int b, int c)
 
 int Chi0_standard::parallel_g()
 {
-	flag1 = new int[dim];  ZEROS(flag1, dim);
+	flag1 = new int[dim];  ModuleBase::GlobalFunc::ZEROS(flag1, dim);
 	para_g = new double*[dim];
 	for(int i=0;i<dim;i++)
 	{
@@ -947,7 +947,7 @@ void Chi0_standard::chi0_para_g()
 {
 	for(int g0=0; g0<dim_para; g0++)
 	{
-		ZEROS( chi0_para[g0], dim_para);
+		ModuleBase::GlobalFunc::ZEROS( chi0_para[g0], dim_para);
 	}
 	
 	for(int g0=0; g0<dim; g0++)

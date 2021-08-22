@@ -147,6 +147,7 @@ extern std::string	global_wannier_card;
 extern std::string	global_pseudo_dir;
 extern std::string   global_pseudo_type; // mohan add 2013-05-20 (xiaohui add 2013-06-23)
 extern std::string 	global_out_dir;
+extern std::string global_orbital_dir; // liuyu add 2021-08-14
 extern std::string   global_readin_dir; //zhengdy modified
 
 extern std::ofstream ofs_running;

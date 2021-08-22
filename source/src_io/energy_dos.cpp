@@ -284,9 +284,9 @@ void energy::perform_dos(void)
 				matrix Dwf = D.wfc_gamma[is];
 				for (int i=0; i<GlobalV::NBANDS; ++i)		  
 				{     
-					ZEROS(waveg, GlobalV::NLOCAL);
+					ModuleBase::GlobalFunc::ZEROS(waveg, GlobalV::NLOCAL);
 
-					ZEROS(Gauss,np);
+					ModuleBase::GlobalFunc::ZEROS(Gauss,np);
 					for (int n=0; n<npoints; ++n)		  
 					{  
 						double en=emin+n * de_ev;
@@ -367,7 +367,7 @@ void energy::perform_dos(void)
 				GlobalC::LM.zeros_HSR('S', GlobalC::LNNR.nnr);
 				GlobalC::UHM.genH.calculate_S_no();
 				GlobalC::UHM.genH.build_ST_new('S', false);
-				std::vector<ComplexMatrix> Mulk;
+				std::vector<ModuleBase::ComplexMatrix> Mulk;
 				Mulk.resize(1);
 				Mulk[0].create(GlobalC::ParaO.ncol,GlobalC::ParaO.nrow);
 
@@ -382,15 +382,15 @@ void energy::perform_dos(void)
 						GlobalC::LNNR.folding_fixedH(ik);
 
 
-						ComplexMatrix Dwfc = conj(D.wfc_k[ik]);
+						ModuleBase::ComplexMatrix Dwfc = conj(D.wfc_k[ik]);
 
 						for (int i=0; i<GlobalV::NBANDS; ++i)		  
 						{     
 
-							ZEROS(waveg, GlobalV::NLOCAL);
+							ModuleBase::GlobalFunc::ZEROS(waveg, GlobalV::NLOCAL);
 
 
-							ZEROS(Gauss,np);
+							ModuleBase::GlobalFunc::ZEROS(Gauss,np);
 							for (int n=0; n<npoints; ++n)		  
 							{  
 								double en=emin+n * de_ev;

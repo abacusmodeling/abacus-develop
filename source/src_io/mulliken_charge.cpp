@@ -61,13 +61,13 @@ Mulliken_Charge::Mulliken_Charge()
 	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
 		DecMulP[is] = new double[GlobalV::NLOCAL];
-		ZEROS(DecMulP[is], GlobalV::NLOCAL);
+		ModuleBase::GlobalFunc::ZEROS(DecMulP[is], GlobalV::NLOCAL);
 	}
 	MecMulP = new double* [GlobalV::NSPIN];
 	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
 		MecMulP[is] = new double[GlobalV::NLOCAL];
-		ZEROS(MecMulP[is], GlobalV::NLOCAL);
+		ModuleBase::GlobalFunc::ZEROS(MecMulP[is], GlobalV::NLOCAL);
 	}
 
 
@@ -79,7 +79,7 @@ Mulliken_Charge::Mulliken_Charge()
 		for (int i=0; i<GlobalC::ucell.nat; i++)
 		{
 			ADecMulP[is][i] = new double[(2*GlobalC::ucell.lmax+1)*(2*GlobalC::ucell.lmax+1)*GlobalC::ucell.nmax];
-			ZEROS(ADecMulP[is][i], (2*GlobalC::ucell.lmax+1)*(2*GlobalC::ucell.lmax+1)*GlobalC::ucell.nmax);
+			ModuleBase::GlobalFunc::ZEROS(ADecMulP[is][i], (2*GlobalC::ucell.lmax+1)*(2*GlobalC::ucell.lmax+1)*GlobalC::ucell.nmax);
 		}
 	}
 }
@@ -128,7 +128,7 @@ void Mulliken_Charge::cal_mulliken(void)
 			matrix Dwf = M.wfc_gamma[is];
 			for (int i=0; i<GlobalV::NBANDS; ++i)		  
 			{     
-				ZEROS(mug, GlobalV::NLOCAL);
+				ModuleBase::GlobalFunc::ZEROS(mug, GlobalV::NLOCAL);
 				const int NB= i+1;
 
 				const double one_float=1.0, zero_float=0.0;
@@ -166,7 +166,7 @@ void Mulliken_Charge::cal_mulliken(void)
 		}//if
 		else
 		{   
-			std::vector<ComplexMatrix> mud;
+			std::vector<ModuleBase::ComplexMatrix> mud;
 			mud.resize(1);
 			mud[0].create(GlobalC::ParaO.ncol,GlobalC::ParaO.nrow);
 
@@ -217,11 +217,11 @@ void Mulliken_Charge::cal_mulliken(void)
 					GlobalC::LM.allocate_HS_k(GlobalC::ParaO.nloc);
 					GlobalC::LM.zeros_HSk('S');
 					GlobalC::LNNR.folding_fixedH(ik);
-					ComplexMatrix Dwf = conj(M.wfc_k[ik]);
+					ModuleBase::ComplexMatrix Dwf = conj(M.wfc_k[ik]);
 
 					for (int i=0; i<GlobalV::NBANDS; ++i)		  
 					{     
-						ZEROS(mug, GlobalV::NLOCAL);
+						ModuleBase::GlobalFunc::ZEROS(mug, GlobalV::NLOCAL);
 
 						const int NB= i+1;
 

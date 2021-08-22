@@ -31,6 +31,8 @@ FFTW3;
 
 ### Build and install ABACUS with CMake
 
+#### Configure
+
 We recommend building ABACUS with `cmake` to avoid dependency issues.
 ABACUS requires a minimum `cmake` version of `3.18`. Check the version of `cmake`  on your machine with:
 
@@ -52,10 +54,24 @@ For example:
 cmake -B build -DFFTW3_ROOT=/opt/fftw3 -DBOOST_INCLUDEDIR=/usr/include/boost
 ```
 
+You can also choose to build with which components.
+
+```bash
+cmake -B build -DUSE_LIBXC=1
+```
+
+If Libxc is not installed in standard path (i.e. installed with a custom prefix path), you may add the installation prefix of `FindLibxc.cmake` to `CMAKE_MODULE_PATH` environment variable, or set `Libxc_DIR` to the directory containing the file.
+
+```bash
+cmake -B build -DLibxc_DIR=~/libxc
+```
+
+#### Build and Install
+
 After configuring, start build and install by:
 
 ```bash
-cmake --build build
+cmake --build build -j9
 cmake --install build
 ```
 

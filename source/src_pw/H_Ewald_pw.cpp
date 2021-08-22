@@ -47,7 +47,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
     // buffer variable
     // used to optimize alpha
 
-	if(GlobalV::test_energy)OUT(GlobalV::ofs_running,"mxr",mxr);
+	if(GlobalV::test_energy)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"mxr",mxr);
     r  = new Vector3<double>[mxr];
     r2 = new double[mxr];
     int* irr = new int[mxr];
@@ -58,7 +58,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
     {
         charge += cell.atoms[it].na * cell.atoms[it].zv;//mohan modify 2007-11-7
     }
-    if(GlobalV::test_energy)OUT(GlobalV::ofs_running,"Total ionic charge",charge);
+    if(GlobalV::test_energy)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Total ionic charge",charge);
 
 	// (2) calculate the converged value: alpha
     H_Ewald_pw::alpha = 2.90;
@@ -76,8 +76,8 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
                      erfc(sqrt(cell.tpiba2 * pwb.ggchg / 4.0 / alpha));
     }
     while (upperbound > 1.0e-7);
-    if(GlobalV::test_energy)OUT(GlobalV::ofs_running,"alpha",alpha);
-	if(GlobalV::test_energy)OUT(GlobalV::ofs_running,"Upper bound",upperbound);
+    if(GlobalV::test_energy)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"alpha",alpha);
+	if(GlobalV::test_energy)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Upper bound",upperbound);
 
     // G-space sum here.
     // Determine if this processor contains G=0 and set the constant term
@@ -136,7 +136,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
     if (pwb.gstart == 1)
     {	
         rmax = 4.0 / sqrt(alpha) / cell.lat0;
-		if(GlobalV::test_energy)OUT(GlobalV::ofs_running,"rmax(unit lat0)",rmax);
+		if(GlobalV::test_energy)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"rmax(unit lat0)",rmax);
         // with this choice terms up to ZiZj*erfc(4) are counted (erfc(4)=2x10^-8
         int nt1=0;
         int nt2=0;
@@ -158,10 +158,10 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 
                         if (GlobalV::test_energy>1)
                         {
-                            OUT("dtau.x",dtau.x);
-                            OUT("dtau.y",dtau.y);
-                            OUT("dtau.z",dtau.z);
-                            OUT("nrm",nrm);
+                            ModuleBase::GlobalFunc::OUT("dtau.x",dtau.x);
+                            ModuleBase::GlobalFunc::OUT("dtau.y",dtau.y);
+                            ModuleBase::GlobalFunc::OUT("dtau.z",dtau.z);
+                            ModuleBase::GlobalFunc::OUT("nrm",nrm);
                         }
                         for (nr = 0;nr < nrm;nr++)
                         {
@@ -170,7 +170,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
                                      erfc(sqrt(alpha) * rr) / rr;
 
                         } // enddo
-                        if (GlobalV::test_energy>1) OUT("ewaldr",ewaldr);
+                        if (GlobalV::test_energy>1) ModuleBase::GlobalFunc::OUT("ewaldr",ewaldr);
                     } // enddo
                 } // enddo
             } // nt2
@@ -184,9 +184,9 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 
     if (GlobalV::test_energy>1)
     {
-        OUT("ewaldg",ewaldg);
-        OUT("ewaldr",ewaldr);
-        OUT("ewalds",ewalds);
+        ModuleBase::GlobalFunc::OUT("ewaldg",ewaldg);
+        ModuleBase::GlobalFunc::OUT("ewaldr",ewaldr);
+        ModuleBase::GlobalFunc::OUT("ewalds",ewalds);
     }
 
     delete[] irr;
@@ -282,9 +282,9 @@ void H_Ewald_pw::rgen(
 
     if (GlobalV::test_energy>1)
     {
-        OUT("nm1",nm1);
-        OUT("nm2",nm2);
-        OUT("nm3",nm3);
+        ModuleBase::GlobalFunc::OUT("nm1",nm1);
+        ModuleBase::GlobalFunc::OUT("nm2",nm2);
+        ModuleBase::GlobalFunc::OUT("nm3",nm3);
     }
 
     for (i = -nm1; i <= nm1; i++) // mohan fix bug, add '='. 2009-02-27

@@ -24,8 +24,8 @@ private:
 		const matrix & m,
 		const size_t & T,
 		const size_t & L,
-		const Element_Basis_Index::Range & range,
-		const Element_Basis_Index::IndexLNM & index );
+		const ModuleBase::Element_Basis_Index::Range & range,
+		const ModuleBase::Element_Basis_Index::IndexLNM & index );
 	static matrix get_column_mean0_matrix( const matrix & m );
 };
 

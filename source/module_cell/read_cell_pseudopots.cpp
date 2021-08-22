@@ -1,4 +1,5 @@
 #include "unitcell_pseudo.h"
+#include "../input.h"
 #ifdef __LCAO
 //#include "../module_orbital/ORB_read.h" // to use 'ORB' -- mohan 2021-01-30
 #endif
@@ -82,22 +83,22 @@ void UnitCell_pseudo::read_cell_pseudopots(const std::string &pp_dir)
 			atoms[i].set_pseudo_nc( upf );
 
 			GlobalV::ofs_running << "\n Read in pseudopotential file is " << pseudo_fn[i] << std::endl;
-			OUT(GlobalV::ofs_running,"pseudopotential type",atoms[i].pp_type);
-			OUT(GlobalV::ofs_running,"functional Ex", atoms[i].dft[0]);
-			OUT(GlobalV::ofs_running,"functional Ec", atoms[i].dft[1]);
-			OUT(GlobalV::ofs_running,"functional GCEx", atoms[i].dft[2]);
-			OUT(GlobalV::ofs_running,"functional GCEc", atoms[i].dft[3]);
-			OUT(GlobalV::ofs_running,"nonlocal core correction", atoms[i].nlcc);
-//			OUT(GlobalV::ofs_running,"spin orbital",atoms[i].has_so);
-			OUT(GlobalV::ofs_running,"valence electrons", atoms[i].zv);
-			OUT(GlobalV::ofs_running,"lmax", atoms[i].lmax);
-			OUT(GlobalV::ofs_running,"number of zeta", atoms[i].nchi);
-			OUT(GlobalV::ofs_running,"number of projectors", atoms[i].nbeta);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"pseudopotential type",atoms[i].pp_type);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"functional Ex", atoms[i].dft[0]);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"functional Ec", atoms[i].dft[1]);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"functional GCEx", atoms[i].dft[2]);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"functional GCEc", atoms[i].dft[3]);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nonlocal core correction", atoms[i].nlcc);
+//			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"spin orbital",atoms[i].has_so);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"valence electrons", atoms[i].zv);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"lmax", atoms[i].lmax);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of zeta", atoms[i].nchi);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of projectors", atoms[i].nbeta);
 			for(int ib=0; ib<atoms[i].nbeta; ib++)
 			{
-				OUT(GlobalV::ofs_running,"L of projector", atoms[i].lll[ib]);
+				ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"L of projector", atoms[i].lll[ib]);
 			}
-//			OUT(GlobalV::ofs_running,"Grid Mesh Number", atoms[i].mesh);
+//			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Grid Mesh Number", atoms[i].mesh);
 		}
 		if(upf.functional_error == 1)
 		{
@@ -111,10 +112,10 @@ void UnitCell_pseudo::read_cell_pseudopots(const std::string &pp_dir)
 			if(GlobalV::MY_RANK==0)
 			{
 				GlobalV::ofs_running << "\n XC functional updated to : " << std::endl;
-				OUT(GlobalV::ofs_running,"functional Ex", atoms[i].dft[0]);
-				OUT(GlobalV::ofs_running,"functional Ec", atoms[i].dft[1]);
-				OUT(GlobalV::ofs_running,"functional GCEx", atoms[i].dft[2]);
-				OUT(GlobalV::ofs_running,"functional GCEc", atoms[i].dft[3]);
+				ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"functional Ex", atoms[i].dft[0]);
+				ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"functional Ec", atoms[i].dft[1]);
+				ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"functional GCEx", atoms[i].dft[2]);
+				ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"functional GCEc", atoms[i].dft[3]);
 			}
 		}
 			

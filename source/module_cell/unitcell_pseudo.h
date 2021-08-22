@@ -31,11 +31,15 @@ public: // member variables
 public: // member functions
 	UnitCell_pseudo();
 	~UnitCell_pseudo();
-	void setup_cell(const std::string &s_pseudopot_dir, output &outp, const std::string &fn, std::ofstream &log);
+	void setup_cell(
+		const std::string &s_pseudopot_dir, 
+		output &outp, 
+		const std::string &fn, 
+		std::ofstream &log);
 	void setup_cell_classic(
-	const std::string &fn, 
-	std::ofstream &ofs_running,
-	std::ofstream &ofs_warning); // Yu Liu 2021-07-13, RX changed ofs_running and ofs_warning from globalV to inputs. 2021-07-24
+		const std::string &fn, 
+		std::ofstream &ofs_running,
+		std::ofstream &ofs_warning); // liuyu 2021-07-13, RX changed ofs_running and ofs_warning from globalV to inputs. 2021-07-24
 	void read_atom_species(std::ifstream &ifa, std::ofstream &ofs_running); // read in the atom information for each type of atom
 	bool read_atom_positions(std::ifstream &ifpos, std::ofstream &ofs_running, std::ofstream &ofs_warning); // read in atomic positions
 	int find_type(const std::string &label);

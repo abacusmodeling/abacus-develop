@@ -29,8 +29,8 @@ void Ions_Move_Basic::setup_gradient(double* pos, double *grad, const matrix &fo
 	assert(grad!=NULL);
 	assert(dim == 3*GlobalC::ucell.nat);
 
-	ZEROS(pos, dim);
-	ZEROS(grad, dim);
+	ModuleBase::GlobalFunc::ZEROS(pos, dim);
+	ModuleBase::GlobalFunc::ZEROS(grad, dim);
 
 	// (1) init gradient
 	// the unit of pos: Bohr.
@@ -143,10 +143,10 @@ void Ions_Move_Basic::check_converged(const double *grad)
 
 	if(GlobalV::test_ion_dynamics)
 	{	
-		OUT(GlobalV::ofs_running,"old total energy (ry)", etot_p);
-		OUT(GlobalV::ofs_running,"new total energy (ry)", etot);
-		OUT(GlobalV::ofs_running,"energy difference (ry)", Ions_Move_Basic::ediff);
-		OUT(GlobalV::ofs_running,"largest gradient (ry/bohr)",Ions_Move_Basic::largest_grad);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"old total energy (ry)", etot_p);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"new total energy (ry)", etot);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"energy difference (ry)", Ions_Move_Basic::ediff);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"largest gradient (ry/bohr)",Ions_Move_Basic::largest_grad);
 	}
 
 	if(GlobalV::OUT_LEVEL=="ie")
@@ -195,8 +195,8 @@ void Ions_Move_Basic::terminate(void)
 	if(Ions_Move_Basic::converged)
 	{
 		GlobalV::ofs_running << " end of geometry optimization"<<std::endl;
-		OUT(GlobalV::ofs_running,"istep", Ions_Move_Basic::istep);
-		OUT(GlobalV::ofs_running,"update iteration", Ions_Move_Basic::update_iter);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"istep", Ions_Move_Basic::istep);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"update iteration", Ions_Move_Basic::update_iter);
 		/*
 		GlobalV::ofs_running<<"Saving the approximate inverse hessian"<<std::endl;
 		std::ofstream hess("hess.out");

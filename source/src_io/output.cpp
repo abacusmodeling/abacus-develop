@@ -55,7 +55,7 @@ void output::printrm(const std::string &s, const matrix &m, const double &limit)
     return;
 }
 
-void output::printcm_norm(std::ofstream &ofs, const std::string &s, const ComplexMatrix &m, const double &limit)const
+void output::printcm_norm(std::ofstream &ofs, const std::string &s, const ModuleBase::ComplexMatrix &m, const double &limit)const
 {
     const int b1 = m.nr;
     const int b2 = m.nc;
@@ -75,7 +75,7 @@ void output::printcm_norm(std::ofstream &ofs, const std::string &s, const Comple
     return;
 }
 
-void output::printcm_norm(const std::string &s, const ComplexMatrix &m, const double &limit)const
+void output::printcm_norm(const std::string &s, const ModuleBase::ComplexMatrix &m, const double &limit)const
 {
     const int b1 = m.nr;
     const int b2 = m.nc;
@@ -96,7 +96,7 @@ void output::printcm_norm(const std::string &s, const ComplexMatrix &m, const do
 }
 
 
-void output::printcm(std::ofstream &ofs, const std::string &s, const ComplexMatrix &m) const
+void output::printcm(std::ofstream &ofs, const std::string &s, const ModuleBase::ComplexMatrix &m) const
 {
     const int b1 = m.nr;
     const int b2 = m.nc;
@@ -117,7 +117,7 @@ void output::printcm(std::ofstream &ofs, const std::string &s, const ComplexMatr
     return;
 }//end print cm
 
-void output::printcm(const std::string &s, const ComplexMatrix &m) const
+void output::printcm(const std::string &s, const ModuleBase::ComplexMatrix &m) const
 {
     const int b1 = m.nr;
     const int b2 = m.nc;
@@ -136,7 +136,7 @@ void output::printcm(const std::string &s, const ComplexMatrix &m) const
     return;
 }
 
-void output::printcm_real_limit_hermit(const std::string &s, const ComplexMatrix &m,const double &limit) const
+void output::printcm_real_limit_hermit(const std::string &s, const ModuleBase::ComplexMatrix &m,const double &limit) const
 {
     const int b1 = m.nr;
     const int b2 = m.nc;
@@ -157,7 +157,7 @@ void output::printcm_real_limit_hermit(const std::string &s, const ComplexMatrix
     return;
 }
 
-void output::printcm_real(const std::string &s, const ComplexMatrix &m,const double &limit) const
+void output::printcm_real(const std::string &s, const ModuleBase::ComplexMatrix &m,const double &limit) const
 {
     const int b1 = m.nr;
     const int b2 = m.nc;
@@ -180,7 +180,7 @@ void output::printcm_real(const std::string &s, const ComplexMatrix &m,const dou
 
 
 
-void output::printcm_imag(const std::string &s, const ComplexMatrix &m,const double &limit) const
+void output::printcm_imag(const std::string &s, const ModuleBase::ComplexMatrix &m,const double &limit) const
 {
     const int b1 = m.nr;
     const int b2 = m.nc;
@@ -271,7 +271,3 @@ void output::printM3(const std::string &description, const Matrix3 &m)const
          << std::setw(20) << m.e31 << std::setw(20) << m.e32 << std::setw(20) << m.e33 << std::endl;
     return;
 }
-
-
-
-

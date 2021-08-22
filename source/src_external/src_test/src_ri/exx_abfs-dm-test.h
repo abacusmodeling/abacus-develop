@@ -9,25 +9,25 @@
 class Exx_Abfs_DM_Test
 {
 public:
-	static std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> cal_DMk_raw_readfile( const set<std::pair<size_t,size_t>> &atom_pairs );
+	static std::map<size_t,std::map<size_t,std::vector<ModuleBase::ComplexMatrix>>> cal_DMk_raw_readfile( const set<std::pair<size_t,size_t>> &atom_pairs );
 	static std::vector<std::vector<std::complex<double>>> read_wfc( const std::string &file_name );
 	static matrix read_wg( const std::string &file_name );
 };
 
-std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> 
+std::map<size_t,std::map<size_t,std::vector<ModuleBase::ComplexMatrix>>> 
 Exx_Abfs_DM_Test::cal_DMk_raw_readfile( const set<std::pair<size_t,size_t>> &atom_pairs )
 {
 	static int istep=-1;	++istep;	
-	TITLE("cal_DMk_raw_readfile_"+TO_STRING(istep));
-	matrix wf_wg = read_wg( "wf.wg/wf.wg_"+TO_STRING(istep) );
+	TITLE("cal_DMk_raw_readfile_"+ModuleBase::GlobalFunc::TO_STRING(istep));
+	matrix wf_wg = read_wg( "wf.wg/wf.wg_"+ModuleBase::GlobalFunc::TO_STRING(istep) );
 	std::vector<std::vector<std::vector<std::complex<double>>>> wfc(GlobalC::kv.nks);
 	for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
-		wfc[ik] = read_wfc( "hvec/hvec_"+TO_STRING(istep)+"_"+TO_STRING(ik) );	
+		wfc[ik] = read_wfc( "hvec/hvec_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(ik) );	
 	
 	
 	const double SPIN_multiple = 0.5*GlobalV::NSPIN;
 	
-	std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> DMk_raw;
+	std::map<size_t,std::map<size_t,std::vector<ModuleBase::ComplexMatrix>>> DMk_raw;
 	for( const std::pair<size_t,size_t> & atom_pair : atom_pairs )
 	{
 		const size_t iat1 = atom_pair.first;
@@ -37,7 +37,7 @@ Exx_Abfs_DM_Test::cal_DMk_raw_readfile( const set<std::pair<size_t,size_t>> &ato
 		const size_t ia1 = GlobalC::ucell.iat2ia[iat1];
 		const size_t ia2 = GlobalC::ucell.iat2ia[iat2];
 
-		DMk_raw[iat1][iat2] = std::vector<ComplexMatrix>( GlobalC::kv.nks, {GlobalC::ucell.atoms[it1].nw,GlobalC::ucell.atoms[it2].nw} );
+		DMk_raw[iat1][iat2] = std::vector<ModuleBase::ComplexMatrix>( GlobalC::kv.nks, {GlobalC::ucell.atoms[it1].nw,GlobalC::ucell.atoms[it2].nw} );
 		for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 		{
 			for( size_t iw1=0; iw1!=GlobalC::ucell.atoms[it1].nw; ++iw1 )
