@@ -98,6 +98,7 @@ If you only want to plot total DOS, you can modify `pdosfile` to `tdosfile` and 
 |*species*|`List[str]` or `Dict[str, List[int]]` or `Dict[str, Dict[str, List[int]]]]`| Three ways to plot partial DOS e.g. ["C", "Si"], {"C":[0, 1], "Si":[0]}, ["C":{"0":[0]}, "Si":{"1":[0, 1]}]|
 |*tdosfig*|`str`|Output picture of total DOS|
 |*pdosfig*|`str`|Output picture of partial DOS|
+
 Then, the following command will plot both total DOS and partial DOS:
 ```shell
 abacus-plot -b dos-input.json
