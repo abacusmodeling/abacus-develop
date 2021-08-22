@@ -37,6 +37,7 @@ First, prepare a json file e.g. band-input.json:
 |*kptfile*|`str`|K-points file in ABACUS format|
 |*label*|`str` or `List[str]`|Label of band structure|
 |*color*|`str` or `List[str]`|Color of band structure|
+
 The *kptfile* should be as follows, and notes after `#` will be set as k-points label automatically.
 ```shell
 K_POINTS
