@@ -2199,7 +2199,7 @@ void Input::Bcast()
 		Parallel_Common::bcast_double(mdp.rcut_lj);
 		Parallel_Common::bcast_double(mdp.epsilon_lj);
 		Parallel_Common::bcast_double(mdp.sigma_lj);
-		Parallel_Common::bcast_double(mdp.md_potential);
+		Parallel_Common::bcast_string(mdp.md_potential);
 /* 	// Peize Lin add 2014-04-07
 	Parallel_Common::bcast_bool( vdwD2 );
 	Parallel_Common::bcast_double( vdwD2_scaling );
