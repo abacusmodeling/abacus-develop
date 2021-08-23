@@ -230,7 +230,7 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool
 	for (int ir = 0; ir < this->nr_uniform; ir++)
 	{
 		const double psi_uniform_tmp  = 
-		Mathzone_Add1::Uni_RadialF(ModuleBase::GlobalFunc::VECTOR_TO_PTR(this->psi), this->nr, this->rab[0], ir * dr_uniform); 
+		ModuleBase::Mathzone_Add1::Uni_RadialF(ModuleBase::GlobalFunc::VECTOR_TO_PTR(this->psi), this->nr, this->rab[0], ir * dr_uniform); 
 		this->psi_uniform[ir] = psi_uniform_tmp;
 //    	this->psi_uniform[ir] = Mathzone::Polynomial_Interpolation(this->psi, this->nr, this->rab[0], ir * dr_uniform); 
     }
@@ -247,11 +247,11 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool
 	// has problem that the derivatives of orbitals oscillate a lot
 	// around r=0
 	//--------------------------------------------------------------------------
-	//Mathzone_Add1::SplineD2 (r_radial, psi, nr, 100000.0, 100000.0, y2);
+	//ModuleBase::Mathzone_Add1::SplineD2 (r_radial, psi, nr, 100000.0, 100000.0, y2);
 	//double yp1=(this->psi[1]-this->psi[0])/this->r_radial[1];
 	//std::cout<<"psi0="<<"  "<<this->psi[0]<<"  "<<"psi1="<<"  "<<this->psi[1]<<"  "<<"r1="<<"  "<<this->r_radial[1]<<std::endl; 
 	//std::cout<<"yp1="<<"  "<<yp1<<std::endl;
-	//Mathzone_Add1::SplineD2 (r_radial, psi, nr, yp1, 0.0, y2);
+	//ModuleBase::Mathzone_Add1::SplineD2 (r_radial, psi, nr, yp1, 0.0, y2);
 	
 
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -260,28 +260,28 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool
 	// Peize Lin update 2016-08-31
 	switch( this->angular_momentum_l ) // added by pengfei 13-8-8 different l has different  boundary conditions 
 	{
-		case 0: Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
-		case 1: Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 100000.0, 100000.0, y2); break;
-		case 2: Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
-		case 3: Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 100000.0, 100000.0, y2); break;
-		case 4: Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
+		case 0: ModuleBase::Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
+		case 1: ModuleBase::Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 100000.0, 100000.0, y2); break;
+		case 2: ModuleBase::Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
+		case 3: ModuleBase::Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 100000.0, 100000.0, y2); break;
+		case 4: ModuleBase::Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
 		default: 
 			//GlobalV::ofs_warning << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << std::endl;
 			//GlobalV::ofs_warning << " Check file " << __FILE__ << " line " << __LINE__ <<std::endl;
 			std::cout << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << std::endl;
 			std::cout << " Check file " << __FILE__ << " line " << __LINE__ <<std::endl;
-			Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
+			ModuleBase::Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
 	}
 
-	//Mathzone_Add1::SplineD2 (r_radial, psi, nr, 0.0, 0.0, y2);
+	//ModuleBase::Mathzone_Add1::SplineD2 (r_radial, psi, nr, 0.0, 0.0, y2);
 	//std::cout<<"angular_momentum_l="<<"  "<<this->angular_momentum_l<<std::endl;
 	//for (int i=0; i<nr; i++)
 	//{
 	//     std::cout<<r_radial[i]<<"  "<<y2[i]<<std::endl;
 	//}
 	//Method 1
-	//	Mathzone_Add1::Uni_Deriv_Phi (psi_uniform, nr_uniform, dr_uniform, 1, dpsi_uniform);
-	//	Mathzone_Add1::Uni_Deriv_Phi (psi_uniform, nr_uniform, dr_uniform, 2, ddpsi_uniform);
+	//	ModuleBase::Mathzone_Add1::Uni_Deriv_Phi (psi_uniform, nr_uniform, dr_uniform, 1, dpsi_uniform);
+	//	ModuleBase::Mathzone_Add1::Uni_Deriv_Phi (psi_uniform, nr_uniform, dr_uniform, 2, ddpsi_uniform);
 
 	double* rad = new double[nr_uniform];
 	for (int ir = 0; ir < nr_uniform; ir++)
@@ -289,23 +289,23 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool
 		rad[ir] = ir*dr_uniform;
 	}
 
-	//	Mathzone_Add1::SplineD2 (rad, psi_uniform, nr_uniform, 0.0, 0.0, ddpsi_uniform);
+	//	ModuleBase::Mathzone_Add1::SplineD2 (rad, psi_uniform, nr_uniform, 0.0, 0.0, ddpsi_uniform);
 	double* tmp = new double[nr_uniform];
-	Mathzone_Add1::Cubic_Spline_Interpolation(ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), y2, 
+	ModuleBase::Mathzone_Add1::Cubic_Spline_Interpolation(ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), y2, 
 			nr, rad, nr_uniform, tmp, ModuleBase::GlobalFunc::VECTOR_TO_PTR(dpsi_uniform) );
 
 	// calculate zty
 	// liaochen add 2010-08
 	if( force_flag )	// Peize Lin add if 2017-10-26
 	{
-		Mathzone_Add1::Uni_Deriv_Phi (
+		ModuleBase::Mathzone_Add1::Uni_Deriv_Phi (
 			ModuleBase::GlobalFunc::VECTOR_TO_PTR(this->psi_uniform), 
 			this->nr_uniform, 
 			dr_uniform, 
 			angular_momentum_l, 
 			tmp);
 
-		this->zty = tmp[0]/Mathzone_Add1::factorial (angular_momentum_l);
+		this->zty = tmp[0]/ModuleBase::Mathzone_Add1::factorial (angular_momentum_l);
 	}
 
 	delete [] y2;
@@ -355,12 +355,12 @@ void Numerical_Orbital_Lm::use_uniform(const double &dr_uniform_in)
 	for(int i=0; i<nr_uniform; i++)
 	{
 		this->psi_uniform[i] = 
-			Mathzone_Add1::Uni_RadialF(ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), this->nr, this->rab[0], i*dr_uniform); 
+			ModuleBase::Mathzone_Add1::Uni_RadialF(ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), this->nr, this->rab[0], i*dr_uniform); 
 	}
 	
 	this->dpsi_uniform.resize(nr_uniform);
 
-	Mathzone_Add1::Uni_Deriv_Phi (
+	ModuleBase::Mathzone_Add1::Uni_Deriv_Phi (
 		ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi_uniform), 
 		nr_uniform, dr_uniform, 
 		1, 
@@ -408,7 +408,7 @@ void Numerical_Orbital_Lm::cal_kradial(void)
 	}
 	
 	//liaochen add
-	Mathzone_Add1::Sbt_new (3, angular_momentum_l, 
+	ModuleBase::Mathzone_Add1::Sbt_new (3, angular_momentum_l, 
 							k_radial, dk, nk, 
 							rad, dr_uniform, nr_uniform, 
 							psi_uniform, 0, this->psik);

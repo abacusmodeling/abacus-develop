@@ -229,7 +229,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 		}
 		
 		ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,kab,temp);
-		rs[0] = FOUR_PI / Mathzone_Add1::dualfac (2*l+1) * temp;
+		rs[0] = FOUR_PI / ModuleBase::Mathzone_Add1::dualfac (2*l+1) * temp;
 	}
 
 	delete [] integrated_func;
@@ -358,7 +358,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 
 			// PLEASE try to make dualfac function as input parameters
 			// mohan note 2021-03-23
-			rs[0] = FOUR_PI / Mathzone_Add1::dualfac (2*l+1) * temp;
+			rs[0] = FOUR_PI / ModuleBase::Mathzone_Add1::dualfac (2*l+1) * temp;
 		}
 	}
 	

@@ -207,7 +207,7 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 		
 		// Call simpson integration
 		ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,kab,temp);
-		rs[0] = FOUR_PI / Mathzone_Add1::dualfac (2*l+1) * temp;
+		rs[0] = FOUR_PI / ModuleBase::Mathzone_Add1::dualfac (2*l+1) * temp;
 	}
 	
 	delete [] integrated_func;

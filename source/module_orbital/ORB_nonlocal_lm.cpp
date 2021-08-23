@@ -202,7 +202,7 @@ void Numerical_Nonlocal_Lm::extra_uniform(const double &dr_uniform_in)
 	ModuleBase::GlobalFunc::ZEROS(this->dbeta_uniform, nr_uniform);
 	
 	double* y2 = new double[nr];
-	Mathzone_Add1::SplineD2 (r_radial, beta_r, nr, 0.0, 0.0, y2);
+	ModuleBase::Mathzone_Add1::SplineD2 (r_radial, beta_r, nr, 0.0, 0.0, y2);
 
 	double* rad = new double[nr_uniform];
 	for (int ir = 0; ir < nr_uniform; ir++)
@@ -211,7 +211,7 @@ void Numerical_Nonlocal_Lm::extra_uniform(const double &dr_uniform_in)
 	}
 	
 	double* tmp = new double[nr_uniform];
-	Mathzone_Add1::Cubic_Spline_Interpolation(r_radial, beta_r, y2, 
+	ModuleBase::Mathzone_Add1::Cubic_Spline_Interpolation(r_radial, beta_r, y2, 
 					nr, rad, nr_uniform, tmp, dbeta_uniform );
 
 	for(int ir= 0 ; ir<nr_uniform; ir++)
