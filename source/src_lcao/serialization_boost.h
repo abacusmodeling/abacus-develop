@@ -64,7 +64,7 @@ namespace boost
 
 		// MatrixWrapper									Peize Lin add 2018-07-31
 		template<typename Archive>
-		inline void save( Archive & ar, const Matrix_Wrapper & m, const unsigned int /*file_version*/ )
+		inline void save( Archive & ar, const ModuleBase::Matrix_Wrapper & m, const unsigned int /*file_version*/ )
 		{
 			const collection_size_type nr(m.nr), nc(m.nc);
 			ar << BOOST_SERIALIZATION_NVP(nr) << BOOST_SERIALIZATION_NVP(nc);
@@ -72,7 +72,7 @@ namespace boost
 				ar << serialization::make_array( m.c, nr*nc );
 		}
 		template<class Archive>
-		inline void load( Archive & ar, Matrix_Wrapper &m,  const unsigned int /*file_version*/ )
+		inline void load( Archive & ar, ModuleBase::Matrix_Wrapper &m,  const unsigned int /*file_version*/ )
 		{
 			collection_size_type nr, nc;
 			ar >> BOOST_SERIALIZATION_NVP(nr) >> BOOST_SERIALIZATION_NVP(nc);
@@ -81,7 +81,7 @@ namespace boost
 				ar >> serialization::make_array( m.c, nr*nc );
 		}
 		template<class Archive>
-		inline void serialize( Archive & ar, Matrix_Wrapper & m, const unsigned int file_version )
+		inline void serialize( Archive & ar, ModuleBase::Matrix_Wrapper & m, const unsigned int file_version )
 		{
 			boost::serialization::split_free(ar, m, file_version);
 		}

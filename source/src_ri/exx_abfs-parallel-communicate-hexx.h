@@ -59,10 +59,10 @@ private:
 		void set_atom_in_2D();
 		void ask( const int rank_delta_now );
 		void recv_data_process( const int rank_data );
-		void insert_data( std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> &data_rank );
+		void insert_data( std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::Matrix_Wrapper>>>> &data_rank );
 		void insert_data();
 		void send_data_process( const int rank_asked );
-		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> get_data_local_wrapper( 
+		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::Matrix_Wrapper>>>> get_data_local_wrapper( 
 			const std::pair<std::vector<bool>,std::vector<bool>> &atom_asked ) const;
 
 	private:
