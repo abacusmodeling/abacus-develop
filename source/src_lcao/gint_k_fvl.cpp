@@ -546,7 +546,7 @@ void Gint_k::evaluate_vl_stress(
                 const int dRz = R1z - R2z;
 
                 double rt[3];
-                Mathzone::Direct_to_Cartesian(dRx,dRy,dRz,
+                ModuleBase::Mathzone::Direct_to_Cartesian(dRx,dRy,dRz,
                                               GlobalC::ucell.a1.x, GlobalC::ucell.a1.y, GlobalC::ucell.a1.z,
                                               GlobalC::ucell.a2.x, GlobalC::ucell.a2.y, GlobalC::ucell.a2.z,
                                               GlobalC::ucell.a3.x, GlobalC::ucell.a3.y, GlobalC::ucell.a3.z,

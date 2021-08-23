@@ -232,7 +232,7 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool
 		const double psi_uniform_tmp  = 
 		ModuleBase::Mathzone_Add1::Uni_RadialF(ModuleBase::GlobalFunc::VECTOR_TO_PTR(this->psi), this->nr, this->rab[0], ir * dr_uniform); 
 		this->psi_uniform[ir] = psi_uniform_tmp;
-//    	this->psi_uniform[ir] = Mathzone::Polynomial_Interpolation(this->psi, this->nr, this->rab[0], ir * dr_uniform); 
+//    	this->psi_uniform[ir] = ModuleBase::Mathzone::Polynomial_Interpolation(this->psi, this->nr, this->rab[0], ir * dr_uniform); 
     }
 	
 	//----------------------------------------------	 

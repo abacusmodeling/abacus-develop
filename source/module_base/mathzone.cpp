@@ -5,6 +5,9 @@
 #include "global_function.h"
 #include "timer.h"
 
+namespace ModuleBase
+{
+
 Mathzone::Mathzone()
 {
 }
@@ -73,3 +76,4 @@ void Mathzone::To_Polar_Coordinate
     return;
 }
 
+}

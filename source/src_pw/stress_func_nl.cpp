@@ -415,7 +415,7 @@ double Stress_Func::Polynomial_Interpolation_nl
     const double &x                             // input value
 )
 {
-//      timer::tick("Mathzone","Poly_Interpo_2");
+
 	assert(table_interval>0.0);
 	const double position = x  / table_interval;
 	const int iq = static_cast<int>(position);
@@ -430,7 +430,7 @@ double Stress_Func::Polynomial_Interpolation_nl
 			table(dim1, dim2, iq+2) * (+x1*x3-x0*x3-x0*x1) / 2.0 +
 			table(dim1, dim2, iq+3) * (+x1*x2-x0*x2-x0*x1) / 6.0 )/table_interval ;
 
-//      timer::tick("Mathzone","Poly_Interpo_2");
+
 	return y;
 }
 

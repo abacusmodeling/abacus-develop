@@ -625,7 +625,7 @@ void MD_basic::getTaudUpdate()
     Vector3<double> fracStep;
 	for(int  ii=0;ii<ucell.nat;ii++)
     { 
-		Mathzone::Cartesian_to_Direct(cart_change[ii].x,cart_change[ii].y,cart_change[ii].z,
+		ModuleBase::Mathzone::Cartesian_to_Direct(cart_change[ii].x,cart_change[ii].y,cart_change[ii].z,
 					ucell.latvec.e11,ucell.latvec.e12,ucell.latvec.e13,
 					ucell.latvec.e21,ucell.latvec.e22,ucell.latvec.e23,
 					ucell.latvec.e31,ucell.latvec.e32,ucell.latvec.e33,

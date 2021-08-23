@@ -417,7 +417,7 @@ void Grid::In_Which_Cell(const UnitCell &ucell, int &a, int &b, int &c, const FA
 // d_minX, d_minY, d_minZ must be the cell origin
 //----------------------------------------------------------
 		double directx, directy, directz;
-		Mathzone::Cartesian_to_Direct(
+		ModuleBase::Mathzone::Cartesian_to_Direct(
 		    atom.x(), atom.y(), atom.z(),
 		    vec1[0], vec1[1], vec1[2],
 		    vec2[0], vec2[1], vec2[2],

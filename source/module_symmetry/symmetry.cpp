@@ -130,7 +130,7 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, std::o
 	{
 		for(int ia=0; ia<ucell.atoms[it].na; ++ia)
 		{
-			Mathzone::Cartesian_to_Direct(ucell.atoms[it].tau[ia].x, 
+			ModuleBase::Mathzone::Cartesian_to_Direct(ucell.atoms[it].tau[ia].x, 
 					ucell.atoms[it].tau[ia].y, 
 					ucell.atoms[it].tau[ia].z,
 					new_lat.e11, new_lat.e12, new_lat.e13,
@@ -721,7 +721,7 @@ void Symmetry::lattice_type(
         {
                 for(int ia=0; ia<ucell.atoms[it].na; ++ia)
                 {
-                        Mathzone::Cartesian_to_Direct(ucell.atoms[it].tau[ia].x,
+                        ModuleBase::Mathzone::Cartesian_to_Direct(ucell.atoms[it].tau[ia].x,
                                         ucell.atoms[it].tau[ia].y,
                                         ucell.atoms[it].tau[ia].z,
                                         q1.x, q1.y, q1.z,

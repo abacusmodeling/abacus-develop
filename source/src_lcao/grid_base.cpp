@@ -115,7 +115,7 @@ void Grid_Base::init(
 
 				const int index = j * ny * nz + i  * nz + k;
 
-				Mathzone::Direct_to_Cartesian(
+				ModuleBase::Mathzone::Direct_to_Cartesian(
 				    direct.x, direct.y, direct.z,
 				    latvec0.e11, latvec0.e12, latvec0.e13,
 				    latvec0.e21, latvec0.e22, latvec0.e23,
@@ -192,7 +192,7 @@ void Grid_Base::get_small_box(
 	Vector3<double> tau_dir;
 
 	// NOTE: tau_dir can be calculated and stored firstly.
-	Mathzone::Cartesian_to_Direct
+	ModuleBase::Mathzone::Cartesian_to_Direct
 	(
 	    tau.x, tau.y, tau.z,
 	    latvec.e11, latvec.e12, latvec.e13,
