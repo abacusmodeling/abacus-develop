@@ -707,10 +707,6 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 			}// end na
 		}//end for ntype
 	}// end scan_begin
-	std::cout<<"mag_stru";
-	for(int i=0;i<ntype;i++)
-	{std::cout<<magnet.start_magnetization[i];}
-	std::cout<<"\n";
 //check if any atom can move in MD
 	if(!this->if_atoms_can_move() && GlobalV::CALCULATION=="md")
 	{

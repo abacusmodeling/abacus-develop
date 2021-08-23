@@ -1217,7 +1217,7 @@ This part of variables are used to control DFT+U correlated parameters
 ### Start magnetization
 - magmom
     - *Type*: Real
-    - *Description*: This set the start magnetization for each type of atom one by one. Different type of atom with same magetic moment could be abbreviated as ntype\*magmom(NOTICE:No space before and after '\*').If one set the start magnetization here, they MUST NOT be specified again in STRU file.
+    - *Description*: This set the start magnetization for each type of atom. The input magmom should be seperated by space and in the same order of STRU file. Different type of atoms with same magetic moment could be abbreviated as ntype\*magmom(NOTICE:No space before and after '\*').If one set the start magnetization here, they MUST NOT be specified again in STRU file.
     - *Default*: 0.0
     [back to top](#input-file)
 
