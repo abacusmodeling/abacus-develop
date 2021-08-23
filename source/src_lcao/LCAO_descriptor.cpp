@@ -23,6 +23,9 @@ LCAO_Descriptor::LCAO_Descriptor()
     d = new double[1];
     H_V_delta = new double[1];
     dm_double = new double[1];
+    DH_V_delta_x = new double[1];
+    DH_V_delta_y = new double[1];
+    DH_V_delta_z = new double[1];
 }
 
 
@@ -34,36 +37,46 @@ LCAO_Descriptor::~LCAO_Descriptor()
     delete[] d;
     delete[] H_V_delta;
     delete[] dm_double;
+    delete[] DH_V_delta_x;
+    delete[] DH_V_delta_y;
+    delete[] DH_V_delta_z;
+
+    //=======1. "out_descriptor" part==========
     //delete S_mu_alpha**
     for (int inl = 0;inl < this->inlmax;inl++)
     {
         delete[] S_mu_alpha[inl];
     }
     delete[] S_mu_alpha;
-
-    //delete DS_mu_alpha**
-    for (int inl = 0;inl < this->inlmax;inl++)
-    {
-        delete[] DS_mu_alpha_x[inl];
-        delete[] DS_mu_alpha_y[inl];
-        delete[] DS_mu_alpha_z[inl];
-    }
-    delete[] DS_mu_alpha_x;
-    delete[] DS_mu_alpha_y;
-    delete[] DS_mu_alpha_z;
-
     //delete pdm**
     for (int inl = 0;inl < this->inlmax;inl++)
     {
         delete[] pdm[inl];
     }
     delete[] pdm;
-    //delete gedm**
-    for (int inl = 0;inl < this->inlmax;inl++)
+    //=======2. "deepks_scf" part==========
+    if (INPUT.deepks_scf)
     {
-        delete[] gedm[inl];
+        //delete gedm**
+        for (int inl = 0;inl < this->inlmax;inl++)
+        {
+            delete[] gedm[inl];
+        }
+        delete[] gedm;
+        if (FORCE)
+        {
+            //delete DS_mu_alpha**
+            for (int inl = 0;inl < this->inlmax;inl++)
+            {
+                delete[] DS_mu_alpha_x[inl];
+                delete[] DS_mu_alpha_y[inl];
+                delete[] DS_mu_alpha_z[inl];
+            }
+            delete[] DS_mu_alpha_x;
+            delete[] DS_mu_alpha_y;
+            delete[] DS_mu_alpha_z;
+        }
     }
-    delete[] gedm;
 }
 
 
@@ -100,22 +113,6 @@ void LCAO_Descriptor::init(
         ZEROS(S_mu_alpha[inl], NLOCAL * (2 * this->lmaxd+ 1));
     }
 
-    //init F_delta
-    F_delta.create(ucell.nat, 3);
-    //init DS_mu_alpha**
-    this->DS_mu_alpha_x = new double* [this->inlmax];
-    this->DS_mu_alpha_y = new double* [this->inlmax];
-    this->DS_mu_alpha_z = new double* [this->inlmax];
-    for (int inl = 0;inl < this->inlmax;inl++)
-    {
-        this->DS_mu_alpha_x[inl] = new double[NLOCAL * (2 * this->lmaxd + 1)];
-        this->DS_mu_alpha_y[inl] = new double[NLOCAL * (2 * this->lmaxd + 1)];
-        this->DS_mu_alpha_z[inl] = new double[NLOCAL * (2 * this->lmaxd + 1)];
-        ZEROS(DS_mu_alpha_x[inl], NLOCAL * (2 * this->lmaxd + 1));
-        ZEROS(DS_mu_alpha_y[inl], NLOCAL * (2 * this->lmaxd + 1));
-        ZEROS(DS_mu_alpha_z[inl], NLOCAL * (2 * this->lmaxd + 1));
-    }
-
     //init pdm**
     const int PDM_size = (this->lmaxd * 2 + 1) * (this->lmaxd * 2 + 1);
     this->pdm = new double* [this->inlmax];
@@ -123,14 +120,6 @@ void LCAO_Descriptor::init(
     {
         this->pdm[inl] = new double[PDM_size];
         ZEROS(this->pdm[inl], PDM_size);
-    }
-
-    //init gedm**
-    this->gedm = new double* [this->inlmax];
-    for (int inl = 0;inl < this->inlmax;inl++)
-    {
-        this->gedm[inl] = new double[PDM_size];
-        ZEROS(this->gedm[inl], PDM_size);
     }
 
     // cal n(descriptor) per atom , related to Lmax, nchi(L) and m. (not total_nchi!)
@@ -653,6 +642,42 @@ void LCAO_Descriptor::deepks_pre_scf(const string& model_file)
     this->H_V_delta = new double[NLOCAL * NLOCAL];
     ZEROS(this->H_V_delta, NLOCAL * NLOCAL);
 
+    //init gedm**
+    const int PDM_size = (this->lmaxd * 2 + 1) * (this->lmaxd * 2 + 1);
+    this->gedm = new double* [this->inlmax];
+    for (int inl = 0;inl < this->inlmax;inl++)
+    {
+        this->gedm[inl] = new double[PDM_size];
+        ZEROS(this->gedm[inl], PDM_size);
+    }
+    if (FORCE)
+    {
+        //init F_delta
+        F_delta.create(ucell.nat, 3);
+        //init DS_mu_alpha**
+        this->DS_mu_alpha_x = new double* [this->inlmax];
+        this->DS_mu_alpha_y = new double* [this->inlmax];
+        this->DS_mu_alpha_z = new double* [this->inlmax];
+        for (int inl = 0;inl < this->inlmax;inl++)
+        {
+            this->DS_mu_alpha_x[inl] = new double[NLOCAL * (2 * this->lmaxd + 1)];
+            this->DS_mu_alpha_y[inl] = new double[NLOCAL * (2 * this->lmaxd + 1)];
+            this->DS_mu_alpha_z[inl] = new double[NLOCAL * (2 * this->lmaxd + 1)];
+            ZEROS(DS_mu_alpha_x[inl], NLOCAL * (2 * this->lmaxd + 1));
+            ZEROS(DS_mu_alpha_y[inl], NLOCAL * (2 * this->lmaxd + 1));
+            ZEROS(DS_mu_alpha_z[inl], NLOCAL * (2 * this->lmaxd + 1));
+        }
+        //init DH_V_delta*
+        delete[] DH_V_delta_x;
+        delete[] DH_V_delta_y;
+        delete[] DH_V_delta_z;
+        this->DH_V_delta_x = new double[NLOCAL * NLOCAL];
+        this->DH_V_delta_y = new double [NLOCAL * NLOCAL];
+        this->DH_V_delta_z = new double[NLOCAL * NLOCAL];
+        ZEROS(DH_V_delta_x, NLOCAL * NLOCAL);
+        ZEROS(DH_V_delta_y, NLOCAL * NLOCAL);
+        ZEROS(DH_V_delta_y, NLOCAL * NLOCAL);
+    }
     return;
 }
 
@@ -702,6 +727,329 @@ void LCAO_Descriptor::cal_v_delta(const matrix& dm)
 
     ofs_running << " Finish calculating H_V_delta" << endl;
     return;
+}
+
+//for GAMMA_ONLY, search adjacent atoms from I0
+void LCAO_Descriptor::build_v_delta_alpha(const bool& calc_deri)
+{
+    TITLE("LCAO_Descriptor", "build_v_delta_alpha");
+    ZEROS(this->H_V_delta, NLOCAL * NLOCAL); //init before calculate
+
+    std::vector<double> Rcut;
+	for(int it1=0; it1<ucell.ntype; ++it1)
+        Rcut.push_back(ORB.Phi[it1].getRcut() + ORB.Alpha[0].getRcut());
+    
+    for (int T0 = 0;T0 < ucell.ntype;++T0)
+    {
+        for (int I0 = 0;I0 < ucell.atoms[T0].na;++I0)
+        {
+            const Vector3<double> tau0 = ucell.atoms[T0].tau[I0];
+            //Rcut in this function may need to be changed ?! (I think the range of adjacent atoms here should be rcut(phi)+rcut(alpha))
+            GridD.Find_atom(ucell, tau0, T0, I0);
+
+            //adj atom pairs
+            for (int ad1 = 0;ad1 < GridD.getAdjacentNum() + 1;++ad1)
+            {
+                const int T1 = GridD.getType(ad1);
+                const int I1 = GridD.getNatom(ad1);
+				//const int iat1 = ucell.itia2iat(T1, I1);
+                const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
+                const Vector3<double> tau1 = GridD.getAdjacentTau(ad1);
+                const Atom* atom1 = &ucell.atoms[T1];
+                const int nw1_tot = atom1->nw * NPOL;
+                for (int ad2 = 0;ad2 < GridD.getAdjacentNum() + 1;++ad2)
+                {
+                    const int T2 = GridD.getType(ad2);
+					const int I2 = GridD.getNatom(ad2);
+					const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+					const Vector3<double> tau2 = GridD.getAdjacentTau(ad2);
+					const Atom* atom2 = &ucell.atoms[T2];
+                    const int nw2_tot = atom2->nw * NPOL;
+
+                    Vector3<double> dtau10 = tau1 - tau0;
+                    Vector3<double> dtau20 = tau2 - tau0;
+                    double distance10 = dtau10.norm() * ucell.lat0;
+                    double distance20 = dtau20.norm() * ucell.lat0;
+                    
+                    if (distance10 < Rcut[T1] && distance20 < Rcut[T2])
+                    {
+                        for (int iw1=0; iw1<nw1_tot; ++iw1)
+						{
+							const int iw1_all = start1 + iw1;
+							const int iw1_local = ParaO.trace_loc_row[iw1_all];
+							if(iw1_local < 0)continue;
+							const int iw1_0 = iw1/NPOL;
+
+							for (int iw2=0; iw2<nw2_tot; ++iw2)
+							{
+								const int iw2_all = start2 + iw2;
+								const int iw2_local = ParaO.trace_loc_col[iw2_all];
+								if(iw2_local < 0)continue;
+								const int iw2_0 = iw2/NPOL;
+
+								double nlm[3];
+								nlm[0] = nlm[1] = nlm[2] = 0.0;
+
+								if(!calc_deri)
+								{
+									UOT.snap_psialpha(
+											nlm, 0, tau1, T1,
+											atom1->iw2l[ iw1_0 ], // L1
+											atom1->iw2m[ iw1_0 ], // m1
+											atom1->iw2n[ iw1_0 ], // N1
+											tau2, T2,
+											atom2->iw2l[ iw2_0 ], // L2
+											atom2->iw2m[ iw2_0 ], // m2
+											atom2->iw2n[ iw2_0 ], // n2
+											ucell.atoms[T0].tau[I0], T0, I0, 
+                                            this->inl_index,
+                                            this->gedm);
+                                    //LM.set_HSgamma(iw1_all, iw2_all, nlm[0], 'L');
+                                    int index = iw2_all * NLOCAL + iw1_all;     //for genelpa
+                                    this->H_V_delta[index] += nlm[0];
+                                }
+								else  // calculate force
+								{
+									UOT.snap_psialpha(
+											nlm, 1, tau1, T1,
+											atom1->iw2l[ iw1_0 ], // L1
+											atom1->iw2m[ iw1_0 ], // m1
+											atom1->iw2n[ iw1_0 ], // N1
+											tau2, T2,
+											atom2->iw2l[ iw2_0 ], // L2
+											atom2->iw2m[ iw2_0 ], // m2
+											atom2->iw2n[ iw2_0 ], // n2
+											ucell.atoms[T0].tau[I0], T0, I0, 
+                                            this->inl_index,
+                                            this->gedm);
+                                    //for Pulay Force
+                                    //LM.set_force(iw1_all, iw2_all, nlm[0], nlm[1], nlm[2], 'N');
+                                    int index = iw2_all * NLOCAL + iw1_all;     //for genelpa
+                                    this->DH_V_delta_x[index] += nlm[0];
+                                    this->DH_V_delta_y[index] += nlm[1];
+                                    this->DH_V_delta_z[index] += nlm[2];
+                                }
+							}// end iw2
+						}// end iw1
+					} // end distance
+                }//end ad2
+            }//end ad1
+        }//end I0
+    }//end T0
+    return;
+}
+
+//for multi-k, search adjacent atoms from mu
+void LCAO_Descriptor::build_v_delta_mu(const bool& calc_deri)
+{
+    TITLE("LCAO_Descriptor", "build_v_delta_mu");
+    ZEROS(this->H_V_delta, NLOCAL * NLOCAL); //init before calculate
+    //timer::tick ("LCAO_gen_fixedH","build_Nonlocal_mu");
+
+    // < phi1 | beta > < beta | phi2 >
+	// phi1 is within the unitcell.
+	// while beta is in the supercell.
+	// while phi2 is in the supercell.
+
+	int nnr = 0;
+	Vector3<double> tau1, tau2, dtau;
+	Vector3<double> dtau1, dtau2, tau0;
+	double distance = 0.0;
+	double distance1, distance2;
+	double rcut = 0.0;
+	double rcut1, rcut2;
+		
+//	Record_adj RA;
+//	RA.for_2d();
+
+	// psi1
+    for (int T1 = 0; T1 < ucell.ntype; ++T1)
+    {
+		const Atom* atom1 = &ucell.atoms[T1];
+        for (int I1 =0; I1< atom1->na; ++I1)
+        {
+            //GridD.Find_atom( atom1->tau[I1] );
+            GridD.Find_atom(ucell, atom1->tau[I1] ,T1, I1);
+			//const int iat1 = ucell.itia2iat(T1, I1);
+			const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
+            tau1 = atom1->tau[I1];
+
+			// psi2
+            for (int ad2=0; ad2<GridD.getAdjacentNum()+1; ++ad2)
+			{
+				const int T2 = GridD.getType(ad2);
+				const Atom* atom2 = &ucell.atoms[T2];
+                
+				const int I2 = GridD.getNatom(ad2);
+				//const int iat2 = ucell.itia2iat(T2, I2);
+                const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+                tau2 = GridD.getAdjacentTau(ad2);
+
+				bool is_adj = false;
+					
+				dtau = tau2 - tau1;
+				distance = dtau.norm() * ucell.lat0;
+				// this rcut is in order to make nnr consistent 
+				// with other matrix.
+				rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+				if(distance < rcut) is_adj = true;
+				else if(distance >= rcut)
+				{
+                    for (int ad0 = 0; ad0 < GridD.getAdjacentNum()+1; ++ad0)
+                    {
+						const int T0 = GridD.getType(ad0);
+						//const int I0 = GridD.getNatom(ad0);
+						//const int T0 = RA.info[iat1][ad0][3];
+						//const int I0 = RA.info[iat1][ad0][4];
+                        //const int iat0 = ucell.itia2iat(T0, I0);
+                        //const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+
+                        tau0 = GridD.getAdjacentTau(ad0);
+                        dtau1 = tau0 - tau1;
+                        dtau2 = tau0 - tau2;
+
+                        double distance1 = dtau1.norm() * ucell.lat0;
+                        double distance2 = dtau2.norm() * ucell.lat0;
+
+                        rcut1 = ORB.Phi[T1].getRcut() + ORB.Alpha[0].getRcut();
+                        rcut2 = ORB.Phi[T2].getRcut() + ORB.Alpha[0].getRcut();
+
+                        if( distance1 < rcut1 && distance2 < rcut2 )
+                        {
+                            is_adj = true;
+                            break;
+                        }
+                    }
+				}
+
+
+				if(is_adj)
+				{
+					// < psi1 | all projectors | psi2 >
+					// ----------------------------- enter the nnr increaing zone -------------------------
+					for (int j=0; j<atom1->nw*NPOL; j++)
+					{
+						const int j0 = j/NPOL;//added by zhengdy-soc
+						const int iw1_all = start1 + j;
+						const int mu = ParaO.trace_loc_row[iw1_all];
+						if(mu < 0)continue; 
+
+						// fix a serious bug: atom2[T2] -> atom2
+						// mohan 2010-12-20
+						for (int k=0; k<atom2->nw*NPOL; k++)
+						{
+							const int k0 = k/NPOL;
+							const int iw2_all = start2 + k;
+							const int nu = ParaO.trace_loc_col[iw2_all];						
+							if(nu < 0)continue;
+
+
+							//(3) run over all projectors in nonlocal pseudopotential.
+							for (int ad0=0; ad0 < GridD.getAdjacentNum()+1 ; ++ad0)
+							{
+								const int T0 = GridD.getType(ad0);
+                                const int I0 = GridD.getNatom(ad0);
+								tau0 = GridD.getAdjacentTau(ad0);
+
+								dtau1 = tau0 - tau1;
+								dtau2 = tau0 - tau2;
+								distance1 = dtau1.norm() * ucell.lat0;
+								distance2 = dtau2.norm() * ucell.lat0;
+
+								// seems a bug here!! mohan 2011-06-17
+								rcut1 = ORB.Phi[T1].getRcut() + ORB.Alpha[0].getRcut();
+								rcut2 = ORB.Phi[T2].getRcut() + ORB.Alpha[0].getRcut();
+
+								if(distance1 < rcut1 && distance2 < rcut2)
+								{
+									//const Atom* atom0 = &ucell.atoms[T0];
+									double nlm[3]={0,0,0};
+									if(!calc_deri)
+									{
+										UOT.snap_psialpha(
+												nlm, 0, tau1, T1,
+												atom1->iw2l[ j0 ], // L1
+												atom1->iw2m[ j0 ], // m1
+												atom1->iw2n[ j0 ], // N1
+												tau2, T2,
+												atom2->iw2l[ k0 ], // L2
+												atom2->iw2m[ k0 ], // m2
+												atom2->iw2n[ k0 ], // n2
+												tau0, T0, I0,
+                                                this->inl_index,
+                                                this->gedm);
+
+
+										if(GAMMA_ONLY_LOCAL)
+										{
+											// mohan add 2010-12-20
+											if( nlm[0]!=0.0 )
+											{
+                                                //LM.set_HSgamma(iw1_all,iw2_all,nlm[0],'N');//N stands for nonlocal.
+                                                int index = iw2_all * NLOCAL + iw1_all;     //for genelpa
+                                                this->H_V_delta[index] += nlm[0];
+                                            }
+										}
+										else
+                                        {
+                                            //for multi-k, not prepared yet 
+                                        }
+									}// calc_deri
+									else // calculate the derivative
+									{
+										if(GAMMA_ONLY_LOCAL)
+										{
+                                            UOT.snap_psialpha(
+                                                    nlm, 1, tau1, T1,
+                                                    atom1->iw2l[ j0 ], // L1
+                                                    atom1->iw2m[ j0 ], // m1
+                                                    atom1->iw2n[ j0 ], // N1
+                                                    tau2, T2,
+                                                    atom2->iw2l[ k0 ], // L2
+                                                    atom2->iw2m[ k0 ], // m2
+                                                    atom2->iw2n[ k0 ], // n2
+                                                    tau0, T0, I0,
+                                                    this->inl_index,
+                                                    this->gedm);
+
+											// sum all projectors for one atom.
+											//LM.set_force (iw1_all, iw2_all,	nlm[0], nlm[1], nlm[2], 'N');
+										}
+										else
+										{
+											// mohan change the order on 2011-06-17
+											// origin: < psi1 | beta > < beta | dpsi2/dtau >
+											//now: < psi1/dtau | beta > < beta | psi2 >
+											UOT.snap_psialpha(
+													nlm, 1, tau2, T2,
+													atom2->iw2l[ k0 ], // L2
+													atom2->iw2m[ k0 ], // m2
+													atom2->iw2n[ k0 ], // n2
+													tau1, T1,
+													atom1->iw2l[ j0 ], // L1
+													atom1->iw2m[ j0 ], // m1
+													atom1->iw2n[ j0 ], // N1
+                                                    tau0, T0, I0,
+                                                    this->inl_index,
+                                                    this->gedm);
+
+											//LM.DHloc_fixedR_x[nnr] += nlm[0];
+											//LM.DHloc_fixedR_y[nnr] += nlm[1];
+											//LM.DHloc_fixedR_z[nnr] += nlm[2];
+										}
+									}//!calc_deri
+								}// distance
+							} // ad0
+							++nnr;
+						}// k
+					} // j 
+				}// end is_adj
+			} // ad2
+		} // I1
+	} // T1
+
+    //timer::tick ("LCAO_gen_fixedH","build_Nonlocal_mu");
+	return;
 }
 
 
@@ -827,7 +1175,115 @@ void LCAO_Descriptor::cal_f_delta(const matrix &dm)
     return;
 }
 
+void LCAO_Descriptor::cal_f_delta_hf(const matrix& dm)
+{
+    TITLE("LCAO_Descriptor", "cal_f_delta_hf");
+    for (int iat = 0; iat < ucell.nat; ++iat)
+    {
+        const int it = ucell.iat2it[iat];
+        const int ia = ucell.iat2ia[iat];
+        const Vector3<double> tau0 = ucell.atoms[it].tau[ia];
+		GridD.Find_atom(ucell, ucell.atoms[it].tau[ia] ,it, ia);
+		const double Rcut_Alpha = ORB.Alpha[0].getRcut();
 
+        //FOLLOWING ARE CONTRIBUTIONS FROM
+        //VNL DUE TO PROJECTOR'S DISPLACEMENT
+        for (int ad1 =0 ; ad1 < GridD.getAdjacentNum()+1; ad1++)
+        {
+            const int T1 = GridD.getType (ad1);
+            const Atom* atom1 = &ucell.atoms[T1];
+            const int I1 = GridD.getNatom (ad1);
+            const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
+			const Vector3<double> tau1 = GridD.getAdjacentTau (ad1);
+			const double Rcut_AO1 = ORB.Phi[T1].getRcut();
+
+            for (int ad2 =0 ; ad2 < GridD.getAdjacentNum()+1; ad2++)
+            {
+                const int T2 = GridD.getType (ad2);
+                const Atom* atom2 = &ucell.atoms[T2];
+                const int I2 = GridD.getNatom (ad2);
+                const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+                const Vector3<double> tau2 = GridD.getAdjacentTau (ad2);
+                const double Rcut_AO2 = ORB.Phi[T2].getRcut();
+
+                const double dist1 = (tau1-tau0).norm() * ucell.lat0;
+                const double dist2 = (tau2-tau0).norm() * ucell.lat0;
+
+                if (dist1 > Rcut_Alpha + Rcut_AO1
+                        || dist2 > Rcut_Alpha + Rcut_AO2)
+                {
+                    continue;
+                }
+
+                for (int jj = 0; jj < ucell.atoms[T1].nw; jj++)
+                {
+                    const int iw1_all = start1 + jj;
+                    const int mu = ParaO.trace_loc_row[iw1_all];
+                    if(mu<0) continue;
+                    for (int kk = 0; kk < ucell.atoms[T2].nw; kk++)
+                    {
+                        const int iw2_all = start2 + kk;
+                        const int nu = ParaO.trace_loc_col[iw2_all];
+                        if(nu<0) continue;
+                    
+                        double nlm[3] = {0,0,0};
+                                
+                        UOT.snap_psialpha(
+                            nlm, 1,
+                            tau1, T1,
+                            atom1->iw2l[jj], // L2
+                            atom1->iw2m[jj], // m2
+                            atom1->iw2n[jj], // N2
+                            tau2, T2,
+                            atom2->iw2l[kk], // L1
+                            atom2->iw2m[kk], // m1
+                            atom2->iw2n[kk], // n1
+                            tau0, it, ia, 
+                            this->inl_index,
+                            this->gedm); // mohan  add 2021-05-07
+
+                        double nlm1[3] = {0,0,0};
+
+                        const int index = mu * ParaO.ncol + nu;
+
+                        // HF term is minus, only one projector for each atom force.
+
+                        double sum_dm = 0.0;
+                        //remaining: sum for is
+                        this->F_delta(iat, 0) -= 2 * dm(mu, nu) * nlm[0];
+                        this->F_delta(iat, 1) -= 2 * dm(mu, nu) * nlm[1];
+                        this->F_delta(iat, 2) -= 2 * dm(mu, nu) * nlm[2];
+                        //this->F_delta(iat, 0) -= 4 * dm(mu, nu) * nlm[0];   //2 for v_delta(not calculated togethor), 2 for e_delta
+                        //this->F_delta(iat, 1) -= 4 * dm(mu, nu) * nlm[1];
+                        //this->F_delta(iat, 2) -= 4 * dm(mu, nu) * nlm[2];
+                    }//!kk
+                }//!ad2
+            }//!jj
+        }//!ad1
+    }//!iat
+    return;
+}
+void LCAO_Descriptor::cal_f_delta_pulay(const matrix& dm)
+{
+    TITLE("LCAO_Descriptor", "cal_f_delta_pulay");
+    this->build_v_delta_alpha(1);
+    //this->build_v_delta_mu(1);    //, if multi-k
+    for (int mu = 0;mu < NLOCAL;++mu)
+    {
+        const int iat = ucell.iwt2iat[mu];//the atom whose force being calculated
+        for (int nu = 0;nu < NLOCAL;++nu)
+        {
+            //for genelpa
+            this->F_delta(iat, 0) += 2 * dm(mu, nu) * this->DH_V_delta_x[nu * NLOCAL + mu];
+            this->F_delta(iat, 1) += 2 * dm(mu, nu) * this->DH_V_delta_y[nu * NLOCAL + mu];
+            this->F_delta(iat, 2) += 2 * dm(mu, nu) * this->DH_V_delta_z[nu * NLOCAL + mu];
+            //this->F_delta(iat, 0) += 4 * dm(mu, nu) * this->DH_V_delta_x[nu * NLOCAL + mu];
+            //this->F_delta(iat, 1) += 4 * dm(mu, nu) * this->DH_V_delta_y[nu * NLOCAL + mu];
+            //this->F_delta(iat, 2) += 4 * dm(mu, nu) * this->DH_V_delta_z[nu * NLOCAL + mu];
+        }
+    }
+    return;
+}
 void LCAO_Descriptor::cal_descriptor_tensor(void)
 {
     TITLE("LCAO_Descriptor", "cal_descriptor_tensor");

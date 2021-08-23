@@ -80,8 +80,14 @@ void Force_LCAO_gamma::ftable_gamma (
 #ifdef __DEEPKS
     if (INPUT.deepks_scf)
     {
-        ld.build_S_descriptor(1);   //for F_delta calculation
-        ld.cal_f_delta(LOC.wfc_dm_2d.dm_gamma[0]);
+        //=======method 1: dgemm==============
+        //ld.build_S_descriptor(1);   //for F_delta calculation
+        //ld.cal_f_delta(LOC.wfc_dm_2d.dm_gamma[0]);
+
+        //=======method 2: snap_psialpha========
+        ld.cal_gedm(LOC.wfc_dm_2d.dm_gamma[0]);
+        ld.cal_f_delta_hf(LOC.wfc_dm_2d.dm_gamma[0]);
+        ld.cal_f_delta_pulay(LOC.wfc_dm_2d.dm_gamma[0]);
         ld.print_F_delta();
     }
 #endif

@@ -71,8 +71,28 @@ class ORB_gen_tables
 		const int &nproj_in, // mohan add 2021-05-07
 		complex<double> *nlm1=NULL,
 		const int is=0)const;
-
-	/// set as public because in hamilt_linear, 
+#ifdef __DEEPKS
+    void snap_psialpha(
+        double nlm[],
+        const int& job,
+        const Vector3<double>& R1,
+        const int& T1,
+        const int& L1,
+        const int& m1,
+        const int& N1,
+        const Vector3<double>& R2,
+        const int& T2,
+        const int& L2,
+        const int& m2,
+        const int& N2,
+        const Vector3<double>& R0, // The projector.
+        const int& T0,
+        const int& A0,  //gedm is related to specific atom
+        IntArray* inl_index,
+        double** gedm    //Coefficient Matrix (non-diagonal)
+        ) const;
+#endif
+    /// set as public because in hamilt_linear, 
 	/// we need to destroy the tables: SR,TR,NR
 	/// after ionic optimization is done.
 	ORB_table_phi MOT;

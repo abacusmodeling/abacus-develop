@@ -26,16 +26,17 @@ public:
     explicit LCAO_Descriptor();
     ~LCAO_Descriptor();
 
-	// index of descriptor in all atoms
-	void init(const int lm, const int nm, const int tot_inl);
+     //only for descriptor part, not including scf
+    void init(const int lm, const int nm, const int tot_inl);
 
 	// cal S_alpha_mu: overlap between lcao basis Phi and descriptor basis Al
     void build_S_descriptor(const bool &calc_deri);
 
 
 	// 1. Load DeePKS model
-	// 2. Initialize the deltaV Hamiltonian matrix
-	void deepks_pre_scf(const string& model_file);
+    // 2. Initialize the deltaV Hamiltonian matrix 
+    // 3. If FORCE, initialize the matrces for force
+    void deepks_pre_scf(const string& model_file);
 
 
 	//------------------------------------------------------------------------------
@@ -48,10 +49,17 @@ public:
 	//------------------------------------------------------------------------------
     void cal_projected_DM(const matrix &dm);
     void cal_descriptor(void);
-	void cal_dm_as_descriptor(const matrix &dm); // mohan add 2021-08-04
-	void cal_v_delta(const matrix& dm);
-	void add_v_delta(void);
-	void cal_f_delta(const matrix& dm);
+    void cal_dm_as_descriptor(const matrix& dm); // mohan add 2021-08-04
+
+    void cal_gedm(const matrix& dm);	//need to load model in this step
+    void build_v_delta_alpha(const bool& cal_deri);
+    void build_v_delta_mu(const bool& cal_deri);
+    void cal_v_delta(const matrix& dm);
+    void add_v_delta(void);
+
+    void cal_f_delta_hf(const matrix& dm);
+    void cal_f_delta_pulay(const matrix& dm);
+    void cal_f_delta(const matrix& dm);
 
 
 	//----------------------------------------------------------------------
@@ -116,7 +124,11 @@ private:
 	double** DS_mu_alpha_y;
 	double** DS_mu_alpha_z;
 
-	// projected density matrix
+    double* DH_V_delta_x;
+    double* DH_V_delta_y;
+    double* DH_V_delta_z;
+
+    // projected density matrix
 	double** pdm;	//[tot_Inl][2l+1][2l+1]	caoyu modified 2021-05-07
 	std::vector<torch::Tensor> pdm_tensor;
 
@@ -175,9 +187,9 @@ private:
 		const double& vz);
 
 	void init_gdmx(void);
-	void load_model(const string& model_file);
-	void cal_gedm(const matrix& dm);	//need to load model in this step
-	void cal_gdmx(const matrix& dm);	//dD/dX
+    void load_model(const string& model_file);
+    
+    void cal_gdmx(const matrix& dm);	//dD/dX
 	void del_gdmx(void);
 
 	void getdm_double(const matrix& dm);
