@@ -11,11 +11,11 @@ NP      = 8
 ##==========================
 ## FFTW package needed 
 ##==========================
+HONG_FFTW        = -D__FFTW3
+FFTW_INCLUDE_DIR = ${MKLROOT}/include/fftw
 #FFTW_DIR = /home/qianrui/intelcompile/impi_fftw
 #FFTW_DIR = /home/mohan/1_Software/impi_fftw-3.3.8
-HONG_FFTW        = -D__FFTW3
 #FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
-FFTW_INCLUDE_DIR = ${MKLROOT}/include/fftw
 #FFTW_LIB_DIR     = ${FFTW_DIR}/lib
 #FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
 
@@ -24,10 +24,12 @@ FFTW_INCLUDE_DIR = ${MKLROOT}/include/fftw
 #==========================
 LIBS = -lifcore -lm -lpthread ${FFTW_LIB}
 
+
+INCLUDES = -I. -Icommands -I${FFTW_INCLUDE_DIR}
+
 #==========================
 # OPTIMIZE OPTIONS
 #==========================
-INCLUDES = -I. -Icommands -I${FFTW_INCLUDE_DIR}
 # -pedantic turns off more extensions and generates more warnings
 # -xHost generates instructions for the highest instruction set available on the compilation host processor
 OPTS = ${INCLUDES} -Ofast -std=c++11 -simd -march=native -xHost -m64 -qopenmp -Werror -Wall -pedantic -g

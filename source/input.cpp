@@ -1247,18 +1247,22 @@ bool Input::Read(const std::string &fn)
 //----------------------------------------------------------
 		else if (strcmp("rcut_lj",word) == 0)
 		{
-			read_value(ifs,mdp.rcut_lj );
+			read_value(ifs, mdp.rcut_lj);
 			mdp.rcut_lj*=ANGSTROM_AU;
 		}
 		else if (strcmp("epsilon_lj",word) == 0)
 		{
-			read_value(ifs,mdp.epsilon_lj );
+			read_value(ifs, mdp.epsilon_lj);
 			mdp.epsilon_lj/=Ry_to_eV;
 		}
 		else if (strcmp("sigma_lj",word) == 0)
 		{
-			read_value(ifs,mdp.sigma_lj );
+			read_value(ifs, mdp.sigma_lj);
 			mdp.sigma_lj*=ANGSTROM_AU;
+		}
+		else if (strcmp("md_potential",word) == 0)
+		{
+			read_value(ifs, mdp.md_potential);
 		}
 //----------------------------------------------------------
 // tddft
@@ -2195,6 +2199,7 @@ void Input::Bcast()
 		Parallel_Common::bcast_double(mdp.rcut_lj);
 		Parallel_Common::bcast_double(mdp.epsilon_lj);
 		Parallel_Common::bcast_double(mdp.sigma_lj);
+		Parallel_Common::bcast_double(mdp.md_potential);
 /* 	// Peize Lin add 2014-04-07
 	Parallel_Common::bcast_bool( vdwD2 );
 	Parallel_Common::bcast_double( vdwD2_scaling );

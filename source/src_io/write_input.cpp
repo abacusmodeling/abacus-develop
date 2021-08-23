@@ -153,6 +153,7 @@ void Input::Print(const std::string &fn)const
 
 	ofs << "\n#Parameters (10.Molecular dynamics)" << std::endl;
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_mdtype",mdp.mdtype,"choose ensemble");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_potential",mdp.md_potential,"choose potential");
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_dt",mdp.dt,"time step");
 	ModuleBase::GlobalFunc::OUTP(ofs,"mnhc",mdp.MNHC,"number of Nose-Hoover chains");
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_qmass",mdp.Qmass,"mass of thermostat");
