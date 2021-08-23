@@ -45,7 +45,7 @@ void Parallel_Global::split_diag_world(const int &diag_np)
 	assert(diag_np>0);
 	// number of processors in each 'grid group'.
 	int* group_grid_np = new int[diag_np];
-	ZEROS(group_grid_np, diag_np);
+	ModuleBase::GlobalFunc::ZEROS(group_grid_np, diag_np);
 	// average processors in each 'grid group'
 	int ave = GlobalV::NPROC/diag_np;
 	// remain processors.
@@ -100,7 +100,7 @@ void Parallel_Global::split_grid_world(const int &diag_np)
 	assert(diag_np>0);
 	// number of processors in each 'grid group'.
 	int* group_grid_np = new int[diag_np];
-	ZEROS(group_grid_np, diag_np);
+	ModuleBase::GlobalFunc::ZEROS(group_grid_np, diag_np);
 	// average processors in each 'grid group'
 	int ave = GlobalV::NPROC/diag_np;
 	// remain processors.

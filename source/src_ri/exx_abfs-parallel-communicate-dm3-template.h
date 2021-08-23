@@ -9,7 +9,7 @@ const matrix &Exx_Abfs::Parallel::Communicate::DM3::D_phase(
 }
 
 matrix Exx_Abfs::Parallel::Communicate::DM3::D_phase(
-	const ComplexMatrix &DK, const int ik, const Abfs::Vector3_Order<int> &box2) const
+	const ModuleBase::ComplexMatrix &DK, const int ik, const Abfs::Vector3_Order<int> &box2) const
 {
 	return (DK * exp( -TWO_PI*IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (box2*GlobalC::ucell.latvec)) )).real();
 }
@@ -22,7 +22,7 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<Tmatrix> &DK_2D, 
 
 	/*{
 		static int istep=0;
-		std::ofstream ofs("DK_2D_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
+		std::ofstream ofs("DK_2D_"+ModuleBase::GlobalFunc::TO_STRING(istep++)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 		ofs<<DK_2D<<std::endl;
 	}*/
 	
@@ -89,7 +89,7 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<Tmatrix> &DK_2D, 
 	
 	/*{
 		static int istep=0;
-		std::ofstream ofs("DR_a2D_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
+		std::ofstream ofs("DR_a2D_"+ModuleBase::GlobalFunc::TO_STRING(istep++)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 		ofs<<DR_a2D<<std::endl;
 	}*/
 	return DR_a2D;

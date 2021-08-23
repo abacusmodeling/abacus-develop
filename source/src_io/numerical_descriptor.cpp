@@ -21,10 +21,10 @@ Numerical_Descriptor::~Numerical_Descriptor()
 }
 
 
-void Numerical_Descriptor::output_descriptor(const ComplexMatrix *psi, const int &lmax_in)
+void Numerical_Descriptor::output_descriptor(const ModuleBase::ComplexMatrix *psi, const int &lmax_in)
 {
 	TITLE("Numerical_Descriptor","output_descriptor");
-	NEW_PART("DeepKS descriptor: D_{Inl}");
+	ModuleBase::GlobalFunc::NEW_PART("DeepKS descriptor: D_{Inl}");
 
 	//-----------------------------------
 	// 1. Initialize parameters
@@ -67,12 +67,12 @@ void Numerical_Descriptor::output_descriptor(const ComplexMatrix *psi, const int
     realArray overlap_Q1(nks, GlobalV::NBANDS, this->nlocal );
     realArray overlap_Q2(nks, GlobalV::NBANDS, this->nlocal );
 
-    ZEROS(overlap_Q1.ptr, overlap_Q1.getSize() );
-    ZEROS(overlap_Q2.ptr, overlap_Q2.getSize() );
+    ModuleBase::GlobalFunc::ZEROS(overlap_Q1.ptr, overlap_Q1.getSize() );
+    ModuleBase::GlobalFunc::ZEROS(overlap_Q2.ptr, overlap_Q2.getSize() );
 
-	OUT(GlobalV::ofs_running,"number of k points",overlap_Q1.getBound1());
-	OUT(GlobalV::ofs_running,"number of bands",overlap_Q1.getBound2());
-	OUT(GlobalV::ofs_running,"number of local orbitals",overlap_Q1.getBound3());
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of k points",overlap_Q1.getBound1());
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of bands",overlap_Q1.getBound2());
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of local orbitals",overlap_Q1.getBound3());
 
 
 	//-------------------------------------
@@ -89,7 +89,7 @@ void Numerical_Descriptor::output_descriptor(const ComplexMatrix *psi, const int
 		GlobalV::ofs_running << " --------------------------------------------------------" << std::endl;
         // search for all k-points.
         this->jlq3d_overlap(overlap_Q1, overlap_Q2, ik, ik, npw, psi[ik]);
-        DONE(GlobalV::ofs_running,"jlq3d_overlap");
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"jlq3d_overlap");
 	}
 
 #ifdef __MPI
@@ -170,7 +170,7 @@ const int &it, const int &ia, double *d, const int &nd)
 		{
 				const int dim = 2*l+1;
 				// descriptor for atom (it, ia)
-				ComplexMatrix des(dim, dim);
+				ModuleBase::ComplexMatrix des(dim, dim);
 				for (int m=0; m<2*l+1; m++)
 				{
 						const int ii=mu_index[it](ia,l,n,m);
@@ -231,7 +231,7 @@ void Numerical_Descriptor::jlq3d_overlap(
     const int &ik_ibz,
     const int &ik,
     const int &np,
-    const ComplexMatrix &psi)
+    const ModuleBase::ComplexMatrix &psi)
 {
     TITLE("Numerical_Descriptor","jlq3d_overlap");
     timer::tick("Numerical_Descriptor","jlq3d_overlap");

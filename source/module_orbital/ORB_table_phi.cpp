@@ -220,7 +220,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 
 	if (l > 0)
 	{
-		ZEROS(integrated_func,kmesh);
+		ModuleBase::GlobalFunc::ZEROS(integrated_func,kmesh);
 		double temp = 0.0;
 	
 		for (int ik = 0; ik < kmesh; ik++)
@@ -318,7 +318,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 		}
 		double temp = 0.0;
 
-		Integral::Simpson_Integral(kmesh,VECTOR_TO_PTR(integrated_func),dk,temp);
+		Integral::Simpson_Integral(kmesh,ModuleBase::GlobalFunc::VECTOR_TO_PTR(integrated_func),dk,temp);
 		rs[ir] = temp * FOUR_PI ;
 		
 		const std::vector<double> &jlm1_r = jlm1[ir];
@@ -339,7 +339,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 			}
 		}
 
-		Integral::Simpson_Integral(kmesh,VECTOR_TO_PTR(integrated_func),dk,temp);
+		Integral::Simpson_Integral(kmesh,ModuleBase::GlobalFunc::VECTOR_TO_PTR(integrated_func),dk,temp);
 		drs[ir] = -FOUR_PI*(l+1)/(2.0*l+1) * temp;
 	}
 
@@ -354,7 +354,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 			}
 			double temp = 0.0;
 
-			Integral::Simpson_Integral(kmesh,VECTOR_TO_PTR(integrated_func),dk,temp);
+			Integral::Simpson_Integral(kmesh,ModuleBase::GlobalFunc::VECTOR_TO_PTR(integrated_func),dk,temp);
 
 			// PLEASE try to make dualfac function as input parameters
 			// mohan note 2021-03-23
@@ -545,20 +545,20 @@ void ORB_table_phi::init_Table(
 									switch ( job0 )
 									{
 										case 1:
-										ZEROS (Table_SR[0][Tpair][Opair][L], rmesh);
-										ZEROS (Table_SR[1][Tpair][Opair][L], rmesh);
+										ModuleBase::GlobalFunc::ZEROS (Table_SR[0][Tpair][Opair][L], rmesh);
+										ModuleBase::GlobalFunc::ZEROS (Table_SR[1][Tpair][Opair][L], rmesh);
 										break;
 
 										case 2:
-										ZEROS (Table_TR[0][Tpair][Opair][L], rmesh);
-										ZEROS (Table_TR[1][Tpair][Opair][L], rmesh);
+										ModuleBase::GlobalFunc::ZEROS (Table_TR[0][Tpair][Opair][L], rmesh);
+										ModuleBase::GlobalFunc::ZEROS (Table_TR[1][Tpair][Opair][L], rmesh);
 										break;
 
 										case 3:
-										ZEROS (Table_SR[0][Tpair][Opair][L], rmesh);
-										ZEROS (Table_SR[1][Tpair][Opair][L], rmesh);
-										ZEROS (Table_TR[0][Tpair][Opair][L], rmesh);
-										ZEROS (Table_TR[1][Tpair][Opair][L], rmesh);
+										ModuleBase::GlobalFunc::ZEROS (Table_SR[0][Tpair][Opair][L], rmesh);
+										ModuleBase::GlobalFunc::ZEROS (Table_SR[1][Tpair][Opair][L], rmesh);
+										ModuleBase::GlobalFunc::ZEROS (Table_TR[0][Tpair][Opair][L], rmesh);
+										ModuleBase::GlobalFunc::ZEROS (Table_TR[1][Tpair][Opair][L], rmesh);
 										break;
 									}
 

@@ -54,7 +54,7 @@ public:
 //==========================================================
 	void fir_wf
 	(
-		ComplexMatrix *wf,// address of wave functions. 
+		ModuleBase::ComplexMatrix *wf,// address of wave functions. 
 		const int npsi, // number of wave funcs to output.
 		const std::string &fn // file address.
 	);
@@ -72,7 +72,7 @@ public:
 
 	bool sec_wf
 	(
-		ComplexMatrix *psi,// address of wave functions.
+		ModuleBase::ComplexMatrix *psi,// address of wave functions.
 		const int npsi,// how many wave functions read in.
 		const std::string &fn// file address.
 	)const;
@@ -83,7 +83,7 @@ public:
 //==========================================================
 	void out_gspace_wan
 	(
-		const ComplexMatrix *psi,// address of wave funcs.
+		const ModuleBase::ComplexMatrix *psi,// address of wave funcs.
 		const int iw, // index of wave funs to export.
 		const std::string &file_name// file address.
 	);

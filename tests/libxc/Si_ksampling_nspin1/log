@@ -1,0 +1,94 @@
+ *********************************************************
+ *                                                       *
+ *                  WELCOME TO ABACUS                    *
+ *                                                       *
+ *            'Atomic-orbital Based Ab-initio            *
+ *                  Computation at UStc'                 *
+ *                                                       *
+ *          Website: http://abacus.ustc.edu.cn/          *
+ *                                                       *
+ *********************************************************
+ Wed Aug 18 15:32:58 2021
+ MAKE THE DIR         : OUT.autotest/
+ DONE(0.154673   SEC) : SETUP UNITCELL
+ DONE(0.226649   SEC) : SYMMETRY
+ DONE(0.232385   SEC) : INIT K-POINTS
+ ---------------------------------------------------------
+ Self-consistent calculations for electrons
+ ---------------------------------------------------------
+ SPIN    KPOINTS         PROCESSORS  
+ 1       3               1           
+ ---------------------------------------------------------
+ Use plane wave basis
+ ---------------------------------------------------------
+ ELEMENT NATOM       XC          
+ Si      2           NOX NOC SCAN SCAN
+ ---------------------------------------------------------
+ Initial plane wave basis and FFT box
+ ---------------------------------------------------------
+ DONE(0.354379   SEC) : INIT PLANEWAVE
+ UNIFORM GRID DIM     : 24 * 24 * 24
+ UNIFORM GRID DIM(BIG): 24 * 24 * 24
+ MEMORY FOR PSI (MB)  : 0.112885
+ DONE(0.373528   SEC) : LOCAL POTENTIAL
+ DONE(0.422997   SEC) : NON-LOCAL POTENTIAL
+ START POTENTIAL      : atomic
+ DONE(0.44963    SEC) : INIT POTENTIAL
+ DONE(0.78487    SEC) : INIT BASIS
+ -------------------------------------------
+ SELF-CONSISTENT : 
+ -------------------------------------------
+ ITER   ETOT(eV)       EDIFF(eV)      DRHO2      CG_ITER    TIME(S)    
+ CG1    -2.120086e+02  0.000000e+00   9.608e-02  1.944e+00  5.900e-01  
+ CG2    -2.116587e+02  3.499795e-01   9.310e-03  2.500e+00  5.800e-01  
+ CG3    -2.116647e+02  -6.064108e-03  3.044e-04  2.944e+00  7.800e-01  
+ CG4    -2.116973e+02  -3.259780e-02  5.018e-05  3.111e+00  5.600e-01  
+ CG5    -2.116856e+02  1.167005e-02   5.054e-07  2.889e+00  1.010e+00  
+ CG6    -2.116006e+02  8.504648e-02   3.186e-07  4.000e+00  1.180e+00  
+ CG7    -2.115971e+02  3.493277e-03   7.052e-06  4.611e+00  1.110e+00  
+ CG8    -2.116013e+02  -4.185755e-03  7.254e-06  2.722e+00  1.730e+00  
+ CG9    -2.116013e+02  8.273370e-06   7.275e-06  2.667e+00  1.390e+00  
+ CG10   -2.116013e+02  8.824106e-06   7.417e-06  2.667e+00  8.200e-01  
+ CG11   -2.116871e+02  -8.586551e-02  5.288e-06  3.000e+00  9.800e-01  
+ CG12   -2.116053e+02  8.178758e-02   6.835e-07  4.611e+00  1.570e+00  
+ CG13   -2.115968e+02  8.543639e-03   4.393e-06  4.611e+00  1.490e+00  
+ CG14   -2.116011e+02  -4.255975e-03  7.805e-06  3.500e+00  1.220e+00  
+ CG15   -2.116014e+02  -3.712649e-04  5.164e-06  2.667e+00  1.080e+00  
+ CG16   -2.116015e+02  -7.525379e-05  2.005e-06  3.056e+00  9.500e-01  
+ CG17   -2.116010e+02  5.344131e-04   6.215e-06  3.500e+00  1.450e+00  
+ CG18   -2.116016e+02  -6.242944e-04  2.114e-06  3.500e+00  1.250e+00  
+ CG19   -2.116013e+02  3.250873e-04   2.052e-06  2.667e+00  1.860e+00  
+ CG20   -2.116015e+02  -2.512047e-04  3.306e-07  3.222e+00  1.280e+00  
+ CG21   -2.116013e+02  2.486304e-04   8.052e-10  2.778e+00  1.250e+00  
+
+  |CLASS_NAME---------|NAME---------------|TIME(Sec)-----|CALLS----|AVG------|PER%-------
+                       total               12.699         17        0.75      1e+02     %
+   Run_pw              plane_wave_line     12.647         1         13        1e+02     %
+   PW_Basis            gen_pw              0.12174        1         0.12      0.96      %
+   Cell_PW             opt_cells_pw        12.333         1         12        97        %
+   Sphbes              Spherical_Bessel    0.10021        2710      3.7e-05   0.79      %
+   FFT                 FFT3D               2.4572         14904     0.00016   19        %
+   Potential           v_of_rho            0.77377        22        0.035     6.1       %
+   Potential_Libxc     v_xc                6.7129         11        0.61      53        %
+   Potential_Libxc     v_xc_meta           6.8382         11        0.62      54        %
+   WF_atomic           init_at_1           0.16697        1         0.17      1.3       %
+   wavefunc            wfcinit             0.16818        1         0.17      1.3       %
+   Hamilt_PW           diagH_subspace      1.4071         63        0.022     11        %
+   Hamilt_PW           h_psi               9.7094         1290      0.0075    76        %
+   Hamilt_PW           vloc                0.64546        1290      0.0005    5.1       %
+   Hamilt_PW           vnl                 6.7058         1290      0.0052    53        %
+   Hamilt_PW           add_nonlocal_pp     0.13856        1290      0.00011   1.1       %
+   Hamilt_PW           meta                2.3529         1290      0.0018    19        %
+   Ions                opt_ions_pw         11.904         1         12        94        %
+   Electrons           self_consistent     11.904         1         12        94        %
+   Electrons           c_bands             5.8406         11        0.53      46        %
+   Hamilt              diagH_pw            9.6167         63        0.15      76        %
+   Diago_CG            diag                8.375          63        0.13      66        %
+   electrons           c_bands             5.4958         11        0.5       43        %
+   Charge              sum_band            0.46247        21        0.022     3.6       %
+ ----------------------------------------------------------------------------------------
+
+ START  Time  : Wed Aug 18 15:32:58 2021
+ FINISH Time  : Wed Aug 18 15:33:11 2021
+ TOTAL  Time  : 13
+ SEE INFORMATION IN : OUT.autotest/

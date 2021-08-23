@@ -11,7 +11,7 @@ void Stress_Func::stress_har(matrix& sigma, const bool is_pw)
 	std::complex<double> *Porter = GlobalC::UFFT.porter;
 
 	//  Hartree potential VH(r) from n(r)
-	ZEROS( Porter, GlobalC::pw.nrxx );
+	ModuleBase::GlobalFunc::ZEROS( Porter, GlobalC::pw.nrxx );
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
@@ -26,7 +26,7 @@ void Stress_Func::stress_har(matrix& sigma, const bool is_pw)
 
 	std::complex<double> *psic = new std::complex<double> [GlobalC::pw.nrxx];
 	double *psic0 = new double[GlobalC::pw.nrxx];
-	ZEROS( psic0, GlobalC::pw.nrxx);
+	ModuleBase::GlobalFunc::ZEROS( psic0, GlobalC::pw.nrxx);
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		daxpy (GlobalC::pw.nrxx, 1.0, GlobalC::CHR.rho[is], 1, psic0, 2);
@@ -39,7 +39,7 @@ void Stress_Func::stress_har(matrix& sigma, const bool is_pw)
 	GlobalC::pw.FFT_chg.FFT3D(psic, -1) ;
 
 	std::complex<double> *vh_g  = new std::complex<double>[GlobalC::pw.ngmc];
-	ZEROS(vh_g, GlobalC::pw.ngmc);
+	ModuleBase::GlobalFunc::ZEROS(vh_g, GlobalC::pw.ngmc);
 
 //	double ehart=0;
 	for (int ig = GlobalC::pw.gstart; ig<GlobalC::pw.ngmc; ig++)

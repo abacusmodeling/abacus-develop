@@ -197,15 +197,15 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
 		
 		// get the number of total plane waves within a spheri.
         this->ngmc_g = PW_complement::get_total_pw_number(0.0, ggchg, ncx, ncy, ncz, Ucell->GGT);
-		OUT(GlobalV::ofs_running,"number of total plane waves",ngmc_g);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of total plane waves",ngmc_g);
 
         double cutgg_pieces = 10;
 
-		// OUT(GlobalV::ofs_running,"cutgg_pieces",cutgg_pieces);
+		// ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"cutgg_pieces",cutgg_pieces);
         const double cutgg_delta = ggchg / std::pow( (double)cutgg_pieces, 2.0/3.0 );
 
         // get cutgg_delta from input.
-		// OUT(GlobalV::ofs_running,"cutgg_delta",cutgg_delta);
+		// ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"cutgg_delta",cutgg_delta);
 
         //int cutgg_num_start = 0;
         double ggchg_start = 0.0;
@@ -268,7 +268,7 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
             ggchg_time_global = ggchg_time;
 			delete [] cutgg_num_table;
             cutgg_num_table = new int[ggchg_time_global];
-            ZEROS(cutgg_num_table, ggchg_time_global);
+            ModuleBase::GlobalFunc::ZEROS(cutgg_num_table, ggchg_time_global);
             GlobalV::ofs_running << "\n SETUP COORDINATES OF PLANE WAVES" << std::endl;
 
             double cutgg_pieces2 = 10;
@@ -318,7 +318,7 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
     else
     {
         this->ngmc_g = PW_complement::get_total_pw_number(0.0, ggchg, ncx, ncy, ncz, Ucell->GGT);
-		OUT(GlobalV::ofs_running,"ngmc_g",ngmc_g);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"ngmc_g",ngmc_g);
 
         delete[] gg_global;
         gg_global = new double[ngmc_g];// store the |G|^2 of the 1d array
@@ -350,8 +350,8 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
         FFT_wfc.setupFFT3D(this->nx, this->ny,this->nz);
         FFT_chg.setupFFT3D(this->ncx, this->ncy,this->ncz);
 #endif
-		OUT(GlobalV::ofs_running,"fft charge/potential grid",ncx,ncy,ncz);
-		OUT(GlobalV::ofs_running,"fft wavefunction grid",nx,ny,nz);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"fft charge/potential grid",ncx,ncy,ncz);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"fft wavefunction grid",nx,ny,nz);
     }
 
     this->get_nggm(this->ngmc);
@@ -407,7 +407,7 @@ void PW_Basis::setup_gg(void)
 #endif
     }
 
-	OUT(GlobalV::ofs_running,"energy cutoff for wavefunc (unit:Ry)",ecutwfc);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"energy cutoff for wavefunc (unit:Ry)",ecutwfc);
 
     return;
 }
@@ -456,10 +456,10 @@ void PW_Basis::setup_FFT_dimension(void)
 	this->nbz = this->ncz / this->bz;
 	this->nbxyz = this->nbx * this->nby * this->nbz;//mohan add 2011-06-02
 
-	OUT(GlobalV::ofs_running,"fft grid for wave functions",nx,ny,nz);
-	OUT(GlobalV::ofs_running,"fft grid for charge/potential",ncx,ncy,ncz);
-	OUT(GlobalV::ofs_running,"fft grid division",bx,by,bz);
-	OUT(GlobalV::ofs_running,"big fft grid for charge/potential",nbx,nby,nbz);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"fft grid for wave functions",nx,ny,nz);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"fft grid for charge/potential",ncx,ncy,ncz);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"fft grid division",bx,by,bz);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"big fft grid for charge/potential",nbx,nby,nbz);
 
 	// used in Grid_Base_Beta.init() (Grid integration)
 	// mohan add 2009-11-09
@@ -506,14 +506,14 @@ void PW_Basis::divide_fft_grid(void)
 		this->nbzp_start = GlobalV::RANK_IN_POOL * nbzp + remain_planes;
     }
 
-	if(GlobalV::test_pw)OUT(GlobalV::ofs_running,"remain planes",remain_planes);
-	if(GlobalV::test_pw)OUT(GlobalV::ofs_running,"small planes in this processor(charge)",nczp);
-	if(GlobalV::test_pw)OUT(GlobalV::ofs_running,"big   planes in this processor(charge)",nbzp);
-	if(GlobalV::test_pw)OUT(GlobalV::ofs_running,"nczp_start",nczp);
-	if(GlobalV::test_pw)OUT(GlobalV::ofs_running,"nbzp_start",nbzp);
-	OUT(GlobalV::ofs_running,"nbxx",nbxx);
-	OUT(GlobalV::ofs_running,"nrxx",nrxx);
-	if(GlobalV::test_pw)OUT(GlobalV::ofs_running,"nrxx_start",nrxx_start);
+	if(GlobalV::test_pw)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"remain planes",remain_planes);
+	if(GlobalV::test_pw)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"small planes in this processor(charge)",nczp);
+	if(GlobalV::test_pw)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"big   planes in this processor(charge)",nbzp);
+	if(GlobalV::test_pw)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nczp_start",nczp);
+	if(GlobalV::test_pw)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nbzp_start",nbzp);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nbxx",nbxx);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nrxx",nrxx);
+	if(GlobalV::test_pw)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nrxx_start",nrxx_start);
 
     //=====================================
     // generate nst,st_i,st_j,st_k,npps
@@ -575,9 +575,9 @@ void PW_Basis::get_MPI_GVectors(void)
     this->ig1 = new int[ngmc];
     this->ig2 = new int[ngmc];
     this->ig3 = new int[ngmc];
-	ZEROS(ig1, ngmc);
-	ZEROS(ig2, ngmc);
-	ZEROS(ig3, ngmc);
+	ModuleBase::GlobalFunc::ZEROS(ig1, ngmc);
+	ModuleBase::GlobalFunc::ZEROS(ig2, ngmc);
+	ModuleBase::GlobalFunc::ZEROS(ig3, ngmc);
 
     for (int i = 0; i < ngmc;i++)
     {
@@ -639,10 +639,10 @@ void PW_Basis::get_GVectors(void)
     this->ig1 = new int[ngmc];
     this->ig2 = new int[ngmc];
     this->ig3 = new int[ngmc];
-	ZEROS(ig2fftc, ngmc);
-	ZEROS(ig1, ngmc);
-	ZEROS(ig2, ngmc);
-	ZEROS(ig3, ngmc);
+	ModuleBase::GlobalFunc::ZEROS(ig2fftc, ngmc);
+	ModuleBase::GlobalFunc::ZEROS(ig1, ngmc);
+	ModuleBase::GlobalFunc::ZEROS(ig2, ngmc);
+	ModuleBase::GlobalFunc::ZEROS(ig3, ngmc);
     PW_complement::get_ig2fftc(ngmc, ncx, ncy, ncz, gdirect, ig1, ig2, ig3, ig2fftc);
 
     // (3) calculate ngmw: number of plane wave to describe wave functions.
@@ -651,9 +651,9 @@ void PW_Basis::get_GVectors(void)
     assert(ngmw>0);
     delete[] ig2fftw;
     ig2fftw = new int[ngmw];
-	ZEROS(ig2fftw, ngmw);
+	ModuleBase::GlobalFunc::ZEROS(ig2fftw, ngmw);
     Memory::record("PW_complement","ig2fftw",ngmw,"int");
-    ZEROS(ig2fftw, ngmw);
+    ModuleBase::GlobalFunc::ZEROS(ig2fftw, ngmw);
 
     PW_complement::get_ig2fftw(ngmw, nx, ny, nz, gdirect, ig2fftw);
 
@@ -673,12 +673,12 @@ void PW_Basis::get_nggm(const int ngmc_local)
     //*********************************************
 	assert(ngmc_local>0);
     double *tmp = new double[ngmc_local];
-	ZEROS(tmp, ngmc_local);
+	ModuleBase::GlobalFunc::ZEROS(tmp, ngmc_local);
 
 
     delete[] ig2ngg;
     this->ig2ngg = new int[ngmc_local];
-	ZEROS(ig2ngg, ngmc_local);
+	ModuleBase::GlobalFunc::ZEROS(ig2ngg, ngmc_local);
 
     tmp[0] = this->gg[0];
     ig2ngg[0] = 0;
@@ -701,11 +701,11 @@ void PW_Basis::get_nggm(const int ngmc_local)
     // *******************************
     this->nggm = ng;
 
-	OUT(GlobalV::ofs_running,"number of |g|",nggm);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of |g|",nggm);
 
     delete[] ggs;
     this->ggs = new double[this->nggm];
-	ZEROS(ggs, this->nggm);
+	ModuleBase::GlobalFunc::ZEROS(ggs, this->nggm);
 
 	// mohan update 2011-06-12
 	for(int ig=0; ig<nggm; ig++)
@@ -713,8 +713,8 @@ void PW_Basis::get_nggm(const int ngmc_local)
 		this->ggs[ig] = tmp[ig];
 	}
 
-	OUT(GlobalV::ofs_running,"max |g|",ggs[nggm-1]);
-	OUT(GlobalV::ofs_running,"min |g|",ggs[0]);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"max |g|",ggs[nggm-1]);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"min |g|",ggs[0]);
 
     if (this->ggs[0]>1.0e-4) // mohan modified 2009-07-07
     {
@@ -725,7 +725,7 @@ void PW_Basis::get_nggm(const int ngmc_local)
         gstart = 1;
     }
 
-	if(GlobalV::test_pw)OUT(GlobalV::ofs_running,"gstart",gstart);
+	if(GlobalV::test_pw)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"gstart",gstart);
 
     delete[] tmp;
     timer::tick("PW_Basis","get_nggm");
@@ -783,7 +783,7 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
     {
         if (GlobalV::test_pw > 1)
         {
-            OUT(GlobalV::ofs_running,"eigts",i);
+            ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"eigts",i);
         }
         for (j = 0; j < Ucell->atoms[i].na;j++)
         {
@@ -1049,7 +1049,7 @@ void PW_Basis::update_gvectors(std::ofstream &runlog, const UnitCell &Ucell_in)
     if (cutgg_flag)
     {
 #ifdef __MPI
-        OUT(GlobalV::ofs_running,"number of total plane waves",ngmc_g);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of total plane waves",ngmc_g);
 
         double cutgg_pieces = 10;
 

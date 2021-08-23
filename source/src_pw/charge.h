@@ -51,7 +51,7 @@ public:
 
     void atomic_rho(const int spin_number_need, double **rho_in)const;
 
-    void set_rho_core(const ComplexMatrix &structure_factor);
+    void set_rho_core(const ModuleBase::ComplexMatrix &structure_factor);
 
     void cal_nelec();  // calculate total number of electrons  Yu Liu add 2021-07-03
 

@@ -99,7 +99,7 @@ cout_t("sum_all",t_sum_all);
 		static int istep=1;
 		for(int ik=0; ik!=GlobalC::kv.nks; ++ik)
 		{
-			std::ofstream ofs("Hexxk_"+TO_STRING(istep++)+"_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK));
+			std::ofstream ofs("Hexxk_"+ModuleBase::GlobalFunc::TO_STRING(istep++)+"_"+ModuleBase::GlobalFunc::TO_STRING(ik)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 			for(int i=0; i!=GlobalV::NLOCAL; ++i)
 			{
 				for(int j=0; j!=GlobalV::NLOCAL; ++j)
@@ -173,7 +173,7 @@ void Exx_Lip::init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in, PW_Basis *pw_ptr_i
 
 		k_pack->wf_wg.create(k_pack->kv_ptr->nks,GlobalV::NBANDS);
 
-		k_pack->hvec_array = new ComplexMatrix [k_pack->kv_ptr->nks];
+		k_pack->hvec_array = new ModuleBase::ComplexMatrix [k_pack->kv_ptr->nks];
 		for( int ik=0; ik<k_pack->kv_ptr->nks; ++ik)
 		{
 			k_pack->hvec_array[ik].create(GlobalV::NLOCAL,GlobalV::NBANDS);
@@ -331,7 +331,7 @@ void Exx_Lip::phi_cal(k_package *kq_pack, int ikq)
 {
 	for( int iw=0; iw< GlobalV::NLOCAL; ++iw)
 	{
-		ZEROS( UFFT_ptr->porter, pw_ptr->nrxx );
+		ModuleBase::GlobalFunc::ZEROS( UFFT_ptr->porter, pw_ptr->nrxx );
 		for( int ig=0; ig<kq_pack->kv_ptr->ngk[ikq]; ++ig)
 			UFFT_ptr->porter[ pw_ptr->ig2fftw[kq_pack->wf_ptr->igk(ikq,ig)] ] = kq_pack->wf_ptr->wanf2[ikq](iw,ig);
 		pw_ptr->FFT_wfc.FFT3D(UFFT_ptr->porter,1);
@@ -363,7 +363,7 @@ void Exx_Lip::psi_cal()
 		{
 			for( int ib = 0; ib < GlobalV::NBANDS; ++ib)
 			{
-				ZEROS( UFFT_ptr->porter, pw_ptr->nrxx );
+				ModuleBase::GlobalFunc::ZEROS( UFFT_ptr->porter, pw_ptr->nrxx );
 				for( int ig = 0; ig < q_pack->kv_ptr->ngk[iq] ; ++ig)
 				{
 					UFFT_ptr->porter[ pw_ptr->ig2fftw[q_pack->wf_ptr->igk(iq,ig)] ] = q_pack->wf_ptr->evc[iq](ib,ig);
@@ -395,7 +395,7 @@ void Exx_Lip::psi_cal()
 			phi_cal( q_pack, iq);
 			for( int ib=0; ib<GlobalV::NBANDS; ++ib)
 			{
-				ZEROS(psi[iq][ib],pw_ptr->nrxx);
+				ModuleBase::GlobalFunc::ZEROS(psi[iq][ib],pw_ptr->nrxx);
 				for( int iw=0; iw<GlobalV::NLOCAL; ++iw)
 				{
 					for( int ir=0; ir<pw_ptr->nrxx; ++ir)
@@ -708,7 +708,7 @@ void Exx_Lip::read_q_pack()
 	}
 	MPI_Bcast( q_pack->wf_wg.c, q_pack->kv_ptr->nks*GlobalV::NBANDS, MPI_DOUBLE, 0, POOL_WORLD);
 
-	q_pack->hvec_array = new ComplexMatrix [q_pack->kv_ptr->nks];
+	q_pack->hvec_array = new ModuleBase::ComplexMatrix [q_pack->kv_ptr->nks];
 	for( int iq=0; iq<q_pack->kv_ptr->nks; ++iq)
 	{
 		q_pack->hvec_array[iq].create(GlobalV::NLOCAL,GlobalV::NBANDS);
@@ -821,7 +821,7 @@ void Exx_Lip::read_q_pack()
 	{
 		q_pack.wf_wg[iq] = new double[GlobalV::NBANDS];
 	}
-	q_pack.hvec_array = new ComplexMatrix [q_pack->kv_ptr->nks];
+	q_pack.hvec_array = new ModuleBase::ComplexMatrix [q_pack->kv_ptr->nks];
 	for( int iq=0; iq<q_pack->kv_ptr->nks; ++iq)
 	{
 		q_pack.hvec_array[iq].create(GlobalV::NLOCAL,GlobalV::NBANDS);

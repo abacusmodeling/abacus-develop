@@ -46,12 +46,12 @@ void BFGS_Basic::allocate_basic(void)
     move = new double [dim];
     move_p = new double [dim];
 
-    ZEROS(pos, dim);
-    ZEROS(grad, dim);
-    ZEROS(pos_p, dim);
-    ZEROS(grad_p, dim);
-    ZEROS(move, dim);
-    ZEROS(move_p, dim);
+    ModuleBase::GlobalFunc::ZEROS(pos, dim);
+    ModuleBase::GlobalFunc::ZEROS(grad, dim);
+    ModuleBase::GlobalFunc::ZEROS(pos_p, dim);
+    ModuleBase::GlobalFunc::ZEROS(grad_p, dim);
+    ModuleBase::GlobalFunc::ZEROS(move, dim);
+    ModuleBase::GlobalFunc::ZEROS(move_p, dim);
 	
 	// init inverse Hessien matrix.
 	inv_hess.create(dim, dim);
@@ -66,8 +66,8 @@ void BFGS_Basic::update_inverse_hessian(void)
 
     double *s = new double [dim];
     double *y = new double [dim];
-    ZEROS(s, dim);
-    ZEROS(y, dim);
+    ModuleBase::GlobalFunc::ZEROS(s, dim);
+    ModuleBase::GlobalFunc::ZEROS(y, dim);
 
     for(int i=0;i<dim;i++)
     {
@@ -95,9 +95,9 @@ void BFGS_Basic::update_inverse_hessian(void)
     double *Hs = new double [dim];
     double *Hy = new double [dim];
     double *yH = new double [dim];
-    ZEROS(Hs,dim);
-    ZEROS(Hy,dim);
-    ZEROS(yH,dim);
+    ModuleBase::GlobalFunc::ZEROS(Hs,dim);
+    ModuleBase::GlobalFunc::ZEROS(Hy,dim);
+    ModuleBase::GlobalFunc::ZEROS(yH,dim);
 
 	for(int i=0;i<dim;i++)
     {
@@ -149,14 +149,14 @@ void BFGS_Basic::check_wolfe_conditions(void)
 
 	if(GlobalV::test_ion_dynamics)
 	{
-		OUT(GlobalV::ofs_running,"etot - etot_p",etot-etot_p);
-		OUT(GlobalV::ofs_running,"w1 * dot_p",w1 * dot_p);
-		OUT(GlobalV::ofs_running,"dot",dot);
-		OUT(GlobalV::ofs_running,"w2 * dot_p",w2 * dot_p);	
-		OUT(GlobalV::ofs_running,"w1",w1);
-		OUT(GlobalV::ofs_running,"w2",w2);
-		OUT(GlobalV::ofs_running,"wolfe1",wolfe1);
-		OUT(GlobalV::ofs_running,"wolfe2",wolfe2);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"etot - etot_p",etot-etot_p);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"w1 * dot_p",w1 * dot_p);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"dot",dot);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"w2 * dot_p",w2 * dot_p);	
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"w1",w1);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"w2",w2);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wolfe1",wolfe1);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wolfe2",wolfe2);
 	}
 
     this->wolfe_flag = wolfe1 && wolfe2;
@@ -173,13 +173,13 @@ void BFGS_Basic::check_wolfe_conditions(void)
 	   }
 	 */
 	 
-	OUT(GlobalV::ofs_running,"etot - etot_p",etot-etot_p);
-	OUT(GlobalV::ofs_running,"w1 * dot_p",w1 * dot_p);
-    OUT(GlobalV::ofs_running,"wolfe1",wolfe1);
-    OUT(GlobalV::ofs_running,"wolfe2",wolfe2);
-//  OUT(GlobalV::ofs_running,"dot = ",dot);
-//  OUT(GlobalV::ofs_running,"dot_p = ",dot_p);
-    OUT(GlobalV::ofs_running,"wolfe condition satisfied",wolfe_flag);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"etot - etot_p",etot-etot_p);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"w1 * dot_p",w1 * dot_p);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wolfe1",wolfe1);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wolfe2",wolfe2);
+//  ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"dot = ",dot);
+//  ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"dot_p = ",dot_p);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wolfe condition satisfied",wolfe_flag);
     return;
 }
 
@@ -322,7 +322,7 @@ void BFGS_Basic::compute_trust_radius(void)
 	// is used to compare to trust_radius_old.
     double norm_move = dot_func( this->move, this->move, dim);
     norm_move = std::sqrt(norm_move);
-    OUT(GlobalV::ofs_running,"move(norm)",norm_move);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"move(norm)",norm_move);
 
     ltest = ltest && (norm_move > trust_radius_old);
 
@@ -357,11 +357,11 @@ void BFGS_Basic::compute_trust_radius(void)
 
 	if(GlobalV::test_ion_dynamics)
 	{
-		OUT(GlobalV::ofs_running,"wolfe_flag",wolfe_flag);
-		OUT(GlobalV::ofs_running,"trust_radius_old",trust_radius_old);
-		OUT(GlobalV::ofs_running,"2*a*trust_radius_old",2.0*a*trust_radius_old);
-		OUT(GlobalV::ofs_running,"norm_move",norm_move);
-		OUT(GlobalV::ofs_running,"Trust_radius (Bohr)",trust_radius);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wolfe_flag",wolfe_flag);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"trust_radius_old",trust_radius_old);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"2*a*trust_radius_old",2.0*a*trust_radius_old);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"norm_move",norm_move);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Trust_radius (Bohr)",trust_radius);
 	}
 
     if( trust_radius < trust_radius_min )

@@ -98,16 +98,16 @@ void Charge::allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_i
 		rhog[is] = new std::complex<double>[ngmc];
 		rho_save[is] = new double[nrxx];
 		rhog_save[is] = new std::complex<double>[ngmc];			
-		ZEROS(rho[is], nrxx);
-		ZEROS(rhog[is], ngmc);
-		ZEROS(rho_save[is], nrxx);
-		ZEROS(rhog_save[is], ngmc);
+		ModuleBase::GlobalFunc::ZEROS(rho[is], nrxx);
+		ModuleBase::GlobalFunc::ZEROS(rhog[is], ngmc);
+		ModuleBase::GlobalFunc::ZEROS(rho_save[is], nrxx);
+		ModuleBase::GlobalFunc::ZEROS(rhog_save[is], ngmc);
 		if(GlobalV::DFT_META)
 		{
 			kin_r[is] = new double[nrxx];
-			ZEROS(kin_r[is], nrxx);
+			ModuleBase::GlobalFunc::ZEROS(kin_r[is], nrxx);
 			kin_r_save[is] = new double[nrxx];
-			ZEROS(kin_r_save[is], nrxx);
+			ModuleBase::GlobalFunc::ZEROS(kin_r_save[is], nrxx);
 		}
 	}
 
@@ -119,10 +119,10 @@ void Charge::allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_i
     Memory::record("Charge","kin_r_save",nspin*ngmc,"double");
 
     this->rho_core = new double[nrxx]; // core charge in real space
-    ZEROS( rho_core, nrxx);
+    ModuleBase::GlobalFunc::ZEROS( rho_core, nrxx);
 
 	this->rhog_core = new std::complex<double>[ngmc]; // reciprocal core charge
-	ZEROS( rhog_core, ngmc);
+	ModuleBase::GlobalFunc::ZEROS( rhog_core, ngmc);
 
     Memory::record("Charge","rho_core",nrxx,"double");
     Memory::record("Charge","rhog_core",ngmc,"double");
@@ -173,7 +173,7 @@ void Charge::renormalize_rho(void)
 
     const double sr = this->sum_rho();
 	GlobalV::ofs_warning << std::setprecision(15);
-	OUT(GlobalV::ofs_warning,"charge before normalized",sr);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_warning,"charge before normalized",sr);
     const double normalize_factor = nelec / sr;
 
 	for(int is=0; is<nspin; is++)
@@ -184,7 +184,7 @@ void Charge::renormalize_rho(void)
 		}
 	}
 
-	OUT(GlobalV::ofs_warning,"charge after normalized",this->sum_rho());
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_warning,"charge after normalized",this->sum_rho());
 
 	GlobalV::ofs_running << std::setprecision(6);
     return;
@@ -200,10 +200,10 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
     TITLE("Charge","atomic_rho");
     timer::tick("Charge","atomic_rho");
 
-	const ComplexMatrix rho_g3d = [&]()->ComplexMatrix
+	const ModuleBase::ComplexMatrix rho_g3d = [&]()->ModuleBase::ComplexMatrix
 	{
 		// use interpolation to get three dimension charge density.
-		ComplexMatrix rho_g3d( spin_number_need, GlobalC::pw.ngmc);
+		ModuleBase::ComplexMatrix rho_g3d( spin_number_need, GlobalC::pw.ngmc);
 		
 		// check the start magnetization
 		const int startmag_type = [&]()->int
@@ -216,7 +216,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 						return 2;
 			return 1;
 		}();
-		OUT(GlobalV::ofs_warning,"startmag_type",startmag_type);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_warning,"startmag_type",startmag_type);
 
 		for (int it = 0;it < GlobalC::ucell.ntype;it++)
 		{
@@ -249,13 +249,13 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 
 						double charge = 0.0;
 						Integral::Simpson_Integral(atom->msh,atom->rho_at,atom->rab,charge);
-						OUT(GlobalV::ofs_warning,"charge from rho_at",charge);
+						ModuleBase::GlobalFunc::OUT(GlobalV::ofs_warning,"charge from rho_at",charge);
 						assert(charge!=0.0 || charge==atom->zv);		// Peize Lin add charge==atom->zv for bsse 2021.04.07
 
 						double scale=1.0;
 						if(charge!=atom->zv)
 						{
-							OUT(GlobalV::ofs_warning,"charge should be",atom->zv);
+							ModuleBase::GlobalFunc::OUT(GlobalV::ofs_warning,"charge should be",atom->zv);
 							scale = atom->zv/charge;
 						}
 
@@ -497,11 +497,11 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 	for(int is=0; is<spin0; ++is)
 	{
 		GlobalV::ofs_warning << "\n SETUP ATOMIC RHO FOR SPIN " << is+1 << std::endl;
-		OUT(GlobalV::ofs_warning,"Electron number from rho",ne[is]);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_warning,"Electron number from rho",ne[is]);
 		ne_tot += ne[is];
 	}
-	OUT(GlobalV::ofs_warning,"total electron number from rho",ne_tot);
-	OUT(GlobalV::ofs_warning,"should be",nelec);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_warning,"total electron number from rho",ne_tot);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_warning,"should be",nelec);
 	for(int is=0; is<spin_number_need; ++is)
 		for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
 			rho_in[is][ir] = rho_in[is][ir] / ne_tot * nelec;
@@ -538,7 +538,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 // computes the core charge on the real space 3D mesh.
 //==========================================================
 void Charge::set_rho_core(
-    const ComplexMatrix &structure_factor
+    const ModuleBase::ComplexMatrix &structure_factor
 )
 {
     TITLE("Charge","set_rho_core");
@@ -568,13 +568,13 @@ void Charge::set_rho_core(
 
     if (!bl)
     {
-        ZEROS( this->rho_core, GlobalC::pw.nrxx);
+        ModuleBase::GlobalFunc::ZEROS( this->rho_core, GlobalC::pw.nrxx);
     	timer::tick("Charge","set_rho_core");
         return;
     }
 
     double *rhocg = new double[GlobalC::pw.nggm];
-    ZEROS(rhocg, GlobalC::pw.nggm );
+    ModuleBase::GlobalFunc::ZEROS(rhocg, GlobalC::pw.nggm );
 
 	// three dimension.
     std::complex<double> *vg = new std::complex<double>[GlobalC::pw.ngmc];	
@@ -720,10 +720,10 @@ void Charge::sum_band(void)
 
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		ZEROS(rho[is], GlobalC::pw.nrxx);
+		ModuleBase::GlobalFunc::ZEROS(rho[is], GlobalC::pw.nrxx);
 		if (GlobalV::DFT_META)
 		{
-			ZEROS(kin_r[is], GlobalC::pw.nrxx);	
+			ModuleBase::GlobalFunc::ZEROS(kin_r[is], GlobalC::pw.nrxx);	
 		}
 	}
 	
@@ -754,7 +754,7 @@ void Charge::sum_band_k(void)
 			for (int ibnd = 0;ibnd < GlobalV::NBANDS;ibnd++)
 			{
 				GlobalC::en.eband += GlobalC::wf.ekb[ik][ibnd] * GlobalC::wf.wg(ik, ibnd);
-				ZEROS( porter, GlobalC::pw.nrxx );
+				ModuleBase::GlobalFunc::ZEROS( porter, GlobalC::pw.nrxx );
 				for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
  				{
 					porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)] ] = GlobalC::wf.evc[ik](ibnd, ig);
@@ -762,7 +762,7 @@ void Charge::sum_band_k(void)
 				GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter, 1);
 				if(GlobalV::NPOL ==2)
 				{
-					ZEROS( porter1, GlobalC::pw.nrxx );
+					ModuleBase::GlobalFunc::ZEROS( porter1, GlobalC::pw.nrxx );
 					for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
 					{
 						porter1[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)] ] = GlobalC::wf.evc[ik](ibnd, ig + GlobalC::wf.npwx);
@@ -810,7 +810,7 @@ void Charge::sum_band_k(void)
 			GlobalC::en.eband += GlobalC::wf.ekb[ik][ibnd] * GlobalC::wf.wg(ik, ibnd);
 			//std::cout << "\n ekb = " << GlobalC::wf.ekb[ik][ibnd] << " wg = " << GlobalC::wf.wg(ik, ibnd);
 
-			ZEROS( porter, GlobalC::pw.nrxx );
+			ModuleBase::GlobalFunc::ZEROS( porter, GlobalC::pw.nrxx );
 			for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
 			{
 				porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)] ] = GlobalC::wf.evc[ik](ibnd, ig);
@@ -832,7 +832,7 @@ void Charge::sum_band_k(void)
 			{
 				for (int j=0; j<3; j++)
 				{
-					ZEROS( porter, GlobalC::pw.nrxx );
+					ModuleBase::GlobalFunc::ZEROS( porter, GlobalC::pw.nrxx );
 					for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
 					{
 						double fact = GlobalC::pw.get_GPlusK_cartesian_projection(ik,GlobalC::wf.igk(ik,ig),j) * GlobalC::ucell.tpiba;
@@ -900,7 +900,7 @@ void Charge::rho_mpi(void)
 	// num_z: how many planes on processor 'ip'
     //=================================================
     int *num_z = new int[GlobalV::NPROC_IN_POOL];
-    ZEROS(num_z, GlobalV::NPROC_IN_POOL);
+    ModuleBase::GlobalFunc::ZEROS(num_z, GlobalV::NPROC_IN_POOL);
     for (iz=0;iz<GlobalC::pw.nbz;iz++)
     {
         ip = iz % GlobalV::NPROC_IN_POOL;
@@ -919,7 +919,7 @@ void Charge::rho_mpi(void)
 	// processor ip.
     //=======================================
     int *start_z = new int[GlobalV::NPROC_IN_POOL];
-    ZEROS(start_z, GlobalV::NPROC_IN_POOL);
+    ModuleBase::GlobalFunc::ZEROS(start_z, GlobalV::NPROC_IN_POOL);
     for (ip=1;ip<GlobalV::NPROC_IN_POOL;ip++)
     {
         start_z[ip] = start_z[ip-1]+num_z[ip-1];
@@ -929,7 +929,7 @@ void Charge::rho_mpi(void)
     // Find "number of data" in each processor in each pool
     //====================================================
     int *rec = new int[GlobalV::NPROC_IN_POOL];
-	ZEROS(rec, GlobalV::NPROC_IN_POOL);
+	ModuleBase::GlobalFunc::ZEROS(rec, GlobalV::NPROC_IN_POOL);
     const int ncxy = GlobalC::pw.ncx * GlobalC::pw.ncy;
     for (ip=0;ip<GlobalV::NPROC_IN_POOL;ip++)
     {
@@ -941,7 +941,7 @@ void Charge::rho_mpi(void)
 	// also, we mean start position of data.
     //======================================================
     int *dis = new int[GlobalV::NPROC_IN_POOL];
-	ZEROS(dis, GlobalV::NPROC_IN_POOL);
+	ModuleBase::GlobalFunc::ZEROS(dis, GlobalV::NPROC_IN_POOL);
     for (ip=1;ip<GlobalV::NPROC_IN_POOL;ip++)
     {
         dis[ip]=dis[ip-1]+rec[ip-1];
@@ -955,7 +955,7 @@ void Charge::rho_mpi(void)
     double *rho_tmp = new double[GlobalC::pw.nrxx];
     double *rho_tot = new double[GlobalC::pw.ncxyz];
     double *rho_tot_aux = new double[GlobalC::pw.ncxyz];
-	ZEROS(rho_tot_aux, GlobalC::pw.ncxyz);
+	ModuleBase::GlobalFunc::ZEROS(rho_tot_aux, GlobalC::pw.ncxyz);
 
 	double *tau_tmp;
 	double *tau_tot;
@@ -966,13 +966,13 @@ void Charge::rho_mpi(void)
     	tau_tmp = new double[GlobalC::pw.nrxx];
 	    tau_tot = new double[GlobalC::pw.ncxyz];
     	tau_tot_aux = new double[GlobalC::pw.ncxyz];
-		ZEROS(tau_tot_aux, GlobalC::pw.ncxyz);
+		ModuleBase::GlobalFunc::ZEROS(tau_tot_aux, GlobalC::pw.ncxyz);
 	}
 
     for (int is=0; is< GlobalV::NSPIN; is++)
     {
-        ZEROS(rho_tot, GlobalC::pw.ncxyz);
-		if(GlobalV::DFT_META) ZEROS(tau_tot, GlobalC::pw.ncxyz);
+        ModuleBase::GlobalFunc::ZEROS(rho_tot, GlobalC::pw.ncxyz);
+		if(GlobalV::DFT_META) ModuleBase::GlobalFunc::ZEROS(tau_tot, GlobalC::pw.ncxyz);
 
 		for (ir=0;ir<GlobalC::pw.nrxx;ir++)
 		{
@@ -992,10 +992,10 @@ void Charge::rho_mpi(void)
         // Change the order of rho_tot in each pool , make them consistent
         // this is the most complicated part !!
         //=================================================================
-        ZEROS(rho_tot_aux, GlobalC::pw.ncxyz);
+        ModuleBase::GlobalFunc::ZEROS(rho_tot_aux, GlobalC::pw.ncxyz);
 		if(GlobalV::DFT_META)
 		{
-        	ZEROS(tau_tot_aux, GlobalC::pw.ncxyz);
+        	ModuleBase::GlobalFunc::ZEROS(tau_tot_aux, GlobalC::pw.ncxyz);
 		}
 
         for (ip=0;ip<GlobalV::NPROC_IN_POOL;ip++)
@@ -1102,8 +1102,8 @@ void Charge::save_rho_before_sum_band(void)
 {
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-    	DCOPY( rho[is], rho_save[is], GlobalC::pw.nrxx);
-    	if(GlobalV::DFT_META) DCOPY( kin_r[is], kin_r_save[is], GlobalC::pw.nrxx);
+    	ModuleBase::GlobalFunc::DCOPY( rho[is], rho_save[is], GlobalC::pw.nrxx);
+    	if(GlobalV::DFT_META) ModuleBase::GlobalFunc::DCOPY( kin_r[is], kin_r_save[is], GlobalC::pw.nrxx);
     }
     return;
 }
@@ -1150,10 +1150,10 @@ void Charge::init_final_scf()
 		rhog[is] = new std::complex<double>[GlobalC::pw.ngmc];
 		rho_save[is] = new double[GlobalC::pw.nrxx];
 		rhog_save[is] = new std::complex<double>[GlobalC::pw.ngmc];			
-		ZEROS(rho[is], GlobalC::pw.nrxx);
-		ZEROS(rhog[is], GlobalC::pw.ngmc);
-		ZEROS(rho_save[is], GlobalC::pw.nrxx);
-		ZEROS(rhog_save[is], GlobalC::pw.ngmc);
+		ModuleBase::GlobalFunc::ZEROS(rho[is], GlobalC::pw.nrxx);
+		ModuleBase::GlobalFunc::ZEROS(rhog[is], GlobalC::pw.ngmc);
+		ModuleBase::GlobalFunc::ZEROS(rho_save[is], GlobalC::pw.nrxx);
+		ModuleBase::GlobalFunc::ZEROS(rhog_save[is], GlobalC::pw.ngmc);
 	}
 
     Memory::record("Charge","rho",GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
@@ -1162,10 +1162,10 @@ void Charge::init_final_scf()
     Memory::record("Charge","rhog_save",GlobalV::NSPIN*GlobalC::pw.ngmc,"double");
 
     this->rho_core = new double[GlobalC::pw.nrxx]; // core charge in real space
-    ZEROS( rho_core, GlobalC::pw.nrxx);
+    ModuleBase::GlobalFunc::ZEROS( rho_core, GlobalC::pw.nrxx);
 
 	this->rhog_core = new std::complex<double>[GlobalC::pw.ngmc]; // reciprocal core charge
-	ZEROS( rhog_core, GlobalC::pw.ngmc);
+	ModuleBase::GlobalFunc::ZEROS( rhog_core, GlobalC::pw.ngmc);
 
     Memory::record("Charge","rho_core",GlobalC::pw.nrxx,"double");
     Memory::record("Charge","rhog_core",GlobalC::pw.ngmc,"double");
@@ -1199,12 +1199,12 @@ void Charge::cal_nelec(void)
 			nelec += nelec_it;
 			ss2 << "total electron number of element " << GlobalC::ucell.atoms[it].label; 
 			
-			OUT(GlobalV::ofs_running,ss1.str(),GlobalC::ucell.atoms[it].zv);
-			OUT(GlobalV::ofs_running,ss2.str(),nelec_it);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,ss1.str(),GlobalC::ucell.atoms[it].zv);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,ss2.str(),nelec_it);
 		}
 	}
 
-	//OUT(GlobalV::ofs_running,"Total nelec",nelec);
+	//ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Total nelec",nelec);
 
 	//=======================================
 	// calculate number of bands (setup.f90)
@@ -1216,7 +1216,7 @@ void Charge::cal_nelec(void)
 		occupied_bands = std::floor(occupied_bands) + 1.0; //mohan fix 2012-04-16
 	}
 
-	OUT(GlobalV::ofs_running,"occupied bands",occupied_bands);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"occupied bands",occupied_bands);
 	
 	// mohan add 2010-09-04
     //std::cout << "nbands(GlobalC::ucell) = " <<GlobalV::NBANDS <<std::endl;
@@ -1245,7 +1245,7 @@ void Charge::cal_nelec(void)
 				GlobalV::NBANDS = max(nbands3, nbands4);
 				if(GlobalV::BASIS_TYPE!="pw") GlobalV::NBANDS = min(GlobalV::NBANDS, GlobalV::NLOCAL);
 			}
-			AUTO_SET("NBANDS",GlobalV::NBANDS);
+			ModuleBase::GlobalFunc::AUTO_SET("NBANDS",GlobalV::NBANDS);
 		}
 		//else if ( GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax") //pengfei 2014-10-13
 		else
@@ -1253,7 +1253,7 @@ void Charge::cal_nelec(void)
 			if(GlobalV::NBANDS < occupied_bands) WARNING_QUIT("unitcell","Too few bands!");
 			if(GlobalV::NBANDS < GlobalC::ucell.magnet.get_nelup() ) 
 			{
-				OUT(GlobalV::ofs_running,"nelup",GlobalC::ucell.magnet.get_nelup());
+				ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nelup",GlobalC::ucell.magnet.get_nelup());
 				WARNING_QUIT("unitcell","Too few spin up bands!");
 			}
 			if(GlobalV::NBANDS < GlobalC::ucell.magnet.get_neldw() )
@@ -1273,11 +1273,11 @@ void Charge::cal_nelec(void)
         }
         else
         {
-            OUT(GlobalV::ofs_running,"NLOCAL",GlobalV::NLOCAL);
-            OUT(GlobalV::ofs_running,"NBANDS",GlobalV::NBANDS);
+            ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"NLOCAL",GlobalV::NLOCAL);
+            ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"NBANDS",GlobalV::NBANDS);
         }
     }
 
-	OUT(GlobalV::ofs_running,"NBANDS",GlobalV::NBANDS);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"NBANDS",GlobalV::NBANDS);
 	return;
 }

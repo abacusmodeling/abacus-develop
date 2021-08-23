@@ -63,7 +63,7 @@ void Charge_Mixing::plain_mixing( double *rho, double *rho_save_in ) const
 	// after mixing, the charge density become 
 	// the input charge density of next iteration.
     //double* rho_tmp = new double[GlobalC::pw.nrxx];
-    //DCOPY( rho, rho_tmp, GlobalC::pw.nrxx);
+    //ModuleBase::GlobalFunc::DCOPY( rho, rho_tmp, GlobalC::pw.nrxx);
 
 //xiaohui add 2014-12-09
 	if(this->mixing_gg0 > 0.0)
@@ -109,7 +109,7 @@ void Charge_Mixing::plain_mixing( double *rho, double *rho_save_in ) const
 		}
 	}
 
-	DCOPY( rho, rho_save_in, GlobalC::pw.nrxx);
+	ModuleBase::GlobalFunc::DCOPY( rho, rho_save_in, GlobalC::pw.nrxx);
 //    delete[] rho_tmp;
 
     return;
@@ -127,7 +127,7 @@ void Charge_Mixing::Kerker_mixing( double *rho, const std::complex<double> *resi
 
     // (1) do kerker mixing in reciprocal space.
     std::complex<double> *rhog = new std::complex<double>[GlobalC::pw.ngmc];
-    ZEROS(rhog, GlobalC::pw.ngmc);
+    ModuleBase::GlobalFunc::ZEROS(rhog, GlobalC::pw.ngmc);
 
 	// mohan modify 2010-02-03, rhog should store the old
 	// charge density. " rhog = FFT^{-1}(rho_save) "
@@ -159,7 +159,7 @@ void Charge_Mixing::Kerker_mixing( double *rho, const std::complex<double> *resi
 
     // (5)
 	// mohan change the order of (4) (5), 2010-02-05
-    DCOPY(rho, rho_save, GlobalC::pw.nrxx);
+    ModuleBase::GlobalFunc::DCOPY(rho, rho_save, GlobalC::pw.nrxx);
 
     //this->renormalize_rho();
 

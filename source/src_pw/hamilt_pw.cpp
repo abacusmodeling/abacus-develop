@@ -47,9 +47,9 @@ void Hamilt_PW::allocate(
     this->GR_index = new int[nrxx];
     this->Bec = new std::complex<double> [nkb];
 
-    ZEROS(this->hpsi, npwx * npol);
-    ZEROS(this->spsi, npwx * npol);
-    ZEROS(this->GR_index, nrxx);
+    ModuleBase::GlobalFunc::ZEROS(this->hpsi, npwx * npol);
+    ModuleBase::GlobalFunc::ZEROS(this->spsi, npwx * npol);
+    ModuleBase::GlobalFunc::ZEROS(this->GR_index, nrxx);
 
     return;
 }
@@ -107,8 +107,8 @@ void Hamilt_PW::diagH_subspace(
     const int ik,
     const int nstart,
     const int n_band,
-    const ComplexMatrix &psi,
-    ComplexMatrix &evc,
+    const ModuleBase::ComplexMatrix &psi,
+    ModuleBase::ComplexMatrix &evc,
     double *en)
 {
     TITLE("Hamilt_PW","diagH_subspace");
@@ -117,9 +117,9 @@ void Hamilt_PW::diagH_subspace(
 	assert(nstart!=0);
 	assert(n_band!=0);
 
-    ComplexMatrix hc(nstart, nstart);
-    ComplexMatrix sc(nstart, nstart);
-    ComplexMatrix hvec(nstart,n_band);
+    ModuleBase::ComplexMatrix hc(nstart, nstart);
+    ModuleBase::ComplexMatrix sc(nstart, nstart);
+    ModuleBase::ComplexMatrix hvec(nstart,n_band);
 
 	int dmin=0;
 	int dmax=0;
@@ -296,7 +296,7 @@ void Hamilt_PW::diagH_subspace(
 		// qianrui improve this part 2021-3-13
 		char transa = 'N';
 		char transb = 'T';
-		ComplexMatrix evctmp(n_band, dmin,false);
+		ModuleBase::ComplexMatrix evctmp(n_band, dmin,false);
 		zgemm_(&transa,&transb,&dmin,&n_band,&nstart,&ONE,psi.c,&dmax,hvec.c,&n_band,&ZERO,evctmp.c,&dmin);
 		for(int ib=0; ib<n_band; ib++)
 		{
@@ -356,8 +356,8 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
     int j = 0;
     int ig= 0;
 
-	//if(GlobalV::NSPIN!=4) ZEROS(hpsi, GlobalC::wf.npw);
-	//else ZEROS(hpsi, GlobalC::wf.npwx * GlobalV::NPOL);//added by zhengdy-soc
+	//if(GlobalV::NSPIN!=4) ModuleBase::GlobalFunc::ZEROS(hpsi, GlobalC::wf.npw);
+	//else ModuleBase::GlobalFunc::ZEROS(hpsi, GlobalC::wf.npwx * GlobalV::NPOL);//added by zhengdy-soc
 	int dmax = GlobalC::wf.npwx * GlobalV::NPOL;
 
 	//------------------------------------
@@ -407,7 +407,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 		for(int ib = 0 ; ib < m; ++ib)
 		{
 			if(GlobalV::NSPIN!=4){
-				ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
+				ModuleBase::GlobalFunc::ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
 				GlobalC::UFFT.RoundTrip( tmpsi_in, GlobalC::pot.vr_eff1, GR_index, GlobalC::UFFT.porter );
 				for (j = 0;j < GlobalC::wf.npw;j++)
 				{
@@ -417,8 +417,8 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 			else
 			{
 				std::complex<double>* porter1 = new std::complex<double>[GlobalC::pw.nrxx];
-				ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
-				ZEROS( porter1, GlobalC::pw.nrxx);
+				ModuleBase::GlobalFunc::ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
+				ModuleBase::GlobalFunc::ZEROS( porter1, GlobalC::pw.nrxx);
 				for (int ig=0; ig< GlobalC::wf.npw; ig++)
 				{
 					GlobalC::UFFT.porter[ GR_index[ig]  ] = tmpsi_in[ig];
@@ -468,7 +468,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 			//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 			//qianrui optimize 2021-3-31
 			int nkb=GlobalC::ppcell.nkb;
-			ComplexMatrix becp(GlobalV::NPOL * m, nkb, false);
+			ModuleBase::ComplexMatrix becp(GlobalV::NPOL * m, nkb, false);
 			char transa = 'C';
 			char transb = 'N';
 			if(m==1 && GlobalV::NPOL==1)
@@ -483,7 +483,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 				//add_nonlocal_pp is moddified, thus tranpose not needed here.
 				//if(GlobalV::NONCOLIN)
 				//{
-				//	ComplexMatrix partbecp(GlobalV::NPOL, nkb ,false);
+				//	ModuleBase::ComplexMatrix partbecp(GlobalV::NPOL, nkb ,false);
 				//	for(int ib = 0; ib < m; ++ib)
 				//	{
 //
@@ -503,7 +503,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 			this->add_nonlocal_pp(hpsi, becp.c, m);
 			//======================================================================
 			/*std::complex<double> *becp = new std::complex<double>[ GlobalC::ppcell.nkb * GlobalV::NPOL ];
-			ZEROS(becp,GlobalC::ppcell.nkb * GlobalV::NPOL);
+			ModuleBase::GlobalFunc::ZEROS(becp,GlobalC::ppcell.nkb * GlobalV::NPOL);
 			for (i=0;i< GlobalC::ppcell.nkb;i++)
 			{
 				const std::complex<double>* p = &GlobalC::ppcell.vkb(i,0);
@@ -537,7 +537,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 		{
 			for(int j=0; j<3; j++)
 			{
-				ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
+				ModuleBase::GlobalFunc::ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
 				for (int ig = 0;ig < GlobalC::kv.ngk[GlobalV::CURRENT_K] ; ig++)
 				{
 					double fact = GlobalC::pw.get_GPlusK_cartesian_projection(GlobalV::CURRENT_K,GlobalC::wf.igk(GlobalV::CURRENT_K,ig),j) * GlobalC::ucell.tpiba;
@@ -579,7 +579,7 @@ void Hamilt_PW::add_nonlocal_pp(
 	int nkb = GlobalC::ppcell.nkb;
 
 	std::complex<double> *ps  = new std::complex<double> [nkb * GlobalV::NPOL * m];
-    ZEROS(ps, GlobalV::NPOL * m * nkb);
+    ModuleBase::GlobalFunc::ZEROS(ps, GlobalV::NPOL * m * nkb);
 
     int sum = 0;
     int iat = 0;
@@ -731,7 +731,7 @@ void Hamilt_PW::add_nonlocal_pp(
     return;
 }
 
-void Hamilt_PW::diag_zheev(const int &npw_in, ComplexMatrix &psi, const int &nband, double *em, double *err)
+void Hamilt_PW::diag_zheev(const int &npw_in, ModuleBase::ComplexMatrix &psi, const int &nband, double *em, double *err)
 {
     TITLE("Hamilt_PW","diag_zheev");
     assert(nband < npw_in) ;
@@ -740,14 +740,14 @@ void Hamilt_PW::diag_zheev(const int &npw_in, ComplexMatrix &psi, const int &nba
     // RedM means Reduced matrix, because the dimension of plane wave
     // is much larger than nbands.
 
-    ComplexMatrix RedM(nband, nband);
+    ModuleBase::ComplexMatrix RedM(nband, nband);
     std::complex<double> * eta =  new std::complex<double>[npw_in] ;
     std::complex<double> * hpsi1 =  new std::complex<double>[npw_in] ;
     std::complex<double> * spsi1 =  new std::complex<double>[npw_in] ;
 
-	ZEROS(eta, npw_in);
-	ZEROS(hpsi1, npw_in);
-	ZEROS(spsi1, npw_in);
+	ModuleBase::GlobalFunc::ZEROS(eta, npw_in);
+	ModuleBase::GlobalFunc::ZEROS(hpsi1, npw_in);
+	ModuleBase::GlobalFunc::ZEROS(spsi1, npw_in);
 
     double * tmpen = new double[nband] ;
 
@@ -851,7 +851,7 @@ void Hamilt_PW::diag_zheev(const int &npw_in, ComplexMatrix &psi, const int &nba
         std::cout << "the algorithm failed to converge. info = " << info << std::endl ;
     }
 
-    ComplexMatrix kpsi(nband, npw_in);
+    ModuleBase::ComplexMatrix kpsi(nband, npw_in);
 
     // kpsi = c_1 \psi_1 + c_2 \psi_2 + \cdots + c_N \psi_N
     // For the mth wavefunction, |psi(m)> = U(1, m) \psi_1 + ... U(k, m) \psi_k + ...
@@ -916,7 +916,7 @@ void Hamilt_PW::diag_zheev(const int &npw_in, ComplexMatrix &psi, const int &nba
 void Hamilt_PW::cal_err
 (
     const int &npw_in,
-    ComplexMatrix &psi,
+    ModuleBase::ComplexMatrix &psi,
     const int &nband,
     double *em,
     double *err
@@ -1040,7 +1040,7 @@ std::complex<double> Hamilt_PW::just_ddot(
 // this return <psi(m)|psik>
 std::complex<double> Hamilt_PW::ddot(
     const int & dim,
-    const ComplexMatrix &psi,
+    const ModuleBase::ComplexMatrix &psi,
     const int & m,
     const std::complex<double> *psik
 )const

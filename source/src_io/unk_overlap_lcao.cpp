@@ -16,7 +16,7 @@ unkOverlap_lcao::unkOverlap_lcao()
 		for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 		{
 			lcao_wfc_global[ik][ib] = new std::complex<double>[GlobalV::NLOCAL];
-			ZEROS(lcao_wfc_global[ik][ib], GlobalV::NLOCAL);
+			ModuleBase::GlobalFunc::ZEROS(lcao_wfc_global[ik][ib], GlobalV::NLOCAL);
 		}
 	}
 	
@@ -24,7 +24,7 @@ unkOverlap_lcao::unkOverlap_lcao()
 	for(int iw = 0; iw < GlobalV::NLOCAL; iw++)
 	{
 		cal_tag[iw] = new int[GlobalV::NLOCAL];
-		ZEROS(cal_tag[iw],GlobalV::NLOCAL);
+		ModuleBase::GlobalFunc::ZEROS(cal_tag[iw],GlobalV::NLOCAL);
 	}
 	*/
 	//GlobalV::ofs_running << "this is unkOverlap_lcao()" << std::endl;
@@ -105,7 +105,7 @@ void unkOverlap_lcao::init()
 			for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 			{
 				lcao_wfc_global[ik][ib] = new std::complex<double>[GlobalV::NLOCAL];
-				ZEROS(lcao_wfc_global[ik][ib], GlobalV::NLOCAL);
+				ModuleBase::GlobalFunc::ZEROS(lcao_wfc_global[ik][ib], GlobalV::NLOCAL);
 			}
 		}
 	
@@ -113,7 +113,7 @@ void unkOverlap_lcao::init()
 		for(int iw = 0; iw < GlobalV::NLOCAL; iw++)
 		{
 			cal_tag[iw] = new int[GlobalV::NLOCAL];
-			ZEROS(cal_tag[iw],GlobalV::NLOCAL);
+			ModuleBase::GlobalFunc::ZEROS(cal_tag[iw],GlobalV::NLOCAL);
 		}
 	}
 	
@@ -601,7 +601,7 @@ void unkOverlap_lcao::get_lcao_wfc_global_ik(std::complex<double> **ctot, std::c
 
 					// receive crecv
 					std::complex<double>* crecv = new std::complex<double>[GlobalV::NBANDS*lgd2];
-					ZEROS(crecv, GlobalV::NBANDS*lgd2);
+					ModuleBase::GlobalFunc::ZEROS(crecv, GlobalV::NBANDS*lgd2);
 					tag = i * 3 + 2;
 					MPI_Recv(crecv,GlobalV::NBANDS*lgd2,mpicomplex,i,tag,DIAG_WORLD, &status);
 				
@@ -639,7 +639,7 @@ void unkOverlap_lcao::get_lcao_wfc_global_ik(std::complex<double> **ctot, std::c
 
 				// send cc
 				std::complex<double>* csend = new std::complex<double>[GlobalV::NBANDS*GlobalC::GridT.lgd];
-				ZEROS(csend, GlobalV::NBANDS*GlobalC::GridT.lgd);
+				ModuleBase::GlobalFunc::ZEROS(csend, GlobalV::NBANDS*GlobalC::GridT.lgd);
 
 				for (int ib=0; ib<GlobalV::NBANDS; ib++)
 				{
@@ -680,7 +680,7 @@ void unkOverlap_lcao::prepare_midmatrix_pblas(const int ik_L, const int ik_R, co
 {
 	//Vector3<double> dk = GlobalC::kv.kvec_c[ik_R] - GlobalC::kv.kvec_c[ik_L];
 	midmatrix = new std::complex<double>[GlobalC::ParaO.nloc];
-	ZEROS(midmatrix,GlobalC::ParaO.nloc);
+	ModuleBase::GlobalFunc::ZEROS(midmatrix,GlobalC::ParaO.nloc);
 	for (int iw_row = 0; iw_row < GlobalV::NLOCAL; iw_row++) // global
 	{
 		for (int iw_col = 0; iw_col < GlobalV::NLOCAL; iw_col++) // global
@@ -712,8 +712,8 @@ std::complex<double> unkOverlap_lcao::det_berryphase(const int ik_L, const int i
 	std::complex<double> *midmatrix = NULL;
 	std::complex<double> *C_matrix = new std::complex<double>[GlobalC::ParaO.nloc];
 	std::complex<double> *out_matrix = new std::complex<double>[GlobalC::ParaO.nloc];
-	ZEROS(C_matrix,GlobalC::ParaO.nloc);
-	ZEROS(out_matrix,GlobalC::ParaO.nloc);
+	ModuleBase::GlobalFunc::ZEROS(C_matrix,GlobalC::ParaO.nloc);
+	ModuleBase::GlobalFunc::ZEROS(out_matrix,GlobalC::ParaO.nloc);
 	
 	this->prepare_midmatrix_pblas(ik_L,ik_R,dk,midmatrix);
 	

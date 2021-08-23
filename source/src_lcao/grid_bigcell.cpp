@@ -113,7 +113,7 @@ void Grid_BigCell::init_grid_expansion(void)
 	{
 		this->orbital_rmax = std::max( GlobalC::ORB.Phi[T].getRcut(), this->orbital_rmax);
 	}
-	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"rmax of periodic grid (bohr)",orbital_rmax);
+	if(GlobalV::test_gridt)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"rmax of periodic grid (bohr)",orbital_rmax);
 
 	// calculate the distance between bigcell.
 	// in other word, calculate the distance one bigcell point
@@ -124,7 +124,7 @@ void Grid_BigCell::init_grid_expansion(void)
 	this->bigcell_dy = GlobalC::ucell.a2.norm() * GlobalC::ucell.lat0 / (double)nby;	
 	this->bigcell_dz = GlobalC::ucell.a3.norm() * GlobalC::ucell.lat0 / (double)nbz;
 
-	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"Length of Meshcell (Bohr): ",bigcell_dx,bigcell_dy,bigcell_dz);
+	if(GlobalV::test_gridt)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Length of Meshcell (Bohr): ",bigcell_dx,bigcell_dy,bigcell_dz);
 	
 	assert( bigcell_dx > 0.0);
 	assert( bigcell_dy > 0.0);
@@ -165,7 +165,7 @@ void Grid_BigCell::init_grid_expansion(void)
 	this->dze = static_cast<int>( this->orbital_rmax * g3) +1;
 
 	//xiaohui add 'GlobalV::OUT_LEVEL' line, 2015-09-16
-	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"extended fft grid",dxe,dye,dze);
+	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"extended fft grid",dxe,dye,dze);
 
 	// calculate the dimension of expanded grid.
 	// +1 in order to cover the spillage atom on the right side.
@@ -178,7 +178,7 @@ void Grid_BigCell::init_grid_expansion(void)
 	this->nze = nbz + 2*dze +1;
 	this->nxyze = this->nxe * this->nye * this->nze;
 
-	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"dimension of extened grid",nxe,nye,nze);
+	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"dimension of extened grid",nxe,nye,nze);
 	return;
 }
 

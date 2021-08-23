@@ -52,8 +52,8 @@ void LCAO_nnr::cal_nnr(void)
 	delete[] nlocstart;
 	nlocdim = new int[GlobalC::ucell.nat];	
 	nlocstart = new int[GlobalC::ucell.nat];
-	ZEROS(nlocdim, GlobalC::ucell.nat);
-	ZEROS(nlocstart, GlobalC::ucell.nat);
+	ModuleBase::GlobalFunc::ZEROS(nlocdim, GlobalC::ucell.nat);
+	ModuleBase::GlobalFunc::ZEROS(nlocstart, GlobalC::ucell.nat);
 
 	this->nnr = 0;
 	int start = 0;
@@ -178,7 +178,7 @@ void LCAO_nnr::cal_nnr(void)
 	} // end T1
 
 	//xiaohui add 'GlobalV::OUT_LEVEL' line, 2015-09-16
-	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"nnr",nnr);
+	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nnr",nnr);
 //	for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 //	{
 //		std::cout << " nlocdim[" << iat << "]=" << nlocdim[iat];
@@ -205,9 +205,9 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 	this->nlocdimg = new int[GlobalC::ucell.nat];	
 	this->nlocstartg = new int[GlobalC::ucell.nat];
 	
-	ZEROS(nad, GlobalC::ucell.nat);
-	ZEROS(nlocdimg, GlobalC::ucell.nat);
-	ZEROS(nlocstartg, GlobalC::ucell.nat);
+	ModuleBase::GlobalFunc::ZEROS(nad, GlobalC::ucell.nat);
+	ModuleBase::GlobalFunc::ZEROS(nlocdimg, GlobalC::ucell.nat);
+	ModuleBase::GlobalFunc::ZEROS(nlocstartg, GlobalC::ucell.nat);
 
 
 	Vector3<double> tau1, tau2, dtau;
@@ -321,7 +321,7 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 		}// end I1
 	}// end T1
 
-	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"nnrg",this->nnrg);
+	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nnrg",this->nnrg);
 
 	//--------------------------------------------------
 	// search again, to order each (iat2, b1, b2, b3)
@@ -352,14 +352,14 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 	{
 		// at least nad contains itself, so nad[iat] can not be 0.
 		this->find_R2[iat] = new int[nad[iat]];
-		ZEROS(find_R2[iat], nad[iat]);
+		ModuleBase::GlobalFunc::ZEROS(find_R2[iat], nad[iat]);
 	}
 
 	this->find_R2st = new int*[GlobalC::ucell.nat];
 	for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 	{
 		this->find_R2st[iat] = new int[nad[iat]];
-		ZEROS(find_R2st[iat], nad[iat]);
+		ModuleBase::GlobalFunc::ZEROS(find_R2st[iat], nad[iat]);
 	}
 	allocate_find_R2 = true;
 
@@ -513,12 +513,12 @@ void LCAO_nnr::cal_max_box_index(void)
 	}
 
 	/*
-	OUT(GlobalV::ofs_running,"maxB1",maxB1);
-	OUT(GlobalV::ofs_running,"maxB2",maxB2);
-	OUT(GlobalV::ofs_running,"maxB3",maxB3);
-	OUT(GlobalV::ofs_running,"minB1",minB1);
-	OUT(GlobalV::ofs_running,"minB2",minB2);
-	OUT(GlobalV::ofs_running,"minB3",minB3);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"maxB1",maxB1);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"maxB2",maxB2);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"maxB3",maxB3);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"minB1",minB1);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"minB2",minB2);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"minB3",minB3);
 	*/
 
 	nB1 = maxB1-minB1+1;
@@ -526,14 +526,14 @@ void LCAO_nnr::cal_max_box_index(void)
 	nB3 = maxB3-minB3+1;
 
 	/*
-	OUT(GlobalV::ofs_running,"nB1",nB1);
-	OUT(GlobalV::ofs_running,"nB2",nB2);
-	OUT(GlobalV::ofs_running,"nB3",nB3);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nB1",nB1);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nB2",nB2);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nB3",nB3);
 	*/
 
 	nbox = nB1 * nB2 * nB3;
 	
-	//OUT(GlobalV::ofs_running,"nbox",nbox);
+	//ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nbox",nbox);
 
 	return;
 }

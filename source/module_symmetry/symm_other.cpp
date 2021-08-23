@@ -6,99 +6,99 @@ void Symm_Other::print1(const int &ibrav, const double *cel_const, std::ofstream
 {
 	TITLE("Symm_Other","print1");
 
-	OUT(ofs_running,"IBRAV",ibrav);
+	ModuleBase::GlobalFunc::OUT(ofs_running,"IBRAV",ibrav);
 	if(ibrav==1)
 	{
-		OUT(ofs_running,"BRAVAIS","SIMPLE CUBIC");
-    	OUT(ofs_running,"LATTICE CONSTANT A",cel_const[0]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"BRAVAIS","SIMPLE CUBIC");
+    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTANT A",cel_const[0]);
 	}
 	else if(ibrav==2)
 	{
-		OUT(ofs_running,"BRAVAIS","BODY CENTERED CUBIC");
-    	OUT(ofs_running,"LATTICE CONSTANT A",cel_const[0]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"BRAVAIS","BODY CENTERED CUBIC");
+    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTANT A",cel_const[0]);
 	}
 	else if(ibrav==3)
 	{
-		OUT(ofs_running,"BRAVAIS","FACE CENTERED CUBIC");
-    	OUT(ofs_running,"LATTICE CONSTANT A",cel_const[0]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"BRAVAIS","FACE CENTERED CUBIC");
+    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTANT A",cel_const[0]);
 	}
 	else if(ibrav==4)
 	{
-		OUT(ofs_running,"BRAVAIS","HEXAGONAL CELL");
-    	OUT(ofs_running,"LATTICE CONSTANT A",cel_const[0]);
-		OUT(ofs_running,"C/A RATIO",cel_const[2]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"BRAVAIS","HEXAGONAL CELL");
+    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTANT A",cel_const[0]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"C/A RATIO",cel_const[2]);
 	}
 	else if(ibrav==5)
 	{
-		OUT(ofs_running,"BRAVAIS","SIMPLE TETROGONAL CELL");
-    	OUT(ofs_running,"LATTICE CONSTANT A",cel_const[0]);
-		OUT(ofs_running,"C/A RATIO",cel_const[2]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"BRAVAIS","SIMPLE TETROGONAL CELL");
+    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTANT A",cel_const[0]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"C/A RATIO",cel_const[2]);
 	}
 	else if(ibrav==6)
 	{
-		OUT(ofs_running,"BRAVAIS","BODY CENTERED TETROGONAL CELL");
-    	OUT(ofs_running,"LATTICE CONSTANT A",cel_const[0]);
-		OUT(ofs_running,"C/A RATIO",cel_const[2]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"BRAVAIS","BODY CENTERED TETROGONAL CELL");
+    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTANT A",cel_const[0]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"C/A RATIO",cel_const[2]);
 	}
 	else if(ibrav==7)
 	{
-		OUT(ofs_running,"BRAVAIS","TRIGONAL (RHOMBOEDRIC) CELL");
-    	OUT(ofs_running,"LATTICE CONSTANT A",cel_const[0]);
-		OUT(ofs_running,"COS(ALPHA)",cel_const[3]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"BRAVAIS","TRIGONAL (RHOMBOEDRIC) CELL");
+    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTANT A",cel_const[0]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"COS(ALPHA)",cel_const[3]);
 	}
 	else if(ibrav==8)
 	{
-		OUT(ofs_running,"BRAVAIS","SIMPLE ORTHORHOMBIC CELL");
-    	OUT(ofs_running,"LATTICE CONSTANT A",cel_const[0]);
-		OUT(ofs_running,"B/A RATIO",cel_const[1]);
-		OUT(ofs_running,"C/A RATIO",cel_const[2]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"BRAVAIS","SIMPLE ORTHORHOMBIC CELL");
+    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTANT A",cel_const[0]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"B/A RATIO",cel_const[1]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"C/A RATIO",cel_const[2]);
 	}
 	else if(ibrav==9)
 	{
-		OUT(ofs_running,"BRAVAIS","BODY CENTERED ORTHORHOMBIC CELL");
-    	OUT(ofs_running,"LATTICE CONSTAddNT A",cel_const[0]);
-		OUT(ofs_running,"B/A RATIO",cel_const[1]);
-		OUT(ofs_running,"C/A RATIO",cel_const[2]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"BRAVAIS","BODY CENTERED ORTHORHOMBIC CELL");
+    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTAddNT A",cel_const[0]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"B/A RATIO",cel_const[1]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"C/A RATIO",cel_const[2]);
 	}
 	else if(ibrav==10)
 	{
-		OUT(ofs_running,"BRAVAIS","FACE CENTERED ORTHORHOMBIC CELL");
-    	OUT(ofs_running,"LATTICE CONSTAddNT A",cel_const[0]);
-		OUT(ofs_running,"B/A RATIO",cel_const[1]);
-		OUT(ofs_running,"C/A RATIO",cel_const[2]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"BRAVAIS","FACE CENTERED ORTHORHOMBIC CELL");
+    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTAddNT A",cel_const[0]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"B/A RATIO",cel_const[1]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"C/A RATIO",cel_const[2]);
 	}
 	else if(ibrav==11)
 	{
-		OUT(ofs_running,"BRAVAIS","BASE CENTERED ORTHORHOMBIC CELL");
-    	OUT(ofs_running,"LATTICE CONSTAddNT A",cel_const[0]);
-		OUT(ofs_running,"B/A RATIO",cel_const[1]);
-		OUT(ofs_running,"C/A RATIO",cel_const[2]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"BRAVAIS","BASE CENTERED ORTHORHOMBIC CELL");
+    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTAddNT A",cel_const[0]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"B/A RATIO",cel_const[1]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"C/A RATIO",cel_const[2]);
 	}
 	else if(ibrav==12)
 	{
-		OUT(ofs_running,"BRAVAIS","SIMPLE MONOLINIC CELL");
-    	OUT(ofs_running,"LATTICE CONSTAddNT A",cel_const[0]);
-		OUT(ofs_running,"B/A RATIO",cel_const[1]);
-		OUT(ofs_running,"C/A RATIO",cel_const[2]);
-		OUT(ofs_running,"COS(BETA)",cel_const[4]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"BRAVAIS","SIMPLE MONOLINIC CELL");
+    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTAddNT A",cel_const[0]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"B/A RATIO",cel_const[1]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"C/A RATIO",cel_const[2]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"COS(BETA)",cel_const[4]);
 	}
 	else if(ibrav==13)
 	{
-		OUT(ofs_running,"BRAVAIS","BASED CENTERED MONOLINIC CELL");
-    	OUT(ofs_running,"LATTICE CONSTAddNT A",cel_const[0]);
-		OUT(ofs_running,"B/A RATIO",cel_const[1]);
-		OUT(ofs_running,"C/A RATIO",cel_const[2]);
-		OUT(ofs_running,"COS(BETA)",cel_const[4]);	
+		ModuleBase::GlobalFunc::OUT(ofs_running,"BRAVAIS","BASED CENTERED MONOLINIC CELL");
+    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTAddNT A",cel_const[0]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"B/A RATIO",cel_const[1]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"C/A RATIO",cel_const[2]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"COS(BETA)",cel_const[4]);	
 	}
 	else if(ibrav==14)
 	{
-		OUT(ofs_running,"BRAVAIS","TRICLINIC CELL");
-    	OUT(ofs_running,"LATTICE CONSTAddNT A",cel_const[0]);
-		OUT(ofs_running,"B/A RATIO",cel_const[1]);
-		OUT(ofs_running,"C/A RATIO",cel_const[2]);
-		OUT(ofs_running,"COS(ALPHA)",cel_const[3]);	
-		OUT(ofs_running,"COS(BETA)",cel_const[4]);	
-		OUT(ofs_running,"COS(GAMMA)",cel_const[5]);	
+		ModuleBase::GlobalFunc::OUT(ofs_running,"BRAVAIS","TRICLINIC CELL");
+    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTAddNT A",cel_const[0]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"B/A RATIO",cel_const[1]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"C/A RATIO",cel_const[2]);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"COS(ALPHA)",cel_const[3]);	
+		ModuleBase::GlobalFunc::OUT(ofs_running,"COS(BETA)",cel_const[4]);	
+		ModuleBase::GlobalFunc::OUT(ofs_running,"COS(GAMMA)",cel_const[5]);	
 	}
 	else
 	{

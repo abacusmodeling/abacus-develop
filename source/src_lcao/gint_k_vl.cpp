@@ -176,7 +176,7 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r,
 			if(distance[ib][id] > (GlobalC::ORB.Phi[it].getRcut()- 1.0e-15)) 
 			{
 				cal_flag[ib][id]=false;
-				ZEROS(p, block_size[id]);
+				ModuleBase::GlobalFunc::ZEROS(p, block_size[id]);
 				continue;
 			}
 
@@ -335,7 +335,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 		// is used to save <phi | Vl | phi>
 		if(this->reduced)
 		{
-			ZEROS(this->pvpR_reduced[spin], GlobalC::LNNR.nnrg);
+			ModuleBase::GlobalFunc::ZEROS(this->pvpR_reduced[spin], GlobalC::LNNR.nnrg);
 		}
 		// else one needs to consdier all cell with a std::vector R
 		// the number of cells is GridT.nutot,
@@ -344,7 +344,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 		{
 			for(int i=0; i<GridT.lgd * GridT.nutot; i++)
 			{
-				ZEROS(pvpR[i], GridT.lgd * GridT.nutot);
+				ModuleBase::GlobalFunc::ZEROS(pvpR[i], GridT.lgd * GridT.nutot);
 			}
 		}
 	}
@@ -374,10 +374,10 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 		// save the small box information for a big box.
 		distance = new double*[bxyz];
 		psir_ylm_pool=new double[bxyz*LD_pool];
-		ZEROS(psir_ylm_pool, bxyz*LD_pool);
+		ModuleBase::GlobalFunc::ZEROS(psir_ylm_pool, bxyz*LD_pool);
 		psir_ylm=new double *[bxyz];
 		psir_vlbr3_pool=new double[bxyz*LD_pool];
-		ZEROS(psir_vlbr3_pool, bxyz*LD_pool);
+		ModuleBase::GlobalFunc::ZEROS(psir_vlbr3_pool, bxyz*LD_pool);
 		psir_vlbr3=new double *[bxyz];
 		cal_flag = new bool*[bxyz];
 		block_iw=new int[max_size];
@@ -401,8 +401,8 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 			distance[i] = new double[max_size];
 			cal_flag[i] = new bool[max_size];
 
-			ZEROS(distance[i], max_size);
-			ZEROS(cal_flag[i], max_size);
+			ModuleBase::GlobalFunc::ZEROS(distance[i], max_size);
+			ModuleBase::GlobalFunc::ZEROS(cal_flag[i], max_size);
 		}
 	}
 	
@@ -413,7 +413,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 	// array to store local potential for each small box in
 	// a big box.
 	double* vldr3 = new double[bxyz];
-	ZEROS(vldr3, bxyz);
+	ModuleBase::GlobalFunc::ZEROS(vldr3, bxyz);
 
 	for(int i=0; i<nbx; i++)
 	{

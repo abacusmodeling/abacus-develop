@@ -59,10 +59,10 @@ matrix Exx_Abfs::Parallel::Communicate::Hexx::H_phase<matrix>(
 }
 
 template<>
-ComplexMatrix Exx_Abfs::Parallel::Communicate::Hexx::H_phase<ComplexMatrix>(
+ModuleBase::ComplexMatrix Exx_Abfs::Parallel::Communicate::Hexx::H_phase<ModuleBase::ComplexMatrix>(
 	matrix &&HR, const int ik, const Abfs::Vector3_Order<int> &box2) const
 {
-	return ComplexMatrix(HR) * exp( TWO_PI*IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (box2*GlobalC::ucell.latvec)) );
+	return ModuleBase::ComplexMatrix(HR) * exp( TWO_PI*IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (box2*GlobalC::ucell.latvec)) );
 }
 
 template<typename Tmatrix>
@@ -146,7 +146,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D_mixing(
 //gettimeofday( &t_start, NULL);
 //			const std::map<size_t,std::map<size_t,matrix>> HK_a2D = R_to_K(HR_a2D[ik]);
 //ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::Hexx::R_to_K\t"<<time_during(t_start)<<std::endl;
-//ofs_matrixes( exx_lcao.test_dir+"test-HK_a2D_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK), HK_a2D );
+//ofs_matrixes( exx_lcao.test_dir+"test-HK_a2D_"+ModuleBase::GlobalFunc::TO_STRING(ik)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK), HK_a2D );
 //gettimeofday( &t_start, NULL);
 		switch(mixing_mode)
 		{
@@ -163,11 +163,11 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D_mixing(
 				HK_m2D[ik] = pulay_mixing( HK_m2D[ik], HK_m2D_pulay_seq[ik], Ra2D_to_Km2D<Tmatrix>(HR_a2D, ik) );
 				break;
 			default:
-				throw std::domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	break;
+				throw std::domain_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));	break;
 		}
 //ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D\t"<<time_during(t_start)<<std::endl;
 	}
-//ofs_matrixes( exx_lcao.test_dir+"test-HK_m2D_"+TO_STRING(GlobalV::MY_RANK), HK_m2D );
+//ofs_matrixes( exx_lcao.test_dir+"test-HK_m2D_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK), HK_m2D );
 }
 
 template<typename Tmatrix>

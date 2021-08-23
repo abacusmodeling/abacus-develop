@@ -95,7 +95,7 @@ void Potential::write_potential(
     {
         // num_z: how many planes on processor 'ip'
         int *num_z = new int[GlobalV::NPROC_IN_POOL];
-        ZEROS(num_z, GlobalV::NPROC_IN_POOL);
+        ModuleBase::GlobalFunc::ZEROS(num_z, GlobalV::NPROC_IN_POOL);
         for (int iz=0;iz<GlobalC::pw.ncz;iz++)
         {
             int ip = iz % GlobalV::NPROC_IN_POOL;
@@ -105,7 +105,7 @@ void Potential::write_potential(
         // start_z: start position of z in
         // processor ip.
         int *start_z = new int[GlobalV::NPROC_IN_POOL];
-        ZEROS(start_z, GlobalV::NPROC_IN_POOL);
+        ModuleBase::GlobalFunc::ZEROS(start_z, GlobalV::NPROC_IN_POOL);
         for (int ip=1;ip<GlobalV::NPROC_IN_POOL;ip++)
         {
             start_z[ip] = start_z[ip-1]+num_z[ip-1];
@@ -113,7 +113,7 @@ void Potential::write_potential(
 
         // which_ip: found iz belongs to which ip.
         int *which_ip = new int[GlobalC::pw.ncz];
-        ZEROS(which_ip, GlobalC::pw.ncz);
+        ModuleBase::GlobalFunc::ZEROS(which_ip, GlobalC::pw.ncz);
         for(int iz=0; iz<GlobalC::pw.ncz; iz++)
         {
             for(int ip=0; ip<GlobalV::NPROC_IN_POOL; ip++)
@@ -139,7 +139,7 @@ void Potential::write_potential(
         {
             //GlobalV::ofs_running << "\n" << iz << " iz"; //LiuXh modify 20200624
             // tag must be different for different iz.
-            ZEROS(zpiece, nxy);
+            ModuleBase::GlobalFunc::ZEROS(zpiece, nxy);
             int tag = iz;
             MPI_Status ierror;
 
@@ -203,10 +203,10 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
 
     double *v_elecstat;
     v_elecstat = new double[GlobalC::pw.nrxx];
-    ZEROS(v_elecstat, GlobalC::pw.nrxx);
+    ModuleBase::GlobalFunc::ZEROS(v_elecstat, GlobalC::pw.nrxx);
 
     std::complex<double> *Porter = GlobalC::UFFT.porter;
-    ZEROS( Porter, GlobalC::pw.nrxx );
+    ModuleBase::GlobalFunc::ZEROS( Porter, GlobalC::pw.nrxx );
     
     int nspin0 = 1;
     if(GlobalV::NSPIN==2) nspin0 = GlobalV::NSPIN;
@@ -227,7 +227,7 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
     // calculate hartree potential in G-space (NB: V(G=0)=0 )
     //=======================================================
     std::complex<double> *vh_g  = new std::complex<double>[GlobalC::pw.ngmc];
-    ZEROS(vh_g, GlobalC::pw.ngmc);
+    ModuleBase::GlobalFunc::ZEROS(vh_g, GlobalC::pw.ngmc);
 
     for(int ig = GlobalC::pw.gstart; ig<GlobalC::pw.ngmc; ig++)
     {
@@ -239,7 +239,7 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
         }
     }
 
-    ZEROS(Porter, GlobalC::pw.nrxx);
+    ModuleBase::GlobalFunc::ZEROS(Porter, GlobalC::pw.nrxx);
 
     for (int ig = 0;ig < GlobalC::pw.ngmc;ig++)
     {
@@ -357,7 +357,7 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
     {
         // num_z: how many planes on processor 'ip'
         int *num_z = new int[GlobalV::NPROC_IN_POOL];
-        ZEROS(num_z, GlobalV::NPROC_IN_POOL);
+        ModuleBase::GlobalFunc::ZEROS(num_z, GlobalV::NPROC_IN_POOL);
         //for (int iz=0;iz<GlobalC::pw.ncz;iz++)
         //{
         //    int ip = iz % GlobalV::NPROC_IN_POOL;
@@ -372,7 +372,7 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
         // start_z: start position of z in
         // processor ip.
         int *start_z = new int[GlobalV::NPROC_IN_POOL];
-        ZEROS(start_z, GlobalV::NPROC_IN_POOL);
+        ModuleBase::GlobalFunc::ZEROS(start_z, GlobalV::NPROC_IN_POOL);
         for (int ip=1;ip<GlobalV::NPROC_IN_POOL;ip++)
         {
             start_z[ip] = start_z[ip-1]+num_z[ip-1];
@@ -380,7 +380,7 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
 
         // which_ip: found iz belongs to which ip.
         int *which_ip = new int[GlobalC::pw.ncz];
-        ZEROS(which_ip, GlobalC::pw.ncz);
+        ModuleBase::GlobalFunc::ZEROS(which_ip, GlobalC::pw.ncz);
         for(int iz=0; iz<GlobalC::pw.ncz; iz++)
         {
             for(int ip=0; ip<GlobalV::NPROC_IN_POOL; ip++)
@@ -406,7 +406,7 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
         {
             //GlobalV::ofs_running << "\n" << iz << " iz";
             // tag must be different for different iz.
-            ZEROS(zpiece, nxy);
+            ModuleBase::GlobalFunc::ZEROS(zpiece, nxy);
             int tag = iz;
             MPI_Status ierror;
 

@@ -111,8 +111,8 @@ public:
 	const int& getL() const        { return angular_momentum_l; }
 	const int& getChi() const      { return index_chi; }
 
-	const double* getPsiuniform() const  { return VECTOR_TO_PTR(psi_uniform); }
-	const double* getDpsiuniform() const { return VECTOR_TO_PTR(dpsi_uniform); }
+	const double* getPsiuniform() const  { return ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi_uniform); }
+	const double* getDpsiuniform() const { return ModuleBase::GlobalFunc::VECTOR_TO_PTR(dpsi_uniform); }
 	const int& getNruniform() const { return nr_uniform; }
 	const double& getDruniform() const { return dr_uniform; }
 
@@ -122,32 +122,32 @@ public:
 	const double& getRcut() const { return rcut; }
 	const double& getKcut() const { return kcut; }
 	
-	const double* getRadial() const             { return VECTOR_TO_PTR(r_radial); }
+	const double* getRadial() const             { return ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial); }
 	const std::vector<double>& get_r_radial() const  { return r_radial; }
 	const double& getRadial(const int ir) const { return r_radial[ir]; }
 
-	const double* getRab() const { return VECTOR_TO_PTR(rab); }
+	const double* getRab() const { return ModuleBase::GlobalFunc::VECTOR_TO_PTR(rab); }
 	const std::vector<double>& get_rab() const { return rab; }
 	const double& getRab(const int ir) const { return rab[ir]; }
 	
 	const double& getDk()const { return dk; }
-	const double* getKpoint() const { return VECTOR_TO_PTR(k_radial); }
+	const double* getKpoint() const { return ModuleBase::GlobalFunc::VECTOR_TO_PTR(k_radial); }
 	const double& getKpoint(const int ik) const { return k_radial[ik]; }
 	const std::vector<double>& get_k_radial() const { return k_radial; }
 
-	const double* getPsi() const { return VECTOR_TO_PTR(psi);}
+	const double* getPsi() const { return ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi);}
 	const double& getPsi(const int ir) const { return psi[ir];}	
 	const std::vector<double>& get_psi() const { return psi; }
-	const double* getPsi_r() const { return VECTOR_TO_PTR(psir); }
+	const double* getPsi_r() const { return ModuleBase::GlobalFunc::VECTOR_TO_PTR(psir); }
 	const double& getPsi_r(const int ir) const { return psir[ir]; }
 
-	const double* getPsif() const               { return VECTOR_TO_PTR(psif); }
+	const double* getPsif() const               { return ModuleBase::GlobalFunc::VECTOR_TO_PTR(psif); }
 	const double& getPsif(const int ik) const   { return psif[ik]; }
 	const std::vector<double>& get_psif() const      { return psif; }
-	const double* getPsi_k() const              { return VECTOR_TO_PTR(psik); }
+	const double* getPsi_k() const              { return ModuleBase::GlobalFunc::VECTOR_TO_PTR(psik); }
 	const double& getPsi_k(const int ik) const  { return psik[ik]; }
 	const std::vector<double>& get_psi_k() const      { return psik; }
-	const double* getPsi_k2() const             { return VECTOR_TO_PTR(psik2); }
+	const double* getPsi_k2() const             { return ModuleBase::GlobalFunc::VECTOR_TO_PTR(psik2); }
 	const double& getPsi_k2(const int ik) const { return psik2[ik]; }
 	const std::vector<double>& get_psi_k2() const      { return psik2; }
 };

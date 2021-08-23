@@ -56,7 +56,7 @@ public:
 	
 	// ������lcao�����µ�wannier90�������
 	realArray table_local;
-	ComplexMatrix *unk_inLcao;                                                             // lcao�����²����������ڲ���unk
+	ModuleBase::ComplexMatrix *unk_inLcao;                                                             // lcao�����²����������ڲ���unk
 
 
 
@@ -72,21 +72,21 @@ public:
 	void init_wannier();
 	void read_nnkp();
 	void outEIG();
-	void cal_Amn(const ComplexMatrix *wfc_pw);
-	void cal_Mmn(const ComplexMatrix *wfc_pw);
-	void produce_trial_in_pw(const int &ik, ComplexMatrix &trial_orbitals_k);
+	void cal_Amn(const ModuleBase::ComplexMatrix *wfc_pw);
+	void cal_Mmn(const ModuleBase::ComplexMatrix *wfc_pw);
+	void produce_trial_in_pw(const int &ik, ModuleBase::ComplexMatrix &trial_orbitals_k);
 	void get_trial_orbitals_lm_k(const int wannier_index, const int orbital_L, const int orbital_m, matrix &ylm, 
 										matrix &dr, matrix &r, matrix &psir, const int mesh_r, 
-										Vector3<double> *gk, const int npw, ComplexMatrix &trial_orbitals_k);
+										Vector3<double> *gk, const int npw, ModuleBase::ComplexMatrix &trial_orbitals_k);
 	void integral(const int meshr, const double *psir, const double *r, const double *rab, const int &l, double* table);
-	void writeUNK(const ComplexMatrix *wfc_pw);
-	void ToRealSpace(const int &ik, const int &ib, const ComplexMatrix *evc, std::complex<double> *psir, const Vector3<double> G);
-	std::complex<double> unkdotb(const std::complex<double> *psir, const int ikb, const int bandindex, const ComplexMatrix *wfc_pw);
-	std::complex<double> unkdotkb(const int &ik, const int &ikb, const int &iband_L, const int &iband_R, const Vector3<double> G, const ComplexMatrix *wfc_pw);
-	std::complex<double> gamma_only_cal(const int &ib_L, const int &ib_R, const ComplexMatrix *wfc_pw, const Vector3<double> G);
+	void writeUNK(const ModuleBase::ComplexMatrix *wfc_pw);
+	void ToRealSpace(const int &ik, const int &ib, const ModuleBase::ComplexMatrix *evc, std::complex<double> *psir, const Vector3<double> G);
+	std::complex<double> unkdotb(const std::complex<double> *psir, const int ikb, const int bandindex, const ModuleBase::ComplexMatrix *wfc_pw);
+	std::complex<double> unkdotkb(const int &ik, const int &ikb, const int &iband_L, const int &iband_R, const Vector3<double> G, const ModuleBase::ComplexMatrix *wfc_pw);
+	std::complex<double> gamma_only_cal(const int &ib_L, const int &ib_R, const ModuleBase::ComplexMatrix *wfc_pw, const Vector3<double> G);
 	
 	// lcao����
-	void lcao2pw_basis(const int ik, ComplexMatrix &orbital_in_G);
+	void lcao2pw_basis(const int ik, ModuleBase::ComplexMatrix &orbital_in_G);
 	void getUnkFromLcao();
 	void get_lcao_wfc_global_ik(std::complex<double> **ctot, std::complex<double> **cc);
 

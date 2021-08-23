@@ -64,7 +64,7 @@ class Potential_Libxc
 	{
 		if     (GlobalV::NSPIN==1 || (GlobalV::NSPIN==4 && (!GlobalV::DOMAG && !GlobalV::DOMAG_Z)))		return 1;
 		else if(GlobalV::NSPIN==2 || (GlobalV::NSPIN==4 && ( GlobalV::DOMAG ||  GlobalV::DOMAG_Z)))		return 2;
-		else throw std::runtime_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		else throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
 };
 

@@ -10,9 +10,9 @@ class Inverse_Matrix_Complex
 	Inverse_Matrix_Complex();
 	~Inverse_Matrix_Complex();
 	
-	ComplexMatrix A;
-	void using_zpotrf( const ComplexMatrix &Sin);
-	void using_zheev(const ComplexMatrix &in, ComplexMatrix &out);
+	ModuleBase::ComplexMatrix A;
+	void using_zpotrf( const ModuleBase::ComplexMatrix &Sin);
+	void using_zheev(const ModuleBase::ComplexMatrix &in, ModuleBase::ComplexMatrix &out);
 	void init( const int &dim_in);
 
 	private:
@@ -24,7 +24,7 @@ class Inverse_Matrix_Complex
 	int info;
 	bool allocate; //mohan add 2012-04-02
 
-	ComplexMatrix EA;
+	ModuleBase::ComplexMatrix EA;
 };
 
 class Inverse_Matrix_Real

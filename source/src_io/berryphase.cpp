@@ -220,7 +220,7 @@ void berryphase::set_kpoints(const int direction)
 double berryphase::stringPhase(int index_str, int nbands)
 {
 	std::complex<double> zeta(1.0, 0.0);
-	ComplexMatrix mat(nbands,nbands);
+	ModuleBase::ComplexMatrix mat(nbands,nbands);
 	int ik_1;
 	int ik_2;
 	Vector3<double> G(0.0,0.0,0.0);
@@ -459,7 +459,7 @@ void berryphase::Macroscopic_polarization()
 	
 	// ion polarization	
 	double polarization_ion[3]; // 指的是晶格矢量R1，R2，R3方向
-	ZEROS(polarization_ion,3);
+	ModuleBase::GlobalFunc::ZEROS(polarization_ion,3);
 	// 倒格矢
 	Vector3<double> rcell_1(GlobalC::ucell.G.e11,GlobalC::ucell.G.e12,GlobalC::ucell.G.e13);
 	Vector3<double> rcell_2(GlobalC::ucell.G.e21,GlobalC::ucell.G.e22,GlobalC::ucell.G.e23);
@@ -468,10 +468,10 @@ void berryphase::Macroscopic_polarization()
 	double *pdl_ion_R1 = new double[GlobalC::ucell.nat];
 	double *pdl_ion_R2 = new double[GlobalC::ucell.nat];
 	double *pdl_ion_R3 = new double[GlobalC::ucell.nat];  
-	ZEROS(mod_ion,GlobalC::ucell.nat);
-	ZEROS(pdl_ion_R1,GlobalC::ucell.nat);
-	ZEROS(pdl_ion_R2,GlobalC::ucell.nat);
-	ZEROS(pdl_ion_R3,GlobalC::ucell.nat);
+	ModuleBase::GlobalFunc::ZEROS(mod_ion,GlobalC::ucell.nat);
+	ModuleBase::GlobalFunc::ZEROS(pdl_ion_R1,GlobalC::ucell.nat);
+	ModuleBase::GlobalFunc::ZEROS(pdl_ion_R2,GlobalC::ucell.nat);
+	ModuleBase::GlobalFunc::ZEROS(pdl_ion_R3,GlobalC::ucell.nat);
 	
 	bool lodd = false;
 	int atom_index = 0;
