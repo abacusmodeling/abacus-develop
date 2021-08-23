@@ -3,7 +3,8 @@
 #include "constants.h"
 #include <cassert>
 #include <cmath>
-using namespace std;
+namespace ModuleBase
+{
 
 int Integral_G::n_root = 512;
 bool Integral_G::calc_wx = false;
@@ -106,3 +107,4 @@ void Integral_G::gauleg(void)
 	return;
 }
 
+}

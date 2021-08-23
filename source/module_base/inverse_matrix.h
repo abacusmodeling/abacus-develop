@@ -2,6 +2,8 @@
 #define INVERSE_MATRIX_H
 
 #include "../src_pw/tools.h"
+namespace ModuleBase
+{
 
 class Inverse_Matrix_Complex
 {
@@ -27,6 +29,7 @@ class Inverse_Matrix_Complex
 	ModuleBase::ComplexMatrix EA;
 };
 
+//not been used yet!
 class Inverse_Matrix_Real
 {
 	public:
@@ -38,4 +41,5 @@ class Inverse_Matrix_Real
 
 };
 
+}
 #endif
