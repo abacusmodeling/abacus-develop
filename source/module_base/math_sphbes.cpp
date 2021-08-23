@@ -2,6 +2,9 @@
 #include "timer.h"
 #include "constants.h"
 
+namespace ModuleBase
+{
+
 Sphbes::Sphbes(){}
 Sphbes::~Sphbes(){}
 
@@ -616,4 +619,6 @@ void Sphbes::Spherical_Bessel
 		sjp[ir] = 1.0;
 	}
 	return;
+}
+
 }

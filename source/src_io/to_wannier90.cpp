@@ -1450,7 +1450,7 @@ void toWannier90::integral(const int meshr, const double *psir, const double *r,
 	for (int iq=0; iq<GlobalV::NQX; iq++)
 	{
 		const double q = GlobalV::DQ * iq;
-		Sphbes::Spherical_Bessel(meshr, r, q, l, aux);
+		ModuleBase::Sphbes::Spherical_Bessel(meshr, r, q, l, aux);
 		for (int ir = 0;ir < meshr;ir++)
 		{
 			vchi[ir] = psir[ir] * aux[ir] * r[ir];

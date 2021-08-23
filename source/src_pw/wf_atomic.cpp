@@ -124,7 +124,7 @@ void WF_atomic::init_at_1(void)
                 for (int iq=startq; iq<GlobalV::NQX; iq++)
                 {
                     const double q = GlobalV::DQ * iq;
-                    Sphbes::Spherical_Bessel(atom->msh, atom->r, q, l, aux);
+                    ModuleBase::Sphbes::Spherical_Bessel(atom->msh, atom->r, q, l, aux);
                     for (int ir = 0;ir < atom->msh;ir++)
                     {
                         vchi[ir] = atom->chi(ic,ir) * aux[ir] * atom->r[ir];

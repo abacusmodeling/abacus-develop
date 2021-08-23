@@ -238,7 +238,7 @@ void Numerical_Nonlocal_Lm::get_kradial(void)
 
     for (int ik = 0; ik < nk; ik++)
     {
-        Sphbes::Spherical_Bessel(
+        ModuleBase::Sphbes::Spherical_Bessel(
                 this->nr,
                 this->r_radial,
                 this->k_radial[ik],

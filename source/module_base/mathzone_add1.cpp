@@ -253,7 +253,7 @@ void Mathzone_Add1::uni_radfft
 	for (int ik = 0; ik < mshk; ik++)
 	{
 		//calculate spherical bessel
-		Sphbes::Spherical_Bessel(mshr, ri, arr_k[ik], aml, jl);
+		ModuleBase::Sphbes::Spherical_Bessel(mshr, ri, arr_k[ik], aml, jl);
 		
 		//functions to be integrated
 		for (int ir = 0; ir < mshr; ir++)

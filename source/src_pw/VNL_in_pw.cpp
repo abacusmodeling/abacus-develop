@@ -376,7 +376,7 @@ void pseudopot_cell_vnl::init_vnl(UnitCell_pseudo &cell)
 			for (int iq=0; iq<GlobalV::NQX; iq++)  
 			{
 				const double q = iq * GlobalV::DQ;
-				Sphbes::Spherical_Bessel(kkbeta, cell.atoms[it].r, q, l, jl);
+				ModuleBase::Sphbes::Spherical_Bessel(kkbeta, cell.atoms[it].r, q, l, jl);
 
 				for (int ir = 0;ir < kkbeta;ir++)
 				{
@@ -603,7 +603,7 @@ void pseudopot_cell_vnl::init_vnl_alpha(void)          // pengfei Li 2018-3-23
 				for (int iq = 0; iq < GlobalV::NQX; iq++)
 				{
 					const double q = iq * GlobalV::DQ;
-					Sphbes::Spherical_Bessel(kkbeta, GlobalC::ucell.atoms[it].r, q, L, jl);
+					ModuleBase::Sphbes::Spherical_Bessel(kkbeta, GlobalC::ucell.atoms[it].r, q, L, jl);
 					
 					for (int ir = 0;ir < kkbeta;ir++)
 					{
