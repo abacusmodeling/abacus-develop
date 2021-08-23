@@ -158,7 +158,7 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 			integrated_func[ik] = jl[ir][ik] * k1_dot_k2[ik];
 		}
 		// Call simpson integration
-		Integral::Simpson_Integral(kmesh,integrated_func,kab,temp);
+		ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,kab,temp);
 		rs[ir] = temp * FOUR_PI;
 		
 		//drs
@@ -171,7 +171,7 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 				integrated_func[ik] = jlm1[ir][ik] * k1_dot_k2[ik] * kpoint[ik];
 			}
 
-			Integral::Simpson_Integral(kmesh,integrated_func,kab,temp1);
+			ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,kab,temp1);
 		}
 		
 				
@@ -180,7 +180,7 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 			integrated_func[ik] = jlp1[ir][ik] * k1_dot_k2[ik] * kpoint[ik];
 		}
 		
-		Integral::Simpson_Integral(kmesh,integrated_func,kab,temp2);
+		ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,kab,temp2);
 		
 		if (l == 0)
 		{
@@ -206,7 +206,7 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 		}
 		
 		// Call simpson integration
-		Integral::Simpson_Integral(kmesh,integrated_func,kab,temp);
+		ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,kab,temp);
 		rs[0] = FOUR_PI / Mathzone_Add1::dualfac (2*l+1) * temp;
 	}
 	

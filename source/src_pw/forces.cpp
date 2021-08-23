@@ -865,7 +865,7 @@ void Forces::cal_force_scc(matrix& forcescc)
                     aux[ir] = GlobalC::ucell.atoms[nt].rho_at[ir] * sin(gxx) / gxx;
                 }
             }
-            Integral::Simpson_Integral(mesh , aux, GlobalC::ucell.atoms[nt].rab , rhocgnt [ig]);
+            ModuleBase::Integral::Simpson_Integral(mesh , aux, GlobalC::ucell.atoms[nt].rab , rhocgnt [ig]);
         }
 
         int iat = 0;

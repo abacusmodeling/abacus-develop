@@ -1017,7 +1017,7 @@ void LCAO_Orbitals::read_orb_file(
 			}
 			double unit = 0.0;
 
-			Integral::Simpson_Integral(meshr, inner, rab, unit);
+			ModuleBase::Integral::Simpson_Integral(meshr, inner, rab, unit);
 
 			assert(unit>0.0);
 
@@ -1034,7 +1034,7 @@ void LCAO_Orbitals::read_orb_file(
 			{
 				inner[ir] = psir[ir] * psir[ir];
 			}
-			Integral::Simpson_Integral(meshr, inner, rab, unit);
+			ModuleBase::Integral::Simpson_Integral(meshr, inner, rab, unit);
 			delete[] inner;
 			ofs_in << std::setw(12) << unit << std::endl;
 

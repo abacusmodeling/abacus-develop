@@ -213,7 +213,7 @@ std::vector<std::vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 				inner[ir] = psir[ir] * psir[ir];
 			}
 			double unit = 0.0;	
-			Integral::Simpson_Integral(meshr, ModuleBase::GlobalFunc::VECTOR_TO_PTR(inner), ModuleBase::GlobalFunc::VECTOR_TO_PTR(rab), unit);
+			ModuleBase::Integral::Simpson_Integral(meshr, ModuleBase::GlobalFunc::VECTOR_TO_PTR(inner), ModuleBase::GlobalFunc::VECTOR_TO_PTR(rab), unit);
 			for( int ir=0; ir!=meshr; ++ir )
 			{
 				psis[L][N][ir] /= sqrt(unit);

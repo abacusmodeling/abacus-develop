@@ -1442,7 +1442,7 @@ void toWannier90::integral(const int meshr, const double *psir, const double *r,
 	}
 	
 	double unit = 0.0;
-	Integral::Simpson_Integral(meshr, inner_part, rab, unit);
+	ModuleBase::Integral::Simpson_Integral(meshr, inner_part, rab, unit);
 	delete[] inner_part;
 
 	double *aux = new double[meshr];
@@ -1457,7 +1457,7 @@ void toWannier90::integral(const int meshr, const double *psir, const double *r,
 		}
 		
 		double vqint = 0.0;
-		Integral::Simpson_Integral(meshr, vchi, rab, vqint);
+		ModuleBase::Integral::Simpson_Integral(meshr, vchi, rab, vqint);
 
 		table[iq] =  vqint * pref;
 	}

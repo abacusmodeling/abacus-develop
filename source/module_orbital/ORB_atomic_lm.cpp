@@ -432,7 +432,7 @@ void Numerical_Orbital_Lm::cal_kradial(void)
 			integrated_func[ir] = this->psir[ir] * this->r_radial[ir] * jl[ir];
 		}
 
-		Integral::Simpson_Integral(
+		ModuleBase::Integral::Simpson_Integral(
 				this->nr,
 				integrated_func,
 				ModuleBase::GlobalFunc::VECTOR_TO_PTR(this->rab),
@@ -486,7 +486,7 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 		const std::vector<double> &jlk = jl[ik];
 		for (int ir = 0; ir < nr; ir++)
 			integrated_func[ir] = psir2[ir] * jlk[ir];
-		Integral::Simpson_Integral(
+		ModuleBase::Integral::Simpson_Integral(
 				this->nr,
 				ModuleBase::GlobalFunc::VECTOR_TO_PTR(integrated_func),
 				dr,
@@ -662,7 +662,7 @@ void Numerical_Orbital_Lm::norm_test(void)const
 	double sumr = 0.0;
 	//double sumk = 0.0;
 
-	Integral::Simpson_Integral(this->nr, f, ModuleBase::GlobalFunc::VECTOR_TO_PTR(this->rab), sumr);
+	ModuleBase::Integral::Simpson_Integral(this->nr, f, ModuleBase::GlobalFunc::VECTOR_TO_PTR(this->rab), sumr);
 
 	delete[] f;
 	f = new double[nk];
@@ -671,7 +671,7 @@ void Numerical_Orbital_Lm::norm_test(void)const
 		f[ik] = this->psik[ik] * this->psik[ik];
 	}
 
-//	Integral::Simpson_Integral(this->nk, f, this->k_radial, sumk);
+//	ModuleBase::Integral::Simpson_Integral(this->nk, f, this->k_radial, sumk);
 	
 	//means nothing.
 	//GlobalV::ofs_running << std::setw(12) << sumk << std::endl;

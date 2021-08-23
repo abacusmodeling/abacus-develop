@@ -251,7 +251,7 @@ void Numerical_Nonlocal_Lm::get_kradial(void)
             integrated_func[ir] = this->beta_r[ir] * this->r_radial[ir] * jl[ir];
         }
 
-        Integral::Simpson_Integral(
+        ModuleBase::Integral::Simpson_Integral(
                 this->nr,
                 integrated_func,
                 this->rab,

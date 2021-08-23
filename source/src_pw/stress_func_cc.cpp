@@ -183,7 +183,7 @@ void Stress_Func::deriv_drhoc
 		{
 			aux [ir] = r [ir] * rhoc [ir] * (r [ir] * cos (gx * r [ir] ) / gx - sin (gx * r [ir] ) / pow(gx,2));
 		}//ir
-		Integral::Simpson_Integral(mesh, aux, rab, rhocg1);
+		ModuleBase::Integral::Simpson_Integral(mesh, aux, rab, rhocg1);
 		drhocg [igl] = FOUR_PI / GlobalC::ucell.omega * rhocg1;
 	}//igl
 	

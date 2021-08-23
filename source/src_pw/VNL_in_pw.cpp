@@ -384,7 +384,7 @@ void pseudopot_cell_vnl::init_vnl(UnitCell_pseudo &cell)
 					          jl[ir] * cell.atoms[it].r[ir];
 				} 
 				double vqint;
-				Integral::Simpson_Integral(kkbeta, aux, cell.atoms[it].rab, vqint);
+				ModuleBase::Integral::Simpson_Integral(kkbeta, aux, cell.atoms[it].rab, vqint);
 				this->tab(it, ib, iq) = vqint * pref;
 			} 
 		} 
@@ -611,7 +611,7 @@ void pseudopot_cell_vnl::init_vnl_alpha(void)          // pengfei Li 2018-3-23
 								  GlobalC::ucell.atoms[it].r[ir] * GlobalC::ucell.atoms[it].r[ir];
 					}
 					double vqint;
-					Integral::Simpson_Integral(kkbeta, aux, GlobalC::ucell.atoms[it].rab, vqint);
+					ModuleBase::Integral::Simpson_Integral(kkbeta, aux, GlobalC::ucell.atoms[it].rab, vqint);
 					this->tab_alpha(it, ib, L, iq) = vqint * pref;
 				}
 			}

@@ -308,7 +308,7 @@ void Bessel_Basis::init_TableOne(
 				}
 				
 				// make table value
-				Integral::Simpson_Integral(rmesh, function, rab, this->TableOne(l, ie, ik) );
+				ModuleBase::Integral::Simpson_Integral(rmesh, function, rab, this->TableOne(l, ie, ik) );
 			}
 			
 		}// end ie

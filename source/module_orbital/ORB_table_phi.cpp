@@ -188,7 +188,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 		// Call simpson integration
 		double temp = 0.0;
 
-		Integral::Simpson_Integral(kmesh,integrated_func,dk,temp);
+		ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,dk,temp);
 		rs[ir] = temp * FOUR_PI ;
 		
 		// Peize Lin accelerate 2017-10-02
@@ -210,7 +210,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 			}
 		}
 
-		Integral::Simpson_Integral(kmesh,integrated_func,dk,temp);
+		ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,dk,temp);
 		drs[ir] = -FOUR_PI*(l+1)/(2.0*l+1) * temp;
 	}
 
@@ -228,7 +228,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 			integrated_func[ik] = k1_dot_k2[ik] * pow (kpoint[ik], l);
 		}
 		
-		Integral::Simpson_Integral(kmesh,integrated_func,kab,temp);
+		ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,kab,temp);
 		rs[0] = FOUR_PI / Mathzone_Add1::dualfac (2*l+1) * temp;
 	}
 
@@ -318,7 +318,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 		}
 		double temp = 0.0;
 
-		Integral::Simpson_Integral(kmesh,ModuleBase::GlobalFunc::VECTOR_TO_PTR(integrated_func),dk,temp);
+		ModuleBase::Integral::Simpson_Integral(kmesh,ModuleBase::GlobalFunc::VECTOR_TO_PTR(integrated_func),dk,temp);
 		rs[ir] = temp * FOUR_PI ;
 		
 		const std::vector<double> &jlm1_r = jlm1[ir];
@@ -339,7 +339,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 			}
 		}
 
-		Integral::Simpson_Integral(kmesh,ModuleBase::GlobalFunc::VECTOR_TO_PTR(integrated_func),dk,temp);
+		ModuleBase::Integral::Simpson_Integral(kmesh,ModuleBase::GlobalFunc::VECTOR_TO_PTR(integrated_func),dk,temp);
 		drs[ir] = -FOUR_PI*(l+1)/(2.0*l+1) * temp;
 	}
 
@@ -354,7 +354,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 			}
 			double temp = 0.0;
 
-			Integral::Simpson_Integral(kmesh,ModuleBase::GlobalFunc::VECTOR_TO_PTR(integrated_func),dk,temp);
+			ModuleBase::Integral::Simpson_Integral(kmesh,ModuleBase::GlobalFunc::VECTOR_TO_PTR(integrated_func),dk,temp);
 
 			// PLEASE try to make dualfac function as input parameters
 			// mohan note 2021-03-23

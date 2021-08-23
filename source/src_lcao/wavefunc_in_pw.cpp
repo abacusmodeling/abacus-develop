@@ -221,7 +221,7 @@ const double *rab, const int &l, double* table)
 	}
 
 	double unit = 0.0;
-	Integral::Simpson_Integral(meshr, inner_part, rab, unit);
+	ModuleBase::Integral::Simpson_Integral(meshr, inner_part, rab, unit);
 	delete[] inner_part;
 	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"normalize unit",unit);
 
@@ -237,7 +237,7 @@ const double *rab, const int &l, double* table)
 		}
 
 		double vqint = 0.0;
-		Integral::Simpson_Integral(meshr, vchi, rab, vqint);
+		ModuleBase::Integral::Simpson_Integral(meshr, vchi, rab, vqint);
 
 		table[iq] =  vqint * pref;
 	}

@@ -91,7 +91,7 @@ void WF_atomic::init_at_1(void)
                 inner_part[ir] = atom->chi(ic,ir) * atom->chi(ic,ir);
             }
             double unit = 0.0;
-            Integral::Simpson_Integral(nmesh, inner_part, atom->rab, unit);
+            ModuleBase::Integral::Simpson_Integral(nmesh, inner_part, atom->rab, unit);
             delete[] inner_part;
 
 			GlobalV::ofs_running << " the unit of pseudo atomic orbital is " << unit;
@@ -113,7 +113,7 @@ void WF_atomic::init_at_1(void)
                 inner_part[ir] = atom->chi(ic,ir) * atom->chi(ic,ir);
             }
             unit = 0.0;
-            Integral::Simpson_Integral(nmesh, inner_part, atom->rab, unit);
+            ModuleBase::Integral::Simpson_Integral(nmesh, inner_part, atom->rab, unit);
             delete[] inner_part;
 
 			GlobalV::ofs_running << ", renormalize to " << unit << std::endl;
@@ -131,7 +131,7 @@ void WF_atomic::init_at_1(void)
                     }
 
                     double vqint = 0.0;
-                    Integral::Simpson_Integral(atom->msh, vchi, atom->rab, vqint);
+                    ModuleBase::Integral::Simpson_Integral(atom->msh, vchi, atom->rab, vqint);
 
                     GlobalC::ppcell.tab_at(it, ic, iq) =  vqint * pref;
                     //				if( it == 0 && ic == 0 )
