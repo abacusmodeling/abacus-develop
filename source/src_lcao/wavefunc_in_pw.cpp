@@ -283,7 +283,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ModuleBase::Complex
 
 					for(int ig=0; ig<npw; ig++)
 					{
-						flq[ig] = PolyInt::Polynomial_Interpolation(table_local,
+						flq[ig] = ModuleBase::PolyInt::Polynomial_Interpolation(table_local,
 						it, ic, GlobalV::NQX, GlobalV::DQ, gk[ig].norm() * GlobalC::ucell.tpiba );
 					}
 
@@ -342,7 +342,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ModuleBase::Complex
 										for(int ig=0;ig<npw;ig++)
 										{//Average the two functions
 											chiaux[ig] =  L *
-												PolyInt::Polynomial_Interpolation(table_local,
+												ModuleBase::PolyInt::Polynomial_Interpolation(table_local,
 												it, ic, GlobalV::NQX, GlobalV::DQ, gk[ig].norm() * GlobalC::ucell.tpiba );
 
 											chiaux[ig] += flq[ig] * (L+1.0) ;
@@ -485,7 +485,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ModuleBase::Comp
 						}
 						else
 						{
-						   flq[ig] = PolyInt::Polynomial_Interpolation(table_local, it, ic, GlobalV::NQX, GlobalV::DQ, gkq[ig].norm() * GlobalC::ucell.tpiba );
+						   flq[ig] = ModuleBase::PolyInt::Polynomial_Interpolation(table_local, it, ic, GlobalV::NQX, GlobalV::DQ, gkq[ig].norm() * GlobalC::ucell.tpiba );
 						}
 					}
 
@@ -559,7 +559,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ModuleBase::Comp
 										for(int ig=0;ig<npw;ig++)
 										{//Average the two functions
 											chiaux[ig] =  L *
-												PolyInt::Polynomial_Interpolation(table_local,
+												ModuleBase::PolyInt::Polynomial_Interpolation(table_local,
 																	it, ic, GlobalV::NQX, GlobalV::DQ, gkq[ig].norm() * GlobalC::ucell.tpiba );
 
 											chiaux[ig] += flq[ig] * (L+1.0) ;

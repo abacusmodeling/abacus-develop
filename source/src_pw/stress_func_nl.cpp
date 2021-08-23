@@ -270,7 +270,7 @@ void Stress_Func::get_dvnl1
 				//cout << "\n gk[ig] = " << gk[ig].x << " " << gk[ig].y << " " << gk[ig].z;
 				//cout << "\n gk.norm = " << gnorm;
 
-				vq [ig] = PolyInt::Polynomial_Interpolation(
+				vq [ig] = ModuleBase::PolyInt::Polynomial_Interpolation(
 						GlobalC::ppcell.tab, it, nb, GlobalV::NQX, GlobalV::DQ, gnorm );
 
 			} // enddo

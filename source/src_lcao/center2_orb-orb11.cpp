@@ -132,7 +132,7 @@ double Center2_Orb::Orb11::cal_overlap(
 
 			const double Interp_Tlm = 
 				(distance > tiny2) ?
-				PolyInt::Polynomial_Interpolation(
+				ModuleBase::PolyInt::Polynomial_Interpolation(
 					ModuleBase::GlobalFunc::VECTOR_TO_PTR(tb_r.second),
 					MOT.get_rmesh(RcutA, RcutB),
 					MOT.dr,

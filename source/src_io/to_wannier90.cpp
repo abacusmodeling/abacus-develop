@@ -1360,7 +1360,7 @@ void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orb
 	// ��GlobalV::NQX��G���в�ֵ�����npw��G���ֵ
 	for(int ig = 0; ig < npw; ig++)
 	{
-		psik[ig] = PolyInt::Polynomial_Interpolation(psik_tem, GlobalV::NQX, GlobalV::DQ, gk[ig].norm() * GlobalC::ucell.tpiba);
+		psik[ig] = ModuleBase::PolyInt::Polynomial_Interpolation(psik_tem, GlobalV::NQX, GlobalV::DQ, gk[ig].norm() * GlobalC::ucell.tpiba);
 	}
 	
 	

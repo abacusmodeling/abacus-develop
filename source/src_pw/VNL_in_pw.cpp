@@ -178,7 +178,7 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 			{
 				const double gnorm = gk[ig].norm() * GlobalC::ucell.tpiba;
 
-				vq [ig] = PolyInt::Polynomial_Interpolation(
+				vq [ig] = ModuleBase::PolyInt::Polynomial_Interpolation(
 						this->tab, it, nb, GlobalV::NQX, GlobalV::DQ, gnorm );
 			}
 
@@ -506,7 +506,7 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 				for (ig = 0;ig < npw;ig++)
 				{
 					const double gnorm = gk[ig].norm() * GlobalC::ucell.tpiba;
-					vq [ig] = PolyInt::Polynomial_Interpolation(
+					vq [ig] = ModuleBase::PolyInt::Polynomial_Interpolation(
 							this->tab_alpha, it, nb, L, GlobalV::NQX, GlobalV::DQ, gnorm);
 					
 					for (int M=0; M<2*L+1; M++)

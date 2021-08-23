@@ -193,7 +193,7 @@ void Numerical_Nonlocal_Lm::extra_uniform(const double &dr_uniform_in)
 	for (int ir = 0; ir < this->nr_uniform; ir++)
 	{
 		double rnew = ir * dr_uniform;
-		this->beta_uniform[ir] = PolyInt::Polynomial_Interpolation_xy(this->r_radial, beta, this->nr, rnew); 
+		this->beta_uniform[ir] = ModuleBase::PolyInt::Polynomial_Interpolation_xy(this->r_radial, beta, this->nr, rnew); 
     }
 	delete[] beta;
 

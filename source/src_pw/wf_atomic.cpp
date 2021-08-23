@@ -287,7 +287,7 @@ void WF_atomic::atomic_wfc
                     for (int ig=0; ig<np; ig++)
                     {
                         flq[ig] =
-                            PolyInt::Polynomial_Interpolation(table_q,
+                            ModuleBase::PolyInt::Polynomial_Interpolation(table_q,
                                                                it, iw, table_dimension, dq, gk[ig].norm() * GlobalC::ucell.tpiba );
                     }
 
@@ -357,7 +357,7 @@ void WF_atomic::atomic_wfc
                                  for(int ig=0;ig<np;ig++)
                                  {//Average the two functions
                                     chiaux[ig] =  l *
-                                         PolyInt::Polynomial_Interpolation(table_q,
+                                         ModuleBase::PolyInt::Polynomial_Interpolation(table_q,
                                                                it, nc, table_dimension, dq, gk[ig].norm() * GlobalC::ucell.tpiba );
 
                                     chiaux[ig] += flq[ig] * (l+1.0) ;

@@ -710,7 +710,7 @@ void ORB_gen_tables::snap_psipsi(
 
 			if (distance > tiny2)
 			{
-				Interp_Slm = i_exp * PolyInt::Polynomial_Interpolation(
+				Interp_Slm = i_exp * ModuleBase::PolyInt::Polynomial_Interpolation(
 					MOT.Table_SR[0][dim1][dim2][L], rmesh, MOT.dr, distance);
 				Interp_Slm /= rl;
 			}
@@ -723,7 +723,7 @@ void ORB_gen_tables::snap_psipsi(
 			{
 				if (distance > tiny2)
 				{
-					Interp_dSlm = i_exp * PolyInt::Polynomial_Interpolation(
+					Interp_dSlm = i_exp * ModuleBase::PolyInt::Polynomial_Interpolation(
 						MOT.Table_SR[1][dim1][dim2][L], rmesh, MOT.dr, distance);
 					Interp_dSlm = Interp_dSlm / pow(distance, L) - Interp_Slm * L / distance;
 				}
@@ -811,7 +811,7 @@ void ORB_gen_tables::snap_psipsi(
 			double rl = pow(distance, L);
 			if (distance > tiny2)
 			{
-				Interp_Tlm = i_exp * PolyInt::Polynomial_Interpolation(
+				Interp_Tlm = i_exp * ModuleBase::PolyInt::Polynomial_Interpolation(
 					MOT.Table_TR[0][dim1][dim2][L], rmesh, MOT.dr, distance);
 				Interp_Tlm /= rl;
 			}
@@ -822,7 +822,7 @@ void ORB_gen_tables::snap_psipsi(
 			{
 				if (distance > tiny2)
 				{
-					Interp_dTlm = i_exp * PolyInt::Polynomial_Interpolation(
+					Interp_dTlm = i_exp * ModuleBase::PolyInt::Polynomial_Interpolation(
 						MOT.Table_TR[1][dim1][dim2][L], rmesh, MOT.dr, distance);
 					Interp_dTlm = Interp_dTlm / rl - Interp_Tlm * L / distance;
 				}
@@ -900,7 +900,7 @@ void ORB_gen_tables::snap_psipsi(
 
 			if (distance > tiny2)
 			{
-				Interp_Slm = i_exp * PolyInt::Polynomial_Interpolation(
+				Interp_Slm = i_exp * ModuleBase::PolyInt::Polynomial_Interpolation(
 					talpha.Table_DSR[0][dim1][dim2][L], rmesh, MOT.dr, distance);
 				Interp_Slm /= rl;
 			}
@@ -913,7 +913,7 @@ void ORB_gen_tables::snap_psipsi(
 			{
 				if (distance > tiny2)
 				{
-					Interp_dSlm = i_exp * PolyInt::Polynomial_Interpolation(
+					Interp_dSlm = i_exp * ModuleBase::PolyInt::Polynomial_Interpolation(
 						talpha.Table_DSR[1][dim1][dim2][L], rmesh, MOT.dr, distance);
 					Interp_dSlm = Interp_dSlm / pow(distance, L) - Interp_Slm * L / distance;
 				}

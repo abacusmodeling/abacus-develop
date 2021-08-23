@@ -3,7 +3,8 @@
 
 #include "realarray.h"
 
-using namespace std;
+namespace ModuleBase
+{
 
 // mohan add 2021-05-07
 class PolyInt
@@ -67,4 +68,5 @@ class PolyInt
     );
 
 };
+}
 #endif
