@@ -348,6 +348,8 @@ class Input
 	//double  ocp_kb[10000];
 	int     lcao_box[3];           // the scale for searching the existence of the overlap <i,0|j,R>
 	int    mulliken;//qifeng add 2019-9-10
+	bool input_mag;
+	double *start_magnetization;
 	//added by zhengdy-soc
 	bool noncolin;
 	bool lspinorb;

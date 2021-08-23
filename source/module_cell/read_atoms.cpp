@@ -403,7 +403,10 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 			OUT(ofs_running, "atom label",atoms[it].label);
 
 #ifndef __CMD
+			if(!input_mag)
+			{
 			READ_VALUE(ifpos, magnet.start_magnetization[it] );
+			}
 
 #ifndef __SYMMETRY
 			if(GlobalV::NSPIN==4)//added by zhengdy-soc
@@ -697,7 +700,10 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 			}// end na
 		}//end for ntype
 	}// end scan_begin
-
+	std::cout<<"mag_stru";
+	for(int i=0;i<ntype;i++)
+	{std::cout<<magnet.start_magnetization[i];}
+	std::cout<<"\n";
 //check if any atom can move in MD
 	if(!this->if_atoms_can_move() && GlobalV::CALCULATION=="md")
 	{

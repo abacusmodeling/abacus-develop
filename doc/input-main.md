@@ -49,6 +49,10 @@
 
         [md_type](#md-type) | [md_rstmd](#md-rstmd) | [md_dt](#md-dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_dumpmdfred](#md-dumpmdfred) | [md_fixtemperature](#md-fixtemperature) | [NVT_control](#nvt-control) | [NVT_tau](#nvt-tau) | [MNHC](#mnhc) | [md_ediff](#md-ediff) | [md_ediffg](#md-ediffg) | [rcut_lj](#rcut_lj) | [epsilon_lj](#epsilon_lj) | [sigma_lj](#sigma_lj)
 
+    - [DFT+U correction](#DFT_U-correction)
+
+    -[Start magnetization](#Start-magnetization)
+
     - [VdW correction](#vdw-correction)
 
         [vdw_method](#vdw-method) | [vdw_s6](#vdw-s6) | [vdw_s8](#vdw-s8) | [vdw_a1](#vdw-a1) | [vdw_a2](#vdw-a2) | [vdw_d](#vdw-d) | [vdw_abc](#vdw-abc) | [vdw_C6_file](#vdw-C6-file) | [vdw_C6_unit](#vdw-C6-unit) | [vdw_R0_file](#vdw-R0-file) | [vdw_R0_unit](#vdw-R0-unit) | [vdw_model](#vdw-model) | [vdw_radius](#vdw-radius) | [vdw_radius_unit](#vdw-radius-unit) | [vdw_cn_radius](#vdw-cn-radius) | [vdw_cn_radius_unit](#vdw-cn-radius-unit) | [vdw_period](#vdw-period)
@@ -1165,6 +1169,58 @@ This part of variables are used to control the molecular dynamics calculations.
     - *Default*: 3.405 (for He)
 
     [back to top](#input-file)
+
+### DFT+U correction
+This part of variables are used to control DFT+U correlated parameters
+- dft_plus_u 
+    - *Type*: Bool
+    - *Description*: If set to 1, ABCUS will calculate plus U correction, which is especially important for correlated electron.
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+- orbital_corr
+    - *Type*: Int
+    - *Description*: $l_1,l_2,l_3,\ldots$ for atom type 1,2,3 respectively.(usually 2 for d electrons and 3 for f electrons) .Specify which orbits need plus U correction for each atom. If set to -1, the correction would not be calculate for this atom.
+    - *Default*: None
+
+    [back to top](#input-file)
+
+- hubbard_u
+    - *Type*: Real
+    - *Description*: Hubbard Coulomb interaction parameter U(ev) in plus U correction,which should be specified for each atom unless Yukawa potential is use. ABACUS use a simplified scheme which only need U and J for each atom.
+    - *Default*: 0.0 
+
+    [back to top](#input-file)
+
+- hund_j
+    - *Type*: Real
+    - *Description*: Hund exchange parameter J(ev) in plus U correction ,which should be specified for each atom unless Yukawa potential is use. ABACUS use a simplified scheme which only need U and J for each atom.
+    - *Default*: 0.0 
+
+    [back to top](#input-file)
+
+- yukawa_potential
+    - *Type*: Bool
+    - *Description*: whether use the local screen Coulomb potential method to calculate the value of U and J. If this is set to 1, hubbard_u and hund_j do not need to be specified.
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+- omc 
+    - *Type*: Bool
+    - *Description*: whether turn on occupation matrix control method or not
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+### Start magnetization
+- magmom
+    - *Type*: Real
+    - *Description*: This set the start magnetization for each type of atom one by one. Different type of atom with same magetic moment could be abbreviated as ntype\*magmom(NOTICE:No space before and after '\*').If one set the start magnetization here, they MUST NOT be specified again in STRU file.
+    - *Default*: 0.0
+    [back to top](#input-file)
+
 
 ### VdW correction
 This part of variables are used to control vdW-corrected related parameters.

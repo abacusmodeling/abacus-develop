@@ -238,7 +238,7 @@ void DFTU::init(
 				this->U_Yukawa.at(it).at(l).resize(N, 0.0);
 				this->J_Yukawa.at(it).at(l).resize(N, 0.0);
 
-				// if(l>=INPUT.orbital_corr[it] && INPUT.orbital_corr[it]!=-1)
+				// if(l>=orbital_corr[it] && orbital_corr[it]!=-1)
 				// {
 					// this->cal_slater_Fk(l, it);
 					// this->cal_slater_UJ(it, l);
@@ -278,9 +278,9 @@ void DFTU::cal_occup_m_k(const int iter)
 
 	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
-		if(INPUT.orbital_corr[T]==-1) continue;
+		if(orbital_corr[T]==-1) continue;
 
-		//const int LC = INPUT.orbital_corr[T];
+		//const int LC = orbital_corr[T];
 		
 		for(int I=0; I<GlobalC::ucell.atoms[T].na; I++)
 		{
@@ -337,7 +337,7 @@ void DFTU::cal_occup_m_k(const int iter)
     for(int it=0; it<GlobalC::ucell.ntype; it++)
 	  {
 	  	const int NL = GlobalC::ucell.atoms[it].nwl + 1;
-	  	const int LC = INPUT.orbital_corr[it];
+	  	const int LC = orbital_corr[it];
   
 	  	if(LC == -1) continue;
 
@@ -349,13 +349,13 @@ void DFTU::cal_occup_m_k(const int iter)
 		  	{				
 		  		// if(Yukawa)
 		  		// {
-		  			// if(l<INPUT.orbital_corr[it]) continue;
+		  			// if(l<orbital_corr[it]) continue;
 		  		// }
 		  		// else
 		  		// {
-		  			// if(l!=INPUT.orbital_corr[it]) continue;
+		  			// if(l!=orbital_corr[it]) continue;
 		  		// }
-		  		if(l!=INPUT.orbital_corr[it]) continue;
+		  		if(l!=orbital_corr[it]) continue;
 
 		  		const int N = GlobalC::ucell.atoms[it].l_nchi[l];
   
@@ -406,7 +406,7 @@ void DFTU::cal_occup_m_k(const int iter)
   for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
 	  const int NL = GlobalC::ucell.atoms[it].nwl + 1;
-	  const int LC = INPUT.orbital_corr[it];
+	  const int LC = orbital_corr[it];
   
 	  if(LC == -1) continue;
 
@@ -418,13 +418,13 @@ void DFTU::cal_occup_m_k(const int iter)
 			{				
 				// if(Yukawa)
 				// {
-					// if(l<INPUT.orbital_corr[it]) continue;
+					// if(l<orbital_corr[it]) continue;
 				// }
 				// else
 				// {
-					// if(l!=INPUT.orbital_corr[it]) continue;
+					// if(l!=orbital_corr[it]) continue;
 				// }
-				if(l!=INPUT.orbital_corr[it]) continue;
+				if(l!=orbital_corr[it]) continue;
 
 	  		const int N = GlobalC::ucell.atoms[it].l_nchi[l];
 
@@ -492,8 +492,8 @@ void DFTU::cal_occup_m_gamma(const int iter)
 	timer::tick("DFTU", "cal_occup_m_gamma");
 	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
-		if(INPUT.orbital_corr[T]==-1) continue;
-		const int L = INPUT.orbital_corr[T];
+		if(orbital_corr[T]==-1) continue;
+		const int L = orbital_corr[T];
 		
 		for(int I=0; I<GlobalC::ucell.atoms[T].na; I++)
 		{
@@ -536,7 +536,7 @@ void DFTU::cal_occup_m_gamma(const int iter)
     for(int it=0; it<GlobalC::ucell.ntype; it++)
 	  {
 	  	const int NL = GlobalC::ucell.atoms[it].nwl + 1;
-	  	if(INPUT.orbital_corr[it] == -1) continue;
+	  	if(orbital_corr[it] == -1) continue;
 	  	for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 	  	{
 	  		const int iat = GlobalC::ucell.itia2iat(it, ia);
@@ -545,13 +545,13 @@ void DFTU::cal_occup_m_gamma(const int iter)
 	  		{				
 	  			// if(Yukawa)
 	  			// {
-	  				// if(l<INPUT.orbital_corr[it]) continue;
+	  				// if(l<orbital_corr[it]) continue;
 	  			// }
 	  			// else
 	  			// {
-	  				// if(l!=INPUT.orbital_corr[it]) continue;
+	  				// if(l!=orbital_corr[it]) continue;
 	  			// }
-	  			if(l!=INPUT.orbital_corr[it]) continue;
+	  			if(l!=orbital_corr[it]) continue;
 
 	  			const int N = GlobalC::ucell.atoms[it].l_nchi[l];
 
@@ -677,9 +677,9 @@ void DFTU::write_occup_m(const std::string &fn)
 
 	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
-		if(INPUT.orbital_corr[T]==-1) continue;
+		if(orbital_corr[T]==-1) continue;
 		const int NL = GlobalC::ucell.atoms[T].nwl+1;
-		const int LC = INPUT.orbital_corr[T];
+		const int LC = orbital_corr[T];
 
 		for(int I=0; I<GlobalC::ucell.atoms[T].na; I++)
 		{
@@ -690,13 +690,13 @@ void DFTU::write_occup_m(const std::string &fn)
 			{
 				// if(Yukawa)
 				// {
-					// if(l<INPUT.orbital_corr[T]) continue;
+					// if(l<orbital_corr[T]) continue;
 				// }
 				// else
 				// {
-					// if(l!=INPUT.orbital_corr[T]) continue;
+					// if(l!=orbital_corr[T]) continue;
 				// }
-				if(l!=INPUT.orbital_corr[T]) continue;
+				if(l!=orbital_corr[T]) continue;
 				
 				const int N = GlobalC::ucell.atoms[T].l_nchi[l];
 				ofdftu << "L" << "  " << l << std::endl;
@@ -767,7 +767,7 @@ void DFTU::read_occup_m(const std::string &fn)
 		}
 		else
 		{
-			if(INPUT.omc) 
+			if(omc) 
 			{
 				std::cout << "DFTU::read_occup_m. Can not find the file initial_onsite.dm . Please check your initial_onsite.dm" << std::endl;
 			}
@@ -796,19 +796,19 @@ void DFTU::read_occup_m(const std::string &fn)
 
 			T= this->iat2it.at(iat);
 			const int NL = GlobalC::ucell.atoms[T].nwl + 1;
-			const int LC = INPUT.orbital_corr[T];
+			const int LC = orbital_corr[T];
 	
 			for(int l=0; l<NL; l++)			
 			{
 				// if(Yukawa)
 				// {
-					// if(l<INPUT.orbital_corr[T]) continue;
+					// if(l<orbital_corr[T]) continue;
 				// }
 				// else
 				// {
-					// if(l!=INPUT.orbital_corr[T]) continue;
+					// if(l!=orbital_corr[T]) continue;
 				// }
-				if(l!=INPUT.orbital_corr[T]) continue;
+				if(l!=orbital_corr[T]) continue;
 
 				ifdftu >> word;
 
@@ -917,24 +917,24 @@ void DFTU::local_occup_bcast()
 
 	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
-		if(INPUT.orbital_corr[T]==-1) continue;
+		if(orbital_corr[T]==-1) continue;
 
 		for(int I=0; I<GlobalC::ucell.atoms[T].na; I++)
 		{
 			const int iat = GlobalC::ucell.itia2iat(T,I);
-			const int L = INPUT.orbital_corr[T];
+			const int L = orbital_corr[T];
 
 			for(int l=0; l<=GlobalC::ucell.atoms[T].nwl; l++)
 			{
 				// if(Yukawa)
 				// {
-					// if(l<INPUT.orbital_corr[T]) continue;
+					// if(l<orbital_corr[T]) continue;
 				// }
 				// else
 				// {
-					// if(l!=INPUT.orbital_corr[T]) continue;
+					// if(l!=orbital_corr[T]) continue;
 				// }
-				if(l!=INPUT.orbital_corr[T]) continue;
+				if(l!=orbital_corr[T]) continue;
 
 				for(int n=0; n<GlobalC::ucell.atoms[T].l_nchi[l]; n++)
 				{
@@ -985,7 +985,7 @@ void DFTU::cal_energy_correction(const int istep)
 {
 	TITLE("DFTU", "cal_energy_correction");
 	timer::tick("DFTU", "cal_energy_correction");
-	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!INPUT.omc) && istep==0 && this->iter_dftu==1) return;
+	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!omc) && istep==0 && this->iter_dftu==1) return;
 
 	this->EU = 0.0;
 	double EU_dc = 0.0;
@@ -993,22 +993,22 @@ void DFTU::cal_energy_correction(const int istep)
 	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
 		const int NL = GlobalC::ucell.atoms[T].nwl + 1;
-		const int LC = INPUT.orbital_corr[T]; 
+		const int LC = orbital_corr[T]; 
 		for(int I=0; I<GlobalC::ucell.atoms[T].na; I++)
 		{
 			if(LC == -1) continue;
 
 			const int iat = GlobalC::ucell.itia2iat(T, I);
-			const int L = INPUT.orbital_corr[T];
+			const int L = orbital_corr[T];
 
 			for(int l=0; l<NL; l++)
 			{
 				// if(Yukawa)
 				// {
-					// if(l<INPUT.orbital_corr[T]) continue;
+					// if(l<orbital_corr[T]) continue;
 				// }	
-				// else if(l!=INPUT.orbital_corr[T]) continue;
-				if(l!=INPUT.orbital_corr[T]) continue;
+				// else if(l!=orbital_corr[T]) continue;
+				if(l!=orbital_corr[T]) continue;
 
 				const int N = GlobalC::ucell.atoms[T].l_nchi[l];
 
@@ -1147,7 +1147,7 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, std::complex<d
 {
 	TITLE("DFTU", "cal_eff_pot_mat");
 	timer::tick("DFTU", "cal_eff_pot_mat");
- 	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!INPUT.omc) && istep==0 && this->iter_dftu==1) return;
+ 	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!omc) && istep==0 && this->iter_dftu==1) return;
 	
 	int spin = GlobalC::kv.isk[ik];
 
@@ -1230,7 +1230,7 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 {
 	TITLE("DFTU", "cal_eff_pot_mat");
 	timer::tick("DFTU", "cal_eff_pot_mat");
- 	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!INPUT.omc) && istep==0 && this->iter_dftu==1) return;
+ 	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!omc) && istep==0 && this->iter_dftu==1) return;
 	
 	int spin = GlobalC::kv.isk[ik];
 
@@ -1323,9 +1323,9 @@ void DFTU::output()
 		{
 			const int N = GlobalC::ucell.atoms[T].l_nchi[L];
 
-			if(L>=INPUT.orbital_corr[T] && INPUT.orbital_corr[T]!=-1)
+			if(L>=orbital_corr[T] && orbital_corr[T]!=-1)
 			{
- 				if(L!=INPUT.orbital_corr[T]) continue;
+ 				if(L!=orbital_corr[T]) continue;
 				
 				if(!Yukawa)
 				{
@@ -1349,9 +1349,9 @@ void DFTU::output()
 	GlobalV::ofs_running << "Local occupation matrices" << std::endl;
 	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
-		if(INPUT.orbital_corr[T]==-1) continue;
+		if(orbital_corr[T]==-1) continue;
 		const int NL = GlobalC::ucell.atoms[T].nwl+1;
-		const int LC = INPUT.orbital_corr[T];
+		const int LC = orbital_corr[T];
 
 		for(int I=0; I<GlobalC::ucell.atoms[T].na; I++)
 		{
@@ -1362,13 +1362,13 @@ void DFTU::output()
 			{
 				// if(Yukawa)
 				// {
-					// if(l<INPUT.orbital_corr[T]) continue;
+					// if(l<orbital_corr[T]) continue;
 				// }
 				// else
 				// {
-					// if(l!=INPUT.orbital_corr[T]) continue;
+					// if(l!=orbital_corr[T]) continue;
 				// }
-				if(l!=INPUT.orbital_corr[T]) continue;
+				if(l!=orbital_corr[T]) continue;
 				
 				const int N = GlobalC::ucell.atoms[T].l_nchi[l];
 				GlobalV::ofs_running << "   L" << " " << l ;

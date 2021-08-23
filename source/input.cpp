@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <vector>
-
+#include <sstream>
 Input INPUT;
 
 void Input::Init(const std::string &fn)
@@ -509,7 +509,7 @@ bool Input::Read(const std::string &fn)
     }
 
     ifs.rdstate();
-
+	input_mag=false;
     while (ifs.good())
     {
         ifs >> word1;
@@ -1731,6 +1731,84 @@ bool Input::Read(const std::string &fn)
 		{
 			read_value(ifs, test_just_neighbor);
 		}
+//---------------
+//start magnetic
+#ifndef __CMD
+		else if (strcmp("magmom", word) == 0)
+		{
+			start_magnetization = new double[ntype];
+			for(int i=0;i<ntype;i++)
+			{
+				start_magnetization[i]=0.0;
+			}
+			int n_has_input=0;
+			
+			stringstream sstr;
+			string s;
+			getline(ifs,s);
+			sstr.str(s);
+			s="";
+			//1 3*2 6*1 
+			while(sstr.good())
+			{
+				sstr>>s;
+				string s1;
+				string s2;
+				bool mul=0;// if this parameter is the form n*m
+				for(int i=0;i<s.size();i++)
+				{
+					if ((s[i]>='0'&& s[i]<='9') or s[i]=='.' or s[i]=='+' or s[i]=='-')
+					{
+						s1.push_back(s[i]);
+					} 
+					else if (s[i]=='*')
+					{
+						s2=s1;
+						s1="";
+						mul=true;
+					}
+					else
+					{
+						std::cout<<"Unrecognized character"<<s[i]<<"when reading start magnetism";
+						exit(0);
+					}
+				}
+				//cout<<"s1 "<<s1<<" s2 "<<s2<<'h'<<n_has_input<<"\n";
+				double mag=stoi(s1);
+				if(mul)
+				{
+					int num=stoi(s2);
+					if (n_has_input+num>ntype)
+					{
+						std::cout<<"Too much start magnetic moment";
+						exit(0);
+					}
+					for(int i=0;i<num;i++)
+					{
+
+						start_magnetization[n_has_input+i]=mag;
+					}
+
+					n_has_input+=num;
+				}
+				else
+				{
+					if (n_has_input>=ntype)
+					{
+						std::cout<<"Too much start magnetic moment";
+						exit(0);
+					}
+					start_magnetization[n_has_input]=mag;
+					n_has_input+=1;
+				}
+			}	
+	input_mag=true;
+
+	}
+
+#endif
+		
+//--------------
 //----------------------------------------------------------------------------------
 //         Xin Qu added on 2020-10-29 for DFT+U
 //----------------------------------------------------------------------------------

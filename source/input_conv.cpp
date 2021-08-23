@@ -311,13 +311,17 @@ void Input_Conv::Convert(void)
 		GlobalC::dftu.double_counting = INPUT.double_counting;
 		GlobalC::dftu.Yukawa = INPUT.yukawa_potential;
 		GlobalC::dftu.omc=INPUT.omc;
+		GlobalC::dftu.orbital_corr=INPUT.orbital_corr;
 		if(!INPUT.yukawa_potential)
 		{
 			GlobalC::dftu.U = INPUT.hubbard_u;            //Hubbard Coulomb interaction parameter U(ev)
 			GlobalC::dftu.J = INPUT.hund_j;               //Hund exchange parameter J(ev)
 		}
 	}
-
+#ifndef __CMD
+	GlobalC::ucell.input_mag=INPUT.input_mag;
+	GlobalC::ucell.magnet.start_magnetization=INPUT.start_magnetization;
+#endif
 //--------------------------------------------
 // added by zhengdy-soc
 //--------------------------------------------
