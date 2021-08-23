@@ -4,7 +4,8 @@
 #include "vector3.h"
 #include "matrix.h"
 
-using namespace std;
+namespace ModuleBase
+{
 
 class YlmReal 
 {
@@ -44,5 +45,7 @@ class YlmReal
     static int Semi_Fact(const int n);
 
 };
+
+}
 
 #endif

@@ -339,7 +339,7 @@ void Stress_Func::get_dvnl2(ModuleBase::ComplexMatrix &vkb,
 	{
 		gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
 	}
-	YlmReal::Ylm_Real(x1, npw, gk, ylm);
+	ModuleBase::YlmReal::Ylm_Real(x1, npw, gk, ylm);
 
 	int jkb = 0;
 	for(int it = 0;it < GlobalC::ucell.ntype;it++)
@@ -508,7 +508,7 @@ void Stress_Func::dylmr2 (
 	}
 	//$OMP END PARALLEL DO
 
-	YlmReal::Ylm_Real(nylm, ngy, gx, dylm);
+	ModuleBase::YlmReal::Ylm_Real(nylm, ngy, gx, dylm);
 	//$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(ig)
 	for(ig = 0;ig< ngy;ig++)
 	{
@@ -521,7 +521,7 @@ void Stress_Func::dylmr2 (
 	}
 	//$OMP END PARALLEL DO
 
-	YlmReal::Ylm_Real(nylm, ngy, gx, ylmaux);
+	ModuleBase::YlmReal::Ylm_Real(nylm, ngy, gx, ylmaux);
 
 
 	//  zaxpy ( - 1.0, ylmaux, 1, dylm, 1);

@@ -354,7 +354,7 @@ matrix Numerical_Basis::cal_ylm(const std::vector<Vector3<double>> &gk)
 {
     const int total_lm = ( GlobalC::ucell.lmax + 1) * ( GlobalC::ucell.lmax + 1);
     matrix ylm(total_lm, gk.size());
-    YlmReal::Ylm_Real(total_lm, gk.size(), gk.data(), ylm);
+    ModuleBase::YlmReal::Ylm_Real(total_lm, gk.size(), gk.data(), ylm);
     return ylm;
 }
 
@@ -410,7 +410,7 @@ void Numerical_Basis::numerical_atomic_wfc(
 
     const int total_lm = ( GlobalC::ucell.lmax + 1) * ( GlobalC::ucell.lmax + 1);
     matrix ylm(total_lm, np);
-    YlmReal::Ylm_Real(total_lm, np, gk.data(), ylm);
+    ModuleBase::YlmReal::Ylm_Real(total_lm, np, gk.data(), ylm);
 
     std::vector<double> flq(np);
     for (int it = 0; it < GlobalC::ucell.ntype; it++)

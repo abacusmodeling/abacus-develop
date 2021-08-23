@@ -250,7 +250,7 @@ void Numerical_Descriptor::jlq3d_overlap(
         gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
     }
 
-    YlmReal::Ylm_Real(total_lm, np, gk, ylm);
+    ModuleBase::YlmReal::Ylm_Real(total_lm, np, gk, ylm);
 
     GlobalV::ofs_running << "\n " << std::setw(5) << "ik"
     << std::setw(8) << "Type1"

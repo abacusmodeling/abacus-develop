@@ -147,7 +147,7 @@ void ORB_gaunt_table::init_Ylm_Gaunt
 		}
 	}
 
-	YlmReal::Ylm_Real(nlm, 256, &g_gaunt[0], this->Ylm_Gaunt);
+	ModuleBase::YlmReal::Ylm_Real(nlm, 256, &g_gaunt[0], this->Ylm_Gaunt);
 
 	timer::tick("ORB_gaunt_table", "init_Ylm_Gaunt");
 	return;

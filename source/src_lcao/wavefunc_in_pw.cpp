@@ -263,7 +263,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ModuleBase::Complex
 		gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
 	}
 
-	YlmReal::Ylm_Real(total_lm, npw, gk, ylm);
+	ModuleBase::YlmReal::Ylm_Real(total_lm, npw, gk, ylm);
 
 	//int index = 0;
 	double *flq = new double[npw];
@@ -461,7 +461,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ModuleBase::Comp
 		gkq[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig) + q;
 	}
 
-	YlmReal::Ylm_Real(total_lm, npw, gkq, ylm);
+	ModuleBase::YlmReal::Ylm_Real(total_lm, npw, gkq, ylm);
 
 	//int index = 0;
 	double *flq = new double[npw];
