@@ -1,16 +1,19 @@
 #include "DP_potential.h"
-//#include "deepmd/DeepPot.h"
+#ifdef __DPMD
+#include "deepmd/DeepPot.h"
+#endif
 
 DP_potential::DP_potential(){}
 
 DP_potential::~DP_potential(){}
 
+#ifdef __DPMD
 void DP_potential::DP_pot(UnitCell_pseudo &ucell_c, double &potential, Vector3<double> *force, matrix &stress)
 {
     TITLE("DP_potential", "DP_pot");
     timer::tick("DP_potential", "DP_pot");
 
-    //deepmd::DeepPot dp ("graph.pb");
+    deepmd::DeepPot dp ("graph.pb");
 
     std::vector<double> cell(9);
     std::vector<int> atype;
@@ -20,7 +23,7 @@ void DP_potential::DP_pot(UnitCell_pseudo &ucell_c, double &potential, Vector3<d
 
     std::vector<double> f, v;
 
-    //dp.compute (potential, f, v, coord, atype, cell);
+    dp.compute (potential, f, v, coord, atype, cell);
 
     for(int i=0; i<ucell_c.nat;  ++i)
     {
@@ -39,7 +42,7 @@ void DP_potential::DP_pot(UnitCell_pseudo &ucell_c, double &potential, Vector3<d
 
     timer::tick("DP_potential", "DP_pot");
 }
-
+#endif
 
 void DP_potential::DP_init(UnitCell_pseudo &ucell_c, 
                 std::vector<double> &cell, 
