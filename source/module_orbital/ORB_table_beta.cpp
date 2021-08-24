@@ -289,7 +289,7 @@ void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
 							this->Table_NR[0][Tpair][Opair][L] = new double[rmesh];
 							this->Table_NR[1][Tpair][Opair][L] = new double[rmesh];
 
-							Memory::record("ORB_table_beta","Table_NR",
+							ModuleBase::Memory::record("ORB_table_beta","Table_NR",
 							2*NL_nTpairs*pairs_chi*rmesh,"double");
 
 							//for those L whose Gaunt Coefficients = 0, we

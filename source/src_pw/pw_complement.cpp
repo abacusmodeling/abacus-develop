@@ -369,10 +369,10 @@ void PW_complement::get_ig2fftc(const int &ngmc, const int &ncx, const int &ncy,
     ModuleBase::GlobalFunc::ZEROS(ig2, ngmc);
     ModuleBase::GlobalFunc::ZEROS(ig3, ngmc);
 
-    Memory::record("PW_complement","ig2fftc",ngmc,"int");
-    Memory::record("PW_complement","ig1",ngmc,"int");
-    Memory::record("PW_complement","ig2",ngmc,"int");
-    Memory::record("PW_complement","ig3",ngmc,"int");
+    ModuleBase::Memory::record("PW_complement","ig2fftc",ngmc,"int");
+    ModuleBase::Memory::record("PW_complement","ig1",ngmc,"int");
+    ModuleBase::Memory::record("PW_complement","ig2",ngmc,"int");
+    ModuleBase::Memory::record("PW_complement","ig3",ngmc,"int");
 
     for (int i = 0; i < ngmc;i++)
     {

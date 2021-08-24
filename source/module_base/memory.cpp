@@ -4,6 +4,8 @@
 //==========================================================
 #include "memory.h"
 
+namespace ModuleBase
+{
 // 1024 bit  = 1 Byte
 // 1024 Byte = 1 KB
 // 1024 KB   = 1 MB
@@ -212,4 +214,6 @@ void Memory::print_all(std::ofstream &ofs)
     ofs<<" ----------------------------------------------------------"<<std::endl;
 	delete[] print_flag; //mohan fix by valgrind at 2012-04-02
 	return;
+}
+
 }

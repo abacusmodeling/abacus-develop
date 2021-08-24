@@ -46,7 +46,7 @@ void Force_LCAO_gamma::ftable_gamma (
         // calculate the 'density matrix' here.
         ModuleBase::matrix dm2d;
 		dm2d.create(GlobalV::NSPIN, GlobalC::ParaO.nloc);
-        Memory::record ("Force_LCAO_gamma", "dm2d", GlobalC::ParaO.nloc*GlobalV::NSPIN, "double");    
+        ModuleBase::Memory::record ("Force_LCAO_gamma", "dm2d", GlobalC::ParaO.nloc*GlobalV::NSPIN, "double");    
 
         bool with_energy = false;
 
@@ -139,7 +139,7 @@ void Force_LCAO_gamma::allocate_gamma(void)
     GlobalC::UHM.genH.build_ST_new ('S', cal_deri);
     //timer::tick("Force_LCAO_gamma","build_S_new");
 
-    Memory::record("force_lo", "dS", GlobalC::ParaO.nloc*3, "double");
+    ModuleBase::Memory::record("force_lo", "dS", GlobalC::ParaO.nloc*3, "double");
 
     //calculate dT in LCAP
     //allocation dt
@@ -164,7 +164,7 @@ void Force_LCAO_gamma::allocate_gamma(void)
     //timer::tick("Force_LCAO_gamma","build_Nonlocal_mu");
     //test_gamma(GlobalC::LM.DHloc_fixed_x, "dHloc_fixed_x Vnl part");
 
-    Memory::record("force_lo", "dTVNL", GlobalC::ParaO.nloc*3, "double");
+    ModuleBase::Memory::record("force_lo", "dTVNL", GlobalC::ParaO.nloc*3, "double");
 
     timer::tick("Force_LCAO_gamma","allocate_gamma");
     return;

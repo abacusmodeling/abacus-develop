@@ -248,7 +248,7 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
 			{
 				DM[is][i] = &DM_pool[is][i*lgd_now];
 			}
-			Memory::record("LocalOrbital_Charge","Density_Kernal",GlobalV::NSPIN*lgd_now*lgd_now,"double");
+			ModuleBase::Memory::record("LocalOrbital_Charge","Density_Kernal",GlobalV::NSPIN*lgd_now*lgd_now,"double");
 		}
 		this->init_DM = true;
         this->lgd_last = lgd_now;

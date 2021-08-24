@@ -44,8 +44,8 @@ void wavefunc::allocate_ekb_wg(const int nks)
 
 	// the weight of each k point and band
     this->wg.create(nks, GlobalV::NBANDS);
-    Memory::record("wavefunc","ekb",nks*GlobalV::NBANDS,"double");
-    Memory::record("wavefunc","wg",nks*GlobalV::NBANDS,"double");
+    ModuleBase::Memory::record("wavefunc","ekb",nks*GlobalV::NBANDS,"double");
+    ModuleBase::Memory::record("wavefunc","wg",nks*GlobalV::NBANDS,"double");
 
     return;
 }
@@ -66,7 +66,7 @@ void wavefunc::allocate(const int nks)
 	delete[] g2kin;
 	this->g2kin = new double[npwx];
 	ModuleBase::GlobalFunc::ZEROS(g2kin, npwx);
-	Memory::record("wavefunc","g2kin",npwx,"double");
+	ModuleBase::Memory::record("wavefunc","g2kin",npwx,"double");
 
 	// if use spin orbital, do not double nks but double allocate evc and wanf2.
 	int prefactor = 1;
@@ -82,8 +82,8 @@ void wavefunc::allocate(const int nks)
 	
 	// the weight of each k point and band
 	this->wg.create(nks, GlobalV::NBANDS);
-	Memory::record("wavefunc","et",nks*GlobalV::NBANDS,"double");
-	Memory::record("wavefunc","wg",nks*GlobalV::NBANDS,"double");
+	ModuleBase::Memory::record("wavefunc","et",nks*GlobalV::NBANDS,"double");
+	ModuleBase::Memory::record("wavefunc","wg",nks*GlobalV::NBANDS,"double");
 
 	delete[] evc;
 	delete[] wanf2;
@@ -103,10 +103,10 @@ void wavefunc::allocate(const int nks)
 		{
 			wanf2[0].create(GlobalV::NLOCAL, npwx * GlobalV::NPOL);
 			std::cout << " Memory for wanf2 (MB): " << 
-				Memory::record("wavefunc","wanf2",GlobalV::NLOCAL*(prefactor*npwx),"complexmatrix") << std::endl;
+				ModuleBase::Memory::record("wavefunc","wanf2",GlobalV::NLOCAL*(prefactor*npwx),"complexmatrix") << std::endl;
 		}
 		std::cout << " MEMORY FOR PSI (MB)  : " << 
-			Memory::record("wavefunc","evc",GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << std::endl;
+			ModuleBase::Memory::record("wavefunc","evc",GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << std::endl;
 	}
 	else
 	{
@@ -125,7 +125,7 @@ void wavefunc::allocate(const int nks)
 		};
 
 		std::cout << " MEMORY FOR PSI (MB)  : " << 
-		Memory::record("wavefunc","evc",nks2*GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << std::endl;
+		ModuleBase::Memory::record("wavefunc","evc",nks2*GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << std::endl;
 	}
 
 	//showMemStats();
@@ -773,7 +773,7 @@ void wavefunc::init_after_vc(const int nks)
     delete[] g2kin;
     this->g2kin = new double[npwx];   // [npw],kinetic energy
     ModuleBase::GlobalFunc::ZEROS(g2kin, npwx);
-    Memory::record("wavefunc","g2kin",npwx,"double");
+    ModuleBase::Memory::record("wavefunc","g2kin",npwx,"double");
     if(GlobalV::test_wf)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"g2kin allocation","Done");
 
     int prefactor = 1;
@@ -786,8 +786,8 @@ void wavefunc::init_after_vc(const int nks)
     this->allocate_ekb = true;
 
     this->wg.create(nks, GlobalV::NBANDS);       // the weight of each k point and band
-    Memory::record("wavefunc","et",nks*GlobalV::NBANDS,"double");
-    Memory::record("wavefunc","wg",nks*GlobalV::NBANDS,"double");
+    ModuleBase::Memory::record("wavefunc","et",nks*GlobalV::NBANDS,"double");
+    ModuleBase::Memory::record("wavefunc","wg",nks*GlobalV::NBANDS,"double");
     if(GlobalV::test_wf)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "et allocation","Done");
     if(GlobalV::test_wf)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "wg allocation","Done");
 
@@ -806,10 +806,10 @@ void wavefunc::init_after_vc(const int nks)
         {
             wanf2[0].create(GlobalV::NLOCAL*prefactor, npwx);
             std::cout << " Memory for wanf2 (MB): " <<
-            Memory::record("wavefunc","wanf2",(GlobalV::NLOCAL*prefactor)*npwx,"complexmatrix") << std::endl;
+            ModuleBase::Memory::record("wavefunc","wanf2",(GlobalV::NLOCAL*prefactor)*npwx,"complexmatrix") << std::endl;
         }
         std::cout << " MEMORY FOR PSI (MB)  : " <<
-        Memory::record("wavefunc","evc",(GlobalV::NBANDS*prefactor)*npwx,"complexmatrix") << std::endl;
+        ModuleBase::Memory::record("wavefunc","evc",(GlobalV::NBANDS*prefactor)*npwx,"complexmatrix") << std::endl;
     }
     else
     {
@@ -827,7 +827,7 @@ void wavefunc::init_after_vc(const int nks)
         }
 
         std::cout << " MEMORY FOR PSI (MB)  : " <<
-        Memory::record("wavefunc","evc",(nks*prefactor)*(GlobalV::NBANDS*prefactor)*npwx,"complexmatrix") << std::endl;
+        ModuleBase::Memory::record("wavefunc","evc",(nks*prefactor)*(GlobalV::NBANDS*prefactor)*npwx,"complexmatrix") << std::endl;
     }
 
     if(GlobalV::test_wf)

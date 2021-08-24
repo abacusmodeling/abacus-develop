@@ -515,7 +515,7 @@ void ORB_table_phi::init_Table(
 									Table_SR[0][Tpair][Opair][L] = new double[rmesh];
 									Table_SR[1][Tpair][Opair][L] = new double[rmesh];
 
-									Memory::record("ORB_table_phi","Table_SR",
+									ModuleBase::Memory::record("ORB_table_phi","Table_SR",
 									2*OV_nTpairs*pairs_chi*rmesh,"double");
 									break;
 
@@ -523,7 +523,7 @@ void ORB_table_phi::init_Table(
 									Table_TR[0][Tpair][Opair][L] = new double[rmesh];
 									Table_TR[1][Tpair][Opair][L] = new double[rmesh];
 
-									Memory::record("ORB_table_phi","Table_TR",
+									ModuleBase::Memory::record("ORB_table_phi","Table_TR",
 									2*OV_nTpairs*pairs_chi*rmesh,"double");
 									break;
 
@@ -533,7 +533,7 @@ void ORB_table_phi::init_Table(
 									Table_TR[0][Tpair][Opair][L] = new double[rmesh];
 									Table_TR[1][Tpair][Opair][L] = new double[rmesh];
 
-									Memory::record("ORB_table_phi","Table_SR&TR",
+									ModuleBase::Memory::record("ORB_table_phi","Table_SR&TR",
 									2*2*OV_nTpairs*pairs_chi*rmesh,"double");
 									break;
 								}
@@ -899,5 +899,5 @@ void ORB_table_phi::init_Table_Spherical_Bessel (
 //	OUT(GlobalV::ofs_running,"lmax used to generate Jlq",Lmax_used);
 //	OUT(GlobalV::ofs_running,"kmesh",kmesh);
 //	OUT(GlobalV::ofs_running,"Rmesh",Rmesh);
-	Memory::record ("ORB_table_phi", "Jl(x)", (Lmax_used+1) * this->kmesh * this->Rmesh, "double");
+	ModuleBase::Memory::record ("ORB_table_phi", "Jl(x)", (Lmax_used+1) * this->kmesh * this->Rmesh, "double");
 }

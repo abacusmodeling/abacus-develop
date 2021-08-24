@@ -575,7 +575,7 @@ void Pdiag_Double::diago_double_begin(
         double* Z = new double[this->loc_size * GlobalV::NLOCAL];
         ModuleBase::GlobalFunc::ZEROS(Z, this->loc_size * GlobalV::NLOCAL);
 
-        Memory::record("Pdiag_Double","Z",loc_size * GlobalV::NLOCAL,"double");
+        ModuleBase::Memory::record("Pdiag_Double","Z",loc_size * GlobalV::NLOCAL,"double");
         timer::tick("Diago_LCAO_Matrix","pdgseps");
 		LapackConnector::copy(nloc, s_mat, inc, Stmp, inc);
 		pdgseps(comm_2D, GlobalV::NLOCAL, nb, h_mat, Stmp, Z, eigen, this->MatrixInfo, uplo, this->loc_size, loc_pos);
@@ -674,7 +674,7 @@ void Pdiag_Double::diago_double_begin(
 				ctot[i] = new double[GlobalV::NLOCAL];
 				ModuleBase::GlobalFunc::ZEROS(ctot[i], GlobalV::NLOCAL);
 			}
-			Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"double");
+			ModuleBase::Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"double");
 		}
 
 		for(int iprow=0; iprow<dim0; ++iprow)
@@ -1003,7 +1003,7 @@ void Pdiag_Double::diago_complex_begin(
         std::complex<double>* Z = new std::complex<double>[this->loc_size * GlobalV::NLOCAL];
         ModuleBase::GlobalFunc::ZEROS(Z, this->loc_size * GlobalV::NLOCAL);
 
-        Memory::record("Pdiag_Double","Z",loc_size * GlobalV::NLOCAL,"cdouble");
+        ModuleBase::Memory::record("Pdiag_Double","Z",loc_size * GlobalV::NLOCAL,"cdouble");
 		int nbands_tmp = GlobalV::NBANDS;
         timer::tick("Diago_LCAO_Matrix","pzgseps");
 		LapackConnector::copy(nloc, cs_mat, inc, Stmp, inc);
@@ -1093,7 +1093,7 @@ void Pdiag_Double::diago_complex_begin(
                             ctot[i] = new std::complex<double>[GlobalV::NLOCAL];
                             ModuleBase::GlobalFunc::ZEROS(ctot[i], GlobalV::NLOCAL);
                         }
-                        Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
+                        ModuleBase::Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
                     }
 					// mohan update 2021-02-12, delete BFIELD option
 					info=q2WFC_WFCAUG_CTOT_complex(myid, naroc, nb,
@@ -1214,7 +1214,7 @@ void Pdiag_Double::diago_complex_begin(
 								ctot[i] = new std::complex<double>[GlobalV::NLOCAL];
 								ModuleBase::GlobalFunc::ZEROS(ctot[i], GlobalV::NLOCAL);
 							}
-							Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
+							ModuleBase::Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
 						}
 						// mohan update 2021-02-12, delete BFIELD option
 						info=q2WFC_WFCAUG_CTOT_complex(myid, naroc, nb,

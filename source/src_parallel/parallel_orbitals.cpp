@@ -64,8 +64,8 @@ void Parallel_Orbitals::set_trace(void)
         trace_loc_col[i] = -1;
     }
 
-    Memory::record("Parallel_Orbitals","trace_loc_row",GlobalV::NLOCAL,"int");
-    Memory::record("Parallel_Orbitals","trace_loc_col",GlobalV::NLOCAL,"int");
+    ModuleBase::Memory::record("Parallel_Orbitals","trace_loc_row",GlobalV::NLOCAL,"int");
+    ModuleBase::Memory::record("Parallel_Orbitals","trace_loc_col",GlobalV::NLOCAL,"int");
 
     if(GlobalV::KS_SOLVER=="lapack"
     || GlobalV::KS_SOLVER=="cg"

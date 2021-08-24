@@ -447,7 +447,7 @@ void Atom_input::Expand_Grid(const UnitCell &ucell, const int ntype)
 	this->store_y = new double[d_amount_expand];
 	this->store_z = new double[d_amount_expand];
 
-	double mem = Memory::record("Expand_grid","Expanded Atom",d_amount_expand*3,"double");
+	double mem = ModuleBase::Memory::record("Expand_grid","Expanded Atom",d_amount_expand*3,"double");
 	if(test_atom_input)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Memory for store_x,y,z",mem);
 
 	// store which grid the atom is in.
@@ -458,7 +458,7 @@ void Atom_input::Expand_Grid(const UnitCell &ucell, const int ntype)
 	this->store_type = new int[d_amount_expand];
 	this->store_natom = new int[d_amount_expand];
 
-	mem = Memory::record("Expand_grid","Exapanded atom info",d_amount_expand*5,"int");
+	mem = ModuleBase::Memory::record("Expand_grid","Exapanded atom info",d_amount_expand*5,"int");
 	if(test_atom_input)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Memory for storo other info",mem);
 
 	int ia_all = 0;

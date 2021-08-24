@@ -53,7 +53,7 @@ void Gint_k::allocate_pvpR(void)
 			ModuleBase::GlobalFunc::ZEROS( pvpR_reduced[is], GlobalC::LNNR.nnrg);
 		}
 
-		double mem = Memory::record("allocate_pvpR", "pvpR_reduced", GlobalC::LNNR.nnrg * GlobalV::NSPIN , "double");
+		double mem = ModuleBase::Memory::record("allocate_pvpR", "pvpR_reduced", GlobalC::LNNR.nnrg * GlobalV::NSPIN , "double");
 
         if(GlobalV::OUT_LEVEL != "m") 
 		{
@@ -70,7 +70,7 @@ void Gint_k::allocate_pvpR(void)
 	}
 	else
 	{
-		double mem = Memory::record("allocate_pvpR", "pvpR", GlobalC::GridT.lgd * GlobalC::GridT.nutot
+		double mem = ModuleBase::Memory::record("allocate_pvpR", "pvpR", GlobalC::GridT.lgd * GlobalC::GridT.nutot
 				* GlobalC::GridT.lgd * GlobalC::GridT.nutot , "double");
 
 		if(GlobalV::OUT_LEVEL != "m") 

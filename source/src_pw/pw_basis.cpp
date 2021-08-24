@@ -322,15 +322,15 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
 
         delete[] gg_global;
         gg_global = new double[ngmc_g];// store the |G|^2 of the 1d array
-        Memory::record("PW_complement","gg_global",ngmc_g,"double");
+        ModuleBase::Memory::record("PW_complement","gg_global",ngmc_g,"double");
 
         delete[] gdirect_global;
         gdirect_global = new Vector3<double>[ngmc_g];// indices of G vectors
-        Memory::record("PW_complement","gdirect_global",ngmc_g,"Vector3<double>");
+        ModuleBase::Memory::record("PW_complement","gdirect_global",ngmc_g,"Vector3<double>");
 
         delete[] gcar_global;
         gcar_global = new Vector3<double>[ngmc_g];
-        Memory::record("PW_complement","gcar",ngmc_g,"Vector3<double>");
+        ModuleBase::Memory::record("PW_complement","gcar",ngmc_g,"Vector3<double>");
 
         PW_complement::get_total_pw(gg_global, gdirect_global, 0.0, ggchg, ncx, ncy, ncz, Ucell->GGT, ngmc_g);
         PW_complement::setup_GVectors(Ucell->G, ngmc_g, gg_global, gdirect_global, gcar_global);
@@ -652,7 +652,7 @@ void PW_Basis::get_GVectors(void)
     delete[] ig2fftw;
     ig2fftw = new int[ngmw];
 	ModuleBase::GlobalFunc::ZEROS(ig2fftw, ngmw);
-    Memory::record("PW_complement","ig2fftw",ngmw,"int");
+    ModuleBase::Memory::record("PW_complement","ig2fftw",ngmw,"int");
     ModuleBase::GlobalFunc::ZEROS(ig2fftw, ngmw);
 
     PW_complement::get_ig2fftw(ngmw, nx, ny, nz, gdirect, ig2fftw);
@@ -741,7 +741,7 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
     const std::complex<double> ci_tpi = NEG_IMAG_UNIT * TWO_PI;
 
     this->strucFac.create(Ucell->ntype, this->ngmc);
-    Memory::record("PW_Basis","struc_fac", Ucell->ntype*this->ngmc,"complexmatrix");
+    ModuleBase::Memory::record("PW_Basis","struc_fac", Ucell->ntype*this->ngmc,"complexmatrix");
 
 //	std::string outstr;
 //	outstr = GlobalV::global_out_dir + "strucFac.dat"; 
@@ -773,9 +773,9 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
     this->eigts2.create(Ucell->nat, 2*this->ncy + 1);
     this->eigts3.create(Ucell->nat, 2*this->ncz + 1);
 
-    Memory::record("PW_Basis","eigts1",Ucell->nat*2*this->ncx + 1,"complexmatrix");
-    Memory::record("PW_Basis","eigts2",Ucell->nat*2*this->ncy + 1,"complexmatrix");
-    Memory::record("PW_Basis","eigts3",Ucell->nat*2*this->ncz + 1,"complexmatrix");
+    ModuleBase::Memory::record("PW_Basis","eigts1",Ucell->nat*2*this->ncx + 1,"complexmatrix");
+    ModuleBase::Memory::record("PW_Basis","eigts2",Ucell->nat*2*this->ncy + 1,"complexmatrix");
+    ModuleBase::Memory::record("PW_Basis","eigts3",Ucell->nat*2*this->ncz + 1,"complexmatrix");
 
     Vector3<double> gtau;
     int inat = 0;

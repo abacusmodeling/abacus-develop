@@ -41,7 +41,7 @@ void Force_LCAO_k::ftable_k (
 		dm2d[is] = new double[GlobalC::LNNR.nnr];
 		ModuleBase::GlobalFunc::ZEROS(dm2d[is], GlobalC::LNNR.nnr);
 	}
-	Memory::record ("Force_LCAO_k", "dm2d", GlobalV::NSPIN*GlobalC::LNNR.nnr, "double");	
+	ModuleBase::Memory::record ("Force_LCAO_k", "dm2d", GlobalV::NSPIN*GlobalC::LNNR.nnr, "double");	
 	bool with_energy = false;
 
 	
@@ -115,7 +115,7 @@ void Force_LCAO_k::allocate_k(void)
     ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_Rx, nnr);
     ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_Ry, nnr);
     ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_Rz, nnr);
-	Memory::record("force_lo", "dS", nnr*3, "double");
+	ModuleBase::Memory::record("force_lo", "dS", nnr*3, "double");
     
 	if(GlobalV::STRESS){
 		GlobalC::LM.DH_r = new double [3* nnr];
@@ -132,7 +132,7 @@ void Force_LCAO_k::allocate_k(void)
 		ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.stvnl22,  nnr);
 		ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.stvnl23,  nnr);
 		ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.stvnl33,  nnr);
-		Memory::record("stress_lo", "dSR", nnr*6, "double");
+		ModuleBase::Memory::record("stress_lo", "dSR", nnr*6, "double");
 	}
 
 	//-----------------------------
@@ -151,7 +151,7 @@ void Force_LCAO_k::allocate_k(void)
     ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixedR_x, nnr);
     ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixedR_y, nnr);
     ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixedR_z, nnr);
-	Memory::record("force_lo", "dTVNL", nnr*3, "double");
+	ModuleBase::Memory::record("force_lo", "dTVNL", nnr*3, "double");
     
     // calculate dT=<phi|kin|dphi> in LCAO
     // calculate T + VNL(P1) in LCAO basis

@@ -33,25 +33,25 @@ void Potential::allocate(const int nrxx)
 
     delete[] this->vltot;
     this->vltot = new double[nrxx];
-    Memory::record("Potential","vltot",nrxx,"double");
+    ModuleBase::Memory::record("Potential","vltot",nrxx,"double");
 
     this->vr.create(GlobalV::NSPIN,nrxx);
     this->vr_eff.create(GlobalV::NSPIN,nrxx);
-    Memory::record("Potential","vr",GlobalV::NSPIN*nrxx,"double");
-    Memory::record("Potential","vr_eff",GlobalV::NSPIN*nrxx,"double");
+    ModuleBase::Memory::record("Potential","vr",GlobalV::NSPIN*nrxx,"double");
+    ModuleBase::Memory::record("Potential","vr_eff",GlobalV::NSPIN*nrxx,"double");
 	
 	if(GlobalV::DFT_META)
 	{
 		this->vofk.create(GlobalV::NSPIN,nrxx);
-    	Memory::record("Potential","vofk",GlobalV::NSPIN*nrxx,"double");
+    	ModuleBase::Memory::record("Potential","vofk",GlobalV::NSPIN*nrxx,"double");
 	}
 
     delete[] this->vr_eff1;
     this->vr_eff1 = new double[nrxx];
-    Memory::record("Potential","vr_eff1",nrxx,"double");
+    ModuleBase::Memory::record("Potential","vr_eff1",nrxx,"double");
 
     this->vnew.create(GlobalV::NSPIN,nrxx);
-    Memory::record("Potential","vnew",GlobalV::NSPIN*nrxx,"double");
+    ModuleBase::Memory::record("Potential","vnew",GlobalV::NSPIN*nrxx,"double");
 
     return;
 }

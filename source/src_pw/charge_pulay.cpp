@@ -320,7 +320,7 @@ void Charge_Pulay::allocate_pulay(const int &scheme)
 				ModuleBase::GlobalFunc::ZEROS( Rrho[is][i], GlobalC::pw.nrxx );
         	}
 		}
-    	Memory::record("Charge_Pulay","Rrho", GlobalV::NSPIN*rstep*GlobalC::pw.nrxx,"double");
+    	ModuleBase::Memory::record("Charge_Pulay","Rrho", GlobalV::NSPIN*rstep*GlobalC::pw.nrxx,"double");
 
 		// (2) allocate "dRrho[i] = Rrho[i+1] - Rrho[i]" of the last few steps.
 		// allocate "drho[i] = rho[i+1] - rho[i]" of the last few steps.
@@ -344,20 +344,20 @@ void Charge_Pulay::allocate_pulay(const int &scheme)
 				ModuleBase::GlobalFunc::ZEROS( drho[is][i], GlobalC::pw.nrxx);
 			}
 		}
-    	Memory::record("Charge_Pulay","dRrho", GlobalV::NSPIN*dstep*GlobalC::pw.nrxx,"double");
-    	Memory::record("Charge_Pulay","drho", GlobalV::NSPIN*dstep*GlobalC::pw.nrxx,"double");
-    	Memory::record("Charge_Pulay","rho_save2", GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
+    	ModuleBase::Memory::record("Charge_Pulay","dRrho", GlobalV::NSPIN*dstep*GlobalC::pw.nrxx,"double");
+    	ModuleBase::Memory::record("Charge_Pulay","drho", GlobalV::NSPIN*dstep*GlobalC::pw.nrxx,"double");
+    	ModuleBase::Memory::record("Charge_Pulay","rho_save2", GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
 
 		ModuleBase::GlobalFunc::NOTE("Allocate Abar = <dRrho_j | dRrho_i >, dimension = dstep.");
 		if(scheme==1)
 		{
 			this->Abar.create(dstep, dstep);
-    		Memory::record("Charge_Pulay","Abar", dstep*dstep,"double");
+    		ModuleBase::Memory::record("Charge_Pulay","Abar", dstep*dstep,"double");
 		}
 		else if(scheme==2)
 		{
 			this->Abar.create(rstep, rstep);
-			Memory::record("Charge_Pulay","Abar", rstep*rstep,"double");
+			ModuleBase::Memory::record("Charge_Pulay","Abar", rstep*rstep,"double");
 		}
 
 		// (4) allocate dRR = <delta R|R>

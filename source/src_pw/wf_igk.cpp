@@ -68,7 +68,7 @@ int WF_igk::setupIndGk(const PW_Basis &pwb,const int nks)
 // EXPLAIN : correspondence K + G <- -> G
 //----------------------------------------------------------
     igk.create(nks, npw_max);
-    Memory::record("WF_igk","igk",nks*npw_max,"int");
+    ModuleBase::Memory::record("WF_igk","igk",nks*npw_max,"int");
 
 //----------------------------------------------------------
 // EXPLAIN : Calculate again ! (Not a smart job)

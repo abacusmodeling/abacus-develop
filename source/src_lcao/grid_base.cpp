@@ -99,7 +99,7 @@ void Grid_Base::init(
 
 	delete[] this->cartesian;
 	this->cartesian = new Vector3<double>[ this->nxyz ];
-	Memory::record("Grid_Base","cartesian",nxyz*3,"double");
+	ModuleBase::Memory::record("Grid_Base","cartesian",nxyz*3,"double");
 
 	Vector3<double> direct;
 	for (int i = 0; i < this->nx; i++)

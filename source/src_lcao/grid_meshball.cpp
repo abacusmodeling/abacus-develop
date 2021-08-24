@@ -82,7 +82,7 @@ void Grid_MeshBall::init_meshball(void)
 		}
 		this->flag_mp = true;
 
-		Memory::record("init_meshball","meshball_pos",meshball_ncells*3,"double");
+		ModuleBase::Memory::record("init_meshball","meshball_pos",meshball_ncells*3,"double");
 	}
 
 	delete[] index_ball;

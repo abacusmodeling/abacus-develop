@@ -264,7 +264,7 @@ void DFTU::init(
 			this->local_occup_bcast();
 		}
 	}
-	Memory::record("DFTU","locale",GlobalV::NLOCAL*GlobalV::NLOCAL,"double");
+	ModuleBase::Memory::record("DFTU","locale",GlobalV::NLOCAL*GlobalV::NLOCAL,"double");
 	//this->out_numorb();
 
   //GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__ << std::endl;

@@ -285,8 +285,8 @@ void Grid::setBoundaryAdjacent(
 //		/ static_cast<double>(Cell[0][0][0].length));
 	}
 
-	Memory::record("AdjacentSet", "offset", AdjacentSet::call_times, "short");
-	Memory::record("AdjacentSet", "box", AdjacentSet::call_times, "short");
+	ModuleBase::Memory::record("AdjacentSet", "offset", AdjacentSet::call_times, "short");
+	ModuleBase::Memory::record("AdjacentSet", "box", AdjacentSet::call_times, "short");
 
 	//if (test_grid)ModuleBase::GlobalFunc::DONE(ofs_in, "Construct_Adjacent");
 
@@ -328,7 +328,7 @@ AtomLink* Grid::Build_Cache(const UnitCell &ucell, const Atom_input &input)
 {
 //	if (test_grid)TITLE(ofs_running, "Grid", "Build_Cache");
 	AtomLink* const start = new AtomLink[natom+1];
-	Memory::record("grid", "AtomLink", natom, "AtomLink");
+	ModuleBase::Memory::record("grid", "AtomLink", natom, "AtomLink");
 
 	// the pointer stay at the end of atom.
 	//const AtomLink* const end = start + natom + 1;

@@ -501,7 +501,7 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
             DGridV_23[i] = &DGridV_stress_pool[i*GlobalC::GridT.lgd+4*DGridV_Size];
             DGridV_33[i] = &DGridV_stress_pool[i*GlobalC::GridT.lgd+5*DGridV_Size];
         }
-        Memory::record("Gint_Gamma","DGridV_stress",6*GlobalC::GridT.lgd*GlobalC::GridT.lgd,"double");
+        ModuleBase::Memory::record("Gint_Gamma","DGridV_stress",6*GlobalC::GridT.lgd*GlobalC::GridT.lgd,"double");
     }
     for (int i=0; i<GlobalC::GridT.lgd; ++i)
     {
@@ -509,7 +509,7 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
         DGridV_y[i] = &DGridV_pool[i*GlobalC::GridT.lgd+DGridV_Size];
         DGridV_z[i] = &DGridV_pool[i*GlobalC::GridT.lgd+2*DGridV_Size];
     }
-    Memory::record("Gint_Gamma","DGridV",3*GlobalC::GridT.lgd*GlobalC::GridT.lgd,"double");
+    ModuleBase::Memory::record("Gint_Gamma","DGridV",3*GlobalC::GridT.lgd*GlobalC::GridT.lgd,"double");
     //OUT(GlobalV::ofs_running,"DGridV was allocated");
 
     // it's a uniform grid to save orbital values, so the delta_r is a constant.

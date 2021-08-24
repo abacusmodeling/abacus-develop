@@ -289,7 +289,7 @@ void ORB_table_alpha::init_Table_Alpha(
 							this->Table_DSR[0][T1][Opair][L] = new double[rmesh];
 							this->Table_DSR[1][T1][Opair][L] = new double[rmesh];
 
-							Memory::record("ORB_table_alpha", "Table_DSR",
+							ModuleBase::Memory::record("ORB_table_alpha", "Table_DSR",
 										   2 * this->ntype * pairs_chi * rmesh, "double");
 
 							//for those L whose Gaunt Coefficients = 0, we

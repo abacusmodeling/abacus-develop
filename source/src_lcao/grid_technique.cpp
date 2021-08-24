@@ -112,7 +112,7 @@ void Grid_Technique::init_atoms_on_grid(void)
 	delete[] this->how_many_atoms;
 	this->how_many_atoms = new int[nbxx];
 	ModuleBase::GlobalFunc::ZEROS(how_many_atoms, nbxx);
-	Memory::record("atoms_on_grid","how_many_atoms",nbxx,"int");
+	ModuleBase::Memory::record("atoms_on_grid","how_many_atoms",nbxx,"int");
 
 	// (2) start z and ended z,
 	// consistent with division of FFT grid.
@@ -144,7 +144,7 @@ void Grid_Technique::init_atoms_on_grid(void)
 	assert( this->nxyze > 0);
 	int* index2normal = new int[this->nxyze];
 	assert( index2normal != NULL );
-	Memory::record("Grid_Meshcell","index2normal",this->nxyze,"int");
+	ModuleBase::Memory::record("Grid_Meshcell","index2normal",this->nxyze,"int");
 	this->grid_expansion_index(1,index2normal); 
 
  	
@@ -228,7 +228,7 @@ void Grid_Technique::init_atoms_on_grid2(const int* index2normal)
 
 	int* index2ucell = new int[this->nxyze];
 	assert( index2ucell != NULL );
-	Memory::record("Grid_Meshcell","index2ucell",this->nxyze,"int");	
+	ModuleBase::Memory::record("Grid_Meshcell","index2ucell",this->nxyze,"int");	
 	this->grid_expansion_index(0,index2ucell);
 	
 	const int zstart = nbzp_start;
@@ -245,17 +245,17 @@ void Grid_Technique::init_atoms_on_grid2(const int* index2normal)
 	delete[] which_atom;
 	this->which_atom = new int[total_atoms_on_grid];
 	assert( which_atom != 0);
-	Memory::record("atoms_on_grid","which_atom",total_atoms_on_grid,"int");
+	ModuleBase::Memory::record("atoms_on_grid","which_atom",total_atoms_on_grid,"int");
 
 	delete[] which_bigcell;
 	this->which_bigcell = new int[total_atoms_on_grid];
 	assert( which_bigcell != 0);
-	Memory::record("atoms_on_grid","which_bigcell",total_atoms_on_grid,"int");
+	ModuleBase::Memory::record("atoms_on_grid","which_bigcell",total_atoms_on_grid,"int");
 
 	delete[] which_unitcell;
 	this->which_unitcell = new int[total_atoms_on_grid];
 	assert( which_unitcell != 0);
-	Memory::record("atoms_on_grid","which_unitcell",total_atoms_on_grid,"int");
+	ModuleBase::Memory::record("atoms_on_grid","which_unitcell",total_atoms_on_grid,"int");
 	// for each atom, first we need to locate which cell
 	// the atom is in, then we search meshball aroung this
 	// grid, and record each grid's atom position.
@@ -322,7 +322,7 @@ void Grid_Technique::cal_grid_integration_index(void)
 	// save the start 
 	delete[] this->bcell_start;
 	this->bcell_start = new int[nbxx];
-	Memory::record("atoms_on_grid","bcell_start",nbxx,"int");
+	ModuleBase::Memory::record("atoms_on_grid","bcell_start",nbxx,"int");
 	this->bcell_start[0] = 0;
 	for(int i=1; i<nbxx; i++)
 	{
@@ -418,7 +418,7 @@ void Grid_Technique::cal_trace_lo(void)
 	{
 		this->trace_lo[i] = -1;
 	}
-	Memory::record("atoms_on_grid","trace_lo",GlobalV::NLOCAL,"int");
+	ModuleBase::Memory::record("atoms_on_grid","trace_lo",GlobalV::NLOCAL,"int");
 
 	this->lnat = 0;
 	this->lgd = 0;

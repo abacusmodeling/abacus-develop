@@ -536,7 +536,7 @@ void Pdiag_Basic::gath_eig(MPI_Comm comm,int n,double **wfc,double *Z)
         	ctot[i] = new double[GlobalV::NLOCAL];
         	ModuleBase::GlobalFunc::ZEROS(ctot[i], GlobalV::NLOCAL);
     	}
-    	Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"double");
+    	ModuleBase::Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"double");
 	}
 
     k=0;
@@ -760,7 +760,7 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **cc
         	ctot[i] = new std::complex<double>[GlobalV::NLOCAL];
         	ModuleBase::GlobalFunc::ZEROS(ctot[i], GlobalV::NLOCAL);
     	}
-    	Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
+    	ModuleBase::Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
 	}
 
 	k=0;

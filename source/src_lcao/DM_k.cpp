@@ -34,7 +34,7 @@ void Local_Orbital_Charge::allocate_DM_k(void)
         }
         this->nnrg_last = nnrg_now;
         this->init_DM_R = true;
-        Memory::record("LocalOrbital_Charge","Density_Matrix",GlobalV::NSPIN*nnrg_now,"double");
+        ModuleBase::Memory::record("LocalOrbital_Charge","Density_Matrix",GlobalV::NSPIN*nnrg_now,"double");
     }
     else if(nnrg_now==0)
     {

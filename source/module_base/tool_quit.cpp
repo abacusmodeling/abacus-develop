@@ -48,7 +48,7 @@ void QUIT(void)
 
     if (GlobalV::MY_RANK==0)
     {
-        Memory::print_all( GlobalV::ofs_running ) ;
+        ModuleBase::Memory::print_all( GlobalV::ofs_running ) ;
     }
     std::cout<<" See output information in : "<<GlobalV::global_out_dir<<std::endl;
 #endif

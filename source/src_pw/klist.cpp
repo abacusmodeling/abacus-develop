@@ -152,11 +152,11 @@ void K_Vectors::renew(const int &kpoint_number)
     isk = new int[kpoint_number];
     ngk = new int[kpoint_number];
 
-    Memory::record("K_Vectors","kvec_c",kpoint_number*3,"double");
-    Memory::record("K_Vectors","kvec_d",kpoint_number*3,"double");
-    Memory::record("K_Vectors","wk",kpoint_number*3,"double");
-    Memory::record("K_Vectors","isk",kpoint_number*3,"int");
-    Memory::record("K_Vectors","ngk",kpoint_number*3,"int");
+    ModuleBase::Memory::record("K_Vectors","kvec_c",kpoint_number*3,"double");
+    ModuleBase::Memory::record("K_Vectors","kvec_d",kpoint_number*3,"double");
+    ModuleBase::Memory::record("K_Vectors","wk",kpoint_number*3,"double");
+    ModuleBase::Memory::record("K_Vectors","isk",kpoint_number*3,"int");
+    ModuleBase::Memory::record("K_Vectors","ngk",kpoint_number*3,"int");
 
     return;
 }

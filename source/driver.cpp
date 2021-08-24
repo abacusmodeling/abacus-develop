@@ -102,7 +102,7 @@ void Driver::atomic_world(void)
 
 	timer::finish( GlobalV::ofs_running );
 
-	Memory::print_all( GlobalV::ofs_running ) ;
+	ModuleBase::Memory::print_all( GlobalV::ofs_running ) ;
 
 	return;
 }

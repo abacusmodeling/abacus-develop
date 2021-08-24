@@ -111,12 +111,12 @@ void Charge::allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_i
 		}
 	}
 
-    Memory::record("Charge","rho",nspin*nrxx,"double");
-    Memory::record("Charge","rho_save",nspin*nrxx,"double");
-    Memory::record("Charge","rhog",nspin*ngmc,"double");
-    Memory::record("Charge","rhog_save",nspin*ngmc,"double");
-    Memory::record("Charge","kin_r",nspin*ngmc,"double");
-    Memory::record("Charge","kin_r_save",nspin*ngmc,"double");
+    ModuleBase::Memory::record("Charge","rho",nspin*nrxx,"double");
+    ModuleBase::Memory::record("Charge","rho_save",nspin*nrxx,"double");
+    ModuleBase::Memory::record("Charge","rhog",nspin*ngmc,"double");
+    ModuleBase::Memory::record("Charge","rhog_save",nspin*ngmc,"double");
+    ModuleBase::Memory::record("Charge","kin_r",nspin*ngmc,"double");
+    ModuleBase::Memory::record("Charge","kin_r_save",nspin*ngmc,"double");
 
     this->rho_core = new double[nrxx]; // core charge in real space
     ModuleBase::GlobalFunc::ZEROS( rho_core, nrxx);
@@ -124,8 +124,8 @@ void Charge::allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_i
 	this->rhog_core = new std::complex<double>[ngmc]; // reciprocal core charge
 	ModuleBase::GlobalFunc::ZEROS( rhog_core, ngmc);
 
-    Memory::record("Charge","rho_core",nrxx,"double");
-    Memory::record("Charge","rhog_core",ngmc,"double");
+    ModuleBase::Memory::record("Charge","rho_core",nrxx,"double");
+    ModuleBase::Memory::record("Charge","rhog_core",ngmc,"double");
 
 	this->allocate_rho = true;
     return;
@@ -1156,10 +1156,10 @@ void Charge::init_final_scf()
 		ModuleBase::GlobalFunc::ZEROS(rhog_save[is], GlobalC::pw.ngmc);
 	}
 
-    Memory::record("Charge","rho",GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
-    Memory::record("Charge","rho_save",GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
-    Memory::record("Charge","rhog",GlobalV::NSPIN*GlobalC::pw.ngmc,"double");
-    Memory::record("Charge","rhog_save",GlobalV::NSPIN*GlobalC::pw.ngmc,"double");
+    ModuleBase::Memory::record("Charge","rho",GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
+    ModuleBase::Memory::record("Charge","rho_save",GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
+    ModuleBase::Memory::record("Charge","rhog",GlobalV::NSPIN*GlobalC::pw.ngmc,"double");
+    ModuleBase::Memory::record("Charge","rhog_save",GlobalV::NSPIN*GlobalC::pw.ngmc,"double");
 
     this->rho_core = new double[GlobalC::pw.nrxx]; // core charge in real space
     ModuleBase::GlobalFunc::ZEROS( rho_core, GlobalC::pw.nrxx);
@@ -1167,8 +1167,8 @@ void Charge::init_final_scf()
 	this->rhog_core = new std::complex<double>[GlobalC::pw.ngmc]; // reciprocal core charge
 	ModuleBase::GlobalFunc::ZEROS( rhog_core, GlobalC::pw.ngmc);
 
-    Memory::record("Charge","rho_core",GlobalC::pw.nrxx,"double");
-    Memory::record("Charge","rhog_core",GlobalC::pw.ngmc,"double");
+    ModuleBase::Memory::record("Charge","rho_core",GlobalC::pw.nrxx,"double");
+    ModuleBase::Memory::record("Charge","rhog_core",GlobalC::pw.ngmc,"double");
 
 	this->allocate_rho_final_scf = true;
     return;
