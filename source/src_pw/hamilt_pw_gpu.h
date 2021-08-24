@@ -2,9 +2,9 @@
 #define HAMILT_PW_H
 
 #include "tools.h"
-// #include "cufft.h"
-// #include "cublas_v2.h"
-// typedef cufftDoubleComplex CUFFT_COMPLEX;
+#include "cufft.h"
+#include "cublas_v2.h"
+typedef cufftDoubleComplex CUFFT_COMPLEX;
 
 class Hamilt_PW
 {
@@ -18,8 +18,8 @@ public:
 
 	void allocate(
 		const int &npwx, // number of plane wave (max)
-		const int &npol, // polarization 
-		const int &nkb,  // number of non-local pseudopotential projectors 
+		const int &npol, // polarization
+		const int &nkb,  // number of non-local pseudopotential projectors
 		const int &nrxx); // number of grids on this processor
 
     void cal_err
@@ -34,7 +34,7 @@ public:
 	void init_k(const int ik);
 
 	private:
-	
+
 	friend class Diago_David;
 	// friend class Diago_CG;
     friend class Diago_CG_GPU;
@@ -55,9 +55,9 @@ public:
         CUFFT_COMPLEX *hpsi,
         CUFFT_COMPLEX *spsi);
 
-    void h_psi( 
-		const CUFFT_COMPLEX *psi, 
-		CUFFT_COMPLEX *hpsi, 
+    void h_psi(
+		const CUFFT_COMPLEX *psi,
+		CUFFT_COMPLEX *hpsi,
 		const int m = 1); // qianrui add a default parameter 2021-3-31
 
     void s_1psi(
@@ -79,9 +79,9 @@ public:
 
 	private:
 
-	double ddot_real( 
-		const int& npw, 
-		const std::complex<double>* psi_L, 
+	double ddot_real(
+		const int& npw,
+		const std::complex<double>* psi_L,
 		const std::complex<double>* psi_R)const;
 
     std::complex<double> ddot( const int& npw,
@@ -110,4 +110,4 @@ public:
 
 };
 
-#endif 
+#endif
