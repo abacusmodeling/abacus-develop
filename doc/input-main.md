@@ -950,24 +950,8 @@ This part of variables are relevant when using hybrid functionals
     - *Default*: 0.11
 
     [back to top](#input-file)
-
-- exx_separate_loop<a id="exx-separate-loop"></a>
-    - *Type*: Boolean
-    - *Description*: When hybrid functional is used, the Hamiltonian can be partitioned into H=H<sub>LDA/GGA</sub>+F<sub>X</sub>. Updating of the latter takes more computational effort. As a result, we devise a double-SCF procedure, which is adopted when setting exx_separate_loop=1. In the procedure, the inner loop converges H<sub>LDA/GGA</sub> while F<sub>X</sub> is fixed. While in the outer loop, F<sub>X</sub> achieves self-consistency. On the other hand, if exx_separate is set to 0, only a single SCF is used to converge H. **Note: only pulay and plain mixing are allowed if exx_separate_loop = 0**
-    - *Default*: 1
-
-    [back to top](#input-file)
-
-- exx_hybrid_step<a id="exx-hybrid-step"></a>
-    - *Type*: Integer
-    - *Description*: If exx_separate_loop is set to 1, this gives the maximum steps allowed in the inner loop.
-    - *Default*: 100
-
-    [back to top](#input-file)
-
-- exx_lambda<a id="exx-lambda"></a>
-    - *Type*: Real
-    - *Description*: This parameter is only relevant when using hybrid functional with lcao in pw basis set (i.e. when basis_type="lcao_in_pw") to treat the divergence of Coulomb potential at g=0 in reciprocal space. There we damp the divergence with function e^(-&gamma;g).
+adial integration for pseudopotentials, in Bohr.
+@@ -214,6 +279,13 @@ This part of variables are used to control general system para
     - *Default*: 0.3
 
     [back to top](#input-file)

@@ -320,7 +320,8 @@ void Input_Conv::Convert(void)
 	}
 #ifndef __CMD
 	GlobalC::ucell.input_mag=INPUT.input_mag;
-	GlobalC::ucell.magnet.start_magnetization=INPUT.start_magnetization;
+	GlobalC::ucell.n_mag_at=INPUT.n_mag_at;
+	GlobalC::ucell.atom_mag=INPUT.atom_mag;
 #endif
 //--------------------------------------------
 // added by zhengdy-soc

@@ -1736,17 +1736,15 @@ bool Input::Read(const std::string &fn)
 #ifndef __CMD
 		else if (strcmp("magmom", word) == 0)
 		{
-			start_magnetization = new double[ntype];
-			for(int i=0;i<ntype;i++)
-			{
-				start_magnetization[i]=0.0;
-			}
-			int n_has_input=0;
-			
+			n_mag_at=0;
 			stringstream sstr;
 			string s;
 			getline(ifs,s);
 			sstr.str(s);
+			int tmplength=s.length();
+    		int at_per_mag[tmplength];
+    		double mags[tmplength];
+    		int n_magmom=0;
 			s="";
 			//1 3*2 6*1 
 			while(sstr.good())
@@ -1773,37 +1771,37 @@ bool Input::Read(const std::string &fn)
 						exit(0);
 					}
 				}
-				//cout<<"s1 "<<s1<<" s2 "<<s2<<'h'<<n_has_input<<"\n";
+				cout<<"s1 "<<s1<<" s2 "<<s2<<'h'<<n_mag_at<<"\n";
 				double mag=stoi(s1);
 				if(mul)
 				{
 					int num=stoi(s2);
-					if (n_has_input+num>ntype)
-					{
-						std::cout<<"Too much start magnetic moment";
-						exit(0);
-					}
-					for(int i=0;i<num;i++)
-					{
-
-						start_magnetization[n_has_input+i]=mag;
-					}
-
-					n_has_input+=num;
+					mags[n_magmom]=mag;
+	    			at_per_mag[n_magmom]=num;
+					n_mag_at+=num;
 				}
 				else
 				{
-					if (n_has_input>=ntype)
-					{
-						std::cout<<"Too much start magnetic moment";
-						exit(0);
-					}
-					start_magnetization[n_has_input]=mag;
-					n_has_input+=1;
+					mags[n_magmom]=mag;
+	    			at_per_mag[n_magmom]=1;
+					n_mag_at+=1;
 				}
+				n_magmom+=1;
+			}
+			atom_mag = new double[n_mag_at];
+			int n_m=0;// the n_m value of magmom
+			int n_n=0;//how many magmom has been defined
+			for(int i=0;i<n_mag_at;i++)
+			{
+				if (i-n_n>=at_per_mag[n_m])
+				{
+					n_n+=at_per_mag[n_m];
+					n_m+=1;
+				}
+				atom_mag[i]=mags[n_m];
+				cout<<"atom_mag"<<atom_mag[i];
 			}	
 	input_mag=true;
-
 	}
 
 #endif
