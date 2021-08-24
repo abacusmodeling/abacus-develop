@@ -4,9 +4,9 @@
 
 void Exx_Opt_Orb::print_matrix(
 	const std::string &file_name,
-	const std::vector<matrix> &matrix_Q, 
-	const std::vector<std::vector<matrix>> &matrix_S,
-	const matrix &matrix_V,
+	const std::vector<ModuleBase::matrix> &matrix_Q, 
+	const std::vector<std::vector<ModuleBase::matrix>> &matrix_S,
+	const ModuleBase::matrix &matrix_V,
 	const size_t TA, const size_t IA, const size_t TB, const size_t IB,
 	const ModuleBase::Element_Basis_Index::Range &range_jles, 
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_jles) const

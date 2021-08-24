@@ -50,16 +50,16 @@ public:
 
     static void iweights(const int nks,const double *wk,const int nband,
                          const double &nelec, double **ekb, double &ef, 
-						matrix &wg, const int &is, const int *isk);
+						ModuleBase::matrix &wg, const int &is, const int *isk);
 
     static void gweights(const int nks,const double *wk,const int nband,
 						const double &nelec,const double &degauss,
                          const int ngauss,double **ekb, double &ef, 
-						double &demet, matrix &wg, const int &is, const int *isk);
+						double &demet, ModuleBase::matrix &wg, const int &is, const int *isk);
 
     static void tweights(const int nks,const int nspin,const int nband,
 						const double &nelec,const int ntetra,
-                         const matrix &tetra,double **ekb,double &ef,matrix &wg);
+                         const ModuleBase::matrix &tetra,double **ekb,double &ef,ModuleBase::matrix &wg);
 
     static double wsweight(const Vector3<double> &r, Vector3<double> *rws,const int nrws);
 
@@ -84,10 +84,10 @@ private:
     static void efermit(double **ekb,const int nband,
                         const int nks,const double &nelec,
                         const int nspin,const int ntetra,
-                        const matrix &tetra, double &ef);
+                        const ModuleBase::matrix &tetra, double &ef);
 
     static double sumkt(double **ekb,const int nband,const int nks,const int nspin,const int ntetra,
-                        const matrix &tetra,const double &eup);
+                        const ModuleBase::matrix &tetra,const double &eup);
 
     static void piksort(const int n, double *a);
 };

@@ -1,7 +1,7 @@
 #include"stress_func.h"
 
 //calculate the kinetic stress in PW base
-void Stress_Func::stress_kin(matrix& sigma)
+void Stress_Func::stress_kin(ModuleBase::matrix& sigma)
 {
 	double *kfac;
 	double **gk;

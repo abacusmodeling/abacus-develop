@@ -182,7 +182,7 @@ ofs.close();
 }
 
 
-matrix Exx_Abfs::Matrix_Orbs22::cal_overlap_matrix(
+ModuleBase::matrix Exx_Abfs::Matrix_Orbs22::cal_overlap_matrix(
 	const size_t TA,
 	const size_t TB,
 	const Vector3<double> &tauA,
@@ -195,7 +195,7 @@ matrix Exx_Abfs::Matrix_Orbs22::cal_overlap_matrix(
 {
 	TITLE("Exx_Abfs::Matrix_Orbs22","cal_overlap_matrix");
 
-	matrix m;
+	ModuleBase::matrix m;
 	switch(matrix_order)
 	{
 		case Matrix_Order::A1B1_A2B2:	m.create( index_A1[TA].count_size*index_B1[TB].count_size, index_A2[TA].count_size*index_B2[TB].count_size );	break;
@@ -267,7 +267,7 @@ matrix Exx_Abfs::Matrix_Orbs22::cal_overlap_matrix(
 }
 
 
-std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Exx_Abfs::Matrix_Orbs22::cal_overlap_matrix(
+std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> Exx_Abfs::Matrix_Orbs22::cal_overlap_matrix(
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_A1,
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_A2,
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_B1,
@@ -276,7 +276,7 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Exx_A
 std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 gettimeofday( &t_start, NULL);
-	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> matrixes;
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> matrixes;
 
 	for( const auto &co1 : center2_orb22_s )
 	{

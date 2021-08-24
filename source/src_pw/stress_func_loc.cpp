@@ -2,7 +2,7 @@
 #include "../module_base/math_integral.h"
 
 //calculate local pseudopotential stress in PW or VL_dVL stress in LCAO
-void Stress_Func::stress_loc(matrix& sigma, const bool is_pw)
+void Stress_Func::stress_loc(ModuleBase::matrix& sigma, const bool is_pw)
 {
     timer::tick("Stress_Func","stress_loc");
 

@@ -27,7 +27,7 @@ class Use_FFT
 	// From G space to real space. wave functions.
 	void ToRealSpace(const std::complex<double> *vg, std::complex<double> *vr);
 
-	void ToRealSpace(const int &is, const ModuleBase::ComplexMatrix &vg, matrix &v);
+	void ToRealSpace(const int &is, const ModuleBase::ComplexMatrix &vg, ModuleBase::matrix &v);
 
 	//---------------------------------------------------------------------
 

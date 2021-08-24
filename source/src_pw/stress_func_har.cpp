@@ -3,7 +3,7 @@
 #include "./H_Hartree_pw.h"
 
 //calculate the Hartree part in PW or LCAO base
-void Stress_Func::stress_har(matrix& sigma, const bool is_pw)
+void Stress_Func::stress_har(ModuleBase::matrix& sigma, const bool is_pw)
 {
 	timer::tick("Stress_Func","stress_har");
 	double shart;

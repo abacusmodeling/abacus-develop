@@ -59,7 +59,7 @@ void Lattice_Change_CG::allocate(void)
 	this->e0 = 0.0;	
 }
 
-void Lattice_Change_CG::start(const matrix &stress_in, const double& etot_in)
+void Lattice_Change_CG::start(const ModuleBase::matrix &stress_in, const double& etot_in)
 {
 	TITLE("Lattice_Change_CG","start");
 
@@ -105,7 +105,7 @@ void Lattice_Change_CG::start(const matrix &stress_in, const double& etot_in)
 		nbrent = 0;
 	}
 	
-	matrix stress(stress_in);
+	ModuleBase::matrix stress(stress_in);
 	Lattice_Change_Basic::setup_gradient(lat, grad, stress);
 	// use energy_in and istep to setup etot and etot_old.
 	Lattice_Change_Basic::setup_etot(etot_in, 0);

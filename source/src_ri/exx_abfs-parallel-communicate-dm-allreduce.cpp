@@ -11,7 +11,7 @@
 
 Exx_Abfs::Parallel::Communicate::DM::Allreduce::Allreduce( 
 	const MPI_Comm & mpi_comm_in, 
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local_in,
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &data_local_in,
 	const Abfs::Vector3_Order<int> &Born_von_Karman_period,
 	const set<std::pair<size_t,size_t>> &H_atom_pairs_core)
 	:mpi_comm(mpi_comm_in),
@@ -89,7 +89,7 @@ Exx_Abfs::Parallel::Communicate::DM::Allreduce::~Allreduce()
 
 
 
-std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>>
+std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>>
 Exx_Abfs::Parallel::Communicate::DM::Allreduce::grid_to_exx()
 {
 timeval t_start;
@@ -338,32 +338,32 @@ ofs_thread.close();
 
 
 void Exx_Abfs::Parallel::Communicate::DM::Allreduce::insert_data( 
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_rank )
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &data_rank )
 {
-	std::vector<const std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>*> data_rank_Ap(GlobalV::NSPIN,nullptr);
-	std::vector<const std::map<Abfs::Vector3_Order<int>,matrix>*> data_rank_Bp(GlobalV::NSPIN,nullptr);
-	std::vector<const matrix*> data_rank_Cp(GlobalV::NSPIN,nullptr);
+	std::vector<const std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>*> data_rank_Ap(GlobalV::NSPIN,nullptr);
+	std::vector<const std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>*> data_rank_Bp(GlobalV::NSPIN,nullptr);
+	std::vector<const ModuleBase::matrix*> data_rank_Cp(GlobalV::NSPIN,nullptr);
 std::ofstream ofs_mpi("allreduce_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);	
 ofs_mpi<<"insert_data"<<std::endl;
 	
 	for( auto atom_unset_Ap=atom_unset.begin(); atom_unset_Ap!=atom_unset.end(); )
 	{
 		const size_t iat1 = atom_unset_Ap->first;
-		for( int is=0; is!=GlobalV::NSPIN; ++is )	data_rank_Ap[is] = static_cast<const std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>*>( ModuleBase::GlobalFunc::MAP_EXIST( data_rank[is], iat1 ) );
+		for( int is=0; is!=GlobalV::NSPIN; ++is )	data_rank_Ap[is] = static_cast<const std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>*>( ModuleBase::GlobalFunc::MAP_EXIST( data_rank[is], iat1 ) );
 		if( !data_rank_Ap[0] ){ ++atom_unset_Ap; continue; }
 //ofs_mpi<<" "<<iat1<<std::endl;
 		
 		for( auto atom_unset_Bp=atom_unset_Ap->second.begin(); atom_unset_Bp!=atom_unset_Ap->second.end(); )
 		{
 			const size_t iat2 = atom_unset_Bp->first;
-			for( int is=0; is!=GlobalV::NSPIN; ++is )	data_rank_Bp[is] = static_cast<const std::map<Abfs::Vector3_Order<int>,matrix>*>( ModuleBase::GlobalFunc::MAP_EXIST( *data_rank_Ap[is], iat2 ) );
+			for( int is=0; is!=GlobalV::NSPIN; ++is )	data_rank_Bp[is] = static_cast<const std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>*>( ModuleBase::GlobalFunc::MAP_EXIST( *data_rank_Ap[is], iat2 ) );
 			if( !data_rank_Bp[0] ){ ++atom_unset_Bp; continue; }
 //ofs_mpi<<"  "<<iat2<<std::endl;
 		
 			for( auto atom_unset_Cp=atom_unset_Bp->second.begin(); atom_unset_Cp!=atom_unset_Bp->second.end(); )
 			{
 				const Abfs::Vector3_Order<int> &box2 = *atom_unset_Cp;
-				for( int is=0; is!=GlobalV::NSPIN; ++is )	data_rank_Cp[is] = static_cast<const matrix*>( ModuleBase::GlobalFunc::MAP_EXIST( *data_rank_Bp[is], box2 ) );
+				for( int is=0; is!=GlobalV::NSPIN; ++is )	data_rank_Cp[is] = static_cast<const ModuleBase::matrix*>( ModuleBase::GlobalFunc::MAP_EXIST( *data_rank_Bp[is], box2 ) );
 				if( !data_rank_Cp[0] ){ ++atom_unset_Cp; continue; }
 //ofs_mpi<<"   "<<box2<<std::endl;
 				
@@ -492,19 +492,19 @@ Exx_Abfs::Parallel::Communicate::DM::Allreduce::get_data_local_wrapper(
 		for( const auto & atom_asked_A : atom_asked )
 		{
 			const size_t iat1 = atom_asked_A.first;
-			if( auto data_local_A = static_cast<const std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>> * const>(ModuleBase::GlobalFunc::MAP_EXIST( data_local_is, iat1 )) )
+			if( auto data_local_A = static_cast<const std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>> * const>(ModuleBase::GlobalFunc::MAP_EXIST( data_local_is, iat1 )) )
 			{
 				auto &mw_A = mw_is[iat1];
 				for( const auto & atom_asked_B : atom_asked_A.second )
 				{
 					const size_t iat2 = atom_asked_B.first;
-					if( auto data_local_B = static_cast<const std::map<Abfs::Vector3_Order<int>,matrix> * const>(ModuleBase::GlobalFunc::MAP_EXIST( *data_local_A, iat2 )) )
+					if( auto data_local_B = static_cast<const std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix> * const>(ModuleBase::GlobalFunc::MAP_EXIST( *data_local_A, iat2 )) )
 					{
 						auto &mw_B = mw_A[iat2];
 						for( const auto & atom_asked_C : atom_asked_B.second )
 						{
 							const Abfs::Vector3_Order<int> &box2 = atom_asked_C;
-							if( auto data_local_C = static_cast<const matrix * const>(ModuleBase::GlobalFunc::MAP_EXIST( *data_local_B, box2 )) )
+							if( auto data_local_C = static_cast<const ModuleBase::matrix * const>(ModuleBase::GlobalFunc::MAP_EXIST( *data_local_B, box2 )) )
 							{
 								mw_B[box2] = *data_local_C;
 							}

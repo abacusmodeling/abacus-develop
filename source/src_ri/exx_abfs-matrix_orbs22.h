@@ -36,7 +36,7 @@ public:
 	void init_radial_table( const std::map<size_t,std::map<size_t,std::set<double>>> &Rs );		// unit is ucell.lat0
 
 	enum class Matrix_Order{A1B1_A2B2};
-	matrix cal_overlap_matrix(  
+	ModuleBase::matrix cal_overlap_matrix(  
 		const size_t TA, 
 		const size_t TB, 
 		const Vector3<double> &tauA,
@@ -46,7 +46,7 @@ public:
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_B1,
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_B2,
 		const Matrix_Order &matrix_order) const;
-	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> cal_overlap_matrix(
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> cal_overlap_matrix(
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_A1, 
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_A2, 
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_B1, 

@@ -12,7 +12,7 @@
 
 Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::Allreduce(
 	const MPI_Comm & mpi_comm_in,
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local_in )
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &data_local_in )
 	:mpi_comm(mpi_comm_in),
 	 data_local(data_local_in),
 	 lock_insert(ATOMIC_FLAG_INIT)
@@ -74,7 +74,7 @@ Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::~Allreduce()
 
 
 
-std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>>
+std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>>
 Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::exx_to_a2D()
 {
 	auto clear_oars = [&]( std::vector<MPI_Request> &requests, boost::dynamic_bitset<> &flags, std::vector<boost::mpi::packed_oarchive*> &oarps, const std::string &s )

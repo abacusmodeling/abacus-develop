@@ -589,7 +589,7 @@ void Vdwd3::get_dc6_dcnij(int &mxci, int &mxcj, double &cni, double &cnj, int &i
 	}
 }
 
-void Vdwd3::pbcgdisp(std::vector<Vector3<double>> &g, matrix &sigma)
+void Vdwd3::pbcgdisp(std::vector<Vector3<double>> &g, ModuleBase::matrix &sigma)
 {
 	init(ucell);
 	std::vector<double> c6save(ucell.nat*(ucell.nat+1)), dc6_rest_sum(ucell.nat*(ucell.nat+1)/2), dc6i(ucell.nat), cn(ucell.nat);
@@ -1207,7 +1207,7 @@ void Vdwd3::cal_force()
 	std::vector<Vector3<double>> g;
 	g.clear();
 	g.resize(ucell.nat);
-	matrix sigma(3, 3);
+	ModuleBase::matrix sigma(3, 3);
 
 	pbcgdisp(g, sigma);
 
@@ -1223,7 +1223,7 @@ void Vdwd3::cal_stress()
 	std::vector<Vector3<double>> g;
 	g.clear();
 	g.resize(ucell.nat);
-	matrix sigma(3, 3);
+	ModuleBase::matrix sigma(3, 3);
 
 	pbcgdisp(g, sigma);
 	

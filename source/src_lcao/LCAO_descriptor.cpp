@@ -701,7 +701,7 @@ void LCAO_Descriptor::cal_v_delta(const std::string& model_file)
     return;
 }
 
-void LCAO_Descriptor::cal_f_delta(matrix& dm)
+void LCAO_Descriptor::cal_f_delta(ModuleBase::matrix& dm)
 {
     TITLE("LCAO_Descriptor", "cal_f_delta");
     int iat = 0;    //check if the index same as GlobalC::ucell.iw2iat or not !!
@@ -914,7 +914,7 @@ void LCAO_Descriptor::save_npy_e(double& ebase)
     return;
 }
 
-void LCAO_Descriptor::save_npy_f(matrix& fbase)
+void LCAO_Descriptor::save_npy_f(ModuleBase::matrix& fbase)
 {
     //save f_base
     //caution: unit: Rydberg/Bohr

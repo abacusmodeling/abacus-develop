@@ -256,9 +256,9 @@ std::vector<std::vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 
 void Exx_Abfs::IO::print_matrix( 
 		const std::string &file_name_prefix, 
-		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &matrixes_Q, 
-		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &matrixes_S,
-		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &matrixes_V,
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> &matrixes_Q, 
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> &matrixes_S,
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> &matrixes_V,
 		const ModuleBase::Element_Basis_Index::Range &range_jles, 
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_jles, 
 		const ModuleBase::Element_Basis_Index::Range &range_lcaos,
@@ -371,7 +371,7 @@ void Exx_Abfs::IO::print_matrix(
 							for( size_t NB=0; NB!=range_lcaos[TB][LB].N; ++NB )	
 								for( size_t MB=0; MB!=range_lcaos[TB][LB].M; ++MB )
 								{
-									const std::vector<matrix> & matrix_Q = matrixes_Q.at(TA).at(IA).at(TB).at(IB);
+									const std::vector<ModuleBase::matrix> & matrix_Q = matrixes_Q.at(TA).at(IA).at(TB).at(IB);
 									const size_t index_lcao 
 										= Exx_Abfs::Abfs_Index::get_index_index( 
 											index_lcaos,TA,LA,NA,MA, 
@@ -412,7 +412,7 @@ void Exx_Abfs::IO::print_matrix(
 		---------------------*/		
 		auto q1q2 = [&]( size_t T1, size_t I1, size_t T2, size_t I2, size_t L1, size_t M1, size_t L2, size_t M2)
 		{
-			const matrix & matrix_S = matrixes_S.at(T1).at(I1).at(T2).at(I2);
+			const ModuleBase::matrix & matrix_S = matrixes_S.at(T1).at(I1).at(T2).at(I2);
 			for( size_t N1=0; N1!=range_jles[T1][L1].N; ++N1)
 				for( size_t N2=0; N2!=range_jles[T2][L2].N; ++N2)
 					ofs<< matrix_S( index_jles[T1][L1][N1][M1], index_jles[T2][L2][N2][M2] ) * scale << "\t" << 0.0 * scale << std::endl;
@@ -468,7 +468,7 @@ void Exx_Abfs::IO::print_matrix(
 		---------------------*/
 		ofs << "<OVERLAP_V>" << std::endl;
 		
-		const matrix & matrix_V = matrixes_V.at(TA).at(IA).at(TB).at(IB);
+		const ModuleBase::matrix & matrix_V = matrixes_V.at(TA).at(IA).at(TB).at(IB);
 		
 		for( int ik=0; ik!=GlobalC::kv.nkstot; ++ik )
 	//		for ib = 0 to GlobalV::NBANDS

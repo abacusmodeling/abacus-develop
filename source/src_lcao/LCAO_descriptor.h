@@ -28,7 +28,7 @@ public:
 
 
 	void cal_v_delta(const std::string& model_file);//<psi|V_delta|psi>
-	void cal_f_delta(matrix& dm);	//pytorch term remaining!
+	void cal_f_delta(ModuleBase::matrix& dm);	//pytorch term remaining!
 	void print_H_V_delta();
 	void print_F_delta();
 
@@ -39,14 +39,14 @@ public:
     and get l_e_delta and l_f_delta corresponding to the exact e,f data.*/
 	void save_npy_d();
 	void save_npy_e(double& ebase);	//Ry
-	void save_npy_f(matrix& fbase);//Ry
+	void save_npy_f(ModuleBase::matrix& fbase);//Ry
 
 	//deepks E_delta(Ry)
 	double E_delta = 0.0;
 	//deepks V_delta, to be added to Hamiltonian matrix
 	double* H_V_delta;
 	//deepks F_delta(Ry/Bohr), to be added to atom force
-	matrix	F_delta;
+	ModuleBase::matrix	F_delta;
 
 private:
 	torch::jit::script::Module module;
@@ -119,7 +119,7 @@ private:
 	void init_gdmx();
 	void load_model(const std::string& model_file);
 	void cal_gedm();	//need to load model in this step
-	void cal_gdmx(matrix& dm);	//dD/dX
+	void cal_gdmx(ModuleBase::matrix& dm);	//dD/dX
 	void del_gdmx();
 
 	void getdm(double* dm);

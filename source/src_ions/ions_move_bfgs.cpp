@@ -35,7 +35,7 @@ void Ions_Move_BFGS::allocate()
 	return;
 }
 
-void Ions_Move_BFGS::start(const matrix& force, const double &energy_in)
+void Ions_Move_BFGS::start(const ModuleBase::matrix& force, const double &energy_in)
 {
 	TITLE("Ions_Move_BFGS","start");
 	

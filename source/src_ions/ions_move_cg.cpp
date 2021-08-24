@@ -56,7 +56,7 @@ void Ions_Move_CG::allocate(void)
 	this->e0 = 0.0;
 }
 
-void Ions_Move_CG::start(const matrix& force, const double& etot_in)
+void Ions_Move_CG::start(const ModuleBase::matrix& force, const double& etot_in)
 {
 	TITLE("Ions_Move_CG","start");
 	assert(dim>0);

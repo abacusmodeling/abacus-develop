@@ -769,7 +769,7 @@ void toWannier90::produce_trial_in_pw(const int &ik, ModuleBase::ComplexMatrix &
 	const int npw = GlobalC::kv.ngk[ik];
 	const int npwx = GlobalC::wf.npwx;
 	const int total_lm = 16;
-	matrix ylm(total_lm,npw);               //�������͵���г����
+	ModuleBase::matrix ylm(total_lm,npw);               //�������͵���г����
 	//matrix wannier_ylm(num_wannier,npw);    //Ҫ��̽�����ʹ�õ���г����
 	double bs2, bs3, bs6, bs12;
 	bs2 = 1.0/sqrt(2.0);
@@ -795,11 +795,11 @@ void toWannier90::produce_trial_in_pw(const int &ik, ModuleBase::ComplexMatrix &
 	const int mesh_r = 333; 		//��������������Ҫ�ĸ����
 	const double dx = 0.025; 		//�̶�������������ɷǹ̶������dr����߾���,���ֵ������
 	const double x_min = -6.0;  	// ��������dr��r����ʼ��
-	matrix r(num_wannier,mesh_r);   //��ͬalfa�ľ�������r
-	matrix dr(num_wannier,mesh_r);  //��ͬalfa�ľ�������ÿ��r��ļ��
-	matrix psi(num_wannier,mesh_r); //������psi in ʵ�ռ�
-	matrix psir(num_wannier,mesh_r);// psi * r in ʵ�ռ�
-	matrix psik(num_wannier,npw);   //��������ĳ��k���µ��ռ��ͶӰ
+	ModuleBase::matrix r(num_wannier,mesh_r);   //��ͬalfa�ľ�������r
+	ModuleBase::matrix dr(num_wannier,mesh_r);  //��ͬalfa�ľ�������ÿ��r��ļ��
+	ModuleBase::matrix psi(num_wannier,mesh_r); //������psi in ʵ�ռ�
+	ModuleBase::matrix psir(num_wannier,mesh_r);// psi * r in ʵ�ռ�
+	ModuleBase::matrix psik(num_wannier,npw);   //��������ĳ��k���µ��ռ��ͶӰ
 	
 	// ����r,dr
 	for(int i = 0; i < num_wannier; i++)
@@ -1334,8 +1334,8 @@ void toWannier90::produce_trial_in_pw(const int &ik, ModuleBase::ComplexMatrix &
 }
 
 // ע����������Lֵ�����Ǵ��ڵ���0��
-void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orbital_L, const int orbital_m, matrix &ylm, 
-										matrix &dr, matrix &r, matrix &psir, const int mesh_r, 
+void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orbital_L, const int orbital_m, ModuleBase::matrix &ylm, 
+										ModuleBase::matrix &dr, ModuleBase::matrix &r, ModuleBase::matrix &psir, const int mesh_r, 
 										Vector3<double> *gk, const int npw, ModuleBase::ComplexMatrix &trial_orbitals_k)
 {
 	//���㾶������ĳ��k���µ��ռ��ͶӰ

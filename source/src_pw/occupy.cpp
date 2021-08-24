@@ -226,7 +226,7 @@ void Occupy::iweights
     const double &nelec, //number of electrons for this spin direction.
     double **ekb,//the array save the band energy.
     double &ef,//output: the highest occupied Kohn-Sham level.
-    matrix &wg,//output: weight for each k, each band.
+    ModuleBase::matrix &wg,//output: weight for each k, each band.
     const int &is,//the spin index now.
     const int *isk//distinguish k point belong to which spin.
 )
@@ -312,7 +312,7 @@ void Occupy::gweights(
     double **ekb,//save the band energy.
     double &ef,//ouput: fermi level
     double &demet,//output: energy correction for metal
-    matrix &wg,//output: weight of each band at each k point.
+    ModuleBase::matrix &wg,//output: weight of each band at each k point.
 	const int &is, // spin
 	const int *isk) // array to point out each k belong to which spin
 {
@@ -682,7 +682,7 @@ double Occupy::w1gauss(const double &x,const int n)
 
 
 void Occupy::tweights(const int nks,const int nspin,const int nband,const double &nelec,
-                      const int ntetra,const matrix &tetra, double **ekb, double &ef, matrix &wg)
+                      const int ntetra,const ModuleBase::matrix &tetra, double **ekb, double &ef, ModuleBase::matrix &wg)
 {
     //===================================================================
     // calculates weights with the tetrahedron method (Bloechl version)
@@ -874,7 +874,7 @@ double Occupy::wsweight(const Vector3<double> &r, Vector3<double> *rws,const int
 } // end function wsweight
 
 void Occupy::efermit(double** ekb,const int nband,const int nks,const double &nelec,const int nspin,
-                     const int ntetra,const matrix &tetra, double &ef)
+                     const int ntetra,const ModuleBase::matrix &tetra, double &ef)
 {
     //=======================================================
     // Finds the Fermi energy - tetrahedron method (Bloechl)
@@ -980,7 +980,7 @@ void Occupy::efermit(double** ekb,const int nband,const int nks,const double &ne
 
 
 double Occupy::sumkt(double** ekb,const int nband,const int nks,const int nspin,const int ntetra,
-                     const matrix &tetra,const double &e)
+                     const ModuleBase::matrix &tetra,const double &e)
 {
     double etetra[4];
     double sum = 0.0;

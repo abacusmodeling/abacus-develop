@@ -242,7 +242,7 @@ void Numerical_Descriptor::jlq3d_overlap(
 	const double normalization = (4 * PI) / sqrt(GlobalC::ucell.omega);// Peize Lin add normalization 2015-12-29
 
     const int total_lm = ( this->lmax + 1) * ( this->lmax + 1);
-    matrix ylm(total_lm, np);
+    ModuleBase::matrix ylm(total_lm, np);
 
     Vector3<double> *gk = new Vector3 <double> [np];
     for (int ig=0; ig<np; ig++)

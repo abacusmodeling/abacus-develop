@@ -17,7 +17,7 @@ pseudopot_cell_vl::~pseudopot_cell_vl()
 }
 
 
-void pseudopot_cell_vl::init_vloc(const int &nggm, matrix &vloc_in)
+void pseudopot_cell_vl::init_vloc(const int &nggm, ModuleBase::matrix &vloc_in)
 {
 	TITLE("pseudopot_cell_vl","init_vloc");
 

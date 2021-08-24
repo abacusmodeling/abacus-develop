@@ -149,11 +149,11 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 
 	const int npw = GlobalC::kv.ngk[ik];
 	int ig, ia, nb, ih;
-	matrix vkb1(nhm, npw);
+	ModuleBase::matrix vkb1(nhm, npw);
 	double *vq = new double[npw];
 	const int x1= (lmaxkb + 1)*(lmaxkb + 1);
 
-	matrix ylm(x1, npw);
+	ModuleBase::matrix ylm(x1, npw);
 	Vector3<double> *gk = new Vector3<double>[npw];
 	for (ig = 0;ig < npw;ig++) 
 	{
@@ -447,7 +447,7 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 	double *vq = new double[npw];
 	const int x1= (lmaxkb + 2)*(lmaxkb + 2);
 
-	matrix ylm(x1, npw);
+	ModuleBase::matrix ylm(x1, npw);
 	Vector3<double> *gk = new Vector3<double>[npw];
 	for (ig = 0;ig < npw;ig++) 
 	{

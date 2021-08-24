@@ -20,7 +20,7 @@
 //XC_FAMILY_LDA, XC_FAMILY_GGA, XC_FAMILY_HYB_GGA, XC_CORRELATION: internal flags used in LIBXC, denote the types of functional associated with a certain functional ID, definition can be found in xc.h from LIBXC
 
 // [etxc, vtxc, v] = Potential_Libxc::v_xc(...)
-std::tuple<double,double,matrix> Potential_Libxc::v_xc(
+std::tuple<double,double,ModuleBase::matrix> Potential_Libxc::v_xc(
 	const double * const * const rho_in,
 	const double * const rho_core_in)
 {
@@ -29,7 +29,7 @@ std::tuple<double,double,matrix> Potential_Libxc::v_xc(
 
     double etxc = 0.0;
     double vtxc = 0.0;
-	matrix v(GlobalV::NSPIN,GlobalC::pw.nrxx);
+	ModuleBase::matrix v(GlobalV::NSPIN,GlobalC::pw.nrxx);
 
 	if(GlobalV::VXC_IN_H == 0 )
 	{

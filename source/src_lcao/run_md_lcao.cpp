@@ -315,10 +315,10 @@ void Run_MD_LCAO::final_scf(void)
     return;
 }
 
-void Run_MD_LCAO::callInteraction_LCAO(const int& numIon, Vector3<double>* force, matrix& stress_lcao)
+void Run_MD_LCAO::callInteraction_LCAO(const int& numIon, Vector3<double>* force, ModuleBase::matrix& stress_lcao)
 {
 //to call the force of each atom
-	matrix fcs;//temp force matrix
+	ModuleBase::matrix fcs;//temp force matrix
 	Force_Stress_LCAO FSL;
 	FSL.allocate (); 
 	FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS, GlobalV::TEST_FORCE, GlobalV::TEST_STRESS, fcs, stress_lcao);

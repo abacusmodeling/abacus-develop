@@ -12,14 +12,14 @@ Force_LCAO_gamma::~Force_LCAO_gamma ()
 void Force_LCAO_gamma::ftable_gamma (
 	const bool isforce,
 	const bool isstress,
-	matrix& foverlap,
-	matrix& ftvnl_dphi,
-	matrix& fvnl_dbeta,	
-	matrix& fvl_dphi,
-	matrix& soverlap,
-	matrix& stvnl_dphi,
-	matrix& svnl_dbeta,
-	matrix& svl_dphi)
+	ModuleBase::matrix& foverlap,
+	ModuleBase::matrix& ftvnl_dphi,
+	ModuleBase::matrix& fvnl_dbeta,	
+	ModuleBase::matrix& fvl_dphi,
+	ModuleBase::matrix& soverlap,
+	ModuleBase::matrix& stvnl_dphi,
+	ModuleBase::matrix& svnl_dbeta,
+	ModuleBase::matrix& svl_dphi)
 {
     TITLE("Force_LCAO_gamma", "ftable");
     timer::tick("Force_LCAO_gamma","ftable_gamma");
@@ -44,7 +44,7 @@ void Force_LCAO_gamma::ftable_gamma (
     {
         timer::tick("Force_LCAO_gamma","cal_dm_grid");
         // calculate the 'density matrix' here.
-        matrix dm2d;
+        ModuleBase::matrix dm2d;
 		dm2d.create(GlobalV::NSPIN, GlobalC::ParaO.nloc);
         Memory::record ("Force_LCAO_gamma", "dm2d", GlobalC::ParaO.nloc*GlobalV::NSPIN, "double");    
 

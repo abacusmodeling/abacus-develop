@@ -245,7 +245,7 @@ void WF_atomic::atomic_wfc
     // WF_atomictions for a given k-point.
     //=========================================================
     const int total_lm = (lmax_wfc + 1) * (lmax_wfc + 1);
-    matrix ylm(total_lm, np);
+    ModuleBase::matrix ylm(total_lm, np);
     std::complex<double> *aux = new std::complex<double>[np];
     double *chiaux = new double[1];
 

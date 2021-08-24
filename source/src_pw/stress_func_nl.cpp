@@ -3,7 +3,7 @@
 #include "../module_base/math_ylmreal.h"
 
 //calculate the nonlocal pseudopotential stress in PW
-void Stress_Func::stress_nl(matrix& sigma){
+void Stress_Func::stress_nl(ModuleBase::matrix& sigma){
 	TITLE("Stress_Func","stres_nl");
 	timer::tick("Stress_Func","stres_nl");
 	
@@ -236,12 +236,12 @@ void Stress_Func::get_dvnl1
 	const int npw = GlobalC::kv.ngk[ik];
 	const int nhm = GlobalC::ppcell.nhm;
 	int ig, ia, nb, ih;
-	matrix vkb1(nhm, npw);
+	ModuleBase::matrix vkb1(nhm, npw);
 	vkb1.zero_out();
 	double *vq = new double[npw];
 	const int x1= (lmaxkb + 1)*(lmaxkb + 1);
 
-	matrix dylm(x1, npw);
+	ModuleBase::matrix dylm(x1, npw);
 	Vector3<double> *gk = new Vector3<double>[npw];
 	for (ig = 0;ig < npw;ig++)
 	{
@@ -329,11 +329,11 @@ void Stress_Func::get_dvnl2(ModuleBase::ComplexMatrix &vkb,
 	const int npw = GlobalC::kv.ngk[ik];
 	const int nhm = GlobalC::ppcell.nhm;
 	int ig, ia, nb, ih;
-	matrix vkb1(nhm, npw);
+	ModuleBase::matrix vkb1(nhm, npw);
 	double *vq = new double[npw];
 	const int x1= (lmaxkb + 1)*(lmaxkb + 1);
 
-	matrix ylm(x1, npw);
+	ModuleBase::matrix ylm(x1, npw);
 	Vector3<double> *gk = new Vector3<double>[npw];
 	for (ig = 0;ig < npw;ig++)
 	{
@@ -438,7 +438,7 @@ void Stress_Func::dylmr2 (
 	const int nylm,
 	const int ngy,
 	Vector3<double> *gk,
-	matrix &dylm,
+	ModuleBase::matrix &dylm,
 	const int ipol)
 {
   //-----------------------------------------------------------------------
@@ -463,7 +463,7 @@ void Stress_Func::dylmr2 (
 	const double delta = 1e-6;
 	double *dg, *dgi;
 
-	matrix ylmaux;
+	ModuleBase::matrix ylmaux;
 	// dg is the finite increment for numerical derivation:
 	// dg = delta |G| = delta * sqrt(gg)
 	// dgi= 1 /(delta * sqrt(gg))

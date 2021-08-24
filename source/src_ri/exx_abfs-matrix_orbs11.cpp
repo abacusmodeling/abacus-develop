@@ -192,11 +192,11 @@ void Exx_Abfs::Matrix_Orbs11::init_radial_table()
 }
 */
 /*
-std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Matrix_Orbs11::cal_overlap_matrix( 
+std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> Matrix_Orbs11::cal_overlap_matrix( 
 	const Exx_Abfs::Abfs_Index::Index &index_r, 
 	const Exx_Abfs::Abfs_Index::Index &index_c )
 {
-	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> matrix_V;
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> matrix_V;
 	
 	for( auto &co1 : center2_orb11_s )
 	{
@@ -249,7 +249,7 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Matri
 }
 */
 
-matrix Exx_Abfs::Matrix_Orbs11::cal_overlap_matrix( 
+ModuleBase::matrix Exx_Abfs::Matrix_Orbs11::cal_overlap_matrix( 
 	const size_t TA, 
 	const size_t TB, 
 	const Vector3<double> &tauA,
@@ -259,7 +259,7 @@ matrix Exx_Abfs::Matrix_Orbs11::cal_overlap_matrix(
 {
 //	TITLE("Exx_Abfs::Matrix_Orbs11","cal_overlap_matrix");
 	
-	matrix m( index_r[TA].count_size, index_c[TB].count_size );
+	ModuleBase::matrix m( index_r[TA].count_size, index_c[TB].count_size );
 	
 	for( const auto &co3 : center2_orb11_s.at(TA).at(TB) )
 	{
@@ -290,7 +290,7 @@ matrix Exx_Abfs::Matrix_Orbs11::cal_overlap_matrix(
 	return m;
 }
 
-std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Exx_Abfs::Matrix_Orbs11::cal_overlap_matrix( 
+std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> Exx_Abfs::Matrix_Orbs11::cal_overlap_matrix( 
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_r, 
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_c ) const
 {
@@ -299,7 +299,7 @@ timeval t_start;
 gettimeofday( &t_start, NULL);
 	TITLE("Exx_Abfs::Matrix_Orbs11","cal_overlap_matrix");
 	
-	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> matrixes;
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> matrixes;
 	
 	for( const auto &co1 : center2_orb11_s )
 	{

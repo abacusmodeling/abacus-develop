@@ -16,7 +16,7 @@ double Lattice_Change_Basic::lattice_change_ini = 0.01; // default is 0.5
 
 int Lattice_Change_Basic::out_stru=0;
 
-void Lattice_Change_Basic::setup_gradient(double* lat, double *grad, matrix &stress)
+void Lattice_Change_Basic::setup_gradient(double* lat, double *grad, ModuleBase::matrix &stress)
 {
 	TITLE("Lattice_Change_Basic","setup_gradient");
 	
@@ -142,7 +142,7 @@ void Lattice_Change_Basic::change_lattice(double *move, double *lat)
 	return;
 }
 
-void Lattice_Change_Basic::check_converged(matrix &stress, double *grad)
+void Lattice_Change_Basic::check_converged(ModuleBase::matrix &stress, double *grad)
 {
 	TITLE("Lattice_Change_Basic","check_converged");
 

@@ -26,11 +26,11 @@ class Potential_Libxc
 	// by using the input charge density rho_in and rho_core_in
 	//------------------------------------------------
 	// [etxc, vtxc, v] = v_xc(...)
-	static std::tuple<double,double,matrix> v_xc(
+	static std::tuple<double,double,ModuleBase::matrix> v_xc(
 		const double * const * const rho_in,
 		const double * const rho_core_in);
 	
-	static std::tuple<double,double,matrix,matrix> v_xc_meta(
+	static std::tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> v_xc_meta(
 		const double * const * const rho_in,
 		const double * const rho_core_in,
 		const double * const * const kin_r_in);

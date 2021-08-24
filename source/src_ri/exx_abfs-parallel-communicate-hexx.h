@@ -21,7 +21,7 @@ class Exx_Abfs::Parallel::Communicate::Hexx
 {
 public:
 	void Rexx_to_Km2D(
-		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &HR_exx,
+		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &HR_exx,
 		const std::pair<bool,bool> &io_HR_a2D );
 
 private:
@@ -33,13 +33,13 @@ private:
 //	template< typename T >
 //	T a2D_to_m2D( const std::map<size_t,std::map<size_t,T>> & H_a2D ) const;
 	template<typename T>
-	inline T H_phase(matrix &&HR, const int ik, const Abfs::Vector3_Order<int> &box2) const;
+	inline T H_phase(ModuleBase::matrix &&HR, const int ik, const Abfs::Vector3_Order<int> &box2) const;
 	template<typename Tmatrix>
 	Tmatrix Ra2D_to_Km2D(
-		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &HR_a2D, const int ik) const;
+		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &HR_a2D, const int ik) const;
 	template<typename Tmatrix>
 	void Ra2D_to_Km2D_mixing(
-		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &HR_a2D,
+		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &HR_a2D,
 		std::vector<Tmatrix> &HK_m2D,
 		std::vector<std::deque<Tmatrix>> &HK_m2D_pulay_seq) const;
 	template<typename T>
@@ -51,9 +51,9 @@ private:
 	public:
 		Allreduce(
 			const MPI_Comm &mpi_comm_in,
-			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local_in );
+			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &data_local_in );
 		~Allreduce();
-		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> exx_to_a2D();
+		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> exx_to_a2D();
 
 	private:
 		void set_atom_in_2D();
@@ -66,8 +66,8 @@ private:
 			const std::pair<std::vector<bool>,std::vector<bool>> &atom_asked ) const;
 
 	private:
-		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> data_all;
-		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local;
+		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> data_all;
+		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &data_local;
 
 		std::pair< std::vector<bool>, std::vector<bool> > atom_in_2D;
 
@@ -97,8 +97,8 @@ private:
 		void init(
 			const MPI_Comm &mpi_comm_in,
 			const std::set<std::pair<size_t,size_t>> &H_atom_pairs_core);
-		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> exx_to_a2D(
-			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local) const;
+		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> exx_to_a2D(
+			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &data_local) const;
 
 	private:
 		enum class Flag_Send {undo, begin_oar, finish_oar, begin_isend, finish_isend};
@@ -119,18 +119,18 @@ private:
 			const std::vector<std::atomic<Flag_Send>> &flags_send) const;
 		void send_data_process(
 			const int rank_send_now,
-			const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local,
+			const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &data_local,
 			std::vector<std::valarray<double>> &oars_isend,
 			std::vector<std::atomic<Flag_Send>> &flags_send) const;
 		void recv_data_process(
 			const int rank_recv,
-			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_all,
+			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &data_all,
 			std::vector<std::valarray<double>> &iarps_irecv,
 			std::vector<std::atomic<Flag_Recv>> &flags_recv,
 			std::atomic_flag &lock_insert) const;			
 		void insert_data(
-			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_rank,
-			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_all) const;
+			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &data_rank,
+			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &data_all) const;
 
 	private:
 		MPI_Comm mpi_comm;
@@ -144,9 +144,9 @@ private:
 	#endif
 
 public:
-	std::vector<matrix>        HK_Gamma_m2D;
+	std::vector<ModuleBase::matrix>        HK_Gamma_m2D;
 	std::vector<ModuleBase::ComplexMatrix> HK_K_m2D;
-	std::vector<std::deque<matrix>>        HK_Gamma_m2D_pulay_seq;
+	std::vector<std::deque<ModuleBase::matrix>>        HK_Gamma_m2D_pulay_seq;
 	std::vector<std::deque<ModuleBase::ComplexMatrix>> HK_K_m2D_pulay_seq;
 
 	enum class Mixing_Mode{ No, Plain, Pulay };

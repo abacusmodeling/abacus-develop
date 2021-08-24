@@ -494,7 +494,7 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 		}
 	}
 
-	matrix wg_local(GlobalV::NSPIN,band_local);
+	ModuleBase::matrix wg_local(GlobalV::NSPIN,band_local);
 	for(int id=0, Total_Bands=0; id <= lastband_in_proc; ++id)
 	{
 		if(myid == id)
@@ -512,7 +512,7 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 
 	for( int is=0; is<GlobalV::NSPIN; ++is )
 	{
-		matrix Z_wg( GlobalV::NLOCAL, band_local );
+		ModuleBase::matrix Z_wg( GlobalV::NLOCAL, band_local );
 		if(myid <= lastband_in_proc)
 		{
 			for(int iw=0; iw<GlobalV::NLOCAL; iw++)
@@ -526,9 +526,9 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 
 		const int row_col = (GlobalV::NLOCAL%300) ? GlobalV::NLOCAL/300+1 : GlobalV::NLOCAL/300;
 
-		matrix Z_row;
-		matrix Z_col;
-		matrix rho_row_col;
+		ModuleBase::matrix Z_row;
+		ModuleBase::matrix Z_col;
+		ModuleBase::matrix rho_row_col;
 
 		for(int row_count=0; row_count<row_col; row_count++)
 		{

@@ -571,7 +571,7 @@ void LCAO_Orbitals::Read_NonLocal(
 	// this needed to be modified.	
 	//-------------------------------------------
 	int nproj_allowed = nlmax+1;
-	matrix coefficient_D_in(nproj_allowed, nproj_allowed);
+	ModuleBase::matrix coefficient_D_in(nproj_allowed, nproj_allowed);
 	ModuleBase::ComplexMatrix coefficient_D_nc_in(nproj_allowed*2, nproj_allowed*2);
 
 //	OUT(GlobalV::ofs_running,"nproj_allowed",nproj_allowed);

@@ -114,6 +114,6 @@ class ORB_gaunt_table
 	std::map<int,std::map<int,double>> Gaunt_CH;		// Peize Lin update 2016-08-26
 	
 	//direct integral
-	matrix Ylm_Gaunt;
+	ModuleBase::matrix Ylm_Gaunt;
 };
 #endif

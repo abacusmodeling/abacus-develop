@@ -674,7 +674,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
     TITLE("LCAO_gen_fixedH","build_Nonlocal_beta");
     timer::tick ("LCAO_gen_fixedH","build_Nonlocal_beta");
 
-	matrix Rcut(GlobalC::ucell.ntype, GlobalC::ucell.ntype);
+	ModuleBase::matrix Rcut(GlobalC::ucell.ntype, GlobalC::ucell.ntype);
 	for(int it1=0; it1<GlobalC::ucell.ntype; ++it1)
         for(int it2=0; it2<GlobalC::ucell.ntype; ++it2)
             Rcut(it1,it2) = GlobalC::ORB.Phi[it1].getRcut() + GlobalC::ORB.Phi[it2].getRcut();

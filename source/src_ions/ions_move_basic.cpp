@@ -20,7 +20,7 @@ double Ions_Move_Basic::best_xxx = 1.0;
 
 int Ions_Move_Basic::out_stru=0;
 
-void Ions_Move_Basic::setup_gradient(double* pos, double *grad, const matrix &force)
+void Ions_Move_Basic::setup_gradient(double* pos, double *grad, const ModuleBase::matrix &force)
 {
 	TITLE("Ions_Move_Basic","setup_gradient");
 	

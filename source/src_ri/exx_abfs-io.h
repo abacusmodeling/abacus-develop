@@ -16,9 +16,9 @@ class Exx_Abfs::IO
 public:
 	static void print_matrix( 
 		const std::string &file_name_prefix, 
-		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &matrixes_Q, 
-		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &matrixes_S,
-		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &matrixes_V,
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> &matrixes_Q, 
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> &matrixes_S,
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> &matrixes_V,
 		const ModuleBase::Element_Basis_Index::Range &range_jles, 
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_jles, 
 		const ModuleBase::Element_Basis_Index::Range &range_lcaos,

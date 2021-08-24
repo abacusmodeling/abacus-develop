@@ -40,7 +40,7 @@ void Diago_LCAO_Matrix::solve_complex_matrix(
 void Diago_LCAO_Matrix::solve_double_matrix(
 	const int &ik, 
 	double** wfc, 
-	matrix &wfc_2d)const
+	ModuleBase::matrix &wfc_2d)const
 {
 	TITLE("Diago_LCAO_Matrix","solve_double_matrix");
 	timer::tick("Diago_LCAO_Matrix","solve_double_matrix");
@@ -72,7 +72,7 @@ void Diago_LCAO_Matrix::solve_double_matrix(
 }
 
 #ifdef __MPI
-void Diago_LCAO_Matrix::using_HPSEPS_double(const int &ik, double**wfc, matrix &wfc_2d)const
+void Diago_LCAO_Matrix::using_HPSEPS_double(const int &ik, double**wfc, ModuleBase::matrix &wfc_2d)const
 {
 	TITLE("Diago_LCAO_Matrix","using_HPSEPS_double");
 
@@ -195,8 +195,8 @@ void Diago_LCAO_Matrix::using_LAPACK(const int &ik, double** wfc)const
 	bool bit = true;//zhengdy-soc
 	HS_Matrix::saving_HS(GlobalC::LM.Hloc, GlobalC::LM.Sloc, bit, GlobalC::ParaO.out_hs);
 
-	matrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
-	matrix Stmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	ModuleBase::matrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	ModuleBase::matrix Stmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{
 		for(int j=0; j<GlobalV::NLOCAL; j++)

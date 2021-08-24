@@ -1507,7 +1507,7 @@ void Symmetry::rho_symmetry( double *rho,
     timer::tick("Symmetry","rho_symmetry");
 }
 
-void Symmetry::force_symmetry(matrix &force , double* pos, const UnitCell_pseudo &ucell)   // pengfei 2016-12-20
+void Symmetry::force_symmetry(ModuleBase::matrix &force , double* pos, const UnitCell_pseudo &ucell)   // pengfei 2016-12-20
 {
 	TITLE("Symmetry","force_symmetry");
 	double *protpos;
@@ -1587,7 +1587,7 @@ void Symmetry::force_symmetry(matrix &force , double* pos, const UnitCell_pseudo
 	return;
 }
 
-void Symmetry::stress_symmetry(matrix& sigma, const UnitCell_pseudo &ucell)   //zhengdy added 2017
+void Symmetry::stress_symmetry(ModuleBase::matrix& sigma, const UnitCell_pseudo &ucell)   //zhengdy added 2017
 {
 	double *tot_sigma, *temp;
 	tot_sigma = new double[9];

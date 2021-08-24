@@ -28,7 +28,7 @@ void Wfc_Dm_2d::init()
 	}
 }
 
-void Wfc_Dm_2d::cal_dm(const matrix &wg)
+void Wfc_Dm_2d::cal_dm(const ModuleBase::matrix &wg)
 {
 	TITLE("Wfc_Dm_2d", "cal_dm");
 	
@@ -66,7 +66,7 @@ void Wfc_Dm_2d::cal_dm(const matrix &wg)
 			}
 			
 			// wg_wfc(ib,iw) = wg[ib] * wfc(ib,iw);
-			matrix wg_wfc(wfc_gamma[is]);
+			ModuleBase::matrix wg_wfc(wfc_gamma[is]);
 			for(int ir=0; ir!=wg_wfc.nr; ++ir)
 			{
 				LapackConnector::scal( wg_wfc.nc, wg_local[ir], wg_wfc.c+ir*wg_wfc.nc, 1 );

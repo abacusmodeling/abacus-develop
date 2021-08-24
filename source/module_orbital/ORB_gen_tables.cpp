@@ -129,7 +129,7 @@ void ORB_gen_tables::snap_psibeta(
 	const int &N2,
 	const Vector3<double> &R0, // The projector.
 	const int &T0,
-	const matrix &dion, // mohan add 2021-04-25
+	const ModuleBase::matrix &dion, // mohan add 2021-04-25
 	const int &nspin,
 	const ModuleBase::ComplexArray &d_so, // mohan add 2021-05-07
 	const int &count_soc, // mohan add 2021-05-07

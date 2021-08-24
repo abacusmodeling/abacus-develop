@@ -5,7 +5,7 @@
 
 #include "../module_base/ylm.h"
 
-void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
+void Gint_k::fvl_k_RealSpace(ModuleBase::matrix& fvl_dphi, const double *vl)
 {
 	TITLE("Gint_k","cal_force");
 	timer::tick("Gint_k","cal_force");
@@ -199,8 +199,8 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 }
 
 void Gint_k::svl_k_RealSpace(
-	matrix& fvl_dphi, 
-	matrix& svl_dphi, 
+	ModuleBase::matrix& fvl_dphi, 
+	ModuleBase::matrix& svl_dphi, 
 	const double *vl)
 {
 	TITLE("Gint_k","cal_stress");

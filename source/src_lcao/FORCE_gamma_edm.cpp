@@ -26,7 +26,7 @@ double Force_LCAO_gamma::set_EDM_element(
 }
 
 //#include "../src_develop/src_siao/selinv.h"
-void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
+void Force_LCAO_gamma::set_EDM_gamma(ModuleBase::matrix& dm, bool with_energy)
 {
     TITLE("Force_LCAO_gamma","set_EDM_gamma");
     timer::tick("Force_LCAO_gamma","set_EDM");
@@ -647,8 +647,8 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 void Force_LCAO_gamma::cal_foverlap(
 	const bool isforce, 
 	const bool isstress, 
-	matrix& foverlap, 
-	matrix& soverlap)
+	ModuleBase::matrix& foverlap, 
+	ModuleBase::matrix& soverlap)
 {
     TITLE("Force_LCAO_gamma","cal_foverlap");
     timer::tick("Force_LCAO_gamma","cal_foverlap");
@@ -658,7 +658,7 @@ void Force_LCAO_gamma::cal_foverlap(
     {
         timer::tick("Force_LCAO_gamma","cal_edm_2d");
 
-        matrix wgEkb;
+        ModuleBase::matrix wgEkb;
         wgEkb.create(GlobalV::NSPIN, GlobalV::NBANDS);
 
         for(int is=0; is<GlobalV::NSPIN; is++)
@@ -717,7 +717,7 @@ void Force_LCAO_gamma::cal_foverlap(
     else
     {
         timer::tick("Force_LCAO_gamma","cal_edm_grid");
-        matrix edm2d;
+        ModuleBase::matrix edm2d;
 		edm2d.create(GlobalV::NSPIN, GlobalC::ParaO.nloc);
 
         bool with_energy = true;

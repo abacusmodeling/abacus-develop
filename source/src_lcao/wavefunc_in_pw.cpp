@@ -253,7 +253,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ModuleBase::Complex
 	assert(ik>=0);
 	const int npw = GlobalC::kv.ngk[ik];
 	const int total_lm = ( GlobalC::ucell.lmax + 1) * ( GlobalC::ucell.lmax + 1);
-	matrix ylm(total_lm, npw);
+	ModuleBase::matrix ylm(total_lm, npw);
 	std::complex<double> *aux = new std::complex<double>[npw];
 	double *chiaux = new double[1];
 
@@ -450,7 +450,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ModuleBase::Comp
 	assert(ik>=0);
 	const int npw = GlobalC::kv.ngk[ik];
 	const int total_lm = ( GlobalC::ucell.lmax + 1) * ( GlobalC::ucell.lmax + 1);
-	matrix ylm(total_lm, npw);
+	ModuleBase::matrix ylm(total_lm, npw);
 	std::complex<double> *aux = new std::complex<double>[npw];
 	double *chiaux = new double[1];
 

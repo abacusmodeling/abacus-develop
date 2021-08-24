@@ -9,7 +9,7 @@ public:
     ~Ions_Move_CG();
 
     void allocate(void);
-    void start(const matrix& force, const double &etot);
+    void start(const ModuleBase::matrix& force, const double &etot);
         
         static double CG_THRESHOLD;
 	int sd_step;
