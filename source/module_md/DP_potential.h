@@ -20,7 +20,7 @@ public:
     static void DP_pot(UnitCell_pseudo &ucell_c, 
                 double &potential, 
                 Vector3<double> *force, 
-                matrix &stress);
+                ModuleBase::matrix &stress);
     
 };
 
