@@ -30,7 +30,7 @@ Run_MD_CLASSIC::~Run_MD_CLASSIC()
 void Run_MD_CLASSIC::classic_md_line(void)
 {
 	TITLE("Run_MD_CLASSIC", "classic_md_line");
-    timer::tick("Run_MD_CLASSIC", "classic_md_line");
+    ModuleBase::timer::tick("Run_MD_CLASSIC", "classic_md_line");
 
 	// Setup the unitcell.
     ucell_c.setup_cell_classic(GlobalV::global_atom_card, GlobalV::ofs_running, GlobalV::ofs_warning);
@@ -84,14 +84,14 @@ void Run_MD_CLASSIC::classic_md_line(void)
     GlobalV::ofs_running << " !FINAL_ETOT_IS " << potential*Ry_to_eV << " eV" << std::endl; 
     GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
-    timer::tick("Run_MD_CLASSIC", "md_cells_classic");
+    ModuleBase::timer::tick("Run_MD_CLASSIC", "md_cells_classic");
     return;
 }
 
 void Run_MD_CLASSIC::md_force_stress(double &potential)
 {
 	TITLE("Run_MD_CLASSIC", "md_force_stress");
-    timer::tick("Run_MD_CLASSIC", "md_force_stress");
+    ModuleBase::timer::tick("Run_MD_CLASSIC", "md_force_stress");
 
 	if(INPUT.mdp.md_potential == "LJ")
 	{
@@ -157,7 +157,7 @@ void Run_MD_CLASSIC::md_force_stress(double &potential)
 		}
 	}
 
-	timer::tick("Run_MD_CLASSIC", "md_force_stress");
+	ModuleBase::timer::tick("Run_MD_CLASSIC", "md_force_stress");
 }
 
 

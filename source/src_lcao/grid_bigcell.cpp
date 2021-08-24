@@ -319,7 +319,7 @@ void Grid_BigCell::init_tau_in_bigcell(void)
 void Grid_BigCell::grid_expansion_index(bool f2normal, int *target)const
 {
 	TITLE("Grid_BigCell","grid_expansion_index");
-	timer::tick("Grid_BigCell","grid_expansion_index");
+	ModuleBase::timer::tick("Grid_BigCell","grid_expansion_index");
 //	std::cout << " ncx=" << ncx << " ncy=" << ncy << " ncz=" << ncz << std::endl;
 //	std::stringstream ss;
 //	ss << GlobalV::global_out_dir << "expand_grid.dat";
@@ -420,6 +420,6 @@ void Grid_BigCell::grid_expansion_index(bool f2normal, int *target)const
 			}// k
 		}// j
 	}// i
-	timer::tick("Grid_BigCell","grid_expansion_index");
+	ModuleBase::timer::tick("Grid_BigCell","grid_expansion_index");
 	return;
 }

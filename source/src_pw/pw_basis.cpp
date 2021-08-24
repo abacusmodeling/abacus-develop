@@ -125,7 +125,7 @@ void PW_Basis::set
 void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_Vectors &Klist_in)
 {
     TITLE("PW_Basis","gen_pw");
-    timer::tick("PW_Basis","gen_pw");
+    ModuleBase::timer::tick("PW_Basis","gen_pw");
 
 
 	GlobalV::ofs_running << "\n\n\n\n";
@@ -359,7 +359,7 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
     this->setup_structure_factor();
 
 //	this->printPW("src_check/check_pw.txt");
-    timer::tick("PW_Basis","gen_pw");
+    ModuleBase::timer::tick("PW_Basis","gen_pw");
     return;
 }
 
@@ -610,7 +610,7 @@ void PW_Basis::get_MPI_GVectors(void)
 void PW_Basis::get_GVectors(void)
 {
     if (GlobalV::test_pw) TITLE("PW_Basis","get_GVectors");
-    timer::tick("PW_Basis","get_GVectors");
+    ModuleBase::timer::tick("PW_Basis","get_GVectors");
 
     this->nrxx = this->ncxyz;
     this->ngmc=this->ngmc_g;
@@ -657,7 +657,7 @@ void PW_Basis::get_GVectors(void)
 
     PW_complement::get_ig2fftw(ngmw, nx, ny, nz, gdirect, ig2fftw);
 
-    timer::tick("PW_Basis","get_GVectors");
+    ModuleBase::timer::tick("PW_Basis","get_GVectors");
     return;
 }//end get_GVectors;
 #endif
@@ -665,7 +665,7 @@ void PW_Basis::get_GVectors(void)
 void PW_Basis::get_nggm(const int ngmc_local)
 {
     TITLE("PW_Basis","get_nggm");
-    timer::tick("PW_Basis","get_nggm");
+    ModuleBase::timer::tick("PW_Basis","get_nggm");
 
 //	GlobalV::ofs_running << " calculate the norm of G vectors." << std::endl;
     //*********************************************
@@ -728,7 +728,7 @@ void PW_Basis::get_nggm(const int ngmc_local)
 	if(GlobalV::test_pw)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"gstart",gstart);
 
     delete[] tmp;
-    timer::tick("PW_Basis","get_nggm");
+    ModuleBase::timer::tick("PW_Basis","get_nggm");
     return;
 }
 
@@ -737,7 +737,7 @@ void PW_Basis::get_nggm(const int ngmc_local)
 void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add OpenMP 2021.04.01
 {
     TITLE("PW_Basis","setup_structure_factor");
-    timer::tick("PW_Basis","setup_struc_factor");
+    ModuleBase::timer::tick("PW_Basis","setup_struc_factor");
     const std::complex<double> ci_tpi = NEG_IMAG_UNIT * TWO_PI;
 
     this->strucFac.create(Ucell->ntype, this->ngmc);
@@ -806,7 +806,7 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
             inat++;
         }
     }
-    timer::tick("PW_Basis","setup_struc_factor");
+    ModuleBase::timer::tick("PW_Basis","setup_struc_factor");
     return;
 }
 
@@ -1037,7 +1037,7 @@ void PW_Basis::columns_and_pw_distribution_2(void)
 void PW_Basis::update_gvectors(std::ofstream &runlog, const UnitCell &Ucell_in)
 {
     TITLE("PW_Basis","update_gvectors");
-    timer::tick("PW_Basis","update_gvectors");
+    ModuleBase::timer::tick("PW_Basis","update_gvectors");
 
 #ifdef __MPI
     bool cutgg_flag = true;
@@ -1102,7 +1102,7 @@ void PW_Basis::update_gvectors(std::ofstream &runlog, const UnitCell &Ucell_in)
 
     this->setup_structure_factor();
 
-    timer::tick("PW_Basis","update_gvectors");
+    ModuleBase::timer::tick("PW_Basis","update_gvectors");
 
 
     return;

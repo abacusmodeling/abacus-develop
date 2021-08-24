@@ -64,7 +64,7 @@ inline int CTOT2q_c(
 int WF_Local::read_lowf_complex(std::complex<double> **c, const int &ik, const bool &newdm)
 {
     TITLE("WF_Local","read_lowf_complex");
-    timer::tick("WF_Local","read_lowf_complex");
+    ModuleBase::timer::tick("WF_Local","read_lowf_complex");
 
     std::complex<double> **ctot;
 
@@ -221,14 +221,14 @@ int WF_Local::read_lowf_complex(std::complex<double> **c, const int &ik, const b
 	*/
 
 
-    timer::tick("WF_Local","read_lowf_complex");
+    ModuleBase::timer::tick("WF_Local","read_lowf_complex");
 	return 0;
 }
 
 int WF_Local::read_lowf(double **c, const int &is)
 {
     TITLE("WF_Local","read_lowf");
-    timer::tick("WF_Local","read_lowf");
+    ModuleBase::timer::tick("WF_Local","read_lowf");
 
     double **ctot;
 
@@ -353,14 +353,14 @@ int WF_Local::read_lowf(double **c, const int &is)
         delete[] ctot;
     }
 
-    timer::tick("WF_Local","read_lowf");
+    ModuleBase::timer::tick("WF_Local","read_lowf");
     return 0;
 }
 
 void WF_Local::write_lowf(const std::string &name, double **ctot)
 {
     TITLE("WF_Local","write_lowf");
-    timer::tick("WF_Local","write_lowf");
+    ModuleBase::timer::tick("WF_Local","write_lowf");
 
     std::ofstream ofs;
     if (GlobalV::DRANK==0)
@@ -391,14 +391,14 @@ void WF_Local::write_lowf(const std::string &name, double **ctot)
         ofs.close();
     }
 
-    timer::tick("WF_Local","write_lowf");
+    ModuleBase::timer::tick("WF_Local","write_lowf");
     return;
 }
 
 void WF_Local::write_lowf_complex(const std::string &name, std::complex<double> **ctot, const int &ik)
 {
     TITLE("WF_Local","write_lowf_complex");
-    timer::tick("WF_Local","write_lowf_complex");
+    ModuleBase::timer::tick("WF_Local","write_lowf_complex");
 
     std::ofstream ofs;
     if (GlobalV::DRANK==0)
@@ -431,7 +431,7 @@ void WF_Local::write_lowf_complex(const std::string &name, std::complex<double> 
         ofs.close();
     }
 
-    timer::tick("WF_Local","write_lowf_complex");
+    ModuleBase::timer::tick("WF_Local","write_lowf_complex");
     return;
 }
 

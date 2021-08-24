@@ -12,7 +12,7 @@ ModuleBase::matrix H_Hartree_pw::v_hartree(
 	const double*const*const rho)
 {
     TITLE("H_Hartree_pw","v_hartree");
-    timer::tick("H_Hartree_pw","v_hartree");
+    ModuleBase::timer::tick("H_Hartree_pw","v_hartree");
 
     //  Hartree potential VH(r) from n(r)
     std::vector<std::complex<double>> Porter(pwb.nrxx);
@@ -105,6 +105,6 @@ ModuleBase::matrix H_Hartree_pw::v_hartree(
 	}
 */
 
-    timer::tick("H_Hartree_pw","v_hartree");
+    ModuleBase::timer::tick("H_Hartree_pw","v_hartree");
     return v;
 } // end subroutine v_h

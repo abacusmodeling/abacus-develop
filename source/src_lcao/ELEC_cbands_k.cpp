@@ -13,7 +13,7 @@ ELEC_cbands_k::~ELEC_cbands_k(){};
 void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 {
 	TITLE("ELEC_cbands_k","cal_bands");
-	timer::tick("ELEC_cbands_k","cal_bands");
+	ModuleBase::timer::tick("ELEC_cbands_k","cal_bands");
 
 	int start_spin = -1;
 	uhm.GK.reset_spin(start_spin);
@@ -83,8 +83,8 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		//--------------------------------------------
 
 		// with k points
-		timer::tick("Efficience","each_k");
-		timer::tick("Efficience","H_k");
+		ModuleBase::timer::tick("Efficience","each_k");
+		ModuleBase::timer::tick("Efficience","H_k");
 		uhm.calculate_Hk(ik);
 
 		// Effective potential of DFT+U is added to total Hamiltonian here; Quxin adds on 20201029
@@ -97,7 +97,7 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 				GlobalC::LM.Hloc2[irc] += eff_pot[irc];					
 		}
 
-		timer::tick("Efficience","H_k");
+		ModuleBase::timer::tick("Efficience","H_k");
 
 		// Peize Lin add at 2020.04.04
 		if(GlobalC::restart.info_load.load_H && !GlobalC::restart.info_load.load_H_finish)
@@ -111,12 +111,12 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		}
 
 		// write the wave functions into GlobalC::LOWF.WFC_K[ik].
-		timer::tick("Efficience","diago_k");
+		ModuleBase::timer::tick("Efficience","diago_k");
 		Diago_LCAO_Matrix DLM;
 		DLM.solve_complex_matrix(ik, GlobalC::LOWF.WFC_K[ik], GlobalC::LOC.wfc_dm_2d.wfc_k[ik]);
-		timer::tick("Efficience","diago_k");
+		ModuleBase::timer::tick("Efficience","diago_k");
 
-		timer::tick("Efficience","each_k");
+		ModuleBase::timer::tick("Efficience","each_k");
 	} // end k
 			
 	// LiuXh modify 2019-07-15*/
@@ -125,7 +125,7 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		uhm.GK.destroy_pvpR();
 	}
 
-	timer::tick("ELEC_cbands_k","cal_bands");
+	ModuleBase::timer::tick("ELEC_cbands_k","cal_bands");
 	return;	
 }
 

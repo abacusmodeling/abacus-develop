@@ -105,7 +105,7 @@ void Parallel_PW::init(const double &gcut_in, const int &n1_in, const int &n2_in
 void Parallel_PW::columns_map(void)
 {
 	if(GlobalV::test_pw) TITLE("Parallel_PW","columns_map");
-	timer::tick("Parallel_PW","columns_map");
+	ModuleBase::timer::tick("Parallel_PW","columns_map");
 		
 	int ibox[3];
 	
@@ -185,7 +185,7 @@ void Parallel_PW::columns_map(void)
 	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of plane waves",ng);
 	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of sticks", nst);
 
-	timer::tick("Parallel_PW","columns_map");
+	ModuleBase::timer::tick("Parallel_PW","columns_map");
 	return;
 }
 

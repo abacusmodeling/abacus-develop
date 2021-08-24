@@ -130,7 +130,7 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 		double *rs,
 		double *drs)
 {
-	timer::tick ("ORB_table_beta", "VNL_PhiBeta_R");
+	ModuleBase::timer::tick ("ORB_table_beta", "VNL_PhiBeta_R");
 
 	assert(kmesh > 0);
 
@@ -213,7 +213,7 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 	delete [] integrated_func;
 	delete[] k1_dot_k2;
 
-	timer::tick ("ORB_table_beta", "VNL_PhiBeta_R");
+	ModuleBase::timer::tick ("ORB_table_beta", "VNL_PhiBeta_R");
 	return;
 }
 
@@ -221,7 +221,7 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
 {
 	TITLE("ORB_table_beta", "init_Table_Beta");
-	timer::tick("ORB_table_beta", "init_Table_Beta");
+	ModuleBase::timer::tick("ORB_table_beta", "init_Table_Beta");
 
 	// (1) allocate 1st dimension ( overlap, derivative)
 	this->Table_NR = new double****[2];
@@ -322,7 +322,7 @@ void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
 
 
 //	OUT(GlobalV::ofs_running,"allocate non-local potential matrix","Done");
-	timer::tick("ORB_table_beta", "init_Table_Beta");
+	ModuleBase::timer::tick("ORB_table_beta", "init_Table_Beta");
 	return;
 }
 

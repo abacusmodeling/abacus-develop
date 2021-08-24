@@ -8,7 +8,7 @@
 void Gint_k::fvl_k_RealSpace(ModuleBase::matrix& fvl_dphi, const double *vl)
 {
 	TITLE("Gint_k","cal_force");
-	timer::tick("Gint_k","cal_force");
+	ModuleBase::timer::tick("Gint_k","cal_force");
 
 	if(!this->reduced)
 	{
@@ -194,7 +194,7 @@ void Gint_k::fvl_k_RealSpace(ModuleBase::matrix& fvl_dphi, const double *vl)
 
         delete[] ylma;
     }
-	timer::tick("Gint_k","cal_force");
+	ModuleBase::timer::tick("Gint_k","cal_force");
 	return;
 }
 
@@ -204,7 +204,7 @@ void Gint_k::svl_k_RealSpace(
 	const double *vl)
 {
 	TITLE("Gint_k","cal_stress");
-	timer::tick("Gint_k","cal_stress");
+	ModuleBase::timer::tick("Gint_k","cal_stress");
 
 	if(!this->reduced)
 	{
@@ -411,7 +411,7 @@ void Gint_k::svl_k_RealSpace(
 
 		delete[] ylma;
 	}
-	timer::tick("Gint_k","cal_stress");
+	ModuleBase::timer::tick("Gint_k","cal_stress");
 	return;
 }
 

@@ -26,7 +26,7 @@ WF_igk::~WF_igk()
 int WF_igk::setupIndGk(const PW_Basis &pwb,const int nks)
 {
     TITLE("WF_igk","setupIndGk");
-    timer::tick("WF_igk","setupIndGk");
+    ModuleBase::timer::tick("WF_igk","setupIndGk");
 
     //============================================
     // Find out for each k point,
@@ -115,7 +115,7 @@ int WF_igk::setupIndGk(const PW_Basis &pwb,const int nks)
 		ofs.close();
 	}
 
-    timer::tick("WF_igk","setupIndGk");
+    ModuleBase::timer::tick("WF_igk","setupIndGk");
     return npw_max;
 } // end setupIndGk()
 
@@ -125,7 +125,7 @@ int WF_igk::setupIndGk(const PW_Basis &pwb,const int nks)
 //--------------------------------------------------------
 void WF_igk::ekin(const int ik)
 {
-    timer::tick("WF_igk","ekin");
+    ModuleBase::timer::tick("WF_igk","ekin");
     zeros( g2kin, this->npwx);
 
     for (int ig = 0;ig < GlobalC::kv.ngk[ik];ig++)
@@ -135,7 +135,7 @@ void WF_igk::ekin(const int ik)
 //--------------------------------------------------------
         this->g2kin[ig] = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig)).norm2() * GlobalC::ucell.tpiba2;
     }
-    timer::tick("WF_igk","ekin");
+    ModuleBase::timer::tick("WF_igk","ekin");
     return ;
 }
 
@@ -174,7 +174,7 @@ double* WF_igk::get_qvec_cartesian(const int &ik)
 
 std::complex<double>* WF_igk::get_sk(const int ik, const int it, const int ia)const
 {
-    timer::tick("WF_igk","get_sk");
+    ModuleBase::timer::tick("WF_igk","get_sk");
     const double arg = (GlobalC::kv.kvec_c[ik] * GlobalC::ucell.atoms[it].tau[ia]) * TWO_PI;
     const std::complex<double> kphase = std::complex <double> ( cos(arg),  -sin(arg) );
     std::complex<double> *sk = new std::complex<double>[ GlobalC::kv.ngk[ik] ];
@@ -187,7 +187,7 @@ std::complex<double>* WF_igk::get_sk(const int ik, const int it, const int ia)co
                  * GlobalC::pw.eigts2(iat, GlobalC::pw.ig2[iig])
                  * GlobalC::pw.eigts3(iat, GlobalC::pw.ig3[iig]);
     }
-    timer::tick("WF_igk","get_sk");
+    ModuleBase::timer::tick("WF_igk","get_sk");
     return sk;
 }
 

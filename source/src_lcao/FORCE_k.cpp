@@ -26,7 +26,7 @@ void Force_LCAO_k::ftable_k (
 		)
 {
     TITLE("Force_LCAO_k", "ftable_k");
-	timer::tick("Force_LCAO_k","ftable_k");
+	ModuleBase::timer::tick("Force_LCAO_k","ftable_k");
 	
 	this->allocate_k();
 
@@ -96,14 +96,14 @@ void Force_LCAO_k::ftable_k (
 
 	this->finish_k();
 
-	timer::tick("Force_LCAO_k","ftable_k");
+	ModuleBase::timer::tick("Force_LCAO_k","ftable_k");
     return;
 }
 
 void Force_LCAO_k::allocate_k(void)
 {
 	TITLE("Force_LCAO_k","allocate_k");
-	timer::tick("Force_LCAO_k","allocate_k");
+	ModuleBase::timer::tick("Force_LCAO_k","allocate_k");
 
 	const int nnr = GlobalC::LNNR.nnr;
 	//--------------------------------
@@ -162,7 +162,7 @@ void Force_LCAO_k::allocate_k(void)
 	GlobalC::UHM.genH.build_Nonlocal_mu (cal_deri);
 	//test(GlobalC::LM.DHloc_fixedR_x,"GlobalC::LM.DHloc_fixedR_x Vnl part");
 
-	timer::tick("Force_LCAO_k","allocate");
+	ModuleBase::timer::tick("Force_LCAO_k","allocate");
 	return;
 }
 
@@ -192,7 +192,7 @@ void Force_LCAO_k::finish_k(void)
 void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 {
 	TITLE("Force_LCAO_k","set_EDM_k");
-	timer::tick("Force_LCAO_k","set_EDM_k");
+	ModuleBase::timer::tick("Force_LCAO_k","set_EDM_k");
 
 	Vector3<double> tau1, dtau;
 
@@ -355,7 +355,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 	}// T1
 
 RA.delete_grid();//xiaohui add 2015-02-04
-	timer::tick("Force_LCAO_k","set_EDM_k");
+	ModuleBase::timer::tick("Force_LCAO_k","set_EDM_k");
 	return;
 }
 
@@ -394,7 +394,7 @@ void Force_LCAO_k::cal_foverlap_k(
 	ModuleBase::matrix& soverlap)
 {
 	TITLE("Force_LCAO_k","cal_foverlap_k");
-	timer::tick("Force_LCAO_k","cal_foverlap_k");
+	ModuleBase::timer::tick("Force_LCAO_k","cal_foverlap_k");
 
 	//--------------------------------------------
 	// (1) allocate energy density matrix (nnr)
@@ -521,7 +521,7 @@ void Force_LCAO_k::cal_foverlap_k(
 	delete[] edm2d;
 
 	RA.delete_grid();//xiaohui add 2015-02-04
-	timer::tick("Force_LCAO_k","cal_foverlap_k");
+	ModuleBase::timer::tick("Force_LCAO_k","cal_foverlap_k");
 	return;
 }
 
@@ -533,7 +533,7 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(
 	ModuleBase::matrix& stvnl_dphi)
 {	
 	TITLE("Force_LCAO_k","cal_ftvnl_dphi");
-	timer::tick("Force_LCAO_k","cal_ftvnl_dphi");
+	ModuleBase::timer::tick("Force_LCAO_k","cal_ftvnl_dphi");
 	
 	// get the adjacent atom's information.
 
@@ -614,7 +614,7 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(
 	}
 
 	RA.delete_grid();//xiaohui add 2015-02-04
-	timer::tick("Force_LCAO_k","cal_ftvnl_dphi");
+	ModuleBase::timer::tick("Force_LCAO_k","cal_ftvnl_dphi");
 	return;
 }
 
@@ -695,7 +695,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 	ModuleBase::matrix& svnl_dbeta)
 {
 	TITLE("Force_LCAO_k","cal_fvnl_dbeta_k");
-	timer::tick("Force_LCAO_k","cal_fvnl_dbeta_k");
+	ModuleBase::timer::tick("Force_LCAO_k","cal_fvnl_dbeta_k");
 	int iir = 0;
 	Vector3<double> tau1;
 	Vector3<double> tau2;
@@ -901,7 +901,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 		}
 	}
 
-	timer::tick("Force_LCAO_k","cal_fvnl_dbeta_k");
+	ModuleBase::timer::tick("Force_LCAO_k","cal_fvnl_dbeta_k");
 	return;
 }
 
@@ -915,7 +915,7 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 	ModuleBase::matrix& svl_dphi)
 {
 	TITLE("Force_LCAO_k","cal_fvl_dphi_k");
-	timer::tick("Force_LCAO_k","cal_fvl_dphi_k");
+	ModuleBase::timer::tick("Force_LCAO_k","cal_fvl_dphi_k");
 
 	if(!isforce&&!isstress) return;
 	assert(GlobalC::LM.DHloc_fixedR_x!=NULL);
@@ -965,7 +965,7 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 		}
 	}
 
-	timer::tick("Force_LCAO_k","cal_fvl_dphi_k");
+	ModuleBase::timer::tick("Force_LCAO_k","cal_fvl_dphi_k");
 	return;
 }
 

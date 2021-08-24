@@ -15,7 +15,7 @@ std::tuple<double,double,ModuleBase::matrix> H_XC_pw::v_xc
 	const double*const rho_core) // core charge density
 {
     TITLE("H_XC_pw","v_xc");
-    timer::tick("H_XC_pw","v_xc");
+    ModuleBase::timer::tick("H_XC_pw","v_xc");
 
 	#ifndef USE_LIBXC
 	if(GlobalV::DFT_META)
@@ -30,7 +30,7 @@ std::tuple<double,double,ModuleBase::matrix> H_XC_pw::v_xc
 
 	if(GlobalV::VXC_IN_H == 0)
 	{
-    	timer::tick("H_XC_pw","v_xc");
+    	ModuleBase::timer::tick("H_XC_pw","v_xc");
     	return std::make_tuple(et_xc, vt_xc, std::move(v));
 	}
     // the square of the e charge
@@ -172,6 +172,6 @@ std::tuple<double,double,ModuleBase::matrix> H_XC_pw::v_xc
     et_xc *= omega / ncxyz;
     vt_xc *= omega / ncxyz;
 
-    timer::tick("H_XC_pw","v_xc");
+    ModuleBase::timer::tick("H_XC_pw","v_xc");
     return std::make_tuple(et_xc, vt_xc, std::move(v));
 }

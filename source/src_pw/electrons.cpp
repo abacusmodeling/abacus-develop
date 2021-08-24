@@ -30,7 +30,7 @@ Electrons::~Electrons()
 void Electrons::non_self_consistent(const int &istep)
 {
     TITLE("Electrons","non_self_consistent");
-    timer::tick("Electrons","non_self_consistent");
+    ModuleBase::timer::tick("Electrons","non_self_consistent");
 
     //========================================
     // diagonalization of the KS hamiltonian
@@ -58,7 +58,7 @@ void Electrons::non_self_consistent(const int &istep)
         bp.Macroscopic_polarization();
     }
 
-    timer::tick("Electrons","non_self_consistent");
+    ModuleBase::timer::tick("Electrons","non_self_consistent");
     return;
 }
 
@@ -66,7 +66,7 @@ void Electrons::non_self_consistent(const int &istep)
 #include "occupy.h"
 void Electrons::self_consistent(const int &istep)
 {
-    timer::tick("Electrons","self_consistent");
+    ModuleBase::timer::tick("Electrons","self_consistent");
 
 	// mohan update 2021-02-25
 	H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw); 
@@ -405,7 +405,7 @@ void Electrons::self_consistent(const int &istep)
 			{
 				print_eigenvalue(GlobalV::ofs_running);
 			}
-            timer::tick("Electrons","self_consistent");
+            ModuleBase::timer::tick("Electrons","self_consistent");
             return;
         }
 
@@ -413,7 +413,7 @@ void Electrons::self_consistent(const int &istep)
         //GlobalV::ofs_running << "\n start next iterate for idum ";
     } //END DO
 
-    timer::tick("Electrons","self_consistent");
+    ModuleBase::timer::tick("Electrons","self_consistent");
     return;
 } // end Electrons
 
@@ -434,7 +434,7 @@ bool Electrons::check_stop_now(void)
 void Electrons::c_bands(const int &istep)
 {
     if (GlobalV::test_elec) TITLE("Electrons","c_bands");
-    timer::tick("Electrons", "c_bands"
+    ModuleBase::timer::tick("Electrons", "c_bands"
     );
 
     int precondition_type = 2;
@@ -515,7 +515,7 @@ void Electrons::c_bands(const int &istep)
         avg_iter /= static_cast<double>(GlobalC::kv.nkstot);
     }
     delete [] h_diag;
-    timer::tick("electrons","c_bands");
+    ModuleBase::timer::tick("electrons","c_bands");
     return;
 } // END SUBROUTINE c_bands_k
 

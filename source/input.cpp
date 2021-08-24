@@ -17,7 +17,7 @@ Input INPUT;
 
 void Input::Init(const std::string &fn)
 {
-	timer::tick("Input","Init");
+	ModuleBase::timer::tick("Input","Init");
     this->Default();
 
     bool success = this->Read(fn);
@@ -88,7 +88,7 @@ void Input::Init(const std::string &fn)
 
 	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"pseudo_type", pseudo_type); // mohan add 2013-05-20 (xiaohui add 2013-06-23, GlobalV::global_pseudo_type -> pseudo_type)
 
-	timer::tick("Input","Init");
+	ModuleBase::timer::tick("Input","Init");
     return;
 }
 

@@ -4,14 +4,13 @@
 #include "constants.h"
 #include "timer.h"
 
-using namespace std;
 int Ylm::nlm = 0;
 std::vector<double> Ylm::ylmcoef(100);
 
 // here Lmax == max angular momentum + 1
 void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr[] )
 {	
-	timer::tick ("Ylm","get_ylm_real");
+	ModuleBase::timer::tick ("Ylm","get_ylm_real");
 	//1e-9 is too large
 	const double cut0 = 1e-12;
 	// allocate space.
@@ -122,7 +121,7 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 		}
 	}// end do
 
-	timer::tick ("Ylm", "get_ylm_real");
+	ModuleBase::timer::tick ("Ylm", "get_ylm_real");
 	return;
 }
 
@@ -289,7 +288,7 @@ void Ylm::rlylm
 )
 {
 //	TITLE("Ylm","rlylm");
-//	timer::tick("Ylm","rlylm");
+//	ModuleBase::timer::tick("Ylm","rlylm");
 
 	int MaxL = Lmax - 1;
 	
@@ -479,7 +478,7 @@ void Ylm::rlylm
 		}
 	}
 
-//	timer::tick("Ylm", "rlylm");
+//	ModuleBase::timer::tick("Ylm", "rlylm");
 	return;
 }
 

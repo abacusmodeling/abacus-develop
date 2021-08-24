@@ -24,7 +24,7 @@ void Grid_Driver::Find_atom(
 	const int &nnumber)
 {
 	//if (test_grid_driver) TITLE(GlobalV::ofs_running, "Grid_Driver", "Find_atom");
-	timer::tick("Grid_Driver","Find_atom");
+	ModuleBase::timer::tick("Grid_Driver","Find_atom");
 
 	if (test_grid_driver > 1)
 	{
@@ -45,7 +45,7 @@ void Grid_Driver::Find_atom(
 
 	this->Find_adjacent_atom(offset, this->atomlink[offset].fatom.getAdjacentSet());
 
-	timer::tick("Grid_Driver","Find_atom");
+	ModuleBase::timer::tick("Grid_Driver","Find_atom");
 	return;
 }
 

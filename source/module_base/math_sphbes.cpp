@@ -421,7 +421,7 @@ void Sphbes::Spherical_Bessel
     double *jl		 // jl(1:msh) = j_l(q*r(i)),spherical bessel function
 )
 {
-    timer::tick("Sphbes","Spherical_Bessel");
+    ModuleBase::timer::tick("Sphbes","Spherical_Bessel");
     double x1=0.0;
 
     int i=0;
@@ -594,7 +594,7 @@ void Sphbes::Spherical_Bessel
         }
     }
 
-    timer::tick("Sphbes","Spherical_Bessel");
+    ModuleBase::timer::tick("Sphbes","Spherical_Bessel");
     return;
 }
 
@@ -609,7 +609,7 @@ void Sphbes::Spherical_Bessel
 	double *sjp
 )
 {
-	timer::tick("Sphbes","Spherical_Bessel");
+	ModuleBase::timer::tick("Sphbes","Spherical_Bessel");
 
 	//calculate jlx first
 	Spherical_Bessel (msh, r, q, l, sj);

@@ -259,7 +259,7 @@ inline void cal_DM_ATOM_nc(
 void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
 {
     TITLE("Local_Orbital_Charge","cal_dk_k");
-    timer::tick("LCAO_Charge","cal_dk_k");  
+    ModuleBase::timer::tick("LCAO_Charge","cal_dk_k");  
     //int nnrg = 0;
     Vector3<double> tau1;
 	Vector3<double> dtau;
@@ -393,7 +393,7 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
 
     RA.delete_grid();//xiaohui add 2015-02-04
 
-    timer::tick("LCAO_Charge","cal_dk_k");  
+    ModuleBase::timer::tick("LCAO_Charge","cal_dk_k");  
     return;
 }
 

@@ -210,7 +210,7 @@ void Numerical_Orbital_Lm::copy_parameter(
 
 void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool &force_flag)
 {
-	timer::tick("NOrbital_Lm", "extra_uniform");
+	ModuleBase::timer::tick("NOrbital_Lm", "extra_uniform");
 	
 	//---------------------------------------------
 	// set the dr, fixed by liaochen.
@@ -311,7 +311,7 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool
 	delete [] y2;
 	delete [] rad;
 	delete [] tmp;
-	timer::tick("NOrbital_Lm", "extra_uniform");
+	ModuleBase::timer::tick("NOrbital_Lm", "extra_uniform");
 }
 
 void Numerical_Orbital_Lm::use_uniform(const double &dr_uniform_in)

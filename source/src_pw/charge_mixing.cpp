@@ -119,7 +119,7 @@ void Charge_Mixing::plain_mixing( double *rho, double *rho_save_in ) const
 void Charge_Mixing::Kerker_mixing( double *rho, const std::complex<double> *residual_g, double *rho_save)
 {
 //  TITLE("Charge_Mixing","Kerker");
-    timer::tick("Charge_Mixing","Kerker");
+    ModuleBase::timer::tick("Charge_Mixing","Kerker");
 
 //	std::cout << " here is Kerker" << std::endl;
 //	this->check_ne(rho);
@@ -166,7 +166,7 @@ void Charge_Mixing::Kerker_mixing( double *rho, const std::complex<double> *resi
 
     delete[] filter_g;
     delete[] rhog;
-    timer::tick("Charge_Mixing","Kerker");
+    ModuleBase::timer::tick("Charge_Mixing","Kerker");
     return;
 }
 
@@ -177,7 +177,7 @@ double Charge_Mixing::rhog_dot_product(
 ) const
 {
     TITLE("Charge_Mixing","rhog_dot_product");
-	timer::tick("Charge_Mixing","rhog_dot_product");
+	ModuleBase::timer::tick("Charge_Mixing","rhog_dot_product");
     static const double fac = e2 * FOUR_PI / GlobalC::ucell.tpiba2;
     static const double fac2 = e2 * FOUR_PI / (TWO_PI * TWO_PI);
 
@@ -271,7 +271,7 @@ double Charge_Mixing::rhog_dot_product(
 
     Parallel_Reduce::reduce_double_pool( sum );
 
-	timer::tick("Charge_Mixing","rhog_dot_product");
+	ModuleBase::timer::tick("Charge_Mixing","rhog_dot_product");
 
 	sum *= GlobalC::ucell.omega * 0.5;
 

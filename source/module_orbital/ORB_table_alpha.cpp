@@ -132,7 +132,7 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 	double *rs,
 	double *drs)
 {
-	timer::tick("ORB_table_alpha", "S_PhiAlpha_R");
+	ModuleBase::timer::tick("ORB_table_alpha", "S_PhiAlpha_R");
 
 	assert(kmesh > 0);
 
@@ -215,7 +215,7 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 	delete[] integrated_func;
 	delete[] k1_dot_k2;
 
-	timer::tick("ORB_table_alpha", "S_PhiAlpha_R");
+	ModuleBase::timer::tick("ORB_table_alpha", "S_PhiAlpha_R");
 	return;
 }
 
@@ -223,7 +223,7 @@ void ORB_table_alpha::init_Table_Alpha(
 	Sph_Bessel_Recursive::D2 *pSB)
 {
 	TITLE("ORB_table_alpha", "init_Table_Alpha");
-	timer::tick("ORB_table_alpha", "init_Table_Alpha");
+	ModuleBase::timer::tick("ORB_table_alpha", "init_Table_Alpha");
 
 	assert(ntype > 0);
 
@@ -319,7 +319,7 @@ void ORB_table_alpha::init_Table_Alpha(
 	destroy_nr = true;
 
 	//	OUT(GlobalV::ofs_running,"allocate non-local potential matrix","Done");
-	timer::tick("ORB_table_alpha", "init_Table_Alpha");
+	ModuleBase::timer::tick("ORB_table_alpha", "init_Table_Alpha");
 	return;
 }
 

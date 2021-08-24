@@ -25,7 +25,7 @@ Run_MD_PW::~Run_MD_PW()
 void Run_MD_PW::md_ions_pw(void)
 {
     TITLE("Run_MD_PW", "md_ions_pw");
-    timer::tick("Run_MD_PW", "md_ions_pw");
+    ModuleBase::timer::tick("Run_MD_PW", "md_ions_pw");
 
     if (GlobalV::OUT_LEVEL == "i")
     {
@@ -216,14 +216,14 @@ void Run_MD_PW::md_ions_pw(void)
         std::cout << " ION DYNAMICS FINISHED :)" << std::endl;
     }
 
-    timer::tick("Run_MD_PW", "md_ions_pw");
+    ModuleBase::timer::tick("Run_MD_PW", "md_ions_pw");
     return;
 }
 
 void Run_MD_PW::md_cells_pw()
 {
     TITLE("Run_MD_PW", "md_cells_pw");
-    timer::tick("Run_MD_PW", "md_cells_pw");
+    ModuleBase::timer::tick("Run_MD_PW", "md_cells_pw");
 
     GlobalC::wf.allocate(GlobalC::kv.nks);
 
@@ -301,7 +301,7 @@ void Run_MD_PW::md_cells_pw()
     GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
     GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
-    timer::tick("Run_MD_PW", "md_cells_pw");
+    ModuleBase::timer::tick("Run_MD_PW", "md_cells_pw");
 }
 
 void Run_MD_PW::callInteraction_PW(const int& numIon, Vector3<double>* force, ModuleBase::matrix& stress_pw)

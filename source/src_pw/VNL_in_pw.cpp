@@ -24,7 +24,7 @@ pseudopot_cell_vnl::~pseudopot_cell_vnl()
 void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 {
 	TITLE("pseudopot_cell_vnl", "init");
-	timer::tick("ppcell_vnl", "init");
+	ModuleBase::timer::tick("ppcell_vnl", "init");
 
 	GlobalV::ofs_running << "\n SETUP NONLOCAL PSEUDOPOTENTIALS IN PLANE WAVE BASIS" << std::endl;
 
@@ -127,7 +127,7 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 		this->tab_at.create(ntype, nchix_nc, GlobalV::NQX);
 	}
 
-	timer::tick("ppcell_vnl","init");
+	ModuleBase::timer::tick("ppcell_vnl","init");
 	return;
 }
 
@@ -140,7 +140,7 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 void pseudopot_cell_vnl::getvnl(const int &ik)
 {
 	if(GlobalV::test_pp) TITLE("pseudopot_cell_vnl","getvnl");
-	timer::tick("pp_cell_vnl","getvnl");
+	ModuleBase::timer::tick("pp_cell_vnl","getvnl");
 
 	if(lmaxkb < 0) 
 	{
@@ -217,7 +217,7 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 	delete [] gk;
 	delete [] vq;
 
-	timer::tick("pp_cell_vnl","getvnl");
+	ModuleBase::timer::tick("pp_cell_vnl","getvnl");
 
 	return;
 } // end subroutine getvnl
@@ -227,7 +227,7 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 void pseudopot_cell_vnl::init_vnl(UnitCell_pseudo &cell)
 {
 	TITLE("pseudopot_cell_vnl","init_vnl");
-	timer::tick("ppcell_vnl","init_vnl");
+	ModuleBase::timer::tick("ppcell_vnl","init_vnl");
 
 	//from init_us_1
 	//   a) For each non vanderbilt pseudopotential it computes the D and
@@ -391,7 +391,7 @@ void pseudopot_cell_vnl::init_vnl(UnitCell_pseudo &cell)
 		delete[] aux;
 		delete[] jl;
 	}
-	timer::tick("ppcell_vnl","init_vnl");
+	ModuleBase::timer::tick("ppcell_vnl","init_vnl");
 	GlobalV::ofs_running << "\n Init Non-Local-Pseudopotential done." << std::endl;
 	return;
 }
@@ -434,7 +434,7 @@ double pseudopot_cell_vnl::CG(int l1, int m1, int l2, int m2, int L, int M)     
 void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  2018-3-23
 {
 	if(GlobalV::test_pp) TITLE("pseudopot_cell_vnl","getvnl_alpha");
-	timer::tick("pp_cell_vnl","getvnl_alpha");
+	ModuleBase::timer::tick("pp_cell_vnl","getvnl_alpha");
 
 	if(lmaxkb < 0) 
 	{
@@ -546,7 +546,7 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 
 	delete [] gk;
 	delete [] vq;
-	timer::tick("pp_cell_vnl","getvnl_alpha");
+	ModuleBase::timer::tick("pp_cell_vnl","getvnl_alpha");
 	return;
 } 
 #endif
@@ -554,7 +554,7 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 void pseudopot_cell_vnl::init_vnl_alpha(void)          // pengfei Li 2018-3-23
 {
 	if(GlobalV::test_pp) TITLE("pseudopot_cell_vnl","init_vnl_alpha");
-	timer::tick("ppcell_vnl","init_vnl_alpha");
+	ModuleBase::timer::tick("ppcell_vnl","init_vnl_alpha");
 
 	for(int it=0;it<GlobalC::ucell.ntype;it++)
 	{
@@ -619,7 +619,7 @@ void pseudopot_cell_vnl::init_vnl_alpha(void)          // pengfei Li 2018-3-23
 		delete[] aux;
 		delete[] jl;
 	}
-	timer::tick("ppcell_vnl","init_vnl_alpha");
+	ModuleBase::timer::tick("ppcell_vnl","init_vnl_alpha");
 	GlobalV::ofs_running << "\n Init Non-Local-Pseudopotential done(including L)." << std::endl;
 	return;
 }

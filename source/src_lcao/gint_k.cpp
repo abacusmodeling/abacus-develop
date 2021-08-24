@@ -146,7 +146,7 @@ void Gint_k::folding_force(
 	double* pvdpz)
 {
 	TITLE("Gint_k","folding_force");
-	timer::tick("Gint_k","folding_force");
+	ModuleBase::timer::tick("Gint_k","folding_force");
 
 	//xiaohui modify 2013-12-17, test
 //	assert(GlobalC::GridT.lgd > 0); //mohan add 2012-06-10
@@ -308,7 +308,7 @@ void Gint_k::folding_force(
 		delete[] ppy;
 		delete[] ppz;
 	}
-	timer::tick("Gint_k","folding_force");
+	ModuleBase::timer::tick("Gint_k","folding_force");
 	return;
 }
 
@@ -328,7 +328,7 @@ void Gint_k::folding_stress(
 	double* pvdp23)
 {
 	TITLE("Gint_k","folding_stress");
-	timer::tick("Gint_k","folding_stress");
+	ModuleBase::timer::tick("Gint_k","folding_stress");
 
 	const int lgd = GlobalC::GridT.lgd;
 
@@ -566,7 +566,7 @@ void Gint_k::folding_stress(
 		delete[] pp13;
 		delete[] pp23;
 	}
-	timer::tick("Gint_k","folding_stress");
+	ModuleBase::timer::tick("Gint_k","folding_stress");
 	return;
 }
 
@@ -575,7 +575,7 @@ void Gint_k::folding_stress(
 void Gint_k::folding_vl_k(const int &ik)
 {
 	TITLE("Gint_k","folding_vl_k");
-	timer::tick("Gint_k","folding_vl_k");
+	ModuleBase::timer::tick("Gint_k","folding_vl_k");
 
 	if(!pvpR_alloc_flag)
 	{
@@ -766,7 +766,7 @@ void Gint_k::folding_vl_k(const int &ik)
 	*/
 
 	// Distribution of data.
-	timer::tick("Gint_k","Distri");
+	ModuleBase::timer::tick("Gint_k","Distri");
 	std::complex<double>* tmp;
 	for (int i=0; i<GlobalV::NLOCAL; i++)
 	{
@@ -821,9 +821,9 @@ void Gint_k::folding_vl_k(const int &ik)
 		delete[] pvp[i];
 	}
 	delete[] pvp;
-	timer::tick("Gint_k","Distri");
+	ModuleBase::timer::tick("Gint_k","Distri");
 
-	timer::tick("Gint_k","folding_vl_k");
+	ModuleBase::timer::tick("Gint_k","folding_vl_k");
 	return;
 }
 
@@ -833,7 +833,7 @@ void Gint_k::folding_vl_k(const int &ik)
 void Gint_k::folding_vl_k_nc(const int &ik)
 {
 	TITLE("Gint_k","folding_vl_k_nc");
-	timer::tick("Gint_k","folding_vl_k_nc");
+	ModuleBase::timer::tick("Gint_k","folding_vl_k_nc");
 
 	if(!pvpR_alloc_flag)
 	{
@@ -1024,7 +1024,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 	*/
 
 	// Distribution of data.
-	timer::tick("Gint_k","Distri");
+	ModuleBase::timer::tick("Gint_k","Distri");
 	std::complex<double>* tmp;
 	for (int i=0; i<GlobalV::NLOCAL; i++)
 	{
@@ -1138,9 +1138,9 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 		}
 		delete[] this->pvp_nc[spin];
 	}
-	timer::tick("Gint_k","Distri");
+	ModuleBase::timer::tick("Gint_k","Distri");
 
-	timer::tick("Gint_k","folding_vl_k_nc");
+	ModuleBase::timer::tick("Gint_k","folding_vl_k_nc");
 	return;
 }
 

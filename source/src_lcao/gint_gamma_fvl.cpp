@@ -14,10 +14,10 @@
 // calcualte the forces related to grid
 void Gint_Gamma::cal_force(const double*const vlocal)
 {
-    timer::tick("Gint_Gamma","cal_force");
+    ModuleBase::timer::tick("Gint_Gamma","cal_force");
     this->save_atoms_on_grid(GlobalC::GridT);
     this->gamma_force(vlocal);
-    timer::tick("Gint_Gamma","cal_force");
+    ModuleBase::timer::tick("Gint_Gamma","cal_force");
 }
 
 inline void cal_psir_ylm_dphi(
@@ -464,7 +464,7 @@ inline void cal_meshball_DGridV(
 void Gint_Gamma::gamma_force(const double*const vlocal) const
 {
     TITLE("Grid_Integral","gamma_force");
-    timer::tick("Gint_Gamma","gamma_force");
+    ModuleBase::timer::tick("Gint_Gamma","gamma_force");
     // GlobalC::GridT.lgd: local grid dimension (sub-FFT-mesh).
     int DGridV_Size=GlobalC::GridT.lgd*GlobalC::GridT.lgd;
     //OUT(GlobalV::ofs_running,"Enter gamma_force, DGridV_Size", DGridV_Size);
@@ -570,7 +570,7 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
     		}
         }*/
         //OUT(GlobalV::ofs_running,"Data were prepared");
-        //timer::tick("Gint_Gamma","prepare");
+        //ModuleBase::timer::tick("Gint_Gamma","prepare");
         for (int i=0; i< GlobalC::GridT.nbx; i++)
         {
             const int ibx = i*GlobalC::pw.bx; 
@@ -637,13 +637,13 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
 
     }//end if, replace goto line
 //ENDandRETURN:
-    timer::tick("Gint_Gamma","gamma_force");
+    ModuleBase::timer::tick("Gint_Gamma","gamma_force");
 #ifdef __MPI
-    timer::tick("Gint_Gamma","gamma_force_wait");
+    ModuleBase::timer::tick("Gint_Gamma","gamma_force_wait");
 	MPI_Barrier(MPI_COMM_WORLD);
-    timer::tick("Gint_Gamma","gamma_force_wait");
+    ModuleBase::timer::tick("Gint_Gamma","gamma_force_wait");
 #endif
-    timer::tick("Gint_Gamma","gamma_force2");
+    ModuleBase::timer::tick("Gint_Gamma","gamma_force2");
 
 
     //OUT(GlobalV::ofs_running,"Start reduce DGridV");
@@ -801,7 +801,7 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
     //     }
     // }
     // delete[] tmp;
-    timer::tick("Gint_Gamma","gamma_force2");   
+    ModuleBase::timer::tick("Gint_Gamma","gamma_force2");   
     
     //delete DGridV_x,y,z
     delete [] DGridV_x;

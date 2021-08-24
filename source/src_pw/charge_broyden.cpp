@@ -83,7 +83,7 @@ void Charge_Broyden::mix_rho
 )
 {
     TITLE("Charge_Broyden","mix_rho");
-	timer::tick("Charge", "mix_rho");
+	ModuleBase::timer::tick("Charge", "mix_rho");
 
     for (int is=0; is<GlobalV::NSPIN; is++)
     {
@@ -134,13 +134,13 @@ void Charge_Broyden::mix_rho
     if ( dr2 < diago_error )
     {
         GlobalV::ofs_warning << " dr2 < diago_error, keep charge density unchanged." << std::endl;
-    	timer::tick("Charge","mix_rho");
+    	ModuleBase::timer::tick("Charge","mix_rho");
         return;
     }
     else if (dr2 < tr2)
     {
         converged = true;
-    	timer::tick("Charge","mix_rho");
+    	ModuleBase::timer::tick("Charge","mix_rho");
 		return;
     }
 
@@ -213,7 +213,7 @@ void Charge_Broyden::mix_rho
 	}
 	delete[] rho123;
 
-    timer::tick("Charge","mix_rho");
+    ModuleBase::timer::tick("Charge","mix_rho");
     return;
 }
 

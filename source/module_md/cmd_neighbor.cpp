@@ -42,7 +42,7 @@ Vector3<double> CMD_neighbor::cell_periodic(const Vector3<double> a, const Vecto
 void CMD_neighbor::neighbor(UnitCell_pseudo &ucell_c)
 {
     TITLE("CMD_neighbor", "Neighbor");
-    timer::tick("CMD_neighbor", "Neighbor");
+    ModuleBase::timer::tick("CMD_neighbor", "Neighbor");
 
     delete[] nlist;
     for(int i=0; i<dim; i++)
@@ -121,7 +121,7 @@ void CMD_neighbor::neighbor(UnitCell_pseudo &ucell_c)
     delete[] list_local;
 #endif
 
-    timer::tick("CMD_neighbor", "Neighbor");
+    ModuleBase::timer::tick("CMD_neighbor", "Neighbor");
     return;
 }
 

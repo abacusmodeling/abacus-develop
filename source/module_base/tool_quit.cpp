@@ -42,7 +42,7 @@ void QUIT(void)
 #ifdef __NORMAL
 
 #else
-    timer::finish(GlobalV::ofs_running , !GlobalV::MY_RANK);
+    ModuleBase::timer::finish(GlobalV::ofs_running , !GlobalV::MY_RANK);
 
     ModuleBase::Global_File::close_all_log(GlobalV::MY_RANK);
 

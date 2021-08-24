@@ -564,7 +564,7 @@ int LCAO_nnr::cal_RindexAtom(const int &u1, const int &u2, const int &u3, const 
 void LCAO_nnr::folding_fixedH(const int &ik)
 {
 	TITLE("LCAO_nnr","folding_fixedH");
-	timer::tick("LCAO_nnr","folding_fixedH");
+	ModuleBase::timer::tick("LCAO_nnr","folding_fixedH");
 
 	int iat = 0;
 	int index = 0;
@@ -709,6 +709,6 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 
 	assert(index==this->nnr);
 
-	timer::tick("LCAO_nnr","folding_fixedH");
+	ModuleBase::timer::tick("LCAO_nnr","folding_fixedH");
 	return;
 }

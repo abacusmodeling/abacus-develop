@@ -122,7 +122,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 	double* drs
 ) const
 {
-	timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
+	ModuleBase::timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
 
 	double* k1_dot_k2 = new double[kmesh];
 	double* k1_dot_k2_dot_kpoint = new double[kmesh];
@@ -236,7 +236,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 	delete [] k1_dot_k2;
 	delete [] k1_dot_k2_dot_kpoint;	
 
-	timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
+	ModuleBase::timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
 	
 	return;
 }
@@ -255,7 +255,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 ) const
 {
 //	TITLE("ORB_table_phi","cal_ST_Phi12_R");
-	timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
+	ModuleBase::timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
 
 	std::vector<double> k1_dot_k2(kmesh);
 	switch(job)
@@ -362,7 +362,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 		}
 	}
 	
-	timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
+	ModuleBase::timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
 	
 	return;
 }
@@ -374,7 +374,7 @@ void ORB_table_phi::init_Table(
 	LCAO_Orbitals &orb)
 {
 	TITLE("ORB_table_phi", "init_Table");
-	timer::tick("ORB_table_phi", "init_Table");
+	ModuleBase::timer::tick("ORB_table_phi", "init_Table");
 	const int ntype = orb.get_ntype();
 	assert( ORB_table_phi::dr > 0.0);
 	assert( OV_nTpairs>0);
@@ -630,7 +630,7 @@ void ORB_table_phi::init_Table(
 		break;
 	}
 		
-	timer::tick("ORB_table_phi", "init_Table");
+	ModuleBase::timer::tick("ORB_table_phi", "init_Table");
 	return;
 }
 

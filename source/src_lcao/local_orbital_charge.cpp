@@ -97,7 +97,7 @@ void Local_Orbital_Charge::allocate_dm_wfc(const Grid_Technique &gt)
 void Local_Orbital_Charge::sum_bands(void)
 {
     TITLE("Local_Orbital_Charge","sum_bands");
-    timer::tick("Local_Orbital_Cha","sum_bands");
+    ModuleBase::timer::tick("Local_Orbital_Cha","sum_bands");
 
     GlobalC::en.eband = 0.0;
 
@@ -122,11 +122,11 @@ void Local_Orbital_Charge::sum_bands(void)
             if(INPUT.new_dm>0)
             {
                 //density matrix has already been calculated.
-                timer::tick("LCAO_Charge","cal_dm_2d");
+                ModuleBase::timer::tick("LCAO_Charge","cal_dm_2d");
 
                 wfc_dm_2d.cal_dm(GlobalC::wf.wg);        // Peize Lin test 2019-01-16
 
-                timer::tick("LCAO_Charge","cal_dm_2d");
+                ModuleBase::timer::tick("LCAO_Charge","cal_dm_2d");
 
                 this->cal_dk_gamma_from_2D(); // transform dm_gamma[is].c to this->DM[is]
             }
@@ -180,6 +180,6 @@ void Local_Orbital_Charge::sum_bands(void)
 
 	GlobalC::CHR.renormalize_rho();
 
-	timer::tick("Local_Orbital_Cha","sum_bands");
+	ModuleBase::timer::tick("Local_Orbital_Cha","sum_bands");
 	return;
 }

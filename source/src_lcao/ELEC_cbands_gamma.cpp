@@ -14,7 +14,7 @@ ELEC_cbands_gamma::~ELEC_cbands_gamma(){};
 void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 {
 	TITLE("ELEC_cbands_gamma","cal_bands");
-	timer::tick("ELEC_cband_gamma","cal_bands");
+	ModuleBase::timer::tick("ELEC_cband_gamma","cal_bands");
 
 	assert(GlobalV::NSPIN == GlobalC::kv.nks);
 						
@@ -102,7 +102,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		GlobalC::SGO.dis_subwfc();
 	}// end k points
 			
-	timer::tick("ELEC_cband_gamma","cal_bands");
+	ModuleBase::timer::tick("ELEC_cband_gamma","cal_bands");
 	return;	
 }
 

@@ -12,7 +12,7 @@ H_Ewald_pw::~H_Ewald_pw(){};
 void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 {
     TITLE("H_Ewald_pw","compute_ewald");
-    timer::tick("H_Ewald_pw","compute_ewald");
+    ModuleBase::timer::tick("H_Ewald_pw","compute_ewald");
 
 //----------------------------------------------------------
 // Calculates Ewald energy with both G- and R-space terms.
@@ -196,7 +196,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 	// set the Ewald energy, mohan add 2021-02-25
 	H_Ewald_pw::ewald_energy = ewalds; 
 
-    timer::tick("H_Ewald_pw","compute_ewald");
+    ModuleBase::timer::tick("H_Ewald_pw","compute_ewald");
     return;
 } // end function ewald
 

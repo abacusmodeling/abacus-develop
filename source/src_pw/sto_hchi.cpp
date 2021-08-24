@@ -432,7 +432,7 @@ void Stochastic_hchi::hchi_real(std::complex<double>*chi_in, std::complex<double
 
 void Stochastic_hchi:: hchi_reciprocal(std::complex<double> *chig, std::complex<double> *hchig, const int m)
 {
-	timer::tick("Stochastic_hchi","hchi_reciprocal");
+	ModuleBase::timer::tick("Stochastic_hchi","hchi_reciprocal");
 	
 	//---------------------------------------------------
 
@@ -460,7 +460,7 @@ void Stochastic_hchi:: hchi_reciprocal(std::complex<double> *chig, std::complex<
 	//------------------------------------
 	//(2) the local potential.
 	//------------------------------------
-	timer::tick("Stochastic_hchi","vloc");
+	ModuleBase::timer::tick("Stochastic_hchi","vloc");
 	if(GlobalV::VL_IN_H)
 	{
 		chibg = chig;
@@ -478,13 +478,13 @@ void Stochastic_hchi:: hchi_reciprocal(std::complex<double> *chig, std::complex<
 		}
 			
 	}
-	timer::tick("Stochastic_hchi","vloc");
+	ModuleBase::timer::tick("Stochastic_hchi","vloc");
 
 
 	//------------------------------------
 	// (3) the nonlocal pseudopotential.
 	//------------------------------------
-	timer::tick("Stochastic_hchi","vnl");
+	ModuleBase::timer::tick("Stochastic_hchi","vnl");
 	if(GlobalV::VNL_IN_H)
 	{
 		if ( GlobalC::ppcell.nkb > 0)
@@ -546,7 +546,7 @@ void Stochastic_hchi:: hchi_reciprocal(std::complex<double> *chig, std::complex<
 			delete[] Ps;
 		}
 	}
-	timer::tick("Stochastic_hchi","vnl");
+	ModuleBase::timer::tick("Stochastic_hchi","vnl");
 
 
 
@@ -558,7 +558,7 @@ void Stochastic_hchi:: hchi_reciprocal(std::complex<double> *chig, std::complex<
 		hchig[ig] = (hchig[ig] - Ebar * chig[ig]) / DeltaE;
 	}
 	
-	timer::tick("Stochastic_hchi","hchi_reciprocal");
+	ModuleBase::timer::tick("Stochastic_hchi","hchi_reciprocal");
 
 
 	return;

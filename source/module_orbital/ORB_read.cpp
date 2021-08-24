@@ -112,7 +112,7 @@ void LCAO_Orbitals::Read_Orbitals(
 	const int &my_rank) // mohan add 2021-04-26
 {
 	TITLE("LCAO_Orbitals", "Read_Orbitals");
-	timer::tick("LCAO_Orbitals","Read_Orbitals");
+	ModuleBase::timer::tick("LCAO_Orbitals","Read_Orbitals");
 
 	ofs_in << "\n\n\n\n";
 	ofs_in << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
@@ -265,7 +265,7 @@ void LCAO_Orbitals::Read_Orbitals(
 
 	}
 
-	timer::tick("LCAO_Orbitals","Read_Orbitals");
+	ModuleBase::timer::tick("LCAO_Orbitals","Read_Orbitals");
 	return;
 }
 

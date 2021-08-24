@@ -576,10 +576,10 @@ void Pdiag_Double::diago_double_begin(
         ModuleBase::GlobalFunc::ZEROS(Z, this->loc_size * GlobalV::NLOCAL);
 
         ModuleBase::Memory::record("Pdiag_Double","Z",loc_size * GlobalV::NLOCAL,"double");
-        timer::tick("Diago_LCAO_Matrix","pdgseps");
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","pdgseps");
 		LapackConnector::copy(nloc, s_mat, inc, Stmp, inc);
 		pdgseps(comm_2D, GlobalV::NLOCAL, nb, h_mat, Stmp, Z, eigen, this->MatrixInfo, uplo, this->loc_size, loc_pos);
-        timer::tick("Diago_LCAO_Matrix","pdgseps");
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","pdgseps");
 
         if(myid <= lastband_in_proc)
         {
@@ -603,9 +603,9 @@ void Pdiag_Double::diago_double_begin(
         //=====================================
 
         //xiaohui modify 2014-06-18
-        timer::tick("Diago_LCAO_Matrix","gath_eig");
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig");
         this->gath_eig(DIAG_HPSEPS_WORLD, GlobalV::NLOCAL, wfc, Z);
-        timer::tick("Diago_LCAO_Matrix","gath_eig");
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig");
         //delete[] Z; //LiuXh 20171109
 	}// HPSEPS method
     else if(GlobalV::KS_SOLVER=="genelpa")
@@ -631,22 +631,22 @@ void Pdiag_Double::diago_double_begin(
 
         if(GlobalC::CHR.get_new_e_iteration())
         {
-            timer::tick("Diago_LCAO_Matrix","genelpa1");
+            ModuleBase::timer::tick("Diago_LCAO_Matrix","genelpa1");
             method=0;
         	LapackConnector::copy(nloc, s_mat, inc, Stmp, inc);
             info=pdDecomposeRightMatrix2(GlobalV::NLOCAL, nrow, ncol, desc,
                                         Stmp, eigen, wfc_2d.c, work,
                                         comm_2D_f, mpi_comm_rows, mpi_comm_cols,
                                         method, THIS_REAL_ELPA_KERNEL_API, useQR);
-            timer::tick("Diago_LCAO_Matrix","genelpa1");
+            ModuleBase::timer::tick("Diago_LCAO_Matrix","genelpa1");
         }
-        timer::tick("Diago_LCAO_Matrix","genelpa2");
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","genelpa2");
         info=pdSolveEigen2(GlobalV::NBANDS, GlobalV::NLOCAL, nrow, ncol, desc,
                           h_mat, Stmp, eigen, wfc_2d.c, work,
                           comm_2D_f, mpi_comm_rows, mpi_comm_cols, method,
                           THIS_REAL_ELPA_KERNEL_API, useQR,
                           wantEigenVector, wantDebug);
-        timer::tick("Diago_LCAO_Matrix","genelpa2");
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","genelpa2");
 
     	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"K-S equation was solved by genelpa2");
         LapackConnector::copy(GlobalV::NBANDS, eigen, inc, ekb, inc);
@@ -657,7 +657,7 @@ void Pdiag_Double::diago_double_begin(
 			// and calculate the density matrix in the tranditional way
 			// redistribute eigenvectors to wfc / wfc_aug
 
-		timer::tick("Diago_LCAO_Matrix","gath_eig");
+		ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig");
 		int pos=0;
 		for(int i=0; i<myid; ++i)
 		{
@@ -734,7 +734,7 @@ void Pdiag_Double::diago_double_begin(
 		}
 
 		delete[] work;
-		timer::tick("Diago_LCAO_Matrix","gath_eig");
+		ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig");
 	} // GenELPA method
 	else if(GlobalV::KS_SOLVER=="lapack_gv")
 	{
@@ -1005,18 +1005,18 @@ void Pdiag_Double::diago_complex_begin(
 
         ModuleBase::Memory::record("Pdiag_Double","Z",loc_size * GlobalV::NLOCAL,"cdouble");
 		int nbands_tmp = GlobalV::NBANDS;
-        timer::tick("Diago_LCAO_Matrix","pzgseps");
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","pzgseps");
 		LapackConnector::copy(nloc, cs_mat, inc, Stmp, inc);
     	pzgseps(comm_2D, GlobalV::NLOCAL, nb, nbands_tmp, ch_mat, Stmp, Z, eigen, this->MatrixInfo, uplo, this->loc_size, loc_pos);
-        timer::tick("Diago_LCAO_Matrix","pzgseps");
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","pzgseps");
         // the eigenvalues.
         LapackConnector::copy(GlobalV::NBANDS, eigen, inc, ekb, inc);
         delete[] eigen;
 
         // Z is delete in gath_eig
-        timer::tick("Diago_LCAO_Matrix","gath_eig_complex");
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig_complex");
         this->gath_eig_complex(DIAG_HPSEPS_WORLD, GlobalV::NLOCAL, wfc, Z, ik);
-        timer::tick("Diago_LCAO_Matrix","gath_eig_complex");
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig_complex");
         //delete[] Z; //LiuXh 20180329, fix bug of 'double free()'
         //this->gath_full_eig_complex(DIAG_WORLD, GlobalV::NLOCAL, c, Z);
 	} // HPSEPS method
@@ -1036,7 +1036,7 @@ void Pdiag_Double::diago_complex_begin(
         MPI_Comm comm_2D_f = comm_2D;
 
         int THIS_REAL_ELPA_KERNEL_API=9;
-        timer::tick("Diago_LCAO_Matrix","genelpa");
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","genelpa");
         LapackConnector::copy(nloc, cs_mat, inc, Stmp, inc);
         int method=0;
         //info=pzSolveGenEigen2(GlobalV::NBANDS, GlobalV::NLOCAL, nrow, ncol, desc,
@@ -1044,27 +1044,27 @@ void Pdiag_Double::diago_complex_begin(
         //                      comm_2D_f, blacs_ctxt,
         //                      method, THIS_REAL_ELPA_KERNEL_API,
         //                      wantEigenVector, wantDebug);
-        //timer::tick("Diago_LCAO_Matrix","genelpa");
-        timer::tick("Diago_LCAO_Matrix","genelpa1");
+        //ModuleBase::timer::tick("Diago_LCAO_Matrix","genelpa");
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","genelpa1");
         info=pzDecomposeRightMatrix2(GlobalV::NLOCAL, nrow, ncol, desc,
                                     Stmp, eigen, wfc_2d.c, work,
                                     comm_2D_f, mpi_comm_rows, mpi_comm_cols,
                                     method, THIS_REAL_ELPA_KERNEL_API);
-        timer::tick("Diago_LCAO_Matrix","genelpa1");
-        timer::tick("Diago_LCAO_Matrix","genelpa2");
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","genelpa1");
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","genelpa2");
         info=pzSolveEigen2(GlobalV::NBANDS, GlobalV::NLOCAL, nrow, ncol, desc,
                     ch_mat, Stmp, eigen, wfc_2d.c, work,
                     comm_2D_f, mpi_comm_rows, mpi_comm_cols, method,
                     THIS_REAL_ELPA_KERNEL_API,
                     wantEigenVector, wantDebug);
-        timer::tick("Diago_LCAO_Matrix","genelpa2");
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","genelpa2");
 
         // the eigenvalues.
         LapackConnector::copy(GlobalV::NBANDS, eigen, inc, ekb, inc);
         delete[] eigen;
 
         //change eigenvector matrix from block-cycle distribute matrix to column-divided distribute matrix
-        timer::tick("Diago_LCAO_Matrix","gath_eig_complex");
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig_complex");
         int naroc[2]; // maximum number of row or column
         for(int iprow=0; iprow<dim0; ++iprow)
         {
@@ -1123,7 +1123,7 @@ void Pdiag_Double::diago_complex_begin(
             }
         }
         delete[] work;
-        timer::tick("Diago_LCAO_Matrix","gath_eig_complex");
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig_complex");
     } // GenELPA method
 	else if(GlobalV::KS_SOLVER=="scalapack_gvx")
 	{
@@ -1179,7 +1179,7 @@ void Pdiag_Double::diago_complex_begin(
 		// the follow will be deleted after finish newdm
 		{
 			//change eigenvector matrix from block-cycle distribute matrix to column-divided distribute matrix
-			timer::tick("Diago_LCAO_Matrix","gath_eig_complex");
+			ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig_complex");
 
 			long maxnloc; // maximum number of elements in local matrix
 			MPI_Reduce(&nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, comm_2D);
@@ -1244,7 +1244,7 @@ void Pdiag_Double::diago_complex_begin(
 				}
 			}
 			delete[] work;
-			timer::tick("Diago_LCAO_Matrix","gath_eig_complex");
+			ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig_complex");
 		}
 	}
 

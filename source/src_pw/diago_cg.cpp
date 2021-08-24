@@ -27,7 +27,7 @@ void Diago_CG::diag
 )
 {
     if (test_cg==1) TITLE("Diago_CG","ccgdiagg");
-    timer::tick("Diago_CG", "diag");
+    ModuleBase::timer::tick("Diago_CG", "diag");
 
     avg_iter = 0.0;
     notconv = 0;
@@ -158,7 +158,7 @@ void Diago_CG::diag
     delete [] sphi;
     delete [] phi_m;
 
-    timer::tick("Diago_CG","diag");
+    ModuleBase::timer::tick("Diago_CG","diag");
     return;
 } // end subroutine ccgdiagg
 
@@ -169,7 +169,7 @@ void Diago_CG::calculate_gradient(
     std::complex<double> *g, std::complex<double> *ppsi)
 {
     if (test_cg==1) TITLE("Diago_CG","calculate_gradient");
-    //timer::tick("Diago_CG","grad");
+    //ModuleBase::timer::tick("Diago_CG","grad");
 
     for (int i=0; i<dim; i++)
     {
@@ -196,7 +196,7 @@ void Diago_CG::calculate_gradient(
         // So here we get the gradient.
         g[i] -= lambda * ppsi[i];
     }
-    //timer::tick("Diago_CG","grad");
+    //ModuleBase::timer::tick("Diago_CG","grad");
     return;
 }
 
@@ -206,7 +206,7 @@ void Diago_CG::orthogonal_gradient( const int &dim, const int &dmx,
                                     const ModuleBase::ComplexMatrix &eigenfunction, const int m)
 {
     if (test_cg==1) TITLE("Diago_CG","orthogonal_gradient");
-    //timer::tick("Diago_CG","orth_grad");
+    //ModuleBase::timer::tick("Diago_CG","orth_grad");
 
     GlobalC::hm.hpw.s_1psi(dim , g, sg);
     int inc=1;
@@ -245,7 +245,7 @@ void Diago_CG::orthogonal_gradient( const int &dim, const int &dmx,
     }*/
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-    //timer::tick("Diago_CG","orth_grad");
+    //ModuleBase::timer::tick("Diago_CG","orth_grad");
     return;
 }
 
@@ -263,7 +263,7 @@ void Diago_CG::calculate_gamma_cg(
     const std::complex<double> *psi_m)
 {
     if (test_cg==1) TITLE("Diago_CG","calculate_gamma_cg");
-    //timer::tick("Diago_CG","gamma_cg");
+    //ModuleBase::timer::tick("Diago_CG","gamma_cg");
     double gg_inter;
     if (iter>0)
     {
@@ -319,7 +319,7 @@ void Diago_CG::calculate_gamma_cg(
             cg[i] -= norma * psi_m[i];
         }
     }
-    //timer::tick("Diago_CG","gamma_cg");
+    //ModuleBase::timer::tick("Diago_CG","gamma_cg");
     return;
 }
 
@@ -338,7 +338,7 @@ bool Diago_CG::update_psi(
     std::complex<double> *sphi)
 {
     if (test_cg==1) TITLE("Diago_CG","update_psi");
-    //timer::tick("Diago_CG","update");
+    //ModuleBase::timer::tick("Diago_CG","update");
     GlobalC::hm.hpw.h_1psi(dim, cg, hcg, scg);
     cg_norm = sqrt( this->ddot_real(dim, cg, scg) );
 
@@ -380,7 +380,7 @@ bool Diago_CG::update_psi(
 
     if ( abs(eigenvalue-e0)< threshold)
     {
-        //timer::tick("Diago_CG","update");
+        //ModuleBase::timer::tick("Diago_CG","update");
         return 1;
     }
     else
@@ -390,7 +390,7 @@ bool Diago_CG::update_psi(
             sphi[i] = sphi[i] * cost + sint_norm * scg[i];
             hpsi[i] = hpsi[i] * cost + sint_norm * hcg[i];
         }
-        //timer::tick("Diago_CG","update");
+        //ModuleBase::timer::tick("Diago_CG","update");
         return 0;
     }
 }
@@ -407,7 +407,7 @@ void Diago_CG::schmit_orth
 )
 {
 //	TITLE("Diago_CG","schmit_orth");
-    //timer::tick("Diago_CG","schmit_orth");
+    //ModuleBase::timer::tick("Diago_CG","schmit_orth");
     // orthogonalize starting eigenfunction to those already calculated
     // psi_m orthogonalize to psi(start) ~ psi(m-1)
     // Attention, the orthogonalize here read as
@@ -477,7 +477,7 @@ void Diago_CG::schmit_orth
     GlobalC::hm.hpw.s_1psi(dim, psi_m, sphi); // sphi = S|psi(m)>
 
     delete [] lagrange ;
-    //timer::tick("Diago_CG","schmit_orth");
+    //ModuleBase::timer::tick("Diago_CG","schmit_orth");
     return ;
 }
 

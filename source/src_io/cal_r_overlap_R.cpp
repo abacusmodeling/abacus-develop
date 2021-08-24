@@ -247,7 +247,7 @@ void cal_r_overlap_R::init()
 void cal_r_overlap_R::out_r_overlap_R(const int nspin)
 {	
 	TITLE("cal_r_overlap_R","out_r_overlap_R");
-	timer::tick("cal_r_overlap_R","out_r_overlap_R");
+	ModuleBase::timer::tick("cal_r_overlap_R","out_r_overlap_R");
 
 	Vector3<double> tau1, tau2, dtau;
 	Vector3<double> origin_point(0.0,0.0,0.0);
@@ -416,7 +416,7 @@ center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distan
 	if(GlobalV::DRANK == 0) out_r.close();
 
 
-	timer::tick("cal_r_overlap_R","out_r_overlap_R");
+	ModuleBase::timer::tick("cal_r_overlap_R","out_r_overlap_R");
 	
 	return;
 }

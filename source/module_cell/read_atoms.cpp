@@ -761,7 +761,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 bool UnitCell_pseudo::check_tau(void)const
 {
 	TITLE("UnitCell_pseudo","check_tau");
-	timer::tick("UnitCell_pseudo","check_tau");
+	ModuleBase::timer::tick("UnitCell_pseudo","check_tau");
 	
 	Vector3<double> diff = 0.0;
 	double norm = 0.0;
@@ -816,7 +816,7 @@ bool UnitCell_pseudo::check_tau(void)const
 		}
 	}
 
-	timer::tick("UnitCell_pseudo","check_tau");
+	ModuleBase::timer::tick("UnitCell_pseudo","check_tau");
 	return 1;
 }
 

@@ -15,7 +15,7 @@ void Hamilt::diagH_pw(
     double &avg_iter)
 {
 	TITLE("Hamilt","diagH_pw");
-    timer::tick("Hamilt", "diagH_pw");
+    ModuleBase::timer::tick("Hamilt", "diagH_pw");
     double avg = 0.0;
 
 	// set ik0 because of mem_saver.
@@ -135,7 +135,7 @@ void Hamilt::diagH_pw(
         }
     }
 
-	timer::tick("Hamilt","diagH_pw");
+	ModuleBase::timer::tick("Hamilt","diagH_pw");
     return;
 }
 
@@ -204,7 +204,7 @@ void Hamilt::diagH_LAPACK(
 	ModuleBase::ComplexMatrix &hvec)
 {
     TITLE("Hamilt","diagH_LAPACK");
-	timer::tick("Hamilt","diagH_LAPACK");
+	ModuleBase::timer::tick("Hamilt","diagH_LAPACK");
 
     int lwork=0;
     //========================================
@@ -320,6 +320,6 @@ void Hamilt::diagH_LAPACK(
     delete[] rwork;
     delete[] work;
 
-	timer::tick("Hamilt","diagH_LAPACK");
+	ModuleBase::timer::tick("Hamilt","diagH_LAPACK");
     return;
 }

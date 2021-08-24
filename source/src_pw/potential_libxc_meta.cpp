@@ -37,7 +37,7 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> Potential_Libxc::v_xc
 	const double * const * const kin_r_in)
 {
     TITLE("Potential_Libxc","v_xc");
-    timer::tick("Potential_Libxc","v_xc");
+    ModuleBase::timer::tick("Potential_Libxc","v_xc");
 
 	//output of the subroutine
     double etxc = 0.0;
@@ -47,7 +47,7 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> Potential_Libxc::v_xc
 
 	if(GlobalV::VXC_IN_H == 0 )
 	{
-    	timer::tick("Potential_Libxc","v_xc_meta");
+    	ModuleBase::timer::tick("Potential_Libxc","v_xc_meta");
 		return std::make_tuple( etxc, vtxc, move(v), move(vofk) );
 	}
 	//----------------------------------------------------------
@@ -290,7 +290,7 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> Potential_Libxc::v_xc
     etxc *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
     vtxc *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
 
-    timer::tick("Potential_Libxc","v_xc_meta");
+    ModuleBase::timer::tick("Potential_Libxc","v_xc_meta");
 	return std::make_tuple( etxc, vtxc, move(v), move(vofk) );
 
 }

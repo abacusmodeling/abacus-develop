@@ -52,7 +52,7 @@ void Local_Orbital_Charge::write_dm(
 	{
 		return; 
 	}
-	timer::tick("Local_Orbital_Charge","write_dm");
+	ModuleBase::timer::tick("Local_Orbital_Charge","write_dm");
 
 	time_t start, end;
 	std::ofstream ofs;
@@ -227,7 +227,7 @@ void Local_Orbital_Charge::write_dm(
 		ModuleBase::GlobalFunc::OUT_TIME("write_rho",start,end);
 		ofs.close();
 	}
-	timer::tick("Local_Orbital_Charge","write_dm");
+	ModuleBase::timer::tick("Local_Orbital_Charge","write_dm");
 
     return;
 }

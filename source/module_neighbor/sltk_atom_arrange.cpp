@@ -96,7 +96,7 @@ void atom_arrange::search(
 	const bool test_only)
 {
 	TITLE("atom_arrange", "search");
-	timer::tick("atom_arrange","search");
+	ModuleBase::timer::tick("atom_arrange","search");
 
 	assert( search_radius_bohr > 0.0 );
 
@@ -160,7 +160,7 @@ void atom_arrange::search(
 		exit(0);//just test neighboring searching!
 	}
 	
-	timer::tick("atom_arrange","search");
+	ModuleBase::timer::tick("atom_arrange","search");
 	return;
 }
 

@@ -30,7 +30,7 @@ void Record_adj::delete_grid(void)
 void Record_adj::for_2d(void)
 {
 	TITLE("Record_adj","for_2d");
-	timer::tick("Record_adj","for_2d");
+	ModuleBase::timer::tick("Record_adj","for_2d");
 
 	assert(GlobalC::ucell.nat>0);
 
@@ -215,7 +215,7 @@ void Record_adj::for_2d(void)
 			++iat;
 		}//end I1
 	}//end T1
-	timer::tick("Record_adj","for_2d");
+	ModuleBase::timer::tick("Record_adj","for_2d");
 
 	return;
 }
@@ -228,7 +228,7 @@ void Record_adj::for_2d(void)
 void Record_adj::for_grid(const Grid_Technique &gt)
 {
     TITLE("Record_adj","for_grid");
-	timer::tick("Record_adj","for_grid");
+	ModuleBase::timer::tick("Record_adj","for_grid");
 	
 	Vector3<double> tau1, tau2, dtau;
 	Vector3<double> tau0, dtau1, dtau2;
@@ -417,7 +417,7 @@ void Record_adj::for_grid(const Grid_Technique &gt)
 		}
 	}
 	assert(ca==na_proc);
-	timer::tick("Record_adj","for_grid");
+	ModuleBase::timer::tick("Record_adj","for_grid");
 
 //	std::cout << " after for_grid" << std::endl;
 	return;

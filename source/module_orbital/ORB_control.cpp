@@ -26,7 +26,7 @@ void ORB_control::set_orb_tables(
 	const int &my_rank) // mohan add 2021-04-26
 {
     TITLE("ORB_control","set_orb_tables");
-	timer::tick("ORB_control","set_orb_tables");
+	ModuleBase::timer::tick("ORB_control","set_orb_tables");
     
 	/////////////////////////////////////////////////////////////////
 	/// (1) FUNCTION : use 'info' to generate 'Numerical Orbital'
@@ -62,7 +62,7 @@ void ORB_control::set_orb_tables(
 #else
 	if(GlobalV::CALCULATION=="test")
 	{
-		timer::tick("ORB_control","set_orb_tables");
+		ModuleBase::timer::tick("ORB_control","set_orb_tables");
 		return;
 	}
 #endif
@@ -85,7 +85,7 @@ void ORB_control::set_orb_tables(
     OGT.set_unit(lat0);
 
 
-	timer::tick("ORB_control","set_orb_tables");
+	ModuleBase::timer::tick("ORB_control","set_orb_tables");
     return;
 }
 

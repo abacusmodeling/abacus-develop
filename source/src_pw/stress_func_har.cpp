@@ -5,7 +5,7 @@
 //calculate the Hartree part in PW or LCAO base
 void Stress_Func::stress_har(ModuleBase::matrix& sigma, const bool is_pw)
 {
-	timer::tick("Stress_Func","stress_har");
+	ModuleBase::timer::tick("Stress_Func","stress_har");
 	double shart;
 
 	std::complex<double> *Porter = GlobalC::UFFT.porter;
@@ -112,6 +112,6 @@ void Stress_Func::stress_har(ModuleBase::matrix& sigma, const bool is_pw)
 	delete[] vh_g;
 	delete[] psic;
 	delete[] psic0;
-	timer::tick("Stress_Func","stress_har");
+	ModuleBase::timer::tick("Stress_Func","stress_har");
 	return;
 }

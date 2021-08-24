@@ -26,7 +26,7 @@ void Sph_Bessel::jlx(
 	double *jl	//jl(1:msh) = j_l(q*r(i)),spherical bessel function
 )
 {
-    timer::tick("Sph_Bessel","jlx");
+    ModuleBase::timer::tick("Sph_Bessel","jlx");
     double x1;
     int i, ir, ir0;
 
@@ -194,7 +194,7 @@ void Sph_Bessel::jlx(
             std::cout << "\n error in sph_bes, l out of {-1 ... 6},l = " << l ;
         }
     }
-    timer::tick("Sph_Bessel","jlx");
+    ModuleBase::timer::tick("Sph_Bessel","jlx");
     return;
 }
 

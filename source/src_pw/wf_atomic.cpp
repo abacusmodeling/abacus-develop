@@ -32,7 +32,7 @@ WF_atomic::~WF_atomic()
 void WF_atomic::init_at_1(void)
 {
     if (GlobalV::test_wf) TITLE("WF_atomic","init_at_1");
-    timer::tick("WF_atomic","init_at_1");
+    ModuleBase::timer::tick("WF_atomic","init_at_1");
 
 	GlobalV::ofs_running << "\n Make real space PAO into reciprocal space." << std::endl;
 
@@ -151,7 +151,7 @@ void WF_atomic::init_at_1(void)
 
     delete [] aux;
     delete [] vchi;
-    timer::tick("WF_atomic","init_at_1");
+    ModuleBase::timer::tick("WF_atomic","init_at_1");
     return;
 }// end init_at_1
 
@@ -239,7 +239,7 @@ void WF_atomic::atomic_wfc
 )const
 {
     if (GlobalV::test_wf>3) TITLE("WF_atomic","atomic_wfc");
-    timer::tick("WF_atomic","atomic_wfc");
+    ModuleBase::timer::tick("WF_atomic","atomic_wfc");
     //=========================================================
     // This routine computes the superposition of atomic
     // WF_atomictions for a given k-point.
@@ -467,7 +467,7 @@ void WF_atomic::atomic_wfc
     delete [] gk;
     delete [] aux;
     delete[] chiaux;
-    timer::tick("WF_atomic","atomic_wfc");
+    ModuleBase::timer::tick("WF_atomic","atomic_wfc");
     return;
 } //end subroutine atomic_wfc
 

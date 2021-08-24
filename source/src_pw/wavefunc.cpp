@@ -140,7 +140,7 @@ void wavefunc::allocate(const int nks)
 void wavefunc::wfcinit(void)
 {
     TITLE("wavefunc","wfcinit");
-    timer::tick("wavefunc","wfcinit");
+    ModuleBase::timer::tick("wavefunc","wfcinit");
 
     this->wfcinit_k();
 
@@ -164,7 +164,7 @@ void wavefunc::wfcinit(void)
         this->check_psi(evc);
     }
 
-    timer::tick("wavefunc","wfcinit");
+    ModuleBase::timer::tick("wavefunc","wfcinit");
     return;
 }
 
@@ -210,7 +210,7 @@ int wavefunc::get_starting_nw(void)const
 void wavefunc::LCAO_in_pw_k(const int &ik, ModuleBase::ComplexMatrix &wvf)
 {
 	TITLE("wavefunc","LCAO_in_pw_k");
-	timer::tick("wavefunc","LCAO_in_pw_k");
+	ModuleBase::timer::tick("wavefunc","LCAO_in_pw_k");
 
 	assert(GlobalV::BASIS_TYPE=="lcao_in_pw");
 	
@@ -242,7 +242,7 @@ void wavefunc::LCAO_in_pw_k(const int &ik, ModuleBase::ComplexMatrix &wvf)
 
 //	ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"CONSTRUCT_LOCAL_BASIS_IN_PW");
 
-	timer::tick("wavefunc","LCAO_in_pw_k");
+	ModuleBase::timer::tick("wavefunc","LCAO_in_pw_k");
 	return;
 }
 
@@ -250,13 +250,13 @@ void wavefunc::LCAO_in_pw_k(const int &ik, ModuleBase::ComplexMatrix &wvf)
 void wavefunc::LCAO_in_pw_k_q(const int &ik, ModuleBase::ComplexMatrix &wvf, Vector3<double> q)   // pengfei  2016-11-23
 {
 	TITLE("wavefunc","LCAO_in_pw_k_q");
-	timer::tick("wavefunc","LCAO_in_pw_k_q");
+	ModuleBase::timer::tick("wavefunc","LCAO_in_pw_k_q");
 	//assert(LOCAL_BASIS==4); xiaohui modify 2013-09-01
 	assert(GlobalV::BASIS_TYPE=="lcao_in_pw"); //xiaohui add 2013-09-01. Attention! How about "BASIS_TYPE=="lcao""???
 
 	Wavefunc_in_pw::produce_local_basis_q_in_pw(ik, wvf, this->table_local, q);
 
-	timer::tick("wavefunc","LCAO_in_pw_k_q");
+	ModuleBase::timer::tick("wavefunc","LCAO_in_pw_k_q");
 	return;
 }
 #endif

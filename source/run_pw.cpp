@@ -18,7 +18,7 @@ Run_pw::~Run_pw(){}
 void Run_pw::plane_wave_line(void)
 {
     TITLE("Run_pw","plane_wave_line");
-	timer::tick("Run_pw","plane_wave_line");
+	ModuleBase::timer::tick("Run_pw","plane_wave_line");
 
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
@@ -161,6 +161,6 @@ void Run_pw::plane_wave_line(void)
 	// compute density of states
 	GlobalC::en.perform_dos_pw();
 
-	timer::tick("Run_pw","plane_wave_line");
+	ModuleBase::timer::tick("Run_pw","plane_wave_line");
     return;
 }

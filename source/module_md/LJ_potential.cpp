@@ -10,7 +10,7 @@ double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c,
                     Vector3<double> *force)
 {
     TITLE("LJ_potential", "Lennard_Jones");
-    timer::tick("LJ_potential", "Lennard_Jones");
+    ModuleBase::timer::tick("LJ_potential", "Lennard_Jones");
 
     double distance, potential = 0; //initialize
     int index = 0;
@@ -37,7 +37,7 @@ double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c,
             index++;
 	    }
     }
-    timer::tick("LJ_potential", "Lennard_Jones");
+    ModuleBase::timer::tick("LJ_potential", "Lennard_Jones");
 	return potential/2.0;
 }
 
@@ -46,7 +46,7 @@ double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c,
                     Vector3<double> *force)
 {
     TITLE("LJ_potential", "Lennard_Jones");
-    timer::tick("LJ_potential", "Lennard_Jones");
+    ModuleBase::timer::tick("LJ_potential", "Lennard_Jones");
 
     double potential = 0; //initialize
 
@@ -82,7 +82,7 @@ double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c,
 			}
 		}
 	}
-    timer::tick("LJ_potential", "Lennard_Jones");
+    ModuleBase::timer::tick("LJ_potential", "Lennard_Jones");
 	return potential/2.0;
 }
 

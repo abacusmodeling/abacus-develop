@@ -30,7 +30,7 @@ LOOP_ions::~LOOP_ions()
 void LOOP_ions::opt_ions(void)
 {
     TITLE("LOOP_ions","opt_ions");
-    timer::tick("LOOP_ions","opt_ions");
+    ModuleBase::timer::tick("LOOP_ions","opt_ions");
 
     if(GlobalV::OUT_LEVEL=="i")
     {
@@ -256,7 +256,7 @@ void LOOP_ions::opt_ions(void)
     }
 
 
-    timer::tick("LOOP_ions","opt_ions"); 
+    ModuleBase::timer::tick("LOOP_ions","opt_ions"); 
     return;
 }
 
@@ -272,7 +272,7 @@ bool LOOP_ions::force_stress(
     {
         return 1;
     }
-    timer::tick("LOOP_ions","force_stress");
+    ModuleBase::timer::tick("LOOP_ions","force_stress");
 
 	// set force matrix
 	ModuleBase::matrix fcs;
@@ -455,7 +455,7 @@ xiaohui modify 2014-08-09*/
 
     return 0;
 
-    timer::tick("LOOP_ions","force_stress");
+    ModuleBase::timer::tick("LOOP_ions","force_stress");
 }
 
 void LOOP_ions::final_scf(void)

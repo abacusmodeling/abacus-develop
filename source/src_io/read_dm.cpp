@@ -6,7 +6,7 @@
 void Local_Orbital_Charge::read_dm(const int &is, const std::string &fn)
 {
     TITLE("Local_Orbital_Charge","read_dm");
-    timer::tick("Local_Orbital_Charge","read_dm");
+    ModuleBase::timer::tick("Local_Orbital_Charge","read_dm");
 
     GlobalV::ofs_running << "\n processor 0 is reading density matrix from file < " << fn << " > " << std::endl;
     //xiaohui modify 2015-03-25
@@ -180,6 +180,6 @@ void Local_Orbital_Charge::read_dm(const int &is, const std::string &fn)
 
     GlobalV::ofs_running << " Finish reading density matrix." << std::endl;
 
-    timer::tick("Local_Orbital_Charge","read_dm");
+    ModuleBase::timer::tick("Local_Orbital_Charge","read_dm");
     return;
 }

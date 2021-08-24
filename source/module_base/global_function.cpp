@@ -85,7 +85,7 @@ void DONE(std::ofstream &ofs,const std::string &description, const bool only_ran
         {
      //       ofs << " ---------------------------------------------------------------------------------\n";
             ofs << " DONE : " << description;
-            ofs << " Time : "<< timer::print_until_now() << " (SEC)" ;
+            ofs << " Time : "<< ModuleBase::timer::print_until_now() << " (SEC)" ;
 			ofs << std::endl << std::endl;
      //       ofs << "\n ---------------------------------------------------------------------------------\n";
         }
@@ -94,12 +94,12 @@ void DONE(std::ofstream &ofs,const std::string &description, const bool only_ran
     {
      //   ofs << " ---------------------------------------------------------------------------------\n";
         ofs << " DONE : " << description;
-        ofs << " Time : "<< timer::print_until_now() << " (SEC)" ;
+        ofs << " Time : "<< ModuleBase::timer::print_until_now() << " (SEC)" ;
 		ofs << std::endl << std::endl;
      //   ofs << "\n ---------------------------------------------------------------------------------\n";
     }
 //   	std::cout << "\n---------------------------------------------------------------------------------\n";
-    std::cout << " DONE(" << std::setw(10) << timer::print_until_now() <<" SEC) : "<< description << std::endl;
+    std::cout << " DONE(" << std::setw(10) << ModuleBase::timer::print_until_now() <<" SEC) : "<< description << std::endl;
 //   	std::cout << "\n---------------------------------------------------------------------------------\n";
     return;
 }

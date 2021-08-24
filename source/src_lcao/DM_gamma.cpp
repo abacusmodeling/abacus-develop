@@ -32,7 +32,7 @@ inline int localIndex(int globalIndex, int nblk, int nprocs, int& myproc)
 int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt, int nblk)
 {
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"enter setAlltoallvParameter, nblk", nblk);
-    timer::tick("LCAO_Charge","newDM_index");
+    ModuleBase::timer::tick("LCAO_Charge","newDM_index");
     // setup blacs parameters
     int nprows=0;	
 	int npcols=0;
@@ -200,7 +200,7 @@ int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt
     }
     // ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"last sender_2D_index",sender_2D_index[lgd_now*lgd_now-1]);
     delete[] receiver_2D_index;
-    timer::tick("LCAO_Charge","newDM_index");
+    ModuleBase::timer::tick("LCAO_Charge","newDM_index");
     return 0;
 }
 
@@ -327,7 +327,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D_pub(void)
 // transform dm_gamma[is].c to this->DM[is]
 void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
 {
-    timer::tick("LCAO_Charge","dm_2dTOgrid");
+    ModuleBase::timer::tick("LCAO_Charge","dm_2dTOgrid");
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"cal_dk_gamma_from_2D, GlobalV::NSPIN", GlobalV::NSPIN);
 
     for(int is=0; is<GlobalV::NSPIN; ++is)
@@ -438,7 +438,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
             GlobalV::ofs_running<<"=========================================\n";
         }
     }
-    timer::tick("LCAO_Charge","dm_2dTOgrid");
+    ModuleBase::timer::tick("LCAO_Charge","dm_2dTOgrid");
 	return;
 }
 
@@ -446,7 +446,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
 void Local_Orbital_Charge::cal_dk_gamma(void)
 {
     TITLE("Local_Orbital_Charge","cal_density_kernal");
-    timer::tick("LocalOrbital_Charge","cal_dk_gamma");
+    ModuleBase::timer::tick("LocalOrbital_Charge","cal_dk_gamma");
 
     assert(GlobalV::NSPIN==GlobalC::kv.nks);
 
@@ -626,6 +626,6 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 	}  // end for is    
 #endif //2015-09-06, xiaohui
 
-    timer::tick("LocalOrbital_Charge","cal_dk_gamma");
+    ModuleBase::timer::tick("LocalOrbital_Charge","cal_dk_gamma");
     return;
 }

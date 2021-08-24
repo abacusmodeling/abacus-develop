@@ -112,7 +112,7 @@ void Hamilt_PW::diagH_subspace(
     double *en)
 {
     TITLE("Hamilt_PW","diagH_subspace");
-    timer::tick("Hamilt_PW","diagH_subspace");
+    ModuleBase::timer::tick("Hamilt_PW","diagH_subspace");
 
 	assert(nstart!=0);
 	assert(n_band!=0);
@@ -316,7 +316,7 @@ void Hamilt_PW::diagH_subspace(
 
     //out.printcm_norm("hvec",hvec,1.0e-8);
 
-    timer::tick("Hamilt_PW","diagH_subspace");
+    ModuleBase::timer::tick("Hamilt_PW","diagH_subspace");
     return;
 }
 
@@ -351,7 +351,7 @@ void Hamilt_PW::s_1psi
 
 void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *hpsi, const int m)
 {
-    timer::tick("Hamilt_PW","h_psi");
+    ModuleBase::timer::tick("Hamilt_PW","h_psi");
     int i = 0;
     int j = 0;
     int ig= 0;
@@ -399,7 +399,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 	//------------------------------------
 	//(2) the local potential.
 	//-----------------------------------
-	timer::tick("Hamilt_PW","vloc");
+	ModuleBase::timer::tick("Hamilt_PW","vloc");
 	if(GlobalV::VL_IN_H)
 	{
 		tmhpsi = hpsi;
@@ -455,12 +455,12 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 			tmpsi_in += dmax;
 		}
 	}
-	timer::tick("Hamilt_PW","vloc");
+	ModuleBase::timer::tick("Hamilt_PW","vloc");
 
 	//------------------------------------
 	// (3) the nonlocal pseudopotential.
 	//------------------------------------
-	timer::tick("Hamilt_PW","vnl");
+	ModuleBase::timer::tick("Hamilt_PW","vnl");
 	if(GlobalV::VNL_IN_H)
 	{
 		if ( GlobalC::ppcell.nkb > 0)
@@ -524,11 +524,11 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 			//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 		}
 	}
-	timer::tick("Hamilt_PW","vnl");
+	ModuleBase::timer::tick("Hamilt_PW","vnl");
 	//------------------------------------
 	// (4) the metaGGA part
 	//------------------------------------
-	timer::tick("Hamilt_PW","meta");
+	ModuleBase::timer::tick("Hamilt_PW","meta");
 	if(GlobalV::DFT_META)
 	{
 		tmhpsi = hpsi;
@@ -560,8 +560,8 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 			}//x,y,z directions
 		}
 	}
-	timer::tick("Hamilt_PW","meta");
-    timer::tick("Hamilt_PW","h_psi");
+	ModuleBase::timer::tick("Hamilt_PW","meta");
+    ModuleBase::timer::tick("Hamilt_PW","h_psi");
     return;
 }
 
@@ -573,7 +573,7 @@ void Hamilt_PW::add_nonlocal_pp(
 	const std::complex<double> *becp,
 	const int m)
 {
-    timer::tick("Hamilt_PW","add_nonlocal_pp");
+    ModuleBase::timer::tick("Hamilt_PW","add_nonlocal_pp");
 
 	// number of projectors
 	int nkb = GlobalC::ppcell.nkb;
@@ -727,7 +727,7 @@ void Hamilt_PW::add_nonlocal_pp(
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 	delete[] ps;
-    timer::tick("Hamilt_PW","add_nonlocal_pp");
+    ModuleBase::timer::tick("Hamilt_PW","add_nonlocal_pp");
     return;
 }
 
@@ -926,7 +926,7 @@ void Hamilt_PW::cal_err
 //	std::cout << "\n npw_in = " << npw_in << std::endl;
 
     assert(nband < npw_in);
-    timer::tick("Hamilt_PW", "cal_err") ;
+    ModuleBase::timer::tick("Hamilt_PW", "cal_err") ;
 
     std::complex<double> *psitmp =  new std::complex<double>[npw_in]();
     std::complex<double> *hpsitmp =  new std::complex<double>[npw_in]();
@@ -957,7 +957,7 @@ void Hamilt_PW::cal_err
     delete[] spsitmp;
 
 //	std::cout << " calculate error of the wavefunctions " << std::endl ;
-    timer::tick("Hamilt_PW", "cal_err") ;
+    ModuleBase::timer::tick("Hamilt_PW", "cal_err") ;
     return;
 }
 

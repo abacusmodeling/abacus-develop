@@ -344,7 +344,7 @@ void Forces::print(const std::string &name, const ModuleBase::matrix &f, bool ry
 
 void Forces::cal_force_loc(ModuleBase::matrix& forcelc)
 {
-	timer::tick("Forces","cal_force_loc");
+	ModuleBase::timer::tick("Forces","cal_force_loc");
 
     std::complex<double> *aux = new std::complex<double>[GlobalC::pw.nrxx];
     ModuleBase::GlobalFunc::ZEROS(aux, GlobalC::pw.nrxx);
@@ -393,14 +393,14 @@ void Forces::cal_force_loc(ModuleBase::matrix& forcelc)
     //this->print(GlobalV::ofs_running, "local forces", forcelc);
     Parallel_Reduce::reduce_double_pool(forcelc.c, forcelc.nr * forcelc.nc);
     delete[] aux;
-	timer::tick("Forces","cal_force_loc");
+	ModuleBase::timer::tick("Forces","cal_force_loc");
     return;
 }
 
 #include "H_Ewald_pw.h"
 void Forces::cal_force_ew(ModuleBase::matrix& forceion)
 {
-	timer::tick("Forces","cal_force_ew");
+	ModuleBase::timer::tick("Forces","cal_force_ew");
 
     double fact = 2.0;
     std::complex<double> *aux = new std::complex<double> [GlobalC::pw.ngmc];
@@ -546,7 +546,7 @@ void Forces::cal_force_ew(ModuleBase::matrix& forceion)
 
     //this->print(GlobalV::ofs_running, "ewald forces", forceion);
 
-	timer::tick("Forces","cal_force_ew");
+	ModuleBase::timer::tick("Forces","cal_force_ew");
 
     return;
 }
@@ -657,7 +657,7 @@ void Forces::cal_force_cc(ModuleBase::matrix& forcecc)
 void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
 {
 	TITLE("Forces","cal_force_nl");
-	timer::tick("Forces","cal_force_nl");
+	ModuleBase::timer::tick("Forces","cal_force_nl");
 
     const int nkb = GlobalC::ppcell.nkb;
 	if(nkb == 0) return; // mohan add 2010-07-25
@@ -800,7 +800,7 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
     // sum up forcenl from all processors
     Parallel_Reduce::reduce_double_all(forcenl.c, forcenl.nr * forcenl.nc);
 //  this->print(GlobalV::ofs_running, "nonlocal forces", forcenl);
-	timer::tick("Forces","cal_force_nl");
+	ModuleBase::timer::tick("Forces","cal_force_nl");
     return;
 }
 

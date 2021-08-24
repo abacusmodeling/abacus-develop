@@ -114,7 +114,7 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 void Build_ST_pw::set_local(const int &ik)
 {
 	TITLE("Build_ST_pw","set_local");
-	timer::tick("Build_ST_pw","set_local");
+	ModuleBase::timer::tick("Build_ST_pw","set_local");
 	assert(GlobalV::NLOCAL>0);
 	assert(!GlobalV::GAMMA_ONLY_LOCAL);
 
@@ -250,6 +250,6 @@ void Build_ST_pw::set_local(const int &ik)
     delete[] psi_one;
     delete[] hpsi;
 	delete[] psic;
-	timer::tick("Build_ST_pw","set_local");
+	ModuleBase::timer::tick("Build_ST_pw","set_local");
 	return;
 }

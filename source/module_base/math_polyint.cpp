@@ -15,7 +15,7 @@ void PolyInt::Polynomial_Interpolation
     const double &x				// input value
 )
 {
-    timer::tick("PolyInt","Poly_Interpo_1");
+    ModuleBase::timer::tick("PolyInt","Poly_Interpo_1");
     assert(table_interval>0.0);
     const double position = x / table_interval;
     const int iq = static_cast<int>(position);
@@ -36,7 +36,7 @@ void PolyInt::Polynomial_Interpolation
         table(dim1, dim2, iq+2) * x1 * x0 * x3 / 2.0 +
         table(dim1, dim2, iq+3) * x1 * x2 * x0 / 6.0 ;
 
-    timer::tick("PolyInt","Poly_Interpo_1");
+    ModuleBase::timer::tick("PolyInt","Poly_Interpo_1");
     return;
 }
 
@@ -50,7 +50,7 @@ double PolyInt::Polynomial_Interpolation
     const double &x				// input value
 )
 {
-//	timer::tick("PolyInt","Poly_Interpo_2");
+//	ModuleBase::timer::tick("PolyInt","Poly_Interpo_2");
     assert(table_interval>0.0);
     const double position = x / table_interval;
     const int iq = static_cast<int>(position);
@@ -76,7 +76,7 @@ double PolyInt::Polynomial_Interpolation
         table(dim1, dim2, iq+2) * x1 * x0 * x3 / 2.0 +
         table(dim1, dim2, iq+3) * x1 * x2 * x0 / 6.0 ;
 
-//	timer::tick("PolyInt","Poly_Interpo_2");
+//	ModuleBase::timer::tick("PolyInt","Poly_Interpo_2");
     return y;
 }
 
@@ -91,7 +91,7 @@ double PolyInt::Polynomial_Interpolation            // pengfei Li 2018-3-23
     const double &x				// input value
 )
 {
-//	timer::tick("PolyInt","Poly_Interpo_3");
+//	ModuleBase::timer::tick("PolyInt","Poly_Interpo_3");
     assert(table_interval>0.0);
     const double position = x / table_interval;
     const int iq = static_cast<int>(position);
@@ -113,7 +113,7 @@ double PolyInt::Polynomial_Interpolation            // pengfei Li 2018-3-23
         table(dim1, dim2, dim3, iq+2) * x1 * x0 * x3 / 2.0 +
         table(dim1, dim2, dim3, iq+3) * x1 * x2 * x0 / 6.0 ;
 
-//	timer::tick("PolyInt","Poly_Interpo_3");
+//	ModuleBase::timer::tick("PolyInt","Poly_Interpo_3");
     return y;
 }
 
@@ -163,7 +163,7 @@ double PolyInt::Polynomial_Interpolation_xy
     {
         return ypoint[0];
     }
-    // timer::tick("PolyInt","Poly_Inter_xy");
+    // ModuleBase::timer::tick("PolyInt","Poly_Inter_xy");
 
     for (int ik = 0; ik < table_length; ik++)
     {
@@ -221,12 +221,12 @@ double PolyInt::Polynomial_Interpolation_xy
         part5 = dx1 * dx2 * dx3 * dx4 * dx6 / (-x15) / (-x25) / (-x35) / (-x45) / x56 * ypoint[position+4];
         part6 = dx1 * dx2 * dx3 * dx4 * dx5 / (-x16) / (-x26) / (-x36) / (-x46) / (-x56) * ypoint[position+5];
 
-        // 	timer::tick("PolyInt","Poly_Inter_xy");
+        // 	ModuleBase::timer::tick("PolyInt","Poly_Inter_xy");
         return part1 + part2 + part3 + part4 + part5 + part6;
     }
     else
     {
-        // 	timer::tick("PolyInt","Poly_Inter_xy");
+        // 	ModuleBase::timer::tick("PolyInt","Poly_Inter_xy");
         return ypoint[position];
     }
 }

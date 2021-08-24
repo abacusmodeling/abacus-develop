@@ -59,7 +59,7 @@ void PW_complement::get_total_pw(
 )
 {
     if (GlobalV::test_pw) TITLE("PW_complement","get_total_pw");
-    timer::tick("PW_complement","get_total_pw");
+    ModuleBase::timer::tick("PW_complement","get_total_pw");
     if (ggcut_end<=0.0)
     {
         WARNING_QUIT("PW_complement::get_total_pw","ggcut <= 0.0");
@@ -98,7 +98,7 @@ void PW_complement::get_total_pw(
     }
 
     //std::cout << "\n ng = " << ng;
-    timer::tick("PW_complement","get_total_pw");
+    ModuleBase::timer::tick("PW_complement","get_total_pw");
     return;
 }
 
@@ -239,7 +239,7 @@ void PW_complement::setup_GVectors(
     Vector3<double>* g)
 {
     if (GlobalV::test_pw) TITLE("PW_complement","setup_GVectors");
-    timer::tick("PW_complement","setup_GVectors");
+    ModuleBase::timer::tick("PW_complement","setup_GVectors");
 
     int *ind = new int[ngmc_g_in];// auxiliary array for the 1d G std::vector index
     ModuleBase::GlobalFunc::ZEROS( ind, ngmc_g_in );
@@ -309,7 +309,7 @@ void PW_complement::setup_GVectors(
     }
 
 
-    timer::tick("PW_complement","setup_GVectors");
+    ModuleBase::timer::tick("PW_complement","setup_GVectors");
     return;
 }
 
@@ -408,7 +408,7 @@ void PW_complement::get_total_pw_after_vc(
 )
 {
     if (GlobalV::test_pw) TITLE("PW_complement","get_total_pw");
-    timer::tick("PW_complement","get_total_pw");
+    ModuleBase::timer::tick("PW_complement","get_total_pw");
     if (ggcut_end<=0.0)
     {
         WARNING_QUIT("PW_complement::get_total_pw","ggcut <= 0.0");
@@ -445,6 +445,6 @@ void PW_complement::get_total_pw_after_vc(
             }
         }
     }
-    timer::tick("PW_complement","get_total_pw");
+    ModuleBase::timer::tick("PW_complement","get_total_pw");
     return;
 }

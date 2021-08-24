@@ -6,7 +6,7 @@
 void Stress_PW::cal_stress(ModuleBase::matrix& sigmatot)
 {
 	TITLE("Stress_PW","cal_stress");
-	timer::tick("Stress_PW","cal_stress");    
+	ModuleBase::timer::tick("Stress_PW","cal_stress");    
 
 	// total stress
 	sigmatot.create(3,3);

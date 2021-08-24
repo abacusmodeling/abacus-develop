@@ -24,7 +24,7 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, std::o
 {
     if (available == false) return;
     TITLE("Symmetry","init");
-	timer::tick("Symmetry","analy_sys");
+	ModuleBase::timer::tick("Symmetry","analy_sys");
 
 	ofs_running << "\n\n\n\n";
 	ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
@@ -1416,7 +1416,7 @@ void Symmetry::rho_symmetry( double *rho,
                              const int &nr1, const int &nr2, const int &nr3)
 {
 //  if (GlobalV::test_symmetry)TITLE("Symmetry","rho_symmetry");
-    timer::tick("Symmetry","rho_symmetry");
+    ModuleBase::timer::tick("Symmetry","rho_symmetry");
 
     //for fft commensuration
 	//nrotk : the number of space operations.
@@ -1504,7 +1504,7 @@ void Symmetry::rho_symmetry( double *rho,
     delete[] ri;
     delete[] rj;
     delete[] rk;
-    timer::tick("Symmetry","rho_symmetry");
+    ModuleBase::timer::tick("Symmetry","rho_symmetry");
 }
 
 void Symmetry::force_symmetry(ModuleBase::matrix &force , double* pos, const UnitCell_pseudo &ucell)   // pengfei 2016-12-20

@@ -50,7 +50,7 @@ void Force_Stress_LCAO::getForceStress(
 	ModuleBase::matrix &scs)
 {
     TITLE("Force_Stress_LCAO","getForceStress");
-	timer::tick("Force_Stress_LCAO","getForceStress");
+	ModuleBase::timer::tick("Force_Stress_LCAO","getForceStress");
 	
 	if(!isforce&&!isstress) return;
 
@@ -482,7 +482,7 @@ void Force_Stress_LCAO::getForceStress(
 		GlobalV::PRESSURE = (scs(0,0)+scs(1,1)+scs(2,2))/3;
 	}//end of stress calculation
 	
-	timer::tick("Force_LCAO","start_force");
+	ModuleBase::timer::tick("Force_LCAO","start_force");
 	return;
 }
 

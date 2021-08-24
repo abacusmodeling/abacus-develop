@@ -629,7 +629,7 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex_3(const int &ik, complex<double>
         delete[] eigen;
 
         // Z is delete in gath_eig
-        //timer::tick("Evolve_LCAO_Matrix","gath_eig_complex",'G');
+        //ModuleBase::timer::tick("Evolve_LCAO_Matrix","gath_eig_complex",'G');
 	return 0;
 
 }

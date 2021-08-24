@@ -24,7 +24,7 @@ int ELEC_scf::iter=0;
 void ELEC_scf::scf(const int &istep)
 {
 	TITLE("ELEC_scf","scf");
-	timer::tick("ELEC_scf","scf");
+	ModuleBase::timer::tick("ELEC_scf","scf");
 
 	// (1) calculate ewald energy.
 	// mohan update 2021-02-25
@@ -268,7 +268,7 @@ void ELEC_scf::scf(const int &istep)
 
 		if(conv_elec)
 		{
-			timer::tick("ELEC_scf","scf");
+			ModuleBase::timer::tick("ELEC_scf","scf");
 			return;
 		}
 
@@ -566,7 +566,7 @@ void ELEC_scf::scf(const int &istep)
 			}
 
 //			ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"ELECTRONS CONVERGED!");
-			timer::tick("ELEC_scf","scf");
+			ModuleBase::timer::tick("ELEC_scf","scf");
 			return;
 		}
 	}
@@ -577,7 +577,7 @@ void ELEC_scf::scf(const int &istep)
 		delete[] WFC_init;
 	}
 
-	timer::tick("ELEC_scf","scf");
+	ModuleBase::timer::tick("ELEC_scf","scf");
 	return;
 }
 

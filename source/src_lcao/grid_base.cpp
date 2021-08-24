@@ -230,7 +230,7 @@ void Grid_Base::edge_grid_points(
 	const Vector3<double> &min_direct_coodinate)
 {
 	//index of the 8 edge points in FFT box
-	timer::tick("Grid_Base","edge_grid_points");
+	ModuleBase::timer::tick("Grid_Base","edge_grid_points");
 	edge_min.x = static_cast<int>(min_direct_coodinate.x * this->nx) ;
 	edge_max.x = static_cast<int>(max_direct_coodinate.x * this->nx) + 1;
 	edge_min.y = static_cast<int>(min_direct_coodinate.y * this->ny) ;
@@ -296,7 +296,7 @@ void Grid_Base::edge_grid_points(
 	}
 
 	int count=0;
-	timer::tick("mohan_test","1");
+	ModuleBase::timer::tick("mohan_test","1");
 	for (int i = edge_min.x; i < edge_max.x; i++)
 	{
 		for (int j = edge_min.y; j < edge_max.y; j++)
@@ -317,9 +317,9 @@ void Grid_Base::edge_grid_points(
 			}
 		}
 	}
-	timer::tick("mohan_test","1");
+	ModuleBase::timer::tick("mohan_test","1");
 
-	timer::tick("mohan_test","2");
+	ModuleBase::timer::tick("mohan_test","2");
 	static double yy_tmp[400];
 	count = 0;
 	for (int i = edge_min.x; i < edge_max.x; i++)
@@ -348,7 +348,7 @@ void Grid_Base::edge_grid_points(
 			}
 		}
 	}
-	timer::tick("mohan_test","2");
+	ModuleBase::timer::tick("mohan_test","2");
 
 	if(count!=grid_number)
 	{
@@ -356,6 +356,6 @@ void Grid_Base::edge_grid_points(
 		GlobalV::ofs_warning << "\n grid_number = " << grid_number;
 		WARNING_QUIT("Grid_Base::edge_grid_points","count!=grid_number");
 	}
-	timer::tick("Grid_Base","edge_grid_points");
+	ModuleBase::timer::tick("Grid_Base","edge_grid_points");
 	return;
 }

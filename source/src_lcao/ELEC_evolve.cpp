@@ -30,7 +30,7 @@ void ELEC_evolve::evolve_psi(
 	std::complex<double> ***wfc)
 {
 	TITLE("ELEC_evolve","eveolve_psi");
-	timer::tick("ELEC_evolve","evolve_psi");
+	ModuleBase::timer::tick("ELEC_evolve","evolve_psi");
 
 	int start_spin = -1;
 	uhm.GK.reset_spin(start_spin);
@@ -126,17 +126,17 @@ void ELEC_evolve::evolve_psi(
 
 		if(diago)
 		{
-			timer::tick("Efficience","diago_k");
+			ModuleBase::timer::tick("Efficience","diago_k");
 			Diago_LCAO_Matrix DLM;
 			DLM.solve_complex_matrix(ik, GlobalC::LOWF.WFC_K[ik], GlobalC::LOC.wfc_dm_2d.wfc_k[ik]);
-			timer::tick("Efficience","diago_k");
+			ModuleBase::timer::tick("Efficience","diago_k");
 		}
 		else
 		{
-			timer::tick("Efficience","evolve_k");
+			ModuleBase::timer::tick("Efficience","evolve_k");
 			Evolve_LCAO_Matrix ELM;
 			ELM.evolve_complex_matrix(ik, GlobalC::LOWF.WFC_K[ik], wfc[ik]);
-			timer::tick("Efficience","evolve_k");
+			ModuleBase::timer::tick("Efficience","evolve_k");
 		}
 	} // end k
 
@@ -146,7 +146,7 @@ void ELEC_evolve::evolve_psi(
 		uhm.GK.destroy_pvpR();
 	}
 
-	timer::tick("ELEC_evolve","evolve_psi");
+	ModuleBase::timer::tick("ELEC_evolve","evolve_psi");
 	return;
 }
 

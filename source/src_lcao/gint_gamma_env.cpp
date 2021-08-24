@@ -7,12 +7,12 @@
 void Gint_Gamma::cal_env(const double* wfc, double* rho)
 {
     TITLE("Gint_Gamma","cal_env");
-    timer::tick("Gint_Gamma","cal_env");
+    ModuleBase::timer::tick("Gint_Gamma","cal_env");
 
     this->save_atoms_on_grid(GlobalC::GridT);
     this->gamma_envelope(wfc, rho);
 
-    timer::tick("Gint_Gamma","cal_env");
+    ModuleBase::timer::tick("Gint_Gamma","cal_env");
     return;
 }
 

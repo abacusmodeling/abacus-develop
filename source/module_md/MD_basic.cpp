@@ -131,7 +131,7 @@ void MD_basic::runNVT(int step1, double potential, Vector3<double> *force, const
 //------------------------------------------------------------------------------
 
 	TITLE("MD_basic","runnvt");
-	timer::tick("MD_basic","runnvt");
+	ModuleBase::timer::tick("MD_basic","runnvt");
 	step_=step1+step_rst_;
 	//the real MD step
 	
@@ -275,7 +275,7 @@ void MD_basic::runNVT(int step1, double potential, Vector3<double> *force, const
     //    MPI_Bcast(&vLogS,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
     }
 #endif
-    timer::tick("MD_basic","runnvt");
+    ModuleBase::timer::tick("MD_basic","runnvt");
     return;
 }
 
@@ -287,7 +287,7 @@ void MD_basic::runNVE(int step1, double potential, Vector3<double> *force, const
 //-------------------------------------------------------------------------------
 
     TITLE("MD_basic","runNVE");
-    timer::tick("MD_basic","runNVE");
+    ModuleBase::timer::tick("MD_basic","runNVE");
     step_=step1+step_rst_;
 
   // Set up extra output to ion optimizer / MD header
@@ -400,7 +400,7 @@ void MD_basic::runNVE(int step1, double potential, Vector3<double> *force, const
     }
 #endif
 
-    timer::tick("MD_basic","runNVE");
+    ModuleBase::timer::tick("MD_basic","runNVE");
     return;
 }
 
@@ -410,7 +410,7 @@ bool MD_basic::runFIRE(int step1, double potential, Vector3<double> *force, cons
 // REFERENCES:
 //   
     TITLE("MD_basic","runFIRE");
-    timer::tick("MD_basic","runFIRE");
+    ModuleBase::timer::tick("MD_basic","runFIRE");
     step_ = step1;
     // if(step_==1)
     // {
@@ -507,7 +507,7 @@ bool MD_basic::runFIRE(int step1, double potential, Vector3<double> *force, cons
     {
 	//"convergency reach"
 		//std::cout <<"CONVERGENCY REACH of FIRE in the "<<step <<" steps " <<std::endl;
-		timer::tick("MD_basic","runFIRE");
+		ModuleBase::timer::tick("MD_basic","runFIRE");
 		return true;
 	}
 
@@ -560,7 +560,7 @@ bool MD_basic::runFIRE(int step1, double potential, Vector3<double> *force, cons
     }
 #endif
 
-    timer::tick("MD_basic","runFIRE");
+    ModuleBase::timer::tick("MD_basic","runFIRE");
     return false;
 }
 

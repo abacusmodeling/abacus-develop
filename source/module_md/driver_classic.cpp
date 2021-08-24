@@ -15,7 +15,7 @@ void Driver_classic::init()
 	TITLE("Driver_classic", "init");
 
 	time_t time_start = std::time(NULL);
-	timer::start();
+	ModuleBase::timer::start();
 
 	// (1) read the input parameters.
 	this->reading();
@@ -35,7 +35,7 @@ void Driver_classic::init()
 
 void Driver_classic::reading(void)
 {
-	timer::tick("Driver_classic", "reading");
+	ModuleBase::timer::tick("Driver_classic", "reading");
 
 	// (1) read INPUT 
 	INPUT.Init( GlobalV::global_in_card );
@@ -45,14 +45,14 @@ void Driver_classic::reading(void)
     ss1 << GlobalV::global_out_dir << GlobalV::global_in_card;
     INPUT.Print( ss1.str() );
 
-	timer::tick("Driver_classic","reading");
+	ModuleBase::timer::tick("Driver_classic","reading");
 	return;
 }
 
 void Driver_classic::convert(UnitCell_pseudo &ucell_c)
 {
     TITLE("Driver_classic","convert");
-	timer::tick("Driver_classic","convert");
+	ModuleBase::timer::tick("Driver_classic","convert");
 
     if(INPUT.atom_file!="") GlobalV::global_atom_card = INPUT.atom_file;
     GlobalV::CALCULATION = INPUT.calculation;
@@ -91,7 +91,7 @@ void Driver_classic::classic_world(void)
 
     run_md_classic.classic_md_line();
 
-	timer::finish( GlobalV::ofs_running );
+	ModuleBase::timer::finish( GlobalV::ofs_running );
 
 	ModuleBase::Memory::print_all( GlobalV::ofs_running ) ;
 

@@ -12,7 +12,7 @@ void Optical::cal_epsilon2(const int &nbands)
 {
 	if(!Optical::opt_epsilon2) return;
 	TITLE("Optical","cal_epsilon2");
-	timer::tick("Optical","cal_epsilon2");
+	ModuleBase::timer::tick("Optical","cal_epsilon2");
 
 	if(Optical::opt_nbands > GlobalV::NBANDS)
 	{
@@ -109,7 +109,7 @@ void Optical::cal_epsilon2(const int &nbands)
 		ofs.close();
 	}
 
-	timer::tick("Optical","cal_epsilon2");
+	ModuleBase::timer::tick("Optical","cal_epsilon2");
 	return;
 }
 

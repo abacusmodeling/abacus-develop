@@ -6,7 +6,7 @@
 //calculate the GGA stress correction in PW and LCAO
 void Stress_Func::stress_gga(ModuleBase::matrix& sigma) 
 {
-	timer::tick("Stress_Func","stress_gga");
+	ModuleBase::timer::tick("Stress_Func","stress_gga");
      
 	if (GlobalC::xcf.igcx == 0  &&  GlobalC::xcf.igcc == 0)
 	{
@@ -244,6 +244,6 @@ void Stress_Func::stress_gga(ModuleBase::matrix& sigma)
 		delete[] rhogsum2;
 		delete[] gdr2;
 	}
-	timer::tick("Stress_Func","stress_gga");
+	ModuleBase::timer::tick("Stress_Func","stress_gga");
 	return;
 }

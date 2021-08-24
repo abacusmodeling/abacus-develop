@@ -110,7 +110,7 @@ void HS_Matrix::save_HS_ccf(const int &iter, const int &Hnnz, const int *colptr_
 void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
 {
     TITLE("HS_Matrix","save_HS_bit");
-    timer::tick("HS_Matrix","save_HS_bit");
+    ModuleBase::timer::tick("HS_Matrix","save_HS_bit");
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Dimension of H and S",GlobalV::NLOCAL);
 
     std::stringstream ssh;
@@ -363,7 +363,7 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
 #endif
     }
 
-    timer::tick("HS_Matrix","save_HS_bit");
+    ModuleBase::timer::tick("HS_Matrix","save_HS_bit");
     return;
 }
 
@@ -389,7 +389,7 @@ void HS_Matrix::saving_HS_complex(std::complex<double> *Hloc, std::complex<doubl
 void HS_Matrix::save_HS_complex(std::complex<double> *H, std::complex<double> *S, bool bit)
 {
     TITLE("HS_Matrix","save_HS_bit");
-    timer::tick("HS_Matrix","save_HS_bit");
+    ModuleBase::timer::tick("HS_Matrix","save_HS_bit");
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Dimension of H and S",GlobalV::NLOCAL);
 
     std::stringstream ssh;
@@ -642,7 +642,7 @@ void HS_Matrix::save_HS_complex(std::complex<double> *H, std::complex<double> *S
 #endif
     }
 
-    timer::tick("HS_Matrix","save_HS_bit");
+    ModuleBase::timer::tick("HS_Matrix","save_HS_bit");
     return;
 }
 
@@ -651,7 +651,7 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
 //void HS_Matrix::save_HSR_tr(void)
 {
     TITLE("HS_Matrix","save_HSR_tr");
-    timer::tick("HS_Matrix","save_HSR_tr");
+    ModuleBase::timer::tick("HS_Matrix","save_HSR_tr");
 
     std::stringstream ssh;
     std::stringstream sss;
@@ -857,14 +857,14 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
     g2.close();
 #endif
 
-    timer::tick("HS_Matrix","save_HSR_tr");
+    ModuleBase::timer::tick("HS_Matrix","save_HSR_tr");
     return;
 }
 
 void HS_Matrix::save_HSR_sparse(const int &current_spin, const double &sparse_threshold, const bool &binary)
 {
     TITLE("HS_Matrix","save_HSR_sparse");
-    timer::tick("HS_Matrix","save_HSR_sparse");
+    ModuleBase::timer::tick("HS_Matrix","save_HSR_sparse");
 
     auto &HR_sparse_ptr = GlobalC::LM.HR_sparse;
     auto &HR_soc_sparse_ptr = GlobalC::LM.HR_soc_sparse;
@@ -1077,7 +1077,7 @@ void HS_Matrix::save_HSR_sparse(const int &current_spin, const double &sparse_th
     H_nonzero_number = nullptr;
     S_nonzero_number = nullptr;
 
-    timer::tick("HS_Matrix","save_HSR_sparse");
+    ModuleBase::timer::tick("HS_Matrix","save_HSR_sparse");
     return;
 }
 

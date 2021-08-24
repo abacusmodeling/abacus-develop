@@ -198,7 +198,7 @@ void Charge::renormalize_rho(void)
 void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Peize Lin refactor 2021.04.08
 {
     TITLE("Charge","atomic_rho");
-    timer::tick("Charge","atomic_rho");
+    ModuleBase::timer::tick("Charge","atomic_rho");
 
 	const ModuleBase::ComplexMatrix rho_g3d = [&]()->ModuleBase::ComplexMatrix
 	{
@@ -529,7 +529,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 	//GlobalV::ofs_running << " Superposition of atomic wave function as First-Charge done." << std::endl;
 	//2014-06-22
 
-    timer::tick("Charge","atomic_rho");
+    ModuleBase::timer::tick("Charge","atomic_rho");
     return;
 }
 
@@ -542,7 +542,7 @@ void Charge::set_rho_core(
 )
 {
     TITLE("Charge","set_rho_core");
-    timer::tick("Charge","set_rho_core");
+    ModuleBase::timer::tick("Charge","set_rho_core");
 
     //double eps = 1.e-10;
     GlobalC::en.etxcc = 0.0;
@@ -569,7 +569,7 @@ void Charge::set_rho_core(
     if (!bl)
     {
         ModuleBase::GlobalFunc::ZEROS( this->rho_core, GlobalC::pw.nrxx);
-    	timer::tick("Charge","set_rho_core");
+    	ModuleBase::timer::tick("Charge","set_rho_core");
         return;
     }
 
@@ -644,7 +644,7 @@ void Charge::set_rho_core(
     // The term was present in previous versions of the code but it shouldn't
     delete [] rhocg;
     delete [] vg;
-    timer::tick("Charge","set_rho_core");
+    ModuleBase::timer::tick("Charge","set_rho_core");
     return;
 } // end subroutine set_rhoc
 
@@ -712,7 +712,7 @@ void Charge::non_linear_core_correction
 void Charge::sum_band(void)
 {
     TITLE("Charge","sum_band");
-    timer::tick("Charge","sum_band");
+    ModuleBase::timer::tick("Charge","sum_band");
 //----------------------------------------------------------
 // Calculates the symmetrized charge density and sum of
 // occupied eigenvalues.
@@ -730,7 +730,7 @@ void Charge::sum_band(void)
     sum_band_k();
 
     // Symmetrization of the charge density (and local magnetization)
-    timer::tick("Charge","sum_band");
+    ModuleBase::timer::tick("Charge","sum_band");
     return;
 }
 
@@ -881,7 +881,7 @@ void Charge::rho_mpi(void)
     if (GlobalV::NPROC==1) return;
 	if((GlobalV::CALCULATION=="scf-sto" || GlobalV::CALCULATION=="relax-sto" || GlobalV::CALCULATION=="md-sto")&&GlobalV::NPROC_IN_POOL==1) 
 		return;//qinarui add it temporarily.
-    timer::tick("Charge","rho_mpi");
+    ModuleBase::timer::tick("Charge","rho_mpi");
     int ir;//counters on real space mesh point.
     int iz;//counters on z direction of fft grid.
     int ip;//counters on processors
@@ -1092,7 +1092,7 @@ void Charge::rho_mpi(void)
 
     delete[] num_z;
     delete[] start_z;
-    timer::tick("Charge","rho_mpi");
+    ModuleBase::timer::tick("Charge","rho_mpi");
     return;
 }
 #endif

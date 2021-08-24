@@ -10,7 +10,7 @@
 void Potential::set_vrs_tddft(const int istep)
 {
     TITLE("Potential","set_vrs_tddft");
-    timer::tick("Potential","set_vrs_tddft");
+    ModuleBase::timer::tick("Potential","set_vrs_tddft");
 
     for (int is = 0;is < GlobalV::NSPIN;is++)
     {
@@ -148,6 +148,6 @@ void Potential::set_vrs_tddft(const int istep)
         }
     }
 
-    timer::tick("potential","set_vrs_tddft");
+    ModuleBase::timer::tick("potential","set_vrs_tddft");
     return;
 } //end subroutine set_vrs_tddft

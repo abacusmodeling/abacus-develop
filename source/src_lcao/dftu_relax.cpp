@@ -450,7 +450,7 @@ double DFTU_RELAX::get_onebody_eff_pot
 void DFTU_RELAX::cal_VU_pot_mat_complex(const int spin, const bool newlocale, std::complex<double>* VU)
 {
   TITLE("DFTU_RELAX","cal_VU_pot_mat_complex"); 
-	// timer::tick("DFTU","folding_overlap_matrix");
+	// ModuleBase::timer::tick("DFTU","folding_overlap_matrix");
   ModuleBase::GlobalFunc::ZEROS(VU, GlobalC::ParaO.nloc);
 
   for(int it=0; it<GlobalC::ucell.ntype; ++it)
@@ -507,7 +507,7 @@ void DFTU_RELAX::cal_VU_pot_mat_complex(const int spin, const bool newlocale, st
 void DFTU_RELAX::cal_VU_pot_mat_real(const int spin, const bool newlocale, double* VU)
 {
   TITLE("DFTU_RELAX","cal_VU_pot_mat_real"); 
-	// timer::tick("DFTU","folding_overlap_matrix");
+	// ModuleBase::timer::tick("DFTU","folding_overlap_matrix");
   ModuleBase::GlobalFunc::ZEROS(VU, GlobalC::ParaO.nloc);
 
   for(int it=0; it<GlobalC::ucell.ntype; ++it)

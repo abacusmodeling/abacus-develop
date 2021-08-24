@@ -27,7 +27,7 @@
 void Input_Conv::Convert(void)
 {
     TITLE("Input_Conv","Convert");
-	timer::tick("Input_Conv","Convert");
+	ModuleBase::timer::tick("Input_Conv","Convert");
 //----------------------------------------------------------
 // main parameters / electrons / spin ( 10/16 )
 //----------------------------------------------------------
@@ -624,6 +624,6 @@ void Input_Conv::Convert(void)
 		GlobalV::DFT_META = 1;
 	}
 
-	timer::tick("Input_Conv","Convert");
+	ModuleBase::timer::tick("Input_Conv","Convert");
     return;
 }

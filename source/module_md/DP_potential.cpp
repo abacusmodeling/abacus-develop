@@ -11,7 +11,7 @@ void DP_potential::DP_pot(UnitCell_pseudo &ucell_c, double &potential, Vector3<d
 {
 #ifdef __DPMD
     TITLE("DP_potential", "DP_pot");
-    timer::tick("DP_potential", "DP_pot");
+    ModuleBase::timer::tick("DP_potential", "DP_pot");
 
     deepmd::DeepPot dp ("graph.pb");
 
@@ -40,7 +40,7 @@ void DP_potential::DP_pot(UnitCell_pseudo &ucell_c, double &potential, Vector3<d
         }
     }
 
-    timer::tick("DP_potential", "DP_pot");
+    ModuleBase::timer::tick("DP_potential", "DP_pot");
 #else
     WARNING_QUIT("DP_pot", "Please recompile with -D__DPMD !");
 #endif

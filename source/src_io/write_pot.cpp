@@ -24,7 +24,7 @@ void Potential::write_potential(
     {
         return;
     }
-    timer::tick("potential","write_potential");
+    ModuleBase::timer::tick("potential","write_potential");
 
     std::ofstream ofs;
 
@@ -191,7 +191,7 @@ void Potential::write_potential(
     MPI_Barrier(MPI_COMM_WORLD);
 #endif
     if(GlobalV::MY_RANK==0) ofs.close();
-    timer::tick("potential","write_potential");
+    ModuleBase::timer::tick("potential","write_potential");
     return;
 }
 
@@ -199,7 +199,7 @@ void Potential::write_potential(
 void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_ave)
 {
     TITLE("Potential","write_elecstat_pot");
-    timer::tick("Potential","write_elecstat_pot");
+    ModuleBase::timer::tick("Potential","write_elecstat_pot");
 
     double *v_elecstat;
     v_elecstat = new double[GlobalC::pw.nrxx];
@@ -483,6 +483,6 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
     delete[] v_elecstat;
     delete[] vh_g;
 
-    timer::tick("Potential","write_potential");
+    ModuleBase::timer::tick("Potential","write_potential");
     return;
 }

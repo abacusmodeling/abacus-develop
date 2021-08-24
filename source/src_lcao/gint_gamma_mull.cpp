@@ -9,12 +9,12 @@
 void Gint_Gamma::cal_mulliken(double** mulliken)
 {
     TITLE("Gint_Gamma","cal_mulliken");
-    timer::tick("Gint_Gamma","cal_mulliken");
+    ModuleBase::timer::tick("Gint_Gamma","cal_mulliken");
 
     this->save_atoms_on_grid(GlobalC::GridT);
     this->gamma_mulliken(mulliken);
 
-    timer::tick("Gint_Gamma","cal_mulliken");
+    ModuleBase::timer::tick("Gint_Gamma","cal_mulliken");
     return;
 }
 

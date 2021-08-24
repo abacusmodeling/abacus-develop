@@ -5,7 +5,7 @@
 //NLCC term, need to be tested
 void Stress_Func::stress_cc(ModuleBase::matrix& sigma, const bool is_pw)
 {
-	timer::tick("Stress_Func","stress_cc");
+	ModuleBase::timer::tick("Stress_Func","stress_cc");
         
 	int nt,ng,l,m,ir;
 	double fact=1.0;
@@ -133,7 +133,7 @@ void Stress_Func::stress_cc(ModuleBase::matrix& sigma, const bool is_pw)
 	delete[] rhocg;
 	delete[] psic;
 
-	timer::tick("Stress_Func","stress_cc");
+	ModuleBase::timer::tick("Stress_Func","stress_cc");
 	return;
 }
 

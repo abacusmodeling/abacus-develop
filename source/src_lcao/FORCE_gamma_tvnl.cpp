@@ -10,7 +10,7 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(
 	ModuleBase::matrix& stvnl_dphi)
 {
     TITLE("Force_LCAO_gamma","cal_ftvnl_dphi");
-    timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
     for(int i=0; i<GlobalV::NLOCAL; i++)
     {
         const int iat = GlobalC::ucell.iwt2iat[i];
@@ -59,7 +59,7 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(
             }
         }
     }
-    timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
     return;
 }
 
@@ -73,7 +73,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
 	ModuleBase::matrix& svnl_dbeta)
 {
     TITLE("Force_LCAO_gamma","cal_fvnl_dbeta");
-    timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
 
 	double r0[3];
 	double r1[3];
@@ -224,7 +224,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
             }
         }
     }
-    timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
     return;
 }
 
@@ -237,7 +237,7 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(
 	ModuleBase::matrix& stvnl_dphi)
 {
     TITLE("Force_LCAO_gamma","cal_ftvnl_dphi");
-    timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
 
     for(int i=0; i<GlobalV::NLOCAL; i++)
     {
@@ -287,7 +287,7 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(
             }
         }
     }
-    timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
     return;
 }
 
@@ -300,7 +300,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
 	ModuleBase::matrix& svnl_dbeta)
 {
     TITLE("Force_LCAO_gamma","cal_fvnl_dbeta");
-    timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
 
     for(int iat=0; iat<GlobalC::ucell.nat; iat++)
     {
@@ -447,6 +447,6 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
             }
         }
     }
-    timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
     return;
 }

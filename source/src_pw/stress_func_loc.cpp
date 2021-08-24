@@ -4,7 +4,7 @@
 //calculate local pseudopotential stress in PW or VL_dVL stress in LCAO
 void Stress_Func::stress_loc(ModuleBase::matrix& sigma, const bool is_pw)
 {
-    timer::tick("Stress_Func","stress_loc");
+    ModuleBase::timer::tick("Stress_Func","stress_loc");
 
     double *dvloc;
     double evloc=0.0;
@@ -99,7 +99,7 @@ void Stress_Func::stress_loc(ModuleBase::matrix& sigma, const bool is_pw)
 	delete[] vg;
 
 
-	timer::tick("Stress_Func","stress_loc");
+	ModuleBase::timer::tick("Stress_Func","stress_loc");
 	return;
 }
 

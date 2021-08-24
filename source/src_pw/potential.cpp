@@ -65,7 +65,7 @@ void Potential::init_pot(
 )
 {
     TITLE("Potential","init_pot");
-    timer::tick("Potential","init_pot");
+    ModuleBase::timer::tick("Potential","init_pot");
 
     assert(istep>=0);
 
@@ -242,7 +242,7 @@ void Potential::init_pot(
 
 	// plots
     //figure::picture(this->vr_eff1,GlobalC::pw.ncx,GlobalC::pw.ncy,GlobalC::pw.ncz);
-    timer::tick("Potential","init_pot");
+    ModuleBase::timer::tick("Potential","init_pot");
     return;
 }
 
@@ -260,7 +260,7 @@ void Potential::set_local_pot(
 )const
 {
     TITLE("Potential","set_local_pot");
-    timer::tick("Potential","set_local_pot");
+    ModuleBase::timer::tick("Potential","set_local_pot");
 
     std::complex<double> *vg = new std::complex<double>[ngmc];
 
@@ -295,7 +295,7 @@ void Potential::set_local_pot(
     }
 
     //GlobalV::ofs_running <<" set local pseudopotential done." << std::endl;
-    timer::tick("Potential","set_local_pot");
+    ModuleBase::timer::tick("Potential","set_local_pot");
     return;
 }
 
@@ -310,7 +310,7 @@ ModuleBase::matrix Potential::v_of_rho(
 	const double * const rho_core_in)
 {
     TITLE("Potential","v_of_rho");
-    timer::tick("Potential","v_of_rho");
+    ModuleBase::timer::tick("Potential","v_of_rho");
 
     ModuleBase::matrix v(GlobalV::NSPIN,GlobalC::pw.nrxx);
 
@@ -359,7 +359,7 @@ ModuleBase::matrix Potential::v_of_rho(
             EFID.add_efield(rho_in[is], &v.c[is*GlobalC::pw.nrxx]);
         }
     }
-    timer::tick("Potential","v_of_rho");
+    ModuleBase::timer::tick("Potential","v_of_rho");
     return v;
 } //end subroutine v_of_rho
 
@@ -374,7 +374,7 @@ ModuleBase::matrix Potential::v_of_rho(
 void Potential::set_vr_eff(void)
 {
     TITLE("Potential","set_vr_eff");
-    timer::tick("Potential","set_vr_eff");
+    ModuleBase::timer::tick("Potential","set_vr_eff");
 
     for (int is = 0;is < GlobalV::NSPIN;is++)
     {
@@ -397,7 +397,7 @@ void Potential::set_vr_eff(void)
 		}
     }
 
-    timer::tick("Potential","set_vr_eff");
+    ModuleBase::timer::tick("Potential","set_vr_eff");
     return;
 }
 
