@@ -167,7 +167,7 @@ void Diago_CG_GPU::diag
         }
 
         // cudaMemcpy(sphi, phi_m, dim * sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice);
-        GlobalC::hm.hpw.s_1psi(dim, phi_m, sphi);
+        GlobalC::hm.hpw.s_1psi_gpu(dim, phi_m, sphi);
 
         err = cudaGetLastError();
         if (err != cudaSuccess)
@@ -177,7 +177,7 @@ void Diago_CG_GPU::diag
         
         this->schmit_orth(dim, dmx, m, phi, sphi, phi_m);
 
-        GlobalC::hm.hpw.h_1psi(dim, phi_m, hphi, sphi);
+        GlobalC::hm.hpw.h_1psi_gpu(dim, phi_m, hphi, sphi);
 
         err = cudaGetLastError();
         if (err != cudaSuccess)
@@ -324,7 +324,7 @@ void Diago_CG_GPU::orthogonal_gradient( const int &dim, const int &dmx,
     if (test_cg==1) TITLE("Diago_CG_GPU","orthogonal_gradient");
     timer::tick("Diago_CG_GPU","orth_grad");
 
-    GlobalC::hm.hpw.s_1psi(dim, g, sg);
+    GlobalC::hm.hpw.s_1psi_gpu(dim, g, sg);
 
     int inc=1;
 
@@ -485,7 +485,7 @@ bool Diago_CG_GPU::update_psi(
     {
         cout << "Cuda error: "<< cudaGetErrorString(err) <<" in "<< __LINE__ << endl;
     }
-    GlobalC::hm.hpw.h_1psi(dim, cg, hcg, scg);
+    GlobalC::hm.hpw.h_1psi_gpu(dim, cg, hcg, scg);
     // hpsi end
     err = cudaGetLastError();
     if (err != cudaSuccess)
@@ -597,7 +597,7 @@ void Diago_CG_GPU::schmit_orth
     int block = dim / 512 + 1;
     kernel_normalization<<<block, thread>>>(psi_m, dim, psi_norm);
 
-    GlobalC::hm.hpw.s_1psi(dim, psi_m, sphi);
+    GlobalC::hm.hpw.s_1psi_gpu(dim, psi_m, sphi);
 
     cublasDestroy(handle);
     timer::tick("Diago_CG_GPU","schmit_orth");

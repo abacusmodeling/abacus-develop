@@ -26,7 +26,6 @@ public:
 	friend class Epsilon0_vasp;
 	friend class Potential;
 	friend class Hamilt_PW;
-	friend class Hamilt_PW_GPU;
 	friend class WF_atomic;
 	friend class wavefunc;
 	friend class Stochastic_hchi;

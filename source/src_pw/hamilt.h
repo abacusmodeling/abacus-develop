@@ -2,7 +2,11 @@
 #define HAMILT_H
 
 #include "tools.h"
+#ifdef __CUDA
+#include "hamilt_pw_gpu.h"
+#else
 #include "hamilt_pw.h"
+#endif
 
 class Hamilt
 {

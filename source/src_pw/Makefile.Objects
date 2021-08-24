@@ -79,7 +79,6 @@ energy_dos_pw.o\
 dos.o\
 forces.o\
 global.o \
-hamilt_pw.o \
 hamilt_pw_gpu.o \
 hamilt.o \
 H_Ewald_pw.o\
