@@ -4,6 +4,8 @@
 #include "timer.h"
 #include "global_function.h"
 
+namespace ModuleBase
+{
 Sph_Bessel::Sph_Bessel()
 {
 	eps = 1.0e-10;
@@ -422,4 +424,6 @@ double Sph_Bessel::CHEBEV(double a, double b, double c[], int m, double x)
         dd = sv;
     }
     return y*d - dd + 0.5*c[0];
+}
+
 }
