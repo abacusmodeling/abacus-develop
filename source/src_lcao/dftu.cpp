@@ -436,17 +436,17 @@ void DFTU::cal_occup_m_k(const int iter)
 
 					if(GlobalV::NSPIN==1 || GlobalV::NSPIN==4)
 					{
-            matrix temp(locale[iat][l][n][0]);
+            ModuleBase::matrix temp(locale[iat][l][n][0]);
 						MPI_Allreduce( &temp(0,0), &locale[iat][l][n][0](0,0), (2*l+1)*GlobalV::NPOL*(2*l+1)*GlobalV::NPOL,
 										      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 					}
 					else if(GlobalV::NSPIN==2)
 					{
-            matrix temp0(locale[iat][l][n][0]);
+            ModuleBase::matrix temp0(locale[iat][l][n][0]);
 						MPI_Allreduce( &temp0(0,0), &locale[iat][l][n][0](0,0), (2*l+1)*(2*l+1),
 										      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 
-						matrix temp1(locale[iat][l][n][1]);
+						ModuleBase::matrix temp1(locale[iat][l][n][1]);
 						MPI_Allreduce( &temp1(0,0), &locale[iat][l][n][1](0,0), (2*l+1)*(2*l+1),
 										      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 					}
@@ -600,7 +600,7 @@ void DFTU::cal_occup_m_gamma(const int iter)
 	  					}
 	  				}
 
-	  				matrix temp(locale[iat][l][n][is]);
+	  				ModuleBase::matrix temp(locale[iat][l][n][is]);
 	  				MPI_Allreduce( &temp(0,0), &locale[iat][l][n][is](0,0), (2*l+1)*GlobalV::NPOL*(2*l+1)*GlobalV::NPOL,
 	  								      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 

@@ -173,7 +173,7 @@ int Pseudopot_upf::average_p(const double& lambda)
 		}
 
 		this->nbeta = new_nbeta;
-		matrix dion_new;
+		ModuleBase::matrix dion_new;
 		dion_new.create(this->nbeta, this->nbeta);
 
 		int old_nbeta=-1;

@@ -140,7 +140,7 @@ void Gint_k::destroy_pvpR(void)
 // fold the <phi | vl |dphi(R)> * DM(R) to 
 // calculate the force.
 void Gint_k::folding_force(
-	matrix& fvl_dphi,
+	ModuleBase::matrix& fvl_dphi,
 	double* pvdpx, 
 	double* pvdpy, 
 	double* pvdpz)
@@ -315,8 +315,8 @@ void Gint_k::folding_force(
 // fold the <phi | vl * R_beta|dphi(R_alpha)> * DM(R) to 
 // calculate the stress.
 void Gint_k::folding_stress(
-	matrix& fvl_dphi, 
-	matrix& svl_dphi,
+	ModuleBase::matrix& fvl_dphi, 
+	ModuleBase::matrix& svl_dphi,
 	double* pvdpx, 
 	double* pvdpy, 
 	double* pvdpz,

@@ -255,13 +255,13 @@ bool Ions::after_scf(const int &istep, int &force_step, int &stress_step)
 {
 	TITLE("Ions","after_scf");
 	//calculate and gather all parts of total ionic forces
-	matrix force;
+	ModuleBase::matrix force;
 	if(GlobalV::FORCE)
 	{
 		this->gather_force_pw(force);
 	}
 	//calculate and gather all parts of stress
-	matrix stress;
+	ModuleBase::matrix stress;
 	if(GlobalV::STRESS)
 	{
 		this->gather_stress_pw(stress);
@@ -299,13 +299,13 @@ bool Ions::after_scf(const int &istep, int &force_step, int &stress_step)
 
     return 1;
 }
-void Ions::gather_force_pw(matrix &force)
+void Ions::gather_force_pw(ModuleBase::matrix &force)
 {
 	TITLE("Ions","gather_force_pw");
 	Forces fcs;
 	fcs.init(force);
 }
-void Ions::gather_stress_pw(matrix& stress)
+void Ions::gather_stress_pw(ModuleBase::matrix& stress)
 {
 	TITLE("Ions","gather_stress_pw");
 	//basic stress
@@ -358,14 +358,14 @@ bool Ions::if_do_cellrelax()
 	}
 	else return 0;
 }
-bool Ions::do_relax(const int& istep, int& jstep, const matrix& ionic_force, const double& total_energy)
+bool Ions::do_relax(const int& istep, int& jstep, const ModuleBase::matrix& ionic_force, const double& total_energy)
 {
 	TITLE("Ions","do_relax");
 	IMM.cal_movement(istep, jstep, ionic_force, total_energy);
 	++jstep;
 	return IMM.get_converged();
 }
-bool Ions::do_cellrelax(const int& istep, const matrix& stress, const double& total_energy)
+bool Ions::do_cellrelax(const int& istep, const ModuleBase::matrix& stress, const double& total_energy)
 {
 	TITLE("Ions","do_cellrelax");
 	LCM.cal_lattice_change(istep, stress, total_energy);

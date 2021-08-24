@@ -104,7 +104,7 @@ void Numerical_Basis::output_overlap( const ModuleBase::ComplexMatrix *psi)
             }
         }
 
-        const matrix overlap_V = this->cal_overlap_V(psi, derivative_order);		// Peize Lin add 2020.04.23
+        const ModuleBase::matrix overlap_V = this->cal_overlap_V(psi, derivative_order);		// Peize Lin add 2020.04.23
 
     #ifdef __MPI
         for (int ik=0; ik<GlobalC::kv.nks; ik++)
@@ -156,7 +156,7 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Q(
 
 	const realArray flq = this->cal_flq(ik, gk);
 
-    const matrix ylm = Numerical_Basis::cal_ylm(gk);
+    const ModuleBase::matrix ylm = Numerical_Basis::cal_ylm(gk);
 
     GlobalV::ofs_running << "\n " << std::setw(5)
         << "ik" << std::setw(8) 
@@ -232,7 +232,7 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Sq(
 
 	const realArray flq = this->cal_flq(ik, gk);
 
-    const matrix ylm = Numerical_Basis::cal_ylm(gk);
+    const ModuleBase::matrix ylm = Numerical_Basis::cal_ylm(gk);
 
     GlobalV::ofs_running << "\n " << std::setw(5)
         << "ik" << std::setw(8) 
@@ -318,11 +318,11 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Sq(
 }
 
 // Peize Lin add for dpsi 2020.04.23
-matrix Numerical_Basis::cal_overlap_V(
+ModuleBase::matrix Numerical_Basis::cal_overlap_V(
 	const ModuleBase::ComplexMatrix *psi,
 	const int derivative_order)
 {
-	matrix overlap_V(GlobalC::kv.nks, GlobalV::NBANDS);
+	ModuleBase::matrix overlap_V(GlobalC::kv.nks, GlobalV::NBANDS);
 	for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 	{
 		for(int ib=0; ib<GlobalV::NBANDS; ++ib)
@@ -350,18 +350,18 @@ realArray Numerical_Basis::cal_flq(const int ik, const std::vector<Vector3<doubl
 	return flq;	
 }
 
-matrix Numerical_Basis::cal_ylm(const std::vector<Vector3<double>> &gk)
+ModuleBase::matrix Numerical_Basis::cal_ylm(const std::vector<Vector3<double>> &gk)
 {
     const int total_lm = ( GlobalC::ucell.lmax + 1) * ( GlobalC::ucell.lmax + 1);
-    matrix ylm(total_lm, gk.size());
-    YlmReal::Ylm_Real(total_lm, gk.size(), gk.data(), ylm);
+    ModuleBase::matrix ylm(total_lm, gk.size());
+    ModuleBase::YlmReal::Ylm_Real(total_lm, gk.size(), gk.data(), ylm);
     return ylm;
 }
 
-std::vector<IntArray> Numerical_Basis::init_mu_index(void)
+std::vector<ModuleBase::IntArray> Numerical_Basis::init_mu_index(void)
 {
 	GlobalV::ofs_running << " Initialize the mu index" << std::endl;
-    std::vector<IntArray> mu_index_(GlobalC::ucell.ntype);
+    std::vector<ModuleBase::IntArray> mu_index_(GlobalC::ucell.ntype);
 
     int mu = 0;
     for (int it=0; it<GlobalC::ucell.ntype; it++)
@@ -409,8 +409,8 @@ void Numerical_Basis::numerical_atomic_wfc(
         gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
 
     const int total_lm = ( GlobalC::ucell.lmax + 1) * ( GlobalC::ucell.lmax + 1);
-    matrix ylm(total_lm, np);
-    YlmReal::Ylm_Real(total_lm, np, gk.data(), ylm);
+    ModuleBase::matrix ylm(total_lm, np);
+    ModuleBase::YlmReal::Ylm_Real(total_lm, np, gk.data(), ylm);
 
     std::vector<double> flq(np);
     for (int it = 0; it < GlobalC::ucell.ntype; it++)
@@ -706,7 +706,7 @@ void Numerical_Basis::output_overlap_Sq(
 // Peize Lin add 2020.04.23
 void Numerical_Basis::output_overlap_V(
     std::ofstream &ofs,
-	const matrix &overlap_V)
+	const ModuleBase::matrix &overlap_V)
 {
 	if (GlobalV::MY_RANK==0)
     {

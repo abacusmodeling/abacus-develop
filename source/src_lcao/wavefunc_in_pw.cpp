@@ -221,7 +221,7 @@ const double *rab, const int &l, double* table)
 	}
 
 	double unit = 0.0;
-	Integral::Simpson_Integral(meshr, inner_part, rab, unit);
+	ModuleBase::Integral::Simpson_Integral(meshr, inner_part, rab, unit);
 	delete[] inner_part;
 	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"normalize unit",unit);
 
@@ -230,14 +230,14 @@ const double *rab, const int &l, double* table)
 	for (int iq=0; iq<GlobalV::NQX; iq++)
 	{
 		const double q = GlobalV::DQ * iq;
-		Sphbes::Spherical_Bessel(meshr, r, q, l, aux);
+		ModuleBase::Sphbes::Spherical_Bessel(meshr, r, q, l, aux);
 		for (int ir = 0;ir < meshr;ir++)
 		{
 			vchi[ir] = psir[ir] * aux[ir] * r[ir];
 		}
 
 		double vqint = 0.0;
-		Integral::Simpson_Integral(meshr, vchi, rab, vqint);
+		ModuleBase::Integral::Simpson_Integral(meshr, vchi, rab, vqint);
 
 		table[iq] =  vqint * pref;
 	}
@@ -253,7 +253,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ModuleBase::Complex
 	assert(ik>=0);
 	const int npw = GlobalC::kv.ngk[ik];
 	const int total_lm = ( GlobalC::ucell.lmax + 1) * ( GlobalC::ucell.lmax + 1);
-	matrix ylm(total_lm, npw);
+	ModuleBase::matrix ylm(total_lm, npw);
 	std::complex<double> *aux = new std::complex<double>[npw];
 	double *chiaux = new double[1];
 
@@ -263,7 +263,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ModuleBase::Complex
 		gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
 	}
 
-	YlmReal::Ylm_Real(total_lm, npw, gk, ylm);
+	ModuleBase::YlmReal::Ylm_Real(total_lm, npw, gk, ylm);
 
 	//int index = 0;
 	double *flq = new double[npw];
@@ -283,7 +283,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ModuleBase::Complex
 
 					for(int ig=0; ig<npw; ig++)
 					{
-						flq[ig] = PolyInt::Polynomial_Interpolation(table_local,
+						flq[ig] = ModuleBase::PolyInt::Polynomial_Interpolation(table_local,
 						it, ic, GlobalV::NQX, GlobalV::DQ, gk[ig].norm() * GlobalC::ucell.tpiba );
 					}
 
@@ -342,7 +342,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ModuleBase::Complex
 										for(int ig=0;ig<npw;ig++)
 										{//Average the two functions
 											chiaux[ig] =  L *
-												PolyInt::Polynomial_Interpolation(table_local,
+												ModuleBase::PolyInt::Polynomial_Interpolation(table_local,
 												it, ic, GlobalV::NQX, GlobalV::DQ, gk[ig].norm() * GlobalC::ucell.tpiba );
 
 											chiaux[ig] += flq[ig] * (L+1.0) ;
@@ -450,7 +450,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ModuleBase::Comp
 	assert(ik>=0);
 	const int npw = GlobalC::kv.ngk[ik];
 	const int total_lm = ( GlobalC::ucell.lmax + 1) * ( GlobalC::ucell.lmax + 1);
-	matrix ylm(total_lm, npw);
+	ModuleBase::matrix ylm(total_lm, npw);
 	std::complex<double> *aux = new std::complex<double>[npw];
 	double *chiaux = new double[1];
 
@@ -461,7 +461,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ModuleBase::Comp
 		gkq[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig) + q;
 	}
 
-	YlmReal::Ylm_Real(total_lm, npw, gkq, ylm);
+	ModuleBase::YlmReal::Ylm_Real(total_lm, npw, gkq, ylm);
 
 	//int index = 0;
 	double *flq = new double[npw];
@@ -485,7 +485,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ModuleBase::Comp
 						}
 						else
 						{
-						   flq[ig] = PolyInt::Polynomial_Interpolation(table_local, it, ic, GlobalV::NQX, GlobalV::DQ, gkq[ig].norm() * GlobalC::ucell.tpiba );
+						   flq[ig] = ModuleBase::PolyInt::Polynomial_Interpolation(table_local, it, ic, GlobalV::NQX, GlobalV::DQ, gkq[ig].norm() * GlobalC::ucell.tpiba );
 						}
 					}
 
@@ -559,7 +559,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ModuleBase::Comp
 										for(int ig=0;ig<npw;ig++)
 										{//Average the two functions
 											chiaux[ig] =  L *
-												PolyInt::Polynomial_Interpolation(table_local,
+												ModuleBase::PolyInt::Polynomial_Interpolation(table_local,
 																	it, ic, GlobalV::NQX, GlobalV::DQ, gkq[ig].norm() * GlobalC::ucell.tpiba );
 
 											chiaux[ig] += flq[ig] * (L+1.0) ;

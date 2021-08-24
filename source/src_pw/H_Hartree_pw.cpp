@@ -5,7 +5,7 @@ double H_Hartree_pw::hartree_energy=0.0;
 //--------------------------------------------------------------------
 // Transform charge density to hartree potential.
 //--------------------------------------------------------------------
-matrix H_Hartree_pw::v_hartree(
+ModuleBase::matrix H_Hartree_pw::v_hartree(
 	const UnitCell &cell, 
 	PW_Basis &pwb, 
 	const int &nspin,
@@ -65,7 +65,7 @@ matrix H_Hartree_pw::v_hartree(
     //==========================================
     //Add hartree potential to the xc potential
     //==========================================
-    matrix v(nspin, pwb.nrxx);
+    ModuleBase::matrix v(nspin, pwb.nrxx);
     if(nspin==4)
     {
         for (int ir = 0;ir < pwb.nrxx;ir++)
@@ -95,7 +95,7 @@ matrix H_Hartree_pw::v_hartree(
 		std::string fn = "VH.dat";
 		std::stringstream ss;
 		ss << GlobalV::global_out_dir << fn;
-		matrix v;
+		ModuleBase::matrix v;
 		v.create(1,pwb.nrxx);
 		for(int ir=0; ir<pwb.nrxx; ++ir)
 		{

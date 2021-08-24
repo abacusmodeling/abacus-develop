@@ -5,7 +5,7 @@
 
 #include "../module_base/ylm.h"
 
-void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
+void Gint_k::fvl_k_RealSpace(ModuleBase::matrix& fvl_dphi, const double *vl)
 {
 	TITLE("Gint_k","cal_force");
 	timer::tick("Gint_k","cal_force");
@@ -199,8 +199,8 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 }
 
 void Gint_k::svl_k_RealSpace(
-	matrix& fvl_dphi, 
-	matrix& svl_dphi, 
+	ModuleBase::matrix& fvl_dphi, 
+	ModuleBase::matrix& svl_dphi, 
 	const double *vl)
 {
 	TITLE("Gint_k","cal_stress");
@@ -546,7 +546,7 @@ void Gint_k::evaluate_vl_stress(
                 const int dRz = R1z - R2z;
 
                 double rt[3];
-                Mathzone::Direct_to_Cartesian(dRx,dRy,dRz,
+                ModuleBase::Mathzone::Direct_to_Cartesian(dRx,dRy,dRz,
                                               GlobalC::ucell.a1.x, GlobalC::ucell.a1.y, GlobalC::ucell.a1.z,
                                               GlobalC::ucell.a2.x, GlobalC::ucell.a2.y, GlobalC::ucell.a2.z,
                                               GlobalC::ucell.a3.x, GlobalC::ucell.a3.y, GlobalC::ucell.a3.z,

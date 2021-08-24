@@ -185,11 +185,11 @@ ofs.close();
 }
 
 /*
-std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> Matrix_Abfsphi_Phi::cal_overlap_matrix(
+std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> Matrix_Abfsphi_Phi::cal_overlap_matrix(
 	const Exx_Abfs::Abfs_Index::Index &index_abfs,
 	const Exx_Abfs::Abfs_Index::Index &index_orb )
 {
-	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> matrix_A;
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> matrix_A;
 
 	for( auto &co1 : center2_orb21_s )
 	{
@@ -254,7 +254,7 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matr
 	return matrix_A;
 }*/
 
-matrix Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
+ModuleBase::matrix Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
 	const size_t TA,
 	const size_t TB,
 	const Vector3<double> &tauA,
@@ -264,7 +264,7 @@ matrix Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_B,
 	const Matrix_Order &matrix_order) const
 {
-	matrix m;
+	ModuleBase::matrix m;
 	switch(matrix_order)
 	{
 		case Matrix_Order::A2B_A1:	m.create( index_A2[TA].count_size*index_B [TB].count_size, index_A1[TA].count_size );	break;
@@ -330,7 +330,7 @@ matrix Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
 	return m;
 }
 
-std::vector<matrix> Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
+std::vector<ModuleBase::matrix> Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
 	const size_t TA,
 	const size_t TB,
 	const Vector3<double> &tauA,
@@ -339,8 +339,8 @@ std::vector<matrix> Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_A2,
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_B) const
 {
-	matrix m_A2B_A1( index_A2[TA].count_size*index_B[TB].count_size, index_A1[TA].count_size );
-	matrix m_BA2_A1( index_B[TB].count_size*index_A2[TA].count_size, index_A1[TA].count_size );
+	ModuleBase::matrix m_A2B_A1( index_A2[TA].count_size*index_B[TB].count_size, index_A1[TA].count_size );
+	ModuleBase::matrix m_BA2_A1( index_B[TB].count_size*index_A2[TA].count_size, index_A1[TA].count_size );
 
 	for( const auto &co3 : center2_orb21_s.at(TA).at(TB) )
 	{
@@ -388,10 +388,10 @@ std::vector<matrix> Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
 			}
 		}
 	}
-	return std::vector<matrix>{ std::move(m_A2B_A1), std::move(m_BA2_A1) };
+	return std::vector<ModuleBase::matrix>{ std::move(m_A2B_A1), std::move(m_BA2_A1) };
 }
 
-std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
+std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_A1,
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_A2,
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_B) const
@@ -402,7 +402,7 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matr
 
 	TITLE("Exx_Abfs::Matrix_Orbs21","cal_overlap_matrix");
 
-	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> matrixes;
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> matrixes;
 
 	for( const auto &co1 : center2_orb21_s )
 	{
@@ -418,7 +418,7 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matr
 				{
 					const Vector3<double> &tauB( GlobalC::ucell.atoms[TB].tau[IB] );
 
-					const std::vector<matrix> &&m = cal_overlap_matrix( TA, TB, tauA, tauB, index_A1, index_A2, index_B );
+					const std::vector<ModuleBase::matrix> &&m = cal_overlap_matrix( TA, TB, tauA, tauB, index_A1, index_A2, index_B );
 					matrixes[TA][IA][TB][IB].resize(2);
 					matrixes[TA][IA][TB][IB][0] = std::move(m[0]);
 					matrixes[TB][IB][TA][IA].resize(2);

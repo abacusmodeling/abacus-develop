@@ -27,8 +27,8 @@ public:
     //===============================
     // print matrix
     //===============================
-    void printrm(std::ofstream &ofs,const std::string &s, const matrix &m, const double &limit = 1.0e-15) const;
-    void printrm(const std::string &s, const matrix &m, const double &limit = 1.0e-15) const;
+    void printrm(std::ofstream &ofs,const std::string &s, const ModuleBase::matrix &m, const double &limit = 1.0e-15) const;
+    void printrm(const std::string &s, const ModuleBase::matrix &m, const double &limit = 1.0e-15) const;
 
 
     //===============================

@@ -17,25 +17,25 @@ Forces::Forces()
 Forces::~Forces() {}
 
 #include "efield.h"
-void Forces::init(matrix& force)
+void Forces::init(ModuleBase::matrix& force)
 {
 	TITLE("Forces", "init");
 	this->nat = GlobalC::ucell.nat;
 	force.create(nat, 3);
 	
-	matrix forcelc(nat, 3);
-	matrix forceion(nat, 3);
-	matrix forcecc(nat, 3);
-	matrix forcenl(nat, 3);
-	matrix forcescc(nat, 3);
+	ModuleBase::matrix forcelc(nat, 3);
+	ModuleBase::matrix forceion(nat, 3);
+	ModuleBase::matrix forcecc(nat, 3);
+	ModuleBase::matrix forcenl(nat, 3);
+	ModuleBase::matrix forcescc(nat, 3);
     this->cal_force_loc(forcelc);
     this->cal_force_ew(forceion);
     this->cal_force_nl(forcenl);
 	this->cal_force_cc(forcecc);
 	this->cal_force_scc(forcescc);
 
-	matrix stress_vdw_pw;//.create(3,3);
-    matrix force_vdw;
+	ModuleBase::matrix stress_vdw_pw;//.create(3,3);
+    ModuleBase::matrix force_vdw;
     force_vdw.create(nat, 3);
 	if(GlobalC::vdwd2_para.flag_vdwd2)													//Peize Lin add 2014.04.03, update 2021.03.09
 	{
@@ -70,7 +70,7 @@ void Forces::init(matrix& force)
     //impose total force = 0
     int iat = 0;
 
-	matrix force_e;
+	ModuleBase::matrix force_e;
 	if(GlobalV::EFIELD)
 	{
 		force_e.create(GlobalC::ucell.nat, 3);
@@ -142,7 +142,7 @@ void Forces::init(matrix& force)
 		
 		for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 		{
-			Mathzone::Cartesian_to_Direct(force(iat,0),force(iat,1),force(iat,2),
+			ModuleBase::Mathzone::Cartesian_to_Direct(force(iat,0),force(iat,1),force(iat,2),
                                         GlobalC::ucell.a1.x, GlobalC::ucell.a1.y, GlobalC::ucell.a1.z,
                                         GlobalC::ucell.a2.x, GlobalC::ucell.a2.y, GlobalC::ucell.a2.z,
                                         GlobalC::ucell.a3.x, GlobalC::ucell.a3.y, GlobalC::ucell.a3.z,
@@ -153,7 +153,7 @@ void Forces::init(matrix& force)
 		GlobalC::symm.force_symmetry(force , pos, GlobalC::ucell);
 		for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 		{
-			Mathzone::Direct_to_Cartesian(force(iat,0),force(iat,1),force(iat,2),
+			ModuleBase::Mathzone::Direct_to_Cartesian(force(iat,0),force(iat,1),force(iat,2),
                                         GlobalC::ucell.a1.x, GlobalC::ucell.a1.y, GlobalC::ucell.a1.z,
                                         GlobalC::ucell.a2.x, GlobalC::ucell.a2.y, GlobalC::ucell.a2.z,
                                         GlobalC::ucell.a3.x, GlobalC::ucell.a3.y, GlobalC::ucell.a3.z,
@@ -213,7 +213,7 @@ void Forces::init(matrix& force)
     return;
 }
 
-void Forces::print_to_files(std::ofstream &ofs, const std::string &name, const matrix &f)
+void Forces::print_to_files(std::ofstream &ofs, const std::string &name, const ModuleBase::matrix &f)
 {
     int iat = 0;
     ofs << " " << name;
@@ -258,7 +258,7 @@ void Forces::print_to_files(std::ofstream &ofs, const std::string &name, const m
 
 
 
-void Forces::print(const std::string &name, const matrix &f, bool ry)
+void Forces::print(const std::string &name, const ModuleBase::matrix &f, bool ry)
 {
 	ModuleBase::GlobalFunc::NEW_PART(name);
 
@@ -342,7 +342,7 @@ void Forces::print(const std::string &name, const matrix &f, bool ry)
 }
 
 
-void Forces::cal_force_loc(matrix& forcelc)
+void Forces::cal_force_loc(ModuleBase::matrix& forcelc)
 {
 	timer::tick("Forces","cal_force_loc");
 
@@ -398,7 +398,7 @@ void Forces::cal_force_loc(matrix& forcelc)
 }
 
 #include "H_Ewald_pw.h"
-void Forces::cal_force_ew(matrix& forceion)
+void Forces::cal_force_ew(ModuleBase::matrix& forceion)
 {
 	timer::tick("Forces","cal_force_ew");
 
@@ -551,11 +551,11 @@ void Forces::cal_force_ew(matrix& forceion)
     return;
 }
 
-void Forces::cal_force_cc(matrix& forcecc)
+void Forces::cal_force_cc(ModuleBase::matrix& forcecc)
 {
 	// recalculate the exchange-correlation potential.
 	
-    matrix v(GlobalV::NSPIN,GlobalC::pw.nrxx);
+    ModuleBase::matrix v(GlobalV::NSPIN,GlobalC::pw.nrxx);
 
 	#ifdef USE_LIBXC
 	if(GlobalV::DFT_META)
@@ -579,7 +579,7 @@ void Forces::cal_force_cc(matrix& forcecc)
 	v = std::get<2>(etxc_vtxc_v);
 	#endif
 
-	const matrix vxc = v;
+	const ModuleBase::matrix vxc = v;
     std::complex<double> * psiv = new std::complex<double> [GlobalC::pw.nrxx];
     ModuleBase::GlobalFunc::ZEROS(psiv, GlobalC::pw.nrxx);
     if (GlobalV::NSPIN == 1 || GlobalV::NSPIN == 4)
@@ -654,7 +654,7 @@ void Forces::cal_force_cc(matrix& forcecc)
 	return;
 }
 
-void Forces::cal_force_nl(matrix& forcenl)
+void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
 {
 	TITLE("Forces","cal_force_nl");
 	timer::tick("Forces","cal_force_nl");
@@ -804,7 +804,7 @@ void Forces::cal_force_nl(matrix& forcenl)
     return;
 }
 
-void Forces::cal_force_scc(matrix& forcescc)
+void Forces::cal_force_scc(ModuleBase::matrix& forcescc)
 {
     std::complex<double>* psic = new std::complex<double> [GlobalC::pw.nrxx];
     ModuleBase::GlobalFunc::ZEROS(psic, GlobalC::pw.nrxx);
@@ -865,7 +865,7 @@ void Forces::cal_force_scc(matrix& forcescc)
                     aux[ir] = GlobalC::ucell.atoms[nt].rho_at[ir] * sin(gxx) / gxx;
                 }
             }
-            Integral::Simpson_Integral(mesh , aux, GlobalC::ucell.atoms[nt].rab , rhocgnt [ig]);
+            ModuleBase::Integral::Simpson_Integral(mesh , aux, GlobalC::ucell.atoms[nt].rab , rhocgnt [ig]);
         }
 
         int iat = 0;

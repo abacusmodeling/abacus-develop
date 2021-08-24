@@ -28,7 +28,7 @@ class Numerical_Descriptor
 
 	Bessel_Basis bessel_basis;
 
-	IntArray *mu_index;
+	ModuleBase::IntArray *mu_index;
 	void init_mu_index(void);//mohan added 2021-01-03
 
 	void jlq3d_overlap(realArray &overlap_Q1, realArray &overlap_Q2,

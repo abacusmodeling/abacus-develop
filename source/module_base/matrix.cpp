@@ -9,7 +9,6 @@
 #include <cstdlib>
 #include <limits>
 
-using namespace std;
 #include "matrix.h"
 
 #ifdef __NORMAL
@@ -24,6 +23,8 @@ using namespace std;
 // ********************************************************
 
 //int matrix::mCount = 0;
+namespace ModuleBase
+{
 
 void matrixAlloc()
 {
@@ -427,4 +428,6 @@ double matrix::norm() const
 #else
 	return LapackConnector::nrm2(nr*nc,c,1);
 #endif
+}
+
 }

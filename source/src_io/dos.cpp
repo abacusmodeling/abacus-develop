@@ -149,7 +149,7 @@ bool Dos::calculate_dos
 	const int &nks,//number of k points
 	const int &nkstot,
 	const double *wk,//weight of k points
-	const matrix &wg,//weight of (kpoint,bands)
+	const ModuleBase::matrix &wg,//weight of (kpoint,bands)
 	const int &nbands,// number of bands
 	double** ekb//store energy for each k point and each band
 )

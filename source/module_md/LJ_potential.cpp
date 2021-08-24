@@ -66,7 +66,7 @@ double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c,
 
 			Vector3<double> tempd = cmd_neigh.cell_periodic(taud1,taud2);
             Vector3<double> temp;
-            Mathzone::Direct_to_Cartesian(
+            ModuleBase::Mathzone::Direct_to_Cartesian(
 			tempd.x, tempd.y, tempd.z,
 			ucell_c.latvec.e11, ucell_c.latvec.e12, ucell_c.latvec.e13,
 			ucell_c.latvec.e21, ucell_c.latvec.e22, ucell_c.latvec.e23,

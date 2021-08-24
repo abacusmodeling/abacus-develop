@@ -5,6 +5,9 @@
 #include "realarray.h"
 #include <cassert>
 
+namespace ModuleBase
+{
+
 YlmReal::YlmReal(){}
 YlmReal::~YlmReal(){}
 
@@ -562,4 +565,6 @@ int YlmReal::Semi_Fact(const int n)
         semif *= i;
     }
     return semif;
+}
+
 }

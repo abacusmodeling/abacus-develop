@@ -3,11 +3,11 @@
 
 
 void Force_LCAO_gamma::cal_ftvnl_dphi(
-	matrix& dm2d, 
+	ModuleBase::matrix& dm2d, 
 	const bool isforce, 
 	const bool isstress, 
-	matrix& ftvnl_dphi, 
-	matrix& stvnl_dphi)
+	ModuleBase::matrix& ftvnl_dphi, 
+	ModuleBase::matrix& stvnl_dphi)
 {
     TITLE("Force_LCAO_gamma","cal_ftvnl_dphi");
     timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
@@ -66,11 +66,11 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(
 
 
 void Force_LCAO_gamma::cal_fvnl_dbeta(
-	matrix& dm2d, 
+	ModuleBase::matrix& dm2d, 
 	const bool isforce, 
 	const bool isstress, 
-	matrix& fvnl_dbeta, 
-	matrix& svnl_dbeta)
+	ModuleBase::matrix& fvnl_dbeta, 
+	ModuleBase::matrix& svnl_dbeta)
 {
     TITLE("Force_LCAO_gamma","cal_fvnl_dbeta");
     timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
@@ -230,11 +230,11 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
 
 
 void Force_LCAO_gamma::cal_ftvnl_dphi(
-	const std::vector<matrix> &dm2d, 
+	const std::vector<ModuleBase::matrix> &dm2d, 
 	const bool isforce, 
 	const bool isstress, 
-	matrix& ftvnl_dphi, 
-	matrix& stvnl_dphi)
+	ModuleBase::matrix& ftvnl_dphi, 
+	ModuleBase::matrix& stvnl_dphi)
 {
     TITLE("Force_LCAO_gamma","cal_ftvnl_dphi");
     timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
@@ -293,11 +293,11 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(
 
 
 void Force_LCAO_gamma::cal_fvnl_dbeta(
-	const std::vector<matrix> &dm2d, 
+	const std::vector<ModuleBase::matrix> &dm2d, 
 	const bool isforce, 
 	const bool isstress, 
-	matrix& fvnl_dbeta, 
-	matrix& svnl_dbeta)
+	ModuleBase::matrix& fvnl_dbeta, 
+	ModuleBase::matrix& svnl_dbeta)
 {
     TITLE("Force_LCAO_gamma","cal_fvnl_dbeta");
     timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");

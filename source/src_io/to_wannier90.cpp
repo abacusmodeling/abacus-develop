@@ -769,7 +769,7 @@ void toWannier90::produce_trial_in_pw(const int &ik, ModuleBase::ComplexMatrix &
 	const int npw = GlobalC::kv.ngk[ik];
 	const int npwx = GlobalC::wf.npwx;
 	const int total_lm = 16;
-	matrix ylm(total_lm,npw);               //�������͵���г����
+	ModuleBase::matrix ylm(total_lm,npw);               //�������͵���г����
 	//matrix wannier_ylm(num_wannier,npw);    //Ҫ��̽�����ʹ�õ���г����
 	double bs2, bs3, bs6, bs12;
 	bs2 = 1.0/sqrt(2.0);
@@ -783,7 +783,7 @@ void toWannier90::produce_trial_in_pw(const int &ik, ModuleBase::ComplexMatrix &
 		gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);  // k+Gʸ��
 	}
 	
-	YlmReal::Ylm_Real(total_lm, npw, gk, ylm);
+	ModuleBase::YlmReal::Ylm_Real(total_lm, npw, gk, ylm);
 	
 	// test by jingan
 	//GlobalV::ofs_running << "the mathzone::ylm_real is successful!" << std::endl;
@@ -795,11 +795,11 @@ void toWannier90::produce_trial_in_pw(const int &ik, ModuleBase::ComplexMatrix &
 	const int mesh_r = 333; 		//��������������Ҫ�ĸ����
 	const double dx = 0.025; 		//�̶�������������ɷǹ̶������dr����߾���,���ֵ������
 	const double x_min = -6.0;  	// ��������dr��r����ʼ��
-	matrix r(num_wannier,mesh_r);   //��ͬalfa�ľ�������r
-	matrix dr(num_wannier,mesh_r);  //��ͬalfa�ľ�������ÿ��r��ļ��
-	matrix psi(num_wannier,mesh_r); //������psi in ʵ�ռ�
-	matrix psir(num_wannier,mesh_r);// psi * r in ʵ�ռ�
-	matrix psik(num_wannier,npw);   //��������ĳ��k���µ��ռ��ͶӰ
+	ModuleBase::matrix r(num_wannier,mesh_r);   //��ͬalfa�ľ�������r
+	ModuleBase::matrix dr(num_wannier,mesh_r);  //��ͬalfa�ľ�������ÿ��r��ļ��
+	ModuleBase::matrix psi(num_wannier,mesh_r); //������psi in ʵ�ռ�
+	ModuleBase::matrix psir(num_wannier,mesh_r);// psi * r in ʵ�ռ�
+	ModuleBase::matrix psik(num_wannier,npw);   //��������ĳ��k���µ��ռ��ͶӰ
 	
 	// ����r,dr
 	for(int i = 0; i < num_wannier; i++)
@@ -1334,8 +1334,8 @@ void toWannier90::produce_trial_in_pw(const int &ik, ModuleBase::ComplexMatrix &
 }
 
 // ע����������Lֵ�����Ǵ��ڵ���0��
-void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orbital_L, const int orbital_m, matrix &ylm, 
-										matrix &dr, matrix &r, matrix &psir, const int mesh_r, 
+void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orbital_L, const int orbital_m, ModuleBase::matrix &ylm, 
+										ModuleBase::matrix &dr, ModuleBase::matrix &r, ModuleBase::matrix &psir, const int mesh_r, 
 										Vector3<double> *gk, const int npw, ModuleBase::ComplexMatrix &trial_orbitals_k)
 {
 	//���㾶������ĳ��k���µ��ռ��ͶӰ
@@ -1360,7 +1360,7 @@ void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orb
 	// ��GlobalV::NQX��G���в�ֵ�����npw��G���ֵ
 	for(int ig = 0; ig < npw; ig++)
 	{
-		psik[ig] = PolyInt::Polynomial_Interpolation(psik_tem, GlobalV::NQX, GlobalV::DQ, gk[ig].norm() * GlobalC::ucell.tpiba);
+		psik[ig] = ModuleBase::PolyInt::Polynomial_Interpolation(psik_tem, GlobalV::NQX, GlobalV::DQ, gk[ig].norm() * GlobalC::ucell.tpiba);
 	}
 	
 	
@@ -1442,7 +1442,7 @@ void toWannier90::integral(const int meshr, const double *psir, const double *r,
 	}
 	
 	double unit = 0.0;
-	Integral::Simpson_Integral(meshr, inner_part, rab, unit);
+	ModuleBase::Integral::Simpson_Integral(meshr, inner_part, rab, unit);
 	delete[] inner_part;
 
 	double *aux = new double[meshr];
@@ -1450,14 +1450,14 @@ void toWannier90::integral(const int meshr, const double *psir, const double *r,
 	for (int iq=0; iq<GlobalV::NQX; iq++)
 	{
 		const double q = GlobalV::DQ * iq;
-		Sphbes::Spherical_Bessel(meshr, r, q, l, aux);
+		ModuleBase::Sphbes::Spherical_Bessel(meshr, r, q, l, aux);
 		for (int ir = 0;ir < meshr;ir++)
 		{
 			vchi[ir] = psir[ir] * aux[ir] * r[ir];
 		}
 		
 		double vqint = 0.0;
-		Integral::Simpson_Integral(meshr, vchi, rab, vqint);
+		ModuleBase::Integral::Simpson_Integral(meshr, vchi, rab, vqint);
 
 		table[iq] =  vqint * pref;
 	}

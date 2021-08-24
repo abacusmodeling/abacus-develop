@@ -480,7 +480,7 @@ void Charge_Broyden::allocate_Broyden()
 			this->Abar.create(dstep, dstep);
 			
 
-			this->Zmk = new matrix[GlobalV::NSPIN];
+			this->Zmk = new ModuleBase::matrix[GlobalV::NSPIN];
 //			this->Zmk_old = new matrix[GlobalV::NSPIN];
 			for(int is=0; is<GlobalV::NSPIN; is++)
 			{

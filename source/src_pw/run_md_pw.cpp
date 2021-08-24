@@ -304,10 +304,10 @@ void Run_MD_PW::md_cells_pw()
     timer::tick("Run_MD_PW", "md_cells_pw");
 }
 
-void Run_MD_PW::callInteraction_PW(const int& numIon, Vector3<double>* force, matrix& stress_pw)
+void Run_MD_PW::callInteraction_PW(const int& numIon, Vector3<double>* force, ModuleBase::matrix& stress_pw)
 {
 //to call the force of each atom
-	matrix fcs;//temp force matrix
+	ModuleBase::matrix fcs;//temp force ModuleBase::matrix
 	Forces ff;
 	ff.init(fcs);
 	for(int ion=0;ion<numIon;ion++){

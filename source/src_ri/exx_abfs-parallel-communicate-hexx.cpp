@@ -15,7 +15,7 @@
 //#include <gperftools/profiler.h>
 
 void Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D( 
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &HR_exx,
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &HR_exx,
 	const std::pair<bool,bool> &io_HR_a2D )
 {
 	/*{
@@ -35,9 +35,9 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D(
 //ofs_matrixes( exx_lcao.test_dir+"test-HR_exx_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK), HR_exx );
 	
 //gettimeofday( &t_start, NULL);
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> HR_a2D;
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> HR_a2D;
 	if(io_HR_a2D.first)
-		HR_a2D = Exx_Abfs::IO::input_binary<std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>>>(
+		HR_a2D = Exx_Abfs::IO::input_binary<std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>>>(
 			GlobalV::global_out_dir+"HR_exx_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 	else
 	{

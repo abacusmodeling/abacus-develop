@@ -4,6 +4,9 @@
 //========================================================
 // Spherical Bessel functions, mohan 2021-05-06
 //========================================================
+namespace ModuleBase
+{
+
 class Sphbes 
 {
 	public:
@@ -53,5 +56,7 @@ private:
 
     static int IMAX(int a, int b);
 };
+
+}
 
 #endif

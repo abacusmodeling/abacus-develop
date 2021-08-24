@@ -571,7 +571,7 @@ void LCAO_Orbitals::Read_NonLocal(
 	// this needed to be modified.	
 	//-------------------------------------------
 	int nproj_allowed = nlmax+1;
-	matrix coefficient_D_in(nproj_allowed, nproj_allowed);
+	ModuleBase::matrix coefficient_D_in(nproj_allowed, nproj_allowed);
 	ModuleBase::ComplexMatrix coefficient_D_nc_in(nproj_allowed*2, nproj_allowed*2);
 
 //	OUT(GlobalV::ofs_running,"nproj_allowed",nproj_allowed);
@@ -1017,7 +1017,7 @@ void LCAO_Orbitals::read_orb_file(
 			}
 			double unit = 0.0;
 
-			Integral::Simpson_Integral(meshr, inner, rab, unit);
+			ModuleBase::Integral::Simpson_Integral(meshr, inner, rab, unit);
 
 			assert(unit>0.0);
 
@@ -1034,7 +1034,7 @@ void LCAO_Orbitals::read_orb_file(
 			{
 				inner[ir] = psir[ir] * psir[ir];
 			}
-			Integral::Simpson_Integral(meshr, inner, rab, unit);
+			ModuleBase::Integral::Simpson_Integral(meshr, inner, rab, unit);
 			delete[] inner;
 			ofs_in << std::setw(12) << unit << std::endl;
 

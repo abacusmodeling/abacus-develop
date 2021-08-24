@@ -89,8 +89,8 @@ public:
 	void getgroup(int &nrot, int &nrotk, std::ofstream &ofs_running);
 	void checksym(Matrix3 &s, Vector3<double> &gtrans, double *pos);
 	void rho_symmetry(double *rho, const int &nr1, const int &nr2, const int &nr3);
-	void force_symmetry(matrix &force, double* pos, const UnitCell_pseudo &ucell);
-	void stress_symmetry(matrix &sigma, const UnitCell_pseudo &ucell);
+	void force_symmetry(ModuleBase::matrix &force, double* pos, const UnitCell_pseudo &ucell);
+	void stress_symmetry(ModuleBase::matrix &sigma, const UnitCell_pseudo &ucell);
 	void write();
 
 	void print_pos(const double* pos, const int &nat);

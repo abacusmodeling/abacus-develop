@@ -56,7 +56,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 	// e2 is 2.0, means the square of the electron charge
 	// calculation of dipole
 
-	matrix fdip(GlobalC::ucell.nat, 3);
+	ModuleBase::matrix fdip(GlobalC::ucell.nat, 3);
 
 	if(GlobalV::DIPOLE)
 	{
@@ -269,7 +269,7 @@ double Efield::saw(const double &emaxpos, const double &eopreg, const double &x)
 	return sawout;
 }
 
-void Efield::compute_force(matrix &fdip)
+void Efield::compute_force(ModuleBase::matrix &fdip)
 {
 	assert(bmod>0);
 	int iat = 0;

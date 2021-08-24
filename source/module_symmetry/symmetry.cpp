@@ -130,7 +130,7 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, std::o
 	{
 		for(int ia=0; ia<ucell.atoms[it].na; ++ia)
 		{
-			Mathzone::Cartesian_to_Direct(ucell.atoms[it].tau[ia].x, 
+			ModuleBase::Mathzone::Cartesian_to_Direct(ucell.atoms[it].tau[ia].x, 
 					ucell.atoms[it].tau[ia].y, 
 					ucell.atoms[it].tau[ia].z,
 					new_lat.e11, new_lat.e12, new_lat.e13,
@@ -721,7 +721,7 @@ void Symmetry::lattice_type(
         {
                 for(int ia=0; ia<ucell.atoms[it].na; ++ia)
                 {
-                        Mathzone::Cartesian_to_Direct(ucell.atoms[it].tau[ia].x,
+                        ModuleBase::Mathzone::Cartesian_to_Direct(ucell.atoms[it].tau[ia].x,
                                         ucell.atoms[it].tau[ia].y,
                                         ucell.atoms[it].tau[ia].z,
                                         q1.x, q1.y, q1.z,
@@ -1507,7 +1507,7 @@ void Symmetry::rho_symmetry( double *rho,
     timer::tick("Symmetry","rho_symmetry");
 }
 
-void Symmetry::force_symmetry(matrix &force , double* pos, const UnitCell_pseudo &ucell)   // pengfei 2016-12-20
+void Symmetry::force_symmetry(ModuleBase::matrix &force , double* pos, const UnitCell_pseudo &ucell)   // pengfei 2016-12-20
 {
 	TITLE("Symmetry","force_symmetry");
 	double *protpos;
@@ -1587,7 +1587,7 @@ void Symmetry::force_symmetry(matrix &force , double* pos, const UnitCell_pseudo
 	return;
 }
 
-void Symmetry::stress_symmetry(matrix& sigma, const UnitCell_pseudo &ucell)   //zhengdy added 2017
+void Symmetry::stress_symmetry(ModuleBase::matrix& sigma, const UnitCell_pseudo &ucell)   //zhengdy added 2017
 {
 	double *tot_sigma, *temp;
 	tot_sigma = new double[9];

@@ -34,7 +34,7 @@ public:
 	Matrix3& operator/=(const double &s);
 
 	void print(void)const;
-	matrix to_matrix(void)const;
+	ModuleBase::matrix to_matrix(void)const;
 };
 
 Matrix3 operator +(const Matrix3 &m1, const Matrix3 &m2);	//m1+m2

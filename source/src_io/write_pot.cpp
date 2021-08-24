@@ -6,7 +6,7 @@ void Potential::write_potential(
 	const int &is, 
 	const int &iter, 
 	const std::string &fn, 
-	const matrix &v, 
+	const ModuleBase::matrix &v, 
 	const int &precision, 
 	const int &hartree)const
 {

@@ -246,7 +246,7 @@ void energy::perform_dos(void)
 
 
 		const int np=npoints;
-		matrix*  pdosk = new matrix[nspin0];
+		ModuleBase::matrix*  pdosk = new ModuleBase::matrix[nspin0];
 
 		for(int is=0; is<nspin0; ++is)
 		{
@@ -257,7 +257,7 @@ void energy::perform_dos(void)
 
 
 		}
-		matrix*  pdos = new matrix[nspin0];
+		ModuleBase::matrix*  pdos = new ModuleBase::matrix[nspin0];
 		for(int is=0; is<nspin0; ++is)
 		{
 			pdos[is].create(GlobalV::NLOCAL,np,true);
@@ -276,12 +276,12 @@ void energy::perform_dos(void)
 		{
 			if(GlobalV::GAMMA_ONLY_LOCAL)
 			{
-				std::vector<matrix>   Mulk;
+				std::vector<ModuleBase::matrix>   Mulk;
 				Mulk.resize(1);
 				Mulk[0].create(GlobalC::ParaO.ncol,GlobalC::ParaO.nrow);
 
 
-				matrix Dwf = D.wfc_gamma[is];
+				ModuleBase::matrix Dwf = D.wfc_gamma[is];
 				for (int i=0; i<GlobalV::NBANDS; ++i)		  
 				{     
 					ModuleBase::GlobalFunc::ZEROS(waveg, GlobalV::NLOCAL);

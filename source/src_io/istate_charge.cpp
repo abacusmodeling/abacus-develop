@@ -204,7 +204,7 @@ void IState_Charge::idmatrix(const int &ib)
 			}
 		
 			// wg_wfc(ib,iw) = wg[ib] * wfc(ib,iw);
-			matrix wg_wfc(GlobalC::LOC.wfc_dm_2d.wfc_gamma[is]);
+			ModuleBase::matrix wg_wfc(GlobalC::LOC.wfc_dm_2d.wfc_gamma[is]);
 	
 			for(int ir=0; ir!=wg_wfc.nr; ++ir)
 			{

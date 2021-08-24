@@ -14,7 +14,7 @@
 #include <omp.h>
 
 //=========================================================
-// Integral On 3D Grids, different from Grid_Integral
+// ModuleBase::Integral On 3D Grids, different from Grid_Integral
 // Feature : Matrix Elements Of Local Potential For 
 // Numerical Orbitals
 //=========================================================

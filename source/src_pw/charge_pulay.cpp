@@ -112,7 +112,7 @@ void Charge_Pulay::Pulay_mixing(void)
 			// inverse part of the matrix.
 			//-----------------------------
 			const int predim = idstep+1;
-			matrix preA(predim, predim);
+			ModuleBase::matrix preA(predim, predim);
 			for(int i=0; i<predim; i++)
 			{
 				for(int j=0; j<predim; j++)
@@ -166,7 +166,7 @@ void Charge_Pulay::Pulay_mixing(void)
 	{
 		// generate matrix A = <dR|dR>
 		this->generate_Abar(scheme,Abar);
-		matrix A(Abar);
+		ModuleBase::matrix A(Abar);
 
 		// inverse A matrix to become Abar.
 		this->inverse_real_symmetry_matrix(scheme,Abar);
@@ -404,7 +404,7 @@ void Charge_Pulay::allocate_pulay(const int &scheme)
 // calculate < dR | dR >
 // if spin is considered, double the size.
 // < dR1,dR2 | dR1,dR2 > = < dR1 | dR1 > + < dR2 | dR2 >
-void Charge_Pulay::generate_Abar(const int &scheme, matrix &A)const
+void Charge_Pulay::generate_Abar(const int &scheme, ModuleBase::matrix &A)const
 {
 	int step = 0;
 
@@ -437,7 +437,7 @@ void Charge_Pulay::generate_Abar(const int &scheme, matrix &A)const
 }
 
 
-void Charge_Pulay::inverse_preA(const int &dim, matrix &preA)const
+void Charge_Pulay::inverse_preA(const int &dim, ModuleBase::matrix &preA)const
 {
 	ModuleBase::ComplexMatrix B(dim, dim);
 	ModuleBase::ComplexMatrix C(dim, dim);
@@ -448,7 +448,7 @@ void Charge_Pulay::inverse_preA(const int &dim, matrix &preA)const
 			B(i,j) = std::complex<double> (preA(i,j), 0.0);
 		}
 	}
-	Inverse_Matrix_Complex IMC;
+	ModuleBase::Inverse_Matrix_Complex IMC;
 	IMC.init(dim);
 	IMC.using_zheev(B,C);
 //	out.printcm("Inverse B", C);
@@ -462,7 +462,7 @@ void Charge_Pulay::inverse_preA(const int &dim, matrix &preA)const
 	return;
 }
 
-void Charge_Pulay::inverse_real_symmetry_matrix(const int &scheme, matrix &A)const // indicate the spin.
+void Charge_Pulay::inverse_real_symmetry_matrix(const int &scheme, ModuleBase::matrix &A)const // indicate the spin.
 {
 //	TITLE("Charge_Pulay","inverse_Abar");
 
@@ -484,7 +484,7 @@ void Charge_Pulay::inverse_real_symmetry_matrix(const int &scheme, matrix &A)con
 	}
 
 	// Abar is not 'positive' symmetry matrix!	
-	//Inverse_Matrix_Real IMR;
+	//ModuleBase::Inverse_Matrix_Real IMR;
 	//const int info = IMR.using_spotri(Abar,step);	
 	//for(int i=0; i<step; i++)
 	//{
@@ -494,7 +494,7 @@ void Charge_Pulay::inverse_real_symmetry_matrix(const int &scheme, matrix &A)con
 	//	}
 	//}
 		
-	Inverse_Matrix_Complex IMC;
+	ModuleBase::Inverse_Matrix_Complex IMC;
 	IMC.init(step);
 	IMC.using_zheev(B,C);
 

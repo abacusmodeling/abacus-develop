@@ -1,5 +1,8 @@
 #include "inverse_matrix.h"
 
+namespace ModuleBase
+{
+
 Inverse_Matrix_Complex::Inverse_Matrix_Complex()
 {
 	allocate=false;	
@@ -106,4 +109,6 @@ int Inverse_Matrix_Real::using_spotri(matrix &A, const int dim)
 	LapackConnector::spotri('U',dim,A,dim,&info);
 	std::cout << "\n info_spotri = " << info;
 	return info;
+}
+
 }

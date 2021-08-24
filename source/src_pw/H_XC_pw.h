@@ -26,7 +26,7 @@ class H_XC_pw
 
 	// compute the exchange-correlation energy 
 	// [etxc, vtxc, v] = v_xc(...)
-    static std::tuple<double,double,matrix> v_xc(
+    static std::tuple<double,double,ModuleBase::matrix> v_xc(
 		const int &nrxx, // number of real-space grid
 		const int &ncxyz, // total number of charge grid
 		const double &omega, // volume of cell

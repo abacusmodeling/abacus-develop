@@ -11,12 +11,12 @@ class Stress_PW: public Stress_Func
 	~Stress_PW (){};
 
 	//calculate the stress in PW basis
-	void cal_stress(matrix& sigmatot);
+	void cal_stress(ModuleBase::matrix& sigmatot);
 
 	private :
 
 	//call the vdw stress
-	void stress_vdw(matrix& sigma);   //force and stress calculated in vdw together.
+	void stress_vdw(ModuleBase::matrix& sigma);   //force and stress calculated in vdw together.
 
 };
 #endif

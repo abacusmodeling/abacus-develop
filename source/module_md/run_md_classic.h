@@ -19,7 +19,7 @@ public:
     void update_pos_classic(void);
 
     Vector3<double> *force;  //force of each atom
-	matrix stress;           //stress for this lattice
+	ModuleBase::matrix stress;           //stress for this lattice
 
 private:
     int istep;

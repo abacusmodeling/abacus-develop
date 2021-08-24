@@ -2,7 +2,7 @@
 #include "../module_base/math_integral.h"
 
 //calculate local pseudopotential stress in PW or VL_dVL stress in LCAO
-void Stress_Func::stress_loc(matrix& sigma, const bool is_pw)
+void Stress_Func::stress_loc(ModuleBase::matrix& sigma, const bool is_pw)
 {
     timer::tick("Stress_Func","stress_loc");
 
@@ -166,13 +166,13 @@ double*  dvloc
 		//    and here we perform the integral, after multiplying for the |G|
 		//    dependent  part
 		//
-		// DV(g)/Dg = Integral of r (Dj_0(gr)/Dg) V(r) dr
+		// DV(g)/Dg = ModuleBase::Integral of r (Dj_0(gr)/Dg) V(r) dr
 		for(int i = 1;i< msh;i++)
 		{
 			aux [i] = aux1 [i] * (r [i] * cos (gx * r [i] ) / gx - sin (gx * r [i] ) / pow(gx,2));
 		}
 		// simpson (msh, aux, rab, vlcp);
-		Integral::Simpson_Integral(msh, aux, rab, vlcp );
+		ModuleBase::Integral::Simpson_Integral(msh, aux, rab, vlcp );
 		// DV(g^2)/Dg^2 = (DV(g)/Dg)/2g
 		vlcp *= FOUR_PI / GlobalC::ucell.omega / 2.0 / gx;
 		// subtract the long-range term

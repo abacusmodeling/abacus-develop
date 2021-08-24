@@ -2,7 +2,7 @@
 #include "./H_Ewald_pw.h"
 
 //calcualte the Ewald stress term in PW and LCAO
-void Stress_Func::stress_ewa(matrix& sigma, const bool is_pw)
+void Stress_Func::stress_ewa(ModuleBase::matrix& sigma, const bool is_pw)
 {
     timer::tick("Stress_Func","stress_ew");
 

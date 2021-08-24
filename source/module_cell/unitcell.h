@@ -62,8 +62,8 @@ public:
     int *iat2ia; //iat==>ia
 	int *iwt2iat; // iwt ==> iat.
 	int *iwt2iw; // iwt ==> iw, Peize Lin add 2018-07-02
-    IntArray itia2iat;//(it, ia)==>iat, the index in nat, add 2009-3-2 by mohan
-    IntArray itiaiw2iwt;//(it, ia, iw)==>iwt, the index in nwfc, add 2009-3-2 by mohan
+    ModuleBase::IntArray itia2iat;//(it, ia)==>iat, the index in nat, add 2009-3-2 by mohan
+    ModuleBase::IntArray itiaiw2iwt;//(it, ia, iw)==>iwt, the index in nwfc, add 2009-3-2 by mohan
     //LiuXh add 20180515
     Matrix3 G0;
     Matrix3 GT0;

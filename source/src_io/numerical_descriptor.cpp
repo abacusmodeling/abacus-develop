@@ -242,7 +242,7 @@ void Numerical_Descriptor::jlq3d_overlap(
 	const double normalization = (4 * PI) / sqrt(GlobalC::ucell.omega);// Peize Lin add normalization 2015-12-29
 
     const int total_lm = ( this->lmax + 1) * ( this->lmax + 1);
-    matrix ylm(total_lm, np);
+    ModuleBase::matrix ylm(total_lm, np);
 
     Vector3<double> *gk = new Vector3 <double> [np];
     for (int ig=0; ig<np; ig++)
@@ -250,7 +250,7 @@ void Numerical_Descriptor::jlq3d_overlap(
         gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
     }
 
-    YlmReal::Ylm_Real(total_lm, np, gk, ylm);
+    ModuleBase::YlmReal::Ylm_Real(total_lm, np, gk, ylm);
 
     GlobalV::ofs_running << "\n " << std::setw(5) << "ik"
     << std::setw(8) << "Type1"
@@ -315,7 +315,7 @@ void Numerical_Descriptor::init_mu_index(void)
 	GlobalV::ofs_running << " Initialize the mu index for deepks" << std::endl;
 	GlobalV::ofs_running << " lmax = " << this->lmax << std::endl;
 	GlobalV::ofs_running << " nmax = " << this->nmax << std::endl;
-    Numerical_Descriptor::mu_index = new IntArray[GlobalC::ucell.ntype];
+    Numerical_Descriptor::mu_index = new ModuleBase::IntArray[GlobalC::ucell.ntype];
 
 	assert(lmax>=0);
 	assert(nmax>0);

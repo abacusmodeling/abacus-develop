@@ -4,7 +4,7 @@
 #include "./xc_gga_pw.h"
 
 //calculate the GGA stress correction in PW and LCAO
-void Stress_Func::stress_gga(matrix& sigma) 
+void Stress_Func::stress_gga(ModuleBase::matrix& sigma) 
 {
 	timer::tick("Stress_Func","stress_gga");
      

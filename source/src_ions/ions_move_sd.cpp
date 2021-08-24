@@ -26,7 +26,7 @@ void Ions_Move_SD::allocate(void)
     this->pos_saved = new double[dim];
 }
 
-void Ions_Move_SD::start(const matrix& force, const double& etot_in)
+void Ions_Move_SD::start(const ModuleBase::matrix& force, const double& etot_in)
 {
     TITLE("Ions_Move_SD","start");
 

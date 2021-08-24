@@ -25,7 +25,7 @@ protected:
 	~Grid_Base();
 	
 //==========================================================
-// EXPLAIN : Integral On 3D Real Space For Local Potential
+// EXPLAIN : ModuleBase::Integral On 3D Real Space For Local Potential
 // MEMBER FUNCTION :
 //===========================================================
 	// define pointer

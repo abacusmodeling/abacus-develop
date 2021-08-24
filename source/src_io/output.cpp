@@ -2,7 +2,7 @@
 
 #include "output.h"
 
-void output::printrm(std::ofstream &ofs,const std::string &s, const matrix &m, const double &limit) const
+void output::printrm(std::ofstream &ofs,const std::string &s, const ModuleBase::matrix &m, const double &limit) const
 {
     const int b1 = m.nr;
     const int b2 = m.nc;
@@ -29,7 +29,7 @@ void output::printrm(std::ofstream &ofs,const std::string &s, const matrix &m, c
     return;
 }
 
-void output::printrm(const std::string &s, const matrix &m, const double &limit) const
+void output::printrm(const std::string &s, const ModuleBase::matrix &m, const double &limit) const
 {
     const int b1 = m.nr;
     const int b2 = m.nc;

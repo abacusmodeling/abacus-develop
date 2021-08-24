@@ -6,7 +6,7 @@ double H_XC_pw::etxc;
 double H_XC_pw::vtxc;
 
 // [etxc, vtxc, v] = H_XC_pw::v_xc(...)
-std::tuple<double,double,matrix> H_XC_pw::v_xc
+std::tuple<double,double,ModuleBase::matrix> H_XC_pw::v_xc
 (
 	const int &nrxx, // number of real-space grid
 	const int &ncxyz, // total number of charge grid
@@ -26,7 +26,7 @@ std::tuple<double,double,matrix> H_XC_pw::v_xc
     //Exchange-Correlation potential Vxc(r) from n(r)
     double et_xc = 0.0;
     double vt_xc = 0.0;
-	matrix v(GlobalV::NSPIN, nrxx);
+	ModuleBase::matrix v(GlobalV::NSPIN, nrxx);
 
 	if(GlobalV::VXC_IN_H == 0)
 	{

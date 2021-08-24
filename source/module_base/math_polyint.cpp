@@ -1,5 +1,7 @@
 #include "math_polyint.h"
 #include "timer.h"
+namespace ModuleBase
+{
 
 void PolyInt::Polynomial_Interpolation
 (
@@ -227,4 +229,6 @@ double PolyInt::Polynomial_Interpolation_xy
         // 	timer::tick("PolyInt","Poly_Inter_xy");
         return ypoint[position];
     }
+}
+
 }

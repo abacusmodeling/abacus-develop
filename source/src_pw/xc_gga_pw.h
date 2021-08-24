@@ -12,7 +12,7 @@
 
 namespace GGA_PW
 {
-	void gradcorr(double &etxc, double &vtxc, matrix &v);
+	void gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v);
 	void grad_rho( const std::complex<double> *rhog, Vector3<double> *gdr );
 	void grad_wfc( const std::complex<double> *rhog, const int ik, std::complex<double> **grad, const int npw );
 	void grad_dot( const Vector3<double> *h, double *dh);

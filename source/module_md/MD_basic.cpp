@@ -121,7 +121,7 @@ MD_basic::~MD_basic()
     delete []allmass;
 }
 
-void MD_basic::runNVT(int step1, double potential, Vector3<double> *force, const matrix &stress)
+void MD_basic::runNVT(int step1, double potential, Vector3<double> *force, const ModuleBase::matrix &stress)
 {
 //------------------------------------------------------------------------------
 // DESCRIPTION:
@@ -279,7 +279,7 @@ void MD_basic::runNVT(int step1, double potential, Vector3<double> *force, const
     return;
 }
 
-void MD_basic::runNVE(int step1, double potential, Vector3<double> *force, const matrix &stress)
+void MD_basic::runNVE(int step1, double potential, Vector3<double> *force, const ModuleBase::matrix &stress)
 {
 //-------------------------------------------------------------------------------
 // Adiabatic ensemble 
@@ -404,7 +404,7 @@ void MD_basic::runNVE(int step1, double potential, Vector3<double> *force, const
     return;
 }
 
-bool MD_basic::runFIRE(int step1, double potential, Vector3<double> *force, const matrix &stress)
+bool MD_basic::runFIRE(int step1, double potential, Vector3<double> *force, const ModuleBase::matrix &stress)
 {
 //-------------------------------------------------------------------------------
 // REFERENCES:
@@ -606,7 +606,7 @@ int MD_basic::getRealStep()
 }
 
 //output pressure of total MD system, P = tr(stress) + P_kin
-void MD_basic::outStressMD(const matrix& stress, const double& twiceKE)
+void MD_basic::outStressMD(const ModuleBase::matrix& stress, const double& twiceKE)
 {
     GlobalV::ofs_running<<"\noutput Pressure for check!"<<std::endl;
     double press = 0.0;
@@ -625,7 +625,7 @@ void MD_basic::getTaudUpdate()
     Vector3<double> fracStep;
 	for(int  ii=0;ii<ucell.nat;ii++)
     { 
-		Mathzone::Cartesian_to_Direct(cart_change[ii].x,cart_change[ii].y,cart_change[ii].z,
+		ModuleBase::Mathzone::Cartesian_to_Direct(cart_change[ii].x,cart_change[ii].y,cart_change[ii].z,
 					ucell.latvec.e11,ucell.latvec.e12,ucell.latvec.e13,
 					ucell.latvec.e21,ucell.latvec.e22,ucell.latvec.e23,
 					ucell.latvec.e31,ucell.latvec.e32,ucell.latvec.e33,

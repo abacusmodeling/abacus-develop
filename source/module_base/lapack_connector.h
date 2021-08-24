@@ -101,7 +101,7 @@ private:
     }
     // Transpose the  matrix to the fortran-form real array.
     static inline
-    double * transpose_matrix(const matrix& a, const int n, const int lda)
+    double * transpose_matrix(const ModuleBase::matrix& a, const int n, const int lda)
     {
         double * aux = new double [lda*n];
 		std::cout << " lda=" << lda << " n=" << n << std::endl;
@@ -130,7 +130,7 @@ private:
     
 	// Transpose the fortran-form real array to the matrix.
     static inline
-    void transpose_matrix(const double *aux, matrix &a, const int n, const int lda)
+    void transpose_matrix(const double *aux, ModuleBase::matrix &a, const int n, const int lda)
     {
         for (int i = 0; i < n; ++i)
         {
@@ -231,9 +231,9 @@ public:
 	// mohan add 2010/03/21
 	static inline
 	void sspgvx(const int itype, const char jobz,const char range,const char uplo,
-				const int n,const matrix &ap,const matrix &bp,const double vl,
+				const int n,const ModuleBase::matrix &ap,const ModuleBase::matrix &bp,const double vl,
 				const int vu, const int il, const int iu,const double abstol,
-				const int m,double* w,matrix &z,const int ldz,
+				const int m,double* w,ModuleBase::matrix &z,const int ldz,
 				double *work,int* iwork,int* ifail,int* info)
 	{
 	    // Transpose the std::complex matrix to the fortran-form real*16 array.
@@ -259,8 +259,8 @@ public:
 
 	// calculate the eigenvalues and eigenfunctions of a real symmetric matrix.
     static inline
-    void dsygv(	const int itype,const char jobz,const char uplo,const int n,matrix& a,
-                const int lda,matrix& b,const int ldb,double* w,double* work,
+    void dsygv(	const int itype,const char jobz,const char uplo,const int n,ModuleBase::matrix& a,
+                const int lda,ModuleBase::matrix& b,const int ldb,double* w,double* work,
                 int lwork,int *info)
     {	// Transpose the std::complex matrix to the fortran-form real-std::complex array.
         double* aux = new double[lda*n];
@@ -298,7 +298,7 @@ public:
 		dsyev_(&jobz, &uplo_changed, &n, a, &lda, w, work, &lwork, &info);
 	}
     static inline
-	void dsyev( const char jobz, const char uplo, matrix &a, double* w, int info )		// Peize Lin update 2017-10-17
+	void dsyev( const char jobz, const char uplo, ModuleBase::matrix &a, double* w, int info )		// Peize Lin update 2017-10-17
 	{
 		assert(a.nr==a.nc);
 		const char uplo_changed = change_uplo(uplo);
@@ -335,7 +335,7 @@ public:
 	
     // wrap function of fortran lapack routine dsytrf.
     static inline
-    void dsytrf(char uplo, int n, matrix& a, int lda, int *ipiv,
+    void dsytrf(char uplo, int n, ModuleBase::matrix& a, int lda, int *ipiv,
                 double *work, int lwork , int info)
     {
         double * aux = LapackConnector::transpose_matrix(a, n, lda) ;
@@ -345,7 +345,7 @@ public:
 
     // wrap function of fortran lapack routine dsytri.
     static inline
-    void dsytri(char uplo, int n, matrix& a, int lda, int *iwork,double * work, int info)
+    void dsytri(char uplo, int n, ModuleBase::matrix& a, int lda, int *iwork,double * work, int info)
     {
         double * aux = LapackConnector::transpose_matrix(a, n, lda) ;
         dsytri_(&uplo, &n, aux, &lda, iwork, work, &info);
@@ -383,8 +383,8 @@ public:
     }
     static inline
     void dgesvd(const char jobu,const char jobvt,const int m,const int n,
-                matrix &a,const int lda,double *s,matrix &u,const int ldu,
-                matrix &vt,const int ldvt,double *work,const int lwork,int info)
+                ModuleBase::matrix &a,const int lda,double *s,ModuleBase::matrix &u,const int ldu,
+                ModuleBase::matrix &vt,const int ldvt,double *work,const int lwork,int info)
     {
         //Transpose the matrix to the fortran-form
 
@@ -425,7 +425,7 @@ public:
     }
 
     static inline
-    void spotrf(char uplo,int n,matrix &a, int lda,int *info)
+    void spotrf(char uplo,int n,ModuleBase::matrix &a, int lda,int *info)
 	{
 		double *aux = LapackConnector::transpose_matrix(a, n, lda);
 		for(int i=0; i<4; i++)std::cout << "\n aux=" << aux[i]; 
@@ -437,7 +437,7 @@ public:
 	}
 
 	static inline
-	void spotri(char uplo,int n,matrix &a, int lda, int *info)
+	void spotri(char uplo,int n,ModuleBase::matrix &a, int lda, int *info)
 	{
 		double *aux = LapackConnector::transpose_matrix(a, n, lda);
 		for(int i=0; i<4; i++)std::cout << "\n aux=" << aux[i]; 
@@ -466,7 +466,7 @@ public:
         return;
     }
     static inline
-    void pdgetrf(int m, int n, matrix &a,int ia, int ja, int *desca, int *ipiv, int *info)
+    void pdgetrf(int m, int n, ModuleBase::matrix &a,int ia, int ja, int *desca, int *ipiv, int *info)
     {
 	double *aux = LapackConnector::transpose_matrix(a, n, m);
 	pdgetrf_( &m, &n, aux, &ia, &ja, desca, ipiv, info);
@@ -477,7 +477,7 @@ public:
 
 	// Peize Lin add 2016-07-09
 	static inline
-	void dpotrf( char uplo, const int n, matrix &a, const int lda, int *info )
+	void dpotrf( char uplo, const int n, ModuleBase::matrix &a, const int lda, int *info )
 	{
 		const char uplo_changed = change_uplo(uplo);
 		dpotrf_( &uplo_changed, &n, a.c, &lda, info );
@@ -485,7 +485,7 @@ public:
 	
 	// Peize Lin add 2016-07-09
 	static inline
-	void dpotri( char uplo, const int n, matrix &a, const int lda, int *info )
+	void dpotri( char uplo, const int n, ModuleBase::matrix &a, const int lda, int *info )
 	{
 		const char uplo_changed = change_uplo(uplo);
 		dpotri_( &uplo_changed, &n, a.c, &lda, info);		

@@ -9,7 +9,8 @@
 #include <map>
 #include <cassert>
 #include <complex>
-using namespace std;
+namespace ModuleBase
+{
 
 class Mathzone
 {
@@ -158,5 +159,7 @@ public:
 	}	
 
 };
+
+}
 
 #endif

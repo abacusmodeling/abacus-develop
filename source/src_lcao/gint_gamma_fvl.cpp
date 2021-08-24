@@ -100,7 +100,7 @@ inline void cal_psir_ylm_dphi(
             // iq, x0, x1, x3, x3, x12, x03 are all the variables 
             // needed in this interpolation method.
             // It's the same as the function in mathzone.cpp:
-            // Mathzone::Polynomial_Interpolation
+            // ModuleBase::Mathzone::Polynomial_Interpolation
             // BUT THE IMPORTANT THING IS,
             // in order to minimiz the total operations,
             // we save some variable in advance here,

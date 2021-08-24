@@ -4,7 +4,7 @@
 #include "myfunc.h"
 
 // from gradcorr.f90
-void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
+void GGA_PW::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 {
 	TITLE("GGA_PW","gradcorr");
 	

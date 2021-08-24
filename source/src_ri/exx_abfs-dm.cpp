@@ -27,7 +27,7 @@ void Exx_Abfs::DM::cal_DM(
 
 		for( const Vector3<int> &box : Born_von_Karman_boxes )
 		{
-			DMr[iat1][iat2][box] = std::vector<matrix>( GlobalV::NSPIN, {GlobalC::ucell.atoms[it1].nw,GlobalC::ucell.atoms[it2].nw} );
+			DMr[iat1][iat2][box] = std::vector<ModuleBase::matrix>( GlobalV::NSPIN, {GlobalC::ucell.atoms[it1].nw,GlobalC::ucell.atoms[it2].nw} );
 			for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 			{
 				DMr[iat1][iat2][box][GlobalC::kv.isk[ik]] += ( DMk[iat1][iat2][ik] * exp( -TWO_PI*IMAG_UNIT* (GlobalC::kv.kvec_c[ik]* (box*GlobalC::ucell.latvec)) ) ).real();

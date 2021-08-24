@@ -21,8 +21,8 @@ LCAO_Descriptor ld;
 
 LCAO_Descriptor::LCAO_Descriptor()
 {
-    alpha_index = new IntArray[1];
-    inl_index = new IntArray[1];
+    alpha_index = new ModuleBase::IntArray[1];
+    inl_index = new ModuleBase::IntArray[1];
     inl_l = new int[1];
     d = new double[1];
     H_V_delta = new double[1]; 
@@ -139,9 +139,9 @@ void LCAO_Descriptor::init_index(void)
 {
     
     delete[] this->alpha_index;
-    this->alpha_index = new IntArray[GlobalC::ucell.ntype];
+    this->alpha_index = new ModuleBase::IntArray[GlobalC::ucell.ntype];
     delete[] this->inl_index;
-    this->inl_index = new IntArray[GlobalC::ucell.ntype];
+    this->inl_index = new ModuleBase::IntArray[GlobalC::ucell.ntype];
     delete[] this->inl_l;
     this->inl_l = new int[this->inlmax];
     ModuleBase::GlobalFunc::ZEROS(this->inl_l, this->inlmax);
@@ -701,7 +701,7 @@ void LCAO_Descriptor::cal_v_delta(const std::string& model_file)
     return;
 }
 
-void LCAO_Descriptor::cal_f_delta(matrix& dm)
+void LCAO_Descriptor::cal_f_delta(ModuleBase::matrix& dm)
 {
     TITLE("LCAO_Descriptor", "cal_f_delta");
     int iat = 0;    //check if the index same as GlobalC::ucell.iw2iat or not !!
@@ -914,7 +914,7 @@ void LCAO_Descriptor::save_npy_e(double& ebase)
     return;
 }
 
-void LCAO_Descriptor::save_npy_f(matrix& fbase)
+void LCAO_Descriptor::save_npy_f(ModuleBase::matrix& fbase)
 {
     //save f_base
     //caution: unit: Rydberg/Bohr

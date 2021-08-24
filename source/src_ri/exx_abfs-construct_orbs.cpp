@@ -278,7 +278,7 @@ std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+ModuleBase::GlobalF
 	if(times_threshold>1)
 		return std::vector<std::vector<std::vector<std::vector<double>>>>(abfs.size());
 
-	const std::vector<std::vector<std::pair<std::vector<double>,matrix>>> && eig = Exx_Abfs::PCA::cal_PCA( orbs, abfs, kmesh_times_mot );
+	const std::vector<std::vector<std::pair<std::vector<double>,ModuleBase::matrix>>> && eig = Exx_Abfs::PCA::cal_PCA( orbs, abfs, kmesh_times_mot );
 
 	const std::vector<std::vector<std::vector<std::vector<double>>>> && psis = get_psi( abfs );
 	std::vector<std::vector<std::vector<std::vector<double>>>> psis_new( psis.size() );
@@ -303,7 +303,7 @@ ofs<<"eig_value_threshold:\t"<<eig_value_threshold<<std::endl;
 			for( size_t L=0; L!=eig[T].size(); ++L )
 			{
 				const std::vector<double> &eig_value = eig[T][L].first;
-				const matrix &eig_vec = eig[T][L].second;
+				const ModuleBase::matrix &eig_vec = eig[T][L].second;
 				for( size_t M=0; M!=eig_value.size(); ++M )
 				{
 					if( eig_value[M] > eig_value_threshold )
@@ -344,9 +344,9 @@ std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_O
 	for( int T=0; T!=psis.size(); ++T )
 	{
 		const Numerical_Orbital_Lm &orb = orbs[T][0][0];
-		Gram_Schmidt_Orth<double,double> gso(
+		ModuleBase::Gram_Schmidt_Orth<double,double> gso(
 			orb.get_rab(),
-			Gram_Schmidt_Orth<double,double>::Coordinate::Sphere );
+			ModuleBase::Gram_Schmidt_Orth<double,double>::Coordinate::Sphere );
 		psis_orth[T].resize( psis[T].size() );
 		for( int L=0; L!=psis[T].size(); ++L )
 		{

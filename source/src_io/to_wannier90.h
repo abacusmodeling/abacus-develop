@@ -75,8 +75,8 @@ public:
 	void cal_Amn(const ModuleBase::ComplexMatrix *wfc_pw);
 	void cal_Mmn(const ModuleBase::ComplexMatrix *wfc_pw);
 	void produce_trial_in_pw(const int &ik, ModuleBase::ComplexMatrix &trial_orbitals_k);
-	void get_trial_orbitals_lm_k(const int wannier_index, const int orbital_L, const int orbital_m, matrix &ylm, 
-										matrix &dr, matrix &r, matrix &psir, const int mesh_r, 
+	void get_trial_orbitals_lm_k(const int wannier_index, const int orbital_L, const int orbital_m, ModuleBase::matrix &ylm, 
+										ModuleBase::matrix &dr, ModuleBase::matrix &r, ModuleBase::matrix &psir, const int mesh_r, 
 										Vector3<double> *gk, const int npw, ModuleBase::ComplexMatrix &trial_orbitals_k);
 	void integral(const int meshr, const double *psir, const double *r, const double *rab, const int &l, double* table);
 	void writeUNK(const ModuleBase::ComplexMatrix *wfc_pw);

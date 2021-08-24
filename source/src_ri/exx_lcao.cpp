@@ -40,13 +40,13 @@
 
 /*
 // m_new( i2*n1+i1, i3 ) = m( i1*n2+i2, i3 )
-static matrix transform (
-	const matrix & m,
+static ModuleBase::matrix transform (
+	const ModuleBase::matrix & m,
 	const size_t n1, const size_t n2, const size_t n3 )
 {
 	assert( n1*n2*n3 == m.nr*m.nc );
 	const auto length = sizeof(double)*n3;
-	matrix m_new( n1*n2, n3, false );
+	ModuleBase::matrix m_new( n1*n2, n3, false );
 	for( size_t i1=0; i1!=n1; ++i1 )
 	{
 		for( size_t i2=0; i2!=n2; ++i2 )
@@ -64,22 +64,22 @@ Exx_Lcao::Exx_Lcao( const Exx_Global::Exx_Info &info_global )
 {
 	auto test_gemm = []()
 	{
-		auto init_matrix = [](const int nr, const int nc, const double add) -> matrix
+		auto init_matrix = [](const int nr, const int nc, const double add) -> ModuleBase::matrix
 		{
-			matrix m(nr,nc);
+			ModuleBase::matrix m(nr,nc);
 			for(int i=0; i<m.nr*m.nc; ++i)
 				m.c[i]=i+add;
 			return m;
 		};
-		auto transpose = [](const matrix &m) -> matrix
+		auto transpose = [](const ModuleBase::matrix &m) -> ModuleBase::matrix
 		{
-			matrix mT(m.nc,m.nr);
+			ModuleBase::matrix mT(m.nc,m.nr);
 			for(int ir=0; ir!=m.nr; ++ir)
 				for(int ic=0; ic!=m.nc; ++ic)
 					mT(ic,ir) = m(ir,ic);
 			return mT;
 		};
-		auto print_matrix = [](const matrix &m1,const matrix &m2,const matrix &m3)
+		auto print_matrix = [](const ModuleBase::matrix &m1,const ModuleBase::matrix &m2,const ModuleBase::matrix &m3)
 		{
 			std::cout<<m1<<std::endl;
 			std::cout<<m2<<std::endl;
@@ -87,13 +87,13 @@ Exx_Lcao::Exx_Lcao( const Exx_Global::Exx_Info &info_global )
 			std::cout<<"============================="<<std::endl<<std::endl;
 		};
 		{
-			const matrix m1=init_matrix(1,3,10), m2=init_matrix(3,2,0);
-			matrix m3=m1*m2;
+			const ModuleBase::matrix m1=init_matrix(1,3,10), m2=init_matrix(3,2,0);
+			ModuleBase::matrix m3=m1*m2;
 			print_matrix(m1,m2,m3);
 		}
 		{
-			const matrix m1=init_matrix(1,3,10), m2=init_matrix(3,2,0);
-			matrix m3(m1.nr,m2.nc);
+			const ModuleBase::matrix m1=init_matrix(1,3,10), m2=init_matrix(3,2,0);
+			ModuleBase::matrix m3(m1.nr,m2.nc);
 			LapackConnector::gemm(
 				'N', 'N', 
 				m3.nr, m3.nc, m1.nc,
@@ -102,8 +102,8 @@ Exx_Lcao::Exx_Lcao( const Exx_Global::Exx_Info &info_global )
 			print_matrix(m1,m2,m3);
 		}
 		{
-			const matrix m1=transpose(init_matrix(1,3,10)), m2=init_matrix(3,2,0);
-			matrix m3(m1.nc,m2.nc);
+			const ModuleBase::matrix m1=transpose(init_matrix(1,3,10)), m2=init_matrix(3,2,0);
+			ModuleBase::matrix m3(m1.nc,m2.nc);
 			LapackConnector::gemm(
 				'T', 'N', 
 				m3.nr, m3.nc, m1.nr,
@@ -112,8 +112,8 @@ Exx_Lcao::Exx_Lcao( const Exx_Global::Exx_Info &info_global )
 			print_matrix(m1,m2,m3);
 		}
 		{
-			const matrix m1=transpose(init_matrix(1,3,10)), m2=init_matrix(3,2,0);
-			matrix m3(m1.nc,m2.nc);
+			const ModuleBase::matrix m1=transpose(init_matrix(1,3,10)), m2=init_matrix(3,2,0);
+			ModuleBase::matrix m3(m1.nc,m2.nc);
 			LapackConnector::gemm(
 				'N', 'T', 
 				m3.nr, m3.nc, m1.nr,
@@ -122,8 +122,8 @@ Exx_Lcao::Exx_Lcao( const Exx_Global::Exx_Info &info_global )
 			print_matrix(m1,m2,m3);
 		}
 		{
-			const matrix m1=init_matrix(1,3,10), m2=transpose(init_matrix(3,2,0));
-			matrix m3(m1.nr,m2.nr);
+			const ModuleBase::matrix m1=init_matrix(1,3,10), m2=transpose(init_matrix(3,2,0));
+			ModuleBase::matrix m3(m1.nr,m2.nr);
 			LapackConnector::gemm(
 				'N','T',
 				m3.nr, m3.nc, m1.nc,
@@ -132,8 +132,8 @@ Exx_Lcao::Exx_Lcao( const Exx_Global::Exx_Info &info_global )
 			print_matrix(m1,m2,m3);
 		}
 		{
-			const matrix m1=init_matrix(1,3,10), m2=transpose(init_matrix(3,2,0));
-			matrix m3(m1.nr,m2.nr);
+			const ModuleBase::matrix m1=init_matrix(1,3,10), m2=transpose(init_matrix(3,2,0));
+			ModuleBase::matrix m3(m1.nr,m2.nr);
 			LapackConnector::gemm(
 				'T','N',
 				m3.nr, m3.nc, m1.nc,
@@ -147,7 +147,7 @@ Exx_Lcao::Exx_Lcao( const Exx_Global::Exx_Info &info_global )
 	{
 		constexpr int S=10000;
 		constexpr int N=1000;
-		matrix m1(N,N), m2(N,N), m3(N,N);	
+		ModuleBase::matrix m1(N,N), m2(N,N), m3(N,N);	
 		timeval time;		
 		gettimeofday(&time, NULL);
 		
@@ -174,11 +174,11 @@ Exx_Lcao::Exx_Lcao( const Exx_Global::Exx_Info &info_global )
 		const int M=1;
 		for(int N=1; N<=4096; N*=2)
 		{
-			matrix a(N,N), b(N,N);
+			ModuleBase::matrix a(N,N), b(N,N);
 			timeval t;	gettimeofday(&t,NULL);
 			for(int m=0; m<M; ++m)
 			{
-				matrix c = a * b;
+				ModuleBase::matrix c = a * b;
 				s+=c(0,0);
 			}
 			std::cout<<N<<"\t"<<cal_time(t)<<"\t"<<s<<std::endl;
@@ -491,7 +491,7 @@ void Exx_Lcao::init()
 
 	auto test_matrix = []()
 	{
-		matrix m(3,3);
+		ModuleBase::matrix m(3,3);
 		for( size_t ir=0; ir!=m.nr; ++ir )
 		{
 			for( size_t ic=0; ic!=m.nc; ++ic )
@@ -741,9 +741,9 @@ ofs_mpi.close();
 		pthread_rwlock_t rwlock_Cw;	pthread_rwlock_init(&rwlock_Cw,NULL);
 		pthread_rwlock_t rwlock_Vw;	pthread_rwlock_init(&rwlock_Vw,NULL);
 
-		std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,std::weak_ptr<matrix>>>> Cws;
-		std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,std::weak_ptr<matrix>>>> Vws;
-		std::shared_ptr<matrix> C = Abfs::DPcal_C(
+		std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,std::weak_ptr<ModuleBase::matrix>>>> Cws;
+		std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,std::weak_ptr<ModuleBase::matrix>>>> Vws;
+		std::shared_ptr<ModuleBase::matrix> C = Abfs::DPcal_C(
 			0,
 			0,
 			{0,0,0},
@@ -770,7 +770,7 @@ ofs_mpi.close();
 		m_lcaos_lcaos.init(1,1,1);
 		m_lcaos_lcaos.init_radial(lcaos,lcaos);
 		m_lcaos_lcaos.init_radial_table();
-		const matrix m_overlap = m_lcaos_lcaos.cal_overlap_matrix( 0,0, {0,0,0},{0,0,0}, index_lcaos,index_lcaos );
+		const ModuleBase::matrix m_overlap = m_lcaos_lcaos.cal_overlap_matrix( 0,0, {0,0,0},{0,0,0}, index_lcaos,index_lcaos );
 
 		std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> lcaos_ccp;
 		Conv_Coulomb_Pot::cal_orbs_ccp( lcaos, lcaos_ccp );
@@ -778,7 +778,7 @@ ofs_mpi.close();
 		m_lcaos_ccp.init(1,1,1);
 		m_lcaos_ccp.init_radial(lcaos,lcaos_ccp);
 		m_lcaos_ccp.init_radial_table();
-		const matrix m_overlap_coulomb = m_lcaos_ccp.cal_overlap_matrix( 0,0, {0,0,0},{0,0,0}, index_lcaos,index_lcaos );
+		const ModuleBase::matrix m_overlap_coulomb = m_lcaos_ccp.cal_overlap_matrix( 0,0, {0,0,0},{0,0,0}, index_lcaos,index_lcaos );
 
 		std::ofstream ofs("matrix_overlap.dat");
 		ofs<<m_overlap<<std::endl<<m_overlap_coulomb<<std::endl;
@@ -951,7 +951,7 @@ ofs_mpi<<"sizeof_DM\t"<<get_sizeof(DM_para.DMr)<<std::endl;
 
 gettimeofday( &t_start, NULL);
 	// HexxR[is][iat1][iat2][box2]
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> HexxR = cal_Hexx();
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> HexxR = cal_Hexx();
 ofs_mpi<<"TIME@ Exx_Lcao::cal_Hexx\t"<<time_during(t_start)<<std::endl;
 
 ofs_mpi<<"sizeof_HexxR\t"<<get_sizeof(HexxR)<<std::endl;
@@ -1164,7 +1164,7 @@ ofs_mpi.close();
 
 void Exx_Lcao::cal_exx_elec_nscf()
 {
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> HexxR;
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> HexxR;
 	Hexx_para.Rexx_to_Km2D( HexxR, {GlobalC::pot.start_pot=="file",GlobalC::CHR.out_charge} );
 }
 
@@ -1186,7 +1186,7 @@ void Exx_Lcao::cal_Hexx_gamma( const std::set<std::pair<size_t,size_t>> &atom_pa
 			for( const Abfs::Atom_Info & atom4 : adj2s )
 			{
 				const size_t iat4 = GlobalC::ucell.itia2iat( atom4.T, atom4.I );
-				const matrix matrix_1342 = *Cs[iat1][iat3][atom3.box] * *Vps_gamma[iat1][iat2] * *Cs[iat2][iat4][atom4.box];
+				const ModuleBase::matrix matrix_1342 = *Cs[iat1][iat3][atom3.box] * *Vps_gamma[iat1][iat2] * *Cs[iat2][iat4][atom4.box];
 
 				for( size_t iw1=0; iw1!=GlobalC::ucell.atoms[it1].nw; ++iw1 )
 					for( size_t iw2=0; iw2!=GlobalC::ucell.atoms[it2].nw; ++iw2 )
@@ -1209,7 +1209,7 @@ void Exx_Lcao::cal_Hexx_gamma( const std::set<std::pair<size_t,size_t>> &atom_pa
 */
 
 double Exx_Lcao::cal_energy( 
-	const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &HexxR ) const
+	const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &HexxR ) const
 {
 	TITLE("Exx_Lcao","cal_energy");
 std::ofstream ofs_mpi(test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
@@ -1228,9 +1228,9 @@ gettimeofday( &t_start, NULL);
 				for( const auto & HC : HB.second )
 				{
 					const Abfs::Vector3_Order<int> & box2 = HC.first;
-					if( const matrix*const DMr_ptr = static_cast<const matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( DM_para.DMr[is], iat1, iat2, box2 )) )
+					if( const ModuleBase::matrix*const DMr_ptr = static_cast<const ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( DM_para.DMr[is], iat1, iat2, box2 )) )
 					{
-						const matrix & H = HC.second;
+						const ModuleBase::matrix & H = HC.second;
 						assert(DMr_ptr->nr == H.nr);
 						assert(DMr_ptr->nc == H.nc);
 						energy += LapackConnector::dot( H.nr*H.nc, DMr_ptr->c,1, H.c,1 );
@@ -1256,7 +1256,7 @@ void Exx_Lcao::add_Hexx( const size_t ik, const double alpha ) const
 	
 	if( GlobalV::GAMMA_ONLY_LOCAL )
 	{
-		const matrix & H = Hexx_para.HK_Gamma_m2D[ik];
+		const ModuleBase::matrix & H = Hexx_para.HK_Gamma_m2D[ik];
 		for( size_t i=0; i<H.nr*H.nc; ++i )
 		{
 			GlobalC::LM.Hloc[i] += alpha * H.c[i];
@@ -1434,14 +1434,14 @@ ofs_mpi.close();
 }
 
 
-std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> Exx_Lcao::cal_Hexx() const
+std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> Exx_Lcao::cal_Hexx() const
 {
 #ifdef __MKL
     const int mkl_threads = mkl_get_max_threads();
 	mkl_set_num_threads(std::max(1UL,mkl_threads/atom_pairs_core.size()));
 #endif
 	
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> HexxR(GlobalV::NSPIN);
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> HexxR(GlobalV::NSPIN);
 	omp_lock_t Hexx_lock;
 	omp_init_lock(&Hexx_lock);
 	
@@ -1449,14 +1449,14 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 	{
 		// m_new( i2, i1, i3 ) = m( i1, i2, i3 )
 		auto transform = [](
-			const matrix & m,
-			const size_t n1, const size_t n2, const size_t n3 ) -> matrix
+			const ModuleBase::matrix & m,
+			const size_t n1, const size_t n2, const size_t n3 ) -> ModuleBase::matrix
 		{
 			assert( n1*n2*n3 == m.nr*m.nc );
 			const auto length = sizeof(double)*n3;
 			const auto n13 = n1*n3;
 			const double *m_ptr = m.c;
-			matrix m_new( n1*n2, n3, false );
+			ModuleBase::matrix m_new( n1*n2, n3, false );
 			for( size_t i1=0; i1!=n1; ++i1 )
 			{
 				double *m_new_ptr = m_new.c+i1*n3;
@@ -1474,10 +1474,10 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 			const int N,			// B.?.nc = C.nc
 			const int K,			// A.?.nc = B.?.nr
 			const double alpha,
-			const matrix & A,
-			const matrix & B) -> matrix
+			const ModuleBase::matrix & A,
+			const ModuleBase::matrix & B) -> ModuleBase::matrix
 		{
-			matrix C(M,N,false);
+			ModuleBase::matrix C(M,N,false);
 			LapackConnector::gemm(
 				transA, transB,
 				M, N, K,
@@ -1491,8 +1491,8 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 
 		// insert m_tmp into m_all
 		auto insert_matrixes = []( 
-			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> & m_all,
-			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> & m_tmp)
+			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> & m_all,
+			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> & m_tmp)
 		{
 			for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 			{
@@ -1505,7 +1505,7 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 						for( auto & m_tmp3 : m_tmp2.second )
 						{
 							const Abfs::Vector3_Order<int> & box2 = m_tmp3.first;
-							if( matrix*const m_all_ptr = static_cast<matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( m_all[is], iat1, iat2, box2 )) )
+							if( ModuleBase::matrix*const m_all_ptr = static_cast<ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( m_all[is], iat1, iat2, box2 )) )
 							{
 								*m_all_ptr += m_tmp3.second;
 							}
@@ -1520,7 +1520,7 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 			}
 		};
 
-		auto vector_empty = []( const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> & v ) -> bool
+		auto vector_empty = []( const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> & v ) -> bool
 		{
 			for( const auto &i : v )
 			{
@@ -1529,7 +1529,7 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 			return true;
 		};
 		
-		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> HexxR_tmp(GlobalV::NSPIN);
+		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> HexxR_tmp(GlobalV::NSPIN);
 	
 		#pragma omp for
 		for(size_t i_atom_pair=0; i_atom_pair<atom_pairs_core.size(); ++i_atom_pair)
@@ -1568,7 +1568,7 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 							{
 								const Abfs::Vector3_Order<int> & box2 = Vp.first;
 
-								const matrix & C_13 = *Cp13,								// iw1*iw3, \mu1
+								const ModuleBase::matrix & C_13 = *Cp13,								// iw1*iw3, \mu1
 											 & V    = *Vp.second,							// \mu1, \mu2
 											 & C_24 = *Cp24;								// iw2*iw4, \mu2
 
@@ -1577,19 +1577,19 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 								if(!( cauchy_postcal = cauchy.postcalA( info_step ) ))	continue;
 
 	//								assert( V.nc==C_24.nc );
-								const matrix VC_24 = gemm(									// \mu1, iw2*iw4
+								const ModuleBase::matrix VC_24 = gemm(									// \mu1, iw2*iw4
 									'N', 'T',
 									index_abfs[it1].count_size,
 									index_lcaos[it2].count_size * index_lcaos[it4].count_size,
 									index_abfs[it2].count_size,
 									1, V, C_24 );
-								const matrix VC_24_T = transform( VC_24,					// iw2*\mu1, iw4
+								const ModuleBase::matrix VC_24_T = transform( VC_24,					// iw2*\mu1, iw4
 									index_abfs[it1].count_size,
 									index_lcaos[it2].count_size,
 									index_lcaos[it4].count_size );
 								if(!( cauchy_postcal = cauchy.postcalB( info_step, VC_24_T, index_lcaos[it2].count_size, index_abfs[it1].count_size, index_lcaos[it4].count_size, cauchy_postcal ) ))	continue;
 													
-								const matrix C_13_T = transform( C_13,						// iw3*iw1, \mu1
+								const ModuleBase::matrix C_13_T = transform( C_13,						// iw3*iw1, \mu1
 									index_lcaos[it1].count_size,
 									index_lcaos[it3].count_size,
 									index_abfs[it1].count_size );
@@ -1600,10 +1600,10 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 									{
 										case 4:
 										{
-											const matrix * const DM_ptr = static_cast<const matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( DM_para.DMr[is], iat3, iat4, Abfs::Vector3_Order<int>(box2-box3+box4)%Born_von_Karman_period ));
+											const ModuleBase::matrix * const DM_ptr = static_cast<const ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( DM_para.DMr[is], iat3, iat4, Abfs::Vector3_Order<int>(box2-box3+box4)%Born_von_Karman_period ));
 											if( DM_ptr )
 											{
-												const matrix DVC_32 = gemm(								// iw3, \mu1*iw2
+												const ModuleBase::matrix DVC_32 = gemm(								// iw3, \mu1*iw2
 													'N', 'T',
 													index_lcaos[it3].count_size,
 													index_abfs[it1].count_size * index_lcaos[it2].count_size,
@@ -1613,7 +1613,7 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 													VC_24 );
 												if( cauchy.postcalC( info_step, DVC_32, index_lcaos[it3].count_size, index_abfs[it1].count_size, index_lcaos[it2].count_size, 1 ) )
 												{
-													const matrix Hexx_12 = gemm(							// iw1, iw2
+													const ModuleBase::matrix Hexx_12 = gemm(							// iw1, iw2
 														'N', 'N',
 														index_lcaos[it1].count_size,
 														index_lcaos[it2].count_size,
@@ -1623,13 +1623,13 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 													{
 														if(iat1!=iat2)
 														{
-															const matrix Hexx_21 = transpose(Hexx_12);
-															if( matrix * const HexxR_ptr = static_cast<matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat2, iat1, Abfs::Vector3_Order<int>(-box2)%Born_von_Karman_period )) )
+															const ModuleBase::matrix Hexx_21 = transpose(Hexx_12);
+															if( ModuleBase::matrix * const HexxR_ptr = static_cast<ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat2, iat1, Abfs::Vector3_Order<int>(-box2)%Born_von_Karman_period )) )
 																*HexxR_ptr += Hexx_21;
 															else
 																HexxR_tmp[is][iat2][iat1][Abfs::Vector3_Order<int>(-box2)%Born_von_Karman_period] = std::move(Hexx_21);
 														}
-														if( matrix * const HexxR_ptr = static_cast<matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat1, iat2, Abfs::Vector3_Order<int>(box2)%Born_von_Karman_period )) )
+														if( ModuleBase::matrix * const HexxR_ptr = static_cast<ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat1, iat2, Abfs::Vector3_Order<int>(box2)%Born_von_Karman_period )) )
 															*HexxR_ptr += Hexx_12;
 														else
 															HexxR_tmp[is][iat1][iat2][Abfs::Vector3_Order<int>(box2)%Born_von_Karman_period] = std::move(Hexx_12);
@@ -1639,9 +1639,9 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 										}	// end case 4
 										case 3:
 										{
-											if( const matrix * const DM_ptr = static_cast<const matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( DM_para.DMr[is], iat1, iat4, Abfs::Vector3_Order<int>(box2+box4)%Born_von_Karman_period )) )
+											if( const ModuleBase::matrix * const DM_ptr = static_cast<const ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( DM_para.DMr[is], iat1, iat4, Abfs::Vector3_Order<int>(box2+box4)%Born_von_Karman_period )) )
 											{
-												const matrix DVC_12 = gemm(								// iw1, \mu1*iw2
+												const ModuleBase::matrix DVC_12 = gemm(								// iw1, \mu1*iw2
 													'N', 'T',
 													index_lcaos[it1].count_size,
 													index_abfs[it1].count_size * index_lcaos[it2].count_size,
@@ -1651,7 +1651,7 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 													VC_24 );
 												if( cauchy.postcalC( info_step, DVC_12, index_lcaos[it1].count_size, index_abfs[it1].count_size, index_lcaos[it2].count_size, 3 ) )
 												{
-													const matrix Hexx_32 = gemm(							// iw3, iw2
+													const ModuleBase::matrix Hexx_32 = gemm(							// iw3, iw2
 														'N', 'N',
 														index_lcaos[it3].count_size,
 														index_lcaos[it2].count_size,
@@ -1661,13 +1661,13 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 													{
 														if(iat1!=iat2)
 														{
-															const matrix Hexx_23 = transpose(Hexx_32);
-															if( matrix * const HexxR_ptr = static_cast<matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat2, iat3, Abfs::Vector3_Order<int>(-box2+box3)%Born_von_Karman_period )) )
+															const ModuleBase::matrix Hexx_23 = transpose(Hexx_32);
+															if( ModuleBase::matrix * const HexxR_ptr = static_cast<ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat2, iat3, Abfs::Vector3_Order<int>(-box2+box3)%Born_von_Karman_period )) )
 																*HexxR_ptr += Hexx_23;
 															else
 																HexxR_tmp[is][iat2][iat3][Abfs::Vector3_Order<int>(-box2+box3)%Born_von_Karman_period] = std::move(Hexx_23);
 														}
-														if( matrix * const HexxR_ptr = static_cast<matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat3, iat2, Abfs::Vector3_Order<int>(box2-box3)%Born_von_Karman_period )) )
+														if( ModuleBase::matrix * const HexxR_ptr = static_cast<ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat3, iat2, Abfs::Vector3_Order<int>(box2-box3)%Born_von_Karman_period )) )
 															*HexxR_ptr += Hexx_32;
 														else
 															HexxR_tmp[is][iat3][iat2][Abfs::Vector3_Order<int>(box2-box3)%Born_von_Karman_period] = std::move(Hexx_32);
@@ -1677,9 +1677,9 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 										}	// end case 3
 										case 2:
 										{
-											if( const matrix * const DM_ptr = static_cast<const matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( DM_para.DMr[is], iat3, iat2, Abfs::Vector3_Order<int>(box2-box3)%Born_von_Karman_period )) )
+											if( const ModuleBase::matrix * const DM_ptr = static_cast<const ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( DM_para.DMr[is], iat3, iat2, Abfs::Vector3_Order<int>(box2-box3)%Born_von_Karman_period )) )
 											{
-												const matrix DVC_34 = gemm(								// iw3, \mu1*iw4
+												const ModuleBase::matrix DVC_34 = gemm(								// iw3, \mu1*iw4
 													'N', 'N',
 													index_lcaos[it3].count_size,
 													index_abfs[it1].count_size * index_lcaos[it4].count_size,
@@ -1689,7 +1689,7 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 													VC_24_T );
 												if( cauchy.postcalC( info_step, DVC_34, index_lcaos[it3].count_size, index_abfs[it1].count_size, index_lcaos[it4].count_size, 1 ) )
 												{
-													const matrix Hexx_14 = gemm(							// iw1, iw4
+													const ModuleBase::matrix Hexx_14 = gemm(							// iw1, iw4
 														'N', 'N',
 														index_lcaos[it1].count_size,
 														index_lcaos[it4].count_size,
@@ -1699,13 +1699,13 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 													{
 														if(iat1!=iat2)
 														{
-															const matrix Hexx_41 = transpose(Hexx_14);
-															if( matrix * const HexxR_ptr = static_cast<matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat4, iat1, Abfs::Vector3_Order<int>(-box2-box4)%Born_von_Karman_period )) )
+															const ModuleBase::matrix Hexx_41 = transpose(Hexx_14);
+															if( ModuleBase::matrix * const HexxR_ptr = static_cast<ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat4, iat1, Abfs::Vector3_Order<int>(-box2-box4)%Born_von_Karman_period )) )
 																*HexxR_ptr += Hexx_41;
 															else
 																HexxR_tmp[is][iat4][iat1][Abfs::Vector3_Order<int>(-box2-box4)%Born_von_Karman_period] = std::move(Hexx_41);
 														}	
-														if( matrix * const HexxR_ptr = static_cast<matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat1, iat4, Abfs::Vector3_Order<int>(box2+box4)%Born_von_Karman_period )) )
+														if( ModuleBase::matrix * const HexxR_ptr = static_cast<ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat1, iat4, Abfs::Vector3_Order<int>(box2+box4)%Born_von_Karman_period )) )
 															*HexxR_ptr += Hexx_14;
 														else
 															HexxR_tmp[is][iat1][iat4][Abfs::Vector3_Order<int>(box2+box4)%Born_von_Karman_period] = std::move(Hexx_14);
@@ -1715,9 +1715,9 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 										}	// end case 2
 										case 1:
 										{
-											if( const matrix * const DM_ptr = static_cast<const matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( DM_para.DMr[is], iat1, iat2, Abfs::Vector3_Order<int>(box2)%Born_von_Karman_period )) )
+											if( const ModuleBase::matrix * const DM_ptr = static_cast<const ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( DM_para.DMr[is], iat1, iat2, Abfs::Vector3_Order<int>(box2)%Born_von_Karman_period )) )
 											{
-												const matrix DVC_14 = gemm(								// iw1, \mu1*iw4
+												const ModuleBase::matrix DVC_14 = gemm(								// iw1, \mu1*iw4
 													'N', 'N',
 													index_lcaos[it1].count_size,
 													index_abfs[it1].count_size * index_lcaos[it4].count_size,
@@ -1727,7 +1727,7 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 													VC_24_T );
 												if( cauchy.postcalC( info_step, DVC_14, index_lcaos[it1].count_size, index_abfs[it1].count_size, index_lcaos[it4].count_size, 3 ) )
 												{
-													const matrix Hexx_34 = gemm(							// iw3, iw4
+													const ModuleBase::matrix Hexx_34 = gemm(							// iw3, iw4
 														'N', 'N',
 														index_lcaos[it3].count_size,
 														index_lcaos[it4].count_size,
@@ -1737,13 +1737,13 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 													{
 														if(iat1!=iat2)
 														{
-															const matrix Hexx_43 = transpose(Hexx_34);
-															if( matrix * const HexxR_ptr = static_cast<matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat4, iat3, Abfs::Vector3_Order<int>(-box2+box3-box4)%Born_von_Karman_period )) )
+															const ModuleBase::matrix Hexx_43 = transpose(Hexx_34);
+															if( ModuleBase::matrix * const HexxR_ptr = static_cast<ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat4, iat3, Abfs::Vector3_Order<int>(-box2+box3-box4)%Born_von_Karman_period )) )
 																*HexxR_ptr += Hexx_43;
 															else
 																HexxR_tmp[is][iat4][iat3][Abfs::Vector3_Order<int>(-box2+box3-box4)%Born_von_Karman_period] = std::move(Hexx_43);
 														}	
-														if( matrix * const HexxR_ptr = static_cast<matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat3, iat4, Abfs::Vector3_Order<int>(box2-box3+box4)%Born_von_Karman_period )) )
+														if( ModuleBase::matrix * const HexxR_ptr = static_cast<ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat3, iat4, Abfs::Vector3_Order<int>(box2-box3+box4)%Born_von_Karman_period )) )
 															*HexxR_ptr += Hexx_34;
 														else
 															HexxR_tmp[is][iat3][iat4][Abfs::Vector3_Order<int>(box2-box3+box4)%Born_von_Karman_period] = std::move(Hexx_34);

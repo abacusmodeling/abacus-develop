@@ -23,6 +23,9 @@ typedef fftw_complex FFTW_COMPLEX;
 //#include <unistd.h>
 #include <omp.h>
 
+namespace ModuleBase
+{
+
 bool Mathzone_Add1::flag_jlx_expand_coef = false;
 double** Mathzone_Add1::c_ln_c = nullptr;
 double** Mathzone_Add1::c_ln_s = nullptr;
@@ -253,7 +256,7 @@ void Mathzone_Add1::uni_radfft
 	for (int ik = 0; ik < mshk; ik++)
 	{
 		//calculate spherical bessel
-		Sphbes::Spherical_Bessel(mshr, ri, arr_k[ik], aml, jl);
+		ModuleBase::Sphbes::Spherical_Bessel(mshr, ri, arr_k[ik], aml, jl);
 		
 		//functions to be integrated
 		for (int ir = 0; ir < mshr; ir++)
@@ -1359,4 +1362,6 @@ void Mathzone_Add1::Uni_Deriv_Phi
 	fftw_destroy_plan (p2);	
 	
 	timer::tick("Mathzone_Add1", "Uni_Deriv_Phi");
+}
+
 }

@@ -33,8 +33,8 @@ void Ions_Move_Methods::allocate()
 	return;
 }
 
-//void Ions_Move_Methods::cal_movement(const int &istep, const matrix &f, const double &etot)
-void Ions_Move_Methods::cal_movement(const int &istep, const int &force_step, const matrix &f, const double &etot)
+//void Ions_Move_Methods::cal_movement(const int &istep, const ModuleBase::matrix &f, const double &etot)
+void Ions_Move_Methods::cal_movement(const int &istep, const int &force_step, const ModuleBase::matrix &f, const double &etot)
 {
 	TITLE("Ions_Move_Methods","init");
 

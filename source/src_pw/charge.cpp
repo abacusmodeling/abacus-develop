@@ -248,7 +248,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 						rhoatm[0] = rhoatm[1] / rhoatm[0];
 
 						double charge = 0.0;
-						Integral::Simpson_Integral(atom->msh,atom->rho_at,atom->rab,charge);
+						ModuleBase::Integral::Simpson_Integral(atom->msh,atom->rho_at,atom->rab,charge);
 						ModuleBase::GlobalFunc::OUT(GlobalV::ofs_warning,"charge from rho_at",charge);
 						assert(charge!=0.0 || charge==atom->zv);		// Peize Lin add charge==atom->zv for bsse 2021.04.07
 
@@ -279,7 +279,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 			//              rho1d [ir] = atom->rho_at[ir];
 							rho1d[ir] = rhoatm[ir];
 						}
-						Integral::Simpson_Integral(mesh, rho1d.data(), atom->rab, rho_lgl[0]);
+						ModuleBase::Integral::Simpson_Integral(mesh, rho1d.data(), atom->rab, rho_lgl[0]);
 					}
 					if (GlobalV::test_charge>0) std::cout<<"\n |G|=0 term done." <<std::endl;
 					//----------------------------------------------------------
@@ -305,7 +305,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 								rho1d[ir] = rhoatm[ir] * sin(gxx) / gxx;
 							}
 						}
-						Integral::Simpson_Integral(mesh, rho1d.data(), atom->rab, rho_lgl[ig]);
+						ModuleBase::Integral::Simpson_Integral(mesh, rho1d.data(), atom->rab, rho_lgl[ig]);
 					}
 					
 					if (GlobalV::test_charge>0) std::cout<<" |G|>0 term done." <<std::endl;
@@ -677,7 +677,7 @@ void Charge::non_linear_core_correction
             {
                 aux [ir] = r [ir] * r [ir] * rhoc [ir];
             }
-            Integral::Simpson_Integral(mesh, aux, rab, rhocg1);
+            ModuleBase::Integral::Simpson_Integral(mesh, aux, rab, rhocg1);
             //rhocg [1] = fpi * rhocg1 / omega;
             rhocg [0] = FOUR_PI * rhocg1 / GlobalC::ucell.omega;//mohan modify 2008-01-19
             igl0 = 1;
@@ -687,12 +687,12 @@ void Charge::non_linear_core_correction
         for (int igl = igl0; igl < GlobalC::pw.nggm;igl++) 
         {
             gx = sqrt(GlobalC::pw.ggs [igl] * GlobalC::ucell.tpiba2);
-            Sphbes::Spherical_Bessel(mesh, r, gx, 0, aux);
+            ModuleBase::Sphbes::Spherical_Bessel(mesh, r, gx, 0, aux);
             for (int ir = 0;ir < mesh; ir++) 
             {
                 aux [ir] = r[ir] * r[ir] * rhoc [ir] * aux [ir];
             } //  enddo
-            Integral::Simpson_Integral(mesh, aux, rab, rhocg1);
+            ModuleBase::Integral::Simpson_Integral(mesh, aux, rab, rhocg1);
             rhocg [igl] = FOUR_PI * rhocg1 / GlobalC::ucell.omega;
         } //  enddo
         delete [] aux;

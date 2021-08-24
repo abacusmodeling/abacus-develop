@@ -8,15 +8,15 @@
 #include "../src_external/src_test/src_global/complexmatrix-test.h"
 
 /*
-template<> std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>>
-Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<matrix> &DK_2D, const double threshold_D) const
+template<> std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>>
+Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<ModuleBase::matrix> &DK_2D, const double threshold_D) const
 {
 
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::K_to_R");
 	assert(DK_2D.size()==GlobalV::NSPIN);
 	const double SPIN_multiple = 0.5*GlobalV::NSPIN;
 	
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> DR_a2D(GlobalV::NSPIN);
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> DR_a2D(GlobalV::NSPIN);
 	for(int is=0; is!=GlobalV::NSPIN; ++is)
 	{
 		for(int iwt1_local=0; iwt1_local!=DK_2D[is].nr; ++iwt1_local)
@@ -32,7 +32,7 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<matrix> &DK_2D, c
 				const double dm = DK_2D[is](iwt1_local,iwt2_local);
 				if(abs(dm) > threshold_D)
 				{
-					matrix &DR_a2D_box2 = DR_a2D[is][iat1][iat2][{0,0,0}];
+					ModuleBase::matrix &DR_a2D_box2 = DR_a2D[is][iat1][iat2][{0,0,0}];
 					if(!DR_a2D_box2.c)
 						DR_a2D_box2.create(GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw, GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw);
 					DR_a2D_box2(iw1,iw2) = DK_2D[is](iwt1_local,iwt2_local) * SPIN_multiple;
@@ -45,7 +45,7 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<matrix> &DK_2D, c
 */
 
 /*
-template<> std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>>
+template<> std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>>
 Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<ModuleBase::ComplexMatrix> &DK_2D, const double threshold_D) const
 {
 	{
@@ -59,7 +59,7 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<ModuleBase::Compl
 	const Abfs::Vector3_Order<int> Born_von_Karman_period = Vector3<int>{GlobalC::kv.nmp[0],GlobalC::kv.nmp[1],GlobalC::kv.nmp[2]};
 	const std::vector<Abfs::Vector3_Order<int>> supercell_boxes = Abfs::get_Born_von_Karmen_boxes(Born_von_Karman_period);
 	
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> DR_a2D(GlobalV::NSPIN);
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> DR_a2D(GlobalV::NSPIN);
 	for(int ik=0; ik!=DK_2D.size(); ++ik)
 	{
 		for(int iwt1_local=0; iwt1_local!=DK_2D[ik].nr; ++iwt1_local)
@@ -74,7 +74,7 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<ModuleBase::Compl
 				const int iw2 = GlobalC::ucell.iwt2iw[iwt2];
 				for(const Abfs::Vector3_Order<int> &box2 : supercell_boxes)
 				{
-					matrix &DR_a2D_box2 = DR_a2D[GlobalC::kv.isk[ik]][iat1][iat2][box2];
+					ModuleBase::matrix &DR_a2D_box2 = DR_a2D[GlobalC::kv.isk[ik]][iat1][iat2][box2];
 					if(!DR_a2D_box2.c)
 						DR_a2D_box2.create(GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw, GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw);
 					DR_a2D_box2(iw1,iw2) += real( DK_2D[ik](iwt1_local,iwt2_local) * exp(-TWO_PI*IMAG_UNIT*(GlobalC::kv.kvec_c[ik]*(box2*GlobalC::ucell.latvec))) ) * SPIN_multiple;
@@ -98,7 +98,7 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<ModuleBase::Compl
 void Exx_Abfs::Parallel::Communicate::DM3::cal_DM(const double threshold_D)
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::cal_DM");
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> DR_a2D = GlobalV::GAMMA_ONLY_LOCAL
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> DR_a2D = GlobalV::GAMMA_ONLY_LOCAL
 		? K_to_R(GlobalC::LOC.wfc_dm_2d.dm_gamma, threshold_D)
 		: K_to_R(GlobalC::LOC.wfc_dm_2d.dm_k, threshold_D);
 	DMr = allreduce.a2D_to_exx(DR_a2D);

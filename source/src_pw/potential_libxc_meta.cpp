@@ -31,7 +31,7 @@ using namespace std;
 //XC_POLARIZED, XC_UNPOLARIZED: internal flags used in LIBXC, denote the polarized(nspin=1) or unpolarized(nspin=2) calculations, definition can be found in xc.h from LIBXC
 
 // [etxc, vtxc, v, vofk] = Potential_Libxc::v_xc(...)
-tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
+tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> Potential_Libxc::v_xc_meta(
 	const double * const * const rho_in,
 	const double * const rho_core_in,
 	const double * const * const kin_r_in)
@@ -42,8 +42,8 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 	//output of the subroutine
     double etxc = 0.0;
     double vtxc = 0.0;
-	matrix v(GlobalV::NSPIN,GlobalC::pw.nrxx);
-	matrix vofk(GlobalV::NSPIN,GlobalC::pw.nrxx);
+	ModuleBase::matrix v(GlobalV::NSPIN,GlobalC::pw.nrxx);
+	ModuleBase::matrix vofk(GlobalV::NSPIN,GlobalC::pw.nrxx);
 
 	if(GlobalV::VXC_IN_H == 0 )
 	{

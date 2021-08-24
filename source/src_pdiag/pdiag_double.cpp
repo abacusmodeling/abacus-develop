@@ -498,7 +498,7 @@ void Pdiag_Double::divide_HS_2d
 void Pdiag_Double::diago_double_begin(
 	const int &ik, // k-point index
 	double **wfc, // wave functions
-	matrix &wfc_2d, // wave functions in 2d
+	ModuleBase::matrix &wfc_2d, // wave functions in 2d
 	double* h_mat, // hamiltonian matrix
 	double* s_mat, // overlap matrix
 	double* ekb) // eigenvalues for each k-point and band
@@ -740,7 +740,7 @@ void Pdiag_Double::diago_double_begin(
 	{
 		wfc_2d.create(this->ncol, this->nrow, false);
 		memcpy( wfc_2d.c, h_mat, sizeof(double)*this->ncol*this->nrow );
-		matrix s_tmp(this->ncol, this->nrow, false);
+		ModuleBase::matrix s_tmp(this->ncol, this->nrow, false);
 		memcpy( s_tmp.c, s_mat, sizeof(double)*this->ncol*this->nrow );
 		std::vector<double> ekb_tmp(GlobalV::NLOCAL,0);
 
@@ -775,9 +775,9 @@ void Pdiag_Double::diago_double_begin(
 	}
 	else if(GlobalV::KS_SOLVER=="lapack_gvx")
 	{
-		matrix h_tmp(this->ncol, this->nrow, false);
+		ModuleBase::matrix h_tmp(this->ncol, this->nrow, false);
 		memcpy( h_tmp.c, h_mat, sizeof(double)*this->ncol*this->nrow );
-		matrix s_tmp(this->ncol, this->nrow, false);
+		ModuleBase::matrix s_tmp(this->ncol, this->nrow, false);
 		memcpy( s_tmp.c, s_mat, sizeof(double)*this->ncol*this->nrow );
 		wfc_2d.create(this->ncol, this->nrow, false);
 
@@ -820,9 +820,9 @@ void Pdiag_Double::diago_double_begin(
 	}
 	else if(GlobalV::KS_SOLVER=="scalapack_gvx")
 	{
-		matrix h_tmp(this->ncol, this->nrow, false);
+		ModuleBase::matrix h_tmp(this->ncol, this->nrow, false);
 		memcpy( h_tmp.c, h_mat, sizeof(double)*this->ncol*this->nrow );
-		matrix s_tmp(this->ncol, this->nrow, false);
+		ModuleBase::matrix s_tmp(this->ncol, this->nrow, false);
 		memcpy( s_tmp.c, s_mat, sizeof(double)*this->ncol*this->nrow );
 		wfc_2d.create(this->ncol, this->nrow, false);
 

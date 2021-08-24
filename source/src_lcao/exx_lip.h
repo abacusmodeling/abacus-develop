@@ -51,7 +51,7 @@ private:
 	{
 		K_Vectors *kv_ptr;
 		wavefunc *wf_ptr;
-		matrix wf_wg;
+		ModuleBase::matrix wf_wg;
 		ModuleBase::ComplexMatrix *hvec_array;		
 	} *k_pack, *q_pack;
 	

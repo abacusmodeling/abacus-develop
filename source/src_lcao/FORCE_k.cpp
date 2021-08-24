@@ -15,14 +15,14 @@ Force_LCAO_k::~Force_LCAO_k ()
 void Force_LCAO_k::ftable_k (
 		const bool isforce,
 		const bool isstress,
-		matrix& foverlap,
-		matrix& ftvnl_dphi,
-		matrix& fvnl_dbeta,	
-		matrix& fvl_dphi,
-		matrix& soverlap,
-		matrix& stvnl_dphi,
-		matrix& svnl_dbeta,
-		matrix& svl_dphi
+		ModuleBase::matrix& foverlap,
+		ModuleBase::matrix& ftvnl_dphi,
+		ModuleBase::matrix& fvnl_dbeta,	
+		ModuleBase::matrix& fvl_dphi,
+		ModuleBase::matrix& soverlap,
+		ModuleBase::matrix& stvnl_dphi,
+		ModuleBase::matrix& svnl_dbeta,
+		ModuleBase::matrix& svl_dphi
 		)
 {
     TITLE("Force_LCAO_k", "ftable_k");
@@ -390,8 +390,8 @@ std::complex<double> Force_LCAO_k::set_EDM_k_element(
 void Force_LCAO_k::cal_foverlap_k(
 	const bool isforce, 
 	const bool isstress, 
-	matrix& foverlap, 
-	matrix& soverlap)
+	ModuleBase::matrix& foverlap, 
+	ModuleBase::matrix& soverlap)
 {
 	TITLE("Force_LCAO_k","cal_foverlap_k");
 	timer::tick("Force_LCAO_k","cal_foverlap_k");
@@ -529,8 +529,8 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(
 	double** dm2d, 
 	const bool isforce, 
 	const bool isstress, 
-	matrix& ftvnl_dphi, 
-	matrix& stvnl_dphi)
+	ModuleBase::matrix& ftvnl_dphi, 
+	ModuleBase::matrix& stvnl_dphi)
 {	
 	TITLE("Force_LCAO_k","cal_ftvnl_dphi");
 	timer::tick("Force_LCAO_k","cal_ftvnl_dphi");
@@ -691,8 +691,8 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 	double** dm2d, 
 	const bool isforce, 
 	const bool isstress, 
-	matrix& fvnl_dbeta, 
-	matrix& svnl_dbeta)
+	ModuleBase::matrix& fvnl_dbeta, 
+	ModuleBase::matrix& svnl_dbeta)
 {
 	TITLE("Force_LCAO_k","cal_fvnl_dbeta_k");
 	timer::tick("Force_LCAO_k","cal_fvnl_dbeta_k");
@@ -911,8 +911,8 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 	double** dm2d, 
 	const bool isforce, 
 	const bool isstress, 
-	matrix& fvl_dphi, 
-	matrix& svl_dphi)
+	ModuleBase::matrix& fvl_dphi, 
+	ModuleBase::matrix& svl_dphi)
 {
 	TITLE("Force_LCAO_k","cal_fvl_dphi_k");
 	timer::tick("Force_LCAO_k","cal_fvl_dphi_k");

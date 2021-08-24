@@ -21,7 +21,7 @@ class wavefunc : public WF_atomic
     // wg	 : the weight of each k point and band
 	double **ekb;		   // band energy at each k point, each band.
 	bool   allocate_ekb;   // flag
-    matrix wg;
+    ModuleBase::matrix wg;
 
     // start_wfc : "random",or "atomic" or "file"
     std::string start_wfc;

@@ -153,11 +153,11 @@ void Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::init_radial_table( std::map<size_t,
 	}
 }*/
 
-std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::cal_overlap_matrix(
+std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::cal_overlap_matrix(
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_r, 
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_c )
 {
-	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> matrixes;
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> matrixes;
 
 	for( auto &co1 : center2_orb22_s )
 	{

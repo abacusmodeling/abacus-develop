@@ -50,28 +50,28 @@ public:
 	
 public:
 	
-	static std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>> cal_I( 
-		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &ms, 
+	static std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<ModuleBase::matrix>>>>>> cal_I( 
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> &ms, 
 		const ModuleBase::Element_Basis_Index::IndexLNM &index );
 	
-	static std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> cal_C( 
-		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &matrix_A, 
-		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>> &matrix_L );
+	static std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> cal_C( 
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> &matrix_A, 
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<ModuleBase::matrix>>>>>> &matrix_L );
 	
 	void cal_CVC( 
-		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &matrix_C, 
-		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &matrix_V ) const;
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> &matrix_C, 
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> &matrix_V ) const;
 		
-	static std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> cal_lcaos2_lcaos2_proj_asa( 
-		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &ms_lcaos2_asa, 
-		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>> &ms_asa_asa_I,
+	static std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> cal_lcaos2_lcaos2_proj_asa( 
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> &ms_lcaos2_asa, 
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<ModuleBase::matrix>>>>>> &ms_asa_asa_I,
 		const ModuleBase::Element_Basis_Index::Range &range,
 		const ModuleBase::Element_Basis_Index::IndexLNM &index);
 		
-	static std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> cal_lcaos2_jys_proj_asa(
-		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &ms_lcaos2_asa,
-		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>> &ms_asa_asa_I,
-		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &ms_asa_jys);	
+	static std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> cal_lcaos2_jys_proj_asa(
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> &ms_lcaos2_asa,
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<ModuleBase::matrix>>>>>> &ms_asa_asa_I,
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> &ms_asa_jys);	
 };
 
 #endif

@@ -49,13 +49,13 @@ public:
 	double *rab;		// mesh_2 // rab(mesh)
 	double *rho_atc;	// nlcc_1 // rho_atc(mesh) "Nonlinear Core Correction"
 	double *vloc;		// local_1 // vloc(mesh)
-	matrix chi;			// pswfc_1 // chi(nwfc,mesh)
+	ModuleBase::matrix chi;			// pswfc_1 // chi(nwfc,mesh)
 	double *rho_at;		// psrhoatom_1 // rho_at(mesh)
 
 	int *lll;       	// nl_1  // lll(nbeta):angular momentum of projector i
 	int *kkbeta;    	// nl_2  // kkbeta(nbeta):number of mesh points for projector i (must be .le.mesh )
-	matrix beta;		// nl_3  // beta(nbeta,mesh)
-	matrix dion;		// nl_4  //dion(nbeta,nbeta)
+	ModuleBase::matrix beta;		// nl_3  // beta(nbeta,mesh)
+	ModuleBase::matrix dion;		// nl_4  //dion(nbeta,nbeta)
 						         //the D_ij factors (Ry^{-1}) of the nonlocal PP:
 						         //V_NL = \sum_{i,j} D_{i,j} |\beta_i><\beta_j|
 	//added by zhengdy-soc
