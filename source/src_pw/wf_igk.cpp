@@ -126,7 +126,7 @@ int WF_igk::setupIndGk(const PW_Basis &pwb,const int nks)
 void WF_igk::ekin(const int ik)
 {
     ModuleBase::timer::tick("WF_igk","ekin");
-    zeros( g2kin, this->npwx);
+    ModuleBase::GlobalFunc::ZEROS( g2kin, this->npwx);
 
     for (int ig = 0;ig < GlobalC::kv.ngk[ik];ig++)
     {

@@ -102,7 +102,7 @@ class Stress_Func
 			ModuleBase::ComplexMatrix &vkb,
 			const int ik);		//used in nonlocal part in PW basis
 	double Polynomial_Interpolation_nl(
-			const realArray &table,
+			const ModuleBase::realArray &table,
 			const int &dim1,
 			const int &dim2,
 			const double &table_interval,

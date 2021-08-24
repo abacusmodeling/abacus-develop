@@ -5,6 +5,9 @@
 #include <cstdlib>
 #include "realarray.h"
 
+namespace ModuleBase
+{
+
 int realArray::arrayCount = 0;
 
 void realArrayAlloc()
@@ -168,4 +171,6 @@ void realArray::zero_out(void)
 	if (size <= 0) return;
 	for (int i = 0;i < size; i++) ptr[i] = 0;
 	return;
+}
+
 }

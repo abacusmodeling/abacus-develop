@@ -8,7 +8,7 @@
 
 void Wavefunc_in_pw::make_table_q(
 	std::vector<std::string> &fn, 
-	realArray &table_local)
+	ModuleBase::realArray &table_local)
 {
 	ModuleBase::TITLE("Wavefunc_in_pw","make_table_q");
 
@@ -247,7 +247,7 @@ const double *rab, const int &l, double* table)
 }
 
 
-void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ModuleBase::ComplexMatrix &psi, const realArray &table_local)
+void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ModuleBase::ComplexMatrix &psi, const ModuleBase::realArray &table_local)
 {
 	ModuleBase::TITLE("Wavefunc_in_pw","produce_local_basis_in_pw");
 	assert(ik>=0);
@@ -444,7 +444,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ModuleBase::Complex
 }
 
 
-void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ModuleBase::ComplexMatrix &psi, const realArray &table_local, ModuleBase::Vector3<double> q)   // pengfei 2016-11-23
+void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ModuleBase::ComplexMatrix &psi, const ModuleBase::realArray &table_local, ModuleBase::Vector3<double> q)   // pengfei 2016-11-23
 {
 	ModuleBase::TITLE("Wavefunc_in_pw","produce_local_basis_in_pw");
 	assert(ik>=0);

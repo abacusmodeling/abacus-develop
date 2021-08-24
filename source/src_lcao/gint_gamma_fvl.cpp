@@ -31,7 +31,7 @@ inline void cal_psir_ylm_dphi(
 	double*const*const dphix, 
 	double*const*const dphiy, 
 	double*const*const dphiz,
-	realArray& drr)
+	ModuleBase::realArray& drr)
 {    
     for (int id=0; id<na_grid; id++)
     {
@@ -258,7 +258,7 @@ inline void cal_meshball_DGridV(
 	double*const*const DGridV_x,  double*const*const DGridV_y,  double*const*const DGridV_z,
 	double*const*const DGridV_11, double*const*const DGridV_12, double*const*const DGridV_13,
 	double*const*const DGridV_22, double*const*const DGridV_23, double*const*const DGridV_33,
-	realArray& drr)
+	ModuleBase::realArray& drr)
 {
     const char transa='N', transb='T';
     const double alpha=-1.0, beta=1.0;
@@ -549,7 +549,7 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
             cal_flag[i] = new bool[max_size];
         }
 
-        realArray drr;//rewrite drr form by zhengdy-2019-04-02
+        ModuleBase::realArray drr;//rewrite drr form by zhengdy-2019-04-02
         if(GlobalV::STRESS)
         {
             drr.create(max_size, GlobalC::pw.bxyz, 3);

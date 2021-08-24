@@ -376,7 +376,7 @@ void YlmReal::Ylm_Real
 //==========================================================
 // NAME : p(Legendre Polynomials) (0 <= m <= l)
 //==========================================================
-    realArray p(lmax+1,lmax+1,ng);
+    ModuleBase::realArray p(lmax+1,lmax+1,ng);
     int m;
     int i;
     double x1, x2;

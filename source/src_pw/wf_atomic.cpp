@@ -233,7 +233,7 @@ void WF_atomic::atomic_wfc
   const int np,
   const int lmax_wfc,
   ModuleBase::ComplexMatrix &wfcatom,
-  const realArray &table_q,
+  const ModuleBase::realArray &table_q,
   const int &table_dimension,
   const double &dq
 )const

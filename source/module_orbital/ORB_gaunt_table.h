@@ -53,7 +53,7 @@ class ORB_gaunt_table
 	 * Directly Calculate integral of
 	 * \f$ S(l_1,m_1), S(l_2,m_2), S(L,M) \f$
 	 */
-	realArray Gaunt_Coefficients;
+	ModuleBase::realArray Gaunt_Coefficients;
 
 	/// (1) Make Ylm_Gaunt Table.
 	///----------------

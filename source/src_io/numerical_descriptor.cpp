@@ -64,8 +64,8 @@ void Numerical_Descriptor::output_descriptor(const ModuleBase::ComplexMatrix *ps
 	// 3. Initialize overlap_Q1 and Q2 
 	//-------------------------------------
 	// OVERLAP : < J_mu | Psi >
-    realArray overlap_Q1(nks, GlobalV::NBANDS, this->nlocal );
-    realArray overlap_Q2(nks, GlobalV::NBANDS, this->nlocal );
+    ModuleBase::realArray overlap_Q1(nks, GlobalV::NBANDS, this->nlocal );
+    ModuleBase::realArray overlap_Q2(nks, GlobalV::NBANDS, this->nlocal );
 
     ModuleBase::GlobalFunc::ZEROS(overlap_Q1.ptr, overlap_Q1.getSize() );
     ModuleBase::GlobalFunc::ZEROS(overlap_Q2.ptr, overlap_Q2.getSize() );
@@ -149,7 +149,7 @@ void Numerical_Descriptor::output_descriptor(const ModuleBase::ComplexMatrix *ps
 }
 
 
-void Numerical_Descriptor::generate_descriptor(realArray &overlap_Q1, realArray &overlap_Q2, 
+void Numerical_Descriptor::generate_descriptor(ModuleBase::realArray &overlap_Q1, ModuleBase::realArray &overlap_Q2, 
 const int &it, const int &ia, double *d, const int &nd)
 {
 	int nbands = overlap_Q1.getBound2();
@@ -226,8 +226,8 @@ const int &it, const int &ia, double *d, const int &nd)
 
 
 void Numerical_Descriptor::jlq3d_overlap(
-    realArray &overlap_Q1,
-    realArray &overlap_Q2,
+    ModuleBase::realArray &overlap_Q1,
+    ModuleBase::realArray &overlap_Q2,
     const int &ik_ibz,
     const int &ik,
     const int &np,

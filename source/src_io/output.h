@@ -15,8 +15,8 @@ public:
     //============================
     // Print realArray (3D or 4D)
     //============================
-    void printr3_d(std::ofstream &ofs,const std::string &s,const realArray &u) const;
-    void printr4_d(std::ofstream &ofs,const std::string &s,const realArray &u) const;
+    void printr3_d(std::ofstream &ofs,const std::string &s,const ModuleBase::realArray &u) const;
+    void printr4_d(std::ofstream &ofs,const std::string &s,const ModuleBase::realArray &u) const;
 
     //===========================
     // print matrix3

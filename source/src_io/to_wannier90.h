@@ -55,7 +55,7 @@ public:
 
 	
 	// ������lcao�����µ�wannier90�������
-	realArray table_local;
+	ModuleBase::realArray table_local;
 	ModuleBase::ComplexMatrix *unk_inLcao;                                                             // lcao�����²����������ڲ���unk
 
 

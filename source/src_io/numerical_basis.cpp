@@ -154,7 +154,7 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Q(
     for (int ig=0; ig<np; ig++)
         gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
 
-	const realArray flq = this->cal_flq(ik, gk);
+	const ModuleBase::realArray flq = this->cal_flq(ik, gk);
 
     const ModuleBase::matrix ylm = Numerical_Basis::cal_ylm(gk);
 
@@ -230,7 +230,7 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Sq(
     for (int ig=0; ig<np; ig++)
         gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
 
-	const realArray flq = this->cal_flq(ik, gk);
+	const ModuleBase::realArray flq = this->cal_flq(ik, gk);
 
     const ModuleBase::matrix ylm = Numerical_Basis::cal_ylm(gk);
 
@@ -336,13 +336,13 @@ ModuleBase::matrix Numerical_Basis::cal_overlap_V(
 	return overlap_V;
 }
 
-realArray Numerical_Basis::cal_flq(const int ik, const std::vector<ModuleBase::Vector3<double>> &gk) const
+ModuleBase::realArray Numerical_Basis::cal_flq(const int ik, const std::vector<ModuleBase::Vector3<double>> &gk) const
 {
 	const int np = gk.size();
 	const int enumber = this->bessel_basis.get_ecut_number();
 
     // get flq(G) = \int f(r)jl(G*r) from interpolation table.
-    realArray flq(GlobalC::ucell.lmax+1, enumber, np);
+    ModuleBase::realArray flq(GlobalC::ucell.lmax+1, enumber, np);
     for (int il=0; il<GlobalC::ucell.lmax+1; il++)
         for (int ie=0; ie<enumber; ie++)
             for (int ig=0; ig<np; ig++)

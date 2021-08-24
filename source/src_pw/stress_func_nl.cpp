@@ -408,7 +408,7 @@ void Stress_Func::get_dvnl2(ModuleBase::ComplexMatrix &vkb,
 
 double Stress_Func::Polynomial_Interpolation_nl
 (
-    const realArray &table,
+    const ModuleBase::realArray &table,
     const int &dim1,
     const int &dim2,
     const double &table_interval,
