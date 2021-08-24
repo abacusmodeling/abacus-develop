@@ -47,7 +47,11 @@
 
     - [Molecular dynamics](#molecular-dynamics)
 
-        [md_type](#md-type) | [md_rstmd](#md-rstmd) | [md_dt](#md-dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_dumpmdfred](#md-dumpmdfred) | [md_fixtemperature](#md-fixtemperature) | [NVT_control](#nvt-control) | [NVT_tau](#nvt-tau) | [MNHC](#mnhc) | [md_ediff](#md-ediff) | [md_ediffg](#md-ediffg) | [rcut_lj](#rcut_lj) | [epsilon_lj](#epsilon_lj) | [sigma_lj](#sigma_lj)
+        [md_type](#md-type) | [md_potential](#md-potential) | [md_rstmd](#md-rstmd) | [md_dt](#md-dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_dumpmdfred](#md-dumpmdfred) | [md_fixtemperature](#md-fixtemperature) | [NVT_control](#nvt-control) | [NVT_tau](#nvt-tau) | [MNHC](#mnhc) | [md_ediff](#md-ediff) | [md_ediffg](#md-ediffg) | [rcut_lj](#rcut_lj) | [epsilon_lj](#epsilon_lj) | [sigma_lj](#sigma_lj)
+
+    - [DFT+U correction](#DFT_U-correction)
+
+    -[Start magnetization](#Start-magnetization)
 
     - [VdW correction](#vdw-correction)
 
@@ -946,24 +950,8 @@ This part of variables are relevant when using hybrid functionals
     - *Default*: 0.11
 
     [back to top](#input-file)
-
-- exx_separate_loop<a id="exx-separate-loop"></a>
-    - *Type*: Boolean
-    - *Description*: When hybrid functional is used, the Hamiltonian can be partitioned into H=H<sub>LDA/GGA</sub>+F<sub>X</sub>. Updating of the latter takes more computational effort. As a result, we devise a double-SCF procedure, which is adopted when setting exx_separate_loop=1. In the procedure, the inner loop converges H<sub>LDA/GGA</sub> while F<sub>X</sub> is fixed. While in the outer loop, F<sub>X</sub> achieves self-consistency. On the other hand, if exx_separate is set to 0, only a single SCF is used to converge H. **Note: only pulay and plain mixing are allowed if exx_separate_loop = 0**
-    - *Default*: 1
-
-    [back to top](#input-file)
-
-- exx_hybrid_step<a id="exx-hybrid-step"></a>
-    - *Type*: Integer
-    - *Description*: If exx_separate_loop is set to 1, this gives the maximum steps allowed in the inner loop.
-    - *Default*: 100
-
-    [back to top](#input-file)
-
-- exx_lambda<a id="exx-lambda"></a>
-    - *Type*: Real
-    - *Description*: This parameter is only relevant when using hybrid functional with lcao in pw basis set (i.e. when basis_type="lcao_in_pw") to treat the divergence of Coulomb potential at g=0 in reciprocal space. There we damp the divergence with function e^(-&gamma;g).
+adial integration for pseudopotentials, in Bohr.
+@@ -214,6 +279,13 @@ This part of variables are used to control general system para
     - *Default*: 0.3
 
     [back to top](#input-file)
@@ -1064,6 +1052,17 @@ This part of variables are used to control the molecular dynamics calculations.
     - *Default*: 1
 
     [back to top](#input-file)
+
+- md_potential<a id="md-potential"></a>
+    - *Type*: String
+    - *Description*: choose the potential type.
+        - FP: First-Principles MD;
+        - LJ: Leonard Jones potential;
+        - DP: DeeP potential;
+    - *Default*: FP
+
+    [back to top](#input-file)
+
 - md_rstmd<a id="md-rstmd"></a>
     - *Type*: Bool
     - *Description*: to control whether restart md.
@@ -1165,6 +1164,58 @@ This part of variables are used to control the molecular dynamics calculations.
     - *Default*: 3.405 (for He)
 
     [back to top](#input-file)
+
+### DFT+U correction
+This part of variables are used to control DFT+U correlated parameters
+- dft_plus_u 
+    - *Type*: Bool
+    - *Description*: If set to 1, ABCUS will calculate plus U correction, which is especially important for correlated electron.
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+- orbital_corr
+    - *Type*: Int
+    - *Description*: $l_1,l_2,l_3,\ldots$ for atom type 1,2,3 respectively.(usually 2 for d electrons and 3 for f electrons) .Specify which orbits need plus U correction for each atom. If set to -1, the correction would not be calculate for this atom.
+    - *Default*: None
+
+    [back to top](#input-file)
+
+- hubbard_u
+    - *Type*: Real
+    - *Description*: Hubbard Coulomb interaction parameter U(ev) in plus U correction,which should be specified for each atom unless Yukawa potential is use. ABACUS use a simplified scheme which only need U and J for each atom.
+    - *Default*: 0.0 
+
+    [back to top](#input-file)
+
+- hund_j
+    - *Type*: Real
+    - *Description*: Hund exchange parameter J(ev) in plus U correction ,which should be specified for each atom unless Yukawa potential is use. ABACUS use a simplified scheme which only need U and J for each atom.
+    - *Default*: 0.0 
+
+    [back to top](#input-file)
+
+- yukawa_potential
+    - *Type*: Bool
+    - *Description*: whether use the local screen Coulomb potential method to calculate the value of U and J. If this is set to 1, hubbard_u and hund_j do not need to be specified.
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+- omc 
+    - *Type*: Bool
+    - *Description*: whether turn on occupation matrix control method or not
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+### Start magnetization
+- magmom
+    - *Type*: Real
+    - *Description*: This set the start magnetization for each atom. The input magmom should be seperated by space and in the same order of STRU file. Different atoms with same magetic moment could be abbreviated as n\*magmom(NOTICE:No space before and after '\*').If one set the start magnetization here, they MUST NOT be specified again in STRU file(In STRU file, one could only set magnetic moment for each type of atom, but here setting different magnetic moment for the same kind of atom is allowed).
+    - *Default*: 0.0
+    [back to top](#input-file)
+
 
 ### VdW correction
 This part of variables are used to control vdW-corrected related parameters.

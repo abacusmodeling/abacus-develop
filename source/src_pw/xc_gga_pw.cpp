@@ -358,7 +358,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 	return;
 }
 
-void GGA_PW::grad_wfc( const std::complex<double> *rhog, std::complex<double> **grad, int npw )
+void GGA_PW::grad_wfc( const std::complex<double> *rhog, const int ik, std::complex<double> **grad, const int npw )
 {
 	double *kplusg;
 	kplusg = new double[npw];
@@ -370,7 +370,7 @@ void GGA_PW::grad_wfc( const std::complex<double> *rhog, std::complex<double> **
 	{
 		// the formula is : rho(r)^prime = \int iG * rho(G)e^{iGr} dG
 		for(int ig=0; ig<npw; ig++)
-			kplusg[ig] = GlobalC::pw.get_G_cartesian_projection(ig, ipol) * GlobalC::ucell.tpiba;
+			kplusg[ig] = GlobalC::pw.get_GPlusK_cartesian_projection(ik,GlobalC::wf.igk(ik,ig), ipol) * GlobalC::ucell.tpiba;
 
 		ModuleBase::GlobalFunc::ZEROS(Porter, GlobalC::pw.nrxx);
 

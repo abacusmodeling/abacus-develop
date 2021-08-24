@@ -14,7 +14,7 @@ public:
     
 
     void classic_md_line(void);
-    void md_cells_classic(void);
+    void md_force_stress(double &potential);
     void md_allocate_ions(void);
     void update_pos_classic(void);
 
