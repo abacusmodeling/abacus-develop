@@ -8,7 +8,7 @@ int Ylm::nlm = 0;
 std::vector<double> Ylm::ylmcoef(100);
 
 // here Lmax == max angular momentum + 1
-void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr[] )
+void Ylm::get_ylm_real( const int &Lmax, const ModuleBase::Vector3<double> &vec, double ylmr[] )
 {	
 	ModuleBase::timer::tick ("Ylm","get_ylm_real");
 	//1e-9 is too large
@@ -125,7 +125,7 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 	return;
 }
 
-void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr[], double dylmdr[][3] )
+void Ylm::get_ylm_real( const int &Lmax, const ModuleBase::Vector3<double> &vec, double ylmr[], double dylmdr[][3] )
 {	
 	//1e-9 is too large
 	const double cut0 = 1e-12;
@@ -1098,7 +1098,7 @@ void Ylm::set_coefficients(void)
 
 void Ylm::test1 (void)
 {
-	Vector3<double> R (20.0, 0.0, 0.0);
+	ModuleBase::Vector3<double> R (20.0, 0.0, 0.0);
 	double xdr = R.x/R.norm();
 	double ydr = R.y/R.norm();
 	double zdr = R.z/R.norm();
@@ -1136,7 +1136,7 @@ void Ylm::test1 (void)
 
 void Ylm::test2 (void)
 {
-	Vector3<double> R (0.1,-0.2,0.5);
+	ModuleBase::Vector3<double> R (0.1,-0.2,0.5);
 	Ylm::set_coefficients();
 	
 	//int nu = 100;
@@ -1517,7 +1517,7 @@ void Ylm::rlylm
 
 void Ylm::test(void)
 {
-	Vector3<double> R(0.0, 0.0, 1.0);
+	ModuleBase::Vector3<double> R(0.0, 0.0, 1.0);
 	
 	double r,r2,r3,r4,r5,r6,r7;
 	r = R.norm();

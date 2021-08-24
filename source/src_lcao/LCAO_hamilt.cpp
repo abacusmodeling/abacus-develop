@@ -371,8 +371,8 @@ void LCAO_Hamilt::calculate_STN_R(void)
 
     //int iat = 0;
     int index = 0;
-    Vector3<double> dtau, tau1, tau2;
-    Vector3<double> dtau1, dtau2, tau0;
+    ModuleBase::Vector3<double> dtau, tau1, tau2;
+    ModuleBase::Vector3<double> dtau1, dtau2, tau0;
 
     GlobalC::LM.allocate_Hloc_fixedR_tr();
     GlobalC::LM.allocate_HR_tr();
@@ -442,7 +442,7 @@ void LCAO_Hamilt::calculate_STN_R(void)
                 {
                     const int start2 = GlobalC::ucell.itiaiw2iwt(T2,I2,0);
 
-                    Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z);
+                    ModuleBase::Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z);
                     R_x = (int) (dR.x - R_minX);
                     R_y = (int) (dR.y - R_minY);
                     R_z = (int) (dR.z - R_minZ);
@@ -499,8 +499,8 @@ void LCAO_Hamilt::calculate_STN_R_sparse(const double &sparse_threshold)
 
     //int iat = 0;
     int index = 0;
-    Vector3<double> dtau, tau1, tau2;
-    Vector3<double> dtau1, dtau2, tau0;
+    ModuleBase::Vector3<double> dtau, tau1, tau2;
+    ModuleBase::Vector3<double> dtau1, dtau2, tau0;
 
     GlobalC::LM.allocate_HS_R_sparse();
 
@@ -568,7 +568,7 @@ void LCAO_Hamilt::calculate_STN_R_sparse(const double &sparse_threshold)
                 {
                     const int start2 = GlobalC::ucell.itiaiw2iwt(T2,I2,0);
 
-                    Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z);
+                    ModuleBase::Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z);
                     R_x = (int) (dR.x - R_minX);
                     R_y = (int) (dR.y - R_minY);
                     R_z = (int) (dR.z - R_minZ);

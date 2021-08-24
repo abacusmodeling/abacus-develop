@@ -91,7 +91,7 @@ std::map<size_t,std::map<size_t,matrix>> Exx_Abfs::Parallel::Communicate::Hexx::
 		{
 			const size_t iat2 = HR2.first;
 			assert(HR2.second.size()==1);
-			HK[iat1][iat2] = std::move( HR2.second.at(Vector3<int>{0,0,0}) );
+			HK[iat1][iat2] = std::move( HR2.second.at(ModuleBase::Vector3<int>{0,0,0}) );
 		}
 	}
 	return HK;

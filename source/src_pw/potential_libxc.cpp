@@ -132,9 +132,9 @@ std::tuple<double,double,ModuleBase::matrix> Potential_Libxc::v_xc(
 		// cal vtxc, v from rho_in, rho, gdr, vsigma
 		auto process_vsigma = [&]()
 		{
-			const std::vector<std::vector<Vector3<double>>> &gdr = std::get<2>(rho_sigma_gdr);
+			const std::vector<std::vector<ModuleBase::Vector3<double>>> &gdr = std::get<2>(rho_sigma_gdr);
 			
-			std::vector<std::vector<Vector3<double>>> h( nspin0(), std::vector<Vector3<double>>(GlobalC::pw.nrxx) );
+			std::vector<std::vector<ModuleBase::Vector3<double>>> h( nspin0(), std::vector<ModuleBase::Vector3<double>>(GlobalC::pw.nrxx) );
 			if( 1==nspin0() )
 			{
 				for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
@@ -330,7 +330,7 @@ std::vector<xc_func_type> Potential_Libxc::init_func()
 // [rho, sigma, gdr] = Potential_Libxc::cal_input(...)
 std::tuple< std::vector<double>, 
 			std::vector<double>, 
-			std::vector<std::vector<Vector3<double>>> > 
+			std::vector<std::vector<ModuleBase::Vector3<double>>> > 
 Potential_Libxc::cal_input( 
 	const std::vector<xc_func_type> &funcs, 
 	const double * const * const rho_in,
@@ -374,7 +374,7 @@ Potential_Libxc::cal_input(
 	};		
 		
 	// [...,↑_{i},↑_{i+1},...], [...,↓_{i},↓_{i+1},...]
-	std::vector<std::vector<Vector3<double>>> gdr;
+	std::vector<std::vector<ModuleBase::Vector3<double>>> gdr;
 	bool finished_gdr = false;
 	auto cal_gdr = [&]()
 	{

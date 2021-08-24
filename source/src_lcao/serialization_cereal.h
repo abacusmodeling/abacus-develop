@@ -12,11 +12,14 @@
 #include "../module_base/matrix.h"
 
 
-template<class Archive, typename T> void serialize( Archive & ar, Vector3<T> & v ){ ar(v.x); ar(v.y); ar(v.z); }
+
 template<class Archive, typename T> void serialize( Archive & ar, Abfs::Vector3_Order<T> & v ){ ar(v.x); ar(v.y); ar(v.z); }
 
 namespace ModuleBase
 {
+
+template<class Archive, typename T> void serialize( Archive & ar, Vector3<T> & v ){ ar(v.x); ar(v.y); ar(v.z); }
+
 template<class Archive> void save( Archive & ar, const matrix & m )
 {
 	ar(m.nr);	ar(m.nc);

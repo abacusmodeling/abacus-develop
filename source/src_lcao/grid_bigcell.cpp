@@ -208,7 +208,7 @@ void Grid_BigCell::init_tau_in_bigcell(void)
 	}
 	
 	// get the fraction number of (i,j,k)
-	Vector3<double> fraction;
+	ModuleBase::Vector3<double> fraction;
 	int iat=0;
 	int ii,jj,kk;
 	double delta[3];

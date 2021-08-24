@@ -150,7 +150,7 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Q(
 
 	const double normalization = (4 * PI) / sqrt(GlobalC::ucell.omega);			// Peize Lin add normalization 2015-12-29
 
-    std::vector<Vector3<double>> gk(np);
+    std::vector<ModuleBase::Vector3<double>> gk(np);
     for (int ig=0; ig<np; ig++)
         gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
 
@@ -226,7 +226,7 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Sq(
 
 	const double normalization = (4 * PI) * (4 * PI) / GlobalC::ucell.omega;			// Peize Lin add normalization 2015-12-29
 	
-    std::vector<Vector3<double>> gk(np);
+    std::vector<ModuleBase::Vector3<double>> gk(np);
     for (int ig=0; ig<np; ig++)
         gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
 
@@ -336,7 +336,7 @@ ModuleBase::matrix Numerical_Basis::cal_overlap_V(
 	return overlap_V;
 }
 
-realArray Numerical_Basis::cal_flq(const int ik, const std::vector<Vector3<double>> &gk) const
+realArray Numerical_Basis::cal_flq(const int ik, const std::vector<ModuleBase::Vector3<double>> &gk) const
 {
 	const int np = gk.size();
 	const int enumber = this->bessel_basis.get_ecut_number();
@@ -350,7 +350,7 @@ realArray Numerical_Basis::cal_flq(const int ik, const std::vector<Vector3<doubl
 	return flq;	
 }
 
-ModuleBase::matrix Numerical_Basis::cal_ylm(const std::vector<Vector3<double>> &gk)
+ModuleBase::matrix Numerical_Basis::cal_ylm(const std::vector<ModuleBase::Vector3<double>> &gk)
 {
     const int total_lm = ( GlobalC::ucell.lmax + 1) * ( GlobalC::ucell.lmax + 1);
     ModuleBase::matrix ylm(total_lm, gk.size());
@@ -404,7 +404,7 @@ void Numerical_Basis::numerical_atomic_wfc(
 {
     ModuleBase::TITLE("Numerical_Basis", "numerical_atomic_wfc");
 
-    std::vector<Vector3<double>> gk(np);
+    std::vector<ModuleBase::Vector3<double>> gk(np);
     for (int ig=0; ig<np; ig++)
         gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
 

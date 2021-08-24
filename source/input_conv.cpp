@@ -350,7 +350,7 @@ void Input_Conv::Convert(void)
 		delete[] GlobalC::ucell.magnet.m_loc_;
 		delete[] GlobalC::ucell.magnet.angle1_;
 		delete[] GlobalC::ucell.magnet.angle2_;
-		GlobalC::ucell.magnet.m_loc_ = new Vector3<double> [INPUT.ntype];
+		GlobalC::ucell.magnet.m_loc_ = new ModuleBase::Vector3<double> [INPUT.ntype];
 		GlobalC::ucell.magnet.angle1_ = new double[INPUT.ntype];
 		GlobalC::ucell.magnet.angle2_ = new double[INPUT.ntype];
 		for (int i = 0; i < INPUT.ntype; i++)
@@ -365,7 +365,7 @@ void Input_Conv::Convert(void)
 	}
 	else{
 		delete[] GlobalC::ucell.magnet.m_loc_;
-		GlobalC::ucell.magnet.m_loc_ = new Vector3<double> [INPUT.ntype];
+		GlobalC::ucell.magnet.m_loc_ = new ModuleBase::Vector3<double> [INPUT.ntype];
 		GlobalV::LSPINORB = false;
 		GlobalV::NONCOLIN = false;
 		GlobalV::DOMAG = false;

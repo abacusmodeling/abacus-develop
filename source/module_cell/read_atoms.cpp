@@ -367,8 +367,8 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 			return 0; // means something wrong
 		}
 
-		Vector3<double> v;
-		Vector3<int> mv;
+		ModuleBase::Vector3<double> v;
+		ModuleBase::Vector3<int> mv;
 		int na = 0;
 		this->nat = 0;
 
@@ -583,10 +583,10 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 				delete[] atoms[it].vel;
        			delete[] atoms[it].mbl;
 				delete[] atoms[it].mag;
-       			atoms[it].tau = new Vector3<double>[na];
-       			atoms[it].taud = new Vector3<double>[na];
-				atoms[it].vel = new Vector3<double>[na];
-       			atoms[it].mbl = new Vector3<int>[na];
+       			atoms[it].tau = new ModuleBase::Vector3<double>[na];
+       			atoms[it].taud = new ModuleBase::Vector3<double>[na];
+				atoms[it].vel = new ModuleBase::Vector3<double>[na];
+       			atoms[it].mbl = new ModuleBase::Vector3<int>[na];
 				atoms[it].mag = new double[na];
 				atoms[it].mass = this->atom_mass[it]; //mohan add 2011-11-07 
 				ModuleBase::GlobalFunc::ZEROS(atoms[it].mag,na);
@@ -763,7 +763,7 @@ bool UnitCell_pseudo::check_tau(void)const
 	ModuleBase::TITLE("UnitCell_pseudo","check_tau");
 	ModuleBase::timer::tick("UnitCell_pseudo","check_tau");
 	
-	Vector3<double> diff = 0.0;
+	ModuleBase::Vector3<double> diff = 0.0;
 	double norm = 0.0;
 	double tolerence_bohr = 1.0e-3;
 

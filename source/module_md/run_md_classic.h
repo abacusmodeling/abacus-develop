@@ -18,7 +18,7 @@ public:
     void md_allocate_ions(void);
     void update_pos_classic(void);
 
-    Vector3<double> *force;  //force of each atom
+    ModuleBase::Vector3<double> *force;  //force of each atom
 	ModuleBase::matrix stress;           //stress for this lattice
 
 private:

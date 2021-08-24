@@ -142,7 +142,7 @@ void Parallel_PW::columns_map(void)
 			// z is the fastest.
 			for (int k = -ibox[2]; k <= ibox[2]; k++)
 			{
-				Vector3<double> f(i,j,k);
+				ModuleBase::Vector3<double> f(i,j,k);
 				// g2= |f|^2 in the unit of (2Pi/lat0)^2
 				double g2 = f * (GlobalC::ucell.GGT * f);
 

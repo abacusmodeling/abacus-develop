@@ -311,7 +311,7 @@ void LCAO_Matrix::set_stress
     const double& vy,
     const double& vz,
     const char &dtype,
-    const Vector3<double> &dtau)
+    const ModuleBase::Vector3<double> &dtau)
 {
     // use iw1_all and iw2_all to set Hloc
     // becareful! The ir and ic may < 0!!!!!!!!!!!!!!!!

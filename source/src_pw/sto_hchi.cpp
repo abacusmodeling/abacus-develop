@@ -286,7 +286,7 @@ void Stochastic_hchi::hchi_real(std::complex<double>*chi_in, std::complex<double
 	//------------------------------------
 	if(GlobalV::T_IN_H)
 	{
-		Vector3<double> gg;
+		ModuleBase::Vector3<double> gg;
 		int gx,gy,gz;
 		for(int ig1 = 0, i = 0; ig1 < nx; ++ig1)
 		{

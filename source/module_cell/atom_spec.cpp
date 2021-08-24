@@ -11,9 +11,9 @@ Atom::Atom()
     Rcut = 0.0; // pengfei Li 16-2-29
     type = 0;
     stapos_wf = 0;
-    tau = new Vector3<double>[1];
-    taud = new Vector3<double>[1];
-    vel = new Vector3<double>[1];
+    tau = new ModuleBase::Vector3<double>[1];
+    taud = new ModuleBase::Vector3<double>[1];
+    vel = new ModuleBase::Vector3<double>[1];
     mag = new double[1];
     l_nchi = new int[1];
     iw2l = new int[1];
@@ -135,8 +135,8 @@ void Atom::bcast_atom(void)
         delete[] tau;
 		delete[] taud;
         delete[] mag;
-        tau = new Vector3<double>[na];
-		taud = new Vector3<double>[na];
+        tau = new ModuleBase::Vector3<double>[na];
+		taud = new ModuleBase::Vector3<double>[na];
         mag = new double[na];
     }
 

@@ -22,9 +22,9 @@ K_Vectors::K_Vectors()
     kc_done = false;
     kd_done = false;
 
-    kvec_c = new Vector3<double>[1];
-    kvec_d = new Vector3<double>[1];
-    kvec_d_ibz = new Vector3<double>[1];
+    kvec_c = new ModuleBase::Vector3<double>[1];
+    kvec_d = new ModuleBase::Vector3<double>[1];
+    kvec_d_ibz = new ModuleBase::Vector3<double>[1];
 
     wk = new double[1];
     wk_ibz = new double[1];
@@ -146,8 +146,8 @@ void K_Vectors::renew(const int &kpoint_number)
     delete[] isk;
     delete[] ngk;
 
-    kvec_c = new Vector3<double>[kpoint_number];
-    kvec_d = new Vector3<double>[kpoint_number];
+    kvec_c = new ModuleBase::Vector3<double>[kpoint_number];
+    kvec_d = new ModuleBase::Vector3<double>[kpoint_number];
     wk = new double[kpoint_number];
     isk = new int[kpoint_number];
     ngk = new int[kpoint_number];
@@ -533,7 +533,7 @@ void K_Vectors::update_use_ibz( void )
 	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nkstot now",nkstot);
 
     delete[] kvec_d;
-    this->kvec_d = new Vector3<double>[ this->nkstot * nspin]; //qianrui fix a bug 2021-7-13 for nspin=2 in set_kup_and_kdw()
+    this->kvec_d = new ModuleBase::Vector3<double>[ this->nkstot * nspin]; //qianrui fix a bug 2021-7-13 for nspin=2 in set_kup_and_kdw()
 
     for (int i = 0; i < this->nkstot; ++i)
     {
@@ -588,14 +588,14 @@ void K_Vectors::ibz_kpoint(const ModuleSymmetry::Symmetry &symm)
     delete[] kvec_d_ibz;
     delete[] wk_ibz;
     delete[] ibz2bz;
-    this->kvec_d_ibz = new Vector3<double>[ this->nkstot ];
+    this->kvec_d_ibz = new ModuleBase::Vector3<double>[ this->nkstot ];
     this->wk_ibz = new double[ this->nkstot ];
     this->ibz2bz = new int[ this->nkstot ];
 
 	// nkstot is the total input k-points number.
     const double weight = 1.0 / static_cast<double>(nkstot);
 
-    Vector3<double> kvec_rot;
+    ModuleBase::Vector3<double> kvec_rot;
     
 	
 //	for(int i=0; i<nrotkm; i++)

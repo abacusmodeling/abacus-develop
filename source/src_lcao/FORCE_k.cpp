@@ -194,7 +194,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 	ModuleBase::TITLE("Force_LCAO_k","set_EDM_k");
 	ModuleBase::timer::tick("Force_LCAO_k","set_EDM_k");
 
-	Vector3<double> tau1, dtau;
+	ModuleBase::Vector3<double> tau1, dtau;
 
 	//----------------------------------------------------------
 	// RA will set the adjacent information for each atom
@@ -416,7 +416,7 @@ void Force_LCAO_k::cal_foverlap_k(
     //summation \sum_{i,j} E(i,j)*dS(i,j)
     //BEGIN CALCULATION OF FORCE OF EACH ATOM
 	//--------------------------------------------
-	Vector3<double> tau1, dtau, tau2;
+	ModuleBase::Vector3<double> tau1, dtau, tau2;
 
 	Record_adj RA;
 	RA.for_2d();
@@ -697,12 +697,12 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 	ModuleBase::TITLE("Force_LCAO_k","cal_fvnl_dbeta_k");
 	ModuleBase::timer::tick("Force_LCAO_k","cal_fvnl_dbeta_k");
 	int iir = 0;
-	Vector3<double> tau1;
-	Vector3<double> tau2;
-	Vector3<double> dtau;
-	Vector3<double> tau0;
-	Vector3<double>	dtau1;
-	Vector3<double> dtau2;
+	ModuleBase::Vector3<double> tau1;
+	ModuleBase::Vector3<double> tau2;
+	ModuleBase::Vector3<double> dtau;
+	ModuleBase::Vector3<double> tau0;
+	ModuleBase::Vector3<double>	dtau1;
+	ModuleBase::Vector3<double> dtau2;
 
 	double rcut;
 	double distance;

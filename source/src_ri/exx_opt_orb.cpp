@@ -367,8 +367,8 @@ std::map<size_t,std::map<size_t,set<double>>> Exx_Opt_Orb::get_radial_R() const
 			for( size_t TB=0; TB!=GlobalC::ucell.ntype; ++TB )
 				for( size_t IB=0; IB!=GlobalC::ucell.atoms[TB].na; ++IB )
 				{
-					const Vector3<double> &tauA = GlobalC::ucell.atoms[TA].tau[IA];
-					const Vector3<double> &tauB = GlobalC::ucell.atoms[TB].tau[IB];
+					const ModuleBase::Vector3<double> &tauA = GlobalC::ucell.atoms[TA].tau[IA];
+					const ModuleBase::Vector3<double> &tauB = GlobalC::ucell.atoms[TB].tau[IB];
 					const double delta_R = (-tauA+tauB).norm();
 					radial_R[TA][TB].insert( delta_R );
 					radial_R[TB][TA].insert( delta_R );

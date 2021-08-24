@@ -66,8 +66,8 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 	int nnr = 0; // used onlyh for k points.
 
     //\sum{T} e**{ikT} <\phi_{ia}|d\phi_{k\beta}(T)>
-	Vector3<double> tau1, tau2, dtau;
-	Vector3<double> dtau1, dtau2, tau0;
+	ModuleBase::Vector3<double> tau1, tau2, dtau;
+	ModuleBase::Vector3<double> dtau1, dtau2, tau0;
     for (int T1=0; T1<GlobalC::ucell.ntype; ++T1)
     {
 		Atom* atom1 = &GlobalC::ucell.atoms[T1];
@@ -278,7 +278,7 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 void LCAO_gen_fixedH::test_Nonlocal()
 {
 	int nnr = 0;
-	Vector3<double> tau1, tau2, dtau_12, tau0, dtau_10, dtau_20;
+	ModuleBase::Vector3<double> tau1, tau2, dtau_12, tau0, dtau_10, dtau_20;
 	double distance = 0.0;
 	double rcut = 0.0;
 
@@ -418,8 +418,8 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 	// while phi2 is in the supercell.
 
 	int nnr = 0;
-	Vector3<double> tau1, tau2, dtau;
-	Vector3<double> dtau1, dtau2, tau0;
+	ModuleBase::Vector3<double> tau1, tau2, dtau;
+	ModuleBase::Vector3<double> dtau1, dtau2, tau0;
 	double distance = 0.0;
 	double distance1, distance2;
 	double rcut = 0.0;
@@ -695,7 +695,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
                 const int I1 = GlobalC::GridD.getNatom(ad1);
 				//const int iat1 = GlobalC::ucell.itia2iat(T1, I1);
                 const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
-                const Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau(ad1);
+                const ModuleBase::Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau(ad1);
 				const Atom* atom1 = &GlobalC::ucell.atoms[T1];
 				const int nw1_tot = atom1->nw*GlobalV::NPOL;
 
@@ -709,11 +709,11 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 					const int T2 = GlobalC::GridD.getType(ad2);
 					const int I2 = GlobalC::GridD.getNatom(ad2);
 					const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-					const Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad2);
+					const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad2);
 					const Atom* atom2 = &GlobalC::ucell.atoms[T2];
 					const int nw2_tot = atom2->nw*GlobalV::NPOL;
 
-					Vector3<double> dtau = tau2 - tau1;
+					ModuleBase::Vector3<double> dtau = tau2 - tau1;
 					double distance = dtau.norm() * GlobalC::ucell.lat0;
 					double rcut = Rcut(T1,T2);
 					//double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();

@@ -19,7 +19,7 @@ Grid_Driver::~Grid_Driver()
 
 void Grid_Driver::Find_atom(
 	const UnitCell &ucell, 
-	const Vector3<double> &cartesian_pos, 
+	const ModuleBase::Vector3<double> &cartesian_pos, 
 	const int &ntype, 
 	const int &nnumber)
 {
@@ -52,7 +52,7 @@ void Grid_Driver::Find_atom(
 
 int Grid_Driver::Locate_offset(
 	const UnitCell &ucell, 
-	const Vector3<double> &cartesian_pos, 
+	const ModuleBase::Vector3<double> &cartesian_pos, 
 	const int &ntype, 
 	const int &nnumber)const
 {
@@ -263,7 +263,7 @@ double Grid_Driver::Distance(const AtomLink& a1, const AtomLink& a2)const
 //==========================================================
 // For not_expand case
 //==========================================================
-double Grid_Driver::Distance(const AtomLink& a1, const Vector3<double> &adjacent_site)const
+double Grid_Driver::Distance(const AtomLink& a1, const ModuleBase::Vector3<double> &adjacent_site)const
 {
 	const double dx = a1.fatom.x() - adjacent_site.x;
 	const double dy = a1.fatom.y() - adjacent_site.y;
@@ -272,7 +272,7 @@ double Grid_Driver::Distance(const AtomLink& a1, const Vector3<double> &adjacent
 }
 
 
-Vector3<double> Grid_Driver::Calculate_adjacent_site
+ModuleBase::Vector3<double> Grid_Driver::Calculate_adjacent_site
 (
     const short offset,
     const double &box11, const double &box12, const double &box13,
@@ -281,7 +281,7 @@ Vector3<double> Grid_Driver::Calculate_adjacent_site
     const short box_x, const short box_y, const short box_z
 )const
 {
-	Vector3<double> adjacent_site(0, 0, 0);
+	ModuleBase::Vector3<double> adjacent_site(0, 0, 0);
 	adjacent_site.x = this->atomlink[offset].fatom.x() +
 	                  box_x * box11 + box_y * box12 + box_z * box13;
 

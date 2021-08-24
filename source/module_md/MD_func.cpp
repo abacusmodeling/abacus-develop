@@ -1,6 +1,6 @@
 #include "MD_func.h"
 
-bool MD_func::RestartMD(const int& numIon, Vector3<double>* vel, int& step_rst)
+bool MD_func::RestartMD(const int& numIon, ModuleBase::Vector3<double>* vel, int& step_rst)
 {
 	int error(0);
 	double *vell=new double[numIon*3];
@@ -68,7 +68,7 @@ bool MD_func::RestartMD(const int& numIon, Vector3<double>* vel, int& step_rst)
 	return true;
 }
 
-void MD_func::mdRestartOut(const int& step, const int& recordFreq, const int& numIon, Vector3<double>* vel)
+void MD_func::mdRestartOut(const int& step, const int& recordFreq, const int& numIon, ModuleBase::Vector3<double>* vel)
 {
 //this function used for outputting the information of restart file
 	bool pass;
@@ -94,7 +94,7 @@ void MD_func::mdRestartOut(const int& step, const int& recordFreq, const int& nu
 	return;
 }
 
-double MD_func::GetAtomKE(const int& numIon, const Vector3<double>* vel, const double * allmass){
+double MD_func::GetAtomKE(const int& numIon, const ModuleBase::Vector3<double>* vel, const double * allmass){
 //---------------------------------------------------------------------------
 // DESCRIPTION:
 //   This function calculates the classical kinetic energy of a group of atoms.
@@ -115,7 +115,7 @@ void MD_func::InitVelocity(
 	const double& temperature, 
 	const double& fundamentalTime, 
 	const double* allmass,
-	Vector3<double>* vel)
+	ModuleBase::Vector3<double>* vel)
 {
 	if(!GlobalV::MY_RANK){ //xiaohui add 2015-09-25
 		srand(time(0));
@@ -245,7 +245,7 @@ std::string MD_func::intTurnTostring(long int iter, std::string path)
 	return path;
 }
 
-int MD_func::getMassMbl(const UnitCell_pseudo &unit_in, double* allmass, Vector3<int>* ionmbl)
+int MD_func::getMassMbl(const UnitCell_pseudo &unit_in, double* allmass, ModuleBase::Vector3<int>* ionmbl)
 {
 //some prepared information
 //mass and degree of freedom
@@ -295,7 +295,7 @@ void MD_func::scalevel(
 	const int& numIon,
 	const int& nfrozen,
 	const double& temperature,
-	Vector3<double>* vel,
+	ModuleBase::Vector3<double>* vel,
 	const double* allmass
 )
 {
@@ -336,7 +336,7 @@ double MD_func::Conserved(const double KE, const double PE, const int number){
    	return Conserved;
 }
 
-double MD_func::MAXVALF(const int numIon, const Vector3<double>* force){
+double MD_func::MAXVALF(const int numIon, const ModuleBase::Vector3<double>* force){
 	//std::cout<<"enter in MAXVALF"<<std::endl;
 	double max=0;
 	for(int i=0;i<numIon;i++){

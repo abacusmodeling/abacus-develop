@@ -35,8 +35,8 @@ void Record_adj::for_2d(void)
 	assert(GlobalC::ucell.nat>0);
 
 	// (1) find the adjacent atoms of atom[T1,I1];
-	Vector3<double> tau1, tau2, dtau;
-	Vector3<double> dtau1, dtau2, tau0;
+	ModuleBase::Vector3<double> tau1, tau2, dtau;
+	ModuleBase::Vector3<double> dtau1, dtau2, tau0;
 
 	this->na_proc = GlobalC::ucell.nat;
 
@@ -230,8 +230,8 @@ void Record_adj::for_grid(const Grid_Technique &gt)
     ModuleBase::TITLE("Record_adj","for_grid");
 	ModuleBase::timer::tick("Record_adj","for_grid");
 	
-	Vector3<double> tau1, tau2, dtau;
-	Vector3<double> tau0, dtau1, dtau2;
+	ModuleBase::Vector3<double> tau1, tau2, dtau;
+	ModuleBase::Vector3<double> tau0, dtau1, dtau2;
 	
 	this->na_proc = 0;
 	for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)

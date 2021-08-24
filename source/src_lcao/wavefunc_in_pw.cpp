@@ -257,7 +257,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ModuleBase::Complex
 	std::complex<double> *aux = new std::complex<double>[npw];
 	double *chiaux = new double[1];
 
-	Vector3<double> *gk = new Vector3<double>[npw];
+	ModuleBase::Vector3<double> *gk = new ModuleBase::Vector3<double>[npw];
 	for(int ig=0;ig<npw;ig++)
 	{
 		gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
@@ -444,7 +444,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ModuleBase::Complex
 }
 
 
-void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ModuleBase::ComplexMatrix &psi, const realArray &table_local, Vector3<double> q)   // pengfei 2016-11-23
+void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ModuleBase::ComplexMatrix &psi, const realArray &table_local, ModuleBase::Vector3<double> q)   // pengfei 2016-11-23
 {
 	ModuleBase::TITLE("Wavefunc_in_pw","produce_local_basis_in_pw");
 	assert(ik>=0);
@@ -454,7 +454,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ModuleBase::Comp
 	std::complex<double> *aux = new std::complex<double>[npw];
 	double *chiaux = new double[1];
 
-	Vector3<double> *gkq = new Vector3<double>[npw];
+	ModuleBase::Vector3<double> *gkq = new ModuleBase::Vector3<double>[npw];
 
 	for(int ig=0;ig<npw;ig++)
 	{

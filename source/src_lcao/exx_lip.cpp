@@ -165,7 +165,7 @@ void Exx_Lip::init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in, PW_Basis *pw_ptr_i
 		ucell_ptr = ucell_ptr_in;
 
 		int gzero_judge(-1);
-		if (pw_ptr->gcar[0]==Vector3<double>(0.0,0.0,0.0))
+		if (pw_ptr->gcar[0]==ModuleBase::Vector3<double>(0.0,0.0,0.0))
 		{
 			gzero_judge = GlobalV::RANK_IN_POOL;
 		}
@@ -460,7 +460,7 @@ void Exx_Lip::qkg2_exp(int ik, int iq)
 
 void Exx_Lip::b_cal( int ik, int iq, int ib)
 {
-	const Vector3<double> q_minus_k = q_pack->kv_ptr->kvec_d[iq] - k_pack->kv_ptr->kvec_d[ik];
+	const ModuleBase::Vector3<double> q_minus_k = q_pack->kv_ptr->kvec_d[iq] - k_pack->kv_ptr->kvec_d[ik];
 	std::vector<std::complex<double> > mul_tmp(pw_ptr->nrxx);
 	for( size_t ir=0,ix=0; ix<pw_ptr->ncx; ++ix)
 	{
@@ -813,8 +813,8 @@ void Exx_Lip::read_q_pack()
 	MPI_Bcast( &q_pack->kv_ptr->nks, 1, MPI_INT, 0, POOL_WORLD);
 
 	q_pack->kv_ptr->ngk = new int [q_pack->kv_ptr->nks];
-	q_pack.kvec_c = new Vector3<double> [q_pack->kv_ptr->nks];
-	q_pack.kvec_d = new Vector3<double> [q_pack->kv_ptr->nks];
+	q_pack.kvec_c = new ModuleBase::Vector3<double> [q_pack->kv_ptr->nks];
+	q_pack.kvec_d = new ModuleBase::Vector3<double> [q_pack->kv_ptr->nks];
 	double *kvec_tmp = new double [q_pack->kv_ptr->nks*6];				// just for MPI
 	q_pack.wf_wg = new double *[q_pack->kv_ptr->nks];
 	for( int iq=0; iq<q_pack->kv_ptr->nks; ++iq)

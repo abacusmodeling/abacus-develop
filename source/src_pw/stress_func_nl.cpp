@@ -68,7 +68,7 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma){
 				
 		get_dvnl2(vkb2,ik);
 
-		Vector3<double> qvec;
+		ModuleBase::Vector3<double> qvec;
 		double qvec0[3];
 				
 		for (int ipol = 0; ipol<3; ipol++)
@@ -242,7 +242,7 @@ void Stress_Func::get_dvnl1
 	const int x1= (lmaxkb + 1)*(lmaxkb + 1);
 
 	ModuleBase::matrix dylm(x1, npw);
-	Vector3<double> *gk = new Vector3<double>[npw];
+	ModuleBase::Vector3<double> *gk = new ModuleBase::Vector3<double>[npw];
 	for (ig = 0;ig < npw;ig++)
 	{
 		gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
@@ -334,7 +334,7 @@ void Stress_Func::get_dvnl2(ModuleBase::ComplexMatrix &vkb,
 	const int x1= (lmaxkb + 1)*(lmaxkb + 1);
 
 	ModuleBase::matrix ylm(x1, npw);
-	Vector3<double> *gk = new Vector3<double>[npw];
+	ModuleBase::Vector3<double> *gk = new ModuleBase::Vector3<double>[npw];
 	for (ig = 0;ig < npw;ig++)
 	{
 		gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
@@ -437,7 +437,7 @@ double Stress_Func::Polynomial_Interpolation_nl
 void Stress_Func::dylmr2 (
 	const int nylm,
 	const int ngy,
-	Vector3<double> *gk,
+	ModuleBase::Vector3<double> *gk,
 	ModuleBase::matrix &dylm,
 	const int ipol)
 {
@@ -470,7 +470,7 @@ void Stress_Func::dylmr2 (
 	// gx = g +/- dg
 
 
-	Vector3<double> *gx = new Vector3<double> [ngy];
+	ModuleBase::Vector3<double> *gx = new ModuleBase::Vector3<double> [ngy];
 	 
 
 	dg = new double [ngy];

@@ -7,14 +7,14 @@
 Grid_Base::Grid_Base()
 { 
 	this->Rcut_max = new double[1];
-	this->Rcut_max_direct = new Vector3<double>[1];
+	this->Rcut_max_direct = new ModuleBase::Vector3<double>[1];
 	this->ijk_index = new int[1];
 	this->norm1 = new double[1];
 	this->norm2 = new double[1];
-	this->dR1 = new Vector3<double>[1];
-	this->dR2 = new Vector3<double>[1];
+	this->dR1 = new ModuleBase::Vector3<double>[1];
+	this->dR2 = new ModuleBase::Vector3<double>[1];
 	this->grid_number_last = 0; // must initialized!!
-	this->cartesian = new Vector3<double>[1];
+	this->cartesian = new ModuleBase::Vector3<double>[1];
 	this->yy1 = new double*[1];
 	this->yy2 = new double*[1];
 	this->yy1[0] = new double[1];
@@ -98,10 +98,10 @@ void Grid_Base::init(
 	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"da3 = ", da3);
 
 	delete[] this->cartesian;
-	this->cartesian = new Vector3<double>[ this->nxyz ];
+	this->cartesian = new ModuleBase::Vector3<double>[ this->nxyz ];
 	ModuleBase::Memory::record("Grid_Base","cartesian",nxyz*3,"double");
 
-	Vector3<double> direct;
+	ModuleBase::Vector3<double> direct;
 	for (int i = 0; i < this->nx; i++)
 	{
 		direct.x = static_cast<double>(i) / this->nx;
@@ -155,7 +155,7 @@ void Grid_Base::get_rcut_max(void)
 	delete[] Rcut_max;
 	delete[] Rcut_max_direct;
 	this->Rcut_max = new double[ GlobalC::ORB.get_ntype() ];
-	this->Rcut_max_direct = new Vector3<double>[ GlobalC::ORB.get_ntype() ];
+	this->Rcut_max_direct = new ModuleBase::Vector3<double>[ GlobalC::ORB.get_ntype() ];
 
 	for(int it=0; it<GlobalC::ORB.get_ntype(); it++)
 	{
@@ -184,12 +184,12 @@ void Grid_Base::get_rcut_max(void)
 
 // be called by cal_region.
 void Grid_Base::get_small_box( 
-		const Vector3<double> &tau, 
+		const ModuleBase::Vector3<double> &tau, 
 		const int &T,
-		Vector3<double> &tau_max_direct,
-		Vector3<double> &tau_min_direct)
+		ModuleBase::Vector3<double> &tau_max_direct,
+		ModuleBase::Vector3<double> &tau_min_direct)
 {
-	Vector3<double> tau_dir;
+	ModuleBase::Vector3<double> tau_dir;
 
 	// NOTE: tau_dir can be calculated and stored firstly.
 	ModuleBase::Mathzone::Cartesian_to_Direct
@@ -224,10 +224,10 @@ void Grid_Base::get_small_box(
 
 // be called by cal_region
 void Grid_Base::edge_grid_points(
-	const Vector3<double> &R10,
-	const Vector3<double> &R20,
-	const Vector3<double> &max_direct_coodinate,
-	const Vector3<double> &min_direct_coodinate)
+	const ModuleBase::Vector3<double> &R10,
+	const ModuleBase::Vector3<double> &R20,
+	const ModuleBase::Vector3<double> &max_direct_coodinate,
+	const ModuleBase::Vector3<double> &min_direct_coodinate)
 {
 	//index of the 8 edge points in FFT box
 	ModuleBase::timer::tick("Grid_Base","edge_grid_points");
@@ -264,8 +264,8 @@ void Grid_Base::edge_grid_points(
 		delete[] ijk_index;
 		this->norm1 = new double[grid_number];
 		this->norm2 = new double[grid_number];
-		this->dR1 = new Vector3<double>[grid_number];
-		this->dR2 = new Vector3<double>[grid_number];
+		this->dR1 = new ModuleBase::Vector3<double>[grid_number];
+		this->dR2 = new ModuleBase::Vector3<double>[grid_number];
 		this->ijk_index = new int[grid_number];
 	}
 

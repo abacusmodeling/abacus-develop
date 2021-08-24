@@ -61,12 +61,12 @@ void LCAO_nnr::cal_nnr(void)
 	int iat = 0;
 
 	// (1) find the adjacent atoms of atom[T1,I1];
-	Vector3<double> tau1;
-	Vector3<double> tau2;
-	Vector3<double> dtau;
-	Vector3<double> tau0;
-	Vector3<double> dtau1;
-	Vector3<double> dtau2;
+	ModuleBase::Vector3<double> tau1;
+	ModuleBase::Vector3<double> tau2;
+	ModuleBase::Vector3<double> dtau;
+	ModuleBase::Vector3<double> tau0;
+	ModuleBase::Vector3<double> dtau1;
+	ModuleBase::Vector3<double> dtau2;
 
 	for (int T1 = 0; T1 < GlobalC::ucell.ntype; T1++)
 	{
@@ -210,8 +210,8 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 	ModuleBase::GlobalFunc::ZEROS(nlocstartg, GlobalC::ucell.nat);
 
 
-	Vector3<double> tau1, tau2, dtau;
-	Vector3<double> dtau1, dtau2, tau0;
+	ModuleBase::Vector3<double> tau1, tau2, dtau;
+	ModuleBase::Vector3<double> dtau1, dtau2, tau0;
 	for (int T1 = 0; T1 < GlobalC::ucell.ntype; ++T1)
 	{
 		Atom* atom1 = &GlobalC::ucell.atoms[T1];
@@ -496,7 +496,7 @@ void LCAO_nnr::cal_max_box_index(void)
 	{
 		for (int I1 = 0; I1 < GlobalC::ucell.atoms[T1].na; I1++)
 		{
-			Vector3<double> tau1 = GlobalC::ucell.atoms[T1].tau[I1];
+			ModuleBase::Vector3<double> tau1 = GlobalC::ucell.atoms[T1].tau[I1];
 			//GlobalC::GridD.Find_atom(tau1);
 			GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
 			for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ad++)
@@ -568,13 +568,13 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 
 	int iat = 0;
 	int index = 0;
-	Vector3<double> dtau;
-	Vector3<double> tau1;
-	Vector3<double> tau2;
+	ModuleBase::Vector3<double> dtau;
+	ModuleBase::Vector3<double> tau1;
+	ModuleBase::Vector3<double> tau2;
 
-	Vector3<double> dtau1;
-	Vector3<double> dtau2;
-	Vector3<double> tau0;
+	ModuleBase::Vector3<double> dtau1;
+	ModuleBase::Vector3<double> dtau2;
+	ModuleBase::Vector3<double> tau0;
 
 	for (int T1 = 0; T1 < GlobalC::ucell.ntype; ++T1)
 	{
@@ -640,7 +640,7 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 					// exp(k dot dR)
 					// dR is the index of box in Crystal coordinates
 					//------------------------------------------------
-					Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
+					ModuleBase::Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
 					const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * TWO_PI;
 					//const double arg = ( GlobalC::kv.kvec_d[ik] * GlobalC::GridD.getBox(ad) ) * TWO_PI;
 					const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );

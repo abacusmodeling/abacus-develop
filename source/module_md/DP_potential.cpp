@@ -7,7 +7,7 @@ DP_potential::DP_potential(){}
 
 DP_potential::~DP_potential(){}
 
-void DP_potential::DP_pot(UnitCell_pseudo &ucell_c, double &potential, Vector3<double> *force, ModuleBase::matrix &stress)
+void DP_potential::DP_pot(UnitCell_pseudo &ucell_c, double &potential, ModuleBase::Vector3<double> *force, ModuleBase::matrix &stress)
 {
 #ifdef __DPMD
     ModuleBase::TITLE("DP_potential", "DP_pot");

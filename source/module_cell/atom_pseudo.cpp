@@ -3,7 +3,7 @@
 
 Atom_pseudo::Atom_pseudo()
 {
-	mbl = new Vector3<int>[1];
+	mbl = new ModuleBase::Vector3<int>[1];
 	pseudo_fn = "not_init";
 	mass = 0.0;
 
@@ -160,7 +160,7 @@ void Atom_pseudo::bcast_atom_pseudo(const int &na)
 	if(GlobalV::MY_RANK!=0)
 	{
 		delete[] mbl;
-		mbl = new Vector3<int>[na];
+		mbl = new ModuleBase::Vector3<int>[na];
 	}
 
 	for(int i=0;i<na;i++)

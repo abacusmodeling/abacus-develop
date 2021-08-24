@@ -101,7 +101,7 @@ int WF_igk::setupIndGk(const PW_Basis &pwb,const int nks)
 		ofs << GlobalC::pw.ggpsi << " (ggpsi, Ry)" << std::endl;
 		ofs << GlobalC::pw.ggwfc << " (ggwfc, Ry)" << std::endl;
 		ofs << GlobalC::pw.ggwfc2 << " (ggwfc2, Ry)" << std::endl;
-		Vector3<double> f;
+		ModuleBase::Vector3<double> f;
 		for(int ik=0; ik < nks; ++ik)
 		{
 			ofs << ik+1 << " (Index of k)" << std::endl;
@@ -140,9 +140,9 @@ void WF_igk::ekin(const int ik)
 }
 
 
-Vector3<double> WF_igk::get_1qvec_cartesian(const int ik,const int ig)const
+ModuleBase::Vector3<double> WF_igk::get_1qvec_cartesian(const int ik,const int ig)const
 {
-    Vector3<double> qvec = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
+    ModuleBase::Vector3<double> qvec = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
 
     /*
 	if(igk(ik,ig)==0)
@@ -192,13 +192,13 @@ std::complex<double>* WF_igk::get_sk(const int ik, const int it, const int ia)co
 }
 
 
-std::complex<double>* WF_igk::get_skq(int ik, const int it, const int ia, Vector3<double> q)   //pengfei 2016-11-23 
+std::complex<double>* WF_igk::get_skq(int ik, const int it, const int ia, ModuleBase::Vector3<double> q)   //pengfei 2016-11-23 
 {
     std::complex<double> *skq = new std::complex<double>[ GlobalC::kv.ngk[ik] ];
 
     for (int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
     {
-        Vector3<double> qkq = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig)) + q;
+        ModuleBase::Vector3<double> qkq = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig)) + q;
         double arg = (qkq * GlobalC::ucell.atoms[it].tau[ia]) * TWO_PI;
         skq[ig] = std::complex<double>(cos(arg), -sin(arg));
     }

@@ -487,7 +487,7 @@ void Forces::cal_force_ew(ModuleBase::matrix& forceion)
         //output of rgen: the number of vectors in the sphere
         const int mxr = 50;
         // the maximum number of R vectors included in r
-        Vector3<double> *r  = new Vector3<double>[mxr];
+        ModuleBase::Vector3<double> *r  = new ModuleBase::Vector3<double>[mxr];
         double *r2 = new double[mxr];
 		ModuleBase::GlobalFunc::ZEROS(r2, mxr);
         int *irr = new int[mxr];
@@ -507,7 +507,7 @@ void Forces::cal_force_ew(ModuleBase::matrix& forceion)
                     {
                         if (iat1 != iat2)
                         {
-                            Vector3<double> d_tau = GlobalC::ucell.atoms[T1].tau[I1] - GlobalC::ucell.atoms[T2].tau[I2];
+                            ModuleBase::Vector3<double> d_tau = GlobalC::ucell.atoms[T1].tau[I1] - GlobalC::ucell.atoms[T2].tau[I2];
                             H_Ewald_pw::rgen(d_tau, rmax, irr, GlobalC::ucell.latvec, GlobalC::ucell.G, r, r2, nrm);
 
                             for (int n = 0;n < nrm;n++)

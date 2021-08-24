@@ -87,12 +87,12 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> Potential_Libxc::v_xc
 	
 	//rho,grho,tau
 	vector<vector<double>> rho;
-	vector<vector<Vector3<double>>> grho;
+	vector<vector<ModuleBase::Vector3<double>>> grho;
 	vector<vector<double>> kin_r;
 
 	//dExc/d rho,grho,tau
 	vector<vector<double>> vrho;
-	vector<vector<Vector3<double>>> h;
+	vector<vector<ModuleBase::Vector3<double>>> h;
 	vector<vector<double>> kedtaur;
 
 	//ifstream ifs_rho("rho");
@@ -204,7 +204,7 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> Potential_Libxc::v_xc
 		double rhoup, rhodw, tauup, taudw;
 		double ex, v1xup, v1xdw, v2xup, v2xdw, v3xup, v3xdw;
 		double ec, v1cup, v1cdw, v3cup, v3cdw;
-		Vector3<double> grhoup,grhodw,v2cup,v2cdw;
+		ModuleBase::Vector3<double> grhoup,grhodw,v2cup,v2cdw;
 
 	
 		const double rho_th  = 1e-8;

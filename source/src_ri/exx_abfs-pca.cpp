@@ -66,8 +66,8 @@ ofs<<range_abfs<<std::endl;
 		const ModuleBase::matrix && A = m_abfslcaos_lcaos.cal_overlap_matrix(  
 			T, 
 			T, 
-			Vector3<double>{0,0,0},
-			Vector3<double>{0,0,0},  
+			ModuleBase::Vector3<double>{0,0,0},
+			ModuleBase::Vector3<double>{0,0,0},  
 			index_abfs, 
 			index_lcaos,
 			index_lcaos,

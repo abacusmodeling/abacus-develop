@@ -58,7 +58,7 @@ std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_pt
 			const int it2 = GlobalC::ucell.iat2it[iat2];
 			const int ia2 = GlobalC::ucell.iat2ia[iat2];
 			const Vector3_Order<double> tau2( GlobalC::ucell.atoms[it2].tau[ia2] );
-			for( const Vector3<int> &box2 : atom2.second )
+			for( const ModuleBase::Vector3<int> &box2 : atom2.second )
 			{
 //				std::cout<<"cal_Cs\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<std::endl;
 				const std::shared_ptr<ModuleBase::matrix> C = DPcal_C( 
@@ -310,7 +310,7 @@ std::shared_ptr<ModuleBase::matrix> Abfs::DPcal_C(
 	else
 	{
 //		std::cout<<"DPcal_C\t"<<it1<<"\t"<<it2<<"\t"<<R<<std::endl;
-		if( (Vector3<double>(0,0,0)==R) && (it1==it2) )
+		if( (ModuleBase::Vector3<double>(0,0,0)==R) && (it1==it2) )
 		{
 			const std::shared_ptr<ModuleBase::matrix> A = 
 				make_shared<ModuleBase::matrix>( m_abfslcaos_lcaos.cal_overlap_matrix( it1,it2,0,0,index_abfs,index_lcaos,index_lcaos,Exx_Abfs::Matrix_Orbs21::Matrix_Order::A2B_A1 ) );
@@ -406,7 +406,7 @@ std::map<size_t,std::vector<Abfs::Vector3_Order<int>>> Abfs::get_adjs( const siz
 //	ModuleBase::TITLE("Abfs","get_adjs");
 	const int it = GlobalC::ucell.iat2it[iat];
 	const int ia = GlobalC::ucell.iat2ia[iat];
-	const Vector3<double> &tau = GlobalC::ucell.atoms[it].tau[ia];
+	const ModuleBase::Vector3<double> &tau = GlobalC::ucell.atoms[it].tau[ia];
 	
 	std::map<size_t,std::vector<Vector3_Order<int>>> adjs;
 	GlobalC::GridD.Find_atom(GlobalC::ucell,  tau, it, ia );
@@ -415,8 +415,8 @@ std::map<size_t,std::vector<Abfs::Vector3_Order<int>>> Abfs::get_adjs( const siz
 		const size_t it_ad = GlobalC::GridD.getType(ad);
 		const size_t ia_ad = GlobalC::GridD.getNatom(ad);
 		const int iat_ad = GlobalC::ucell.itia2iat(it_ad,ia_ad);
-		const Vector3<int> box_ad = GlobalC::GridD.getBox(ad);
-		const Vector3<double> tau_ad = GlobalC::GridD.getAdjacentTau(ad);
+		const ModuleBase::Vector3<int> box_ad = GlobalC::GridD.getBox(ad);
+		const ModuleBase::Vector3<double> tau_ad = GlobalC::GridD.getAdjacentTau(ad);
 		
 		if( (tau-tau_ad).norm()*GlobalC::ucell.lat0 < GlobalC::ORB.Phi[it].getRcut()+GlobalC::ORB.Phi[it_ad].getRcut() )
 			adjs[iat_ad].push_back(box_ad);

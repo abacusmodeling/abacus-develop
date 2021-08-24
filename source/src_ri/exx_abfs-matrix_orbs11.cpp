@@ -203,7 +203,7 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matr
 		const size_t TA = co1.first;
 		for (size_t IA=0; IA!=GlobalC::ucell.atoms[TA].na; ++IA)
 		{
-			const Vector3<double> &tauA( GlobalC::ucell.atoms[TA].tau[IA] );
+			const ModuleBase::Vector3<double> &tauA( GlobalC::ucell.atoms[TA].tau[IA] );
 			GlobalC::GridD.Find_atom(tauA);
 
 			for( auto &co2 : co1.second )
@@ -221,7 +221,7 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matr
 								const size_t TB = co4.first;
 								if( TB != GlobalC::GridD.getType(ad) )
 									continue;
-								const Vector3<double> &tauB( GlobalC::GridD.getAdjacentTau(ad) );
+								const ModuleBase::Vector3<double> &tauB( GlobalC::GridD.getAdjacentTau(ad) );
 								const size_t IB = GlobalC::GridD.getNatom(ad);
 																					
 								for( auto &co5 : co4.second )
@@ -252,8 +252,8 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matr
 ModuleBase::matrix Exx_Abfs::Matrix_Orbs11::cal_overlap_matrix( 
 	const size_t TA, 
 	const size_t TB, 
-	const Vector3<double> &tauA,
-	const Vector3<double> &tauB, 
+	const ModuleBase::Vector3<double> &tauA,
+	const ModuleBase::Vector3<double> &tauB, 
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_r, 
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_c ) const
 {
@@ -306,14 +306,14 @@ gettimeofday( &t_start, NULL);
 		const size_t TA = co1.first;
 		for (size_t IA=0; IA!=GlobalC::ucell.atoms[TA].na; ++IA)
 		{
-			const Vector3<double> &tauA( GlobalC::ucell.atoms[TA].tau[IA] );
+			const ModuleBase::Vector3<double> &tauA( GlobalC::ucell.atoms[TA].tau[IA] );
 
 			for( const auto &co2 : co1.second )
 			{
 				const size_t TB = co2.first;
 				for (size_t IB=0; IB!=GlobalC::ucell.atoms[TB].na; ++IB)
 				{
-					const Vector3<double> &tauB( GlobalC::ucell.atoms[TB].tau[IB] );
+					const ModuleBase::Vector3<double> &tauB( GlobalC::ucell.atoms[TB].tau[IB] );
 
 					matrixes[TA][IA][TB][IB] = cal_overlap_matrix( TA, TB, tauA, tauB, index_r, index_c );
 				}

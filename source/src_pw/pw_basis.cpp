@@ -231,8 +231,8 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
             delete[] gdirect_global;
             delete[] gcar_global;
             gg_global = new double[cutgg_num_now];
-            gdirect_global = new Vector3<double>[cutgg_num_now];
-            gcar_global = new Vector3<double>[cutgg_num_now];
+            gdirect_global = new ModuleBase::Vector3<double>[cutgg_num_now];
+            gcar_global = new ModuleBase::Vector3<double>[cutgg_num_now];
 
 			//GlobalV::ofs_running << " setup |g|^2" << std::endl;
             PW_complement::get_total_pw(gg_global, gdirect_global, ggchg_start, ggchg_end,
@@ -325,12 +325,12 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
         ModuleBase::Memory::record("PW_complement","gg_global",ngmc_g,"double");
 
         delete[] gdirect_global;
-        gdirect_global = new Vector3<double>[ngmc_g];// indices of G vectors
-        ModuleBase::Memory::record("PW_complement","gdirect_global",ngmc_g,"Vector3<double>");
+        gdirect_global = new ModuleBase::Vector3<double>[ngmc_g];// indices of G vectors
+        ModuleBase::Memory::record("PW_complement","gdirect_global",ngmc_g,"ModuleBase::Vector3<double>");
 
         delete[] gcar_global;
-        gcar_global = new Vector3<double>[ngmc_g];
-        ModuleBase::Memory::record("PW_complement","gcar",ngmc_g,"Vector3<double>");
+        gcar_global = new ModuleBase::Vector3<double>[ngmc_g];
+        ModuleBase::Memory::record("PW_complement","gcar",ngmc_g,"ModuleBase::Vector3<double>");
 
         PW_complement::get_total_pw(gg_global, gdirect_global, 0.0, ggchg, ncx, ncy, ncz, Ucell->GGT, ngmc_g);
         PW_complement::setup_GVectors(Ucell->G, ngmc_g, gg_global, gdirect_global, gcar_global);
@@ -550,8 +550,8 @@ void PW_Basis::divide_fft_grid(void)
     delete[] gg;
     this->ig2fftc = new int[ngmc];
     this->ig2fftw = new int[ngmw];
-    this->gdirect = new Vector3<double>[ngmc];
-    this->gcar  = new Vector3<double>[ngmc];
+    this->gdirect = new ModuleBase::Vector3<double>[ngmc];
+    this->gcar  = new ModuleBase::Vector3<double>[ngmc];
     this->gg = new double[ngmc];
     return;
 }
@@ -750,12 +750,12 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
     for (int it=0; it<Ucell->ntype; it++)
     {
 		const int na = Ucell->atoms[it].na;
-		const Vector3<double> * const tau = Ucell->atoms[it].tau;
+		const ModuleBase::Vector3<double> * const tau = Ucell->atoms[it].tau;
 
 		#pragma omp parallel for schedule(static)
         for (int ig=0; ig<this->ngmc; ig++)
         {
-			const Vector3<double> gcar_ig = gcar[ig];
+			const ModuleBase::Vector3<double> gcar_ig = gcar[ig];
             std::complex<double> sum_phase = ZERO;
             for (int ia=0; ia<na; ia++)
             {
@@ -777,7 +777,7 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
     ModuleBase::Memory::record("PW_Basis","eigts2",Ucell->nat*2*this->ncy + 1,"complexmatrix");
     ModuleBase::Memory::record("PW_Basis","eigts3",Ucell->nat*2*this->ncz + 1,"complexmatrix");
 
-    Vector3<double> gtau;
+    ModuleBase::Vector3<double> gtau;
     int inat = 0;
     for (i = 0; i < Ucell->ntype; i++)
     {
@@ -1075,8 +1075,8 @@ void PW_Basis::update_gvectors(std::ofstream &runlog, const UnitCell &Ucell_in)
             int cutgg_num_now2 = cutgg_num_table[ii];
             gg_global0 = new double[cutgg_num_now2];
             gg_global = new double[cutgg_num_now2];
-            gdirect_global = new Vector3<double>[cutgg_num_now2];
-            gcar_global = new Vector3<double>[cutgg_num_now2];
+            gdirect_global = new ModuleBase::Vector3<double>[cutgg_num_now2];
+            gcar_global = new ModuleBase::Vector3<double>[cutgg_num_now2];
 
             PW_complement::get_total_pw_after_vc(gg_global0, gg_global, gdirect_global, ggchg_start, ggchg_end,
                     ncx, ncy, ncz, Ucell->GGT, Ucell->GGT0, ngmc_g);

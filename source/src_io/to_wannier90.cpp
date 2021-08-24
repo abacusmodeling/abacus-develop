@@ -161,7 +161,7 @@ void toWannier90::read_nnkp()
 		if( (GlobalV::NSPIN == 1 || GlobalV::NSPIN == 4) && numkpt_nnkp != GlobalC::kv.nkstot ) ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
 		else if(GlobalV::NSPIN == 2 && numkpt_nnkp != (GlobalC::kv.nkstot/2))	ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
 	
-		Vector3<double> *kpoints_direct_nnkp = new Vector3<double>[numkpt_nnkp];
+		ModuleBase::Vector3<double> *kpoints_direct_nnkp = new ModuleBase::Vector3<double>[numkpt_nnkp];
 		for(int ik = 0; ik < numkpt_nnkp; ik++)
 		{
 			nnkp_read >> kpoints_direct_nnkp[ik].x >> kpoints_direct_nnkp[ik].y >> kpoints_direct_nnkp[ik].z;
@@ -176,7 +176,7 @@ void toWannier90::read_nnkp()
 		delete[] kpoints_direct_nnkp;
 		
 		//�ж�gamma only
-		Vector3<double> my_gamma_point(0.0,0.0,0.0);
+		ModuleBase::Vector3<double> my_gamma_point(0.0,0.0,0.0);
 		//if( (GlobalC::kv.nkstot == 1) && (GlobalC::kv.kvec_d[0] == my_gamma_point) ) gamma_only_wannier = true;
 	} 
 	
@@ -193,12 +193,12 @@ void toWannier90::read_nnkp()
 				ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","wannier number is lower than 0");
 			}
 			
-			R_centre = new Vector3<double>[num_wannier];
+			R_centre = new ModuleBase::Vector3<double>[num_wannier];
 			L = new int[num_wannier];
 			m = new int[num_wannier];
 			rvalue = new int[num_wannier];
-			Vector3<double>* z_axis = new Vector3<double>[num_wannier];
-			Vector3<double>* x_axis = new Vector3<double>[num_wannier];
+			ModuleBase::Vector3<double>* z_axis = new ModuleBase::Vector3<double>[num_wannier];
+			ModuleBase::Vector3<double>* x_axis = new ModuleBase::Vector3<double>[num_wannier];
 			alfa = new double[num_wannier];
 			
 			
@@ -671,7 +671,7 @@ void toWannier90::cal_Mmn(const ModuleBase::ComplexMatrix *wfc_pw)
 	{
 		for(int ib = 0; ib < nntot; ib++)
 		{
-			Vector3<double> phase_G = nncell[0][ib];
+			ModuleBase::Vector3<double> phase_G = nncell[0][ib];
 			for(int m = 0; m < GlobalV::NBANDS; m++)
 			{
 				if(!tag_cal_band[m]) continue;
@@ -693,7 +693,7 @@ void toWannier90::cal_Mmn(const ModuleBase::ComplexMatrix *wfc_pw)
 		{
 			int ikb = nnlist[ik][ib];             // ik+b : ik�Ľ���k��	
 			
-			Vector3<double> phase_G = nncell[ik][ib];
+			ModuleBase::Vector3<double> phase_G = nncell[ik][ib];
 			
 			if(GlobalV::MY_RANK == 0)
 			{
@@ -777,7 +777,7 @@ void toWannier90::produce_trial_in_pw(const int &ik, ModuleBase::ComplexMatrix &
 	bs6 = 1.0/sqrt(6.0);
 	bs12 = 1.0/sqrt(12.0);
 	
-	Vector3<double> *gk = new Vector3<double>[npw];
+	ModuleBase::Vector3<double> *gk = new ModuleBase::Vector3<double>[npw];
 	for(int ig = 0; ig < npw; ig++)
 	{
 		gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);  // k+Gʸ��
@@ -1336,7 +1336,7 @@ void toWannier90::produce_trial_in_pw(const int &ik, ModuleBase::ComplexMatrix &
 // ע����������Lֵ�����Ǵ��ڵ���0��
 void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orbital_L, const int orbital_m, ModuleBase::matrix &ylm, 
 										ModuleBase::matrix &dr, ModuleBase::matrix &r, ModuleBase::matrix &psir, const int mesh_r, 
-										Vector3<double> *gk, const int npw, ModuleBase::ComplexMatrix &trial_orbitals_k)
+										ModuleBase::Vector3<double> *gk, const int npw, ModuleBase::ComplexMatrix &trial_orbitals_k)
 {
 	//���㾶������ĳ��k���µ��ռ��ͶӰ
 	double *psik = new double[npw];
@@ -1467,7 +1467,7 @@ void toWannier90::integral(const int meshr, const double *psir, const double *r,
 }
 
 
-void toWannier90::ToRealSpace(const int &ik, const int &ib, const ModuleBase::ComplexMatrix *evc, std::complex<double> *psir, const Vector3<double> G)
+void toWannier90::ToRealSpace(const int &ik, const int &ib, const ModuleBase::ComplexMatrix *evc, std::complex<double> *psir, const ModuleBase::Vector3<double> G)
 {
 	// (1) set value
 	std::complex<double> *phase = GlobalC::UFFT.porter;
@@ -1523,7 +1523,7 @@ std::complex<double> toWannier90::unkdotb(const std::complex<double> *psir, cons
 	return result;
 }
 
-std::complex<double> toWannier90::unkdotkb(const int &ik, const int &ikb, const int &iband_L, const int &iband_R, const Vector3<double> G, const ModuleBase::ComplexMatrix *wfc_pw)
+std::complex<double> toWannier90::unkdotkb(const int &ik, const int &ikb, const int &iband_L, const int &iband_R, const ModuleBase::Vector3<double> G, const ModuleBase::ComplexMatrix *wfc_pw)
 {
 	// (1) set value
 	std::complex<double> result(0.0,0.0);
@@ -1576,7 +1576,7 @@ std::complex<double> toWannier90::unkdotkb(const int &ik, const int &ikb, const 
 	
 }
 
-std::complex<double> toWannier90::gamma_only_cal(const int &ib_L, const int &ib_R, const ModuleBase::ComplexMatrix *wfc_pw, const Vector3<double> G)
+std::complex<double> toWannier90::gamma_only_cal(const int &ib_L, const int &ib_R, const ModuleBase::ComplexMatrix *wfc_pw, const ModuleBase::Vector3<double> G)
 {
 	std::complex<double> *phase = new std::complex<double>[GlobalC::pw.nrxx];
 	std::complex<double> *psir = new std::complex<double>[GlobalC::pw.nrxx];

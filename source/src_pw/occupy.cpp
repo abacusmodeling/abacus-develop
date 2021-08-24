@@ -839,7 +839,7 @@ void Occupy::tweights(const int nks,const int nspin,const int nband,const double
 } // end subroutine tweights
 
 
-double Occupy::wsweight(const Vector3<double> &r, Vector3<double> *rws,const int nrws)
+double Occupy::wsweight(const ModuleBase::Vector3<double> &r, ModuleBase::Vector3<double> *rws,const int nrws)
 {
     //============================================================
     // integer ir, nreq, nrws

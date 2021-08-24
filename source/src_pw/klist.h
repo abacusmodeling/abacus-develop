@@ -8,9 +8,9 @@ class K_Vectors
 {
 public:
 
-    Vector3<double> *kvec_c;		// Cartesian coordinates of k points
-    Vector3<double> *kvec_d;		// Direct coordinates of k points
-    Vector3<double> *kvec_d_ibz;	// ibz Direct coordinates of k points
+    ModuleBase::Vector3<double> *kvec_c;		// Cartesian coordinates of k points
+    ModuleBase::Vector3<double> *kvec_d;		// Direct coordinates of k points
+    ModuleBase::Vector3<double> *kvec_d_ibz;	// ibz Direct coordinates of k points
 
     double *wk;						// wk, weight of k points
     double *wk_ibz;					// ibz kpoint wk ,weight of k points

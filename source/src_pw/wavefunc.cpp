@@ -247,7 +247,7 @@ void wavefunc::LCAO_in_pw_k(const int &ik, ModuleBase::ComplexMatrix &wvf)
 }
 
 
-void wavefunc::LCAO_in_pw_k_q(const int &ik, ModuleBase::ComplexMatrix &wvf, Vector3<double> q)   // pengfei  2016-11-23
+void wavefunc::LCAO_in_pw_k_q(const int &ik, ModuleBase::ComplexMatrix &wvf, ModuleBase::Vector3<double> q)   // pengfei  2016-11-23
 {
 	ModuleBase::TITLE("wavefunc","LCAO_in_pw_k_q");
 	ModuleBase::timer::tick("wavefunc","LCAO_in_pw_k_q");
@@ -372,13 +372,13 @@ void wavefunc::wfcinit_k(void)
 		GlobalC::chi0_hilbert.Parallel_G();    // for parallel: make sure in each core, G(all_gcars(GlobalC::pw.gcars))  are the same
 		
 		// iw1->i, iw2->j, R store the positions of the neighbor unitcells that |i,0> and |j,R> have overlaps
-		R = new Vector3<int>** [GlobalV::NLOCAL];
+		R = new ModuleBase::Vector3<int>** [GlobalV::NLOCAL];
 		for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 		{
-			R[iw1] = new Vector3<int>* [GlobalV::NLOCAL];
+			R[iw1] = new ModuleBase::Vector3<int>* [GlobalV::NLOCAL];
 			for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 			{
-				R[iw1][iw2] = new Vector3<int>[GlobalC::chi0_hilbert.lcao_box[0]*GlobalC::chi0_hilbert.lcao_box[1]*GlobalC::chi0_hilbert.lcao_box[2]];
+				R[iw1][iw2] = new ModuleBase::Vector3<int>[GlobalC::chi0_hilbert.lcao_box[0]*GlobalC::chi0_hilbert.lcao_box[1]*GlobalC::chi0_hilbert.lcao_box[2]];
 			}
 		}
 		
@@ -433,8 +433,8 @@ void wavefunc::wfcinit_k(void)
 		
 		ModuleBase::ComplexMatrix Mat;
 		Mat.create(GlobalV::NLOCAL,npwx);
-		Vector3<double> qg; // q+G
-		Vector3<double> gkqg, Rcar[GlobalV::NLOCAL][GlobalV::NLOCAL][NR];  // k+G+qg, Rcartesian
+		ModuleBase::Vector3<double> qg; // q+G
+		ModuleBase::Vector3<double> gkqg, Rcar[GlobalV::NLOCAL][GlobalV::NLOCAL][NR];  // k+G+qg, Rcartesian
 		
 		for(int iw1=0;iw1<GlobalV::NLOCAL; iw1++)
 		{
@@ -635,7 +635,7 @@ void wavefunc::wfcinit_k(void)
 int wavefunc::get_R(int ix, int iy, int iz)   // pengfei 2016-11-23
 {
 	int count;
-	Vector3<double> r,r1,r2;
+	ModuleBase::Vector3<double> r,r1,r2;
 
 	for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 	{

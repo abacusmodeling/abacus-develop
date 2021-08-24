@@ -44,10 +44,10 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 	double* rhotmp2 = nullptr;
 	std::complex<double>* rhogsum1 = nullptr;
 	std::complex<double>* rhogsum2 = nullptr;
-	Vector3<double>* gdr1 = nullptr;
-	Vector3<double>* gdr2 = nullptr;
-	Vector3<double>* h1 = nullptr;
-	Vector3<double>* h2 = nullptr;
+	ModuleBase::Vector3<double>* gdr1 = nullptr;
+	ModuleBase::Vector3<double>* gdr2 = nullptr;
+	ModuleBase::Vector3<double>* h1 = nullptr;
+	ModuleBase::Vector3<double>* h2 = nullptr;
 	double* neg = nullptr;
 	double** vsave = nullptr;
 	double** vgg = nullptr;
@@ -61,8 +61,8 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 	for(int ir=0; ir<GlobalC::pw.nrxx; ir++) rhotmp1[ir] = GlobalC::CHR.rho[0][ir] + fac * GlobalC::CHR.rho_core[ir];
 	for(int ig=0; ig<GlobalC::pw.ngmc; ig++) rhogsum1[ig] = GlobalC::CHR.rhog[0][ig] + fac * GlobalC::CHR.rhog_core[ig];
 
-	gdr1 = new Vector3<double>[GlobalC::pw.nrxx];
-	h1 = new Vector3<double>[GlobalC::pw.nrxx];
+	gdr1 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
+	h1 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
 	
 	GGA_PW::grad_rho( rhogsum1 , gdr1 );
 
@@ -77,8 +77,8 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++) rhotmp2[ir] = GlobalC::CHR.rho[1][ir] + fac * GlobalC::CHR.rho_core[ir];
 		for(int ig=0; ig<GlobalC::pw.ngmc; ig++) rhogsum2[ig] = GlobalC::CHR.rhog[1][ig] + fac * GlobalC::CHR.rhog_core[ig];
 
-		gdr2 = new Vector3<double>[GlobalC::pw.nrxx];
-		h2 = new Vector3<double>[GlobalC::pw.nrxx];
+		gdr2 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
+		h2 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
 		
 		GGA_PW::grad_rho( rhogsum2 , gdr2 );
 	}
@@ -119,8 +119,8 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 			rhogsum1[ig] += fac * GlobalC::CHR.rhog_core[ig];
 		}
 
-		gdr2 = new Vector3<double>[GlobalC::pw.nrxx];
-		h2 = new Vector3<double>[GlobalC::pw.nrxx];
+		gdr2 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
+		h2 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
 
 		GGA_PW::grad_rho( rhogsum1 , gdr1 );
 		GGA_PW::grad_rho( rhogsum2 , gdr2 );
@@ -388,7 +388,7 @@ void GGA_PW::grad_wfc( const std::complex<double> *rhog, const int ik, std::comp
 	return;
 }
 
-void GGA_PW::grad_rho( const std::complex<double> *rhog, Vector3<double> *gdr )
+void GGA_PW::grad_rho( const std::complex<double> *rhog, ModuleBase::Vector3<double> *gdr )
 {
 	std::complex<double> *gdrtmpg = new std::complex<double>[GlobalC::pw.ngmc];
 	ModuleBase::GlobalFunc::ZEROS(gdrtmpg, GlobalC::pw.ngmc);
@@ -434,7 +434,7 @@ void GGA_PW::grad_rho( const std::complex<double> *rhog, Vector3<double> *gdr )
 }
 
 
-void GGA_PW::grad_dot(const Vector3<double> *h, double *dh)
+void GGA_PW::grad_dot(const ModuleBase::Vector3<double> *h, double *dh)
 {
 	std::complex<double> *aux = new std::complex<double>[GlobalC::pw.nrxx];
 	std::complex<double> *gaux = new std::complex<double>[GlobalC::pw.ngmc];

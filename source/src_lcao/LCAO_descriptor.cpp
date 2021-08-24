@@ -199,8 +199,8 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
     double olm[3] = {0.0, 0.0, 0.0};
 
     //\sum{T} e**{ikT} <\phi_{ia}|d\phi_{k\beta}(T)>	//???
-    Vector3<double> tau1, tau2, dtau;
-    Vector3<double> dtau1, dtau2, tau0;
+    ModuleBase::Vector3<double> tau1, tau2, dtau;
+    ModuleBase::Vector3<double> dtau1, dtau2, tau0;
     for (int T1 = 0; T1 < GlobalC::ucell.ntype; ++T1)
     {
         Atom *atom1 = &GlobalC::ucell.atoms[T1];

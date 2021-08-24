@@ -95,7 +95,7 @@ class Stress_Func
 	void dylmr2 (
 			const int nylm,
 			const int ngy,
-			Vector3<double> *gk,
+			ModuleBase::Vector3<double> *gk,
 			ModuleBase::matrix &dylm,
 			const int ipol);	//used in get_dvnl1()
 	void get_dvnl2(

@@ -9,7 +9,7 @@ Magnetism::Magnetism()
     this->abs_magnetization = 0.0;
     this->start_magnetization = new double[10];
 
-	m_loc_ = new Vector3<double> [1];
+	m_loc_ = new ModuleBase::Vector3<double> [1];
 	angle1_ = new double[1];
 	angle2_ = new double[1];
 }
@@ -182,7 +182,7 @@ void Magnetism::cal_ux(const int ntype)
 	return;
 }
 
-bool Magnetism::judge_parallel(double a[3], Vector3<double> b)
+bool Magnetism::judge_parallel(double a[3], ModuleBase::Vector3<double> b)
 {
    bool jp=false;
    double cross;

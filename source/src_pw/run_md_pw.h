@@ -18,7 +18,7 @@ public:
 
     void md_ions_pw();
     void md_cells_pw();
-    void callInteraction_PW(const int& numIon, Vector3<double>* force, ModuleBase::matrix& stress_pw);
+    void callInteraction_PW(const int& numIon, ModuleBase::Vector3<double>* force, ModuleBase::matrix& stress_pw);
 
 private:
     Electrons elec;
@@ -28,7 +28,7 @@ private:
     Charge_Extra CE;
     Lattice_Change_Methods LCM;
 
-    Vector3<double> *force;  //force of each atom
+    ModuleBase::Vector3<double> *force;  //force of each atom
 	ModuleBase::matrix stress;           //stress for this lattice
 };
 

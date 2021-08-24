@@ -56,7 +56,7 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<ModuleBase::Compl
 	
 	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM3::K_to_R");
 	const double SPIN_multiple = 0.5*GlobalV::NSPIN;
-	const Abfs::Vector3_Order<int> Born_von_Karman_period = Vector3<int>{GlobalC::kv.nmp[0],GlobalC::kv.nmp[1],GlobalC::kv.nmp[2]};
+	const Abfs::Vector3_Order<int> Born_von_Karman_period = ModuleBase::Vector3<int>{GlobalC::kv.nmp[0],GlobalC::kv.nmp[1],GlobalC::kv.nmp[2]};
 	const std::vector<Abfs::Vector3_Order<int>> supercell_boxes = Abfs::get_Born_von_Karmen_boxes(Born_von_Karman_period);
 	
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> DR_a2D(GlobalV::NSPIN);

@@ -22,12 +22,12 @@ MD_basic::MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     step_=0;
 //	ucell.latvec=ucell.latvec;
 
-    vel=new Vector3<double>[ucell.nat]; 
-	cart_change=new Vector3<double>[ucell.nat];
-	tauDirectChange=new Vector3<double>[ucell.nat];
+    vel=new ModuleBase::Vector3<double>[ucell.nat]; 
+	cart_change=new ModuleBase::Vector3<double>[ucell.nat];
+	tauDirectChange=new ModuleBase::Vector3<double>[ucell.nat];
 	allmass=new double[ucell.nat];
-	ionmbl=new Vector3<int>[ucell.nat];
-	//force=new Vector3<double>[ucell.nat];
+	ionmbl=new ModuleBase::Vector3<int>[ucell.nat];
+	//force=new ModuleBase::Vector3<double>[ucell.nat];
 
     nfrozen_ = mdf.getMassMbl(ucell, allmass, ionmbl);
     mdf.InitVelocity(ucell.nat, temperature_, fundamentalTime, allmass, vel);
@@ -121,7 +121,7 @@ MD_basic::~MD_basic()
     delete []allmass;
 }
 
-void MD_basic::runNVT(int step1, double potential, Vector3<double> *force, const ModuleBase::matrix &stress)
+void MD_basic::runNVT(int step1, double potential, ModuleBase::Vector3<double> *force, const ModuleBase::matrix &stress)
 {
 //------------------------------------------------------------------------------
 // DESCRIPTION:
@@ -279,7 +279,7 @@ void MD_basic::runNVT(int step1, double potential, Vector3<double> *force, const
     return;
 }
 
-void MD_basic::runNVE(int step1, double potential, Vector3<double> *force, const ModuleBase::matrix &stress)
+void MD_basic::runNVE(int step1, double potential, ModuleBase::Vector3<double> *force, const ModuleBase::matrix &stress)
 {
 //-------------------------------------------------------------------------------
 // Adiabatic ensemble 
@@ -404,7 +404,7 @@ void MD_basic::runNVE(int step1, double potential, Vector3<double> *force, const
     return;
 }
 
-bool MD_basic::runFIRE(int step1, double potential, Vector3<double> *force, const ModuleBase::matrix &stress)
+bool MD_basic::runFIRE(int step1, double potential, ModuleBase::Vector3<double> *force, const ModuleBase::matrix &stress)
 {
 //-------------------------------------------------------------------------------
 // REFERENCES:
@@ -565,7 +565,7 @@ bool MD_basic::runFIRE(int step1, double potential, Vector3<double> *force, cons
 }
 
 //update velocities of ions for half MD step
-void MD_basic::update_half_velocity(Vector3<double> *force)
+void MD_basic::update_half_velocity(ModuleBase::Vector3<double> *force)
 {
     for(int  ii=0;ii<ucell.nat;ii++){ 
         vel[ii] = vel[ii] + force[ii]/allmass[ii]*mdp.dt/2.0;
@@ -622,7 +622,7 @@ void MD_basic::outStressMD(const ModuleBase::matrix& stress, const double& twice
 //turn cartesian coordinate changes to direct changes
 void MD_basic::getTaudUpdate()
 {
-    Vector3<double> fracStep;
+    ModuleBase::Vector3<double> fracStep;
 	for(int  ii=0;ii<ucell.nat;ii++)
     { 
 		ModuleBase::Mathzone::Cartesian_to_Direct(cart_change[ii].x,cart_change[ii].y,cart_change[ii].z,

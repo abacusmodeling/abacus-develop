@@ -31,7 +31,7 @@ public:
 	void init_radial_table();
 	void init_radial_table( const std::set<size_t> &radials );						// unit: Bohr/MOT.dr
 	double cal_overlap(
-		const Vector3<double> &RA, const Vector3<double> &RB,					// unit: Bohr
+		const ModuleBase::Vector3<double> &RA, const ModuleBase::Vector3<double> &RB,					// unit: Bohr
 		const int &mA1, const int &mA2, const int &mB1, const int &mB2) const;
 		
 protected:								// Peize Lin test 2016-10-07

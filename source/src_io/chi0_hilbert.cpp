@@ -433,23 +433,23 @@ void Chi0_hilbert::Chi()
 			ifsn >> NR;
 			std::cout << "NR in = "<<NR << std::endl;
 			
-			R = new Vector3<int>** [GlobalV::NLOCAL];
+			R = new ModuleBase::Vector3<int>** [GlobalV::NLOCAL];
 			for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 			{
-				R[iw1] = new Vector3<int>* [GlobalV::NLOCAL];
+				R[iw1] = new ModuleBase::Vector3<int>* [GlobalV::NLOCAL];
 				for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 				{
-					R[iw1][iw2] = new Vector3<int>[NR];
+					R[iw1][iw2] = new ModuleBase::Vector3<int>[NR];
 				}
 			}
 			
-			Rcar = new Vector3<double>** [GlobalV::NLOCAL];
+			Rcar = new ModuleBase::Vector3<double>** [GlobalV::NLOCAL];
 			for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 			{
-				Rcar[iw1] = new Vector3<double>* [GlobalV::NLOCAL];
+				Rcar[iw1] = new ModuleBase::Vector3<double>* [GlobalV::NLOCAL];
 				for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 				{
-					Rcar[iw1][iw2] = new Vector3<double>[NR];
+					Rcar[iw1][iw2] = new ModuleBase::Vector3<double>[NR];
 				}
 			}
 			
@@ -972,7 +972,7 @@ void Chi0_hilbert::Parallel_G()
 	G_r = new double[GlobalC::pw.ngmc_g];
 	Gvec_core = new double[3*GlobalC::pw.ngmc];
 	Gvec = new double[3*GlobalC::pw.ngmc_g];
-	all_gcar = new Vector3<double>[GlobalC::pw.ngmc_g];
+	all_gcar = new ModuleBase::Vector3<double>[GlobalC::pw.ngmc_g];
 	flag = new int[GlobalC::pw.ngmc_g];
 	
 	for(int i=0;i<GlobalC::pw.ngmc_g;i++)
@@ -1128,7 +1128,7 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 {
 	ModuleBase::TITLE("Chi0_hilbert","Cal_b_lcao");
 	double arg;
-	Vector3<double> qk;
+	ModuleBase::Vector3<double> qk;
 	qk = GlobalC::kv.kvec_c[iq] + GlobalC::kv.kvec_c[ik];
 	//std::cout <<"qk = "<<qk.x<<" "<<qk.y<<" "<<qk.z<<std::endl;
 	
@@ -1255,11 +1255,11 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 {
 	ModuleBase::TITLE("Chi0_hilbert","Cal_b");
-	Vector3<double> qk;
+	ModuleBase::Vector3<double> qk;
 	qk = GlobalC::kv.kvec_c[iq] + GlobalC::kv.kvec_c[ik];
 	//std::cout <<"qk = "<<qk.x<<" "<<qk.y<<" "<<qk.z<<std::endl;
 	double phase_x, phase_xy, phase_xyz;
-	Vector3<double> q = GlobalC::kv.kvec_d[iq];
+	ModuleBase::Vector3<double> q = GlobalC::kv.kvec_d[iq];
 	std::complex<double> exp_tmp;
 	
 	if(ispin == 0)
@@ -1357,12 +1357,12 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 /*void Chi0_hilbert::Cal_b( int iq, int ik, int iqk)
 {
 
-        Vector3<double> qk;
+        ModuleBase::Vector3<double> qk;
         qk = GlobalC::kv.kvec_c[iq] + GlobalC::kv.kvec_c[ik];
         //std::cout <<"qk = "<<qk.x<<" "<<qk.y<<" "<<qk.z<<std::endl;
 
         double phase_x, phase_xy, phase_xyz;
-        Vector3<double> q = GlobalC::kv.kvec_d[iq];
+        ModuleBase::Vector3<double> q = GlobalC::kv.kvec_d[iq];
         std::cout <<"q_in = "<<q.x<<" "<<q.y<<" "<<q.z<<std::endl;
         std::complex<double> exp_tmp;
         Cal_Psi1(ik);

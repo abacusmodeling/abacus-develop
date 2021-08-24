@@ -74,7 +74,7 @@ class Chi0_hilbert
 	void C_inverse(int n, std::complex<double>** a);
 	void plot_chi0(int iq);
 	
-	Vector3<double> *all_gcar;
+	ModuleBase::Vector3<double> *all_gcar;
 	std::complex<double> **chi0;
 	std::complex<double> **chi;
 
@@ -111,8 +111,8 @@ private:
 	std::complex<double> **rpa1;
 	std::complex<double> **chi_para;
 
-	Vector3<int> ***R; 
-	Vector3<double> ***Rcar; 
+	ModuleBase::Vector3<int> ***R; 
+	ModuleBase::Vector3<double> ***Rcar; 
 	int ** Rmax;
 	int NR;
 	std::complex<double> ****overlap;

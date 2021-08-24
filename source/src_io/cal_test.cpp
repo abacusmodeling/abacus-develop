@@ -143,7 +143,7 @@ int Cal_Test::cal_np(const double &ggcut, const int &n1, const int &n2, const in
 		{
 			for (int k = -ibox[2]; k <= ibox[2]; k++)
 			{
-				Vector3<double> f(i,j,k);
+				ModuleBase::Vector3<double> f(i,j,k);
 				// g2= |f|^2 in the unit of (2Pi/lat0)^2
 				double g2 = f * (GlobalC::ucell.GGT * f);
 

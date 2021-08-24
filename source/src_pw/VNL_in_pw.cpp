@@ -154,7 +154,7 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 	const int x1= (lmaxkb + 1)*(lmaxkb + 1);
 
 	ModuleBase::matrix ylm(x1, npw);
-	Vector3<double> *gk = new Vector3<double>[npw];
+	ModuleBase::Vector3<double> *gk = new ModuleBase::Vector3<double>[npw];
 	for (ig = 0;ig < npw;ig++) 
 	{
 		gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
@@ -448,7 +448,7 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 	const int x1= (lmaxkb + 2)*(lmaxkb + 2);
 
 	ModuleBase::matrix ylm(x1, npw);
-	Vector3<double> *gk = new Vector3<double>[npw];
+	ModuleBase::Vector3<double> *gk = new ModuleBase::Vector3<double>[npw];
 	for (ig = 0;ig < npw;ig++) 
 	{
 		gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);

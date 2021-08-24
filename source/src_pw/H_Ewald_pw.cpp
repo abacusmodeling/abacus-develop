@@ -29,8 +29,8 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
     double ewaldr=0.0;
     double ewalds=0.0;
 
-    Vector3<double> dtau ;
-    Vector3<double> *r;
+    ModuleBase::Vector3<double> dtau ;
+    ModuleBase::Vector3<double> *r;
     double *r2;
     double rmax=0.0;
     double rr=0.0;
@@ -48,7 +48,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
     // used to optimize alpha
 
 	if(GlobalV::test_energy)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"mxr",mxr);
-    r  = new Vector3<double>[mxr];
+    r  = new ModuleBase::Vector3<double>[mxr];
     r2 = new double[mxr];
     int* irr = new int[mxr];
 
@@ -202,12 +202,12 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 
 
 void H_Ewald_pw::rgen(
-    const Vector3<double> &dtau,
+    const ModuleBase::Vector3<double> &dtau,
     const double &rmax,
     int *irr,
     const Matrix3 &latvec,
     const Matrix3 &G,
-    Vector3<double> *r,
+    ModuleBase::Vector3<double> *r,
     double *r2,
     int &nrm)
 {
@@ -245,8 +245,8 @@ void H_Ewald_pw::rgen(
     // index of swapping
     // used for swapping
 
-    Vector3<double> t;
-    Vector3<double> t1;
+    ModuleBase::Vector3<double> t;
+    ModuleBase::Vector3<double> t1;
     double tt=0.0;
     double bg1[3]={0,0,0};
     // buffer contains the actual r
@@ -293,7 +293,7 @@ void H_Ewald_pw::rgen(
         {
             for (k = -nm3; k <= nm3; k++)
             {
-                Vector3<double> t1(i,j,k);
+                ModuleBase::Vector3<double> t1(i,j,k);
 //				out.printV3(t1);
                 t = t1 * latvec; // bug ! first '*latvec', second '-dtau'.
                 t = t - dtau; // bug ! t = t - dtau, not t1 = t1 -tau;

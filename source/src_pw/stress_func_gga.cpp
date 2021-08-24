@@ -38,8 +38,8 @@ void Stress_Func::stress_gga(ModuleBase::matrix& sigma)
 	double* rhotmp2;
 	std::complex<double>* rhogsum1;
 	std::complex<double>* rhogsum2;
-	Vector3<double>* gdr1;
-	Vector3<double>* gdr2;
+	ModuleBase::Vector3<double>* gdr1;
+	ModuleBase::Vector3<double>* gdr2;
  
 	rhotmp1 = new double[GlobalC::pw.nrxx];
 	rhogsum1 = new std::complex<double>[GlobalC::pw.ngmc];
@@ -47,7 +47,7 @@ void Stress_Func::stress_gga(ModuleBase::matrix& sigma)
 	ModuleBase::GlobalFunc::ZEROS(rhogsum1, GlobalC::pw.ngmc);
 	for(int ir=0; ir<GlobalC::pw.nrxx; ir++) rhotmp1[ir] = GlobalC::CHR.rho[0][ir] + fac * GlobalC::CHR.rho_core[ir];
 	for(int ig=0; ig<GlobalC::pw.ngmc; ig++) rhogsum1[ig] = GlobalC::CHR.rhog[0][ig] + fac * GlobalC::CHR.rhog_core[ig];
-	gdr1 = new Vector3<double>[GlobalC::pw.nrxx];
+	gdr1 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
 	ModuleBase::GlobalFunc::ZEROS(gdr1, GlobalC::pw.nrxx);
 
 	GGA_PW::grad_rho( rhogsum1 , gdr1 );
@@ -67,7 +67,7 @@ void Stress_Func::stress_gga(ModuleBase::matrix& sigma)
 			rhogsum2[ig] = GlobalC::CHR.rhog[1][ig] + fac * GlobalC::CHR.rhog_core[ig];
 		}
 		
-		gdr2 = new Vector3<double>[GlobalC::pw.nrxx];
+		gdr2 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
 		ModuleBase::GlobalFunc::ZEROS(gdr2, GlobalC::pw.nrxx);
 
 		GGA_PW::grad_rho( rhogsum2 , gdr2 );

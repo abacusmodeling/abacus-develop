@@ -132,7 +132,7 @@ void ORB_gaunt_table::init_Ylm_Gaunt
 
 	//initialization of ylm_map
 
-	Vector3<double> g_gaunt[256];
+	ModuleBase::Vector3<double> g_gaunt[256];
 
 	this->Ylm_Gaunt.create(nlm , 256);
 
@@ -142,7 +142,7 @@ void ORB_gaunt_table::init_Ylm_Gaunt
 		{
 			const double theta = ((s1 + e1) + (e1 - s1) * absc[i]) / 2;
 			const double phi = ((s2 + e2) + (e2 - s2) * absc[j]) / 2;
-			Vector3<double> u(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));
+			ModuleBase::Vector3<double> u(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));
 			g_gaunt[16*i+j] = u;
 		}
 	}

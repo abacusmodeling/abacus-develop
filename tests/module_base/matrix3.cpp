@@ -8,7 +8,7 @@ protected:
 	Matrix3 matrix_a, matrix_a1, matrix_b;
 	Matrix3 get_random_matrix3()
 	{
-		vector<double> v(9);
+		std::vector<double> v(9);
 		for (auto &i : v)
 		{
 			i = std::rand();

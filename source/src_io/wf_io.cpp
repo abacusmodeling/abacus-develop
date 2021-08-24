@@ -53,7 +53,7 @@ void WF_io::write_wfc(const std::string &fn, const ModuleBase::ComplexMatrix *ps
     return;
 }
 
-void WF_io::write_wfc2(const std::string &fn, const ModuleBase::ComplexMatrix *psi, const Vector3<double> *gkk)
+void WF_io::write_wfc2(const std::string &fn, const ModuleBase::ComplexMatrix *psi, const ModuleBase::Vector3<double> *gkk)
 {
     if (GlobalV::test_wf) ModuleBase::TITLE("WF_io","write_wfc2"); 
 

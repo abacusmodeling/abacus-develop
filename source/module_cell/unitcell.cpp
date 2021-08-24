@@ -302,7 +302,7 @@ void UnitCell::update_pos_tau(const double* pos)
     return;
 }
 
-void UnitCell::update_pos_taud(const Vector3<double>* posd_in)
+void UnitCell::update_pos_taud(const ModuleBase::Vector3<double>* posd_in)
 {
     int iat = 0;
     for(int it = 0;it < this->ntype;it++)

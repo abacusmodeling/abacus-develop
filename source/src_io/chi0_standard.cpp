@@ -303,7 +303,7 @@ void Chi0_standard::Parallel_G()
 	G_r = new double[GlobalC::pw.ngmc_g];
 	Gvec_core = new double[3*GlobalC::pw.ngmc];
 	Gvec = new double[3*GlobalC::pw.ngmc_g];
-	all_gcar = new Vector3<double>[GlobalC::pw.ngmc_g];
+	all_gcar = new ModuleBase::Vector3<double>[GlobalC::pw.ngmc_g];
 	flag = new int[GlobalC::pw.ngmc_g];
 	
 	for(int i=0;i<GlobalC::pw.ngmc_g;i++)
@@ -557,11 +557,11 @@ void Chi0_standard::Cal_Psi(int iq, std::complex<double> **psi_r)
 void Chi0_standard::Cal_b(int iq, int ik, int iqk)
 {
 	ModuleBase::TITLE("Chi0_standard","Cal_b");
-	Vector3<double> qk;
+	ModuleBase::Vector3<double> qk;
 	qk = GlobalC::kv.kvec_c[iq] + GlobalC::kv.kvec_c[ik];
 	//std::cout <<"qk = "<<qk.x<<" "<<qk.y<<" "<<qk.z<<std::endl;
 	double phase_x, phase_xy, phase_xyz;
-	Vector3<double> q = GlobalC::kv.kvec_d[iq];
+	ModuleBase::Vector3<double> q = GlobalC::kv.kvec_d[iq];
 	std::complex<double> exp_tmp;
 	
 	Cal_Psi(ik, psi_r1);

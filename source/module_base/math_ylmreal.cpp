@@ -237,7 +237,7 @@ void YlmReal::Ylm_Real2
 (
     const int lmax2, 			// lmax2 = (lmax+1)^2
     const int ng,				//
-    const Vector3<double> *g, 	// g_cartesian_vec(x,y,z)
+    const ModuleBase::Vector3<double> *g, 	// g_cartesian_vec(x,y,z)
     matrix &ylm 				// output
 )
 {
@@ -296,7 +296,7 @@ void YlmReal::Ylm_Real
 (
     const int lmax2, 			// lmax2 = (lmax+1)^2
     const int ng,				//
-    const Vector3<double> *g, 	// g_cartesian_vec(x,y,z)
+    const ModuleBase::Vector3<double> *g, 	// g_cartesian_vec(x,y,z)
     matrix &ylm 				// output
 )
 {

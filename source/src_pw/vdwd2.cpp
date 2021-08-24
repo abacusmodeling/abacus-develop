@@ -34,7 +34,7 @@ void Vdwd2::cal_energy()
 			{
 				for( int ia2=0; ia2!=ucell.atoms[it2].na; ++ia2 )
 				{
-					Vector3<int> ilat_loop;
+					ModuleBase::Vector3<int> ilat_loop;
 					for( ilat_loop.x = -para.period.x/2; ilat_loop.x <= (para.period.x-1)/2; ++ilat_loop.x )
 					{
 						for( ilat_loop.y = -para.period.y/2; ilat_loop.y <= (para.period.y-1)/2; ++ilat_loop.y )
@@ -43,8 +43,8 @@ void Vdwd2::cal_energy()
 							{
 								if( (!( ilat_loop.x || ilat_loop.y || ilat_loop.z )) && (it1==it2) && (ia1==ia2) )
 									continue;
-								const Vector3<double> tau1 = ucell.atoms[it1].tau[ia1];
-								const Vector3<double> tau2 = ucell.atoms[it2].tau[ia2] + ilat_loop * ucell.latvec;
+								const ModuleBase::Vector3<double> tau1 = ucell.atoms[it1].tau[ia1];
+								const ModuleBase::Vector3<double> tau2 = ucell.atoms[it2].tau[ia2] + ilat_loop * ucell.latvec;
 								const double r_sqr = (tau1 - tau2).norm2();
 								const double r = sqrt(r_sqr);
 								const double tmp_damp_recip = 1+ exp( -para.damping* (r/R0_sum-1) );
@@ -82,7 +82,7 @@ void Vdwd2::cal_force()
 			{
 				for( int ia2=0; ia2!=ucell.atoms[it2].na; ++ia2 )
 				{
-					Vector3<int> ilat_loop;
+					ModuleBase::Vector3<int> ilat_loop;
 					for( ilat_loop.x = -para.period.x/2; ilat_loop.x <= (para.period.x-1)/2; ++ilat_loop.x )
 					{
 						for( ilat_loop.y = -para.period.y/2; ilat_loop.y <= (para.period.y-1)/2; ++ilat_loop.y )
@@ -93,8 +93,8 @@ void Vdwd2::cal_force()
 								{
 									continue;
 								}
-								const Vector3<double> tau1 = ucell.atoms[it1].tau[ia1];
-								const Vector3<double> tau2 = ucell.atoms[it2].tau[ia2] + ilat_loop * ucell.latvec;
+								const ModuleBase::Vector3<double> tau1 = ucell.atoms[it1].tau[ia1];
+								const ModuleBase::Vector3<double> tau2 = ucell.atoms[it2].tau[ia2] + ilat_loop * ucell.latvec;
 								const double r_sqr = (tau1 - tau2).norm2();
 								const double r = sqrt(r_sqr);
 								const double tmp_exp = exp( -para.damping* (r/R0_sum-1) );
@@ -137,7 +137,7 @@ void Vdwd2::cal_stress(void)
 			{
 				for( int ia2=0; ia2!=ucell.atoms[it2].na; ++ia2 )
 				{
-					Vector3<int> ilat_loop;
+					ModuleBase::Vector3<int> ilat_loop;
 					for( ilat_loop.x = -para.period.x/2; ilat_loop.x <= (para.period.x-1)/2; ++ilat_loop.x )
 					{
 						for( ilat_loop.y = -para.period.y/2; ilat_loop.y <= (para.period.y-1)/2; ++ilat_loop.y )
@@ -148,9 +148,9 @@ void Vdwd2::cal_stress(void)
 								{
 									continue;
 								}
-								const Vector3<double> tau1 = ucell.atoms[it1].tau[ia1];
-								const Vector3<double> tau2 = ucell.atoms[it2].tau[ia2] + ilat_loop * ucell.latvec;
-								const Vector3<double> dr = tau2 - tau1;
+								const ModuleBase::Vector3<double> tau1 = ucell.atoms[it1].tau[ia1];
+								const ModuleBase::Vector3<double> tau2 = ucell.atoms[it2].tau[ia2] + ilat_loop * ucell.latvec;
+								const ModuleBase::Vector3<double> dr = tau2 - tau1;
 								const double r_sqr = (tau1 - tau2).norm2();
 								const double r = sqrt(r_sqr);
 								const double tmp_exp = exp( -para.damping* (r/R0_sum-1) );

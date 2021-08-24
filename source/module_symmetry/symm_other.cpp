@@ -107,7 +107,7 @@ void Symm_Other::print1(const int &ibrav, const double *cel_const, std::ofstream
 	return;
 }
 
-bool Symm_Other::right_hand_sense(Vector3<double> &v1,Vector3<double> &v2,Vector3<double> &v3)
+bool Symm_Other::right_hand_sense(ModuleBase::Vector3<double> &v1,ModuleBase::Vector3<double> &v2,ModuleBase::Vector3<double> &v3)
 {
 	double volume = Symm_Other::celvol(v1,v2,v3);
 	//OUT(ofs_running,"volume = ",volume);
@@ -122,8 +122,8 @@ bool Symm_Other::right_hand_sense(Vector3<double> &v1,Vector3<double> &v2,Vector
 }
 
 //calculate the volume of the cell spanned by the vectors
-double Symm_Other::celvol(const Vector3<double> &a, 
-const Vector3<double> &b, const Vector3<double> &c)
+double Symm_Other::celvol(const ModuleBase::Vector3<double> &a, 
+const ModuleBase::Vector3<double> &b, const ModuleBase::Vector3<double> &c)
 {
 	return a.x * ( b.y * c.z - b.z * c.y ) + a.y * ( b.z * c.x - b.x * c.z ) 
 	+ a.z * ( b.x * c.y - b.y * c.x );

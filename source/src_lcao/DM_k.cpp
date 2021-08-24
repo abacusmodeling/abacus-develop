@@ -261,8 +261,8 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
     ModuleBase::TITLE("Local_Orbital_Charge","cal_dk_k");
     ModuleBase::timer::tick("LCAO_Charge","cal_dk_k");  
     //int nnrg = 0;
-    Vector3<double> tau1;
-	Vector3<double> dtau;
+    ModuleBase::Vector3<double> tau1;
+	ModuleBase::Vector3<double> dtau;
         
     Record_adj RA;
     RA.for_grid(gt);

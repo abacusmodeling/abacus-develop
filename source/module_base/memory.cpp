@@ -75,7 +75,7 @@ double Memory::calculate_mem(const long &n_in,const std::string &type)
 	{
 		mem =  int_mem * 2 + double_mem * 3;
 	}
-	else if(type=="Vector3<double>")
+	else if(type=="ModuleBase::Vector3<double>")
 	{
 		mem = 3 * double_mem;
 	}

@@ -14,7 +14,7 @@ Run_MD_CLASSIC::Run_MD_CLASSIC()
 	pos_old2 = new double[1];
 	pos_now = new double[1];
 	pos_next = new double[1];
-	force = new Vector3<double>[1];
+	force = new ModuleBase::Vector3<double>[1];
 	stress.create(3,3);
 }
 
@@ -175,7 +175,7 @@ void Run_MD_CLASSIC::md_allocate_ions(void)
 	this->pos_old2 = new double[pos_dim];
 	this->pos_now = new double[pos_dim];
 	this->pos_next = new double[pos_dim];
-	this->force = new Vector3<double>[ucell_c.nat];
+	this->force = new ModuleBase::Vector3<double>[ucell_c.nat];
 
 	ModuleBase::GlobalFunc::ZEROS(pos_old1, pos_dim);
 	ModuleBase::GlobalFunc::ZEROS(pos_old2, pos_dim);

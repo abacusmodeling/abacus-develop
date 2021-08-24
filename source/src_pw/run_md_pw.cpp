@@ -14,7 +14,7 @@
 
 Run_MD_PW::Run_MD_PW()
 {
-    force=new Vector3<double>[GlobalC::ucell.nat];
+    force=new ModuleBase::Vector3<double>[GlobalC::ucell.nat];
 }
 
 Run_MD_PW::~Run_MD_PW()
@@ -304,7 +304,7 @@ void Run_MD_PW::md_cells_pw()
     ModuleBase::timer::tick("Run_MD_PW", "md_cells_pw");
 }
 
-void Run_MD_PW::callInteraction_PW(const int& numIon, Vector3<double>* force, ModuleBase::matrix& stress_pw)
+void Run_MD_PW::callInteraction_PW(const int& numIon, ModuleBase::Vector3<double>* force, ModuleBase::matrix& stress_pw)
 {
 //to call the force of each atom
 	ModuleBase::matrix fcs;//temp force ModuleBase::matrix

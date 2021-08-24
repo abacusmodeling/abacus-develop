@@ -1497,13 +1497,13 @@ void DFTU::folding_overlap_matrix(const int ik, std::complex<double>* Sk)
 
 	int iat = 0;
 	int index = 0;
-	Vector3<double> dtau;
-	Vector3<double> tau1;
-	Vector3<double> tau2;
+	ModuleBase::Vector3<double> dtau;
+	ModuleBase::Vector3<double> tau1;
+	ModuleBase::Vector3<double> tau2;
 
-	Vector3<double> dtau1;
-	Vector3<double> dtau2;
-	Vector3<double> tau0;
+	ModuleBase::Vector3<double> dtau1;
+	ModuleBase::Vector3<double> dtau2;
+	ModuleBase::Vector3<double> tau0;
 
 	for (int T1 = 0; T1 < GlobalC::ucell.ntype; ++T1)
 	{
@@ -1569,7 +1569,7 @@ void DFTU::folding_overlap_matrix(const int ik, std::complex<double>* Sk)
 					// exp(k dot dR)
 					// dR is the index of box in Crystal coordinates
 					//------------------------------------------------
-					Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
+					ModuleBase::Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
 					const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * TWO_PI;
 					//const double arg = ( kv.kvec_d[ik] * GlobalC::GridD.getBox(ad) ) * TWO_PI;
 					const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );

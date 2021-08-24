@@ -38,7 +38,7 @@ namespace Wavefunc_in_pw
 		const int &ik,
 		ModuleBase::ComplexMatrix &psi, 
 		const realArray &table_local, 
-		Vector3<double> q);     // pengfei 2016-11-23
+		ModuleBase::Vector3<double> q);     // pengfei 2016-11-23
 
 }
 #endif

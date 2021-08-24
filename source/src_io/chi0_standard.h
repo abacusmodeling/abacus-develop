@@ -44,7 +44,7 @@ public:
 	  int parallel_g();
 	  void chi0_para_g();
 	  
-	  Vector3<double> *all_gcar;	  
+	  ModuleBase::Vector3<double> *all_gcar;	  
 	  std::complex<double> **chi0;
 	  std::complex<double> **chi;
 	  

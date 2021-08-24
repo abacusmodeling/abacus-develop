@@ -2,9 +2,9 @@
 
 MD_thermo::MD_thermo()
 {
-    G = new Vector3<double>[1];
-    NHCeta = new Vector3<double>[1];
-    NHCpeta = new Vector3<double>[1];
+    G = new ModuleBase::Vector3<double>[1];
+    NHCeta = new ModuleBase::Vector3<double>[1];
+    NHCpeta = new ModuleBase::Vector3<double>[1];
 }
 
 MD_thermo::~MD_thermo()
@@ -23,7 +23,7 @@ void MD_thermo::init_NHC(
     std::ofstream &ofs, 
     const int &numIon,
     const double &temperature,
-    const Vector3<double>* vel,
+    const ModuleBase::Vector3<double>* vel,
     const double* allmass
     )
 {
@@ -55,11 +55,11 @@ void MD_thermo::init_NHC(
 	}
 		
     delete[] G;	
-	G=new Vector3<double>[MNHC_*numIon_];
+	G=new ModuleBase::Vector3<double>[MNHC_*numIon_];
 	delete[] NHCeta;	
-	NHCeta=new Vector3<double>[MNHC_*numIon_];
+	NHCeta=new ModuleBase::Vector3<double>[MNHC_*numIon_];
 	delete[] NHCpeta;	
-	NHCpeta=new Vector3<double>[MNHC_*numIon_];
+	NHCpeta=new ModuleBase::Vector3<double>[MNHC_*numIon_];
 
 	for(int j=0;j<MNHC_;j++)
     {
@@ -289,7 +289,7 @@ double MD_thermo::genrand_res53(void)
 void MD_thermo::Integrator(
     const int control,
     const double &temperature,
-    Vector3<double>* vel,
+    ModuleBase::Vector3<double>* vel,
     const double* allmass)
 {
 	if(control == 1) NHCIntegrator(temperature, vel, allmass);
@@ -301,7 +301,7 @@ void MD_thermo::Integrator(
 
 void MD_thermo::LGVIntegrator(
     const double &temperature,
-    Vector3<double>* vel,
+    ModuleBase::Vector3<double>* vel,
     const double* allmass
 )
 {
@@ -338,7 +338,7 @@ void MD_thermo::LGVIntegrator(
 //added by zifei
 void MD_thermo::ADSIntegrator(
     const double &temperature,
-    Vector3<double>* vel,
+    ModuleBase::Vector3<double>* vel,
     const double* allmass
 )
 {
@@ -387,7 +387,7 @@ void MD_thermo::ADSIntegrator(
 //zifei
 void MD_thermo::NHCIntegrator(
     const double &temperature,
-    Vector3<double>* vel,
+    ModuleBase::Vector3<double>* vel,
     const double* allmass
 ){
 //---------------------------------------------------------------------------

@@ -153,7 +153,7 @@ class LCAO_Matrix
 	void set_force (const int& iw1_all, const int& iw2_all, const double& vx, const double& vy, 
 		const double& vz, const char &dtype);
 	void set_stress (const int& iw1_all, const int& iw2_all, const double& vx, const double& vy,
-		const double& vz, const char &dtype, const Vector3<double> &dtau);
+		const double& vz, const char &dtype, const ModuleBase::Vector3<double> &dtau);
 
 	void set_HR_tr(const int &Rx, const int &Ry, const int &Rz, const int &iw1_all, const int &iw2_all, const double &v);
 	void set_HR_tr_soc(const int &Rx, const int &Ry, const int &Rz, 

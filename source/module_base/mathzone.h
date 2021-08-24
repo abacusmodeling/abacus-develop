@@ -67,7 +67,7 @@ public:
         double &cx,double &cy,double &cz)
     {
         static Matrix3 lattice_vector;
-        static Vector3<double> direct_vec, cartesian_vec;
+        static ModuleBase::Vector3<double> direct_vec, cartesian_vec;
         lattice_vector.e11 = R11;
         lattice_vector.e12 = R12;
         lattice_vector.e13 = R13;
@@ -110,7 +110,7 @@ public:
 
         inv_lat = lattice_vector.Inverse();
 
-        static Vector3<double> direct_vec, cartesian_vec;
+        static ModuleBase::Vector3<double> direct_vec, cartesian_vec;
         cartesian_vec.x = cx;
         cartesian_vec.y = cy;
         cartesian_vec.z = cz;

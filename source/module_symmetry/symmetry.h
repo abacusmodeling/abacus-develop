@@ -20,9 +20,9 @@ public:
 	void analy_sys(const UnitCell_pseudo &ucell, const output &out, std::ofstream &ofs_running);
 	bool available;
 
-	Vector3<double> s1, s2, s3;
-	Vector3<double> a1, a2, a3;	//primitive cell vectors(might be changed during the process of the program)
-	Vector3<double>	p1, p2, p3;	//primitive cell vectors
+	ModuleBase::Vector3<double> s1, s2, s3;
+	ModuleBase::Vector3<double> a1, a2, a3;	//primitive cell vectors(might be changed during the process of the program)
+	ModuleBase::Vector3<double>	p1, p2, p3;	//primitive cell vectors
 	
 	int ntype;	//the number of atomic species
 	int nat; 	//the number of all atoms
@@ -55,7 +55,7 @@ public:
 	std::string plattname;	//the bravais lattice type of the primitive cell
 
 	Matrix3 gmatrix[48];	//the rotation matrices for all space group operations
-	Vector3<double> gtrans[48];
+	ModuleBase::Vector3<double> gtrans[48];
 	
 	Matrix3 symop[48];	//the rotation matrices for the pure bravais lattice
 	int nop;	//the number of point group operations of the pure bravais lattice without basis
@@ -67,19 +67,19 @@ public:
 
 	int tab;
 
-	int standard_lat(Vector3<double> &a,Vector3<double> &b,Vector3<double> &c,double *celconst );
+	int standard_lat(ModuleBase::Vector3<double> &a,ModuleBase::Vector3<double> &b,ModuleBase::Vector3<double> &c,double *celconst );
 
-	void lattice_type(Vector3<double> &v1,Vector3<double> &v2,Vector3<double> &v3, 
+	void lattice_type(ModuleBase::Vector3<double> &v1,ModuleBase::Vector3<double> &v2,ModuleBase::Vector3<double> &v3, 
 			int &ibrav,double *cel_const,std::string &bravname, const UnitCell_pseudo &ucell);
 
 	void recip(
 			const double a,
-			const Vector3<double> &a1,
-			const Vector3<double> &a2,
-			const Vector3<double> &a3,
-			Vector3<double> &b1,
-			Vector3<double> &b2,
-			Vector3<double> &b3
+			const ModuleBase::Vector3<double> &a1,
+			const ModuleBase::Vector3<double> &a2,
+			const ModuleBase::Vector3<double> &a3,
+			ModuleBase::Vector3<double> &b1,
+			ModuleBase::Vector3<double> &b2,
+			ModuleBase::Vector3<double> &b3
 			);
 	
 	void change_lattice(void);
@@ -87,7 +87,7 @@ public:
 	// check if the input cell is a primitive cell.
 	//void pricell(const UnitCell_pseudo &ucell);
 	void getgroup(int &nrot, int &nrotk, std::ofstream &ofs_running);
-	void checksym(Matrix3 &s, Vector3<double> &gtrans, double *pos);
+	void checksym(Matrix3 &s, ModuleBase::Vector3<double> &gtrans, double *pos);
 	void rho_symmetry(double *rho, const int &nr1, const int &nr2, const int &nr3);
 	void force_symmetry(ModuleBase::matrix &force, double* pos, const UnitCell_pseudo &ucell);
 	void stress_symmetry(ModuleBase::matrix &sigma, const UnitCell_pseudo &ucell);
@@ -100,7 +100,7 @@ public:
 
 	// (s)tart (p)osition of atom (t)ype which
 	// has (min)inal number.
-	Vector3<double> sptmin;
+	ModuleBase::Vector3<double> sptmin;
 
 };
 }

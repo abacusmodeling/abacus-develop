@@ -249,7 +249,7 @@ void WF_atomic::atomic_wfc
     std::complex<double> *aux = new std::complex<double>[np];
     double *chiaux = new double[1];
 
-    Vector3<double> *gk = new Vector3 <double> [np];
+    ModuleBase::Vector3<double> *gk = new ModuleBase::Vector3 <double> [np];
     for (int ig=0;ig<np;ig++)
     {
         gk[ig] = WF_atomic::get_1qvec_cartesian(ik, ig);
@@ -517,7 +517,7 @@ void WF_atomic::random(ModuleBase::ComplexMatrix &psi,const int iw_start,const i
                 {
                     const double rr = tmprr[GR_index[ig]];
                     const double arg= TWO_PI * tmparg[GR_index[ig]];
-                    Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
+                    ModuleBase::Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
                     psi(iw,ig+startig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
                 }
                 startig += npwx;
@@ -543,14 +543,14 @@ void WF_atomic::random(ModuleBase::ComplexMatrix &psi,const int iw_start,const i
             {
                 const double rr = std::rand()/double(RAND_MAX); //qianrui add RAND_MAX
                 const double arg= TWO_PI * std::rand()/double(RAND_MAX);
-                Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
+                ModuleBase::Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
                 psi(iw,ig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
             }
             if(GlobalV::NPOL==2)for (int ig = this->npwx;ig < this->npwx + ng;ig++)
             {
                 const double rr = std::rand()/double(RAND_MAX);
                 const double arg= TWO_PI * std::rand()/double(RAND_MAX);
-                Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig - this->npwx));
+                ModuleBase::Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig - this->npwx));
                 psi(iw,ig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
             }
         }

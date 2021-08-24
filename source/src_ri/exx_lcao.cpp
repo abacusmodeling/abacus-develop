@@ -404,8 +404,8 @@ void Exx_Lcao::init()
 			std::cout<<GlobalC::kv.kvec_c[ik]<<std::endl;
 		}
 
-		const Vector3<int>BvK_period( GlobalC::kv.nmp[0], GlobalC::kv.nmp[1], GlobalC::kv.nmp[2] );
-		std::vector<Vector3<double>> boxes;
+		const ModuleBase::Vector3<int>BvK_period( GlobalC::kv.nmp[0], GlobalC::kv.nmp[1], GlobalC::kv.nmp[2] );
+		std::vector<ModuleBase::Vector3<double>> boxes;
 		for( int x=0; x!=BvK_period.x; ++x )
 		{
 			for( int y=0; y!=BvK_period.y; ++y )
@@ -451,7 +451,7 @@ void Exx_Lcao::init()
 		{
 			for( size_t i=0; i!=boxes.size(); ++i )
 			{
-				std::cout<<GlobalC::kv.kvec_d[ik] * static_cast<Vector3<double>>(boxes[i])<<"\t";
+				std::cout<<GlobalC::kv.kvec_d[ik] * static_cast<ModuleBase::Vector3<double>>(boxes[i])<<"\t";
 			}
 			std::cout<<std::endl;
 		}
@@ -460,7 +460,7 @@ void Exx_Lcao::init()
 		{
 			for( size_t i=0; i!=boxes.size(); ++i )
 			{
-				std::cout<<exp( -TWO_PI*IMAG_UNIT* (GlobalC::kv.kvec_d[ik]* static_cast<Vector3<double>>(boxes[i])) )<<"\t";
+				std::cout<<exp( -TWO_PI*IMAG_UNIT* (GlobalC::kv.kvec_d[ik]* static_cast<ModuleBase::Vector3<double>>(boxes[i])) )<<"\t";
 			}
 			std::cout<<std::endl;
 		}
@@ -722,7 +722,7 @@ ofs_mpi<<"TIME@ m_abfslcaos_lcaos.init_radial\t"<<time_during(t_start)<<std::end
 //	m_abfslcaos_lcaos.init_radial_table();
 //ofs_mpi<<"TIME@ m_abfslcaos_lcaos.init_radial_table\t"<<time_during(t_start)<<std::endl;
 
-	Born_von_Karman_period = Vector3<int>{GlobalC::kv.nmp[0],GlobalC::kv.nmp[1],GlobalC::kv.nmp[2]};
+	Born_von_Karman_period = ModuleBase::Vector3<int>{GlobalC::kv.nmp[0],GlobalC::kv.nmp[1],GlobalC::kv.nmp[2]};
 ofs_mpi<<"TIME@ Exx_Lcao::init\t"<<time_during(t_start_all)<<std::endl;
 ofs_mpi.close();
 
@@ -1330,7 +1330,7 @@ gettimeofday( &t_start, NULL);
 	{
 		const size_t it1 = GlobalC::ucell.iat2it[iat1];
 		const size_t ia1 = GlobalC::ucell.iat2ia[iat1];
-		const Vector3<double> tau1 = GlobalC::ucell.atoms[it1].tau[ia1];
+		const ModuleBase::Vector3<double> tau1 = GlobalC::ucell.atoms[it1].tau[ia1];
 
 		const std::map<size_t,std::vector<Abfs::Vector3_Order<int>>> adjs = Abfs::get_adjs(iat1);
 		for( const auto & atom2 : adjs )
@@ -1338,7 +1338,7 @@ gettimeofday( &t_start, NULL);
 			const size_t iat2 = atom2.first;
 			const size_t it2 = GlobalC::ucell.iat2it[iat2];
 			const size_t ia2 = GlobalC::ucell.iat2ia[iat2];
-			const Vector3<double> &tau2 = GlobalC::ucell.atoms[it2].tau[ia2];
+			const ModuleBase::Vector3<double> &tau2 = GlobalC::ucell.atoms[it2].tau[ia2];
 			for( const Abfs::Vector3_Order<int> &box2 : atom2.second )
 			{
 				const double delta_R = (-tau1+tau2+(box2*GlobalC::ucell.latvec)).norm();
@@ -1386,11 +1386,11 @@ gettimeofday( &t_start, NULL);
 		const size_t ia1 = GlobalC::ucell.iat2ia[iat1];
 		const size_t it2 = GlobalC::ucell.iat2it[iat2];
 		const size_t ia2 = GlobalC::ucell.iat2ia[iat2];
-		const Vector3<double> &tau1 = GlobalC::ucell.atoms[it1].tau[ia1];
-		const Vector3<double> &tau2 = GlobalC::ucell.atoms[it2].tau[ia2];
+		const ModuleBase::Vector3<double> &tau1 = GlobalC::ucell.atoms[it1].tau[ia1];
+		const ModuleBase::Vector3<double> &tau2 = GlobalC::ucell.atoms[it2].tau[ia2];
 		const double Rcut = std::min( GlobalC::ORB.Phi[it1].getRcut()*info.ccp_rmesh_times+GlobalC::ORB.Phi[it2].getRcut(), GlobalC::ORB.Phi[it1].getRcut()+GlobalC::ORB.Phi[it2].getRcut()*info.ccp_rmesh_times );
 
-		for( const Vector3<int> &box2 : Coulomb_potential_boxes )
+		for( const ModuleBase::Vector3<int> &box2 : Coulomb_potential_boxes )
 		{
 			const double delta_R = (-tau1+tau2+(box2*GlobalC::ucell.latvec)).norm();
 

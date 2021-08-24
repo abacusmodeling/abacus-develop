@@ -83,13 +83,13 @@ void Stress_Func::stress_ewa(ModuleBase::matrix& sigma, const bool is_pw)
     //R-space sum here (only for the processor that contains G=0) 
     int mxr = 50;
     int *irr;
-    Vector3<double> *r;
+    ModuleBase::Vector3<double> *r;
     double *r2;
-    r  = new Vector3<double>[mxr];
+    r  = new ModuleBase::Vector3<double>[mxr];
     r2 = new double[mxr];
     irr = new int[mxr];
     double rr;
-    Vector3<double> d_tau;
+    ModuleBase::Vector3<double> d_tau;
     double r0[3];
     double rmax=0.0;
     int nrm=0;

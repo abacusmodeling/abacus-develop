@@ -572,8 +572,8 @@ void DFTU_RELAX::fold_dSR_gamma(const int dim1, const int dim2, double* dSR_gamm
   else if(dim1==2) dS_ptr =  GlobalC::LM.DSloc_z;
 
   int nnr = 0;
-	Vector3<double> tau1, tau2, dtau;
-	Vector3<double> dtau1, dtau2, tau0;
+	ModuleBase::Vector3<double> tau1, tau2, dtau;
+	ModuleBase::Vector3<double> dtau1, dtau2, tau0;
   for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
   {
 	  Atom* atom1 = &GlobalC::ucell.atoms[T1];
@@ -658,8 +658,8 @@ void DFTU_RELAX::fold_dSm_k(const int ik, const int dim, std::complex<double>* d
   else if(dim==2) dSm_ptr = GlobalC::LM.DSloc_Rz;
 
   int nnr = 0;
-  Vector3<double> tau1, tau2, dtau;
-	Vector3<double> dtau1, dtau2, tau0;
+  ModuleBase::Vector3<double> tau1, tau2, dtau;
+	ModuleBase::Vector3<double> dtau1, dtau2, tau0;
   for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
   {
 	  Atom* atom1 = &GlobalC::ucell.atoms[T1];
@@ -728,7 +728,7 @@ void DFTU_RELAX::fold_dSm_k(const int ik, const int dim, std::complex<double>* d
 					    const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
 					    if(nu<0) continue;
 
-			  			Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
+			  			ModuleBase::Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
 			  			const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * TWO_PI;
 			  			const std::complex<double> kphase( cos(arg),  sin(arg) );
 
@@ -758,8 +758,8 @@ void DFTU_RELAX::fold_dSR_k(const int ik, const int dim1, const int dim2, std::c
   else if(dim1==2) dSm_ptr = GlobalC::LM.DSloc_Rz;
 
   int nnr = 0;
-	Vector3<double> tau1, tau2, dtau;
-	Vector3<double> dtau1, dtau2, tau0;
+	ModuleBase::Vector3<double> tau1, tau2, dtau;
+	ModuleBase::Vector3<double> dtau1, dtau2, tau0;
   for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
   {
 	  Atom* atom1 = &GlobalC::ucell.atoms[T1];
@@ -828,7 +828,7 @@ void DFTU_RELAX::fold_dSR_k(const int ik, const int dim1, const int dim2, std::c
 					    const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
 					    if(nu<0)continue;
               	
-			  			Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
+			  			ModuleBase::Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
 			  			const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * TWO_PI;
 			  			const std::complex<double> kphase( cos(arg),  sin(arg) );
 

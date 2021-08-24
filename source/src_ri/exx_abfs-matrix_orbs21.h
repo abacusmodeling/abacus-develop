@@ -43,8 +43,8 @@ public:
 	ModuleBase::matrix cal_overlap_matrix(  
 		const size_t TA, 
 		const size_t TB, 
-		const Vector3<double> &tauA,											// unit: ucell.lat0
-		const Vector3<double> &tauB,											// unit: ucell.lat0  
+		const ModuleBase::Vector3<double> &tauA,											// unit: ucell.lat0
+		const ModuleBase::Vector3<double> &tauB,											// unit: ucell.lat0  
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_A1, 
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_A2,
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_B,
@@ -52,8 +52,8 @@ public:
 	std::vector<ModuleBase::matrix> cal_overlap_matrix(  
 		const size_t TA, 
 		const size_t TB, 
-		const Vector3<double> &tauA,											// unit: ucell.lat0
-		const Vector3<double> &tauB,											// unit: ucell.lat0  
+		const ModuleBase::Vector3<double> &tauA,											// unit: ucell.lat0
+		const ModuleBase::Vector3<double> &tauB,											// unit: ucell.lat0  
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_A1, 
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_A2,
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_B) const;

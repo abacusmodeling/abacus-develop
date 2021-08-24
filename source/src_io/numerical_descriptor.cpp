@@ -244,7 +244,7 @@ void Numerical_Descriptor::jlq3d_overlap(
     const int total_lm = ( this->lmax + 1) * ( this->lmax + 1);
     ModuleBase::matrix ylm(total_lm, np);
 
-    Vector3<double> *gk = new Vector3 <double> [np];
+    ModuleBase::Vector3<double> *gk = new ModuleBase::Vector3 <double> [np];
     for (int ig=0; ig<np; ig++)
     {
         gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);

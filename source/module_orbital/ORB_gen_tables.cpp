@@ -117,17 +117,17 @@ void ORB_gen_tables::gen_tables(
 void ORB_gen_tables::snap_psibeta(
 	double nlm[],
 	const int &job,
-	const Vector3<double> &R1,
+	const ModuleBase::Vector3<double> &R1,
 	const int &T1,
 	const int &L1,
 	const int &m1,
 	const int &N1,
-	const Vector3<double> &R2,
+	const ModuleBase::Vector3<double> &R2,
 	const int &T2,
 	const int &L2,
 	const int &m2,
 	const int &N2,
-	const Vector3<double> &R0, // The projector.
+	const ModuleBase::Vector3<double> &R0, // The projector.
 	const int &T0,
 	const ModuleBase::matrix &dion, // mohan add 2021-04-25
 	const int &nspin,
@@ -168,8 +168,8 @@ void ORB_gen_tables::snap_psibeta(
 
 	//in our calculation, we always put orbital phi at the left side of <phi|beta>
 	//because <phi|beta> = <beta|phi>
-	const Vector3<double> dRa = (R0 - R1) * this->lat0;
-	const Vector3<double> dRb = (R0 - R2) * this->lat0;
+	const ModuleBase::Vector3<double> dRa = (R0 - R1) * this->lat0;
+	const ModuleBase::Vector3<double> dRb = (R0 - R2) * this->lat0;
 
 	double distance10 = dRa.norm();
 	double distance20 = dRb.norm();
@@ -570,12 +570,12 @@ void ORB_gen_tables::snap_psipsi(
 	double olm[],
 	const int &job,	   //0, 1
 	const char &dtype, // derivative type: S or T
-	const Vector3<double> &R1,
+	const ModuleBase::Vector3<double> &R1,
 	const int &T1,
 	const int &L1,
 	const int &m1,
 	const int &N1,
-	const Vector3<double> &R2,
+	const ModuleBase::Vector3<double> &R2,
 	const int &T2,
 	const int &L2,
 	const int &m2,
@@ -970,10 +970,10 @@ void ORB_gen_tables::snap_psipsi(
 	return;
 }
 
-double ORB_gen_tables::get_distance(const Vector3<double> &R1, const Vector3<double> &R2) const
+double ORB_gen_tables::get_distance(const ModuleBase::Vector3<double> &R1, const ModuleBase::Vector3<double> &R2) const
 {
 	assert(this->lat0 > 0.0);
-	Vector3<double> dR = R1 - R2;
+	ModuleBase::Vector3<double> dR = R1 - R2;
 	return dR.norm() * this->lat0;
 }
 

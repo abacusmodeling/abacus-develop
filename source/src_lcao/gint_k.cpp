@@ -174,7 +174,7 @@ void Gint_k::folding_force(
 		}
 	}
 	
-	Vector3<double> tau1, dtau;
+	ModuleBase::Vector3<double> tau1, dtau;
 	for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
 	{
 		Atom* atom1 = &GlobalC::ucell.atoms[T1];
@@ -382,7 +382,7 @@ void Gint_k::folding_stress(
 
 		}
 	}
-	Vector3<double> tau1, dtau;
+	ModuleBase::Vector3<double> tau1, dtau;
 	for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
 	{
 		const Atom* atom1 = &GlobalC::ucell.atoms[T1];
@@ -409,7 +409,7 @@ void Gint_k::folding_stress(
 					const int T2 = GlobalC::GridD.getType(ad);
 					const int I2 = GlobalC::GridD.getNatom(ad);
 
-					const Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad);
+					const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad);
 					const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
 					if(GlobalC::GridT.in_this_processor[iat2])
 					{
@@ -606,7 +606,7 @@ void Gint_k::folding_vl_k(const int &ik)
 
 	if(!reduced)
 	{	
-		Vector3<double> dR;
+		ModuleBase::Vector3<double> dR;
 		double arg;
 		std::complex<double> phase;
 		std::complex<double> *pp1;
@@ -649,7 +649,7 @@ void Gint_k::folding_vl_k(const int &ik)
 	else
 	{
 		int lgd = 0;
-		Vector3<double> tau1, dtau, dR;
+		ModuleBase::Vector3<double> tau1, dtau, dR;
 		for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
 		{
 			for(int I1=0; I1<GlobalC::ucell.atoms[T1].na; ++I1)
@@ -696,7 +696,7 @@ void Gint_k::folding_vl_k(const int &ik)
 								const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0); 
 
 								// calculate the distance between iat1 and iat2.
-								// Vector3<double> dR = GlobalC::GridD.getAdjacentTau(ad) - tau1;
+								// ModuleBase::Vector3<double> dR = GlobalC::GridD.getAdjacentTau(ad) - tau1;
 								dR.x = GlobalC::GridD.getBox(ad).x;
 								dR.y = GlobalC::GridD.getBox(ad).y;
 								dR.z = GlobalC::GridD.getBox(ad).z;
@@ -854,7 +854,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 
 	if(!reduced)
 	{	
-		Vector3<double> dR;
+		ModuleBase::Vector3<double> dR;
 		double arg;
 		std::complex<double> phase;
 		std::complex<double> *pp1;
@@ -897,7 +897,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 	else
 	{
 		int lgd = 0;
-		Vector3<double> tau1, dtau, dR;
+		ModuleBase::Vector3<double> tau1, dtau, dR;
 		for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
 		{
 			for(int I1=0; I1<GlobalC::ucell.atoms[T1].na; ++I1)
@@ -944,7 +944,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 								const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 
 								// calculate the distance between iat1 and iat2.
-								// Vector3<double> dR = GlobalC::GridD.getAdjacentTau(ad) - tau1;
+								// ModuleBase::Vector3<double> dR = GlobalC::GridD.getAdjacentTau(ad) - tau1;
 								dR.x = GlobalC::GridD.getBox(ad).x;
 								dR.y = GlobalC::GridD.getBox(ad).y;
 								dR.z = GlobalC::GridD.getBox(ad).z;
@@ -1466,7 +1466,7 @@ void Gint_k::cal_vlocal_R(const int current_spin)
     int R_y;
     int R_z;
 
-    Vector3<double> tau1, dtau, dR;
+    ModuleBase::Vector3<double> tau1, dtau, dR;
     for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
     {
         for(int I1=0; I1<GlobalC::ucell.atoms[T1].na; ++I1)
@@ -1857,7 +1857,7 @@ void Gint_k::cal_vlocal_R_sparseMatrix(const int current_spin, const double &spa
     int R_y;
     int R_z;
 
-    Vector3<double> tau1, dtau, dR;
+    ModuleBase::Vector3<double> tau1, dtau, dR;
     for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
     {
         for(int I1=0; I1<GlobalC::ucell.atoms[T1].na; ++I1)

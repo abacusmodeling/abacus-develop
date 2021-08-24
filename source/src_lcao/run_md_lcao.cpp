@@ -19,7 +19,7 @@
 
 Run_MD_LCAO::Run_MD_LCAO()
 {
-    force=new Vector3<double>[GlobalC::ucell.nat];
+    force=new ModuleBase::Vector3<double>[GlobalC::ucell.nat];
 }
 
 Run_MD_LCAO::~Run_MD_LCAO() 
@@ -315,7 +315,7 @@ void Run_MD_LCAO::final_scf(void)
     return;
 }
 
-void Run_MD_LCAO::callInteraction_LCAO(const int& numIon, Vector3<double>* force, ModuleBase::matrix& stress_lcao)
+void Run_MD_LCAO::callInteraction_LCAO(const int& numIon, ModuleBase::Vector3<double>* force, ModuleBase::matrix& stress_lcao)
 {
 //to call the force of each atom
 	ModuleBase::matrix fcs;//temp force matrix

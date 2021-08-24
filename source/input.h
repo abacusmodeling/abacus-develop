@@ -304,7 +304,7 @@ class Input
 	std::string vdw_R0_file;
 	std::string vdw_R0_unit;		    //"Bohr" or "Angstrom"
 	std::string vdw_model;			//"period" or "radius"
-	Vector3<int> vdw_period;
+	ModuleBase::Vector3<int> vdw_period;
 
 //==========================================================
 // Spectrum
