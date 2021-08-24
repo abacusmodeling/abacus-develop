@@ -7,9 +7,9 @@ DP_potential::DP_potential(){}
 
 DP_potential::~DP_potential(){}
 
-#ifdef __DPMD
 void DP_potential::DP_pot(UnitCell_pseudo &ucell_c, double &potential, Vector3<double> *force, matrix &stress)
 {
+#ifdef __DPMD
     TITLE("DP_potential", "DP_pot");
     timer::tick("DP_potential", "DP_pot");
 
@@ -41,8 +41,10 @@ void DP_potential::DP_pot(UnitCell_pseudo &ucell_c, double &potential, Vector3<d
     }
 
     timer::tick("DP_potential", "DP_pot");
-}
+#else
+    WARNING_QUIT("DP_pot", "Please recompile with -D__DPMD !");
 #endif
+}
 
 void DP_potential::DP_init(UnitCell_pseudo &ucell_c, 
                 std::vector<double> &cell, 
