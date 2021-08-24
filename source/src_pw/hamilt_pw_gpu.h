@@ -2,9 +2,12 @@
 #define HAMILT_PW_GPU_H
 
 #include "tools.h"
+
+#ifdef __CUDA
 #include "cufft.h"
 #include "cublas_v2.h"
 typedef cufftDoubleComplex CUFFT_COMPLEX;
+#endif
 
 class Hamilt_PW
 {
@@ -49,21 +52,37 @@ public:
                   ComplexMatrix &evc,
                   double *en);
 
-    void h_1psi(
+    void h_1psi_gpu(
         const int npw,
         const CUFFT_COMPLEX *psi1d,
         CUFFT_COMPLEX *hpsi,
         CUFFT_COMPLEX *spsi);
 
-    void h_psi(
+    void h_1psi(
+        const int npw,
+        const std::complex<double> *psi1d,
+        std::complex<double> *hpsi,
+        std::complex<double> *spsi);
+
+    void h_psi_gpu(
 		const CUFFT_COMPLEX *psi,
 		CUFFT_COMPLEX *hpsi,
 		const int m = 1); // qianrui add a default parameter 2021-3-31
 
-    void s_1psi(
+    void s_1psi_gpu(
         const int npw,
         const CUFFT_COMPLEX *psi,
         CUFFT_COMPLEX *spsi);
+
+    void s_1psi(
+        const int npw,
+        const std::complex < double> *psi,
+        std::complex < double> *spsi);
+
+    void h_psi(
+		const std::complex<double> *psi,
+		std::complex<double> *hpsi,
+		const int m = 1);
 
 	private:
 
@@ -71,10 +90,15 @@ public:
 
 	// add contributions of h*psi from
 	// non-local pseduopotentials
-	void add_nonlocal_pp(
+	void add_nonlocal_pp_gpu(
 		CUFFT_COMPLEX *hpsi_in,
 		const CUFFT_COMPLEX *becp,
 		const CUFFT_COMPLEX *d_vkb_c,
+		const int m);
+
+    void add_nonlocal_pp(
+		std::complex<double> *hpsi,
+		const std::complex<double> *becp,
 		const int m);
 
 	private:

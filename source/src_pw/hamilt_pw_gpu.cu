@@ -377,10 +377,10 @@ void Hamilt_PW::diagH_subspace(
     return;
 }
 
-void Hamilt_PW::h_1psi( const int npw_in, const CUFFT_COMPLEX *psi,
+void Hamilt_PW::h_1psi_gpu( const int npw_in, const CUFFT_COMPLEX *psi,
                         CUFFT_COMPLEX *hpsi, CUFFT_COMPLEX *spsi)
 {
-    this->h_psi(psi, hpsi);
+    this->h_psi_gpu(psi, hpsi);
 
     int thread = 512;
     int block = npw_in / thread + 1;
@@ -388,13 +388,40 @@ void Hamilt_PW::h_1psi( const int npw_in, const CUFFT_COMPLEX *psi,
     return;
 }
 
-void Hamilt_PW::s_1psi(const int dim, const CUFFT_COMPLEX *psi, CUFFT_COMPLEX *spsi)
+void Hamilt_PW::s_1psi_gpu(const int dim, const CUFFT_COMPLEX *psi, CUFFT_COMPLEX *spsi)
 {
     cudaMemcpy(spsi, psi, dim*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice);
     return;
 }
 
-void Hamilt_PW::h_psi(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, const int m)
+void Hamilt_PW::h_1psi( const int npw_in, const std::complex < double> *psi,
+	std::complex<double> *hpsi, std::complex < double> *spsi)
+{
+	this->h_psi(psi, hpsi);
+
+	for (int i=0;i<npw_in;i++)
+	{
+		spsi[i] = psi[i];
+	}
+	return;
+}
+
+
+void Hamilt_PW::s_1psi
+(
+	const int dim,
+	const std::complex<double> *psi,
+	std::complex<double> *spsi
+)
+{
+	for (int i=0; i<dim; i++)
+	{
+		spsi[i] = psi[i];
+	}
+	return;
+}
+
+void Hamilt_PW::h_psi_gpu(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, const int m)
 {
     timer::tick("Hamilt_PW_GPU","h_psi");
     // int i = 0;
@@ -562,7 +589,7 @@ void Hamilt_PW::h_psi(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, const in
             // delete [] hpsi_cpu;
             // delete [] becp_cpu;
 
-            this->add_nonlocal_pp(hpsi, becp, d_vkb_c, m);
+            this->add_nonlocal_pp_gpu(hpsi, becp, d_vkb_c, m);
 
             cublasDestroy(handle);
             cudaFree(becp);
@@ -584,13 +611,230 @@ void Hamilt_PW::h_psi(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, const in
 }
 
 
-void Hamilt_PW::add_nonlocal_pp(
+void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *hpsi, const int m)
+{
+    timer::tick("Hamilt_PW","h_psi_cpu");
+    int i = 0;
+    int j = 0;
+    int ig= 0;
+
+	//if(GlobalV::NSPIN!=4) ZEROS(hpsi, GlobalC::wf.npw);
+	//else ZEROS(hpsi, GlobalC::wf.npwx * GlobalV::NPOL);//added by zhengdy-soc
+	int dmax = GlobalC::wf.npwx * GlobalV::NPOL;
+
+	//------------------------------------
+	//(1) the kinetical energy.
+	//------------------------------------
+	std::complex<double> *tmhpsi;
+	const std::complex<double> *tmpsi_in;
+ 	if(GlobalV::T_IN_H)
+	{
+		tmhpsi = hpsi;
+		tmpsi_in = psi_in;
+		for(int ib = 0 ; ib < m; ++ib)
+		{
+			for(ig = 0;ig < GlobalC::wf.npw; ++ig)
+			{
+				tmhpsi[ig] = GlobalC::wf.g2kin[ig] * tmpsi_in[ig];
+			}
+			if(GlobalV::NSPIN==4){
+				for(ig=GlobalC::wf.npw; ig < GlobalC::wf.npwx; ++ig)
+				{
+					tmhpsi[ig] = 0;
+				}
+				tmhpsi +=GlobalC::wf.npwx;
+				tmpsi_in += GlobalC::wf.npwx;
+				for (ig = 0;ig < GlobalC::wf.npw ;++ig)
+				{
+					tmhpsi[ig] = GlobalC::wf.g2kin[ig] * tmpsi_in[ig];
+				}
+				for(ig=GlobalC::wf.npw; ig < GlobalC::wf.npwx; ++ig)
+				{
+					tmhpsi[ig] =0;
+				}
+			}
+			tmhpsi += GlobalC::wf.npwx;
+			tmpsi_in += GlobalC::wf.npwx;
+		}
+	}
+
+	//------------------------------------
+	//(2) the local potential.
+	//-----------------------------------
+	// timer::tick("Hamilt_PW","vloc");
+	if(GlobalV::VL_IN_H)
+	{
+		tmhpsi = hpsi;
+		tmpsi_in = psi_in;
+		for(int ib = 0 ; ib < m; ++ib)
+		{
+			if(GlobalV::NSPIN!=4){
+				ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
+				GlobalC::UFFT.RoundTrip( tmpsi_in, GlobalC::pot.vr_eff1, GR_index, GlobalC::UFFT.porter );
+				for (j = 0;j < GlobalC::wf.npw;j++)
+				{
+					tmhpsi[j] += GlobalC::UFFT.porter[ GR_index[j] ];
+				}
+			}
+			else
+			{
+				std::complex<double>* porter1 = new std::complex<double>[GlobalC::pw.nrxx];
+				ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
+				ZEROS( porter1, GlobalC::pw.nrxx);
+				for (int ig=0; ig< GlobalC::wf.npw; ig++)
+				{
+					GlobalC::UFFT.porter[ GR_index[ig]  ] = tmpsi_in[ig];
+					porter1[ GR_index[ig]  ] = tmpsi_in[ig + GlobalC::wf.npwx];
+				}
+				// (2) fft to real space and doing things.
+				GlobalC::pw.FFT_wfc.FFT3D( GlobalC::UFFT.porter, 1);
+				GlobalC::pw.FFT_wfc.FFT3D( porter1, 1);
+				std::complex<double> sup,sdown;
+				for (int ir=0; ir< GlobalC::pw.nrxx; ir++)
+				{
+					sup = GlobalC::UFFT.porter[ir] * (GlobalC::pot.vr_eff(0,ir) + GlobalC::pot.vr_eff(3,ir)) +
+						porter1[ir] * (GlobalC::pot.vr_eff(1,ir) - std::complex<double>(0.0,1.0) * GlobalC::pot.vr_eff(2,ir));
+					sdown = porter1[ir] * (GlobalC::pot.vr_eff(0,ir) - GlobalC::pot.vr_eff(3,ir)) +
+					GlobalC::UFFT.porter[ir] * (GlobalC::pot.vr_eff(1,ir) + std::complex<double>(0.0,1.0) * GlobalC::pot.vr_eff(2,ir));
+					GlobalC::UFFT.porter[ir] = sup;
+					porter1[ir] = sdown;
+				}
+				// (3) fft back to G space.
+				GlobalC::pw.FFT_wfc.FFT3D( GlobalC::UFFT.porter, -1);
+				GlobalC::pw.FFT_wfc.FFT3D( porter1, -1);
+
+				for (j = 0;j < GlobalC::wf.npw;j++)
+				{
+					tmhpsi[j] += GlobalC::UFFT.porter[ GR_index[j] ];
+				}
+				for (j = 0;j < GlobalC::wf.npw;j++ )
+				{
+					tmhpsi[j+GlobalC::wf.npwx] += porter1[ GR_index[j] ];
+				}
+				delete[] porter1;
+			}
+			tmhpsi += dmax;
+			tmpsi_in += dmax;
+		}
+	}
+	// timer::tick("Hamilt_PW","vloc");
+
+	//------------------------------------
+	// (3) the nonlocal pseudopotential.
+	//------------------------------------
+	timer::tick("Hamilt_PW","vnl");
+	if(GlobalV::VNL_IN_H)
+	{
+		if ( GlobalC::ppcell.nkb > 0)
+		{
+			//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+			//qianrui optimize 2021-3-31
+			int nkb=GlobalC::ppcell.nkb;
+			ComplexMatrix becp(GlobalV::NPOL * m, nkb, false);
+			char transa = 'C';
+			char transb = 'N';
+			if(m==1 && GlobalV::NPOL==1)
+			{
+				int inc = 1;
+				zgemv_(&transa, &GlobalC::wf.npw, &nkb, &ONE, GlobalC::ppcell.vkb.c, &GlobalC::wf.npwx, psi_in, &inc, &ZERO, becp.c, &inc);
+			}
+			else
+			{
+				int npm = GlobalV::NPOL * m;
+				zgemm_(&transa,&transb,&nkb,&npm,&GlobalC::wf.npw,&ONE,GlobalC::ppcell.vkb.c,&GlobalC::wf.npwx,psi_in,&GlobalC::wf.npwx,&ZERO,becp.c,&nkb);
+				//add_nonlocal_pp is moddified, thus tranpose not needed here.
+				//if(GlobalV::NONCOLIN)
+				//{
+				//	ComplexMatrix partbecp(GlobalV::NPOL, nkb ,false);
+				//	for(int ib = 0; ib < m; ++ib)
+				//	{
+//
+				//		for ( i = 0;i < GlobalV::NPOL;i++)
+				//			for (j = 0;j < nkb;j++)
+				//				partbecp(i, j) = tmbecp[i*nkb+j];
+				//		for (j = 0; j < nkb; j++)
+				//			for (i = 0;i < GlobalV::NPOL;i++)
+				//				tmbecp[j*GlobalV::NPOL+i] = partbecp(i, j);
+				//		tmbecp += GlobalV::NPOL * nkb;
+				//	}
+				//}
+			}
+
+			Parallel_Reduce::reduce_complex_double_pool( becp.c, nkb * GlobalV::NPOL * m);
+
+			this->add_nonlocal_pp(hpsi, becp.c, m);
+			//======================================================================
+			/*std::complex<double> *becp = new std::complex<double>[ GlobalC::ppcell.nkb * GlobalV::NPOL ];
+			ZEROS(becp,GlobalC::ppcell.nkb * GlobalV::NPOL);
+			for (i=0;i< GlobalC::ppcell.nkb;i++)
+			{
+				const std::complex<double>* p = &GlobalC::ppcell.vkb(i,0);
+				const std::complex<double>* const p_end = p + GlobalC::wf.npw;
+				const std::complex<double>* psip = psi_in;
+				for (;p<p_end;++p,++psip)
+				{
+					if(!GlobalV::NONCOLIN) becp[i] += psip[0]* conj( p[0] );
+					else{
+						becp[i*2] += psip[0]* conj( p[0] );
+						becp[i*2+1] += psip[GlobalC::wf.npwx]* conj( p[0] );
+					}
+				}
+			}
+			Parallel_Reduce::reduce_complex_double_pool( becp, GlobalC::ppcell.nkb * GlobalV::NPOL);
+			this->add_nonlocal_pp(hpsi, becp);
+			delete[] becp;*/
+			//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+		}
+	}
+	// timer::tick("Hamilt_PW","vnl");
+	//------------------------------------
+	// (4) the metaGGA part
+	//------------------------------------
+	// timer::tick("Hamilt_PW","meta");
+	if(GlobalV::DFT_META)
+	{
+		tmhpsi = hpsi;
+		tmpsi_in = psi_in;
+		for(int ib = 0; ib < m; ++ib)
+		{
+			for(int j=0; j<3; j++)
+			{
+				ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
+				for (int ig = 0;ig < GlobalC::kv.ngk[GlobalV::CURRENT_K] ; ig++)
+				{
+					double fact = GlobalC::pw.get_GPlusK_cartesian_projection(GlobalV::CURRENT_K,GlobalC::wf.igk(GlobalV::CURRENT_K,ig),j) * GlobalC::ucell.tpiba;
+					GlobalC::UFFT.porter[ GR_index[ig] ] = tmpsi_in[ig] * complex<double>(0.0,fact);
+				}
+
+				GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter, 1);
+
+				for (int ir = 0; ir < GlobalC::pw.nrxx; ir++)
+				{
+					GlobalC::UFFT.porter[ir] = GlobalC::UFFT.porter[ir] * GlobalC::pot.vofk(GlobalV::CURRENT_SPIN,ir);
+				}
+				GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter, -1);
+
+				for (int ig = 0;ig < GlobalC::kv.ngk[GlobalV::CURRENT_K] ; ig++)
+				{
+					double fact = GlobalC::pw.get_GPlusK_cartesian_projection(GlobalV::CURRENT_K,GlobalC::wf.igk(GlobalV::CURRENT_K,ig),j) * GlobalC::ucell.tpiba;
+					tmhpsi[ig] = tmhpsi[ig] - complex<double>(0.0,fact) * GlobalC::UFFT.porter[ GR_index[ig] ];
+				}
+			}//x,y,z directions
+		}
+	}
+	// timer::tick("Hamilt_PW","meta");
+    timer::tick("Hamilt_PW","h_psi_cpu");
+    return;
+}
+
+
+void Hamilt_PW::add_nonlocal_pp_gpu(
 	CUFFT_COMPLEX *hpsi_in,
 	const CUFFT_COMPLEX *becp,
     const CUFFT_COMPLEX *d_vkb_c,
 	const int m)
 {
-    timer::tick("Hamilt_PW_GPU","add_nonlocal_pp");
+    timer::tick("Hamilt_PW","add_nonlocal_pp_gpu");
 
 	// number of projectors
 	int nkb = GlobalC::ppcell.nkb;
@@ -686,6 +930,169 @@ void Hamilt_PW::add_nonlocal_pp(
 
 	// delete[] ps;
     cudaFree(ps);
-    timer::tick("Hamilt_PW_GPU","add_nonlocal_pp");
+    timer::tick("Hamilt_PW","add_nonlocal_pp_gpu");
+    return;
+}
+
+void Hamilt_PW::add_nonlocal_pp(
+	std::complex<double> *hpsi_in,
+	const std::complex<double> *becp,
+	const int m)
+{
+    timer::tick("Hamilt_PW","add_nonlocal_pp");
+
+	// number of projectors
+	int nkb = GlobalC::ppcell.nkb;
+
+	std::complex<double> *ps  = new std::complex<double> [nkb * GlobalV::NPOL * m];
+    ZEROS(ps, GlobalV::NPOL * m * nkb);
+
+    int sum = 0;
+    int iat = 0;
+    if(GlobalV::NSPIN!=4)
+	{
+		for (int it=0; it<GlobalC::ucell.ntype; it++)
+		{
+			const int nproj = GlobalC::ucell.atoms[it].nh;
+			for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
+			{
+				// each atom has nproj, means this is with structure factor;
+				// each projector (each atom) must multiply coefficient
+				// with all the other projectors.
+				for (int ip=0; ip<nproj; ip++)
+				{
+					for (int ip2=0; ip2<nproj; ip2++)
+					{
+						for(int ib = 0; ib < m ; ++ib)
+						{
+							ps[(sum + ip2) * m + ib] +=
+							GlobalC::ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip, ip2)
+							* becp[ib * nkb + sum + ip];
+						}//end ib
+					}// end ih
+				}//end jh
+				sum += nproj;
+				++iat;
+			} //end na
+		} //end nt
+	}
+	else
+	{
+		for (int it=0; it<GlobalC::ucell.ntype; it++)
+		{
+			int psind=0;
+			int becpind=0;
+			std::complex<double> becp1=std::complex<double>(0.0,0.0);
+			std::complex<double> becp2=std::complex<double>(0.0,0.0);
+
+			const int nproj = GlobalC::ucell.atoms[it].nh;
+			for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
+			{
+				// each atom has nproj, means this is with structure factor;
+				// each projector (each atom) must multiply coefficient
+				// with all the other projectors.
+				for (int ip=0; ip<nproj; ip++)
+				{
+					for (int ip2=0; ip2<nproj; ip2++)
+					{
+						for(int ib = 0; ib < m ; ++ib)
+						{
+							psind = (sum+ip2) * 2 * m + ib * 2;
+							becpind = ib*nkb*2 + sum + ip;
+							becp1 =  becp[becpind];
+							becp2 =  becp[becpind + nkb];
+							ps[psind] += GlobalC::ppcell.deeq_nc(0, iat, ip2, ip) * becp1
+								+GlobalC::ppcell.deeq_nc(1, iat, ip2, ip) * becp2;
+							ps[psind +1] += GlobalC::ppcell.deeq_nc(2, iat, ip2, ip) * becp1
+								+GlobalC::ppcell.deeq_nc(3, iat, ip2, ip) * becp2;
+						}//end ib
+					}// end ih
+				}//end jh
+				sum += nproj;
+				++iat;
+			} //end na
+		} //end nt
+	}
+
+	/*
+    for (int ig=0;ig<GlobalC::wf.npw;ig++)
+    {
+        for (int i=0;i< GlobalC::ppcell.nkb;i++)
+        {
+            hpsi_in[ig]+=ps[i]*GlobalC::ppcell.vkb(i,ig);
+        }
+    }
+	*/
+
+
+	// use simple method.
+	//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	//qianrui optimize 2021-3-31
+	char transa = 'N';
+	char transb = 'T';
+	if(GlobalV::NPOL==1 && m==1)
+	{
+		int inc = 1;
+		zgemv_(&transa,
+			&GlobalC::wf.npw,
+			&GlobalC::ppcell.nkb,
+			&ONE,
+			GlobalC::ppcell.vkb.c,
+			&GlobalC::wf.npwx,
+			ps,
+			&inc,
+			&ONE,
+			hpsi_in,
+			&inc);
+	}
+	else
+	{
+		int npm = GlobalV::NPOL*m;
+		zgemm_(&transa,
+			&transb,
+			&GlobalC::wf.npw,
+			&npm,
+			&GlobalC::ppcell.nkb,
+			&ONE,
+			GlobalC::ppcell.vkb.c,
+			&GlobalC::wf.npwx,
+			ps,
+			&npm,
+			&ONE,
+			hpsi_in,
+			&GlobalC::wf.npwx);
+	}
+
+	//======================================================================
+	/*if(!GlobalV::NONCOLIN)
+	for(int i=0; i<GlobalC::ppcell.nkb; i++)
+	{
+		std::complex<double>* p = &GlobalC::ppcell.vkb(i,0);
+		std::complex<double>* p_end = p + GlobalC::wf.npw;
+		std::complex<double>* hp = hpsi_in;
+		std::complex<double>* psp = &ps[i];
+		for (;p<p_end;++p,++hp)
+		{
+			hp[0] += psp[0] * p[0];
+		}
+	}
+	else
+	for(int i=0; i<GlobalC::ppcell.nkb; i++)
+	{
+		std::complex<double>* p = &GlobalC::ppcell.vkb(i,0);
+		std::complex<double>* p_end = p + GlobalC::wf.npw;
+		std::complex<double>* hp = hpsi_in;
+		std::complex<double>* hp1 = hpsi_in + GlobalC::wf.npwx;
+		std::complex<double>* psp = &ps[i*2];
+		for (;p<p_end;p++,++hp,++hp1)
+		{
+			hp[0] += psp[0] * (p[0]);
+			hp1[0] += psp[1] * (p[0]);
+		}
+	}*/
+	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+	delete[] ps;
+    timer::tick("Hamilt_PW","add_nonlocal_pp");
     return;
 }

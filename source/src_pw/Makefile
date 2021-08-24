@@ -118,7 +118,7 @@ ${OBJ_DIR}/%.o:%.cpp
 
 # rules of .cu files
 ${OBJ_DIR}/%.o:%.cu
-	${CUDA_COMPILE} ${OPTS_CUDA} ${LIBS} -I/home/haosen/intel/compilers_and_libraries_2017.8.262/linux/mpi/intel64/include -c ${HONG} $< -o $@
+	${CUDA_COMPILE} ${OPTS_CUDA} ${LIBS} -I/home/haosen/intel/compilers_and_libraries_2017.8.262/linux/mpi/intel64/include -c ${HONG} -D__CUDA $< -o $@
 
 
 .PHONY:clean

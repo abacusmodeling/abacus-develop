@@ -74,7 +74,7 @@ void Reorder_psi_minus(CUFFT_COMPLEX *dst, CUFFT_COMPLEX *src)
 }
 
 
-void RoundTrip(const CUFFT_COMPLEX *psi, const double *vr, const int *fft_index, CUFFT_COMPLEX *psic)
+void RoundTrip_kernel(const CUFFT_COMPLEX *psi, const double *vr, const int *fft_index, CUFFT_COMPLEX *psic)
 
 {
     // (1) set value
@@ -118,7 +118,6 @@ void RoundTrip(const CUFFT_COMPLEX *psi, const double *vr, const int *fft_index,
     cudaFree(ordered_psi);
 
 /*
-
     // todo: delete!
     // cout<<"size of ismap"<<GlobalC::pw.FFT_wfc.nst<<endl;
     // cout<<"nppz:"<<GlobalC::pw.FFT_wfc.npps[0]<<endl;
@@ -219,6 +218,7 @@ void RoundTrip(const CUFFT_COMPLEX *psi, const double *vr, const int *fft_index,
     // cout<<"rounftrip end"<<endl;
 
     // cout<<"fft dim: "<<GlobalC::pw.nx<<" "<<GlobalC::pw.ny<<" "<<GlobalC::pw.nz<<endl;
+*/
 
     return;
 }
