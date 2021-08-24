@@ -12,7 +12,7 @@ std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_
 	const LCAO_Orbitals &orbs_in,
 	const double kmesh_times )
 {
-	TITLE("Exx_Abfs::Construct_Orbs::change_orbs");
+	ModuleBase::TITLE("Exx_Abfs::Construct_Orbs::change_orbs");
 
 	std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> orbs;
 	orbs.resize( orbs_in.get_ntype() );
@@ -51,7 +51,7 @@ std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_
 	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orbs_in,
 	const double kmesh_times )
 {
-	TITLE("Exx_Abfs::Construct_Orbs::change_orbs");
+	ModuleBase::TITLE("Exx_Abfs::Construct_Orbs::change_orbs");
 	return orbital( get_psi(orbs_in), orbs_in, kmesh_times );
 }
 
@@ -81,7 +81,7 @@ std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_
 	const double kmesh_times_mot,
 	const double times_threshold )
 {
-	TITLE("Exx_Abfs::Construct_Orbs::abfs_same_atom");
+	ModuleBase::TITLE("Exx_Abfs::Construct_Orbs::abfs_same_atom");
 
 	const std::vector<std::vector<std::vector<std::vector<double>>>>
 		abfs_same_atom_psi = psi_mult_psi( orbs );
@@ -116,7 +116,7 @@ std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_
 	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orbs,
 	const double norm_threshold )
 {
-	TITLE("Exx_Abfs::Construct_Orbs::orth_orbs");
+	ModuleBase::TITLE("Exx_Abfs::Construct_Orbs::orth_orbs");
 	const std::vector<std::vector<std::vector<std::vector<double>>>>
 		orbs_psi = get_psi( orbs );
 	const std::vector<std::vector<std::vector<std::vector<double>>>>
@@ -319,7 +319,7 @@ ofs<<"eig_value_threshold:\t"<<eig_value_threshold<<std::endl;
 		}
 		else
 		{
-			WARNING(ModuleBase::GlobalFunc::TO_STRING(__FILE__),
+			ModuleBase::WARNING(ModuleBase::GlobalFunc::TO_STRING(__FILE__),
 				"Element "+ModuleBase::GlobalFunc::TO_STRING(T)+" , all training data (lcao[i]*lcao[j]) are all the same. So PCA randomly choose an abf as the result.");
 			psis_new[T].resize( psis[T].size() );
 			for( size_t L=0; L!=psis[T].size(); ++L )

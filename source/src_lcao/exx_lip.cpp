@@ -28,7 +28,7 @@ Exx_Lip::Exx_Info::Exx_Info( const Exx_Global::Exx_Info &info_global )
 
 void Exx_Lip::cal_exx()
 {
-	TITLE("Exx_Lip","cal_exx");
+	ModuleBase::TITLE("Exx_Lip","cal_exx");
 	auto my_time = [](timeval &t_begin) -> double
 	{
 		const double time_during = cal_time(t_begin);
@@ -113,7 +113,7 @@ cout_t("sum_all",t_sum_all);
 /*
 void Exx_Lip::cal_exx()
 {
-	TITLE("Exx_Lip","cal_exx");
+	ModuleBase::TITLE("Exx_Lip","cal_exx");
 	wf_wg_cal();
 	psi_cal();
 	for( int ik=0; ik<k_pack->kv_ptr->nks; ++ik)
@@ -154,7 +154,7 @@ void Exx_Lip::cal_exx()
 
 void Exx_Lip::init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in, PW_Basis *pw_ptr_in, Use_FFT *UFFT_ptr_in, UnitCell_pseudo *ucell_ptr_in)
 {
-	TITLE("Exx_Lip","init");
+	ModuleBase::TITLE("Exx_Lip","init");
 	try
 	{
 		k_pack = new k_package;
@@ -243,7 +243,7 @@ void Exx_Lip::init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in, PW_Basis *pw_ptr_i
 	}
 	catch(const std::bad_alloc &ex)
 	{
-		WARNING_QUIT("exact_exchange","Memory");
+		ModuleBase::WARNING_QUIT("exact_exchange","Memory");
 	}
 
 	init_finish = true;
@@ -251,7 +251,7 @@ void Exx_Lip::init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in, PW_Basis *pw_ptr_i
 
 Exx_Lip::~Exx_Lip()
 {
-	TITLE("Exx_Lip","~Exx_Lip");
+	ModuleBase::TITLE("Exx_Lip","~Exx_Lip");
 	if( init_finish)
 	{
 		for( int iw=0; iw<GlobalV::NLOCAL; ++iw)
@@ -316,7 +316,7 @@ Exx_Lip::~Exx_Lip()
 
 void Exx_Lip::wf_wg_cal()
 {
-	TITLE("Exx_Lip","wf_wg_cal");
+	ModuleBase::TITLE("Exx_Lip","wf_wg_cal");
 	if(GlobalV::NSPIN==1)
 		for( int ik=0; ik<k_pack->kv_ptr->nks; ++ik)
 			for( int ib=0; ib<GlobalV::NBANDS; ++ib)
@@ -356,7 +356,7 @@ void Exx_Lip::phi_cal(k_package *kq_pack, int ikq)
 
 void Exx_Lip::psi_cal()
 {
-	TITLE("Exx_Lip","psi_cal");
+	ModuleBase::TITLE("Exx_Lip","psi_cal");
 	if (GlobalC::pot.start_pot=="atomic")
 	{
 		for( int iq = 0; iq < q_pack->kv_ptr->nks; ++iq)
@@ -549,7 +549,7 @@ void Exx_Lip::sum_all(int ik)
 
 void Exx_Lip::exx_energy_cal()
 {
-	TITLE("Exx_Lip","exx_energy_cal");
+	ModuleBase::TITLE("Exx_Lip","exx_energy_cal");
 
 	double exx_energy_tmp = 0.0;
 
@@ -751,7 +751,7 @@ void Exx_Lip::write_q_pack() const
 		std::ofstream ofs(ssc.str().c_str());
     	if (!ofs)
     	{
-        	WARNING("Exx_Lip::write_q_pack","Can't create Exx_Lip File!");
+        	ModuleBase::WARNING("Exx_Lip::write_q_pack","Can't create Exx_Lip File!");
     	}
 
 		ofs<<q_pack->kv_ptr->nks<<std::endl;
@@ -804,7 +804,7 @@ void Exx_Lip::read_q_pack()
 		ifs.open(ssc.str().c_str());
     	if (!ifs)
     	{
-        	WARNING("Exx_Lip::write_q_pack","Can't read Exx_Lip File!");
+        	ModuleBase::WARNING("Exx_Lip::write_q_pack","Can't read Exx_Lip File!");
     	}
 
 		ifs >> q_pack->kv_ptr->nks;
@@ -886,7 +886,7 @@ void Exx_Lip::read_q_pack()
 		std::ofstream ofs(sss.str().c_str());
 		if (!ofs)
 		{
-			WARNING("Exx_Lip::write_q_pack","Can't create Exx_Lip File!");
+			ModuleBase::WARNING("Exx_Lip::write_q_pack","Can't create Exx_Lip File!");
 		}
 
 		ofs<<q_pack->kv_ptr->nks<<std::endl;

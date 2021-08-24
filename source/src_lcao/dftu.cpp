@@ -75,7 +75,7 @@ void DFTU::init(
 	Parallel_Orbitals &po // parallel orbitals parameters
 )
 {
-    TITLE("DFTU", "init");
+    ModuleBase::TITLE("DFTU", "init");
 
 	// please, do not use 'INPUT' directly in the class!
 	// needs reconstructions in future
@@ -91,7 +91,7 @@ void DFTU::init(
 	else if(dftu_type==1 && double_counting==2) cal_type = 2;
 	else if(dftu_type==2 && double_counting==1) cal_type = 3;
 	else if(dftu_type==2 && double_counting==2) cal_type = 4;
-	else WARNING_QUIT("DFT+U", "Wrong parameter");
+	else ModuleBase::WARNING_QUIT("DFT+U", "Wrong parameter");
 		
 	this->EU = 0.0;
 
@@ -273,7 +273,7 @@ void DFTU::init(
 
 void DFTU::cal_occup_m_k(const int iter)
 {
-	TITLE("DFTU", "cal_occup_m_k");
+	ModuleBase::TITLE("DFTU", "cal_occup_m_k");
 	ModuleBase::timer::tick("DFTU", "cal_occup_m_k");
 
 	for(int T=0; T<GlobalC::ucell.ntype; T++)
@@ -488,7 +488,7 @@ void DFTU::cal_occup_m_k(const int iter)
 
 void DFTU::cal_occup_m_gamma(const int iter)
 {
-	TITLE("DFTU", "cal_occup_m_gamma");	
+	ModuleBase::TITLE("DFTU", "cal_occup_m_gamma");	
 	ModuleBase::timer::tick("DFTU", "cal_occup_m_gamma");
 	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
@@ -663,7 +663,7 @@ void DFTU::cal_occup_m_gamma(const int iter)
 
 void DFTU::write_occup_m(const std::string &fn)
 {
-	TITLE("DFTU", "write_occup_m");
+	ModuleBase::TITLE("DFTU", "write_occup_m");
 
 	if(GlobalV::MY_RANK!=0) return;
 
@@ -753,7 +753,7 @@ void DFTU::write_occup_m(const std::string &fn)
 
 void DFTU::read_occup_m(const std::string &fn)
 {
-	TITLE("DFTU", "read_occup_m");
+	ModuleBase::TITLE("DFTU", "read_occup_m");
 
 	if(GlobalV::MY_RANK!=0) return;
 
@@ -913,7 +913,7 @@ void DFTU::read_occup_m(const std::string &fn)
 
 void DFTU::local_occup_bcast()
 {
-	TITLE("DFTU", "local_occup_bcast");
+	ModuleBase::TITLE("DFTU", "local_occup_bcast");
 
 	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
@@ -983,7 +983,7 @@ void DFTU::local_occup_bcast()
 
 void DFTU::cal_energy_correction(const int istep)
 {
-	TITLE("DFTU", "cal_energy_correction");
+	ModuleBase::TITLE("DFTU", "cal_energy_correction");
 	ModuleBase::timer::tick("DFTU", "cal_energy_correction");
 	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!omc) && istep==0 && this->iter_dftu==1) return;
 
@@ -1145,7 +1145,7 @@ void DFTU::cal_energy_correction(const int istep)
 
 void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, std::complex<double>* eff_pot)
 {
-	TITLE("DFTU", "cal_eff_pot_mat");
+	ModuleBase::TITLE("DFTU", "cal_eff_pot_mat");
 	ModuleBase::timer::tick("DFTU", "cal_eff_pot_mat");
  	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!omc) && istep==0 && this->iter_dftu==1) return;
 	
@@ -1228,7 +1228,7 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, std::complex<d
 
 void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 {
-	TITLE("DFTU", "cal_eff_pot_mat");
+	ModuleBase::TITLE("DFTU", "cal_eff_pot_mat");
 	ModuleBase::timer::tick("DFTU", "cal_eff_pot_mat");
  	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!omc) && istep==0 && this->iter_dftu==1) return;
 	
@@ -1311,7 +1311,7 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 
 void DFTU::output()
 {
-	TITLE("DFTU", "output");
+	ModuleBase::TITLE("DFTU", "output");
 	
 	GlobalV::ofs_running << "//=========================L(S)DA+U===========================//" << std::endl;
 
@@ -1490,7 +1490,7 @@ void DFTU::cal_eff_pot_mat_R_complex_double(
 
 void DFTU::folding_overlap_matrix(const int ik, std::complex<double>* Sk)
 {
-  TITLE("DFTU","folding_overlap_matrix"); 
+  ModuleBase::TITLE("DFTU","folding_overlap_matrix"); 
 	ModuleBase::timer::tick("DFTU","folding_overlap_matrix");
 
   ModuleBase::GlobalFunc::ZEROS(Sk, GlobalC::ParaO.nloc);

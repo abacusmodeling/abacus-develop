@@ -35,7 +35,7 @@ void toWannier90::init_wannier()
 		else if(wannier_spin == "down") start_k_index = num_kpts/2;
 		else
 		{
-			WARNING_QUIT("toWannier90::init_wannier","Error wannier_spin set,is not \"up\" or \"down\" ");
+			ModuleBase::WARNING_QUIT("toWannier90::init_wannier","Error wannier_spin set,is not \"up\" or \"down\" ");
 		}
 	}
 	
@@ -92,7 +92,7 @@ void toWannier90::read_nnkp()
 	
 	std::ifstream nnkp_read(INPUT.NNKP.c_str(), ios::in);
 	
-	if(!nnkp_read) WARNING_QUIT("toWannier90::read_nnkp","Error during readin parameters.");
+	if(!nnkp_read) ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error during readin parameters.");
 	
 	if( ModuleBase::GlobalFunc::SCAN_BEGIN(nnkp_read,"real_lattice") )
 	{
@@ -104,23 +104,23 @@ void toWannier90::read_nnkp()
 		real_lattice_nnkp = real_lattice_nnkp / GlobalC::ucell.lat0_angstrom;
 		
 		if(abs(real_lattice_nnkp.e11 - GlobalC::ucell.latvec.e11) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
 		if(abs(real_lattice_nnkp.e12 - GlobalC::ucell.latvec.e12) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
 		if(abs(real_lattice_nnkp.e13 - GlobalC::ucell.latvec.e13) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
 		if(abs(real_lattice_nnkp.e21 - GlobalC::ucell.latvec.e21) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
 		if(abs(real_lattice_nnkp.e22 - GlobalC::ucell.latvec.e22) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
 		if(abs(real_lattice_nnkp.e23 - GlobalC::ucell.latvec.e23) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
 		if(abs(real_lattice_nnkp.e31 - GlobalC::ucell.latvec.e31) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
 		if(abs(real_lattice_nnkp.e32 - GlobalC::ucell.latvec.e32) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
 		if(abs(real_lattice_nnkp.e33 - GlobalC::ucell.latvec.e33) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
 		
 	}
 	
@@ -135,42 +135,42 @@ void toWannier90::read_nnkp()
 		recip_lattice_nnkp = recip_lattice_nnkp / tpiba_angstrom;
 		
 		if(abs(recip_lattice_nnkp.e11 - GlobalC::ucell.G.e11) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
 		if(abs(recip_lattice_nnkp.e12 - GlobalC::ucell.G.e12) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
 		if(abs(recip_lattice_nnkp.e13 - GlobalC::ucell.G.e13) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
 		if(abs(recip_lattice_nnkp.e21 - GlobalC::ucell.G.e21) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
 		if(abs(recip_lattice_nnkp.e22 - GlobalC::ucell.G.e22) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
 		if(abs(recip_lattice_nnkp.e23 - GlobalC::ucell.G.e23) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
 		if(abs(recip_lattice_nnkp.e31 - GlobalC::ucell.G.e31) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
 		if(abs(recip_lattice_nnkp.e32 - GlobalC::ucell.G.e32) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
 		if(abs(recip_lattice_nnkp.e33 - GlobalC::ucell.G.e33) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
 	}
 	
 	if( ModuleBase::GlobalFunc::SCAN_BEGIN(nnkp_read,"kpoints") )
 	{
 		int numkpt_nnkp;
 		ModuleBase::GlobalFunc::READ_VALUE(nnkp_read, numkpt_nnkp);
-		if( (GlobalV::NSPIN == 1 || GlobalV::NSPIN == 4) && numkpt_nnkp != GlobalC::kv.nkstot ) WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
-		else if(GlobalV::NSPIN == 2 && numkpt_nnkp != (GlobalC::kv.nkstot/2))	WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
+		if( (GlobalV::NSPIN == 1 || GlobalV::NSPIN == 4) && numkpt_nnkp != GlobalC::kv.nkstot ) ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
+		else if(GlobalV::NSPIN == 2 && numkpt_nnkp != (GlobalC::kv.nkstot/2))	ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
 	
 		Vector3<double> *kpoints_direct_nnkp = new Vector3<double>[numkpt_nnkp];
 		for(int ik = 0; ik < numkpt_nnkp; ik++)
 		{
 			nnkp_read >> kpoints_direct_nnkp[ik].x >> kpoints_direct_nnkp[ik].y >> kpoints_direct_nnkp[ik].z;
 			if(abs(kpoints_direct_nnkp[ik].x - GlobalC::kv.kvec_d[ik].x) > 1.0e-4) 
-				WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
+				ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
 			if(abs(kpoints_direct_nnkp[ik].y - GlobalC::kv.kvec_d[ik].y) > 1.0e-4) 
-				WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
+				ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
 			if(abs(kpoints_direct_nnkp[ik].z - GlobalC::kv.kvec_d[ik].z) > 1.0e-4) 
-				WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
+				ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
 		}
 				
 		delete[] kpoints_direct_nnkp;
@@ -190,7 +190,7 @@ void toWannier90::read_nnkp()
 			// test
 			if(num_wannier < 0)
 			{
-				WARNING_QUIT("toWannier90::read_nnkp","wannier number is lower than 0");
+				ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","wannier number is lower than 0");
 			}
 			
 			R_centre = new Vector3<double>[num_wannier];
@@ -216,7 +216,7 @@ void toWannier90::read_nnkp()
 	}
 	else
 	{
-		WARNING_QUIT("toWannier90::read_nnkp","noncolin spin is not done yet");
+		ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","noncolin spin is not done yet");
 	}
 
 	if( ModuleBase::GlobalFunc::SCAN_BEGIN(nnkp_read,"nnkpts") )
@@ -241,7 +241,7 @@ void toWannier90::read_nnkp()
 			{
 				int ik_nnkp;
 				nnkp_read >> ik_nnkp;
-				if(ik_nnkp != (ik+1)) WARNING_QUIT("toWannier90::read_nnkp","error nnkpts in *.nnkp file");
+				if(ik_nnkp != (ik+1)) ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","error nnkpts in *.nnkp file");
 				nnkp_read >> nnlist[ik][ib];
 				nnkp_read >> nncell[ik][ib].x >> nncell[ik][ib].y >> nncell[ik][ib].z;
 				nnlist[ik][ib]--; // this is c++ , begin from 0
@@ -254,7 +254,7 @@ void toWannier90::read_nnkp()
 	{
 		ModuleBase::GlobalFunc::READ_VALUE(nnkp_read, num_exclude_bands);
 		if(num_exclude_bands > 0) exclude_bands = new int[num_exclude_bands];
-		else if(num_exclude_bands < 0) WARNING_QUIT("toWannier90::read_nnkp","the exclude bands is wrong , please check *.nnkp file.");
+		else if(num_exclude_bands < 0) ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","the exclude bands is wrong , please check *.nnkp file.");
 		
 		if(num_exclude_bands > 0)
 		{
@@ -294,7 +294,7 @@ void toWannier90::read_nnkp()
 	
 	// ����exclude_bands
 	tag_cal_band = new bool[GlobalV::NBANDS];
-	if(GlobalV::NBANDS <= num_exclude_bands) WARNING_QUIT("toWannier90::read_nnkp","you set the band numer is not enough, please add bands number.");
+	if(GlobalV::NBANDS <= num_exclude_bands) ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","you set the band numer is not enough, please add bands number.");
 	if(num_exclude_bands == 0)
 	{
 		for(int ib = 0; ib < GlobalV::NBANDS; ib++) tag_cal_band[ib] = true;

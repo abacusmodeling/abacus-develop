@@ -23,7 +23,7 @@ pseudopot_cell_vnl::~pseudopot_cell_vnl()
 //-----------------------------------
 void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 {
-	TITLE("pseudopot_cell_vnl", "init");
+	ModuleBase::TITLE("pseudopot_cell_vnl", "init");
 	ModuleBase::timer::tick("ppcell_vnl", "init");
 
 	GlobalV::ofs_running << "\n SETUP NONLOCAL PSEUDOPOTENTIALS IN PLANE WAVE BASIS" << std::endl;
@@ -139,7 +139,7 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 //----------------------------------------------------------
 void pseudopot_cell_vnl::getvnl(const int &ik)
 {
-	if(GlobalV::test_pp) TITLE("pseudopot_cell_vnl","getvnl");
+	if(GlobalV::test_pp) ModuleBase::TITLE("pseudopot_cell_vnl","getvnl");
 	ModuleBase::timer::tick("pp_cell_vnl","getvnl");
 
 	if(lmaxkb < 0) 
@@ -226,7 +226,7 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 
 void pseudopot_cell_vnl::init_vnl(UnitCell_pseudo &cell)
 {
-	TITLE("pseudopot_cell_vnl","init_vnl");
+	ModuleBase::TITLE("pseudopot_cell_vnl","init_vnl");
 	ModuleBase::timer::tick("ppcell_vnl","init_vnl");
 
 	//from init_us_1
@@ -414,7 +414,7 @@ std::complex<double> pseudopot_cell_vnl::Cal_C(int alpha, int lu, int mu, int L,
 	}
 	else
 	{
-		WARNING_QUIT("pseudopot_cell_vnl_alpha", "alpha must be 0~2");
+		ModuleBase::WARNING_QUIT("pseudopot_cell_vnl_alpha", "alpha must be 0~2");
 	}
 	
 	return cf;
@@ -433,7 +433,7 @@ double pseudopot_cell_vnl::CG(int l1, int m1, int l2, int m2, int L, int M)     
 
 void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  2018-3-23
 {
-	if(GlobalV::test_pp) TITLE("pseudopot_cell_vnl","getvnl_alpha");
+	if(GlobalV::test_pp) ModuleBase::TITLE("pseudopot_cell_vnl","getvnl_alpha");
 	ModuleBase::timer::tick("pp_cell_vnl","getvnl_alpha");
 
 	if(lmaxkb < 0) 
@@ -553,7 +553,7 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 
 void pseudopot_cell_vnl::init_vnl_alpha(void)          // pengfei Li 2018-3-23
 {
-	if(GlobalV::test_pp) TITLE("pseudopot_cell_vnl","init_vnl_alpha");
+	if(GlobalV::test_pp) ModuleBase::TITLE("pseudopot_cell_vnl","init_vnl_alpha");
 	ModuleBase::timer::tick("ppcell_vnl","init_vnl_alpha");
 
 	for(int it=0;it<GlobalC::ucell.ntype;it++)

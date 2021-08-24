@@ -10,7 +10,7 @@
 template< typename T >
 T Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D( const std::map<size_t,std::map<size_t,T>> & H_a2D ) const
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D");
 	
 	T H_m2D;
 	if(GlobalV::KS_SOLVER=="genelpa")
@@ -69,7 +69,7 @@ template<typename Tmatrix>
 Tmatrix Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D(
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &HR_a2D, const int ik) const
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D");
 
 	Tmatrix HK_m2D;
 	if(GlobalV::KS_SOLVER=="genelpa")
@@ -137,7 +137,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D_mixing(
 	std::vector<Tmatrix> &HK_m2D,
 	std::vector<std::deque<Tmatrix>> &HK_m2D_pulay_seq) const
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D_mixing");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D_mixing");
 
 	HK_m2D.resize(GlobalC::kv.nks);
 	HK_m2D_pulay_seq.resize(GlobalC::kv.nks);
@@ -174,7 +174,7 @@ template<typename Tmatrix>
 Tmatrix Exx_Abfs::Parallel::Communicate::Hexx::pulay_mixing(
 	const Tmatrix &H_pulay_old, std::deque<Tmatrix> &H_seq, const Tmatrix &H_new ) const
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::pulay_mixing");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::Hexx::pulay_mixing");
 
 	Tmatrix H_pulay;
 	if( 0==GlobalC::CHR.totstep )

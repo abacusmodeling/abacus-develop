@@ -46,7 +46,7 @@ Chi0_standard:: ~Chi0_standard()
 
 void Chi0_standard:: Chi()
 {
-	TITLE("Chi0_standard","Chi");
+	ModuleBase::TITLE("Chi0_standard","Chi");
 
 	//---------------------------------------
 	//  the serial number of q
@@ -66,7 +66,7 @@ void Chi0_standard:: Chi()
 	
 	if(!exist_q)
 	{
-		WARNING_QUIT("chi0_hilbert","the chosen q is not included in the kmesh!!");
+		ModuleBase::WARNING_QUIT("chi0_hilbert","the chosen q is not included in the kmesh!!");
 	}
 	else
 	{
@@ -189,11 +189,11 @@ void Chi0_standard:: Chi()
 	
 	//if(total_icount == 0)
 	//{
-	//	WARNING_QUIT("chi0_hilbert","Now the kmesh contains no kpoint along this direction!");
+	//	ModuleBase::WARNING_QUIT("chi0_hilbert","Now the kmesh contains no kpoint along this direction!");
 	//}
 	if(total_icount < nq-1 )
 	{
-		WARNING_QUIT("chi0_hilbert","Now the kmesh doesn't contain enough kpoints along this direction! please change the parameter nq smaller");
+		ModuleBase::WARNING_QUIT("chi0_hilbert","Now the kmesh doesn't contain enough kpoints along this direction! please change the parameter nq smaller");
 	}
 	
 	for(icount=0; icount<total_icount-1; icount++)
@@ -291,7 +291,7 @@ void Chi0_standard:: Chi()
 
 void Chi0_standard::Parallel_G()
 {
-	TITLE("Chi0_standard","Parallel_G");
+	ModuleBase::TITLE("Chi0_standard","Parallel_G");
 	//----------------------------
 	// init
 	//----------------------------
@@ -453,7 +453,7 @@ void Chi0_standard:: Init()
 
 void Chi0_standard::Delete()
 {
-	TITLE("Chi0_standard","Delete");
+	ModuleBase::TITLE("Chi0_standard","Delete");
 	if(init_finish == true)				// Peize Lin change = to == at 2020.01.31
 	{
 		delete[] b_core;
@@ -556,7 +556,7 @@ void Chi0_standard::Cal_Psi(int iq, std::complex<double> **psi_r)
 
 void Chi0_standard::Cal_b(int iq, int ik, int iqk)
 {
-	TITLE("Chi0_standard","Cal_b");
+	ModuleBase::TITLE("Chi0_standard","Cal_b");
 	Vector3<double> qk;
 	qk = GlobalC::kv.kvec_c[iq] + GlobalC::kv.kvec_c[ik];
 	//std::cout <<"qk = "<<qk.x<<" "<<qk.y<<" "<<qk.z<<std::endl;
@@ -725,7 +725,7 @@ void Chi0_standard:: Cal_rpa(int iq)
 	int l = Cinv(dim, rpa);
 	if(l == 0)
 	{
-		WARNING_QUIT("chi0_standard","(I-v*chi0) is a singular matrix !!");
+		ModuleBase::WARNING_QUIT("chi0_standard","(I-v*chi0) is a singular matrix !!");
 	}
 	
 	return;	

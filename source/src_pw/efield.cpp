@@ -15,7 +15,7 @@ double Efield::bmod;
 
 void Efield::add_efield(const double*const rho, double* v_in)
 {
-	TITLE("Efield","add_efield");
+	ModuleBase::TITLE("Efield","add_efield");
 
 	if(!GlobalV::EFIELD) return;
 
@@ -41,7 +41,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 	else
 	{
 		throw range_error("Efield::add_efield, edir is < 1 or > 3. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		//WARNING_QUIT("Efield::add_efield","edir is < 1 or > 3.");
+		//ModuleBase::WARNING_QUIT("Efield::add_efield","edir is < 1 or > 3.");
 	}
 //	std::cout << " bvec=" << bvec[0] << " " << bvec[1] << " " << bvec[2] << std::endl;
 
@@ -209,7 +209,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 void Efield::compute_el_dip(const double &emaxpos, const double &eopreg,
 	const int &edir, const double*const rho, double &e_dipole)const
 {
-	TITLE("Efield","compute_el_dip");
+	ModuleBase::TITLE("Efield","compute_el_dip");
 
 
 	return;
@@ -218,7 +218,7 @@ void Efield::compute_el_dip(const double &emaxpos, const double &eopreg,
 void Efield::compute_ion_dip(const double &emaxpos, const double &eopreg,
 	const int &edir, double &ion_dipole, const double &bmod_in, const double *bvec_in)const
 {
-	TITLE("Efield","compute_ion_dip");
+	ModuleBase::TITLE("Efield","compute_ion_dip");
 
 	// Calculate IONIC dipole
 	// 

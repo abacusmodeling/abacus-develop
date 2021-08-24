@@ -29,7 +29,7 @@ LOOP_ions::~LOOP_ions()
 
 void LOOP_ions::opt_ions(void)
 {
-    TITLE("LOOP_ions","opt_ions");
+    ModuleBase::TITLE("LOOP_ions","opt_ions");
     ModuleBase::timer::tick("LOOP_ions","opt_ions");
 
     if(GlobalV::OUT_LEVEL=="i")
@@ -266,7 +266,7 @@ bool LOOP_ions::force_stress(
 	int &force_step,
 	int &stress_step)
 {
-    TITLE("LOOP_ions","force_stress");
+    ModuleBase::TITLE("LOOP_ions","force_stress");
 
     if(!GlobalV::FORCE && !GlobalV::STRESS)
     {
@@ -460,7 +460,7 @@ xiaohui modify 2014-08-09*/
 
 void LOOP_ions::final_scf(void)
 {
-    TITLE("LOOP_ions","final_scf");
+    ModuleBase::TITLE("LOOP_ions","final_scf");
 
     GlobalV::FINAL_SCF = true;
 

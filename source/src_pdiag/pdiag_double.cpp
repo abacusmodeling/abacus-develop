@@ -406,7 +406,7 @@ void Pdiag_Double::divide_HS_2d
 #endif
 )
 {
-	TITLE("Pdiag_Double","divide_HS_2d");
+	ModuleBase::TITLE("Pdiag_Double","divide_HS_2d");
 	assert(GlobalV::NLOCAL>0);
 	assert(GlobalV::DSIZE>0);
 
@@ -547,7 +547,7 @@ void Pdiag_Double::diago_double_begin(
 	#endif
 
 #ifdef __MPI
-	TITLE("Pdiag_Double","diago_begin");
+	ModuleBase::TITLE("Pdiag_Double","diago_begin");
 	assert(this->loc_size > 0);
 	assert(GlobalV::NLOCAL > 0);
 
@@ -976,7 +976,7 @@ void Pdiag_Double::diago_complex_begin(
     #endif
 
 #ifdef __MPI
-	TITLE("Pdiag_Double","diago_complex_begin");
+	ModuleBase::TITLE("Pdiag_Double","diago_complex_begin");
 
 	char uplo='U';
 	const int inc=1;
@@ -1262,7 +1262,7 @@ void Pdiag_Double::readin(
 	double *eigen,
 	double *eigvr)
 {
-    TITLE("Pdiag_Double","readin");
+    ModuleBase::TITLE("Pdiag_Double","readin");
 
     int coord[2];
     int dim[2];

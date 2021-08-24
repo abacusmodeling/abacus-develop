@@ -6,7 +6,7 @@
 
 void LOOP_ions::output_HS_R(void)
 {
-    TITLE("LOOP_ions","output_HS_R"); 
+    ModuleBase::TITLE("LOOP_ions","output_HS_R"); 
     ModuleBase::timer::tick("LOOP_ions","output_HS_R"); 
 	
 	// add by jingan for out r_R matrix 2019.8.14

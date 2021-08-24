@@ -17,7 +17,7 @@ Run_pw::~Run_pw(){}
 
 void Run_pw::plane_wave_line(void)
 {
-    TITLE("Run_pw","plane_wave_line");
+    ModuleBase::TITLE("Run_pw","plane_wave_line");
 	ModuleBase::timer::tick("Run_pw","plane_wave_line");
 
     // Setup the unitcell.
@@ -68,7 +68,7 @@ void Run_pw::plane_wave_line(void)
     if(GlobalV::CALCULATION == "test")
     {
         Cal_Test::test_memory();
-        QUIT();
+        ModuleBase::QUIT();
     }
 
     // mohan add 2010-09-13

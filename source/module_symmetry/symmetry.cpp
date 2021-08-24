@@ -23,7 +23,7 @@ bool Symmetry::symm_flag=false;
 void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, std::ofstream &ofs_running)
 {
     if (available == false) return;
-    TITLE("Symmetry","init");
+    ModuleBase::TITLE("Symmetry","init");
 	ModuleBase::timer::tick("Symmetry","analy_sys");
 
 	ofs_running << "\n\n\n\n";
@@ -495,7 +495,7 @@ void Symmetry::lattice_type(
     const UnitCell_pseudo &ucell
 )
 {
-    TITLE("Symmetry","lattice_type");
+    ModuleBase::TITLE("Symmetry","lattice_type");
 //      std::cout << "v1 = " << v1.x << " " << v1.y << " " << v1.z <<std::endl;
 //      std::cout << "v2 = " << v2.x << " " << v2.y << " " << v2.z <<std::endl;
 //      std::cout << "v3 = " << v3.x << " " << v3.y << " " << v3.z <<std::endl;
@@ -818,7 +818,7 @@ void Symmetry::lattice_type(
 void Symmetry::change_lattice(void)
 {
     //if lattice vectors are changed, do the coordinates conversion
-    if (GlobalV::test_symmetry) TITLE("Symmetry","change_lattice");
+    if (GlobalV::test_symmetry) ModuleBase::TITLE("Symmetry","change_lattice");
 
 	change = 0;
 
@@ -844,7 +844,7 @@ void Symmetry::change_lattice(void)
 void Symmetry::pricell(const UnitCell_pseudo &ucell)
 {
     //detect the generating cell (primitive cell) of a supercell
-    if (GlobalV::test_symmetry) TITLE("Symmetry","pricell");
+    if (GlobalV::test_symmetry) ModuleBase::TITLE("Symmetry","pricell");
 
     // part 1 of pricell
     for (int it = 0; it < ntype; it++)
@@ -1071,7 +1071,7 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
     Vector3<double> zero(0.0,0.0,0.0);
     if (p1 == zero || p2 == zero || p3 == zero)
     {
-		WARNING_QUIT("Symmetry::pricell","At least one of the primitive std::vector is (0,0,0).");
+		ModuleBase::WARNING_QUIT("Symmetry::pricell","At least one of the primitive std::vector is (0,0,0).");
     }
 
     double celvolume = 0;
@@ -1125,7 +1125,7 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
 
 void Symmetry::getgroup(int &nrot, int &nrotk, std::ofstream &ofs_running)
 {
-    TITLE("Symmetry","getgroup");
+    ModuleBase::TITLE("Symmetry","getgroup");
 
 	//--------------------------------------------------------------------------------
     //GETGRP (L347 symlib.f VASP)
@@ -1415,7 +1415,7 @@ void Symmetry::checksym(Matrix3 &s, Vector3<double> &gtrans, double* pos)
 void Symmetry::rho_symmetry( double *rho,
                              const int &nr1, const int &nr2, const int &nr3)
 {
-//  if (GlobalV::test_symmetry)TITLE("Symmetry","rho_symmetry");
+//  if (GlobalV::test_symmetry)ModuleBase::TITLE("Symmetry","rho_symmetry");
     ModuleBase::timer::tick("Symmetry","rho_symmetry");
 
     //for fft commensuration
@@ -1509,7 +1509,7 @@ void Symmetry::rho_symmetry( double *rho,
 
 void Symmetry::force_symmetry(ModuleBase::matrix &force , double* pos, const UnitCell_pseudo &ucell)   // pengfei 2016-12-20
 {
-	TITLE("Symmetry","force_symmetry");
+	ModuleBase::TITLE("Symmetry","force_symmetry");
 	double *protpos;
 	double *tot_force;
 	int *n;
@@ -1719,7 +1719,7 @@ void Symmetry::stress_symmetry(ModuleBase::matrix& sigma, const UnitCell_pseudo 
 
 void Symmetry::write(void)
 {
-    if (GlobalV::test_symmetry) TITLE("Symmetry","write");
+    if (GlobalV::test_symmetry) ModuleBase::TITLE("Symmetry","write");
     GlobalV::ofs_running<<std::endl;
     GlobalV::ofs_running<<"\n The point group serial number is "<<pgnumber<<"."<<std::endl;
     GlobalV::ofs_running<<"\n Its Schoenflies name is "<<pgname<<"."<<std::endl;

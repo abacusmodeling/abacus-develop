@@ -22,7 +22,7 @@ int Ions_Move_Basic::out_stru=0;
 
 void Ions_Move_Basic::setup_gradient(double* pos, double *grad, const ModuleBase::matrix &force)
 {
-	TITLE("Ions_Move_Basic","setup_gradient");
+	ModuleBase::TITLE("Ions_Move_Basic","setup_gradient");
 	
 	assert(GlobalC::ucell.ntype>0);
 	assert(pos!=NULL);
@@ -66,7 +66,7 @@ void Ions_Move_Basic::setup_gradient(double* pos, double *grad, const ModuleBase
 
 void Ions_Move_Basic::move_atoms(double *move, double *pos)
 {
-	TITLE("Ions_Move_Basic","move_atoms");
+	ModuleBase::TITLE("Ions_Move_Basic","move_atoms");
 
 	assert(move!=NULL);
 	assert(pos!=NULL);
@@ -124,7 +124,7 @@ void Ions_Move_Basic::move_atoms(double *move, double *pos)
 
 void Ions_Move_Basic::check_converged(const double *grad)
 {
-	TITLE("Ions_Move_Basic","check_converged");
+	ModuleBase::TITLE("Ions_Move_Basic","check_converged");
 	assert(dim>0);
 
 	//------------------------------------------------
@@ -191,7 +191,7 @@ void Ions_Move_Basic::check_converged(const double *grad)
 
 void Ions_Move_Basic::terminate(void)
 {
-	TITLE("Ions_Move_Basic","terminate");
+	ModuleBase::TITLE("Ions_Move_Basic","terminate");
 	if(Ions_Move_Basic::converged)
 	{
 		GlobalV::ofs_running << " end of geometry optimization"<<std::endl;
@@ -289,7 +289,7 @@ void Ions_Move_Basic::second_order(
 	double &best_e
 	)
 {
-	TITLE("Ions_Move_Basic","second_order");
+	ModuleBase::TITLE("Ions_Move_Basic","second_order");
 
 	// (1) E = ax^2 + bx + c
 	// |x> is the movement,or the trust radius 

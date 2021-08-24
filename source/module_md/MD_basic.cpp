@@ -63,7 +63,7 @@ MD_basic::MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
 		if(mdp.NVT_control == 1) mdp.NVT_tau = 20 * mdp.dt; //NHC
 		else if(mdp.NVT_control == 2) mdp.NVT_tau = 20 * mdp.dt; //LGV
 		else if(mdp.NVT_control == 3) mdp.NVT_tau = 20 * mdp.dt; //ADS
-		else WARNING_QUIT("md:InitMD", "please choose available reservoir!!!");
+		else ModuleBase::WARNING_QUIT("md:InitMD", "please choose available reservoir!!!");
 	}
 	else
 	{
@@ -130,7 +130,7 @@ void MD_basic::runNVT(int step1, double potential, Vector3<double> *force, const
 // Normal Nose-Hoover thermostat method is retained for test.
 //------------------------------------------------------------------------------
 
-	TITLE("MD_basic","runnvt");
+	ModuleBase::TITLE("MD_basic","runnvt");
 	ModuleBase::timer::tick("MD_basic","runnvt");
 	step_=step1+step_rst_;
 	//the real MD step
@@ -286,7 +286,7 @@ void MD_basic::runNVE(int step1, double potential, Vector3<double> *force, const
 // Molecular dynamics calculation with Verlet algorithm
 //-------------------------------------------------------------------------------
 
-    TITLE("MD_basic","runNVE");
+    ModuleBase::TITLE("MD_basic","runNVE");
     ModuleBase::timer::tick("MD_basic","runNVE");
     step_=step1+step_rst_;
 
@@ -409,7 +409,7 @@ bool MD_basic::runFIRE(int step1, double potential, Vector3<double> *force, cons
 //-------------------------------------------------------------------------------
 // REFERENCES:
 //   
-    TITLE("MD_basic","runFIRE");
+    ModuleBase::TITLE("MD_basic","runFIRE");
     ModuleBase::timer::tick("MD_basic","runFIRE");
     step_ = step1;
     // if(step_==1)

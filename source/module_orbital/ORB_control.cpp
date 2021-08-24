@@ -25,7 +25,7 @@ void ORB_control::set_orb_tables(
 	const bool &force_flag, // mohan add 2021-05-07
 	const int &my_rank) // mohan add 2021-04-26
 {
-    TITLE("ORB_control","set_orb_tables");
+    ModuleBase::TITLE("ORB_control","set_orb_tables");
 	ModuleBase::timer::tick("ORB_control","set_orb_tables");
     
 	/////////////////////////////////////////////////////////////////
@@ -94,7 +94,7 @@ void ORB_control::clear_after_ions(
 	LCAO_Orbitals &orb,
 	const int &out_descriptor)
 {
-    TITLE("ORB_control","clear_after_ions");
+    ModuleBase::TITLE("ORB_control","clear_after_ions");
     OGT.MOT.Destroy_Table(orb);
     OGT.tbeta.Destroy_Table_Beta(orb);
     

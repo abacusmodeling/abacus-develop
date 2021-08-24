@@ -24,7 +24,7 @@ void Sphbes::BESSJY(double x, double xnu, double *rj, double *ry, double *rjp, d
     if (x <= 0.0 || xnu < 0.0)
     {
 		std::cout << "Sphbes::BESSJY, bad arguments" << std::endl;
-        //WARNING_QUIT("Sphbes::BESSJY","bad arguments");
+        //ModuleBase::WARNING_QUIT("Sphbes::BESSJY","bad arguments");
 		exit(0); // mohan add 2021-05-06
     }
 
@@ -303,7 +303,7 @@ double Sphbes::Spherical_Bessel_7(const int n, const double &x)
     if (n < 0 || x <= 0.0)
     {
 		std::cout << "Spherical_Bessel_7, bad arguments in sphbes" << std::endl;
-        //WARNING_QUIT("Sphbes::Spherical_Bessel_7","bad arguments in sphbes");
+        //ModuleBase::WARNING_QUIT("Sphbes::Spherical_Bessel_7","bad arguments in sphbes");
 		exit(0);
     }
 
@@ -329,17 +329,17 @@ void Sphbes::Spherical_Bessel_Roots
     const double &rcut
 )
 {
-    //TITLE("Sphbes","Spherical_Bessel_Roots");
+    //ModuleBase::TITLE("Sphbes","Spherical_Bessel_Roots");
     if (num<=0)
 	{
 		std::cout << "Spherical_Bessel_Roots, num<=0" << std::endl;
-		//WARNING_QUIT("Sphbes::Spherical_Bessel_Roots","num<=0");
+		//ModuleBase::WARNING_QUIT("Sphbes::Spherical_Bessel_Roots","num<=0");
 		exit(0);
 	}
     if (rcut<=0.0)
 	{
 		std::cout << "Spherical_Bessel_Roots, rcut<=0" << std::endl;
-		//WARNING_QUIT("Sphbes::Spherical_Bessel_Roots","rcut<=0.0");
+		//ModuleBase::WARNING_QUIT("Sphbes::Spherical_Bessel_Roots","rcut<=0.0");
 		exit(0);
 	}
 

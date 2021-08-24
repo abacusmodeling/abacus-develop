@@ -243,7 +243,7 @@ void YlmReal::Ylm_Real2
 {
     if (ng<1 || lmax2<1)
     {
-        WARNING("YLM_REAL","ng<1 or lmax2<1");
+        ModuleBase::WARNING("YLM_REAL","ng<1 or lmax2<1");
         return;
     }
 
@@ -263,7 +263,7 @@ void YlmReal::Ylm_Real2
     }
     if (out_of_range)
     {
-        WARNING_QUIT("YLM_REAL","l>30 or l<0");
+        ModuleBase::WARNING_QUIT("YLM_REAL","l>30 or l<0");
     }
 
 //----------------------------------------------------------
@@ -303,7 +303,7 @@ void YlmReal::Ylm_Real
 
     if (ng<1 || lmax2<1)
     {
-        WARNING("YLM_REAL","ng<1 or lmax2<1");
+        ModuleBase::WARNING("YLM_REAL","ng<1 or lmax2<1");
         return;
     }
 
@@ -323,7 +323,7 @@ void YlmReal::Ylm_Real
     }
     if (out_of_range)
     {
-        WARNING_QUIT("YLM_REAL","l>30 or l<0");
+        ModuleBase::WARNING_QUIT("YLM_REAL","l>30 or l<0");
     }
 
 //----------------------------------------------------------
@@ -477,7 +477,7 @@ void YlmReal::Ylm_Real
             		}
             	}
             	MPI_Barrier(MPI_COMM_WORLD);
-            	QUIT();
+            	ModuleBase::QUIT();
             }
             */
 
@@ -505,7 +505,7 @@ void YlmReal::Ylm_Real
     					}
     				}
     				MPI_Barrier(MPI_COMM_WORLD);
-    				QUIT();
+    				ModuleBase::QUIT();
     			}
     			double sum_before = 0.0;
     			for(int ig=0; ig<ng; ig++)

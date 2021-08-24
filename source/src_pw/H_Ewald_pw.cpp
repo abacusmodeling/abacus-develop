@@ -11,7 +11,7 @@ H_Ewald_pw::~H_Ewald_pw(){};
 
 void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 {
-    TITLE("H_Ewald_pw","compute_ewald");
+    ModuleBase::TITLE("H_Ewald_pw","compute_ewald");
     ModuleBase::timer::tick("H_Ewald_pw","compute_ewald");
 
 //----------------------------------------------------------
@@ -70,7 +70,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 
         if (alpha <= 0.0)
         {
-            WARNING_QUIT("ewald","Can't find optimal alpha.");
+            ModuleBase::WARNING_QUIT("ewald","Can't find optimal alpha.");
         }
         upperbound = 2.0 * charge * charge * sqrt(2.0 * alpha / TWO_PI) *
                      erfc(sqrt(cell.tpiba2 * pwb.ggchg / 4.0 / alpha));

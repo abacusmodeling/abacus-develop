@@ -52,7 +52,7 @@ void Vdwd2_Parameters::C6_input(const std::string &file, const std::string &unit
 	{
 		std::ifstream ifs(file);
 		if(!ifs)
-			WARNING_QUIT("Vdwd2::C6_input", "Can not find the file "+ModuleBase::GlobalFunc::TO_STRING(file));
+			ModuleBase::WARNING_QUIT("Vdwd2::C6_input", "Can not find the file "+ModuleBase::GlobalFunc::TO_STRING(file));
 		std::string element;
 		double value;
 		while( ifs >> element >> value )
@@ -67,7 +67,7 @@ void Vdwd2_Parameters::C6_input(const std::string &file, const std::string &unit
 			c6.second /= pow(BOHR_TO_A,6)/Ry_to_eV;
 //		else if( unit == "RyBohr6");
 		else
-			WARNING_QUIT("Input","vdwD2_C6_unit must be Jnm6/mol or eVA6");
+			ModuleBase::WARNING_QUIT("Input","vdwD2_C6_unit must be Jnm6/mol or eVA6");
 	}
 }
 
@@ -77,7 +77,7 @@ void Vdwd2_Parameters::R0_input(const std::string &file, const std::string &unit
 	{
 		std::ifstream ifs(file.c_str());
 		if(!ifs)
-			WARNING_QUIT("Vdwd2::R0_input", "Can not find the file "+ModuleBase::GlobalFunc::TO_STRING(file));
+			ModuleBase::WARNING_QUIT("Vdwd2::R0_input", "Can not find the file "+ModuleBase::GlobalFunc::TO_STRING(file));
 		std::string element;
 		double value;
 		while( ifs >> element >> value )
@@ -90,7 +90,7 @@ void Vdwd2_Parameters::R0_input(const std::string &file, const std::string &unit
 			r0.second/= BOHR_TO_A;
 		else if( unit == "Bohr") ;
 		else
-			WARNING_QUIT("Input","vdwD2_R0_unit must be A or Bohr");			
+			ModuleBase::WARNING_QUIT("Input","vdwD2_R0_unit must be A or Bohr");			
 	}
 }
 

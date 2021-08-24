@@ -63,7 +63,7 @@ delete[] ngm_i_number;
 void Parallel_PW::init(const double &gcut_in, const int &n1_in, const int &n2_in, const int &n3_in,
 		const int &bz, const int &nproc_in,const int &rank_in)
 {
-	if(GlobalV::test_pw) TITLE("Parallel_PW","init");
+	if(GlobalV::test_pw) ModuleBase::TITLE("Parallel_PW","init");
 
 	this->gcut=gcut_in;
 	this->n1=n1_in;
@@ -104,7 +104,7 @@ void Parallel_PW::init(const double &gcut_in, const int &n1_in, const int &n2_in
 
 void Parallel_PW::columns_map(void)
 {
-	if(GlobalV::test_pw) TITLE("Parallel_PW","columns_map");
+	if(GlobalV::test_pw) ModuleBase::TITLE("Parallel_PW","columns_map");
 	ModuleBase::timer::tick("Parallel_PW","columns_map");
 		
 	int ibox[3];
@@ -191,7 +191,7 @@ void Parallel_PW::columns_map(void)
 
 void Parallel_PW::restore_st(void)
 {
-	if(GlobalV::test_pw) TITLE("Parallel_PW","restore_st");
+	if(GlobalV::test_pw) ModuleBase::TITLE("Parallel_PW","restore_st");
 	
 	// assert the number of total sticks has
 	// been calculated.
@@ -199,7 +199,7 @@ void Parallel_PW::restore_st(void)
 
 	if(this->nst < nproc_use)
 	{
-		WARNING_QUIT("Parallel_PW::restore_st","nst(number of sticks in FFT xy plane) < nproc_use, too many processes used.");
+		ModuleBase::WARNING_QUIT("Parallel_PW::restore_st","nst(number of sticks in FFT xy plane) < nproc_use, too many processes used.");
 	}
 
 	//---------------------------------------
@@ -240,7 +240,7 @@ void Parallel_PW::restore_st(void)
 
 void Parallel_PW::columns_and_pw_distribution(void)
 {
-	if(GlobalV::test_pw) TITLE("Parallel_PW","columns_and_pw_distribution");
+	if(GlobalV::test_pw) ModuleBase::TITLE("Parallel_PW","columns_and_pw_distribution");
 
 	// number of sticks of each processor in one pool.
 	delete[] nst_per;
@@ -408,7 +408,7 @@ void Parallel_PW::fft_map(
         int ggchg_time
 )
 {
-	if(GlobalV::test_pw) TITLE("Parallel_PW","fft_map");
+	if(GlobalV::test_pw) ModuleBase::TITLE("Parallel_PW","fft_map");
 
 	// if already found all the plane waves in this process, return.
 	if(ngm_i == ngm) return;
@@ -454,7 +454,7 @@ void Parallel_PW::fft_map(
 	{
 		std::cout << std::setw(12) << "ngm_i = " << std::setw(12) << ngm_i << std::endl;
 		std::cout << std::setw(12) << "npw_per = " << this->npw_per[rank_use] << std::endl;
-		WARNING_QUIT("Parallel_PW::fft_map","ngm_i !=npw_per[rank_use]");
+		ModuleBase::WARNING_QUIT("Parallel_PW::fft_map","ngm_i !=npw_per[rank_use]");
 	}
 	*/
 	
@@ -485,7 +485,7 @@ void Parallel_PW::fft_map(
 				<<std::setw(12)<<"isind"<<std::setw(12)<<"ig2fft"<<std::endl;
 			std::cout<<std::setw(12)<<index_now
 				<<std::setw(12)<<this->isind[index_now]<<std::setw(12)<<ig2fft[ig]<<std::endl;
-			WARNING_QUIT("Parallel_PW::fft_map","isind == -1 !");
+			ModuleBase::WARNING_QUIT("Parallel_PW::fft_map","isind == -1 !");
 		}
 		ig2fft[ig] = z + this->isind[index_now] * this->n3;
 		//std::cout << "\n i=" << i << " ig2fft=" << ig2fft[i];
@@ -554,7 +554,7 @@ void Parallel_PW::fft_map_after_vc(
         int ggchg_time
 )
 {
-    if(GlobalV::test_pw) TITLE("Parallel_PW","fft_map_after_vc");
+    if(GlobalV::test_pw) ModuleBase::TITLE("Parallel_PW","fft_map_after_vc");
 
     if(!allocate_igl2g)
     {
@@ -588,7 +588,7 @@ void Parallel_PW::fft_map_final_scf(
 	const int &ngmc_g_in // cutgg_num
 )
 {
-	if(GlobalV::test_pw) TITLE("Parallel_PW","fft_map_final_scf");
+	if(GlobalV::test_pw) ModuleBase::TITLE("Parallel_PW","fft_map_final_scf");
 
 	// if already found all the plane waves in this process, return.
 	if(ngm_i_final_scf == ngm) return;
@@ -653,7 +653,7 @@ void Parallel_PW::fft_map_final_scf(
 				<<std::setw(12)<<"isind"<<std::setw(12)<<"ig2fft"<<std::endl;
 			std::cout<<std::setw(12)<<index_now
 				<<std::setw(12)<<this->isind[index_now]<<std::setw(12)<<ig2fft[ig]<<std::endl;
-			WARNING_QUIT("Parallel_PW::fft_map","isind == -1 !");
+			ModuleBase::WARNING_QUIT("Parallel_PW::fft_map","isind == -1 !");
 		}
 		ig2fft[ig] = z + this->isind[index_now] * this->n3;
 		//std::cout << "\n i=" << i << " ig2fft=" << ig2fft[i];
@@ -669,7 +669,7 @@ void Parallel_PW::fft_map_final_scf(
 #ifdef __MPI
 void Parallel_PW:: stick_to_pool(double *stick, const int &ir, double *out)
 {	
-	//TITLE("Parallel_Grid","zpiece_to_all");
+	//ModuleBase::TITLE("Parallel_Grid","zpiece_to_all");
 	MPI_Status ierror;
 
 	const int is = isind[ir];

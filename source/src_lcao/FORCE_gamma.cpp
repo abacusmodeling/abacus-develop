@@ -21,7 +21,7 @@ void Force_LCAO_gamma::ftable_gamma (
 	ModuleBase::matrix& svnl_dbeta,
 	ModuleBase::matrix& svl_dphi)
 {
-    TITLE("Force_LCAO_gamma", "ftable");
+    ModuleBase::TITLE("Force_LCAO_gamma", "ftable");
     ModuleBase::timer::tick("Force_LCAO_gamma","ftable_gamma");
     
     // allocate DSloc_x, DSloc_y, DSloc_z
@@ -89,7 +89,7 @@ void Force_LCAO_gamma::ftable_gamma (
 
 void Force_LCAO_gamma::allocate_gamma(void)
 {
-    TITLE("Force_LCAO_gamma","allocate_gamma");
+    ModuleBase::TITLE("Force_LCAO_gamma","allocate_gamma");
     ModuleBase::timer::tick("Force_LCAO_gamma","allocate_gamma");
 
     // need to calculate the derivative in build_ST_new

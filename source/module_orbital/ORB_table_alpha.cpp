@@ -44,7 +44,7 @@ void ORB_table_alpha::allocate(
 	const double &dr_in,
 	const double &dk_in)
 {
-	TITLE("ORB_table_alpha", "allocate");
+	ModuleBase::TITLE("ORB_table_alpha", "allocate");
 
 	this->ntype = ntype_in; // type of elements.
 	this->lmax = lmax_in;
@@ -118,7 +118,7 @@ int ORB_table_alpha::get_rmesh(const double &R1, const double &R2)
 //		GlobalV::ofs_warning << "\n rmesh = " << rmesh;
 		std::cout << "\n R1 = " << R1 << " R2 = " << R2;
 		std::cout << "\n rmesh = " << rmesh;
-		WARNING_QUIT("ORB_table_alpha::get_rmesh", "rmesh <= 0");
+		ModuleBase::WARNING_QUIT("ORB_table_alpha::get_rmesh", "rmesh <= 0");
 	}
 	return rmesh;
 }
@@ -222,7 +222,7 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 void ORB_table_alpha::init_Table_Alpha(
 	Sph_Bessel_Recursive::D2 *pSB)
 {
-	TITLE("ORB_table_alpha", "init_Table_Alpha");
+	ModuleBase::TITLE("ORB_table_alpha", "init_Table_Alpha");
 	ModuleBase::timer::tick("ORB_table_alpha", "init_Table_Alpha");
 
 	assert(ntype > 0);
@@ -364,7 +364,7 @@ void ORB_table_alpha::Destroy_Table_Alpha(void)
 
 void ORB_table_alpha::init_DS_2Lplus1(void)
 {
-	TITLE("Make_Overlap_Table", "init_DS_2Lplus1");
+	ModuleBase::TITLE("Make_Overlap_Table", "init_DS_2Lplus1");
 	assert(this->ntype > 0);
 	delete[] DS_2Lplus1;
 	DS_2Lplus1 = new int[ntype]; // 2Lmax+1 for each T1
@@ -417,7 +417,7 @@ void ORB_table_alpha::init_DS_Opair(void)
 //caoyu add 2021-03-20
 void ORB_table_alpha::print_Table_DSR(void)
 {
-	TITLE("ORB_table_alpha", "print_Table_DSR");
+	ModuleBase::TITLE("ORB_table_alpha", "print_Table_DSR");
 	NEW_PART("Overlap table S between lcao orbital and descriptor basis : S_{I_mu_alpha}");
 
 	std::ofstream ofs;

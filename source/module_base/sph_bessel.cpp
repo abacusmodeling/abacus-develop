@@ -209,7 +209,7 @@ double Sph_Bessel::jlx7(const int &n, const double &x)
     if (n < 0 || x <= 0.0)
     {
 		std::cout << "Sph_Bessel::jlx7,bad arguments in sphbes" << std::endl;
-        //WARNING_QUIT("Sph_Bessel::jlx7","bad arguments in sphbes");
+        //ModuleBase::WARNING_QUIT("Sph_Bessel::jlx7","bad arguments in sphbes");
 		exit(0); // mohan add 2021-05-05
     }
 	order = n + 0.5;
@@ -229,7 +229,7 @@ void Sph_Bessel::BESSJY(double x, double xnu, double *rj, double *ry, double *rj
 	if (x <= 0.0 || xnu < 0.0)
 	{
 		std::cout << "Sph_Bessel::BESSJY, bad arguments in bessjy" << std::endl;
-		//WARNING_QUIT("Sph_Bessel::BESSJY","bad arguments in bessjy");
+		//ModuleBase::WARNING_QUIT("Sph_Bessel::BESSJY","bad arguments in bessjy");
 		exit(0);
 	}
 	nl=(x < xmin ? (int)(xnu+0.5) : IMAX(0,(int)(xnu-x+1.5)));
@@ -259,7 +259,7 @@ void Sph_Bessel::BESSJY(double x, double xnu, double *rj, double *ry, double *rj
 	if (i > maxit)
 	{
 		std::cout << "Sph_Bessel::BESSJY, x too large in bessjy; try asymptotic expansion" << std::endl;
-		//WARNING_QUIT("Sph_Bessel::BESSJY","x too large in bessjy; try asymptotic expansion");
+		//ModuleBase::WARNING_QUIT("Sph_Bessel::BESSJY","x too large in bessjy; try asymptotic expansion");
 		exit(0);
 	}
 	rjl=isign*fpmin;
@@ -308,7 +308,7 @@ void Sph_Bessel::BESSJY(double x, double xnu, double *rj, double *ry, double *rj
 		if (i > maxit)
 		{
 			std::cout << "Sph_Bessel::BESSJY, bessy series failed to converge" << std::endl;
-			//WARNING_QUIT("Sph_Bessel::BESSJY","bessy series failed to converge");
+			//ModuleBase::WARNING_QUIT("Sph_Bessel::BESSJY","bessy series failed to converge");
 			exit(0); // mohan add 2021-05-05
 		}
 		rymu = -sum;
@@ -355,7 +355,7 @@ void Sph_Bessel::BESSJY(double x, double xnu, double *rj, double *ry, double *rj
 		if (i > maxit)
 		{
 			std::cout << "Sph_Bessel::BESSJY, cf2 failed in bessjy" << std::endl;
-			//WARNING_QUIT("Sph_Bessel::BESSJY","cf2 failed in bessjy");
+			//ModuleBase::WARNING_QUIT("Sph_Bessel::BESSJY","cf2 failed in bessjy");
 			exit(0); // mohan add 2021-05-05
 		}
 		gam=(p-f)/q;

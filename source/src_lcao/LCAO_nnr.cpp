@@ -46,7 +46,7 @@ LCAO_nnr::~LCAO_nnr()
 // be called in LOOP_ions.cpp
 void LCAO_nnr::cal_nnr(void)
 {
-	TITLE("LCAO_nnr","cal_nnr");
+	ModuleBase::TITLE("LCAO_nnr","cal_nnr");
 
 	delete[] nlocdim;
 	delete[] nlocstart;
@@ -191,7 +191,7 @@ void LCAO_nnr::cal_nnr(void)
 // This is for cell R dependent part. 
 void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 {
-	TITLE("LCAO_nnr","cal_nnrg");
+	ModuleBase::TITLE("LCAO_nnr","cal_nnrg");
 
 	this->cal_max_box_index();
 
@@ -489,7 +489,7 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 
 void LCAO_nnr::cal_max_box_index(void)
 {
-	TITLE("LCAO_nnr","cal_max_box_index");
+	ModuleBase::TITLE("LCAO_nnr","cal_max_box_index");
 	this->maxB1 = this->maxB2 = this->maxB3 = -10000;
 	this->minB1 = this->minB2 = this->minB3 = 10000;
 	for (int T1 = 0; T1 < GlobalC::ucell.ntype; T1++)
@@ -549,7 +549,7 @@ int LCAO_nnr::cal_RindexAtom(const int &u1, const int &u2, const int &u3, const 
 		std::cout << " u1=" << u1 << " minB1=" << minB1 << std::endl;
 		std::cout << " u2=" << u2 << " minB2=" << minB2 << std::endl;
 		std::cout << " u3=" << u3 << " minB3=" << minB3 << std::endl;
-		WARNING_QUIT("LCAO_nnr::cal_Rindex","x1<0 || x2<0 || x3<0 !");
+		ModuleBase::WARNING_QUIT("LCAO_nnr::cal_Rindex","x1<0 || x2<0 || x3<0 !");
 	}
 
 	assert(x1>=0);
@@ -563,7 +563,7 @@ int LCAO_nnr::cal_RindexAtom(const int &u1, const int &u2, const int &u3, const 
 // be called in LCAO_Hamilt::calculate_Hk.
 void LCAO_nnr::folding_fixedH(const int &ik)
 {
-	TITLE("LCAO_nnr","folding_fixedH");
+	ModuleBase::TITLE("LCAO_nnr","folding_fixedH");
 	ModuleBase::timer::tick("LCAO_nnr","folding_fixedH");
 
 	int iat = 0;

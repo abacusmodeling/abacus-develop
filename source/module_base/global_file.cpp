@@ -76,7 +76,7 @@ void ModuleBase::Global_File::make_dir_out(
 	if(make_dir==0)
 	{
 		std::cout << " CAN NOT MAKE THE OUT DIR......." << std::endl;
-		QUIT();		
+		ModuleBase::QUIT();		
 	}
 	MPI_Barrier(MPI_COMM_WORLD);
 #endif

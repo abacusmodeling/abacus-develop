@@ -50,7 +50,7 @@ DFTU_RELAX::~DFTU_RELAX(){}
 
 void DFTU_RELAX::force_stress()
 {
-	TITLE("DFTU_RELAX", "force_stress");
+	ModuleBase::TITLE("DFTU_RELAX", "force_stress");
 
 	if(GlobalV::FORCE)
 	{
@@ -164,7 +164,7 @@ void DFTU_RELAX::force_stress()
 
 void DFTU_RELAX::cal_force_k(const int ik, const std::complex<double>* rho_VU)
 {
-	TITLE("DFTU_RELAX", "cal_force_k");
+	ModuleBase::TITLE("DFTU_RELAX", "cal_force_k");
 
 	const char transN = 'N';
 	const int  one_int = 1;
@@ -207,7 +207,7 @@ void DFTU_RELAX::cal_force_k(const int ik, const std::complex<double>* rho_VU)
 
 void DFTU_RELAX::cal_stress_k(const int ik, const std::complex<double>* rho_VU)
 {
-	TITLE("DFTU_RELAX", "cal_stress_k");
+	ModuleBase::TITLE("DFTU_RELAX", "cal_stress_k");
 
 	const char transN = 'N';
 	const int  one_int = 1;
@@ -250,7 +250,7 @@ void DFTU_RELAX::cal_stress_k(const int ik, const std::complex<double>* rho_VU)
 
 void DFTU_RELAX::cal_force_gamma(const double* rho_VU)
 {
-	TITLE("DFTU_RELAX", "cal_force_gamma");
+	ModuleBase::TITLE("DFTU_RELAX", "cal_force_gamma");
 
 	const char transN = 'N';
 	const int  one_int = 1;
@@ -294,7 +294,7 @@ void DFTU_RELAX::cal_force_gamma(const double* rho_VU)
 
 void DFTU_RELAX::cal_stress_gamma(const double* rho_VU)
 {
-	TITLE("DFTU_RELAX", "cal_stress_gamma");
+	ModuleBase::TITLE("DFTU_RELAX", "cal_stress_gamma");
 
 	const char transN = 'N';
 	const int  one_int = 1;
@@ -344,7 +344,7 @@ double DFTU_RELAX::get_onebody_eff_pot
   const int type, const bool newlocale 
 )
 {
-	TITLE("DFTU_RELAX","get_onebody_eff_pot");
+	ModuleBase::TITLE("DFTU_RELAX","get_onebody_eff_pot");
 
 	double VU = 0.0;
 
@@ -449,7 +449,7 @@ double DFTU_RELAX::get_onebody_eff_pot
 
 void DFTU_RELAX::cal_VU_pot_mat_complex(const int spin, const bool newlocale, std::complex<double>* VU)
 {
-  TITLE("DFTU_RELAX","cal_VU_pot_mat_complex"); 
+  ModuleBase::TITLE("DFTU_RELAX","cal_VU_pot_mat_complex"); 
 	// ModuleBase::timer::tick("DFTU","folding_overlap_matrix");
   ModuleBase::GlobalFunc::ZEROS(VU, GlobalC::ParaO.nloc);
 
@@ -506,7 +506,7 @@ void DFTU_RELAX::cal_VU_pot_mat_complex(const int spin, const bool newlocale, st
 
 void DFTU_RELAX::cal_VU_pot_mat_real(const int spin, const bool newlocale, double* VU)
 {
-  TITLE("DFTU_RELAX","cal_VU_pot_mat_real"); 
+  ModuleBase::TITLE("DFTU_RELAX","cal_VU_pot_mat_real"); 
 	// ModuleBase::timer::tick("DFTU","folding_overlap_matrix");
   ModuleBase::GlobalFunc::ZEROS(VU, GlobalC::ParaO.nloc);
 
@@ -562,7 +562,7 @@ void DFTU_RELAX::cal_VU_pot_mat_real(const int spin, const bool newlocale, doubl
 
 void DFTU_RELAX::fold_dSR_gamma(const int dim1, const int dim2, double* dSR_gamma)
 {
-  TITLE("DFTU_RELAX","fold_dSR_gamma");
+  ModuleBase::TITLE("DFTU_RELAX","fold_dSR_gamma");
 
   ModuleBase::GlobalFunc::ZEROS(dSR_gamma, GlobalC::ParaO.nloc);
 
@@ -648,7 +648,7 @@ void DFTU_RELAX::fold_dSR_gamma(const int dim1, const int dim2, double* dSR_gamm
 
 void DFTU_RELAX::fold_dSm_k(const int ik, const int dim, std::complex<double>* dSm_k)
 {
-  TITLE("DFTU_RELAX","fold_dSm_k");
+  ModuleBase::TITLE("DFTU_RELAX","fold_dSm_k");
 
   ModuleBase::GlobalFunc::ZEROS(dSm_k, GlobalC::ParaO.nloc);
 
@@ -748,7 +748,7 @@ void DFTU_RELAX::fold_dSm_k(const int ik, const int dim, std::complex<double>* d
 
 void DFTU_RELAX::fold_dSR_k(const int ik, const int dim1, const int dim2, std::complex<double>* dSR_k)
 {
-  TITLE("DFTU_RELAX","fold_dSR_k");
+  ModuleBase::TITLE("DFTU_RELAX","fold_dSR_k");
 
   ModuleBase::GlobalFunc::ZEROS(dSR_k, GlobalC::ParaO.nloc);
 

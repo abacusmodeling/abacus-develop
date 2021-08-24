@@ -18,7 +18,7 @@ int Lattice_Change_Basic::out_stru=0;
 
 void Lattice_Change_Basic::setup_gradient(double* lat, double *grad, ModuleBase::matrix &stress)
 {
-	TITLE("Lattice_Change_Basic","setup_gradient");
+	ModuleBase::TITLE("Lattice_Change_Basic","setup_gradient");
 	
 	if(INPUT.fixed_axes == "volume")
 	{
@@ -60,7 +60,7 @@ void Lattice_Change_Basic::setup_gradient(double* lat, double *grad, ModuleBase:
 
 void Lattice_Change_Basic::change_lattice(double *move, double *lat)
 {
-	TITLE("Lattice_Change_Basic","change_lattice");
+	ModuleBase::TITLE("Lattice_Change_Basic","change_lattice");
 
 	assert(move!=NULL);
 	assert(lat!=NULL);
@@ -144,7 +144,7 @@ void Lattice_Change_Basic::change_lattice(double *move, double *lat)
 
 void Lattice_Change_Basic::check_converged(ModuleBase::matrix &stress, double *grad)
 {
-	TITLE("Lattice_Change_Basic","check_converged");
+	ModuleBase::TITLE("Lattice_Change_Basic","check_converged");
 
 	Lattice_Change_Basic::largest_grad = 0.0;
 	double stress_ii_max = 0.0;
@@ -227,7 +227,7 @@ void Lattice_Change_Basic::check_converged(ModuleBase::matrix &stress, double *g
 
 void Lattice_Change_Basic::terminate(void)
 {
-	TITLE("Lattice_Change_Basic","terminate");
+	ModuleBase::TITLE("Lattice_Change_Basic","terminate");
 	if(Lattice_Change_Basic::converged)
 	{
 		GlobalV::ofs_running << " end of lattice optimization"<<std::endl;

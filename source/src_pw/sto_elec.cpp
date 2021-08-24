@@ -263,7 +263,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			{
 				GlobalV::ofs_running << " Notice: Threshold on eigenvalues was too large.\n";
 
-				WARNING("scf","Threshold on eigenvalues was too large.");
+				ModuleBase::WARNING("scf","Threshold on eigenvalues was too large.");
 				GlobalV::ofs_running << " dr2=" << dr2 << " < diago_error=" << diago_error << std::endl;
 
 				// update GlobalV::ETHR.
@@ -381,7 +381,7 @@ bool Stochastic_Elec::check_stop_now(void)
 
 void Stochastic_Elec::c_bands(const int &istep)
 {
-	if (GlobalV::test_elec) TITLE("electrons","c_bands");
+	if (GlobalV::test_elec) ModuleBase::TITLE("electrons","c_bands");
 	ModuleBase::timer::tick("Elec_Stochastic","c_bands");
 
 	int precondition_type = 2;

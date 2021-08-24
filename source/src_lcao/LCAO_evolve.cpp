@@ -12,7 +12,7 @@ Evolve_LCAO_Matrix::~Evolve_LCAO_Matrix(){}
 
 void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, std::complex<double>** cc, std::complex<double>** cc_init)const
 {
-	TITLE("Evolve_LCAO_Matrix","evolve_complex_matrix");
+	ModuleBase::TITLE("Evolve_LCAO_Matrix","evolve_complex_matrix");
 	time_t time_start = time(NULL);
 	GlobalV::ofs_running << " Start Time : " << ctime(&time_start);
 
@@ -30,7 +30,7 @@ void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, std::complex<doubl
 	}
 	else
 	{
-		WARNING_QUIT("Evolve_LCAO_Matrix::evolve_complex_matrix","only tddft==1 cando evolve");
+		ModuleBase::WARNING_QUIT("Evolve_LCAO_Matrix::evolve_complex_matrix","only tddft==1 cando evolve");
 	}
 
 	time_t time_end = time(NULL);
@@ -41,7 +41,7 @@ void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, std::complex<doubl
 
 void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, std::complex<double>** c, std::complex<double>** c_init)const
 {
-	                                                                                                                     TITLE("Evolve_LCAO_Matrix","using_LAPACK_complex");
+	                                                                                                                     ModuleBase::TITLE("Evolve_LCAO_Matrix","using_LAPACK_complex");
 
 //	Calculate the U operator
 
@@ -300,7 +300,7 @@ extern "C"
 
 int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, std::complex<double>** c, std::complex<double>** c_init)const
 {
-	TITLE("Evolve_LCAO_Matrix", "using_scalapack_complex");
+	ModuleBase::TITLE("Evolve_LCAO_Matrix", "using_scalapack_complex");
 	ModuleBase::ComplexMatrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	ModuleBase::ComplexMatrix Stmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	for(int i=0; i<GlobalV::NLOCAL; i++)
@@ -463,7 +463,7 @@ int localIndex(int globalIndex, int nblk, int nprocs, int& myproc)
 
 int Evolve_LCAO_Matrix::using_ScaLAPACK_complex_3(const int &ik, complex<double>** c, complex<double>** c_init)const
 {
-	TITLE("Evolve_LCAO_Matrix","using_ScaLAPACK_complex");
+	ModuleBase::TITLE("Evolve_LCAO_Matrix","using_ScaLAPACK_complex");
 
 	//inverse of matrix
 	//pzgetrf (int *m, int *n, Complex16 *a, int ia, int ja, int *desca, int *ipiv, int info);

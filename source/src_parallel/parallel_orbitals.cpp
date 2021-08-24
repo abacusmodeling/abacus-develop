@@ -46,7 +46,7 @@ bool Parallel_Orbitals::in_this_processor(const int &iw1_all, const int &iw2_all
 
 void Parallel_Orbitals::set_trace(void)
 {
-    TITLE("Parallel_Orbitals","set_trace");
+    ModuleBase::TITLE("Parallel_Orbitals","set_trace");
     assert(GlobalV::NLOCAL>0);
 
     delete[] trace_loc_row;
@@ -106,7 +106,7 @@ void Parallel_Orbitals::set_trace(void)
     else 
     {
         std::cout << " Parallel Orbial, GlobalV::DIAGO_TYPE = " << GlobalV::KS_SOLVER << std::endl;
-        WARNING_QUIT("Parallel_Orbitals::set_trace","Check GlobalV::KS_SOLVER.");
+        ModuleBase::WARNING_QUIT("Parallel_Orbitals::set_trace","Check GlobalV::KS_SOLVER.");
     }
 
     //---------------------------

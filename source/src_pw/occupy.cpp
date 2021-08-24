@@ -22,7 +22,7 @@ bool Occupy::fixed_occupations = false;
 
 void Occupy::calculate_weights(void)
 {
-	TITLE("Occupy","calculate_weights");
+	ModuleBase::TITLE("Occupy","calculate_weights");
 
 	// for test
 //	std::cout << " gaussian_broadening = " << use_gaussian_broadening << std::endl;
@@ -53,7 +53,7 @@ void Occupy::calculate_weights(void)
     }
     else if (use_tetrahedron_method)
     {
-        WARNING_QUIT("calculate_weights","not implemented yet,coming soon!");
+        ModuleBase::WARNING_QUIT("calculate_weights","not implemented yet,coming soon!");
 //		if(my_rank == 0)
 //		{
 //			tweights(GlobalC::kv.nkstot, nspin, GlobalV::NBANDS, GlobalC::CHR.nelec, ntetra,tetra, GlobalC::wf.et, GlobalC::en.ef, GlobalC::wf.wg);
@@ -136,7 +136,7 @@ void Occupy::calculate_weights(void)
 
 void Occupy::decision(const std::string &name,const std::string &smearing,const double &degauss)
 {
-	TITLE("Occupy","decision");
+	ModuleBase::TITLE("Occupy","decision");
     use_gaussian_broadening = false;
     use_tetrahedron_method = false;
     fixed_occupations = false;
@@ -148,7 +148,7 @@ void Occupy::decision(const std::string &name,const std::string &smearing,const 
     {
         if ( gaussian_parameter!=0.0 )
         {
-            WARNING("smearing_decision","Fixed occupations,gauss broadening ignored");
+            ModuleBase::WARNING("smearing_decision","Fixed occupations,gauss broadening ignored");
             ModuleBase::GlobalFunc::AUTO_SET("gaussian_parameter",0.0);
             gaussian_parameter = 0.0;
         }
@@ -157,7 +157,7 @@ void Occupy::decision(const std::string &name,const std::string &smearing,const 
     {
         if ( gaussian_parameter!=0.0 )
         {
-            WARNING("smearing_decision","Fixed occupations,gauss broadening ignored");
+            ModuleBase::WARNING("smearing_decision","Fixed occupations,gauss broadening ignored");
             ModuleBase::GlobalFunc::AUTO_SET("gaussian_parameter",0.0);
             gaussian_parameter = 0.0;
         }
@@ -173,7 +173,7 @@ void Occupy::decision(const std::string &name,const std::string &smearing,const 
         use_gaussian_broadening = true;
         if ( gaussian_parameter == 0.0)
         {
-            WARNING_QUIT("smearing_decision",
+            ModuleBase::WARNING_QUIT("smearing_decision",
                          "Smearing requires gaussian broadening,but gaussian_parameter = 0(default value = 0.1)");
         }
         if ( smearing == "gaussian" || smearing == "gauss")
@@ -208,7 +208,7 @@ void Occupy::decision(const std::string &name,const std::string &smearing,const 
     }
     else
     {
-        WARNING_QUIT("occupy_decision","occupations, not implemented");
+        ModuleBase::WARNING_QUIT("occupy_decision","occupations, not implemented");
     }
     return;
 }
@@ -292,7 +292,7 @@ void Occupy::iweights
 
     if(conv == false && GlobalC::en.iter == 2)
     {
-       WARNING_QUIT("Occupied","not converged, change 'smearing' method.");
+       ModuleBase::WARNING_QUIT("Occupied","not converged, change 'smearing' method.");
     }
 
     return;
@@ -316,7 +316,7 @@ void Occupy::gweights(
 	const int &is, // spin
 	const int *isk) // array to point out each k belong to which spin
 {
-	//TITLE("Occupy","gweights");
+	//ModuleBase::TITLE("Occupy","gweights");
     //===============================
     // Calculate the Fermi energy ef
     //===============================
@@ -365,7 +365,7 @@ void Occupy::efermig
 	const int *isk
 )
 {
-	//TITLE("Occupy","efermig");
+	//ModuleBase::TITLE("Occupy","efermig");
     //==================================================================
     // Finds the Fermi energy - Gaussian Broadening (Methfessel-Paxton)
     //==================================================================
@@ -421,7 +421,7 @@ void Occupy::efermig
 		std::cout << " sumklw = " << sumklw << std::endl;
 		std::cout << " sumkup - nelec = " << sumkup - nelec << std::endl;
 		std::cout << " sumklw - nelec = " << sumklw - nelec << std::endl;
-		WARNING_QUIT("Occupy::efermig","ERROS in SMEARING");
+		ModuleBase::WARNING_QUIT("Occupy::efermig","ERROS in SMEARING");
     }
 
     for (int i = 0;i < maxiter;i++)
@@ -464,7 +464,7 @@ double Occupy::sumkg(
 	const int *isk
 )
 {
-	//TITLE("Occupy","sumkg");
+	//ModuleBase::TITLE("Occupy","sumkg");
     double sum2 = 0.0;
     for (int ik = 0;ik < nks; ik++)
 	{
@@ -495,7 +495,7 @@ double Occupy::sumkg(
 
 double Occupy::wgauss(const double &x,const int n)
 {
-	//TITLE("Occupy","wgauss");
+	//ModuleBase::TITLE("Occupy","wgauss");
     //=====================================================================
     // This function computes the approximate theta function for the
     // iven order n, at the point x.
@@ -922,7 +922,7 @@ void Occupy::efermit(double** ekb,const int nband,const int nks,const double &ne
 
     if ((sumkup - nelec) < - eps || (sumklw - nelec) > eps)
     {
-        WARNING("efermit","unexpected error.");
+        ModuleBase::WARNING("efermit","unexpected error.");
     }
 
     double better = 1.0e+10;

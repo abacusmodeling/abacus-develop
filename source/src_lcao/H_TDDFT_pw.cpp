@@ -9,7 +9,7 @@
 //==========================================================
 void Potential::set_vrs_tddft(const int istep)
 {
-    TITLE("Potential","set_vrs_tddft");
+    ModuleBase::TITLE("Potential","set_vrs_tddft");
     ModuleBase::timer::tick("Potential","set_vrs_tddft");
 
     for (int is = 0;is < GlobalV::NSPIN;is++)

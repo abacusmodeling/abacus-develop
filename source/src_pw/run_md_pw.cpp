@@ -24,7 +24,7 @@ Run_MD_PW::~Run_MD_PW()
 
 void Run_MD_PW::md_ions_pw(void)
 {
-    TITLE("Run_MD_PW", "md_ions_pw");
+    ModuleBase::TITLE("Run_MD_PW", "md_ions_pw");
     ModuleBase::timer::tick("Run_MD_PW", "md_ions_pw");
 
     if (GlobalV::OUT_LEVEL == "i")
@@ -171,7 +171,7 @@ void Run_MD_PW::md_ions_pw(void)
         }
         else
         {
-            WARNING_QUIT("opt_ions", "mdtype should be -1~2!");
+            ModuleBase::WARNING_QUIT("opt_ions", "mdtype should be -1~2!");
         }
 
         time_t fend = time(NULL);
@@ -222,7 +222,7 @@ void Run_MD_PW::md_ions_pw(void)
 
 void Run_MD_PW::md_cells_pw()
 {
-    TITLE("Run_MD_PW", "md_cells_pw");
+    ModuleBase::TITLE("Run_MD_PW", "md_cells_pw");
     ModuleBase::timer::tick("Run_MD_PW", "md_cells_pw");
 
     GlobalC::wf.allocate(GlobalC::kv.nks);

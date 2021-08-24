@@ -36,7 +36,7 @@ void Stochastic_Chebychev::init(int &dim, int &chetype)
 
     if(norder<5)
     {
-        WARNING_QUIT("Stochastic_Chebychev", "The Chebychev expansion order should be at least 5!");
+        ModuleBase::WARNING_QUIT("Stochastic_Chebychev", "The Chebychev expansion order should be at least 5!");
     }
 
     assert(extend >= 1);
@@ -64,7 +64,7 @@ void Stochastic_Chebychev::init(int &dim, int &chetype)
     
 void Stochastic_Chebychev::calcoef(double fun(double))
 {
-    if(!initcoef) WARNING_QUIT("Stochastic_Chebychev", "Please init coef first!");
+    if(!initcoef) ModuleBase::WARNING_QUIT("Stochastic_Chebychev", "Please init coef first!");
     std::complex<double> *pcoef = (std::complex<double> *)ccoef;
     //three point = 2/3 M + 1/3 T;
 
@@ -108,7 +108,7 @@ void Stochastic_Chebychev::calcoef(double fun(double))
     }
     if( coef[norder-1]/coef[0] > 1e-9 )
     {
-        WARNING("Stochastic_Chebychev", 
+        ModuleBase::WARNING("Stochastic_Chebychev", 
 		"(coef[norder-1]/coef[0] > 1e-9) Please add more expansion terms for Chebychev expansion.");
     }
     getcoef = true;
@@ -120,7 +120,7 @@ std::complex<double> Stochastic_Chebychev::sumallterms(void)
 {
     if(!getcoef||!getpolyval) 
 	{
-		WARNING_QUIT("Stochastic_Chebychev", "Please calculate coef or polyval first!");
+		ModuleBase::WARNING_QUIT("Stochastic_Chebychev", "Please calculate coef or polyval first!");
 	}
 
     std::complex<double> result = 0;
@@ -193,7 +193,7 @@ void Stochastic_Chebychev::calfinalvec(
 	std::complex<double> *waveout, 
 	const int m)
 {
-    if(!getcoef) WARNING_QUIT("Stochastic_Chebychev", "Please calculate coef first!");
+    if(!getcoef) ModuleBase::WARNING_QUIT("Stochastic_Chebychev", "Please calculate coef first!");
 
     std::complex<double> *arraynp1;
 	std::complex<double> *arrayn;

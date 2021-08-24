@@ -5,7 +5,7 @@
 std::vector<std::pair<std::vector<bool>,std::vector<bool>>>
 Exx_Abfs::Parallel::Communicate::Function::get_atom_in_2D_list(const MPI_Comm &mpi_comm)
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::Functions::get_atom_in_2D_list");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::Functions::get_atom_in_2D_list");
 	int comm_sz;	MPI_Comm_size(mpi_comm, &comm_sz);
 	
 	bool atom_in_2D[GlobalC::ucell.nat*2];

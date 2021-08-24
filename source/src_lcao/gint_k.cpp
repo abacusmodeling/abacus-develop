@@ -31,12 +31,12 @@ void Gint_k::reset_spin(const int &spin_now_in)
 
 void Gint_k::allocate_pvpR(void)
 {
-	TITLE("Gint_k","allocate_pvpR");
+	ModuleBase::TITLE("Gint_k","allocate_pvpR");
 
 	if(this->pvpR_alloc_flag)
 	{
 		return; //Liuxh add, 20181012
-		WARNING_QUIT("Gint_k::allocate_pvpR","pvpR has been allocated!");
+		ModuleBase::WARNING_QUIT("Gint_k::allocate_pvpR","pvpR has been allocated!");
 	}
 
 	//	reduced = GlobalV::NURSE; 
@@ -64,7 +64,7 @@ void Gint_k::allocate_pvpR(void)
         {
             GlobalV::ofs_warning << " memory for pvpR = " << mem << std::endl;
             GlobalV::ofs_warning << " which is larger than 800 MB ! " << std::endl;
-			WARNING_QUIT("Gint_k","allocate_pvpR");
+			ModuleBase::WARNING_QUIT("Gint_k","allocate_pvpR");
 		}
 
 	}
@@ -82,7 +82,7 @@ void Gint_k::allocate_pvpR(void)
 		{
 			GlobalV::ofs_warning << " memory for pvpR = " << mem << std::endl;
 			GlobalV::ofs_warning << " which is larger than 800 MB ! " << std::endl;
-			WARNING_QUIT("Gint_k","allocate_pvpR");
+			ModuleBase::WARNING_QUIT("Gint_k","allocate_pvpR");
 		}
 
 		//----------------------------------------------
@@ -111,11 +111,11 @@ void Gint_k::allocate_pvpR(void)
 
 void Gint_k::destroy_pvpR(void)
 {
-	TITLE("Gint_k","destroy_pvpR");
+	ModuleBase::TITLE("Gint_k","destroy_pvpR");
 	
 	if(!pvpR_alloc_flag)
 	{
-		WARNING_QUIT("Gint_k::destroy_pvpR","<phi_0i | V | phi_Rj> matrix has not been allocated yet!");
+		ModuleBase::WARNING_QUIT("Gint_k::destroy_pvpR","<phi_0i | V | phi_Rj> matrix has not been allocated yet!");
 	}
 	
 	if(this->reduced)
@@ -145,7 +145,7 @@ void Gint_k::folding_force(
 	double* pvdpy, 
 	double* pvdpz)
 {
-	TITLE("Gint_k","folding_force");
+	ModuleBase::TITLE("Gint_k","folding_force");
 	ModuleBase::timer::tick("Gint_k","folding_force");
 
 	//xiaohui modify 2013-12-17, test
@@ -327,7 +327,7 @@ void Gint_k::folding_stress(
 	double* pvdp13, 
 	double* pvdp23)
 {
-	TITLE("Gint_k","folding_stress");
+	ModuleBase::TITLE("Gint_k","folding_stress");
 	ModuleBase::timer::tick("Gint_k","folding_stress");
 
 	const int lgd = GlobalC::GridT.lgd;
@@ -574,12 +574,12 @@ void Gint_k::folding_stress(
 // H(k)=\sum{R} H(R)exp(ikR) 
 void Gint_k::folding_vl_k(const int &ik)
 {
-	TITLE("Gint_k","folding_vl_k");
+	ModuleBase::TITLE("Gint_k","folding_vl_k");
 	ModuleBase::timer::tick("Gint_k","folding_vl_k");
 
 	if(!pvpR_alloc_flag)
 	{
-		WARNING_QUIT("Gint_k::destroy_pvpR","pvpR hasnot been allocated yet!");
+		ModuleBase::WARNING_QUIT("Gint_k::destroy_pvpR","pvpR hasnot been allocated yet!");
 	}
 
 	//####################### EXPLAIN #################################
@@ -832,12 +832,12 @@ void Gint_k::folding_vl_k(const int &ik)
 // for non-collinear case  
 void Gint_k::folding_vl_k_nc(const int &ik)
 {
-	TITLE("Gint_k","folding_vl_k_nc");
+	ModuleBase::TITLE("Gint_k","folding_vl_k_nc");
 	ModuleBase::timer::tick("Gint_k","folding_vl_k_nc");
 
 	if(!pvpR_alloc_flag)
 	{
-		WARNING_QUIT("Gint_k::destroy_pvpR","pvpR hasnot been allocated yet!");
+		ModuleBase::WARNING_QUIT("Gint_k::destroy_pvpR","pvpR hasnot been allocated yet!");
 	}
 
 	this->ik_now = ik;
@@ -1070,7 +1070,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 						}
 						else
 						{
-							WARNING_QUIT("Gint_k::folding_vl_k_nc","index is wrong!");
+							ModuleBase::WARNING_QUIT("Gint_k::folding_vl_k_nc","index is wrong!");
 						}
 						//tmp[j] = this->pvp[spin][mug][nug];
 					}
@@ -1102,7 +1102,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 						}
 						else
 						{
-							WARNING_QUIT("Gint_k::folding_vl_k_nc","index is wrong!");
+							ModuleBase::WARNING_QUIT("Gint_k::folding_vl_k_nc","index is wrong!");
 						}
 						//tmp[j] = conj(this->pvp[spin][nug][mug]);
 						
@@ -1252,7 +1252,7 @@ void Gint_k::set_ijk_atom(
 
 void Gint_k::allocate_pvpR_tr(void)
 {
-    TITLE("Gint_k","allocate_pvpR_tr");
+    ModuleBase::TITLE("Gint_k","allocate_pvpR_tr");
 
     int R_x = GlobalC::GridD.getCellX();
     int R_y = GlobalC::GridD.getCellY();
@@ -1314,7 +1314,7 @@ void Gint_k::allocate_pvpR_tr(void)
 
 void Gint_k::destroy_pvpR_tr(void)
 {
-    TITLE("Gint_k","destroy_pvpR_tr");
+    ModuleBase::TITLE("Gint_k","destroy_pvpR_tr");
 
     int R_x = GlobalC::GridD.getCellX();
     int R_y = GlobalC::GridD.getCellY();
@@ -1366,7 +1366,7 @@ void Gint_k::destroy_pvpR_tr(void)
 
 void Gint_k::distribute_pvpR_tr(void)
 {
-    TITLE("Gint_k","distribute_pvpR_tr");
+    ModuleBase::TITLE("Gint_k","distribute_pvpR_tr");
 
     int R_x = GlobalC::GridD.getCellX();
     int R_y = GlobalC::GridD.getCellY();
@@ -1452,7 +1452,7 @@ void Gint_k::distribute_pvpR_tr(void)
 
 void Gint_k::cal_vlocal_R(const int current_spin)
 {
-    TITLE("Gint_k","cal_vlocal_R");
+    ModuleBase::TITLE("Gint_k","cal_vlocal_R");
 
     allocate_pvpR_tr();
 
@@ -1558,7 +1558,7 @@ void Gint_k::cal_vlocal_R(const int current_spin)
 												}
 												else
 												{
-													WARNING_QUIT("Gint_k::folding_vl_k_nc","index is wrong!");
+													ModuleBase::WARNING_QUIT("Gint_k::folding_vl_k_nc","index is wrong!");
 												}
 									}//endif NC
 									else
@@ -1587,7 +1587,7 @@ void Gint_k::cal_vlocal_R(const int current_spin)
 
 void Gint_k::allocate_pvpR_sparseMatrix(void)
 {
-    TITLE("Gint_k","allocate_pvpR_sparseMatrix");
+    ModuleBase::TITLE("Gint_k","allocate_pvpR_sparseMatrix");
 
     int R_x = GlobalC::GridD.getCellX();
     int R_y = GlobalC::GridD.getCellY();
@@ -1623,7 +1623,7 @@ void Gint_k::allocate_pvpR_sparseMatrix(void)
 
 void Gint_k::destroy_pvpR_sparseMatrix(void)
 {
-	TITLE("Gint_k","destroy_pvpR_sparseMatrix");
+	ModuleBase::TITLE("Gint_k","destroy_pvpR_sparseMatrix");
 
 	int R_x = GlobalC::GridD.getCellX();
     int R_y = GlobalC::GridD.getCellY();
@@ -1660,7 +1660,7 @@ void Gint_k::destroy_pvpR_sparseMatrix(void)
 
 void Gint_k::distribute_pvpR_sparseMatrix(const double &sparse_threshold)
 {
-	TITLE("Gint_k","distribute_pvpR_sparseMatrix");
+	ModuleBase::TITLE("Gint_k","distribute_pvpR_sparseMatrix");
 
 	int R_x = GlobalC::GridD.getCellX();
     int R_y = GlobalC::GridD.getCellY();
@@ -1843,7 +1843,7 @@ void Gint_k::distribute_pvpR_sparseMatrix(const double &sparse_threshold)
 
 void Gint_k::cal_vlocal_R_sparseMatrix(const int current_spin, const double &sparse_threshold)
 {
-    TITLE("Gint_k","cal_vlocal_R_sparseMatrix");
+    ModuleBase::TITLE("Gint_k","cal_vlocal_R_sparseMatrix");
 
     allocate_pvpR_sparseMatrix();
 
@@ -1967,7 +1967,7 @@ void Gint_k::cal_vlocal_R_sparseMatrix(const int current_spin, const double &spa
 										}
 										else
 										{
-											WARNING_QUIT("Gint_k::folding_vl_k_nc","index is wrong!");
+											ModuleBase::WARNING_QUIT("Gint_k::folding_vl_k_nc","index is wrong!");
 										}
 									} //endif NC
 									else

@@ -9,7 +9,7 @@ Threshold_Elec::Threshold_Elec()
 
 void Threshold_Elec::set_ethr(void) const
 {
-	TITLE("Threshold_Elec","set_ethr");
+	ModuleBase::TITLE("Threshold_Elec","set_ethr");
     //========================================================================
     // setup ethr see setup.f90 Page 5/14
     // setup ethr, the convergence threshold for eigenvalues
@@ -105,7 +105,7 @@ void Threshold_Elec::print_eigenvalue(std::ofstream &ofs)
 	}
 	if(wrong)
 	{
-		WARNING_QUIT("Threshold_Elec::print_eigenvalue","Eigenvalues are too large!");
+		ModuleBase::WARNING_QUIT("Threshold_Elec::print_eigenvalue","Eigenvalues are too large!");
 	}
 
 
@@ -114,7 +114,7 @@ void Threshold_Elec::print_eigenvalue(std::ofstream &ofs)
 		return;
 	}
 
-	TITLE("Threshold_Elec","print_eigenvalue");
+	ModuleBase::TITLE("Threshold_Elec","print_eigenvalue");
 
     ofs << "\n STATE ENERGY(eV) AND OCCUPATIONS ";
 	ofs << std::setprecision(5);

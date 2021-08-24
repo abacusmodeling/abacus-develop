@@ -5,7 +5,7 @@ void Input::Print(const std::string &fn)const
 {
     if (GlobalV::MY_RANK!=0) return;
 
-    TITLE("Input","Print");
+    ModuleBase::TITLE("Input","Print");
 
     std::ofstream ofs(fn.c_str());
 

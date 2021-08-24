@@ -30,7 +30,7 @@ Run_MD_LCAO::~Run_MD_LCAO()
 
 void Run_MD_LCAO::opt_cell(void)
 {
-	TITLE("Run_MD_LCAO","opt_cell");
+	ModuleBase::TITLE("Run_MD_LCAO","opt_cell");
 
     // Initialize the local wave functions.
     // npwx, eigenvalues, and weights
@@ -60,7 +60,7 @@ void Run_MD_LCAO::opt_cell(void)
 
 void Run_MD_LCAO::opt_ions(void)
 {
-    TITLE("Run_MD_LCAO","opt_ions"); 
+    ModuleBase::TITLE("Run_MD_LCAO","opt_ions"); 
     ModuleBase::timer::tick("Run_MD_LCAO","opt_ions"); 
 		
     if(GlobalV::OUT_LEVEL=="i")
@@ -158,7 +158,7 @@ void Run_MD_LCAO::opt_ions(void)
         }
         else
         {
-            WARNING_QUIT("opt_ions", "mdtype should be -1~2!");
+            ModuleBase::WARNING_QUIT("opt_ions", "mdtype should be -1~2!");
         }
 
         if(GlobalC::pot.out_potential == 2)
@@ -230,7 +230,7 @@ void Run_MD_LCAO::opt_ions(void)
 
 void Run_MD_LCAO::final_scf(void)
 {
-    TITLE("Run_MD_LCAO","final_scf"); 
+    ModuleBase::TITLE("Run_MD_LCAO","final_scf"); 
 
     GlobalV::FINAL_SCF = true;
 

@@ -25,7 +25,7 @@
 
 void LOOP_elec::solve_elec_stru(const int &istep)
 {
-    TITLE("LOOP_elec","solve_elec_stru"); 
+    ModuleBase::TITLE("LOOP_elec","solve_elec_stru"); 
     ModuleBase::timer::tick("LOOP_elec","solve_elec_stru"); 
 
 	// prepare HS matrices, prepare grid integral
@@ -42,7 +42,7 @@ void LOOP_elec::solve_elec_stru(const int &istep)
 
 void LOOP_elec::set_matrix_grid(void)
 {
-    TITLE("LOOP_elec","set_matrix_grid"); 
+    ModuleBase::TITLE("LOOP_elec","set_matrix_grid"); 
     ModuleBase::timer::tick("LOOP_elec","set_matrix_grid"); 
 
 	// (1) Find adjacent atoms for each atom.
@@ -90,7 +90,7 @@ void LOOP_elec::set_matrix_grid(void)
 
 void LOOP_elec::before_solver(const int &istep)
 {
-    TITLE("LOOP_elec","before_solver"); 
+    ModuleBase::TITLE("LOOP_elec","before_solver"); 
     ModuleBase::timer::tick("LOOP_elec","before_solver"); 
 
 	// set the augmented orbitals index.
@@ -151,7 +151,7 @@ void LOOP_elec::before_solver(const int &istep)
 
 void LOOP_elec::solver(const int &istep)
 {
-    TITLE("LOOP_elec","solver"); 
+    ModuleBase::TITLE("LOOP_elec","solver"); 
     ModuleBase::timer::tick("LOOP_elec","solver"); 
 
 	// self consistent calculations for electronic ground state
@@ -229,7 +229,7 @@ void LOOP_elec::solver(const int &istep)
 	}
 	else
 	{
-		WARNING_QUIT("LOOP_elec::solver","CALCULATION type not supported");
+		ModuleBase::WARNING_QUIT("LOOP_elec::solver","CALCULATION type not supported");
 	}
 
     ModuleBase::timer::tick("LOOP_elec","solver"); 

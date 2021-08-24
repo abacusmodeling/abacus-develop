@@ -29,7 +29,7 @@ Electrons::~Electrons()
 
 void Electrons::non_self_consistent(const int &istep)
 {
-    TITLE("Electrons","non_self_consistent");
+    ModuleBase::TITLE("Electrons","non_self_consistent");
     ModuleBase::timer::tick("Electrons","non_self_consistent");
 
     //========================================
@@ -256,7 +256,7 @@ void Electrons::self_consistent(const int &istep)
                 {
                     GlobalV::ofs_running << " Notice: Threshold on eigenvalues was too large.\n";
 
-                    WARNING("scf","Threshold on eigenvalues was too large.");
+                    ModuleBase::WARNING("scf","Threshold on eigenvalues was too large.");
                     GlobalV::ofs_running << " dr2=" << dr2 << " < diago_error=" << diago_error << std::endl;
 
                     // update GlobalV::ETHR.
@@ -433,7 +433,7 @@ bool Electrons::check_stop_now(void)
 
 void Electrons::c_bands(const int &istep)
 {
-    if (GlobalV::test_elec) TITLE("Electrons","c_bands");
+    if (GlobalV::test_elec) ModuleBase::TITLE("Electrons","c_bands");
     ModuleBase::timer::tick("Electrons", "c_bands"
     );
 
@@ -522,7 +522,7 @@ void Electrons::c_bands(const int &istep)
 
 void Electrons::init_mixstep_final_scf(void)
 {
-    TITLE("electrons","init_mixstep_final_scf");
+    ModuleBase::TITLE("electrons","init_mixstep_final_scf");
 
     GlobalC::CHR.irstep=0;
     GlobalC::CHR.idstep=0;

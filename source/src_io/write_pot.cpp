@@ -10,7 +10,7 @@ void Potential::write_potential(
 	const int &precision, 
 	const int &hartree)const
 {
-    TITLE("potential","write_potential");
+    ModuleBase::TITLE("potential","write_potential");
 
     if(out_potential==0) 
     {
@@ -64,7 +64,7 @@ void Potential::write_potential(
         ofs << scientific; 
         if(!ofs)
         {
-            WARNING("potential::write_potential","Can't create VHartree File!");
+            ModuleBase::WARNING("potential::write_potential","Can't create VHartree File!");
         }
     }	
 
@@ -198,7 +198,7 @@ void Potential::write_potential(
 
 void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_ave)
 {
-    TITLE("Potential","write_elecstat_pot");
+    ModuleBase::TITLE("Potential","write_elecstat_pot");
     ModuleBase::timer::tick("Potential","write_elecstat_pot");
 
     double *v_elecstat;
@@ -323,7 +323,7 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
         ofs_ave << scientific; 
         if(!ofs)
         {
-            WARNING("potential::write_potential","Can't create VHartree File!");
+            ModuleBase::WARNING("potential::write_potential","Can't create VHartree File!");
         }
     }	
 

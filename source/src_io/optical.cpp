@@ -11,7 +11,7 @@ Optical::~Optical(){}
 void Optical::cal_epsilon2(const int &nbands)
 {
 	if(!Optical::opt_epsilon2) return;
-	TITLE("Optical","cal_epsilon2");
+	ModuleBase::TITLE("Optical","cal_epsilon2");
 	ModuleBase::timer::tick("Optical","cal_epsilon2");
 
 	if(Optical::opt_nbands > GlobalV::NBANDS)

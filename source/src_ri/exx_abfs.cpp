@@ -565,7 +565,7 @@ std::cout<<"D"<<std::endl;
 			}
 		}
 		ofs.close();
-		WARNING_QUIT( ModuleBase::GlobalFunc::TO_STRING(__FILE__), ModuleBase::GlobalFunc::TO_STRING(__LINE__) );
+		ModuleBase::WARNING_QUIT( ModuleBase::GlobalFunc::TO_STRING(__FILE__), ModuleBase::GlobalFunc::TO_STRING(__LINE__) );
 	};
 
 	// Peize Lin test
@@ -598,7 +598,7 @@ std::cout<<"D"<<std::endl;
 			}
 		}
 		ofs.close();
-		WARNING_QUIT( ModuleBase::GlobalFunc::TO_STRING(__FILE__), "line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__) );
+		ModuleBase::WARNING_QUIT( ModuleBase::GlobalFunc::TO_STRING(__FILE__), "line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__) );
 	};
 
 	// Peize Lin test

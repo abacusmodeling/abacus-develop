@@ -30,7 +30,7 @@ void Exx_Abfs::Screen::Schwarz::cal_max_pair_fock(
 	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,std::weak_ptr<ModuleBase::matrix>>>> &Vws )
 {
 	if(!flag_screen_schwarz)	return;
-	TITLE("Exx_Abfs::Screen::Schwarz::cal_max_pair_fock");
+	ModuleBase::TITLE("Exx_Abfs::Screen::Schwarz::cal_max_pair_fock");
 	pthread_rwlock_t rwlock_Cw;	pthread_rwlock_init(&rwlock_Cw,NULL);
 	pthread_rwlock_t rwlock_Vw;	pthread_rwlock_init(&rwlock_Vw,NULL);
 	

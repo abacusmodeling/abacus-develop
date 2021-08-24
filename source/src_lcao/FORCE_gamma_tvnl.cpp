@@ -9,7 +9,7 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(
 	ModuleBase::matrix& ftvnl_dphi, 
 	ModuleBase::matrix& stvnl_dphi)
 {
-    TITLE("Force_LCAO_gamma","cal_ftvnl_dphi");
+    ModuleBase::TITLE("Force_LCAO_gamma","cal_ftvnl_dphi");
     ModuleBase::timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
     for(int i=0; i<GlobalV::NLOCAL; i++)
     {
@@ -72,7 +72,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
 	ModuleBase::matrix& fvnl_dbeta, 
 	ModuleBase::matrix& svnl_dbeta)
 {
-    TITLE("Force_LCAO_gamma","cal_fvnl_dbeta");
+    ModuleBase::TITLE("Force_LCAO_gamma","cal_fvnl_dbeta");
     ModuleBase::timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
 
 	double r0[3];
@@ -236,7 +236,7 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(
 	ModuleBase::matrix& ftvnl_dphi, 
 	ModuleBase::matrix& stvnl_dphi)
 {
-    TITLE("Force_LCAO_gamma","cal_ftvnl_dphi");
+    ModuleBase::TITLE("Force_LCAO_gamma","cal_ftvnl_dphi");
     ModuleBase::timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
 
     for(int i=0; i<GlobalV::NLOCAL; i++)
@@ -299,7 +299,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
 	ModuleBase::matrix& fvnl_dbeta, 
 	ModuleBase::matrix& svnl_dbeta)
 {
-    TITLE("Force_LCAO_gamma","cal_fvnl_dbeta");
+    ModuleBase::TITLE("Force_LCAO_gamma","cal_fvnl_dbeta");
     ModuleBase::timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
 
     for(int iat=0; iat<GlobalC::ucell.nat; iat++)

@@ -25,7 +25,7 @@ void Force_LCAO_k::ftable_k (
 		ModuleBase::matrix& svl_dphi
 		)
 {
-    TITLE("Force_LCAO_k", "ftable_k");
+    ModuleBase::TITLE("Force_LCAO_k", "ftable_k");
 	ModuleBase::timer::tick("Force_LCAO_k","ftable_k");
 	
 	this->allocate_k();
@@ -102,7 +102,7 @@ void Force_LCAO_k::ftable_k (
 
 void Force_LCAO_k::allocate_k(void)
 {
-	TITLE("Force_LCAO_k","allocate_k");
+	ModuleBase::TITLE("Force_LCAO_k","allocate_k");
 	ModuleBase::timer::tick("Force_LCAO_k","allocate_k");
 
 	const int nnr = GlobalC::LNNR.nnr;
@@ -191,7 +191,7 @@ void Force_LCAO_k::finish_k(void)
 #include "LCAO_nnr.h"
 void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 {
-	TITLE("Force_LCAO_k","set_EDM_k");
+	ModuleBase::TITLE("Force_LCAO_k","set_EDM_k");
 	ModuleBase::timer::tick("Force_LCAO_k","set_EDM_k");
 
 	Vector3<double> tau1, dtau;
@@ -393,7 +393,7 @@ void Force_LCAO_k::cal_foverlap_k(
 	ModuleBase::matrix& foverlap, 
 	ModuleBase::matrix& soverlap)
 {
-	TITLE("Force_LCAO_k","cal_foverlap_k");
+	ModuleBase::TITLE("Force_LCAO_k","cal_foverlap_k");
 	ModuleBase::timer::tick("Force_LCAO_k","cal_foverlap_k");
 
 	//--------------------------------------------
@@ -511,7 +511,7 @@ void Force_LCAO_k::cal_foverlap_k(
 	{
 		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wrong irr",irr);
 		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wrong GlobalC::LNNR.nnr",GlobalC::LNNR.nnr);
-		WARNING_QUIT("Force_LCAO_k::cal_foverlap_k","irr!=GlobalC::LNNR.nnr");
+		ModuleBase::WARNING_QUIT("Force_LCAO_k::cal_foverlap_k","irr!=GlobalC::LNNR.nnr");
 	}
 	
 	for(int is=0; is<GlobalV::NSPIN; is++)
@@ -532,7 +532,7 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(
 	ModuleBase::matrix& ftvnl_dphi, 
 	ModuleBase::matrix& stvnl_dphi)
 {	
-	TITLE("Force_LCAO_k","cal_ftvnl_dphi");
+	ModuleBase::TITLE("Force_LCAO_k","cal_ftvnl_dphi");
 	ModuleBase::timer::tick("Force_LCAO_k","cal_ftvnl_dphi");
 	
 	// get the adjacent atom's information.
@@ -694,7 +694,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 	ModuleBase::matrix& fvnl_dbeta, 
 	ModuleBase::matrix& svnl_dbeta)
 {
-	TITLE("Force_LCAO_k","cal_fvnl_dbeta_k");
+	ModuleBase::TITLE("Force_LCAO_k","cal_fvnl_dbeta_k");
 	ModuleBase::timer::tick("Force_LCAO_k","cal_fvnl_dbeta_k");
 	int iir = 0;
 	Vector3<double> tau1;
@@ -914,7 +914,7 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 	ModuleBase::matrix& fvl_dphi, 
 	ModuleBase::matrix& svl_dphi)
 {
-	TITLE("Force_LCAO_k","cal_fvl_dphi_k");
+	ModuleBase::TITLE("Force_LCAO_k","cal_fvl_dphi_k");
 	ModuleBase::timer::tick("Force_LCAO_k","cal_fvl_dphi_k");
 
 	if(!isforce&&!isstress) return;

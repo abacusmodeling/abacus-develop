@@ -6,7 +6,7 @@
 #include "LCAO_nnr.h"
 void Local_Orbital_Charge::allocate_DM_k(void)
 {
-    TITLE("Local_Orbital_Charge","allocate_k");
+    ModuleBase::TITLE("Local_Orbital_Charge","allocate_k");
 
     this->nnrg_now = GlobalC::LNNR.nnrg;
     //xiaohui add 'GlobalV::OUT_LEVEL' line, 2015-09-16
@@ -42,7 +42,7 @@ void Local_Orbital_Charge::allocate_DM_k(void)
     }
     else
     {
-        WARNING_QUIT("Local_Orbital_Charge::allocate_k","check init_DM_R.");
+        ModuleBase::WARNING_QUIT("Local_Orbital_Charge::allocate_k","check init_DM_R.");
     }
 
 	// Peize Lin test 2019-01-16 
@@ -57,7 +57,7 @@ void Local_Orbital_Charge::allocate_DM_k(void)
 
 void Local_Orbital_Charge::kpt_file(const Grid_Technique &gt)
 {
-	TITLE("Local_Orbital_Charge","kpt_file");
+	ModuleBase::TITLE("Local_Orbital_Charge","kpt_file");
 
 	int error;
 	std::cout << " Read in wave functions files: " << GlobalC::kv.nkstot << std::endl;
@@ -79,19 +79,19 @@ void Local_Orbital_Charge::kpt_file(const Grid_Technique &gt)
 		GlobalV::ofs_running << " Error=" << error << std::endl;
 		if(error==1)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: GlobalC::LOWF.dat");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: GlobalC::LOWF.dat");
 		}
 		else if(error==2)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","In wave function file, band number doesn't match");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In wave function file, band number doesn't match");
 		}
 		else if(error==3)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","In wave function file, nlocal doesn't match");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In wave function file, nlocal doesn't match");
 		}
 		else if(error==4)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","In k-dependent wave function file, k point is not correct");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In k-dependent wave function file, k point is not correct");
 		}
 
 	}//loop ispin
@@ -185,7 +185,7 @@ inline void cal_DM_ATOM_nc(
 
     if(GlobalV::NSPIN !=4 ) 
 	{
-		WARNING_QUIT("Local_Orbital_Charge","NSPIN not match!");
+		ModuleBase::WARNING_QUIT("Local_Orbital_Charge","NSPIN not match!");
 	}
 
     const char transa='N';
@@ -258,7 +258,7 @@ inline void cal_DM_ATOM_nc(
 
 void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
 {
-    TITLE("Local_Orbital_Charge","cal_dk_k");
+    ModuleBase::TITLE("Local_Orbital_Charge","cal_dk_k");
     ModuleBase::timer::tick("LCAO_Charge","cal_dk_k");  
     //int nnrg = 0;
     Vector3<double> tau1;

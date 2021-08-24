@@ -66,7 +66,7 @@ Charge::~Charge()
 
 void Charge::allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_in)
 {
-    TITLE("Charge","allocate");
+    ModuleBase::TITLE("Charge","allocate");
 
 	assert(allocate_rho == false);
 
@@ -134,7 +134,7 @@ void Charge::allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_i
 
 double Charge::sum_rho(void) const
 {
-	TITLE("Charge","sum_rho");
+	ModuleBase::TITLE("Charge","sum_rho");
 
     double sum_rho = 0.0;
     int nspin0 = 1;
@@ -160,7 +160,7 @@ double Charge::sum_rho(void) const
     if (sum_rho <= 0.1)
     {
 		GlobalV::ofs_warning << " sum_rho=" << sum_rho << std::endl;
-        WARNING_QUIT("Charge::renormalize_rho","Can't find even an electron!");
+        ModuleBase::WARNING_QUIT("Charge::renormalize_rho","Can't find even an electron!");
     }
 
     return sum_rho;
@@ -169,7 +169,7 @@ double Charge::sum_rho(void) const
 
 void Charge::renormalize_rho(void)
 {
-    TITLE("Charge","renormalize_rho");
+    ModuleBase::TITLE("Charge","renormalize_rho");
 
     const double sr = this->sum_rho();
 	GlobalV::ofs_warning << std::setprecision(15);
@@ -197,7 +197,7 @@ void Charge::renormalize_rho(void)
 //-------------------------------------------------------
 void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Peize Lin refactor 2021.04.08
 {
-    TITLE("Charge","atomic_rho");
+    ModuleBase::TITLE("Charge","atomic_rho");
     ModuleBase::timer::tick("Charge","atomic_rho");
 
 	const ModuleBase::ComplexMatrix rho_g3d = [&]()->ModuleBase::ComplexMatrix
@@ -431,7 +431,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 				}
 				else
 				{
-					WARNING_QUIT("Charge::spin_number_need"," Either 1 or 2 or 4, check SPIN number !");
+					ModuleBase::WARNING_QUIT("Charge::spin_number_need"," Either 1 or 2 or 4, check SPIN number !");
 				}
 			}
 		}
@@ -541,7 +541,7 @@ void Charge::set_rho_core(
     const ModuleBase::ComplexMatrix &structure_factor
 )
 {
-    TITLE("Charge","set_rho_core");
+    ModuleBase::TITLE("Charge","set_rho_core");
     ModuleBase::timer::tick("Charge","set_rho_core");
 
     //double eps = 1.e-10;
@@ -659,7 +659,7 @@ void Charge::non_linear_core_correction
     const double *rhoc,
     double *rhocg)
 {
-    TITLE("charge","drhoc");
+    ModuleBase::TITLE("charge","drhoc");
     double gx = 0.0;
     double rhocg1 = 0.0;
     double *aux;
@@ -711,7 +711,7 @@ void Charge::non_linear_core_correction
 //----------------------------------------------------------
 void Charge::sum_band(void)
 {
-    TITLE("Charge","sum_band");
+    ModuleBase::TITLE("Charge","sum_band");
     ModuleBase::timer::tick("Charge","sum_band");
 //----------------------------------------------------------
 // Calculates the symmetrized charge density and sum of
@@ -736,7 +736,7 @@ void Charge::sum_band(void)
 
 void Charge::sum_band_k(void)
 {
-	TITLE("Charge","sum_band_k");
+	ModuleBase::TITLE("Charge","sum_band_k");
 	GlobalC::en.eband = 0.0;
 
 	std::complex<double>* porter = GlobalC::UFFT.porter;
@@ -877,7 +877,7 @@ void Charge::sum_band_k(void)
 #ifdef __MPI
 void Charge::rho_mpi(void)
 {
-	TITLE("Charge","rho_mpi");
+	ModuleBase::TITLE("Charge","rho_mpi");
     if (GlobalV::NPROC==1) return;
 	if((GlobalV::CALCULATION=="scf-sto" || GlobalV::CALCULATION=="relax-sto" || GlobalV::CALCULATION=="md-sto")&&GlobalV::NPROC_IN_POOL==1) 
 		return;//qinarui add it temporarily.
@@ -1128,7 +1128,7 @@ double Charge::check_ne(const double *rho_in) const
 //LiuXh add 20180619
 void Charge::init_final_scf()
 {
-    TITLE("Charge","init_after_scf");
+    ModuleBase::TITLE("Charge","init_after_scf");
 
 	assert(allocate_rho_final_scf == false);
 
@@ -1181,7 +1181,7 @@ void Charge::init_final_scf()
 #include "occupy.h"
 void Charge::cal_nelec(void)
 {
-	TITLE("UnitCell_pseudo","cal_nelec");
+	ModuleBase::TITLE("UnitCell_pseudo","cal_nelec");
 	//=======================================================
 	// calculate the total number of electrons in the system
 	// if nelec <>0; use input number (setup.f90)
@@ -1224,7 +1224,7 @@ void Charge::cal_nelec(void)
 	{
 		if( Occupy::gauss() || Occupy::tetra() )
 		{
-			WARNING_QUIT("UnitCell_pseudo::cal_nelec","for smearing, num. of bands > num. of occupied bands");
+			ModuleBase::WARNING_QUIT("UnitCell_pseudo::cal_nelec","for smearing, num. of bands > num. of occupied bands");
 		}
 	}
 	
@@ -1250,15 +1250,15 @@ void Charge::cal_nelec(void)
 		//else if ( GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax") //pengfei 2014-10-13
 		else
 		{
-			if(GlobalV::NBANDS < occupied_bands) WARNING_QUIT("unitcell","Too few bands!");
+			if(GlobalV::NBANDS < occupied_bands) ModuleBase::WARNING_QUIT("unitcell","Too few bands!");
 			if(GlobalV::NBANDS < GlobalC::ucell.magnet.get_nelup() ) 
 			{
 				ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nelup",GlobalC::ucell.magnet.get_nelup());
-				WARNING_QUIT("unitcell","Too few spin up bands!");
+				ModuleBase::WARNING_QUIT("unitcell","Too few spin up bands!");
 			}
 			if(GlobalV::NBANDS < GlobalC::ucell.magnet.get_neldw() )
 			{
-				WARNING_QUIT("unitcell","Too few spin down bands!");
+				ModuleBase::WARNING_QUIT("unitcell","Too few spin down bands!");
 			}
 		}
 	}
@@ -1269,7 +1269,7 @@ void Charge::cal_nelec(void)
     {
         if( GlobalV::NBANDS > GlobalV::NLOCAL )
         {
-            WARNING_QUIT("UnitCell_pseudo::cal_nwfc","NLOCAL < NBANDS");
+            ModuleBase::WARNING_QUIT("UnitCell_pseudo::cal_nwfc","NLOCAL < NBANDS");
         }
         else
         {

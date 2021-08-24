@@ -4,7 +4,7 @@
 
 void energy::perform_dos_pw(void)
 {
-	TITLE("energy","perform_dos_pw");
+	ModuleBase::TITLE("energy","perform_dos_pw");
 
 	if(out_dos !=0 || out_band !=0)
     {

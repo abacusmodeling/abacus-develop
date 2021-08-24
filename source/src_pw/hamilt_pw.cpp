@@ -30,7 +30,7 @@ void Hamilt_PW::allocate(
 	const int &nkb,
 	const int &nrxx)
 {
-    TITLE("Hamilt_PW","allocate");
+    ModuleBase::TITLE("Hamilt_PW","allocate");
 
 	assert(npwx > 0);
 	assert(npol > 0);
@@ -57,7 +57,7 @@ void Hamilt_PW::allocate(
 
 void Hamilt_PW::init_k(const int ik)
 {
-    TITLE("Hamilt_PW","init_k");
+    ModuleBase::TITLE("Hamilt_PW","init_k");
 
 	// mohan add 2010-09-30
 	// (1) Which spin to use.
@@ -111,7 +111,7 @@ void Hamilt_PW::diagH_subspace(
     ModuleBase::ComplexMatrix &evc,
     double *en)
 {
-    TITLE("Hamilt_PW","diagH_subspace");
+    ModuleBase::TITLE("Hamilt_PW","diagH_subspace");
     ModuleBase::timer::tick("Hamilt_PW","diagH_subspace");
 
 	assert(nstart!=0);
@@ -733,7 +733,7 @@ void Hamilt_PW::add_nonlocal_pp(
 
 void Hamilt_PW::diag_zheev(const int &npw_in, ModuleBase::ComplexMatrix &psi, const int &nband, double *em, double *err)
 {
-    TITLE("Hamilt_PW","diag_zheev");
+    ModuleBase::TITLE("Hamilt_PW","diag_zheev");
     assert(nband < npw_in) ;
 
     // if flag =0, this means success.
@@ -922,7 +922,7 @@ void Hamilt_PW::cal_err
     double *err
 )
 {
-//	TITLE("Hamilt_PW", "cal_err");
+//	ModuleBase::TITLE("Hamilt_PW", "cal_err");
 //	std::cout << "\n npw_in = " << npw_in << std::endl;
 
     assert(nband < npw_in);

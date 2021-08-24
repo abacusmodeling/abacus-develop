@@ -26,7 +26,7 @@ Numerical_Basis::~Numerical_Basis() {}
 //============================================================
 void Numerical_Basis::start_from_file_k( const int &ik, ModuleBase::ComplexMatrix &psi)
 {
-    TITLE("Numerical_Basis","start_from_file_k");
+    ModuleBase::TITLE("Numerical_Basis","start_from_file_k");
 
     if (!this->init_label)
     {
@@ -41,7 +41,7 @@ void Numerical_Basis::start_from_file_k( const int &ik, ModuleBase::ComplexMatri
 // The function is called in run_fp.cpp.
 void Numerical_Basis::output_overlap( const ModuleBase::ComplexMatrix *psi)
 {
-    TITLE("Numerical_Basis","output_overlap");
+    ModuleBase::TITLE("Numerical_Basis","output_overlap");
     ModuleBase::GlobalFunc::NEW_PART("Overlap Data For Spillage Minimization");
     
 	//---------------------------------------------------------
@@ -139,7 +139,7 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Q(
     const ModuleBase::ComplexMatrix &psi,
 	const int derivative_order) const
 {
-    TITLE("Numerical_Basis","cal_overlap_Q");
+    ModuleBase::TITLE("Numerical_Basis","cal_overlap_Q");
     ModuleBase::timer::tick("Numerical_Basis","cal_overlap_Q");
 
 	GlobalV::ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS AND BLOCH WAVE FUNCTIONS" << std::endl;
@@ -214,7 +214,7 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Sq(
     const int &np,
 	const int derivative_order) const
 {
-    TITLE("Numerical_Basis","cal_overlap_Sq");
+    ModuleBase::TITLE("Numerical_Basis","cal_overlap_Sq");
     ModuleBase::timer::tick("Numerical_Basis","cal_overlap_Sq");
 
 	GlobalV::ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS"  << std::endl;
@@ -402,7 +402,7 @@ void Numerical_Basis::numerical_atomic_wfc(
     const int &np,
     ModuleBase::ComplexMatrix &psi)
 {
-    TITLE("Numerical_Basis", "numerical_atomic_wfc");
+    ModuleBase::TITLE("Numerical_Basis", "numerical_atomic_wfc");
 
     std::vector<Vector3<double>> gk(np);
     for (int ig=0; ig<np; ig++)

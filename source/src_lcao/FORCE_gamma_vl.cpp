@@ -8,7 +8,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
 	ModuleBase::matrix& fvl_dphi, 
 	ModuleBase::matrix& svl_dphi)
 {   
-    TITLE("Force_LCAO_gamma","cal_fvl_dphi");
+    ModuleBase::TITLE("Force_LCAO_gamma","cal_fvl_dphi");
     ModuleBase::timer::tick("Force_LCAO_gamma","cal_fvl_dphi");
 	
 	if(isforce)
@@ -151,7 +151,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
 	ModuleBase::matrix& fvl_dphi, 
 	ModuleBase::matrix& svl_dphi)
 {   
-    TITLE("Force_LCAO_gamma","cal_fvl_dphi");
+    ModuleBase::TITLE("Force_LCAO_gamma","cal_fvl_dphi");
     ModuleBase::timer::tick("Force_LCAO_gamma","cal_fvl_dphi");
 
     ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_x, GlobalC::ParaO.nloc);

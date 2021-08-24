@@ -439,7 +439,7 @@ void Mathzone_Add1::Sbt_new
 	{
 		std::cout << "\nhigh order interpolation is not available!" << std::endl;
 		exit(0); // mohan add 2021-05-06
-		//QUIT();
+		//ModuleBase::QUIT();
 	}
 	
 	/**********************************
@@ -680,7 +680,7 @@ double Mathzone_Add1::pol_seg_int
 	if (ik == 110) 
 	{
 		std::cout << "val = " << val << std::endl;
-		QUIT ();
+		ModuleBase::QUIT ();
 	}
 	*/
 	return val;
@@ -801,7 +801,7 @@ void Mathzone_Add1::test2 ()
 		std::cout << kad[ik] << " " << fk[ik] << " " << sqrt(PI/4/ci)/pow(2*ci, l+1)*pow(kad[ik], l)*exp(-kad[ik]*kad[ik]/4/ci)
 		<< " "	<< log(fabs(diff))/log(10) << std::endl;
 	}
-	QUIT ();
+	ModuleBase::QUIT ();
 */
 	Sbt_new (polint_order, l, rad, dr, N, kad, dk, N, fk, 0, fr);
 
@@ -868,7 +868,7 @@ double Mathzone_Add1::Polynomial_Interpolation
 			if(den == 0.0) 
 			{
 				std::cout << "Two Xs are equal" << std::endl;
-				// WARNING_QUIT("Mathzone_Add1::Polynomial_Interpolation","Two Xs are equal");
+				// ModuleBase::WARNING_QUIT("Mathzone_Add1::Polynomial_Interpolation","Two Xs are equal");
 				exit(0); // mohan update 2021-05-06
 			}
 			den = w / den;
@@ -1002,7 +1002,7 @@ void Mathzone_Add1::Cubic_Spline_Interpolation
 		if(h == 0.0) 
 		{
 			std::cout << "Cubic_Spline_Interpolation, h == 0.0 so that cannot be divided" << std::endl;
-			//WARNING_QUIT("Cubic_Spline_Interpolation","h == 0.0 so that cannot be divided");
+			//ModuleBase::WARNING_QUIT("Cubic_Spline_Interpolation","h == 0.0 so that cannot be divided");
 			exit(0);
 		}
 

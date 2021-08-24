@@ -22,7 +22,7 @@ void Stress_Func::stress_ewa(ModuleBase::matrix& sigma, const bool is_pw)
     do{
        alpha-=0.1;
        if(alpha==0.0)
-          WARNING_QUIT("stres_ew", "optimal alpha not found");
+          ModuleBase::WARNING_QUIT("stres_ew", "optimal alpha not found");
        upperbound =e2 * pow(charge,2) * sqrt( 2 * alpha / (TWO_PI)) * erfc(sqrt(GlobalC::ucell.tpiba2 * GlobalC::pw.ggchg / 4.0 / alpha));
     }
     while(upperbound>1e-7);

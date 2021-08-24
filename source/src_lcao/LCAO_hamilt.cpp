@@ -24,7 +24,7 @@ LCAO_Hamilt::~LCAO_Hamilt()
 //--------------------------------------------
 void LCAO_Hamilt::set_lcao_matrices(void)
 {
-	TITLE("LCAO_Hamilt","set_lcao_matrices");
+	ModuleBase::TITLE("LCAO_Hamilt","set_lcao_matrices");
 	ModuleBase::timer::tick("LCAO_Hamilt","set_lcao_matrices");
 
 	if(GlobalV::GAMMA_ONLY_LOCAL)
@@ -58,7 +58,7 @@ void LCAO_Hamilt::set_lcao_matrices(void)
 
 void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-12-03
 {
-	TITLE("LCAO_Hamilt","calculate_Hgamma");
+	ModuleBase::TITLE("LCAO_Hamilt","calculate_Hgamma");
 	ModuleBase::timer::tick("LCAO_Hamilt","cal_Hgamma");
 
 	// Set the matrix 'H' to zero.
@@ -112,8 +112,8 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-
 		GlobalC::LM.print_HSgamma('S'); // S
 		GlobalC::LM.print_HSgamma('T');
 		GlobalC::LM.print_HSgamma('H');
-	//	WARNING_QUIT("LCAO_Hamilt::calculate_Hgamma","print the H,S matrix");
-//		QUIT();
+	//	ModuleBase::WARNING_QUIT("LCAO_Hamilt::calculate_Hgamma","print the H,S matrix");
+//		ModuleBase::QUIT();
 	}
 
 
@@ -125,7 +125,7 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-
 
 void LCAO_Hamilt::calculate_STNR_gamma(void)
 {
-	TITLE("LCAO_Hamilt","calculate_fixed");
+	ModuleBase::TITLE("LCAO_Hamilt","calculate_fixed");
 
 	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"gamma_only_local",GlobalV::GAMMA_ONLY_LOCAL);
 
@@ -185,7 +185,7 @@ void LCAO_Hamilt::calculate_STNR_gamma(void)
 // be called in LOOP_elec::cal_bands(). 
 void LCAO_Hamilt::calculate_Hk(const int &ik)
 {
-	TITLE("LCAO_Hamilt","calculate_Hk");
+	ModuleBase::TITLE("LCAO_Hamilt","calculate_Hk");
 	ModuleBase::timer::tick("LCAO_Hamilt","calculate_Hk");
 
 	// whether you want to calculate the local potential
@@ -266,7 +266,7 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 // available for all k points.
 void LCAO_Hamilt::calculate_STNR_k(void)
 {
-    TITLE("Hamilt_Linear","calculate_STBR_k");
+    ModuleBase::TITLE("Hamilt_Linear","calculate_STBR_k");
 
 	//--------------------------------------------
 	// set S(R) to zero.
@@ -367,7 +367,7 @@ void LCAO_Hamilt::calculate_STNR_k(void)
 
 void LCAO_Hamilt::calculate_STN_R(void)
 {
-    TITLE("LCAO_Hamilt","calculate_STN_R");
+    ModuleBase::TITLE("LCAO_Hamilt","calculate_STN_R");
 
     //int iat = 0;
     int index = 0;
@@ -495,7 +495,7 @@ void LCAO_Hamilt::calculate_STN_R(void)
 
 void LCAO_Hamilt::calculate_STN_R_sparse(const double &sparse_threshold)
 {
-    TITLE("LCAO_Hamilt","calculate_STN_R_sparse");
+    ModuleBase::TITLE("LCAO_Hamilt","calculate_STN_R_sparse");
 
     //int iat = 0;
     int index = 0;
@@ -630,7 +630,7 @@ void LCAO_Hamilt::calculate_STN_R_sparse(const double &sparse_threshold)
 
 void LCAO_Hamilt::calculate_HSR_sparse(const int &current_spin, const double &sparse_threshold)
 {
-	TITLE("LCAO_Hamilt","calculate_HSR_sparse");
+	ModuleBase::TITLE("LCAO_Hamilt","calculate_HSR_sparse");
 
 	calculate_STN_R_sparse(sparse_threshold);
 
@@ -652,7 +652,7 @@ void LCAO_Hamilt::calculate_HSR_sparse(const int &current_spin, const double &sp
 
 void LCAO_Hamilt::calculat_HR_dftu_sparse(const int &current_spin, const double &sparse_threshold)
 {
-	TITLE("LCAO_Hamilt","calculat_HR_dftu_sparse");
+	ModuleBase::TITLE("LCAO_Hamilt","calculat_HR_dftu_sparse");
 	ModuleBase::timer::tick("LCAO_Hamilt","calculat_HR_dftu_sparse");
 
 	int R_x = GlobalC::GridD.getCellX();
@@ -750,7 +750,7 @@ void LCAO_Hamilt::calculat_HR_dftu_sparse(const int &current_spin, const double 
 
 void LCAO_Hamilt::calculat_HR_dftu_soc_sparse(const int &current_spin, const double &sparse_threshold)
 {
-	TITLE("LCAO_Hamilt","calculat_HR_dftu_soc_sparse");
+	ModuleBase::TITLE("LCAO_Hamilt","calculat_HR_dftu_soc_sparse");
 	ModuleBase::timer::tick("LCAO_Hamilt","calculat_HR_dftu_soc_sparse");
 
 	int R_x = GlobalC::GridD.getCellX();

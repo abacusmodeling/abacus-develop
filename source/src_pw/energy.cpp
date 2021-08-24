@@ -42,7 +42,7 @@ energy::~energy()
 
 void energy::calculate_harris(const int &flag)
 {
-//	TITLE("energy","calculate_harris");
+//	ModuleBase::TITLE("energy","calculate_harris");
 	
 	if(flag==1)
 	{
@@ -71,7 +71,7 @@ void energy::calculate_harris(const int &flag)
 
 void energy::calculate_etot(void)
 {
-	TITLE("energy","calculate_etot");
+	ModuleBase::TITLE("energy","calculate_etot");
 	//std::cout << "\n demet in etot = " << demet << std::endl;
 	this->etot = eband + deband 
 	+ (H_XC_pw::etxc - etxcc) 
@@ -117,7 +117,7 @@ void energy::print_etot(
 	const double &avg_iter,
 	bool print)
 {
-	TITLE("energy","print_etot");
+	ModuleBase::TITLE("energy","print_etot");
 	this->iter = iter_in;
 
 	GlobalV::ofs_running << std::setprecision(12);
@@ -206,7 +206,7 @@ void energy::print_etot(
 	}
 	else
 	{
-		WARNING_QUIT("Energy","print_etot");
+		ModuleBase::WARNING_QUIT("Energy","print_etot");
 	}
     ss << label << iter;
 	//xiaohui add 2013-09-02
@@ -394,7 +394,7 @@ double energy::delta_e(void)
 
 void energy::delta_escf(void)
 {
-	TITLE("energy","delta_escf");
+	ModuleBase::TITLE("energy","delta_escf");
     this->descf = 0.0;
 
 	// now rho1 is "mixed" charge density
@@ -453,7 +453,7 @@ void energy::print_band(const int &ik)
 	}
 	if(wrong)
     {
-        WARNING_QUIT("Threshold_Elec::print_eigenvalue","Eigenvalues are too large!");
+        ModuleBase::WARNING_QUIT("Threshold_Elec::print_eigenvalue","Eigenvalues are too large!");
     }
 
 
@@ -492,7 +492,7 @@ void energy::print_band(const int &ik)
 #ifdef __LCAO
 void energy::set_exx()
 {
-	TITLE("energy", "set_exx");
+	ModuleBase::TITLE("energy", "set_exx");
 
 	auto exx_energy = []() -> double
 	{

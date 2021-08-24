@@ -82,7 +82,7 @@ void Charge_Broyden::mix_rho
     bool &converged
 )
 {
-    TITLE("Charge_Broyden","mix_rho");
+    ModuleBase::TITLE("Charge_Broyden","mix_rho");
 	ModuleBase::timer::tick("Charge", "mix_rho");
 
     for (int is=0; is<GlobalV::NSPIN; is++)
@@ -188,7 +188,7 @@ void Charge_Broyden::mix_rho
     }
     else
     {
-        WARNING_QUIT("Charge_Pulay","Not implemended yet,coming soon.");
+        ModuleBase::WARNING_QUIT("Charge_Pulay","Not implemended yet,coming soon.");
     }
 
 	// mohan add 2011-06-07
@@ -269,9 +269,9 @@ void Charge_Broyden::Simplified_Broyden_mixing(const int &iter)
 		char uu='U';
 		int info;
 		dsytrf_(&uu,&iter_used,beta.c,&iter_used,iwork,work,&iter_used,&info);
-		if(info != 0) WARNING_QUIT("Broyden_mixing", "Error when factorizing beta.");
+		if(info != 0) ModuleBase::WARNING_QUIT("Broyden_mixing", "Error when factorizing beta.");
 		dsytri_(&uu,&iter_used,beta.c,&iter_used,iwork,work,&info);
-		if(info != 0) WARNING_QUIT("Broyden_mixing", "Error when DSYTRI beta.");
+		if(info != 0) ModuleBase::WARNING_QUIT("Broyden_mixing", "Error when DSYTRI beta.");
 		for(int i = 0; i < iter_used; ++i)
 		{
 			for(int j = i + 1; j < iter_used; ++j)
@@ -334,7 +334,7 @@ void Charge_Broyden::Simplified_Broyden_mixing(const int &iter)
 
 void Charge_Broyden::Modified_Broyden_mixing(void)
 {
-    //TITLE("Charge_Broyden","Modified_Broyden_Mixing");
+    //ModuleBase::TITLE("Charge_Broyden","Modified_Broyden_Mixing");
 
     this->rstep = this->mixing_ndim;
     this->dstep = this->rstep - 1;
@@ -496,7 +496,7 @@ void Charge_Broyden::allocate_Broyden()
 
 void Charge_Broyden::generate_beta(const int &is)
 {
-	//TITLE("Charge_Broyden","generate_beta");
+	//ModuleBase::TITLE("Charge_Broyden","generate_beta");
 
 	//(1) generate Abar(k,n) = w(k)*w(n)*<dR(n)|dR(k)>
 	for(int k=0; k<dstep; k++)
@@ -548,7 +548,7 @@ void Charge_Broyden::generate_beta(const int &is)
 
 void Charge_Broyden::generate_Zmk(const int &totstep, const int &irstep, const int &idstep, const int &is)
 {
-	//TITLE("Charge_Bryoden","generate_Zmk");
+	//ModuleBase::TITLE("Charge_Bryoden","generate_Zmk");
 	this->Zmk[is].zero_out();
 		
 	for(int k=0; k<dstep; k++)
@@ -600,7 +600,7 @@ void Charge_Broyden::generate_Zmk(const int &totstep, const int &irstep, const i
 
 void Charge_Broyden::generate_new_broyden_rho(const int &is, const int &m)
 {
-//	TITLE("Charge_Broyden","generate_new_broyden_rho");
+//	ModuleBase::TITLE("Charge_Broyden","generate_new_broyden_rho");
 	double mixp = this->mixing_beta;
 
 	// gamma save how much 'u' to mix.

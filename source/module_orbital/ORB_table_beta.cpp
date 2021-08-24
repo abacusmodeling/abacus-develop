@@ -43,7 +43,7 @@ void ORB_table_beta::allocate
     const double &dk_in
 )
 {
-	TITLE("ORB_table_beta", "allocate");
+	ModuleBase::TITLE("ORB_table_beta", "allocate");
 
 	this->ntype = ntype_in;// type of elements.
 	this->lmax = lmax_in;
@@ -114,7 +114,7 @@ int ORB_table_beta::get_rmesh(const double &R1, const double &R2)
 		//GlobalV::ofs_warning << "\n rmesh = " << rmesh;
 		std::cout << "\n R1 = " << R1 << " R2 = " << R2;
 		std::cout << "\n rmesh = " << rmesh;
-		WARNING_QUIT("ORB_table_beta::get_rmesh", "rmesh <= 0");
+		ModuleBase::WARNING_QUIT("ORB_table_beta::get_rmesh", "rmesh <= 0");
 	}
 	return rmesh;
 }
@@ -220,7 +220,7 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 
 void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
 {
-	TITLE("ORB_table_beta", "init_Table_Beta");
+	ModuleBase::TITLE("ORB_table_beta", "init_Table_Beta");
 	ModuleBase::timer::tick("ORB_table_beta", "init_Table_Beta");
 
 	// (1) allocate 1st dimension ( overlap, derivative)
@@ -364,7 +364,7 @@ void ORB_table_beta::Destroy_Table_Beta(LCAO_Orbitals &orb)
 
 void ORB_table_beta::init_NL_Tpair(void)
 {
-	TITLE("ORB_table_beta","init_NL_index");
+	ModuleBase::TITLE("ORB_table_beta","init_NL_index");
 	assert(ntype>0);
 	this->NL_nTpairs = this->ntype * this->ntype;	
 	this->NL_Tpair.create( this->ntype, this->ntype);
@@ -393,7 +393,7 @@ void ORB_table_beta::init_NL_Tpair(void)
 			 // however, there are no projectors.
 			 if(NL_L2plus1(T1,T0) <= 0)
 			 {
-				WARNING_QUIT("ORB_table_beta::init_paris_nonlocal_type","NL_L2plus1<=0");
+				ModuleBase::WARNING_QUIT("ORB_table_beta::init_paris_nonlocal_type","NL_L2plus1<=0");
 			 }
 		}
 	}
@@ -411,7 +411,7 @@ void ORB_table_beta::init_NL_Opair(LCAO_Orbitals &orb)
 	// may have bug if we use all H!
 	if( nprojmax == 0)
 	{
-		WARNING("ORB_table_beta","nproj for nonlocal pseudopotetials are zero, it must be all H atoms");
+		ModuleBase::WARNING("ORB_table_beta","nproj for nonlocal pseudopotetials are zero, it must be all H atoms");
 		return;
 	}
 	assert( NL_nTpairs > 0);

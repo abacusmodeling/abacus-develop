@@ -209,7 +209,7 @@ int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt
 // positions change
 void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
 {
-     TITLE("Local_Orbital_Charge","allocate_gamma");
+     ModuleBase::TITLE("Local_Orbital_Charge","allocate_gamma");
 
     // mohan fix serious bug 2010-09-06
     this->lgd_now = gt.lgd;
@@ -261,7 +261,7 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
     }
     else
     {
-        WARNING_QUIT("Local_Orbital_Charge::allocate","lgd<0!Something Wrong!");
+        ModuleBase::WARNING_QUIT("Local_Orbital_Charge::allocate","lgd<0!Something Wrong!");
     }
     
     setAlltoallvParameter(GlobalC::ParaO.comm_2D, GlobalC::ParaO.blacs_ctxt, GlobalC::ParaO.nb);
@@ -278,7 +278,7 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
 
 void Local_Orbital_Charge::gamma_file(const Grid_Technique &gt)
 {
-	TITLE("Local_Orbital_Charge","gamma_file");
+	ModuleBase::TITLE("Local_Orbital_Charge","gamma_file");
 
 	int error;
 	std::cout << " Read in gamma point wave function files " << std::endl;
@@ -299,19 +299,19 @@ void Local_Orbital_Charge::gamma_file(const Grid_Technique &gt)
 		GlobalV::ofs_running << " Error=" << error << std::endl;
 		if(error==1)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: GlobalC::LOWF.dat");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: GlobalC::LOWF.dat");
 		}
 		else if(error==2)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","In wave function file, band number doesn't match");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In wave function file, band number doesn't match");
 		}
 		else if(error==3)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","In wave function file, nlocal doesn't match");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In wave function file, nlocal doesn't match");
 		}
 		else if(error==4)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","In k-dependent wave function file, k point is not correct");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In k-dependent wave function file, k point is not correct");
 		}
 
 	}//loop ispin
@@ -319,7 +319,7 @@ void Local_Orbital_Charge::gamma_file(const Grid_Technique &gt)
 
 void Local_Orbital_Charge::cal_dk_gamma_from_2D_pub(void)
 {
-    TITLE("Local_Orbital_Charge","cal_dk_gamma_from_2D_pub");
+    ModuleBase::TITLE("Local_Orbital_Charge","cal_dk_gamma_from_2D_pub");
 
 	cal_dk_gamma_from_2D();
 }
@@ -445,7 +445,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
 //--------------------------------------------------------------
 void Local_Orbital_Charge::cal_dk_gamma(void)
 {
-    TITLE("Local_Orbital_Charge","cal_density_kernal");
+    ModuleBase::TITLE("Local_Orbital_Charge","cal_density_kernal");
     ModuleBase::timer::tick("LocalOrbital_Charge","cal_dk_gamma");
 
     assert(GlobalV::NSPIN==GlobalC::kv.nks);

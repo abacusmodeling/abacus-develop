@@ -23,7 +23,7 @@ int ELEC_scf::iter=0;
 
 void ELEC_scf::scf(const int &istep)
 {
-	TITLE("ELEC_scf","scf");
+	ModuleBase::TITLE("ELEC_scf","scf");
 	ModuleBase::timer::tick("ELEC_scf","scf");
 
 	// (1) calculate ewald energy.
@@ -584,7 +584,7 @@ void ELEC_scf::scf(const int &istep)
 
 void ELEC_scf::init_mixstep_final_scf(void)
 {
-    TITLE("ELEC_scf","init_mixstep_final_scf");
+    ModuleBase::TITLE("ELEC_scf","init_mixstep_final_scf");
 
     GlobalC::CHR.irstep=0;
     GlobalC::CHR.idstep=0;

@@ -13,7 +13,7 @@ void Exx_Abfs::Screen::Cauchy::init(
 	const double threshold_in,
 	const Abfs::Vector3_Order<int> Born_von_Karman_period_in)
 {
-	TITLE("Exx_Abfs::Screen::Cauchy::init");
+	ModuleBase::TITLE("Exx_Abfs::Screen::Cauchy::init");
 	flag_screen_cauchy = flag_screen_cauchy_in;
 	threshold = threshold_in;
 	Born_von_Karman_period = Born_von_Karman_period_in;
@@ -25,7 +25,7 @@ void Exx_Abfs::Screen::Cauchy::cal_norm_C_max(
 	const ModuleBase::Element_Basis_Index::IndexLNM & index_abfs)
 {
 	if(!flag_screen_cauchy)	return;
-	TITLE("Exx_Abfs::Screen::Cauchy::cal_norm_C_max");
+	ModuleBase::TITLE("Exx_Abfs::Screen::Cauchy::cal_norm_C_max");
 	
 	for( const auto & Cs1 : Cs )
 	{
@@ -108,7 +108,7 @@ void Exx_Abfs::Screen::Cauchy::cal_norm_C_max(
 void Exx_Abfs::Screen::Cauchy::cal_norm_V( const std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<ModuleBase::matrix>>>> & Vs )
 {
 	if(!flag_screen_cauchy)	return;
-	TITLE("Exx_Abfs::Screen::Cauchy::cal_norm_V");
+	ModuleBase::TITLE("Exx_Abfs::Screen::Cauchy::cal_norm_V");
 	
 	for( const auto & Vs1 : Vs )
 	{
@@ -130,7 +130,7 @@ void Exx_Abfs::Screen::Cauchy::cal_norm_V( const std::map<size_t,std::map<size_t
 void Exx_Abfs::Screen::Cauchy::cal_norm_D_max( const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> & Ds )
 {
 	if(!flag_screen_cauchy)	return;
-	TITLE("Exx_Abfs::Screen::Cauchy::cal_norm_D_max");
+	ModuleBase::TITLE("Exx_Abfs::Screen::Cauchy::cal_norm_D_max");
 	
 	for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 	{

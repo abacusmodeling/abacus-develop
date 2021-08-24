@@ -20,7 +20,7 @@ void ORB_gen_tables::gen_tables(
 	const int &Lmax_exx,
 	const int &out_descriptor)
 {
-	TITLE("ORB_gen_tables", "gen_tables");
+	ModuleBase::TITLE("ORB_gen_tables", "gen_tables");
 	ModuleBase::timer::tick("ORB_gen_tables", "gen_tables");
 
 	ofs_in << "\n SETUP THE TWO-CENTER INTEGRATION TABLES" << std::endl;
@@ -139,7 +139,7 @@ void ORB_gen_tables::snap_psibeta(
 	std::complex<double> *nlm1,
 	const int is) const
 {
-	//TITLE ("ORB_gen_tables","snap_psibeta");
+	//ModuleBase::TITLE ("ORB_gen_tables","snap_psibeta");
 
 	//optimized by zhengdy-soc
 	if (nspin == 4 && count_soc == 0)
@@ -545,7 +545,7 @@ void ORB_gen_tables::snap_psibeta(
 					}
 					else
 					{
-						WARNING_QUIT("ORB_gen_tables::snap_psibeta", "Conflict! Didn't count non-local part");
+						ModuleBase::WARNING_QUIT("ORB_gen_tables::snap_psibeta", "Conflict! Didn't count non-local part");
 					}
 				}
 				break;
@@ -583,11 +583,11 @@ void ORB_gen_tables::snap_psipsi(
 	const int &nspin,
 	std::complex<double> *olm1) const
 {
-	//TITLE("ORB_gen_tables","snap_psipsi");
+	//ModuleBase::TITLE("ORB_gen_tables","snap_psipsi");
 	//ModuleBase::timer::tick ("ORB_gen_tables", "snap_psipsi");
 	if (job != 0 && job != 1)
 	{
-		WARNING_QUIT("ORB_gen_tables::snap_psipsi", "job must be equal to 0 or 1!");
+		ModuleBase::WARNING_QUIT("ORB_gen_tables::snap_psipsi", "job must be equal to 0 or 1!");
 	}
 
 	Numerical_Orbital::set_position(R1, R2);
@@ -763,7 +763,7 @@ void ORB_gen_tables::snap_psipsi(
 					}
 					else
 					{
-						WARNING_QUIT("ORB_gen_tables::snap_psipsi", "something wrong!");
+						ModuleBase::WARNING_QUIT("ORB_gen_tables::snap_psipsi", "something wrong!");
 					}
 
 					/*
@@ -859,7 +859,7 @@ void ORB_gen_tables::snap_psipsi(
 					}
 					else
 					{
-						WARNING_QUIT("ORB_gen_tables::snap_psipsi", "something wrong in T.");
+						ModuleBase::WARNING_QUIT("ORB_gen_tables::snap_psipsi", "something wrong in T.");
 					}
 					break;
 				}
@@ -947,7 +947,7 @@ void ORB_gen_tables::snap_psipsi(
 					}
 					else
 					{
-						WARNING_QUIT("ORB_gen_tables::snap_psialpha", "deepks with GlobalV::NSPIN>1 has not implemented yet!");
+						ModuleBase::WARNING_QUIT("ORB_gen_tables::snap_psialpha", "deepks with GlobalV::NSPIN>1 has not implemented yet!");
 					}
 					break;
 				}

@@ -21,7 +21,7 @@ std::vector<std::vector<std::pair<std::vector<double>,ModuleBase::matrix>>> Exx_
 	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &abfs,
 	const double kmesh_times )
 {
-	TITLE("Exx_Abfs::PCA::cal_PCA");
+	ModuleBase::TITLE("Exx_Abfs::PCA::cal_PCA");
 std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 	
@@ -96,7 +96,7 @@ ofs<<"TIME@LapackConnector::dsyev\t"<<time_during(t_start)<<std::endl;
 				std::cout<<std::endl<<"info_dsyev = "<<info<<std::endl;
 				GlobalV::ofs_warning<<mm<<std::endl;
 				std::cout<<"in file "<<__FILE__<<" line "<<__LINE__<<std::endl;
-				QUIT();
+				ModuleBase::QUIT();
 			}
 			eig[T][L] = make_pair( eig_value, mm );
 //for( const auto v : eig_value )
@@ -117,7 +117,7 @@ ModuleBase::matrix Exx_Abfs::PCA::get_sub_matrix(
 	const ModuleBase::Element_Basis_Index::Range & range,
 	const ModuleBase::Element_Basis_Index::IndexLNM & index )
 {
-	TITLE("Exx_Abfs::PCA::get_sub_matrix");
+	ModuleBase::TITLE("Exx_Abfs::PCA::get_sub_matrix");
 	
 	ModuleBase::matrix m_sub( m.nr, range[T][L].N );
 	for( size_t ir=0; ir!=m.nr; ++ir )

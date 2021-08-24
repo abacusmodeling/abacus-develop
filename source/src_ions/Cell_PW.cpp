@@ -3,7 +3,7 @@
 
 void Cell_PW::opt_cells_pw()
 {
-    TITLE("Cell_PW", "opt_cells_pw");
+    ModuleBase::TITLE("Cell_PW", "opt_cells_pw");
     ModuleBase::timer::tick("Cell_PW", "opt_cells_pw");
     GlobalC::wf.allocate(GlobalC::kv.nks);
 

@@ -24,7 +24,7 @@ std::tuple<double,double,ModuleBase::matrix> Potential_Libxc::v_xc(
 	const double * const * const rho_in,
 	const double * const rho_core_in)
 {
-    TITLE("Potential_Libxc","v_xc");
+    ModuleBase::TITLE("Potential_Libxc","v_xc");
     ModuleBase::timer::tick("Potential_Libxc","v_xc");
 
     double etxc = 0.0;

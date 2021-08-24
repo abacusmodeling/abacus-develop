@@ -13,7 +13,7 @@ LCAO_gen_fixedH::~LCAO_gen_fixedH()
 
 void LCAO_gen_fixedH::calculate_NL_no(void)
 {
-    TITLE("LCAO_gen_fixedH","calculate_NL_no");
+    ModuleBase::TITLE("LCAO_gen_fixedH","calculate_NL_no");
 
 	// PLEASE rebuild the following two functions,
 	// 'build_Nonlocal_beta' and  'build_Nonlocal_mu',
@@ -41,14 +41,14 @@ void LCAO_gen_fixedH::calculate_NL_no(void)
 
 void LCAO_gen_fixedH::calculate_T_no(void)
 {
-    TITLE("LCAO_gen_fixedH","calculate_T_no");
+    ModuleBase::TITLE("LCAO_gen_fixedH","calculate_T_no");
     this->build_ST_new('T', false);
     return;
 }
 
 void LCAO_gen_fixedH::calculate_S_no(void)
 {
-    TITLE("LCAO_gen_fixedH", "calculate_S_no");
+    ModuleBase::TITLE("LCAO_gen_fixedH", "calculate_S_no");
     ModuleBase::timer::tick("LCAO_gen_fixedH","calculate_S_no");
 	this->build_ST_new('S', false);
     ModuleBase::timer::tick("LCAO_gen_fixedH","calculate_S_no");
@@ -59,7 +59,7 @@ void LCAO_gen_fixedH::calculate_S_no(void)
 //liaochen modify interface 2010-3-22
 void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 {
-    TITLE("LCAO_gen_fixedH","build_ST_new");
+    ModuleBase::TITLE("LCAO_gen_fixedH","build_ST_new");
 
     //array to store data
     double olm[3]={0.0,0.0,0.0};
@@ -268,7 +268,7 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 		{
 			std::cout << " nnr=" << nnr << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << std::endl;
 			GlobalV::ofs_running << " nnr=" << nnr << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << std::endl;
-			WARNING_QUIT("LCAO_gen_fixedH::build_ST_new","nnr != GlobalC::LNNR.nnr");
+			ModuleBase::WARNING_QUIT("LCAO_gen_fixedH::build_ST_new","nnr != GlobalC::LNNR.nnr");
 		}
 	}
 
@@ -409,7 +409,7 @@ void LCAO_gen_fixedH::test_Nonlocal()
 #include "record_adj.h" //mohan add 2012-07-06
 void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 {
-    TITLE("LCAO_gen_fixedH","build_Nonlocal_mu");
+    ModuleBase::TITLE("LCAO_gen_fixedH","build_Nonlocal_mu");
     ModuleBase::timer::tick ("LCAO_gen_fixedH","build_Nonlocal_mu");
 
 	// < phi1 | beta > < beta | phi2 >
@@ -658,7 +658,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 //		GlobalV::ofs_running << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << std::endl;
 		if( nnr!=GlobalC::LNNR.nnr)
 		{
-			WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_mu","nnr!=GlobalC::LNNR.nnr");
+			ModuleBase::WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_mu","nnr!=GlobalC::LNNR.nnr");
 		}
 	}
 
@@ -671,7 +671,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 
 void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liuyu 2021-04-07
 {
-    TITLE("LCAO_gen_fixedH","build_Nonlocal_beta");
+    ModuleBase::TITLE("LCAO_gen_fixedH","build_Nonlocal_beta");
     ModuleBase::timer::tick ("LCAO_gen_fixedH","build_Nonlocal_beta");
 
 	ModuleBase::matrix Rcut(GlobalC::ucell.ntype, GlobalC::ucell.ntype);
@@ -767,7 +767,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 									//}
 								//	else
 								//	{
-								//		WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_beta","not consistent with k point algorithm.");
+								//		ModuleBase::WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_beta","not consistent with k point algorithm.");
 //										assert( nnr < GlobalC::LNNR.nnr );
 //										GlobalC::LM.Hloc_fixedR[ nnr ] += nlm[0];
 //										++nnr;
@@ -799,7 +799,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 									//}
 									//else
 									//{
-										//WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_beta","not consistent with k point algorithm.");
+										//ModuleBase::WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_beta","not consistent with k point algorithm.");
 										//GlobalC::LM.DHloc_fixedR_x[ nnr ] += nlm[0];
 										//GlobalC::LM.DHloc_fixedR_y[ nnr ] += nlm[1];
 										//GlobalC::LM.DHloc_fixedR_z[ nnr ] += nlm[2];
@@ -821,7 +821,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 							std::cout << " nnr = " << nnr << std::endl;
 							std::cout << " nlocstart[iat] = " << GlobalC::LNNR.nlocstart[iat] << std::endl;
 							std::cout << " nlocstart[iat+1] = " << GlobalC::LNNR.nlocstart[iat+1] << std::endl;
-							WARNING_QUIT("build_Nonlocal_beta","nnr");
+							ModuleBase::WARNING_QUIT("build_Nonlocal_beta","nnr");
 						}
 					}
 				}*/

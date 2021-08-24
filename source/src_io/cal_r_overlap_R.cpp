@@ -24,7 +24,7 @@ cal_r_overlap_R::~cal_r_overlap_R()
 
 void cal_r_overlap_R::init()
 {
-	TITLE("cal_r_overlap_R","init");
+	ModuleBase::TITLE("cal_r_overlap_R","init");
 
 	this->R_x_num = GlobalC::GridD.getCellX();
     this->R_y_num = GlobalC::GridD.getCellY();
@@ -246,7 +246,7 @@ void cal_r_overlap_R::init()
 
 void cal_r_overlap_R::out_r_overlap_R(const int nspin)
 {	
-	TITLE("cal_r_overlap_R","out_r_overlap_R");
+	ModuleBase::TITLE("cal_r_overlap_R","out_r_overlap_R");
 	ModuleBase::timer::tick("cal_r_overlap_R","out_r_overlap_R");
 
 	Vector3<double> tau1, tau2, dtau;

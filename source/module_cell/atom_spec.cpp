@@ -112,7 +112,7 @@ void Atom::print_Atom(std::ofstream &ofs, output &outp)
 #ifdef __MPI
 void Atom::bcast_atom(void)
 {
-    if (GlobalV::test_atom) TITLE("Atom","bcast_atom");
+    if (GlobalV::test_atom) ModuleBase::TITLE("Atom","bcast_atom");
 
     Parallel_Common::bcast_int( type );
     Parallel_Common::bcast_int( na );

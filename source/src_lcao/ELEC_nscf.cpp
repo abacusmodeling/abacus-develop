@@ -13,7 +13,7 @@ ELEC_nscf::~ELEC_nscf(){}
 
 void ELEC_nscf::nscf(LCAO_Hamilt &uhm)
 {
-	TITLE("ELEC_nscf","nscf");
+	ModuleBase::TITLE("ELEC_nscf","nscf");
 
 	std::cout << " NON-SELF CONSISTENT CALCULATIONS" << std::endl;
 	

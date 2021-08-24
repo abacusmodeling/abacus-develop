@@ -19,7 +19,7 @@ Force_Stress_LCAO::~Force_Stress_LCAO (){}
 
 void Force_Stress_LCAO::allocate(void)
 {
-    TITLE("Force_Stress_LCAO","allocate");
+    ModuleBase::TITLE("Force_Stress_LCAO","allocate");
 
     // reduce memory occupy by vlocal
     delete[] GlobalC::ParaO.sender_local_index;
@@ -49,7 +49,7 @@ void Force_Stress_LCAO::getForceStress(
 	ModuleBase::matrix &fcs,
 	ModuleBase::matrix &scs)
 {
-    TITLE("Force_Stress_LCAO","getForceStress");
+    ModuleBase::TITLE("Force_Stress_LCAO","getForceStress");
 	ModuleBase::timer::tick("Force_Stress_LCAO","getForceStress");
 	
 	if(!isforce&&!isstress) return;
@@ -550,7 +550,7 @@ void Force_Stress_LCAO::print_force(const std::string &name, ModuleBase::matrix&
 
 void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, ModuleBase::matrix& fcs)
 {
-	TITLE("Force_Stress_LCAO","printforce_total");
+	ModuleBase::TITLE("Force_Stress_LCAO","printforce_total");
 	double unit_transform = 1;
 
 	if(!ry)

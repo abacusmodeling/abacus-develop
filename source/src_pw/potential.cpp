@@ -28,7 +28,7 @@ Potential::~Potential()
 
 void Potential::allocate(const int nrxx)
 {
-    TITLE("Potential","allocate");
+    ModuleBase::TITLE("Potential","allocate");
     assert(nrxx>0);
 
     delete[] this->vltot;
@@ -64,7 +64,7 @@ void Potential::init_pot(
 	ModuleBase::ComplexMatrix &sf // structure factors
 )
 {
-    TITLE("Potential","init_pot");
+    ModuleBase::TITLE("Potential","init_pot");
     ModuleBase::timer::tick("Potential","init_pot");
 
     assert(istep>=0);
@@ -164,7 +164,7 @@ void Potential::init_pot(
 					{//read up and down , then rearrange them.
 						if(is==1) 
 						{
-							WARNING_QUIT("potential::init_pot","Incomplete charge density file!");
+							ModuleBase::WARNING_QUIT("potential::init_pot","Incomplete charge density file!");
 						}
 						else if(is==2) 
 						{
@@ -184,7 +184,7 @@ void Potential::init_pot(
 					}
 					else
 					{
-						WARNING_QUIT("potential::init_pot","Incomplete charge density file!");
+						ModuleBase::WARNING_QUIT("potential::init_pot","Incomplete charge density file!");
 					}
 				}
 				else
@@ -196,7 +196,7 @@ void Potential::init_pot(
         }
         else
         {
-            WARNING_QUIT("potential::init_pot","start_pot is wrong!");
+            ModuleBase::WARNING_QUIT("potential::init_pot","start_pot is wrong!");
         }
 		
 		// Peize Lin add 2020.04.04
@@ -259,7 +259,7 @@ void Potential::set_local_pot(
 	ModuleBase::ComplexMatrix &sf // structure factors	
 )const
 {
-    TITLE("Potential","set_local_pot");
+    ModuleBase::TITLE("Potential","set_local_pot");
     ModuleBase::timer::tick("Potential","set_local_pot");
 
     std::complex<double> *vg = new std::complex<double>[ngmc];
@@ -309,7 +309,7 @@ ModuleBase::matrix Potential::v_of_rho(
 	const double*const*const rho_in,
 	const double * const rho_core_in)
 {
-    TITLE("Potential","v_of_rho");
+    ModuleBase::TITLE("Potential","v_of_rho");
     ModuleBase::timer::tick("Potential","v_of_rho");
 
     ModuleBase::matrix v(GlobalV::NSPIN,GlobalC::pw.nrxx);
@@ -373,7 +373,7 @@ ModuleBase::matrix Potential::v_of_rho(
 //==========================================================
 void Potential::set_vr_eff(void)
 {
-    TITLE("Potential","set_vr_eff");
+    ModuleBase::TITLE("Potential","set_vr_eff");
     ModuleBase::timer::tick("Potential","set_vr_eff");
 
     for (int is = 0;is < GlobalV::NSPIN;is++)
@@ -405,7 +405,7 @@ void Potential::set_vr_eff(void)
 // ----------------------------------------------------------------------
 void Potential::newd(void)
 {
-    TITLE("Potential","newd");
+    ModuleBase::TITLE("Potential","newd");
 
     // distringuish non-local pseudopotential in REAL or RECIPROCAL space.
     // if in real space, call new_r

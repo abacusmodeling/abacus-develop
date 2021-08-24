@@ -56,7 +56,7 @@ void Grid_MeshCell::set_grid_dim(
 		std::cout << " nby = " << nby << std::endl;
 		std::cout << " nbz = " << nbz << std::endl;
 		std::cout << " nbxx = " << nbxx << std::endl;
-		WARNING_QUIT("Grid_MeshCell::set_grid_dim","nbxx is <=0 !");
+		ModuleBase::WARNING_QUIT("Grid_MeshCell::set_grid_dim","nbxx is <=0 !");
 	}
 
 	//xiaohui add 'GlobalV::OUT_LEVEL' line, 2015-09-16
@@ -76,7 +76,7 @@ void Grid_MeshCell::set_grid_dim(
 // (1)
 void Grid_MeshCell::init_latvec(void)
 {
-	TITLE("Grid_MeshCell","init_latvec");
+	ModuleBase::TITLE("Grid_MeshCell","init_latvec");
 	// initialize the mesh cell vectors.
 	assert(ncx>0);
 	assert(ncy>0);

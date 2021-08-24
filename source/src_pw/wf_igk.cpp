@@ -25,7 +25,7 @@ WF_igk::~WF_igk()
 //========================================================
 int WF_igk::setupIndGk(const PW_Basis &pwb,const int nks)
 {
-    TITLE("WF_igk","setupIndGk");
+    ModuleBase::TITLE("WF_igk","setupIndGk");
     ModuleBase::timer::tick("WF_igk","setupIndGk");
 
     //============================================

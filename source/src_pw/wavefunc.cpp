@@ -30,7 +30,7 @@ wavefunc::~wavefunc()
 
 void wavefunc::allocate_ekb_wg(const int nks)
 {
-    TITLE("wavefunc","init_local");
+    ModuleBase::TITLE("wavefunc","init_local");
     this->npwx = this->setupIndGk(GlobalC::pw, nks);
 
 	// band energies
@@ -52,7 +52,7 @@ void wavefunc::allocate_ekb_wg(const int nks)
 
 void wavefunc::allocate(const int nks)
 {	
-	TITLE("wavefunc","allocate");
+	ModuleBase::TITLE("wavefunc","allocate");
 
 	this->npwx = this->setupIndGk(GlobalC::pw, nks);
 	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"npwx",npwx);
@@ -139,7 +139,7 @@ void wavefunc::allocate(const int nks)
 #include "occupy.h"
 void wavefunc::wfcinit(void)
 {
-    TITLE("wavefunc","wfcinit");
+    ModuleBase::TITLE("wavefunc","wfcinit");
     ModuleBase::timer::tick("wavefunc","wfcinit");
 
     this->wfcinit_k();
@@ -173,7 +173,7 @@ int wavefunc::get_starting_nw(void)const
     if (start_wfc == "file")
     {
 		throw std::runtime_error("wavefunc::get_starting_nw. start_ wfc from file: not implemented yet! "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__)); 	// Peize Lin change 2019-05-01
-        //WARNING_QUIT("wfcinit_k","\n start_ wfc from file: not implemented yet!");
+        //ModuleBase::WARNING_QUIT("wfcinit_k","\n start_ wfc from file: not implemented yet!");
         //**********************************************************************
         // ... read the wavefunction into memory (if it is not done in c_bands)
         //**********************************************************************
@@ -200,7 +200,7 @@ int wavefunc::get_starting_nw(void)const
     else
     {
 		throw std::runtime_error("wavefunc::get_starting_nw. Don't know what to do! Please Check source code! "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__)); 	// Peize Lin change 2019-05-01
-        //WARNING_QUIT("get_starting_nw","Don't know what to do! Please Check source code!");
+        //ModuleBase::WARNING_QUIT("get_starting_nw","Don't know what to do! Please Check source code!");
     }
 }
 
@@ -209,7 +209,7 @@ int wavefunc::get_starting_nw(void)const
 #ifdef __LCAO
 void wavefunc::LCAO_in_pw_k(const int &ik, ModuleBase::ComplexMatrix &wvf)
 {
-	TITLE("wavefunc","LCAO_in_pw_k");
+	ModuleBase::TITLE("wavefunc","LCAO_in_pw_k");
 	ModuleBase::timer::tick("wavefunc","LCAO_in_pw_k");
 
 	assert(GlobalV::BASIS_TYPE=="lcao_in_pw");
@@ -249,7 +249,7 @@ void wavefunc::LCAO_in_pw_k(const int &ik, ModuleBase::ComplexMatrix &wvf)
 
 void wavefunc::LCAO_in_pw_k_q(const int &ik, ModuleBase::ComplexMatrix &wvf, Vector3<double> q)   // pengfei  2016-11-23
 {
-	TITLE("wavefunc","LCAO_in_pw_k_q");
+	ModuleBase::TITLE("wavefunc","LCAO_in_pw_k_q");
 	ModuleBase::timer::tick("wavefunc","LCAO_in_pw_k_q");
 	//assert(LOCAL_BASIS==4); xiaohui modify 2013-09-01
 	assert(GlobalV::BASIS_TYPE=="lcao_in_pw"); //xiaohui add 2013-09-01. Attention! How about "BASIS_TYPE=="lcao""???
@@ -264,7 +264,7 @@ void wavefunc::LCAO_in_pw_k_q(const int &ik, ModuleBase::ComplexMatrix &wvf, Vec
 
 void wavefunc::diago_PAO_in_pw_k(const int &ik, ModuleBase::ComplexMatrix &wvf)
 {
-	TITLE("wavefunc","diago_PAO_in_pw_k");
+	ModuleBase::TITLE("wavefunc","diago_PAO_in_pw_k");
 
 	GlobalC::hm.hpw.init_k(ik);
     this->diago_PAO_in_pw_k2(ik, wvf);
@@ -274,7 +274,7 @@ void wavefunc::diago_PAO_in_pw_k(const int &ik, ModuleBase::ComplexMatrix &wvf)
 
 void wavefunc::diago_PAO_in_pw_k2(const int &ik, ModuleBase::ComplexMatrix &wvf)
 {
-	TITLE("wavefunc","diago_PAO_in_pw_k2");
+	ModuleBase::TITLE("wavefunc","diago_PAO_in_pw_k2");
 	// (6) Prepare for atmoic orbitals or random orbitals
 	const int starting_nw = this->get_starting_nw();
 	assert(starting_nw > 0);
@@ -337,7 +337,7 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ModuleBase::ComplexMatrix &wvf)
 
 void wavefunc::wfcinit_k(void)
 {
-	TITLE("wavefunc","wfcinit_k");
+	ModuleBase::TITLE("wavefunc","wfcinit_k");
 
 	if(mem_saver) 
 	{
@@ -762,7 +762,7 @@ void wavefunc::init_after_vc(const int nks)
         done_once = true;
     }
 
-    TITLE("wavefunc","init");
+    ModuleBase::TITLE("wavefunc","init");
     //this->npwx = this->setupIndGk(GlobalC::pw, nks);
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"npwx",npwx);
 

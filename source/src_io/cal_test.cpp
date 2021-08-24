@@ -45,7 +45,7 @@ double Cal_Test::mtot;
 
 void Cal_Test::test_memory(void)
 {
-	TITLE("Cal_Test","test_memory");
+	ModuleBase::TITLE("Cal_Test","test_memory");
 
 	const int ngmw = Cal_Test::cal_np(GlobalC::pw.ggwfc2, GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz);
 	const int ngmc = Cal_Test::cal_np(GlobalC::pw.ggchg, GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz);

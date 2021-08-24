@@ -26,7 +26,7 @@ std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_pt
 	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<ModuleBase::matrix>>>> &Cws,
 	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<ModuleBase::matrix>>>> &Vws )
 {
-	TITLE("Abfs","cal_Cs");
+	ModuleBase::TITLE("Abfs","cal_Cs");
 	pthread_rwlock_t rwlock_Cw;	pthread_rwlock_init(&rwlock_Cw,NULL);
 	pthread_rwlock_t rwlock_Vw;	pthread_rwlock_init(&rwlock_Vw,NULL);
 	
@@ -128,7 +128,7 @@ std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_pt
 		std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,std::shared_ptr<matrix>>>> &Vs,
 		std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<matrix>>>> &Vws )
 {
-	TITLE("Abfs","cal_Vps");	
+	ModuleBase::TITLE("Abfs","cal_Vps");	
 	
 	std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,std::shared_ptr<matrix>>>> Vps;
 	
@@ -175,7 +175,7 @@ std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_pt
 	const double threshold,
 	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<ModuleBase::matrix>>>> &Vws )
 {
-	TITLE("Abfs","cal_Vs");
+	ModuleBase::TITLE("Abfs","cal_Vs");
 	pthread_rwlock_t rwlock_Vw;	pthread_rwlock_init(&rwlock_Vw,NULL);
 	std::vector<Abfs::Vector3_Order<int>> Coulomb_potential_boxes = get_Coulomb_potential_boxes(rmesh_times);
 
@@ -262,7 +262,7 @@ std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_pt
 	const Abfs::Vector3_Order<int> &Born_von_Karman_period,
 	const std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,std::shared_ptr<ModuleBase::matrix>>>> &ms )
 {
-	TITLE("Abfs","cal_mps");
+	ModuleBase::TITLE("Abfs","cal_mps");
 	std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,std::shared_ptr<ModuleBase::matrix>>>> mps;
 	for( const auto & m1s : ms )
 		for( const auto & m12s : m1s.second )
@@ -300,7 +300,7 @@ std::shared_ptr<ModuleBase::matrix> Abfs::DPcal_C(
 	//         浪费空间（可在算完全部Cs后根据需要删除无需的Cs，释放空间？）
 	// 根据后续情况选择权衡。
 	
-//	TITLE("Abfs","DPcal_C");
+//	ModuleBase::TITLE("Abfs","DPcal_C");
 	pthread_rwlock_rdlock(&rwlock_Cw);
 	const std::weak_ptr<ModuleBase::matrix> * const Cws_ptr   = static_cast<const std::weak_ptr<ModuleBase::matrix> * const>( ModuleBase::GlobalFunc::MAP_EXIST( Cws, it1, it2, R ) );
 	pthread_rwlock_unlock(&rwlock_Cw);
@@ -366,7 +366,7 @@ std::shared_ptr<ModuleBase::matrix> Abfs::DPcal_V(
 	pthread_rwlock_t &rwlock_Vw,
 	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<ModuleBase::matrix>>>> &Vws)
 {
-//	TITLE("Abfs","DPcal_V");
+//	ModuleBase::TITLE("Abfs","DPcal_V");
 	pthread_rwlock_rdlock(&rwlock_Vw);
 	const std::weak_ptr<ModuleBase::matrix> * const Vws12_ptr = static_cast<const std::weak_ptr<ModuleBase::matrix> * const>( ModuleBase::GlobalFunc::MAP_EXIST( Vws, it1, it2, R ) );
 	const std::weak_ptr<ModuleBase::matrix> * const Vws21_ptr = static_cast<const std::weak_ptr<ModuleBase::matrix> * const>( ModuleBase::GlobalFunc::MAP_EXIST( Vws, it2, it1, -R ) );
@@ -403,7 +403,7 @@ std::shared_ptr<ModuleBase::matrix> Abfs::DPcal_V(
 
 std::map<size_t,std::vector<Abfs::Vector3_Order<int>>> Abfs::get_adjs( const size_t &iat )
 {
-//	TITLE("Abfs","get_adjs");
+//	ModuleBase::TITLE("Abfs","get_adjs");
 	const int it = GlobalC::ucell.iat2it[iat];
 	const int ia = GlobalC::ucell.iat2ia[iat];
 	const Vector3<double> &tau = GlobalC::ucell.atoms[it].tau[ia];
@@ -435,7 +435,7 @@ std::vector<std::map<size_t,std::vector<Abfs::Vector3_Order<int>>>> Abfs::get_ad
 /*
 set<std::pair<size_t,size_t>> Abfs::get_H_pairs_core( const std::vector<std::pair<size_t,size_t>> &atom_pairs )
 {
-	TITLE("Exx_Lcao","allocate_Hexx");
+	ModuleBase::TITLE("Exx_Lcao","allocate_Hexx");
 
 	set<std::pair<size_t,size_t>> H_atom_pairs_core;
 	for( const std::pair<size_t,size_t> & atom_pair : atom_pairs )
@@ -465,7 +465,7 @@ set<std::pair<size_t,size_t>> Abfs::get_H_pairs_core( const std::vector<std::pai
 
 std::map<set<size_t>,set<size_t>> Abfs::get_H_pairs_core_group( const std::vector<std::pair<size_t,size_t>> &atom_pairs )
 {
-	TITLE("Abfs","get_H_pairs_core_group");
+	ModuleBase::TITLE("Abfs","get_H_pairs_core_group");
 	
 	const std::vector<std::map<size_t,std::vector<Abfs::Vector3_Order<int>>>> adjs = Abfs::get_adjs();
 	
@@ -509,7 +509,7 @@ std::map<set<size_t>,set<size_t>> Abfs::get_H_pairs_core_group( const std::vecto
 
 set<std::pair<size_t,size_t>> Abfs::get_H_pairs_core( const std::vector<std::pair<size_t,size_t>> &atom_pairs )
 {
-	TITLE("Exx_Lcao","get_H_pairs_core");
+	ModuleBase::TITLE("Exx_Lcao","get_H_pairs_core");
 	
 	const std::vector<std::map<size_t,std::vector<Abfs::Vector3_Order<int>>>> adjs = Abfs::get_adjs();
 	
@@ -587,7 +587,7 @@ std::vector<Abfs::Vector3_Order<int>> Abfs::get_Born_von_Karmen_boxes( const Abf
 
 std::shared_ptr<ModuleBase::matrix> Abfs::cal_I( const std::shared_ptr<ModuleBase::matrix> &m )
 {
-//	TITLE("Abfs","cal_I1");
+//	ModuleBase::TITLE("Abfs","cal_I1");
 	Exx_Abfs::Inverse_Matrix_Double I;
 	I.init( m->nc );
 	I.input( m );
@@ -615,7 +615,7 @@ std::shared_ptr<ModuleBase::matrix> Abfs::cal_I( const std::shared_ptr<ModuleBas
 
 std::vector<std::vector<std::shared_ptr<ModuleBase::matrix>>> Abfs::cal_I( const std::vector<std::vector<std::shared_ptr<ModuleBase::matrix>>> &ms )
 {
-//	TITLE("Abfs","cal_I4");
+//	ModuleBase::TITLE("Abfs","cal_I4");
 	Exx_Abfs::Inverse_Matrix_Double I;
 	I.init( ms[0][0]->nc + ms[0][1]->nc );
 	I.input( ms[0][0], ms[0][1], ms[1][0], ms[1][1] );

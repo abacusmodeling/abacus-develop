@@ -12,7 +12,8 @@
 #include <complex>
 #include <cassert>
 
-using namespace std;
+namespace ModuleBase
+{
 
 //==========================================================
 // GLOBAL FUNCTIONS :
@@ -22,5 +23,6 @@ void CHECK_NAME(std::ifstream &ifs, const std::string &name_in, bool quit=true);
 void CHECK_INT(std::ifstream &ifs, const int &v, bool quit=true);
 void CHECK_DOUBLE(std::ifstream &ifs, const double &v, bool quit=true);
 void CHECK_STRING(std::ifstream &ifs, const std::string &v, bool quit=true);
+}
 
 #endif

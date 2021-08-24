@@ -89,7 +89,7 @@ void Exx_Abfs::Parallel::Communicate::DM2::cal_DM_k(
 	const set<std::pair<size_t,size_t>> &H_atom_pairs_core,
 	const double threshold )
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::DM::cal_DM");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM::cal_DM");
 	
 	std::vector<Abfs::Vector3_Order<int>> Born_von_Karman_boxes;
 	for( int ix=0; ix<Born_von_Karman_period.x; ++ix )

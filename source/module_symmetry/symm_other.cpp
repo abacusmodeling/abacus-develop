@@ -4,7 +4,7 @@ namespace ModuleSymmetry
 {
 void Symm_Other::print1(const int &ibrav, const double *cel_const, std::ofstream &ofs_running)
 {
-	TITLE("Symm_Other","print1");
+	ModuleBase::TITLE("Symm_Other","print1");
 
 	ModuleBase::GlobalFunc::OUT(ofs_running,"IBRAV",ibrav);
 	if(ibrav==1)
@@ -102,7 +102,7 @@ void Symm_Other::print1(const int &ibrav, const double *cel_const, std::ofstream
 	}
 	else
 	{
-		WARNING_QUIT("Symm_Other::print1","ibrav is wrong.");
+		ModuleBase::WARNING_QUIT("Symm_Other::print1","ibrav is wrong.");
 	}
 	return;
 }

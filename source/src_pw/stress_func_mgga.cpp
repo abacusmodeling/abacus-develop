@@ -8,7 +8,7 @@ void Stress_Func::stress_mgga(ModuleBase::matrix& sigma)
 {
 	ModuleBase::timer::tick("Stress_Func","stress_mgga");
 
-	if (GlobalV::NSPIN==4) WARNING_QUIT("stress_mgga","noncollinear stress + mGGA not implemented");
+	if (GlobalV::NSPIN==4) ModuleBase::WARNING_QUIT("stress_mgga","noncollinear stress + mGGA not implemented");
 
 	int current_spin = 0;
 	

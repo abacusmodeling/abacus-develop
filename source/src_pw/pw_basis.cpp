@@ -86,7 +86,7 @@ void PW_Basis::set
 	const int &bz_in
 )
 {
-    TITLE("PW_Basis","set");
+    ModuleBase::TITLE("PW_Basis","set");
     this->gamma_only = gamma_only_in;
     this->ecutwfc = ecutwfc_in;
     this->ecutrho = ecutrho_in,
@@ -102,7 +102,7 @@ void PW_Basis::set
 
     if (ecutwfc <= 0.00)
     {
-        WARNING_QUIT("PW_Basis::set","ecutwfc < 0 is not allowed !");
+        ModuleBase::WARNING_QUIT("PW_Basis::set","ecutwfc < 0 is not allowed !");
     }
 
     if (ecutrho <= 0.00)
@@ -114,7 +114,7 @@ void PW_Basis::set
         this->wfac = ecutrho/ecutwfc;
         if (wfac <= 1.0)
         {
-            WARNING_QUIT("input","GlobalC::pw.wfac <= 1.0 is not allowed !");
+            ModuleBase::WARNING_QUIT("input","GlobalC::pw.wfac <= 1.0 is not allowed !");
         }
     }
     return;
@@ -124,7 +124,7 @@ void PW_Basis::set
 // initialize of plane wave basis.
 void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_Vectors &Klist_in)
 {
-    TITLE("PW_Basis","gen_pw");
+    ModuleBase::TITLE("PW_Basis","gen_pw");
     ModuleBase::timer::tick("PW_Basis","gen_pw");
 
 
@@ -365,11 +365,11 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
 
 void PW_Basis::setup_gg(void)
 {
-    TITLE("PW_Basis","setup_gg");
+    ModuleBase::TITLE("PW_Basis","setup_gg");
 
     if (Ucell->tpiba2 <= 0)
     {
-        WARNING_QUIT("PW_Basis::setup_gg","tpiba2 <= 0");
+        ModuleBase::WARNING_QUIT("PW_Basis::setup_gg","tpiba2 <= 0");
     }
     this->ggpsi = this->ecutwfc / Ucell->tpiba2;
     //=================================
@@ -417,7 +417,7 @@ void PW_Basis::setup_gg(void)
 //  Set up crystal structure parameters.
 void PW_Basis::setup_FFT_dimension(void)
 {
-    if (GlobalV::test_pw) TITLE("PW_Basis","setup_FFT_dimension");
+    if (GlobalV::test_pw) ModuleBase::TITLE("PW_Basis","setup_FFT_dimension");
 
     this->nxyz = nx * ny * nz;
     this->ncxyz = ncx * ncy * ncz;
@@ -472,7 +472,7 @@ void PW_Basis::setup_FFT_dimension(void)
 #ifdef __MPI
 void PW_Basis::divide_fft_grid(void)
 {
-    TITLE("PW_Basis","divide_fft_grid");
+    ModuleBase::TITLE("PW_Basis","divide_fft_grid");
 
     //----------------------------------------------
     // set charge/potential grid : nrxx
@@ -567,7 +567,7 @@ void PW_Basis::divide_fft_grid(void)
 
 void PW_Basis::get_MPI_GVectors(void)
 {
-    if (GlobalV::test_pw) TITLE("PW_Basis","get_MPI_GVectors");
+    if (GlobalV::test_pw) ModuleBase::TITLE("PW_Basis","get_MPI_GVectors");
 
     delete[] ig1;
     delete[] ig2;
@@ -609,7 +609,7 @@ void PW_Basis::get_MPI_GVectors(void)
 #else
 void PW_Basis::get_GVectors(void)
 {
-    if (GlobalV::test_pw) TITLE("PW_Basis","get_GVectors");
+    if (GlobalV::test_pw) ModuleBase::TITLE("PW_Basis","get_GVectors");
     ModuleBase::timer::tick("PW_Basis","get_GVectors");
 
     this->nrxx = this->ncxyz;
@@ -664,7 +664,7 @@ void PW_Basis::get_GVectors(void)
 
 void PW_Basis::get_nggm(const int ngmc_local)
 {
-    TITLE("PW_Basis","get_nggm");
+    ModuleBase::TITLE("PW_Basis","get_nggm");
     ModuleBase::timer::tick("PW_Basis","get_nggm");
 
 //	GlobalV::ofs_running << " calculate the norm of G vectors." << std::endl;
@@ -736,7 +736,7 @@ void PW_Basis::get_nggm(const int ngmc_local)
 //  Calculate structure factor
 void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add OpenMP 2021.04.01
 {
-    TITLE("PW_Basis","setup_structure_factor");
+    ModuleBase::TITLE("PW_Basis","setup_structure_factor");
     ModuleBase::timer::tick("PW_Basis","setup_struc_factor");
     const std::complex<double> ci_tpi = NEG_IMAG_UNIT * TWO_PI;
 
@@ -813,7 +813,7 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
 #ifdef __MPI
 void PW_Basis::columns_and_pw_distribution_2(void)
 {
-    TITLE("PW_Basis","columns_and_pw_distribution_2");
+    ModuleBase::TITLE("PW_Basis","columns_and_pw_distribution_2");
 
     // time count the number of sticks in charge grid.
     int time=0;
@@ -1005,7 +1005,7 @@ void PW_Basis::columns_and_pw_distribution_2(void)
             GlobalV::ofs_running<<" too many sticks for cpu = "<<ip<<std::endl;
             GlobalV::ofs_running<<" ngrid is = "<< ngrid << std::endl;
             GlobalV::ofs_running<<" In fact , non_zero_grid = "<< non_zero_grid << std::endl;
-            WARNING_QUIT("PW_Basis::columns_and_pw_distribution_2","conflict about pw distribution.");
+            ModuleBase::WARNING_QUIT("PW_Basis::columns_and_pw_distribution_2","conflict about pw distribution.");
         }
     }
 
@@ -1024,7 +1024,7 @@ void PW_Basis::columns_and_pw_distribution_2(void)
 
 	if(no_pw>0)
 	{
-		WARNING_QUIT("distribution of pw","some processor has no plane waves!");
+		ModuleBase::WARNING_QUIT("distribution of pw","some processor has no plane waves!");
 	}
 
 
@@ -1036,7 +1036,7 @@ void PW_Basis::columns_and_pw_distribution_2(void)
 //20180515
 void PW_Basis::update_gvectors(std::ofstream &runlog, const UnitCell &Ucell_in)
 {
-    TITLE("PW_Basis","update_gvectors");
+    ModuleBase::TITLE("PW_Basis","update_gvectors");
     ModuleBase::timer::tick("PW_Basis","update_gvectors");
 
 #ifdef __MPI

@@ -87,7 +87,7 @@ void Inverse_Matrix_Complex::using_zpotrf( const ModuleBase::ComplexMatrix &Sin)
 	if(info!=0)
 	{
 		std::cout << "\n info_zpotrf = " << info;
-		QUIT();
+		ModuleBase::QUIT();
 	}
 	
 	LapackConnector::zpotri('U',dim,A,dim,&info);
@@ -95,7 +95,7 @@ void Inverse_Matrix_Complex::using_zpotrf( const ModuleBase::ComplexMatrix &Sin)
 	if(info!=0)
 	{
 		std::cout << "\n info_zpotri = " << info;
-		QUIT();
+		ModuleBase::QUIT();
 	}
 //	ModuleBase::timer::tick("Inverse","using_zpotrf");
 	return;

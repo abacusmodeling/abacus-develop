@@ -54,7 +54,7 @@ void Grid_Technique::set_pbc_grid(
 		const int &nbzp_start_in,
 		const int &nbzp_in)
 {
-	TITLE("Grid_Technique","init");
+	ModuleBase::TITLE("Grid_Technique","init");
 	ModuleBase::timer::tick("Grid_Technique","init");
 
 	if(GlobalV::OUT_LEVEL != "m") 
@@ -102,7 +102,7 @@ void Grid_Technique::set_pbc_grid(
 // mohan add 2021-04-06
 void Grid_Technique::init_atoms_on_grid(void)
 {
-	TITLE("Grid_Technique","init_atoms_on_grid");
+	ModuleBase::TITLE("Grid_Technique","init_atoms_on_grid");
 
 	assert(nbxx>0);
 	
@@ -169,7 +169,7 @@ void Grid_Technique::init_atoms_on_grid(void)
 					std::cout << " index_ball=" << index_ball[im] << std::endl;
 					std::cout << " normal=" << normal << std::endl;
 					std::cout << " nbxyz=" << nbxyz << std::endl;
-					WARNING_QUIT("Grid_Technique::init_atoms_on_grid","normal >= nbxyz");
+					ModuleBase::WARNING_QUIT("Grid_Technique::init_atoms_on_grid","normal >= nbxyz");
 				}
 
 				assert(normal>=0);	
@@ -205,7 +205,7 @@ void Grid_Technique::init_atoms_on_grid(void)
 	Parallel_Reduce::reduce_int_all( stop );
 	if(stop)
 	{
-		WARNING("Grid_Technique::init_atoms_on_grid","No atom on this sub-FFT-mesh.");
+		ModuleBase::WARNING("Grid_Technique::init_atoms_on_grid","No atom on this sub-FFT-mesh.");
 	}
 
 	// need how_many_atoms first.
@@ -218,11 +218,11 @@ void Grid_Technique::init_atoms_on_grid(void)
 
 void Grid_Technique::init_atoms_on_grid2(const int* index2normal)
 {	
-	TITLE("Grid_Techinique","init_atoms_on_grid2");
+	ModuleBase::TITLE("Grid_Techinique","init_atoms_on_grid2");
 
 	if(total_atoms_on_grid==0) 
 	{	
-		WARNING("Grid_Technique::init_atoms_on_grid2","no atom on this sub FFT grid.");
+		ModuleBase::WARNING("Grid_Technique::init_atoms_on_grid2","no atom on this sub FFT grid.");
 		return;
 	}
 
@@ -408,7 +408,7 @@ void Grid_Technique::cal_trace_beta(void)
 // set 'lgd' variable
 void Grid_Technique::cal_trace_lo(void)
 {	
-	TITLE("Grid_Technique","cal_trace_lo");
+	ModuleBase::TITLE("Grid_Technique","cal_trace_lo");
 	// save the atom information in trace_lo,
 	// in fact the trace_lo dimension can be reduced
 	// to GlobalC::ucell.nat, but I think this is another way.

@@ -143,7 +143,7 @@ void Stress_Func::stress_gga(ModuleBase::matrix& sigma)
 		{
 			if(GlobalV::DFT_META)
 			{
-				WARNING_QUIT("stress_gga","stress mGGA not ready for nspin=2");
+				ModuleBase::WARNING_QUIT("stress_gga","stress mGGA not ready for nspin=2");
 			}
 			double rh = rhotmp1[ir] + rhotmp2[ir];
 			grho2a = gdr1[ir].norm2();;
@@ -156,7 +156,7 @@ void Stress_Func::stress_gga(ModuleBase::matrix& sigma)
 			{
 				if(igcc_is_lyp)
 				{
-					WARNING_QUIT("stress","igcc_is_lyp is not available now.");
+					ModuleBase::WARNING_QUIT("stress","igcc_is_lyp is not available now.");
 				}
 				else
 				{

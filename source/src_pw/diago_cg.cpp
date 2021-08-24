@@ -26,7 +26,7 @@ void Diago_CG::diag
     double &avg_iter
 )
 {
-    if (test_cg==1) TITLE("Diago_CG","ccgdiagg");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG","ccgdiagg");
     ModuleBase::timer::tick("Diago_CG", "diag");
 
     avg_iter = 0.0;
@@ -168,7 +168,7 @@ void Diago_CG::calculate_gradient(
     const std::complex<double> *hpsi, const std::complex<double> *spsi,
     std::complex<double> *g, std::complex<double> *ppsi)
 {
-    if (test_cg==1) TITLE("Diago_CG","calculate_gradient");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG","calculate_gradient");
     //ModuleBase::timer::tick("Diago_CG","grad");
 
     for (int i=0; i<dim; i++)
@@ -205,7 +205,7 @@ void Diago_CG::orthogonal_gradient( const int &dim, const int &dmx,
                                     std::complex<double> *g, std::complex<double> *sg, std::complex<double> *lagrange,
                                     const ModuleBase::ComplexMatrix &eigenfunction, const int m)
 {
-    if (test_cg==1) TITLE("Diago_CG","orthogonal_gradient");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG","orthogonal_gradient");
     //ModuleBase::timer::tick("Diago_CG","orth_grad");
 
     GlobalC::hm.hpw.s_1psi(dim , g, sg);
@@ -262,7 +262,7 @@ void Diago_CG::calculate_gamma_cg(
     const double &theta,
     const std::complex<double> *psi_m)
 {
-    if (test_cg==1) TITLE("Diago_CG","calculate_gamma_cg");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG","calculate_gamma_cg");
     //ModuleBase::timer::tick("Diago_CG","gamma_cg");
     double gg_inter;
     if (iter>0)
@@ -337,7 +337,7 @@ bool Diago_CG::update_psi(
     std::complex<double> *hpsi,
     std::complex<double> *sphi)
 {
-    if (test_cg==1) TITLE("Diago_CG","update_psi");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG","update_psi");
     //ModuleBase::timer::tick("Diago_CG","update");
     GlobalC::hm.hpw.h_1psi(dim, cg, hcg, scg);
     cg_norm = sqrt( this->ddot_real(dim, cg, scg) );
@@ -406,7 +406,7 @@ void Diago_CG::schmit_orth
     std::complex<double> *psi_m
 )
 {
-//	TITLE("Diago_CG","schmit_orth");
+//	ModuleBase::TITLE("Diago_CG","schmit_orth");
     //ModuleBase::timer::tick("Diago_CG","schmit_orth");
     // orthogonalize starting eigenfunction to those already calculated
     // psi_m orthogonalize to psi(start) ~ psi(m-1)
@@ -465,7 +465,7 @@ void Diago_CG::schmit_orth
 		}
         std::cout << " in diago_cg, psi norm = " << psi_norm << std::endl;
 		std::cout << " If you use GNU compiler, it may due to the zdotc is unavailable." << std::endl;
-        WARNING_QUIT("schmit_orth","psi_norm <= 0.0");
+        ModuleBase::WARNING_QUIT("schmit_orth","psi_norm <= 0.0");
     }
 
     psi_norm = sqrt(psi_norm);

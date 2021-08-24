@@ -11,7 +11,7 @@ std::vector<std::pair<size_t,size_t>> Exx_Abfs::Parallel::Distribute::Htime::dis
 //std::ofstream ofs("htime_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 //ofs<<rmesh_times<<std::endl;
 
-	TITLE("Exx_Abfs::Parallel::Distribute::Htime::distribute");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Distribute::Htime::distribute");
 	const std::vector<size_t> Nadj = cal_Nadj(Born_von_Karman_period);
 //ofs<<Nadj<<std::endl;
 
@@ -30,7 +30,7 @@ std::vector<std::pair<size_t,size_t>> Exx_Abfs::Parallel::Distribute::Htime::dis
 std::vector<size_t> Exx_Abfs::Parallel::Distribute::Htime::cal_Nadj( 
 	const Abfs::Vector3_Order<int> & Born_von_Karman_period )
 {
-	TITLE("Exx_Abfs::Parallel::Distribute::Htime::cal_Nadj");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Distribute::Htime::cal_Nadj");
 	std::vector<size_t> Nadj(GlobalC::ucell.nat);
 	for( size_t iat=0; iat!=GlobalC::ucell.nat; ++iat )
 	{
@@ -52,7 +52,7 @@ std::vector<std::pair<size_t,std::pair<size_t,size_t>>> Exx_Abfs::Parallel::Dist
 	const std::vector<size_t> &Nadj, 
 	const double rmesh_times )
 {
-	TITLE("Exx_Abfs::Parallel::Distribute::Htime::cal_pair_costs");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Distribute::Htime::cal_pair_costs");
 			
 	const std::vector<Abfs::Vector3_Order<int>> Coulomb_potential_boxes = Abfs::get_Coulomb_potential_boxes(rmesh_times);
 	auto neighbour = [&](const size_t iat1, const size_t iat2) -> int
@@ -92,7 +92,7 @@ std::vector<std::pair<size_t,std::pair<size_t,size_t>>> Exx_Abfs::Parallel::Dist
 std::vector<std::vector<std::pair<size_t,size_t>>> Exx_Abfs::Parallel::Distribute::Htime::cal_rank_work( 
 	const std::vector<std::pair<size_t,std::pair<size_t,size_t>>> & pair_costs )
 {
-	TITLE("Exx_Abfs::Parallel::Distribute::Htime::cal_rank_work");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Distribute::Htime::cal_rank_work");
 	std::vector<std::pair<size_t,size_t>> rank_cost(GlobalV::NPROC);				// rank_cost[i] = { irank, cost }
 	for( size_t irank=0; irank!=GlobalV::NPROC; ++irank )
 		rank_cost[irank] = { irank, 0 };

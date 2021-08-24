@@ -80,7 +80,7 @@ void Stochastic_hchi:: init()
     }
     else
     {
-        WARNING_QUIT("Stochastic_hchi", "Number of grids should be at least one!");
+        ModuleBase::WARNING_QUIT("Stochastic_hchi", "Number of grids should be at least one!");
     }
 
 }
@@ -117,8 +117,8 @@ void Stochastic_hchi::get_GRA_index()
 void Stochastic_hchi::orthogonal_to_psi_real(std::complex<double> *wfin, std::complex<double> *wfout, int &ikk)
 {
 
-	TITLE("Stochastic_hchi","orthogonal_to_psi0");
-	if(!initplan) WARNING_QUIT("Stochastic_hchi", "Please init hchi first!");
+	ModuleBase::TITLE("Stochastic_hchi","orthogonal_to_psi0");
+	if(!initplan) ModuleBase::WARNING_QUIT("Stochastic_hchi", "Please init hchi first!");
 
 	ModuleBase::GlobalFunc::DCOPY(wfin,rp_chi,nrxx);
 	//LapackConnector::copy(nrxx,wfin,1,rp_chi,1);
@@ -205,7 +205,7 @@ void Stochastic_hchi::orthogonal_to_psi_real(std::complex<double> *wfin, std::co
 void Stochastic_hchi::orthogonal_to_psi_reciprocal(std::complex<double> *wfgin, std::complex<double> *wfgout, int &ikk)
 {
 
-	TITLE("Stochastic_hchi","orthogonal_to_psi0");
+	ModuleBase::TITLE("Stochastic_hchi","orthogonal_to_psi0");
 	int nchip=GlobalC::sto_wf.nchip;
 	int npw = GlobalC::wf.npw;
 	for(int ig = 0 ; ig < npw * nchip; ++ig)
@@ -245,7 +245,7 @@ void Stochastic_hchi::hchi_real(std::complex<double>*chi_in, std::complex<double
 	dk3 = GlobalC::ucell.tpiba;
 		
 	//---------------------------------------------------
-	if(!initplan) WARNING_QUIT("Stochastic_hchi", "Please init hchi first!");
+	if(!initplan) ModuleBase::WARNING_QUIT("Stochastic_hchi", "Please init hchi first!");
 
 	ModuleBase::GlobalFunc::ZEROS(hchi,nrxx);
 	ModuleBase::GlobalFunc::DCOPY(chi_in, rp_chi, nrxx);

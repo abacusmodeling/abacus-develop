@@ -10,7 +10,7 @@
 void pdgseps(MPI_Comm comm_2D,int n,int nb,double *A, double *B,double *Z,double *eigen,
              LocalMatrix LM,char uplo, int &loc_size,int &loc_pos)
 {
-    TITLE("Parallel_Diago","pdgseps");
+    ModuleBase::TITLE("Parallel_Diago","pdgseps");
     int i,j,count=0,k=0,incx=1;
     int color,key;
 
@@ -41,7 +41,7 @@ void pdgseps(MPI_Comm comm_2D,int n,int nb,double *A, double *B,double *Z,double
 	if(wrong_input > 0)
 	{
 		GlobalV::ofs_running << "\n col_num == 0 || row_num == 0" << std::endl;
-		WARNING_QUIT("pdgseps","col_num == 0 || row_num == 0");
+		ModuleBase::WARNING_QUIT("pdgseps","col_num == 0 || row_num == 0");
 	}
 //time_t s,e;
 //s=clock();

@@ -28,7 +28,7 @@ void Ions_Move_Methods::allocate()
 	}
 	else
 	{
-		WARNING("Ions_Move_Methods::init","the parameter GlobalV::MOVE_IONS is not correct.");
+		ModuleBase::WARNING("Ions_Move_Methods::init","the parameter GlobalV::MOVE_IONS is not correct.");
 	}
 	return;
 }
@@ -36,7 +36,7 @@ void Ions_Move_Methods::allocate()
 //void Ions_Move_Methods::cal_movement(const int &istep, const ModuleBase::matrix &f, const double &etot)
 void Ions_Move_Methods::cal_movement(const int &istep, const int &force_step, const ModuleBase::matrix &f, const double &etot)
 {
-	TITLE("Ions_Move_Methods","init");
+	ModuleBase::TITLE("Ions_Move_Methods","init");
 
 	//Ions_Move_Basic::istep = istep;
     Ions_Move_Basic::istep = force_step;
@@ -62,7 +62,7 @@ void Ions_Move_Methods::cal_movement(const int &istep, const int &force_step, co
         }
 	else
 	{
-		WARNING("Ions_Move_Methods::init","the parameter GlobalV::MOVE_IONS is not correct.");
+		ModuleBase::WARNING("Ions_Move_Methods::init","the parameter GlobalV::MOVE_IONS is not correct.");
 	}
 
 	// print the atom positions for convinience.

@@ -42,7 +42,7 @@ void Local_Orbital_Charge::write_dm(
 	const std::string &fn, 
 	const int &precision)
 {
-    TITLE("Local_Orbital_Charge","write_dm");
+    ModuleBase::TITLE("Local_Orbital_Charge","write_dm");
 
 	if (out_dm==0)
 	{
@@ -64,7 +64,7 @@ void Local_Orbital_Charge::write_dm(
 		ofs.open(fn.c_str());
 		if (!ofs)
 		{
-			WARNING("Charge::write_rho","Can't create Charge File!");
+			ModuleBase::WARNING("Charge::write_rho","Can't create Charge File!");
 		}
 
 		//GlobalV::ofs_running << "\n Output charge file." << std::endl;
@@ -110,7 +110,7 @@ void Local_Orbital_Charge::write_dm(
 		}
 		else
 		{
-			WARNING_QUIT("write_rho","check nspin!");
+			ModuleBase::WARNING_QUIT("write_rho","check nspin!");
 		}
 
 
@@ -136,7 +136,7 @@ void Local_Orbital_Charge::write_dm(
     }
     else
     {
-        WARNING_QUIT("write_dm","not ready yet");
+        ModuleBase::WARNING_QUIT("write_dm","not ready yet");
         ofs << " " << GlobalC::LNNR.nnrg << " (nnrg)" << std::endl;
         for(int i=0; i<GlobalC::LNNR.nnrg; ++i)
         {
@@ -218,7 +218,7 @@ void Local_Orbital_Charge::write_dm(
     else
     {
         ofs << " " << GlobalC::LNNR.nnrg << " (nnrg)" << std::endl;
-        WARNING_QUIT("local_orbital_charge","not ready to output DM_R");
+        ModuleBase::WARNING_QUIT("local_orbital_charge","not ready to output DM_R");
     }
 #endif
 	if(GlobalV::MY_RANK==0)

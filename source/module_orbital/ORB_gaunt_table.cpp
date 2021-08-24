@@ -17,7 +17,7 @@ void ORB_gaunt_table::init_Gaunt(const int &lmax)
 ////////////////////////////////////////
 /// EXPLAIN : make table of Gaunt Coefficients
 ////////////////////////////////////////
-    TITLE("ORB_gaunt_table", "init_Gaunt");
+    ModuleBase::TITLE("ORB_gaunt_table", "init_Gaunt");
     ModuleBase::timer::tick("ORB_gaunt_table", "init_Gaunt");
     
 	const int nlm = (lmax * 2 + 1) * (lmax * 2 + 1);
@@ -119,7 +119,7 @@ void ORB_gaunt_table::init_Ylm_Gaunt
 	const double &e2
 )
 {
-	TITLE("ORB_gaunt_table", "init_Ylm_Gaunt");
+	ModuleBase::TITLE("ORB_gaunt_table", "init_Ylm_Gaunt");
 	ModuleBase::timer::tick("ORB_gaunt_table", "inite_Ylm_Gaunt");
 
 	const int nlm = (2*lmax+1) * (2*lmax+1);
@@ -198,7 +198,7 @@ int ORB_gaunt_table::index_func
 
 void ORB_gaunt_table::init_Gaunt_CH(const int& Lmax)
 {
-	TITLE("ORB_gaunt_table","init_Gaunt_CH");
+	ModuleBase::TITLE("ORB_gaunt_table","init_Gaunt_CH");
 	ModuleBase::timer::tick("ORB_gaunt_table","init_Gaunt_CH");
 
 //	assert(Lmax <= 6);			// Peize Lin delete 2016-08-26. why?
@@ -270,7 +270,7 @@ double ORB_gaunt_table::Calc_Gaunt_CH
 	const int& m3
 )
 {
-//	TITLE("ORB_gaunt_table","Calc_Gaunt_CH");
+//	ModuleBase::TITLE("ORB_gaunt_table","Calc_Gaunt_CH");
 	ModuleBase::timer::tick("ORB_gaunt_table","Calc_Gaunt_CH");
 	
 	double fac = sqrt((2*l1+1) * (2*l2+1) * (2*l3+1) / FOUR_PI);
@@ -375,7 +375,7 @@ double ORB_gaunt_table::Get_Gaunt_SH
 	const int& mm3
 )
 {
-//	TITLE("ORB_gaunt_table","Get_Gaunt_SH");
+//	ModuleBase::TITLE("ORB_gaunt_table","Get_Gaunt_SH");
 	ModuleBase::timer::tick("ORB_gaunt_table","Get_Gaunt_SH");
 	
 	//Tranform M index

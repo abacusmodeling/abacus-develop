@@ -4,7 +4,7 @@
 
 //calculate the nonlocal pseudopotential stress in PW
 void Stress_Func::stress_nl(ModuleBase::matrix& sigma){
-	TITLE("Stress_Func","stres_nl");
+	ModuleBase::TITLE("Stress_Func","stres_nl");
 	ModuleBase::timer::tick("Stress_Func","stres_nl");
 	
 	const int nkb = GlobalC::ppcell.nkb;
@@ -225,7 +225,7 @@ void Stress_Func::get_dvnl1
 	const int ipol
 )
 {
-	if(GlobalV::test_pp) TITLE("Stress_Func","get_dvnl1");
+	if(GlobalV::test_pp) ModuleBase::TITLE("Stress_Func","get_dvnl1");
 
 	const int lmaxkb = GlobalC::ppcell.lmaxkb;
 	if(lmaxkb < 0)
@@ -317,7 +317,7 @@ void Stress_Func::get_dvnl1
 void Stress_Func::get_dvnl2(ModuleBase::ComplexMatrix &vkb,
 		const int ik)
 {
-	if(GlobalV::test_pp) TITLE("Stress","get_dvnl2");
+	if(GlobalV::test_pp) ModuleBase::TITLE("Stress","get_dvnl2");
 //	ModuleBase::timer::tick("Stress","get_dvnl2");
 
 	const int lmaxkb = GlobalC::ppcell.lmaxkb;

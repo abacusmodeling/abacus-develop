@@ -26,7 +26,7 @@
 
 void Input_Conv::Convert(void)
 {
-    TITLE("Input_Conv","Convert");
+    ModuleBase::TITLE("Input_Conv","Convert");
 	ModuleBase::timer::tick("Input_Conv","Convert");
 //----------------------------------------------------------
 // main parameters / electrons / spin ( 10/16 )
@@ -137,7 +137,7 @@ void Input_Conv::Convert(void)
 	}
 	else
 	{
-		WARNING_QUIT("Input", "fixed_axes should be None,a,b,c,ab,ac,bc or abc!");
+		ModuleBase::WARNING_QUIT("Input", "fixed_axes should be None,a,b,c,ab,ac,bc or abc!");
 	}
 
 	GlobalV::MOVE_IONS = INPUT.ion_dynamics;
@@ -619,7 +619,7 @@ void Input_Conv::Convert(void)
 	{
 		if(GlobalV::BASIS_TYPE != "pw")
 		{
-			 WARNING_QUIT("Input_conv","add metaGGA for pw first");
+			 ModuleBase::WARNING_QUIT("Input_conv","add metaGGA for pw first");
 		}
 		GlobalV::DFT_META = 1;
 	}

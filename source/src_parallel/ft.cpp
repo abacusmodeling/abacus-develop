@@ -8,7 +8,7 @@
 
 FFT::FFT()
 {
-	//TITLE("FFT","FFT");
+	//ModuleBase::TITLE("FFT","FFT");
 	this->plan_nx = 0;
 	this->plan_ny = 0;
 	this->plan_nz = 0;
@@ -106,7 +106,7 @@ void FFT::FFT3D(matrix &psi, const int sign)
 
 void FFT::setupFFT3D(const int nx, const int ny, const int nz)
 {
-	if(GlobalV::test_fft) TITLE("FFT","setupFFT3D");
+	if(GlobalV::test_fft) ModuleBase::TITLE("FFT","setupFFT3D");
 
 	this->plan_nx = nx;
 	this->plan_ny = ny;
@@ -174,7 +174,7 @@ void FFT::SFFT3D(std::complex<double> *psi, const int sign)
 {
 	if(!FFTWsetupwasdone) 
 	{
-		WARNING("FFT3D","init setupFFT3D_2");
+		ModuleBase::WARNING("FFT3D","init setupFFT3D_2");
 		this->setupFFT3D_2();
 	}
 	
@@ -216,7 +216,7 @@ void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nx
 {
 	//ModuleBase::timer::tick("FFT","Setup_MPI_FFT3D");
 	
-	if(GlobalV::test_fft) TITLE("FFT","setup_MPI_FFT3D");
+	if(GlobalV::test_fft) ModuleBase::TITLE("FFT","setup_MPI_FFT3D");
 	this->plan_nx = nx;
 	this->plan_ny = ny;
 	this->plan_nz = nz;
@@ -387,7 +387,7 @@ void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nx
 	if (!planplus_x ||!planplus_y ||!planplus_z || !planminus_x || !planminus_y|| !planminus_z )
 	{
 		std::cout << "\nCan't create plans for FFTW in setupFFT3D()\n\n";
-		QUIT();
+		ModuleBase::QUIT();
 	}
 
 	this->FFTWsetupwasdone = 1;

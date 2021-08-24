@@ -59,7 +59,7 @@ Chi0_hilbert::~Chi0_hilbert()
 #include "../src_pw/occupy.h"
 void Chi0_hilbert::Chi()
 {
-	TITLE("Chi0_hilbert","Chi");
+	ModuleBase::TITLE("Chi0_hilbert","Chi");
 	//---------------------------------------
 	// check nomega
 	//---------------------------------------
@@ -81,7 +81,7 @@ void Chi0_hilbert::Chi()
 	{
 		int nomega_right = int(max_e/domega);
 		std::cout << "nomega must >= "<<nomega_right<<std::endl;
-		WARNING_QUIT("chi0_hilbert","nomega is too small!!!!!!!!!");
+		ModuleBase::WARNING_QUIT("chi0_hilbert","nomega is too small!!!!!!!!!");
 	}
 	
 	//---------------------------------------
@@ -102,7 +102,7 @@ void Chi0_hilbert::Chi()
 	
 	if(!exist_q)
 	{
-		WARNING_QUIT("chi0_hilbert","the chosen q is not included in the kmesh!!");
+		ModuleBase::WARNING_QUIT("chi0_hilbert","the chosen q is not included in the kmesh!!");
 	}
 	else
 	{
@@ -224,11 +224,11 @@ void Chi0_hilbert::Chi()
 	
 	//if(total_icount == 0)
 	//{
-	//	WARNING_QUIT("chi0_hilbert","Now the kmesh contains no kpoint along this direction!");
+	//	ModuleBase::WARNING_QUIT("chi0_hilbert","Now the kmesh contains no kpoint along this direction!");
 	//}
 	if(total_icount < nq-1 )
 	{
-		WARNING_QUIT("chi0_hilbert","Now the kmesh doesn't contain enough kpoints along this direction! please change the parameter nq smaller");
+		ModuleBase::WARNING_QUIT("chi0_hilbert","Now the kmesh doesn't contain enough kpoints along this direction! please change the parameter nq smaller");
 	}
 	
 	for(icount=0; icount<total_icount-1; icount++)
@@ -310,7 +310,7 @@ void Chi0_hilbert::Chi()
 			}
 			else
 			{
-				WARNING_QUIT("chi0_hilbert","Sorry! This smearing hasn't been realized here yet!!!");
+				ModuleBase::WARNING_QUIT("chi0_hilbert","Sorry! This smearing hasn't been realized here yet!!!");
 			}			
 		} 
 	}
@@ -428,7 +428,7 @@ void Chi0_hilbert::Chi()
 			std::ifstream ifsn(ss.str().c_str());
 			if(!ifsn)
 			{
-				WARNING_QUIT("chi0_hilbert", "Can't find the nearest.dat file!");
+				ModuleBase::WARNING_QUIT("chi0_hilbert", "Can't find the nearest.dat file!");
 			}
 			ifsn >> NR;
 			std::cout << "NR in = "<<NR << std::endl;
@@ -519,7 +519,7 @@ void Chi0_hilbert::Chi()
 				std::ifstream ifso(ssq.str().c_str());
 				if (!ifso)
 				{
-					WARNING_QUIT("chi0_hilbert", "Can't find the overlap_q file!");
+					ModuleBase::WARNING_QUIT("chi0_hilbert", "Can't find the overlap_q file!");
 				}
 				ifso >> tmp; //std::cout << tmp << std::endl;
 				for(int ig=0; ig<dim; ig++)
@@ -619,7 +619,7 @@ void Chi0_hilbert::Chi()
 		}
 		else
 		{
-			WARNING_QUIT("chi0_hilbert","pw, lcao_in_pw, or lcao must be chosen!!!!!!");
+			ModuleBase::WARNING_QUIT("chi0_hilbert","pw, lcao_in_pw, or lcao must be chosen!!!!!!");
 		}
 	}
 	//----------------------------------------------------------
@@ -667,7 +667,7 @@ void Chi0_hilbert::Chi()
 	}
 	else
 	{
-		WARNING_QUIT("chi0_hilbert","system must be bulk or surface!!!!!!!");
+		ModuleBase::WARNING_QUIT("chi0_hilbert","system must be bulk or surface!!!!!!!");
 	}
 	
 	Delete();
@@ -677,7 +677,7 @@ void Chi0_hilbert::Chi()
 
 void Chi0_hilbert::Init()
 {
-	TITLE("Chi0_hilbert","Init");
+	ModuleBase::TITLE("Chi0_hilbert","Init");
 	//std::cout << "nbands(init) = " <<GlobalV::NBANDS <<std::endl;
 	//std::cout << "oband = " <<oband <<std::endl;
 	//std::cout << "nrxx = "<<GlobalC::pw.nrxx<<std::endl;
@@ -821,7 +821,7 @@ void Chi0_hilbert::Init()
 
 void Chi0_hilbert::Delete()
 {
-	TITLE("Chi0_hilbert","Delete");
+	ModuleBase::TITLE("Chi0_hilbert","Delete");
 	if(init_finish)
 	{
 		delete[] b_core;
@@ -960,7 +960,7 @@ void Chi0_hilbert::Delete()
 //----------------------------------------------------------
 void Chi0_hilbert::Parallel_G()
 {
-	TITLE("Chi0_hilbert","Parallel_G");
+	ModuleBase::TITLE("Chi0_hilbert","Parallel_G");
 	//----------------------------
 	// init
 	//----------------------------
@@ -1126,7 +1126,7 @@ void Chi0_hilbert::Cal_lcao_psi()
 //---------------------------------------------------------------------------
 void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 {
-	TITLE("Chi0_hilbert","Cal_b_lcao");
+	ModuleBase::TITLE("Chi0_hilbert","Cal_b_lcao");
 	double arg;
 	Vector3<double> qk;
 	qk = GlobalC::kv.kvec_c[iq] + GlobalC::kv.kvec_c[ik];
@@ -1254,7 +1254,7 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 
 void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 {
-	TITLE("Chi0_hilbert","Cal_b");
+	ModuleBase::TITLE("Chi0_hilbert","Cal_b");
 	Vector3<double> qk;
 	qk = GlobalC::kv.kvec_c[iq] + GlobalC::kv.kvec_c[ik];
 	//std::cout <<"qk = "<<qk.x<<" "<<qk.y<<" "<<qk.z<<std::endl;
@@ -1448,7 +1448,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 // calculate the chi0s matrix
 void Chi0_hilbert::Cal_Chi0s(int iq)
 {
-	TITLE("Chi0_hilbert","Cal_Chi0s");
+	ModuleBase::TITLE("Chi0_hilbert","Cal_Chi0s");
 	double delta_e,e1,e2;
 	std::complex<double> weight1, weight2;
 	for(int g0=0; g0<dim; g0++)
@@ -1466,7 +1466,7 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 	std::ifstream ifs("band.dat");
 	if(!ifs)
 	{
-		WARNING_QUIT("chi0_hilbert","Can't find band.dat");
+		ModuleBase::WARNING_QUIT("chi0_hilbert","Can't find band.dat");
 	}
 	for(int i=0;i<GlobalC::kv.nks;i++)
 	{
@@ -1718,7 +1718,7 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 // calculte the transportation matrix
 void Chi0_hilbert::Cal_T()
 {
-	TITLE("Chi0_hilbert","Cal_T");
+	ModuleBase::TITLE("Chi0_hilbert","Cal_T");
 	std::complex<double> M1, M2;
 	for(int n1=0; n1<nomega; n1++)
 	{
@@ -1738,7 +1738,7 @@ void Chi0_hilbert::Cal_T()
 // calculate the chi0
 void Chi0_hilbert::Cal_Chi0()
 {
-	TITLE("Chi0_hilbert","Cal_Chi0");
+	ModuleBase::TITLE("Chi0_hilbert","Cal_Chi0");
 	std::vector<std::vector<std::complex<double>>> chi0s2(dim*dim,
 		std::vector<std::complex<double>>(nomega));			// Peize Lin change ptr to std::vector at 2020.01.31
 	std::vector<std::vector<std::complex<double>>> T2(nomega,
@@ -1813,7 +1813,7 @@ std::complex<double> Chi0_hilbert::f(int k, int j)
 // calculate the chi
 void Chi0_hilbert::Cal_Chi(int iq)
 {
-	TITLE("Chi0_hilbert","Cal_Chi");
+	ModuleBase::TITLE("Chi0_hilbert","Cal_Chi");
 	double q = sqrt(((GlobalC::kv.kvec_c[iq])*(TWO_PI/GlobalC::ucell.lat0)).norm2());
 	std::vector<std::complex<double>> gather_chi(nomega);			// Peize Lin change ptr to std::vector at 2020.01.31
 	for(int i=0; i<nomega; i++)
@@ -1923,7 +1923,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 
 void Chi0_hilbert::Cal_Chi_surface(int iq)
 {
-	TITLE("Chi0_hilbert","Cal_Chi_surface");
+	ModuleBase::TITLE("Chi0_hilbert","Cal_Chi_surface");
 	std::complex<double> g;
 	for(int i=0; i<nomega; i++)
 	{
@@ -2112,7 +2112,7 @@ void Chi0_hilbert::Cal_Rpa(int iq)
 	int l = Cinv(dim, rpa);
 	if (l == 0)
 	{
-		WARNING_QUIT("chi0_hilbert","(I-v*chi0) is a singular matrix !!");
+		ModuleBase::WARNING_QUIT("chi0_hilbert","(I-v*chi0) is a singular matrix !!");
 	}
 	
 	//-------------------------------------------------------------
@@ -2427,7 +2427,7 @@ void Chi0_hilbert::Cal_Rpa1()
 	int l = Cinv(dim_para, rpa1);
 	if (l == 0)
 	{
-		WARNING_QUIT("chi0_hilbert","(I-v*chi0) is a singular matrix !!");
+		ModuleBase::WARNING_QUIT("chi0_hilbert","(I-v*chi0) is a singular matrix !!");
 	}
 	
 	return;

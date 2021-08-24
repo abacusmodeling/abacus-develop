@@ -392,7 +392,7 @@ void Vdwd3::pbcthreebody(std::vector<int> &iz,  std::vector<Vector3<double>> &la
 
 void Vdwd3::cal_energy()
 {
-	TITLE("Vdwd3","cal_energy");
+	ModuleBase::TITLE("Vdwd3","cal_energy");
 	init(ucell);
 
 	int ij;	
@@ -1199,7 +1199,7 @@ void Vdwd3::pbcgdisp(std::vector<Vector3<double>> &g, ModuleBase::matrix &sigma)
 
 void Vdwd3::cal_force()
 {
-	TITLE("Vdwd3","cal_force");
+	ModuleBase::TITLE("Vdwd3","cal_force");
 
 	force.clear();
 	force.resize(ucell.nat);
@@ -1218,7 +1218,7 @@ void Vdwd3::cal_force()
 
 void Vdwd3::cal_stress()
 {
-	TITLE("Vdwd3","cal_stress");
+	ModuleBase::TITLE("Vdwd3","cal_stress");
 
 	std::vector<Vector3<double>> g;
 	g.clear();

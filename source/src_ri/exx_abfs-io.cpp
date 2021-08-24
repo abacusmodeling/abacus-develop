@@ -135,10 +135,10 @@ std::vector<std::vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 		}		
 	}
 	
-	CHECK_NAME(ifs, "Mesh");
+	ModuleBase::CHECK_NAME(ifs, "Mesh");
 	ifs >> meshr;
 	
-	CHECK_NAME(ifs, "dr");
+	ModuleBase::CHECK_NAME(ifs, "dr");
 	ifs >> dr;
 
 	while(ifs.good())

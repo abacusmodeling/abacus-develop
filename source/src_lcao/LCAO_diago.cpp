@@ -13,7 +13,7 @@ void Diago_LCAO_Matrix::solve_complex_matrix(
 	std::complex<double>** wfc, 
 	ModuleBase::ComplexMatrix &wfc_2d)const
 {
-	TITLE("Diago_LCAO_Matrix","solve_complex_matrix");
+	ModuleBase::TITLE("Diago_LCAO_Matrix","solve_complex_matrix");
 	time_t time_start = time(NULL);
 
 	if(GlobalV::KS_SOLVER=="lapack")
@@ -25,7 +25,7 @@ void Diago_LCAO_Matrix::solve_complex_matrix(
 #ifdef __MPI
 		this->using_HPSEPS_complex(ik, wfc, wfc_2d);
 #else
-		WARNING_QUIT("Diago_LCAO_Matrix::solve_complex_matrix","only lapack is available!");
+		ModuleBase::WARNING_QUIT("Diago_LCAO_Matrix::solve_complex_matrix","only lapack is available!");
 #endif
 	}
 
@@ -42,7 +42,7 @@ void Diago_LCAO_Matrix::solve_double_matrix(
 	double** wfc, 
 	ModuleBase::matrix &wfc_2d)const
 {
-	TITLE("Diago_LCAO_Matrix","solve_double_matrix");
+	ModuleBase::TITLE("Diago_LCAO_Matrix","solve_double_matrix");
 	ModuleBase::timer::tick("Diago_LCAO_Matrix","solve_double_matrix");
 	time_t time_start = time(NULL);
 
@@ -60,7 +60,7 @@ void Diago_LCAO_Matrix::solve_double_matrix(
 	else
 	{
 		std::cout << " Diago_LCAO_Matrix, diago_type = " << GlobalV::KS_SOLVER << std::endl; 
-		WARNING_QUIT("Diago_LCAO_Matrix::init","Check GlobalV::KS_SOLVER.");
+		ModuleBase::WARNING_QUIT("Diago_LCAO_Matrix::init","Check GlobalV::KS_SOLVER.");
 	}
 
 	time_t time_end = time(NULL);
@@ -74,7 +74,7 @@ void Diago_LCAO_Matrix::solve_double_matrix(
 #ifdef __MPI
 void Diago_LCAO_Matrix::using_HPSEPS_double(const int &ik, double**wfc, ModuleBase::matrix &wfc_2d)const
 {
-	TITLE("Diago_LCAO_Matrix","using_HPSEPS_double");
+	ModuleBase::TITLE("Diago_LCAO_Matrix","using_HPSEPS_double");
 
 	// save H and S matrix to disk.
 	bool bit = false;
@@ -91,7 +91,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_double(const int &ik, double**wfc, ModuleBa
 
 void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, std::complex<double>** wfc, ModuleBase::ComplexMatrix &wfc_2d)const
 {
-	TITLE("Diago_LCAO_Matrix","using_HPSEPS_complex");
+	ModuleBase::TITLE("Diago_LCAO_Matrix","using_HPSEPS_complex");
 
 	//GlobalC::ParaO.out_hs=1;//zhengdy-soc-test
 	bool bit = false; //LiuXh, 2017-03-21
@@ -126,7 +126,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, std::complex<double>
 
 void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, std::complex<double> **wfc)const
 {
-	TITLE("Diago_LCAO_Matrix","using_LAPACK_complex");
+	ModuleBase::TITLE("Diago_LCAO_Matrix","using_LAPACK_complex");
 
 	assert(GlobalV::NPROC = 1);
 
@@ -187,7 +187,7 @@ void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, std::complex<double>
 
 void Diago_LCAO_Matrix::using_LAPACK(const int &ik, double** wfc)const
 {
-	TITLE("Diago_LCAO_Matrix","using_LAPACK");
+	ModuleBase::TITLE("Diago_LCAO_Matrix","using_LAPACK");
 	assert(GlobalV::NLOCAL>0);
 
 	// save H and S matrix to disk.

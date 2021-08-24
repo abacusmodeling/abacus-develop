@@ -212,7 +212,7 @@ void Grid_Base::get_small_box(
 		std::cout << "\n tau_dir.x = " << tau_dir.x;
 		std::cout << "\n tau_dir.y = " << tau_dir.y;
 		std::cout << "\n tau_dir.z = " << tau_dir.z;
-		WARNING_QUIT("Grid_Base::get_small_box",
+		ModuleBase::WARNING_QUIT("Grid_Base::get_small_box",
 		"Positions(x,y,z) Of tau and R2 in Direct Coordinates should be between 0 and 1!");
 	}
 
@@ -354,7 +354,7 @@ void Grid_Base::edge_grid_points(
 	{
 		GlobalV::ofs_warning << "\n count = " << count;
 		GlobalV::ofs_warning << "\n grid_number = " << grid_number;
-		WARNING_QUIT("Grid_Base::edge_grid_points","count!=grid_number");
+		ModuleBase::WARNING_QUIT("Grid_Base::edge_grid_points","count!=grid_number");
 	}
 	ModuleBase::timer::tick("Grid_Base","edge_grid_points");
 	return;

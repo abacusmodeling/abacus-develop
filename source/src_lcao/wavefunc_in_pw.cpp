@@ -10,11 +10,11 @@ void Wavefunc_in_pw::make_table_q(
 	std::vector<std::string> &fn, 
 	realArray &table_local)
 {
-	TITLE("Wavefunc_in_pw","make_table_q");
+	ModuleBase::TITLE("Wavefunc_in_pw","make_table_q");
 
 	if( fn.size() != static_cast<size_t>(GlobalC::ucell.ntype) )
 	{
-		WARNING_QUIT("Wavefunc_in_pw::make_table_q","maybe NUMERICAL_ORBITAL is not read in, please check.");
+		ModuleBase::WARNING_QUIT("Wavefunc_in_pw::make_table_q","maybe NUMERICAL_ORBITAL is not read in, please check.");
 	}
 
 	for(int it=0; it<GlobalC::ucell.ntype; it++)
@@ -23,7 +23,7 @@ void Wavefunc_in_pw::make_table_q(
 		if(!in)
 		{
 			GlobalV::ofs_warning << " File name : " << fn[it] << std::endl;
-			WARNING_QUIT("Wavefunc_in_pw::make_table_q","Can not find file.");
+			ModuleBase::WARNING_QUIT("Wavefunc_in_pw::make_table_q","Can not find file.");
 		}
 		else
 		{
@@ -47,7 +47,7 @@ void Wavefunc_in_pw::make_table_q(
 				if (!in)
 				{
 					GlobalV::ofs_warning << " File name : " << fn[it] << std::endl;
-					WARNING_QUIT("Wavefunc_in_pw::make_table_q","Can not find file.");
+					ModuleBase::WARNING_QUIT("Wavefunc_in_pw::make_table_q","Can not find file.");
 				}
 				int meshr=0;
 				double dr=0.0; // only used in uniform grid
@@ -61,7 +61,7 @@ void Wavefunc_in_pw::make_table_q(
 					}
 				}
 
-				CHECK_NAME(in, "Mesh");
+				ModuleBase::CHECK_NAME(in, "Mesh");
 				in >> meshr;
 				int meshr_read = meshr;
 				if(meshr%2==0)
@@ -70,7 +70,7 @@ void Wavefunc_in_pw::make_table_q(
 				}
 				GlobalV::ofs_running << " meshr=" << meshr;
 
-				CHECK_NAME(in, "dr");
+				ModuleBase::CHECK_NAME(in, "dr");
 				in >> dr;
 				GlobalV::ofs_running << " dr=" << dr;
 
@@ -105,7 +105,7 @@ void Wavefunc_in_pw::make_table_q(
 					{
 						GlobalV::ofs_warning << "\n Can't find l="
 						<< L << " n=" << N << " orbital." << std::endl;
-						WARNING_QUIT("Control_Overlap","Read_PAO");
+						ModuleBase::WARNING_QUIT("Control_Overlap","Read_PAO");
 					}
 					in >> name1 >> name2 >> name3;
 					assert( name1 == "Type" );
@@ -186,7 +186,7 @@ double Wavefunc_in_pw::smearing(const double &energy_x,
 
     if (beta >= 1.0 || beta<0 )
     {
-        WARNING_QUIT("wavefunc_in_pw::smearing", "beta must between 0 ~ 1 ");
+        ModuleBase::WARNING_QUIT("wavefunc_in_pw::smearing", "beta must between 0 ~ 1 ");
     }
 
     if (energy_x < beta_e)
@@ -249,7 +249,7 @@ const double *rab, const int &l, double* table)
 
 void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ModuleBase::ComplexMatrix &psi, const realArray &table_local)
 {
-	TITLE("Wavefunc_in_pw","produce_local_basis_in_pw");
+	ModuleBase::TITLE("Wavefunc_in_pw","produce_local_basis_in_pw");
 	assert(ik>=0);
 	const int npw = GlobalC::kv.ngk[ik];
 	const int total_lm = ( GlobalC::ucell.lmax + 1) * ( GlobalC::ucell.lmax + 1);
@@ -356,7 +356,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ModuleBase::Complex
 									for(int m = 0;m<2*L+1;m++)
 									{
 										const int lm = L*L +m;
-										if(iwall+2*L+1>GlobalC::ucell.natomwfc) WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
+										if(iwall+2*L+1>GlobalC::ucell.natomwfc) ModuleBase::WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
 										for(int ig = 0;ig<npw;ig++)
 										{
 											aux[ig] = sk[ig] * ylm(lm,ig) * chiaux[ig];
@@ -391,7 +391,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ModuleBase::Complex
 								for(int m = 0;m<2*L+1;m++)
 								{
 									const int lm = L*L +m;
-									if(iwall+2*L+1>GlobalC::ucell.natomwfc) WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
+									if(iwall+2*L+1>GlobalC::ucell.natomwfc) ModuleBase::WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
 									for(int ig = 0;ig<npw;ig++)
 									{
 										aux[ig] = sk[ig] * ylm(lm,ig) * flq[ig];
@@ -446,7 +446,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ModuleBase::Complex
 
 void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ModuleBase::ComplexMatrix &psi, const realArray &table_local, Vector3<double> q)   // pengfei 2016-11-23
 {
-	TITLE("Wavefunc_in_pw","produce_local_basis_in_pw");
+	ModuleBase::TITLE("Wavefunc_in_pw","produce_local_basis_in_pw");
 	assert(ik>=0);
 	const int npw = GlobalC::kv.ngk[ik];
 	const int total_lm = ( GlobalC::ucell.lmax + 1) * ( GlobalC::ucell.lmax + 1);
@@ -573,7 +573,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ModuleBase::Comp
 									for(int m = 0;m<2*L+1;m++)
 									{
 										const int lm = L*L +m;
-										//if(iwall+2*l+1>GlobalC::ucell.natomwfc) WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
+										//if(iwall+2*l+1>GlobalC::ucell.natomwfc) ModuleBase::WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
 										for(int ig = 0;ig<npw;ig++)
 										{
 											aux[ig] = skq[ig] * ylm(lm,ig) * chiaux[ig];
@@ -608,7 +608,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ModuleBase::Comp
 								for(int m = 0;m<2*L+1;m++)
 								{
 									const int lm = L*L +m;
-								//   if(iwall+2*l+1>GlobalC::ucell.natomwfc) WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
+								//   if(iwall+2*l+1>GlobalC::ucell.natomwfc) ModuleBase::WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
 									for(int ig = 0;ig<npw;ig++)
 									{
 										aux[ig] = skq[ig] * ylm(lm,ig) * flq[ig];

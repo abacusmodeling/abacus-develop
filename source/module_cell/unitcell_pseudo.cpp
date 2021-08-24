@@ -8,7 +8,7 @@
 
 UnitCell_pseudo::UnitCell_pseudo()
 {
-	if(GlobalV::test_pseudo_cell) TITLE("unitcell_pseudo","Constructor");
+	if(GlobalV::test_pseudo_cell) ModuleBase::TITLE("unitcell_pseudo","Constructor");
 	set_atom_flag = false;
 }
 
@@ -29,7 +29,7 @@ void UnitCell_pseudo::setup_cell(
 		const std::string &fn,
 		std::ofstream &log)
 {
-	TITLE("UnitCell_pseudo","setup_cell");	
+	ModuleBase::TITLE("UnitCell_pseudo","setup_cell");	
 	// (1) init mag
 	assert(ntype>0);
 #ifndef __CMD
@@ -109,11 +109,11 @@ void UnitCell_pseudo::setup_cell(
 #endif
 	if(!ok)
 	{
-		WARNING_QUIT("UnitCell_pseudo::setup_cell","Can not find the file containing atom positions.!");
+		ModuleBase::WARNING_QUIT("UnitCell_pseudo::setup_cell","Can not find the file containing atom positions.!");
 	}
 	if(!ok2)
 	{
-		WARNING_QUIT("UnitCell_pseudo::setup_cell","Something wrong during read_atom_positions.");
+		ModuleBase::WARNING_QUIT("UnitCell_pseudo::setup_cell","Something wrong during read_atom_positions.");
 	}
 
 #ifdef __MPI
@@ -134,7 +134,7 @@ void UnitCell_pseudo::setup_cell(
 	this->omega = abs( latvec.Det() ) * this->lat0 * lat0 * lat0 ;
 	if(this->omega<=0)
 	{
-		WARNING_QUIT("setup_cell","omega <= 0 .");
+		ModuleBase::WARNING_QUIT("setup_cell","omega <= 0 .");
 	}
 	else
 	{
@@ -271,7 +271,7 @@ void UnitCell_pseudo::setup_cell(
 				<< atoms[it].dft[0] << " " << atoms[it].dft[1] << " "
 				<< atoms[it].dft[2] << " " << atoms[it].dft[3] << std::endl;
 				
-				WARNING_QUIT("setup_cell","All DFT functional must consistent.");
+				ModuleBase::WARNING_QUIT("setup_cell","All DFT functional must consistent.");
 			}
 		}
 	}
@@ -311,7 +311,7 @@ void UnitCell_pseudo::setup_cell_classic(
 	std::ofstream &ofs_warning)
 
 {
-	TITLE("UnitCell_pseudo","setup_cell_classic");
+	ModuleBase::TITLE("UnitCell_pseudo","setup_cell_classic");
 
 	assert(ntype>0);
 
@@ -372,11 +372,11 @@ void UnitCell_pseudo::setup_cell_classic(
 #endif
 	if(!ok)
 	{
-		WARNING_QUIT("UnitCell_pseudo::setup_cell","Can not find the file containing atom positions.!");
+		ModuleBase::WARNING_QUIT("UnitCell_pseudo::setup_cell","Can not find the file containing atom positions.!");
 	}
 	if(!ok2)
 	{
-		WARNING_QUIT("UnitCell_pseudo::setup_cell","Something wrong during read_atom_positions.");
+		ModuleBase::WARNING_QUIT("UnitCell_pseudo::setup_cell","Something wrong during read_atom_positions.");
 	}
 
 #ifdef __MPI
@@ -390,7 +390,7 @@ void UnitCell_pseudo::setup_cell_classic(
 	this->omega = abs( latvec.Det() ) * this->lat0 * lat0 * lat0 ;
 	if(this->omega<=0)
 	{
-		WARNING_QUIT("setup_cell","omega <= 0 .");
+		ModuleBase::WARNING_QUIT("setup_cell","omega <= 0 .");
 	}
 	else
 	{
@@ -413,7 +413,7 @@ void UnitCell_pseudo::setup_cell_classic(
 //===========================================
 void UnitCell_pseudo::cal_nwfc(void)
 {
-	TITLE("UnitCell_pseudo","cal_nwfc");
+	ModuleBase::TITLE("UnitCell_pseudo","cal_nwfc");
 	assert(ntype>0);
 	assert(nat>0);
 
@@ -563,7 +563,7 @@ void UnitCell_pseudo::cal_nwfc(void)
 		//{
 		//	if(GlobalV::NBANDS < GlobalV::NLOCAL)
 		//	{
-		//		WARNING_QUIT("cal_nwfc","NBANDS must > GlobalV::NLOCAL !");
+		//		ModuleBase::WARNING_QUIT("cal_nwfc","NBANDS must > GlobalV::NLOCAL !");
 		//	}
 		//}
 	}
@@ -577,7 +577,7 @@ void UnitCell_pseudo::cal_nwfc(void)
 //======================
 void UnitCell_pseudo::cal_meshx()
 {
-	if(GlobalV::test_pseudo_cell) TITLE("UnitCell_pseudo","cal_meshx");
+	if(GlobalV::test_pseudo_cell) ModuleBase::TITLE("UnitCell_pseudo","cal_meshx");
 	this->meshx = 0;
 	for (int it = 0;it < this->ntype;it++)
 	{
@@ -599,7 +599,7 @@ void UnitCell_pseudo::cal_meshx()
 //=========================
 void UnitCell_pseudo::cal_natomwfc(void)
 {
-	if(GlobalV::test_pseudo_cell) TITLE("UnitCell_pseudo","cal_natomwfc");
+	if(GlobalV::test_pseudo_cell) ModuleBase::TITLE("UnitCell_pseudo","cal_natomwfc");
 
 	this->natomwfc = 0;
 	for (int it = 0;it < ntype;it++)
@@ -654,7 +654,7 @@ void UnitCell_pseudo::setup_cell_after_vc(
     this->omega = abs(latvec.Det()) * this->lat0 * lat0 * lat0;
     if(this->omega <= 0)
     {
-        WARNING_QUIT("setup_cell_after_vc", "omega <= 0 .");
+        ModuleBase::WARNING_QUIT("setup_cell_after_vc", "omega <= 0 .");
     }
     else
     {

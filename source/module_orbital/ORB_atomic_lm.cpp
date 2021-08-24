@@ -648,7 +648,7 @@ void Numerical_Orbital_Lm::cal_rradial_sbpool(void)
 //===============================================
 void Numerical_Orbital_Lm::norm_test(void)const
 {
-//	TITLE(ofs_onscaling, "Numerical_Orbital_Lm", "norm_test");
+//	ModuleBase::TITLE(ofs_onscaling, "Numerical_Orbital_Lm", "norm_test");
 	//double asum_r = 0.0;
 	//double asum_k = 0.0;
 
@@ -682,7 +682,7 @@ void Numerical_Orbital_Lm::norm_test(void)const
 
 void Numerical_Orbital_Lm::plot(void)const
 {
-	TITLE("Numerical_Orbital_Lm","plot");
+	ModuleBase::TITLE("Numerical_Orbital_Lm","plot");
 	
 	std::string orbital_type;
 	// Peize Lin update 2016-08-31
@@ -737,7 +737,7 @@ void Numerical_Orbital_Lm::plot(void)const
 
 		if (!ofsk || !ofsr || !ofsru || !ofsdru) // 2013-08-10 pengfei
 		{
-			WARNING("Numerical_Orbital_Lm : plot", "Can't open files !");
+			ModuleBase::WARNING("Numerical_Orbital_Lm : plot", "Can't open files !");
 		}
 
 		for (int i = 0; i < this->nr; i++)

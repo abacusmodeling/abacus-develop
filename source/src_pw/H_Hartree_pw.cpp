@@ -11,7 +11,7 @@ ModuleBase::matrix H_Hartree_pw::v_hartree(
 	const int &nspin,
 	const double*const*const rho)
 {
-    TITLE("H_Hartree_pw","v_hartree");
+    ModuleBase::TITLE("H_Hartree_pw","v_hartree");
     ModuleBase::timer::tick("H_Hartree_pw","v_hartree");
 
     //  Hartree potential VH(r) from n(r)

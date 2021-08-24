@@ -8,7 +8,7 @@
 
 void Gint_Gamma::cal_mulliken(double** mulliken)
 {
-    TITLE("Gint_Gamma","cal_mulliken");
+    ModuleBase::TITLE("Gint_Gamma","cal_mulliken");
     ModuleBase::timer::tick("Gint_Gamma","cal_mulliken");
 
     this->save_atoms_on_grid(GlobalC::GridT);
@@ -24,7 +24,7 @@ void Gint_Gamma::cal_mulliken(double** mulliken)
 // this code very efficiently, very carefully.
 void Gint_Gamma::gamma_mulliken(double** mulliken)
 {
-    TITLE("Grid_Integral","gamma_charge");
+    ModuleBase::TITLE("Grid_Integral","gamma_charge");
 
     // it's a uniform grid to save orbital values, so the delta_r is a constant.
     const double delta_r = GlobalC::ORB.dr_uniform;

@@ -9,7 +9,7 @@ double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c,
                     Grid_Driver &grid_neigh, 
                     Vector3<double> *force)
 {
-    TITLE("LJ_potential", "Lennard_Jones");
+    ModuleBase::TITLE("LJ_potential", "Lennard_Jones");
     ModuleBase::timer::tick("LJ_potential", "Lennard_Jones");
 
     double distance, potential = 0; //initialize
@@ -45,7 +45,7 @@ double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c,
                     CMD_neighbor &cmd_neigh,
                     Vector3<double> *force)
 {
-    TITLE("LJ_potential", "Lennard_Jones");
+    ModuleBase::TITLE("LJ_potential", "Lennard_Jones");
     ModuleBase::timer::tick("LJ_potential", "Lennard_Jones");
 
     double potential = 0; //initialize

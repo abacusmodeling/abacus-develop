@@ -45,7 +45,7 @@ Atom_input::Atom_input
 		type(0),
 		natom(-1)
 {
-	TITLE("Atom_input", "Atom_input");
+	ModuleBase::TITLE("Atom_input", "Atom_input");
 
 	if(test_atom_input) ModuleBase::GlobalFunc::OUT(ofs_in, "ntype", ntype);
 	if(test_atom_input) ModuleBase::GlobalFunc::OUT(ofs_in, "Amount(atom number)", amount);
@@ -58,7 +58,7 @@ Atom_input::Atom_input
 
 	if (radius < 0)
 	{
-		WARNING_QUIT("atom_arrange::init", " search radius < 0,forbidden");
+		ModuleBase::WARNING_QUIT("atom_arrange::init", " search radius < 0,forbidden");
 	}
 
 	//===========================
@@ -205,7 +205,7 @@ Atom_input::~Atom_input()
 //============================================
 void Atom_input::Check_Expand_Condition(const UnitCell &ucell)
 {
-//	TITLE(GlobalV::ofs_running, "Atom_input", "Check_Expand_Condition");
+//	ModuleBase::TITLE(GlobalV::ofs_running, "Atom_input", "Check_Expand_Condition");
 
 	if (!periodic_boundary) return;
 
@@ -237,17 +237,17 @@ void Atom_input::Check_Expand_Condition(const UnitCell &ucell)
 	if(dminX<0.0)
 	{
 		std::cout << " dminX=" << dminX << std::endl;
-		WARNING_QUIT("Atom_input::Check_Expand_Condition","dminX<0.0");
+		ModuleBase::WARNING_QUIT("Atom_input::Check_Expand_Condition","dminX<0.0");
 	}
 	if(dminY<0.0)
 	{
 		std::cout << " dminY=" << dminY << std::endl;
-		WARNING_QUIT("Atom_input::Check_Expand_Condition","dminY<0.0");
+		ModuleBase::WARNING_QUIT("Atom_input::Check_Expand_Condition","dminY<0.0");
 	}
 	if(dminZ<0.0)
 	{
 		std::cout << " dminZ=" << dminZ << std::endl;
-		WARNING_QUIT("Atom_input::Check_Expand_Condition","dminZ<0.0");
+		ModuleBase::WARNING_QUIT("Atom_input::Check_Expand_Condition","dminZ<0.0");
 	}
 
 
@@ -396,7 +396,7 @@ void Atom_input::Check_Expand_Condition(const UnitCell &ucell)
 
 void Atom_input::Expand_Grid(const UnitCell &ucell, const int ntype)
 {
-	TITLE("Atom_input", "Expand_Grid");
+	ModuleBase::TITLE("Atom_input", "Expand_Grid");
 
 	if(test_atom_input)
 	{
@@ -567,7 +567,7 @@ void Atom_input::Expand_Grid(const UnitCell &ucell, const int ntype)
 
 void Atom_input::calculate_cells(void)
 {
-	TITLE("Atom_input", "calculate_cells");
+	ModuleBase::TITLE("Atom_input", "calculate_cells");
 //----------------------------------------------------------
 // EXPLAIN :
 // Expand_Case : Simple , we already know the cell numbres,
@@ -652,7 +652,7 @@ void Atom_input::set_FAtom(const UnitCell &ucell, FAtom &a)const
 
 void Atom_input::Load_atom(const UnitCell& ucell)const
 {
-//	TITLE("Atom_input","load_atom");
+//	ModuleBase::TITLE("Atom_input","load_atom");
 	natom++;
 
 	if (natom >= ucell.atoms[type].na)

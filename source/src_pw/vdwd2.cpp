@@ -15,7 +15,7 @@ Vdwd2::Vdwd2(const UnitCell_pseudo &unit_in, Vdwd2_Parameters &para_in):
 
 void Vdwd2::cal_energy()
 {
-    TITLE("Vdwd2","energy");
+    ModuleBase::TITLE("Vdwd2","energy");
 	para.initset(ucell);
 
 	energy = 0;
@@ -28,7 +28,7 @@ void Vdwd2::cal_energy()
 			const double R0_sum = ( para.R0.at(ucell.atoms[it1].psd) + para.R0.at(ucell.atoms[it2].psd) )/ucell.lat0;
 			if(!R0_sum)
 			{
-				WARNING_QUIT("Input", "R0_sum can not be 0");		
+				ModuleBase::WARNING_QUIT("Input", "R0_sum can not be 0");		
 			}
 			for( int ia1=0; ia1!=ucell.atoms[it1].na; ++ia1 )
 			{
@@ -61,7 +61,7 @@ void Vdwd2::cal_energy()
 
 void Vdwd2::cal_force()
 {
-    TITLE("Vdwd2","force");
+    ModuleBase::TITLE("Vdwd2","force");
 	para.initset(ucell);
 
 	force.clear();
@@ -76,7 +76,7 @@ void Vdwd2::cal_force()
 			const double R0_sum = ( para.R0.at(ucell.atoms[it1].psd) + para.R0.at(ucell.atoms[it2].psd) )/ucell.lat0;
 			if(!R0_sum)
 			{
-				WARNING_QUIT("Input", "R0_sum can not be 0");
+				ModuleBase::WARNING_QUIT("Input", "R0_sum can not be 0");
 			}
 			for( int ia1=0; ia1!=ucell.atoms[it1].na; ++ia1 )
 			{
@@ -117,7 +117,7 @@ void Vdwd2::cal_force()
 
 void Vdwd2::cal_stress(void)
 {
-    TITLE("Vdwd2","stress");
+    ModuleBase::TITLE("Vdwd2","stress");
 	para.initset(ucell);
 
 	stress.Zero();
@@ -131,7 +131,7 @@ void Vdwd2::cal_stress(void)
 			const double R0_sum = ( para.R0.at(ucell.atoms[it1].psd) + para.R0.at(ucell.atoms[it2].psd) )/ucell.lat0;
 			if(!R0_sum)
 			{
-				WARNING_QUIT("Input", "R0_sum can not be 0");
+				ModuleBase::WARNING_QUIT("Input", "R0_sum can not be 0");
 			}
 			for( int ia1=0; ia1!=ucell.atoms[it1].na; ++ia1 )
 			{

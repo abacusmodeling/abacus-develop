@@ -30,7 +30,7 @@ void Diago_David::diag
     double& avg_iter
 )
 {
-    if (test_david==1) TITLE("Diago_David","diag");
+    if (test_david==1) ModuleBase::TITLE("Diago_David","diag");
     ModuleBase::timer::tick("Diago_David", "diag");
 
     assert( order > 1 );
@@ -227,7 +227,7 @@ void Diago_David::cal_grad
     std::complex<double>* respsi
 )
 {
-    if ( test_david ==1 ) TITLE("DIAGO_DAVID","cal_grad");
+    if ( test_david ==1 ) ModuleBase::TITLE("DIAGO_DAVID","cal_grad");
     ModuleBase::timer::tick("Diago_David", "cal_grad"
     );
 
@@ -283,7 +283,7 @@ void Diago_David::cal_elem
     ModuleBase::ComplexMatrix &sc
 )
 {
-    if ( test_david ==1 ) TITLE("DIAGO_DAVID","cal_elem");
+    if ( test_david ==1 ) ModuleBase::TITLE("DIAGO_DAVID","cal_elem");
     ModuleBase::timer::tick("Diago_David","cal_elem");
 
     // updat the reduced Hamiltonian
@@ -347,7 +347,7 @@ void Diago_David::diag_zhegvx
     ModuleBase::ComplexMatrix &vc
 )
 {
-//	TITLE("DIAGO_DAVID","diag_zhegvx");
+//	ModuleBase::TITLE("DIAGO_DAVID","diag_zhegvx");
     ModuleBase::timer::tick("Diago_David","diag_zhegvx");
     assert( ldh >= max(1,n) );
     int lwork ;
@@ -382,7 +382,7 @@ void Diago_David::diag_zhegvx
     ModuleBase::GlobalFunc::ZEROS(iwork,5*n);
     ModuleBase::GlobalFunc::ZEROS(ifail,n);
 
-	//WARNING_QUIT("divid","open zhegvx!");
+	//ModuleBase::WARNING_QUIT("divid","open zhegvx!");
 	
 	LapackConnector::zhegvx(1, 'V', 'I', 'L', n, hc, n, sc, n,
            0.0, 0.0, 1, m, 0.0, mm, e, vc, n,
@@ -418,7 +418,7 @@ void Diago_David::refresh
     ModuleBase::ComplexMatrix &vc
 )
 {
-    if ( test_david==1 ) TITLE("Diago_David","refresh");
+    if ( test_david==1 ) ModuleBase::TITLE("Diago_David","refresh");
     ModuleBase::timer::tick("Diago_David","refresh");
 
     // update hp,sp
@@ -519,7 +519,7 @@ void Diago_David::SchmitOrth
     std::complex<double>* spsi
 )
 {
-//	if(test_david == 1) TITLE("Diago_David","SchmitOrth");
+//	if(test_david == 1) ModuleBase::TITLE("Diago_David","SchmitOrth");
     ModuleBase::timer::tick("Diago_David","SchmitOrth");
 
     // orthogonalize starting eigenfunction to those already calculated

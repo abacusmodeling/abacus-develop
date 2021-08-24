@@ -40,7 +40,7 @@ public:
 	/// about the distance between two atoms.
 	static double& get_distance()
 	{ 
-		if(distance < 0.0) WARNING_QUIT("NUMERICAL_ORBITAL","distance should be above zero!"); 
+		if(distance < 0.0) ModuleBase::WARNING_QUIT("NUMERICAL_ORBITAL","distance should be above zero!"); 
 		return distance; 
 	}
 	

@@ -36,7 +36,7 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> Potential_Libxc::v_xc
 	const double * const rho_core_in,
 	const double * const * const kin_r_in)
 {
-    TITLE("Potential_Libxc","v_xc");
+    ModuleBase::TITLE("Potential_Libxc","v_xc");
     ModuleBase::timer::tick("Potential_Libxc","v_xc");
 
 	//output of the subroutine
@@ -256,7 +256,7 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> Potential_Libxc::v_xc
 	}//nspin=2
 	else
 	{
-		WARNING_QUIT("potential_libxc_meta","meta-GGA for nspin=1,2 first");
+		ModuleBase::WARNING_QUIT("potential_libxc_meta","meta-GGA for nspin=1,2 first");
 	}
 
 	vector<double> dh;

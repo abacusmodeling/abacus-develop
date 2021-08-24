@@ -70,7 +70,7 @@ LCAO_Descriptor::~LCAO_Descriptor()
 
 void LCAO_Descriptor::init(int lm, int nm, int tot_inl)
 {
-    TITLE("LCAO_Descriptor", "init");
+    ModuleBase::TITLE("LCAO_Descriptor", "init");
     GlobalV::ofs_running << " Initialize the descriptor index for deepks (lcao line)" << std::endl;
 
     assert(lm >= 0);
@@ -194,7 +194,7 @@ void LCAO_Descriptor::init_index(void)
 
 void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
 {
-    TITLE("LCAO_Descriptor", "build_S_descriptor");
+    ModuleBase::TITLE("LCAO_Descriptor", "build_S_descriptor");
     //array to store data
     double olm[3] = {0.0, 0.0, 0.0};
 
@@ -279,7 +279,7 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
     }     // T1
     if (!GlobalV::GAMMA_ONLY_LOCAL)
     {
-        WARNING_QUIT("LCAO_Descriptor::build_S_descriptor", 
+        ModuleBase::WARNING_QUIT("LCAO_Descriptor::build_S_descriptor", 
 		"muti-kpoint method for descriptor is not implemented yet! ");
     }
     return;
@@ -310,7 +310,7 @@ void LCAO_Descriptor::set_S_mu_alpha(const int &iw1_all, const int &inl, const i
 
 void LCAO_Descriptor::cal_projected_DM(void)
 {
-    TITLE("LCAO_Descriptor", "cal_projected_DM");
+    ModuleBase::TITLE("LCAO_Descriptor", "cal_projected_DM");
     //step 1: get dm: the coefficient of wfc, not charge density
     double *dm = new double[GlobalV::NLOCAL * GlobalV::NLOCAL];
     ModuleBase::GlobalFunc::ZEROS(dm, GlobalV::NLOCAL * GlobalV::NLOCAL);
@@ -378,7 +378,7 @@ void LCAO_Descriptor::cal_projected_DM(void)
 
 void LCAO_Descriptor::cal_descriptor(void)
 {
-    TITLE("LCAO_Descriptor", "cal_descriptor");
+    ModuleBase::TITLE("LCAO_Descriptor", "cal_descriptor");
     delete[] d;
     d = new double[this->n_descriptor];
 
@@ -487,7 +487,7 @@ void LCAO_Descriptor::print_projected_DM(
 
 void LCAO_Descriptor::print_descriptor(void)
 {
-    TITLE("LCAO_Descriptor", "print_descriptor");
+    ModuleBase::TITLE("LCAO_Descriptor", "print_descriptor");
     std::ofstream ofs;
     std::stringstream ss;
     // the parameter 'winput::spillage_outdir' is read from INPUTw.
@@ -564,7 +564,7 @@ void LCAO_Descriptor::getdm(double* dm)
 
 void LCAO_Descriptor::cal_gdmx(matrix &dm)
 {
-    TITLE("LCAO_Descriptor", "cal_gdmx");
+    ModuleBase::TITLE("LCAO_Descriptor", "cal_gdmx");
     //get DS_alpha_mu and S_nu_beta
     double** ss = this->S_mu_alpha;
     double** dsx = this->DS_mu_alpha_x;
@@ -656,7 +656,7 @@ void LCAO_Descriptor::del_gdmx(void)
 
 void LCAO_Descriptor::cal_v_delta(const std::string& model_file)
 {
-    TITLE("LCAO_Descriptor", "cal_v_delta");
+    ModuleBase::TITLE("LCAO_Descriptor", "cal_v_delta");
     //1.  (dE/dD)<alpha_m'|psi_nv>
     this->load_model(model_file);
     this->cal_gedm();
@@ -703,7 +703,7 @@ void LCAO_Descriptor::cal_v_delta(const std::string& model_file)
 
 void LCAO_Descriptor::cal_f_delta(ModuleBase::matrix& dm)
 {
-    TITLE("LCAO_Descriptor", "cal_f_delta");
+    ModuleBase::TITLE("LCAO_Descriptor", "cal_f_delta");
     int iat = 0;    //check if the index same as GlobalC::ucell.iw2iat or not !!
     for (int it = 0;it < GlobalC::ucell.ntype;++it)
     {
@@ -740,7 +740,7 @@ void LCAO_Descriptor::cal_f_delta(ModuleBase::matrix& dm)
 
 void LCAO_Descriptor::cal_descriptor_tensor()
 {
-    TITLE("LCAO_Descriptor", "cal_descriptor_tensor");
+    ModuleBase::TITLE("LCAO_Descriptor", "cal_descriptor_tensor");
     //init pdm_tensor and d_tensor
     torch::Tensor tmp;
     for (int inl = 0;inl < this->inlmax;++inl)
@@ -783,7 +783,7 @@ void LCAO_Descriptor::load_model(const std::string& model_file)
 }
 void LCAO_Descriptor::cal_gedm()
 {
-    TITLE("LCAO_Descriptor", "cal_gedm");
+    ModuleBase::TITLE("LCAO_Descriptor", "cal_gedm");
     //forward
     std::vector<torch::jit::IValue> inputs;
     //input_dim:(natom, des_per_atom)
@@ -816,7 +816,7 @@ void LCAO_Descriptor::cal_gedm()
 
 void LCAO_Descriptor::print_H_V_delta()
 {
-    TITLE("LCAO_Descriptor", "print_H_V_delta");
+    ModuleBase::TITLE("LCAO_Descriptor", "print_H_V_delta");
     std::ofstream ofs;
     std::stringstream ss;
     // the parameter 'winput::spillage_outdir' is read from INPUTw.
@@ -852,7 +852,7 @@ void LCAO_Descriptor::print_H_V_delta()
 
 void LCAO_Descriptor::print_F_delta()
 {
-    TITLE("LCAO_Descriptor", "print_F_delta");
+    ModuleBase::TITLE("LCAO_Descriptor", "print_F_delta");
     std::ofstream ofs;
     std::stringstream ss;
     // the parameter 'winput::spillage_outdir' is read from INPUTw.

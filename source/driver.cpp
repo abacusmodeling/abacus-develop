@@ -20,7 +20,7 @@ Driver::~Driver(){}
 
 void Driver::init()
 {
-	TITLE("Driver","init");
+	ModuleBase::TITLE("Driver","init");
 
 	time_t time_start = std::time(NULL);
 	ModuleBase::timer::start();
@@ -81,7 +81,7 @@ void Driver::reading(void)
 
 void Driver::atomic_world(void)
 {
-	TITLE("Driver","atomic_world");
+	ModuleBase::TITLE("Driver","atomic_world");
 
 	//--------------------------------------------------
 	// choose basis sets:

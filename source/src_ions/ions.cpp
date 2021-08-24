@@ -13,7 +13,7 @@
 
 void Ions::opt_ions_pw(void)
 {
-	TITLE("Ions","opt_ions_pw");
+	ModuleBase::TITLE("Ions","opt_ions_pw");
 	ModuleBase::timer::tick("Ions","opt_ions_pw");
 	
 	if(GlobalV::OUT_LEVEL=="i")
@@ -253,7 +253,7 @@ void Ions::opt_ions_pw(void)
 
 bool Ions::after_scf(const int &istep, int &force_step, int &stress_step)
 {
-	TITLE("Ions","after_scf");
+	ModuleBase::TITLE("Ions","after_scf");
 	//calculate and gather all parts of total ionic forces
 	ModuleBase::matrix force;
 	if(GlobalV::FORCE)
@@ -301,13 +301,13 @@ bool Ions::after_scf(const int &istep, int &force_step, int &stress_step)
 }
 void Ions::gather_force_pw(ModuleBase::matrix &force)
 {
-	TITLE("Ions","gather_force_pw");
+	ModuleBase::TITLE("Ions","gather_force_pw");
 	Forces fcs;
 	fcs.init(force);
 }
 void Ions::gather_stress_pw(ModuleBase::matrix& stress)
 {
-	TITLE("Ions","gather_stress_pw");
+	ModuleBase::TITLE("Ions","gather_stress_pw");
 	//basic stress
 	Stress_PW ss;
 	ss.cal_stress(stress);
@@ -324,7 +324,7 @@ void Ions::gather_stress_pw(ModuleBase::matrix& stress)
 
 bool Ions::if_do_relax()
 {
-	TITLE("Ions","if_do_relax");
+	ModuleBase::TITLE("Ions","if_do_relax");
 	if(GlobalV::CALCULATION=="relax"||GlobalV::CALCULATION=="cell-relax")
 	{
 		if(!GlobalC::ucell.if_atoms_can_move()) 
@@ -342,7 +342,7 @@ bool Ions::if_do_relax()
 }
 bool Ions::if_do_cellrelax()
 {
-	TITLE("Ions","if_do_cellrelax");
+	ModuleBase::TITLE("Ions","if_do_cellrelax");
 	if(GlobalV::CALCULATION=="cell-relax")
 	{
 		if(!GlobalC::ucell.if_cell_can_change()||!IMM.get_converged()) 
@@ -360,20 +360,20 @@ bool Ions::if_do_cellrelax()
 }
 bool Ions::do_relax(const int& istep, int& jstep, const ModuleBase::matrix& ionic_force, const double& total_energy)
 {
-	TITLE("Ions","do_relax");
+	ModuleBase::TITLE("Ions","do_relax");
 	IMM.cal_movement(istep, jstep, ionic_force, total_energy);
 	++jstep;
 	return IMM.get_converged();
 }
 bool Ions::do_cellrelax(const int& istep, const ModuleBase::matrix& stress, const double& total_energy)
 {
-	TITLE("Ions","do_cellrelax");
+	ModuleBase::TITLE("Ions","do_cellrelax");
 	LCM.cal_lattice_change(istep, stress, total_energy);
     return LCM.get_converged();
 }
 void Ions::reset_after_relax(const int& istep)
 {
-	TITLE("Ions","reset_after_relax");
+	ModuleBase::TITLE("Ions","reset_after_relax");
 	GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << std::endl;
 	GlobalC::pw.setup_structure_factor();
 
@@ -391,7 +391,7 @@ void Ions::reset_after_relax(const int& istep)
 }
 void Ions::reset_after_cellrelax(int& f_step, int& s_step)
 {
-	TITLE("Ions","reset_after_cellrelax");
+	ModuleBase::TITLE("Ions","reset_after_cellrelax");
 	Variable_Cell::init_after_vc();
 	GlobalC::pot.init_pot(s_step, GlobalC::pw.strucFac); //LiuXh add 20180619
 

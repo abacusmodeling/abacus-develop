@@ -10,7 +10,7 @@ using namespace std;
 
 UnitCell::UnitCell()
 {
-    if (GlobalV::test_unitcell) TITLE("unitcell","Constructor");
+    if (GlobalV::test_unitcell) ModuleBase::TITLE("unitcell","Constructor");
     Coordinate = "Direct";
     latName = "none";
     lat0 = 0.0;
@@ -62,7 +62,7 @@ UnitCell::~UnitCell()
 #ifdef __MPI
 void UnitCell::bcast_unitcell(void)
 {
-    if (GlobalV::test_unitcell)TITLE("UnitCell","bcast_unitcell");
+    if (GlobalV::test_unitcell)ModuleBase::TITLE("UnitCell","bcast_unitcell");
     Parallel_Common::bcast_string( Coordinate );
     Parallel_Common::bcast_int( nat );
 
@@ -150,7 +150,7 @@ void UnitCell::bcast_unitcell2(void)
 
 void UnitCell::print_cell(std::ofstream &ofs, output &outp)const
 {
-    if (GlobalV::test_unitcell) TITLE("UnitCell","print_cell");
+    if (GlobalV::test_unitcell) ModuleBase::TITLE("UnitCell","print_cell");
 
     ModuleBase::GlobalFunc::OUT(ofs,"print_unitcell()");
 
@@ -173,7 +173,7 @@ void UnitCell::print_cell(std::ofstream &ofs, output &outp)const
 
 void UnitCell::print_cell_cif(const std::string &fn)const
 {
-	if (GlobalV::test_unitcell) TITLE("UnitCell","print_cell_cif");
+	if (GlobalV::test_unitcell) ModuleBase::TITLE("UnitCell","print_cell_cif");
 	
 	if(GlobalV::MY_RANK!=0) return;//xiaohui add 2015-03-15
 
@@ -226,7 +226,7 @@ void UnitCell::print_cell_cif(const std::string &fn)const
 
 void UnitCell::print_cell_xyz(const std::string &fn)const
 {
-    if (GlobalV::test_unitcell) TITLE("UnitCell","print_cell_xyz");
+    if (GlobalV::test_unitcell) ModuleBase::TITLE("UnitCell","print_cell_xyz");
 
 	if(GlobalV::MY_RANK!=0) return;//xiaohui add 2015-03-15
 
@@ -348,7 +348,7 @@ void UnitCell::periodic_boundary_adjustment()
 				GlobalV::ofs_warning << " it=" << it+1 << " ia=" << ia+1 << std::endl;
 				GlobalV::ofs_warning << "d=" << atom->taud[ia].x << " " << 
 				atom->taud[ia].y << " " << atom->taud[ia].z << std::endl;
-				WARNING_QUIT("Ions_Move_Basic::move_ions","the movement of atom is larger than the length of cell.");
+				ModuleBase::WARNING_QUIT("Ions_Move_Basic::move_ions","the movement of atom is larger than the length of cell.");
 			}
 
 			atom->tau[ia] = atom->taud[ia] * this->latvec;

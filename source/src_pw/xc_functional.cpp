@@ -218,7 +218,7 @@ void XC_Functional::xc_spin(const double &rho, const double &zeta,
 		case 4: //mohan fix bug 2012-05-28, case 2 to 4.
 		XC_Functional::pw_spin(rs, zeta, ec, vcup, vcdw); break;
 		default:
-		WARNING_QUIT("XC_Functional::xc_spin", "GlobalC::xcf.icorr_now wrong!");
+		ModuleBase::WARNING_QUIT("XC_Functional::xc_spin", "GlobalC::xcf.icorr_now wrong!");
 	}
 
 	return;
@@ -369,7 +369,7 @@ void XC_Functional::slater_rxc_spin( const double &rho, const double &z,
 //iflag=1: G. Ortiz and P. Ballone, PRB 50, 1391 (1994)
 void XC_Functional::pz(const double &rs, const int &iflag, double &ec, double &vc)
 {
-//	TITLE("XC_Functional","pz");
+//	ModuleBase::TITLE("XC_Functional","pz");
 	const double a[2] = {0.0311, 0.031091};
     const double b[2] = { -0.048, -0.046644 };
     const double c[2] = { 0.0020, 0.00419 };
@@ -404,7 +404,7 @@ void XC_Functional::pz(const double &rs, const int &iflag, double &ec, double &v
 void XC_Functional::pz_spin( const double &rs, const double &zeta, 
 	double &ec, double &vcup, double &vcdw)
 {
-//	TITLE("XC_Functional","pz_spin");
+//	ModuleBase::TITLE("XC_Functional","pz_spin");
 	double ecu, vcu, ecp, vcp ;
     static const double p43 = 4.00 / 3.0;
     static const double third = 1.0 / 3.0;
@@ -434,7 +434,7 @@ void XC_Functional::pz_spin( const double &rs, const double &zeta,
 // J.P. Perdew and A. Zunger, PRB 23, 5048 (1981)
 void XC_Functional::pz_polarized( const double &rs, double &ec, double &vc)
 {
-//	TITLE("XC_Functional","pz_polarized");
+//	ModuleBase::TITLE("XC_Functional","pz_polarized");
 	static const double a = 0.015550;
 	static const double b = -0.02690;
 	static const double c = 0.00070;
@@ -836,7 +836,7 @@ void XC_Functional::tau_xc(const double &rho, const double &grho, const double &
 	}
 	else
 	{
-		WARNING_QUIT("tau_xc","functional not implemented yet");
+		ModuleBase::WARNING_QUIT("tau_xc","functional not implemented yet");
 	}
 
 //correlation
@@ -850,7 +850,7 @@ void XC_Functional::tau_xc(const double &rho, const double &grho, const double &
 	}
 	else
 	{
-		WARNING_QUIT("tau_xc","functional not implemented yet");
+		ModuleBase::WARNING_QUIT("tau_xc","functional not implemented yet");
 	}
 	return;
 }
@@ -884,7 +884,7 @@ void XC_Functional::tau_xc_spin(const double &rhoup, const double &rhodw, const 
 	}
 	else
 	{
-		WARNING_QUIT("tau_xc_spin","functional not implemented yet");
+		ModuleBase::WARNING_QUIT("tau_xc_spin","functional not implemented yet");
 	}
 
 //correlation
@@ -896,7 +896,7 @@ void XC_Functional::tau_xc_spin(const double &rhoup, const double &rhodw, const 
 	}
 	else
 	{
-		WARNING_QUIT("tau_xc_spin","functional not implemented yet");
+		ModuleBase::WARNING_QUIT("tau_xc_spin","functional not implemented yet");
 	}
 
 	sx = sx * (rho[0]+rho[1]);

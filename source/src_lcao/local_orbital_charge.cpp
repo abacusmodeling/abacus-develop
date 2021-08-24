@@ -77,7 +77,7 @@ Local_Orbital_Charge::~Local_Orbital_Charge()
 
 void Local_Orbital_Charge::allocate_dm_wfc(const Grid_Technique &gt)
 {
-    TITLE("Local_Orbital_Charge","allocate_dm_wfc");
+    ModuleBase::TITLE("Local_Orbital_Charge","allocate_dm_wfc");
 
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
@@ -96,7 +96,7 @@ void Local_Orbital_Charge::allocate_dm_wfc(const Grid_Technique &gt)
 
 void Local_Orbital_Charge::sum_bands(void)
 {
-    TITLE("Local_Orbital_Charge","sum_bands");
+    ModuleBase::TITLE("Local_Orbital_Charge","sum_bands");
     ModuleBase::timer::tick("Local_Orbital_Cha","sum_bands");
 
     GlobalC::en.eband = 0.0;

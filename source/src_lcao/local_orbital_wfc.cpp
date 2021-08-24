@@ -70,10 +70,10 @@ Local_Orbital_wfc::~Local_Orbital_wfc()
 
 void Local_Orbital_wfc::allocate_k(const Grid_Technique &gt)
 {
-	TITLE("Local_Orbital_wfc","allocate_k");
+	ModuleBase::TITLE("Local_Orbital_wfc","allocate_k");
 	if(GlobalV::NLOCAL < GlobalV::NBANDS)
 	{
-		WARNING_QUIT("Local_Orbital_wfc::allocate","NLOCAL<NBANDS");
+		ModuleBase::WARNING_QUIT("Local_Orbital_wfc::allocate","NLOCAL<NBANDS");
 	}
 
 	// mohan add the flag 2011-03-02
@@ -136,24 +136,24 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique &gt)
 		GlobalV::ofs_running << " Error=" << error << std::endl;
 		if(error==1)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: GlobalC::LOWF.dat");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: GlobalC::LOWF.dat");
 		}
 		else if(error==2)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","In wave function file, band number doesn't match");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In wave function file, band number doesn't match");
 		}
 		else if(error==3)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","In wave function file, nlocal doesn't match");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In wave function file, nlocal doesn't match");
 		}
 		else if(error==4)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","In k-dependent wave function file, k point is not correct");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In k-dependent wave function file, k point is not correct");
 		}
 	}
 	else
 	{
-		WARNING_QUIT("Local_Orbital_wfc","check the parameter: start_wfc");
+		ModuleBase::WARNING_QUIT("Local_Orbital_wfc","check the parameter: start_wfc");
 	}
 
 	return;
@@ -162,7 +162,7 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique &gt)
 
 void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
 {
-	TITLE("Local_Orbital_wfc","set_trace_aug");
+	ModuleBase::TITLE("Local_Orbital_wfc","set_trace_aug");
 	ModuleBase::timer::tick("Local_Orbital_wfc","set_trace_aug");
 	// this function must be called after GlobalC::ParaO.trace_loc_row
 	// , GlobalC::ParaO.trace_loc_col and GlobalC::GridT.trace_lo have been called.

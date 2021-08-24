@@ -7,7 +7,7 @@
 std::pair< std::vector<Exx_Abfs::Parallel::Distribute::Kmeans::Atom>, std::vector<Exx_Abfs::Parallel::Distribute::Kmeans::Cluster> >
 Exx_Abfs::Parallel::Distribute::Kmeans::cluster( const int Nc )
 {
-	TITLE("Exx_Abfs::Parallel::Distribute::Kmeans::cluster");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Distribute::Kmeans::cluster");
 	
 	std::vector<Cluster> clusters(Nc+1);						// clusters[Nc] just for atoms init
 	std::vector<Atom> atoms(GlobalC::ucell.nat);
@@ -150,7 +150,7 @@ Exx_Abfs::Parallel::Distribute::Kmeans::cluster( const int Nc )
 std::vector<std::pair<size_t,size_t>> 
 Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans2( const MPI_Comm & mpi_comm, const int multiple_core )
 {
-	TITLE("Exx_Abfs::Parallel::Distribute::Kmeans::distribute");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Distribute::Kmeans::distribute");
 	
 	assert(multiple_core>=1);
 	int comm_size;	MPI_Comm_size( mpi_comm, &comm_size );

@@ -19,7 +19,7 @@ pseudopot_cell_vl::~pseudopot_cell_vl()
 
 void pseudopot_cell_vl::init_vloc(const int &nggm, ModuleBase::matrix &vloc_in)
 {
-	TITLE("pseudopot_cell_vl","init_vloc");
+	ModuleBase::TITLE("pseudopot_cell_vl","init_vloc");
 
 	// This routine computes the fourier coefficient of the local
 	// potential vloc(ig,it) for each type of atom
@@ -51,7 +51,7 @@ void pseudopot_cell_vl::init_vloc(const int &nggm, ModuleBase::matrix &vloc_in)
 		}
 		else
 		{
-			WARNING_QUIT("init_vloc","not available now.");
+			ModuleBase::WARNING_QUIT("init_vloc","not available now.");
 		}
 
 		dcopy(vloc1d, vloc_in, it);
@@ -69,7 +69,7 @@ void pseudopot_cell_vl::init_vloc(const int &nggm, ModuleBase::matrix &vloc_in)
 
 void pseudopot_cell_vl::allocate(void)
 {
-	if(GlobalV::test_pp>0) TITLE("pseudopot_cell_vl","allocate");
+	if(GlobalV::test_pp>0) ModuleBase::TITLE("pseudopot_cell_vl","allocate");
 	this->vloc.create(GlobalC::ucell.ntype, GlobalC::pw.nggm);
 
 	delete[] numeric;

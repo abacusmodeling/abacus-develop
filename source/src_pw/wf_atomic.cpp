@@ -31,7 +31,7 @@ WF_atomic::~WF_atomic()
 //==========================================================
 void WF_atomic::init_at_1(void)
 {
-    if (GlobalV::test_wf) TITLE("WF_atomic","init_at_1");
+    if (GlobalV::test_wf) ModuleBase::TITLE("WF_atomic","init_at_1");
     ModuleBase::timer::tick("WF_atomic","init_at_1");
 
 	GlobalV::ofs_running << "\n Make real space PAO into reciprocal space." << std::endl;
@@ -173,7 +173,7 @@ void WF_atomic::print_PAOs(void)const
             else
             {
 				GlobalV::ofs_warning << "\n nchi = " << GlobalC::ucell.atoms[it].nchi << std::endl;
-                WARNING_QUIT("WF_atomic::print_PAOs", "unknown PAO type.");
+                ModuleBase::WARNING_QUIT("WF_atomic::print_PAOs", "unknown PAO type.");
             }
 
             std::stringstream ss;
@@ -225,7 +225,7 @@ void WF_atomic::check_psi(const ModuleBase::ComplexMatrix *evc)const
         ModuleBase::GlobalFunc::OUT("ik",ik);
         ModuleBase::GlobalFunc::OUT("sum_evc2",sum_evc);
     }
-    //QUIT();
+    //ModuleBase::QUIT();
 }
 
 void WF_atomic::atomic_wfc
@@ -238,7 +238,7 @@ void WF_atomic::atomic_wfc
   const double &dq
 )const
 {
-    if (GlobalV::test_wf>3) TITLE("WF_atomic","atomic_wfc");
+    if (GlobalV::test_wf>3) ModuleBase::TITLE("WF_atomic","atomic_wfc");
     ModuleBase::timer::tick("WF_atomic","atomic_wfc");
     //=========================================================
     // This routine computes the superposition of atomic
@@ -371,7 +371,7 @@ void WF_atomic::atomic_wfc
                               for(int m = 0;m<2*l+1;m++)
                               {
                                  const int lm = l*l +m;
-                                 if(index+2*l+1>GlobalC::ucell.natomwfc) WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
+                                 if(index+2*l+1>GlobalC::ucell.natomwfc) ModuleBase::WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
                                  for(int ig = 0;ig<np;ig++)
                                  {
                                      aux[ig] = sk[ig] * ylm(lm,ig) * chiaux[ig];
@@ -406,7 +406,7 @@ void WF_atomic::atomic_wfc
                             for(int m = 0;m<2*l+1;m++)
                             {
                                 const int lm = l*l +m;
-                                if(index+2*l+1>GlobalC::ucell.natomwfc) WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
+                                if(index+2*l+1>GlobalC::ucell.natomwfc) ModuleBase::WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
                                 for(int ig = 0;ig<np;ig++)
                                 {
                                      aux[ig] = sk[ig] * ylm(lm,ig) * flq[ig];
@@ -461,7 +461,7 @@ void WF_atomic::atomic_wfc
 
     if (index != GlobalC::ucell.natomwfc)
     {
-        WARNING_QUIT("GlobalC::wf.atomic_wfc()","index != GlobalC::ucell.natomwfc");
+        ModuleBase::WARNING_QUIT("GlobalC::wf.atomic_wfc()","index != GlobalC::ucell.natomwfc");
     }
     delete[] flq;
     delete [] gk;

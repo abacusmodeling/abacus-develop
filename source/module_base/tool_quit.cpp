@@ -14,6 +14,8 @@
 #include "memory.h"
 #endif
 
+namespace ModuleBase
+{
 //==========================================================
 // GLOBAL FUNCTION :
 // NAME : WARNING( write information into GlobalV::ofs_warning)
@@ -128,4 +130,6 @@ void WARNING_QUIT(const std::string &file,const std::string &description)
 #endif
 
     QUIT();
+}
+
 }

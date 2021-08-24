@@ -29,7 +29,7 @@ void Numerical_Orbital::set_orbital_info
 )
 {
 	//what is GlobalV::test_overlap
-	TITLE("Numerical_Orbital", "set_type_info");
+	ModuleBase::TITLE("Numerical_Orbital", "set_type_info");
 
 	// (1) set type,label,lmax
 	this->type = type_in;
@@ -47,7 +47,7 @@ void Numerical_Orbital::set_orbital_info
 	// we need this to generate numerical_orbital_lm.
 	if (total_nchi_in < 0 || total_nchi_in > 50) 
 	{
-		WARNING_QUIT("Numerical_Orbital::init", "total_nchi<0 || total_nchi>50");
+		ModuleBase::WARNING_QUIT("Numerical_Orbital::init", "total_nchi<0 || total_nchi>50");
 	}
 	else 
 	{

@@ -25,7 +25,7 @@
 
 void energy::perform_dos(void)
 {
-	TITLE("energy","perform_dos");
+	ModuleBase::TITLE("energy","perform_dos");
 
 
     if(out_dos !=0 || out_band !=0)

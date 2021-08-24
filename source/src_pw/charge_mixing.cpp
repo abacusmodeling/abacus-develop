@@ -20,7 +20,7 @@ void Charge_Mixing::set_mixing
 
 //    if (mixing_mode != "plain") // "TF","local-TF","potential"
 //    {
-//        WARNING_QUIT("set_mixing","only plain mixing availabel.");
+//        ModuleBase::WARNING_QUIT("set_mixing","only plain mixing availabel.");
 //    }
 
     return;
@@ -30,7 +30,7 @@ void Charge_Mixing::set_mixing
 // Fourier transform of rho(g) to rho(r) in real space.
 void Charge_Mixing::set_rhor(std::complex<double> *rhog, double *rho)const
 {
-    if (GlobalV::test_charge)TITLE("Charge_Mixing","set_rhor");
+    if (GlobalV::test_charge)ModuleBase::TITLE("Charge_Mixing","set_rhor");
     for (int is=0; is < GlobalV::NSPIN; is++)
     {
 		GlobalC::UFFT.ToRealSpace(rhog, rho);
@@ -41,7 +41,7 @@ void Charge_Mixing::set_rhor(std::complex<double> *rhog, double *rho)const
 
 void Charge_Mixing::set_rhog(const double *rho_in, std::complex<double> *rhog_in)const
 {
-    if (GlobalV::test_charge)TITLE("Charge_Mixing","set_rhog");
+    if (GlobalV::test_charge)ModuleBase::TITLE("Charge_Mixing","set_rhog");
 	GlobalC::UFFT.ToReciSpace(rho_in, rhog_in);
     return;
 }
@@ -118,7 +118,7 @@ void Charge_Mixing::plain_mixing( double *rho, double *rho_save_in ) const
 
 void Charge_Mixing::Kerker_mixing( double *rho, const std::complex<double> *residual_g, double *rho_save)
 {
-//  TITLE("Charge_Mixing","Kerker");
+//  ModuleBase::TITLE("Charge_Mixing","Kerker");
     ModuleBase::timer::tick("Charge_Mixing","Kerker");
 
 //	std::cout << " here is Kerker" << std::endl;
@@ -176,7 +176,7 @@ double Charge_Mixing::rhog_dot_product(
 	const std::complex<double>*const*const rhog2
 ) const
 {
-    TITLE("Charge_Mixing","rhog_dot_product");
+    ModuleBase::TITLE("Charge_Mixing","rhog_dot_product");
 	ModuleBase::timer::tick("Charge_Mixing","rhog_dot_product");
     static const double fac = e2 * FOUR_PI / GlobalC::ucell.tpiba2;
     static const double fac2 = e2 * FOUR_PI / (TWO_PI * TWO_PI);

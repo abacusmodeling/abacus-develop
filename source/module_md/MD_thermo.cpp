@@ -295,7 +295,7 @@ void MD_thermo::Integrator(
 	if(control == 1) NHCIntegrator(temperature, vel, allmass);
 	else if(control == 2) LGVIntegrator(temperature, vel, allmass);
 	else if(control == 3) ADSIntegrator(temperature, vel, allmass);
-	else WARNING_QUIT("MD_thermo:Integrator", "please choose available reservoir!!!");
+	else ModuleBase::WARNING_QUIT("MD_thermo:Integrator", "please choose available reservoir!!!");
 	return;
 }
 

@@ -28,7 +28,7 @@ double Force_LCAO_gamma::set_EDM_element(
 //#include "../src_develop/src_siao/selinv.h"
 void Force_LCAO_gamma::set_EDM_gamma(ModuleBase::matrix& dm, bool with_energy)
 {
-    TITLE("Force_LCAO_gamma","set_EDM_gamma");
+    ModuleBase::TITLE("Force_LCAO_gamma","set_EDM_gamma");
     ModuleBase::timer::tick("Force_LCAO_gamma","set_EDM");
 
 #ifdef __SELINV
@@ -650,7 +650,7 @@ void Force_LCAO_gamma::cal_foverlap(
 	ModuleBase::matrix& foverlap, 
 	ModuleBase::matrix& soverlap)
 {
-    TITLE("Force_LCAO_gamma","cal_foverlap");
+    ModuleBase::TITLE("Force_LCAO_gamma","cal_foverlap");
     ModuleBase::timer::tick("Force_LCAO_gamma","cal_foverlap");
 
     // set energy density matrix.

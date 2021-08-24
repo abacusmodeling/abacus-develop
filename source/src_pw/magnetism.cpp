@@ -170,7 +170,7 @@ void Magnetism::cal_ux(const int ntype)
 		uxmod =  pow(ux_[0],2) + pow(ux_[1],2) +pow(ux_[2],2);
 		if(uxmod<1e-6) 
 		{
-			WARNING_QUIT("cal_ux","wrong uxmod");
+			ModuleBase::WARNING_QUIT("cal_ux","wrong uxmod");
 		}
 		for(int i = 0;i<3;i++)
 		{

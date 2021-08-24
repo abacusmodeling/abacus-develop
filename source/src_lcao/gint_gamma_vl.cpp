@@ -304,7 +304,7 @@ inline int setBufferParameter(
 // Output:	GridVlocal.ptr_2D[iw1_lo][iw2_lo]
 Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vlocal) const						// Peize Lin update OpenMP 2020.09.27
 {
-    TITLE("Gint_Gamma","gamma_vlocal");
+    ModuleBase::TITLE("Gint_Gamma","gamma_vlocal");
     ModuleBase::timer::tick("Gint_Gamma","gamma_vlocal");
 
 	Gint_Tools::Array_Pool<double> GridVlocal(GlobalC::GridT.lgd, GlobalC::GridT.lgd);
@@ -514,7 +514,7 @@ void vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal)
 void Gint_Gamma::cal_vlocal(
     const double*const vlocal)
 {
-    TITLE("Gint_Gamma","cal_vlocal");
+    ModuleBase::TITLE("Gint_Gamma","cal_vlocal");
     ModuleBase::timer::tick("Gint_Gamma", "cal_vlocal"
     );
 

@@ -3,7 +3,7 @@
 #ifdef __LCAO
 void Dos::calculate_Mulliken(const std::string &fa)
 {
-	TITLE("Dos","calculate_Mulliken");
+	ModuleBase::TITLE("Dos","calculate_Mulliken");
 	std::ofstream ofs;
 	
 	if(GlobalV::MY_RANK==0)
@@ -128,7 +128,7 @@ void Dos::calculate_Mulliken(const std::string &fa)
 	}
 	else
 	{
-		WARNING_QUIT("Mulliken Charge","Not implement yet.");	
+		ModuleBase::WARNING_QUIT("Mulliken Charge","Not implement yet.");	
 	}	
 	
 
@@ -154,7 +154,7 @@ bool Dos::calculate_dos
 	double** ekb//store energy for each k point and each band
 )
 {
-	TITLE("Dos","calculae_dos");
+	ModuleBase::TITLE("Dos","calculae_dos");
 	std::ofstream ofs;
 	if(GlobalV::MY_RANK==0)
 	{
@@ -167,12 +167,12 @@ bool Dos::calculate_dos
 
 	if(de_ev <= 0)
 	{
-		WARNING("DOS::calculate_dos","de <= 0 ");
+		ModuleBase::WARNING("DOS::calculate_dos","de <= 0 ");
 		return 0; 
 	}
 	else if(emax_ev < emin_ev)
 	{
-		WARNING("calculate_dos","emax_ev < emin_ev");
+		ModuleBase::WARNING("calculate_dos","emax_ev < emin_ev");
 		return 0;
 	}
 
@@ -181,7 +181,7 @@ bool Dos::calculate_dos
 	if(npoints <= 0)
 	{
 		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"npoints",npoints);
-		WARNING("calculate_dos","npoints < 0");
+		ModuleBase::WARNING("calculate_dos","npoints < 0");
 		return 0;
 	}
 	if(GlobalV::MY_RANK==0)
@@ -337,7 +337,7 @@ void Dos::nscf_band(
 	const double &fermie,
 	double** ekb)
 {
-	TITLE("Dos","nscf_band");
+	ModuleBase::TITLE("Dos","nscf_band");
 
 #ifdef __MPI
 	if(GlobalV::MY_RANK==0)

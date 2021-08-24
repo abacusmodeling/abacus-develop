@@ -207,7 +207,7 @@ inline void cal_band_rho(
 					std::cout << " size1=" << ia1 << " size2=" << ia1 << std::endl;
                     std::cout << " iat1=" << iat1 << " iat2=" << iat1 << std::endl;
                     std::cout << " dR=" << dRx << " " << dRy << " " << dRz << std::endl;
-					WARNING_QUIT("gint_k","evaluate_pDMp wrong");
+					ModuleBase::WARNING_QUIT("gint_k","evaluate_pDMp wrong");
 				}
 				//const int offset=AllOffset[ia1][ia2];
 				assert(offset < GlobalC::LNNR.nad[iat1]);
@@ -246,7 +246,7 @@ inline void cal_band_rho(
 					std::cout << " size1=" << ia1 << " size2=" << ia1 << std::endl;
                     std::cout << " iat1=" << iat1 << " iat2=" << iat1 << std::endl;
                     std::cout << " dR=" << dRx << " " << dRy << " " << dRz << std::endl;
-					WARNING_QUIT("gint_k","evaluate_pDMp wrong");
+					ModuleBase::WARNING_QUIT("gint_k","evaluate_pDMp wrong");
 				}
 				//const int offset=AllOffset[ia1][ia2];
 				assert(offset < GlobalC::LNNR.nad[iat1]);
@@ -310,7 +310,7 @@ inline void cal_band_rho(
                         std::cout << " dR=" << dRx << " " << dRy << " " << dRz << std::endl;
                         std::cout << " R1=" << R1x << " " << R1y << " " << R1z << std::endl;
                         std::cout << " R2=" << R2x << " " << R2y << " " << R2z << std::endl;
-    					WARNING_QUIT("gint_k","evaluate_pDMp wrong");
+    					ModuleBase::WARNING_QUIT("gint_k","evaluate_pDMp wrong");
     				}				
     				assert(offset < GlobalC::LNNR.nad[iat1]);
 
@@ -359,7 +359,7 @@ inline void cal_band_rho(
                         std::cout << " dR=" << dRx << " " << dRy << " " << dRz << std::endl;
                         std::cout << " R1=" << R1x << " " << R1y << " " << R1z << std::endl;
                         std::cout << " R2=" << R2x << " " << R2y << " " << R2z << std::endl;
-    					WARNING_QUIT("gint_k","evaluate_pDMp wrong");
+    					ModuleBase::WARNING_QUIT("gint_k","evaluate_pDMp wrong");
     				}				
     				assert(offset < GlobalC::LNNR.nad[iat1]);
 
@@ -392,7 +392,7 @@ inline void cal_band_rho(
 
 void Gint_k::cal_rho_k(void)
 {
-	TITLE("Gint_k","cal_rho_k");
+	ModuleBase::TITLE("Gint_k","cal_rho_k");
 	ModuleBase::timer::tick("Gint_k","cal_rho_k");
 
 	const double delta_r = GlobalC::ORB.dr_uniform;
@@ -648,7 +648,7 @@ void Gint_k::evaluate_pDMp(
                     std::cout << " dR=" << dRx << " " << dRy << " " << dRz << std::endl;
                     std::cout << " R1=" << R1x << " " << R1y << " " << R1z << std::endl;
                     std::cout << " R2=" << R2x << " " << R2y << " " << R2z << std::endl;
-					WARNING_QUIT("gint_k","evaluate_pDMp wrong");
+					ModuleBase::WARNING_QUIT("gint_k","evaluate_pDMp wrong");
 				}
 				assert(offset < GlobalC::LNNR.nad[iat]);
 

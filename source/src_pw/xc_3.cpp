@@ -813,7 +813,7 @@ void zgemm(char tra,
            std::complex<double> *c,
            int ldc)
 {
-	TITLE("myfunc5","zgemm1");
+	ModuleBase::TITLE("myfunc5","zgemm1");
     //int nra=1;
 	int nca=k;
 	int nrb=b.nr;
@@ -860,9 +860,9 @@ void zgemm(char tra,
         }
     }
 
-	//WARNING_QUIT("reset zgemm","reset zgemm");
+	//ModuleBase::WARNING_QUIT("reset zgemm","reset zgemm");
 //    zgemm_(&tra, &trb, &m, &n, &k, alpha0, aux, &lda, bux, &ldb, beta0, cux, &ldc);
-	WARNING_QUIT("myfunc_5::zgemm","please don't ever use it again.");
+	ModuleBase::WARNING_QUIT("myfunc_5::zgemm","please don't ever use it again.");
 
     for (i = 0; i < ncc; i++)
     {
@@ -890,7 +890,7 @@ void zgemm(char tra,
            ModuleBase::ComplexMatrix &c,
            int ldc)
 {
-    TITLE("myfunc5","zgemm2");
+    ModuleBase::TITLE("myfunc5","zgemm2");
     //int nra = 1;
 	int nca = k;
 	int nrb = b.nr;
@@ -937,9 +937,9 @@ void zgemm(char tra,
         }
     }
 
-	//WARNING_QUIT("reset zgemm","reset zgemm");
+	//ModuleBase::WARNING_QUIT("reset zgemm","reset zgemm");
     //zgemm_(&tra, &trb, &m, &n, &k, alpha0, aux, &lda, bux, &ldb, beta0, cux, &ldc);
-	WARNING_QUIT("myfunc_5::zgemm","please don't ever use it again.");
+	ModuleBase::WARNING_QUIT("myfunc_5::zgemm","please don't ever use it again.");
 
     for (i = 0; i < ncc; i++)
     {
@@ -973,7 +973,7 @@ void zgemm(char tra,
            ModuleBase::ComplexMatrix &c,
            int ldc)
 {
-//	TITLE("myfunc5","zgemm3");
+//	ModuleBase::TITLE("myfunc5","zgemm3");
     int nra, nca, nrb, ncb, nrc, ncc ;
     nra = a.nr,   nca = a.nc;
     nrb = b.nr,   ncb = b.nc;
@@ -1022,9 +1022,9 @@ void zgemm(char tra,
         }
     }
 
-	//WARNING_QUIT("reset zgemm","reset zgemm");
+	//ModuleBase::WARNING_QUIT("reset zgemm","reset zgemm");
     //zgemm_(&tra, &trb, &m, &n, &k, alpha0, aux, &lda, bux, &ldb, beta0, cux, &ldc);
-	WARNING_QUIT("myfunc_5::zgemm","please don't ever use it again.");
+	ModuleBase::WARNING_QUIT("myfunc_5::zgemm","please don't ever use it again.");
 
     for (i = 0; i < ncc; i++)
     {
@@ -1144,7 +1144,7 @@ void ZHEGVX(int itype,
             int *ifail,
             int &info )
 {
-//	TITLE("myfunc5","ZHEGVX");
+//	ModuleBase::TITLE("myfunc5","ZHEGVX");
     double *aux, *bux, *zux;
     aux = new double[2*lda*n];//mohan fix + --> * 2007-10-22
     bux = new double[2*ldb*n];

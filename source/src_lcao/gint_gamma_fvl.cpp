@@ -463,7 +463,7 @@ inline void cal_meshball_DGridV(
 
 void Gint_Gamma::gamma_force(const double*const vlocal) const
 {
-    TITLE("Grid_Integral","gamma_force");
+    ModuleBase::TITLE("Grid_Integral","gamma_force");
     ModuleBase::timer::tick("Gint_Gamma","gamma_force");
     // GlobalC::GridT.lgd: local grid dimension (sub-FFT-mesh).
     int DGridV_Size=GlobalC::GridT.lgd*GlobalC::GridT.lgd;

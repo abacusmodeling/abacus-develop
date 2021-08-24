@@ -43,7 +43,7 @@ void ORB_table_phi::allocate
     const double &dk_in
 )
 {
-	TITLE("ORB_table_phi", "allocate");
+	ModuleBase::TITLE("ORB_table_phi", "allocate");
 
 	this->ntype = ntype_in;// type of elements.
 	this->lmax = lmax_in;
@@ -105,7 +105,7 @@ int ORB_table_phi::get_rmesh(const double &R1, const double &R2)
 		//GlobalV::ofs_warning << "\n rmesh = " << rmesh;
 		std::cout << "\n R1 = " << R1 << " R2 = " << R2;
 		std::cout << "\n rmesh = " << rmesh;
-		WARNING_QUIT("ORB_table_phi::get_rmesh", "rmesh <= 0");
+		ModuleBase::WARNING_QUIT("ORB_table_phi::get_rmesh", "rmesh <= 0");
 	}
 	return rmesh;
 }
@@ -254,7 +254,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 	double* drs
 ) const
 {
-//	TITLE("ORB_table_phi","cal_ST_Phi12_R");
+//	ModuleBase::TITLE("ORB_table_phi","cal_ST_Phi12_R");
 	ModuleBase::timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
 
 	std::vector<double> k1_dot_k2(kmesh);
@@ -373,7 +373,7 @@ void ORB_table_phi::init_Table(
 	const int &job0, 
 	LCAO_Orbitals &orb)
 {
-	TITLE("ORB_table_phi", "init_Table");
+	ModuleBase::TITLE("ORB_table_phi", "init_Table");
 	ModuleBase::timer::tick("ORB_table_phi", "init_Table");
 	const int ntype = orb.get_ntype();
 	assert( ORB_table_phi::dr > 0.0);
@@ -686,7 +686,7 @@ void ORB_table_phi::Destroy_Table(LCAO_Orbitals &orb)
 
 void ORB_table_phi::init_OV_Tpair(LCAO_Orbitals &orb)
 {
-	TITLE("ORB_table_phi","init_OV_Tpair");
+	ModuleBase::TITLE("ORB_table_phi","init_OV_Tpair");
     assert(ntype>0);
 
     this->OV_nTpairs = this->ntype * (this->ntype + 1) / 2;
@@ -853,7 +853,7 @@ void ORB_table_phi::init_Table_Spherical_Bessel (
 	int &Lmax,
 	const int &Lmax_exx)
 {
-	TITLE("ORB_table_phi", "init_Table_Spherical_Bessel");
+	ModuleBase::TITLE("ORB_table_phi", "init_Table_Spherical_Bessel");
 
 	this->init_Lmax (orb_num,mode,Lmax_used,Lmax,Lmax_exx);		// Peize Lin add 2016-01-26
 

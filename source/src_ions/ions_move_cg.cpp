@@ -39,7 +39,7 @@ Ions_Move_CG::~Ions_Move_CG()
 
 void Ions_Move_CG::allocate(void)
 {
-	TITLE("Ions_Move_CG","allocate");
+	ModuleBase::TITLE("Ions_Move_CG","allocate");
 	assert( dim > 0);
 	delete[] pos0;
 	delete[] grad0;
@@ -58,7 +58,7 @@ void Ions_Move_CG::allocate(void)
 
 void Ions_Move_CG::start(const ModuleBase::matrix& force, const double& etot_in)
 {
-	TITLE("Ions_Move_CG","start");
+	ModuleBase::TITLE("Ions_Move_CG","start");
 	assert(dim>0);
 	assert(pos0!=0);
 	assert(grad0!=0);
@@ -284,7 +284,7 @@ void Ions_Move_CG::start(const ModuleBase::matrix& force, const double& etot_in)
 
 void Ions_Move_CG::setup_cg_grad(double *grad, const double *grad0, double *cg_grad, const double *cg_grad0, const int &ncggrad, int &flag)
 {
-	TITLE("Ions_Move_CG","setup_cg_grad");
+	ModuleBase::TITLE("Ions_Move_CG","setup_cg_grad");
 	assert(Ions_Move_Basic::istep > 0);
 	double gamma;
 	double cg0_cg,cg0_cg0,cg0_g;

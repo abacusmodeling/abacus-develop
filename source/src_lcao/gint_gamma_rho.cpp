@@ -160,7 +160,7 @@ void Gint_Gamma::cal_band_rho(
 // Output:	rho.ptr_2D[is][ir]
 Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const*const DM) const					// Peize Lin update OpenMP 2020.09.28
 {
-    TITLE("Gint_Gamma","gamma_charge");
+    ModuleBase::TITLE("Gint_Gamma","gamma_charge");
     ModuleBase::timer::tick("Gint_Gamma","gamma_charge");   
 
 	Gint_Tools::Array_Pool<double> rho(GlobalV::NSPIN, GlobalC::pw.nrxx);
@@ -299,7 +299,7 @@ double sum_up_rho(const Gint_Tools::Array_Pool<double> &rho)
 // calculate charge density
 double Gint_Gamma::cal_rho(const double*const*const*const DM)
 {
-    TITLE("Gint_Gamma","cal_rho");
+    ModuleBase::TITLE("Gint_Gamma","cal_rho");
     ModuleBase::timer::tick("Gint_Gamma","cal_rho");
 
     this->job = cal_charge;

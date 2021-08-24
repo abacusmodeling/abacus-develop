@@ -24,7 +24,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D(
 		ofs<<HR_exx<<std::endl;
 	}*/
 
-	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D");
 	
 //std::ofstream ofs_time("time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 //timeval t_start;	
@@ -81,7 +81,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D(
 std::map<size_t,std::map<size_t,matrix>> Exx_Abfs::Parallel::Communicate::Hexx::R_to_K( 
 	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>> & HR) const
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::R_to_K");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::Hexx::R_to_K");
 	
 	std::map<size_t,std::map<size_t,matrix>> HK;
 	for( auto & HR1 : HR )
@@ -103,7 +103,7 @@ std::map<size_t,std::map<size_t,ModuleBase::ComplexMatrix>> Exx_Abfs::Parallel::
 	const std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>> & HR,
 	const size_t ik) const
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::R_to_K");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::Hexx::R_to_K");
 	
 	std::map<size_t,std::map<size_t,ModuleBase::ComplexMatrix>> HK;
 	for( auto & HRA : HR )

@@ -514,7 +514,7 @@ void Exx_Lcao::init()
 		std::cout<<LapackConnector::nrm2( 3, ModuleBase::GlobalFunc::VECTOR_TO_PTR(z), 2 )<<std::endl;
 	};
 
-	TITLE("Exx_Lcao","init");
+	ModuleBase::TITLE("Exx_Lcao","init");
 
 mkdir_test_dir();
 
@@ -788,7 +788,7 @@ ofs_mpi.close();
 
 void Exx_Lcao::cal_exx_ions()
 {
-	TITLE("Exx_Lcao","cal_exx_ions");
+	ModuleBase::TITLE("Exx_Lcao","cal_exx_ions");
 std::ofstream ofs_mpi(test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start, t_start_all;
 gettimeofday( &t_start_all, NULL);
@@ -910,7 +910,7 @@ ofs_mpi.close();
 
 void Exx_Lcao::cal_exx_elec()
 {
-	TITLE("Exx_Lcao","cal_exx_elec");
+	ModuleBase::TITLE("Exx_Lcao","cal_exx_elec");
 
 static int istep=0;
 	#if TEST_EXX_LCAO==1
@@ -1066,7 +1066,7 @@ ofs_mpi.close();
 						// we need to fix this function in near future.
 						// -- mohan add 2021-02-09
 						//---------------------------------------------------------
-						WARNING_QUIT("Exx_Abfs::DM::cal_DMk_raw","need to update GlobalC::LOWF.WFC_GAMMA");
+						ModuleBase::WARNING_QUIT("Exx_Abfs::DM::cal_DMk_raw","need to update GlobalC::LOWF.WFC_GAMMA");
 						//ofs<<GlobalC::LOWF.WFC_GAMMA[ik][ib][iwt]<<"\t";
 					}
 					ofs<<std::endl;
@@ -1211,7 +1211,7 @@ void Exx_Lcao::cal_Hexx_gamma( const std::set<std::pair<size_t,size_t>> &atom_pa
 double Exx_Lcao::cal_energy( 
 	const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &HexxR ) const
 {
-	TITLE("Exx_Lcao","cal_energy");
+	ModuleBase::TITLE("Exx_Lcao","cal_energy");
 std::ofstream ofs_mpi(test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 gettimeofday( &t_start, NULL);
@@ -1252,7 +1252,7 @@ ofs_mpi.close();
 
 void Exx_Lcao::add_Hexx( const size_t ik, const double alpha ) const
 {
-	TITLE("Exx_Lcao","add_Hexx");
+	ModuleBase::TITLE("Exx_Lcao","add_Hexx");
 	
 	if( GlobalV::GAMMA_ONLY_LOCAL )
 	{
@@ -1275,7 +1275,7 @@ void Exx_Lcao::add_Hexx( const size_t ik, const double alpha ) const
 
 void Exx_Lcao::init_radial_table_ions( const std::set<size_t> &atom_centres_core, const std::vector<std::pair<size_t,size_t>> &atom_pairs_core )
 {
-	TITLE("Exx_Lcao::init_radial_table_ions");
+	ModuleBase::TITLE("Exx_Lcao::init_radial_table_ions");
 	
 std::ofstream ofs_mpi(test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;

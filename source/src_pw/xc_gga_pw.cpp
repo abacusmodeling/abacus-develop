@@ -6,7 +6,7 @@
 // from gradcorr.f90
 void GGA_PW::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 {
-	TITLE("GGA_PW","gradcorr");
+	ModuleBase::TITLE("GGA_PW","gradcorr");
 	
 	if (GlobalC::xcf.igcx_now == 0  &&  GlobalC::xcf.igcc_now == 0)
 	{
@@ -226,7 +226,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 			{
 				if(igcc_is_lyp)
 				{
-					WARNING_QUIT("gga_pw","igcc_is_lyp is not available now.");
+					ModuleBase::WARNING_QUIT("gga_pw","igcc_is_lyp is not available now.");
 				}
 				else
 				{

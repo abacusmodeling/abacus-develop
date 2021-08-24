@@ -13,7 +13,7 @@ ELEC_cbands_gamma::~ELEC_cbands_gamma(){};
 
 void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 {
-	TITLE("ELEC_cbands_gamma","cal_bands");
+	ModuleBase::TITLE("ELEC_cbands_gamma","cal_bands");
 	ModuleBase::timer::tick("ELEC_cband_gamma","cal_bands");
 
 	assert(GlobalV::NSPIN == GlobalC::kv.nks);
@@ -38,7 +38,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		
 		if(!uhm.init_s)
     	{
-    	    WARNING_QUIT("Hamilt_Linear::solve_using_cg","Need init S matrix firstly");
+    	    ModuleBase::WARNING_QUIT("Hamilt_Linear::solve_using_cg","Need init S matrix firstly");
     	}
 
 		//--------------------------------------------
@@ -90,7 +90,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 			GlobalV::ofs_running << " no diagonalization." << std::endl;
 #else
 			std::cout << " DCOLOR=" << GlobalV::DCOLOR << std::endl;
-			WARNING_QUIT("ELEC_cbands_gamma::cal_bands","no diagonalization");
+			ModuleBase::WARNING_QUIT("ELEC_cbands_gamma::cal_bands","no diagonalization");
 #endif
 
 		}

@@ -21,7 +21,7 @@ double atom_arrange::set_sr_NL(
 	const double &rcutmax_Beta, 
 	const bool gamma_only_local)
 {
-	TITLE("atom_arrange","set_sr_NL");
+	ModuleBase::TITLE("atom_arrange","set_sr_NL");
 
 	if(output_level != "m") //xiaohui add 'output_level', 2015-09-16
 	{
@@ -69,7 +69,7 @@ double atom_arrange::set_sr_NL(
 // mohan update 2011-03-10
 void atom_arrange::set_sr_OV(void)
 {
-	TITLE("atom_arrange","set_sr_OV");
+	ModuleBase::TITLE("atom_arrange","set_sr_OV");
 	double longest_orb_rcut = 0.0;
 	for(int it=0; it<ucell.ntype; it++)
 	{
@@ -95,7 +95,7 @@ void atom_arrange::search(
 	const int &test_atom_in,
 	const bool test_only)
 {
-	TITLE("atom_arrange", "search");
+	ModuleBase::TITLE("atom_arrange", "search");
 	ModuleBase::timer::tick("atom_arrange","search");
 
 	assert( search_radius_bohr > 0.0 );

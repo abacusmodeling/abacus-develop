@@ -12,7 +12,7 @@ Driver_classic::~Driver_classic(){}
 
 void Driver_classic::init()
 {
-	TITLE("Driver_classic", "init");
+	ModuleBase::TITLE("Driver_classic", "init");
 
 	time_t time_start = std::time(NULL);
 	ModuleBase::timer::start();
@@ -51,7 +51,7 @@ void Driver_classic::reading(void)
 
 void Driver_classic::convert(UnitCell_pseudo &ucell_c)
 {
-    TITLE("Driver_classic","convert");
+    ModuleBase::TITLE("Driver_classic","convert");
 	ModuleBase::timer::tick("Driver_classic","convert");
 
     if(INPUT.atom_file!="") GlobalV::global_atom_card = INPUT.atom_file;
@@ -78,7 +78,7 @@ void Driver_classic::convert(UnitCell_pseudo &ucell_c)
 
 void Driver_classic::classic_world(void)
 {
-	TITLE("Driver_classic", "classic_world");
+	ModuleBase::TITLE("Driver_classic", "classic_world");
 
 	Run_MD_CLASSIC run_md_classic;
 
@@ -86,7 +86,7 @@ void Driver_classic::classic_world(void)
 
 	if(GlobalV::CALCULATION != "md")
 	{
-		WARNING_QUIT("Driver_classic::classic_world","CALCULATION must be md!");
+		ModuleBase::WARNING_QUIT("Driver_classic::classic_world","CALCULATION must be md!");
 	}
 
     run_md_classic.classic_md_line();

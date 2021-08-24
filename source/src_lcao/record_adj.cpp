@@ -29,7 +29,7 @@ void Record_adj::delete_grid(void)
 #include "LCAO_nnr.h"
 void Record_adj::for_2d(void)
 {
-	TITLE("Record_adj","for_2d");
+	ModuleBase::TITLE("Record_adj","for_2d");
 	ModuleBase::timer::tick("Record_adj","for_2d");
 
 	assert(GlobalC::ucell.nat>0);
@@ -227,7 +227,7 @@ void Record_adj::for_2d(void)
 //--------------------------------------------
 void Record_adj::for_grid(const Grid_Technique &gt)
 {
-    TITLE("Record_adj","for_grid");
+    ModuleBase::TITLE("Record_adj","for_grid");
 	ModuleBase::timer::tick("Record_adj","for_grid");
 	
 	Vector3<double> tau1, tau2, dtau;

@@ -199,7 +199,7 @@ void Symmetry_Basic::atom_ordering(double *posi, const int natom, int *subindex)
 
 void Symmetry_Basic::order_y(double *pos1, const int &oldpos1, const int &newpos1)
 {
-//	TITLE("Symmetry_Basic","order_y");
+//	ModuleBase::TITLE("Symmetry_Basic","order_y");
 	// how many atoms need to be reordered according to same x value.
 	const int nat1 = newpos1 - oldpos1;
 //	std::cout << "\n nat1=" << nat1 << std::endl; 
@@ -256,7 +256,7 @@ void Symmetry_Basic::order_y(double *pos1, const int &oldpos1, const int &newpos
 
 void Symmetry_Basic::order_z(double* pos2, const int &oldpos2, const int &newpos2)
 {
-//	TITLE("Symmetry_Basic","order_z");
+//	ModuleBase::TITLE("Symmetry_Basic","order_z");
 	const int nat2 = newpos2 - oldpos2;
 //	std::cout << "\n nat2=" << nat2; 
 //	if(nat2==1) return;
@@ -706,7 +706,7 @@ void Symmetry_Basic::matrigen(Matrix3 *symgen, const int ngen, Matrix3* symop, i
 //--------------------------------------------------------------
 void Symmetry_Basic::setgroup(Matrix3* symop, int &nop, const int &ibrav)
 {
-	if(GlobalV::test_symmetry) TITLE("Symmetry_Basic","setgroup");
+	if(GlobalV::test_symmetry) ModuleBase::TITLE("Symmetry_Basic","setgroup");
 
 	Matrix3 symgen[3];
 
@@ -854,7 +854,7 @@ void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, std::string &pgn
 
 	//there are four trivial cases which could be easily determined
 	//because the number of their elements are exclusive
-	if(GlobalV::test_symmetry) TITLE("Symmetry_Basic","pointgroup");
+	if(GlobalV::test_symmetry) ModuleBase::TITLE("Symmetry_Basic","pointgroup");
 
 	if(nrot == 1)
 	{

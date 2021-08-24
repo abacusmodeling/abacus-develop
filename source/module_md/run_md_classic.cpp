@@ -29,7 +29,7 @@ Run_MD_CLASSIC::~Run_MD_CLASSIC()
 
 void Run_MD_CLASSIC::classic_md_line(void)
 {
-	TITLE("Run_MD_CLASSIC", "classic_md_line");
+	ModuleBase::TITLE("Run_MD_CLASSIC", "classic_md_line");
     ModuleBase::timer::tick("Run_MD_CLASSIC", "classic_md_line");
 
 	// Setup the unitcell.
@@ -69,7 +69,7 @@ void Run_MD_CLASSIC::classic_md_line(void)
         }
         else
         {
-            WARNING_QUIT("md_cells_classic", "mdtype should be -1~2!");
+            ModuleBase::WARNING_QUIT("md_cells_classic", "mdtype should be -1~2!");
         }
 
         time_t fend = time(NULL);
@@ -90,7 +90,7 @@ void Run_MD_CLASSIC::classic_md_line(void)
 
 void Run_MD_CLASSIC::md_force_stress(double &potential)
 {
-	TITLE("Run_MD_CLASSIC", "md_force_stress");
+	ModuleBase::TITLE("Run_MD_CLASSIC", "md_force_stress");
     ModuleBase::timer::tick("Run_MD_CLASSIC", "md_force_stress");
 
 	if(INPUT.mdp.md_potential == "LJ")
@@ -130,11 +130,11 @@ void Run_MD_CLASSIC::md_force_stress(double &potential)
 	}
 	else if(INPUT.mdp.md_potential == "FP")
 	{
-		WARNING_QUIT("md_force_stress", "FPMD is only available in integrated program or PW module ！");
+		ModuleBase::WARNING_QUIT("md_force_stress", "FPMD is only available in integrated program or PW module ！");
 	}
 	else
 	{
-		WARNING_QUIT("md_force_stress", "Unsupported MD potential ！");
+		ModuleBase::WARNING_QUIT("md_force_stress", "Unsupported MD potential ！");
 	}
 
 	ModuleBase::GlobalFunc::NEW_PART("   TOTAL-FORCE (eV/Angstrom)");

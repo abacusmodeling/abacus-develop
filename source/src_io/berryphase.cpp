@@ -23,7 +23,7 @@ void berryphase::get_occupation_bands()
 	occ_nbands = (int) occupied_bands;
 	if(occ_nbands > GlobalV::NBANDS) 
 	{
-		WARNING_QUIT("berryphase::get_occupation_bands","not enough bands for berryphase, increase band numbers.");
+		ModuleBase::WARNING_QUIT("berryphase::get_occupation_bands","not enough bands for berryphase, increase band numbers.");
 	}
 	//GlobalV::ofs_running << "the berryphase's occ_nbands is " << occ_nbands << std::endl;
 }
@@ -31,7 +31,7 @@ void berryphase::get_occupation_bands()
 void berryphase::lcao_init()
 {
 	#ifdef __LCAO
-	TITLE("berryphase","lcao_init");
+	ModuleBase::TITLE("berryphase","lcao_init");
 	lcao_method.init();
 	lcao_method.cal_R_number();
 	lcao_method.cal_orb_overlap();
@@ -42,7 +42,7 @@ void berryphase::lcao_init()
 // this routine 依赖于 kpoint的mp生成方式
 void berryphase::set_kpoints(const int direction)
 {
-	TITLE("berryphase","set_kpoints");
+	ModuleBase::TITLE("berryphase","set_kpoints");
 
 	const int mp_x = GlobalC::kv.nmp[0]; // x,y,z方向k点的数目
 	const int mp_y = GlobalC::kv.nmp[1];

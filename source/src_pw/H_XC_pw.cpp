@@ -14,13 +14,13 @@ std::tuple<double,double,ModuleBase::matrix> H_XC_pw::v_xc
     const double*const*const rho_in,
 	const double*const rho_core) // core charge density
 {
-    TITLE("H_XC_pw","v_xc");
+    ModuleBase::TITLE("H_XC_pw","v_xc");
     ModuleBase::timer::tick("H_XC_pw","v_xc");
 
 	#ifndef USE_LIBXC
 	if(GlobalV::DFT_META)
 	{
-		WARNING_QUIT("Potential::v_of_rho","to use metaGGA, please link LIBXC");
+		ModuleBase::WARNING_QUIT("Potential::v_of_rho","to use metaGGA, please link LIBXC");
 	}
 	#endif
     //Exchange-Correlation potential Vxc(r) from n(r)

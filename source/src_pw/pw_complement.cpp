@@ -9,10 +9,10 @@ int PW_complement::get_total_pw_number(
     const int& nz,
     const Matrix3& GGT)
 {
-    if (GlobalV::test_pw) TITLE("PW_complement","get_total_pw_number");
+    if (GlobalV::test_pw) ModuleBase::TITLE("PW_complement","get_total_pw_number");
     if (ggcut_end<=0.0)
     {
-        WARNING_QUIT("PW_complement::get_total_pw_number","ggcut <= 0.0");
+        ModuleBase::WARNING_QUIT("PW_complement::get_total_pw_number","ggcut <= 0.0");
     }
     // First, figure out the number of G-vectors within the cutoff G2max.
     int ibox[3]={0,0,0};
@@ -58,11 +58,11 @@ void PW_complement::get_total_pw(
     int& ngm// number of total plane waves.
 )
 {
-    if (GlobalV::test_pw) TITLE("PW_complement","get_total_pw");
+    if (GlobalV::test_pw) ModuleBase::TITLE("PW_complement","get_total_pw");
     ModuleBase::timer::tick("PW_complement","get_total_pw");
     if (ggcut_end<=0.0)
     {
-        WARNING_QUIT("PW_complement::get_total_pw","ggcut <= 0.0");
+        ModuleBase::WARNING_QUIT("PW_complement::get_total_pw","ggcut <= 0.0");
     }
     // First, figure out the number of G-vectors within the cutoff G2max.
     int ibox[3]={0,0,0};
@@ -112,7 +112,7 @@ void PW_complement::get_FFT_dimension(
 	const int &by,
 	const int &bz)
 {
-    if (GlobalV::test_pw) TITLE("PW_complement","get_FFT_dimension");
+    if (GlobalV::test_pw) ModuleBase::TITLE("PW_complement","get_FFT_dimension");
     // read in the FFT dimension (Nx, Ny, Nz) from INPUT,
     // if Nx*Ny*Nz >0,use the input
     // FFT grid, otherwise generate the FFT grid in the code.
@@ -238,7 +238,7 @@ void PW_complement::setup_GVectors(
     Vector3<double>* ig,
     Vector3<double>* g)
 {
-    if (GlobalV::test_pw) TITLE("PW_complement","setup_GVectors");
+    if (GlobalV::test_pw) ModuleBase::TITLE("PW_complement","setup_GVectors");
     ModuleBase::timer::tick("PW_complement","setup_GVectors");
 
     int *ind = new int[ngmc_g_in];// auxiliary array for the 1d G std::vector index
@@ -338,7 +338,7 @@ void PW_complement::get_ig2fftw(const int &ngmw, const int &nx, const int &ny, c
     // establish the mapping between 1d array and the FFT box.for wfc
     //=====================================================================
     // firt , get ngmw = number of plane waves for wave functions.
-    if (GlobalV::test_pw) TITLE("PW_complement","get_ig2fftw");
+    if (GlobalV::test_pw) ModuleBase::TITLE("PW_complement","get_ig2fftw");
 
     for (int ig=0; ig<ngmw; ig++)
     {
@@ -361,7 +361,7 @@ void PW_complement::get_ig2fftc(const int &ngmc, const int &ncx, const int &ncy,
     //=================================================================
     // set ig2fftc & ig2fftw with the correct fft correspondence
     //=================================================================
-    if (GlobalV::test_pw) TITLE("PW_Basis","get_ig2fftc");
+    if (GlobalV::test_pw) ModuleBase::TITLE("PW_Basis","get_ig2fftc");
     // see ggen.f90, set ig2fftc ith the correct fft correspondence Page 4/6
 
     ModuleBase::GlobalFunc::ZEROS(ig2fftc, ngmc);
@@ -407,11 +407,11 @@ void PW_complement::get_total_pw_after_vc(
         int& ngm// number of total plane waves.
 )
 {
-    if (GlobalV::test_pw) TITLE("PW_complement","get_total_pw");
+    if (GlobalV::test_pw) ModuleBase::TITLE("PW_complement","get_total_pw");
     ModuleBase::timer::tick("PW_complement","get_total_pw");
     if (ggcut_end<=0.0)
     {
-        WARNING_QUIT("PW_complement::get_total_pw","ggcut <= 0.0");
+        ModuleBase::WARNING_QUIT("PW_complement::get_total_pw","ggcut <= 0.0");
     }
 
     int ibox[3]={0,0,0};

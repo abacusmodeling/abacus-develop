@@ -19,7 +19,7 @@ Forces::~Forces() {}
 #include "efield.h"
 void Forces::init(ModuleBase::matrix& force)
 {
-	TITLE("Forces", "init");
+	ModuleBase::TITLE("Forces", "init");
 	this->nat = GlobalC::ucell.nat;
 	force.create(nat, 3);
 	
@@ -433,7 +433,7 @@ void Forces::cal_force_ew(ModuleBase::matrix& forceion)
 
         if (alpha <= 0.0)
         {
-            WARNING_QUIT("ewald","Can't find optimal alpha.");
+            ModuleBase::WARNING_QUIT("ewald","Can't find optimal alpha.");
         }
         upperbound = 2.0 * charge * charge * sqrt(2.0 * alpha / TWO_PI) *
                      erfc(sqrt(GlobalC::ucell.tpiba2 * GlobalC::pw.ggchg / 4.0 / alpha));
@@ -656,7 +656,7 @@ void Forces::cal_force_cc(ModuleBase::matrix& forcecc)
 
 void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
 {
-	TITLE("Forces","cal_force_nl");
+	ModuleBase::TITLE("Forces","cal_force_nl");
 	ModuleBase::timer::tick("Forces","cal_force_nl");
 
     const int nkb = GlobalC::ppcell.nkb;

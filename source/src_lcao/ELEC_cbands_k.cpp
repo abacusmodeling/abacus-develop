@@ -12,7 +12,7 @@ ELEC_cbands_k::~ELEC_cbands_k(){};
 
 void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 {
-	TITLE("ELEC_cbands_k","cal_bands");
+	ModuleBase::TITLE("ELEC_cbands_k","cal_bands");
 	ModuleBase::timer::tick("ELEC_cbands_k","cal_bands");
 
 	int start_spin = -1;
@@ -74,7 +74,7 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 
 		if(!uhm.init_s)
     	{
-    	    WARNING_QUIT("Hamilt_Linear::solve_using_cg","Need init S matrix firstly");
+    	    ModuleBase::WARNING_QUIT("Hamilt_Linear::solve_using_cg","Need init S matrix firstly");
     	}
 
 		//--------------------------------------------

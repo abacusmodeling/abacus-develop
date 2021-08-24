@@ -57,7 +57,7 @@ void OUT(std::ofstream &ofs,const std::string &name)
 //==========================================================
 void MAKE_DIR(const std::string &fn)
 {
-//	TITLE("global_function","MAKE_DIR");
+//	ModuleBase::TITLE("global_function","MAKE_DIR");
     if (GlobalV::MY_RANK==0)
     {
         std::stringstream ss;
@@ -67,7 +67,7 @@ void MAKE_DIR(const std::string &fn)
 //----------------------------------------------------------
         if ( system( ss.str().c_str() ) )
         {
-            WARNING_QUIT( "MAKE_DIR", fn );
+            ModuleBase::WARNING_QUIT( "MAKE_DIR", fn );
         }
     }
 #ifdef __MPI
@@ -212,7 +212,7 @@ void BLOCK_HERE( const std::string &description)
 	}
 	else
 	{
-		QUIT();
+		ModuleBase::QUIT();
 	}
 }
 

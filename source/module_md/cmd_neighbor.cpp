@@ -41,7 +41,7 @@ Vector3<double> CMD_neighbor::cell_periodic(const Vector3<double> a, const Vecto
 //build the neighbor list
 void CMD_neighbor::neighbor(UnitCell_pseudo &ucell_c)
 {
-    TITLE("CMD_neighbor", "Neighbor");
+    ModuleBase::TITLE("CMD_neighbor", "Neighbor");
     ModuleBase::timer::tick("CMD_neighbor", "Neighbor");
 
     delete[] nlist;

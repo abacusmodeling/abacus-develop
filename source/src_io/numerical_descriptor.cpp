@@ -23,7 +23,7 @@ Numerical_Descriptor::~Numerical_Descriptor()
 
 void Numerical_Descriptor::output_descriptor(const ModuleBase::ComplexMatrix *psi, const int &lmax_in)
 {
-	TITLE("Numerical_Descriptor","output_descriptor");
+	ModuleBase::TITLE("Numerical_Descriptor","output_descriptor");
 	ModuleBase::GlobalFunc::NEW_PART("DeepKS descriptor: D_{Inl}");
 
 	//-----------------------------------
@@ -233,7 +233,7 @@ void Numerical_Descriptor::jlq3d_overlap(
     const int &np,
     const ModuleBase::ComplexMatrix &psi)
 {
-    TITLE("Numerical_Descriptor","jlq3d_overlap");
+    ModuleBase::TITLE("Numerical_Descriptor","jlq3d_overlap");
     ModuleBase::timer::tick("Numerical_Descriptor","jlq3d_overlap");
 
 	GlobalV::ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS AND BLOCH WAVE FUNCTIONS" << std::endl;

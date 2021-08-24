@@ -9,7 +9,7 @@ Grid_Driver::Grid_Driver(
 test_grid_driver(test_gd_in),
 Grid(test_grid_in)
 {
-	//	TITLE("Grid_Driver","Grid_Driver");
+	//	ModuleBase::TITLE("Grid_Driver","Grid_Driver");
 }
 
 Grid_Driver::~Grid_Driver()
@@ -23,7 +23,7 @@ void Grid_Driver::Find_atom(
 	const int &ntype, 
 	const int &nnumber)
 {
-	//if (test_grid_driver) TITLE(GlobalV::ofs_running, "Grid_Driver", "Find_atom");
+	//if (test_grid_driver) ModuleBase::TITLE(GlobalV::ofs_running, "Grid_Driver", "Find_atom");
 	ModuleBase::timer::tick("Grid_Driver","Find_atom");
 
 	if (test_grid_driver > 1)
@@ -56,7 +56,7 @@ int Grid_Driver::Locate_offset(
 	const int &ntype, 
 	const int &nnumber)const
 {
-//	if (test_grid_driver) TITLE(GlobalV::ofs_running, "Grid_Driver", "Locate_offset");
+//	if (test_grid_driver) ModuleBase::TITLE(GlobalV::ofs_running, "Grid_Driver", "Locate_offset");
 
 //----------------------------------------------------------
 // EXPLAIN : Create an AtomLink object
@@ -92,7 +92,7 @@ int Grid_Driver::Locate_offset(
 	// Peize Lin update 2019-05-01
 	// throw std::runtime_error("Locate_Atom wrong. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 	// mohan update 2021-06-21
-	WARNING_QUIT("Locate_Atom", "something wrong!");
+	ModuleBase::WARNING_QUIT("Locate_Atom", "something wrong!");
 
 	return 0; //meaningless mohan add 2021-06-21
 
@@ -100,7 +100,7 @@ int Grid_Driver::Locate_offset(
 
 void Grid_Driver::Find_adjacent_atom(const int offset, std::shared_ptr<AdjacentSet> as)
 {
-//	if (test_grid_driver) TITLE(GlobalV::ofs_running, "Grid_Driver", "Find_adjacent_atom");
+//	if (test_grid_driver) ModuleBase::TITLE(GlobalV::ofs_running, "Grid_Driver", "Find_adjacent_atom");
 
 //----------------------------------------------------------
 // CALL OTHER CLASS MEMBER FUNCTION :
