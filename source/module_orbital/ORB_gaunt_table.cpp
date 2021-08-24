@@ -358,7 +358,7 @@ double ORB_gaunt_table::Get_Gaunt_CH
 	int ic2 = M2 + L2;
 
 	try{ return Gaunt_CH.at(ic1).at(ic2); }			// Peize Lin add 2016-08-26
-	catch( out_of_range ){ return 0; }
+	catch( std::out_of_range ){ return 0; }
 }
 	
 
