@@ -16,7 +16,6 @@ list(APPEND objects
     energy.cpp
     forces.cpp
     global.cpp
-    hamilt_pw.cpp
     klist.cpp
     magnetism.cpp
     occupy.cpp
@@ -62,10 +61,13 @@ if(USE_CUDA)
     list(APPEND objects
         diago_cg_gpu.cu
         hamilt.cu
+        hamilt_pw_gpu.cu
+        use_fft_kernel.cu
     )
 else()
     list(APPEND objects
         hamilt.cpp
+        hamilt_pw.cpp
     )
 endif()
 

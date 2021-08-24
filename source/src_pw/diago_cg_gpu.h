@@ -1,6 +1,6 @@
 // #include "ft_gpu.h"
 // #include "tools.h"
-# ifndef DIAGO_CG_CPU_H
+# ifndef DIAGO_CG_GPU_H
 # define DIAGO_CG_GPU_H
 #include "cufft.h"
 #include "cublas_v2.h"

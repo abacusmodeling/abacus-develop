@@ -7,7 +7,6 @@
 #else
 #include "hamilt_pw.h"
 #endif
-
 class Hamilt
 {
 	public:
