@@ -13,12 +13,12 @@ project(ABACUS
 
 option(ENABLE_DEEPKS "Enable DeePKS functionality" OFF)
 option(ENABLE_LIBXC "Enable LibXC functionality" OFF)
+option(USE_CUDA "Enable support to CUDA." ON)
 
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 option(BUILD_UNIT_TESTS "Build ABACUS unit tests" OFF)
 option(GENERATE_TEST_REPORTS "Enable test report generation" OFF)
 
-option(USE_CUDA "Enable support to CUDA." OFF)
 
 
 include(CheckLanguage)
@@ -49,6 +49,7 @@ if(USE_CUDA)
   set(CMAKE_CUDA_HOST_COMPILER ${CMAKE_CXX_COMPILER})
   enable_language(CUDA)
   include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
+  add_compile_definitions(__CUDA)
 endif()
 
 

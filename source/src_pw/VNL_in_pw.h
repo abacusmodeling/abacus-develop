@@ -1,5 +1,5 @@
-#ifndef VNL_IN_PW_H 
-#define VNL_IN_PW_H 
+#ifndef VNL_IN_PW_H
+#define VNL_IN_PW_H
 
 #include "tools.h"
 #include "VL_in_pw.h"
@@ -35,13 +35,13 @@ public:
 
     double cell_factor; //LiuXh add 20180619
 
-	int nkb; // total number of beta functions considering all atoms 
+	int nkb; // total number of beta functions considering all atoms
 
 	int lmaxkb; // max angular momentum for non-local projectors
 
 	void init_vnl(UnitCell_pseudo &cell);
 
-private:
+
 
 	void getvnl(const int &ik);
 
@@ -57,7 +57,7 @@ private:
 // NAME : lmaxq
 // NAME : dq(space between points in the pseudopotential tab)
 //===============================================================
-
+// private:
 	int calculate_nqx(const double &ecutwfc,const double &dq);
 
 	int nhm;
@@ -84,7 +84,7 @@ private:
 	ComplexMatrix vkb;	// all beta functions in reciprocal space
 	std::complex<double> ***vkb1_alpha;
 	std::complex<double> ***vkb_alpha;
-	
+
 	// other variables
 	std::complex<double> Cal_C(int alpha, int lu, int mu, int L, int M);
 
@@ -96,4 +96,4 @@ private:
 	#endif
 };
 
-#endif // VNL_IN_PW 
+#endif // VNL_IN_PW

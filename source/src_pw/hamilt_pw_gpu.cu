@@ -485,7 +485,7 @@ void Hamilt_PW::h_psi(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, const in
             // ZEROS( UFFT.porter, pw.nrxx);
             cudaMemset(d_porter, 0, GlobalC::pw.nrxx * sizeof(CUFFT_COMPLEX));
 
-            GlobalC::UFFT.RoundTrip_GPU( tmpsi_in, d_vr_eff1, GR_index, d_porter );
+            GlobalC::UFFT.RoundTrip( tmpsi_in, d_vr_eff1, GR_index, d_porter );
 
             // for (j = 0;j < wf.npw;j++)
             // {
