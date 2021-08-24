@@ -54,9 +54,9 @@ __global__ void kernel_addpp(CUFFT_COMPLEX *ps, double *deeq, const CUFFT_COMPLE
 }
 
 
-int Hamilt_PW_GPU::moved = 0;
+int Hamilt_PW::moved = 0;
 
-Hamilt_PW_GPU::Hamilt_PW_GPU()
+Hamilt_PW::Hamilt_PW()
 {
     // hpsi = new complex<double>[1];
     // spsi = new complex<double>[1];
@@ -65,7 +65,7 @@ Hamilt_PW_GPU::Hamilt_PW_GPU()
     cudaMalloc((void**)&GR_index, sizeof(int)); // Only use this member now.
 }
 
-Hamilt_PW_GPU::~Hamilt_PW_GPU()
+Hamilt_PW::~Hamilt_PW()
 {
     // delete[] hpsi;
     // delete[] spsi;
@@ -75,7 +75,7 @@ Hamilt_PW_GPU::~Hamilt_PW_GPU()
 }
 
 
-void Hamilt_PW_GPU::allocate(
+void Hamilt_PW::allocate(
 	const int &npwx, 
 	const int &npol, 
 	const int &nkb, 
@@ -107,7 +107,7 @@ void Hamilt_PW_GPU::allocate(
 }
 
 
-void Hamilt_PW_GPU::init_k(const int ik)
+void Hamilt_PW::init_k(const int ik)
 {
     TITLE("Hamilt_PW_GPU","init_k");	
 	// mohan add 2010-09-30
@@ -147,17 +147,238 @@ void Hamilt_PW_GPU::init_k(const int ik)
     // cout<<"init_K"<<endl;
     cudaMemcpy(this->GR_index, GR_index_tmp, GlobalC::pw.nrxx*sizeof(int), cudaMemcpyHostToDevice);
     delete [] GR_index_tmp;
+
+    // (7) ik
+	GlobalV::CURRENT_K = ik;
+
     return;
 }
 
-void Hamilt_PW_GPU::s_1psi(const int dim, const CUFFT_COMPLEX *psi, CUFFT_COMPLEX *spsi)
+
+//----------------------------------------------------------------------
+// Hamiltonian diagonalization in the subspace spanned
+// by nstart states psi (atomic or random wavefunctions).
+// Produces on output n_band eigenvectors (n_band <= nstart) in evc.
+//----------------------------------------------------------------------
+void Hamilt_PW::diagH_subspace(
+    const int ik,
+    const int nstart,
+    const int n_band,
+    const ComplexMatrix &psi,
+    ComplexMatrix &evc,
+    double *en)
 {
-    cudaMemcpy(spsi, psi, dim*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice);
+    TITLE("Hamilt_PW","diagH_subspace");
+    timer::tick("Hamilt_PW","diagH_subspace");
+
+	assert(nstart!=0);
+	assert(n_band!=0);
+
+    ComplexMatrix hc(nstart, nstart);
+    ComplexMatrix sc(nstart, nstart);
+    ComplexMatrix hvec(nstart,n_band);
+
+	int dmin=0;
+	int dmax=0;
+	const int npw = GlobalC::kv.ngk[ik];
+
+	if(GlobalV::NSPIN != 4)
+	{
+		dmin= npw;
+		dmax = GlobalC::wf.npwx;
+	}
+	else
+	{
+		dmin = GlobalC::wf.npwx*GlobalV::NPOL;
+		dmax = GlobalC::wf.npwx*GlobalV::NPOL;
+	}
+
+	//qianrui improve this part 2021-3-14
+	std::complex<double> *aux=new std::complex<double> [dmax*nstart];
+	std::complex<double> *paux = aux;
+	std::complex<double> *ppsi = psi.c;
+
+	//qianrui replace it
+	this->h_psi(psi.c, aux, nstart);
+
+	char trans1 = 'C';
+	char trans2 = 'N';
+	zgemm_(&trans1,&trans2,&nstart,&nstart,&dmin,&ONE,psi.c,&dmax,aux,&dmax,&ZERO,hc.c,&nstart);
+	hc=transpose(hc,false);
+
+	zgemm_(&trans1,&trans2,&nstart,&nstart,&dmin,&ONE,psi.c,&dmax,psi.c,&dmax,&ZERO,sc.c,&nstart);
+	sc=transpose(sc,false);
+
+	delete []aux;
+
+	// Peize Lin add 2019-03-09
+#ifdef __LCAO
+	if(GlobalV::BASIS_TYPE=="lcao_in_pw")
+	{
+		auto add_Hexx = [&](const double alpha)
+		{
+			for (int m=0; m<nstart; ++m)
+			{
+				for (int n=0; n<nstart; ++n)
+				{
+					hc(m,n) += alpha * GlobalC::exx_lip.get_exx_matrix()[ik][m][n];
+				}
+			}
+		};
+		if( 5==GlobalC::xcf.iexch_now && 0==GlobalC::xcf.igcx_now )				// HF
+		{
+			add_Hexx(1);
+		}
+		else if( 6==GlobalC::xcf.iexch_now && 8==GlobalC::xcf.igcx_now )			// PBE0
+		{
+			add_Hexx(GlobalC::exx_global.info.hybrid_alpha);
+		}
+		else if( 9==GlobalC::xcf.iexch_now && 12==GlobalC::xcf.igcx_now )			// HSE
+		{
+			add_Hexx(GlobalC::exx_global.info.hybrid_alpha);
+		}
+	}
+#endif
+
+	if(GlobalV::NPROC_IN_POOL>1)
+	{
+		Parallel_Reduce::reduce_complex_double_pool( hc.c, nstart*nstart );
+		Parallel_Reduce::reduce_complex_double_pool( sc.c, nstart*nstart );
+	}
+
+	// after generation of H and S matrix, diag them
+    GlobalC::hm.diagH_LAPACK(nstart, n_band, hc, sc, nstart, en, hvec);
+
+
+	// Peize Lin add 2019-03-09
+#ifdef __LCAO
+	if("lcao_in_pw"==GlobalV::BASIS_TYPE)
+	{
+		switch(GlobalC::exx_global.info.hybrid_type)
+		{
+			case Exx_Global::Hybrid_Type::HF:
+			case Exx_Global::Hybrid_Type::PBE0:
+			case Exx_Global::Hybrid_Type::HSE:
+				GlobalC::exx_lip.k_pack->hvec_array[ik] = hvec;
+				break;
+		}
+	}
+#endif
+
+    //=======================
+    //diagonize the H-matrix
+    //=======================
+
+// for tests
+/*
+		std::cout << std::setprecision(3);
+		out.printV3(GlobalV::ofs_running,GlobalC::kv.kvec_c[ik]);
+		out.printcm_norm("sc",sc,1.0e-4);
+		out.printcm_norm("hvec",hvec,1.0e-4);
+		out.printcm_norm("hc",hc,1.0e-4);
+		std::cout << std::endl;
+*/
+
+	std::cout << std::setprecision(5);
+
+//--------------------------
+// KEEP THIS BLOCK FOR TESTS
+//--------------------------
+/*
+	std::cout << "  hc matrix" << std::endl;
+	for(int i=0; i<GlobalV::NLOCAL; i++)
+	{
+		for(int j=0; j<GlobalV::NLOCAL; j++)
+		{
+			double a = hc(i,j).real();
+			if(abs(a) < 1.0e-5) a = 0;
+			std::cout << std::setw(6) << a;
+		}
+		std::cout << std::endl;
+	}
+
+	std::cout << "  sc matrix" << std::endl;
+	for(int i=0; i<GlobalV::NLOCAL; i++)
+	{
+		for(int j=0; j<GlobalV::NLOCAL; j++)
+		{
+			double a = sc(i,j).real();
+			if(abs(a) < 1.0e-5) a = 0;
+			std::cout << std::setw(6) << a;
+		}
+		std::cout << std::endl;
+	}
+
+	std::cout << "\n Band Energy" << std::endl;
+	for(int i=0; i<GlobalV::NBANDS; i++)
+	{
+		std::cout << " e[" << i+1 << "]=" << en[i] * Ry_to_eV << std::endl;
+	}
+*/
+//--------------------------
+// KEEP THIS BLOCK FOR TESTS
+//--------------------------
+
+
+	if((GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") && GlobalV::CALCULATION=="nscf" && !Optical::opt_epsilon2)
+	{
+		GlobalV::ofs_running << " Not do zgemm to get evc." << std::endl;
+	}
+	else if((GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw")
+		&& ( GlobalV::CALCULATION == "scf" || GlobalV::CALCULATION == "md" || GlobalV::CALCULATION == "relax")) //pengfei 2014-10-13
+	{
+		// because psi and evc are different here,
+		// I think if psi and evc are the same,
+		// there may be problems, mohan 2011-01-01
+		char transa = 'N';
+		char transb = 'T';
+		zgemm_( &transa,
+				&transb,
+				&dmax, // m: row of A,C
+				&n_band, // n: col of B,C
+				&nstart, // k: col of A, row of B
+				&ONE, // alpha
+				psi.c, // A
+				&dmax, // LDA: if(N) max(1,m) if(T) max(1,k)
+				hvec.c, // B
+				&n_band, // LDB: if(N) max(1,k) if(T) max(1,n)
+				&ZERO,  // belta
+				evc.c, // C
+				&dmax ); // LDC: if(N) max(1, m)
+	}
+	else
+	{
+		// As the evc and psi may refer to the same matrix, we first
+		// create a temporary matrix to story the result. (by wangjp)
+		// qianrui improve this part 2021-3-13
+		char transa = 'N';
+		char transb = 'T';
+		ComplexMatrix evctmp(n_band, dmin,false);
+		zgemm_(&transa,&transb,&dmin,&n_band,&nstart,&ONE,psi.c,&dmax,hvec.c,&n_band,&ZERO,evctmp.c,&dmin);
+		for(int ib=0; ib<n_band; ib++)
+		{
+			for(int ig=0; ig<dmin; ig++)
+			{
+				evc(ib,ig) = evctmp(ib,ig);
+			}
+		}
+	}
+    //out.printr1_d("en",en,n_band);
+
+//	std::cout << "\n bands" << std::endl;
+//	for(int ib=0; ib<n_band; ib++)
+//	{
+//		std::cout << " ib=" << ib << " " << en[ib] * Ry_to_eV << std::endl;
+//	}
+
+    //out.printcm_norm("hvec",hvec,1.0e-8);
+
+    timer::tick("Hamilt_PW","diagH_subspace");
     return;
 }
 
-void Hamilt_PW_GPU::h_1psi( const int npw_in, const CUFFT_COMPLEX *psi,
-            CUFFT_COMPLEX *hpsi, CUFFT_COMPLEX *spsi)
+void Hamilt_PW::h_1psi( const int npw_in, const CUFFT_COMPLEX *psi,
+                        CUFFT_COMPLEX *hpsi, CUFFT_COMPLEX *spsi)
 {
     this->h_psi(psi, hpsi);
 
@@ -167,7 +388,13 @@ void Hamilt_PW_GPU::h_1psi( const int npw_in, const CUFFT_COMPLEX *psi,
     return;
 }
 
-void Hamilt_PW_GPU::h_psi(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, const int m)
+void Hamilt_PW::s_1psi(const int dim, const CUFFT_COMPLEX *psi, CUFFT_COMPLEX *spsi)
+{
+    cudaMemcpy(spsi, psi, dim*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice);
+    return;
+}
+
+void Hamilt_PW::h_psi(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, const int m)
 {
     timer::tick("Hamilt_PW_GPU","h_psi");
     // int i = 0;
@@ -335,7 +562,7 @@ void Hamilt_PW_GPU::h_psi(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, cons
             // delete [] hpsi_cpu;
             // delete [] becp_cpu;
 
-            this->add_nonlocal_pp_gpu(hpsi, becp, d_vkb_c, m);
+            this->add_nonlocal_pp(hpsi, becp, d_vkb_c, m);
 
             cublasDestroy(handle);
             cudaFree(becp);
@@ -346,151 +573,24 @@ void Hamilt_PW_GPU::h_psi(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, cons
     }
     
     timer::tick("Hamilt_PW_GPU","vnl");
+    
+    //------------------------------------
+	// (4) the metaGGA part
+	//------------------------------------
+    // TODO: add metaGGA part
+
     timer::tick("Hamilt_PW_GPU","h_psi");
     return;
 }
 
-void Hamilt_PW_GPU::add_nonlocal_pp(
-	complex<double> *hpsi_in,
-	const complex<double> *becp,
-	const int m)
-{
-    timer::tick("Hamilt_PW_GPU","add_nonlocal_pp");
 
-	// number of projectors
-	int nkb = GlobalC::ppcell.nkb;
-
-	complex<double> *ps  = new complex<double> [nkb * GlobalV::NPOL * m];
-    ZEROS(ps, GlobalV::NPOL * m * nkb);
-
-    int sum = 0;
-    int iat = 0;
-    if(GlobalV::NSPIN!=4)
-	{
-		for (int it=0; it<GlobalC::ucell.ntype; it++)
-		{
-			const int nproj = GlobalC::ucell.atoms[it].nh;
-			for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
-			{
-				// each atom has nproj, means this is with structure factor;
-				// each projector (each atom) must multiply coefficient
-				// with all the other projectors.
-				for (int ip=0; ip<nproj; ip++)
-				{
-                    for (int ip2=0; ip2<nproj; ip2++)
-                    {
-                        for(int ib = 0; ib < m ; ++ib)
-                        {
-                            ps[(sum + ip2) * m + ib] += 
-                            GlobalC::ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip, ip2) 
-                            * becp[ib * nkb + sum + ip];
-                        }//end ib
-                    }// end ih
-				}//end jh 
-				sum += nproj;
-				++iat;
-			} //end na
-		} //end nt
-	}
-	else
-	{
-		for (int it=0; it<GlobalC::ucell.ntype; it++)
-		{
-			int psind=0;
-			int becpind=0;
-			complex<double> becp1=complex<double>(0.0,0.0);
-			complex<double> becp2=complex<double>(0.0,0.0);
-
-			const int nproj = GlobalC::ucell.atoms[it].nh;
-			for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
-			{
-				// each atom has nproj, means this is with structure factor;
-				// each projector (each atom) must multiply coefficient
-				// with all the other projectors.
-
-				for (int ip=0; ip<nproj; ip++)
-				{
-					for (int ip2=0; ip2<nproj; ip2++)
-					{
-						for(int ib = 0; ib < m ; ++ib)
-						{
-							psind = (sum+ip2) * 2 * m + ib * 2;
-							becpind = ib*nkb*2 + sum + ip;
-							becp1 =  becp[becpind];
-							becp2 =  becp[becpind + nkb];
-							ps[psind] += GlobalC::ppcell.deeq_nc(0, iat, ip2, ip) * becp1
-								+GlobalC::ppcell.deeq_nc(1, iat, ip2, ip) * becp2;
-							ps[psind +1] += GlobalC::ppcell.deeq_nc(2, iat, ip2, ip) * becp1
-								+GlobalC::ppcell.deeq_nc(3, iat, ip2, ip) * becp2;
-						}//end ib
-					}// end ih
-				}//end jh
-				sum += nproj;
-				++iat;
-			} //end na
-		} //end nt
-	}
-
-	/*
-    for (int ig=0;ig<GlobalC::wf.npw;ig++)
-    {
-        for (int i=0;i< GlobalC::ppcell.nkb;i++)
-        {
-            hpsi_in[ig]+=ps[i]*GlobalC::ppcell.vkb(i,ig);
-        }
-    }
-	*/
-
-	// use simple method.
-	//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	//qianrui optimize 2021-3-31
-	char transa = 'N';
-	char transb = 'T';
-	if(GlobalV::NPOL==1 && m==1)
-	{
-		int inc = 1;
-		zgemv_(&transa, 
-			&GlobalC::wf.npw, 
-			&GlobalC::ppcell.nkb, 
-			&ONE, 
-			GlobalC::ppcell.vkb.c, 
-			&GlobalC::wf.npwx, 
-			ps, 
-			&inc, 
-			&ONE, 
-			hpsi_in, 
-			&inc);
-	}
-	else
-	{
-		int npm = GlobalV::NPOL*m;
-		zgemm_(&transa,
-			&transb,
-			&GlobalC::wf.npw,
-			&npm,
-			&GlobalC::ppcell.nkb,
-			&ONE,
-			GlobalC::ppcell.vkb.c,
-			&GlobalC::wf.npwx,
-			ps,
-			&npm,
-			&ONE,
-			hpsi_in,
-			&GlobalC::wf.npwx);
-	}
-
-	delete[] ps;
-    timer::tick("Hamilt_PW_GPU","add_nonlocal_pp");
-    return;
-}
-
-void Hamilt_PW_GPU::add_nonlocal_pp_gpu(
+void Hamilt_PW::add_nonlocal_pp(
 	CUFFT_COMPLEX *hpsi_in,
 	const CUFFT_COMPLEX *becp,
     const CUFFT_COMPLEX *d_vkb_c,
 	const int m)
 {
-    timer::tick("Hamilt_PW_GPU","add_nonlocal_pp_gpu");
+    timer::tick("Hamilt_PW_GPU","add_nonlocal_pp");
 
 	// number of projectors
 	int nkb = GlobalC::ppcell.nkb;
@@ -586,6 +686,6 @@ void Hamilt_PW_GPU::add_nonlocal_pp_gpu(
 
 	// delete[] ps;
     cudaFree(ps);
-    timer::tick("Hamilt_PW_GPU","add_nonlocal_pp_gpu");
+    timer::tick("Hamilt_PW_GPU","add_nonlocal_pp");
     return;
 }
