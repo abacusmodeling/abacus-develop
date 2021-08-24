@@ -1,6 +1,7 @@
 #include "run_md_classic.h"
 #include "MD_basic.h"
 #include "LJ_potential.h"
+#include "DP_potential.h"
 #include "cmd_neighbor.h"
 #include "../input.h"
 #include "../src_io/print_info.h"
@@ -28,22 +29,12 @@ Run_MD_CLASSIC::~Run_MD_CLASSIC()
 
 void Run_MD_CLASSIC::classic_md_line(void)
 {
+	TITLE("Run_MD_CLASSIC", "classic_md_line");
+    timer::tick("Run_MD_CLASSIC", "classic_md_line");
+
 	// Setup the unitcell.
     ucell_c.setup_cell_classic(GlobalV::global_atom_card, GlobalV::ofs_running, GlobalV::ofs_warning);
 	ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
-
-	//Print_Info PI;
-    //PI.setup_parameters();
-
-	this->md_cells_classic();
-
-	return;
-}
-
-void Run_MD_CLASSIC::md_cells_classic(void)
-{
-    TITLE("Run_MD_CLASSIC", "md_cells_classic");
-    timer::tick("Run_MD_CLASSIC", "md_cells_classic");
 
     this->md_allocate_ions();
 
@@ -53,7 +44,6 @@ void Run_MD_CLASSIC::md_cells_classic(void)
     this->istep = 1;
     bool stop = false;
 	double potential;
-	bool which_method = this->ucell_c.judge_big_cell();
 
     while (istep <= GlobalV::NSTEP && !stop)
     {
@@ -61,53 +51,7 @@ void Run_MD_CLASSIC::md_cells_classic(void)
 
         Print_Info::print_screen(0, 0, istep);
 
-		if(which_method)
-		{
-			CMD_neighbor cmd_neigh;
-			cmd_neigh.neighbor(this->ucell_c);
-
-			potential = LJ_potential::Lennard_Jones(
-								this->ucell_c,
-								cmd_neigh,
-								this->force);
-		}
-		else
-		{
-			Grid_Driver grid_neigh(GlobalV::test_deconstructor, GlobalV::test_grid_driver, GlobalV::test_grid);
-			atom_arrange::search(
-				GlobalV::SEARCH_PBC,
-				GlobalV::ofs_running,
-				grid_neigh,
-				this->ucell_c, 
-				GlobalV::SEARCH_RADIUS, 
-				GlobalV::test_atom_input,
-				INPUT.test_just_neighbor);
-
-			potential = LJ_potential::Lennard_Jones(
-								this->ucell_c,
-								grid_neigh,
-								this->force);
-		}
-
-		ModuleBase::GlobalFunc::NEW_PART("   TOTAL-FORCE (eV/Angstrom)");
-		GlobalV::ofs_running << std::endl;
-		GlobalV::ofs_running << " atom    x              y              z" << std::endl;
-		const double fac = Ry_to_eV*ANGSTROM_AU;
-		int iat = 0;
-		for(int it=0; it<ucell_c.ntype; ++it)
-		{
-			for(int ia=0; ia<ucell_c.atoms[it].na; ++ia)
-			{
-				std::stringstream ss;
-				ss << ucell_c.atoms[it].label << ia+1;
-				GlobalV::ofs_running << " " << std::left << std::setw(8) << ss.str()
-						  			<< std::setw(15) << std::setiosflags(ios::fixed) << std::setprecision(6) << force[iat].x*fac
-						  			<< std::setw(15) << std::setiosflags(ios::fixed) << std::setprecision(6) << force[iat].y*fac
-						  			<< std::setw(15) << std::setiosflags(ios::fixed) << std::setprecision(6) << force[iat].z*fac
-						  			<< std::endl;
-				iat++;
-			}
-		}
+		this->md_force_stress(potential);
 
 		this->update_pos_classic();
 
@@ -143,6 +87,79 @@ void Run_MD_CLASSIC::md_cells_classic(void)
     timer::tick("Run_MD_CLASSIC", "md_cells_classic");
     return;
 }
+
+void Run_MD_CLASSIC::md_force_stress(double &potential)
+{
+	TITLE("Run_MD_CLASSIC", "md_force_stress");
+    timer::tick("Run_MD_CLASSIC", "md_force_stress");
+
+	if(INPUT.mdp.md_potential == "LJ")
+	{
+		bool which_method = this->ucell_c.judge_big_cell();
+		if(which_method)
+		{
+			CMD_neighbor cmd_neigh;
+			cmd_neigh.neighbor(this->ucell_c);
+
+			potential = LJ_potential::Lennard_Jones(
+								this->ucell_c,
+								cmd_neigh,
+								this->force);
+		}
+		else
+		{
+			Grid_Driver grid_neigh(GlobalV::test_deconstructor, GlobalV::test_grid_driver, GlobalV::test_grid);
+			atom_arrange::search(
+					GlobalV::SEARCH_PBC,
+					GlobalV::ofs_running,
+					grid_neigh,
+					this->ucell_c, 
+					GlobalV::SEARCH_RADIUS, 
+					GlobalV::test_atom_input,
+					INPUT.test_just_neighbor);
+
+			potential = LJ_potential::Lennard_Jones(
+								this->ucell_c,
+								grid_neigh,
+								this->force);
+		}
+	}
+	else if(INPUT.mdp.md_potential == "DP")
+	{
+		DP_potential::DP_pot(ucell_c, potential, force, stress);
+	}
+	else if(INPUT.mdp.md_potential == "FP")
+	{
+		WARNING_QUIT("md_force_stress", "FPMD is only available in integrated program or PW module ！");
+	}
+	else
+	{
+		WARNING_QUIT("md_force_stress", "Unsupported MD potential ！");
+	}
+
+	ModuleBase::GlobalFunc::NEW_PART("   TOTAL-FORCE (eV/Angstrom)");
+	GlobalV::ofs_running << std::endl;
+	GlobalV::ofs_running << " atom    x              y              z" << std::endl;
+	const double fac = Ry_to_eV*ANGSTROM_AU;
+	int iat = 0;
+	for(int it=0; it<ucell_c.ntype; ++it)
+	{
+		for(int ia=0; ia<ucell_c.atoms[it].na; ++ia)
+		{
+			std::stringstream ss;
+			ss << ucell_c.atoms[it].label << ia+1;
+			GlobalV::ofs_running << " " << std::left << std::setw(8) << ss.str()
+						  		<< std::setw(15) << std::setiosflags(ios::fixed) << std::setprecision(6) << force[iat].x*fac
+						  		<< std::setw(15) << std::setiosflags(ios::fixed) << std::setprecision(6) << force[iat].y*fac
+						  		<< std::setw(15) << std::setiosflags(ios::fixed) << std::setprecision(6) << force[iat].z*fac
+						  		<< std::endl;
+			iat++;
+		}
+	}
+
+	timer::tick("Run_MD_CLASSIC", "md_force_stress");
+}
+
 
 void Run_MD_CLASSIC::md_allocate_ions(void)
 {

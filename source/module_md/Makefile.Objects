@@ -13,6 +13,7 @@ MD_func.o\
 MD_thermo.o\
 run_md_classic.o\
 LJ_potential.o\
+DP_potential.o\
 cmd_neighbor.o\
 
 OBJS_BASE=matrix3.o\

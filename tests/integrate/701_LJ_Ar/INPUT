@@ -6,6 +6,7 @@ calculation     md
 basis_type      pw
 nstep           1
 
+md_potential    LJ
 rcut_lj         8.5
 epsilon_lj      0.01062
 sigma_lj        3.360

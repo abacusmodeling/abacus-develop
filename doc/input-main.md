@@ -47,7 +47,7 @@
 
     - [Molecular dynamics](#molecular-dynamics)
 
-        [md_type](#md-type) | [md_rstmd](#md-rstmd) | [md_dt](#md-dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_dumpmdfred](#md-dumpmdfred) | [md_fixtemperature](#md-fixtemperature) | [NVT_control](#nvt-control) | [NVT_tau](#nvt-tau) | [MNHC](#mnhc) | [md_ediff](#md-ediff) | [md_ediffg](#md-ediffg) | [rcut_lj](#rcut_lj) | [epsilon_lj](#epsilon_lj) | [sigma_lj](#sigma_lj)
+        [md_type](#md-type) | [md_potential](#md-potential) | [md_rstmd](#md-rstmd) | [md_dt](#md-dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_dumpmdfred](#md-dumpmdfred) | [md_fixtemperature](#md-fixtemperature) | [NVT_control](#nvt-control) | [NVT_tau](#nvt-tau) | [MNHC](#mnhc) | [md_ediff](#md-ediff) | [md_ediffg](#md-ediffg) | [rcut_lj](#rcut_lj) | [epsilon_lj](#epsilon_lj) | [sigma_lj](#sigma_lj)
 
     - [VdW correction](#vdw-correction)
 
@@ -1064,6 +1064,17 @@ This part of variables are used to control the molecular dynamics calculations.
     - *Default*: 1
 
     [back to top](#input-file)
+
+- md_potential<a id="md-potential"></a>
+    - *Type*: String
+    - *Description*: choose the potential type.
+        - FP: First-Principles MD;
+        - LJ: Leonard Jones potential;
+        - DP: DeeP potential;
+    - *Default*: FP
+
+    [back to top](#input-file)
+
 - md_rstmd<a id="md-rstmd"></a>
     - *Type*: Bool
     - *Description*: to control whether restart md.
