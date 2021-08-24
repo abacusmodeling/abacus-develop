@@ -1,4 +1,4 @@
-#include "use_fft_kernel.h"
+#include "use_fft.h"
 #include "global.h"
 #include "cufft.h"
 

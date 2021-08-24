@@ -62,6 +62,7 @@ if(USE_CUDA)
         diago_cg_gpu.cu
         hamilt.cu
         hamilt_pw_gpu.cu
+        use_fft_kernel.cu
     )
 else()
     list(APPEND objects

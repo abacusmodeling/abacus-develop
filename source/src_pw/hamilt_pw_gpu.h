@@ -36,8 +36,6 @@ public:
 
 	void init_k(const int ik);
 
-	private:
-
 	friend class Diago_David;
 	// friend class Diago_CG;
     friend class Diago_CG_GPU;

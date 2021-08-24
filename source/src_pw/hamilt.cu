@@ -2,7 +2,7 @@
 #include "hamilt.h"
 #include "diago_cg.h"
 #include "diago_david.h"
-#include "diago_cg_gpu.cu"
+#include "diago_cg_gpu.h"
 #include "cufft.h"
 
 
@@ -94,7 +94,7 @@ void Hamilt::diagH_pw(
                 int DIM_CG_GPU2 = GlobalC::wf.npwx * GlobalV::NPOL;
                 double *d_precondition;
 
-				if(GlobalV::NPOL==1) 
+				if(GlobalV::NPOL==1)
 				{
                     cudaMalloc((void**)&d_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx * sizeof(CUFFT_COMPLEX));
                     cudaMalloc((void**)&d_wf_ekb, GlobalV::NBANDS * sizeof(double));
@@ -104,7 +104,7 @@ void Hamilt::diagH_pw(
                     // cudaMemcpy(d_wf_ekb, wf.ekb[ik], NBANDS * sizeof(double), cudaMemcpyHostToDevice);
                     cudaMemcpy(d_precondition, precondition, DIM_CG_GPU * sizeof(double), cudaMemcpyHostToDevice);
 
-                    cg_gpu.diag(d_wf_evc, d_wf_ekb, DIM_CG_GPU, GlobalC::wf.npwx, 
+                    cg_gpu.diag(d_wf_evc, d_wf_ekb, DIM_CG_GPU, GlobalC::wf.npwx,
                         GlobalV::NBANDS, d_precondition, GlobalV::ETHR,
                         GlobalV::DIAGO_CG_MAXITER, reorder, notconv, avg);
 
@@ -128,7 +128,7 @@ void Hamilt::diagH_pw(
                     cudaMemcpy(d_precondition, precondition, DIM_CG_GPU2 * sizeof(double), cudaMemcpyHostToDevice);
                     // do things
 
-                    cg_gpu.diag(d_wf_evc, d_wf_ekb, DIM_CG_GPU2, DIM_CG_GPU2, 
+                    cg_gpu.diag(d_wf_evc, d_wf_ekb, DIM_CG_GPU2, DIM_CG_GPU2,
                         GlobalV::NBANDS, d_precondition, GlobalV::ETHR,
                         GlobalV::DIAGO_CG_MAXITER, reorder, notconv, avg);
 
