@@ -8,7 +8,7 @@ This example shows how to calculate the energy band structure. Similar to the [D
 out_charge              1
 ```
 
-this will produce the converged charge density, which is contained in the file SPIN1_CHG. Copy the file along with the `STRU` file, the pseudopotential file and the atomic orbital file to the new working directory where we will do a non-self-consistent calculation. In this example, the potential is constructed from the ground-state charge density from the proceeding calculation. Now the INPUT file is like:
+this will produce the converged charge density, which is contained in the file SPIN1_CHG. Copy the file along with the `STRU` file, the pseudopotential file and the atomic orbital file (and the local density matrix file onsite.dm if DFT+U is used) to the new working directory where we will do a non-self-consistent calculation. In this example, the potential is constructed from the ground-state charge density from the proceeding calculation. Now the INPUT file is like:
 ```
 INPUT_PARAMETERS
 #Parameters (General)

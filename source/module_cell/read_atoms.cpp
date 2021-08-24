@@ -403,7 +403,11 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 			ModuleBase::GlobalFunc::OUT(ofs_running, "atom label",atoms[it].label);
 
 #ifndef __CMD
+			if(!input_mag)
+			{
 			ModuleBase::GlobalFunc::READ_VALUE(ifpos, magnet.start_magnetization[it] );
+			}
+			
 
 #ifndef __SYMMETRY
 			if(GlobalV::NSPIN==4)//added by zhengdy-soc
@@ -622,7 +626,18 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
                                         }
 					string mags;
 					atoms[it].mag[ia] = 0.0;
-
+// define mag for each atom instead of each type of atom
+#ifndef __CMD
+					if(input_mag)
+					{
+						if(nat > n_mag_at) 
+						{
+							WARNING_QUIT("read_atoms","Number of defined magnetic moment not equal to number of atoms");
+						}
+						atoms[it].mag[ia] = atom_mag[nat-na+ia];
+					}
+					
+#endif
 					if(Coordinate=="Direct")
 					{
 						// change v from direct to cartesian,
@@ -703,7 +718,15 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 			}// end na
 		}//end for ntype
 	}// end scan_begin
-
+#ifndef __CMD
+	if(input_mag)
+	{
+		if (this->n_mag_at != this->nat)
+		{
+			WARNING_QUIT("read_atoms","Number of defined magnetic moment not equal to number of atoms");
+		}
+	}
+#endif
 //check if any atom can move in MD
 	if(!this->if_atoms_can_move() && GlobalV::CALCULATION=="md")
 	{

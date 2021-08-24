@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <vector>
-
+#include <sstream>
 Input INPUT;
 
 void Input::Init(const std::string &fn)
@@ -509,7 +509,7 @@ bool Input::Read(const std::string &fn)
     }
 
     ifs.rdstate();
-
+	input_mag=false;
     while (ifs.good())
     {
         ifs >> word1;
@@ -1735,6 +1735,82 @@ bool Input::Read(const std::string &fn)
 		{
 			read_value(ifs, test_just_neighbor);
 		}
+//---------------
+//start magnetic
+#ifndef __CMD
+		else if (strcmp("magmom", word) == 0)
+		{
+			n_mag_at=0;
+			stringstream sstr;
+			string s;
+			getline(ifs,s);
+			sstr.str(s);
+			int tmplength=s.length();
+    		int at_per_mag[tmplength];
+    		double mags[tmplength];
+    		int n_magmom=0;
+			s="";
+			//1 3*2 6*1 
+			while(sstr.good())
+			{
+				sstr>>s;
+				string s1;
+				string s2;
+				bool mul=0;// if this parameter is the form n*m
+				for(int i=0;i<s.size();i++)
+				{
+					if ((s[i]>='0'&& s[i]<='9') or s[i]=='.' or s[i]=='+' or s[i]=='-')
+					{
+						s1.push_back(s[i]);
+					} 
+					else if (s[i]=='*')
+					{
+						s2=s1;
+						s1="";
+						mul=true;
+					}
+					else
+					{
+						std::cout<<"Unrecognized character"<<s[i]<<"when reading start magnetism";
+						exit(0);
+					}
+				}
+				cout<<"s1 "<<s1<<" s2 "<<s2<<'h'<<n_mag_at<<"\n";
+				double mag=stoi(s1);
+				if(mul)
+				{
+					int num=stoi(s2);
+					mags[n_magmom]=mag;
+	    			at_per_mag[n_magmom]=num;
+					n_mag_at+=num;
+				}
+				else
+				{
+					mags[n_magmom]=mag;
+	    			at_per_mag[n_magmom]=1;
+					n_mag_at+=1;
+				}
+				n_magmom+=1;
+			}
+			atom_mag = new double[n_mag_at];
+			int n_m=0;// the n_m value of magmom
+			int n_n=0;//how many magmom has been defined
+			for(int i=0;i<n_mag_at;i++)
+			{
+				if (i-n_n>=at_per_mag[n_m])
+				{
+					n_n+=at_per_mag[n_m];
+					n_m+=1;
+				}
+				atom_mag[i]=mags[n_m];
+				cout<<"atom_mag"<<atom_mag[i];
+			}	
+	input_mag=true;
+	}
+
+#endif
+		
+//--------------
 //----------------------------------------------------------------------------------
 //         Xin Qu added on 2020-10-29 for DFT+U
 //----------------------------------------------------------------------------------
