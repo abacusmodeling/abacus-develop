@@ -153,7 +153,7 @@ void Symmetry_Basic::atom_ordering(double *posi, const int natom, int *subindex)
 	{
 		tmppos[i] = posi[i*3];
 	}
-	heapsort(natom, tmppos, subindex);
+	ModuleBase::heapsort(natom, tmppos, subindex);
 
 //	for(int i=0; i<natom; i++)
 //	{
@@ -216,7 +216,7 @@ void Symmetry_Basic::order_y(double *pos1, const int &oldpos1, const int &newpos
 //		std::cout << "\n ia=" << ia << " y=" << tmp1[ia];
 	}
 
-	heapsort(nat1, tmp1, index1);
+	ModuleBase::heapsort(nat1, tmp1, index1);
 
 	this->order_atoms(pos1,nat1,index1);
 	
@@ -269,7 +269,7 @@ void Symmetry_Basic::order_z(double* pos2, const int &oldpos2, const int &newpos
 		tmp2[ia] = pos2[3*ia+2];
 	}
 
-	heapsort(nat2, tmp2, index2);
+	ModuleBase::heapsort(nat2, tmp2, index2);
 
 //	for(int ia=0; ia<nat2; ia++)
 //	{

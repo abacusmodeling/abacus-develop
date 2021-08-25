@@ -322,7 +322,7 @@ void H_Ewald_pw::rgen(
     irr[0] = 0;
     if (nrm > 1)
     {
-        heapsort(nrm, r2, irr);
+        ModuleBase::heapsort(nrm, r2, irr);
     }
 
 	// mohan fix bug 2011-06-07

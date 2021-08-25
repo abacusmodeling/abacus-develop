@@ -250,7 +250,7 @@ void PW_complement::setup_GVectors(
     // sort the norm of the G vectors of G1d[] in the ascending
     // order
     //----------------------------------------------------------
-    heapsort(ngmc_g_in, gg, ind);
+    ModuleBase::heapsort(ngmc_g_in, gg, ind);
 
     /***************************************************************/
     // adjust G1d[NG] according to the new order.
