@@ -146,10 +146,10 @@ void Hamilt_PW::diagH_subspace(
 
 	char trans1 = 'C';
 	char trans2 = 'N';
-	zgemm_(&trans1,&trans2,&nstart,&nstart,&dmin,&ONE,psi.c,&dmax,aux,&dmax,&ZERO,hc.c,&nstart);
+	zgemm_(&trans1,&trans2,&nstart,&nstart,&dmin,&ONE,psi.c,&dmax,aux,&dmax,&ModuleBase::ZERO,hc.c,&nstart);
 	hc=transpose(hc,false);
 
-	zgemm_(&trans1,&trans2,&nstart,&nstart,&dmin,&ONE,psi.c,&dmax,psi.c,&dmax,&ZERO,sc.c,&nstart);
+	zgemm_(&trans1,&trans2,&nstart,&nstart,&dmin,&ONE,psi.c,&dmax,psi.c,&dmax,&ModuleBase::ZERO,sc.c,&nstart);
 	sc=transpose(sc,false);
 
 	delete []aux;
@@ -285,7 +285,7 @@ void Hamilt_PW::diagH_subspace(
 				&dmax, // LDA: if(N) max(1,m) if(T) max(1,k)
 				hvec.c, // B
 				&n_band, // LDB: if(N) max(1,k) if(T) max(1,n)
-				&ZERO,  // belta
+				&ModuleBase::ZERO,  // belta
 				evc.c, // C
 				&dmax ); // LDC: if(N) max(1, m)
 	}
@@ -297,7 +297,7 @@ void Hamilt_PW::diagH_subspace(
 		char transa = 'N';
 		char transb = 'T';
 		ModuleBase::ComplexMatrix evctmp(n_band, dmin,false);
-		zgemm_(&transa,&transb,&dmin,&n_band,&nstart,&ONE,psi.c,&dmax,hvec.c,&n_band,&ZERO,evctmp.c,&dmin);
+		zgemm_(&transa,&transb,&dmin,&n_band,&nstart,&ONE,psi.c,&dmax,hvec.c,&n_band,&ModuleBase::ZERO,evctmp.c,&dmin);
 		for(int ib=0; ib<n_band; ib++)
 		{
 			for(int ig=0; ig<dmin; ig++)
@@ -474,12 +474,12 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 			if(m==1 && GlobalV::NPOL==1)
 			{
 				int inc = 1;
-				zgemv_(&transa, &GlobalC::wf.npw, &nkb, &ONE, GlobalC::ppcell.vkb.c, &GlobalC::wf.npwx, psi_in, &inc, &ZERO, becp.c, &inc);
+				zgemv_(&transa, &GlobalC::wf.npw, &nkb, &ONE, GlobalC::ppcell.vkb.c, &GlobalC::wf.npwx, psi_in, &inc, &ModuleBase::ZERO, becp.c, &inc);
 			}
 			else
 			{
 				int npm = GlobalV::NPOL * m;
-				zgemm_(&transa,&transb,&nkb,&npm,&GlobalC::wf.npw,&ONE,GlobalC::ppcell.vkb.c,&GlobalC::wf.npwx,psi_in,&GlobalC::wf.npwx,&ZERO,becp.c,&nkb);
+				zgemm_(&transa,&transb,&nkb,&npm,&GlobalC::wf.npw,&ONE,GlobalC::ppcell.vkb.c,&GlobalC::wf.npwx,psi_in,&GlobalC::wf.npwx,&ModuleBase::ZERO,becp.c,&nkb);
 				//add_nonlocal_pp is moddified, thus tranpose not needed here.
 				//if(GlobalV::NONCOLIN)
 				//{
@@ -769,8 +769,8 @@ void Hamilt_PW::diag_zheev(const int &npw_in, ModuleBase::ComplexMatrix &psi, co
         dcopy(psi, i, eta);
         h_1psi(npw_in, eta, hpsi1, spsi1) ;
 
-        tmp = ZERO ;
-        tmp1 = ZERO ;
+        tmp = ModuleBase::ZERO ;
+        tmp1 = ModuleBase::ZERO ;
 
         for (int ig = 0; ig < npw_in; ig++)
         {
@@ -787,7 +787,7 @@ void Hamilt_PW::diag_zheev(const int &npw_in, ModuleBase::ComplexMatrix &psi, co
             // calculate H[i,j] = <i|eta> where |eta> = H|j>
             // RedM(j, i) = <j|H|i>
 
-            tmp = ZERO ;
+            tmp = ModuleBase::ZERO ;
 
             for (int ig = 0; ig < npw_in; ig++)
             {
@@ -865,7 +865,7 @@ void Hamilt_PW::diag_zheev(const int &npw_in, ModuleBase::ComplexMatrix &psi, co
     {
         for (int j = 0; j < npw_in; j++)
         {
-            tmp = ZERO ;
+            tmp = ModuleBase::ZERO ;
 
             for (int  k = 0; k < nband; k++)
             {
@@ -940,7 +940,7 @@ void Hamilt_PW::cal_err
         dcopy(psi, m, psitmp) ;
         h_1psi(npw_in, psitmp, hpsitmp, spsitmp);
 
-        std::complex<double> tmp = ZERO;
+        std::complex<double> tmp = ModuleBase::ZERO;
 
         for (int ig=0;  ig<npw_in; ig++)
         {
@@ -995,7 +995,7 @@ std::complex<double> Hamilt_PW::ddot(
     const std::complex<double> * psi_R
 )const
 {
-	std::complex<double> result = ZERO;
+	std::complex<double> result = ModuleBase::ZERO;
 	const int incx = 1;
 	const int incy = 1;
 	// mohan add 2010-10-11
@@ -1014,7 +1014,7 @@ std::complex<double> Hamilt_PW::just_ddot(
     const std::complex<double> * psi_R
 )const
 {
-	std::complex<double> result = ZERO;
+	std::complex<double> result = ModuleBase::ZERO;
 
 	// mohan add 2010-10-11
 //	zdotc_(&result, &dim, psi_L, &incx, psi_R, &incy);

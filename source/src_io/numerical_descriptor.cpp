@@ -259,7 +259,7 @@ void Numerical_Descriptor::jlq3d_overlap(
 	<< std::endl;
 
     double *flq = new double[np];
-    std::complex<double> overlapQ = ZERO;
+    std::complex<double> overlapQ = ModuleBase::ZERO;
     for (int T1 = 0; T1 < GlobalC::ucell.ntype; T1++)
     {
         for (int I1 = 0; I1 < GlobalC::ucell.atoms[T1].na; I1++)
@@ -287,7 +287,7 @@ void Numerical_Descriptor::jlq3d_overlap(
                         const int lm = L*L+m;
                         for (int ib=0; ib<GlobalV::NBANDS; ib++)
                         {
-                            std::complex<double> overlap_tmp = ZERO;
+                            std::complex<double> overlap_tmp = ModuleBase::ZERO;
                             for (int ig=0; ig<np; ig++)
                             {
                                 const std::complex<double> local_tmp = lphase * sk[ig] * ylm(lm, ig) * flq[ig];

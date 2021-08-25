@@ -119,7 +119,7 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 
 							olm[0] = olm[1] = olm[2] = 0.0;
 
-							std::complex<double> olm1[4]={ZERO, ZERO, ZERO, ZERO};
+							std::complex<double> olm1[4]={ModuleBase::ZERO, ModuleBase::ZERO, ModuleBase::ZERO, ModuleBase::ZERO};
 							std::complex<double> *olm2 = &olm1[0];
 							if(!calc_deri)
 							{

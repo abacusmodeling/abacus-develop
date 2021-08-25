@@ -220,7 +220,7 @@ void Stochastic_hchi::orthogonal_to_psi_reciprocal(std::complex<double> *wfgin, 
 	char transN='N';
 	
 	//sum(b<GlobalV::NBANDS, a<nchi) = < psi_b | chi_a >
-	zgemm_(&transC, &transN, &GlobalV::NBANDS, &nchip, &npw, &ONE, GlobalC::wf.evc[ikk].c, &GlobalC::wf.npwx, wfgout, &npw, &ZERO, sum, &GlobalV::NBANDS);
+	zgemm_(&transC, &transN, &GlobalV::NBANDS, &nchip, &npw, &ONE, GlobalC::wf.evc[ikk].c, &GlobalC::wf.npwx, wfgout, &npw, &ModuleBase::ZERO, sum, &GlobalV::NBANDS);
 	Parallel_Reduce::reduce_complex_double_pool(sum, GlobalV::NBANDS * nchip);
 	
 	//psi -= psi * sum
@@ -496,11 +496,11 @@ void Stochastic_hchi:: hchi_reciprocal(std::complex<double> *chig, std::complex<
 			char transt = 'T';
 			if(m==1 && GlobalV::NPOL ==1)
 			{
-				zgemv_(&transc, &npw, &nkb, &ONE, GlobalC::ppcell.vkb.c, &GlobalC::wf.npwx, chig, &inc, &ZERO, becp, &inc);
+				zgemv_(&transc, &npw, &nkb, &ONE, GlobalC::ppcell.vkb.c, &GlobalC::wf.npwx, chig, &inc, &ModuleBase::ZERO, becp, &inc);
 			}
 			else
 			{
-				zgemm_(&transc,&transn,&nkb,&npm,&npw,&ONE,GlobalC::ppcell.vkb.c,&GlobalC::wf.npwx,chig,&npw,&ZERO,becp,&nkb);
+				zgemm_(&transc,&transn,&nkb,&npm,&npw,&ONE,GlobalC::ppcell.vkb.c,&GlobalC::wf.npwx,chig,&npw,&ModuleBase::ZERO,becp,&nkb);
 			}
 			Parallel_Reduce::reduce_complex_double_pool( becp, nkb * GlobalV::NPOL * m);
 

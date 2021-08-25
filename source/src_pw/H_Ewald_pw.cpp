@@ -106,7 +106,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 
     for (int ig=pwb.gstart; ig<pwb.ngmc; ig++)
     {
-        std::complex<double> rhon = ZERO;
+        std::complex<double> rhon = ModuleBase::ZERO;
         for (int it=0; it<cell.ntype; it++)
         {
             rhon += static_cast<double>( cell.atoms[it].zv ) * conj( pwb.strucFac(it, ig));

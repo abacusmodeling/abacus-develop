@@ -346,7 +346,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 					// mohan add 2011-06-14
 					else if(startmag_type==2)
 					{
-						std::complex<double> swap = ZERO;
+						std::complex<double> swap = ModuleBase::ZERO;
 						std::complex<double> ci_tpi = NEG_IMAG_UNIT * ModuleBase::TWO_PI;
 						for (int ia = 0; ia < atom->na; ia++)
 						{
@@ -398,7 +398,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 					}
 					else if(startmag_type == 2)
 					{//zdy-warning-not-available
-						std::complex<double> swap = ZERO;
+						std::complex<double> swap = ModuleBase::ZERO;
 						std::complex<double> ci_tpi = NEG_IMAG_UNIT * ModuleBase::TWO_PI;
 						for(int ia = 0;ia<atom->na;ia++)
 						{

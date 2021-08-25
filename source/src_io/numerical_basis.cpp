@@ -189,7 +189,7 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Q(
                         const int lm = L*L+m;
                         for (int ib=0; ib<GlobalV::NBANDS; ib++)
                         {
-                            std::complex<double> overlap_tmp = ZERO;
+                            std::complex<double> overlap_tmp = ModuleBase::ZERO;
                             for (int ig=0; ig<np; ig++)
                             {
 //                              const std::complex<double> local_tmp = lphase * sk[ig] * ylm(lm, ig) * flq[ig];

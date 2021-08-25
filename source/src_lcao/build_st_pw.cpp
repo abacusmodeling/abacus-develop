@@ -33,7 +33,7 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 					
 					if(GlobalV::NSPIN!=4)
 					{
-						std::complex<double> v = ZERO;
+						std::complex<double> v = ModuleBase::ZERO;
 						for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++) 
 						{
 							v += conj(GlobalC::wf.wanf2[ik](mu, ig)) * GlobalC::wf.wanf2[ik](nu, ig);
@@ -48,7 +48,7 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 					}
 					else//added by zhengdy-soc
 					{
-/*						std::complex<double> v0 = ZERO, v1 = ZERO, v2 = ZERO, v3 = ZERO;
+/*						std::complex<double> v0 = ModuleBase::ZERO, v1 = ModuleBase::ZERO, v2 = ModuleBase::ZERO, v3 = ModuleBase::ZERO;
 						for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++)
 						{
 							v0 += conj(GlobalC::wf.wanf2[ik](mu, ig)) * GlobalC::wf.wanf2[ik](nu, ig);
@@ -60,7 +60,7 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 						GlobalC::LM.Sloc2_soc(1, mu * GlobalC::ParaO.ncol + nu) = v1;
 						GlobalC::LM.Sloc2_soc(2, mu * GlobalC::ParaO.ncol + nu) = v2;
 						GlobalC::LM.Sloc2_soc(3, mu * GlobalC::ParaO.ncol + nu) = v3;*/
-						std::complex<double> v0 = ZERO;
+						std::complex<double> v0 = ModuleBase::ZERO;
 						for (int ig = 0; ig < GlobalC::wf.npwx*GlobalV::NPOL; ig++)
 							v0 += conj(GlobalC::wf.wanf2[ik](mu, ig)) * GlobalC::wf.wanf2[ik](nu, ig);
 						GlobalC::LM.Sloc2[ mu * GlobalC::ParaO.ncol + nu ] = v0;
@@ -86,7 +86,7 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 					const int nu = GlobalC::ParaO.trace_loc_col[j];
 					if(nu < 0)continue;
 					
-					std::complex<double> v = ZERO;
+					std::complex<double> v = ModuleBase::ZERO;
 					for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++) 
 					{
 						v += conj(GlobalC::wf.wanf2[ik](mu, ig)) * GlobalC::wf.wanf2[ik](nu, ig) * GlobalC::wf.g2kin[ig];
@@ -163,7 +163,7 @@ void Build_ST_pw::set_local(const int &ik)
 
 			for(int j=i; j<GlobalV::NLOCAL; j++)
 			{
-				std::complex<double> v = ZERO;
+				std::complex<double> v = ModuleBase::ZERO;
 				for(int ig=0; ig<npw; ig++)
 				{
 					v += conj( GlobalC::wf.wanf2[ik](j,ig) ) * hpsi[ig];
@@ -226,7 +226,7 @@ void Build_ST_pw::set_local(const int &ik)
 
 			for(int j=i; j<GlobalV::NLOCAL; j++)
 			{
-				std::complex<double> v = ZERO;
+				std::complex<double> v = ModuleBase::ZERO;
 				for(int ig=0; ig<npw; ig++)
 				{
 					v += conj( GlobalC::wf.wanf2[ik](j,ig) ) * hpsi[ig];

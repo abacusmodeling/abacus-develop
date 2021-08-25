@@ -1101,7 +1101,7 @@ std::complex < double> ZDOTU(int nstart,
                         int npwx)
 {
     std::cout << "\n do nothing in ZDOTU(), only return ZERO,";
-    return ZERO;
+    return ModuleBase::ZERO;
 }
 
 void zgemv(char ,

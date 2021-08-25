@@ -213,11 +213,11 @@ void Diago_CG::orthogonal_gradient( const int &dim, const int &dmx,
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     //qianrui replace 2021-3-15
     char trans='C';
-    zgemv_(&trans,&dim,&m,&ONE,eigenfunction.c,&dmx,sg,&inc,&ZERO,lagrange,&inc);
+    zgemv_(&trans,&dim,&m,&ONE,eigenfunction.c,&dmx,sg,&inc,&ModuleBase::ZERO,lagrange,&inc);
     //======================================================================
     /*for (int i=0; i<m; i++)
     {
-        lagrange[i] = ZERO;
+        lagrange[i] = ModuleBase::ZERO;
         for (int j=0; j<dim; j++)
         {
             lagrange[i] += conj( eigenfunction(i,j) ) * sg[j];
@@ -424,7 +424,7 @@ void Diago_CG::schmit_orth
     int inc=1;
     int mp1 = m+1;
     char trans='C';
-    zgemv_(&trans,&dim,&mp1,&ONE,psi.c,&dmx,sphi,&inc,&ZERO,lagrange,&inc);
+    zgemv_(&trans,&dim,&mp1,&ONE,psi.c,&dmx,sphi,&inc,&ModuleBase::ZERO,lagrange,&inc);
     //======================================================================
     /*for (int j = 0; j <= m; j++)
     {
@@ -560,7 +560,7 @@ std::complex<double> Diago_CG::ddot
     const int & n
 )
 {
-    std::complex<double> result = ZERO;
+    std::complex<double> result = ModuleBase::ZERO;
     assert( (dim>0) && (dim<=psi_L.nc) && (dim<=psi_R.nc) );
 
     for ( int i = 0; i < dim ; i++)
