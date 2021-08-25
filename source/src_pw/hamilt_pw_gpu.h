@@ -86,6 +86,10 @@ public:
 
     int *GR_index;
 
+#ifdef __CUDA
+    int *GR_index_d;
+#endif
+
 	// add contributions of h*psi from
 	// non-local pseduopotentials
 	void add_nonlocal_pp_gpu(

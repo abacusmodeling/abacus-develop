@@ -62,16 +62,17 @@ Hamilt_PW::Hamilt_PW()
     // spsi = new complex<double>[1];
     // GR_index = new int[1];
     // Bec = new complex<double>[1];
-    cudaMalloc((void**)&GR_index, sizeof(int)); // Only use this member now.
 }
 
 Hamilt_PW::~Hamilt_PW()
 {
     // delete[] hpsi;
     // delete[] spsi;
-    // delete[] GR_index;
+    delete[] GR_index;
     // delete[] Bec;
-    cudaFree(GR_index);
+#ifdef __CUDA
+    cudaFree(GR_index_d);
+#endif
 }
 
 
@@ -93,12 +94,13 @@ void Hamilt_PW::allocate(
     // delete[] GR_index;
     // delete[] Bec;
 
-    cudaFree(GR_index);
-    // this->hpsi = new complex<double> [npwx * npol];
-    // this->spsi = new complex<double> [npwx * npol];
-    cudaMalloc((void**)&GR_index, nrxx*sizeof(int));
-    // this->Bec = new complex<double> [nkb];
+	delete [] GR_index;
+	GR_index = new int[nrxx];
 
+#ifdef __CUDA
+    cudaFree(GR_index_d);
+    cudaMalloc((void**)&GR_index_d, nrxx*sizeof(int));
+#endif
     // ZEROS(this->hpsi, npwx * npol);
     // ZEROS(this->spsi, npwx * npol);
     // ZEROS(this->GR_index, nrxx);
@@ -139,14 +141,16 @@ void Hamilt_PW::init_k(const int ik)
 	GlobalC::wf.npw = GlobalC::kv.ngk[ik];
 
 	// (6) The index of plane waves.
-    int *GR_index_tmp = new int[GlobalC::pw.nrxx];
+    // int *GR_index_tmp = new int[GlobalC::pw.nrxx];
     for (int ig = 0;ig < GlobalC::wf.npw;ig++)
     {
-        GR_index_tmp[ig] = GlobalC::pw.ig2fftw[ GlobalC::wf.igk(ik, ig) ];
+        GR_index[ig] = GlobalC::pw.ig2fftw[ GlobalC::wf.igk(ik, ig) ];
     }
     // cout<<"init_K"<<endl;
-    cudaMemcpy(this->GR_index, GR_index_tmp, GlobalC::pw.nrxx*sizeof(int), cudaMemcpyHostToDevice);
-    delete [] GR_index_tmp;
+#ifdef __CUDA
+    cudaMemcpy(this->GR_index_d, GR_index, GlobalC::pw.nrxx*sizeof(int), cudaMemcpyHostToDevice);
+    // delete [] GR_index_tmp;
+#endif
 
     // (7) ik
 	GlobalV::CURRENT_K = ik;
@@ -512,7 +516,7 @@ void Hamilt_PW::h_psi_gpu(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, cons
             // ZEROS( UFFT.porter, pw.nrxx);
             cudaMemset(d_porter, 0, GlobalC::pw.nrxx * sizeof(CUFFT_COMPLEX));
 
-            GlobalC::UFFT.RoundTrip( tmpsi_in, d_vr_eff1, GR_index, d_porter );
+            GlobalC::UFFT.RoundTrip( tmpsi_in, d_vr_eff1, GR_index_d, d_porter );
 
             // for (j = 0;j < wf.npw;j++)
             // {
@@ -520,7 +524,7 @@ void Hamilt_PW::h_psi_gpu(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, cons
             // }
             int thread = 512;
             int block = GlobalC::wf.npw / thread + 1;
-            kernel_add_tmhpsi<<<block, thread>>>(GlobalC::wf.npw, tmhpsi, d_porter, GR_index);
+            kernel_add_tmhpsi<<<block, thread>>>(GlobalC::wf.npw, tmhpsi, d_porter, GR_index_d);
 
             tmhpsi += dmax;
             tmpsi_in += dmax;
