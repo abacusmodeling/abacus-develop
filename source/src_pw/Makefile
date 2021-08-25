@@ -82,7 +82,7 @@ VPATH=../src_global\
 #==========================
 #HONG= -DMETIS -DMKL_ILP64 -D__NORMAL ${HONG_FFTW} 
 #HONG= ${HONG_FFTW}  -D__MPI -DUSE_LIBXC
-HONG= ${HONG_FFTW}  -D__MPI -D__NOMD
+HONG= ${HONG_FFTW}  -D__MPI -D__NOMD -D__CUDA
 FP_OBJS_0=main.o\
 $(OBJS_BASE)\
 $(OBJS_PW)\
@@ -118,7 +118,7 @@ ${OBJ_DIR}/%.o:%.cpp
 
 # rules of .cu files
 ${OBJ_DIR}/%.o:%.cu
-	${CUDA_COMPILE} ${OPTS_CUDA} ${LIBS} -I/home/haosen/intel/compilers_and_libraries_2017.8.262/linux/mpi/intel64/include -c ${HONG} -D__CUDA $< -o $@
+	${CUDA_COMPILE} ${OPTS_CUDA} ${LIBS} -I/home/haosen/intel/compilers_and_libraries_2017.8.262/linux/mpi/intel64/include -c ${HONG} $< -o $@
 
 
 .PHONY:clean

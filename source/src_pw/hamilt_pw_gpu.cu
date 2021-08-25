@@ -934,6 +934,7 @@ void Hamilt_PW::add_nonlocal_pp_gpu(
 
 	// delete[] ps;
     cudaFree(ps);
+	cublasDestroy(handle);
     timer::tick("Hamilt_PW","add_nonlocal_pp_gpu");
     return;
 }
