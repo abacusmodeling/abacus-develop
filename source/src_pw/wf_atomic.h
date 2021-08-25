@@ -11,7 +11,7 @@ class WF_atomic : public WF_igk
     WF_atomic();
     ~WF_atomic();
 
-	realArray table_local;//mohan add 2009-09-10
+	ModuleBase::realArray table_local;//mohan add 2009-09-10
 
     ModuleBase::ComplexMatrix *evc;  // wavefunctions in the PW basis
 
@@ -31,7 +31,7 @@ class WF_atomic : public WF_igk
         const int np,
         const int lmax_wfc,
         ModuleBase::ComplexMatrix &wfcatom,
-        const realArray &table_q,
+        const ModuleBase::realArray &table_q,
         const int &table_dimension,
         const double &dq
     )const;

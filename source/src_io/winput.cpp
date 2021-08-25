@@ -79,7 +79,7 @@ winput::~winput()
 void winput::Init(const std::string &fn)
 {
 	Default();
-	if(GlobalV::test_winput) TITLE("winput","Init");
+	if(GlobalV::test_winput) ModuleBase::TITLE("winput","Init");
 	//==========================================
 	// First readin and check value in root cpu
 	// and then bcast value
@@ -95,7 +95,7 @@ void winput::Init(const std::string &fn)
 
 void winput::Read(const std::string &fn)
 {
-	TITLE("winput","Read");
+	ModuleBase::TITLE("winput","Read");
 	
 	if(GlobalV::MY_RANK!=0) return;
 
@@ -103,7 +103,7 @@ void winput::Read(const std::string &fn)
 	if (!ifs)
 	{
 		//xiaohui move warning 2015-09-30
-		//WARNING("winput::Read","Can't find wannier input file.");
+		//ModuleBase::WARNING("winput::Read","Can't find wannier input file.");
 		return;
 	}
 	else
@@ -130,7 +130,7 @@ void winput::Read(const std::string &fn)
 
 	if (ierr == 0)
 	{
-		WARNING("winput::Read","error parameteters title, should be WANNIER_PARAMETERS");
+		ModuleBase::WARNING("winput::Read","error parameteters title, should be WANNIER_PARAMETERS");
 	}
 
 	ifs.rdstate();
@@ -234,7 +234,7 @@ void winput::Read(const std::string &fn)
 
 void winput::Default()
 {
-	if(GlobalV::test_winput) TITLE("winput","Default");
+	if(GlobalV::test_winput) ModuleBase::TITLE("winput","Default");
 	//========================
 	//	part1 : control
 	//========================
@@ -345,7 +345,7 @@ void winput::Default()
 
 void winput::Check(void)
 {
-	if(GlobalV::test_winput) TITLE("winput","Check");
+	if(GlobalV::test_winput) ModuleBase::TITLE("winput","Check");
 
 	if(GlobalV::MY_RANK!=0) return;
 
@@ -368,30 +368,30 @@ void winput::Check(void)
 	//xiaohui modify 2013-09-02
 	//if(LOCAL_BASIS==1)
 	//{
-	//	WARNING("winput::Check","Using local basis.");
+	//	ModuleBase::WARNING("winput::Check","Using local basis.");
 	//	// turn on
 	//	if(!b_recon && !recon_wanq )
 	//	{
-	//		WARNING("winput::Check","Auto start reconstruction operation.");
+	//		ModuleBase::WARNING("winput::Check","Auto start reconstruction operation.");
 	//		b_recon = true;
 	//		ModuleBase::GlobalFunc::AUTO_SET("b_recon",b_recon);
 	//	}
 	//	// turn off
 	//	if(before_iter)
 	//	{
-	//		WARNING("winput::Check","Auto turn down 'before_iter'.");
+	//		ModuleBase::WARNING("winput::Check","Auto turn down 'before_iter'.");
 	//		before_iter = false;
 	//		ModuleBase::GlobalFunc::AUTO_SET("before_iter",before_iter);
 	//	}
 	//	if(after_iter)
 	//	{
-	//		WARNING("winput::Check","Auto turn down after_iter.");
+	//		ModuleBase::WARNING("winput::Check","Auto turn down after_iter.");
 	//		after_iter = false;
 	//		ModuleBase::GlobalFunc::AUTO_SET("after_iter",after_iter);
 	//	}
 	//	if(build_wf)
 	//	{
-	//		WARNING("winput::Check","Not available to build wannier functions in local basis");
+	//		ModuleBase::WARNING("winput::Check","Not available to build wannier functions in local basis");
 	//		build_wf = 0;
 	//		ModuleBase::GlobalFunc::AUTO_SET("build_wf",build_wf);
 	//	}
@@ -400,13 +400,13 @@ void winput::Check(void)
 	//	{
 	//		if(sph_proj==2)
 	//		{
-	//			WARNING("winput::Check","Add self site wave functions during reconstruction.");
+	//			ModuleBase::WARNING("winput::Check","Add self site wave functions during reconstruction.");
 	//			no_center = true;
 	//			ModuleBase::GlobalFunc::AUTO_SET("no_center",no_center);
 	//		}
 	//		else if(sph_proj==1)
 	//		{
-	//			WARNING("winput::Check","Not meaning in reconstruction if sph_proj==1");
+	//			ModuleBase::WARNING("winput::Check","Not meaning in reconstruction if sph_proj==1");
 	//		}
 	//		sph_proj=0;
 	//		ModuleBase::GlobalFunc::AUTO_SET("sph_proj",sph_proj);
@@ -415,11 +415,11 @@ void winput::Check(void)
 	//	{
 	//		if(imp_pao==2)
 	//		{
-	//			WARNING("winput::Check","Use improve_pao 2 method, add the center wave functions");
+	//			ModuleBase::WARNING("winput::Check","Use improve_pao 2 method, add the center wave functions");
 	//		}
 	//		if(trunc_wan > 0)
 	//		{
-	//			WARNING("winput::Check","Use real space truncation. So we must get fft_init started.");
+	//			ModuleBase::WARNING("winput::Check","Use real space truncation. So we must get fft_init started.");
 	//			b_fftwan = true;
 	//			ModuleBase::GlobalFunc::AUTO_SET("b_fftwan",b_fftwan);
 	//		}
@@ -429,17 +429,17 @@ void winput::Check(void)
 	//}
 	//else if(LOCAL_BASIS==0)
 	//{
-	//	WARNING("winput::Check","Use plane wave basis.");
+	//	ModuleBase::WARNING("winput::Check","Use plane wave basis.");
 	//	// turn off
 	//	if(b_recon)
 	//	{
-	//		WARNING("winput::Check","Auto turn off the reconstruction.");
+	//		ModuleBase::WARNING("winput::Check","Auto turn off the reconstruction.");
 	//		ModuleBase::GlobalFunc::AUTO_SET("b_recon",b_recon);
 	//		b_recon = 0;
 	//	}
 	//	if(recon_wanq)
 	//	{
-	//		WARNING("winput::Check","Auto turn off the recon_wanq");
+	//		ModuleBase::WARNING("winput::Check","Auto turn off the recon_wanq");
 	//		ModuleBase::GlobalFunc::AUTO_SET("recon_wanq",recon_wanq);
 	//		recon_wanq = 0;
 	//	}
@@ -448,20 +448,20 @@ void winput::Check(void)
 	//	{
 	//		if(imp_pao == 2)
 	//		{
-	//			WARNING("winput::Check","Use improve_pao method.");
+	//			ModuleBase::WARNING("winput::Check","Use improve_pao method.");
 	//			OUT(GlobalV::ofs_warning,"imp_pao",imp_pao);
 
-	//			WARNING("winput::Check","If use imp_pao>0 ,sph_proj must be 0.");
+	//			ModuleBase::WARNING("winput::Check","If use imp_pao>0 ,sph_proj must be 0.");
 	//			sph_proj=0;
 	//			ModuleBase::GlobalFunc::AUTO_SET("sph_proj",sph_proj);
 
-	//			WARNING("winput::Check","If use imp_pao>0 ,build is no need, can be 0.");
+	//			ModuleBase::WARNING("winput::Check","If use imp_pao>0 ,build is no need, can be 0.");
 	//			build_wf=0;
 	//			ModuleBase::GlobalFunc::AUTO_SET("build_wf",build_wf);
 
 	//			if(trunc_wan > 0 && b_recon)
 	//			{
-	//				WARNING("winput::Check","Use real space truncation. So we must get fft_init started.");
+	//				ModuleBase::WARNING("winput::Check","Use real space truncation. So we must get fft_init started.");
 	//				b_fftwan = true;
 	//				ModuleBase::GlobalFunc::AUTO_SET("b_fftwan",b_fftwan);
 	//			}
@@ -470,7 +470,7 @@ void winput::Check(void)
 	//		}
 	//		else if(sph_proj>0)
 	//		{
-	//			WARNING("winput::Check","Auto build localized wave functions.");
+	//			ModuleBase::WARNING("winput::Check","Auto build localized wave functions.");
 	//			build_wf = true;
 	//			ModuleBase::GlobalFunc::AUTO_SET("build_wf",build_wf);
 	//			if(sph_proj == 1) 
@@ -480,13 +480,13 @@ void winput::Check(void)
 	//			}
 	//			else if(sph_proj == 2) 
 	//			{
-	//				WARNING("winput::Check","Searching Adjacent without self site.");
+	//				ModuleBase::WARNING("winput::Check","Searching Adjacent without self site.");
 	//				no_center = true;
 	//				ModuleBase::GlobalFunc::AUTO_SET("no_center",no_center);
 	//			}
 	//			else
 	//			{
-	//				WARNING_QUIT("winput::Check","sph_proj must be 0 1 or 2");
+	//				ModuleBase::WARNING_QUIT("winput::Check","sph_proj must be 0 1 or 2");
 	//			}
 	//		}
 
@@ -494,11 +494,11 @@ void winput::Check(void)
 	//		{
 	//			if(bloch_end == 0 || bloch_begin > bloch_end)
 	//			{
-	//				WARNING_QUIT("winput::Check","Please check your bloch_end");
+	//				ModuleBase::WARNING_QUIT("winput::Check","Please check your bloch_end");
 	//			}
 	//			if(bloch_end > GlobalV::NBANDS)
 	//			{
-	//				WARNING_QUIT("winput::Check","Bloch_end > GlobalV::NBANDS, reset either of them");
+	//				ModuleBase::WARNING_QUIT("winput::Check","Bloch_end > GlobalV::NBANDS, reset either of them");
 	//			}
 	//		}
 	//	}// end after_iter
@@ -515,7 +515,7 @@ void winput::Check(void)
 	{
 		if(b_plot_build == true && b_plot_atomic == true)
 		{
-			WARNING_QUIT("winput::Check()","Plot atomic or plot build wannier functions?");
+			ModuleBase::WARNING_QUIT("winput::Check()","Plot atomic or plot build wannier functions?");
 		}
 		else
 		{
@@ -529,7 +529,7 @@ void winput::Check(void)
 
 void winput::Print(const std::string &fn)
 {
-	if(GlobalV::test_winput) TITLE("winput","Print");
+	if(GlobalV::test_winput) ModuleBase::TITLE("winput","Print");
 
 	if(GlobalV::MY_RANK!=0) return;
  
@@ -626,7 +626,7 @@ void winput::Print(const std::string &fn)
 #ifdef __MPI
 void winput::Bcast(void)
 {
-	if(GlobalV::test_winput) TITLE("winput","Bcast");
+	if(GlobalV::test_winput) ModuleBase::TITLE("winput","Bcast");
 
 	Parallel_Common::bcast_string( target );
 	Parallel_Common::bcast_bool( before_iter );

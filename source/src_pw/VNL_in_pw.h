@@ -68,16 +68,16 @@ private:
 	ModuleBase::matrix nhtolm;     	// correspondence n <-> combined lm index for (l,m)
 	ModuleBase::matrix nhtoj;		// new added
 
-	realArray dvan;		//(:,:,:),  the D functions of the solid
+	ModuleBase::realArray dvan;		//(:,:,:),  the D functions of the solid
 	ModuleBase::ComplexArray dvan_so;	//(:,:,:),  spin-orbit case,  added by zhengdy-soc
 
-	realArray tab;		//(:,:,:), interpolation table for PPs
-	realArray tab_alpha;
-	realArray tab_at;	//(:,:,:), interpolation table for atomic wfc
+	ModuleBase::realArray tab;		//(:,:,:), interpolation table for PPs
+	ModuleBase::realArray tab_alpha;
+	ModuleBase::realArray tab_at;	//(:,:,:), interpolation table for atomic wfc
 
-	realArray deeq;		//(:,:,:,:), the integral of V_eff and Q_{nm}
+	ModuleBase::realArray deeq;		//(:,:,:,:), the integral of V_eff and Q_{nm}
 	ModuleBase::ComplexArray deeq_nc;	//(:,:,:,:), the spin-orbit case
-	realArray becsum;	//(:,:,:,:), \sum_i  f(i) <psi(i)/beta_1><beta_m/psi(i)> //used in charge
+	ModuleBase::realArray becsum;	//(:,:,:,:), \sum_i  f(i) <psi(i)/beta_1><beta_m/psi(i)> //used in charge
 
 
 	ModuleBase::ComplexMatrix vkb;	// all beta functions in reciprocal space

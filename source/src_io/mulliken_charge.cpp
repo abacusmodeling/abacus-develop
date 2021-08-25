@@ -115,7 +115,7 @@ Mulliken_Charge::~Mulliken_Charge()
   
 void Mulliken_Charge::cal_mulliken(void)
 {
-	TITLE("Mulliken_Charge","cal_mulliken");
+	ModuleBase::TITLE("Mulliken_Charge","cal_mulliken");
 
 	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
@@ -299,7 +299,7 @@ void Mulliken_Charge::stdout_mulliken(void)
 {                    this->cal_mulliken();
 	if(GlobalV::MY_RANK == 0)
 	{
-		TITLE("Dos","calculate_Mulliken");
+		ModuleBase::TITLE("Dos","calculate_Mulliken");
 		std::ofstream fout;
 		const char * fn= "mulliken.txt";
 		fout.open(fn);

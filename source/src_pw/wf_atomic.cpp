@@ -31,8 +31,8 @@ WF_atomic::~WF_atomic()
 //==========================================================
 void WF_atomic::init_at_1(void)
 {
-    if (GlobalV::test_wf) TITLE("WF_atomic","init_at_1");
-    timer::tick("WF_atomic","init_at_1");
+    if (GlobalV::test_wf) ModuleBase::TITLE("WF_atomic","init_at_1");
+    ModuleBase::timer::tick("WF_atomic","init_at_1");
 
 	GlobalV::ofs_running << "\n Make real space PAO into reciprocal space." << std::endl;
 
@@ -61,7 +61,7 @@ void WF_atomic::init_at_1(void)
 // NAME : GlobalC::ucell.atoms.r
 //----------------------------------------------------------
     const int startq = 0;
-    const double pref = FOUR_PI / sqrt(GlobalC::ucell.omega);
+    const double pref = ModuleBase::FOUR_PI / sqrt(GlobalC::ucell.omega);
     double *aux = new double[ndm];
     double *vchi = new double[ndm];
 
@@ -151,7 +151,7 @@ void WF_atomic::init_at_1(void)
 
     delete [] aux;
     delete [] vchi;
-    timer::tick("WF_atomic","init_at_1");
+    ModuleBase::timer::tick("WF_atomic","init_at_1");
     return;
 }// end init_at_1
 
@@ -173,7 +173,7 @@ void WF_atomic::print_PAOs(void)const
             else
             {
 				GlobalV::ofs_warning << "\n nchi = " << GlobalC::ucell.atoms[it].nchi << std::endl;
-                WARNING_QUIT("WF_atomic::print_PAOs", "unknown PAO type.");
+                ModuleBase::WARNING_QUIT("WF_atomic::print_PAOs", "unknown PAO type.");
             }
 
             std::stringstream ss;
@@ -225,7 +225,7 @@ void WF_atomic::check_psi(const ModuleBase::ComplexMatrix *evc)const
         ModuleBase::GlobalFunc::OUT("ik",ik);
         ModuleBase::GlobalFunc::OUT("sum_evc2",sum_evc);
     }
-    //QUIT();
+    //ModuleBase::QUIT();
 }
 
 void WF_atomic::atomic_wfc
@@ -233,13 +233,13 @@ void WF_atomic::atomic_wfc
   const int np,
   const int lmax_wfc,
   ModuleBase::ComplexMatrix &wfcatom,
-  const realArray &table_q,
+  const ModuleBase::realArray &table_q,
   const int &table_dimension,
   const double &dq
 )const
 {
-    if (GlobalV::test_wf>3) TITLE("WF_atomic","atomic_wfc");
-    timer::tick("WF_atomic","atomic_wfc");
+    if (GlobalV::test_wf>3) ModuleBase::TITLE("WF_atomic","atomic_wfc");
+    ModuleBase::timer::tick("WF_atomic","atomic_wfc");
     //=========================================================
     // This routine computes the superposition of atomic
     // WF_atomictions for a given k-point.
@@ -249,7 +249,7 @@ void WF_atomic::atomic_wfc
     std::complex<double> *aux = new std::complex<double>[np];
     double *chiaux = new double[1];
 
-    Vector3<double> *gk = new Vector3 <double> [np];
+    ModuleBase::Vector3<double> *gk = new ModuleBase::Vector3 <double> [np];
     for (int ig=0;ig<np;ig++)
     {
         gk[ig] = WF_atomic::get_1qvec_cartesian(ik, ig);
@@ -275,7 +275,7 @@ void WF_atomic::atomic_wfc
                 if (GlobalC::ucell.atoms[it].oc[iw] >= 0.0)
                 {
                     const int l = GlobalC::ucell.atoms[it].lchi[iw];
-                    std::complex<double> lphase = pow(NEG_IMAG_UNIT, l);
+                    std::complex<double> lphase = pow(ModuleBase::NEG_IMAG_UNIT, l);
                     //-----------------------------------------------------
                     //  the factor i^l MUST BE PRESENT in order to produce
                     //  WF_atomictions for k=0 that are real in real space
@@ -366,12 +366,12 @@ void WF_atomic::atomic_wfc
                               }
                               //and construct the starting wavefunctions as in the noncollinear case.
                               alpha = GlobalC::ucell.magnet.angle1_[it];
-                              gamma = -1 * GlobalC::ucell.magnet.angle2_[it] + 0.5 * PI;
+                              gamma = -1 * GlobalC::ucell.magnet.angle2_[it] + 0.5 * ModuleBase::PI;
 
                               for(int m = 0;m<2*l+1;m++)
                               {
                                  const int lm = l*l +m;
-                                 if(index+2*l+1>GlobalC::ucell.natomwfc) WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
+                                 if(index+2*l+1>GlobalC::ucell.natomwfc) ModuleBase::WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
                                  for(int ig = 0;ig<np;ig++)
                                  {
                                      aux[ig] = sk[ig] * ylm(lm,ig) * chiaux[ig];
@@ -381,16 +381,16 @@ void WF_atomic::atomic_wfc
                                  for(int ig = 0;ig<np;ig++)
                                  {
                                      fup = cos(0.5 * alpha) * aux[ig];
-                                     fdown = IMAG_UNIT * sin(0.5* alpha) * aux[ig];
+                                     fdown = ModuleBase::IMAG_UNIT * sin(0.5* alpha) * aux[ig];
                                      //build the orthogonal wfc
-                                     //first rotation with angle (alpha + PI) around (OX)
-                                     wfcatom(index,ig) = (cos(0.5 * gamma) + IMAG_UNIT * sin(0.5*gamma)) * fup;
-                                     wfcatom(index,ig+ this->npwx) = (cos(0.5 * gamma) - IMAG_UNIT * sin(0.5*gamma)) * fdown;
+                                     //first rotation with angle (alpha + ModuleBase::PI) around (OX)
+                                     wfcatom(index,ig) = (cos(0.5 * gamma) + ModuleBase::IMAG_UNIT * sin(0.5*gamma)) * fup;
+                                     wfcatom(index,ig+ this->npwx) = (cos(0.5 * gamma) - ModuleBase::IMAG_UNIT * sin(0.5*gamma)) * fdown;
                                      //second rotation with angle gamma around(OZ)
-                                     fup = cos(0.5 * (alpha + PI))*aux[ig];
-                                     fdown = IMAG_UNIT * sin(0.5 * (alpha + PI))*aux[ig];
-                                     wfcatom(index+2*l+1,ig) = (cos(0.5*gamma) + IMAG_UNIT*sin(0.5*gamma))*fup;
-                                     wfcatom(index+2*l+1,ig+ this->npwx) = (cos(0.5*gamma) - IMAG_UNIT*sin(0.5*gamma))*fdown;
+                                     fup = cos(0.5 * (alpha + ModuleBase::PI))*aux[ig];
+                                     fdown = ModuleBase::IMAG_UNIT * sin(0.5 * (alpha + ModuleBase::PI))*aux[ig];
+                                     wfcatom(index+2*l+1,ig) = (cos(0.5*gamma) + ModuleBase::IMAG_UNIT*sin(0.5*gamma))*fup;
+                                     wfcatom(index+2*l+1,ig+ this->npwx) = (cos(0.5*gamma) - ModuleBase::IMAG_UNIT*sin(0.5*gamma))*fdown;
                                  }
                                  index++;
                               }
@@ -402,11 +402,11 @@ void WF_atomic::atomic_wfc
                             double alpha, gamman;
                             std::complex<double> fup, fdown;
                             alpha = GlobalC::ucell.magnet.angle1_[it];
-                            gamman = -GlobalC::ucell.magnet.angle2_[it] + 0.5*PI;
+                            gamman = -GlobalC::ucell.magnet.angle2_[it] + 0.5*ModuleBase::PI;
                             for(int m = 0;m<2*l+1;m++)
                             {
                                 const int lm = l*l +m;
-                                if(index+2*l+1>GlobalC::ucell.natomwfc) WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
+                                if(index+2*l+1>GlobalC::ucell.natomwfc) ModuleBase::WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
                                 for(int ig = 0;ig<np;ig++)
                                 {
                                      aux[ig] = sk[ig] * ylm(lm,ig) * flq[ig];
@@ -416,16 +416,16 @@ void WF_atomic::atomic_wfc
                                 for(int ig = 0;ig<np;ig++)
                                 {
                                      fup = cos(0.5*alpha) * aux[ig];
-                                     fdown = IMAG_UNIT * sin(0.5* alpha) * aux[ig];
+                                     fdown = ModuleBase::IMAG_UNIT * sin(0.5* alpha) * aux[ig];
                                      //build the orthogonal wfc
-                                     //first rotation with angle(alpha+PI) around(OX)
-                                     wfcatom(index,ig) = (cos(0.5 * gamman) + IMAG_UNIT * sin(0.5*gamman)) * fup;
-                                     wfcatom(index,ig+ this->npwx) = (cos(0.5 * gamman) - IMAG_UNIT * sin(0.5*gamman)) * fdown;
+                                     //first rotation with angle(alpha+ModuleBase::PI) around(OX)
+                                     wfcatom(index,ig) = (cos(0.5 * gamman) + ModuleBase::IMAG_UNIT * sin(0.5*gamman)) * fup;
+                                     wfcatom(index,ig+ this->npwx) = (cos(0.5 * gamman) - ModuleBase::IMAG_UNIT * sin(0.5*gamman)) * fdown;
                                      //second rotation with angle gamma around(OZ)
-                                     fup = cos(0.5 * (alpha + PI)) * aux[ig];
-                                     fdown = IMAG_UNIT * sin(0.5 * (alpha + PI)) * aux[ig];
-                                     wfcatom(index+2*l+1,ig) = (cos(0.5*gamman) + IMAG_UNIT*sin(0.5*gamman))*fup;
-                                     wfcatom(index+2*l+1,ig+ this->npwx) = (cos(0.5*gamman) - IMAG_UNIT*sin(0.5*gamman))*fdown;
+                                     fup = cos(0.5 * (alpha + ModuleBase::PI)) * aux[ig];
+                                     fdown = ModuleBase::IMAG_UNIT * sin(0.5 * (alpha + ModuleBase::PI)) * aux[ig];
+                                     wfcatom(index+2*l+1,ig) = (cos(0.5*gamman) + ModuleBase::IMAG_UNIT*sin(0.5*gamman))*fup;
+                                     wfcatom(index+2*l+1,ig+ this->npwx) = (cos(0.5*gamman) - ModuleBase::IMAG_UNIT*sin(0.5*gamman))*fdown;
                                 }
                                 index++;
                             }
@@ -461,13 +461,13 @@ void WF_atomic::atomic_wfc
 
     if (index != GlobalC::ucell.natomwfc)
     {
-        WARNING_QUIT("GlobalC::wf.atomic_wfc()","index != GlobalC::ucell.natomwfc");
+        ModuleBase::WARNING_QUIT("GlobalC::wf.atomic_wfc()","index != GlobalC::ucell.natomwfc");
     }
     delete[] flq;
     delete [] gk;
     delete [] aux;
     delete[] chiaux;
-    timer::tick("WF_atomic","atomic_wfc");
+    ModuleBase::timer::tick("WF_atomic","atomic_wfc");
     return;
 } //end subroutine atomic_wfc
 
@@ -516,8 +516,8 @@ void WF_atomic::random(ModuleBase::ComplexMatrix &psi,const int iw_start,const i
                 for (int ig = 0;ig < ng;ig++)
                 {
                     const double rr = tmprr[GR_index[ig]];
-                    const double arg= TWO_PI * tmparg[GR_index[ig]];
-                    Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
+                    const double arg= ModuleBase::TWO_PI * tmparg[GR_index[ig]];
+                    ModuleBase::Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
                     psi(iw,ig+startig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
                 }
                 startig += npwx;
@@ -542,15 +542,15 @@ void WF_atomic::random(ModuleBase::ComplexMatrix &psi,const int iw_start,const i
             for (int ig = 0;ig < ng;ig++)
             {
                 const double rr = std::rand()/double(RAND_MAX); //qianrui add RAND_MAX
-                const double arg= TWO_PI * std::rand()/double(RAND_MAX);
-                Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
+                const double arg= ModuleBase::TWO_PI * std::rand()/double(RAND_MAX);
+                ModuleBase::Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
                 psi(iw,ig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
             }
             if(GlobalV::NPOL==2)for (int ig = this->npwx;ig < this->npwx + ng;ig++)
             {
                 const double rr = std::rand()/double(RAND_MAX);
-                const double arg= TWO_PI * std::rand()/double(RAND_MAX);
-                Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig - this->npwx));
+                const double arg= ModuleBase::TWO_PI * std::rand()/double(RAND_MAX);
+                ModuleBase::Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig - this->npwx));
                 psi(iw,ig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
             }
         }
@@ -606,7 +606,7 @@ void WF_atomic::atomicrandom(ModuleBase::ComplexMatrix &psi,const int iw_start,c
                 for (int ig = 0;ig < ng;ig++)
                 {
                     const double rr = tmprr[GR_index[ig]];
-                    const double arg= TWO_PI * tmparg[GR_index[ig]];
+                    const double arg= ModuleBase::TWO_PI * tmparg[GR_index[ig]];
                     psi(iw,startig+ig) *= (1.0 + 0.05 * std::complex<double>(rr * cos(arg), rr * sin(arg)));
                 }
                 startig += npwx;
@@ -635,7 +635,7 @@ void WF_atomic::atomicrandom(ModuleBase::ComplexMatrix &psi,const int iw_start,c
 				for(int ig = 0 ; ig < npw ; ++ig)
 				{
 					rr = rand()/double(RAND_MAX);
-					arg = TWO_PI * rand()/double(RAND_MAX);
+					arg = ModuleBase::TWO_PI * rand()/double(RAND_MAX);
 					psi(iw,startig+ig) *= (1.0 + 0.05 * std::complex<double>(rr * cos(arg), rr * sin(arg)));
 				}
 				startig += npwx;

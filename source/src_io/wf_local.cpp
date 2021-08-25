@@ -63,8 +63,8 @@ inline int CTOT2q_c(
 // be called in local_orbital_wfc::allocate_k
 int WF_Local::read_lowf_complex(std::complex<double> **c, const int &ik, const bool &newdm)
 {
-    TITLE("WF_Local","read_lowf_complex");
-    timer::tick("WF_Local","read_lowf_complex");
+    ModuleBase::TITLE("WF_Local","read_lowf_complex");
+    ModuleBase::timer::tick("WF_Local","read_lowf_complex");
 
     std::complex<double> **ctot;
 
@@ -221,14 +221,14 @@ int WF_Local::read_lowf_complex(std::complex<double> **c, const int &ik, const b
 	*/
 
 
-    timer::tick("WF_Local","read_lowf_complex");
+    ModuleBase::timer::tick("WF_Local","read_lowf_complex");
 	return 0;
 }
 
 int WF_Local::read_lowf(double **c, const int &is)
 {
-    TITLE("WF_Local","read_lowf");
-    timer::tick("WF_Local","read_lowf");
+    ModuleBase::TITLE("WF_Local","read_lowf");
+    ModuleBase::timer::tick("WF_Local","read_lowf");
 
     double **ctot;
 
@@ -353,14 +353,14 @@ int WF_Local::read_lowf(double **c, const int &is)
         delete[] ctot;
     }
 
-    timer::tick("WF_Local","read_lowf");
+    ModuleBase::timer::tick("WF_Local","read_lowf");
     return 0;
 }
 
 void WF_Local::write_lowf(const std::string &name, double **ctot)
 {
-    TITLE("WF_Local","write_lowf");
-    timer::tick("WF_Local","write_lowf");
+    ModuleBase::TITLE("WF_Local","write_lowf");
+    ModuleBase::timer::tick("WF_Local","write_lowf");
 
     std::ofstream ofs;
     if (GlobalV::DRANK==0)
@@ -368,7 +368,7 @@ void WF_Local::write_lowf(const std::string &name, double **ctot)
         ofs.open(name.c_str());
         if (!ofs)
         {
-            WARNING("Pdiag_Basic::write_lowf","Can't write local orbital wave functions.");
+            ModuleBase::WARNING("Pdiag_Basic::write_lowf","Can't write local orbital wave functions.");
         }
         ofs << GlobalV::NBANDS << " (number of bands)" << std::endl;
         ofs << GlobalV::NLOCAL << " (number of orbitals)";
@@ -391,14 +391,14 @@ void WF_Local::write_lowf(const std::string &name, double **ctot)
         ofs.close();
     }
 
-    timer::tick("WF_Local","write_lowf");
+    ModuleBase::timer::tick("WF_Local","write_lowf");
     return;
 }
 
 void WF_Local::write_lowf_complex(const std::string &name, std::complex<double> **ctot, const int &ik)
 {
-    TITLE("WF_Local","write_lowf_complex");
-    timer::tick("WF_Local","write_lowf_complex");
+    ModuleBase::TITLE("WF_Local","write_lowf_complex");
+    ModuleBase::timer::tick("WF_Local","write_lowf_complex");
 
     std::ofstream ofs;
     if (GlobalV::DRANK==0)
@@ -406,7 +406,7 @@ void WF_Local::write_lowf_complex(const std::string &name, std::complex<double> 
         ofs.open(name.c_str());
         if (!ofs)
         {
-            WARNING("Pdiag_Basic::write_lowf","Can't write local orbital wave functions.");
+            ModuleBase::WARNING("Pdiag_Basic::write_lowf","Can't write local orbital wave functions.");
         }
         ofs << std::setprecision(25);
 		ofs << ik+1 << " (index of k points)" << std::endl;
@@ -431,13 +431,13 @@ void WF_Local::write_lowf_complex(const std::string &name, std::complex<double> 
         ofs.close();
     }
 
-    timer::tick("WF_Local","write_lowf_complex");
+    ModuleBase::timer::tick("WF_Local","write_lowf_complex");
     return;
 }
 
 void WF_Local::distri_lowf_new(double **ctot, const int &is)
 {
-    TITLE("WF_Local","distri_lowf_new");
+    ModuleBase::TITLE("WF_Local","distri_lowf_new");
 #ifdef __MPI
 
 //1. alloc work array; set some parameters
@@ -502,14 +502,14 @@ void WF_Local::distri_lowf_new(double **ctot, const int &is)
 
 	delete[] work;
 #else
-	WARNING_QUIT("WF_Local::distri_lowf_new","check the code without MPI.");
+	ModuleBase::WARNING_QUIT("WF_Local::distri_lowf_new","check the code without MPI.");
 #endif
     return;
 }
 
 void WF_Local::distri_lowf_complex_new(std::complex<double> **ctot, const int &ik)
 {
-    TITLE("WF_Local","distri_lowf_complex_new");
+    ModuleBase::TITLE("WF_Local","distri_lowf_complex_new");
 #ifdef __MPI
 
 //1. alloc work array; set some parameters
@@ -574,14 +574,14 @@ void WF_Local::distri_lowf_complex_new(std::complex<double> **ctot, const int &i
 
 	delete[] work;
 #else
-	WARNING_QUIT("WF_Local::distri_lowf_new","check the code without MPI.");
+	ModuleBase::WARNING_QUIT("WF_Local::distri_lowf_new","check the code without MPI.");
 #endif
     return;
 }
 
 void WF_Local::distri_lowf(double **ctot, double **c)
 {
-    TITLE("WF_Local","distri_lowf");
+    ModuleBase::TITLE("WF_Local","distri_lowf");
 #ifdef __MPI
 
     MPI_Status status;
@@ -704,7 +704,7 @@ void WF_Local::distri_lowf(double **ctot, double **c)
     GlobalV::ofs_running << std::endl;
     */
 #else
-	WARNING_QUIT("WF_Local::distri_lowf","check the code without MPI.");
+	ModuleBase::WARNING_QUIT("WF_Local::distri_lowf","check the code without MPI.");
 #endif
     return;
 }
@@ -712,7 +712,7 @@ void WF_Local::distri_lowf(double **ctot, double **c)
 
 void WF_Local::distri_lowf_complex(std::complex<double> **ctot, std::complex<double> **cc)
 {
-    TITLE("WF_Local","distri_lowf_complex");
+    ModuleBase::TITLE("WF_Local","distri_lowf_complex");
 #ifdef __MPI
 
     MPI_Status status;
@@ -836,7 +836,7 @@ void WF_Local::distri_lowf_complex(std::complex<double> **ctot, std::complex<dou
     GlobalV::ofs_running << std::endl;
     */
 #else
-	WARNING_QUIT("WF_Local::distri_lowf_complex","check the code without MPI.");
+	ModuleBase::WARNING_QUIT("WF_Local::distri_lowf_complex","check the code without MPI.");
 #endif
     return;
 }
@@ -844,7 +844,7 @@ void WF_Local::distri_lowf_complex(std::complex<double> **ctot, std::complex<dou
 
 void WF_Local::distri_lowf_aug(double **ctot, double **c_aug)
 {
-    TITLE("WF_Local","distri_lowf_aug");
+    ModuleBase::TITLE("WF_Local","distri_lowf_aug");
 
 #ifdef __MPI
     MPI_Status status;
@@ -1005,7 +1005,7 @@ void WF_Local::distri_lowf_aug(double **ctot, double **c_aug)
     GlobalV::ofs_running << std::endl;
     */
 #else
-	WARNING_QUIT("WF_Local::distri_lowf_aug","check code without MPI.");
+	ModuleBase::WARNING_QUIT("WF_Local::distri_lowf_aug","check code without MPI.");
 #endif
     return;
 }
@@ -1013,7 +1013,7 @@ void WF_Local::distri_lowf_aug(double **ctot, double **c_aug)
 
 void WF_Local::distri_lowf_aug_complex(std::complex<double> **ctot, std::complex<double> **c_aug)
 {
-    TITLE("WF_Local","distri_lowf_aug_complex");
+    ModuleBase::TITLE("WF_Local","distri_lowf_aug_complex");
 
 #ifdef __MPI
     MPI_Status status;
@@ -1177,7 +1177,7 @@ void WF_Local::distri_lowf_aug_complex(std::complex<double> **ctot, std::complex
     GlobalV::ofs_running << std::endl;
 	*/
 #else
-	WARNING_QUIT("WF_Local::distri_lowf_aug_complex","check code without MPI.");
+	ModuleBase::WARNING_QUIT("WF_Local::distri_lowf_aug_complex","check code without MPI.");
 #endif
     return;
 }

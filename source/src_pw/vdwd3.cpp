@@ -13,13 +13,13 @@ Vdwd3::Vdwd3(const UnitCell_pseudo &unit_in, Vdwd3_Parameters &para_in):
 	ucell(unit_in),
 	para(para_in){}
 
-void Vdwd3::set_criteria(double &rthr, std::vector<Vector3<double>> &lat, std::vector<double> &tau_max)
+void Vdwd3::set_criteria(double &rthr, std::vector<ModuleBase::Vector3<double>> &lat, std::vector<double> &tau_max)
 {
     tau_max.resize(3);
 	double r_cutoff = sqrt(rthr);
-	Vector3<double> norm1 = (lat[1] ^ lat[2]).normalize();
-	Vector3<double> norm2 = (lat[2] ^ lat[0]).normalize();
-	Vector3<double> norm3 = (lat[0] ^ lat[1]).normalize();
+	ModuleBase::Vector3<double> norm1 = (lat[1] ^ lat[2]).normalize();
+	ModuleBase::Vector3<double> norm2 = (lat[2] ^ lat[0]).normalize();
+	ModuleBase::Vector3<double> norm3 = (lat[0] ^ lat[1]).normalize();
 	double cos10 = norm1 * lat[0];
 	double cos21 = norm2 * lat[1];
 	double cos32 = norm3 * lat[2];
@@ -105,7 +105,7 @@ void Vdwd3::pbcncoord(std::vector<double> &cn)
 	for(size_t i=0; i!=ucell.nat; i++)
 	{
 		double xn = 0.0;
-		Vector3<double> tau;
+		ModuleBase::Vector3<double> tau;
 		double r2 = 0.0, rr = 0.0;
 		for(size_t iat=0; iat!=ucell.nat; iat++)
 			for(int taux=-rep_cn[0]; taux<=rep_cn[0]; taux++)
@@ -123,12 +123,12 @@ void Vdwd3::pbcncoord(std::vector<double> &cn)
 	}
 }
 
-void Vdwd3::pbcthreebody(std::vector<int> &iz,  std::vector<Vector3<double>> &lat, std::vector<Vector3<double>> &xyz, std::vector<int> &rep_cn, std::vector<double> &cc6ab, double &eabc)
+void Vdwd3::pbcthreebody(std::vector<int> &iz,  std::vector<ModuleBase::Vector3<double>> &lat, std::vector<ModuleBase::Vector3<double>> &xyz, std::vector<int> &rep_cn, std::vector<double> &cc6ab, double &eabc)
 {
 	double sr9=0.75, alp9=-16.0;
 	int ij, ik, jk;
 	double r0ij, r0ik, r0jk, c9, rij2, rik2, rjk2, rr0ij, rr0ik, rr0jk, geomean, fdamp, tmp1, tmp2, tmp3, tmp4, ang;
-	Vector3<double> ijvec, ikvec, jkvec, jtau, ktau;
+	ModuleBase::Vector3<double> ijvec, ikvec, jkvec, jtau, ktau;
 	std::vector<double> repmin(3), repmax(3);
 	for(int iat=2; iat!=ucell.nat; iat++)
 		for(int jat=1; jat!=iat; jat++)
@@ -392,7 +392,7 @@ void Vdwd3::pbcthreebody(std::vector<int> &iz,  std::vector<Vector3<double>> &la
 
 void Vdwd3::cal_energy()
 {
-	TITLE("Vdwd3","cal_energy");
+	ModuleBase::TITLE("Vdwd3","cal_energy");
 	init(ucell);
 
 	int ij;	
@@ -400,7 +400,7 @@ void Vdwd3::cal_energy()
 	double e6 = 0.0, e8 = 0.0, eabc = 0.0;
 	std::vector<double> cc6ab(ucell.nat*ucell.nat), cn(ucell.nat);
 	pbcncoord(cn);
-	Vector3<double> tau;
+	ModuleBase::Vector3<double> tau;
 	if(para.version == "d3_0") // DFT-D3(zero-damping)
 	{
 		double tmp;
@@ -589,7 +589,7 @@ void Vdwd3::get_dc6_dcnij(int &mxci, int &mxcj, double &cni, double &cnj, int &i
 	}
 }
 
-void Vdwd3::pbcgdisp(std::vector<Vector3<double>> &g, ModuleBase::matrix &sigma)
+void Vdwd3::pbcgdisp(std::vector<ModuleBase::Vector3<double>> &g, ModuleBase::matrix &sigma)
 {
 	init(ucell);
 	std::vector<double> c6save(ucell.nat*(ucell.nat+1)), dc6_rest_sum(ucell.nat*(ucell.nat+1)/2), dc6i(ucell.nat), cn(ucell.nat);
@@ -599,7 +599,7 @@ void Vdwd3::pbcgdisp(std::vector<Vector3<double>> &g, ModuleBase::matrix &sigma)
 	double r = 0.0, r0 = 0.0, r2 = 0.0, r6 = 0.0, r7 = 0.0, r8 = 0.0, r9 = 0.0;
 	double r42 = 0.0, rcovij = 0.0, t6 = 0.0, t8 = 0.0, dc6_rest = 0.0;
 	int linii = 0, linij = 0;
-	Vector3<double> tau;
+	ModuleBase::Vector3<double> tau;
 	std::vector<std::vector<std::vector<std::vector<double>>>> drij(ucell.nat*(ucell.nat+1)/2, std::vector<std::vector<std::vector<double>>>(2*rep_vdw[0]+1, std::vector<std::vector<double>>(2*rep_vdw[1]+1, std::vector<double>(2*rep_vdw[2]+1))));
 	if(para.version == "d3_0")
 	{
@@ -773,7 +773,7 @@ void Vdwd3::pbcgdisp(std::vector<Vector3<double>> &g, ModuleBase::matrix &sigma)
 
 	if(para.abc)
 	{
-		Vector3<double> ijvec, ikvec, jkvec, jtau, ktau;
+		ModuleBase::Vector3<double> ijvec, ikvec, jkvec, jtau, ktau;
 		std::vector<int> repmin(3), repmax(3);
 		double sr9=0.75, alp9=-16.0;
 		double linik, linjk, rij2, rik2, rjk2, rr0ij, rr0ik, rr0jk, geomean2, geomean, geomean3, r0av, r;
@@ -1128,7 +1128,7 @@ void Vdwd3::pbcgdisp(std::vector<Vector3<double>> &g, ModuleBase::matrix &sigma)
 
 	// dE/dr_ij * dr_ij/dxyz_i
 	double expterm, dcnn, x1;
-	Vector3<double> rij, vec3;
+	ModuleBase::Vector3<double> rij, vec3;
 	for(int iat=1; iat!=ucell.nat; iat++)
 		for(int jat=0; jat!=iat; jat++)
 		{
@@ -1199,12 +1199,12 @@ void Vdwd3::pbcgdisp(std::vector<Vector3<double>> &g, ModuleBase::matrix &sigma)
 
 void Vdwd3::cal_force()
 {
-	TITLE("Vdwd3","cal_force");
+	ModuleBase::TITLE("Vdwd3","cal_force");
 
 	force.clear();
 	force.resize(ucell.nat);
 
-	std::vector<Vector3<double>> g;
+	std::vector<ModuleBase::Vector3<double>> g;
 	g.clear();
 	g.resize(ucell.nat);
 	ModuleBase::matrix sigma(3, 3);
@@ -1218,9 +1218,9 @@ void Vdwd3::cal_force()
 
 void Vdwd3::cal_stress()
 {
-	TITLE("Vdwd3","cal_stress");
+	ModuleBase::TITLE("Vdwd3","cal_stress");
 
-	std::vector<Vector3<double>> g;
+	std::vector<ModuleBase::Vector3<double>> g;
 	g.clear();
 	g.resize(ucell.nat);
 	ModuleBase::matrix sigma(3, 3);

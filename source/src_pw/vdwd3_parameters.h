@@ -34,7 +34,7 @@ public:
 	double rs18;
     std::string version;
     std::string model;
-	Vector3<int> period;
+	ModuleBase::Vector3<int> period;
 
     // internal used
     int max_elem = 94;

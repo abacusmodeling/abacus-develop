@@ -184,7 +184,7 @@ void Numerical_Orbital_Lm::copy_parameter(
 	/***********************************************************
 	be careful! LiaoChen modify on 2010/4/21
 	************************************************************/
-//	this->dk = PI / rcut / 2.0;
+//	this->dk = ModuleBase::PI / rcut / 2.0;
 //	this->nk = this->nr;
 
 	r_radial.resize(nr);
@@ -210,7 +210,7 @@ void Numerical_Orbital_Lm::copy_parameter(
 
 void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool &force_flag)
 {
-	timer::tick("NOrbital_Lm", "extra_uniform");
+	ModuleBase::timer::tick("NOrbital_Lm", "extra_uniform");
 	
 	//---------------------------------------------
 	// set the dr, fixed by liaochen.
@@ -311,7 +311,7 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool
 	delete [] y2;
 	delete [] rad;
 	delete [] tmp;
-	timer::tick("NOrbital_Lm", "extra_uniform");
+	ModuleBase::timer::tick("NOrbital_Lm", "extra_uniform");
 }
 
 void Numerical_Orbital_Lm::use_uniform(const double &dr_uniform_in)
@@ -397,7 +397,7 @@ void Numerical_Orbital_Lm::cal_kradial(void)
 	double *jl = new double[nr];
 	double *integrated_func = new double[nr];
 
-	const double pref = sqrt( 2.0 / PI );
+	const double pref = sqrt( 2.0 / ModuleBase::PI );
 	//Sbt method
 	
 	/*
@@ -475,7 +475,7 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 	const std::vector<std::vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
 
 	std::vector<double> integrated_func( this->nr );
-	const double pref = sqrt( 2.0 / PI );
+	const double pref = sqrt( 2.0 / ModuleBase::PI );
 
 	std::vector<double> psir2(nr);
 	for( size_t ir=0; ir!=nr; ++ir )
@@ -529,7 +529,7 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 	pSB->cal_jlx( this->angular_momentum_l, this->nk, this->nr );
 	const std::vector<std::vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
 
-	const double pref = sqrt( 2.0 / PI );
+	const double pref = sqrt( 2.0 / ModuleBase::PI );
 
 	std::vector<double> r_tmp(nr);
 	for( int ir=0; ir!=nr; ++ir )
@@ -606,7 +606,7 @@ void Numerical_Orbital_Lm::cal_rradial_sbpool(void)
 
 	const std::vector<std::vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
 
-	const double pref = sqrt(2.0/PI);
+	const double pref = sqrt(2.0/ModuleBase::PI);
 
 	std::vector<double> k_tmp(nk);
 
@@ -648,7 +648,7 @@ void Numerical_Orbital_Lm::cal_rradial_sbpool(void)
 //===============================================
 void Numerical_Orbital_Lm::norm_test(void)const
 {
-//	TITLE(ofs_onscaling, "Numerical_Orbital_Lm", "norm_test");
+//	ModuleBase::TITLE(ofs_onscaling, "Numerical_Orbital_Lm", "norm_test");
 	//double asum_r = 0.0;
 	//double asum_k = 0.0;
 
@@ -682,7 +682,7 @@ void Numerical_Orbital_Lm::norm_test(void)const
 
 void Numerical_Orbital_Lm::plot(void)const
 {
-	TITLE("Numerical_Orbital_Lm","plot");
+	ModuleBase::TITLE("Numerical_Orbital_Lm","plot");
 	
 	std::string orbital_type;
 	// Peize Lin update 2016-08-31
@@ -737,7 +737,7 @@ void Numerical_Orbital_Lm::plot(void)const
 
 		if (!ofsk || !ofsr || !ofsru || !ofsdru) // 2013-08-10 pengfei
 		{
-			WARNING("Numerical_Orbital_Lm : plot", "Can't open files !");
+			ModuleBase::WARNING("Numerical_Orbital_Lm : plot", "Can't open files !");
 		}
 
 		for (int i = 0; i < this->nr; i++)

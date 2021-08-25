@@ -12,7 +12,7 @@ template<> std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Or
 Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<ModuleBase::matrix> &DK_2D, const double threshold_D) const
 {
 
-	TITLE("Exx_Abfs::Parallel::Communicate::DM3::K_to_R");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM3::K_to_R");
 	assert(DK_2D.size()==GlobalV::NSPIN);
 	const double SPIN_multiple = 0.5*GlobalV::NSPIN;
 	
@@ -54,9 +54,9 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<ModuleBase::Compl
 		ofs<<DK_2D<<std::endl;
 	}
 	
-	TITLE("Exx_Abfs::Parallel::Communicate::DM3::K_to_R");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM3::K_to_R");
 	const double SPIN_multiple = 0.5*GlobalV::NSPIN;
-	const Abfs::Vector3_Order<int> Born_von_Karman_period = Vector3<int>{GlobalC::kv.nmp[0],GlobalC::kv.nmp[1],GlobalC::kv.nmp[2]};
+	const Abfs::Vector3_Order<int> Born_von_Karman_period = ModuleBase::Vector3<int>{GlobalC::kv.nmp[0],GlobalC::kv.nmp[1],GlobalC::kv.nmp[2]};
 	const std::vector<Abfs::Vector3_Order<int>> supercell_boxes = Abfs::get_Born_von_Karmen_boxes(Born_von_Karman_period);
 	
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> DR_a2D(GlobalV::NSPIN);
@@ -77,7 +77,7 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<ModuleBase::Compl
 					ModuleBase::matrix &DR_a2D_box2 = DR_a2D[GlobalC::kv.isk[ik]][iat1][iat2][box2];
 					if(!DR_a2D_box2.c)
 						DR_a2D_box2.create(GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw, GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw);
-					DR_a2D_box2(iw1,iw2) += real( DK_2D[ik](iwt1_local,iwt2_local) * exp(-TWO_PI*IMAG_UNIT*(GlobalC::kv.kvec_c[ik]*(box2*GlobalC::ucell.latvec))) ) * SPIN_multiple;
+					DR_a2D_box2(iw1,iw2) += real( DK_2D[ik](iwt1_local,iwt2_local) * exp(-ModuleBase::TWO_PI*IMAG_UNIT*(GlobalC::kv.kvec_c[ik]*(box2*GlobalC::ucell.latvec))) ) * SPIN_multiple;
 				}
 			}
 		}
@@ -97,7 +97,7 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<ModuleBase::Compl
 
 void Exx_Abfs::Parallel::Communicate::DM3::cal_DM(const double threshold_D)
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::DM3::cal_DM");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM3::cal_DM");
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> DR_a2D = GlobalV::GAMMA_ONLY_LOCAL
 		? K_to_R(GlobalC::LOC.wfc_dm_2d.dm_gamma, threshold_D)
 		: K_to_R(GlobalC::LOC.wfc_dm_2d.dm_k, threshold_D);

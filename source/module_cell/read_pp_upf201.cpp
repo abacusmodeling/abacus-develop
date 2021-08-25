@@ -10,7 +10,7 @@ int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 	//--------------------------------------
 	//-              PP_HEADER             - 
 	//--------------------------------------
-	if(!ModuleBase::GlobalFunc::SCAN_BEGIN(ifs,"<PP_HEADER"))	WARNING_QUIT("read_pseudo_upf201","Found no PP_HEADER");
+	if(!ModuleBase::GlobalFunc::SCAN_BEGIN(ifs,"<PP_HEADER"))	ModuleBase::WARNING_QUIT("read_pseudo_upf201","Found no PP_HEADER");
 	std::string *name=new std::string[50];
 	std::string *val=new std::string[50];
 	int nparameter;
@@ -33,20 +33,20 @@ int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 			pp_type = val[ip];
 			if(pp_type!="NC") 
 			{
-				WARNING_QUIT("Pseudopot_upf::read_pseudo_header","unknown pseudo type");
+				ModuleBase::WARNING_QUIT("Pseudopot_upf::read_pseudo_header","unknown pseudo type");
 			}
 		}
 		else if(name[ip]=="relativistic"){}
 		else if(name[ip]=="is_ultrasoft"){
 			if(val[ip]=="T" || val[ip]=="TRUE" || val[ip]=="True" || val[ip]=="true")
 			{
-				WARNING_QUIT("Pseudopot_upf::read_pseudo_header","ULTRASOFT PSEUDOPOTENTIAL IS NOT SUPPORTED !!!");
+				ModuleBase::WARNING_QUIT("Pseudopot_upf::read_pseudo_header","ULTRASOFT PSEUDOPOTENTIAL IS NOT SUPPORTED !!!");
 			}
 		}
 		else if(name[ip]=="is_paw"){
 			if(val[ip]=="T" || val[ip]=="TRUE" || val[ip]=="True" || val[ip]=="true")
 			{
-				WARNING_QUIT("Pseudopot_upf::read_pseudo_header","PAW PSEUDOPOTENTIAL IS NOT SUPPORTED !!!");
+				ModuleBase::WARNING_QUIT("Pseudopot_upf::read_pseudo_header","PAW PSEUDOPOTENTIAL IS NOT SUPPORTED !!!");
 			}
 		}
 		else if(name[ip]=="is_coulomb"){}
@@ -99,7 +99,7 @@ int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 		else
 		{
 			std::string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
-			WARNING("PP_HEADRER reading", warningstr);
+			ModuleBase::WARNING("PP_HEADRER reading", warningstr);
 		}
 	}
 			
@@ -120,7 +120,7 @@ int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 			else
 			{
 				std::string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
-				WARNING("PP_MESH reading", warningstr);
+				ModuleBase::WARNING("PP_MESH reading", warningstr);
 			}
 
 		}
@@ -220,7 +220,7 @@ int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 			else
 			{
 				std::string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
-				WARNING("PP_BETA reading", warningstr);
+				ModuleBase::WARNING("PP_BETA reading", warningstr);
 			}
 		}
 		for (int ir=0;ir<mesh;ir++)
@@ -288,7 +288,7 @@ int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 			else
 			{
 				std::string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
-				WARNING("PP_CHI reading", warningstr);
+				ModuleBase::WARNING("PP_CHI reading", warningstr);
 			}
 		}
 		for (int ir=0;ir<mesh;ir++)
@@ -349,7 +349,7 @@ int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 					else
 					{
 						std::string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
-						WARNING("PP_RELBETA reading", warningstr);
+						ModuleBase::WARNING("PP_RELBETA reading", warningstr);
 					}
 				}
 			}
@@ -381,7 +381,7 @@ int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 					else
 					{
 						std::string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
-						WARNING("PP_RELWFC reading", warningstr);
+						ModuleBase::WARNING("PP_RELWFC reading", warningstr);
 					}
 				}
 			}
@@ -450,7 +450,7 @@ int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 
 			if(pp_type!="NC") 
 			{
-				WARNING_QUIT("Pseudopot_upf::read_pseudo_header","unknown pseudo type");
+				ModuleBase::WARNING_QUIT("Pseudopot_upf::read_pseudo_header","unknown pseudo type");
 			}
 
 			ModuleBase::GlobalFunc::READ_VALUE(ifs, word);   // relativistic
@@ -1227,7 +1227,7 @@ void Pseudopot_upf:: getnameval(std::ifstream& ifs,int &n, std::string * name, s
 				break;
 			}
 		}
-		if(!findmark) WARNING_QUIT("read_upf201",
+		if(!findmark) ModuleBase::WARNING_QUIT("read_upf201",
 		"The values are not in \' or \". Please improve the program in read_pp_upf201.cpp");
 		pos = pos2;
 		pos2 = txt.find(mark,pos);

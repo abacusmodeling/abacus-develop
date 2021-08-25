@@ -160,8 +160,8 @@ void Gint_Gamma::cal_band_rho(
 // Output:	rho.ptr_2D[is][ir]
 Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const*const DM) const					// Peize Lin update OpenMP 2020.09.28
 {
-    TITLE("Gint_Gamma","gamma_charge");
-    timer::tick("Gint_Gamma","gamma_charge");   
+    ModuleBase::TITLE("Gint_Gamma","gamma_charge");
+    ModuleBase::timer::tick("Gint_Gamma","gamma_charge");   
 
 	Gint_Tools::Array_Pool<double> rho(GlobalV::NSPIN, GlobalC::pw.nrxx);
 	ModuleBase::GlobalFunc::ZEROS(rho.ptr_1D, GlobalV::NSPIN*GlobalC::pw.nrxx);
@@ -280,17 +280,17 @@ double sum_up_rho(const Gint_Tools::Array_Pool<double> &rho)
 	}
     if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "sum", sum);
 
-    timer::tick("Gint_Gamma","reduce_charge");
+    ModuleBase::timer::tick("Gint_Gamma","reduce_charge");
 #ifdef __MPI
     Parallel_Reduce::reduce_double_pool( sum );
 #endif
-    timer::tick("Gint_Gamma","reduce_charge");
+    ModuleBase::timer::tick("Gint_Gamma","reduce_charge");
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_warning,"charge density sumed from grid", sum * GlobalC::ucell.omega/ GlobalC::pw.ncxyz);
 
     const double ne = sum * GlobalC::ucell.omega / GlobalC::pw.ncxyz;
     //xiaohui add 'GlobalV::OUT_LEVEL', 2015-09-16
     if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "ne", ne);
-    timer::tick("Gint_Gamma","gamma_charge");
+    ModuleBase::timer::tick("Gint_Gamma","gamma_charge");
 	return ne;
 }
 
@@ -299,8 +299,8 @@ double sum_up_rho(const Gint_Tools::Array_Pool<double> &rho)
 // calculate charge density
 double Gint_Gamma::cal_rho(const double*const*const*const DM)
 {
-    TITLE("Gint_Gamma","cal_rho");
-    timer::tick("Gint_Gamma","cal_rho");
+    ModuleBase::TITLE("Gint_Gamma","cal_rho");
+    ModuleBase::timer::tick("Gint_Gamma","cal_rho");
 
     this->job = cal_charge;
     this->save_atoms_on_grid(GlobalC::GridT);
@@ -308,6 +308,6 @@ double Gint_Gamma::cal_rho(const double*const*const*const DM)
 	const Gint_Tools::Array_Pool<double> rho = this->gamma_charge(DM);
     const double ne = sum_up_rho(rho);
 
-    timer::tick("Gint_Gamma","cal_rho");
+    ModuleBase::timer::tick("Gint_Gamma","cal_rho");
     return ne;
 }

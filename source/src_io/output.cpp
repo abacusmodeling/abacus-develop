@@ -104,7 +104,7 @@ void output::printcm(std::ofstream &ofs, const std::string &s, const ModuleBase:
 
     if (b1*b2 == 0) return;
 
-    ofs.setf(ios::scientific, ios::floatfield);
+    ofs.setf(std::ios::scientific, std::ios::floatfield);
     for (int i = 0;i < b1;i++)
     {
         for (int j = 0;j < b2;j++)
@@ -113,7 +113,7 @@ void output::printcm(std::ofstream &ofs, const std::string &s, const ModuleBase:
             ofs << std::setw(20) << m(i, j).real() << std::setw(20) << m(i, j).imag();
         }
     }
-    ofs.unsetf(ios::scientific);
+    ofs.unsetf(std::ios::scientific);
     return;
 }//end print cm
 
@@ -205,7 +205,7 @@ void output::printcm_imag(const std::string &s, const ModuleBase::ComplexMatrix 
 
 
 
-void output::printr3_d(std::ofstream &ofs, const std::string &s,const realArray &u) const
+void output::printr3_d(std::ofstream &ofs, const std::string &s,const ModuleBase::realArray &u) const
 {
     const int b1 = u.getBound1();
     const int b2 = u.getBound2();
@@ -228,7 +228,7 @@ void output::printr3_d(std::ofstream &ofs, const std::string &s,const realArray 
     return;
 }//end printr3_d
 
-void output::printr4_d(std::ofstream &ofs, const std::string &s,const realArray &u) const
+void output::printr4_d(std::ofstream &ofs, const std::string &s,const ModuleBase::realArray &u) const
 {
     const int b1 = u.getBound1();
     const int b2 = u.getBound2();
@@ -255,11 +255,11 @@ void output::printr4_d(std::ofstream &ofs, const std::string &s,const realArray 
 void output::printM3(std::ofstream &ofs,const std::string &description, const Matrix3 &m)const
 {
     ofs << " " << description << std::endl;
-	ofs << std::setiosflags(ios::showpos);
+	ofs << std::setiosflags(std::ios::showpos);
     ofs << " " << std::setw(20) << m.e11 << std::setw(20) << m.e12 << std::setw(20) << m.e13 
 	<< "\n " << std::setw(20) << m.e21 << std::setw(20) << m.e22 << std::setw(20) << m.e23 
 	<< "\n " << std::setw(20) << m.e31 << std::setw(20) << m.e32 << std::setw(20) << m.e33 << std::endl;
-	ofs << std::resetiosflags(ios::showpos);
+	ofs << std::resetiosflags(std::ios::showpos);
     return;
 }
 

@@ -32,7 +32,7 @@ Gint_Gamma::~Gint_Gamma()
 
 void Gint_Gamma::save_atoms_on_grid(const Grid_Technique &gt)
 {
-    TITLE("Grid_Integral","save_atoms_on_grid");
+    ModuleBase::TITLE("Grid_Integral","save_atoms_on_grid");
 
     // mohan change.
     max_size = gt.max_atom;

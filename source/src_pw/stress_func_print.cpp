@@ -62,7 +62,7 @@ void Stress_Func::printstress_total(const ModuleBase::matrix& scs, bool ry)
 
 	if(!ry)
 	{
-		unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
+		unit_transform = ModuleBase::RYDBERG_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
 	}
 //	std::cout.setf(ios::fixed);
 

@@ -199,7 +199,7 @@ void Symmetry_Basic::atom_ordering(double *posi, const int natom, int *subindex)
 
 void Symmetry_Basic::order_y(double *pos1, const int &oldpos1, const int &newpos1)
 {
-//	TITLE("Symmetry_Basic","order_y");
+//	ModuleBase::TITLE("Symmetry_Basic","order_y");
 	// how many atoms need to be reordered according to same x value.
 	const int nat1 = newpos1 - oldpos1;
 //	std::cout << "\n nat1=" << nat1 << std::endl; 
@@ -256,7 +256,7 @@ void Symmetry_Basic::order_y(double *pos1, const int &oldpos1, const int &newpos
 
 void Symmetry_Basic::order_z(double* pos2, const int &oldpos2, const int &newpos2)
 {
-//	TITLE("Symmetry_Basic","order_z");
+//	ModuleBase::TITLE("Symmetry_Basic","order_z");
 	const int nat2 = newpos2 - oldpos2;
 //	std::cout << "\n nat2=" << nat2; 
 //	if(nat2==1) return;
@@ -347,8 +347,8 @@ void Symmetry_Basic::maxmin(
 }
 
 void Symmetry_Basic::shorter_vector(
-Vector3<double> &t1,
-Vector3<double> &t2,
+ModuleBase::Vector3<double> &t1,
+ModuleBase::Vector3<double> &t2,
 double &abs0,
 double &abs1,
 bool &flag1)
@@ -393,9 +393,9 @@ bool &flag1)
 }
 
 void Symmetry_Basic::shortest_vector(
-		Vector3<double> &t1,
-		Vector3<double>	&t2,
-		Vector3<double> &t3
+		ModuleBase::Vector3<double> &t1,
+		ModuleBase::Vector3<double>	&t2,
+		ModuleBase::Vector3<double> &t3
 		)
 {
 	bool flag1 = true;
@@ -426,12 +426,12 @@ void Symmetry_Basic::shortest_vector(
 //set up the reciprocal lattice vectors b1, b2, b3 for a given set of lattice vectors a1, a2, a3
 void Symmetry_Basic::recip(
 		const double a, 
-		const Vector3<double> &a1, 
-		const Vector3<double> &a2, 
-		const Vector3<double> &a3, 
-		Vector3<double> &b1, 
-		Vector3<double> &b2, 
-		Vector3<double> &b3
+		const ModuleBase::Vector3<double> &a1, 
+		const ModuleBase::Vector3<double> &a2, 
+		const ModuleBase::Vector3<double> &a3, 
+		ModuleBase::Vector3<double> &b1, 
+		ModuleBase::Vector3<double> &b2, 
+		ModuleBase::Vector3<double> &b3
 		)
 {
 	double volume = Symm_Other::celvol(a1, a2, a3);
@@ -457,12 +457,12 @@ void Symmetry_Basic::veccon(
 		double *carpos, 
 		double *rotpos, 
 		const int num, 
-		const Vector3<double> &old1, 
-		const Vector3<double> &old2, 
-		const Vector3<double> &old3, 
-		const Vector3<double> &new1, 
-		const Vector3<double> &new2, 
-		const Vector3<double> &new3
+		const ModuleBase::Vector3<double> &old1, 
+		const ModuleBase::Vector3<double> &old2, 
+		const ModuleBase::Vector3<double> &old3, 
+		const ModuleBase::Vector3<double> &new1, 
+		const ModuleBase::Vector3<double> &new2, 
+		const ModuleBase::Vector3<double> &new3
 		)
 {
 
@@ -498,9 +498,9 @@ void Symmetry_Basic::veccon(
 
 	Matrix3 GT = newlat.Inverse();
 	
-	Vector3<double> car;
-	Vector3<double> direct_old;
-	Vector3<double> direct_new;
+	ModuleBase::Vector3<double> car;
+	ModuleBase::Vector3<double> direct_old;
+	ModuleBase::Vector3<double> direct_new;
 
 	//calculate the reciprocal vectors rb1, rb2, rb3 for the vectors new1, new2, new3
 	//this->recip(1.0, new1, new2, new3, rb1, rb2, rb3);
@@ -706,7 +706,7 @@ void Symmetry_Basic::matrigen(Matrix3 *symgen, const int ngen, Matrix3* symop, i
 //--------------------------------------------------------------
 void Symmetry_Basic::setgroup(Matrix3* symop, int &nop, const int &ibrav)
 {
-	if(GlobalV::test_symmetry) TITLE("Symmetry_Basic","setgroup");
+	if(GlobalV::test_symmetry) ModuleBase::TITLE("Symmetry_Basic","setgroup");
 
 	Matrix3 symgen[3];
 
@@ -854,7 +854,7 @@ void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, std::string &pgn
 
 	//there are four trivial cases which could be easily determined
 	//because the number of their elements are exclusive
-	if(GlobalV::test_symmetry) TITLE("Symmetry_Basic","pointgroup");
+	if(GlobalV::test_symmetry) ModuleBase::TITLE("Symmetry_Basic","pointgroup");
 
 	if(nrot == 1)
 	{
@@ -1139,7 +1139,7 @@ void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, std::string &pgn
 }
 
 
-void Symmetry_Basic::rotate( Matrix3 &gmatrix, Vector3<double> &gtrans, 
+void Symmetry_Basic::rotate( Matrix3 &gmatrix, ModuleBase::Vector3<double> &gtrans, 
 		int i, int j, int k, // FFT grid index.
 		const int nr1, const int nr2, const int nr3, // dimension of FFT grid. 
 		int &ri, int &rj, int &rk)

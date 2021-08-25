@@ -43,7 +43,7 @@ void ORB_table_phi::allocate
     const double &dk_in
 )
 {
-	TITLE("ORB_table_phi", "allocate");
+	ModuleBase::TITLE("ORB_table_phi", "allocate");
 
 	this->ntype = ntype_in;// type of elements.
 	this->lmax = lmax_in;
@@ -105,7 +105,7 @@ int ORB_table_phi::get_rmesh(const double &R1, const double &R2)
 		//GlobalV::ofs_warning << "\n rmesh = " << rmesh;
 		std::cout << "\n R1 = " << R1 << " R2 = " << R2;
 		std::cout << "\n rmesh = " << rmesh;
-		WARNING_QUIT("ORB_table_phi::get_rmesh", "rmesh <= 0");
+		ModuleBase::WARNING_QUIT("ORB_table_phi::get_rmesh", "rmesh <= 0");
 	}
 	return rmesh;
 }
@@ -122,7 +122,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 	double* drs
 ) const
 {
-	timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
+	ModuleBase::timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
 
 	double* k1_dot_k2 = new double[kmesh];
 	double* k1_dot_k2_dot_kpoint = new double[kmesh];
@@ -189,7 +189,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 		double temp = 0.0;
 
 		ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,dk,temp);
-		rs[ir] = temp * FOUR_PI ;
+		rs[ir] = temp * ModuleBase::FOUR_PI ;
 		
 		// Peize Lin accelerate 2017-10-02
 		const std::vector<double> &jlm1_r = jlm1[ir];
@@ -211,7 +211,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 		}
 
 		ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,dk,temp);
-		drs[ir] = -FOUR_PI*(l+1)/(2.0*l+1) * temp;
+		drs[ir] = -ModuleBase::FOUR_PI*(l+1)/(2.0*l+1) * temp;
 	}
 
 	//liaochen modify on 2010/4/22
@@ -229,14 +229,14 @@ void ORB_table_phi::cal_ST_Phi12_R
 		}
 		
 		ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,kab,temp);
-		rs[0] = FOUR_PI / ModuleBase::Mathzone_Add1::dualfac (2*l+1) * temp;
+		rs[0] = ModuleBase::FOUR_PI / ModuleBase::Mathzone_Add1::dualfac (2*l+1) * temp;
 	}
 
 	delete [] integrated_func;
 	delete [] k1_dot_k2;
 	delete [] k1_dot_k2_dot_kpoint;	
 
-	timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
+	ModuleBase::timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
 	
 	return;
 }
@@ -254,8 +254,8 @@ void ORB_table_phi::cal_ST_Phi12_R
 	double* drs
 ) const
 {
-//	TITLE("ORB_table_phi","cal_ST_Phi12_R");
-	timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
+//	ModuleBase::TITLE("ORB_table_phi","cal_ST_Phi12_R");
+	ModuleBase::timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
 
 	std::vector<double> k1_dot_k2(kmesh);
 	switch(job)
@@ -319,7 +319,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 		double temp = 0.0;
 
 		ModuleBase::Integral::Simpson_Integral(kmesh,ModuleBase::GlobalFunc::VECTOR_TO_PTR(integrated_func),dk,temp);
-		rs[ir] = temp * FOUR_PI ;
+		rs[ir] = temp * ModuleBase::FOUR_PI ;
 		
 		const std::vector<double> &jlm1_r = jlm1[ir];
 		const std::vector<double> &jlp1_r = jlp1[ir];
@@ -340,7 +340,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 		}
 
 		ModuleBase::Integral::Simpson_Integral(kmesh,ModuleBase::GlobalFunc::VECTOR_TO_PTR(integrated_func),dk,temp);
-		drs[ir] = -FOUR_PI*(l+1)/(2.0*l+1) * temp;
+		drs[ir] = -ModuleBase::FOUR_PI*(l+1)/(2.0*l+1) * temp;
 	}
 
 	// cal rs[0] special
@@ -358,11 +358,11 @@ void ORB_table_phi::cal_ST_Phi12_R
 
 			// PLEASE try to make dualfac function as input parameters
 			// mohan note 2021-03-23
-			rs[0] = FOUR_PI / ModuleBase::Mathzone_Add1::dualfac (2*l+1) * temp;
+			rs[0] = ModuleBase::FOUR_PI / ModuleBase::Mathzone_Add1::dualfac (2*l+1) * temp;
 		}
 	}
 	
-	timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
+	ModuleBase::timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
 	
 	return;
 }
@@ -373,8 +373,8 @@ void ORB_table_phi::init_Table(
 	const int &job0, 
 	LCAO_Orbitals &orb)
 {
-	TITLE("ORB_table_phi", "init_Table");
-	timer::tick("ORB_table_phi", "init_Table");
+	ModuleBase::TITLE("ORB_table_phi", "init_Table");
+	ModuleBase::timer::tick("ORB_table_phi", "init_Table");
 	const int ntype = orb.get_ntype();
 	assert( ORB_table_phi::dr > 0.0);
 	assert( OV_nTpairs>0);
@@ -515,7 +515,7 @@ void ORB_table_phi::init_Table(
 									Table_SR[0][Tpair][Opair][L] = new double[rmesh];
 									Table_SR[1][Tpair][Opair][L] = new double[rmesh];
 
-									Memory::record("ORB_table_phi","Table_SR",
+									ModuleBase::Memory::record("ORB_table_phi","Table_SR",
 									2*OV_nTpairs*pairs_chi*rmesh,"double");
 									break;
 
@@ -523,7 +523,7 @@ void ORB_table_phi::init_Table(
 									Table_TR[0][Tpair][Opair][L] = new double[rmesh];
 									Table_TR[1][Tpair][Opair][L] = new double[rmesh];
 
-									Memory::record("ORB_table_phi","Table_TR",
+									ModuleBase::Memory::record("ORB_table_phi","Table_TR",
 									2*OV_nTpairs*pairs_chi*rmesh,"double");
 									break;
 
@@ -533,7 +533,7 @@ void ORB_table_phi::init_Table(
 									Table_TR[0][Tpair][Opair][L] = new double[rmesh];
 									Table_TR[1][Tpair][Opair][L] = new double[rmesh];
 
-									Memory::record("ORB_table_phi","Table_SR&TR",
+									ModuleBase::Memory::record("ORB_table_phi","Table_SR&TR",
 									2*2*OV_nTpairs*pairs_chi*rmesh,"double");
 									break;
 								}
@@ -630,7 +630,7 @@ void ORB_table_phi::init_Table(
 		break;
 	}
 		
-	timer::tick("ORB_table_phi", "init_Table");
+	ModuleBase::timer::tick("ORB_table_phi", "init_Table");
 	return;
 }
 
@@ -686,7 +686,7 @@ void ORB_table_phi::Destroy_Table(LCAO_Orbitals &orb)
 
 void ORB_table_phi::init_OV_Tpair(LCAO_Orbitals &orb)
 {
-	TITLE("ORB_table_phi","init_OV_Tpair");
+	ModuleBase::TITLE("ORB_table_phi","init_OV_Tpair");
     assert(ntype>0);
 
     this->OV_nTpairs = this->ntype * (this->ntype + 1) / 2;
@@ -853,7 +853,7 @@ void ORB_table_phi::init_Table_Spherical_Bessel (
 	int &Lmax,
 	const int &Lmax_exx)
 {
-	TITLE("ORB_table_phi", "init_Table_Spherical_Bessel");
+	ModuleBase::TITLE("ORB_table_phi", "init_Table_Spherical_Bessel");
 
 	this->init_Lmax (orb_num,mode,Lmax_used,Lmax,Lmax_exx);		// Peize Lin add 2016-01-26
 
@@ -899,5 +899,5 @@ void ORB_table_phi::init_Table_Spherical_Bessel (
 //	OUT(GlobalV::ofs_running,"lmax used to generate Jlq",Lmax_used);
 //	OUT(GlobalV::ofs_running,"kmesh",kmesh);
 //	OUT(GlobalV::ofs_running,"Rmesh",Rmesh);
-	Memory::record ("ORB_table_phi", "Jl(x)", (Lmax_used+1) * this->kmesh * this->Rmesh, "double");
+	ModuleBase::Memory::record ("ORB_table_phi", "Jl(x)", (Lmax_used+1) * this->kmesh * this->Rmesh, "double");
 }

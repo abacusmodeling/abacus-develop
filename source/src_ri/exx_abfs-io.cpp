@@ -135,10 +135,10 @@ std::vector<std::vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 		}		
 	}
 	
-	CHECK_NAME(ifs, "Mesh");
+	ModuleBase::CHECK_NAME(ifs, "Mesh");
 	ifs >> meshr;
 	
-	CHECK_NAME(ifs, "dr");
+	ModuleBase::CHECK_NAME(ifs, "dr");
 	ifs >> dr;
 
 	while(ifs.good())
@@ -339,8 +339,8 @@ void Exx_Abfs::IO::print_matrix(
 		const size_t nwfc = (TA==TB && IA==IB) ? cal_sum_M(TA) : cal_sum_M(TA)+cal_sum_M(TB);
 		ofs	<< nwfc << " nwfc" << std::endl;
 		
-		const size_t ecut_numberA = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * GlobalC::ORB.Phi[TA].getRcut() / PI ); // Rydberg Unit
-		const size_t ecut_numberB = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * GlobalC::ORB.Phi[TB].getRcut() / PI ); // Rydberg Unit
+		const size_t ecut_numberA = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * GlobalC::ORB.Phi[TA].getRcut() / ModuleBase::PI ); // Rydberg Unit
+		const size_t ecut_numberB = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * GlobalC::ORB.Phi[TB].getRcut() / ModuleBase::PI ); // Rydberg Unit
 		assert( ecut_numberA == ecut_numberB );
 		ofs	<< ecut_numberA << " ne" << std::endl;
 		

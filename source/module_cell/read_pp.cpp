@@ -55,7 +55,7 @@ Pseudopot_upf::~Pseudopot_upf()
 
 int Pseudopot_upf::init_pseudo_reader(const std::string &fn)
 {
-    TITLE("Pseudopot_upf","init");
+    ModuleBase::TITLE("Pseudopot_upf","init");
     // First check if this pseudo-potential has spin-orbit information
     std::ifstream ifs(fn.c_str(), ios::in);
 
@@ -152,7 +152,7 @@ int Pseudopot_upf::average_p(const double& lambda)
 		std::cout<<"warning_quit! no soc upf used for lspinorb calculation, error!"<<std::endl; 
 		return error;
 	}
-	//WARNING_QUIT("average_p", "no soc upf used for lspinorb calculation, error!");
+	//ModuleBase::WARNING_QUIT("average_p", "no soc upf used for lspinorb calculation, error!");
 
 	if(!this->has_so || (GlobalV::LSPINORB && abs(lambda_ - 1.0) < 1.0e-8) )
 	{
@@ -267,7 +267,7 @@ int Pseudopot_upf::average_p(const double& lambda)
 				{
 					if(abs(this->jchi[old_nwfc+1]-this->lchi[old_nwfc+1]-0.5)>1e-6) 
 					{error++; cout<<"warning_quit! error chi function 1 !"<<endl; return error;}
-	//					WARNING_QUIT("average_p", "error chi function 1 !");
+	//					ModuleBase::WARNING_QUIT("average_p", "error chi function 1 !");
 					ind = old_nwfc +1;
 					ind1 = old_nwfc;
 				}
@@ -275,7 +275,7 @@ int Pseudopot_upf::average_p(const double& lambda)
 				{
 					if(abs(this->jchi[old_nwfc+1]-this->lchi[old_nwfc+1]+0.5)>1e-6)
 					{error++; cout<<"warning_quit! error chi function 2 !"<<endl; return error;}
-	//					WARNING_QUIT("average_p", "error chi function 2 !");
+	//					ModuleBase::WARNING_QUIT("average_p", "error chi function 2 !");
 					ind = old_nwfc;
 					ind1 = old_nwfc +1;
 				}

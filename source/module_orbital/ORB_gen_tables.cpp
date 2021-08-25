@@ -20,8 +20,8 @@ void ORB_gen_tables::gen_tables(
 	const int &Lmax_exx,
 	const int &out_descriptor)
 {
-	TITLE("ORB_gen_tables", "gen_tables");
-	timer::tick("ORB_gen_tables", "gen_tables");
+	ModuleBase::TITLE("ORB_gen_tables", "gen_tables");
+	ModuleBase::timer::tick("ORB_gen_tables", "gen_tables");
 
 	ofs_in << "\n SETUP THE TWO-CENTER INTEGRATION TABLES" << std::endl;
 
@@ -105,29 +105,29 @@ void ORB_gen_tables::gen_tables(
 	/////////////////////////////
 
 	const int lmax = (Lmax_used - 1) / 2;
-	//MGT.init_Ylm_Gaunt(orb.get_lmax()+1, 0.0,PI,0.0,TWO_PI);
+	//MGT.init_Ylm_Gaunt(orb.get_lmax()+1, 0.0,PI,0.0,ModuleBase::TWO_PI);
 	MGT.init_Gaunt_CH(lmax);
 	//MGT.init_Gaunt(orb.get_lmax()+1);
 	MGT.init_Gaunt(lmax);
 
-	timer::tick("ORB_gen_tables", "gen_tables");
+	ModuleBase::timer::tick("ORB_gen_tables", "gen_tables");
 	return;
 }
 
 void ORB_gen_tables::snap_psibeta(
 	double nlm[],
 	const int &job,
-	const Vector3<double> &R1,
+	const ModuleBase::Vector3<double> &R1,
 	const int &T1,
 	const int &L1,
 	const int &m1,
 	const int &N1,
-	const Vector3<double> &R2,
+	const ModuleBase::Vector3<double> &R2,
 	const int &T2,
 	const int &L2,
 	const int &m2,
 	const int &N2,
-	const Vector3<double> &R0, // The projector.
+	const ModuleBase::Vector3<double> &R0, // The projector.
 	const int &T0,
 	const ModuleBase::matrix &dion, // mohan add 2021-04-25
 	const int &nspin,
@@ -139,7 +139,7 @@ void ORB_gen_tables::snap_psibeta(
 	std::complex<double> *nlm1,
 	const int is) const
 {
-	//TITLE ("ORB_gen_tables","snap_psibeta");
+	//ModuleBase::TITLE ("ORB_gen_tables","snap_psibeta");
 
 	//optimized by zhengdy-soc
 	if (nspin == 4 && count_soc == 0)
@@ -147,7 +147,7 @@ void ORB_gen_tables::snap_psibeta(
 		return;
 	}
 
-	timer::tick("ORB_gen_tables", "snap_psibeta");
+	ModuleBase::timer::tick("ORB_gen_tables", "snap_psibeta");
 
 	bool has_so = 0;
 	if (count_soc > 0)
@@ -168,8 +168,8 @@ void ORB_gen_tables::snap_psibeta(
 
 	//in our calculation, we always put orbital phi at the left side of <phi|beta>
 	//because <phi|beta> = <beta|phi>
-	const Vector3<double> dRa = (R0 - R1) * this->lat0;
-	const Vector3<double> dRb = (R0 - R2) * this->lat0;
+	const ModuleBase::Vector3<double> dRa = (R0 - R1) * this->lat0;
+	const ModuleBase::Vector3<double> dRb = (R0 - R2) * this->lat0;
 
 	double distance10 = dRa.norm();
 	double distance20 = dRb.norm();
@@ -201,7 +201,7 @@ void ORB_gen_tables::snap_psibeta(
 		delete[] calproj;
 		delete[] rmesh1;
 		delete[] rmesh2;
-		timer::tick("ORB_gen_tables", "snap_psibeta");
+		ModuleBase::timer::tick("ORB_gen_tables", "snap_psibeta");
 		return;
 	}
 
@@ -545,7 +545,7 @@ void ORB_gen_tables::snap_psibeta(
 					}
 					else
 					{
-						WARNING_QUIT("ORB_gen_tables::snap_psibeta", "Conflict! Didn't count non-local part");
+						ModuleBase::WARNING_QUIT("ORB_gen_tables::snap_psibeta", "Conflict! Didn't count non-local part");
 					}
 				}
 				break;
@@ -562,7 +562,7 @@ void ORB_gen_tables::snap_psibeta(
 	delete[] rmesh1;
 	delete[] rmesh2;
 
-	timer::tick("ORB_gen_tables", "snap_psibeta");
+	ModuleBase::timer::tick("ORB_gen_tables", "snap_psibeta");
 	return;
 }
 
@@ -570,12 +570,12 @@ void ORB_gen_tables::snap_psipsi(
 	double olm[],
 	const int &job,	   //0, 1
 	const char &dtype, // derivative type: S or T
-	const Vector3<double> &R1,
+	const ModuleBase::Vector3<double> &R1,
 	const int &T1,
 	const int &L1,
 	const int &m1,
 	const int &N1,
-	const Vector3<double> &R2,
+	const ModuleBase::Vector3<double> &R2,
 	const int &T2,
 	const int &L2,
 	const int &m2,
@@ -583,11 +583,11 @@ void ORB_gen_tables::snap_psipsi(
 	const int &nspin,
 	std::complex<double> *olm1) const
 {
-	//TITLE("ORB_gen_tables","snap_psipsi");
-	//timer::tick ("ORB_gen_tables", "snap_psipsi");
+	//ModuleBase::TITLE("ORB_gen_tables","snap_psipsi");
+	//ModuleBase::timer::tick ("ORB_gen_tables", "snap_psipsi");
 	if (job != 0 && job != 1)
 	{
-		WARNING_QUIT("ORB_gen_tables::snap_psipsi", "job must be equal to 0 or 1!");
+		ModuleBase::WARNING_QUIT("ORB_gen_tables::snap_psipsi", "job must be equal to 0 or 1!");
 	}
 
 	Numerical_Orbital::set_position(R1, R2);
@@ -763,7 +763,7 @@ void ORB_gen_tables::snap_psipsi(
 					}
 					else
 					{
-						WARNING_QUIT("ORB_gen_tables::snap_psipsi", "something wrong!");
+						ModuleBase::WARNING_QUIT("ORB_gen_tables::snap_psipsi", "something wrong!");
 					}
 
 					/*
@@ -859,7 +859,7 @@ void ORB_gen_tables::snap_psipsi(
 					}
 					else
 					{
-						WARNING_QUIT("ORB_gen_tables::snap_psipsi", "something wrong in T.");
+						ModuleBase::WARNING_QUIT("ORB_gen_tables::snap_psipsi", "something wrong in T.");
 					}
 					break;
 				}
@@ -947,7 +947,7 @@ void ORB_gen_tables::snap_psipsi(
 					}
 					else
 					{
-						WARNING_QUIT("ORB_gen_tables::snap_psialpha", "deepks with GlobalV::NSPIN>1 has not implemented yet!");
+						ModuleBase::WARNING_QUIT("ORB_gen_tables::snap_psialpha", "deepks with GlobalV::NSPIN>1 has not implemented yet!");
 					}
 					break;
 				}
@@ -966,14 +966,14 @@ void ORB_gen_tables::snap_psipsi(
 			} //m
 		}
 	}
-	//	timer::tick ("ORB_gen_tables", "snap_psipsi");
+	//	ModuleBase::timer::tick ("ORB_gen_tables", "snap_psipsi");
 	return;
 }
 
-double ORB_gen_tables::get_distance(const Vector3<double> &R1, const Vector3<double> &R2) const
+double ORB_gen_tables::get_distance(const ModuleBase::Vector3<double> &R1, const ModuleBase::Vector3<double> &R2) const
 {
 	assert(this->lat0 > 0.0);
-	Vector3<double> dR = R1 - R2;
+	ModuleBase::Vector3<double> dR = R1 - R2;
 	return dR.norm() * this->lat0;
 }
 

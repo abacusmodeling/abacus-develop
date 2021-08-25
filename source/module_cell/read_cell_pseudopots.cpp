@@ -15,7 +15,7 @@
 //==========================================================
 void UnitCell_pseudo::read_cell_pseudopots(const std::string &pp_dir)
 {
-	TITLE("UnitCell_pseudo","read_cell_pseudopots");
+	ModuleBase::TITLE("UnitCell_pseudo","read_cell_pseudopots");
 	// setup reading log for pseudopot_upf
 	std::stringstream ss;
 	ss << GlobalV::global_out_dir << "atom_pseudo.log";
@@ -53,22 +53,22 @@ void UnitCell_pseudo::read_cell_pseudopots(const std::string &pp_dir)
 
 		if(error_ap) 
 		{
-			WARNING_QUIT("UnitCell_pseudo::read_pseudopot","error when average the pseudopotential.");
+			ModuleBase::WARNING_QUIT("UnitCell_pseudo::read_pseudopot","error when average the pseudopotential.");
 		}
 
 		if(error==1)
 		{
 			std::cout << " Pseudopotential directory now is : " << pp_address << std::endl;
 			GlobalV::ofs_warning << " Pseudopotential directory now is : " << pp_address << std::endl;
-			WARNING_QUIT("read_pseudopot","Couldn't find pseudopotential file.");
+			ModuleBase::WARNING_QUIT("read_pseudopot","Couldn't find pseudopotential file.");
 		}
 		else if(error==2)
 		{
-			WARNING_QUIT("read_pseudopot","Pseudopotential data do not match.");
+			ModuleBase::WARNING_QUIT("read_pseudopot","Pseudopotential data do not match.");
 		}
 		else if(error==3)
 		{
-			WARNING_QUIT("read_pseudopot","Check the reference states in pseudopotential .vwr file.\n Also the norm of the read in pseudo wave functions\n explicitly please check S, P and D channels.\n If the norm of the wave function is \n unreasonable large (should be near 1.0), ABACUS would quit. \n The solution is to turn off the wave functions  \n and the corresponding non-local projectors together\n in .vwr pseudopotential file.");
+			ModuleBase::WARNING_QUIT("read_pseudopot","Check the reference states in pseudopotential .vwr file.\n Also the norm of the read in pseudo wave functions\n explicitly please check S, P and D channels.\n If the norm of the wave function is \n unreasonable large (should be near 1.0), ABACUS would quit. \n The solution is to turn off the wave functions  \n and the corresponding non-local projectors together\n in .vwr pseudopotential file.");
 		}
 
 //xiaohui add 2015-03-24
@@ -132,7 +132,7 @@ void UnitCell_pseudo::read_cell_pseudopots(const std::string &pp_dir)
 
 void UnitCell_pseudo::print_unitcell_pseudo(const std::string &fn, output &outp)
 {
-	if(GlobalV::test_pseudo_cell) TITLE("UnitCell_pseudo","print_unitcell_pseudo");
+	if(GlobalV::test_pseudo_cell) ModuleBase::TITLE("UnitCell_pseudo","print_unitcell_pseudo");
 	std::ofstream ofs( fn.c_str() );
 
 	this->print_cell(ofs, outp);

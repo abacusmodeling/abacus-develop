@@ -34,12 +34,12 @@ void pbec_spin(double rho, double zeta, double grho, const int &flag, double &sc
 void gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v);
 
 void gradient(int ncx, int ncy, int ncz, int ncxyz, double *a, int ngm,
-              Vector3 < double> *g, int *nl, double lat0,
-              Vector3 < double> *ga);
+              ModuleBase::Vector3 < double> *g, int *nl, double lat0,
+              ModuleBase::Vector3 < double> *ga);
 //void grad_dot (int ncx, int ncy, int ncz,int ncxyz, ModuleBase::matrix a, int ngm,
-//	       Vector3 < double> *g, int *nl, double lat0,double *da);
-void grad_dot(int ncx, int ncy, int ncz, int ncxyz, Vector3 < double> *a, int ngmc,
-              Vector3 < double> *g, int *ig2fftc, double lat0, double *da);
+//	       ModuleBase::Vector3 < double> *g, int *nl, double lat0,double *da);
+void grad_dot(int ncx, int ncy, int ncz, int ncxyz, ModuleBase::Vector3 < double> *a, int ngmc,
+              ModuleBase::Vector3 < double> *g, int *ig2fftc, double lat0, double *da);
 
 
 // myfunc5.cpp (from LPACK)

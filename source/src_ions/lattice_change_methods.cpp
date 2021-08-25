@@ -15,7 +15,7 @@ void Lattice_Change_Methods::allocate()
 
 void Lattice_Change_Methods::cal_lattice_change(const int &istep, const ModuleBase::matrix &stress, const double &etot)
 {
-	TITLE("Lattice_Change_Methods","lattice_change_init");
+	ModuleBase::TITLE("Lattice_Change_Methods","lattice_change_init");
 	Lattice_Change_Basic::istep = istep;
 	
 	lccg.start(stress,etot);

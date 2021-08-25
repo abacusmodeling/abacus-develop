@@ -59,7 +59,7 @@ Chi0_hilbert::~Chi0_hilbert()
 #include "../src_pw/occupy.h"
 void Chi0_hilbert::Chi()
 {
-	TITLE("Chi0_hilbert","Chi");
+	ModuleBase::TITLE("Chi0_hilbert","Chi");
 	//---------------------------------------
 	// check nomega
 	//---------------------------------------
@@ -81,7 +81,7 @@ void Chi0_hilbert::Chi()
 	{
 		int nomega_right = int(max_e/domega);
 		std::cout << "nomega must >= "<<nomega_right<<std::endl;
-		WARNING_QUIT("chi0_hilbert","nomega is too small!!!!!!!!!");
+		ModuleBase::WARNING_QUIT("chi0_hilbert","nomega is too small!!!!!!!!!");
 	}
 	
 	//---------------------------------------
@@ -102,7 +102,7 @@ void Chi0_hilbert::Chi()
 	
 	if(!exist_q)
 	{
-		WARNING_QUIT("chi0_hilbert","the chosen q is not included in the kmesh!!");
+		ModuleBase::WARNING_QUIT("chi0_hilbert","the chosen q is not included in the kmesh!!");
 	}
 	else
 	{
@@ -224,11 +224,11 @@ void Chi0_hilbert::Chi()
 	
 	//if(total_icount == 0)
 	//{
-	//	WARNING_QUIT("chi0_hilbert","Now the kmesh contains no kpoint along this direction!");
+	//	ModuleBase::WARNING_QUIT("chi0_hilbert","Now the kmesh contains no kpoint along this direction!");
 	//}
 	if(total_icount < nq-1 )
 	{
-		WARNING_QUIT("chi0_hilbert","Now the kmesh doesn't contain enough kpoints along this direction! please change the parameter nq smaller");
+		ModuleBase::WARNING_QUIT("chi0_hilbert","Now the kmesh doesn't contain enough kpoints along this direction! please change the parameter nq smaller");
 	}
 	
 	for(icount=0; icount<total_icount-1; icount++)
@@ -310,7 +310,7 @@ void Chi0_hilbert::Chi()
 			}
 			else
 			{
-				WARNING_QUIT("chi0_hilbert","Sorry! This smearing hasn't been realized here yet!!!");
+				ModuleBase::WARNING_QUIT("chi0_hilbert","Sorry! This smearing hasn't been realized here yet!!!");
 			}			
 		} 
 	}
@@ -428,28 +428,28 @@ void Chi0_hilbert::Chi()
 			std::ifstream ifsn(ss.str().c_str());
 			if(!ifsn)
 			{
-				WARNING_QUIT("chi0_hilbert", "Can't find the nearest.dat file!");
+				ModuleBase::WARNING_QUIT("chi0_hilbert", "Can't find the nearest.dat file!");
 			}
 			ifsn >> NR;
 			std::cout << "NR in = "<<NR << std::endl;
 			
-			R = new Vector3<int>** [GlobalV::NLOCAL];
+			R = new ModuleBase::Vector3<int>** [GlobalV::NLOCAL];
 			for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 			{
-				R[iw1] = new Vector3<int>* [GlobalV::NLOCAL];
+				R[iw1] = new ModuleBase::Vector3<int>* [GlobalV::NLOCAL];
 				for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 				{
-					R[iw1][iw2] = new Vector3<int>[NR];
+					R[iw1][iw2] = new ModuleBase::Vector3<int>[NR];
 				}
 			}
 			
-			Rcar = new Vector3<double>** [GlobalV::NLOCAL];
+			Rcar = new ModuleBase::Vector3<double>** [GlobalV::NLOCAL];
 			for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 			{
-				Rcar[iw1] = new Vector3<double>* [GlobalV::NLOCAL];
+				Rcar[iw1] = new ModuleBase::Vector3<double>* [GlobalV::NLOCAL];
 				for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 				{
-					Rcar[iw1][iw2] = new Vector3<double>[NR];
+					Rcar[iw1][iw2] = new ModuleBase::Vector3<double>[NR];
 				}
 			}
 			
@@ -519,7 +519,7 @@ void Chi0_hilbert::Chi()
 				std::ifstream ifso(ssq.str().c_str());
 				if (!ifso)
 				{
-					WARNING_QUIT("chi0_hilbert", "Can't find the overlap_q file!");
+					ModuleBase::WARNING_QUIT("chi0_hilbert", "Can't find the overlap_q file!");
 				}
 				ifso >> tmp; //std::cout << tmp << std::endl;
 				for(int ig=0; ig<dim; ig++)
@@ -619,7 +619,7 @@ void Chi0_hilbert::Chi()
 		}
 		else
 		{
-			WARNING_QUIT("chi0_hilbert","pw, lcao_in_pw, or lcao must be chosen!!!!!!");
+			ModuleBase::WARNING_QUIT("chi0_hilbert","pw, lcao_in_pw, or lcao must be chosen!!!!!!");
 		}
 	}
 	//----------------------------------------------------------
@@ -667,7 +667,7 @@ void Chi0_hilbert::Chi()
 	}
 	else
 	{
-		WARNING_QUIT("chi0_hilbert","system must be bulk or surface!!!!!!!");
+		ModuleBase::WARNING_QUIT("chi0_hilbert","system must be bulk or surface!!!!!!!");
 	}
 	
 	Delete();
@@ -677,7 +677,7 @@ void Chi0_hilbert::Chi()
 
 void Chi0_hilbert::Init()
 {
-	TITLE("Chi0_hilbert","Init");
+	ModuleBase::TITLE("Chi0_hilbert","Init");
 	//std::cout << "nbands(init) = " <<GlobalV::NBANDS <<std::endl;
 	//std::cout << "oband = " <<oband <<std::endl;
 	//std::cout << "nrxx = "<<GlobalC::pw.nrxx<<std::endl;
@@ -821,7 +821,7 @@ void Chi0_hilbert::Init()
 
 void Chi0_hilbert::Delete()
 {
-	TITLE("Chi0_hilbert","Delete");
+	ModuleBase::TITLE("Chi0_hilbert","Delete");
 	if(init_finish)
 	{
 		delete[] b_core;
@@ -960,7 +960,7 @@ void Chi0_hilbert::Delete()
 //----------------------------------------------------------
 void Chi0_hilbert::Parallel_G()
 {
-	TITLE("Chi0_hilbert","Parallel_G");
+	ModuleBase::TITLE("Chi0_hilbert","Parallel_G");
 	//----------------------------
 	// init
 	//----------------------------
@@ -972,7 +972,7 @@ void Chi0_hilbert::Parallel_G()
 	G_r = new double[GlobalC::pw.ngmc_g];
 	Gvec_core = new double[3*GlobalC::pw.ngmc];
 	Gvec = new double[3*GlobalC::pw.ngmc_g];
-	all_gcar = new Vector3<double>[GlobalC::pw.ngmc_g];
+	all_gcar = new ModuleBase::Vector3<double>[GlobalC::pw.ngmc_g];
 	flag = new int[GlobalC::pw.ngmc_g];
 	
 	for(int i=0;i<GlobalC::pw.ngmc_g;i++)
@@ -1064,7 +1064,7 @@ void Chi0_hilbert::Cal_Psi(int iq, std::complex<double> **psi_r)
 				phase_xy = phase_x + GlobalC::kv.kvec_d[iq].y*iy/GlobalC::pw.ncy;
 				for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; iz++)
 				{
-					phase_xyz = (phase_xy + GlobalC::kv.kvec_d[iq].z*iz/GlobalC::pw.ncz) *TWO_PI;
+					phase_xyz = (phase_xy + GlobalC::kv.kvec_d[iq].z*iz/GlobalC::pw.ncz) *ModuleBase::TWO_PI;
 					exp_tmp = std::complex<double>( cos(phase_xyz), sin(phase_xyz) );
 					psi_r[ib][ir] = GlobalC::UFFT.porter[ir]*exp_tmp;
 					ir++;
@@ -1100,7 +1100,7 @@ void Chi0_hilbert::Cal_Psi_down(int iq, std::complex<double> **psi_r)
 				phase_xy = phase_x + GlobalC::kv.kvec_d[iq].y*iy/GlobalC::pw.ncy;
 				for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; iz++)
 				{
-					phase_xyz = (phase_xy + GlobalC::kv.kvec_d[iq].z*iz/GlobalC::pw.ncz) *TWO_PI;
+					phase_xyz = (phase_xy + GlobalC::kv.kvec_d[iq].z*iz/GlobalC::pw.ncz) *ModuleBase::TWO_PI;
 					exp_tmp = std::complex<double>( cos(phase_xyz), sin(phase_xyz) );
 					psi_r[ib][ir] = GlobalC::UFFT.porter[ir]*exp_tmp;
 					ir++;
@@ -1126,9 +1126,9 @@ void Chi0_hilbert::Cal_lcao_psi()
 //---------------------------------------------------------------------------
 void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 {
-	TITLE("Chi0_hilbert","Cal_b_lcao");
+	ModuleBase::TITLE("Chi0_hilbert","Cal_b_lcao");
 	double arg;
-	Vector3<double> qk;
+	ModuleBase::Vector3<double> qk;
 	qk = GlobalC::kv.kvec_c[iq] + GlobalC::kv.kvec_c[ik];
 	//std::cout <<"qk = "<<qk.x<<" "<<qk.y<<" "<<qk.z<<std::endl;
 	
@@ -1151,7 +1151,7 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 		{
 			for(int ir=0; ir<Rmax[iw1][iw2]; ir++)
 			{
-				arg = qk * Rcar[iw1][iw2][ir] * TWO_PI;
+				arg = qk * Rcar[iw1][iw2][ir] * ModuleBase::TWO_PI;
 				phase[iw1][iw2][ir] = std::complex<double>( cos(arg),  sin(arg) );
 				MR++;
 				//std::cout << "phase["<<iw1<<"]["<<iw2<<"]["<<ir<<"] = "<<phase[iw1][iw2][ir]<<std::endl;
@@ -1254,12 +1254,12 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 
 void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 {
-	TITLE("Chi0_hilbert","Cal_b");
-	Vector3<double> qk;
+	ModuleBase::TITLE("Chi0_hilbert","Cal_b");
+	ModuleBase::Vector3<double> qk;
 	qk = GlobalC::kv.kvec_c[iq] + GlobalC::kv.kvec_c[ik];
 	//std::cout <<"qk = "<<qk.x<<" "<<qk.y<<" "<<qk.z<<std::endl;
 	double phase_x, phase_xy, phase_xyz;
-	Vector3<double> q = GlobalC::kv.kvec_d[iq];
+	ModuleBase::Vector3<double> q = GlobalC::kv.kvec_d[iq];
 	std::complex<double> exp_tmp;
 	
 	if(ispin == 0)
@@ -1286,7 +1286,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 					phase_xy = phase_x + q.y*iy/GlobalC::pw.ncy;
 					for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; iz++)
 					{
-						phase_xyz = (phase_xy + q.z*iz/GlobalC::pw.ncz) *TWO_PI;
+						phase_xyz = (phase_xy + q.z*iz/GlobalC::pw.ncz) *ModuleBase::TWO_PI;
 						exp_tmp = std::complex<double>(cos(-phase_xyz), sin(-phase_xyz));
 						GlobalC::UFFT.porter[ir] = conj(psi_r1[ib1][ir]) * psi_r2[ib2][ir] *exp_tmp;
 						ir++;
@@ -1340,7 +1340,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 	//		{
 	//			for(int ig =0; ig< GlobalC::kv.ngk[ik]; ig++)
 	//			{
-	//				b[ig][ib1][ib2] += conj(GlobalC::wf.evc[ik](ib1,ig)) * sqrt(((GlobalC::kv.kvec_c[ik]+GlobalC::pw.gcar[ig])*(-TWO_PI/GlobalC::ucell.lat0)).norm2()) * GlobalC::wf.evc[ik](ib2,ig);
+	//				b[ig][ib1][ib2] += conj(GlobalC::wf.evc[ik](ib1,ig)) * sqrt(((GlobalC::kv.kvec_c[ik]+GlobalC::pw.gcar[ig])*(-ModuleBase::TWO_PI/GlobalC::ucell.lat0)).norm2()) * GlobalC::wf.evc[ik](ib2,ig);
 	//			}
 	//			b[ig][ib1][ib2] /=(GlobalC::wf.ekb[ik][ib1] - GlobalC::wf.ekb[ik][ib2]);
 	//		}
@@ -1357,12 +1357,12 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 /*void Chi0_hilbert::Cal_b( int iq, int ik, int iqk)
 {
 
-        Vector3<double> qk;
+        ModuleBase::Vector3<double> qk;
         qk = GlobalC::kv.kvec_c[iq] + GlobalC::kv.kvec_c[ik];
         //std::cout <<"qk = "<<qk.x<<" "<<qk.y<<" "<<qk.z<<std::endl;
 
         double phase_x, phase_xy, phase_xyz;
-        Vector3<double> q = GlobalC::kv.kvec_d[iq];
+        ModuleBase::Vector3<double> q = GlobalC::kv.kvec_d[iq];
         std::cout <<"q_in = "<<q.x<<" "<<q.y<<" "<<q.z<<std::endl;
         std::complex<double> exp_tmp;
         Cal_Psi1(ik);
@@ -1392,7 +1392,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
         //                                phase_xy = phase_x + (q.y + GlobalC::pw.gdirect[ig].y)*iy/GlobalC::pw.ncy;
         //                                for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; ++iz)
         //                                {
-        //                                        phase_xyz = (phase_xy + (q.z + GlobalC::pw.gdirect[ig].z)*iz/GlobalC::pw.ncz) *TWO_PI;
+        //                                        phase_xyz = (phase_xy + (q.z + GlobalC::pw.gdirect[ig].z)*iz/GlobalC::pw.ncz) *ModuleBase::TWO_PI;
         //                                        exp_tmp.real() = cos(-phase_xyz);
         //                                        exp_tmp.imag() = sin(-phase_xyz);
         //                                        b[ig][ib1][ib2] = b[ig][ib1][ib2] +  conj(psi_r1[ib1][ir]) * psi_r2[ib2][ir] *exp_tmp;
@@ -1417,7 +1417,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
                     phase_xy = phase_x + (q.y + GlobalC::pw.gdirect[ig].y)*iy/GlobalC::pw.ncy;
                     for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; ++iz)
                     {
-                        phase_xyz = (phase_xy + (q.z + GlobalC::pw.gdirect[ig].z)*iz/GlobalC::pw.ncz) *TWO_PI;
+                        phase_xyz = (phase_xy + (q.z + GlobalC::pw.gdirect[ig].z)*iz/GlobalC::pw.ncz) *ModuleBase::TWO_PI;
                         exp_tmp.real() = cos(-phase_xyz);
                         exp_tmp.imag() = sin(-phase_xyz);
                         for(int ib1=0;ib1<oband;ib1++)
@@ -1448,7 +1448,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 // calculate the chi0s matrix
 void Chi0_hilbert::Cal_Chi0s(int iq)
 {
-	TITLE("Chi0_hilbert","Cal_Chi0s");
+	ModuleBase::TITLE("Chi0_hilbert","Cal_Chi0s");
 	double delta_e,e1,e2;
 	std::complex<double> weight1, weight2;
 	for(int g0=0; g0<dim; g0++)
@@ -1466,7 +1466,7 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 	std::ifstream ifs("band.dat");
 	if(!ifs)
 	{
-		WARNING_QUIT("chi0_hilbert","Can't find band.dat");
+		ModuleBase::WARNING_QUIT("chi0_hilbert","Can't find band.dat");
 	}
 	for(int i=0;i<GlobalC::kv.nks;i++)
 	{
@@ -1718,7 +1718,7 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 // calculte the transportation matrix
 void Chi0_hilbert::Cal_T()
 {
-	TITLE("Chi0_hilbert","Cal_T");
+	ModuleBase::TITLE("Chi0_hilbert","Cal_T");
 	std::complex<double> M1, M2;
 	for(int n1=0; n1<nomega; n1++)
 	{
@@ -1738,7 +1738,7 @@ void Chi0_hilbert::Cal_T()
 // calculate the chi0
 void Chi0_hilbert::Cal_Chi0()
 {
-	TITLE("Chi0_hilbert","Cal_Chi0");
+	ModuleBase::TITLE("Chi0_hilbert","Cal_Chi0");
 	std::vector<std::vector<std::complex<double>>> chi0s2(dim*dim,
 		std::vector<std::complex<double>>(nomega));			// Peize Lin change ptr to std::vector at 2020.01.31
 	std::vector<std::vector<std::complex<double>>> T2(nomega,
@@ -1813,8 +1813,8 @@ std::complex<double> Chi0_hilbert::f(int k, int j)
 // calculate the chi
 void Chi0_hilbert::Cal_Chi(int iq)
 {
-	TITLE("Chi0_hilbert","Cal_Chi");
-	double q = sqrt(((GlobalC::kv.kvec_c[iq])*(TWO_PI/GlobalC::ucell.lat0)).norm2());
+	ModuleBase::TITLE("Chi0_hilbert","Cal_Chi");
+	double q = sqrt(((GlobalC::kv.kvec_c[iq])*(ModuleBase::TWO_PI/GlobalC::ucell.lat0)).norm2());
 	std::vector<std::complex<double>> gather_chi(nomega);			// Peize Lin change ptr to std::vector at 2020.01.31
 	for(int i=0; i<nomega; i++)
 	{
@@ -1860,7 +1860,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 		//---------------------------------------------------------------------
 		if(!coulomb_cutoff)
 		{
-			std::cout <<"iq = "<<iq<<" epsilon["<<i<<"] = "<<8*PI/q/q*chi[0][0].real()<<"  "<<8*PI/q/q*chi[0][0].imag()<<std::endl;
+			std::cout <<"iq = "<<iq<<" epsilon["<<i<<"] = "<<8*ModuleBase::PI/q/q*chi[0][0].real()<<"  "<<8*ModuleBase::PI/q/q*chi[0][0].imag()<<std::endl;
 		}
 		else
 		{
@@ -1869,14 +1869,14 @@ void Chi0_hilbert::Cal_Chi(int iq)
 			//---------------------------------------------------------------------
 			double factor;
 			factor = 1.0 - exp(-q * (GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0)/2.0);
-			std::cout <<"iq = "<<iq<<" epsilon["<<i<<"] = "<<8*PI/q/q * factor * chi[0][0].real()<<"  "<<8*PI/q/q * factor * chi[0][0].imag()<<std::endl; 
+			std::cout <<"iq = "<<iq<<" epsilon["<<i<<"] = "<<8*ModuleBase::PI/q/q * factor * chi[0][0].real()<<"  "<<8*ModuleBase::PI/q/q * factor * chi[0][0].imag()<<std::endl; 
 		}
 		
 		//--------------------------------------------------------------------
 		//  Re{epsilon}  NJP(2014)
 		//--------------------------------------------------------------------
 		//std::complex<double> M;
-		//M = 1.0/(8*PI/q/q*chi[0][0]);
+		//M = 1.0/(8*ModuleBase::PI/q/q*chi[0][0]);
 		//std::cout <<"iq = "<<iq<<" epsMreal["<<i<<"] = "<<M.real()<<std::endl;
 		//std::cout <<"iq = "<<iq<<" epsMimag["<<i<<"] = "<<M.imag()<<std::endl; 
 	}
@@ -1903,7 +1903,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 		{
 			for(int i=0;i<nomega;i++)
 			{
-				ofseps << i * domega <<"   "<<-8*PI/q/q*gather_chi[i].imag()<<std::endl;
+				ofseps << i * domega <<"   "<<-8*ModuleBase::PI/q/q*gather_chi[i].imag()<<std::endl;
 			}
 		}
 		else
@@ -1912,7 +1912,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 			factor = 1.0 - exp(-q * (GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0)/2.0);
 			for(int i=0;i<nomega;i++)
 			{
-				ofseps << i * domega <<"   "<<-8*PI/q/q*factor*gather_chi[i].imag()<<std::endl;
+				ofseps << i * domega <<"   "<<-8*ModuleBase::PI/q/q*factor*gather_chi[i].imag()<<std::endl;
 			}			
 		}
 		ofseps.close();
@@ -1923,7 +1923,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 
 void Chi0_hilbert::Cal_Chi_surface(int iq)
 {
-	TITLE("Chi0_hilbert","Cal_Chi_surface");
+	ModuleBase::TITLE("Chi0_hilbert","Cal_Chi_surface");
 	std::complex<double> g;
 	for(int i=0; i<nomega; i++)
 	{
@@ -1962,7 +1962,7 @@ void Chi0_hilbert:: Cal_kernel(int iq)
 				{
 					if(g0 == g1)
 					{
-						kernel[g0][g1] = 8.0 * PI/qg2(iq,g0);
+						kernel[g0][g1] = 8.0 * ModuleBase::PI/qg2(iq,g0);
 					}
 					else
 					{
@@ -1984,7 +1984,7 @@ void Chi0_hilbert:: Cal_kernel(int iq)
 				{
 					if(g0 == g1)
 					{
-						kernel[g0][g1] = 8.0 * PI/qg2(iq,g0) * (1 - sign * exp(-qG(iq,g0)*(GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0)/2.0));
+						kernel[g0][g1] = 8.0 * ModuleBase::PI/qg2(iq,g0) * (1 - sign * exp(-qG(iq,g0)*(GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0)/2.0));
 					}
 					else
 					{
@@ -2014,11 +2014,11 @@ void Chi0_hilbert::Cal_Rpa(int iq)
 			{
 				if (g0 != g1)
 				{
-					rpa[g0][g1] = -8.0 * PI/qg2(iq,g0) * chi0_gg[g0][g1];
+					rpa[g0][g1] = -8.0 * ModuleBase::PI/qg2(iq,g0) * chi0_gg[g0][g1];
 				}
 				else
 				{
-					rpa[g0][g1] = 1.0 - 8.0 * PI/qg2(iq,g0) * chi0_gg[g0][g1];
+					rpa[g0][g1] = 1.0 - 8.0 * ModuleBase::PI/qg2(iq,g0) * chi0_gg[g0][g1];
 				}
 			}
 		}
@@ -2038,11 +2038,11 @@ void Chi0_hilbert::Cal_Rpa(int iq)
 			{
 				if(g0 != g1)
 				{
-					rpa[g0][g1] = -8.0 * PI/qg2(iq,g0) * (1 - sign * exp(-qG(iq,g0)*(GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0)/2.0)) * chi0_gg[g0][g1];
+					rpa[g0][g1] = -8.0 * ModuleBase::PI/qg2(iq,g0) * (1 - sign * exp(-qG(iq,g0)*(GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0)/2.0)) * chi0_gg[g0][g1];
 				}
 				else
 				{
-					rpa[g0][g1] = 1.0 - 8.0 * PI/qg2(iq,g0) * (1 - sign * exp(-qG(iq,g0)*(GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0)/2.0)) * chi0_gg[g0][g1];
+					rpa[g0][g1] = 1.0 - 8.0 * ModuleBase::PI/qg2(iq,g0) * (1 - sign * exp(-qG(iq,g0)*(GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0)/2.0)) * chi0_gg[g0][g1];
 				}
 			}
 			
@@ -2112,7 +2112,7 @@ void Chi0_hilbert::Cal_Rpa(int iq)
 	int l = Cinv(dim, rpa);
 	if (l == 0)
 	{
-		WARNING_QUIT("chi0_hilbert","(I-v*chi0) is a singular matrix !!");
+		ModuleBase::WARNING_QUIT("chi0_hilbert","(I-v*chi0) is a singular matrix !!");
 	}
 	
 	//-------------------------------------------------------------
@@ -2127,7 +2127,7 @@ void Chi0_hilbert::Cal_Rpa(int iq)
 double Chi0_hilbert::qg2( int iq, int g0)
 {
 	double qg2;
-	qg2 = ((GlobalC::kv.kvec_c[iq]+all_gcar[g0])*(TWO_PI/GlobalC::ucell.lat0)).norm2();
+	qg2 = ((GlobalC::kv.kvec_c[iq]+all_gcar[g0])*(ModuleBase::TWO_PI/GlobalC::ucell.lat0)).norm2();
 	
 	return qg2;
 }
@@ -2374,7 +2374,7 @@ void Chi0_hilbert::Cal_kernel_2D(int iq)
 			{
 				if(g0 == g1)
 				{
-					kernel[g0][g1] = 4* PI/qg(iq,g0) * (GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0);
+					kernel[g0][g1] = 4* ModuleBase::PI/qg(iq,g0) * (GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0);
 				}
 				else
 				{
@@ -2393,7 +2393,7 @@ void Chi0_hilbert::Cal_kernel_2D(int iq)
 double Chi0_hilbert::qG(int iq, int g0)
 {
 	double qG;
-	qG = sqrt((GlobalC::kv.kvec_c[iq].x + all_gcar[g0].x) * (GlobalC::kv.kvec_c[iq].x + all_gcar[g0].x) + (GlobalC::kv.kvec_c[iq].y + all_gcar[g0].y) * (GlobalC::kv.kvec_c[iq].y + all_gcar[g0].y)) * (TWO_PI/GlobalC::ucell.lat0);
+	qG = sqrt((GlobalC::kv.kvec_c[iq].x + all_gcar[g0].x) * (GlobalC::kv.kvec_c[iq].x + all_gcar[g0].x) + (GlobalC::kv.kvec_c[iq].y + all_gcar[g0].y) * (GlobalC::kv.kvec_c[iq].y + all_gcar[g0].y)) * (ModuleBase::TWO_PI/GlobalC::ucell.lat0);
      	
 	return qG;
 }
@@ -2401,7 +2401,7 @@ double Chi0_hilbert::qG(int iq, int g0)
 double Chi0_hilbert::qg(int iq, int g0)
 {
 	double qg;
-	qg = sqrt((GlobalC::kv.kvec_c[iq].x + para_g[g0][0]) * (GlobalC::kv.kvec_c[iq].x + para_g[g0][0]) + (GlobalC::kv.kvec_c[iq].y + para_g[g0][1]) * (GlobalC::kv.kvec_c[iq].y + para_g[g0][1])) * (TWO_PI/GlobalC::ucell.lat0);
+	qg = sqrt((GlobalC::kv.kvec_c[iq].x + para_g[g0][0]) * (GlobalC::kv.kvec_c[iq].x + para_g[g0][0]) + (GlobalC::kv.kvec_c[iq].y + para_g[g0][1]) * (GlobalC::kv.kvec_c[iq].y + para_g[g0][1])) * (ModuleBase::TWO_PI/GlobalC::ucell.lat0);
 	
 	return qg;
 }
@@ -2427,7 +2427,7 @@ void Chi0_hilbert::Cal_Rpa1()
 	int l = Cinv(dim_para, rpa1);
 	if (l == 0)
 	{
-		WARNING_QUIT("chi0_hilbert","(I-v*chi0) is a singular matrix !!");
+		ModuleBase::WARNING_QUIT("chi0_hilbert","(I-v*chi0) is a singular matrix !!");
 	}
 	
 	return;
@@ -2446,7 +2446,7 @@ std::complex<double> Chi0_hilbert:: Cal_g(int iq)
     std::complex<double> g;
     double L = GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0;
     double dz = L/GlobalC::pw.ncz;
-    double q =  sqrt(((GlobalC::kv.kvec_c[iq])*(TWO_PI/GlobalC::ucell.lat0)).norm2());
+    double q =  sqrt(((GlobalC::kv.kvec_c[iq])*(ModuleBase::TWO_PI/GlobalC::ucell.lat0)).norm2());
     
     g = std::complex<double>(0.0,0.0);
 
@@ -2456,7 +2456,7 @@ std::complex<double> Chi0_hilbert:: Cal_g(int iq)
             double exp_phase = exp(-q*(z0+z1)*dz);
             g += chi_para[z0][z1] * exp_phase * dz * dz;
         }
-    g = -4*PI/q * g;
+    g = -4*ModuleBase::PI/q * g;
 
     return g;
 }

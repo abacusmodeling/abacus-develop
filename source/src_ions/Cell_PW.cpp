@@ -3,8 +3,8 @@
 
 void Cell_PW::opt_cells_pw()
 {
-    TITLE("Cell_PW", "opt_cells_pw");
-    timer::tick("Cell_PW", "opt_cells_pw");
+    ModuleBase::TITLE("Cell_PW", "opt_cells_pw");
+    ModuleBase::timer::tick("Cell_PW", "opt_cells_pw");
     GlobalC::wf.allocate(GlobalC::kv.nks);
 
     GlobalC::UFFT.allocate();
@@ -77,5 +77,5 @@ void Cell_PW::opt_cells_pw()
     Ions ions;
     ions.opt_ions_pw();
     
-    timer::tick("Cell_PW", "opt_cells_pw");
+    ModuleBase::timer::tick("Cell_PW", "opt_cells_pw");
 }

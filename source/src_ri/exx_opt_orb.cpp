@@ -20,7 +20,7 @@ void Exx_Opt_Orb::generate_matrix() const
 {
 std::ofstream ofs_mpi(GlobalC::exx_lcao.test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 
-	TITLE("Exx_Opt_Orb::generate_matrix");
+	ModuleBase::TITLE("Exx_Opt_Orb::generate_matrix");
 ofs_mpi<<"memory:\t"<<get_memory(10)<<std::endl;
 
 	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> lcaos = Exx_Abfs::Construct_Orbs::change_orbs( GlobalC::ORB, this->kmesh_times );
@@ -305,7 +305,7 @@ ModuleBase::matrix Exx_Opt_Orb::cal_proj(
 	const std::vector<std::vector<ModuleBase::matrix>> & m_middle, 
 	const std::vector<ModuleBase::matrix> & m_right ) const
 {
-	TITLE("Exx_Opt_Orb::cal_proj");
+	ModuleBase::TITLE("Exx_Opt_Orb::cal_proj");
 
 //auto print_nrc = [](const matrix & m){ std::cout<<"\t"<<m.nr<<"\t"<<m.nc<<std::endl; };
 
@@ -329,7 +329,7 @@ std::vector<std::vector<ModuleBase::matrix>> Exx_Opt_Orb::cal_I(
 	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> &ms,
 	const size_t TA, const size_t IA, const size_t TB, const size_t IB ) const
 {
-	TITLE("Exx_Opt_Orb::cal_I");
+	ModuleBase::TITLE("Exx_Opt_Orb::cal_I");
 
 	if( TA==TB && IA==IB )
 	{
@@ -360,15 +360,15 @@ std::vector<std::vector<ModuleBase::matrix>> Exx_Opt_Orb::cal_I(
 
 std::map<size_t,std::map<size_t,set<double>>> Exx_Opt_Orb::get_radial_R() const
 {
-	TITLE("Exx_Opt_Orb::get_radial_R");
+	ModuleBase::TITLE("Exx_Opt_Orb::get_radial_R");
 	std::map<size_t,std::map<size_t,set<double>>> radial_R;
 	for( size_t TA=0; TA!=GlobalC::ucell.ntype; ++TA )
 		for( size_t IA=0; IA!=GlobalC::ucell.atoms[TA].na; ++IA )
 			for( size_t TB=0; TB!=GlobalC::ucell.ntype; ++TB )
 				for( size_t IB=0; IB!=GlobalC::ucell.atoms[TB].na; ++IB )
 				{
-					const Vector3<double> &tauA = GlobalC::ucell.atoms[TA].tau[IA];
-					const Vector3<double> &tauB = GlobalC::ucell.atoms[TB].tau[IB];
+					const ModuleBase::Vector3<double> &tauA = GlobalC::ucell.atoms[TA].tau[IA];
+					const ModuleBase::Vector3<double> &tauB = GlobalC::ucell.atoms[TB].tau[IB];
 					const double delta_R = (-tauA+tauB).norm();
 					radial_R[TA][TB].insert( delta_R );
 					radial_R[TB][TA].insert( delta_R );

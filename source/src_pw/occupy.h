@@ -61,7 +61,7 @@ public:
 						const double &nelec,const int ntetra,
                          const ModuleBase::matrix &tetra,double **ekb,double &ef,ModuleBase::matrix &wg);
 
-    static double wsweight(const Vector3<double> &r, Vector3<double> *rws,const int nrws);
+    static double wsweight(const ModuleBase::Vector3<double> &r, ModuleBase::Vector3<double> *rws,const int nrws);
 
 private:
 

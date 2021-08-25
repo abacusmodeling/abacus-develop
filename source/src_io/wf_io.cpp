@@ -20,7 +20,7 @@
 
 void WF_io::write_wfc(const std::string &fn, const ModuleBase::ComplexMatrix *psi)
 {
-    if (GlobalV::test_wf) TITLE("WF_io","write_wfc");
+    if (GlobalV::test_wf) ModuleBase::TITLE("WF_io","write_wfc");
 
     std::ofstream ofs( fn.c_str() );
 
@@ -53,9 +53,9 @@ void WF_io::write_wfc(const std::string &fn, const ModuleBase::ComplexMatrix *ps
     return;
 }
 
-void WF_io::write_wfc2(const std::string &fn, const ModuleBase::ComplexMatrix *psi, const Vector3<double> *gkk)
+void WF_io::write_wfc2(const std::string &fn, const ModuleBase::ComplexMatrix *psi, const ModuleBase::Vector3<double> *gkk)
 {
-    if (GlobalV::test_wf) TITLE("WF_io","write_wfc2"); 
+    if (GlobalV::test_wf) ModuleBase::TITLE("WF_io","write_wfc2"); 
 
     std::string * wfilename;
     wfilename=new std::string[GlobalC::kv.nkstot];

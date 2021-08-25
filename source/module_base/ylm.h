@@ -15,13 +15,13 @@ class Ylm
 	// (1) for check
 	static void get_ylm_real( 
 			const int &Lmax , 
-			const Vector3<double> &vec, 
+			const ModuleBase::Vector3<double> &vec, 
 			double ylmr[]);
 
 	// (2) for check
 	static void get_ylm_real( 
 			const int &Lmax , 
-			const Vector3<double> &vec, 
+			const ModuleBase::Vector3<double> &vec, 
 			double ylmr[],
 			double dylmdr[][3]);
 

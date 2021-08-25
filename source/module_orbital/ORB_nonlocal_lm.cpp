@@ -228,7 +228,7 @@ void Numerical_Nonlocal_Lm::extra_uniform(const double &dr_uniform_in)
 
 void Numerical_Nonlocal_Lm::get_kradial(void)
 {
-    //TITLE("Numerical_Nonlocal_Lm","get_kradial");
+    //ModuleBase::TITLE("Numerical_Nonlocal_Lm","get_kradial");
     double *jl = new double[nr];
     double *integrated_func = new double[nr];
 
@@ -275,7 +275,7 @@ void Numerical_Nonlocal_Lm::plot(const int &my_rank)const
 		case 2: orbital_type = "d"; break;
 		case 3: orbital_type = "f"; break;
 		case 4: orbital_type = "g"; break;
-		default: WARNING_QUIT("Numerical_Orbital_Lm::plot","Please check in functoin.");
+		default: ModuleBase::WARNING_QUIT("Numerical_Orbital_Lm::plot","Please check in functoin.");
 	}
 
 #ifdef __NORMAL
@@ -299,7 +299,7 @@ void Numerical_Nonlocal_Lm::plot(const int &my_rank)const
 
 		if (!ofsk || !ofsr || !ofsru)
 		{
-			WARNING_QUIT("Numerical_Orbital_Lm::plot", "Can't open files!");
+			ModuleBase::WARNING_QUIT("Numerical_Orbital_Lm::plot", "Can't open files!");
 		}
 
 		for (int i = 0; i < this->nr; i++)

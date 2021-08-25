@@ -44,7 +44,7 @@ void ORB_table_alpha::allocate(
 	const double &dr_in,
 	const double &dk_in)
 {
-	TITLE("ORB_table_alpha", "allocate");
+	ModuleBase::TITLE("ORB_table_alpha", "allocate");
 
 	this->ntype = ntype_in; // type of elements.
 	this->lmax = lmax_in;
@@ -118,7 +118,7 @@ int ORB_table_alpha::get_rmesh(const double &R1, const double &R2)
 //		GlobalV::ofs_warning << "\n rmesh = " << rmesh;
 		std::cout << "\n R1 = " << R1 << " R2 = " << R2;
 		std::cout << "\n rmesh = " << rmesh;
-		WARNING_QUIT("ORB_table_alpha::get_rmesh", "rmesh <= 0");
+		ModuleBase::WARNING_QUIT("ORB_table_alpha::get_rmesh", "rmesh <= 0");
 	}
 	return rmesh;
 }
@@ -132,7 +132,7 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 	double *rs,
 	double *drs)
 {
-	timer::tick("ORB_table_alpha", "S_PhiAlpha_R");
+	ModuleBase::timer::tick("ORB_table_alpha", "S_PhiAlpha_R");
 
 	assert(kmesh > 0);
 
@@ -162,7 +162,7 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 		}
 		// Call simpson integration
 		ModuleBase::Integral::Simpson_Integral(kmesh, integrated_func, kab, temp);
-		rs[ir] = temp * FOUR_PI;
+		rs[ir] = temp * ModuleBase::FOUR_PI;
 
 		//drs
 		double temp1, temp2;
@@ -186,11 +186,11 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 
 		if (l == 0)
 		{
-			drs[ir] = -FOUR_PI * temp2;
+			drs[ir] = -ModuleBase::FOUR_PI * temp2;
 		}
 		else
 		{
-			drs[ir] = FOUR_PI * (temp1 * l - (l + 1) * temp2) / (2.0 * l + 1);
+			drs[ir] = ModuleBase::FOUR_PI * (temp1 * l - (l + 1) * temp2) / (2.0 * l + 1);
 		}
 	}
 
@@ -209,21 +209,21 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 
 		// Call simpson integration
 		ModuleBase::Integral::Simpson_Integral(kmesh, integrated_func, kab, temp);
-		rs[0] = FOUR_PI / ModuleBase::Mathzone_Add1::dualfac(2 * l + 1) * temp;
+		rs[0] = ModuleBase::FOUR_PI / ModuleBase::Mathzone_Add1::dualfac(2 * l + 1) * temp;
 	}
 
 	delete[] integrated_func;
 	delete[] k1_dot_k2;
 
-	timer::tick("ORB_table_alpha", "S_PhiAlpha_R");
+	ModuleBase::timer::tick("ORB_table_alpha", "S_PhiAlpha_R");
 	return;
 }
 
 void ORB_table_alpha::init_Table_Alpha(
 	Sph_Bessel_Recursive::D2 *pSB)
 {
-	TITLE("ORB_table_alpha", "init_Table_Alpha");
-	timer::tick("ORB_table_alpha", "init_Table_Alpha");
+	ModuleBase::TITLE("ORB_table_alpha", "init_Table_Alpha");
+	ModuleBase::timer::tick("ORB_table_alpha", "init_Table_Alpha");
 
 	assert(ntype > 0);
 
@@ -289,7 +289,7 @@ void ORB_table_alpha::init_Table_Alpha(
 							this->Table_DSR[0][T1][Opair][L] = new double[rmesh];
 							this->Table_DSR[1][T1][Opair][L] = new double[rmesh];
 
-							Memory::record("ORB_table_alpha", "Table_DSR",
+							ModuleBase::Memory::record("ORB_table_alpha", "Table_DSR",
 										   2 * this->ntype * pairs_chi * rmesh, "double");
 
 							//for those L whose Gaunt Coefficients = 0, we
@@ -319,7 +319,7 @@ void ORB_table_alpha::init_Table_Alpha(
 	destroy_nr = true;
 
 	//	OUT(GlobalV::ofs_running,"allocate non-local potential matrix","Done");
-	timer::tick("ORB_table_alpha", "init_Table_Alpha");
+	ModuleBase::timer::tick("ORB_table_alpha", "init_Table_Alpha");
 	return;
 }
 
@@ -364,7 +364,7 @@ void ORB_table_alpha::Destroy_Table_Alpha(void)
 
 void ORB_table_alpha::init_DS_2Lplus1(void)
 {
-	TITLE("Make_Overlap_Table", "init_DS_2Lplus1");
+	ModuleBase::TITLE("Make_Overlap_Table", "init_DS_2Lplus1");
 	assert(this->ntype > 0);
 	delete[] DS_2Lplus1;
 	DS_2Lplus1 = new int[ntype]; // 2Lmax+1 for each T1
@@ -417,7 +417,7 @@ void ORB_table_alpha::init_DS_Opair(void)
 //caoyu add 2021-03-20
 void ORB_table_alpha::print_Table_DSR(void)
 {
-	TITLE("ORB_table_alpha", "print_Table_DSR");
+	ModuleBase::TITLE("ORB_table_alpha", "print_Table_DSR");
 	NEW_PART("Overlap table S between lcao orbital and descriptor basis : S_{I_mu_alpha}");
 
 	std::ofstream ofs;

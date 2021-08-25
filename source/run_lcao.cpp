@@ -16,8 +16,8 @@ Run_lcao::~Run_lcao(){}
 
 void Run_lcao::lcao_line(void)
 {
-    TITLE("Run_lcao","lcao_line");
-	timer::tick("Run_lcao","lcao_line");
+    ModuleBase::TITLE("Run_lcao","lcao_line");
+	ModuleBase::timer::tick("Run_lcao","lcao_line");
 
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
@@ -112,7 +112,7 @@ void Run_lcao::lcao_line(void)
     if(GlobalV::CALCULATION == "test")
     {
         Cal_Test::test_memory();
-        QUIT();
+        ModuleBase::QUIT();
     }
 
     // initialize the real-space uniform grid for FFT and parallel
@@ -156,6 +156,6 @@ void Run_lcao::lcao_line(void)
 		GlobalC::en.perform_dos();
 	}
 
-	timer::tick("Run_lcao","lcao_line");
+	ModuleBase::timer::tick("Run_lcao","lcao_line");
     return;
 }

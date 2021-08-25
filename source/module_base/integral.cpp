@@ -73,7 +73,7 @@ void Integral_G::gauleg(void)
 
 	for(i = 1; i <= m; i++)
 	{
-		z = cos( PI * (i - 0.250) / (n_root + 0.5) );
+		z = cos( ModuleBase::PI * (i - 0.250) / (n_root + 0.5) );
 
 		do
 		{

@@ -218,7 +218,7 @@ void XC_Functional::xc_spin(const double &rho, const double &zeta,
 		case 4: //mohan fix bug 2012-05-28, case 2 to 4.
 		XC_Functional::pw_spin(rs, zeta, ec, vcup, vcdw); break;
 		default:
-		WARNING_QUIT("XC_Functional::xc_spin", "GlobalC::xcf.icorr_now wrong!");
+		ModuleBase::WARNING_QUIT("XC_Functional::xc_spin", "GlobalC::xcf.icorr_now wrong!");
 	}
 
 	return;
@@ -369,7 +369,7 @@ void XC_Functional::slater_rxc_spin( const double &rho, const double &z,
 //iflag=1: G. Ortiz and P. Ballone, PRB 50, 1391 (1994)
 void XC_Functional::pz(const double &rs, const int &iflag, double &ec, double &vc)
 {
-//	TITLE("XC_Functional","pz");
+//	ModuleBase::TITLE("XC_Functional","pz");
 	const double a[2] = {0.0311, 0.031091};
     const double b[2] = { -0.048, -0.046644 };
     const double c[2] = { 0.0020, 0.00419 };
@@ -404,7 +404,7 @@ void XC_Functional::pz(const double &rs, const int &iflag, double &ec, double &v
 void XC_Functional::pz_spin( const double &rs, const double &zeta, 
 	double &ec, double &vcup, double &vcdw)
 {
-//	TITLE("XC_Functional","pz_spin");
+//	ModuleBase::TITLE("XC_Functional","pz_spin");
 	double ecu, vcu, ecp, vcp ;
     static const double p43 = 4.00 / 3.0;
     static const double third = 1.0 / 3.0;
@@ -434,7 +434,7 @@ void XC_Functional::pz_spin( const double &rs, const double &zeta,
 // J.P. Perdew and A. Zunger, PRB 23, 5048 (1981)
 void XC_Functional::pz_polarized( const double &rs, double &ec, double &vc)
 {
-//	TITLE("XC_Functional","pz_polarized");
+//	ModuleBase::TITLE("XC_Functional","pz_polarized");
 	static const double a = 0.015550;
 	static const double b = -0.02690;
 	static const double c = 0.00070;
@@ -731,7 +731,7 @@ double &sx, double &v1x, double &v2x)
     
 	// numerical coefficients (NB: c2=(3 pi^2)^(1/3) )
     const double third = 1.0 / 3.0;
-    const double c1 = 0.750 / PI;
+    const double c1 = 0.750 / ModuleBase::PI;
     const double c2 = 3.0936677262801360;
     const double c5 = 4.0 * third;
     // parameters of the functional
@@ -836,7 +836,7 @@ void XC_Functional::tau_xc(const double &rho, const double &grho, const double &
 	}
 	else
 	{
-		WARNING_QUIT("tau_xc","functional not implemented yet");
+		ModuleBase::WARNING_QUIT("tau_xc","functional not implemented yet");
 	}
 
 //correlation
@@ -850,13 +850,13 @@ void XC_Functional::tau_xc(const double &rho, const double &grho, const double &
 	}
 	else
 	{
-		WARNING_QUIT("tau_xc","functional not implemented yet");
+		ModuleBase::WARNING_QUIT("tau_xc","functional not implemented yet");
 	}
 	return;
 }
 
-void XC_Functional::tau_xc_spin(const double &rhoup, const double &rhodw, const Vector3<double> &grhoup, const Vector3<double> &grhodw, const double &tauup, const double &taudw, double &sx, double &sc,
-          double &v1xup, double &v1xdw, double &v2xup, double &v2xdw, double &v3xup, double &v3xdw, double &v1cup, double &v1cdw, Vector3<double> &v2cup, Vector3<double> &v2cdw, double &v3cup, double &v3cdw)
+void XC_Functional::tau_xc_spin(const double &rhoup, const double &rhodw, const ModuleBase::Vector3<double> &grhoup, const ModuleBase::Vector3<double> &grhodw, const double &tauup, const double &taudw, double &sx, double &sc,
+          double &v1xup, double &v1xdw, double &v2xup, double &v2xdw, double &v3xup, double &v3xdw, double &v1cup, double &v1cdw, ModuleBase::Vector3<double> &v2cup, ModuleBase::Vector3<double> &v2cdw, double &v3cup, double &v3cdw)
 {
 //initialize X and C functionals
 	xc_func_type x_func;
@@ -884,7 +884,7 @@ void XC_Functional::tau_xc_spin(const double &rhoup, const double &rhodw, const 
 	}
 	else
 	{
-		WARNING_QUIT("tau_xc_spin","functional not implemented yet");
+		ModuleBase::WARNING_QUIT("tau_xc_spin","functional not implemented yet");
 	}
 
 //correlation
@@ -896,7 +896,7 @@ void XC_Functional::tau_xc_spin(const double &rhoup, const double &rhodw, const 
 	}
 	else
 	{
-		WARNING_QUIT("tau_xc_spin","functional not implemented yet");
+		ModuleBase::WARNING_QUIT("tau_xc_spin","functional not implemented yet");
 	}
 
 	sx = sx * (rho[0]+rho[1]);
@@ -1190,7 +1190,7 @@ void XC_Functional::wcx(const double &rho,const double &grho, double &sx, double
   double third, c1, c2, c5, teneightyone;	// c6
   
   third = 1.0/3.0;
-  c1 = 0.75/PI;
+  c1 = 0.75/ModuleBase::PI;
   c2 = 3.093667726280136;
   c5 = 4.0 * third;
   teneightyone = 0.123456790123;

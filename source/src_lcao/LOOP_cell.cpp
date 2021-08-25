@@ -11,7 +11,7 @@ LOOP_cell::~LOOP_cell(){}
 
 void LOOP_cell::opt_cell(void)
 {
-	TITLE("LOOP_cell","opt_cell");
+	ModuleBase::TITLE("LOOP_cell","opt_cell");
 
     // Initialize the local wave functions.
     // npwx, eigenvalues, and weights

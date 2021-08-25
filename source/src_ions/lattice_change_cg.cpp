@@ -38,7 +38,7 @@ Lattice_Change_CG::~Lattice_Change_CG()
 
 void Lattice_Change_CG::allocate(void)
 {
-	TITLE("Lattice_Change_CG","allocate");
+	ModuleBase::TITLE("Lattice_Change_CG","allocate");
 	// mohan add 2021-02-07
 	assert(dim>0);
 
@@ -61,7 +61,7 @@ void Lattice_Change_CG::allocate(void)
 
 void Lattice_Change_CG::start(const ModuleBase::matrix &stress_in, const double& etot_in)
 {
-	TITLE("Lattice_Change_CG","start");
+	ModuleBase::TITLE("Lattice_Change_CG","start");
 
 	assert(lat0!=0);
 	assert(grad0!=0);
@@ -280,7 +280,7 @@ void Lattice_Change_CG::start(const ModuleBase::matrix &stress_in, const double&
 
 void Lattice_Change_CG::setup_cg_grad(double *grad, const double *grad0, double *cg_grad, const double *cg_grad0, const int &ncggrad, int &flag)
 {
-	TITLE("Lattice_Change_CG","setup_cg_grad");
+	ModuleBase::TITLE("Lattice_Change_CG","setup_cg_grad");
 	assert(Lattice_Change_Basic::istep > 0);
 	double gamma;
 	double cg0_cg,cg0_cg0,cg0_g;

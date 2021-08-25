@@ -51,7 +51,7 @@ class Potential_Libxc
 	static std::tuple< 
 		std::vector<double>, 
 		std::vector<double>, 
-		std::vector<std::vector<Vector3<double>>> > 
+		std::vector<std::vector<ModuleBase::Vector3<double>>> > 
 	cal_input(
 		const std::vector<XC(func_type)> &funcs, 
 		const double * const * const rho_in,

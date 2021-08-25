@@ -18,7 +18,7 @@ std::map<size_t,std::map<size_t,std::vector<ModuleBase::ComplexMatrix>>>
 Exx_Abfs_DM_Test::cal_DMk_raw_readfile( const set<std::pair<size_t,size_t>> &atom_pairs )
 {
 	static int istep=-1;	++istep;	
-	TITLE("cal_DMk_raw_readfile_"+ModuleBase::GlobalFunc::TO_STRING(istep));
+	ModuleBase::TITLE("cal_DMk_raw_readfile_"+ModuleBase::GlobalFunc::TO_STRING(istep));
 	ModuleBase::matrix wf_wg = read_wg( "wf.wg/wf.wg_"+ModuleBase::GlobalFunc::TO_STRING(istep) );
 	std::vector<std::vector<std::vector<std::complex<double>>>> wfc(GlobalC::kv.nks);
 	for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )

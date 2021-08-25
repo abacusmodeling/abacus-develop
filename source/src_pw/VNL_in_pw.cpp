@@ -23,8 +23,8 @@ pseudopot_cell_vnl::~pseudopot_cell_vnl()
 //-----------------------------------
 void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 {
-	TITLE("pseudopot_cell_vnl", "init");
-	timer::tick("ppcell_vnl", "init");
+	ModuleBase::TITLE("pseudopot_cell_vnl", "init");
+	ModuleBase::timer::tick("ppcell_vnl", "init");
 
 	GlobalV::ofs_running << "\n SETUP NONLOCAL PSEUDOPOTENTIALS IN PLANE WAVE BASIS" << std::endl;
 
@@ -127,7 +127,7 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 		this->tab_at.create(ntype, nchix_nc, GlobalV::NQX);
 	}
 
-	timer::tick("ppcell_vnl","init");
+	ModuleBase::timer::tick("ppcell_vnl","init");
 	return;
 }
 
@@ -139,8 +139,8 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 //----------------------------------------------------------
 void pseudopot_cell_vnl::getvnl(const int &ik)
 {
-	if(GlobalV::test_pp) TITLE("pseudopot_cell_vnl","getvnl");
-	timer::tick("pp_cell_vnl","getvnl");
+	if(GlobalV::test_pp) ModuleBase::TITLE("pseudopot_cell_vnl","getvnl");
+	ModuleBase::timer::tick("pp_cell_vnl","getvnl");
 
 	if(lmaxkb < 0) 
 	{
@@ -154,7 +154,7 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 	const int x1= (lmaxkb + 1)*(lmaxkb + 1);
 
 	ModuleBase::matrix ylm(x1, npw);
-	Vector3<double> *gk = new Vector3<double>[npw];
+	ModuleBase::Vector3<double> *gk = new ModuleBase::Vector3<double>[npw];
 	for (ig = 0;ig < npw;ig++) 
 	{
 		gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
@@ -203,7 +203,7 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 			std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
 			for (ih = 0;ih < nh;ih++)
 			{
-				std::complex<double> pref = pow( NEG_IMAG_UNIT, nhtol(it, ih));	//?
+				std::complex<double> pref = pow( ModuleBase::NEG_IMAG_UNIT, nhtol(it, ih));	//?
 				for (ig = 0;ig < npw;ig++)
 				{
 					this->vkb(jkb, ig) = vkb1(ih, ig) * sk [ig] * pref;
@@ -217,7 +217,7 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 	delete [] gk;
 	delete [] vq;
 
-	timer::tick("pp_cell_vnl","getvnl");
+	ModuleBase::timer::tick("pp_cell_vnl","getvnl");
 
 	return;
 } // end subroutine getvnl
@@ -226,8 +226,8 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 
 void pseudopot_cell_vnl::init_vnl(UnitCell_pseudo &cell)
 {
-	TITLE("pseudopot_cell_vnl","init_vnl");
-	timer::tick("ppcell_vnl","init_vnl");
+	ModuleBase::TITLE("pseudopot_cell_vnl","init_vnl");
+	ModuleBase::timer::tick("ppcell_vnl","init_vnl");
 
 	//from init_us_1
 	//   a) For each non vanderbilt pseudopotential it computes the D and
@@ -352,7 +352,7 @@ void pseudopot_cell_vnl::init_vnl(UnitCell_pseudo &cell)
 	// fill the interpolation table tab
 	************************************************************/
 
-	const double pref = FOUR_PI / sqrt(cell.omega);
+	const double pref = ModuleBase::FOUR_PI / sqrt(cell.omega);
 	this->tab.zero_out();
 	GlobalV::ofs_running<<"\n Init Non-Local PseudoPotential table : ";
 	for (int it = 0;it < cell.ntype;it++)  
@@ -391,7 +391,7 @@ void pseudopot_cell_vnl::init_vnl(UnitCell_pseudo &cell)
 		delete[] aux;
 		delete[] jl;
 	}
-	timer::tick("ppcell_vnl","init_vnl");
+	ModuleBase::timer::tick("ppcell_vnl","init_vnl");
 	GlobalV::ofs_running << "\n Init Non-Local-Pseudopotential done." << std::endl;
 	return;
 }
@@ -402,19 +402,19 @@ std::complex<double> pseudopot_cell_vnl::Cal_C(int alpha, int lu, int mu, int L,
 	std::complex<double> cf;
 	if(alpha == 0)
 	{
-		cf = -sqrt(4*PI/3)*CG(lu,mu,1,1,L,M);
+		cf = -sqrt(4*ModuleBase::PI/3)*CG(lu,mu,1,1,L,M);
 	}
 	else if(alpha == 1)
 	{
-		cf = -sqrt(4*PI/3)*CG(lu,mu,1,2,L,M);
+		cf = -sqrt(4*ModuleBase::PI/3)*CG(lu,mu,1,2,L,M);
 	}
 	else if(alpha == 2)
 	{
-		cf = sqrt(4*PI/3)*CG(lu,mu,1,0,L,M);
+		cf = sqrt(4*ModuleBase::PI/3)*CG(lu,mu,1,0,L,M);
 	}
 	else
 	{
-		WARNING_QUIT("pseudopot_cell_vnl_alpha", "alpha must be 0~2");
+		ModuleBase::WARNING_QUIT("pseudopot_cell_vnl_alpha", "alpha must be 0~2");
 	}
 	
 	return cf;
@@ -433,8 +433,8 @@ double pseudopot_cell_vnl::CG(int l1, int m1, int l2, int m2, int L, int M)     
 
 void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  2018-3-23
 {
-	if(GlobalV::test_pp) TITLE("pseudopot_cell_vnl","getvnl_alpha");
-	timer::tick("pp_cell_vnl","getvnl_alpha");
+	if(GlobalV::test_pp) ModuleBase::TITLE("pseudopot_cell_vnl","getvnl_alpha");
+	ModuleBase::timer::tick("pp_cell_vnl","getvnl_alpha");
 
 	if(lmaxkb < 0) 
 	{
@@ -448,7 +448,7 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 	const int x1= (lmaxkb + 2)*(lmaxkb + 2);
 
 	ModuleBase::matrix ylm(x1, npw);
-	Vector3<double> *gk = new Vector3<double>[npw];
+	ModuleBase::Vector3<double> *gk = new ModuleBase::Vector3<double>[npw];
 	for (ig = 0;ig < npw;ig++) 
 	{
 		gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
@@ -519,7 +519,7 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 							{
 								std::cout<<"lu= "<<lu<<"  mu= "<<mu<<"  L= "<<L<<"  M= "<<M<<" alpha = "<<alpha<<"  "<<c<<std::endl;
 							}*/
-							vkb1_alpha[alpha][ih][ig] += c * vq[ig] * ylm(lm, ig) * pow( NEG_IMAG_UNIT, L);
+							vkb1_alpha[alpha][ih][ig] += c * vq[ig] * ylm(lm, ig) * pow( ModuleBase::NEG_IMAG_UNIT, L);
 						}	
 					}
 				}
@@ -546,15 +546,15 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 
 	delete [] gk;
 	delete [] vq;
-	timer::tick("pp_cell_vnl","getvnl_alpha");
+	ModuleBase::timer::tick("pp_cell_vnl","getvnl_alpha");
 	return;
 } 
 #endif
 
 void pseudopot_cell_vnl::init_vnl_alpha(void)          // pengfei Li 2018-3-23
 {
-	if(GlobalV::test_pp) TITLE("pseudopot_cell_vnl","init_vnl_alpha");
-	timer::tick("ppcell_vnl","init_vnl_alpha");
+	if(GlobalV::test_pp) ModuleBase::TITLE("pseudopot_cell_vnl","init_vnl_alpha");
+	ModuleBase::timer::tick("ppcell_vnl","init_vnl_alpha");
 
 	for(int it=0;it<GlobalC::ucell.ntype;it++)
 	{
@@ -577,7 +577,7 @@ void pseudopot_cell_vnl::init_vnl_alpha(void)          // pengfei Li 2018-3-23
 	// max number of beta functions
 	const int nbrx = 10;
 
-	const double pref = FOUR_PI / sqrt(GlobalC::ucell.omega);
+	const double pref = ModuleBase::FOUR_PI / sqrt(GlobalC::ucell.omega);
 	this->tab_alpha.create(GlobalC::ucell.ntype, nbrx, lmaxkb+2, GlobalV::NQX);
 	this->tab_alpha.zero_out();
 	GlobalV::ofs_running<<"\n Init Non-Local PseudoPotential table( including L index) : ";
@@ -619,7 +619,7 @@ void pseudopot_cell_vnl::init_vnl_alpha(void)          // pengfei Li 2018-3-23
 		delete[] aux;
 		delete[] jl;
 	}
-	timer::tick("ppcell_vnl","init_vnl_alpha");
+	ModuleBase::timer::tick("ppcell_vnl","init_vnl_alpha");
 	GlobalV::ofs_running << "\n Init Non-Local-Pseudopotential done(including L)." << std::endl;
 	return;
 }

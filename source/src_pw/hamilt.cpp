@@ -14,8 +14,8 @@ void Hamilt::diagH_pw(
     const double *precondition,
     double &avg_iter)
 {
-	TITLE("Hamilt","diagH_pw");
-    timer::tick("Hamilt", "diagH_pw");
+	ModuleBase::TITLE("Hamilt","diagH_pw");
+    ModuleBase::timer::tick("Hamilt", "diagH_pw");
     double avg = 0.0;
 
 	// set ik0 because of mem_saver.
@@ -57,7 +57,7 @@ void Hamilt::diagH_pw(
 		{
 			GlobalV::ofs_warning << " The diago_type " << GlobalV::KS_SOLVER 
 				<< " not implemented yet." << std::endl; //xiaohui add 2013-09-02
-			WARNING_QUIT("Hamilt::diago","no implemt yet.");
+			ModuleBase::WARNING_QUIT("Hamilt::diago","no implemt yet.");
 		}
     }
     else
@@ -121,7 +121,7 @@ void Hamilt::diagH_pw(
         	}
         	else
         	{
-				WARNING_QUIT("calculate_bands","Check GlobalV::KS_SOLVER !");
+				ModuleBase::WARNING_QUIT("calculate_bands","Check GlobalV::KS_SOLVER !");
         	}
             avg_iter += avg;
             ++ntry;
@@ -135,7 +135,7 @@ void Hamilt::diagH_pw(
         }
     }
 
-	timer::tick("Hamilt","diagH_pw");
+	ModuleBase::timer::tick("Hamilt","diagH_pw");
     return;
 }
 
@@ -172,7 +172,7 @@ void Hamilt::diagH_subspace(
 {
 	if(nstart < n_band)
 	{
-		WARNING_QUIT("diagH_subspace","nstart < n_band!");
+		ModuleBase::WARNING_QUIT("diagH_subspace","nstart < n_band!");
 	}
 
     if(GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")
@@ -181,7 +181,7 @@ void Hamilt::diagH_subspace(
     }
     else
     {
-		WARNING_QUIT("diagH_subspace","Check parameters: GlobalV::BASIS_TYPE. ");
+		ModuleBase::WARNING_QUIT("diagH_subspace","Check parameters: GlobalV::BASIS_TYPE. ");
     }
     return;
 }
@@ -203,8 +203,8 @@ void Hamilt::diagH_LAPACK(
 	double *e,
 	ModuleBase::ComplexMatrix &hvec)
 {
-    TITLE("Hamilt","diagH_LAPACK");
-	timer::tick("Hamilt","diagH_LAPACK");
+    ModuleBase::TITLE("Hamilt","diagH_LAPACK");
+	ModuleBase::timer::tick("Hamilt","diagH_LAPACK");
 
     int lwork=0;
     //========================================
@@ -320,6 +320,6 @@ void Hamilt::diagH_LAPACK(
     delete[] rwork;
     delete[] work;
 
-	timer::tick("Hamilt","diagH_LAPACK");
+	ModuleBase::timer::tick("Hamilt","diagH_LAPACK");
     return;
 }

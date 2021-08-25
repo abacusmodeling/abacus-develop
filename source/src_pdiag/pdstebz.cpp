@@ -28,7 +28,7 @@ void pdstebz(MPI_Comm comm ,double *D,double *E,double *eigen,int N)
  *             Stores the eigenvalue required
  */
 {
-	TITLE("Parallel_Diago","pdstebz");
+	ModuleBase::TITLE("Parallel_Diago","pdstebz");
     /*Array A contains main diagonal element;Array B contains offdiagonal element*/
     int size,myid;
 

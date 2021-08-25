@@ -4,7 +4,7 @@
 //calculate local pseudopotential stress in PW or VL_dVL stress in LCAO
 void Stress_Func::stress_loc(ModuleBase::matrix& sigma, const bool is_pw)
 {
-    timer::tick("Stress_Func","stress_loc");
+    ModuleBase::timer::tick("Stress_Func","stress_loc");
 
     double *dvloc;
     double evloc=0.0;
@@ -99,7 +99,7 @@ void Stress_Func::stress_loc(ModuleBase::matrix& sigma, const bool is_pw)
 	delete[] vg;
 
 
-	timer::tick("Stress_Func","stress_loc");
+	ModuleBase::timer::tick("Stress_Func","stress_loc");
 	return;
 }
 
@@ -156,7 +156,7 @@ double*  dvloc
 	//
 	for(int i = 0;i< msh; i++)
 	{
-		aux1[i] = r [i] * vloc_at [i] + zp * e2 * erf(r[i]);
+		aux1[i] = r [i] * vloc_at [i] + zp * ModuleBase::e2 * erf(r[i]);
 	}
 	for(int igl = igl0;igl< GlobalC::pw.nggm;igl++)
 	{
@@ -174,10 +174,10 @@ double*  dvloc
 		// simpson (msh, aux, rab, vlcp);
 		ModuleBase::Integral::Simpson_Integral(msh, aux, rab, vlcp );
 		// DV(g^2)/Dg^2 = (DV(g)/Dg)/2g
-		vlcp *= FOUR_PI / GlobalC::ucell.omega / 2.0 / gx;
+		vlcp *= ModuleBase::FOUR_PI / GlobalC::ucell.omega / 2.0 / gx;
 		// subtract the long-range term
 		double g2a = gx2 / 4.0;
-		vlcp += FOUR_PI / GlobalC::ucell.omega * zp * e2 * exp ( - g2a) * (g2a + 1) / pow(gx2 , 2);
+		vlcp += ModuleBase::FOUR_PI / GlobalC::ucell.omega * zp * ModuleBase::e2 * exp ( - g2a) * (g2a + 1) / pow(gx2 , 2);
 		dvloc [igl] = vlcp;
 	}
 	delete[] aux1;
@@ -216,7 +216,7 @@ double* dvloc
 	}
 	for(int i=igl0;i<GlobalC::pw.nggm;i++)
 	{
-		dvloc[i] = FOUR_PI * zp * e2 / GlobalC::ucell.omega / pow(( GlobalC::ucell.tpiba2 * GlobalC::pw.ggs[i] ),2);
+		dvloc[i] = ModuleBase::FOUR_PI * zp * ModuleBase::e2 / GlobalC::ucell.omega / pow(( GlobalC::ucell.tpiba2 * GlobalC::pw.ggs[i] ),2);
 	}
 	
 	return;

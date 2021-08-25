@@ -19,11 +19,11 @@ pseudopot_cell_vl::~pseudopot_cell_vl()
 
 void pseudopot_cell_vl::init_vloc(const int &nggm, ModuleBase::matrix &vloc_in)
 {
-	TITLE("pseudopot_cell_vl","init_vloc");
+	ModuleBase::TITLE("pseudopot_cell_vl","init_vloc");
 
 	// This routine computes the fourier coefficient of the local
 	// potential vloc(ig,it) for each type of atom
-	timer::tick("ppcell_vl","init_vloc");
+	ModuleBase::timer::tick("ppcell_vl","init_vloc");
 
 	double *vloc1d = new double[nggm];
 	ModuleBase::GlobalFunc::ZEROS(vloc1d, nggm);
@@ -51,7 +51,7 @@ void pseudopot_cell_vl::init_vloc(const int &nggm, ModuleBase::matrix &vloc_in)
 		}
 		else
 		{
-			WARNING_QUIT("init_vloc","not available now.");
+			ModuleBase::WARNING_QUIT("init_vloc","not available now.");
 		}
 
 		dcopy(vloc1d, vloc_in, it);
@@ -62,14 +62,14 @@ void pseudopot_cell_vl::init_vloc(const int &nggm, ModuleBase::matrix &vloc_in)
 
 	this->print_vloc();
 
-	timer::tick("ppcell_vl","init_vloc");
+	ModuleBase::timer::tick("ppcell_vl","init_vloc");
 	return;
 }
 
 
 void pseudopot_cell_vl::allocate(void)
 {
-	if(GlobalV::test_pp>0) TITLE("pseudopot_cell_vl","allocate");
+	if(GlobalV::test_pp>0) ModuleBase::TITLE("pseudopot_cell_vl","allocate");
 	this->vloc.create(GlobalC::ucell.ntype, GlobalC::pw.nggm);
 
 	delete[] numeric;
@@ -156,7 +156,7 @@ void pseudopot_cell_vl::vloc_of_g(
 			// This is the |G| = 0 component of the local
 			// potential giving rise to the so-called
 			// "alpha*Z" term in the energy.
-			aux[ir] = r [ir] * (r [ir] * vloc_at [ir] + zp_in * e2);
+			aux[ir] = r [ir] * (r [ir] * vloc_at [ir] + zp_in * ModuleBase::e2);
 			//aux[ir] = r [ir] * (r [ir] * vloc_at [ir] );
 		}
 		ModuleBase::Integral::Simpson_Integral(msh, aux, rab, vloc_1d[0] );
@@ -169,7 +169,7 @@ void pseudopot_cell_vl::vloc_of_g(
 
 	// (2) here the |G|>0 terms, we first compute the part of the integrand func
 	// indipendent of |G| in real space
-	double fac = zp_in * e2;
+	double fac = zp_in * ModuleBase::e2;
 	for (ir = 0;ir < msh;ir++)  
 	{
 		aux1 [ir] = r[ir] * vloc_at [ir] + fac * erf(r[ir]);
@@ -190,7 +190,7 @@ void pseudopot_cell_vl::vloc_of_g(
 		vloc_1d[ig] -= fac * exp(- gx2 * 0.25)/ gx2;
 	} // enddo
 
-	const double d_fpi_omega = FOUR_PI/GlobalC::ucell.omega;//mohan add 2008-06-04
+	const double d_fpi_omega = ModuleBase::FOUR_PI/GlobalC::ucell.omega;//mohan add 2008-06-04
 	for (ig = 0;ig < GlobalC::pw.nggm; ig++)
 	{
 		vloc_1d[ig] *= d_fpi_omega;

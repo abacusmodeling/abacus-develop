@@ -13,11 +13,11 @@ Use_FFT::~Use_FFT()
 
 void Use_FFT::allocate(void)
 {
-    TITLE("Use_FFT","allocate");
+    ModuleBase::TITLE("Use_FFT","allocate");
 
     delete[] porter;
     porter = new std::complex<double>[GlobalC::pw.nrxx];
-    Memory::record("Use_FFT","porter",GlobalC::pw.nrxx,"complexmatrix");
+    ModuleBase::Memory::record("Use_FFT","porter",GlobalC::pw.nrxx,"complexmatrix");
 
     return;
 }

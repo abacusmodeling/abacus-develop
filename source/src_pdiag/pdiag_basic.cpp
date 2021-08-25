@@ -26,7 +26,7 @@ Pdiag_Basic::~Pdiag_Basic()
 
 void Pdiag_Basic::set_parameters(void)
 {
-    TITLE("Pdiag_Basic","set_parameters");
+    ModuleBase::TITLE("Pdiag_Basic","set_parameters");
 
     // set loc_size
 	if(GlobalV::GAMMA_ONLY_LOCAL)//xiaohui add 2014-12-21
@@ -37,7 +37,7 @@ void Pdiag_Basic::set_parameters(void)
 		if(loc_size==0)
 		{
 			GlobalV::ofs_warning << " loc_size=0" << " in proc " << GlobalV::MY_RANK+1 << std::endl;
-			WARNING_QUIT("Pdiag_Basic::set_parameters","NLOCAL < GlobalV::DSIZE");
+			ModuleBase::WARNING_QUIT("Pdiag_Basic::set_parameters","NLOCAL < GlobalV::DSIZE");
 		}
 
 		if (GlobalV::DRANK<GlobalV::NBANDS%GlobalV::DSIZE) loc_size=loc_size+1;
@@ -79,7 +79,7 @@ void Pdiag_Basic::set_parameters(void)
 		if(loc_size==0)
 		{
 			GlobalV::ofs_warning << " loc_size=0" << " in proc " << GlobalV::MY_RANK+1 << std::endl;
-			WARNING_QUIT("Pdiag_Basic::set_parameters","NLOCAL < GlobalV::DSIZE");
+			ModuleBase::WARNING_QUIT("Pdiag_Basic::set_parameters","NLOCAL < GlobalV::DSIZE");
 		}
 
 		if (GlobalV::DRANK<GlobalV::NLOCAL%GlobalV::DSIZE) 
@@ -136,7 +136,7 @@ void Pdiag_Basic::set_parameters(void)
 // creat the 'comm_2D' stratege.
 void Pdiag_Basic::mpi_creat_cart(MPI_Comm *comm_2D, int prow, int pcol)
 {
-    TITLE("Pdiag_Basic","mpi_creat_cart");
+    ModuleBase::TITLE("Pdiag_Basic","mpi_creat_cart");
     // the matrix is divided as ( dim[0] * dim[1] )
     int dim[2];
     int period[2]={1,1};
@@ -158,7 +158,7 @@ void Pdiag_Basic::mat_2d(MPI_Comm vu,
                          const int &nb,
                          LocalMatrix &LM)
 {
-    TITLE("Pdiag_Basic","mat_2d");
+    ModuleBase::TITLE("Pdiag_Basic","mat_2d");
     int dim[2];
     int period[2];
     int coord[2];
@@ -187,7 +187,7 @@ void Pdiag_Basic::mat_2d(MPI_Comm vu,
 	{
 		GlobalV::ofs_warning << " cpu 2D distribution : " << dim[0] << "*" << dim[1] << std::endl;
 		GlobalV::ofs_warning << " but, the number of row blocks is " << block << std::endl;
-		WARNING_QUIT("Pdiag_Basic::mat_2d","some processor has no row blocks, try a smaller 'nb2d' parameter.");
+		ModuleBase::WARNING_QUIT("Pdiag_Basic::mat_2d","some processor has no row blocks, try a smaller 'nb2d' parameter.");
 	}
 
     // (2.1) row_b : how many blocks for this processor. (at least)
@@ -256,7 +256,7 @@ void Pdiag_Basic::mat_2d(MPI_Comm vu,
 	{
 		GlobalV::ofs_warning << " cpu 2D distribution : " << dim[0] << "*" << dim[1] << std::endl;
 		GlobalV::ofs_warning << " but, the number of column blocks is " << block << std::endl;
-		WARNING_QUIT("Pdiag_Basic::mat_2d","some processor has no column blocks.");
+		ModuleBase::WARNING_QUIT("Pdiag_Basic::mat_2d","some processor has no column blocks.");
 	}
 
     LM.col_b=block/dim[1];
@@ -317,7 +317,7 @@ void Pdiag_Basic::data_distribution(
     double *A,
     const LocalMatrix &LM)
 {
-    TITLE("Pdiag_Basic","data_distribution");
+    ModuleBase::TITLE("Pdiag_Basic","data_distribution");
     MPI_Comm comm_row;
     MPI_Comm comm_col;
     MPI_Status status;
@@ -494,7 +494,7 @@ void Pdiag_Basic::data_distribution(
 
     if (!find)
     {
-        WARNING_QUIT("Pdiag_Basic::data_distribution","Can't find the H/S file");
+        ModuleBase::WARNING_QUIT("Pdiag_Basic::data_distribution","Can't find the H/S file");
     }
 
     return;
@@ -505,7 +505,7 @@ void Pdiag_Basic::data_distribution(
 #include "../src_pw/occupy.h"
 void Pdiag_Basic::gath_eig(MPI_Comm comm,int n,double **wfc,double *Z)
 {
-    TITLE("Pdiag_Basic","gath_eig");
+    ModuleBase::TITLE("Pdiag_Basic","gath_eig");
     time_t time_start = time(NULL);
 //  GlobalV::ofs_running << " Start gath_eig Time : " << ctime(&time_start);
 
@@ -536,7 +536,7 @@ void Pdiag_Basic::gath_eig(MPI_Comm comm,int n,double **wfc,double *Z)
         	ctot[i] = new double[GlobalV::NLOCAL];
         	ModuleBase::GlobalFunc::ZEROS(ctot[i], GlobalV::NLOCAL);
     	}
-    	Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"double");
+    	ModuleBase::Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"double");
 	}
 
     k=0;
@@ -729,7 +729,7 @@ MPI_Barrier(comm);
 
 void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **cc,std::complex<double> *Z, const int &ik)
 {
-    TITLE("Pdiag_Basic","gath_eig_complex");
+    ModuleBase::TITLE("Pdiag_Basic","gath_eig_complex");
     time_t time_start = time(NULL);
     //GlobalV::ofs_running << " Start gath_eig_complex Time : " << ctime(&time_start);
 
@@ -760,7 +760,7 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **cc
         	ctot[i] = new std::complex<double>[GlobalV::NLOCAL];
         	ModuleBase::GlobalFunc::ZEROS(ctot[i], GlobalV::NLOCAL);
     	}
-    	Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
+    	ModuleBase::Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
 	}
 
 	k=0;
@@ -917,7 +917,7 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **cc
 #ifdef __MPI
 void Pdiag_Basic::gath_full_eig(MPI_Comm comm,int n,double **c,double *Z)
 {
-    TITLE("Pdiag_Basic","gath_full_eig");
+    ModuleBase::TITLE("Pdiag_Basic","gath_full_eig");
 
     time_t time_start = time(NULL);
     //GlobalV::ofs_running << " Start gath_full_eig Time : " << ctime(&time_start);
@@ -1021,7 +1021,7 @@ void Pdiag_Basic::gath_full_eig(MPI_Comm comm,int n,double **c,double *Z)
 
 void Pdiag_Basic::gath_full_eig_complex(MPI_Comm comm,int n,std::complex<double> **c,std::complex<double> *Z)
 {
-    TITLE("Pdiag_Basic","gath_full_eig_complex");
+    ModuleBase::TITLE("Pdiag_Basic","gath_full_eig_complex");
 
     time_t time_start = time(NULL);
     //GlobalV::ofs_running << " Start gath_full_eig_complex Time : " << ctime(&time_start);

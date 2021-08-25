@@ -15,7 +15,7 @@ Vdwd2::Vdwd2(const UnitCell_pseudo &unit_in, Vdwd2_Parameters &para_in):
 
 void Vdwd2::cal_energy()
 {
-    TITLE("Vdwd2","energy");
+    ModuleBase::TITLE("Vdwd2","energy");
 	para.initset(ucell);
 
 	energy = 0;
@@ -28,13 +28,13 @@ void Vdwd2::cal_energy()
 			const double R0_sum = ( para.R0.at(ucell.atoms[it1].psd) + para.R0.at(ucell.atoms[it2].psd) )/ucell.lat0;
 			if(!R0_sum)
 			{
-				WARNING_QUIT("Input", "R0_sum can not be 0");		
+				ModuleBase::WARNING_QUIT("Input", "R0_sum can not be 0");		
 			}
 			for( int ia1=0; ia1!=ucell.atoms[it1].na; ++ia1 )
 			{
 				for( int ia2=0; ia2!=ucell.atoms[it2].na; ++ia2 )
 				{
-					Vector3<int> ilat_loop;
+					ModuleBase::Vector3<int> ilat_loop;
 					for( ilat_loop.x = -para.period.x/2; ilat_loop.x <= (para.period.x-1)/2; ++ilat_loop.x )
 					{
 						for( ilat_loop.y = -para.period.y/2; ilat_loop.y <= (para.period.y-1)/2; ++ilat_loop.y )
@@ -43,8 +43,8 @@ void Vdwd2::cal_energy()
 							{
 								if( (!( ilat_loop.x || ilat_loop.y || ilat_loop.z )) && (it1==it2) && (ia1==ia2) )
 									continue;
-								const Vector3<double> tau1 = ucell.atoms[it1].tau[ia1];
-								const Vector3<double> tau2 = ucell.atoms[it2].tau[ia2] + ilat_loop * ucell.latvec;
+								const ModuleBase::Vector3<double> tau1 = ucell.atoms[it1].tau[ia1];
+								const ModuleBase::Vector3<double> tau2 = ucell.atoms[it2].tau[ia2] + ilat_loop * ucell.latvec;
 								const double r_sqr = (tau1 - tau2).norm2();
 								const double r = sqrt(r_sqr);
 								const double tmp_damp_recip = 1+ exp( -para.damping* (r/R0_sum-1) );
@@ -61,7 +61,7 @@ void Vdwd2::cal_energy()
 
 void Vdwd2::cal_force()
 {
-    TITLE("Vdwd2","force");
+    ModuleBase::TITLE("Vdwd2","force");
 	para.initset(ucell);
 
 	force.clear();
@@ -76,13 +76,13 @@ void Vdwd2::cal_force()
 			const double R0_sum = ( para.R0.at(ucell.atoms[it1].psd) + para.R0.at(ucell.atoms[it2].psd) )/ucell.lat0;
 			if(!R0_sum)
 			{
-				WARNING_QUIT("Input", "R0_sum can not be 0");
+				ModuleBase::WARNING_QUIT("Input", "R0_sum can not be 0");
 			}
 			for( int ia1=0; ia1!=ucell.atoms[it1].na; ++ia1 )
 			{
 				for( int ia2=0; ia2!=ucell.atoms[it2].na; ++ia2 )
 				{
-					Vector3<int> ilat_loop;
+					ModuleBase::Vector3<int> ilat_loop;
 					for( ilat_loop.x = -para.period.x/2; ilat_loop.x <= (para.period.x-1)/2; ++ilat_loop.x )
 					{
 						for( ilat_loop.y = -para.period.y/2; ilat_loop.y <= (para.period.y-1)/2; ++ilat_loop.y )
@@ -93,8 +93,8 @@ void Vdwd2::cal_force()
 								{
 									continue;
 								}
-								const Vector3<double> tau1 = ucell.atoms[it1].tau[ia1];
-								const Vector3<double> tau2 = ucell.atoms[it2].tau[ia2] + ilat_loop * ucell.latvec;
+								const ModuleBase::Vector3<double> tau1 = ucell.atoms[it1].tau[ia1];
+								const ModuleBase::Vector3<double> tau2 = ucell.atoms[it2].tau[ia2] + ilat_loop * ucell.latvec;
 								const double r_sqr = (tau1 - tau2).norm2();
 								const double r = sqrt(r_sqr);
 								const double tmp_exp = exp( -para.damping* (r/R0_sum-1) );
@@ -117,7 +117,7 @@ void Vdwd2::cal_force()
 
 void Vdwd2::cal_stress(void)
 {
-    TITLE("Vdwd2","stress");
+    ModuleBase::TITLE("Vdwd2","stress");
 	para.initset(ucell);
 
 	stress.Zero();
@@ -131,13 +131,13 @@ void Vdwd2::cal_stress(void)
 			const double R0_sum = ( para.R0.at(ucell.atoms[it1].psd) + para.R0.at(ucell.atoms[it2].psd) )/ucell.lat0;
 			if(!R0_sum)
 			{
-				WARNING_QUIT("Input", "R0_sum can not be 0");
+				ModuleBase::WARNING_QUIT("Input", "R0_sum can not be 0");
 			}
 			for( int ia1=0; ia1!=ucell.atoms[it1].na; ++ia1 )
 			{
 				for( int ia2=0; ia2!=ucell.atoms[it2].na; ++ia2 )
 				{
-					Vector3<int> ilat_loop;
+					ModuleBase::Vector3<int> ilat_loop;
 					for( ilat_loop.x = -para.period.x/2; ilat_loop.x <= (para.period.x-1)/2; ++ilat_loop.x )
 					{
 						for( ilat_loop.y = -para.period.y/2; ilat_loop.y <= (para.period.y-1)/2; ++ilat_loop.y )
@@ -148,9 +148,9 @@ void Vdwd2::cal_stress(void)
 								{
 									continue;
 								}
-								const Vector3<double> tau1 = ucell.atoms[it1].tau[ia1];
-								const Vector3<double> tau2 = ucell.atoms[it2].tau[ia2] + ilat_loop * ucell.latvec;
-								const Vector3<double> dr = tau2 - tau1;
+								const ModuleBase::Vector3<double> tau1 = ucell.atoms[it1].tau[ia1];
+								const ModuleBase::Vector3<double> tau2 = ucell.atoms[it2].tau[ia2] + ilat_loop * ucell.latvec;
+								const ModuleBase::Vector3<double> dr = tau2 - tau1;
 								const double r_sqr = (tau1 - tau2).norm2();
 								const double r = sqrt(r_sqr);
 								const double tmp_exp = exp( -para.damping* (r/R0_sum-1) );

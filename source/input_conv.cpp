@@ -26,8 +26,8 @@
 
 void Input_Conv::Convert(void)
 {
-    TITLE("Input_Conv","Convert");
-	timer::tick("Input_Conv","Convert");
+    ModuleBase::TITLE("Input_Conv","Convert");
+	ModuleBase::timer::tick("Input_Conv","Convert");
 //----------------------------------------------------------
 // main parameters / electrons / spin ( 10/16 )
 //----------------------------------------------------------
@@ -137,7 +137,7 @@ void Input_Conv::Convert(void)
 	}
 	else
 	{
-		WARNING_QUIT("Input", "fixed_axes should be None,a,b,c,ab,ac,bc or abc!");
+		ModuleBase::WARNING_QUIT("Input", "fixed_axes should be None,a,b,c,ab,ac,bc or abc!");
 	}
 
 	GlobalV::MOVE_IONS = INPUT.ion_dynamics;
@@ -350,13 +350,13 @@ void Input_Conv::Convert(void)
 		delete[] GlobalC::ucell.magnet.m_loc_;
 		delete[] GlobalC::ucell.magnet.angle1_;
 		delete[] GlobalC::ucell.magnet.angle2_;
-		GlobalC::ucell.magnet.m_loc_ = new Vector3<double> [INPUT.ntype];
+		GlobalC::ucell.magnet.m_loc_ = new ModuleBase::Vector3<double> [INPUT.ntype];
 		GlobalC::ucell.magnet.angle1_ = new double[INPUT.ntype];
 		GlobalC::ucell.magnet.angle2_ = new double[INPUT.ntype];
 		for (int i = 0; i < INPUT.ntype; i++)
 		{
-			GlobalC::ucell.magnet.angle1_[i] = INPUT.angle1[i] / 180 * PI;
-			GlobalC::ucell.magnet.angle2_[i] = INPUT.angle2[i] / 180 * PI;
+			GlobalC::ucell.magnet.angle1_[i] = INPUT.angle1[i] / 180 * ModuleBase::PI;
+			GlobalC::ucell.magnet.angle2_[i] = INPUT.angle2[i] / 180 * ModuleBase::PI;
 		}
 #ifdef __MPI
 //			Parallel_Common::bcast_double(GlobalC::ucell.magnet.angle1_[i]);
@@ -365,7 +365,7 @@ void Input_Conv::Convert(void)
 	}
 	else{
 		delete[] GlobalC::ucell.magnet.m_loc_;
-		GlobalC::ucell.magnet.m_loc_ = new Vector3<double> [INPUT.ntype];
+		GlobalC::ucell.magnet.m_loc_ = new ModuleBase::Vector3<double> [INPUT.ntype];
 		GlobalV::LSPINORB = false;
 		GlobalV::NONCOLIN = false;
 		GlobalV::DOMAG = false;
@@ -619,11 +619,11 @@ void Input_Conv::Convert(void)
 	{
 		if(GlobalV::BASIS_TYPE != "pw")
 		{
-			 WARNING_QUIT("Input_conv","add metaGGA for pw first");
+			 ModuleBase::WARNING_QUIT("Input_conv","add metaGGA for pw first");
 		}
 		GlobalV::DFT_META = 1;
 	}
 
-	timer::tick("Input_Conv","Convert");
+	ModuleBase::timer::tick("Input_Conv","Convert");
     return;
 }

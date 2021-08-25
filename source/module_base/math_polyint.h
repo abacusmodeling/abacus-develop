@@ -20,10 +20,10 @@ class PolyInt
     //========================================================
     static void Polynomial_Interpolation
     (
-        const realArray &table,
+        const ModuleBase::realArray &table,
         const int &dim1,
         const int &dim2,
-        realArray &y,
+        ModuleBase::realArray &y,
         const int &dim_y,
         const int &table_length,
         const double &table_interval,
@@ -32,7 +32,7 @@ class PolyInt
 
     static double Polynomial_Interpolation
     (
-        const realArray &table,
+        const ModuleBase::realArray &table,
         const int &dim1,
         const int &dim2,
         const int &table_length,
@@ -42,7 +42,7 @@ class PolyInt
 
     static double Polynomial_Interpolation             // pengfei Li 2018-3-23
     (
-        const realArray &table,
+        const ModuleBase::realArray &table,
         const int &dim1,
         const int &dim2,
         const int &dim3,

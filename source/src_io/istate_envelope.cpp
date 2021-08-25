@@ -11,13 +11,13 @@ IState_Envelope::~IState_Envelope()
 
 void IState_Envelope::begin(void)
 {
-	TITLE("IState_Envelope","begin");
+	ModuleBase::TITLE("IState_Envelope","begin");
 
 	std::cout << " perform |psi(band, r)| for selected bands." << std::endl;
 
 	if(!GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		WARNING_QUIT("IState_Envelope::begin","Only available for GlobalV::GAMMA_ONLY_LOCAL now.");
+		ModuleBase::WARNING_QUIT("IState_Envelope::begin","Only available for GlobalV::GAMMA_ONLY_LOCAL now.");
 	}
 
 	// (1) 
@@ -80,7 +80,7 @@ void IState_Envelope::begin(void)
 				// we need to fix this function in near future.
 				// -- mohan add 2021-02-09
 				//---------------------------------------------------------
-				WARNING_QUIT("IState_Charge::idmatrix","need to update GlobalC::LOWF.WFC_GAMMA");
+				ModuleBase::WARNING_QUIT("IState_Charge::idmatrix","need to update GlobalC::LOWF.WFC_GAMMA");
 
 				//GlobalC::UHM.GG.cal_env( GlobalC::LOWF.WFC_GAMMA[is][ib], GlobalC::CHR.rho[is] );
 

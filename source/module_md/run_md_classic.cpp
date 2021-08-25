@@ -14,7 +14,7 @@ Run_MD_CLASSIC::Run_MD_CLASSIC()
 	pos_old2 = new double[1];
 	pos_now = new double[1];
 	pos_next = new double[1];
-	force = new Vector3<double>[1];
+	force = new ModuleBase::Vector3<double>[1];
 	stress.create(3,3);
 }
 
@@ -29,8 +29,8 @@ Run_MD_CLASSIC::~Run_MD_CLASSIC()
 
 void Run_MD_CLASSIC::classic_md_line(void)
 {
-	TITLE("Run_MD_CLASSIC", "classic_md_line");
-    timer::tick("Run_MD_CLASSIC", "classic_md_line");
+	ModuleBase::TITLE("Run_MD_CLASSIC", "classic_md_line");
+    ModuleBase::timer::tick("Run_MD_CLASSIC", "classic_md_line");
 
 	// Setup the unitcell.
     ucell_c.setup_cell_classic(GlobalV::global_atom_card, GlobalV::ofs_running, GlobalV::ofs_warning);
@@ -69,7 +69,7 @@ void Run_MD_CLASSIC::classic_md_line(void)
         }
         else
         {
-            WARNING_QUIT("md_cells_classic", "mdtype should be -1~2!");
+            ModuleBase::WARNING_QUIT("md_cells_classic", "mdtype should be -1~2!");
         }
 
         time_t fend = time(NULL);
@@ -81,17 +81,17 @@ void Run_MD_CLASSIC::classic_md_line(void)
 
 	GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
     GlobalV::ofs_running << std::setprecision(16);
-    GlobalV::ofs_running << " !FINAL_ETOT_IS " << potential*Ry_to_eV << " eV" << std::endl; 
+    GlobalV::ofs_running << " !FINAL_ETOT_IS " << potential*ModuleBase::Ry_to_eV << " eV" << std::endl; 
     GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
-    timer::tick("Run_MD_CLASSIC", "md_cells_classic");
+    ModuleBase::timer::tick("Run_MD_CLASSIC", "md_cells_classic");
     return;
 }
 
 void Run_MD_CLASSIC::md_force_stress(double &potential)
 {
-	TITLE("Run_MD_CLASSIC", "md_force_stress");
-    timer::tick("Run_MD_CLASSIC", "md_force_stress");
+	ModuleBase::TITLE("Run_MD_CLASSIC", "md_force_stress");
+    ModuleBase::timer::tick("Run_MD_CLASSIC", "md_force_stress");
 
 	if(INPUT.mdp.md_potential == "LJ")
 	{
@@ -130,17 +130,17 @@ void Run_MD_CLASSIC::md_force_stress(double &potential)
 	}
 	else if(INPUT.mdp.md_potential == "FP")
 	{
-		WARNING_QUIT("md_force_stress", "FPMD is only available in integrated program or PW module ！");
+		ModuleBase::WARNING_QUIT("md_force_stress", "FPMD is only available in integrated program or PW module ！");
 	}
 	else
 	{
-		WARNING_QUIT("md_force_stress", "Unsupported MD potential ！");
+		ModuleBase::WARNING_QUIT("md_force_stress", "Unsupported MD potential ！");
 	}
 
 	ModuleBase::GlobalFunc::NEW_PART("   TOTAL-FORCE (eV/Angstrom)");
 	GlobalV::ofs_running << std::endl;
 	GlobalV::ofs_running << " atom    x              y              z" << std::endl;
-	const double fac = Ry_to_eV*ANGSTROM_AU;
+	const double fac = ModuleBase::Ry_to_eV*ModuleBase::ANGSTROM_AU;
 	int iat = 0;
 	for(int it=0; it<ucell_c.ntype; ++it)
 	{
@@ -157,7 +157,7 @@ void Run_MD_CLASSIC::md_force_stress(double &potential)
 		}
 	}
 
-	timer::tick("Run_MD_CLASSIC", "md_force_stress");
+	ModuleBase::timer::tick("Run_MD_CLASSIC", "md_force_stress");
 }
 
 
@@ -175,7 +175,7 @@ void Run_MD_CLASSIC::md_allocate_ions(void)
 	this->pos_old2 = new double[pos_dim];
 	this->pos_now = new double[pos_dim];
 	this->pos_next = new double[pos_dim];
-	this->force = new Vector3<double>[ucell_c.nat];
+	this->force = new ModuleBase::Vector3<double>[ucell_c.nat];
 
 	ModuleBase::GlobalFunc::ZEROS(pos_old1, pos_dim);
 	ModuleBase::GlobalFunc::ZEROS(pos_old2, pos_dim);

@@ -1,6 +1,6 @@
 #include "MD_func.h"
 
-bool MD_func::RestartMD(const int& numIon, Vector3<double>* vel, int& step_rst)
+bool MD_func::RestartMD(const int& numIon, ModuleBase::Vector3<double>* vel, int& step_rst)
 {
 	int error(0);
 	double *vell=new double[numIon*3];
@@ -68,7 +68,7 @@ bool MD_func::RestartMD(const int& numIon, Vector3<double>* vel, int& step_rst)
 	return true;
 }
 
-void MD_func::mdRestartOut(const int& step, const int& recordFreq, const int& numIon, Vector3<double>* vel)
+void MD_func::mdRestartOut(const int& step, const int& recordFreq, const int& numIon, ModuleBase::Vector3<double>* vel)
 {
 //this function used for outputting the information of restart file
 	bool pass;
@@ -94,7 +94,7 @@ void MD_func::mdRestartOut(const int& step, const int& recordFreq, const int& nu
 	return;
 }
 
-double MD_func::GetAtomKE(const int& numIon, const Vector3<double>* vel, const double * allmass){
+double MD_func::GetAtomKE(const int& numIon, const ModuleBase::Vector3<double>* vel, const double * allmass){
 //---------------------------------------------------------------------------
 // DESCRIPTION:
 //   This function calculates the classical kinetic energy of a group of atoms.
@@ -115,7 +115,7 @@ void MD_func::InitVelocity(
 	const double& temperature, 
 	const double& fundamentalTime, 
 	const double* allmass,
-	Vector3<double>* vel)
+	ModuleBase::Vector3<double>* vel)
 {
 	if(!GlobalV::MY_RANK){ //xiaohui add 2015-09-25
 		srand(time(0));
@@ -146,9 +146,9 @@ void MD_func::InitVelocity(
 			else j2=j0+m;										
 			v=((double)j1)/((double)m);		        //second ramdon number
 			j1=j2;
-			x=tan(PI*(u-0.5));
-			y=1.6*v/(PI*(x*x+1.0));
-			if(y<=(1.0/sqrt(2.0*PI)*exp(-0.5*x*x))){
+			x=tan(ModuleBase::PI*(u-0.5));
+			y=1.6*v/(ModuleBase::PI*(x*x+1.0));
+			if(y<=(1.0/sqrt(2.0*ModuleBase::PI)*exp(-0.5*x*x))){
 				if(M<numIon) vel[M].x=x;
 				else if(M<2*numIon) vel[M-numIon].y=x;
 				else vel[M-2*numIon].z=x;
@@ -162,8 +162,8 @@ void MD_func::InitVelocity(
 			vel[ion]/=sqrt(allmass[ion]*9.01938e-31);				 
 		}
 		for(ion=0;ion<numIon;ion++){
-			vel[ion]*=sqrt(temperature/K_BOLTZMAN_AU * K_BOLTZMAN_SI);
-			vel[ion]*= fundamentalTime/BOHR_RADIUS_SI;
+			vel[ion]*=sqrt(temperature/ModuleBase::K_BOLTZMAN_AU * ModuleBase::K_BOLTZMAN_SI);
+			vel[ion]*= fundamentalTime/ModuleBase::BOHR_RADIUS_SI;
 		//rescale the velocities to a.u.
 		}
 	} //xiaohui add 2 lines 2015-09-25, bcast vel
@@ -207,15 +207,15 @@ void MD_func::InitVelocity(
 			file.close();
 
 			// Renew information.
-			intemp =  intemp * K_BOLTZMAN_AU;
+			intemp =  intemp * ModuleBase::K_BOLTZMAN_AU;
 			if ( fabs(intemp-temperature) >1e-6 ) {
-				std::cout <<"(ReadNewTemp): Read in new temp:"<< intemp/K_BOLTZMAN_AU 
-					<<" previous temp:"<< temperature/K_BOLTZMAN_AU<<std::endl;
+				std::cout <<"(ReadNewTemp): Read in new temp:"<< intemp/ModuleBase::K_BOLTZMAN_AU 
+					<<" previous temp:"<< temperature/ModuleBase::K_BOLTZMAN_AU<<std::endl;
 				temperature = intemp;
 			}
 			else{
-				std::cout<<"(ReadNewTemp): new temp:"<< intemp/K_BOLTZMAN_AU
-					<<" previous temp:"<<temperature/K_BOLTZMAN_AU
+				std::cout<<"(ReadNewTemp): new temp:"<< intemp/ModuleBase::K_BOLTZMAN_AU
+					<<" previous temp:"<<temperature/ModuleBase::K_BOLTZMAN_AU
 					<< ". No change of temp."<<std::endl;
 			}
 		}
@@ -245,7 +245,7 @@ std::string MD_func::intTurnTostring(long int iter, std::string path)
 	return path;
 }
 
-int MD_func::getMassMbl(const UnitCell_pseudo &unit_in, double* allmass, Vector3<int>* ionmbl)
+int MD_func::getMassMbl(const UnitCell_pseudo &unit_in, double* allmass, ModuleBase::Vector3<int>* ionmbl)
 {
 //some prepared information
 //mass and degree of freedom
@@ -295,7 +295,7 @@ void MD_func::scalevel(
 	const int& numIon,
 	const int& nfrozen,
 	const double& temperature,
-	Vector3<double>* vel,
+	ModuleBase::Vector3<double>* vel,
 	const double* allmass
 )
 {
@@ -329,14 +329,14 @@ double MD_func::Conserved(const double KE, const double PE, const int number){
         GlobalV::ofs_running<< "            SUMMARY OF NVE CALCULATION            "<<std::endl;
         GlobalV::ofs_running<<" --------------------------------------------------"<<std::endl;  
 		GlobalV::ofs_running<< "NVE Conservation     : "<< Conserved<<" (Hartree)"<<std::endl;
-		GlobalV::ofs_running<< "NVE Temperature      : "<< 2*KE/(3*number)/K_BOLTZMAN_AU<<" (K)"<<std::endl;
+		GlobalV::ofs_running<< "NVE Temperature      : "<< 2*KE/(3*number)/ModuleBase::K_BOLTZMAN_AU<<" (K)"<<std::endl;
 		GlobalV::ofs_running<< "NVE Kinetic energy   : "<< KE<<" (Hartree)"<<std::endl;
 		GlobalV::ofs_running<< "NVE Potential energy : "<< PE<<" (Hartree)"<<std::endl;
 	}
    	return Conserved;
 }
 
-double MD_func::MAXVALF(const int numIon, const Vector3<double>* force){
+double MD_func::MAXVALF(const int numIon, const ModuleBase::Vector3<double>* force){
 	//std::cout<<"enter in MAXVALF"<<std::endl;
 	double max=0;
 	for(int i=0;i<numIon;i++){

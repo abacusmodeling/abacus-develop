@@ -60,11 +60,11 @@ void Sph_Bessel_Recursive::D1::cal_jlx_smallx( const int l_size, const size_t ix
 	{
 		if(jlx[l].size()<ix_size)
 		{
-			const double coeff = sqrt(PI)/tgamma(l+1.5)/pow(2,l+1);
+			const double coeff = sqrt(ModuleBase::PI)/tgamma(l+1.5)/pow(2,l+1);
 			const double smallx_range = pow( this->threshold/coeff*(l+1.5)*4, 1.0/(l+2) );
 			
 			const size_t ix_size_begin = static_cast<int>(jlx[l].size());
-			const size_t ix_size_end = min( ix_size, static_cast<size_t>(smallx_range/dx) );
+			const size_t ix_size_end = std::min( ix_size, static_cast<size_t>(smallx_range/dx) );
 			if(jlx[l].size()<ix_size_end)
 			{
 				jlx[l].resize(ix_size_end);

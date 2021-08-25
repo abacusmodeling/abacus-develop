@@ -59,7 +59,7 @@ void Exx_Abfs::Matrix_Orbs22::init_radial(
 std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 gettimeofday( &t_start, NULL);
-	TITLE("Exx_Abfs::Matrix_Orbs22","init_radial");
+	ModuleBase::TITLE("Exx_Abfs::Matrix_Orbs22","init_radial");
 
 	assert(orb_A1.size()==orb_A2.size());
 	assert(orb_B1.size()==orb_B2.size());
@@ -93,7 +93,7 @@ void Exx_Abfs::Matrix_Orbs22::init_radial(
 std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 gettimeofday( &t_start, NULL);
-	TITLE("Exx_Abfs::Matrix_Orbs22","init_radial");
+	ModuleBase::TITLE("Exx_Abfs::Matrix_Orbs22","init_radial");
 
 	assert( orb_A1.get_ntype() == orb_A2.get_ntype() );
 	assert( orb_B1.get_ntype() == orb_B2.get_ntype() );
@@ -123,7 +123,7 @@ void Exx_Abfs::Matrix_Orbs22::init_radial_table()
 std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 gettimeofday( &t_start, NULL);
-	TITLE("Exx_Abfs::Matrix_Orbs22","init_radial_table");
+	ModuleBase::TITLE("Exx_Abfs::Matrix_Orbs22","init_radial_table");
 
 	for( auto &coA : center2_orb22_s )
 		for( auto &coB : coA.second )
@@ -145,7 +145,7 @@ void Exx_Abfs::Matrix_Orbs22::init_radial_table( const std::map<size_t,std::map<
 std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 gettimeofday( &t_start, NULL);
-	TITLE("Exx_Abfs::Matrix_Orbs22","init_radial_table_Rs");
+	ModuleBase::TITLE("Exx_Abfs::Matrix_Orbs22","init_radial_table_Rs");
 
 	for( const auto &RsA : Rs )
 		for( const auto &RsB : RsA.second )
@@ -185,15 +185,15 @@ ofs.close();
 ModuleBase::matrix Exx_Abfs::Matrix_Orbs22::cal_overlap_matrix(
 	const size_t TA,
 	const size_t TB,
-	const Vector3<double> &tauA,
-	const Vector3<double> &tauB,
+	const ModuleBase::Vector3<double> &tauA,
+	const ModuleBase::Vector3<double> &tauB,
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_A1,
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_A2,
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_B1,
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_B2,
 	const Matrix_Order &matrix_order) const
 {
-	TITLE("Exx_Abfs::Matrix_Orbs22","cal_overlap_matrix");
+	ModuleBase::TITLE("Exx_Abfs::Matrix_Orbs22","cal_overlap_matrix");
 
 	ModuleBase::matrix m;
 	switch(matrix_order)
@@ -283,14 +283,14 @@ gettimeofday( &t_start, NULL);
 		const size_t TA = co1.first;
 		for( size_t IA=0; IA!=GlobalC::ucell.atoms[TA].na; ++IA )
 		{
-			const Vector3<double> &tauA( GlobalC::ucell.atoms[TA].tau[IA] );
+			const ModuleBase::Vector3<double> &tauA( GlobalC::ucell.atoms[TA].tau[IA] );
 
 			for( const auto &co2 : co1.second )
 			{
 				const size_t TB = co2.first;
 				for( size_t IB=0; IB!=GlobalC::ucell.atoms[TB].na; ++IB )
 				{
-					const Vector3<double> &tauB( GlobalC::ucell.atoms[TB].tau[IB] );
+					const ModuleBase::Vector3<double> &tauB( GlobalC::ucell.atoms[TB].tau[IB] );
 
 					matrixes[TA][IA][TB][IB] = cal_overlap_matrix(
 						TA,

@@ -16,7 +16,7 @@ void Grid_Base_Beta::prepare(
     const Matrix3 &latvec_in,
     const double &lat0_in)
 {
-	TITLE("Grid_Base_Beta","prepare");
+	ModuleBase::TITLE("Grid_Base_Beta","prepare");
 
 	this->latvec = latvec_in;
 	this->lat0 = lat0_in;

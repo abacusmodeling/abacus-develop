@@ -15,7 +15,7 @@
 
 void Wfc_Dm_2d::init()
 {
-	TITLE("Wfc_Dm_2d", "init");
+	ModuleBase::TITLE("Wfc_Dm_2d", "init");
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
 		wfc_gamma.resize(GlobalV::NSPIN);
@@ -30,7 +30,7 @@ void Wfc_Dm_2d::init()
 
 void Wfc_Dm_2d::cal_dm(const ModuleBase::matrix &wg)
 {
-	TITLE("Wfc_Dm_2d", "cal_dm");
+	ModuleBase::TITLE("Wfc_Dm_2d", "cal_dm");
 	
 	#ifdef TEST_DIAG
 	{
