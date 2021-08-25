@@ -205,8 +205,8 @@ void H_Ewald_pw::rgen(
     const ModuleBase::Vector3<double> &dtau,
     const double &rmax,
     int *irr,
-    const Matrix3 &latvec,
-    const Matrix3 &G,
+    const ModuleBase::Matrix3 &latvec,
+    const ModuleBase::Matrix3 &G,
     ModuleBase::Vector3<double> *r,
     double *r2,
     int &nrm)

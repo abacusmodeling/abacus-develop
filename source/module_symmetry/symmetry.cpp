@@ -67,7 +67,7 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, std::o
     this->a2 = ucell.a2;
     this->a3 = ucell.a3;
 
-	Matrix3 latvec1;
+	ModuleBase::Matrix3 latvec1;
 	latvec1.e11 = a1.x; latvec1.e12 = a1.y; latvec1.e13 = a1.z;
 	latvec1.e21 = a2.x; latvec1.e22 = a2.y; latvec1.e23 = a2.z;
 	latvec1.e31 = a3.x; latvec1.e32 = a3.y; latvec1.e33 = a3.z;
@@ -119,7 +119,7 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, std::o
 
 	// the atom position coordinates are changed to 
 	// crystal coordinates of a1,a2,a3
-	Matrix3 new_lat;
+	ModuleBase::Matrix3 new_lat;
 	new_lat.e11=a1.x; new_lat.e12=a1.y; new_lat.e13=a1.z;
 	new_lat.e21=a2.x; new_lat.e22=a2.y; new_lat.e23=a2.z;
 	new_lat.e31=a3.x; new_lat.e32=a3.y; new_lat.e33=a3.z;
@@ -591,7 +591,7 @@ void Symmetry::lattice_type(
                                 {
                                     for (int n11 = -2; n11 < 3; ++n11)
                                     {
-                                        Matrix3 mat(n11, n12, n13, n21, n22, n23, n31, n32, n33);
+                                        ModuleBase::Matrix3 mat(n11, n12, n13, n21, n22, n23, n31, n32, n33);
 
                                         if (equal(mat.Det(),1.0))
                                         {
@@ -1134,8 +1134,8 @@ void Symmetry::getgroup(int &nrot, int &nrotk, std::ofstream &ofs_running)
     //the symmetry of the pure translation lattice without any basic.
 	//--------------------------------------------------------------------------------
 
-    Matrix3 zero(0,0,0,0,0,0,0,0,0);
-    Matrix3 help[48];
+    ModuleBase::Matrix3 zero(0,0,0,0,0,0,0,0,0);
+    ModuleBase::Matrix3 help[48];
     ModuleBase::Vector3<double> temp[48];
 
     nrot = 0;
@@ -1224,7 +1224,7 @@ void Symmetry::getgroup(int &nrot, int &nrotk, std::ofstream &ofs_running)
     return;
 }
 
-void Symmetry::checksym(Matrix3 &s, ModuleBase::Vector3<double> &gtrans, double* pos)
+void Symmetry::checksym(ModuleBase::Matrix3 &s, ModuleBase::Vector3<double> &gtrans, double* pos)
 {
 	//----------------------------------------------
     // checks whether a point group symmetry element 
@@ -1441,7 +1441,7 @@ void Symmetry::rho_symmetry( double *rho,
 
 
 	// get the remaining rotation matrix.
-	std::array<Matrix3, 48> gmatrix_fft;
+	std::array<ModuleBase::Matrix3, 48> gmatrix_fft;
 
     int counter = 0;
     for (int i=0; i<48; ++i)

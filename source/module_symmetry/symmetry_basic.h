@@ -55,14 +55,14 @@ class Symmetry_Basic
 			const ModuleBase::Vector3<double> &bb2,
 			const ModuleBase::Vector3<double> &bb3
 			);
-	void matrigen(Matrix3 *symgen, const int ngen, Matrix3* symop, int &nop);
-	void setgroup(Matrix3 *symop, int &nop, const int &ibrav);
-	void rotate( Matrix3 &gmatrix, ModuleBase::Vector3<double> &gtrans, int i, int j, int k, const int, const int, const int, int&, int&, int&);
+	void matrigen(ModuleBase::Matrix3 *symgen, const int ngen, ModuleBase::Matrix3* symop, int &nop);
+	void setgroup(ModuleBase::Matrix3 *symop, int &nop, const int &ibrav);
+	void rotate( ModuleBase::Matrix3 &gmatrix, ModuleBase::Vector3<double> &gtrans, int i, int j, int k, const int, const int, const int, int&, int&, int&);
 
 	protected:
 
 	std::string get_brav_name(const int ibrav);
-	void pointgroup(const int &nrot,int &pgnumber,std::string &pgname, const Matrix3* gmatrix, std::ofstream &ofs_running);
+	void pointgroup(const int &nrot,int &pgnumber,std::string &pgname, const ModuleBase::Matrix3* gmatrix, std::ofstream &ofs_running);
 	void atom_ordering(double *posi, const int natom, int *subindex);
 
 	private:

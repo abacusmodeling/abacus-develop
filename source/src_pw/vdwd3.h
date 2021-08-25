@@ -23,7 +23,7 @@ public:
 
 	const double                       &get_energy()const{ return energy; }
 	const std::vector<ModuleBase::Vector3<double>> 	   &get_force() const{ return force;  }
-	const Matrix3                      &get_stress()const{ return stress; }
+	const ModuleBase::Matrix3                      &get_stress()const{ return stress; }
 
 private:
 
@@ -32,7 +32,7 @@ private:
 
 	double energy = 0;
 	std::vector<ModuleBase::Vector3<double>> force;
-	Matrix3 stress;
+	ModuleBase::Matrix3 stress;
 
 	std::vector<ModuleBase::Vector3<double>> lat;
     std::vector<int> iz;

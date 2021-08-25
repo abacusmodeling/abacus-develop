@@ -12,7 +12,7 @@ class Grid_Base
 {
 public:
 	void init( 
-		const Matrix3 &latvec_in, 
+		const ModuleBase::Matrix3 &latvec_in, 
 		const double &lat0_in, 
 		const int &nx_in,
 		const int &ny_in,
@@ -46,8 +46,8 @@ protected:
 
 	int* ijk_index;
 
-	Matrix3 latvec;
-	Matrix3 latvec0;
+	ModuleBase::Matrix3 latvec;
+	ModuleBase::Matrix3 latvec0;
 
 	ModuleBase::Vector3<double> a1;
 	ModuleBase::Vector3<double> a2;

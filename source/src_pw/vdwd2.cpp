@@ -156,7 +156,7 @@ void Vdwd2::cal_stress(void)
 								const double tmp_exp = exp( -para.damping* (r/R0_sum-1) );
 								const double tmp_factor = C6_product/ pow(r_sqr,3)/ r/ 
 								(1+tmp_exp)* ( -6/r + tmp_exp/(1+tmp_exp)*para.damping/R0_sum);
-								stress += tmp_factor / 2 * Matrix3(
+								stress += tmp_factor / 2 * ModuleBase::Matrix3(
 									dr.x*dr.x, dr.x*dr.y, dr.x*dr.z,
 									dr.y*dr.x, dr.y*dr.y, dr.y*dr.z,
 									dr.z*dr.x, dr.z*dr.y, dr.z*dr.z);

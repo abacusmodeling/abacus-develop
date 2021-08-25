@@ -42,7 +42,7 @@ Grid_Base::~Grid_Base()
 }
 
 void Grid_Base::init(
-    const Matrix3 &latvec_in,
+    const ModuleBase::Matrix3 &latvec_in,
     const double &lat0_in,
     const int &nx_in,
     const int &ny_in,

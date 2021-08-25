@@ -7,7 +7,7 @@
 #include "../module_base/math_polyint.h" 
 #include "../module_base/math_ylmreal.h" 
 
-toWannier90::toWannier90(int num_kpts, Matrix3 recip_lattice)
+toWannier90::toWannier90(int num_kpts, ModuleBase::Matrix3 recip_lattice)
 {
 	this->num_kpts = num_kpts;
 	this->recip_lattice = recip_lattice;
@@ -96,7 +96,7 @@ void toWannier90::read_nnkp()
 	
 	if( ModuleBase::GlobalFunc::SCAN_BEGIN(nnkp_read,"real_lattice") )
 	{
-		Matrix3 real_lattice_nnkp;
+		ModuleBase::Matrix3 real_lattice_nnkp;
 		nnkp_read >> real_lattice_nnkp.e11 >> real_lattice_nnkp.e12 >> real_lattice_nnkp.e13
 				  >> real_lattice_nnkp.e21 >> real_lattice_nnkp.e22 >> real_lattice_nnkp.e23
 				  >> real_lattice_nnkp.e31 >> real_lattice_nnkp.e32 >> real_lattice_nnkp.e33;
@@ -126,7 +126,7 @@ void toWannier90::read_nnkp()
 	
 	if( ModuleBase::GlobalFunc::SCAN_BEGIN(nnkp_read,"recip_lattice") )
 	{
-		Matrix3 recip_lattice_nnkp;
+		ModuleBase::Matrix3 recip_lattice_nnkp;
 		nnkp_read >> recip_lattice_nnkp.e11 >> recip_lattice_nnkp.e12 >> recip_lattice_nnkp.e13
 				  >> recip_lattice_nnkp.e21 >> recip_lattice_nnkp.e22 >> recip_lattice_nnkp.e23
 				  >> recip_lattice_nnkp.e31 >> recip_lattice_nnkp.e32 >> recip_lattice_nnkp.e33;

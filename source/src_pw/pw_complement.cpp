@@ -7,7 +7,7 @@ int PW_complement::get_total_pw_number(
     const int& nx,
     const int& ny,
     const int& nz,
-    const Matrix3& GGT)
+    const ModuleBase::Matrix3& GGT)
 {
     if (GlobalV::test_pw) ModuleBase::TITLE("PW_complement","get_total_pw_number");
     if (ggcut_end<=0.0)
@@ -54,7 +54,7 @@ void PW_complement::get_total_pw(
     const int& nx,
     const int& ny,
     const int& nz,
-    const Matrix3& GGT, // GGT = G*GT.
+    const ModuleBase::Matrix3& GGT, // GGT = G*GT.
     int& ngm// number of total plane waves.
 )
 {
@@ -103,7 +103,7 @@ void PW_complement::get_total_pw(
 }
 
 void PW_complement::get_FFT_dimension(
-    const Matrix3 &latvec,
+    const ModuleBase::Matrix3 &latvec,
     const double &ggcut,
     int &nx_tmp,
     int &ny_tmp,
@@ -232,7 +232,7 @@ void PW_complement::get_FFT_dimension(
 // generate : gg_global, g_global, ig_global
 //==========================================================
 void PW_complement::setup_GVectors(
-    const Matrix3& G,
+    const ModuleBase::Matrix3& G,
     const int &ngmc_g_in,
     double* gg,
     ModuleBase::Vector3<double>* ig,
@@ -402,8 +402,8 @@ void PW_complement::get_total_pw_after_vc(
         const int& nx,
         const int& ny,
         const int& nz,
-        const Matrix3& GGT, // GGT = G*GT.
-        const Matrix3& GGT0,
+        const ModuleBase::Matrix3& GGT, // GGT = G*GT.
+        const ModuleBase::Matrix3& GGT0,
         int& ngm// number of total plane waves.
 )
 {

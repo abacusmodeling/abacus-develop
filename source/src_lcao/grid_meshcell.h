@@ -11,8 +11,8 @@ class Grid_MeshCell: public Grid_MeshK
 	double meshcell_vec1[3];
 	double meshcell_vec2[3];
 	double meshcell_vec3[3];
-	Matrix3 meshcell_latvec0;
-	Matrix3 meshcell_GT;
+	ModuleBase::Matrix3 meshcell_latvec0;
+	ModuleBase::Matrix3 meshcell_GT;
 	
 	double** meshcell_pos;
 	bool allocate_pos;
