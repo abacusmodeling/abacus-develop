@@ -443,7 +443,7 @@ void YlmReal::Ylm_Real
                                     static_cast<double>(Fact(l - m)) /
                                     static_cast<double>(Fact(l + m))
                                 )
-                                *SQRT2;
+                                *ModuleBase::SQRT2;
 
             ++lm;
             for (i=0;i<ng;i++)

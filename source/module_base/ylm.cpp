@@ -110,7 +110,7 @@ void Ylm::get_ylm_real( const int &Lmax, const ModuleBase::Vector3<double> &vec,
 					static_cast<double>( Ylm::Fact(l - m)) / 
 					static_cast<double>( Ylm::Fact(l + m)) 
 					) 
-					*SQRT2;
+					*ModuleBase::SQRT2;
 
 			++lm;
 			ylmr[lm] = same * p[m][l] * cos(m * phi);
@@ -249,7 +249,7 @@ void Ylm::get_ylm_real( const int &Lmax, const ModuleBase::Vector3<double> &vec,
 					static_cast<double>( Ylm::Fact(l - m)) / 
 					static_cast<double>( Ylm::Fact(l + m)) 
 					) 
-					*SQRT2;
+					*ModuleBase::SQRT2;
 
 			++lm;
 			ylmr[lm] = same * p[m][l] * cos(m * phi);

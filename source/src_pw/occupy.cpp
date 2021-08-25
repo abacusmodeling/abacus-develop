@@ -536,7 +536,7 @@ double Occupy::wgauss(const double &x,const int n)
     //===================
     if (n == - 1)
     {
-        const double xp = x - 1.00 / SQRT2;
+        const double xp = x - 1.00 / ModuleBase::SQRT2;
         const double arg = std::min(maxarg, xp * xp);
         wga = 0.50 * erf(xp) + 1.00 / sqrt( ModuleBase::TWO_PI ) * std::exp(- arg) + 0.50;
         return wga;
@@ -546,7 +546,7 @@ double Occupy::wgauss(const double &x,const int n)
     // Methfessel-Paxton       //pengfei 2014-10-13
     //====================
     wga = 0.5 * (1 - erf(-x));
-    //wga = gauss_freq(x * SQRT2);
+    //wga = gauss_freq(x * ModuleBase::SQRT2);
     //	std::cout<<"\n x="<<x<<" wga="<<wga;
     if (n == 0)
     {
@@ -622,7 +622,7 @@ double Occupy::w1gauss(const double &x,const int n)
 
     if (n == - 1)
     {
-        const double xp = x - 1.00 / SQRT2;
+        const double xp = x - 1.00 / ModuleBase::SQRT2;
         const double arg = std::min(200.0, xp*xp);
         w1 = 1.00 / sqrt(ModuleBase::TWO_PI) * xp * std::exp(- arg);
         return w1;
