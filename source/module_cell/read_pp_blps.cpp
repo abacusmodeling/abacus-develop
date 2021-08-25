@@ -1,61 +1,10 @@
 #include "read_pp.h"
 
-//  read bulk local pseudopotential "blps" in the Unified
-// int Pseudopot_upf::read_pseudo_blps(ifstream &ifs)
-// {
-//     if(!SCAN_BEGIN(ifs,"START")) WARNING_QUIT("read_pp_blps","Find no PP_HEADER");
-//     skip_comment(ifs);
-
-//     float max_g;
-//     ifs >> max_g;
-
-//     char comment[200];
-//     int nline = 0;
-//     while(ifs.getline(comment,sizeof(comment)))
-//     {
-//         if(comment != "1000"){
-//             ++nline;
-//         }
-//         else{
-//             break;
-//         }
-//     }
-//     this->mesh = nline * 3;
-//     double dg = max_g / (mesh - 1);
-
-//     // begin read vlocal
-//     delete[] r;
-//     delete[] vloc;
-//     this->r = new double[mesh];
-//     this->vloc = new double[mesh];
-//     skip_comment(ifs);
-//     ifs >> max_g;
-//     for(int i = 0;i < mesh;++i)
-//     {
-//         r[i] = dg * i;
-//         ifs >> this->vloc[i];
-//     }
-//     return 0;
-// }
-
-// void Pseudopot_upf::skip_comment(ifstream &ifs)
-// {
-//     char comment[200];
-//     while(ifs.getline(comment,sizeof(comment)))
-//     {
-//         if(comment != "END COMMENT") break;
-//     }
-//     int temp1;
-//     int temp2;
-//     ifs >> temp1 >> temp2;
-// }
-
 int Pseudopot_upf::read_pseudo_blps(ifstream &ifs)
 {
     // double bohr2a = 0.529177249;
     this->nlcc = false;
     this->tvanp = false;
-
 
     this->nbeta = 0;
     delete[] kkbeta;
@@ -72,9 +21,9 @@ int Pseudopot_upf::read_pseudo_blps(ifstream &ifs)
     this->nn = new int[1];
     this->jchi = new double[1];
     this->jjj = new double[1];
-    ZEROS(nn, 1);
-    ZEROS(jchi, 1);
-    ZEROS(jjj, 1);
+    ModuleBase::GlobalFunc::ZEROS(nn, 1);
+    ModuleBase::GlobalFunc::ZEROS(jchi, 1);
+    ModuleBase::GlobalFunc::ZEROS(jjj, 1);
 
     ifs >> this->psd;
     // if(!SCAN_BEGIN(ifs,"BLPS")) WARNING_QUIT("read_pp_blps","Find no PP_HEADER");
@@ -116,9 +65,9 @@ int Pseudopot_upf::read_pseudo_blps(ifstream &ifs)
     this->r = new double[mesh]; // Bohr
     this->rab = new double[mesh];
     this->vloc = new double[mesh]; // Hatree
-    ZEROS(r,mesh);
-    ZEROS(rab,mesh);
-    ZEROS(vloc,mesh);
+    ModuleBase::GlobalFunc::ZEROS(r,mesh);
+    ModuleBase::GlobalFunc::ZEROS(rab,mesh);
+    ModuleBase::GlobalFunc::ZEROS(vloc,mesh);
     int num;
     for(int i = 0;i < mesh; ++i)
     {
@@ -134,15 +83,12 @@ int Pseudopot_upf::read_pseudo_blps(ifstream &ifs)
 
     delete[] rho_at;
     this->rho_at = new double[mesh];
-    ZEROS(rho_at,mesh);
-    // double charge = zion/(4.0/3.0*3.1415926535*r[mesh-1]*r[mesh-1]*r[mesh-1]);
-    // double charge = 1;
+    ModuleBase::GlobalFunc::ZEROS(rho_at,mesh);
     double charge = zion/r[mesh-1];
     for(int i = 0;i < mesh; ++i)
     {
         rho_at[i] = charge;
     }
-    // cout<<"mesh="<<this->mesh<<endl;
     return 0;
 }
 
