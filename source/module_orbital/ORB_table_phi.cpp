@@ -857,7 +857,7 @@ void ORB_table_phi::init_Table_Spherical_Bessel (
 
 	this->init_Lmax (orb_num,mode,Lmax_used,Lmax,Lmax_exx);		// Peize Lin add 2016-01-26
 
-	for( auto & sb : Sph_Bessel_Recursive_Pool::D2::sb_pool )
+	for( auto & sb : ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool )
 	{
 		if( this->dr * this->dk == sb.get_dx() )
 		{
@@ -868,8 +868,8 @@ void ORB_table_phi::init_Table_Spherical_Bessel (
 
 	if(!pSB)
 	{
-		Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});
-		pSB = &Sph_Bessel_Recursive_Pool::D2::sb_pool.back();
+		ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});
+		pSB = &ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool.back();
 	}
 	
 	pSB->set_dx( this->dr * this->dk );

@@ -9,6 +9,8 @@
 #include<cmath>
 #include<stdexcept>
 
+namespace ModuleBase
+{
 
 std::vector<Sph_Bessel_Recursive::D1> Sph_Bessel_Recursive_Pool::D1::sb_pool;
 
@@ -116,6 +118,8 @@ void Sph_Bessel_Recursive::D1::cal_jlx_recursive( const int l_size, const size_t
 			}
 		}
 	}
+}
+
 }
 
 /*
