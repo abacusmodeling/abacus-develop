@@ -87,7 +87,7 @@ int Pseudopot_upf::init_pseudo_reader(const std::string &fn)
 		int info = read_pseudo_upf201(ifs);
 		return info;
 	}
-	else if(global_pseudo_type=="blps") // sunliang added 2021.7
+	else if(GlobalV::global_pseudo_type=="blps") // sunliang added 2021.7
 	{
 		int info = read_pseudo_blps(ifs);
 		return info;
