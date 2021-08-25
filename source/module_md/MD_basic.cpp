@@ -139,7 +139,7 @@ void MD_basic::runNVT(int step1, double potential, ModuleBase::Vector3<double> *
 //	if (step_!=1)mdf.ReadNewTemp( step_ );
 	
 	std::cout << " ------------------------------------------------------------" << std::endl;
-	std::cout << " Target temperature  : " << temperature_/K_BOLTZMAN_AU << " (K)"<< std::endl;
+	std::cout << " Target temperature  : " << temperature_/ModuleBase::K_BOLTZMAN_AU << " (K)"<< std::endl;
 	
 	if(step_==1||step_%mdp.fixTemperature==1)
     {
@@ -176,7 +176,7 @@ void MD_basic::runNVT(int step1, double potential, ModuleBase::Vector3<double> *
 	// big loop
 	//-----------------------------------------------
 	std::cout<<" "<<std::left<<std::setw(12)<<"MD_STEP"<<std::left<<std::setw(12)<< "SystemE"<<std::left<<std::setw(12)<< "Conserved"<<std::left<<std::setw(12)<< "DeltaE"<<std::left<<std::setw(12)<< "Temperature"<<std::endl;
-	std::cout<<" "<<std::left<<std::setw(12)<<step_<<std::left<<std::setw(12)<< energy_<<std::left<<std::setw(12)<< hamiltonian<<std::left<<std::setw(12)<< energy_-oldEtot_<<std::left<<std::setw(12)<<twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU<<std::endl;
+	std::cout<<" "<<std::left<<std::setw(12)<<step_<<std::left<<std::setw(12)<< energy_<<std::left<<std::setw(12)<< hamiltonian<<std::left<<std::setw(12)<< energy_-oldEtot_<<std::left<<std::setw(12)<<twiceKE/(3*double(ucell.nat-nfrozen_))/ModuleBase::K_BOLTZMAN_AU<<std::endl;
 	std::cout << " ------------------------------------------------------------" << std::endl;
 
 	oldEtot_=energy_;
@@ -258,7 +258,7 @@ void MD_basic::runNVT(int step1, double potential, ModuleBase::Vector3<double> *
         GlobalV::ofs_running << " maxForce             : " << std::setw(10) << maxForce << std::endl;
         GlobalV::ofs_running << " maxStep              : " << std::setw(10) << maxStep << std::endl;
         GlobalV::ofs_running << " " <<std::left<<std::setw(20)<<"MD_STEP"<<std::left<<std::setw(20)<< "SystemE"<<std::left<<std::setw(20)<< "Conserved"<<std::left<<std::setw(20)<< "DeltaE"<<std::left<<std::setw(20)<< "Temperature"<<std::endl;
-	    GlobalV::ofs_running << " " <<std::left<<std::setw(20)<<step_<<std::left<<std::setw(20)<< energy_<<std::left<<std::setw(20)<< hamiltonian<<std::left<<std::setw(20)<< energy_-oldEtot_<<std::left<<std::setw(20)<<twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU<<std::endl;
+	    GlobalV::ofs_running << " " <<std::left<<std::setw(20)<<step_<<std::left<<std::setw(20)<< energy_<<std::left<<std::setw(20)<< hamiltonian<<std::left<<std::setw(20)<< energy_-oldEtot_<<std::left<<std::setw(20)<<twiceKE/(3*double(ucell.nat-nfrozen_))/ModuleBase::K_BOLTZMAN_AU<<std::endl;
     }
     oldEtot_=energy_;
     //output basic restart info
@@ -292,7 +292,7 @@ void MD_basic::runNVE(int step1, double potential, ModuleBase::Vector3<double> *
 
   // Set up extra output to ion optimizer / MD header
   //std::cout<<"Time interval       : "<< mdp.dt*fundamentalTime*1e15<< " (fs)"<<std::endl;
-  //std::cout<<"Target temperature  : "<< temperature_/K_BOLTZMAN_AU<< " (K)"<<std::endl;
+  //std::cout<<"Target temperature  : "<< temperature_/ModuleBase::K_BOLTZMAN_AU<< " (K)"<<std::endl;
 
     if(step_==1){
         for(int k=0;k<ucell.nat;k++)
@@ -309,8 +309,8 @@ void MD_basic::runNVE(int step1, double potential, ModuleBase::Vector3<double> *
     double twiceKE=mdf.GetAtomKE(ucell.nat, vel, allmass);
     twiceKE = twiceKE * 2;
 
-    double tempNow = twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU;
-    //std::cout<<" start temperature = "<< tempNow/K_BOLTZMAN_AU<< " (k)"<<std::endl;
+    double tempNow = twiceKE/(3*double(ucell.nat-nfrozen_))/ModuleBase::K_BOLTZMAN_AU;
+    //std::cout<<" start temperature = "<< tempNow/ModuleBase::K_BOLTZMAN_AU<< " (k)"<<std::endl;
 
     if(GlobalV::STRESS)
 	{
@@ -335,7 +335,7 @@ void MD_basic::runNVE(int step1, double potential, ModuleBase::Vector3<double> *
     // Output the message to the screen.
     // std::cout << " ------------------------------------------------------------" << std::endl;
     // std::cout<<" "<<std::left<<std::setw(12)<<"NVE_STEP"<<std::left<<std::setw(12)<< "SystemE"<<std::left<<std::setw(12)<< "Conserved"<<std::left<<std::setw(12)<< "DeltaE"<<std::left<<std::setw(12)<< "Temperature"<<std::endl;
-	// std::cout<<" "<<std::left<<std::setw(12)<<step_<<std::left<<std::setw(12)<< energy_<<std::left<<std::setw(12)<< conservedE <<std::left<<std::setw(12)<< energy_-oldEtot_<<std::left<<std::setw(12)<<twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU<<std::endl;
+	// std::cout<<" "<<std::left<<std::setw(12)<<step_<<std::left<<std::setw(12)<< energy_<<std::left<<std::setw(12)<< conservedE <<std::left<<std::setw(12)<< energy_-oldEtot_<<std::left<<std::setw(12)<<twiceKE/(3*double(ucell.nat-nfrozen_))/ModuleBase::K_BOLTZMAN_AU<<std::endl;
 	// std::cout << " ------------------------------------------------------------" << std::endl;
   
     // (1) 1st step of Verlet-Velocity
@@ -374,12 +374,12 @@ void MD_basic::runNVE(int step1, double potential, ModuleBase::Vector3<double> *
     { 
         GlobalV::ofs_running << " ------------------------------------------------------------" << std::endl;
         GlobalV::ofs_running << " "<<std::left<<std::setw(12)<<"NVE_STEP"<<std::left<<std::setw(12)<< "SystemE"<<std::left<<std::setw(12)<< "Conserved"<<std::left<<std::setw(12)<< "DeltaE"<<std::left<<std::setw(12)<< "Temperature"<<std::endl;
-	    GlobalV::ofs_running << " "<<std::left<<std::setw(12)<<step_<<std::left<<std::setw(12)<< energy_<<std::left<<std::setw(12)<< hamiltonian <<std::left<<std::setw(12)<< energy_-oldEtot_<<std::left<<std::setw(12)<<twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU<<std::endl;
+	    GlobalV::ofs_running << " "<<std::left<<std::setw(12)<<step_<<std::left<<std::setw(12)<< energy_<<std::left<<std::setw(12)<< hamiltonian <<std::left<<std::setw(12)<< energy_-oldEtot_<<std::left<<std::setw(12)<<twiceKE/(3*double(ucell.nat-nfrozen_))/ModuleBase::K_BOLTZMAN_AU<<std::endl;
 	    GlobalV::ofs_running << " ------------------------------------------------------------" << std::endl;
     }
     std::cout << " ------------------------------------------------------------" << std::endl;
     std::cout << " "<<std::left<<std::setw(12)<<"NVE_STEP"<<std::left<<std::setw(12)<< "SystemE"<<std::left<<std::setw(12)<< "Conserved"<<std::left<<std::setw(12)<< "DeltaE"<<std::left<<std::setw(12)<< "Temperature"<<std::endl;
-	std::cout << " "<<std::left<<std::setw(12)<<step_<<std::left<<std::setw(12)<< energy_<<std::left<<std::setw(12)<< hamiltonian <<std::left<<std::setw(12)<< energy_-oldEtot_<<std::left<<std::setw(12)<<twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU<<std::endl;
+	std::cout << " "<<std::left<<std::setw(12)<<step_<<std::left<<std::setw(12)<< energy_<<std::left<<std::setw(12)<< hamiltonian <<std::left<<std::setw(12)<< energy_-oldEtot_<<std::left<<std::setw(12)<<twiceKE/(3*double(ucell.nat-nfrozen_))/ModuleBase::K_BOLTZMAN_AU<<std::endl;
 	std::cout << " ------------------------------------------------------------" << std::endl;
 
     oldEtot_=energy_;
@@ -441,8 +441,8 @@ bool MD_basic::runFIRE(int step1, double potential, ModuleBase::Vector3<double> 
     double twiceKE=mdf.GetAtomKE(ucell.nat, vel, allmass);
     twiceKE = twiceKE * 2;
 
-    double tempNow = twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU;
-    //std::cout<<" start temperature = "<< tempNow/K_BOLTZMAN_AU<< " (k)"<<std::endl;
+    double tempNow = twiceKE/(3*double(ucell.nat-nfrozen_))/ModuleBase::K_BOLTZMAN_AU;
+    //std::cout<<" start temperature = "<< tempNow/ModuleBase::K_BOLTZMAN_AU<< " (k)"<<std::endl;
 
     for(int k=0;k<ucell.nat;k++)
     {
@@ -461,7 +461,7 @@ bool MD_basic::runFIRE(int step1, double potential, ModuleBase::Vector3<double> 
 
     // std::cout << " ------------------------------------------------------------" << std::endl;
     // std::cout << " "<<std::left<<std::setw(12)<<"FIRE_STEP"<<std::left<<std::setw(12)<< "SystemE"<<std::left<<std::setw(12)<< "Conserved"<<std::left<<std::setw(12)<< "DeltaE"<<std::left<<std::setw(12)<< "Temperature"<<std::endl;
-	// std::cout << " "<<std::left<<std::setw(12)<<step_<<std::left<<std::setw(12)<< energy_<<std::left<<std::setw(12)<< conservedE <<std::left<<std::setw(12)<< energy_-oldEtot_<<std::left<<std::setw(12)<<twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU<<std::endl;
+	// std::cout << " "<<std::left<<std::setw(12)<<step_<<std::left<<std::setw(12)<< energy_<<std::left<<std::setw(12)<< conservedE <<std::left<<std::setw(12)<< energy_-oldEtot_<<std::left<<std::setw(12)<<twiceKE/(3*double(ucell.nat-nfrozen_))/ModuleBase::K_BOLTZMAN_AU<<std::endl;
 	// std::cout << " FIRE Fronzen Atom Number : "<<nfrozen_<<std::endl;
     // std::cout << " ------------------------------------------------------------" << std::endl;
 
@@ -501,9 +501,9 @@ bool MD_basic::runFIRE(int step1, double potential, ModuleBase::Vector3<double> 
         } 
 	}
 	
-	GlobalV::ofs_running << " LARGEST GRAD (eV/A)  : " << largest_grad_FIRE * Ry_to_eV / 0.529177 << std::endl;
+	GlobalV::ofs_running << " LARGEST GRAD (eV/A)  : " << largest_grad_FIRE * ModuleBase::Ry_to_eV / 0.529177 << std::endl;
 
-	if(largest_grad_FIRE*Ry_to_eV/0.529177 < 0.01)
+	if(largest_grad_FIRE*ModuleBase::Ry_to_eV/0.529177 < 0.01)
     {
 	//"convergency reach"
 		//std::cout <<"CONVERGENCY REACH of FIRE in the "<<step <<" steps " <<std::endl;
@@ -537,12 +537,12 @@ bool MD_basic::runFIRE(int step1, double potential, ModuleBase::Vector3<double> 
     { 
         GlobalV::ofs_running << " ------------------------------------------------------------" << std::endl;
         GlobalV::ofs_running << " "<<std::left<<std::setw(12)<<"NVE_STEP"<<std::left<<std::setw(12)<< "SystemE"<<std::left<<std::setw(12)<< "Conserved"<<std::left<<std::setw(12)<< "DeltaE"<<std::left<<std::setw(12)<< "Temperature"<<std::endl;
-	    GlobalV::ofs_running << " "<<std::left<<std::setw(12)<<step_<<std::left<<std::setw(12)<< energy_<<std::left<<std::setw(12)<< hamiltonian <<std::left<<std::setw(12)<< energy_-oldEtot_<<std::left<<std::setw(12)<<twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU<<std::endl;
+	    GlobalV::ofs_running << " "<<std::left<<std::setw(12)<<step_<<std::left<<std::setw(12)<< energy_<<std::left<<std::setw(12)<< hamiltonian <<std::left<<std::setw(12)<< energy_-oldEtot_<<std::left<<std::setw(12)<<twiceKE/(3*double(ucell.nat-nfrozen_))/ModuleBase::K_BOLTZMAN_AU<<std::endl;
 	    GlobalV::ofs_running << " ------------------------------------------------------------" << std::endl;
     }
     std::cout << " ------------------------------------------------------------" << std::endl;
     std::cout << " "<<std::left<<std::setw(12)<<"NVE_STEP"<<std::left<<std::setw(12)<< "SystemE"<<std::left<<std::setw(12)<< "Conserved"<<std::left<<std::setw(12)<< "DeltaE"<<std::left<<std::setw(12)<< "Temperature"<<std::endl;
-	std::cout << " "<<std::left<<std::setw(12)<<step_<<std::left<<std::setw(12)<< energy_<<std::left<<std::setw(12)<< hamiltonian <<std::left<<std::setw(12)<< energy_-oldEtot_<<std::left<<std::setw(12)<<twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU<<std::endl;
+	std::cout << " "<<std::left<<std::setw(12)<<step_<<std::left<<std::setw(12)<< energy_<<std::left<<std::setw(12)<< hamiltonian <<std::left<<std::setw(12)<< energy_-oldEtot_<<std::left<<std::setw(12)<<twiceKE/(3*double(ucell.nat-nfrozen_))/ModuleBase::K_BOLTZMAN_AU<<std::endl;
 	std::cout << " FIRE Fronzen Atom Number : "<<nfrozen_<<std::endl;
     std::cout << " ------------------------------------------------------------" << std::endl;
 
@@ -615,7 +615,7 @@ void MD_basic::outStressMD(const ModuleBase::matrix& stress, const double& twice
         press += stress(i,i)/3;
     }
     press += twiceKE/3/ucell.omega; //output virtual press = 2/3 *Ek/V + sum(sigma[i][i])/3
-    const double unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8 ;
+    const double unit_transform = ModuleBase::RYDBERG_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8 ;
     GlobalV::ofs_running<<"Virtual Pressure is "<<press*unit_transform<<" Kbar "<<std::endl;
 }
 

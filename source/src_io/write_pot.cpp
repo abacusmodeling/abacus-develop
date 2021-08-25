@@ -234,7 +234,7 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
         const int j = GlobalC::pw.ig2fftc[ig];
         if(GlobalC::pw.gg[ig] >= 1.0e-12) //LiuXh 20180410
         {
-            const double fac = e2 * ModuleBase::FOUR_PI / (GlobalC::ucell.tpiba2 * GlobalC::pw.gg [ig]);
+            const double fac = ModuleBase::e2 * ModuleBase::FOUR_PI / (GlobalC::ucell.tpiba2 * GlobalC::pw.gg [ig]);
             vh_g[ig] = fac * Porter[j];
         }
     }

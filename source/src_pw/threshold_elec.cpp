@@ -183,7 +183,7 @@ void Threshold_Elec::print_eigenvalue(std::ofstream &ofs)
 			for (int ib = 0; ib < GlobalV::NBANDS; ib++)
 			{
 				ofs << std::setw(8) << ib+1 
-				    << std::setw(15) << GlobalC::wf.ekb[ik][ib] * Ry_to_eV 
+				    << std::setw(15) << GlobalC::wf.ekb[ik][ib] * ModuleBase::Ry_to_eV 
                     << std::setw(15) << GlobalC::wf.wg(ik, ib) << std::endl;
 			}
 			ofs << std::endl;

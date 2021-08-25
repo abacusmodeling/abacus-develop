@@ -82,7 +82,7 @@ std::tuple<double,double,ModuleBase::matrix> Potential_Libxc::v_xc(
 		{
 			for( size_t is=0; is!=nspin0(); ++is )
 				for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
-					etxc += e2 * exc[ir] * rho[ir*nspin0()+is] * sgn[ir*nspin0()+is];
+					etxc += ModuleBase::e2 * exc[ir] * rho[ir*nspin0()+is] * sgn[ir*nspin0()+is];
 		};
 
 		// cal vtx, v from rho_in, vrho
@@ -94,7 +94,7 @@ std::tuple<double,double,ModuleBase::matrix> Potential_Libxc::v_xc(
 				{
 					for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 					{
-						const double v_tmp = e2 * vrho[ir*nspin0()+is] * sgn[ir*nspin0()+is];
+						const double v_tmp = ModuleBase::e2 * vrho[ir*nspin0()+is] * sgn[ir*nspin0()+is];
 						v(is,ir) += v_tmp;
 						vtxc += v_tmp * rho_in[is][ir];
 					}
@@ -106,7 +106,7 @@ std::tuple<double,double,ModuleBase::matrix> Potential_Libxc::v_xc(
 				for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 				{
 					std::vector<double> v_tmp(4);
-					v_tmp[0] = e2 * (0.5 * (vrho[ir*2] + vrho[ir*2+1]));
+					v_tmp[0] = ModuleBase::e2 * (0.5 * (vrho[ir*2] + vrho[ir*2+1]));
 					const double vs = 0.5 * (vrho[ir*2] - vrho[ir*2+1]);
 					const double amag = sqrt( pow(rho_in[1][ir],2) 
 						+ pow(rho_in[2][ir],2) 
@@ -116,7 +116,7 @@ std::tuple<double,double,ModuleBase::matrix> Potential_Libxc::v_xc(
 					{
 						for(int ipol=1; ipol<4; ++ipol)
 						{
-							v_tmp[ipol] = e2 * vs * rho_in[ipol][ir] / amag;
+							v_tmp[ipol] = ModuleBase::e2 * vs * rho_in[ipol][ir] / amag;
 						}
 					}
 					for(int ipol=0; ipol<4; ++ipol)
@@ -139,16 +139,16 @@ std::tuple<double,double,ModuleBase::matrix> Potential_Libxc::v_xc(
 			{
 				for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 				{
-					h[0][ir] = e2 * gdr[0][ir] * vsigma[ir] * 2.0 * sgn[ir];
+					h[0][ir] = ModuleBase::e2 * gdr[0][ir] * vsigma[ir] * 2.0 * sgn[ir];
 				}
 			}
 			else
 			{
 				for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 				{
-					h[0][ir] = e2 * (gdr[0][ir] * vsigma[ir*3  ] * 2.0 * sgn[ir*2  ]
+					h[0][ir] = ModuleBase::e2 * (gdr[0][ir] * vsigma[ir*3  ] * 2.0 * sgn[ir*2  ]
 						           + gdr[1][ir] * vsigma[ir*3+1]       * sgn[ir*2]   * sgn[ir*2+1]);
-					h[1][ir] = e2 * (gdr[1][ir] * vsigma[ir*3+2] * 2.0 * sgn[ir*2+1]
+					h[1][ir] = ModuleBase::e2 * (gdr[1][ir] * vsigma[ir*3+2] * 2.0 * sgn[ir*2+1]
 					               + gdr[0][ir] * vsigma[ir*3+1]       * sgn[ir*2]   * sgn[ir*2+1]);
 				}
 			}

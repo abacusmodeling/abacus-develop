@@ -88,7 +88,7 @@ void Force_LCAO_k::ftable_k (
 	std::cout << " overlap force" << std::endl;
 	for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
 	{
-		const double fac = Ry_to_eV / 0.529177;
+		const double fac = ModuleBase::Ry_to_eV / 0.529177;
 		std::cout << std::setw(5) << iat+1 << std::setw(15) << foverlap[iat][0] *fac<< std::setw(15) << foverlap[iat][1]*fac << 
 		std::setw(15) << foverlap[iat][2]*fac << std::endl;
 	}
@@ -492,7 +492,7 @@ void Force_LCAO_k::cal_foverlap_k(
 	std::cout << " overlap force" << std::endl;
 	for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
 	{
-		const double fac = Ry_to_eV / 0.529177;
+		const double fac = ModuleBase::Ry_to_eV / 0.529177;
 		std::cout << std::setw(5) << iat+1 << std::setw(15) << foverlap[iat][0] *fac<< std::setw(15) << foverlap[iat][1]*fac << 
 		std::setw(15) << foverlap[iat][2]*fac << std::endl;
 	}

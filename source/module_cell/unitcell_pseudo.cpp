@@ -140,7 +140,7 @@ void UnitCell_pseudo::setup_cell(
 	{
 		GlobalV::ofs_running << std::endl;
 		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Volume (Bohr^3)", this->omega);
-		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Volume (A^3)", this->omega * pow(BOHR_TO_A, 3));
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Volume (A^3)", this->omega * pow(ModuleBase::BOHR_TO_A, 3));
 	}
 		
 	//==========================================================
@@ -396,7 +396,7 @@ void UnitCell_pseudo::setup_cell_classic(
 	{
 		ofs_running << std::endl;
 		ModuleBase::GlobalFunc::OUT(ofs_running,"Volume (Bohr^3)", this->omega);
-		ModuleBase::GlobalFunc::OUT(ofs_running,"Volume (A^3)", this->omega * pow(BOHR_TO_A, 3));
+		ModuleBase::GlobalFunc::OUT(ofs_running,"Volume (A^3)", this->omega * pow(ModuleBase::BOHR_TO_A, 3));
 	}
 
 	this->set_iat2itia();
@@ -660,7 +660,7 @@ void UnitCell_pseudo::setup_cell_after_vc(
     {
         GlobalV::ofs_running << std::endl;
         ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Volume (Bohr^3)", this->omega);
-        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Volume (A^3))", this->omega * pow(BOHR_TO_A, 3));
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Volume (A^3))", this->omega * pow(ModuleBase::BOHR_TO_A, 3));
     }
 
     //==========================================================

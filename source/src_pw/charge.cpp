@@ -1209,7 +1209,7 @@ void Charge::cal_nelec(void)
 	//=======================================
 	// calculate number of bands (setup.f90)
 	//=======================================
-	double occupied_bands = static_cast<double>(nelec/DEGSPIN);	
+	double occupied_bands = static_cast<double>(nelec/ModuleBase::DEGSPIN);	
 
 	if( (occupied_bands - std::floor(occupied_bands)) > 0.0 )
 	{

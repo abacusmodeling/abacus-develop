@@ -812,7 +812,7 @@ bool UnitCell_pseudo::check_tau(void)const
 			}
 			//GlobalV::ofs_running << " " << std::setw(5) << atoms[T1].label << std::setw(6) << I1+1 
 			//<< std::setw(20) << shortest_norm  
-			//<< std::setw(20) << shortest_norm * BOHR_TO_A << std::endl;
+			//<< std::setw(20) << shortest_norm * ModuleBase::BOHR_TO_A << std::endl;
 		}
 	}
 

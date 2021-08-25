@@ -52,8 +52,8 @@ void Optical::cal_epsilon2(const int &nbands)
 	Parallel_Reduce::gather_min_double_all( mine );
 #endif
 
-	maxe *= Ry_to_eV;
-	mine *= Ry_to_eV;
+	maxe *= ModuleBase::Ry_to_eV;
+	mine *= ModuleBase::Ry_to_eV;
 
 	double range = maxe - mine;
 	int np = int(range / de) + 1; 
@@ -86,7 +86,7 @@ void Optical::cal_epsilon2(const int &nbands)
 			for(int ic=n_occ; ic<opt_nbands; ic++)
 			{
 				const double ec = GlobalC::wf.ekb[ik][ic];
-				const int ie = int((ec - ev)*Ry_to_eV/de);
+				const int ie = int((ec - ev)*ModuleBase::Ry_to_eV/de);
 				assert(ie < np);
 				epsilon2[ie] += GlobalC::kv.wk[ik] * this->element_cvk(ik, iv, ic);
 			}

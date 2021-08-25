@@ -589,7 +589,7 @@ void eximport::out_band(std::ofstream &out_data)
 	{
 		for (int ib = 0; ib < GlobalV::NBANDS; ib++)
 		{
-			out_data << std::setw(10) << std::setprecision(6) << GlobalC::wf.ekb[ik][ib]*Ry_to_eV;//6.1
+			out_data << std::setw(10) << std::setprecision(6) << GlobalC::wf.ekb[ik][ib]*ModuleBase::Ry_to_eV;//6.1
 		}
 		out_data << std::endl;
 	}

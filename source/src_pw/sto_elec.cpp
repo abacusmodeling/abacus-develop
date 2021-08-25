@@ -339,9 +339,9 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			if(conv_elec)
 			{
 				//GlobalV::ofs_running << " convergence is achieved" << std::endl;			
-				//GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl; 
+				//GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl; 
 				GlobalV::ofs_running << " charge density convergence is achieved" << std::endl;
-                                GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
+                                GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
 			}
 			else
 			{

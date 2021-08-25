@@ -214,7 +214,7 @@ bool Dos::calculate_dos
 				for(int ib = 0; ib < nbands; ib++)
 				{
 					//  compare et and e_old(e_new) in ev unit.
-					if( ekb[ik][ib]*Ry_to_eV >= e_old && ekb[ik][ib]*Ry_to_eV < e_new)
+					if( ekb[ik][ib]*ModuleBase::Ry_to_eV >= e_old && ekb[ik][ib]*ModuleBase::Ry_to_eV < e_new)
 					{
 						// because count is 'double' type,so
 						// we can't write count++ or ++count
@@ -304,7 +304,7 @@ void Dos::nscf_fermi_surface(const std::string &out_band_dir,
 
 				for(int ib = 0; ib < nband; ib++)
 				{
-					ofs << " " << ekb[ik_now][ib] * Ry_to_eV;
+					ofs << " " << ekb[ik_now][ib] * ModuleBase::Ry_to_eV;
 				}
 				ofs << std::endl;
 
@@ -362,7 +362,7 @@ void Dos::nscf_band(
 					ofs << ik+1;
 					for(int ib = 0; ib < nband; ib++)
 					{
-						ofs << " " << (ekb[ik_now+is*nks][ib]-fermie) * Ry_to_eV;
+						ofs << " " << (ekb[ik_now+is*nks][ib]-fermie) * ModuleBase::Ry_to_eV;
 					}
 					ofs << std::endl;
 					ofs.close();	
@@ -384,7 +384,7 @@ void Dos::nscf_band(
 				ofs<<std::setw(12)<<ik;
 				for(int ib = 0; ib < nband; ib++)
 				{
-					ofs <<std::setw(12)<< ekb[ik][ib] * Ry_to_eV;
+					ofs <<std::setw(12)<< ekb[ik][ib] * ModuleBase::Ry_to_eV;
 				}
 				ofs<<std::endl;
 			}
@@ -405,7 +405,7 @@ void Dos::nscf_band(
 			ofs<<std::setw(12)<<ik + 1;
 			for(int ibnd = 0; ibnd < nband; ibnd++)
 			{
-				ofs <<std::setw(15) << (ekb[ik][ibnd]-fermie) * Ry_to_eV;
+				ofs <<std::setw(15) << (ekb[ik][ibnd]-fermie) * ModuleBase::Ry_to_eV;
 			}
 			ofs<<std::endl;
 		}

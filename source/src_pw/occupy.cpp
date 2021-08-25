@@ -124,10 +124,10 @@ void Occupy::calculate_weights(void)
 		Parallel_Reduce::gather_min_double_all( ebotom );
 
 		//not parallel yet!
-//		OUT(GlobalV::ofs_running,"Top    Energy (eV)", etop * Ry_to_eV);
-//      OUT(GlobalV::ofs_running,"Fermi  Energy (eV)", GlobalC::en.ef * Ry_to_eV);
-//		OUT(GlobalV::ofs_running,"Bottom Energy (eV)", ebotom * Ry_to_eV);
-//		OUT(GlobalV::ofs_running,"Range  Energy (eV)", etop-ebotom * Ry_to_eV);
+//		OUT(GlobalV::ofs_running,"Top    Energy (eV)", etop * ModuleBase::Ry_to_eV);
+//      OUT(GlobalV::ofs_running,"Fermi  Energy (eV)", GlobalC::en.ef * ModuleBase::Ry_to_eV);
+//		OUT(GlobalV::ofs_running,"Bottom Energy (eV)", ebotom * ModuleBase::Ry_to_eV);
+//		OUT(GlobalV::ofs_running,"Range  Energy (eV)", etop-ebotom * ModuleBase::Ry_to_eV);
     }
 
 	return;

@@ -177,7 +177,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
         }//nt1
     } // endif
 
-    ewalds = 0.50 * e2 * (ewaldg + ewaldr);
+    ewalds = 0.50 * ModuleBase::e2 * (ewaldg + ewaldr);
 
 	// mohan fix bug 2010-07-26
     Parallel_Reduce::reduce_double_pool( ewalds );

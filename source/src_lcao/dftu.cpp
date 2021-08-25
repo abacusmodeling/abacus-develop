@@ -1122,7 +1122,7 @@ void DFTU::cal_energy_correction(const int istep)
 	if(GlobalV::MY_RANK==0)
 	{
 		std::ofstream of_eu("energy_correction", ios_base::app);
-		double e=EU*Ry_to_eV;
+		double e=EU*ModuleBase::Ry_to_eV;
 		of_eu << "ITERATION STEP " << std::setw(3) << this->iter_dftu <<"      " << std::setw(15) << e << "ev" << std::endl;
 	}
 	*/
@@ -1134,7 +1134,7 @@ void DFTU::cal_energy_correction(const int istep)
 	if(GlobalV::MY_RANK==0)
 	{
 		std::ofstream of_en("energy_correction.dat",ios_base::app);
-		double val = this->EU*Ry_to_eV;
+		double val = this->EU*ModuleBase::Ry_to_eV;
 
 		of_en << fixed << std::setprecision(8) << val << "eV" << std::endl;
 	}
@@ -1329,16 +1329,16 @@ void DFTU::output()
 				
 				if(!Yukawa)
 				{
-					GlobalV::ofs_running << "atom_type=" << T << "  L=" << L << "  chi=" << 0 << "    U=" << this->U[T]*Ry_to_eV 
-					<< "ev    J=" << this->J[T]*Ry_to_eV << "ev" << std::endl;
+					GlobalV::ofs_running << "atom_type=" << T << "  L=" << L << "  chi=" << 0 << "    U=" << this->U[T]*ModuleBase::Ry_to_eV 
+					<< "ev    J=" << this->J[T]*ModuleBase::Ry_to_eV << "ev" << std::endl;
 				}
 				else
 				{
 					for(int n=0; n<N; n++)
 					{
  						if(n!=0) continue;						
-						double Ueff = (this->U_Yukawa.at(T).at(L).at(n) - this->J_Yukawa.at(T).at(L).at(n))*Ry_to_eV;
-						GlobalV::ofs_running << "atom_type=" << T << "  L=" << L << "  chi=" << n << "    U=" << this->U_Yukawa.at(T).at(L).at(n)*Ry_to_eV << "ev    " << "J=" << this->J_Yukawa.at(T).at(L).at(n)*Ry_to_eV
+						double Ueff = (this->U_Yukawa.at(T).at(L).at(n) - this->J_Yukawa.at(T).at(L).at(n))*ModuleBase::Ry_to_eV;
+						GlobalV::ofs_running << "atom_type=" << T << "  L=" << L << "  chi=" << n << "    U=" << this->U_Yukawa.at(T).at(L).at(n)*ModuleBase::Ry_to_eV << "ev    " << "J=" << this->J_Yukawa.at(T).at(L).at(n)*ModuleBase::Ry_to_eV
 						<< "ev" << std::endl;
 					}
 				}

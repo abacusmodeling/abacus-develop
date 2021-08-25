@@ -57,7 +57,7 @@ void Driver_classic::convert(UnitCell_pseudo &ucell_c)
     if(INPUT.atom_file!="") GlobalV::global_atom_card = INPUT.atom_file;
     GlobalV::CALCULATION = INPUT.calculation;
     GlobalV::OUT_LEVEL = INPUT.out_level;
-    GlobalV::SEARCH_RADIUS = max(INPUT.search_radius,INPUT.mdp.rcut_lj+2*ANGSTROM_AU);
+    GlobalV::SEARCH_RADIUS = max(INPUT.search_radius,INPUT.mdp.rcut_lj+2*ModuleBase::ANGSTROM_AU);
 	GlobalV::SEARCH_PBC = INPUT.search_pbc;
     GlobalV::NSTEP = INPUT.nstep;
 

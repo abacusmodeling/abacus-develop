@@ -219,10 +219,10 @@ void Ions::opt_ions_pw(void)
 			
 			std::cout << " " << std::setw(7) << ss.str() 
 			<< std::setw(5) << eiter 
-			<< std::setw(15) << std::setprecision(6) << GlobalC::en.etot * Ry_to_eV 
-			<< std::setw(15) << IMM.get_ediff() * Ry_to_eV
+			<< std::setw(15) << std::setprecision(6) << GlobalC::en.etot * ModuleBase::Ry_to_eV 
+			<< std::setw(15) << IMM.get_ediff() * ModuleBase::Ry_to_eV
 			<< std::setprecision(3)
-			<< std::setw(15) << IMM.get_largest_grad() * Ry_to_eV / 0.529177
+			<< std::setw(15) << IMM.get_largest_grad() * ModuleBase::Ry_to_eV / 0.529177
 			<< std::setw(15) << IMM.get_trust_radius()
 			<< std::setw(8) << IMM.get_update_iter()
 			<< std::setprecision(2) << std::setw(11) << etime_min
@@ -237,7 +237,7 @@ void Ions::opt_ions_pw(void)
     {
         GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
         GlobalV::ofs_running << std::setprecision(16);
-        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl; 
+        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl; 
         GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
     }
 
@@ -313,7 +313,7 @@ void Ions::gather_stress_pw(ModuleBase::matrix& stress)
 	ss.cal_stress(stress);
 	//external stress
 	double unit_transform = 0.0;
-	unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
+	unit_transform = ModuleBase::RYDBERG_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
 	double external_stress[3] = {GlobalV::PRESS1,GlobalV::PRESS2,GlobalV::PRESS3};
 	for(int i=0;i<3;i++)
 	{

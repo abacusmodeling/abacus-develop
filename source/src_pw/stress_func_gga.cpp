@@ -120,7 +120,7 @@ void Stress_Func::stress_gga(ModuleBase::matrix& sigma)
 					{
 						for(int m = 0;m< l+1;m++)
 						{
-							sigma_gradcorr[l][m] += tt[l] * tt[m] * e2 * (v2x + v2c);
+							sigma_gradcorr[l][m] += tt[l] * tt[m] * ModuleBase::e2 * (v2x + v2c);
 						}
 					}
 				}
@@ -193,13 +193,13 @@ void Stress_Func::stress_gga(ModuleBase::matrix& sigma)
 			    for(int m = 0;m< l+1;m++)
 				{
 				//    exchange
-				sigma_gradcorr [l][m] += tt1[l] * tt1[m] * e2 * v2xup + 
-							tt2[l] * tt2[m] * e2 * v2xdw;
+				sigma_gradcorr [l][m] += tt1[l] * tt1[m] * ModuleBase::e2 * v2xup + 
+							tt2[l] * tt2[m] * ModuleBase::e2 * v2xdw;
 				//    correlation
 				sigma_gradcorr [l][m] += ( tt1[l] * tt1[m] * v2cup + 
 							tt2[l] * tt2[m] * v2cdw + 
 							(tt1[l] * tt2[m] +
-							tt2[l] * tt1[m] ) * v2cud ) * e2;
+							tt2[l] * tt1[m] ) * v2cud ) * ModuleBase::e2;
 				}
 			}
 		}

@@ -255,7 +255,7 @@ void Hamilt_PW::diagH_subspace(
 	std::cout << "\n Band Energy" << std::endl;
 	for(int i=0; i<GlobalV::NBANDS; i++)
 	{
-		std::cout << " e[" << i+1 << "]=" << en[i] * Ry_to_eV << std::endl;
+		std::cout << " e[" << i+1 << "]=" << en[i] * ModuleBase::Ry_to_eV << std::endl;
 	}
 */
 //--------------------------
@@ -311,7 +311,7 @@ void Hamilt_PW::diagH_subspace(
 //	std::cout << "\n bands" << std::endl;
 //	for(int ib=0; ib<n_band; ib++)
 //	{
-//		std::cout << " ib=" << ib << " " << en[ib] * Ry_to_eV << std::endl;
+//		std::cout << " ib=" << ib << " " << en[ib] * ModuleBase::Ry_to_eV << std::endl;
 //	}
 
     //out.printcm_norm("hvec",hvec,1.0e-8);
@@ -903,9 +903,9 @@ void Hamilt_PW::diag_zheev(const int &npw_in, ModuleBase::ComplexMatrix &psi, co
     for (int m = 0; m < 5; m++)
     {
         std::cout << std::setw(6) << m
-             << std::setw(12) << em[m] * Ry_to_eV
+             << std::setw(12) << em[m] * ModuleBase::Ry_to_eV
              << std::setw(12) << err[m]
-             << std::setw(25) << tmpen[m] * Ry_to_eV << std::endl ;
+             << std::setw(25) << tmpen[m] * ModuleBase::Ry_to_eV << std::endl ;
     }
 
     std::cout << " end of diag_zheev " << std::endl ;

@@ -134,7 +134,7 @@ void energy::perform_dos(void)
 						<<std::setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<std::endl;
 						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
-							ofsi2<<std::setw(6)<<ib+1<<std::setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV<<std::setw(25)<<GlobalC::wf.wg(ik,ib)<<std::endl;
+							ofsi2<<std::setw(6)<<ib+1<<std::setw(25)<<GlobalC::wf.ekb[ik][ib]* ModuleBase::Ry_to_eV<<std::setw(25)<<GlobalC::wf.wg(ik,ib)<<std::endl;
 						}
 						ofsi2 <<std::endl;
 						ofsi2 <<std::endl;
@@ -155,9 +155,9 @@ void energy::perform_dos(void)
 						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
 							ofsi2<<std::setw(6)<<ib+1
-							<<std::setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV
+							<<std::setw(25)<<GlobalC::wf.ekb[ik][ib]* ModuleBase::Ry_to_eV
 							<<std::setw(25)<<GlobalC::wf.wg(ik,ib)
-							<<std::setw(25)<<GlobalC::wf.ekb[(ik+GlobalC::kv.nks/2)][ib]* Ry_to_eV
+							<<std::setw(25)<<GlobalC::wf.ekb[(ik+GlobalC::kv.nks/2)][ib]* ModuleBase::Ry_to_eV
 							<<std::setw(25)<<GlobalC::wf.wg(ik+GlobalC::kv.nks/2,ib)<<std::endl;
 						}
 						ofsi2 <<std::endl;
@@ -203,8 +203,8 @@ void energy::perform_dos(void)
 		Parallel_Reduce::gather_min_double_all(emin);
 #endif
 
-		emax *= Ry_to_eV;
-		emin *= Ry_to_eV;
+		emax *= ModuleBase::Ry_to_eV;
+		emin *= ModuleBase::Ry_to_eV;
 
 //scale up a little bit so the end peaks are displaced better
 		double delta=(emax-emin)*dos_scale;
@@ -290,7 +290,7 @@ void energy::perform_dos(void)
 					for (int n=0; n<npoints; ++n)		  
 					{  
 						double en=emin+n * de_ev;
-						double en0=GlobalC::wf.ekb[0][i]*Ry_to_eV;
+						double en0=GlobalC::wf.ekb[0][i]*ModuleBase::Ry_to_eV;
 						double de = en-en0;
 						double de2 = 0.5*de * de;
 						Gauss[n] = GlobalC::kv.wk[0]*exp(-de2/a/a)/b;
@@ -394,7 +394,7 @@ void energy::perform_dos(void)
 							for (int n=0; n<npoints; ++n)		  
 							{  
 								double en=emin+n * de_ev;
-								double en0=GlobalC::wf.ekb[ik][i]*Ry_to_eV;
+								double en0=GlobalC::wf.ekb[ik][i]*ModuleBase::Ry_to_eV;
 								double de = en-en0;
 								double de2 = 0.5*de * de;
 								Gauss[n] = GlobalC::kv.wk[ik]*exp(-de2/a/a)/b;

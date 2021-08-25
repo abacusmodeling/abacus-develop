@@ -162,8 +162,8 @@ void MD_func::InitVelocity(
 			vel[ion]/=sqrt(allmass[ion]*9.01938e-31);				 
 		}
 		for(ion=0;ion<numIon;ion++){
-			vel[ion]*=sqrt(temperature/K_BOLTZMAN_AU * K_BOLTZMAN_SI);
-			vel[ion]*= fundamentalTime/BOHR_RADIUS_SI;
+			vel[ion]*=sqrt(temperature/ModuleBase::K_BOLTZMAN_AU * ModuleBase::K_BOLTZMAN_SI);
+			vel[ion]*= fundamentalTime/ModuleBase::BOHR_RADIUS_SI;
 		//rescale the velocities to a.u.
 		}
 	} //xiaohui add 2 lines 2015-09-25, bcast vel
@@ -207,15 +207,15 @@ void MD_func::InitVelocity(
 			file.close();
 
 			// Renew information.
-			intemp =  intemp * K_BOLTZMAN_AU;
+			intemp =  intemp * ModuleBase::K_BOLTZMAN_AU;
 			if ( fabs(intemp-temperature) >1e-6 ) {
-				std::cout <<"(ReadNewTemp): Read in new temp:"<< intemp/K_BOLTZMAN_AU 
-					<<" previous temp:"<< temperature/K_BOLTZMAN_AU<<std::endl;
+				std::cout <<"(ReadNewTemp): Read in new temp:"<< intemp/ModuleBase::K_BOLTZMAN_AU 
+					<<" previous temp:"<< temperature/ModuleBase::K_BOLTZMAN_AU<<std::endl;
 				temperature = intemp;
 			}
 			else{
-				std::cout<<"(ReadNewTemp): new temp:"<< intemp/K_BOLTZMAN_AU
-					<<" previous temp:"<<temperature/K_BOLTZMAN_AU
+				std::cout<<"(ReadNewTemp): new temp:"<< intemp/ModuleBase::K_BOLTZMAN_AU
+					<<" previous temp:"<<temperature/ModuleBase::K_BOLTZMAN_AU
 					<< ". No change of temp."<<std::endl;
 			}
 		}
@@ -329,7 +329,7 @@ double MD_func::Conserved(const double KE, const double PE, const int number){
         GlobalV::ofs_running<< "            SUMMARY OF NVE CALCULATION            "<<std::endl;
         GlobalV::ofs_running<<" --------------------------------------------------"<<std::endl;  
 		GlobalV::ofs_running<< "NVE Conservation     : "<< Conserved<<" (Hartree)"<<std::endl;
-		GlobalV::ofs_running<< "NVE Temperature      : "<< 2*KE/(3*number)/K_BOLTZMAN_AU<<" (K)"<<std::endl;
+		GlobalV::ofs_running<< "NVE Temperature      : "<< 2*KE/(3*number)/ModuleBase::K_BOLTZMAN_AU<<" (K)"<<std::endl;
 		GlobalV::ofs_running<< "NVE Kinetic energy   : "<< KE<<" (Hartree)"<<std::endl;
 		GlobalV::ofs_running<< "NVE Potential energy : "<< PE<<" (Hartree)"<<std::endl;
 	}

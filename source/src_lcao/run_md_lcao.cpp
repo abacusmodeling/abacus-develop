@@ -202,11 +202,11 @@ void Run_MD_LCAO::opt_ions(void)
             std::cout << std::setiosflags(ios::scientific)
             << " " << std::setw(7) << ss.str()
             << std::setw(5) << ELEC_scf::iter
-            << std::setw(18) << std::setprecision(6) << GlobalC::en.etot * Ry_to_eV;
+            << std::setw(18) << std::setprecision(6) << GlobalC::en.etot * ModuleBase::Ry_to_eV;
 
             std::cout << std::setprecision(2) << std::setiosflags(ios::scientific)
-            << std::setw(10) << IMM.get_ediff() * Ry_to_eV * 1000
-            << std::setw(10) << IMM.get_largest_grad() * Ry_to_eV / BOHR_TO_A;
+            << std::setw(10) << IMM.get_ediff() * ModuleBase::Ry_to_eV * 1000
+            << std::setw(10) << IMM.get_largest_grad() * ModuleBase::Ry_to_eV / ModuleBase::BOHR_TO_A;
 
             std::cout << std::resetiosflags(ios::scientific)
             << std::setprecision(2) << std::setw(10) << etime_min + ftime_min;
@@ -309,7 +309,7 @@ void Run_MD_LCAO::final_scf(void)
 
     GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
     GlobalV::ofs_running << std::setprecision(16);
-    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl; 
+    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl; 
     GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
     return;

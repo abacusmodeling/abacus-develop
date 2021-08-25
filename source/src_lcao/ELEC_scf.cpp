@@ -534,7 +534,7 @@ void ELEC_scf::scf(const int &istep)
 			if(conv_elec)
 			{
 				GlobalV::ofs_running << "\n charge density convergence is achieved" << std::endl;
-            	GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
+            	GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
 			}
 
 			if(GlobalV::OUT_LEVEL != "m") 
@@ -546,10 +546,10 @@ void ELEC_scf::scf(const int &istep)
 			{
  				//xiaohui add "OUT_LEVEL", 2015-09-16
 				if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << std::setprecision(16);
-				if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " EFERMI = " << GlobalC::en.ef * Ry_to_eV << " eV" << std::endl;
+				if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " EFERMI = " << GlobalC::en.ef * ModuleBase::Ry_to_eV << " eV" << std::endl;
 				if(GlobalV::OUT_LEVEL=="ie")
 				{
-					GlobalV::ofs_running << " " << GlobalV::global_out_dir << " final etot is " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
+					GlobalV::ofs_running << " " << GlobalV::global_out_dir << " final etot is " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
 				}
 #ifdef __DEEPKS
 				if (INPUT.deepks_scf)	//caoyu add 2021-06-04

@@ -188,9 +188,9 @@ void Forces::init(ModuleBase::matrix& force)
 		}
 		for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 		{
-			ofs << "   " << force(iat,0)*Ry_to_eV / 0.529177 
-				<< "   " << force(iat,1)*Ry_to_eV / 0.529177 
-				<< "   " << force(iat,2)*Ry_to_eV / 0.529177 << std::endl;
+			ofs << "   " << force(iat,0)*ModuleBase::Ry_to_eV / 0.529177 
+				<< "   " << force(iat,1)*ModuleBase::Ry_to_eV / 0.529177 
+				<< "   " << force(iat,2)*ModuleBase::Ry_to_eV / 0.529177 << std::endl;
 		}
 		ofs.close();
 	}
@@ -220,7 +220,7 @@ void Forces::print_to_files(std::ofstream &ofs, const std::string &name, const M
     ofs << std::setprecision(8);
 	//ofs << std::setiosflags(ios::showpos);
    
-	double fac = Ry_to_eV / 0.529177;// (eV/A)
+	double fac = ModuleBase::Ry_to_eV / 0.529177;// (eV/A)
 
 	if(GlobalV::TEST_FORCE)
 	{
@@ -265,7 +265,7 @@ void Forces::print(const std::string &name, const ModuleBase::matrix &f, bool ry
 	GlobalV::ofs_running << " " << std::setw(8) << "atom" << std::setw(15) << "x" << std::setw(15) << "y" << std::setw(15) << "z" << std::endl;
 	GlobalV::ofs_running << std::setiosflags(ios::showpos);
 
-	const double fac = Ry_to_eV / 0.529177;
+	const double fac = ModuleBase::Ry_to_eV / 0.529177;
 	
 	if(GlobalV::TEST_FORCE)
 	{
@@ -467,7 +467,7 @@ void Forces::cal_force_ew(ModuleBase::matrix& forceion)
             }
             for (int ipol = 0;ipol < 3;ipol++)
             {
-                forceion(iat, ipol) *= GlobalC::ucell.atoms[it].zv * e2 * GlobalC::ucell.tpiba * ModuleBase::TWO_PI / GlobalC::ucell.omega * fact;
+                forceion(iat, ipol) *= GlobalC::ucell.atoms[it].zv * ModuleBase::e2 * GlobalC::ucell.tpiba * ModuleBase::TWO_PI / GlobalC::ucell.omega * fact;
             }
 
 	//		std::cout << " atom" << iat << std::endl;
@@ -514,7 +514,7 @@ void Forces::cal_force_ew(ModuleBase::matrix& forceion)
                             {
 								const double rr = sqrt(r2[n]) * GlobalC::ucell.lat0;
 
-                                double factor = GlobalC::ucell.atoms[T1].zv * GlobalC::ucell.atoms[T2].zv * e2 / (rr * rr)
+                                double factor = GlobalC::ucell.atoms[T1].zv * GlobalC::ucell.atoms[T2].zv * ModuleBase::e2 / (rr * rr)
                                                 * (erfc(sqrt(alpha) * rr) / rr
                                     + sqrt(8.0 * alpha / ModuleBase::TWO_PI) * exp(-1.0 * alpha * rr * rr)) * GlobalC::ucell.lat0;
 

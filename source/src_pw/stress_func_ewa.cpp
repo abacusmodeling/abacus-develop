@@ -23,7 +23,7 @@ void Stress_Func::stress_ewa(ModuleBase::matrix& sigma, const bool is_pw)
        alpha-=0.1;
        if(alpha==0.0)
           ModuleBase::WARNING_QUIT("stres_ew", "optimal alpha not found");
-       upperbound =e2 * pow(charge,2) * sqrt( 2 * alpha / (ModuleBase::TWO_PI)) * erfc(sqrt(GlobalC::ucell.tpiba2 * GlobalC::pw.ggchg / 4.0 / alpha));
+       upperbound =ModuleBase::e2 * pow(charge,2) * sqrt( 2 * alpha / (ModuleBase::TWO_PI)) * erfc(sqrt(GlobalC::ucell.tpiba2 * GlobalC::pw.ggchg / 4.0 / alpha));
     }
     while(upperbound>1e-7);
 
@@ -32,7 +32,7 @@ void Stress_Func::stress_ewa(ModuleBase::matrix& sigma, const bool is_pw)
     double sdewald;
     if(GlobalC::pw.gstart == 1)
 	{
-       sdewald = (ModuleBase::TWO_PI) * e2 / 4.0 / alpha * pow(charge/GlobalC::ucell.omega,2);
+       sdewald = (ModuleBase::TWO_PI) * ModuleBase::e2 / 4.0 / alpha * pow(charge/GlobalC::ucell.omega,2);
     }
     else 
 	{
@@ -65,7 +65,7 @@ void Stress_Func::stress_ewa(ModuleBase::matrix& sigma, const bool is_pw)
 			}
 		}
 		rhostar /= GlobalC::ucell.omega;
-		sewald = fact* (ModuleBase::TWO_PI) * e2 * exp(-g2a) / g2 * pow(abs(rhostar),2);
+		sewald = fact* (ModuleBase::TWO_PI) * ModuleBase::e2 * exp(-g2a) / g2 * pow(abs(rhostar),2);
 		sdewald = sdewald - sewald;
 		for(int l=0;l<3;l++)
 		{
@@ -113,7 +113,7 @@ void Stress_Func::stress_ewa(ModuleBase::matrix& sigma, const bool is_pw)
 						for(int nr=0 ; nr<nrm ; nr++)
 						{
 							rr=sqrt(r2[nr]) * GlobalC::ucell.lat0;
-							fac = -e2/2.0/GlobalC::ucell.omega*pow(GlobalC::ucell.lat0,2)*GlobalC::ucell.atoms[it].zv * GlobalC::ucell.atoms[jt].zv / pow(rr,3) * (erfc(sqrt(alpha)*rr)+rr * sqrt(8 * alpha / (ModuleBase::TWO_PI)) * exp(-alpha * pow(rr,2)));
+							fac = -ModuleBase::e2/2.0/GlobalC::ucell.omega*pow(GlobalC::ucell.lat0,2)*GlobalC::ucell.atoms[it].zv * GlobalC::ucell.atoms[jt].zv / pow(rr,3) * (erfc(sqrt(alpha)*rr)+rr * sqrt(8 * alpha / (ModuleBase::TWO_PI)) * exp(-alpha * pow(rr,2)));
 							for(int l=0; l<3; l++)
 							{
 								for(int m=0; m<l+1; m++)

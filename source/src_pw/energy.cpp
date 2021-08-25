@@ -260,8 +260,8 @@ void energy::print_etot(
 					//printf( "[32m%-14e[0m", dr2);
 				}
 				// 34 is blue
-				printf( "\e[36m%-15f\e[0m", GlobalC::en.etot*Ry_to_eV);	
-				//printf( "[36m%-15f[0m", GlobalC::en.etot*Ry_to_eV);	
+				printf( "\e[36m%-15f\e[0m", GlobalC::en.etot*ModuleBase::Ry_to_eV);	
+				//printf( "[36m%-15f[0m", GlobalC::en.etot*ModuleBase::Ry_to_eV);	
 				std::cout << std::setprecision(3);
 	//			std::cout << std::setw(11) << GlobalC::en.eband;
 	//			std::cout << std::setw(11) << H_Hartree_pw::hartree_energy;
@@ -293,8 +293,8 @@ void energy::print_etot(
 				std::cout<<std::setw(10)<<GlobalC::ucell.magnet.abs_magnetization;
 			}
 			std::cout << std::setprecision(6);
-			std::cout << std::setw(15) << GlobalC::en.etot*Ry_to_eV;
-                        std::cout << std::setw(15) << (GlobalC::en.etot - GlobalC::en.etot_old) *Ry_to_eV;  //pengfei Li added 2015-1-31
+			std::cout << std::setw(15) << GlobalC::en.etot*ModuleBase::Ry_to_eV;
+                        std::cout << std::setw(15) << (GlobalC::en.etot - GlobalC::en.etot_old) *ModuleBase::Ry_to_eV;  //pengfei Li added 2015-1-31
                         std::cout << std::setprecision(3);
                         std::cout << std::setw(11) << dr2;
 			std::cout << std::setprecision(3);
@@ -331,7 +331,7 @@ void energy::print_format(const std::string &name, const double &value)
 	std::stringstream name2;
 	name2 << name;
 	GlobalV::ofs_running << " " << std::setw(12) << name2.str() << std::setw(30) <<  value 
-	<< std::setw(30) << value * Ry_to_eV << std::endl;
+	<< std::setw(30) << value * ModuleBase::Ry_to_eV << std::endl;
 	GlobalV::ofs_running << std::resetiosflags(ios::showpos);
 	return;
 }
@@ -476,7 +476,7 @@ void energy::print_band(const int &ik)
 				for(int ib=0;ib<GlobalV::NBANDS;ib++)
 				{
 					GlobalV::ofs_running << " "<< std::setw(6) << ib+1  
-						<< std::setw(15) << GlobalC::wf.ekb[ik][ib] * Ry_to_eV;
+						<< std::setw(15) << GlobalC::wf.ekb[ik][ib] * ModuleBase::Ry_to_eV;
 					// for the first electron iteration, we don't have the energy
 					// spectrum, so we can't get the occupations. 
 					GlobalV::ofs_running << std::setw(15) << GlobalC::wf.wg(ik,ib);

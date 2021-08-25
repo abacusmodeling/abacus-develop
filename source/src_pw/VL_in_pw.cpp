@@ -156,7 +156,7 @@ void pseudopot_cell_vl::vloc_of_g(
 			// This is the |G| = 0 component of the local
 			// potential giving rise to the so-called
 			// "alpha*Z" term in the energy.
-			aux[ir] = r [ir] * (r [ir] * vloc_at [ir] + zp_in * e2);
+			aux[ir] = r [ir] * (r [ir] * vloc_at [ir] + zp_in * ModuleBase::e2);
 			//aux[ir] = r [ir] * (r [ir] * vloc_at [ir] );
 		}
 		ModuleBase::Integral::Simpson_Integral(msh, aux, rab, vloc_1d[0] );
@@ -169,7 +169,7 @@ void pseudopot_cell_vl::vloc_of_g(
 
 	// (2) here the |G|>0 terms, we first compute the part of the integrand func
 	// indipendent of |G| in real space
-	double fac = zp_in * e2;
+	double fac = zp_in * ModuleBase::e2;
 	for (ir = 0;ir < msh;ir++)  
 	{
 		aux1 [ir] = r[ir] * vloc_at [ir] + fac * erf(r[ir]);

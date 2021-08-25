@@ -336,7 +336,7 @@ void toWannier90::outEIG()
 				index_band++;
 				eig_file << std::setw(5) << index_band << std::setw(5) << ik+1-start_k_index
 						 << std::setw(18) << showpoint << fixed << std::setprecision(12) 
-						 << GlobalC::wf.ekb[ik][ib] * Ry_to_eV << std::endl;
+						 << GlobalC::wf.ekb[ik][ib] * ModuleBase::Ry_to_eV << std::endl;
 			}
 		}
 		

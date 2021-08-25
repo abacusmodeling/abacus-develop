@@ -158,7 +158,7 @@ void Ions_Move_CG::start(const ModuleBase::matrix& force, const double& etot_in)
 			
 			if(GlobalV::MOVE_IONS=="cg_bfgs")
 			{
-				if(Ions_Move_Basic::largest_grad * Ry_to_eV / 0.529177 < CG_THRESHOLD )         // cg to bfgs  by pengfei 13-8-8
+				if(Ions_Move_Basic::largest_grad * ModuleBase::Ry_to_eV / 0.529177 < CG_THRESHOLD )         // cg to bfgs  by pengfei 13-8-8
 				{
 					 GlobalV::MOVE_IONS="bfgs";
 				}

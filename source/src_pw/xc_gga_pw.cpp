@@ -189,14 +189,14 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 
 					// first term of the gradient correction:
 					// D(rho*Exc)/D(rho)
-					v(0, ir) += e2 * ( v1x + v1c );
+					v(0, ir) += ModuleBase::e2 * ( v1x + v1c );
 					
 					// h contains
 					// D(rho*Exc) / D(|grad rho|) * (grad rho) / |grad rho|
-					h1[ir] = e2 * ( v2x + v2c ) * gdr1[ir];
+					h1[ir] = ModuleBase::e2 * ( v2x + v2c ) * gdr1[ir];
 					
-					vtxcgc += e2*( v1x + v1c ) * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] );
-					etxcgc += e2*( sx + sc ) * segno;
+					vtxcgc += ModuleBase::e2*( v1x + v1c ) * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] );
+					etxcgc += ModuleBase::e2*( sx + sc ) * segno;
 				}
 			} // end arho > epsr
 		}
@@ -252,18 +252,18 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 			}
 
 			// first term of the gradient correction : D(rho*Exc)/D(rho)
-			v(0,ir) = v(0,ir) + e2 * ( v1xup + v1cup );
-			v(1,ir) = v(1,ir) + e2 * ( v1xdw + v1cdw );
+			v(0,ir) = v(0,ir) + ModuleBase::e2 * ( v1xup + v1cup );
+			v(1,ir) = v(1,ir) + ModuleBase::e2 * ( v1xdw + v1cdw );
 
 //			continue; //mohan tmp
 			
 			// h contains D(rho*Exc)/D(|grad rho|) * (grad rho) / |grad rho|
-			h1[ir] = e2 * ( ( v2xup + v2cup ) * gdr1[ir] + v2cud * gdr2[ir] );
-			h2[ir] = e2 * ( ( v2xdw + v2cdw ) * gdr2[ir] + v2cud * gdr1[ir] );
+			h1[ir] = ModuleBase::e2 * ( ( v2xup + v2cup ) * gdr1[ir] + v2cud * gdr2[ir] );
+			h2[ir] = ModuleBase::e2 * ( ( v2xdw + v2cdw ) * gdr2[ir] + v2cud * gdr1[ir] );
 
-			vtxcgc = vtxcgc + e2 * ( v1xup + v1cup ) * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] * fac );
-			vtxcgc = vtxcgc + e2 * ( v1xdw + v1cdw ) * ( rhotmp2[ir] - GlobalC::CHR.rho_core[ir] * fac );
-			etxcgc = etxcgc + e2 * ( sx + sc );
+			vtxcgc = vtxcgc + ModuleBase::e2 * ( v1xup + v1cup ) * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] * fac );
+			vtxcgc = vtxcgc + ModuleBase::e2 * ( v1xdw + v1cdw ) * ( rhotmp2[ir] - GlobalC::CHR.rho_core[ir] * fac );
+			etxcgc = etxcgc + ModuleBase::e2 * ( sx + sc );
 			
 
 		}// end ir

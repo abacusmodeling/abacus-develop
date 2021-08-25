@@ -198,10 +198,10 @@ void Run_MD_PW::md_ions_pw(void)
 
             std::cout << " " << std::setw(7) << ss.str()
                  << std::setw(5) << eiter
-                 << std::setw(15) << std::setprecision(6) << GlobalC::en.etot * Ry_to_eV
-                 << std::setw(15) << IMM.get_ediff() * Ry_to_eV
+                 << std::setw(15) << std::setprecision(6) << GlobalC::en.etot * ModuleBase::Ry_to_eV
+                 << std::setw(15) << IMM.get_ediff() * ModuleBase::Ry_to_eV
                  << std::setprecision(3)
-                 << std::setw(15) << IMM.get_largest_grad() * Ry_to_eV / 0.529177
+                 << std::setw(15) << IMM.get_largest_grad() * ModuleBase::Ry_to_eV / 0.529177
                  << std::setw(15) << IMM.get_trust_radius()
                  << std::setw(8) << IMM.get_update_iter()
                  << std::setprecision(2) << std::setw(11) << etime_min
@@ -298,7 +298,7 @@ void Run_MD_PW::md_cells_pw()
 
     GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
     GlobalV::ofs_running << std::setprecision(16);
-    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
+    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
     GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
     ModuleBase::timer::tick("Run_MD_PW", "md_cells_pw");

@@ -305,7 +305,7 @@ void Input::Default(void)
 	vdwD2_R0_unit="A";
 	vdwD2_model="radius";
 	vdwD2_period = {3,3,3};
-	vdwD2_radius=30.0/BOHR_TO_A;
+	vdwD2_radius=30.0/ModuleBase::BOHR_TO_A;
 	vdwD2_radius_unit="Bohr"; */
 
 //----------------------------------------------------------
@@ -1248,17 +1248,17 @@ bool Input::Read(const std::string &fn)
 		else if (strcmp("rcut_lj",word) == 0)
 		{
 			read_value(ifs, mdp.rcut_lj);
-			mdp.rcut_lj*=ANGSTROM_AU;
+			mdp.rcut_lj*=ModuleBase::ANGSTROM_AU;
 		}
 		else if (strcmp("epsilon_lj",word) == 0)
 		{
 			read_value(ifs, mdp.epsilon_lj);
-			mdp.epsilon_lj/=Ry_to_eV;
+			mdp.epsilon_lj/=ModuleBase::Ry_to_eV;
 		}
 		else if (strcmp("sigma_lj",word) == 0)
 		{
 			read_value(ifs, mdp.sigma_lj);
-			mdp.sigma_lj*=ANGSTROM_AU;
+			mdp.sigma_lj*=ModuleBase::ANGSTROM_AU;
 		}
 		else if (strcmp("md_potential",word) == 0)
 		{
@@ -1924,7 +1924,7 @@ bool Input::Read(const std::string &fn)
 				for(int i=0; i<ntype; i++)
 				{
 					ifs >> hubbard_u[i];
-					hubbard_u[i] /= Ry_to_eV;
+					hubbard_u[i] /= ModuleBase::Ry_to_eV;
 				}
 			}
 			else if (strcmp("hund_j",word)==0)
@@ -1932,7 +1932,7 @@ bool Input::Read(const std::string &fn)
 				for(int i=0;i<ntype;i++)
 				{
 					ifs >> hund_j[i];
-					hund_j[i] /= Ry_to_eV;
+					hund_j[i] /= ModuleBase::Ry_to_eV;
 				}
 			}
 			else if(strcmp("orbital_corr", word)==0)

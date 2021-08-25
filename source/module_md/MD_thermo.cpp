@@ -36,7 +36,7 @@ void MD_thermo::init_NHC(
 	init_by_array(init, length);
 	ofs<<" ...............Nose-Hoover Chain parameter initialization...............  " << std::endl;
 	ofs<<" Temperature =    "<< temperature << std::endl;
-	ofs<<" Temperature2 =    "<< temperature/K_BOLTZMAN_AU << std::endl;
+	ofs<<" Temperature2 =    "<< temperature/ModuleBase::K_BOLTZMAN_AU << std::endl;
 	ofs<<" NHC frequency =    "<< 1.0/NVT_tau_ << std::endl;
 	ofs<<" NHC chain =    "<< MNHC_ << std::endl;
 	ofs<<" Qmass  =    "<< Qmass_ << std::endl;
@@ -120,7 +120,7 @@ double MD_thermo::NHChamiltonian(
         GlobalV::ofs_running<< "            SUMMARY OF NVT CALCULATION            "<<std::endl;
         GlobalV::ofs_running<<" --------------------------------------------------"<<std::endl;
         GlobalV::ofs_running<<" NVT Conservation     : "<<std::setw(10)<< NHChamiltonian0*2<<" (Rydberg)"<<std::endl;
-        GlobalV::ofs_running<<" NVT Temperature      : "<<std::setw(10)<< KE*2/(3*double(numIon_-nfrozen))/K_BOLTZMAN_AU<<" (K)"<<std::endl;
+        GlobalV::ofs_running<<" NVT Temperature      : "<<std::setw(10)<< KE*2/(3*double(numIon_-nfrozen))/ModuleBase::K_BOLTZMAN_AU<<" (K)"<<std::endl;
         GlobalV::ofs_running<<" NVT Kinetic energy   : "<<std::setw(10)<< KE*2<<" (Rydberg)"<<std::endl;
         GlobalV::ofs_running<<" NVT Potential energy : "<<std::setw(10)<< PE*2<<" (Rydberg)"<<std::endl;
     }

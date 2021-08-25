@@ -827,7 +827,7 @@ void LCAO_Descriptor::print_H_V_delta()
         ofs.open(ss.str().c_str());
     }
     ofs << "E_delta(Ry) from deepks model: " << this->E_delta << std::endl;
-    ofs << "E_delta(eV) from deepks model: " << this->E_delta * Hartree_to_eV << std::endl;
+    ofs << "E_delta(eV) from deepks model: " << this->E_delta * ModuleBase::Hartree_to_eV << std::endl;
     ofs << "H_delta(Hartree)(gamma only)) from deepks model: " << std::endl;
     for (int i = 0;i < GlobalV::NLOCAL;++i)
     {
@@ -842,7 +842,7 @@ void LCAO_Descriptor::print_H_V_delta()
     {
         for (int j = 0;j < GlobalV::NLOCAL;++j)
         {
-            ofs<< std::setw(12)<< this->H_V_delta[i * GlobalV::NLOCAL + j] *Hartree_to_eV<< " ";
+            ofs<< std::setw(12)<< this->H_V_delta[i * GlobalV::NLOCAL + j] *ModuleBase::Hartree_to_eV<< " ";
         }
         ofs << std::endl;
     }
@@ -882,9 +882,9 @@ void LCAO_Descriptor::print_F_delta()
         {
             int iat = GlobalC::ucell.itia2iat(it, ia);
             ofs << std::setw(12) << GlobalC::ucell.atoms[it].label << std::setw(12)
-                << ia << std::setw(15) << this->F_delta(iat, 0) * Ry_to_eV/BOHR_TO_A
-                << std::setw(15) << this->F_delta(iat, 1) * Ry_to_eV/BOHR_TO_A
-                << std::setw(15) << this->F_delta(iat, 2) * Ry_to_eV/BOHR_TO_A << std::endl;
+                << ia << std::setw(15) << this->F_delta(iat, 0) * ModuleBase::Ry_to_eV/ModuleBase::BOHR_TO_A
+                << std::setw(15) << this->F_delta(iat, 1) * ModuleBase::Ry_to_eV/ModuleBase::BOHR_TO_A
+                << std::setw(15) << this->F_delta(iat, 2) * ModuleBase::Ry_to_eV/ModuleBase::BOHR_TO_A << std::endl;
         }
     }
     GlobalV::ofs_running << "F_delta is printed" << std::endl;

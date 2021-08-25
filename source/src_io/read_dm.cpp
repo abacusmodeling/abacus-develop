@@ -33,7 +33,7 @@ void Local_Orbital_Charge::read_dm(const int &is, const std::string &fn)
             ifs >> name;
 
             // check lattice constant, unit is Angstrom
-            ModuleBase::CHECK_DOUBLE(ifs,GlobalC::ucell.lat0 * BOHR_TO_A,quit);
+            ModuleBase::CHECK_DOUBLE(ifs,GlobalC::ucell.lat0 * ModuleBase::BOHR_TO_A,quit);
             ModuleBase::CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e11,quit);
             ModuleBase::CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e12,quit);
             ModuleBase::CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e13,quit);

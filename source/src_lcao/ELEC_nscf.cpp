@@ -71,7 +71,7 @@ void ELEC_nscf::nscf(LCAO_Hamilt &uhm)
         {			
             GlobalV::ofs_running << " spin" << GlobalC::kv.isk[ik]+1 
 			<< "final_state " << ib+1 << " " 
-			<< GlobalC::wf.ekb[ik][ib] * Ry_to_eV 
+			<< GlobalC::wf.ekb[ik][ib] * ModuleBase::Ry_to_eV 
 			<< " " << GlobalC::wf.wg(ik, ib)*GlobalC::kv.nks << std::endl;
         }
 		GlobalV::ofs_running << std::endl;

@@ -70,7 +70,7 @@ void Local_Orbital_Charge::write_dm(
 		//GlobalV::ofs_running << "\n Output charge file." << std::endl;
 
 		ofs << GlobalC::ucell.latName << std::endl;//1
-		ofs << " " << GlobalC::ucell.lat0 * BOHR_TO_A << std::endl;
+		ofs << " " << GlobalC::ucell.lat0 * ModuleBase::BOHR_TO_A << std::endl;
 		ofs << " " << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << std::endl;
 		ofs << " " << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << std::endl;
 		ofs << " " << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << std::endl;

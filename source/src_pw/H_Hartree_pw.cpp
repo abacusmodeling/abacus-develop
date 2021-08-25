@@ -42,7 +42,7 @@ ModuleBase::matrix H_Hartree_pw::v_hartree(
         const int j = pwb.ig2fftc[ig];
         if(pwb.gg[ig] >= 1.0e-12) //LiuXh 20180410
         {
-            const double fac = e2 * ModuleBase::FOUR_PI / (cell.tpiba2 * pwb.gg [ig]);
+            const double fac = ModuleBase::e2 * ModuleBase::FOUR_PI / (cell.tpiba2 * pwb.gg [ig]);
 
             ehart += ( conj( Porter[j] ) * Porter[j] ).real() * fac;
             vh_g[ig] = fac * Porter[j];

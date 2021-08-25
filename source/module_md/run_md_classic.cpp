@@ -81,7 +81,7 @@ void Run_MD_CLASSIC::classic_md_line(void)
 
 	GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
     GlobalV::ofs_running << std::setprecision(16);
-    GlobalV::ofs_running << " !FINAL_ETOT_IS " << potential*Ry_to_eV << " eV" << std::endl; 
+    GlobalV::ofs_running << " !FINAL_ETOT_IS " << potential*ModuleBase::Ry_to_eV << " eV" << std::endl; 
     GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
     ModuleBase::timer::tick("Run_MD_CLASSIC", "md_cells_classic");
@@ -140,7 +140,7 @@ void Run_MD_CLASSIC::md_force_stress(double &potential)
 	ModuleBase::GlobalFunc::NEW_PART("   TOTAL-FORCE (eV/Angstrom)");
 	GlobalV::ofs_running << std::endl;
 	GlobalV::ofs_running << " atom    x              y              z" << std::endl;
-	const double fac = Ry_to_eV*ANGSTROM_AU;
+	const double fac = ModuleBase::Ry_to_eV*ModuleBase::ANGSTROM_AU;
 	int iat = 0;
 	for(int it=0; it<ucell_c.ntype; ++it)
 	{

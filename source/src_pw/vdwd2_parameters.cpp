@@ -27,7 +27,7 @@ void Vdwd2_Parameters::initial_parameters(const Input &input)
 		}
 		else
 		{
-			this->radius = std::stod(input.vdw_radius) * BOHR_TO_A;
+			this->radius = std::stod(input.vdw_radius) * ModuleBase::BOHR_TO_A;
 		}
 	}
 	else if(input.vdw_model=="period")
@@ -62,9 +62,9 @@ void Vdwd2_Parameters::C6_input(const std::string &file, const std::string &unit
 	for(auto &c6 : C6)
 	{
 		if( unit == "Jnm6/mol")
-			c6.second *= 1e6/(ELECTRONVOLT_SI*NA)/pow(BOHR_TO_A,6)/Ry_to_eV;
+			c6.second *= 1e6/(ModuleBase::ELECTRONVOLT_SI*ModuleBase::NA)/pow(ModuleBase::BOHR_TO_A,6)/ModuleBase::Ry_to_eV;
 		else if( unit == "eVA6")
-			c6.second /= pow(BOHR_TO_A,6)/Ry_to_eV;
+			c6.second /= pow(ModuleBase::BOHR_TO_A,6)/ModuleBase::Ry_to_eV;
 //		else if( unit == "RyBohr6");
 		else
 			ModuleBase::WARNING_QUIT("Input","vdwD2_C6_unit must be Jnm6/mol or eVA6");
@@ -87,7 +87,7 @@ void Vdwd2_Parameters::R0_input(const std::string &file, const std::string &unit
 	for(auto &r0 : R0)
 	{
 		if( unit == "A")
-			r0.second/= BOHR_TO_A;
+			r0.second/= ModuleBase::BOHR_TO_A;
 		else if( unit == "Bohr") ;
 		else
 			ModuleBase::WARNING_QUIT("Input","vdwD2_R0_unit must be A or Bohr");			
