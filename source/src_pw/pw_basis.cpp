@@ -738,7 +738,7 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
 {
     ModuleBase::TITLE("PW_Basis","setup_structure_factor");
     ModuleBase::timer::tick("PW_Basis","setup_struc_factor");
-    const std::complex<double> ci_tpi = NEG_IMAG_UNIT * ModuleBase::TWO_PI;
+    const std::complex<double> ci_tpi = ModuleBase::NEG_IMAG_UNIT * ModuleBase::TWO_PI;
 
     this->strucFac.create(Ucell->ntype, this->ngmc);
     ModuleBase::Memory::record("PW_Basis","struc_fac", Ucell->ntype*this->ngmc,"complexmatrix");

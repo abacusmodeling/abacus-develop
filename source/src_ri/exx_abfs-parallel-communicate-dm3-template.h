@@ -11,7 +11,7 @@ const ModuleBase::matrix &Exx_Abfs::Parallel::Communicate::DM3::D_phase(
 ModuleBase::matrix Exx_Abfs::Parallel::Communicate::DM3::D_phase(
 	const ModuleBase::ComplexMatrix &DK, const int ik, const Abfs::Vector3_Order<int> &box2) const
 {
-	return (DK * exp( -ModuleBase::TWO_PI*IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (box2*GlobalC::ucell.latvec)) )).real();
+	return (DK * exp( -ModuleBase::TWO_PI*ModuleBase::IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (box2*GlobalC::ucell.latvec)) )).real();
 }
 
 

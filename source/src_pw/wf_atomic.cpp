@@ -275,7 +275,7 @@ void WF_atomic::atomic_wfc
                 if (GlobalC::ucell.atoms[it].oc[iw] >= 0.0)
                 {
                     const int l = GlobalC::ucell.atoms[it].lchi[iw];
-                    std::complex<double> lphase = pow(NEG_IMAG_UNIT, l);
+                    std::complex<double> lphase = pow(ModuleBase::NEG_IMAG_UNIT, l);
                     //-----------------------------------------------------
                     //  the factor i^l MUST BE PRESENT in order to produce
                     //  WF_atomictions for k=0 that are real in real space
@@ -381,16 +381,16 @@ void WF_atomic::atomic_wfc
                                  for(int ig = 0;ig<np;ig++)
                                  {
                                      fup = cos(0.5 * alpha) * aux[ig];
-                                     fdown = IMAG_UNIT * sin(0.5* alpha) * aux[ig];
+                                     fdown = ModuleBase::IMAG_UNIT * sin(0.5* alpha) * aux[ig];
                                      //build the orthogonal wfc
                                      //first rotation with angle (alpha + ModuleBase::PI) around (OX)
-                                     wfcatom(index,ig) = (cos(0.5 * gamma) + IMAG_UNIT * sin(0.5*gamma)) * fup;
-                                     wfcatom(index,ig+ this->npwx) = (cos(0.5 * gamma) - IMAG_UNIT * sin(0.5*gamma)) * fdown;
+                                     wfcatom(index,ig) = (cos(0.5 * gamma) + ModuleBase::IMAG_UNIT * sin(0.5*gamma)) * fup;
+                                     wfcatom(index,ig+ this->npwx) = (cos(0.5 * gamma) - ModuleBase::IMAG_UNIT * sin(0.5*gamma)) * fdown;
                                      //second rotation with angle gamma around(OZ)
                                      fup = cos(0.5 * (alpha + ModuleBase::PI))*aux[ig];
-                                     fdown = IMAG_UNIT * sin(0.5 * (alpha + ModuleBase::PI))*aux[ig];
-                                     wfcatom(index+2*l+1,ig) = (cos(0.5*gamma) + IMAG_UNIT*sin(0.5*gamma))*fup;
-                                     wfcatom(index+2*l+1,ig+ this->npwx) = (cos(0.5*gamma) - IMAG_UNIT*sin(0.5*gamma))*fdown;
+                                     fdown = ModuleBase::IMAG_UNIT * sin(0.5 * (alpha + ModuleBase::PI))*aux[ig];
+                                     wfcatom(index+2*l+1,ig) = (cos(0.5*gamma) + ModuleBase::IMAG_UNIT*sin(0.5*gamma))*fup;
+                                     wfcatom(index+2*l+1,ig+ this->npwx) = (cos(0.5*gamma) - ModuleBase::IMAG_UNIT*sin(0.5*gamma))*fdown;
                                  }
                                  index++;
                               }
@@ -416,16 +416,16 @@ void WF_atomic::atomic_wfc
                                 for(int ig = 0;ig<np;ig++)
                                 {
                                      fup = cos(0.5*alpha) * aux[ig];
-                                     fdown = IMAG_UNIT * sin(0.5* alpha) * aux[ig];
+                                     fdown = ModuleBase::IMAG_UNIT * sin(0.5* alpha) * aux[ig];
                                      //build the orthogonal wfc
                                      //first rotation with angle(alpha+ModuleBase::PI) around(OX)
-                                     wfcatom(index,ig) = (cos(0.5 * gamman) + IMAG_UNIT * sin(0.5*gamman)) * fup;
-                                     wfcatom(index,ig+ this->npwx) = (cos(0.5 * gamman) - IMAG_UNIT * sin(0.5*gamman)) * fdown;
+                                     wfcatom(index,ig) = (cos(0.5 * gamman) + ModuleBase::IMAG_UNIT * sin(0.5*gamman)) * fup;
+                                     wfcatom(index,ig+ this->npwx) = (cos(0.5 * gamman) - ModuleBase::IMAG_UNIT * sin(0.5*gamman)) * fdown;
                                      //second rotation with angle gamma around(OZ)
                                      fup = cos(0.5 * (alpha + ModuleBase::PI)) * aux[ig];
-                                     fdown = IMAG_UNIT * sin(0.5 * (alpha + ModuleBase::PI)) * aux[ig];
-                                     wfcatom(index+2*l+1,ig) = (cos(0.5*gamman) + IMAG_UNIT*sin(0.5*gamman))*fup;
-                                     wfcatom(index+2*l+1,ig+ this->npwx) = (cos(0.5*gamman) - IMAG_UNIT*sin(0.5*gamman))*fdown;
+                                     fdown = ModuleBase::IMAG_UNIT * sin(0.5 * (alpha + ModuleBase::PI)) * aux[ig];
+                                     wfcatom(index+2*l+1,ig) = (cos(0.5*gamman) + ModuleBase::IMAG_UNIT*sin(0.5*gamman))*fup;
+                                     wfcatom(index+2*l+1,ig+ this->npwx) = (cos(0.5*gamman) - ModuleBase::IMAG_UNIT*sin(0.5*gamman))*fdown;
                                 }
                                 index++;
                             }

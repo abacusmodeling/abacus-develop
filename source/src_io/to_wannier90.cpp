@@ -1388,7 +1388,7 @@ void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orb
 	}
 	
 	// 4.����������̽�����ĳ��k����ƽ�沨�����ͶӰ
-	std::complex<double> lphase = pow(NEG_IMAG_UNIT, orbital_L);
+	std::complex<double> lphase = pow(ModuleBase::NEG_IMAG_UNIT, orbital_L);
 	for(int ig = 0; ig < GlobalC::wf.npwx; ig++)
 	{
 		if(ig < npw)

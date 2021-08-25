@@ -273,7 +273,7 @@ void Numerical_Descriptor::jlq3d_overlap(
 							<< std::setw(8) << L
 							<< std::endl;
                 //OUT("l",l);
-                std::complex<double> lphase = normalization * pow(IMAG_UNIT, L);			// Peize Lin add normalization 2015-12-29
+                std::complex<double> lphase = normalization * pow(ModuleBase::IMAG_UNIT, L);			// Peize Lin add normalization 2015-12-29
                 for (int ie=0; ie < nmax; ie++)
                 {
                     for (int ig=0; ig<np; ig++)

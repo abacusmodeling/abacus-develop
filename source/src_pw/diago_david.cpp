@@ -458,8 +458,8 @@ void Diago_David::refresh
     for ( int i = 0; i < nbase; i++ )
     {
         hc(i,i) = en[i];
-        sc(i,i) = ONE;
-        vc(i,i) = ONE;
+        sc(i,i) = ModuleBase::ONE;
+        vc(i,i) = ModuleBase::ONE;
     }
 
     ModuleBase::timer::tick("Diago_David","refresh");

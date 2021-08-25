@@ -397,7 +397,7 @@ void GGA_PW::grad_rho( const std::complex<double> *rhog, ModuleBase::Vector3<dou
 
 	// the formula is : rho(r)^prime = \int iG * rho(G)e^{iGr} dG
 	for(int ig=0; ig<GlobalC::pw.ngmc; ig++)
-		gdrtmpg[ig] = IMAG_UNIT * rhog[ig];
+		gdrtmpg[ig] = ModuleBase::IMAG_UNIT * rhog[ig];
 
 	// calculate the charge density gradient in reciprocal space.
 	ModuleBase::GlobalFunc::ZEROS(Porter, GlobalC::pw.nrxx);
@@ -446,7 +446,7 @@ void GGA_PW::grad_dot(const ModuleBase::Vector3<double> *h, double *dh)
 	// bring to G space.
 	GlobalC::pw.FFT_chg.FFT3D(aux, -1);
 	for(int ig=0; ig<GlobalC::pw.ngmc; ig++)
-		gaux[ig] += GlobalC::pw.get_G_cartesian_projection(ig, 0) * IMAG_UNIT * aux[GlobalC::pw.ig2fftc[ig]];
+		gaux[ig] += GlobalC::pw.get_G_cartesian_projection(ig, 0) * ModuleBase::IMAG_UNIT * aux[GlobalC::pw.ig2fftc[ig]];
 
 	ModuleBase::GlobalFunc::ZEROS(aux, GlobalC::pw.nrxx);
 	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
@@ -454,7 +454,7 @@ void GGA_PW::grad_dot(const ModuleBase::Vector3<double> *h, double *dh)
 	// bring to G space.
 	GlobalC::pw.FFT_chg.FFT3D(aux, -1);
 	for(int ig=0; ig<GlobalC::pw.ngmc; ig++)
-		gaux[ig] += GlobalC::pw.get_G_cartesian_projection(ig, 1) * IMAG_UNIT * aux[GlobalC::pw.ig2fftc[ig]];
+		gaux[ig] += GlobalC::pw.get_G_cartesian_projection(ig, 1) * ModuleBase::IMAG_UNIT * aux[GlobalC::pw.ig2fftc[ig]];
 
 	ModuleBase::GlobalFunc::ZEROS(aux, GlobalC::pw.nrxx);
 	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
@@ -462,7 +462,7 @@ void GGA_PW::grad_dot(const ModuleBase::Vector3<double> *h, double *dh)
 	// bring to G space.
 	GlobalC::pw.FFT_chg.FFT3D(aux, -1);
 	for(int ig=0; ig<GlobalC::pw.ngmc; ig++)
-		gaux[ig] += GlobalC::pw.get_G_cartesian_projection(ig, 2) * IMAG_UNIT * aux[GlobalC::pw.ig2fftc[ig]];
+		gaux[ig] += GlobalC::pw.get_G_cartesian_projection(ig, 2) * ModuleBase::IMAG_UNIT * aux[GlobalC::pw.ig2fftc[ig]];
 
 	ModuleBase::GlobalFunc::ZEROS(aux, GlobalC::pw.nrxx);
 	for(int ig=0; ig<GlobalC::pw.ngmc; ig++)

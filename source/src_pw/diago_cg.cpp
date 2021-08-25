@@ -213,7 +213,7 @@ void Diago_CG::orthogonal_gradient( const int &dim, const int &dmx,
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     //qianrui replace 2021-3-15
     char trans='C';
-    zgemv_(&trans,&dim,&m,&ONE,eigenfunction.c,&dmx,sg,&inc,&ModuleBase::ZERO,lagrange,&inc);
+    zgemv_(&trans,&dim,&m,&ModuleBase::ONE,eigenfunction.c,&dmx,sg,&inc,&ModuleBase::ZERO,lagrange,&inc);
     //======================================================================
     /*for (int i=0; i<m; i++)
     {
@@ -231,8 +231,8 @@ void Diago_CG::orthogonal_gradient( const int &dim, const int &dmx,
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     //qianrui replace 2021-3-15
     char trans2='N';
-    zgemv_(&trans2,&dim,&m,&NEG_ONE,eigenfunction.c,&dmx,lagrange,&inc,&ONE,g,&inc);
-    zgemv_(&trans2,&dim,&m,&NEG_ONE,eigenfunction.c,&dmx,lagrange,&inc,&ONE,sg,&inc);
+    zgemv_(&trans2,&dim,&m,&ModuleBase::NEG_ONE,eigenfunction.c,&dmx,lagrange,&inc,&ModuleBase::ONE,g,&inc);
+    zgemv_(&trans2,&dim,&m,&ModuleBase::NEG_ONE,eigenfunction.c,&dmx,lagrange,&inc,&ModuleBase::ONE,sg,&inc);
     //======================================================================
     /*for (int i=0; i<m; i++)
     {
@@ -424,7 +424,7 @@ void Diago_CG::schmit_orth
     int inc=1;
     int mp1 = m+1;
     char trans='C';
-    zgemv_(&trans,&dim,&mp1,&ONE,psi.c,&dmx,sphi,&inc,&ModuleBase::ZERO,lagrange,&inc);
+    zgemv_(&trans,&dim,&mp1,&ModuleBase::ONE,psi.c,&dmx,sphi,&inc,&ModuleBase::ZERO,lagrange,&inc);
     //======================================================================
     /*for (int j = 0; j <= m; j++)
     {
@@ -443,7 +443,7 @@ void Diago_CG::schmit_orth
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     //qianrui replace 2021-3-15
     char trans2='N';
-    zgemv_(&trans2,&dim,&m,&NEG_ONE,psi.c,&dmx,lagrange,&inc,&ONE,psi_m,&inc);
+    zgemv_(&trans2,&dim,&m,&ModuleBase::NEG_ONE,psi.c,&dmx,lagrange,&inc,&ModuleBase::ONE,psi_m,&inc);
     psi_norm -= ddot_real(m,lagrange,lagrange,false);
     //======================================================================
     /*for (int j = 0; j < m; j++)

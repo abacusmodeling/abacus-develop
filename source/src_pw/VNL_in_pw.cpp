@@ -203,7 +203,7 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 			std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
 			for (ih = 0;ih < nh;ih++)
 			{
-				std::complex<double> pref = pow( NEG_IMAG_UNIT, nhtol(it, ih));	//?
+				std::complex<double> pref = pow( ModuleBase::NEG_IMAG_UNIT, nhtol(it, ih));	//?
 				for (ig = 0;ig < npw;ig++)
 				{
 					this->vkb(jkb, ig) = vkb1(ih, ig) * sk [ig] * pref;
@@ -519,7 +519,7 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 							{
 								std::cout<<"lu= "<<lu<<"  mu= "<<mu<<"  L= "<<L<<"  M= "<<M<<" alpha = "<<alpha<<"  "<<c<<std::endl;
 							}*/
-							vkb1_alpha[alpha][ih][ig] += c * vq[ig] * ylm(lm, ig) * pow( NEG_IMAG_UNIT, L);
+							vkb1_alpha[alpha][ih][ig] += c * vq[ig] * ylm(lm, ig) * pow( ModuleBase::NEG_IMAG_UNIT, L);
 						}	
 					}
 				}

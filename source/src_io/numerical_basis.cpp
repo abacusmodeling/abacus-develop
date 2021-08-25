@@ -179,7 +179,7 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Q(
 							<< std::setw(8) << L
 							<< std::endl;
                 //OUT("l",l);
-                std::complex<double> lphase = normalization * pow(IMAG_UNIT, L);			// Peize Lin add normalization 2015-12-29
+                std::complex<double> lphase = normalization * pow(ModuleBase::IMAG_UNIT, L);			// Peize Lin add normalization 2015-12-29
                 for (int ie=0; ie < this->bessel_basis.get_ecut_number(); ie++)
                 {
                     const int N = 0;
@@ -255,7 +255,7 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Sq(
                     std::complex<double> *sk2 = GlobalC::wf.get_sk(ik, T2, I2);
                     for (int l1 = 0; l1 < GlobalC::ucell.atoms[T1].nwl+1; l1++) // 1.3
                     {
-                        const std::complex<double> lphase1 = normalization * pow(IMAG_UNIT, l1);			// Peize Lin add normalization 2015-12-29
+                        const std::complex<double> lphase1 = normalization * pow(ModuleBase::IMAG_UNIT, l1);			// Peize Lin add normalization 2015-12-29
                         for (int l2 = 0; l2 < GlobalC::ucell.atoms[T2].nwl+1; l2++) // 2.3
                         {
                             GlobalV::ofs_running << " " << std::setw(5)
@@ -267,7 +267,7 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Sq(
                                 << I2+1 << std::setw(8)
                                 << l2 << std::setw(8) << std::endl;
 
-                            const std::complex<double> lphase2 = pow(IMAG_UNIT, l2);
+                            const std::complex<double> lphase2 = pow(ModuleBase::IMAG_UNIT, l2);
                             for (int ic1=0; ic1 < GlobalC::ucell.nmax; ic1++) // 1.5
                             {
                                 for (int ic2=0; ic2 < GlobalC::ucell.nmax; ic2++) // 2.5
@@ -423,7 +423,7 @@ void Numerical_Basis::numerical_atomic_wfc(
             for (int l = 0; l < GlobalC::ucell.atoms[it].nwl+1; l++)
             {
                 //OUT("l",l);
-                std::complex<double> lphase = pow(IMAG_UNIT, l);
+                std::complex<double> lphase = pow(ModuleBase::IMAG_UNIT, l);
                 for (int ic=0; ic < GlobalC::ucell.atoms[it].l_nchi[l]; ic++)
                 {
                     //OUT("ic",ic);

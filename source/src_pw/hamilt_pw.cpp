@@ -146,10 +146,10 @@ void Hamilt_PW::diagH_subspace(
 
 	char trans1 = 'C';
 	char trans2 = 'N';
-	zgemm_(&trans1,&trans2,&nstart,&nstart,&dmin,&ONE,psi.c,&dmax,aux,&dmax,&ModuleBase::ZERO,hc.c,&nstart);
+	zgemm_(&trans1,&trans2,&nstart,&nstart,&dmin,&ModuleBase::ONE,psi.c,&dmax,aux,&dmax,&ModuleBase::ZERO,hc.c,&nstart);
 	hc=transpose(hc,false);
 
-	zgemm_(&trans1,&trans2,&nstart,&nstart,&dmin,&ONE,psi.c,&dmax,psi.c,&dmax,&ModuleBase::ZERO,sc.c,&nstart);
+	zgemm_(&trans1,&trans2,&nstart,&nstart,&dmin,&ModuleBase::ONE,psi.c,&dmax,psi.c,&dmax,&ModuleBase::ZERO,sc.c,&nstart);
 	sc=transpose(sc,false);
 
 	delete []aux;
@@ -280,7 +280,7 @@ void Hamilt_PW::diagH_subspace(
 				&dmax, // m: row of A,C
 				&n_band, // n: col of B,C
 				&nstart, // k: col of A, row of B
-				&ONE, // alpha
+				&ModuleBase::ONE, // alpha
 				psi.c, // A
 				&dmax, // LDA: if(N) max(1,m) if(T) max(1,k)
 				hvec.c, // B
@@ -297,7 +297,7 @@ void Hamilt_PW::diagH_subspace(
 		char transa = 'N';
 		char transb = 'T';
 		ModuleBase::ComplexMatrix evctmp(n_band, dmin,false);
-		zgemm_(&transa,&transb,&dmin,&n_band,&nstart,&ONE,psi.c,&dmax,hvec.c,&n_band,&ModuleBase::ZERO,evctmp.c,&dmin);
+		zgemm_(&transa,&transb,&dmin,&n_band,&nstart,&ModuleBase::ONE,psi.c,&dmax,hvec.c,&n_band,&ModuleBase::ZERO,evctmp.c,&dmin);
 		for(int ib=0; ib<n_band; ib++)
 		{
 			for(int ig=0; ig<dmin; ig++)
@@ -474,12 +474,12 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 			if(m==1 && GlobalV::NPOL==1)
 			{
 				int inc = 1;
-				zgemv_(&transa, &GlobalC::wf.npw, &nkb, &ONE, GlobalC::ppcell.vkb.c, &GlobalC::wf.npwx, psi_in, &inc, &ModuleBase::ZERO, becp.c, &inc);
+				zgemv_(&transa, &GlobalC::wf.npw, &nkb, &ModuleBase::ONE, GlobalC::ppcell.vkb.c, &GlobalC::wf.npwx, psi_in, &inc, &ModuleBase::ZERO, becp.c, &inc);
 			}
 			else
 			{
 				int npm = GlobalV::NPOL * m;
-				zgemm_(&transa,&transb,&nkb,&npm,&GlobalC::wf.npw,&ONE,GlobalC::ppcell.vkb.c,&GlobalC::wf.npwx,psi_in,&GlobalC::wf.npwx,&ModuleBase::ZERO,becp.c,&nkb);
+				zgemm_(&transa,&transb,&nkb,&npm,&GlobalC::wf.npw,&ModuleBase::ONE,GlobalC::ppcell.vkb.c,&GlobalC::wf.npwx,psi_in,&GlobalC::wf.npwx,&ModuleBase::ZERO,becp.c,&nkb);
 				//add_nonlocal_pp is moddified, thus tranpose not needed here.
 				//if(GlobalV::NONCOLIN)
 				//{
@@ -670,12 +670,12 @@ void Hamilt_PW::add_nonlocal_pp(
 		zgemv_(&transa,
 			&GlobalC::wf.npw,
 			&GlobalC::ppcell.nkb,
-			&ONE,
+			&ModuleBase::ONE,
 			GlobalC::ppcell.vkb.c,
 			&GlobalC::wf.npwx,
 			ps,
 			&inc,
-			&ONE,
+			&ModuleBase::ONE,
 			hpsi_in,
 			&inc);
 	}
@@ -687,12 +687,12 @@ void Hamilt_PW::add_nonlocal_pp(
 			&GlobalC::wf.npw,
 			&npm,
 			&GlobalC::ppcell.nkb,
-			&ONE,
+			&ModuleBase::ONE,
 			GlobalC::ppcell.vkb.c,
 			&GlobalC::wf.npwx,
 			ps,
 			&npm,
-			&ONE,
+			&ModuleBase::ONE,
 			hpsi_in,
 			&GlobalC::wf.npwx);
 	}

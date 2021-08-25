@@ -299,7 +299,7 @@ void Stress_Func::get_dvnl1
 			std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
 			for (ih = 0;ih < nh;ih++)
 			{
-				std::complex<double> pref = pow( NEG_IMAG_UNIT, GlobalC::ppcell.nhtol(it, ih));      //?
+				std::complex<double> pref = pow( ModuleBase::NEG_IMAG_UNIT, GlobalC::ppcell.nhtol(it, ih));      //?
 				for (ig = 0;ig < npw;ig++)
 				{
 					vkb(jkb, ig) = vkb1(ih, ig) * sk [ig] * pref;
@@ -385,7 +385,7 @@ void Stress_Func::get_dvnl2(ModuleBase::ComplexMatrix &vkb,
 			std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
 			for (ih = 0;ih < nh;ih++)
 			{
-				std::complex<double> pref = pow( NEG_IMAG_UNIT, GlobalC::ppcell.nhtol(it, ih));      //?
+				std::complex<double> pref = pow( ModuleBase::NEG_IMAG_UNIT, GlobalC::ppcell.nhtol(it, ih));      //?
 				for (ig = 0;ig < npw;ig++)
 				{
 					vkb(jkb, ig) = vkb1(ih, ig) * sk [ig] * pref;
