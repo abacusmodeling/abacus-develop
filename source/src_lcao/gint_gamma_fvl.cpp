@@ -92,7 +92,7 @@ inline void cal_psir_ylm_dphi(
             // <<<
             // Ylm::rlylm(GlobalC::ucell.atoms[it].nwl+1, dr[id].x, dr[id].y, dr[id].z, rly, grly);
             // Ylm::rlylm(GlobalC::ucell.atoms[it].nwl+1, dr[id].x, dr[id].y, dr[id].z, rly, grly);
-            Ylm::grad_rl_sph_harm(GlobalC::ucell.atoms[it].nwl, dr[0], dr[1], dr[2], rly, grly);
+            ModuleBase::Ylm::grad_rl_sph_harm(GlobalC::ucell.atoms[it].nwl, dr[0], dr[1], dr[2], rly, grly);
 
             // 1E-7 is necessary in case of R is just on one grid
             // the following code is about interpolation,

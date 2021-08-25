@@ -46,7 +46,7 @@ void Exx_Abfs::Matrix_Orbs21::init(
 	// (2) init Ylm Coef
 	//=========================================
 //gettimeofday( &t_start, NULL);
-	Ylm::set_coefficients ();
+	ModuleBase::Ylm::set_coefficients ();
 //ofs<<"TIME@Exx_Abfs::Matrix_Orbs21::init::Ylm\t"<<time_during(t_start)<<std::endl;
 
 	//=========================================

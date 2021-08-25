@@ -28,7 +28,7 @@ void Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::init(
 	//=========================================
 	// (2) init Ylm Coef
 	//=========================================
-	Ylm::set_coefficients ();
+	ModuleBase::Ylm::set_coefficients ();
 	
 	//=========================================
 	// (3) make Gaunt coefficients table
