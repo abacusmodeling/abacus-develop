@@ -61,7 +61,7 @@ void WF_atomic::init_at_1(void)
 // NAME : GlobalC::ucell.atoms.r
 //----------------------------------------------------------
     const int startq = 0;
-    const double pref = FOUR_PI / sqrt(GlobalC::ucell.omega);
+    const double pref = ModuleBase::FOUR_PI / sqrt(GlobalC::ucell.omega);
     double *aux = new double[ndm];
     double *vchi = new double[ndm];
 
@@ -516,7 +516,7 @@ void WF_atomic::random(ModuleBase::ComplexMatrix &psi,const int iw_start,const i
                 for (int ig = 0;ig < ng;ig++)
                 {
                     const double rr = tmprr[GR_index[ig]];
-                    const double arg= TWO_PI * tmparg[GR_index[ig]];
+                    const double arg= ModuleBase::TWO_PI * tmparg[GR_index[ig]];
                     ModuleBase::Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
                     psi(iw,ig+startig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
                 }
@@ -542,14 +542,14 @@ void WF_atomic::random(ModuleBase::ComplexMatrix &psi,const int iw_start,const i
             for (int ig = 0;ig < ng;ig++)
             {
                 const double rr = std::rand()/double(RAND_MAX); //qianrui add RAND_MAX
-                const double arg= TWO_PI * std::rand()/double(RAND_MAX);
+                const double arg= ModuleBase::TWO_PI * std::rand()/double(RAND_MAX);
                 ModuleBase::Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
                 psi(iw,ig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
             }
             if(GlobalV::NPOL==2)for (int ig = this->npwx;ig < this->npwx + ng;ig++)
             {
                 const double rr = std::rand()/double(RAND_MAX);
-                const double arg= TWO_PI * std::rand()/double(RAND_MAX);
+                const double arg= ModuleBase::TWO_PI * std::rand()/double(RAND_MAX);
                 ModuleBase::Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig - this->npwx));
                 psi(iw,ig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
             }
@@ -606,7 +606,7 @@ void WF_atomic::atomicrandom(ModuleBase::ComplexMatrix &psi,const int iw_start,c
                 for (int ig = 0;ig < ng;ig++)
                 {
                     const double rr = tmprr[GR_index[ig]];
-                    const double arg= TWO_PI * tmparg[GR_index[ig]];
+                    const double arg= ModuleBase::TWO_PI * tmparg[GR_index[ig]];
                     psi(iw,startig+ig) *= (1.0 + 0.05 * std::complex<double>(rr * cos(arg), rr * sin(arg)));
                 }
                 startig += npwx;
@@ -635,7 +635,7 @@ void WF_atomic::atomicrandom(ModuleBase::ComplexMatrix &psi,const int iw_start,c
 				for(int ig = 0 ; ig < npw ; ++ig)
 				{
 					rr = rand()/double(RAND_MAX);
-					arg = TWO_PI * rand()/double(RAND_MAX);
+					arg = ModuleBase::TWO_PI * rand()/double(RAND_MAX);
 					psi(iw,startig+ig) *= (1.0 + 0.05 * std::complex<double>(rr * cos(arg), rr * sin(arg)));
 				}
 				startig += npwx;

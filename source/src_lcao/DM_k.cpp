@@ -268,7 +268,7 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
     RA.for_grid(gt);
 
     int ca = 0;
-    std::complex<double> fac = TWO_PI * IMAG_UNIT;
+    std::complex<double> fac = ModuleBase::TWO_PI * IMAG_UNIT;
 
     std::complex<double> *WFC_PHASE=new std::complex<double>[GlobalV::NLOCAL*GlobalC::ucell.nwmax];
     

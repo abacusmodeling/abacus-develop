@@ -58,7 +58,7 @@ void Mathzone::To_Polar_Coordinate
     }
     else if ( x_cartesian > small && y_cartesian < -small)
     {
-        phi = atan( y_cartesian/x_cartesian ) + TWO_PI;
+        phi = atan( y_cartesian/x_cartesian ) + ModuleBase::TWO_PI;
     }
     else
     {

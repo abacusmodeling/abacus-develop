@@ -174,10 +174,10 @@ double*  dvloc
 		// simpson (msh, aux, rab, vlcp);
 		ModuleBase::Integral::Simpson_Integral(msh, aux, rab, vlcp );
 		// DV(g^2)/Dg^2 = (DV(g)/Dg)/2g
-		vlcp *= FOUR_PI / GlobalC::ucell.omega / 2.0 / gx;
+		vlcp *= ModuleBase::FOUR_PI / GlobalC::ucell.omega / 2.0 / gx;
 		// subtract the long-range term
 		double g2a = gx2 / 4.0;
-		vlcp += FOUR_PI / GlobalC::ucell.omega * zp * e2 * exp ( - g2a) * (g2a + 1) / pow(gx2 , 2);
+		vlcp += ModuleBase::FOUR_PI / GlobalC::ucell.omega * zp * e2 * exp ( - g2a) * (g2a + 1) / pow(gx2 , 2);
 		dvloc [igl] = vlcp;
 	}
 	delete[] aux1;
@@ -216,7 +216,7 @@ double* dvloc
 	}
 	for(int i=igl0;i<GlobalC::pw.nggm;i++)
 	{
-		dvloc[i] = FOUR_PI * zp * e2 / GlobalC::ucell.omega / pow(( GlobalC::ucell.tpiba2 * GlobalC::pw.ggs[i] ),2);
+		dvloc[i] = ModuleBase::FOUR_PI * zp * e2 / GlobalC::ucell.omega / pow(( GlobalC::ucell.tpiba2 * GlobalC::pw.ggs[i] ),2);
 	}
 	
 	return;

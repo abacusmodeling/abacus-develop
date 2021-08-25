@@ -189,7 +189,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 		double temp = 0.0;
 
 		ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,dk,temp);
-		rs[ir] = temp * FOUR_PI ;
+		rs[ir] = temp * ModuleBase::FOUR_PI ;
 		
 		// Peize Lin accelerate 2017-10-02
 		const std::vector<double> &jlm1_r = jlm1[ir];
@@ -211,7 +211,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 		}
 
 		ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,dk,temp);
-		drs[ir] = -FOUR_PI*(l+1)/(2.0*l+1) * temp;
+		drs[ir] = -ModuleBase::FOUR_PI*(l+1)/(2.0*l+1) * temp;
 	}
 
 	//liaochen modify on 2010/4/22
@@ -229,7 +229,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 		}
 		
 		ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,kab,temp);
-		rs[0] = FOUR_PI / ModuleBase::Mathzone_Add1::dualfac (2*l+1) * temp;
+		rs[0] = ModuleBase::FOUR_PI / ModuleBase::Mathzone_Add1::dualfac (2*l+1) * temp;
 	}
 
 	delete [] integrated_func;
@@ -319,7 +319,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 		double temp = 0.0;
 
 		ModuleBase::Integral::Simpson_Integral(kmesh,ModuleBase::GlobalFunc::VECTOR_TO_PTR(integrated_func),dk,temp);
-		rs[ir] = temp * FOUR_PI ;
+		rs[ir] = temp * ModuleBase::FOUR_PI ;
 		
 		const std::vector<double> &jlm1_r = jlm1[ir];
 		const std::vector<double> &jlp1_r = jlp1[ir];
@@ -340,7 +340,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 		}
 
 		ModuleBase::Integral::Simpson_Integral(kmesh,ModuleBase::GlobalFunc::VECTOR_TO_PTR(integrated_func),dk,temp);
-		drs[ir] = -FOUR_PI*(l+1)/(2.0*l+1) * temp;
+		drs[ir] = -ModuleBase::FOUR_PI*(l+1)/(2.0*l+1) * temp;
 	}
 
 	// cal rs[0] special
@@ -358,7 +358,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 
 			// PLEASE try to make dualfac function as input parameters
 			// mohan note 2021-03-23
-			rs[0] = FOUR_PI / ModuleBase::Mathzone_Add1::dualfac (2*l+1) * temp;
+			rs[0] = ModuleBase::FOUR_PI / ModuleBase::Mathzone_Add1::dualfac (2*l+1) * temp;
 		}
 	}
 	

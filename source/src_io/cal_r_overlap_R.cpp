@@ -256,7 +256,7 @@ void cal_r_overlap_R::out_r_overlap_R(const int nspin)
     int R_y;
     int R_z;
 
-	double factor = sqrt(FOUR_PI/3.0);
+	double factor = sqrt(ModuleBase::FOUR_PI/3.0);
 	
 	for(int ix = 0; ix < R_x_num; ix++)
     {

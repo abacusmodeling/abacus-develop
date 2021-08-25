@@ -190,7 +190,7 @@ void pseudopot_cell_vl::vloc_of_g(
 		vloc_1d[ig] -= fac * exp(- gx2 * 0.25)/ gx2;
 	} // enddo
 
-	const double d_fpi_omega = FOUR_PI/GlobalC::ucell.omega;//mohan add 2008-06-04
+	const double d_fpi_omega = ModuleBase::FOUR_PI/GlobalC::ucell.omega;//mohan add 2008-06-04
 	for (ig = 0;ig < GlobalC::pw.nggm; ig++)
 	{
 		vloc_1d[ig] *= d_fpi_omega;

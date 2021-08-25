@@ -358,7 +358,7 @@ bool Diago_CG::update_psi(
 
     if (e1>e2)
     {
-        theta +=  PI_HALF;
+        theta +=  ModuleBase::PI_HALF;
     }
 
     eigenvalue = min( e1, e2 );

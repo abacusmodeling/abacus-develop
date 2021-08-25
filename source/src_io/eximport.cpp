@@ -213,7 +213,7 @@ void eximport::out_gspace_wan(const ModuleBase::ComplexMatrix *psi,const int iw,
 		}
 	}
 	int nks = GlobalC::kv.nks;
-	double factor = TWO_PI/GlobalC::ucell.lat0;
+	double factor = ModuleBase::TWO_PI/GlobalC::ucell.lat0;
 	out_gwan << qtot << std::endl;
 	for(int ik=0;ik<nks;ik++)
 	{

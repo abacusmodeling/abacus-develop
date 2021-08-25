@@ -345,7 +345,7 @@ void Exx_Lip::phi_cal(k_package *kq_pack, int ikq)
 				for( int iz=pw_ptr->nczp_start; iz<pw_ptr->nczp_start+pw_ptr->nczp; ++iz)
 				{
 					const double phase_xyz = phase_xy + kq_pack->kv_ptr->kvec_d[ikq].z * iz / pw_ptr->ncz;
-					const std::complex<double> exp_tmp = exp(phase_xyz*TWO_PI*IMAG_UNIT);
+					const std::complex<double> exp_tmp = exp(phase_xyz*ModuleBase::TWO_PI*IMAG_UNIT);
 					phi[iw][ir] = UFFT_ptr->porter[ir]*exp_tmp;
 					++ir;
 				}
@@ -379,7 +379,7 @@ void Exx_Lip::psi_cal()
 						for( int iz=pw_ptr->nczp_start; iz<pw_ptr->nczp_start+pw_ptr->nczp; ++iz)
 						{
 							const double phase_xyz = phase_xy + q_pack->kv_ptr->kvec_d[iq].z * iz / pw_ptr->ncz;
-							const std::complex<double> exp_tmp = exp(phase_xyz*TWO_PI*IMAG_UNIT);
+							const std::complex<double> exp_tmp = exp(phase_xyz*ModuleBase::TWO_PI*IMAG_UNIT);
 							psi[iq][ib][ir] = UFFT_ptr->porter[ir]*exp_tmp;
 							++ir;
 						}
@@ -437,7 +437,7 @@ void Exx_Lip::qkg2_exp(int ik, int iq)
 {
 	for( int ig=0; ig<pw_ptr->ngmc; ++ig)
 	{
-		const double qkg2 = ( (q_pack->kv_ptr->kvec_c[iq] - k_pack->kv_ptr->kvec_c[ik] + pw_ptr->gcar[ig]) *(TWO_PI/ucell_ptr->lat0)).norm2();
+		const double qkg2 = ( (q_pack->kv_ptr->kvec_c[iq] - k_pack->kv_ptr->kvec_c[ik] + pw_ptr->gcar[ig]) *(ModuleBase::TWO_PI/ucell_ptr->lat0)).norm2();
 		if( (Exx_Global::Hybrid_Type::PBE0==info.hybrid_type) || (Exx_Global::Hybrid_Type::HF==info.hybrid_type) )
 		{
 			if( abs(qkg2)<1e-10 )
@@ -471,7 +471,7 @@ void Exx_Lip::b_cal( int ik, int iq, int ib)
 			for( size_t iz=pw_ptr->nczp_start; iz<pw_ptr->nczp_start+pw_ptr->nczp; ++iz)
 			{
 				const double phase_xyz = phase_xy + q_minus_k.z*iz/pw_ptr->ncz;
-				mul_tmp[ir] = exp(-phase_xyz*TWO_PI*IMAG_UNIT);
+				mul_tmp[ir] = exp(-phase_xyz*ModuleBase::TWO_PI*IMAG_UNIT);
 				mul_tmp[ir] *= psi[iq][ib][ir];
 				++ir;
 			}

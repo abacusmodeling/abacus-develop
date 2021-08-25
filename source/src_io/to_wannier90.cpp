@@ -131,7 +131,7 @@ void toWannier90::read_nnkp()
 				  >> recip_lattice_nnkp.e21 >> recip_lattice_nnkp.e22 >> recip_lattice_nnkp.e23
 				  >> recip_lattice_nnkp.e31 >> recip_lattice_nnkp.e32 >> recip_lattice_nnkp.e33;
 		
-		const double tpiba_angstrom = TWO_PI / GlobalC::ucell.lat0_angstrom;
+		const double tpiba_angstrom = ModuleBase::TWO_PI / GlobalC::ucell.lat0_angstrom;
 		recip_lattice_nnkp = recip_lattice_nnkp / tpiba_angstrom;
 		
 		if(abs(recip_lattice_nnkp.e11 - GlobalC::ucell.G.e11) > 1.0e-4) 
@@ -1368,7 +1368,7 @@ void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orb
 	std::complex<double> *sk = new std::complex<double>[npw];
 	for(int ig = 0; ig < npw; ig++)
 	{
-		const double arg = ( gk[ig] * R_centre[wannier_index] ) * TWO_PI;
+		const double arg = ( gk[ig] * R_centre[wannier_index] ) * ModuleBase::TWO_PI;
 		sk[ig] = std::complex <double> ( cos(arg),  -sin(arg) );
 	}
 	
@@ -1433,7 +1433,7 @@ void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orb
 
 void toWannier90::integral(const int meshr, const double *psir, const double *r, const double *rab, const int &l, double* table)
 {
-	const double pref = FOUR_PI / sqrt(GlobalC::ucell.omega);
+	const double pref = ModuleBase::FOUR_PI / sqrt(GlobalC::ucell.omega);
 	
 	double *inner_part = new double[meshr];
 	for(int ir=0; ir<meshr; ir++)

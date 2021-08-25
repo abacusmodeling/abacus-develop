@@ -62,7 +62,7 @@ template<>
 ModuleBase::ComplexMatrix Exx_Abfs::Parallel::Communicate::Hexx::H_phase<ModuleBase::ComplexMatrix>(
 	ModuleBase::matrix &&HR, const int ik, const Abfs::Vector3_Order<int> &box2) const
 {
-	return ModuleBase::ComplexMatrix(HR) * exp( TWO_PI*IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (box2*GlobalC::ucell.latvec)) );
+	return ModuleBase::ComplexMatrix(HR) * exp( ModuleBase::TWO_PI*IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (box2*GlobalC::ucell.latvec)) );
 }
 
 template<typename Tmatrix>

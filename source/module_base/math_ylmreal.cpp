@@ -204,7 +204,7 @@ void YlmReal::rlylm
 	
 	for(int il = 0; il <= lmax; il++)
 	{
-		double fac = sqrt( (2.0 * il + 1.0) / FOUR_PI );
+		double fac = sqrt( (2.0 * il + 1.0) / ModuleBase::FOUR_PI );
 
 		double rl = pow(rpi, il);
 			
@@ -333,7 +333,7 @@ void YlmReal::Ylm_Real
     {
         for (int i=0;i<ng;i++)
         {
-            ylm(0, i) = SQRT_INVERSE_FOUR_PI;
+            ylm(0, i) = ModuleBase::SQRT_INVERSE_FOUR_PI;
         }
         return;
     }
@@ -369,7 +369,7 @@ void YlmReal::Ylm_Real
         }
         else
         {
-            phi[ig] = PI_HALF * ((g[ig].y >= 0.0) ? 1.0 : -1.0); //HLX: modified on 10/13/2006
+            phi[ig] = ModuleBase::PI_HALF * ((g[ig].y >= 0.0) ? 1.0 : -1.0); //HLX: modified on 10/13/2006
         } // end if
     } // enddo
 
@@ -383,7 +383,7 @@ void YlmReal::Ylm_Real
     int lm = -1;
     for (int l=0; l<=lmax; l++)
     {
-        const double c = sqrt((2*l+1) / FOUR_PI);
+        const double c = sqrt((2*l+1) / ModuleBase::FOUR_PI);
         if (l == 0)
         {
             for (i=0;i<ng;i++)
@@ -512,7 +512,7 @@ void YlmReal::Ylm_Real
     			{
     				sum_before += ylm(count, ig) * ylm(count, ig);
     			}
-    			sum_before *= FOUR_PI/ng;
+    			sum_before *= ModuleBase::FOUR_PI/ng;
     			GlobalV::ofs_running<<std::setw(5)<<l<<std::setw(5)<<m<<std::setw(15)<<sum_before;
 
 
@@ -526,7 +526,7 @@ void YlmReal::Ylm_Real
     //				sum += ylm(count, ig) * ylm(count, ig);
     //			}
     //			count++;
-    //			GlobalV::ofs_running<<std::setw(15)<<sum*FOUR_PI/ng;
+    //			GlobalV::ofs_running<<std::setw(15)<<sum*ModuleBase::FOUR_PI/ng;
 
     			GlobalV::ofs_running<<std::endl;
     		}

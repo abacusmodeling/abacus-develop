@@ -178,8 +178,8 @@ double Charge_Mixing::rhog_dot_product(
 {
     ModuleBase::TITLE("Charge_Mixing","rhog_dot_product");
 	ModuleBase::timer::tick("Charge_Mixing","rhog_dot_product");
-    static const double fac = e2 * FOUR_PI / GlobalC::ucell.tpiba2;
-    static const double fac2 = e2 * FOUR_PI / (TWO_PI * TWO_PI);
+    static const double fac = e2 * ModuleBase::FOUR_PI / GlobalC::ucell.tpiba2;
+    static const double fac2 = e2 * ModuleBase::FOUR_PI / (ModuleBase::TWO_PI * ModuleBase::TWO_PI);
 
     double sum = 0.0;
 	

@@ -122,7 +122,7 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 		lat0_angstrom = lat0 * 0.529177 ;
 		ModuleBase::GlobalFunc::OUT(ofs_running,"lattice constant (Bohr)",lat0);
 		ModuleBase::GlobalFunc::OUT(ofs_running,"lattice constant (Angstrom)",lat0_angstrom);
-		this->tpiba  = TWO_PI / lat0;
+		this->tpiba  = ModuleBase::TWO_PI / lat0;
 		this->tpiba2 = tpiba * tpiba;
 	}
 

@@ -159,7 +159,7 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 		}
 		// Call simpson integration
 		ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,kab,temp);
-		rs[ir] = temp * FOUR_PI;
+		rs[ir] = temp * ModuleBase::FOUR_PI;
 		
 		//drs
 		double temp1, temp2;
@@ -184,11 +184,11 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 		
 		if (l == 0)
 		{
-			drs[ir] = -FOUR_PI*temp2;
+			drs[ir] = -ModuleBase::FOUR_PI*temp2;
 		}
 		else
 		{
-			drs[ir] = FOUR_PI*(temp1*l-(l+1)*temp2)/(2.0*l+1);
+			drs[ir] = ModuleBase::FOUR_PI*(temp1*l-(l+1)*temp2)/(2.0*l+1);
 		}
 	}
 	
@@ -207,7 +207,7 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 		
 		// Call simpson integration
 		ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,kab,temp);
-		rs[0] = FOUR_PI / ModuleBase::Mathzone_Add1::dualfac (2*l+1) * temp;
+		rs[0] = ModuleBase::FOUR_PI / ModuleBase::Mathzone_Add1::dualfac (2*l+1) * temp;
 	}
 	
 	delete [] integrated_func;

@@ -538,7 +538,7 @@ double Occupy::wgauss(const double &x,const int n)
     {
         const double xp = x - 1.00 / SQRT2;
         const double arg = std::min(maxarg, xp * xp);
-        wga = 0.50 * erf(xp) + 1.00 / sqrt( TWO_PI ) * std::exp(- arg) + 0.50;
+        wga = 0.50 * erf(xp) + 1.00 / sqrt( ModuleBase::TWO_PI ) * std::exp(- arg) + 0.50;
         return wga;
     }
 
@@ -624,7 +624,7 @@ double Occupy::w1gauss(const double &x,const int n)
     {
         const double xp = x - 1.00 / SQRT2;
         const double arg = std::min(200.0, xp*xp);
-        w1 = 1.00 / sqrt(TWO_PI) * xp * std::exp(- arg);
+        w1 = 1.00 / sqrt(ModuleBase::TWO_PI) * xp * std::exp(- arg);
         return w1;
     }
 

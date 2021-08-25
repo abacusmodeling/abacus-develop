@@ -442,7 +442,7 @@ void Exx_Lcao::init()
 		{
 			for( size_t i=0; i!=boxes.size(); ++i )
 			{
-				std::cout<<exp( -TWO_PI*IMAG_UNIT* (GlobalC::kv.kvec_c[ik]* (boxes[i]*GlobalC::ucell.latvec)) )<<"\t";
+				std::cout<<exp( -ModuleBase::TWO_PI*IMAG_UNIT* (GlobalC::kv.kvec_c[ik]* (boxes[i]*GlobalC::ucell.latvec)) )<<"\t";
 			}
 			std::cout<<std::endl;
 		}
@@ -460,7 +460,7 @@ void Exx_Lcao::init()
 		{
 			for( size_t i=0; i!=boxes.size(); ++i )
 			{
-				std::cout<<exp( -TWO_PI*IMAG_UNIT* (GlobalC::kv.kvec_d[ik]* static_cast<ModuleBase::Vector3<double>>(boxes[i])) )<<"\t";
+				std::cout<<exp( -ModuleBase::TWO_PI*IMAG_UNIT* (GlobalC::kv.kvec_d[ik]* static_cast<ModuleBase::Vector3<double>>(boxes[i])) )<<"\t";
 			}
 			std::cout<<std::endl;
 		}
@@ -499,7 +499,7 @@ void Exx_Lcao::init()
 				m(ir,ic) = ir*10+ic;
 			}
 		}
-		ModuleBase::ComplexMatrix cm = ModuleBase::ComplexMatrix(m) * exp( -TWO_PI*IMAG_UNIT* 1.0/3.0 );
+		ModuleBase::ComplexMatrix cm = ModuleBase::ComplexMatrix(m) * exp( -ModuleBase::TWO_PI*IMAG_UNIT* 1.0/3.0 );
 		std::cout<<m<<std::endl;
 		std::cout<<cm<<std::endl;
 	};

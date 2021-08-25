@@ -19,7 +19,7 @@ void Ylm::get_ylm_real( const int &Lmax, const ModuleBase::Vector3<double> &vec,
 	{
 		for(int i=0; i<Ylm::nlm; i++)
 		{
-			ylmr[i] = SQRT_INVERSE_FOUR_PI;
+			ylmr[i] = ModuleBase::SQRT_INVERSE_FOUR_PI;
 		}
 	}
 
@@ -53,7 +53,7 @@ void Ylm::get_ylm_real( const int &Lmax, const ModuleBase::Vector3<double> &vec,
 	}
 	else
 	{
-		phi = PI_HALF * ((vec.y >= 0.0) ? 1.0 : -1.0);
+		phi = ModuleBase::PI_HALF * ((vec.y >= 0.0) ? 1.0 : -1.0);
 	}
 
 	//===============================
@@ -68,7 +68,7 @@ void Ylm::get_ylm_real( const int &Lmax, const ModuleBase::Vector3<double> &vec,
 
 	for (int l=0; l<Lmax; l++)
 	{
-		const double c = sqrt((2*l+1) / FOUR_PI);
+		const double c = sqrt((2*l+1) / ModuleBase::FOUR_PI);
 		if (l == 0)
 		{ 
 			p[0][0] = 1.0; 
@@ -135,7 +135,7 @@ void Ylm::get_ylm_real( const int &Lmax, const ModuleBase::Vector3<double> &vec,
 	{
 		for(int i=0; i<Ylm::nlm; i++)
 		{
-			ylmr[i] = SQRT_INVERSE_FOUR_PI;
+			ylmr[i] = ModuleBase::SQRT_INVERSE_FOUR_PI;
 			for(int j = 0; j < 3; j++)
 			{
 				dylmdr[i][j] = 0.0;
@@ -172,7 +172,7 @@ void Ylm::get_ylm_real( const int &Lmax, const ModuleBase::Vector3<double> &vec,
 	}
 	else
 	{
-		phi = PI_HALF * ((vec.y >= 0.0) ? 1.0 : -1.0);
+		phi = ModuleBase::PI_HALF * ((vec.y >= 0.0) ? 1.0 : -1.0);
 	}
 
 	//===============================
@@ -186,7 +186,7 @@ void Ylm::get_ylm_real( const int &Lmax, const ModuleBase::Vector3<double> &vec,
 	int lm = -1; // must initialized!
 	for (int l=0; l<Lmax; l++)
 	{
-		const double c = sqrt((2*l+1) / FOUR_PI);
+		const double c = sqrt((2*l+1) / ModuleBase::FOUR_PI);
 		if (l == 0)
 		{ 
 			p[0][0] = 1.0; 
@@ -456,7 +456,7 @@ void Ylm::rlylm
 	int ic = 0;
 	for(int il = 0; il <= MaxL; il++)
 	{
-		double fac = sqrt( (2.0 * il + 1.0) / FOUR_PI );
+		double fac = sqrt( (2.0 * il + 1.0) / ModuleBase::FOUR_PI );
 			
 		//m=0
 		rly[ic] = Am[0] * zdep[il][0] * fac;
@@ -1056,8 +1056,8 @@ void Ylm::grad_rl_sph_harm
 	
 void Ylm::set_coefficients(void)
 {
-	Ylm::ylmcoef[0] = 1.0 / sqrt(FOUR_PI);
-	Ylm::ylmcoef[1] = sqrt (3.0 / FOUR_PI);
+	Ylm::ylmcoef[0] = 1.0 / sqrt(ModuleBase::FOUR_PI);
+	Ylm::ylmcoef[1] = sqrt (3.0 / ModuleBase::FOUR_PI);
 	Ylm::ylmcoef[2] = sqrt (15.0) / 2.0;
 	Ylm::ylmcoef[3] = sqrt (5.0) / 2.0;
 	Ylm::ylmcoef[4] = sqrt (5.0);
@@ -1480,7 +1480,7 @@ void Ylm::rlylm
 	int ic = 0;
 	for(int il = 0; il <= MaxL; il++)
 	{
-		double fac = sqrt( (2.0 * il + 1.0) / FOUR_PI );
+		double fac = sqrt( (2.0 * il + 1.0) / ModuleBase::FOUR_PI );
 			
 		//m=0
 		rly[ic] = Am[0] * zdep[il][0] * fac;

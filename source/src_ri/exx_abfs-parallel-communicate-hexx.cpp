@@ -119,7 +119,7 @@ std::map<size_t,std::map<size_t,ModuleBase::ComplexMatrix>> Exx_Abfs::Parallel::
 			for( auto & HRC : HRB.second )
 			{
 				const Abfs::Vector3_Order<int> & box2 = HRC.first;
-				HK_tmp += ModuleBase::ComplexMatrix(HRC.second) * exp( TWO_PI*IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (box2*GlobalC::ucell.latvec)) );
+				HK_tmp += ModuleBase::ComplexMatrix(HRC.second) * exp( ModuleBase::TWO_PI*IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (box2*GlobalC::ucell.latvec)) );
 			}
 			HK[iat1][iat2] = std::move(HK_tmp);
 		}

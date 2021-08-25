@@ -71,7 +71,7 @@ void Stochastic_Chebychev::calcoef(double fun(double))
     //(M)iddle point integral method part
     for(int i = 0; i < norder2; ++i)
     {
-        dcoef[i]=fun(cos((i+0.5)*TWO_PI/norder2));
+        dcoef[i]=fun(cos((i+0.5)*ModuleBase::TWO_PI/norder2));
     }
 
     fftw_execute(plancoef);
@@ -91,7 +91,7 @@ void Stochastic_Chebychev::calcoef(double fun(double))
     //(T)rapezoid integral method part
     for(int i = 0; i < norder2; ++i)
     {
-        dcoef[i]=fun(cos(i*TWO_PI/norder2));
+        dcoef[i]=fun(cos(i*ModuleBase::TWO_PI/norder2));
     }
     
     fftw_execute(plancoef);

@@ -729,7 +729,7 @@ void DFTU_RELAX::fold_dSm_k(const int ik, const int dim, std::complex<double>* d
 					    if(nu<0) continue;
 
 			  			ModuleBase::Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
-			  			const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * TWO_PI;
+			  			const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * ModuleBase::TWO_PI;
 			  			const std::complex<double> kphase( cos(arg),  sin(arg) );
 
               			dSm_k[nu*GlobalC::ParaO.nrow + mu] += dSm_ptr[nnr]*kphase;
@@ -829,7 +829,7 @@ void DFTU_RELAX::fold_dSR_k(const int ik, const int dim1, const int dim2, std::c
 					    if(nu<0)continue;
               	
 			  			ModuleBase::Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
-			  			const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * TWO_PI;
+			  			const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * ModuleBase::TWO_PI;
 			  			const std::complex<double> kphase( cos(arg),  sin(arg) );
 
 			  			dSR_k[nu*GlobalC::ParaO.nrow + mu] += dSm_ptr[nnr]*GlobalC::LM.DH_r[nnr*3+dim2]*kphase;														

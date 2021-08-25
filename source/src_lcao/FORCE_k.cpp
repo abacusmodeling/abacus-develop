@@ -266,7 +266,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 							//-----------------
 							// exp[i * R * k]
 							//-----------------
-							const std::complex<double> phase = w1 * exp(TWO_PI * IMAG_UNIT * (
+							const std::complex<double> phase = w1 * exp(ModuleBase::TWO_PI * IMAG_UNIT * (
 										GlobalC::kv.kvec_d[ik].x * RA.info[iat][cb][0] +
 										GlobalC::kv.kvec_d[ik].y * RA.info[iat][cb][1] +
 										GlobalC::kv.kvec_d[ik].z * RA.info[iat][cb][2]

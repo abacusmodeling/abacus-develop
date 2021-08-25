@@ -375,7 +375,7 @@ void Forces::cal_force_loc(ModuleBase::matrix& forcelc)
         {
             for (int ig = gstart_here; ig < GlobalC::pw.ngmc; ig++)
             {
-                const double phase = TWO_PI * (GlobalC::pw.get_G_cartesian(ig) * GlobalC::ucell.atoms[it].tau[ia]);
+                const double phase = ModuleBase::TWO_PI * (GlobalC::pw.get_G_cartesian(ig) * GlobalC::ucell.atoms[it].tau[ia]);
                 const double factor = GlobalC::ppcell.vloc(it, GlobalC::pw.ig2ngg[ig]) *
 									  ( cos(phase) * aux[ GlobalC::pw.ig2fftc[ig] ].imag()
                                       + sin(phase) * aux[ GlobalC::pw.ig2fftc[ig] ].real()); 
@@ -435,7 +435,7 @@ void Forces::cal_force_ew(ModuleBase::matrix& forceion)
         {
             ModuleBase::WARNING_QUIT("ewald","Can't find optimal alpha.");
         }
-        upperbound = 2.0 * charge * charge * sqrt(2.0 * alpha / TWO_PI) *
+        upperbound = 2.0 * charge * charge * sqrt(2.0 * alpha / ModuleBase::TWO_PI) *
                      erfc(sqrt(GlobalC::ucell.tpiba2 * GlobalC::pw.ggchg / 4.0 / alpha));
     }
     while (upperbound > 1.0e-6);
@@ -459,7 +459,7 @@ void Forces::cal_force_ew(ModuleBase::matrix& forceion)
         {
             for (int ig = gstart; ig < GlobalC::pw.ngmc; ig++)
             {
-                const double arg = TWO_PI * (GlobalC::pw.get_G_cartesian(ig) * GlobalC::ucell.atoms[it].tau[ia]);
+                const double arg = ModuleBase::TWO_PI * (GlobalC::pw.get_G_cartesian(ig) * GlobalC::ucell.atoms[it].tau[ia]);
                 double sumnb =  -cos(arg) * aux[ig].imag() + sin(arg) * aux[ig].real();
                 forceion(iat, 0) += GlobalC::pw.get_G_cartesian_projection(ig, 0) * sumnb;
                 forceion(iat, 1) += GlobalC::pw.get_G_cartesian_projection(ig, 1) * sumnb;
@@ -467,7 +467,7 @@ void Forces::cal_force_ew(ModuleBase::matrix& forceion)
             }
             for (int ipol = 0;ipol < 3;ipol++)
             {
-                forceion(iat, ipol) *= GlobalC::ucell.atoms[it].zv * e2 * GlobalC::ucell.tpiba * TWO_PI / GlobalC::ucell.omega * fact;
+                forceion(iat, ipol) *= GlobalC::ucell.atoms[it].zv * e2 * GlobalC::ucell.tpiba * ModuleBase::TWO_PI / GlobalC::ucell.omega * fact;
             }
 
 	//		std::cout << " atom" << iat << std::endl;
@@ -516,7 +516,7 @@ void Forces::cal_force_ew(ModuleBase::matrix& forceion)
 
                                 double factor = GlobalC::ucell.atoms[T1].zv * GlobalC::ucell.atoms[T2].zv * e2 / (rr * rr)
                                                 * (erfc(sqrt(alpha) * rr) / rr
-                                    + sqrt(8.0 * alpha / TWO_PI) * exp(-1.0 * alpha * rr * rr)) * GlobalC::ucell.lat0;
+                                    + sqrt(8.0 * alpha / ModuleBase::TWO_PI) * exp(-1.0 * alpha * rr * rr)) * GlobalC::ucell.lat0;
 
 								forceion(iat1, 0) -= factor * r[n].x;
                                 forceion(iat1, 1) -= factor * r[n].y;
@@ -623,7 +623,7 @@ void Forces::cal_force_cc(ModuleBase::matrix& forcecc)
             {
                 for (int ig = GlobalC::pw.gstart; ig < GlobalC::pw.ngmc; ig++)
                 {
-                    const double arg = TWO_PI * (GlobalC::pw.get_G_cartesian_projection(ig, 0) * GlobalC::ucell.atoms[T1].tau[I1].x + 
+                    const double arg = ModuleBase::TWO_PI * (GlobalC::pw.get_G_cartesian_projection(ig, 0) * GlobalC::ucell.atoms[T1].tau[I1].x + 
                         GlobalC::pw.get_G_cartesian_projection(ig, 1) * GlobalC::ucell.atoms[T1].tau[I1].y + 
                         GlobalC::pw.get_G_cartesian_projection(ig, 2) * GlobalC::ucell.atoms[T1].tau[I1].z);
 
@@ -877,7 +877,7 @@ void Forces::cal_force_scc(ModuleBase::matrix& forcescc)
                 {
                     for (int ig = GlobalC::pw.gstart;ig < GlobalC::pw.ngmc;ig++)
                     {
-                        const double arg = TWO_PI * (GlobalC::pw.get_G_cartesian_projection(ig, 0) * GlobalC::ucell.atoms[it].tau[ia].x + 
+                        const double arg = ModuleBase::TWO_PI * (GlobalC::pw.get_G_cartesian_projection(ig, 0) * GlobalC::ucell.atoms[it].tau[ia].x + 
                             GlobalC::pw.get_G_cartesian_projection(ig, 1) * GlobalC::ucell.atoms[it].tau[ia].y + 
                             GlobalC::pw.get_G_cartesian_projection(ig, 2) * GlobalC::ucell.atoms[it].tau[ia].z);
 

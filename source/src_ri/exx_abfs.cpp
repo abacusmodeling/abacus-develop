@@ -1072,7 +1072,7 @@ void density_matrix()
 		{
 			for( size_t ik=k_start; ik!=k_end; ++ik )
 			{
-				DM_R[is][iR] += exp(TWO_PI*IMAG_UNIT*dot(GlobalC::kv.kvec_d[ik],R_supercell[iR])) * DM[ik];
+				DM_R[is][iR] += exp(ModuleBase::TWO_PI*IMAG_UNIT*dot(GlobalC::kv.kvec_d[ik],R_supercell[iR])) * DM[ik];
 			}
 		}
 	}

@@ -72,7 +72,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
         {
             ModuleBase::WARNING_QUIT("ewald","Can't find optimal alpha.");
         }
-        upperbound = 2.0 * charge * charge * sqrt(2.0 * alpha / TWO_PI) *
+        upperbound = 2.0 * charge * charge * sqrt(2.0 * alpha / ModuleBase::TWO_PI) *
                      erfc(sqrt(cell.tpiba2 * pwb.ggchg / 4.0 / alpha));
     }
     while (upperbound > 1.0e-7);
@@ -118,7 +118,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
         }
     }
 
-    ewaldg = FOUR_PI / cell.omega * ewaldg;
+    ewaldg = ModuleBase::FOUR_PI / cell.omega * ewaldg;
 
 //	std::cout << "\n ewaldg = " << ewaldg;
 
@@ -127,7 +127,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 	{
     	for (int it = 0; it < cell.ntype;it++)
     	{
-        	ewaldg = ewaldg - cell.atoms[it].na * cell.atoms[it].zv * cell.atoms[it].zv * sqrt(8.0 / TWO_PI * alpha);
+        	ewaldg = ewaldg - cell.atoms[it].na * cell.atoms[it].zv * cell.atoms[it].zv * sqrt(8.0 / ModuleBase::TWO_PI * alpha);
 		}
     }//mohan modify 2007-11-7, 2010-07-26
 

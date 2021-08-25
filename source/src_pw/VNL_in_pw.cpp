@@ -352,7 +352,7 @@ void pseudopot_cell_vnl::init_vnl(UnitCell_pseudo &cell)
 	// fill the interpolation table tab
 	************************************************************/
 
-	const double pref = FOUR_PI / sqrt(cell.omega);
+	const double pref = ModuleBase::FOUR_PI / sqrt(cell.omega);
 	this->tab.zero_out();
 	GlobalV::ofs_running<<"\n Init Non-Local PseudoPotential table : ";
 	for (int it = 0;it < cell.ntype;it++)  
@@ -577,7 +577,7 @@ void pseudopot_cell_vnl::init_vnl_alpha(void)          // pengfei Li 2018-3-23
 	// max number of beta functions
 	const int nbrx = 10;
 
-	const double pref = FOUR_PI / sqrt(GlobalC::ucell.omega);
+	const double pref = ModuleBase::FOUR_PI / sqrt(GlobalC::ucell.omega);
 	this->tab_alpha.create(GlobalC::ucell.ntype, nbrx, lmaxkb+2, GlobalV::NQX);
 	this->tab_alpha.zero_out();
 	GlobalV::ofs_running<<"\n Init Non-Local PseudoPotential table( including L index) : ";

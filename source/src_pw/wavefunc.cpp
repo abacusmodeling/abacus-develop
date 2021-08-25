@@ -522,7 +522,7 @@ void wavefunc::wfcinit_k(void)
 								gkqg = GlobalC::pw.get_GPlusK_cartesian(ik, GlobalC::wf.igk(ik, ig)) + qg;
 								for(int ir=0; ir<Rmax[iw1][iw2]; ir++)   // Rmax
 								{
-									arg = gkqg * Rcar[iw1][iw2][ir] * TWO_PI;
+									arg = gkqg * Rcar[iw1][iw2][ir] * ModuleBase::TWO_PI;
 									phase = std::complex<double>( cos(arg),  -sin(arg) );
 									overlap_aux[iw1][iw2][g][ir] += conj(GlobalC::wf.wanf2[ik](iw1,ig)) 
 									* wanf2_q[ik][iw2][ig] * phase/static_cast<double>(GlobalC::kv.nks);		

@@ -1064,7 +1064,7 @@ void Chi0_hilbert::Cal_Psi(int iq, std::complex<double> **psi_r)
 				phase_xy = phase_x + GlobalC::kv.kvec_d[iq].y*iy/GlobalC::pw.ncy;
 				for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; iz++)
 				{
-					phase_xyz = (phase_xy + GlobalC::kv.kvec_d[iq].z*iz/GlobalC::pw.ncz) *TWO_PI;
+					phase_xyz = (phase_xy + GlobalC::kv.kvec_d[iq].z*iz/GlobalC::pw.ncz) *ModuleBase::TWO_PI;
 					exp_tmp = std::complex<double>( cos(phase_xyz), sin(phase_xyz) );
 					psi_r[ib][ir] = GlobalC::UFFT.porter[ir]*exp_tmp;
 					ir++;
@@ -1100,7 +1100,7 @@ void Chi0_hilbert::Cal_Psi_down(int iq, std::complex<double> **psi_r)
 				phase_xy = phase_x + GlobalC::kv.kvec_d[iq].y*iy/GlobalC::pw.ncy;
 				for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; iz++)
 				{
-					phase_xyz = (phase_xy + GlobalC::kv.kvec_d[iq].z*iz/GlobalC::pw.ncz) *TWO_PI;
+					phase_xyz = (phase_xy + GlobalC::kv.kvec_d[iq].z*iz/GlobalC::pw.ncz) *ModuleBase::TWO_PI;
 					exp_tmp = std::complex<double>( cos(phase_xyz), sin(phase_xyz) );
 					psi_r[ib][ir] = GlobalC::UFFT.porter[ir]*exp_tmp;
 					ir++;
@@ -1151,7 +1151,7 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 		{
 			for(int ir=0; ir<Rmax[iw1][iw2]; ir++)
 			{
-				arg = qk * Rcar[iw1][iw2][ir] * TWO_PI;
+				arg = qk * Rcar[iw1][iw2][ir] * ModuleBase::TWO_PI;
 				phase[iw1][iw2][ir] = std::complex<double>( cos(arg),  sin(arg) );
 				MR++;
 				//std::cout << "phase["<<iw1<<"]["<<iw2<<"]["<<ir<<"] = "<<phase[iw1][iw2][ir]<<std::endl;
@@ -1286,7 +1286,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 					phase_xy = phase_x + q.y*iy/GlobalC::pw.ncy;
 					for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; iz++)
 					{
-						phase_xyz = (phase_xy + q.z*iz/GlobalC::pw.ncz) *TWO_PI;
+						phase_xyz = (phase_xy + q.z*iz/GlobalC::pw.ncz) *ModuleBase::TWO_PI;
 						exp_tmp = std::complex<double>(cos(-phase_xyz), sin(-phase_xyz));
 						GlobalC::UFFT.porter[ir] = conj(psi_r1[ib1][ir]) * psi_r2[ib2][ir] *exp_tmp;
 						ir++;
@@ -1340,7 +1340,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 	//		{
 	//			for(int ig =0; ig< GlobalC::kv.ngk[ik]; ig++)
 	//			{
-	//				b[ig][ib1][ib2] += conj(GlobalC::wf.evc[ik](ib1,ig)) * sqrt(((GlobalC::kv.kvec_c[ik]+GlobalC::pw.gcar[ig])*(-TWO_PI/GlobalC::ucell.lat0)).norm2()) * GlobalC::wf.evc[ik](ib2,ig);
+	//				b[ig][ib1][ib2] += conj(GlobalC::wf.evc[ik](ib1,ig)) * sqrt(((GlobalC::kv.kvec_c[ik]+GlobalC::pw.gcar[ig])*(-ModuleBase::TWO_PI/GlobalC::ucell.lat0)).norm2()) * GlobalC::wf.evc[ik](ib2,ig);
 	//			}
 	//			b[ig][ib1][ib2] /=(GlobalC::wf.ekb[ik][ib1] - GlobalC::wf.ekb[ik][ib2]);
 	//		}
@@ -1392,7 +1392,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
         //                                phase_xy = phase_x + (q.y + GlobalC::pw.gdirect[ig].y)*iy/GlobalC::pw.ncy;
         //                                for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; ++iz)
         //                                {
-        //                                        phase_xyz = (phase_xy + (q.z + GlobalC::pw.gdirect[ig].z)*iz/GlobalC::pw.ncz) *TWO_PI;
+        //                                        phase_xyz = (phase_xy + (q.z + GlobalC::pw.gdirect[ig].z)*iz/GlobalC::pw.ncz) *ModuleBase::TWO_PI;
         //                                        exp_tmp.real() = cos(-phase_xyz);
         //                                        exp_tmp.imag() = sin(-phase_xyz);
         //                                        b[ig][ib1][ib2] = b[ig][ib1][ib2] +  conj(psi_r1[ib1][ir]) * psi_r2[ib2][ir] *exp_tmp;
@@ -1417,7 +1417,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
                     phase_xy = phase_x + (q.y + GlobalC::pw.gdirect[ig].y)*iy/GlobalC::pw.ncy;
                     for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; ++iz)
                     {
-                        phase_xyz = (phase_xy + (q.z + GlobalC::pw.gdirect[ig].z)*iz/GlobalC::pw.ncz) *TWO_PI;
+                        phase_xyz = (phase_xy + (q.z + GlobalC::pw.gdirect[ig].z)*iz/GlobalC::pw.ncz) *ModuleBase::TWO_PI;
                         exp_tmp.real() = cos(-phase_xyz);
                         exp_tmp.imag() = sin(-phase_xyz);
                         for(int ib1=0;ib1<oband;ib1++)
@@ -1814,7 +1814,7 @@ std::complex<double> Chi0_hilbert::f(int k, int j)
 void Chi0_hilbert::Cal_Chi(int iq)
 {
 	ModuleBase::TITLE("Chi0_hilbert","Cal_Chi");
-	double q = sqrt(((GlobalC::kv.kvec_c[iq])*(TWO_PI/GlobalC::ucell.lat0)).norm2());
+	double q = sqrt(((GlobalC::kv.kvec_c[iq])*(ModuleBase::TWO_PI/GlobalC::ucell.lat0)).norm2());
 	std::vector<std::complex<double>> gather_chi(nomega);			// Peize Lin change ptr to std::vector at 2020.01.31
 	for(int i=0; i<nomega; i++)
 	{
@@ -2127,7 +2127,7 @@ void Chi0_hilbert::Cal_Rpa(int iq)
 double Chi0_hilbert::qg2( int iq, int g0)
 {
 	double qg2;
-	qg2 = ((GlobalC::kv.kvec_c[iq]+all_gcar[g0])*(TWO_PI/GlobalC::ucell.lat0)).norm2();
+	qg2 = ((GlobalC::kv.kvec_c[iq]+all_gcar[g0])*(ModuleBase::TWO_PI/GlobalC::ucell.lat0)).norm2();
 	
 	return qg2;
 }
@@ -2393,7 +2393,7 @@ void Chi0_hilbert::Cal_kernel_2D(int iq)
 double Chi0_hilbert::qG(int iq, int g0)
 {
 	double qG;
-	qG = sqrt((GlobalC::kv.kvec_c[iq].x + all_gcar[g0].x) * (GlobalC::kv.kvec_c[iq].x + all_gcar[g0].x) + (GlobalC::kv.kvec_c[iq].y + all_gcar[g0].y) * (GlobalC::kv.kvec_c[iq].y + all_gcar[g0].y)) * (TWO_PI/GlobalC::ucell.lat0);
+	qG = sqrt((GlobalC::kv.kvec_c[iq].x + all_gcar[g0].x) * (GlobalC::kv.kvec_c[iq].x + all_gcar[g0].x) + (GlobalC::kv.kvec_c[iq].y + all_gcar[g0].y) * (GlobalC::kv.kvec_c[iq].y + all_gcar[g0].y)) * (ModuleBase::TWO_PI/GlobalC::ucell.lat0);
      	
 	return qG;
 }
@@ -2401,7 +2401,7 @@ double Chi0_hilbert::qG(int iq, int g0)
 double Chi0_hilbert::qg(int iq, int g0)
 {
 	double qg;
-	qg = sqrt((GlobalC::kv.kvec_c[iq].x + para_g[g0][0]) * (GlobalC::kv.kvec_c[iq].x + para_g[g0][0]) + (GlobalC::kv.kvec_c[iq].y + para_g[g0][1]) * (GlobalC::kv.kvec_c[iq].y + para_g[g0][1])) * (TWO_PI/GlobalC::ucell.lat0);
+	qg = sqrt((GlobalC::kv.kvec_c[iq].x + para_g[g0][0]) * (GlobalC::kv.kvec_c[iq].x + para_g[g0][0]) + (GlobalC::kv.kvec_c[iq].y + para_g[g0][1]) * (GlobalC::kv.kvec_c[iq].y + para_g[g0][1])) * (ModuleBase::TWO_PI/GlobalC::ucell.lat0);
 	
 	return qg;
 }
@@ -2446,7 +2446,7 @@ std::complex<double> Chi0_hilbert:: Cal_g(int iq)
     std::complex<double> g;
     double L = GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0;
     double dz = L/GlobalC::pw.ncz;
-    double q =  sqrt(((GlobalC::kv.kvec_c[iq])*(TWO_PI/GlobalC::ucell.lat0)).norm2());
+    double q =  sqrt(((GlobalC::kv.kvec_c[iq])*(ModuleBase::TWO_PI/GlobalC::ucell.lat0)).norm2());
     
     g = std::complex<double>(0.0,0.0);
 

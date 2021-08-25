@@ -241,7 +241,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 						for(int ir=0; ir<mesh; ++ir)
 						{
 							double r2=atom->r[ir]*atom->r[ir];
-							rhoatm[ir]=atom->rho_at[ir]/FOUR_PI/r2;
+							rhoatm[ir]=atom->rho_at[ir]/ModuleBase::FOUR_PI/r2;
 						}
 						rhoatm[0] = pow( (rhoatm[2]/rhoatm[1]), 1./(atom->r[2]-atom->r[1]) );//zws add
 						rhoatm[0] = pow(rhoatm[0], atom->r[1]);
@@ -262,7 +262,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 						for(int ir=0; ir<mesh; ++ir)
 						{
 							rhoatm[ir] *= scale;
-							rhoatm[ir] *= (FOUR_PI*atom->r[ir]*atom->r[ir]);
+							rhoatm[ir] *= (ModuleBase::FOUR_PI*atom->r[ir]*atom->r[ir]);
 						}
 						return rhoatm;
 					}();
@@ -347,7 +347,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 					else if(startmag_type==2)
 					{
 						std::complex<double> swap = ZERO;
-						std::complex<double> ci_tpi = NEG_IMAG_UNIT * TWO_PI;
+						std::complex<double> ci_tpi = NEG_IMAG_UNIT * ModuleBase::TWO_PI;
 						for (int ia = 0; ia < atom->na; ia++)
 						{
 							//const double up = 0.5 * ( 1 + atom->mag[ia] );
@@ -399,7 +399,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 					else if(startmag_type == 2)
 					{//zdy-warning-not-available
 						std::complex<double> swap = ZERO;
-						std::complex<double> ci_tpi = NEG_IMAG_UNIT * TWO_PI;
+						std::complex<double> ci_tpi = NEG_IMAG_UNIT * ModuleBase::TWO_PI;
 						for(int ia = 0;ia<atom->na;ia++)
 						{
 							for (int ig = 0; ig < GlobalC::pw.ngmc ; ig++)
@@ -679,7 +679,7 @@ void Charge::non_linear_core_correction
             }
             ModuleBase::Integral::Simpson_Integral(mesh, aux, rab, rhocg1);
             //rhocg [1] = fpi * rhocg1 / omega;
-            rhocg [0] = FOUR_PI * rhocg1 / GlobalC::ucell.omega;//mohan modify 2008-01-19
+            rhocg [0] = ModuleBase::FOUR_PI * rhocg1 / GlobalC::ucell.omega;//mohan modify 2008-01-19
             igl0 = 1;
         }
 
@@ -693,7 +693,7 @@ void Charge::non_linear_core_correction
                 aux [ir] = r[ir] * r[ir] * rhoc [ir] * aux [ir];
             } //  enddo
             ModuleBase::Integral::Simpson_Integral(mesh, aux, rab, rhocg1);
-            rhocg [igl] = FOUR_PI * rhocg1 / GlobalC::ucell.omega;
+            rhocg [igl] = ModuleBase::FOUR_PI * rhocg1 / GlobalC::ucell.omega;
         } //  enddo
         delete [] aux;
     }

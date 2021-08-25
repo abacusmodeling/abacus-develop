@@ -1283,7 +1283,7 @@ void Mathzone_Add1::Uni_Deriv_Phi
 #endif
 
 	
-	double dk_uniform = TWO_PI / FFT_NR / dr;
+	double dk_uniform = ModuleBase::TWO_PI / FFT_NR / dr;
 	
 	//for (int ik = 0; ik < FFT_NR/2; ik++)
 	//{

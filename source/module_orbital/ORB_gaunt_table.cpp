@@ -273,7 +273,7 @@ double ORB_gaunt_table::Calc_Gaunt_CH
 //	ModuleBase::TITLE("ORB_gaunt_table","Calc_Gaunt_CH");
 	ModuleBase::timer::tick("ORB_gaunt_table","Calc_Gaunt_CH");
 	
-	double fac = sqrt((2*l1+1) * (2*l2+1) * (2*l3+1) / FOUR_PI);
+	double fac = sqrt((2*l1+1) * (2*l2+1) * (2*l3+1) / ModuleBase::FOUR_PI);
 
 	int g = (l1+l2+l3)/2;
 	double triangle_f = sqrt( Fact(l1+l2-l3) * Fact(l1-l2+l3) * Fact(-l1+l2+l3) / Fact(2*g+1) );

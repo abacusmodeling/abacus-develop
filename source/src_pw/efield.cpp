@@ -66,7 +66,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 		tot_dipole = ion_dipole - e_dipole;
 		Parallel_Reduce::reduce_double_all(tot_dipole);
 		// calculate the correction to total energy
-		etotefield = -e2*(eamp-tot_dipole/2.0)*tot_dipole*GlobalC::ucell.omega/FOUR_PI;
+		etotefield = -e2*(eamp-tot_dipole/2.0)*tot_dipole*GlobalC::ucell.omega/ModuleBase::FOUR_PI;
 		// calculate the force
 		if(GlobalV::FORCE)
 		{
@@ -92,7 +92,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 	{
 		// dipole correction is not active
 		this->compute_ion_dip(emaxpos, eopreg, edir, ion_dipole, bmod, bvec);
-		this->etotefield=-e2*eamp*ion_dipole*GlobalC::ucell.omega/FOUR_PI;
+		this->etotefield=-e2*eamp*ion_dipole*GlobalC::ucell.omega/ModuleBase::FOUR_PI;
 		// calculate the force
 		if(GlobalV::FORCE)
 		{
@@ -122,7 +122,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 		std::sqrt(avec[0]*avec[0]+avec[1]*avec[1]+avec[2]*avec[2]));
 
 	const double vamp = e2*(eamp-tot_dipole)*length;
-	//const double fac = GlobalC::ucell.omega/FOUR_PI;
+	//const double fac = GlobalC::ucell.omega/ModuleBase::FOUR_PI;
 
 //	std::cout << " Elec. dipole = " << e_dipole << " (Ry au), also = " 
 //	<< e_dipole * debye << " (debye)" << std::endl; 
@@ -238,7 +238,7 @@ void Efield::compute_ion_dip(const double &emaxpos, const double &eopreg,
 				+ atom->tau[ia].z * bvec_in[2];
 
 			ion_dipole += atom->zv * this->saw(emaxpos,eopreg, tvectb )
-			 * (GlobalC::ucell.lat0/bmod_in) * (FOUR_PI/GlobalC::ucell.omega);
+			 * (GlobalC::ucell.lat0/bmod_in) * (ModuleBase::FOUR_PI/GlobalC::ucell.omega);
 
 //			std::cout << "--------------------------------------" << std::endl;
 //			std::cout << " tvectb=" << tvectb << std::endl;

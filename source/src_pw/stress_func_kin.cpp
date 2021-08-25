@@ -30,7 +30,7 @@ void Stress_Func::stress_kin(ModuleBase::matrix& sigma)
 	{
 		kfac[i]=1;
 	}
-	double factor=TWO_PI/GlobalC::ucell.lat0;
+	double factor=ModuleBase::TWO_PI/GlobalC::ucell.lat0;
 
 	for(int ik=0;ik<GlobalC::kv.nks;ik++)
 	{

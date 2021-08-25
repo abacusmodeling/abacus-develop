@@ -105,7 +105,7 @@ void ORB_gen_tables::gen_tables(
 	/////////////////////////////
 
 	const int lmax = (Lmax_used - 1) / 2;
-	//MGT.init_Ylm_Gaunt(orb.get_lmax()+1, 0.0,PI,0.0,TWO_PI);
+	//MGT.init_Ylm_Gaunt(orb.get_lmax()+1, 0.0,PI,0.0,ModuleBase::TWO_PI);
 	MGT.init_Gaunt_CH(lmax);
 	//MGT.init_Gaunt(orb.get_lmax()+1);
 	MGT.init_Gaunt(lmax);

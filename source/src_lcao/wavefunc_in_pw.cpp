@@ -212,7 +212,7 @@ double Wavefunc_in_pw::smearing(const double &energy_x,
 void Wavefunc_in_pw::integral(const int meshr, const double *psir, const double *r,
 const double *rab, const int &l, double* table)
 {
-	const double pref = FOUR_PI / sqrt(GlobalC::ucell.omega);
+	const double pref = ModuleBase::FOUR_PI / sqrt(GlobalC::ucell.omega);
 
 	double *inner_part = new double[meshr];
 	for(int ir=0; ir<meshr; ir++)
