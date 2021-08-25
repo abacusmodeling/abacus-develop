@@ -1,6 +1,6 @@
 #include "read_pp.h"
 
-int Pseudopot_upf::read_pseudo_blps(ifstream &ifs)
+int Pseudopot_upf::read_pseudo_blps(std::ifstream &ifs)
 {
     // double bohr2a = 0.529177249;
     this->nlcc = false;
