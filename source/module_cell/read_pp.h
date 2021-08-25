@@ -94,6 +94,7 @@ private:
 	int read_pseudo_upf(std::ifstream &ifs);
 	int read_pseudo_vwr(std::ifstream &ifs);
 	int read_pseudo_upf201(std::ifstream &ifs);
+	int read_pseudo_blps(std::ifstream &ifs); // sunliang added 2021.07.08
 	void read_pseudo_header(std::ifstream &ifs);
 	void read_pseudo_mesh(std::ifstream &ifs);
 	void read_pseudo_nlcc(std::ifstream &ifs);
