@@ -34,7 +34,7 @@ public:
 	
 	int num_kpts;                                                                           // k�����Ŀ
 	int cal_num_kpts;                                                                       // ��Ҫ�����k����Ŀ������nspin=2ʱ���ô�
-	Matrix3 recip_lattice;
+	ModuleBase::Matrix3 recip_lattice;
 	std::vector<std::vector<int>> nnlist;                                                             //ÿ��k��Ľ���k�����
 	std::vector<std::vector<ModuleBase::Vector3<double>>> nncell;                                                 //ÿ��k��Ľ���k�����ڵ�ԭ�����
 	int nntot = 0;                                                                          //ÿ��k��Ľ���k����Ŀ   
@@ -60,7 +60,7 @@ public:
 
 
 
-	toWannier90(int num_kpts,Matrix3 recip_lattice);
+	toWannier90(int num_kpts,ModuleBase::Matrix3 recip_lattice);
 	~toWannier90();
 
 	//void kmesh_supercell_sort(); //������ԭ��ľ����С��������lmn

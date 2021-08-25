@@ -1227,7 +1227,7 @@ void Vdwd3::cal_stress()
 
 	pbcgdisp(g, sigma);
 	
-	stress = Matrix3(
+	stress = ModuleBase::Matrix3(
 		2.0*sigma(0, 0), 2.0*sigma(0, 1), 2.0*sigma(0, 2),
 		2.0*sigma(1, 0), 2.0*sigma(1, 1), 2.0*sigma(1, 2),
 		2.0*sigma(2, 0), 2.0*sigma(2, 1), 2.0*sigma(2, 2)

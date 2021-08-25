@@ -32,8 +32,8 @@ public:
         const ModuleSymmetry::Symmetry &symm,
         const std::string &k_file_name,
         const int& nspin,
-        const Matrix3 &reciprocal_vec,
-        const Matrix3 &latvec);
+        const ModuleBase::Matrix3 &reciprocal_vec,
+        const ModuleBase::Matrix3 &latvec);
 
     void ibz_kpoint( const ModuleSymmetry::Symmetry &symm);
     //LiuXh add 20180515
@@ -41,8 +41,8 @@ public:
             const ModuleSymmetry::Symmetry &symm,
             const std::string &k_file_name,
             const int& nspin,
-            const Matrix3 &reciprocal_vec,
-            const Matrix3 &latvec);
+            const ModuleBase::Matrix3 &reciprocal_vec,
+            const ModuleBase::Matrix3 &latvec);
 
 private:
     int nspin;
@@ -62,7 +62,7 @@ private:
 
     // step 2 : set both kvec and kved; normalize weight
     void update_use_ibz( void );
-    void set_both_kvec(const Matrix3 &G,const Matrix3 &R);
+    void set_both_kvec(const ModuleBase::Matrix3 &G,const ModuleBase::Matrix3 &R);
     void normalize_wk( const int &degspin );
 
     // step 3 : mpi kpoints information.
@@ -79,7 +79,7 @@ private:
     //bool read_kpoints_after_vc(const std::string &fn); //LiuXh add 20180515
     //void Monkhorst_Pack_after_vc(const int *nmp_in,const double *koffset_in,const int tipo); //LiuXh add 20180515
     void mpi_k_after_vc(); //LiuXh add 20180515
-    void set_both_kvec_after_vc(const Matrix3 &G,const Matrix3 &R);
+    void set_both_kvec_after_vc(const ModuleBase::Matrix3 &G,const ModuleBase::Matrix3 &R);
     void set_kup_and_kdw_after_vc();
 };
 

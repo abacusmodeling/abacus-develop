@@ -100,7 +100,7 @@ double Center2_Orb::Orb11::cal_overlap(
 	const int LB = nB.getL();
 
 	std::vector<double> rly;
-	Ylm::rl_sph_harm (
+	ModuleBase::Ylm::rl_sph_harm (
 		LA+LB,											// max LAB
 		delta_R.x, delta_R.y, delta_R.z,
 		rly);

@@ -4,6 +4,9 @@
 #include "constants.h"
 #include "timer.h"
 
+namespace ModuleBase
+{
+
 int Ylm::nlm = 0;
 std::vector<double> Ylm::ylmcoef(100);
 
@@ -1645,4 +1648,6 @@ double Ylm::sgn(const double x)
 	if(x < 0.0) return -1.0;
 	if(x > 0.0) return 1.0;
 	return 0.0;
+}
+
 }

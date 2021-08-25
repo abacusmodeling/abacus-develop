@@ -3,6 +3,9 @@
 #include <cstdlib>
 #include <cassert>
 
+namespace ModuleBase
+{
+
 class Random
 {
 	public:
@@ -43,5 +46,7 @@ class Random
 	}
 
 };
+
+}
 
 #endif

@@ -4,6 +4,9 @@
 #include "vector3.h"
 #include <vector>
 
+namespace ModuleBase
+{
+
 class Ylm
 {
 	public:
@@ -83,5 +86,7 @@ class Ylm
 	static int Semi_Fact(const int n); 
 	static double sgn(const double x);
 };
+
+}
 
 #endif

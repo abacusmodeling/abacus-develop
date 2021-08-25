@@ -122,7 +122,7 @@ int ORB_table_beta::get_rmesh(const double &R1, const double &R2)
 
 
 void ORB_table_beta::cal_VNL_PhiBeta_R(
-		Sph_Bessel_Recursive::D2 *pSB, // mohan add 2021-03-06
+		ModuleBase::Sph_Bessel_Recursive::D2 *pSB, // mohan add 2021-03-06
 		const int &l,
 		const Numerical_Orbital_Lm &n1,
 		const Numerical_Nonlocal_Lm &n2,
@@ -218,7 +218,7 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 }
 
 
-void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
+void ORB_table_beta::init_Table_Beta(ModuleBase::Sph_Bessel_Recursive::D2 *pSB)
 {
 	ModuleBase::TITLE("ORB_table_beta", "init_Table_Beta");
 	ModuleBase::timer::tick("ORB_table_beta", "init_Table_Beta");

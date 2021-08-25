@@ -5,15 +5,15 @@
 class matrix3_test : public testing::Test
 {
 protected:
-	Matrix3 matrix_a, matrix_a1, matrix_b;
-	Matrix3 get_random_matrix3()
+	ModuleBase::Matrix3 matrix_a, matrix_a1, matrix_b;
+	ModuleBase::Matrix3 get_random_matrix3()
 	{
 		std::vector<double> v(9);
 		for (auto &i : v)
 		{
 			i = std::rand();
 		}
-		auto matrix_a = Matrix3(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8]);
+		auto matrix_a = ModuleBase::Matrix3(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8]);
 		return matrix_a;
 	}
 	void SetUp()

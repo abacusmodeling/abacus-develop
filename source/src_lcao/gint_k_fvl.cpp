@@ -1028,7 +1028,7 @@ void Gint_k::set_ijk_atom_force(
 			}
 
 			// get the 'phi' and 'dphi'.
-			Ylm::grad_rl_sph_harm(GlobalC::ucell.atoms[it].nwl, dr[ib][id][0], dr[ib][id][1], dr[ib][id][2], rly, grly);
+			ModuleBase::Ylm::grad_rl_sph_harm(GlobalC::ucell.atoms[it].nwl, dr[ib][id][0], dr[ib][id][1], dr[ib][id][2], rly, grly);
 
 //			Ylm::sph_harm ( GlobalC::ucell.atoms[it].nwl,
 //					dr[ib][id][0] / distance[ib][id],

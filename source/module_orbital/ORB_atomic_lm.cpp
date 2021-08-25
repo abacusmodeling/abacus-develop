@@ -458,7 +458,7 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 	for( size_t ir=1; ir<this->nr; ++ir )
 		assert( dr == this->rab[ir] );
 
-	Sph_Bessel_Recursive::D2* pSB = nullptr;
+	ModuleBase::Sph_Bessel_Recursive::D2* pSB = nullptr;
 	for( auto & sb : Sph_Bessel_Recursive_Pool::D2::sb_pool )
 		if( this->dk * dr == sb.get_dx() )
 		{
@@ -510,8 +510,8 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 		assert( dr == this->rab[ir] );
 	}
 
-	Sph_Bessel_Recursive::D2* pSB = nullptr;
-	for( auto & sb : Sph_Bessel_Recursive_Pool::D2::sb_pool )
+	ModuleBase::Sph_Bessel_Recursive::D2* pSB = nullptr;
+	for( auto & sb : ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool )
 	{
 		if( this->dk * dr == sb.get_dx() )
 		{
@@ -522,8 +522,8 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 
 	if(!pSB)
 	{
-		Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});
-		pSB = &Sph_Bessel_Recursive_Pool::D2::sb_pool.back();
+		ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});
+		pSB = &ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool.back();
 	}
 	pSB->set_dx( this->dk * dr );
 	pSB->cal_jlx( this->angular_momentum_l, this->nk, this->nr );
@@ -585,8 +585,8 @@ void Numerical_Orbital_Lm::cal_rradial_sbpool(void)
 		assert( dr == this->rab[ir] );
 	}
 
-	Sph_Bessel_Recursive::D2* pSB = nullptr;
-	for( auto & sb : Sph_Bessel_Recursive_Pool::D2::sb_pool )
+	ModuleBase::Sph_Bessel_Recursive::D2* pSB = nullptr;
+	for( auto & sb : ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool )
 	{
 		if( dr * dk == sb.get_dx() )
 		{
@@ -597,8 +597,8 @@ void Numerical_Orbital_Lm::cal_rradial_sbpool(void)
 
 	if(!pSB)
 	{
-		Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});
-		pSB = &Sph_Bessel_Recursive_Pool::D2::sb_pool.back();
+		ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});
+		pSB = &ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool.back();
 	}
 
 	pSB->set_dx( dr * dk );

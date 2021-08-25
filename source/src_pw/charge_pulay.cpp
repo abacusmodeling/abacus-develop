@@ -1,7 +1,6 @@
 #include "charge_pulay.h"
 #include "global.h"
 #include "../module_base/inverse_matrix.h"
-#include "../module_base/random.h"
 
 Charge_Pulay::Charge_Pulay()
 {
@@ -177,76 +176,6 @@ void Charge_Pulay::Pulay_mixing(void)
 		}
 
 		this->generate_alpha(scheme);
-
-		/*	
-			double opt_rnorm = 0.0;
-			if(scheme==1)
-			{
-		//	out.printrm("A=<dR|dR>",A);
-
-		opt_rnorm = calculate_residual_norm( Rrho[is][irstep], Rrho[is][irstep] );
-		//				std::cout << "\n part1 = " << opt_rnorm;
-		for(int i=0; i<dstep; i++)
-		{
-		for(int j=0; j<dstep; j++)
-		{	
-		opt_rnorm += alpha[i] * alpha[j] * A(i,j);
-		}
-		}
-		//				std::cout << "\n part2 = " << opt_rnorm;
-
-		for(int i=0; i<dstep; i++)
-		{
-		opt_rnorm += 2*alpha[i]*dRR[i];
-		}
-		//				std::cout << "\n part3 = " << opt_rnorm;
-		}
-		else if(scheme==2)
-		{
-		for(int i=0; i<rstep; i++)
-		{
-		for(int j=0; j<rstep; j++)
-		{
-		opt_rnorm += alpha[i] * alpha[j] * calculate_residual_norm( Rrho[is][i], Rrho[is][j] );
-		}
-		}
-		}
-		 */		
-
-		//std::cout << "\n After optimizing_the residual norm = " << opt_rnorm << std::endl;
-		//			BLOCK_HERE("haha");
-		/*		
-				double optimal_rnorm = 9999.0; // just need a big number
-				double *atmp = new double[rstep];
-
-				for(int iter=0; iter<1000; iter++)
-				{				
-				double rnorm = 0.0;	
-
-				Random::between0and1(alpha,3);
-
-				for(int i=0; i<rstep; i++)
-				{
-				for(int j=0; j<rstep; j++)
-				{
-				rnorm += alpha[i] * alpha[j] * calculate_residual_norm( Rrho[0][i], Rrho[0][j] );
-				}
-
-				}
-
-		//std::cout << "\n rnorm = " << rnorm;
-
-		if(optimal_rnorm > rnorm)
-		{
-		optimal_rnorm = rnorm;
-		ModuleBase::GlobalFunc::DCOPY(atmp, alpha, rstep);
-		}
-		}
-
-		delete[] atmp;
-
-		std::cout << "\n optimal_residual_norm = " << optimal_rnorm << std::endl;
-		 */
 
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{

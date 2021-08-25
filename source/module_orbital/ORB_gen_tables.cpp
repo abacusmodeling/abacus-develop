@@ -77,7 +77,7 @@ void ORB_gen_tables::gen_tables(
 	/// (2) init Ylm Coef
 	//////////////////////////////
 	//liaochen add 2010/4/29
-	Ylm::set_coefficients();
+	ModuleBase::Ylm::set_coefficients();
 
 	// PLEASE add explanations for all options of 'orb_num' and 'mode'
 	// mohan add 2021-04-03
@@ -274,14 +274,14 @@ void ORB_gen_tables::snap_psibeta(
 	std::vector<double> rlyb;
 	std::vector<std::vector<double>> grlyb;
 
-	Ylm::rl_sph_harm(T1_2Lplus1 - 1, dRa.x, dRa.y, dRa.z, rlya);
+	ModuleBase::Ylm::rl_sph_harm(T1_2Lplus1 - 1, dRa.x, dRa.y, dRa.z, rlya);
 	if (job == 0)
 	{
-		Ylm::rl_sph_harm(T2_2Lplus1 - 1, dRb.x, dRb.y, dRb.z, rlyb);
+		ModuleBase::Ylm::rl_sph_harm(T2_2Lplus1 - 1, dRb.x, dRb.y, dRb.z, rlyb);
 	}
 	else
 	{
-		Ylm::grad_rl_sph_harm(T2_2Lplus1 - 1, dRb.x, dRb.y, dRb.z, rlyb, grlyb);
+		ModuleBase::Ylm::grad_rl_sph_harm(T2_2Lplus1 - 1, dRb.x, dRb.y, dRb.z, rlyb, grlyb);
 	}
 	//////////////////////////////////////////////////////////////////////////
 	/// Formula :                         T1       T0          T0        T2
@@ -677,12 +677,12 @@ void ORB_gen_tables::snap_psipsi(
 	{
 		//		Ylm::rlylm(dim3, arr_dR[0], arr_dR[1], arr_dR[2], rly);
 		//		Ylm::sph_harm (dim3-1, xdr, ydr, zdr, rly);
-		Ylm::rl_sph_harm(dim3 - 1, arr_dR[0], arr_dR[1], arr_dR[2], rly);
+		ModuleBase::Ylm::rl_sph_harm(dim3 - 1, arr_dR[0], arr_dR[1], arr_dR[2], rly);
 	}
 	else
 	{
 		//		Ylm::rlylm(dim3, arr_dR[0], arr_dR[1], arr_dR[2], rly, grly);
-		Ylm::grad_rl_sph_harm(dim3 - 1, arr_dR[0], arr_dR[1], arr_dR[2], rly, grly);
+		ModuleBase::Ylm::grad_rl_sph_harm(dim3 - 1, arr_dR[0], arr_dR[1], arr_dR[2], rly, grly);
 	}
 
 	switch (dtype)

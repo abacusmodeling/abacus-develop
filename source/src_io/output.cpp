@@ -252,7 +252,7 @@ void output::printr4_d(std::ofstream &ofs, const std::string &s,const ModuleBase
                 }
 }//end print4_d
 
-void output::printM3(std::ofstream &ofs,const std::string &description, const Matrix3 &m)const
+void output::printM3(std::ofstream &ofs,const std::string &description, const ModuleBase::Matrix3 &m)const
 {
     ofs << " " << description << std::endl;
 	ofs << std::setiosflags(std::ios::showpos);
@@ -263,7 +263,7 @@ void output::printM3(std::ofstream &ofs,const std::string &description, const Ma
     return;
 }
 
-void output::printM3(const std::string &description, const Matrix3 &m)const
+void output::printM3(const std::string &description, const ModuleBase::Matrix3 &m)const
 {
     std::cout << "\n " << description << std::endl;
     std::cout << std::setw(20) << m.e11 << std::setw(20) << m.e12 << std::setw(20) << m.e13 << "\n"

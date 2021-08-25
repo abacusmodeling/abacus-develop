@@ -42,7 +42,7 @@ Grid_Base::~Grid_Base()
 }
 
 void Grid_Base::init(
-    const Matrix3 &latvec_in,
+    const ModuleBase::Matrix3 &latvec_in,
     const double &lat0_in,
     const int &nx_in,
     const int &ny_in,
@@ -328,7 +328,7 @@ void Grid_Base::edge_grid_points(
 		{
 			for (int k = edge_min.z; k < edge_max.z; k++)
 			{
-				Ylm::get_ylm_real(this->lmax1, dR1[count], yy_tmp );
+				ModuleBase::Ylm::get_ylm_real(this->lmax1, dR1[count], yy_tmp );
 				for(int in=0; in<n1; in++) yy1[in][count] = yy_tmp[in];
 				++count;
 			}
@@ -342,7 +342,7 @@ void Grid_Base::edge_grid_points(
 		{
 			for (int k = edge_min.z; k < edge_max.z; k++)
 			{
-				Ylm::get_ylm_real(this->lmax2, dR2[count], yy_tmp );
+				ModuleBase::Ylm::get_ylm_real(this->lmax2, dR2[count], yy_tmp );
 				for(int in=0; in<n2; in++) yy2[in][count] = yy_tmp[in];
 				++count;
 			}

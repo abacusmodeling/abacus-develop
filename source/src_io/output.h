@@ -21,8 +21,8 @@ public:
     //===========================
     // print matrix3
     //===========================
-    void printM3(std::ofstream &ofs,const std::string& description, const Matrix3 &m)const;
-    void printM3(const std::string &description, const Matrix3 &m)const;
+    void printM3(std::ofstream &ofs,const std::string& description, const ModuleBase::Matrix3 &m)const;
+    void printM3(const std::string &description, const ModuleBase::Matrix3 &m)const;
 
     //===============================
     // print matrix

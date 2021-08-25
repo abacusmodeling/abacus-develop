@@ -35,7 +35,7 @@ public:
 
 	int *DS_2Lplus1;
 
-	void init_Table_Alpha(Sph_Bessel_Recursive::D2 *pSB);
+	void init_Table_Alpha(ModuleBase::Sph_Bessel_Recursive::D2 *pSB);
 
 	void Destroy_Table_Alpha(void);
 
@@ -54,7 +54,7 @@ public:
 private:
 
 	void cal_S_PhiAlpha_R(
-		Sph_Bessel_Recursive::D2 *pSB, // mohan add 2021-03-06
+		ModuleBase::Sph_Bessel_Recursive::D2 *pSB, // mohan add 2021-03-06
 		const int &l,
 		const Numerical_Orbital_Lm &n1,
 		const Numerical_Orbital_Lm &n2,
