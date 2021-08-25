@@ -175,7 +175,7 @@ This part of variables are used to control general system parameters.
         - upf : .UPF format
         - vwr : .vwr format
         - upf201 : the new UPF format
-        - blps : Bulk local pseudopotential
+        - blps : bulk local pseudopotential
     - *Default* : upf
 
     [back to top](#input-file)
