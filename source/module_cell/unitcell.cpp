@@ -196,9 +196,9 @@ void UnitCell::print_cell_cif(const std::string &fn)const
 	//ofs << "_cell_angle_beta " << "90.00" << std::endl; 
 	//ofs << "_cell_angle_gamma " << "90.00" << std::endl; 
 	//xiaohui modify alpha, beta and gamma 2015-09-29
-	double angle_alpha = acos((a2 * a3) / (a2.norm() * a3.norm())) /PI*180.0;
-	double angle_beta = acos((a1 * a3) / (a1.norm() * a3.norm())) /PI*180.0;
-	double angle_gamma = acos((a1 * a2) / (a1.norm() * a2.norm())) /PI*180.0;
+	double angle_alpha = acos((a2 * a3) / (a2.norm() * a3.norm())) /ModuleBase::PI*180.0;
+	double angle_beta = acos((a1 * a3) / (a1.norm() * a3.norm())) /ModuleBase::PI*180.0;
+	double angle_gamma = acos((a1 * a2) / (a1.norm() * a2.norm())) /ModuleBase::PI*180.0;
 	ofs << "_cell_angle_alpha " << angle_alpha << std::endl;
 	ofs << "_cell_angle_beta " << angle_beta << std::endl;
 	ofs << "_cell_angle_gamma " << angle_gamma << std::endl;

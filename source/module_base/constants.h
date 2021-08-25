@@ -15,9 +15,12 @@ using namespace std;
 // NAME : sqrtpi ( sqrt pi )
 // NAME : sqrtpm1 ( 1/sqrtpi )
 //==========================================================
+namespace ModuleBase
+{
 const double PI		  				= 3.14159265358979323846;
-const double PI_HALF				= PI / 2.0;
-const double TWO_PI					= 2 * PI;
+}
+const double PI_HALF				= ModuleBase::PI / 2.0;
+const double TWO_PI					= 2 * ModuleBase::PI;
 const double FOUR_PI   				= 4.0 * 3.14159265358979323846;
 const double SQRT_PI				= 1.77245385090551602729;
 const double INVERSE_SQRT_PI		= 1.0 / SQRT_PI;

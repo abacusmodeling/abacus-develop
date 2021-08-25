@@ -536,12 +536,12 @@ void Exx_Lip::sum_all(int ik)
 	{
 		for( int iw_r=0; iw_r<GlobalV::NLOCAL; ++iw_r)
 		{
-			exx_matrix[ik][iw_l][iw_r] = 2.0* (-4*PI/ucell_ptr->omega *sum1[iw_l*GlobalV::NLOCAL+iw_r]);
+			exx_matrix[ik][iw_l][iw_r] = 2.0* (-4*ModuleBase::PI/ucell_ptr->omega *sum1[iw_l*GlobalV::NLOCAL+iw_r]);
 			if( Exx_Global::Hybrid_Type::HF==info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==info.hybrid_type )
 				if(gzero_rank_in_pool==GlobalV::RANK_IN_POOL)
 				{
-					exx_matrix[ik][iw_l][iw_r] += 2.0* (4*PI/ucell_ptr->omega *sum3[iw_l][iw_r] *sum2_factor_g );
-					exx_matrix[ik][iw_l][iw_r] += 2.0* (-1/sqrt(info.lambda*PI)*(q_pack->kv_ptr->nks/GlobalV::NSPIN) * sum3[iw_l][iw_r]);
+					exx_matrix[ik][iw_l][iw_r] += 2.0* (4*ModuleBase::PI/ucell_ptr->omega *sum3[iw_l][iw_r] *sum2_factor_g );
+					exx_matrix[ik][iw_l][iw_r] += 2.0* (-1/sqrt(info.lambda*ModuleBase::PI)*(q_pack->kv_ptr->nks/GlobalV::NSPIN) * sum3[iw_l][iw_r]);
 				}
 		}
 	}

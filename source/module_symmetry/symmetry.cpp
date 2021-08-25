@@ -233,9 +233,9 @@ int Symmetry::standard_lat(
 //		OUT(GlobalV::ofs_running,"alpha  = ", alpha );
 //		OUT(GlobalV::ofs_running,"beta   = " ,beta  );
 //		OUT(GlobalV::ofs_running,"gamma  = " ,gamma );
-        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"ALPHA (DEGREE)", acos(alpha)/PI*180.0 );
-        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"BETA  (DEGREE)" ,acos(beta)/PI*180.0  );
-        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"GAMMA (DEGREE)" ,acos(gamma)/PI*180.0 );
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"ALPHA (DEGREE)", acos(alpha)/ModuleBase::PI*180.0 );
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"BETA  (DEGREE)" ,acos(beta)/ModuleBase::PI*180.0  );
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"GAMMA (DEGREE)" ,acos(gamma)/ModuleBase::PI*180.0 );
         first = false;
     }
 

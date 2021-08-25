@@ -148,7 +148,7 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Q(
     ModuleBase::ComplexArray overlap_Q(GlobalV::NBANDS, GlobalV::NLOCAL, this->bessel_basis.get_ecut_number() );
     overlap_Q.zero_out();
 
-	const double normalization = (4 * PI) / sqrt(GlobalC::ucell.omega);			// Peize Lin add normalization 2015-12-29
+	const double normalization = (4 * ModuleBase::PI) / sqrt(GlobalC::ucell.omega);			// Peize Lin add normalization 2015-12-29
 
     std::vector<ModuleBase::Vector3<double>> gk(np);
     for (int ig=0; ig<np; ig++)
@@ -224,7 +224,7 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Sq(
     ModuleBase::ComplexArray overlap_Sq( GlobalV::NLOCAL, GlobalV::NLOCAL, enumber, enumber );
     overlap_Sq.zero_out();
 
-	const double normalization = (4 * PI) * (4 * PI) / GlobalC::ucell.omega;			// Peize Lin add normalization 2015-12-29
+	const double normalization = (4 * ModuleBase::PI) * (4 * ModuleBase::PI) / GlobalC::ucell.omega;			// Peize Lin add normalization 2015-12-29
 	
     std::vector<ModuleBase::Vector3<double>> gk(np);
     for (int ig=0; ig<np; ig++)

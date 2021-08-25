@@ -1860,7 +1860,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 		//---------------------------------------------------------------------
 		if(!coulomb_cutoff)
 		{
-			std::cout <<"iq = "<<iq<<" epsilon["<<i<<"] = "<<8*PI/q/q*chi[0][0].real()<<"  "<<8*PI/q/q*chi[0][0].imag()<<std::endl;
+			std::cout <<"iq = "<<iq<<" epsilon["<<i<<"] = "<<8*ModuleBase::PI/q/q*chi[0][0].real()<<"  "<<8*ModuleBase::PI/q/q*chi[0][0].imag()<<std::endl;
 		}
 		else
 		{
@@ -1869,14 +1869,14 @@ void Chi0_hilbert::Cal_Chi(int iq)
 			//---------------------------------------------------------------------
 			double factor;
 			factor = 1.0 - exp(-q * (GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0)/2.0);
-			std::cout <<"iq = "<<iq<<" epsilon["<<i<<"] = "<<8*PI/q/q * factor * chi[0][0].real()<<"  "<<8*PI/q/q * factor * chi[0][0].imag()<<std::endl; 
+			std::cout <<"iq = "<<iq<<" epsilon["<<i<<"] = "<<8*ModuleBase::PI/q/q * factor * chi[0][0].real()<<"  "<<8*ModuleBase::PI/q/q * factor * chi[0][0].imag()<<std::endl; 
 		}
 		
 		//--------------------------------------------------------------------
 		//  Re{epsilon}  NJP(2014)
 		//--------------------------------------------------------------------
 		//std::complex<double> M;
-		//M = 1.0/(8*PI/q/q*chi[0][0]);
+		//M = 1.0/(8*ModuleBase::PI/q/q*chi[0][0]);
 		//std::cout <<"iq = "<<iq<<" epsMreal["<<i<<"] = "<<M.real()<<std::endl;
 		//std::cout <<"iq = "<<iq<<" epsMimag["<<i<<"] = "<<M.imag()<<std::endl; 
 	}
@@ -1903,7 +1903,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 		{
 			for(int i=0;i<nomega;i++)
 			{
-				ofseps << i * domega <<"   "<<-8*PI/q/q*gather_chi[i].imag()<<std::endl;
+				ofseps << i * domega <<"   "<<-8*ModuleBase::PI/q/q*gather_chi[i].imag()<<std::endl;
 			}
 		}
 		else
@@ -1912,7 +1912,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 			factor = 1.0 - exp(-q * (GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0)/2.0);
 			for(int i=0;i<nomega;i++)
 			{
-				ofseps << i * domega <<"   "<<-8*PI/q/q*factor*gather_chi[i].imag()<<std::endl;
+				ofseps << i * domega <<"   "<<-8*ModuleBase::PI/q/q*factor*gather_chi[i].imag()<<std::endl;
 			}			
 		}
 		ofseps.close();
@@ -1962,7 +1962,7 @@ void Chi0_hilbert:: Cal_kernel(int iq)
 				{
 					if(g0 == g1)
 					{
-						kernel[g0][g1] = 8.0 * PI/qg2(iq,g0);
+						kernel[g0][g1] = 8.0 * ModuleBase::PI/qg2(iq,g0);
 					}
 					else
 					{
@@ -1984,7 +1984,7 @@ void Chi0_hilbert:: Cal_kernel(int iq)
 				{
 					if(g0 == g1)
 					{
-						kernel[g0][g1] = 8.0 * PI/qg2(iq,g0) * (1 - sign * exp(-qG(iq,g0)*(GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0)/2.0));
+						kernel[g0][g1] = 8.0 * ModuleBase::PI/qg2(iq,g0) * (1 - sign * exp(-qG(iq,g0)*(GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0)/2.0));
 					}
 					else
 					{
@@ -2014,11 +2014,11 @@ void Chi0_hilbert::Cal_Rpa(int iq)
 			{
 				if (g0 != g1)
 				{
-					rpa[g0][g1] = -8.0 * PI/qg2(iq,g0) * chi0_gg[g0][g1];
+					rpa[g0][g1] = -8.0 * ModuleBase::PI/qg2(iq,g0) * chi0_gg[g0][g1];
 				}
 				else
 				{
-					rpa[g0][g1] = 1.0 - 8.0 * PI/qg2(iq,g0) * chi0_gg[g0][g1];
+					rpa[g0][g1] = 1.0 - 8.0 * ModuleBase::PI/qg2(iq,g0) * chi0_gg[g0][g1];
 				}
 			}
 		}
@@ -2038,11 +2038,11 @@ void Chi0_hilbert::Cal_Rpa(int iq)
 			{
 				if(g0 != g1)
 				{
-					rpa[g0][g1] = -8.0 * PI/qg2(iq,g0) * (1 - sign * exp(-qG(iq,g0)*(GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0)/2.0)) * chi0_gg[g0][g1];
+					rpa[g0][g1] = -8.0 * ModuleBase::PI/qg2(iq,g0) * (1 - sign * exp(-qG(iq,g0)*(GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0)/2.0)) * chi0_gg[g0][g1];
 				}
 				else
 				{
-					rpa[g0][g1] = 1.0 - 8.0 * PI/qg2(iq,g0) * (1 - sign * exp(-qG(iq,g0)*(GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0)/2.0)) * chi0_gg[g0][g1];
+					rpa[g0][g1] = 1.0 - 8.0 * ModuleBase::PI/qg2(iq,g0) * (1 - sign * exp(-qG(iq,g0)*(GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0)/2.0)) * chi0_gg[g0][g1];
 				}
 			}
 			
@@ -2374,7 +2374,7 @@ void Chi0_hilbert::Cal_kernel_2D(int iq)
 			{
 				if(g0 == g1)
 				{
-					kernel[g0][g1] = 4* PI/qg(iq,g0) * (GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0);
+					kernel[g0][g1] = 4* ModuleBase::PI/qg(iq,g0) * (GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0);
 				}
 				else
 				{
@@ -2456,7 +2456,7 @@ std::complex<double> Chi0_hilbert:: Cal_g(int iq)
             double exp_phase = exp(-q*(z0+z1)*dz);
             g += chi_para[z0][z1] * exp_phase * dz * dz;
         }
-    g = -4*PI/q * g;
+    g = -4*ModuleBase::PI/q * g;
 
     return g;
 }

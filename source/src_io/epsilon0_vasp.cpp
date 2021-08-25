@@ -521,8 +521,8 @@ void Epsilon0_vasp:: Cal_epsilon0s()
 					int n = int(delta_e/domega);
 					double e1 = double(n) * domega;
 					double e2 = double(n+1) * domega;
-					std::complex<double> weight1 = std::complex<double>(32 * (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(ik,oband+ib2)) * (e2 - delta_e)/domega/GlobalC::ucell.omega * PI * PI /delta_e/delta_e/domega, 0.0);
-					std::complex<double> weight2 = std::complex<double>(32 * (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(ik,oband+ib2)) * (delta_e - e1)/domega/GlobalC::ucell.omega * PI * PI /delta_e/delta_e/domega, 0.0);
+					std::complex<double> weight1 = std::complex<double>(32 * (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(ik,oband+ib2)) * (e2 - delta_e)/domega/GlobalC::ucell.omega * ModuleBase::PI * ModuleBase::PI /delta_e/delta_e/domega, 0.0);
+					std::complex<double> weight2 = std::complex<double>(32 * (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(ik,oband+ib2)) * (delta_e - e1)/domega/GlobalC::ucell.omega * ModuleBase::PI * ModuleBase::PI /delta_e/delta_e/domega, 0.0);
 					
 					eps0s[0][n] += weight1 * b[ib1][ib2][0] * conj(b[ib1][ib2][0]);
 					eps0s[1][n] += weight1 * b[ib1][ib2][0] * conj(b[ib1][ib2][1]);
@@ -550,7 +550,7 @@ void Epsilon0_vasp:: Cal_epsilon0s()
 					int n = int(delta_e/domega);
 					double e1 = double(n) * domega;
 					double e2 = double(n+1) * domega;					
-					std::complex<double> weight1 = std::complex<double>(32 * (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(ik,oband+ib2)) * (e2 - delta_e)/domega/GlobalC::ucell.omega * PI * PI /delta_e/delta_e/domega, 0.0);
+					std::complex<double> weight1 = std::complex<double>(32 * (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(ik,oband+ib2)) * (e2 - delta_e)/domega/GlobalC::ucell.omega * ModuleBase::PI * ModuleBase::PI /delta_e/delta_e/domega, 0.0);
 
 					eps0s[0][n] += weight1 * b[ib1][ib2][0] * conj(b[ib1][ib2][0]);
 					eps0s[1][n] += weight1 * b[ib1][ib2][0] * conj(b[ib1][ib2][1]);
@@ -582,7 +582,7 @@ void Epsilon0_vasp:: Cal_T()
 			M1 = std::complex<double>(n1_e - n_e, -eta);
 			M2 = std::complex<double>(-n1_e - n_e, eta);
 			
-			T[n][n1] = (1.0/M1 + 1.0/M2) * (-0.5) * 2.0/PI * domega;
+			T[n][n1] = (1.0/M1 + 1.0/M2) * (-0.5) * 2.0/ModuleBase::PI * domega;
 		}
 		
 	return;

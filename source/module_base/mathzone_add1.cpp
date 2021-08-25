@@ -754,8 +754,8 @@ void Mathzone_Add1::test ()
 	
 	for (int ik = 0; ik < dim; ik++)
 	{
-		double diff = fk[ik]- sqrt(PI/4/ci)/pow(2.0*ci, l+1)* std::pow(rad[ik], l) * exp(-rad[ik]*rad[ik]/4/ci);
-		std::cout << rad[ik] << " " << fk[ik] << " " << sqrt(PI/4/ci)/pow(2.0*ci, l+1)*pow(rad[ik], l)*exp(-rad[ik]*rad[ik]/4/ci)
+		double diff = fk[ik]- sqrt(ModuleBase::PI/4/ci)/pow(2.0*ci, l+1)* std::pow(rad[ik], l) * exp(-rad[ik]*rad[ik]/4/ci);
+		std::cout << rad[ik] << " " << fk[ik] << " " << sqrt(ModuleBase::PI/4/ci)/pow(2.0*ci, l+1)*pow(rad[ik], l)*exp(-rad[ik]*rad[ik]/4/ci)
 		<< " "	<< std::log(fabs(diff))/std::log(10.0) << std::endl;
 	}
 
@@ -774,7 +774,7 @@ void Mathzone_Add1::test2 ()
 	double rmax = 20;
 	double dr = rmax/(N-1);
 
-	double dk = PI / rmax /2;
+	double dk = ModuleBase::PI / rmax /2;
 //	double kmax = PI / dr; 
 //	double dk = dr;
 	
@@ -807,7 +807,7 @@ void Mathzone_Add1::test2 ()
 
 	for (int ir = 0; ir < N; ir++)
 	{
-		std::cout << ir*dr << " " << func[ir] << " " << fr[ir] *2.0 / PI << " " << std::log(fabs(fr[ir]*2.0/PI-func[ir]))/std::log(10.0) << std::endl;
+		std::cout << ir*dr << " " << func[ir] << " " << fr[ir] *2.0 / ModuleBase::PI << " " << std::log(fabs(fr[ir]*2.0/ModuleBase::PI-func[ir]))/std::log(10.0) << std::endl;
 	}
 	
 

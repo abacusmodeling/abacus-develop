@@ -184,7 +184,7 @@ void Numerical_Orbital_Lm::copy_parameter(
 	/***********************************************************
 	be careful! LiaoChen modify on 2010/4/21
 	************************************************************/
-//	this->dk = PI / rcut / 2.0;
+//	this->dk = ModuleBase::PI / rcut / 2.0;
 //	this->nk = this->nr;
 
 	r_radial.resize(nr);
@@ -397,7 +397,7 @@ void Numerical_Orbital_Lm::cal_kradial(void)
 	double *jl = new double[nr];
 	double *integrated_func = new double[nr];
 
-	const double pref = sqrt( 2.0 / PI );
+	const double pref = sqrt( 2.0 / ModuleBase::PI );
 	//Sbt method
 	
 	/*
@@ -475,7 +475,7 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 	const std::vector<std::vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
 
 	std::vector<double> integrated_func( this->nr );
-	const double pref = sqrt( 2.0 / PI );
+	const double pref = sqrt( 2.0 / ModuleBase::PI );
 
 	std::vector<double> psir2(nr);
 	for( size_t ir=0; ir!=nr; ++ir )
@@ -529,7 +529,7 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 	pSB->cal_jlx( this->angular_momentum_l, this->nk, this->nr );
 	const std::vector<std::vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
 
-	const double pref = sqrt( 2.0 / PI );
+	const double pref = sqrt( 2.0 / ModuleBase::PI );
 
 	std::vector<double> r_tmp(nr);
 	for( int ir=0; ir!=nr; ++ir )
@@ -606,7 +606,7 @@ void Numerical_Orbital_Lm::cal_rradial_sbpool(void)
 
 	const std::vector<std::vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
 
-	const double pref = sqrt(2.0/PI);
+	const double pref = sqrt(2.0/ModuleBase::PI);
 
 	std::vector<double> k_tmp(nk);
 

@@ -355,8 +355,8 @@ void Input_Conv::Convert(void)
 		GlobalC::ucell.magnet.angle2_ = new double[INPUT.ntype];
 		for (int i = 0; i < INPUT.ntype; i++)
 		{
-			GlobalC::ucell.magnet.angle1_[i] = INPUT.angle1[i] / 180 * PI;
-			GlobalC::ucell.magnet.angle2_[i] = INPUT.angle2[i] / 180 * PI;
+			GlobalC::ucell.magnet.angle1_[i] = INPUT.angle1[i] / 180 * ModuleBase::PI;
+			GlobalC::ucell.magnet.angle2_[i] = INPUT.angle2[i] / 180 * ModuleBase::PI;
 		}
 #ifdef __MPI
 //			Parallel_Common::bcast_double(GlobalC::ucell.magnet.angle1_[i]);

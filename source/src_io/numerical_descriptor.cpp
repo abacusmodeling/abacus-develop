@@ -239,7 +239,7 @@ void Numerical_Descriptor::jlq3d_overlap(
 	GlobalV::ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS AND BLOCH WAVE FUNCTIONS" << std::endl;
 	GlobalV::ofs_running << " Q = < J_it_ia_il_in_im | Psi_n, k > " << std::endl;
 
-	const double normalization = (4 * PI) / sqrt(GlobalC::ucell.omega);// Peize Lin add normalization 2015-12-29
+	const double normalization = (4 * ModuleBase::PI) / sqrt(GlobalC::ucell.omega);// Peize Lin add normalization 2015-12-29
 
     const int total_lm = ( this->lmax + 1) * ( this->lmax + 1);
     ModuleBase::matrix ylm(total_lm, np);

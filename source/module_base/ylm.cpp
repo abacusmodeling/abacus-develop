@@ -49,7 +49,7 @@ void Ylm::get_ylm_real( const int &Lmax, const ModuleBase::Vector3<double> &vec,
 	}
 	else if( vec.x < -cut0 )
 	{ 
-		phi = std::atan( vec.y / vec.x ) + PI;
+		phi = std::atan( vec.y / vec.x ) + ModuleBase::PI;
 	}
 	else
 	{
@@ -168,7 +168,7 @@ void Ylm::get_ylm_real( const int &Lmax, const ModuleBase::Vector3<double> &vec,
 	}
 	else if( vec.x < -cut0 )
 	{ 
-		phi = std::atan( vec.y / vec.x ) + PI;
+		phi = std::atan( vec.y / vec.x ) + ModuleBase::PI;
 	}
 	else
 	{
@@ -356,8 +356,8 @@ void Ylm::rlylm
 			for(int ip = 0; ip <= im; ip++)
 			{
 				double aux = Fact(im) / Fact(ip) / Fact(im - ip);
-				Am[im] += aux * pow(x, ip) * pow(y, im-ip) * cos( (im-ip) * PI / 2.0 );
-				Bm[im] += aux * pow(x, ip) * pow(y, im-ip) * sin( (im-ip) * PI / 2.0 );
+				Am[im] += aux * pow(x, ip) * pow(y, im-ip) * cos( (im-ip) * ModuleBase::PI / 2.0 );
+				Bm[im] += aux * pow(x, ip) * pow(y, im-ip) * sin( (im-ip) * ModuleBase::PI / 2.0 );
 			}
 		}
 	}
@@ -1282,19 +1282,19 @@ void Ylm::rlylm
 			for(int ip = 0; ip <= im; ip++)
 			{
 				double aux = Fact(im) / Fact(ip) / Fact(im - ip);
-				Am[im] += aux * pow(x, ip) * pow(y, im-ip) * cos( (im-ip) * PI / 2.0 );
-				Bm[im] += aux * pow(x, ip) * pow(y, im-ip) * sin( (im-ip) * PI / 2.0 );
+				Am[im] += aux * pow(x, ip) * pow(y, im-ip) * cos( (im-ip) * ModuleBase::PI / 2.0 );
+				Bm[im] += aux * pow(x, ip) * pow(y, im-ip) * sin( (im-ip) * ModuleBase::PI / 2.0 );
 
 				if(ip > 0)
 				{
-					Gx_Am[im] += aux * ip * pow(x, ip-1) * pow(y, im-ip) * cos( (im-ip) * PI / 2.0 );
-					Gx_Bm[im] += aux * ip * pow(x, ip-1) * pow(y, im-ip) * sin( (im-ip) * PI / 2.0 );
+					Gx_Am[im] += aux * ip * pow(x, ip-1) * pow(y, im-ip) * cos( (im-ip) * ModuleBase::PI / 2.0 );
+					Gx_Bm[im] += aux * ip * pow(x, ip-1) * pow(y, im-ip) * sin( (im-ip) * ModuleBase::PI / 2.0 );
 				}
 
 				if(ip < im)
 				{
-					Gy_Am[im] += aux * pow(x, ip) * (im - ip) * pow(y, im-ip-1) * cos( (im-ip) * PI / 2.0 );
-					Gy_Bm[im] += aux * pow(x, ip) * (im - ip) * pow(y, im-ip-1) * sin( (im-ip) * PI / 2.0 );
+					Gy_Am[im] += aux * pow(x, ip) * (im - ip) * pow(y, im-ip-1) * cos( (im-ip) * ModuleBase::PI / 2.0 );
+					Gy_Bm[im] += aux * pow(x, ip) * (im - ip) * pow(y, im-ip-1) * sin( (im-ip) * ModuleBase::PI / 2.0 );
 				}
 			}
 		}

@@ -366,7 +366,7 @@ void WF_atomic::atomic_wfc
                               }
                               //and construct the starting wavefunctions as in the noncollinear case.
                               alpha = GlobalC::ucell.magnet.angle1_[it];
-                              gamma = -1 * GlobalC::ucell.magnet.angle2_[it] + 0.5 * PI;
+                              gamma = -1 * GlobalC::ucell.magnet.angle2_[it] + 0.5 * ModuleBase::PI;
 
                               for(int m = 0;m<2*l+1;m++)
                               {
@@ -383,12 +383,12 @@ void WF_atomic::atomic_wfc
                                      fup = cos(0.5 * alpha) * aux[ig];
                                      fdown = IMAG_UNIT * sin(0.5* alpha) * aux[ig];
                                      //build the orthogonal wfc
-                                     //first rotation with angle (alpha + PI) around (OX)
+                                     //first rotation with angle (alpha + ModuleBase::PI) around (OX)
                                      wfcatom(index,ig) = (cos(0.5 * gamma) + IMAG_UNIT * sin(0.5*gamma)) * fup;
                                      wfcatom(index,ig+ this->npwx) = (cos(0.5 * gamma) - IMAG_UNIT * sin(0.5*gamma)) * fdown;
                                      //second rotation with angle gamma around(OZ)
-                                     fup = cos(0.5 * (alpha + PI))*aux[ig];
-                                     fdown = IMAG_UNIT * sin(0.5 * (alpha + PI))*aux[ig];
+                                     fup = cos(0.5 * (alpha + ModuleBase::PI))*aux[ig];
+                                     fdown = IMAG_UNIT * sin(0.5 * (alpha + ModuleBase::PI))*aux[ig];
                                      wfcatom(index+2*l+1,ig) = (cos(0.5*gamma) + IMAG_UNIT*sin(0.5*gamma))*fup;
                                      wfcatom(index+2*l+1,ig+ this->npwx) = (cos(0.5*gamma) - IMAG_UNIT*sin(0.5*gamma))*fdown;
                                  }
@@ -402,7 +402,7 @@ void WF_atomic::atomic_wfc
                             double alpha, gamman;
                             std::complex<double> fup, fdown;
                             alpha = GlobalC::ucell.magnet.angle1_[it];
-                            gamman = -GlobalC::ucell.magnet.angle2_[it] + 0.5*PI;
+                            gamman = -GlobalC::ucell.magnet.angle2_[it] + 0.5*ModuleBase::PI;
                             for(int m = 0;m<2*l+1;m++)
                             {
                                 const int lm = l*l +m;
@@ -418,12 +418,12 @@ void WF_atomic::atomic_wfc
                                      fup = cos(0.5*alpha) * aux[ig];
                                      fdown = IMAG_UNIT * sin(0.5* alpha) * aux[ig];
                                      //build the orthogonal wfc
-                                     //first rotation with angle(alpha+PI) around(OX)
+                                     //first rotation with angle(alpha+ModuleBase::PI) around(OX)
                                      wfcatom(index,ig) = (cos(0.5 * gamman) + IMAG_UNIT * sin(0.5*gamman)) * fup;
                                      wfcatom(index,ig+ this->npwx) = (cos(0.5 * gamman) - IMAG_UNIT * sin(0.5*gamman)) * fdown;
                                      //second rotation with angle gamma around(OZ)
-                                     fup = cos(0.5 * (alpha + PI)) * aux[ig];
-                                     fdown = IMAG_UNIT * sin(0.5 * (alpha + PI)) * aux[ig];
+                                     fup = cos(0.5 * (alpha + ModuleBase::PI)) * aux[ig];
+                                     fdown = IMAG_UNIT * sin(0.5 * (alpha + ModuleBase::PI)) * aux[ig];
                                      wfcatom(index+2*l+1,ig) = (cos(0.5*gamman) + IMAG_UNIT*sin(0.5*gamman))*fup;
                                      wfcatom(index+2*l+1,ig+ this->npwx) = (cos(0.5*gamman) - IMAG_UNIT*sin(0.5*gamman))*fdown;
                                 }

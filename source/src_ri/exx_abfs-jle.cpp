@@ -20,7 +20,7 @@ void Exx_Abfs::Jle::init_jle( const double kmesh_times )
 		for (int L=0; L <= Lmax ; ++L)
 		{
 			const size_t ecut_number 
-				= static_cast<size_t>( sqrt( Ecut_exx ) * GlobalC::ORB.Phi[T].getRcut() / PI ); // Rydberg Unit.
+				= static_cast<size_t>( sqrt( Ecut_exx ) * GlobalC::ORB.Phi[T].getRcut() / ModuleBase::PI ); // Rydberg Unit.
 
 			jle[T][L].resize( ecut_number );
 

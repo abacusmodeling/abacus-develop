@@ -399,7 +399,7 @@ void berryphase::Berry_Phase(int nbands, double &pdl_elec_tot, int &mod_elec_tot
 	{
 		cphik[istring] = cphik[istring] / cave;
 		dtheta = atan2(cphik[istring].imag(),cphik[istring].real());
-		phik[istring] = (theta0 + dtheta) / (2 * PI);
+		phik[istring] = (theta0 + dtheta) / (2 * ModuleBase::PI);
 		phik_ave = phik_ave + wistring[istring] * phik[istring];
 		// test by jingan
 		//GlobalV::ofs_running << "phik[" << istring << "] = " << phik[istring] << std::endl;

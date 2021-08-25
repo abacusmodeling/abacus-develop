@@ -560,7 +560,7 @@ double Occupy::wgauss(const double &x,const int n)
     double hp = std::exp(- arg);
     double h0 = 1.00;
     double h1 = -2.00 * x;
-    double a = 1.0 / sqrt(PI);
+    double a = 1.0 / sqrt(ModuleBase::PI);
     for (int i = 0;i < n;i++)
     {
         a = - a / ( static_cast<double>(i+1) * 4.00);
@@ -633,7 +633,7 @@ double Occupy::w1gauss(const double &x,const int n)
     // Methfessel-Paxton
     //====================
     const double arg = std::min(200.0, x * x);
-    w1 = - 0.50 * std::exp(- arg) / sqrt(PI);
+    w1 = - 0.50 * std::exp(- arg) / sqrt(ModuleBase::PI);
 
 	//std::cout << "\n x=" << x << " w1=" << w1;
     if (n == 0)//specific case : gaussian smearing.
@@ -644,7 +644,7 @@ double Occupy::w1gauss(const double &x,const int n)
 /*    double hd = 0.0;
     double hp = exp(- arg);
     int ni = 0;
-    double a = 1.0 / sqrt(PI);
+    double a = 1.0 / sqrt(ModuleBase::PI);
 
     for (int i = 0;i < n;i++)
     {
@@ -665,7 +665,7 @@ double Occupy::w1gauss(const double &x,const int n)
     double hp = std::exp(- arg);
     double h0 = 1.00;
     double h1 = 2.00 * x;
-    double a = 1.0 / sqrt(PI);
+    double a = 1.0 / sqrt(ModuleBase::PI);
     for (int i = 0;i < n;i++)
     {
         a = - a / ( static_cast<double>(i+1) * 4.00);

@@ -266,8 +266,8 @@ void Chi0_standard:: Chi()
 			Cal_rpa(iq);
 			Cal_chi();
 			std::cout<<"chi iq= "<<iq<<" omega= "<<omega<<"  "<<chi[0][0].real()<<" "<<chi[0][0].imag()<<std::endl;
-			std::cout<<"epsilon iq= "<<iq<<" omega= "<<omega<<"  "<<8*PI/q/q*chi[0][0].real()<<" "<<8*PI/q/q*chi[0][0].imag()<<std::endl;
-			gather[count] = -8*PI/q/q*chi[0][0].imag();		
+			std::cout<<"epsilon iq= "<<iq<<" omega= "<<omega<<"  "<<8*ModuleBase::PI/q/q*chi[0][0].real()<<" "<<8*ModuleBase::PI/q/q*chi[0][0].imag()<<std::endl;
+			gather[count] = -8*ModuleBase::PI/q/q*chi[0][0].imag();		
 			count++;
 		}
 
@@ -714,11 +714,11 @@ void Chi0_standard:: Cal_rpa(int iq)
 		{
 			if(g0!=g1)
 			{
-				rpa[g0][g1] = -8.0 * PI/qg2(iq,g0) * chi0[g0][g1];
+				rpa[g0][g1] = -8.0 * ModuleBase::PI/qg2(iq,g0) * chi0[g0][g1];
 			}
 			else
 			{
-				rpa[g0][g1] = 1.0 - 8.0 * PI/qg2(iq,g0) * chi0[g0][g1];			 	
+				rpa[g0][g1] = 1.0 - 8.0 * ModuleBase::PI/qg2(iq,g0) * chi0[g0][g1];			 	
 			}
 		}
 		

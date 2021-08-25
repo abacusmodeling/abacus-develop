@@ -93,8 +93,8 @@ void YlmReal::rlylm
 			for(int ip = 0; ip <= im; ip++)
 			{
 				double aux = Fact(im) / Fact(ip) / Fact(im - ip);
-				Am[im] += aux * pow(x, ip) * pow(y, im-ip) * cos( (im-ip) * PI / 2.0 );
-				Bm[im] += aux * pow(x, ip) * pow(y, im-ip) * sin( (im-ip) * PI / 2.0 );
+				Am[im] += aux * pow(x, ip) * pow(y, im-ip) * cos( (im-ip) * ModuleBase::PI / 2.0 );
+				Bm[im] += aux * pow(x, ip) * pow(y, im-ip) * sin( (im-ip) * ModuleBase::PI / 2.0 );
 			}
 		}
 	}
@@ -365,7 +365,7 @@ void YlmReal::Ylm_Real
         }
         else if (g[ig].x < -1.e-9)
         {
-            phi[ig] = atan(g[ig].y / g[ig].x) + PI;
+            phi[ig] = atan(g[ig].y / g[ig].x) + ModuleBase::PI;
         }
         else
         {

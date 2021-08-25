@@ -146,9 +146,9 @@ void MD_func::InitVelocity(
 			else j2=j0+m;										
 			v=((double)j1)/((double)m);		        //second ramdon number
 			j1=j2;
-			x=tan(PI*(u-0.5));
-			y=1.6*v/(PI*(x*x+1.0));
-			if(y<=(1.0/sqrt(2.0*PI)*exp(-0.5*x*x))){
+			x=tan(ModuleBase::PI*(u-0.5));
+			y=1.6*v/(ModuleBase::PI*(x*x+1.0));
+			if(y<=(1.0/sqrt(2.0*ModuleBase::PI)*exp(-0.5*x*x))){
 				if(M<numIon) vel[M].x=x;
 				else if(M<2*numIon) vel[M-numIon].y=x;
 				else vel[M-2*numIon].z=x;

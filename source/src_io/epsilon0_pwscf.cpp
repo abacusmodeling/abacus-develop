@@ -134,7 +134,7 @@ void Epsilon0_pwscf:: Cal_epsilon0()
 			}
 		}
 		
-		double coff = 64 * PI /GlobalC::ucell.omega/GlobalC::kv.nks;
+		double coff = 64 * ModuleBase::PI /GlobalC::ucell.omega/GlobalC::kv.nks;
 		std::cout << "all finish" << std::endl;
 		
 		for(int iw=0; iw<nomega; iw++)
@@ -255,7 +255,7 @@ void Epsilon0_pwscf:: Cal_epsilon0()
 			}
 		}
 		
-		double coff = 128 * PI /GlobalC::ucell.omega/GlobalC::kv.nks;
+		double coff = 128 * ModuleBase::PI /GlobalC::ucell.omega/GlobalC::kv.nks;
 		std::cout << "all finish" << std::endl;
 
 		for(int iw=0; iw<nomega; iw++)

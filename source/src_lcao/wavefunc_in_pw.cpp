@@ -195,7 +195,7 @@ double Wavefunc_in_pw::smearing(const double &energy_x,
     }
     else if (energy_x >= beta_e && energy_x <= ecut)
     {
-        const double arg = PI * (ecut - energy_x) * 0.5 / (1-beta) / ecut ;
+        const double arg = ModuleBase::PI * (ecut - energy_x) * 0.5 / (1-beta) / ecut ;
         // const double sin_arg = sin(arg);  // gong 2009. 7. 12 , correct
         // w = sin_arg*sin_argi ;
         w = 0.5 * (1 - cos(2.0 * arg));
@@ -351,7 +351,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ModuleBase::Complex
 									}
 									//and construct the starting wavefunctions as in the noncollinear case.
 									alpha = GlobalC::ucell.magnet.angle1_[it];
-									gamma = -1 * GlobalC::ucell.magnet.angle2_[it] + 0.5 * PI;
+									gamma = -1 * GlobalC::ucell.magnet.angle2_[it] + 0.5 * ModuleBase::PI;
 
 									for(int m = 0;m<2*L+1;m++)
 									{
@@ -368,12 +368,12 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ModuleBase::Complex
 											fup = cos(0.5 * alpha) * aux[ig];
 											fdown = IMAG_UNIT * sin(0.5* alpha) * aux[ig];
 											//build the orthogonal wfc
-											//first rotation with angle (alpha + PI) around (OX)
+											//first rotation with angle (alpha + ModuleBase::PI) around (OX)
 											psi(iwall,ig) = (cos(0.5 * gamma) + IMAG_UNIT * sin(0.5*gamma)) * fup;
 											psi(iwall,ig+ GlobalC::wf.npwx) = (cos(0.5 * gamma) - IMAG_UNIT * sin(0.5*gamma)) * fdown;
 											//second rotation with angle gamma around(OZ)
-											fup = cos(0.5 * (alpha + PI))*aux[ig];
-											fdown = IMAG_UNIT * sin(0.5 * (alpha + PI))*aux[ig];
+											fup = cos(0.5 * (alpha + ModuleBase::PI))*aux[ig];
+											fdown = IMAG_UNIT * sin(0.5 * (alpha + ModuleBase::PI))*aux[ig];
 											psi(iwall+2*L+1,ig) = (cos(0.5*gamma) + IMAG_UNIT*sin(0.5*gamma))*fup;
 											psi(iwall+2*L+1,ig+ GlobalC::wf.npwx) = (cos(0.5*gamma) - IMAG_UNIT*sin(0.5*gamma))*fdown;
 										}
@@ -387,7 +387,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ModuleBase::Complex
 								double alpha, gamman;
 								std::complex<double> fup, fdown;
 								alpha = GlobalC::ucell.magnet.angle1_[it];
-								gamman = -GlobalC::ucell.magnet.angle2_[it] + 0.5*PI;
+								gamman = -GlobalC::ucell.magnet.angle2_[it] + 0.5*ModuleBase::PI;
 								for(int m = 0;m<2*L+1;m++)
 								{
 									const int lm = L*L +m;
@@ -403,12 +403,12 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ModuleBase::Complex
 										fup = cos(0.5*alpha) * aux[ig];
 										fdown = IMAG_UNIT * sin(0.5* alpha) * aux[ig];
 										//build the orthogonal wfc
-										//first rotation with angle(alpha+PI) around(OX)
+										//first rotation with angle(alpha+ModuleBase::PI) around(OX)
 										psi(iwall,ig) = (cos(0.5 * gamman) + IMAG_UNIT * sin(0.5*gamman)) * fup;
 										psi(iwall,ig+ GlobalC::wf.npwx) = (cos(0.5 * gamman) - IMAG_UNIT * sin(0.5*gamman)) * fdown;
 										//second rotation with angle gamma around(OZ)
-										fup = cos(0.5 * (alpha + PI)) * aux[ig];
-										fdown = IMAG_UNIT * sin(0.5 * (alpha + PI)) * aux[ig];
+										fup = cos(0.5 * (alpha + ModuleBase::PI)) * aux[ig];
+										fdown = IMAG_UNIT * sin(0.5 * (alpha + ModuleBase::PI)) * aux[ig];
 										psi(iwall+2*L+1,ig) = (cos(0.5*gamman) + IMAG_UNIT*sin(0.5*gamman))*fup;
 										psi(iwall+2*L+1,ig+ GlobalC::wf.npwx) = (cos(0.5*gamman) - IMAG_UNIT*sin(0.5*gamman))*fdown;
 									} // end ig
@@ -568,7 +568,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ModuleBase::Comp
 									}
 									//and construct the starting wavefunctions as in the noncollinear case.
 									alpha = GlobalC::ucell.magnet.angle1_[it];
-									gamma = -1 * GlobalC::ucell.magnet.angle2_[it] + 0.5 * PI;
+									gamma = -1 * GlobalC::ucell.magnet.angle2_[it] + 0.5 * ModuleBase::PI;
 
 									for(int m = 0;m<2*L+1;m++)
 									{
@@ -585,12 +585,12 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ModuleBase::Comp
 											fup = cos(0.5 * alpha) * aux[ig];
 											fdown = IMAG_UNIT * sin(0.5* alpha) * aux[ig];
 											//build the orthogonal wfc
-											//first rotation with angle (alpha + PI) around (OX)
+											//first rotation with angle (alpha + ModuleBase::PI) around (OX)
 											psi(iwall,ig) = (cos(0.5 * gamma) + IMAG_UNIT * sin(0.5*gamma)) * fup;
 											psi(iwall,ig+ GlobalC::wf.npwx) = (cos(0.5 * gamma) - IMAG_UNIT * sin(0.5*gamma)) * fdown;
 											//second rotation with angle gamma around(OZ)
-											fup = cos(0.5 * (alpha + PI))*aux[ig];
-											fdown = IMAG_UNIT * sin(0.5 * (alpha + PI))*aux[ig];
+											fup = cos(0.5 * (alpha + ModuleBase::PI))*aux[ig];
+											fdown = IMAG_UNIT * sin(0.5 * (alpha + ModuleBase::PI))*aux[ig];
 											psi(iwall+2*L+1,ig) = (cos(0.5*gamma) + IMAG_UNIT*sin(0.5*gamma))*fup;
 											psi(iwall+2*L+1,ig+ GlobalC::wf.npwx) = (cos(0.5*gamma) - IMAG_UNIT*sin(0.5*gamma))*fdown;
 										}
@@ -604,7 +604,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ModuleBase::Comp
 								double alpha, gamman;
 								std::complex<double> fup, fdown;
 								alpha = GlobalC::ucell.magnet.angle1_[it];
-								gamman = -GlobalC::ucell.magnet.angle2_[it] + 0.5*PI;
+								gamman = -GlobalC::ucell.magnet.angle2_[it] + 0.5*ModuleBase::PI;
 								for(int m = 0;m<2*L+1;m++)
 								{
 									const int lm = L*L +m;
@@ -620,12 +620,12 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ModuleBase::Comp
 										fup = cos(0.5*alpha) * aux[ig];
 										fdown = IMAG_UNIT * sin(0.5* alpha) * aux[ig];
 										//build the orthogonal wfc
-										//first rotation with angle(alpha+PI) around(OX)
+										//first rotation with angle(alpha+ModuleBase::PI) around(OX)
 										psi(iwall,ig) = (cos(0.5 * gamman) + IMAG_UNIT * sin(0.5*gamman)) * fup;
 										psi(iwall,ig+ GlobalC::wf.npwx) = (cos(0.5 * gamman) - IMAG_UNIT * sin(0.5*gamman)) * fdown;
 										//second rotation with angle gamma around(OZ)
-										fup = cos(0.5 * (alpha + PI)) * aux[ig];
-										fdown = IMAG_UNIT * sin(0.5 * (alpha + PI)) * aux[ig];
+										fup = cos(0.5 * (alpha + ModuleBase::PI)) * aux[ig];
+										fdown = IMAG_UNIT * sin(0.5 * (alpha + ModuleBase::PI)) * aux[ig];
 										psi(iwall+2*L+1,ig) = (cos(0.5*gamman) + IMAG_UNIT*sin(0.5*gamman))*fup;
 										psi(iwall+2*L+1,ig+ GlobalC::wf.npwx) = (cos(0.5*gamman) - IMAG_UNIT*sin(0.5*gamman))*fdown;
 									}

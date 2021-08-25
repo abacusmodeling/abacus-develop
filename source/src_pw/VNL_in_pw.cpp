@@ -402,15 +402,15 @@ std::complex<double> pseudopot_cell_vnl::Cal_C(int alpha, int lu, int mu, int L,
 	std::complex<double> cf;
 	if(alpha == 0)
 	{
-		cf = -sqrt(4*PI/3)*CG(lu,mu,1,1,L,M);
+		cf = -sqrt(4*ModuleBase::PI/3)*CG(lu,mu,1,1,L,M);
 	}
 	else if(alpha == 1)
 	{
-		cf = -sqrt(4*PI/3)*CG(lu,mu,1,2,L,M);
+		cf = -sqrt(4*ModuleBase::PI/3)*CG(lu,mu,1,2,L,M);
 	}
 	else if(alpha == 2)
 	{
-		cf = sqrt(4*PI/3)*CG(lu,mu,1,0,L,M);
+		cf = sqrt(4*ModuleBase::PI/3)*CG(lu,mu,1,0,L,M);
 	}
 	else
 	{

@@ -731,7 +731,7 @@ double &sx, double &v1x, double &v2x)
     
 	// numerical coefficients (NB: c2=(3 pi^2)^(1/3) )
     const double third = 1.0 / 3.0;
-    const double c1 = 0.750 / PI;
+    const double c1 = 0.750 / ModuleBase::PI;
     const double c2 = 3.0936677262801360;
     const double c5 = 4.0 * third;
     // parameters of the functional
@@ -1190,7 +1190,7 @@ void XC_Functional::wcx(const double &rho,const double &grho, double &sx, double
   double third, c1, c2, c5, teneightyone;	// c6
   
   third = 1.0/3.0;
-  c1 = 0.75/PI;
+  c1 = 0.75/ModuleBase::PI;
   c2 = 3.093667726280136;
   c5 = 4.0 * third;
   teneightyone = 0.123456790123;
