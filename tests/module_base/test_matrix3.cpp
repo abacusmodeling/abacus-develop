@@ -1,4 +1,4 @@
-#include "module_base/matrix3.h"
+#include "matrix3.h"
 #include "gtest/gtest.h"
 #include <random>
 #include <vector>
