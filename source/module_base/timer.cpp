@@ -52,10 +52,10 @@ double timer::cpu_time(void)
 	// const time_t t1 = time(NULL);
 	// double res = difftime(t1, t0);
 	// return (res<0) ? 0 : res;
-	static auto t1 = chrono::system_clock::now();
-	const auto t2 = chrono::system_clock::now();
-	auto duration = chrono::duration_cast<chrono::microseconds>(t2 - t1);
-	return double(duration.count()) * chrono::microseconds::period::num / chrono::microseconds::period::den;
+	static auto t1 = std::chrono::system_clock::now();
+	const auto t2 = std::chrono::system_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1);
+	return double(duration.count()) * std::chrono::microseconds::period::num / std::chrono::microseconds::period::den;
 		// mohan add, abandon the cross point time 2^32 ~ -2^32 .
 }
 
