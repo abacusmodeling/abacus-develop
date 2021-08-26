@@ -1,7 +1,7 @@
 <!--
  * @Date: 2021-08-21 21:58:06
  * @LastEditors: jiyuyang
- * @LastEditTime: 2021-08-26 14:32:52
+ * @LastEditTime: 2021-08-26 14:41:36
  * @Mail: jiyuyang@mail.ustc.edu.cn, 1041176461@qq.com
 -->
 
@@ -104,5 +104,5 @@ If you only want to plot total DOS, you can modify `pdosfile` to `tdosfile` and 
 
 Then, the following command will plot both total DOS and partial DOS:
 ```shell
-abacus-plot -b dos-input.json
+abacus-plot -d dos-input.json
 ```
