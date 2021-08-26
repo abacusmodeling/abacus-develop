@@ -59,7 +59,7 @@ void Electrons::non_self_consistent(const int &istep)
         {
             GlobalV::ofs_running << " spin" << GlobalC::kv.isk[ik]+1
             << "_final_band " << ib+1
-            << " " << GlobalC::wf.ekb[ik][ib] * Ry_to_eV
+            << " " << GlobalC::wf.ekb[ik][ib] * ModuleBase::Ry_to_eV
             << " " << GlobalC::wf.wg(ik, ib)*GlobalC::kv.nks << std::endl;
         }
         GlobalV::ofs_running << std::endl;
