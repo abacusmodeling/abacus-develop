@@ -46,7 +46,7 @@ void Exx_Abfs::Matrix_Orbs11::init(
 	//=========================================
 	//liaochen add 2010/4/29
 //gettimeofday( &t_start, NULL);
-	Ylm::set_coefficients ();
+	ModuleBase::Ylm::set_coefficients ();
 //ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init::Ylm\t"<<time_during(t_start)<<std::endl;
 	
 	//=========================================

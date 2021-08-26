@@ -63,7 +63,7 @@ void cal_r_overlap_R::init()
 		
 	MOT.init_Table_Spherical_Bessel (2, 3, Lmax_used, Lmax, Exx_Abfs::Lmax);
 
-	Ylm::set_coefficients();
+	ModuleBase::Ylm::set_coefficients();
 
 	MGT.init_Gaunt_CH( Lmax );
 	MGT.init_Gaunt( Lmax );	

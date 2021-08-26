@@ -66,7 +66,7 @@ public:
         const double &R31,const double &R32,const double &R33,
         double &cx,double &cy,double &cz)
     {
-        static Matrix3 lattice_vector;
+        static ModuleBase::Matrix3 lattice_vector;
         static ModuleBase::Vector3<double> direct_vec, cartesian_vec;
         lattice_vector.e11 = R11;
         lattice_vector.e12 = R12;
@@ -97,7 +97,7 @@ public:
         const double &R31,const double &R32,const double &R33,
         double &dx,double &dy,double &dz)
     {
-        static Matrix3 lattice_vector, inv_lat;
+        static ModuleBase::Matrix3 lattice_vector, inv_lat;
         lattice_vector.e11 = R11;
         lattice_vector.e12 = R12;
         lattice_vector.e13 = R13;

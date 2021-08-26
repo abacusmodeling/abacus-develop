@@ -30,12 +30,12 @@ UnitCell::UnitCell()
 	lc = new int[3];
     itiaiw2iwt.create(1,1,1);
 
-    latvec = Matrix3();
-    latvec_supercell = Matrix3();
-    G = Matrix3();
-    GT = Matrix3();
-    GGT = Matrix3();
-    invGGT = Matrix3();
+    latvec = ModuleBase::Matrix3();
+    latvec_supercell = ModuleBase::Matrix3();
+    G = ModuleBase::Matrix3();
+    GT = ModuleBase::Matrix3();
+    GGT = ModuleBase::Matrix3();
+    invGGT = ModuleBase::Matrix3();
 
     tpiba = 0.0;
     tpiba2 = 0.0;

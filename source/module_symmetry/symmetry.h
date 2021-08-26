@@ -54,10 +54,10 @@ public:
 	std::string ilattname;	//the bravais lattice type of the supercell
 	std::string plattname;	//the bravais lattice type of the primitive cell
 
-	Matrix3 gmatrix[48];	//the rotation matrices for all space group operations
+	ModuleBase::Matrix3 gmatrix[48];	//the rotation matrices for all space group operations
 	ModuleBase::Vector3<double> gtrans[48];
 	
-	Matrix3 symop[48];	//the rotation matrices for the pure bravais lattice
+	ModuleBase::Matrix3 symop[48];	//the rotation matrices for the pure bravais lattice
 	int nop;	//the number of point group operations of the pure bravais lattice without basis
 	int s_flag;	//whether the current matrix is one of all space group operations
 	int nrot;	//the number of pure point group rotations
@@ -87,7 +87,7 @@ public:
 	// check if the input cell is a primitive cell.
 	//void pricell(const UnitCell_pseudo &ucell);
 	void getgroup(int &nrot, int &nrotk, std::ofstream &ofs_running);
-	void checksym(Matrix3 &s, ModuleBase::Vector3<double> &gtrans, double *pos);
+	void checksym(ModuleBase::Matrix3 &s, ModuleBase::Vector3<double> &gtrans, double *pos);
 	void rho_symmetry(double *rho, const int &nr1, const int &nr2, const int &nr3);
 	void force_symmetry(ModuleBase::matrix &force, double* pos, const UnitCell_pseudo &ucell);
 	void stress_symmetry(ModuleBase::matrix &sigma, const UnitCell_pseudo &ucell);

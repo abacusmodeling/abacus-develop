@@ -60,8 +60,8 @@ void K_Vectors::set(
     const ModuleSymmetry::Symmetry &symm,
     const std::string &k_file_name,
     const int& nspin_in,
-    const Matrix3 &reciprocal_vec,
-    const Matrix3 &latvec)
+    const ModuleBase::Matrix3 &reciprocal_vec,
+    const ModuleBase::Matrix3 &latvec)
 {
     ModuleBase::TITLE("K_Vectors", "set");
 
@@ -558,8 +558,8 @@ void K_Vectors::ibz_kpoint(const ModuleSymmetry::Symmetry &symm)
     // inverse operation, double it.
     //===============================================
     bool include_inv = false;
-    Matrix3 *kgmatrix = new Matrix3[48 * 2];
-    Matrix3 inv(-1, 0, 0, 0, -1, 0, 0, 0, -1);
+    ModuleBase::Matrix3 *kgmatrix = new ModuleBase::Matrix3[48 * 2];
+    ModuleBase::Matrix3 inv(-1, 0, 0, 0, -1, 0, 0, 0, -1);
 
     int nrotkm = symm.nrotk;// change if inv not included
     for (int i = 0; i < nrotkm; ++i)
@@ -715,7 +715,7 @@ void K_Vectors::ibz_kpoint(const ModuleSymmetry::Symmetry &symm)
 }
 
 
-void K_Vectors::set_both_kvec(const Matrix3 &G, const Matrix3 &R)
+void K_Vectors::set_both_kvec(const ModuleBase::Matrix3 &G, const ModuleBase::Matrix3 &R)
 {
 
     if(GlobalV::FINAL_SCF) //LiuXh add 20180606
@@ -768,7 +768,7 @@ void K_Vectors::set_both_kvec(const Matrix3 &G, const Matrix3 &R)
     // set direct k vectors
     else if (kc_done && !kd_done)
     {
-        Matrix3 RT = R.Transpose();
+        ModuleBase::Matrix3 RT = R.Transpose();
         for (int i = 0;i < nkstot;i++)
         {
 //			std::cout << " ik=" << i
@@ -1021,8 +1021,8 @@ void K_Vectors::set_after_vc(
         const ModuleSymmetry::Symmetry &symm,
         const std::string &k_file_name,
         const int& nspin_in,
-        const Matrix3 &reciprocal_vec,
-        const Matrix3 &latvec)
+        const ModuleBase::Matrix3 &reciprocal_vec,
+        const ModuleBase::Matrix3 &latvec)
 {
     ModuleBase::TITLE("K_Vectors", "set_after_vc");
 
@@ -1118,7 +1118,7 @@ void K_Vectors::mpi_k_after_vc(void)
 #endif
 }
 
-void K_Vectors::set_both_kvec_after_vc(const Matrix3 &G, const Matrix3 &R)
+void K_Vectors::set_both_kvec_after_vc(const ModuleBase::Matrix3 &G, const ModuleBase::Matrix3 &R)
 {
     // set cartesian k vectors.
     kd_done = true;
@@ -1146,7 +1146,7 @@ void K_Vectors::set_both_kvec_after_vc(const Matrix3 &G, const Matrix3 &R)
     // set direct k vectors
     else if (kc_done && !kd_done)
     {
-        Matrix3 RT = R.Transpose();
+        ModuleBase::Matrix3 RT = R.Transpose();
         for (int i = 0;i < nkstot;i++)
         {
 //			std::cout << " ik=" << i

@@ -1,5 +1,9 @@
 #include "mymath.h"
 #include "timer.h"
+
+namespace ModuleBase
+{
+
 void heapAjust(double *r, int *ind, int s, int m)
 {
     int j, ic;
@@ -167,4 +171,6 @@ void hpsort(int n, double *ra, int *ind)
 
         ind[i] = iind;
     }
+}
+
 }

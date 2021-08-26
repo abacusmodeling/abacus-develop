@@ -6,6 +6,9 @@
 #include <cstdlib>
 #include "mymath.h"
 
+namespace ModuleBase
+{
+
 typedef double real;
 #ifdef __FFTW3
 void fftw_zeros(fftw_complex *data,int n)
@@ -259,3 +262,5 @@ double gauss_freq(double x)
     const double g_freq = 0.5 * my_erfc(- x * 0.707106781186548);
     return g_freq;
 } //end function gauss_freq
+
+}

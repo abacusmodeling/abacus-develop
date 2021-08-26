@@ -3,7 +3,7 @@
 
 #include "ORB_read.h" // use LCAO_Orbitals
 #include "ORB_atomic_lm.h" // use Numerical_Orbital_Lm
-#include "../module_base/sph_bessel_recursive.h" // use Sph_Bessel_Recursive
+#include "../module_base/sph_bessel_recursive.h" // use ModuleBase::Sph_Bessel_Recursive
 
 class ORB_table_beta
 {
@@ -37,7 +37,7 @@ class ORB_table_beta
 	ModuleBase::IntArray NL_Opair;
 	ModuleBase::IntArray NL_L2plus1;
 
-	void init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB);
+	void init_Table_Beta(ModuleBase::Sph_Bessel_Recursive::D2 *pSB);
 
 	void Destroy_Table_Beta(LCAO_Orbitals &orb);
 
@@ -50,7 +50,7 @@ class ORB_table_beta
 	private:
 
 	void cal_VNL_PhiBeta_R(
-		Sph_Bessel_Recursive::D2 *pSB, // mohan add 2021-03-06
+		ModuleBase::Sph_Bessel_Recursive::D2 *pSB, // mohan add 2021-03-06
         const int &l,
         const Numerical_Orbital_Lm &n1,
         const Numerical_Nonlocal_Lm &n2,

@@ -8,6 +8,9 @@
 #include "vector3.h"
 #include "matrix.h"
 
+namespace ModuleBase
+{
+
 class Matrix3
 {
 	/* data */
@@ -68,6 +71,8 @@ ModuleBase::Vector3<double> operator *(const ModuleBase::Vector3<T> &u, const Ma
 	return ModuleBase::Vector3<double>(u.x*m.e11 + u.y*m.e21 + u.z*m.e31,
 	                       u.x*m.e12 + u.y*m.e22 + u.z*m.e32,
 	                       u.x*m.e13 + u.y*m.e23 + u.z*m.e33);
+}
+
 }
 
 #endif // MATRIX3_H

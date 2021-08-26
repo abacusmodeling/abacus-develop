@@ -10,15 +10,15 @@
 namespace PW_complement
 {
 int get_total_pw_number(const double& ggcut_start, const double& ggcut_end,
-                        const int& nx, const int& ny, const int& nz, const Matrix3& GGT);
+                        const int& nx, const int& ny, const int& nz, const ModuleBase::Matrix3& GGT);
 
 void get_total_pw(double* ig2sort, ModuleBase::Vector3<double> *igsort,
                   const double& ggcut_start, const double& ggcut_end,
-                  const int& nx, const int& ny, const int& nz, const Matrix3& GGT, // GGT = G*GT
+                  const int& nx, const int& ny, const int& nz, const ModuleBase::Matrix3& GGT, // GGT = G*GT
                   int& ngm); // number of total plane waves.
 
 // output nx, ny, nz according to input: latve and ggcut.
-void get_FFT_dimension(const Matrix3& latvec, const double &ggcut, int &nx, int &ny, int &nz,
+void get_FFT_dimension(const ModuleBase::Matrix3& latvec, const double &ggcut, int &nx, int &ny, int &nz,
 const int &bx, const int &by, const int &bz);
 
 //==========================================================
@@ -31,13 +31,13 @@ const int &bx, const int &by, const int &bz);
 // the 3D G-grid and the FFT grid.
 // generate : gg_global, g_global, ig_global
 //==========================================================
-void setup_GVectors(const Matrix3& G, const int &ngmc_g, double* gg,
+void setup_GVectors(const ModuleBase::Matrix3& G, const int &ngmc_g, double* gg,
                     ModuleBase::Vector3<double>* ig, ModuleBase::Vector3<double>* g);
 
 void get_total_pw_after_vc(double* ig2sort0, double* ig2sort, ModuleBase::Vector3<double> *igsort,
                   const double& ggcut_start, const double& ggcut_end,
-                  const int& nx, const int& ny, const int& nz, const Matrix3& GGT, // GGT = G*GT
-                  const Matrix3& GGT0,
+                  const int& nx, const int& ny, const int& nz, const ModuleBase::Matrix3& GGT, // GGT = G*GT
+                  const ModuleBase::Matrix3& GGT0,
                   int& ngm); // number of total plane waves.
 
 #ifndef __MPI

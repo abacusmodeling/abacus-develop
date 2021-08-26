@@ -124,7 +124,7 @@ int ORB_table_alpha::get_rmesh(const double &R1, const double &R2)
 }
 
 void ORB_table_alpha::cal_S_PhiAlpha_R(
-	Sph_Bessel_Recursive::D2 *pSB, // mohan add 2021-03-06
+	ModuleBase::Sph_Bessel_Recursive::D2 *pSB, // mohan add 2021-03-06
 	const int &l,
 	const Numerical_Orbital_Lm &n1,
 	const Numerical_Orbital_Lm &n2,
@@ -220,7 +220,7 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 }
 
 void ORB_table_alpha::init_Table_Alpha(
-	Sph_Bessel_Recursive::D2 *pSB)
+	ModuleBase::Sph_Bessel_Recursive::D2 *pSB)
 {
 	ModuleBase::TITLE("ORB_table_alpha", "init_Table_Alpha");
 	ModuleBase::timer::tick("ORB_table_alpha", "init_Table_Alpha");

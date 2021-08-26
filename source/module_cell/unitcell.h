@@ -33,15 +33,15 @@ public:
     double tpiba2; // tpiba ^ 2
     double omega;// the volume of the unit cell
 
-    Matrix3 latvec; // Unitcell lattice vectors
+    ModuleBase::Matrix3 latvec; // Unitcell lattice vectors
 	int *lc;  // Change the lattice vectors or not
 	ModuleBase::Vector3<double> a1,a2,a3; // Same as latvec, just at another form.
 	ModuleBase::Vector3<double> latcenter; // (a1+a2+a3)/2 the center of vector
-    Matrix3 latvec_supercell; // Supercell lattice vectors
-    Matrix3 G; // reciprocal lattice vector (2pi*inv(R) )
-    Matrix3 GT; // traspose of G
-    Matrix3 GGT; // GGT = G*GT
-    Matrix3 invGGT; // inverse G
+    ModuleBase::Matrix3 latvec_supercell; // Supercell lattice vectors
+    ModuleBase::Matrix3 G; // reciprocal lattice vector (2pi*inv(R) )
+    ModuleBase::Matrix3 GT; // traspose of G
+    ModuleBase::Matrix3 GGT; // GGT = G*GT
+    ModuleBase::Matrix3 invGGT; // inverse G
 
     //========================================================
     // relationship between:
@@ -65,10 +65,10 @@ public:
     ModuleBase::IntArray itia2iat;//(it, ia)==>iat, the index in nat, add 2009-3-2 by mohan
     ModuleBase::IntArray itiaiw2iwt;//(it, ia, iw)==>iwt, the index in nwfc, add 2009-3-2 by mohan
     //LiuXh add 20180515
-    Matrix3 G0;
-    Matrix3 GT0;
-    Matrix3 GGT0;
-    Matrix3 invGGT0;
+    ModuleBase::Matrix3 G0;
+    ModuleBase::Matrix3 GT0;
+    ModuleBase::Matrix3 GGT0;
+    ModuleBase::Matrix3 invGGT0;
 	
 public:
     UnitCell();

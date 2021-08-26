@@ -735,7 +735,7 @@ void Occupy::tweights(const int nks,const int nspin,const int nband,const double
 
                 itetra[0] = 0;
 
-                hpsort(4, etetra, itetra);
+                ModuleBase::hpsort(4, etetra, itetra);
 
                 //===============================================
                 // ...sort in ascending order: e1 < e2 < e3 < e4

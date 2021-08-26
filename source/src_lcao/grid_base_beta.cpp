@@ -13,7 +13,7 @@ Grid_Base_Beta::~Grid_Base_Beta()
 }
 
 void Grid_Base_Beta::prepare(
-    const Matrix3 &latvec_in,
+    const ModuleBase::Matrix3 &latvec_in,
     const double &lat0_in)
 {
 	ModuleBase::TITLE("Grid_Base_Beta","prepare");

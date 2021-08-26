@@ -1,7 +1,7 @@
 #include "math_sphbes.h"
 #include "timer.h"
 #include "constants.h"
-
+using namespace std;
 namespace ModuleBase
 {
 

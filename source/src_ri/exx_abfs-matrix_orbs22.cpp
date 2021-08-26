@@ -39,7 +39,7 @@ gettimeofday( &t_start, NULL);
 	//=========================================
 	// (2) init Ylm Coef
 	//=========================================
-	Ylm::set_coefficients ();
+	ModuleBase::Ylm::set_coefficients ();
 
 	//=========================================
 	// (3) make Gaunt coefficients table

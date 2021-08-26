@@ -97,7 +97,7 @@ inline void cal_psir_ylm(
 			//	Ylm::get_ylm_real(this->nnn[it], this->dr[id], ylma);
 			if (distance < 1.0E-9) distance += 1.0E-9;
 			
-			Ylm::sph_harm (	GlobalC::ucell.atoms[it].nwl,
+			ModuleBase::Ylm::sph_harm (	GlobalC::ucell.atoms[it].nwl,
 					dr[0] / distance,
 					dr[1] / distance,
 					dr[2] / distance,
