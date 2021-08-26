@@ -82,12 +82,22 @@ void ORB_gen_tables::gen_tables(
 	// PLEASE add explanations for all options of 'orb_num' and 'mode'
 	// mohan add 2021-04-03
 	// Peize Lin update 2016-01-26
+#ifdef __ORBITAL
+	int orb_num = 4;
+#else
 	int orb_num = 2; //
+#endif
 	int mode = 1;	 // 1: <phi|phi> and <phi|beta>
 	int Lmax_used = 0;
-	int Lmax = 0;
 
-	MOT.init_Table_Spherical_Bessel(orb_num, mode, Lmax_used, Lmax, Lmax_exx);
+#ifdef __ORBITAL
+	int Lmax=orb.get_lmax();
+#else
+	int Lmax = 0;
+#endif
+
+
+	MOT.init_Table_Spherical_Bessel(orb_num, mode, Lmax_used, Lmax, Lmax_exx, orb);
 
 	//calculate S(R) for interpolation
 	MOT.init_Table(job0, orb);

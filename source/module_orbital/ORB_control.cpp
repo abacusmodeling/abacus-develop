@@ -67,7 +67,6 @@ void ORB_control::set_orb_tables(
 	}
 #endif
 
-#ifndef __ORBITAL
 
     ///////////////////////////////////////////////////////////////////
     /// (2) FUNCTION : Generate Gaunt_Coefficients and S-table using OGT.init
@@ -75,7 +74,11 @@ void ORB_control::set_orb_tables(
 	///
 	/// (2) RESULT : we have tabulated S table for use.
     ///////////////////////////////////////////////////////////////////
+#ifdef __ORBITAL
+	const int job0 = 1;
+#else
     const int job0 = 3;
+#endif
     /// job0 :
     /// 1. generate overlap table
     /// 2. generate kinetic table
@@ -85,7 +88,6 @@ void ORB_control::set_orb_tables(
 
 	assert(lat0>0.0);
     OGT.set_unit(lat0);
-#endif
 
 	ModuleBase::timer::tick("ORB_control","set_orb_tables");
     return;
