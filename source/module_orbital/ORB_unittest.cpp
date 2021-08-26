@@ -5,10 +5,73 @@
 #include "../module_base/global_function.h"	
 
 test_orb::test_orb()
-{}
+{
+	ofs_running.open("log.txt");
+}
 
 test_orb::~test_orb()
 {}
+
+void test_orb::set_ekcut()
+{
+	std::cout << "set lcao_ecut from LCAO files" << std::endl;
+	//set as max of ekcut from every element
+
+	lcao_ecut=0.0;
+	std::ifstream in_ao;
+
+	for(int it=0;it<ntype;it++)
+	{
+		double ek_current;
+
+		in_ao.open(ORB.orbital_file[it].c_str());
+		if(!in_ao)
+		{
+			std::cout << "error : cannot find LCAO file : " << ORB.orbital_file[it] << std::endl;
+		}
+
+		string word;
+		while (in_ao.good())
+		{
+			in_ao >> word;
+			if(word == "Cutoff(Ry)") break;
+		}
+		in_ao >> ek_current;
+		lcao_ecut = std::max(lcao_ecut,ek_current);
+
+		in_ao.close();
+	}
+
+	ORB.ecutwfc=lcao_ecut;
+	cout << "lcao_ecut : " << lcao_ecut << std::endl;
+	
+	return;
+}
+
+void test_orb::read_files()
+{
+	for(int it=0;it<ntype;it++)
+	{
+		std::cout << "read from orbital_file : " << ORB.orbital_file[it] << std::endl;
+		ooo.set_orb_tables(ofs_running,
+			OGT,
+			ORB,
+			ntype,
+			lmax,
+			lcao_ecut,
+			lcao_dk,
+			lcao_dr,
+			lcao_rmax,
+			lat0,
+			out_descriptor,
+			out_r_matrix,
+			lmax,
+			force_flag,
+			my_rank);
+	}
+
+	return;
+}
 
 void test_orb::set_files()
 {
@@ -16,13 +79,13 @@ void test_orb::set_files()
 	std::ifstream ifs("STRU",std::ios::in);
 
 	ModuleBase::GlobalFunc::SCAN_BEGIN(ifs,"NUMERICAL_ORBITAL");
-	GlobalC::ORB.read_in_flag = true;
+	ORB.read_in_flag = true;
 
 	for(int it=0;it<ntype;it++)
 	{
 		std::string ofile;
 		ifs >> ofile;
-		GlobalC::ORB.orbital_file.push_back(ofile);
+		ORB.orbital_file.push_back(ofile);
 
 		std::cout << "Numerical orbital file : " << ofile << std::endl;
 	}

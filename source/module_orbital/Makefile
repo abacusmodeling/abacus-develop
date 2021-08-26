@@ -40,7 +40,7 @@ VPATH=../module_base\
 #==========================
 # Define HONG
 #==========================
-HONG= -DMETIS -DMKL_ILP64 -D__NORMAL ${HONG_FFTW} 
+HONG= -DMETIS -DMKL_ILP64 -D__NORMAL -D__ORBITAL ${HONG_FFTW} 
 
 FP_OBJS_0=main.o\
 $(OBJS_BASE)\

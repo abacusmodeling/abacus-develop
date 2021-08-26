@@ -67,6 +67,8 @@ void ORB_control::set_orb_tables(
 	}
 #endif
 
+#ifndef __ORBITAL
+
     ///////////////////////////////////////////////////////////////////
     /// (2) FUNCTION : Generate Gaunt_Coefficients and S-table using OGT.init
 	/// 	   Must have 'Numerical Orbital' infomation
@@ -83,7 +85,7 @@ void ORB_control::set_orb_tables(
 
 	assert(lat0>0.0);
     OGT.set_unit(lat0);
-
+#endif
 
 	ModuleBase::timer::tick("ORB_control","set_orb_tables");
     return;
