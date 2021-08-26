@@ -140,8 +140,6 @@ void Run_lcao::lcao_line(void)
 			case Exx_Global::Hybrid_Type::HSE:
 				GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
 				break;
-			default:
-				throw invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 		}
 	}
 
