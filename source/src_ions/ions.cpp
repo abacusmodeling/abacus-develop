@@ -329,6 +329,7 @@ bool Ions::if_do_relax()
 	{
 		if(!GlobalC::ucell.if_atoms_can_move()) 
 		{
+			ModuleBase::WARNING("Ions","No atom is allowed to move!");
 			return 0;
 		}
 //		if(!IMM.get_converged()) return 1;
@@ -345,11 +346,16 @@ bool Ions::if_do_cellrelax()
 	ModuleBase::TITLE("Ions","if_do_cellrelax");
 	if(GlobalV::CALCULATION=="cell-relax")
 	{
-		if(!GlobalC::ucell.if_cell_can_change()||!IMM.get_converged()) 
+		if(!GlobalC::ucell.if_cell_can_change()) 
 		{
+			ModuleBase::WARNING("Ions", "Lattice vectors are not allowed to change!");
 			return 0;
 		}
-		//if(LCM.get_converged()) return 0;
+		else if(GlobalC::ucell.if_atoms_can_move()&&!IMM.get_converged())
+		{
+			GlobalV::ofs_running<<"Note: Need to wait for atomic relaxation first!";
+			return 0;
+		}
 		else 
 		{
 			assert(GlobalV::STRESS==1);
