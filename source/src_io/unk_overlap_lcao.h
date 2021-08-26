@@ -26,9 +26,9 @@ public:
 	ORB_gaunt_table MGT;
 	Numerical_Orbital_Lm orb_r;  // 新建的r矢量,以原子轨道形式存在,以solid球谐函数展开
 	
-	std::vector<std::vector<std::vector<Vector3<double>>>> orb1_orb2_R;
+	std::vector<std::vector<std::vector<ModuleBase::Vector3<double>>>> orb1_orb2_R;
 	std::vector<std::vector<std::vector<double>>> psi_psi;
-	std::vector<std::vector<std::vector<Vector3<double>>>> psi_r_psi;
+	std::vector<std::vector<std::vector<ModuleBase::Vector3<double>>>> psi_r_psi;
 	bool allocate_flag; // 用于初始化数组的
 	std::complex<double>***lcao_wfc_global; // 全局的lcao基组下的波函数系数
 	int** cal_tag; // 用于并行方案
@@ -60,12 +60,12 @@ public:
 	int iw2iL(int iw);
 	int iw2iN(int iw);
 	int iw2im(int iw);
-	std::complex<double> unkdotp_LCAO(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const Vector3<double> dk);
+	std::complex<double> unkdotp_LCAO(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const ModuleBase::Vector3<double> dk);
 	void cal_R_number();
 	void cal_orb_overlap();
 	void get_lcao_wfc_global_ik(std::complex<double> **ctot, std::complex<double> **cc);
-	void prepare_midmatrix_pblas(const int ik_L, const int ik_R, const Vector3<double> dk, std::complex<double> *&midmatrix);
-	std::complex<double> det_berryphase(const int ik_L, const int ik_R, const Vector3<double> dk, const int occ_bands);
+	void prepare_midmatrix_pblas(const int ik_L, const int ik_R, const ModuleBase::Vector3<double> dk, std::complex<double> *&midmatrix);
+	std::complex<double> det_berryphase(const int ik_L, const int ik_R, const ModuleBase::Vector3<double> dk, const int occ_bands);
 	
 	void test();
 	

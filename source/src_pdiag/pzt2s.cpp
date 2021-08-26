@@ -36,7 +36,7 @@ void pzt2s(MPI_Comm comm2D,int N_A,int NB,std::complex <double> *A,std::complex 
  *          object element and its corresponding process  and memory location.
  *      */
 {
-	TITLE("Parallel_Diago","pzt2s");
+	ModuleBase::TITLE("Parallel_Diago","pzt2s");
 
 	/*
 	GlobalV::ofs_running << "\n A matrix elements : " << std::endl;

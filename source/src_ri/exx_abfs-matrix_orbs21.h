@@ -40,24 +40,24 @@ public:
 	void init_radial_table( const std::map<size_t,std::map<size_t,std::set<double>>> &Rs );		// unit: ucell.lat0
 		
 	enum class Matrix_Order{A2B_A1,BA2_A1};
-	matrix cal_overlap_matrix(  
+	ModuleBase::matrix cal_overlap_matrix(  
 		const size_t TA, 
 		const size_t TB, 
-		const Vector3<double> &tauA,											// unit: ucell.lat0
-		const Vector3<double> &tauB,											// unit: ucell.lat0  
+		const ModuleBase::Vector3<double> &tauA,											// unit: ucell.lat0
+		const ModuleBase::Vector3<double> &tauB,											// unit: ucell.lat0  
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_A1, 
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_A2,
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_B,
 		const Matrix_Order &matrix_order) const;
-	std::vector<matrix> cal_overlap_matrix(  
+	std::vector<ModuleBase::matrix> cal_overlap_matrix(  
 		const size_t TA, 
 		const size_t TB, 
-		const Vector3<double> &tauA,											// unit: ucell.lat0
-		const Vector3<double> &tauB,											// unit: ucell.lat0  
+		const ModuleBase::Vector3<double> &tauA,											// unit: ucell.lat0
+		const ModuleBase::Vector3<double> &tauB,											// unit: ucell.lat0  
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_A1, 
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_A2,
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_B) const;
-	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> cal_overlap_matrix(  
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> cal_overlap_matrix(  
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_A1, 
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_A2,
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_B) const;

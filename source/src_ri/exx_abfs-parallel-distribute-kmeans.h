@@ -18,14 +18,14 @@ private:
 
 	struct Cluster
 	{
-		Vector3<double> tau;
+		ModuleBase::Vector3<double> tau;
 		size_t size;
-		Vector3<double> tau_sum;
+		ModuleBase::Vector3<double> tau_sum;
 	};
 
 	struct Atom
 	{
-		Vector3<double> tau;
+		ModuleBase::Vector3<double> tau;
 		int center;
 		double distance;
 	};

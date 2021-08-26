@@ -40,12 +40,12 @@ class Ions
 
 	//seperate force_stress function first
 	bool after_scf(const int &istep, int &force_step, int &stress_step);
-	void gather_force_pw(matrix &force);
-	void gather_stress_pw(matrix& stress);
+	void gather_force_pw(ModuleBase::matrix &force);
+	void gather_stress_pw(ModuleBase::matrix& stress);
 	bool if_do_relax();
 	bool if_do_cellrelax();
-	bool do_relax(const int& istep, int& jstep, const matrix& ionic_force, const double& total_energy);
-	bool do_cellrelax(const int& istep, const matrix& stress, const double& total_energy);
+	bool do_relax(const int& istep, int& jstep, const ModuleBase::matrix& ionic_force, const double& total_energy);
+	bool do_cellrelax(const int& istep, const ModuleBase::matrix& stress, const double& total_energy);
 	void reset_after_relax(const int& istep);
 	void reset_after_cellrelax(int& force_step, int& stress_step);
 

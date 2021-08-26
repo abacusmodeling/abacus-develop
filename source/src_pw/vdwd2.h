@@ -22,8 +22,8 @@ public:
 	void cal_stress();
 
 	const double                       &get_energy()const{ return energy; }
-	const std::vector<Vector3<double>> &get_force() const{ return force;  }
-	const Matrix3                      &get_stress()const{ return stress; }
+	const std::vector<ModuleBase::Vector3<double>> &get_force() const{ return force;  }
+	const ModuleBase::Matrix3                      &get_stress()const{ return stress; }
 
 private:
 
@@ -31,8 +31,8 @@ private:
 	Vdwd2_Parameters &para;
 
 	double energy = 0;
-	std::vector<Vector3<double>> force;
-	Matrix3 stress;
+	std::vector<ModuleBase::Vector3<double>> force;
+	ModuleBase::Matrix3 stress;
 };
 
 #endif

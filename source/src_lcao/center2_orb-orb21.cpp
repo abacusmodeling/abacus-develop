@@ -107,7 +107,7 @@ void Center2_Orb::Orb21::init_radial_table( const std::set<size_t> &radials )
 }
 
 double Center2_Orb::Orb21::cal_overlap(
-	const Vector3<double> &RA, const Vector3<double> &RB,
+	const ModuleBase::Vector3<double> &RA, const ModuleBase::Vector3<double> &RB,
 	const int &mA1, const int &mA2, const int &mB) const
 {
 	const int LA1 = nA1.getL();

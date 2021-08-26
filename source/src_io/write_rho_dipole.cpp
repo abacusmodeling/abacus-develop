@@ -6,7 +6,7 @@
 //fuxiang add 2017-03-15
 void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &iter, const std::string &fn, const int &precision, const bool for_plot)
 {
-    TITLE("Charge","write_rho_dipole");
+    ModuleBase::TITLE("Charge","write_rho_dipole");
     if (out_charge==0) 
 	{
 		return;
@@ -26,7 +26,7 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 		ofs.open(fn.c_str());
     	if (!ofs)
     	{
-        	WARNING("Charge::write_rho","Can't create Charge File!");
+        	ModuleBase::WARNING("Charge::write_rho","Can't create Charge File!");
     	}	
 
 		//GlobalV::ofs_running << "\n Output charge file." << std::endl;
@@ -76,7 +76,7 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 			}
 			else
 			{
-				WARNING_QUIT("write_rho","check nspin!");
+				ModuleBase::WARNING_QUIT("write_rho","check nspin!");
 			}
 		}
 		ofs << "\n  " << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz << std::endl;

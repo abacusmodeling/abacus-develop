@@ -23,7 +23,7 @@ class Pdiag_Double : public Pdiag_Basic
 #endif
 
 	// this subroutine needs reconstruction in near future -- mohan note 2021-03
-	void diago_double_begin(const int &ik, double **wfc, matrix &wfc_2d,
+	void diago_double_begin(const int &ik, double **wfc, ModuleBase::matrix &wfc_2d,
 		double *h_mat, double *s_mat, double *ekb);			// Peize Lin add wfc_2d 2019-01-17
 	
 	// this subroutine needs reconstruction in near future -- mohan note 2021-03

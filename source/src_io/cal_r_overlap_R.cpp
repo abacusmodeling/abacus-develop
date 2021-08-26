@@ -24,7 +24,7 @@ cal_r_overlap_R::~cal_r_overlap_R()
 
 void cal_r_overlap_R::init()
 {
-	TITLE("cal_r_overlap_R","init");
+	ModuleBase::TITLE("cal_r_overlap_R","init");
 
 	this->R_x_num = GlobalC::GridD.getCellX();
     this->R_y_num = GlobalC::GridD.getCellY();
@@ -34,16 +34,16 @@ void cal_r_overlap_R::init()
 	this->R_minZ = (int)GlobalC::GridD.getD_minZ();
 	
 	// allocate for psi_r_psi	
-	psi_r_psi = new Vector3<double> ***[R_x_num];
+	psi_r_psi = new ModuleBase::Vector3<double> ***[R_x_num];
 	for(int ix = 0; ix < R_x_num; ix++)
 	{
-		psi_r_psi[ix] = new Vector3<double> **[R_y_num];
+		psi_r_psi[ix] = new ModuleBase::Vector3<double> **[R_y_num];
 		for(int iy = 0; iy < R_y_num; iy++)
 		{
-			psi_r_psi[ix][iy] = new Vector3<double> *[R_z_num];
+			psi_r_psi[ix][iy] = new ModuleBase::Vector3<double> *[R_z_num];
 			for(int iz = 0; iz < R_z_num; iz++)
 			{				
-				psi_r_psi[ix][iy][iz] = new Vector3<double> [GlobalC::ParaO.nloc];				
+				psi_r_psi[ix][iy][iz] = new ModuleBase::Vector3<double> [GlobalC::ParaO.nloc];				
 			}
 		}
 	}
@@ -63,7 +63,7 @@ void cal_r_overlap_R::init()
 		
 	MOT.init_Table_Spherical_Bessel (2, 3, Lmax_used, Lmax, Exx_Abfs::Lmax);
 
-	Ylm::set_coefficients();
+	ModuleBase::Ylm::set_coefficients();
 
 	MGT.init_Gaunt_CH( Lmax );
 	MGT.init_Gaunt( Lmax );	
@@ -246,17 +246,17 @@ void cal_r_overlap_R::init()
 
 void cal_r_overlap_R::out_r_overlap_R(const int nspin)
 {	
-	TITLE("cal_r_overlap_R","out_r_overlap_R");
-	timer::tick("cal_r_overlap_R","out_r_overlap_R");
+	ModuleBase::TITLE("cal_r_overlap_R","out_r_overlap_R");
+	ModuleBase::timer::tick("cal_r_overlap_R","out_r_overlap_R");
 
-	Vector3<double> tau1, tau2, dtau;
-	Vector3<double> origin_point(0.0,0.0,0.0);
+	ModuleBase::Vector3<double> tau1, tau2, dtau;
+	ModuleBase::Vector3<double> origin_point(0.0,0.0,0.0);
 
     int R_x;
     int R_y;
     int R_z;
 
-	double factor = sqrt(FOUR_PI/3.0);
+	double factor = sqrt(ModuleBase::FOUR_PI/3.0);
 	
 	for(int ix = 0; ix < R_x_num; ix++)
     {
@@ -268,7 +268,7 @@ void cal_r_overlap_R::out_r_overlap_R(const int nspin)
             {
                 int dRz = iz + R_minZ;	
 
-				Vector3<double> R_car = Vector3<double>(dRx,dRy,dRz) * GlobalC::ucell.latvec;
+				ModuleBase::Vector3<double> R_car = ModuleBase::Vector3<double>(dRx,dRy,dRz) * GlobalC::ucell.latvec;
 				
 				int ir,ic;
 				for(int iw1 = 0; iw1 < GlobalV::NLOCAL; iw1++)
@@ -304,7 +304,7 @@ void cal_r_overlap_R::out_r_overlap_R(const int nspin)
 									int L2 = iw2iL(orb_index_col);  
 									int m2 = iw2im(orb_index_col);
 
-									Vector3<double> r_distance = ( GlobalC::ucell.atoms[it2].tau[ia2] 
+									ModuleBase::Vector3<double> r_distance = ( GlobalC::ucell.atoms[it2].tau[ia2] 
 									- GlobalC::ucell.atoms[it1].tau[ia1] + R_car ) * GlobalC::ucell.lat0;	
 
 double overlap_o = center2_orb11[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distance, m1, m2 );
@@ -315,13 +315,13 @@ center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distan
 									double overlap_z =      factor * 
 center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distance, m1, 0, m2 ); // m = 0	
 
-									psi_r_psi[ix][iy][iz][icc] = Vector3<double>( overlap_x,overlap_y,overlap_z ) 
+									psi_r_psi[ix][iy][iz][icc] = ModuleBase::Vector3<double>( overlap_x,overlap_y,overlap_z ) 
 + GlobalC::ucell.atoms[it1].tau[ia1] * GlobalC::ucell.lat0 * overlap_o;
 
 								}
 								else
 								{
-									psi_r_psi[ix][iy][iz][icc] = Vector3<double>(0.0,0.0,0.0);
+									psi_r_psi[ix][iy][iz][icc] = ModuleBase::Vector3<double>(0.0,0.0,0.0);
 								}
 							}
 						}
@@ -416,7 +416,7 @@ center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distan
 	if(GlobalV::DRANK == 0) out_r.close();
 
 
-	timer::tick("cal_r_overlap_R","out_r_overlap_R");
+	ModuleBase::timer::tick("cal_r_overlap_R","out_r_overlap_R");
 	
 	return;
 }

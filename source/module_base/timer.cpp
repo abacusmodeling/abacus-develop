@@ -10,7 +10,8 @@
 #include "mpi.h"
 #endif
 
-using namespace std;
+namespace ModuleBase
+{
 
 //----------------------------------------------------------
 // EXPLAIN :   
@@ -141,7 +142,7 @@ void timer::print_all(std::ofstream &ofs)
 			 << std::setw(10) << std::setprecision(2) << timer_one.cpu_second/timer_one.calls
 			 << std::setw(10) << timer_one.cpu_second / timer_pool_order[0].second.cpu_second * 100 << "%" << std::endl;
 
-		std::cout << std::resetiosflags(ios::scientific);
+		std::cout << std::resetiosflags(std::ios::scientific);
 		
 		std::cout << " " 
 			// << std::setw(2)  << timer_one.level
@@ -155,6 +156,7 @@ void timer::print_all(std::ofstream &ofs)
 	}
 	std::cout<<" ----------------------------------------------------------------------------------------"<<std::endl;
 	ofs <<" ----------------------------------------------------------------------------------------"<<std::endl;
+}
 }
 
 /*

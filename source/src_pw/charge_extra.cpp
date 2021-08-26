@@ -82,7 +82,7 @@ Charge_Extra::~Charge_Extra()
 
 void Charge_Extra::allocate_ions(void)
 {
-	TITLE("Charge_Extra","allocate_ions");
+	ModuleBase::TITLE("Charge_Extra","allocate_ions");
 
 	// 1: first order extrapolation.
 	// 2: second order extrapolation.
@@ -109,7 +109,7 @@ void Charge_Extra::allocate_ions(void)
 
 	if(init_rho)
 	{
-		WARNING_QUIT("Charge_Extra::allocate","rho_ion has been allocated, pls check.");
+		ModuleBase::WARNING_QUIT("Charge_Extra::allocate","rho_ion has been allocated, pls check.");
 	}
 
 	this->rho_ion = new double**[dim];
@@ -130,7 +130,7 @@ void Charge_Extra::allocate_ions(void)
 
 	init_rho = true;
 
-	Memory::record("charge_extra","rho_ion",dim*GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
+	ModuleBase::Memory::record("charge_extra","rho_ion",dim*GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
 
 	return;
 }
@@ -138,7 +138,7 @@ void Charge_Extra::allocate_ions(void)
 
 void Charge_Extra::extrapolate_charge()
 {
-    TITLE("Charge_Extra","extrapolate_charge");
+    ModuleBase::TITLE("Charge_Extra","extrapolate_charge");
 	//-------------------------------------------------------
     // charge density expolation:
     // pot_order = 0 copy the old potential(nothing is done);
@@ -159,7 +159,7 @@ void Charge_Extra::extrapolate_charge()
 	{
 		if(GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{
-			WARNING_QUIT("Charge_Extra","charge extrapolation method is not available");
+			ModuleBase::WARNING_QUIT("Charge_Extra","charge extrapolation method is not available");
 		}
 		else
 		{
@@ -348,7 +348,7 @@ void Charge_Extra::extrapolate_charge()
 	}
 	else
 	{
-		WARNING_QUIT("potential::init_pot","extra_pot parameter is wrong!");
+		ModuleBase::WARNING_QUIT("potential::init_pot","extra_pot parameter is wrong!");
 	}
 
     return;

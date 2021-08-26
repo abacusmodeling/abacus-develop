@@ -6,7 +6,7 @@ std::vector<double> Conv_Coulomb_Pot_K::cal_psi_ccp( const std::vector<double> &
 {
 	std::vector<double> psik2_ccp(psif.size());
 	for( size_t ik=0; ik<psif.size(); ++ik )
-		psik2_ccp[ik] = FOUR_PI * psif[ik];
+		psik2_ccp[ik] = ModuleBase::FOUR_PI * psif[ik];
 	return psik2_ccp;
 }
 
@@ -17,7 +17,7 @@ std::vector<double> Conv_Coulomb_Pot_K::cal_psi_hse(
 {
 	std::vector<double> psik2_ccp(psif.size());
 	for( size_t ik=0; ik<psif.size(); ++ik )
-		psik2_ccp[ik] = FOUR_PI * psif[ik] * (1-std::exp(-(k_radial[ik]*k_radial[ik])/(4*omega*omega)));
+		psik2_ccp[ik] = ModuleBase::FOUR_PI * psif[ik] * (1-std::exp(-(k_radial[ik]*k_radial[ik])/(4*omega*omega)));
 	return psik2_ccp;
 }
 

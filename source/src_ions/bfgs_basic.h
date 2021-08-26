@@ -51,7 +51,7 @@ class BFGS_Basic
 	private:
 
 	bool wolfe_flag;
-	matrix inv_hess;
+	ModuleBase::matrix inv_hess;
 
 	int bfgs_ndim;
 

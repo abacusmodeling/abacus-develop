@@ -19,7 +19,7 @@ Stochastic_Elec::~Stochastic_Elec()
 
 void Stochastic_Elec::scf_stochastic(const int &istep)
 {
-	timer::tick("Elec_Stochastic","scf_stochastic");
+	ModuleBase::timer::tick("Elec_Stochastic","scf_stochastic");
 
 	// mohan update 2021-02-25
 	H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw); 
@@ -263,7 +263,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			{
 				GlobalV::ofs_running << " Notice: Threshold on eigenvalues was too large.\n";
 
-				WARNING("scf","Threshold on eigenvalues was too large.");
+				ModuleBase::WARNING("scf","Threshold on eigenvalues was too large.");
 				GlobalV::ofs_running << " dr2=" << dr2 << " < diago_error=" << diago_error << std::endl;
 
 				// update GlobalV::ETHR.
@@ -339,9 +339,9 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			if(conv_elec)
 			{
 				//GlobalV::ofs_running << " convergence is achieved" << std::endl;			
-				//GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl; 
+				//GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl; 
 				GlobalV::ofs_running << " charge density convergence is achieved" << std::endl;
-                                GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
+                                GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
 			}
 			else
 			{
@@ -352,7 +352,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			{
 				print_eigenvalue(GlobalV::ofs_running);
 			}
-			timer::tick("Elec_Stochastic","scf_stochastic");
+			ModuleBase::timer::tick("Elec_Stochastic","scf_stochastic");
             return;
         }
 		
@@ -361,7 +361,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		
     } 
 	
-	timer::tick("Elec_Stochastic","scf_stochastic");
+	ModuleBase::timer::tick("Elec_Stochastic","scf_stochastic");
     return;
 } // end electrons
 
@@ -381,8 +381,8 @@ bool Stochastic_Elec::check_stop_now(void)
 
 void Stochastic_Elec::c_bands(const int &istep)
 {
-	if (GlobalV::test_elec) TITLE("electrons","c_bands");
-	timer::tick("Elec_Stochastic","c_bands");
+	if (GlobalV::test_elec) ModuleBase::TITLE("electrons","c_bands");
+	ModuleBase::timer::tick("Elec_Stochastic","c_bands");
 
 	int precondition_type = 2;
 
@@ -458,7 +458,7 @@ void Stochastic_Elec::c_bands(const int &istep)
 
 	delete [] h_diag;
 
-	timer::tick("Elec_Stochastic","c_bands");
+	ModuleBase::timer::tick("Elec_Stochastic","c_bands");
 
 	return;
 } 

@@ -13,11 +13,11 @@ Use_FFT::~Use_FFT()
 
 void Use_FFT::allocate(void)
 {
-    TITLE("Use_FFT","allocate");
+    ModuleBase::TITLE("Use_FFT","allocate");
 
     delete[] porter;
     porter = new std::complex<double>[GlobalC::pw.nrxx];
-    Memory::record("Use_FFT","porter",GlobalC::pw.nrxx,"complexmatrix");
+    ModuleBase::Memory::record("Use_FFT","porter",GlobalC::pw.nrxx,"complexmatrix");
 
     return;
 }
@@ -94,7 +94,7 @@ void Use_FFT::ToRealSpace_psi(const int &ik, const int &ib, const ModuleBase::Co
 
 
 
-void Use_FFT::ToRealSpace(const int &is, const ModuleBase::ComplexMatrix &vg, matrix &vr)
+void Use_FFT::ToRealSpace(const int &is, const ModuleBase::ComplexMatrix &vg, ModuleBase::matrix &vr)
 {
 	// (1) set value
     ModuleBase::GlobalFunc::ZEROS( porter, GlobalC::pw.nrxx);

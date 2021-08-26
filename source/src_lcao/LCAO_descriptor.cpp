@@ -21,8 +21,8 @@ LCAO_Descriptor ld;
 
 LCAO_Descriptor::LCAO_Descriptor()
 {
-    alpha_index = new IntArray[1];
-    inl_index = new IntArray[1];
+    alpha_index = new ModuleBase::IntArray[1];
+    inl_index = new ModuleBase::IntArray[1];
     inl_l = new int[1];
     d = new double[1];
     H_V_delta = new double[1]; 
@@ -70,7 +70,7 @@ LCAO_Descriptor::~LCAO_Descriptor()
 
 void LCAO_Descriptor::init(int lm, int nm, int tot_inl)
 {
-    TITLE("LCAO_Descriptor", "init");
+    ModuleBase::TITLE("LCAO_Descriptor", "init");
     GlobalV::ofs_running << " Initialize the descriptor index for deepks (lcao line)" << std::endl;
 
     assert(lm >= 0);
@@ -139,9 +139,9 @@ void LCAO_Descriptor::init_index(void)
 {
     
     delete[] this->alpha_index;
-    this->alpha_index = new IntArray[GlobalC::ucell.ntype];
+    this->alpha_index = new ModuleBase::IntArray[GlobalC::ucell.ntype];
     delete[] this->inl_index;
-    this->inl_index = new IntArray[GlobalC::ucell.ntype];
+    this->inl_index = new ModuleBase::IntArray[GlobalC::ucell.ntype];
     delete[] this->inl_l;
     this->inl_l = new int[this->inlmax];
     ModuleBase::GlobalFunc::ZEROS(this->inl_l, this->inlmax);
@@ -194,13 +194,13 @@ void LCAO_Descriptor::init_index(void)
 
 void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
 {
-    TITLE("LCAO_Descriptor", "build_S_descriptor");
+    ModuleBase::TITLE("LCAO_Descriptor", "build_S_descriptor");
     //array to store data
     double olm[3] = {0.0, 0.0, 0.0};
 
     //\sum{T} e**{ikT} <\phi_{ia}|d\phi_{k\beta}(T)>	//???
-    Vector3<double> tau1, tau2, dtau;
-    Vector3<double> dtau1, dtau2, tau0;
+    ModuleBase::Vector3<double> tau1, tau2, dtau;
+    ModuleBase::Vector3<double> dtau1, dtau2, tau0;
     for (int T1 = 0; T1 < GlobalC::ucell.ntype; ++T1)
     {
         Atom *atom1 = &GlobalC::ucell.atoms[T1];
@@ -279,7 +279,7 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
     }     // T1
     if (!GlobalV::GAMMA_ONLY_LOCAL)
     {
-        WARNING_QUIT("LCAO_Descriptor::build_S_descriptor", 
+        ModuleBase::WARNING_QUIT("LCAO_Descriptor::build_S_descriptor", 
 		"muti-kpoint method for descriptor is not implemented yet! ");
     }
     return;
@@ -310,7 +310,7 @@ void LCAO_Descriptor::set_S_mu_alpha(const int &iw1_all, const int &inl, const i
 
 void LCAO_Descriptor::cal_projected_DM(void)
 {
-    TITLE("LCAO_Descriptor", "cal_projected_DM");
+    ModuleBase::TITLE("LCAO_Descriptor", "cal_projected_DM");
     //step 1: get dm: the coefficient of wfc, not charge density
     double *dm = new double[GlobalV::NLOCAL * GlobalV::NLOCAL];
     ModuleBase::GlobalFunc::ZEROS(dm, GlobalV::NLOCAL * GlobalV::NLOCAL);
@@ -378,7 +378,7 @@ void LCAO_Descriptor::cal_projected_DM(void)
 
 void LCAO_Descriptor::cal_descriptor(void)
 {
-    TITLE("LCAO_Descriptor", "cal_descriptor");
+    ModuleBase::TITLE("LCAO_Descriptor", "cal_descriptor");
     delete[] d;
     d = new double[this->n_descriptor];
 
@@ -487,7 +487,7 @@ void LCAO_Descriptor::print_projected_DM(
 
 void LCAO_Descriptor::print_descriptor(void)
 {
-    TITLE("LCAO_Descriptor", "print_descriptor");
+    ModuleBase::TITLE("LCAO_Descriptor", "print_descriptor");
     std::ofstream ofs;
     std::stringstream ss;
     // the parameter 'winput::spillage_outdir' is read from INPUTw.
@@ -564,7 +564,7 @@ void LCAO_Descriptor::getdm(double* dm)
 
 void LCAO_Descriptor::cal_gdmx(matrix &dm)
 {
-    TITLE("LCAO_Descriptor", "cal_gdmx");
+    ModuleBase::TITLE("LCAO_Descriptor", "cal_gdmx");
     //get DS_alpha_mu and S_nu_beta
     double** ss = this->S_mu_alpha;
     double** dsx = this->DS_mu_alpha_x;
@@ -656,7 +656,7 @@ void LCAO_Descriptor::del_gdmx(void)
 
 void LCAO_Descriptor::cal_v_delta(const std::string& model_file)
 {
-    TITLE("LCAO_Descriptor", "cal_v_delta");
+    ModuleBase::TITLE("LCAO_Descriptor", "cal_v_delta");
     //1.  (dE/dD)<alpha_m'|psi_nv>
     this->load_model(model_file);
     this->cal_gedm();
@@ -701,9 +701,9 @@ void LCAO_Descriptor::cal_v_delta(const std::string& model_file)
     return;
 }
 
-void LCAO_Descriptor::cal_f_delta(matrix& dm)
+void LCAO_Descriptor::cal_f_delta(ModuleBase::matrix& dm)
 {
-    TITLE("LCAO_Descriptor", "cal_f_delta");
+    ModuleBase::TITLE("LCAO_Descriptor", "cal_f_delta");
     int iat = 0;    //check if the index same as GlobalC::ucell.iw2iat or not !!
     for (int it = 0;it < GlobalC::ucell.ntype;++it)
     {
@@ -740,7 +740,7 @@ void LCAO_Descriptor::cal_f_delta(matrix& dm)
 
 void LCAO_Descriptor::cal_descriptor_tensor()
 {
-    TITLE("LCAO_Descriptor", "cal_descriptor_tensor");
+    ModuleBase::TITLE("LCAO_Descriptor", "cal_descriptor_tensor");
     //init pdm_tensor and d_tensor
     torch::Tensor tmp;
     for (int inl = 0;inl < this->inlmax;++inl)
@@ -783,7 +783,7 @@ void LCAO_Descriptor::load_model(const std::string& model_file)
 }
 void LCAO_Descriptor::cal_gedm()
 {
-    TITLE("LCAO_Descriptor", "cal_gedm");
+    ModuleBase::TITLE("LCAO_Descriptor", "cal_gedm");
     //forward
     std::vector<torch::jit::IValue> inputs;
     //input_dim:(natom, des_per_atom)
@@ -816,7 +816,7 @@ void LCAO_Descriptor::cal_gedm()
 
 void LCAO_Descriptor::print_H_V_delta()
 {
-    TITLE("LCAO_Descriptor", "print_H_V_delta");
+    ModuleBase::TITLE("LCAO_Descriptor", "print_H_V_delta");
     std::ofstream ofs;
     std::stringstream ss;
     // the parameter 'winput::spillage_outdir' is read from INPUTw.
@@ -827,7 +827,7 @@ void LCAO_Descriptor::print_H_V_delta()
         ofs.open(ss.str().c_str());
     }
     ofs << "E_delta(Ry) from deepks model: " << this->E_delta << std::endl;
-    ofs << "E_delta(eV) from deepks model: " << this->E_delta * Hartree_to_eV << std::endl;
+    ofs << "E_delta(eV) from deepks model: " << this->E_delta * ModuleBase::Hartree_to_eV << std::endl;
     ofs << "H_delta(Hartree)(gamma only)) from deepks model: " << std::endl;
     for (int i = 0;i < GlobalV::NLOCAL;++i)
     {
@@ -842,7 +842,7 @@ void LCAO_Descriptor::print_H_V_delta()
     {
         for (int j = 0;j < GlobalV::NLOCAL;++j)
         {
-            ofs<< std::setw(12)<< this->H_V_delta[i * GlobalV::NLOCAL + j] *Hartree_to_eV<< " ";
+            ofs<< std::setw(12)<< this->H_V_delta[i * GlobalV::NLOCAL + j] *ModuleBase::Hartree_to_eV<< " ";
         }
         ofs << std::endl;
     }
@@ -852,7 +852,7 @@ void LCAO_Descriptor::print_H_V_delta()
 
 void LCAO_Descriptor::print_F_delta()
 {
-    TITLE("LCAO_Descriptor", "print_F_delta");
+    ModuleBase::TITLE("LCAO_Descriptor", "print_F_delta");
     std::ofstream ofs;
     std::stringstream ss;
     // the parameter 'winput::spillage_outdir' is read from INPUTw.
@@ -882,9 +882,9 @@ void LCAO_Descriptor::print_F_delta()
         {
             int iat = GlobalC::ucell.itia2iat(it, ia);
             ofs << std::setw(12) << GlobalC::ucell.atoms[it].label << std::setw(12)
-                << ia << std::setw(15) << this->F_delta(iat, 0) * Ry_to_eV/BOHR_TO_A
-                << std::setw(15) << this->F_delta(iat, 1) * Ry_to_eV/BOHR_TO_A
-                << std::setw(15) << this->F_delta(iat, 2) * Ry_to_eV/BOHR_TO_A << std::endl;
+                << ia << std::setw(15) << this->F_delta(iat, 0) * ModuleBase::Ry_to_eV/ModuleBase::BOHR_TO_A
+                << std::setw(15) << this->F_delta(iat, 1) * ModuleBase::Ry_to_eV/ModuleBase::BOHR_TO_A
+                << std::setw(15) << this->F_delta(iat, 2) * ModuleBase::Ry_to_eV/ModuleBase::BOHR_TO_A << std::endl;
         }
     }
     GlobalV::ofs_running << "F_delta is printed" << std::endl;
@@ -914,7 +914,7 @@ void LCAO_Descriptor::save_npy_e(double& ebase)
     return;
 }
 
-void LCAO_Descriptor::save_npy_f(matrix& fbase)
+void LCAO_Descriptor::save_npy_f(ModuleBase::matrix& fbase)
 {
     //save f_base
     //caution: unit: Rydberg/Bohr

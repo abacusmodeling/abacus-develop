@@ -66,7 +66,7 @@ Charge::~Charge()
 
 void Charge::allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_in)
 {
-    TITLE("Charge","allocate");
+    ModuleBase::TITLE("Charge","allocate");
 
 	assert(allocate_rho == false);
 
@@ -111,12 +111,12 @@ void Charge::allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_i
 		}
 	}
 
-    Memory::record("Charge","rho",nspin*nrxx,"double");
-    Memory::record("Charge","rho_save",nspin*nrxx,"double");
-    Memory::record("Charge","rhog",nspin*ngmc,"double");
-    Memory::record("Charge","rhog_save",nspin*ngmc,"double");
-    Memory::record("Charge","kin_r",nspin*ngmc,"double");
-    Memory::record("Charge","kin_r_save",nspin*ngmc,"double");
+    ModuleBase::Memory::record("Charge","rho",nspin*nrxx,"double");
+    ModuleBase::Memory::record("Charge","rho_save",nspin*nrxx,"double");
+    ModuleBase::Memory::record("Charge","rhog",nspin*ngmc,"double");
+    ModuleBase::Memory::record("Charge","rhog_save",nspin*ngmc,"double");
+    ModuleBase::Memory::record("Charge","kin_r",nspin*ngmc,"double");
+    ModuleBase::Memory::record("Charge","kin_r_save",nspin*ngmc,"double");
 
     this->rho_core = new double[nrxx]; // core charge in real space
     ModuleBase::GlobalFunc::ZEROS( rho_core, nrxx);
@@ -124,8 +124,8 @@ void Charge::allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_i
 	this->rhog_core = new std::complex<double>[ngmc]; // reciprocal core charge
 	ModuleBase::GlobalFunc::ZEROS( rhog_core, ngmc);
 
-    Memory::record("Charge","rho_core",nrxx,"double");
-    Memory::record("Charge","rhog_core",ngmc,"double");
+    ModuleBase::Memory::record("Charge","rho_core",nrxx,"double");
+    ModuleBase::Memory::record("Charge","rhog_core",ngmc,"double");
 
 	this->allocate_rho = true;
     return;
@@ -134,7 +134,7 @@ void Charge::allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_i
 
 double Charge::sum_rho(void) const
 {
-	TITLE("Charge","sum_rho");
+	ModuleBase::TITLE("Charge","sum_rho");
 
     double sum_rho = 0.0;
     int nspin0 = 1;
@@ -160,7 +160,7 @@ double Charge::sum_rho(void) const
     if (sum_rho <= 0.1)
     {
 		GlobalV::ofs_warning << " sum_rho=" << sum_rho << std::endl;
-        WARNING_QUIT("Charge::renormalize_rho","Can't find even an electron!");
+        ModuleBase::WARNING_QUIT("Charge::renormalize_rho","Can't find even an electron!");
     }
 
     return sum_rho;
@@ -169,7 +169,7 @@ double Charge::sum_rho(void) const
 
 void Charge::renormalize_rho(void)
 {
-    TITLE("Charge","renormalize_rho");
+    ModuleBase::TITLE("Charge","renormalize_rho");
 
     const double sr = this->sum_rho();
 	GlobalV::ofs_warning << std::setprecision(15);
@@ -197,8 +197,8 @@ void Charge::renormalize_rho(void)
 //-------------------------------------------------------
 void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Peize Lin refactor 2021.04.08
 {
-    TITLE("Charge","atomic_rho");
-    timer::tick("Charge","atomic_rho");
+    ModuleBase::TITLE("Charge","atomic_rho");
+    ModuleBase::timer::tick("Charge","atomic_rho");
 
 	const ModuleBase::ComplexMatrix rho_g3d = [&]()->ModuleBase::ComplexMatrix
 	{
@@ -241,14 +241,14 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 						for(int ir=0; ir<mesh; ++ir)
 						{
 							double r2=atom->r[ir]*atom->r[ir];
-							rhoatm[ir]=atom->rho_at[ir]/FOUR_PI/r2;
+							rhoatm[ir]=atom->rho_at[ir]/ModuleBase::FOUR_PI/r2;
 						}
 						rhoatm[0] = pow( (rhoatm[2]/rhoatm[1]), 1./(atom->r[2]-atom->r[1]) );//zws add
 						rhoatm[0] = pow(rhoatm[0], atom->r[1]);
 						rhoatm[0] = rhoatm[1] / rhoatm[0];
 
 						double charge = 0.0;
-						Integral::Simpson_Integral(atom->msh,atom->rho_at,atom->rab,charge);
+						ModuleBase::Integral::Simpson_Integral(atom->msh,atom->rho_at,atom->rab,charge);
 						ModuleBase::GlobalFunc::OUT(GlobalV::ofs_warning,"charge from rho_at",charge);
 						assert(charge!=0.0 || charge==atom->zv);		// Peize Lin add charge==atom->zv for bsse 2021.04.07
 
@@ -262,7 +262,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 						for(int ir=0; ir<mesh; ++ir)
 						{
 							rhoatm[ir] *= scale;
-							rhoatm[ir] *= (FOUR_PI*atom->r[ir]*atom->r[ir]);
+							rhoatm[ir] *= (ModuleBase::FOUR_PI*atom->r[ir]*atom->r[ir]);
 						}
 						return rhoatm;
 					}();
@@ -279,7 +279,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 			//              rho1d [ir] = atom->rho_at[ir];
 							rho1d[ir] = rhoatm[ir];
 						}
-						Integral::Simpson_Integral(mesh, rho1d.data(), atom->rab, rho_lgl[0]);
+						ModuleBase::Integral::Simpson_Integral(mesh, rho1d.data(), atom->rab, rho_lgl[0]);
 					}
 					if (GlobalV::test_charge>0) std::cout<<"\n |G|=0 term done." <<std::endl;
 					//----------------------------------------------------------
@@ -305,7 +305,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 								rho1d[ir] = rhoatm[ir] * sin(gxx) / gxx;
 							}
 						}
-						Integral::Simpson_Integral(mesh, rho1d.data(), atom->rab, rho_lgl[ig]);
+						ModuleBase::Integral::Simpson_Integral(mesh, rho1d.data(), atom->rab, rho_lgl[ig]);
 					}
 					
 					if (GlobalV::test_charge>0) std::cout<<" |G|>0 term done." <<std::endl;
@@ -346,8 +346,8 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 					// mohan add 2011-06-14
 					else if(startmag_type==2)
 					{
-						std::complex<double> swap = ZERO;
-						std::complex<double> ci_tpi = NEG_IMAG_UNIT * TWO_PI;
+						std::complex<double> swap = ModuleBase::ZERO;
+						std::complex<double> ci_tpi = ModuleBase::NEG_IMAG_UNIT * ModuleBase::TWO_PI;
 						for (int ia = 0; ia < atom->na; ia++)
 						{
 							//const double up = 0.5 * ( 1 + atom->mag[ia] );
@@ -398,8 +398,8 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 					}
 					else if(startmag_type == 2)
 					{//zdy-warning-not-available
-						std::complex<double> swap = ZERO;
-						std::complex<double> ci_tpi = NEG_IMAG_UNIT * TWO_PI;
+						std::complex<double> swap = ModuleBase::ZERO;
+						std::complex<double> ci_tpi = ModuleBase::NEG_IMAG_UNIT * ModuleBase::TWO_PI;
 						for(int ia = 0;ia<atom->na;ia++)
 						{
 							for (int ig = 0; ig < GlobalC::pw.ngmc ; ig++)
@@ -431,7 +431,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 				}
 				else
 				{
-					WARNING_QUIT("Charge::spin_number_need"," Either 1 or 2 or 4, check SPIN number !");
+					ModuleBase::WARNING_QUIT("Charge::spin_number_need"," Either 1 or 2 or 4, check SPIN number !");
 				}
 			}
 		}
@@ -529,7 +529,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 	//GlobalV::ofs_running << " Superposition of atomic wave function as First-Charge done." << std::endl;
 	//2014-06-22
 
-    timer::tick("Charge","atomic_rho");
+    ModuleBase::timer::tick("Charge","atomic_rho");
     return;
 }
 
@@ -541,8 +541,8 @@ void Charge::set_rho_core(
     const ModuleBase::ComplexMatrix &structure_factor
 )
 {
-    TITLE("Charge","set_rho_core");
-    timer::tick("Charge","set_rho_core");
+    ModuleBase::TITLE("Charge","set_rho_core");
+    ModuleBase::timer::tick("Charge","set_rho_core");
 
     //double eps = 1.e-10;
     GlobalC::en.etxcc = 0.0;
@@ -569,7 +569,7 @@ void Charge::set_rho_core(
     if (!bl)
     {
         ModuleBase::GlobalFunc::ZEROS( this->rho_core, GlobalC::pw.nrxx);
-    	timer::tick("Charge","set_rho_core");
+    	ModuleBase::timer::tick("Charge","set_rho_core");
         return;
     }
 
@@ -644,7 +644,7 @@ void Charge::set_rho_core(
     // The term was present in previous versions of the code but it shouldn't
     delete [] rhocg;
     delete [] vg;
-    timer::tick("Charge","set_rho_core");
+    ModuleBase::timer::tick("Charge","set_rho_core");
     return;
 } // end subroutine set_rhoc
 
@@ -659,7 +659,7 @@ void Charge::non_linear_core_correction
     const double *rhoc,
     double *rhocg)
 {
-    TITLE("charge","drhoc");
+    ModuleBase::TITLE("charge","drhoc");
     double gx = 0.0;
     double rhocg1 = 0.0;
     double *aux;
@@ -677,9 +677,9 @@ void Charge::non_linear_core_correction
             {
                 aux [ir] = r [ir] * r [ir] * rhoc [ir];
             }
-            Integral::Simpson_Integral(mesh, aux, rab, rhocg1);
+            ModuleBase::Integral::Simpson_Integral(mesh, aux, rab, rhocg1);
             //rhocg [1] = fpi * rhocg1 / omega;
-            rhocg [0] = FOUR_PI * rhocg1 / GlobalC::ucell.omega;//mohan modify 2008-01-19
+            rhocg [0] = ModuleBase::FOUR_PI * rhocg1 / GlobalC::ucell.omega;//mohan modify 2008-01-19
             igl0 = 1;
         }
 
@@ -687,13 +687,13 @@ void Charge::non_linear_core_correction
         for (int igl = igl0; igl < GlobalC::pw.nggm;igl++) 
         {
             gx = sqrt(GlobalC::pw.ggs [igl] * GlobalC::ucell.tpiba2);
-            Sphbes::Spherical_Bessel(mesh, r, gx, 0, aux);
+            ModuleBase::Sphbes::Spherical_Bessel(mesh, r, gx, 0, aux);
             for (int ir = 0;ir < mesh; ir++) 
             {
                 aux [ir] = r[ir] * r[ir] * rhoc [ir] * aux [ir];
             } //  enddo
-            Integral::Simpson_Integral(mesh, aux, rab, rhocg1);
-            rhocg [igl] = FOUR_PI * rhocg1 / GlobalC::ucell.omega;
+            ModuleBase::Integral::Simpson_Integral(mesh, aux, rab, rhocg1);
+            rhocg [igl] = ModuleBase::FOUR_PI * rhocg1 / GlobalC::ucell.omega;
         } //  enddo
         delete [] aux;
     }
@@ -711,8 +711,8 @@ void Charge::non_linear_core_correction
 //----------------------------------------------------------
 void Charge::sum_band(void)
 {
-    TITLE("Charge","sum_band");
-    timer::tick("Charge","sum_band");
+    ModuleBase::TITLE("Charge","sum_band");
+    ModuleBase::timer::tick("Charge","sum_band");
 //----------------------------------------------------------
 // Calculates the symmetrized charge density and sum of
 // occupied eigenvalues.
@@ -730,13 +730,13 @@ void Charge::sum_band(void)
     sum_band_k();
 
     // Symmetrization of the charge density (and local magnetization)
-    timer::tick("Charge","sum_band");
+    ModuleBase::timer::tick("Charge","sum_band");
     return;
 }
 
 void Charge::sum_band_k(void)
 {
-	TITLE("Charge","sum_band_k");
+	ModuleBase::TITLE("Charge","sum_band_k");
 	GlobalC::en.eband = 0.0;
 
 	std::complex<double>* porter = GlobalC::UFFT.porter;
@@ -877,11 +877,11 @@ void Charge::sum_band_k(void)
 #ifdef __MPI
 void Charge::rho_mpi(void)
 {
-	TITLE("Charge","rho_mpi");
+	ModuleBase::TITLE("Charge","rho_mpi");
     if (GlobalV::NPROC==1) return;
 	if((GlobalV::CALCULATION=="scf-sto" || GlobalV::CALCULATION=="relax-sto" || GlobalV::CALCULATION=="md-sto")&&GlobalV::NPROC_IN_POOL==1) 
 		return;//qinarui add it temporarily.
-    timer::tick("Charge","rho_mpi");
+    ModuleBase::timer::tick("Charge","rho_mpi");
     int ir;//counters on real space mesh point.
     int iz;//counters on z direction of fft grid.
     int ip;//counters on processors
@@ -1092,7 +1092,7 @@ void Charge::rho_mpi(void)
 
     delete[] num_z;
     delete[] start_z;
-    timer::tick("Charge","rho_mpi");
+    ModuleBase::timer::tick("Charge","rho_mpi");
     return;
 }
 #endif
@@ -1128,7 +1128,7 @@ double Charge::check_ne(const double *rho_in) const
 //LiuXh add 20180619
 void Charge::init_final_scf()
 {
-    TITLE("Charge","init_after_scf");
+    ModuleBase::TITLE("Charge","init_after_scf");
 
 	assert(allocate_rho_final_scf == false);
 
@@ -1156,10 +1156,10 @@ void Charge::init_final_scf()
 		ModuleBase::GlobalFunc::ZEROS(rhog_save[is], GlobalC::pw.ngmc);
 	}
 
-    Memory::record("Charge","rho",GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
-    Memory::record("Charge","rho_save",GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
-    Memory::record("Charge","rhog",GlobalV::NSPIN*GlobalC::pw.ngmc,"double");
-    Memory::record("Charge","rhog_save",GlobalV::NSPIN*GlobalC::pw.ngmc,"double");
+    ModuleBase::Memory::record("Charge","rho",GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
+    ModuleBase::Memory::record("Charge","rho_save",GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
+    ModuleBase::Memory::record("Charge","rhog",GlobalV::NSPIN*GlobalC::pw.ngmc,"double");
+    ModuleBase::Memory::record("Charge","rhog_save",GlobalV::NSPIN*GlobalC::pw.ngmc,"double");
 
     this->rho_core = new double[GlobalC::pw.nrxx]; // core charge in real space
     ModuleBase::GlobalFunc::ZEROS( rho_core, GlobalC::pw.nrxx);
@@ -1167,8 +1167,8 @@ void Charge::init_final_scf()
 	this->rhog_core = new std::complex<double>[GlobalC::pw.ngmc]; // reciprocal core charge
 	ModuleBase::GlobalFunc::ZEROS( rhog_core, GlobalC::pw.ngmc);
 
-    Memory::record("Charge","rho_core",GlobalC::pw.nrxx,"double");
-    Memory::record("Charge","rhog_core",GlobalC::pw.ngmc,"double");
+    ModuleBase::Memory::record("Charge","rho_core",GlobalC::pw.nrxx,"double");
+    ModuleBase::Memory::record("Charge","rhog_core",GlobalC::pw.ngmc,"double");
 
 	this->allocate_rho_final_scf = true;
     return;
@@ -1181,7 +1181,7 @@ void Charge::init_final_scf()
 #include "occupy.h"
 void Charge::cal_nelec(void)
 {
-	TITLE("UnitCell_pseudo","cal_nelec");
+	ModuleBase::TITLE("UnitCell_pseudo","cal_nelec");
 	//=======================================================
 	// calculate the total number of electrons in the system
 	// if nelec <>0; use input number (setup.f90)
@@ -1209,7 +1209,7 @@ void Charge::cal_nelec(void)
 	//=======================================
 	// calculate number of bands (setup.f90)
 	//=======================================
-	double occupied_bands = static_cast<double>(nelec/DEGSPIN);	
+	double occupied_bands = static_cast<double>(nelec/ModuleBase::DEGSPIN);	
 
 	if( (occupied_bands - std::floor(occupied_bands)) > 0.0 )
 	{
@@ -1224,7 +1224,7 @@ void Charge::cal_nelec(void)
 	{
 		if( Occupy::gauss() || Occupy::tetra() )
 		{
-			WARNING_QUIT("UnitCell_pseudo::cal_nelec","for smearing, num. of bands > num. of occupied bands");
+			ModuleBase::WARNING_QUIT("UnitCell_pseudo::cal_nelec","for smearing, num. of bands > num. of occupied bands");
 		}
 	}
 	
@@ -1250,15 +1250,15 @@ void Charge::cal_nelec(void)
 		//else if ( GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax") //pengfei 2014-10-13
 		else
 		{
-			if(GlobalV::NBANDS < occupied_bands) WARNING_QUIT("unitcell","Too few bands!");
+			if(GlobalV::NBANDS < occupied_bands) ModuleBase::WARNING_QUIT("unitcell","Too few bands!");
 			if(GlobalV::NBANDS < GlobalC::ucell.magnet.get_nelup() ) 
 			{
 				ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nelup",GlobalC::ucell.magnet.get_nelup());
-				WARNING_QUIT("unitcell","Too few spin up bands!");
+				ModuleBase::WARNING_QUIT("unitcell","Too few spin up bands!");
 			}
 			if(GlobalV::NBANDS < GlobalC::ucell.magnet.get_neldw() )
 			{
-				WARNING_QUIT("unitcell","Too few spin down bands!");
+				ModuleBase::WARNING_QUIT("unitcell","Too few spin down bands!");
 			}
 		}
 	}
@@ -1269,7 +1269,7 @@ void Charge::cal_nelec(void)
     {
         if( GlobalV::NBANDS > GlobalV::NLOCAL )
         {
-            WARNING_QUIT("UnitCell_pseudo::cal_nwfc","NLOCAL < NBANDS");
+            ModuleBase::WARNING_QUIT("UnitCell_pseudo::cal_nwfc","NLOCAL < NBANDS");
         }
         else
         {

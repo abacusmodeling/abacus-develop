@@ -22,8 +22,8 @@ public:
 	void cal_stress();
 
 	const double                       &get_energy()const{ return energy; }
-	const std::vector<Vector3<double>> 	   &get_force() const{ return force;  }
-	const Matrix3                      &get_stress()const{ return stress; }
+	const std::vector<ModuleBase::Vector3<double>> 	   &get_force() const{ return force;  }
+	const ModuleBase::Matrix3                      &get_stress()const{ return stress; }
 
 private:
 
@@ -31,12 +31,12 @@ private:
 	Vdwd3_Parameters &para;
 
 	double energy = 0;
-	std::vector<Vector3<double>> force;
-	Matrix3 stress;
+	std::vector<ModuleBase::Vector3<double>> force;
+	ModuleBase::Matrix3 stress;
 
-	std::vector<Vector3<double>> lat;
+	std::vector<ModuleBase::Vector3<double>> lat;
     std::vector<int> iz;
-	std::vector<Vector3<double>> xyz;
+	std::vector<ModuleBase::Vector3<double>> xyz;
 	std::vector<int> rep_vdw;
     std::vector<int> rep_cn;
 
@@ -44,7 +44,7 @@ private:
 
 	void set_criteria(
 		double &rthr, 
-		std::vector<Vector3<double>> &lat, 
+		std::vector<ModuleBase::Vector3<double>> &lat, 
 		std::vector<double> &tau_max);
 
     std::vector<double> atomkind(const UnitCell_pseudo &ucell);	
@@ -55,15 +55,15 @@ private:
 
 	void pbcthreebody(
 		std::vector<int> &iz,  
-		std::vector<Vector3<double>> &lat, 
-		std::vector<Vector3<double>> &xyz, 
+		std::vector<ModuleBase::Vector3<double>> &lat, 
+		std::vector<ModuleBase::Vector3<double>> &xyz, 
 		std::vector<int> &rep_cn, 
 		std::vector<double> &cc6ab, 
 		double &eabc);
 
 	void pbcgdisp(
-		std::vector<Vector3<double>> &g, 
-		matrix &sigma);
+		std::vector<ModuleBase::Vector3<double>> &g, 
+		ModuleBase::matrix &sigma);
 
 	void get_dc6_dcnij(
 		int &mxci, 

@@ -13,7 +13,7 @@ namespace Wavefunc_in_pw
 
 	void make_table_q(
 		std::vector<std::string> &orbital_files, 
-		realArray &table_local);
+		ModuleBase::realArray &table_local);
 
 	void integral(
 		const int meshr, // number of mesh points 
@@ -32,13 +32,13 @@ namespace Wavefunc_in_pw
 	void produce_local_basis_in_pw(
 		const int &ik,
 		ModuleBase::ComplexMatrix &psi, 
-		const realArray &table_local);
+		const ModuleBase::realArray &table_local);
 
  	void produce_local_basis_q_in_pw(
 		const int &ik,
 		ModuleBase::ComplexMatrix &psi, 
-		const realArray &table_local, 
-		Vector3<double> q);     // pengfei 2016-11-23
+		const ModuleBase::realArray &table_local, 
+		ModuleBase::Vector3<double> q);     // pengfei 2016-11-23
 
 }
 #endif

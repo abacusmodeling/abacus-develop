@@ -10,9 +10,9 @@ public:
 	pseudopot_cell_vl();
 	~pseudopot_cell_vl();
 
-	void init_vloc(const int &nggm, matrix &vloc_in);
+	void init_vloc(const int &nggm, ModuleBase::matrix &vloc_in);
 
-	matrix vloc;   //(ntype,ngl),the local potential for each atom type(ntype,ngl)
+	ModuleBase::matrix vloc;   //(ntype,ngl),the local potential for each atom type(ntype,ngl)
 	bool *numeric; //[ntype], =true
 
 private:

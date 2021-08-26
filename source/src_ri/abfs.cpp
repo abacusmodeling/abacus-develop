@@ -16,17 +16,17 @@
 #include "../src_external/src_test/src_global/matrix-test.h"		// Peize Lin test
 #include "../src_external/src_test/test_function.h"
 
-std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>>>> Abfs::cal_Cs(
+std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<ModuleBase::matrix>>>> Abfs::cal_Cs(
 	const set<size_t> &atom_centres,
 	const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
 	const Exx_Abfs::Matrix_Orbs21 &m_abfslcaos_lcaos,
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_abfs,
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_lcaos,
 	const double threshold,
-	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<matrix>>>> &Cws,
-	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<matrix>>>> &Vws )
+	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<ModuleBase::matrix>>>> &Cws,
+	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<ModuleBase::matrix>>>> &Vws )
 {
-	TITLE("Abfs","cal_Cs");
+	ModuleBase::TITLE("Abfs","cal_Cs");
 	pthread_rwlock_t rwlock_Cw;	pthread_rwlock_init(&rwlock_Cw,NULL);
 	pthread_rwlock_t rwlock_Vw;	pthread_rwlock_init(&rwlock_Vw,NULL);
 	
@@ -34,7 +34,7 @@ std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_pt
 	const std::vector<std::map<size_t,std::vector<Abfs::Vector3_Order<int>>>> adjs = get_adjs();
 	
 	// pre-cal Vws on same atom, speed up DPcal_V() in DPcal_C()
-	std::vector<std::shared_ptr<matrix>> Vs_same_atom(GlobalC::ucell.ntype);
+	std::vector<std::shared_ptr<ModuleBase::matrix>> Vs_same_atom(GlobalC::ucell.ntype);
 	for(size_t it=0; it!=GlobalC::ucell.ntype; ++it)
 		Vs_same_atom[it] = DPcal_V( it,it,{0,0,0}, m_abfs_abfs, index_abfs, 0,true, rwlock_Vw,Vws );
 	
@@ -43,7 +43,7 @@ std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_pt
 	mkl_set_num_threads(std::max(1UL,mkl_threads/atom_centres_vector.size()));
 #endif
 	
-	std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,std::shared_ptr<matrix>>>> Cs;
+	std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,std::shared_ptr<ModuleBase::matrix>>>> Cs;
 	#pragma omp parallel for
 	for( int i_iat1=0; i_iat1<atom_centres_vector.size(); ++i_iat1 )
 	{
@@ -58,10 +58,10 @@ std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_pt
 			const int it2 = GlobalC::ucell.iat2it[iat2];
 			const int ia2 = GlobalC::ucell.iat2ia[iat2];
 			const Vector3_Order<double> tau2( GlobalC::ucell.atoms[it2].tau[ia2] );
-			for( const Vector3<int> &box2 : atom2.second )
+			for( const ModuleBase::Vector3<int> &box2 : atom2.second )
 			{
 //				std::cout<<"cal_Cs\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<std::endl;
-				const std::shared_ptr<matrix> C = DPcal_C( 
+				const std::shared_ptr<ModuleBase::matrix> C = DPcal_C( 
 					it1, it2, -tau1+tau2+(box2*GlobalC::ucell.latvec), 
 					m_abfs_abfs, m_abfslcaos_lcaos, index_abfs, index_lcaos, 
 					threshold, true, rwlock_Cw, rwlock_Vw, Cws, Vws );
@@ -128,7 +128,7 @@ std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_pt
 		std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,std::shared_ptr<matrix>>>> &Vs,
 		std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<matrix>>>> &Vws )
 {
-	TITLE("Abfs","cal_Vps");	
+	ModuleBase::TITLE("Abfs","cal_Vps");	
 	
 	std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,std::shared_ptr<matrix>>>> Vps;
 	
@@ -153,13 +153,13 @@ std::cout<<"cal_Vs\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<std::endl;
 		std::vector<ModuleBase::ComplexMatrix> Vkps( GlobalC::kv.nks/GlobalV::NSPIN, {Vs[iat1][iat2][{0,0,0}]->nr, Vs[iat1][iat2][{0,0,0}]->nc} );
 		for( size_t ik=0; ik!=GlobalC::kv.nks/GlobalV::NSPIN; ++ik )
 			for( const Vector3_Order<int> &box2 : Coulomb_potential_boxes )
-				Vkps[ik] += static_cast<ModuleBase::ComplexMatrix>(*Vs[iat1][iat2][box2]) * exp(-TWO_PI*IMAG_UNIT*(GlobalC::kv.kvec_c[ik]*(box2*GlobalC::ucell.latvec)));
+				Vkps[ik] += static_cast<ModuleBase::ComplexMatrix>(*Vs[iat1][iat2][box2]) * exp(-ModuleBase::TWO_PI*IMAG_UNIT*(GlobalC::kv.kvec_c[ik]*(box2*GlobalC::ucell.latvec)));
 		
 		for( const Vector3_Order<int> &box2 : Born_von_Karman_boxes )
 		{
 			ModuleBase::ComplexMatrix Vps_tmp ( Vkps[0].nr, Vkps[0].nc );
 			for( size_t ik=0; ik!=GlobalC::kv.nks/GlobalV::NSPIN; ++ik )
-				Vps_tmp += Vkps[ik] * GlobalC::kv.wk[ik]*(0.5*GlobalV::NSPIN) * exp(TWO_PI*IMAG_UNIT*(GlobalC::kv.kvec_c[ik]*(box2*GlobalC::ucell.latvec)));
+				Vps_tmp += Vkps[ik] * GlobalC::kv.wk[ik]*(0.5*GlobalV::NSPIN) * exp(ModuleBase::TWO_PI*IMAG_UNIT*(GlobalC::kv.kvec_c[ik]*(box2*GlobalC::ucell.latvec)));
 			Vps[iat1][iat2][box2] = make_shared<matrix>( Vps_tmp.real() );
 		}
 	}
@@ -167,19 +167,19 @@ std::cout<<"cal_Vs\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<std::endl;
 }
 */
 
-std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>>>> Abfs::cal_Vs(
+std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<ModuleBase::matrix>>>> Abfs::cal_Vs(
 	const std::vector<std::pair<size_t,size_t>> &atom_pairs,
 	const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
 	const ModuleBase::Element_Basis_Index::IndexLNM &index_abfs,
 	const double rmesh_times,
 	const double threshold,
-	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<matrix>>>> &Vws )
+	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<ModuleBase::matrix>>>> &Vws )
 {
-	TITLE("Abfs","cal_Vs");
+	ModuleBase::TITLE("Abfs","cal_Vs");
 	pthread_rwlock_t rwlock_Vw;	pthread_rwlock_init(&rwlock_Vw,NULL);
 	std::vector<Abfs::Vector3_Order<int>> Coulomb_potential_boxes = get_Coulomb_potential_boxes(rmesh_times);
 
-	std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,std::shared_ptr<matrix>>>> Vs;
+	std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,std::shared_ptr<ModuleBase::matrix>>>> Vs;
 	#pragma omp parallel for
 	for( int i_atom_pair=0; i_atom_pair<atom_pairs.size(); ++i_atom_pair )
 	{
@@ -199,7 +199,7 @@ std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_pt
 			if( delta_R.norm()*GlobalC::ucell.lat0 < Rcut )
 			{
 //				std::cout<<"cal_Vs\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<"\t"<<delta_R<<"\t"<<delta_R.norm()<<"\t"<<delta_R.norm()*GlobalC::ucell.lat0<<"\t"<<GlobalC::ORB.Phi[it1].getRcut()*rmesh_times+GlobalC::ORB.Phi[it2].getRcut()<<std::endl;
-				const std::shared_ptr<matrix> V = DPcal_V( 
+				const std::shared_ptr<ModuleBase::matrix> V = DPcal_V( 
 					it1, it2, delta_R, 
 					m_abfs_abfs, index_abfs, 
 					threshold, true, rwlock_Vw, Vws );
@@ -213,9 +213,9 @@ std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_pt
 	return Vs;
 }
 
-std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>> Abfs::cal_mps(
+std::map<Abfs::Vector3_Order<int>,std::shared_ptr<ModuleBase::matrix>> Abfs::cal_mps(
 	const Abfs::Vector3_Order<int> &Born_von_Karman_period,
-	const std::map<Vector3_Order<int>,std::shared_ptr<matrix>> &ms )
+	const std::map<Vector3_Order<int>,std::shared_ptr<ModuleBase::matrix>> &ms )
 {
 	std::map< Vector3_Order<int>, std::vector<Vector3_Order<int>> > indexs;
 	for( const auto & m : ms )
@@ -240,7 +240,7 @@ std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>> Abfs::cal_mps(
 		#error
 	#endif
 	
-	std::map<Vector3_Order<int>,std::shared_ptr<matrix>> mps;
+	std::map<Vector3_Order<int>,std::shared_ptr<ModuleBase::matrix>> mps;
 	for( const auto & index : indexs )
 	{
 		const Vector3_Order<int> & boxp = index.first;
@@ -249,7 +249,7 @@ std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>> Abfs::cal_mps(
 			mps[boxp] = ms.at(index.second[0]);
 		else
 		{
-			mps[boxp] = make_shared<matrix>();
+			mps[boxp] = make_shared<ModuleBase::matrix>();
 			*mps[boxp] = *ms.at(index.second[0]);
 			for( size_t i=1; i<index.second.size(); ++i )
 				*mps[boxp] += *ms.at(index.second[i]);
@@ -258,12 +258,12 @@ std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>> Abfs::cal_mps(
 	return mps;
 }
 
-std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>>>> Abfs::cal_mps(
+std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<ModuleBase::matrix>>>> Abfs::cal_mps(
 	const Abfs::Vector3_Order<int> &Born_von_Karman_period,
-	const std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,std::shared_ptr<matrix>>>> &ms )
+	const std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,std::shared_ptr<ModuleBase::matrix>>>> &ms )
 {
-	TITLE("Abfs","cal_mps");
-	std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,std::shared_ptr<matrix>>>> mps;
+	ModuleBase::TITLE("Abfs","cal_mps");
+	std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,std::shared_ptr<ModuleBase::matrix>>>> mps;
 	for( const auto & m1s : ms )
 		for( const auto & m12s : m1s.second )
 			mps[m1s.first][m12s.first] = cal_mps( Born_von_Karman_period, m12s.second );
@@ -271,7 +271,7 @@ std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_pt
 }
 
 
-std::shared_ptr<matrix> Abfs::DPcal_C( 
+std::shared_ptr<ModuleBase::matrix> Abfs::DPcal_C( 
 	const size_t &it1, 
 	const size_t &it2, 
 	const Vector3_Order<double> &R, 
@@ -283,8 +283,8 @@ std::shared_ptr<matrix> Abfs::DPcal_C(
 	const bool writable,
 	pthread_rwlock_t &rwlock_Cw,
 	pthread_rwlock_t &rwlock_Vw,
-	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<matrix>>>> &Cws,
-	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<matrix>>>> &Vws )
+	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<ModuleBase::matrix>>>> &Cws,
+	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<ModuleBase::matrix>>>> &Vws )
 {
 	// Attention: 
 	// 在计算 C[it1,it1,0][it2,R] 后，额外计算 C[it2,it2,0][it1,-R] 几乎不耗时。
@@ -300,9 +300,9 @@ std::shared_ptr<matrix> Abfs::DPcal_C(
 	//         浪费空间（可在算完全部Cs后根据需要删除无需的Cs，释放空间？）
 	// 根据后续情况选择权衡。
 	
-//	TITLE("Abfs","DPcal_C");
+//	ModuleBase::TITLE("Abfs","DPcal_C");
 	pthread_rwlock_rdlock(&rwlock_Cw);
-	const std::weak_ptr<matrix> * const Cws_ptr   = static_cast<const std::weak_ptr<matrix> * const>( ModuleBase::GlobalFunc::MAP_EXIST( Cws, it1, it2, R ) );
+	const std::weak_ptr<ModuleBase::matrix> * const Cws_ptr   = static_cast<const std::weak_ptr<ModuleBase::matrix> * const>( ModuleBase::GlobalFunc::MAP_EXIST( Cws, it1, it2, R ) );
 	pthread_rwlock_unlock(&rwlock_Cw);
 	
 	if( Cws_ptr && !Cws_ptr->expired() )
@@ -310,13 +310,13 @@ std::shared_ptr<matrix> Abfs::DPcal_C(
 	else
 	{
 //		std::cout<<"DPcal_C\t"<<it1<<"\t"<<it2<<"\t"<<R<<std::endl;
-		if( (Vector3<double>(0,0,0)==R) && (it1==it2) )
+		if( (ModuleBase::Vector3<double>(0,0,0)==R) && (it1==it2) )
 		{
-			const std::shared_ptr<matrix> A = 
-				make_shared<matrix>( m_abfslcaos_lcaos.cal_overlap_matrix( it1,it2,0,0,index_abfs,index_lcaos,index_lcaos,Exx_Abfs::Matrix_Orbs21::Matrix_Order::A2B_A1 ) );
-			const std::shared_ptr<matrix> V = DPcal_V(it1,it2,{0,0,0}, m_abfs_abfs,index_abfs, 0,false, rwlock_Vw,Vws);
-			const std::shared_ptr<matrix> L = cal_I(V);
-			std::shared_ptr<matrix> C = make_shared<matrix>( 0.5 * *A * *L );
+			const std::shared_ptr<ModuleBase::matrix> A = 
+				make_shared<ModuleBase::matrix>( m_abfslcaos_lcaos.cal_overlap_matrix( it1,it2,0,0,index_abfs,index_lcaos,index_lcaos,Exx_Abfs::Matrix_Orbs21::Matrix_Order::A2B_A1 ) );
+			const std::shared_ptr<ModuleBase::matrix> V = DPcal_V(it1,it2,{0,0,0}, m_abfs_abfs,index_abfs, 0,false, rwlock_Vw,Vws);
+			const std::shared_ptr<ModuleBase::matrix> L = cal_I(V);
+			std::shared_ptr<ModuleBase::matrix> C = make_shared<ModuleBase::matrix>( 0.5 * *A * *L );
 			if(C->absmax()<=threshold)	C->create(0,0);
 			if(writable)
 			{
@@ -328,21 +328,21 @@ std::shared_ptr<matrix> Abfs::DPcal_C(
 		}
 		else
 		{
-			const std::vector<std::shared_ptr<matrix>> A = 
-				{ make_shared<matrix>( m_abfslcaos_lcaos.cal_overlap_matrix(it1,it2,0,R ,index_abfs,index_lcaos,index_lcaos,Exx_Abfs::Matrix_Orbs21::Matrix_Order::A2B_A1) ) ,
-				  make_shared<matrix>( m_abfslcaos_lcaos.cal_overlap_matrix(it2,it1,0,-R,index_abfs,index_lcaos,index_lcaos,Exx_Abfs::Matrix_Orbs21::Matrix_Order::BA2_A1) ) };
+			const std::vector<std::shared_ptr<ModuleBase::matrix>> A = 
+				{ make_shared<ModuleBase::matrix>( m_abfslcaos_lcaos.cal_overlap_matrix(it1,it2,0,R ,index_abfs,index_lcaos,index_lcaos,Exx_Abfs::Matrix_Orbs21::Matrix_Order::A2B_A1) ) ,
+				  make_shared<ModuleBase::matrix>( m_abfslcaos_lcaos.cal_overlap_matrix(it2,it1,0,-R,index_abfs,index_lcaos,index_lcaos,Exx_Abfs::Matrix_Orbs21::Matrix_Order::BA2_A1) ) };
 			
-			const std::shared_ptr<matrix> V_00 = DPcal_V(it1,it1,{0,0,0}, m_abfs_abfs,index_abfs, 0,false, rwlock_Vw,Vws);
-			const std::shared_ptr<matrix> V_01 = DPcal_V(it1,it2,R,       m_abfs_abfs,index_abfs, 0,false, rwlock_Vw,Vws);
-			const std::shared_ptr<matrix> V_10 = DPcal_V(it2,it1,-R,      m_abfs_abfs,index_abfs, 0,false, rwlock_Vw,Vws);
-			const std::shared_ptr<matrix> V_11 = DPcal_V(it2,it2,{0,0,0}, m_abfs_abfs,index_abfs, 0,false, rwlock_Vw,Vws);
-			const std::vector<std::vector<std::shared_ptr<matrix>>> V = 
+			const std::shared_ptr<ModuleBase::matrix> V_00 = DPcal_V(it1,it1,{0,0,0}, m_abfs_abfs,index_abfs, 0,false, rwlock_Vw,Vws);
+			const std::shared_ptr<ModuleBase::matrix> V_01 = DPcal_V(it1,it2,R,       m_abfs_abfs,index_abfs, 0,false, rwlock_Vw,Vws);
+			const std::shared_ptr<ModuleBase::matrix> V_10 = DPcal_V(it2,it1,-R,      m_abfs_abfs,index_abfs, 0,false, rwlock_Vw,Vws);
+			const std::shared_ptr<ModuleBase::matrix> V_11 = DPcal_V(it2,it2,{0,0,0}, m_abfs_abfs,index_abfs, 0,false, rwlock_Vw,Vws);
+			const std::vector<std::vector<std::shared_ptr<ModuleBase::matrix>>> V = 
 				{{ V_00, V_01 },
 				 { V_10, V_11 }};
 
-			const std::vector<std::vector<std::shared_ptr<matrix>>> L = cal_I(V);
+			const std::vector<std::vector<std::shared_ptr<ModuleBase::matrix>>> L = cal_I(V);
 
-			std::shared_ptr<matrix> C = make_shared<matrix>( *A[0] * *L[0][0] + *A[1] * *L[1][0] );
+			std::shared_ptr<ModuleBase::matrix> C = make_shared<ModuleBase::matrix>( *A[0] * *L[0][0] + *A[1] * *L[1][0] );
 			if(C->absmax()<=threshold)	C->create(0,0);
 			if(writable)
 			{
@@ -355,7 +355,7 @@ std::shared_ptr<matrix> Abfs::DPcal_C(
 	}
 }
 
-std::shared_ptr<matrix> Abfs::DPcal_V( 
+std::shared_ptr<ModuleBase::matrix> Abfs::DPcal_V( 
 	const size_t &it1, 
 	const size_t &it2, 
 	const Vector3_Order<double> &R, 
@@ -364,19 +364,19 @@ std::shared_ptr<matrix> Abfs::DPcal_V(
 	const double threshold,
 	const bool writable,
 	pthread_rwlock_t &rwlock_Vw,
-	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<matrix>>>> &Vws)
+	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<ModuleBase::matrix>>>> &Vws)
 {
-//	TITLE("Abfs","DPcal_V");
+//	ModuleBase::TITLE("Abfs","DPcal_V");
 	pthread_rwlock_rdlock(&rwlock_Vw);
-	const std::weak_ptr<matrix> * const Vws12_ptr = static_cast<const std::weak_ptr<matrix> * const>( ModuleBase::GlobalFunc::MAP_EXIST( Vws, it1, it2, R ) );
-	const std::weak_ptr<matrix> * const Vws21_ptr = static_cast<const std::weak_ptr<matrix> * const>( ModuleBase::GlobalFunc::MAP_EXIST( Vws, it2, it1, -R ) );
+	const std::weak_ptr<ModuleBase::matrix> * const Vws12_ptr = static_cast<const std::weak_ptr<ModuleBase::matrix> * const>( ModuleBase::GlobalFunc::MAP_EXIST( Vws, it1, it2, R ) );
+	const std::weak_ptr<ModuleBase::matrix> * const Vws21_ptr = static_cast<const std::weak_ptr<ModuleBase::matrix> * const>( ModuleBase::GlobalFunc::MAP_EXIST( Vws, it2, it1, -R ) );
 	pthread_rwlock_unlock(&rwlock_Vw);
 	
 	if( Vws12_ptr && !Vws12_ptr->expired() )
 		return Vws12_ptr->lock();
 	else if( Vws21_ptr && !Vws21_ptr->expired() )
 	{
-		std::shared_ptr<matrix> VT = make_shared<matrix>( transpose(*Vws21_ptr->lock()) );
+		std::shared_ptr<ModuleBase::matrix> VT = make_shared<ModuleBase::matrix>( transpose(*Vws21_ptr->lock()) );
 		if(VT->absmax()<=threshold)	VT->create(0,0);
 		if(writable)
 		{
@@ -389,7 +389,7 @@ std::shared_ptr<matrix> Abfs::DPcal_V(
 	else
 	{
 //		std::cout<<"DPcal_V\t"<<it1<<"\t"<<it2<<"\t"<<R<<std::endl;
-		std::shared_ptr<matrix> V = make_shared<matrix>( m_abfs_abfs.cal_overlap_matrix(it1,it2,0,R,index_abfs,index_abfs) );
+		std::shared_ptr<ModuleBase::matrix> V = make_shared<ModuleBase::matrix>( m_abfs_abfs.cal_overlap_matrix(it1,it2,0,R,index_abfs,index_abfs) );
 		if(V->absmax()<=threshold)	V->create(0,0);
 		if(writable)
 		{
@@ -403,10 +403,10 @@ std::shared_ptr<matrix> Abfs::DPcal_V(
 
 std::map<size_t,std::vector<Abfs::Vector3_Order<int>>> Abfs::get_adjs( const size_t &iat )
 {
-//	TITLE("Abfs","get_adjs");
+//	ModuleBase::TITLE("Abfs","get_adjs");
 	const int it = GlobalC::ucell.iat2it[iat];
 	const int ia = GlobalC::ucell.iat2ia[iat];
-	const Vector3<double> &tau = GlobalC::ucell.atoms[it].tau[ia];
+	const ModuleBase::Vector3<double> &tau = GlobalC::ucell.atoms[it].tau[ia];
 	
 	std::map<size_t,std::vector<Vector3_Order<int>>> adjs;
 	GlobalC::GridD.Find_atom(GlobalC::ucell,  tau, it, ia );
@@ -415,8 +415,8 @@ std::map<size_t,std::vector<Abfs::Vector3_Order<int>>> Abfs::get_adjs( const siz
 		const size_t it_ad = GlobalC::GridD.getType(ad);
 		const size_t ia_ad = GlobalC::GridD.getNatom(ad);
 		const int iat_ad = GlobalC::ucell.itia2iat(it_ad,ia_ad);
-		const Vector3<int> box_ad = GlobalC::GridD.getBox(ad);
-		const Vector3<double> tau_ad = GlobalC::GridD.getAdjacentTau(ad);
+		const ModuleBase::Vector3<int> box_ad = GlobalC::GridD.getBox(ad);
+		const ModuleBase::Vector3<double> tau_ad = GlobalC::GridD.getAdjacentTau(ad);
 		
 		if( (tau-tau_ad).norm()*GlobalC::ucell.lat0 < GlobalC::ORB.Phi[it].getRcut()+GlobalC::ORB.Phi[it_ad].getRcut() )
 			adjs[iat_ad].push_back(box_ad);
@@ -435,7 +435,7 @@ std::vector<std::map<size_t,std::vector<Abfs::Vector3_Order<int>>>> Abfs::get_ad
 /*
 set<std::pair<size_t,size_t>> Abfs::get_H_pairs_core( const std::vector<std::pair<size_t,size_t>> &atom_pairs )
 {
-	TITLE("Exx_Lcao","allocate_Hexx");
+	ModuleBase::TITLE("Exx_Lcao","allocate_Hexx");
 
 	set<std::pair<size_t,size_t>> H_atom_pairs_core;
 	for( const std::pair<size_t,size_t> & atom_pair : atom_pairs )
@@ -465,7 +465,7 @@ set<std::pair<size_t,size_t>> Abfs::get_H_pairs_core( const std::vector<std::pai
 
 std::map<set<size_t>,set<size_t>> Abfs::get_H_pairs_core_group( const std::vector<std::pair<size_t,size_t>> &atom_pairs )
 {
-	TITLE("Abfs","get_H_pairs_core_group");
+	ModuleBase::TITLE("Abfs","get_H_pairs_core_group");
 	
 	const std::vector<std::map<size_t,std::vector<Abfs::Vector3_Order<int>>>> adjs = Abfs::get_adjs();
 	
@@ -509,7 +509,7 @@ std::map<set<size_t>,set<size_t>> Abfs::get_H_pairs_core_group( const std::vecto
 
 set<std::pair<size_t,size_t>> Abfs::get_H_pairs_core( const std::vector<std::pair<size_t,size_t>> &atom_pairs )
 {
-	TITLE("Exx_Lcao","get_H_pairs_core");
+	ModuleBase::TITLE("Exx_Lcao","get_H_pairs_core");
 	
 	const std::vector<std::map<size_t,std::vector<Abfs::Vector3_Order<int>>>> adjs = Abfs::get_adjs();
 	
@@ -585,9 +585,9 @@ std::vector<Abfs::Vector3_Order<int>> Abfs::get_Born_von_Karmen_boxes( const Abf
 	return Born_von_Karman_boxes;
 }
 
-std::shared_ptr<matrix> Abfs::cal_I( const std::shared_ptr<matrix> &m )
+std::shared_ptr<ModuleBase::matrix> Abfs::cal_I( const std::shared_ptr<ModuleBase::matrix> &m )
 {
-//	TITLE("Abfs","cal_I1");
+//	ModuleBase::TITLE("Abfs","cal_I1");
 	Exx_Abfs::Inverse_Matrix_Double I;
 	I.init( m->nc );
 	I.input( m );
@@ -608,14 +608,14 @@ std::shared_ptr<matrix> Abfs::cal_I( const std::shared_ptr<matrix> &m )
 		#error "TEST_EXX_LCAO"
 	#endif
 
-	std::shared_ptr<matrix> m_new = make_shared<matrix>(m->nr,m->nc);
+	std::shared_ptr<ModuleBase::matrix> m_new = make_shared<ModuleBase::matrix>(m->nr,m->nc);
 	I.output( m_new );
 	return m_new;
 }
 
-std::vector<std::vector<std::shared_ptr<matrix>>> Abfs::cal_I( const std::vector<std::vector<std::shared_ptr<matrix>>> &ms )
+std::vector<std::vector<std::shared_ptr<ModuleBase::matrix>>> Abfs::cal_I( const std::vector<std::vector<std::shared_ptr<ModuleBase::matrix>>> &ms )
 {
-//	TITLE("Abfs","cal_I4");
+//	ModuleBase::TITLE("Abfs","cal_I4");
 	Exx_Abfs::Inverse_Matrix_Double I;
 	I.init( ms[0][0]->nc + ms[0][1]->nc );
 	I.input( ms[0][0], ms[0][1], ms[1][0], ms[1][1] );
@@ -636,10 +636,10 @@ std::vector<std::vector<std::shared_ptr<matrix>>> Abfs::cal_I( const std::vector
 		#error "TEST_EXX_LCAO"
 	#endif
 	
-	std::vector<std::vector<std::shared_ptr<matrix>>> ms_new( 2, std::vector<std::shared_ptr<matrix>>(2) );
+	std::vector<std::vector<std::shared_ptr<ModuleBase::matrix>>> ms_new( 2, std::vector<std::shared_ptr<ModuleBase::matrix>>(2) );
 	for( size_t i=0; i!=2; ++i )
 		for(size_t j=0; j!=2; ++j )
-			ms_new[i][j] = make_shared<matrix>( ms[i][j]->nr, ms[i][j]->nc );
+			ms_new[i][j] = make_shared<ModuleBase::matrix>( ms[i][j]->nr, ms[i][j]->nc );
 	I.output( ms_new[0][0], ms_new[0][1], ms_new[1][0], ms_new[1][1] );
 	return ms_new;
 }

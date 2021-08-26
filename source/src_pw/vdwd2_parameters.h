@@ -31,7 +31,7 @@ public:
 	
 	std::string model;
 	double radius;
-	Vector3<int> period;
+	ModuleBase::Vector3<int> period;
 
 	void initset(const UnitCell_pseudo &ucell); //init sets of vdwd2 once this correction is called
 	void initial_parameters(const Input &input); //initial parameters of Vdwd2 with INPUT file 

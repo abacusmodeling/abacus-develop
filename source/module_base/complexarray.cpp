@@ -10,7 +10,6 @@
 #include "complexarray.h"
 namespace ModuleBase
 {
-const std::complex <double> ZERO(0.0, 0.0), ONE(1.0, 0.0);
 
 void complexArrayxAlloc()
 {

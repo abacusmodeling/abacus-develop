@@ -5,7 +5,7 @@ void Input::Print(const std::string &fn)const
 {
     if (GlobalV::MY_RANK!=0) return;
 
-    TITLE("Input","Print");
+    ModuleBase::TITLE("Input","Print");
 
     std::ofstream ofs(fn.c_str());
 
@@ -153,6 +153,7 @@ void Input::Print(const std::string &fn)const
 
 	ofs << "\n#Parameters (10.Molecular dynamics)" << std::endl;
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_mdtype",mdp.mdtype,"choose ensemble");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_potential",mdp.md_potential,"choose potential");
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_dt",mdp.dt,"time step");
 	ModuleBase::GlobalFunc::OUTP(ofs,"mnhc",mdp.MNHC,"number of Nose-Hoover chains");
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_qmass",mdp.Qmass,"mass of thermostat");
@@ -166,9 +167,9 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_ediffg",mdp.ediffg,"parameter for constraining max force change");
 	ModuleBase::GlobalFunc::OUTP(ofs,"NVT_tau",mdp.NVT_tau,"parameter for adjust effect of thermostat");
 	ModuleBase::GlobalFunc::OUTP(ofs,"NVT_control",mdp.NVT_control,"choose which thermostat used in NVT ensemble");
-	ModuleBase::GlobalFunc::OUTP(ofs,"rcut_lj",mdp.rcut_lj/ANGSTROM_AU,"cutoff radius of LJ potential");
-	ModuleBase::GlobalFunc::OUTP(ofs,"epsilon_lj",mdp.epsilon_lj*Ry_to_eV,"the value of epsilon for LJ potential");
-	ModuleBase::GlobalFunc::OUTP(ofs,"sigma_lj",mdp.sigma_lj/ANGSTROM_AU,"the value of sigma for LJ potential");
+	ModuleBase::GlobalFunc::OUTP(ofs,"rcut_lj",mdp.rcut_lj/ModuleBase::ANGSTROM_AU,"cutoff radius of LJ potential");
+	ModuleBase::GlobalFunc::OUTP(ofs,"epsilon_lj",mdp.epsilon_lj*ModuleBase::Ry_to_eV,"the value of epsilon for LJ potential");
+	ModuleBase::GlobalFunc::OUTP(ofs,"sigma_lj",mdp.sigma_lj/ModuleBase::ANGSTROM_AU,"the value of sigma for LJ potential");
 
 	ofs << "\n#Parameters (11.Efield)" << std::endl;
 	ModuleBase::GlobalFunc::OUTP(ofs,"efield",efield,"add electric field");

@@ -4,6 +4,9 @@
 #include "vector3.h"
 #include <vector>
 
+namespace ModuleBase
+{
+
 class Ylm
 {
 	public:
@@ -15,13 +18,13 @@ class Ylm
 	// (1) for check
 	static void get_ylm_real( 
 			const int &Lmax , 
-			const Vector3<double> &vec, 
+			const ModuleBase::Vector3<double> &vec, 
 			double ylmr[]);
 
 	// (2) for check
 	static void get_ylm_real( 
 			const int &Lmax , 
-			const Vector3<double> &vec, 
+			const ModuleBase::Vector3<double> &vec, 
 			double ylmr[],
 			double dylmdr[][3]);
 
@@ -83,5 +86,7 @@ class Ylm
 	static int Semi_Fact(const int n); 
 	static double sgn(const double x);
 };
+
+}
 
 #endif

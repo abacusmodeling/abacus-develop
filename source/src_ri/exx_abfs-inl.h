@@ -28,8 +28,8 @@ void Exx_Abfs::minus_matrixes(
 
 template<>
 void Exx_Abfs::minus_matrixes(
-	matrix &A,
-	const matrix &B) const
+	ModuleBase::matrix &A,
+	const ModuleBase::matrix &B) const
 {
 	A -= B;
 }

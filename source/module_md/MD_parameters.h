@@ -23,9 +23,10 @@ public:
 		ediffg=1e-3;
 		MNHC=4;
 
-		rcut_lj = 8.5*ANGSTROM_AU;
-		epsilon_lj = 0.01032/Ry_to_eV;
-		sigma_lj = 3.405*ANGSTROM_AU;
+		md_potential = "FP";
+		rcut_lj = 8.5*ModuleBase::ANGSTROM_AU;
+		epsilon_lj = 0.01032/ModuleBase::Ry_to_eV;
+		sigma_lj = 3.405*ModuleBase::ANGSTROM_AU;
 	};
     ~MD_parameters(){};
 
@@ -45,10 +46,11 @@ public:
 	double ediffg;      //parameter for constrain
     int fixTemperature;
 
-	/*Classic MD*/      // liuyu 2021-07-30
-	double rcut_lj;     // cutoff radius of LJ potential (Bohr)
-	double epsilon_lj;  // the value of epsilon for LJ potential
-	double sigma_lj;    // the value of sigma for LJ potential
+	/*Classic MD*/              // liuyu 2021-07-30
+	std::string md_potential;   // choose potential: LJ, DP, FP
+	double rcut_lj;             // cutoff radius of LJ potential (Bohr)
+	double epsilon_lj;          // the value of epsilon for LJ potential
+	double sigma_lj;            // the value of sigma for LJ potential
 };
 
 

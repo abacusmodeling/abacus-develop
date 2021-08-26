@@ -1,7 +1,6 @@
 #include "charge_pulay.h"
 #include "global.h"
 #include "../module_base/inverse_matrix.h"
-#include "../module_base/random.h"
 
 Charge_Pulay::Charge_Pulay()
 {
@@ -54,7 +53,7 @@ Charge_Pulay::~Charge_Pulay()
 
 void Charge_Pulay::Pulay_mixing(void)
 {
-//  TITLE("Charge_Pulay","Pulay_mixing");
+//  ModuleBase::TITLE("Charge_Pulay","Pulay_mixing");
 	rstep = this->mixing_ndim;
 	dstep = this->mixing_ndim - 1;
 	assert(dstep>0);
@@ -112,7 +111,7 @@ void Charge_Pulay::Pulay_mixing(void)
 			// inverse part of the matrix.
 			//-----------------------------
 			const int predim = idstep+1;
-			matrix preA(predim, predim);
+			ModuleBase::matrix preA(predim, predim);
 			for(int i=0; i<predim; i++)
 			{
 				for(int j=0; j<predim; j++)
@@ -166,7 +165,7 @@ void Charge_Pulay::Pulay_mixing(void)
 	{
 		// generate matrix A = <dR|dR>
 		this->generate_Abar(scheme,Abar);
-		matrix A(Abar);
+		ModuleBase::matrix A(Abar);
 
 		// inverse A matrix to become Abar.
 		this->inverse_real_symmetry_matrix(scheme,Abar);
@@ -177,76 +176,6 @@ void Charge_Pulay::Pulay_mixing(void)
 		}
 
 		this->generate_alpha(scheme);
-
-		/*	
-			double opt_rnorm = 0.0;
-			if(scheme==1)
-			{
-		//	out.printrm("A=<dR|dR>",A);
-
-		opt_rnorm = calculate_residual_norm( Rrho[is][irstep], Rrho[is][irstep] );
-		//				std::cout << "\n part1 = " << opt_rnorm;
-		for(int i=0; i<dstep; i++)
-		{
-		for(int j=0; j<dstep; j++)
-		{	
-		opt_rnorm += alpha[i] * alpha[j] * A(i,j);
-		}
-		}
-		//				std::cout << "\n part2 = " << opt_rnorm;
-
-		for(int i=0; i<dstep; i++)
-		{
-		opt_rnorm += 2*alpha[i]*dRR[i];
-		}
-		//				std::cout << "\n part3 = " << opt_rnorm;
-		}
-		else if(scheme==2)
-		{
-		for(int i=0; i<rstep; i++)
-		{
-		for(int j=0; j<rstep; j++)
-		{
-		opt_rnorm += alpha[i] * alpha[j] * calculate_residual_norm( Rrho[is][i], Rrho[is][j] );
-		}
-		}
-		}
-		 */		
-
-		//std::cout << "\n After optimizing_the residual norm = " << opt_rnorm << std::endl;
-		//			BLOCK_HERE("haha");
-		/*		
-				double optimal_rnorm = 9999.0; // just need a big number
-				double *atmp = new double[rstep];
-
-				for(int iter=0; iter<1000; iter++)
-				{				
-				double rnorm = 0.0;	
-
-				Random::between0and1(alpha,3);
-
-				for(int i=0; i<rstep; i++)
-				{
-				for(int j=0; j<rstep; j++)
-				{
-				rnorm += alpha[i] * alpha[j] * calculate_residual_norm( Rrho[0][i], Rrho[0][j] );
-				}
-
-				}
-
-		//std::cout << "\n rnorm = " << rnorm;
-
-		if(optimal_rnorm > rnorm)
-		{
-		optimal_rnorm = rnorm;
-		ModuleBase::GlobalFunc::DCOPY(atmp, alpha, rstep);
-		}
-		}
-
-		delete[] atmp;
-
-		std::cout << "\n optimal_residual_norm = " << optimal_rnorm << std::endl;
-		 */
 
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
@@ -301,7 +230,7 @@ void Charge_Pulay::allocate_pulay(const int &scheme)
 	//std::cout << "\n initp = " << initp << std::endl;
 	if(!this->initp)
 	{
-		TITLE("Charge_Pulay","allocate_pulay");
+		ModuleBase::TITLE("Charge_Pulay","allocate_pulay");
 		ModuleBase::GlobalFunc::NOTE("rstep is used to record Rrho");
 		if(GlobalV::test_charge)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"rstep",rstep);
 		ModuleBase::GlobalFunc::NOTE("dstep is used to record dRrho, drho");
@@ -320,7 +249,7 @@ void Charge_Pulay::allocate_pulay(const int &scheme)
 				ModuleBase::GlobalFunc::ZEROS( Rrho[is][i], GlobalC::pw.nrxx );
         	}
 		}
-    	Memory::record("Charge_Pulay","Rrho", GlobalV::NSPIN*rstep*GlobalC::pw.nrxx,"double");
+    	ModuleBase::Memory::record("Charge_Pulay","Rrho", GlobalV::NSPIN*rstep*GlobalC::pw.nrxx,"double");
 
 		// (2) allocate "dRrho[i] = Rrho[i+1] - Rrho[i]" of the last few steps.
 		// allocate "drho[i] = rho[i+1] - rho[i]" of the last few steps.
@@ -344,20 +273,20 @@ void Charge_Pulay::allocate_pulay(const int &scheme)
 				ModuleBase::GlobalFunc::ZEROS( drho[is][i], GlobalC::pw.nrxx);
 			}
 		}
-    	Memory::record("Charge_Pulay","dRrho", GlobalV::NSPIN*dstep*GlobalC::pw.nrxx,"double");
-    	Memory::record("Charge_Pulay","drho", GlobalV::NSPIN*dstep*GlobalC::pw.nrxx,"double");
-    	Memory::record("Charge_Pulay","rho_save2", GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
+    	ModuleBase::Memory::record("Charge_Pulay","dRrho", GlobalV::NSPIN*dstep*GlobalC::pw.nrxx,"double");
+    	ModuleBase::Memory::record("Charge_Pulay","drho", GlobalV::NSPIN*dstep*GlobalC::pw.nrxx,"double");
+    	ModuleBase::Memory::record("Charge_Pulay","rho_save2", GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
 
 		ModuleBase::GlobalFunc::NOTE("Allocate Abar = <dRrho_j | dRrho_i >, dimension = dstep.");
 		if(scheme==1)
 		{
 			this->Abar.create(dstep, dstep);
-    		Memory::record("Charge_Pulay","Abar", dstep*dstep,"double");
+    		ModuleBase::Memory::record("Charge_Pulay","Abar", dstep*dstep,"double");
 		}
 		else if(scheme==2)
 		{
 			this->Abar.create(rstep, rstep);
-			Memory::record("Charge_Pulay","Abar", rstep*rstep,"double");
+			ModuleBase::Memory::record("Charge_Pulay","Abar", rstep*rstep,"double");
 		}
 
 		// (4) allocate dRR = <delta R|R>
@@ -404,7 +333,7 @@ void Charge_Pulay::allocate_pulay(const int &scheme)
 // calculate < dR | dR >
 // if spin is considered, double the size.
 // < dR1,dR2 | dR1,dR2 > = < dR1 | dR1 > + < dR2 | dR2 >
-void Charge_Pulay::generate_Abar(const int &scheme, matrix &A)const
+void Charge_Pulay::generate_Abar(const int &scheme, ModuleBase::matrix &A)const
 {
 	int step = 0;
 
@@ -437,7 +366,7 @@ void Charge_Pulay::generate_Abar(const int &scheme, matrix &A)const
 }
 
 
-void Charge_Pulay::inverse_preA(const int &dim, matrix &preA)const
+void Charge_Pulay::inverse_preA(const int &dim, ModuleBase::matrix &preA)const
 {
 	ModuleBase::ComplexMatrix B(dim, dim);
 	ModuleBase::ComplexMatrix C(dim, dim);
@@ -448,7 +377,7 @@ void Charge_Pulay::inverse_preA(const int &dim, matrix &preA)const
 			B(i,j) = std::complex<double> (preA(i,j), 0.0);
 		}
 	}
-	Inverse_Matrix_Complex IMC;
+	ModuleBase::Inverse_Matrix_Complex IMC;
 	IMC.init(dim);
 	IMC.using_zheev(B,C);
 //	out.printcm("Inverse B", C);
@@ -462,9 +391,9 @@ void Charge_Pulay::inverse_preA(const int &dim, matrix &preA)const
 	return;
 }
 
-void Charge_Pulay::inverse_real_symmetry_matrix(const int &scheme, matrix &A)const // indicate the spin.
+void Charge_Pulay::inverse_real_symmetry_matrix(const int &scheme, ModuleBase::matrix &A)const // indicate the spin.
 {
-//	TITLE("Charge_Pulay","inverse_Abar");
+//	ModuleBase::TITLE("Charge_Pulay","inverse_Abar");
 
 	int step = 0;
 
@@ -484,7 +413,7 @@ void Charge_Pulay::inverse_real_symmetry_matrix(const int &scheme, matrix &A)con
 	}
 
 	// Abar is not 'positive' symmetry matrix!	
-	//Inverse_Matrix_Real IMR;
+	//ModuleBase::Inverse_Matrix_Real IMR;
 	//const int info = IMR.using_spotri(Abar,step);	
 	//for(int i=0; i<step; i++)
 	//{
@@ -494,7 +423,7 @@ void Charge_Pulay::inverse_real_symmetry_matrix(const int &scheme, matrix &A)con
 	//	}
 	//}
 		
-	Inverse_Matrix_Complex IMC;
+	ModuleBase::Inverse_Matrix_Complex IMC;
 	IMC.init(step);
 	IMC.using_zheev(B,C);
 
@@ -531,7 +460,7 @@ void Charge_Pulay::generate_dRR(const int &m)
 // scheme2 : use rstep to generate Abar(rstep, rstep)
 void Charge_Pulay::generate_alpha(const int &scheme)
 {
-//	TITLE("Charge_Pulay","generate_alpha");
+//	ModuleBase::TITLE("Charge_Pulay","generate_alpha");
 
 	ModuleBase::GlobalFunc::ZEROS(alpha, dstep);
 	if(scheme==1)
@@ -580,7 +509,7 @@ void Charge_Pulay::generate_alpha(const int &scheme)
 
 void Charge_Pulay::generate_new_rho(const int &is, const int &m)
 {
-//	TITLE("Charge_Pulay","generate_new_rho");
+//	ModuleBase::TITLE("Charge_Pulay","generate_new_rho");
 
 //	std::cout << " generate_new_rho " << std::endl;
 //	this->check_ne(rho[is]);

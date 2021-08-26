@@ -13,6 +13,8 @@
 
 // !!! Attention: c is very dangerous, may be changed by other class,
 //	e.g. changed the value, size!=nr*nc, deleted
+namespace ModuleBase
+{
 
 class Matrix_Wrapper
 {
@@ -79,6 +81,8 @@ inline Matrix_Wrapper& Matrix_Wrapper::operator=( Matrix_Wrapper&&m )
 	nr = m.nr;	nc = m.nc;	c = m.c;		flag_delete_c = m.flag_delete_c;
 	m.nr = 0;	m.nc = 0;	m.c = nullptr;	m.flag_delete_c = false;
 	return *this;
+}
+
 }
 
 #endif

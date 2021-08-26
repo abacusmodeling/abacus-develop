@@ -8,7 +8,7 @@ void Charge::write_rho_cube(
 	const std::string &fn, 
 	const int &precision) 
 {
-    TITLE("Charge","write_rho_cube");
+    ModuleBase::TITLE("Charge","write_rho_cube");
 
 	time_t start, end;
 	std::ofstream ofs;
@@ -20,7 +20,7 @@ void Charge::write_rho_cube(
 		ofs.open(fn.c_str());
     	if (!ofs)
     	{
-        	WARNING("Charge::write_rho","Can't create Charge File!");
+        	ModuleBase::WARNING("Charge::write_rho","Can't create Charge File!");
     	}	
 
 		ofs << "Cubefile created from ABACUS SCF calculation" << std::endl;

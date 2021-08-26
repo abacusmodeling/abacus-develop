@@ -29,7 +29,7 @@ public:
 
 	void Find_atom(
 		const UnitCell &ucell, 
-		const Vector3<double> &cartesian_posi, 
+		const ModuleBase::Vector3<double> &cartesian_posi, 
 		const int &ntype, 
 		const int &nnumber);
 
@@ -45,16 +45,16 @@ public:
 	const int& getAdjacentNum(void)const { return adj_num; }
 	const int& getType(const int i) const { return ntype[i]; }
 	const int& getNatom(const int i) const { return natom[i]; }
-	const Vector3<double>& getAdjacentTau(const int i) const { return adjacent_tau[i]; } 
-	const Vector3<int>& getBox(const int i) const {return box[i];}
+	const ModuleBase::Vector3<double>& getAdjacentTau(const int i) const { return adjacent_tau[i]; } 
+	const ModuleBase::Vector3<int>& getBox(const int i) const {return box[i];}
 
 private:
 
 	mutable int adj_num;
 	std::vector<int> ntype;
 	std::vector<int> natom;
-	std::vector<Vector3<double>> adjacent_tau;
-	std::vector<Vector3<int>> box;
+	std::vector<ModuleBase::Vector3<double>> adjacent_tau;
+	std::vector<ModuleBase::Vector3<int>> box;
 
 	const int test_deconstructor;//caoyu reconst 2021-05-24
 	const int test_grid_driver;	//caoyu reconst 2021-05-24
@@ -67,7 +67,7 @@ private:
 	//==========================================================
 	int Locate_offset(
 		const UnitCell &ucell, 
-		const Vector3<double> &cartesian_pos, 
+		const ModuleBase::Vector3<double> &cartesian_pos, 
 		const int &ntype, 
 		const int &nnumber)const;
 
@@ -75,14 +75,14 @@ private:
 		const int offset, 
 		std::shared_ptr<AdjacentSet> as);
 
-	double Distance(const AtomLink& a1, const Vector3<double> &adjacent_site)const;
+	double Distance(const AtomLink& a1, const ModuleBase::Vector3<double> &adjacent_site)const;
 	double Distance(const AtomLink& a1, const AtomLink& a2)const;
 
 //==========================================================
 // MEMBER FUNCTIONS :
 // NAME : Calculate_adjacent_site
 //==========================================================
-	Vector3<double> Calculate_adjacent_site
+	ModuleBase::Vector3<double> Calculate_adjacent_site
 	(
 	    const short offset, // use offset cartesian coordiante
 	    const double &box11, const double &box12, const double &box13,

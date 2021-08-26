@@ -40,7 +40,7 @@ void pzhtrsm(char isuplo,int b_n,MPI_Comm comm_2D,int NB,int N_A,
    *          the mapping between an object element and its corresponding 
    *          process and memory location.
    */
-    TITLE("Parallel","pzhtrsm");
+    ModuleBase::TITLE("Parallel","pzhtrsm");
     int m,n,m1,n1,m2,n2,loc_m,loc_n,lda,ldb,ldc,loc_i,loc_j,loc_i1,loc_j1,loc_i2,loc_j2;
     int coord[2],dim[2],period[2];
     int i,j,bi,bj,k,k1,k2,ia,ja,ia1,ja1,ia2,ja2,km,kn,km1,kn1,km2,kn2;

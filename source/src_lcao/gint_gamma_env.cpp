@@ -6,20 +6,20 @@
 
 void Gint_Gamma::cal_env(const double* wfc, double* rho)
 {
-    TITLE("Gint_Gamma","cal_env");
-    timer::tick("Gint_Gamma","cal_env");
+    ModuleBase::TITLE("Gint_Gamma","cal_env");
+    ModuleBase::timer::tick("Gint_Gamma","cal_env");
 
     this->save_atoms_on_grid(GlobalC::GridT);
     this->gamma_envelope(wfc, rho);
 
-    timer::tick("Gint_Gamma","cal_env");
+    ModuleBase::timer::tick("Gint_Gamma","cal_env");
     return;
 }
 
 
 void Gint_Gamma::gamma_envelope(const double* wfc, double* rho)
 {
-    TITLE("Grid_Integral","gamma_charge");
+    ModuleBase::TITLE("Grid_Integral","gamma_charge");
 
     // it's a uniform grid to save orbital values, so the delta_r is a constant.
     const double delta_r = GlobalC::ORB.dr_uniform;
@@ -138,7 +138,7 @@ void Gint_Gamma::gamma_envelope(const double* wfc, double* rho)
 						//	Ylm::get_ylm_real(this->nnn[it], this->dr[id], ylma);
 						if (distance[ib][id] < 1.0E-9) distance[ib][id] += 1.0E-9;
 						
-						Ylm::sph_harm (	GlobalC::ucell.atoms[it].nwl,
+						ModuleBase::Ylm::sph_harm (	GlobalC::ucell.atoms[it].nwl,
 								dr[ib][id][0] / distance[ib][id],
 								dr[ib][id][1] / distance[ib][id],
 								dr[ib][id][2] / distance[ib][id],

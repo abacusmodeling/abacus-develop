@@ -7,7 +7,7 @@ Variable_Cell::~Variable_Cell(){}
 
 void Variable_Cell::init_after_vc(void)
 {
-	TITLE("Variable_Cell","init_after_vc");
+	ModuleBase::TITLE("Variable_Cell","init_after_vc");
 
     GlobalC::ucell.setup_cell_after_vc(GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
     ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
@@ -53,7 +53,7 @@ void Variable_Cell::init_after_vc(void)
 
 void Variable_Cell::final_calculation_after_vc(void)
 {
-	TITLE("Variable_Cell","final_after_vc");
+	ModuleBase::TITLE("Variable_Cell","final_after_vc");
 
     std::cout<<" -----------------------------------------------------------------"<<std::endl;
 

@@ -15,7 +15,8 @@
 #endif
 
 
-using namespace std;
+namespace ModuleBase
+{
 
 class realArray
 {
@@ -78,6 +79,8 @@ void zeros(T *u,const int n)
 {
 	assert(n>0);
 	for (int i = 0;i < n;i++) u[i] = 0;
+}
+
 }
 
 #endif	// realArray class

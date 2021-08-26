@@ -245,7 +245,7 @@ void Parallel_Kpoints::pool_collection(double &value, const double *wk, const in
 }
 
 
-void Parallel_Kpoints::pool_collection(double *valuea, double *valueb, const realArray &a, const realArray &b, const int &ik)
+void Parallel_Kpoints::pool_collection(double *valuea, double *valueb, const ModuleBase::realArray &a, const ModuleBase::realArray &b, const int &ik)
 {
     const int dim2 = a.getBound2();
     const int dim3 = a.getBound3();

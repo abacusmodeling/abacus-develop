@@ -3,7 +3,7 @@
 static double output_acc = 1.0e-8;
 
 //print target stress term 
-void Stress_Func::print_stress(const std::string &name, const matrix& f, const bool screen, bool ry)const
+void Stress_Func::print_stress(const std::string &name, const ModuleBase::matrix& f, const bool screen, bool ry)const
 {
 	GlobalV::ofs_running << " --------------------------- " << name << " ----------------------------" << std::endl;
 	
@@ -55,14 +55,14 @@ void Stress_Func::print_stress(const std::string &name, const matrix& f, const b
 }
 
 //print total stress
-void Stress_Func::printstress_total(const matrix& scs, bool ry)
+void Stress_Func::printstress_total(const ModuleBase::matrix& scs, bool ry)
 {
 // zhengdy update 2016-10-08
 	double unit_transform = 1;
 
 	if(!ry)
 	{
-		unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
+		unit_transform = ModuleBase::RYDBERG_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
 	}
 //	std::cout.setf(ios::fixed);
 

@@ -25,7 +25,7 @@ void pdsteiz(int n,double *a,double *b,double *w,double *Z,int m)
  *   Z contains the computed eigenvectors associated with the  specified eigenvalues.
  */
 {
-	TITLE("Parallel_Diago","pdsteiz");
+	ModuleBase::TITLE("Parallel_Diago","pdsteiz");
     int i,j,info,ldz=n;
 
     double work[5*n];

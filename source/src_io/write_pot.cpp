@@ -6,11 +6,11 @@ void Potential::write_potential(
 	const int &is, 
 	const int &iter, 
 	const std::string &fn, 
-	const matrix &v, 
+	const ModuleBase::matrix &v, 
 	const int &precision, 
 	const int &hartree)const
 {
-    TITLE("potential","write_potential");
+    ModuleBase::TITLE("potential","write_potential");
 
     if(out_potential==0) 
     {
@@ -24,7 +24,7 @@ void Potential::write_potential(
     {
         return;
     }
-    timer::tick("potential","write_potential");
+    ModuleBase::timer::tick("potential","write_potential");
 
     std::ofstream ofs;
 
@@ -64,7 +64,7 @@ void Potential::write_potential(
         ofs << scientific; 
         if(!ofs)
         {
-            WARNING("potential::write_potential","Can't create VHartree File!");
+            ModuleBase::WARNING("potential::write_potential","Can't create VHartree File!");
         }
     }	
 
@@ -191,15 +191,15 @@ void Potential::write_potential(
     MPI_Barrier(MPI_COMM_WORLD);
 #endif
     if(GlobalV::MY_RANK==0) ofs.close();
-    timer::tick("potential","write_potential");
+    ModuleBase::timer::tick("potential","write_potential");
     return;
 }
 
 
 void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_ave)
 {
-    TITLE("Potential","write_elecstat_pot");
-    timer::tick("Potential","write_elecstat_pot");
+    ModuleBase::TITLE("Potential","write_elecstat_pot");
+    ModuleBase::timer::tick("Potential","write_elecstat_pot");
 
     double *v_elecstat;
     v_elecstat = new double[GlobalC::pw.nrxx];
@@ -234,7 +234,7 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
         const int j = GlobalC::pw.ig2fftc[ig];
         if(GlobalC::pw.gg[ig] >= 1.0e-12) //LiuXh 20180410
         {
-            const double fac = e2 * FOUR_PI / (GlobalC::ucell.tpiba2 * GlobalC::pw.gg [ig]);
+            const double fac = ModuleBase::e2 * ModuleBase::FOUR_PI / (GlobalC::ucell.tpiba2 * GlobalC::pw.gg [ig]);
             vh_g[ig] = fac * Porter[j];
         }
     }
@@ -323,7 +323,7 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
         ofs_ave << scientific; 
         if(!ofs)
         {
-            WARNING("potential::write_potential","Can't create VHartree File!");
+            ModuleBase::WARNING("potential::write_potential","Can't create VHartree File!");
         }
     }	
 
@@ -483,6 +483,6 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
     delete[] v_elecstat;
     delete[] vh_g;
 
-    timer::tick("Potential","write_potential");
+    ModuleBase::timer::tick("Potential","write_potential");
     return;
 }

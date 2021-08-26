@@ -29,8 +29,8 @@ LOOP_ions::~LOOP_ions()
 
 void LOOP_ions::opt_ions(void)
 {
-    TITLE("LOOP_ions","opt_ions");
-    timer::tick("LOOP_ions","opt_ions");
+    ModuleBase::TITLE("LOOP_ions","opt_ions");
+    ModuleBase::timer::tick("LOOP_ions","opt_ions");
 
     if(GlobalV::OUT_LEVEL=="i")
     {
@@ -222,11 +222,11 @@ void LOOP_ions::opt_ions(void)
             std::cout << std::setiosflags(ios::scientific)
             << " " << std::setw(7) << ss.str()
             << std::setw(5) << ELEC_scf::iter
-            << std::setw(18) << std::setprecision(6) << GlobalC::en.etot * Ry_to_eV;
+            << std::setw(18) << std::setprecision(6) << GlobalC::en.etot * ModuleBase::Ry_to_eV;
 
             std::cout << std::setprecision(2) << std::setiosflags(ios::scientific)
-            << std::setw(10) << IMM.get_ediff() * Ry_to_eV * 1000
-            << std::setw(10) << IMM.get_largest_grad() * Ry_to_eV / BOHR_TO_A;
+            << std::setw(10) << IMM.get_ediff() * ModuleBase::Ry_to_eV * 1000
+            << std::setw(10) << IMM.get_largest_grad() * ModuleBase::Ry_to_eV / ModuleBase::BOHR_TO_A;
             //<< std::setw(12) << IMM.get_trust_radius();
 
             std::cout << std::resetiosflags(ios::scientific)
@@ -250,13 +250,13 @@ void LOOP_ions::opt_ions(void)
     {
         GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
         GlobalV::ofs_running << std::setprecision(16);
-        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
+        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
         GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
     }
 
 
-    timer::tick("LOOP_ions","opt_ions"); 
+    ModuleBase::timer::tick("LOOP_ions","opt_ions"); 
     return;
 }
 
@@ -266,18 +266,18 @@ bool LOOP_ions::force_stress(
 	int &force_step,
 	int &stress_step)
 {
-    TITLE("LOOP_ions","force_stress");
+    ModuleBase::TITLE("LOOP_ions","force_stress");
 
     if(!GlobalV::FORCE && !GlobalV::STRESS)
     {
         return 1;
     }
-    timer::tick("LOOP_ions","force_stress");
+    ModuleBase::timer::tick("LOOP_ions","force_stress");
 
 	// set force matrix
-	matrix fcs;
+	ModuleBase::matrix fcs;
 	// set stress matrix
-	matrix scs;
+	ModuleBase::matrix scs;
 	Force_Stress_LCAO FSL;
 	FSL.allocate ();
 	FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS, GlobalV::TEST_FORCE, GlobalV::TEST_STRESS, fcs, scs);
@@ -455,12 +455,12 @@ xiaohui modify 2014-08-09*/
 
     return 0;
 
-    timer::tick("LOOP_ions","force_stress");
+    ModuleBase::timer::tick("LOOP_ions","force_stress");
 }
 
 void LOOP_ions::final_scf(void)
 {
-    TITLE("LOOP_ions","final_scf");
+    ModuleBase::TITLE("LOOP_ions","final_scf");
 
     GlobalV::FINAL_SCF = true;
 
@@ -544,7 +544,7 @@ void LOOP_ions::final_scf(void)
     {
         GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
         GlobalV::ofs_running << std::setprecision(16);
-        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
+        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
         GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
     }
 

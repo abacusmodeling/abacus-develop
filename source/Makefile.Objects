@@ -32,6 +32,7 @@ read_pp.o \
 read_pp_upf100.o \
 read_pp_upf201.o \
 read_pp_vwr.o \
+read_pp_blps.o \
 pseudo_nc.o \
 VL_in_pw.o\
 VNL_in_pw.o\
@@ -288,6 +289,7 @@ diago_cg.o\
 output.o  \
 run_md_classic.o\
 LJ_potential.o\
+DP_potential.o\
 cmd_neighbor.o\
 dos.o \
 inverse_matrix.o \

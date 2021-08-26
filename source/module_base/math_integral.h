@@ -2,6 +2,8 @@
 #define MATH_INTEGRAL_H
 
 // mohan add 2021-04-03
+namespace ModuleBase
+{
 
 class Integral
 {
@@ -48,4 +50,6 @@ class Integral
     );     
 
 };
+
+}
 #endif

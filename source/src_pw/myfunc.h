@@ -31,22 +31,22 @@ void pbec_spin(double rho, double zeta, double grho, const int &flag, double &sc
                double &v1cup, double &v1cdw, double &v2c);
 
 // GGA : gradcorr (myfunc3.cpp)
-void gradcorr(double &etxc, double &vtxc, matrix &v);
+void gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v);
 
 void gradient(int ncx, int ncy, int ncz, int ncxyz, double *a, int ngm,
-              Vector3 < double> *g, int *nl, double lat0,
-              Vector3 < double> *ga);
-//void grad_dot (int ncx, int ncy, int ncz,int ncxyz, matrix a, int ngm,
-//	       Vector3 < double> *g, int *nl, double lat0,double *da);
-void grad_dot(int ncx, int ncy, int ncz, int ncxyz, Vector3 < double> *a, int ngmc,
-              Vector3 < double> *g, int *ig2fftc, double lat0, double *da);
+              ModuleBase::Vector3 < double> *g, int *nl, double lat0,
+              ModuleBase::Vector3 < double> *ga);
+//void grad_dot (int ncx, int ncy, int ncz,int ncxyz, ModuleBase::matrix a, int ngm,
+//	       ModuleBase::Vector3 < double> *g, int *nl, double lat0,double *da);
+void grad_dot(int ncx, int ncy, int ncz, int ncxyz, ModuleBase::Vector3 < double> *a, int ngmc,
+              ModuleBase::Vector3 < double> *g, int *ig2fftc, double lat0, double *da);
 
 
 // myfunc5.cpp (from LPACK)
 // compute y = alpha * y where alpha is a scalar and y is an n-std::vector
 void dscal(const int n, const double &alpha, double *y, const int incy);
 // a(i,:) = alpha * a(i,:) where a is a matrix
-void dscal(const double &alpha, const matrix &a, const int i);
+void dscal(const double &alpha, const ModuleBase::matrix &a, const int i);
 // compute y = alpha * x + y where alpha is a scalar and x and y are n-vectors
 void daxpy(const int n, const double &alpha, const double *x, const int incx, double *y, const int incy);
 void zaxpy(int n, double alpha, std::complex < double> *x, int incx,std::complex<double> *y, int incy);
@@ -71,16 +71,16 @@ void dcopy(int n,int *x,int incx,int *y,int incy);
 
 // copy ith row of a to y where a is a matrix and y is a std::vector
 void dcopy(const ModuleBase::ComplexMatrix &a,int i,std::complex<double> *y);
-void dcopy(const matrix &a,int i,double *y);
-void dcopy(const matrix &a,int i,int *y);
+void dcopy(const ModuleBase::matrix &a,int i,double *y);
+void dcopy(const ModuleBase::matrix &a,int i,int *y);
 
 // copy x to ith row of b where b is a matrix and x is a std::vector
 void dcopy(std::complex<double> *x,ModuleBase::ComplexMatrix &b,int i);
-void dcopy(double *x,matrix &b,int i);
+void dcopy(double *x,ModuleBase::matrix &b,int i);
 
 // b(j,:) = a(i,:)
 void dcopy(const ModuleBase::ComplexMatrix &a,int i,ModuleBase::ComplexMatrix &b,int j);
-void dcopy(const matrix &a,       int i,matrix &b,       int j);
+void dcopy(const ModuleBase::matrix &a,       int i,ModuleBase::matrix &b,       int j);
 void dcopy(int n,const ModuleBase::ComplexMatrix &a,int inca,ModuleBase::ComplexMatrix &b,int i,int incb);
 
 
@@ -93,13 +93,13 @@ std::complex<double> ddot(int n,std::complex<double> *x,int incx,std::complex<do
 std::complex<double> ddot(const ModuleBase::ComplexMatrix &a,int i,std::complex<double> *x);
 std::complex<double> ddot(std::complex<double> *x,const ModuleBase::ComplexMatrix &y,int i);
 std::complex<double> ddot(const ModuleBase::ComplexMatrix &x,int i,const ModuleBase::ComplexMatrix &y,int j);
-double ddot(const matrix &a,int i,double *y);
-double ddot(const matrix &x,int i,const matrix &y,int j);
+double ddot(const ModuleBase::matrix &a,int i,double *y);
+double ddot(const ModuleBase::matrix &x,int i,const ModuleBase::matrix &y,int j);
 
 
 // perform one of the matrix-matrix operations
 // C = alpha * op(A) * op(B) + beta * C
-void dgemm(char tra, char trb, int m, int n, int k, double alpha,const matrix A, int lda, const matrix B, int ldb, double beta,matrix &C, int ldc);
+void dgemm(char tra, char trb, int m, int n, int k, double alpha,const ModuleBase::matrix A, int lda, const ModuleBase::matrix B, int ldb, double beta,ModuleBase::matrix &C, int ldc);
 void zgemm(char tra,char trb,int m,int n,int k,std::complex<double> alpha,
            const ModuleBase::ComplexMatrix &A,
            int lda,
@@ -148,7 +148,7 @@ void ZHPEV(int , std::complex < double> *hp, double *e, ModuleBase::ComplexMatri
 // compute the Euclidean length (12 norm) of std::vector x, with scaling of
 // input to avoid destructive underflow and overflow
 double dnrm2(const int n, const double *x, const int incx) ;
-double dnrm2(const matrix &a, int i) ;	// i-row of matrix a
+double dnrm2(const ModuleBase::matrix &a, int i) ;	// i-row of matrix a
 
 // additional
 //---------------------------------
@@ -165,15 +165,15 @@ void new_ns();
 
 
 // symmetry (not used here)
-void psymrho(matrix rho, int nvx, int ncy, int ncz, int nsym, double s,
+void psymrho(ModuleBase::matrix rho, int nvx, int ncy, int ncz, int nsym, double s,
              int ftau);
-void symrho(matrix rho, int ncx, int ncy, int ncz, int nsym, double s,
+void symrho(ModuleBase::matrix rho, int ncx, int ncy, int ncz, int nsym, double s,
             int ftau);
 
 // Parallel code only
-void poolrecover(matrix et, int nbnd, int nkstot, int nks);
+void poolrecover(ModuleBase::matrix et, int nbnd, int nkstot, int nks);
 void poolreduce(int, double eband);
-void poolscatter(int nbnd, int nkstot, matrix , int nks, matrix wg);
+void poolscatter(int nbnd, int nkstot, ModuleBase::matrix , int nks, ModuleBase::matrix wg);
 void mp_bcast(double ef, int root_image, int intra_image_comm);
 void mp_bcast(double *e, int root_image, int intra_image_comm);
 void mp_bcast(ModuleBase::ComplexMatrix, int root_image, int intra_image_comm);
@@ -227,7 +227,7 @@ void ZHEGVX(
 void DGER(int na, int nb, double , ModuleBase::ComplexMatrix a, int lda,
           ModuleBase::ComplexMatrix b, int ldb, ModuleBase::ComplexMatrix c, int ldc);
 
-void add_efield(matrix rho, double *v, double etotefield);	// no used
+void add_efield(ModuleBase::matrix rho, double *v, double etotefield);	// no used
 
 
 

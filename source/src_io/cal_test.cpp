@@ -45,7 +45,7 @@ double Cal_Test::mtot;
 
 void Cal_Test::test_memory(void)
 {
-	TITLE("Cal_Test","test_memory");
+	ModuleBase::TITLE("Cal_Test","test_memory");
 
 	const int ngmw = Cal_Test::cal_np(GlobalC::pw.ggwfc2, GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz);
 	const int ngmc = Cal_Test::cal_np(GlobalC::pw.ggchg, GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz);
@@ -54,7 +54,7 @@ void Cal_Test::test_memory(void)
 	std::cout << " plane wave number for wave functions = " << ngmw << std::endl;
 	std::cout << " plane wave number for chage density  = " << ngmc << std::endl;
 
-	mporter = Memory::calculate_mem ( GlobalC::pw.ncxyz, "double");
+	mporter = ModuleBase::Memory::calculate_mem ( GlobalC::pw.ncxyz, "double");
 
 	mrho = mporter;
 	mrho_save = mrho;
@@ -78,24 +78,24 @@ void Cal_Test::test_memory(void)
 	mvrs1 = mrho;
 	mvnew = mrho;
 
-	mrhog = Memory::calculate_mem( ngmc, "cdouble");
-	mrhog_save = Memory::calculate_mem( ngmc, "cdouble");
-	mrhog_core = Memory::calculate_mem( ngmc, "cdouble"); 
+	mrhog = ModuleBase::Memory::calculate_mem( ngmc, "cdouble");
+	mrhog_save = ModuleBase::Memory::calculate_mem( ngmc, "cdouble");
+	mrhog_core = ModuleBase::Memory::calculate_mem( ngmc, "cdouble"); 
 	
-	mhs = Memory::calculate_mem( GlobalV::NLOCAL*GlobalV::NLOCAL, "double" );
-	mwf = Memory::calculate_mem( GlobalV::NLOCAL*GlobalV::NBANDS, "double" );
-	mnonzero = Memory::calculate_mem( GlobalV::NLOCAL*(GlobalV::NLOCAL+1)/2, "bool");
+	mhs = ModuleBase::Memory::calculate_mem( GlobalV::NLOCAL*GlobalV::NLOCAL, "double" );
+	mwf = ModuleBase::Memory::calculate_mem( GlobalV::NLOCAL*GlobalV::NBANDS, "double" );
+	mnonzero = ModuleBase::Memory::calculate_mem( GlobalV::NLOCAL*(GlobalV::NLOCAL+1)/2, "bool");
 // mohan comment out 2021-02-11
 //	mspar_hsrho = Memory::calculate_mem( Hnnz*3, "double");
 	
 
-	mgvec = Memory::calculate_mem( ngmc * 3 * 2, "double" );
-	mig2fftw = Memory::calculate_mem( ngmw , "int");  
-	mig2fftc = Memory::calculate_mem( ngmc , "int");  
-	mgg = Memory::calculate_mem( ngmc, "double");
-	mig123 = Memory::calculate_mem( ngmc*3, "int");
-	mstrucFac = Memory::calculate_mem( GlobalC::ucell.ntype*ngmc, "cdouble");
-	meigts123 = Memory::calculate_mem( GlobalC::ucell.nat * (2*GlobalC::pw.ncx+1+2*GlobalC::pw.ncy+1+2*GlobalC::pw.ncz+1), "cdouble");
+	mgvec = ModuleBase::Memory::calculate_mem( ngmc * 3 * 2, "double" );
+	mig2fftw = ModuleBase::Memory::calculate_mem( ngmw , "int");  
+	mig2fftc = ModuleBase::Memory::calculate_mem( ngmc , "int");  
+	mgg = ModuleBase::Memory::calculate_mem( ngmc, "double");
+	mig123 = ModuleBase::Memory::calculate_mem( ngmc*3, "int");
+	mstrucFac = ModuleBase::Memory::calculate_mem( GlobalC::ucell.ntype*ngmc, "cdouble");
+	meigts123 = ModuleBase::Memory::calculate_mem( GlobalC::ucell.nat * (2*GlobalC::pw.ncx+1+2*GlobalC::pw.ncy+1+2*GlobalC::pw.ncz+1), "cdouble");
 
 //	std::cout << " Memory for "
 
@@ -143,7 +143,7 @@ int Cal_Test::cal_np(const double &ggcut, const int &n1, const int &n2, const in
 		{
 			for (int k = -ibox[2]; k <= ibox[2]; k++)
 			{
-				Vector3<double> f(i,j,k);
+				ModuleBase::Vector3<double> f(i,j,k);
 				// g2= |f|^2 in the unit of (2Pi/lat0)^2
 				double g2 = f * (GlobalC::ucell.GGT * f);
 

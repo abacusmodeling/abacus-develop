@@ -27,11 +27,11 @@ class Potential
 
     std::string start_pot;
 	std::string extra_pot;
-    matrix vr;
-    matrix vr_eff;
-    matrix vnew;
+    ModuleBase::matrix vr;
+    ModuleBase::matrix vr_eff;
+    ModuleBase::matrix vnew;
 	
-	matrix vofk; //kinetic energy density, for meta-GGA; wenfei 2021-07-28
+	ModuleBase::matrix vofk; //kinetic energy density, for meta-GGA; wenfei 2021-07-28
 
     double *vr_eff1; 
     double *vltot;
@@ -44,7 +44,7 @@ class Potential
 		ModuleBase::ComplexMatrix &sf // structure factors
 	);
 
-    matrix v_of_rho(
+    ModuleBase::matrix v_of_rho(
 		const double*const*const rho_in,
 		const double * const rho_core_in);
 
@@ -57,7 +57,7 @@ class Potential
 	// mohan add 2011-02-28
 	// here vh is std::complex because the array is got after std::complex FFT.
 	void write_potential(const int &is, const int &iter, const std::string &fn,
-		const matrix &v, const int &precision, const int &hartree = 0)const;
+		const ModuleBase::matrix &v, const int &precision, const int &hartree = 0)const;
 
     void write_elecstat_pot(const std::string &fn, const std::string &fn_ave);
 	
@@ -68,7 +68,7 @@ class Potential
 		double* vl_pseudo, // store the local pseudopotential
 		const int &ntype, // number of atom types
 		const int &ngmc, // number of |g|, g is plane wave
-		matrix &vloc, // local pseduopotentials
+		ModuleBase::matrix &vloc, // local pseduopotentials
 		int* ig2ngg, // ig2ngg
 		ModuleBase::ComplexMatrix &sf // structure factors	
 	)const;

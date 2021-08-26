@@ -53,7 +53,7 @@ class pseudo_nc
 	double *rho_at;   // radial atomic charge density, rho_at[0:mesh-1]
 
 	// <PP_PSWFC>
-	matrix chi;	  // radial atomic orbitals, chi(nchi, mesh)
+	ModuleBase::matrix chi;	  // radial atomic orbitals, chi(nchi, mesh)
 
 	//other
 	int msh;          // number of points up to rcut
@@ -65,8 +65,8 @@ class pseudo_nc
 	int kkbeta;		// kkbeta(nbeta), point where the beta are zero
 
 	// <PP_DIJ>
-	matrix dion;	// dion(nbeta,nbeta)
-	matrix betar;	// (nbeta, mesh), radial beta_{mu} functions
+	ModuleBase::matrix dion;	// dion(nbeta,nbeta)
+	ModuleBase::matrix betar;	// (nbeta, mesh), radial beta_{mu} functions
 
 	// other
 	int nh;         // number of beta functions per atomic type

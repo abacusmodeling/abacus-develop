@@ -8,7 +8,7 @@
 
 FFT::FFT()
 {
-	//TITLE("FFT","FFT");
+	//ModuleBase::TITLE("FFT","FFT");
 	this->plan_nx = 0;
 	this->plan_ny = 0;
 	this->plan_nz = 0;
@@ -65,7 +65,7 @@ void FFT::FFT3D(std::complex<double> *psi,const int sign)
 	std::cout << std::endl;
 	*/
 
-	timer::tick("FFT","FFT3D");
+	ModuleBase::timer::tick("FFT","FFT3D");
 
 #ifdef __MPI
 	P3DFFT(psi,sign);
@@ -74,7 +74,7 @@ void FFT::FFT3D(std::complex<double> *psi,const int sign)
 	SFFT3D(psi,sign);
 #endif
 
-	timer::tick("FFT","FFT3D");
+	ModuleBase::timer::tick("FFT","FFT3D");
 
 	/*
 	std::cout << "\n\n after FFTW:  \n ";
@@ -106,7 +106,7 @@ void FFT::FFT3D(matrix &psi, const int sign)
 
 void FFT::setupFFT3D(const int nx, const int ny, const int nz)
 {
-	if(GlobalV::test_fft) TITLE("FFT","setupFFT3D");
+	if(GlobalV::test_fft) ModuleBase::TITLE("FFT","setupFFT3D");
 
 	this->plan_nx = nx;
 	this->plan_ny = ny;
@@ -117,7 +117,7 @@ void FFT::setupFFT3D(const int nx, const int ny, const int nz)
 
 void FFT::setupFFT3D_2()
 {
-	//timer::tick("FFT","setupFFT3D_2");
+	//ModuleBase::timer::tick("FFT","setupFFT3D_2");
 	
 #if defined __FFTW2
 
@@ -165,7 +165,7 @@ void FFT::setupFFT3D_2()
 	}
 	this->FFTWsetupwasdone = true;
 
-	//timer::tick("FFT","setupFFT3D_2");
+	//ModuleBase::timer::tick("FFT","setupFFT3D_2");
 
 	return;
 }
@@ -174,7 +174,7 @@ void FFT::SFFT3D(std::complex<double> *psi, const int sign)
 {
 	if(!FFTWsetupwasdone) 
 	{
-		WARNING("FFT3D","init setupFFT3D_2");
+		ModuleBase::WARNING("FFT3D","init setupFFT3D_2");
 		this->setupFFT3D_2();
 	}
 	
@@ -214,9 +214,9 @@ void FFT::SFFT3D(std::complex<double> *psi, const int sign)
 
 void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nxx_in,const bool in_pool2)
 {
-	//timer::tick("FFT","Setup_MPI_FFT3D");
+	//ModuleBase::timer::tick("FFT","Setup_MPI_FFT3D");
 	
-	if(GlobalV::test_fft) TITLE("FFT","setup_MPI_FFT3D");
+	if(GlobalV::test_fft) ModuleBase::TITLE("FFT","setup_MPI_FFT3D");
 	this->plan_nx = nx;
 	this->plan_ny = ny;
 	this->plan_nz = nz;
@@ -387,12 +387,12 @@ void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nx
 	if (!planplus_x ||!planplus_y ||!planplus_z || !planminus_x || !planminus_y|| !planminus_z )
 	{
 		std::cout << "\nCan't create plans for FFTW in setupFFT3D()\n\n";
-		QUIT();
+		ModuleBase::QUIT();
 	}
 
 	this->FFTWsetupwasdone = 1;
 
-	//timer::tick("FFT","Setup_MPI_FFT3D");
+	//ModuleBase::timer::tick("FFT","Setup_MPI_FFT3D");
 
 	if(GlobalV::test_fft)std::cout << "\n FFTW setup done";
 	return;
@@ -402,14 +402,14 @@ void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nx
 void FFT::P3DFFT(std::complex<double> *psi, const int sign)
 {
 	
-	//timer::tick("FFT","P3DFFT_Init");
+	//ModuleBase::timer::tick("FFT","P3DFFT_Init");
 
 	ModuleBase::GlobalFunc::ZEROS(this->aux, this->nxx);
 
 	// number of z in this cpu.
 	const int npps_now = this->npps[rank_use];
 
-	//timer::tick("FFT","P3DFFT_Init");
+	//ModuleBase::timer::tick("FFT","P3DFFT_Init");
 
 	// G --> real space
 	if (sign == 1)
@@ -420,7 +420,7 @@ void FFT::P3DFFT(std::complex<double> *psi, const int sign)
 		// the result is recorded in aux.
 		this->scatter(psi, sign);
 		
-		//timer::tick("FFT","P3DFFT_Map+");
+		//ModuleBase::timer::tick("FFT","P3DFFT_Map+");
 		ModuleBase::GlobalFunc::ZEROS(psi, this->nxx);
 		int ii = 0;
 		for (int ip = 0;ip < nproc_use;ip++)
@@ -441,7 +441,7 @@ void FFT::P3DFFT(std::complex<double> *psi, const int sign)
 				ii++;
 			}
 		}
-		//timer::tick("FFT","P3DFFT_Map+");
+		//ModuleBase::timer::tick("FFT","P3DFFT_Map+");
 
 		this->fftxy(psi, sign);
 	}
@@ -450,7 +450,7 @@ void FFT::P3DFFT(std::complex<double> *psi, const int sign)
 		this->fftxy(psi, sign);
 		int sticknow = 0;
 		
-		//timer::tick("FFT","P3DFFT_Map-");
+		//ModuleBase::timer::tick("FFT","P3DFFT_Map-");
 		for (int ip = 0;ip < nproc_use;ip++)
 		{
 			for (int j = 0;j < nst_per[ip];j++)
@@ -466,7 +466,7 @@ void FFT::P3DFFT(std::complex<double> *psi, const int sign)
 				sticknow++;
 			}
 		}
-		//timer::tick("FFT","P3DFFT_Map-");
+		//ModuleBase::timer::tick("FFT","P3DFFT_Map-");
 
 		this->scatter(psi, sign);
 		this->fftz(aux, sign, psi);
@@ -477,7 +477,7 @@ void FFT::P3DFFT(std::complex<double> *psi, const int sign)
 
 void FFT::fftxy(std::complex<double> *psi, const int sign)
 {
-	//timer::tick("FFT","fftxy");
+	//ModuleBase::timer::tick("FFT","fftxy");
 
 	// Number of z in this cpu. 
 	int np = this->npps[rank_use];
@@ -574,7 +574,7 @@ void FFT::fftxy(std::complex<double> *psi, const int sign)
 		}
 	}
 	
-	//timer::tick("FFT","fftxy");
+	//ModuleBase::timer::tick("FFT","fftxy");
 	return;
 }
 
@@ -582,7 +582,7 @@ void FFT::fftxy(std::complex<double> *psi, const int sign)
 
 void FFT::fftz(std::complex<double> *psi_in, const int sign, std::complex<double> *psi_out)
 {
-	//timer::tick("FFT","fftz");
+	//ModuleBase::timer::tick("FFT","fftz");
 	// number of sticks in this process.
 #if defined __FFTW2
 	int ns = this->nst_per[rank_use];
@@ -637,7 +637,7 @@ void FFT::fftz(std::complex<double> *psi_in, const int sign, std::complex<double
 		}
 	}
 
-	//timer::tick("FFT","fftz");
+	//ModuleBase::timer::tick("FFT","fftz");
 	return;
 }
 
@@ -645,7 +645,7 @@ void FFT::fftz(std::complex<double> *psi_in, const int sign, std::complex<double
 
 void FFT::scatter(std::complex<double> *psi, int sign)
 {
-	//timer::tick("FFT","scatter");
+	//ModuleBase::timer::tick("FFT","scatter");
 
 	int ns = nst_per[rank_use];
 	int nz = this->plan_nz;
@@ -724,7 +724,7 @@ void FFT::scatter(std::complex<double> *psi, int sign)
 		}
 	}
 
-	//timer::tick("FFT","scatter");
+	//ModuleBase::timer::tick("FFT","scatter");
 	return;
 }
 #endif // __MPI

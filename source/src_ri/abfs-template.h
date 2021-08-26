@@ -6,7 +6,7 @@
 template<typename T1,typename T2,typename T3,typename Tmatrix>
 void Abfs::delete_empty_ptrs( std::map<T1,std::map<T2,std::map<T3,std::weak_ptr<Tmatrix>>>> &ptrs )
 {
-	TITLE("Abfs","delete_empty_ptrs");
+	ModuleBase::TITLE("Abfs","delete_empty_ptrs");
 	for( auto iter1=ptrs.begin(); iter1!=ptrs.end(); )
 	{
 		for( auto iter2=iter1->second.begin(); iter2!=iter1->second.end(); )
@@ -60,7 +60,7 @@ void Abfs::delete_threshold_ptrs( std::map<Tkey1,std::map<Tkey2,Tvalue>> &ptrs, 
 template<typename T1,typename T2,typename T3,typename Tmatrix>
 void Abfs::delete_threshold_ptrs( std::map<T1,std::map<T2,std::map<T3,std::shared_ptr<Tmatrix>>>> &ptrs, const double threshold)
 {
-	TITLE("Abfs","delete_threshold_ptrs");
+	ModuleBase::TITLE("Abfs","delete_threshold_ptrs");
 	for( auto iter1=ptrs.begin(); iter1!=ptrs.end(); )
 	{
 		for( auto iter2=iter1->second.begin(); iter2!=iter1->second.end(); )
@@ -81,7 +81,7 @@ void Abfs::delete_threshold_ptrs( std::map<T1,std::map<T2,std::map<T3,std::share
 template<typename T1,typename T2,typename T3,typename Tmatrix>
 void Abfs::delete_threshold_ptrs( std::map<T1,std::map<T2,std::map<T3,Tmatrix>>> &ptrs, const double threshold)
 {
-	TITLE("Abfs","delete_threshold_ptrs");
+	ModuleBase::TITLE("Abfs","delete_threshold_ptrs");
 	for( auto iter1=ptrs.begin(); iter1!=ptrs.end(); )
 	{
 		for( auto iter2=iter1->second.begin(); iter2!=iter1->second.end(); )

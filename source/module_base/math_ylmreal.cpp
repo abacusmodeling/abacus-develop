@@ -5,6 +5,9 @@
 #include "realarray.h"
 #include <cassert>
 
+namespace ModuleBase
+{
+
 YlmReal::YlmReal(){}
 YlmReal::~YlmReal(){}
 
@@ -17,7 +20,7 @@ void YlmReal::rlylm
     double* rly 	 // output
 )
 {
-	timer::tick("YlmReal","rlylm");
+	ModuleBase::timer::tick("YlmReal","rlylm");
 
 	assert(lmax >= 0);
 
@@ -90,8 +93,8 @@ void YlmReal::rlylm
 			for(int ip = 0; ip <= im; ip++)
 			{
 				double aux = Fact(im) / Fact(ip) / Fact(im - ip);
-				Am[im] += aux * pow(x, ip) * pow(y, im-ip) * cos( (im-ip) * PI / 2.0 );
-				Bm[im] += aux * pow(x, ip) * pow(y, im-ip) * sin( (im-ip) * PI / 2.0 );
+				Am[im] += aux * pow(x, ip) * pow(y, im-ip) * cos( (im-ip) * ModuleBase::PI / 2.0 );
+				Bm[im] += aux * pow(x, ip) * pow(y, im-ip) * sin( (im-ip) * ModuleBase::PI / 2.0 );
 			}
 		}
 	}
@@ -201,7 +204,7 @@ void YlmReal::rlylm
 	
 	for(int il = 0; il <= lmax; il++)
 	{
-		double fac = sqrt( (2.0 * il + 1.0) / FOUR_PI );
+		double fac = sqrt( (2.0 * il + 1.0) / ModuleBase::FOUR_PI );
 
 		double rl = pow(rpi, il);
 			
@@ -225,7 +228,7 @@ void YlmReal::rlylm
 		}
 	}
 
-	timer::tick("YlmReal","rlylm");
+	ModuleBase::timer::tick("YlmReal","rlylm");
 	return;
 }
 
@@ -234,13 +237,13 @@ void YlmReal::Ylm_Real2
 (
     const int lmax2, 			// lmax2 = (lmax+1)^2
     const int ng,				//
-    const Vector3<double> *g, 	// g_cartesian_vec(x,y,z)
+    const ModuleBase::Vector3<double> *g, 	// g_cartesian_vec(x,y,z)
     matrix &ylm 				// output
 )
 {
     if (ng<1 || lmax2<1)
     {
-        WARNING("YLM_REAL","ng<1 or lmax2<1");
+        ModuleBase::WARNING("YLM_REAL","ng<1 or lmax2<1");
         return;
     }
 
@@ -260,7 +263,7 @@ void YlmReal::Ylm_Real2
     }
     if (out_of_range)
     {
-        WARNING_QUIT("YLM_REAL","l>30 or l<0");
+        ModuleBase::WARNING_QUIT("YLM_REAL","l>30 or l<0");
     }
 
 //----------------------------------------------------------
@@ -293,14 +296,14 @@ void YlmReal::Ylm_Real
 (
     const int lmax2, 			// lmax2 = (lmax+1)^2
     const int ng,				//
-    const Vector3<double> *g, 	// g_cartesian_vec(x,y,z)
+    const ModuleBase::Vector3<double> *g, 	// g_cartesian_vec(x,y,z)
     matrix &ylm 				// output
 )
 {
 
     if (ng<1 || lmax2<1)
     {
-        WARNING("YLM_REAL","ng<1 or lmax2<1");
+        ModuleBase::WARNING("YLM_REAL","ng<1 or lmax2<1");
         return;
     }
 
@@ -320,7 +323,7 @@ void YlmReal::Ylm_Real
     }
     if (out_of_range)
     {
-        WARNING_QUIT("YLM_REAL","l>30 or l<0");
+        ModuleBase::WARNING_QUIT("YLM_REAL","l>30 or l<0");
     }
 
 //----------------------------------------------------------
@@ -330,7 +333,7 @@ void YlmReal::Ylm_Real
     {
         for (int i=0;i<ng;i++)
         {
-            ylm(0, i) = SQRT_INVERSE_FOUR_PI;
+            ylm(0, i) = ModuleBase::SQRT_INVERSE_FOUR_PI;
         }
         return;
     }
@@ -362,25 +365,25 @@ void YlmReal::Ylm_Real
         }
         else if (g[ig].x < -1.e-9)
         {
-            phi[ig] = atan(g[ig].y / g[ig].x) + PI;
+            phi[ig] = atan(g[ig].y / g[ig].x) + ModuleBase::PI;
         }
         else
         {
-            phi[ig] = PI_HALF * ((g[ig].y >= 0.0) ? 1.0 : -1.0); //HLX: modified on 10/13/2006
+            phi[ig] = ModuleBase::PI_HALF * ((g[ig].y >= 0.0) ? 1.0 : -1.0); //HLX: modified on 10/13/2006
         } // end if
     } // enddo
 
 //==========================================================
 // NAME : p(Legendre Polynomials) (0 <= m <= l)
 //==========================================================
-    realArray p(lmax+1,lmax+1,ng);
+    ModuleBase::realArray p(lmax+1,lmax+1,ng);
     int m;
     int i;
     double x1, x2;
     int lm = -1;
     for (int l=0; l<=lmax; l++)
     {
-        const double c = sqrt((2*l+1) / FOUR_PI);
+        const double c = sqrt((2*l+1) / ModuleBase::FOUR_PI);
         if (l == 0)
         {
             for (i=0;i<ng;i++)
@@ -440,7 +443,7 @@ void YlmReal::Ylm_Real
                                     static_cast<double>(Fact(l - m)) /
                                     static_cast<double>(Fact(l + m))
                                 )
-                                *SQRT2;
+                                *ModuleBase::SQRT2;
 
             ++lm;
             for (i=0;i<ng;i++)
@@ -474,7 +477,7 @@ void YlmReal::Ylm_Real
             		}
             	}
             	MPI_Barrier(MPI_COMM_WORLD);
-            	QUIT();
+            	ModuleBase::QUIT();
             }
             */
 
@@ -502,14 +505,14 @@ void YlmReal::Ylm_Real
     					}
     				}
     				MPI_Barrier(MPI_COMM_WORLD);
-    				QUIT();
+    				ModuleBase::QUIT();
     			}
     			double sum_before = 0.0;
     			for(int ig=0; ig<ng; ig++)
     			{
     				sum_before += ylm(count, ig) * ylm(count, ig);
     			}
-    			sum_before *= FOUR_PI/ng;
+    			sum_before *= ModuleBase::FOUR_PI/ng;
     			GlobalV::ofs_running<<std::setw(5)<<l<<std::setw(5)<<m<<std::setw(15)<<sum_before;
 
 
@@ -523,7 +526,7 @@ void YlmReal::Ylm_Real
     //				sum += ylm(count, ig) * ylm(count, ig);
     //			}
     //			count++;
-    //			GlobalV::ofs_running<<std::setw(15)<<sum*FOUR_PI/ng;
+    //			GlobalV::ofs_running<<std::setw(15)<<sum*ModuleBase::FOUR_PI/ng;
 
     			GlobalV::ofs_running<<std::endl;
     		}
@@ -562,4 +565,6 @@ int YlmReal::Semi_Fact(const int n)
         semif *= i;
     }
     return semif;
+}
+
 }

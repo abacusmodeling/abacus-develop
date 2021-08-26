@@ -48,17 +48,17 @@ class Stress_Func
 
 //stress functions
 // 1) the stress from the electron kinetic energy
-	void stress_kin(matrix& sigma);  //electron kinetic part in PW basis
+	void stress_kin(ModuleBase::matrix& sigma);  //electron kinetic part in PW basis
 
 // 2) the stress from the Hartree term
-	void stress_har(matrix& sigma, const bool is_pw);  //hartree part in PW or LCAO basis
+	void stress_har(ModuleBase::matrix& sigma, const bool is_pw);  //hartree part in PW or LCAO basis
 
 // 3) the stress from the ewald term (ion-ion intraction under 
 //		periodic boundary conditions). 
-	void stress_ewa(matrix& sigma, const bool is_pw);     //ewald part in PW or LCAO basis
+	void stress_ewa(ModuleBase::matrix& sigma, const bool is_pw);     //ewald part in PW or LCAO basis
 
 // 4) the stress from the local pseudopotentials
-	void stress_loc(matrix& sigma, const bool is_pw);  //local pseudopotential part in PW or LCAO
+	void stress_loc(ModuleBase::matrix& sigma, const bool is_pw);  //local pseudopotential part in PW or LCAO
 	
 	void dvloc_of_g (const int& msh,
 			const double* rab,
@@ -70,7 +70,7 @@ class Stress_Func
 	void dvloc_coul (const double& zp, double* dvloc); //used in local pseudopotential stress
 
 // 5) the stress from the non-linear core correction (if any)
-	void stress_cc(matrix& sigma, const bool is_pw); 			//nonlinear core correction stress in PW or LCAO basis
+	void stress_cc(ModuleBase::matrix& sigma, const bool is_pw); 			//nonlinear core correction stress in PW or LCAO basis
 
 	void deriv_drhoc (
 			const bool &numeric,
@@ -81,11 +81,11 @@ class Stress_Func
 			double *drhocg);	//used in nonlinear core correction stress
 
 // 6) the stress from the exchange-correlation functional term
-	void stress_gga(matrix& sigma);			//gga part in both PW and LCAO basis
-	void stress_mgga(matrix& sigma);			//gga part in PW basis
+	void stress_gga(ModuleBase::matrix& sigma);			//gga part in both PW and LCAO basis
+	void stress_mgga(ModuleBase::matrix& sigma);			//gga part in PW basis
 
 // 7) the stress from the non-local pseudopotentials
-	void stress_nl(matrix& sigma);			//nonlocal part in PW basis
+	void stress_nl(ModuleBase::matrix& sigma);			//nonlocal part in PW basis
 
 
 	void get_dvnl1(
@@ -95,23 +95,23 @@ class Stress_Func
 	void dylmr2 (
 			const int nylm,
 			const int ngy,
-			Vector3<double> *gk,
-			matrix &dylm,
+			ModuleBase::Vector3<double> *gk,
+			ModuleBase::matrix &dylm,
 			const int ipol);	//used in get_dvnl1()
 	void get_dvnl2(
 			ModuleBase::ComplexMatrix &vkb,
 			const int ik);		//used in nonlocal part in PW basis
 	double Polynomial_Interpolation_nl(
-			const realArray &table,
+			const ModuleBase::realArray &table,
 			const int &dim1,
 			const int &dim2,
 			const double &table_interval,
 			const double &x);	//used in get_dvnl2()
 
 	//functions for stress print
-	void print_stress(const std::string &name, const matrix& f, const bool screen, bool ry)const;
+	void print_stress(const std::string &name, const ModuleBase::matrix& f, const bool screen, bool ry)const;
 
-	void printstress_total (const matrix& scs, bool ry);
+	void printstress_total (const ModuleBase::matrix& scs, bool ry);
 	
 	static double stress_invalid_threshold_ev;
 
