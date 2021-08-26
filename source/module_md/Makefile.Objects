@@ -37,6 +37,7 @@ read_pp.o\
 read_pp_upf100.o\
 read_pp_upf201.o\
 read_pp_vwr.o\
+read_pp_blps.o\
 unitcell.o\
 unitcell_pseudo.o\
 read_atoms.o\

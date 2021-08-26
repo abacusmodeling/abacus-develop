@@ -1,6 +1,6 @@
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 
-RUN apt-get update && apt-get install -y --no-install-recommends git gfortran libboost-dev libssl-dev make ssh vim wget bc \
+RUN apt-get update && apt-get install -y --no-install-recommends git gfortran libboost-dev libssl-dev make cmake ssh vim wget bc \
     && apt-get install -y --no-install-recommends mpich libmpich-dev
 
 ENV GIT_SSL_NO_VERIFY 1
