@@ -89,12 +89,7 @@ void ORB_gen_tables::gen_tables(
 #endif
 	int mode = 1;	 // 1: <phi|phi> and <phi|beta>
 	int Lmax_used = 0;
-
-#ifdef __ORBITAL
-	int Lmax=orb.get_lmax();
-#else
 	int Lmax = 0;
-#endif
 
 
 	MOT.init_Table_Spherical_Bessel(orb_num, mode, Lmax_used, Lmax, Lmax_exx, orb);

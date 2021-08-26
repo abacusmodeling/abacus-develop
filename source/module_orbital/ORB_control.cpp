@@ -74,11 +74,7 @@ void ORB_control::set_orb_tables(
 	///
 	/// (2) RESULT : we have tabulated S table for use.
     ///////////////////////////////////////////////////////////////////
-#ifdef __ORBITAL
-	const int job0 = 1;
-#else
     const int job0 = 3;
-#endif
     /// job0 :
     /// 1. generate overlap table
     /// 2. generate kinetic table
