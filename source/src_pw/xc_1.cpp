@@ -204,7 +204,7 @@ void hcth(double rho, double grho, double &sx, double &v1x, double &v2x)
     dgaa_drho, dgab_drho, dgx_drho, dgaa_dgr, dgab_dgr, dgx_dgr;
 
     r3q2 = std::pow(2.0, (-o3));
-    r3pi = std::pow((3.0 / PI), o3);
+    r3pi = std::pow((3.0 / ModuleBase::PI), o3);
     //.....coefficients for pwf correlation......................................
     cg0[1] = 0.0310910;
     cg0[2] = 0.2137000;

@@ -4,6 +4,8 @@
 #include <cstdlib>
 #include "intarray.h"
 
+namespace ModuleBase
+{
 int IntArray::arrayCount = 0;
 
 void IntArrayAlloc()
@@ -274,4 +276,6 @@ void IntArray::zero_out(void)
 	if (size <= 0) return;
 	for (int i = 0;i < size; i++) ptr[i] = 0;
 	return;
+}
+
 }

@@ -11,13 +11,13 @@ IState_Envelope::~IState_Envelope()
 
 void IState_Envelope::begin(void)
 {
-	TITLE("IState_Envelope","begin");
+	ModuleBase::TITLE("IState_Envelope","begin");
 
 	std::cout << " perform |psi(band, r)| for selected bands." << std::endl;
 
 	if(!GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		WARNING_QUIT("IState_Envelope::begin","Only available for GlobalV::GAMMA_ONLY_LOCAL now.");
+		ModuleBase::WARNING_QUIT("IState_Envelope::begin","Only available for GlobalV::GAMMA_ONLY_LOCAL now.");
 	}
 
 	// (1) 
@@ -25,7 +25,7 @@ void IState_Envelope::begin(void)
 
 	// (1.2) read in LOWF_GAMMA.dat
 
-	OUT(GlobalV::ofs_running,"GlobalC::LOWF.allocate_flag",GlobalC::LOWF.get_allocate_flag());	
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"GlobalC::LOWF.allocate_flag",GlobalC::LOWF.get_allocate_flag());	
 
 	// mohan update 2011-03-21
 	// if ucell is odd, it's correct,
@@ -53,7 +53,7 @@ void IState_Envelope::begin(void)
 
 	// (2.3) output the charge density in .cub format.
 	this->bands_picked = new bool[GlobalV::NBANDS];
-	ZEROS(bands_picked, GlobalV::NBANDS);
+	ModuleBase::GlobalFunc::ZEROS(bands_picked, GlobalV::NBANDS);
 	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
 		if( ib >= fermi_band - bands_below ) 
@@ -72,7 +72,7 @@ void IState_Envelope::begin(void)
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{
 				std::cout << " Perform envelope function for band " << ib+1 << std::endl;
-				ZEROS(GlobalC::CHR.rho[is],GlobalC::pw.nrxx);	
+				ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[is],GlobalC::pw.nrxx);	
 
 
 				//---------------------------------------------------------
@@ -80,7 +80,7 @@ void IState_Envelope::begin(void)
 				// we need to fix this function in near future.
 				// -- mohan add 2021-02-09
 				//---------------------------------------------------------
-				WARNING_QUIT("IState_Charge::idmatrix","need to update GlobalC::LOWF.WFC_GAMMA");
+				ModuleBase::WARNING_QUIT("IState_Charge::idmatrix","need to update GlobalC::LOWF.WFC_GAMMA");
 
 				//GlobalC::UHM.GG.cal_env( GlobalC::LOWF.WFC_GAMMA[is][ib], GlobalC::CHR.rho[is] );
 

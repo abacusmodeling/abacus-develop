@@ -304,7 +304,7 @@ class Input
 	std::string vdw_R0_file;
 	std::string vdw_R0_unit;		    //"Bohr" or "Angstrom"
 	std::string vdw_model;			//"period" or "radius"
-	Vector3<int> vdw_period;
+	ModuleBase::Vector3<int> vdw_period;
 
 //==========================================================
 // Spectrum
@@ -348,6 +348,9 @@ class Input
 	//double  ocp_kb[10000];
 	int     lcao_box[3];           // the scale for searching the existence of the overlap <i,0|j,R>
 	int    mulliken;//qifeng add 2019-9-10
+	bool input_mag;
+	double* atom_mag;
+	int n_mag_at;
 	//added by zhengdy-soc
 	bool noncolin;
 	bool lspinorb;

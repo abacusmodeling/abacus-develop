@@ -85,7 +85,7 @@ void gcx_spin(double rhoup, double rhodw, double grhoup2, double grhodw2,
         if (rhoup > small && sqrt(abs(grhoup2)) > small)
         {
             //XC_Functional::ggax(2.0 * rhoup, 4.0 * grhoup2, sxup, v1xup, v2xup);
-			throw std::runtime_error("sxup, v1xup, v2xup uninitialized in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::runtime_error("sxup, v1xup, v2xup uninitialized in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
         }
         else
         {
@@ -97,7 +97,7 @@ void gcx_spin(double rhoup, double rhodw, double grhoup2, double grhodw2,
         if (rhodw > small && sqrt(abs(grhodw2)) > small)
         {
             //XC_Functional::ggax(2.0 * rhodw, 4.0 * grhodw2, sxdw, v1xdw, v2xdw);
-			throw std::runtime_error("sxdw, v1xdw, v2xdw uninitialized in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::runtime_error("sxdw, v1xdw, v2xdw uninitialized in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
         }
         else
         {
@@ -174,7 +174,7 @@ void gcx_spin(double rhoup, double rhodw, double grhoup2, double grhodw2,
 	// igcx=12: HSE
 	else if (GlobalC::xcf.igcx_now == 12)
 	{
-		throw std::domain_error( "HSE unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw std::domain_error( "HSE unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
     else
     {

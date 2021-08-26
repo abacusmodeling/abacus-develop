@@ -31,10 +31,10 @@ Charge_Extra::Charge_Extra()
 		// for second-order extrapolation
 		delta_rho3[is] = new double[GlobalC::pw.nrxx];
 
-		ZEROS(delta_rho1[is], GlobalC::pw.nrxx);
-		ZEROS(delta_rho2[is], GlobalC::pw.nrxx);
-		ZEROS(delta_rho[is], GlobalC::pw.nrxx);
-		ZEROS(delta_rho3[is], GlobalC::pw.nrxx);
+		ModuleBase::GlobalFunc::ZEROS(delta_rho1[is], GlobalC::pw.nrxx);
+		ModuleBase::GlobalFunc::ZEROS(delta_rho2[is], GlobalC::pw.nrxx);
+		ModuleBase::GlobalFunc::ZEROS(delta_rho[is], GlobalC::pw.nrxx);
+		ModuleBase::GlobalFunc::ZEROS(delta_rho3[is], GlobalC::pw.nrxx);
 	}
 
 	pos_old1 = new double[1];
@@ -82,7 +82,7 @@ Charge_Extra::~Charge_Extra()
 
 void Charge_Extra::allocate_ions(void)
 {
-	TITLE("Charge_Extra","allocate_ions");
+	ModuleBase::TITLE("Charge_Extra","allocate_ions");
 
 	// 1: first order extrapolation.
 	// 2: second order extrapolation.
@@ -102,14 +102,14 @@ void Charge_Extra::allocate_ions(void)
 	this->pos_now = new double[pos_dim];
 	this->pos_next = new double[pos_dim];
 
-	ZEROS(pos_old1, pos_dim);
-	ZEROS(pos_old2, pos_dim);
-	ZEROS(pos_now, pos_dim);
-	ZEROS(pos_next, pos_dim);
+	ModuleBase::GlobalFunc::ZEROS(pos_old1, pos_dim);
+	ModuleBase::GlobalFunc::ZEROS(pos_old2, pos_dim);
+	ModuleBase::GlobalFunc::ZEROS(pos_now, pos_dim);
+	ModuleBase::GlobalFunc::ZEROS(pos_next, pos_dim);
 
 	if(init_rho)
 	{
-		WARNING_QUIT("Charge_Extra::allocate","rho_ion has been allocated, pls check.");
+		ModuleBase::WARNING_QUIT("Charge_Extra::allocate","rho_ion has been allocated, pls check.");
 	}
 
 	this->rho_ion = new double**[dim];
@@ -130,7 +130,7 @@ void Charge_Extra::allocate_ions(void)
 
 	init_rho = true;
 
-	Memory::record("charge_extra","rho_ion",dim*GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
+	ModuleBase::Memory::record("charge_extra","rho_ion",dim*GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
 
 	return;
 }
@@ -138,7 +138,7 @@ void Charge_Extra::allocate_ions(void)
 
 void Charge_Extra::extrapolate_charge()
 {
-    TITLE("Charge_Extra","extrapolate_charge");
+    ModuleBase::TITLE("Charge_Extra","extrapolate_charge");
 	//-------------------------------------------------------
     // charge density expolation:
     // pot_order = 0 copy the old potential(nothing is done);
@@ -159,7 +159,7 @@ void Charge_Extra::extrapolate_charge()
 	{
 		if(GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{
-			WARNING_QUIT("Charge_Extra","charge extrapolation method is not available");
+			ModuleBase::WARNING_QUIT("Charge_Extra","charge extrapolation method is not available");
 		}
 		else
 		{
@@ -177,8 +177,8 @@ void Charge_Extra::extrapolate_charge()
 			rho_atom_old[is] = new double[GlobalC::pw.nrxx];
 			rho_atom_new[is] = new double[GlobalC::pw.nrxx];
 
-			ZEROS(rho_atom_old[is], GlobalC::pw.nrxx);
-			ZEROS(rho_atom_new[is], GlobalC::pw.nrxx);
+			ModuleBase::GlobalFunc::ZEROS(rho_atom_old[is], GlobalC::pw.nrxx);
+			ModuleBase::GlobalFunc::ZEROS(rho_atom_new[is], GlobalC::pw.nrxx);
 		}
 		GlobalC::CHR.atomic_rho(GlobalV::NSPIN,rho_atom_old);
 		for(int is=0; is<GlobalV::NSPIN; is++)
@@ -224,8 +224,8 @@ void Charge_Extra::extrapolate_charge()
 			rho_atom_old[is] = new double[GlobalC::pw.nrxx];
 			rho_atom_new[is] = new double[GlobalC::pw.nrxx];
 
-			ZEROS(rho_atom_old[is], GlobalC::pw.nrxx);
-			ZEROS(rho_atom_new[is], GlobalC::pw.nrxx);
+			ModuleBase::GlobalFunc::ZEROS(rho_atom_old[is], GlobalC::pw.nrxx);
+			ModuleBase::GlobalFunc::ZEROS(rho_atom_new[is], GlobalC::pw.nrxx);
 		}
 
 		// generate atomic rho
@@ -282,8 +282,8 @@ void Charge_Extra::extrapolate_charge()
 			rho_atom_old[is] = new double[GlobalC::pw.nrxx];
 			rho_atom_new[is] = new double[GlobalC::pw.nrxx];
 
-			ZEROS(rho_atom_old[is], GlobalC::pw.nrxx);
-			ZEROS(rho_atom_new[is], GlobalC::pw.nrxx);
+			ModuleBase::GlobalFunc::ZEROS(rho_atom_old[is], GlobalC::pw.nrxx);
+			ModuleBase::GlobalFunc::ZEROS(rho_atom_new[is], GlobalC::pw.nrxx);
 		}
 
 		// generate atomic_rho
@@ -348,7 +348,7 @@ void Charge_Extra::extrapolate_charge()
 	}
 	else
 	{
-		WARNING_QUIT("potential::init_pot","extra_pot parameter is wrong!");
+		ModuleBase::WARNING_QUIT("potential::init_pot","extra_pot parameter is wrong!");
 	}
 
     return;

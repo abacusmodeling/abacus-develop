@@ -13,9 +13,9 @@ class Charge_Broyden;
 class Exx_Abfs::DM
 {
 public:
-	std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> DMk;								// DMk[iat1][iat2][ik](iw1,iw2)
-	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::vector<matrix>>>> DMr;		// DMr[iat1][iat2][box][is](iw1,iw2)
-	std::deque<std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>>> DMk_pulay_seq;				// DMk_pulay_seq[istep][iat1][iat2][ik](iw1,iw2)
+	std::map<size_t,std::map<size_t,std::vector<ModuleBase::ComplexMatrix>>> DMk;								// DMk[iat1][iat2][ik](iw1,iw2)
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::vector<ModuleBase::matrix>>>> DMr;		// DMr[iat1][iat2][box][is](iw1,iw2)
+	std::deque<std::map<size_t,std::map<size_t,std::vector<ModuleBase::ComplexMatrix>>>> DMk_pulay_seq;				// DMk_pulay_seq[istep][iat1][iat2][ik](iw1,iw2)
 //	double DM_threshold = std::numeric_limits<double>::min();
 	bool flag_mix;
 
@@ -23,7 +23,7 @@ public:
 	void cal_DM(
 		const std::set<std::pair<size_t,size_t>> &atom_pairs,
 		const std::vector<Abfs::Vector3_Order<int>> &Born_von_Karman_boxes);
-	std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> cal_DMk_raw( const std::set<std::pair<size_t,size_t>> &atom_pairs ) const;
+	std::map<size_t,std::map<size_t,std::vector<ModuleBase::ComplexMatrix>>> cal_DMk_raw( const std::set<std::pair<size_t,size_t>> &atom_pairs ) const;
 		
 private:
 	void cal_DMk_mixing(

@@ -38,7 +38,7 @@ void Conv_Coulomb_Pot::cal_conv_coulomb_pot()
 	{
 		tmp_func[ir] = orb.getPsi(ir) * pow( orb.getRadial(ir), orb.getL()+2 );
 	}	
-	Integral::Simpson_Integral_0toall( orb.getNr(), VECTOR_TO_PTR(tmp_func), orb.getRab(), VECTOR_TO_PTR(tmp_integral) );
+	ModuleBase::Integral::Simpson_Integral_0toall( orb.getNr(), ModuleBase::GlobalFunc::VECTOR_TO_PTR(tmp_func), orb.getRab(), ModuleBase::GlobalFunc::VECTOR_TO_PTR(tmp_integral) );
 	conv_coulomb_pot[0]=0;
 	for( size_t ir=1; ir!=orb.getNr(); ++ir )
 	{
@@ -54,14 +54,14 @@ void Conv_Coulomb_Pot::cal_conv_coulomb_pot()
 	{
 		tmp_func[ir] = orb.getPsi(ir) / pow( orb.getRadial(ir), orb.getL()-1 );
 	}
-	Integral::Simpson_Integral_alltoinf( orb.getNr(), VECTOR_TO_PTR(tmp_func), orb.getRab(), VECTOR_TO_PTR(tmp_integral) );
+	ModuleBase::Integral::Simpson_Integral_alltoinf( orb.getNr(), ModuleBase::GlobalFunc::VECTOR_TO_PTR(tmp_func), orb.getRab(), ModuleBase::GlobalFunc::VECTOR_TO_PTR(tmp_integral) );
 	for( size_t ir=0; ir!=orb.getNr(); ++ir )
 	{
 		conv_coulomb_pot[ir] += tmp_integral[ir] * pow( orb.getRadial(ir), orb.getL() );
 	}
 
 	// 4pi/(2L+1)
-	const double coefficient = 4*PI/(2*orb.getL()+1);
+	const double coefficient = 4*ModuleBase::PI/(2*orb.getL()+1);
 	for( size_t ir=0; ir!=orb.getNr(); ++ir )
 	{
 		conv_coulomb_pot[ir] *= coefficient;
@@ -111,10 +111,10 @@ void Conv_Coulomb_Pot::cal_orbs_ccp<Numerical_Orbital_Lm>(
 		orbs.getL(),
 		orbs.getChi(),
 	    mesh,
-		VECTOR_TO_PTR(rab),
-		VECTOR_TO_PTR(r_radial),
+		ModuleBase::GlobalFunc::VECTOR_TO_PTR(rab),
+		ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial),
 		Numerical_Orbital_Lm::Psi_Type::Psi,
-		VECTOR_TO_PTR(psi),
+		ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi),
 		orbs.getNk() * kmesh_times | 1,								// Nk must be odd
 		orbs.getDk(),												// Peize Lin change 2017-04-16
 //		orbs.getDk() / kmesh_times,

@@ -27,7 +27,7 @@ namespace Ions_Move_Basic
 	//----------------------------------------------------------------------------
 	// setup the gradient, all the same for any geometry optimization methods.
 	//----------------------------------------------------------------------------
-	void setup_gradient(double *pos, double* grad, const matrix &force);
+	void setup_gradient(double *pos, double* grad, const ModuleBase::matrix &force);
 
 	//----------------------------------------------------------------------------
 	// move the atom positions, considering the periodic boundary condition.

@@ -4,12 +4,12 @@
 
 void Exx_Opt_Orb::print_matrix(
 	const std::string &file_name,
-	const std::vector<matrix> &matrix_Q, 
-	const std::vector<std::vector<matrix>> &matrix_S,
-	const matrix &matrix_V,
+	const std::vector<ModuleBase::matrix> &matrix_Q, 
+	const std::vector<std::vector<ModuleBase::matrix>> &matrix_S,
+	const ModuleBase::matrix &matrix_V,
 	const size_t TA, const size_t IA, const size_t TB, const size_t IB,
-	const Element_Basis_Index::Range &range_jles, 
-	const Element_Basis_Index::IndexLNM &index_jles) const
+	const ModuleBase::Element_Basis_Index::Range &range_jles, 
+	const ModuleBase::Element_Basis_Index::IndexLNM &index_jles) const
 {
 	auto print_header = [&]( std::ofstream &ofs )
 	{
@@ -89,8 +89,8 @@ void Exx_Opt_Orb::print_matrix(
 		const size_t nwfc = (TA==TB && IA==IB) ? cal_sum_M(TA) : cal_sum_M(TA)+cal_sum_M(TB);
 		ofs	<< nwfc << " nwfc" << std::endl;
 		
-		const size_t ecut_numberA = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * GlobalC::ORB.Phi[TA].getRcut() / PI ); // Rydberg Unit
-		const size_t ecut_numberB = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * GlobalC::ORB.Phi[TB].getRcut() / PI ); // Rydberg Unit
+		const size_t ecut_numberA = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * GlobalC::ORB.Phi[TA].getRcut() / ModuleBase::PI ); // Rydberg Unit
+		const size_t ecut_numberB = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * GlobalC::ORB.Phi[TB].getRcut() / ModuleBase::PI ); // Rydberg Unit
 		if(TA==TB)
 			ofs	<< ecut_numberA << " ne" << std::endl;
 		else
@@ -195,7 +195,7 @@ void Exx_Opt_Orb::print_matrix(
 		ofs << "</OVERLAP_V>" << std::endl << std::endl;
 	};
 	
-	std::ofstream ofs(file_name+"_"+TO_STRING(TA)+"_"+TO_STRING(IA)+"_"+TO_STRING(TB)+"_"+TO_STRING(IB));
+	std::ofstream ofs(file_name+"_"+ModuleBase::GlobalFunc::TO_STRING(TA)+"_"+ModuleBase::GlobalFunc::TO_STRING(IA)+"_"+ModuleBase::GlobalFunc::TO_STRING(TB)+"_"+ModuleBase::GlobalFunc::TO_STRING(IB));
 	print_header(ofs);
 	print_Q(ofs);
 	print_S(ofs);

@@ -3,7 +3,9 @@
 #include "constants.h"
 #include <cassert>
 #include <cmath>
-using namespace std;
+
+namespace ModuleBase
+{
 
 int Integral_G::n_root = 512;
 bool Integral_G::calc_wx = false;
@@ -45,8 +47,8 @@ double Integral_G::Gauss_Legendre
 	for(ir = 0; ir < n_root; ir++)
 	{
 		xgl = (sab + dab * gauleg_x[ir]) / 2;
-		ygl = Polint::RadialF(Rad, F, Msh, 0, xgl);
-		ygl = Polint::Lagrange3(Rad, F, Msh, xgl);
+		ygl = ModuleBase::Polint::RadialF(Rad, F, Msh, 0, xgl);
+		ygl = ModuleBase::Polint::Lagrange3(Rad, F, Msh, xgl);
 //		std::cout << "\nxgl = " << xgl << " ygl = " << ygl << std::endl;
 
 		sum += gauleg_w[ir] * ygl;
@@ -72,7 +74,7 @@ void Integral_G::gauleg(void)
 
 	for(i = 1; i <= m; i++)
 	{
-		z = cos( PI * (i - 0.250) / (n_root + 0.5) );
+		z = cos( ModuleBase::PI * (i - 0.250) / (n_root + 0.5) );
 
 		do
 		{
@@ -106,3 +108,4 @@ void Integral_G::gauleg(void)
 	return;
 }
 
+}

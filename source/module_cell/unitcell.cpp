@@ -10,7 +10,7 @@ using namespace std;
 
 UnitCell::UnitCell()
 {
-    if (GlobalV::test_unitcell) TITLE("unitcell","Constructor");
+    if (GlobalV::test_unitcell) ModuleBase::TITLE("unitcell","Constructor");
     Coordinate = "Direct";
     latName = "none";
     lat0 = 0.0;
@@ -30,12 +30,12 @@ UnitCell::UnitCell()
 	lc = new int[3];
     itiaiw2iwt.create(1,1,1);
 
-    latvec = Matrix3();
-    latvec_supercell = Matrix3();
-    G = Matrix3();
-    GT = Matrix3();
-    GGT = Matrix3();
-    invGGT = Matrix3();
+    latvec = ModuleBase::Matrix3();
+    latvec_supercell = ModuleBase::Matrix3();
+    G = ModuleBase::Matrix3();
+    GT = ModuleBase::Matrix3();
+    GGT = ModuleBase::Matrix3();
+    invGGT = ModuleBase::Matrix3();
 
     tpiba = 0.0;
     tpiba2 = 0.0;
@@ -62,7 +62,7 @@ UnitCell::~UnitCell()
 #ifdef __MPI
 void UnitCell::bcast_unitcell(void)
 {
-    if (GlobalV::test_unitcell)TITLE("UnitCell","bcast_unitcell");
+    if (GlobalV::test_unitcell)ModuleBase::TITLE("UnitCell","bcast_unitcell");
     Parallel_Common::bcast_string( Coordinate );
     Parallel_Common::bcast_int( nat );
 
@@ -150,17 +150,17 @@ void UnitCell::bcast_unitcell2(void)
 
 void UnitCell::print_cell(std::ofstream &ofs, output &outp)const
 {
-    if (GlobalV::test_unitcell) TITLE("UnitCell","print_cell");
+    if (GlobalV::test_unitcell) ModuleBase::TITLE("UnitCell","print_cell");
 
-    OUT(ofs,"print_unitcell()");
+    ModuleBase::GlobalFunc::OUT(ofs,"print_unitcell()");
 
-    OUT(ofs,"latName",latName);
-    OUT(ofs,"ntype",ntype);
-    OUT(ofs,"nat",nat);
-    OUT(ofs,"lat0",lat0);
-    OUT(ofs,"lat0_angstrom",lat0_angstrom);
-    OUT(ofs,"tpiba",tpiba);
-    OUT(ofs,"omega",omega);
+    ModuleBase::GlobalFunc::OUT(ofs,"latName",latName);
+    ModuleBase::GlobalFunc::OUT(ofs,"ntype",ntype);
+    ModuleBase::GlobalFunc::OUT(ofs,"nat",nat);
+    ModuleBase::GlobalFunc::OUT(ofs,"lat0",lat0);
+    ModuleBase::GlobalFunc::OUT(ofs,"lat0_angstrom",lat0_angstrom);
+    ModuleBase::GlobalFunc::OUT(ofs,"tpiba",tpiba);
+    ModuleBase::GlobalFunc::OUT(ofs,"omega",omega);
 
     outp.printM3(ofs,"Lattices Vector (R) : ", latvec);
     outp.printM3(ofs ,"Supercell lattice vector : ", latvec_supercell);
@@ -173,7 +173,7 @@ void UnitCell::print_cell(std::ofstream &ofs, output &outp)const
 
 void UnitCell::print_cell_cif(const std::string &fn)const
 {
-	if (GlobalV::test_unitcell) TITLE("UnitCell","print_cell_cif");
+	if (GlobalV::test_unitcell) ModuleBase::TITLE("UnitCell","print_cell_cif");
 	
 	if(GlobalV::MY_RANK!=0) return;//xiaohui add 2015-03-15
 
@@ -196,9 +196,9 @@ void UnitCell::print_cell_cif(const std::string &fn)const
 	//ofs << "_cell_angle_beta " << "90.00" << std::endl; 
 	//ofs << "_cell_angle_gamma " << "90.00" << std::endl; 
 	//xiaohui modify alpha, beta and gamma 2015-09-29
-	double angle_alpha = acos((a2 * a3) / (a2.norm() * a3.norm())) /PI*180.0;
-	double angle_beta = acos((a1 * a3) / (a1.norm() * a3.norm())) /PI*180.0;
-	double angle_gamma = acos((a1 * a2) / (a1.norm() * a2.norm())) /PI*180.0;
+	double angle_alpha = acos((a2 * a3) / (a2.norm() * a3.norm())) /ModuleBase::PI*180.0;
+	double angle_beta = acos((a1 * a3) / (a1.norm() * a3.norm())) /ModuleBase::PI*180.0;
+	double angle_gamma = acos((a1 * a2) / (a1.norm() * a2.norm())) /ModuleBase::PI*180.0;
 	ofs << "_cell_angle_alpha " << angle_alpha << std::endl;
 	ofs << "_cell_angle_beta " << angle_beta << std::endl;
 	ofs << "_cell_angle_gamma " << angle_gamma << std::endl;
@@ -226,7 +226,7 @@ void UnitCell::print_cell_cif(const std::string &fn)const
 
 void UnitCell::print_cell_xyz(const std::string &fn)const
 {
-    if (GlobalV::test_unitcell) TITLE("UnitCell","print_cell_xyz");
+    if (GlobalV::test_unitcell) ModuleBase::TITLE("UnitCell","print_cell_xyz");
 
 	if(GlobalV::MY_RANK!=0) return;//xiaohui add 2015-03-15
 
@@ -302,7 +302,7 @@ void UnitCell::update_pos_tau(const double* pos)
     return;
 }
 
-void UnitCell::update_pos_taud(const Vector3<double>* posd_in)
+void UnitCell::update_pos_taud(const ModuleBase::Vector3<double>* posd_in)
 {
     int iat = 0;
     for(int it = 0;it < this->ntype;it++)
@@ -310,7 +310,7 @@ void UnitCell::update_pos_taud(const Vector3<double>* posd_in)
         Atom* atom = &this->atoms[it];
         for(int ia =0;ia< atom->na;ia++)
         {
-            this->atoms[it].taud[ia] += posd_in[ia];
+            this->atoms[it].taud[ia] += posd_in[iat];
             iat++;
         }
     }
@@ -348,7 +348,7 @@ void UnitCell::periodic_boundary_adjustment()
 				GlobalV::ofs_warning << " it=" << it+1 << " ia=" << ia+1 << std::endl;
 				GlobalV::ofs_warning << "d=" << atom->taud[ia].x << " " << 
 				atom->taud[ia].y << " " << atom->taud[ia].z << std::endl;
-				WARNING_QUIT("Ions_Move_Basic::move_ions","the movement of atom is larger than the length of cell.");
+				ModuleBase::WARNING_QUIT("Ions_Move_Basic::move_ions","the movement of atom is larger than the length of cell.");
 			}
 
 			atom->tau[ia] = atom->taud[ia] * this->latvec;

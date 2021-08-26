@@ -8,7 +8,7 @@
 
 UnitCell_pseudo::UnitCell_pseudo()
 {
-	if(GlobalV::test_pseudo_cell) TITLE("unitcell_pseudo","Constructor");
+	if(GlobalV::test_pseudo_cell) ModuleBase::TITLE("unitcell_pseudo","Constructor");
 	set_atom_flag = false;
 }
 
@@ -29,12 +29,15 @@ void UnitCell_pseudo::setup_cell(
 		const std::string &fn,
 		std::ofstream &log)
 {
-	TITLE("UnitCell_pseudo","setup_cell");	
+	ModuleBase::TITLE("UnitCell_pseudo","setup_cell");	
 	// (1) init mag
 	assert(ntype>0);
 #ifndef __CMD
-	delete[] magnet.start_magnetization;
+	if(!input_mag)
+	{
+		delete[] magnet.start_magnetization;
 	magnet.start_magnetization = new double[this->ntype];
+	}	
 #endif
 
 	// (2) init *Atom class array.
@@ -90,7 +93,7 @@ void UnitCell_pseudo::setup_cell(
 			{
 				for(int i=0;i<this->ntype;i++)
 				{
-					Global_File::make_dir_atom( this->atoms[i].label );
+					ModuleBase::Global_File::make_dir_atom( this->atoms[i].label );
 				}
 			}
 		}
@@ -106,11 +109,11 @@ void UnitCell_pseudo::setup_cell(
 #endif
 	if(!ok)
 	{
-		WARNING_QUIT("UnitCell_pseudo::setup_cell","Can not find the file containing atom positions.!");
+		ModuleBase::WARNING_QUIT("UnitCell_pseudo::setup_cell","Can not find the file containing atom positions.!");
 	}
 	if(!ok2)
 	{
-		WARNING_QUIT("UnitCell_pseudo::setup_cell","Something wrong during read_atom_positions.");
+		ModuleBase::WARNING_QUIT("UnitCell_pseudo::setup_cell","Something wrong during read_atom_positions.");
 	}
 
 #ifdef __MPI
@@ -131,13 +134,13 @@ void UnitCell_pseudo::setup_cell(
 	this->omega = abs( latvec.Det() ) * this->lat0 * lat0 * lat0 ;
 	if(this->omega<=0)
 	{
-		WARNING_QUIT("setup_cell","omega <= 0 .");
+		ModuleBase::WARNING_QUIT("setup_cell","omega <= 0 .");
 	}
 	else
 	{
 		GlobalV::ofs_running << std::endl;
-		OUT(GlobalV::ofs_running,"Volume (Bohr^3)", this->omega);
-		OUT(GlobalV::ofs_running,"Volume (A^3)", this->omega * pow(BOHR_TO_A, 3));
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Volume (Bohr^3)", this->omega);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Volume (A^3)", this->omega * pow(ModuleBase::BOHR_TO_A, 3));
 	}
 		
 	//==========================================================
@@ -268,7 +271,7 @@ void UnitCell_pseudo::setup_cell(
 				<< atoms[it].dft[0] << " " << atoms[it].dft[1] << " "
 				<< atoms[it].dft[2] << " " << atoms[it].dft[3] << std::endl;
 				
-				WARNING_QUIT("setup_cell","All DFT functional must consistent.");
+				ModuleBase::WARNING_QUIT("setup_cell","All DFT functional must consistent.");
 			}
 		}
 	}
@@ -308,7 +311,7 @@ void UnitCell_pseudo::setup_cell_classic(
 	std::ofstream &ofs_warning)
 
 {
-	TITLE("UnitCell_pseudo","setup_cell_classic");
+	ModuleBase::TITLE("UnitCell_pseudo","setup_cell_classic");
 
 	assert(ntype>0);
 
@@ -358,7 +361,7 @@ void UnitCell_pseudo::setup_cell_classic(
 			{
 				for(int i=0;i<this->ntype;i++)
 				{
-					Global_File::make_dir_atom( this->atoms[i].label );
+					ModuleBase::Global_File::make_dir_atom( this->atoms[i].label );
 				}
 			}
 		}
@@ -369,11 +372,11 @@ void UnitCell_pseudo::setup_cell_classic(
 #endif
 	if(!ok)
 	{
-		WARNING_QUIT("UnitCell_pseudo::setup_cell","Can not find the file containing atom positions.!");
+		ModuleBase::WARNING_QUIT("UnitCell_pseudo::setup_cell","Can not find the file containing atom positions.!");
 	}
 	if(!ok2)
 	{
-		WARNING_QUIT("UnitCell_pseudo::setup_cell","Something wrong during read_atom_positions.");
+		ModuleBase::WARNING_QUIT("UnitCell_pseudo::setup_cell","Something wrong during read_atom_positions.");
 	}
 
 #ifdef __MPI
@@ -387,13 +390,13 @@ void UnitCell_pseudo::setup_cell_classic(
 	this->omega = abs( latvec.Det() ) * this->lat0 * lat0 * lat0 ;
 	if(this->omega<=0)
 	{
-		WARNING_QUIT("setup_cell","omega <= 0 .");
+		ModuleBase::WARNING_QUIT("setup_cell","omega <= 0 .");
 	}
 	else
 	{
 		ofs_running << std::endl;
-		OUT(ofs_running,"Volume (Bohr^3)", this->omega);
-		OUT(ofs_running,"Volume (A^3)", this->omega * pow(BOHR_TO_A, 3));
+		ModuleBase::GlobalFunc::OUT(ofs_running,"Volume (Bohr^3)", this->omega);
+		ModuleBase::GlobalFunc::OUT(ofs_running,"Volume (A^3)", this->omega * pow(ModuleBase::BOHR_TO_A, 3));
 	}
 
 	this->set_iat2itia();
@@ -410,7 +413,7 @@ void UnitCell_pseudo::setup_cell_classic(
 //===========================================
 void UnitCell_pseudo::cal_nwfc(void)
 {
-	TITLE("UnitCell_pseudo","cal_nwfc");
+	ModuleBase::TITLE("UnitCell_pseudo","cal_nwfc");
 	assert(ntype>0);
 	assert(nat>0);
 
@@ -552,7 +555,7 @@ void UnitCell_pseudo::cal_nwfc(void)
 	//=====================
 	if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02
 	{
-		AUTO_SET("NBANDS",GlobalV::NBANDS);
+		ModuleBase::GlobalFunc::AUTO_SET("NBANDS",GlobalV::NBANDS);
 	}
 	else // plane wave basis
 	{
@@ -560,7 +563,7 @@ void UnitCell_pseudo::cal_nwfc(void)
 		//{
 		//	if(GlobalV::NBANDS < GlobalV::NLOCAL)
 		//	{
-		//		WARNING_QUIT("cal_nwfc","NBANDS must > GlobalV::NLOCAL !");
+		//		ModuleBase::WARNING_QUIT("cal_nwfc","NBANDS must > GlobalV::NLOCAL !");
 		//	}
 		//}
 	}
@@ -574,7 +577,7 @@ void UnitCell_pseudo::cal_nwfc(void)
 //======================
 void UnitCell_pseudo::cal_meshx()
 {
-	if(GlobalV::test_pseudo_cell) TITLE("UnitCell_pseudo","cal_meshx");
+	if(GlobalV::test_pseudo_cell) ModuleBase::TITLE("UnitCell_pseudo","cal_meshx");
 	this->meshx = 0;
 	for (int it = 0;it < this->ntype;it++)
 	{
@@ -596,7 +599,7 @@ void UnitCell_pseudo::cal_meshx()
 //=========================
 void UnitCell_pseudo::cal_natomwfc(void)
 {
-	if(GlobalV::test_pseudo_cell) TITLE("UnitCell_pseudo","cal_natomwfc");
+	if(GlobalV::test_pseudo_cell) ModuleBase::TITLE("UnitCell_pseudo","cal_natomwfc");
 
 	this->natomwfc = 0;
 	for (int it = 0;it < ntype;it++)
@@ -628,7 +631,7 @@ void UnitCell_pseudo::cal_natomwfc(void)
 		}
 		natomwfc += tmp * atoms[it].na;
 	}
-	OUT(GlobalV::ofs_running,"initial pseudo atomic orbital number",natomwfc);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"initial pseudo atomic orbital number",natomwfc);
 	return;
 }
 
@@ -651,13 +654,13 @@ void UnitCell_pseudo::setup_cell_after_vc(
     this->omega = abs(latvec.Det()) * this->lat0 * lat0 * lat0;
     if(this->omega <= 0)
     {
-        WARNING_QUIT("setup_cell_after_vc", "omega <= 0 .");
+        ModuleBase::WARNING_QUIT("setup_cell_after_vc", "omega <= 0 .");
     }
     else
     {
         GlobalV::ofs_running << std::endl;
-        OUT(GlobalV::ofs_running, "Volume (Bohr^3)", this->omega);
-        OUT(GlobalV::ofs_running, "Volume (A^3))", this->omega * pow(BOHR_TO_A, 3));
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Volume (Bohr^3)", this->omega);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Volume (A^3))", this->omega * pow(ModuleBase::BOHR_TO_A, 3));
     }
 
     //==========================================================

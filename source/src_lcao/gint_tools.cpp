@@ -175,7 +175,7 @@ namespace Gint_Tools
 				double *p=&psir_ylm.ptr_2D[ib][block_index[id]];
 				if(!cal_flag[ib][id]) 
 				{
-					ZEROS(p, block_size[id]);
+					ModuleBase::GlobalFunc::ZEROS(p, block_size[id]);
 				}
 				else
 				{
@@ -193,7 +193,7 @@ namespace Gint_Tools
 					//------------------------------------------------------
 					std::vector<double> ylma;
 					//	Ylm::get_ylm_real(this->nnn[it], this->dr[id], ylma);
-					Ylm::sph_harm ( GlobalC::ucell.atoms[it].nwl,
+					ModuleBase::Ylm::sph_harm ( GlobalC::ucell.atoms[it].nwl,
 							dr[0] / distance,
 							dr[1] / distance,
 							dr[2] / distance,

@@ -13,7 +13,8 @@
 #include <iostream>
 #include <iomanip>
 #include <map>
-using namespace std;
+namespace ModuleBase
+{
 
 //==========================================================
 // CLASS :
@@ -70,5 +71,7 @@ class timer
 	static double cpu_time(void);
 
 };
+
+}
 #endif
 

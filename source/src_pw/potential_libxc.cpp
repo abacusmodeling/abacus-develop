@@ -20,20 +20,20 @@
 //XC_FAMILY_LDA, XC_FAMILY_GGA, XC_FAMILY_HYB_GGA, XC_CORRELATION: internal flags used in LIBXC, denote the types of functional associated with a certain functional ID, definition can be found in xc.h from LIBXC
 
 // [etxc, vtxc, v] = Potential_Libxc::v_xc(...)
-std::tuple<double,double,matrix> Potential_Libxc::v_xc(
+std::tuple<double,double,ModuleBase::matrix> Potential_Libxc::v_xc(
 	const double * const * const rho_in,
 	const double * const rho_core_in)
 {
-    TITLE("Potential_Libxc","v_xc");
-    timer::tick("Potential_Libxc","v_xc");
+    ModuleBase::TITLE("Potential_Libxc","v_xc");
+    ModuleBase::timer::tick("Potential_Libxc","v_xc");
 
     double etxc = 0.0;
     double vtxc = 0.0;
-	matrix v(GlobalV::NSPIN,GlobalC::pw.nrxx);
+	ModuleBase::matrix v(GlobalV::NSPIN,GlobalC::pw.nrxx);
 
 	if(GlobalV::VXC_IN_H == 0 )
 	{
-    	timer::tick("Potential_Libxc","v_xc");
+    	ModuleBase::timer::tick("Potential_Libxc","v_xc");
 		return std::make_tuple( etxc, vtxc, std::move(v) );
 	}
 	//----------------------------------------------------------
@@ -82,7 +82,7 @@ std::tuple<double,double,matrix> Potential_Libxc::v_xc(
 		{
 			for( size_t is=0; is!=nspin0(); ++is )
 				for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
-					etxc += e2 * exc[ir] * rho[ir*nspin0()+is] * sgn[ir*nspin0()+is];
+					etxc += ModuleBase::e2 * exc[ir] * rho[ir*nspin0()+is] * sgn[ir*nspin0()+is];
 		};
 
 		// cal vtx, v from rho_in, vrho
@@ -94,7 +94,7 @@ std::tuple<double,double,matrix> Potential_Libxc::v_xc(
 				{
 					for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 					{
-						const double v_tmp = e2 * vrho[ir*nspin0()+is] * sgn[ir*nspin0()+is];
+						const double v_tmp = ModuleBase::e2 * vrho[ir*nspin0()+is] * sgn[ir*nspin0()+is];
 						v(is,ir) += v_tmp;
 						vtxc += v_tmp * rho_in[is][ir];
 					}
@@ -106,7 +106,7 @@ std::tuple<double,double,matrix> Potential_Libxc::v_xc(
 				for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 				{
 					std::vector<double> v_tmp(4);
-					v_tmp[0] = e2 * (0.5 * (vrho[ir*2] + vrho[ir*2+1]));
+					v_tmp[0] = ModuleBase::e2 * (0.5 * (vrho[ir*2] + vrho[ir*2+1]));
 					const double vs = 0.5 * (vrho[ir*2] - vrho[ir*2+1]);
 					const double amag = sqrt( pow(rho_in[1][ir],2) 
 						+ pow(rho_in[2][ir],2) 
@@ -116,7 +116,7 @@ std::tuple<double,double,matrix> Potential_Libxc::v_xc(
 					{
 						for(int ipol=1; ipol<4; ++ipol)
 						{
-							v_tmp[ipol] = e2 * vs * rho_in[ipol][ir] / amag;
+							v_tmp[ipol] = ModuleBase::e2 * vs * rho_in[ipol][ir] / amag;
 						}
 					}
 					for(int ipol=0; ipol<4; ++ipol)
@@ -132,23 +132,23 @@ std::tuple<double,double,matrix> Potential_Libxc::v_xc(
 		// cal vtxc, v from rho_in, rho, gdr, vsigma
 		auto process_vsigma = [&]()
 		{
-			const std::vector<std::vector<Vector3<double>>> &gdr = std::get<2>(rho_sigma_gdr);
+			const std::vector<std::vector<ModuleBase::Vector3<double>>> &gdr = std::get<2>(rho_sigma_gdr);
 			
-			std::vector<std::vector<Vector3<double>>> h( nspin0(), std::vector<Vector3<double>>(GlobalC::pw.nrxx) );
+			std::vector<std::vector<ModuleBase::Vector3<double>>> h( nspin0(), std::vector<ModuleBase::Vector3<double>>(GlobalC::pw.nrxx) );
 			if( 1==nspin0() )
 			{
 				for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 				{
-					h[0][ir] = e2 * gdr[0][ir] * vsigma[ir] * 2.0 * sgn[ir];
+					h[0][ir] = ModuleBase::e2 * gdr[0][ir] * vsigma[ir] * 2.0 * sgn[ir];
 				}
 			}
 			else
 			{
 				for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 				{
-					h[0][ir] = e2 * (gdr[0][ir] * vsigma[ir*3  ] * 2.0 * sgn[ir*2  ]
+					h[0][ir] = ModuleBase::e2 * (gdr[0][ir] * vsigma[ir*3  ] * 2.0 * sgn[ir*2  ]
 						           + gdr[1][ir] * vsigma[ir*3+1]       * sgn[ir*2]   * sgn[ir*2+1]);
-					h[1][ir] = e2 * (gdr[1][ir] * vsigma[ir*3+2] * 2.0 * sgn[ir*2+1]
+					h[1][ir] = ModuleBase::e2 * (gdr[1][ir] * vsigma[ir*3+2] * 2.0 * sgn[ir*2+1]
 					               + gdr[0][ir] * vsigma[ir*3+1]       * sgn[ir*2]   * sgn[ir*2+1]);
 				}
 			}
@@ -156,7 +156,7 @@ std::tuple<double,double,matrix> Potential_Libxc::v_xc(
 			// define two dimensional array dh [ nspin, GlobalC::pw.nrxx ]
 			std::vector<std::vector<double>> dh(nspin0(), std::vector<double>(GlobalC::pw.nrxx));
 			for( size_t is=0; is!=nspin0(); ++is )
-				GGA_PW::grad_dot( VECTOR_TO_PTR(h[is]), VECTOR_TO_PTR(dh[is]) );
+				GGA_PW::grad_dot( ModuleBase::GlobalFunc::VECTOR_TO_PTR(h[is]), ModuleBase::GlobalFunc::VECTOR_TO_PTR(dh[is]) );
 
 			for( size_t is=0; is!=nspin0(); ++is )
 				for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
@@ -209,8 +209,8 @@ std::tuple<double,double,matrix> Potential_Libxc::v_xc(
 				process_vsigma();
 				break;
 			default:
-				throw std::domain_error("func.info->family ="+TO_STRING(func.info->family)
-					+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+				throw std::domain_error("func.info->family ="+ModuleBase::GlobalFunc::TO_STRING(func.info->family)
+					+" unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 				break;
 		}
 		// Libxc function: Deallocate memory
@@ -226,7 +226,7 @@ std::tuple<double,double,matrix> Potential_Libxc::v_xc(
     etxc *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
     vtxc *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
 
-    timer::tick("Potential_Libxc","v_xc");
+    ModuleBase::timer::tick("Potential_Libxc","v_xc");
 	return std::make_tuple( etxc, vtxc, std::move(v) );
 }
 
@@ -297,8 +297,8 @@ std::vector<xc_func_type> Potential_Libxc::init_func()
 	}
 	else
 	{
-		throw std::domain_error("iexch="+TO_STRING(GlobalC::xcf.iexch_now)+", igcx="+TO_STRING(GlobalC::xcf.igcx_now)
-			+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw std::domain_error("iexch="+ModuleBase::GlobalFunc::TO_STRING(GlobalC::xcf.iexch_now)+", igcx="+ModuleBase::GlobalFunc::TO_STRING(GlobalC::xcf.igcx_now)
+			+" unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
 
 	//--------------------------------------
@@ -318,8 +318,8 @@ std::vector<xc_func_type> Potential_Libxc::init_func()
 	}
 	else
 	{
-		throw std::domain_error("icorr="+TO_STRING(GlobalC::xcf.icorr_now)+", igcc="+TO_STRING(GlobalC::xcf.igcc_now)
-			+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw std::domain_error("icorr="+ModuleBase::GlobalFunc::TO_STRING(GlobalC::xcf.icorr_now)+", igcc="+ModuleBase::GlobalFunc::TO_STRING(GlobalC::xcf.igcc_now)
+			+" unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
 
 	return funcs;
@@ -330,7 +330,7 @@ std::vector<xc_func_type> Potential_Libxc::init_func()
 // [rho, sigma, gdr] = Potential_Libxc::cal_input(...)
 std::tuple< std::vector<double>, 
 			std::vector<double>, 
-			std::vector<std::vector<Vector3<double>>> > 
+			std::vector<std::vector<ModuleBase::Vector3<double>>> > 
 Potential_Libxc::cal_input( 
 	const std::vector<xc_func_type> &funcs, 
 	const double * const * const rho_in,
@@ -374,7 +374,7 @@ Potential_Libxc::cal_input(
 	};		
 		
 	// [...,↑_{i},↑_{i+1},...], [...,↓_{i},↓_{i+1},...]
-	std::vector<std::vector<Vector3<double>>> gdr;
+	std::vector<std::vector<ModuleBase::Vector3<double>>> gdr;
 	bool finished_gdr = false;
 	auto cal_gdr = [&]()
 	{
@@ -449,8 +449,8 @@ Potential_Libxc::cal_input(
 				cal_sigma();
 				break;
 			default:
-				throw std::domain_error("func.info->family ="+TO_STRING(func.info->family)
-					+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+				throw std::domain_error("func.info->family ="+ModuleBase::GlobalFunc::TO_STRING(func.info->family)
+					+" unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 				break;
 		}
 	}

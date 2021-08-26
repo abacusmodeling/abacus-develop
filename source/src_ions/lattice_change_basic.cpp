@@ -16,9 +16,9 @@ double Lattice_Change_Basic::lattice_change_ini = 0.01; // default is 0.5
 
 int Lattice_Change_Basic::out_stru=0;
 
-void Lattice_Change_Basic::setup_gradient(double* lat, double *grad, matrix &stress)
+void Lattice_Change_Basic::setup_gradient(double* lat, double *grad, ModuleBase::matrix &stress)
 {
-	TITLE("Lattice_Change_Basic","setup_gradient");
+	ModuleBase::TITLE("Lattice_Change_Basic","setup_gradient");
 	
 	if(INPUT.fixed_axes == "volume")
 	{
@@ -60,7 +60,7 @@ void Lattice_Change_Basic::setup_gradient(double* lat, double *grad, matrix &str
 
 void Lattice_Change_Basic::change_lattice(double *move, double *lat)
 {
-	TITLE("Lattice_Change_Basic","change_lattice");
+	ModuleBase::TITLE("Lattice_Change_Basic","change_lattice");
 
 	assert(move!=NULL);
 	assert(lat!=NULL);
@@ -142,9 +142,9 @@ void Lattice_Change_Basic::change_lattice(double *move, double *lat)
 	return;
 }
 
-void Lattice_Change_Basic::check_converged(matrix &stress, double *grad)
+void Lattice_Change_Basic::check_converged(ModuleBase::matrix &stress, double *grad)
 {
-	TITLE("Lattice_Change_Basic","check_converged");
+	ModuleBase::TITLE("Lattice_Change_Basic","check_converged");
 
 	Lattice_Change_Basic::largest_grad = 0.0;
 	double stress_ii_max = 0.0;
@@ -175,7 +175,7 @@ void Lattice_Change_Basic::check_converged(matrix &stress, double *grad)
 	}
 
 	double unit_transform = 0.0;
-	unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
+	unit_transform = ModuleBase::RYDBERG_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
 	Lattice_Change_Basic::largest_grad = Lattice_Change_Basic::largest_grad * unit_transform;
 	stress_ii_max = stress_ii_max * unit_transform;
 	
@@ -227,12 +227,12 @@ void Lattice_Change_Basic::check_converged(matrix &stress, double *grad)
 
 void Lattice_Change_Basic::terminate(void)
 {
-	TITLE("Lattice_Change_Basic","terminate");
+	ModuleBase::TITLE("Lattice_Change_Basic","terminate");
 	if(Lattice_Change_Basic::converged)
 	{
 		GlobalV::ofs_running << " end of lattice optimization"<<std::endl;
-		OUT(GlobalV::ofs_running,"istep", Lattice_Change_Basic::istep);
-		OUT(GlobalV::ofs_running,"update iteration", Lattice_Change_Basic::update_iter);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"istep", Lattice_Change_Basic::istep);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"update iteration", Lattice_Change_Basic::update_iter);
 		/*
 		GlobalV::ofs_running<<"Saving the approximate inverse hessian"<<std::endl;
 		std::ofstream hess("hess.out");

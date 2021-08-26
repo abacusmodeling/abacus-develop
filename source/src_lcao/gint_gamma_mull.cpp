@@ -8,13 +8,13 @@
 
 void Gint_Gamma::cal_mulliken(double** mulliken)
 {
-    TITLE("Gint_Gamma","cal_mulliken");
-    timer::tick("Gint_Gamma","cal_mulliken");
+    ModuleBase::TITLE("Gint_Gamma","cal_mulliken");
+    ModuleBase::timer::tick("Gint_Gamma","cal_mulliken");
 
     this->save_atoms_on_grid(GlobalC::GridT);
     this->gamma_mulliken(mulliken);
 
-    timer::tick("Gint_Gamma","cal_mulliken");
+    ModuleBase::timer::tick("Gint_Gamma","cal_mulliken");
     return;
 }
 
@@ -24,7 +24,7 @@ void Gint_Gamma::cal_mulliken(double** mulliken)
 // this code very efficiently, very carefully.
 void Gint_Gamma::gamma_mulliken(double** mulliken)
 {
-    TITLE("Grid_Integral","gamma_charge");
+    ModuleBase::TITLE("Grid_Integral","gamma_charge");
 
     // it's a uniform grid to save orbital values, so the delta_r is a constant.
     const double delta_r = GlobalC::ORB.dr_uniform;
@@ -55,15 +55,15 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 			psir_ylm[i] = new double*[max_size];
 			cal_flag[i] = new bool[max_size];
 
-			ZEROS(distance[i], max_size);
-			ZEROS(cal_flag[i], max_size);
+			ModuleBase::GlobalFunc::ZEROS(distance[i], max_size);
+			ModuleBase::GlobalFunc::ZEROS(cal_flag[i], max_size);
 
 			for(int j=0; j<max_size; j++) 
 			{
 				dr[i][j] = new double[3];
 				psir_ylm[i][j] = new double[GlobalC::ucell.nwmax];
-				ZEROS(dr[i][j],3);
-				ZEROS(psir_ylm[i][j],GlobalC::ucell.nwmax);
+				ModuleBase::GlobalFunc::ZEROS(dr[i][j],3);
+				ModuleBase::GlobalFunc::ZEROS(psir_ylm[i][j],GlobalC::ucell.nwmax);
 			}
 		}
 	}
@@ -72,8 +72,8 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 	double *vldr3 = new double[GlobalC::pw.bxyz];
 	double v1 = 0.0;
 	int* vindex=new int[GlobalC::pw.bxyz];
-	ZEROS(vldr3, GlobalC::pw.bxyz);
-	ZEROS(vindex, GlobalC::pw.bxyz);
+	ModuleBase::GlobalFunc::ZEROS(vldr3, GlobalC::pw.bxyz);
+	ModuleBase::GlobalFunc::ZEROS(vindex, GlobalC::pw.bxyz);
 	double phi=0.0;
 
 	const int nbx = GlobalC::GridT.nbx;
@@ -143,7 +143,7 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 						//	Ylm::get_ylm_real(this->nnn[it], this->dr[id], ylma);
 						if (distance[ib][id] < 1.0E-9) distance[ib][id] += 1.0E-9;
 						
-						Ylm::sph_harm (	GlobalC::ucell.atoms[it].nwl,
+						ModuleBase::Ylm::sph_harm (	GlobalC::ucell.atoms[it].nwl,
 								dr[ib][id][0] / distance[ib][id],
 								dr[ib][id][1] / distance[ib][id],
 								dr[ib][id][2] / distance[ib][id],

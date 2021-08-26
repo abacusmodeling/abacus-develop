@@ -26,7 +26,7 @@ int Grid_MeshK::cal_Rindex(const int &u1, const int &u2, const int &u3)const
 		std::cout << " u1=" << u1 << " minu1=" << minu1 << std::endl;
 		std::cout << " u2=" << u2 << " minu2=" << minu2 << std::endl;
 		std::cout << " u3=" << u3 << " minu3=" << minu3 << std::endl;
-		WARNING_QUIT("Grid_MeshK::cal_Rindex","x1<0 || x2<0 || x3<0 !");
+		ModuleBase::WARNING_QUIT("Grid_MeshK::cal_Rindex","x1<0 || x2<0 || x3<0 !");
 	}
 
 	assert(x1>=0);
@@ -37,7 +37,7 @@ int Grid_MeshK::cal_Rindex(const int &u1, const int &u2, const int &u3)const
 
 void Grid_MeshK::cal_extended_cell(const int &dxe, const int &dye, const int &dze)
 {
-	TITLE("Grid_MeshK","cal_extended_cell");
+	ModuleBase::TITLE("Grid_MeshK","cal_extended_cell");
 
 	//--------------------------------------
 	// max and min unitcell in expaned grid.
@@ -50,8 +50,8 @@ void Grid_MeshK::cal_extended_cell(const int &dxe, const int &dye, const int &dz
 	this->minu2 = (-dye+1) / GlobalC::pw.nby - 1; 
 	this->minu3 = (-dze+1) / GlobalC::pw.nbz - 1; 
 
-	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"MaxUnitcell",maxu1,maxu2,maxu3);
-	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"MinUnitcell",minu1,minu2,minu3);
+	if(GlobalV::test_gridt)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"MaxUnitcell",maxu1,maxu2,maxu3);
+	if(GlobalV::test_gridt)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"MinUnitcell",minu1,minu2,minu3);
 
 	//--------------------------------------
 	// number of unitcell in each direction.
@@ -61,9 +61,9 @@ void Grid_MeshK::cal_extended_cell(const int &dxe, const int &dye, const int &dz
 	this->nu3 = maxu3 - minu3 + 1;
 	this->nutot = nu1 * nu2 * nu3;
 
-	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"UnitCellNumber",nu1,nu2,nu3);
+	if(GlobalV::test_gridt)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"UnitCellNumber",nu1,nu2,nu3);
 	//xiaohui add 'GlobalV::OUT_LEVEL' line, 2015-09-16
-	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"UnitCellTotal",nutot);
+	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"UnitCellTotal",nutot);
 
 //	std::cout << " nu1 = " << nu1 << " nu2 = " << nu2 << " nu3 = " << nu3 << std::endl;
 //	std::cout << " nutot = " << nutot << std::endl;
@@ -74,9 +74,9 @@ void Grid_MeshK::cal_extended_cell(const int &dxe, const int &dye, const int &dz
 	this->ucell_index2x = new int[nutot];
 	this->ucell_index2y = new int[nutot];
 	this->ucell_index2z = new int[nutot];
-	ZEROS(ucell_index2x, nutot);
-	ZEROS(ucell_index2y, nutot);
-	ZEROS(ucell_index2z, nutot);
+	ModuleBase::GlobalFunc::ZEROS(ucell_index2x, nutot);
+	ModuleBase::GlobalFunc::ZEROS(ucell_index2y, nutot);
+	ModuleBase::GlobalFunc::ZEROS(ucell_index2z, nutot);
 
 	this->nutot = nu1 * nu2 * nu3;
 

@@ -2,38 +2,38 @@
 #include "../src_pw/global.h"
 
 void Force_LCAO_gamma::cal_fvl_dphi(
-	matrix& dm2d, 
+	ModuleBase::matrix& dm2d, 
 	const bool isforce, 
 	const bool isstress, 
-	matrix& fvl_dphi, 
-	matrix& svl_dphi)
+	ModuleBase::matrix& fvl_dphi, 
+	ModuleBase::matrix& svl_dphi)
 {   
-    TITLE("Force_LCAO_gamma","cal_fvl_dphi");
-    timer::tick("Force_LCAO_gamma","cal_fvl_dphi");
+    ModuleBase::TITLE("Force_LCAO_gamma","cal_fvl_dphi");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_fvl_dphi");
 	
 	if(isforce)
 	{
-		ZEROS (GlobalC::LM.DHloc_fixed_x, GlobalC::ParaO.nloc);
-		ZEROS (GlobalC::LM.DHloc_fixed_y, GlobalC::ParaO.nloc);
-		ZEROS (GlobalC::LM.DHloc_fixed_z, GlobalC::ParaO.nloc);
+		ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_x, GlobalC::ParaO.nloc);
+		ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_y, GlobalC::ParaO.nloc);
+		ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_z, GlobalC::ParaO.nloc);
 	}
     if(isstress)
     {
-        ZEROS (GlobalC::LM.DHloc_fixed_11, GlobalC::ParaO.nloc);
-        ZEROS (GlobalC::LM.DHloc_fixed_12, GlobalC::ParaO.nloc);
-        ZEROS (GlobalC::LM.DHloc_fixed_13, GlobalC::ParaO.nloc);
-        ZEROS (GlobalC::LM.DHloc_fixed_22, GlobalC::ParaO.nloc);
-        ZEROS (GlobalC::LM.DHloc_fixed_23, GlobalC::ParaO.nloc);
-        ZEROS (GlobalC::LM.DHloc_fixed_33, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_11, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_12, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_13, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_22, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_23, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_33, GlobalC::ParaO.nloc);
     }
 
 
     double* tmpDHx = new double[GlobalC::ParaO.nloc];
     double* tmpDHy = new double[GlobalC::ParaO.nloc];
     double* tmpDHz = new double[GlobalC::ParaO.nloc];
-    ZEROS( tmpDHx, GlobalC::ParaO.nloc );
-    ZEROS( tmpDHy, GlobalC::ParaO.nloc );
-    ZEROS( tmpDHz, GlobalC::ParaO.nloc );
+    ModuleBase::GlobalFunc::ZEROS( tmpDHx, GlobalC::ParaO.nloc );
+    ModuleBase::GlobalFunc::ZEROS( tmpDHy, GlobalC::ParaO.nloc );
+    ModuleBase::GlobalFunc::ZEROS( tmpDHz, GlobalC::ParaO.nloc );
     for(int i=0; i<GlobalC::ParaO.nloc; ++i)
     {
         tmpDHx[i] = GlobalC::LM.DHloc_fixed_x[i];
@@ -55,9 +55,9 @@ void Force_LCAO_gamma::cal_fvl_dphi(
     {
         GlobalV::CURRENT_SPIN = is;
 
-        ZEROS (GlobalC::LM.DHloc_fixed_x, GlobalC::ParaO.nloc);
-        ZEROS (GlobalC::LM.DHloc_fixed_y, GlobalC::ParaO.nloc);
-        ZEROS (GlobalC::LM.DHloc_fixed_z, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_x, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_y, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_z, GlobalC::ParaO.nloc);
 
         for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
         {
@@ -65,9 +65,9 @@ void Force_LCAO_gamma::cal_fvl_dphi(
         }
 
         //  should not be set zero if VNA is used.
-        //  ZEROS(GlobalC::LM.DHloc_fixed_x,GlobalC::ParaO.nloc);
-        //  ZEROS(GlobalC::LM.DHloc_fixed_y,GlobalC::ParaO.nloc);
-        //  ZEROS(GlobalC::LM.DHloc_fixed_z,GlobalC::ParaO.nloc);
+        //  ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DHloc_fixed_x,GlobalC::ParaO.nloc);
+        //  ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DHloc_fixed_y,GlobalC::ParaO.nloc);
+        //  ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DHloc_fixed_z,GlobalC::ParaO.nloc);
         GlobalC::UHM.GG.cal_force(GlobalC::pot.vr_eff1);
 
 
@@ -138,42 +138,42 @@ void Force_LCAO_gamma::cal_fvl_dphi(
     delete[] tmpDHz;
 
 
-    timer::tick("Force_LCAO_gamma","cal_fvl_dphi");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_fvl_dphi");
     return;
 }
 
 
 
 void Force_LCAO_gamma::cal_fvl_dphi(
-	const std::vector<matrix> &dm2d, 
+	const std::vector<ModuleBase::matrix> &dm2d, 
 	const bool isforce, 
 	const bool isstress, 
-	matrix& fvl_dphi, 
-	matrix& svl_dphi)
+	ModuleBase::matrix& fvl_dphi, 
+	ModuleBase::matrix& svl_dphi)
 {   
-    TITLE("Force_LCAO_gamma","cal_fvl_dphi");
-    timer::tick("Force_LCAO_gamma","cal_fvl_dphi");
+    ModuleBase::TITLE("Force_LCAO_gamma","cal_fvl_dphi");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_fvl_dphi");
 
-    ZEROS (GlobalC::LM.DHloc_fixed_x, GlobalC::ParaO.nloc);
-    ZEROS (GlobalC::LM.DHloc_fixed_y, GlobalC::ParaO.nloc);
-    ZEROS (GlobalC::LM.DHloc_fixed_z, GlobalC::ParaO.nloc);
+    ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_x, GlobalC::ParaO.nloc);
+    ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_y, GlobalC::ParaO.nloc);
+    ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_z, GlobalC::ParaO.nloc);
     if(GlobalV::STRESS)
     {
-        ZEROS (GlobalC::LM.DHloc_fixed_11, GlobalC::ParaO.nloc);
-        ZEROS (GlobalC::LM.DHloc_fixed_12, GlobalC::ParaO.nloc);
-        ZEROS (GlobalC::LM.DHloc_fixed_13, GlobalC::ParaO.nloc);
-        ZEROS (GlobalC::LM.DHloc_fixed_22, GlobalC::ParaO.nloc);
-        ZEROS (GlobalC::LM.DHloc_fixed_23, GlobalC::ParaO.nloc);
-        ZEROS (GlobalC::LM.DHloc_fixed_33, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_11, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_12, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_13, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_22, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_23, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_33, GlobalC::ParaO.nloc);
     }
 
 
     double* tmpDHx = new double[GlobalC::ParaO.nloc];
     double* tmpDHy = new double[GlobalC::ParaO.nloc];
     double* tmpDHz = new double[GlobalC::ParaO.nloc];
-    ZEROS( tmpDHx, GlobalC::ParaO.nloc );
-    ZEROS( tmpDHy, GlobalC::ParaO.nloc );
-    ZEROS( tmpDHz, GlobalC::ParaO.nloc );
+    ModuleBase::GlobalFunc::ZEROS( tmpDHx, GlobalC::ParaO.nloc );
+    ModuleBase::GlobalFunc::ZEROS( tmpDHy, GlobalC::ParaO.nloc );
+    ModuleBase::GlobalFunc::ZEROS( tmpDHz, GlobalC::ParaO.nloc );
     for(int i=0; i<GlobalC::ParaO.nloc; ++i)
     {
         tmpDHx[i] = GlobalC::LM.DHloc_fixed_x[i];
@@ -194,9 +194,9 @@ void Force_LCAO_gamma::cal_fvl_dphi(
     {
         GlobalV::CURRENT_SPIN = is;
 
-        ZEROS (GlobalC::LM.DHloc_fixed_x, GlobalC::ParaO.nloc);
-        ZEROS (GlobalC::LM.DHloc_fixed_y, GlobalC::ParaO.nloc);
-        ZEROS (GlobalC::LM.DHloc_fixed_z, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_x, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_y, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_z, GlobalC::ParaO.nloc);
 
         for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
         {
@@ -204,9 +204,9 @@ void Force_LCAO_gamma::cal_fvl_dphi(
         }
 
         //should not be set zero if VNA is used.
-        //ZEROS(GlobalC::LM.DHloc_fixed_x,GlobalC::ParaO.nloc);
-        //ZEROS(GlobalC::LM.DHloc_fixed_y,GlobalC::ParaO.nloc);
-        //ZEROS(GlobalC::LM.DHloc_fixed_z,GlobalC::ParaO.nloc);
+        //ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DHloc_fixed_x,GlobalC::ParaO.nloc);
+        //ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DHloc_fixed_y,GlobalC::ParaO.nloc);
+        //ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DHloc_fixed_z,GlobalC::ParaO.nloc);
         GlobalC::UHM.GG.cal_force(GlobalC::pot.vr_eff1);
 
         for(int i=0; i<GlobalV::NLOCAL; i++)
@@ -274,6 +274,6 @@ void Force_LCAO_gamma::cal_fvl_dphi(
     delete[] tmpDHy;
     delete[] tmpDHz;
 
-    timer::tick("Force_LCAO_gamma", "cal_fvl_dphi");
+    ModuleBase::timer::tick("Force_LCAO_gamma", "cal_fvl_dphi");
     return;
 }

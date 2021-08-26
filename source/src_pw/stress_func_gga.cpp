@@ -4,9 +4,9 @@
 #include "./xc_gga_pw.h"
 
 //calculate the GGA stress correction in PW and LCAO
-void Stress_Func::stress_gga(matrix& sigma) 
+void Stress_Func::stress_gga(ModuleBase::matrix& sigma) 
 {
-	timer::tick("Stress_Func","stress_gga");
+	ModuleBase::timer::tick("Stress_Func","stress_gga");
      
 	if (GlobalC::xcf.igcx == 0  &&  GlobalC::xcf.igcc == 0)
 	{
@@ -38,17 +38,17 @@ void Stress_Func::stress_gga(matrix& sigma)
 	double* rhotmp2;
 	std::complex<double>* rhogsum1;
 	std::complex<double>* rhogsum2;
-	Vector3<double>* gdr1;
-	Vector3<double>* gdr2;
+	ModuleBase::Vector3<double>* gdr1;
+	ModuleBase::Vector3<double>* gdr2;
  
 	rhotmp1 = new double[GlobalC::pw.nrxx];
 	rhogsum1 = new std::complex<double>[GlobalC::pw.ngmc];
-	ZEROS(rhotmp1, GlobalC::pw.nrxx);
-	ZEROS(rhogsum1, GlobalC::pw.ngmc);
+	ModuleBase::GlobalFunc::ZEROS(rhotmp1, GlobalC::pw.nrxx);
+	ModuleBase::GlobalFunc::ZEROS(rhogsum1, GlobalC::pw.ngmc);
 	for(int ir=0; ir<GlobalC::pw.nrxx; ir++) rhotmp1[ir] = GlobalC::CHR.rho[0][ir] + fac * GlobalC::CHR.rho_core[ir];
 	for(int ig=0; ig<GlobalC::pw.ngmc; ig++) rhogsum1[ig] = GlobalC::CHR.rhog[0][ig] + fac * GlobalC::CHR.rhog_core[ig];
-	gdr1 = new Vector3<double>[GlobalC::pw.nrxx];
-	ZEROS(gdr1, GlobalC::pw.nrxx);
+	gdr1 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
+	ModuleBase::GlobalFunc::ZEROS(gdr1, GlobalC::pw.nrxx);
 
 	GGA_PW::grad_rho( rhogsum1 , gdr1 );
 
@@ -56,8 +56,8 @@ void Stress_Func::stress_gga(matrix& sigma)
 	{
 		rhotmp2 = new double[GlobalC::pw.nrxx];
 		rhogsum2 = new std::complex<double>[GlobalC::pw.ngmc];
-		ZEROS(rhotmp2, GlobalC::pw.nrxx);
-		ZEROS(rhogsum2, GlobalC::pw.ngmc);
+		ModuleBase::GlobalFunc::ZEROS(rhotmp2, GlobalC::pw.nrxx);
+		ModuleBase::GlobalFunc::ZEROS(rhogsum2, GlobalC::pw.ngmc);
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
 			rhotmp2[ir] = GlobalC::CHR.rho[1][ir] + fac * GlobalC::CHR.rho_core[ir];
@@ -67,8 +67,8 @@ void Stress_Func::stress_gga(matrix& sigma)
 			rhogsum2[ig] = GlobalC::CHR.rhog[1][ig] + fac * GlobalC::CHR.rhog_core[ig];
 		}
 		
-		gdr2 = new Vector3<double>[GlobalC::pw.nrxx];
-		ZEROS(gdr2, GlobalC::pw.nrxx);
+		gdr2 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
+		ModuleBase::GlobalFunc::ZEROS(gdr2, GlobalC::pw.nrxx);
 
 		GGA_PW::grad_rho( rhogsum2 , gdr2 );
 	}
@@ -120,7 +120,7 @@ void Stress_Func::stress_gga(matrix& sigma)
 					{
 						for(int m = 0;m< l+1;m++)
 						{
-							sigma_gradcorr[l][m] += tt[l] * tt[m] * e2 * (v2x + v2c);
+							sigma_gradcorr[l][m] += tt[l] * tt[m] * ModuleBase::e2 * (v2x + v2c);
 						}
 					}
 				}
@@ -143,7 +143,7 @@ void Stress_Func::stress_gga(matrix& sigma)
 		{
 			if(GlobalV::DFT_META)
 			{
-				WARNING_QUIT("stress_gga","stress mGGA not ready for nspin=2");
+				ModuleBase::WARNING_QUIT("stress_gga","stress mGGA not ready for nspin=2");
 			}
 			double rh = rhotmp1[ir] + rhotmp2[ir];
 			grho2a = gdr1[ir].norm2();;
@@ -156,7 +156,7 @@ void Stress_Func::stress_gga(matrix& sigma)
 			{
 				if(igcc_is_lyp)
 				{
-					WARNING_QUIT("stress","igcc_is_lyp is not available now.");
+					ModuleBase::WARNING_QUIT("stress","igcc_is_lyp is not available now.");
 				}
 				else
 				{
@@ -193,13 +193,13 @@ void Stress_Func::stress_gga(matrix& sigma)
 			    for(int m = 0;m< l+1;m++)
 				{
 				//    exchange
-				sigma_gradcorr [l][m] += tt1[l] * tt1[m] * e2 * v2xup + 
-							tt2[l] * tt2[m] * e2 * v2xdw;
+				sigma_gradcorr [l][m] += tt1[l] * tt1[m] * ModuleBase::e2 * v2xup + 
+							tt2[l] * tt2[m] * ModuleBase::e2 * v2xdw;
 				//    correlation
 				sigma_gradcorr [l][m] += ( tt1[l] * tt1[m] * v2cup + 
 							tt2[l] * tt2[m] * v2cdw + 
 							(tt1[l] * tt2[m] +
-							tt2[l] * tt1[m] ) * v2cud ) * e2;
+							tt2[l] * tt1[m] ) * v2cud ) * ModuleBase::e2;
 				}
 			}
 		}
@@ -244,6 +244,6 @@ void Stress_Func::stress_gga(matrix& sigma)
 		delete[] rhogsum2;
 		delete[] gdr2;
 	}
-	timer::tick("Stress_Func","stress_gga");
+	ModuleBase::timer::tick("Stress_Func","stress_gga");
 	return;
 }

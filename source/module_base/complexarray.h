@@ -6,7 +6,8 @@
 #include <fstream>
 #include <iomanip>
 
-using namespace std;
+namespace ModuleBase
+{
 
 class ComplexArray
 {
@@ -113,6 +114,7 @@ void zeros(std::complex <T> *u, int n)
 	{
 		u[i] = std::complex <T> (0.0, 0.0);
 	}
+}
 }
 
 #endif // COMPLEX_ARRAY_H

@@ -1,5 +1,6 @@
 101_PW_15_f_pseudopots
 101_PW_15_pseudopots
+101_PW_blps_pseudopots
 101_PW_OU_pseudopots
 101_PW_upf201_pseudopots
 101_PW_VW_pseudopots
@@ -71,4 +72,6 @@
 
 401_NP_KP_sp
 401_NP_KP_spd
-601_NO_TDDFT_N2
+601_NO_TDDFT_N2_vel
+601_NO_TDDFT_N2_occ
+701_LJ_Ar

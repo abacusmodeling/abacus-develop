@@ -82,19 +82,19 @@ void Charge_Broyden::mix_rho
     bool &converged
 )
 {
-    TITLE("Charge_Broyden","mix_rho");
-	timer::tick("Charge", "mix_rho");
+    ModuleBase::TITLE("Charge_Broyden","mix_rho");
+	ModuleBase::timer::tick("Charge", "mix_rho");
 
     for (int is=0; is<GlobalV::NSPIN; is++)
     {
-		NOTE("Perform FFT on rho(r) to obtain rho(G).");
+		ModuleBase::GlobalFunc::NOTE("Perform FFT on rho(r) to obtain rho(G).");
         this->set_rhog(rho[is], rhog[is]);
 
-		NOTE("Perform FFT on rho_save(r) to obtain rho_save(G).");
+		ModuleBase::GlobalFunc::NOTE("Perform FFT on rho_save(r) to obtain rho_save(G).");
         this->set_rhog(rho_save[is], rhog_save[is]);
 
 
-		NOTE("Calculate the charge difference between rho(G) and rho_save(G)");
+		ModuleBase::GlobalFunc::NOTE("Calculate the charge difference between rho(G) and rho_save(G)");
         for (int ig=0; ig<GlobalC::pw.ngmc; ig++)
         {
             this->rhog[is][ig] -= this->rhog_save[is][ig];
@@ -102,7 +102,7 @@ void Charge_Broyden::mix_rho
 
     }
 
-	NOTE("Calculate the norm of the Residual std::vector: < R[rho] | R[rho_save] >");
+	ModuleBase::GlobalFunc::NOTE("Calculate the norm of the Residual std::vector: < R[rho] | R[rho_save] >");
     dr2 = this->rhog_dot_product( this->rhog, this->rhog);
 	
 	if(GlobalV::test_charge)GlobalV::ofs_running << " dr2 from rhog_dot_product is " << dr2 << std::endl;
@@ -134,13 +134,13 @@ void Charge_Broyden::mix_rho
     if ( dr2 < diago_error )
     {
         GlobalV::ofs_warning << " dr2 < diago_error, keep charge density unchanged." << std::endl;
-    	timer::tick("Charge","mix_rho");
+    	ModuleBase::timer::tick("Charge","mix_rho");
         return;
     }
     else if (dr2 < tr2)
     {
         converged = true;
-    	timer::tick("Charge","mix_rho");
+    	ModuleBase::timer::tick("Charge","mix_rho");
 		return;
     }
 
@@ -150,7 +150,7 @@ void Charge_Broyden::mix_rho
 	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
 		rho123[is] = new double[GlobalC::pw.nrxx];
-		ZEROS(rho123[is], GlobalC::pw.nrxx);
+		ModuleBase::GlobalFunc::ZEROS(rho123[is], GlobalC::pw.nrxx);
 		for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
 		{
 			rho123[is][ir] = this->rho[is][ir];
@@ -188,7 +188,7 @@ void Charge_Broyden::mix_rho
     }
     else
     {
-        WARNING_QUIT("Charge_Pulay","Not implemended yet,coming soon.");
+        ModuleBase::WARNING_QUIT("Charge_Pulay","Not implemended yet,coming soon.");
     }
 
 	// mohan add 2011-06-07
@@ -205,7 +205,7 @@ void Charge_Broyden::mix_rho
     }
 
 //	for(int is=0; is<GlobalV::NSPIN; ++is)
-  //	DCOPY(rho[is],rho_save[is],GlobalC::pw.nrxx);
+  //	ModuleBase::GlobalFunc::DCOPY(rho[is],rho_save[is],GlobalC::pw.nrxx);
 	//2014-06-22
 	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
@@ -213,7 +213,7 @@ void Charge_Broyden::mix_rho
 	}
 	delete[] rho123;
 
-    timer::tick("Charge","mix_rho");
+    ModuleBase::timer::tick("Charge","mix_rho");
     return;
 }
 
@@ -269,9 +269,9 @@ void Charge_Broyden::Simplified_Broyden_mixing(const int &iter)
 		char uu='U';
 		int info;
 		dsytrf_(&uu,&iter_used,beta.c,&iter_used,iwork,work,&iter_used,&info);
-		if(info != 0) WARNING_QUIT("Broyden_mixing", "Error when factorizing beta.");
+		if(info != 0) ModuleBase::WARNING_QUIT("Broyden_mixing", "Error when factorizing beta.");
 		dsytri_(&uu,&iter_used,beta.c,&iter_used,iwork,work,&info);
-		if(info != 0) WARNING_QUIT("Broyden_mixing", "Error when DSYTRI beta.");
+		if(info != 0) ModuleBase::WARNING_QUIT("Broyden_mixing", "Error when DSYTRI beta.");
 		for(int i = 0; i < iter_used; ++i)
 		{
 			for(int j = i + 1; j < iter_used; ++j)
@@ -334,7 +334,7 @@ void Charge_Broyden::Simplified_Broyden_mixing(const int &iter)
 
 void Charge_Broyden::Modified_Broyden_mixing(void)
 {
-    //TITLE("Charge_Broyden","Modified_Broyden_Mixing");
+    //ModuleBase::TITLE("Charge_Broyden","Modified_Broyden_Mixing");
 
     this->rstep = this->mixing_ndim;
     this->dstep = this->rstep - 1;
@@ -416,8 +416,8 @@ void Charge_Broyden::allocate_Broyden()
     	        	dn[i][is] = new std::complex<double>[GlobalC::pw.ngmc];
     	    	}
 			}
-			Memory::record("Charge_Broyden","dF", GlobalV::NSPIN*npdim*GlobalC::pw.ngmc,"cdouble");
-    		Memory::record("Charge_Broyden","dn", GlobalV::NSPIN*npdim*GlobalC::pw.ngmc,"cdouble");
+			ModuleBase::Memory::record("Charge_Broyden","dF", GlobalV::NSPIN*npdim*GlobalC::pw.ngmc,"cdouble");
+    		ModuleBase::Memory::record("Charge_Broyden","dn", GlobalV::NSPIN*npdim*GlobalC::pw.ngmc,"cdouble");
 		}
 		else
 		{
@@ -446,10 +446,10 @@ void Charge_Broyden::allocate_Broyden()
     	    	for (int i=0; i<rstep; i++)
     	    	{
     	        	this->Rrho[is][i] = new double[GlobalC::pw.nrxx];
-    	        	ZEROS(Rrho[is][i],GlobalC::pw.nrxx);
+    	        	ModuleBase::GlobalFunc::ZEROS(Rrho[is][i],GlobalC::pw.nrxx);
     	    	}	
     		}
-    		Memory::record("Charge_Broyden","Rrho", GlobalV::NSPIN*rstep*GlobalC::pw.nrxx,"double");
+    		ModuleBase::Memory::record("Charge_Broyden","Rrho", GlobalV::NSPIN*rstep*GlobalC::pw.nrxx,"double");
 
     		// (2) allocate dRrho[i]: Rrho[i+1] - Rrho[i]
     		this->dRrho = new double**[GlobalV::NSPIN];
@@ -464,23 +464,23 @@ void Charge_Broyden::allocate_Broyden()
     	    	{
     	        	dRrho[is][i] = new double[GlobalC::pw.nrxx];
     	        	drho[is][i] = new double[GlobalC::pw.nrxx];
-    	        	ZEROS( dRrho[is][i], GlobalC::pw.nrxx );
-    	        	ZEROS( drho[is][i], GlobalC::pw.nrxx);
+    	        	ModuleBase::GlobalFunc::ZEROS( dRrho[is][i], GlobalC::pw.nrxx );
+    	        	ModuleBase::GlobalFunc::ZEROS( drho[is][i], GlobalC::pw.nrxx);
     	    	}
     		}
-    		Memory::record("Charge_Broyden","dRrho", GlobalV::NSPIN*dstep*GlobalC::pw.nrxx,"double");
-    		Memory::record("Charge_Broyden","drho", GlobalV::NSPIN*dstep*GlobalC::pw.nrxx,"double");
-    		Memory::record("Charge_Broyden","rho_save2", GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
+    		ModuleBase::Memory::record("Charge_Broyden","dRrho", GlobalV::NSPIN*dstep*GlobalC::pw.nrxx,"double");
+    		ModuleBase::Memory::record("Charge_Broyden","drho", GlobalV::NSPIN*dstep*GlobalC::pw.nrxx,"double");
+    		ModuleBase::Memory::record("Charge_Broyden","rho_save2", GlobalV::NSPIN*GlobalC::pw.nrxx,"double");
 
 			this->dRR = new double[dstep];
-			ZEROS(dRR, dstep);
+			ModuleBase::GlobalFunc::ZEROS(dRR, dstep);
 
 			this->beta.create(dstep, dstep);
 			this->betabar.create(dstep, dstep);
 			this->Abar.create(dstep, dstep);
 			
 
-			this->Zmk = new matrix[GlobalV::NSPIN];
+			this->Zmk = new ModuleBase::matrix[GlobalV::NSPIN];
 //			this->Zmk_old = new matrix[GlobalV::NSPIN];
 			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
@@ -496,7 +496,7 @@ void Charge_Broyden::allocate_Broyden()
 
 void Charge_Broyden::generate_beta(const int &is)
 {
-	//TITLE("Charge_Broyden","generate_beta");
+	//ModuleBase::TITLE("Charge_Broyden","generate_beta");
 
 	//(1) generate Abar(k,n) = w(k)*w(n)*<dR(n)|dR(k)>
 	for(int k=0; k<dstep; k++)
@@ -548,7 +548,7 @@ void Charge_Broyden::generate_beta(const int &is)
 
 void Charge_Broyden::generate_Zmk(const int &totstep, const int &irstep, const int &idstep, const int &is)
 {
-	//TITLE("Charge_Bryoden","generate_Zmk");
+	//ModuleBase::TITLE("Charge_Bryoden","generate_Zmk");
 	this->Zmk[is].zero_out();
 		
 	for(int k=0; k<dstep; k++)
@@ -600,12 +600,12 @@ void Charge_Broyden::generate_Zmk(const int &totstep, const int &irstep, const i
 
 void Charge_Broyden::generate_new_broyden_rho(const int &is, const int &m)
 {
-//	TITLE("Charge_Broyden","generate_new_broyden_rho");
+//	ModuleBase::TITLE("Charge_Broyden","generate_new_broyden_rho");
 	double mixp = this->mixing_beta;
 
 	// gamma save how much 'u' to mix.
 	double* gamma = new double[dstep];
-	ZEROS(gamma, dstep);
+	ModuleBase::GlobalFunc::ZEROS(gamma, dstep);
 	for(int i=0; i<dstep; i++)
 	{
 		for(int k=0; k<dstep; k++)
@@ -630,7 +630,7 @@ void Charge_Broyden::generate_new_broyden_rho(const int &is, const int &m)
 	std::cout << "\n check E: " << std::endl;
 	
 	double* rhot = new double[GlobalC::pw.nrxx];
-	ZEROS(rhot, GlobalC::pw.nrxx);
+	ModuleBase::GlobalFunc::ZEROS(rhot, GlobalC::pw.nrxx);
 
 	for(int i=0; i<dstep; i++)
 	{
@@ -646,7 +646,7 @@ void Charge_Broyden::generate_new_broyden_rho(const int &is, const int &m)
 	delete[] rhot;
 	*/
 
-	DCOPY(rho[is], rho_save[is], GlobalC::pw.nrxx);
+	ModuleBase::GlobalFunc::DCOPY(rho[is], rho_save[is], GlobalC::pw.nrxx);
 
 	delete[] gamma;
 	return;

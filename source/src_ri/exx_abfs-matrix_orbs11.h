@@ -33,16 +33,16 @@ public:
 	void init_radial_table();
 	void init_radial_table( const std::map<size_t,std::map<size_t,std::set<double>>> &Rs );		// unit: ucell.lat0
 
-	matrix cal_overlap_matrix(
+	ModuleBase::matrix cal_overlap_matrix(
 		const size_t TA,
 		const size_t TB,
-		const Vector3<double> &tauA,											// unit: ucell.lat0
-		const Vector3<double> &tauB,											// unit: ucell.lat0
-		const Element_Basis_Index::IndexLNM &index_r,
-		const Element_Basis_Index::IndexLNM &index_c ) const;
-	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> cal_overlap_matrix(
-		const Element_Basis_Index::IndexLNM &index_r,
-		const Element_Basis_Index::IndexLNM &index_c ) const;
+		const ModuleBase::Vector3<double> &tauA,											// unit: ucell.lat0
+		const ModuleBase::Vector3<double> &tauB,											// unit: ucell.lat0
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_r,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_c ) const;
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> cal_overlap_matrix(
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_r,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_c ) const;
 
 protected:
 	ORB_table_phi MOT;

@@ -133,8 +133,8 @@ void Epsilon0_pwscf:: Cal_epsilon0()
 				}
 			}
 		}
-
-		double coff = 64 * PI /GlobalC::ucell.omega/GlobalC::kv.nks;
+		
+		double coff = 64 * ModuleBase::PI /GlobalC::ucell.omega/GlobalC::kv.nks;
 		std::cout << "all finish" << std::endl;
 
 		for(int iw=0; iw<nomega; iw++)
@@ -254,8 +254,8 @@ void Epsilon0_pwscf:: Cal_epsilon0()
 				}
 			}
 		}
-
-		double coff = 128 * PI /GlobalC::ucell.omega/GlobalC::kv.nks;
+		
+		double coff = 128 * ModuleBase::PI /GlobalC::ucell.omega/GlobalC::kv.nks;
 		std::cout << "all finish" << std::endl;
 
 		for(int iw=0; iw<nomega; iw++)
@@ -399,8 +399,8 @@ double Epsilon0_pwscf:: focc(int ib, int ik)
 	else if(GlobalV::NSPIN == 2)
 		return (GlobalC::wf.wg(ik,ib) * 1.0/ GlobalC::kv.wk[ik] );
 	else				// Peize Lin add 2019-05-01
-		throw std::domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
-}
+		throw std::domain_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+} 
 void Epsilon0_pwscf:: Cal_dipole(int ik)
 {
 
@@ -426,9 +426,9 @@ void Epsilon0_pwscf:: Cal_dipole(int ik)
 				{
 					for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 					{
-						dipole_aux_core[0][ib1][ib2] += conj(GlobalC::wf.evc[ik](ib1, ig)) * GlobalC::pw.get_G_cartesian_projection(ig, 0) * (TWO_PI / GlobalC::ucell.lat0) * GlobalC::wf.evc[ik](ib2, ig);
-						dipole_aux_core[1][ib1][ib2] += conj(GlobalC::wf.evc[ik](ib1, ig)) * GlobalC::pw.get_G_cartesian_projection(ig, 1) * (TWO_PI / GlobalC::ucell.lat0) * GlobalC::wf.evc[ik](ib2,ig);
-						dipole_aux_core[2][ib1][ib2] += conj(GlobalC::wf.evc[ik](ib1, ig)) * GlobalC::pw.get_G_cartesian_projection(ig, 2) * (TWO_PI / GlobalC::ucell.lat0) * GlobalC::wf.evc[ik](ib2,ig);
+						dipole_aux_core[0][ib1][ib2] += conj(GlobalC::wf.evc[ik](ib1, ig)) * GlobalC::pw.get_G_cartesian_projection(ig, 0) * (ModuleBase::TWO_PI / GlobalC::ucell.lat0) * GlobalC::wf.evc[ik](ib2, ig);
+						dipole_aux_core[1][ib1][ib2] += conj(GlobalC::wf.evc[ik](ib1, ig)) * GlobalC::pw.get_G_cartesian_projection(ig, 1) * (ModuleBase::TWO_PI / GlobalC::ucell.lat0) * GlobalC::wf.evc[ik](ib2,ig);
+						dipole_aux_core[2][ib1][ib2] += conj(GlobalC::wf.evc[ik](ib1, ig)) * GlobalC::pw.get_G_cartesian_projection(ig, 2) * (ModuleBase::TWO_PI / GlobalC::ucell.lat0) * GlobalC::wf.evc[ik](ib2,ig);
 					}
 				}
 			}
@@ -442,9 +442,9 @@ void Epsilon0_pwscf:: Cal_dipole(int ik)
 		{
 			for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 			{
-				dipole_aux_core[0][ib1][ib1] += conj(GlobalC::wf.evc[ik](ib1, ig)) * GlobalC::pw.get_GPlusK_cartesian_projection(ik, ig, 0) * (TWO_PI / GlobalC::ucell.lat0) * GlobalC::wf.evc[ik](ib1,ig);
-				dipole_aux_core[1][ib1][ib1] += conj(GlobalC::wf.evc[ik](ib1, ig)) * GlobalC::pw.get_GPlusK_cartesian_projection(ik, ig, 1) * (TWO_PI / GlobalC::ucell.lat0) * GlobalC::wf.evc[ik](ib1, ig);
-				dipole_aux_core[2][ib1][ib1] += conj(GlobalC::wf.evc[ik](ib1, ig)) * GlobalC::pw.get_GPlusK_cartesian_projection(ik, ig, 2) * (TWO_PI / GlobalC::ucell.lat0) * GlobalC::wf.evc[ik](ib1, ig);
+				dipole_aux_core[0][ib1][ib1] += conj(GlobalC::wf.evc[ik](ib1, ig)) * GlobalC::pw.get_GPlusK_cartesian_projection(ik, ig, 0) * (ModuleBase::TWO_PI / GlobalC::ucell.lat0) * GlobalC::wf.evc[ik](ib1,ig);
+				dipole_aux_core[1][ib1][ib1] += conj(GlobalC::wf.evc[ik](ib1, ig)) * GlobalC::pw.get_GPlusK_cartesian_projection(ik, ig, 1) * (ModuleBase::TWO_PI / GlobalC::ucell.lat0) * GlobalC::wf.evc[ik](ib1, ig);
+				dipole_aux_core[2][ib1][ib1] += conj(GlobalC::wf.evc[ik](ib1, ig)) * GlobalC::pw.get_GPlusK_cartesian_projection(ik, ig, 2) * (ModuleBase::TWO_PI / GlobalC::ucell.lat0) * GlobalC::wf.evc[ik](ib1, ig);
 			}
 		}
 	}

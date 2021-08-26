@@ -37,7 +37,7 @@ Grid_BigCell::~Grid_BigCell()
 
 void Grid_BigCell::init_big_latvec(void)
 {
-	TITLE("Grid_BigCell","init_big_latvec");
+	ModuleBase::TITLE("Grid_BigCell","init_big_latvec");
 	// initialize the mesh cell vectors.
 	assert(nbx>0);
 	assert(nby>0);
@@ -105,7 +105,7 @@ void Grid_BigCell::init_big_latvec(void)
 
 void Grid_BigCell::init_grid_expansion(void)
 {
-	TITLE("Grid_BigCell","init_grid_expansion");
+	ModuleBase::TITLE("Grid_BigCell","init_grid_expansion");
 
 	// calculate the max cutoff radius among all orbitals.
 	// then we will use this parameter to generate grid expansion.
@@ -113,7 +113,7 @@ void Grid_BigCell::init_grid_expansion(void)
 	{
 		this->orbital_rmax = std::max( GlobalC::ORB.Phi[T].getRcut(), this->orbital_rmax);
 	}
-	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"rmax of periodic grid (bohr)",orbital_rmax);
+	if(GlobalV::test_gridt)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"rmax of periodic grid (bohr)",orbital_rmax);
 
 	// calculate the distance between bigcell.
 	// in other word, calculate the distance one bigcell point
@@ -124,7 +124,7 @@ void Grid_BigCell::init_grid_expansion(void)
 	this->bigcell_dy = GlobalC::ucell.a2.norm() * GlobalC::ucell.lat0 / (double)nby;	
 	this->bigcell_dz = GlobalC::ucell.a3.norm() * GlobalC::ucell.lat0 / (double)nbz;
 
-	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"Length of Meshcell (Bohr): ",bigcell_dx,bigcell_dy,bigcell_dz);
+	if(GlobalV::test_gridt)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Length of Meshcell (Bohr): ",bigcell_dx,bigcell_dy,bigcell_dz);
 	
 	assert( bigcell_dx > 0.0);
 	assert( bigcell_dy > 0.0);
@@ -165,7 +165,7 @@ void Grid_BigCell::init_grid_expansion(void)
 	this->dze = static_cast<int>( this->orbital_rmax * g3) +1;
 
 	//xiaohui add 'GlobalV::OUT_LEVEL' line, 2015-09-16
-	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"extended fft grid",dxe,dye,dze);
+	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"extended fft grid",dxe,dye,dze);
 
 	// calculate the dimension of expanded grid.
 	// +1 in order to cover the spillage atom on the right side.
@@ -178,14 +178,14 @@ void Grid_BigCell::init_grid_expansion(void)
 	this->nze = nbz + 2*dze +1;
 	this->nxyze = this->nxe * this->nye * this->nze;
 
-	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"dimension of extened grid",nxe,nye,nze);
+	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"dimension of extened grid",nxe,nye,nze);
 	return;
 }
 
 
 void Grid_BigCell::init_tau_in_bigcell(void)
 {
-	TITLE("Grid_BigCell","init_tau_in_bigcell");
+	ModuleBase::TITLE("Grid_BigCell","init_tau_in_bigcell");
 	
 	// allcoate space for atom positions relative
 	// to meshcell.
@@ -204,11 +204,11 @@ void Grid_BigCell::init_tau_in_bigcell(void)
 		delete[] index_atom;
 		this->index_atom = new int[GlobalC::ucell.nat];
 
-		Memory::record("Grid_BigCell","tau_in_bigcell",GlobalC::ucell.nat*3,"double");
+		ModuleBase::Memory::record("Grid_BigCell","tau_in_bigcell",GlobalC::ucell.nat*3,"double");
 	}
 	
 	// get the fraction number of (i,j,k)
-	Vector3<double> fraction;
+	ModuleBase::Vector3<double> fraction;
 	int iat=0;
 	int ii,jj,kk;
 	double delta[3];
@@ -253,7 +253,7 @@ void Grid_BigCell::init_tau_in_bigcell(void)
 				std::cout << fraction.y << " ";
 				std::cout << fraction.z << " ";
 				std::cout << std::endl;
-				WARNING_QUIT("Grid_BigCell::init_tau_in_bigcell","fraction.x<0 || fraction.y<0 || fraction.z<0");
+				ModuleBase::WARNING_QUIT("Grid_BigCell::init_tau_in_bigcell","fraction.x<0 || fraction.y<0 || fraction.z<0");
 			}
 
 			assert(fraction.x >= 0.0);
@@ -318,8 +318,8 @@ void Grid_BigCell::init_tau_in_bigcell(void)
 // if f2normal == false, calculate the index2cell. 
 void Grid_BigCell::grid_expansion_index(bool f2normal, int *target)const
 {
-	TITLE("Grid_BigCell","grid_expansion_index");
-	timer::tick("Grid_BigCell","grid_expansion_index");
+	ModuleBase::TITLE("Grid_BigCell","grid_expansion_index");
+	ModuleBase::timer::tick("Grid_BigCell","grid_expansion_index");
 //	std::cout << " ncx=" << ncx << " ncy=" << ncy << " ncz=" << ncz << std::endl;
 //	std::stringstream ss;
 //	ss << GlobalV::global_out_dir << "expand_grid.dat";
@@ -414,12 +414,12 @@ void Grid_BigCell::grid_expansion_index(bool f2normal, int *target)const
 					}
 					else
 					{
-						WARNING_QUIT("Grid_BigCell::init_grid_expansion_index","check ii,jj,kk!");
+						ModuleBase::WARNING_QUIT("Grid_BigCell::init_grid_expansion_index","check ii,jj,kk!");
 					}
 				}// f2 normal
 			}// k
 		}// j
 	}// i
-	timer::tick("Grid_BigCell","grid_expansion_index");
+	ModuleBase::timer::tick("Grid_BigCell","grid_expansion_index");
 	return;
 }

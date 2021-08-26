@@ -42,7 +42,7 @@ void Local_Orbital_Charge::write_dm(
 	const std::string &fn, 
 	const int &precision)
 {
-    TITLE("Local_Orbital_Charge","write_dm");
+    ModuleBase::TITLE("Local_Orbital_Charge","write_dm");
 
 	if (out_dm==0)
 	{
@@ -52,7 +52,7 @@ void Local_Orbital_Charge::write_dm(
 	{
 		return; 
 	}
-	timer::tick("Local_Orbital_Charge","write_dm");
+	ModuleBase::timer::tick("Local_Orbital_Charge","write_dm");
 
 	time_t start, end;
 	std::ofstream ofs;
@@ -64,13 +64,13 @@ void Local_Orbital_Charge::write_dm(
 		ofs.open(fn.c_str());
 		if (!ofs)
 		{
-			WARNING("Charge::write_rho","Can't create Charge File!");
+			ModuleBase::WARNING("Charge::write_rho","Can't create Charge File!");
 		}
 
 		//GlobalV::ofs_running << "\n Output charge file." << std::endl;
 
 		ofs << GlobalC::ucell.latName << std::endl;//1
-		ofs << " " << GlobalC::ucell.lat0 * BOHR_TO_A << std::endl;
+		ofs << " " << GlobalC::ucell.lat0 * ModuleBase::BOHR_TO_A << std::endl;
 		ofs << " " << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << std::endl;
 		ofs << " " << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << std::endl;
 		ofs << " " << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << std::endl;
@@ -110,7 +110,7 @@ void Local_Orbital_Charge::write_dm(
 		}
 		else
 		{
-			WARNING_QUIT("write_rho","check nspin!");
+			ModuleBase::WARNING_QUIT("write_rho","check nspin!");
 		}
 
 
@@ -136,7 +136,7 @@ void Local_Orbital_Charge::write_dm(
     }
     else
     {
-        WARNING_QUIT("write_dm","not ready yet");
+        ModuleBase::WARNING_QUIT("write_dm","not ready yet");
         ofs << " " << GlobalC::LNNR.nnrg << " (nnrg)" << std::endl;
         for(int i=0; i<GlobalC::LNNR.nnrg; ++i)
         {
@@ -154,7 +154,7 @@ void Local_Orbital_Charge::write_dm(
         for (int i=0; i<GlobalV::NLOCAL; ++i)
         {
             // when reduce, there may be 'redundance', we need to count them.
-            ZEROS(count, GlobalV::NLOCAL);
+            ModuleBase::GlobalFunc::ZEROS(count, GlobalV::NLOCAL);
             const int mu = GlobalC::GridT.trace_lo[i];
             if (mu >= 0)
             {
@@ -170,7 +170,7 @@ void Local_Orbital_Charge::write_dm(
             Parallel_Reduce::reduce_int_all( count, GlobalV::NLOCAL );
 
             // reduce the density matrix for 'i' line.
-            ZEROS(tmp, GlobalV::NLOCAL);
+            ModuleBase::GlobalFunc::ZEROS(tmp, GlobalV::NLOCAL);
             if (mu >= 0)
             {
                 for (int j=0; j<GlobalV::NLOCAL; j++)
@@ -218,16 +218,16 @@ void Local_Orbital_Charge::write_dm(
     else
     {
         ofs << " " << GlobalC::LNNR.nnrg << " (nnrg)" << std::endl;
-        WARNING_QUIT("local_orbital_charge","not ready to output DM_R");
+        ModuleBase::WARNING_QUIT("local_orbital_charge","not ready to output DM_R");
     }
 #endif
 	if(GlobalV::MY_RANK==0)
 	{
 		end = time(NULL);
-		OUT_TIME("write_rho",start,end);
+		ModuleBase::GlobalFunc::OUT_TIME("write_rho",start,end);
 		ofs.close();
 	}
-	timer::tick("Local_Orbital_Charge","write_dm");
+	ModuleBase::timer::tick("Local_Orbital_Charge","write_dm");
 
     return;
 }

@@ -118,15 +118,15 @@ int Pseudopot_upf::read_pseudo_vwr(std::ifstream &ifs)
 	this->r = new double[mesh];
 	this->rab = new double[mesh];
 	this->vloc = new double[mesh];
-	ZEROS(r,mesh);
-	ZEROS(rab,mesh);
-	ZEROS(vloc,mesh);
+	ModuleBase::GlobalFunc::ZEROS(r,mesh);
+	ModuleBase::GlobalFunc::ZEROS(rab,mesh);
+	ModuleBase::GlobalFunc::ZEROS(vloc,mesh);
 	delete[] rho_at;
 	delete[] rho_atc;
 	rho_at = new double[mesh];
 	rho_atc = new double[mesh];
-	ZEROS(rho_at, mesh);
-	ZEROS(rho_atc, mesh);
+	ModuleBase::GlobalFunc::ZEROS(rho_at, mesh);
+	ModuleBase::GlobalFunc::ZEROS(rho_atc, mesh);
 	// local variables in this function
 	this->vs = new double[mesh];
 	this->vp = new double[mesh];
@@ -134,12 +134,12 @@ int Pseudopot_upf::read_pseudo_vwr(std::ifstream &ifs)
 	this->ws = new double[mesh];
 	this->wp = new double[mesh];
 	this->wd = new double[mesh];
-	ZEROS(vs,mesh);
-	ZEROS(vp,mesh);
-	ZEROS(vd,mesh);
-	ZEROS(ws,mesh);
-	ZEROS(wp,mesh);
-	ZEROS(wd,mesh);
+	ModuleBase::GlobalFunc::ZEROS(vs,mesh);
+	ModuleBase::GlobalFunc::ZEROS(vp,mesh);
+	ModuleBase::GlobalFunc::ZEROS(vd,mesh);
+	ModuleBase::GlobalFunc::ZEROS(ws,mesh);
+	ModuleBase::GlobalFunc::ZEROS(wp,mesh);
+	ModuleBase::GlobalFunc::ZEROS(wd,mesh);
 	std::string line;
 	if(spd_loc>0 && nlcc==0)
 	{
@@ -317,9 +317,9 @@ int Pseudopot_upf::read_pseudo_vwr(std::ifstream &ifs)
 	double* vl = new double[mesh];
 	// tmp wave function (ws, wp or wd with r)
 	double* wlr = new double[mesh];
-	ZEROS(func, mesh);
-	ZEROS(vl, mesh);
-	ZEROS(wlr, mesh);
+	ModuleBase::GlobalFunc::ZEROS(func, mesh);
+	ModuleBase::GlobalFunc::ZEROS(vl, mesh);
+	ModuleBase::GlobalFunc::ZEROS(wlr, mesh);
 	double rcut = 5.0/1.03;
 	GlobalV::ofs_running << std::setw(15) << "RCUT_NL" << std::setw(15) << rcut << std::endl;
 	for(int ib=0; ib<nbeta; ++ib)

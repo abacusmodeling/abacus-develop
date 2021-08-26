@@ -3,7 +3,7 @@
 
 Atom_pseudo::Atom_pseudo()
 {
-	mbl = new Vector3<int>[1];
+	mbl = new ModuleBase::Vector3<int>[1];
 	pseudo_fn = "not_init";
 	mass = 0.0;
 
@@ -22,14 +22,14 @@ Atom_pseudo::~Atom_pseudo()
 
 // mohan add 2021-05-07
 void Atom_pseudo::set_d_so(
-	ComplexMatrix &d_so_in,
+	ModuleBase::ComplexMatrix &d_so_in,
 	const int &nproj_in,
 	const int &nproj_in_so,
 	const bool has_so)
 {
 	if (this->lmax < -1 || this->lmax > 20)
 	{
-		 WARNING_QUIT("Numerical_Nonlocal", "bad input of lmax : should be between -1 and 20");
+		 ModuleBase::WARNING_QUIT("Numerical_Nonlocal", "bad input of lmax : should be between -1 and 20");
 	}
 
 	this->nproj = nproj_in;
@@ -48,7 +48,7 @@ void Atom_pseudo::set_d_so(
 	//2016-07-19 begin, LiuXh
 	if(!has_so)
 	{
-		ZEROS(this->non_zero_count_soc, 4);
+		ModuleBase::GlobalFunc::ZEROS(this->non_zero_count_soc, 4);
 	}
 	else //zhengdy-soc
 	{
@@ -142,10 +142,10 @@ void Atom_pseudo::set_d_so(
 
 void Atom_pseudo::print_atom(std::ofstream &ofs)
 {
-	if(GlobalV::test_atom) TITLE("atom_pseudo","print_atom");
+	if(GlobalV::test_atom) ModuleBase::TITLE("atom_pseudo","print_atom");
 
-	OUT(ofs,"mass",mass);
-	OUT(ofs,"pseudo_fn",pseudo_fn);
+	ModuleBase::GlobalFunc::OUT(ofs,"mass",mass);
+	ModuleBase::GlobalFunc::OUT(ofs,"pseudo_fn",pseudo_fn);
 
 	return;
 }
@@ -153,14 +153,14 @@ void Atom_pseudo::print_atom(std::ofstream &ofs)
 #ifdef __MPI
 void Atom_pseudo::bcast_atom_pseudo(const int &na)
 {
-	TITLE("Atom_pseudo","bcast_atom_pseudo");
+	ModuleBase::TITLE("Atom_pseudo","bcast_atom_pseudo");
 	Parallel_Common::bcast_double( mass );
 	Parallel_Common::bcast_string( pseudo_fn );
 
 	if(GlobalV::MY_RANK!=0)
 	{
 		delete[] mbl;
-		mbl = new Vector3<int>[na];
+		mbl = new ModuleBase::Vector3<int>[na];
 	}
 
 	for(int i=0;i<na;i++)
@@ -174,7 +174,7 @@ void Atom_pseudo::bcast_atom_pseudo(const int &na)
 
 void Atom_pseudo::bcast_atom_pseudo2(void)
 {
-	TITLE("Atom_pseudo","bcast_atom_pseudo2");
+	ModuleBase::TITLE("Atom_pseudo","bcast_atom_pseudo2");
 // == pseudo_h ==
 //int
 	Parallel_Common::bcast_int( lmax );

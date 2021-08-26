@@ -30,7 +30,7 @@ void dscal(const int n,const double &alpha,double *y,const int incy)
 
 // a(i,:) = alpha * a(i,:) where a is a matrix
 // i line
-void dscal(const double &alpha,matrix &a,const int i)
+void dscal(const double &alpha,ModuleBase::matrix &a,const int i)
 {
     int nc = a.nc;
     int nr = a.nr;
@@ -135,7 +135,7 @@ void zaxpy(int n, std::complex < double> alpha,  std::complex < double> *x,
 // y(i,:) = alpha * x + y(i,:) where y is a matrix
 void zaxpy(double alpha,
            std::complex < double> *x,
-           ComplexMatrix &y,
+           ModuleBase::ComplexMatrix &y,
            int i)
 {
     int nr, nc;
@@ -158,7 +158,7 @@ void zaxpy(double alpha,
 
 // y = alpha * x(i,:) + y
 void zaxpy(double alpha,
-           const ComplexMatrix &x,
+           const ModuleBase::ComplexMatrix &x,
            int i,
            std::complex < double> *y)
 {
@@ -179,7 +179,7 @@ void zaxpy(double alpha,
 }
 
 void zaxpy(std::complex < double> alpha,
-           const ComplexMatrix &x,
+           const ModuleBase::ComplexMatrix &x,
            int i,
            std::complex < double> *y)
 {
@@ -201,9 +201,9 @@ void zaxpy(std::complex < double> alpha,
 
 // y(j,:) = alpha * x(i,:) + y(j,:)
 void zaxpy(std::complex < double> alpha,
-           const ComplexMatrix &x,
+           const ModuleBase::ComplexMatrix &x,
            int i,
-           ComplexMatrix &y,
+           ModuleBase::ComplexMatrix &y,
            int j)
 {
     int nr, nc;
@@ -270,7 +270,7 @@ void dcopy(int n, int *x, int incx, int *y, int incy)
 }
 
 /* Copy a(i,:) to y where x is matrix, and y are n-vectors. */
-void dcopy(const matrix &a,
+void dcopy(const ModuleBase::matrix &a,
            int i,
            double *y)
 {
@@ -293,7 +293,7 @@ void dcopy(const matrix &a,
 } // end dcopy
 
 //-------------------------------------
-void dcopy(const matrix &a,
+void dcopy(const ModuleBase::matrix &a,
            int i,
            int *y)
 {
@@ -316,7 +316,7 @@ void dcopy(const matrix &a,
 } // end dcopy
 
 //-----------------------------------------------------------------
-void dcopy(const ComplexMatrix &a,
+void dcopy(const ModuleBase::ComplexMatrix &a,
            int i,
            std::complex < double> *y)
 {
@@ -326,7 +326,7 @@ void dcopy(const ComplexMatrix &a,
 
     if (nr < 1 || nc < 1 || i < 0 || i >= nr)
     {
-        std::cerr << "\n error in dcopy(ComplexMatrix a, int i, std::complex < double> *),"
+        std::cerr << "\n error in dcopy(ModuleBase::ComplexMatrix a, int i, std::complex < double> *),"
              << " nr or nc < 1 or i out of range ";
         return;
     }
@@ -338,7 +338,7 @@ void dcopy(const ComplexMatrix &a,
 } // end dcopy
 
 // ------------------------------------
-void dcopy(double *x, matrix &b, int i)
+void dcopy(double *x, ModuleBase::matrix &b, int i)
 {
     // copy x to ith row of b where b is a matrix and x is a std::vector
     int nr, nc;
@@ -358,7 +358,7 @@ void dcopy(double *x, matrix &b, int i)
     }
 }
 
-void dcopy(std::complex < double> *x, ComplexMatrix &b, int i)
+void dcopy(std::complex < double> *x, ModuleBase::ComplexMatrix &b, int i)
 {
     // copy x to ith row of b where b is a std::complex matrix and x is a std::vector
     int nr, nc;
@@ -367,7 +367,7 @@ void dcopy(std::complex < double> *x, ComplexMatrix &b, int i)
 
     if (nr < 1 || nc < 1 || i < 0 || i >= nr)
     {
-        std::cerr << "\n error in dcopy(double> *x, ComplexMatrix &b, int i), "
+        std::cerr << "\n error in dcopy(double> *x, ModuleBase::ComplexMatrix &b, int i), "
              << "nr or nc < 1 or i out of range ";
         return;
     }
@@ -379,9 +379,9 @@ void dcopy(std::complex < double> *x, ComplexMatrix &b, int i)
 }
 
 // b(j,:) = a(i,:)
-void dcopy(const matrix &a,
+void dcopy(const ModuleBase::matrix &a,
            int i,
-           matrix &b,
+           ModuleBase::matrix &b,
            int j)
 {
     int nr, nc;
@@ -401,9 +401,9 @@ void dcopy(const matrix &a,
     }
 }
 
-void dcopy(const ComplexMatrix &a,
+void dcopy(const ModuleBase::ComplexMatrix &a,
            int i,
-           ComplexMatrix &b,
+           ModuleBase::ComplexMatrix &b,
            int j)
 {
     int nr, nc;
@@ -412,7 +412,7 @@ void dcopy(const ComplexMatrix &a,
 
     if (nr < 1 || nc < 1 || i < 0 || i >= nr)
     {
-        std::cerr << "\n error in dcopy(ComplexMatrix a, int i,ComplexMatrix &b, int j), "
+        std::cerr << "\n error in dcopy(ModuleBase::ComplexMatrix a, int i,ModuleBase::ComplexMatrix &b, int j), "
              << " nr or nc < 1 or i out of range ";
         return;
     }
@@ -424,9 +424,9 @@ void dcopy(const ComplexMatrix &a,
 }
 
 void dcopy(int n,
-           const ComplexMatrix &a,
+           const ModuleBase::ComplexMatrix &a,
            int inca,
-           ComplexMatrix &b,
+           ModuleBase::ComplexMatrix &b,
            int i,
            int incb)
 {
@@ -438,7 +438,7 @@ void dcopy(int n,
 //-------------------------------------------------------------------
 //void dsytrf(char uplo,  int  n,  double  *a,  int  lda,  int *ipivot,
 //			int *info)
-void dsytrf(char , int iter_used, matrix beta, int maxter, int *iwork,
+void dsytrf(char , int iter_used, ModuleBase::matrix beta, int maxter, int *iwork,
             double *work, int , int &info)
 {
     // dsytrf computes the factorization of a real symmetric matrix
@@ -564,7 +564,7 @@ void dsytrf(char , int iter_used, matrix beta, int maxter, int *iwork,
 //--------------------------------------------------------------------
 //void dsytri(char uplo,  int  n,  double  *a,  int  lda,  int
 //             *ipivot, int *info)
-void dsytri(char, int iter_used, matrix beta, int maxter, int *iwork,
+void dsytri(char, int iter_used, ModuleBase::matrix beta, int maxter, int *iwork,
             double *work, int &info)
 {
     std::cout << "\n do nothing, in dsytri() ";
@@ -674,7 +674,7 @@ std::complex < double> ddot(int n,
 } // end zdotc
 
 // -----------------------------------------------------------------------
-std::complex < double> ddot(const ComplexMatrix &a,
+std::complex < double> ddot(const ModuleBase::ComplexMatrix &a,
                        int i,
                        std::complex < double> *y)
 {
@@ -703,7 +703,7 @@ std::complex < double> ddot(const ComplexMatrix &a,
 }
 
 //--------------------------------
-double ddot(const matrix &a,
+double ddot(const ModuleBase::matrix &a,
             int i,
             double  *y)
 {
@@ -727,9 +727,9 @@ double ddot(const matrix &a,
     return z;
 }
 
-double ddot(const matrix &a,
+double ddot(const ModuleBase::matrix &a,
             int i,
-            const matrix &b,
+            const ModuleBase::matrix &b,
             int j)
 {
     int nr, nc;
@@ -776,7 +776,7 @@ double dnrm2(const int n, const double *x, const int incx)
 }
 
 // i-row of matrix a
-double dnrm2(const matrix &a,
+double dnrm2(const ModuleBase::matrix &a,
              int i)
 {
     int nc, nr;
@@ -807,13 +807,13 @@ void zgemm(char tra,
            std::complex < double> alpha,
            const std::complex<double> *a,
            int lda,
-           const ComplexMatrix &b,
+           const ModuleBase::ComplexMatrix &b,
            int ldb,
            std::complex < double> beta,
            std::complex<double> *c,
            int ldc)
 {
-	TITLE("myfunc5","zgemm1");
+	ModuleBase::TITLE("myfunc5","zgemm1");
     //int nra=1;
 	int nca=k;
 	int nrb=b.nr;
@@ -860,9 +860,9 @@ void zgemm(char tra,
         }
     }
 
-	//WARNING_QUIT("reset zgemm","reset zgemm");
+	//ModuleBase::WARNING_QUIT("reset zgemm","reset zgemm");
 //    zgemm_(&tra, &trb, &m, &n, &k, alpha0, aux, &lda, bux, &ldb, beta0, cux, &ldc);
-	WARNING_QUIT("myfunc_5::zgemm","please don't ever use it again.");
+	ModuleBase::WARNING_QUIT("myfunc_5::zgemm","please don't ever use it again.");
 
     for (i = 0; i < ncc; i++)
     {
@@ -884,13 +884,13 @@ void zgemm(char tra,
            std::complex < double> alpha,
            const std::complex<double> *a,
            int lda,
-           const ComplexMatrix &b,
+           const ModuleBase::ComplexMatrix &b,
            int ldb,
            std::complex < double> beta,
-           ComplexMatrix &c,
+           ModuleBase::ComplexMatrix &c,
            int ldc)
 {
-    TITLE("myfunc5","zgemm2");
+    ModuleBase::TITLE("myfunc5","zgemm2");
     //int nra = 1;
 	int nca = k;
 	int nrb = b.nr;
@@ -937,9 +937,9 @@ void zgemm(char tra,
         }
     }
 
-	//WARNING_QUIT("reset zgemm","reset zgemm");
+	//ModuleBase::WARNING_QUIT("reset zgemm","reset zgemm");
     //zgemm_(&tra, &trb, &m, &n, &k, alpha0, aux, &lda, bux, &ldb, beta0, cux, &ldc);
-	WARNING_QUIT("myfunc_5::zgemm","please don't ever use it again.");
+	ModuleBase::WARNING_QUIT("myfunc_5::zgemm","please don't ever use it again.");
 
     for (i = 0; i < ncc; i++)
     {
@@ -965,15 +965,15 @@ void zgemm(char tra,
            int n,
            int k,
            std::complex < double> alpha,
-           const ComplexMatrix &a,
+           const ModuleBase::ComplexMatrix &a,
            int lda,
-           const ComplexMatrix &b,
+           const ModuleBase::ComplexMatrix &b,
            int ldb,
            std::complex < double> beta,
-           ComplexMatrix &c,
+           ModuleBase::ComplexMatrix &c,
            int ldc)
 {
-//	TITLE("myfunc5","zgemm3");
+//	ModuleBase::TITLE("myfunc5","zgemm3");
     int nra, nca, nrb, ncb, nrc, ncc ;
     nra = a.nr,   nca = a.nc;
     nrb = b.nr,   ncb = b.nc;
@@ -1022,9 +1022,9 @@ void zgemm(char tra,
         }
     }
 
-	//WARNING_QUIT("reset zgemm","reset zgemm");
+	//ModuleBase::WARNING_QUIT("reset zgemm","reset zgemm");
     //zgemm_(&tra, &trb, &m, &n, &k, alpha0, aux, &lda, bux, &ldb, beta0, cux, &ldc);
-	WARNING_QUIT("myfunc_5::zgemm","please don't ever use it again.");
+	ModuleBase::WARNING_QUIT("myfunc_5::zgemm","please don't ever use it again.");
 
     for (i = 0; i < ncc; i++)
     {
@@ -1044,11 +1044,11 @@ void zgemm(char tra,
 
 // C = alpha * op(A) * op(B) + beta * C
 void dgemm(char tra, char trb, int m, int n, int k, double alpha,
-           const matrix  a, int lda, const matrix b, int ldb, double beta,
-           matrix &c, int ldc)
+           const ModuleBase::matrix  a, int lda, const ModuleBase::matrix b, int ldb, double beta,
+           ModuleBase::matrix &c, int ldc)
 {
 //    std::cout << "\n === ZGEMM() ===" << std::endl;
-    matrix a1;
+    ModuleBase::matrix a1;
 
     if (tra == 'n' || tra == 'N')
         a1.create(a.nr, a.nc);
@@ -1085,7 +1085,7 @@ int ILAENV(int ispec, char *name, char *opts,
 void ZHPEV(int ,
            std::complex < double> *hp,
            double *e,
-           ComplexMatrix &v,
+           ModuleBase::ComplexMatrix &v,
            int ldh,
            int n,
            std::complex < double> *aux,
@@ -1101,19 +1101,19 @@ std::complex < double> ZDOTU(int nstart,
                         int npwx)
 {
     std::cout << "\n do nothing in ZDOTU(), only return ZERO,";
-    return ZERO;
+    return ModuleBase::ZERO;
 }
 
 void zgemv(char ,
            int ,
            int ,
            std::complex < double> alpha ,
-           ComplexMatrix overlap,
+           ModuleBase::ComplexMatrix overlap,
            int ,
            std::complex < double> swfcatom ,
            int npwx,
            std::complex < double>  ,
-           ComplexMatrix work, int)
+           ModuleBase::ComplexMatrix work, int)
 {
     std::cout << "\n do nothing, in dgemv () ";
 }
@@ -1124,9 +1124,9 @@ void ZHEGVX(int itype,
             char range ,
             char uplo ,
             const int n,
-            const ComplexMatrix &a,
+            const ModuleBase::ComplexMatrix &a,
             const int lda,
-            const ComplexMatrix &b,
+            const ModuleBase::ComplexMatrix &b,
             const int ldb,
             double vl,
             double vu,
@@ -1135,7 +1135,7 @@ void ZHEGVX(int itype,
             double abstol,
             int &m,
             double *w,
-            ComplexMatrix &z,
+            ModuleBase::ComplexMatrix &z,
             const int ldz,
             double *work,
             int lwork,
@@ -1144,7 +1144,7 @@ void ZHEGVX(int itype,
             int *ifail,
             int &info )
 {
-//	TITLE("myfunc5","ZHEGVX");
+//	ModuleBase::TITLE("myfunc5","ZHEGVX");
     double *aux, *bux, *zux;
     aux = new double[2*lda*n];//mohan fix + --> * 2007-10-22
     bux = new double[2*ldb*n];

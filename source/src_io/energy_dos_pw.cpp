@@ -4,7 +4,7 @@
 
 void energy::perform_dos_pw(void)
 {
-	TITLE("energy","perform_dos_pw");
+	ModuleBase::TITLE("energy","perform_dos_pw");
 
 	if(out_dos !=0 || out_band !=0)
     {
@@ -55,7 +55,7 @@ void energy::perform_dos_pw(void)
 						<<std::setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<std::endl;
 						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
-							ofsi2<<std::setw(6)<<ib+1<<std::setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV<<std::setw(25)<<GlobalC::wf.wg(ik,ib)<<std::endl;
+							ofsi2<<std::setw(6)<<ib+1<<std::setw(25)<<GlobalC::wf.ekb[ik][ib]* ModuleBase::Ry_to_eV<<std::setw(25)<<GlobalC::wf.wg(ik,ib)<<std::endl;
 						}
 						ofsi2 <<std::endl;
 						ofsi2 <<std::endl;
@@ -80,9 +80,9 @@ void energy::perform_dos_pw(void)
 						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
 							ofsi2<<std::setw(6)<<ib+1
-							<<std::setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV
+							<<std::setw(25)<<GlobalC::wf.ekb[ik][ib]* ModuleBase::Ry_to_eV
 							<<std::setw(25)<<GlobalC::wf.wg(ik,ib)
-							<<std::setw(25)<<GlobalC::wf.ekb[(ik+GlobalC::kv.nks/2)][ib]* Ry_to_eV
+							<<std::setw(25)<<GlobalC::wf.ekb[(ik+GlobalC::kv.nks/2)][ib]* ModuleBase::Ry_to_eV
 							<<std::setw(25)<<GlobalC::wf.wg(ik+GlobalC::kv.nks/2,ib)<<std::endl;
 						}
 						ofsi2 <<std::endl;
@@ -120,8 +120,8 @@ void energy::perform_dos_pw(void)
 		Parallel_Reduce::gather_min_double_all(emin);
 #endif
 
-		emax *= Ry_to_eV;
-		emin *= Ry_to_eV;
+		emax *= ModuleBase::Ry_to_eV;
+		emin *= ModuleBase::Ry_to_eV;
 
 //scale up a little bit so the end peaks are displaced better
 		const double scl=this->dos_scale;
@@ -130,8 +130,8 @@ void energy::perform_dos_pw(void)
 		emax=emax+delta/2.0;
 		emin=emin-delta/2.0;
 
-				OUT(GlobalV::ofs_running,"minimal energy is (eV)", emin);
-				OUT(GlobalV::ofs_running,"maximal energy is (eV)", emax);
+				ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"minimal energy is (eV)", emin);
+				ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"maximal energy is (eV)", emax);
 		// 		atom_arrange::set_sr_NL();
 		//		atom_arrange::search( GlobalV::SEARCH_RADIUS );//qifeng-2019-01-21
 		

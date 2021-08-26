@@ -51,8 +51,8 @@ private:
 	{
 		K_Vectors *kv_ptr;
 		wavefunc *wf_ptr;
-		matrix wf_wg;
-		ComplexMatrix *hvec_array;
+		ModuleBase::matrix wf_wg;
+		ModuleBase::ComplexMatrix *hvec_array;		
 	} *k_pack, *q_pack;
 
 	int iq_vecik;
@@ -86,10 +86,10 @@ private:
 		const int ik,
 		const int nstart,
 		const int n_band,
-		const ComplexMatrix &psi,
-		ComplexMatrix &evc,
-		double *en);
-
+		const ModuleBase::ComplexMatrix &psi,
+		ModuleBase::ComplexMatrix &evc,
+		double *en);	
+	
 public:
 
 	PW_Basis *pw_ptr;

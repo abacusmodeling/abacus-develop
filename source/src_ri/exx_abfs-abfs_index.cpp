@@ -1,10 +1,10 @@
 #include "exx_abfs-abfs_index.h"
 #include "../module_orbital/ORB_read.h"
 
-Element_Basis_Index::Range
+ModuleBase::Element_Basis_Index::Range
 	Exx_Abfs::Abfs_Index::construct_range( const LCAO_Orbitals &orb )
 {
-	Element_Basis_Index::Range range;
+	ModuleBase::Element_Basis_Index::Range range;
 	range.resize( orb.get_ntype() );
 	for( size_t T=0; T!=range.size(); ++T )
 	{
@@ -19,10 +19,10 @@ Element_Basis_Index::Range
 }
 
 
-Element_Basis_Index::Range
+ModuleBase::Element_Basis_Index::Range
 	Exx_Abfs::Abfs_Index::construct_range( const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orb )
 {
-	Element_Basis_Index::Range range;
+	ModuleBase::Element_Basis_Index::Range range;
 	range.resize( orb.size() );
 	for( size_t T=0; T!=range.size(); ++T )
 	{

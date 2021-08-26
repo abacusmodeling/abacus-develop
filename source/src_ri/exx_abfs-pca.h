@@ -15,18 +15,18 @@
 class Exx_Abfs::PCA
 {
 public:
-	static std::vector<std::vector<std::pair<std::vector<double>,matrix>>> cal_PCA( 
+	static std::vector<std::vector<std::pair<std::vector<double>,ModuleBase::matrix>>> cal_PCA( 
 		const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &lcaos, 
 		const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &abfs,		// abfs must be orthonormal
 		const double kmesh_times );
 private:
-	static matrix get_sub_matrix( 
-		const matrix & m,
+	static ModuleBase::matrix get_sub_matrix( 
+		const ModuleBase::matrix & m,
 		const size_t & T,
 		const size_t & L,
-		const Element_Basis_Index::Range & range,
-		const Element_Basis_Index::IndexLNM & index );
-	static matrix get_column_mean0_matrix( const matrix & m );
+		const ModuleBase::Element_Basis_Index::Range & range,
+		const ModuleBase::Element_Basis_Index::IndexLNM & index );
+	static ModuleBase::matrix get_column_mean0_matrix( const ModuleBase::matrix & m );
 };
 
 #endif	// EXX_ABFS_PCA_H

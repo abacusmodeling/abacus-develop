@@ -5,6 +5,8 @@
 #include "global_variable.h"
 #endif
 
+namespace ModuleBase
+{
 //==========================================================
 // GLOBAL FUNCTION :
 // NAME : TITLE( title for each function )
@@ -49,4 +51,6 @@ void TITLE(std::ofstream &ofs,const std::string &class_name,const std::string &f
 	}
 #endif
     return;
+}
+
 }

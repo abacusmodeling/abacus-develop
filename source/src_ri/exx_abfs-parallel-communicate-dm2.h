@@ -15,14 +15,14 @@ public:
 		const set<std::pair<size_t,size_t>> &H_atom_pairs_core,
 		const double threshold_in);
 	void clear_DMr();
-	void set_DM_gamma( const matrix &DM_2D, const int is, const std::pair<int,int> &index_begin );
+	void set_DM_gamma( const ModuleBase::matrix &DM_2D, const int is, const std::pair<int,int> &index_begin );
 	
 	void cal_DM_k( 
 		const Abfs::Vector3_Order<int> &Born_von_Karman_period,
 		const set<std::pair<size_t,size_t>> &H_atom_pairs_core,
 		const double threshold );
 
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> DMr;
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> DMr;
 	
 private:
 

@@ -13,7 +13,7 @@ ELEC_nscf::~ELEC_nscf(){}
 
 void ELEC_nscf::nscf(LCAO_Hamilt &uhm)
 {
-	TITLE("ELEC_nscf","nscf");
+	ModuleBase::TITLE("ELEC_nscf","nscf");
 
 	std::cout << " NON-SELF CONSISTENT CALCULATIONS" << std::endl;
 	
@@ -44,7 +44,7 @@ void ELEC_nscf::nscf(LCAO_Hamilt &uhm)
 	}
 
 	time_t time_finish=std::time(NULL);
-	OUT_TIME("cal_bands",time_start, time_finish);
+	ModuleBase::GlobalFunc::OUT_TIME("cal_bands",time_start, time_finish);
 
     GlobalV::ofs_running << " end of band structure calculation " << std::endl;
     GlobalV::ofs_running << " band eigenvalue in this processor (eV) :" << std::endl;
@@ -71,7 +71,7 @@ void ELEC_nscf::nscf(LCAO_Hamilt &uhm)
         {			
             GlobalV::ofs_running << " spin" << GlobalC::kv.isk[ik]+1 
 			<< "final_state " << ib+1 << " " 
-			<< GlobalC::wf.ekb[ik][ib] * Ry_to_eV 
+			<< GlobalC::wf.ekb[ik][ib] * ModuleBase::Ry_to_eV 
 			<< " " << GlobalC::wf.wg(ik, ib)*GlobalC::kv.nks << std::endl;
         }
 		GlobalV::ofs_running << std::endl;

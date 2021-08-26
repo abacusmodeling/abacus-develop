@@ -11,8 +11,8 @@ Optical::~Optical(){}
 void Optical::cal_epsilon2(const int &nbands)
 {
 	if(!Optical::opt_epsilon2) return;
-	TITLE("Optical","cal_epsilon2");
-	timer::tick("Optical","cal_epsilon2");
+	ModuleBase::TITLE("Optical","cal_epsilon2");
+	ModuleBase::timer::tick("Optical","cal_epsilon2");
 
 	if(Optical::opt_nbands > GlobalV::NBANDS)
 	{
@@ -52,8 +52,8 @@ void Optical::cal_epsilon2(const int &nbands)
 	Parallel_Reduce::gather_min_double_all( mine );
 #endif
 
-	maxe *= Ry_to_eV;
-	mine *= Ry_to_eV;
+	maxe *= ModuleBase::Ry_to_eV;
+	mine *= ModuleBase::Ry_to_eV;
 
 	double range = maxe - mine;
 	int np = int(range / de) + 1; 
@@ -67,16 +67,16 @@ void Optical::cal_epsilon2(const int &nbands)
 	std::cout << " energy range = " << maxe - mine << std::endl;
 	std::cout << " de = " << de << " points = " << np << std::endl;
 
-	OUT(GlobalV::ofs_running,"n_occ",n_occ);
-	OUT(GlobalV::ofs_running,"nbands for optical",opt_nbands);
-	OUT(GlobalV::ofs_running,"max energy",maxe);
-	OUT(GlobalV::ofs_running,"min energy",mine);
-	OUT(GlobalV::ofs_running,"energy range",maxe-mine);
-	OUT(GlobalV::ofs_running,"de",de);
-	OUT(GlobalV::ofs_running,"points",np);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"n_occ",n_occ);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nbands for optical",opt_nbands);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"max energy",maxe);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"min energy",mine);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"energy range",maxe-mine);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"de",de);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"points",np);
 
 	double *epsilon2 = new double[np];
-	ZEROS(epsilon2, np);
+	ModuleBase::GlobalFunc::ZEROS(epsilon2, np);
 
 	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
@@ -86,7 +86,7 @@ void Optical::cal_epsilon2(const int &nbands)
 			for(int ic=n_occ; ic<opt_nbands; ic++)
 			{
 				const double ec = GlobalC::wf.ekb[ik][ic];
-				const int ie = int((ec - ev)*Ry_to_eV/de);
+				const int ie = int((ec - ev)*ModuleBase::Ry_to_eV/de);
 				assert(ie < np);
 				epsilon2[ie] += GlobalC::kv.wk[ik] * this->element_cvk(ik, iv, ic);
 			}
@@ -109,7 +109,7 @@ void Optical::cal_epsilon2(const int &nbands)
 		ofs.close();
 	}
 
-	timer::tick("Optical","cal_epsilon2");
+	ModuleBase::timer::tick("Optical","cal_epsilon2");
 	return;
 }
 
@@ -119,7 +119,7 @@ double Optical::element_cvk(const int &ik, const int &iv, const int &ic)
 	double v=0.0;
 
 	std::complex<double> tmp[3];
-	ZEROS(tmp, 3);
+	ModuleBase::GlobalFunc::ZEROS(tmp, 3);
 	for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 	{
 		const std::complex<double> uvc = conj( GlobalC::wf.evc[ik](ic,ig) ) * GlobalC::wf.evc[ik](iv, ig);

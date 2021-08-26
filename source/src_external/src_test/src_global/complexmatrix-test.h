@@ -9,7 +9,7 @@
 #include "../../../module_base/complexmatrix.h"
 #include<limits>
 
-static std::ostream & operator<<( std::ostream & os, const ComplexMatrix & m )
+static std::ostream & operator<<( std::ostream & os, const ModuleBase::ComplexMatrix & m )
 {
 	for( int ir=0; ir!=m.nr; ++ir )
 	{

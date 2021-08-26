@@ -69,7 +69,7 @@ class ORB_table_phi
 		const int &Lmax_exx);
 
 	// Peize Lin add 2017-04-24, and change all jlx in this class
-	Sph_Bessel_Recursive::D2* pSB = nullptr;
+	ModuleBase::Sph_Bessel_Recursive::D2* pSB = nullptr;
 
 	///
 	/// make the index, in order to get the element from Table_SR and Table_TR quickly.
@@ -87,9 +87,9 @@ class ORB_table_phi
 	void init_OV_Opair(LCAO_Orbitals& orb);
 
 	int OV_nTpairs;
-    IntArray OV_Tpair;
-    IntArray OV_Opair;
-    IntArray OV_L2plus1;
+    ModuleBase::IntArray OV_Tpair;
+    ModuleBase::IntArray OV_Opair;
+    ModuleBase::IntArray OV_L2plus1;
 
 	static int get_rmesh( const double &R1, const double &R2);
 

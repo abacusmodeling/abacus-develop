@@ -80,11 +80,11 @@ std::vector<std::vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 		
 		if( "Element"==word )
 		{
-			READ_VALUE( ifs, label );
+			ModuleBase::GlobalFunc::READ_VALUE( ifs, label );
 		}
 		else if ( "Lmax"==word )
 		{
-			READ_VALUE( ifs, L_size );
+			ModuleBase::GlobalFunc::READ_VALUE( ifs, L_size );
 			
 			if( L_size>=9 )
 			{
@@ -95,39 +95,39 @@ std::vector<std::vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 		}
 		else if ( "Sorbital-->"==word )
 		{
-			READ_VALUE( ifs, N_size[0] );
+			ModuleBase::GlobalFunc::READ_VALUE( ifs, N_size[0] );
 		}
 		else if ( "Porbital-->"==word )
 		{
-			READ_VALUE( ifs, N_size[1] );
+			ModuleBase::GlobalFunc::READ_VALUE( ifs, N_size[1] );
 		}
 		else if ( "Dorbital-->"==word )
 		{
-			READ_VALUE( ifs, N_size[2] );
+			ModuleBase::GlobalFunc::READ_VALUE( ifs, N_size[2] );
 		}
 		else if ( "Forbital-->"==word )
 		{
-			READ_VALUE( ifs, N_size[3] );
+			ModuleBase::GlobalFunc::READ_VALUE( ifs, N_size[3] );
 		}
 		else if ( "Gorbital-->"==word )
 		{
-			READ_VALUE( ifs, N_size[4] );
+			ModuleBase::GlobalFunc::READ_VALUE( ifs, N_size[4] );
 		}
 		else if ( "Horbital-->"==word )
 		{
-			READ_VALUE( ifs, N_size[5] );
+			ModuleBase::GlobalFunc::READ_VALUE( ifs, N_size[5] );
 		}
 		else if ( "Iorbital-->"==word )
 		{
-			READ_VALUE( ifs, N_size[6] );
+			ModuleBase::GlobalFunc::READ_VALUE( ifs, N_size[6] );
 		}
 		else if ( "Jorbital-->"==word )
 		{
-			READ_VALUE( ifs, N_size[7] );
+			ModuleBase::GlobalFunc::READ_VALUE( ifs, N_size[7] );
 		}
 		else if ( "Korbital-->"==word )
 		{
-			READ_VALUE( ifs, N_size[8] );
+			ModuleBase::GlobalFunc::READ_VALUE( ifs, N_size[8] );
 		}
 		else if ( "END"==word )
 		{
@@ -135,10 +135,10 @@ std::vector<std::vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 		}		
 	}
 	
-	CHECK_NAME(ifs, "Mesh");
+	ModuleBase::CHECK_NAME(ifs, "Mesh");
 	ifs >> meshr;
 	
-	CHECK_NAME(ifs, "dr");
+	ModuleBase::CHECK_NAME(ifs, "dr");
 	ifs >> dr;
 
 	while(ifs.good())
@@ -213,7 +213,7 @@ std::vector<std::vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 				inner[ir] = psir[ir] * psir[ir];
 			}
 			double unit = 0.0;	
-			Integral::Simpson_Integral(meshr, VECTOR_TO_PTR(inner), VECTOR_TO_PTR(rab), unit);
+			ModuleBase::Integral::Simpson_Integral(meshr, ModuleBase::GlobalFunc::VECTOR_TO_PTR(inner), ModuleBase::GlobalFunc::VECTOR_TO_PTR(rab), unit);
 			for( int ir=0; ir!=meshr; ++ir )
 			{
 				psis[L][N][ir] /= sqrt(unit);
@@ -239,10 +239,10 @@ std::vector<std::vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 				L, //angular momentum L
 				N, // number of orbitals of this L
 				meshr, // number of radial mesh
-				VECTOR_TO_PTR(rab),
-				VECTOR_TO_PTR(radial),// radial mesh value(a.u.)
+				ModuleBase::GlobalFunc::VECTOR_TO_PTR(rab),
+				ModuleBase::GlobalFunc::VECTOR_TO_PTR(radial),// radial mesh value(a.u.)
 				Numerical_Orbital_Lm::Psi_Type::Psi,
-				VECTOR_TO_PTR(psis[L][N]), // radial wave function
+				ModuleBase::GlobalFunc::VECTOR_TO_PTR(psis[L][N]), // radial wave function
 				nk,
 				dk,
 				dr_uniform,
@@ -256,13 +256,13 @@ std::vector<std::vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 
 void Exx_Abfs::IO::print_matrix( 
 		const std::string &file_name_prefix, 
-		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &matrixes_Q, 
-		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &matrixes_S,
-		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &matrixes_V,
-		const Element_Basis_Index::Range &range_jles, 
-		const Element_Basis_Index::IndexLNM &index_jles, 
-		const Element_Basis_Index::Range &range_lcaos,
-		const Element_Basis_Index::IndexLNM &index_lcaos )
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> &matrixes_Q, 
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> &matrixes_S,
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> &matrixes_V,
+		const ModuleBase::Element_Basis_Index::Range &range_jles, 
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_jles, 
+		const ModuleBase::Element_Basis_Index::Range &range_lcaos,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_lcaos )
 {
 	auto print_header = [&]( std::ofstream &ofs, size_t TA, size_t IA, size_t TB, size_t IB )
 	{
@@ -339,8 +339,8 @@ void Exx_Abfs::IO::print_matrix(
 		const size_t nwfc = (TA==TB && IA==IB) ? cal_sum_M(TA) : cal_sum_M(TA)+cal_sum_M(TB);
 		ofs	<< nwfc << " nwfc" << std::endl;
 		
-		const size_t ecut_numberA = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * GlobalC::ORB.Phi[TA].getRcut() / PI ); // Rydberg Unit
-		const size_t ecut_numberB = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * GlobalC::ORB.Phi[TB].getRcut() / PI ); // Rydberg Unit
+		const size_t ecut_numberA = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * GlobalC::ORB.Phi[TA].getRcut() / ModuleBase::PI ); // Rydberg Unit
+		const size_t ecut_numberB = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * GlobalC::ORB.Phi[TB].getRcut() / ModuleBase::PI ); // Rydberg Unit
 		assert( ecut_numberA == ecut_numberB );
 		ofs	<< ecut_numberA << " ne" << std::endl;
 		
@@ -371,7 +371,7 @@ void Exx_Abfs::IO::print_matrix(
 							for( size_t NB=0; NB!=range_lcaos[TB][LB].N; ++NB )	
 								for( size_t MB=0; MB!=range_lcaos[TB][LB].M; ++MB )
 								{
-									const std::vector<matrix> & matrix_Q = matrixes_Q.at(TA).at(IA).at(TB).at(IB);
+									const std::vector<ModuleBase::matrix> & matrix_Q = matrixes_Q.at(TA).at(IA).at(TB).at(IB);
 									const size_t index_lcao 
 										= Exx_Abfs::Abfs_Index::get_index_index( 
 											index_lcaos,TA,LA,NA,MA, 
@@ -412,7 +412,7 @@ void Exx_Abfs::IO::print_matrix(
 		---------------------*/		
 		auto q1q2 = [&]( size_t T1, size_t I1, size_t T2, size_t I2, size_t L1, size_t M1, size_t L2, size_t M2)
 		{
-			const matrix & matrix_S = matrixes_S.at(T1).at(I1).at(T2).at(I2);
+			const ModuleBase::matrix & matrix_S = matrixes_S.at(T1).at(I1).at(T2).at(I2);
 			for( size_t N1=0; N1!=range_jles[T1][L1].N; ++N1)
 				for( size_t N2=0; N2!=range_jles[T2][L2].N; ++N2)
 					ofs<< matrix_S( index_jles[T1][L1][N1][M1], index_jles[T2][L2][N2][M2] ) * scale << "\t" << 0.0 * scale << std::endl;
@@ -468,7 +468,7 @@ void Exx_Abfs::IO::print_matrix(
 		---------------------*/
 		ofs << "<OVERLAP_V>" << std::endl;
 		
-		const matrix & matrix_V = matrixes_V.at(TA).at(IA).at(TB).at(IB);
+		const ModuleBase::matrix & matrix_V = matrixes_V.at(TA).at(IA).at(TB).at(IB);
 		
 		for( int ik=0; ik!=GlobalC::kv.nkstot; ++ik )
 	//		for ib = 0 to GlobalV::NBANDS
@@ -499,7 +499,7 @@ void Exx_Abfs::IO::print_matrix(
 			{
 				for( size_t IB=((TB==TA)?IA:0); IB!=GlobalC::ucell.atoms[TB].na; ++IB )
 				{
-					std::ofstream ofs(( file_name_prefix+"matrix_"+TO_STRING(TA)+"_"+TO_STRING(IA)+"_"+TO_STRING(TB)+"_"+TO_STRING(IB) ).c_str());
+					std::ofstream ofs(( file_name_prefix+"matrix_"+ModuleBase::GlobalFunc::TO_STRING(TA)+"_"+ModuleBase::GlobalFunc::TO_STRING(IA)+"_"+ModuleBase::GlobalFunc::TO_STRING(TB)+"_"+ModuleBase::GlobalFunc::TO_STRING(IB) ).c_str());
 					print_header( ofs, TA, IA, TB, IB );
 //					const double scale = 1.0 / max( matrixes_V.at(TA).at(IA).at(TB).at(IB) );
 					const double scale = 1;		// Peize Lin test

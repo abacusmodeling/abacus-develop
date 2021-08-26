@@ -48,10 +48,10 @@ class LCAO_Matrix
 	std::complex<double> *Hloc_fixed2;
 	std::complex<double> *Sdiag2; // used in pdiag_double.cpp
 	//with soc, zhengdy-soc
-/*	ComplexMatrix Hloc2_soc;
-	ComplexMatrix Sloc2_soc;
-	ComplexMatrix Hloc_fixed2_soc;
-	ComplexMatrix Sdiag2_soc;*/
+/*	ModuleBase::ComplexMatrix Hloc2_soc;
+	ModuleBase::ComplexMatrix Sloc2_soc;
+	ModuleBase::ComplexMatrix Hloc_fixed2_soc;
+	ModuleBase::ComplexMatrix Sdiag2_soc;*/
 
 
 	//------------------------------
@@ -155,56 +155,17 @@ class LCAO_Matrix
 	double* DHloc_fixed_33;
 
 
-	//------------------------------------------------------
-	// DESCRIPTION:
-	// set 'dtype' matrix element (iw1_all, iw2_all) with
-	// an input value 'v'
-	//------------------------------------------------------
-	void set_HSgamma(
-		const int &iw1_all,
-		const int &iw2_all,
-		const double &v,
-		const char &dtype);
+	void set_HSgamma(const int &iw1_all, const int &iw2_all, const double &v, const char &dtype);
+	void set_HSk(const int &iw1_all, const int &iw2_all, const std::complex<double> &v, const char &dtype, const int spin = 0);
 
-	void set_HSk(
-		const int &iw1_all,
-		const int &iw2_all,
-		const complex<double> &v,
-		const char &dtype,
-		const int spin = 0);
+	void set_force (const int& iw1_all, const int& iw2_all, const double& vx, const double& vy, 
+		const double& vz, const char &dtype);
+	void set_stress (const int& iw1_all, const int& iw2_all, const double& vx, const double& vy,
+		const double& vz, const char &dtype, const ModuleBase::Vector3<double> &dtau);
 
-	void set_force (
-		const int& iw1_all,
-		const int& iw2_all,
-		const double& vx,
-		const double& vy,
-		const double& vz,
-		const char &dtype);
-
-	void set_stress (
-		const int& iw1_all,
-		const int& iw2_all,
-		const double& vx,
-		const double& vy,
-		const double& vz,
-		const char &dtype,
-		const Vector3<double> &dtau);
-
-	void set_HR_tr(
-		const int &Rx,
-		const int &Ry,
-		const int &Rz,
-		const int &iw1_all,
-		const int &iw2_all,
-		const double &v);
-
-	void set_HR_tr_soc(
-		const int &Rx,
-		const int &Ry,
-		const int &Rz,
-		const int &iw1_all,
-		const int &iw2_all,
-		const complex<double> &v); //LiuXh add 2019-07-16
+	void set_HR_tr(const int &Rx, const int &Ry, const int &Rz, const int &iw1_all, const int &iw2_all, const double &v);
+	void set_HR_tr_soc(const int &Rx, const int &Ry, const int &Rz, 
+		const int &iw1_all, const int &iw2_all, const std::complex<double> &v); //LiuXh add 2019-07-16
 
 	void zeros_HSgamma(const char &mtype);
 	void zeros_HSk(const char &mtype);

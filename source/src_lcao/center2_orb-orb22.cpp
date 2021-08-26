@@ -46,7 +46,7 @@ void Center2_Orb::Orb22::init_radial_table()
 			nB_short.getRab(),
 			nB_short.getRadial(),
 			Numerical_Orbital_Lm::Psi_Type::Psi,
-			VECTOR_TO_PTR(nB_tmp),
+			ModuleBase::GlobalFunc::VECTOR_TO_PTR(nB_tmp),
 			nB_short.getNk(),
 			nB_short.getDk(),
 			nB_short.getDruniform(),
@@ -86,7 +86,7 @@ void Center2_Orb::Orb22::init_radial_table( const std::set<size_t> &radials )
 			nB_short.getRab(),
 			nB_short.getRadial(),
 			Numerical_Orbital_Lm::Psi_Type::Psi,
-			VECTOR_TO_PTR(nB_tmp),
+			ModuleBase::GlobalFunc::VECTOR_TO_PTR(nB_tmp),
 			nB_short.getNk(),
 			nB_short.getDk(),
 			nB_short.getDruniform(),
@@ -100,7 +100,7 @@ void Center2_Orb::Orb22::init_radial_table( const std::set<size_t> &radials )
 }
 
 double Center2_Orb::Orb22::cal_overlap(
-	const Vector3<double> &RA, const Vector3<double> &RB,
+	const ModuleBase::Vector3<double> &RA, const ModuleBase::Vector3<double> &RB,
 	const int &mA1, const int &mA2, const int &mB1, const int &mB2) const
 {
 	const int LB1 = nB1.getL();

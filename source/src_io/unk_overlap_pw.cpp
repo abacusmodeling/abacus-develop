@@ -12,7 +12,7 @@ unkOverlap_pw::~unkOverlap_pw()
 
 
 
-std::complex<double> unkOverlap_pw::unkdotp_G(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const ComplexMatrix *evc)
+std::complex<double> unkOverlap_pw::unkdotp_G(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const ModuleBase::ComplexMatrix *evc)
 {
 	
 	std::complex<double> result(0.0,0.0);
@@ -20,8 +20,8 @@ std::complex<double> unkOverlap_pw::unkdotp_G(const int ik_L, const int ik_R, co
 	const int number_pw = GlobalC::pw.ngmw;
 	std::complex<double> *unk_L = new std::complex<double>[number_pw];
 	std::complex<double> *unk_R = new std::complex<double>[number_pw];
-	ZEROS(unk_L,number_pw);
-	ZEROS(unk_R,number_pw);
+	ModuleBase::GlobalFunc::ZEROS(unk_L,number_pw);
+	ModuleBase::GlobalFunc::ZEROS(unk_R,number_pw);
 	
 
 	for (int ig = 0; ig < GlobalC::kv.ngk[ik_L]; ig++)
@@ -63,15 +63,15 @@ std::complex<double> unkOverlap_pw::unkdotp_G(const int ik_L, const int ik_R, co
 
 
 
-std::complex<double> unkOverlap_pw::unkdotp_G0(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const ComplexMatrix *evc, const Vector3<double> G)
+std::complex<double> unkOverlap_pw::unkdotp_G0(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const ModuleBase::ComplexMatrix *evc, const ModuleBase::Vector3<double> G)
 {
 	// (1) set value
 	std::complex<double> result(0.0,0.0);
 	std::complex<double> *phase = GlobalC::UFFT.porter;
 	std::complex<double> *psi_r = new std::complex<double>[GlobalC::pw.nrxx]; // 实空间的波函数
 
-	ZEROS( phase, GlobalC::pw.nrxx);
-	ZEROS( psi_r, GlobalC::pw.nrxx );
+	ModuleBase::GlobalFunc::ZEROS( phase, GlobalC::pw.nrxx);
+	ModuleBase::GlobalFunc::ZEROS( psi_r, GlobalC::pw.nrxx );
 
 
 	for (int ig = 0; ig < GlobalC::kv.ngk[ik_L]; ig++)
@@ -126,7 +126,7 @@ std::complex<double> unkOverlap_pw::unkdotp_G0(const int ik_L, const int ik_R, c
 }
 
 // if noncollinear = 1 or GlobalV::NSPIN = 4 , you need this routine to calculate overlap unk
-std::complex<double> unkOverlap_pw::unkdotp_soc_G(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const ComplexMatrix *evc)
+std::complex<double> unkOverlap_pw::unkdotp_soc_G(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const ModuleBase::ComplexMatrix *evc)
 {
 	
 	std::complex<double> result(0.0,0.0);
@@ -134,8 +134,8 @@ std::complex<double> unkOverlap_pw::unkdotp_soc_G(const int ik_L, const int ik_R
 	const int number_pw = GlobalC::pw.ngmw;
 	std::complex<double> *unk_L = new std::complex<double>[number_pw*GlobalV::NPOL];
 	std::complex<double> *unk_R = new std::complex<double>[number_pw*GlobalV::NPOL];
-	ZEROS(unk_L,number_pw*GlobalV::NPOL);
-	ZEROS(unk_R,number_pw*GlobalV::NPOL);
+	ModuleBase::GlobalFunc::ZEROS(unk_L,number_pw*GlobalV::NPOL);
+	ModuleBase::GlobalFunc::ZEROS(unk_R,number_pw*GlobalV::NPOL);
 	
 	for(int i = 0; i < GlobalV::NPOL; i++)
 	{
@@ -178,16 +178,16 @@ std::complex<double> unkOverlap_pw::unkdotp_soc_G(const int ik_L, const int ik_R
 
 
 //这里G矢量是direct坐标
-std::complex<double> unkOverlap_pw::unkdotp_soc_G0(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const ComplexMatrix *evc, const Vector3<double> G)
+std::complex<double> unkOverlap_pw::unkdotp_soc_G0(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const ModuleBase::ComplexMatrix *evc, const ModuleBase::Vector3<double> G)
 {
 	// (1) set value
 	std::complex<double> result(0.0,0.0);
 	std::complex<double> *phase = GlobalC::UFFT.porter;
 	std::complex<double> *psi_up = new std::complex<double>[GlobalC::pw.nrxx];
 	std::complex<double> *psi_down = new std::complex<double>[GlobalC::pw.nrxx];
-	ZEROS( phase, GlobalC::pw.nrxx);
-	ZEROS( psi_up, GlobalC::pw.nrxx );
-	ZEROS( psi_down, GlobalC::pw.nrxx );
+	ModuleBase::GlobalFunc::ZEROS( phase, GlobalC::pw.nrxx);
+	ModuleBase::GlobalFunc::ZEROS( psi_up, GlobalC::pw.nrxx );
+	ModuleBase::GlobalFunc::ZEROS( psi_down, GlobalC::pw.nrxx );
 
 	for(int i = 0; i < GlobalV::NPOL; i++)
 	{

@@ -80,7 +80,7 @@ void Stochastic_hchi:: init()
     }
     else
     {
-        WARNING_QUIT("Stochastic_hchi", "Number of grids should be at least one!");
+        ModuleBase::WARNING_QUIT("Stochastic_hchi", "Number of grids should be at least one!");
     }
 
 }
@@ -99,7 +99,7 @@ void Stochastic_hchi::get_GRA_index()
 	{
 		int ix,iy,iz;
 		int ir;
-		ZEROS(GRA_index,GlobalC::wf.npw);
+		ModuleBase::GlobalFunc::ZEROS(GRA_index,GlobalC::wf.npw);
 		for(int ig = 0 ; ig < GlobalC::wf.npw; ++ig)
 		{
 			ix = floor(GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(0, ig), 0) + 0.1);
@@ -117,10 +117,10 @@ void Stochastic_hchi::get_GRA_index()
 void Stochastic_hchi::orthogonal_to_psi_real(std::complex<double> *wfin, std::complex<double> *wfout, int &ikk)
 {
 
-	TITLE("Stochastic_hchi","orthogonal_to_psi0");
-	if(!initplan) WARNING_QUIT("Stochastic_hchi", "Please init hchi first!");
+	ModuleBase::TITLE("Stochastic_hchi","orthogonal_to_psi0");
+	if(!initplan) ModuleBase::WARNING_QUIT("Stochastic_hchi", "Please init hchi first!");
 
-	DCOPY(wfin,rp_chi,nrxx);
+	ModuleBase::GlobalFunc::DCOPY(wfin,rp_chi,nrxx);
 	//LapackConnector::copy(nrxx,wfin,1,rp_chi,1);
 	fftw_execute(pf);
 	
@@ -163,7 +163,7 @@ void Stochastic_hchi::orthogonal_to_psi_real(std::complex<double> *wfin, std::co
 	{
 		rp_chi[GRA_index[ig]] = chig[ig];
 	}
-	DCOPY(rp_chi,rl_chi,nrxx);
+	ModuleBase::GlobalFunc::DCOPY(rp_chi,rl_chi,nrxx);
 	//LapackConnector::copy(nrxx,rp_chi,1,rl_chi,1);
 
 	fftw_execute(pb);
@@ -182,7 +182,7 @@ void Stochastic_hchi::orthogonal_to_psi_real(std::complex<double> *wfin, std::co
 	fftw_plan pp=fftw_plan_dft_3d(GlobalC::pw.nx,GlobalC::pw.ny,GlobalC::pw.nz,(fftw_complex *)kswf,(fftw_complex *)kswf, FFTW_BACKWARD, FFTW_ESTIMATE);
 	for(int iksb = 0; iksb < GlobalV::NBANDS; ++iksb)
 	{
-		ZEROS(kswf,nrxx);
+		ModuleBase::GlobalFunc::ZEROS(kswf,nrxx);
 		for(int ig = 0 ; ig < GlobalC::wf.npw; ++ig)
 		{
 			kswf[GRA_index[ig]] = GlobalC::wf.evc[ikk](iksb,ig);
@@ -205,7 +205,7 @@ void Stochastic_hchi::orthogonal_to_psi_real(std::complex<double> *wfin, std::co
 void Stochastic_hchi::orthogonal_to_psi_reciprocal(std::complex<double> *wfgin, std::complex<double> *wfgout, int &ikk)
 {
 
-	TITLE("Stochastic_hchi","orthogonal_to_psi0");
+	ModuleBase::TITLE("Stochastic_hchi","orthogonal_to_psi0");
 	int nchip=GlobalC::sto_wf.nchip;
 	int npw = GlobalC::wf.npw;
 	for(int ig = 0 ; ig < npw * nchip; ++ig)
@@ -220,11 +220,11 @@ void Stochastic_hchi::orthogonal_to_psi_reciprocal(std::complex<double> *wfgin, 
 	char transN='N';
 	
 	//sum(b<GlobalV::NBANDS, a<nchi) = < psi_b | chi_a >
-	zgemm_(&transC, &transN, &GlobalV::NBANDS, &nchip, &npw, &ONE, GlobalC::wf.evc[ikk].c, &GlobalC::wf.npwx, wfgout, &npw, &ZERO, sum, &GlobalV::NBANDS);
+	zgemm_(&transC, &transN, &GlobalV::NBANDS, &nchip, &npw, &ModuleBase::ONE, GlobalC::wf.evc[ikk].c, &GlobalC::wf.npwx, wfgout, &npw, &ModuleBase::ZERO, sum, &GlobalV::NBANDS);
 	Parallel_Reduce::reduce_complex_double_pool(sum, GlobalV::NBANDS * nchip);
 	
 	//psi -= psi * sum
-	zgemm_(&transN, &transN, &npw, &nchip, &GlobalV::NBANDS, &NEG_ONE, GlobalC::wf.evc[ikk].c, &GlobalC::wf.npwx, sum, &GlobalV::NBANDS, &ONE, wfgout, &npw);
+	zgemm_(&transN, &transN, &npw, &nchip, &GlobalV::NBANDS, &ModuleBase::NEG_ONE, GlobalC::wf.evc[ikk].c, &GlobalC::wf.npwx, sum, &GlobalV::NBANDS, &ModuleBase::ONE, wfgout, &npw);
 	
 	ortho = true;
 	delete[] sum;
@@ -245,15 +245,15 @@ void Stochastic_hchi::hchi_real(std::complex<double>*chi_in, std::complex<double
 	dk3 = GlobalC::ucell.tpiba;
 		
 	//---------------------------------------------------
-	if(!initplan) WARNING_QUIT("Stochastic_hchi", "Please init hchi first!");
+	if(!initplan) ModuleBase::WARNING_QUIT("Stochastic_hchi", "Please init hchi first!");
 
-	ZEROS(hchi,nrxx);
-	DCOPY(chi_in, rp_chi, nrxx);
+	ModuleBase::GlobalFunc::ZEROS(hchi,nrxx);
+	ModuleBase::GlobalFunc::DCOPY(chi_in, rp_chi, nrxx);
 	//LapackConnector::copy(nrxx,chi_in,1,rp_chi,1);
 	fftw_execute(pf);
 
 	std::complex<double> * chig = new std::complex<double> [GlobalC::wf.npw];
-	ZEROS(chig,GlobalC::wf.npw);
+	ModuleBase::GlobalFunc::ZEROS(chig,GlobalC::wf.npw);
 	for(int ig = 0; ig < GlobalC::wf.npw; ++ig)
 	{
 		chig[ig] = rp_chi[GRA_index[ig]]; 
@@ -286,7 +286,7 @@ void Stochastic_hchi::hchi_real(std::complex<double>*chi_in, std::complex<double
 	//------------------------------------
 	if(GlobalV::T_IN_H)
 	{
-		Vector3<double> gg;
+		ModuleBase::Vector3<double> gg;
 		int gx,gy,gz;
 		for(int ig1 = 0, i = 0; ig1 < nx; ++ig1)
 		{
@@ -321,7 +321,7 @@ void Stochastic_hchi::hchi_real(std::complex<double>*chi_in, std::complex<double
 		if ( GlobalC::ppcell.nkb > 0)
 		{
 			std::complex<double> *becp = new std::complex<double>[ GlobalC::ppcell.nkb * GlobalV::NPOL ];
-			ZEROS(becp,GlobalC::ppcell.nkb * GlobalV::NPOL);
+			ModuleBase::GlobalFunc::ZEROS(becp,GlobalC::ppcell.nkb * GlobalV::NPOL);
 
 			for (int i=0;i< GlobalC::ppcell.nkb;++i)
 			{
@@ -335,7 +335,7 @@ void Stochastic_hchi::hchi_real(std::complex<double>*chi_in, std::complex<double
 
 			//Parallel_Reduce::reduce_complex_double_pool( becp, GlobalC::ppcell.nkb * GlobalV::NPOL);
 			std::complex<double> * Ps = new std::complex<double> [GlobalC::ppcell.nkb * GlobalV::NPOL];
-			ZEROS( Ps, GlobalC::ppcell.nkb * GlobalV::NPOL );
+			ModuleBase::GlobalFunc::ZEROS( Ps, GlobalC::ppcell.nkb * GlobalV::NPOL );
 			int sum = 0;
     		int iat = 0;
     		// this function sum up each non-local pseudopotential located in each atom,
@@ -363,7 +363,7 @@ void Stochastic_hchi::hchi_real(std::complex<double>*chi_in, std::complex<double
     		} //end nt
 
 			// use simple method.
-			ZEROS(chig, GlobalC::wf.npw);
+			ModuleBase::GlobalFunc::ZEROS(chig, GlobalC::wf.npw);
 			if(GlobalV::NSPIN!=4)
 				for(int i=0; i<GlobalC::ppcell.nkb; ++i)
 				{
@@ -432,7 +432,7 @@ void Stochastic_hchi::hchi_real(std::complex<double>*chi_in, std::complex<double
 
 void Stochastic_hchi:: hchi_reciprocal(std::complex<double> *chig, std::complex<double> *hchig, const int m)
 {
-	timer::tick("Stochastic_hchi","hchi_reciprocal");
+	ModuleBase::timer::tick("Stochastic_hchi","hchi_reciprocal");
 	
 	//---------------------------------------------------
 
@@ -460,14 +460,14 @@ void Stochastic_hchi:: hchi_reciprocal(std::complex<double> *chig, std::complex<
 	//------------------------------------
 	//(2) the local potential.
 	//------------------------------------
-	timer::tick("Stochastic_hchi","vloc");
+	ModuleBase::timer::tick("Stochastic_hchi","vloc");
 	if(GlobalV::VL_IN_H)
 	{
 		chibg = chig;
 		hchibg = hchig;
 		for(int ib = 0 ; ib < m ; ++ib)
 		{
-			ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
+			ModuleBase::GlobalFunc::ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
 			GlobalC::UFFT.RoundTrip( chibg, GlobalC::pot.vr_eff1, GRA_index, GlobalC::UFFT.porter );
 			for (int ig = 0; ig < npw; ++ig)
 			{
@@ -478,13 +478,13 @@ void Stochastic_hchi:: hchi_reciprocal(std::complex<double> *chig, std::complex<
 		}
 			
 	}
-	timer::tick("Stochastic_hchi","vloc");
+	ModuleBase::timer::tick("Stochastic_hchi","vloc");
 
 
 	//------------------------------------
 	// (3) the nonlocal pseudopotential.
 	//------------------------------------
-	timer::tick("Stochastic_hchi","vnl");
+	ModuleBase::timer::tick("Stochastic_hchi","vnl");
 	if(GlobalV::VNL_IN_H)
 	{
 		if ( GlobalC::ppcell.nkb > 0)
@@ -496,16 +496,16 @@ void Stochastic_hchi:: hchi_reciprocal(std::complex<double> *chig, std::complex<
 			char transt = 'T';
 			if(m==1 && GlobalV::NPOL ==1)
 			{
-				zgemv_(&transc, &npw, &nkb, &ONE, GlobalC::ppcell.vkb.c, &GlobalC::wf.npwx, chig, &inc, &ZERO, becp, &inc);
+				zgemv_(&transc, &npw, &nkb, &ModuleBase::ONE, GlobalC::ppcell.vkb.c, &GlobalC::wf.npwx, chig, &inc, &ModuleBase::ZERO, becp, &inc);
 			}
 			else
 			{
-				zgemm_(&transc,&transn,&nkb,&npm,&npw,&ONE,GlobalC::ppcell.vkb.c,&GlobalC::wf.npwx,chig,&npw,&ZERO,becp,&nkb);
+				zgemm_(&transc,&transn,&nkb,&npm,&npw,&ModuleBase::ONE,GlobalC::ppcell.vkb.c,&GlobalC::wf.npwx,chig,&npw,&ModuleBase::ZERO,becp,&nkb);
 			}
 			Parallel_Reduce::reduce_complex_double_pool( becp, nkb * GlobalV::NPOL * m);
 
 			std::complex<double> *Ps  = new std::complex<double> [nkb * GlobalV::NPOL * m];
-   			ZEROS( Ps, GlobalV::NPOL * m * nkb);
+   			ModuleBase::GlobalFunc::ZEROS( Ps, GlobalV::NPOL * m * nkb);
 			
 			int sum = 0;
     		int iat = 0;
@@ -535,18 +535,18 @@ void Stochastic_hchi:: hchi_reciprocal(std::complex<double> *chig, std::complex<
 
 			if(GlobalV::NPOL==1 && m==1)
 			{
-				zgemv_(&transn, &npw, &nkb, &ONE, GlobalC::ppcell.vkb.c, &GlobalC::wf.npwx, Ps, &inc, &ONE, hchig, &inc);
+				zgemv_(&transn, &npw, &nkb, &ModuleBase::ONE, GlobalC::ppcell.vkb.c, &GlobalC::wf.npwx, Ps, &inc, &ModuleBase::ONE, hchig, &inc);
 			}
 			else
 			{
-				zgemm_(&transn,&transt,&npw,&npm,&nkb,&ONE,GlobalC::ppcell.vkb.c,&GlobalC::wf.npwx,Ps,&npm,&ONE,hchig,&npw);
+				zgemm_(&transn,&transt,&npw,&npm,&nkb,&ModuleBase::ONE,GlobalC::ppcell.vkb.c,&GlobalC::wf.npwx,Ps,&npm,&ModuleBase::ONE,hchig,&npw);
 			}
 
 			delete[] becp;
 			delete[] Ps;
 		}
 	}
-	timer::tick("Stochastic_hchi","vnl");
+	ModuleBase::timer::tick("Stochastic_hchi","vnl");
 
 
 
@@ -558,7 +558,7 @@ void Stochastic_hchi:: hchi_reciprocal(std::complex<double> *chig, std::complex<
 		hchig[ig] = (hchig[ig] - Ebar * chig[ig]) / DeltaE;
 	}
 	
-	timer::tick("Stochastic_hchi","hchi_reciprocal");
+	ModuleBase::timer::tick("Stochastic_hchi","hchi_reciprocal");
 
 
 	return;

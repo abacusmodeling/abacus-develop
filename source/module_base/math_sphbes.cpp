@@ -1,6 +1,9 @@
 #include "math_sphbes.h"
 #include "timer.h"
 #include "constants.h"
+using namespace std;
+namespace ModuleBase
+{
 
 Sphbes::Sphbes(){}
 Sphbes::~Sphbes(){}
@@ -21,7 +24,7 @@ void Sphbes::BESSJY(double x, double xnu, double *rj, double *ry, double *rjp, d
     if (x <= 0.0 || xnu < 0.0)
     {
 		std::cout << "Sphbes::BESSJY, bad arguments" << std::endl;
-        //WARNING_QUIT("Sphbes::BESSJY","bad arguments");
+        //ModuleBase::WARNING_QUIT("Sphbes::BESSJY","bad arguments");
 		exit(0); // mohan add 2021-05-06
     }
 
@@ -31,7 +34,7 @@ void Sphbes::BESSJY(double x, double xnu, double *rj, double *ry, double *rjp, d
     const double xmu2 = xmu * xmu;
     xi = 1.0 / x;
     xi2 = 2.0 * xi;
-    w = xi2 / PI;
+    w = xi2 / ModuleBase::PI;
     isign = 1;
     h = xnu * xi;
 
@@ -101,20 +104,20 @@ void Sphbes::BESSJY(double x, double xnu, double *rj, double *ry, double *rjp, d
     if (x < XMIN)
     {
         x2 = 0.5 * x;
-        pimu = PI * xmu;
+        pimu = ModuleBase::PI * xmu;
         fact = (fabs(pimu) < EPS ? 1.0 : pimu / sin(pimu));
         d = -log(x2);
         e = xmu * d;
         fact2 = (fabs(e) < EPS ? 1.0 : sinh(e) / e);
         // call BESCHB
         BESCHB(xmu, &gam1, &gam2, &gampl, &gammi);
-        ff = 2.0 / PI * fact * (gam1 * cosh(e) + gam2 * fact2 * d);
+        ff = 2.0 / ModuleBase::PI * fact * (gam1 * cosh(e) + gam2 * fact2 * d);
         e = exp(e);
-        p = e / (gampl * PI);
-        q = 1.0 / (e * PI * gammi);
+        p = e / (gampl * ModuleBase::PI);
+        q = 1.0 / (e * ModuleBase::PI * gammi);
         pimu2 = 0.5 * pimu;
         fact3 = (fabs(pimu2) < EPS ? 1.0 : sin(pimu2) / pimu2);
-        r = PI * pimu2 * fact3 * fact3;
+        r = ModuleBase::PI * pimu2 * fact3 * fact3;
         c = 1.0;
         d = -x2 * x2;
         sum = ff + r * q;
@@ -300,7 +303,7 @@ double Sphbes::Spherical_Bessel_7(const int n, const double &x)
     if (n < 0 || x <= 0.0)
     {
 		std::cout << "Spherical_Bessel_7, bad arguments in sphbes" << std::endl;
-        //WARNING_QUIT("Sphbes::Spherical_Bessel_7","bad arguments in sphbes");
+        //ModuleBase::WARNING_QUIT("Sphbes::Spherical_Bessel_7","bad arguments in sphbes");
 		exit(0);
     }
 
@@ -326,23 +329,23 @@ void Sphbes::Spherical_Bessel_Roots
     const double &rcut
 )
 {
-    //TITLE("Sphbes","Spherical_Bessel_Roots");
+    //ModuleBase::TITLE("Sphbes","Spherical_Bessel_Roots");
     if (num<=0)
 	{
 		std::cout << "Spherical_Bessel_Roots, num<=0" << std::endl;
-		//WARNING_QUIT("Sphbes::Spherical_Bessel_Roots","num<=0");
+		//ModuleBase::WARNING_QUIT("Sphbes::Spherical_Bessel_Roots","num<=0");
 		exit(0);
 	}
     if (rcut<=0.0)
 	{
 		std::cout << "Spherical_Bessel_Roots, rcut<=0" << std::endl;
-		//WARNING_QUIT("Sphbes::Spherical_Bessel_Roots","rcut<=0.0");
+		//ModuleBase::WARNING_QUIT("Sphbes::Spherical_Bessel_Roots","rcut<=0.0");
 		exit(0);
 	}
 
     double min = 0.0;
-    double max = 2*PI + (num + (l+0.5)/2 + 0.75)*PI/2 +
-                 sqrt((num + (l+0.5)/2+0.75)*(num + (l+0.5)/2+0.75)*PI*PI/4-(l+0.5)*(l+0.5)/2);
+    double max = 2*ModuleBase::PI + (num + (l+0.5)/2 + 0.75)*ModuleBase::PI/2 +
+                 sqrt((num + (l+0.5)/2+0.75)*(num + (l+0.5)/2+0.75)*ModuleBase::PI*ModuleBase::PI/4-(l+0.5)*(l+0.5)/2);
 
     // magic number !!
     // guess : only need to > 1
@@ -418,7 +421,7 @@ void Sphbes::Spherical_Bessel
     double *jl		 // jl(1:msh) = j_l(q*r(i)),spherical bessel function
 )
 {
-    timer::tick("Sphbes","Spherical_Bessel");
+    ModuleBase::timer::tick("Sphbes","Spherical_Bessel");
     double x1=0.0;
 
     int i=0;
@@ -591,7 +594,7 @@ void Sphbes::Spherical_Bessel
         }
     }
 
-    timer::tick("Sphbes","Spherical_Bessel");
+    ModuleBase::timer::tick("Sphbes","Spherical_Bessel");
     return;
 }
 
@@ -606,7 +609,7 @@ void Sphbes::Spherical_Bessel
 	double *sjp
 )
 {
-	timer::tick("Sphbes","Spherical_Bessel");
+	ModuleBase::timer::tick("Sphbes","Spherical_Bessel");
 
 	//calculate jlx first
 	Spherical_Bessel (msh, r, q, l, sj);
@@ -616,4 +619,6 @@ void Sphbes::Spherical_Bessel
 		sjp[ir] = 1.0;
 	}
 	return;
+}
+
 }

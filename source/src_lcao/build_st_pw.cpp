@@ -33,7 +33,7 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 					
 					if(GlobalV::NSPIN!=4)
 					{
-						std::complex<double> v = ZERO;
+						std::complex<double> v = ModuleBase::ZERO;
 						for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++) 
 						{
 							v += conj(GlobalC::wf.wanf2[ik](mu, ig)) * GlobalC::wf.wanf2[ik](nu, ig);
@@ -48,7 +48,7 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 					}
 					else//added by zhengdy-soc
 					{
-/*						std::complex<double> v0 = ZERO, v1 = ZERO, v2 = ZERO, v3 = ZERO;
+/*						std::complex<double> v0 = ModuleBase::ZERO, v1 = ModuleBase::ZERO, v2 = ModuleBase::ZERO, v3 = ModuleBase::ZERO;
 						for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++)
 						{
 							v0 += conj(GlobalC::wf.wanf2[ik](mu, ig)) * GlobalC::wf.wanf2[ik](nu, ig);
@@ -60,7 +60,7 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 						GlobalC::LM.Sloc2_soc(1, mu * GlobalC::ParaO.ncol + nu) = v1;
 						GlobalC::LM.Sloc2_soc(2, mu * GlobalC::ParaO.ncol + nu) = v2;
 						GlobalC::LM.Sloc2_soc(3, mu * GlobalC::ParaO.ncol + nu) = v3;*/
-						std::complex<double> v0 = ZERO;
+						std::complex<double> v0 = ModuleBase::ZERO;
 						for (int ig = 0; ig < GlobalC::wf.npwx*GlobalV::NPOL; ig++)
 							v0 += conj(GlobalC::wf.wanf2[ik](mu, ig)) * GlobalC::wf.wanf2[ik](nu, ig);
 						GlobalC::LM.Sloc2[ mu * GlobalC::ParaO.ncol + nu ] = v0;
@@ -86,7 +86,7 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 					const int nu = GlobalC::ParaO.trace_loc_col[j];
 					if(nu < 0)continue;
 					
-					std::complex<double> v = ZERO;
+					std::complex<double> v = ModuleBase::ZERO;
 					for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++) 
 					{
 						v += conj(GlobalC::wf.wanf2[ik](mu, ig)) * GlobalC::wf.wanf2[ik](nu, ig) * GlobalC::wf.g2kin[ig];
@@ -113,8 +113,8 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 
 void Build_ST_pw::set_local(const int &ik)
 {
-	TITLE("Build_ST_pw","set_local");
-	timer::tick("Build_ST_pw","set_local");
+	ModuleBase::TITLE("Build_ST_pw","set_local");
+	ModuleBase::timer::tick("Build_ST_pw","set_local");
 	assert(GlobalV::NLOCAL>0);
 	assert(!GlobalV::GAMMA_ONLY_LOCAL);
 
@@ -128,7 +128,7 @@ void Build_ST_pw::set_local(const int &ik)
 		fft_index[ig] = GlobalC::pw.ig2fftw[ GlobalC::wf.igk(ik, ig) ];
 	}
 
-//	ComplexMatrix vij(GlobalV::NLOCAL, GlobalV::NLOCAL);
+//	ModuleBase::ComplexMatrix vij(GlobalV::NLOCAL, GlobalV::NLOCAL);
 
 	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{
@@ -139,7 +139,7 @@ void Build_ST_pw::set_local(const int &ik)
 				psi_one[ig] = GlobalC::wf.wanf2[ik](i, ig);
 			}
 
-			ZEROS( psic, GlobalC::pw.nrxx);
+			ModuleBase::GlobalFunc::ZEROS( psic, GlobalC::pw.nrxx);
 			// (1) set value
 			for (int ig=0; ig< npw; ig++)
 			{
@@ -163,7 +163,7 @@ void Build_ST_pw::set_local(const int &ik)
 
 			for(int j=i; j<GlobalV::NLOCAL; j++)
 			{
-				std::complex<double> v = ZERO;
+				std::complex<double> v = ModuleBase::ZERO;
 				for(int ig=0; ig<npw; ig++)
 				{
 					v += conj( GlobalC::wf.wanf2[ik](j,ig) ) * hpsi[ig];
@@ -182,7 +182,7 @@ void Build_ST_pw::set_local(const int &ik)
 			std::complex<double> *psic1 = new std::complex<double>[GlobalC::pw.nrxx];
 			delete[] hpsi;
 			hpsi = new std::complex<double> [GlobalC::wf.npwx*GlobalV::NPOL];
-			ZEROS(hpsi, GlobalC::wf.npwx*GlobalV::NPOL);
+			ModuleBase::GlobalFunc::ZEROS(hpsi, GlobalC::wf.npwx*GlobalV::NPOL);
 			
 			for(int ig=0; ig<npw; ig++)
 			{
@@ -190,8 +190,8 @@ void Build_ST_pw::set_local(const int &ik)
 				psi_down[ig] = GlobalC::wf.wanf2[ik](i, ig+ GlobalC::wf.npwx);
 			}
 
-			ZEROS( psic, GlobalC::pw.nrxx);
-			ZEROS( psic1, GlobalC::pw.nrxx);
+			ModuleBase::GlobalFunc::ZEROS( psic, GlobalC::pw.nrxx);
+			ModuleBase::GlobalFunc::ZEROS( psic1, GlobalC::pw.nrxx);
 			// (1) set value
 			for (int ig=0; ig< npw; ig++)
 			{
@@ -226,7 +226,7 @@ void Build_ST_pw::set_local(const int &ik)
 
 			for(int j=i; j<GlobalV::NLOCAL; j++)
 			{
-				std::complex<double> v = ZERO;
+				std::complex<double> v = ModuleBase::ZERO;
 				for(int ig=0; ig<npw; ig++)
 				{
 					v += conj( GlobalC::wf.wanf2[ik](j,ig) ) * hpsi[ig];
@@ -250,6 +250,6 @@ void Build_ST_pw::set_local(const int &ik)
     delete[] psi_one;
     delete[] hpsi;
 	delete[] psic;
-	timer::tick("Build_ST_pw","set_local");
+	ModuleBase::timer::tick("Build_ST_pw","set_local");
 	return;
 }

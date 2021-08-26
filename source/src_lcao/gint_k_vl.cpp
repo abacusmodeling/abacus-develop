@@ -121,7 +121,7 @@ inline int find_offset(const int size, const int grid_index,
 			GlobalV::ofs_running << " ad=" << iii << " find_R2=" << GlobalC::LNNR.find_R2[iat1][iii] << std::endl;
 		}
 		GlobalV::ofs_warning << " The adjacent atom found by 	 is not found by SLTK_Adjacent program!" << std::endl;
-		WARNING_QUIT("gint_k","evaluate_pvpR_reduced wrong");
+		ModuleBase::WARNING_QUIT("gint_k","evaluate_pvpR_reduced wrong");
 	}
 	assert(offset < GlobalC::LNNR.nad[iat1]);
 	return offset;
@@ -176,7 +176,7 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r,
 			if(distance[ib][id] > (GlobalC::ORB.Phi[it].getRcut()- 1.0e-15)) 
 			{
 				cal_flag[ib][id]=false;
-				ZEROS(p, block_size[id]);
+				ModuleBase::GlobalFunc::ZEROS(p, block_size[id]);
 				continue;
 			}
 
@@ -187,7 +187,7 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r,
 			//	Ylm::get_ylm_real(this->nnn[it], this->dr[id], ylma);
 			if (distance[ib][id] < 1.0E-9) distance[ib][id] += 1.0E-9;
 			
-			Ylm::sph_harm (	GlobalC::ucell.atoms[it].nwl,
+			ModuleBase::Ylm::sph_harm (	GlobalC::ucell.atoms[it].nwl,
 					dr[0] / distance[ib][id],
 					dr[1] / distance[ib][id],
 					dr[2] / distance[ib][id],
@@ -323,11 +323,11 @@ inline void cal_pvpR_reduced(int size, int LD_pool, int grid_index,
 
 void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const int spin)
 {
-	TITLE("Gint_k","cal_vlocal_k");
+	ModuleBase::TITLE("Gint_k","cal_vlocal_k");
 
 	if(!pvpR_alloc_flag)
 	{
-		WARNING_QUIT("Gint_k::destroy_pvpR","pvpR has not been allocated yet!");
+		ModuleBase::WARNING_QUIT("Gint_k::destroy_pvpR","pvpR has not been allocated yet!");
 	}
 	else
 	{
@@ -335,7 +335,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 		// is used to save <phi | Vl | phi>
 		if(this->reduced)
 		{
-			ZEROS(this->pvpR_reduced[spin], GlobalC::LNNR.nnrg);
+			ModuleBase::GlobalFunc::ZEROS(this->pvpR_reduced[spin], GlobalC::LNNR.nnrg);
 		}
 		// else one needs to consdier all cell with a std::vector R
 		// the number of cells is GridT.nutot,
@@ -344,12 +344,12 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 		{
 			for(int i=0; i<GridT.lgd * GridT.nutot; i++)
 			{
-				ZEROS(pvpR[i], GridT.lgd * GridT.nutot);
+				ModuleBase::GlobalFunc::ZEROS(pvpR[i], GridT.lgd * GridT.nutot);
 			}
 		}
 	}
 
-	timer::tick("Gint_k","vlocal");
+	ModuleBase::timer::tick("Gint_k","vlocal");
 
 	// it's a uniform grid to save orbital values, so the delta_r is a constant.
 	double delta_r = GlobalC::ORB.dr_uniform;
@@ -374,10 +374,10 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 		// save the small box information for a big box.
 		distance = new double*[bxyz];
 		psir_ylm_pool=new double[bxyz*LD_pool];
-		ZEROS(psir_ylm_pool, bxyz*LD_pool);
+		ModuleBase::GlobalFunc::ZEROS(psir_ylm_pool, bxyz*LD_pool);
 		psir_ylm=new double *[bxyz];
 		psir_vlbr3_pool=new double[bxyz*LD_pool];
-		ZEROS(psir_vlbr3_pool, bxyz*LD_pool);
+		ModuleBase::GlobalFunc::ZEROS(psir_vlbr3_pool, bxyz*LD_pool);
 		psir_vlbr3=new double *[bxyz];
 		cal_flag = new bool*[bxyz];
 		block_iw=new int[max_size];
@@ -401,8 +401,8 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 			distance[i] = new double[max_size];
 			cal_flag[i] = new bool[max_size];
 
-			ZEROS(distance[i], max_size);
-			ZEROS(cal_flag[i], max_size);
+			ModuleBase::GlobalFunc::ZEROS(distance[i], max_size);
+			ModuleBase::GlobalFunc::ZEROS(cal_flag[i], max_size);
 		}
 	}
 	
@@ -413,7 +413,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 	// array to store local potential for each small box in
 	// a big box.
 	double* vldr3 = new double[bxyz];
-	ZEROS(vldr3, bxyz);
+	ModuleBase::GlobalFunc::ZEROS(vldr3, bxyz);
 
 	for(int i=0; i<nbx; i++)
 	{
@@ -491,7 +491,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 		delete[] block_index;
 	}	
 
-	timer::tick("Gint_k","vlocal");
+	ModuleBase::timer::tick("Gint_k","vlocal");
 	return;
 }
 
@@ -697,7 +697,7 @@ void Gint_k::evaluate_pvpR_reduced(
                         GlobalV::ofs_running << " ad=" << iii << " find_R2=" << GlobalC::LNNR.find_R2[iat][iii] << std::endl;
                     }
 					GlobalV::ofs_warning << " The adjacent atom found by gt is not found by SLTK_Adjacent program!" << std::endl;
-                    WARNING_QUIT("gint_k","evaluate_pvpR_reduced wrong");
+                    ModuleBase::WARNING_QUIT("gint_k","evaluate_pvpR_reduced wrong");
                 }
                 assert(offset < GlobalC::LNNR.nad[iat]);
 

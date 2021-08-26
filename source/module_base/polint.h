@@ -1,6 +1,9 @@
 #ifndef POLINT_H
 #define POLINT_H
 
+namespace ModuleBase
+{
+
 class Polint
 {
 	public:
@@ -26,5 +29,7 @@ class Polint
 		);
 
 };
+
+}
 
 #endif

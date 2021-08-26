@@ -3,8 +3,8 @@
 
 void Cell_PW::opt_cells_pw()
 {
-    TITLE("Cell_PW", "opt_cells_pw");
-    timer::tick("Cell_PW", "opt_cells_pw");
+    ModuleBase::TITLE("Cell_PW", "opt_cells_pw");
+    ModuleBase::timer::tick("Cell_PW", "opt_cells_pw");
     GlobalC::wf.allocate(GlobalC::kv.nks);
 
     // cout<<GlobalC::pw.nrxx<<endl;
@@ -28,13 +28,13 @@ void Cell_PW::opt_cells_pw()
     // initalize local pseudopotential
     //=================================
     GlobalC::ppcell.init_vloc(GlobalC::pw.nggm, GlobalC::ppcell.vloc);
-    DONE(GlobalV::ofs_running, "LOCAL POTENTIAL");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "LOCAL POTENTIAL");
 
     //======================================
     // Initalize non local pseudopotential
     //======================================
     GlobalC::ppcell.init_vnl(GlobalC::ucell);
-    DONE(GlobalV::ofs_running, "NON-LOCAL POTENTIAL");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "NON-LOCAL POTENTIAL");
 
     //=========================================================
     // calculate the total local pseudopotential in real space
@@ -43,7 +43,7 @@ void Cell_PW::opt_cells_pw()
 
     GlobalC::pot.newd();
 
-    DONE(GlobalV::ofs_running, "INIT POTENTIAL");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT POTENTIAL");
 
     //==================================================
     // create GlobalC::ppcell.tab_at , for trial wave functions.
@@ -70,17 +70,17 @@ void Cell_PW::opt_cells_pw()
         break;
     case Exx_Global::Hybrid_Type::Generate_Matrix:
     default:
-        throw std::invalid_argument(TO_STRING(__FILE__) + TO_STRING(__LINE__));
+        throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__) + ModuleBase::GlobalFunc::TO_STRING(__LINE__));
     }
 #endif
 
-    DONE(GlobalV::ofs_running, "INIT BASIS");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT BASIS");
 
     // ion optimization begins
     // electron density optimization is included in ion optimization
 
     Ions ions;
     ions.opt_ions_pw();
-
-    timer::tick("Cell_PW", "opt_cells_pw");
+    
+    ModuleBase::timer::tick("Cell_PW", "opt_cells_pw");
 }

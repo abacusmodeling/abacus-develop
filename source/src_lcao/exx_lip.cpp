@@ -28,7 +28,7 @@ Exx_Lip::Exx_Info::Exx_Info( const Exx_Global::Exx_Info &info_global )
 
 void Exx_Lip::cal_exx()
 {
-	TITLE("Exx_Lip","cal_exx");
+	ModuleBase::TITLE("Exx_Lip","cal_exx");
 	auto my_time = [](timeval &t_begin) -> double
 	{
 		const double time_during = cal_time(t_begin);
@@ -99,7 +99,7 @@ cout_t("sum_all",t_sum_all);
 		static int istep=1;
 		for(int ik=0; ik!=GlobalC::kv.nks; ++ik)
 		{
-			std::ofstream ofs("Hexxk_"+TO_STRING(istep++)+"_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK));
+			std::ofstream ofs("Hexxk_"+ModuleBase::GlobalFunc::TO_STRING(istep++)+"_"+ModuleBase::GlobalFunc::TO_STRING(ik)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
 			for(int i=0; i!=GlobalV::NLOCAL; ++i)
 			{
 				for(int j=0; j!=GlobalV::NLOCAL; ++j)
@@ -113,7 +113,7 @@ cout_t("sum_all",t_sum_all);
 /*
 void Exx_Lip::cal_exx()
 {
-	TITLE("Exx_Lip","cal_exx");
+	ModuleBase::TITLE("Exx_Lip","cal_exx");
 	wf_wg_cal();
 	psi_cal();
 	for( int ik=0; ik<k_pack->kv_ptr->nks; ++ik)
@@ -154,7 +154,7 @@ void Exx_Lip::cal_exx()
 
 void Exx_Lip::init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in, PW_Basis *pw_ptr_in, Use_FFT *UFFT_ptr_in, UnitCell_pseudo *ucell_ptr_in)
 {
-	TITLE("Exx_Lip","init");
+	ModuleBase::TITLE("Exx_Lip","init");
 	try
 	{
 		k_pack = new k_package;
@@ -165,7 +165,7 @@ void Exx_Lip::init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in, PW_Basis *pw_ptr_i
 		ucell_ptr = ucell_ptr_in;
 
 		int gzero_judge(-1);
-		if (pw_ptr->gcar[0]==Vector3<double>(0.0,0.0,0.0))
+		if (pw_ptr->gcar[0]==ModuleBase::Vector3<double>(0.0,0.0,0.0))
 		{
 			gzero_judge = GlobalV::RANK_IN_POOL;
 		}
@@ -173,7 +173,7 @@ void Exx_Lip::init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in, PW_Basis *pw_ptr_i
 
 		k_pack->wf_wg.create(k_pack->kv_ptr->nks,GlobalV::NBANDS);
 
-		k_pack->hvec_array = new ComplexMatrix [k_pack->kv_ptr->nks];
+		k_pack->hvec_array = new ModuleBase::ComplexMatrix [k_pack->kv_ptr->nks];
 		for( int ik=0; ik<k_pack->kv_ptr->nks; ++ik)
 		{
 			k_pack->hvec_array[ik].create(GlobalV::NLOCAL,GlobalV::NBANDS);
@@ -243,7 +243,7 @@ void Exx_Lip::init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in, PW_Basis *pw_ptr_i
 	}
 	catch(const std::bad_alloc &ex)
 	{
-		WARNING_QUIT("exact_exchange","Memory");
+		ModuleBase::WARNING_QUIT("exact_exchange","Memory");
 	}
 
 	init_finish = true;
@@ -251,7 +251,7 @@ void Exx_Lip::init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in, PW_Basis *pw_ptr_i
 
 Exx_Lip::~Exx_Lip()
 {
-	TITLE("Exx_Lip","~Exx_Lip");
+	ModuleBase::TITLE("Exx_Lip","~Exx_Lip");
 	if( init_finish)
 	{
 		for( int iw=0; iw<GlobalV::NLOCAL; ++iw)
@@ -316,7 +316,7 @@ Exx_Lip::~Exx_Lip()
 
 void Exx_Lip::wf_wg_cal()
 {
-	TITLE("Exx_Lip","wf_wg_cal");
+	ModuleBase::TITLE("Exx_Lip","wf_wg_cal");
 	if(GlobalV::NSPIN==1)
 		for( int ik=0; ik<k_pack->kv_ptr->nks; ++ik)
 			for( int ib=0; ib<GlobalV::NBANDS; ++ib)
@@ -331,7 +331,7 @@ void Exx_Lip::phi_cal(k_package *kq_pack, int ikq)
 {
 	for( int iw=0; iw< GlobalV::NLOCAL; ++iw)
 	{
-		ZEROS( UFFT_ptr->porter, pw_ptr->nrxx );
+		ModuleBase::GlobalFunc::ZEROS( UFFT_ptr->porter, pw_ptr->nrxx );
 		for( int ig=0; ig<kq_pack->kv_ptr->ngk[ikq]; ++ig)
 			UFFT_ptr->porter[ pw_ptr->ig2fftw[kq_pack->wf_ptr->igk(ikq,ig)] ] = kq_pack->wf_ptr->wanf2[ikq](iw,ig);
 		pw_ptr->FFT_wfc.FFT3D(UFFT_ptr->porter,1);
@@ -345,7 +345,7 @@ void Exx_Lip::phi_cal(k_package *kq_pack, int ikq)
 				for( int iz=pw_ptr->nczp_start; iz<pw_ptr->nczp_start+pw_ptr->nczp; ++iz)
 				{
 					const double phase_xyz = phase_xy + kq_pack->kv_ptr->kvec_d[ikq].z * iz / pw_ptr->ncz;
-					const std::complex<double> exp_tmp = exp(phase_xyz*TWO_PI*IMAG_UNIT);
+					const std::complex<double> exp_tmp = exp(phase_xyz*ModuleBase::TWO_PI*ModuleBase::IMAG_UNIT);
 					phi[iw][ir] = UFFT_ptr->porter[ir]*exp_tmp;
 					++ir;
 				}
@@ -356,14 +356,14 @@ void Exx_Lip::phi_cal(k_package *kq_pack, int ikq)
 
 void Exx_Lip::psi_cal()
 {
-	TITLE("Exx_Lip","psi_cal");
+	ModuleBase::TITLE("Exx_Lip","psi_cal");
 	if (GlobalC::pot.start_pot=="atomic")
 	{
 		for( int iq = 0; iq < q_pack->kv_ptr->nks; ++iq)
 		{
 			for( int ib = 0; ib < GlobalV::NBANDS; ++ib)
 			{
-				ZEROS( UFFT_ptr->porter, pw_ptr->nrxx );
+				ModuleBase::GlobalFunc::ZEROS( UFFT_ptr->porter, pw_ptr->nrxx );
 				for( int ig = 0; ig < q_pack->kv_ptr->ngk[iq] ; ++ig)
 				{
 					UFFT_ptr->porter[ pw_ptr->ig2fftw[q_pack->wf_ptr->igk(iq,ig)] ] = q_pack->wf_ptr->evc[iq](ib,ig);
@@ -379,7 +379,7 @@ void Exx_Lip::psi_cal()
 						for( int iz=pw_ptr->nczp_start; iz<pw_ptr->nczp_start+pw_ptr->nczp; ++iz)
 						{
 							const double phase_xyz = phase_xy + q_pack->kv_ptr->kvec_d[iq].z * iz / pw_ptr->ncz;
-							const std::complex<double> exp_tmp = exp(phase_xyz*TWO_PI*IMAG_UNIT);
+							const std::complex<double> exp_tmp = exp(phase_xyz*ModuleBase::TWO_PI*ModuleBase::IMAG_UNIT);
 							psi[iq][ib][ir] = UFFT_ptr->porter[ir]*exp_tmp;
 							++ir;
 						}
@@ -395,7 +395,7 @@ void Exx_Lip::psi_cal()
 			phi_cal( q_pack, iq);
 			for( int ib=0; ib<GlobalV::NBANDS; ++ib)
 			{
-				ZEROS(psi[iq][ib],pw_ptr->nrxx);
+				ModuleBase::GlobalFunc::ZEROS(psi[iq][ib],pw_ptr->nrxx);
 				for( int iw=0; iw<GlobalV::NLOCAL; ++iw)
 				{
 					for( int ir=0; ir<pw_ptr->nrxx; ++ir)
@@ -437,7 +437,7 @@ void Exx_Lip::qkg2_exp(int ik, int iq)
 {
 	for( int ig=0; ig<pw_ptr->ngmc; ++ig)
 	{
-		const double qkg2 = ( (q_pack->kv_ptr->kvec_c[iq] - k_pack->kv_ptr->kvec_c[ik] + pw_ptr->gcar[ig]) *(TWO_PI/ucell_ptr->lat0)).norm2();
+		const double qkg2 = ( (q_pack->kv_ptr->kvec_c[iq] - k_pack->kv_ptr->kvec_c[ik] + pw_ptr->gcar[ig]) *(ModuleBase::TWO_PI/ucell_ptr->lat0)).norm2();
 		if( (Exx_Global::Hybrid_Type::PBE0==info.hybrid_type) || (Exx_Global::Hybrid_Type::HF==info.hybrid_type) )
 		{
 			if( abs(qkg2)<1e-10 )
@@ -460,7 +460,7 @@ void Exx_Lip::qkg2_exp(int ik, int iq)
 
 void Exx_Lip::b_cal( int ik, int iq, int ib)
 {
-	const Vector3<double> q_minus_k = q_pack->kv_ptr->kvec_d[iq] - k_pack->kv_ptr->kvec_d[ik];
+	const ModuleBase::Vector3<double> q_minus_k = q_pack->kv_ptr->kvec_d[iq] - k_pack->kv_ptr->kvec_d[ik];
 	std::vector<std::complex<double> > mul_tmp(pw_ptr->nrxx);
 	for( size_t ir=0,ix=0; ix<pw_ptr->ncx; ++ix)
 	{
@@ -471,7 +471,7 @@ void Exx_Lip::b_cal( int ik, int iq, int ib)
 			for( size_t iz=pw_ptr->nczp_start; iz<pw_ptr->nczp_start+pw_ptr->nczp; ++iz)
 			{
 				const double phase_xyz = phase_xy + q_minus_k.z*iz/pw_ptr->ncz;
-				mul_tmp[ir] = exp(-phase_xyz*TWO_PI*IMAG_UNIT);
+				mul_tmp[ir] = exp(-phase_xyz*ModuleBase::TWO_PI*ModuleBase::IMAG_UNIT);
 				mul_tmp[ir] *= psi[iq][ib][ir];
 				++ir;
 			}
@@ -536,12 +536,12 @@ void Exx_Lip::sum_all(int ik)
 	{
 		for( int iw_r=0; iw_r<GlobalV::NLOCAL; ++iw_r)
 		{
-			exx_matrix[ik][iw_l][iw_r] = 2.0* (-4*PI/ucell_ptr->omega *sum1[iw_l*GlobalV::NLOCAL+iw_r]);
+			exx_matrix[ik][iw_l][iw_r] = 2.0* (-4*ModuleBase::PI/ucell_ptr->omega *sum1[iw_l*GlobalV::NLOCAL+iw_r]);
 			if( Exx_Global::Hybrid_Type::HF==info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==info.hybrid_type )
 				if(gzero_rank_in_pool==GlobalV::RANK_IN_POOL)
 				{
-					exx_matrix[ik][iw_l][iw_r] += 2.0* (4*PI/ucell_ptr->omega *sum3[iw_l][iw_r] *sum2_factor_g );
-					exx_matrix[ik][iw_l][iw_r] += 2.0* (-1/sqrt(info.lambda*PI)*(q_pack->kv_ptr->nks/GlobalV::NSPIN) * sum3[iw_l][iw_r]);
+					exx_matrix[ik][iw_l][iw_r] += 2.0* (4*ModuleBase::PI/ucell_ptr->omega *sum3[iw_l][iw_r] *sum2_factor_g );
+					exx_matrix[ik][iw_l][iw_r] += 2.0* (-1/sqrt(info.lambda*ModuleBase::PI)*(q_pack->kv_ptr->nks/GlobalV::NSPIN) * sum3[iw_l][iw_r]);
 				}
 		}
 	}
@@ -549,7 +549,7 @@ void Exx_Lip::sum_all(int ik)
 
 void Exx_Lip::exx_energy_cal()
 {
-	TITLE("Exx_Lip","exx_energy_cal");
+	ModuleBase::TITLE("Exx_Lip","exx_energy_cal");
 
 	double exx_energy_tmp = 0.0;
 
@@ -708,7 +708,7 @@ void Exx_Lip::read_q_pack()
 	}
 	MPI_Bcast( q_pack->wf_wg.c, q_pack->kv_ptr->nks*GlobalV::NBANDS, MPI_DOUBLE, 0, POOL_WORLD);
 
-	q_pack->hvec_array = new ComplexMatrix [q_pack->kv_ptr->nks];
+	q_pack->hvec_array = new ModuleBase::ComplexMatrix [q_pack->kv_ptr->nks];
 	for( int iq=0; iq<q_pack->kv_ptr->nks; ++iq)
 	{
 		q_pack->hvec_array[iq].create(GlobalV::NLOCAL,GlobalV::NBANDS);
@@ -751,7 +751,7 @@ void Exx_Lip::write_q_pack() const
 		std::ofstream ofs(ssc.str().c_str());
     	if (!ofs)
     	{
-        	WARNING("Exx_Lip::write_q_pack","Can't create Exx_Lip File!");
+        	ModuleBase::WARNING("Exx_Lip::write_q_pack","Can't create Exx_Lip File!");
     	}
 
 		ofs<<q_pack->kv_ptr->nks<<std::endl;
@@ -804,7 +804,7 @@ void Exx_Lip::read_q_pack()
 		ifs.open(ssc.str().c_str());
     	if (!ifs)
     	{
-        	WARNING("Exx_Lip::write_q_pack","Can't read Exx_Lip File!");
+        	ModuleBase::WARNING("Exx_Lip::write_q_pack","Can't read Exx_Lip File!");
     	}
 
 		ifs >> q_pack->kv_ptr->nks;
@@ -813,15 +813,15 @@ void Exx_Lip::read_q_pack()
 	MPI_Bcast( &q_pack->kv_ptr->nks, 1, MPI_INT, 0, POOL_WORLD);
 
 	q_pack->kv_ptr->ngk = new int [q_pack->kv_ptr->nks];
-	q_pack.kvec_c = new Vector3<double> [q_pack->kv_ptr->nks];
-	q_pack.kvec_d = new Vector3<double> [q_pack->kv_ptr->nks];
+	q_pack.kvec_c = new ModuleBase::Vector3<double> [q_pack->kv_ptr->nks];
+	q_pack.kvec_d = new ModuleBase::Vector3<double> [q_pack->kv_ptr->nks];
 	double *kvec_tmp = new double [q_pack->kv_ptr->nks*6];				// just for MPI
 	q_pack.wf_wg = new double *[q_pack->kv_ptr->nks];
 	for( int iq=0; iq<q_pack->kv_ptr->nks; ++iq)
 	{
 		q_pack.wf_wg[iq] = new double[GlobalV::NBANDS];
 	}
-	q_pack.hvec_array = new ComplexMatrix [q_pack->kv_ptr->nks];
+	q_pack.hvec_array = new ModuleBase::ComplexMatrix [q_pack->kv_ptr->nks];
 	for( int iq=0; iq<q_pack->kv_ptr->nks; ++iq)
 	{
 		q_pack.hvec_array[iq].create(GlobalV::NLOCAL,GlobalV::NBANDS);
@@ -886,7 +886,7 @@ void Exx_Lip::read_q_pack()
 		std::ofstream ofs(sss.str().c_str());
 		if (!ofs)
 		{
-			WARNING("Exx_Lip::write_q_pack","Can't create Exx_Lip File!");
+			ModuleBase::WARNING("Exx_Lip::write_q_pack","Can't create Exx_Lip File!");
 		}
 
 		ofs<<q_pack->kv_ptr->nks<<std::endl;

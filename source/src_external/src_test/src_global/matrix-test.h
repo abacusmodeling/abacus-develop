@@ -9,7 +9,7 @@
 #include "../../../module_base/matrix.h"
 #include<limits>
 
-static double sum( const matrix & m )
+static double sum( const ModuleBase::matrix & m )
 {
 	double value = 0.0;
 	for( int ir=0; ir!=m.nr; ++ir )
@@ -18,7 +18,7 @@ static double sum( const matrix & m )
 	return value;
 }
 
-static double average( const matrix & m )
+static double average( const ModuleBase::matrix & m )
 {
 	return sum(m) / (m.nr*m.nc);
 }

@@ -14,6 +14,8 @@
 #include "memory.h"
 #endif
 
+namespace ModuleBase
+{
 //==========================================================
 // GLOBAL FUNCTION :
 // NAME : WARNING( write information into GlobalV::ofs_warning)
@@ -42,13 +44,13 @@ void QUIT(void)
 #ifdef __NORMAL
 
 #else
-    timer::finish(GlobalV::ofs_running , !GlobalV::MY_RANK);
+    ModuleBase::timer::finish(GlobalV::ofs_running , !GlobalV::MY_RANK);
 
-    Global_File::close_all_log(GlobalV::MY_RANK);
+    ModuleBase::Global_File::close_all_log(GlobalV::MY_RANK);
 
     if (GlobalV::MY_RANK==0)
     {
-        Memory::print_all( GlobalV::ofs_running ) ;
+        ModuleBase::Memory::print_all( GlobalV::ofs_running ) ;
     }
     std::cout<<" See output information in : "<<GlobalV::global_out_dir<<std::endl;
 #endif
@@ -128,4 +130,6 @@ void WARNING_QUIT(const std::string &file,const std::string &description)
 #endif
 
     QUIT();
+}
+
 }

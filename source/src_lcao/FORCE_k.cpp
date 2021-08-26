@@ -15,18 +15,18 @@ Force_LCAO_k::~Force_LCAO_k ()
 void Force_LCAO_k::ftable_k (
 		const bool isforce,
 		const bool isstress,
-		matrix& foverlap,
-		matrix& ftvnl_dphi,
-		matrix& fvnl_dbeta,	
-		matrix& fvl_dphi,
-		matrix& soverlap,
-		matrix& stvnl_dphi,
-		matrix& svnl_dbeta,
-		matrix& svl_dphi
+		ModuleBase::matrix& foverlap,
+		ModuleBase::matrix& ftvnl_dphi,
+		ModuleBase::matrix& fvnl_dbeta,	
+		ModuleBase::matrix& fvl_dphi,
+		ModuleBase::matrix& soverlap,
+		ModuleBase::matrix& stvnl_dphi,
+		ModuleBase::matrix& svnl_dbeta,
+		ModuleBase::matrix& svl_dphi
 		)
 {
-    TITLE("Force_LCAO_k", "ftable_k");
-	timer::tick("Force_LCAO_k","ftable_k");
+    ModuleBase::TITLE("Force_LCAO_k", "ftable_k");
+	ModuleBase::timer::tick("Force_LCAO_k","ftable_k");
 	
 	this->allocate_k();
 
@@ -39,9 +39,9 @@ void Force_LCAO_k::ftable_k (
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		dm2d[is] = new double[GlobalC::LNNR.nnr];
-		ZEROS(dm2d[is], GlobalC::LNNR.nnr);
+		ModuleBase::GlobalFunc::ZEROS(dm2d[is], GlobalC::LNNR.nnr);
 	}
-	Memory::record ("Force_LCAO_k", "dm2d", GlobalV::NSPIN*GlobalC::LNNR.nnr, "double");	
+	ModuleBase::Memory::record ("Force_LCAO_k", "dm2d", GlobalV::NSPIN*GlobalC::LNNR.nnr, "double");	
 	bool with_energy = false;
 
 	
@@ -88,7 +88,7 @@ void Force_LCAO_k::ftable_k (
 	std::cout << " overlap force" << std::endl;
 	for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
 	{
-		const double fac = Ry_to_eV / 0.529177;
+		const double fac = ModuleBase::Ry_to_eV / 0.529177;
 		std::cout << std::setw(5) << iat+1 << std::setw(15) << foverlap[iat][0] *fac<< std::setw(15) << foverlap[iat][1]*fac << 
 		std::setw(15) << foverlap[iat][2]*fac << std::endl;
 	}
@@ -96,14 +96,14 @@ void Force_LCAO_k::ftable_k (
 
 	this->finish_k();
 
-	timer::tick("Force_LCAO_k","ftable_k");
+	ModuleBase::timer::tick("Force_LCAO_k","ftable_k");
     return;
 }
 
 void Force_LCAO_k::allocate_k(void)
 {
-	TITLE("Force_LCAO_k","allocate_k");
-	timer::tick("Force_LCAO_k","allocate_k");
+	ModuleBase::TITLE("Force_LCAO_k","allocate_k");
+	ModuleBase::timer::tick("Force_LCAO_k","allocate_k");
 
 	const int nnr = GlobalC::LNNR.nnr;
 	//--------------------------------
@@ -112,27 +112,27 @@ void Force_LCAO_k::allocate_k(void)
 	GlobalC::LM.DSloc_Rx = new double [nnr];
     GlobalC::LM.DSloc_Ry = new double [nnr];
     GlobalC::LM.DSloc_Rz = new double [nnr];
-    ZEROS(GlobalC::LM.DSloc_Rx, nnr);
-    ZEROS(GlobalC::LM.DSloc_Ry, nnr);
-    ZEROS(GlobalC::LM.DSloc_Rz, nnr);
-	Memory::record("force_lo", "dS", nnr*3, "double");
+    ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_Rx, nnr);
+    ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_Ry, nnr);
+    ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_Rz, nnr);
+	ModuleBase::Memory::record("force_lo", "dS", nnr*3, "double");
     
 	if(GlobalV::STRESS){
 		GlobalC::LM.DH_r = new double [3* nnr];
-		ZEROS(GlobalC::LM.DH_r, 3 * nnr);
+		ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DH_r, 3 * nnr);
 		GlobalC::LM.stvnl11 = new double [nnr];
 		GlobalC::LM.stvnl12 = new double [nnr];
 		GlobalC::LM.stvnl13 = new double [nnr];
 		GlobalC::LM.stvnl22 = new double [nnr];
 		GlobalC::LM.stvnl23 = new double [nnr];
 		GlobalC::LM.stvnl33 = new double [nnr];
-		ZEROS(GlobalC::LM.stvnl11,  nnr);
-		ZEROS(GlobalC::LM.stvnl12,  nnr);
-		ZEROS(GlobalC::LM.stvnl13,  nnr);
-		ZEROS(GlobalC::LM.stvnl22,  nnr);
-		ZEROS(GlobalC::LM.stvnl23,  nnr);
-		ZEROS(GlobalC::LM.stvnl33,  nnr);
-		Memory::record("stress_lo", "dSR", nnr*6, "double");
+		ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.stvnl11,  nnr);
+		ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.stvnl12,  nnr);
+		ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.stvnl13,  nnr);
+		ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.stvnl22,  nnr);
+		ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.stvnl23,  nnr);
+		ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.stvnl33,  nnr);
+		ModuleBase::Memory::record("stress_lo", "dSR", nnr*6, "double");
 	}
 
 	//-----------------------------
@@ -148,10 +148,10 @@ void Force_LCAO_k::allocate_k(void)
     GlobalC::LM.DHloc_fixedR_x = new double [nnr];
     GlobalC::LM.DHloc_fixedR_y = new double [nnr];
     GlobalC::LM.DHloc_fixedR_z = new double [nnr];
-    ZEROS (GlobalC::LM.DHloc_fixedR_x, nnr);
-    ZEROS (GlobalC::LM.DHloc_fixedR_y, nnr);
-    ZEROS (GlobalC::LM.DHloc_fixedR_z, nnr);
-	Memory::record("force_lo", "dTVNL", nnr*3, "double");
+    ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixedR_x, nnr);
+    ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixedR_y, nnr);
+    ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixedR_z, nnr);
+	ModuleBase::Memory::record("force_lo", "dTVNL", nnr*3, "double");
     
     // calculate dT=<phi|kin|dphi> in LCAO
     // calculate T + VNL(P1) in LCAO basis
@@ -162,7 +162,7 @@ void Force_LCAO_k::allocate_k(void)
 	GlobalC::UHM.genH.build_Nonlocal_mu (cal_deri);
 	//test(GlobalC::LM.DHloc_fixedR_x,"GlobalC::LM.DHloc_fixedR_x Vnl part");
 
-	timer::tick("Force_LCAO_k","allocate");
+	ModuleBase::timer::tick("Force_LCAO_k","allocate");
 	return;
 }
 
@@ -191,10 +191,10 @@ void Force_LCAO_k::finish_k(void)
 #include "LCAO_nnr.h"
 void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 {
-	TITLE("Force_LCAO_k","set_EDM_k");
-	timer::tick("Force_LCAO_k","set_EDM_k");
+	ModuleBase::TITLE("Force_LCAO_k","set_EDM_k");
+	ModuleBase::timer::tick("Force_LCAO_k","set_EDM_k");
 
-	Vector3<double> tau1, dtau;
+	ModuleBase::Vector3<double> tau1, dtau;
 
 	//----------------------------------------------------------
 	// RA will set the adjacent information for each atom
@@ -227,7 +227,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
    			for(int is=0; is<GlobalV::NSPIN; is++)
 			   {
 				   vvv[is] = new std::complex<double>[ irr ];
-				   ZEROS(vvv[is], irr );
+				   ModuleBase::GlobalFunc::ZEROS(vvv[is], irr );
 			   }
          }
 
@@ -266,7 +266,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 							//-----------------
 							// exp[i * R * k]
 							//-----------------
-							const std::complex<double> phase = w1 * exp(TWO_PI * IMAG_UNIT * (
+							const std::complex<double> phase = w1 * exp(ModuleBase::TWO_PI * ModuleBase::IMAG_UNIT * (
 										GlobalC::kv.kvec_d[ik].x * RA.info[iat][cb][0] +
 										GlobalC::kv.kvec_d[ik].y * RA.info[iat][cb][1] +
 										GlobalC::kv.kvec_d[ik].z * RA.info[iat][cb][2]
@@ -355,7 +355,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 	}// T1
 
 RA.delete_grid();//xiaohui add 2015-02-04
-	timer::tick("Force_LCAO_k","set_EDM_k");
+	ModuleBase::timer::tick("Force_LCAO_k","set_EDM_k");
 	return;
 }
 
@@ -390,11 +390,11 @@ std::complex<double> Force_LCAO_k::set_EDM_k_element(
 void Force_LCAO_k::cal_foverlap_k(
 	const bool isforce, 
 	const bool isstress, 
-	matrix& foverlap, 
-	matrix& soverlap)
+	ModuleBase::matrix& foverlap, 
+	ModuleBase::matrix& soverlap)
 {
-	TITLE("Force_LCAO_k","cal_foverlap_k");
-	timer::tick("Force_LCAO_k","cal_foverlap_k");
+	ModuleBase::TITLE("Force_LCAO_k","cal_foverlap_k");
+	ModuleBase::timer::tick("Force_LCAO_k","cal_foverlap_k");
 
 	//--------------------------------------------
 	// (1) allocate energy density matrix (nnr)
@@ -403,7 +403,7 @@ void Force_LCAO_k::cal_foverlap_k(
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		edm2d[is] = new double[GlobalC::LNNR.nnr];
-		ZEROS(edm2d[is], GlobalC::LNNR.nnr);
+		ModuleBase::GlobalFunc::ZEROS(edm2d[is], GlobalC::LNNR.nnr);
 	}
 	bool with_energy = true;
 
@@ -416,7 +416,7 @@ void Force_LCAO_k::cal_foverlap_k(
     //summation \sum_{i,j} E(i,j)*dS(i,j)
     //BEGIN CALCULATION OF FORCE OF EACH ATOM
 	//--------------------------------------------
-	Vector3<double> tau1, dtau, tau2;
+	ModuleBase::Vector3<double> tau1, dtau, tau2;
 
 	Record_adj RA;
 	RA.for_2d();
@@ -492,7 +492,7 @@ void Force_LCAO_k::cal_foverlap_k(
 	std::cout << " overlap force" << std::endl;
 	for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
 	{
-		const double fac = Ry_to_eV / 0.529177;
+		const double fac = ModuleBase::Ry_to_eV / 0.529177;
 		std::cout << std::setw(5) << iat+1 << std::setw(15) << foverlap[iat][0] *fac<< std::setw(15) << foverlap[iat][1]*fac << 
 		std::setw(15) << foverlap[iat][2]*fac << std::endl;
 	}
@@ -509,9 +509,9 @@ void Force_LCAO_k::cal_foverlap_k(
 
 	if(irr!=GlobalC::LNNR.nnr)
 	{
-		OUT(GlobalV::ofs_running,"wrong irr",irr);
-		OUT(GlobalV::ofs_running,"wrong GlobalC::LNNR.nnr",GlobalC::LNNR.nnr);
-		WARNING_QUIT("Force_LCAO_k::cal_foverlap_k","irr!=GlobalC::LNNR.nnr");
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wrong irr",irr);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wrong GlobalC::LNNR.nnr",GlobalC::LNNR.nnr);
+		ModuleBase::WARNING_QUIT("Force_LCAO_k::cal_foverlap_k","irr!=GlobalC::LNNR.nnr");
 	}
 	
 	for(int is=0; is<GlobalV::NSPIN; is++)
@@ -521,7 +521,7 @@ void Force_LCAO_k::cal_foverlap_k(
 	delete[] edm2d;
 
 	RA.delete_grid();//xiaohui add 2015-02-04
-	timer::tick("Force_LCAO_k","cal_foverlap_k");
+	ModuleBase::timer::tick("Force_LCAO_k","cal_foverlap_k");
 	return;
 }
 
@@ -529,11 +529,11 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(
 	double** dm2d, 
 	const bool isforce, 
 	const bool isstress, 
-	matrix& ftvnl_dphi, 
-	matrix& stvnl_dphi)
+	ModuleBase::matrix& ftvnl_dphi, 
+	ModuleBase::matrix& stvnl_dphi)
 {	
-	TITLE("Force_LCAO_k","cal_ftvnl_dphi");
-	timer::tick("Force_LCAO_k","cal_ftvnl_dphi");
+	ModuleBase::TITLE("Force_LCAO_k","cal_ftvnl_dphi");
+	ModuleBase::timer::tick("Force_LCAO_k","cal_ftvnl_dphi");
 	
 	// get the adjacent atom's information.
 
@@ -614,7 +614,7 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(
 	}
 
 	RA.delete_grid();//xiaohui add 2015-02-04
-	timer::tick("Force_LCAO_k","cal_ftvnl_dphi");
+	ModuleBase::timer::tick("Force_LCAO_k","cal_ftvnl_dphi");
 	return;
 }
 
@@ -633,7 +633,7 @@ void Force_LCAO_k::test(double* mmm, const std::string &name)
 	
 	double *test;
 	test = new double[GlobalV::NLOCAL * GlobalV::NLOCAL];
-	ZEROS(test, GlobalV::NLOCAL *GlobalV::NLOCAL);
+	ModuleBase::GlobalFunc::ZEROS(test, GlobalV::NLOCAL *GlobalV::NLOCAL);
 	
 	for(int T1=0; T1<GlobalC::ucell.ntype; T1++)
     {
@@ -691,18 +691,18 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 	double** dm2d, 
 	const bool isforce, 
 	const bool isstress, 
-	matrix& fvnl_dbeta, 
-	matrix& svnl_dbeta)
+	ModuleBase::matrix& fvnl_dbeta, 
+	ModuleBase::matrix& svnl_dbeta)
 {
-	TITLE("Force_LCAO_k","cal_fvnl_dbeta_k");
-	timer::tick("Force_LCAO_k","cal_fvnl_dbeta_k");
+	ModuleBase::TITLE("Force_LCAO_k","cal_fvnl_dbeta_k");
+	ModuleBase::timer::tick("Force_LCAO_k","cal_fvnl_dbeta_k");
 	int iir = 0;
-	Vector3<double> tau1;
-	Vector3<double> tau2;
-	Vector3<double> dtau;
-	Vector3<double> tau0;
-	Vector3<double>	dtau1;
-	Vector3<double> dtau2;
+	ModuleBase::Vector3<double> tau1;
+	ModuleBase::Vector3<double> tau2;
+	ModuleBase::Vector3<double> dtau;
+	ModuleBase::Vector3<double> tau0;
+	ModuleBase::Vector3<double>	dtau1;
+	ModuleBase::Vector3<double> dtau2;
 
 	double rcut;
 	double distance;
@@ -901,7 +901,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 		}
 	}
 
-	timer::tick("Force_LCAO_k","cal_fvnl_dbeta_k");
+	ModuleBase::timer::tick("Force_LCAO_k","cal_fvnl_dbeta_k");
 	return;
 }
 
@@ -911,11 +911,11 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 	double** dm2d, 
 	const bool isforce, 
 	const bool isstress, 
-	matrix& fvl_dphi, 
-	matrix& svl_dphi)
+	ModuleBase::matrix& fvl_dphi, 
+	ModuleBase::matrix& svl_dphi)
 {
-	TITLE("Force_LCAO_k","cal_fvl_dphi_k");
-	timer::tick("Force_LCAO_k","cal_fvl_dphi_k");
+	ModuleBase::TITLE("Force_LCAO_k","cal_fvl_dphi_k");
+	ModuleBase::timer::tick("Force_LCAO_k","cal_fvl_dphi_k");
 
 	if(!isforce&&!isstress) return;
 	assert(GlobalC::LM.DHloc_fixedR_x!=NULL);
@@ -965,7 +965,7 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 		}
 	}
 
-	timer::tick("Force_LCAO_k","cal_fvl_dphi_k");
+	ModuleBase::timer::tick("Force_LCAO_k","cal_fvl_dphi_k");
 	return;
 }
 

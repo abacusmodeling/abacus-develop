@@ -124,7 +124,7 @@ public:
     int *ig2fftw; // dimension: [ngmw]
 
 	// structure factor (ntype, ngmc)
-    ComplexMatrix strucFac;
+    ModuleBase::ComplexMatrix strucFac;
     void setup_structure_factor(void); 		// Calculate structur factors
 
 private:
@@ -142,26 +142,26 @@ private:
 // Part 5: G vectors, |G|^2, G index [ngmc] 
 //===============================================
 public:
-    Vector3<double> *gdirect;		//(= *G1d) ; // ig = new Vector igc[ngmc],
-    Vector3<double> *gdirect_global;	//(= *G1d) ; // ig = new Vector igc[ngmc],
+    ModuleBase::Vector3<double> *gdirect;		//(= *G1d) ; // ig = new Vector igc[ngmc],
+    ModuleBase::Vector3<double> *gdirect_global;	//(= *G1d) ; // ig = new Vector igc[ngmc],
     // store the 3D G std::vector coordinates for charge density grid;
     // ig.x, ig.y, ig.z should be integers !!!
     // G vectors are in order of increasing G^2
     // can be shared by charge density/potential and wave functions.
 
-    Vector3<double> *gcar;   			//G vectors in cartesian corrdinate
-    Vector3<double> *gcar_global;   	//G vectors in cartesian corrdinate
+    ModuleBase::Vector3<double> *gcar;   			//G vectors in cartesian corrdinate
+    ModuleBase::Vector3<double> *gcar_global;   	//G vectors in cartesian corrdinate
     //g=ig*G ?? HLX (05-26-06): need to check if this is ok!
     //tau is also defined in Cartesian coordintes unit lat0
-    Vector3<double> get_GPlusK_cartesian(const int ik, const int ig) const {
+    ModuleBase::Vector3<double> get_GPlusK_cartesian(const int ik, const int ig) const {
         assert(ig>=0 && ig<this->ngmc && ik>=0 && ik<Klist->nks);
-        Vector3<double> g_temp_ = Klist->kvec_c[ik] + this->gcar[ig];
+        ModuleBase::Vector3<double> g_temp_ = Klist->kvec_c[ik] + this->gcar[ig];
         return g_temp_;
     };
     double get_GPlusK_cartesian_projection(const int ik, const int ig, const int axis) const
     {
         assert(ig >= 0 && ig < this->ngmc && ik >= 0 && ik < Klist->nks && axis >= 0 && axis <= 2);
-        Vector3<double> g_temp_ = Klist->kvec_c[ik] + this->gcar[ig];
+        ModuleBase::Vector3<double> g_temp_ = Klist->kvec_c[ik] + this->gcar[ig];
         if (axis == 0)
         {
             return g_temp_.x;
@@ -179,10 +179,10 @@ public:
     double get_SquareGPlusK_cartesian(const int ik, const int ig) const 
     {
         assert(ig >= 0 && ig < this->ngmc && ik >= 0 && ik < Klist->nks);
-        Vector3<double> g_temp_ = Klist->kvec_c[ik] + this->gcar[ig];
+        ModuleBase::Vector3<double> g_temp_ = Klist->kvec_c[ik] + this->gcar[ig];
         return (g_temp_ * g_temp_);
     };
-    Vector3<double> get_G_cartesian(const int ig) const 
+    ModuleBase::Vector3<double> get_G_cartesian(const int ig) const 
     {
         assert(ig>=0 && ig<this->ngmc);
         return this->gcar[ig];
@@ -243,9 +243,9 @@ private:
 //===============================================
 public:
 	// phase of e^{-iG*tau_s}
-    ComplexMatrix eigts1; // dimension: [Ucell->nat, 2*this->ncx + 1] 
-    ComplexMatrix eigts2; // dimension: [Ucell->nat, 2*this->ncy + 1] 
-    ComplexMatrix eigts3; // dimension: [Ucell->nat, 2*this->ncz + 1]
+    ModuleBase::ComplexMatrix eigts1; // dimension: [Ucell->nat, 2*this->ncx + 1] 
+    ModuleBase::ComplexMatrix eigts2; // dimension: [Ucell->nat, 2*this->ncy + 1] 
+    ModuleBase::ComplexMatrix eigts3; // dimension: [Ucell->nat, 2*this->ncz + 1]
 
 
 

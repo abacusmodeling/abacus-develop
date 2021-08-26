@@ -16,8 +16,8 @@ Run_lcao::~Run_lcao(){}
 
 void Run_lcao::lcao_line(void)
 {
-    TITLE("Run_lcao","lcao_line");
-	timer::tick("Run_lcao","lcao_line");
+    ModuleBase::TITLE("Run_lcao","lcao_line");
+	ModuleBase::timer::tick("Run_lcao","lcao_line");
 
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
@@ -57,18 +57,18 @@ void Run_lcao::lcao_line(void)
 	}
 
     //GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir , GlobalV::global_atom_card , GlobalV::ofs_running, GlobalV::NLOCAL, GlobalV::NBANDS);
-    DONE(GlobalV::ofs_running, "SETUP UNITCELL");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     // symmetry analysis should be performed every time the cell is changed
     if (ModuleSymmetry::Symmetry::symm_flag)
     {
         GlobalC::symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
-        DONE(GlobalV::ofs_running, "SYMMETRY");
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
     // Setup the k points according to symmetry.
     GlobalC::kv.set(GlobalC::symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec );
-    DONE(GlobalV::ofs_running,"INIT K-POINTS");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT K-POINTS");
 
     // print information
     // mohan add 2021-01-30
@@ -104,7 +104,7 @@ void Run_lcao::lcao_line(void)
 
     // Initalize the plane wave basis set
     GlobalC::pw.gen_pw(GlobalV::ofs_running, GlobalC::ucell, GlobalC::kv);
-    DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
     std::cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx <<" * " << GlobalC::pw.ny <<" * "<< GlobalC::pw.nz << std::endl;
     std::cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx <<" * " << GlobalC::pw.nby <<" * "<< GlobalC::pw.nbz << std::endl;
 
@@ -112,7 +112,7 @@ void Run_lcao::lcao_line(void)
     if(GlobalV::CALCULATION == "test")
     {
         Cal_Test::test_memory();
-        QUIT();
+        ModuleBase::QUIT();
     }
 
     // initialize the real-space uniform grid for FFT and parallel
@@ -123,11 +123,11 @@ void Run_lcao::lcao_line(void)
 
 	// Inititlize the charge density.
     GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
-    DONE(GlobalV::ofs_running,"INIT CHARGE");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT CHARGE");
 
 	// Initializee the potential.
     GlobalC::pot.allocate(GlobalC::pw.nrxx);
-    DONE(GlobalV::ofs_running,"INIT POTENTIAL");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT POTENTIAL");
 
 
 	// Peize Lin add 2018-11-30
@@ -158,6 +158,6 @@ void Run_lcao::lcao_line(void)
 		GlobalC::en.perform_dos();
 	}
 
-	timer::tick("Run_lcao","lcao_line");
+	ModuleBase::timer::tick("Run_lcao","lcao_line");
     return;
 }

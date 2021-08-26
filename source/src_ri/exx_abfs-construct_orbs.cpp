@@ -12,7 +12,7 @@ std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_
 	const LCAO_Orbitals &orbs_in,
 	const double kmesh_times )
 {
-	TITLE("Exx_Abfs::Construct_Orbs::change_orbs");
+	ModuleBase::TITLE("Exx_Abfs::Construct_Orbs::change_orbs");
 
 	std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> orbs;
 	orbs.resize( orbs_in.get_ntype() );
@@ -51,7 +51,7 @@ std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_
 	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orbs_in,
 	const double kmesh_times )
 {
-	TITLE("Exx_Abfs::Construct_Orbs::change_orbs");
+	ModuleBase::TITLE("Exx_Abfs::Construct_Orbs::change_orbs");
 	return orbital( get_psi(orbs_in), orbs_in, kmesh_times );
 }
 
@@ -81,7 +81,7 @@ std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_
 	const double kmesh_times_mot,
 	const double times_threshold )
 {
-	TITLE("Exx_Abfs::Construct_Orbs::abfs_same_atom");
+	ModuleBase::TITLE("Exx_Abfs::Construct_Orbs::abfs_same_atom");
 
 	const std::vector<std::vector<std::vector<std::vector<double>>>>
 		abfs_same_atom_psi = psi_mult_psi( orbs );
@@ -116,7 +116,7 @@ std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_
 	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orbs,
 	const double norm_threshold )
 {
-	TITLE("Exx_Abfs::Construct_Orbs::orth_orbs");
+	ModuleBase::TITLE("Exx_Abfs::Construct_Orbs::orth_orbs");
 	const std::vector<std::vector<std::vector<std::vector<double>>>>
 		orbs_psi = get_psi( orbs );
 	const std::vector<std::vector<std::vector<std::vector<double>>>>
@@ -274,11 +274,11 @@ std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_O
 	const double kmesh_times_mot,
 	const double times_threshold )
 {
-std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
+std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 	if(times_threshold>1)
 		return std::vector<std::vector<std::vector<std::vector<double>>>>(abfs.size());
 
-	const std::vector<std::vector<std::pair<std::vector<double>,matrix>>> && eig = Exx_Abfs::PCA::cal_PCA( orbs, abfs, kmesh_times_mot );
+	const std::vector<std::vector<std::pair<std::vector<double>,ModuleBase::matrix>>> && eig = Exx_Abfs::PCA::cal_PCA( orbs, abfs, kmesh_times_mot );
 
 	const std::vector<std::vector<std::vector<std::vector<double>>>> && psis = get_psi( abfs );
 	std::vector<std::vector<std::vector<std::vector<double>>>> psis_new( psis.size() );
@@ -303,7 +303,7 @@ ofs<<"eig_value_threshold:\t"<<eig_value_threshold<<std::endl;
 			for( size_t L=0; L!=eig[T].size(); ++L )
 			{
 				const std::vector<double> &eig_value = eig[T][L].first;
-				const matrix &eig_vec = eig[T][L].second;
+				const ModuleBase::matrix &eig_vec = eig[T][L].second;
 				for( size_t M=0; M!=eig_value.size(); ++M )
 				{
 					if( eig_value[M] > eig_value_threshold )
@@ -319,8 +319,8 @@ ofs<<"eig_value_threshold:\t"<<eig_value_threshold<<std::endl;
 		}
 		else
 		{
-			WARNING(TO_STRING(__FILE__),
-				"Element "+TO_STRING(T)+" , all training data (lcao[i]*lcao[j]) are all the same. So PCA randomly choose an abf as the result.");
+			ModuleBase::WARNING(ModuleBase::GlobalFunc::TO_STRING(__FILE__),
+				"Element "+ModuleBase::GlobalFunc::TO_STRING(T)+" , all training data (lcao[i]*lcao[j]) are all the same. So PCA randomly choose an abf as the result.");
 			psis_new[T].resize( psis[T].size() );
 			for( size_t L=0; L!=psis[T].size(); ++L )
 				if( !psis[T][L].empty() )
@@ -344,9 +344,9 @@ std::vector<std::vector<std::vector<std::vector<double>>>> Exx_Abfs::Construct_O
 	for( int T=0; T!=psis.size(); ++T )
 	{
 		const Numerical_Orbital_Lm &orb = orbs[T][0][0];
-		Gram_Schmidt_Orth<double,double> gso(
+		ModuleBase::Gram_Schmidt_Orth<double,double> gso(
 			orb.get_rab(),
-			Gram_Schmidt_Orth<double,double>::Coordinate::Sphere );
+			ModuleBase::Gram_Schmidt_Orth<double,double>::Coordinate::Sphere );
 		psis_orth[T].resize( psis[T].size() );
 		for( int L=0; L!=psis[T].size(); ++L )
 		{
@@ -425,7 +425,7 @@ std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_
 					orb_info.getRab(),
 					orb_info.getRadial(),
 					Numerical_Orbital_Lm::Psi_Type::Psi,
-					VECTOR_TO_PTR(psis[T][L][N]),
+					ModuleBase::GlobalFunc::VECTOR_TO_PTR(psis[T][L][N]),
 					static_cast<int>(orb_info.getNk() * kmesh_times) | 1,	// Nk must be odd
 					orb_info.getDk(),					// Peize Lin test 2017-04-16
 //					orb_info.getDk() / kmesh_times,

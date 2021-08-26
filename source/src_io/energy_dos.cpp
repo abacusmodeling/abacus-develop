@@ -25,7 +25,7 @@
 
 void energy::perform_dos(void)
 {
-	TITLE("energy","perform_dos");
+	ModuleBase::TITLE("energy","perform_dos");
 
 
     if(out_dos !=0 || out_band !=0)
@@ -134,7 +134,7 @@ void energy::perform_dos(void)
 						<<std::setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<std::endl;
 						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
-							ofsi2<<std::setw(6)<<ib+1<<std::setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV<<std::setw(25)<<GlobalC::wf.wg(ik,ib)<<std::endl;
+							ofsi2<<std::setw(6)<<ib+1<<std::setw(25)<<GlobalC::wf.ekb[ik][ib]* ModuleBase::Ry_to_eV<<std::setw(25)<<GlobalC::wf.wg(ik,ib)<<std::endl;
 						}
 						ofsi2 <<std::endl;
 						ofsi2 <<std::endl;
@@ -155,9 +155,9 @@ void energy::perform_dos(void)
 						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
 							ofsi2<<std::setw(6)<<ib+1
-							<<std::setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV
+							<<std::setw(25)<<GlobalC::wf.ekb[ik][ib]* ModuleBase::Ry_to_eV
 							<<std::setw(25)<<GlobalC::wf.wg(ik,ib)
-							<<std::setw(25)<<GlobalC::wf.ekb[(ik+GlobalC::kv.nks/2)][ib]* Ry_to_eV
+							<<std::setw(25)<<GlobalC::wf.ekb[(ik+GlobalC::kv.nks/2)][ib]* ModuleBase::Ry_to_eV
 							<<std::setw(25)<<GlobalC::wf.wg(ik+GlobalC::kv.nks/2,ib)<<std::endl;
 						}
 						ofsi2 <<std::endl;
@@ -203,8 +203,8 @@ void energy::perform_dos(void)
 		Parallel_Reduce::gather_min_double_all(emin);
 #endif
 
-		emax *= Ry_to_eV;
-		emin *= Ry_to_eV;
+		emax *= ModuleBase::Ry_to_eV;
+		emin *= ModuleBase::Ry_to_eV;
 
 //scale up a little bit so the end peaks are displaced better
 		double delta=(emax-emin)*dos_scale;
@@ -246,7 +246,7 @@ void energy::perform_dos(void)
 
 
 		const int np=npoints;
-		matrix*  pdosk = new matrix[nspin0];
+		ModuleBase::matrix*  pdosk = new ModuleBase::matrix[nspin0];
 
 		for(int is=0; is<nspin0; ++is)
 		{
@@ -257,7 +257,7 @@ void energy::perform_dos(void)
 
 
 		}
-		matrix*  pdos = new matrix[nspin0];
+		ModuleBase::matrix*  pdos = new ModuleBase::matrix[nspin0];
 		for(int is=0; is<nspin0; ++is)
 		{
 			pdos[is].create(GlobalV::NLOCAL,np,true);
@@ -276,21 +276,21 @@ void energy::perform_dos(void)
 		{
 			if(GlobalV::GAMMA_ONLY_LOCAL)
 			{
-				std::vector<matrix>   Mulk;
+				std::vector<ModuleBase::matrix>   Mulk;
 				Mulk.resize(1);
 				Mulk[0].create(GlobalC::ParaO.ncol,GlobalC::ParaO.nrow);
 
 
-				matrix Dwf = D.wfc_gamma[is];
+				ModuleBase::matrix Dwf = D.wfc_gamma[is];
 				for (int i=0; i<GlobalV::NBANDS; ++i)		  
 				{     
-					ZEROS(waveg, GlobalV::NLOCAL);
+					ModuleBase::GlobalFunc::ZEROS(waveg, GlobalV::NLOCAL);
 
-					ZEROS(Gauss,np);
+					ModuleBase::GlobalFunc::ZEROS(Gauss,np);
 					for (int n=0; n<npoints; ++n)		  
 					{  
 						double en=emin+n * de_ev;
-						double en0=GlobalC::wf.ekb[0][i]*Ry_to_eV;
+						double en0=GlobalC::wf.ekb[0][i]*ModuleBase::Ry_to_eV;
 						double de = en-en0;
 						double de2 = 0.5*de * de;
 						Gauss[n] = GlobalC::kv.wk[0]*exp(-de2/a/a)/b;
@@ -367,7 +367,7 @@ void energy::perform_dos(void)
 				GlobalC::LM.zeros_HSR('S', GlobalC::LNNR.nnr);
 				GlobalC::UHM.genH.calculate_S_no();
 				GlobalC::UHM.genH.build_ST_new('S', false);
-				std::vector<ComplexMatrix> Mulk;
+				std::vector<ModuleBase::ComplexMatrix> Mulk;
 				Mulk.resize(1);
 				Mulk[0].create(GlobalC::ParaO.ncol,GlobalC::ParaO.nrow);
 
@@ -382,19 +382,19 @@ void energy::perform_dos(void)
 						GlobalC::LNNR.folding_fixedH(ik);
 
 
-						ComplexMatrix Dwfc = conj(D.wfc_k[ik]);
+						ModuleBase::ComplexMatrix Dwfc = conj(D.wfc_k[ik]);
 
 						for (int i=0; i<GlobalV::NBANDS; ++i)		  
 						{     
 
-							ZEROS(waveg, GlobalV::NLOCAL);
+							ModuleBase::GlobalFunc::ZEROS(waveg, GlobalV::NLOCAL);
 
 
-							ZEROS(Gauss,np);
+							ModuleBase::GlobalFunc::ZEROS(Gauss,np);
 							for (int n=0; n<npoints; ++n)		  
 							{  
 								double en=emin+n * de_ev;
-								double en0=GlobalC::wf.ekb[ik][i]*Ry_to_eV;
+								double en0=GlobalC::wf.ekb[ik][i]*ModuleBase::Ry_to_eV;
 								double de = en-en0;
 								double de2 = 0.5*de * de;
 								Gauss[n] = GlobalC::kv.wk[ik]*exp(-de2/a/a)/b;

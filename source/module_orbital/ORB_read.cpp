@@ -46,7 +46,7 @@ void LCAO_Orbitals::bcast_files(
 	const int &ntype_in, 
 	const int &my_rank)
 {
-	TITLE("LCAO_Orbitals","bcast_files");
+	ModuleBase::TITLE("LCAO_Orbitals","bcast_files");
 
 	// 'read_in_flag' is true when there is a
 	// block "NUMERICAL_ORBITAL" in structure
@@ -111,8 +111,8 @@ void LCAO_Orbitals::Read_Orbitals(
 	const bool &force_flag, // mohan add 2021-05-07
 	const int &my_rank) // mohan add 2021-04-26
 {
-	TITLE("LCAO_Orbitals", "Read_Orbitals");
-	timer::tick("LCAO_Orbitals","Read_Orbitals");
+	ModuleBase::TITLE("LCAO_Orbitals", "Read_Orbitals");
+	ModuleBase::timer::tick("LCAO_Orbitals","Read_Orbitals");
 
 	ofs_in << "\n\n\n\n";
 	ofs_in << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
@@ -136,15 +136,15 @@ void LCAO_Orbitals::Read_Orbitals(
 
 	if(!read_in_flag)
 	{
-		WARNING_QUIT("LCAO_Orbitals::Read_Orbitals","Set the NUMERICAL_ORBITAL block in structure file.");
+		ModuleBase::WARNING_QUIT("LCAO_Orbitals::Read_Orbitals","Set the NUMERICAL_ORBITAL block in structure file.");
 	}
 
 
 	//OUT(ofs_in,"ecutwfc for kmesh",ecutwfc);
-	OUT(ofs_in,"delta k  (1/Bohr)",dk);
-	OUT(ofs_in,"delta r    (Bohr)",dR);
-	OUT(ofs_in,"dr_uniform (Bohr)",dr_uniform);
-	OUT(ofs_in,"rmax       (Bohr)",Rmax);
+	ModuleBase::GlobalFunc::OUT(ofs_in,"delta k  (1/Bohr)",dk);
+	ModuleBase::GlobalFunc::OUT(ofs_in,"delta r    (Bohr)",dR);
+	ModuleBase::GlobalFunc::OUT(ofs_in,"dr_uniform (Bohr)",dr_uniform);
+	ModuleBase::GlobalFunc::OUT(ofs_in,"rmax       (Bohr)",Rmax);
 
 	// check the read in data.
     assert(dk > 0.0);
@@ -186,7 +186,7 @@ void LCAO_Orbitals::Read_Orbitals(
 
 	//	this->kmesh = static_cast<int> (PI / 0.01 / 4 / this->dk);
 	if(kmesh%2==0) kmesh++;
-	OUT(ofs_in,"kmesh",kmesh);
+	ModuleBase::GlobalFunc::OUT(ofs_in,"kmesh",kmesh);
 	//-----------------------------------------------------------------
 
 
@@ -218,7 +218,7 @@ void LCAO_Orbitals::Read_Orbitals(
 
 	delete[] nproj;
 	this->nproj = new int[ntype];
-	ZEROS(nproj, ntype);
+	ModuleBase::GlobalFunc::ZEROS(nproj, ntype);
 	
 	this->nprojmax = 0;
 	
@@ -265,7 +265,7 @@ void LCAO_Orbitals::Read_Orbitals(
 
 	}
 
-	timer::tick("LCAO_Orbitals","Read_Orbitals");
+	ModuleBase::timer::tick("LCAO_Orbitals","Read_Orbitals");
 	return;
 }
 
@@ -280,7 +280,7 @@ void LCAO_Orbitals::Read_Orbitals(
 // In order to get rid of the read in file .NONLOCAL.
 void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 {
-	TITLE("LCAO_Orbitals","Set_NonLocal");
+	ModuleBase::TITLE("LCAO_Orbitals","Set_NonLocal");
 
 	// set a pointer
 	Atom* atom = &GlobalC::ucell.atoms[it];
@@ -293,7 +293,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 	// set the nonlocal projector objects
 	Numerical_Nonlocal_Lm* tmpBeta_lm = new Numerical_Nonlocal_Lm[n_projectors];
 
-	ComplexMatrix coefficient_D_nc_in(nh*2, nh*2);//zhengdy-soc
+	ModuleBase::ComplexMatrix coefficient_D_nc_in(nh*2, nh*2);//zhengdy-soc
 
 	if(!atom->has_so)
 	{
@@ -315,7 +315,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 
 //		std::cout << " cut_mesh=" << cut_mesh << std::endl;
 			double* beta_r = new double[cut_mesh];
-			ZEROS(beta_r, cut_mesh);
+			ModuleBase::GlobalFunc::ZEROS(beta_r, cut_mesh);
 			for(int ir=0; ir<cut_mesh; ++ir)
 			{
 				beta_r[ir] = atom->betar(p1,ir);
@@ -340,7 +340,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 		}
 		
 		// mohan comment out 2021-04-26
-		//WARNING("LCAO_Orbitals::Set_NonLocal","bug in line "+TO_STRING(__LINE__)+", matrix ic>=nc");		
+		//ModuleBase::WARNING("LCAO_Orbitals::Set_NonLocal","bug in line "+TO_STRING(__LINE__)+", matrix ic>=nc");		
 
 
 		// Peize Lin add 2019-01-23
@@ -425,7 +425,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 			}
 
 			double* beta_r = new double[cut_mesh];
-			ZEROS(beta_r, cut_mesh);
+			ModuleBase::GlobalFunc::ZEROS(beta_r, cut_mesh);
 			for(int ir=0; ir<cut_mesh; ++ir)
 			{
 				beta_r[ir] = atom->betar(p1,ir);
@@ -475,7 +475,7 @@ void LCAO_Orbitals::Read_NonLocal(
 	int &n_projectors,
 	const int &my_rank)
 {
-	TITLE("LCAO_Orbitals","Read_NonLocal");
+	ModuleBase::TITLE("LCAO_Orbitals","Read_NonLocal");
 
 	std::ifstream ifs;
 
@@ -496,7 +496,7 @@ void LCAO_Orbitals::Read_NonLocal(
 	if(!open)
 	{
 		std::cout << " Non-local File : " << nonlocal_file[it] << std::endl;
-		WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","Can not find the NONLOCAL file.");
+		ModuleBase::WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","Can not find the NONLOCAL file.");
 	}
 	else
 	{
@@ -512,18 +512,18 @@ void LCAO_Orbitals::Read_NonLocal(
 
 	if(my_rank==0)
 	{
-		if(SCAN_BEGIN(ifs, "<HEADER>"))
+		if(ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<HEADER>"))
 		{
-			READ_VALUE(ifs, label);
-			READ_VALUE(ifs, ps_type);
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, label);
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, ps_type);
 			if(ps_type != "NC")
 			{
-				WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","Only available for NC nonlocal pseudopotential");
+				ModuleBase::WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","Only available for NC nonlocal pseudopotential");
 			}
-			READ_VALUE(ifs, nlmax);
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, nlmax);
 //			std::cout << " " << label << " " << ps_type << " " << nlmax << std::endl; 
 			assert(nlmax >= -1);
-			SCAN_END(ifs,"</HEADER>");
+			ModuleBase::GlobalFunc::SCAN_END(ifs,"</HEADER>");
 		}
 	}
 
@@ -556,35 +556,35 @@ void LCAO_Orbitals::Read_NonLocal(
 			{
 				std::cout << " Max L Read in from pseudopotential file = " << GlobalC::ucell.atoms[it].lll[ib] << std::endl;
 			}
-			WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","nlmax != GlobalC::ucell.atoms[it].lll");
+			ModuleBase::WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","nlmax != GlobalC::ucell.atoms[it].lll");
 		}
 	}
 
 
 //	OUT(GlobalV::ofs_running,"Type",it);
-	OUT(GlobalV::ofs_running,"label",label);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"label",label);
 //	OUT(GlobalV::ofs_running,"ps_type",ps_type);
-	OUT(GlobalV::ofs_running,"nlmax",nlmax);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nlmax",nlmax);
 
 	//-------------------------------------------
 	// if each L has projectors more than once,
 	// this needed to be modified.	
 	//-------------------------------------------
 	int nproj_allowed = nlmax+1;
-	matrix coefficient_D_in(nproj_allowed, nproj_allowed);
-	ComplexMatrix coefficient_D_nc_in(nproj_allowed*2, nproj_allowed*2);
+	ModuleBase::matrix coefficient_D_in(nproj_allowed, nproj_allowed);
+	ModuleBase::ComplexMatrix coefficient_D_nc_in(nproj_allowed*2, nproj_allowed*2);
 
 //	OUT(GlobalV::ofs_running,"nproj_allowed",nproj_allowed);
 
 	if(my_rank==0)
 	{
-		if(SCAN_BEGIN(ifs, "<DIJ>"))
+		if(ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<DIJ>"))
 		{
 			//--------------------------------------
 			// this parameter is very important!!!
 			//--------------------------------------
-			READ_VALUE(ifs, n_projectors);
-			OUT(GlobalV::ofs_running,"n_projectors",n_projectors);
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, n_projectors);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"n_projectors",n_projectors);
 			
 			for (int p1 = 0; p1 < n_projectors; p1++)
         	{
@@ -602,7 +602,7 @@ void LCAO_Orbitals::Read_NonLocal(
 //					GlobalV::ofs_running << " L1=" << L1_read << " L2=" << L2_read << " Coef=" << coefficient_D_in(L1_read,L2_read) << std::endl;
             	}
         	}
-			SCAN_END(ifs,"</DIJ>");
+			ModuleBase::GlobalFunc::SCAN_END(ifs,"</DIJ>");
 		}
 	}
 
@@ -613,37 +613,37 @@ void LCAO_Orbitals::Read_NonLocal(
 
 	Numerical_Nonlocal_Lm* tmpBeta_lm = new Numerical_Nonlocal_Lm[n_projectors];
 	int* LfromBeta = new int[n_projectors];
-	ZEROS(LfromBeta, n_projectors);
+	ModuleBase::GlobalFunc::ZEROS(LfromBeta, n_projectors);
 
 	for(int p1 = 0; p1<n_projectors; p1++)
 	{
 		int meshr_ps = 0;
 		if(my_rank==0)
 		{
-			if(SCAN_BEGIN(ifs, "<PP_BETA>", 0))
+			if(ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_BETA>", 0))
 			{
 				int iproj;
-				READ_VALUE(ifs, iproj);
+				ModuleBase::GlobalFunc::READ_VALUE(ifs, iproj);
 				if(iproj!=p1)
 				{
 					std::cout << " iproj=" << iproj << " p1=" << p1 << std::endl;
-					WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","Check non-local projector index.");
+					ModuleBase::WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","Check non-local projector index.");
 				}
 				
-				READ_VALUE(ifs, LfromBeta[p1]);
+				ModuleBase::GlobalFunc::READ_VALUE(ifs, LfromBeta[p1]);
 				assert( LfromBeta[p1] >= 0 );
 				assert( LfromBeta[p1] <= nlmax );
 
-				READ_VALUE(ifs, meshr_ps);
+				ModuleBase::GlobalFunc::READ_VALUE(ifs, meshr_ps);
 				if(meshr_ps%2==0)
 				{
 					std::cout << " meshr_ps = " << meshr_ps << std::endl;
-					WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","meshr_ps must be odd!");
+					ModuleBase::WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","meshr_ps must be odd!");
 				}
 			}
 			else
 			{
-				WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","<PP_BETA> doesn't match!");
+				ModuleBase::WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","<PP_BETA> doesn't match!");
 			}
 		}// end my_rank==0
 
@@ -657,9 +657,9 @@ void LCAO_Orbitals::Read_NonLocal(
 		double* radial_ps = new double[meshr_ps];
 		double* rab_ps = new double[meshr_ps];
 		double* beta_r = new double[meshr_ps];
-		ZEROS(radial_ps, meshr_ps);
-		ZEROS(rab_ps, meshr_ps);
-		ZEROS(beta_r, meshr_ps);
+		ModuleBase::GlobalFunc::ZEROS(radial_ps, meshr_ps);
+		ModuleBase::GlobalFunc::ZEROS(rab_ps, meshr_ps);
+		ModuleBase::GlobalFunc::ZEROS(beta_r, meshr_ps);
 
 		if(my_rank==0)
 		{
@@ -700,7 +700,7 @@ void LCAO_Orbitals::Read_NonLocal(
 		
 		if(my_rank==0)
 		{
-			SCAN_END(ifs,"</PP_BETA>");
+			ModuleBase::GlobalFunc::SCAN_END(ifs,"</PP_BETA>");
 		}
 	}// end projectors.
 	
@@ -736,7 +736,7 @@ void LCAO_Orbitals::Read_PAO(
 	const bool &force_flag, // mohan add 2021-05-07
 	const int &my_rank) // mohan add 2021-04-26
 {
-	TITLE("LCAO_Orbitals","Read_PAO");
+	ModuleBase::TITLE("LCAO_Orbitals","Read_PAO");
 
 	std::ifstream in_ao;
 	bool open=false;
@@ -754,7 +754,7 @@ void LCAO_Orbitals::Read_PAO(
 	if(!open)
 	{
 		std::cout << " Orbital file : " << this->orbital_file[it] << std::endl;
-		WARNING_QUIT("LCAO_Orbitals::Read_PAO","Couldn't find orbital files");
+		ModuleBase::WARNING_QUIT("LCAO_Orbitals::Read_PAO","Couldn't find orbital files");
 	}
 
 	ofs_in << " " << std::setw(12) << "ORBITAL" << std::setw(3) << "L" 
@@ -783,7 +783,7 @@ void LCAO_Orbitals::Read_Descriptor(
 	const bool &force_flag, // mohan add 2021-05-07
 	const int &my_rank)	//read descriptor basis
 {
-	TITLE("LCAO_Orbitals", "Read_Descriptor");
+	ModuleBase::TITLE("LCAO_Orbitals", "Read_Descriptor");
 
 	std::ifstream in_de;
 	ofs_in << " " << std::setw(12) << "DESCRIPTOR" << std::setw(3) << "L"
@@ -807,7 +807,7 @@ void LCAO_Orbitals::Read_Descriptor(
 	if (!open)
 	{
 		std::cout << " Orbital file : " << this->descriptor_file << std::endl;
-		WARNING_QUIT("LCAO_Orbitals::Read_Descriptor", "Couldn't find orbital files for descriptor");
+		ModuleBase::WARNING_QUIT("LCAO_Orbitals::Read_Descriptor", "Couldn't find orbital files for descriptor");
 	}
 
 	this->lmax_d = 0;
@@ -831,7 +831,7 @@ void LCAO_Orbitals::read_orb_file(
 	const bool &force_flag,
 	const int &my_rank)
 {
-	TITLE("LCAO_Orbitals","read_orb_file");
+	ModuleBase::TITLE("LCAO_Orbitals","read_orb_file");
 	char word[80];
 	std::string orb_label;
 	if (my_rank == 0)
@@ -896,14 +896,14 @@ void LCAO_Orbitals::read_orb_file(
 				break;
 			}
 		}
-		CHECK_NAME(ifs, "Mesh");
+		ModuleBase::CHECK_NAME(ifs, "Mesh");
 		ifs >> meshr;
 		meshr_read = meshr;
 		if (meshr % 2 == 0)
 		{
 			++meshr;
 		}
-		CHECK_NAME(ifs, "dr");
+		ModuleBase::CHECK_NAME(ifs, "dr");
 		ifs >> dr;
 	}
 
@@ -1001,7 +1001,7 @@ void LCAO_Orbitals::read_orb_file(
 #endif
 			if (!find)
 			{
-				WARNING_QUIT("LCAO_Orbitals::read_orb_file", "Can't find orbitals.");
+				ModuleBase::WARNING_QUIT("LCAO_Orbitals::read_orb_file", "Can't find orbitals.");
 			}
 
 #ifdef __MPI
@@ -1017,7 +1017,7 @@ void LCAO_Orbitals::read_orb_file(
 			}
 			double unit = 0.0;
 
-			Integral::Simpson_Integral(meshr, inner, rab, unit);
+			ModuleBase::Integral::Simpson_Integral(meshr, inner, rab, unit);
 
 			assert(unit>0.0);
 
@@ -1034,7 +1034,7 @@ void LCAO_Orbitals::read_orb_file(
 			{
 				inner[ir] = psir[ir] * psir[ir];
 			}
-			Integral::Simpson_Integral(meshr, inner, rab, unit);
+			ModuleBase::Integral::Simpson_Integral(meshr, inner, rab, unit);
 			delete[] inner;
 			ofs_in << std::setw(12) << unit << std::endl;
 

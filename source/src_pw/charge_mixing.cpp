@@ -20,7 +20,7 @@ void Charge_Mixing::set_mixing
 
 //    if (mixing_mode != "plain") // "TF","local-TF","potential"
 //    {
-//        WARNING_QUIT("set_mixing","only plain mixing availabel.");
+//        ModuleBase::WARNING_QUIT("set_mixing","only plain mixing availabel.");
 //    }
 
     return;
@@ -30,7 +30,7 @@ void Charge_Mixing::set_mixing
 // Fourier transform of rho(g) to rho(r) in real space.
 void Charge_Mixing::set_rhor(std::complex<double> *rhog, double *rho)const
 {
-    if (GlobalV::test_charge)TITLE("Charge_Mixing","set_rhor");
+    if (GlobalV::test_charge)ModuleBase::TITLE("Charge_Mixing","set_rhor");
     for (int is=0; is < GlobalV::NSPIN; is++)
     {
 		GlobalC::UFFT.ToRealSpace(rhog, rho);
@@ -41,7 +41,7 @@ void Charge_Mixing::set_rhor(std::complex<double> *rhog, double *rho)const
 
 void Charge_Mixing::set_rhog(const double *rho_in, std::complex<double> *rhog_in)const
 {
-    if (GlobalV::test_charge)TITLE("Charge_Mixing","set_rhog");
+    if (GlobalV::test_charge)ModuleBase::TITLE("Charge_Mixing","set_rhog");
 	GlobalC::UFFT.ToReciSpace(rho_in, rhog_in);
     return;
 }
@@ -63,7 +63,7 @@ void Charge_Mixing::plain_mixing( double *rho, double *rho_save_in ) const
 	// after mixing, the charge density become 
 	// the input charge density of next iteration.
     //double* rho_tmp = new double[GlobalC::pw.nrxx];
-    //DCOPY( rho, rho_tmp, GlobalC::pw.nrxx);
+    //ModuleBase::GlobalFunc::DCOPY( rho, rho_tmp, GlobalC::pw.nrxx);
 
 //xiaohui add 2014-12-09
 	if(this->mixing_gg0 > 0.0)
@@ -109,7 +109,7 @@ void Charge_Mixing::plain_mixing( double *rho, double *rho_save_in ) const
 		}
 	}
 
-	DCOPY( rho, rho_save_in, GlobalC::pw.nrxx);
+	ModuleBase::GlobalFunc::DCOPY( rho, rho_save_in, GlobalC::pw.nrxx);
 //    delete[] rho_tmp;
 
     return;
@@ -118,8 +118,8 @@ void Charge_Mixing::plain_mixing( double *rho, double *rho_save_in ) const
 
 void Charge_Mixing::Kerker_mixing( double *rho, const std::complex<double> *residual_g, double *rho_save)
 {
-//  TITLE("Charge_Mixing","Kerker");
-    timer::tick("Charge_Mixing","Kerker");
+//  ModuleBase::TITLE("Charge_Mixing","Kerker");
+    ModuleBase::timer::tick("Charge_Mixing","Kerker");
 
 //	std::cout << " here is Kerker" << std::endl;
 //	this->check_ne(rho);
@@ -127,7 +127,7 @@ void Charge_Mixing::Kerker_mixing( double *rho, const std::complex<double> *resi
 
     // (1) do kerker mixing in reciprocal space.
     std::complex<double> *rhog = new std::complex<double>[GlobalC::pw.ngmc];
-    ZEROS(rhog, GlobalC::pw.ngmc);
+    ModuleBase::GlobalFunc::ZEROS(rhog, GlobalC::pw.ngmc);
 
 	// mohan modify 2010-02-03, rhog should store the old
 	// charge density. " rhog = FFT^{-1}(rho_save) "
@@ -159,14 +159,14 @@ void Charge_Mixing::Kerker_mixing( double *rho, const std::complex<double> *resi
 
     // (5)
 	// mohan change the order of (4) (5), 2010-02-05
-    DCOPY(rho, rho_save, GlobalC::pw.nrxx);
+    ModuleBase::GlobalFunc::DCOPY(rho, rho_save, GlobalC::pw.nrxx);
 
     //this->renormalize_rho();
 
 
     delete[] filter_g;
     delete[] rhog;
-    timer::tick("Charge_Mixing","Kerker");
+    ModuleBase::timer::tick("Charge_Mixing","Kerker");
     return;
 }
 
@@ -176,10 +176,10 @@ double Charge_Mixing::rhog_dot_product(
 	const std::complex<double>*const*const rhog2
 ) const
 {
-    TITLE("Charge_Mixing","rhog_dot_product");
-	timer::tick("Charge_Mixing","rhog_dot_product");
-    static const double fac = e2 * FOUR_PI / GlobalC::ucell.tpiba2;
-    static const double fac2 = e2 * FOUR_PI / (TWO_PI * TWO_PI);
+    ModuleBase::TITLE("Charge_Mixing","rhog_dot_product");
+	ModuleBase::timer::tick("Charge_Mixing","rhog_dot_product");
+    static const double fac = ModuleBase::e2 * ModuleBase::FOUR_PI / GlobalC::ucell.tpiba2;
+    static const double fac2 = ModuleBase::e2 * ModuleBase::FOUR_PI / (ModuleBase::TWO_PI * ModuleBase::TWO_PI);
 
     double sum = 0.0;
 	
@@ -271,7 +271,7 @@ double Charge_Mixing::rhog_dot_product(
 
     Parallel_Reduce::reduce_double_pool( sum );
 
-	timer::tick("Charge_Mixing","rhog_dot_product");
+	ModuleBase::timer::tick("Charge_Mixing","rhog_dot_product");
 
 	sum *= GlobalC::ucell.omega * 0.5;
 

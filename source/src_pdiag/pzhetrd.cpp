@@ -42,7 +42,7 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
  *    norm    (local output) double precision array,
  *             This array contains the scalar factors TAU of  the elementary reflectors. 
  */        
-	TITLE("Parallel","pzhetrd");
+	ModuleBase::TITLE("Parallel","pzhetrd");
 	std::complex<double>  W_R[loc_A.row_num][NB],U_R[loc_A.row_num][NB],
 		W_C[loc_A.col_num][NB],U_C[loc_A.col_num][NB],
 		W_C1[loc_A.col_num][NB],U_C1[loc_A.col_num][NB];

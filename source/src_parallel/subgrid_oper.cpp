@@ -24,10 +24,10 @@ SubGrid_oper::~SubGrid_oper()
 /*
 void SubGrid_oper::cal_totwfc_aug()
 {
-	TITLE("SubGrid_oper","cal_totwfc_aug");
+	ModuleBase::TITLE("SubGrid_oper","cal_totwfc_aug");
 
 	int *occupy = new int[GlobalV::NLOCAL];
-	ZEROS(occupy, GlobalV::NLOCAL);
+	ModuleBase::GlobalFunc::ZEROS(occupy, GlobalV::NLOCAL);
 	for(int i=0; i<GlobalV::NLOCAL; ++i)
 	{
 		if(GlobalC::LOWF.trace_aug[i]>=0)
@@ -43,7 +43,7 @@ void SubGrid_oper::cal_totwfc_aug()
 
 	delete[] trace_aug_tot;
 	trace_aug_tot = new int[GlobalV::NLOCAL];
-	ZEROS(trace_aug_tot,GlobalV::NLOCAL);
+	ModuleBase::GlobalFunc::ZEROS(trace_aug_tot,GlobalV::NLOCAL);
 	for(int i=0; i<GlobalV::NLOCAL; ++i)
 	{
 		trace_aug_tot[i]=GlobalC::LOWF.trace_aug[i];
@@ -94,14 +94,14 @@ void SubGrid_oper::cal_totwfc_aug()
 
 void SubGrid_oper::cal_totwfc()
 {
-	TITLE("SubGrid_oper","cal_totwfc");
+	ModuleBase::TITLE("SubGrid_oper","cal_totwfc");
 
 	//-----------------------------------------
 	// combine the wave functions index in the 
 	// 'Grid group'
 	//-----------------------------------------
 	int *occupy = new int[GlobalV::NLOCAL];
-	ZEROS(occupy, GlobalV::NLOCAL);	
+	ModuleBase::GlobalFunc::ZEROS(occupy, GlobalV::NLOCAL);	
 	for(int iw=0; iw<GlobalV::NLOCAL; ++iw)
 	{
 		if(GlobalC::GridT.trace_lo[iw] >= 0)
@@ -125,7 +125,7 @@ void SubGrid_oper::cal_totwfc()
 
 	delete[] trace_lo_tot;
 	trace_lo_tot = new int[GlobalV::NLOCAL];
-	ZEROS(trace_lo_tot, GlobalV::NLOCAL);
+	ModuleBase::GlobalFunc::ZEROS(trace_lo_tot, GlobalV::NLOCAL);
 
 
 	int count = 0;
@@ -165,7 +165,7 @@ void SubGrid_oper::cal_totwfc()
 	if(GlobalV::GRANK==0)
 	{
           	//xiaohui add 'GlobalV::OUT_LEVEL', 2015-09-16
-		if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"GlobalC::SGO.lgd",lgd);
+		if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"GlobalC::SGO.lgd",lgd);
 	
 		if(lgd==0)
 		{
@@ -199,7 +199,7 @@ void SubGrid_oper::cal_totwfc()
 			for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 			{
 				this->totwfc[is][ib] = new double[lgd];	
-				ZEROS(totwfc[is][ib], lgd);
+				ModuleBase::GlobalFunc::ZEROS(totwfc[is][ib], lgd);
 
 				// mohan update 2012-02-10
 				//if(GlobalV::DIAGO_TYPE!="cg") xiaohui modify 2013-09-02
@@ -239,7 +239,7 @@ void SubGrid_oper::cal_totwfc()
 
 void SubGrid_oper::dis_subwfc()
 {
-	TITLE("SubGrid_oper","dis_subwfc");
+	ModuleBase::TITLE("SubGrid_oper","dis_subwfc");
 
 #ifdef __MPI
 
@@ -304,7 +304,7 @@ void SubGrid_oper::dis_subwfc()
 				
 				// send csend
 				double* csend = new double[GlobalV::NBANDS*lgd2];
-				ZEROS(csend, GlobalV::NBANDS*lgd2);
+				ModuleBase::GlobalFunc::ZEROS(csend, GlobalV::NBANDS*lgd2);
 
 				for (int iw=0; iw<GlobalV::NLOCAL; iw++)
 				{
@@ -353,7 +353,7 @@ void SubGrid_oper::dis_subwfc()
 
 			// receive c
 			double* crecv = new double[GlobalV::NBANDS*GlobalC::GridT.lgd];
-			ZEROS(crecv, GlobalV::NBANDS*GlobalC::GridT.lgd);
+			ModuleBase::GlobalFunc::ZEROS(crecv, GlobalV::NBANDS*GlobalC::GridT.lgd);
 
 			tag = GlobalV::GRANK * 10 + 2;
 //			GlobalV::ofs_running << " receive=" << tag << std::endl;

@@ -34,11 +34,11 @@ public:
 		const double threshold_in,
 		const Abfs::Vector3_Order<int> Born_von_Karman_period_in);
 	void cal_norm_C_max( 
-		const std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>>>> & Cs,
-		const Element_Basis_Index::IndexLNM & index_lcaos,
-		const Element_Basis_Index::IndexLNM & index_abfs);
-	void cal_norm_V( const std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<matrix>>>> & Vs );
-	void cal_norm_D_max( const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> & Ds );
+		const std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<ModuleBase::matrix>>>> & Cs,
+		const ModuleBase::Element_Basis_Index::IndexLNM & index_lcaos,
+		const ModuleBase::Element_Basis_Index::IndexLNM & index_abfs);
+	void cal_norm_V( const std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<ModuleBase::matrix>>>> & Vs );
+	void cal_norm_D_max( const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> & Ds );
 		
 	Info_Step input_info(
 		const size_t iat1, const size_t iat2, const size_t iat3, const size_t iat4,
@@ -48,27 +48,27 @@ public:
 	int postcalA( const Info_Step & info_step ) const;
 	int postcalB(
 		const Info_Step & info_step,
-		const matrix & VC_T,			// iw2, \mu1, iw4
+		const ModuleBase::matrix & VC_T,			// iw2, \mu1, iw4
 		const size_t range_iw2,
 		const size_t range_mu1,
 		const size_t range_iw4,
 		const int postcal_in) const;
 	bool postcalC(
 		const Info_Step & info_step,
-		const matrix & DVC,				// iw1/iw3, \mu1, iw2/iw4
+		const ModuleBase::matrix & DVC,				// iw1/iw3, \mu1, iw2/iw4
 		const size_t range_iw13,
 		const size_t range_mu1,
 		const size_t range_iw24,
 		const size_t iw13H) const;
-	bool postcalD( const matrix & H ) const { return (H.absmax()>threshold) ? true : false; }
+	bool postcalD( const ModuleBase::matrix & H ) const { return (H.absmax()>threshold) ? true : false; }
 	
 private:
 	// max_j \sqrt{ \sum_i m(i,j)^2 }
-	double cal_matrix_inner_max( const matrix & m, const size_t ni, const size_t nj ) const;
+	double cal_matrix_inner_max( const ModuleBase::matrix & m, const size_t ni, const size_t nj ) const;
 	// max_i \sqrt{ \sum_j m(i,j)^2 }
-	double cal_matrix_outer_max( const matrix & m, const size_t ni, const size_t nj ) const;
+	double cal_matrix_outer_max( const ModuleBase::matrix & m, const size_t ni, const size_t nj ) const;
 	// m m^+
-	matrix m_mT( const matrix & m ) const;
+	ModuleBase::matrix m_mT( const ModuleBase::matrix & m ) const;
 
 private:
 

@@ -6,12 +6,12 @@
 #include "LCAO_nnr.h"
 void Local_Orbital_Charge::allocate_DM_k(void)
 {
-    TITLE("Local_Orbital_Charge","allocate_k");
+    ModuleBase::TITLE("Local_Orbital_Charge","allocate_k");
 
     this->nnrg_now = GlobalC::LNNR.nnrg;
     //xiaohui add 'GlobalV::OUT_LEVEL' line, 2015-09-16
-    if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"nnrg_last",nnrg_last);
-    if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"nnrg_now",nnrg_now);
+    if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nnrg_last",nnrg_last);
+    if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nnrg_now",nnrg_now);
 
     if(this->init_DM_R)
     {
@@ -30,11 +30,11 @@ void Local_Orbital_Charge::allocate_DM_k(void)
         for(int is=0; is<GlobalV::NSPIN; is++)
         {
             this->DM_R[is] = new double[nnrg_now];
-            ZEROS(DM_R[is], nnrg_now);
+            ModuleBase::GlobalFunc::ZEROS(DM_R[is], nnrg_now);
         }
         this->nnrg_last = nnrg_now;
         this->init_DM_R = true;
-        Memory::record("LocalOrbital_Charge","Density_Matrix",GlobalV::NSPIN*nnrg_now,"double");
+        ModuleBase::Memory::record("LocalOrbital_Charge","Density_Matrix",GlobalV::NSPIN*nnrg_now,"double");
     }
     else if(nnrg_now==0)
     {
@@ -42,7 +42,7 @@ void Local_Orbital_Charge::allocate_DM_k(void)
     }
     else
     {
-        WARNING_QUIT("Local_Orbital_Charge::allocate_k","check init_DM_R.");
+        ModuleBase::WARNING_QUIT("Local_Orbital_Charge::allocate_k","check init_DM_R.");
     }
 
 	// Peize Lin test 2019-01-16 
@@ -57,7 +57,7 @@ void Local_Orbital_Charge::allocate_DM_k(void)
 
 void Local_Orbital_Charge::kpt_file(const Grid_Technique &gt)
 {
-	TITLE("Local_Orbital_Charge","kpt_file");
+	ModuleBase::TITLE("Local_Orbital_Charge","kpt_file");
 
 	int error;
 	std::cout << " Read in wave functions files: " << GlobalC::kv.nkstot << std::endl;
@@ -79,19 +79,19 @@ void Local_Orbital_Charge::kpt_file(const Grid_Technique &gt)
 		GlobalV::ofs_running << " Error=" << error << std::endl;
 		if(error==1)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: GlobalC::LOWF.dat");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: GlobalC::LOWF.dat");
 		}
 		else if(error==2)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","In wave function file, band number doesn't match");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In wave function file, band number doesn't match");
 		}
 		else if(error==3)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","In wave function file, nlocal doesn't match");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In wave function file, nlocal doesn't match");
 		}
 		else if(error==4)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","In k-dependent wave function file, k point is not correct");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In k-dependent wave function file, k point is not correct");
 		}
 
 	}//loop ispin
@@ -137,7 +137,7 @@ inline void cal_DM_ATOM(
                         GlobalC::kv.kvec_d[ik].z * RA.info[ia1][ia2][2]  
                         ) );
             
-            //ZEROS(WFC_PHASE, GlobalV::NBANDS*nw1);
+            //ModuleBase::GlobalFunc::ZEROS(WFC_PHASE, GlobalV::NBANDS*nw1);
             int ibStart=0;
             int nRow=0;
             for(int ib=0; ib<GlobalV::NBANDS; ++ib)
@@ -185,7 +185,7 @@ inline void cal_DM_ATOM_nc(
 
     if(GlobalV::NSPIN !=4 ) 
 	{
-		WARNING_QUIT("Local_Orbital_Charge","NSPIN not match!");
+		ModuleBase::WARNING_QUIT("Local_Orbital_Charge","NSPIN not match!");
 	}
 
     const char transa='N';
@@ -218,7 +218,7 @@ inline void cal_DM_ATOM_nc(
                                 GlobalC::kv.kvec_d[ik].z * RA.info[ia1][ia2][2]  
                                 ) );
             
-            		//ZEROS(WFC_PHASE, GlobalV::NBANDS*nw1);
+            		//ModuleBase::GlobalFunc::ZEROS(WFC_PHASE, GlobalV::NBANDS*nw1);
                     int ibStart=0;
                     int nRow=0;
                     for(int ib=0; ib<GlobalV::NBANDS; ++ib)
@@ -258,17 +258,17 @@ inline void cal_DM_ATOM_nc(
 
 void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
 {
-    TITLE("Local_Orbital_Charge","cal_dk_k");
-    timer::tick("LCAO_Charge","cal_dk_k");  
+    ModuleBase::TITLE("Local_Orbital_Charge","cal_dk_k");
+    ModuleBase::timer::tick("LCAO_Charge","cal_dk_k");  
     //int nnrg = 0;
-    Vector3<double> tau1;
-	Vector3<double> dtau;
+    ModuleBase::Vector3<double> tau1;
+	ModuleBase::Vector3<double> dtau;
         
     Record_adj RA;
     RA.for_grid(gt);
 
     int ca = 0;
-    std::complex<double> fac = TWO_PI * IMAG_UNIT;
+    std::complex<double> fac = ModuleBase::TWO_PI * ModuleBase::IMAG_UNIT;
 
     std::complex<double> *WFC_PHASE=new std::complex<double>[GlobalV::NLOCAL*GlobalC::ucell.nwmax];
     
@@ -278,7 +278,7 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
     for(int is=0; is<GlobalV::NSPIN; ++is)
     {
         DM_ATOM[is]=new std::complex<double>[DM_ATOM_SIZE];
-        ZEROS(DM_ATOM[is], DM_ATOM_SIZE);
+        ModuleBase::GlobalFunc::ZEROS(DM_ATOM[is], DM_ATOM_SIZE);
     }
     for(int T1=0; T1<GlobalC::ucell.ntype; T1++)
     {
@@ -308,9 +308,9 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
                 }
                 for(int is=0; is<GlobalV::NSPIN; ++is)
 				{
-                    ZEROS(DM_ATOM[is], ng);
+                    ModuleBase::GlobalFunc::ZEROS(DM_ATOM[is], ng);
 				}
-                ZEROS(WFC_PHASE, GlobalV::NBANDS*nw1);
+                ModuleBase::GlobalFunc::ZEROS(WFC_PHASE, GlobalV::NBANDS*nw1);
                 if(GlobalV::NSPIN!=4)
 				{
 					cal_DM_ATOM(gt, fac, RA, ca, iw1_lo, nw1, gstart, WFC_PHASE, DM_ATOM);
@@ -393,7 +393,7 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
 
     RA.delete_grid();//xiaohui add 2015-02-04
 
-    timer::tick("LCAO_Charge","cal_dk_k");  
+    ModuleBase::timer::tick("LCAO_Charge","cal_dk_k");  
     return;
 }
 

@@ -147,7 +147,7 @@ void Stochastic_Iter::checkemm(int &iter)
 
 void Stochastic_Iter::itermu(int &iter) 
 {
-    timer::tick("Stochastic_Iter","itermu");
+    ModuleBase::timer::tick("Stochastic_Iter","itermu");
     int nkk=1;// We temporarily use gamma k point.
     double dmu;
     if(iter == 1)
@@ -242,18 +242,18 @@ void Stochastic_Iter::itermu(int &iter)
             }
         }
     }
-    timer::tick("Stochastic_Iter","itermu");
+    ModuleBase::timer::tick("Stochastic_Iter","itermu");
     return;
 }
 
 void Stochastic_Iter:: sumpolyval()
 {
-    timer::tick("Stochastic_Iter","sumpolyval");
+    ModuleBase::timer::tick("Stochastic_Iter","sumpolyval");
     int norder = stoche.norder;
     //wait for init
     int nkk=1;
     
-    ZEROS(spolyv, norder);
+    ModuleBase::GlobalFunc::ZEROS(spolyv, norder);
     std::complex<double> * pchi;
     for(int ik = 0; ik < nkk; ++ik)
     {
@@ -262,7 +262,7 @@ void Stochastic_Iter:: sumpolyval()
             if(GlobalV::NBANDS > 0)  pchi = GlobalC::sto_wf.chiortho[ik].c; 
             else            pchi = GlobalC::sto_wf.chi0[ik].c;
             stoche.calpolyval(stohchi.hchi_reciprocal, pchi, nchip);
-            DCOPY(stoche.polyvalue, spolyv, norder);
+            ModuleBase::GlobalFunc::DCOPY(stoche.polyvalue, spolyv, norder);
         }
         else
         for(int ichi = 0; ichi < nchip; ++ichi)
@@ -276,14 +276,14 @@ void Stochastic_Iter:: sumpolyval()
             }
         }
     }
-    timer::tick("Stochastic_Iter","sumpolyval");
+    ModuleBase::timer::tick("Stochastic_Iter","sumpolyval");
     return;
 }
 
 
 double Stochastic_Iter::calne()
 {  
-    timer::tick("Stochastic_Iter","calne");
+    ModuleBase::timer::tick("Stochastic_Iter","calne");
     //wait for init
     int nkk = 1;
 
@@ -320,13 +320,13 @@ double Stochastic_Iter::calne()
 #endif
 
     totne = KS_ne + sto_ne;
-    timer::tick("Stochastic_Iter","calne");
+    ModuleBase::timer::tick("Stochastic_Iter","calne");
     return totne;
 }
 
 void Stochastic_Iter::sum_stoband()
 {  
-    timer::tick("Stochastic_Iter","sum_stoband");
+    ModuleBase::timer::tick("Stochastic_Iter","sum_stoband");
     int nkk=1;// We temporarily use gamma k point.
     int nrxx = stohchi.nrxx;
     int npw = GlobalC::wf.npw;
@@ -385,7 +385,7 @@ void Stochastic_Iter::sum_stoband()
     std::complex<double> outtem;
     double sto_ne = 0;
     double sto_eband = 0;
-    ZEROS(sto_rho, nrxx);
+    ModuleBase::GlobalFunc::ZEROS(sto_rho, nrxx);
 
     std::complex<double> * pchi;
     std::complex<double>* porter = GlobalC::UFFT.porter;
@@ -396,8 +396,8 @@ void Stochastic_Iter::sum_stoband()
     if(GlobalV::NBANDS > 0 && GlobalV::MY_POOL==0 && stotype == "pw")
     {
         ksrho = new double [nrxx];
-        DCOPY(GlobalC::CHR.rho[0],ksrho,nrxx);
-        ZEROS(GlobalC::CHR.rho[0],nrxx);
+        ModuleBase::GlobalFunc::DCOPY(GlobalC::CHR.rho[0],ksrho,nrxx);
+        ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[0],nrxx);
     }
     
     for(int ik = 0; ik < nkk; ++ik)
@@ -419,7 +419,7 @@ void Stochastic_Iter::sum_stoband()
                 std::complex<double> *tmpout = out;
             for(int ichi = 0; ichi < nchip ; ++ichi)
             {
-                ZEROS( porter, GlobalC::pw.nrxx );
+                ModuleBase::GlobalFunc::ZEROS( porter, GlobalC::pw.nrxx );
                 for(int ig = 0; ig < npw; ++ig)
                 {
                     porter[ GRA_index[ig] ] = tmpout[ig];
@@ -508,9 +508,9 @@ void Stochastic_Iter::sum_stoband()
     if(GlobalV::MY_POOL==0 && stotype == "pw")
     {
         if(GlobalV::NBANDS > 0)
-            DCOPY(ksrho,GlobalC::CHR.rho[0],nrxx);
+            ModuleBase::GlobalFunc::DCOPY(ksrho,GlobalC::CHR.rho[0],nrxx);
         else
-            ZEROS(GlobalC::CHR.rho[0],nrxx);
+            ModuleBase::GlobalFunc::ZEROS(GlobalC::CHR.rho[0],nrxx);
     }
     
     
@@ -535,7 +535,7 @@ void Stochastic_Iter::sum_stoband()
     delete [] sto_rho;
     if(GlobalV::NBANDS == 0 || stotype != "pw")
         delete [] out;
-    timer::tick("Stochastic_Iter","sum_stoband");
+    ModuleBase::timer::tick("Stochastic_Iter","sum_stoband");
     return;
 }
 
@@ -618,8 +618,8 @@ double Stochastic_Iter:: nfdlnfd(double e)
     
     std::complex<double> *chig1 = new std::complex<double> [GlobalC::wf.npw];
     std::complex<double> *chig2 = new std::complex<double> [GlobalC::wf.npw];
-    ZEROS(in,GlobalC::pw.nrxx);
-    ZEROS(in2,GlobalC::pw.nrxx);*/
+    ModuleBase::GlobalFunc::ZEROS(in,GlobalC::pw.nrxx);
+    ModuleBase::GlobalFunc::ZEROS(in2,GlobalC::pw.nrxx);*/
 
     //---------------------------------------------------
     /*//test hermit property of  hchi matrix
@@ -697,7 +697,7 @@ double Stochastic_Iter:: nfdlnfd(double e)
     Stochastic_hchi:: Emin = this -> Emin;
     Stochastic_hchi:: Emax = this -> Emax;
     int * GRA_index = stohchi.GRA_index;
-    ZEROS(in,GlobalC::pw.nrxx);
+    ModuleBase::GlobalFunc::ZEROS(in,GlobalC::pw.nrxx);
     std::complex<double> *kswf = &GlobalC::wf.evc[0](0,0);
     for ( int ig = 0 ; ig< GlobalC::wf.npw; ++ig)
     {
@@ -742,7 +742,7 @@ double Stochastic_Iter:: nfdlnfd(double e)
         GlobalC::hm.hpw.h_psi( kswf , chigout);
         double energy = 0;
         double norm1 =0;
-        ZEROS(wave,GlobalC::pw.nrxx);
+        ModuleBase::GlobalFunc::ZEROS(wave,GlobalC::pw.nrxx);
         for(int ig = 0 ; ig < GlobalC::wf.npw ; ++ig)
         {
             energy += real(conj(kswf[ig]) * chigout[ig]);
@@ -782,7 +782,7 @@ double Stochastic_Iter:: nfdlnfd(double e)
     fftw_plan pp=fftw_plan_dft_3d(GlobalC::pw.nx,GlobalC::pw.ny,GlobalC::pw.nz,(fftw_complex *)wave,(fftw_complex *)wave, FFTW_BACKWARD, FFTW_ESTIMATE);
     for(int ib = 0 ; ib < GlobalV::NBANDS ; ++ib)
     {
-        ZEROS(wave,GlobalC::pw.nrxx);
+        ModuleBase::GlobalFunc::ZEROS(wave,GlobalC::pw.nrxx);
         std::complex<double> *kswf = &GlobalC::wf.evc[0](ib,0);
         for(int ig = 0 ; ig < GlobalC::wf.npw ; ++ig)
         {

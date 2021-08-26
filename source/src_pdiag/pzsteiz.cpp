@@ -25,7 +25,7 @@ void pzsteiz(int n,double *a,double *b,double *w,std::complex <double> *Z,int m)
  *    Z contains the computed eigenvectors associated with the  specified eigenvalues. 
  */
 {
-    TITLE("Parallel","pzsteiz");
+    ModuleBase::TITLE("Parallel","pzsteiz");
     int i,j,info,ldz=n;
 
     double work[5*n];

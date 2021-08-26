@@ -9,8 +9,8 @@ class Diago_LCAO_Matrix
 	Diago_LCAO_Matrix();
 	~Diago_LCAO_Matrix();
 
-	void solve_double_matrix(const int &ik, double **wfc, matrix &wfc_2d)const;
-	void solve_complex_matrix(const int &ik, std::complex<double> **wfc, ComplexMatrix &wfc_2d)const;
+	void solve_double_matrix(const int &ik, double **wfc, ModuleBase::matrix &wfc_2d)const;
+	void solve_complex_matrix(const int &ik, std::complex<double> **wfc, ModuleBase::ComplexMatrix &wfc_2d)const;
 
 	private:
 
@@ -19,8 +19,8 @@ class Diago_LCAO_Matrix
 	void using_CG(const int &ik, double **c)const;
 
 #ifdef __MPI
-	void using_HPSEPS_double(const int &ik, double **wfc, matrix &wfc_2d)const;
-	void using_HPSEPS_complex(const int &ik, std::complex<double> **wfc, ComplexMatrix &wfc_2d)const;
+	void using_HPSEPS_double(const int &ik, double **wfc, ModuleBase::matrix &wfc_2d)const;
+	void using_HPSEPS_complex(const int &ik, std::complex<double> **wfc, ModuleBase::ComplexMatrix &wfc_2d)const;
 #endif
 
 };

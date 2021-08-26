@@ -21,7 +21,7 @@ double atom_arrange::set_sr_NL(
 	const double &rcutmax_Beta, 
 	const bool gamma_only_local)
 {
-	TITLE("atom_arrange","set_sr_NL");
+	ModuleBase::TITLE("atom_arrange","set_sr_NL");
 
 	if(output_level != "m") //xiaohui add 'output_level', 2015-09-16
 	{
@@ -42,10 +42,10 @@ double atom_arrange::set_sr_NL(
 	//xiaohui add 'output_level' line, 2015-09-16
 	if(output_level != "m") ofs_in << "\n SETUP SEARCHING RADIUS FOR PROGRAM TO SEARCH ADJACENT ATOMS" << std::endl;
 	if(output_level != "m") ofs_in << std::setprecision(3);
-	if(output_level != "m") OUT(ofs_in,"longest orb rcut (Bohr)",rcutmax_Phi);
+	if(output_level != "m") ModuleBase::GlobalFunc::OUT(ofs_in,"longest orb rcut (Bohr)",rcutmax_Phi);
 
 //	std::cout << " LONGEST NL PROJ RCUT : " << longest_nl_proj_rcut << std::endl;
-	if(output_level != "m") OUT(ofs_in,"longest nonlocal projector rcut (Bohr)", rcutmax_Beta);
+	if(output_level != "m") ModuleBase::GlobalFunc::OUT(ofs_in,"longest nonlocal projector rcut (Bohr)", rcutmax_Beta);
 
 	// check in use_overlap_matrix, 
 	double sr = 0.0;
@@ -69,7 +69,7 @@ double atom_arrange::set_sr_NL(
 // mohan update 2011-03-10
 void atom_arrange::set_sr_OV(void)
 {
-	TITLE("atom_arrange","set_sr_OV");
+	ModuleBase::TITLE("atom_arrange","set_sr_OV");
 	double longest_orb_rcut = 0.0;
 	for(int it=0; it<ucell.ntype; it++)
 	{
@@ -95,8 +95,8 @@ void atom_arrange::search(
 	const int &test_atom_in,
 	const bool test_only)
 {
-	TITLE("atom_arrange", "search");
-	timer::tick("atom_arrange","search");
+	ModuleBase::TITLE("atom_arrange", "search");
+	ModuleBase::timer::tick("atom_arrange","search");
 
 	assert( search_radius_bohr > 0.0 );
 
@@ -106,8 +106,8 @@ void atom_arrange::search(
 //	if(GlobalV::OUT_LEVEL != "m") OUT(ofs_in,"searching radius is (Bohr))", search_radius_bohr);
 //	if(GlobalV::OUT_LEVEL != "m") OUT(ofs_in,"searching radius unit is (Bohr))",ucell.lat0);
 
-	OUT(ofs_in,"searching radius is (Bohr))", search_radius_bohr);
-	OUT(ofs_in,"searching radius unit is (Bohr))",ucell.lat0);
+	ModuleBase::GlobalFunc::OUT(ofs_in,"searching radius is (Bohr))", search_radius_bohr);
+	ModuleBase::GlobalFunc::OUT(ofs_in,"searching radius unit is (Bohr))",ucell.lat0);
 
 	assert(ucell.nat > 0);
 	//=============================
@@ -149,8 +149,8 @@ void atom_arrange::search(
 				
 				for(int ad=0; ad < grid_d.getAdjacentNum()+1; ad++)
 				{
-					Vector3<double> tau = grid_d.getAdjacentTau(ad);
-					Vector3<int> box = grid_d.getBox(ad);
+					ModuleBase::Vector3<double> tau = grid_d.getAdjacentTau(ad);
+					ModuleBase::Vector3<int> box = grid_d.getBox(ad);
 					std::cout << std::setw(15) << tau.x << " " << std::setw(15) << tau.y << " " << std::setw(15) << tau.z << " " 
 					<< std::setw(8) << box.x << std::setw(8) << box.y << std::setw(8) << box.z << std::endl;
 				}
@@ -160,7 +160,7 @@ void atom_arrange::search(
 		exit(0);//just test neighboring searching!
 	}
 	
-	timer::tick("atom_arrange","search");
+	ModuleBase::timer::tick("atom_arrange","search");
 	return;
 }
 

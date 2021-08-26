@@ -26,10 +26,10 @@ double Force_LCAO_gamma::set_EDM_element(
 }
 
 //#include "../src_develop/src_siao/selinv.h"
-void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
+void Force_LCAO_gamma::set_EDM_gamma(ModuleBase::matrix& dm, bool with_energy)
 {
-    TITLE("Force_LCAO_gamma","set_EDM_gamma");
-    timer::tick("Force_LCAO_gamma","set_EDM");
+    ModuleBase::TITLE("Force_LCAO_gamma","set_EDM_gamma");
+    ModuleBase::timer::tick("Force_LCAO_gamma","set_EDM");
 
 #ifdef __SELINV
 //xiaohui modified 2013-03-23, adding "/*"
@@ -72,7 +72,7 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 
 	int *local_bands;
 	local_bands = new int[GlobalV::DSIZE];
-	ZEROS(local_bands, GlobalV::DSIZE);
+	ModuleBase::GlobalFunc::ZEROS(local_bands, GlobalV::DSIZE);
 
 	int lastband_in_proc = 0;
 	//int lastband_number = 0;
@@ -103,7 +103,7 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			w1[is] = new double[local_band];
-			ZEROS(w1[is], local_band);
+			ModuleBase::GlobalFunc::ZEROS(w1[is], local_band);
 		}
 
 
@@ -137,7 +137,7 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			Z_wg[is] = new double[local_band * GlobalV::NLOCAL];
-			ZEROS(Z_wg[is], local_band * GlobalV::NLOCAL);
+			ModuleBase::GlobalFunc::ZEROS(Z_wg[is], local_band * GlobalV::NLOCAL);
 		}
 
 		//time_t time_Z_wg_start = time(NULL);
@@ -176,7 +176,7 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
 				ZW_300[is] = new double[300 * local_band];
-				ZEROS(ZW_300[is], 300 * local_band);
+				ModuleBase::GlobalFunc::ZEROS(ZW_300[is], 300 * local_band);
 			}
 
 			double** Z_300;
@@ -184,7 +184,7 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
 				Z_300[is] = new double[300 * local_band];
-				ZEROS(Z_300[is], 300 * local_band);
+				ModuleBase::GlobalFunc::ZEROS(Z_300[is], 300 * local_band);
 			}
 			if(GlobalV::NLOCAL%300 != 0) row_col += 1;
 			int row_global = 0;
@@ -215,7 +215,7 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 							for(int is=0; is<GlobalV::NSPIN; is++)
 							{
 								rho_300[is] = new double[300*300];
-								ZEROS(rho_300[is], 300*300);
+								ModuleBase::GlobalFunc::ZEROS(rho_300[is], 300*300);
 							}
 
 							for(int i_col=0; i_col<300; i_col++)
@@ -282,7 +282,7 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 							for(int is=0; is<GlobalV::NSPIN; is++)
 							{
 								Z_remain[is] = new double[col_remain * local_band];
-								ZEROS(Z_remain[is], col_remain * local_band);
+								ModuleBase::GlobalFunc::ZEROS(Z_remain[is], col_remain * local_band);
 							}
 
 							double** rho_300_remain;
@@ -290,7 +290,7 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 							for(int is=0; is<GlobalV::NSPIN; is++)
 							{
 								rho_300_remain[is] = new double[300*col_remain];
-								ZEROS(rho_300_remain[is], 300*col_remain);
+								ModuleBase::GlobalFunc::ZEROS(rho_300_remain[is], 300*col_remain);
 							}
 							for(int i_col=0; i_col<col_remain; i_col++)
 							{
@@ -360,7 +360,7 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 					for(int is=0; is<GlobalV::NSPIN; is++)
 					{
 						Z_row_remain[is] = new double[row_remain * local_band];
-						ZEROS(Z_row_remain[is], row_remain * local_band);
+						ModuleBase::GlobalFunc::ZEROS(Z_row_remain[is], row_remain * local_band);
 					}
 
 					for(int i_row=0; i_row<row_remain; i_row++)
@@ -382,7 +382,7 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 							for(int is=0; is<GlobalV::NSPIN; is++)
 							{
 								rho_remain_300[is] = new double[row_remain * 300];
-								ZEROS(rho_remain_300[is], row_remain * 300);
+								ModuleBase::GlobalFunc::ZEROS(rho_remain_300[is], row_remain * 300);
 							}
 
 							for(int i_col=0; i_col<300; i_col++)
@@ -448,14 +448,14 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 							for(int is=0; is<GlobalV::NSPIN; is++)
 							{
 								Z_col_remain[is] = new double[col_remain * local_band];
-								ZEROS(Z_col_remain[is], col_remain * local_band);
+								ModuleBase::GlobalFunc::ZEROS(Z_col_remain[is], col_remain * local_band);
 							}
 							double** rho_remain_remain;
 							rho_remain_remain = new double*[GlobalV::NSPIN];
 							for(int is=0; is<GlobalV::NSPIN; is++)
 							{
 								rho_remain_remain[is] = new double[row_remain * col_remain];
-								ZEROS(rho_remain_remain[is], row_remain * col_remain);
+								ModuleBase::GlobalFunc::ZEROS(rho_remain_remain[is], row_remain * col_remain);
 							}
 							for(int i_col=0; i_col<col_remain; i_col++)
 							{
@@ -536,7 +536,7 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
 				rho_NLOCAL_NLOCAL[is] = new double[GlobalV::NLOCAL*GlobalV::NLOCAL];
-				ZEROS(rho_NLOCAL_NLOCAL[is], GlobalV::NLOCAL*GlobalV::NLOCAL);
+				ModuleBase::GlobalFunc::ZEROS(rho_NLOCAL_NLOCAL[is], GlobalV::NLOCAL*GlobalV::NLOCAL);
 			}
 			for(int i_row=0; i_row<GlobalV::NLOCAL; i_row++)
 			{
@@ -637,7 +637,7 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 		}// end i
 	}//end ispin
 #endif //2015-09-06, xiaohui
-    timer::tick("Force_LCAO_gamma","set_EDM");
+    ModuleBase::timer::tick("Force_LCAO_gamma","set_EDM");
     return;
 }
 
@@ -647,18 +647,18 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 void Force_LCAO_gamma::cal_foverlap(
 	const bool isforce, 
 	const bool isstress, 
-	matrix& foverlap, 
-	matrix& soverlap)
+	ModuleBase::matrix& foverlap, 
+	ModuleBase::matrix& soverlap)
 {
-    TITLE("Force_LCAO_gamma","cal_foverlap");
-    timer::tick("Force_LCAO_gamma","cal_foverlap");
+    ModuleBase::TITLE("Force_LCAO_gamma","cal_foverlap");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_foverlap");
 
     // set energy density matrix.
     if(INPUT.new_dm>0)
     {
-        timer::tick("Force_LCAO_gamma","cal_edm_2d");
+        ModuleBase::timer::tick("Force_LCAO_gamma","cal_edm_2d");
 
-        matrix wgEkb;
+        ModuleBase::matrix wgEkb;
         wgEkb.create(GlobalV::NSPIN, GlobalV::NBANDS);
 
         for(int is=0; is<GlobalV::NSPIN; is++)
@@ -674,7 +674,7 @@ void Force_LCAO_gamma::cal_foverlap(
         wfc_edm_2d.wfc_gamma=GlobalC::LOC.wfc_dm_2d.wfc_gamma;
         wfc_edm_2d.cal_dm(wgEkb);
 
-        timer::tick("Force_LCAO_gamma","cal_edm_2d");
+        ModuleBase::timer::tick("Force_LCAO_gamma","cal_edm_2d");
 
         for(int i=0; i<GlobalV::NLOCAL; i++)
         {
@@ -716,8 +716,8 @@ void Force_LCAO_gamma::cal_foverlap(
     }
     else
     {
-        timer::tick("Force_LCAO_gamma","cal_edm_grid");
-        matrix edm2d;
+        ModuleBase::timer::tick("Force_LCAO_gamma","cal_edm_grid");
+        ModuleBase::matrix edm2d;
 		edm2d.create(GlobalV::NSPIN, GlobalC::ParaO.nloc);
 
         bool with_energy = true;
@@ -726,7 +726,7 @@ void Force_LCAO_gamma::cal_foverlap(
 
 		this->set_EDM_gamma(edm2d, with_energy);
 
-        timer::tick("Force_LCAO_gamma","cal_edm_grid");
+        ModuleBase::timer::tick("Force_LCAO_gamma","cal_edm_grid");
 
         //summation \sum_{i,j} E(i,j)*dS(i,j)
         //BEGIN GlobalV::CALCULATION OF GlobalV::FORCE OF EACH ATOM
@@ -788,6 +788,6 @@ void Force_LCAO_gamma::cal_foverlap(
             }
         }
     }
-    timer::tick("Force_LCAO_gamma","cal_foverlap");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_foverlap");
     return;
 }

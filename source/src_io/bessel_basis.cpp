@@ -24,7 +24,7 @@ void Bessel_Basis::init(
 	const double &dk,
 	const double &dr)
 {
-	TITLE("Bessel_Basis", "init");
+	ModuleBase::TITLE("Bessel_Basis", "init");
 	this->Dk = dk;
 
 	//--------------------------
@@ -38,8 +38,8 @@ void Bessel_Basis::init(
 	// setup Ecut_number
 	// ne * pi / rcut = sqrt(ecut) (Rydberg)
 	//----------------------------------------------
-//	this->Ecut_number = static_cast<int>( sqrt( 2.0 * ecut )* rcut/PI );// hartree
-	this->Ecut_number = static_cast<int>( sqrt( ecut )* rcut/PI ); // Rydberg Unit.
+//	this->Ecut_number = static_cast<int>( sqrt( 2.0 * ecut )* rcut/ModuleBase::PI );// hartree
+	this->Ecut_number = static_cast<int>( sqrt( ecut )* rcut/ModuleBase::PI ); // Rydberg Unit.
 	assert( this->Ecut_number > 0 );
 
 	//------------------
@@ -82,7 +82,7 @@ double Bessel_Basis::Polynomial_Interpolation2
 	{	
 		std::cout << "\n iq = " << iq;
 		std::cout << "\n kmesh = " << kmesh;
-		QUIT();
+		ModuleBase::QUIT();
 	}
 	*/
 	assert(iq < kmesh-4);
@@ -122,8 +122,8 @@ void Bessel_Basis::init_Faln(
 	const int &nmax,
 	const int &ecut_number)
 {
-	TITLE("Bessel_Basis","init_Faln");
-	timer::tick("Spillage","init_Faln");
+	ModuleBase::TITLE("Bessel_Basis","init_Faln");
+	ModuleBase::timer::tick("Spillage","init_Faln");
 	assert( this->kmesh > 0);
 
 	this->Faln.create(ntype, lmax+1, nmax, this->kmesh);
@@ -146,9 +146,9 @@ void Bessel_Basis::init_Faln(
 			}
 		}
 	}
-	OUT("nwfc = ",nwfc);
+	ModuleBase::GlobalFunc::OUT("nwfc = ",nwfc);
 
-	timer::tick("Spillage","init_Faln");
+	ModuleBase::timer::tick("Spillage","init_Faln");
 	return;
 }
 
@@ -164,8 +164,8 @@ void Bessel_Basis::init_TableOne(
 	const int &ecut_number,
 	const double &tolerence)
 {
-	TITLE("Bessel_Basis","init_TableOne");
-	timer::tick("Spillage","TableONe");
+	ModuleBase::TITLE("Bessel_Basis","init_TableOne");
+	ModuleBase::timer::tick("Spillage","TableONe");
 	// check
 	assert(ecutwfc > 0.0);
 	assert(dr > 0.0);
@@ -174,8 +174,8 @@ void Bessel_Basis::init_TableOne(
 	// init kmesh
 	this->kmesh = static_cast<int>(sqrt(ecutwfc) / dk) +1 + 4;
 	if (kmesh % 2 == 0)++kmesh;
-	OUT(GlobalV::ofs_running, "kmesh",kmesh);
-	OUT(GlobalV::ofs_running, "dk",dk);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "kmesh",kmesh);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "dk",dk);
 
 	// init Table One
 	this->TableOne.create(lmax+1, ecut_number, kmesh);
@@ -183,8 +183,8 @@ void Bessel_Basis::init_TableOne(
 	// init rmesh
 	int rmesh = static_cast<int>( rcut / dr ) + 4;
     if (rmesh % 2 == 0) ++rmesh;
-    OUT(GlobalV::ofs_running, "rmesh",rmesh);
-    OUT(GlobalV::ofs_running, "dr",dr);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "rmesh",rmesh);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "dr",dr);
 
 	// allocate rmesh and Jlk and eigenvalue of Jlq
 	double *r = new double[rmesh];
@@ -243,12 +243,12 @@ void Bessel_Basis::init_TableOne(
 	// init eigenvalue of Jl
 	for(int l=0; l<lmax+1; l++)
 	{
-		ZEROS(en, ecut_number);
-		ZEROS(jle, rmesh);
-		ZEROS(jlk, rmesh);
+		ModuleBase::GlobalFunc::ZEROS(en, ecut_number);
+		ModuleBase::GlobalFunc::ZEROS(jle, rmesh);
+		ModuleBase::GlobalFunc::ZEROS(jlk, rmesh);
 
 		// calculate eigenvalue for l
-		Sphbes::Spherical_Bessel_Roots(ecut_number, l, tolerence, en, rcut);
+		ModuleBase::Sphbes::Spherical_Bessel_Roots(ecut_number, l, tolerence, en, rcut);
 //		for (int ie=0; ie<ecut_number; ie++) 
 //		{
 //			std::cout << "\n en[" << ie << "]=" << en[ie];
@@ -258,7 +258,7 @@ void Bessel_Basis::init_TableOne(
 		for (int ie=0; ie<ecut_number; ie++)
 		{
 			// calculate J_{l}( en[ir]*r) 
-			Sphbes::Spherical_Bessel(rmesh, r, en[ie], l, jle);
+			ModuleBase::Sphbes::Spherical_Bessel(rmesh, r, en[ie], l, jle);
 
 			//caoyu add 2021-3-10
 			//=========output .orb format=============
@@ -299,7 +299,7 @@ void Bessel_Basis::init_TableOne(
 			for(int ik=0; ik<kmesh; ik++)
 			{
 				// calculate J_{l}( ik*dk*r )
-				Sphbes::Spherical_Bessel(rmesh, r, ik*dk, l, jlk);
+				ModuleBase::Sphbes::Spherical_Bessel(rmesh, r, ik*dk, l, jlk);
 
 				// calculate the function will be integrated
 				for(int ir=0; ir<rmesh; ir++)
@@ -308,7 +308,7 @@ void Bessel_Basis::init_TableOne(
 				}
 				
 				// make table value
-				Integral::Simpson_Integral(rmesh, function, rab, this->TableOne(l, ie, ik) );
+				ModuleBase::Integral::Simpson_Integral(rmesh, function, rab, this->TableOne(l, ie, ik) );
 			}
 			
 		}// end ie
@@ -326,7 +326,7 @@ void Bessel_Basis::init_TableOne(
 	delete[] g;
 	delete[] r;
 	delete[] function;
-	timer::tick("Spillage","TableONe");
+	ModuleBase::timer::tick("Spillage","TableONe");
 	return;
 }
 
@@ -338,7 +338,7 @@ void Bessel_Basis::readin_C4(
 	const int &ecut_number,
 	const double &tolerence)
 {
-	TITLE("Bessel_Basis","readin_C4");
+	ModuleBase::TITLE("Bessel_Basis","readin_C4");
 
 	if(GlobalV::MY_RANK != 0) return;
 
@@ -347,10 +347,10 @@ void Bessel_Basis::readin_C4(
 	if(!ifs) 
 	{
 		GlobalV::ofs_warning << " File name : " << name << std::endl;
-		WARNING_QUIT("Bessel_Basis::readin_C4","Can not find file.");
+		ModuleBase::WARNING_QUIT("Bessel_Basis::readin_C4","Can not find file.");
 	}
 
-	if (SCAN_BEGIN(ifs, "<FILE>"))
+	if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<FILE>"))
 	{
 		// mohan modify 2009-11-29
 		for (int it = 0; it < ntype; it++)
@@ -369,19 +369,19 @@ void Bessel_Basis::readin_C4(
 					if(!inc4) 
 					{
 						GlobalV::ofs_warning << " File name : " << filec4 << std::endl;
-						WARNING_QUIT("Bessel_Basis::readin_C4","Can not find file.");
+						ModuleBase::WARNING_QUIT("Bessel_Basis::readin_C4","Can not find file.");
 					}
 
-					if(SCAN_BEGIN(inc4, "<INPUTS>"))
+					if(ModuleBase::GlobalFunc::SCAN_BEGIN(inc4, "<INPUTS>"))
 					{
 						double tmp_ecut;
 						double tmp_rcut;
 						double tmp_enumber; 
 						double tmp_tolerence;
-						READ_VALUE( inc4, tmp_ecut); 
-						READ_VALUE( inc4, tmp_rcut); 
-						READ_VALUE( inc4, tmp_enumber); 
-						READ_VALUE( inc4, tmp_tolerence); 
+						ModuleBase::GlobalFunc::READ_VALUE( inc4, tmp_ecut); 
+						ModuleBase::GlobalFunc::READ_VALUE( inc4, tmp_rcut); 
+						ModuleBase::GlobalFunc::READ_VALUE( inc4, tmp_enumber); 
+						ModuleBase::GlobalFunc::READ_VALUE( inc4, tmp_tolerence); 
 						assert( tmp_ecut = this->ecut );
 						assert( tmp_rcut = this->rcut );
 						assert( tmp_enumber = this->Ecut_number);
@@ -389,10 +389,10 @@ void Bessel_Basis::readin_C4(
 					}
 
 					bool find = false;
-					if(SCAN_BEGIN(inc4, "<C4>"))
+					if(ModuleBase::GlobalFunc::SCAN_BEGIN(inc4, "<C4>"))
 					{
 						int total_nchi = 0;
-						READ_VALUE(inc4, total_nchi);
+						ModuleBase::GlobalFunc::READ_VALUE(inc4, total_nchi);
 
 						for(int ichi=0; ichi<total_nchi; ichi++)
 						{
@@ -428,13 +428,13 @@ void Bessel_Basis::readin_C4(
 					if(!find)
 					{
 						std::cout << "\n T=" << it << " L=" << il << " N=" << in;
-						WARNING_QUIT("Bessel_Basis::readin_C4","Can't find needed c4!");
+						ModuleBase::WARNING_QUIT("Bessel_Basis::readin_C4","Can't find needed c4!");
 					}
 					inc4.close();
 				}
 			}
 		}
-		SCAN_END(ifs, "</FILE>");
+		ModuleBase::GlobalFunc::SCAN_END(ifs, "</FILE>");
 	}
 	ifs.close();
 	return;
@@ -446,7 +446,7 @@ void Bessel_Basis::allocate_C4(
 	const int &nmax,
 	const int &ecut_number)
 {
-	TITLE("Bessel_Basis","allocate_C4");
+	ModuleBase::TITLE("Bessel_Basis","allocate_C4");
 		
 	this->C4.create(ntype, lmax+1, nmax, ecut_number);
 
@@ -469,7 +469,7 @@ void Bessel_Basis::allocate_C4(
 void Bessel_Basis::bcast(void)
 {
 #ifdef __MPI
-	TITLE("Bessel_Basis", "bcast");
+	ModuleBase::TITLE("Bessel_Basis", "bcast");
 	
 	Parallel_Common::bcast_double( ecut );
 	Parallel_Common::bcast_double( rcut );
@@ -480,7 +480,7 @@ void Bessel_Basis::bcast(void)
 
 void Bessel_Basis::readin(const std::string &name)
 {
-	TITLE("Bessel_Basis", "readin");
+	ModuleBase::TITLE("Bessel_Basis", "readin");
 	if (GlobalV::MY_RANK == 0)
 	{
 		std::ifstream ifs(name.c_str());
@@ -488,26 +488,26 @@ void Bessel_Basis::readin(const std::string &name)
 		if (!ifs)
 		{
 			std::cout << " File name : " << name << std::endl;
-			WARNING_QUIT("Bessel_Basis::readin","Can not find file.");
+			ModuleBase::WARNING_QUIT("Bessel_Basis::readin","Can not find file.");
 		}
-		CHECK_NAME(ifs, "INPUT_ORBITAL_INFORMATION");
-		if (SCAN_BEGIN(ifs, "<SPHERICAL_BESSEL>"))
+		ModuleBase::CHECK_NAME(ifs, "INPUT_ORBITAL_INFORMATION");
+		if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<SPHERICAL_BESSEL>"))
 		{
-			READ_VALUE(ifs, this->smooth);
-			READ_VALUE(ifs, this->sigma);
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, this->smooth);
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, this->sigma);
 			assert(sigma!=0.0);
-			READ_VALUE(ifs, this->ecut); // readin ecut
-			READ_VALUE(ifs, this->rcut); // readin rcut
-			READ_VALUE(ifs, this->tolerence);
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, this->ecut); // readin ecut
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, this->rcut); // readin rcut
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, this->tolerence);
 			assert(ecut > 0.0);
 			assert(rcut > 0.0);
 			assert(tolerence > 0.0);
-			OUT(GlobalV::ofs_running, "smooth",smooth);
-			OUT(GlobalV::ofs_running, "sigma",sigma);
-			OUT(GlobalV::ofs_running, "ecut", ecut);
-			OUT(GlobalV::ofs_running, "rcut", rcut);
-			OUT(GlobalV::ofs_running, "tolerence", tolerence);
-			SCAN_END(ifs, "</SPHERICAL_BESSEL>");
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "smooth",smooth);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "sigma",sigma);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "ecut", ecut);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "rcut", rcut);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "tolerence", tolerence);
+			ModuleBase::GlobalFunc::SCAN_END(ifs, "</SPHERICAL_BESSEL>");
 		}
 		ifs.close();
 	}

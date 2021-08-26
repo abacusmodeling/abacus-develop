@@ -14,7 +14,7 @@
 
 Run_MD_PW::Run_MD_PW()
 {
-    force=new Vector3<double>[GlobalC::ucell.nat];
+    force=new ModuleBase::Vector3<double>[GlobalC::ucell.nat];
 }
 
 Run_MD_PW::~Run_MD_PW()
@@ -24,8 +24,8 @@ Run_MD_PW::~Run_MD_PW()
 
 void Run_MD_PW::md_ions_pw(void)
 {
-    TITLE("Run_MD_PW", "md_ions_pw");
-    timer::tick("Run_MD_PW", "md_ions_pw");
+    ModuleBase::TITLE("Run_MD_PW", "md_ions_pw");
+    ModuleBase::timer::tick("Run_MD_PW", "md_ions_pw");
 
     if (GlobalV::OUT_LEVEL == "i")
     {
@@ -115,7 +115,7 @@ void Run_MD_PW::md_ions_pw(void)
             }
             else if (Exx_Global::Hybrid_Type::Generate_Matrix == GlobalC::exx_global.info.hybrid_type)
             {
-                throw std::invalid_argument(TO_STRING(__FILE__) + TO_STRING(__LINE__));
+                throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__) + ModuleBase::GlobalFunc::TO_STRING(__LINE__));
             }
             else // Peize Lin add 2019-03-09
             {
@@ -180,7 +180,7 @@ void Run_MD_PW::md_ions_pw(void)
         }
         else
         {
-            WARNING_QUIT("opt_ions", "mdtype should be -1~2!");
+            ModuleBase::WARNING_QUIT("opt_ions", "mdtype should be -1~2!");
         }
 
         time_t fend = time(NULL);
@@ -207,10 +207,10 @@ void Run_MD_PW::md_ions_pw(void)
 
             std::cout << " " << std::setw(7) << ss.str()
                  << std::setw(5) << eiter
-                 << std::setw(15) << std::setprecision(6) << GlobalC::en.etot * Ry_to_eV
-                 << std::setw(15) << IMM.get_ediff() * Ry_to_eV
+                 << std::setw(15) << std::setprecision(6) << GlobalC::en.etot * ModuleBase::Ry_to_eV
+                 << std::setw(15) << IMM.get_ediff() * ModuleBase::Ry_to_eV
                  << std::setprecision(3)
-                 << std::setw(15) << IMM.get_largest_grad() * Ry_to_eV / 0.529177
+                 << std::setw(15) << IMM.get_largest_grad() * ModuleBase::Ry_to_eV / 0.529177
                  << std::setw(15) << IMM.get_trust_radius()
                  << std::setw(8) << IMM.get_update_iter()
                  << std::setprecision(2) << std::setw(11) << etime_min
@@ -225,14 +225,14 @@ void Run_MD_PW::md_ions_pw(void)
         std::cout << " ION DYNAMICS FINISHED :)" << std::endl;
     }
 
-    timer::tick("Run_MD_PW", "md_ions_pw");
+    ModuleBase::timer::tick("Run_MD_PW", "md_ions_pw");
     return;
 }
 
 void Run_MD_PW::md_cells_pw()
 {
-    TITLE("Run_MD_PW", "md_cells_pw");
-    timer::tick("Run_MD_PW", "md_cells_pw");
+    ModuleBase::TITLE("Run_MD_PW", "md_cells_pw");
+    ModuleBase::timer::tick("Run_MD_PW", "md_cells_pw");
 
     GlobalC::wf.allocate(GlobalC::kv.nks);
 
@@ -253,13 +253,13 @@ void Run_MD_PW::md_cells_pw()
     // initalize local pseudopotential
     //=================================
     GlobalC::ppcell.init_vloc(GlobalC::pw.nggm, GlobalC::ppcell.vloc);
-    DONE(GlobalV::ofs_running, "LOCAL POTENTIAL");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "LOCAL POTENTIAL");
 
     //======================================
     // Initalize non local pseudopotential
     //======================================
     GlobalC::ppcell.init_vnl(GlobalC::ucell);
-    DONE(GlobalV::ofs_running, "NON-LOCAL POTENTIAL");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "NON-LOCAL POTENTIAL");
 
     //=========================================================
     // calculate the total local pseudopotential in real space
@@ -268,7 +268,7 @@ void Run_MD_PW::md_cells_pw()
 
     GlobalC::pot.newd();
 
-    DONE(GlobalV::ofs_running, "INIT POTENTIAL");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT POTENTIAL");
 
     //==================================================
     // create GlobalC::ppcell.tab_at , for trial wave functions.
@@ -294,11 +294,11 @@ void Run_MD_PW::md_cells_pw()
         break;
     case Exx_Global::Hybrid_Type::Generate_Matrix:
     default:
-        throw std::invalid_argument(TO_STRING(__FILE__) + TO_STRING(__LINE__));
+        throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__) + ModuleBase::GlobalFunc::TO_STRING(__LINE__));
     }
 #endif
 
-    DONE(GlobalV::ofs_running, "INIT BASIS");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT BASIS");
 
     // ion optimization begins
     // electron density optimization is included in ion optimization
@@ -307,16 +307,16 @@ void Run_MD_PW::md_cells_pw()
 
     GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
     GlobalV::ofs_running << std::setprecision(16);
-    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
+    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
     GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
-    timer::tick("Run_MD_PW", "md_cells_pw");
+    ModuleBase::timer::tick("Run_MD_PW", "md_cells_pw");
 }
 
-void Run_MD_PW::callInteraction_PW(const int& numIon, Vector3<double>* force, matrix& stress_pw)
+void Run_MD_PW::callInteraction_PW(const int& numIon, ModuleBase::Vector3<double>* force, ModuleBase::matrix& stress_pw)
 {
 //to call the force of each atom
-	matrix fcs;//temp force matrix
+	ModuleBase::matrix fcs;//temp force ModuleBase::matrix
 	Forces ff;
 	ff.init(fcs);
 	for(int ion=0;ion<numIon;ion++){

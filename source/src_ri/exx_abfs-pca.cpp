@@ -16,24 +16,24 @@
 #include <sys/time.h>			// Peize Lin test
 #include "../src_lcao/global_fp.h"		// Peize Lin test
 
-std::vector<std::vector<std::pair<std::vector<double>,matrix>>> Exx_Abfs::PCA::cal_PCA( 
+std::vector<std::vector<std::pair<std::vector<double>,ModuleBase::matrix>>> Exx_Abfs::PCA::cal_PCA( 
 	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &lcaos, 
 	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &abfs,
 	const double kmesh_times )
 {
-	TITLE("Exx_Abfs::PCA::cal_PCA");
-std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
+	ModuleBase::TITLE("Exx_Abfs::PCA::cal_PCA");
+std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 	
-	const Element_Basis_Index::Range
+	const ModuleBase::Element_Basis_Index::Range
 		&& range_lcaos = Exx_Abfs::Abfs_Index::construct_range( lcaos );
-	const Element_Basis_Index::IndexLNM
-		&& index_lcaos = Element_Basis_Index::construct_index( range_lcaos );
+	const ModuleBase::Element_Basis_Index::IndexLNM
+		&& index_lcaos = ModuleBase::Element_Basis_Index::construct_index( range_lcaos );
 
-	const Element_Basis_Index::Range
+	const ModuleBase::Element_Basis_Index::Range
 		&& range_abfs = Exx_Abfs::Abfs_Index::construct_range( abfs );
-	const Element_Basis_Index::IndexLNM
-		&& index_abfs = Element_Basis_Index::construct_index( range_abfs );
+	const ModuleBase::Element_Basis_Index::IndexLNM
+		&& index_abfs = ModuleBase::Element_Basis_Index::construct_index( range_abfs );
 		
 ofs<<range_lcaos<<std::endl;
 ofs<<range_abfs<<std::endl;
@@ -60,14 +60,14 @@ ofs<<range_abfs<<std::endl;
 
 	Exx_Abfs::Lmax = Lmax_bak;
 	
-	std::vector<std::vector<std::pair<std::vector<double>,matrix>>> eig(abfs.size());
+	std::vector<std::vector<std::pair<std::vector<double>,ModuleBase::matrix>>> eig(abfs.size());
 	for( size_t T=0; T!=abfs.size(); ++T )
 	{
-		const matrix && A = m_abfslcaos_lcaos.cal_overlap_matrix(  
+		const ModuleBase::matrix && A = m_abfslcaos_lcaos.cal_overlap_matrix(  
 			T, 
 			T, 
-			Vector3<double>{0,0,0},
-			Vector3<double>{0,0,0},  
+			ModuleBase::Vector3<double>{0,0,0},
+			ModuleBase::Vector3<double>{0,0,0},  
 			index_abfs, 
 			index_lcaos,
 			index_lcaos,
@@ -79,24 +79,24 @@ ofs<<range_abfs<<std::endl;
 		{
 //ofs<<"get_sub_matrix:"<<std::endl<<get_sub_matrix( A, T, L, range_abfs, index_abfs )<<std::endl;
 //			const matrix A_sub = get_column_mean0_matrix( get_sub_matrix( A, T, L, range_abfs, index_abfs ) );
-			const matrix A_sub = get_sub_matrix( A, T, L, range_abfs, index_abfs );
+			const ModuleBase::matrix A_sub = get_sub_matrix( A, T, L, range_abfs, index_abfs );
 //ofs<<"A_sub:"<<std::endl<<A_sub<<std::endl;
 //ofs<<"transpose:"<<std::endl<<transpose(A_sub)<<std::endl;
 //ofs<<"mul:"<<std::endl<<transpose(A_sub) * A_sub<<std::endl;
-			matrix mm = transpose(A_sub) * A_sub;
+			ModuleBase::matrix mm = transpose(A_sub) * A_sub;
 //ofs<<"mm:"<<std::endl<<mm<<std::endl;
 			std::vector<double> eig_value(mm.nr);
 			
 			int info;
 gettimeofday( &t_start, NULL);
-			LapackConnector::dsyev( 'V', 'U', mm, VECTOR_TO_PTR(eig_value), info );
+			LapackConnector::dsyev( 'V', 'U', mm, ModuleBase::GlobalFunc::VECTOR_TO_PTR(eig_value), info );
 ofs<<"TIME@LapackConnector::dsyev\t"<<time_during(t_start)<<std::endl;
 			if( info )
 			{
 				std::cout<<std::endl<<"info_dsyev = "<<info<<std::endl;
 				GlobalV::ofs_warning<<mm<<std::endl;
 				std::cout<<"in file "<<__FILE__<<" line "<<__LINE__<<std::endl;
-				QUIT();
+				ModuleBase::QUIT();
 			}
 			eig[T][L] = make_pair( eig_value, mm );
 //for( const auto v : eig_value )
@@ -110,16 +110,16 @@ ofs.close();
 	return eig;
 }
 
-matrix Exx_Abfs::PCA::get_sub_matrix( 
-	const matrix & m,
+ModuleBase::matrix Exx_Abfs::PCA::get_sub_matrix( 
+	const ModuleBase::matrix & m,
 	const size_t & T,
 	const size_t & L,
-	const Element_Basis_Index::Range & range,
-	const Element_Basis_Index::IndexLNM & index )
+	const ModuleBase::Element_Basis_Index::Range & range,
+	const ModuleBase::Element_Basis_Index::IndexLNM & index )
 {
-	TITLE("Exx_Abfs::PCA::get_sub_matrix");
+	ModuleBase::TITLE("Exx_Abfs::PCA::get_sub_matrix");
 	
-	matrix m_sub( m.nr, range[T][L].N );
+	ModuleBase::matrix m_sub( m.nr, range[T][L].N );
 	for( size_t ir=0; ir!=m.nr; ++ir )
 		for( size_t N=0; N!=range[T][L].N; ++N )
 			m_sub( ir, N ) = m( ir, index[T][L][N][0] );
@@ -127,9 +127,9 @@ matrix Exx_Abfs::PCA::get_sub_matrix(
 }
 
 
-matrix Exx_Abfs::PCA::get_column_mean0_matrix( const matrix & m )
+ModuleBase::matrix Exx_Abfs::PCA::get_column_mean0_matrix( const ModuleBase::matrix & m )
 {
-	matrix m_new( m.nr, m.nc );
+	ModuleBase::matrix m_new( m.nr, m.nc );
 	for( size_t ic=0; ic!=m.nc; ++ic )
 	{
 		double sum=0;

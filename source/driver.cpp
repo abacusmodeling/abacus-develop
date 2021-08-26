@@ -20,10 +20,10 @@ Driver::~Driver(){}
 
 void Driver::init()
 {
-	TITLE("Driver","init");
+	ModuleBase::TITLE("Driver","init");
 
 	time_t time_start = std::time(NULL);
-	timer::start();
+	ModuleBase::timer::start();
 
 	// (1) read the input parameters.
 	this->reading();
@@ -46,7 +46,7 @@ void Driver::init()
 
 void Driver::reading(void)
 {
-	timer::tick("Driver","reading");
+	ModuleBase::timer::tick("Driver","reading");
 
 	// (1) read INPUT 
 	INPUT.Init( GlobalV::global_in_card );
@@ -57,11 +57,11 @@ void Driver::reading(void)
 	// (3) define the 'DIAGONALIZATION' world in MPI
 	Parallel_Global::split_diag_world(GlobalV::DIAGO_PROC);
 	Parallel_Global::split_grid_world(GlobalV::DIAGO_PROC);
-	OUT(GlobalV::ofs_running,"DRANK",GlobalV::DRANK+1);
-	OUT(GlobalV::ofs_running,"DSIZE",GlobalV::DSIZE);
-	OUT(GlobalV::ofs_running,"DCOLOR",GlobalV::DCOLOR+1);
-	OUT(GlobalV::ofs_running,"GRANK",GlobalV::GRANK+1);
-	OUT(GlobalV::ofs_running,"GSIZE",GlobalV::GSIZE);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"DRANK",GlobalV::DRANK+1);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"DSIZE",GlobalV::DSIZE);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"DCOLOR",GlobalV::DCOLOR+1);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"GRANK",GlobalV::GRANK+1);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"GSIZE",GlobalV::GSIZE);
 
 #ifdef __MPI
     // (4)  divide the GlobalV::NPROC processors into GlobalV::NPOOL for k-points parallelization.
@@ -75,15 +75,15 @@ void Driver::reading(void)
     std::stringstream ss1;
     ss1 << GlobalV::global_out_dir << GlobalV::global_in_card;
     INPUT.Print( ss1.str() );
-    //DONE(GlobalV::ofs_running,"READING CARDS");
+    //ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"READING CARDS");
 
-	timer::tick("Driver","reading");
+	ModuleBase::timer::tick("Driver","reading");
 	return;
 }
 
 void Driver::atomic_world(void)
 {
-	TITLE("Driver","atomic_world");
+	ModuleBase::TITLE("Driver","atomic_world");
 
 	//--------------------------------------------------
 	// choose basis sets:
@@ -102,9 +102,9 @@ void Driver::atomic_world(void)
 	}
 #endif
 
-	timer::finish( GlobalV::ofs_running );
+	ModuleBase::timer::finish( GlobalV::ofs_running );
 
-	Memory::print_all( GlobalV::ofs_running ) ;
+	ModuleBase::Memory::print_all( GlobalV::ofs_running ) ;
 
 	return;
 }

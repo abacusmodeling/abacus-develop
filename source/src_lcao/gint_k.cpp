@@ -31,12 +31,12 @@ void Gint_k::reset_spin(const int &spin_now_in)
 
 void Gint_k::allocate_pvpR(void)
 {
-	TITLE("Gint_k","allocate_pvpR");
+	ModuleBase::TITLE("Gint_k","allocate_pvpR");
 
 	if(this->pvpR_alloc_flag)
 	{
 		return; //Liuxh add, 20181012
-		WARNING_QUIT("Gint_k::allocate_pvpR","pvpR has been allocated!");
+		ModuleBase::WARNING_QUIT("Gint_k::allocate_pvpR","pvpR has been allocated!");
 	}
 
 	//	reduced = GlobalV::NURSE; 
@@ -50,10 +50,10 @@ void Gint_k::allocate_pvpR(void)
 		for(int is =0;is<GlobalV::NSPIN;is++)
 		{
 			this->pvpR_reduced[is] = new double[GlobalC::LNNR.nnrg];	
-			ZEROS( pvpR_reduced[is], GlobalC::LNNR.nnrg);
+			ModuleBase::GlobalFunc::ZEROS( pvpR_reduced[is], GlobalC::LNNR.nnrg);
 		}
 
-		double mem = Memory::record("allocate_pvpR", "pvpR_reduced", GlobalC::LNNR.nnrg * GlobalV::NSPIN , "double");
+		double mem = ModuleBase::Memory::record("allocate_pvpR", "pvpR_reduced", GlobalC::LNNR.nnrg * GlobalV::NSPIN , "double");
 
         if(GlobalV::OUT_LEVEL != "m") 
 		{
@@ -64,13 +64,13 @@ void Gint_k::allocate_pvpR(void)
         {
             GlobalV::ofs_warning << " memory for pvpR = " << mem << std::endl;
             GlobalV::ofs_warning << " which is larger than 800 MB ! " << std::endl;
-			WARNING_QUIT("Gint_k","allocate_pvpR");
+			ModuleBase::WARNING_QUIT("Gint_k","allocate_pvpR");
 		}
 
 	}
 	else
 	{
-		double mem = Memory::record("allocate_pvpR", "pvpR", GlobalC::GridT.lgd * GlobalC::GridT.nutot
+		double mem = ModuleBase::Memory::record("allocate_pvpR", "pvpR", GlobalC::GridT.lgd * GlobalC::GridT.nutot
 				* GlobalC::GridT.lgd * GlobalC::GridT.nutot , "double");
 
 		if(GlobalV::OUT_LEVEL != "m") 
@@ -82,7 +82,7 @@ void Gint_k::allocate_pvpR(void)
 		{
 			GlobalV::ofs_warning << " memory for pvpR = " << mem << std::endl;
 			GlobalV::ofs_warning << " which is larger than 800 MB ! " << std::endl;
-			WARNING_QUIT("Gint_k","allocate_pvpR");
+			ModuleBase::WARNING_QUIT("Gint_k","allocate_pvpR");
 		}
 
 		//----------------------------------------------
@@ -94,7 +94,7 @@ void Gint_k::allocate_pvpR(void)
 		const int LDIM=GlobalC::GridT.lgd*GlobalC::GridT.nutot;
 
 		this->pvpR_pool = new double[LDIM*LDIM];
-		ZEROS(pvpR_pool, LDIM*LDIM);
+		ModuleBase::GlobalFunc::ZEROS(pvpR_pool, LDIM*LDIM);
 
 		this->pvpR = new double*[LDIM];
 		for(int i=0; i<LDIM; i++)
@@ -111,11 +111,11 @@ void Gint_k::allocate_pvpR(void)
 
 void Gint_k::destroy_pvpR(void)
 {
-	TITLE("Gint_k","destroy_pvpR");
+	ModuleBase::TITLE("Gint_k","destroy_pvpR");
 	
 	if(!pvpR_alloc_flag)
 	{
-		WARNING_QUIT("Gint_k::destroy_pvpR","<phi_0i | V | phi_Rj> matrix has not been allocated yet!");
+		ModuleBase::WARNING_QUIT("Gint_k::destroy_pvpR","<phi_0i | V | phi_Rj> matrix has not been allocated yet!");
 	}
 	
 	if(this->reduced)
@@ -140,13 +140,13 @@ void Gint_k::destroy_pvpR(void)
 // fold the <phi | vl |dphi(R)> * DM(R) to 
 // calculate the force.
 void Gint_k::folding_force(
-	matrix& fvl_dphi,
+	ModuleBase::matrix& fvl_dphi,
 	double* pvdpx, 
 	double* pvdpy, 
 	double* pvdpz)
 {
-	TITLE("Gint_k","folding_force");
-	timer::tick("Gint_k","folding_force");
+	ModuleBase::TITLE("Gint_k","folding_force");
+	ModuleBase::timer::tick("Gint_k","folding_force");
 
 	//xiaohui modify 2013-12-17, test
 //	assert(GlobalC::GridT.lgd > 0); //mohan add 2012-06-10
@@ -168,13 +168,13 @@ void Gint_k::folding_force(
 			ppx[i] = new double[lgd];
 			ppy[i] = new double[lgd];
 			ppz[i] = new double[lgd];
-			ZEROS( ppx[i], lgd);
-			ZEROS( ppy[i], lgd);
-			ZEROS( ppz[i], lgd);
+			ModuleBase::GlobalFunc::ZEROS( ppx[i], lgd);
+			ModuleBase::GlobalFunc::ZEROS( ppy[i], lgd);
+			ModuleBase::GlobalFunc::ZEROS( ppz[i], lgd);
 		}
 	}
 	
-	Vector3<double> tau1, dtau;
+	ModuleBase::Vector3<double> tau1, dtau;
 	for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
 	{
 		Atom* atom1 = &GlobalC::ucell.atoms[T1];
@@ -247,7 +247,7 @@ void Gint_k::folding_force(
 	double* tmp = new double[GlobalV::NLOCAL*3];
 	for(int i=0; i<GlobalV::NLOCAL; ++i)
 	{
-		ZEROS(tmp, 3*GlobalV::NLOCAL);
+		ModuleBase::GlobalFunc::ZEROS(tmp, 3*GlobalV::NLOCAL);
 		const int mug = GlobalC::GridT.trace_lo[i];
 		// if the row element is on this processor
 		if(mug>=0)
@@ -308,15 +308,15 @@ void Gint_k::folding_force(
 		delete[] ppy;
 		delete[] ppz;
 	}
-	timer::tick("Gint_k","folding_force");
+	ModuleBase::timer::tick("Gint_k","folding_force");
 	return;
 }
 
 // fold the <phi | vl * R_beta|dphi(R_alpha)> * DM(R) to 
 // calculate the stress.
 void Gint_k::folding_stress(
-	matrix& fvl_dphi, 
-	matrix& svl_dphi,
+	ModuleBase::matrix& fvl_dphi, 
+	ModuleBase::matrix& svl_dphi,
 	double* pvdpx, 
 	double* pvdpy, 
 	double* pvdpz,
@@ -327,8 +327,8 @@ void Gint_k::folding_stress(
 	double* pvdp13, 
 	double* pvdp23)
 {
-	TITLE("Gint_k","folding_stress");
-	timer::tick("Gint_k","folding_stress");
+	ModuleBase::TITLE("Gint_k","folding_stress");
+	ModuleBase::timer::tick("Gint_k","folding_stress");
 
 	const int lgd = GlobalC::GridT.lgd;
 
@@ -363,26 +363,26 @@ void Gint_k::folding_stress(
 			ppx[i] = new double[lgd];
 			ppy[i] = new double[lgd];
 			ppz[i] = new double[lgd];
-			ZEROS( ppx[i], lgd);
-			ZEROS( ppy[i], lgd);
-			ZEROS( ppz[i], lgd);
+			ModuleBase::GlobalFunc::ZEROS( ppx[i], lgd);
+			ModuleBase::GlobalFunc::ZEROS( ppy[i], lgd);
+			ModuleBase::GlobalFunc::ZEROS( ppz[i], lgd);
 
 			pp11[i] = new double[lgd];
 			pp22[i] = new double[lgd];
 			pp33[i] = new double[lgd];
-			ZEROS( pp11[i], lgd);
-			ZEROS( pp22[i], lgd);
-			ZEROS( pp33[i], lgd);
+			ModuleBase::GlobalFunc::ZEROS( pp11[i], lgd);
+			ModuleBase::GlobalFunc::ZEROS( pp22[i], lgd);
+			ModuleBase::GlobalFunc::ZEROS( pp33[i], lgd);
 			pp12[i] = new double[lgd];
 			pp13[i] = new double[lgd];
 			pp23[i] = new double[lgd];
-			ZEROS( pp12[i], lgd);
-			ZEROS( pp13[i], lgd);
-			ZEROS( pp23[i], lgd);
+			ModuleBase::GlobalFunc::ZEROS( pp12[i], lgd);
+			ModuleBase::GlobalFunc::ZEROS( pp13[i], lgd);
+			ModuleBase::GlobalFunc::ZEROS( pp23[i], lgd);
 
 		}
 	}
-	Vector3<double> tau1, dtau;
+	ModuleBase::Vector3<double> tau1, dtau;
 	for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
 	{
 		const Atom* atom1 = &GlobalC::ucell.atoms[T1];
@@ -409,7 +409,7 @@ void Gint_k::folding_stress(
 					const int T2 = GlobalC::GridD.getType(ad);
 					const int I2 = GlobalC::GridD.getNatom(ad);
 
-					const Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad);
+					const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad);
 					const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
 					if(GlobalC::GridT.in_this_processor[iat2])
 					{
@@ -482,8 +482,8 @@ void Gint_k::folding_stress(
 	double* tmp1 = new double[GlobalV::NLOCAL*6];
 	for(int i=0; i<GlobalV::NLOCAL; ++i)
 	{
-		ZEROS(tmp, 3*GlobalV::NLOCAL);
-		ZEROS(tmp1, 6*GlobalV::NLOCAL);
+		ModuleBase::GlobalFunc::ZEROS(tmp, 3*GlobalV::NLOCAL);
+		ModuleBase::GlobalFunc::ZEROS(tmp1, 6*GlobalV::NLOCAL);
 		const int mug = GlobalC::GridT.trace_lo[i];
 		// if the row element is on this processor
 		if(mug>=0)
@@ -566,7 +566,7 @@ void Gint_k::folding_stress(
 		delete[] pp13;
 		delete[] pp23;
 	}
-	timer::tick("Gint_k","folding_stress");
+	ModuleBase::timer::tick("Gint_k","folding_stress");
 	return;
 }
 
@@ -574,12 +574,12 @@ void Gint_k::folding_stress(
 // H(k)=\sum{R} H(R)exp(ikR) 
 void Gint_k::folding_vl_k(const int &ik)
 {
-	TITLE("Gint_k","folding_vl_k");
-	timer::tick("Gint_k","folding_vl_k");
+	ModuleBase::TITLE("Gint_k","folding_vl_k");
+	ModuleBase::timer::tick("Gint_k","folding_vl_k");
 
 	if(!pvpR_alloc_flag)
 	{
-		WARNING_QUIT("Gint_k::destroy_pvpR","pvpR hasnot been allocated yet!");
+		ModuleBase::WARNING_QUIT("Gint_k::destroy_pvpR","pvpR hasnot been allocated yet!");
 	}
 
 	//####################### EXPLAIN #################################
@@ -601,12 +601,12 @@ void Gint_k::folding_vl_k(const int &ik)
 	for(int i=0; i<GlobalC::GridT.lgd; i++)
 	{
 		this->pvp[i] = new std::complex<double>[GlobalC::GridT.lgd];
-		ZEROS( this->pvp[i], GlobalC::GridT.lgd);
+		ModuleBase::GlobalFunc::ZEROS( this->pvp[i], GlobalC::GridT.lgd);
 	}
 
 	if(!reduced)
 	{	
-		Vector3<double> dR;
+		ModuleBase::Vector3<double> dR;
 		double arg;
 		std::complex<double> phase;
 		std::complex<double> *pp1;
@@ -629,7 +629,7 @@ void Gint_k::folding_vl_k(const int &ik)
 				dR.y = GlobalC::GridT.ucell_index2y[m] - R1y;
 				dR.z = GlobalC::GridT.ucell_index2z[m] - R1z;
 
-				arg = (GlobalC::kv.kvec_d[ this->ik_now ] * dR) * TWO_PI;
+				arg = (GlobalC::kv.kvec_d[ this->ik_now ] * dR) * ModuleBase::TWO_PI;
 				phase = std::complex<double>(cos(arg), sin(arg));
 				for(int i=0; i<GlobalC::GridT.lgd; i++)
 				{
@@ -649,7 +649,7 @@ void Gint_k::folding_vl_k(const int &ik)
 	else
 	{
 		int lgd = 0;
-		Vector3<double> tau1, dtau, dR;
+		ModuleBase::Vector3<double> tau1, dtau, dR;
 		for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
 		{
 			for(int I1=0; I1<GlobalC::ucell.atoms[T1].na; ++I1)
@@ -696,13 +696,13 @@ void Gint_k::folding_vl_k(const int &ik)
 								const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0); 
 
 								// calculate the distance between iat1 and iat2.
-								// Vector3<double> dR = GlobalC::GridD.getAdjacentTau(ad) - tau1;
+								// ModuleBase::Vector3<double> dR = GlobalC::GridD.getAdjacentTau(ad) - tau1;
 								dR.x = GlobalC::GridD.getBox(ad).x;
 								dR.y = GlobalC::GridD.getBox(ad).y;
 								dR.z = GlobalC::GridD.getBox(ad).z;
 
 								// calculate the phase factor exp(ikR).
-								const double arg = (GlobalC::kv.kvec_d[ this->ik_now ] * dR) * TWO_PI;
+								const double arg = (GlobalC::kv.kvec_d[ this->ik_now ] * dR) * ModuleBase::TWO_PI;
 								std::complex<double> phase = std::complex<double>(cos(arg), sin(arg));
 								int ixxx = DM_start + GlobalC::LNNR.find_R2st[iat][nad];
 								for(int iw=0; iw<atom1->nw; iw++)
@@ -766,12 +766,12 @@ void Gint_k::folding_vl_k(const int &ik)
 	*/
 
 	// Distribution of data.
-	timer::tick("Gint_k","Distri");
+	ModuleBase::timer::tick("Gint_k","Distri");
 	std::complex<double>* tmp;
 	for (int i=0; i<GlobalV::NLOCAL; i++)
 	{
 		tmp = new std::complex<double>[GlobalV::NLOCAL];
-		ZEROS(tmp, GlobalV::NLOCAL);
+		ModuleBase::GlobalFunc::ZEROS(tmp, GlobalV::NLOCAL);
 		const int mug = GlobalC::GridT.trace_lo[i];
 		// if the row element is on this processor.
 		if (mug >= 0)
@@ -821,9 +821,9 @@ void Gint_k::folding_vl_k(const int &ik)
 		delete[] pvp[i];
 	}
 	delete[] pvp;
-	timer::tick("Gint_k","Distri");
+	ModuleBase::timer::tick("Gint_k","Distri");
 
-	timer::tick("Gint_k","folding_vl_k");
+	ModuleBase::timer::tick("Gint_k","folding_vl_k");
 	return;
 }
 
@@ -832,12 +832,12 @@ void Gint_k::folding_vl_k(const int &ik)
 // for non-collinear case  
 void Gint_k::folding_vl_k_nc(const int &ik)
 {
-	TITLE("Gint_k","folding_vl_k_nc");
-	timer::tick("Gint_k","folding_vl_k_nc");
+	ModuleBase::TITLE("Gint_k","folding_vl_k_nc");
+	ModuleBase::timer::tick("Gint_k","folding_vl_k_nc");
 
 	if(!pvpR_alloc_flag)
 	{
-		WARNING_QUIT("Gint_k::destroy_pvpR","pvpR hasnot been allocated yet!");
+		ModuleBase::WARNING_QUIT("Gint_k::destroy_pvpR","pvpR hasnot been allocated yet!");
 	}
 
 	this->ik_now = ik;
@@ -848,13 +848,13 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 		for(int i=0; i<GlobalC::GridT.lgd; i++)
 		{
 			pvp_nc[spin][i] = new std::complex<double>[GlobalC::GridT.lgd];
-			ZEROS( this->pvp_nc[spin][i], GlobalC::GridT.lgd);
+			ModuleBase::GlobalFunc::ZEROS( this->pvp_nc[spin][i], GlobalC::GridT.lgd);
 		}
 	}
 
 	if(!reduced)
 	{	
-		Vector3<double> dR;
+		ModuleBase::Vector3<double> dR;
 		double arg;
 		std::complex<double> phase;
 		std::complex<double> *pp1;
@@ -877,7 +877,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 				dR.y = GlobalC::GridT.ucell_index2y[m] - R1y;
 				dR.z = GlobalC::GridT.ucell_index2z[m] - R1z;
 
-				arg = (GlobalC::kv.kvec_d[ this->ik_now ] * dR) * TWO_PI;
+				arg = (GlobalC::kv.kvec_d[ this->ik_now ] * dR) * ModuleBase::TWO_PI;
 				phase = std::complex<double>(cos(arg), sin(arg));
 				for(int i=0; i<GlobalC::GridT.lgd; i++)
 				{
@@ -897,7 +897,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 	else
 	{
 		int lgd = 0;
-		Vector3<double> tau1, dtau, dR;
+		ModuleBase::Vector3<double> tau1, dtau, dR;
 		for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
 		{
 			for(int I1=0; I1<GlobalC::ucell.atoms[T1].na; ++I1)
@@ -944,13 +944,13 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 								const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 
 								// calculate the distance between iat1 and iat2.
-								// Vector3<double> dR = GlobalC::GridD.getAdjacentTau(ad) - tau1;
+								// ModuleBase::Vector3<double> dR = GlobalC::GridD.getAdjacentTau(ad) - tau1;
 								dR.x = GlobalC::GridD.getBox(ad).x;
 								dR.y = GlobalC::GridD.getBox(ad).y;
 								dR.z = GlobalC::GridD.getBox(ad).z;
 
 								// calculate the phase factor exp(ikR).
-								const double arg = (GlobalC::kv.kvec_d[ this->ik_now ] * dR) * TWO_PI;
+								const double arg = (GlobalC::kv.kvec_d[ this->ik_now ] * dR) * ModuleBase::TWO_PI;
 								std::complex<double> phase = std::complex<double>(cos(arg), sin(arg));
 								int ixxx = DM_start + GlobalC::LNNR.find_R2st[iat][nad];
 								for(int iw=0; iw<atom1->nw; iw++)
@@ -1024,12 +1024,12 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 	*/
 
 	// Distribution of data.
-	timer::tick("Gint_k","Distri");
+	ModuleBase::timer::tick("Gint_k","Distri");
 	std::complex<double>* tmp;
 	for (int i=0; i<GlobalV::NLOCAL; i++)
 	{
 		tmp = new std::complex<double>[GlobalV::NLOCAL];
-		ZEROS(tmp, GlobalV::NLOCAL);
+		ModuleBase::GlobalFunc::ZEROS(tmp, GlobalV::NLOCAL);
 		const int mug = GlobalC::GridT.trace_lo[i];
 		const int mug0 = mug/GlobalV::NPOL;
 		// if the row element is on this processor.
@@ -1070,7 +1070,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 						}
 						else
 						{
-							WARNING_QUIT("Gint_k::folding_vl_k_nc","index is wrong!");
+							ModuleBase::WARNING_QUIT("Gint_k::folding_vl_k_nc","index is wrong!");
 						}
 						//tmp[j] = this->pvp[spin][mug][nug];
 					}
@@ -1102,7 +1102,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 						}
 						else
 						{
-							WARNING_QUIT("Gint_k::folding_vl_k_nc","index is wrong!");
+							ModuleBase::WARNING_QUIT("Gint_k::folding_vl_k_nc","index is wrong!");
 						}
 						//tmp[j] = conj(this->pvp[spin][nug][mug]);
 						
@@ -1138,9 +1138,9 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 		}
 		delete[] this->pvp_nc[spin];
 	}
-	timer::tick("Gint_k","Distri");
+	ModuleBase::timer::tick("Gint_k","Distri");
 
-	timer::tick("Gint_k","folding_vl_k_nc");
+	ModuleBase::timer::tick("Gint_k","folding_vl_k_nc");
 	return;
 }
 
@@ -1201,7 +1201,7 @@ void Gint_k::set_ijk_atom(
 			if (distance[ib][id] < 1.0E-9) distance[ib][id] += 1.0E-9;
 
 			std::vector<double> ylma;
-			Ylm::sph_harm ( GlobalC::ucell.atoms[it].nwl,
+			ModuleBase::Ylm::sph_harm ( GlobalC::ucell.atoms[it].nwl,
 					dr[ib][id][0] / distance[ib][id],
 					dr[ib][id][1] / distance[ib][id],
 					dr[ib][id][2] / distance[ib][id],
@@ -1252,7 +1252,7 @@ void Gint_k::set_ijk_atom(
 
 void Gint_k::allocate_pvpR_tr(void)
 {
-    TITLE("Gint_k","allocate_pvpR_tr");
+    ModuleBase::TITLE("Gint_k","allocate_pvpR_tr");
 
     int R_x = GlobalC::GridD.getCellX();
     int R_y = GlobalC::GridD.getCellY();
@@ -1279,7 +1279,7 @@ void Gint_k::allocate_pvpR_tr(void)
                         pvpR_tr[ix][iy][iz][iw] = new double[GlobalC::GridT.lgd];
 //do    uble mem = Memory::record("allocate_pvpR_tr", "pvpR_tr[ix][iy][iz][iw]", GlobalC::GridT.lgd , "double");
 //co    ut<<" Memory of pvpR_tr[ix][iy][iz][iw]: "<<mem<<" MB"<<std::endl;
-                        ZEROS(pvpR_tr[ix][iy][iz][iw], GlobalC::GridT.lgd);
+                        ModuleBase::GlobalFunc::ZEROS(pvpR_tr[ix][iy][iz][iw], GlobalC::GridT.lgd);
                     }
                 }
             }
@@ -1302,7 +1302,7 @@ void Gint_k::allocate_pvpR_tr(void)
                         pvpR_tr_soc[ix][iy][iz][iw] = new std::complex<double>[GlobalC::GridT.lgd];
 //do    uble mem = Memory::record("allocate_pvpR_tr", "pvpR_tr[ix][iy][iz][iw]", GlobalC::GridT.lgd , "double");
 //co    ut<<" Memory of pvpR_tr[ix][iy][iz][iw]: "<<mem<<" MB"<<std::endl;
-                        ZEROS(pvpR_tr_soc[ix][iy][iz][iw], GlobalC::GridT.lgd);
+                        ModuleBase::GlobalFunc::ZEROS(pvpR_tr_soc[ix][iy][iz][iw], GlobalC::GridT.lgd);
                     }
                 }
             }
@@ -1314,7 +1314,7 @@ void Gint_k::allocate_pvpR_tr(void)
 
 void Gint_k::destroy_pvpR_tr(void)
 {
-    TITLE("Gint_k","destroy_pvpR_tr");
+    ModuleBase::TITLE("Gint_k","destroy_pvpR_tr");
 
     int R_x = GlobalC::GridD.getCellX();
     int R_y = GlobalC::GridD.getCellY();
@@ -1366,7 +1366,7 @@ void Gint_k::destroy_pvpR_tr(void)
 
 void Gint_k::distribute_pvpR_tr(void)
 {
-    TITLE("Gint_k","distribute_pvpR_tr");
+    ModuleBase::TITLE("Gint_k","distribute_pvpR_tr");
 
     int R_x = GlobalC::GridD.getCellX();
     int R_y = GlobalC::GridD.getCellY();
@@ -1385,12 +1385,12 @@ void Gint_k::distribute_pvpR_tr(void)
                     if(GlobalV::NSPIN!=4)
                     {
                         tmp = new double[GlobalV::NLOCAL];
-                        ZEROS(tmp, GlobalV::NLOCAL);
+                        ModuleBase::GlobalFunc::ZEROS(tmp, GlobalV::NLOCAL);
                     }
                     else
                     {
                         tmp_soc = new std::complex<double>[GlobalV::NLOCAL];
-                        ZEROS(tmp_soc, GlobalV::NLOCAL);
+                        ModuleBase::GlobalFunc::ZEROS(tmp_soc, GlobalV::NLOCAL);
                     }
 
                     const int mug = GlobalC::GridT.trace_lo[i];
@@ -1452,7 +1452,7 @@ void Gint_k::distribute_pvpR_tr(void)
 
 void Gint_k::cal_vlocal_R(const int current_spin)
 {
-    TITLE("Gint_k","cal_vlocal_R");
+    ModuleBase::TITLE("Gint_k","cal_vlocal_R");
 
     allocate_pvpR_tr();
 
@@ -1466,7 +1466,7 @@ void Gint_k::cal_vlocal_R(const int current_spin)
     int R_y;
     int R_z;
 
-    Vector3<double> tau1, dtau, dR;
+    ModuleBase::Vector3<double> tau1, dtau, dR;
     for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
     {
         for(int I1=0; I1<GlobalC::ucell.atoms[T1].na; ++I1)
@@ -1558,7 +1558,7 @@ void Gint_k::cal_vlocal_R(const int current_spin)
 												}
 												else
 												{
-													WARNING_QUIT("Gint_k::folding_vl_k_nc","index is wrong!");
+													ModuleBase::WARNING_QUIT("Gint_k::folding_vl_k_nc","index is wrong!");
 												}
 									}//endif NC
 									else
@@ -1587,7 +1587,7 @@ void Gint_k::cal_vlocal_R(const int current_spin)
 
 void Gint_k::allocate_pvpR_sparseMatrix(void)
 {
-    TITLE("Gint_k","allocate_pvpR_sparseMatrix");
+    ModuleBase::TITLE("Gint_k","allocate_pvpR_sparseMatrix");
 
     int R_x = GlobalC::GridD.getCellX();
     int R_y = GlobalC::GridD.getCellY();
@@ -1623,7 +1623,7 @@ void Gint_k::allocate_pvpR_sparseMatrix(void)
 
 void Gint_k::destroy_pvpR_sparseMatrix(void)
 {
-	TITLE("Gint_k","destroy_pvpR_sparseMatrix");
+	ModuleBase::TITLE("Gint_k","destroy_pvpR_sparseMatrix");
 
 	int R_x = GlobalC::GridD.getCellX();
     int R_y = GlobalC::GridD.getCellY();
@@ -1660,7 +1660,7 @@ void Gint_k::destroy_pvpR_sparseMatrix(void)
 
 void Gint_k::distribute_pvpR_sparseMatrix(const double &sparse_threshold)
 {
-	TITLE("Gint_k","distribute_pvpR_sparseMatrix");
+	ModuleBase::TITLE("Gint_k","distribute_pvpR_sparseMatrix");
 
 	int R_x = GlobalC::GridD.getCellX();
     int R_y = GlobalC::GridD.getCellY();
@@ -1704,12 +1704,12 @@ void Gint_k::distribute_pvpR_sparseMatrix(const double &sparse_threshold)
 					if (GlobalV::NSPIN != 4)
 					{
 						tmp = new double[GlobalV::NLOCAL];
-						ZEROS(tmp, GlobalV::NLOCAL);
+						ModuleBase::GlobalFunc::ZEROS(tmp, GlobalV::NLOCAL);
 					}
 					else
 					{
 						tmp_soc = new std::complex<double>[GlobalV::NLOCAL];
-						ZEROS(tmp_soc, GlobalV::NLOCAL);
+						ModuleBase::GlobalFunc::ZEROS(tmp_soc, GlobalV::NLOCAL);
 					}
 
 					if(GlobalC::GridT.trace_lo[row] >= 0)
@@ -1843,7 +1843,7 @@ void Gint_k::distribute_pvpR_sparseMatrix(const double &sparse_threshold)
 
 void Gint_k::cal_vlocal_R_sparseMatrix(const int current_spin, const double &sparse_threshold)
 {
-    TITLE("Gint_k","cal_vlocal_R_sparseMatrix");
+    ModuleBase::TITLE("Gint_k","cal_vlocal_R_sparseMatrix");
 
     allocate_pvpR_sparseMatrix();
 
@@ -1857,7 +1857,7 @@ void Gint_k::cal_vlocal_R_sparseMatrix(const int current_spin, const double &spa
     int R_y;
     int R_z;
 
-    Vector3<double> tau1, dtau, dR;
+    ModuleBase::Vector3<double> tau1, dtau, dR;
     for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
     {
         for(int I1=0; I1<GlobalC::ucell.atoms[T1].na; ++I1)
@@ -1967,7 +1967,7 @@ void Gint_k::cal_vlocal_R_sparseMatrix(const int current_spin, const double &spa
 										}
 										else
 										{
-											WARNING_QUIT("Gint_k::folding_vl_k_nc","index is wrong!");
+											ModuleBase::WARNING_QUIT("Gint_k::folding_vl_k_nc","index is wrong!");
 										}
 									} //endif NC
 									else

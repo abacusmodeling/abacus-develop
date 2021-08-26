@@ -54,8 +54,8 @@ void Grid_Technique::set_pbc_grid(
 		const int &nbzp_start_in,
 		const int &nbzp_in)
 {
-	TITLE("Grid_Technique","init");
-	timer::tick("Grid_Technique","init");
+	ModuleBase::TITLE("Grid_Technique","init");
+	ModuleBase::timer::tick("Grid_Technique","init");
 
 	if(GlobalV::OUT_LEVEL != "m") 
 	{
@@ -92,7 +92,7 @@ void Grid_Technique::set_pbc_grid(
 
 	this->cal_trace_lo();
 
-	timer::tick("Grid_Technique","init");
+	ModuleBase::timer::tick("Grid_Technique","init");
 	return;
 }
 
@@ -102,7 +102,7 @@ void Grid_Technique::set_pbc_grid(
 // mohan add 2021-04-06
 void Grid_Technique::init_atoms_on_grid(void)
 {
-	TITLE("Grid_Technique","init_atoms_on_grid");
+	ModuleBase::TITLE("Grid_Technique","init_atoms_on_grid");
 
 	assert(nbxx>0);
 	
@@ -111,16 +111,16 @@ void Grid_Technique::init_atoms_on_grid(void)
 	// values on the bigcell.
 	delete[] this->how_many_atoms;
 	this->how_many_atoms = new int[nbxx];
-	ZEROS(how_many_atoms, nbxx);
-	Memory::record("atoms_on_grid","how_many_atoms",nbxx,"int");
+	ModuleBase::GlobalFunc::ZEROS(how_many_atoms, nbxx);
+	ModuleBase::Memory::record("atoms_on_grid","how_many_atoms",nbxx,"int");
 
 	// (2) start z and ended z,
 	// consistent with division of FFT grid.
 	// mohan add 2010-07-01
 	const int zstart = nbzp_start;
 	const int zend = nbzp + zstart;
-	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"zstart",zstart);
-	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"zend",zend);
+	if(GlobalV::test_gridt)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"zstart",zstart);
+	if(GlobalV::test_gridt)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"zend",zend);
 	int iz_now = -1;
 	
 	// (3) information about gloabl grid
@@ -144,7 +144,7 @@ void Grid_Technique::init_atoms_on_grid(void)
 	assert( this->nxyze > 0);
 	int* index2normal = new int[this->nxyze];
 	assert( index2normal != NULL );
-	Memory::record("Grid_Meshcell","index2normal",this->nxyze,"int");
+	ModuleBase::Memory::record("Grid_Meshcell","index2normal",this->nxyze,"int");
 	this->grid_expansion_index(1,index2normal); 
 
  	
@@ -169,7 +169,7 @@ void Grid_Technique::init_atoms_on_grid(void)
 					std::cout << " index_ball=" << index_ball[im] << std::endl;
 					std::cout << " normal=" << normal << std::endl;
 					std::cout << " nbxyz=" << nbxyz << std::endl;
-					WARNING_QUIT("Grid_Technique::init_atoms_on_grid","normal >= nbxyz");
+					ModuleBase::WARNING_QUIT("Grid_Technique::init_atoms_on_grid","normal >= nbxyz");
 				}
 
 				assert(normal>=0);	
@@ -194,7 +194,7 @@ void Grid_Technique::init_atoms_on_grid(void)
 		}
 	}
 
-	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"Total_atoms_on_grid",total_atoms_on_grid);
+	if(GlobalV::test_gridt)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Total_atoms_on_grid",total_atoms_on_grid);
 	
 	int stop = 0;
 	if(total_atoms_on_grid == 0)
@@ -205,7 +205,7 @@ void Grid_Technique::init_atoms_on_grid(void)
 	Parallel_Reduce::reduce_int_all( stop );
 	if(stop)
 	{
-		WARNING("Grid_Technique::init_atoms_on_grid","No atom on this sub-FFT-mesh.");
+		ModuleBase::WARNING("Grid_Technique::init_atoms_on_grid","No atom on this sub-FFT-mesh.");
 	}
 
 	// need how_many_atoms first.
@@ -218,17 +218,17 @@ void Grid_Technique::init_atoms_on_grid(void)
 
 void Grid_Technique::init_atoms_on_grid2(const int* index2normal)
 {	
-	TITLE("Grid_Techinique","init_atoms_on_grid2");
+	ModuleBase::TITLE("Grid_Techinique","init_atoms_on_grid2");
 
 	if(total_atoms_on_grid==0) 
 	{	
-		WARNING("Grid_Technique::init_atoms_on_grid2","no atom on this sub FFT grid.");
+		ModuleBase::WARNING("Grid_Technique::init_atoms_on_grid2","no atom on this sub FFT grid.");
 		return;
 	}
 
 	int* index2ucell = new int[this->nxyze];
 	assert( index2ucell != NULL );
-	Memory::record("Grid_Meshcell","index2ucell",this->nxyze,"int");	
+	ModuleBase::Memory::record("Grid_Meshcell","index2ucell",this->nxyze,"int");	
 	this->grid_expansion_index(0,index2ucell);
 	
 	const int zstart = nbzp_start;
@@ -245,23 +245,23 @@ void Grid_Technique::init_atoms_on_grid2(const int* index2normal)
 	delete[] which_atom;
 	this->which_atom = new int[total_atoms_on_grid];
 	assert( which_atom != 0);
-	Memory::record("atoms_on_grid","which_atom",total_atoms_on_grid,"int");
+	ModuleBase::Memory::record("atoms_on_grid","which_atom",total_atoms_on_grid,"int");
 
 	delete[] which_bigcell;
 	this->which_bigcell = new int[total_atoms_on_grid];
 	assert( which_bigcell != 0);
-	Memory::record("atoms_on_grid","which_bigcell",total_atoms_on_grid,"int");
+	ModuleBase::Memory::record("atoms_on_grid","which_bigcell",total_atoms_on_grid,"int");
 
 	delete[] which_unitcell;
 	this->which_unitcell = new int[total_atoms_on_grid];
 	assert( which_unitcell != 0);
-	Memory::record("atoms_on_grid","which_unitcell",total_atoms_on_grid,"int");
+	ModuleBase::Memory::record("atoms_on_grid","which_unitcell",total_atoms_on_grid,"int");
 	// for each atom, first we need to locate which cell
 	// the atom is in, then we search meshball aroung this
 	// grid, and record each grid's atom position.
 	int count = 0;
 	int iat = 0;
-	ZEROS(this->how_many_atoms, nbxx);
+	ModuleBase::GlobalFunc::ZEROS(this->how_many_atoms, nbxx);
 	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
 		for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
@@ -322,7 +322,7 @@ void Grid_Technique::cal_grid_integration_index(void)
 	// save the start 
 	delete[] this->bcell_start;
 	this->bcell_start = new int[nbxx];
-	Memory::record("atoms_on_grid","bcell_start",nbxx,"int");
+	ModuleBase::Memory::record("atoms_on_grid","bcell_start",nbxx,"int");
 	this->bcell_start[0] = 0;
 	for(int i=1; i<nbxx; i++)
 	{
@@ -338,7 +338,7 @@ void Grid_Technique::cal_grid_integration_index(void)
 
 #ifdef __MPI
 	int* all = new int[GlobalV::NPROC];
-	ZEROS(all, GlobalV::NPROC);
+	ModuleBase::GlobalFunc::ZEROS(all, GlobalV::NPROC);
 	Parallel_Reduce::gather_int_all(max_atom,all);
 	if(GlobalV::MY_RANK==0)
 	{
@@ -351,7 +351,7 @@ void Grid_Technique::cal_grid_integration_index(void)
 	delete[] all;
 #endif
 
-	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"Max atom on bigcell",max_atom);
+	if(GlobalV::test_gridt)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Max atom on bigcell",max_atom);
 	return;
 }
 
@@ -399,7 +399,7 @@ void Grid_Technique::cal_trace_beta(void)
 	}
 	this->lgbeta = ih_local;
 	assert(lgbeta>=0);
-	OUT(GlobalV::ofs_running,"lgbeta",lgbeta);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"lgbeta",lgbeta);
 
 	return;
 }
@@ -408,7 +408,7 @@ void Grid_Technique::cal_trace_beta(void)
 // set 'lgd' variable
 void Grid_Technique::cal_trace_lo(void)
 {	
-	TITLE("Grid_Technique","cal_trace_lo");
+	ModuleBase::TITLE("Grid_Technique","cal_trace_lo");
 	// save the atom information in trace_lo,
 	// in fact the trace_lo dimension can be reduced
 	// to GlobalC::ucell.nat, but I think this is another way.
@@ -418,7 +418,7 @@ void Grid_Technique::cal_trace_lo(void)
 	{
 		this->trace_lo[i] = -1;
 	}
-	Memory::record("atoms_on_grid","trace_lo",GlobalV::NLOCAL,"int");
+	ModuleBase::Memory::record("atoms_on_grid","trace_lo",GlobalV::NLOCAL,"int");
 
 	this->lnat = 0;
 	this->lgd = 0;
@@ -471,8 +471,8 @@ void Grid_Technique::cal_trace_lo(void)
 
 	if(GlobalV::OUT_LEVEL != "m") 
 	{
-		OUT(GlobalV::ofs_running,"Atom number in sub-FFT-grid",lnat);
-		OUT(GlobalV::ofs_running,"Local orbitals number in sub-FFT-grid",lgd);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Atom number in sub-FFT-grid",lnat);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Local orbitals number in sub-FFT-grid",lgd);
 	}
 
 	assert(iw_local == lgd);

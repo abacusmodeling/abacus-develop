@@ -294,7 +294,7 @@ void xcfunc::hybrid_first()
 {
 #ifdef __LCAO
 	// may do something
-	WARNING("functional","file "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__)+" may error ");
+	ModuleBase::WARNING("functional","file "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__)+" may error ");
 	if(Exx_Global::Hybrid_Type::HF==GlobalC::exx_global.info.hybrid_type)
 	{
 		iexch_now = 1;

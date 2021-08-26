@@ -33,19 +33,19 @@ class Hamilt
 		const int ik,
 		const int nstart,
 		const int nbnd,
-		const ComplexMatrix &psi,
-		ComplexMatrix &evc,
+		const ModuleBase::ComplexMatrix &psi,
+		ModuleBase::ComplexMatrix &evc,
 		double *en);
 
 	// be called by diagH_subspace
     void diagH_LAPACK(
 		const int n,
 		const int m,
-		const ComplexMatrix &hc, // Hamiltonian matrix
-		const ComplexMatrix &sc, // overlap matrix
+		const ModuleBase::ComplexMatrix &hc, // Hamiltonian matrix
+		const ModuleBase::ComplexMatrix &sc, // overlap matrix
 		const int ldh,
 		double *e, // output: eigenvalues
-		ComplexMatrix &hvec); // output: eigenvectors
+		ModuleBase::ComplexMatrix &hvec); // output: eigenvectors
 
     Hamilt_PW hpw;
 	// Hamilt_PW_GPU hpw_gpu;

@@ -2,9 +2,9 @@
 #include "../module_base/math_integral.h"
 
 //calculate local pseudopotential stress in PW or VL_dVL stress in LCAO
-void Stress_Func::stress_loc(matrix& sigma, const bool is_pw)
+void Stress_Func::stress_loc(ModuleBase::matrix& sigma, const bool is_pw)
 {
-    timer::tick("Stress_Func","stress_loc");
+    ModuleBase::timer::tick("Stress_Func","stress_loc");
 
     double *dvloc;
     double evloc=0.0;
@@ -16,7 +16,7 @@ void Stress_Func::stress_loc(matrix& sigma, const bool is_pw)
 
 	std::complex<double> *Porter = GlobalC::UFFT.porter;
 
-	ZEROS( Porter, GlobalC::pw.nrxx );
+	ModuleBase::GlobalFunc::ZEROS( Porter, GlobalC::pw.nrxx );
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
@@ -32,7 +32,7 @@ void Stress_Func::stress_loc(matrix& sigma, const bool is_pw)
 	evloc=0.0;
 
 	std::complex<double> *vg = new std::complex<double>[GlobalC::pw.ngmc];
-	ZEROS( vg, GlobalC::pw.ngmc );
+	ModuleBase::GlobalFunc::ZEROS( vg, GlobalC::pw.ngmc );
 	for (int it=0; it<GlobalC::ucell.ntype; it++)
 	{
 		if (GlobalC::pw.gstart==1) evloc += GlobalC::ppcell.vloc(it, GlobalC::pw.ig2ngg[0]) * (GlobalC::pw.strucFac(it,0) * conj(Porter[GlobalC::pw.ig2fftc[0]])).real();
@@ -99,7 +99,7 @@ void Stress_Func::stress_loc(matrix& sigma, const bool is_pw)
 	delete[] vg;
 
 
-	timer::tick("Stress_Func","stress_loc");
+	ModuleBase::timer::tick("Stress_Func","stress_loc");
 	return;
 }
 
@@ -132,8 +132,8 @@ double*  dvloc
 
 	aux = new double[msh];
 	aux1 = new double[msh];
-	ZEROS(aux, msh);
-	ZEROS(aux1, msh);
+	ModuleBase::GlobalFunc::ZEROS(aux, msh);
+	ModuleBase::GlobalFunc::ZEROS(aux1, msh);
 
 	// the  G=0 component is not computed
 	if (GlobalC::pw.ggs[0] < 1.0e-8)
@@ -156,7 +156,7 @@ double*  dvloc
 	//
 	for(int i = 0;i< msh; i++)
 	{
-		aux1[i] = r [i] * vloc_at [i] + zp * e2 * erf(r[i]);
+		aux1[i] = r [i] * vloc_at [i] + zp * ModuleBase::e2 * erf(r[i]);
 	}
 	for(int igl = igl0;igl< GlobalC::pw.nggm;igl++)
 	{
@@ -166,18 +166,18 @@ double*  dvloc
 		//    and here we perform the integral, after multiplying for the |G|
 		//    dependent  part
 		//
-		// DV(g)/Dg = Integral of r (Dj_0(gr)/Dg) V(r) dr
+		// DV(g)/Dg = ModuleBase::Integral of r (Dj_0(gr)/Dg) V(r) dr
 		for(int i = 1;i< msh;i++)
 		{
 			aux [i] = aux1 [i] * (r [i] * cos (gx * r [i] ) / gx - sin (gx * r [i] ) / pow(gx,2));
 		}
 		// simpson (msh, aux, rab, vlcp);
-		Integral::Simpson_Integral(msh, aux, rab, vlcp );
+		ModuleBase::Integral::Simpson_Integral(msh, aux, rab, vlcp );
 		// DV(g^2)/Dg^2 = (DV(g)/Dg)/2g
-		vlcp *= FOUR_PI / GlobalC::ucell.omega / 2.0 / gx;
+		vlcp *= ModuleBase::FOUR_PI / GlobalC::ucell.omega / 2.0 / gx;
 		// subtract the long-range term
 		double g2a = gx2 / 4.0;
-		vlcp += FOUR_PI / GlobalC::ucell.omega * zp * e2 * exp ( - g2a) * (g2a + 1) / pow(gx2 , 2);
+		vlcp += ModuleBase::FOUR_PI / GlobalC::ucell.omega * zp * ModuleBase::e2 * exp ( - g2a) * (g2a + 1) / pow(gx2 , 2);
 		dvloc [igl] = vlcp;
 	}
 	delete[] aux1;
@@ -216,7 +216,7 @@ double* dvloc
 	}
 	for(int i=igl0;i<GlobalC::pw.nggm;i++)
 	{
-		dvloc[i] = FOUR_PI * zp * e2 / GlobalC::ucell.omega / pow(( GlobalC::ucell.tpiba2 * GlobalC::pw.ggs[i] ),2);
+		dvloc[i] = ModuleBase::FOUR_PI * zp * ModuleBase::e2 / GlobalC::ucell.omega / pow(( GlobalC::ucell.tpiba2 * GlobalC::pw.ggs[i] ),2);
 	}
 	
 	return;

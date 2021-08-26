@@ -12,7 +12,8 @@
 #include <complex>
 #include <cassert>
 
-using namespace std;
+namespace ModuleBase
+{
 
 //==========================================================
 // GLOBAL FUNCTION :
@@ -25,5 +26,6 @@ void WARNING(const std::string &file,const std::string &description);
 void QUIT(void);
 void WARNING_QUIT(const std::string &file,const std::string &description);
 
+}
 
 #endif

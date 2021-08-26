@@ -1,7 +1,8 @@
 #ifndef SPH_BESSEL_H
 #define SPH_BESSEL_H
 
-using namespace std;
+namespace ModuleBase
+{
 
 class Sph_Bessel
 {
@@ -34,5 +35,7 @@ private:
 	double pi;
 
 };
+
+}
 
 #endif

@@ -4,7 +4,6 @@
 //==========================================================
 #ifndef EXPORT_H
 #define EXPORT_H
-using namespace std;
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -15,9 +14,12 @@ using namespace std;
 #ifdef __MPI
 #include <mpi.h>
 #endif
+//these two function is not used yet!!!!
+/*namespace ModuleBase
+{
 
 template <class T>
-void AUTO_SET(std::ofstream &ofs,const std::string &name,const T &a)
+void ModuleBase::GlobalFunc::AUTO_SET(std::ofstream &ofs,const std::string &name,const T &a)
 {
 	ofs<<" AUTO_SET "<<name<<" : "<<a << std::endl;
 	return;
@@ -47,5 +49,6 @@ void IF_MATCH(const T &a,const T &b)
 
 void IF_MATCH(const std::string &name,const std::string &name2);
 
+}*/
 
 #endif 

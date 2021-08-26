@@ -7,14 +7,14 @@
 Grid_Base::Grid_Base()
 { 
 	this->Rcut_max = new double[1];
-	this->Rcut_max_direct = new Vector3<double>[1];
+	this->Rcut_max_direct = new ModuleBase::Vector3<double>[1];
 	this->ijk_index = new int[1];
 	this->norm1 = new double[1];
 	this->norm2 = new double[1];
-	this->dR1 = new Vector3<double>[1];
-	this->dR2 = new Vector3<double>[1];
+	this->dR1 = new ModuleBase::Vector3<double>[1];
+	this->dR2 = new ModuleBase::Vector3<double>[1];
 	this->grid_number_last = 0; // must initialized!!
-	this->cartesian = new Vector3<double>[1];
+	this->cartesian = new ModuleBase::Vector3<double>[1];
 	this->yy1 = new double*[1];
 	this->yy2 = new double*[1];
 	this->yy1[0] = new double[1];
@@ -42,7 +42,7 @@ Grid_Base::~Grid_Base()
 }
 
 void Grid_Base::init(
-    const Matrix3 &latvec_in,
+    const ModuleBase::Matrix3 &latvec_in,
     const double &lat0_in,
     const int &nx_in,
     const int &ny_in,
@@ -82,26 +82,26 @@ void Grid_Base::init(
 
 	this->get_rcut_max();
 
-	OUT(GlobalV::ofs_running,"lat0 = ", lat0);
-	OUT(GlobalV::ofs_running,"|a1| = ", a1_len);
-	OUT(GlobalV::ofs_running,"|a2| = ", a2_len);
-	OUT(GlobalV::ofs_running,"|a3| = ", a3_len);
-	OUT(GlobalV::ofs_running,"da_d.x = ", da_d.x);
-	OUT(GlobalV::ofs_running,"da_d.y = ", da_d.y);
-	OUT(GlobalV::ofs_running,"da_d.z = ", da_d.z);
-	OUT(GlobalV::ofs_running,"nx = ", nx);
-	OUT(GlobalV::ofs_running,"ny = ", ny);
-	OUT(GlobalV::ofs_running,"nz = ", nz);
-	OUT(GlobalV::ofs_running,"nxyz = ", nxyz);
-	OUT(GlobalV::ofs_running,"da1 = ", da1);
-	OUT(GlobalV::ofs_running,"da2 = ", da2);
-	OUT(GlobalV::ofs_running,"da3 = ", da3);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"lat0 = ", lat0);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"|a1| = ", a1_len);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"|a2| = ", a2_len);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"|a3| = ", a3_len);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"da_d.x = ", da_d.x);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"da_d.y = ", da_d.y);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"da_d.z = ", da_d.z);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nx = ", nx);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"ny = ", ny);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nz = ", nz);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nxyz = ", nxyz);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"da1 = ", da1);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"da2 = ", da2);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"da3 = ", da3);
 
 	delete[] this->cartesian;
-	this->cartesian = new Vector3<double>[ this->nxyz ];
-	Memory::record("Grid_Base","cartesian",nxyz*3,"double");
+	this->cartesian = new ModuleBase::Vector3<double>[ this->nxyz ];
+	ModuleBase::Memory::record("Grid_Base","cartesian",nxyz*3,"double");
 
-	Vector3<double> direct;
+	ModuleBase::Vector3<double> direct;
 	for (int i = 0; i < this->nx; i++)
 	{
 		direct.x = static_cast<double>(i) / this->nx;
@@ -115,7 +115,7 @@ void Grid_Base::init(
 
 				const int index = j * ny * nz + i  * nz + k;
 
-				Mathzone::Direct_to_Cartesian(
+				ModuleBase::Mathzone::Direct_to_Cartesian(
 				    direct.x, direct.y, direct.z,
 				    latvec0.e11, latvec0.e12, latvec0.e13,
 				    latvec0.e21, latvec0.e22, latvec0.e23,
@@ -138,7 +138,7 @@ void Grid_Base::init(
 			}
 		}
 	}
-	OUT(GlobalV::ofs_running,"total atom pairs = ",tot_pairs);	
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"total atom pairs = ",tot_pairs);	
 
 	return;
 }
@@ -155,7 +155,7 @@ void Grid_Base::get_rcut_max(void)
 	delete[] Rcut_max;
 	delete[] Rcut_max_direct;
 	this->Rcut_max = new double[ GlobalC::ORB.get_ntype() ];
-	this->Rcut_max_direct = new Vector3<double>[ GlobalC::ORB.get_ntype() ];
+	this->Rcut_max_direct = new ModuleBase::Vector3<double>[ GlobalC::ORB.get_ntype() ];
 
 	for(int it=0; it<GlobalC::ORB.get_ntype(); it++)
 	{
@@ -184,15 +184,15 @@ void Grid_Base::get_rcut_max(void)
 
 // be called by cal_region.
 void Grid_Base::get_small_box( 
-		const Vector3<double> &tau, 
+		const ModuleBase::Vector3<double> &tau, 
 		const int &T,
-		Vector3<double> &tau_max_direct,
-		Vector3<double> &tau_min_direct)
+		ModuleBase::Vector3<double> &tau_max_direct,
+		ModuleBase::Vector3<double> &tau_min_direct)
 {
-	Vector3<double> tau_dir;
+	ModuleBase::Vector3<double> tau_dir;
 
 	// NOTE: tau_dir can be calculated and stored firstly.
-	Mathzone::Cartesian_to_Direct
+	ModuleBase::Mathzone::Cartesian_to_Direct
 	(
 	    tau.x, tau.y, tau.z,
 	    latvec.e11, latvec.e12, latvec.e13,
@@ -212,7 +212,7 @@ void Grid_Base::get_small_box(
 		std::cout << "\n tau_dir.x = " << tau_dir.x;
 		std::cout << "\n tau_dir.y = " << tau_dir.y;
 		std::cout << "\n tau_dir.z = " << tau_dir.z;
-		WARNING_QUIT("Grid_Base::get_small_box",
+		ModuleBase::WARNING_QUIT("Grid_Base::get_small_box",
 		"Positions(x,y,z) Of tau and R2 in Direct Coordinates should be between 0 and 1!");
 	}
 
@@ -224,13 +224,13 @@ void Grid_Base::get_small_box(
 
 // be called by cal_region
 void Grid_Base::edge_grid_points(
-	const Vector3<double> &R10,
-	const Vector3<double> &R20,
-	const Vector3<double> &max_direct_coodinate,
-	const Vector3<double> &min_direct_coodinate)
+	const ModuleBase::Vector3<double> &R10,
+	const ModuleBase::Vector3<double> &R20,
+	const ModuleBase::Vector3<double> &max_direct_coodinate,
+	const ModuleBase::Vector3<double> &min_direct_coodinate)
 {
 	//index of the 8 edge points in FFT box
-	timer::tick("Grid_Base","edge_grid_points");
+	ModuleBase::timer::tick("Grid_Base","edge_grid_points");
 	edge_min.x = static_cast<int>(min_direct_coodinate.x * this->nx) ;
 	edge_max.x = static_cast<int>(max_direct_coodinate.x * this->nx) + 1;
 	edge_min.y = static_cast<int>(min_direct_coodinate.y * this->ny) ;
@@ -264,8 +264,8 @@ void Grid_Base::edge_grid_points(
 		delete[] ijk_index;
 		this->norm1 = new double[grid_number];
 		this->norm2 = new double[grid_number];
-		this->dR1 = new Vector3<double>[grid_number];
-		this->dR2 = new Vector3<double>[grid_number];
+		this->dR1 = new ModuleBase::Vector3<double>[grid_number];
+		this->dR2 = new ModuleBase::Vector3<double>[grid_number];
 		this->ijk_index = new int[grid_number];
 	}
 
@@ -296,7 +296,7 @@ void Grid_Base::edge_grid_points(
 	}
 
 	int count=0;
-	timer::tick("mohan_test","1");
+	ModuleBase::timer::tick("mohan_test","1");
 	for (int i = edge_min.x; i < edge_max.x; i++)
 	{
 		for (int j = edge_min.y; j < edge_max.y; j++)
@@ -317,9 +317,9 @@ void Grid_Base::edge_grid_points(
 			}
 		}
 	}
-	timer::tick("mohan_test","1");
+	ModuleBase::timer::tick("mohan_test","1");
 
-	timer::tick("mohan_test","2");
+	ModuleBase::timer::tick("mohan_test","2");
 	static double yy_tmp[400];
 	count = 0;
 	for (int i = edge_min.x; i < edge_max.x; i++)
@@ -328,7 +328,7 @@ void Grid_Base::edge_grid_points(
 		{
 			for (int k = edge_min.z; k < edge_max.z; k++)
 			{
-				Ylm::get_ylm_real(this->lmax1, dR1[count], yy_tmp );
+				ModuleBase::Ylm::get_ylm_real(this->lmax1, dR1[count], yy_tmp );
 				for(int in=0; in<n1; in++) yy1[in][count] = yy_tmp[in];
 				++count;
 			}
@@ -342,20 +342,20 @@ void Grid_Base::edge_grid_points(
 		{
 			for (int k = edge_min.z; k < edge_max.z; k++)
 			{
-				Ylm::get_ylm_real(this->lmax2, dR2[count], yy_tmp );
+				ModuleBase::Ylm::get_ylm_real(this->lmax2, dR2[count], yy_tmp );
 				for(int in=0; in<n2; in++) yy2[in][count] = yy_tmp[in];
 				++count;
 			}
 		}
 	}
-	timer::tick("mohan_test","2");
+	ModuleBase::timer::tick("mohan_test","2");
 
 	if(count!=grid_number)
 	{
 		GlobalV::ofs_warning << "\n count = " << count;
 		GlobalV::ofs_warning << "\n grid_number = " << grid_number;
-		WARNING_QUIT("Grid_Base::edge_grid_points","count!=grid_number");
+		ModuleBase::WARNING_QUIT("Grid_Base::edge_grid_points","count!=grid_number");
 	}
-	timer::tick("Grid_Base","edge_grid_points");
+	ModuleBase::timer::tick("Grid_Base","edge_grid_points");
 	return;
 }

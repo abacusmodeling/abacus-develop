@@ -11,11 +11,11 @@ class WF_atomic : public WF_igk
     WF_atomic();
     ~WF_atomic();
 
-	realArray table_local;//mohan add 2009-09-10
+	ModuleBase::realArray table_local;//mohan add 2009-09-10
 
-    ComplexMatrix *evc;  // wavefunctions in the PW basis
+    ModuleBase::ComplexMatrix *evc;  // wavefunctions in the PW basis
 
-    ComplexMatrix *wanf2; // wannier functions in the PW basis
+    ModuleBase::ComplexMatrix *wanf2; // wannier functions in the PW basis
     
     int seed; //random seed for wave functions qianrui add 2021-8-13
 
@@ -30,8 +30,8 @@ class WF_atomic : public WF_igk
         const int ik,
         const int np,
         const int lmax_wfc,
-        ComplexMatrix &wfcatom,
-        const realArray &table_q,
+        ModuleBase::ComplexMatrix &wfcatom,
+        const ModuleBase::realArray &table_q,
         const int &table_dimension,
         const double &dq
     )const;
@@ -40,10 +40,10 @@ class WF_atomic : public WF_igk
     // Calculate random wave functions
     // as trial wave functions
     //==================================
-    void random(ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const;
-    void atomicrandom(ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const;
+    void random(ModuleBase::ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const;
+    void atomicrandom(ModuleBase::ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const;
 
-    void check_psi(const ComplexMatrix *psi)const;
+    void check_psi(const ModuleBase::ComplexMatrix *psi)const;
 
 };
 #endif 

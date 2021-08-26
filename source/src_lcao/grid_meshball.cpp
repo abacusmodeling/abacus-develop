@@ -26,7 +26,7 @@ Grid_MeshBall::~Grid_MeshBall()
 
 void Grid_MeshBall::init_meshball(void)
 {	
-	TITLE("Grid_MeshBall","init_meshball");
+	ModuleBase::TITLE("Grid_MeshBall","init_meshball");
 
 	// init meshball_radius, generally the value
 	// is same as orbital_rmax, of course you can
@@ -70,7 +70,7 @@ void Grid_MeshBall::init_meshball(void)
 			}
 		}
 	}
-	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running, "how many cells in meshball",this->meshball_ncells);
+	if(GlobalV::test_gridt)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "how many cells in meshball",this->meshball_ncells);
 
 	// prepare for the second calculation.
 	if(!flag_mp)
@@ -82,12 +82,12 @@ void Grid_MeshBall::init_meshball(void)
 		}
 		this->flag_mp = true;
 
-		Memory::record("init_meshball","meshball_pos",meshball_ncells*3,"double");
+		ModuleBase::Memory::record("init_meshball","meshball_pos",meshball_ncells*3,"double");
 	}
 
 	delete[] index_ball;
 	this->index_ball = new int[meshball_ncells];
-	ZEROS(index_ball, meshball_ncells);
+	ModuleBase::GlobalFunc::ZEROS(index_ball, meshball_ncells);
 
 	// second time.
 	int count = 0;
@@ -158,7 +158,7 @@ double Grid_MeshBall::deal_with_atom_spillage(const double *pos)
 //LiuXh add 2018-12-14
 void Grid_MeshBall::delete_meshball_positions(void)
 {	
-	TITLE("Grid_MeshBall","delete_meshball_positions");
+	ModuleBase::TITLE("Grid_MeshBall","delete_meshball_positions");
 	if(flag_mp)
 	{
 		for(int i=0; i<meshball_ncells; i++)

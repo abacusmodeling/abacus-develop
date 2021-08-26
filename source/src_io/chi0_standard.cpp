@@ -46,7 +46,7 @@ Chi0_standard:: ~Chi0_standard()
 
 void Chi0_standard:: Chi()
 {
-	TITLE("Chi0_standard","Chi");
+	ModuleBase::TITLE("Chi0_standard","Chi");
 
 	//---------------------------------------
 	//  the serial number of q
@@ -66,7 +66,7 @@ void Chi0_standard:: Chi()
 
 	if(!exist_q)
 	{
-		WARNING_QUIT("chi0_hilbert","the chosen q is not included in the kmesh!!");
+		ModuleBase::WARNING_QUIT("chi0_hilbert","the chosen q is not included in the kmesh!!");
 	}
 	else
 	{
@@ -189,11 +189,11 @@ void Chi0_standard:: Chi()
 
 	//if(total_icount == 0)
 	//{
-	//	WARNING_QUIT("chi0_hilbert","Now the kmesh contains no kpoint along this direction!");
+	//	ModuleBase::WARNING_QUIT("chi0_hilbert","Now the kmesh contains no kpoint along this direction!");
 	//}
 	if(total_icount < nq-1 )
 	{
-		WARNING_QUIT("chi0_hilbert","Now the kmesh doesn't contain enough kpoints along this direction! please change the parameter nq smaller");
+		ModuleBase::WARNING_QUIT("chi0_hilbert","Now the kmesh doesn't contain enough kpoints along this direction! please change the parameter nq smaller");
 	}
 
 	for(icount=0; icount<total_icount-1; icount++)
@@ -250,7 +250,7 @@ void Chi0_standard:: Chi()
 
 	for(int iq=start_q;iq< (start_q + interval_q * nq); iq=iq+interval_q)
 	{
-		double q = sqrt(((GlobalC::kv.kvec_c[iq])*(TWO_PI/GlobalC::ucell.lat0)).norm2());
+		double q = sqrt(((GlobalC::kv.kvec_c[iq])*(ModuleBase::TWO_PI/GlobalC::ucell.lat0)).norm2());
 		double gather[nomega];
 
 		int count =0;
@@ -266,8 +266,8 @@ void Chi0_standard:: Chi()
 			Cal_rpa(iq);
 			Cal_chi();
 			std::cout<<"chi iq= "<<iq<<" omega= "<<omega<<"  "<<chi[0][0].real()<<" "<<chi[0][0].imag()<<std::endl;
-			std::cout<<"epsilon iq= "<<iq<<" omega= "<<omega<<"  "<<8*PI/q/q*chi[0][0].real()<<" "<<8*PI/q/q*chi[0][0].imag()<<std::endl;
-			gather[count] = -8*PI/q/q*chi[0][0].imag();
+			std::cout<<"epsilon iq= "<<iq<<" omega= "<<omega<<"  "<<8*ModuleBase::PI/q/q*chi[0][0].real()<<" "<<8*ModuleBase::PI/q/q*chi[0][0].imag()<<std::endl;
+			gather[count] = -8*ModuleBase::PI/q/q*chi[0][0].imag();		
 			count++;
 		}
 
@@ -291,7 +291,7 @@ void Chi0_standard:: Chi()
 
 void Chi0_standard::Parallel_G()
 {
-	TITLE("Chi0_standard","Parallel_G");
+	ModuleBase::TITLE("Chi0_standard","Parallel_G");
 	//----------------------------
 	// init
 	//----------------------------
@@ -303,19 +303,19 @@ void Chi0_standard::Parallel_G()
 	G_r = new double[GlobalC::pw.ngmc_g];
 	Gvec_core = new double[3*GlobalC::pw.ngmc];
 	Gvec = new double[3*GlobalC::pw.ngmc_g];
-	all_gcar = new Vector3<double>[GlobalC::pw.ngmc_g];
+	all_gcar = new ModuleBase::Vector3<double>[GlobalC::pw.ngmc_g];
 	flag = new int[GlobalC::pw.ngmc_g];
 
 	for(int i=0;i<GlobalC::pw.ngmc_g;i++)
 	{
 		flag[i] = i;
 	}
-
-	ZEROS( num_G_dis, GlobalV::DSIZE);
-	ZEROS( num_G_core, GlobalV::DSIZE);
-	ZEROS( num_Gvector_dis, GlobalV::DSIZE);
-	ZEROS( num_Gvector_core, GlobalV::DSIZE);
-
+	
+	ModuleBase::GlobalFunc::ZEROS( num_G_dis, GlobalV::DSIZE);
+	ModuleBase::GlobalFunc::ZEROS( num_G_core, GlobalV::DSIZE);
+	ModuleBase::GlobalFunc::ZEROS( num_Gvector_dis, GlobalV::DSIZE);
+	ModuleBase::GlobalFunc::ZEROS( num_Gvector_core, GlobalV::DSIZE);
+	
 #ifdef __MPI
 	MPI_Allgather( &GlobalC::pw.ngmc, 1, MPI_INT, num_G_core, 1, MPI_INT, POOL_WORLD);
 #endif
@@ -453,7 +453,7 @@ void Chi0_standard:: Init()
 
 void Chi0_standard::Delete()
 {
-	TITLE("Chi0_standard","Delete");
+	ModuleBase::TITLE("Chi0_standard","Delete");
 	if(init_finish == true)				// Peize Lin change = to == at 2020.01.31
 	{
 		delete[] b_core;
@@ -525,7 +525,7 @@ void Chi0_standard::Cal_Psi(int iq, std::complex<double> **psi_r)
 	std::complex<double> exp_tmp;
 	for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 	{
-		ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
+		ModuleBase::GlobalFunc::ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
 		for(int ig = 0; ig < GlobalC::kv.ngk[iq] ; ig++)
 		{
 			GlobalC::UFFT.porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(iq,ig)] ] = GlobalC::wf.evc[iq](ib,ig);
@@ -541,7 +541,7 @@ void Chi0_standard::Cal_Psi(int iq, std::complex<double> **psi_r)
 				phase_xy = phase_x + GlobalC::kv.kvec_d[iq].y*iy/GlobalC::pw.ncy;
 				for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; iz++)
 				{
-					phase_xyz = (phase_xy + GlobalC::kv.kvec_d[iq].z*iz/GlobalC::pw.ncz) *TWO_PI;
+					phase_xyz = (phase_xy + GlobalC::kv.kvec_d[iq].z*iz/GlobalC::pw.ncz) *ModuleBase::TWO_PI;
 					exp_tmp = std::complex<double>( cos(phase_xyz), sin(phase_xyz) );
 					psi_r[ib][ir] = GlobalC::UFFT.porter[ir]*exp_tmp;
 					ir++;
@@ -556,12 +556,12 @@ void Chi0_standard::Cal_Psi(int iq, std::complex<double> **psi_r)
 
 void Chi0_standard::Cal_b(int iq, int ik, int iqk)
 {
-	TITLE("Chi0_standard","Cal_b");
-	Vector3<double> qk;
+	ModuleBase::TITLE("Chi0_standard","Cal_b");
+	ModuleBase::Vector3<double> qk;
 	qk = GlobalC::kv.kvec_c[iq] + GlobalC::kv.kvec_c[ik];
 	//std::cout <<"qk = "<<qk.x<<" "<<qk.y<<" "<<qk.z<<std::endl;
 	double phase_x, phase_xy, phase_xyz;
-	Vector3<double> q = GlobalC::kv.kvec_d[iq];
+	ModuleBase::Vector3<double> q = GlobalC::kv.kvec_d[iq];
 	std::complex<double> exp_tmp;
 
 	Cal_Psi(ik, psi_r1);
@@ -580,7 +580,7 @@ void Chi0_standard::Cal_b(int iq, int ik, int iqk)
 					phase_xy = phase_x + q.y*iy/GlobalC::pw.ncy;
 					for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; iz++)
 					{
-						phase_xyz = (phase_xy + q.z*iz/GlobalC::pw.ncz) *TWO_PI;
+						phase_xyz = (phase_xy + q.z*iz/GlobalC::pw.ncz) *ModuleBase::TWO_PI;
 						exp_tmp = std::complex<double>(cos(-phase_xyz), sin(-phase_xyz));
 						GlobalC::UFFT.porter[ir] = conj(psi_r1[ib1][ir]) * psi_r2[ib2][ir] *exp_tmp;
 						ir++;
@@ -695,8 +695,8 @@ void Chi0_standard:: Cal_chi0(int iq, double omega)
 		int lda = dim;
 		int ldb = oband*GlobalV::NBANDS;
 		int ldc = dim;
-		zgemm_(&transa, &transb, &M, &N, &K, &alpha, VECTOR_TO_PTR(B1[0]), &lda, VECTOR_TO_PTR(A1[0]), &ldb, &beta, VECTOR_TO_PTR(C[0]), &ldc);
-
+		zgemm_(&transa, &transb, &M, &N, &K, &alpha, ModuleBase::GlobalFunc::VECTOR_TO_PTR(B1[0]), &lda, ModuleBase::GlobalFunc::VECTOR_TO_PTR(A1[0]), &ldb, &beta, ModuleBase::GlobalFunc::VECTOR_TO_PTR(C[0]), &ldc);
+		
 		for(int g0=0; g0<dim; g0++)
 			for(int g1=0; g1<dim; g1++)
 			{
@@ -714,18 +714,18 @@ void Chi0_standard:: Cal_rpa(int iq)
 		{
 			if(g0!=g1)
 			{
-				rpa[g0][g1] = -8.0 * PI/qg2(iq,g0) * chi0[g0][g1];
+				rpa[g0][g1] = -8.0 * ModuleBase::PI/qg2(iq,g0) * chi0[g0][g1];
 			}
 			else
 			{
-				rpa[g0][g1] = 1.0 - 8.0 * PI/qg2(iq,g0) * chi0[g0][g1];
+				rpa[g0][g1] = 1.0 - 8.0 * ModuleBase::PI/qg2(iq,g0) * chi0[g0][g1];			 	
 			}
 		}
 
 	int l = Cinv(dim, rpa);
 	if(l == 0)
 	{
-		WARNING_QUIT("chi0_standard","(I-v*chi0) is a singular matrix !!");
+		ModuleBase::WARNING_QUIT("chi0_standard","(I-v*chi0) is a singular matrix !!");
 	}
 
 	return;
@@ -741,8 +741,8 @@ void Chi0_standard:: Cal_chi()
 double Chi0_standard::qg2( int iq, int g0)
 {
 	double qg2;
-	qg2 = ((GlobalC::kv.kvec_c[iq]+all_gcar[g0])*(TWO_PI/GlobalC::ucell.lat0)).norm2();
-
+	qg2 = ((GlobalC::kv.kvec_c[iq]+all_gcar[g0])*(ModuleBase::TWO_PI/GlobalC::ucell.lat0)).norm2();
+	
 	return qg2;
 }
 int Chi0_standard::Cinv(int n, std::complex<double>** a)
@@ -894,7 +894,7 @@ int Chi0_standard::Cal_iq(int ik, int iq, int a, int b, int c)
 
 int Chi0_standard::parallel_g()
 {
-	flag1 = new int[dim];  ZEROS(flag1, dim);
+	flag1 = new int[dim];  ModuleBase::GlobalFunc::ZEROS(flag1, dim);
 	para_g = new double*[dim];
 	for(int i=0;i<dim;i++)
 	{
@@ -947,7 +947,7 @@ void Chi0_standard::chi0_para_g()
 {
 	for(int g0=0; g0<dim_para; g0++)
 	{
-		ZEROS( chi0_para[g0], dim_para);
+		ModuleBase::GlobalFunc::ZEROS( chi0_para[g0], dim_para);
 	}
 
 	for(int g0=0; g0<dim; g0++)

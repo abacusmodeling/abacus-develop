@@ -14,7 +14,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::init(
 	const MPI_Comm &mpi_comm_in,
 	const set<std::pair<size_t,size_t>> &H_atom_pairs_core)
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::init");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::init");
 	
 	mpi_comm = mpi_comm_in;
 	MPI_Comm_size(mpi_comm, &comm_sz);
@@ -25,16 +25,16 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::init(
 	recv_size = GlobalC::ParaO.nrow * GlobalC::ParaO.ncol * sizeof(double);
 }
 
-std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> 
+std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> 
 Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::exx_to_a2D(
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local) const
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &data_local) const
 {
-std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"Hmpi_"+TO_STRING(my_rank), std::ofstream::app);
+std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"Hmpi_"+ModuleBase::GlobalFunc::TO_STRING(my_rank), std::ofstream::app);
 timeval t_all;	gettimeofday(&t_all,NULL);
 
-	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::exx_to_a2D");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::exx_to_a2D");
 	
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> data_all(GlobalV::NSPIN);
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> data_all(GlobalV::NSPIN);
 //ofs<<__LINE__<<std::endl;
 
 	std::vector<atomic<Flag_Send>> flags_send(comm_sz);
@@ -75,7 +75,7 @@ std::vector<timeval>t_recv(comm_sz);
 			if( flags_send[rank_send] == Flag_Send::finish_oar )
 			{
 //ofs<<__LINE__<<"\t"<<rank_send<<std::endl;
-				if(MPI_Isend( VECTOR_TO_PTR(oarps_isend[rank_send]), oarps_isend[rank_send].size(), MPI_DOUBLE, rank_send, 0, mpi_comm, &requests_isend[rank_send] )!=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				if(MPI_Isend( ModuleBase::GlobalFunc::VECTOR_TO_PTR(oarps_isend[rank_send]), oarps_isend[rank_send].size(), MPI_DOUBLE, rank_send, 0, mpi_comm, &requests_isend[rank_send] )!=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 				flags_send[rank_send] = Flag_Send::begin_isend;
 gettimeofday(&t_send[rank_send],NULL);
 			}
@@ -86,7 +86,7 @@ gettimeofday(&t_send[rank_send],NULL);
 			{
 //ofs<<__LINE__<<"\t"<<rank_send<<std::endl;
 				int flag_finish;
-				if(MPI_Test( &requests_isend[rank_send], &flag_finish, MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				if(MPI_Test( &requests_isend[rank_send], &flag_finish, MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 				if(flag_finish)
 				{
 					oarps_isend[rank_send].resize(0);
@@ -100,15 +100,15 @@ ofs<<"isend_finish\t"<<rank_send<<"\t"<<cal_time(t_send[rank_send])<<std::endl;
 		{
 			MPI_Status status;
 			int flag_message;
-			if(MPI_Iprobe( MPI_ANY_SOURCE, 0, mpi_comm, &flag_message, &status )!=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+			if(MPI_Iprobe( MPI_ANY_SOURCE, 0, mpi_comm, &flag_message, &status )!=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 			if(flag_message)
 			{
 				int message_size;
-				if(MPI_Get_count( &status, MPI_PACKED, &message_size )!=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				if(MPI_Get_count( &status, MPI_PACKED, &message_size )!=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 				const int rank_recv = status.MPI_SOURCE;
 //ofs<<__LINE__<<"\t"<<rank_recv<<std::endl;
 				iarps_irecv[rank_recv].resize(message_size);
-				if(MPI_Irecv( VECTOR_TO_PTR(iarps_irecv[rank_recv]), message_size, MPI_DOUBLE, rank_recv, 0, mpi_comm, &requests_irecv[rank_recv] )!=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				if(MPI_Irecv( ModuleBase::GlobalFunc::VECTOR_TO_PTR(iarps_irecv[rank_recv]), message_size, MPI_DOUBLE, rank_recv, 0, mpi_comm, &requests_irecv[rank_recv] )!=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 				flags_recv[rank_recv] = Flag_Recv::begin_irecv;
 gettimeofday(&t_recv[rank_recv],NULL);
 			}
@@ -118,7 +118,7 @@ gettimeofday(&t_recv[rank_recv],NULL);
 			if(flags_recv[rank_recv] == Flag_Recv::begin_irecv)
 			{
 				int flag_finish;
-				if(MPI_Test( &requests_irecv[rank_recv], &flag_finish, MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				if(MPI_Test( &requests_irecv[rank_recv], &flag_finish, MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 				if(flag_finish)
 				{
 //ofs<<__LINE__<<"\t"<<rank_recv<<std::endl;
@@ -145,7 +145,7 @@ ofs<<"insert\t"<<my_rank<<"\t"<<cut_time(t)<<std::endl;
 	{
 		if( flags_send[rank_send] == Flag_Send::begin_isend )
 		{
-			if(MPI_Wait( &requests_isend[rank_send], MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw std::runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+			if(MPI_Wait( &requests_isend[rank_send], MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 			oarps_isend[rank_send].resize(0);
 			flags_send[rank_send] = Flag_Send::finish_isend;
 		}
@@ -165,7 +165,7 @@ std::vector<size_t> Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::get_send_
 	const set<std::pair<size_t,size_t>> &H_atom_pairs_core,
 	const std::vector<std::pair<std::vector<bool>,std::vector<bool>>> &atom_in_2D_list) const
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::get_send_size_list");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::get_send_size_list");
 	std::vector<size_t> send_size_list(comm_sz,0);
 	for(const auto &H_atom_pair : H_atom_pairs_core)
 	{
@@ -214,20 +214,20 @@ bool Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::memory_enough(
 	for(int rank_send=0; rank_send<comm_sz; ++rank_send)
 		if(flags_send[rank_send]==Flag_Send::begin_oar)
 			memory_need += send_size_list[rank_send];
-	const size_t memory_available = MemAvailable()*1024;
+	const size_t memory_available = ModuleBase::GlobalFunc::MemAvailable()*1024;
 	return (memory_available-memory_need>send_size_list[rank_send_next]) ? true : false;
 }
 
 void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::send_data_process(
 	const int rank_send_now,
-	const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local,
+	const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &data_local,
 	std::vector<std::valarray<double>> &oarps_isend,
 	std::vector<atomic<Flag_Send>> &flags_send) const
 {
-std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"Hmpi_"+TO_STRING(my_rank), std::ofstream::app);
+std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"Hmpi_"+ModuleBase::GlobalFunc::TO_STRING(my_rank), std::ofstream::app);
 timeval t;	gettimeofday(&t, NULL);	
 	std::valarray<size_t> send_size(GlobalV::NSPIN);
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,const matrix*>>>> mw(GlobalV::NSPIN);
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,const ModuleBase::matrix*>>>> mw(GlobalV::NSPIN);
 	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		send_size[is]=0;
@@ -255,7 +255,7 @@ timeval t;	gettimeofday(&t, NULL);
 ofs<<"get_send_data_wrapper\t"<<rank_send_now<<"\t"<<cut_time(t)<<std::endl;
 	
 	oarps_isend[rank_send_now].resize(send_size.sum()+GlobalV::NSPIN);
-	double * ptr = VECTOR_TO_PTR(oarps_isend[rank_send_now]);
+	double * ptr = ModuleBase::GlobalFunc::VECTOR_TO_PTR(oarps_isend[rank_send_now]);
 	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		ptr[0] = send_size[is];
@@ -269,7 +269,7 @@ ofs<<"get_send_data_wrapper\t"<<rank_send_now<<"\t"<<cut_time(t)<<std::endl;
 					ptr[0] = mw_A.first;
 					ptr[1] = mw_B.first;
 					ptr[2] = mw_C.first.x;    ptr[3] = mw_C.first.y;    ptr[4] = mw_C.first.z;
-					const matrix &m = *mw_C.second;
+					const ModuleBase::matrix &m = *mw_C.second;
 					ptr[5] = m.nr;   ptr[6] = m.nc;
 					memcpy( ptr+7, m.c, m.nr*m.nc*sizeof(double) );
 					ptr += 7+m.nr*m.nc;
@@ -283,22 +283,22 @@ ofs<<"oar<<\t"<<rank_send_now<<"\t"<<cut_time(t)<<std::endl;
 
 void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::recv_data_process(
 	const int rank_recv,
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_all,
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &data_all,
 	std::vector<std::valarray<double>> &iarps_irecv,
 	std::vector<atomic<Flag_Recv>> &flags_recv,
 	atomic_flag &lock_insert) const
 {
-std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"Hmpi_"+TO_STRING(my_rank), std::ofstream::app);
+std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"Hmpi_"+ModuleBase::GlobalFunc::TO_STRING(my_rank), std::ofstream::app);
 timeval t;	gettimeofday(&t, NULL);	
-	auto vector_empty = []( const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &v ) -> bool
+	auto vector_empty = []( const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &v ) -> bool
 	{
 		for( const auto &i : v )
 			if(!i.empty())	return false;
 		return true;
 	};
 
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> data_rank(GlobalV::NSPIN);
-	double *ptr = VECTOR_TO_PTR(iarps_irecv[rank_recv]);
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> data_rank(GlobalV::NSPIN);
+	double *ptr = ModuleBase::GlobalFunc::VECTOR_TO_PTR(iarps_irecv[rank_recv]);
 	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		const size_t recv_size = ptr[0];
@@ -309,7 +309,7 @@ timeval t;	gettimeofday(&t, NULL);
 			const size_t iat1=ptr[0], iat2=ptr[1];
 			const Abfs::Vector3_Order<int> box2 = {ptr[2],ptr[3],ptr[4]};
 			const int nr=ptr[5], nc=ptr[6];
-			matrix &m = data_rank[is][iat1][iat2][box2];
+			ModuleBase::matrix &m = data_rank[is][iat1][iat2][box2];
 			m.create(nr,nc);
 			memcpy( m.c, ptr+7, nr*nc*sizeof(double) );
 			ptr += 7+nr*nc;
@@ -330,8 +330,8 @@ ofs<<"insert\t"<<rank_recv<<"\t"<<cut_time(t)<<std::endl;
 }
 
 void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::insert_data(
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_rank,
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_all) const
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &data_rank,
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &data_all) const
 {
 	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{

@@ -17,7 +17,7 @@ void Exx_Abfs::Inverse_Matrix_Double::cal_inverse( const Method &method )
 {
 	#if TEST_EXX_LCAO==1
 		static int i=0;
-		std::ofstream ofs("inverse_matrix_"+TO_STRING(i));
+		std::ofstream ofs("inverse_matrix_"+ModuleBase::GlobalFunc::TO_STRING(i));
 		ofs<<A<<std::endl;
 		ofs.close();
 		++i;
@@ -40,7 +40,7 @@ void Exx_Abfs::Inverse_Matrix_Double::using_dpotrf()
 	{
 		std::cout << "\n info_dpotrf = " << info <<std::endl;
 		GlobalV::ofs_warning<<A<<std::endl;
-		QUIT();
+		ModuleBase::QUIT();
 	}
 
 	LapackConnector::dpotri('U',dim,A,dim,&info);
@@ -49,7 +49,7 @@ void Exx_Abfs::Inverse_Matrix_Double::using_dpotrf()
 	{
 		std::cout << "\n info_dpotri = " << info <<std::endl;
 		GlobalV::ofs_warning<<A<<std::endl;
-		QUIT();
+		ModuleBase::QUIT();
 	}
 	
 	copy_down_triangle();
@@ -58,7 +58,7 @@ void Exx_Abfs::Inverse_Matrix_Double::using_dpotrf()
 void Exx_Abfs::Inverse_Matrix_Double::using_dsyev( const double &threshold_condition_number )
 {
 	std::vector<double> eigen_value(A.nr);
-	LapackConnector::dsyev('V','U',A,VECTOR_TO_PTR(eigen_value),info);
+	LapackConnector::dsyev('V','U',A,ModuleBase::GlobalFunc::VECTOR_TO_PTR(eigen_value),info);
 	
 	#if TEST_EXX_LCAO==1
 		for( const double &ie : eigen_value )
@@ -86,7 +86,7 @@ void Exx_Abfs::Inverse_Matrix_Double::using_dsyev( const double &threshold_condi
 	A = transpose(A) * eigen_value_inverse * A;
 	*/
 	
-	matrix eA( A.nr, A.nc );
+	ModuleBase::matrix eA( A.nr, A.nc );
 	int ie=0;
 	for( int i=0; i!=A.nr; ++i )
 		if( eigen_value[i] > threshold )
@@ -98,7 +98,7 @@ void Exx_Abfs::Inverse_Matrix_Double::using_dsyev( const double &threshold_condi
 }
 
 
-void Exx_Abfs::Inverse_Matrix_Double::input( const matrix &m )
+void Exx_Abfs::Inverse_Matrix_Double::input( const ModuleBase::matrix &m )
 {
 	for( size_t ir=0; ir!=m.nr; ++ir )
 		for( size_t ic=0; ic!=m.nc; ++ic )
@@ -106,10 +106,10 @@ void Exx_Abfs::Inverse_Matrix_Double::input( const matrix &m )
 }
 
 void Exx_Abfs::Inverse_Matrix_Double::input( 
-	const matrix &m_00,
-	const matrix &m_01,
-	const matrix &m_10,
-	const matrix &m_11)
+	const ModuleBase::matrix &m_00,
+	const ModuleBase::matrix &m_01,
+	const ModuleBase::matrix &m_10,
+	const ModuleBase::matrix &m_11)
 {
 	const size_t delta_nr = m_00.nr, delta_nc = m_00.nc;
 	
@@ -127,7 +127,7 @@ void Exx_Abfs::Inverse_Matrix_Double::input(
 			A(ir+delta_nr,ic+delta_nc) = m_11(ir,ic);
 }
 
-void Exx_Abfs::Inverse_Matrix_Double::output( matrix &m ) const
+void Exx_Abfs::Inverse_Matrix_Double::output( ModuleBase::matrix &m ) const
 {
 	for( size_t ir=0; ir!=m.nr; ++ir )
 		for( size_t ic=0; ic!=m.nc; ++ic )
@@ -135,10 +135,10 @@ void Exx_Abfs::Inverse_Matrix_Double::output( matrix &m ) const
 }
 
 void Exx_Abfs::Inverse_Matrix_Double::output( 
-	matrix &m_00,
-	matrix &m_01,
-	matrix &m_10,
-	matrix &m_11) const
+	ModuleBase::matrix &m_00,
+	ModuleBase::matrix &m_01,
+	ModuleBase::matrix &m_10,
+	ModuleBase::matrix &m_11) const
 {
 	const size_t delta_nr = m_00.nr, delta_nc = m_00.nc;
 	

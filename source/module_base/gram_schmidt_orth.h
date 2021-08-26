@@ -8,6 +8,9 @@
 
 #include<limits>
 
+namespace ModuleBase
+{
+
 template<typename Func_Type, typename R_Type=double>
 class Gram_Schmidt_Orth
 {
@@ -31,4 +34,5 @@ private:
 
 };
 
+}
 #endif	// GRAM_SCHMIDT_ORTH_H

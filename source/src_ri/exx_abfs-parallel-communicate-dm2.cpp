@@ -26,7 +26,7 @@ void Exx_Abfs::Parallel::Communicate::DM2::clear_DMr()
 	DMr.resize(GlobalV::NSPIN);
 }
 
-void Exx_Abfs::Parallel::Communicate::DM2::set_DM_gamma( const matrix &DM_2D, const int is, const std::pair<int,int> &index_begin )
+void Exx_Abfs::Parallel::Communicate::DM2::set_DM_gamma( const ModuleBase::matrix &DM_2D, const int is, const std::pair<int,int> &index_begin )
 {
 	auto get_iats = []( const int n, const int i_begin, const std::vector<bool> &in_exx ) -> std::map<int,std::pair<int,int>>
 	{
@@ -59,7 +59,7 @@ void Exx_Abfs::Parallel::Communicate::DM2::set_DM_gamma( const matrix &DM_2D, co
 			const auto &iat2_range = iat2sA.second;
 			if( !atom_in_exx.row_col[iat1][iat2] )	continue;
 			
-			matrix DM_local( GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw, GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw );
+			ModuleBase::matrix DM_local( GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw, GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw );
 			const int iw2_begin = GlobalC::ucell.iwt2iw[ iat2_range.first + index_begin.second ];
 			for( int iw1_2D=iat1_range.first; iw1_2D<=iat1_range.second; ++iw1_2D )
 			{
@@ -73,7 +73,7 @@ void Exx_Abfs::Parallel::Communicate::DM2::set_DM_gamma( const matrix &DM_2D, co
 			
 			if( DM_local.absmax() < threshold )	continue;
 			
-			if( matrix*const DM_ptr = static_cast<matrix*const>(MAP_EXIST( DMr[is], iat1, iat2, Abfs::Vector3_Order<int>{0,0,0} )) )
+			if( ModuleBase::matrix*const DM_ptr = static_cast<ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( DMr[is], iat1, iat2, Abfs::Vector3_Order<int>{0,0,0} )) )
 				*DM_ptr += DM_local;
 			else
 				DMr[is][iat1][iat2][{0,0,0}] = std::move(DM_local);
@@ -89,7 +89,7 @@ void Exx_Abfs::Parallel::Communicate::DM2::cal_DM_k(
 	const set<std::pair<size_t,size_t>> &H_atom_pairs_core,
 	const double threshold )
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::DM::cal_DM");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM::cal_DM");
 	
 	std::vector<Abfs::Vector3_Order<int>> Born_von_Karman_boxes;
 	for( int ix=0; ix<Born_von_Karman_period.x; ++ix )

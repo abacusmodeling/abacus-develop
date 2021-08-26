@@ -19,7 +19,7 @@ Force_Stress_LCAO::~Force_Stress_LCAO (){}
 
 void Force_Stress_LCAO::allocate(void)
 {
-    TITLE("Force_Stress_LCAO","allocate");
+    ModuleBase::TITLE("Force_Stress_LCAO","allocate");
 
     // reduce memory occupy by vlocal
     delete[] GlobalC::ParaO.sender_local_index;
@@ -46,27 +46,27 @@ void Force_Stress_LCAO::getForceStress(
 	const bool isstress,
 	const bool istestf,
 	const bool istests,
-	matrix &fcs,
-	matrix &scs)
+	ModuleBase::matrix &fcs,
+	ModuleBase::matrix &scs)
 {
-    TITLE("Force_Stress_LCAO","getForceStress");
-	timer::tick("Force_Stress_LCAO","getForceStress");
-
+    ModuleBase::TITLE("Force_Stress_LCAO","getForceStress");
+	ModuleBase::timer::tick("Force_Stress_LCAO","getForceStress");
+	
 	if(!isforce&&!isstress) return;
 
 	const int nat = GlobalC::ucell.nat;
 
-	//total force : matrix fcs;
+	//total force : ModuleBase::matrix fcs;
 
 	// part of total force
-    matrix foverlap;
-    matrix ftvnl_dphi;
-    matrix fvnl_dbeta;
-    matrix fvl_dphi;
-    matrix fvl_dvl;
-    matrix fewalds;
-    matrix fcc;
-	matrix fscc;
+    ModuleBase::matrix foverlap;
+    ModuleBase::matrix ftvnl_dphi;
+    ModuleBase::matrix fvnl_dbeta;
+    ModuleBase::matrix fvl_dphi;
+    ModuleBase::matrix fvl_dvl;
+    ModuleBase::matrix fewalds;
+    ModuleBase::matrix fcc;
+	ModuleBase::matrix fscc;
 
 	fvl_dphi.create (nat, 3);//must do it now, update it later, noted by zhengdy
 
@@ -84,16 +84,16 @@ void Force_Stress_LCAO::getForceStress(
 		this->calForcePwPart(fvl_dvl, fewalds, fcc, fscc);
 	}
 
-	//total stress : matrix scs
-	matrix sigmacc;
-	matrix sigmadvl;
-	matrix sigmaewa;
-	matrix sigmaxc;
-	matrix sigmahar;
-	matrix soverlap;
-	matrix stvnl_dphi;
-	matrix svnl_dbeta;
-	matrix svl_dphi;
+	//total stress : ModuleBase::matrix scs
+	ModuleBase::matrix sigmacc;
+	ModuleBase::matrix sigmadvl;
+	ModuleBase::matrix sigmaewa;
+	ModuleBase::matrix sigmaxc;
+	ModuleBase::matrix sigmahar;
+	ModuleBase::matrix soverlap;
+	ModuleBase::matrix stvnl_dphi;
+	ModuleBase::matrix svnl_dbeta;
+	ModuleBase::matrix svl_dphi;
 
 	if(isstress)
 	{
@@ -135,8 +135,8 @@ void Force_Stress_LCAO::getForceStress(
 
 	//implement vdw force or stress here
 	// Peize Lin add 2014-04-04, update 2021-03-09
-	matrix force_vdw;
-	matrix stress_vdw;
+	ModuleBase::matrix force_vdw;
+	ModuleBase::matrix stress_vdw;
 	if(GlobalC::vdwd2_para.flag_vdwd2)
 	{
 		if(isforce)
@@ -181,15 +181,15 @@ void Force_Stress_LCAO::getForceStress(
 		}
 	}
 	//implement force from E-field
-    matrix fefield;
+    ModuleBase::matrix fefield;
     if(GlobalV::EFIELD&&isforce)
     {
         fefield.create(nat, 3);
         Efield::compute_force(fefield);
     }
 	//Force contribution from DFT+U
-	matrix force_dftu;
-	matrix stress_dftu;
+	ModuleBase::matrix force_dftu;
+	ModuleBase::matrix stress_dftu;
 	if (INPUT.dft_plus_u)
 	{
 		if(isforce)
@@ -303,9 +303,9 @@ void Force_Stress_LCAO::getForceStress(
 		if(istestf)
 		{
 			// test
-			//matrix fvlocal;
+			//ModuleBase::matrix fvlocal;
 			//fvlocal.create(nat,3);
-			matrix ftvnl;
+			ModuleBase::matrix ftvnl;
 			ftvnl.create(nat, 3);
 			for (int iat = 0; iat < nat; iat++)
 			{
@@ -374,7 +374,7 @@ void Force_Stress_LCAO::getForceStress(
 				GlobalV::ofs_running << " " << std::setw(8) << iat;
 				for(int i=0; i<3; i++)
 				{
-					if( abs( fcs(iat,i)*Ry_to_eV/0.529177 ) < Force_Stress_LCAO::force_invalid_threshold_ev)
+					if( abs( fcs(iat,i)*ModuleBase::Ry_to_eV/0.529177 ) < Force_Stress_LCAO::force_invalid_threshold_ev)
 					{
 						fcs(iat,i) = 0.0;
 						GlobalV::ofs_running << std::setw(5) << "1";
@@ -433,9 +433,9 @@ void Force_Stress_LCAO::getForceStress(
 		if(istests)
 		{
 			// test
-			matrix svlocal;
+			ModuleBase::matrix svlocal;
 			svlocal.create(3,3);
-			matrix stvnl;
+			ModuleBase::matrix stvnl;
 			stvnl.create(3,3);
 			for (int i = 0; i<3; i++)
 			{
@@ -480,7 +480,7 @@ void Force_Stress_LCAO::getForceStress(
 		sc_pw.printstress_total(scs, ry);
 
 		double unit_transform = 0.0;
-		unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
+		unit_transform = ModuleBase::RYDBERG_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
 		double external_stress[3] = {GlobalV::PRESS1,GlobalV::PRESS2,GlobalV::PRESS3};
 
 		for(int i=0;i<3;i++)
@@ -489,13 +489,13 @@ void Force_Stress_LCAO::getForceStress(
 		}
 		GlobalV::PRESSURE = (scs(0,0)+scs(1,1)+scs(2,2))/3;
 	}//end of stress calculation
-
-	timer::tick("Force_LCAO","start_force");
+	
+	ModuleBase::timer::tick("Force_LCAO","start_force");
 	return;
 }
 
 //print force term for test
-void Force_Stress_LCAO::print_force(const std::string &name, matrix& f, const bool screen, bool ry)const
+void Force_Stress_LCAO::print_force(const std::string &name, ModuleBase::matrix& f, const bool screen, bool ry)const
 {
 	GlobalV::ofs_running << " --------------------------- " << name << " ----------------------------" << std::endl;
 	GlobalV::ofs_running << " " << std::setw(8) << "atom" << std::setw(15) << "x" << std::setw(15) << "y" << std::setw(15) << "z" << std::endl;
@@ -504,7 +504,7 @@ void Force_Stress_LCAO::print_force(const std::string &name, matrix& f, const bo
 
 	if(!ry)
 	{
-	 	fac = Ry_to_eV / 0.529177;
+	 	fac = ModuleBase::Ry_to_eV / 0.529177;
 	}
 
 	std::cout << std::setprecision(5);
@@ -556,14 +556,14 @@ void Force_Stress_LCAO::print_force(const std::string &name, matrix& f, const bo
 }
 
 
-void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, matrix& fcs)
+void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, ModuleBase::matrix& fcs)
 {
-	TITLE("Force_Stress_LCAO","printforce_total");
+	ModuleBase::TITLE("Force_Stress_LCAO","printforce_total");
 	double unit_transform = 1;
 
 	if(!ry)
 	{
-		unit_transform = Ry_to_eV / 0.529177;
+		unit_transform = ModuleBase::Ry_to_eV / 0.529177;
 	}
 //	std::cout.setf(ios::fixed);
 
@@ -571,7 +571,7 @@ void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, mat
 
 	//GlobalV::ofs_running << std::setiosflags(ios::right);
  	GlobalV::ofs_running << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed) << std::endl;
-	NEW_PART("TOTAL-FORCE (eV/Angstrom)");
+	ModuleBase::GlobalFunc::NEW_PART("TOTAL-FORCE (eV/Angstrom)");
 
 	// print out forces
 	if(INPUT.force_set == 1)
@@ -584,9 +584,9 @@ void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, mat
 
 		for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 		{
-			ofs << "   " << fcs(iat,0)*Ry_to_eV / 0.529177
-				<< "   " << fcs(iat,1)*Ry_to_eV / 0.529177
-				<< "   " << fcs(iat,2)*Ry_to_eV / 0.529177 << std::endl;
+			ofs << "   " << fcs(iat,0)*ModuleBase::Ry_to_eV / 0.529177
+				<< "   " << fcs(iat,1)*ModuleBase::Ry_to_eV / 0.529177
+				<< "   " << fcs(iat,2)*ModuleBase::Ry_to_eV / 0.529177 << std::endl;
 		}
 		ofs.close();
 	}
@@ -633,10 +633,10 @@ void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, mat
 
 //local pseudopotential, ewald, core correction, scc terms in force
 void Force_Stress_LCAO::calForcePwPart(
-	matrix &fvl_dvl,
-	matrix &fewalds,
-	matrix &fcc,
-	matrix &fscc)
+	ModuleBase::matrix &fvl_dvl,
+	ModuleBase::matrix &fewalds,
+	ModuleBase::matrix &fcc,
+	ModuleBase::matrix &fscc)
 {
 	//--------------------------------------------------------
 	// local pseudopotential force:
@@ -663,14 +663,14 @@ void Force_Stress_LCAO::calForceStressIntegralPart(
 	const bool isGammaOnly,
 	const bool isforce,
 	const bool isstress,
-	matrix& foverlap,
-	matrix& ftvnl_dphi,
-	matrix& fvnl_dbeta,
-	matrix& fvl_dphi,
-	matrix& soverlap,
-	matrix& stvnl_dphi,
-	matrix& svnl_dbeta,
-	matrix& svl_dphi)
+	ModuleBase::matrix& foverlap,
+	ModuleBase::matrix& ftvnl_dphi,
+	ModuleBase::matrix& fvnl_dbeta,
+	ModuleBase::matrix& fvl_dphi,
+	ModuleBase::matrix& soverlap,
+	ModuleBase::matrix& stvnl_dphi,
+	ModuleBase::matrix& svnl_dbeta,
+	ModuleBase::matrix& svl_dphi)
 {
 	if(isGammaOnly)
 	{
@@ -705,11 +705,11 @@ void Force_Stress_LCAO::calForceStressIntegralPart(
 
 //vlocal, hartree, ewald, core correction, exchange-correlation terms in stress
 void Force_Stress_LCAO::calStressPwPart(
-	matrix& sigmadvl,
-	matrix& sigmahar,
-	matrix& sigmaewa,
-	matrix& sigmacc,
-	matrix& sigmaxc
+	ModuleBase::matrix& sigmadvl,
+	ModuleBase::matrix& sigmahar,
+	ModuleBase::matrix& sigmaewa,
+	ModuleBase::matrix& sigmacc,
+	ModuleBase::matrix& sigmaxc
 )
 {
 	//--------------------------------------------------------
@@ -747,12 +747,12 @@ void Force_Stress_LCAO::calStressPwPart(
 }
 
 //do symmetry for total force
-void Force_Stress_LCAO::forceSymmetry(matrix& fcs)
+void Force_Stress_LCAO::forceSymmetry(ModuleBase::matrix& fcs)
 {
 	double *pos;
 	double d1,d2,d3;
 	pos = new double[GlobalC::ucell.nat*3];
-	ZEROS(pos, GlobalC::ucell.nat*3);
+	ModuleBase::GlobalFunc::ZEROS(pos, GlobalC::ucell.nat*3);
 	int iat = 0;
 	for(int it = 0;it < GlobalC::ucell.ntype;it++)
 	{
@@ -772,7 +772,7 @@ void Force_Stress_LCAO::forceSymmetry(matrix& fcs)
 
 	for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 	{
-		Mathzone::Cartesian_to_Direct(fcs(iat,0),fcs(iat,1),fcs(iat,2),
+		ModuleBase::Mathzone::Cartesian_to_Direct(fcs(iat,0),fcs(iat,1),fcs(iat,2),
 							GlobalC::ucell.a1.x, GlobalC::ucell.a1.y, GlobalC::ucell.a1.z,
 							GlobalC::ucell.a2.x, GlobalC::ucell.a2.y, GlobalC::ucell.a2.z,
 							GlobalC::ucell.a3.x, GlobalC::ucell.a3.y, GlobalC::ucell.a3.z,
@@ -783,7 +783,7 @@ void Force_Stress_LCAO::forceSymmetry(matrix& fcs)
 	GlobalC::symm.force_symmetry(fcs , pos, GlobalC::ucell);
 	for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 	{
-		Mathzone::Direct_to_Cartesian(fcs(iat,0),fcs(iat,1),fcs(iat,2),
+		ModuleBase::Mathzone::Direct_to_Cartesian(fcs(iat,0),fcs(iat,1),fcs(iat,2),
 							GlobalC::ucell.a1.x, GlobalC::ucell.a1.y, GlobalC::ucell.a1.z,
 							GlobalC::ucell.a2.x, GlobalC::ucell.a2.y, GlobalC::ucell.a2.z,
 							GlobalC::ucell.a3.x, GlobalC::ucell.a3.y, GlobalC::ucell.a3.z,

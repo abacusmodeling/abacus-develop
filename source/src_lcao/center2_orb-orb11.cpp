@@ -45,8 +45,8 @@ void Center2_Orb::Orb11::init_radial_table(void)
 			nA,
 			nB,
 			rmesh,
-			VECTOR_TO_PTR(Table_r[LAB]),
-			VECTOR_TO_PTR(Table_dr[LAB]));
+			ModuleBase::GlobalFunc::VECTOR_TO_PTR(Table_r[LAB]),
+			ModuleBase::GlobalFunc::VECTOR_TO_PTR(Table_dr[LAB]));
 	}
 	return;
 }
@@ -77,19 +77,19 @@ void Center2_Orb::Orb11::init_radial_table( const std::set<size_t> &radials )
 			nA,
 			nB,
 			radials_used,
-			VECTOR_TO_PTR(Table_r[LAB]),
-			VECTOR_TO_PTR(Table_dr[LAB]));
+			ModuleBase::GlobalFunc::VECTOR_TO_PTR(Table_r[LAB]),
+			ModuleBase::GlobalFunc::VECTOR_TO_PTR(Table_dr[LAB]));
 	}
 }
 
 double Center2_Orb::Orb11::cal_overlap(
-	const Vector3<double> &RA, const Vector3<double> &RB,
+	const ModuleBase::Vector3<double> &RA, const ModuleBase::Vector3<double> &RB,
 	const int &mA, const int &mB) const
 {	
 	const double tiny1 = 1e-12;		// why 1e-12?
 	const double tiny2 = 1e-10;		// why 1e-10?
 
-	const Vector3<double> delta_R = RB-RA;
+	const ModuleBase::Vector3<double> delta_R = RB-RA;
 	const double distance_true = delta_R.norm();
 	const double distance = (distance_true>=tiny1) ? distance_true : distance_true+tiny1;
 	const double RcutA = nA.getRcut();
@@ -100,7 +100,7 @@ double Center2_Orb::Orb11::cal_overlap(
 	const int LB = nB.getL();
 
 	std::vector<double> rly;
-	Ylm::rl_sph_harm (
+	ModuleBase::Ylm::rl_sph_harm (
 		LA+LB,											// max LAB
 		delta_R.x, delta_R.y, delta_R.z,
 		rly);
@@ -132,8 +132,8 @@ double Center2_Orb::Orb11::cal_overlap(
 
 			const double Interp_Tlm = 
 				(distance > tiny2) ?
-				PolyInt::Polynomial_Interpolation(
-					VECTOR_TO_PTR(tb_r.second),
+				ModuleBase::PolyInt::Polynomial_Interpolation(
+					ModuleBase::GlobalFunc::VECTOR_TO_PTR(tb_r.second),
 					MOT.get_rmesh(RcutA, RcutB),
 					MOT.dr,
 					distance ) :

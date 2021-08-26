@@ -10,13 +10,13 @@ IState_Charge::~IState_Charge(){}
 
 void IState_Charge::begin(void)
 {
-	TITLE("IState_Charge","begin");
+	ModuleBase::TITLE("IState_Charge","begin");
 
 	std::cout << " Perform |psi(i)|^2 for selected bands." << std::endl;
 
 	if(!GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		WARNING_QUIT("IState_Charge::begin","Only available for GlobalV::GAMMA_ONLY_LOCAL now.");
+		ModuleBase::WARNING_QUIT("IState_Charge::begin","Only available for GlobalV::GAMMA_ONLY_LOCAL now.");
 	}
 
 	int mode = 0;
@@ -33,13 +33,13 @@ void IState_Charge::begin(void)
 	// (2.2) carry out the grid integration to
 	// get the charge density.
 	this->bands_picked = new int[GlobalV::NBANDS];
-	ZEROS(bands_picked, GlobalV::NBANDS);
+	ModuleBase::GlobalFunc::ZEROS(bands_picked, GlobalV::NBANDS);
 
 	// (1) 
 	// (1.1) allocate the space for GlobalC::LOWF.WFC_GAMMA
 
 	// (1.2) read in LOWF_GAMMA.dat
-	OUT(GlobalV::ofs_running,"GlobalC::LOWF.allocate_flag",GlobalC::LOWF.get_allocate_flag());	
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"GlobalC::LOWF.allocate_flag",GlobalC::LOWF.get_allocate_flag());	
 	std::cout << " number of electrons = " << GlobalC::CHR.nelec << std::endl;
 
 	// mohan update 2011-03-21
@@ -89,7 +89,7 @@ void IState_Charge::begin(void)
 				//int band_index;
 				for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 				{
-					READ_VALUE(ifs, bands_picked[ib]);
+					ModuleBase::GlobalFunc::READ_VALUE(ifs, bands_picked[ib]);
 				}
 			}
 		}
@@ -101,7 +101,7 @@ void IState_Charge::begin(void)
 		if(stop)
 		{
 			GlobalV::ofs_warning << " Can't find the file : " << ss.str() << std::endl;
-			WARNING_QUIT("IState_Charge::begin","can't find the istate file.");
+			ModuleBase::WARNING_QUIT("IState_Charge::begin","can't find the istate file.");
 		}
 	}
 
@@ -122,7 +122,7 @@ void IState_Charge::begin(void)
 			// (3) zero out of charge density array. 
 			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
-				ZEROS( GlobalC::CHR.rho[is], GlobalC::pw.nrxx );
+				ModuleBase::GlobalFunc::ZEROS( GlobalC::CHR.rho[is], GlobalC::pw.nrxx );
 			}
 			
 			// (4) calculate charge density for a particular 
@@ -150,7 +150,7 @@ void IState_Charge::begin(void)
 
 void IState_Charge::idmatrix(const int &ib)
 {
-	TITLE("IState_Charge","idmatrix");
+	ModuleBase::TITLE("IState_Charge","idmatrix");
 /*		
 	for(int is=0; is<NSPIN; is++)
 	{
@@ -171,7 +171,7 @@ void IState_Charge::idmatrix(const int &ib)
 						// we need to fix this function in near future.
 						// -- mohan add 2021-02-09
 						//---------------------------------------------------------
-						WARNING_QUIT("IState_Charge::idmatrix","need to update GlobalC::LOWF.WFC_GAMMA");
+						ModuleBase::WARNING_QUIT("IState_Charge::idmatrix","need to update GlobalC::LOWF.WFC_GAMMA");
 						// 2 stands for degeneracy.
 						//alpha[nu_local] += 2.0 * GlobalC::LOWF.WFC_GAMMA[is][ib][mu_local] * GlobalC::LOWF.WFC_GAMMA[is][ib][nu_local];
 					}
@@ -204,7 +204,7 @@ void IState_Charge::idmatrix(const int &ib)
 			}
 		
 			// wg_wfc(ib,iw) = wg[ib] * wfc(ib,iw);
-			matrix wg_wfc(GlobalC::LOC.wfc_dm_2d.wfc_gamma[is]);
+			ModuleBase::matrix wg_wfc(GlobalC::LOC.wfc_dm_2d.wfc_gamma[is]);
 	
 			for(int ir=0; ir!=wg_wfc.nr; ++ir)
 			{

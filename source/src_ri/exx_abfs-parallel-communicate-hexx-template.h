@@ -10,7 +10,7 @@
 template< typename T >
 T Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D( const std::map<size_t,std::map<size_t,T>> & H_a2D ) const
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D");
 	
 	T H_m2D;
 	if(GlobalV::KS_SOLVER=="genelpa")
@@ -51,25 +51,25 @@ T Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D( const std::map<size_t,std::
 */
 
 template<>
-matrix Exx_Abfs::Parallel::Communicate::Hexx::H_phase<matrix>(
-	matrix &&HR, const int ik, const Abfs::Vector3_Order<int> &box2) const
+ModuleBase::matrix Exx_Abfs::Parallel::Communicate::Hexx::H_phase<ModuleBase::matrix>(
+	ModuleBase::matrix &&HR, const int ik, const Abfs::Vector3_Order<int> &box2) const
 {
 	assert(box2 == Abfs::Vector3_Order<int>(0,0,0));
-	return std::forward<matrix>(HR);
+	return std::forward<ModuleBase::matrix>(HR);
 }
 
 template<>
-ComplexMatrix Exx_Abfs::Parallel::Communicate::Hexx::H_phase<ComplexMatrix>(
-	matrix &&HR, const int ik, const Abfs::Vector3_Order<int> &box2) const
+ModuleBase::ComplexMatrix Exx_Abfs::Parallel::Communicate::Hexx::H_phase<ModuleBase::ComplexMatrix>(
+	ModuleBase::matrix &&HR, const int ik, const Abfs::Vector3_Order<int> &box2) const
 {
-	return ComplexMatrix(HR) * exp( TWO_PI*IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (box2*GlobalC::ucell.latvec)) );
+	return ModuleBase::ComplexMatrix(HR) * exp( ModuleBase::TWO_PI*ModuleBase::IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (box2*GlobalC::ucell.latvec)) );
 }
 
 template<typename Tmatrix>
 Tmatrix Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D(
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &HR_a2D, const int ik) const
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &HR_a2D, const int ik) const
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D");
 
 	Tmatrix HK_m2D;
 	if(GlobalV::KS_SOLVER=="genelpa")
@@ -97,9 +97,9 @@ Tmatrix Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D(
 				{
 					const Abfs::Vector3_Order<int> &box2 = HR_a2D_C.first;
 					if(HK_a2D.c)
-						HK_a2D += H_phase<Tmatrix>(std::forward<matrix>(HR_a2D_C.second), ik, box2);
+						HK_a2D += H_phase<Tmatrix>(std::forward<ModuleBase::matrix>(HR_a2D_C.second), ik, box2);
 					else
-						HK_a2D = H_phase<Tmatrix>(std::forward<matrix>(HR_a2D_C.second), ik, box2);
+						HK_a2D = H_phase<Tmatrix>(std::forward<ModuleBase::matrix>(HR_a2D_C.second), ik, box2);
 				}
 
 				for(int iw1=0; iw1!=HK_a2D.nr; ++iw1)
@@ -133,20 +133,20 @@ Tmatrix Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D(
 
 template<typename Tmatrix>
 void Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D_mixing(
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &HR_a2D,
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &HR_a2D,
 	std::vector<Tmatrix> &HK_m2D,
 	std::vector<std::deque<Tmatrix>> &HK_m2D_pulay_seq) const
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D_mixing");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D_mixing");
 
 	HK_m2D.resize(GlobalC::kv.nks);
 	HK_m2D_pulay_seq.resize(GlobalC::kv.nks);
 	for( int ik=0; ik!=GlobalC::kv.nks; ++ik )
 	{
 //gettimeofday( &t_start, NULL);
-//			const std::map<size_t,std::map<size_t,matrix>> HK_a2D = R_to_K(HR_a2D[ik]);
+//			const std::map<size_t,std::map<size_t,ModuleBase::matrix>> HK_a2D = R_to_K(HR_a2D[ik]);
 //ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::Hexx::R_to_K\t"<<time_during(t_start)<<std::endl;
-//ofs_matrixes( exx_lcao.test_dir+"test-HK_a2D_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK), HK_a2D );
+//ofs_matrixes( exx_lcao.test_dir+"test-HK_a2D_"+ModuleBase::GlobalFunc::TO_STRING(ik)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK), HK_a2D );
 //gettimeofday( &t_start, NULL);
 		switch(mixing_mode)
 		{
@@ -163,18 +163,18 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D_mixing(
 				HK_m2D[ik] = pulay_mixing( HK_m2D[ik], HK_m2D_pulay_seq[ik], Ra2D_to_Km2D<Tmatrix>(HR_a2D, ik) );
 				break;
 			default:
-				throw std::domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	break;
+				throw std::domain_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));	break;
 		}
 //ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D\t"<<time_during(t_start)<<std::endl;
 	}
-//ofs_matrixes( exx_lcao.test_dir+"test-HK_m2D_"+TO_STRING(GlobalV::MY_RANK), HK_m2D );
+//ofs_matrixes( exx_lcao.test_dir+"test-HK_m2D_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK), HK_m2D );
 }
 
 template<typename Tmatrix>
 Tmatrix Exx_Abfs::Parallel::Communicate::Hexx::pulay_mixing(
 	const Tmatrix &H_pulay_old, std::deque<Tmatrix> &H_seq, const Tmatrix &H_new ) const
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::pulay_mixing");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::Hexx::pulay_mixing");
 
 	Tmatrix H_pulay;
 	if( 0==GlobalC::CHR.totstep )

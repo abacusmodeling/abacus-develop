@@ -4,6 +4,8 @@
 //==========================================================
 #include "memory.h"
 
+namespace ModuleBase
+{
 // 1024 bit  = 1 Byte
 // 1024 Byte = 1 KB
 // 1024 KB   = 1 MB
@@ -45,7 +47,7 @@ double Memory::calculate_mem(const long &n_in,const std::string &type)
 	double float_mem = float_memory * factor;
 	double short_mem = short_memory * factor;
 
-	if(type=="ComplexMatrix" || type=="complexmatrix" || type=="cdouble")
+	if(type=="ModuleBase::ComplexMatrix" || type=="complexmatrix" || type=="cdouble")
 	{
 		mem = complex_matrix_mem;
 	}
@@ -73,7 +75,7 @@ double Memory::calculate_mem(const long &n_in,const std::string &type)
 	{
 		mem =  int_mem * 2 + double_mem * 3;
 	}
-	else if(type=="Vector3<double>")
+	else if(type=="ModuleBase::Vector3<double>")
 	{
 		mem = 3 * double_mem;
 	}
@@ -212,4 +214,6 @@ void Memory::print_all(std::ofstream &ofs)
     ofs<<" ----------------------------------------------------------"<<std::endl;
 	delete[] print_flag; //mohan fix by valgrind at 2012-04-02
 	return;
+}
+
 }
