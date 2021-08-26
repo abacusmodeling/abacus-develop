@@ -22,16 +22,16 @@ FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
 ##============================
 ## DeePMD-kit (need by DPMD)
 ##============================
-DeeP_DIR = /home/dell/packages/DeePMD/deepmd_root
+DeeP_DIR = ${deepmd_root}
 #DeeP_DIR = /home/mohan/Liuyu/DeePMD/deepmd_gnu_root
 DeeP_INCLUDE_DIR = ${DeeP_DIR}/include
 DeeP_LIB_DIR = ${DeeP_DIR}/lib
-DeeP_LIB = -L${DeeP_LIB_DIR} -ldeepmd_cc -Wl,-rpath=${DeeP_LIB_DIR}
+DeeP_LIB = -L${DeeP_LIB_DIR} -ldeepmd_cc -ldeepmd_op -Wl,-rpath=${DeeP_LIB_DIR}
 
 ##============================
 ## TensorFlow (need by DPMD)
 ##============================
-TensorFlow_DIR = /home/dell/packages/TensorFlow/tensorflow_root
+TensorFlow_DIR = ${tensorflow_root}
 #TensorFlow_DIR = /home/mohan/Liuyu/soft/tensorflow/tensorflow_root
 TensorFlow_INCLUDE_DIR = ${TensorFlow_DIR}/include
 TensorFlow_LIB_DIR = ${TensorFlow_DIR}/lib
