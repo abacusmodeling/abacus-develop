@@ -24,6 +24,9 @@ tool_quit.o\
 tool_check.o\
 timer.o\
 mathzone_add1.o\
+global_variable.o\
+global_function.o\
+global_file.o\
 
 OBJS_ORBITAL=ORB_control.o\
 ORB_read.o\
@@ -36,4 +39,4 @@ ORB_table_beta.o\
 ORB_table_phi.o\
 ORB_table_alpha.o\
 ORB_gen_tables.o\
-
+ORB_unittest.o\
