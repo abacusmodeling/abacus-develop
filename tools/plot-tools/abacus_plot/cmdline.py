@@ -1,7 +1,7 @@
 '''
 Date: 2021-08-21 11:46:01
 LastEditors: jiyuyang
-LastEditTime: 2021-08-26 12:13:31
+LastEditTime: 2021-08-26 14:45:54
 Mail: jiyuyang@mail.ustc.edu.cn, 1041176461@qq.com
 '''
 
@@ -15,7 +15,7 @@ class Show:
     """Show auto-test information"""
 
     @classmethod
-    def show_bandinfo(cls, datafile: Union[PathLike, Sequence[PathLike]], kptfile: PathLike, efermi: Union[float, Sequence[float]] = None, energy_range: Sequence[float] = [], shift: bool = True, blabel: Union[str, Sequence[str]] = None, color: Union[str, Sequence[str]] = None, outfile: PathLike = "band.png"):
+    def show_bandinfo(cls, datafile: Union[PathLike, Sequence[PathLike]], kptfile: PathLike, efermi: Union[float, Sequence[float]] = None, energy_range: Sequence[float] = [], shift: bool = True, label: Union[str, Sequence[str]] = None, color: Union[str, Sequence[str]] = None, outfile: PathLike = "band.png"):
         """Show band structure information
 
         :params datafile: path of band date file 
@@ -23,7 +23,7 @@ class Show:
         :params efermi: Fermi levels in unit eV, its length equals to `filename`
         :params energy_range: range of energy to plot, its length equals to two
         :params shift: if sets True, it will calculate band gap. This parameter usually is suitable for semiconductor and insulator. Default: False
-        :params blabel: band labels, its length equals to `filename`.
+        :params label: band labels, its length equals to `filename`.
         :params color: band colors, its length equals to `filename`.
         :params outfile: band picture file name. Default: 'band.png'
         """
@@ -32,10 +32,10 @@ class Show:
 
         if isinstance(datafile, (str, PathLike)):
             BandPlot.singleplot(datafile, kptfile, efermi,
-                                energy_range, shift, blabel, color, outfile)
+                                energy_range, shift, label, color, outfile)
         elif isinstance(datafile, (list, tuple)):
             BandPlot.multiplot(datafile, kptfile, efermi,
-                               energy_range, shift, blabel, color, outfile)
+                               energy_range, shift, label, color, outfile)
 
     @classmethod
     def show_dosinfo(cls, tdosfile: PathLike = '', pdosfile: PathLike = '', efermi: float = 0, energy_range: Sequence[float] = [], dos_range: Sequence[float] = [], shift: bool = True, species: Union[Sequence[str], Dict[str, List[int]]] = [], tdosfig: PathLike = 'tdos.png', pdosfig: PathLike = 'pdos.png', prec: float = 0.01):
@@ -65,11 +65,11 @@ class Show:
             efermi = text.pop("efermi", 0.0)
             energy_range = text.pop("energy_range", [])
             shift = text.pop("shift", False)
-            blabel = text.pop("blabel", None)
+            label = text.pop("label", None)
             color = text.pop("color", None)
             outfile = text.pop("outfile", "band.png")
             cls.show_bandinfo(filename, kptfile, efermi,
-                              energy_range, shift, blabel, color, outfile)
+                              energy_range, shift, label, color, outfile)
 
         if args.dos:
             text = read_json(args.dos)
