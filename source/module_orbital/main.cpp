@@ -1,6 +1,8 @@
 //#include "timer.h"
 #include <ctime>
 #include "ORB_control.h"
+#include "ORB_unittest.h"
+#include "../module_base/global_variable.h"
 
 void calculate();
 
@@ -8,8 +10,6 @@ int main(int argc, char **argv)
 {
 
 	std::cout << "Hello, this is the ORB module of ABACUS." << std::endl;
-
-	std::cout << "Right now, the module is still empty, soon we will have more tests." << std::endl;
 
     calculate();
 
@@ -19,44 +19,35 @@ int main(int argc, char **argv)
 
 void calculate()
 {
+	GlobalV::ofs_running.open("log.txt");
+	GlobalV::ofs_warning.open("warning.txt");
+	GlobalV::BASIS_TYPE = "lcao";
+
+	test_orb test;
+
+	test.count_ntype();
+	test.set_files();
+/*
 	ORB_control ooo;
+	ooo.Read_Orbitals(
+	GlobalV::ofs_running,
+	test.ntype,
+	test.lmax,
+	test.out_descriptor,
+	test.out_r_matrix,
+	test.force_flag,
+	test.my_rank);
 
-	std::ofstream ofs("log.txt");
-
+*/
 //	ooo.set_orb_tables();
 
-	ofs.close();
 
 	std::cout << "--------------------" << std::endl;
 	std::cout << " Have a great day! " << std::endl;
 	std::cout << "--------------------" << std::endl;
 
-/*
-	time_t time_start = std::time(NULL);
-
-//	ModuleBase::timer::start();
-
-	//----------------------------------------------------------
-	// main program for doing electronic structure calculations
-	//----------------------------------------------------------
-//	Driver DD;
-//	DD.init();
-
-	time_t	time_finish= std::time(NULL);
-
-	// print out information before ABACUS ends
-	std::cout << "\n START  Time  : " << ctime(&time_start);
-	std::cout << " FINISH Time  : " << ctime(&time_finish);
-	std::cout << " TOTAL  Time  : " << difftime(time_finish, time_start) << std::endl;
-
-	double total_time = difftime(time_finish, time_start);
-	int hour = total_time / 3600;
-	int mins = ( total_time - 3600 * hour ) / 60;
-	int secs = total_time - 3600 * hour - 60 * mins ;
-	std::cout << " Total  Time  : " << hour << " h "
-	            << mins << " mins "
-	            << secs << " secs "<< std::endl;
-*/
+	GlobalV::ofs_running.close();
+	GlobalV::ofs_warning.close();
 
     return;
 }
