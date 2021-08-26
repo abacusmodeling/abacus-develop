@@ -1,7 +1,7 @@
 '''
 Date: 2021-08-18 11:05:00
 LastEditors: jiyuyang
-LastEditTime: 2021-08-21 21:31:47
+LastEditTime: 2021-08-26 12:07:08
 Mail: jiyuyang@mail.ustc.edu.cn, 1041176461@qq.com
 '''
 
@@ -150,17 +150,22 @@ class DosPlot:
         ax.legend()
 
     @classmethod
-    def _tplot(cls, res: tuple, efermi: float = 0, energy_range: Sequence[float] = [], dos_range: Sequence[float] = [], prec: float = 0.01):
+    def _tplot(cls, res: tuple, efermi: float = 0, energy_range: Sequence[float] = [], dos_range: Sequence[float] = [], shift: bool = False, prec: float = 0.01):
 
         fig, ax = plt.subplots()
 
         nsplit = len(res)
         if nsplit == 2:
             energy, dos = res
-            vb, cb = cls.set_vcband(
-                energy_minus_efermi(energy, efermi), dos, prec)
-            energy = np.concatenate((vb.band, cb.band))
-            ax.plot(energy, dos, lw=0.8, c='gray', linestyle='-', label='TDOS')
+            if shift:
+                vb, cb = cls.set_vcband(
+                    energy_minus_efermi(energy, efermi), dos, prec)
+                energy = np.concatenate((vb.band, cb.band))
+                ax.plot(energy, dos, lw=0.8, c='gray',
+                        linestyle='-', label='TDOS')
+            else:
+                ax.plot(energy_minus_efermi(energy, efermi), dos,
+                        lw=0.8, c='gray', linestyle='-', label='TDOS')
 
         elif nsplit == 3:
             energy, dos_up, dos_dw = res
@@ -184,7 +189,7 @@ class DosPlot:
         return res, nsplit
 
     @classmethod
-    def plot(cls, tdosfile: PathLike = '', pdosfile: PathLike = '', efermi: float = 0, energy_range: Sequence[float] = [], dos_range: Sequence[float] = [], species: Union[Sequence[str], Dict[str, List[int]], Dict[str, Dict[str, List[int]]]] = [], tdosfig: PathLike = 'tdos.png', pdosfig:  PathLike = 'pdos.png', prec: float = 0.01):
+    def plot(cls, tdosfile: PathLike = '', pdosfile: PathLike = '', efermi: float = 0, energy_range: Sequence[float] = [], dos_range: Sequence[float] = [], shift: bool = False, species: Union[Sequence[str], Dict[str, List[int]], Dict[str, Dict[str, List[int]]]] = [], tdosfig: PathLike = 'tdos.png', pdosfig:  PathLike = 'pdos.png', prec: float = 0.01):
         """Plot total dos or partial dos, if both `tdosfile` and `pdosfile` set, it will ony read `tdosfile`
 
         :params tdosfile: string of TDOS data file
@@ -192,6 +197,7 @@ class DosPlot:
         :params efermi: Fermi level in unit eV
         :params energy_range: range of energy to plot, its length equals to two
         :params dos_range: range of dos to plot, its length equals to two
+        :params shift: if sets True, it will calculate band gap. This parameter usually is suitable for semiconductor and insulator. Default: False
         :params species: list of atomic species or dict of atomic species and its angular momentum list
         :params prec: dos below this value thought to be zero. Default: 0.01
         """
@@ -200,7 +206,7 @@ class DosPlot:
 
         if tdosfile:
             ax, energy_range, dos_range = cls._tplot(
-                res, efermi, energy_range, dos_range, prec)
+                res, efermi, energy_range, dos_range, shift, prec)
             cls._set_figure(ax, energy_range, dos_range)
             plt.savefig(tdosfig)
 
@@ -217,17 +223,20 @@ class DosPlot:
 
             # TDOS
             dos, nsplit = cls._all_sum(orbitals)
-            vb, cb = cls.set_vcband(
-                energy_minus_efermi(energy, efermi), dos, prec)
-            cls.info(vb, cb)
-            energy_f = np.concatenate((vb.band, cb.band))
+            if shift:
+                vb, cb = cls.set_vcband(
+                    energy_minus_efermi(energy, efermi), dos, prec)
+                cls.info(vb, cb)
+                energy_f = np.concatenate((vb.band, cb.band))
+            else:
+                energy_f = energy_minus_efermi(energy, efermi)
             if nsplit == 1:
                 ax, energy_range, dos_range = cls._tplot(
-                    (energy, dos), efermi, energy_range, dos_range, prec)
+                    (energy, dos), efermi, energy_range, dos_range, shift, prec)
             elif nsplit == 2:
                 dos_up, dos_dw = np.split(dos, nsplit, axis=1)
                 ax, energy_range, dos_range = cls._tplot(
-                    (energy, dos_up, dos_dw), efermi, energy_range, dos_range, prec)
+                    (energy, dos_up, dos_dw), efermi, energy_range, dos_range, shift, prec)
             for elem in elements:
                 dos = np.zeros_like(orbitals[0]["data"], dtype=np.float32)
                 for orb in orbitals:
