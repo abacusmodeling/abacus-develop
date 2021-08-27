@@ -54,10 +54,6 @@ find_package(MPI REQUIRED)
 find_package(Threads REQUIRED)
 find_package(OpenMP REQUIRED)
 
-if(DEFINED MKL_DIR)
-  set(MKL_DIR_CACHE "${MKL_DIR}")
-endif()
-
 include(FetchContent)
 
 include_directories(
@@ -96,7 +92,8 @@ if(ENABLE_LIBXC)
   endif()
 endif()
 
-if(DEFINED MKL_DIR_CACHE)
+if(DEFINED ENV{MKLROOT})
+  set(MKLROOT "$ENV{MKLROOT}")
   find_package(IntelMKL REQUIRED)
   add_definitions(-D__MKL -DMKL_ILP64)
   include_directories(${MKL_INCLUDE_DIRS} ${MKL_INCLUDE_DIRS}/fftw)
@@ -153,7 +150,7 @@ target_link_libraries(${ABACUS_BIN_NAME}
     Threads::Threads
 )
 
-if(DEFINED MKL_DIR_CACHE)
+if(DEFINED MKLROOT)
   target_link_libraries(${ABACUS_BIN_NAME}
     -lifcore
     IntelMKL::MKL
