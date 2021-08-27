@@ -255,7 +255,7 @@ int Pseudopot_upf::average_p(const double& lambda)
 		}
 
 		this->nwfc = new_nwfc;
-		int old_nwfc=0;
+		int old_nwfc=-1;
 		for(int nb=0; nb<this->nwfc; nb++)
 		{
 			old_nwfc++;
