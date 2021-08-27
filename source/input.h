@@ -50,6 +50,7 @@ class Input
 	bool set_vel;           // read velocity from STRU or not  liuyu 2021-07-14
 
     bool symmetry;			// turn on symmetry or not
+    double symmetry_prec;   // LiuXh add 2021-08-12, accuracy for symmetry
 	int npool; 				// ecch pool is for one k point
 
     bool berry_phase;		// berry phase calculation

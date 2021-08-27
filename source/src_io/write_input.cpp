@@ -36,6 +36,7 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"nche_sto",nche_sto,"number of orders for Chebyshev expansion in stochastic DFT");
 	ModuleBase::GlobalFunc::OUTP(ofs,"symmetry",symmetry,"turn symmetry on or off");	
 	ModuleBase::GlobalFunc::OUTP(ofs,"set_vel",set_vel,"read velocity from STRU or not");
+	ModuleBase::GlobalFunc::OUTP(ofs,"symmetry_prec",symmetry_prec,"accuracy for symmetry"); // LiuXh add 2021-08-12, accuracy for symmetry
 	ModuleBase::GlobalFunc::OUTP(ofs,"nelec",nelec,"input number of electrons");
 	ModuleBase::GlobalFunc::OUTP(ofs,"tot_magnetization",tot_magnetization,"total magnetization of the system");
 
