@@ -16,7 +16,7 @@ option(ENABLE_LIBXC "Enable LibXC functionality" OFF)
 option(USE_CUDA "Enable support to CUDA." OFF)
 
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
-option(BUILD_UNIT_TESTS "Build ABACUS unit tests" ON)
+option(BUILD_TESTING "Build ABACUS unit tests" ON)
 option(GENERATE_TEST_REPORTS "Enable test report generation" OFF)
 
 include(CheckLanguage)
