@@ -606,6 +606,12 @@ void ORB_table_phi::init_Table(
 										break;
 									}
 								}
+/*
+								std::stringstream ss;
+								ss << "Table_SR0/"<<Tpair<<Opair<<L<<".dat";
+								std::string filename = ss.str();
+								plot_table(filename,rmesh,Table_SR[0][Tpair][Opair][L]);
+*/
 							}//end m
 						}
 					}//end jl
@@ -910,3 +916,18 @@ void ORB_table_phi::init_Table_Spherical_Bessel (
 //	OUT(GlobalV::ofs_running,"Rmesh",Rmesh);
 	ModuleBase::Memory::record ("ORB_table_phi", "Jl(x)", (Lmax_used+1) * this->kmesh * this->Rmesh, "double");
 }
+
+void ORB_table_phi::plot_table(
+	const std::string filename,
+	const int rmesh,
+	double* &column)
+{
+	std::ofstream ofs;
+	ofs.open(filename.c_str());
+	ofs << "ir    table_entry" << std::endl;
+	for(int ir=0;ir<rmesh;ir++)
+	{
+		ofs<<setw(4) << ir << "  " << column[ir]<<std::endl;
+	}
+}
+

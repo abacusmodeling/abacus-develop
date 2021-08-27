@@ -70,6 +70,12 @@ class ORB_table_phi
 		const int &Lmax_exx,
 		const LCAO_Orbitals &orb);
 
+	//Wenfei 2021-8-26, plot table elements against R
+	void plot_table(
+		const std::string filename,
+		const int rmesh,
+		double* &column);
+
 	// Peize Lin add 2017-04-24, and change all jlx in this class
 	ModuleBase::Sph_Bessel_Recursive::D2* pSB = nullptr;
 
