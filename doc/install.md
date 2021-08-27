@@ -15,8 +15,8 @@
 
   [back to main page](../README.md)
 
-
 # Structure of the package
+
 Under the ABACUS directory, there are the following subdirectories:
 
 - cmake/
@@ -41,7 +41,9 @@ Under the ABACUS directory, there are the following subdirectories:
 [back to top](#download-and-install)
 
 ## Structure of source code
+
 The source directory further contains the following folders, where the source files of ABACUS are located:
+
 - module_base
 - module_cell
 - module_grid
@@ -100,11 +102,11 @@ cmake -B build -DCMAKE_INSTALL_PREFIX=${ABACUS_BIN_PATH}
 ```
 
 You can provide path of each dependent package if the package cannot be automatically found by cmake.
-Keys `LAPACK_DIR`, `SCALAPACK_DIR`, `ELPA_DIR`, `FFTW3_DIR`, `CEREAL_INCLUDEDIR`, `BOOST_INCLUDEDIR`, `MPI_CXX_COMPILER` and `MKLROOT` are currently available to specify.
+Keys `LAPACK_DIR`, `SCALAPACK_DIR`, `ELPA_DIR`, `FFTW3_DIR`, `CEREAL_INCLUDEDIR`, `MPI_CXX_COMPILER` and `MKLROOT` are currently available to specify.
 For example:
 
 ```bash
-cmake -B build -DFFTW3_ROOT=/opt/fftw3 -DBOOST_INCLUDEDIR=/usr/include/boost
+cmake -B build -DFFTW3_ROOT=/opt/fftw3
 ```
 
 If environment variable `MKLROOT` exists, `cmake` will take MKL as a preference, i.e. not using `LAPACK` and `ScaLAPACK`. To disable MKL, unset environment variable `MKLROOT`, or pass `-DMKLROOT=OFF` to `cmake`.
@@ -120,7 +122,6 @@ If Libxc is not installed in standard path (i.e. installed with a custom prefix 
 ```bash
 cmake -B build -DLibxc_DIR=~/libxc
 ```
-
 
 #### Build and Install
 
@@ -240,13 +241,12 @@ HONG=${HONG_MPI_SELINV_20210523}
 
 [back to top](#download-and-install)
 
-
-
 # Installation with DeePKS
 
 This part of installation is based on [Installation](#installation). If DeePKS feature is requied for [DeePKS-kit](https://github.com/deepmodeling/deepks-kit), the following prerequisites and steps are needed:
 
 ## Extra prerequisites
+
 - C++ compiler, supporting **C++14**. For example, Intel C++ compiler 18
 - [LibTorch](https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.9.0%2Bcpu.zip) for cpu, with c++11 ABI;
 - [Libnpy](https://github.com.cnpmjs.org/llohse/libnpy/);
@@ -255,24 +255,27 @@ This part of installation is based on [Installation](#installation). If DeePKS f
 
 ### Using Cmake
 
-```
+```bash
 cmake -B build -DENABLE_DEEPKS=1
 ```
 
 ### Using Makefile
+
 Set `LIBTORCH_DIR`and `LIBNPY_DIR`in `Makefile.vars`. For example:
 
-```
+```Makefile
 LIBTORCH_DIR = /opt/libtorch/
 LIBNPY_DIR = /opt/libnpy/
 ```
 
 In `Makefile.system`, add `LIBTORCH_LIB` to  `LIBS`, then set `-std=c++14` in `OPTS`:
-```
-LIBS = -lifcore -lm -lpthread ${LIBTORCH_LIB} ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB}	#for DeePKS
+
+```Makefile
+LIBS = -lifcore -lm -lpthread ${LIBTORCH_LIB} ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB} # for DeePKS
 #LIBS = -lifcore -lm -lpthread ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB}
 ```
-```
+
+```Makefile
 OPTS = ${INCLUDES} -Ofast -traceback -std=c++14 -simd -march=native -xHost -m64 -qopenmp -Werror -Wall -pedantic -g
 ```
 
@@ -292,8 +295,10 @@ OPTS = ${INCLUDES} -Ofast -traceback -std=c++14 -simd -march=native -xHost -m64 
 - src_pdiag
 - src_pw
 - src_ri
+
 In `Makefile`, set the Macro as `HONG_DEEPKS`:
-```
+
+```Makefile
 #!!!!!!!!!!!!!!!!!!!! CHANE HERE IF YOU LIKE !!!!!!!!!!!!!!
 #! change series version or parallel version~~~
 #HONG=${HONG_MPI_SELINV_20210523}
