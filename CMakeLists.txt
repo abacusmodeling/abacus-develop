@@ -96,14 +96,16 @@ if(DEFINED ENV{MKLROOT} OR DEFINED MKLROOT)
   if(NOT DEFINED MKLROOT)
     set(MKLROOT "$ENV{MKLROOT}")
   endif()
-  find_package(IntelMKL REQUIRED)
-  add_definitions(-D__MKL -DMKL_ILP64)
-  include_directories(${MKL_INCLUDE_DIRS} ${MKL_INCLUDE_DIRS}/fftw)
-else()
-  find_package(FFTW3 REQUIRED)
-  find_package(LAPACK REQUIRED)
-  find_package(ScaLAPACK REQUIRED)
-  include_directories(${FFTW3_INCLUDE_DIRS})
+  if(MKLROOT)
+    find_package(IntelMKL REQUIRED)
+    add_definitions(-D__MKL -DMKL_ILP64)
+    include_directories(${MKL_INCLUDE_DIRS} ${MKL_INCLUDE_DIRS}/fftw)
+  else()
+    find_package(FFTW3 REQUIRED)
+    find_package(LAPACK REQUIRED)
+    find_package(ScaLAPACK REQUIRED)
+    include_directories(${FFTW3_INCLUDE_DIRS})
+  endif()
 endif()
 
 add_compile_definitions(
@@ -152,7 +154,7 @@ target_link_libraries(${ABACUS_BIN_NAME}
     Threads::Threads
 )
 
-if(DEFINED MKLROOT)
+if(MKLROOT)
   target_link_libraries(${ABACUS_BIN_NAME}
     -lifcore
     IntelMKL::MKL
