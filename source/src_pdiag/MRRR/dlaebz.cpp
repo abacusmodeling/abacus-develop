@@ -97,7 +97,7 @@ int pdlaebz(int *ijob, int *nitmax, int *n, int *mmax, int *minp, int *nbmin,
 
 	/*  NBMIN   (input) int */
 	/*          The smallest number of intervals that should be processed */
-	/*          using a vector loop.  If zero, then only the scalar loop */
+	/*          using a std::vector loop.  If zero, then only the scalar loop */
 	/*          will be used. */
 
 	/*  ABSTOL  (input) DOUBLE PRECISION */

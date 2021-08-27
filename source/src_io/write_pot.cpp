@@ -5,12 +5,12 @@
 void Potential::write_potential(
 	const int &is, 
 	const int &iter, 
-	const string &fn, 
-	const matrix &v, 
+	const std::string &fn, 
+	const ModuleBase::matrix &v, 
 	const int &precision, 
 	const int &hartree)const
 {
-    TITLE("potential","write_potential");
+    ModuleBase::TITLE("potential","write_potential");
 
     if(out_potential==0) 
     {
@@ -24,31 +24,31 @@ void Potential::write_potential(
     {
         return;
     }
-    timer::tick("potential","write_potential");
+    ModuleBase::timer::tick("potential","write_potential");
 
-    ofstream ofs;
+    std::ofstream ofs;
 
     if(GlobalV::MY_RANK==0)
     {
         ofs.open( fn.c_str() );
 
-        ofs << GlobalC::ucell.latName << endl;//1
-        ofs << " " << GlobalC::ucell.lat0 * 0.529177 << endl;
-        ofs << " " << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << endl;
-        ofs << " " << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << endl;
-        ofs << " " << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << endl;
+        ofs << GlobalC::ucell.latName << std::endl;//1
+        ofs << " " << GlobalC::ucell.lat0 * 0.529177 << std::endl;
+        ofs << " " << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << std::endl;
+        ofs << " " << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << std::endl;
+        ofs << " " << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << std::endl;
 
         for(int it=0; it<GlobalC::ucell.ntype; it++)
         {
             ofs << " " << GlobalC::ucell.atoms[it].label;
         }
-        ofs << endl;
+        ofs << std::endl;
         for(int it=0; it<GlobalC::ucell.ntype; it++)
         {
             ofs << " " << GlobalC::ucell.atoms[it].na;
         }
-        ofs << endl;
-        ofs << "Direct" << endl;
+        ofs << std::endl;
+        ofs << "Direct" << std::endl;
 
         for(int it=0; it<GlobalC::ucell.ntype; it++)
         {
@@ -56,15 +56,15 @@ void Potential::write_potential(
             {
                 ofs << " " << GlobalC::ucell.atoms[it].taud[ia].x
                     << " " << GlobalC::ucell.atoms[it].taud[ia].y
-                    << " " << GlobalC::ucell.atoms[it].taud[ia].z << endl;
+                    << " " << GlobalC::ucell.atoms[it].taud[ia].z << std::endl;
             }
         }
         ofs << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz;
-        ofs << setprecision(precision);
+        ofs << std::setprecision(precision);
         ofs << scientific; 
         if(!ofs)
         {
-            WARNING("potential::write_potential","Can't create VHartree File!");
+            ModuleBase::WARNING("potential::write_potential","Can't create VHartree File!");
         }
     }	
 
@@ -95,7 +95,7 @@ void Potential::write_potential(
     {
         // num_z: how many planes on processor 'ip'
         int *num_z = new int[GlobalV::NPROC_IN_POOL];
-        ZEROS(num_z, GlobalV::NPROC_IN_POOL);
+        ModuleBase::GlobalFunc::ZEROS(num_z, GlobalV::NPROC_IN_POOL);
         for (int iz=0;iz<GlobalC::pw.ncz;iz++)
         {
             int ip = iz % GlobalV::NPROC_IN_POOL;
@@ -105,7 +105,7 @@ void Potential::write_potential(
         // start_z: start position of z in
         // processor ip.
         int *start_z = new int[GlobalV::NPROC_IN_POOL];
-        ZEROS(start_z, GlobalV::NPROC_IN_POOL);
+        ModuleBase::GlobalFunc::ZEROS(start_z, GlobalV::NPROC_IN_POOL);
         for (int ip=1;ip<GlobalV::NPROC_IN_POOL;ip++)
         {
             start_z[ip] = start_z[ip-1]+num_z[ip-1];
@@ -113,7 +113,7 @@ void Potential::write_potential(
 
         // which_ip: found iz belongs to which ip.
         int *which_ip = new int[GlobalC::pw.ncz];
-        ZEROS(which_ip, GlobalC::pw.ncz);
+        ModuleBase::GlobalFunc::ZEROS(which_ip, GlobalC::pw.ncz);
         for(int iz=0; iz<GlobalC::pw.ncz; iz++)
         {
             for(int ip=0; ip<GlobalV::NPROC_IN_POOL; ip++)
@@ -139,7 +139,7 @@ void Potential::write_potential(
         {
             //GlobalV::ofs_running << "\n" << iz << " iz"; //LiuXh modify 20200624
             // tag must be different for different iz.
-            ZEROS(zpiece, nxy);
+            ModuleBase::GlobalFunc::ZEROS(zpiece, nxy);
             int tag = iz;
             MPI_Status ierror;
 
@@ -191,22 +191,22 @@ void Potential::write_potential(
     MPI_Barrier(MPI_COMM_WORLD);
 #endif
     if(GlobalV::MY_RANK==0) ofs.close();
-    timer::tick("potential","write_potential");
+    ModuleBase::timer::tick("potential","write_potential");
     return;
 }
 
 
-void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
+void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_ave)
 {
-    TITLE("Potential","write_elecstat_pot");
-    timer::tick("Potential","write_elecstat_pot");
+    ModuleBase::TITLE("Potential","write_elecstat_pot");
+    ModuleBase::timer::tick("Potential","write_elecstat_pot");
 
     double *v_elecstat;
     v_elecstat = new double[GlobalC::pw.nrxx];
-    ZEROS(v_elecstat, GlobalC::pw.nrxx);
+    ModuleBase::GlobalFunc::ZEROS(v_elecstat, GlobalC::pw.nrxx);
 
-    complex<double> *Porter = GlobalC::UFFT.porter;
-    ZEROS( Porter, GlobalC::pw.nrxx );
+    std::complex<double> *Porter = GlobalC::UFFT.porter;
+    ModuleBase::GlobalFunc::ZEROS( Porter, GlobalC::pw.nrxx );
     
     int nspin0 = 1;
     if(GlobalV::NSPIN==2) nspin0 = GlobalV::NSPIN;
@@ -214,7 +214,7 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
     {
         for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
         {
-            Porter[ir] += complex<double>( GlobalC::CHR.rho[is][ir], 0.0 );
+            Porter[ir] += std::complex<double>( GlobalC::CHR.rho[is][ir], 0.0 );
         }
     }
 
@@ -226,20 +226,20 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
     //=======================================================
     // calculate hartree potential in G-space (NB: V(G=0)=0 )
     //=======================================================
-    complex<double> *vh_g  = new complex<double>[GlobalC::pw.ngmc];
-    ZEROS(vh_g, GlobalC::pw.ngmc);
+    std::complex<double> *vh_g  = new std::complex<double>[GlobalC::pw.ngmc];
+    ModuleBase::GlobalFunc::ZEROS(vh_g, GlobalC::pw.ngmc);
 
     for(int ig = GlobalC::pw.gstart; ig<GlobalC::pw.ngmc; ig++)
     {
         const int j = GlobalC::pw.ig2fftc[ig];
         if(GlobalC::pw.gg[ig] >= 1.0e-12) //LiuXh 20180410
         {
-            const double fac = e2 * FOUR_PI / (GlobalC::ucell.tpiba2 * GlobalC::pw.gg [ig]);
+            const double fac = ModuleBase::e2 * ModuleBase::FOUR_PI / (GlobalC::ucell.tpiba2 * GlobalC::pw.gg [ig]);
             vh_g[ig] = fac * Porter[j];
         }
     }
 
-    ZEROS(Porter, GlobalC::pw.nrxx);
+    ModuleBase::GlobalFunc::ZEROS(Porter, GlobalC::pw.nrxx);
 
     for (int ig = 0;ig < GlobalC::pw.ngmc;ig++)
     {
@@ -261,43 +261,43 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
     //-------------------------------------------
     // output the electrostatic potential into a file.
     //-------------------------------------------
-    ofstream ofs;
-    ofstream ofs_ave;
+    std::ofstream ofs;
+    std::ofstream ofs_ave;
 
     if(GlobalV::MY_RANK==0)
     {
         ofs.open( fn.c_str() );
         ofs_ave.open( fn_ave.c_str() );
 
-        ofs << GlobalC::ucell.latName << endl;//1
-        ofs << " " << GlobalC::ucell.lat0 * 0.529177 << endl;
-        ofs << " " << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << endl;
-        ofs << " " << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << endl;
-        ofs << " " << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << endl;
+        ofs << GlobalC::ucell.latName << std::endl;//1
+        ofs << " " << GlobalC::ucell.lat0 * 0.529177 << std::endl;
+        ofs << " " << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << std::endl;
+        ofs << " " << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << std::endl;
+        ofs << " " << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << std::endl;
 
-        ofs_ave << GlobalC::ucell.latName << endl;//1
-        ofs_ave << " " << GlobalC::ucell.lat0 * 0.529177 << endl;
-        ofs_ave << " " << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << endl;
-        ofs_ave << " " << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << endl;
-        ofs_ave << " " << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << endl;
+        ofs_ave << GlobalC::ucell.latName << std::endl;//1
+        ofs_ave << " " << GlobalC::ucell.lat0 * 0.529177 << std::endl;
+        ofs_ave << " " << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << std::endl;
+        ofs_ave << " " << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << std::endl;
+        ofs_ave << " " << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << std::endl;
 
         for(int it=0; it<GlobalC::ucell.ntype; it++)
         {
             ofs << " " << GlobalC::ucell.atoms[it].label;
             ofs_ave << " " << GlobalC::ucell.atoms[it].label;
         }
-        ofs << endl;
-        ofs_ave << endl;
+        ofs << std::endl;
+        ofs_ave << std::endl;
         for(int it=0; it<GlobalC::ucell.ntype; it++)
         {
             ofs << " " << GlobalC::ucell.atoms[it].na;
             ofs_ave << " " << GlobalC::ucell.atoms[it].na;
         }
-        ofs << endl;
-        ofs << "Direct" << endl;
+        ofs << std::endl;
+        ofs << "Direct" << std::endl;
 
-        ofs_ave << endl;
-        ofs_ave << "Direct" << endl;
+        ofs_ave << std::endl;
+        ofs_ave << "Direct" << std::endl;
 
         for(int it=0; it<GlobalC::ucell.ntype; it++)
         {
@@ -305,11 +305,11 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
             {
                 ofs << " " << GlobalC::ucell.atoms[it].taud[ia].x
                     << " " << GlobalC::ucell.atoms[it].taud[ia].y
-                    << " " << GlobalC::ucell.atoms[it].taud[ia].z << endl;
+                    << " " << GlobalC::ucell.atoms[it].taud[ia].z << std::endl;
 
                 ofs_ave << " " << GlobalC::ucell.atoms[it].taud[ia].x
                     << " " << GlobalC::ucell.atoms[it].taud[ia].y
-                    << " " << GlobalC::ucell.atoms[it].taud[ia].z << endl;
+                    << " " << GlobalC::ucell.atoms[it].taud[ia].z << std::endl;
             }
         }
 
@@ -317,13 +317,13 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
         ofs_ave << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz;
 
         int precision = 9;
-        ofs << setprecision(precision);
+        ofs << std::setprecision(precision);
         ofs << scientific; 
-        ofs_ave << setprecision(precision);
+        ofs_ave << std::setprecision(precision);
         ofs_ave << scientific; 
         if(!ofs)
         {
-            WARNING("potential::write_potential","Can't create VHartree File!");
+            ModuleBase::WARNING("potential::write_potential","Can't create VHartree File!");
         }
     }	
 
@@ -357,7 +357,7 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
     {
         // num_z: how many planes on processor 'ip'
         int *num_z = new int[GlobalV::NPROC_IN_POOL];
-        ZEROS(num_z, GlobalV::NPROC_IN_POOL);
+        ModuleBase::GlobalFunc::ZEROS(num_z, GlobalV::NPROC_IN_POOL);
         //for (int iz=0;iz<GlobalC::pw.ncz;iz++)
         //{
         //    int ip = iz % GlobalV::NPROC_IN_POOL;
@@ -372,7 +372,7 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
         // start_z: start position of z in
         // processor ip.
         int *start_z = new int[GlobalV::NPROC_IN_POOL];
-        ZEROS(start_z, GlobalV::NPROC_IN_POOL);
+        ModuleBase::GlobalFunc::ZEROS(start_z, GlobalV::NPROC_IN_POOL);
         for (int ip=1;ip<GlobalV::NPROC_IN_POOL;ip++)
         {
             start_z[ip] = start_z[ip-1]+num_z[ip-1];
@@ -380,7 +380,7 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
 
         // which_ip: found iz belongs to which ip.
         int *which_ip = new int[GlobalC::pw.ncz];
-        ZEROS(which_ip, GlobalC::pw.ncz);
+        ModuleBase::GlobalFunc::ZEROS(which_ip, GlobalC::pw.ncz);
         for(int iz=0; iz<GlobalC::pw.ncz; iz++)
         {
             for(int ip=0; ip<GlobalV::NPROC_IN_POOL; ip++)
@@ -406,7 +406,7 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
         {
             //GlobalV::ofs_running << "\n" << iz << " iz";
             // tag must be different for different iz.
-            ZEROS(zpiece, nxy);
+            ModuleBase::GlobalFunc::ZEROS(zpiece, nxy);
             int tag = iz;
             MPI_Status ierror;
 
@@ -449,7 +449,7 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
                     //if(count%8==0) ofs << "\n";
                     if(count%5==0) ofs << "\n";
                     //ofs << " " << zpiece[ir];
-                    ofs << setw(17) << zpiece[ir];
+                    ofs << std::setw(17) << zpiece[ir];
                     ave += zpiece[ir];
                     ++count;
                 }
@@ -462,7 +462,7 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
                         //if(count%8==0) ofs << "\n";
                         if(count%5==0) ofs << "\n";
                         //ofs << " " << zpiece[ir];
-                        ofs << setw(17) << zpiece[ix*GlobalC::pw.ncy+iy];
+                        ofs << std::setw(17) << zpiece[ix*GlobalC::pw.ncy+iy];
                         ave += zpiece[ix*GlobalC::pw.ncy+iy];
                         ++count;
                     }
@@ -483,6 +483,6 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
     delete[] v_elecstat;
     delete[] vh_g;
 
-    timer::tick("Potential","write_potential");
+    ModuleBase::timer::tick("Potential","write_potential");
     return;
 }

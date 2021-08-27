@@ -1,5 +1,8 @@
 #include "inverse_matrix.h"
 
+namespace ModuleBase
+{
+
 Inverse_Matrix_Complex::Inverse_Matrix_Complex()
 {
 	allocate=false;	
@@ -17,7 +20,7 @@ Inverse_Matrix_Complex::~Inverse_Matrix_Complex()
 
 void Inverse_Matrix_Complex::init(const int &dim_in)
 {
-//	GlobalV::ofs_running << " allocate=" << allocate << endl;
+//	GlobalV::ofs_running << " allocate=" << allocate << std::endl;
 	if(allocate)
 	{
 		delete[] e; //mohan fix bug 2012-04-02
@@ -33,7 +36,7 @@ void Inverse_Matrix_Complex::init(const int &dim_in)
 	this->lwork = 2*dim;
 
 	assert(lwork>0);
-	this->work2 = new complex<double>[lwork];
+	this->work2 = new std::complex<double>[lwork];
 
 	assert(3*dim-2>0);
 	this->rwork = new double[3*dim-2];
@@ -46,9 +49,9 @@ void Inverse_Matrix_Complex::init(const int &dim_in)
 	return;
 }
 
-void Inverse_Matrix_Complex::using_zheev( const ComplexMatrix &Sin, ComplexMatrix &Sout)
+void Inverse_Matrix_Complex::using_zheev( const ModuleBase::ComplexMatrix &Sin, ModuleBase::ComplexMatrix &Sout)
 {
-	timer::tick("Inverse","using_zheev");
+	ModuleBase::timer::tick("Inverse","using_zheev");
 	this->A = Sin;
 
     //LapackConnector::zhegv( 1, 'V', 'U', nwan , A ,  nwan , B , nwan , e, work2 , 80 , rwork , &info );
@@ -63,13 +66,13 @@ void Inverse_Matrix_Complex::using_zheev( const ComplexMatrix &Sin, ComplexMatri
 	}
 
     Sout = this->A * this->EA;
-	timer::tick("Inverse","using_zheev");
+	ModuleBase::timer::tick("Inverse","using_zheev");
     return;
 }
 
-void Inverse_Matrix_Complex::using_zpotrf( const ComplexMatrix &Sin)
+void Inverse_Matrix_Complex::using_zpotrf( const ModuleBase::ComplexMatrix &Sin)
 {
-//	timer::tick("Inverse","using_zpotrf");
+//	ModuleBase::timer::tick("Inverse","using_zpotrf");
 
 	for(int i=0; i<dim; i++)
 	{
@@ -83,18 +86,18 @@ void Inverse_Matrix_Complex::using_zpotrf( const ComplexMatrix &Sin)
 
 	if(info!=0)
 	{
-		cout << "\n info_zpotrf = " << info;
-		QUIT();
+		std::cout << "\n info_zpotrf = " << info;
+		ModuleBase::QUIT();
 	}
 	
 	LapackConnector::zpotri('U',dim,A,dim,&info);
 	
 	if(info!=0)
 	{
-		cout << "\n info_zpotri = " << info;
-		QUIT();
+		std::cout << "\n info_zpotri = " << info;
+		ModuleBase::QUIT();
 	}
-//	timer::tick("Inverse","using_zpotrf");
+//	ModuleBase::timer::tick("Inverse","using_zpotrf");
 	return;
 }
 
@@ -102,8 +105,10 @@ int Inverse_Matrix_Real::using_spotri(matrix &A, const int dim)
 {
 	int info = 0;
 	LapackConnector::spotrf('U',dim,A,dim,&info);
-	cout << "\n info_spotrf = " << info;
+	std::cout << "\n info_spotrf = " << info;
 	LapackConnector::spotri('U',dim,A,dim,&info);
-	cout << "\n info_spotri = " << info;
+	std::cout << "\n info_spotri = " << info;
 	return info;
+}
+
 }

@@ -4,11 +4,13 @@
 #include <cstdlib>
 #include "intarray.h"
 
+namespace ModuleBase
+{
 int IntArray::arrayCount = 0;
 
 void IntArrayAlloc()
 {
-	cout << "\n Allocation error for IntArray " << endl;
+	std::cout << "\n Allocation error for IntArray " << std::endl;
 	exit(0);
 }
 
@@ -274,4 +276,6 @@ void IntArray::zero_out(void)
 	if (size <= 0) return;
 	for (int i = 0;i < size; i++) ptr[i] = 0;
 	return;
+}
+
 }

@@ -27,8 +27,8 @@ class BFGS_Basic
 	void reset_hessian(void);
 	void save_bfgs(void);
 
-	double* pos; // vector containing 3N coordinates of the system ( x )
-	double* grad; //vector containing 3N components of ( grad( V(x) ) )
+	double* pos; // std::vector containing 3N coordinates of the system ( x )
+	double* grad; //std::vector containing 3N components of ( grad( V(x) ) )
 	double* move; // pos = pos_p + move.
 
 	double* pos_p; // p: previous
@@ -51,7 +51,7 @@ class BFGS_Basic
 	private:
 
 	bool wolfe_flag;
-	matrix inv_hess;
+	ModuleBase::matrix inv_hess;
 
 	int bfgs_ndim;
 

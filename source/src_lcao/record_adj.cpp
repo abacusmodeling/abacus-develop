@@ -29,25 +29,25 @@ void Record_adj::delete_grid(void)
 #include "LCAO_nnr.h"
 void Record_adj::for_2d(void)
 {
-	TITLE("Record_adj","for_2d");
-	timer::tick("Record_adj","for_2d");
+	ModuleBase::TITLE("Record_adj","for_2d");
+	ModuleBase::timer::tick("Record_adj","for_2d");
 
 	assert(GlobalC::ucell.nat>0);
 
 	// (1) find the adjacent atoms of atom[T1,I1];
-	Vector3<double> tau1, tau2, dtau;
-	Vector3<double> dtau1, dtau2, tau0;
+	ModuleBase::Vector3<double> tau1, tau2, dtau;
+	ModuleBase::Vector3<double> dtau1, dtau2, tau0;
 
 	this->na_proc = GlobalC::ucell.nat;
 
 	// number of adjacents for each atom.	
 	this->na_each = new int[na_proc];
-	ZEROS(na_each, na_proc);
+	ModuleBase::GlobalFunc::ZEROS(na_each, na_proc);
 	int iat = 0;
 	int irr = 0;
 
 	
-//	cout << " in for_2d" << endl;
+//	std::cout << " in for_2d" << std::endl;
 
 	for (int T1 = 0; T1 < GlobalC::ucell.ntype; ++T1)
 	{
@@ -127,8 +127,8 @@ void Record_adj::for_2d(void)
 	}//end T1
 
  	//xiaohui add "OUT_LEVEL", 2015-09-16
-	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"irr",irr);
-	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"GlobalC::LNNR.nnr",GlobalC::LNNR.nnr);
+	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"irr",irr);
+	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"GlobalC::LNNR.nnr",GlobalC::LNNR.nnr);
 
 
 
@@ -138,7 +138,7 @@ void Record_adj::for_2d(void)
 	this->info = new int**[na_proc];
 	for(int i=0; i<na_proc; i++)
 	{
-//		GlobalV::ofs_running << " atom" << setw(5) << i << setw(10) << na_each[i] << endl;
+//		GlobalV::ofs_running << " atom" << std::setw(5) << i << std::setw(10) << na_each[i] << std::endl;
 		if( na_each[i] > 0)
 		{
 			info[i] = new int*[ na_each[i] ];
@@ -146,7 +146,7 @@ void Record_adj::for_2d(void)
 			{
 				// (Rx, Ry, Rz, T, I)
 				info[i][j] = new int[5];
-				ZEROS(info[i][j],5);
+				ModuleBase::GlobalFunc::ZEROS(info[i][j],5);
 			}
 		}
 	}
@@ -211,11 +211,11 @@ void Record_adj::for_2d(void)
 					++cb;
 				}
 			}//end ad
-//			GlobalV::ofs_running << " nadj = " << cb << endl;
+//			GlobalV::ofs_running << " nadj = " << cb << std::endl;
 			++iat;
 		}//end I1
 	}//end T1
-	timer::tick("Record_adj","for_2d");
+	ModuleBase::timer::tick("Record_adj","for_2d");
 
 	return;
 }
@@ -227,11 +227,11 @@ void Record_adj::for_2d(void)
 //--------------------------------------------
 void Record_adj::for_grid(const Grid_Technique &gt)
 {
-    TITLE("Record_adj","for_grid");
-	timer::tick("Record_adj","for_grid");
+    ModuleBase::TITLE("Record_adj","for_grid");
+	ModuleBase::timer::tick("Record_adj","for_grid");
 	
-	Vector3<double> tau1, tau2, dtau;
-	Vector3<double> tau0, dtau1, dtau2;
+	ModuleBase::Vector3<double> tau1, tau2, dtau;
+	ModuleBase::Vector3<double> tau0, dtau1, dtau2;
 	
 	this->na_proc = 0;
 	for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
@@ -248,7 +248,7 @@ void Record_adj::for_grid(const Grid_Technique &gt)
 
 	// number of adjacents for each atom.	
 	this->na_each = new int[na_proc];
-	ZEROS(na_each, na_proc);
+	ModuleBase::GlobalFunc::ZEROS(na_each, na_proc);
 
 	int ca = 0;
 	for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
@@ -330,7 +330,7 @@ void Record_adj::for_grid(const Grid_Technique &gt)
 		{
 			// (Rx, Ry, Rz, T, I)
 			info[i][j] = new int[5];
-			ZEROS(info[i][j],5);
+			ModuleBase::GlobalFunc::ZEROS(info[i][j],5);
 		}
 	}
 
@@ -417,9 +417,9 @@ void Record_adj::for_grid(const Grid_Technique &gt)
 		}
 	}
 	assert(ca==na_proc);
-	timer::tick("Record_adj","for_grid");
+	ModuleBase::timer::tick("Record_adj","for_grid");
 
-//	cout << " after for_grid" << endl;
+//	std::cout << " after for_grid" << std::endl;
 	return;
 }
 

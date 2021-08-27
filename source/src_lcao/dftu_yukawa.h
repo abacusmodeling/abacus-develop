@@ -13,6 +13,7 @@ using namespace std;
 // CLASS :
 // NAME : DFTU_Yukawa 
 //==========================================================
+namespace ModuleDFTU{
 class DFTU_Yukawa
 {
 public:
@@ -33,17 +34,21 @@ public:
     double lambda;       //the parameter in Yukawa potential
     int cal_type;        //1:dftu_tpye=1, dc=1; 2:dftu_type=1, dc=2; 3:dftu_tpye=2, dc=1; 4:dftu_tpye=2, dc=2; 
     int dc;              //dc (type of double_counting)
-    double *U;           //J (Hund parameter J)
+    double *U;           //U (Hubbard parameter U)
     double *J;           //J (Hund parameter J)
-    
-    //vector<vector<matrix>> Vsc; //Vsc[T][N](i,j)
-    vector<vector<vector<vector<double>>>> Fk; //slater integral:Fk[T][L][N][k]
-    vector<vector<vector<double>>> U_Yukawa;   //U_Yukawa[T][L][N]
-    vector<vector<vector<double>>> J_Yukawa;   //J_Yukawa[T]{L][N]
+    int *orbital_corr;   //
+    bool omc;
+    int dftu_type;
+    int double_counting;
+
+    //std::vector<std::vector<matrix>> Vsc; //Vsc[T][N](i,j)
+    std::vector<std::vector<std::vector<std::vector<double>>>> Fk; //slater integral:Fk[T][L][N][k]
+    std::vector<std::vector<std::vector<double>>> U_Yukawa;   //U_Yukawa[T][L][N]
+    std::vector<std::vector<std::vector<double>>> J_Yukawa;   //J_Yukawa[T][L][N]
 
     double Nval;         //Total nmuber of valence electrons of the system 
     double Nc;           //Total nmuber of correlated electrons of the system 
 
 };
-
+}
 #endif

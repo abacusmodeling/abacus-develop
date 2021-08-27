@@ -21,7 +21,7 @@ class Efield
 	static double bvec[3];
 	static double bmod;
 
-	static void compute_force(matrix &fdip);
+	static void compute_force(ModuleBase::matrix &fdip);
 
 	private:
 

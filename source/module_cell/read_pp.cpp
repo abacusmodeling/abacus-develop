@@ -11,7 +11,7 @@ using namespace std;
 
 Pseudopot_upf::Pseudopot_upf()
 {
-	this->els = new string[1];
+	this->els = new std::string[1];
 	this->lchi = new int[1];
 	this->oc = new double[1];
 
@@ -53,11 +53,11 @@ Pseudopot_upf::~Pseudopot_upf()
 	delete [] jchi;
 }
 
-int Pseudopot_upf::init_pseudo_reader(const string &fn)
+int Pseudopot_upf::init_pseudo_reader(const std::string &fn)
 {
-    TITLE("Pseudopot_upf","init");
+    ModuleBase::TITLE("Pseudopot_upf","init");
     // First check if this pseudo-potential has spin-orbit information
-    ifstream ifs(fn.c_str(), ios::in);
+    std::ifstream ifs(fn.c_str(), ios::in);
 
 	// can't find the file.
 	if (!ifs)
@@ -87,6 +87,11 @@ int Pseudopot_upf::init_pseudo_reader(const string &fn)
 		int info = read_pseudo_upf201(ifs);
 		return info;
 	}
+	else if(GlobalV::global_pseudo_type=="blps") // sunliang added 2021.7
+	{
+		int info = read_pseudo_blps(ifs);
+		return info;
+	}
 
 	return 0;
 }
@@ -95,17 +100,17 @@ int Pseudopot_upf::init_pseudo_reader(const string &fn)
 //----------------------------------------------------------
 // setting the type of the pseudopotential file
 //----------------------------------------------------------
-int Pseudopot_upf::set_pseudo_type(const string &fn) //zws add
+int Pseudopot_upf::set_pseudo_type(const std::string &fn) //zws add
 {
-    ifstream pptype_ifs(fn.c_str(), ios::in);
-    string dummy;
-	string strversion;
+    std::ifstream pptype_ifs(fn.c_str(), ios::in);
+    std::string dummy;
+	std::string strversion;
 
 	if (pptype_ifs.good())
 	{
 		getline(pptype_ifs,dummy);
 
-		stringstream wdsstream(dummy);
+		std::stringstream wdsstream(dummy);
 		getline(wdsstream,strversion,'"');
 		getline(wdsstream,strversion,'"');
 
@@ -121,22 +126,22 @@ int Pseudopot_upf::set_pseudo_type(const string &fn) //zws add
 	return 0;
 }
 
-string& Pseudopot_upf::trim(string &in_str)
+std::string& Pseudopot_upf::trim(std::string &in_str)
 {
-    static const string deltri = " \t" ; // delete tab or space
-    string::size_type position = in_str.find_first_of(deltri, 0);
-    if (position == string::npos)
+    static const std::string deltri = " \t" ; // delete tab or space
+    std::string::size_type position = in_str.find_first_of(deltri, 0);
+    if (position == std::string::npos)
 	{
         return in_str;
 	}
     return trim(in_str.erase(position, 1) );
 }
 
-string Pseudopot_upf::trimend(string &in_str)
+std::string Pseudopot_upf::trimend(std::string &in_str)
 {
-    const string &deltri =" \t" ;
-    string::size_type position = in_str.find_last_not_of(deltri)+1;
-    string tmpstr=in_str.erase(position);
+    const std::string &deltri =" \t" ;
+    std::string::size_type position = in_str.find_last_not_of(deltri)+1;
+    std::string tmpstr=in_str.erase(position);
     return tmpstr.erase(0,tmpstr.find_first_not_of(deltri));
 } //zws
 
@@ -149,10 +154,10 @@ int Pseudopot_upf::average_p(const double& lambda)
 	if(!this->has_so && GlobalV::LSPINORB) 
 	{
 		error++; 
-		cout<<"warning_quit! no soc upf used for lspinorb calculation, error!"<<endl; 
+		std::cout<<"warning_quit! no soc upf used for lspinorb calculation, error!"<<std::endl; 
 		return error;
 	}
-	//WARNING_QUIT("average_p", "no soc upf used for lspinorb calculation, error!");
+	//ModuleBase::WARNING_QUIT("average_p", "no soc upf used for lspinorb calculation, error!");
 
 	if(!this->has_so || (GlobalV::LSPINORB && abs(lambda_ - 1.0) < 1.0e-8) )
 	{
@@ -173,7 +178,7 @@ int Pseudopot_upf::average_p(const double& lambda)
 		}
 
 		this->nbeta = new_nbeta;
-		matrix dion_new;
+		ModuleBase::matrix dion_new;
 		dion_new.create(this->nbeta, this->nbeta);
 
 		int old_nbeta=-1;
@@ -267,7 +272,7 @@ int Pseudopot_upf::average_p(const double& lambda)
 				{
 					if(abs(this->jchi[old_nwfc+1]-this->lchi[old_nwfc+1]-0.5)>1e-6) 
 					{error++; cout<<"warning_quit! error chi function 1 !"<<endl; return error;}
-	//					WARNING_QUIT("average_p", "error chi function 1 !");
+	//					ModuleBase::WARNING_QUIT("average_p", "error chi function 1 !");
 					ind = old_nwfc +1;
 					ind1 = old_nwfc;
 				}
@@ -275,7 +280,7 @@ int Pseudopot_upf::average_p(const double& lambda)
 				{
 					if(abs(this->jchi[old_nwfc+1]-this->lchi[old_nwfc+1]+0.5)>1e-6)
 					{error++; cout<<"warning_quit! error chi function 2 !"<<endl; return error;}
-	//					WARNING_QUIT("average_p", "error chi function 2 !");
+	//					ModuleBase::WARNING_QUIT("average_p", "error chi function 2 !");
 					ind = old_nwfc;
 					ind1 = old_nwfc +1;
 				}
@@ -326,24 +331,27 @@ int Pseudopot_upf::average_p(const double& lambda)
 					ind = nb;
 					ind1 = nb +1;
 				}
-				//average D (Dion)
-				{
-					double avera = 0.5 * (this->dion(ind, ind) + this->dion(ind1, ind1));
-					double delta = 0.5 * (this->dion(ind, ind) - this->dion(ind1, ind1));
-					this->dion(ind, ind) = avera + delta * lambda_;
-					this->dion(ind1, ind1) = avera - delta * lambda_;
-				}
+				double vion1 = ((l+1.0) * this->dion(ind,ind) + l * this->dion(ind1,ind1)) / (2.0*l+1.0);
+				if(abs(vion1)<1.0e-10) vion1 = 1.0e-10;
 				//average beta (betar)
+				const double sqrtDplus = sqrt(this->dion(ind,ind) / vion1);
+				const double sqrtDminus = sqrt(this->dion(ind1,ind1) / vion1);
+				this->dion(ind, ind) = vion1;
+				this->dion(ind1, ind1) = vion1;
 				for(int ir = 0; ir<this->mesh;ir++)
 				{
-					double avera = 0.5 * 
-							( this->beta(ind, ir) + 
+					double avera = 1.0 / (2.0 * l + 1.0) * 
+							( (l + 1.0) * sqrtDplus *
+							this->beta(ind, ir) + 
+							l * sqrtDminus *
 							this->beta(ind1, ir) ) ;
-					double delta = 0.5 * 
-							( this->beta(ind, ir) - 
+					double delta = 1.0 / (2.0 * l + 1.0) * 
+							( sqrtDplus *
+							this->beta(ind, ir) - 
+							sqrtDminus *
 							this->beta(ind1, ir) ) ;
-					this->beta(ind, ir) = avera + delta * lambda_;
-					this->beta(ind1, ir) = avera - delta * lambda_; 
+					this->beta(ind, ir) = (avera + l * delta * lambda_) ;
+					this->beta(ind1, ir) = (avera - (l + 1) * delta * lambda_); 
 				}
 				nb++;
 			}

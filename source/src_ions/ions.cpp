@@ -8,26 +8,27 @@
 #include "../src_pw/vdwd3_parameters.h"
 #include "../src_pw/pw_complement.h"
 #include "../src_pw/pw_basis.h"
+#include "../src_io/print_info.h"
 #include "variable_cell.h" // mohan add 2021-02-01
 
 void Ions::opt_ions_pw(void)
 {
-	TITLE("Ions","opt_ions_pw");
-	timer::tick("Ions","opt_ions_pw");
+	ModuleBase::TITLE("Ions","opt_ions_pw");
+	ModuleBase::timer::tick("Ions","opt_ions_pw");
 	
 	if(GlobalV::OUT_LEVEL=="i")
 	{
-		cout << setprecision(12);
-    	cout<< " " << setw(7)<< "ISTEP" 
-		<<setw(5)<< "NE"
-		<<setw(15)<< "ETOT(eV)"
-		<<setw(15)<< "EDIFF(eV)"
-        <<setw(15)<< "MAX_F(eV/A)"
-        <<setw(15)<< "TRADIUS(Bohr)"
-		<<setw(8)<< "UPDATE"
-		<<setw(11)<< "ETIME(MIN)"
-		<<setw(11)<< "FTIME(MIN)"
-        <<endl;
+		std::cout << std::setprecision(12);
+    	std::cout<< " " << std::setw(7)<< "ISTEP" 
+		<<std::setw(5)<< "NE"
+		<<std::setw(15)<< "ETOT(eV)"
+		<<std::setw(15)<< "EDIFF(eV)"
+        <<std::setw(15)<< "MAX_F(eV/A)"
+        <<std::setw(15)<< "TRADIUS(Bohr)"
+		<<std::setw(8)<< "UPDATE"
+		<<std::setw(11)<< "ETIME(MIN)"
+		<<std::setw(11)<< "FTIME(MIN)"
+        <<std::endl;
 	}
 
 	// allocation for ion movement.	
@@ -53,44 +54,54 @@ void Ions::opt_ions_pw(void)
 
 		if(GlobalV::OUT_LEVEL=="ie")
 		{
-	
-        	cout << " -------------------------------------------" << endl;
+			Print_Info::print_screen(stress_step, force_step, istep);
+/*        	std::cout << " -------------------------------------------" << std::endl;
 			if(GlobalV::CALCULATION=="relax") //pengfei 2014-10-13
 			{
-        		cout << " STEP OF ION RELAXATION : " << istep << endl;
+        		std::cout << " STEP OF ION RELAXATION : " << istep << std::endl;
 			}
             else if(GlobalV::CALCULATION=="cell-relax")
             {
-                cout << " RELAX CELL : " << stress_step << endl;
-                cout << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << endl;
-                cout << " ---------------------------------------------------------" << endl;
+                std::cout << " RELAX CELL : " << stress_step << std::endl;
+                std::cout << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << std::endl;
             }
 			else if(GlobalV::CALCULATION=="scf") //add 4 lines 2015-09-06, xiaohui
 			{
-        			cout << " SELF-CONSISTENT : " << endl;
+        			std::cout << " SELF-CONSISTENT : " << std::endl;
+			}
+			else if(GlobalV::CALCULATION=="nscf") //add 4 lines 2015-09-06, xiaohui
+			{
+        			std::cout << " NONSELF-CONSISTENT : " << std::endl;
 			}
 			else if(GlobalV::CALCULATION=="md")
 			{
-        		cout << " STEP OF MOLECULAR DYNAMICS : " << istep << endl;
+        		std::cout << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
 			}
-        	cout << " -------------------------------------------" << endl;
+        	std::cout << " -------------------------------------------" << std::endl;
 
-        	GlobalV::ofs_running << " -------------------------------------------" << endl;
+        	GlobalV::ofs_running << " -------------------------------------------" << std::endl;
 			if(GlobalV::CALCULATION=="relax")
 			{
-        		GlobalV::ofs_running << " STEP OF ION RELAXATION : " << istep << endl;
+        		GlobalV::ofs_running << " STEP OF ION RELAXATION : " << istep << std::endl;
 			}
             else if(GlobalV::CALCULATION=="cell-relax")
             {
-                GlobalV::ofs_running << " RELAX CELL : " << stress_step << endl;
-                GlobalV::ofs_running << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << endl;
-                GlobalV::ofs_running << " ---------------------------------------------------------" << endl;
+                GlobalV::ofs_running << " RELAX CELL : " << stress_step << std::endl;
+                GlobalV::ofs_running << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << std::endl;
             }
 			else if(GlobalV::CALCULATION=="md")
 			{
-        		GlobalV::ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << endl;
+        		GlobalV::ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
 			}
-        	GlobalV::ofs_running << " -------------------------------------------" << endl;
+			else if(GlobalV::CALCULATION=="scf")
+            {
+                GlobalV::ofs_running << " SELF-CONSISTENT" << std::endl;
+            }
+            else if(GlobalV::CALCULATION=="nscf")
+            {
+                GlobalV::ofs_running << " NONSELF-CONSISTENT" << std::endl;
+            }
+        	GlobalV::ofs_running << " -------------------------------------------" << std::endl;*/
 		}
 
 	//----------------------------------------------------------
@@ -134,7 +145,7 @@ void Ions::opt_ions_pw(void)
 			}
 			else if( Exx_Global::Hybrid_Type::Generate_Matrix == GlobalC::exx_global.info.hybrid_type )
 			{
-				throw invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 			}
 			else	// Peize Lin add 2019-03-09
 			{
@@ -181,8 +192,8 @@ void Ions::opt_ions_pw(void)
 
 		if(GlobalC::pot.out_potential == 2)
 		{
-			stringstream ssp;
-			stringstream ssp_ave;
+			std::stringstream ssp;
+			std::stringstream ssp_ave;
 			ssp << GlobalV::global_out_dir << "ElecStaticPot";
 			ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
 			GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
@@ -194,7 +205,7 @@ void Ions::opt_ions_pw(void)
 
         if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
         {
-			stop = this->force_stress(istep, force_step, stress_step);    // pengfei Li 2018-05-14
+			stop = this->after_scf(istep, force_step, stress_step);    // pengfei Li 2018-05-14
 		}
 		time_t fend = time(NULL);
 
@@ -203,19 +214,19 @@ void Ions::opt_ions_pw(void)
 		{
 			double etime_min = difftime(eend, estart)/60.0; 
 			double ftime_min = difftime(fend, fstart)/60.0; 
-			stringstream ss;
+			std::stringstream ss;
 			ss << GlobalV::MOVE_IONS << istep;
 			
-			cout << " " << setw(7) << ss.str() 
-			<< setw(5) << eiter 
-			<< setw(15) << setprecision(6) << GlobalC::en.etot * Ry_to_eV 
-			<< setw(15) << IMM.get_ediff() * Ry_to_eV
-			<< setprecision(3)
-			<< setw(15) << IMM.get_largest_grad() * Ry_to_eV / 0.529177
-			<< setw(15) << IMM.get_trust_radius()
-			<< setw(8) << IMM.get_update_iter()
-			<< setprecision(2) << setw(11) << etime_min
-			<< setw(11) << ftime_min << endl;
+			std::cout << " " << std::setw(7) << ss.str() 
+			<< std::setw(5) << eiter 
+			<< std::setw(15) << std::setprecision(6) << GlobalC::en.etot * ModuleBase::Ry_to_eV 
+			<< std::setw(15) << IMM.get_ediff() * ModuleBase::Ry_to_eV
+			<< std::setprecision(3)
+			<< std::setw(15) << IMM.get_largest_grad() * ModuleBase::Ry_to_eV / 0.529177
+			<< std::setw(15) << IMM.get_trust_radius()
+			<< std::setw(8) << IMM.get_update_iter()
+			<< std::setprecision(2) << std::setw(11) << etime_min
+			<< std::setw(11) << ftime_min << std::endl;
 		}
 
 		++istep;
@@ -224,214 +235,174 @@ void Ions::opt_ions_pw(void)
 
     if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
     {
-        GlobalV::ofs_running << "\n\n --------------------------------------------" << endl;
-        GlobalV::ofs_running << setprecision(16);
-        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << endl; 
-        GlobalV::ofs_running << " --------------------------------------------\n\n" << endl;
+        GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
+        GlobalV::ofs_running << std::setprecision(16);
+        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl; 
+        GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
     }
 
 
 	if(GlobalV::OUT_LEVEL=="i")
 	{
-		cout << " ION DYNAMICS FINISHED :)" << endl;
+		std::cout << " ION DYNAMICS FINISHED :)" << std::endl;
 	}
 
-	timer::tick("Ions","opt_ions_pw");
+	ModuleBase::timer::tick("Ions","opt_ions_pw");
     return;
 }
 
-
-bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  // pengfei Li 2018-05-14
+bool Ions::after_scf(const int &istep, int &force_step, int &stress_step)
 {
-	TITLE("Ions","force_stress");
-
-	if(!GlobalV::FORCE && !GlobalV::STRESS)
+	ModuleBase::TITLE("Ions","after_scf");
+	//calculate and gather all parts of total ionic forces
+	ModuleBase::matrix force;
+	if(GlobalV::FORCE)
+	{
+		this->gather_force_pw(force);
+	}
+	//calculate and gather all parts of stress
+	ModuleBase::matrix stress;
+	if(GlobalV::STRESS)
+	{
+		this->gather_stress_pw(stress);
+	}
+	//stop in last step
+	if(istep==GlobalV::NSTEP)
 	{
 		return 1;
 	}
-
-
-	if(GlobalV::FORCE&&!GlobalV::STRESS)
+	//choose what to do next
+	if(GlobalV::CALCULATION!="cell-relax") force_step = istep;
+	if(this->if_do_relax()) 
 	{
-		// (1) calculate the force.
-		matrix force;
-		Forces fcs;
-		fcs.init(force);
-
-		// (2) move the ions.
-		bool converged = false;
-		//if(GlobalV::CALCULATION=="md") //mohan add
-		//{
-		//	md.init_md(istep, fcs.force);
-		//}
-		//else	
-		//{
-			//IMM.cal_movement(istep, fcs.force, GlobalC::en.etot);
-		//}
-		if(GlobalV::CALCULATION=="relax")
+		//do relax calculation and generate next structure 
+		bool converged = 0;
+		converged = this->do_relax(istep, force_step, force, GlobalC::en.etot);
+		if(!converged) 
 		{
-			IMM.cal_movement(istep, istep, force, GlobalC::en.etot);
-			converged = IMM.get_converged();
-
-            if(converged || (istep==GlobalV::NSTEP) ) 
-            {
-                return 1;
-            }
-            else
-            {
-                GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << endl;
-                GlobalC::pw.setup_structure_factor();
-
-                GlobalV::ofs_running << " Setup the extrapolated charge." << endl;
-                // charge extrapolation if istep>0.
-                CE.extrapolate_charge();
-			
-                GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << endl;
-                // calculate the new potential accordint to
-                // the new charge density.
-                GlobalC::pot.init_pot( istep, GlobalC::pw.strucFac );
-
-                GlobalV::ofs_running << " Setup the new wave functions?" << endl;
-                GlobalC::wf.wfcinit();
-            }
-        }
-        else
-        {
-            return 1;
-        }
-    }
-
-	static bool converged_force = false;              // pengfe Li  2018-05-14
-	static bool converged_stress = false;
-
-	if(!GlobalV::FORCE&&GlobalV::STRESS)
-	{
-		Stress_PW ss;
-		matrix stress;
-		ss.cal_stress(stress);
-
-		double unit_transform = 0.0;
-		unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
-		double external_stress[3] = {GlobalV::PRESS1,GlobalV::PRESS2,GlobalV::PRESS3};
-		for(int i=0;i<3;i++)
-		{
-			stress(i,i) -= external_stress[i]/unit_transform;
+			this->reset_after_relax(istep);
+			return converged;
 		}
-		GlobalV::PRESSURE = (stress(0,0)+stress(1,1)+stress(2,2))/3;
-		if(GlobalV::CALCULATION=="cell-relax")
+		else if(GlobalV::CALCULATION!="cell-relax")
 		{
-			LCM.cal_lattice_change(stress_step, stress, GlobalC::en.etot);
-			converged_stress = LCM.get_converged();
-            //cout <<"converged_stress = "<<converged_stress<<endl;
-            if(converged_stress)
-            {
-                return 1;
-            }
-            else
-            {
-                Variable_Cell::init_after_vc();
-                GlobalC::pot.init_pot(stress_step, GlobalC::pw.strucFac); //LiuXh add 20180619
-                GlobalV::ofs_running << " Setup the new wave functions?" << endl; //LiuXh add 20180619
-                GlobalC::wf.wfcinit(); //LiuXh add 20180619
-                ++stress_step;
-                return 0;
-            }
-        }
-        else
-        {
-            return 1;
-        }
-    }
-
-	if(GlobalV::FORCE&&GlobalV::STRESS)
+			return converged;
+		}
+	}
+	if(this->if_do_cellrelax())
 	{
-		//cout<<" istep  force_step  stress_step  converged_force  converged_stress = "<<istep<<"  "<<force_step<<"  "<<stress_step<<"  "<<converged_force<<"  "<<converged_stress<<endl;
+		//do cell relax calculation and generate next structure
+		bool converged = 0;
+		converged = this->do_cellrelax(stress_step, stress, GlobalC::en.etot);
+		if(!converged) this->reset_after_cellrelax(force_step, stress_step);
+		return converged;
+	}
 
-		matrix force;
-		Forces fcs;
-		fcs.init(force);
-                matrix stress;
-                Stress_PW ss;
-                ss.cal_stress(stress);
-		//IMM.cal_movement(force_step, fcs.force, GlobalC::en.etot);
-        if(GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
-        {
-            IMM.cal_movement(istep, force_step, force, GlobalC::en.etot);
-            converged_force = IMM.get_converged();
-
-            //cout<<"converged_force = "<<converged_force<<endl;
-            if(converged_force)
-            {
-                force_step = 1;
-
-
-                double unit_transform = 0.0;
-                unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
-                double external_stress[3] = {GlobalV::PRESS1,GlobalV::PRESS2,GlobalV::PRESS3};
-                for(int i=0;i<3;i++)
-                {
-                    stress(i,i) -= external_stress[i]/unit_transform;
-                }
-				GlobalV::PRESSURE = (stress(0,0)+stress(1,1)+stress(2,2))/3;
-
-                if(GlobalV::CALCULATION=="cell-relax")
-                {
-                    LCM.cal_lattice_change(stress_step, stress, GlobalC::en.etot);
-                    converged_stress = LCM.get_converged();
-                    //cout <<"converged_stress = "<<converged_stress<<endl;
-                    if(converged_stress)
-                    {
-                        return 1;
-                    }
-                    else
-                    {
-                        Variable_Cell::init_after_vc();
-                        GlobalC::pot.init_pot(stress_step, GlobalC::pw.strucFac); //LiuXh add 20180619
-
-                        GlobalV::ofs_running << " Setup the new wave functions?" << endl; //LiuXh add 20180619
-                        GlobalC::wf.wfcinit(); //LiuXh add 20180619
-
-                        ++stress_step;
-                        return 0;
-                    }
-                }
-                else
-                {
-                    return 1;
-                }
-            }
-            else
-            {
-				GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << endl;
-                GlobalC::pw.setup_structure_factor();
-				GlobalV::ofs_running << " Setup the extrapolated charge." << endl;
-                CE.save_pos_next(GlobalC::ucell);
-                CE.update_istep(force_step);
-                CE.extrapolate_charge();
-				GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << endl;
-                GlobalC::pot.init_pot( istep, GlobalC::pw.strucFac );
-				GlobalV::ofs_running << " Setup the new wave functions?" << endl;
-                GlobalC::wf.wfcinit();
-                ++force_step;
-                return 0;
-            }
-        }
-        else
-        {
-
-            double unit_transform = 0.0;
-            unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
-            double external_stress[3] = {GlobalV::PRESS1,GlobalV::PRESS2,GlobalV::PRESS3};
-            for(int i=0;i<3;i++)
-            {
-                stress(i,i) -= external_stress[i]/unit_transform;
-            }
-			GlobalV::PRESSURE = (stress(0,0)+stress(1,1)+stress(2,2))/3;
-            return 1;
-        }
-    }
-
-    return 0;
+    return 1;
+}
+void Ions::gather_force_pw(ModuleBase::matrix &force)
+{
+	ModuleBase::TITLE("Ions","gather_force_pw");
+	Forces fcs;
+	fcs.init(force);
+}
+void Ions::gather_stress_pw(ModuleBase::matrix& stress)
+{
+	ModuleBase::TITLE("Ions","gather_stress_pw");
+	//basic stress
+	Stress_PW ss;
+	ss.cal_stress(stress);
+	//external stress
+	double unit_transform = 0.0;
+	unit_transform = ModuleBase::RYDBERG_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
+	double external_stress[3] = {GlobalV::PRESS1,GlobalV::PRESS2,GlobalV::PRESS3};
+	for(int i=0;i<3;i++)
+	{
+		stress(i,i) -= external_stress[i]/unit_transform;
+	}
+	GlobalV::PRESSURE = (stress(0,0)+stress(1,1)+stress(2,2))/3;
 }
 
+bool Ions::if_do_relax()
+{
+	ModuleBase::TITLE("Ions","if_do_relax");
+	if(GlobalV::CALCULATION=="relax"||GlobalV::CALCULATION=="cell-relax")
+	{
+		if(!GlobalC::ucell.if_atoms_can_move()) 
+		{
+			ModuleBase::WARNING("Ions","No atom is allowed to move!");
+			return 0;
+		}
+//		if(!IMM.get_converged()) return 1;
+		else 
+		{
+			assert(GlobalV::FORCE==1);
+			return 1;
+		}
+	}
+	else return 0;
+}
+bool Ions::if_do_cellrelax()
+{
+	ModuleBase::TITLE("Ions","if_do_cellrelax");
+	if(GlobalV::CALCULATION=="cell-relax")
+	{
+		if(!GlobalC::ucell.if_cell_can_change()) 
+		{
+			ModuleBase::WARNING("Ions", "Lattice vectors are not allowed to change!");
+			return 0;
+		}
+		else if(GlobalC::ucell.if_atoms_can_move()&&!IMM.get_converged())
+		{
+			GlobalV::ofs_running<<"Note: Need to wait for atomic relaxation first!";
+			return 0;
+		}
+		else 
+		{
+			assert(GlobalV::STRESS==1);
+			return 1;
+		}
+	}
+	else return 0;
+}
+bool Ions::do_relax(const int& istep, int& jstep, const ModuleBase::matrix& ionic_force, const double& total_energy)
+{
+	ModuleBase::TITLE("Ions","do_relax");
+	IMM.cal_movement(istep, jstep, ionic_force, total_energy);
+	++jstep;
+	return IMM.get_converged();
+}
+bool Ions::do_cellrelax(const int& istep, const ModuleBase::matrix& stress, const double& total_energy)
+{
+	ModuleBase::TITLE("Ions","do_cellrelax");
+	LCM.cal_lattice_change(istep, stress, total_energy);
+    return LCM.get_converged();
+}
+void Ions::reset_after_relax(const int& istep)
+{
+	ModuleBase::TITLE("Ions","reset_after_relax");
+	GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << std::endl;
+	GlobalC::pw.setup_structure_factor();
 
+	GlobalV::ofs_running << " Setup the extrapolated charge." << std::endl;
+	// charge extrapolation if istep>0.
+	CE.extrapolate_charge();
+
+	GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << std::endl;
+	// calculate the new potential accordint to
+	// the new charge density.
+	GlobalC::pot.init_pot( istep, GlobalC::pw.strucFac );
+
+	GlobalV::ofs_running << " Setup the new wave functions?" << std::endl;
+	GlobalC::wf.wfcinit();
+}
+void Ions::reset_after_cellrelax(int& f_step, int& s_step)
+{
+	ModuleBase::TITLE("Ions","reset_after_cellrelax");
+	Variable_Cell::init_after_vc();
+	GlobalC::pot.init_pot(s_step, GlobalC::pw.strucFac); //LiuXh add 20180619
+
+	GlobalV::ofs_running << " Setup the new wave functions?" << std::endl; //LiuXh add 20180619
+	GlobalC::wf.wfcinit(); //LiuXh add 20180619
+	f_step = 1;
+	++s_step;
+}

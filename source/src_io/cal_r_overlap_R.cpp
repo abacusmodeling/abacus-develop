@@ -24,7 +24,7 @@ cal_r_overlap_R::~cal_r_overlap_R()
 
 void cal_r_overlap_R::init()
 {
-	TITLE("cal_r_overlap_R","init");
+	ModuleBase::TITLE("cal_r_overlap_R","init");
 
 	this->R_x_num = GlobalC::GridD.getCellX();
     this->R_y_num = GlobalC::GridD.getCellY();
@@ -34,16 +34,16 @@ void cal_r_overlap_R::init()
 	this->R_minZ = (int)GlobalC::GridD.getD_minZ();
 	
 	// allocate for psi_r_psi	
-	psi_r_psi = new Vector3<double> ***[R_x_num];
+	psi_r_psi = new ModuleBase::Vector3<double> ***[R_x_num];
 	for(int ix = 0; ix < R_x_num; ix++)
 	{
-		psi_r_psi[ix] = new Vector3<double> **[R_y_num];
+		psi_r_psi[ix] = new ModuleBase::Vector3<double> **[R_y_num];
 		for(int iy = 0; iy < R_y_num; iy++)
 		{
-			psi_r_psi[ix][iy] = new Vector3<double> *[R_z_num];
+			psi_r_psi[ix][iy] = new ModuleBase::Vector3<double> *[R_z_num];
 			for(int iz = 0; iz < R_z_num; iz++)
 			{				
-				psi_r_psi[ix][iy][iz] = new Vector3<double> [GlobalC::ParaO.nloc];				
+				psi_r_psi[ix][iy][iz] = new ModuleBase::Vector3<double> [GlobalC::ParaO.nloc];				
 			}
 		}
 	}
@@ -61,9 +61,9 @@ void cal_r_overlap_R::init()
 		GlobalC::ORB.get_dR(),// delta R, for making radial table
 		GlobalC::ORB.get_dk()); // delta k, for integration in k space
 		
-	MOT.init_Table_Spherical_Bessel (2, 3, Lmax_used, Lmax, Exx_Abfs::Lmax);
+	MOT.init_Table_Spherical_Bessel (2, 3, Lmax_used, Lmax, Exx_Abfs::Lmax,GlobalC::ORB);
 
-	Ylm::set_coefficients();
+	ModuleBase::Ylm::set_coefficients();
 
 	MGT.init_Gaunt_CH( Lmax );
 	MGT.init_Gaunt( Lmax );	
@@ -84,7 +84,7 @@ void cal_r_overlap_R::init()
 //  if(new_kmesh%2 == 0) new_kmesh++;
 
 	int new_kmesh = GlobalC::ORB.Phi[T].PhiLN(0,0).getNk();
-//	cout << "new_kmesh = " << new_kmesh << endl;
+//	std::cout << "new_kmesh = " << new_kmesh << std::endl;
 
 
 	orb_r.set_orbital_info(
@@ -129,9 +129,9 @@ void cal_r_overlap_R::init()
 					false,
 					true);
 					
-				//cout << "getDk:   " << GlobalC::ORB.Phi[it].PhiLN(iL,iN).getDk() << endl;
-				//cout << "getDruniform:   " << GlobalC::ORB.Phi[it].PhiLN(iL,iN).getDruniform() << endl; 
-				//cout << "getNk:   " << GlobalC::ORB.Phi[it].PhiLN(iL,iN).getNk() << endl; 
+				//std::cout << "getDk:   " << GlobalC::ORB.Phi[it].PhiLN(iL,iN).getDk() << std::endl;
+				//std::cout << "getDruniform:   " << GlobalC::ORB.Phi[it].PhiLN(iL,iN).getDruniform() << std::endl; 
+				//std::cout << "getNk:   " << GlobalC::ORB.Phi[it].PhiLN(iL,iN).getNk() << std::endl; 
 			} 
 		}
 	}
@@ -246,17 +246,17 @@ void cal_r_overlap_R::init()
 
 void cal_r_overlap_R::out_r_overlap_R(const int nspin)
 {	
-	TITLE("cal_r_overlap_R","out_r_overlap_R");
-	timer::tick("cal_r_overlap_R","out_r_overlap_R");
+	ModuleBase::TITLE("cal_r_overlap_R","out_r_overlap_R");
+	ModuleBase::timer::tick("cal_r_overlap_R","out_r_overlap_R");
 
-	Vector3<double> tau1, tau2, dtau;
-	Vector3<double> origin_point(0.0,0.0,0.0);
+	ModuleBase::Vector3<double> tau1, tau2, dtau;
+	ModuleBase::Vector3<double> origin_point(0.0,0.0,0.0);
 
     int R_x;
     int R_y;
     int R_z;
 
-	double factor = sqrt(FOUR_PI/3.0);
+	double factor = sqrt(ModuleBase::FOUR_PI/3.0);
 	
 	for(int ix = 0; ix < R_x_num; ix++)
     {
@@ -268,7 +268,7 @@ void cal_r_overlap_R::out_r_overlap_R(const int nspin)
             {
                 int dRz = iz + R_minZ;	
 
-				Vector3<double> R_car = Vector3<double>(dRx,dRy,dRz) * GlobalC::ucell.latvec;
+				ModuleBase::Vector3<double> R_car = ModuleBase::Vector3<double>(dRx,dRy,dRz) * GlobalC::ucell.latvec;
 				
 				int ir,ic;
 				for(int iw1 = 0; iw1 < GlobalV::NLOCAL; iw1++)
@@ -304,7 +304,7 @@ void cal_r_overlap_R::out_r_overlap_R(const int nspin)
 									int L2 = iw2iL(orb_index_col);  
 									int m2 = iw2im(orb_index_col);
 
-									Vector3<double> r_distance = ( GlobalC::ucell.atoms[it2].tau[ia2] 
+									ModuleBase::Vector3<double> r_distance = ( GlobalC::ucell.atoms[it2].tau[ia2] 
 									- GlobalC::ucell.atoms[it1].tau[ia1] + R_car ) * GlobalC::ucell.lat0;	
 
 double overlap_o = center2_orb11[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distance, m1, m2 );
@@ -315,13 +315,13 @@ center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distan
 									double overlap_z =      factor * 
 center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distance, m1, 0, m2 ); // m = 0	
 
-									psi_r_psi[ix][iy][iz][icc] = Vector3<double>( overlap_x,overlap_y,overlap_z ) 
+									psi_r_psi[ix][iy][iz][icc] = ModuleBase::Vector3<double>( overlap_x,overlap_y,overlap_z ) 
 + GlobalC::ucell.atoms[it1].tau[ia1] * GlobalC::ucell.lat0 * overlap_o;
 
 								}
 								else
 								{
-									psi_r_psi[ix][iy][iz][icc] = Vector3<double>(0.0,0.0,0.0);
+									psi_r_psi[ix][iy][iz][icc] = ModuleBase::Vector3<double>(0.0,0.0,0.0);
 								}
 							}
 						}
@@ -332,13 +332,13 @@ center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distan
 	}
 	
 	// out r_overlap_R file
-	ofstream out_r;
-	stringstream ssh;
+	std::ofstream out_r;
+	std::stringstream ssh;
 	ssh << GlobalV::global_out_dir << "data-rR-tr_SPIN" << nspin;
 	if(GlobalV::DRANK == 0)
 	{
 		out_r.open(ssh.str().c_str());
-		out_r << "Matrix Dimension of vector r(R): " << GlobalV::NLOCAL <<endl;
+		out_r << "Matrix Dimension of std::vector r(R): " << GlobalV::NLOCAL <<std::endl;
 	}
 	
 	for(int ix = 0; ix < R_x_num; ix++)
@@ -358,9 +358,9 @@ center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distan
 					liner_x = new double[GlobalV::NLOCAL];
 					liner_y = new double[GlobalV::NLOCAL];
 					liner_z = new double[GlobalV::NLOCAL];
-					ZEROS(liner_x,GlobalV::NLOCAL);
-					ZEROS(liner_y,GlobalV::NLOCAL);
-					ZEROS(liner_z,GlobalV::NLOCAL);
+					ModuleBase::GlobalFunc::ZEROS(liner_x,GlobalV::NLOCAL);
+					ModuleBase::GlobalFunc::ZEROS(liner_y,GlobalV::NLOCAL);
+					ModuleBase::GlobalFunc::ZEROS(liner_z,GlobalV::NLOCAL);
 					
 					ir = GlobalC::ParaO.trace_loc_row[i];
 					
@@ -391,13 +391,13 @@ center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distan
 							if(i==0 && j==0)
 							{
 								out_r << dRx << " " << dRy << " " << dRz  
-								<< "    //R vector(R2 - R1,unit: lattice vector)" <<endl;
+								<< "    //R std::vector(R2 - R1,unit: lattice std::vector)" <<std::endl;
 							}
 							
-							out_r << setw(20) << setprecision(9) << setiosflags(ios::scientific) << liner_x[j] << " "
-							      << setw(20) << setprecision(9) << setiosflags(ios::scientific) << liner_y[j] << " "
-								  << setw(20) << setprecision(9) << setiosflags(ios::scientific) << liner_z[j] << " "
-								  << endl;
+							out_r << std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << liner_x[j] << " "
+							      << std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << liner_y[j] << " "
+								  << std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << liner_z[j] << " "
+								  << std::endl;
 						}
 						
 					}
@@ -416,7 +416,7 @@ center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distan
 	if(GlobalV::DRANK == 0) out_r.close();
 
 
-	timer::tick("cal_r_overlap_R","out_r_overlap_R");
+	ModuleBase::timer::tick("cal_r_overlap_R","out_r_overlap_R");
 	
 	return;
 }

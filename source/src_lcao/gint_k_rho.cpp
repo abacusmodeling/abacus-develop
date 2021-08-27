@@ -67,8 +67,8 @@ inline void cal_psir_ylm(
 		// meshball_positions should be the bigcell position in meshball
 		// to the center of meshball.
 		// calculated in cartesian coordinates
-		// the vector from the grid which is now being operated to the atom position.
-		// in meshball language, is the vector from imcell to the center cel, plus
+		// the std::vector from the grid which is now being operated to the atom position.
+		// in meshball language, is the std::vector from imcell to the center cel, plus
 		// tau_in_bigcell.
 		mt[0]=GlobalC::GridT.meshball_positions[imcell][0] - GlobalC::GridT.tau_in_bigcell[iat][0];
 		mt[1]=GlobalC::GridT.meshball_positions[imcell][1] - GlobalC::GridT.tau_in_bigcell[iat][1];
@@ -86,7 +86,7 @@ inline void cal_psir_ylm(
 			if(distance > (GlobalC::ORB.Phi[it].getRcut() - 1.0e-15)) 
 			{
 				cal_flag[ib][id]=false;
-				ZEROS(p, block_size[id]);
+				ModuleBase::GlobalFunc::ZEROS(p, block_size[id]);
 				continue;
 			}
 
@@ -97,7 +97,7 @@ inline void cal_psir_ylm(
 			//	Ylm::get_ylm_real(this->nnn[it], this->dr[id], ylma);
 			if (distance < 1.0E-9) distance += 1.0E-9;
 			
-			Ylm::sph_harm (	GlobalC::ucell.atoms[it].nwl,
+			ModuleBase::Ylm::sph_harm (	GlobalC::ucell.atoms[it].nwl,
 					dr[0] / distance,
 					dr[1] / distance,
 					dr[2] / distance,
@@ -157,7 +157,7 @@ inline void cal_band_rho(
 
 	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
-		ZEROS(psir_DM_pool, GlobalC::pw.bxyz*LD_pool);
+		ModuleBase::GlobalFunc::ZEROS(psir_DM_pool, GlobalC::pw.bxyz*LD_pool);
 		for (int ia1=0; ia1<size; ++ia1)
 		{
 			const int iw1_lo=block_iw[ia1];
@@ -201,13 +201,13 @@ inline void cal_band_rho(
 
 				if(offset == -1)
 				{					
-					cout << "== charge ==========================" << endl;
-					cout << " grid_index = " << grid_index << endl;
-                    cout << " index = " << index << endl;
-					cout << " size1=" << ia1 << " size2=" << ia1 << endl;
-                    cout << " iat1=" << iat1 << " iat2=" << iat1 << endl;
-                    cout << " dR=" << dRx << " " << dRy << " " << dRz << endl;
-					WARNING_QUIT("gint_k","evaluate_pDMp wrong");
+					std::cout << "== charge ==========================" << std::endl;
+					std::cout << " grid_index = " << grid_index << std::endl;
+                    std::cout << " index = " << index << std::endl;
+					std::cout << " size1=" << ia1 << " size2=" << ia1 << std::endl;
+                    std::cout << " iat1=" << iat1 << " iat2=" << iat1 << std::endl;
+                    std::cout << " dR=" << dRx << " " << dRy << " " << dRz << std::endl;
+					ModuleBase::WARNING_QUIT("gint_k","evaluate_pDMp wrong");
 				}
 				//const int offset=AllOffset[ia1][ia2];
 				assert(offset < GlobalC::LNNR.nad[iat1]);
@@ -240,13 +240,13 @@ inline void cal_band_rho(
 
 				if(offset == -1)
 				{					
-					cout << "== charge ==========================" << endl;
-					cout << " grid_index = " << grid_index << endl;
-                    cout << " index = " << index << endl;
-					cout << " size1=" << ia1 << " size2=" << ia1 << endl;
-                    cout << " iat1=" << iat1 << " iat2=" << iat1 << endl;
-                    cout << " dR=" << dRx << " " << dRy << " " << dRz << endl;
-					WARNING_QUIT("gint_k","evaluate_pDMp wrong");
+					std::cout << "== charge ==========================" << std::endl;
+					std::cout << " grid_index = " << grid_index << std::endl;
+                    std::cout << " index = " << index << std::endl;
+					std::cout << " size1=" << ia1 << " size2=" << ia1 << std::endl;
+                    std::cout << " iat1=" << iat1 << " iat2=" << iat1 << std::endl;
+                    std::cout << " dR=" << dRx << " " << dRy << " " << dRz << std::endl;
+					ModuleBase::WARNING_QUIT("gint_k","evaluate_pDMp wrong");
 				}
 				//const int offset=AllOffset[ia1][ia2];
 				assert(offset < GlobalC::LNNR.nad[iat1]);
@@ -302,15 +302,15 @@ inline void cal_band_rho(
     				}
     				if(offset == -1)
     				{					
-    					cout << "== charge ==========================" << endl;
-    					cout << " grid_index = " << grid_index << endl;
-                        cout << " index = " << index << endl;
-    					cout << " size1=" << ia1 << " size2=" << ia2 << endl;
-                        cout << " iat1=" << iat1 << " iat2=" << iat2 << endl;
-                        cout << " dR=" << dRx << " " << dRy << " " << dRz << endl;
-                        cout << " R1=" << R1x << " " << R1y << " " << R1z << endl;
-                        cout << " R2=" << R2x << " " << R2y << " " << R2z << endl;
-    					WARNING_QUIT("gint_k","evaluate_pDMp wrong");
+    					std::cout << "== charge ==========================" << std::endl;
+    					std::cout << " grid_index = " << grid_index << std::endl;
+                        std::cout << " index = " << index << std::endl;
+    					std::cout << " size1=" << ia1 << " size2=" << ia2 << std::endl;
+                        std::cout << " iat1=" << iat1 << " iat2=" << iat2 << std::endl;
+                        std::cout << " dR=" << dRx << " " << dRy << " " << dRz << std::endl;
+                        std::cout << " R1=" << R1x << " " << R1y << " " << R1z << std::endl;
+                        std::cout << " R2=" << R2x << " " << R2y << " " << R2z << std::endl;
+    					ModuleBase::WARNING_QUIT("gint_k","evaluate_pDMp wrong");
     				}				
     				assert(offset < GlobalC::LNNR.nad[iat1]);
 
@@ -351,15 +351,15 @@ inline void cal_band_rho(
     				}
     				if(offset == -1)
     				{					
-    					cout << "== charge ==========================" << endl;
-    					cout << " grid_index = " << grid_index << endl;
-                        cout << " index = " << index << endl;
-    					cout << " size1=" << ia1 << " size2=" << ia2 << endl;
-                        cout << " iat1=" << iat1 << " iat2=" << iat2 << endl;
-                        cout << " dR=" << dRx << " " << dRy << " " << dRz << endl;
-                        cout << " R1=" << R1x << " " << R1y << " " << R1z << endl;
-                        cout << " R2=" << R2x << " " << R2y << " " << R2z << endl;
-    					WARNING_QUIT("gint_k","evaluate_pDMp wrong");
+    					std::cout << "== charge ==========================" << std::endl;
+    					std::cout << " grid_index = " << grid_index << std::endl;
+                        std::cout << " index = " << index << std::endl;
+    					std::cout << " size1=" << ia1 << " size2=" << ia2 << std::endl;
+                        std::cout << " iat1=" << iat1 << " iat2=" << iat2 << std::endl;
+                        std::cout << " dR=" << dRx << " " << dRy << " " << dRz << std::endl;
+                        std::cout << " R1=" << R1x << " " << R1y << " " << R1z << std::endl;
+                        std::cout << " R2=" << R2x << " " << R2y << " " << R2z << std::endl;
+    					ModuleBase::WARNING_QUIT("gint_k","evaluate_pDMp wrong");
     				}				
     				assert(offset < GlobalC::LNNR.nad[iat1]);
 
@@ -392,8 +392,8 @@ inline void cal_band_rho(
 
 void Gint_k::cal_rho_k(void)
 {
-	TITLE("Gint_k","cal_rho_k");
-	timer::tick("Gint_k","cal_rho_k");
+	ModuleBase::TITLE("Gint_k","cal_rho_k");
+	ModuleBase::timer::tick("Gint_k","cal_rho_k");
 
 	const double delta_r = GlobalC::ORB.dr_uniform;
 	// it is an uniform grid to save orbital values, so the delta_r is a constant.
@@ -416,10 +416,10 @@ void Gint_k::cal_rho_k(void)
     if(max_size!=0)
     {
 		psir_ylm_pool=new double[GlobalC::pw.bxyz*LD_pool];
-		ZEROS(psir_ylm_pool, GlobalC::pw.bxyz*LD_pool);
+		ModuleBase::GlobalFunc::ZEROS(psir_ylm_pool, GlobalC::pw.bxyz*LD_pool);
 		psir_ylm=new double *[GlobalC::pw.bxyz];
 		psir_DM_pool=new double[GlobalC::pw.bxyz*LD_pool];
-		ZEROS(psir_DM_pool, GlobalC::pw.bxyz*LD_pool);
+		ModuleBase::GlobalFunc::ZEROS(psir_DM_pool, GlobalC::pw.bxyz*LD_pool);
 		psir_DM=new double *[GlobalC::pw.bxyz];
 		block_iw=new int[max_size];
 		block_size=new int[max_size];
@@ -435,7 +435,7 @@ void Gint_k::cal_rho_k(void)
 		}
 
 		vindex = new int[GlobalC::pw.bxyz];
-		ZEROS(vindex, GlobalC::pw.bxyz);
+		ModuleBase::GlobalFunc::ZEROS(vindex, GlobalC::pw.bxyz);
 		
         cal_flag = new bool*[GlobalC::pw.bxyz];
 
@@ -466,11 +466,11 @@ void Gint_k::cal_rho_k(void)
 				const int size = GlobalC::GridT.how_many_atoms[grid_index];
 				if(size==0) continue;
 				setVindex(ncyz, ibx, jby, kbz, vindex);
-				//timer::tick("Gint_k","cal_psir_ylm");
+				//ModuleBase::timer::tick("Gint_k","cal_psir_ylm");
 				cal_psir_ylm(size, grid_index, delta_r,
 						at, uc, block_index, block_iw, block_size, 
 						cal_flag, psir_ylm);
-				//timer::tick("Gint_k","cal_psir_ylm");
+				//ModuleBase::timer::tick("Gint_k","cal_psir_ylm");
 
 				cal_band_rho(
 					size, 
@@ -510,9 +510,9 @@ void Gint_k::cal_rho_k(void)
 		delete[] vindex;
     }	
 
-//	cout << " calculate the charge density from density matrix " << endl;
+//	std::cout << " calculate the charge density from density matrix " << std::endl;
 
-	timer::tick("Gint_k","cal_rho_k");
+	ModuleBase::timer::tick("Gint_k","cal_rho_k");
 	return;
 }
 
@@ -530,7 +530,7 @@ void Gint_k::evaluate_pDMp(
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		tchg[is] = new double[GlobalC::pw.bxyz];
-		ZEROS(tchg[is], GlobalC::pw.bxyz);
+		ModuleBase::GlobalFunc::ZEROS(tchg[is], GlobalC::pw.bxyz);
 	}
 
 	bool *all_out_of_range = new bool[size];
@@ -640,15 +640,15 @@ void Gint_k::evaluate_pDMp(
 
 				if(offset == -1)
 				{					
-					cout << "== charge ==========================" << endl;
-					cout << " grid_index = " << grid_index << endl;
-                    cout << " index = " << index << endl;
-					cout << " size1=" << ia1 << " size2=" << ia2 << endl;
-                    cout << " iat=" << iat << " iat2=" << iat2 << endl;
-                    cout << " dR=" << dRx << " " << dRy << " " << dRz << endl;
-                    cout << " R1=" << R1x << " " << R1y << " " << R1z << endl;
-                    cout << " R2=" << R2x << " " << R2y << " " << R2z << endl;
-					WARNING_QUIT("gint_k","evaluate_pDMp wrong");
+					std::cout << "== charge ==========================" << std::endl;
+					std::cout << " grid_index = " << grid_index << std::endl;
+                    std::cout << " index = " << index << std::endl;
+					std::cout << " size1=" << ia1 << " size2=" << ia2 << std::endl;
+                    std::cout << " iat=" << iat << " iat2=" << iat2 << std::endl;
+                    std::cout << " dR=" << dRx << " " << dRy << " " << dRz << std::endl;
+                    std::cout << " R1=" << R1x << " " << R1y << " " << R1z << std::endl;
+                    std::cout << " R2=" << R2x << " " << R2y << " " << R2z << std::endl;
+					ModuleBase::WARNING_QUIT("gint_k","evaluate_pDMp wrong");
 				}
 				assert(offset < GlobalC::LNNR.nad[iat]);
 

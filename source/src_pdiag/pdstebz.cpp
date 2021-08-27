@@ -28,7 +28,7 @@ void pdstebz(MPI_Comm comm ,double *D,double *E,double *eigen,int N)
  *             Stores the eigenvalue required
  */
 {
-	TITLE("Parallel_Diago","pdstebz");
+	ModuleBase::TITLE("Parallel_Diago","pdstebz");
     /*Array A contains main diagonal element;Array B contains offdiagonal element*/
     int size,myid;
 
@@ -47,7 +47,7 @@ void pdstebz(MPI_Comm comm ,double *D,double *E,double *eigen,int N)
 	for(int i=0; i<N; i++)
 	{
 		eigen[i] = D[i];
-		cout << " D[" << i << "]=" << D[i] << endl;
+		std::cout << " D[" << i << "]=" << D[i] << std::endl;
 	}
 	*/
     

@@ -4,6 +4,8 @@
 //==========================================================
 #include "memory.h"
 
+namespace ModuleBase
+{
 // 1024 bit  = 1 Byte
 // 1024 Byte = 1 KB
 // 1024 KB   = 1 MB
@@ -20,8 +22,8 @@ int Memory::n_memory = 500;
 int Memory::n_now = 0;
 bool Memory::init_flag =  false;
 
-string *Memory::name;
-string *Memory::class_name;
+std::string *Memory::name;
+std::string *Memory::class_name;
 double *Memory::consume;
 
 Memory::Memory()
@@ -32,7 +34,7 @@ Memory::~Memory()
 {
 }
 
-double Memory::calculate_mem(const long &n_in,const string &type)
+double Memory::calculate_mem(const long &n_in,const std::string &type)
 {
 	double n = static_cast<double>(n_in);
 	double mem = 0.0;
@@ -45,7 +47,7 @@ double Memory::calculate_mem(const long &n_in,const string &type)
 	double float_mem = float_memory * factor;
 	double short_mem = short_memory * factor;
 
-	if(type=="ComplexMatrix" || type=="complexmatrix" || type=="cdouble")
+	if(type=="ModuleBase::ComplexMatrix" || type=="complexmatrix" || type=="cdouble")
 	{
 		mem = complex_matrix_mem;
 	}
@@ -73,13 +75,13 @@ double Memory::calculate_mem(const long &n_in,const string &type)
 	{
 		mem =  int_mem * 2 + double_mem * 3;
 	}
-	else if(type=="Vector3<double>")
+	else if(type=="ModuleBase::Vector3<double>")
 	{
 		mem = 3 * double_mem;
 	}
 	else
 	{
-		cout<<"not this type in memory storage : "<<type << endl;
+		std::cout<<"not this type in memory storage : "<<type << std::endl;
 	}
 	total += n * mem;	
 	return n*mem;
@@ -88,17 +90,17 @@ double Memory::calculate_mem(const long &n_in,const string &type)
 
 double Memory::record
 (
- 	const string &class_name_in,
-	const string &name_in,
+ 	const std::string &class_name_in,
+	const std::string &name_in,
 	const long &n_in,
-	const string &type,
+	const std::string &type,
 	const bool accumulate
 )
 {
 	if(!Memory::init_flag)
 	{
-		name = new string[n_memory];
-		class_name = new string[n_memory];
+		name = new std::string[n_memory];
+		class_name = new std::string[n_memory];
 		consume = new double[n_memory];
 		for(int i=0;i<n_memory;i++)
 		{
@@ -125,7 +127,7 @@ double Memory::record
 	}
 	if(n_now >= n_memory)
 	{
-		cout<<" Error! Too many memories required.";
+		std::cout<<" Error! Too many memories required.";
 		return 0.0;
 	}
 
@@ -140,13 +142,13 @@ double Memory::record
 
 void Memory::print(const int find)
 {
-//	cout <<"\n Warning_Memory_Consuming : "
-//	<<class_name[find]<<" "<<name[find]<<" "<<consume[find]<<" MB" << endl;
+//	std::cout <<"\n Warning_Memory_Consuming : "
+//	<<class_name[find]<<" "<<name[find]<<" "<<consume[find]<<" MB" << std::endl;
 	return;
 }
 
 
-void Memory::finish(ofstream &ofs)
+void Memory::finish(std::ofstream &ofs)
 {
 	print_all(ofs);
 	if(init_flag)
@@ -159,16 +161,16 @@ void Memory::finish(ofstream &ofs)
 	return;
 }
 
-void Memory::print_all(ofstream &ofs)
+void Memory::print_all(std::ofstream &ofs)
 {
-//	cout<<"\n init_flag="<<init_flag;
+//	std::cout<<"\n init_flag="<<init_flag;
 	if(!init_flag) return;
 
 	const double small = 1.0; 
-//    cout<<"\n CLASS_NAME---------|NAME---------------|MEMORY(MB)--------";
-    ofs <<"\n CLASS_NAME---------|NAME---------------|MEMORY(MB)--------" << endl;
-//	cout<<"\n"<<setw(41)<< " " <<setprecision(4)<<total;
-	ofs <<setw(41)<< " " <<setprecision(4)<<total << endl;
+//    std::cout<<"\n CLASS_NAME---------|NAME---------------|MEMORY(MB)--------";
+    ofs <<"\n CLASS_NAME---------|NAME---------------|MEMORY(MB)--------" << std::endl;
+//	std::cout<<"\n"<<std::setw(41)<< " " <<std::setprecision(4)<<total;
+	ofs <<std::setw(41)<< " " <<std::setprecision(4)<<total << std::endl;
     
 	bool *print_flag = new bool[n_memory];
 	for(int i=0; i<n_memory; i++) print_flag[i] = false;
@@ -198,18 +200,20 @@ void Memory::print_all(ofstream &ofs)
   		else
   		{
         	ofs  << " "
-             << setw(20) << class_name[k]
-             << setw(20) << name[k]
-             << setw(15) << consume[k] << endl;
+             << std::setw(20) << class_name[k]
+             << std::setw(20) << name[k]
+             << std::setw(15) << consume[k] << std::endl;
 
-//        	cout  << "\n "
-//             << setw(20) << class_name[k]
-//             << setw(20) << name[k]
-//             << setw(15) << consume[k];
+//        	std::cout  << "\n "
+//             << std::setw(20) << class_name[k]
+//             << std::setw(20) << name[k]
+//             << std::setw(15) << consume[k];
 		}
     }
-//    cout<<"\n ----------------------------------------------------------"<<endl;
-    ofs<<" ----------------------------------------------------------"<<endl;
+//    std::cout<<"\n ----------------------------------------------------------"<<std::endl;
+    ofs<<" ----------------------------------------------------------"<<std::endl;
 	delete[] print_flag; //mohan fix by valgrind at 2012-04-02
 	return;
+}
+
 }

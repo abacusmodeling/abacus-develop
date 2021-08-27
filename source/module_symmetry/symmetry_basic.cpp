@@ -20,7 +20,7 @@ Symmetry_Basic::~Symmetry_Basic()
 
 
 // Find the type of bravais lattice.
-string Symmetry_Basic::get_brav_name(const int ibrav)
+std::string Symmetry_Basic::get_brav_name(const int ibrav)
 {
 	switch(ibrav)
 	{
@@ -153,16 +153,16 @@ void Symmetry_Basic::atom_ordering(double *posi, const int natom, int *subindex)
 	{
 		tmppos[i] = posi[i*3];
 	}
-	heapsort(natom, tmppos, subindex);
+	ModuleBase::heapsort(natom, tmppos, subindex);
 
 //	for(int i=0; i<natom; i++)
 //	{
-//		cout << "\n subindex[" << i << "]=" << subindex[i];
+//		std::cout << "\n subindex[" << i << "]=" << subindex[i];
 //	}
 	
 	this->order_atoms(posi, natom, subindex);
 
-//	cout << "\n after Order X:" << endl;
+//	std::cout << "\n after Order X:" << std::endl;
 //	print_pos(posi, natom);
 	
 	// order y
@@ -199,30 +199,30 @@ void Symmetry_Basic::atom_ordering(double *posi, const int natom, int *subindex)
 
 void Symmetry_Basic::order_y(double *pos1, const int &oldpos1, const int &newpos1)
 {
-//	TITLE("Symmetry_Basic","order_y");
+//	ModuleBase::TITLE("Symmetry_Basic","order_y");
 	// how many atoms need to be reordered according to same x value.
 	const int nat1 = newpos1 - oldpos1;
-//	cout << "\n nat1=" << nat1 << endl; 
+//	std::cout << "\n nat1=" << nat1 << std::endl; 
 	if(nat1 == 1) return;
 
 	double* tmp1 = new double[nat1];
 	int* index1 = new int[nat1];
-	ZEROS(index1, nat1);
+	ModuleBase::GlobalFunc::ZEROS(index1, nat1);
 	
 	for(int ia=0; ia<nat1; ia++)
 	{
 		//+1 means y
 		tmp1[ia] = pos1[3*ia+1];
-//		cout << "\n ia=" << ia << " y=" << tmp1[ia];
+//		std::cout << "\n ia=" << ia << " y=" << tmp1[ia];
 	}
 
-	heapsort(nat1, tmp1, index1);
+	ModuleBase::heapsort(nat1, tmp1, index1);
 
 	this->order_atoms(pos1,nat1,index1);
 	
 //	for(int ia=0; ia<nat1; ia++)
 //	{
-//		cout << "\n index[" << ia << "]=" << index1[ia];
+//		std::cout << "\n index[" << ia << "]=" << index1[ia];
 //	}
 
 	double oldv2 = pos1[1];
@@ -256,31 +256,31 @@ void Symmetry_Basic::order_y(double *pos1, const int &oldpos1, const int &newpos
 
 void Symmetry_Basic::order_z(double* pos2, const int &oldpos2, const int &newpos2)
 {
-//	TITLE("Symmetry_Basic","order_z");
+//	ModuleBase::TITLE("Symmetry_Basic","order_z");
 	const int nat2 = newpos2 - oldpos2;
-//	cout << "\n nat2=" << nat2; 
+//	std::cout << "\n nat2=" << nat2; 
 //	if(nat2==1) return;
 	double* tmp2 = new double[nat2];
 	int* index2 = new int[nat2];
-	ZEROS(index2, nat2);
+	ModuleBase::GlobalFunc::ZEROS(index2, nat2);
 	for(int ia=0; ia<nat2; ia++)
 	{
 		//+2 means z
 		tmp2[ia] = pos2[3*ia+2];
 	}
 
-	heapsort(nat2, tmp2, index2);
+	ModuleBase::heapsort(nat2, tmp2, index2);
 
 //	for(int ia=0; ia<nat2; ia++)
 //	{
-//		cout << "\n Z1 pos2[" << ia << "]=" << pos2[3*ia] << " " << pos2[3*ia+1] << " " << pos2[3*ia+2];
+//		std::cout << "\n Z1 pos2[" << ia << "]=" << pos2[3*ia] << " " << pos2[3*ia+1] << " " << pos2[3*ia+2];
 //	}
 	
 	this->order_atoms(pos2,nat2,index2);
 
 //	for(int ia=0; ia<nat2; ia++)
 //	{
-//		cout << "\n Z2 pos2[" << ia << "]=" << pos2[3*ia] << " " << pos2[3*ia+1] << " " << pos2[3*ia+2];
+//		std::cout << "\n Z2 pos2[" << ia << "]=" << pos2[3*ia] << " " << pos2[3*ia+1] << " " << pos2[3*ia+2];
 //	}
 
 	delete[] index2;
@@ -347,8 +347,8 @@ void Symmetry_Basic::maxmin(
 }
 
 void Symmetry_Basic::shorter_vector(
-Vector3<double> &t1,
-Vector3<double> &t2,
+ModuleBase::Vector3<double> &t1,
+ModuleBase::Vector3<double> &t2,
 double &abs0,
 double &abs1,
 bool &flag1)
@@ -359,13 +359,13 @@ bool &flag1)
 	flag2 = false;
 	while(true)
 	{
-		//the loop won't stop unless abs0>abs1+epsilon, that is, the shortest vector is found
+		//the loop won't stop unless abs0>abs1+epsilon, that is, the shortest std::vector is found
 		t1 = t1 - t2;
 		abs0 = t1.norm();//calculate the new value of |t1|
-		if(abs0 > abs1 + epsilon) break;	//the shortest vector has already been found, stop the loop
+		if(abs0 > abs1 + epsilon) break;	//the shortest std::vector has already been found, stop the loop
 		if(abs0 < abs1 - epsilon){
-		//shorter vector is found, go on searching for the shortest
-			flag1 = true;	//sign that the some vector has been changed
+		//shorter std::vector is found, go on searching for the shortest
+			flag1 = true;	//sign that the some std::vector has been changed
 			abs1 = abs0;	//update the value of |t1|
 		}
 		flag2 = true;	//sign that the "t1-t2" method is used
@@ -376,26 +376,26 @@ bool &flag1)
 	if(!flag2){
 		//if "t1-t2" method is used, it is not necessary to use "a1+a2" method
 		while(true){
-			//the loop won't stop unless abs0>abs1+epsilon, that is, the shortest vector is found
+			//the loop won't stop unless abs0>abs1+epsilon, that is, the shortest std::vector is found
 			t1 = t1 + t2;//use "t1+t2" method
 			abs0 = t1.norm();//calculate the new value of |t1|
-			if(abs0 > abs1 + epsilon) break;	//the shortest vector has already been found, stop the loop
+			if(abs0 > abs1 + epsilon) break;	//the shortest std::vector has already been found, stop the loop
 			if(abs0 < abs1 - epsilon){
-				//shorter vector is found, go on searching for the shortest
-				flag1 = true;	//sign that the some vector has been changed
+				//shorter std::vector is found, go on searching for the shortest
+				flag1 = true;	//sign that the some std::vector has been changed
 				abs1 = abs0;	//update the value of |t1|
 			}
 		}
 		//the latest operation is catually not used,
-		//so we must set back the vector t1 by the opposite operation
+		//so we must set back the std::vector t1 by the opposite operation
 		t1 = t1 - t2;
 	}
 }
 
 void Symmetry_Basic::shortest_vector(
-		Vector3<double> &t1,
-		Vector3<double>	&t2,
-		Vector3<double> &t3
+		ModuleBase::Vector3<double> &t1,
+		ModuleBase::Vector3<double>	&t2,
+		ModuleBase::Vector3<double> &t3
 		)
 {
 	bool flag1 = true;
@@ -426,12 +426,12 @@ void Symmetry_Basic::shortest_vector(
 //set up the reciprocal lattice vectors b1, b2, b3 for a given set of lattice vectors a1, a2, a3
 void Symmetry_Basic::recip(
 		const double a, 
-		const Vector3<double> &a1, 
-		const Vector3<double> &a2, 
-		const Vector3<double> &a3, 
-		Vector3<double> &b1, 
-		Vector3<double> &b2, 
-		Vector3<double> &b3
+		const ModuleBase::Vector3<double> &a1, 
+		const ModuleBase::Vector3<double> &a2, 
+		const ModuleBase::Vector3<double> &a3, 
+		ModuleBase::Vector3<double> &b1, 
+		ModuleBase::Vector3<double> &b2, 
+		ModuleBase::Vector3<double> &b3
 		)
 {
 	double volume = Symm_Other::celvol(a1, a2, a3);
@@ -457,12 +457,12 @@ void Symmetry_Basic::veccon(
 		double *carpos, 
 		double *rotpos, 
 		const int num, 
-		const Vector3<double> &old1, 
-		const Vector3<double> &old2, 
-		const Vector3<double> &old3, 
-		const Vector3<double> &new1, 
-		const Vector3<double> &new2, 
-		const Vector3<double> &new3
+		const ModuleBase::Vector3<double> &old1, 
+		const ModuleBase::Vector3<double> &old2, 
+		const ModuleBase::Vector3<double> &old3, 
+		const ModuleBase::Vector3<double> &new1, 
+		const ModuleBase::Vector3<double> &new2, 
+		const ModuleBase::Vector3<double> &new3
 		)
 {
 
@@ -474,7 +474,7 @@ void Symmetry_Basic::veccon(
 	GlobalV::ofs_running << "\n new2:" << new2.x << " " << new2.y << " " << new2.z;
 	GlobalV::ofs_running << "\n new3:" << new3.x << " " << new3.y << " " << new3.z;
 
-	Matrix3 oldlat;
+	ModuleBase::Matrix3 oldlat;
 	oldlat.e11 = old1.x;
 	oldlat.e12 = old1.y;
 	oldlat.e13 = old1.z;
@@ -485,7 +485,7 @@ void Symmetry_Basic::veccon(
 	oldlat.e32 = old3.y;
 	oldlat.e33 = old3.z;
 
-	Matrix3 newlat;
+	ModuleBase::Matrix3 newlat;
 	newlat.e11 = new1.x;
 	newlat.e12 = new1.y;
 	newlat.e13 = new1.z;
@@ -496,11 +496,11 @@ void Symmetry_Basic::veccon(
 	newlat.e32 = new3.y;
 	newlat.e33 = new3.z;
 
-	Matrix3 GT = newlat.Inverse();
+	ModuleBase::Matrix3 GT = newlat.Inverse();
 	
-	Vector3<double> car;
-	Vector3<double> direct_old;
-	Vector3<double> direct_new;
+	ModuleBase::Vector3<double> car;
+	ModuleBase::Vector3<double> direct_old;
+	ModuleBase::Vector3<double> direct_new;
 
 	//calculate the reciprocal vectors rb1, rb2, rb3 for the vectors new1, new2, new3
 	//this->recip(1.0, new1, new2, new3, rb1, rb2, rb3);
@@ -517,8 +517,8 @@ void Symmetry_Basic::veccon(
 		
 		direct_new = car * GT;
 
-		//cout << "\n car[" << i << "]=" << car.x << " " << car.y << " " << car.z;
-		//cout << "\n dir[" << i << "]=" << direct_new.x << " " << direct_new.y << " " << direct_new.z;
+		//std::cout << "\n car[" << i << "]=" << car.x << " " << car.y << " " << car.z;
+		//std::cout << "\n dir[" << i << "]=" << direct_new.x << " " << direct_new.y << " " << direct_new.z;
 
 		rotpos[i * 3 + 0] = direct_new.x;
 		rotpos[i * 3 + 1] = direct_new.y;
@@ -530,14 +530,14 @@ void Symmetry_Basic::veccon(
 
 //SGRGEN (L2080 symlib.f VASP)
 //generate all point group symmetry operations from the generation group
-void Symmetry_Basic::matrigen(Matrix3 *symgen, const int ngen, Matrix3* symop, int &nop)
+void Symmetry_Basic::matrigen(ModuleBase::Matrix3 *symgen, const int ngen, ModuleBase::Matrix3* symop, int &nop)
 {
 	int m1, m2;
 	int n;
-	Matrix3 iden(1,0,0,0,1,0,0,0,1);
-	Matrix3 sig(1,0,0,0,1,0,0,0,1);
-	Matrix3 temp1(1,0,0,0,1,0,0,0,1);
-	Matrix3 temp2(1,0,0,0,1,0,0,0,1);
+	ModuleBase::Matrix3 iden(1,0,0,0,1,0,0,0,1);
+	ModuleBase::Matrix3 sig(1,0,0,0,1,0,0,0,1);
+	ModuleBase::Matrix3 temp1(1,0,0,0,1,0,0,0,1);
+	ModuleBase::Matrix3 temp2(1,0,0,0,1,0,0,0,1);
 	bool flag = 0;
 	int order = 0;
 	int now = 0;
@@ -548,7 +548,7 @@ void Symmetry_Basic::matrigen(Matrix3 *symgen, const int ngen, Matrix3* symop, i
 	//take all generators
 	for(int i = 0; i < ngen; ++i)
 	{
-//		cout<<"\n symgen = "<<i<<endl;
+//		std::cout<<"\n symgen = "<<i<<std::endl;
 		sig = symgen[i];
 		flag = 1;
 		for(int j = 0; j < nop; ++j)
@@ -576,31 +576,31 @@ void Symmetry_Basic::matrigen(Matrix3 *symgen, const int ngen, Matrix3* symop, i
 			temp1= sig * temp1;
 		//	temp1 = temp2;
 		}
-//		cout<<"\n order = "<<order<<endl;
+//		std::cout<<"\n order = "<<order<<std::endl;
 		now = nop;
 		for(int j = 0; j < nop; ++j)
 		{	
 			temp1 = symop[j];
-		//	cout<<"\n j = "<<j<<endl<<"================================================="<<endl;
+		//	std::cout<<"\n j = "<<j<<std::endl<<"================================================="<<std::endl;
 		//	out.printM3("temp1",temp1);
 			for(int k = 1; k < order; ++k)
 			{
 				temp1 = sig * temp1;
-			//	cout<<"\n k = "<<k<<endl<<"================================================="<<endl;
+			//	std::cout<<"\n k = "<<k<<std::endl<<"================================================="<<std::endl;
 			//	out.printM3("temp1",temp1);
 			//	out.printM3("temp2",temp2);
 
 				//if(i==0 && j==0 && k==1){
-					//cout<<"sig:"<<endl;
+					//std::cout<<"sig:"<<std::endl;
 					//for(l=0; l<3; l++)
-						//for(m=0; m<3; m++) cout<<sig[l][m]<<"\t";
-					//cout<<endl;
+						//for(m=0; m<3; m++) std::cout<<sig[l][m]<<"\t";
+					//std::cout<<std::endl;
 				//}
 
 				for(int l = 0; l < nop; ++l)
 				{
 					temp2 = symop[l] * temp1;
-				//	cout<<"\n l = "<<l<<endl<<"================================================="<<endl;
+				//	std::cout<<"\n l = "<<l<<std::endl<<"================================================="<<std::endl;
 				//	out.printM3("temp1",temp1);
 				//	out.printM3("temp2",temp2);
 					flag = 1;
@@ -618,21 +618,21 @@ void Symmetry_Basic::matrigen(Matrix3 *symgen, const int ngen, Matrix3* symop, i
 					}
 
 					//if(i==0 && j==0 && k==1 && l==0){
-						//cout<<"symop[0]:"<<endl;
+						//std::cout<<"symop[0]:"<<std::endl;
 						//for(m=0; m<3; m++)
-							//for(t=0; t<3; t++) cout<<temp2[m][t]<<"\t";
-						//cout<<endl;
+							//for(t=0; t<3; t++) std::cout<<temp2[m][t]<<"\t";
+						//std::cout<<std::endl;
 					//}
 
 					++now;	//the number of elements we found
 					if(now > 48)
 					{
-						cout<<"\n a: now= "<<now<<endl;
-						cout<<"\n There are too many symmetrical matrices!"<<endl;
+						std::cout<<"\n a: now= "<<now<<std::endl;
+						std::cout<<"\n There are too many symmetrical matrices!"<<std::endl;
 						return;
 					}
 					symop[now - 1] = temp2;
-				//	cout<<"\n symop[now]:  "<<now<<endl;
+				//	std::cout<<"\n symop[now]:  "<<now<<std::endl;
 				//	out.printM3("",temp2);
 				}
 			}
@@ -668,8 +668,8 @@ void Symmetry_Basic::matrigen(Matrix3 *symgen, const int ngen, Matrix3* symop, i
 					++now;
 					if(now > 48)
 					{
-						cout<<"\n b: now= "<<now<<endl;
-						cout<<"\n There are too many symmetrical matrices!"<<endl;
+						std::cout<<"\n b: now= "<<now<<std::endl;
+						std::cout<<"\n There are too many symmetrical matrices!"<<std::endl;
 						return;
 					}
 					symop[now - 1] = temp1;
@@ -685,14 +685,14 @@ void Symmetry_Basic::matrigen(Matrix3 *symgen, const int ngen, Matrix3* symop, i
 		nop = now;
 //		for(int i = 0; i < nop; ++i)
 //		{
-//			cout<<"\n i = "<<i + 1<<endl;
+//			std::cout<<"\n i = "<<i + 1<<std::endl;
 //			out.printM3("",symop[i]);
 //		}
 	}
-//	cout<<"\n in matrigen:"<<endl;
+//	std::cout<<"\n in matrigen:"<<std::endl;
 //	for(int i = 0; i < nop; ++i)
 //	{
-//		cout<<"\n i = "<<i<<endl;
+//		std::cout<<"\n i = "<<i<<std::endl;
 //		out.printM3("",symop[i]);
 //	}
 }
@@ -704,27 +704,27 @@ void Symmetry_Basic::matrigen(Matrix3 *symgen, const int ngen, Matrix3* symop, i
 // given in crystal coordinates) 
 // of a lattice with some arbitrary basis (atomic arrangement).
 //--------------------------------------------------------------
-void Symmetry_Basic::setgroup(Matrix3* symop, int &nop, const int &ibrav)
+void Symmetry_Basic::setgroup(ModuleBase::Matrix3* symop, int &nop, const int &ibrav)
 {
-	if(GlobalV::test_symmetry) TITLE("Symmetry_Basic","setgroup");
+	if(GlobalV::test_symmetry) ModuleBase::TITLE("Symmetry_Basic","setgroup");
 
-	Matrix3 symgen[3];
+	ModuleBase::Matrix3 symgen[3];
 
-	Matrix3 inv(-1,0,0,0,-1,0,0,0,-1);
-	Matrix3 r3d(0,1,0,0,0,1,1,0,0);
-	Matrix3 r6z(1,1,0,-1,0,0,0,0,1);
-	Matrix3 r2hex(1,0,0,-1,-1,0,0,0,-1);
-	Matrix3 r2tri(-1,0,0,0,0,-1,0,-1,0);
-	Matrix3 r4zp(0,1,0,-1,0,0,0,0,1);
-	Matrix3 r2yp(-1,0,0,0,1,0,0,0,-1);
-	Matrix3 r4zbc(0,0,-1,1,1,1,0,-1,0);
-	Matrix3 r4zfc(1,0,-1,1,0,0,1,-1,0);
-	Matrix3 r2zp(-1,0,0,0,-1,0,0,0,1);
-	Matrix3 r2ybc(0,0,1,-1,-1,-1,1,0,0);
-	Matrix3 r2zbc(0,1,0,1,0,0,-1,-1,-1);
-	Matrix3 r2ybas(0,-1,0,-1,0,0,0,0,-1);
-	Matrix3 r2yfc(0,-1,1,0,-1,0,1,-1,0);
-	Matrix3 r2zfc(0,1,-1,1,0,-1,0,0,-1);
+	ModuleBase::Matrix3 inv(-1,0,0,0,-1,0,0,0,-1);
+	ModuleBase::Matrix3 r3d(0,1,0,0,0,1,1,0,0);
+	ModuleBase::Matrix3 r6z(1,1,0,-1,0,0,0,0,1);
+	ModuleBase::Matrix3 r2hex(1,0,0,-1,-1,0,0,0,-1);
+	ModuleBase::Matrix3 r2tri(-1,0,0,0,0,-1,0,-1,0);
+	ModuleBase::Matrix3 r4zp(0,1,0,-1,0,0,0,0,1);
+	ModuleBase::Matrix3 r2yp(-1,0,0,0,1,0,0,0,-1);
+	ModuleBase::Matrix3 r4zbc(0,0,-1,1,1,1,0,-1,0);
+	ModuleBase::Matrix3 r4zfc(1,0,-1,1,0,0,1,-1,0);
+	ModuleBase::Matrix3 r2zp(-1,0,0,0,-1,0,0,0,1);
+	ModuleBase::Matrix3 r2ybc(0,0,1,-1,-1,-1,1,0,0);
+	ModuleBase::Matrix3 r2zbc(0,1,0,1,0,0,-1,-1,-1);
+	ModuleBase::Matrix3 r2ybas(0,-1,0,-1,0,0,0,0,-1);
+	ModuleBase::Matrix3 r2yfc(0,-1,1,0,-1,0,1,-1,0);
+	ModuleBase::Matrix3 r2zfc(0,1,-1,1,0,-1,0,0,-1);
 
 	//the pure translation lattice (bravais lattice) has some maximum symmetry
 	//set first up the point group operations for this symmetry.
@@ -810,33 +810,33 @@ void Symmetry_Basic::setgroup(Matrix3* symop, int &nop, const int &ibrav)
 		this->matrigen(symgen, 3, symop, nop);
 	}
 
-	OUT(GlobalV::ofs_running,"ROTATION MATRICES",nop);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"ROTATION MATRICES",nop);
 	if(GlobalV::test_symmetry > 1)
 	{
-		GlobalV::ofs_running<<" THERE ARE " << nop << " ROTATION MATRICES FOR THE PURE BRAVAIS LATTICE"<<endl;
-		GlobalV::ofs_running<<"    E11 E12 E13 E21 E22 E23 E31 E32 E33"<<endl;
+		GlobalV::ofs_running<<" THERE ARE " << nop << " ROTATION MATRICES FOR THE PURE BRAVAIS LATTICE"<<std::endl;
+		GlobalV::ofs_running<<"    E11 E12 E13 E21 E22 E23 E31 E32 E33"<<std::endl;
 		for(int i = 0; i < nop; ++i)
 		{
 			GlobalV::ofs_running << " " 
-			<< setw(3) << i + 1
-			<< setw(4) << symop[i].e11
-			<< setw(4) << symop[i].e12
-			<< setw(4) << symop[i].e13
-			<< setw(4) << symop[i].e21
-			<< setw(4) << symop[i].e22
-			<< setw(4) << symop[i].e23
-			<< setw(4) << symop[i].e31
-			<< setw(4) << symop[i].e32
-			<< setw(4) << symop[i].e33 << endl;
+			<< std::setw(3) << i + 1
+			<< std::setw(4) << symop[i].e11
+			<< std::setw(4) << symop[i].e12
+			<< std::setw(4) << symop[i].e13
+			<< std::setw(4) << symop[i].e21
+			<< std::setw(4) << symop[i].e22
+			<< std::setw(4) << symop[i].e23
+			<< std::setw(4) << symop[i].e31
+			<< std::setw(4) << symop[i].e32
+			<< std::setw(4) << symop[i].e33 << std::endl;
 //			out.printM3("",symop[i]);
-//			GlobalV::ofs_running<<endl;
+//			GlobalV::ofs_running<<std::endl;
 		}
 	}
 
 	return;
 }	
 
-void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, string &pgname, const Matrix3* gmatrix, ofstream &ofs_running)
+void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, std::string &pgname, const ModuleBase::Matrix3* gmatrix, std::ofstream &ofs_running)
 {
 	//-------------------------------------------------------------------------
 	//PGROUP (L1760 symlib.f VASP)
@@ -854,7 +854,7 @@ void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, string &pgname, 
 
 	//there are four trivial cases which could be easily determined
 	//because the number of their elements are exclusive
-	if(GlobalV::test_symmetry) TITLE("Symmetry_Basic","pointgroup");
+	if(GlobalV::test_symmetry) ModuleBase::TITLE("Symmetry_Basic","pointgroup");
 
 	if(nrot == 1)
 	{
@@ -907,7 +907,7 @@ void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, string &pgname, 
 	int ns4 = 0;
 	int ns6 = 0; //mohan add 2012-01-15
 
-//	GlobalV::ofs_running << " " << setw(5) << "NROT" << setw(15) << "TRACE" << setw(15) << "DET" << endl;
+//	GlobalV::ofs_running << " " << std::setw(5) << "NROT" << std::setw(15) << "TRACE" << std::setw(15) << "DET" << std::endl;
 	for(int i = 0; i < nrot; ++i)
 	{
 		//calculate the trace of a matrix
@@ -915,7 +915,7 @@ void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, string &pgname, 
 		//calculate the determinant of a matrix
 		det = int(gmatrix[i].Det());
 
-//		GlobalV::ofs_running << " " << setw(5) << i+1 << setw(15) << trace << setw(15) << det << endl;
+//		GlobalV::ofs_running << " " << std::setw(5) << i+1 << std::setw(15) << trace << std::setw(15) << det << std::endl;
 
 		if(trace == 3)
 		{
@@ -938,14 +938,14 @@ void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, string &pgname, 
 		else if(trace == -2 && det == -1) ++ns3; //mohan add 2012-01-15
 	}
 
-	OUT(GlobalV::ofs_running,"C2",nc2);
-	OUT(GlobalV::ofs_running,"C3",nc3);
-	OUT(GlobalV::ofs_running,"C4",nc4);
-	OUT(GlobalV::ofs_running,"C6",nc6);
-	OUT(GlobalV::ofs_running,"S1",ns1);
-	OUT(GlobalV::ofs_running,"S3",ns3);
-	OUT(GlobalV::ofs_running,"S4",ns4);
-	OUT(GlobalV::ofs_running,"S6",ns6);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"C2",nc2);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"C3",nc3);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"C4",nc4);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"C6",nc6);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"S1",ns1);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"S3",ns3);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"S4",ns4);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"S6",ns6);
 	
 	if(nrot == 2)
 	{
@@ -1134,17 +1134,17 @@ void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, string &pgname, 
 		}
 	}
 
-	GlobalV::ofs_running <<"\n No point group found!"<<endl;
+	GlobalV::ofs_running <<"\n No point group found!"<<std::endl;
 	return;
 }
 
 
-void Symmetry_Basic::rotate( Matrix3 &gmatrix, Vector3<double> &gtrans, 
+void Symmetry_Basic::rotate( ModuleBase::Matrix3 &gmatrix, ModuleBase::Vector3<double> &gtrans, 
 		int i, int j, int k, // FFT grid index.
 		const int nr1, const int nr2, const int nr3, // dimension of FFT grid. 
 		int &ri, int &rj, int &rk)
 {
-	static Matrix3 g;
+	static ModuleBase::Matrix3 g;
 	g.e11 = gmatrix.e11;
 	g.e21 = gmatrix.e21 * (double)nr1 / (double)nr2;
 	g.e31 = gmatrix.e31 * (double)nr1 / (double)nr3;

@@ -1,14 +1,16 @@
 #include "driver.h"
-#include "run_pw.h"
 #include "input.h"
 #include "input_conv.h"
+#include "run_pw.h"
+#include "src_pw/global.h"
 #ifdef __LCAO
 #include "run_lcao.h"
 #include "src_lcao/global_fp.h"
 #endif
-#include "src_pw/global.h"
 #include "src_io/cal_test.h"
 #include "src_io/winput.h"
+#include "src_io/print_info.h"
+#include "module_base/timer.h"
 
 Driver::Driver(){}
 
@@ -18,7 +20,10 @@ Driver::~Driver(){}
 
 void Driver::init()
 {
-	TITLE("Driver","init");
+	ModuleBase::TITLE("Driver","init");
+
+	time_t time_start = std::time(NULL);
+	ModuleBase::timer::start();
 
 	// (1) read the input parameters.
 	this->reading();
@@ -26,7 +31,13 @@ void Driver::init()
 	// (2) welcome to the atomic world!
 	this->atomic_world();
 
-	// (3) close all of the running logs 
+
+	// (3) output information
+	time_t	time_finish= std::time(NULL);
+	Print_Info::print_time(time_start, time_finish);
+
+	// (4) close all of the running logs 
+
 	INPUT.close_log();
 
 	return;
@@ -35,7 +46,7 @@ void Driver::init()
 
 void Driver::reading(void)
 {
-	timer::tick("Driver","reading");
+	ModuleBase::timer::tick("Driver","reading");
 
 	// (1) read INPUT 
 	INPUT.Init( GlobalV::global_in_card );
@@ -46,11 +57,11 @@ void Driver::reading(void)
 	// (3) define the 'DIAGONALIZATION' world in MPI
 	Parallel_Global::split_diag_world(GlobalV::DIAGO_PROC);
 	Parallel_Global::split_grid_world(GlobalV::DIAGO_PROC);
-	OUT(GlobalV::ofs_running,"DRANK",GlobalV::DRANK+1);
-	OUT(GlobalV::ofs_running,"DSIZE",GlobalV::DSIZE);
-	OUT(GlobalV::ofs_running,"DCOLOR",GlobalV::DCOLOR+1);
-	OUT(GlobalV::ofs_running,"GRANK",GlobalV::GRANK+1);
-	OUT(GlobalV::ofs_running,"GSIZE",GlobalV::GSIZE);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"DRANK",GlobalV::DRANK+1);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"DSIZE",GlobalV::DSIZE);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"DCOLOR",GlobalV::DCOLOR+1);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"GRANK",GlobalV::GRANK+1);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"GSIZE",GlobalV::GSIZE);
 
 #ifdef __MPI
     // (4)  divide the GlobalV::NPROC processors into GlobalV::NPOOL for k-points parallelization.
@@ -61,18 +72,18 @@ void Driver::reading(void)
     winput::Init( GlobalV::global_wannier_card );
 
     // (6) Print the parameters into INPUT file.
-    stringstream ss1;
+    std::stringstream ss1;
     ss1 << GlobalV::global_out_dir << GlobalV::global_in_card;
     INPUT.Print( ss1.str() );
-    //DONE(GlobalV::ofs_running,"READING CARDS");
+    //ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"READING CARDS");
 
-	timer::tick("Driver","reading");
+	ModuleBase::timer::tick("Driver","reading");
 	return;
 }
 
 void Driver::atomic_world(void)
 {
-	TITLE("Driver","atomic_world");
+	ModuleBase::TITLE("Driver","atomic_world");
 
 	//--------------------------------------------------
 	// choose basis sets:
@@ -91,9 +102,9 @@ void Driver::atomic_world(void)
 	}
 #endif
 
-	timer::finish( GlobalV::ofs_running );
+	ModuleBase::timer::finish( GlobalV::ofs_running );
 
-	Memory::print_all( GlobalV::ofs_running ) ;
+	ModuleBase::Memory::print_all( GlobalV::ofs_running ) ;
 
 	return;
 }

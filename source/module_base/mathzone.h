@@ -9,7 +9,8 @@
 #include <map>
 #include <cassert>
 #include <complex>
-using namespace std;
+namespace ModuleBase
+{
 
 class Mathzone
 {
@@ -24,7 +25,7 @@ class Mathzone
         if (a>=b && a>=c) return a;
         else if (b>=a && b>=c) return b;
         else if (c>=a && c>=b) return c;
-		else throw runtime_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		else throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
     }
 
     // be careful, this can only be used for plane wave
@@ -36,10 +37,10 @@ public:
 
 	// Peize Lin add 2016-08-03
 	template< typename Type >
-	static vector<Type> Pointwise_Product( const vector<Type> &f1, const vector<Type> &f2 )
+	static std::vector<Type> Pointwise_Product( const std::vector<Type> &f1, const std::vector<Type> &f2 )
 	{
 		assert(f1.size()==f2.size());
-		vector<Type> f(f1.size());
+		std::vector<Type> f(f1.size());
 		for( int ir=0; ir!=f.size(); ++ir )
 			f[ir] = f1[ir] * f2[ir];
 		return f;
@@ -48,8 +49,8 @@ public:
 //==========================================================
 // MEMBER FUNCTION :
 // NAME : Direct_to_Cartesian
-// use lattice vector matrix R
-// change the direct vector (dx,dy,dz) to cartesuab vectir
+// use lattice std::vector matrix R
+// change the direct std::vector (dx,dy,dz) to cartesuab vectir
 // (cx,cy,cz)
 // (dx,dy,dz) = (cx,cy,cz) * R
 //
@@ -65,8 +66,8 @@ public:
         const double &R31,const double &R32,const double &R33,
         double &cx,double &cy,double &cz)
     {
-        static Matrix3 lattice_vector;
-        static Vector3<double> direct_vec, cartesian_vec;
+        static ModuleBase::Matrix3 lattice_vector;
+        static ModuleBase::Vector3<double> direct_vec, cartesian_vec;
         lattice_vector.e11 = R11;
         lattice_vector.e12 = R12;
         lattice_vector.e13 = R13;
@@ -96,7 +97,7 @@ public:
         const double &R31,const double &R32,const double &R33,
         double &dx,double &dy,double &dz)
     {
-        static Matrix3 lattice_vector, inv_lat;
+        static ModuleBase::Matrix3 lattice_vector, inv_lat;
         lattice_vector.e11 = R11;
         lattice_vector.e12 = R12;
         lattice_vector.e13 = R13;
@@ -109,7 +110,7 @@ public:
 
         inv_lat = lattice_vector.Inverse();
 
-        static Vector3<double> direct_vec, cartesian_vec;
+        static ModuleBase::Vector3<double> direct_vec, cartesian_vec;
         cartesian_vec.x = cx;
         cartesian_vec.y = cy;
         cartesian_vec.z = cz;
@@ -140,23 +141,25 @@ public:
 		return coeff1 * x1 + (1-coeff1) * x2;
 	}
 	template< typename T, typename T_coeff >
-	static vector<T> Linear_Mixing( const vector<T> & x1, const vector<T> & x2, const T_coeff & coeff1 )
+	static std::vector<T> Linear_Mixing( const std::vector<T> & x1, const std::vector<T> & x2, const T_coeff & coeff1 )
 	{
 		assert(x1.size()==x2.size());
-		vector<T> x;
+		std::vector<T> x;
 		for( size_t i=0; i!=x1.size(); ++i )
 			x.push_back( Linear_Mixing( x1[i], x2[i], coeff1 ) );
 		return x;
 	}
 	template< typename T1, typename T2, typename T_coeff >
-	static map<T1,T2> Linear_Mixing( const map<T1,T2> & x1, const map<T1,T2> & x2, const T_coeff & coeff1 )
+	static std::map<T1,T2> Linear_Mixing( const std::map<T1,T2> & x1, const std::map<T1,T2> & x2, const T_coeff & coeff1 )
 	{
-		map<T1,T2> x;
+		std::map<T1,T2> x;
 		for( const auto & x1i : x1 )
 			x.insert( make_pair( x1i.first, Linear_Mixing( x1i.second, x2.at(x1i.first), coeff1 ) ) );
 		return x;
 	}	
 
 };
+
+}
 
 #endif

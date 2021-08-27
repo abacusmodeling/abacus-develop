@@ -16,8 +16,8 @@ Run_lcao::~Run_lcao(){}
 
 void Run_lcao::lcao_line(void)
 {
-    TITLE("Run_lcao","lcao_line");
-	timer::tick("Run_lcao","lcao_line");
+    ModuleBase::TITLE("Run_lcao","lcao_line");
+	ModuleBase::timer::tick("Run_lcao","lcao_line");
 
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
@@ -29,20 +29,20 @@ void Run_lcao::lcao_line(void)
 		GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
 			GlobalV::ofs_running,
 			GlobalV::OUT_LEVEL,
-			GlobalC::ORB.get_rcutmax_Phi(), 
-			GlobalC::ORB.get_rcutmax_Beta(), 
+			GlobalC::ORB.get_rcutmax_Phi(),
+			GlobalC::ORB.get_rcutmax_Beta(),
 			GlobalV::GAMMA_ONLY_LOCAL);
 
 		atom_arrange::search(
 			GlobalV::SEARCH_PBC,
 			GlobalV::ofs_running,
-			GlobalC::GridD, 
-			GlobalC::ucell, 
-			GlobalV::SEARCH_RADIUS, 
+			GlobalC::GridD,
+			GlobalC::ucell,
+			GlobalV::SEARCH_RADIUS,
 			GlobalV::test_atom_input,
 			INPUT.test_just_neighbor);
 	}
-	// setup GlobalV::NBANDS 
+	// setup GlobalV::NBANDS
 	// Yu Liu add 2021-07-03
 	GlobalC::CHR.cal_nelec();
 
@@ -57,38 +57,37 @@ void Run_lcao::lcao_line(void)
 	}
 
     //GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir , GlobalV::global_atom_card , GlobalV::ofs_running, GlobalV::NLOCAL, GlobalV::NBANDS);
-    DONE(GlobalV::ofs_running, "SETUP UNITCELL");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     // symmetry analysis should be performed every time the cell is changed
     if (ModuleSymmetry::Symmetry::symm_flag)
     {
         GlobalC::symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
-        DONE(GlobalV::ofs_running, "SYMMETRY");
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
     // Setup the k points according to symmetry.
     GlobalC::kv.set(GlobalC::symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec );
-    DONE(GlobalV::ofs_running,"INIT K-POINTS");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT K-POINTS");
 
     // print information
     // mohan add 2021-01-30
-    Print_Info PI;
-    PI.setup_parameters();
+    Print_Info::setup_parameters(GlobalC::ucell, GlobalC::kv, GlobalC::xcf);
 
-    // * reading the localized orbitals/projectors 
+    // * reading the localized orbitals/projectors
 	// * construct the interpolation tables.
 
 	GlobalC::LOWF.orb_con.set_orb_tables(
 		GlobalV::ofs_running,
-		GlobalC::UOT, 
+		GlobalC::UOT,
 		GlobalC::ORB,
 		GlobalC::ucell.ntype,
 		GlobalC::ucell.lmax,
 		INPUT.lcao_ecut,
 		INPUT.lcao_dk,
 		INPUT.lcao_dr,
-		INPUT.lcao_rmax, 
-		GlobalC::ucell.lat0, 
+		INPUT.lcao_rmax,
+		GlobalC::ucell.lat0,
 		INPUT.out_descriptor,
 		INPUT.out_r_matrix,
 		Exx_Abfs::Lmax,
@@ -105,15 +104,15 @@ void Run_lcao::lcao_line(void)
 
     // Initalize the plane wave basis set
     GlobalC::pw.gen_pw(GlobalV::ofs_running, GlobalC::ucell, GlobalC::kv);
-    DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
-    cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx <<" * " << GlobalC::pw.ny <<" * "<< GlobalC::pw.nz << endl;
-    cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx <<" * " << GlobalC::pw.nby <<" * "<< GlobalC::pw.nbz << endl;
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
+    std::cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx <<" * " << GlobalC::pw.ny <<" * "<< GlobalC::pw.nz << std::endl;
+    std::cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx <<" * " << GlobalC::pw.nby <<" * "<< GlobalC::pw.nbz << std::endl;
 
     // the symmetry of a variety of systems.
     if(GlobalV::CALCULATION == "test")
     {
         Cal_Test::test_memory();
-        QUIT();
+        ModuleBase::QUIT();
     }
 
     // initialize the real-space uniform grid for FFT and parallel
@@ -124,11 +123,11 @@ void Run_lcao::lcao_line(void)
 
 	// Inititlize the charge density.
     GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
-    DONE(GlobalV::ofs_running,"INIT CHARGE");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT CHARGE");
 
 	// Initializee the potential.
     GlobalC::pot.allocate(GlobalC::pw.nrxx);
-    DONE(GlobalV::ofs_running,"INIT POTENTIAL");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT POTENTIAL");
 
 
 	// Peize Lin add 2018-11-30
@@ -157,6 +156,6 @@ void Run_lcao::lcao_line(void)
 		GlobalC::en.perform_dos();
 	}
 
-	timer::tick("Run_lcao","lcao_line");
+	ModuleBase::timer::tick("Run_lcao","lcao_line");
     return;
 }

@@ -28,7 +28,7 @@ void Center2_Orb::Orb21::init_radial_table()
 {
 	const Numerical_Orbital_Lm & nA_short = (nA1.getNr()<=nA2.getNr()) ? nA1 : nA2;
 	
-	vector<double> nA_tmp( nA_short.getNr() );
+	std::vector<double> nA_tmp( nA_short.getNr() );
 	for( size_t ir=0; ir!=nA_tmp.size(); ++ir)
 	{
 		nA_tmp[ir] = nA1.getPsi(ir) * nA2.getPsi(ir);
@@ -50,7 +50,7 @@ void Center2_Orb::Orb21::init_radial_table()
 			nA_short.getRab(),
 			nA_short.getRadial(),
 			Numerical_Orbital_Lm::Psi_Type::Psi,
-			VECTOR_TO_PTR(nA_tmp),
+			ModuleBase::GlobalFunc::VECTOR_TO_PTR(nA_tmp),
 			nA_short.getNk(),
 			nA_short.getDk(),
 			nA_short.getDruniform(),
@@ -65,11 +65,11 @@ void Center2_Orb::Orb21::init_radial_table()
 	}
 }
 
-void Center2_Orb::Orb21::init_radial_table( const set<size_t> &radials )
+void Center2_Orb::Orb21::init_radial_table( const std::set<size_t> &radials )
 {
 	const Numerical_Orbital_Lm & nA_short = (nA1.getNr()<=nA2.getNr()) ? nA1 : nA2;
 	
-	vector<double> nA_tmp( nA_short.getNr() );
+	std::vector<double> nA_tmp( nA_short.getNr() );
 	for( size_t ir=0; ir!=nA_tmp.size(); ++ir)
 	{
 		nA_tmp[ir] = nA1.getPsi(ir) * nA2.getPsi(ir);
@@ -91,7 +91,7 @@ void Center2_Orb::Orb21::init_radial_table( const set<size_t> &radials )
 			nA_short.getRab(),
 			nA_short.getRadial(),
 			Numerical_Orbital_Lm::Psi_Type::Psi,
-			VECTOR_TO_PTR(nA_tmp),
+			ModuleBase::GlobalFunc::VECTOR_TO_PTR(nA_tmp),
 			nA_short.getNk(),
 			nA_short.getDk(),
 			nA_short.getDruniform(),
@@ -107,7 +107,7 @@ void Center2_Orb::Orb21::init_radial_table( const set<size_t> &radials )
 }
 
 double Center2_Orb::Orb21::cal_overlap(
-	const Vector3<double> &RA, const Vector3<double> &RB,
+	const ModuleBase::Vector3<double> &RA, const ModuleBase::Vector3<double> &RB,
 	const int &mA1, const int &mA2, const int &mB) const
 {
 	const int LA1 = nA1.getL();

@@ -46,14 +46,14 @@ LCAO_nnr::~LCAO_nnr()
 // be called in LOOP_ions.cpp
 void LCAO_nnr::cal_nnr(void)
 {
-	TITLE("LCAO_nnr","cal_nnr");
+	ModuleBase::TITLE("LCAO_nnr","cal_nnr");
 
 	delete[] nlocdim;
 	delete[] nlocstart;
 	nlocdim = new int[GlobalC::ucell.nat];	
 	nlocstart = new int[GlobalC::ucell.nat];
-	ZEROS(nlocdim, GlobalC::ucell.nat);
-	ZEROS(nlocstart, GlobalC::ucell.nat);
+	ModuleBase::GlobalFunc::ZEROS(nlocdim, GlobalC::ucell.nat);
+	ModuleBase::GlobalFunc::ZEROS(nlocstart, GlobalC::ucell.nat);
 
 	this->nnr = 0;
 	int start = 0;
@@ -61,12 +61,12 @@ void LCAO_nnr::cal_nnr(void)
 	int iat = 0;
 
 	// (1) find the adjacent atoms of atom[T1,I1];
-	Vector3<double> tau1;
-	Vector3<double> tau2;
-	Vector3<double> dtau;
-	Vector3<double> tau0;
-	Vector3<double> dtau1;
-	Vector3<double> dtau2;
+	ModuleBase::Vector3<double> tau1;
+	ModuleBase::Vector3<double> tau2;
+	ModuleBase::Vector3<double> dtau;
+	ModuleBase::Vector3<double> tau0;
+	ModuleBase::Vector3<double> dtau1;
+	ModuleBase::Vector3<double> dtau2;
 
 	for (int T1 = 0; T1 < GlobalC::ucell.ntype; T1++)
 	{
@@ -178,11 +178,11 @@ void LCAO_nnr::cal_nnr(void)
 	} // end T1
 
 	//xiaohui add 'GlobalV::OUT_LEVEL' line, 2015-09-16
-	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"nnr",nnr);
+	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nnr",nnr);
 //	for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 //	{
-//		cout << " nlocdim[" << iat << "]=" << nlocdim[iat];
-//		cout << " nlocstart[" << iat << "]=" << nlocstart[iat] << endl;
+//		std::cout << " nlocdim[" << iat << "]=" << nlocdim[iat];
+//		std::cout << " nlocstart[" << iat << "]=" << nlocstart[iat] << std::endl;
 //	}
 
 	return;
@@ -191,7 +191,7 @@ void LCAO_nnr::cal_nnr(void)
 // This is for cell R dependent part. 
 void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 {
-	TITLE("LCAO_nnr","cal_nnrg");
+	ModuleBase::TITLE("LCAO_nnr","cal_nnrg");
 
 	this->cal_max_box_index();
 
@@ -205,13 +205,13 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 	this->nlocdimg = new int[GlobalC::ucell.nat];	
 	this->nlocstartg = new int[GlobalC::ucell.nat];
 	
-	ZEROS(nad, GlobalC::ucell.nat);
-	ZEROS(nlocdimg, GlobalC::ucell.nat);
-	ZEROS(nlocstartg, GlobalC::ucell.nat);
+	ModuleBase::GlobalFunc::ZEROS(nad, GlobalC::ucell.nat);
+	ModuleBase::GlobalFunc::ZEROS(nlocdimg, GlobalC::ucell.nat);
+	ModuleBase::GlobalFunc::ZEROS(nlocstartg, GlobalC::ucell.nat);
 
 
-	Vector3<double> tau1, tau2, dtau;
-	Vector3<double> dtau1, dtau2, tau0;
+	ModuleBase::Vector3<double> tau1, tau2, dtau;
+	ModuleBase::Vector3<double> dtau1, dtau2, tau0;
 	for (int T1 = 0; T1 < GlobalC::ucell.ntype; ++T1)
 	{
 		Atom* atom1 = &GlobalC::ucell.atoms[T1];
@@ -270,11 +270,11 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 							++count;
 
 							/*
-							   ofs << setw(10) << iat << setw(10) << iat2
-							   << setw(10) << GlobalC::GridD.getBox(ad).x 
-							   << setw(10) << GlobalC::GridD.getBox(ad).y 
-							   << setw(10) << GlobalC::GridD.getBox(ad).z 
-							   << setw(20) << distance << endl;
+							   ofs << std::setw(10) << iat << std::setw(10) << iat2
+							   << std::setw(10) << GlobalC::GridD.getBox(ad).x 
+							   << std::setw(10) << GlobalC::GridD.getBox(ad).y 
+							   << std::setw(10) << GlobalC::GridD.getBox(ad).z 
+							   << std::setw(20) << distance << std::endl;
 							 */
 						}
 						// there is another possibility that i and j are adjacent atoms.
@@ -316,12 +316,12 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 						*/
 					}// end iat2
 				}// end ad
-//				GlobalV::ofs_running << " iat=" << iat << " nlocstartg=" << nlocstartg[iat] << " nad=" << nad[iat] << endl;
+//				GlobalV::ofs_running << " iat=" << iat << " nlocstartg=" << nlocstartg[iat] << " nad=" << nad[iat] << std::endl;
 			}// end iat
 		}// end I1
 	}// end T1
 
-	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"nnrg",this->nnrg);
+	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nnrg",this->nnrg);
 
 	//--------------------------------------------------
 	// search again, to order each (iat2, b1, b2, b3)
@@ -352,35 +352,35 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 	{
 		// at least nad contains itself, so nad[iat] can not be 0.
 		this->find_R2[iat] = new int[nad[iat]];
-		ZEROS(find_R2[iat], nad[iat]);
+		ModuleBase::GlobalFunc::ZEROS(find_R2[iat], nad[iat]);
 	}
 
 	this->find_R2st = new int*[GlobalC::ucell.nat];
 	for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 	{
 		this->find_R2st[iat] = new int[nad[iat]];
-		ZEROS(find_R2st[iat], nad[iat]);
+		ModuleBase::GlobalFunc::ZEROS(find_R2st[iat], nad[iat]);
 	}
 	allocate_find_R2 = true;
 
-//	GlobalV::ofs_running << setw(5) << "b1" << setw(5) << "b2" << setw(5) << "b3"
-//	<< setw(8) << "iat" << setw(8) << "ad" << setw(8) << "iat2"
-//	<< setw(8) << "find_R2" << setw(8) << "find_R2st" << setw(8) << "dis" << endl;
+//	GlobalV::ofs_running << std::setw(5) << "b1" << std::setw(5) << "b2" << std::setw(5) << "b3"
+//	<< std::setw(8) << "iat" << std::setw(8) << "ad" << std::setw(8) << "iat2"
+//	<< std::setw(8) << "find_R2" << std::setw(8) << "find_R2st" << std::setw(8) << "dis" << std::endl;
 	for (int T1 = 0; T1 < GlobalC::ucell.ntype; T1++)
 	{
 		for (int I1 = 0; I1 < GlobalC::ucell.atoms[T1].na; I1++)
 		{
-//			cout << " T1=" << T1 << " I1=" << I1 << endl; 
+//			std::cout << " T1=" << T1 << " I1=" << I1 << std::endl; 
 			tau1 = GlobalC::ucell.atoms[T1].tau[I1];
 			GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
 			const int iat = GlobalC::ucell.itia2iat(T1,I1);
 
-//			cout << " Number of adjacent = " << GlobalC::GridD.getAdjacentNum()+1 << endl;
+//			std::cout << " Number of adjacent = " << GlobalC::GridD.getAdjacentNum()+1 << std::endl;
 			
 			int count=0;
 			for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ad++)
 			{
-		//		cout << " ad=" << ad << endl;
+		//		std::cout << " ad=" << ad << std::endl;
 				const int T2 = GlobalC::GridD.getType(ad);
 				const int I2 = GlobalC::GridD.getNatom(ad);
 				const int iat2 = GlobalC::ucell.itia2iat(T2,I2);
@@ -403,23 +403,23 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 						/*
 						if( this->cal_RindexAtom(b1, b2, b3, iat2) == 232 )
 						{
-							cout << " ====== nnrg =========" << endl;
-							cout << " index=" << cal_RindexAtom(b1, b2, b3, iat2) << endl;
-							cout << " iat=" << iat << " iat2=" << iat2 << endl;
-							cout << " R1 = " << tau1.x << " " << tau1.y << " " << tau1.z << endl;
-							cout << " R2 = " << GlobalC::GridD.getAdjacentTau(ad).x 
+							std::cout << " ====== nnrg =========" << std::endl;
+							std::cout << " index=" << cal_RindexAtom(b1, b2, b3, iat2) << std::endl;
+							std::cout << " iat=" << iat << " iat2=" << iat2 << std::endl;
+							std::cout << " R1 = " << tau1.x << " " << tau1.y << " " << tau1.z << std::endl;
+							std::cout << " R2 = " << GlobalC::GridD.getAdjacentTau(ad).x 
 							<< " " << GlobalC::GridD.getAdjacentTau(ad).y 
-							<< " " << GlobalC::GridD.getAdjacentTau(ad).z << endl;
-							cout << setprecision(25);
-							cout << " distance = " << distance << endl;
-							cout << " box = " << b1 << " " << b2 << " " << b3 << endl;
-							cout << " rcut = " << rcut << endl;
+							<< " " << GlobalC::GridD.getAdjacentTau(ad).z << std::endl;
+							std::cout << std::setprecision(25);
+							std::cout << " distance = " << distance << std::endl;
+							std::cout << " box = " << b1 << " " << b2 << " " << b3 << std::endl;
+							std::cout << " rcut = " << rcut << std::endl;
 						}
 						*/
 						
 
-						//cout << " iat=" << iat << " find_R2=" << this->cal_RindexAtom(b1, b2, b3, iat2) <<
-						// " b1=" << b1 << " b2=" << b2 << " b3=" << b3 << " iat2=" << iat2 << " distance=" << distance << endl;
+						//std::cout << " iat=" << iat << " find_R2=" << this->cal_RindexAtom(b1, b2, b3, iat2) <<
+						// " b1=" << b1 << " b2=" << b2 << " b3=" << b3 << " iat2=" << iat2 << " distance=" << distance << std::endl;
 					
 						// mohan fix bug 2011-06-26, should be '<', not '<='	
 						//			if(distance < rcut)
@@ -444,13 +444,13 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 							{
 								GlobalV::ofs_running << " ************** iat=" << iat << " count=" << count << " find_R2=" << find_R2[iat][count] << 
 								" b1=" << b1 << " b2=" << b2 << " b3=" << b3 << " iat2=" << iat2 << " distance=" << distance 
-								<< " rcut=" << rcut <<endl;
+								<< " rcut=" << rcut <<std::endl;
 							}
 							else if(find_R2[iat][count]==10536)
 							{
 								GlobalV::ofs_running << " ************** iat=" << iat << " count=" << count << " find_R2=" << find_R2[iat][count] << 
 								" b1=" << b1 << " b2=" << b2 << " b3=" << b3 << " iat2=" << iat2 << " distance=" << distance 
-								<< " rcut=" << rcut <<endl;
+								<< " rcut=" << rcut <<std::endl;
 							}*/
 
 							// find_R2st
@@ -473,15 +473,15 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 	// for test
 	//---------
 	/*
-	GlobalV::ofs_running << " print find_R2 " << endl;
+	GlobalV::ofs_running << " print find_R2 " << std::endl;
 	for(int i=0; i<GlobalC::ucell.nat; i++)
 	{
 		for(int j=0; j<nad[i]; j++)
 		{
-			GlobalV::ofs_running << " i=" << i << " j=" << j << " find_R2=" << find_R2[i][j] << endl;
+			GlobalV::ofs_running << " i=" << i << " j=" << j << " find_R2=" << find_R2[i][j] << std::endl;
 		}
 	}
-	GlobalV::ofs_running << endl;
+	GlobalV::ofs_running << std::endl;
 	*/
 
 	return;
@@ -489,14 +489,14 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 
 void LCAO_nnr::cal_max_box_index(void)
 {
-	TITLE("LCAO_nnr","cal_max_box_index");
+	ModuleBase::TITLE("LCAO_nnr","cal_max_box_index");
 	this->maxB1 = this->maxB2 = this->maxB3 = -10000;
 	this->minB1 = this->minB2 = this->minB3 = 10000;
 	for (int T1 = 0; T1 < GlobalC::ucell.ntype; T1++)
 	{
 		for (int I1 = 0; I1 < GlobalC::ucell.atoms[T1].na; I1++)
 		{
-			Vector3<double> tau1 = GlobalC::ucell.atoms[T1].tau[I1];
+			ModuleBase::Vector3<double> tau1 = GlobalC::ucell.atoms[T1].tau[I1];
 			//GlobalC::GridD.Find_atom(tau1);
 			GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
 			for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ad++)
@@ -513,12 +513,12 @@ void LCAO_nnr::cal_max_box_index(void)
 	}
 
 	/*
-	OUT(GlobalV::ofs_running,"maxB1",maxB1);
-	OUT(GlobalV::ofs_running,"maxB2",maxB2);
-	OUT(GlobalV::ofs_running,"maxB3",maxB3);
-	OUT(GlobalV::ofs_running,"minB1",minB1);
-	OUT(GlobalV::ofs_running,"minB2",minB2);
-	OUT(GlobalV::ofs_running,"minB3",minB3);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"maxB1",maxB1);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"maxB2",maxB2);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"maxB3",maxB3);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"minB1",minB1);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"minB2",minB2);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"minB3",minB3);
 	*/
 
 	nB1 = maxB1-minB1+1;
@@ -526,14 +526,14 @@ void LCAO_nnr::cal_max_box_index(void)
 	nB3 = maxB3-minB3+1;
 
 	/*
-	OUT(GlobalV::ofs_running,"nB1",nB1);
-	OUT(GlobalV::ofs_running,"nB2",nB2);
-	OUT(GlobalV::ofs_running,"nB3",nB3);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nB1",nB1);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nB2",nB2);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nB3",nB3);
 	*/
 
 	nbox = nB1 * nB2 * nB3;
 	
-	//OUT(GlobalV::ofs_running,"nbox",nbox);
+	//ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nbox",nbox);
 
 	return;
 }
@@ -546,10 +546,10 @@ int LCAO_nnr::cal_RindexAtom(const int &u1, const int &u2, const int &u3, const 
 	
 	if(x1<0 || x2<0 || x3<0)
 	{
-		cout << " u1=" << u1 << " minB1=" << minB1 << endl;
-		cout << " u2=" << u2 << " minB2=" << minB2 << endl;
-		cout << " u3=" << u3 << " minB3=" << minB3 << endl;
-		WARNING_QUIT("LCAO_nnr::cal_Rindex","x1<0 || x2<0 || x3<0 !");
+		std::cout << " u1=" << u1 << " minB1=" << minB1 << std::endl;
+		std::cout << " u2=" << u2 << " minB2=" << minB2 << std::endl;
+		std::cout << " u3=" << u3 << " minB3=" << minB3 << std::endl;
+		ModuleBase::WARNING_QUIT("LCAO_nnr::cal_Rindex","x1<0 || x2<0 || x3<0 !");
 	}
 
 	assert(x1>=0);
@@ -563,18 +563,18 @@ int LCAO_nnr::cal_RindexAtom(const int &u1, const int &u2, const int &u3, const 
 // be called in LCAO_Hamilt::calculate_Hk.
 void LCAO_nnr::folding_fixedH(const int &ik)
 {
-	TITLE("LCAO_nnr","folding_fixedH");
-	timer::tick("LCAO_nnr","folding_fixedH");
+	ModuleBase::TITLE("LCAO_nnr","folding_fixedH");
+	ModuleBase::timer::tick("LCAO_nnr","folding_fixedH");
 
 	int iat = 0;
 	int index = 0;
-	Vector3<double> dtau;
-	Vector3<double> tau1;
-	Vector3<double> tau2;
+	ModuleBase::Vector3<double> dtau;
+	ModuleBase::Vector3<double> tau1;
+	ModuleBase::Vector3<double> tau2;
 
-	Vector3<double> dtau1;
-	Vector3<double> dtau2;
-	Vector3<double> tau0;
+	ModuleBase::Vector3<double> dtau1;
+	ModuleBase::Vector3<double> dtau2;
+	ModuleBase::Vector3<double> tau0;
 
 	for (int T1 = 0; T1 < GlobalC::ucell.ntype; ++T1)
 	{
@@ -640,10 +640,10 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 					// exp(k dot dR)
 					// dR is the index of box in Crystal coordinates
 					//------------------------------------------------
-					Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
-					const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * TWO_PI;
-					//const double arg = ( GlobalC::kv.kvec_d[ik] * GlobalC::GridD.getBox(ad) ) * TWO_PI;
-					const complex<double> kphase = complex <double> ( cos(arg),  sin(arg) );
+					ModuleBase::Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
+					const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * ModuleBase::TWO_PI;
+					//const double arg = ( GlobalC::kv.kvec_d[ik] * GlobalC::GridD.getBox(ad) ) * ModuleBase::TWO_PI;
+					const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );
 
 					//--------------------------------------------------
 					// calculate how many matrix elements are in 
@@ -709,6 +709,6 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 
 	assert(index==this->nnr);
 
-	timer::tick("LCAO_nnr","folding_fixedH");
+	ModuleBase::timer::tick("LCAO_nnr","folding_fixedH");
 	return;
 }

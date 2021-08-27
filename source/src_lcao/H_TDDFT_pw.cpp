@@ -3,14 +3,14 @@
 #include "ELEC_evolve.h"
 
 //==========================================================
-// this function aims to add external time-dependent potential 
+// this function aims to add external time-dependent potential
 // (eg: linear potential) used in tddft
 // fuxiang add in 2017-05
 //==========================================================
 void Potential::set_vrs_tddft(const int istep)
 {
-    TITLE("Potential","set_vrs_tddft");
-    timer::tick("Potential","set_vrs_tddft");
+    ModuleBase::TITLE("Potential","set_vrs_tddft");
+    ModuleBase::timer::tick("Potential","set_vrs_tddft");
 
     for (int is = 0;is < GlobalV::NSPIN;is++)
     {
@@ -25,7 +25,7 @@ void Potential::set_vrs_tddft(const int istep)
             {
                 this->vr_eff(is, i) = this->vltot[i] + this->vr(is, i);
             }
-            cout << "vext = 0! " << endl;
+            std::cout << "vext = 0! " << std::endl;
         }
         else
         {
@@ -44,52 +44,52 @@ void Potential::set_vrs_tddft(const int istep)
 
                 if(ELEC_evolve::td_vext_dire == 1)
                 {
-                    if (k<GlobalC::pw.ncx*0.05) 
+                    if (k<GlobalC::pw.ncx*0.05)
 					{
 						this->vextold[ir] = (0.019447*k/GlobalC::pw.ncx-0.001069585)*GlobalC::ucell.lat0;
 					}
-                    else if (k>=GlobalC::pw.ncx*0.05 && k<GlobalC::pw.ncx*0.95) 
+                    else if (k>=GlobalC::pw.ncx*0.05 && k<GlobalC::pw.ncx*0.95)
 					{
 						this->vextold[ir] = -0.0019447*k/GlobalC::pw.ncx*GlobalC::ucell.lat0;
 					}
-                    else if (k>=GlobalC::pw.ncx*0.95) 
+                    else if (k>=GlobalC::pw.ncx*0.95)
 					{
 						this->vextold[ir] = (0.019447*(1.0*k/GlobalC::pw.ncx-1)-0.001069585)*GlobalC::ucell.lat0;
 					}
                 }
                 else if(ELEC_evolve::td_vext_dire == 2)
                 {
-                    if (j<GlobalC::pw.ncx*0.05) 
+                    if (j<GlobalC::pw.ncx*0.05)
 					{
 						this->vextold[ir] = (0.019447*j/GlobalC::pw.ncx-0.001069585)*GlobalC::ucell.lat0;
 					}
-                    else if (j>=GlobalC::pw.ncx*0.05 && j<GlobalC::pw.ncx*0.95)	
+                    else if (j>=GlobalC::pw.ncx*0.05 && j<GlobalC::pw.ncx*0.95)
 					{
 						this->vextold[ir] = -0.0019447*j/GlobalC::pw.ncx*GlobalC::ucell.lat0;
 					}
-                    else if (j>=GlobalC::pw.ncx*0.95) 
+                    else if (j>=GlobalC::pw.ncx*0.95)
 					{
 						this->vextold[ir] = (0.019447*(1.0*j/GlobalC::pw.ncx-1)-0.001069585)*GlobalC::ucell.lat0;
 					}
                 }
                 else if(ELEC_evolve::td_vext_dire == 3)
                 {
-                    if (i<GlobalC::pw.ncx*0.05) 
+                    if (i<GlobalC::pw.ncx*0.05)
 					{
 						this->vextold[ir] = (0.019447*i/GlobalC::pw.ncx-0.001069585)*GlobalC::ucell.lat0;
 					}
-                    else if (i>=GlobalC::pw.ncx*0.05 && i<GlobalC::pw.ncx*0.95) 
+                    else if (i>=GlobalC::pw.ncx*0.05 && i<GlobalC::pw.ncx*0.95)
 					{
 						this->vextold[ir] = -0.0019447*i/GlobalC::pw.ncx*GlobalC::ucell.lat0;
 					}
-                    else if (i>=GlobalC::pw.ncx*0.95) 
+                    else if (i>=GlobalC::pw.ncx*0.95)
 					{
 						this->vextold[ir] = (0.019447*(1.0*i/GlobalC::pw.ncx-1)-0.001069585)*GlobalC::ucell.lat0;
 					}
                 }
 
                 // Gauss
-				if (ELEC_evolve::td_vexttype = 1)
+				if (ELEC_evolve::td_vexttype == 1)
 				{
 					const double w = 22.13;    // eV
 					const double sigmasquare = 700;
@@ -100,7 +100,7 @@ void Potential::set_vrs_tddft(const int istep)
 				}
 
                 //HHG of H atom
-				if (ELEC_evolve::td_vexttype = 2)
+				if (ELEC_evolve::td_vexttype == 2)
 				{
 					const double w_h = 0.0588; //a.u.
 					const int stepcut1 = 1875;
@@ -123,31 +123,31 @@ void Potential::set_vrs_tddft(const int istep)
 
                 //HHG of H2
 				// Type 3 will be modified into more normolized type soon.
-				if (ELEC_evolve::td_vexttype = 3)
+				if (ELEC_evolve::td_vexttype == 3)
 				{
 					const double w_h2 = 0.0428;  //a.u.
 					const double w_h3 = 0.00107;  //a.u.
 					const double timenow = (istep)*ELEC_evolve::td_dr2*41.34;
 					// The parameters should be written in INPUT!
-					
+
 					//this->vext[ir] = this->vextold[ir]*2.74*cos(0.856*timenow)*sin(0.0214*timenow)*sin(0.0214*timenow);
 					//this->vext[ir] = this->vextold[ir]*2.74*cos(0.856*timenow)*sin(0.0214*timenow)*sin(0.0214*timenow)*0.01944;
 					this->vext[ir] = this->vextold[ir]*2.74*cos(w_h2*timenow)*sin(w_h3*timenow)*sin(w_h3*timenow);
 				}
-				
+
 					this->vr_eff(is,ir) = this->vltot[ir] + this->vr(is, ir) + this->vext[ir];
-				
-                //cout << "x: " << k <<"	" << "y: " << j <<"	"<< "z: "<< i <<"	"<< "ir: " << ir << endl;
-                //cout << "vext: " << this->vext[ir] << endl;
-                //cout << "vrs: " << vrs(is,ir) <<endl;
+
+                //std::cout << "x: " << k <<"	" << "y: " << j <<"	"<< "z: "<< i <<"	"<< "ir: " << ir << std::endl;
+                //std::cout << "vext: " << this->vext[ir] << std::endl;
+                //std::cout << "vrs: " << vrs(is,ir) <<std::endl;
             }
-            cout << "vext exists" << endl;
+            std::cout << "vext exists" << std::endl;
 
             delete[] this->vextold;
             delete[] this->vext;
         }
     }
 
-    timer::tick("potential","set_vrs_tddft");
+    ModuleBase::timer::tick("potential","set_vrs_tddft");
     return;
 } //end subroutine set_vrs_tddft

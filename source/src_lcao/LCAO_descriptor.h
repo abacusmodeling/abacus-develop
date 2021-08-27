@@ -19,7 +19,7 @@ class LCAO_Descriptor
 {
 
 //-------------------
-// public functions 
+// public functions
 //-------------------
 public:
 
@@ -63,6 +63,19 @@ public:
 	void print_H_V_delta(void);
 	void print_F_delta(void);
 
+	//----------------------------------------------------------------------
+	// print_descriptors: print descriptors based on LCAO basis
+	// print_H_V_delta: print the deltaV matrix in LCAO basis
+	// print_F_delta: print the force related to deltaV for each atom
+	//----------------------------------------------------------------------
+	void print_descriptor(void);
+	void print_H_V_delta(void);
+	void print_F_delta(void);
+
+	void cal_v_delta(const std::string& model_file);//<psi|V_delta|psi>
+	void cal_f_delta(ModuleBase::matrix& dm);	//pytorch term remaining!
+	void print_H_V_delta();
+	void print_F_delta();
 
 	//----------------------------------------------------------------------
 	/*These 3 functions save the [dm_eig], [e_base], [f_base]
@@ -70,25 +83,16 @@ public:
 	After a full group of consfigurations are calculated,
     we need a python script to 'load' and 'torch.cat' these .npy files,
     and get l_e_delta and l_f_delta corresponding to the exact e,f data.*/
-	//----------------------------------------------------------------------
-	void save_npy_d(void);
-	void save_npy_e(const double &ebase);	//Ry
-	void save_npy_f(const matrix &fbase);//Ry
+	void save_npy_d();
+	void save_npy_e(double& ebase);	//Ry
+	void save_npy_f(ModuleBase::matrix& fbase);//Ry
 
-
-//-------------------
-// public variables 
-//-------------------
-public:
-
-	//------------------------------------------------------
-	//E_delta: in Ry
-	//H_V_delta: correction term to the Hamiltonian matrix 
 	//F_delta: in Ry/Bohr, force due to the correction term
 	//------------------------------------------------------
 	double E_delta = 0.0;
 	double* H_V_delta;
-	matrix	F_delta;
+	//deepks F_delta(Ry/Bohr), to be added to atom force
+	ModuleBase::matrix	F_delta;
 
 //-------------------
 // private variables
@@ -102,7 +106,7 @@ private:
 	// deep neural network module that provides corrected Hamiltonian term and
 	// related derivatives.
 	torch::jit::script::Module module;
-	
+
 	//density matrix: dm_gamma
 	double* dm_double;
 	// overlap between lcao and descriptor basis
@@ -138,8 +142,8 @@ private:
 	int des_per_atom;
 
 
-	IntArray* alpha_index;
-	IntArray* inl_index;	//caoyu add 2021-05-07
+	ModuleBase::IntArray* alpha_index;
+	ModuleBase::IntArray* inl_index;	//caoyu add 2021-05-07
 	int* inl_l;	//inl_l[inl_index] = l of descriptor with inl_index
 
 //-------------------
@@ -156,26 +160,26 @@ private:
 		const double& v);
 
     void print_projected_DM(
-		ofstream &ofs,
-		ComplexMatrix &des,
+		std::ofstream &ofs,
+		ModuleBase::ComplexMatrix &des,
 		const int &it,
 		const int &ia,
 		const int &l,
 		const int& n);
 
 	void set_DS_mu_alpha(
-		const int& iw1_all,
-		const int& inl,
-		const int& im,
-		const double& vx,
-		const double& vy,
-		const double& vz);
+	const int& iw1_all,
+	const int& inl,
+	const int& im,
+	const double& vx,
+	const double& vy,
+	const double& vz);
 
-	void init_gdmx(void);
-	void load_model(const string& model_file);
-	void cal_gedm(const matrix& dm);	//need to load model in this step
-	void cal_gdmx(const matrix& dm);	//dD/dX
-	void del_gdmx(void);
+	void init_gdmx();
+	void load_model(const std::string& model_file);
+	void cal_gedm();	//need to load model in this step
+	void cal_gdmx(ModuleBase::matrix& dm);	//dD/dX
+	void del_gdmx();
 
 	void getdm_double(const matrix& dm);
 

@@ -10,14 +10,14 @@
 // =============================================================================
 
 #include "export.h"
-
-void IF_MATCH(const string &name,const string &name2)
+/*
+void ModuleBase::IF_MATCH(const std::string &name,const std::string &name2)
 {
 	if(name!=name2)
 	{
 		if(GlobalV::MY_RANK == 0)
 		{
-			cout<<"\n Can not match : "<<name<<"  "<<name2<<endl;
+			std::cout<<"\n Can not match : "<<name<<"  "<<name2<<std::endl;
 		}
 #ifdef __MPI
 		MPI_Finalize();
@@ -25,9 +25,9 @@ void IF_MATCH(const string &name,const string &name2)
 		exit(0);
 	}
 	
-//	cout<<setw(12)<<name<<endl;
+//	std::cout<<std::setw(12)<<name<<std::endl;
 	return;
-}
+}*/
 
 
 

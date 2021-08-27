@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 
-static void print_orbs( const vector<vector<vector<vector<double>>>> & orbs, const std::string & file_name )
+static void print_orbs( const std::vector<std::vector<std::vector<std::vector<double>>>> & orbs, const std::string & file_name )
 {
 	std::ofstream ofsN(file_name);
 	for( size_t T=0; T!=orbs.size(); ++T )
@@ -20,7 +20,7 @@ static void print_orbs( const vector<vector<vector<vector<double>>>> & orbs, con
 	ofsN.close();
 }
 
-static void print_orbs( const vector<vector<vector<Numerical_Orbital_Lm>>> & orbs, const std::string & file_name )
+static void print_orbs( const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> & orbs, const std::string & file_name )
 {
 	std::ofstream ofsN(file_name);
 	for( size_t T=0; T!=orbs.size(); ++T )

@@ -5,13 +5,13 @@
 void Charge::write_rho_cube(
 	const double* rho_save, 
 	const int &is, 
-	const string &fn, 
+	const std::string &fn, 
 	const int &precision) 
 {
-    TITLE("Charge","write_rho_cube");
+    ModuleBase::TITLE("Charge","write_rho_cube");
 
 	time_t start, end;
-	ofstream ofs;
+	std::ofstream ofs;
 	
 	if(GlobalV::MY_RANK==0)
 	{
@@ -20,26 +20,26 @@ void Charge::write_rho_cube(
 		ofs.open(fn.c_str());
     	if (!ofs)
     	{
-        	WARNING("Charge::write_rho","Can't create Charge File!");
+        	ModuleBase::WARNING("Charge::write_rho","Can't create Charge File!");
     	}	
 
-		ofs << "Cubefile created from ABACUS SCF calculation" << endl;
-		ofs << "Contains the selected quantity on a FFT grid" << endl;
+		ofs << "Cubefile created from ABACUS SCF calculation" << std::endl;
+		ofs << "Contains the selected quantity on a FFT grid" << std::endl;
 
-		ofs << GlobalC::ucell.nat << " 0.0 0.0 0.0 " << endl;
+		ofs << GlobalC::ucell.nat << " 0.0 0.0 0.0 " << std::endl;
 		double fac=GlobalC::ucell.lat0;
 		ofs << GlobalC::pw.ncx 
 			<< " " << fac*GlobalC::ucell.latvec.e11/double(GlobalC::pw.ncx) 
 			<< " " << fac*GlobalC::ucell.latvec.e12/double(GlobalC::pw.ncx) 
-			<< " " << fac*GlobalC::ucell.latvec.e13/double(GlobalC::pw.ncx) << endl;
+			<< " " << fac*GlobalC::ucell.latvec.e13/double(GlobalC::pw.ncx) << std::endl;
 		ofs << GlobalC::pw.ncy 
 			<< " " << fac*GlobalC::ucell.latvec.e21/double(GlobalC::pw.ncy) 
 			<< " " << fac*GlobalC::ucell.latvec.e22/double(GlobalC::pw.ncy) 
-			<< " " << fac*GlobalC::ucell.latvec.e23/double(GlobalC::pw.ncy) << endl;
+			<< " " << fac*GlobalC::ucell.latvec.e23/double(GlobalC::pw.ncy) << std::endl;
 		ofs << GlobalC::pw.ncz 
 			<< " " << fac*GlobalC::ucell.latvec.e31/double(GlobalC::pw.ncz) 
 			<< " " << fac*GlobalC::ucell.latvec.e32/double(GlobalC::pw.ncz) 
-			<< " " << fac*GlobalC::ucell.latvec.e33/double(GlobalC::pw.ncz) << endl;
+			<< " " << fac*GlobalC::ucell.latvec.e33/double(GlobalC::pw.ncz) << std::endl;
 
 		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
@@ -47,8 +47,8 @@ void Charge::write_rho_cube(
 			{
 				//convert from label to atomic number
 				int z = 0;
-				for(int j=0; j!=element_name.size(); j++)
-					if (GlobalC::ucell.atoms[it].label == element_name[j])
+				for(int j=0; j!=ModuleBase::element_name.size(); j++)
+					if (GlobalC::ucell.atoms[it].label == ModuleBase::element_name[j])
 					{
 						z=j+1;
 						break;
@@ -56,13 +56,13 @@ void Charge::write_rho_cube(
 				ofs << " " << z << " " << z
 					<< " " << fac*GlobalC::ucell.atoms[it].taud[ia].x
 					<< " " << fac*GlobalC::ucell.atoms[it].taud[ia].y
-					<< " " << fac*GlobalC::ucell.atoms[it].taud[ia].z << endl;
+					<< " " << fac*GlobalC::ucell.atoms[it].taud[ia].z << std::endl;
 			}
 		}
 
-//		ofs << "\n  " << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz << endl;
+//		ofs << "\n  " << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz << std::endl;
 
-		ofs << setprecision(precision);
+		ofs << std::setprecision(precision);
 		ofs << scientific;
 
 	}
@@ -91,11 +91,11 @@ void Charge::write_rho_cube(
 	{
 		int nxyz = GlobalC::pw.ncx * GlobalC::pw.ncy * GlobalC::pw.ncz;
 		double* wfc = new double[nxyz];
-		ZEROS(wfc, nxyz);
+		ModuleBase::GlobalFunc::ZEROS(wfc, nxyz);
 
 		// num_z: how many planes on processor 'ip'
     	int *num_z = new int[GlobalV::NPROC_IN_POOL];
-    	ZEROS(num_z, GlobalV::NPROC_IN_POOL);
+    	ModuleBase::GlobalFunc::ZEROS(num_z, GlobalV::NPROC_IN_POOL);
     	for (int iz=0;iz<GlobalC::pw.nbz;iz++)
     	{
         	int ip = iz % GlobalV::NPROC_IN_POOL;
@@ -105,7 +105,7 @@ void Charge::write_rho_cube(
 		// start_z: start position of z in 
 		// processor ip.
     	int *start_z = new int[GlobalV::NPROC_IN_POOL];
-    	ZEROS(start_z, GlobalV::NPROC_IN_POOL);
+    	ModuleBase::GlobalFunc::ZEROS(start_z, GlobalV::NPROC_IN_POOL);
     	for (int ip=1;ip<GlobalV::NPROC_IN_POOL;ip++)
     	{
         	start_z[ip] = start_z[ip-1]+num_z[ip-1];
@@ -113,7 +113,7 @@ void Charge::write_rho_cube(
 
 		// which_ip: found iz belongs to which ip.
 		int *which_ip = new int[GlobalC::pw.ncz];
-		ZEROS(which_ip, GlobalC::pw.ncz);
+		ModuleBase::GlobalFunc::ZEROS(which_ip, GlobalC::pw.ncz);
 		for(int iz=0; iz<GlobalC::pw.ncz; iz++)
 		{
 			for(int ip=0; ip<GlobalV::NPROC_IN_POOL; ip++)
@@ -138,9 +138,9 @@ void Charge::write_rho_cube(
 		// save the rho one z by one z.
 		for(int iz=0; iz<GlobalC::pw.ncz; iz++)
 		{
-			//	cout << "\n iz=" << iz << endl;
+			//	std::cout << "\n iz=" << iz << std::endl;
 			// tag must be different for different iz.
-			ZEROS(zpiece, nxy);
+			ModuleBase::GlobalFunc::ZEROS(zpiece, nxy);
 			int tag = iz;
 			MPI_Status ierror;
 
@@ -216,7 +216,7 @@ void Charge::write_rho_cube(
 	if(GlobalV::MY_RANK==0) 
 	{
 		end = time(NULL);
-		OUT_TIME("write_rho",start,end);
+		ModuleBase::GlobalFunc::OUT_TIME("write_rho",start,end);
 		ofs.close();
 	}
 

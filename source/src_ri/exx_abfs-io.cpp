@@ -10,12 +10,12 @@
 #include "../module_base/math_integral.h" // mohan add 2021-04-03
 
 
-vector<vector<vector<Numerical_Orbital_Lm>>> Exx_Abfs::IO::construct_abfs(
+std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::IO::construct_abfs(
 	const LCAO_Orbitals &orbs,
-	const vector<string> &files_abfs,
+	const std::vector<std::string> &files_abfs,
 	const double kmesh_times )
 {
-	vector<vector<vector<Numerical_Orbital_Lm>>> abfs( files_abfs.size() );
+	std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> abfs( files_abfs.size() );
 	for( size_t T=0; T!=files_abfs.size(); ++T )
 		abfs[T] = construct_abfs_T( 
 			files_abfs[T],
@@ -28,13 +28,13 @@ vector<vector<vector<Numerical_Orbital_Lm>>> Exx_Abfs::IO::construct_abfs(
 	return abfs;
 }
 
-vector<vector<vector<Numerical_Orbital_Lm>>> Exx_Abfs::IO::construct_abfs( 
-	const vector<vector<vector<Numerical_Orbital_Lm>>> & abfs_pre,
+std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::IO::construct_abfs( 
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> & abfs_pre,
 	const LCAO_Orbitals &orbs,
-	const vector<string> &files_abfs,
+	const std::vector<std::string> &files_abfs,
 	const double kmesh_times )
 {
-	vector<vector<vector<Numerical_Orbital_Lm>>> 
+	std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> 
 		&&abfs = construct_abfs( orbs, files_abfs, kmesh_times );
 			
 	assert( abfs.size() == abfs_pre.size() );
@@ -51,28 +51,28 @@ vector<vector<vector<Numerical_Orbital_Lm>>> Exx_Abfs::IO::construct_abfs(
 	return abfs;
 }
 
-vector<vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T( 
-	const string & file_name,
+std::vector<std::vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T( 
+	const std::string & file_name,
 	const int &T,
 	const int &nk,
 	const double &dk,
 	const double &dr_uniform)
 {
-	string label;
+	std::string label;
 	size_t L_size;
-	map<size_t,size_t> N_size;
+	std::map<size_t,size_t> N_size;
 	size_t meshr;
 	double dr;
-	map<size_t,map<size_t,vector<double>>> psis;
+	std::map<size_t,std::map<size_t,std::vector<double>>> psis;
 	
 	/*----------------------
 	  1.read abfs
 	----------------------*/
-	string word;
+	std::string word;
 	
-	ifstream ifs( file_name.c_str() );
+	std::ifstream ifs( file_name.c_str() );
 	if(!ifs)
-		throw runtime_error(" Can't find the abfs ORBITAL file.");	
+		throw std::runtime_error(" Can't find the abfs ORBITAL file.");	
 	
 	while( ifs.good() )
 	{
@@ -80,54 +80,54 @@ vector<vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 		
 		if( "Element"==word )
 		{
-			READ_VALUE( ifs, label );
+			ModuleBase::GlobalFunc::READ_VALUE( ifs, label );
 		}
 		else if ( "Lmax"==word )
 		{
-			READ_VALUE( ifs, L_size );
+			ModuleBase::GlobalFunc::READ_VALUE( ifs, L_size );
 			
 			if( L_size>=9 )
 			{
-				stringstream ss;
+				std::stringstream ss;
 				ss<<"Lmax>=9 error in "<<__FILE__<<" line "<<__LINE__;
-				throw invalid_argument(ss.str());
+				throw std::invalid_argument(ss.str());
 			}
 		}
 		else if ( "Sorbital-->"==word )
 		{
-			READ_VALUE( ifs, N_size[0] );
+			ModuleBase::GlobalFunc::READ_VALUE( ifs, N_size[0] );
 		}
 		else if ( "Porbital-->"==word )
 		{
-			READ_VALUE( ifs, N_size[1] );
+			ModuleBase::GlobalFunc::READ_VALUE( ifs, N_size[1] );
 		}
 		else if ( "Dorbital-->"==word )
 		{
-			READ_VALUE( ifs, N_size[2] );
+			ModuleBase::GlobalFunc::READ_VALUE( ifs, N_size[2] );
 		}
 		else if ( "Forbital-->"==word )
 		{
-			READ_VALUE( ifs, N_size[3] );
+			ModuleBase::GlobalFunc::READ_VALUE( ifs, N_size[3] );
 		}
 		else if ( "Gorbital-->"==word )
 		{
-			READ_VALUE( ifs, N_size[4] );
+			ModuleBase::GlobalFunc::READ_VALUE( ifs, N_size[4] );
 		}
 		else if ( "Horbital-->"==word )
 		{
-			READ_VALUE( ifs, N_size[5] );
+			ModuleBase::GlobalFunc::READ_VALUE( ifs, N_size[5] );
 		}
 		else if ( "Iorbital-->"==word )
 		{
-			READ_VALUE( ifs, N_size[6] );
+			ModuleBase::GlobalFunc::READ_VALUE( ifs, N_size[6] );
 		}
 		else if ( "Jorbital-->"==word )
 		{
-			READ_VALUE( ifs, N_size[7] );
+			ModuleBase::GlobalFunc::READ_VALUE( ifs, N_size[7] );
 		}
 		else if ( "Korbital-->"==word )
 		{
-			READ_VALUE( ifs, N_size[8] );
+			ModuleBase::GlobalFunc::READ_VALUE( ifs, N_size[8] );
 		}
 		else if ( "END"==word )
 		{
@@ -135,10 +135,10 @@ vector<vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 		}		
 	}
 	
-	CHECK_NAME(ifs, "Mesh");
+	ModuleBase::CHECK_NAME(ifs, "Mesh");
 	ifs >> meshr;
 	
-	CHECK_NAME(ifs, "dr");
+	ModuleBase::CHECK_NAME(ifs, "dr");
 	ifs >> dr;
 
 	while(ifs.good())
@@ -146,7 +146,7 @@ vector<vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 		ifs >> word;
 		if(word=="Type")
 		{
-			string s_L, s_N;
+			std::string s_L, s_N;
 			ifs >> s_L >> s_N;
 			
 			size_t T,L,N;
@@ -169,17 +169,17 @@ vector<vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 	for( size_t L=0; L<=L_size; ++L )
 		if( N_size.find(L) == N_size.end() )
 		{
-			stringstream ss;
+			std::stringstream ss;
 			ss<<"Can't find N of L="<<L<<" in "<<file_name;
-			throw domain_error(ss.str());
+			throw std::domain_error(ss.str());
 		}
 	for( size_t L=0; L<=L_size; ++L )
 		for( size_t N=0; N!=N_size[L]; ++N )
 			if( psis.find(L)==psis.end() || psis[L].find(N)==psis[L].end() )
 			{
-				stringstream ss;
+				std::stringstream ss;
 				ss<<"Can't find abf of L="<<L<<" T="<<T<<" in "<<file_name;
-				throw domain_error(ss.str());
+				throw std::domain_error(ss.str());
 			}
 
 			
@@ -188,8 +188,8 @@ vector<vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 	----------------------*/		
 	if(meshr%2==0)	++meshr;
 	
-	vector<double> rab(meshr);
-	vector<double> radial(meshr);
+	std::vector<double> rab(meshr);
+	std::vector<double> radial(meshr);
 	for( int ir=0; ir!=meshr; ++ir )
 	{
 		rab[ir] = dr;
@@ -204,8 +204,8 @@ vector<vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 	{	
 		for( size_t N=0; N!=N_size[L]; ++N )
 		{
-			vector<double> psir(meshr);
-			vector<double> inner(meshr);
+			std::vector<double> psir(meshr);
+			std::vector<double> inner(meshr);
 			psis[L][N].resize(meshr);
 			for( int ir=0; ir!=meshr; ++ir )
 			{
@@ -213,7 +213,7 @@ vector<vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 				inner[ir] = psir[ir] * psir[ir];
 			}
 			double unit = 0.0;	
-			Integral::Simpson_Integral(meshr, VECTOR_TO_PTR(inner), VECTOR_TO_PTR(rab), unit);
+			ModuleBase::Integral::Simpson_Integral(meshr, ModuleBase::GlobalFunc::VECTOR_TO_PTR(inner), ModuleBase::GlobalFunc::VECTOR_TO_PTR(rab), unit);
 			for( int ir=0; ir!=meshr; ++ir )
 			{
 				psis[L][N][ir] /= sqrt(unit);
@@ -225,7 +225,7 @@ vector<vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 	/*----------------------
 	  5.construct abfs
 	----------------------*/	
-	vector<vector<Numerical_Orbital_Lm>> abfs_T;
+	std::vector<std::vector<Numerical_Orbital_Lm>> abfs_T;
 
 	abfs_T.resize(L_size+1);
 	for( size_t L=0; L<=L_size; ++L )
@@ -239,10 +239,10 @@ vector<vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 				L, //angular momentum L
 				N, // number of orbitals of this L
 				meshr, // number of radial mesh
-				VECTOR_TO_PTR(rab),
-				VECTOR_TO_PTR(radial),// radial mesh value(a.u.)
+				ModuleBase::GlobalFunc::VECTOR_TO_PTR(rab),
+				ModuleBase::GlobalFunc::VECTOR_TO_PTR(radial),// radial mesh value(a.u.)
 				Numerical_Orbital_Lm::Psi_Type::Psi,
-				VECTOR_TO_PTR(psis[L][N]), // radial wave function
+				ModuleBase::GlobalFunc::VECTOR_TO_PTR(psis[L][N]), // radial wave function
 				nk,
 				dk,
 				dr_uniform,
@@ -255,79 +255,79 @@ vector<vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 }
 
 void Exx_Abfs::IO::print_matrix( 
-		const string &file_name_prefix, 
-		const map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>> &matrixes_Q, 
-		const map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> &matrixes_S,
-		const map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> &matrixes_V,
-		const Element_Basis_Index::Range &range_jles, 
-		const Element_Basis_Index::IndexLNM &index_jles, 
-		const Element_Basis_Index::Range &range_lcaos,
-		const Element_Basis_Index::IndexLNM &index_lcaos )
+		const std::string &file_name_prefix, 
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> &matrixes_Q, 
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> &matrixes_S,
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> &matrixes_V,
+		const ModuleBase::Element_Basis_Index::Range &range_jles, 
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_jles, 
+		const ModuleBase::Element_Basis_Index::Range &range_lcaos,
+		const ModuleBase::Element_Basis_Index::IndexLNM &index_lcaos )
 {
-	auto print_header = [&]( ofstream &ofs, size_t TA, size_t IA, size_t TB, size_t IB )
+	auto print_header = [&]( std::ofstream &ofs, size_t TA, size_t IA, size_t TB, size_t IB )
 	{
-		ofs << GlobalC::ucell.lat0 << endl;
+		ofs << GlobalC::ucell.lat0 << std::endl;
 
-		ofs << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << endl;
-		ofs << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << endl;
-		ofs << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << endl;
+		ofs << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << std::endl;
+		ofs << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << std::endl;
+		ofs << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << std::endl;
 		
 		if( TA==TB )
 		{
-			ofs << 1 << " ntype" << endl;
-			ofs << GlobalC::ucell.atoms[TA].label << " label" << endl;
+			ofs << 1 << " ntype" << std::endl;
+			ofs << GlobalC::ucell.atoms[TA].label << " label" << std::endl;
 			if( IA==IB )
 			{
-				ofs << 1 << " na" << endl;
+				ofs << 1 << " na" << std::endl;
 				ofs << GlobalC::ucell.atoms[TA].tau[IA].x << " " 
 					<< GlobalC::ucell.atoms[TA].tau[IA].y << " " 
-					<< GlobalC::ucell.atoms[TA].tau[IA].z << endl;
+					<< GlobalC::ucell.atoms[TA].tau[IA].z << std::endl;
 			}
 			else
 			{
-				ofs << 2 << " na" << endl;
+				ofs << 2 << " na" << std::endl;
 				ofs << GlobalC::ucell.atoms[TA].tau[IA].x << " " 
 					<< GlobalC::ucell.atoms[TA].tau[IA].y << " "
-					<< GlobalC::ucell.atoms[TA].tau[IA].z << endl;
+					<< GlobalC::ucell.atoms[TA].tau[IA].z << std::endl;
 				ofs << GlobalC::ucell.atoms[TB].tau[IB].x << " " 
 					<< GlobalC::ucell.atoms[TB].tau[IB].y << " " 
-					<< GlobalC::ucell.atoms[TB].tau[IB].z << endl;
+					<< GlobalC::ucell.atoms[TB].tau[IB].z << std::endl;
 			}
 		}
 		else
 		{
-			ofs << 2 << " ntype" << endl;
-			ofs << GlobalC::ucell.atoms[TA].label << " label" << endl;
-			ofs << 1 << " na" << endl;
+			ofs << 2 << " ntype" << std::endl;
+			ofs << GlobalC::ucell.atoms[TA].label << " label" << std::endl;
+			ofs << 1 << " na" << std::endl;
 			ofs << GlobalC::ucell.atoms[TA].tau[IA].x << " " 
 				<< GlobalC::ucell.atoms[TA].tau[IA].y << " " 
-				<< GlobalC::ucell.atoms[TA].tau[IA].z << endl;
-			ofs << GlobalC::ucell.atoms[TB].label << " label" << endl;
-			ofs << 1 << " na" << endl;
+				<< GlobalC::ucell.atoms[TA].tau[IA].z << std::endl;
+			ofs << GlobalC::ucell.atoms[TB].label << " label" << std::endl;
+			ofs << 1 << " na" << std::endl;
 			ofs << GlobalC::ucell.atoms[TB].tau[IB].x << " " 
 				<< GlobalC::ucell.atoms[TB].tau[IB].y << " " 
-				<< GlobalC::ucell.atoms[TB].tau[IB].z << endl;
+				<< GlobalC::ucell.atoms[TB].tau[IB].z << std::endl;
 		}
 		
 		// ecutwfc_jlq determine the jlq corresponding to plane wave calculation.
-		ofs << Exx_Abfs::Jle::Ecut_exx << " ecutwfc" << endl; // mohan add 2009-09-08
+		ofs << Exx_Abfs::Jle::Ecut_exx << " ecutwfc" << std::endl; // mohan add 2009-09-08
 
 		// this parameter determine the total number of jlq.
-		ofs << Exx_Abfs::Jle::Ecut_exx << " ecutwfc_jlq" << endl;//mohan modify 2009-09-08
+		ofs << Exx_Abfs::Jle::Ecut_exx << " ecutwfc_jlq" << std::endl;//mohan modify 2009-09-08
 
 		assert( GlobalC::ORB.Phi[TA].getRcut() == GlobalC::ORB.Phi[TB].getRcut() );
-		ofs << GlobalC::ORB.Phi[TA].getRcut() << " rcut_Jlq" << endl;
+		ofs << GlobalC::ORB.Phi[TA].getRcut() << " rcut_Jlq" << std::endl;
 
 		// mohan add 'smooth' and 'sigma' 2009-08-28
-		ofs << 0 << " smooth" << endl;
-		ofs << 0 << " sigma" << endl;
+		ofs << 0 << " smooth" << std::endl;
+		ofs << 0 << " sigma" << std::endl;
 
-		ofs << Exx_Abfs::Jle::tolerence << " tolerence" << endl;
+		ofs << Exx_Abfs::Jle::tolerence << " tolerence" << std::endl;
 
-		ofs << Exx_Abfs::Jle::Lmax << " lmax" << endl;
+		ofs << Exx_Abfs::Jle::Lmax << " lmax" << std::endl;
 
-		ofs << GlobalC::kv.nkstot << " nks" << endl;
-		ofs	<< index_lcaos[TA].count_size * index_lcaos[TB].count_size << " nbands" << endl;
+		ofs << GlobalC::kv.nkstot << " nks" << std::endl;
+		ofs	<< index_lcaos[TA].count_size * index_lcaos[TB].count_size << " nbands" << std::endl;
 		
 		auto cal_sum_M = [&range_jles](size_t T) -> size_t
 		{
@@ -337,25 +337,25 @@ void Exx_Abfs::IO::print_matrix(
 			return sum_M;
 		};
 		const size_t nwfc = (TA==TB && IA==IB) ? cal_sum_M(TA) : cal_sum_M(TA)+cal_sum_M(TB);
-		ofs	<< nwfc << " nwfc" << endl;
+		ofs	<< nwfc << " nwfc" << std::endl;
 		
-		const size_t ecut_numberA = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * GlobalC::ORB.Phi[TA].getRcut() / PI ); // Rydberg Unit
-		const size_t ecut_numberB = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * GlobalC::ORB.Phi[TB].getRcut() / PI ); // Rydberg Unit
+		const size_t ecut_numberA = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * GlobalC::ORB.Phi[TA].getRcut() / ModuleBase::PI ); // Rydberg Unit
+		const size_t ecut_numberB = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * GlobalC::ORB.Phi[TB].getRcut() / ModuleBase::PI ); // Rydberg Unit
 		assert( ecut_numberA == ecut_numberB );
-		ofs	<< ecut_numberA << " ne" << endl;
+		ofs	<< ecut_numberA << " ne" << std::endl;
 		
-		ofs << "<WEIGHT_OF_KPOINTS>" << endl;
+		ofs << "<WEIGHT_OF_KPOINTS>" << std::endl;
 		for( int ik=0; ik!=GlobalC::kv.nkstot; ++ik )		
 		{
 			ofs << GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z;
-			ofs << " " << GlobalC::kv.wk[ik] * 0.5 << endl;
+			ofs << " " << GlobalC::kv.wk[ik] * 0.5 << std::endl;
 		}
-		ofs << "</WEIGHT_OF_KPOINTS>" << endl;
+		ofs << "</WEIGHT_OF_KPOINTS>" << std::endl;
 
-		ofs << endl;
+		ofs << std::endl;
 	};
 	
-	auto print_Q = [&]( ofstream &ofs, const size_t TA, const size_t IA, const size_t TB, const size_t IB, const double scale=1 )
+	auto print_Q = [&]( std::ofstream &ofs, const size_t TA, const size_t IA, const size_t TB, const size_t IB, const double scale=1 )
 	{
 		/*---------------------
 		  < jY | Psi >
@@ -371,7 +371,7 @@ void Exx_Abfs::IO::print_matrix(
 							for( size_t NB=0; NB!=range_lcaos[TB][LB].N; ++NB )	
 								for( size_t MB=0; MB!=range_lcaos[TB][LB].M; ++MB )
 								{
-									const vector<matrix> & matrix_Q = matrixes_Q.at(TA).at(IA).at(TB).at(IB);
+									const std::vector<ModuleBase::matrix> & matrix_Q = matrixes_Q.at(TA).at(IA).at(TB).at(IB);
 									const size_t index_lcao 
 										= Exx_Abfs::Abfs_Index::get_index_index( 
 											index_lcaos,TA,LA,NA,MA, 
@@ -405,14 +405,14 @@ void Exx_Abfs::IO::print_matrix(
 	};
 
 
-	auto print_S = [&]( ofstream &ofs, const size_t TA, const size_t IA, const size_t TB, const size_t IB, const double scale=1 )
+	auto print_S = [&]( std::ofstream &ofs, const size_t TA, const size_t IA, const size_t TB, const size_t IB, const double scale=1 )
 	{
 		/*---------------------
 		  < jY | jY >
 		---------------------*/		
 		auto q1q2 = [&]( size_t T1, size_t I1, size_t T2, size_t I2, size_t L1, size_t M1, size_t L2, size_t M2)
 		{
-			const matrix & matrix_S = matrixes_S.at(T1).at(I1).at(T2).at(I2);
+			const ModuleBase::matrix & matrix_S = matrixes_S.at(T1).at(I1).at(T2).at(I2);
 			for( size_t N1=0; N1!=range_jles[T1][L1].N; ++N1)
 				for( size_t N2=0; N2!=range_jles[T2][L2].N; ++N2)
 					ofs<< matrix_S( index_jles[T1][L1][N1][M1], index_jles[T2][L2][N2][M2] ) * scale << "\t" << 0.0 * scale << std::endl;
@@ -442,7 +442,7 @@ void Exx_Abfs::IO::print_matrix(
 				}
 		};	
 		
-		ofs<< "<OVERLAP_Sq>" <<endl;
+		ofs<< "<OVERLAP_Sq>" <<std::endl;
 		
 		for( int ik=0; ik!=GlobalC::kv.nkstot; ++ik )
 		{
@@ -461,14 +461,14 @@ void Exx_Abfs::IO::print_matrix(
 	};
 
 
-	auto print_V = [&]( ofstream &ofs, const size_t TA, const size_t IA, const size_t TB, const size_t IB, const double scale=1 )
+	auto print_V = [&]( std::ofstream &ofs, const size_t TA, const size_t IA, const size_t TB, const size_t IB, const double scale=1 )
 	{
 		/*---------------------
 		  < Psi | Psi >
 		---------------------*/
 		ofs << "<OVERLAP_V>" << std::endl;
 		
-		const matrix & matrix_V = matrixes_V.at(TA).at(IA).at(TB).at(IB);
+		const ModuleBase::matrix & matrix_V = matrixes_V.at(TA).at(IA).at(TB).at(IB);
 		
 		for( int ik=0; ik!=GlobalC::kv.nkstot; ++ik )
 	//		for ib = 0 to GlobalV::NBANDS
@@ -499,7 +499,7 @@ void Exx_Abfs::IO::print_matrix(
 			{
 				for( size_t IB=((TB==TA)?IA:0); IB!=GlobalC::ucell.atoms[TB].na; ++IB )
 				{
-					ofstream ofs(( file_name_prefix+"matrix_"+TO_STRING(TA)+"_"+TO_STRING(IA)+"_"+TO_STRING(TB)+"_"+TO_STRING(IB) ).c_str());
+					std::ofstream ofs(( file_name_prefix+"matrix_"+ModuleBase::GlobalFunc::TO_STRING(TA)+"_"+ModuleBase::GlobalFunc::TO_STRING(IA)+"_"+ModuleBase::GlobalFunc::TO_STRING(TB)+"_"+ModuleBase::GlobalFunc::TO_STRING(IB) ).c_str());
 					print_header( ofs, TA, IA, TB, IB );
 //					const double scale = 1.0 / max( matrixes_V.at(TA).at(IA).at(TB).at(IB) );
 					const double scale = 1;		// Peize Lin test

@@ -4,11 +4,13 @@
 #include <cmath>
 #include <cassert>
 
-using namespace std;
+namespace ModuleBase
+{
 
 /************************************************************************
 LiaoChen add @ 2010/03/09 to add efficient functions in LCAO calculation
 ************************************************************************/
+//Only used in module_orbital
 class Mathzone_Add1
 {
 public:
@@ -189,5 +191,7 @@ public:
 		 const int& ik
 		);
 };
+
+}
 
 #endif

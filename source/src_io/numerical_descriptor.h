@@ -16,7 +16,7 @@ class Numerical_Descriptor
 	Numerical_Descriptor();
 	~Numerical_Descriptor();
 
-	void output_descriptor( const ComplexMatrix *psi, const int &lmax_in); // mohan added 2021-01-03
+	void output_descriptor( const ModuleBase::ComplexMatrix *psi, const int &lmax_in); // mohan added 2021-01-03
 
 	private:
 
@@ -28,13 +28,13 @@ class Numerical_Descriptor
 
 	Bessel_Basis bessel_basis;
 
-	IntArray *mu_index;
+	ModuleBase::IntArray *mu_index;
 	void init_mu_index(void);//mohan added 2021-01-03
 
-	void jlq3d_overlap(realArray &overlap_Q1, realArray &overlap_Q2,
-		const int &ik_ibz, const int &ik, const int &np, const ComplexMatrix &psi);
+	void jlq3d_overlap(ModuleBase::realArray &overlap_Q1, ModuleBase::realArray &overlap_Q2,
+		const int &ik_ibz, const int &ik, const int &np, const ModuleBase::ComplexMatrix &psi);
 
-	void generate_descriptor(realArray &overlap_Q1, realArray &overlap_Q2, 
+	void generate_descriptor(ModuleBase::realArray &overlap_Q1, ModuleBase::realArray &overlap_Q2, 
 		const int &it, const int &ia, double *d, const int &nd);
 
 };

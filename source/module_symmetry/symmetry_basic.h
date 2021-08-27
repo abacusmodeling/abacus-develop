@@ -33,36 +33,36 @@ class Symmetry_Basic
 	void change_value(double &x1, double &x2);
 	void change_value(int &x1, int &x2);
 	
-	void shortest_vector(Vector3<double> &t1,Vector3<double> &t2,Vector3<double> &t3);
-	void shorter_vector(Vector3<double> &t1,Vector3<double> &t2,double &abs0,double &abs1,bool &flag1);
+	void shortest_vector(ModuleBase::Vector3<double> &t1,ModuleBase::Vector3<double> &t2,ModuleBase::Vector3<double> &t3);
+	void shorter_vector(ModuleBase::Vector3<double> &t1,ModuleBase::Vector3<double> &t2,double &abs0,double &abs1,bool &flag1);
 	void recip(
 			const double a,
-			const Vector3<double> &a1,
-			const Vector3<double> &a2,
-			const Vector3<double> &a3,
-			Vector3<double> &b1,
-			Vector3<double> &b2,
-			Vector3<double> &b3
+			const ModuleBase::Vector3<double> &a1,
+			const ModuleBase::Vector3<double> &a2,
+			const ModuleBase::Vector3<double> &a3,
+			ModuleBase::Vector3<double> &b1,
+			ModuleBase::Vector3<double> &b2,
+			ModuleBase::Vector3<double> &b3
 			);
 	void veccon(
 			double *va,
 			double *vb,
 			const int num,
-			const Vector3<double> &aa1,
-			const Vector3<double> &aa2,
-			const Vector3<double> &aa3,
-			const Vector3<double> &bb1,
-			const Vector3<double> &bb2,
-			const Vector3<double> &bb3
+			const ModuleBase::Vector3<double> &aa1,
+			const ModuleBase::Vector3<double> &aa2,
+			const ModuleBase::Vector3<double> &aa3,
+			const ModuleBase::Vector3<double> &bb1,
+			const ModuleBase::Vector3<double> &bb2,
+			const ModuleBase::Vector3<double> &bb3
 			);
-	void matrigen(Matrix3 *symgen, const int ngen, Matrix3* symop, int &nop);
-	void setgroup(Matrix3 *symop, int &nop, const int &ibrav);
-	void rotate( Matrix3 &gmatrix, Vector3<double> &gtrans, int i, int j, int k, const int, const int, const int, int&, int&, int&);
+	void matrigen(ModuleBase::Matrix3 *symgen, const int ngen, ModuleBase::Matrix3* symop, int &nop);
+	void setgroup(ModuleBase::Matrix3 *symop, int &nop, const int &ibrav);
+	void rotate( ModuleBase::Matrix3 &gmatrix, ModuleBase::Vector3<double> &gtrans, int i, int j, int k, const int, const int, const int, int&, int&, int&);
 
 	protected:
 
-	string get_brav_name(const int ibrav);
-	void pointgroup(const int &nrot,int &pgnumber,string &pgname, const Matrix3* gmatrix, ofstream &ofs_running);
+	std::string get_brav_name(const int ibrav);
+	void pointgroup(const int &nrot,int &pgnumber,std::string &pgname, const ModuleBase::Matrix3* gmatrix, std::ofstream &ofs_running);
 	void atom_ordering(double *posi, const int natom, int *subindex);
 
 	private:

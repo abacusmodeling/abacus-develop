@@ -5,19 +5,19 @@
 
 #include "../module_base/ylm.h"
 
-void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
+void Gint_k::fvl_k_RealSpace(ModuleBase::matrix& fvl_dphi, const double *vl)
 {
-	TITLE("Gint_k","cal_force");
-	timer::tick("Gint_k","cal_force");
+	ModuleBase::TITLE("Gint_k","cal_force");
+	ModuleBase::timer::tick("Gint_k","cal_force");
 
 	if(!this->reduced)
 	{
-		WARNING_QUIT("Gint_k::cal_force_k","The force with k can only with reduced H.");
+		ModuleBase::WARNING_QUIT("Gint_k::cal_force_k","The force with k can only with reduced H.");
 	}
 
 	int nnrg = GlobalC::LNNR.nnrg;
  	//xiaohui add "OUT_LEVEL", 2015-09-16
-	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " GlobalC::LNNR.nnrg in cal_force_k = " << GlobalC::LNNR.nnrg << endl;
+	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " GlobalC::LNNR.nnrg in cal_force_k = " << GlobalC::LNNR.nnrg << std::endl;
 	assert(nnrg>=0);
 
 	// just because to make thea arrys meaningful.
@@ -30,9 +30,9 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 	double* pvdpx = new double[nnrg];
 	double* pvdpy = new double[nnrg];
 	double* pvdpz = new double[nnrg];
-	ZEROS(pvdpx, nnrg);
-	ZEROS(pvdpy, nnrg);
-	ZEROS(pvdpz, nnrg); 
+	ModuleBase::GlobalFunc::ZEROS(pvdpx, nnrg);
+	ModuleBase::GlobalFunc::ZEROS(pvdpy, nnrg);
+	ModuleBase::GlobalFunc::ZEROS(pvdpz, nnrg); 
 
     const double delta_r = GlobalC::ORB.dr_uniform;
     // it's a uniform grid to save orbital values, so the delta_r is a constant.
@@ -65,7 +65,7 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
             nn = max(nn, (GlobalC::ucell.atoms[it].nwl+1)*(GlobalC::ucell.atoms[it].nwl+1));
         }
         ylma = new double[nn];
-        ZEROS(ylma, nn);
+        ModuleBase::GlobalFunc::ZEROS(ylma, nn);
 
         for(int i=0; i<bxyz; i++)
         {
@@ -77,8 +77,8 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 			dphi_y[i] = new double*[max_size];
 			dphi_z[i] = new double*[max_size];
 
-            ZEROS(distance[i], max_size);
-            ZEROS(cal_flag[i], max_size);
+            ModuleBase::GlobalFunc::ZEROS(distance[i], max_size);
+            ModuleBase::GlobalFunc::ZEROS(cal_flag[i], max_size);
 
             for(int j=0; j<max_size; j++)
             {
@@ -87,11 +87,11 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 				dphi_x[i][j] = new double[GlobalC::ucell.nwmax];
 				dphi_y[i][j] = new double[GlobalC::ucell.nwmax];
 				dphi_z[i][j] = new double[GlobalC::ucell.nwmax];
-                ZEROS(dr[i][j],3);
-                ZEROS(psir_ylm[i][j],GlobalC::ucell.nwmax);
-                ZEROS(dphi_x[i][j],GlobalC::ucell.nwmax);
-                ZEROS(dphi_y[i][j],GlobalC::ucell.nwmax);
-                ZEROS(dphi_z[i][j],GlobalC::ucell.nwmax);
+                ModuleBase::GlobalFunc::ZEROS(dr[i][j],3);
+                ModuleBase::GlobalFunc::ZEROS(psir_ylm[i][j],GlobalC::ucell.nwmax);
+                ModuleBase::GlobalFunc::ZEROS(dphi_x[i][j],GlobalC::ucell.nwmax);
+                ModuleBase::GlobalFunc::ZEROS(dphi_y[i][j],GlobalC::ucell.nwmax);
+                ModuleBase::GlobalFunc::ZEROS(dphi_z[i][j],GlobalC::ucell.nwmax);
             }
         }
     }
@@ -100,7 +100,7 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
     const double dv = GlobalC::ucell.omega/this->ncxyz;
     int vl_index=0;
     double* vldr3 = new double[bxyz];
-    ZEROS(vldr3, bxyz);
+    ModuleBase::GlobalFunc::ZEROS(vldr3, bxyz);
 
 	for(int i=0; i<nbx; i++)
 	{
@@ -194,26 +194,26 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 
         delete[] ylma;
     }
-	timer::tick("Gint_k","cal_force");
+	ModuleBase::timer::tick("Gint_k","cal_force");
 	return;
 }
 
 void Gint_k::svl_k_RealSpace(
-	matrix& fvl_dphi, 
-	matrix& svl_dphi, 
+	ModuleBase::matrix& fvl_dphi, 
+	ModuleBase::matrix& svl_dphi, 
 	const double *vl)
 {
-	TITLE("Gint_k","cal_stress");
-	timer::tick("Gint_k","cal_stress");
+	ModuleBase::TITLE("Gint_k","cal_stress");
+	ModuleBase::timer::tick("Gint_k","cal_stress");
 
 	if(!this->reduced)
 	{
-		WARNING_QUIT("Gint_k::cal_stress_k","The stress with k can only with reduced H.");
+		ModuleBase::WARNING_QUIT("Gint_k::cal_stress_k","The stress with k can only with reduced H.");
 	}
 
 	int nnrg = GlobalC::LNNR.nnrg;
 
-	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " GlobalC::LNNR.nnrg in cal_force_k = " << GlobalC::LNNR.nnrg << endl;
+	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " GlobalC::LNNR.nnrg in cal_force_k = " << GlobalC::LNNR.nnrg << std::endl;
 	assert(nnrg>=0);
 
 	// just because to make thea arrys meaningful.
@@ -232,15 +232,15 @@ void Gint_k::svl_k_RealSpace(
 	double* pvdp12 = new double[nnrg];
 	double* pvdp13 = new double[nnrg];
 	double* pvdp23 = new double[nnrg];
-	ZEROS(pvdpx, nnrg);
-	ZEROS(pvdpy, nnrg);
-	ZEROS(pvdpz, nnrg);
-	ZEROS(pvdp11, nnrg);
-	ZEROS(pvdp22, nnrg);
-	ZEROS(pvdp33, nnrg);
-	ZEROS(pvdp12, nnrg);
-	ZEROS(pvdp13, nnrg);
-	ZEROS(pvdp23, nnrg);
+	ModuleBase::GlobalFunc::ZEROS(pvdpx, nnrg);
+	ModuleBase::GlobalFunc::ZEROS(pvdpy, nnrg);
+	ModuleBase::GlobalFunc::ZEROS(pvdpz, nnrg);
+	ModuleBase::GlobalFunc::ZEROS(pvdp11, nnrg);
+	ModuleBase::GlobalFunc::ZEROS(pvdp22, nnrg);
+	ModuleBase::GlobalFunc::ZEROS(pvdp33, nnrg);
+	ModuleBase::GlobalFunc::ZEROS(pvdp12, nnrg);
+	ModuleBase::GlobalFunc::ZEROS(pvdp13, nnrg);
+	ModuleBase::GlobalFunc::ZEROS(pvdp23, nnrg);
 
 
 	const double delta_r = GlobalC::ORB.dr_uniform;
@@ -275,7 +275,7 @@ void Gint_k::svl_k_RealSpace(
 			nn = max(nn, (GlobalC::ucell.atoms[it].nwl+1)*(GlobalC::ucell.atoms[it].nwl+1));
 		}
 		ylma = new double[nn];
-		ZEROS(ylma, nn);
+		ModuleBase::GlobalFunc::ZEROS(ylma, nn);
 
 		for(int i=0; i<bxyz; i++)
 		{
@@ -287,8 +287,8 @@ void Gint_k::svl_k_RealSpace(
 			dphi_y[i] = new double*[max_size];
 			dphi_z[i] = new double*[max_size];
 
-			ZEROS(distance[i], max_size);
-			ZEROS(cal_flag[i], max_size);
+			ModuleBase::GlobalFunc::ZEROS(distance[i], max_size);
+			ModuleBase::GlobalFunc::ZEROS(cal_flag[i], max_size);
 
 			for(int j=0; j<max_size; j++)
 			{
@@ -297,11 +297,11 @@ void Gint_k::svl_k_RealSpace(
 				dphi_x[i][j] = new double[GlobalC::ucell.nwmax];
 				dphi_y[i][j] = new double[GlobalC::ucell.nwmax];
 				dphi_z[i][j] = new double[GlobalC::ucell.nwmax];
-				ZEROS(dr[i][j],3);
-				ZEROS(psir_ylm[i][j],GlobalC::ucell.nwmax);
-				ZEROS(dphi_x[i][j],GlobalC::ucell.nwmax);
-				ZEROS(dphi_y[i][j],GlobalC::ucell.nwmax);
-				ZEROS(dphi_z[i][j],GlobalC::ucell.nwmax);
+				ModuleBase::GlobalFunc::ZEROS(dr[i][j],3);
+				ModuleBase::GlobalFunc::ZEROS(psir_ylm[i][j],GlobalC::ucell.nwmax);
+				ModuleBase::GlobalFunc::ZEROS(dphi_x[i][j],GlobalC::ucell.nwmax);
+				ModuleBase::GlobalFunc::ZEROS(dphi_y[i][j],GlobalC::ucell.nwmax);
+				ModuleBase::GlobalFunc::ZEROS(dphi_z[i][j],GlobalC::ucell.nwmax);
 			}
 		}
 	}
@@ -310,7 +310,7 @@ void Gint_k::svl_k_RealSpace(
 	const double dv = GlobalC::ucell.omega/this->ncxyz;
 	int vl_index=0;
 	double* vldr3 = new double[bxyz];
-	ZEROS(vldr3, bxyz);
+	ModuleBase::GlobalFunc::ZEROS(vldr3, bxyz);
 
 	for(int i=0; i<nbx; i++)
 	{
@@ -350,7 +350,7 @@ void Gint_k::svl_k_RealSpace(
 						}
 					}
 				}
-				//cout<<"loop  "<<i<<" "<<j<<" "<<k<<endl;//test
+				//std::cout<<"loop  "<<i<<" "<<j<<" "<<k<<std::endl;//test
 
 				this->evaluate_vl_stress(grid_index, size,i,j,k,
 						psir_ylm, cal_flag, vldr3, distance,
@@ -411,7 +411,7 @@ void Gint_k::svl_k_RealSpace(
 
 		delete[] ylma;
 	}
-	timer::tick("Gint_k","cal_stress");
+	ModuleBase::timer::tick("Gint_k","cal_stress");
 	return;
 }
 
@@ -508,7 +508,7 @@ void Gint_k::evaluate_vl_stress(
 			{
 				if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
 				{
-				//	cout << " same flag is = " << ib << endl;
+				//	std::cout << " same flag is = " << ib << std::endl;
 					same_flag = true;
 					break;
 				}
@@ -546,7 +546,7 @@ void Gint_k::evaluate_vl_stress(
                 const int dRz = R1z - R2z;
 
                 double rt[3];
-                Mathzone::Direct_to_Cartesian(dRx,dRy,dRz,
+                ModuleBase::Mathzone::Direct_to_Cartesian(dRx,dRy,dRz,
                                               GlobalC::ucell.a1.x, GlobalC::ucell.a1.y, GlobalC::ucell.a1.z,
                                               GlobalC::ucell.a2.x, GlobalC::ucell.a2.y, GlobalC::ucell.a2.z,
                                               GlobalC::ucell.a3.x, GlobalC::ucell.a3.y, GlobalC::ucell.a3.z,
@@ -570,12 +570,12 @@ void Gint_k::evaluate_vl_stress(
 
 				if(offset == -1 )
                 {
-                    WARNING_QUIT("gint_k","evaluate_vl_force wrong");
+                    ModuleBase::WARNING_QUIT("gint_k","evaluate_vl_force wrong");
                 }
                 assert(offset < GlobalC::LNNR.nad[iat]);
 
 				//--------------------------------------------------------------- 
-				// what I do above is to get 'offset' for atom pair (iat1, iat2)
+				// what I do above is to get 'offset' for atom std::pair (iat1, iat2)
 				// if I want to simplify this searching for offset,
 				// I should take advantage of gt.which_unitcell.
 				//--------------------------------------------------------------- 
@@ -790,7 +790,7 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
                         {
                                 if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
                                 {
-                                //      cout << " same flag is = " << ib << endl;
+                                //      std::cout << " same flag is = " << ib << std::endl;
                                         same_flag = true;
                                         break;
                                 }
@@ -845,12 +845,12 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
 
                                 if(offset == -1 )
                 {
-                    WARNING_QUIT("gint_k","evaluate_vl_force wrong");
+                    ModuleBase::WARNING_QUIT("gint_k","evaluate_vl_force wrong");
                 }
                 assert(offset < GlobalC::LNNR.nad[iat]);
 
                                 //--------------------------------------------------------------- 
-                                // what I do above is to get 'offset' for atom pair (iat1, iat2)
+                                // what I do above is to get 'offset' for atom std::pair (iat1, iat2)
                                 // if I want to simplify this searching for offset,
                                 // I should take advantage of gt.which_unitcell.
                                 //--------------------------------------------------------------- 
@@ -990,8 +990,8 @@ void Gint_k::set_ijk_atom_force(
 	const Numerical_Orbital_Lm* pointer;
 	double mt[3];
     // Peize Lin change rly, grly 2016-08-26
-    static vector<double> rly;
-    static vector<vector<double>> grly;
+    static std::vector<double> rly;
+    static std::vector<std::vector<double>> grly;
 	for (int id=0; id<size; ++id)
 	{
 		// (2.1) get the atom type and atom index.
@@ -1028,7 +1028,7 @@ void Gint_k::set_ijk_atom_force(
 			}
 
 			// get the 'phi' and 'dphi'.
-			Ylm::grad_rl_sph_harm(GlobalC::ucell.atoms[it].nwl, dr[ib][id][0], dr[ib][id][1], dr[ib][id][2], rly, grly);
+			ModuleBase::Ylm::grad_rl_sph_harm(GlobalC::ucell.atoms[it].nwl, dr[ib][id][0], dr[ib][id][1], dr[ib][id][2], rly, grly);
 
 //			Ylm::sph_harm ( GlobalC::ucell.atoms[it].nwl,
 //					dr[ib][id][0] / distance[ib][id],

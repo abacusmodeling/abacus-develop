@@ -13,10 +13,10 @@ Grid_Base_Beta::~Grid_Base_Beta()
 }
 
 void Grid_Base_Beta::prepare(
-    const Matrix3 &latvec_in,
+    const ModuleBase::Matrix3 &latvec_in,
     const double &lat0_in)
 {
-	TITLE("Grid_Base_Beta","prepare");
+	ModuleBase::TITLE("Grid_Base_Beta","prepare");
 
 	this->latvec = latvec_in;
 	this->lat0 = lat0_in;
@@ -29,7 +29,7 @@ void Grid_Base_Beta::prepare(
 	for(int T1=0; T1<GlobalC::ucell.ntype; T1++)
 	{
 		this->nnn[T1] = (GlobalC::ucell.atoms[T1].nwl+1) * (GlobalC::ucell.atoms[T1].nwl+1);
-	//	cout << "\n nnn = " << nnn[T1];
+	//	std::cout << "\n nnn = " << nnn[T1];
 	}	
 	return;
 }

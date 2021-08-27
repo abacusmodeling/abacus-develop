@@ -31,7 +31,7 @@ struct Exx_Global
 					xcf.iexch_now=9;	xcf.igcx_now=12;
 					break;
 				default:
-					throw invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+					throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 			}			
 		}			
 	};

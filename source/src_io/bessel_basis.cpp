@@ -24,7 +24,7 @@ void Bessel_Basis::init(
 	const double &dk,
 	const double &dr)
 {
-	TITLE("Bessel_Basis", "init");
+	ModuleBase::TITLE("Bessel_Basis", "init");
 	this->Dk = dk;
 
 	//--------------------------
@@ -38,8 +38,8 @@ void Bessel_Basis::init(
 	// setup Ecut_number
 	// ne * pi / rcut = sqrt(ecut) (Rydberg)
 	//----------------------------------------------
-//	this->Ecut_number = static_cast<int>( sqrt( 2.0 * ecut )* rcut/PI );// hartree
-	this->Ecut_number = static_cast<int>( sqrt( ecut )* rcut/PI ); // Rydberg Unit.
+//	this->Ecut_number = static_cast<int>( sqrt( 2.0 * ecut )* rcut/ModuleBase::PI );// hartree
+	this->Ecut_number = static_cast<int>( sqrt( ecut )* rcut/ModuleBase::PI ); // Rydberg Unit.
 	assert( this->Ecut_number > 0 );
 
 	//------------------
@@ -80,9 +80,9 @@ double Bessel_Basis::Polynomial_Interpolation2
 	/*
 	if(iq >= kmesh-4)
 	{	
-		cout << "\n iq = " << iq;
-		cout << "\n kmesh = " << kmesh;
-		QUIT();
+		std::cout << "\n iq = " << iq;
+		std::cout << "\n kmesh = " << kmesh;
+		ModuleBase::QUIT();
 	}
 	*/
 	assert(iq < kmesh-4);
@@ -122,8 +122,8 @@ void Bessel_Basis::init_Faln(
 	const int &nmax,
 	const int &ecut_number)
 {
-	TITLE("Bessel_Basis","init_Faln");
-	timer::tick("Spillage","init_Faln");
+	ModuleBase::TITLE("Bessel_Basis","init_Faln");
+	ModuleBase::timer::tick("Spillage","init_Faln");
 	assert( this->kmesh > 0);
 
 	this->Faln.create(ntype, lmax+1, nmax, this->kmesh);
@@ -146,9 +146,9 @@ void Bessel_Basis::init_Faln(
 			}
 		}
 	}
-	OUT("nwfc = ",nwfc);
+	ModuleBase::GlobalFunc::OUT("nwfc = ",nwfc);
 
-	timer::tick("Spillage","init_Faln");
+	ModuleBase::timer::tick("Spillage","init_Faln");
 	return;
 }
 
@@ -164,8 +164,8 @@ void Bessel_Basis::init_TableOne(
 	const int &ecut_number,
 	const double &tolerence)
 {
-	TITLE("Bessel_Basis","init_TableOne");
-	timer::tick("Spillage","TableONe");
+	ModuleBase::TITLE("Bessel_Basis","init_TableOne");
+	ModuleBase::timer::tick("Spillage","TableONe");
 	// check
 	assert(ecutwfc > 0.0);
 	assert(dr > 0.0);
@@ -174,8 +174,8 @@ void Bessel_Basis::init_TableOne(
 	// init kmesh
 	this->kmesh = static_cast<int>(sqrt(ecutwfc) / dk) +1 + 4;
 	if (kmesh % 2 == 0)++kmesh;
-	OUT(GlobalV::ofs_running, "kmesh",kmesh);
-	OUT(GlobalV::ofs_running, "dk",dk);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "kmesh",kmesh);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "dk",dk);
 
 	// init Table One
 	this->TableOne.create(lmax+1, ecut_number, kmesh);
@@ -183,8 +183,8 @@ void Bessel_Basis::init_TableOne(
 	// init rmesh
 	int rmesh = static_cast<int>( rcut / dr ) + 4;
     if (rmesh % 2 == 0) ++rmesh;
-    OUT(GlobalV::ofs_running, "rmesh",rmesh);
-    OUT(GlobalV::ofs_running, "dr",dr);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "rmesh",rmesh);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "dr",dr);
 
 	// allocate rmesh and Jlk and eigenvalue of Jlq
 	double *r = new double[rmesh];
@@ -207,69 +207,69 @@ void Bessel_Basis::init_TableOne(
 	
 	//caoyu add 2021-3-10
 	//=========output .orb format=============
-	stringstream ss;
+	std::stringstream ss;
 	ss << GlobalV::global_out_dir << "jle.orb";
-	ofstream ofs(ss.str().c_str());
-	ofs << "---------------------------------------------------------------------------"<< endl;
-	ofs << setiosflags(ios::left) << setw(28) << "Energy Cutoff(Ry)" << ecut << endl;
-	ofs << setiosflags(ios::left) << setw(28) << "Radius Cutoff(a.u.)" << rcut << endl;
-	ofs << setiosflags(ios::left) << setw(28) << "Lmax" << lmax << endl;
+	std::ofstream ofs(ss.str().c_str());
+	ofs << "---------------------------------------------------------------------------"<< std::endl;
+	ofs << std::setiosflags(ios::left) << std::setw(28) << "Energy Cutoff(Ry)" << ecut << std::endl;
+	ofs << std::setiosflags(ios::left) << std::setw(28) << "Radius Cutoff(a.u.)" << rcut << std::endl;
+	ofs << std::setiosflags(ios::left) << std::setw(28) << "Lmax" << lmax << std::endl;
 	for (int l = 0; l < lmax + 1; l++) 
 	{
 		switch (l) 
 		{
 			case 0:
-			ofs << setiosflags(ios::left) << setw(28) << "Number of Sorbitals-->" << ecut_number << endl;
+			ofs << std::setiosflags(ios::left) << std::setw(28) << "Number of Sorbitals-->" << ecut_number << std::endl;
 			break;
 			case 1:
-			ofs << setiosflags(ios::left) << setw(28) << "Number of Porbitals-->" << ecut_number << endl;
+			ofs << std::setiosflags(ios::left) << std::setw(28) << "Number of Porbitals-->" << ecut_number << std::endl;
 			break;
 			case 2:
-			ofs << setiosflags(ios::left) << setw(28) << "Number of Dorbitals-->" << ecut_number << endl;
+			ofs << std::setiosflags(ios::left) << std::setw(28) << "Number of Dorbitals-->" << ecut_number << std::endl;
 			break;
 			case 3:
-			ofs << setiosflags(ios::left) << setw(28) << "Number of Forbitals-->" << ecut_number << endl;
+			ofs << std::setiosflags(ios::left) << std::setw(28) << "Number of Forbitals-->" << ecut_number << std::endl;
 			break;
 			default:
-			ofs << setiosflags(ios::left) << setw(28) << "Number of Gorbitals-->" << ecut_number << endl;
+			ofs << std::setiosflags(ios::left) << std::setw(28) << "Number of Gorbitals-->" << ecut_number << std::endl;
 		}
 	}
-	ofs << "---------------------------------------------------------------------------"<< endl;
-	ofs << "SUMMARY END" << endl << endl;
-	ofs << setiosflags(ios::left) << setw(28) << "Mesh" << rmesh << endl;
-	ofs << setiosflags(ios::left) << setw(28) << "dr" << dr << endl ;
+	ofs << "---------------------------------------------------------------------------"<< std::endl;
+	ofs << "SUMMARY END" << std::endl << std::endl;
+	ofs << std::setiosflags(ios::left) << std::setw(28) << "Mesh" << rmesh << std::endl;
+	ofs << std::setiosflags(ios::left) << std::setw(28) << "dr" << dr << std::endl ;
 	//=========output	 .orb format=============
 
 	// init eigenvalue of Jl
 	for(int l=0; l<lmax+1; l++)
 	{
-		ZEROS(en, ecut_number);
-		ZEROS(jle, rmesh);
-		ZEROS(jlk, rmesh);
+		ModuleBase::GlobalFunc::ZEROS(en, ecut_number);
+		ModuleBase::GlobalFunc::ZEROS(jle, rmesh);
+		ModuleBase::GlobalFunc::ZEROS(jlk, rmesh);
 
 		// calculate eigenvalue for l
-		Sphbes::Spherical_Bessel_Roots(ecut_number, l, tolerence, en, rcut);
+		ModuleBase::Sphbes::Spherical_Bessel_Roots(ecut_number, l, tolerence, en, rcut);
 //		for (int ie=0; ie<ecut_number; ie++) 
 //		{
-//			cout << "\n en[" << ie << "]=" << en[ie];
+//			std::cout << "\n en[" << ie << "]=" << en[ie];
 //		}
 
 		// for each eigenvalue
 		for (int ie=0; ie<ecut_number; ie++)
 		{
 			// calculate J_{l}( en[ir]*r) 
-			Sphbes::Spherical_Bessel(rmesh, r, en[ie], l, jle);
+			ModuleBase::Sphbes::Spherical_Bessel(rmesh, r, en[ie], l, jle);
 
 			//caoyu add 2021-3-10
 			//=========output .orb format=============
-			ofs << setiosflags(ios::right) << setw(20) << "Type"<< setw(20) << "L" << setw(20) << "N" << endl;
-			ofs << setiosflags(ios::right) << setw(20) << "0"<< setw(20) << l << setw(20) << ie << endl;
+			ofs << std::setiosflags(ios::right) << std::setw(20) << "Type"<< std::setw(20) << "L" << std::setw(20) << "N" << std::endl;
+			ofs << std::setiosflags(ios::right) << std::setw(20) << "0"<< std::setw(20) << l << std::setw(20) << ie << std::endl;
 			for (int ir = 0; ir < rmesh; ir++) 
 			{ 
-				ofs << setiosflags(ios::scientific) 
-				<< setprecision(12) << jle[ir]<< " "; if ((ir+1) % 4 == 0) ofs << endl; 
+				ofs << std::setiosflags(ios::scientific) 
+				<< std::setprecision(12) << jle[ir]<< " "; if ((ir+1) % 4 == 0) ofs << std::endl; 
 			}
-			ofs << endl;
+			ofs << std::endl;
 			//=========output .orb format=============
 
 			for(int ir=0; ir<rmesh; ir++)
@@ -278,11 +278,11 @@ void Bessel_Basis::init_TableOne(
 			}
 
 			//====== output ========
-//			stringstream ss;
+//			std::stringstream ss;
 //			ss << GlobalV::global_out_dir << l << "." << ie << ".txt";
-//			ofstream ofs(ss.str().c_str());
+//			std::ofstream ofs(ss.str().c_str());
 
-//			for(int ir=0; ir<rmesh; ir++) ofs << r[ir] << " " << jle[ir] << " " << jle[ir]*g[ir] << endl; 
+//			for(int ir=0; ir<rmesh; ir++) ofs << r[ir] << " " << jle[ir] << " " << jle[ir]*g[ir] << std::endl; 
 
 //			ofs.close();
 			//====== output ========
@@ -299,7 +299,7 @@ void Bessel_Basis::init_TableOne(
 			for(int ik=0; ik<kmesh; ik++)
 			{
 				// calculate J_{l}( ik*dk*r )
-				Sphbes::Spherical_Bessel(rmesh, r, ik*dk, l, jlk);
+				ModuleBase::Sphbes::Spherical_Bessel(rmesh, r, ik*dk, l, jlk);
 
 				// calculate the function will be integrated
 				for(int ir=0; ir<rmesh; ir++)
@@ -308,7 +308,7 @@ void Bessel_Basis::init_TableOne(
 				}
 				
 				// make table value
-				Integral::Simpson_Integral(rmesh, function, rab, this->TableOne(l, ie, ik) );
+				ModuleBase::Integral::Simpson_Integral(rmesh, function, rab, this->TableOne(l, ie, ik) );
 			}
 			
 		}// end ie
@@ -326,62 +326,62 @@ void Bessel_Basis::init_TableOne(
 	delete[] g;
 	delete[] r;
 	delete[] function;
-	timer::tick("Spillage","TableONe");
+	ModuleBase::timer::tick("Spillage","TableONe");
 	return;
 }
 
 void Bessel_Basis::readin_C4(
-	const string &name,
+	const std::string &name,
 	const int &ntype,
 	const int &ecut,
 	const int &rcut,
 	const int &ecut_number,
 	const double &tolerence)
 {
-	TITLE("Bessel_Basis","readin_C4");
+	ModuleBase::TITLE("Bessel_Basis","readin_C4");
 
 	if(GlobalV::MY_RANK != 0) return;
 
-	ifstream ifs( name.c_str() );
+	std::ifstream ifs( name.c_str() );
 
 	if(!ifs) 
 	{
-		GlobalV::ofs_warning << " File name : " << name << endl;
-		WARNING_QUIT("Bessel_Basis::readin_C4","Can not find file.");
+		GlobalV::ofs_warning << " File name : " << name << std::endl;
+		ModuleBase::WARNING_QUIT("Bessel_Basis::readin_C4","Can not find file.");
 	}
 
-	if (SCAN_BEGIN(ifs, "<FILE>"))
+	if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<FILE>"))
 	{
 		// mohan modify 2009-11-29
 		for (int it = 0; it < ntype; it++)
 		{
-			string filec4;
+			std::string filec4;
 			ifs >> filec4;
 			for(int il=0; il< GlobalC::ucell.atoms[it].nwl+1; il++)
 			{
 				for(int in=0; in< GlobalC::ucell.atoms[it].l_nchi[il]; in++)
 				{
 					//for tests
-					//cout << "\n" << setw(5) << it << setw(5) << il << setw(5) << in;
-					//cout << "\n file=" << filec4;
-					ifstream inc4( filec4.c_str() );
+					//std::cout << "\n" << std::setw(5) << it << std::setw(5) << il << std::setw(5) << in;
+					//std::cout << "\n file=" << filec4;
+					std::ifstream inc4( filec4.c_str() );
 					
 					if(!inc4) 
 					{
-						GlobalV::ofs_warning << " File name : " << filec4 << endl;
-						WARNING_QUIT("Bessel_Basis::readin_C4","Can not find file.");
+						GlobalV::ofs_warning << " File name : " << filec4 << std::endl;
+						ModuleBase::WARNING_QUIT("Bessel_Basis::readin_C4","Can not find file.");
 					}
 
-					if(SCAN_BEGIN(inc4, "<INPUTS>"))
+					if(ModuleBase::GlobalFunc::SCAN_BEGIN(inc4, "<INPUTS>"))
 					{
 						double tmp_ecut;
 						double tmp_rcut;
 						double tmp_enumber; 
 						double tmp_tolerence;
-						READ_VALUE( inc4, tmp_ecut); 
-						READ_VALUE( inc4, tmp_rcut); 
-						READ_VALUE( inc4, tmp_enumber); 
-						READ_VALUE( inc4, tmp_tolerence); 
+						ModuleBase::GlobalFunc::READ_VALUE( inc4, tmp_ecut); 
+						ModuleBase::GlobalFunc::READ_VALUE( inc4, tmp_rcut); 
+						ModuleBase::GlobalFunc::READ_VALUE( inc4, tmp_enumber); 
+						ModuleBase::GlobalFunc::READ_VALUE( inc4, tmp_tolerence); 
 						assert( tmp_ecut = this->ecut );
 						assert( tmp_rcut = this->rcut );
 						assert( tmp_enumber = this->Ecut_number);
@@ -389,19 +389,19 @@ void Bessel_Basis::readin_C4(
 					}
 
 					bool find = false;
-					if(SCAN_BEGIN(inc4, "<C4>"))
+					if(ModuleBase::GlobalFunc::SCAN_BEGIN(inc4, "<C4>"))
 					{
 						int total_nchi = 0;
-						READ_VALUE(inc4, total_nchi);
+						ModuleBase::GlobalFunc::READ_VALUE(inc4, total_nchi);
 
 						for(int ichi=0; ichi<total_nchi; ichi++)
 						{
-							string title1, title2, title3;
+							std::string title1, title2, title3;
 							inc4 >> title1 >> title2 >> title3;
 
 							int tmp_type, tmp_l, tmp_n;
 							inc4 >> tmp_type >> tmp_l >> tmp_n;
-							//cout << "\n Find T=" << tmp_type << " L=" << tmp_l << " N=" << tmp_n;
+							//std::cout << "\n Find T=" << tmp_type << " L=" << tmp_l << " N=" << tmp_n;
 								
 							if(tmp_l == il && tmp_n == in)
 							//if(tmp_type == it && tmp_l == il && tmp_n == in) // mohan modify 2009-11-29
@@ -411,7 +411,7 @@ void Bessel_Basis::readin_C4(
 								{
 									inc4 >> this->C4(it, il, in, ie);
 									// for tests
-									//cout << "\n" << setw(5) << ie << setw(25) << this->C4(it, il, in, ie);
+									//std::cout << "\n" << std::setw(5) << ie << std::setw(25) << this->C4(it, il, in, ie);
 								}
 							}
 							else
@@ -427,14 +427,14 @@ void Bessel_Basis::readin_C4(
 					}
 					if(!find)
 					{
-						cout << "\n T=" << it << " L=" << il << " N=" << in;
-						WARNING_QUIT("Bessel_Basis::readin_C4","Can't find needed c4!");
+						std::cout << "\n T=" << it << " L=" << il << " N=" << in;
+						ModuleBase::WARNING_QUIT("Bessel_Basis::readin_C4","Can't find needed c4!");
 					}
 					inc4.close();
 				}
 			}
 		}
-		SCAN_END(ifs, "</FILE>");
+		ModuleBase::GlobalFunc::SCAN_END(ifs, "</FILE>");
 	}
 	ifs.close();
 	return;
@@ -446,7 +446,7 @@ void Bessel_Basis::allocate_C4(
 	const int &nmax,
 	const int &ecut_number)
 {
-	TITLE("Bessel_Basis","allocate_C4");
+	ModuleBase::TITLE("Bessel_Basis","allocate_C4");
 		
 	this->C4.create(ntype, lmax+1, nmax, ecut_number);
 
@@ -469,7 +469,7 @@ void Bessel_Basis::allocate_C4(
 void Bessel_Basis::bcast(void)
 {
 #ifdef __MPI
-	TITLE("Bessel_Basis", "bcast");
+	ModuleBase::TITLE("Bessel_Basis", "bcast");
 	
 	Parallel_Common::bcast_double( ecut );
 	Parallel_Common::bcast_double( rcut );
@@ -478,36 +478,36 @@ void Bessel_Basis::bcast(void)
 #endif
 }
 
-void Bessel_Basis::readin(const string &name)
+void Bessel_Basis::readin(const std::string &name)
 {
-	TITLE("Bessel_Basis", "readin");
+	ModuleBase::TITLE("Bessel_Basis", "readin");
 	if (GlobalV::MY_RANK == 0)
 	{
-		ifstream ifs(name.c_str());
-		GlobalV::ofs_running << " File name : " << name << endl;
+		std::ifstream ifs(name.c_str());
+		GlobalV::ofs_running << " File name : " << name << std::endl;
 		if (!ifs)
 		{
-			cout << " File name : " << name << endl;
-			WARNING_QUIT("Bessel_Basis::readin","Can not find file.");
+			std::cout << " File name : " << name << std::endl;
+			ModuleBase::WARNING_QUIT("Bessel_Basis::readin","Can not find file.");
 		}
-		CHECK_NAME(ifs, "INPUT_ORBITAL_INFORMATION");
-		if (SCAN_BEGIN(ifs, "<SPHERICAL_BESSEL>"))
+		ModuleBase::CHECK_NAME(ifs, "INPUT_ORBITAL_INFORMATION");
+		if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<SPHERICAL_BESSEL>"))
 		{
-			READ_VALUE(ifs, this->smooth);
-			READ_VALUE(ifs, this->sigma);
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, this->smooth);
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, this->sigma);
 			assert(sigma!=0.0);
-			READ_VALUE(ifs, this->ecut); // readin ecut
-			READ_VALUE(ifs, this->rcut); // readin rcut
-			READ_VALUE(ifs, this->tolerence);
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, this->ecut); // readin ecut
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, this->rcut); // readin rcut
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, this->tolerence);
 			assert(ecut > 0.0);
 			assert(rcut > 0.0);
 			assert(tolerence > 0.0);
-			OUT(GlobalV::ofs_running, "smooth",smooth);
-			OUT(GlobalV::ofs_running, "sigma",sigma);
-			OUT(GlobalV::ofs_running, "ecut", ecut);
-			OUT(GlobalV::ofs_running, "rcut", rcut);
-			OUT(GlobalV::ofs_running, "tolerence", tolerence);
-			SCAN_END(ifs, "</SPHERICAL_BESSEL>");
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "smooth",smooth);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "sigma",sigma);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "ecut", ecut);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "rcut", rcut);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "tolerence", tolerence);
+			ModuleBase::GlobalFunc::SCAN_END(ifs, "</SPHERICAL_BESSEL>");
 		}
 		ifs.close();
 	}

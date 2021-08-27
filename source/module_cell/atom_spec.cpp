@@ -11,9 +11,9 @@ Atom::Atom()
     Rcut = 0.0; // pengfei Li 16-2-29
     type = 0;
     stapos_wf = 0;
-    tau = new Vector3<double>[1];
-    taud = new Vector3<double>[1];
-    vel = new Vector3<double>[1];
+    tau = new ModuleBase::Vector3<double>[1];
+    taud = new ModuleBase::Vector3<double>[1];
+    vel = new ModuleBase::Vector3<double>[1];
     mag = new double[1];
     l_nchi = new int[1];
     iw2l = new int[1];
@@ -78,17 +78,17 @@ void Atom::set_index(void)
     return;
 }
 
-void Atom::print_Atom(ofstream &ofs, output &outp)
+void Atom::print_Atom(std::ofstream &ofs, output &outp)
 {
     //OUT(ofs,"print_Atom()");
-    OUT(ofs,"label",label);
-    OUT(ofs,"type", type);
-    OUT(ofs,"na",na);
-    OUT(ofs,"nwl",nwl);
-    OUT(ofs,"Rcut", Rcut); // pengfei Li 16-2-29
-    OUT(ofs,"nw",nw);
-    OUT(ofs,"stapos_wf",stapos_wf);
-    ofs<<endl;
+    ModuleBase::GlobalFunc::OUT(ofs,"label",label);
+    ModuleBase::GlobalFunc::OUT(ofs,"type", type);
+    ModuleBase::GlobalFunc::OUT(ofs,"na",na);
+    ModuleBase::GlobalFunc::OUT(ofs,"nwl",nwl);
+    ModuleBase::GlobalFunc::OUT(ofs,"Rcut", Rcut); // pengfei Li 16-2-29
+    ModuleBase::GlobalFunc::OUT(ofs,"nw",nw);
+    ModuleBase::GlobalFunc::OUT(ofs,"stapos_wf",stapos_wf);
+    ofs<<std::endl;
 
     //===================
     // call print atom
@@ -99,12 +99,12 @@ void Atom::print_Atom(ofstream &ofs, output &outp)
     /*
     for (int i = 0;i < na;i++)
     {
-    	ofs << setw(15) << this->tau[i].x
-    		<< setw(15) << this->tau[i].y
-    		<< setw(15) << this->tau[i].z << endl;
+    	ofs << std::setw(15) << this->tau[i].x
+    		<< std::setw(15) << this->tau[i].y
+    		<< std::setw(15) << this->tau[i].z << std::endl;
     }
     */
-    ofs << endl;
+    ofs << std::endl;
 
     return;
 }
@@ -112,7 +112,7 @@ void Atom::print_Atom(ofstream &ofs, output &outp)
 #ifdef __MPI
 void Atom::bcast_atom(void)
 {
-    if (GlobalV::test_atom) TITLE("Atom","bcast_atom");
+    if (GlobalV::test_atom) ModuleBase::TITLE("Atom","bcast_atom");
 
     Parallel_Common::bcast_int( type );
     Parallel_Common::bcast_int( na );
@@ -135,8 +135,8 @@ void Atom::bcast_atom(void)
         delete[] tau;
 		delete[] taud;
         delete[] mag;
-        tau = new Vector3<double>[na];
-		taud = new Vector3<double>[na];
+        tau = new ModuleBase::Vector3<double>[na];
+		taud = new ModuleBase::Vector3<double>[na];
         mag = new double[na];
     }
 

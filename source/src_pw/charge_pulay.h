@@ -44,18 +44,18 @@ class Charge_Pulay: public Charge_Mixing
 	double*** drho;// drho(i)= rho_save(i+1) - rho_save2(i), (GlobalV::NSPIN, dstep, pw.nrxx)
 	double** rho_save2;//rho_save: rho_in, rho_save2: rho_in(last step)
 	bool initp; // p stands for pulay algorithms
-	complex<double>*** dF; // dF(i) = rhog(i) - rhog_save(i), (GlobalV::NSPIN, rstep, pw.ngmc)
-	complex<double>*** dn; // dn(i) = rhog(i+1) - rhog(i), (GlobalV::NSPIN, rstep, pw.ngmc)
+	std::complex<double>*** dF; // dF(i) = rhog(i) - rhog_save(i), (GlobalV::NSPIN, rstep, pw.ngmc)
+	std::complex<double>*** dn; // dn(i) = rhog(i+1) - rhog(i), (GlobalV::NSPIN, rstep, pw.ngmc)
 	
-	matrix Abar; // <dR_j|dR_i>^{-1}
+	ModuleBase::matrix Abar; // <dR_j|dR_i>^{-1}
 	double* dRR; // <dR_j|R_m>
 	double* alpha; // - sum (Abar * dRR)
 	
 	void allocate_pulay(const int &scheme);
 	void generate_datas(const int &irstep, const int &idstep, const int &totstep);
-	void generate_Abar(const int &scheme, matrix &A)const;
-	void inverse_preA(const int &dim, matrix &preA)const;
-	void inverse_real_symmetry_matrix(const int &scheme, matrix &A)const; // indicate the spin.
+	void generate_Abar(const int &scheme, ModuleBase::matrix &A)const;
+	void inverse_preA(const int &dim, ModuleBase::matrix &preA)const;
+	void inverse_real_symmetry_matrix(const int &scheme, ModuleBase::matrix &A)const; // indicate the spin.
 	void generate_dRR(const int &m);
 	void generate_alpha(const int &scheme);
 	void generate_new_rho(const int &is,const int &m);

@@ -19,7 +19,7 @@ extern MPI_Comm GRID_WORLD; //mohan add 2012-01-13
 extern MPI_Comm DIAG_WORLD; //mohan add 2012-01-13
 #endif
 
-//void myProd(complex<double> *in,complex<double> *inout,int *len,MPI_Datatype *dptr);
+//void myProd(std::complex<double> *in,std::complex<double> *inout,int *len,MPI_Datatype *dptr);
 
 namespace Parallel_Global
 {
@@ -28,7 +28,7 @@ namespace Parallel_Global
 	//---------------------------
 	void read_mpi_parameters(int argc, char **argv);
 #ifdef __MPI
-	void myProd(complex<double> *in,complex<double> *inout,int *len,MPI_Datatype *dptr);
+	void myProd(std::complex<double> *in,std::complex<double> *inout,int *len,MPI_Datatype *dptr);
 #endif
 	
 	//-------------------------------------------

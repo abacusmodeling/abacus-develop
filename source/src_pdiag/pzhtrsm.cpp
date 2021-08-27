@@ -1,6 +1,6 @@
 #include "pzhtrsm.h"
 void pzhtrsm(char isuplo,int b_n,MPI_Comm comm_2D,int NB,int N_A,
-            complex<double> *A,complex<double> *B, LocalMatrix loc_A,LocalMatrix loc_B)
+            std::complex<double> *A,std::complex<double> *B, LocalMatrix loc_A,LocalMatrix loc_B)
 {
    /*  PSEPS routine (version 1.0) --
    *  Computer Network Information Center, CAS. 
@@ -19,17 +19,17 @@ void pzhtrsm(char isuplo,int b_n,MPI_Comm comm_2D,int NB,int N_A,
    *  comm_2D. (input) MPI_Comm 
    *         2-D grid MPI communicator
    *  N_A    (global input) INTEGER
-   *         The number of columns and rows to be operated on matrices A£¬N >= 0. 
+   *         The number of columns and rows to be operated on matrices A, N >= 0. 
    *  NB     (input) INTEGER
    *         blocked size of 2D blocked cyclic matrix
-   *  A      (local input/local output) double precision complex pointer,
+   *  A      (local input/local output) double precision std::complex pointer,
    *         pointer into the local memory to an array of dimension (loc_A.row_num, loc_A.col_num).
    *         On entry, this array contains the local pieces of the
    *         N-by-N Hermitian distributed matrix sub( A ). If UPLO = 'U',the leading N-by-N 
    *         upper triangular part of sub( A ) contains the upper triangular part of the matrix.
    *         If UPLO = 'L', the leading N-by-N lower triangular part of sub( A ) contains the lower 
    *         triangular part of the matrix.
-   *  B      (local input/local output) double precision complex pointer,
+   *  B      (local input/local output) double precision std::complex pointer,
    *          pointer into the local memory to an array of dimension (loc_B.row_num, loc_B.col_num).
    *          On entry, this array contains the local pieces of the N-by-N Hermitian distributed 
    *          matrix sub( B). If UPLO = 'U',the leading N-by-N upper triangular part of sub( A )
@@ -40,17 +40,17 @@ void pzhtrsm(char isuplo,int b_n,MPI_Comm comm_2D,int NB,int N_A,
    *          the mapping between an object element and its corresponding 
    *          process and memory location.
    */
-    TITLE("Parallel","pzhtrsm");
+    ModuleBase::TITLE("Parallel","pzhtrsm");
     int m,n,m1,n1,m2,n2,loc_m,loc_n,lda,ldb,ldc,loc_i,loc_j,loc_i1,loc_j1,loc_i2,loc_j2;
     int coord[2],dim[2],period[2];
     int i,j,bi,bj,k,k1,k2,ia,ja,ia1,ja1,ia2,ja2,km,kn,km1,kn1,km2,kn2;
     int cur_col,cur_row;
-    complex<double> alpha,beta;
+    std::complex<double> alpha,beta;
  
     char transa,transb,diag,side,uplo;
     int iarow,iacol,pos,iarow1,iacol1,iarow2,iacol2;
-    complex<double> CU[NB][loc_A.col_num],CU_A[loc_A.row_num][NB];
-    complex<double> CR[loc_A.row_num][NB],CR_A[NB][loc_A.col_num];
+    std::complex<double> CU[NB][loc_A.col_num],CU_A[loc_A.row_num][NB];
+    std::complex<double> CR[loc_A.row_num][NB],CR_A[NB][loc_A.col_num];
 
     MPI_Comm comm_row,comm_col;
     MPI_Status status;
@@ -88,10 +88,10 @@ void pzhtrsm(char isuplo,int b_n,MPI_Comm comm_2D,int NB,int N_A,
         {
             for (i=0; i<NB; i++)
                 for (j=0; j<loc_A.col_num; j++)
-                    CU[i][j]=complex<double> (0.0,0.0);
+                    CU[i][j]=std::complex<double> (0.0,0.0);
             for (i=0; i<loc_A.row_num; i++)
                 for (j=0; j<NB; j++)
-                    CU_A[i][j]=complex<double> (0.0,0.0);
+                    CU_A[i][j]=std::complex<double> (0.0,0.0);
             /*Compute the row number of processors corresponding to the bj row block*/
             ia1=bj*NB;
             ja1=bj*NB;
@@ -129,7 +129,7 @@ void pzhtrsm(char isuplo,int b_n,MPI_Comm comm_2D,int NB,int N_A,
                 lda=loc_A.col_num;
                 ldc=loc_A.col_num;
                 pos=cur_col;
-                alpha=complex<double> (1.0,0.0);
+                alpha=std::complex<double> (1.0,0.0);
 //printf("alpha=%lf\n",alpha.real());
 //printf("1:A=%lf+i%lf,%lf+i%lf\n",A[0].real(),A[0].imag(),A[1].real(),A[1].imag());
   //  printf("side=%c,uplo=%c,transb=%c,diag=%c,n=%d,m=%d,alpha=%lf+i%lf,ldc=%d,lda=%d\n",side,uplo,transb,diag,n,m,alpha.real(),alpha.imag(),ldc,lda);
@@ -153,9 +153,9 @@ void pzhtrsm(char isuplo,int b_n,MPI_Comm comm_2D,int NB,int N_A,
             m=loc_A.row_pos;
             k=n1;
             n=loc_A.col_num-cur_col;
-            alpha=complex<double> (-1.0,0.0);
+            alpha=std::complex<double> (-1.0,0.0);
 //printf("1:%lf\n",alpha.real());
-            beta=complex<double> (1.0,0.0);
+            beta=std::complex<double> (1.0,0.0);
             lda=loc_A.col_num;
             ldb=loc_A.col_num;
             ldc=NB;
@@ -190,12 +190,12 @@ void pzhtrsm(char isuplo,int b_n,MPI_Comm comm_2D,int NB,int N_A,
             for (i=0; i<loc_A.row_num; i++)
                 for (j=0; j<NB; j++)
                 {
-                    CR[i][j]=complex<double> (0.0,0.0);
+                    CR[i][j]=std::complex<double> (0.0,0.0);
                 }
             for (i=0; i<NB; i++)
                 for (j=0; j<loc_A.col_num; j++)
                 {
-                    CR_A[i][j]=complex<double> (0.0,0.0);
+                    CR_A[i][j]=std::complex<double> (0.0,0.0);
                 }
             /*Compute the row number of processors corresponding to the bj row block*/
             ia1=bj*NB;
@@ -231,7 +231,7 @@ void pzhtrsm(char isuplo,int b_n,MPI_Comm comm_2D,int NB,int N_A,
                 lda=loc_A.col_num;
                 ldc=NB;
                 pos=cur_row*loc_A.col_num;
-                alpha=complex<double> (1.0,0.0);
+                alpha=std::complex<double> (1.0,0.0);
                 ztrsm_(&side,&uplo,&transb,&diag,&n,&m,&alpha,&CR[cur_row][0],&ldc,&A[pos],&lda);
                 for (i=0; i<m; i++)
                     for (j=0; j<n; j++)
@@ -247,8 +247,8 @@ void pzhtrsm(char isuplo,int b_n,MPI_Comm comm_2D,int NB,int N_A,
             m=loc_A.row_num-cur_row;
             k=m1;
             n=loc_A.col_pos;
-            alpha=complex<double> (-1.0,0.0);
-            beta=complex<double> (1.0,0.0);
+            alpha=std::complex<double> (-1.0,0.0);
+            beta=std::complex<double> (1.0,0.0);
             lda=loc_A.col_num;
             ldb=NB;
             ldc=loc_A.col_num;

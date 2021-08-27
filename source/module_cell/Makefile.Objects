@@ -5,6 +5,8 @@
 VERSION= ABACUS-cell
 HEADERS= *.h
 
+OBJS_MAIN=input.o\
+
 OBJS_IO=output.o\
 
 OBJS_PW=magnetism.o\
@@ -32,6 +34,7 @@ read_pp.o\
 read_pp_upf100.o\
 read_pp_upf201.o\
 read_pp_vwr.o\
+read_pp_blps.o\
 unitcell.o\
 unitcell_pseudo.o\
 read_atoms.o\

@@ -2,6 +2,8 @@
 #define INVERSE_MATRIX_H
 
 #include "../src_pw/tools.h"
+namespace ModuleBase
+{
 
 class Inverse_Matrix_Complex
 {
@@ -10,23 +12,24 @@ class Inverse_Matrix_Complex
 	Inverse_Matrix_Complex();
 	~Inverse_Matrix_Complex();
 	
-	ComplexMatrix A;
-	void using_zpotrf( const ComplexMatrix &Sin);
-	void using_zheev(const ComplexMatrix &in, ComplexMatrix &out);
+	ModuleBase::ComplexMatrix A;
+	void using_zpotrf( const ModuleBase::ComplexMatrix &Sin);
+	void using_zheev(const ModuleBase::ComplexMatrix &in, ModuleBase::ComplexMatrix &out);
 	void init( const int &dim_in);
 
 	private:
 	int dim;
 	double *e;
 	int lwork;
-	complex<double> *work2;
+	std::complex<double> *work2;
 	double* rwork;
 	int info;
 	bool allocate; //mohan add 2012-04-02
 
-	ComplexMatrix EA;
+	ModuleBase::ComplexMatrix EA;
 };
 
+//not been used yet!
 class Inverse_Matrix_Real
 {
 	public:
@@ -38,4 +41,5 @@ class Inverse_Matrix_Real
 
 };
 
+}
 #endif

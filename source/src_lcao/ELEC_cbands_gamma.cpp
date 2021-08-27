@@ -13,8 +13,8 @@ ELEC_cbands_gamma::~ELEC_cbands_gamma(){};
 
 void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 {
-	TITLE("ELEC_cbands_gamma","cal_bands");
-	timer::tick("ELEC_cband_gamma","cal_bands");
+	ModuleBase::TITLE("ELEC_cbands_gamma","cal_bands");
+	ModuleBase::timer::tick("ELEC_cband_gamma","cal_bands");
 
 	assert(GlobalV::NSPIN == GlobalC::kv.nks);
 						
@@ -38,7 +38,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		
 		if(!uhm.init_s)
     	{
-    	    WARNING_QUIT("Hamilt_Linear::solve_using_cg","Need init S matrix firstly");
+    	    ModuleBase::WARNING_QUIT("Hamilt_Linear::solve_using_cg","Need init S matrix firstly");
     	}
 
 		//--------------------------------------------
@@ -52,7 +52,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
     // Effective potential of DFT+U is added to total Hamiltonian here; Quxin adds on 20201029
 		if(INPUT.dft_plus_u) 
 		{
-      vector<double> eff_pot(GlobalC::ParaO.nloc);
+      std::vector<double> eff_pot(GlobalC::ParaO.nloc);
 			GlobalC::dftu.cal_eff_pot_mat_real(ik, istep, &eff_pot[0]);
 
 			const int spin = GlobalC::kv.isk[ik];
@@ -87,10 +87,10 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		else
 		{
 #ifdef __MPI
-			GlobalV::ofs_running << " no diagonalization." << endl;
+			GlobalV::ofs_running << " no diagonalization." << std::endl;
 #else
-			cout << " DCOLOR=" << GlobalV::DCOLOR << endl;
-			WARNING_QUIT("ELEC_cbands_gamma::cal_bands","no diagonalization");
+			std::cout << " DCOLOR=" << GlobalV::DCOLOR << std::endl;
+			ModuleBase::WARNING_QUIT("ELEC_cbands_gamma::cal_bands","no diagonalization");
 #endif
 
 		}
@@ -102,7 +102,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		GlobalC::SGO.dis_subwfc();
 	}// end k points
 			
-	timer::tick("ELEC_cband_gamma","cal_bands");
+	ModuleBase::timer::tick("ELEC_cband_gamma","cal_bands");
 	return;	
 }
 

@@ -20,6 +20,7 @@
 #include "LOOP_ions.h"
 #include "LCAO_matrix.h"
 
+namespace ModuleDFTU{
 DFTU_Yukawa::DFTU_Yukawa(){}
 
 DFTU_Yukawa::~DFTU_Yukawa(){}
@@ -27,7 +28,7 @@ DFTU_Yukawa::~DFTU_Yukawa(){}
 
 void DFTU_Yukawa::cal_yukawa_lambda()
 {
-	TITLE("DFTU_Yukawa", "cal_yukawa_lambda");
+	ModuleBase::TITLE("DFTU_Yukawa", "cal_yukawa_lambda");
 	
 	double sum_rho = 0.0;
 	double sum_rho_lambda = 0.0;	
@@ -38,7 +39,7 @@ void DFTU_Yukawa::cal_yukawa_lambda()
 			double rho_ir = GlobalC::CHR.rho[is][ir];
 			sum_rho += rho_ir;
 
-			double lambda_ir = 2*pow(3*rho_ir/PI, (double)1.0/6.0);
+			double lambda_ir = 2*pow(3*rho_ir/ModuleBase::PI, (double)1.0/6.0);
 			sum_rho_lambda += lambda_ir*rho_ir;
 		}
 	}
@@ -59,7 +60,7 @@ void DFTU_Yukawa::cal_yukawa_lambda()
 
 void DFTU_Yukawa::cal_slater_Fk(const int L, const int T)
 {
-	TITLE("DFTU_Yukawa","cal_slater_Fk");
+	ModuleBase::TITLE("DFTU_Yukawa","cal_slater_Fk");
 	
 	if(Yukawa)
 	{	 
@@ -110,7 +111,7 @@ void DFTU_Yukawa::cal_slater_Fk(const int L, const int T)
 
 void DFTU_Yukawa::cal_slater_UJ(const int istep, const int iter)
 {
-	TITLE("DFTU_Yukawa", "cal_slater_UJ");
+	ModuleBase::TITLE("DFTU_Yukawa", "cal_slater_UJ");
 	if(!Yukawa) return;
 
 	this->cal_yukawa_lambda();
@@ -124,7 +125,7 @@ void DFTU_Yukawa::cal_slater_UJ(const int istep, const int iter)
 			int N = GlobalC::ucell.atoms[it].l_nchi[l];
 			for(int n=0; n<N; n++)
 			{
-				ZEROS(VECTOR_TO_PTR(this->Fk.at(it).at(l).at(n)), l+1);
+				ModuleBase::GlobalFunc::ZEROS(ModuleBase::GlobalFunc::VECTOR_TO_PTR(this->Fk.at(it).at(l).at(n)), l+1);
 			}			
 		}			 	
 	}
@@ -215,7 +216,7 @@ void DFTU_Yukawa::cal_slater_UJ(const int istep, const int iter)
 
 double DFTU_Yukawa::spherical_Bessel(const int k, const double r, const double lambda)
 {
-  TITLE("DFTU_Yukawa", "spherical_Bessel");
+  ModuleBase::TITLE("DFTU_Yukawa", "spherical_Bessel");
 
   double val;
   double x=r*lambda;
@@ -246,7 +247,7 @@ double DFTU_Yukawa::spherical_Bessel(const int k, const double r, const double l
 
 double DFTU_Yukawa::spherical_Hankel(const int k, const double r, const double lambda)
 {
-  TITLE("DFTU_Yukawa", "spherical_Bessel");
+  ModuleBase::TITLE("DFTU_Yukawa", "spherical_Bessel");
 
   double val;
   double x=r*lambda;
@@ -278,7 +279,7 @@ double DFTU_Yukawa::spherical_Hankel(const int k, const double r, const double l
 /*
 void DFTU::cal_unscreened_slater_Fk(const int L, const int T)
 {
-	TITLE("DFTU","cal_slater_Fk");
+	ModuleBase::TITLE("DFTU","cal_slater_Fk");
 
 	for(int chi=0; chi<GlobalC::ucell.atoms[T].l_nchi[L]; chi++)
 	{
@@ -325,7 +326,7 @@ void DFTU::cal_unscreened_slater_Fk(const int L, const int T)
 
 void DFTU::cal_slater_Vsc(const int T, const int L)
 {
-	TITLE("DFTU", "cal_slater_Vsc");
+	ModuleBase::TITLE("DFTU", "cal_slater_Vsc");
 
 	for(int N=0; N<GlobalC::ucell.atoms[T].l_nchi[L]; N++)
 	{
@@ -359,7 +360,7 @@ void DFTU::cal_slater_Vsc(const int T, const int L)
 								double gaunt1 = GlobalC::UOT.get_Gaunt_coefficients(gindex0, gindex2, gindex);
 								double gaunt2 = GlobalC::UOT.get_Gaunt_coefficients(gindex1, gindex3, gindex);
 
-								this->Vsc.at(T).at(N)(M0, M1) += FOUR_PI*gaunt1*gaunt2*Fk.at(T).at(N).at(l)/(2.0*k+1.0);
+								this->Vsc.at(T).at(N)(M0, M1) += ModuleBase::FOUR_PI*gaunt1*gaunt2*Fk.at(T).at(N).at(l)/(2.0*k+1.0);
 							}
 						}
 					}
@@ -371,3 +372,5 @@ void DFTU::cal_slater_Vsc(const int T, const int L)
 	return;
 }
 */
+
+}

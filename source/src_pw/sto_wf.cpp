@@ -3,8 +3,8 @@
 
 Stochastic_WF::Stochastic_WF()
 {
-    chiortho  = new ComplexMatrix[1];
-	chi0  = new ComplexMatrix[1];
+    chiortho  = new ModuleBase::ComplexMatrix[1];
+	chi0  = new ModuleBase::ComplexMatrix[1];
 	emax_sto = 1;
 	emin_sto = -1;
 	stotype = "pw";
@@ -54,17 +54,17 @@ void Stochastic_WF::init(void)
     if(nchi == 0)
     {
         nchi = totnpw-GlobalV::NBANDS;
-        cout<<"Using all normal bases: "<<totnpw<<endl;
+        std::cout<<"Using all normal bases: "<<totnpw<<std::endl;
         allbase = true;
     }
     nchip = int(nchi/GlobalV::NPOOL);
     if(GlobalV::NPOOL - GlobalV::MY_POOL - 1 < nchi%GlobalV::NPOOL) ++nchip;
 
-    complex<double> ui(0,1);
+    std::complex<double> ui(0,1);
 
     //We temporarily init one group of orbitals for all k points.
     delete[] chi0;
-    chi0 = new ComplexMatrix[1]; 
+    chi0 = new ModuleBase::ComplexMatrix[1]; 
     
     
     //srand((unsigned)time(NULL)+GlobalV::MY_RANK*10000);
@@ -109,7 +109,7 @@ void Stochastic_WF::init(void)
         chi0[0].create(nchip,ndim,false);
         for(int i=0; i<chi0[0].size; ++i)
         {
-            chi0[0].c[i]=exp(2*PI*rand()/double(RAND_MAX)*ui) / sqrt(double(nchi));
+            chi0[0].c[i]=exp(2*ModuleBase::PI*rand()/double(RAND_MAX)*ui) / sqrt(double(nchi));
         }
     }
     
@@ -125,7 +125,7 @@ void Stochastic_WF::init(void)
     delete[] displ;
 #endif
     int nkk = 1; // We temporarily use gamma k point.
-    chiortho = new ComplexMatrix[1];
+    chiortho = new ModuleBase::ComplexMatrix[1];
     if(GlobalV::NBANDS > 0)
     {
         chiortho[0].create(nchip,ndim,false);

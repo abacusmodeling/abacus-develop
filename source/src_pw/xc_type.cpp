@@ -12,18 +12,18 @@ xcfunc::~xcfunc()
 }
 
 // mohan update 2009-12-15
-const string exc[10] = { "NOX", "SLA", "SL1", "RXC", "OEP", "HF", "PB0X", "B3LP", "KZK", "HSEX"};
-const string corr[12] = { "NOC", "PZ", "VWN", "LYP", "PW", "WIG", "HL", "OBZ",
+const std::string exc[10] = { "NOX", "SLA", "SL1", "RXC", "OEP", "HF", "PB0X", "B3LP", "KZK", "HSEX"};
+const std::string corr[12] = { "NOC", "PZ", "VWN", "LYP", "PW", "WIG", "HL", "OBZ",
                           "OBW", "GL", "B3LP", "KZK"};
-const string gradx[14] = { "NOGX", "B88", "GGX", "PBX",  "RPB", "HCTH", "OPTX", "META", "PB0X", "B3LP", "PSX", "WC", "HSEX", "SCAN"};
-const string gradc[10] = { "NOGC", "P86", "GGC", "BLYP", "PBC", "HCTH", "META", "B3LP", "PSC", "SCAN"};
+const std::string gradx[14] = { "NOGX", "B88", "GGX", "PBX",  "RPB", "HCTH", "OPTX", "META", "PB0X", "B3LP", "PSX", "WC", "HSEX", "SCAN"};
+const std::string gradc[10] = { "NOGC", "P86", "GGC", "BLYP", "PBC", "HCTH", "META", "B3LP", "PSC", "SCAN"};
 
 // from function.f90
 //-----------------------------------------------------------------------
-void xcfunc::which_dft(const string *dft)
+void xcfunc::which_dft(const std::string *dft)
 {
 	//-----------------------------------------------------------------------
-	// translates a string containing the exchange-correlation name
+	// translates a std::string containing the exchange-correlation name
 	// into internal indices iexch, icorr, igcx, igcc
 
 	const int nxc = 10; // number of exchange functional
@@ -82,9 +82,9 @@ void xcfunc::which_dft(const string *dft)
 
 	static int itype = 0;
 	++itype;
-	stringstream ss;
+	std::stringstream ss;
 	ss << " ELEMENT " << itype << " FUNCTIONAL : "; 
-//	cout << ss.str() << dft[0] << " " << dft[1] << " " << dft[2] << " " << dft[3] << endl;
+//	std::cout << ss.str() << dft[0] << " " << dft[1] << " " << dft[2] << " " << dft[3] << std::endl;
 	
 	if( match_one( dft, "PBE0"))
 	{
@@ -182,7 +182,7 @@ void xcfunc::which_dft(const string *dft)
 
 	if (igcx == 6)
 	{
-		cerr << "\n which_dft,OPTX untested please test,";	//-igcx);
+		std::cerr << "\n which_dft,OPTX untested please test,";	//-igcx);
 	}
 
 	if (iexch == notset)
@@ -206,15 +206,15 @@ void xcfunc::which_dft(const string *dft)
 		set_dft_value(igcc, 0);
 	}
 
-//	cout << "\n iexch = " << iexch; 
-//	cout << "\n icorr = " << icorr; 
-//	cout << "\n igcx = " << igcx; 
-//	cout << "\n igcc = " << igcc << endl; 
+//	std::cout << "\n iexch = " << iexch; 
+//	std::cout << "\n icorr = " << icorr; 
+//	std::cout << "\n igcx = " << igcx; 
+//	std::cout << "\n igcc = " << igcc << std::endl; 
 
-	//cout << "\n corr = " << exc[icorr];
-	//cout << "  corr = " << corr[icorr];
-	//cout << "  gradx = " << gradx[igcx];
-	//cout << "  gradc = " << gradc[igcc] << endl;
+	//std::cout << "\n corr = " << exc[icorr];
+	//std::cout << "  corr = " << corr[icorr];
+	//std::cout << "  gradx = " << gradx[igcx];
+	//std::cout << "  gradc = " << gradc[igcc] << std::endl;
 	//'-'//corr (icorr) //'-'//gradx (igcx) //'-'//gradc (igcc)
 	//      WRITE( stdout,'(a)') dftout
 	
@@ -232,13 +232,13 @@ void xcfunc::set_dft_value(int &m,const int i)
 
 	if (m != notset && m != i)
 	{
-		cerr << "\n set_dft_value, two conflicting matching values,";	// 1);
+		std::cerr << "\n set_dft_value, two conflicting matching values,";	// 1);
 	}
 	m = i;
 	return;
 } //  end subroutine set_dft_value
 
-void xcfunc::printdft(ofstream &ofs)
+void xcfunc::printdft(std::ofstream &ofs)
 {
 	ofs << "\n iexch = " << iexch
 	<< "  -> " << exc [iexch];
@@ -251,7 +251,7 @@ void xcfunc::printdft(ofstream &ofs)
 }
 
 
-void xcfunc::ostreamdft(ostream &ofs) // zws add 20150108
+void xcfunc::ostreamdft(std::ostream &ofs) // zws add 20150108
 {
 	if ( iexch == 1 && icorr == 1 && igcx == 0 && igcc == 0 )
 	{ 
@@ -271,11 +271,11 @@ void xcfunc::ostreamdft(ostream &ofs) // zws add 20150108
 }
 
 
-bool xcfunc::match_one(const string* dft, const string &name)const
+bool xcfunc::match_one(const std::string* dft, const std::string &name)const
 {
 	for(int i=0; i<4; i++)
 	{
-		if(dft[i]==name) return 1; // match one of the four string.
+		if(dft[i]==name) return 1; // match one of the four std::string.
 	}
 	return 0; // no one match
 }
@@ -294,7 +294,7 @@ void xcfunc::hybrid_first()
 {
 #ifdef __LCAO
 	// may do something
-	WARNING("functional","file "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__)+" may error ");
+	ModuleBase::WARNING("functional","file "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__)+" may error ");
 	if(Exx_Global::Hybrid_Type::HF==GlobalC::exx_global.info.hybrid_type)
 	{
 		iexch_now = 1;

@@ -3,14 +3,14 @@
 
 
 void Force_LCAO_gamma::cal_ftvnl_dphi(
-	matrix& dm2d, 
+	ModuleBase::matrix& dm2d, 
 	const bool isforce, 
 	const bool isstress, 
-	matrix& ftvnl_dphi, 
-	matrix& stvnl_dphi)
+	ModuleBase::matrix& ftvnl_dphi, 
+	ModuleBase::matrix& stvnl_dphi)
 {
-    TITLE("Force_LCAO_gamma","cal_ftvnl_dphi");
-    timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
+    ModuleBase::TITLE("Force_LCAO_gamma","cal_ftvnl_dphi");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
     for(int i=0; i<GlobalV::NLOCAL; i++)
     {
         const int iat = GlobalC::ucell.iwt2iat[i];
@@ -59,21 +59,21 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(
             }
         }
     }
-    timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
     return;
 }
 
 
 
 void Force_LCAO_gamma::cal_fvnl_dbeta(
-	matrix& dm2d, 
+	ModuleBase::matrix& dm2d, 
 	const bool isforce, 
 	const bool isstress, 
-	matrix& fvnl_dbeta, 
-	matrix& svnl_dbeta)
+	ModuleBase::matrix& fvnl_dbeta, 
+	ModuleBase::matrix& svnl_dbeta)
 {
-    TITLE("Force_LCAO_gamma","cal_fvnl_dbeta");
-    timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
+    ModuleBase::TITLE("Force_LCAO_gamma","cal_fvnl_dbeta");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
 
 	double r0[3];
 	double r1[3];
@@ -82,7 +82,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
     {
         const int it = GlobalC::ucell.iat2it[iat];
         const int ia = GlobalC::ucell.iat2ia[iat];
-        const Vector3<double> tau0 = GlobalC::ucell.atoms[it].tau[ia];
+        const ModuleBase::Vector3<double> tau0 = GlobalC::ucell.atoms[it].tau[ia];
         //find ajacent atom of atom ia
         //GlobalC::GridD.Find_atom( GlobalC::ucell.atoms[it].tau[ia] );
 		GlobalC::GridD.Find_atom(GlobalC::ucell, GlobalC::ucell.atoms[it].tau[ia] ,it, ia);
@@ -96,7 +96,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
             const Atom* atom1 = &GlobalC::ucell.atoms[T1];
             const int I1 = GlobalC::GridD.getNatom (ad1);
             const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
-			const Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau (ad1);
+			const ModuleBase::Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau (ad1);
 			const double Rcut_AO1 = GlobalC::ORB.Phi[T1].getRcut();
 
             for (int ad2 =0 ; ad2 < GlobalC::GridD.getAdjacentNum()+1; ad2++)
@@ -105,7 +105,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
                 const Atom* atom2 = &GlobalC::ucell.atoms[T2];
                 const int I2 = GlobalC::GridD.getNatom (ad2);
                 const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-                const Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau (ad2);
+                const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau (ad2);
                 const double Rcut_AO2 = GlobalC::ORB.Phi[T2].getRcut();
 
                 const double dist1 = (tau1-tau0).norm() * GlobalC::ucell.lat0;
@@ -224,20 +224,20 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
             }
         }
     }
-    timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
     return;
 }
 
 
 void Force_LCAO_gamma::cal_ftvnl_dphi(
-	const std::vector<matrix> &dm2d, 
+	const std::vector<ModuleBase::matrix> &dm2d, 
 	const bool isforce, 
 	const bool isstress, 
-	matrix& ftvnl_dphi, 
-	matrix& stvnl_dphi)
+	ModuleBase::matrix& ftvnl_dphi, 
+	ModuleBase::matrix& stvnl_dphi)
 {
-    TITLE("Force_LCAO_gamma","cal_ftvnl_dphi");
-    timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
+    ModuleBase::TITLE("Force_LCAO_gamma","cal_ftvnl_dphi");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
 
     for(int i=0; i<GlobalV::NLOCAL; i++)
     {
@@ -287,26 +287,26 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(
             }
         }
     }
-    timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
     return;
 }
 
 
 void Force_LCAO_gamma::cal_fvnl_dbeta(
-	const std::vector<matrix> &dm2d, 
+	const std::vector<ModuleBase::matrix> &dm2d, 
 	const bool isforce, 
 	const bool isstress, 
-	matrix& fvnl_dbeta, 
-	matrix& svnl_dbeta)
+	ModuleBase::matrix& fvnl_dbeta, 
+	ModuleBase::matrix& svnl_dbeta)
 {
-    TITLE("Force_LCAO_gamma","cal_fvnl_dbeta");
-    timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
+    ModuleBase::TITLE("Force_LCAO_gamma","cal_fvnl_dbeta");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
 
     for(int iat=0; iat<GlobalC::ucell.nat; iat++)
     {
         const int it = GlobalC::ucell.iat2it[iat];
         const int ia = GlobalC::ucell.iat2ia[iat];
-        const Vector3<double> tau0 = GlobalC::ucell.atoms[it].tau[ia];
+        const ModuleBase::Vector3<double> tau0 = GlobalC::ucell.atoms[it].tau[ia];
         //find ajacent atom of atom ia
         //GlobalC::GridD.Find_atom( GlobalC::ucell.atoms[it].tau[ia] );
         GlobalC::GridD.Find_atom(GlobalC::ucell, GlobalC::ucell.atoms[it].tau[ia] ,it, ia);
@@ -319,7 +319,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
             const Atom* atom1 = &GlobalC::ucell.atoms[T1];
             const int I1 = GlobalC::GridD.getNatom (ad1);
             const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
-            const Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau (ad1);
+            const ModuleBase::Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau (ad1);
 
             for (int ad2 =0 ; ad2 < GlobalC::GridD.getAdjacentNum()+1; ad2++)
             {
@@ -327,7 +327,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
                 const Atom* atom2 = &GlobalC::ucell.atoms[T2];
                 const int I2 = GlobalC::GridD.getNatom (ad2);
                 const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-                const Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau (ad2);
+                const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau (ad2);
 
                 const double Rcut_Beta = GlobalC::ORB.Beta[it].get_rcut_max();
                 const double Rcut_AO1 = GlobalC::ORB.Phi[T1].getRcut();
@@ -447,6 +447,6 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
             }
         }
     }
-    timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
     return;
 }

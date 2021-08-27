@@ -9,6 +9,9 @@
 #include<cmath>
 #include<stdexcept>
 
+namespace ModuleBase
+{
+
 std::vector<Sph_Bessel_Recursive::D2> Sph_Bessel_Recursive_Pool::D2::sb_pool;
 
 void Sph_Bessel_Recursive::D2::set_dx( const double dx_in )
@@ -56,7 +59,7 @@ void Sph_Bessel_Recursive::D2::cal_jlx_smallx( const int l_size, const size_t ix
 	
 	for( int l=0; l!=l_size; ++l )
 	{
-		const double coeff = sqrt(PI)/tgamma(l+1.5)/pow(2,l+1);
+		const double coeff = sqrt(ModuleBase::PI)/tgamma(l+1.5)/pow(2,l+1);
 		const double smallx_range = pow( this->threshold/coeff*(l+1.5)*4, 1.0/(l+2) );
 		
 		if(jlx[l].size()<ix1_size)
@@ -135,10 +138,12 @@ void Sph_Bessel_Recursive::D2::cal_jlx_recursive( const int l_size, const size_t
 	}
 }
 
+}
+
 /*
 void Sph_Bessel_Recursive::cal_jlx_preset(const int l_size, const size_t ix_size)
 {	
-cout<<l_size<<"\t"<<ix_size<<endl;
+std::cout<<l_size<<"\t"<<ix_size<<std::endl;
 	if(jlx.size()<l_size)
 		jlx.resize(l_size);
 	
@@ -389,7 +394,7 @@ cout<<l_size<<"\t"<<ix_size<<endl;
 			}
 		}
 //timeval t_end; gettimeofday( &t_end, NULL);
-//cout<<l<<"\t"<<(double)(t_end.tv_sec-t_start.tv_sec) + (double)(t_end.tv_usec-t_start.tv_usec)/1000000.0<<endl;
+//std::cout<<l<<"\t"<<(double)(t_end.tv_sec-t_start.tv_sec) + (double)(t_end.tv_usec-t_start.tv_usec)/1000000.0<<std::endl;
 	}
 }
 */	

@@ -6,12 +6,12 @@
 #include "LCAO_nnr.h"
 void Local_Orbital_Charge::allocate_DM_k(void)
 {
-    TITLE("Local_Orbital_Charge","allocate_k");
+    ModuleBase::TITLE("Local_Orbital_Charge","allocate_k");
 
     this->nnrg_now = GlobalC::LNNR.nnrg;
     //xiaohui add 'GlobalV::OUT_LEVEL' line, 2015-09-16
-    if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"nnrg_last",nnrg_last);
-    if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"nnrg_now",nnrg_now);
+    if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nnrg_last",nnrg_last);
+    if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nnrg_now",nnrg_now);
 
     if(this->init_DM_R)
     {
@@ -30,11 +30,11 @@ void Local_Orbital_Charge::allocate_DM_k(void)
         for(int is=0; is<GlobalV::NSPIN; is++)
         {
             this->DM_R[is] = new double[nnrg_now];
-            ZEROS(DM_R[is], nnrg_now);
+            ModuleBase::GlobalFunc::ZEROS(DM_R[is], nnrg_now);
         }
         this->nnrg_last = nnrg_now;
         this->init_DM_R = true;
-        Memory::record("LocalOrbital_Charge","Density_Matrix",GlobalV::NSPIN*nnrg_now,"double");
+        ModuleBase::Memory::record("LocalOrbital_Charge","Density_Matrix",GlobalV::NSPIN*nnrg_now,"double");
     }
     else if(nnrg_now==0)
     {
@@ -42,7 +42,7 @@ void Local_Orbital_Charge::allocate_DM_k(void)
     }
     else
     {
-        WARNING_QUIT("Local_Orbital_Charge::allocate_k","check init_DM_R.");
+        ModuleBase::WARNING_QUIT("Local_Orbital_Charge::allocate_k","check init_DM_R.");
     }
 
 	// Peize Lin test 2019-01-16 
@@ -57,12 +57,12 @@ void Local_Orbital_Charge::allocate_DM_k(void)
 
 void Local_Orbital_Charge::kpt_file(const Grid_Technique &gt)
 {
-	TITLE("Local_Orbital_Charge","kpt_file");
+	ModuleBase::TITLE("Local_Orbital_Charge","kpt_file");
 
 	int error;
-	cout << " Read in wave functions files: " << GlobalC::kv.nkstot << endl;
+	std::cout << " Read in wave functions files: " << GlobalC::kv.nkstot << std::endl;
 
-	complex<double> **ctot;
+	std::complex<double> **ctot;
 
 	for(int ik=0; ik<GlobalC::kv.nkstot; ++ik)
 	{
@@ -70,28 +70,28 @@ void Local_Orbital_Charge::kpt_file(const Grid_Technique &gt)
 		GlobalC::LOC.wfc_dm_2d.wfc_k[ik].create(GlobalC::ParaO.ncol, GlobalC::ParaO.nrow);
 		GlobalC::LOC.wfc_dm_2d.wfc_k[ik].zero_out();
 
-		GlobalV::ofs_running << " Read in wave functions " << ik + 1 << endl;
+		GlobalV::ofs_running << " Read in wave functions " << ik + 1 << std::endl;
 		error = WF_Local::read_lowf_complex( ctot , ik , 1);
 
 #ifdef __MPI
 		Parallel_Common::bcast_int(error);
 #endif
-		GlobalV::ofs_running << " Error=" << error << endl;
+		GlobalV::ofs_running << " Error=" << error << std::endl;
 		if(error==1)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: GlobalC::LOWF.dat");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: GlobalC::LOWF.dat");
 		}
 		else if(error==2)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","In wave function file, band number doesn't match");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In wave function file, band number doesn't match");
 		}
 		else if(error==3)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","In wave function file, nlocal doesn't match");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In wave function file, nlocal doesn't match");
 		}
 		else if(error==4)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","In k-dependent wave function file, k point is not correct");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In k-dependent wave function file, k point is not correct");
 		}
 
 	}//loop ispin
@@ -101,43 +101,43 @@ void Local_Orbital_Charge::kpt_file(const Grid_Technique &gt)
 #include "record_adj.h"
 inline void cal_DM_ATOM(
 	const Grid_Technique &gt, 
-	const complex<double> fac, 
+	const std::complex<double> fac, 
 	Record_adj RA,
  	const int ia1, 
 	const int iw1_lo, 
 	const int nw1, 
 	const int gstart, 
-	complex<double> *WFC_PHASE, 
-	complex<double> **DM_ATOM)
+	std::complex<double> *WFC_PHASE, 
+	std::complex<double> **DM_ATOM)
 {
 
     const char transa='N';
 	const char transb='T';  
-    const complex<double> alpha=1;
-	const complex<double> beta=1;
+    const std::complex<double> alpha=1;
+	const std::complex<double> beta=1;
 
     for(int ik=0; ik<GlobalC::kv.nks; ik++)
     {
-        complex<double> **wfc = GlobalC::LOWF.WFC_K[ik];
+        std::complex<double> **wfc = GlobalC::LOWF.WFC_K[ik];
         const int ispin = GlobalC::kv.isk[ik];
         int atom2start=0;
 
         for (int ia2 = 0; ia2 < RA.na_each[ia1]; ++ia2)
         {
-            complex<double> *DM=&DM_ATOM[ispin][atom2start];
+            std::complex<double> *DM=&DM_ATOM[ispin][atom2start];
             const int T2 = RA.info[ia1][ia2][3];
             const int I2 = RA.info[ia1][ia2][4];
             Atom* atom2 = &GlobalC::ucell.atoms[T2];
             const int start2 = GlobalC::ucell.itiaiw2iwt(T2,I2,0);
             const int iw2_lo=gt.trace_lo[start2];
             const int nw2=atom2->nw;
-            complex<double> exp_R= exp( fac * (
+            std::complex<double> exp_R= exp( fac * (
                         GlobalC::kv.kvec_d[ik].x * RA.info[ia1][ia2][0] + 
                         GlobalC::kv.kvec_d[ik].y * RA.info[ia1][ia2][1] + 
                         GlobalC::kv.kvec_d[ik].z * RA.info[ia1][ia2][2]  
                         ) );
             
-            //ZEROS(WFC_PHASE, GlobalV::NBANDS*nw1);
+            //ModuleBase::GlobalFunc::ZEROS(WFC_PHASE, GlobalV::NBANDS*nw1);
             int ibStart=0;
             int nRow=0;
             for(int ib=0; ib<GlobalV::NBANDS; ++ib)
@@ -147,7 +147,7 @@ inline void cal_DM_ATOM(
                 {
                     if(nRow==0) ibStart=ib;
                     const int iline=nRow*nw1;
-                    complex<double> phase=exp_R*wg_local;
+                    std::complex<double> phase=exp_R*wg_local;
                     for(int iw1=0; iw1<nw1; ++iw1)
 					{
                         WFC_PHASE[iline+iw1]=phase*conj(wfc[ib][iw1_lo+iw1]);
@@ -173,25 +173,25 @@ inline void cal_DM_ATOM(
 //added by zhengdy-soc, for non-collinear case
 inline void cal_DM_ATOM_nc(
 	const Grid_Technique &gt, 
-	const complex<double> fac, 
+	const std::complex<double> fac, 
 	Record_adj RA,
 	const int ia1, 
 	const int iw1_lo, 
 	const int nw1, 
 	const int gstart, 
-	complex<double> *WFC_PHASE, 
-	complex<double> **DM_ATOM)
+	std::complex<double> *WFC_PHASE, 
+	std::complex<double> **DM_ATOM)
 {
 
     if(GlobalV::NSPIN !=4 ) 
 	{
-		WARNING_QUIT("Local_Orbital_Charge","NSPIN not match!");
+		ModuleBase::WARNING_QUIT("Local_Orbital_Charge","NSPIN not match!");
 	}
 
     const char transa='N';
 	const char transb='T';  
-    const complex<double> alpha=1;
-	const complex<double> beta=1;
+    const std::complex<double> alpha=1;
+	const std::complex<double> beta=1;
     int ispin=0;
 
     for(int is1=0;is1<2;is1++)
@@ -200,25 +200,25 @@ inline void cal_DM_ATOM_nc(
         {
             for(int ik=0; ik<GlobalC::kv.nks; ik++)
             {
-                complex<double> **wfc = GlobalC::LOWF.WFC_K[ik];
+                std::complex<double> **wfc = GlobalC::LOWF.WFC_K[ik];
                 int atom2start=0;
 
                 for (int ia2 = 0; ia2 < RA.na_each[ia1]; ++ia2)
                 {
-                    complex<double> *DM=&DM_ATOM[ispin][atom2start];
+                    std::complex<double> *DM=&DM_ATOM[ispin][atom2start];
                     const int T2 = RA.info[ia1][ia2][3];
                     const int I2 = RA.info[ia1][ia2][4];
                     Atom* atom2 = &GlobalC::ucell.atoms[T2];
                     const int start2 = GlobalC::ucell.itiaiw2iwt(T2,I2,0);
                     const int iw2_lo=gt.trace_lo[start2]/GlobalV::NPOL + gt.lgd/GlobalV::NPOL*is2;
                     const int nw2=atom2->nw;
-                    complex<double> exp_R= exp( fac * (
+                    std::complex<double> exp_R= exp( fac * (
                                 GlobalC::kv.kvec_d[ik].x * RA.info[ia1][ia2][0] + 
                                 GlobalC::kv.kvec_d[ik].y * RA.info[ia1][ia2][1] + 
                                 GlobalC::kv.kvec_d[ik].z * RA.info[ia1][ia2][2]  
                                 ) );
             
-            		//ZEROS(WFC_PHASE, GlobalV::NBANDS*nw1);
+            		//ModuleBase::GlobalFunc::ZEROS(WFC_PHASE, GlobalV::NBANDS*nw1);
                     int ibStart=0;
                     int nRow=0;
                     for(int ib=0; ib<GlobalV::NBANDS; ++ib)
@@ -231,7 +231,7 @@ inline void cal_DM_ATOM_nc(
 								ibStart=ib;
 							}
                             const int iline=nRow*nw1;
-                            complex<double> phase=exp_R*w1;
+                            std::complex<double> phase=exp_R*w1;
                             for(int iw1=0; iw1<nw1; ++iw1)
 							{
                                 WFC_PHASE[iline+iw1]=phase*conj(wfc[ib][iw1_lo+iw1 + gt.lgd/GlobalV::NPOL*is1]);
@@ -258,27 +258,27 @@ inline void cal_DM_ATOM_nc(
 
 void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
 {
-    TITLE("Local_Orbital_Charge","cal_dk_k");
-    timer::tick("LCAO_Charge","cal_dk_k");  
+    ModuleBase::TITLE("Local_Orbital_Charge","cal_dk_k");
+    ModuleBase::timer::tick("LCAO_Charge","cal_dk_k");  
     //int nnrg = 0;
-    Vector3<double> tau1;
-	Vector3<double> dtau;
+    ModuleBase::Vector3<double> tau1;
+	ModuleBase::Vector3<double> dtau;
         
     Record_adj RA;
     RA.for_grid(gt);
 
     int ca = 0;
-    complex<double> fac = TWO_PI * IMAG_UNIT;
+    std::complex<double> fac = ModuleBase::TWO_PI * ModuleBase::IMAG_UNIT;
 
-    complex<double> *WFC_PHASE=new complex<double>[GlobalV::NLOCAL*GlobalC::ucell.nwmax];
+    std::complex<double> *WFC_PHASE=new std::complex<double>[GlobalV::NLOCAL*GlobalC::ucell.nwmax];
     
     int DM_ATOM_SIZE=1; 
-    complex<double> **DM_ATOM=new complex<double> *[GlobalV::NSPIN];
+    std::complex<double> **DM_ATOM=new std::complex<double> *[GlobalV::NSPIN];
 
     for(int is=0; is<GlobalV::NSPIN; ++is)
     {
-        DM_ATOM[is]=new complex<double>[DM_ATOM_SIZE];
-        ZEROS(DM_ATOM[is], DM_ATOM_SIZE);
+        DM_ATOM[is]=new std::complex<double>[DM_ATOM_SIZE];
+        ModuleBase::GlobalFunc::ZEROS(DM_ATOM[is], DM_ATOM_SIZE);
     }
     for(int T1=0; T1<GlobalC::ucell.ntype; T1++)
     {
@@ -303,14 +303,14 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
 					}
                     for(int is=0; is<GlobalV::NSPIN; ++is)
 					{
-                        DM_ATOM[is]=new complex<double>[DM_ATOM_SIZE];
+                        DM_ATOM[is]=new std::complex<double>[DM_ATOM_SIZE];
 					}
                 }
                 for(int is=0; is<GlobalV::NSPIN; ++is)
 				{
-                    ZEROS(DM_ATOM[is], ng);
+                    ModuleBase::GlobalFunc::ZEROS(DM_ATOM[is], ng);
 				}
-                ZEROS(WFC_PHASE, GlobalV::NBANDS*nw1);
+                ModuleBase::GlobalFunc::ZEROS(WFC_PHASE, GlobalV::NBANDS*nw1);
                 if(GlobalV::NSPIN!=4)
 				{
 					cal_DM_ATOM(gt, fac, RA, ca, iw1_lo, nw1, gstart, WFC_PHASE, DM_ATOM);
@@ -365,14 +365,14 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
     //------------
     // for test
     //------------
-/*  cout << setprecision(3);
+/*  std::cout << std::setprecision(3);
     for(int i=0; i<nnrg_now; i++)
 
     for(int ik=0; ik<GlobalC::kv.nkstot; ++ik)
     {
         for(int ib=0; ib<GlobalV::NBANDS; ++ib)
         {
-            cout << " ik=" << ik << " ib=" << ib << " occ=" << GlobalC::wf.wg(ik,ib) << " e=" << GlobalC::wf.ekb[ik][ib] << endl;
+            std::cout << " ik=" << ik << " ib=" << ib << " occ=" << GlobalC::wf.wg(ik,ib) << " e=" << GlobalC::wf.ekb[ik][ib] << std::endl;
         }
     }
 
@@ -380,7 +380,7 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
     {
         if(DM_R[0][i]>1.0e-8)
         {
-            cout << " i=" << i << " DM_R=" << DM_R[0][i] << endl;
+            std::cout << " i=" << i << " DM_R=" << DM_R[0][i] << std::endl;
         }
     }
 */
@@ -393,7 +393,7 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
 
     RA.delete_grid();//xiaohui add 2015-02-04
 
-    timer::tick("LCAO_Charge","cal_dk_k");  
+    ModuleBase::timer::tick("LCAO_Charge","cal_dk_k");  
     return;
 }
 

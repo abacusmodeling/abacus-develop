@@ -11,26 +11,26 @@
 #include "../src_external/src_test/src_ri/exx_abfs-dm-test.h"
 
 void Exx_Abfs::DM::cal_DM(
-	const set<pair<size_t,size_t>> &atom_pairs,
-	const vector<Abfs::Vector3_Order<int>> &Born_von_Karman_boxes)
+	const std::set<std::pair<size_t,size_t>> &atom_pairs,
+	const std::vector<Abfs::Vector3_Order<int>> &Born_von_Karman_boxes)
 {
-	TITLE("Exx_Abfs::DM::cal_DM");
+	ModuleBase::TITLE("Exx_Abfs::DM::cal_DM");
 	
 	cal_DMk_mixing( GlobalC::CHR, atom_pairs );
 
-	for( const pair<size_t,size_t> & atom_pair : atom_pairs )
+	for( const std::pair<size_t,size_t> & atom_pair : atom_pairs )
 	{
 		const size_t iat1 = atom_pair.first;
 		const size_t iat2 = atom_pair.second;
 		const size_t it1 = GlobalC::ucell.iat2it[iat1];
 		const size_t it2 = GlobalC::ucell.iat2it[iat2];
 
-		for( const Vector3<int> &box : Born_von_Karman_boxes )
+		for( const ModuleBase::Vector3<int> &box : Born_von_Karman_boxes )
 		{
-			DMr[iat1][iat2][box] = vector<matrix>( GlobalV::NSPIN, {GlobalC::ucell.atoms[it1].nw,GlobalC::ucell.atoms[it2].nw} );
+			DMr[iat1][iat2][box] = std::vector<ModuleBase::matrix>( GlobalV::NSPIN, {GlobalC::ucell.atoms[it1].nw,GlobalC::ucell.atoms[it2].nw} );
 			for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 			{
-				DMr[iat1][iat2][box][GlobalC::kv.isk[ik]] += ( DMk[iat1][iat2][ik] * exp( -TWO_PI*IMAG_UNIT* (GlobalC::kv.kvec_c[ik]* (box*GlobalC::ucell.latvec)) ) ).real();
+				DMr[iat1][iat2][box][GlobalC::kv.isk[ik]] += ( DMk[iat1][iat2][ik] * exp( -ModuleBase::TWO_PI*ModuleBase::IMAG_UNIT* (GlobalC::kv.kvec_c[ik]* (box*GlobalC::ucell.latvec)) ) ).real();
 			}
 		}
 	}
@@ -40,9 +40,9 @@ void Exx_Abfs::DM::cal_DM(
 
 void Exx_Abfs::DM::cal_DMk_mixing(
 	const Charge_Broyden &charge,
-	const set<pair<size_t,size_t>> &atom_pairs )
+	const std::set<std::pair<size_t,size_t>> &atom_pairs )
 {
-	TITLE("Exx_Abfs::DM::cal_DMk_mixing");
+	ModuleBase::TITLE("Exx_Abfs::DM::cal_DMk_mixing");
 
 	if(flag_mix)
 	{
@@ -52,7 +52,7 @@ void Exx_Abfs::DM::cal_DMk_mixing(
 		}
 		else if ( charge.mixing_mode == "kerker" )
 		{
-			throw invalid_argument("mixing density matrix can't be kerker. In "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::invalid_argument("mixing density matrix can't be kerker. In "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 		else if ( charge.mixing_mode == "pulay" )
 		{
@@ -60,11 +60,11 @@ void Exx_Abfs::DM::cal_DMk_mixing(
 		}
 		else if ( charge.mixing_mode == "pulay-kerker" )
 		{
-			throw invalid_argument("mixing density matrix can't be pulay-kerker. In "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::invalid_argument("mixing density matrix can't be pulay-kerker. In "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 		else
 		{
-			throw invalid_argument("mixing density matrix error. In "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::invalid_argument("mixing density matrix error. In "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 	}
 	else
@@ -74,7 +74,7 @@ void Exx_Abfs::DM::cal_DMk_mixing(
 
 		#if TEST_EXX_LCAO==1
 			static int istep=0;
-			ofs_matrixes("DMk_"+TO_STRING(istep++)+".dat(@Exx_Abfs::DM::cal_DMk_mixing)",DMk);
+			ofs_matrixes("DMk_"+ModuleBase::GlobalFunc::TO_STRING(istep++)+".dat(@Exx_Abfs::DM::cal_DMk_mixing)",DMk);
 		#elif TEST_EXX_LCAO==-1
 			#error
 		#endif
@@ -83,14 +83,14 @@ void Exx_Abfs::DM::cal_DMk_mixing(
 
 
 
-map<size_t,map<size_t,vector<ComplexMatrix>>> Exx_Abfs::DM::cal_DMk_raw( const set<pair<size_t,size_t>> &atom_pairs ) const
+std::map<size_t,std::map<size_t,std::vector<ModuleBase::ComplexMatrix>>> Exx_Abfs::DM::cal_DMk_raw( const std::set<std::pair<size_t,size_t>> &atom_pairs ) const
 {
-	TITLE("Exx_Abfs::DM::cal_DMk_raw");
+	ModuleBase::TITLE("Exx_Abfs::DM::cal_DMk_raw");
 
 	const double SPIN_multiple = 0.5*GlobalV::NSPIN;
 	
-	map<size_t,map<size_t,vector<ComplexMatrix>>> DMk_raw;
-	for( const pair<size_t,size_t> & atom_pair : atom_pairs )
+	std::map<size_t,std::map<size_t,std::vector<ModuleBase::ComplexMatrix>>> DMk_raw;
+	for( const std::pair<size_t,size_t> & atom_pair : atom_pairs )
 	{
 		const size_t iat1 = atom_pair.first;
 		const size_t iat2 = atom_pair.second;
@@ -99,7 +99,7 @@ map<size_t,map<size_t,vector<ComplexMatrix>>> Exx_Abfs::DM::cal_DMk_raw( const s
 		const size_t ia1 = GlobalC::ucell.iat2ia[iat1];
 		const size_t ia2 = GlobalC::ucell.iat2ia[iat2];
 
-		DMk_raw[iat1][iat2] = vector<ComplexMatrix>( GlobalC::kv.nks, {GlobalC::ucell.atoms[it1].nw,GlobalC::ucell.atoms[it2].nw} );
+		DMk_raw[iat1][iat2] = std::vector<ModuleBase::ComplexMatrix>( GlobalC::kv.nks, {GlobalC::ucell.atoms[it1].nw,GlobalC::ucell.atoms[it2].nw} );
 		for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 		{
 			for( size_t iw1=0; iw1!=GlobalC::ucell.atoms[it1].nw; ++iw1 )
@@ -115,7 +115,7 @@ map<size_t,map<size_t,vector<ComplexMatrix>>> Exx_Abfs::DM::cal_DMk_raw( const s
 							// we need to fix this function in near future.
 							// -- mohan add 2021-02-09
 							//---------------------------------------------------------
-							WARNING_QUIT("Exx_Abfs::DM::cal_DMk_raw","need to update GlobalC::LOWF.WFC_GAMMA");
+							ModuleBase::WARNING_QUIT("Exx_Abfs::DM::cal_DMk_raw","need to update GlobalC::LOWF.WFC_GAMMA");
 //							DMk_raw[iat1][iat2][ik](iw1,iw2) += GlobalC::wf.wg(ik,ib) 
 //								* GlobalC::LOWF.WFC_GAMMA[ik][ib][GlobalC::ucell.itiaiw2iwt(it1,ia1,iw1)] 
 //								* GlobalC::LOWF.WFC_GAMMA[ik][ib][GlobalC::ucell.itiaiw2iwt(it2,ia2,iw2)];
@@ -135,7 +135,7 @@ map<size_t,map<size_t,vector<ComplexMatrix>>> Exx_Abfs::DM::cal_DMk_raw( const s
 	
 	#if TEST_EXX_LCAO==1
 		static int istep=0;
-		ofs_matrixes("DMk_raw_"+TO_STRING(istep++)+".dat(@Exx_Abfs::DM::cal_DMk_raw)",DMk_raw);
+		ofs_matrixes("DMk_raw_"+ModuleBase::GlobalFunc::TO_STRING(istep++)+".dat(@Exx_Abfs::DM::cal_DMk_raw)",DMk_raw);
 	#elif TEST_EXX_LCAO==-1
 		#error
 	#endif
@@ -146,9 +146,9 @@ map<size_t,map<size_t,vector<ComplexMatrix>>> Exx_Abfs::DM::cal_DMk_raw( const s
 
 void Exx_Abfs::DM::plain_mixing(
 	const Charge_Broyden &charge,
-	const set<pair<size_t,size_t>> &atom_pairs)
+	const std::set<std::pair<size_t,size_t>> &atom_pairs)
 {
-	TITLE("Exx_Abfs::DM::plain_mixing");
+	ModuleBase::TITLE("Exx_Abfs::DM::plain_mixing");
 
 	if(DMk.empty())
 		DMk = cal_DMk_raw(atom_pairs);
@@ -160,7 +160,7 @@ void Exx_Abfs::DM::plain_mixing(
 
 void Exx_Abfs::DM::pulay_mixing(
 	const Charge_Broyden &charge,
-	const set<pair<size_t,size_t>> &atom_pairs)
+	const std::set<std::pair<size_t,size_t>> &atom_pairs)
 {
 	if( 1==charge.totstep )
 	{
@@ -189,12 +189,12 @@ void Exx_Abfs::DM::pulay_mixing(
 				
 		#if TEST_EXX_LCAO==1
 		{
-			cout<<"charge.alpha"<<endl;
-			cout<<alpha_begin<<"\t"<<alpha_end<<"\t"<<alpha_size<<endl;
-			cout<<charge.alpha[alpha_index(alpha_size-1)]<<endl;
+			std::cout<<"charge.alpha"<<std::endl;
+			std::cout<<alpha_begin<<"\t"<<alpha_end<<"\t"<<alpha_size<<std::endl;
+			std::cout<<charge.alpha[alpha_index(alpha_size-1)]<<std::endl;
 			for( size_t i=1; i<DMk_pulay_seq.size()-1; ++i )
-				cout<<charge.alpha[alpha_index(i-1)]<<"\t"<<charge.alpha[alpha_index(i)]<<endl;
-			cout<<charge.alpha[alpha_index(0)]<<endl;
+				std::cout<<charge.alpha[alpha_index(i-1)]<<"\t"<<charge.alpha[alpha_index(i)]<<std::endl;
+			std::cout<<charge.alpha[alpha_index(0)]<<std::endl;
 		}
 		#elif TEST_EXX_LCAO==-1
 			#error
@@ -203,10 +203,10 @@ void Exx_Abfs::DM::pulay_mixing(
 	
 	#if TEST_EXX_LCAO==1
 	{
-		cout<<"charge.alpha_all"<<endl;
+		std::cout<<"charge.alpha_all"<<std::endl;
 		for( size_t i=0; i!=charge.dstep; ++i )
-			cout<<charge.alpha[i]<<"\t";
-		cout<<endl;
+			std::cout<<charge.alpha[i]<<"\t";
+		std::cout<<std::endl;
 	}
 	#elif TEST_EXX_LCAO==-1
 		#error
@@ -216,7 +216,7 @@ void Exx_Abfs::DM::pulay_mixing(
 //	{
 //		static int istep=0;
 //		for( size_t i=0; i!=DMk_pulay_seq.size(); ++i )
-//			ofs_matrixes( "DMk_pulay_seq_"+TO_STRING(istep)+"_"+TO_STRING(i), DMk_pulay_seq[i] );
+//			ofs_matrixes( "DMk_pulay_seq_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(i), DMk_pulay_seq[i] );
 //		++istep;
 //	}
 	#elif TEST_EXX_LCAO==-1

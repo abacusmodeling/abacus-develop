@@ -22,7 +22,7 @@ static void cout_MGT ( const ORB_gaunt_table & MGT, const int Lmax )
 					{
 						for( int mAB=0; mAB!=2*LAB+1; ++mAB )
 						{
-							cout<<LA<<"\t"
+							std::cout<<LA<<"\t"
 								<<LB<<"\t"
 								<<LAB<<"\t"
 								<<mA<<"\t"
@@ -34,7 +34,7 @@ static void cout_MGT ( const ORB_gaunt_table & MGT, const int Lmax )
 								<<MGT.Gaunt_Coefficients (
 									MGT.get_lm_index(LA,mA),
 									MGT.get_lm_index(LB,mB),
-									MGT.get_lm_index(LAB,mAB))<<endl;
+									MGT.get_lm_index(LAB,mAB))<<std::endl;
 						}
 					}
 				}

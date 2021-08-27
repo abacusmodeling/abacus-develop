@@ -33,44 +33,44 @@ class Force_Stress_LCAO
 	void allocate (void);
 	void destroy (void);
 	
-	void print_force(const string &name, matrix& f, const bool screen, bool ry)const;
-	void printforce_total (const bool ry, const bool istestf, matrix& fcs);
+	void print_force(const std::string &name, ModuleBase::matrix& f, const bool screen, bool ry)const;
+	void printforce_total (const bool ry, const bool istestf, ModuleBase::matrix& fcs);
 	
 	void getForceStress(
 		const bool isforce, 
 		const bool isstress, 
 		const bool istestf, 
 		const bool istests, 
-		matrix &fcs, 
-		matrix &scs);
+		ModuleBase::matrix &fcs, 
+		ModuleBase::matrix &scs);
 
-	void forceSymmetry(matrix &fcs);
+	void forceSymmetry(ModuleBase::matrix &fcs);
 
 	void calForcePwPart(
-		matrix &fvl_dvl, 
-		matrix &fewalds, 
-		matrix &fcc, 
-		matrix &fscc);
+		ModuleBase::matrix &fvl_dvl, 
+		ModuleBase::matrix &fewalds, 
+		ModuleBase::matrix &fcc, 
+		ModuleBase::matrix &fscc);
 
 	void calForceStressIntegralPart(
 		const bool isGammaOnly,
 		const bool isforce,
 		const bool isstress,
-		matrix &foverlap,
-		matrix &ftvnl_dphi,
-		matrix &fvnl_dbeta,	
-		matrix &fvl_dphi,
-		matrix &soverlap,
-		matrix &stvnl_dphi,
-		matrix &svnl_dbeta,
-		matrix &svl_dphi);
+		ModuleBase::matrix &foverlap,
+		ModuleBase::matrix &ftvnl_dphi,
+		ModuleBase::matrix &fvnl_dbeta,	
+		ModuleBase::matrix &fvl_dphi,
+		ModuleBase::matrix &soverlap,
+		ModuleBase::matrix &stvnl_dphi,
+		ModuleBase::matrix &svnl_dbeta,
+		ModuleBase::matrix &svl_dphi);
 
 	void calStressPwPart(
-		matrix &sigmadvl,
-		matrix &sigmahar,
-		matrix &sigmaewa,
-		matrix &sigmacc,
-		matrix &sigmaxc);
+		ModuleBase::matrix &sigmadvl,
+		ModuleBase::matrix &sigmahar,
+		ModuleBase::matrix &sigmaewa,
+		ModuleBase::matrix &sigmacc,
+		ModuleBase::matrix &sigmaxc);
 	
 	static double force_invalid_threshold_ev;
 	static double output_acc; // control the accuracy

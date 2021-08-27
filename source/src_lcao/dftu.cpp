@@ -62,9 +62,10 @@ extern "C"
 
 namespace GlobalC
 {
-DFTU dftu;
+ModuleDFTU::DFTU dftu;
 }
 
+namespace ModuleDFTU{
 DFTU::DFTU(){}
 
 DFTU::~DFTU(){}
@@ -74,7 +75,7 @@ void DFTU::init(
 	Parallel_Orbitals &po // parallel orbitals parameters
 )
 {
-    TITLE("DFTU", "init");
+    ModuleBase::TITLE("DFTU", "init");
 
 	// please, do not use 'INPUT' directly in the class!
 	// needs reconstructions in future
@@ -83,15 +84,14 @@ void DFTU::init(
 	const int nlocal = GlobalV::NLOCAL; // number of total local orbitals
 	const int nks = GlobalC::kv.nks; // number of k-points
 	const int nspin = GlobalV::NSPIN; // number of spins
-	const int dftu_type = INPUT.dftu_type;
-	const int double_counting = INPUT.double_counting;
+	
 	
 
 	if(dftu_type==1 && double_counting==1) cal_type = 1;
 	else if(dftu_type==1 && double_counting==2) cal_type = 2;
 	else if(dftu_type==2 && double_counting==1) cal_type = 3;
 	else if(dftu_type==2 && double_counting==2) cal_type = 4;
-	else WARNING_QUIT("DFT+U", "Wrong parameter");
+	else ModuleBase::WARNING_QUIT("DFT+U", "Wrong parameter");
 		
 	this->EU = 0.0;
 
@@ -115,26 +115,27 @@ void DFTU::init(
 	this->iatlnmipol2iwt.resize(cell.nat);
 	this->iat2it.resize(cell.nat);
 	this->iwt2it.resize(nlocal);
-	this->iwt2iat.resize(nlocal);
 	this->iwt2l.resize(nlocal);
 	this->iwt2n.resize(nlocal);
 	this->iwt2m.resize(nlocal);
 	this->iwt2ipol.resize(nlocal);	
 
+	//initialize 
 	for(int i=0; i<nlocal; i++)
 	{
 		this->iwt2it.at(i) = -1;
-		this->iwt2iat.at(i) = -1;
 		this->iwt2l.at(i) = -1;
 		this->iwt2n.at(i) = -1;
 		this->iwt2m.at(i) = -1;
 		this->iwt2ipol.at(i) = -1;
 	}
-
+	//it:index of type of atom
 	for(int it=0; it<cell.ntype; ++it)
 	{				
 		for(int ia=0; ia<cell.atoms[it].na; ia++)
 		{
+			//ia:index of atoms of this type
+			//determine the size of locale
 			const int iat = cell.itia2iat(it, ia);
 			this->iat2it.at(iat) = it;
 
@@ -200,7 +201,6 @@ void DFTU::init(
 								
 				this->iatlnmipol2iwt.at(iat).at(l).at(n).at(m).at(ipol) = iwt;
 				this->iwt2it.at(iwt) = it;
-				this->iwt2iat.at(iwt) = iat;
 				this->iwt2l.at(iwt) = l;
 				this->iwt2n.at(iwt) = n;
 				this->iwt2m.at(iwt) = m;
@@ -209,7 +209,7 @@ void DFTU::init(
 		}	
 	}
 
-	this->Yukawa = INPUT.yukawa_potential;
+	
  	if(Yukawa)
  	{
 		this->Fk.resize(cell.ntype);
@@ -238,7 +238,7 @@ void DFTU::init(
 				this->U_Yukawa.at(it).at(l).resize(N, 0.0);
 				this->J_Yukawa.at(it).at(l).resize(N, 0.0);
 
-				// if(l>=INPUT.orbital_corr[it] && INPUT.orbital_corr[it]!=-1)
+				// if(l>=orbital_corr[it] && orbital_corr[it]!=-1)
 				// {
 					// this->cal_slater_Fk(l, it);
 					// this->cal_slater_UJ(it, l);
@@ -246,45 +246,41 @@ void DFTU::init(
 			}			 	
 		}
  	}
-	else
-	{
-		this->U = INPUT.hubbard_u;            //Hubbard Coulomb interaction parameter U(ev)
-		this->J = INPUT.hund_j;               //Hund exchange parameter J(ev)
-	}
 
 	if(GlobalV::CALCULATION=="nscf")
 	{
-		stringstream sst; 
+		std::stringstream sst; 
 		sst << GlobalV::global_out_dir << "onsite.dm"; 
 		this->read_occup_m( sst.str() );
 		this->local_occup_bcast();		
 	}
 	else
 	{
-		if(INPUT.omc) 
+		if(omc) 
 		{
-			stringstream sst; 
+			std::stringstream sst; 
 			sst << "initial_onsite.dm"; 
 			this->read_occup_m( sst.str() );
 			this->local_occup_bcast();
 		}
 	}
-
+	ModuleBase::Memory::record("DFTU","locale",GlobalV::NLOCAL*GlobalV::NLOCAL,"double");
 	//this->out_numorb();
 
-  //GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__ << endl;
+  //GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__ << std::endl;
     return;
 }
 
 void DFTU::cal_occup_m_k(const int iter)
 {
-	TITLE("DFTU", "cal_occup_m_k");
+	ModuleBase::TITLE("DFTU", "cal_occup_m_k");
+	ModuleBase::timer::tick("DFTU", "cal_occup_m_k");
 
 	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
-		if(INPUT.orbital_corr[T]==-1) continue;
+		if(orbital_corr[T]==-1) continue;
 
-		//const int LC = INPUT.orbital_corr[T];
+		//const int LC = orbital_corr[T];
 		
 		for(int I=0; I<GlobalC::ucell.atoms[T].na; I++)
 		{
@@ -319,10 +315,10 @@ void DFTU::cal_occup_m_k(const int iter)
 	//call PBLAS routine to calculate the product of the S and density matrix
 	const char transN = 'N', transT = 'T';
 	const int  one_int = 1;
-	const complex<double> alpha(1.0,0.0), beta(0.0,0.0);
+	const std::complex<double> alpha(1.0,0.0), beta(0.0,0.0);
 
-	vector<complex<double>> srho(GlobalC::ParaO.nloc);
-    vector<complex<double>> Sk(GlobalC::ParaO.nloc);
+	std::vector<std::complex<double>> srho(GlobalC::ParaO.nloc);
+    std::vector<std::complex<double>> Sk(GlobalC::ParaO.nloc);
 	
 	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
@@ -341,7 +337,7 @@ void DFTU::cal_occup_m_k(const int iter)
     for(int it=0; it<GlobalC::ucell.ntype; it++)
 	  {
 	  	const int NL = GlobalC::ucell.atoms[it].nwl + 1;
-	  	const int LC = INPUT.orbital_corr[it];
+	  	const int LC = orbital_corr[it];
   
 	  	if(LC == -1) continue;
 
@@ -353,13 +349,13 @@ void DFTU::cal_occup_m_k(const int iter)
 		  	{				
 		  		// if(Yukawa)
 		  		// {
-		  			// if(l<INPUT.orbital_corr[it]) continue;
+		  			// if(l<orbital_corr[it]) continue;
 		  		// }
 		  		// else
 		  		// {
-		  			// if(l!=INPUT.orbital_corr[it]) continue;
+		  			// if(l!=orbital_corr[it]) continue;
 		  		// }
-		  		if(l!=INPUT.orbital_corr[it]) continue;
+		  		if(l!=orbital_corr[it]) continue;
 
 		  		const int N = GlobalC::ucell.atoms[it].l_nchi[l];
   
@@ -410,7 +406,7 @@ void DFTU::cal_occup_m_k(const int iter)
   for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
 	  const int NL = GlobalC::ucell.atoms[it].nwl + 1;
-	  const int LC = INPUT.orbital_corr[it];
+	  const int LC = orbital_corr[it];
   
 	  if(LC == -1) continue;
 
@@ -422,13 +418,13 @@ void DFTU::cal_occup_m_k(const int iter)
 			{				
 				// if(Yukawa)
 				// {
-					// if(l<INPUT.orbital_corr[it]) continue;
+					// if(l<orbital_corr[it]) continue;
 				// }
 				// else
 				// {
-					// if(l!=INPUT.orbital_corr[it]) continue;
+					// if(l!=orbital_corr[it]) continue;
 				// }
-				if(l!=INPUT.orbital_corr[it]) continue;
+				if(l!=orbital_corr[it]) continue;
 
 	  		const int N = GlobalC::ucell.atoms[it].l_nchi[l];
 
@@ -440,17 +436,17 @@ void DFTU::cal_occup_m_k(const int iter)
 
 					if(GlobalV::NSPIN==1 || GlobalV::NSPIN==4)
 					{
-            matrix temp(locale[iat][l][n][0]);
+            ModuleBase::matrix temp(locale[iat][l][n][0]);
 						MPI_Allreduce( &temp(0,0), &locale[iat][l][n][0](0,0), (2*l+1)*GlobalV::NPOL*(2*l+1)*GlobalV::NPOL,
 										      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 					}
 					else if(GlobalV::NSPIN==2)
 					{
-            matrix temp0(locale[iat][l][n][0]);
+            ModuleBase::matrix temp0(locale[iat][l][n][0]);
 						MPI_Allreduce( &temp0(0,0), &locale[iat][l][n][0](0,0), (2*l+1)*(2*l+1),
 										      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 
-						matrix temp1(locale[iat][l][n][1]);
+						ModuleBase::matrix temp1(locale[iat][l][n][1]);
 						MPI_Allreduce( &temp1(0,0), &locale[iat][l][n][1](0,0), (2*l+1)*(2*l+1),
 										      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 					}
@@ -474,7 +470,7 @@ void DFTU::cal_occup_m_k(const int iter)
 					  	break;
 
 					  default:
-					  	cout << "Not supported NSPIN parameter" << endl;
+					  	std::cout << "Not supported NSPIN parameter" << std::endl;
 					  	exit(0);			
 					}
 
@@ -484,18 +480,20 @@ void DFTU::cal_occup_m_k(const int iter)
 	  }//end ia
 	}//end it
 
-	//GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
+	//GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << std::endl;
+
+	ModuleBase::timer::tick("DFTU", "cal_occup_m_k");
 	return;
 }
 
 void DFTU::cal_occup_m_gamma(const int iter)
 {
-	TITLE("DFTU", "cal_occup_m_gamma");	
-
+	ModuleBase::TITLE("DFTU", "cal_occup_m_gamma");	
+	ModuleBase::timer::tick("DFTU", "cal_occup_m_gamma");
 	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
-		if(INPUT.orbital_corr[T]==-1) continue;
-		const int L = INPUT.orbital_corr[T];
+		if(orbital_corr[T]==-1) continue;
+		const int L = orbital_corr[T];
 		
 		for(int I=0; I<GlobalC::ucell.atoms[T].na; I++)
 		{
@@ -523,7 +521,7 @@ void DFTU::cal_occup_m_gamma(const int iter)
 	const int  one_int = 1;
 	const double alpha = 1.0, beta = 0.0;
 
-	vector<double> srho(GlobalC::ParaO.nloc);
+	std::vector<double> srho(GlobalC::ParaO.nloc);
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		// srho(mu,nu) = \sum_{iw} S(mu,iw)*dm_gamma(iw,nu)
@@ -538,7 +536,7 @@ void DFTU::cal_occup_m_gamma(const int iter)
     for(int it=0; it<GlobalC::ucell.ntype; it++)
 	  {
 	  	const int NL = GlobalC::ucell.atoms[it].nwl + 1;
-	  	if(INPUT.orbital_corr[it] == -1) continue;
+	  	if(orbital_corr[it] == -1) continue;
 	  	for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 	  	{
 	  		const int iat = GlobalC::ucell.itia2iat(it, ia);
@@ -547,13 +545,13 @@ void DFTU::cal_occup_m_gamma(const int iter)
 	  		{				
 	  			// if(Yukawa)
 	  			// {
-	  				// if(l<INPUT.orbital_corr[it]) continue;
+	  				// if(l<orbital_corr[it]) continue;
 	  			// }
 	  			// else
 	  			// {
-	  				// if(l!=INPUT.orbital_corr[it]) continue;
+	  				// if(l!=orbital_corr[it]) continue;
 	  			// }
-	  			if(l!=INPUT.orbital_corr[it]) continue;
+	  			if(l!=orbital_corr[it]) continue;
 
 	  			const int N = GlobalC::ucell.atoms[it].l_nchi[l];
 
@@ -602,7 +600,7 @@ void DFTU::cal_occup_m_gamma(const int iter)
 	  					}
 	  				}
 
-	  				matrix temp(locale[iat][l][n][is]);
+	  				ModuleBase::matrix temp(locale[iat][l][n][is]);
 	  				MPI_Allreduce( &temp(0,0), &locale[iat][l][n][is](0,0), (2*l+1)*GlobalV::NPOL*(2*l+1)*GlobalV::NPOL,
 	  								      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 
@@ -620,7 +618,7 @@ void DFTU::cal_occup_m_gamma(const int iter)
 	  				  	break;
 
 	  				  default:
-	  				  	cout << "Not supported NSPIN parameter" << endl;
+	  				  	std::cout << "Not supported NSPIN parameter" << std::endl;
 	  				  	exit(0);			
 	  				}
 
@@ -653,74 +651,75 @@ void DFTU::cal_occup_m_gamma(const int iter)
 
 	if(GlobalV::MY_RANK==0)
 	{
-		ofstream ofs_elec("nelec.dat", ios_base::app);
-		ofs_elec << "Total number of electrons of the system " << Nele << endl;
+		std::ofstream ofs_elec("nelec.dat", ios_base::app);
+		ofs_elec << "Total number of electrons of the system " << Nele << std::endl;
 	}
 	*/
 
-	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
+	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << std::endl;
+	ModuleBase::timer::tick("DFTU", "cal_occup_m_gamma");
 	return;
 }
 
-void DFTU::write_occup_m(const string &fn)
+void DFTU::write_occup_m(const std::string &fn)
 {
-	TITLE("DFTU", "write_occup_m");
+	ModuleBase::TITLE("DFTU", "write_occup_m");
 
 	if(GlobalV::MY_RANK!=0) return;
 
-	ofstream ofdftu;
+	std::ofstream ofdftu;
 	ofdftu.open(fn.c_str());
     if (!ofdftu)
     {
-    	cout << "DFTU::write_occup_m. Can't create file onsite.dm!" << endl;
+    	std::cout << "DFTU::write_occup_m. Can't create file onsite.dm!" << std::endl;
 		exit(0);
     }
 
 	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
-		if(INPUT.orbital_corr[T]==-1) continue;
+		if(orbital_corr[T]==-1) continue;
 		const int NL = GlobalC::ucell.atoms[T].nwl+1;
-		const int LC = INPUT.orbital_corr[T];
+		const int LC = orbital_corr[T];
 
 		for(int I=0; I<GlobalC::ucell.atoms[T].na; I++)
 		{
 			const int iat = GlobalC::ucell.itia2iat(T, I);
-			ofdftu << "atoms" << "  " << iat << endl;
+			ofdftu << "atoms" << "  " << iat << std::endl;
 
 			for(int l=0; l<NL; l++)
 			{
 				// if(Yukawa)
 				// {
-					// if(l<INPUT.orbital_corr[T]) continue;
+					// if(l<orbital_corr[T]) continue;
 				// }
 				// else
 				// {
-					// if(l!=INPUT.orbital_corr[T]) continue;
+					// if(l!=orbital_corr[T]) continue;
 				// }
-				if(l!=INPUT.orbital_corr[T]) continue;
+				if(l!=orbital_corr[T]) continue;
 				
 				const int N = GlobalC::ucell.atoms[T].l_nchi[l];
-				ofdftu << "L" << "  " << l << endl;
+				ofdftu << "L" << "  " << l << std::endl;
 
 				for(int n=0; n<N; n++)		
 				{
 					// if(!Yukawa && n!=0) continue;
 					if(n!=0) continue;
 
-					ofdftu << "zeta" << "  " << n << endl;
+					ofdftu << "zeta" << "  " << n << std::endl;
 					
 					if(GlobalV::NSPIN==1 || GlobalV::NSPIN==2)
 					{
 						for(int is=0; is<2; is++)
 						{
-							ofdftu << "spin" << "  " << is << endl;
+							ofdftu << "spin" << "  " << is << std::endl;
 							for(int m0=0; m0<2*l+1; m0++)
 							{
 								for(int m1=0; m1<2*l+1; m1++)
 								{
-									ofdftu << fixed << setw(12) << setprecision(8) << locale.at(iat).at(l).at(n).at(is)(m0, m1);
+									ofdftu << fixed << std::setw(12) << std::setprecision(8) << locale.at(iat).at(l).at(n).at(is)(m0, m1);
 								}
-								ofdftu << endl;
+								ofdftu << std::endl;
 							}
 						}
 					}
@@ -737,10 +736,10 @@ void DFTU::write_occup_m(const string &fn)
 									for(int ipol1=0; ipol1<GlobalV::NPOL; ipol1++)
 									{
 										int m1_all = m1 + (2*l+1)*ipol1;
-										ofdftu << fixed << setw(12) << setprecision(8) << locale.at(iat).at(l).at(n).at(0)(m0_all, m1_all);
+										ofdftu << fixed << std::setw(12) << std::setprecision(8) << locale.at(iat).at(l).at(n).at(0)(m0_all, m1_all);
 									}
 								}
-								ofdftu << endl;
+								ofdftu << std::endl;
 							}							
 						}
 					}					
@@ -752,25 +751,25 @@ void DFTU::write_occup_m(const string &fn)
 	return;
 }
 
-void DFTU::read_occup_m(const string &fn)
+void DFTU::read_occup_m(const std::string &fn)
 {
-	TITLE("DFTU", "read_occup_m");
+	ModuleBase::TITLE("DFTU", "read_occup_m");
 
 	if(GlobalV::MY_RANK!=0) return;
 
-	ifstream ifdftu(fn.c_str(), ios::in);	
+	std::ifstream ifdftu(fn.c_str(), ios::in);	
 
 	if (!ifdftu) 
 	{
 		if(GlobalV::CALCULATION=="nscf") 
 		{
-			cout << "DFTU::read_occup_m. Can not find the file oneite.dm . Please do scf calculation first" << endl;
+			std::cout << "DFTU::read_occup_m. Can not find the file onsite.dm . Please do scf calculation first" << std::endl;
 		}
 		else
 		{
-			if(INPUT.omc) 
+			if(omc) 
 			{
-				cout << "DFTU::read_occup_m. Can not find the file initial_onsite.dm . Please check your initial_onsite.dm" << endl;
+				std::cout << "DFTU::read_occup_m. Can not find the file initial_onsite.dm . Please check your initial_onsite.dm" << std::endl;
 			}
 		}
 		exit(0);
@@ -797,19 +796,19 @@ void DFTU::read_occup_m(const string &fn)
 
 			T= this->iat2it.at(iat);
 			const int NL = GlobalC::ucell.atoms[T].nwl + 1;
-			const int LC = INPUT.orbital_corr[T];
+			const int LC = orbital_corr[T];
 	
 			for(int l=0; l<NL; l++)			
 			{
 				// if(Yukawa)
 				// {
-					// if(l<INPUT.orbital_corr[T]) continue;
+					// if(l<orbital_corr[T]) continue;
 				// }
 				// else
 				// {
-					// if(l!=INPUT.orbital_corr[T]) continue;
+					// if(l!=orbital_corr[T]) continue;
 				// }
-				if(l!=INPUT.orbital_corr[T]) continue;
+				if(l!=orbital_corr[T]) continue;
 
 				ifdftu >> word;
 
@@ -853,7 +852,7 @@ void DFTU::read_occup_m(const string &fn)
 									}
 									else
 									{								
-										cout << "WRONG IN READING LOCAL OCCUPATION NUMBER MATRIX FROM DFTU FILE" << endl;
+										std::cout << "WRONG IN READING LOCAL OCCUPATION NUMBER MATRIX FROM DFTU FILE" << std::endl;
 										exit(0);
 									}	
 								}
@@ -883,21 +882,21 @@ void DFTU::read_occup_m(const string &fn)
 						}
 						else
 						{						
-							cout << "WRONG IN READING LOCAL OCCUPATION NUMBER MATRIX FROM DFTU FILE" << endl;
+							std::cout << "WRONG IN READING LOCAL OCCUPATION NUMBER MATRIX FROM DFTU FILE" << std::endl;
 							exit(0);
 						}
 					}
 				}
 				else
 				{				
-					cout << "WRONG IN READING LOCAL OCCUPATION NUMBER MATRIX FROM DFTU FILE" << endl;
+					std::cout << "WRONG IN READING LOCAL OCCUPATION NUMBER MATRIX FROM DFTU FILE" << std::endl;
 					exit(0);
 				}								
 			}			
         }
 		else
 		{		
-			cout << "WRONG IN READING LOCAL OCCUPATION NUMBER MATRIX FROM DFTU FILE" << endl;
+			std::cout << "WRONG IN READING LOCAL OCCUPATION NUMBER MATRIX FROM DFTU FILE" << std::endl;
 			exit(0);
 		}
 		
@@ -914,28 +913,28 @@ void DFTU::read_occup_m(const string &fn)
 
 void DFTU::local_occup_bcast()
 {
-	TITLE("DFTU", "local_occup_bcast");
+	ModuleBase::TITLE("DFTU", "local_occup_bcast");
 
 	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
-		if(INPUT.orbital_corr[T]==-1) continue;
+		if(orbital_corr[T]==-1) continue;
 
 		for(int I=0; I<GlobalC::ucell.atoms[T].na; I++)
 		{
 			const int iat = GlobalC::ucell.itia2iat(T,I);
-			const int L = INPUT.orbital_corr[T];
+			const int L = orbital_corr[T];
 
 			for(int l=0; l<=GlobalC::ucell.atoms[T].nwl; l++)
 			{
 				// if(Yukawa)
 				// {
-					// if(l<INPUT.orbital_corr[T]) continue;
+					// if(l<orbital_corr[T]) continue;
 				// }
 				// else
 				// {
-					// if(l!=INPUT.orbital_corr[T]) continue;
+					// if(l!=orbital_corr[T]) continue;
 				// }
-				if(l!=INPUT.orbital_corr[T]) continue;
+				if(l!=orbital_corr[T]) continue;
 
 				for(int n=0; n<GlobalC::ucell.atoms[T].l_nchi[l]; n++)
 				{
@@ -984,9 +983,9 @@ void DFTU::local_occup_bcast()
 
 void DFTU::cal_energy_correction(const int istep)
 {
-	TITLE("DFTU", "cal_energy_correction");
-
- 	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!INPUT.omc) && istep==0 && this->iter_dftu==1) return;
+	ModuleBase::TITLE("DFTU", "cal_energy_correction");
+	ModuleBase::timer::tick("DFTU", "cal_energy_correction");
+	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!omc) && istep==0 && this->iter_dftu==1) return;
 
 	this->EU = 0.0;
 	double EU_dc = 0.0;
@@ -994,22 +993,22 @@ void DFTU::cal_energy_correction(const int istep)
 	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
 		const int NL = GlobalC::ucell.atoms[T].nwl + 1;
-		const int LC = INPUT.orbital_corr[T]; 
+		const int LC = orbital_corr[T]; 
 		for(int I=0; I<GlobalC::ucell.atoms[T].na; I++)
 		{
 			if(LC == -1) continue;
 
 			const int iat = GlobalC::ucell.itia2iat(T, I);
-			const int L = INPUT.orbital_corr[T];
+			const int L = orbital_corr[T];
 
 			for(int l=0; l<NL; l++)
 			{
 				// if(Yukawa)
 				// {
-					// if(l<INPUT.orbital_corr[T]) continue;
+					// if(l<orbital_corr[T]) continue;
 				// }	
-				// else if(l!=INPUT.orbital_corr[T]) continue;
-				if(l!=INPUT.orbital_corr[T]) continue;
+				// else if(l!=orbital_corr[T]) continue;
+				if(l!=orbital_corr[T]) continue;
 
 				const int N = GlobalC::ucell.atoms[T].l_nchi[l];
 
@@ -1122,9 +1121,9 @@ void DFTU::cal_energy_correction(const int istep)
 	/*
 	if(GlobalV::MY_RANK==0)
 	{
-		ofstream of_eu("energy_correction", ios_base::app);
-		double e=EU*Ry_to_eV;
-		of_eu << "ITERATION STEP " << setw(3) << this->iter_dftu <<"      " << setw(15) << e << "ev" << endl;
+		std::ofstream of_eu("energy_correction", ios_base::app);
+		double e=EU*ModuleBase::Ry_to_eV;
+		of_eu << "ITERATION STEP " << std::setw(3) << this->iter_dftu <<"      " << std::setw(15) << e << "ev" << std::endl;
 	}
 	*/
 	
@@ -1134,53 +1133,53 @@ void DFTU::cal_energy_correction(const int istep)
 	/*
 	if(GlobalV::MY_RANK==0)
 	{
-		ofstream of_en("energy_correction.dat",ios_base::app);
-		double val = this->EU*Ry_to_eV;
+		std::ofstream of_en("energy_correction.dat",ios_base::app);
+		double val = this->EU*ModuleBase::Ry_to_eV;
 
-		of_en << fixed << setprecision(8) << val << "eV" << endl;
+		of_en << fixed << std::setprecision(8) << val << "eV" << std::endl;
 	}
 	*/
-
+	ModuleBase::timer::tick("DFTU", "cal_energy_correction");
 	return;
 }
 
-void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, complex<double>* eff_pot)
+void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, std::complex<double>* eff_pot)
 {
-	TITLE("DFTU", "cal_eff_pot_mat");
-
- 	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!INPUT.omc) && istep==0 && this->iter_dftu==1) return;
+	ModuleBase::TITLE("DFTU", "cal_eff_pot_mat");
+	ModuleBase::timer::tick("DFTU", "cal_eff_pot_mat");
+ 	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!omc) && istep==0 && this->iter_dftu==1) return;
 	
 	int spin = GlobalC::kv.isk[ik];
 
-	ZEROS(eff_pot, GlobalC::ParaO.nloc);
+	ModuleBase::GlobalFunc::ZEROS(eff_pot, GlobalC::ParaO.nloc);
 
-	//GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
+	//GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << std::endl;
 	//=============================================================
 	//   PART2: call pblas to calculate effective potential matrix
 	//=============================================================
 	const char transN = 'N', transT = 'T';
 	const int  one_int = 1;
-  const complex<double> alpha_c(1.0,0.0), beta_c(0.0,0.0), half_c(0.5,0.0), one_c(1.0,0.0);
+  const std::complex<double> zero(0.0,0.0), half(0.5,0.0), one(1.0,0.0);
 
-	vector<complex<double>> VU(GlobalC::ParaO.nloc);
-  this->cal_VU_pot_mat_complex(spin, 1, &VU[0]);
+	std::vector<std::complex<double>> VU(GlobalC::ParaO.nloc);
+  this->cal_VU_pot_mat_complex(spin, true, &VU[0]);
 
 	pzgemm_(&transN, &transN,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
-		&half_c, 
-		VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc,
+		&half, 
+		ModuleBase::GlobalFunc::VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc,
 		GlobalC::LM.Sloc2, &one_int, &one_int, GlobalC::ParaO.desc,
-		&beta_c,
+		&zero,
 		eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
 
   for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
     VU[irc] = eff_pot[irc];
   
-  // pztranc(m, n, alpha, a, ia, ja, desca, beta, c, ic, jc, descc)
+  //pztranc(m, n, alpha, a, ia, ja, desca, beta, c, ic, jc, descc)
   pztranc_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
-           &one_c, 
+           &one, 
            &VU[0], &one_int, &one_int, GlobalC::ParaO.desc, 
-           &one_c, 
+           &one, 
            eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
 
 	//code for testing whther the effective potential is Hermitian
@@ -1207,7 +1206,7 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, complex<double
 			{
 				int iic = i*NLOCAL + j;
 				int jjc = j*NLOCAL + i;
-				complex<double> tmp = pot_eff_k.at(ik).at(iic) - conj(pot_eff_k.at(ik).at(jjc));
+				std::complex<double> tmp = pot_eff_k.at(ik).at(iic) - conj(pot_eff_k.at(ik).at(jjc));
 				double tmp_norm = sqrt(std::norm(tmp));
 				if(tmp_norm>1.0e-9) pot_Hermitian = false;
 			}
@@ -1217,27 +1216,27 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, complex<double
 
 	if(MY_RANK==0)
 	{
-		ofstream of_potH("Hermitian_pot.dat",ios_base::app);
-		of_potH << "Hermitian  " << pot_Hermitian << endl;
+		std::ofstream of_potH("Hermitian_pot.dat",ios_base::app);
+		of_potH << "Hermitian  " << pot_Hermitian << std::endl;
 	}
 	*/
 
-	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
-
+	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << std::endl;
+	ModuleBase::timer::tick("DFTU", "cal_eff_pot_mat");
 	return;	
 }
 
 void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 {
-	TITLE("DFTU", "cal_eff_pot_mat");
-
- 	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!INPUT.omc) && istep==0 && this->iter_dftu==1) return;
+	ModuleBase::TITLE("DFTU", "cal_eff_pot_mat");
+	ModuleBase::timer::tick("DFTU", "cal_eff_pot_mat");
+ 	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!omc) && istep==0 && this->iter_dftu==1) return;
 	
 	int spin = GlobalC::kv.isk[ik];
 
-	ZEROS(eff_pot, GlobalC::ParaO.nloc);
+	ModuleBase::GlobalFunc::ZEROS(eff_pot, GlobalC::ParaO.nloc);
 
-	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
+	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << std::endl;
 	//=============================================================
 	//   PART2: call pblas to calculate effective potential matrix
 	//=============================================================
@@ -1245,13 +1244,13 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 	const int  one_int = 1;
 	const double alpha = 1.0, beta = 0.0, half=0.5, one=1.0;
 
-	vector<double> VU(GlobalC::ParaO.nloc);
+	std::vector<double> VU(GlobalC::ParaO.nloc);
   this->cal_VU_pot_mat_real(spin, 1, &VU[0]);
 
 	pdgemm_(&transN, &transN,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 		&half, 
-		VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc, 
+		ModuleBase::GlobalFunc::VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc, 
 		GlobalC::LM.Sloc, &one_int, &one_int, GlobalC::ParaO.desc,
 		&beta,
 		eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
@@ -1290,7 +1289,7 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 			{
 				int iic = i*GlobalV::NLOCAL + j;
 				int jjc = j*GlobalV::NLOCAL + i;
-				complex<double> tmp = pot_eff_k.at(ik).at(iic) - conj(pot_eff_k.at(ik).at(jjc));
+				std::complex<double> tmp = pot_eff_k.at(ik).at(iic) - conj(pot_eff_k.at(ik).at(jjc));
 				double tmp_norm = sqrt(std::norm(tmp));
 				if(tmp_norm>1.0e-9) pot_Hermitian = false;
 			}
@@ -1300,21 +1299,21 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 
 	if(GlobalV::MY_RANK==0)
 	{
-		ofstream of_potH("Hermitian_pot.dat",ios_base::app);
-		of_potH << "Hermitian  " << pot_Hermitian << endl;
+		std::ofstream of_potH("Hermitian_pot.dat",ios_base::app);
+		of_potH << "Hermitian  " << pot_Hermitian << std::endl;
 	}
 	*/
 	
-	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
-
+	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << std::endl;
+	ModuleBase::timer::tick("DFTU", "cal_eff_pot_mat");
 	return;	
 }
 
 void DFTU::output()
 {
-	TITLE("DFTU", "output");
+	ModuleBase::TITLE("DFTU", "output");
 	
-	GlobalV::ofs_running << "//=========================L(S)DA+U===========================//" << endl;
+	GlobalV::ofs_running << "//=========================L(S)DA+U===========================//" << std::endl;
 
 	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{			
@@ -1324,35 +1323,35 @@ void DFTU::output()
 		{
 			const int N = GlobalC::ucell.atoms[T].l_nchi[L];
 
-			if(L>=INPUT.orbital_corr[T] && INPUT.orbital_corr[T]!=-1)
+			if(L>=orbital_corr[T] && orbital_corr[T]!=-1)
 			{
- 				if(L!=INPUT.orbital_corr[T]) continue;
+ 				if(L!=orbital_corr[T]) continue;
 				
 				if(!Yukawa)
 				{
-					GlobalV::ofs_running << "atom_type=" << T << "  L=" << L << "  chi=" << 0 << "    U=" << this->U[T]*Ry_to_eV 
-					<< "ev    J=" << this->J[T]*Ry_to_eV << "ev" << endl;
+					GlobalV::ofs_running << "atom_type=" << T << "  L=" << L << "  chi=" << 0 << "    U=" << this->U[T]*ModuleBase::Ry_to_eV 
+					<< "ev    J=" << this->J[T]*ModuleBase::Ry_to_eV << "ev" << std::endl;
 				}
 				else
 				{
 					for(int n=0; n<N; n++)
 					{
  						if(n!=0) continue;						
-						double Ueff = (this->U_Yukawa.at(T).at(L).at(n) - this->J_Yukawa.at(T).at(L).at(n))*Ry_to_eV;
-						GlobalV::ofs_running << "atom_type=" << T << "  L=" << L << "  chi=" << n << "    U=" << this->U_Yukawa.at(T).at(L).at(n)*Ry_to_eV << "ev    " << "J=" << this->J_Yukawa.at(T).at(L).at(n)*Ry_to_eV
-						<< "ev" << endl;
+						double Ueff = (this->U_Yukawa.at(T).at(L).at(n) - this->J_Yukawa.at(T).at(L).at(n))*ModuleBase::Ry_to_eV;
+						GlobalV::ofs_running << "atom_type=" << T << "  L=" << L << "  chi=" << n << "    U=" << this->U_Yukawa.at(T).at(L).at(n)*ModuleBase::Ry_to_eV << "ev    " << "J=" << this->J_Yukawa.at(T).at(L).at(n)*ModuleBase::Ry_to_eV
+						<< "ev" << std::endl;
 					}
 				}
 			}
 		}
 	}
 
-	GlobalV::ofs_running << "Local occupation matrices" << endl;
+	GlobalV::ofs_running << "Local occupation matrices" << std::endl;
 	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
-		if(INPUT.orbital_corr[T]==-1) continue;
+		if(orbital_corr[T]==-1) continue;
 		const int NL = GlobalC::ucell.atoms[T].nwl+1;
-		const int LC = INPUT.orbital_corr[T];
+		const int LC = orbital_corr[T];
 
 		for(int I=0; I<GlobalC::ucell.atoms[T].na; I++)
 		{
@@ -1363,13 +1362,13 @@ void DFTU::output()
 			{
 				// if(Yukawa)
 				// {
-					// if(l<INPUT.orbital_corr[T]) continue;
+					// if(l<orbital_corr[T]) continue;
 				// }
 				// else
 				// {
-					// if(l!=INPUT.orbital_corr[T]) continue;
+					// if(l!=orbital_corr[T]) continue;
 				// }
-				if(l!=INPUT.orbital_corr[T]) continue;
+				if(l!=orbital_corr[T]) continue;
 				
 				const int N = GlobalC::ucell.atoms[T].l_nchi[l];
 				GlobalV::ofs_running << "   L" << " " << l ;
@@ -1379,20 +1378,20 @@ void DFTU::output()
 					// if(!Yukawa && n!=0) continue;
 					if(n!=0) continue;
 
-					GlobalV::ofs_running << "   zeta" << " " << n << endl;
+					GlobalV::ofs_running << "   zeta" << " " << n << std::endl;
 					
 					if(GlobalV::NSPIN==1 || GlobalV::NSPIN==2)
 					{
 						for(int is=0; is<2; is++)
 						{
-							GlobalV::ofs_running << "spin" << "  " << is << endl;
+							GlobalV::ofs_running << "spin" << "  " << is << std::endl;
 							for(int m0=0; m0<2*l+1; m0++)
 							{
 								for(int m1=0; m1<2*l+1; m1++)
 								{
-									GlobalV::ofs_running << fixed << setw(12) << setprecision(8) << locale.at(iat).at(l).at(n).at(is)(m0, m1);
+									GlobalV::ofs_running << fixed << std::setw(12) << std::setprecision(8) << locale.at(iat).at(l).at(n).at(is)(m0, m1);
 								}
-								GlobalV::ofs_running << endl;
+								GlobalV::ofs_running << std::endl;
 							}
 						}	
 					}
@@ -1409,10 +1408,10 @@ void DFTU::output()
 									for(int ipol1=0; ipol1<GlobalV::NPOL; ipol1++)
 									{
 										int m1_all = m1 + (2*l+1)*ipol1;
-										GlobalV::ofs_running << fixed << setw(12) << setprecision(8) << locale.at(iat).at(l).at(n).at(0)(m0_all, m1_all);
+										GlobalV::ofs_running << fixed << std::setw(12) << std::setprecision(8) << locale.at(iat).at(l).at(n).at(0)(m0_all, m1_all);
 									}
 								}
-								GlobalV::ofs_running << endl;
+								GlobalV::ofs_running << std::endl;
 							}							
 						}
 					}					
@@ -1420,7 +1419,7 @@ void DFTU::output()
 			}//l
 		}//I
 	}//T
-	GlobalV::ofs_running << "//=======================================================//" << endl;
+	GlobalV::ofs_running << "//=======================================================//" << std::endl;
 	
 	return;
 }
@@ -1433,13 +1432,13 @@ void DFTU::cal_eff_pot_mat_R_double(const int ispin, double* SR, double* HR)
 
   for(int i=0; i<GlobalC::ParaO.nloc; i++) HR[i] = 0.0;
 
-  vector<double> VU(GlobalC::ParaO.nloc);
+  std::vector<double> VU(GlobalC::ParaO.nloc);
   this->cal_VU_pot_mat_real(ispin, 1, &VU[0]);
 
 	pdgemm_(&transN, &transN,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 		&half, 
-		VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc, 
+		ModuleBase::GlobalFunc::VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc, 
 		SR, &one_int, &one_int, GlobalC::ParaO.desc,
 		&beta,
 		HR, &one_int, &one_int, GlobalC::ParaO.desc);
@@ -1457,22 +1456,22 @@ void DFTU::cal_eff_pot_mat_R_double(const int ispin, double* SR, double* HR)
 }
 
 void DFTU::cal_eff_pot_mat_R_complex_double(
-  const int ispin, complex<double>* SR, complex<double>* HR)
+  const int ispin, std::complex<double>* SR, std::complex<double>* HR)
 {
   const char transN = 'N', transT = 'T';
 	const int  one_int = 1;
-	const complex<double> alpha(1.0,0.0), beta(0.0,0.0);
-  const complex<double> zero(0.0,0.0), half(0.5,0.0), one(1.0,0.0);
+	const std::complex<double> alpha(1.0,0.0), beta(0.0,0.0);
+  const std::complex<double> zero(0.0,0.0), half(0.5,0.0), one(1.0,0.0);
 
   for(int i=0; i<GlobalC::ParaO.nloc; i++) HR[i] = zero;
 
-  vector<complex<double>> VU(GlobalC::ParaO.nloc);
+  std::vector<std::complex<double>> VU(GlobalC::ParaO.nloc);
   this->cal_VU_pot_mat_complex(ispin, 1, &VU[0]);
 
 	pzgemm_(&transN, &transN,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 		&half, 
-		VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc,
+		ModuleBase::GlobalFunc::VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc,
 		SR, &one_int, &one_int, GlobalC::ParaO.desc,
 		&beta,
 		HR, &one_int, &one_int, GlobalC::ParaO.desc);
@@ -1489,22 +1488,22 @@ void DFTU::cal_eff_pot_mat_R_complex_double(
   return;
 }
 
-void DFTU::folding_overlap_matrix(const int ik, complex<double>* Sk)
+void DFTU::folding_overlap_matrix(const int ik, std::complex<double>* Sk)
 {
-  TITLE("DFTU","folding_overlap_matrix"); 
-	// timer::tick("DFTU","folding_overlap_matrix");
+  ModuleBase::TITLE("DFTU","folding_overlap_matrix"); 
+	ModuleBase::timer::tick("DFTU","folding_overlap_matrix");
 
-  ZEROS(Sk, GlobalC::ParaO.nloc);
+  ModuleBase::GlobalFunc::ZEROS(Sk, GlobalC::ParaO.nloc);
 
 	int iat = 0;
 	int index = 0;
-	Vector3<double> dtau;
-	Vector3<double> tau1;
-	Vector3<double> tau2;
+	ModuleBase::Vector3<double> dtau;
+	ModuleBase::Vector3<double> tau1;
+	ModuleBase::Vector3<double> tau2;
 
-	Vector3<double> dtau1;
-	Vector3<double> dtau2;
-	Vector3<double> tau0;
+	ModuleBase::Vector3<double> dtau1;
+	ModuleBase::Vector3<double> dtau2;
+	ModuleBase::Vector3<double> tau0;
 
 	for (int T1 = 0; T1 < GlobalC::ucell.ntype; ++T1)
 	{
@@ -1570,10 +1569,10 @@ void DFTU::folding_overlap_matrix(const int ik, complex<double>* Sk)
 					// exp(k dot dR)
 					// dR is the index of box in Crystal coordinates
 					//------------------------------------------------
-					Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
-					const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * TWO_PI;
-					//const double arg = ( kv.kvec_d[ik] * GlobalC::GridD.getBox(ad) ) * TWO_PI;
-					const complex<double> kphase = complex <double> ( cos(arg),  sin(arg) );
+					ModuleBase::Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
+					const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * ModuleBase::TWO_PI;
+					//const double arg = ( kv.kvec_d[ik] * GlobalC::GridD.getBox(ad) ) * ModuleBase::TWO_PI;
+					const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );
 
 					//--------------------------------------------------
 					// calculate how many matrix elements are in 
@@ -1637,6 +1636,8 @@ void DFTU::folding_overlap_matrix(const int ik, complex<double>* Sk)
 
 	assert(index==GlobalC::LNNR.nnr);
 
-  // timer::tick("DFTU","folding_overlap_matrix");
+  	ModuleBase::timer::tick("DFTU","folding_overlap_matrix");
 	return;
+}
+
 }

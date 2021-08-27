@@ -53,7 +53,7 @@ class ORB_gaunt_table
 	 * Directly Calculate integral of
 	 * \f$ S(l_1,m_1), S(l_2,m_2), S(L,M) \f$
 	 */
-	realArray Gaunt_Coefficients;
+	ModuleBase::realArray Gaunt_Coefficients;
 
 	/// (1) Make Ylm_Gaunt Table.
 	///----------------
@@ -90,7 +90,7 @@ class ORB_gaunt_table
 	
 	// Index Function
 	// Yu's mehtod
-	// Peize Lin delete void ZEROS(); 2016-08-26
+	// Peize Lin delete void ModuleBase::GlobalFunc::ZEROS(); 2016-08-26
 	
 	int P_EL(const int& L);
 
@@ -114,6 +114,6 @@ class ORB_gaunt_table
 	std::map<int,std::map<int,double>> Gaunt_CH;		// Peize Lin update 2016-08-26
 	
 	//direct integral
-	matrix Ylm_Gaunt;
+	ModuleBase::matrix Ylm_Gaunt;
 };
 #endif

@@ -6,6 +6,9 @@
 #include <cstdlib>
 #include "mymath.h"
 
+namespace ModuleBase
+{
+
 typedef double real;
 #ifdef __FFTW3
 void fftw_zeros(fftw_complex *data,int n)
@@ -45,9 +48,9 @@ void simpson(const int mesh,const double *func,const double *rab, double &asum)
 
     if (mesh%2==0) 	//( mesh+1 - ( (mesh+1) / 2 ) * 2 != 1 )
     {
-        cout << "\n error in subroutine simpson ";
-        cout << "\n routine assumes mesh is odd but mesh = "
-             << mesh << endl;
+        std::cout << "\n error in subroutine simpson ";
+        std::cout << "\n routine assumes mesh is odd but mesh = "
+             << mesh << std::endl;
         // write(*,*) '***error in subroutine radlg';
         // write(*,*) 'routine assumes mesh is odd but mesh =',mesh+1,??;
         exit(0);
@@ -79,7 +82,7 @@ void simpson_cp90(int mesh, double *func, double *rab, double intg)
     int i;
 
     if (mesh < 8)
-        cout << "\n simpson , few mesh points,8 " << endl;
+        std::cout << "\n simpson , few mesh points,8 " << std::endl;
 
     c[0] = 109.0 / 48.0;
 
@@ -259,3 +262,5 @@ double gauss_freq(double x)
     const double g_freq = 0.5 * my_erfc(- x * 0.707106781186548);
     return g_freq;
 } //end function gauss_freq
+
+}

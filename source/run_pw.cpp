@@ -17,8 +17,8 @@ Run_pw::~Run_pw(){}
 
 void Run_pw::plane_wave_line(void)
 {
-    TITLE("Run_pw","plane_wave_line");
-	timer::tick("Run_pw","plane_wave_line");
+    ModuleBase::TITLE("Run_pw","plane_wave_line");
+	ModuleBase::timer::tick("Run_pw","plane_wave_line");
 
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
@@ -40,36 +40,35 @@ void Run_pw::plane_wave_line(void)
 		GlobalC::xcf.which_dft(GlobalC::ucell.atoms[it].dft);
     }
 
-    DONE(GlobalV::ofs_running, "SETUP UNITCELL");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     // symmetry analysis should be performed every time the cell is changed
     if (ModuleSymmetry::Symmetry::symm_flag)
     {
         GlobalC::symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
-        DONE(GlobalV::ofs_running, "SYMMETRY");
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
     // Setup the k points according to symmetry.
     GlobalC::kv.set( GlobalC::symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec );
-    DONE(GlobalV::ofs_running,"INIT K-POINTS");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT K-POINTS");
 
     // print information
     // mohan add 2021-01-30
-    Print_Info PI;
-    PI.setup_parameters();
+    Print_Info::setup_parameters(GlobalC::ucell, GlobalC::kv, GlobalC::xcf);
 
     // Initalize the plane wave basis set
     GlobalC::pw.gen_pw(GlobalV::ofs_running, GlobalC::ucell, GlobalC::kv);
-    DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
-    cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx <<" * " << GlobalC::pw.ny <<" * "<< GlobalC::pw.nz << endl;
-    cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx <<" * " << GlobalC::pw.nby <<" * "<< GlobalC::pw.nbz << endl;
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
+    std::cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx <<" * " << GlobalC::pw.ny <<" * "<< GlobalC::pw.nz << std::endl;
+    std::cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx <<" * " << GlobalC::pw.nby <<" * "<< GlobalC::pw.nbz << std::endl;
 
     // mohan add 2010-10-10, just to test the symmetry of a variety
     // of systems.
     if(GlobalV::CALCULATION == "test")
     {
         Cal_Test::test_memory();
-        QUIT();
+        ModuleBase::QUIT();
     }
 
     // mohan add 2010-09-13
@@ -77,10 +76,12 @@ void Run_pw::plane_wave_line(void)
     // distribution of plane waves
     GlobalC::Pgrid.init(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, GlobalC::pw.nczp,
         GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
+    
+    // cout<<"after pgrid init nrxx = "<<GlobalC::pw.nrxx<<endl;
 
 //----------------------------------------------------------
 // 1 read in initial data:
-//   a lattice structure:atom_species,atom_positions,lattice vector
+//   a lattice structure:atom_species,atom_positions,lattice std::vector
 //   b k_points
 //   c pseudopotential
 // 2 setup planeware basis, FFT,structure factor, ...
@@ -105,32 +106,34 @@ void Run_pw::plane_wave_line(void)
         cpws.opt_cells_pw();
     }
 
+    // cout<<"cpws SUCCESS"<<endl;
+
 
     // caoyu add 2020-11-24, mohan updat 2021-01-03
     if(GlobalV::BASIS_TYPE=="pw" && INPUT.out_descriptor==1)
     {
         Numerical_Descriptor nc;
         nc.output_descriptor(GlobalC::wf.evc, INPUT.lmax_descriptor);
-        DONE(GlobalV::ofs_running,"GENERATE DESCRIPTOR FOR DEEPKS");
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"GENERATE DESCRIPTOR FOR DEEPKS");
     }
 
 
     if(GlobalV::BASIS_TYPE=="pw" && winput::out_spillage) //xiaohui add 2013-09-01
     {
-        //cout << "\n Output Spillage Information : " << endl;
+        //std::cout << "\n Output Spillage Information : " << std::endl;
         // calculate spillage value.
 #ifdef __LCAO
         if ( winput::out_spillage == 3)
         {
             GlobalV::BASIS_TYPE="pw"; 
-            cout << " NLOCAL = " << GlobalV::NLOCAL << endl;
+            std::cout << " NLOCAL = " << GlobalV::NLOCAL << std::endl;
 
             for (int ik=0; ik<GlobalC::kv.nks; ik++)
             {
                 GlobalC::wf.wanf2[ik].create(GlobalV::NLOCAL, GlobalC::wf.npwx);
 				if(GlobalV::BASIS_TYPE=="pw")
                 {
-					cout << " ik=" << ik + 1 << endl;
+					std::cout << " ik=" << ik + 1 << std::endl;
 
                     GlobalV::BASIS_TYPE="lcao_in_pw";
 					GlobalC::wf.LCAO_in_pw_k(ik, GlobalC::wf.wanf2[ik]);
@@ -148,7 +151,7 @@ void Run_pw::plane_wave_line(void)
         {
             Numerical_Basis numerical_basis;
             numerical_basis.output_overlap(GlobalC::wf.evc);
-            DONE(GlobalV::ofs_running,"BASIS OVERLAP (Q and S) GENERATION.");
+            ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"BASIS OVERLAP (Q and S) GENERATION.");
         }
     }
 
@@ -162,6 +165,6 @@ void Run_pw::plane_wave_line(void)
 	// compute density of states
 	GlobalC::en.perform_dos_pw();
 
-	timer::tick("Run_pw","plane_wave_line");
+	ModuleBase::timer::tick("Run_pw","plane_wave_line");
     return;
 }

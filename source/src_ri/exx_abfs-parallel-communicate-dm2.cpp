@@ -3,20 +3,20 @@
 
 
 void Exx_Abfs::Parallel::Communicate::DM2::init( 
-	const set<pair<size_t,size_t>> &H_atom_pairs_core,
+	const set<std::pair<size_t,size_t>> &H_atom_pairs_core,
 	const double threshold_in)
 {
 	threshold = threshold_in;
 	
 	atom_in_exx.row.resize(GlobalC::ucell.nat,false);
 	atom_in_exx.col.resize(GlobalC::ucell.nat,false);
-	atom_in_exx.row_col.resize(GlobalC::ucell.nat,vector<bool>(GlobalC::ucell.nat,false));
+	atom_in_exx.row_col.resize(GlobalC::ucell.nat,std::vector<bool>(GlobalC::ucell.nat,false));
 	
-	for( const auto &pair : H_atom_pairs_core )
+	for( const auto &std::pair : H_atom_pairs_core )
 	{
-		atom_in_exx.row[pair.first] = true;
-		atom_in_exx.col[pair.second] = true;
-		atom_in_exx.row_col[pair.first][pair.second] = true;
+		atom_in_exx.row[std::pair.first] = true;
+		atom_in_exx.col[std::pair.second] = true;
+		atom_in_exx.row_col[std::pair.first][std::pair.second] = true;
 	}
 }
 
@@ -26,11 +26,11 @@ void Exx_Abfs::Parallel::Communicate::DM2::clear_DMr()
 	DMr.resize(GlobalV::NSPIN);
 }
 
-void Exx_Abfs::Parallel::Communicate::DM2::set_DM_gamma( const matrix &DM_2D, const int is, const pair<int,int> &index_begin )
+void Exx_Abfs::Parallel::Communicate::DM2::set_DM_gamma( const ModuleBase::matrix &DM_2D, const int is, const std::pair<int,int> &index_begin )
 {
-	auto get_iats = []( const int n, const int i_begin, const vector<bool> &in_exx ) -> map<int,pair<int,int>>
+	auto get_iats = []( const int n, const int i_begin, const std::vector<bool> &in_exx ) -> std::map<int,std::pair<int,int>>
 	{
-		map<int,pair<int,int>> iats;
+		std::map<int,std::pair<int,int>> iats;
 		for( int i=0; i<n; ++i )
 		{
 			const int iat = GlobalC::ucell.iwt2iat[i+i_begin];
@@ -45,8 +45,8 @@ void Exx_Abfs::Parallel::Communicate::DM2::set_DM_gamma( const matrix &DM_2D, co
 		}
 		return iats;
 	};
-	const map<int,pair<int,int>> iat1s = get_iats( DM_2D.nr, index_begin.first, atom_in_exx.row );
-	const map<int,pair<int,int>> iat2s = get_iats( DM_2D.nc, index_begin.second, atom_in_exx.col );
+	const std::map<int,std::pair<int,int>> iat1s = get_iats( DM_2D.nr, index_begin.first, atom_in_exx.row );
+	const std::map<int,std::pair<int,int>> iat2s = get_iats( DM_2D.nc, index_begin.second, atom_in_exx.col );
 	
 	const double SPIN_multiple = 0.5*GlobalV::NSPIN;	
 	for( const auto &iat1sA : iat1s )
@@ -59,7 +59,7 @@ void Exx_Abfs::Parallel::Communicate::DM2::set_DM_gamma( const matrix &DM_2D, co
 			const auto &iat2_range = iat2sA.second;
 			if( !atom_in_exx.row_col[iat1][iat2] )	continue;
 			
-			matrix DM_local( GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw, GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw );
+			ModuleBase::matrix DM_local( GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw, GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw );
 			const int iw2_begin = GlobalC::ucell.iwt2iw[ iat2_range.first + index_begin.second ];
 			for( int iw1_2D=iat1_range.first; iw1_2D<=iat1_range.second; ++iw1_2D )
 			{
@@ -73,7 +73,7 @@ void Exx_Abfs::Parallel::Communicate::DM2::set_DM_gamma( const matrix &DM_2D, co
 			
 			if( DM_local.absmax() < threshold )	continue;
 			
-			if( matrix*const DM_ptr = static_cast<matrix*const>(MAP_EXIST( DMr[is], iat1, iat2, Abfs::Vector3_Order<int>{0,0,0} )) )
+			if( ModuleBase::matrix*const DM_ptr = static_cast<ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( DMr[is], iat1, iat2, Abfs::Vector3_Order<int>{0,0,0} )) )
 				*DM_ptr += DM_local;
 			else
 				DMr[is][iat1][iat2][{0,0,0}] = std::move(DM_local);
@@ -86,12 +86,12 @@ void Exx_Abfs::Parallel::Communicate::DM2::set_DM_gamma( const matrix &DM_2D, co
 
 void Exx_Abfs::Parallel::Communicate::DM2::cal_DM_k( 
 	const Abfs::Vector3_Order<int> &Born_von_Karman_period,
-	const set<pair<size_t,size_t>> &H_atom_pairs_core,
+	const set<std::pair<size_t,size_t>> &H_atom_pairs_core,
 	const double threshold )
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::DM::cal_DM");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM::cal_DM");
 	
-	vector<Abfs::Vector3_Order<int>> Born_von_Karman_boxes;
+	std::vector<Abfs::Vector3_Order<int>> Born_von_Karman_boxes;
 	for( int ix=0; ix<Born_von_Karman_period.x; ++ix )
 		for( int iy=0; iy<Born_von_Karman_period.y; ++iy )
 			for( int iz=0; iz<Born_von_Karman_period.z; ++iz )

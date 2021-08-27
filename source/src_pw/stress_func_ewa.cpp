@@ -2,9 +2,9 @@
 #include "./H_Ewald_pw.h"
 
 //calcualte the Ewald stress term in PW and LCAO
-void Stress_Func::stress_ewa(matrix& sigma, const bool is_pw)
+void Stress_Func::stress_ewa(ModuleBase::matrix& sigma, const bool is_pw)
 {
-    timer::tick("Stress_Func","stress_ew");
+    ModuleBase::timer::tick("Stress_Func","stress_ew");
 
     double charge=0;
     for(int it=0; it < GlobalC::ucell.ntype; it++)
@@ -22,8 +22,8 @@ void Stress_Func::stress_ewa(matrix& sigma, const bool is_pw)
     do{
        alpha-=0.1;
        if(alpha==0.0)
-          WARNING_QUIT("stres_ew", "optimal alpha not found");
-       upperbound =e2 * pow(charge,2) * sqrt( 2 * alpha / (TWO_PI)) * erfc(sqrt(GlobalC::ucell.tpiba2 * GlobalC::pw.ggchg / 4.0 / alpha));
+          ModuleBase::WARNING_QUIT("stres_ew", "optimal alpha not found");
+       upperbound =ModuleBase::e2 * pow(charge,2) * sqrt( 2 * alpha / (ModuleBase::TWO_PI)) * erfc(sqrt(GlobalC::ucell.tpiba2 * GlobalC::pw.ggchg / 4.0 / alpha));
     }
     while(upperbound>1e-7);
 
@@ -32,7 +32,7 @@ void Stress_Func::stress_ewa(matrix& sigma, const bool is_pw)
     double sdewald;
     if(GlobalC::pw.gstart == 1)
 	{
-       sdewald = (TWO_PI) * e2 / 4.0 / alpha * pow(charge/GlobalC::ucell.omega,2);
+       sdewald = (ModuleBase::TWO_PI) * ModuleBase::e2 / 4.0 / alpha * pow(charge/GlobalC::ucell.omega,2);
     }
     else 
 	{
@@ -47,25 +47,25 @@ void Stress_Func::stress_ewa(matrix& sigma, const bool is_pw)
 
     double g2,g2a;
     double arg;
-    complex<double> rhostar;
+    std::complex<double> rhostar;
     double sewald;
     for(int ng=GlobalC::pw.gstart;ng<GlobalC::pw.ngmc;ng++)
 	{
 		g2 = GlobalC::pw.gg[ng]* GlobalC::ucell.tpiba2;
 		g2a = g2 /4.0/alpha;
-		rhostar=complex<double>(0.0,0.0);
+		rhostar=std::complex<double>(0.0,0.0);
 		for(int it=0; it < GlobalC::ucell.ntype; it++)
 		{
 			for(int i=0; i<GlobalC::ucell.atoms[it].na; i++)
 			{
 				arg = (GlobalC::pw.get_G_cartesian_projection(ng, 0) * GlobalC::ucell.atoms[it].tau[i].x + 
 					GlobalC::pw.get_G_cartesian_projection(ng, 1) * GlobalC::ucell.atoms[it].tau[i].y + 
-					GlobalC::pw.get_G_cartesian_projection(ng, 2) * GlobalC::ucell.atoms[it].tau[i].z) * (TWO_PI);
-				rhostar = rhostar + complex<double>(GlobalC::ucell.atoms[it].zv * cos(arg),GlobalC::ucell.atoms[it].zv * sin(arg));
+					GlobalC::pw.get_G_cartesian_projection(ng, 2) * GlobalC::ucell.atoms[it].tau[i].z) * (ModuleBase::TWO_PI);
+				rhostar = rhostar + std::complex<double>(GlobalC::ucell.atoms[it].zv * cos(arg),GlobalC::ucell.atoms[it].zv * sin(arg));
 			}
 		}
 		rhostar /= GlobalC::ucell.omega;
-		sewald = fact* (TWO_PI) * e2 * exp(-g2a) / g2 * pow(abs(rhostar),2);
+		sewald = fact* (ModuleBase::TWO_PI) * ModuleBase::e2 * exp(-g2a) / g2 * pow(abs(rhostar),2);
 		sdewald = sdewald - sewald;
 		for(int l=0;l<3;l++)
 		{
@@ -83,13 +83,13 @@ void Stress_Func::stress_ewa(matrix& sigma, const bool is_pw)
     //R-space sum here (only for the processor that contains G=0) 
     int mxr = 50;
     int *irr;
-    Vector3<double> *r;
+    ModuleBase::Vector3<double> *r;
     double *r2;
-    r  = new Vector3<double>[mxr];
+    r  = new ModuleBase::Vector3<double>[mxr];
     r2 = new double[mxr];
     irr = new int[mxr];
     double rr;
-    Vector3<double> d_tau;
+    ModuleBase::Vector3<double> d_tau;
     double r0[3];
     double rmax=0.0;
     int nrm=0;
@@ -113,7 +113,7 @@ void Stress_Func::stress_ewa(matrix& sigma, const bool is_pw)
 						for(int nr=0 ; nr<nrm ; nr++)
 						{
 							rr=sqrt(r2[nr]) * GlobalC::ucell.lat0;
-							fac = -e2/2.0/GlobalC::ucell.omega*pow(GlobalC::ucell.lat0,2)*GlobalC::ucell.atoms[it].zv * GlobalC::ucell.atoms[jt].zv / pow(rr,3) * (erfc(sqrt(alpha)*rr)+rr * sqrt(8 * alpha / (TWO_PI)) * exp(-alpha * pow(rr,2)));
+							fac = -ModuleBase::e2/2.0/GlobalC::ucell.omega*pow(GlobalC::ucell.lat0,2)*GlobalC::ucell.atoms[it].zv * GlobalC::ucell.atoms[jt].zv / pow(rr,3) * (erfc(sqrt(alpha)*rr)+rr * sqrt(8 * alpha / (ModuleBase::TWO_PI)) * exp(-alpha * pow(rr,2)));
 							for(int l=0; l<3; l++)
 							{
 								for(int m=0; m<l+1; m++)
@@ -150,7 +150,7 @@ void Stress_Func::stress_ewa(matrix& sigma, const bool is_pw)
 	delete[] r2;
 	delete[] irr;
 	// this->print(GlobalV::ofs_running, "ewald stress", stression);
-	timer::tick("Force_Func","stress_ew");
+	ModuleBase::timer::tick("Force_Func","stress_ew");
 
 	return;
 }

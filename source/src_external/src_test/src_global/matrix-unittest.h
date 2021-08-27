@@ -8,7 +8,7 @@ static void matrix_mutiply_test()
 	const size_t dim1=2,dim2=3,dim3=4;
 	
 	// C = A * B
-	matrix A(dim1,dim2), B(dim2,dim3), C(dim1,dim3);
+	ModuleBase::matrix A(dim1,dim2), B(dim2,dim3), C(dim1,dim3);
 
 	A(0,0)=1; A(0,1)=3;A(0,2)=4; 
 	A(1,0)=5; A(1,1)=6;A(1,2)=8;
@@ -19,7 +19,7 @@ static void matrix_mutiply_test()
 
 	C = A * B;
 
-	cout<<C<<endl;
+	std::cout<<C<<std::endl;
 }
 
 /* output:

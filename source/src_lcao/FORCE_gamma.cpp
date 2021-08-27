@@ -12,17 +12,17 @@ Force_LCAO_gamma::~Force_LCAO_gamma ()
 void Force_LCAO_gamma::ftable_gamma (
 	const bool isforce,
 	const bool isstress,
-	matrix& foverlap,
-	matrix& ftvnl_dphi,
-	matrix& fvnl_dbeta,	
-	matrix& fvl_dphi,
-	matrix& soverlap,
-	matrix& stvnl_dphi,
-	matrix& svnl_dbeta,
-	matrix& svl_dphi)
+	ModuleBase::matrix& foverlap,
+	ModuleBase::matrix& ftvnl_dphi,
+	ModuleBase::matrix& fvnl_dbeta,	
+	ModuleBase::matrix& fvl_dphi,
+	ModuleBase::matrix& soverlap,
+	ModuleBase::matrix& stvnl_dphi,
+	ModuleBase::matrix& svnl_dbeta,
+	ModuleBase::matrix& svl_dphi)
 {
-    TITLE("Force_LCAO_gamma", "ftable");
-    timer::tick("Force_LCAO_gamma","ftable_gamma");
+    ModuleBase::TITLE("Force_LCAO_gamma", "ftable");
+    ModuleBase::timer::tick("Force_LCAO_gamma","ftable_gamma");
     
     // allocate DSloc_x, DSloc_y, DSloc_z
     // allocate DHloc_fixed_x, DHloc_fixed_y, DHloc_fixed_z
@@ -42,17 +42,17 @@ void Force_LCAO_gamma::ftable_gamma (
     }
     else
     {
-        timer::tick("Force_LCAO_gamma","cal_dm_grid");
+        ModuleBase::timer::tick("Force_LCAO_gamma","cal_dm_grid");
         // calculate the 'density matrix' here.
-        matrix dm2d;
+        ModuleBase::matrix dm2d;
 		dm2d.create(GlobalV::NSPIN, GlobalC::ParaO.nloc);
-        Memory::record ("Force_LCAO_gamma", "dm2d", GlobalC::ParaO.nloc*GlobalV::NSPIN, "double");    
+        ModuleBase::Memory::record ("Force_LCAO_gamma", "dm2d", GlobalC::ParaO.nloc*GlobalV::NSPIN, "double");    
 
         bool with_energy = false;
 
 		this->set_EDM_gamma(dm2d, with_energy);
 
-        timer::tick("Force_LCAO_gamma","cal_dm_grid");
+        ModuleBase::timer::tick("Force_LCAO_gamma","cal_dm_grid");
 
         this->cal_ftvnl_dphi(dm2d, isforce, isstress, ftvnl_dphi, stvnl_dphi);
         this->cal_fvnl_dbeta(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
@@ -83,14 +83,14 @@ void Force_LCAO_gamma::ftable_gamma (
     // delete DHloc_fixed_x, DHloc_fixed_y, DHloc_fixed_z
     this->finish_ftable_gamma();
 
-    timer::tick("Force_LCAO_gamma","ftable_gamma");
+    ModuleBase::timer::tick("Force_LCAO_gamma","ftable_gamma");
     return;
 }
 
 void Force_LCAO_gamma::allocate_gamma(void)
 {
-    TITLE("Force_LCAO_gamma","allocate_gamma");
-    timer::tick("Force_LCAO_gamma","allocate_gamma");
+    ModuleBase::TITLE("Force_LCAO_gamma","allocate_gamma");
+    ModuleBase::timer::tick("Force_LCAO_gamma","allocate_gamma");
 
     // need to calculate the derivative in build_ST_new
     bool cal_deri = true;
@@ -102,9 +102,9 @@ void Force_LCAO_gamma::allocate_gamma(void)
     GlobalC::LM.DSloc_x = new double [GlobalC::ParaO.nloc];
     GlobalC::LM.DSloc_y = new double [GlobalC::ParaO.nloc];
     GlobalC::LM.DSloc_z = new double [GlobalC::ParaO.nloc];
-    ZEROS(GlobalC::LM.DSloc_x, GlobalC::ParaO.nloc);
-    ZEROS(GlobalC::LM.DSloc_y, GlobalC::ParaO.nloc);
-    ZEROS(GlobalC::LM.DSloc_z, GlobalC::ParaO.nloc);
+    ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_x, GlobalC::ParaO.nloc);
+    ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_y, GlobalC::ParaO.nloc);
+    ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_z, GlobalC::ParaO.nloc);
     //allocate stress part in gamma_only-line, added by zhengdy-stress
     if(GlobalV::STRESS)
     {
@@ -114,32 +114,32 @@ void Force_LCAO_gamma::allocate_gamma(void)
         GlobalC::LM.DSloc_22 = new double [GlobalC::ParaO.nloc];
         GlobalC::LM.DSloc_23 = new double [GlobalC::ParaO.nloc];
         GlobalC::LM.DSloc_33 = new double [GlobalC::ParaO.nloc];
-        ZEROS(GlobalC::LM.DSloc_11, GlobalC::ParaO.nloc);
-        ZEROS(GlobalC::LM.DSloc_12, GlobalC::ParaO.nloc);
-        ZEROS(GlobalC::LM.DSloc_13, GlobalC::ParaO.nloc);
-        ZEROS(GlobalC::LM.DSloc_22, GlobalC::ParaO.nloc);
-        ZEROS(GlobalC::LM.DSloc_23, GlobalC::ParaO.nloc);
-        ZEROS(GlobalC::LM.DSloc_33, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_11, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_12, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_13, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_22, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_23, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_33, GlobalC::ParaO.nloc);
         GlobalC::LM.DHloc_fixed_11 = new double [GlobalC::ParaO.nloc];
         GlobalC::LM.DHloc_fixed_12 = new double [GlobalC::ParaO.nloc];
         GlobalC::LM.DHloc_fixed_13 = new double [GlobalC::ParaO.nloc];
         GlobalC::LM.DHloc_fixed_22 = new double [GlobalC::ParaO.nloc];
         GlobalC::LM.DHloc_fixed_23 = new double [GlobalC::ParaO.nloc];
         GlobalC::LM.DHloc_fixed_33 = new double [GlobalC::ParaO.nloc];
-        ZEROS (GlobalC::LM.DHloc_fixed_11, GlobalC::ParaO.nloc);
-        ZEROS (GlobalC::LM.DHloc_fixed_12, GlobalC::ParaO.nloc);
-        ZEROS (GlobalC::LM.DHloc_fixed_13, GlobalC::ParaO.nloc);
-        ZEROS (GlobalC::LM.DHloc_fixed_22, GlobalC::ParaO.nloc);
-        ZEROS (GlobalC::LM.DHloc_fixed_23, GlobalC::ParaO.nloc);
-        ZEROS (GlobalC::LM.DHloc_fixed_33, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_11, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_12, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_13, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_22, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_23, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_33, GlobalC::ParaO.nloc);
     }
     //calculate dS in LCAO basis
     // tips: build_ST_new --> GlobalC::ParaO.set_force 
-    //timer::tick("Force_LCAO_gamma","build_S_new");
+    //ModuleBase::timer::tick("Force_LCAO_gamma","build_S_new");
     GlobalC::UHM.genH.build_ST_new ('S', cal_deri);
-    //timer::tick("Force_LCAO_gamma","build_S_new");
+    //ModuleBase::timer::tick("Force_LCAO_gamma","build_S_new");
 
-    Memory::record("force_lo", "dS", GlobalC::ParaO.nloc*3, "double");
+    ModuleBase::Memory::record("force_lo", "dS", GlobalC::ParaO.nloc*3, "double");
 
     //calculate dT in LCAP
     //allocation dt
@@ -147,26 +147,26 @@ void Force_LCAO_gamma::allocate_gamma(void)
     GlobalC::LM.DHloc_fixed_x = new double [GlobalC::ParaO.nloc];
     GlobalC::LM.DHloc_fixed_y = new double [GlobalC::ParaO.nloc];
     GlobalC::LM.DHloc_fixed_z = new double [GlobalC::ParaO.nloc];
-    ZEROS (GlobalC::LM.DHloc_fixed_x, GlobalC::ParaO.nloc);
-    ZEROS (GlobalC::LM.DHloc_fixed_y, GlobalC::ParaO.nloc);
-    ZEROS (GlobalC::LM.DHloc_fixed_z, GlobalC::ParaO.nloc);
+    ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_x, GlobalC::ParaO.nloc);
+    ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_y, GlobalC::ParaO.nloc);
+    ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_z, GlobalC::ParaO.nloc);
     
     //calculate dT
     //calculate T + VNL(P1) in LCAO basis
-    //timer::tick("Force_LCAO_gamma","build_T_new");
+    //ModuleBase::timer::tick("Force_LCAO_gamma","build_T_new");
     GlobalC::UHM.genH.build_ST_new ('T', cal_deri);
-    //timer::tick("Force_LCAO_gamma","build_T_new");
+    //ModuleBase::timer::tick("Force_LCAO_gamma","build_T_new");
     //test_gamma(GlobalC::LM.DHloc_fixed_x, "dHloc_fixed_x T part");
     
     //GlobalC::UHM.genH.build_Nonlocal_beta (cal_deri);
-    //timer::tick("Force_LCAO_gamma","build_Nonlocal_mu");
+    //ModuleBase::timer::tick("Force_LCAO_gamma","build_Nonlocal_mu");
     GlobalC::UHM.genH.build_Nonlocal_mu (cal_deri);
-    //timer::tick("Force_LCAO_gamma","build_Nonlocal_mu");
+    //ModuleBase::timer::tick("Force_LCAO_gamma","build_Nonlocal_mu");
     //test_gamma(GlobalC::LM.DHloc_fixed_x, "dHloc_fixed_x Vnl part");
 
-    Memory::record("force_lo", "dTVNL", GlobalC::ParaO.nloc*3, "double");
+    ModuleBase::Memory::record("force_lo", "dTVNL", GlobalC::ParaO.nloc*3, "double");
 
-    timer::tick("Force_LCAO_gamma","allocate_gamma");
+    ModuleBase::timer::tick("Force_LCAO_gamma","allocate_gamma");
     return;
 }
 
@@ -197,24 +197,24 @@ void Force_LCAO_gamma::finish_ftable_gamma(void)
 }
 
 
-void Force_LCAO_gamma::test_gamma(double* mm, const string &name)
+void Force_LCAO_gamma::test_gamma(double* mm, const std::string &name)
 {
-    cout << "\n PRINT " << name << endl;
-    cout << setprecision(6) << endl;
+    std::cout << "\n PRINT " << name << std::endl;
+    std::cout << std::setprecision(6) << std::endl;
     for(int i=0; i<GlobalV::NLOCAL; i++)
     {
         for(int j=0; j<GlobalV::NLOCAL; j++)
         {
             if( abs(mm[i*GlobalV::NLOCAL+j])>1.0e-5)
             {
-                cout << setw(12) << mm[i*GlobalV::NLOCAL+j];
+                std::cout << std::setw(12) << mm[i*GlobalV::NLOCAL+j];
             }
             else
             {
-                cout << setw(12) << "0";
+                std::cout << std::setw(12) << "0";
             }
         }
-        cout << endl;
+        std::cout << std::endl;
     }
     return;
 }

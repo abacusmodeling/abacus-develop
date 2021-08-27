@@ -21,17 +21,17 @@ Numerical_Descriptor::~Numerical_Descriptor()
 }
 
 
-void Numerical_Descriptor::output_descriptor(const ComplexMatrix *psi, const int &lmax_in)
+void Numerical_Descriptor::output_descriptor(const ModuleBase::ComplexMatrix *psi, const int &lmax_in)
 {
-	TITLE("Numerical_Descriptor","output_descriptor");
-	NEW_PART("DeepKS descriptor: D_{Inl}");
+	ModuleBase::TITLE("Numerical_Descriptor","output_descriptor");
+	ModuleBase::GlobalFunc::NEW_PART("DeepKS descriptor: D_{Inl}");
 
 	//-----------------------------------
 	// 1. Initialize parameters
 	//-----------------------------------
 
-	//GlobalV::ofs_running << "D_{Inl}_m_m'=sum_{i}<J_Inl_m|Psi_i><Psi_i|J_Inl_m'>" << endl;
-	GlobalV::ofs_running << "input lmax = " << lmax << endl;
+	//GlobalV::ofs_running << "D_{Inl}_m_m'=sum_{i}<J_Inl_m|Psi_i><Psi_i|J_Inl_m'>" << std::endl;
+	GlobalV::ofs_running << "input lmax = " << lmax << std::endl;
 	this->lmax = lmax_in;
 	assert(lmax>=0);
 
@@ -50,8 +50,8 @@ void Numerical_Descriptor::output_descriptor(const ComplexMatrix *psi, const int
 	//-----------------------------------
 	// 2. Open the file
 	//-----------------------------------
-    ofstream ofs;
-    stringstream ss;
+    std::ofstream ofs;
+    std::stringstream ss;
     // the parameter 'winput::spillage_outdir' is read from INPUTw.
     ss << winput::spillage_outdir << "/" << "descriptor.dat";
     if (GlobalV::MY_RANK==0)
@@ -64,15 +64,15 @@ void Numerical_Descriptor::output_descriptor(const ComplexMatrix *psi, const int
 	// 3. Initialize overlap_Q1 and Q2 
 	//-------------------------------------
 	// OVERLAP : < J_mu | Psi >
-    realArray overlap_Q1(nks, GlobalV::NBANDS, this->nlocal );
-    realArray overlap_Q2(nks, GlobalV::NBANDS, this->nlocal );
+    ModuleBase::realArray overlap_Q1(nks, GlobalV::NBANDS, this->nlocal );
+    ModuleBase::realArray overlap_Q2(nks, GlobalV::NBANDS, this->nlocal );
 
-    ZEROS(overlap_Q1.ptr, overlap_Q1.getSize() );
-    ZEROS(overlap_Q2.ptr, overlap_Q2.getSize() );
+    ModuleBase::GlobalFunc::ZEROS(overlap_Q1.ptr, overlap_Q1.getSize() );
+    ModuleBase::GlobalFunc::ZEROS(overlap_Q2.ptr, overlap_Q2.getSize() );
 
-	OUT(GlobalV::ofs_running,"number of k points",overlap_Q1.getBound1());
-	OUT(GlobalV::ofs_running,"number of bands",overlap_Q1.getBound2());
-	OUT(GlobalV::ofs_running,"number of local orbitals",overlap_Q1.getBound3());
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of k points",overlap_Q1.getBound1());
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of bands",overlap_Q1.getBound2());
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of local orbitals",overlap_Q1.getBound3());
 
 
 	//-------------------------------------
@@ -82,14 +82,14 @@ void Numerical_Descriptor::output_descriptor(const ComplexMatrix *psi, const int
     for (int ik=0; ik<nks; ik++)
     {
         const int npw= GlobalC::kv.ngk[ik];
-		GlobalV::ofs_running << " --------------------------------------------------------" << endl;
+		GlobalV::ofs_running << " --------------------------------------------------------" << std::endl;
 		GlobalV::ofs_running << " Print the overlap matrixs Q and S for this kpoint";
-        GlobalV::ofs_running << "\n " << setw(8) << "ik" << setw(8) << "npw";
-        GlobalV::ofs_running << "\n " << setw(8) << ik+1 << setw(8) << npw << endl;
-		GlobalV::ofs_running << " --------------------------------------------------------" << endl;
+        GlobalV::ofs_running << "\n " << std::setw(8) << "ik" << std::setw(8) << "npw";
+        GlobalV::ofs_running << "\n " << std::setw(8) << ik+1 << std::setw(8) << npw << std::endl;
+		GlobalV::ofs_running << " --------------------------------------------------------" << std::endl;
         // search for all k-points.
         this->jlq3d_overlap(overlap_Q1, overlap_Q2, ik, ik, npw, psi[ik]);
-        DONE(GlobalV::ofs_running,"jlq3d_overlap");
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"jlq3d_overlap");
 	}
 
 #ifdef __MPI
@@ -108,7 +108,7 @@ void Numerical_Descriptor::output_descriptor(const ComplexMatrix *psi, const int
 	
 	for (int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		GlobalV::ofs_running << GlobalC::ucell.atoms[it].label << " label" << endl;
+		GlobalV::ofs_running << GlobalC::ucell.atoms[it].label << " label" << std::endl;
 		for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{
 			//--------------------------------------------------
@@ -119,7 +119,7 @@ void Numerical_Descriptor::output_descriptor(const ComplexMatrix *psi, const int
 			int r_mu = mu_index[it](ia, lmax, nmax-1, 2*lmax);//max mu_index for each atom
 			const int nd =r_mu - l_mu + 1;
 			
-			GlobalV::ofs_running << " atom_index: " << ia+1 << " dimension of descritpor: " << nd << endl;
+			GlobalV::ofs_running << " atom_index: " << ia+1 << " dimension of descritpor: " << nd << std::endl;
 
 			double* d = new double[nd]; //descriptor for each atom
 				
@@ -128,15 +128,15 @@ void Numerical_Descriptor::output_descriptor(const ComplexMatrix *psi, const int
 			// for each 'lmax' we have 'n' up to 'ecut_number'
 			this->generate_descriptor(overlap_Q1, overlap_Q2, it ,ia, d, nd);
 
-			ofs << GlobalC::ucell.atoms[it].label << " atom_index " << ia+1 << " n_descriptor " << nd << endl;
+			ofs << GlobalC::ucell.atoms[it].label << " atom_index " << ia+1 << " n_descriptor " << nd << std::endl;
 			for(int id=0; id<nd; ++id)
 			{
-				if(id>0 && id%8==0) ofs << endl;
+				if(id>0 && id%8==0) ofs << std::endl;
 			//	if(abs(d[id]>1.0e-9)) ofs << d[id] << " ";
 			//	else ofs << "0 ";
 				ofs << d[id] << " ";
 			}
-			ofs << endl;
+			ofs << std::endl;
 
 			delete[] d;
 		}
@@ -149,7 +149,7 @@ void Numerical_Descriptor::output_descriptor(const ComplexMatrix *psi, const int
 }
 
 
-void Numerical_Descriptor::generate_descriptor(realArray &overlap_Q1, realArray &overlap_Q2, 
+void Numerical_Descriptor::generate_descriptor(ModuleBase::realArray &overlap_Q1, ModuleBase::realArray &overlap_Q2, 
 const int &it, const int &ia, double *d, const int &nd)
 {
 	int nbands = overlap_Q1.getBound2();
@@ -162,7 +162,7 @@ const int &it, const int &ia, double *d, const int &nd)
 	int ik=0;
 
 
-	GlobalV::ofs_running << " print out each descriptor" << endl;
+	GlobalV::ofs_running << " print out each descriptor" << std::endl;
 	int id=0;
 	for (int l=0; l<lmax+1; l++)
 	{
@@ -170,7 +170,7 @@ const int &it, const int &ia, double *d, const int &nd)
 		{
 				const int dim = 2*l+1;
 				// descriptor for atom (it, ia)
-				ComplexMatrix des(dim, dim);
+				ModuleBase::ComplexMatrix des(dim, dim);
 				for (int m=0; m<2*l+1; m++)
 				{
 						const int ii=mu_index[it](ia,l,n,m);
@@ -179,15 +179,15 @@ const int &it, const int &ia, double *d, const int &nd)
 								const int jj=mu_index[it](ia,l,n,m2);
 								for(int ib=0; ib<nbands; ib++) // sum for nbands
 								{
-										complex<double> c1(overlap_Q1(ik, ib, ii),  overlap_Q2(ik, ib, ii));
-										complex<double> c2(overlap_Q1(ik, ib, jj), -overlap_Q2(ik, ib, jj));
+										std::complex<double> c1(overlap_Q1(ik, ib, ii),  overlap_Q2(ik, ib, ii));
+										std::complex<double> c2(overlap_Q1(ik, ib, jj), -overlap_Q2(ik, ib, jj));
 										des(m,m2) += c1*c2;
 								}
-			//					GlobalV::ofs_running << setw(15) << des(m,m2);
+			//					GlobalV::ofs_running << std::setw(15) << des(m,m2);
 						}
-			//			GlobalV::ofs_running << endl;
+			//			GlobalV::ofs_running << std::endl;
 				}
-				GlobalV::ofs_running << "dimension of des is " << 2*l+1 << endl;
+				GlobalV::ofs_running << "dimension of des is " << 2*l+1 << std::endl;
 				
 				if(l==0)
 				{
@@ -203,7 +203,7 @@ const int &it, const int &ia, double *d, const int &nd)
 					int ndim = des.nr;
 					double* tmpd = new double[ndim]();
 					const int lwork = 2*ndim;
-					complex<double>* work = new complex<double>[lwork]();
+					std::complex<double>* work = new std::complex<double>[lwork]();
 					double* rwork = new double[3 * ndim - 2]();
 					int infor = 0;	
 					// diag by calling zheev
@@ -226,54 +226,54 @@ const int &it, const int &ia, double *d, const int &nd)
 
 
 void Numerical_Descriptor::jlq3d_overlap(
-    realArray &overlap_Q1,
-    realArray &overlap_Q2,
+    ModuleBase::realArray &overlap_Q1,
+    ModuleBase::realArray &overlap_Q2,
     const int &ik_ibz,
     const int &ik,
     const int &np,
-    const ComplexMatrix &psi)
+    const ModuleBase::ComplexMatrix &psi)
 {
-    TITLE("Numerical_Descriptor","jlq3d_overlap");
-    timer::tick("Numerical_Descriptor","jlq3d_overlap");
+    ModuleBase::TITLE("Numerical_Descriptor","jlq3d_overlap");
+    ModuleBase::timer::tick("Numerical_Descriptor","jlq3d_overlap");
 
-	GlobalV::ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS AND BLOCH WAVE FUNCTIONS" << endl;
-	GlobalV::ofs_running << " Q = < J_it_ia_il_in_im | Psi_n, k > " << endl;
+	GlobalV::ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS AND BLOCH WAVE FUNCTIONS" << std::endl;
+	GlobalV::ofs_running << " Q = < J_it_ia_il_in_im | Psi_n, k > " << std::endl;
 
-	const double normalization = (4 * PI) / sqrt(GlobalC::ucell.omega);// Peize Lin add normalization 2015-12-29
+	const double normalization = (4 * ModuleBase::PI) / sqrt(GlobalC::ucell.omega);// Peize Lin add normalization 2015-12-29
 
     const int total_lm = ( this->lmax + 1) * ( this->lmax + 1);
-    matrix ylm(total_lm, np);
+    ModuleBase::matrix ylm(total_lm, np);
 
-    Vector3<double> *gk = new Vector3 <double> [np];
+    ModuleBase::Vector3<double> *gk = new ModuleBase::Vector3 <double> [np];
     for (int ig=0; ig<np; ig++)
     {
         gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
     }
 
-    YlmReal::Ylm_Real(total_lm, np, gk, ylm);
+    ModuleBase::YlmReal::Ylm_Real(total_lm, np, gk, ylm);
 
-    GlobalV::ofs_running << "\n " << setw(5) << "ik"
-    << setw(8) << "Type1"
-    << setw(8) << "Atom1" 
-	<< setw(8) << "L"
-	<< endl;
+    GlobalV::ofs_running << "\n " << std::setw(5) << "ik"
+    << std::setw(8) << "Type1"
+    << std::setw(8) << "Atom1" 
+	<< std::setw(8) << "L"
+	<< std::endl;
 
     double *flq = new double[np];
-    complex<double> overlapQ = ZERO;
+    std::complex<double> overlapQ = ModuleBase::ZERO;
     for (int T1 = 0; T1 < GlobalC::ucell.ntype; T1++)
     {
         for (int I1 = 0; I1 < GlobalC::ucell.atoms[T1].na; I1++)
         {
-            complex<double> *sk = GlobalC::wf.get_sk(ik, T1, I1);
+            std::complex<double> *sk = GlobalC::wf.get_sk(ik, T1, I1);
             for (int L=0; L< lmax+1; L++)
             {
-                GlobalV::ofs_running << " " << setw(5) << ik+1
-                            << setw(8) << GlobalC::ucell.atoms[T1].label
-                            << setw(8) << I1+1 
-							<< setw(8) << L
-							<< endl;
+                GlobalV::ofs_running << " " << std::setw(5) << ik+1
+                            << std::setw(8) << GlobalC::ucell.atoms[T1].label
+                            << std::setw(8) << I1+1 
+							<< std::setw(8) << L
+							<< std::endl;
                 //OUT("l",l);
-                complex<double> lphase = normalization * pow(IMAG_UNIT, L);			// Peize Lin add normalization 2015-12-29
+                std::complex<double> lphase = normalization * pow(ModuleBase::IMAG_UNIT, L);			// Peize Lin add normalization 2015-12-29
                 for (int ie=0; ie < nmax; ie++)
                 {
                     for (int ig=0; ig<np; ig++)
@@ -287,10 +287,10 @@ void Numerical_Descriptor::jlq3d_overlap(
                         const int lm = L*L+m;
                         for (int ib=0; ib<GlobalV::NBANDS; ib++)
                         {
-                            complex<double> overlap_tmp = ZERO;
+                            std::complex<double> overlap_tmp = ModuleBase::ZERO;
                             for (int ig=0; ig<np; ig++)
                             {
-                                const complex<double> local_tmp = lphase * sk[ig] * ylm(lm, ig) * flq[ig];
+                                const std::complex<double> local_tmp = lphase * sk[ig] * ylm(lm, ig) * flq[ig];
                                 overlap_tmp += conj( local_tmp ) * psi(ib, ig); // psi is bloch orbitals
                             }
                             overlap_Q1(ik_ibz, ib, mu_index[T1](I1, L, ie, m)) = overlap_tmp.real();
@@ -305,17 +305,17 @@ void Numerical_Descriptor::jlq3d_overlap(
 
     delete[] flq;
     delete[] gk;
-    timer::tick("Numerical_Descriptor","jlq3d_overlap");
+    ModuleBase::timer::tick("Numerical_Descriptor","jlq3d_overlap");
     return;
 }
 
 
 void Numerical_Descriptor::init_mu_index(void)
 {
-	GlobalV::ofs_running << " Initialize the mu index for deepks" << endl;
-	GlobalV::ofs_running << " lmax = " << this->lmax << endl;
-	GlobalV::ofs_running << " nmax = " << this->nmax << endl;
-    Numerical_Descriptor::mu_index = new IntArray[GlobalC::ucell.ntype];
+	GlobalV::ofs_running << " Initialize the mu index for deepks" << std::endl;
+	GlobalV::ofs_running << " lmax = " << this->lmax << std::endl;
+	GlobalV::ofs_running << " nmax = " << this->nmax << std::endl;
+    Numerical_Descriptor::mu_index = new ModuleBase::IntArray[GlobalC::ucell.ntype];
 
 	assert(lmax>=0);
 	assert(nmax>0);
@@ -333,7 +333,7 @@ void Numerical_Descriptor::init_mu_index(void)
 		<< " number_of_atoms " << GlobalC::ucell.atoms[it].na
 		<< " number_of_L " << lmax+1
 		<< " number_of_n " << nmax
-		<< " number_of_m " << 2*lmax+1 << endl;
+		<< " number_of_m " << 2*lmax+1 << std::endl;
 
         for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{
@@ -353,7 +353,7 @@ void Numerical_Descriptor::init_mu_index(void)
 	}
 
 	this->nlocal = mu;
-	GlobalV::ofs_running << " total number of atomic orbitals " << nlocal << endl;
+	GlobalV::ofs_running << " total number of atomic orbitals " << nlocal << std::endl;
 
 	return;
 }

@@ -13,19 +13,19 @@ void Exx_Abfs::Screen::Cauchy::init(
 	const double threshold_in,
 	const Abfs::Vector3_Order<int> Born_von_Karman_period_in)
 {
-	TITLE("Exx_Abfs::Screen::Cauchy::init");
+	ModuleBase::TITLE("Exx_Abfs::Screen::Cauchy::init");
 	flag_screen_cauchy = flag_screen_cauchy_in;
 	threshold = threshold_in;
 	Born_von_Karman_period = Born_von_Karman_period_in;
 }
 
 void Exx_Abfs::Screen::Cauchy::cal_norm_C_max( 
-	const map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> & Cs,
-	const Element_Basis_Index::IndexLNM & index_lcaos,
-	const Element_Basis_Index::IndexLNM & index_abfs)
+	const std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<ModuleBase::matrix>>>> & Cs,
+	const ModuleBase::Element_Basis_Index::IndexLNM & index_lcaos,
+	const ModuleBase::Element_Basis_Index::IndexLNM & index_abfs)
 {
 	if(!flag_screen_cauchy)	return;
-	TITLE("Exx_Abfs::Screen::Cauchy::cal_norm_C_max");
+	ModuleBase::TITLE("Exx_Abfs::Screen::Cauchy::cal_norm_C_max");
 	
 	for( const auto & Cs1 : Cs )
 	{
@@ -38,19 +38,19 @@ void Exx_Abfs::Screen::Cauchy::cal_norm_C_max(
 			for( const auto & Cs3 : Cs2.second )
 			{
 				const Abfs::Vector3_Order<int> &box2 = Cs3.first;
-				const matrix & C = *Cs3.second;
+				const ModuleBase::matrix & C = *Cs3.second;
 
 				const size_t nw1 = index_lcaos[it1].count_size,
 				             nw2 = index_lcaos[it2].count_size,
 				             nw3 = index_abfs[it1].count_size;
 
 				{ //    || C(i) ||    || C(i) C^+(i) ||
-					valarray<double> C_norm2_outer(nw1);
-					valarray<double> C_norm4_outer(nw1);
+					std::valarray<double> C_norm2_outer(nw1);
+					std::valarray<double> C_norm4_outer(nw1);
 					for( size_t iw1=0; iw1!=nw1; ++iw1 )
 					{
 						// C_outer( iw2, iw3 ) = C( iw1, iw2, iw3 )
-						matrix C_outer( nw2, nw3 );
+						ModuleBase::matrix C_outer( nw2, nw3 );
 //						for( size_t iw2=0; iw2!=nw2; ++iw2 )
 //							memcpy( C_outer.c+iw2*nw3, C.c+(iw1*nw2+iw2)*nw3, sizeof(double)*nw3 );
 						memcpy( C_outer.c, C.c+iw1*nw2*nw3, sizeof(double)*nw2*nw3 );
@@ -63,12 +63,12 @@ void Exx_Abfs::Screen::Cauchy::cal_norm_C_max(
 				}
 
 				{ //    || C(j) ||    || C(j) C^+(j) ||
-					valarray<double> C_norm2_inner(nw2);
-					valarray<double> C_norm4_inner(nw2);
+					std::valarray<double> C_norm2_inner(nw2);
+					std::valarray<double> C_norm4_inner(nw2);
 					for( size_t iw2=0; iw2!=nw2; ++iw2 )
 					{
 						// C_inner( iw1, iw3 ) = C( iw1, iw2, iw3 )
-						matrix C_inner( nw1, nw3 );
+						ModuleBase::matrix C_inner( nw1, nw3 );
 //						for( size_t iw1=0; iw1!=nw1; ++iw1 )
 //							memcpy( C_inner.c+iw1*nw3, C.c+(iw1*nw2+iw2)*nw3, sizeof(double)*nw3 );
 						const size_t nw23 = nw2*nw3;
@@ -86,14 +86,14 @@ void Exx_Abfs::Screen::Cauchy::cal_norm_C_max(
 				}
 
 				/*
-				matrix C_norm2_12( nw1, nw2 );
+				ModuleBase::matrix C_norm2_12( nw1, nw2 );
 				for( size_t iw1=0; iw1!=nw1; ++iw1 )
 					for( size_t iw2=0; iw2!=nw2; ++iw2 )
 						C_norm2_12(iw1,iw2) = nrm2( nw3, C+iw1+iw2, 1 );
-				valarray<double> C_norm2_1(nw1);
+				std::valarray<double> C_norm2_1(nw1);
 				for( size_t iw1=0; iw1!=nw1; ++iw1 )
 					C_norm2_1(iw1) = nrm2( nw2, C_norm2_12+iw1, 1 );
-				valarray<double> C_norm2_2(nw2);
+				std::valarray<double> C_norm2_2(nw2);
 				for( size_t iw2=0; iw2!=nw2; ++iw2 )
 					C_norm2_2(iw2) = nrm2( nw1, C_norm2_12+iw2, 1 );
 
@@ -105,10 +105,10 @@ void Exx_Abfs::Screen::Cauchy::cal_norm_C_max(
 	}
 }
 
-void Exx_Abfs::Screen::Cauchy::cal_norm_V( const map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> & Vs )
+void Exx_Abfs::Screen::Cauchy::cal_norm_V( const std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_ptr<ModuleBase::matrix>>>> & Vs )
 {
 	if(!flag_screen_cauchy)	return;
-	TITLE("Exx_Abfs::Screen::Cauchy::cal_norm_V");
+	ModuleBase::TITLE("Exx_Abfs::Screen::Cauchy::cal_norm_V");
 	
 	for( const auto & Vs1 : Vs )
 	{
@@ -119,7 +119,7 @@ void Exx_Abfs::Screen::Cauchy::cal_norm_V( const map<size_t,map<size_t,map<Abfs:
 			for( const auto & Vs3 : Vs2.second )
 			{
 				const Abfs::Vector3_Order<int> &box2 = Vs3.first;
-				const matrix & V = *Vs3.second;
+				const ModuleBase::matrix & V = *Vs3.second;
 
 				V_norm4[iat1][iat2][box2] = sqrt( m_mT(V).norm() );		// \sqrt{ || V V^+ || }
 			}
@@ -127,10 +127,10 @@ void Exx_Abfs::Screen::Cauchy::cal_norm_V( const map<size_t,map<size_t,map<Abfs:
 	}
 }
 
-void Exx_Abfs::Screen::Cauchy::cal_norm_D_max( const vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> & Ds )
+void Exx_Abfs::Screen::Cauchy::cal_norm_D_max( const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> & Ds )
 {
 	if(!flag_screen_cauchy)	return;
-	TITLE("Exx_Abfs::Screen::Cauchy::cal_norm_D_max");
+	ModuleBase::TITLE("Exx_Abfs::Screen::Cauchy::cal_norm_D_max");
 	
 	for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 	{
@@ -143,7 +143,7 @@ void Exx_Abfs::Screen::Cauchy::cal_norm_D_max( const vector<map<size_t,map<size_
 				for( const auto & DsC : DsB.second )
 				{
 					const Abfs::Vector3_Order<int> &box2 = DsC.first;
-					const matrix & D = DsC.second;
+					const ModuleBase::matrix & D = DsC.second;
 					const double D_norm4 = sqrt( m_mT(D).norm() );											// \sqrt{ || D D^+ || }
 					D_norm4_max[iat1][iat2][box2] = max( D_norm4, D_norm4_max[iat1][iat2][box2] );			// \sqrt{ || D D^+ || }
 				}
@@ -172,19 +172,19 @@ Exx_Abfs::Screen::Cauchy::Info_Step Exx_Abfs::Screen::Cauchy::input_info(
 
 	info_step.V_norm4 = V_norm4.at(iat1).at(iat2).at(box2);
 
-	if( const double*const D_ptr = static_cast<const double*const>(MAP_EXIST( D_norm4_max, iat3, iat4, Abfs::Vector3_Order<int>(box2-box3+box4)%Born_von_Karman_period )) )
+	if( const double*const D_ptr = static_cast<const double*const>(ModuleBase::GlobalFunc::MAP_EXIST( D_norm4_max, iat3, iat4, Abfs::Vector3_Order<int>(box2-box3+box4)%Born_von_Karman_period )) )
 		info_step.D34_norm4_max = *D_ptr;
 	else
 		info_step.D34_norm4_max = 0;
-	if( const double*const D_ptr = static_cast<const double*const>(MAP_EXIST( D_norm4_max, iat3, iat2, Abfs::Vector3_Order<int>(box2-box3     )%Born_von_Karman_period )) )
+	if( const double*const D_ptr = static_cast<const double*const>(ModuleBase::GlobalFunc::MAP_EXIST( D_norm4_max, iat3, iat2, Abfs::Vector3_Order<int>(box2-box3     )%Born_von_Karman_period )) )
 		info_step.D32_norm4_max = *D_ptr;
 	else
 		info_step.D32_norm4_max = 0;
-	if( const double*const D_ptr = static_cast<const double*const>(MAP_EXIST( D_norm4_max, iat1, iat4, Abfs::Vector3_Order<int>(box2     +box4)%Born_von_Karman_period )) )
+	if( const double*const D_ptr = static_cast<const double*const>(ModuleBase::GlobalFunc::MAP_EXIST( D_norm4_max, iat1, iat4, Abfs::Vector3_Order<int>(box2     +box4)%Born_von_Karman_period )) )
 		info_step.D14_norm4_max = *D_ptr;
 	else
 		info_step.D14_norm4_max = 0;
-	if( const double*const D_ptr = static_cast<const double*const>(MAP_EXIST( D_norm4_max, iat1, iat2, Abfs::Vector3_Order<int>(box2          )%Born_von_Karman_period )) )
+	if( const double*const D_ptr = static_cast<const double*const>(ModuleBase::GlobalFunc::MAP_EXIST( D_norm4_max, iat1, iat2, Abfs::Vector3_Order<int>(box2          )%Born_von_Karman_period )) )
 		info_step.D12_norm4_max = *D_ptr;
 	else
 		info_step.D12_norm4_max = 0;
@@ -205,7 +205,7 @@ int Exx_Abfs::Screen::Cauchy::postcalA( const Info_Step & info_step ) const
 
 int Exx_Abfs::Screen::Cauchy::postcalB(
 	const Info_Step & info_step,
-	const matrix & VC_T,			// iw2, \mu1, iw4
+	const ModuleBase::matrix & VC_T,			// iw2, \mu1, iw4
 	const size_t range_iw2,
 	const size_t range_mu1,
 	const size_t range_iw4,
@@ -233,7 +233,7 @@ int Exx_Abfs::Screen::Cauchy::postcalB(
 
 bool Exx_Abfs::Screen::Cauchy::postcalC(
 	const Info_Step & info_step,
-	const matrix & DVC,				// iw1/iw3, \mu1, iw2/iw4
+	const ModuleBase::matrix & DVC,				// iw1/iw3, \mu1, iw2/iw4
 	const size_t range_iw13,
 	const size_t range_mu1,
 	const size_t range_iw24,
@@ -268,15 +268,15 @@ bool Exx_Abfs::Screen::Cauchy::postcalC(
 			}	
 			break;
 		default:
-			throw domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::domain_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
 }
 
 // max_j \sqrt{ \sum_i m(i,j)^2 }
-double Exx_Abfs::Screen::Cauchy::cal_matrix_inner_max( const matrix & m, const size_t ni, const size_t nj ) const
+double Exx_Abfs::Screen::Cauchy::cal_matrix_inner_max( const ModuleBase::matrix & m, const size_t ni, const size_t nj ) const
 {
 	assert( m.nr*m.nc == ni*nj );
-	valarray<double> m_inner(0.0,nj);
+	std::valarray<double> m_inner(0.0,nj);
 	double * const m_inner_ptr = &m_inner[0];
 	for( size_t i=0; i<ni; ++i )
 	{
@@ -289,19 +289,19 @@ double Exx_Abfs::Screen::Cauchy::cal_matrix_inner_max( const matrix & m, const s
 }
 
 // max_i \sqrt{ \sum_j m(i,j)^2 }
-double Exx_Abfs::Screen::Cauchy::cal_matrix_outer_max( const matrix & m, const size_t ni, const size_t nj ) const
+double Exx_Abfs::Screen::Cauchy::cal_matrix_outer_max( const ModuleBase::matrix & m, const size_t ni, const size_t nj ) const
 {
 	assert( m.nr*m.nc == ni*nj );
-	valarray<double> m_outer(ni);
+	std::valarray<double> m_outer(ni);
 	for( size_t i=0; i<ni; ++i )
 		m_outer[i] = LapackConnector::nrm2( nj, m.c+i*nj, 1 );
 	return m_outer.max();
 }
 
 // m m^+
-matrix Exx_Abfs::Screen::Cauchy::m_mT( const matrix & m ) const
+ModuleBase::matrix Exx_Abfs::Screen::Cauchy::m_mT( const ModuleBase::matrix & m ) const
 {
-	matrix mm( m.nr, m.nr, false );
+	ModuleBase::matrix mm( m.nr, m.nr, false );
 	LapackConnector::gemm( 'N','T', m.nr,m.nr,m.nc, 1, m.c,m.nc, m.c,m.nc, 0, mm.c,mm.nc );
 	return mm;
 }

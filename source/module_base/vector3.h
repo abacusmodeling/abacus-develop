@@ -8,7 +8,8 @@
 #include <cmath>
 #include <iostream>
 #include <iomanip>
-using namespace std;
+namespace ModuleBase
+{
 
 template <class T>
 class Vector3
@@ -88,17 +89,17 @@ template <class T> inline bool operator ==(const Vector3<T> &u, const Vector3<T>
 
 template <class T> void Vector3<T>::print(void)const
 {
-	cout.precision(5) ;
-	cout << "(" << setw(10) << x << "," << setw(10) << y << ","
-	<< setw(10) << z  << ")"  << endl ;
+	std::cout.precision(5) ;
+	std::cout << "(" << std::setw(10) << x << "," << std::setw(10) << y << ","
+	<< std::setw(10) << z  << ")"  << std::endl ;
 	return ;
 }
 template<class T> static std::ostream & operator << ( std::ostream &os, const Vector3<T> &u )
 {
-	os << "(" << setw(10) << u.x << "," << setw(10) << u.y << "," << setw(10) << u.z  << ")";
+	os << "(" << std::setw(10) << u.x << "," << std::setw(10) << u.y << "," << std::setw(10) << u.z  << ")";
 	return os;
 }
 
-
+}
 
 #endif

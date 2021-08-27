@@ -3,9 +3,9 @@
 #include "../module_base/math_integral.h"
 
 //NLCC term, need to be tested
-void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
+void Stress_Func::stress_cc(ModuleBase::matrix& sigma, const bool is_pw)
 {
-	timer::tick("Stress_Func","stress_cc");
+	ModuleBase::timer::tick("Stress_Func","stress_cc");
         
 	int nt,ng,l,m,ir;
 	double fact=1.0;
@@ -15,7 +15,7 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 		fact = 2.0; //is_pw:PW basis, gamma_only need to double.
 	}
 
-	complex<double> sigmadiag;
+	std::complex<double> sigmadiag;
 	double* rhocg;
 
 	int judge=0;
@@ -36,18 +36,18 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
     const auto etxc_vtxc_v = H_XC_pw::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 	H_XC_pw::etxc    = std::get<0>(etxc_vtxc_v);			// may delete?
 	H_XC_pw::vtxc    = std::get<1>(etxc_vtxc_v);			// may delete?
-	const matrix vxc = std::get<2>(etxc_vtxc_v);
+	const ModuleBase::matrix vxc = std::get<2>(etxc_vtxc_v);
 
-	complex<double> * psic = new complex<double> [GlobalC::pw.nrxx];
+	std::complex<double> * psic = new std::complex<double> [GlobalC::pw.nrxx];
 
-	ZEROS(psic, GlobalC::pw.nrxx);
+	ModuleBase::GlobalFunc::ZEROS(psic, GlobalC::pw.nrxx);
 
 	if(GlobalV::NSPIN==1||GlobalV::NSPIN==4)
 	{
 		for(ir=0;ir<GlobalC::pw.nrxx;ir++)
 		{
 			// psic[ir] = vxc(0,ir);
-			psic[ir] = complex<double>(vxc(0, ir),  0.0);
+			psic[ir] = std::complex<double>(vxc(0, ir),  0.0);
 		}
 	}
 	else
@@ -63,7 +63,7 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 
 	//psic cantains now Vxc(G)
 	rhocg= new double [GlobalC::pw.nggm];
-	ZEROS(rhocg, GlobalC::pw.nggm);
+	ModuleBase::GlobalFunc::ZEROS(rhocg, GlobalC::pw.nggm);
 
 	sigmadiag=0.0;
 	for(nt=0;nt<GlobalC::ucell.ntype;nt++)
@@ -106,7 +106,7 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 				{
 					for (m = 0;m< 3;m++)
 					{
-						const complex<double> t = conj(psic[GlobalC::pw.ig2fftc[ng]]) * GlobalC::pw.strucFac(nt, ng) * rhocg[GlobalC::pw.ig2ngg[ng]] * GlobalC::ucell.tpiba *
+						const std::complex<double> t = conj(psic[GlobalC::pw.ig2fftc[ng]]) * GlobalC::pw.strucFac(nt, ng) * rhocg[GlobalC::pw.ig2ngg[ng]] * GlobalC::ucell.tpiba *
 												  GlobalC::pw.get_G_cartesian_projection(ng, l) * GlobalC::pw.get_G_cartesian_projection(ng, m) 
 												  / norm_g * fact;
 						//						sigmacc [l][ m] += t.real();
@@ -133,7 +133,7 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 	delete[] rhocg;
 	delete[] psic;
 
-	timer::tick("Stress_Func","stress_cc");
+	ModuleBase::timer::tick("Stress_Func","stress_cc");
 	return;
 }
 
@@ -183,8 +183,8 @@ void Stress_Func::deriv_drhoc
 		{
 			aux [ir] = r [ir] * rhoc [ir] * (r [ir] * cos (gx * r [ir] ) / gx - sin (gx * r [ir] ) / pow(gx,2));
 		}//ir
-		Integral::Simpson_Integral(mesh, aux, rab, rhocg1);
-		drhocg [igl] = FOUR_PI / GlobalC::ucell.omega * rhocg1;
+		ModuleBase::Integral::Simpson_Integral(mesh, aux, rab, rhocg1);
+		drhocg [igl] = ModuleBase::FOUR_PI / GlobalC::ucell.omega * rhocg1;
 	}//igl
 	
 	delete [] aux;

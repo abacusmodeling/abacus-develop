@@ -16,13 +16,13 @@ public:
 	Atom_pseudo();
 	~Atom_pseudo();
 
-	Vector3<int> *mbl; // whether the atoms can move or not
-	string pseudo_fn; // File name of pseudopotentials
+	ModuleBase::Vector3<int> *mbl; // whether the atoms can move or not
+	std::string pseudo_fn; // File name of pseudopotentials
 	double mass; // the mass of atom
 	bool flag_empty_element = false; // whether is the empty element for bsse.	Peize Lin add 2021.04.07
 
 	// mohan add 2021-05-07
-	ComplexArray d_so; //(:,:,:), spin-orbit case
+	ModuleBase::ComplexArray d_so; //(:,:,:), spin-orbit case
 	int nproj;
 	int nproj_soc; // dimension of D_ij^so
 	int non_zero_count_soc[4];
@@ -30,14 +30,14 @@ public:
 	int *index2_soc[4];
 
 	void set_d_so( // mohan add 2021-05-07
-		ComplexMatrix &d_so_in,
+		ModuleBase::ComplexMatrix &d_so_in,
 		const int &nproj_in,
 		const int &nproj_in_so,
 		const bool has_so);
 	
 protected:
 
-	void print_atom(ofstream &ofs);
+	void print_atom(std::ofstream &ofs);
 
 #ifdef __MPI
 	void bcast_atom_pseudo(const int &na);

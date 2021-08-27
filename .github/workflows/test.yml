@@ -28,7 +28,7 @@ jobs:
           mode: start
           github-token: ${{ secrets.PAT }}
           ec2-image-id: ami-07758124f42f794bf
-          ec2-instance-type: c5.xlarge
+          ec2-instance-type: c5.2xlarge
           subnet-id: subnet-f7edb991
           security-group-id: sg-fd5185e7
   test:
@@ -42,6 +42,8 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
       - name: Build and Test
+        env:
+          GTEST_COLOR: 'yes'
         run: |
           cmake -B build
           cmake --build build -j16

@@ -1,0 +1,34 @@
+INPUT_PARAMETERS
+#Parameters	(General)
+suffix                  autotest
+pseudo_dir		./
+read_file_dir           ./
+ntype			1	
+nbands			12
+calculation		md
+
+#Parameter (Accuracy)
+ecutwfc			60
+niter			30
+
+smearing		gaussian
+sigma			0.02
+
+basis_type		lcao
+out_charge		1
+gamma_only		0
+nstep			2
+
+stress                  1
+stress_thr              1e-6
+force                   1
+force_thr_ev            1.0e-3
+
+dr2			1.0e-6
+
+tddft			1
+
+md_mdtype		0
+md_dt			0.01
+ocp                     1
+ocp_set                 5*2 2*0 1*2 4*0

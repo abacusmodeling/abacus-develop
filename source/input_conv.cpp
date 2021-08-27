@@ -21,12 +21,13 @@
 #include "src_lcao/FORCE_STRESS.h"
 #include "src_lcao/local_orbital_charge.h"
 #include "src_lcao/ELEC_evolve.h"
-#endif 
+#include "src_lcao/dftu.h"
+#endif
 
 void Input_Conv::Convert(void)
 {
-    TITLE("Input_Conv","Convert");
-	timer::tick("Input_Conv","Convert");
+    ModuleBase::TITLE("Input_Conv","Convert");
+	ModuleBase::timer::tick("Input_Conv","Convert");
 //----------------------------------------------------------
 // main parameters / electrons / spin ( 10/16 )
 //----------------------------------------------------------
@@ -35,18 +36,21 @@ void Input_Conv::Convert(void)
 	GlobalV::global_wannier_card = INPUT.wannier_card;
     if(INPUT.kpoint_file!= "") GlobalV::global_kpoint_card = INPUT.kpoint_file;
     if(INPUT.pseudo_dir != "") GlobalV::global_pseudo_dir = INPUT.pseudo_dir + "/";
+	if(INPUT.orbital_dir != "") GlobalV::global_orbital_dir = INPUT.orbital_dir + "/";
     GlobalV::global_pseudo_type = INPUT.pseudo_type;
-	GlobalC::ucell.latName = INPUT.latname; 
+	GlobalC::ucell.latName = INPUT.latname;
 	GlobalC::ucell.ntype = INPUT.ntype;
 	GlobalC::ucell.lmaxmax = INPUT.lmaxmax;
 	GlobalC::ucell.set_vel = INPUT.set_vel;
 
     GlobalV::NBANDS = INPUT.nbands;
+	GlobalC::wf.seed = INPUT.seed;
+	GlobalC::pw.seed = INPUT.seed;
     GlobalV::NBANDS_ISTATE = INPUT.nbands_istate;
 	GlobalV::NPOOL = INPUT.npool;
 	GlobalV::CALCULATION = INPUT.calculation;
 
-	GlobalV::PSEUDORCUT = INPUT.pseudo_rcut; 
+	GlobalV::PSEUDORCUT = INPUT.pseudo_rcut;
     GlobalV::RENORMWITHMESH = INPUT.renormwithmesh;
 
 	// qianrui add 2021-2-5
@@ -65,8 +69,8 @@ void Input_Conv::Convert(void)
 	Efield::eamp = INPUT.eamp;
 
 	// optical
-	Optical::opt_epsilon2=INPUT.opt_epsilon2;	// mohan add 2010-03-24	
-	Optical::opt_nbands=INPUT.opt_nbands;		// number of bands for optical transition.	
+	Optical::opt_epsilon2=INPUT.opt_epsilon2;	// mohan add 2010-03-24
+	Optical::opt_nbands=INPUT.opt_nbands;		// number of bands for optical transition.
 
 	GlobalV::DFT_FUNCTIONAL = INPUT.dft_functional;
     GlobalV::NSPIN = INPUT.nspin;
@@ -133,7 +137,7 @@ void Input_Conv::Convert(void)
 	}
 	else
 	{
-		WARNING_QUIT("Input", "fixed_axes should be None,a,b,c,ab,ac,bc or abc!");
+		ModuleBase::WARNING_QUIT("Input", "fixed_axes should be None,a,b,c,ab,ac,bc or abc!");
 	}
 
 	GlobalV::MOVE_IONS = INPUT.ion_dynamics;
@@ -179,6 +183,9 @@ void Input_Conv::Convert(void)
 	GlobalV::T_IN_H = INPUT.t_in_h;
 	GlobalV::VL_IN_H = INPUT.vl_in_h;
 	GlobalV::VNL_IN_H = INPUT.vnl_in_h;
+	GlobalV::VH_IN_H = INPUT.vh_in_h;
+	GlobalV::VXC_IN_H = INPUT.vxc_in_h;
+	GlobalV::VION_IN_H = INPUT.vion_in_h;
 	GlobalV::TEST_FORCE = INPUT.test_force;
 	GlobalV::TEST_STRESS = INPUT.test_stress;
 
@@ -195,14 +202,14 @@ void Input_Conv::Convert(void)
 	GlobalC::wf.mem_saver = INPUT.mem_saver; //mohan add 2010-09-07
 	GlobalC::en.printe    = INPUT.printe; // mohan add 2011-03-16
 
-    
+
 //----------------------------------------------------------
 // about spectrum, pengfei 2016-12-14
 //----------------------------------------------------------
 #ifdef __LCAO
-	if( (INPUT.spectral_type == "eels" && INPUT.eels_method == 0) 
-		|| (INPUT.spectral_type == "None" 
-		&& INPUT.eels_method == 0 
+	if( (INPUT.spectral_type == "eels" && INPUT.eels_method == 0)
+		|| (INPUT.spectral_type == "None"
+		&& INPUT.eels_method == 0
 		&& INPUT.kmesh_interpolation) )
 	{
 		if(INPUT.spectral_type == "eels")
@@ -219,15 +226,15 @@ void Input_Conv::Convert(void)
 		GlobalC::chi0_hilbert.eta = INPUT.eta;
 		GlobalC::chi0_hilbert.domega = INPUT.domega;
 		GlobalC::chi0_hilbert.nomega = INPUT.nomega;
-		GlobalC::chi0_hilbert.dim = INPUT.ecut_chi; 
+		GlobalC::chi0_hilbert.dim = INPUT.ecut_chi;
 		//GlobalC::chi0_hilbert.oband = INPUT.oband;
 
-		GlobalC::chi0_hilbert.q_start[0] = INPUT.q_start[0];  
-		GlobalC::chi0_hilbert.q_start[1] = INPUT.q_start[1]; 
+		GlobalC::chi0_hilbert.q_start[0] = INPUT.q_start[0];
+		GlobalC::chi0_hilbert.q_start[1] = INPUT.q_start[1];
 		GlobalC::chi0_hilbert.q_start[2] = INPUT.q_start[2];
 
-		GlobalC::chi0_hilbert.direct[0] = INPUT.q_direct[0]; 
-		GlobalC::chi0_hilbert.direct[1] = INPUT.q_direct[1]; 
+		GlobalC::chi0_hilbert.direct[0] = INPUT.q_direct[0];
+		GlobalC::chi0_hilbert.direct[1] = INPUT.q_direct[1];
 		GlobalC::chi0_hilbert.direct[2] = INPUT.q_direct[2];
 
 		//GlobalC::chi0_hilbert.start_q = INPUT.start_q;
@@ -241,16 +248,16 @@ void Input_Conv::Convert(void)
 		GlobalC::chi0_hilbert.kmesh_interpolation = INPUT.kmesh_interpolation;
 		for(int i=0; i<100; i++)
 		{
-			GlobalC::chi0_hilbert.qcar[i][0] = INPUT.qcar[i][0]; 
-			GlobalC::chi0_hilbert.qcar[i][1] = INPUT.qcar[i][1]; 
-			GlobalC::chi0_hilbert.qcar[i][2] = INPUT.qcar[i][2]; 
+			GlobalC::chi0_hilbert.qcar[i][0] = INPUT.qcar[i][0];
+			GlobalC::chi0_hilbert.qcar[i][1] = INPUT.qcar[i][1];
+			GlobalC::chi0_hilbert.qcar[i][2] = INPUT.qcar[i][2];
 		}
-		GlobalC::chi0_hilbert.lcao_box[0] = INPUT.lcao_box[0]; 
-		GlobalC::chi0_hilbert.lcao_box[1] = INPUT.lcao_box[1]; 
+		GlobalC::chi0_hilbert.lcao_box[0] = INPUT.lcao_box[0];
+		GlobalC::chi0_hilbert.lcao_box[1] = INPUT.lcao_box[1];
 		GlobalC::chi0_hilbert.lcao_box[2] = INPUT.lcao_box[2];
 	}
 #endif
-	
+
 	//if( INPUT.epsilon && (INPUT.epsilon_choice == 1))
 	if( INPUT.spectral_type == "eels" && INPUT.eels_method == 1)
 	{
@@ -262,18 +269,18 @@ void Input_Conv::Convert(void)
 		GlobalC::chi0_standard.nomega = INPUT.nomega;
 		GlobalC::chi0_standard.dim = INPUT.ecut_chi;
 		//GlobalC::chi0_standard.oband = INPUT.oband;
-		GlobalC::chi0_standard.q_start[0] = INPUT.q_start[0]; 
-	 	GlobalC::chi0_standard.q_start[1] = INPUT.q_start[1]; 
+		GlobalC::chi0_standard.q_start[0] = INPUT.q_start[0];
+	 	GlobalC::chi0_standard.q_start[1] = INPUT.q_start[1];
 		GlobalC::chi0_standard.q_start[2] = INPUT.q_start[2];
-		GlobalC::chi0_standard.direct[0] = INPUT.q_direct[0];  
-		GlobalC::chi0_standard.direct[1] = INPUT.q_direct[1]; 
+		GlobalC::chi0_standard.direct[0] = INPUT.q_direct[0];
+		GlobalC::chi0_standard.direct[1] = INPUT.q_direct[1];
 		GlobalC::chi0_standard.direct[2] = INPUT.q_direct[2];
 		//GlobalC::chi0_standard.start_q = INPUT.start_q;
 		//GlobalC::chi0_standard.interval_q = INPUT.interval_q;
 		GlobalC::chi0_standard.nq = INPUT.nq;
-		GlobalC::chi0_standard.out_epsilon = INPUT.out_epsilon;		
+		GlobalC::chi0_standard.out_epsilon = INPUT.out_epsilon;
 	}
-	
+
 	//if( INPUT.epsilon0 && (INPUT.epsilon0_choice == 1) )
 	if( INPUT.spectral_type == "absorption" && INPUT.absorption_method == 1)
 	{
@@ -287,7 +294,7 @@ void Input_Conv::Convert(void)
 		GlobalC::epsilon0_pwscf.metalcalc = INPUT.metalcalc;
 		GlobalC::epsilon0_pwscf.degauss = INPUT.eps_degauss;
 	}
-	
+
 	//if( INPUT.epsilon0 && (INPUT.epsilon0_choice == 0))
 	if( INPUT.spectral_type == "absorption" && INPUT.absorption_method == 0)
 	{
@@ -298,10 +305,28 @@ void Input_Conv::Convert(void)
 		GlobalC::epsilon0_vasp.eta = INPUT.eta;
 	}
 
+	if(INPUT.dft_plus_u)
+	{
+		GlobalC::dftu.dftu_type = INPUT.dftu_type;
+		GlobalC::dftu.double_counting = INPUT.double_counting;
+		GlobalC::dftu.Yukawa = INPUT.yukawa_potential;
+		GlobalC::dftu.omc=INPUT.omc;
+		GlobalC::dftu.orbital_corr=INPUT.orbital_corr;
+		if(!INPUT.yukawa_potential)
+		{
+			GlobalC::dftu.U = INPUT.hubbard_u;            //Hubbard Coulomb interaction parameter U(ev)
+			GlobalC::dftu.J = INPUT.hund_j;               //Hund exchange parameter J(ev)
+		}
+	}
+#ifndef __CMD
+	GlobalC::ucell.input_mag=INPUT.input_mag;
+	GlobalC::ucell.n_mag_at=INPUT.n_mag_at;
+	GlobalC::ucell.atom_mag=INPUT.atom_mag;
+#endif
 //--------------------------------------------
 // added by zhengdy-soc
 //--------------------------------------------
-	if(INPUT.noncolin||INPUT.lspinorb) 
+	if(INPUT.noncolin||INPUT.lspinorb)
 	{
 		GlobalV::NSPIN = 4;
 	}
@@ -325,13 +350,13 @@ void Input_Conv::Convert(void)
 		delete[] GlobalC::ucell.magnet.m_loc_;
 		delete[] GlobalC::ucell.magnet.angle1_;
 		delete[] GlobalC::ucell.magnet.angle2_;
-		GlobalC::ucell.magnet.m_loc_ = new Vector3<double> [INPUT.ntype];
+		GlobalC::ucell.magnet.m_loc_ = new ModuleBase::Vector3<double> [INPUT.ntype];
 		GlobalC::ucell.magnet.angle1_ = new double[INPUT.ntype];
 		GlobalC::ucell.magnet.angle2_ = new double[INPUT.ntype];
-		for(int i = 0;i<INPUT.ntype;i++)
+		for (int i = 0; i < INPUT.ntype; i++)
 		{
-			GlobalC::ucell.magnet.angle1_[i] = INPUT.angle1[i]/180*PI;
-			GlobalC::ucell.magnet.angle2_[i] = INPUT.angle2[i]/180*PI;
+			GlobalC::ucell.magnet.angle1_[i] = INPUT.angle1[i] / 180 * ModuleBase::PI;
+			GlobalC::ucell.magnet.angle2_[i] = INPUT.angle2[i] / 180 * ModuleBase::PI;
 		}
 #ifdef __MPI
 //			Parallel_Common::bcast_double(GlobalC::ucell.magnet.angle1_[i]);
@@ -340,14 +365,14 @@ void Input_Conv::Convert(void)
 	}
 	else{
 		delete[] GlobalC::ucell.magnet.m_loc_;
-		GlobalC::ucell.magnet.m_loc_ = new Vector3<double> [INPUT.ntype];
+		GlobalC::ucell.magnet.m_loc_ = new ModuleBase::Vector3<double> [INPUT.ntype];
 		GlobalV::LSPINORB = false;
 		GlobalV::NONCOLIN = false;
 		GlobalV::DOMAG = false;
 		GlobalV::DOMAG_Z = false;
 		GlobalV::NPOL = 1;
 	}
-	
+
 //----------------------------------------------------------
 // Fuxiang He add 2016-10-26
 //----------------------------------------------------------
@@ -360,7 +385,7 @@ void Input_Conv::Convert(void)
 	ELEC_evolve::td_val_elec_02 = INPUT.td_val_elec_02;
 	ELEC_evolve::td_val_elec_03 = INPUT.td_val_elec_03;
 	ELEC_evolve::td_vext = INPUT.td_vext;
-	ELEC_evolve::td_vext_dire = INPUT.td_vext_dire;	
+	ELEC_evolve::td_vext_dire = INPUT.td_vext_dire;
 	ELEC_evolve::td_timescale = INPUT.td_timescale;
 	ELEC_evolve::td_vexttype = INPUT.td_vexttype;
 	ELEC_evolve::td_vextout = INPUT.td_vextout;
@@ -369,23 +394,21 @@ void Input_Conv::Convert(void)
 
 
 
-	// jiyy add 2020.10.11	
-	GlobalV::ocp = INPUT.ocp;
-     //ocp_n = INPUT.ocp_n;
-    GlobalV::ocp_set = INPUT.ocp_set;
+	// jiyy add 2020.10.11
+	// fix bugs of ocp_set   --  Yuanbo Li 2021/8/17
     if(GlobalV::ocp == 1)
 	{
 		int count = 0;
-		string pattern("([0-9]+\\*[0-9.]+|[0-9,.]+)");
-		vector<string> str;
-		string::size_type pos1, pos2;
-		string c = " ";
+		std::string pattern("([0-9]+\\*[0-9.]+|[0-9,.]+)");
+		std::vector<std::string> str;
+		std::string::size_type pos1, pos2;
+		std::string c = " ";
 		pos2 = GlobalV::ocp_set.find(c);
 		pos1 = 0;
-		while(string::npos != pos2)
+		while(std::string::npos != pos2)
 		{
 			str.push_back(GlobalV::ocp_set.substr(pos1, pos2-pos1));
- 
+
 			pos1 = pos2 + c.size();
 			pos2 = GlobalV::ocp_set.find(c, pos1);
 		}
@@ -400,17 +423,17 @@ void Input_Conv::Convert(void)
 		const size_t nmatch=1;
 		for(int i=0; i<str.size(); ++i)
 		{
-			if(str[i] == "") 
+			if(str[i] == "")
 			{
 				continue;
 			}
 			int status = regexec(&reg, str[i].c_str(), nmatch, pmatch, 0);
-			string sub_str = "";
+			std::string sub_str = "";
 			for(int j=pmatch[0].rm_so; j!=pmatch[0].rm_eo; ++j)
 			{
 				sub_str += str[i][j];
 			}
-			string sub_pattern("\\*");
+			std::string sub_pattern("\\*");
 			regex_t sub_reg;
 			regcomp(&sub_reg, sub_pattern.c_str(), REG_EXTENDED);
 			regmatch_t sub_pmatch[1];
@@ -420,8 +443,8 @@ void Input_Conv::Convert(void)
 				int pos = sub_str.find("*");
 				int num = stoi(sub_str.substr(0, pos));
 				double occ = stof(sub_str.substr(pos+1, sub_str.size()));
-				vector<double> ocp_temp(num, occ);
-				const vector<double>::iterator dest = GlobalV::ocp_kb.begin()+count;
+				std::vector<double> ocp_temp(num, occ);
+				const std::vector<double>::iterator dest = GlobalV::ocp_kb.begin()+count;
 				copy(ocp_temp.begin(), ocp_temp.end(), dest);
 				count += num;
 			}
@@ -432,16 +455,16 @@ void Input_Conv::Convert(void)
 			}
 		}
 	}
-		
+
     GlobalV::mulliken = INPUT.mulliken;//qifeng add 2019/9/10
 
 //----------------------------------------------------------
 // about restart, // Peize Lin add 2020-04-04
-//----------------------------------------------------------	
+//----------------------------------------------------------
 	if(INPUT.restart_save)
 	{
 		GlobalC::restart.folder = GlobalV::global_out_dir + "restart/";
-		const string command0 =  "test -d " + GlobalC::restart.folder + " || mkdir " + GlobalC::restart.folder;
+		const std::string command0 =  "test -d " + GlobalC::restart.folder + " || mkdir " + GlobalC::restart.folder;
 		if(GlobalV::MY_RANK==0)
 			system( command0.c_str() );
 		if(INPUT.exx_hybrid_type=="no")
@@ -470,7 +493,7 @@ void Input_Conv::Convert(void)
 
 //----------------------------------------------------------
 // about exx, Peize Lin add 2018-06-20
-//----------------------------------------------------------	
+//----------------------------------------------------------
 #ifdef __LCAO
 	if(INPUT.exx_hybrid_type=="no")
 	{
@@ -546,11 +569,11 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------
 // charge mixing(3/3)
 //----------------------------------------------------------
-    GlobalC::CHR.set_mixing(INPUT.mixing_mode, INPUT.mixing_beta, 
+    GlobalC::CHR.set_mixing(INPUT.mixing_mode, INPUT.mixing_beta,
 	INPUT.mixing_ndim, INPUT.mixing_gg0); //mohan modify 2014-09-27, add mixing_gg0
 
 //----------------------------------------------------------
-// iteration 
+// iteration
 //----------------------------------------------------------
     GlobalV::NITER = INPUT.niter;
     GlobalV::NSTEP = INPUT.nstep;
@@ -586,7 +609,7 @@ void Input_Conv::Convert(void)
 //	ORB.ecutwfc = INPUT.lcao_ecut;
 //	ORB.dk = INPUT.lcao_dk;
 //	ORB.dR = INPUT.lcao_dr;
-//	ORB.Rmax = INPUT.lcao_rmax; 
+//	ORB.Rmax = INPUT.lcao_rmax;
 
 	// mohan add 2021-02-16
 	berryphase::berry_phase_flag = INPUT.berry_phase;
@@ -596,12 +619,11 @@ void Input_Conv::Convert(void)
 	{
 		if(GlobalV::BASIS_TYPE != "pw")
 		{
-			 WARNING_QUIT("Input_conv","add metaGGA for pw first");
+			 ModuleBase::WARNING_QUIT("Input_conv","add metaGGA for pw first");
 		}
 		GlobalV::DFT_META = 1;
 	}
 
-	timer::tick("Input_Conv","Convert");
+	ModuleBase::timer::tick("Input_Conv","Convert");
     return;
 }
-

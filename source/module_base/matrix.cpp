@@ -9,7 +9,6 @@
 #include <cstdlib>
 #include <limits>
 
-using namespace std;
 #include "matrix.h"
 
 #ifdef __NORMAL
@@ -24,15 +23,17 @@ using namespace std;
 // ********************************************************
 
 //int matrix::mCount = 0;
+namespace ModuleBase
+{
 
 void matrixAlloc()
 {
 // mohan add 2021-04-25
 #ifdef __NORMAL
-	cout << "Allocation error for Matrix" << endl;
+	std::cout << "Allocation error for Matrix" << std::endl;
 	exit(0);
 #else
-	WARNING_QUIT("matrix","Allocation error for Matrix");
+	ModuleBase::WARNING_QUIT("matrix","Allocation error for Matrix");
 #endif
 }
 
@@ -43,9 +44,9 @@ matrix::matrix( const int nrows, const int ncols, const bool flag_zero )
 {
 	if( nr && nc )
 	{
-		auto handler_old = set_new_handler(matrixAlloc);
+		auto handler_old = std::set_new_handler(matrixAlloc);
 		c = new double[nr*nc];
-		set_new_handler(handler_old);
+		std::set_new_handler(handler_old);
 		if(flag_zero)	this->zero_out();
 	}
 }
@@ -57,9 +58,9 @@ matrix::matrix( const matrix &m_in )
 {
 	if( nr && nc )
 	{
-		auto handler_old = set_new_handler(matrixAlloc);
+		auto handler_old = std::set_new_handler(matrixAlloc);
 		c = new double[nr*nc];
-		set_new_handler(handler_old);
+		std::set_new_handler(handler_old);
 		memcpy( c, m_in.c, nr*nc*sizeof(double) );
 	}
 }
@@ -135,16 +136,16 @@ void matrix::create( const int nrow, const int ncol, const bool flag_zero )
 			if( size!=nr*nc )
 			{
 				delete[] c;
-				auto handler_old = set_new_handler(matrixAlloc);			
+				auto handler_old = std::set_new_handler(matrixAlloc);			
 				c = new double[size];
-				set_new_handler(handler_old);
+				std::set_new_handler(handler_old);
 			}
 		}
 		else
 		{
-			auto handler_old = set_new_handler(matrixAlloc);
+			auto handler_old = std::set_new_handler(matrixAlloc);
 			c = new double[nrow * ncol];
-			set_new_handler(handler_old);
+			std::set_new_handler(handler_old);
 		}			
 			
 		nr = nrow;
@@ -427,4 +428,6 @@ double matrix::norm() const
 #else
 	return LapackConnector::nrm2(nr*nc,c,1);
 #endif
+}
+
 }

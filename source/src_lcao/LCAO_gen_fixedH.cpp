@@ -13,7 +13,7 @@ LCAO_gen_fixedH::~LCAO_gen_fixedH()
 
 void LCAO_gen_fixedH::calculate_NL_no(void)
 {
-    TITLE("LCAO_gen_fixedH","calculate_NL_no");
+    ModuleBase::TITLE("LCAO_gen_fixedH","calculate_NL_no");
 
 	// PLEASE rebuild the following two functions,
 	// 'build_Nonlocal_beta' and  'build_Nonlocal_mu',
@@ -41,17 +41,17 @@ void LCAO_gen_fixedH::calculate_NL_no(void)
 
 void LCAO_gen_fixedH::calculate_T_no(void)
 {
-    TITLE("LCAO_gen_fixedH","calculate_T_no");
+    ModuleBase::TITLE("LCAO_gen_fixedH","calculate_T_no");
     this->build_ST_new('T', false);
     return;
 }
 
 void LCAO_gen_fixedH::calculate_S_no(void)
 {
-    TITLE("LCAO_gen_fixedH", "calculate_S_no");
-    timer::tick("LCAO_gen_fixedH","calculate_S_no");
+    ModuleBase::TITLE("LCAO_gen_fixedH", "calculate_S_no");
+    ModuleBase::timer::tick("LCAO_gen_fixedH","calculate_S_no");
 	this->build_ST_new('S', false);
-    timer::tick("LCAO_gen_fixedH","calculate_S_no");
+    ModuleBase::timer::tick("LCAO_gen_fixedH","calculate_S_no");
     return;
 }
 
@@ -59,15 +59,15 @@ void LCAO_gen_fixedH::calculate_S_no(void)
 //liaochen modify interface 2010-3-22
 void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 {
-    TITLE("LCAO_gen_fixedH","build_ST_new");
+    ModuleBase::TITLE("LCAO_gen_fixedH","build_ST_new");
 
     //array to store data
     double olm[3]={0.0,0.0,0.0};
 	int nnr = 0; // used onlyh for k points.
 
     //\sum{T} e**{ikT} <\phi_{ia}|d\phi_{k\beta}(T)>
-	Vector3<double> tau1, tau2, dtau;
-	Vector3<double> dtau1, dtau2, tau0;
+	ModuleBase::Vector3<double> tau1, tau2, dtau;
+	ModuleBase::Vector3<double> dtau1, dtau2, tau0;
     for (int T1=0; T1<GlobalC::ucell.ntype; ++T1)
     {
 		Atom* atom1 = &GlobalC::ucell.atoms[T1];
@@ -119,8 +119,8 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 
 							olm[0] = olm[1] = olm[2] = 0.0;
 
-							complex<double> olm1[4]={ZERO, ZERO, ZERO, ZERO};
-							complex<double> *olm2 = &olm1[0];
+							std::complex<double> olm1[4]={ModuleBase::ZERO, ModuleBase::ZERO, ModuleBase::ZERO, ModuleBase::ZERO};
+							std::complex<double> *olm2 = &olm1[0];
 							if(!calc_deri)
 							{
 								// PLEASE use UOT as an input parameter of this subroutine
@@ -266,9 +266,9 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 	{
 		if(nnr != GlobalC::LNNR.nnr)
 		{
-			cout << " nnr=" << nnr << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << endl;
-			GlobalV::ofs_running << " nnr=" << nnr << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << endl;
-			WARNING_QUIT("LCAO_gen_fixedH::build_ST_new","nnr != GlobalC::LNNR.nnr");
+			std::cout << " nnr=" << nnr << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << std::endl;
+			GlobalV::ofs_running << " nnr=" << nnr << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << std::endl;
+			ModuleBase::WARNING_QUIT("LCAO_gen_fixedH::build_ST_new","nnr != GlobalC::LNNR.nnr");
 		}
 	}
 
@@ -278,12 +278,12 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 void LCAO_gen_fixedH::test_Nonlocal()
 {
 	int nnr = 0;
-	Vector3<double> tau1, tau2, dtau_12, tau0, dtau_10, dtau_20;
+	ModuleBase::Vector3<double> tau1, tau2, dtau_12, tau0, dtau_10, dtau_20;
 	double distance = 0.0;
 	double rcut = 0.0;
 
 //	double* vnltest = new double[GlobalC::ParaO.nloc];	
-//	ZEROS(vnltest, GlobalC::ParaO.nloc);
+//	ModuleBase::GlobalFunc::ZEROS(vnltest, GlobalC::ParaO.nloc);
 
 	// psi1
 	double sum = 0.0;
@@ -378,11 +378,11 @@ void LCAO_gen_fixedH::test_Nonlocal()
 		} // I1
 	} // T1
 
-	GlobalV::ofs_running << " not included Vnl pair = " << count << endl;
-	GlobalV::ofs_running << " sum for the correction = " << sum << endl;
+	GlobalV::ofs_running << " not included Vnl std::pair = " << count << std::endl;
+	GlobalV::ofs_running << " sum for the correction = " << sum << std::endl;
 
 	/*
-	cout << " correction for Vnl matrix " << endl;
+	std::cout << " correction for Vnl matrix " << std::endl;
 	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{
 		for(int j=0; j<GlobalV::NLOCAL; j++)
@@ -390,14 +390,14 @@ void LCAO_gen_fixedH::test_Nonlocal()
 			double a = vnltest[i*GlobalC::ParaO.ncol+j];
 			if( abs(a) > 1.0e-6 )
 			{
-				cout << setw(15) << vnltest[i*GlobalC::ParaO.ncol+j];
+				std::cout << std::setw(15) << vnltest[i*GlobalC::ParaO.ncol+j];
 			}
 			else
 			{
-				cout << setw(15) << "0";
+				std::cout << std::setw(15) << "0";
 			}
 		}
-		cout << endl;
+		std::cout << std::endl;
 	}
 	delete[] vnltest;
 	*/
@@ -409,8 +409,8 @@ void LCAO_gen_fixedH::test_Nonlocal()
 #include "record_adj.h" //mohan add 2012-07-06
 void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 {
-    TITLE("LCAO_gen_fixedH","build_Nonlocal_mu");
-    timer::tick ("LCAO_gen_fixedH","build_Nonlocal_mu");
+    ModuleBase::TITLE("LCAO_gen_fixedH","build_Nonlocal_mu");
+    ModuleBase::timer::tick ("LCAO_gen_fixedH","build_Nonlocal_mu");
 
 	// < phi1 | beta > < beta | phi2 >
 	// phi1 is within the unitcell.
@@ -418,8 +418,8 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 	// while phi2 is in the supercell.
 
 	int nnr = 0;
-	Vector3<double> tau1, tau2, dtau;
-	Vector3<double> dtau1, dtau2, tau0;
+	ModuleBase::Vector3<double> tau1, tau2, dtau;
+	ModuleBase::Vector3<double> dtau1, dtau2, tau0;
 	double distance = 0.0;
 	double distance1, distance2;
 	double rcut = 0.0;
@@ -535,8 +535,8 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 								{
 									//const Atom* atom0 = &GlobalC::ucell.atoms[T0];
 									double nlm[3]={0,0,0};
-									complex<double> nlm1[4]={0,0,0,0};//modified by zhengdy-soc
-									complex<double> *nlm2 = NULL;
+									std::complex<double> nlm1[4]={0,0,0,0};//modified by zhengdy-soc
+									std::complex<double> *nlm2 = NULL;
 									if(GlobalV::NSPIN==4) nlm2 = &nlm1[0];
 									if(!calc_deri)
 									{
@@ -565,8 +565,8 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 											// mohan add 2010-12-20
 											if( nlm[0]!=0.0 )
 											{
-												// GlobalV::ofs_running << setw(10) << iw1_all << setw(10) 
-												// << iw2_all << setw(20) << nlm[0] << endl; 
+												// GlobalV::ofs_running << std::setw(10) << iw1_all << std::setw(10) 
+												// << iw2_all << std::setw(20) << nlm[0] << std::endl; 
 												GlobalC::LM.set_HSgamma(iw1_all,iw2_all,nlm[0],'N');//N stands for nonlocal.
 											}
 										}
@@ -652,29 +652,29 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 
 	if(!GlobalV::GAMMA_ONLY_LOCAL)
 	{
-//		cout << " nr="  << nnr << endl;
-//		cout << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << endl;
-//		GlobalV::ofs_running << " nr="  << nnr << endl;
-//		GlobalV::ofs_running << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << endl;
+//		std::cout << " nr="  << nnr << std::endl;
+//		std::cout << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << std::endl;
+//		GlobalV::ofs_running << " nr="  << nnr << std::endl;
+//		GlobalV::ofs_running << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << std::endl;
 		if( nnr!=GlobalC::LNNR.nnr)
 		{
-			WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_mu","nnr!=GlobalC::LNNR.nnr");
+			ModuleBase::WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_mu","nnr!=GlobalC::LNNR.nnr");
 		}
 	}
 
-//	cout << " build_Nonlocal_mu done" << endl;
+//	std::cout << " build_Nonlocal_mu done" << std::endl;
 
-    timer::tick ("LCAO_gen_fixedH","build_Nonlocal_mu");
+    ModuleBase::timer::tick ("LCAO_gen_fixedH","build_Nonlocal_mu");
 	return;
 }
 
 
 void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liuyu 2021-04-07
 {
-    TITLE("LCAO_gen_fixedH","build_Nonlocal_beta");
-    timer::tick ("LCAO_gen_fixedH","build_Nonlocal_beta");
+    ModuleBase::TITLE("LCAO_gen_fixedH","build_Nonlocal_beta");
+    ModuleBase::timer::tick ("LCAO_gen_fixedH","build_Nonlocal_beta");
 
-	matrix Rcut(GlobalC::ucell.ntype, GlobalC::ucell.ntype);
+	ModuleBase::matrix Rcut(GlobalC::ucell.ntype, GlobalC::ucell.ntype);
 	for(int it1=0; it1<GlobalC::ucell.ntype; ++it1)
         for(int it2=0; it2<GlobalC::ucell.ntype; ++it2)
             Rcut(it1,it2) = GlobalC::ORB.Phi[it1].getRcut() + GlobalC::ORB.Phi[it2].getRcut();
@@ -688,14 +688,14 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
             GlobalC::GridD.Find_atom(GlobalC::ucell, atom0->tau[I0] ,T0, I0);
 
             //(2)
-            //for each projector (T0, I0), one pair of ads are used
+            //for each projector (T0, I0), one std::pair of ads are used
             for (int ad1=0; ad1<GlobalC::GridD.getAdjacentNum()+1 ; ++ad1)
             {
                 const int T1 = GlobalC::GridD.getType(ad1);
                 const int I1 = GlobalC::GridD.getNatom(ad1);
 				//const int iat1 = GlobalC::ucell.itia2iat(T1, I1);
                 const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
-                const Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau(ad1);
+                const ModuleBase::Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau(ad1);
 				const Atom* atom1 = &GlobalC::ucell.atoms[T1];
 				const int nw1_tot = atom1->nw*GlobalV::NPOL;
 
@@ -709,11 +709,11 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 					const int T2 = GlobalC::GridD.getType(ad2);
 					const int I2 = GlobalC::GridD.getNatom(ad2);
 					const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-					const Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad2);
+					const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad2);
 					const Atom* atom2 = &GlobalC::ucell.atoms[T2];
 					const int nw2_tot = atom2->nw*GlobalV::NPOL;
 
-					Vector3<double> dtau = tau2 - tau1;
+					ModuleBase::Vector3<double> dtau = tau2 - tau1;
 					double distance = dtau.norm() * GlobalC::ucell.lat0;
 					double rcut = Rcut(T1,T2);
 					//double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
@@ -767,7 +767,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 									//}
 								//	else
 								//	{
-								//		WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_beta","not consistent with k point algorithm.");
+								//		ModuleBase::WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_beta","not consistent with k point algorithm.");
 //										assert( nnr < GlobalC::LNNR.nnr );
 //										GlobalC::LM.Hloc_fixedR[ nnr ] += nlm[0];
 //										++nnr;
@@ -799,7 +799,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 									//}
 									//else
 									//{
-										//WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_beta","not consistent with k point algorithm.");
+										//ModuleBase::WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_beta","not consistent with k point algorithm.");
 										//GlobalC::LM.DHloc_fixedR_x[ nnr ] += nlm[0];
 										//GlobalC::LM.DHloc_fixedR_y[ nnr ] += nlm[1];
 										//GlobalC::LM.DHloc_fixedR_z[ nnr ] += nlm[2];
@@ -818,10 +818,10 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 					{
 						if( nnr != GlobalC::LNNR.nlocstart[iat+1] )
 						{
-							cout << " nnr = " << nnr << endl;
-							cout << " nlocstart[iat] = " << GlobalC::LNNR.nlocstart[iat] << endl;
-							cout << " nlocstart[iat+1] = " << GlobalC::LNNR.nlocstart[iat+1] << endl;
-							WARNING_QUIT("build_Nonlocal_beta","nnr");
+							std::cout << " nnr = " << nnr << std::endl;
+							std::cout << " nlocstart[iat] = " << GlobalC::LNNR.nlocstart[iat] << std::endl;
+							std::cout << " nlocstart[iat+1] = " << GlobalC::LNNR.nlocstart[iat+1] << std::endl;
+							ModuleBase::WARNING_QUIT("build_Nonlocal_beta","nnr");
 						}
 					}
 				}*/
@@ -829,7 +829,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
         }// end I0
     }// end T0
 
-    timer::tick ("LCAO_gen_fixedH","build_Nonlocal_beta");
+    ModuleBase::timer::tick ("LCAO_gen_fixedH","build_Nonlocal_beta");
     return;
 }
 

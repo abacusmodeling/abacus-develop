@@ -6,6 +6,7 @@
 // new
 #include "H_XC_pw.h"
 #include "../module_base/math_integral.h"
+#include "potential_libxc.h"
 
 double Forces::output_acc = 1.0e-8; // (Ryd/angstrom).	
 
@@ -16,25 +17,25 @@ Forces::Forces()
 Forces::~Forces() {}
 
 #include "efield.h"
-void Forces::init(matrix& force)
+void Forces::init(ModuleBase::matrix& force)
 {
-	TITLE("Forces", "init");
+	ModuleBase::TITLE("Forces", "init");
 	this->nat = GlobalC::ucell.nat;
 	force.create(nat, 3);
 	
-	matrix forcelc(nat, 3);
-	matrix forceion(nat, 3);
-	matrix forcecc(nat, 3);
-	matrix forcenl(nat, 3);
-	matrix forcescc(nat, 3);
+	ModuleBase::matrix forcelc(nat, 3);
+	ModuleBase::matrix forceion(nat, 3);
+	ModuleBase::matrix forcecc(nat, 3);
+	ModuleBase::matrix forcenl(nat, 3);
+	ModuleBase::matrix forcescc(nat, 3);
     this->cal_force_loc(forcelc);
     this->cal_force_ew(forceion);
     this->cal_force_nl(forcenl);
 	this->cal_force_cc(forcecc);
 	this->cal_force_scc(forcescc);
 
-	matrix stress_vdw_pw;//.create(3,3);
-    matrix force_vdw;
+	ModuleBase::matrix stress_vdw_pw;//.create(3,3);
+    ModuleBase::matrix force_vdw;
     force_vdw.create(nat, 3);
 	if(GlobalC::vdwd2_para.flag_vdwd2)													//Peize Lin add 2014.04.03, update 2021.03.09
 	{
@@ -69,7 +70,7 @@ void Forces::init(matrix& force)
     //impose total force = 0
     int iat = 0;
 
-	matrix force_e;
+	ModuleBase::matrix force_e;
 	if(GlobalV::EFIELD)
 	{
 		force_e.create(GlobalC::ucell.nat, 3);
@@ -120,7 +121,7 @@ void Forces::init(matrix& force)
 		double *pos;
 		double d1,d2,d3;
 		pos = new double[GlobalC::ucell.nat*3];
-		ZEROS(pos, GlobalC::ucell.nat*3);
+		ModuleBase::GlobalFunc::ZEROS(pos, GlobalC::ucell.nat*3);
 		int iat = 0;
 		for(int it = 0;it < GlobalC::ucell.ntype;it++)
 		{
@@ -141,7 +142,7 @@ void Forces::init(matrix& force)
 		
 		for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 		{
-			Mathzone::Cartesian_to_Direct(force(iat,0),force(iat,1),force(iat,2),
+			ModuleBase::Mathzone::Cartesian_to_Direct(force(iat,0),force(iat,1),force(iat,2),
                                         GlobalC::ucell.a1.x, GlobalC::ucell.a1.y, GlobalC::ucell.a1.z,
                                         GlobalC::ucell.a2.x, GlobalC::ucell.a2.y, GlobalC::ucell.a2.z,
                                         GlobalC::ucell.a3.x, GlobalC::ucell.a3.y, GlobalC::ucell.a3.z,
@@ -152,20 +153,20 @@ void Forces::init(matrix& force)
 		GlobalC::symm.force_symmetry(force , pos, GlobalC::ucell);
 		for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 		{
-			Mathzone::Direct_to_Cartesian(force(iat,0),force(iat,1),force(iat,2),
+			ModuleBase::Mathzone::Direct_to_Cartesian(force(iat,0),force(iat,1),force(iat,2),
                                         GlobalC::ucell.a1.x, GlobalC::ucell.a1.y, GlobalC::ucell.a1.z,
                                         GlobalC::ucell.a2.x, GlobalC::ucell.a2.y, GlobalC::ucell.a2.z,
                                         GlobalC::ucell.a3.x, GlobalC::ucell.a3.y, GlobalC::ucell.a3.z,
                                         d1,d2,d3);
 			force(iat,0) = d1;force(iat,1) = d2;force(iat,2) = d3;
 		}
-		// cout << "nrotk =" << GlobalC::symm.nrotk << endl;
+		// std::cout << "nrotk =" << GlobalC::symm.nrotk << std::endl;
 		delete[] pos;
 		
 	}
 
- 	GlobalV::ofs_running << setiosflags(ios::fixed) << setprecision(6) << endl;
-	if(GlobalV::TEST_FORCE)
+ 	GlobalV::ofs_running << std::setiosflags(ios::fixed) << std::setprecision(6) << std::endl;
+	/*if(GlobalV::TEST_FORCE)
 	{
 		Forces::print("LOCAL    FORCE (Ry/Bohr)", forcelc);
 		Forces::print("NONLOCAL FORCE (Ry/Bohr)", forcenl);
@@ -173,30 +174,30 @@ void Forces::init(matrix& force)
 		Forces::print("ION      FORCE (Ry/Bohr)", forceion);
 		Forces::print("SCC      FORCE (Ry/Bohr)", forcescc);
 		if(GlobalV::EFIELD) Forces::print("EFIELD   FORCE (Ry/Bohr)", force_e);
-	}
+	}*/
 	
 /*
 	Forces::print("   TOTAL-FORCE (Ry/Bohr)", force);
 	
 	if(INPUT.force_set)                                                   // pengfei 2016-12-20
 	{
-		ofstream ofs("FORCE.dat");
+		std::ofstream ofs("FORCE.dat");
 		if(!ofs)
 		{
-			cout << "open FORCE.dat error !" <<endl;
+			std::cout << "open FORCE.dat error !" <<std::endl;
 		}
 		for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 		{
-			ofs << "   " << force(iat,0)*Ry_to_eV / 0.529177 
-				<< "   " << force(iat,1)*Ry_to_eV / 0.529177 
-				<< "   " << force(iat,2)*Ry_to_eV / 0.529177 << endl;
+			ofs << "   " << force(iat,0)*ModuleBase::Ry_to_eV / 0.529177 
+				<< "   " << force(iat,1)*ModuleBase::Ry_to_eV / 0.529177 
+				<< "   " << force(iat,2)*ModuleBase::Ry_to_eV / 0.529177 << std::endl;
 		}
 		ofs.close();
 	}
 */
 		
 	// output force in unit eV/Angstrom
-	GlobalV::ofs_running << endl;
+	GlobalV::ofs_running << std::endl;
 
 	if(GlobalV::TEST_FORCE)
 	{
@@ -212,67 +213,67 @@ void Forces::init(matrix& force)
     return;
 }
 
-void Forces::print_to_files(ofstream &ofs, const string &name, const matrix &f)
+void Forces::print_to_files(std::ofstream &ofs, const std::string &name, const ModuleBase::matrix &f)
 {
     int iat = 0;
     ofs << " " << name;
-    ofs << setprecision(8);
-	//ofs << setiosflags(ios::showpos);
+    ofs << std::setprecision(8);
+	//ofs << std::setiosflags(ios::showpos);
    
-	double fac = Ry_to_eV / 0.529177;// (eV/A)
+	double fac = ModuleBase::Ry_to_eV / 0.529177;// (eV/A)
 
 	if(GlobalV::TEST_FORCE)
 	{
-		cout << setiosflags(ios::showpos);
-		cout << " " << name;
-		cout << setprecision(8);
+		std::cout << std::setiosflags(ios::showpos);
+		std::cout << " " << name;
+		std::cout << std::setprecision(8);
 	}
 
     for (int it = 0;it < GlobalC::ucell.ntype;it++)
     {
         for (int ia = 0;ia < GlobalC::ucell.atoms[it].na;ia++)
         {
-            ofs << " " << setw(5) << it
-            << setw(8) << ia+1
-            << setw(20) << f(iat, 0)*fac
-            << setw(20) << f(iat, 1)*fac
-            << setw(20) << f(iat, 2)*fac << endl;
+            ofs << " " << std::setw(5) << it
+            << std::setw(8) << ia+1
+            << std::setw(20) << f(iat, 0)*fac
+            << std::setw(20) << f(iat, 1)*fac
+            << std::setw(20) << f(iat, 2)*fac << std::endl;
 			
 			if(GlobalV::TEST_FORCE)
 			{
-            	cout << " " << setw(5) << it
-            	<< setw(8) << ia+1
-            	<< setw(20) << f(iat, 0)*fac
-            	<< setw(20) << f(iat, 1)*fac
-            	<< setw(20) << f(iat, 2)*fac << endl;
+            	std::cout << " " << std::setw(5) << it
+            	<< std::setw(8) << ia+1
+            	<< std::setw(20) << f(iat, 0)*fac
+            	<< std::setw(20) << f(iat, 1)*fac
+            	<< std::setw(20) << f(iat, 2)*fac << std::endl;
 			}
             iat++;
         }
     }
 
-	GlobalV::ofs_running << resetiosflags(ios::showpos);
-	cout << resetiosflags(ios::showpos);
+	GlobalV::ofs_running << std::resetiosflags(ios::showpos);
+	std::cout << std::resetiosflags(ios::showpos);
     return;
 }
 
 
 
-void Forces::print(const string &name, const matrix &f, bool ry)
+void Forces::print(const std::string &name, const ModuleBase::matrix &f, bool ry)
 {
-	NEW_PART(name);
+	ModuleBase::GlobalFunc::NEW_PART(name);
 
-	GlobalV::ofs_running << " " << setw(8) << "atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << endl;
-	GlobalV::ofs_running << setiosflags(ios::showpos);
+	GlobalV::ofs_running << " " << std::setw(8) << "atom" << std::setw(15) << "x" << std::setw(15) << "y" << std::setw(15) << "z" << std::endl;
+	GlobalV::ofs_running << std::setiosflags(ios::showpos);
 
-	const double fac = Ry_to_eV / 0.529177;
+	const double fac = ModuleBase::Ry_to_eV / 0.529177;
 	
 	if(GlobalV::TEST_FORCE)
 	{
-		cout << " --------------- " << name << " ---------------" << endl;
-		cout << " " << setw(8) << "atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << endl;
-		cout << setiosflags(ios::showpos);
-		cout << setprecision(6);
-		cout << setiosflags(ios::fixed);
+		std::cout << " --------------- " << name << " ---------------" << std::endl;
+		std::cout << " " << std::setw(8) << "atom" << std::setw(15) << "x" << std::setw(15) << "y" << std::setw(15) << "z" << std::endl;
+		std::cout << std::setiosflags(ios::showpos);
+		std::cout << std::setprecision(6);
+		std::cout << std::setiosflags(ios::fixed);
 	}
 
     int iat = 0;
@@ -280,73 +281,73 @@ void Forces::print(const string &name, const matrix &f, bool ry)
     {
         for (int ia = 0;ia < GlobalC::ucell.atoms[it].na;ia++)
         {
-			stringstream ss;
+			std::stringstream ss;
 			ss << GlobalC::ucell.atoms[it].label << ia+1;
 
 			if(ry) // output Rydberg Unit
 			{
-				GlobalV::ofs_running << " " << setw(8) << ss.str();
-				if( abs(f(iat,0)) > Forces::output_acc) GlobalV::ofs_running << setw(15) << f(iat,0);
-				else GlobalV::ofs_running << setw(15) << "0";
-				if( abs(f(iat,1)) > Forces::output_acc) GlobalV::ofs_running << setw(15) << f(iat,1);
-				else GlobalV::ofs_running << setw(15) << "0";
-				if( abs(f(iat,2)) > Forces::output_acc) GlobalV::ofs_running << setw(15) << f(iat,2);
-				else GlobalV::ofs_running << setw(15) << "0";
-				GlobalV::ofs_running << endl;
+				GlobalV::ofs_running << " " << std::setw(8) << ss.str();
+				if( abs(f(iat,0)) > Forces::output_acc) GlobalV::ofs_running << std::setw(15) << f(iat,0);
+				else GlobalV::ofs_running << std::setw(15) << "0";
+				if( abs(f(iat,1)) > Forces::output_acc) GlobalV::ofs_running << std::setw(15) << f(iat,1);
+				else GlobalV::ofs_running << std::setw(15) << "0";
+				if( abs(f(iat,2)) > Forces::output_acc) GlobalV::ofs_running << std::setw(15) << f(iat,2);
+				else GlobalV::ofs_running << std::setw(15) << "0";
+				GlobalV::ofs_running << std::endl;
 			}
 			else
 			{
-				GlobalV::ofs_running << " " << setw(8) << ss.str();
-				if( abs(f(iat,0)) > Forces::output_acc) GlobalV::ofs_running << setw(15) << f(iat,0)*fac;
-				else GlobalV::ofs_running << setw(15) << "0";
-				if( abs(f(iat,1)) > Forces::output_acc) GlobalV::ofs_running << setw(15) << f(iat,1)*fac;
-				else GlobalV::ofs_running << setw(15) << "0";
-				if( abs(f(iat,2)) > Forces::output_acc) GlobalV::ofs_running << setw(15) << f(iat,2)*fac;
-				else GlobalV::ofs_running << setw(15) << "0";
-				GlobalV::ofs_running << endl;
+				GlobalV::ofs_running << " " << std::setw(8) << ss.str();
+				if( abs(f(iat,0)) > Forces::output_acc) GlobalV::ofs_running << std::setw(15) << f(iat,0)*fac;
+				else GlobalV::ofs_running << std::setw(15) << "0";
+				if( abs(f(iat,1)) > Forces::output_acc) GlobalV::ofs_running << std::setw(15) << f(iat,1)*fac;
+				else GlobalV::ofs_running << std::setw(15) << "0";
+				if( abs(f(iat,2)) > Forces::output_acc) GlobalV::ofs_running << std::setw(15) << f(iat,2)*fac;
+				else GlobalV::ofs_running << std::setw(15) << "0";
+				GlobalV::ofs_running << std::endl;
 			}
 
 			if(GlobalV::TEST_FORCE && ry)
 			{
-				cout << " " << setw(8) << ss.str();
-                cout<<fixed;
-				if( abs(f(iat,0)) > Forces::output_acc) cout << setw(15) << f(iat,0);
-				else cout << setw(15) << "0";
-				if( abs(f(iat,1)) > Forces::output_acc) cout << setw(15) << f(iat,1);
-				else cout << setw(15) << "0";
-				if( abs(f(iat,2)) > Forces::output_acc) cout << setw(15) << f(iat,2);
-				else cout << setw(15) << "0";
-				cout << endl;
+				std::cout << " " << std::setw(8) << ss.str();
+                std::cout<<fixed;
+				if( abs(f(iat,0)) > Forces::output_acc) std::cout << std::setw(15) << f(iat,0);
+				else std::cout << std::setw(15) << "0";
+				if( abs(f(iat,1)) > Forces::output_acc) std::cout << std::setw(15) << f(iat,1);
+				else std::cout << std::setw(15) << "0";
+				if( abs(f(iat,2)) > Forces::output_acc) std::cout << std::setw(15) << f(iat,2);
+				else std::cout << std::setw(15) << "0";
+				std::cout << std::endl;
 			}
 			else if (GlobalV::TEST_FORCE)
 			{
-				cout << " " << setw(8) << ss.str();
-                cout<<fixed;
-				if( abs(f(iat,0)) > Forces::output_acc) cout << setw(15) << f(iat,0)*fac;
-				else cout << setw(15) << "0";
-				if( abs(f(iat,1)) > Forces::output_acc) cout << setw(15) << f(iat,1)*fac;
-				else cout << setw(15) << "0";
-				if( abs(f(iat,2)) > Forces::output_acc) cout << setw(15) << f(iat,2)*fac;
-				else cout << setw(15) << "0";
-				cout << endl;
+				std::cout << " " << std::setw(8) << ss.str();
+                std::cout<<fixed;
+				if( abs(f(iat,0)) > Forces::output_acc) std::cout << std::setw(15) << f(iat,0)*fac;
+				else std::cout << std::setw(15) << "0";
+				if( abs(f(iat,1)) > Forces::output_acc) std::cout << std::setw(15) << f(iat,1)*fac;
+				else std::cout << std::setw(15) << "0";
+				if( abs(f(iat,2)) > Forces::output_acc) std::cout << std::setw(15) << f(iat,2)*fac;
+				else std::cout << std::setw(15) << "0";
+				std::cout << std::endl;
 			}	
 				
             iat++;
         }
     }
 
-	GlobalV::ofs_running << resetiosflags(ios::showpos);
-	cout << resetiosflags(ios::showpos);
+	GlobalV::ofs_running << std::resetiosflags(ios::showpos);
+	std::cout << std::resetiosflags(ios::showpos);
     return;
 }
 
 
-void Forces::cal_force_loc(matrix& forcelc)
+void Forces::cal_force_loc(ModuleBase::matrix& forcelc)
 {
-	timer::tick("Forces","cal_force_loc");
+	ModuleBase::timer::tick("Forces","cal_force_loc");
 
-    complex<double> *aux = new complex<double>[GlobalC::pw.nrxx];
-    ZEROS(aux, GlobalC::pw.nrxx);
+    std::complex<double> *aux = new std::complex<double>[GlobalC::pw.nrxx];
+    ModuleBase::GlobalFunc::ZEROS(aux, GlobalC::pw.nrxx);
 
     // now, in all pools , the charge are the same,
     // so, the force calculated by each pool is equal.
@@ -355,7 +356,7 @@ void Forces::cal_force_loc(matrix& forcelc)
 	{
 		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-        	aux[ir] += complex<double>( GlobalC::CHR.rho[is][ir], 0.0 );
+        	aux[ir] += std::complex<double>( GlobalC::CHR.rho[is][ir], 0.0 );
 		}
 	}
 
@@ -374,7 +375,7 @@ void Forces::cal_force_loc(matrix& forcelc)
         {
             for (int ig = gstart_here; ig < GlobalC::pw.ngmc; ig++)
             {
-                const double phase = TWO_PI * (GlobalC::pw.get_G_cartesian(ig) * GlobalC::ucell.atoms[it].tau[ia]);
+                const double phase = ModuleBase::TWO_PI * (GlobalC::pw.get_G_cartesian(ig) * GlobalC::ucell.atoms[it].tau[ia]);
                 const double factor = GlobalC::ppcell.vloc(it, GlobalC::pw.ig2ngg[ig]) *
 									  ( cos(phase) * aux[ GlobalC::pw.ig2fftc[ig] ].imag()
                                       + sin(phase) * aux[ GlobalC::pw.ig2fftc[ig] ].real()); 
@@ -392,18 +393,18 @@ void Forces::cal_force_loc(matrix& forcelc)
     //this->print(GlobalV::ofs_running, "local forces", forcelc);
     Parallel_Reduce::reduce_double_pool(forcelc.c, forcelc.nr * forcelc.nc);
     delete[] aux;
-	timer::tick("Forces","cal_force_loc");
+	ModuleBase::timer::tick("Forces","cal_force_loc");
     return;
 }
 
 #include "H_Ewald_pw.h"
-void Forces::cal_force_ew(matrix& forceion)
+void Forces::cal_force_ew(ModuleBase::matrix& forceion)
 {
-	timer::tick("Forces","cal_force_ew");
+	ModuleBase::timer::tick("Forces","cal_force_ew");
 
     double fact = 2.0;
-    complex<double> *aux = new complex<double> [GlobalC::pw.ngmc];
-    ZEROS(aux, GlobalC::pw.ngmc);
+    std::complex<double> *aux = new std::complex<double> [GlobalC::pw.ngmc];
+    ModuleBase::GlobalFunc::ZEROS(aux, GlobalC::pw.ngmc);
 
     int gstart = GlobalC::pw.gstart;
 
@@ -432,14 +433,14 @@ void Forces::cal_force_ew(matrix& forceion)
 
         if (alpha <= 0.0)
         {
-            WARNING_QUIT("ewald","Can't find optimal alpha.");
+            ModuleBase::WARNING_QUIT("ewald","Can't find optimal alpha.");
         }
-        upperbound = 2.0 * charge * charge * sqrt(2.0 * alpha / TWO_PI) *
+        upperbound = 2.0 * charge * charge * sqrt(2.0 * alpha / ModuleBase::TWO_PI) *
                      erfc(sqrt(GlobalC::ucell.tpiba2 * GlobalC::pw.ggchg / 4.0 / alpha));
     }
     while (upperbound > 1.0e-6);
-//	cout << " GlobalC::en.alpha = " << alpha << endl;
-//	cout << " upperbound = " << upperbound << endl;
+//	std::cout << " GlobalC::en.alpha = " << alpha << std::endl;
+//	std::cout << " upperbound = " << upperbound << std::endl;
 	
 
 
@@ -458,7 +459,7 @@ void Forces::cal_force_ew(matrix& forceion)
         {
             for (int ig = gstart; ig < GlobalC::pw.ngmc; ig++)
             {
-                const double arg = TWO_PI * (GlobalC::pw.get_G_cartesian(ig) * GlobalC::ucell.atoms[it].tau[ia]);
+                const double arg = ModuleBase::TWO_PI * (GlobalC::pw.get_G_cartesian(ig) * GlobalC::ucell.atoms[it].tau[ia]);
                 double sumnb =  -cos(arg) * aux[ig].imag() + sin(arg) * aux[ig].real();
                 forceion(iat, 0) += GlobalC::pw.get_G_cartesian_projection(ig, 0) * sumnb;
                 forceion(iat, 1) += GlobalC::pw.get_G_cartesian_projection(ig, 1) * sumnb;
@@ -466,11 +467,11 @@ void Forces::cal_force_ew(matrix& forceion)
             }
             for (int ipol = 0;ipol < 3;ipol++)
             {
-                forceion(iat, ipol) *= GlobalC::ucell.atoms[it].zv * e2 * GlobalC::ucell.tpiba * TWO_PI / GlobalC::ucell.omega * fact;
+                forceion(iat, ipol) *= GlobalC::ucell.atoms[it].zv * ModuleBase::e2 * GlobalC::ucell.tpiba * ModuleBase::TWO_PI / GlobalC::ucell.omega * fact;
             }
 
-	//		cout << " atom" << iat << endl;
-	//		cout << setw(15) << forceion(iat, 0) << setw(15) << forceion(iat,1) << setw(15) << forceion(iat,2) << endl; 
+	//		std::cout << " atom" << iat << std::endl;
+	//		std::cout << std::setw(15) << forceion(iat, 0) << std::setw(15) << forceion(iat,1) << std::setw(15) << forceion(iat,2) << std::endl; 
             iat++;
         }
     }
@@ -486,11 +487,11 @@ void Forces::cal_force_ew(matrix& forceion)
         //output of rgen: the number of vectors in the sphere
         const int mxr = 50;
         // the maximum number of R vectors included in r
-        Vector3<double> *r  = new Vector3<double>[mxr];
+        ModuleBase::Vector3<double> *r  = new ModuleBase::Vector3<double>[mxr];
         double *r2 = new double[mxr];
-		ZEROS(r2, mxr);
+		ModuleBase::GlobalFunc::ZEROS(r2, mxr);
         int *irr = new int[mxr];
-		ZEROS(irr, mxr);
+		ModuleBase::GlobalFunc::ZEROS(irr, mxr);
         // the square modulus of R_j-tau_s-tau_s'
 
 		int iat1 = 0;
@@ -506,26 +507,26 @@ void Forces::cal_force_ew(matrix& forceion)
                     {
                         if (iat1 != iat2)
                         {
-                            Vector3<double> d_tau = GlobalC::ucell.atoms[T1].tau[I1] - GlobalC::ucell.atoms[T2].tau[I2];
+                            ModuleBase::Vector3<double> d_tau = GlobalC::ucell.atoms[T1].tau[I1] - GlobalC::ucell.atoms[T2].tau[I2];
                             H_Ewald_pw::rgen(d_tau, rmax, irr, GlobalC::ucell.latvec, GlobalC::ucell.G, r, r2, nrm);
 
                             for (int n = 0;n < nrm;n++)
                             {
 								const double rr = sqrt(r2[n]) * GlobalC::ucell.lat0;
 
-                                double factor = GlobalC::ucell.atoms[T1].zv * GlobalC::ucell.atoms[T2].zv * e2 / (rr * rr)
+                                double factor = GlobalC::ucell.atoms[T1].zv * GlobalC::ucell.atoms[T2].zv * ModuleBase::e2 / (rr * rr)
                                                 * (erfc(sqrt(alpha) * rr) / rr
-                                    + sqrt(8.0 * alpha / TWO_PI) * exp(-1.0 * alpha * rr * rr)) * GlobalC::ucell.lat0;
+                                    + sqrt(8.0 * alpha / ModuleBase::TWO_PI) * exp(-1.0 * alpha * rr * rr)) * GlobalC::ucell.lat0;
 
 								forceion(iat1, 0) -= factor * r[n].x;
                                 forceion(iat1, 1) -= factor * r[n].y;
                                 forceion(iat1, 2) -= factor * r[n].z;
 
-//								cout << " r.z=" << r[n].z << " r2=" << r2[n] << endl;
-						//		cout << " " << iat1 << " " << iat2 << " n=" << n
+//								std::cout << " r.z=" << r[n].z << " r2=" << r2[n] << std::endl;
+						//		std::cout << " " << iat1 << " " << iat2 << " n=" << n
 						//		 << " rn.z=" << r[n].z 
 						//		 << " r2=" << r2[n] << " rr=" << rr << " fac=" << factor << " force=" << forceion(iat1,2) 
-						//		 << " new_part=" << factor*r[n].z <<  endl;
+						//		 << " new_part=" << factor*r[n].z <<  std::endl;
                             }
                         }
 
@@ -533,8 +534,8 @@ void Forces::cal_force_ew(matrix& forceion)
                     }
                 }//atom b
 
-//				cout << " atom" << iat1 << endl;
-//				cout << setw(15) << forceion(iat1, 0) << setw(15) << forceion(iat1,1) << setw(15) << forceion(iat1,2) << endl; 
+//				std::cout << " atom" << iat1 << std::endl;
+//				std::cout << std::setw(15) << forceion(iat1, 0) << std::setw(15) << forceion(iat1,1) << std::setw(15) << forceion(iat1,2) << std::endl; 
 
                 ++iat1;
             }
@@ -545,26 +546,47 @@ void Forces::cal_force_ew(matrix& forceion)
 
     //this->print(GlobalV::ofs_running, "ewald forces", forceion);
 
-	timer::tick("Forces","cal_force_ew");
+	ModuleBase::timer::tick("Forces","cal_force_ew");
 
     return;
 }
 
-void Forces::cal_force_cc(matrix& forcecc)
+void Forces::cal_force_cc(ModuleBase::matrix& forcecc)
 {
 	// recalculate the exchange-correlation potential.
+	
+    ModuleBase::matrix v(GlobalV::NSPIN,GlobalC::pw.nrxx);
+
+	#ifdef USE_LIBXC
+	if(GlobalV::DFT_META)
+	{
+    	const auto etxc_vtxc_v = Potential_Libxc::v_xc_meta(GlobalC::CHR.rho, GlobalC::CHR.rho_core, GlobalC::CHR.kin_r);
+		H_XC_pw::etxc = std::get<0>(etxc_vtxc_v);
+		H_XC_pw::vtxc = std::get<1>(etxc_vtxc_v);
+	    v = std::get<2>(etxc_vtxc_v);
+	}
+	else
+	{	
+    	const auto etxc_vtxc_v = Potential_Libxc::v_xc(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
+		H_XC_pw::etxc = std::get<0>(etxc_vtxc_v);
+		H_XC_pw::vtxc = std::get<1>(etxc_vtxc_v);
+	    v = std::get<2>(etxc_vtxc_v);
+	}
+	#else
     const auto etxc_vtxc_v = H_XC_pw::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 	H_XC_pw::etxc    = std::get<0>(etxc_vtxc_v);			// may delete?
 	H_XC_pw::vtxc    = std::get<1>(etxc_vtxc_v);			// may delete?
-	const matrix vxc = std::get<2>(etxc_vtxc_v);
+	v = std::get<2>(etxc_vtxc_v);
+	#endif
 
-    complex<double> * psiv = new complex<double> [GlobalC::pw.nrxx];
-    ZEROS(psiv, GlobalC::pw.nrxx);
+	const ModuleBase::matrix vxc = v;
+    std::complex<double> * psiv = new std::complex<double> [GlobalC::pw.nrxx];
+    ModuleBase::GlobalFunc::ZEROS(psiv, GlobalC::pw.nrxx);
     if (GlobalV::NSPIN == 1 || GlobalV::NSPIN == 4)
     {
         for (int ir = 0;ir < GlobalC::pw.nrxx;ir++)
         {
-            psiv[ir] = complex<double>(vxc(0, ir),  0.0);
+            psiv[ir] = std::complex<double>(vxc(0, ir),  0.0);
         }
     }
     else
@@ -580,7 +602,7 @@ void Forces::cal_force_cc(matrix& forcecc)
 
     //psiv contains now Vxc(G)
     double * rhocg = new double [GlobalC::pw.nggm];
-    ZEROS(rhocg, GlobalC::pw.nggm);
+    ModuleBase::GlobalFunc::ZEROS(rhocg, GlobalC::pw.nggm);
     int iat = 0;
     for (int T1 = 0;T1 < GlobalC::ucell.ntype;T1++)
     {
@@ -596,25 +618,25 @@ void Forces::cal_force_cc(matrix& forcecc)
                 rhocg);
 
 
-			complex<double> ipol0, ipol1, ipol2;
+			std::complex<double> ipol0, ipol1, ipol2;
             for (int I1 = 0;I1 < GlobalC::ucell.atoms[T1].na;I1++)
             {
                 for (int ig = GlobalC::pw.gstart; ig < GlobalC::pw.ngmc; ig++)
                 {
-                    const double arg = TWO_PI * (GlobalC::pw.get_G_cartesian_projection(ig, 0) * GlobalC::ucell.atoms[T1].tau[I1].x + 
+                    const double arg = ModuleBase::TWO_PI * (GlobalC::pw.get_G_cartesian_projection(ig, 0) * GlobalC::ucell.atoms[T1].tau[I1].x + 
                         GlobalC::pw.get_G_cartesian_projection(ig, 1) * GlobalC::ucell.atoms[T1].tau[I1].y + 
                         GlobalC::pw.get_G_cartesian_projection(ig, 2) * GlobalC::ucell.atoms[T1].tau[I1].z);
 
                     ipol0 = GlobalC::ucell.tpiba * GlobalC::ucell.omega * rhocg[GlobalC::pw.ig2ngg[ig]] * 
-                        GlobalC::pw.get_G_cartesian_projection(ig, 0) * conj(psiv[GlobalC::pw.ig2fftc[ig]]) * complex<double>(sin(arg), cos(arg));
+                        GlobalC::pw.get_G_cartesian_projection(ig, 0) * conj(psiv[GlobalC::pw.ig2fftc[ig]]) * std::complex<double>(sin(arg), cos(arg));
                     forcecc(iat, 0) +=  ipol0.real();
 
                     ipol1 = GlobalC::ucell.tpiba * GlobalC::ucell.omega * rhocg[GlobalC::pw.ig2ngg[ig]] * 
-                        GlobalC::pw.get_G_cartesian_projection(ig, 1) * conj(psiv[GlobalC::pw.ig2fftc[ig]]) * complex<double>(sin(arg), cos(arg));
+                        GlobalC::pw.get_G_cartesian_projection(ig, 1) * conj(psiv[GlobalC::pw.ig2fftc[ig]]) * std::complex<double>(sin(arg), cos(arg));
                     forcecc(iat, 1) += ipol1.real();
 
                     ipol2 = GlobalC::ucell.tpiba * GlobalC::ucell.omega * rhocg[GlobalC::pw.ig2ngg[ig]] * 
-                        GlobalC::pw.get_G_cartesian_projection(ig, 2) * conj(psiv[GlobalC::pw.ig2fftc[ig]]) * complex<double>(sin(arg), cos(arg));
+                        GlobalC::pw.get_G_cartesian_projection(ig, 2) * conj(psiv[GlobalC::pw.ig2fftc[ig]]) * std::complex<double>(sin(arg), cos(arg));
 
                     forcecc(iat, 2) += ipol2.real();
                 }
@@ -632,21 +654,21 @@ void Forces::cal_force_cc(matrix& forcecc)
 	return;
 }
 
-void Forces::cal_force_nl(matrix& forcenl)
+void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
 {
-	TITLE("Forces","cal_force_nl");
-	timer::tick("Forces","cal_force_nl");
+	ModuleBase::TITLE("Forces","cal_force_nl");
+	ModuleBase::timer::tick("Forces","cal_force_nl");
 
     const int nkb = GlobalC::ppcell.nkb;
 	if(nkb == 0) return; // mohan add 2010-07-25
 	
 	// dbecp: conj( -iG * <Beta(nkb,npw)|psi(nbnd,npw)> )
-	ComplexArray dbecp( nkb, GlobalV::NBANDS, 3);
-    ComplexMatrix becp( nkb, GlobalV::NBANDS);
+	ModuleBase::ComplexArray dbecp( nkb, GlobalV::NBANDS, 3);
+    ModuleBase::ComplexMatrix becp( nkb, GlobalV::NBANDS);
     
 	
 	// vkb1: |Beta(nkb,npw)><Beta(nkb,npw)|psi(nbnd,npw)>
-	ComplexMatrix vkb1( nkb, GlobalC::wf.npwx );
+	ModuleBase::ComplexMatrix vkb1( nkb, GlobalC::wf.npwx );
 
     for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {
@@ -686,17 +708,17 @@ void Forces::cal_force_nl(matrix& forcenl)
 				if (ipol==0)
 				{
 					for (int ig=0; ig<GlobalC::wf.npw; ig++)
-                        vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(ik, ig), 0);
+                        vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(ik, ig), 0);
                 }
 				if (ipol==1)
 				{
 					for (int ig=0; ig<GlobalC::wf.npw; ig++)
-                        vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(ik, ig), 1);
+                        vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(ik, ig), 1);
                 }
 				if (ipol==2)
 				{
 					for (int ig=0; ig<GlobalC::wf.npw; ig++)
-                        vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(ik, ig), 2);
+                        vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * ModuleBase::NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(ik, ig), 2);
                 }
 			}
             for (int ib=0; ib<GlobalV::NBANDS; ib++)
@@ -716,7 +738,7 @@ void Forces::cal_force_nl(matrix& forcenl)
 //		Parallel_Reduce::reduce_complex_double_pool( dbecp.ptr, dbecp.ndata);
 
 //		double *cf = new double[GlobalC::ucell.nat*3];
-//		ZEROS(cf, GlobalC::ucell.nat);
+//		ModuleBase::GlobalFunc::ZEROS(cf, GlobalC::ucell.nat);
 		for (int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
 			double fac = GlobalC::wf.wg(ik, ib) * 2.0 * GlobalC::ucell.tpiba;
@@ -743,7 +765,7 @@ void Forces::cal_force_nl(matrix& forcenl)
 
 					//if ( GlobalC::ucell.atoms[it].nbeta > GlobalC::ucell.atoms[it].lmax+1 )    //{zws add 20160110
 					//{
-					//cout << " \n multi-projector force calculation ... " << endl;
+					//std::cout << " \n multi-projector force calculation ... " << std::endl;
 					for (int ip=0; ip<Nprojs; ip++)
 					{
 						const int inkb = sum + ip;
@@ -778,14 +800,14 @@ void Forces::cal_force_nl(matrix& forcenl)
     // sum up forcenl from all processors
     Parallel_Reduce::reduce_double_all(forcenl.c, forcenl.nr * forcenl.nc);
 //  this->print(GlobalV::ofs_running, "nonlocal forces", forcenl);
-	timer::tick("Forces","cal_force_nl");
+	ModuleBase::timer::tick("Forces","cal_force_nl");
     return;
 }
 
-void Forces::cal_force_scc(matrix& forcescc)
+void Forces::cal_force_scc(ModuleBase::matrix& forcescc)
 {
-    complex<double>* psic = new complex<double> [GlobalC::pw.nrxx];
-    ZEROS(psic, GlobalC::pw.nrxx);
+    std::complex<double>* psic = new std::complex<double> [GlobalC::pw.nrxx];
+    ModuleBase::GlobalFunc::ZEROS(psic, GlobalC::pw.nrxx);
 
     if (GlobalV::NSPIN == 1 || GlobalV::NSPIN == 4)
     {
@@ -816,10 +838,10 @@ void Forces::cal_force_scc(matrix& forcescc)
 
     //work space
     double* aux = new double[ndm];
-    ZEROS(aux, ndm);
+    ModuleBase::GlobalFunc::ZEROS(aux, ndm);
 
     double* rhocgnt = new double[GlobalC::pw.nggm];
-    ZEROS(rhocgnt, GlobalC::pw.nggm);
+    ModuleBase::GlobalFunc::ZEROS(rhocgnt, GlobalC::pw.nggm);
 
     GlobalC::pw.FFT_chg.FFT3D(psic, -1);
 
@@ -843,7 +865,7 @@ void Forces::cal_force_scc(matrix& forcescc)
                     aux[ir] = GlobalC::ucell.atoms[nt].rho_at[ir] * sin(gxx) / gxx;
                 }
             }
-            Integral::Simpson_Integral(mesh , aux, GlobalC::ucell.atoms[nt].rab , rhocgnt [ig]);
+            ModuleBase::Integral::Simpson_Integral(mesh , aux, GlobalC::ucell.atoms[nt].rab , rhocgnt [ig]);
         }
 
         int iat = 0;
@@ -855,17 +877,17 @@ void Forces::cal_force_scc(matrix& forcescc)
                 {
                     for (int ig = GlobalC::pw.gstart;ig < GlobalC::pw.ngmc;ig++)
                     {
-                        const double arg = TWO_PI * (GlobalC::pw.get_G_cartesian_projection(ig, 0) * GlobalC::ucell.atoms[it].tau[ia].x + 
+                        const double arg = ModuleBase::TWO_PI * (GlobalC::pw.get_G_cartesian_projection(ig, 0) * GlobalC::ucell.atoms[it].tau[ia].x + 
                             GlobalC::pw.get_G_cartesian_projection(ig, 1) * GlobalC::ucell.atoms[it].tau[ia].y + 
                             GlobalC::pw.get_G_cartesian_projection(ig, 2) * GlobalC::ucell.atoms[it].tau[ia].z);
 
-                        const complex<double> cpm = complex<double>(sin(arg), cos(arg)) * conj(psic[GlobalC::pw.ig2fftc[ig] ]);
+                        const std::complex<double> cpm = std::complex<double>(sin(arg), cos(arg)) * conj(psic[GlobalC::pw.ig2fftc[ig] ]);
 
                         forcescc(iat, 0) += fact * rhocgnt[GlobalC::pw.ig2ngg[ig]] * GlobalC::ucell.tpiba * GlobalC::pw.get_G_cartesian_projection(ig, 0) * cpm.real();
                         forcescc(iat, 1) += fact * rhocgnt[GlobalC::pw.ig2ngg[ig]] * GlobalC::ucell.tpiba * GlobalC::pw.get_G_cartesian_projection(ig, 1) * cpm.real();
                         forcescc(iat, 2) += fact * rhocgnt[GlobalC::pw.ig2ngg[ig]] * GlobalC::ucell.tpiba * GlobalC::pw.get_G_cartesian_projection(ig, 2) * cpm.real();
                     }
-					//cout << " forcescc = " << forcescc(iat,0) << " " << forcescc(iat,1) << " " << forcescc(iat,2) << endl;
+					//std::cout << " forcescc = " << forcescc(iat,0) << " " << forcescc(iat,1) << " " << forcescc(iat,2) << std::endl;
                 }
                 iat++;
             }

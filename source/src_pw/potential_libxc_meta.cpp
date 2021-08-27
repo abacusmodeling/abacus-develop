@@ -10,6 +10,8 @@
 #include "global.h"
 #include "tools.h"
 #include "xc_gga_pw.h"
+#include "./xc_functional.h"
+
 #include "../module_base/global_function.h"
 #ifdef __LCAO
 #include "../src_lcao/global_fp.h"
@@ -26,20 +28,28 @@ using namespace std;
 //v1-v4: derivative of energy density w.r.t rho, gradient, laplacian and tau
 //v1 and v2 are combined to give v; v4 goes into vofk
 
+//XC_POLARIZED, XC_UNPOLARIZED: internal flags used in LIBXC, denote the polarized(nspin=1) or unpolarized(nspin=2) calculations, definition can be found in xc.h from LIBXC
+
 // [etxc, vtxc, v, vofk] = Potential_Libxc::v_xc(...)
-tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
+tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> Potential_Libxc::v_xc_meta(
 	const double * const * const rho_in,
 	const double * const rho_core_in,
 	const double * const * const kin_r_in)
 {
-    TITLE("Potential_Libxc","v_xc");
-    timer::tick("Potential_Libxc","v_xc");
+    ModuleBase::TITLE("Potential_Libxc","v_xc");
+    ModuleBase::timer::tick("Potential_Libxc","v_xc");
 
+	//output of the subroutine
     double etxc = 0.0;
     double vtxc = 0.0;
-	matrix v(GlobalV::NSPIN,GlobalC::pw.nrxx);
-	matrix vofk(GlobalV::NSPIN,GlobalC::pw.nrxx);
+	ModuleBase::matrix v(GlobalV::NSPIN,GlobalC::pw.nrxx);
+	ModuleBase::matrix vofk(GlobalV::NSPIN,GlobalC::pw.nrxx);
 
+	if(GlobalV::VXC_IN_H == 0 )
+	{
+    	ModuleBase::timer::tick("Potential_Libxc","v_xc_meta");
+		return std::make_tuple( etxc, vtxc, move(v), move(vofk) );
+	}
 	//----------------------------------------------------------
 	// xc_func_type is defined in Libxc package
 	// to understand the usage of xc_func_type,
@@ -59,8 +69,8 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 	}
 	else
 	{
-		throw domain_error("iexch="+TO_STRING(GlobalC::xcf.iexch_now)+", igcx="+TO_STRING(GlobalC::xcf.igcx_now)
-			+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw domain_error("iexch="+ModuleBase::GlobalFunc::TO_STRING(GlobalC::xcf.iexch_now)+", igcx="+ModuleBase::GlobalFunc::TO_STRING(GlobalC::xcf.igcx_now)
+			+" unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
 
 	//correlation
@@ -70,22 +80,24 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 	}
     else
 	{
-		throw domain_error("icorr="+TO_STRING(GlobalC::xcf.icorr_now)+", igcc="+TO_STRING(GlobalC::xcf.igcc_now)
-			+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw domain_error("icorr="+ModuleBase::GlobalFunc::TO_STRING(GlobalC::xcf.icorr_now)+", igcc="+ModuleBase::GlobalFunc::TO_STRING(GlobalC::xcf.igcc_now)
+			+" unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 
 	}
 	
-	//input of xc_mgga_exc_vxc 
+	//rho,grho,tau
 	vector<vector<double>> rho;
-	vector<vector<Vector3<double>>> grho;
-	vector<vector<double>> sigma;
+	vector<vector<ModuleBase::Vector3<double>>> grho;
 	vector<vector<double>> kin_r;
 
-	//output of xc_mgga_exc_vxc
+	//dExc/d rho,grho,tau
 	vector<vector<double>> vrho;
-	vector<vector<Vector3<double>>> h;
+	vector<vector<ModuleBase::Vector3<double>>> h;
 	vector<vector<double>> kedtaur;
-	
+
+	//ifstream ifs_rho("rho");
+	//ifstream ifs_tau("tau");
+
 	//rho : from double** to vector<double>
 	rho.resize(GlobalV::NSPIN);
 	for( int is=0; is!=GlobalV::NSPIN; ++is )
@@ -94,6 +106,7 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 		for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 		{
 			rho[is][ir] = rho_in[is][ir] + (1.0/GlobalV::NSPIN)*rho_core_in[ir]; 
+			//ifs_rho >> rho[is][ir];
 		}
 	}
 
@@ -106,7 +119,6 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 		vector<complex<double>> rhog(GlobalC::pw.ngmc);
 		GlobalC::CHR.set_rhog(rho[is].data(), rhog.data());
 		GGA_PW::grad_rho(rhog.data(), grho[is].data());
-
 	}
 		
 	//kin_r : from double** to vector<double>
@@ -119,11 +131,11 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 			for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 			{
 				kin_r[is][ir] = kin_r_in[is][ir];
+				//ifs_tau >> kin_r[is][ir];
 			}
 		}	
 	}
 
-	cout << "flag 3" << endl;
 	if(GlobalV::NSPIN==1)
 	{
 		vrho.resize(GlobalV::NSPIN);
@@ -142,14 +154,13 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 			const double grho_th = 1e-12;
 			const double tau_th  = 1e-8;
 
-			lapl = 0.0;//dummy argument, not used
 
-	cout << "flag 4" << endl;
 			for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 			{
-				arho  = abs(rho[is][ir]);
+				arho  = abs(rho_in[is][ir]);
 				grho2 = grho[0][ir]*grho[0][ir];
-				atau  = kin_r[is][ir] / e2;
+				atau  = kin_r[is][ir] / ModuleBase::e2;
+				lapl  = grho2;//dummy argument, not used
 			
 				if(arho > rho_th && grho2 > grho_th && abs(atau) > tau_th)
 				{
@@ -157,25 +168,23 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 					xc_mgga_exc_vxc(&c_func,1,&arho,&grho2,&lapl,&atau,&ec,&v1c,&v2c,&vlapl,&v3c);
 					ex = ex * rho[is][ir];
 					ec = ec * rho[is][ir];
-					v2x = v2x * e2;
-					v2c = v2c * e2;
+					v2x = v2x * ModuleBase::e2;
+					v2c = v2c * ModuleBase::e2;
 
-					vrho[is][ir] = (v1x + v1c) * e2;
-					h[is][ir] = (v2x + v2c) * e2 * grho[is][ir];
+					vrho[is][ir] = (v1x + v1c) * ModuleBase::e2;
+					h[is][ir] = (v2x + v2c) * ModuleBase::e2 * grho[is][ir];
 					kedtaur[is][ir] = v3x + v3c;
 				
-					etxc += (ex + ec) * e2;
-					vtxc += (v1x + v1c) * e2 * arho;	
+					etxc += (ex + ec) * ModuleBase::e2;
+					vtxc += (v1x + v1c) * ModuleBase::e2 * arho;	
 				}
 				else
 				{
 					vrho[is][ir] = 0.0;
 					h[is][ir] = 0.0;
-					cout << "should be 0" << h[is][ir];
 					kedtaur[is][ir] = 0.0;
 				}
 			}//loop over grid points
-	cout << "flag 5" << endl;
 		}//loop over spin
 	}//nspin=1
 	else if(GlobalV::NSPIN==2)
@@ -191,15 +200,12 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 			kedtaur[is].resize(GlobalC::pw.nrxx);
 		}
 
-		double rh, ggrho2, atau, ex, ec;
-		vector<double> arho, grho2, tau, lapl;
-		vector<double> v1x, v2x, v3x, v1c, v2c, v3c, vlapl;
-		Vector3<double> v2cup, v2cdw;
-	
-		arho.resize(2);grho2.resize(3);tau.resize(2);
-		v1x.resize(2);v2x.resize(3);v3x.resize(2);
-		v1c.resize(2);v2c.resize(3);v3c.resize(2);
-		lapl.resize(6);vlapl.resize(6);
+		double rh, ggrho2, atau;
+		double rhoup, rhodw, tauup, taudw;
+		double ex, v1xup, v1xdw, v2xup, v2xdw, v3xup, v3xdw;
+		double ec, v1cup, v1cdw, v3cup, v3cdw;
+		ModuleBase::Vector3<double> grhoup,grhodw,v2cup,v2cdw;
+
 	
 		const double rho_th  = 1e-8;
 		const double grho_th = 1e-12;
@@ -207,42 +213,33 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 
 		for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 		{
-			arho[0] = rho[0][ir]; arho[1] = rho[1][ir];
-			rh = arho[0] + arho[1];
+			rhoup = rho_in[0][ir];
+			rhodw = rho_in[1][ir];
+			rh = rhoup + rhodw;
 
-			grho2[0]=grho[0][ir]*grho[0][ir];
-			grho2[1]=grho[0][ir]*grho[1][ir];
-			grho2[2]=grho[1][ir]*grho[1][ir];
-			ggrho2 = (grho2[0] + grho2[2]) * 4.0;
+			grhoup = grho[0][ir];
+			grhodw = grho[1][ir];
+			ggrho2 = (grhoup*grhoup + grhodw*grhodw) * 4.0;
 
-			tau[0] = kin_r[0][ir] / e2;tau[1] = kin_r[1][ir] / e2;
-			atau = tau[0] + tau[1];
+			tauup = kin_r[0][ir] / ModuleBase::e2;
+			taudw = kin_r[1][ir] / ModuleBase::e2;
+			atau = tauup + taudw;
 
 			if (rh > rho_th && ggrho2 > grho_th && abs(atau) > tau_th)
 			{
-				xc_mgga_exc_vxc(&x_func,1,arho.data(),grho2.data(),lapl.data(),tau.data(),&ex,v1x.data(),v2x.data(),vlapl.data(),v3x.data());
-				xc_mgga_exc_vxc(&c_func,1,arho.data(),grho2.data(),lapl.data(),tau.data(),&ec,v1c.data(),v2c.data(),vlapl.data(),v3c.data());
+				XC_Functional::tau_xc_spin(rhoup, rhodw, grhoup, grhodw, tauup, taudw, ex, ec, v1xup, v1xdw, v2xup, v2xdw, v3xup, v3xdw, v1cup, v1cdw, v2cup, v2cdw, v3cup, v3cdw );
 
-				ex = ex*rh;
-				v2x[0]=v2x[0]*e2;v2x[1]=v2x[1]*e2;
+				vrho[0][ir] = (v1xup+v1cup) * ModuleBase::e2;
+				vrho[1][ir] = (v1xdw+v1cdw) * ModuleBase::e2;
+
+				h[0][ir] = (v2xup*grhoup+v2cup)*ModuleBase::e2;
+				h[1][ir] = (v2xdw*grhodw+v2cdw)*ModuleBase::e2;
 				
-				ec = ec*rh;
-				v2c[0]=v2c[0]*e2;v2c[1]=v2c[1]*e2;
+				kedtaur[0][ir] = v3xup+v3cup;
+				kedtaur[1][ir] = v3xdw+v3cdw;
 
-				v2cup=v2c[0]*grho[0][ir]*e2 + v2c[1]*grho[1][ir];
-				v2cdw=v2c[2]*grho[1][ir]*e2 + v2c[1]*grho[0][ir];
-
-				vrho[0][ir] = (v1x[0]+v1c[0]) * e2;
-				vrho[1][ir] = (v1x[1]+v1c[1]) * e2;
-
-				h[0][ir] = (v2x[0]*grho[0][ir]+v2cup)*e2;
-				h[1][ir] = (v2x[1]*grho[1][ir]+v2cdw)*e2;
-				
-				kedtaur[0][ir] = v3x[0]+v3c[0];
-				kedtaur[1][ir] = v3x[1]+v3c[1];
-
-				etxc += (ex+ec) * e2;
-				vtxc += (v1x[0]+v1x[1]+v1c[0]+v1c[1]) * e2 * rh;
+				etxc += (ex+ec) * ModuleBase::e2;
+				vtxc += (v1xup+v1xdw+v1cup+v1cdw) * ModuleBase::e2 * rh;
 			}
 			else
 			{
@@ -259,23 +256,21 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 	}//nspin=2
 	else
 	{
-		WARNING_QUIT("potential_libxc_meta","meta-GGA for nspin=1,2 first");
+		ModuleBase::WARNING_QUIT("potential_libxc_meta","meta-GGA for nspin=1,2 first");
 	}
 
 	vector<double> dh;
 	dh.resize(GlobalC::pw.nrxx);
-	cout << "flag 6" << endl;
 
 	for(int is=0;is<GlobalV::NSPIN;is++)
 	{
-		GGA_PW::grad_dot(VECTOR_TO_PTR(h[is]),VECTOR_TO_PTR(dh));	
+		GGA_PW::grad_dot(ModuleBase::GlobalFunc::VECTOR_TO_PTR(h[is]),ModuleBase::GlobalFunc::VECTOR_TO_PTR(dh));	
 		for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 		{
 			vrho[is][ir]-=dh[ir];
 			vtxc-=dh[ir]*rho_in[is][ir];
 		}
 	}
-	cout << "flag 7" << endl;
 
 	for( int is=0; is!=nspin0(); ++is )
 	{
@@ -285,7 +280,6 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 			vofk(is,ir) = kedtaur[is][ir];
 		}
 	}
-	cout << "flag 8" << endl;
 		
 	//-------------------------------------------------
 	// for MPI, reduce the exchange-correlation energy
@@ -296,7 +290,7 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
     etxc *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
     vtxc *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
 
-    timer::tick("Potential_Libxc","v_xc_meta");
+    ModuleBase::timer::tick("Potential_Libxc","v_xc_meta");
 	return std::make_tuple( etxc, vtxc, move(v), move(vofk) );
 
 }

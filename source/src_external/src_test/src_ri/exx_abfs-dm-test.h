@@ -9,26 +9,26 @@
 class Exx_Abfs_DM_Test
 {
 public:
-	static map<size_t,map<size_t,vector<ComplexMatrix>>> cal_DMk_raw_readfile( const set<pair<size_t,size_t>> &atom_pairs );
-	static vector<vector<complex<double>>> read_wfc( const string &file_name );
-	static matrix read_wg( const string &file_name );
+	static std::map<size_t,std::map<size_t,std::vector<ModuleBase::ComplexMatrix>>> cal_DMk_raw_readfile( const set<std::pair<size_t,size_t>> &atom_pairs );
+	static std::vector<std::vector<std::complex<double>>> read_wfc( const std::string &file_name );
+	static ModuleBase::matrix read_wg( const std::string &file_name );
 };
 
-map<size_t,map<size_t,vector<ComplexMatrix>>> 
-Exx_Abfs_DM_Test::cal_DMk_raw_readfile( const set<pair<size_t,size_t>> &atom_pairs )
+std::map<size_t,std::map<size_t,std::vector<ModuleBase::ComplexMatrix>>> 
+Exx_Abfs_DM_Test::cal_DMk_raw_readfile( const set<std::pair<size_t,size_t>> &atom_pairs )
 {
 	static int istep=-1;	++istep;	
-	TITLE("cal_DMk_raw_readfile_"+TO_STRING(istep));
-	matrix wf_wg = read_wg( "wf.wg/wf.wg_"+TO_STRING(istep) );
-	vector<vector<vector<complex<double>>>> wfc(GlobalC::kv.nks);
+	ModuleBase::TITLE("cal_DMk_raw_readfile_"+ModuleBase::GlobalFunc::TO_STRING(istep));
+	ModuleBase::matrix wf_wg = read_wg( "wf.wg/wf.wg_"+ModuleBase::GlobalFunc::TO_STRING(istep) );
+	std::vector<std::vector<std::vector<std::complex<double>>>> wfc(GlobalC::kv.nks);
 	for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
-		wfc[ik] = read_wfc( "hvec/hvec_"+TO_STRING(istep)+"_"+TO_STRING(ik) );	
+		wfc[ik] = read_wfc( "hvec/hvec_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(ik) );	
 	
 	
 	const double SPIN_multiple = 0.5*GlobalV::NSPIN;
 	
-	map<size_t,map<size_t,vector<ComplexMatrix>>> DMk_raw;
-	for( const pair<size_t,size_t> & atom_pair : atom_pairs )
+	std::map<size_t,std::map<size_t,std::vector<ModuleBase::ComplexMatrix>>> DMk_raw;
+	for( const std::pair<size_t,size_t> & atom_pair : atom_pairs )
 	{
 		const size_t iat1 = atom_pair.first;
 		const size_t iat2 = atom_pair.second;
@@ -37,7 +37,7 @@ Exx_Abfs_DM_Test::cal_DMk_raw_readfile( const set<pair<size_t,size_t>> &atom_pai
 		const size_t ia1 = GlobalC::ucell.iat2ia[iat1];
 		const size_t ia2 = GlobalC::ucell.iat2ia[iat2];
 
-		DMk_raw[iat1][iat2] = vector<ComplexMatrix>( GlobalC::kv.nks, {GlobalC::ucell.atoms[it1].nw,GlobalC::ucell.atoms[it2].nw} );
+		DMk_raw[iat1][iat2] = std::vector<ModuleBase::ComplexMatrix>( GlobalC::kv.nks, {GlobalC::ucell.atoms[it1].nw,GlobalC::ucell.atoms[it2].nw} );
 		for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 		{
 			for( size_t iw1=0; iw1!=GlobalC::ucell.atoms[it1].nw; ++iw1 )
@@ -58,10 +58,10 @@ Exx_Abfs_DM_Test::cal_DMk_raw_readfile( const set<pair<size_t,size_t>> &atom_pai
 
 
 
-vector<vector<complex<double>>> Exx_Abfs_DM_Test::read_wfc( const string &file_name )
+std::vector<std::vector<std::complex<double>>> Exx_Abfs_DM_Test::read_wfc( const std::string &file_name )
 {
-	vector<vector<complex<double>>> wfc(GlobalV::NBANDS,vector<complex<double>>(GlobalV::NLOCAL));
-	ifstream ifs(file_name);
+	std::vector<std::vector<std::complex<double>>> wfc(GlobalV::NBANDS,std::vector<std::complex<double>>(GlobalV::NLOCAL));
+	std::ifstream ifs(file_name);
 	for( size_t iw=0; iw!=GlobalV::NLOCAL; ++iw )
 	{
 		for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
@@ -77,10 +77,10 @@ vector<vector<complex<double>>> Exx_Abfs_DM_Test::read_wfc( const string &file_n
 
 
 
-matrix Exx_Abfs_DM_Test::read_wg( const string &file_name )
+ModuleBase::matrix Exx_Abfs_DM_Test::read_wg( const std::string &file_name )
 {
-	matrix wf_wg(GlobalC::kv.nks,GlobalV::NBANDS);
-	ifstream ifs(file_name);
+	ModuleBase::matrix wf_wg(GlobalC::kv.nks,GlobalV::NBANDS);
+	std::ifstream ifs(file_name);
 	for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 	{
 		for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )

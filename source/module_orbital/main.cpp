@@ -1,62 +1,50 @@
 //#include "timer.h"
+#include <fstream>
 #include <ctime>
 #include "ORB_control.h"
+#include "ORB_unittest.h"
+#include "../module_base/global_variable.h"
+#include "../module_base/global_file.h"
 
 void calculate();
 
 int main(int argc, char **argv)
 {
 
-	cout << "Hello, this is the ORB module of ABACUS." << endl;
-
-	cout << "Right now, the module is still empty, soon we will have more tests." << endl;
+	std::cout << "Hello, this is the ORB module of ABACUS." << std::endl;
 
     calculate();
 
     return 0;
 }
 
-
 void calculate()
 {
-	ORB_control ooo;
+	GlobalV::BASIS_TYPE = "lcao";
 
-	ofstream ofs("log.txt");
+	test_orb test;
 
-//	ooo.set_orb_tables();
-
-	ofs.close();
-
-	cout << "--------------------" << endl;
-	cout << " Have a great day! " << endl;
-	cout << "--------------------" << endl;
+	test.count_ntype();
+	test.set_files();
+	test.set_ekcut();
+	test.read_files();
 
 /*
-	time_t time_start = std::time(NULL);
+	ooo.Read_Orbitals(
+	GlobalV::ofs_running,
+	test.ntype,
+	test.lmax,
+	test.out_descriptor,
+	test.out_r_matrix,
+	test.force_flag,
+	test.my_rank);
 
-//	timer::start();
-
-	//----------------------------------------------------------
-	// main program for doing electronic structure calculations
-	//----------------------------------------------------------
-//	Driver DD;
-//	DD.init();
-
-	time_t	time_finish= std::time(NULL);
-
-	// print out information before ABACUS ends
-	cout << "\n START  Time  : " << ctime(&time_start);
-	cout << " FINISH Time  : " << ctime(&time_finish);
-	cout << " TOTAL  Time  : " << difftime(time_finish, time_start) << endl;
-
-	double total_time = difftime(time_finish, time_start);
-	int hour = total_time / 3600;
-	int mins = ( total_time - 3600 * hour ) / 60;
-	int secs = total_time - 3600 * hour - 60 * mins ;
-	cout << " Total  Time  : " << hour << " h "
-	            << mins << " mins "
-	            << secs << " secs "<< endl;
 */
+//	ooo.set_orb_tables();
+
+	std::cout << "--------------------" << std::endl;
+	std::cout << " Have a great day! " << std::endl;
+	std::cout << "--------------------" << std::endl;
 
     return;
 }

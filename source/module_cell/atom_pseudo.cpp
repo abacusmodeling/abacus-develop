@@ -3,7 +3,7 @@
 
 Atom_pseudo::Atom_pseudo()
 {
-	mbl = new Vector3<int>[1];
+	mbl = new ModuleBase::Vector3<int>[1];
 	pseudo_fn = "not_init";
 	mass = 0.0;
 
@@ -22,14 +22,14 @@ Atom_pseudo::~Atom_pseudo()
 
 // mohan add 2021-05-07
 void Atom_pseudo::set_d_so(
-	ComplexMatrix &d_so_in,
+	ModuleBase::ComplexMatrix &d_so_in,
 	const int &nproj_in,
 	const int &nproj_in_so,
 	const bool has_so)
 {
 	if (this->lmax < -1 || this->lmax > 20)
 	{
-		 WARNING_QUIT("Numerical_Nonlocal", "bad input of lmax : should be between -1 and 20");
+		 ModuleBase::WARNING_QUIT("Numerical_Nonlocal", "bad input of lmax : should be between -1 and 20");
 	}
 
 	this->nproj = nproj_in;
@@ -43,12 +43,12 @@ void Atom_pseudo::set_d_so(
 	assert(nproj <= nproj_in+1); //LiuXh 2016-01-13, 2016-05-16
 	assert(nproj >= 0);
 
-//	cout << " has_so=" << has_so << endl;
+//	std::cout << " has_so=" << has_so << std::endl;
 
 	//2016-07-19 begin, LiuXh
 	if(!has_so)
 	{
-		ZEROS(this->non_zero_count_soc, 4);
+		ModuleBase::GlobalFunc::ZEROS(this->non_zero_count_soc, 4);
 	}
 	else //zhengdy-soc
 	{
@@ -64,7 +64,7 @@ void Atom_pseudo::set_d_so(
 			this->index2_soc[is] = new int[nproj_soc * nproj_soc];
 		}
 
-//		cout << "lmax=" << lmax << endl;
+//		std::cout << "lmax=" << lmax << std::endl;
 
 		if(this->lmax > -1)
 		{
@@ -85,8 +85,8 @@ void Atom_pseudo::set_d_so(
 								if(fabs(this->d_so(is, L1, L2).real())>1.0e-8 ||
 										fabs(this->d_so(is, L1, L2).imag())>1.0e-8 )
 								{
-//									cout << "tt in atom is=" << is << " L1=" << L1 << " L2=" 
-//									<< L2 << " " << d_so(is, L1, L2) << endl;
+//									std::cout << "tt in atom is=" << is << " L1=" << L1 << " L2=" 
+//									<< L2 << " " << d_so(is, L1, L2) << std::endl;
 
 									this->index1_soc[is][non_zero_count_soc[is]] = L1;
 									this->index2_soc[is][non_zero_count_soc[is]] = L2;
@@ -112,7 +112,7 @@ void Atom_pseudo::set_d_so(
 							{
 								if(is==1||is==2)
 								{
-									this->d_so(is, L1, L2) = complex<double>(0.0,0.0);
+									this->d_so(is, L1, L2) = std::complex<double>(0.0,0.0);
 								}
 								else
 								{
@@ -140,12 +140,12 @@ void Atom_pseudo::set_d_so(
 	return;
 }
 
-void Atom_pseudo::print_atom(ofstream &ofs)
+void Atom_pseudo::print_atom(std::ofstream &ofs)
 {
-	if(GlobalV::test_atom) TITLE("atom_pseudo","print_atom");
+	if(GlobalV::test_atom) ModuleBase::TITLE("atom_pseudo","print_atom");
 
-	OUT(ofs,"mass",mass);
-	OUT(ofs,"pseudo_fn",pseudo_fn);
+	ModuleBase::GlobalFunc::OUT(ofs,"mass",mass);
+	ModuleBase::GlobalFunc::OUT(ofs,"pseudo_fn",pseudo_fn);
 
 	return;
 }
@@ -153,14 +153,14 @@ void Atom_pseudo::print_atom(ofstream &ofs)
 #ifdef __MPI
 void Atom_pseudo::bcast_atom_pseudo(const int &na)
 {
-	TITLE("Atom_pseudo","bcast_atom_pseudo");
+	ModuleBase::TITLE("Atom_pseudo","bcast_atom_pseudo");
 	Parallel_Common::bcast_double( mass );
 	Parallel_Common::bcast_string( pseudo_fn );
 
 	if(GlobalV::MY_RANK!=0)
 	{
 		delete[] mbl;
-		mbl = new Vector3<int>[na];
+		mbl = new ModuleBase::Vector3<int>[na];
 	}
 
 	for(int i=0;i<na;i++)
@@ -174,7 +174,7 @@ void Atom_pseudo::bcast_atom_pseudo(const int &na)
 
 void Atom_pseudo::bcast_atom_pseudo2(void)
 {
-	TITLE("Atom_pseudo","bcast_atom_pseudo2");
+	ModuleBase::TITLE("Atom_pseudo","bcast_atom_pseudo2");
 // == pseudo_h ==
 //int
 	Parallel_Common::bcast_int( lmax );
@@ -194,7 +194,7 @@ void Atom_pseudo::bcast_atom_pseudo2(void)
 	Parallel_Common::bcast_bool( nlcc );
 	Parallel_Common::bcast_bool( has_so );
 
-//string
+//std::string
 	Parallel_Common::bcast_string( psd );
 	Parallel_Common::bcast_string( pp_type );
 	Parallel_Common::bcast_string( dft, 4 );
@@ -208,7 +208,7 @@ void Atom_pseudo::bcast_atom_pseudo2(void)
 		delete[] jchi;
 		delete[] nn;
 		jjj = new double [nbeta];
-		els = new string[nchi];
+		els = new std::string[nchi];
 		lchi = new int [nchi];
 		oc = new double[nchi];
 		jchi = new double[nchi];

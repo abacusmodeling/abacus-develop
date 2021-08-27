@@ -52,21 +52,21 @@ void Grid_MeshCell::set_grid_dim(
 
 	if(nbxx<=0)
 	{
-		cout << " nbx = " << nbx << endl;
-		cout << " nby = " << nby << endl;
-		cout << " nbz = " << nbz << endl;
-		cout << " nbxx = " << nbxx << endl;
-		WARNING_QUIT("Grid_MeshCell::set_grid_dim","nbxx is <=0 !");
+		std::cout << " nbx = " << nbx << std::endl;
+		std::cout << " nby = " << nby << std::endl;
+		std::cout << " nbz = " << nbz << std::endl;
+		std::cout << " nbxx = " << nbxx << std::endl;
+		ModuleBase::WARNING_QUIT("Grid_MeshCell::set_grid_dim","nbxx is <=0 !");
 	}
 
 	//xiaohui add 'GlobalV::OUT_LEVEL' line, 2015-09-16
-	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"real space grid",ncx,ncy,ncz); // real space uniform grid
-	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"big cell numbers in grid",nbx,nby,nbz); // reduced by BIG_CELL
-	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"meshcell numbers in big cell",bx,by,bz); // is small integer, typical number 2*2*2
+	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"real space grid",ncx,ncy,ncz); // real space uniform grid
+	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"big cell numbers in grid",nbx,nby,nbz); // reduced by BIG_CELL
+	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"meshcell numbers in big cell",bx,by,bz); // is small integer, typical number 2*2*2
 
-	//cout << " bx=" << bx << " by=" << by << " bz=" << bz << endl;
-	//cout << " nbx=" << nbx << " nby=" << nby << " nbz=" << nbz << endl; 
-	//cout << " ncx=" << ncx << " ncy=" << ncy << " ncz=" << ncz << endl;
+	//std::cout << " bx=" << bx << " by=" << by << " bz=" << bz << std::endl;
+	//std::cout << " nbx=" << nbx << " nby=" << nby << " nbz=" << nbz << std::endl; 
+	//std::cout << " ncx=" << ncx << " ncy=" << ncy << " ncz=" << ncz << std::endl;
 
     return;
 }
@@ -76,7 +76,7 @@ void Grid_MeshCell::set_grid_dim(
 // (1)
 void Grid_MeshCell::init_latvec(void)
 {
-	TITLE("Grid_MeshCell","init_latvec");
+	ModuleBase::TITLE("Grid_MeshCell","init_latvec");
 	// initialize the mesh cell vectors.
 	assert(ncx>0);
 	assert(ncy>0);
@@ -119,24 +119,24 @@ void Grid_MeshCell::init_latvec(void)
 
 	if(GlobalV::test_gridt)
 	{
-		GlobalV::ofs_running << " the VECTORS of MESHCELL are (Bohr): " << endl;
+		GlobalV::ofs_running << " the VECTORS of MESHCELL are (Bohr): " << std::endl;
 		GlobalV::ofs_running << " vec1( " 
-			<< setw(15) << meshcell_vec1[0]
-			<< setw(15) << meshcell_vec1[1]
-			<< setw(15) << meshcell_vec1[2] 
-			<< ")" << endl;
+			<< std::setw(15) << meshcell_vec1[0]
+			<< std::setw(15) << meshcell_vec1[1]
+			<< std::setw(15) << meshcell_vec1[2] 
+			<< ")" << std::endl;
 
 		GlobalV::ofs_running << " vec2( " 
-			<< setw(15) << meshcell_vec2[0]
-			<< setw(15) << meshcell_vec2[1]
-			<< setw(15) << meshcell_vec2[2]
-			<< ")" << endl;
+			<< std::setw(15) << meshcell_vec2[0]
+			<< std::setw(15) << meshcell_vec2[1]
+			<< std::setw(15) << meshcell_vec2[2]
+			<< ")" << std::endl;
 
 		GlobalV::ofs_running << " vec3( " 
-			<< setw(15) << meshcell_vec3[0]
-			<< setw(15) << meshcell_vec3[1]
-			<< setw(15) << meshcell_vec3[2]
-			<< ")" << endl;
+			<< std::setw(15) << meshcell_vec3[0]
+			<< std::setw(15) << meshcell_vec3[1]
+			<< std::setw(15) << meshcell_vec3[2]
+			<< ")" << std::endl;
 	}
 	
 	return;
@@ -167,13 +167,13 @@ void Grid_MeshCell::init_meshcell_pos(void)
 		{
 			for(int k=0; k<bz; k++)
 			{
-//				cout << setw(5) << i << setw(5) << j << setw(5) << k;
+//				std::cout << std::setw(5) << i << std::setw(5) << j << std::setw(5) << k;
 				for(int p=0; p<3; p++)
 				{
 					meshcell_pos[index][p] = i*meshcell_vec1[p] + j*meshcell_vec2[p] + k*meshcell_vec3[p];
-					//cout << setw(15) << meshcell_pos[index][p]; 
+					//std::cout << std::setw(15) << meshcell_pos[index][p]; 
 				}
-//				cout << endl;
+//				std::cout << std::endl;
 				++index;
 			}
 		}

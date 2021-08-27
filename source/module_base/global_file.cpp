@@ -13,8 +13,9 @@
 //----------------------------------------------------------
 // EXPLAIN : Be Called in input.cpp
 //----------------------------------------------------------
-
-void Global_File::make_dir_out(
+namespace ModuleBase
+{
+void ModuleBase::Global_File::make_dir_out(
     const std::string &suffix,
 	const std::string &calculation,
     const int rank,
@@ -27,7 +28,7 @@ void Global_File::make_dir_out(
 // NAME : system
 //----------------------------------------------------------
 
-    string prefix ;
+    std::string prefix ;
 
 #ifdef __EPM
 #ifdef __MPI
@@ -46,7 +47,7 @@ void Global_File::make_dir_out(
 #endif
     int make_dir = 0;
 	// mohan update 2011-05-03
-	string command0 =  "test -d " + GlobalV::global_out_dir + " || mkdir " + GlobalV::global_out_dir;	
+	std::string command0 =  "test -d " + GlobalV::global_out_dir + " || mkdir " + GlobalV::global_out_dir;	
 
 	int times = 0;
 	while(times<GlobalV::NPROC)
@@ -55,12 +56,12 @@ void Global_File::make_dir_out(
 		{
 			if ( system( command0.c_str() ) == 0 )
 			{
-				cout << " MAKE THE DIR         : " << GlobalV::global_out_dir << endl;
+				std::cout << " MAKE THE DIR         : " << GlobalV::global_out_dir << std::endl;
 				make_dir = 1;
 			}
 			else
 			{
-				cout << " PROC " << rank << " CAN NOT MAKE THE DIR !!! " << endl;	
+				std::cout << " PROC " << rank << " CAN NOT MAKE THE DIR !!! " << std::endl;	
 				make_dir = 0;
 			}
 		}
@@ -74,13 +75,13 @@ void Global_File::make_dir_out(
 #ifdef __MPI
 	if(make_dir==0)
 	{
-		cout << " CAN NOT MAKE THE OUT DIR......." << endl;
-		QUIT();		
+		std::cout << " CAN NOT MAKE THE OUT DIR......." << std::endl;
+		ModuleBase::QUIT();		
 	}
 	MPI_Barrier(MPI_COMM_WORLD);
 #endif
 
-    stringstream ss,ss1;
+    std::stringstream ss,ss1;
 
     // mohan add 2010-09-12
     if(out_alllog)
@@ -104,45 +105,45 @@ void Global_File::make_dir_out(
     return;
 }
 
-void Global_File::make_dir_atom(const std::string &label)
+void ModuleBase::Global_File::make_dir_atom(const std::string &label)
 {
 //----------------------------------------------------------
 // EXPLAIN : generate atom dir for each type of atom
 //----------------------------------------------------------
-    stringstream ss;
+    std::stringstream ss;
     ss << GlobalV::global_out_dir << label << "/";
 
-    string command1 = "test -d " + ss.str() + " || mkdir " + ss.str();
+    std::string command1 = "test -d " + ss.str() + " || mkdir " + ss.str();
     std::system( command1.c_str() );
     return;
 }
 
-void Global_File::open_log(std::ofstream &ofs,const std::string &fn)
+void ModuleBase::Global_File::open_log(std::ofstream &ofs,const std::string &fn)
 {
 //----------------------------------------------------------
 // USE GLOBAL VARIABLE :
 // GlobalV::global_out_dir : (default dir to store "*.log" file)
 //----------------------------------------------------------
-    stringstream ss;
+    std::stringstream ss;
     ss << GlobalV::global_out_dir << fn << ".log";
 
     ofs.open( ss.str().c_str() );
-//	ofs << " WELCOME TO MESIA PROGRAM." << endl;
-//	ofs << " OPEN "<<fn<<".log"<<" DONE."<<endl;
+//	ofs << " WELCOME TO MESIA PROGRAM." << std::endl;
+//	ofs << " OPEN "<<fn<<".log"<<" DONE."<<std::endl;
     return;
 }
 
-void Global_File::close_log( std::ofstream &ofs,const std::string &fn)
+void ModuleBase::Global_File::close_log( std::ofstream &ofs,const std::string &fn)
 {
 	if(ofs)
 	{
     	ofs.close();
 	}
-    ofs << "CLOSE "<<fn<<".log"<<" DONE."<<endl;
+    ofs << "CLOSE "<<fn<<".log"<<" DONE."<<std::endl;
     return;
 }
 
-void Global_File::close_all_log(const int rank, const bool out_alllog)
+void ModuleBase::Global_File::close_all_log(const int rank, const bool out_alllog)
 {
 //----------------------------------------------------------
 // USE GLOBAL VARIABLES :
@@ -154,7 +155,7 @@ void Global_File::close_all_log(const int rank, const bool out_alllog)
 //----------------------------------------------------------
 
 	// mohan update 2011-01-13
-    stringstream ss;
+    std::stringstream ss;
 	if(out_alllog)
 	{
     	ss << "running_" << GlobalV::CALCULATION << "_cpu" << rank << ".log";
@@ -175,4 +176,4 @@ void Global_File::close_all_log(const int rank, const bool out_alllog)
     }
     return;
 }
-
+}

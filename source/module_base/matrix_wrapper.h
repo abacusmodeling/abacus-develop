@@ -13,15 +13,17 @@
 
 // !!! Attention: c is very dangerous, may be changed by other class,
 //	e.g. changed the value, size!=nr*nc, deleted
+namespace ModuleBase
+{
 
 class Matrix_Wrapper
 {
 public:
-	double *c;
 	int nr;
 	int nc;
+	double *c;
 	bool flag_delete_c;
-	
+
 	Matrix_Wrapper(): nr(0), nc(0), c(nullptr), flag_delete_c(false){}
 	Matrix_Wrapper( const matrix &m ): nr(m.nr), nc(m.nc), c(m.c), flag_delete_c(false){}
 	inline void create( const int nr_in, const int nc_in, const bool flag_zero );
@@ -62,8 +64,8 @@ inline Matrix_Wrapper::Matrix_Wrapper( Matrix_Wrapper &&m )
 	 c(m.c),
 	 flag_delete_c(m.flag_delete_c)
 {
-	m.nr = m.nc = 0; 
-	m.c = nullptr; 
+	m.nr = m.nc = 0;
+	m.c = nullptr;
 	m.flag_delete_c = false;
 }
 
@@ -79,6 +81,8 @@ inline Matrix_Wrapper& Matrix_Wrapper::operator=( Matrix_Wrapper&&m )
 	nr = m.nr;	nc = m.nc;	c = m.c;		flag_delete_c = m.flag_delete_c;
 	m.nr = 0;	m.nc = 0;	m.c = nullptr;	m.flag_delete_c = false;
 	return *this;
+}
+
 }
 
 #endif

@@ -19,9 +19,11 @@ void Symmetry_rho::begin(const int &spin_now, const Charge_Broyden &CHR, const P
 #ifdef __MPI
 	// parallel version
 	psymm(CHR.rho[spin_now], pw, Pgrid, symm);
+	if(GlobalV::DFT_META) psymm(CHR.kin_r[spin_now],pw,Pgrid,symm);
 #else
 	// series version.
 	symm.rho_symmetry(CHR.rho[spin_now], pw.ncx, pw.ncy, pw.ncz);
+	if(GlobalV::DFT_META) symm.rho_symmetry(CHR.kin_r[spin_now],pw.ncx, pw.ncy, pw.ncz);
 #endif
 	return;
 }
@@ -31,7 +33,7 @@ void Symmetry_rho::psymm(double* rho_part, const PW_Basis &pw, Parallel_Grid &Pg
 #ifdef __MPI
 	// (1) reduce all rho from the first pool.
 	double* rhotot = new double[pw.ncxyz];
-	ZEROS(rhotot, pw.ncxyz);
+	ModuleBase::GlobalFunc::ZEROS(rhotot, pw.ncxyz);
 	Pgrid.reduce_to_fullrho(rhotot, rho_part);
 
 	// (2)
@@ -63,7 +65,7 @@ void Symmetry_rho::psymm(double* rho_part, const PW_Basis &pw, Parallel_Grid &Pg
 	for(int iz=0; iz<pw.ncz; iz++)
 	{
 		//GlobalV::ofs_running << "\n iz=" << iz;
-		ZEROS(zpiece, ncxy);
+		ModuleBase::GlobalFunc::ZEROS(zpiece, ncxy);
 		if(GlobalV::MY_RANK==0)
 		{
 			for(int ix=0; ix<pw.ncx; ix++)
