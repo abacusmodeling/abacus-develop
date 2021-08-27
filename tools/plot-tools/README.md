@@ -1,7 +1,7 @@
 <!--
  * @Date: 2021-08-21 21:58:06
  * @LastEditors: jiyuyang
- * @LastEditTime: 2021-08-21 23:14:43
+ * @LastEditTime: 2021-08-26 14:51:04
  * @Mail: jiyuyang@mail.ustc.edu.cn, 1041176461@qq.com
 -->
 
@@ -29,14 +29,17 @@ First, prepare a json file e.g. band-input.json:
 	"kptfile" : "KPT"
 }
 ```
-|Property|Type|Note|
-|:--:|:--:|:--:|
-|*filename*|`str` or `List[str]`|Bands data file output from ABACUS|
-|*efermi*|`float` or `List[float]`|Fermi level in eV|
-|*energy_range*|`list`| Range of energy in eV|
-|*kptfile*|`str`|K-points file in ABACUS format|
-|*label*|`str` or `List[str]`|Label of band structure|
-|*color*|`str` or `List[str]`|Color of band structure|
+|    Property    |           Type           |                              Note                              |
+| :------------: | :----------------------: | :------------------------------------------------------------: |
+|   *filename*   |   `str` or `List[str]`   |               Bands data file output from ABACUS               |
+|    *efermi*    | `float` or `List[float]` |                       Fermi level in eV                        |
+| *energy_range* |          `list`          |                     Range of energy in eV                      |
+|    *shift*     |          `bool`          | If set `'true'`, it will evaluate band gap. Default: `'false'` |
+|   *kptfile*    |          `str`           |                 K-points file in ABACUS format                 |
+|    *label*     |   `str` or `List[str]`   |                    Label of band structure                     |
+|    *color*     |   `str` or `List[str]`   |                    Color of band structure                     |
+
+If you want to plot band structure of `nspin=2` or compare to band structure on same k-path, you can set *filename*, *efermi*, *label*, *color* in `list` type. 
 
 The *kptfile* should be as follows, and notes after `#` will be set as k-points label automatically.
 ```shell
@@ -90,17 +93,18 @@ First, prepare a json file e.g. dos-input.json:
 }
 ```
 If you only want to plot total DOS, you can modify `pdosfile` to `tdosfile` and do not set `species` and `pdosfig`.
-|Property|Type|Note|
-|:--:|:--:|:--:|
-|*tdosfile*|`str`|Total DOS data file output from ABACUS|
-|*pdosfile*|`str`|Partial DOS data file output from ABACUS in xml format|
-|*efermi*|`float`|Fermi level in eV|
-|*energy_range*|`list`| Range of energy in eV|
-|*species*|`List[str]` or `Dict[str, List[int]]` or `Dict[str, Dict[str, List[int]]]]`| Three ways to plot partial DOS e.g. ["C", "Si"], {"C":[0, 1], "Si":[0]}, ["C":{"0":[0]}, "Si":{"1":[0, 1]}]|
-|*tdosfig*|`str`|Output picture of total DOS|
-|*pdosfig*|`str`|Output picture of partial DOS|
+|    Property    |                                    Type                                     |                                                    Note                                                     |
+| :------------: | :-------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------: |
+|   *tdosfile*   |                                    `str`                                    |                                   Total DOS data file output from ABACUS                                    |
+|   *pdosfile*   |                                    `str`                                    |                           Partial DOS data file output from ABACUS in xml format                            |
+|    *efermi*    |                                   `float`                                   |                                              Fermi level in eV                                              |
+| *energy_range* |                                   `list`                                    |                                            Range of energy in eV                                            |
+|    *shift*     |                                   `bool`                                    |                       If set `'true'`, it will evaluate band gap. Default: `'false'`                        |
+|   *species*    | `List[str]` or `Dict[str, List[int]]` or `Dict[str, Dict[str, List[int]]]]` | Three ways to plot partial DOS e.g. ["C", "Si"], {"C":[0, 1], "Si":[0]}, ["C":{"0":[0]}, "Si":{"1":[0, 1]}] |
+|   *tdosfig*    |                                    `str`                                    |                                         Output picture of total DOS                                         |
+|   *pdosfig*    |                                    `str`                                    |                                        Output picture of partial DOS                                        |
 
 Then, the following command will plot both total DOS and partial DOS:
 ```shell
-abacus-plot -b dos-input.json
+abacus-plot -d dos-input.json
 ```
