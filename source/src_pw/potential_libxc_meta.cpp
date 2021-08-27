@@ -227,7 +227,8 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> Potential_Libxc::v_xc
 
 			if (rh > rho_th && ggrho2 > grho_th && abs(atau) > tau_th)
 			{
-				XC_Functional::tau_xc_spin(rhoup, rhodw, grhoup, grhodw, tauup, taudw, ex, ec, v1xup, v1xdw, v2xup, v2xdw, v3xup, v3xdw, v1cup, v1cdw, v2cup, v2cdw, v3cup, v3cdw );
+				vector<double> v2c;
+				XC_Functional::tau_xc_spin(rhoup, rhodw, grhoup, grhodw, tauup, taudw, ex, ec, v1xup, v1xdw, v2xup, v2xdw, v3xup, v3xdw, v1cup, v1cdw, v2cup, v2cdw, v2c, v3cup, v3cdw );
 
 				vrho[0][ir] = (v1xup+v1cup) * ModuleBase::e2;
 				vrho[1][ir] = (v1xdw+v1cdw) * ModuleBase::e2;

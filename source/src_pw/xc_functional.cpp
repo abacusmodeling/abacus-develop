@@ -856,7 +856,7 @@ void XC_Functional::tau_xc(const double &rho, const double &grho, const double &
 }
 
 void XC_Functional::tau_xc_spin(const double &rhoup, const double &rhodw, const ModuleBase::Vector3<double> &grhoup, const ModuleBase::Vector3<double> &grhodw, const double &tauup, const double &taudw, double &sx, double &sc,
-          double &v1xup, double &v1xdw, double &v2xup, double &v2xdw, double &v3xup, double &v3xdw, double &v1cup, double &v1cdw, ModuleBase::Vector3<double> &v2cup, ModuleBase::Vector3<double> &v2cdw, double &v3cup, double &v3cdw)
+          double &v1xup, double &v1xdw, double &v2xup, double &v2xdw, double &v3xup, double &v3xdw, double &v1cup, double &v1cdw, ModuleBase::Vector3<double> &v2cup, ModuleBase::Vector3<double> &v2cdw, vector<double> &v2c, double &v3cup, double &v3cdw)
 {
 //initialize X and C functionals
 	xc_func_type x_func;
@@ -864,7 +864,7 @@ void XC_Functional::tau_xc_spin(const double &rhoup, const double &rhodw, const 
 	const int xc_polarized = XC_POLARIZED;
 
 	vector<double> rho, grho2, tau, v1x, v2x, v3x;
-	vector<double> v1c, v2c, v3c, lapl_rho, vlapl_rho;
+	vector<double> v1c, v3c, lapl_rho, vlapl_rho;
 
 	rho.resize(2); grho2.resize(3); tau.resize(2);
 	v1x.resize(2); v2x.resize(3); v3x.resize(2);

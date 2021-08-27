@@ -35,7 +35,7 @@ class XC_Functional
 	static void tau_xc(const double &rho, const double &grho, const double &atau, double &sx, double &sc,
           double &v1x, double &v2x, double &v3x, double &v1c, double &v2c, double &v3c);
 	static void tau_xc_spin(const double &rhoup, const double &rhodw, const ModuleBase::Vector3<double> &grhoup, const ModuleBase::Vector3<double> &grhodw, const double &tauup, const double &taudw, double &sx, double &sc,
-          double &v1xup, double &v1xdw, double &v2xup, double &v2xdw, double &v3xup, double &v3xdw, double &v1cup, double &v1cdw, ModuleBase::Vector3<double> &v2cup, ModuleBase::Vector3<double> &v2cdw, double &v3cup, double &v3cdw);
+          double &v1xup, double &v1xdw, double &v2xup, double &v2xdw, double &v3xup, double &v3xdw, double &v1cup, double &v1cdw, ModuleBase::Vector3<double> &v2cup, ModuleBase::Vector3<double> &v2cdw, vector<double> &v2c, double &v3cup, double &v3cdw);
 #endif
 
 	// PBEx, PBEc
