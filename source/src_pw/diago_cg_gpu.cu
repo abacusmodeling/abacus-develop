@@ -99,8 +99,8 @@ void Diago_CG_GPU::diag
 
     // cout<<"begin diago fft dim"<<GlobalC::pw.nx<<" "<<GlobalC::pw.ny<<" "<<GlobalC::pw.nz<<endl;
     // cout << &GlobalC::pw << endl;
-    if (test_cg==1) TITLE("Diago_CG_GPU","diag");
-    timer::tick("Diago_CG_GPU","diag");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG_GPU","diag");
+    ModuleBase::timer::tick("Diago_CG_GPU","diag");
 
     avg_iter = 0.0;
     notconv = 0;
@@ -220,10 +220,10 @@ void Diago_CG_GPU::diag
 
         if (m > 0 && reorder)
         {
-			NOTE("reorder bands!");
+			ModuleBase::GlobalFunc::NOTE("reorder bands!");
             double* e_host;
             e_host = (double*)malloc(n_band*sizeof(double));
-            ZEROS(e_host, n_band);
+            ModuleBase::GlobalFunc::ZEROS(e_host, n_band);
             cudaMemcpy(e_host, e, n_band*sizeof(double), cudaMemcpyDeviceToHost);
 
             if (e_host[m]-e_host[m-1]<-2.0*eps)
@@ -275,7 +275,7 @@ void Diago_CG_GPU::diag
     cudaFree(sphi);
     cudaFree(phi_m);
 
-    timer::tick("Diago_CG_GPU","diag");
+    ModuleBase::timer::tick("Diago_CG_GPU","diag");
     return;
 } // end subroutine ccgdiagg
 
@@ -285,8 +285,8 @@ void Diago_CG_GPU::calculate_gradient(
     const CUFFT_COMPLEX *hpsi, const CUFFT_COMPLEX *spsi,
     CUFFT_COMPLEX *g, CUFFT_COMPLEX *ppsi)
 {
-    if (test_cg==1) TITLE("Diago_CG_GPU","calculate_gradient");
-    timer::tick("Diago_CG_GPU","calculate_grad");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG_GPU","calculate_gradient");
+    ModuleBase::timer::tick("Diago_CG_GPU","calculate_grad");
 
     int thread = 512;
     int block = dim / thread + 1;
@@ -307,7 +307,7 @@ void Diago_CG_GPU::calculate_gradient(
     // Update g !
     kernel_get_gredient<<<block, thread>>>(g, ppsi, dim, lambda);
     // kernel_multi_add<<<block, thread>>>(g, g, 1, ppsi, -lambda, dim);
-    timer::tick("Diago_CG_GPU","calculate_grad");
+    ModuleBase::timer::tick("Diago_CG_GPU","calculate_grad");
     cudaError_t err = cudaGetLastError();
     if (err != cudaSuccess)
     {
@@ -321,8 +321,8 @@ void Diago_CG_GPU::orthogonal_gradient( const int &dim, const int &dmx,
                                     CUFFT_COMPLEX *g, CUFFT_COMPLEX *sg, CUFFT_COMPLEX *lagrange,
                                     const CUFFT_COMPLEX *eigenfunction, const int m)
 {
-    if (test_cg==1) TITLE("Diago_CG_GPU","orthogonal_gradient");
-    timer::tick("Diago_CG_GPU","orth_grad");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG_GPU","orthogonal_gradient");
+    ModuleBase::timer::tick("Diago_CG_GPU","orth_grad");
 
     GlobalC::hm.hpw.s_1psi_gpu(dim, g, sg);
 
@@ -364,7 +364,7 @@ void Diago_CG_GPU::orthogonal_gradient( const int &dim, const int &dmx,
         }
     }*/
 
-    timer::tick("Diago_CG_GPU","orth_grad");
+    ModuleBase::timer::tick("Diago_CG_GPU","orth_grad");
     cublasDestroy(handle);
     return;
 }
@@ -382,8 +382,8 @@ void Diago_CG_GPU::calculate_gamma_cg(
     const double &theta,
     const CUFFT_COMPLEX *psi_m)
 {
-    if (test_cg==1) TITLE("Diago_CG_GPU","calculate_gamma_cg");
-    timer::tick("Diago_CG_GPU","gamma_cg");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG_GPU","calculate_gamma_cg");
+    ModuleBase::timer::tick("Diago_CG_GPU","gamma_cg");
     double gg_inter;
     if (iter>0)
     {
@@ -455,7 +455,7 @@ void Diago_CG_GPU::calculate_gamma_cg(
 
         kernel_get_normacg<<<block, thread>>>(dim, cg, psi_m, norma);
     }
-    timer::tick("Diago_CG_GPU","gamma_cg");
+    ModuleBase::timer::tick("Diago_CG_GPU","gamma_cg");
     return;
 }
 
@@ -473,8 +473,8 @@ bool Diago_CG_GPU::update_psi(
     CUFFT_COMPLEX *hpsi,
     CUFFT_COMPLEX *sphi)
 {
-    if (test_cg==1) TITLE("Diago_CG_GPU","update_psi");
-    timer::tick("Diago_CG_GPU","update_psi");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG_GPU","update_psi");
+    ModuleBase::timer::tick("Diago_CG_GPU","update_psi");
     int thread = 512;
     int block = dim / 512 + 1;
     // pw.h_1psi(dim, cg, hcg, scg); // TODO
@@ -516,7 +516,7 @@ bool Diago_CG_GPU::update_psi(
     const double e2 = ( e0 + b0 - new_e ) /2.0;
     if (e1>e2)
     {
-        theta +=  PI_HALF;
+        theta +=  ModuleBase::PI_HALF;
     }
 
     eigenvalue = min( e1, e2 );
@@ -539,7 +539,7 @@ bool Diago_CG_GPU::update_psi(
 
     if ( abs(eigenvalue-e0)< threshold)
     {
-        timer::tick("Diago_CG_GPU","update_psi");
+        ModuleBase::timer::tick("Diago_CG_GPU","update_psi");
         return 1;
     }
     else
@@ -551,7 +551,7 @@ bool Diago_CG_GPU::update_psi(
         // }
         kernel_multi_add<<<block, thread>>>(sphi, sphi, cost, scg, sint_norm, dim);
         kernel_multi_add<<<block, thread>>>(hpsi, hpsi, cost, hcg, sint_norm, dim);
-        timer::tick("Diago_CG_GPU","update_psi");
+        ModuleBase::timer::tick("Diago_CG_GPU","update_psi");
         return 0;
     }
 }
@@ -566,7 +566,7 @@ void Diago_CG_GPU::schmit_orth
     CUFFT_COMPLEX *psi_m
 )
 {
-    timer::tick("Diago_CG_GPU","schmit_orth");
+    ModuleBase::timer::tick("Diago_CG_GPU","schmit_orth");
     assert( m >= 0 );
     // cout<<"orth, dim="<<dim<<endl;
 
@@ -600,7 +600,7 @@ void Diago_CG_GPU::schmit_orth
     GlobalC::hm.hpw.s_1psi_gpu(dim, psi_m, sphi);
 
     cublasDestroy(handle);
-    timer::tick("Diago_CG_GPU","schmit_orth");
+    ModuleBase::timer::tick("Diago_CG_GPU","schmit_orth");
     cudaFree(lagrange);
     return ;
 }

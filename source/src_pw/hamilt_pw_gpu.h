@@ -28,7 +28,7 @@ public:
     void cal_err
     (
         const int &npw,
-        ComplexMatrix &psi,
+        ModuleBase::ComplexMatrix &psi,
         const int &nband,
         double *em,
         double *err
@@ -46,8 +46,8 @@ public:
 	void diagH_subspace(const int ik,
                   const int nstart,
                   const int nbnd,
-                  const ComplexMatrix &psi,
-                  ComplexMatrix &evc,
+                  const ModuleBase::ComplexMatrix &psi,
+                  ModuleBase::ComplexMatrix &evc,
                   double *en);
 
     void h_1psi_gpu(
@@ -119,7 +119,7 @@ public:
                           const std::complex<double> * psi_R )const ;
 
     std::complex<double> ddot( const int & npw,
-                          const ComplexMatrix &psi,
+                          const ModuleBase::ComplexMatrix &psi,
                           const int & m,
                           const std::complex<double> *psik )const ;
 
@@ -128,7 +128,7 @@ public:
     void diag_zheev
     (
         const int& npw,
-        ComplexMatrix& psi,
+        ModuleBase::ComplexMatrix& psi,
         const int& nband,
         double *em,
         double *err
