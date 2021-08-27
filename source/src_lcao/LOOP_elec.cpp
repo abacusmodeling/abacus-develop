@@ -21,7 +21,9 @@
 #include "../src_ri/exx_opt_orb.h"
 #include "../src_pw/vdwd2.h"
 #include "../src_pw/vdwd3.h"
-
+#ifdef __DEEPKS
+#include "LCAO_descriptor.h"
+#endif
 
 void LOOP_elec::solve_elec_stru(const int &istep)
 {
