@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # ABACUS executable path
-abacus=abacus
+abacus=/home/mohan/Liuyu/DeePKS/abacus-develop/bin/ABACUS.mpi
 # number of mpi processes
-np=4
+np=1
 # threshold with unit: eV
 threshold=0.0000001
 # check accuracy
@@ -66,12 +66,11 @@ check_out(){
 		#--------------------------------------------------
 		# calculated value
 		#--------------------------------------------------
-		cal=`grep "$key" $outfile | awk '{printf "%.'$ca'f\n",$2}'`
+		cal=`grep "$key" result.out | awk '{printf "%.'$ca'f\n",$2}'`
 
 		#--------------------------------------------------
 		# reference value
 		#--------------------------------------------------
-
 		ref=`grep "$key" result.ref | awk '{printf "%.'$ca'f\n",$2}'`
 
 		#--------------------------------------------------
@@ -84,7 +83,7 @@ check_out(){
 		if [ $key == "totaltimeref" ]; then
 			# echo "time=$cal ref=$ref"
 			break
-		fi
+		fi		
 
 
 		#--------------------------------------------------

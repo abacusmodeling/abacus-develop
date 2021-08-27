@@ -9,8 +9,6 @@
 int main(int argc, char **argv)
 {
     Parallel_Global::read_mpi_parameters(argc,argv);
-
-    //----------------------------------------------------------
 	// main program for doing electronic structure calculations
 	//----------------------------------------------------------
 	Driver DD;

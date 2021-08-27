@@ -29,7 +29,7 @@ void Hamilt::diagH_pw(
 		{
 			// generate PAOs first, then diagonalize to get
 			// inital wavefunctions.
-			GlobalC::wf.diago_PAO_in_pw_k2(ik, GlobalC::wf.evc[0]);	
+			GlobalC::wf.diago_PAO_in_pw_k2(ik, GlobalC::wf.evc[0]);
 		}
 #ifdef __LCAO
 		else if(GlobalV::BASIS_TYPE=="lcao_in_pw")
@@ -46,16 +46,16 @@ void Hamilt::diagH_pw(
 		{
 			assert(GlobalV::NLOCAL >= GlobalV::NBANDS);
         	this->diagH_subspace(
-				ik, 
-				GlobalV::NLOCAL, 
-				GlobalV::NBANDS, 
-				GlobalC::wf.wanf2[ik0], 
-				GlobalC::wf.evc[ik0], 
+				ik,
+				GlobalV::NLOCAL,
+				GlobalV::NBANDS,
+				GlobalC::wf.wanf2[ik0],
+				GlobalC::wf.evc[ik0],
 				GlobalC::wf.ekb[ik]);
 		}
 		else
 		{
-			GlobalV::ofs_warning << " The diago_type " << GlobalV::KS_SOLVER 
+			GlobalV::ofs_warning << " The diago_type " << GlobalV::KS_SOLVER
 				<< " not implemented yet." << std::endl; //xiaohui add 2013-09-02
 			ModuleBase::WARNING_QUIT("Hamilt::diago","no implemt yet.");
 		}
@@ -65,27 +65,27 @@ void Hamilt::diagH_pw(
         int ntry = 0;
         int notconv = 0;
         do
-        {	
+        {
 	   		if(GlobalV::KS_SOLVER=="cg")
-            {			
+            {
 				// qian change it, because it has been executed in diago_PAO_in_pw_k2
                 if ( iter > 1 || istep > 1 ||  ntry > 0)
                 {
-                    this->diagH_subspace( 
+                    this->diagH_subspace(
 						ik,
-						GlobalV::NBANDS, 
-						GlobalV::NBANDS, 
-						GlobalC::wf.evc[ik0], 
-						GlobalC::wf.evc[ik0], 
+						GlobalV::NBANDS,
+						GlobalV::NBANDS,
+						GlobalC::wf.evc[ik0],
+						GlobalC::wf.evc[ik0],
 						GlobalC::wf.ekb[ik]);
 
                     avg_iter += 1.0;
                 }
                 Diago_CG cg;
-    	
+
 				bool reorder = true;
 
-				if(GlobalV::NPOL==1) 
+				if(GlobalV::NPOL==1)
 				{
 						cg.diag(GlobalC::wf.evc[ik0], GlobalC::wf.ekb[ik], GlobalC::kv.ngk[ik], GlobalC::wf.npwx,
 						GlobalV::NBANDS, precondition, GlobalV::ETHR,
@@ -106,7 +106,7 @@ void Hamilt::diagH_pw(
 	   		else if(GlobalV::KS_SOLVER=="dav")
         	{
 				Diago_David david;
-				if(GlobalV::NPOL==1) 
+				if(GlobalV::NPOL==1)
 				{
 					david.diag(GlobalC::wf.evc[ik0], GlobalC::wf.ekb[ik], GlobalC::kv.ngk[ik],
 						GlobalV::NBANDS, precondition, GlobalV::DIAGO_DAVID_NDIM,
@@ -143,7 +143,7 @@ void Hamilt::diagH_pw(
 bool Hamilt::test_exit_cond(const int &ntry, const int &notconv)
 {
     //================================================================
-    // If this logical function is true, need to do diagH_subspace 
+    // If this logical function is true, need to do diagH_subspace
 	// and cg again.
     //================================================================
 
@@ -227,7 +227,7 @@ void Hamilt::diagH_LAPACK(
     {
         nb = std::max(1, nstart);
     }
-    
+
 	if (nb == 1 || nb >= nstart)
     {
         lwork = 2 * nstart; // mohan modify 2009-08-02
@@ -254,7 +254,7 @@ void Hamilt::diagH_LAPACK(
     {
         rwork_dim = 7*nstart;
     }
-	
+
     double *rwork = new double[rwork_dim];
     ModuleBase::GlobalFunc::ZEROS( rwork, rwork_dim );
 

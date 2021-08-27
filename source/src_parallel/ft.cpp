@@ -185,6 +185,7 @@ void FFT::SFFT3D(std::complex<double> *psi, const int sign)
 		fftwnd(this->plus_plan, 1, (FFTW_COMPLEX *)psi, 1, 0, NULL, 0, 0);
 #elif defined __FFTW3
 		//fftw_execute( this->plus_plan);
+		// cout<<"SUCCESS fft+1!"<<endl;
 		fftw_execute_dft( this->plus_plan, (FFTW_COMPLEX *)psi, (FFTW_COMPLEX *)psi);
 #endif
 
@@ -196,6 +197,7 @@ void FFT::SFFT3D(std::complex<double> *psi, const int sign)
 		fftwnd( this->minus_plan, 1, (FFTW_COMPLEX *)psi, 1, 0, NULL, 0, 0);
 #elif defined __FFTW3
 		//fftw_execute( this->minus_plan);
+		// cout<<"SUCCESS fft-1!"<<endl;
 		fftw_execute_dft( this->minus_plan, (FFTW_COMPLEX *)psi, (FFTW_COMPLEX *)psi);
 #endif
 

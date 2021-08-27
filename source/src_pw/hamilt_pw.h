@@ -15,8 +15,8 @@ public:
 
 	void allocate(
 		const int &npwx, // number of plane wave (max)
-		const int &npol, // polarization 
-		const int &nkb,  // number of non-local pseudopotential projectors 
+		const int &npol, // polarization
+		const int &nkb,  // number of non-local pseudopotential projectors
 		const int &nrxx); // number of grids on this processor
 
     void cal_err
@@ -30,10 +30,9 @@ public:
 
     void init_k(const int ik);
 
-	private:
-	
 	friend class Diago_David;
 	friend class Diago_CG;
+    // friend class Diago_CG_GPU;
 	friend class Exx_Lip;
 	friend class Hamilt;
     friend class Stochastic_Iter;
@@ -51,17 +50,15 @@ public:
         std::complex<double> *hpsi,
         std::complex<double> *spsi);
 
-    void h_psi( 
-		const std::complex<double> *psi, 
-		std::complex<double> *hpsi, 
+    void h_psi(
+		const std::complex<double> *psi,
+		std::complex<double> *hpsi,
 		const int m = 1); // qianrui add a default parameter 2021-3-31
 
     void s_1psi(
         const int npw,
         const std::complex < double> *psi,
         std::complex < double> *spsi);
-
-	private:
 
     int *GR_index;
 
@@ -75,15 +72,13 @@ public:
 	// add contributions of h*psi from
 	// non-local pseduopotentials
     void add_nonlocal_pp(
-		std::complex<double> *hpsi, 
-		const std::complex<double> *becp, 
+		std::complex<double> *hpsi,
+		const std::complex<double> *becp,
 		const int m);
 
-	private:
-
-    double ddot_real( 
-		const int& npw, 
-		const std::complex<double>* psi_L, 
+    double ddot_real(
+		const int& npw,
+		const std::complex<double>* psi_L,
 		const std::complex<double>* psi_R)const;
 
     std::complex<double> ddot( const int& npw,
@@ -99,8 +94,6 @@ public:
                           const int & m,
                           const std::complex<double> *psik )const ;
 
-	private:
-
     void diag_zheev
     (
         const int& npw,
@@ -112,4 +105,4 @@ public:
 
 };
 
-#endif 
+#endif
