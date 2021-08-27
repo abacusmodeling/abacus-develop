@@ -34,7 +34,7 @@ LCAO_Matrix::~LCAO_Matrix()
 
 void LCAO_Matrix::divide_HS_in_frag(const bool isGamma, Parallel_Orbitals &po)
 {
-	TITLE("LCAO_Matrix","divide_HS_in_frag");
+	ModuleBase::TITLE("LCAO_Matrix","divide_HS_in_frag");
 
 	GlobalV::ofs_running << "\n SETUP THE DIVISION OF H/S MATRIX" << std::endl;
 	
@@ -48,7 +48,7 @@ void LCAO_Matrix::divide_HS_in_frag(const bool isGamma, Parallel_Orbitals &po)
 		// is determined in 'divide_HS_2d' subroutine
 		po.divide_HS_2d(DIAG_WORLD);
 #else
-		WARNING_QUIT("LCAO_Matrix::init","diago method is not ready.");
+		ModuleBase::WARNING_QUIT("LCAO_Matrix::init","diago method is not ready.");
 #endif
 	}
 	else
@@ -78,7 +78,7 @@ void LCAO_Matrix::divide_HS_in_frag(const bool isGamma, Parallel_Orbitals &po)
 
 void LCAO_Matrix::allocate_HS_gamma(const long &nloc)
 {
-	TITLE("LCAO_Matrix","allocate_HS_gamma");
+	ModuleBase::TITLE("LCAO_Matrix","allocate_HS_gamma");
 
 	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nloc",nloc);
 	if(nloc==0) return; //mohan fix bug 2012-05-25
@@ -107,7 +107,7 @@ void LCAO_Matrix::allocate_HS_gamma(const long &nloc)
 
 void LCAO_Matrix::allocate_HS_k(const long &nloc)
 {
-	TITLE("LCAO_Matrix","allocate_HS_k");
+	ModuleBase::TITLE("LCAO_Matrix","allocate_HS_k");
 
 	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nloc",nloc);
 	if(nloc==0) return; //mohan fix bug 2012-05-25
@@ -167,15 +167,27 @@ void LCAO_Matrix::allocate_HS_R(const int &nnR)
 	return;
 }
 
-void LCAO_Matrix::set_HSgamma(const int &iw1_all, const int &iw2_all, const double &v, const char &dtype)
+//------------------------------------------------------
+// DESCRIPTION:
+// set 'dtype' matrix element (iw1_all, iw2_all) with 
+// an input value 'v'
+//------------------------------------------------------
+void LCAO_Matrix::set_HSgamma(
+	const int &iw1_all, // index i for atomic orbital (row)
+	const int &iw2_all, // index j for atomic orbital (column)
+	const double &v, // value for matrix element (i,j) 
+	const char &dtype) // type of the matrix
 {
     // use iw1_all and iw2_all to set Hloc
-    // becareful! The ir and ic may < 0!!!!!!!!!!!!!!!!
+    // becareful! The ir and ic may be < 0 !!!
     const int ir = GlobalC::ParaO.trace_loc_row[ iw1_all ];
     const int ic = GlobalC::ParaO.trace_loc_col[ iw2_all ];
-    //const int index = ir * GlobalC::ParaO.ncol + ic;
-	long index;
-	if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+
+    //const int index = ir * ParaO.ncol + ic;
+	long index=0;
+
+	// save the matrix as column major format
+	if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")
 	{
 		index=ic*GlobalC::ParaO.nrow+ir;
 	}
@@ -192,14 +204,16 @@ void LCAO_Matrix::set_HSgamma(const int &iw1_all, const int &iw2_all, const doub
 		std::cout << " ic = " << ic << std::endl;
 		std::cout << " index = " << index << std::endl;
 		std::cout << " GlobalC::ParaO.nloc = " << GlobalC::ParaO.nloc << std::endl;
-		WARNING_QUIT("LCAO_Matrix","set_HSgamma");
+		ModuleBase::WARNING_QUIT("LCAO_Matrix","set_HSgamma");
 	}	 
 
+	//-----------------------------------
+	// dtype: type of the matrix.
 	// S : S matrix element.
 	// T : T matrix element.
 	// N : nonlocal H matrix element.
 	// L : local H matrix element.
-
+	//-----------------------------------
     if (dtype=='S')
     {
         this->Sloc[index] += v;
@@ -248,7 +262,7 @@ void LCAO_Matrix::set_HSk(const int &iw1_all, const int &iw2_all, const std::com
 	}
 	else
 	{
-		WARNING_QUIT("LCAO_Matrix","set_HSk");
+		ModuleBase::WARNING_QUIT("LCAO_Matrix","set_HSk");
 	}
 
     return;
@@ -277,7 +291,7 @@ void LCAO_Matrix::set_force
 		std::cout << " ic = " << ic << std::endl;
 		std::cout << " index = " << index << std::endl;
 		std::cout << " GlobalC::ParaO.nloc = " << GlobalC::ParaO.nloc << std::endl;
-		WARNING_QUIT("LCAO_Matrix","set_force");
+		ModuleBase::WARNING_QUIT("LCAO_Matrix","set_force");
 	}	 
 
     if (dtype == 'S')
@@ -311,7 +325,7 @@ void LCAO_Matrix::set_stress
     const double& vy,
     const double& vz,
     const char &dtype,
-    const Vector3<double> &dtau)
+    const ModuleBase::Vector3<double> &dtau)
 {
     // use iw1_all and iw2_all to set Hloc
     // becareful! The ir and ic may < 0!!!!!!!!!!!!!!!!
@@ -327,7 +341,7 @@ void LCAO_Matrix::set_stress
 		std::cout << " ic = " << ic << std::endl;
 		std::cout << " index = " << index << std::endl;
 		std::cout << " GlobalC::ParaO.nloc = " << GlobalC::ParaO.nloc << std::endl;
-		WARNING_QUIT("LCAO_Matrix","set_stress");
+		ModuleBase::WARNING_QUIT("LCAO_Matrix","set_stress");
 	}
 
 	if (dtype == 'S')
@@ -398,13 +412,13 @@ void LCAO_Matrix::zeros_HSR(const char &mtype, const int &nnr)
 // Peize Lin add vtype='A' 2018-11-30
 void LCAO_Matrix::print_HSk(const char &mtype, const char &vtype, const double &accuracy, std::ostream &os)
 {
-	TITLE("LCAO_Matrix","print_HSk");
+	ModuleBase::TITLE("LCAO_Matrix","print_HSk");
 	if(mtype=='S') os << "Sloc2 matrix" << std::endl;
 	else if(mtype=='T') os << "Hloc_fixed2 matrix" << std::endl;
 	else if(mtype=='H') os << "Hloc2 matrix" << std::endl;
 	else
 	{
-		WARNING_QUIT("LCAO_Matrix::print_HSk","Check input parameter: mtype.");
+		ModuleBase::WARNING_QUIT("LCAO_Matrix::print_HSk","Check input parameter: mtype.");
 	}
 
 	if(vtype=='C') os << " Output norm."  << std::endl;
@@ -473,7 +487,7 @@ void LCAO_Matrix::print_HSk(const char &mtype, const char &vtype, const double &
 
 void LCAO_Matrix::print_HSgamma(const char &mtype, std::ostream &os)
 {
-	TITLE("Parallel_Orbitals","print_HSgamma");
+	ModuleBase::TITLE("Parallel_Orbitals","print_HSgamma");
 
 	GlobalV::ofs_running << " " << mtype << " matrix" << std::endl;
 	GlobalV::ofs_running << " nrow=" << GlobalC::ParaO.nrow << std::endl;
@@ -567,7 +581,7 @@ void LCAO_Matrix::update_Hloc2(void)
 
 void LCAO_Matrix::output_HSk(const char &mtype, std::string &fn)
 {
-	TITLE("LCAO_Matrix","output_HSk");
+	ModuleBase::TITLE("LCAO_Matrix","output_HSk");
 	std::stringstream ss;
 	ss << GlobalV::global_out_dir << fn;
 	std::ofstream ofs(ss.str().c_str());
@@ -588,7 +602,7 @@ void LCAO_Matrix::output_HSk(const char &mtype, std::string &fn)
 
 void LCAO_Matrix::allocate_Hloc_fixedR_tr(void)
 {
-    TITLE("LCAO_Matrix","allocate_Hloc_fixedR_tr");
+    ModuleBase::TITLE("LCAO_Matrix","allocate_Hloc_fixedR_tr");
 
     //int R_x = 10;
     //int R_y = 10;
@@ -663,7 +677,7 @@ void LCAO_Matrix::allocate_Hloc_fixedR_tr(void)
 
 void LCAO_Matrix::allocate_HR_tr(void)
 {
-    TITLE("LCAO_Matrix","allocate_HR_tr");
+    ModuleBase::TITLE("LCAO_Matrix","allocate_HR_tr");
 
     //int R_x = 10;
     //int R_y = 10;
@@ -712,7 +726,7 @@ void LCAO_Matrix::allocate_HR_tr(void)
 
 void LCAO_Matrix::allocate_SlocR_tr(void)
 {
-    TITLE("LCAO_Matrix","allocate_SlocR_tr");
+    ModuleBase::TITLE("LCAO_Matrix","allocate_SlocR_tr");
 
     //int R_x = 10;
     //int R_y = 10;
@@ -761,7 +775,7 @@ void LCAO_Matrix::allocate_SlocR_tr(void)
 
 void LCAO_Matrix::destroy_Hloc_fixedR_tr(void)
 {
-    TITLE("LCAO_Matrix","destroy_Hloc_fixed2_R");
+    ModuleBase::TITLE("LCAO_Matrix","destroy_Hloc_fixed2_R");
 
     //int R_x = 10;
     //int R_y = 10;
@@ -893,7 +907,7 @@ void LCAO_Matrix::set_HR_tr_soc(const int &Rx, const int &Ry, const int &Rz, con
 
 void LCAO_Matrix::allocate_HS_R_sparse(void)
 {
-	TITLE("LCAO_Matrix","allocate_HS_R_sparse");
+	ModuleBase::TITLE("LCAO_Matrix","allocate_HS_R_sparse");
 
 	int R_x = GlobalC::GridD.getCellX();
     int R_y = GlobalC::GridD.getCellY();
@@ -935,7 +949,7 @@ void LCAO_Matrix::allocate_HS_R_sparse(void)
 
 void LCAO_Matrix::destroy_HS_R_sparse(void)
 {
-	TITLE("LCAO_Matrix","destroy_HS_R_sparse");
+	ModuleBase::TITLE("LCAO_Matrix","destroy_HS_R_sparse");
 
 	int R_x = GlobalC::GridD.getCellX();
     int R_y = GlobalC::GridD.getCellY();

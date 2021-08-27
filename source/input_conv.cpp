@@ -21,12 +21,13 @@
 #include "src_lcao/FORCE_STRESS.h"
 #include "src_lcao/local_orbital_charge.h"
 #include "src_lcao/ELEC_evolve.h"
+#include "src_lcao/dftu.h"
 #endif
 
 void Input_Conv::Convert(void)
 {
-    TITLE("Input_Conv","Convert");
-	timer::tick("Input_Conv","Convert");
+    ModuleBase::TITLE("Input_Conv","Convert");
+	ModuleBase::timer::tick("Input_Conv","Convert");
 //----------------------------------------------------------
 // main parameters / electrons / spin ( 10/16 )
 //----------------------------------------------------------
@@ -136,7 +137,7 @@ void Input_Conv::Convert(void)
 	}
 	else
 	{
-		WARNING_QUIT("Input", "fixed_axes should be None,a,b,c,ab,ac,bc or abc!");
+		ModuleBase::WARNING_QUIT("Input", "fixed_axes should be None,a,b,c,ab,ac,bc or abc!");
 	}
 
 	GlobalV::MOVE_IONS = INPUT.ion_dynamics;
@@ -305,6 +306,24 @@ void Input_Conv::Convert(void)
 		GlobalC::epsilon0_vasp.eta = INPUT.eta;
 	}
 
+	if(INPUT.dft_plus_u)
+	{
+		GlobalC::dftu.dftu_type = INPUT.dftu_type;
+		GlobalC::dftu.double_counting = INPUT.double_counting;
+		GlobalC::dftu.Yukawa = INPUT.yukawa_potential;
+		GlobalC::dftu.omc=INPUT.omc;
+		GlobalC::dftu.orbital_corr=INPUT.orbital_corr;
+		if(!INPUT.yukawa_potential)
+		{
+			GlobalC::dftu.U = INPUT.hubbard_u;            //Hubbard Coulomb interaction parameter U(ev)
+			GlobalC::dftu.J = INPUT.hund_j;               //Hund exchange parameter J(ev)
+		}
+	}
+#ifndef __CMD
+	GlobalC::ucell.input_mag=INPUT.input_mag;
+	GlobalC::ucell.n_mag_at=INPUT.n_mag_at;
+	GlobalC::ucell.atom_mag=INPUT.atom_mag;
+#endif
 //--------------------------------------------
 // added by zhengdy-soc
 //--------------------------------------------
@@ -332,13 +351,13 @@ void Input_Conv::Convert(void)
 		delete[] GlobalC::ucell.magnet.m_loc_;
 		delete[] GlobalC::ucell.magnet.angle1_;
 		delete[] GlobalC::ucell.magnet.angle2_;
-		GlobalC::ucell.magnet.m_loc_ = new Vector3<double> [INPUT.ntype];
+		GlobalC::ucell.magnet.m_loc_ = new ModuleBase::Vector3<double> [INPUT.ntype];
 		GlobalC::ucell.magnet.angle1_ = new double[INPUT.ntype];
 		GlobalC::ucell.magnet.angle2_ = new double[INPUT.ntype];
 		for (int i = 0; i < INPUT.ntype; i++)
 		{
-			GlobalC::ucell.magnet.angle1_[i] = INPUT.angle1[i] / 180 * PI;
-			GlobalC::ucell.magnet.angle2_[i] = INPUT.angle2[i] / 180 * PI;
+			GlobalC::ucell.magnet.angle1_[i] = INPUT.angle1[i] / 180 * ModuleBase::PI;
+			GlobalC::ucell.magnet.angle2_[i] = INPUT.angle2[i] / 180 * ModuleBase::PI;
 		}
 #ifdef __MPI
 //			Parallel_Common::bcast_double(GlobalC::ucell.magnet.angle1_[i]);
@@ -347,7 +366,7 @@ void Input_Conv::Convert(void)
 	}
 	else{
 		delete[] GlobalC::ucell.magnet.m_loc_;
-		GlobalC::ucell.magnet.m_loc_ = new Vector3<double> [INPUT.ntype];
+		GlobalC::ucell.magnet.m_loc_ = new ModuleBase::Vector3<double> [INPUT.ntype];
 		GlobalV::LSPINORB = false;
 		GlobalV::NONCOLIN = false;
 		GlobalV::DOMAG = false;
@@ -377,9 +396,7 @@ void Input_Conv::Convert(void)
 
 
 	// jiyy add 2020.10.11
-	GlobalV::ocp = INPUT.ocp;
-     //ocp_n = INPUT.ocp_n;
-    GlobalV::ocp_set = INPUT.ocp_set;
+	// fix bugs of ocp_set   --  Yuanbo Li 2021/8/17
     if(GlobalV::ocp == 1)
 	{
 		int count = 0;
@@ -603,11 +620,11 @@ void Input_Conv::Convert(void)
 	{
 		if(GlobalV::BASIS_TYPE != "pw")
 		{
-			 WARNING_QUIT("Input_conv","add metaGGA for pw first");
+			 ModuleBase::WARNING_QUIT("Input_conv","add metaGGA for pw first");
 		}
 		GlobalV::DFT_META = 1;
 	}
 
-	timer::tick("Input_Conv","Convert");
+	ModuleBase::timer::tick("Input_Conv","Convert");
     return;
 }

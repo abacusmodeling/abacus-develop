@@ -44,7 +44,7 @@ const char* const Grid::ERROR[3] =
 
 Grid::Grid(const int &test_grid_in):test_grid(test_grid_in)
 {
-//	TITLE("Grid","Grid");
+//	ModuleBase::TITLE("Grid","Grid");
 //----------------------------------------------------------
 // EXPLAIN : init_cell_flag (use this flag in case memory
 // leak)
@@ -64,7 +64,7 @@ void Grid::init(
 	const UnitCell &ucell, 
 	const Atom_input &input)
 {
-	TITLE("SLTK_Grid", "init");
+	ModuleBase::TITLE("SLTK_Grid", "init");
 
 	this->setMemberVariables(ofs_in, input);
 	this->setAtomLinkArray(ucell, input);
@@ -81,7 +81,7 @@ void Grid::setMemberVariables(
 	std::ofstream &ofs_in, //  output data to ofs
 	const Atom_input &input)
 {
-	TITLE("SLTK_Grid", "setMemberVariables");
+	ModuleBase::TITLE("SLTK_Grid", "setMemberVariables");
 
 	// mohan add 2010-09-05
 	AdjacentSet::call_times = 0;
@@ -252,7 +252,7 @@ void Grid::setBoundaryAdjacent(
 	std::ofstream &ofs_in,
 	const Atom_input &input)
 {
-	if (test_grid) TITLE(ofs_in, "Grid", "setBoundaryAdjacent");
+	if (test_grid) ModuleBase::TITLE(ofs_in, "Grid", "setBoundaryAdjacent");
 
 	if (expand_flag)
 	{
@@ -285,8 +285,8 @@ void Grid::setBoundaryAdjacent(
 //		/ static_cast<double>(Cell[0][0][0].length));
 	}
 
-	Memory::record("AdjacentSet", "offset", AdjacentSet::call_times, "short");
-	Memory::record("AdjacentSet", "box", AdjacentSet::call_times, "short");
+	ModuleBase::Memory::record("AdjacentSet", "offset", AdjacentSet::call_times, "short");
+	ModuleBase::Memory::record("AdjacentSet", "box", AdjacentSet::call_times, "short");
 
 	//if (test_grid)ModuleBase::GlobalFunc::DONE(ofs_in, "Construct_Adjacent");
 
@@ -326,9 +326,9 @@ bool Grid::Push(const UnitCell &ucell, const FAtom &atom)
 
 AtomLink* Grid::Build_Cache(const UnitCell &ucell, const Atom_input &input)
 {
-//	if (test_grid)TITLE(ofs_running, "Grid", "Build_Cache");
+//	if (test_grid)ModuleBase::TITLE(ofs_running, "Grid", "Build_Cache");
 	AtomLink* const start = new AtomLink[natom+1];
-	Memory::record("grid", "AtomLink", natom, "AtomLink");
+	ModuleBase::Memory::record("grid", "AtomLink", natom, "AtomLink");
 
 	// the pointer stay at the end of atom.
 	//const AtomLink* const end = start + natom + 1;
@@ -359,7 +359,7 @@ AtomLink* Grid::Build_Cache(const UnitCell &ucell, const Atom_input &input)
 
 void Grid::Build_Cell(void)
 {
-	TITLE("SLTK_Grid", "Build_Cell");
+	ModuleBase::TITLE("SLTK_Grid", "Build_Cell");
 
 	delete[] this->atomlink;
 	this->atomlink = new AtomLink[this->natom];
@@ -417,7 +417,7 @@ void Grid::In_Which_Cell(const UnitCell &ucell, int &a, int &b, int &c, const FA
 // d_minX, d_minY, d_minZ must be the cell origin
 //----------------------------------------------------------
 		double directx, directy, directz;
-		Mathzone::Cartesian_to_Direct(
+		ModuleBase::Mathzone::Cartesian_to_Direct(
 		    atom.x(), atom.y(), atom.z(),
 		    vec1[0], vec1[1], vec1[2],
 		    vec2[0], vec2[1], vec2[2],
@@ -506,7 +506,7 @@ AtomLink* Grid::getHashCode(const UnitCell &ucell, const FAtom& atom)const
 
 void Grid::Build_Hash_Table(const UnitCell &ucell, AtomLink* const pointCache)
 {
-	TITLE("SLTK_Grid", "Build_Hash_Table");
+	ModuleBase::TITLE("SLTK_Grid", "Build_Hash_Table");
 
 	AtomLink* current = pointCache;
 
@@ -562,7 +562,7 @@ void Grid::Build_Hash_Table(const UnitCell &ucell, AtomLink* const pointCache)
 
 void Grid::Fold_Hash_Table()
 {
-	TITLE("SLTK_Grid", "Fold_Hash_Table");
+	ModuleBase::TITLE("SLTK_Grid", "Fold_Hash_Table");
 
 	struct AtomLinkPointStack
 	{
@@ -713,7 +713,7 @@ void Grid::Construct_Adjacent_expand(
 	const int true_j, 
 	const int true_k)
 {
-//	if (test_grid)TITLE(ofs_running, "Grid", "Construct_Adjacent_expand");
+//	if (test_grid)ModuleBase::TITLE(ofs_running, "Grid", "Construct_Adjacent_expand");
 
 //----------------------------------------------------------
 // EXPlAIN : In expand grid case, use
@@ -777,7 +777,7 @@ void Grid::Construct_Adjacent_expand(
 		}
 		else
 		{
-			WARNING_QUIT("Construct_Adjacent_expand", "\n Expand case, must use periodic boundary.");
+			ModuleBase::WARNING_QUIT("Construct_Adjacent_expand", "\n Expand case, must use periodic boundary.");
 		}
 	}
 	return;
@@ -789,7 +789,7 @@ void Grid::Construct_Adjacent_expand_periodic(
 	const int true_k, 
 	const int true_ia)
 {
-//	if (test_grid)TITLE(ofs_running, "Grid", "Construct_Adjacent_expand_periodic");
+//	if (test_grid)ModuleBase::TITLE(ofs_running, "Grid", "Construct_Adjacent_expand_periodic");
 
 	for (int i = 0;i < this->dx;i++)
 	{
@@ -810,7 +810,7 @@ void Grid::Construct_Adjacent_expand_periodic(
 
 void Grid::Construct_Adjacent_begin(void)
 {
-//	if (test_grid)TITLE(ofs_running, "Grid", "Construct_Adjacent_begin");
+//	if (test_grid)ModuleBase::TITLE(ofs_running, "Grid", "Construct_Adjacent_begin");
 
 //----------------------------------------------------------
 // EXPLAIN : Searching in all cells in this grid
@@ -873,7 +873,7 @@ void Grid::Construct_Adjacent_nature
     const int ia
 )
 {
-//	if(test_grid)TITLE(ofs_running,"Grid","Construct_Adjacent_nature");
+//	if(test_grid)ModuleBase::TITLE(ofs_running,"Grid","Construct_Adjacent_nature");
 	for (int i2 = i - 1;i2 <= i + 1;i2++)
 	{
 		if (i2<dx && i2 >= 0)
@@ -908,7 +908,7 @@ void Grid::Construct_Adjacent_periodic
     const int ia
 )
 {
-//	if(test_grid)TITLE(ofs_running,"Grid","Construct_Adjacent_periodic");
+//	if(test_grid)ModuleBase::TITLE(ofs_running,"Grid","Construct_Adjacent_periodic");
 	bool first_i = true;
 
 	for (int i2 = i - 1;i2 <= i + 1;i2++)

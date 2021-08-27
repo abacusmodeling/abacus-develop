@@ -12,9 +12,13 @@
 #include "../module_base/matrix.h"
 
 
-template<class Archive, typename T> void serialize( Archive & ar, Vector3<T> & v ){ ar(v.x); ar(v.y); ar(v.z); }
+
 template<class Archive, typename T> void serialize( Archive & ar, Abfs::Vector3_Order<T> & v ){ ar(v.x); ar(v.y); ar(v.z); }
 
+namespace ModuleBase
+{
+
+template<class Archive, typename T> void serialize( Archive & ar, Vector3<T> & v ){ ar(v.x); ar(v.y); ar(v.z); }
 
 template<class Archive> void save( Archive & ar, const matrix & m )
 {
@@ -27,6 +31,7 @@ template<class Archive> void load( Archive & ar, matrix & m )
 	ar(nr);	ar(nc);
 	m.create(nr,nc);
 	ar(cereal::binary_data(m.c, m.nr*m.nc*sizeof(double)));
+}
 }
 
 #endif

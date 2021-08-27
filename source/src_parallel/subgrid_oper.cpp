@@ -24,7 +24,7 @@ SubGrid_oper::~SubGrid_oper()
 /*
 void SubGrid_oper::cal_totwfc_aug()
 {
-	TITLE("SubGrid_oper","cal_totwfc_aug");
+	ModuleBase::TITLE("SubGrid_oper","cal_totwfc_aug");
 
 	int *occupy = new int[GlobalV::NLOCAL];
 	ModuleBase::GlobalFunc::ZEROS(occupy, GlobalV::NLOCAL);
@@ -94,7 +94,7 @@ void SubGrid_oper::cal_totwfc_aug()
 
 void SubGrid_oper::cal_totwfc()
 {
-	TITLE("SubGrid_oper","cal_totwfc");
+	ModuleBase::TITLE("SubGrid_oper","cal_totwfc");
 
 	//-----------------------------------------
 	// combine the wave functions index in the 
@@ -239,7 +239,7 @@ void SubGrid_oper::cal_totwfc()
 
 void SubGrid_oper::dis_subwfc()
 {
-	TITLE("SubGrid_oper","dis_subwfc");
+	ModuleBase::TITLE("SubGrid_oper","dis_subwfc");
 
 #ifdef __MPI
 

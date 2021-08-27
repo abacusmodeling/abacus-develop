@@ -20,8 +20,8 @@ void ORB_gen_tables::gen_tables(
 	const int &Lmax_exx,
 	const int &out_descriptor)
 {
-	TITLE("ORB_gen_tables", "gen_tables");
-	timer::tick("ORB_gen_tables", "gen_tables");
+	ModuleBase::TITLE("ORB_gen_tables", "gen_tables");
+	ModuleBase::timer::tick("ORB_gen_tables", "gen_tables");
 
 	ofs_in << "\n SETUP THE TWO-CENTER INTEGRATION TABLES" << std::endl;
 
@@ -77,17 +77,22 @@ void ORB_gen_tables::gen_tables(
 	/// (2) init Ylm Coef
 	//////////////////////////////
 	//liaochen add 2010/4/29
-	Ylm::set_coefficients();
+	ModuleBase::Ylm::set_coefficients();
 
 	// PLEASE add explanations for all options of 'orb_num' and 'mode'
 	// mohan add 2021-04-03
 	// Peize Lin update 2016-01-26
+#ifdef __ORBITAL
+	int orb_num = 4;
+#else
 	int orb_num = 2; //
+#endif
 	int mode = 1;	 // 1: <phi|phi> and <phi|beta>
 	int Lmax_used = 0;
 	int Lmax = 0;
 
-	MOT.init_Table_Spherical_Bessel(orb_num, mode, Lmax_used, Lmax, Lmax_exx);
+
+	MOT.init_Table_Spherical_Bessel(orb_num, mode, Lmax_used, Lmax, Lmax_exx, orb);
 
 	//calculate S(R) for interpolation
 	MOT.init_Table(job0, orb);
@@ -105,31 +110,31 @@ void ORB_gen_tables::gen_tables(
 	/////////////////////////////
 
 	const int lmax = (Lmax_used - 1) / 2;
-	//MGT.init_Ylm_Gaunt(orb.get_lmax()+1, 0.0,PI,0.0,TWO_PI);
+	//MGT.init_Ylm_Gaunt(orb.get_lmax()+1, 0.0,PI,0.0,ModuleBase::TWO_PI);
 	MGT.init_Gaunt_CH(lmax);
 	//MGT.init_Gaunt(orb.get_lmax()+1);
 	MGT.init_Gaunt(lmax);
 
-	timer::tick("ORB_gen_tables", "gen_tables");
+	ModuleBase::timer::tick("ORB_gen_tables", "gen_tables");
 	return;
 }
 
 void ORB_gen_tables::snap_psibeta(
 	double nlm[],
 	const int &job,
-	const Vector3<double> &R1,
+	const ModuleBase::Vector3<double> &R1,
 	const int &T1,
 	const int &L1,
 	const int &m1,
 	const int &N1,
-	const Vector3<double> &R2,
+	const ModuleBase::Vector3<double> &R2,
 	const int &T2,
 	const int &L2,
 	const int &m2,
 	const int &N2,
-	const Vector3<double> &R0, // The projector.
+	const ModuleBase::Vector3<double> &R0, // The projector.
 	const int &T0,
-	const matrix &dion, // mohan add 2021-04-25
+	const ModuleBase::matrix &dion, // mohan add 2021-04-25
 	const int &nspin,
 	const ModuleBase::ComplexArray &d_so, // mohan add 2021-05-07
 	const int &count_soc, // mohan add 2021-05-07
@@ -139,7 +144,7 @@ void ORB_gen_tables::snap_psibeta(
 	std::complex<double> *nlm1,
 	const int is) const
 {
-	//TITLE ("ORB_gen_tables","snap_psibeta");
+	//ModuleBase::TITLE ("ORB_gen_tables","snap_psibeta");
 
 	//optimized by zhengdy-soc
 	if (nspin == 4 && count_soc == 0)
@@ -147,7 +152,7 @@ void ORB_gen_tables::snap_psibeta(
 		return;
 	}
 
-	timer::tick("ORB_gen_tables", "snap_psibeta");
+	ModuleBase::timer::tick("ORB_gen_tables", "snap_psibeta");
 
 	bool has_so = 0;
 	if (count_soc > 0)
@@ -168,8 +173,8 @@ void ORB_gen_tables::snap_psibeta(
 
 	//in our calculation, we always put orbital phi at the left side of <phi|beta>
 	//because <phi|beta> = <beta|phi>
-	const Vector3<double> dRa = (R0 - R1) * this->lat0;
-	const Vector3<double> dRb = (R0 - R2) * this->lat0;
+	const ModuleBase::Vector3<double> dRa = (R0 - R1) * this->lat0;
+	const ModuleBase::Vector3<double> dRb = (R0 - R2) * this->lat0;
 
 	double distance10 = dRa.norm();
 	double distance20 = dRb.norm();
@@ -201,7 +206,7 @@ void ORB_gen_tables::snap_psibeta(
 		delete[] calproj;
 		delete[] rmesh1;
 		delete[] rmesh2;
-		timer::tick("ORB_gen_tables", "snap_psibeta");
+		ModuleBase::timer::tick("ORB_gen_tables", "snap_psibeta");
 		return;
 	}
 
@@ -274,14 +279,14 @@ void ORB_gen_tables::snap_psibeta(
 	std::vector<double> rlyb;
 	std::vector<std::vector<double>> grlyb;
 
-	Ylm::rl_sph_harm(T1_2Lplus1 - 1, dRa.x, dRa.y, dRa.z, rlya);
+	ModuleBase::Ylm::rl_sph_harm(T1_2Lplus1 - 1, dRa.x, dRa.y, dRa.z, rlya);
 	if (job == 0)
 	{
-		Ylm::rl_sph_harm(T2_2Lplus1 - 1, dRb.x, dRb.y, dRb.z, rlyb);
+		ModuleBase::Ylm::rl_sph_harm(T2_2Lplus1 - 1, dRb.x, dRb.y, dRb.z, rlyb);
 	}
 	else
 	{
-		Ylm::grad_rl_sph_harm(T2_2Lplus1 - 1, dRb.x, dRb.y, dRb.z, rlyb, grlyb);
+		ModuleBase::Ylm::grad_rl_sph_harm(T2_2Lplus1 - 1, dRb.x, dRb.y, dRb.z, rlyb, grlyb);
 	}
 	//////////////////////////////////////////////////////////////////////////
 	/// Formula :                         T1       T0          T0        T2
@@ -545,7 +550,7 @@ void ORB_gen_tables::snap_psibeta(
 					}
 					else
 					{
-						WARNING_QUIT("ORB_gen_tables::snap_psibeta", "Conflict! Didn't count non-local part");
+						ModuleBase::WARNING_QUIT("ORB_gen_tables::snap_psibeta", "Conflict! Didn't count non-local part");
 					}
 				}
 				break;
@@ -562,7 +567,7 @@ void ORB_gen_tables::snap_psibeta(
 	delete[] rmesh1;
 	delete[] rmesh2;
 
-	timer::tick("ORB_gen_tables", "snap_psibeta");
+	ModuleBase::timer::tick("ORB_gen_tables", "snap_psibeta");
 	return;
 }
 
@@ -570,12 +575,12 @@ void ORB_gen_tables::snap_psipsi(
 	double olm[],
 	const int &job,	   //0, 1
 	const char &dtype, // derivative type: S or T
-	const Vector3<double> &R1,
+	const ModuleBase::Vector3<double> &R1,
 	const int &T1,
 	const int &L1,
 	const int &m1,
 	const int &N1,
-	const Vector3<double> &R2,
+	const ModuleBase::Vector3<double> &R2,
 	const int &T2,
 	const int &L2,
 	const int &m2,
@@ -583,11 +588,11 @@ void ORB_gen_tables::snap_psipsi(
 	const int &nspin,
 	std::complex<double> *olm1) const
 {
-	//TITLE("ORB_gen_tables","snap_psipsi");
-	//timer::tick ("ORB_gen_tables", "snap_psipsi");
+	//ModuleBase::TITLE("ORB_gen_tables","snap_psipsi");
+	//ModuleBase::timer::tick ("ORB_gen_tables", "snap_psipsi");
 	if (job != 0 && job != 1)
 	{
-		WARNING_QUIT("ORB_gen_tables::snap_psipsi", "job must be equal to 0 or 1!");
+		ModuleBase::WARNING_QUIT("ORB_gen_tables::snap_psipsi", "job must be equal to 0 or 1!");
 	}
 
 	Numerical_Orbital::set_position(R1, R2);
@@ -677,12 +682,12 @@ void ORB_gen_tables::snap_psipsi(
 	{
 		//		Ylm::rlylm(dim3, arr_dR[0], arr_dR[1], arr_dR[2], rly);
 		//		Ylm::sph_harm (dim3-1, xdr, ydr, zdr, rly);
-		Ylm::rl_sph_harm(dim3 - 1, arr_dR[0], arr_dR[1], arr_dR[2], rly);
+		ModuleBase::Ylm::rl_sph_harm(dim3 - 1, arr_dR[0], arr_dR[1], arr_dR[2], rly);
 	}
 	else
 	{
 		//		Ylm::rlylm(dim3, arr_dR[0], arr_dR[1], arr_dR[2], rly, grly);
-		Ylm::grad_rl_sph_harm(dim3 - 1, arr_dR[0], arr_dR[1], arr_dR[2], rly, grly);
+		ModuleBase::Ylm::grad_rl_sph_harm(dim3 - 1, arr_dR[0], arr_dR[1], arr_dR[2], rly, grly);
 	}
 
 	switch (dtype)
@@ -710,7 +715,7 @@ void ORB_gen_tables::snap_psipsi(
 
 			if (distance > tiny2)
 			{
-				Interp_Slm = i_exp * PolyInt::Polynomial_Interpolation(
+				Interp_Slm = i_exp * ModuleBase::PolyInt::Polynomial_Interpolation(
 					MOT.Table_SR[0][dim1][dim2][L], rmesh, MOT.dr, distance);
 				Interp_Slm /= rl;
 			}
@@ -723,7 +728,7 @@ void ORB_gen_tables::snap_psipsi(
 			{
 				if (distance > tiny2)
 				{
-					Interp_dSlm = i_exp * PolyInt::Polynomial_Interpolation(
+					Interp_dSlm = i_exp * ModuleBase::PolyInt::Polynomial_Interpolation(
 						MOT.Table_SR[1][dim1][dim2][L], rmesh, MOT.dr, distance);
 					Interp_dSlm = Interp_dSlm / pow(distance, L) - Interp_Slm * L / distance;
 				}
@@ -763,7 +768,7 @@ void ORB_gen_tables::snap_psipsi(
 					}
 					else
 					{
-						WARNING_QUIT("ORB_gen_tables::snap_psipsi", "something wrong!");
+						ModuleBase::WARNING_QUIT("ORB_gen_tables::snap_psipsi", "something wrong!");
 					}
 
 					/*
@@ -811,7 +816,7 @@ void ORB_gen_tables::snap_psipsi(
 			double rl = pow(distance, L);
 			if (distance > tiny2)
 			{
-				Interp_Tlm = i_exp * PolyInt::Polynomial_Interpolation(
+				Interp_Tlm = i_exp * ModuleBase::PolyInt::Polynomial_Interpolation(
 					MOT.Table_TR[0][dim1][dim2][L], rmesh, MOT.dr, distance);
 				Interp_Tlm /= rl;
 			}
@@ -822,7 +827,7 @@ void ORB_gen_tables::snap_psipsi(
 			{
 				if (distance > tiny2)
 				{
-					Interp_dTlm = i_exp * PolyInt::Polynomial_Interpolation(
+					Interp_dTlm = i_exp * ModuleBase::PolyInt::Polynomial_Interpolation(
 						MOT.Table_TR[1][dim1][dim2][L], rmesh, MOT.dr, distance);
 					Interp_dTlm = Interp_dTlm / rl - Interp_Tlm * L / distance;
 				}
@@ -859,7 +864,7 @@ void ORB_gen_tables::snap_psipsi(
 					}
 					else
 					{
-						WARNING_QUIT("ORB_gen_tables::snap_psipsi", "something wrong in T.");
+						ModuleBase::WARNING_QUIT("ORB_gen_tables::snap_psipsi", "something wrong in T.");
 					}
 					break;
 				}
@@ -900,7 +905,7 @@ void ORB_gen_tables::snap_psipsi(
 
 			if (distance > tiny2)
 			{
-				Interp_Slm = i_exp * PolyInt::Polynomial_Interpolation(
+				Interp_Slm = i_exp * ModuleBase::PolyInt::Polynomial_Interpolation(
 					talpha.Table_DSR[0][dim1][dim2][L], rmesh, MOT.dr, distance);
 				Interp_Slm /= rl;
 			}
@@ -913,7 +918,7 @@ void ORB_gen_tables::snap_psipsi(
 			{
 				if (distance > tiny2)
 				{
-					Interp_dSlm = i_exp * PolyInt::Polynomial_Interpolation(
+					Interp_dSlm = i_exp * ModuleBase::PolyInt::Polynomial_Interpolation(
 						talpha.Table_DSR[1][dim1][dim2][L], rmesh, MOT.dr, distance);
 					Interp_dSlm = Interp_dSlm / pow(distance, L) - Interp_Slm * L / distance;
 				}
@@ -947,7 +952,7 @@ void ORB_gen_tables::snap_psipsi(
 					}
 					else
 					{
-						WARNING_QUIT("ORB_gen_tables::snap_psialpha", "deepks with GlobalV::NSPIN>1 has not implemented yet!");
+						ModuleBase::WARNING_QUIT("ORB_gen_tables::snap_psialpha", "deepks with GlobalV::NSPIN>1 has not implemented yet!");
 					}
 					break;
 				}
@@ -966,14 +971,14 @@ void ORB_gen_tables::snap_psipsi(
 			} //m
 		}
 	}
-	//	timer::tick ("ORB_gen_tables", "snap_psipsi");
+	//	ModuleBase::timer::tick ("ORB_gen_tables", "snap_psipsi");
 	return;
 }
 
-double ORB_gen_tables::get_distance(const Vector3<double> &R1, const Vector3<double> &R2) const
+double ORB_gen_tables::get_distance(const ModuleBase::Vector3<double> &R1, const ModuleBase::Vector3<double> &R2) const
 {
 	assert(this->lat0 > 0.0);
-	Vector3<double> dR = R1 - R2;
+	ModuleBase::Vector3<double> dR = R1 - R2;
 	return dR.norm() * this->lat0;
 }
 

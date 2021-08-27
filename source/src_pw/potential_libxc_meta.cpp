@@ -31,23 +31,23 @@ using namespace std;
 //XC_POLARIZED, XC_UNPOLARIZED: internal flags used in LIBXC, denote the polarized(nspin=1) or unpolarized(nspin=2) calculations, definition can be found in xc.h from LIBXC
 
 // [etxc, vtxc, v, vofk] = Potential_Libxc::v_xc(...)
-tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
+tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> Potential_Libxc::v_xc_meta(
 	const double * const * const rho_in,
 	const double * const rho_core_in,
 	const double * const * const kin_r_in)
 {
-    TITLE("Potential_Libxc","v_xc");
-    timer::tick("Potential_Libxc","v_xc");
+    ModuleBase::TITLE("Potential_Libxc","v_xc");
+    ModuleBase::timer::tick("Potential_Libxc","v_xc");
 
 	//output of the subroutine
     double etxc = 0.0;
     double vtxc = 0.0;
-	matrix v(GlobalV::NSPIN,GlobalC::pw.nrxx);
-	matrix vofk(GlobalV::NSPIN,GlobalC::pw.nrxx);
+	ModuleBase::matrix v(GlobalV::NSPIN,GlobalC::pw.nrxx);
+	ModuleBase::matrix vofk(GlobalV::NSPIN,GlobalC::pw.nrxx);
 
 	if(GlobalV::VXC_IN_H == 0 )
 	{
-    	timer::tick("Potential_Libxc","v_xc_meta");
+    	ModuleBase::timer::tick("Potential_Libxc","v_xc_meta");
 		return std::make_tuple( etxc, vtxc, move(v), move(vofk) );
 	}
 	//----------------------------------------------------------
@@ -87,12 +87,12 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 	
 	//rho,grho,tau
 	vector<vector<double>> rho;
-	vector<vector<Vector3<double>>> grho;
+	vector<vector<ModuleBase::Vector3<double>>> grho;
 	vector<vector<double>> kin_r;
 
 	//dExc/d rho,grho,tau
 	vector<vector<double>> vrho;
-	vector<vector<Vector3<double>>> h;
+	vector<vector<ModuleBase::Vector3<double>>> h;
 	vector<vector<double>> kedtaur;
 
 	//ifstream ifs_rho("rho");
@@ -159,7 +159,7 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 			{
 				arho  = abs(rho_in[is][ir]);
 				grho2 = grho[0][ir]*grho[0][ir];
-				atau  = kin_r[is][ir] / e2;
+				atau  = kin_r[is][ir] / ModuleBase::e2;
 				lapl  = grho2;//dummy argument, not used
 			
 				if(arho > rho_th && grho2 > grho_th && abs(atau) > tau_th)
@@ -168,15 +168,15 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 					xc_mgga_exc_vxc(&c_func,1,&arho,&grho2,&lapl,&atau,&ec,&v1c,&v2c,&vlapl,&v3c);
 					ex = ex * rho[is][ir];
 					ec = ec * rho[is][ir];
-					v2x = v2x * e2;
-					v2c = v2c * e2;
+					v2x = v2x * ModuleBase::e2;
+					v2c = v2c * ModuleBase::e2;
 
-					vrho[is][ir] = (v1x + v1c) * e2;
-					h[is][ir] = (v2x + v2c) * e2 * grho[is][ir];
+					vrho[is][ir] = (v1x + v1c) * ModuleBase::e2;
+					h[is][ir] = (v2x + v2c) * ModuleBase::e2 * grho[is][ir];
 					kedtaur[is][ir] = v3x + v3c;
 				
-					etxc += (ex + ec) * e2;
-					vtxc += (v1x + v1c) * e2 * arho;	
+					etxc += (ex + ec) * ModuleBase::e2;
+					vtxc += (v1x + v1c) * ModuleBase::e2 * arho;	
 				}
 				else
 				{
@@ -204,7 +204,7 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 		double rhoup, rhodw, tauup, taudw;
 		double ex, v1xup, v1xdw, v2xup, v2xdw, v3xup, v3xdw;
 		double ec, v1cup, v1cdw, v3cup, v3cdw;
-		Vector3<double> grhoup,grhodw,v2cup,v2cdw;
+		ModuleBase::Vector3<double> grhoup,grhodw,v2cup,v2cdw;
 
 	
 		const double rho_th  = 1e-8;
@@ -221,25 +221,25 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 			grhodw = grho[1][ir];
 			ggrho2 = (grhoup*grhoup + grhodw*grhodw) * 4.0;
 
-			tauup = kin_r[0][ir] / e2;
-			taudw = kin_r[1][ir] / e2;
+			tauup = kin_r[0][ir] / ModuleBase::e2;
+			taudw = kin_r[1][ir] / ModuleBase::e2;
 			atau = tauup + taudw;
 
 			if (rh > rho_th && ggrho2 > grho_th && abs(atau) > tau_th)
 			{
 				XC_Functional::tau_xc_spin(rhoup, rhodw, grhoup, grhodw, tauup, taudw, ex, ec, v1xup, v1xdw, v2xup, v2xdw, v3xup, v3xdw, v1cup, v1cdw, v2cup, v2cdw, v3cup, v3cdw );
 
-				vrho[0][ir] = (v1xup+v1cup) * e2;
-				vrho[1][ir] = (v1xdw+v1cdw) * e2;
+				vrho[0][ir] = (v1xup+v1cup) * ModuleBase::e2;
+				vrho[1][ir] = (v1xdw+v1cdw) * ModuleBase::e2;
 
-				h[0][ir] = (v2xup*grhoup+v2cup)*e2;
-				h[1][ir] = (v2xdw*grhodw+v2cdw)*e2;
+				h[0][ir] = (v2xup*grhoup+v2cup)*ModuleBase::e2;
+				h[1][ir] = (v2xdw*grhodw+v2cdw)*ModuleBase::e2;
 				
 				kedtaur[0][ir] = v3xup+v3cup;
 				kedtaur[1][ir] = v3xdw+v3cdw;
 
-				etxc += (ex+ec) * e2;
-				vtxc += (v1xup+v1xdw+v1cup+v1cdw) * e2 * rh;
+				etxc += (ex+ec) * ModuleBase::e2;
+				vtxc += (v1xup+v1xdw+v1cup+v1cdw) * ModuleBase::e2 * rh;
 			}
 			else
 			{
@@ -256,7 +256,7 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 	}//nspin=2
 	else
 	{
-		WARNING_QUIT("potential_libxc_meta","meta-GGA for nspin=1,2 first");
+		ModuleBase::WARNING_QUIT("potential_libxc_meta","meta-GGA for nspin=1,2 first");
 	}
 
 	vector<double> dh;
@@ -290,7 +290,7 @@ tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
     etxc *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
     vtxc *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
 
-    timer::tick("Potential_Libxc","v_xc_meta");
+    ModuleBase::timer::tick("Potential_Libxc","v_xc_meta");
 	return std::make_tuple( etxc, vtxc, move(v), move(vofk) );
 
 }

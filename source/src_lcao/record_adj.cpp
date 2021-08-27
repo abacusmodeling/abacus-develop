@@ -29,14 +29,14 @@ void Record_adj::delete_grid(void)
 #include "LCAO_nnr.h"
 void Record_adj::for_2d(void)
 {
-	TITLE("Record_adj","for_2d");
-	timer::tick("Record_adj","for_2d");
+	ModuleBase::TITLE("Record_adj","for_2d");
+	ModuleBase::timer::tick("Record_adj","for_2d");
 
 	assert(GlobalC::ucell.nat>0);
 
 	// (1) find the adjacent atoms of atom[T1,I1];
-	Vector3<double> tau1, tau2, dtau;
-	Vector3<double> dtau1, dtau2, tau0;
+	ModuleBase::Vector3<double> tau1, tau2, dtau;
+	ModuleBase::Vector3<double> dtau1, dtau2, tau0;
 
 	this->na_proc = GlobalC::ucell.nat;
 
@@ -215,7 +215,7 @@ void Record_adj::for_2d(void)
 			++iat;
 		}//end I1
 	}//end T1
-	timer::tick("Record_adj","for_2d");
+	ModuleBase::timer::tick("Record_adj","for_2d");
 
 	return;
 }
@@ -227,11 +227,11 @@ void Record_adj::for_2d(void)
 //--------------------------------------------
 void Record_adj::for_grid(const Grid_Technique &gt)
 {
-    TITLE("Record_adj","for_grid");
-	timer::tick("Record_adj","for_grid");
+    ModuleBase::TITLE("Record_adj","for_grid");
+	ModuleBase::timer::tick("Record_adj","for_grid");
 	
-	Vector3<double> tau1, tau2, dtau;
-	Vector3<double> tau0, dtau1, dtau2;
+	ModuleBase::Vector3<double> tau1, tau2, dtau;
+	ModuleBase::Vector3<double> tau0, dtau1, dtau2;
 	
 	this->na_proc = 0;
 	for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
@@ -417,7 +417,7 @@ void Record_adj::for_grid(const Grid_Technique &gt)
 		}
 	}
 	assert(ca==na_proc);
-	timer::tick("Record_adj","for_grid");
+	ModuleBase::timer::tick("Record_adj","for_grid");
 
 //	std::cout << " after for_grid" << std::endl;
 	return;

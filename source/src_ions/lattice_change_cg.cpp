@@ -38,7 +38,7 @@ Lattice_Change_CG::~Lattice_Change_CG()
 
 void Lattice_Change_CG::allocate(void)
 {
-	TITLE("Lattice_Change_CG","allocate");
+	ModuleBase::TITLE("Lattice_Change_CG","allocate");
 	// mohan add 2021-02-07
 	assert(dim>0);
 
@@ -59,9 +59,9 @@ void Lattice_Change_CG::allocate(void)
 	this->e0 = 0.0;	
 }
 
-void Lattice_Change_CG::start(const matrix &stress_in, const double& etot_in)
+void Lattice_Change_CG::start(const ModuleBase::matrix &stress_in, const double& etot_in)
 {
-	TITLE("Lattice_Change_CG","start");
+	ModuleBase::TITLE("Lattice_Change_CG","start");
 
 	assert(lat0!=0);
 	assert(grad0!=0);
@@ -105,7 +105,7 @@ void Lattice_Change_CG::start(const matrix &stress_in, const double& etot_in)
 		nbrent = 0;
 	}
 	
-	matrix stress(stress_in);
+	ModuleBase::matrix stress(stress_in);
 	Lattice_Change_Basic::setup_gradient(lat, grad, stress);
 	// use energy_in and istep to setup etot and etot_old.
 	Lattice_Change_Basic::setup_etot(etot_in, 0);
@@ -280,7 +280,7 @@ void Lattice_Change_CG::start(const matrix &stress_in, const double& etot_in)
 
 void Lattice_Change_CG::setup_cg_grad(double *grad, const double *grad0, double *cg_grad, const double *cg_grad0, const int &ncggrad, int &flag)
 {
-	TITLE("Lattice_Change_CG","setup_cg_grad");
+	ModuleBase::TITLE("Lattice_Change_CG","setup_cg_grad");
 	assert(Lattice_Change_Basic::istep > 0);
 	double gamma;
 	double cg0_cg,cg0_cg0,cg0_g;

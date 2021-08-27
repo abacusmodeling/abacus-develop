@@ -30,7 +30,7 @@ void dscal(const int n,const double &alpha,double *y,const int incy)
 
 // a(i,:) = alpha * a(i,:) where a is a matrix
 // i line
-void dscal(const double &alpha,matrix &a,const int i)
+void dscal(const double &alpha,ModuleBase::matrix &a,const int i)
 {
     int nc = a.nc;
     int nr = a.nr;
@@ -270,7 +270,7 @@ void dcopy(int n, int *x, int incx, int *y, int incy)
 }
 
 /* Copy a(i,:) to y where x is matrix, and y are n-vectors. */
-void dcopy(const matrix &a,
+void dcopy(const ModuleBase::matrix &a,
            int i,
            double *y)
 {
@@ -293,7 +293,7 @@ void dcopy(const matrix &a,
 } // end dcopy
 
 //-------------------------------------
-void dcopy(const matrix &a,
+void dcopy(const ModuleBase::matrix &a,
            int i,
            int *y)
 {
@@ -338,7 +338,7 @@ void dcopy(const ModuleBase::ComplexMatrix &a,
 } // end dcopy
 
 // ------------------------------------
-void dcopy(double *x, matrix &b, int i)
+void dcopy(double *x, ModuleBase::matrix &b, int i)
 {
     // copy x to ith row of b where b is a matrix and x is a std::vector
     int nr, nc;
@@ -379,9 +379,9 @@ void dcopy(std::complex < double> *x, ModuleBase::ComplexMatrix &b, int i)
 }
 
 // b(j,:) = a(i,:)
-void dcopy(const matrix &a,
+void dcopy(const ModuleBase::matrix &a,
            int i,
-           matrix &b,
+           ModuleBase::matrix &b,
            int j)
 {
     int nr, nc;
@@ -438,7 +438,7 @@ void dcopy(int n,
 //-------------------------------------------------------------------
 //void dsytrf(char uplo,  int  n,  double  *a,  int  lda,  int *ipivot,
 //			int *info)
-void dsytrf(char , int iter_used, matrix beta, int maxter, int *iwork,
+void dsytrf(char , int iter_used, ModuleBase::matrix beta, int maxter, int *iwork,
             double *work, int , int &info)
 {
     // dsytrf computes the factorization of a real symmetric matrix
@@ -564,7 +564,7 @@ void dsytrf(char , int iter_used, matrix beta, int maxter, int *iwork,
 //--------------------------------------------------------------------
 //void dsytri(char uplo,  int  n,  double  *a,  int  lda,  int
 //             *ipivot, int *info)
-void dsytri(char, int iter_used, matrix beta, int maxter, int *iwork,
+void dsytri(char, int iter_used, ModuleBase::matrix beta, int maxter, int *iwork,
             double *work, int &info)
 {
     std::cout << "\n do nothing, in dsytri() ";
@@ -703,7 +703,7 @@ std::complex < double> ddot(const ModuleBase::ComplexMatrix &a,
 }
 
 //--------------------------------
-double ddot(const matrix &a,
+double ddot(const ModuleBase::matrix &a,
             int i,
             double  *y)
 {
@@ -727,9 +727,9 @@ double ddot(const matrix &a,
     return z;
 }
 
-double ddot(const matrix &a,
+double ddot(const ModuleBase::matrix &a,
             int i,
-            const matrix &b,
+            const ModuleBase::matrix &b,
             int j)
 {
     int nr, nc;
@@ -776,7 +776,7 @@ double dnrm2(const int n, const double *x, const int incx)
 }
 
 // i-row of matrix a
-double dnrm2(const matrix &a,
+double dnrm2(const ModuleBase::matrix &a,
              int i)
 {
     int nc, nr;
@@ -813,7 +813,7 @@ void zgemm(char tra,
            std::complex<double> *c,
            int ldc)
 {
-	TITLE("myfunc5","zgemm1");
+	ModuleBase::TITLE("myfunc5","zgemm1");
     //int nra=1;
 	int nca=k;
 	int nrb=b.nr;
@@ -860,9 +860,9 @@ void zgemm(char tra,
         }
     }
 
-	//WARNING_QUIT("reset zgemm","reset zgemm");
+	//ModuleBase::WARNING_QUIT("reset zgemm","reset zgemm");
 //    zgemm_(&tra, &trb, &m, &n, &k, alpha0, aux, &lda, bux, &ldb, beta0, cux, &ldc);
-	WARNING_QUIT("myfunc_5::zgemm","please don't ever use it again.");
+	ModuleBase::WARNING_QUIT("myfunc_5::zgemm","please don't ever use it again.");
 
     for (i = 0; i < ncc; i++)
     {
@@ -890,7 +890,7 @@ void zgemm(char tra,
            ModuleBase::ComplexMatrix &c,
            int ldc)
 {
-    TITLE("myfunc5","zgemm2");
+    ModuleBase::TITLE("myfunc5","zgemm2");
     //int nra = 1;
 	int nca = k;
 	int nrb = b.nr;
@@ -937,9 +937,9 @@ void zgemm(char tra,
         }
     }
 
-	//WARNING_QUIT("reset zgemm","reset zgemm");
+	//ModuleBase::WARNING_QUIT("reset zgemm","reset zgemm");
     //zgemm_(&tra, &trb, &m, &n, &k, alpha0, aux, &lda, bux, &ldb, beta0, cux, &ldc);
-	WARNING_QUIT("myfunc_5::zgemm","please don't ever use it again.");
+	ModuleBase::WARNING_QUIT("myfunc_5::zgemm","please don't ever use it again.");
 
     for (i = 0; i < ncc; i++)
     {
@@ -973,7 +973,7 @@ void zgemm(char tra,
            ModuleBase::ComplexMatrix &c,
            int ldc)
 {
-//	TITLE("myfunc5","zgemm3");
+//	ModuleBase::TITLE("myfunc5","zgemm3");
     int nra, nca, nrb, ncb, nrc, ncc ;
     nra = a.nr,   nca = a.nc;
     nrb = b.nr,   ncb = b.nc;
@@ -1022,9 +1022,9 @@ void zgemm(char tra,
         }
     }
 
-	//WARNING_QUIT("reset zgemm","reset zgemm");
+	//ModuleBase::WARNING_QUIT("reset zgemm","reset zgemm");
     //zgemm_(&tra, &trb, &m, &n, &k, alpha0, aux, &lda, bux, &ldb, beta0, cux, &ldc);
-	WARNING_QUIT("myfunc_5::zgemm","please don't ever use it again.");
+	ModuleBase::WARNING_QUIT("myfunc_5::zgemm","please don't ever use it again.");
 
     for (i = 0; i < ncc; i++)
     {
@@ -1044,11 +1044,11 @@ void zgemm(char tra,
 
 // C = alpha * op(A) * op(B) + beta * C
 void dgemm(char tra, char trb, int m, int n, int k, double alpha,
-           const matrix  a, int lda, const matrix b, int ldb, double beta,
-           matrix &c, int ldc)
+           const ModuleBase::matrix  a, int lda, const ModuleBase::matrix b, int ldb, double beta,
+           ModuleBase::matrix &c, int ldc)
 {
 //    std::cout << "\n === ZGEMM() ===" << std::endl;
-    matrix a1;
+    ModuleBase::matrix a1;
 
     if (tra == 'n' || tra == 'N')
         a1.create(a.nr, a.nc);
@@ -1101,7 +1101,7 @@ std::complex < double> ZDOTU(int nstart,
                         int npwx)
 {
     std::cout << "\n do nothing in ZDOTU(), only return ZERO,";
-    return ZERO;
+    return ModuleBase::ZERO;
 }
 
 void zgemv(char ,
@@ -1144,7 +1144,7 @@ void ZHEGVX(int itype,
             int *ifail,
             int &info )
 {
-//	TITLE("myfunc5","ZHEGVX");
+//	ModuleBase::TITLE("myfunc5","ZHEGVX");
     double *aux, *bux, *zux;
     aux = new double[2*lda*n];//mohan fix + --> * 2007-10-22
     bux = new double[2*ldb*n];

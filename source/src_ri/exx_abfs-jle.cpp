@@ -20,17 +20,17 @@ void Exx_Abfs::Jle::init_jle( const double kmesh_times )
 		for (int L=0; L <= Lmax ; ++L)
 		{
 			const size_t ecut_number 
-				= static_cast<size_t>( sqrt( Ecut_exx ) * GlobalC::ORB.Phi[T].getRcut() / PI ); // Rydberg Unit.
+				= static_cast<size_t>( sqrt( Ecut_exx ) * GlobalC::ORB.Phi[T].getRcut() / ModuleBase::PI ); // Rydberg Unit.
 
 			jle[T][L].resize( ecut_number );
 
 			std::vector<double> en(ecut_number, 0.0);
-			Sphbes::Spherical_Bessel_Roots(ecut_number, L, tolerence, ModuleBase::GlobalFunc::VECTOR_TO_PTR(en), GlobalC::ORB.Phi[T].getRcut());
+			ModuleBase::Sphbes::Spherical_Bessel_Roots(ecut_number, L, tolerence, ModuleBase::GlobalFunc::VECTOR_TO_PTR(en), GlobalC::ORB.Phi[T].getRcut());
 
 			for(size_t E=0; E!=ecut_number; ++E)
 			{
 				std::vector<double> jle_r( GlobalC::ORB.Phi[T].PhiLN(0,0).getNr() );
-				Sphbes::Spherical_Bessel(
+				ModuleBase::Sphbes::Spherical_Bessel(
 					GlobalC::ORB.Phi[T].PhiLN(0,0).getNr(), 
 					GlobalC::ORB.Phi[T].PhiLN(0,0).getRadial(), 
 					en[E], 

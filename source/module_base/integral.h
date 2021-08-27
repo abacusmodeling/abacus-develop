@@ -1,5 +1,8 @@
 #ifndef INTEGRAL_G_H
 #define INTEGRAL_G_H
+//this class has not been used yet
+namespace ModuleBase
+{
 
 class Integral_G
 {
@@ -27,4 +30,6 @@ class Integral_G
 	static bool calc_wx;
 
 };
+
+}
 #endif

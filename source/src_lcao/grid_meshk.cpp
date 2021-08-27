@@ -26,7 +26,7 @@ int Grid_MeshK::cal_Rindex(const int &u1, const int &u2, const int &u3)const
 		std::cout << " u1=" << u1 << " minu1=" << minu1 << std::endl;
 		std::cout << " u2=" << u2 << " minu2=" << minu2 << std::endl;
 		std::cout << " u3=" << u3 << " minu3=" << minu3 << std::endl;
-		WARNING_QUIT("Grid_MeshK::cal_Rindex","x1<0 || x2<0 || x3<0 !");
+		ModuleBase::WARNING_QUIT("Grid_MeshK::cal_Rindex","x1<0 || x2<0 || x3<0 !");
 	}
 
 	assert(x1>=0);
@@ -37,7 +37,7 @@ int Grid_MeshK::cal_Rindex(const int &u1, const int &u2, const int &u3)const
 
 void Grid_MeshK::cal_extended_cell(const int &dxe, const int &dye, const int &dze)
 {
-	TITLE("Grid_MeshK","cal_extended_cell");
+	ModuleBase::TITLE("Grid_MeshK","cal_extended_cell");
 
 	//--------------------------------------
 	// max and min unitcell in expaned grid.

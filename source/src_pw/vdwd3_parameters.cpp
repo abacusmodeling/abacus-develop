@@ -35,7 +35,7 @@ void Vdwd3_Parameters::initial_parameters(const Input &input)
             }
             else
             {
-                  this->rthr2 = pow((std::stod(input.vdw_radius) * BOHR_TO_A),2);       
+                  this->rthr2 = pow((std::stod(input.vdw_radius) * ModuleBase::BOHR_TO_A),2);       
             }
             if(input.vdw_cn_thr_unit=="Bohr")
             {
@@ -43,7 +43,7 @@ void Vdwd3_Parameters::initial_parameters(const Input &input)
             }
             else
             {  
-                  this->cn_thr2 = pow((input.vdw_cn_thr * BOHR_TO_A),2);			
+                  this->cn_thr2 = pow((input.vdw_cn_thr * ModuleBase::BOHR_TO_A),2);			
             }
       }
       else if(input.vdw_model=="period")
@@ -33177,8 +33177,8 @@ void Vdwd3_Parameters::init_r0ab()
       for (size_t i=0; i!=max_elem; i++)
             for (size_t j=0; j<=i; j++)
             {
-                  r0ab[j][i] = r[k]/BOHR_TO_A;
-                  r0ab[i][j] = r[k]/BOHR_TO_A;
+                  r0ab[j][i] = r[k]/ModuleBase::BOHR_TO_A;
+                  r0ab[i][j] = r[k]/ModuleBase::BOHR_TO_A;
                   k += 1;
             }
 }

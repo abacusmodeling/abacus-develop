@@ -27,7 +27,7 @@ void Numerical_Nonlocal::set_type_info
 	const Numerical_Nonlocal_Lm* Proj_in
 )
 {
-	//TITLE("Numerical_Nonlocal","set_type_info");
+	//ModuleBase::TITLE("Numerical_Nonlocal","set_type_info");
 
 	this->type = type_in;
 	this->label = label_in;
@@ -35,7 +35,7 @@ void Numerical_Nonlocal::set_type_info
 
 	if (lmax_in < -1 || lmax_in > 20)
 	{
-		WARNING_QUIT("Numerical_Nonlocal", "bad input of lmax : should be between -1 and 20");
+		ModuleBase::WARNING_QUIT("Numerical_Nonlocal", "bad input of lmax : should be between -1 and 20");
 	}
 
 	this->lmax = lmax_in;

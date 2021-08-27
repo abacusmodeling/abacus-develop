@@ -9,7 +9,7 @@ Grid_Driver::Grid_Driver(
 test_grid_driver(test_gd_in),
 Grid(test_grid_in)
 {
-	//	TITLE("Grid_Driver","Grid_Driver");
+	//	ModuleBase::TITLE("Grid_Driver","Grid_Driver");
 }
 
 Grid_Driver::~Grid_Driver()
@@ -19,12 +19,12 @@ Grid_Driver::~Grid_Driver()
 
 void Grid_Driver::Find_atom(
 	const UnitCell &ucell, 
-	const Vector3<double> &cartesian_pos, 
+	const ModuleBase::Vector3<double> &cartesian_pos, 
 	const int &ntype, 
 	const int &nnumber)
 {
-	//if (test_grid_driver) TITLE(GlobalV::ofs_running, "Grid_Driver", "Find_atom");
-	timer::tick("Grid_Driver","Find_atom");
+	//if (test_grid_driver) ModuleBase::TITLE(GlobalV::ofs_running, "Grid_Driver", "Find_atom");
+	ModuleBase::timer::tick("Grid_Driver","Find_atom");
 
 	if (test_grid_driver > 1)
 	{
@@ -45,18 +45,18 @@ void Grid_Driver::Find_atom(
 
 	this->Find_adjacent_atom(offset, this->atomlink[offset].fatom.getAdjacentSet());
 
-	timer::tick("Grid_Driver","Find_atom");
+	ModuleBase::timer::tick("Grid_Driver","Find_atom");
 	return;
 }
 
 
 int Grid_Driver::Locate_offset(
 	const UnitCell &ucell, 
-	const Vector3<double> &cartesian_pos, 
+	const ModuleBase::Vector3<double> &cartesian_pos, 
 	const int &ntype, 
 	const int &nnumber)const
 {
-//	if (test_grid_driver) TITLE(GlobalV::ofs_running, "Grid_Driver", "Locate_offset");
+//	if (test_grid_driver) ModuleBase::TITLE(GlobalV::ofs_running, "Grid_Driver", "Locate_offset");
 
 //----------------------------------------------------------
 // EXPLAIN : Create an AtomLink object
@@ -92,7 +92,7 @@ int Grid_Driver::Locate_offset(
 	// Peize Lin update 2019-05-01
 	// throw std::runtime_error("Locate_Atom wrong. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 	// mohan update 2021-06-21
-	WARNING_QUIT("Locate_Atom", "something wrong!");
+	ModuleBase::WARNING_QUIT("Locate_Atom", "something wrong!");
 
 	return 0; //meaningless mohan add 2021-06-21
 
@@ -100,7 +100,7 @@ int Grid_Driver::Locate_offset(
 
 void Grid_Driver::Find_adjacent_atom(const int offset, std::shared_ptr<AdjacentSet> as)
 {
-//	if (test_grid_driver) TITLE(GlobalV::ofs_running, "Grid_Driver", "Find_adjacent_atom");
+//	if (test_grid_driver) ModuleBase::TITLE(GlobalV::ofs_running, "Grid_Driver", "Find_adjacent_atom");
 
 //----------------------------------------------------------
 // CALL OTHER CLASS MEMBER FUNCTION :
@@ -263,7 +263,7 @@ double Grid_Driver::Distance(const AtomLink& a1, const AtomLink& a2)const
 //==========================================================
 // For not_expand case
 //==========================================================
-double Grid_Driver::Distance(const AtomLink& a1, const Vector3<double> &adjacent_site)const
+double Grid_Driver::Distance(const AtomLink& a1, const ModuleBase::Vector3<double> &adjacent_site)const
 {
 	const double dx = a1.fatom.x() - adjacent_site.x;
 	const double dy = a1.fatom.y() - adjacent_site.y;
@@ -272,7 +272,7 @@ double Grid_Driver::Distance(const AtomLink& a1, const Vector3<double> &adjacent
 }
 
 
-Vector3<double> Grid_Driver::Calculate_adjacent_site
+ModuleBase::Vector3<double> Grid_Driver::Calculate_adjacent_site
 (
     const short offset,
     const double &box11, const double &box12, const double &box13,
@@ -281,7 +281,7 @@ Vector3<double> Grid_Driver::Calculate_adjacent_site
     const short box_x, const short box_y, const short box_z
 )const
 {
-	Vector3<double> adjacent_site(0, 0, 0);
+	ModuleBase::Vector3<double> adjacent_site(0, 0, 0);
 	adjacent_site.x = this->atomlink[offset].fatom.x() +
 	                  box_x * box11 + box_y * box12 + box_z * box13;
 

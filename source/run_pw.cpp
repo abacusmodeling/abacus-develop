@@ -17,8 +17,8 @@ Run_pw::~Run_pw(){}
 
 void Run_pw::plane_wave_line(void)
 {
-    TITLE("Run_pw","plane_wave_line");
-	timer::tick("Run_pw","plane_wave_line");
+    ModuleBase::TITLE("Run_pw","plane_wave_line");
+	ModuleBase::timer::tick("Run_pw","plane_wave_line");
 
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
@@ -68,7 +68,7 @@ void Run_pw::plane_wave_line(void)
     if(GlobalV::CALCULATION == "test")
     {
         Cal_Test::test_memory();
-        QUIT();
+        ModuleBase::QUIT();
     }
 
     // mohan add 2010-09-13
@@ -76,6 +76,8 @@ void Run_pw::plane_wave_line(void)
     // distribution of plane waves
     GlobalC::Pgrid.init(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, GlobalC::pw.nczp,
         GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
+    
+    // cout<<"after pgrid init nrxx = "<<GlobalC::pw.nrxx<<endl;
 
 //----------------------------------------------------------
 // 1 read in initial data:
@@ -103,6 +105,8 @@ void Run_pw::plane_wave_line(void)
         Cell_PW cpws;
         cpws.opt_cells_pw();
     }
+
+    // cout<<"cpws SUCCESS"<<endl;
 
 
     // caoyu add 2020-11-24, mohan updat 2021-01-03
@@ -161,6 +165,6 @@ void Run_pw::plane_wave_line(void)
 	// compute density of states
 	GlobalC::en.perform_dos_pw();
 
-	timer::tick("Run_pw","plane_wave_line");
+	ModuleBase::timer::tick("Run_pw","plane_wave_line");
     return;
 }

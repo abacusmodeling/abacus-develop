@@ -1,23 +1,24 @@
 #include "use_fft.h"
 #include "global.h"
 
+
 Use_FFT::Use_FFT()
 {
-	porter = new std::complex<double>[GlobalC::pw.nrxx];	
+	porter = new std::complex<double>[GlobalC::pw.nrxx];
 }
 
 Use_FFT::~Use_FFT()
 {
-	delete[] porter;	
+	delete[] porter;
 }
 
 void Use_FFT::allocate(void)
 {
-    TITLE("Use_FFT","allocate");
+    ModuleBase::TITLE("Use_FFT","allocate");
 
     delete[] porter;
     porter = new std::complex<double>[GlobalC::pw.nrxx];
-    Memory::record("Use_FFT","porter",GlobalC::pw.nrxx,"complexmatrix");
+    ModuleBase::Memory::record("Use_FFT","porter",GlobalC::pw.nrxx,"complexmatrix");
 
     return;
 }
@@ -94,7 +95,7 @@ void Use_FFT::ToRealSpace_psi(const int &ik, const int &ib, const ModuleBase::Co
 
 
 
-void Use_FFT::ToRealSpace(const int &is, const ModuleBase::ComplexMatrix &vg, matrix &vr)
+void Use_FFT::ToRealSpace(const int &is, const ModuleBase::ComplexMatrix &vg, ModuleBase::matrix &vr)
 {
 	// (1) set value
     ModuleBase::GlobalFunc::ZEROS( porter, GlobalC::pw.nrxx);
@@ -113,7 +114,7 @@ void Use_FFT::ToRealSpace(const int &is, const ModuleBase::ComplexMatrix &vg, ma
 }
 
 
-// Fourer transform of vg, 
+// Fourer transform of vg,
 // then put vg into vr.
 void Use_FFT::ToRealSpace(const std::complex<double> *vg, double *vr)
 {
@@ -144,4 +145,3 @@ void Use_FFT::ToReciSpace(const double* vr, std::complex<double> *vg)
 	}
 	return;
 }
-

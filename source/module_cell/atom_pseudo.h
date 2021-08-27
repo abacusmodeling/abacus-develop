@@ -16,7 +16,7 @@ public:
 	Atom_pseudo();
 	~Atom_pseudo();
 
-	Vector3<int> *mbl; // whether the atoms can move or not
+	ModuleBase::Vector3<int> *mbl; // whether the atoms can move or not
 	std::string pseudo_fn; // File name of pseudopotentials
 	double mass; // the mass of atom
 	bool flag_empty_element = false; // whether is the empty element for bsse.	Peize Lin add 2021.04.07

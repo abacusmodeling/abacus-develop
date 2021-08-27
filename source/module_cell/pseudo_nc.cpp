@@ -53,7 +53,7 @@ pseudo_nc::~pseudo_nc()
 //---------------------------------------------------------------------
 void pseudo_nc::set_pseudo_nc(const Pseudopot_upf &upf)
 {
-	TITLE("pseudo_nc","set_pseudo_nc");
+	ModuleBase::TITLE("pseudo_nc","set_pseudo_nc");
 
 	// call subroutines
 	this->set_pseudo_h(upf);
@@ -114,7 +114,7 @@ void pseudo_nc::print_pseudo_nc(std::ofstream &ofs, output &outp)
 
 void pseudo_nc::set_pseudo_h(const Pseudopot_upf &upf)
 {
-	TITLE("pseudo_nc::set_pseudo_h");
+	ModuleBase::TITLE("pseudo_nc::set_pseudo_h");
 	// set pseudopotential for each atom type
 	// by using the Unified Pseudopotential Format
 
@@ -226,7 +226,7 @@ void pseudo_nc::set_pseudo_h(const Pseudopot_upf &upf)
 
 void pseudo_nc::set_pseudo_atom(const Pseudopot_upf &upf)
 {
-	TITLE("pseudo_nc","set_pseudo_atom");
+	ModuleBase::TITLE("pseudo_nc","set_pseudo_atom");
 
 	// mohan 2009-12-15
 	// mohan update again 2011-05-23, 
@@ -239,7 +239,7 @@ void pseudo_nc::set_pseudo_atom(const Pseudopot_upf &upf)
 	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"PAO radial cut off (Bohr)",rcut);
 	if(rcut <= 0.0)
 	{
-		WARNING_QUIT("pseudo_atom::set_pseudo_atom","PAO rcut<=0.0");
+		ModuleBase::WARNING_QUIT("pseudo_atom::set_pseudo_atom","PAO rcut<=0.0");
 	}
 
 	chi.create(nchi, mesh);
@@ -328,7 +328,7 @@ void pseudo_nc::set_pseudo_atom(const Pseudopot_upf &upf)
 
 void pseudo_nc::set_pseudo_vl(const Pseudopot_upf &upf)
 {
-	TITLE("pseudo_nc","set_pseudo_vl");
+	ModuleBase::TITLE("pseudo_nc","set_pseudo_vl");
 
 	assert(mesh>0);//mohan add 2021-05-01
 

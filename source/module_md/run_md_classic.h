@@ -14,12 +14,12 @@ public:
     
 
     void classic_md_line(void);
-    void md_cells_classic(void);
+    void md_force_stress(double &potential);
     void md_allocate_ions(void);
     void update_pos_classic(void);
 
-    Vector3<double> *force;  //force of each atom
-	matrix stress;           //stress for this lattice
+    ModuleBase::Vector3<double> *force;  //force of each atom
+	ModuleBase::matrix stress;           //stress for this lattice
 
 private:
     int istep;

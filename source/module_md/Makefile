@@ -1,36 +1,60 @@
-# This is the Makefile of  ABACUS-CMD API
+# This is the Makefile of ABACUS-CMD API
 
 #==========================
 # Compiler information 
 #==========================
-CPLUSPLUS     = icpc
-CPLUSPLUS_MPI = mpiicpc
+CPLUSPLUS     = g++
+CPLUSPLUS_MPI = mpicxx
 OBJ_DIR = md_obj
 NP      = 8
 
 ##==========================
-## FFTW package needed 
+## FFTW3 
 ##==========================
-#FFTW_DIR = /home/qianrui/intelcompile/impi_fftw
-#FFTW_DIR = /home/mohan/1_Software/impi_fftw-3.3.8
 HONG_FFTW        = -D__FFTW3
-#FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
-FFTW_INCLUDE_DIR = ${MKLROOT}/include/fftw
-#FFTW_LIB_DIR     = ${FFTW_DIR}/lib
-#FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
+#FFTW_INCLUDE_DIR = ${MKLROOT}/include/fftw
+FFTW_DIR = /usr/local/fftw
+#FFTW_DIR = /home/dell/packages/fftw3_gnu
+#FFTW_DIR = /home/mohan/1_Software/g_fftw3.3.8_serial
+FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
+FFTW_LIB_DIR     = ${FFTW_DIR}/lib
+FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
+
+##============================
+## DeePMD-kit (need by DPMD)
+##============================
+HONG_DPMD = -D__DPMD -DHIGH_PREC 
+DeeP_DIR = ${deepmd_root}
+#DeeP_DIR = /home/mohan/Liuyu/DeePMD/deepmd_gnu_root
+DeeP_INCLUDE_DIR = ${DeeP_DIR}/include
+DeeP_LIB_DIR = ${DeeP_DIR}/lib
+DeeP_LIB = -L${DeeP_LIB_DIR} -ldeepmd_cc -ldeepmd_op -ldeepmd_op_cuda -Wl,-rpath=${DeeP_LIB_DIR}
+
+##============================
+## TensorFlow (need by DPMD)
+##============================
+TensorFlow_DIR = ${tensorflow_root}
+#TensorFlow_DIR = /home/mohan/Liuyu/soft/tensorflow/tensorflow_root
+TensorFlow_INCLUDE_DIR = ${TensorFlow_DIR}/include
+TensorFlow_LIB_DIR = ${TensorFlow_DIR}/lib
+TensorFlow_LIB = -L${TensorFlow_LIB_DIR} -ltensorflow_cc -Wl,-rpath=${TensorFlow_LIB_DIR}
 
 #==========================
 # LIBS and INCLUDES
 #==========================
-LIBS = -lifcore -lm -lpthread ${FFTW_LIB}
+#LIBS = -lifcore -lm -lpthread ${FFTW_LIB}
+LIBS = -lm -lpthread -openmp -lstdc++ ${FFTW_LIB} ${DeeP_LIB} ${TensorFlow_LIB} -Wl,--no-as-needed
+
+#INCLUDES = -I. -Icommands -I${FFTW_INCLUDE_DIR}
+INCLUDES = -g -I. -Icommands -I${FFTW_INCLUDE_DIR} -I${DeeP_INCLUDE_DIR} -I${TensorFlow_INCLUDE_DIR}
 
 #==========================
 # OPTIMIZE OPTIONS
 #==========================
-INCLUDES = -I. -Icommands -I${FFTW_INCLUDE_DIR}
 # -pedantic turns off more extensions and generates more warnings
 # -xHost generates instructions for the highest instruction set available on the compilation host processor
-OPTS = ${INCLUDES} -Ofast -std=c++11 -simd -march=native -xHost -m64 -qopenmp -Werror -Wall -pedantic -g
+#OPTS = ${INCLUDES} -Ofast -std=c++11 -simd -march=native -xHost -m64 -qopenmp -Werror -Wall -pedantic -g
+OPTS = ${INCLUDES} -Ofast  -std=c++11 -march=native -Wall -fpermissive -fopenmp
 
 include Makefile.Objects
 
@@ -45,7 +69,8 @@ VPATH=../module_base\
 #==========================
 # Define HONG
 #==========================
-HONG= ${HONG_FFTW} -D__MPI -DMETIS -DMKL_ILP64 -D__NORMAL -D__CMD -D__CELL
+#HONG= ${HONG_FFTW} -D__MPI -DMETIS -DMKL_ILP64 -D__NORMAL -D__CMD -D__CELL
+HONG= ${HONG_FFTW} -D__MPI -DMETIS -DMKL_ILP64 -D__NORMAL -D__CMD -D__CELL ${HONG_DPMD}
 
 FP_OBJS_0=main.o\
 $(OBJS_MAIN)\

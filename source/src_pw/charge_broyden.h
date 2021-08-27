@@ -39,10 +39,10 @@ class Charge_Broyden: public Charge_Pulay
 	double w0;
 	double* w;
 	int broyden_type;
-	matrix beta; // (dstep, dstep)
-	matrix betabar; // (dstep, dstep)
-	matrix* Zmk;
-	matrix* Zmk_old;
+	ModuleBase::matrix beta; // (dstep, dstep)
+	ModuleBase::matrix betabar; // (dstep, dstep)
+	ModuleBase::matrix* Zmk;
+	ModuleBase::matrix* Zmk_old;
 };
 
 #endif

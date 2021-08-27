@@ -32,7 +32,7 @@ public:
 	void init_radial_table();
 	void init_radial_table( std::map<size_t,std::map<size_t,set<double>>> &Rs );		// unit is GlobalC::ucell.lat0
 	
-	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> cal_overlap_matrix(
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> cal_overlap_matrix(
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_r, 
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_c );
 

@@ -1,6 +1,6 @@
 #include "tools.h"
 #include "global.h"
-#include "sto_elec.h" 
+#include "sto_elec.h"
 #include "occupy.h"
 #include "../src_pw/symmetry_rho.h"
 #include "../src_io/wf_io.h"
@@ -19,26 +19,26 @@ Stochastic_Elec::~Stochastic_Elec()
 
 void Stochastic_Elec::scf_stochastic(const int &istep)
 {
-	timer::tick("Elec_Stochastic","scf_stochastic");
+	ModuleBase::timer::tick("Elec_Stochastic","scf_stochastic");
 
 	// mohan update 2021-02-25
-	H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw); 
+	H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw);
 
     set_ethr();
-    
+
 	if(GlobalV::OUT_LEVEL=="ie")
 	{
 		std::cout << std::setprecision(12);
-    	std::cout<< " " << std::setw(7)<< "ITER"; 
+    	std::cout<< " " << std::setw(7)<< "ITER";
 
 		if(GlobalV::NSPIN==2)
 		{
 			std::cout<<std::setw(10)<<"TMAG";
 			std::cout<<std::setw(10)<<"AMAG";
 		}
-	
+
         std::cout<<std::setw(15)<< "ETOT(eV)"<<std::setw(15)<< "EDIFF(eV)"<<std::setw(11)<< "DRHO2"; // pengfei Li added 2015-1-31
-		if(GlobalV::KS_SOLVER=="cg") 
+		if(GlobalV::KS_SOLVER=="cg")
 		{
 			std::cout<<std::setw(11)<<"CG_ITER";
 		}
@@ -58,21 +58,21 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 	this->conv_elec = false;
 
 	clock_t start,finish;
-	double duration = 0.0;	
+	double duration = 0.0;
 	GlobalC::sto_wf.init();
 	int chetype = 1;
 
 	for (this->iter = 1;iter <= GlobalV::NITER;iter++)
     {
-		GlobalV::ofs_running 
+		GlobalV::ofs_running
 		<< "\n PW-STOCHASTIC ALGO --------- ION=" << std::setw(4) << istep + 1
-		<< "  ELEC=" << std::setw(4) << iter 
+		<< "  ELEC=" << std::setw(4) << iter
 		<< "--------------------------------\n";
-		if(iter==1) 
+		if(iter==1)
 		{
 			GlobalC::CHR.new_e_iteration = true;
         }
-		else 
+		else
 		{
 			GlobalC::CHR.new_e_iteration = false;
 		}
@@ -82,19 +82,19 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
             GlobalC::CHR.idstep=0;
             GlobalC::CHR.totstep=0;
         }
-		
+
 		// record the start time.
         start=std::clock();
-		
-		
-		//(1) set converged threshold, 
+
+
+		//(1) set converged threshold,
 		// automatically updated during self consistency.
         //this->update_ethr(iter);
-        if(GlobalV::FINAL_SCF && iter==1) 
+        if(GlobalV::FINAL_SCF && iter==1)
 		{
 			GlobalV::ETHR = 1.0e-4/GlobalC::CHR.nelec; //smaller GlobalV::ETHR than KS-DFT
 		}
-        else 
+        else
 		{
 			if (iter == 2)
         	{
@@ -103,14 +103,14 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			GlobalV::ETHR = std::min( GlobalV::ETHR, 0.1*dr2/ std::max(1.0, GlobalC::CHR.nelec));
         }
 
-        
+
 
 		// mohan move harris functional to here, 2012-06-05
 		// use 'rho(in)' and 'v_h and v_xc'(in)
 		//GlobalC::en.calculate_harris(1);
-	
+
 		// first_iter_again:					// Peize Lin delete 2019-05-01
-		
+
 		//(2) calculate band energy using cg or davidson method.
 		// output the new eigenvalues and wave functions.
 		if(GlobalV::NBANDS > 0 && GlobalV::MY_POOL == 0)
@@ -123,9 +123,9 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			//In fact, GlobalC::hm.hpw.init_k has been done in GlobalC::wf.wfcinit();
 		}
 		GlobalC::kv.wk[0] = 2;// GAMMA temporary
-		
+
         if (check_stop_now()) return;
-        
+
 		GlobalC::en.eband  = 0.0;
         GlobalC::en.demet  = 0.0;
         GlobalC::en.ef     = 0.0;
@@ -147,7 +147,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			MPI_Bcast(GlobalC::wf.ekb[0], GlobalV::NBANDS, MPI_DOUBLE, 0, PARAPW_WORLD);
 		}
 #endif
-		
+
 		//(4) calculate fermi energy.
 		int ndim;
     	if(GlobalC::sto_wf.stotype == "pw")
@@ -159,7 +159,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
     	    ndim = GlobalC::pw.nrxx;
 		}
 
-		if(iter == 1)	
+		if(iter == 1)
 		{
 			stoiter.init( ndim, chetype );
 		}
@@ -170,7 +170,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		stoiter.itermu(iter);
 
 
-		//(5) calculate new charge density 
+		//(5) calculate new charge density
 		// calculate KS rho.
 		if(GlobalV::NBANDS > 0)
 		{
@@ -203,9 +203,9 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 
 	// calculate stochastic rho
 		stoiter.sum_stoband();
-		
 
-		//(6) calculate the delta_harris energy 
+
+		//(6) calculate the delta_harris energy
 		// according to new charge density.
 		// mohan add 2009-01-23
 		//GlobalC::en.calculate_harris(2);
@@ -218,15 +218,15 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		}
 
 
-		//(8) deband is calculated from "output" charge density calculated 
+		//(8) deband is calculated from "output" charge density calculated
 		// in sum_band
 		// need 'rho(out)' and 'vr (v_h(in) and v_xc(in))'
         GlobalC::en.deband = GlobalC::en.delta_e();
-	
-	
+
+
 		// tr2_min used only in first scf iteraton
 		double diago_error = 0.0;
-		if(iter==1) 
+		if(iter==1)
 		{
 			// if 'dr2 < GlobalV::ETHR * nelec' happen,
 			// in other word, 'dr2 < diago_error'
@@ -237,7 +237,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		// if converged is achieved, or the self-consistent error(dr2)
 		// is samller than the estimated error due to diagonalization(diago_error)
 		// rhoin and rho are unchanged:
-		// rhoin contain the input charge density and 
+		// rhoin contain the input charge density and
 		// rho contain the output charge density.
 		// in other cases rhoin contains the mixed charge density
 		// (the new input density) while rho is unchanged.
@@ -254,7 +254,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 
 		//			if(GlobalV::MY_RANK==0)
 		//			{
-		//				ofs_mix << std::setw(5) << iter << std::setw(20) << dr2 << std::endl; 
+		//				ofs_mix << std::setw(5) << iter << std::setw(20) << dr2 << std::endl;
 		//			}
 
 		if (iter==1)
@@ -263,7 +263,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			{
 				GlobalV::ofs_running << " Notice: Threshold on eigenvalues was too large.\n";
 
-				WARNING("scf","Threshold on eigenvalues was too large.");
+				ModuleBase::WARNING("scf","Threshold on eigenvalues was too large.");
 				GlobalV::ofs_running << " dr2=" << dr2 << " < diago_error=" << diago_error << std::endl;
 
 				// update GlobalV::ETHR.
@@ -283,7 +283,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			// band, using output charge density.
 			// but E_Hartree(GlobalC::en.ehart) and Exc(GlobalC::en.etxc) are calculated in v_of_rho above,
 			// using the mixed charge density.
-			// so delta_escf corrects for this difference at first order. 
+			// so delta_escf corrects for this difference at first order.
             GlobalC::en.delta_escf();
         }
         else
@@ -304,8 +304,8 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
             GlobalC::en.descf = 0.0;
 
         }
-		
-            
+
+
 
 		// output for tmp.
 		for(int is=0; is<GlobalV::NSPIN; is++)
@@ -314,19 +314,19 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			ssc << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG";
 			GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, iter, ssc.str(), 3);//mohan add 2007-10-17
 		}
-        
-		
+
+
 
 			GlobalC::pot.set_vr_eff();
-        
+
         //print_eigenvalue(GlobalV::ofs_running);
 		GlobalC::en.calculate_etot();
 
-	
+
         finish=clock();
         duration = (double)(finish - start) / CLOCKS_PER_SEC;
 
-		GlobalC::en.print_etot(conv_elec, istep, iter, dr2, duration, GlobalV::ETHR, avg_iter);	
+		GlobalC::en.print_etot(conv_elec, istep, iter, dr2, duration, GlobalV::ETHR, avg_iter);
         if (conv_elec || iter==GlobalV::NITER)
         {
 			for(int is=0; is<GlobalV::NSPIN; is++)
@@ -335,33 +335,33 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
         		ssc << GlobalV::global_out_dir << "SPIN" << is + 1 << "_CHG";
         		GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, 0, ssc.str() );//mohan add 2007-10-17
 			}
-              	 
+
 			if(conv_elec)
 			{
 				//GlobalV::ofs_running << " convergence is achieved" << std::endl;			
-				//GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl; 
+				//GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl; 
 				GlobalV::ofs_running << " charge density convergence is achieved" << std::endl;
-                                GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
+                                GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
 			}
 			else
 			{
-				GlobalV::ofs_running << " convergence has NOT been achieved!" << std::endl;			
+				GlobalV::ofs_running << " convergence has NOT been achieved!" << std::endl;
 			}
 
 			if(GlobalV::OUT_LEVEL != "m") 
 			{
 				print_eigenvalue(GlobalV::ofs_running);
 			}
-			timer::tick("Elec_Stochastic","scf_stochastic");
+			ModuleBase::timer::tick("Elec_Stochastic","scf_stochastic");
             return;
         }
-		
+
         //if ( imix >= 0 )  GlobalC::CHR.rho = GlobalC::CHR.rho_save;
         //GlobalV::ofs_running << "\n start next iterate for idum ";
 		
     } 
 	
-	timer::tick("Elec_Stochastic","scf_stochastic");
+	ModuleBase::timer::tick("Elec_Stochastic","scf_stochastic");
     return;
 } // end electrons
 
@@ -376,13 +376,13 @@ bool Stochastic_Elec::check_stop_now(void)
     }
 
     return check_stop_now;
-} 
+}
 
 
 void Stochastic_Elec::c_bands(const int &istep)
 {
-	if (GlobalV::test_elec) TITLE("electrons","c_bands");
-	timer::tick("Elec_Stochastic","c_bands");
+	if (GlobalV::test_elec) ModuleBase::TITLE("electrons","c_bands");
+	ModuleBase::timer::tick("Elec_Stochastic","c_bands");
 
 	int precondition_type = 2;
 
@@ -390,7 +390,7 @@ void Stochastic_Elec::c_bands(const int &istep)
 	ModuleBase::GlobalFunc::ZEROS(h_diag, GlobalC::wf.npwx * GlobalV::NPOL);
     
 	avg_iter = 0.0;
-       
+
 	GlobalV::ofs_running << " "  <<std::setw(8) << "K-point" << std::setw(15) << "CG iter num" << std::setw(15) << "Time(Sec)"<< std::endl;
 	GlobalV::ofs_running << std::setprecision(6) << std::setiosflags(ios::fixed) << std::setiosflags(ios::showpoint);
 
@@ -442,8 +442,8 @@ void Stochastic_Elec::c_bands(const int &istep)
 		const double duration = static_cast<double>(finish - start) / CLOCKS_PER_SEC;
 
 
-		GlobalV::ofs_running << " " << std::setw(8) 
-			<< ik+1 << std::setw(15) 
+		GlobalV::ofs_running << " " << std::setw(8)
+			<< ik+1 << std::setw(15)
 			<< avg_iter_k << std::setw(15) << duration << std::endl;
 	}//End K Loop
 
@@ -458,8 +458,7 @@ void Stochastic_Elec::c_bands(const int &istep)
 
 	delete [] h_diag;
 
-	timer::tick("Elec_Stochastic","c_bands");
+	ModuleBase::timer::tick("Elec_Stochastic","c_bands");
 
 	return;
-} 
-
+}

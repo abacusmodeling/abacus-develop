@@ -23,7 +23,7 @@ void eximport::write_data
 	const std::string &type
 )
 {
-	TITLE("eximport","write_data");
+	ModuleBase::TITLE("eximport","write_data");
 	std::ofstream ofs(fn.c_str());
 
 	this->out_input(ofs);
@@ -81,13 +81,13 @@ void eximport::write_data
 
 void eximport::read_data(const std::string &fn)
 {
-	TITLE("eximport","read_data");
+	ModuleBase::TITLE("eximport","read_data");
 
 	std::ifstream ifs(fn.c_str());
 	if(!ifs)
 	{
 		GlobalV::ofs_warning << " File name : " << fn << std::endl;
-		WARNING_QUIT("eximport::read_data","Can not find file.");
+		ModuleBase::WARNING_QUIT("eximport::read_data","Can not find file.");
 	}
 
 	this->in_input(ifs);
@@ -107,7 +107,7 @@ void eximport::read_data(const std::string &fn)
 
 void eximport::print_data(const std::string &fn) const
 {
-	TITLE("eximport","print_data");
+	ModuleBase::TITLE("eximport","print_data");
 	std::ofstream ofs( fn.c_str() );
 
 	ofs << std::setw(20) << "basis" << std::setw(20) << this->basis << std::endl;
@@ -213,7 +213,7 @@ void eximport::out_gspace_wan(const ModuleBase::ComplexMatrix *psi,const int iw,
 		}
 	}
 	int nks = GlobalC::kv.nks;
-	double factor = TWO_PI/GlobalC::ucell.lat0;
+	double factor = ModuleBase::TWO_PI/GlobalC::ucell.lat0;
 	out_gwan << qtot << std::endl;
 	for(int ik=0;ik<nks;ik++)
 	{
@@ -589,7 +589,7 @@ void eximport::out_band(std::ofstream &out_data)
 	{
 		for (int ib = 0; ib < GlobalV::NBANDS; ib++)
 		{
-			out_data << std::setw(10) << std::setprecision(6) << GlobalC::wf.ekb[ik][ib]*Ry_to_eV;//6.1
+			out_data << std::setw(10) << std::setprecision(6) << GlobalC::wf.ekb[ik][ib]*ModuleBase::Ry_to_eV;//6.1
 		}
 		out_data << std::endl;
 	}
@@ -759,7 +759,7 @@ void eximport::in_charge_mpi(const std::string &dir)
 		if(ncxyz != GlobalC::pw.ncxyz)
 		{	
 			std::cout<<"\n Read in ncxzy in charge file = "<<ncxyz<<std::endl;
-			QUIT();
+			ModuleBase::QUIT();
 		}
 		for (int ir = 0;ir < GlobalC::pw.ncxyz;ir++)
 		{

@@ -33,12 +33,12 @@ class ORB_gen_tables
 		double olm[],
 		const int &job, ///<[in]0 for matrix element of either S or T, 1 for its derivatives
 	    const char &dtype, ///<[in] derivative type, 'S' for overlap, 'T' for kinetic energy, 'D' for descriptor in deepks
-		const Vector3<double> &R1,
+		const ModuleBase::Vector3<double> &R1,
     	const int &I1,
     	const int &l1,
     	const int &m1,
     	const int &n1,
-    	const Vector3<double> &R2,
+    	const ModuleBase::Vector3<double> &R2,
     	const int &I2,
     	const int &l2,
     	const int &m2,
@@ -50,19 +50,19 @@ class ORB_gen_tables
 	void snap_psibeta(
 		double nlm[],
 		const int& job/**<[in]	job = 0 for vnl matrix elements, job = 1 for its derivatives*/,
-		const Vector3<double> &R1,
+		const ModuleBase::Vector3<double> &R1,
 		const int &I1,
 		const int &l1,
 		const int &m1,
 		const int &n1,
-		const Vector3<double> &R2,
+		const ModuleBase::Vector3<double> &R2,
 		const int &I2,
 		const int &l2,
 		const int &m2,
 		const int &n2,
-		const Vector3<double> &Rnl,
+		const ModuleBase::Vector3<double> &Rnl,
 		const int &type,
-		const matrix &dion, // mohan add 2021-04-25
+		const ModuleBase::matrix &dion, // mohan add 2021-04-25
 		const int &nspin, // mohan add 2021-05-07
 		const ModuleBase::ComplexArray &d_so, // mohan add 2021-04-25
 		const int &count_soc, // mohan add 2021-05-07
@@ -86,7 +86,7 @@ class ORB_gen_tables
 
 	ORB_gaunt_table MGT;
 
-	double get_distance(const Vector3<double> &R1, const Vector3<double> &R2)const;
+	double get_distance(const ModuleBase::Vector3<double> &R1, const ModuleBase::Vector3<double> &R2)const;
 
 	double lat0;
 

@@ -184,7 +184,7 @@ void Numerical_Orbital_Lm::copy_parameter(
 	/***********************************************************
 	be careful! LiaoChen modify on 2010/4/21
 	************************************************************/
-//	this->dk = PI / rcut / 2.0;
+//	this->dk = ModuleBase::PI / rcut / 2.0;
 //	this->nk = this->nr;
 
 	r_radial.resize(nr);
@@ -210,7 +210,7 @@ void Numerical_Orbital_Lm::copy_parameter(
 
 void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool &force_flag)
 {
-	timer::tick("NOrbital_Lm", "extra_uniform");
+	ModuleBase::timer::tick("NOrbital_Lm", "extra_uniform");
 	
 	//---------------------------------------------
 	// set the dr, fixed by liaochen.
@@ -230,9 +230,9 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool
 	for (int ir = 0; ir < this->nr_uniform; ir++)
 	{
 		const double psi_uniform_tmp  = 
-		Mathzone_Add1::Uni_RadialF(ModuleBase::GlobalFunc::VECTOR_TO_PTR(this->psi), this->nr, this->rab[0], ir * dr_uniform); 
+		ModuleBase::Mathzone_Add1::Uni_RadialF(ModuleBase::GlobalFunc::VECTOR_TO_PTR(this->psi), this->nr, this->rab[0], ir * dr_uniform); 
 		this->psi_uniform[ir] = psi_uniform_tmp;
-//    	this->psi_uniform[ir] = Mathzone::Polynomial_Interpolation(this->psi, this->nr, this->rab[0], ir * dr_uniform); 
+//    	this->psi_uniform[ir] = ModuleBase::Mathzone::Polynomial_Interpolation(this->psi, this->nr, this->rab[0], ir * dr_uniform); 
     }
 	
 	//----------------------------------------------	 
@@ -247,11 +247,11 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool
 	// has problem that the derivatives of orbitals oscillate a lot
 	// around r=0
 	//--------------------------------------------------------------------------
-	//Mathzone_Add1::SplineD2 (r_radial, psi, nr, 100000.0, 100000.0, y2);
+	//ModuleBase::Mathzone_Add1::SplineD2 (r_radial, psi, nr, 100000.0, 100000.0, y2);
 	//double yp1=(this->psi[1]-this->psi[0])/this->r_radial[1];
 	//std::cout<<"psi0="<<"  "<<this->psi[0]<<"  "<<"psi1="<<"  "<<this->psi[1]<<"  "<<"r1="<<"  "<<this->r_radial[1]<<std::endl; 
 	//std::cout<<"yp1="<<"  "<<yp1<<std::endl;
-	//Mathzone_Add1::SplineD2 (r_radial, psi, nr, yp1, 0.0, y2);
+	//ModuleBase::Mathzone_Add1::SplineD2 (r_radial, psi, nr, yp1, 0.0, y2);
 	
 
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -260,28 +260,28 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool
 	// Peize Lin update 2016-08-31
 	switch( this->angular_momentum_l ) // added by pengfei 13-8-8 different l has different  boundary conditions 
 	{
-		case 0: Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
-		case 1: Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 100000.0, 100000.0, y2); break;
-		case 2: Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
-		case 3: Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 100000.0, 100000.0, y2); break;
-		case 4: Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
+		case 0: ModuleBase::Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
+		case 1: ModuleBase::Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 100000.0, 100000.0, y2); break;
+		case 2: ModuleBase::Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
+		case 3: ModuleBase::Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 100000.0, 100000.0, y2); break;
+		case 4: ModuleBase::Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
 		default: 
 			//GlobalV::ofs_warning << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << std::endl;
 			//GlobalV::ofs_warning << " Check file " << __FILE__ << " line " << __LINE__ <<std::endl;
 			std::cout << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << std::endl;
 			std::cout << " Check file " << __FILE__ << " line " << __LINE__ <<std::endl;
-			Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
+			ModuleBase::Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
 	}
 
-	//Mathzone_Add1::SplineD2 (r_radial, psi, nr, 0.0, 0.0, y2);
+	//ModuleBase::Mathzone_Add1::SplineD2 (r_radial, psi, nr, 0.0, 0.0, y2);
 	//std::cout<<"angular_momentum_l="<<"  "<<this->angular_momentum_l<<std::endl;
 	//for (int i=0; i<nr; i++)
 	//{
 	//     std::cout<<r_radial[i]<<"  "<<y2[i]<<std::endl;
 	//}
 	//Method 1
-	//	Mathzone_Add1::Uni_Deriv_Phi (psi_uniform, nr_uniform, dr_uniform, 1, dpsi_uniform);
-	//	Mathzone_Add1::Uni_Deriv_Phi (psi_uniform, nr_uniform, dr_uniform, 2, ddpsi_uniform);
+	//	ModuleBase::Mathzone_Add1::Uni_Deriv_Phi (psi_uniform, nr_uniform, dr_uniform, 1, dpsi_uniform);
+	//	ModuleBase::Mathzone_Add1::Uni_Deriv_Phi (psi_uniform, nr_uniform, dr_uniform, 2, ddpsi_uniform);
 
 	double* rad = new double[nr_uniform];
 	for (int ir = 0; ir < nr_uniform; ir++)
@@ -289,29 +289,29 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool
 		rad[ir] = ir*dr_uniform;
 	}
 
-	//	Mathzone_Add1::SplineD2 (rad, psi_uniform, nr_uniform, 0.0, 0.0, ddpsi_uniform);
+	//	ModuleBase::Mathzone_Add1::SplineD2 (rad, psi_uniform, nr_uniform, 0.0, 0.0, ddpsi_uniform);
 	double* tmp = new double[nr_uniform];
-	Mathzone_Add1::Cubic_Spline_Interpolation(ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), y2, 
+	ModuleBase::Mathzone_Add1::Cubic_Spline_Interpolation(ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), y2, 
 			nr, rad, nr_uniform, tmp, ModuleBase::GlobalFunc::VECTOR_TO_PTR(dpsi_uniform) );
 
 	// calculate zty
 	// liaochen add 2010-08
 	if( force_flag )	// Peize Lin add if 2017-10-26
 	{
-		Mathzone_Add1::Uni_Deriv_Phi (
+		ModuleBase::Mathzone_Add1::Uni_Deriv_Phi (
 			ModuleBase::GlobalFunc::VECTOR_TO_PTR(this->psi_uniform), 
 			this->nr_uniform, 
 			dr_uniform, 
 			angular_momentum_l, 
 			tmp);
 
-		this->zty = tmp[0]/Mathzone_Add1::factorial (angular_momentum_l);
+		this->zty = tmp[0]/ModuleBase::Mathzone_Add1::factorial (angular_momentum_l);
 	}
 
 	delete [] y2;
 	delete [] rad;
 	delete [] tmp;
-	timer::tick("NOrbital_Lm", "extra_uniform");
+	ModuleBase::timer::tick("NOrbital_Lm", "extra_uniform");
 }
 
 void Numerical_Orbital_Lm::use_uniform(const double &dr_uniform_in)
@@ -355,12 +355,12 @@ void Numerical_Orbital_Lm::use_uniform(const double &dr_uniform_in)
 	for(int i=0; i<nr_uniform; i++)
 	{
 		this->psi_uniform[i] = 
-			Mathzone_Add1::Uni_RadialF(ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), this->nr, this->rab[0], i*dr_uniform); 
+			ModuleBase::Mathzone_Add1::Uni_RadialF(ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), this->nr, this->rab[0], i*dr_uniform); 
 	}
 	
 	this->dpsi_uniform.resize(nr_uniform);
 
-	Mathzone_Add1::Uni_Deriv_Phi (
+	ModuleBase::Mathzone_Add1::Uni_Deriv_Phi (
 		ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi_uniform), 
 		nr_uniform, dr_uniform, 
 		1, 
@@ -397,7 +397,7 @@ void Numerical_Orbital_Lm::cal_kradial(void)
 	double *jl = new double[nr];
 	double *integrated_func = new double[nr];
 
-	const double pref = sqrt( 2.0 / PI );
+	const double pref = sqrt( 2.0 / ModuleBase::PI );
 	//Sbt method
 	
 	/*
@@ -408,7 +408,7 @@ void Numerical_Orbital_Lm::cal_kradial(void)
 	}
 	
 	//liaochen add
-	Mathzone_Add1::Sbt_new (3, angular_momentum_l, 
+	ModuleBase::Mathzone_Add1::Sbt_new (3, angular_momentum_l, 
 							k_radial, dk, nk, 
 							rad, dr_uniform, nr_uniform, 
 							psi_uniform, 0, this->psik);
@@ -420,7 +420,7 @@ void Numerical_Orbital_Lm::cal_kradial(void)
 	//integration directly
 	for (int ik = 0; ik < nk; ik++)
 	{
-		Sphbes::Spherical_Bessel(
+		ModuleBase::Sphbes::Spherical_Bessel(
 				this->nr, 
 				ModuleBase::GlobalFunc::VECTOR_TO_PTR(this->r_radial), 
 				this->k_radial[ik], 
@@ -432,7 +432,7 @@ void Numerical_Orbital_Lm::cal_kradial(void)
 			integrated_func[ir] = this->psir[ir] * this->r_radial[ir] * jl[ir];
 		}
 
-		Integral::Simpson_Integral(
+		ModuleBase::Integral::Simpson_Integral(
 				this->nr,
 				integrated_func,
 				ModuleBase::GlobalFunc::VECTOR_TO_PTR(this->rab),
@@ -458,7 +458,7 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 	for( size_t ir=1; ir<this->nr; ++ir )
 		assert( dr == this->rab[ir] );
 
-	Sph_Bessel_Recursive::D2* pSB = nullptr;
+	ModuleBase::Sph_Bessel_Recursive::D2* pSB = nullptr;
 	for( auto & sb : Sph_Bessel_Recursive_Pool::D2::sb_pool )
 		if( this->dk * dr == sb.get_dx() )
 		{
@@ -475,7 +475,7 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 	const std::vector<std::vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
 
 	std::vector<double> integrated_func( this->nr );
-	const double pref = sqrt( 2.0 / PI );
+	const double pref = sqrt( 2.0 / ModuleBase::PI );
 
 	std::vector<double> psir2(nr);
 	for( size_t ir=0; ir!=nr; ++ir )
@@ -486,7 +486,7 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 		const std::vector<double> &jlk = jl[ik];
 		for (int ir = 0; ir < nr; ir++)
 			integrated_func[ir] = psir2[ir] * jlk[ir];
-		Integral::Simpson_Integral(
+		ModuleBase::Integral::Simpson_Integral(
 				this->nr,
 				ModuleBase::GlobalFunc::VECTOR_TO_PTR(integrated_func),
 				dr,
@@ -510,8 +510,8 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 		assert( dr == this->rab[ir] );
 	}
 
-	Sph_Bessel_Recursive::D2* pSB = nullptr;
-	for( auto & sb : Sph_Bessel_Recursive_Pool::D2::sb_pool )
+	ModuleBase::Sph_Bessel_Recursive::D2* pSB = nullptr;
+	for( auto & sb : ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool )
 	{
 		if( this->dk * dr == sb.get_dx() )
 		{
@@ -522,14 +522,14 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 
 	if(!pSB)
 	{
-		Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});
-		pSB = &Sph_Bessel_Recursive_Pool::D2::sb_pool.back();
+		ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});
+		pSB = &ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool.back();
 	}
 	pSB->set_dx( this->dk * dr );
 	pSB->cal_jlx( this->angular_momentum_l, this->nk, this->nr );
 	const std::vector<std::vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
 
-	const double pref = sqrt( 2.0 / PI );
+	const double pref = sqrt( 2.0 / ModuleBase::PI );
 
 	std::vector<double> r_tmp(nr);
 	for( int ir=0; ir!=nr; ++ir )
@@ -585,8 +585,8 @@ void Numerical_Orbital_Lm::cal_rradial_sbpool(void)
 		assert( dr == this->rab[ir] );
 	}
 
-	Sph_Bessel_Recursive::D2* pSB = nullptr;
-	for( auto & sb : Sph_Bessel_Recursive_Pool::D2::sb_pool )
+	ModuleBase::Sph_Bessel_Recursive::D2* pSB = nullptr;
+	for( auto & sb : ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool )
 	{
 		if( dr * dk == sb.get_dx() )
 		{
@@ -597,8 +597,8 @@ void Numerical_Orbital_Lm::cal_rradial_sbpool(void)
 
 	if(!pSB)
 	{
-		Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});
-		pSB = &Sph_Bessel_Recursive_Pool::D2::sb_pool.back();
+		ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});
+		pSB = &ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool.back();
 	}
 
 	pSB->set_dx( dr * dk );
@@ -606,7 +606,7 @@ void Numerical_Orbital_Lm::cal_rradial_sbpool(void)
 
 	const std::vector<std::vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
 
-	const double pref = sqrt(2.0/PI);
+	const double pref = sqrt(2.0/ModuleBase::PI);
 
 	std::vector<double> k_tmp(nk);
 
@@ -648,7 +648,7 @@ void Numerical_Orbital_Lm::cal_rradial_sbpool(void)
 //===============================================
 void Numerical_Orbital_Lm::norm_test(void)const
 {
-//	TITLE(ofs_onscaling, "Numerical_Orbital_Lm", "norm_test");
+//	ModuleBase::TITLE(ofs_onscaling, "Numerical_Orbital_Lm", "norm_test");
 	//double asum_r = 0.0;
 	//double asum_k = 0.0;
 
@@ -662,7 +662,7 @@ void Numerical_Orbital_Lm::norm_test(void)const
 	double sumr = 0.0;
 	//double sumk = 0.0;
 
-	Integral::Simpson_Integral(this->nr, f, ModuleBase::GlobalFunc::VECTOR_TO_PTR(this->rab), sumr);
+	ModuleBase::Integral::Simpson_Integral(this->nr, f, ModuleBase::GlobalFunc::VECTOR_TO_PTR(this->rab), sumr);
 
 	delete[] f;
 	f = new double[nk];
@@ -671,7 +671,7 @@ void Numerical_Orbital_Lm::norm_test(void)const
 		f[ik] = this->psik[ik] * this->psik[ik];
 	}
 
-//	Integral::Simpson_Integral(this->nk, f, this->k_radial, sumk);
+//	ModuleBase::Integral::Simpson_Integral(this->nk, f, this->k_radial, sumk);
 	
 	//means nothing.
 	//GlobalV::ofs_running << std::setw(12) << sumk << std::endl;
@@ -682,7 +682,7 @@ void Numerical_Orbital_Lm::norm_test(void)const
 
 void Numerical_Orbital_Lm::plot(void)const
 {
-	TITLE("Numerical_Orbital_Lm","plot");
+	ModuleBase::TITLE("Numerical_Orbital_Lm","plot");
 	
 	std::string orbital_type;
 	// Peize Lin update 2016-08-31
@@ -737,7 +737,7 @@ void Numerical_Orbital_Lm::plot(void)const
 
 		if (!ofsk || !ofsr || !ofsru || !ofsdru) // 2013-08-10 pengfei
 		{
-			WARNING("Numerical_Orbital_Lm : plot", "Can't open files !");
+			ModuleBase::WARNING("Numerical_Orbital_Lm : plot", "Can't open files !");
 		}
 
 		for (int i = 0; i < this->nr; i++)

@@ -2,7 +2,9 @@
 #include <cstdlib>
 #include <cmath>
 #include <iostream>
-using namespace std;
+
+namespace ModuleBase
+{
 
 Polint::Polint()
 {}
@@ -175,3 +177,4 @@ double Polint::RadialF
   return result;
 }
 
+}

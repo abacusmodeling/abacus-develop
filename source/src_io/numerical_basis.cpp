@@ -26,7 +26,7 @@ Numerical_Basis::~Numerical_Basis() {}
 //============================================================
 void Numerical_Basis::start_from_file_k( const int &ik, ModuleBase::ComplexMatrix &psi)
 {
-    TITLE("Numerical_Basis","start_from_file_k");
+    ModuleBase::TITLE("Numerical_Basis","start_from_file_k");
 
     if (!this->init_label)
     {
@@ -41,7 +41,7 @@ void Numerical_Basis::start_from_file_k( const int &ik, ModuleBase::ComplexMatri
 // The function is called in run_fp.cpp.
 void Numerical_Basis::output_overlap( const ModuleBase::ComplexMatrix *psi)
 {
-    TITLE("Numerical_Basis","output_overlap");
+    ModuleBase::TITLE("Numerical_Basis","output_overlap");
     ModuleBase::GlobalFunc::NEW_PART("Overlap Data For Spillage Minimization");
     
 	//---------------------------------------------------------
@@ -104,7 +104,7 @@ void Numerical_Basis::output_overlap( const ModuleBase::ComplexMatrix *psi)
             }
         }
 
-        const matrix overlap_V = this->cal_overlap_V(psi, derivative_order);		// Peize Lin add 2020.04.23
+        const ModuleBase::matrix overlap_V = this->cal_overlap_V(psi, derivative_order);		// Peize Lin add 2020.04.23
 
     #ifdef __MPI
         for (int ik=0; ik<GlobalC::kv.nks; ik++)
@@ -139,8 +139,8 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Q(
     const ModuleBase::ComplexMatrix &psi,
 	const int derivative_order) const
 {
-    TITLE("Numerical_Basis","cal_overlap_Q");
-    timer::tick("Numerical_Basis","cal_overlap_Q");
+    ModuleBase::TITLE("Numerical_Basis","cal_overlap_Q");
+    ModuleBase::timer::tick("Numerical_Basis","cal_overlap_Q");
 
 	GlobalV::ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS AND BLOCH WAVE FUNCTIONS" << std::endl;
 	GlobalV::ofs_running << " Q = < J_mu, q | Psi_n, k > " << std::endl;
@@ -148,15 +148,15 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Q(
     ModuleBase::ComplexArray overlap_Q(GlobalV::NBANDS, GlobalV::NLOCAL, this->bessel_basis.get_ecut_number() );
     overlap_Q.zero_out();
 
-	const double normalization = (4 * PI) / sqrt(GlobalC::ucell.omega);			// Peize Lin add normalization 2015-12-29
+	const double normalization = (4 * ModuleBase::PI) / sqrt(GlobalC::ucell.omega);			// Peize Lin add normalization 2015-12-29
 
-    std::vector<Vector3<double>> gk(np);
+    std::vector<ModuleBase::Vector3<double>> gk(np);
     for (int ig=0; ig<np; ig++)
         gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
 
-	const realArray flq = this->cal_flq(ik, gk);
+	const ModuleBase::realArray flq = this->cal_flq(ik, gk);
 
-    const matrix ylm = Numerical_Basis::cal_ylm(gk);
+    const ModuleBase::matrix ylm = Numerical_Basis::cal_ylm(gk);
 
     GlobalV::ofs_running << "\n " << std::setw(5)
         << "ik" << std::setw(8) 
@@ -179,7 +179,7 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Q(
 							<< std::setw(8) << L
 							<< std::endl;
                 //OUT("l",l);
-                std::complex<double> lphase = normalization * pow(IMAG_UNIT, L);			// Peize Lin add normalization 2015-12-29
+                std::complex<double> lphase = normalization * pow(ModuleBase::IMAG_UNIT, L);			// Peize Lin add normalization 2015-12-29
                 for (int ie=0; ie < this->bessel_basis.get_ecut_number(); ie++)
                 {
                     const int N = 0;
@@ -189,7 +189,7 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Q(
                         const int lm = L*L+m;
                         for (int ib=0; ib<GlobalV::NBANDS; ib++)
                         {
-                            std::complex<double> overlap_tmp = ZERO;
+                            std::complex<double> overlap_tmp = ModuleBase::ZERO;
                             for (int ig=0; ig<np; ig++)
                             {
 //                              const std::complex<double> local_tmp = lphase * sk[ig] * ylm(lm, ig) * flq[ig];
@@ -205,7 +205,7 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Q(
         }
     }
 
-    timer::tick("Numerical_Basis","cal_overlap_Q");
+    ModuleBase::timer::tick("Numerical_Basis","cal_overlap_Q");
     return overlap_Q;
 }
 
@@ -214,8 +214,8 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Sq(
     const int &np,
 	const int derivative_order) const
 {
-    TITLE("Numerical_Basis","cal_overlap_Sq");
-    timer::tick("Numerical_Basis","cal_overlap_Sq");
+    ModuleBase::TITLE("Numerical_Basis","cal_overlap_Sq");
+    ModuleBase::timer::tick("Numerical_Basis","cal_overlap_Sq");
 
 	GlobalV::ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS"  << std::endl;
 	GlobalV::ofs_running << " S = < J_mu,q1 | J_nu,q2 >" << std::endl; 
@@ -224,15 +224,15 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Sq(
     ModuleBase::ComplexArray overlap_Sq( GlobalV::NLOCAL, GlobalV::NLOCAL, enumber, enumber );
     overlap_Sq.zero_out();
 
-	const double normalization = (4 * PI) * (4 * PI) / GlobalC::ucell.omega;			// Peize Lin add normalization 2015-12-29
+	const double normalization = (4 * ModuleBase::PI) * (4 * ModuleBase::PI) / GlobalC::ucell.omega;			// Peize Lin add normalization 2015-12-29
 	
-    std::vector<Vector3<double>> gk(np);
+    std::vector<ModuleBase::Vector3<double>> gk(np);
     for (int ig=0; ig<np; ig++)
         gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
 
-	const realArray flq = this->cal_flq(ik, gk);
+	const ModuleBase::realArray flq = this->cal_flq(ik, gk);
 
-    const matrix ylm = Numerical_Basis::cal_ylm(gk);
+    const ModuleBase::matrix ylm = Numerical_Basis::cal_ylm(gk);
 
     GlobalV::ofs_running << "\n " << std::setw(5)
         << "ik" << std::setw(8) 
@@ -255,7 +255,7 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Sq(
                     std::complex<double> *sk2 = GlobalC::wf.get_sk(ik, T2, I2);
                     for (int l1 = 0; l1 < GlobalC::ucell.atoms[T1].nwl+1; l1++) // 1.3
                     {
-                        const std::complex<double> lphase1 = normalization * pow(IMAG_UNIT, l1);			// Peize Lin add normalization 2015-12-29
+                        const std::complex<double> lphase1 = normalization * pow(ModuleBase::IMAG_UNIT, l1);			// Peize Lin add normalization 2015-12-29
                         for (int l2 = 0; l2 < GlobalC::ucell.atoms[T2].nwl+1; l2++) // 2.3
                         {
                             GlobalV::ofs_running << " " << std::setw(5)
@@ -267,7 +267,7 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Sq(
                                 << I2+1 << std::setw(8)
                                 << l2 << std::setw(8) << std::endl;
 
-                            const std::complex<double> lphase2 = pow(IMAG_UNIT, l2);
+                            const std::complex<double> lphase2 = pow(ModuleBase::IMAG_UNIT, l2);
                             for (int ic1=0; ic1 < GlobalC::ucell.nmax; ic1++) // 1.5
                             {
                                 for (int ic2=0; ic2 < GlobalC::ucell.nmax; ic2++) // 2.5
@@ -313,16 +313,16 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Sq(
         }
     }
 
-    timer::tick("Numerical_Basis","cal_overlap_Sq");
+    ModuleBase::timer::tick("Numerical_Basis","cal_overlap_Sq");
     return overlap_Sq;
 }
 
 // Peize Lin add for dpsi 2020.04.23
-matrix Numerical_Basis::cal_overlap_V(
+ModuleBase::matrix Numerical_Basis::cal_overlap_V(
 	const ModuleBase::ComplexMatrix *psi,
 	const int derivative_order)
 {
-	matrix overlap_V(GlobalC::kv.nks, GlobalV::NBANDS);
+	ModuleBase::matrix overlap_V(GlobalC::kv.nks, GlobalV::NBANDS);
 	for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 	{
 		for(int ib=0; ib<GlobalV::NBANDS; ++ib)
@@ -336,13 +336,13 @@ matrix Numerical_Basis::cal_overlap_V(
 	return overlap_V;
 }
 
-realArray Numerical_Basis::cal_flq(const int ik, const std::vector<Vector3<double>> &gk) const
+ModuleBase::realArray Numerical_Basis::cal_flq(const int ik, const std::vector<ModuleBase::Vector3<double>> &gk) const
 {
 	const int np = gk.size();
 	const int enumber = this->bessel_basis.get_ecut_number();
 
     // get flq(G) = \int f(r)jl(G*r) from interpolation table.
-    realArray flq(GlobalC::ucell.lmax+1, enumber, np);
+    ModuleBase::realArray flq(GlobalC::ucell.lmax+1, enumber, np);
     for (int il=0; il<GlobalC::ucell.lmax+1; il++)
         for (int ie=0; ie<enumber; ie++)
             for (int ig=0; ig<np; ig++)
@@ -350,18 +350,18 @@ realArray Numerical_Basis::cal_flq(const int ik, const std::vector<Vector3<doubl
 	return flq;	
 }
 
-matrix Numerical_Basis::cal_ylm(const std::vector<Vector3<double>> &gk)
+ModuleBase::matrix Numerical_Basis::cal_ylm(const std::vector<ModuleBase::Vector3<double>> &gk)
 {
     const int total_lm = ( GlobalC::ucell.lmax + 1) * ( GlobalC::ucell.lmax + 1);
-    matrix ylm(total_lm, gk.size());
-    YlmReal::Ylm_Real(total_lm, gk.size(), gk.data(), ylm);
+    ModuleBase::matrix ylm(total_lm, gk.size());
+    ModuleBase::YlmReal::Ylm_Real(total_lm, gk.size(), gk.data(), ylm);
     return ylm;
 }
 
-std::vector<IntArray> Numerical_Basis::init_mu_index(void)
+std::vector<ModuleBase::IntArray> Numerical_Basis::init_mu_index(void)
 {
 	GlobalV::ofs_running << " Initialize the mu index" << std::endl;
-    std::vector<IntArray> mu_index_(GlobalC::ucell.ntype);
+    std::vector<ModuleBase::IntArray> mu_index_(GlobalC::ucell.ntype);
 
     int mu = 0;
     for (int it=0; it<GlobalC::ucell.ntype; it++)
@@ -402,15 +402,15 @@ void Numerical_Basis::numerical_atomic_wfc(
     const int &np,
     ModuleBase::ComplexMatrix &psi)
 {
-    TITLE("Numerical_Basis", "numerical_atomic_wfc");
+    ModuleBase::TITLE("Numerical_Basis", "numerical_atomic_wfc");
 
-    std::vector<Vector3<double>> gk(np);
+    std::vector<ModuleBase::Vector3<double>> gk(np);
     for (int ig=0; ig<np; ig++)
         gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
 
     const int total_lm = ( GlobalC::ucell.lmax + 1) * ( GlobalC::ucell.lmax + 1);
-    matrix ylm(total_lm, np);
-    YlmReal::Ylm_Real(total_lm, np, gk.data(), ylm);
+    ModuleBase::matrix ylm(total_lm, np);
+    ModuleBase::YlmReal::Ylm_Real(total_lm, np, gk.data(), ylm);
 
     std::vector<double> flq(np);
     for (int it = 0; it < GlobalC::ucell.ntype; it++)
@@ -423,7 +423,7 @@ void Numerical_Basis::numerical_atomic_wfc(
             for (int l = 0; l < GlobalC::ucell.atoms[it].nwl+1; l++)
             {
                 //OUT("l",l);
-                std::complex<double> lphase = pow(IMAG_UNIT, l);
+                std::complex<double> lphase = pow(ModuleBase::IMAG_UNIT, l);
                 for (int ic=0; ic < GlobalC::ucell.atoms[it].l_nchi[l]; ic++)
                 {
                     //OUT("ic",ic);
@@ -706,7 +706,7 @@ void Numerical_Basis::output_overlap_Sq(
 // Peize Lin add 2020.04.23
 void Numerical_Basis::output_overlap_V(
     std::ofstream &ofs,
-	const matrix &overlap_V)
+	const ModuleBase::matrix &overlap_V)
 {
 	if (GlobalV::MY_RANK==0)
     {

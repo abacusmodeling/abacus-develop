@@ -12,7 +12,7 @@ public:
 	~Ions_Move_BFGS();
 	
 	void allocate(void);
-	void start(const matrix& force,  const double &energy_in);
+	void start(const ModuleBase::matrix& force,  const double &energy_in);
 
 	private:
 

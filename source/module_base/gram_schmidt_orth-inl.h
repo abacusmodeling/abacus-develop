@@ -11,6 +11,8 @@
 #include "mathzone.h"
 #include "lapack_connector.h"
 #include "math_integral.h" // mohan add 2021-04-03
+namespace ModuleBase
+{
 
 template<typename Func_Type, typename R_Type>
 Gram_Schmidt_Orth<Func_Type,R_Type>::Gram_Schmidt_Orth( const std::vector<R_Type> &rab_in, const Coordinate &coordinate_in )
@@ -92,6 +94,8 @@ Func_Type Gram_Schmidt_Orth<Func_Type,R_Type>::cal_norm( const std::vector<Func_
 		}
 	}
 	return norm;
+}
+
 }
 
 #endif	// GRAM_SCHMIDT_ORTH_INL_H

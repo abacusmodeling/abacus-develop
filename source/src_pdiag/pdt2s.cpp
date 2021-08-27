@@ -35,7 +35,7 @@ void pdt2s(MPI_Comm comm2D,int N_A,int NB,double *A,double *X,
  *          process  and memory location.
  */
 {
-	TITLE("Parallel_Diago","pdt2s");
+	ModuleBase::TITLE("Parallel_Diago","pdt2s");
 
 	/*
 	GlobalV::ofs_running << "\n A matrix elements : " << std::endl;

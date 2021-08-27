@@ -193,7 +193,7 @@ void Numerical_Nonlocal_Lm::extra_uniform(const double &dr_uniform_in)
 	for (int ir = 0; ir < this->nr_uniform; ir++)
 	{
 		double rnew = ir * dr_uniform;
-		this->beta_uniform[ir] = PolyInt::Polynomial_Interpolation_xy(this->r_radial, beta, this->nr, rnew); 
+		this->beta_uniform[ir] = ModuleBase::PolyInt::Polynomial_Interpolation_xy(this->r_radial, beta, this->nr, rnew); 
     }
 	delete[] beta;
 
@@ -202,7 +202,7 @@ void Numerical_Nonlocal_Lm::extra_uniform(const double &dr_uniform_in)
 	ModuleBase::GlobalFunc::ZEROS(this->dbeta_uniform, nr_uniform);
 	
 	double* y2 = new double[nr];
-	Mathzone_Add1::SplineD2 (r_radial, beta_r, nr, 0.0, 0.0, y2);
+	ModuleBase::Mathzone_Add1::SplineD2 (r_radial, beta_r, nr, 0.0, 0.0, y2);
 
 	double* rad = new double[nr_uniform];
 	for (int ir = 0; ir < nr_uniform; ir++)
@@ -211,7 +211,7 @@ void Numerical_Nonlocal_Lm::extra_uniform(const double &dr_uniform_in)
 	}
 	
 	double* tmp = new double[nr_uniform];
-	Mathzone_Add1::Cubic_Spline_Interpolation(r_radial, beta_r, y2, 
+	ModuleBase::Mathzone_Add1::Cubic_Spline_Interpolation(r_radial, beta_r, y2, 
 					nr, rad, nr_uniform, tmp, dbeta_uniform );
 
 	for(int ir= 0 ; ir<nr_uniform; ir++)
@@ -228,7 +228,7 @@ void Numerical_Nonlocal_Lm::extra_uniform(const double &dr_uniform_in)
 
 void Numerical_Nonlocal_Lm::get_kradial(void)
 {
-    //TITLE("Numerical_Nonlocal_Lm","get_kradial");
+    //ModuleBase::TITLE("Numerical_Nonlocal_Lm","get_kradial");
     double *jl = new double[nr];
     double *integrated_func = new double[nr];
 
@@ -238,7 +238,7 @@ void Numerical_Nonlocal_Lm::get_kradial(void)
 
     for (int ik = 0; ik < nk; ik++)
     {
-        Sphbes::Spherical_Bessel(
+        ModuleBase::Sphbes::Spherical_Bessel(
                 this->nr,
                 this->r_radial,
                 this->k_radial[ik],
@@ -251,7 +251,7 @@ void Numerical_Nonlocal_Lm::get_kradial(void)
             integrated_func[ir] = this->beta_r[ir] * this->r_radial[ir] * jl[ir];
         }
 
-        Integral::Simpson_Integral(
+        ModuleBase::Integral::Simpson_Integral(
                 this->nr,
                 integrated_func,
                 this->rab,
@@ -275,7 +275,7 @@ void Numerical_Nonlocal_Lm::plot(const int &my_rank)const
 		case 2: orbital_type = "d"; break;
 		case 3: orbital_type = "f"; break;
 		case 4: orbital_type = "g"; break;
-		default: WARNING_QUIT("Numerical_Orbital_Lm::plot","Please check in functoin.");
+		default: ModuleBase::WARNING_QUIT("Numerical_Orbital_Lm::plot","Please check in functoin.");
 	}
 
 #ifdef __NORMAL
@@ -299,7 +299,7 @@ void Numerical_Nonlocal_Lm::plot(const int &my_rank)const
 
 		if (!ofsk || !ofsr || !ofsru)
 		{
-			WARNING_QUIT("Numerical_Orbital_Lm::plot", "Can't open files!");
+			ModuleBase::WARNING_QUIT("Numerical_Orbital_Lm::plot", "Can't open files!");
 		}
 
 		for (int i = 0; i < this->nr; i++)

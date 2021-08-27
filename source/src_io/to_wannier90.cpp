@@ -7,7 +7,7 @@
 #include "../module_base/math_polyint.h" 
 #include "../module_base/math_ylmreal.h" 
 
-toWannier90::toWannier90(int num_kpts, Matrix3 recip_lattice)
+toWannier90::toWannier90(int num_kpts, ModuleBase::Matrix3 recip_lattice)
 {
 	this->num_kpts = num_kpts;
 	this->recip_lattice = recip_lattice;
@@ -35,7 +35,7 @@ void toWannier90::init_wannier()
 		else if(wannier_spin == "down") start_k_index = num_kpts/2;
 		else
 		{
-			WARNING_QUIT("toWannier90::init_wannier","Error wannier_spin set,is not \"up\" or \"down\" ");
+			ModuleBase::WARNING_QUIT("toWannier90::init_wannier","Error wannier_spin set,is not \"up\" or \"down\" ");
 		}
 	}
 	
@@ -92,11 +92,11 @@ void toWannier90::read_nnkp()
 	
 	std::ifstream nnkp_read(INPUT.NNKP.c_str(), ios::in);
 	
-	if(!nnkp_read) WARNING_QUIT("toWannier90::read_nnkp","Error during readin parameters.");
+	if(!nnkp_read) ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error during readin parameters.");
 	
 	if( ModuleBase::GlobalFunc::SCAN_BEGIN(nnkp_read,"real_lattice") )
 	{
-		Matrix3 real_lattice_nnkp;
+		ModuleBase::Matrix3 real_lattice_nnkp;
 		nnkp_read >> real_lattice_nnkp.e11 >> real_lattice_nnkp.e12 >> real_lattice_nnkp.e13
 				  >> real_lattice_nnkp.e21 >> real_lattice_nnkp.e22 >> real_lattice_nnkp.e23
 				  >> real_lattice_nnkp.e31 >> real_lattice_nnkp.e32 >> real_lattice_nnkp.e33;
@@ -104,79 +104,79 @@ void toWannier90::read_nnkp()
 		real_lattice_nnkp = real_lattice_nnkp / GlobalC::ucell.lat0_angstrom;
 		
 		if(abs(real_lattice_nnkp.e11 - GlobalC::ucell.latvec.e11) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
 		if(abs(real_lattice_nnkp.e12 - GlobalC::ucell.latvec.e12) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
 		if(abs(real_lattice_nnkp.e13 - GlobalC::ucell.latvec.e13) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
 		if(abs(real_lattice_nnkp.e21 - GlobalC::ucell.latvec.e21) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
 		if(abs(real_lattice_nnkp.e22 - GlobalC::ucell.latvec.e22) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
 		if(abs(real_lattice_nnkp.e23 - GlobalC::ucell.latvec.e23) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
 		if(abs(real_lattice_nnkp.e31 - GlobalC::ucell.latvec.e31) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
 		if(abs(real_lattice_nnkp.e32 - GlobalC::ucell.latvec.e32) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
 		if(abs(real_lattice_nnkp.e33 - GlobalC::ucell.latvec.e33) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
 		
 	}
 	
 	if( ModuleBase::GlobalFunc::SCAN_BEGIN(nnkp_read,"recip_lattice") )
 	{
-		Matrix3 recip_lattice_nnkp;
+		ModuleBase::Matrix3 recip_lattice_nnkp;
 		nnkp_read >> recip_lattice_nnkp.e11 >> recip_lattice_nnkp.e12 >> recip_lattice_nnkp.e13
 				  >> recip_lattice_nnkp.e21 >> recip_lattice_nnkp.e22 >> recip_lattice_nnkp.e23
 				  >> recip_lattice_nnkp.e31 >> recip_lattice_nnkp.e32 >> recip_lattice_nnkp.e33;
 		
-		const double tpiba_angstrom = TWO_PI / GlobalC::ucell.lat0_angstrom;
+		const double tpiba_angstrom = ModuleBase::TWO_PI / GlobalC::ucell.lat0_angstrom;
 		recip_lattice_nnkp = recip_lattice_nnkp / tpiba_angstrom;
 		
 		if(abs(recip_lattice_nnkp.e11 - GlobalC::ucell.G.e11) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
 		if(abs(recip_lattice_nnkp.e12 - GlobalC::ucell.G.e12) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
 		if(abs(recip_lattice_nnkp.e13 - GlobalC::ucell.G.e13) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
 		if(abs(recip_lattice_nnkp.e21 - GlobalC::ucell.G.e21) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
 		if(abs(recip_lattice_nnkp.e22 - GlobalC::ucell.G.e22) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
 		if(abs(recip_lattice_nnkp.e23 - GlobalC::ucell.G.e23) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
 		if(abs(recip_lattice_nnkp.e31 - GlobalC::ucell.G.e31) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
 		if(abs(recip_lattice_nnkp.e32 - GlobalC::ucell.G.e32) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
 		if(abs(recip_lattice_nnkp.e33 - GlobalC::ucell.G.e33) > 1.0e-4) 
-			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+			ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
 	}
 	
 	if( ModuleBase::GlobalFunc::SCAN_BEGIN(nnkp_read,"kpoints") )
 	{
 		int numkpt_nnkp;
 		ModuleBase::GlobalFunc::READ_VALUE(nnkp_read, numkpt_nnkp);
-		if( (GlobalV::NSPIN == 1 || GlobalV::NSPIN == 4) && numkpt_nnkp != GlobalC::kv.nkstot ) WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
-		else if(GlobalV::NSPIN == 2 && numkpt_nnkp != (GlobalC::kv.nkstot/2))	WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
+		if( (GlobalV::NSPIN == 1 || GlobalV::NSPIN == 4) && numkpt_nnkp != GlobalC::kv.nkstot ) ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
+		else if(GlobalV::NSPIN == 2 && numkpt_nnkp != (GlobalC::kv.nkstot/2))	ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
 	
-		Vector3<double> *kpoints_direct_nnkp = new Vector3<double>[numkpt_nnkp];
+		ModuleBase::Vector3<double> *kpoints_direct_nnkp = new ModuleBase::Vector3<double>[numkpt_nnkp];
 		for(int ik = 0; ik < numkpt_nnkp; ik++)
 		{
 			nnkp_read >> kpoints_direct_nnkp[ik].x >> kpoints_direct_nnkp[ik].y >> kpoints_direct_nnkp[ik].z;
 			if(abs(kpoints_direct_nnkp[ik].x - GlobalC::kv.kvec_d[ik].x) > 1.0e-4) 
-				WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
+				ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
 			if(abs(kpoints_direct_nnkp[ik].y - GlobalC::kv.kvec_d[ik].y) > 1.0e-4) 
-				WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
+				ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
 			if(abs(kpoints_direct_nnkp[ik].z - GlobalC::kv.kvec_d[ik].z) > 1.0e-4) 
-				WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
+				ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
 		}
 				
 		delete[] kpoints_direct_nnkp;
 		
 		//�ж�gamma only
-		Vector3<double> my_gamma_point(0.0,0.0,0.0);
+		ModuleBase::Vector3<double> my_gamma_point(0.0,0.0,0.0);
 		//if( (GlobalC::kv.nkstot == 1) && (GlobalC::kv.kvec_d[0] == my_gamma_point) ) gamma_only_wannier = true;
 	} 
 	
@@ -190,15 +190,15 @@ void toWannier90::read_nnkp()
 			// test
 			if(num_wannier < 0)
 			{
-				WARNING_QUIT("toWannier90::read_nnkp","wannier number is lower than 0");
+				ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","wannier number is lower than 0");
 			}
 			
-			R_centre = new Vector3<double>[num_wannier];
+			R_centre = new ModuleBase::Vector3<double>[num_wannier];
 			L = new int[num_wannier];
 			m = new int[num_wannier];
 			rvalue = new int[num_wannier];
-			Vector3<double>* z_axis = new Vector3<double>[num_wannier];
-			Vector3<double>* x_axis = new Vector3<double>[num_wannier];
+			ModuleBase::Vector3<double>* z_axis = new ModuleBase::Vector3<double>[num_wannier];
+			ModuleBase::Vector3<double>* x_axis = new ModuleBase::Vector3<double>[num_wannier];
 			alfa = new double[num_wannier];
 			
 			
@@ -216,7 +216,7 @@ void toWannier90::read_nnkp()
 	}
 	else
 	{
-		WARNING_QUIT("toWannier90::read_nnkp","noncolin spin is not done yet");
+		ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","noncolin spin is not done yet");
 	}
 
 	if( ModuleBase::GlobalFunc::SCAN_BEGIN(nnkp_read,"nnkpts") )
@@ -241,7 +241,7 @@ void toWannier90::read_nnkp()
 			{
 				int ik_nnkp;
 				nnkp_read >> ik_nnkp;
-				if(ik_nnkp != (ik+1)) WARNING_QUIT("toWannier90::read_nnkp","error nnkpts in *.nnkp file");
+				if(ik_nnkp != (ik+1)) ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","error nnkpts in *.nnkp file");
 				nnkp_read >> nnlist[ik][ib];
 				nnkp_read >> nncell[ik][ib].x >> nncell[ik][ib].y >> nncell[ik][ib].z;
 				nnlist[ik][ib]--; // this is c++ , begin from 0
@@ -254,7 +254,7 @@ void toWannier90::read_nnkp()
 	{
 		ModuleBase::GlobalFunc::READ_VALUE(nnkp_read, num_exclude_bands);
 		if(num_exclude_bands > 0) exclude_bands = new int[num_exclude_bands];
-		else if(num_exclude_bands < 0) WARNING_QUIT("toWannier90::read_nnkp","the exclude bands is wrong , please check *.nnkp file.");
+		else if(num_exclude_bands < 0) ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","the exclude bands is wrong , please check *.nnkp file.");
 		
 		if(num_exclude_bands > 0)
 		{
@@ -294,7 +294,7 @@ void toWannier90::read_nnkp()
 	
 	// ����exclude_bands
 	tag_cal_band = new bool[GlobalV::NBANDS];
-	if(GlobalV::NBANDS <= num_exclude_bands) WARNING_QUIT("toWannier90::read_nnkp","you set the band numer is not enough, please add bands number.");
+	if(GlobalV::NBANDS <= num_exclude_bands) ModuleBase::WARNING_QUIT("toWannier90::read_nnkp","you set the band numer is not enough, please add bands number.");
 	if(num_exclude_bands == 0)
 	{
 		for(int ib = 0; ib < GlobalV::NBANDS; ib++) tag_cal_band[ib] = true;
@@ -336,7 +336,7 @@ void toWannier90::outEIG()
 				index_band++;
 				eig_file << std::setw(5) << index_band << std::setw(5) << ik+1-start_k_index
 						 << std::setw(18) << showpoint << fixed << std::setprecision(12) 
-						 << GlobalC::wf.ekb[ik][ib] * Ry_to_eV << std::endl;
+						 << GlobalC::wf.ekb[ik][ib] * ModuleBase::Ry_to_eV << std::endl;
 			}
 		}
 		
@@ -671,7 +671,7 @@ void toWannier90::cal_Mmn(const ModuleBase::ComplexMatrix *wfc_pw)
 	{
 		for(int ib = 0; ib < nntot; ib++)
 		{
-			Vector3<double> phase_G = nncell[0][ib];
+			ModuleBase::Vector3<double> phase_G = nncell[0][ib];
 			for(int m = 0; m < GlobalV::NBANDS; m++)
 			{
 				if(!tag_cal_band[m]) continue;
@@ -693,7 +693,7 @@ void toWannier90::cal_Mmn(const ModuleBase::ComplexMatrix *wfc_pw)
 		{
 			int ikb = nnlist[ik][ib];             // ik+b : ik�Ľ���k��	
 			
-			Vector3<double> phase_G = nncell[ik][ib];
+			ModuleBase::Vector3<double> phase_G = nncell[ik][ib];
 			
 			if(GlobalV::MY_RANK == 0)
 			{
@@ -769,7 +769,7 @@ void toWannier90::produce_trial_in_pw(const int &ik, ModuleBase::ComplexMatrix &
 	const int npw = GlobalC::kv.ngk[ik];
 	const int npwx = GlobalC::wf.npwx;
 	const int total_lm = 16;
-	matrix ylm(total_lm,npw);               //�������͵���г����
+	ModuleBase::matrix ylm(total_lm,npw);               //�������͵���г����
 	//matrix wannier_ylm(num_wannier,npw);    //Ҫ��̽�����ʹ�õ���г����
 	double bs2, bs3, bs6, bs12;
 	bs2 = 1.0/sqrt(2.0);
@@ -777,13 +777,13 @@ void toWannier90::produce_trial_in_pw(const int &ik, ModuleBase::ComplexMatrix &
 	bs6 = 1.0/sqrt(6.0);
 	bs12 = 1.0/sqrt(12.0);
 	
-	Vector3<double> *gk = new Vector3<double>[npw];
+	ModuleBase::Vector3<double> *gk = new ModuleBase::Vector3<double>[npw];
 	for(int ig = 0; ig < npw; ig++)
 	{
 		gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);  // k+Gʸ��
 	}
 	
-	YlmReal::Ylm_Real(total_lm, npw, gk, ylm);
+	ModuleBase::YlmReal::Ylm_Real(total_lm, npw, gk, ylm);
 	
 	// test by jingan
 	//GlobalV::ofs_running << "the mathzone::ylm_real is successful!" << std::endl;
@@ -795,11 +795,11 @@ void toWannier90::produce_trial_in_pw(const int &ik, ModuleBase::ComplexMatrix &
 	const int mesh_r = 333; 		//��������������Ҫ�ĸ����
 	const double dx = 0.025; 		//�̶�������������ɷǹ̶������dr����߾���,���ֵ������
 	const double x_min = -6.0;  	// ��������dr��r����ʼ��
-	matrix r(num_wannier,mesh_r);   //��ͬalfa�ľ�������r
-	matrix dr(num_wannier,mesh_r);  //��ͬalfa�ľ�������ÿ��r��ļ��
-	matrix psi(num_wannier,mesh_r); //������psi in ʵ�ռ�
-	matrix psir(num_wannier,mesh_r);// psi * r in ʵ�ռ�
-	matrix psik(num_wannier,npw);   //��������ĳ��k���µ��ռ��ͶӰ
+	ModuleBase::matrix r(num_wannier,mesh_r);   //��ͬalfa�ľ�������r
+	ModuleBase::matrix dr(num_wannier,mesh_r);  //��ͬalfa�ľ�������ÿ��r��ļ��
+	ModuleBase::matrix psi(num_wannier,mesh_r); //������psi in ʵ�ռ�
+	ModuleBase::matrix psir(num_wannier,mesh_r);// psi * r in ʵ�ռ�
+	ModuleBase::matrix psik(num_wannier,npw);   //��������ĳ��k���µ��ռ��ͶӰ
 	
 	// ����r,dr
 	for(int i = 0; i < num_wannier; i++)
@@ -1334,9 +1334,9 @@ void toWannier90::produce_trial_in_pw(const int &ik, ModuleBase::ComplexMatrix &
 }
 
 // ע����������Lֵ�����Ǵ��ڵ���0��
-void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orbital_L, const int orbital_m, matrix &ylm, 
-										matrix &dr, matrix &r, matrix &psir, const int mesh_r, 
-										Vector3<double> *gk, const int npw, ModuleBase::ComplexMatrix &trial_orbitals_k)
+void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orbital_L, const int orbital_m, ModuleBase::matrix &ylm, 
+										ModuleBase::matrix &dr, ModuleBase::matrix &r, ModuleBase::matrix &psir, const int mesh_r, 
+										ModuleBase::Vector3<double> *gk, const int npw, ModuleBase::ComplexMatrix &trial_orbitals_k)
 {
 	//���㾶������ĳ��k���µ��ռ��ͶӰ
 	double *psik = new double[npw];
@@ -1360,7 +1360,7 @@ void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orb
 	// ��GlobalV::NQX��G���в�ֵ�����npw��G���ֵ
 	for(int ig = 0; ig < npw; ig++)
 	{
-		psik[ig] = PolyInt::Polynomial_Interpolation(psik_tem, GlobalV::NQX, GlobalV::DQ, gk[ig].norm() * GlobalC::ucell.tpiba);
+		psik[ig] = ModuleBase::PolyInt::Polynomial_Interpolation(psik_tem, GlobalV::NQX, GlobalV::DQ, gk[ig].norm() * GlobalC::ucell.tpiba);
 	}
 	
 	
@@ -1368,7 +1368,7 @@ void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orb
 	std::complex<double> *sk = new std::complex<double>[npw];
 	for(int ig = 0; ig < npw; ig++)
 	{
-		const double arg = ( gk[ig] * R_centre[wannier_index] ) * TWO_PI;
+		const double arg = ( gk[ig] * R_centre[wannier_index] ) * ModuleBase::TWO_PI;
 		sk[ig] = std::complex <double> ( cos(arg),  -sin(arg) );
 	}
 	
@@ -1388,7 +1388,7 @@ void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orb
 	}
 	
 	// 4.����������̽�����ĳ��k����ƽ�沨�����ͶӰ
-	std::complex<double> lphase = pow(NEG_IMAG_UNIT, orbital_L);
+	std::complex<double> lphase = pow(ModuleBase::NEG_IMAG_UNIT, orbital_L);
 	for(int ig = 0; ig < GlobalC::wf.npwx; ig++)
 	{
 		if(ig < npw)
@@ -1433,7 +1433,7 @@ void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orb
 
 void toWannier90::integral(const int meshr, const double *psir, const double *r, const double *rab, const int &l, double* table)
 {
-	const double pref = FOUR_PI / sqrt(GlobalC::ucell.omega);
+	const double pref = ModuleBase::FOUR_PI / sqrt(GlobalC::ucell.omega);
 	
 	double *inner_part = new double[meshr];
 	for(int ir=0; ir<meshr; ir++)
@@ -1442,7 +1442,7 @@ void toWannier90::integral(const int meshr, const double *psir, const double *r,
 	}
 	
 	double unit = 0.0;
-	Integral::Simpson_Integral(meshr, inner_part, rab, unit);
+	ModuleBase::Integral::Simpson_Integral(meshr, inner_part, rab, unit);
 	delete[] inner_part;
 
 	double *aux = new double[meshr];
@@ -1450,14 +1450,14 @@ void toWannier90::integral(const int meshr, const double *psir, const double *r,
 	for (int iq=0; iq<GlobalV::NQX; iq++)
 	{
 		const double q = GlobalV::DQ * iq;
-		Sphbes::Spherical_Bessel(meshr, r, q, l, aux);
+		ModuleBase::Sphbes::Spherical_Bessel(meshr, r, q, l, aux);
 		for (int ir = 0;ir < meshr;ir++)
 		{
 			vchi[ir] = psir[ir] * aux[ir] * r[ir];
 		}
 		
 		double vqint = 0.0;
-		Integral::Simpson_Integral(meshr, vchi, rab, vqint);
+		ModuleBase::Integral::Simpson_Integral(meshr, vchi, rab, vqint);
 
 		table[iq] =  vqint * pref;
 	}
@@ -1467,7 +1467,7 @@ void toWannier90::integral(const int meshr, const double *psir, const double *r,
 }
 
 
-void toWannier90::ToRealSpace(const int &ik, const int &ib, const ModuleBase::ComplexMatrix *evc, std::complex<double> *psir, const Vector3<double> G)
+void toWannier90::ToRealSpace(const int &ik, const int &ib, const ModuleBase::ComplexMatrix *evc, std::complex<double> *psir, const ModuleBase::Vector3<double> G)
 {
 	// (1) set value
 	std::complex<double> *phase = GlobalC::UFFT.porter;
@@ -1523,7 +1523,7 @@ std::complex<double> toWannier90::unkdotb(const std::complex<double> *psir, cons
 	return result;
 }
 
-std::complex<double> toWannier90::unkdotkb(const int &ik, const int &ikb, const int &iband_L, const int &iband_R, const Vector3<double> G, const ModuleBase::ComplexMatrix *wfc_pw)
+std::complex<double> toWannier90::unkdotkb(const int &ik, const int &ikb, const int &iband_L, const int &iband_R, const ModuleBase::Vector3<double> G, const ModuleBase::ComplexMatrix *wfc_pw)
 {
 	// (1) set value
 	std::complex<double> result(0.0,0.0);
@@ -1576,7 +1576,7 @@ std::complex<double> toWannier90::unkdotkb(const int &ik, const int &ikb, const 
 	
 }
 
-std::complex<double> toWannier90::gamma_only_cal(const int &ib_L, const int &ib_R, const ModuleBase::ComplexMatrix *wfc_pw, const Vector3<double> G)
+std::complex<double> toWannier90::gamma_only_cal(const int &ib_L, const int &ib_R, const ModuleBase::ComplexMatrix *wfc_pw, const ModuleBase::Vector3<double> G)
 {
 	std::complex<double> *phase = new std::complex<double>[GlobalC::pw.nrxx];
 	std::complex<double> *psir = new std::complex<double>[GlobalC::pw.nrxx];

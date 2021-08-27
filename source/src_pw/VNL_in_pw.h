@@ -1,5 +1,5 @@
-#ifndef VNL_IN_PW_H 
-#define VNL_IN_PW_H 
+#ifndef VNL_IN_PW_H
+#define VNL_IN_PW_H
 
 #include "tools.h"
 #include "VL_in_pw.h"
@@ -34,13 +34,13 @@ public:
 
     double cell_factor; //LiuXh add 20180619
 
-	int nkb; // total number of beta functions considering all atoms 
+	int nkb; // total number of beta functions considering all atoms
 
 	int lmaxkb; // max angular momentum for non-local projectors
 
 	void init_vnl(UnitCell_pseudo &cell);
 
-private:
+
 
 	void getvnl(const int &ik);
 
@@ -56,34 +56,34 @@ private:
 // NAME : lmaxq
 // NAME : dq(space between points in the pseudopotential tab)
 //===============================================================
-
+// private:
 	int calculate_nqx(const double &ecutwfc,const double &dq);
 
 	int nhm;
 
 	int lmaxq;
 
-	matrix indv;		// indes linking  atomic beta's to beta's in the solid
-	matrix nhtol;      	// correspondence n <-> angular momentum l
-	matrix nhtolm;     	// correspondence n <-> combined lm index for (l,m)
-	matrix nhtoj;		// new added
+	ModuleBase::matrix indv;		// indes linking  atomic beta's to beta's in the solid
+	ModuleBase::matrix nhtol;      	// correspondence n <-> angular momentum l
+	ModuleBase::matrix nhtolm;     	// correspondence n <-> combined lm index for (l,m)
+	ModuleBase::matrix nhtoj;		// new added
 
-	realArray dvan;		//(:,:,:),  the D functions of the solid
+	ModuleBase::realArray dvan;		//(:,:,:),  the D functions of the solid
 	ModuleBase::ComplexArray dvan_so;	//(:,:,:),  spin-orbit case,  added by zhengdy-soc
 
-	realArray tab;		//(:,:,:), interpolation table for PPs
-	realArray tab_alpha;
-	realArray tab_at;	//(:,:,:), interpolation table for atomic wfc
+	ModuleBase::realArray tab;		//(:,:,:), interpolation table for PPs
+	ModuleBase::realArray tab_alpha;
+	ModuleBase::realArray tab_at;	//(:,:,:), interpolation table for atomic wfc
 
-	realArray deeq;		//(:,:,:,:), the integral of V_eff and Q_{nm}
+	ModuleBase::realArray deeq;		//(:,:,:,:), the integral of V_eff and Q_{nm}
 	ModuleBase::ComplexArray deeq_nc;	//(:,:,:,:), the spin-orbit case
-	realArray becsum;	//(:,:,:,:), \sum_i  f(i) <psi(i)/beta_1><beta_m/psi(i)> //used in charge
+	ModuleBase::realArray becsum;	//(:,:,:,:), \sum_i  f(i) <psi(i)/beta_1><beta_m/psi(i)> //used in charge
 
 
 	ModuleBase::ComplexMatrix vkb;	// all beta functions in reciprocal space
 	std::complex<double> ***vkb1_alpha;
 	std::complex<double> ***vkb_alpha;
-	
+
 	// other variables
 	std::complex<double> Cal_C(int alpha, int lu, int mu, int L, int M);
 
@@ -95,4 +95,4 @@ private:
 	#endif
 };
 
-#endif // VNL_IN_PW 
+#endif // VNL_IN_PW

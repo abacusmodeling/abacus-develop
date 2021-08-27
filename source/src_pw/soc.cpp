@@ -51,8 +51,8 @@ double Soc::spinor(const int l, const double j, const int m, const int spin)
 	double den;    // denominator
 	double spinor0;
 
-	if (spin!=0&&spin!=1) WARNING_QUIT("spinor","spin direction unknown");
-	if (m<-l-1||m>l) WARNING_QUIT("spinor","m not allowed");
+	if (spin!=0&&spin!=1) ModuleBase::WARNING_QUIT("spinor","spin direction unknown");
+	if (m<-l-1||m>l) ModuleBase::WARNING_QUIT("spinor","m not allowed");
 
 	den = 1.0/(2.0*l+1.0);
 	if (fabs(j-l-0.50)<1e-8) 
@@ -81,7 +81,7 @@ double Soc::spinor(const int l, const double j, const int m, const int spin)
 	}
 	else
 	{
-		WARNING_QUIT("soc::spinor","j and l not compatible");
+		ModuleBase::WARNING_QUIT("soc::spinor","j and l not compatible");
 	}
 
 	return spinor0;
@@ -120,11 +120,11 @@ int Soc::sph_ind(const int l, const double j, const int m, const int spin)
     int sph_ind0;
     if (spin != 0 && spin!= 1)
 	{
-        WARNING_QUIT("sph_ind","spin must be 0 1");
+        ModuleBase::WARNING_QUIT("sph_ind","spin must be 0 1");
 	}
     if (m< -l-1 || m> l)
 	{
-        WARNING_QUIT("sph_ind","m not allowed");
+        ModuleBase::WARNING_QUIT("sph_ind","m not allowed");
 	}
     if (fabs(j-l-0.5)< 1e-8)
 	{
@@ -152,7 +152,7 @@ int Soc::sph_ind(const int l, const double j, const int m, const int spin)
     else 
 	{
 		std::cout<<"l= "<<l<<" j= "<<j<<std::endl;
-		WARNING_QUIT("sph_ind","l and j not suitable");
+		ModuleBase::WARNING_QUIT("sph_ind","l and j not suitable");
 	}
     if(sph_ind0 < -l || sph_ind0 >l )
 	{

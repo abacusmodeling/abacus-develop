@@ -17,7 +17,7 @@ class H_Hartree_pw
     static double hartree_energy;
 
 	// compute the Hartree energy
-    static matrix v_hartree(
+    static ModuleBase::matrix v_hartree(
 		const UnitCell &cell, 
 		PW_Basis &pwb, 
 		const int &nspin,

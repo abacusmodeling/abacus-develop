@@ -14,7 +14,8 @@ dr2				1e-9
 niter			100
 
 #Parameters (3.Relaxation)
-nstep           20
+nstep           2
+force           1
 force_thr_ev    0.01
 move_method     bfgs
 

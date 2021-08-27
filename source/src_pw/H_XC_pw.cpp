@@ -6,7 +6,7 @@ double H_XC_pw::etxc;
 double H_XC_pw::vtxc;
 
 // [etxc, vtxc, v] = H_XC_pw::v_xc(...)
-std::tuple<double,double,matrix> H_XC_pw::v_xc
+std::tuple<double,double,ModuleBase::matrix> H_XC_pw::v_xc
 (
 	const int &nrxx, // number of real-space grid
 	const int &ncxyz, // total number of charge grid
@@ -14,23 +14,23 @@ std::tuple<double,double,matrix> H_XC_pw::v_xc
     const double*const*const rho_in,
 	const double*const rho_core) // core charge density
 {
-    TITLE("H_XC_pw","v_xc");
-    timer::tick("H_XC_pw","v_xc");
+    ModuleBase::TITLE("H_XC_pw","v_xc");
+    ModuleBase::timer::tick("H_XC_pw","v_xc");
 
 	#ifndef USE_LIBXC
 	if(GlobalV::DFT_META)
 	{
-		WARNING_QUIT("Potential::v_of_rho","to use metaGGA, please link LIBXC");
+		ModuleBase::WARNING_QUIT("Potential::v_of_rho","to use metaGGA, please link LIBXC");
 	}
 	#endif
     //Exchange-Correlation potential Vxc(r) from n(r)
     double et_xc = 0.0;
     double vt_xc = 0.0;
-	matrix v(GlobalV::NSPIN, nrxx);
+	ModuleBase::matrix v(GlobalV::NSPIN, nrxx);
 
 	if(GlobalV::VXC_IN_H == 0)
 	{
-    	timer::tick("H_XC_pw","v_xc");
+    	ModuleBase::timer::tick("H_XC_pw","v_xc");
     	return std::make_tuple(et_xc, vt_xc, std::move(v));
 	}
     // the square of the e charge
@@ -172,6 +172,6 @@ std::tuple<double,double,matrix> H_XC_pw::v_xc
     et_xc *= omega / ncxyz;
     vt_xc *= omega / ncxyz;
 
-    timer::tick("H_XC_pw","v_xc");
+    ModuleBase::timer::tick("H_XC_pw","v_xc");
     return std::make_tuple(et_xc, vt_xc, std::move(v));
 }

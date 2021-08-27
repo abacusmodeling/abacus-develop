@@ -9,7 +9,8 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-using namespace std;
+namespace ModuleBase
+{
 
 // 1024 bit  = 1 Byte
 // 1024 Byte = 1 KB
@@ -55,5 +56,7 @@ private:
 	static double short_memory;//(2 Byte)
 	static double float_memory;//(4 Byte)
 };
+
+}
 
 #endif

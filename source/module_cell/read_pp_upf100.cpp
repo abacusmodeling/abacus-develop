@@ -151,7 +151,7 @@ void Pseudopot_upf::read_pseudo_header(std::ifstream &ifs)
 	{
 		// A bug here!!! can't quit together.
 		std::cout << " pp_type=" << pp_type << std::endl;
-		WARNING_QUIT("Pseudopot_upf::read_pseudo_header","unknown pseudo type");
+		ModuleBase::WARNING_QUIT("Pseudopot_upf::read_pseudo_header","unknown pseudo type");
 	}
 
 	// If use nlcc
@@ -211,7 +211,7 @@ void Pseudopot_upf::read_pseudo_header(std::ifstream &ifs)
 			std::cout << " dft_functional in pseudopot file is: " << dft_tot << std::endl;
 			GlobalV::ofs_warning << " dft_functional readin is: " << GlobalV::DFT_FUNCTIONAL << std::endl;
 			GlobalV::ofs_warning << " dft_functional in pseudopot file is: " << dft_tot << std::endl;
-			//WARNING_QUIT("Pseudopot_upf::read_pseudo_header","input xc functional does not match that in pseudopot file");
+			//ModuleBase::WARNING_QUIT("Pseudopot_upf::read_pseudo_header","input xc functional does not match that in pseudopot file");
 		}
 	}
 	
@@ -372,7 +372,7 @@ void Pseudopot_upf::read_pseudo_nl(std::ifstream &ifs)
 		// QIJ
 		if (tvanp)
 		{
-			WARNING_QUIT("read_pseudo_nl","Ultra Soft Pseudopotential not available yet.");
+			ModuleBase::WARNING_QUIT("read_pseudo_nl","Ultra Soft Pseudopotential not available yet.");
 		}
 		else // not tvanp
 		{
@@ -450,7 +450,7 @@ void Pseudopot_upf::read_pseudo_so(std::ifstream &ifs)
 
 void Pseudopot_upf::print_pseudo_upf(std::ofstream &ofs)
 {
-	TITLE("Pseudopot_upf","print_pseudo_upf");
+	ModuleBase::TITLE("Pseudopot_upf","print_pseudo_upf");
 	ofs << " ==== read_pseudo_upf === " << std::endl;
 
 	// print header

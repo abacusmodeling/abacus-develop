@@ -24,7 +24,7 @@ static void of_abfs_cpp( const std::string &file_name, const std::vector<std::ve
 			}
 }
 
-static void cout_matrix_4( const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &matrix )
+static void cout_matrix_4( const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> &matrix )
 {
 	for( const auto & m1 : matrix )
 	{
@@ -52,7 +52,7 @@ static void cout_matrix_4( const std::map<size_t,std::map<size_t,std::map<size_t
 
 static void ofs_ms( 
 	const std::string& file_name, 
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &ms )
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> &ms )
 {
 	std::ofstream ofs(file_name.c_str());
 	ofs<<"0000"<<std::endl;
@@ -64,7 +64,7 @@ static void ofs_ms(
 
 static void ofs_ms( 
 	const std::string& file_name, 
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &ms )
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> &ms )
 {
 	std::ofstream ofs(file_name.c_str());
 	ofs<<"0000"<<std::endl;
@@ -78,7 +78,7 @@ static void ofs_ms(
 
 static void ofs_ms( 
 	const std::string& file_name, 
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>> &ms )
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<ModuleBase::matrix>>>>>> &ms )
 {
 	std::ofstream ofs(file_name.c_str());
 	ofs<<"0000"<<std::endl;

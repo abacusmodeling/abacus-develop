@@ -9,6 +9,9 @@
 #include <vector>
 #include"stddef.h"
 
+namespace ModuleBase
+{
+
 class Sph_Bessel_Recursive
 {
 public:
@@ -80,5 +83,7 @@ public:
 		static std::vector<Sph_Bessel_Recursive::D2> sb_pool;
 	};
 };
+
+}
 
 #endif	// SPH_BESSEL_RECURSIVE_H

@@ -59,7 +59,7 @@ void Exx_Abfs::test_all() const
 		std::cout<<"D3"<<std::endl;
 		m_abfs_abfs.init_radial_table();
 		std::cout<<"D4"<<std::endl;
-		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>>
 			&&ms_abfs_abfs = m_abfs_abfs.cal_overlap_matrix( index_abfs, index_abfs );
 		ofs_ms("ms_abfs_abfs",ms_abfs_abfs);
 	};
@@ -88,7 +88,7 @@ void Exx_Abfs::test_all() const
 		m_abfslcaos_lcaos.init( 1, 1, 1 );
 		m_abfslcaos_lcaos.init_radial( abfs, GlobalC::ORB, GlobalC::ORB );
 		m_abfslcaos_lcaos.init_radial_table();
-		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>>
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>>
 			&&ms_lcaos2_abfs = m_abfslcaos_lcaos.cal_overlap_matrix( index_abfs, index_lcaos, index_lcaos );
 		ofs_ms("ms_lcaos2_abfs",ms_lcaos2_abfs);
 	};
@@ -217,57 +217,57 @@ std::cout<<"F"<<std::endl;
 
 std::cout<<"G"<<std::endl;
 
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>>
 		&&ms_jys_jys = m_jys_jys.cal_overlap_matrix( index_jys, index_jys );
 
 ofs_ms("ms_jys_jys",ms_jys_jys);
 
-	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>>
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>>
 		&&ms_lcaos2_jys = m_jyslcaos_lcaos.cal_overlap_matrix( index_jys, index_lcaos, index_lcaos );
 
 ofs_ms("ms_lcaos2_jys",ms_lcaos2_jys);
 
 std::cout<<"G2"<<std::endl;
 
-	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>>
 		&&ms_lcaos2_lcaos2 = mllll.cal_overlap_matrix( index_lcaos, index_lcaos );
 
 ofs_ms("ms_lcaos2_lcaos2",ms_lcaos2_lcaos2);
 
 std::cout<<"G3"<<std::endl;
 
-//	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>>
+//	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>>
 //		&&ms_lcaos2_asa = m_asalcaos_lcaos.cal_overlap_matrix( index_asa, index_lcaos, index_lcaos );
 
 //ofs_ms("ms_lcaos2_asa",ms_lcaos2_asa);
 
 std::cout<<"G4"<<std::endl;
 
-//	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
+//	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>>
 //		&&ms_asa_asa = m_asa_asa.cal_overlap_matrix( index_asa, index_asa );
 
 //ofs_ms("ms_asa_asa",ms_asa_asa);
 
 std::cout<<"G5"<<std::endl;
 
-//	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>>
+//	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<ModuleBase::matrix>>>>>>
 //		&&ms_asa_asa_I = cal_I( ms_asa_asa, index_asa );
 
 //ofs_ms("ms_asa_asa_I",ms_asa_asa_I);
 
 std::cout<<"G6"<<std::endl;
 
-//	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
+//	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>>
 //		&&ms_asa_jys = m_asa_jys.cal_overlap_matrix( index_asa, index_jys );
 
 //ofs_ms("ms_asa_jys",ms_asa_jys);
 
-//	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
+//	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>>
 //		&&ms_lcaos2_lcaos2_proj_asa = cal_lcaos2_lcaos2_proj_asa( ms_lcaos2_asa, ms_asa_asa_I, range_lcaos, index_lcaos );
 
 //ofs_ms("ms_lcaos2_lcaos2_proj_asa",ms_lcaos2_lcaos2_proj_asa);
 
-//	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>>
+//	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>>
 //		&&ms_lcaos2_jys_proj_asa = cal_lcaos2_jys_proj_asa( ms_lcaos2_asa, ms_asa_asa_I, ms_asa_jys );
 
 //ofs_ms("ms_lcaos2_jys_proj_asa",ms_lcaos2_jys_proj_asa);
@@ -407,35 +407,35 @@ std::cout<<"G"<<std::endl;
 
 std::cout<<"G2"<<std::endl;
 
-	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>>
 		&&ms_lcaos2_lcaos2 = mllll.cal_overlap_matrix( index_lcaos, index_lcaos );
 
 ofs_ms("ms_lcaos2_lcaos2",ms_lcaos2_lcaos2);
 
 std::cout<<"G3"<<std::endl;
 
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>>
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>>
 		&&ms_lcaos2_abfs = m_abfslcaos_lcaos.cal_overlap_matrix( index_abfs, index_lcaos, index_lcaos );
 
 ofs_ms("ms_lcaos2_abfs",ms_lcaos2_abfs);
 
 std::cout<<"G4"<<std::endl;
 
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>>
 		&&ms_abfs_abfs = m_abfs_abfs.cal_overlap_matrix( index_abfs, index_abfs );
 
 ofs_ms("ms_abfs_abfs",ms_abfs_abfs);
 
 std::cout<<"G5"<<std::endl;
 
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>>
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<ModuleBase::matrix>>>>>>
 		&&ms_abfs_abfs_I = cal_I( ms_abfs_abfs, index_abfs );
 
 ofs_ms("ms_abfs_abfs_I",ms_abfs_abfs_I);
 
 std::cout<<"G6"<<std::endl;
 
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>>
 		&&ms_lcaos2_lcaos2_proj_abfs = cal_lcaos2_lcaos2_proj_asa( ms_lcaos2_abfs, ms_abfs_abfs_I, range_lcaos, index_lcaos );
 
 ofs_ms("ms_lcaos2_lcaos2_proj_abfs",ms_lcaos2_lcaos2_proj_abfs);
@@ -456,7 +456,7 @@ std::cout<<"G7"<<std::endl;
 					for(const auto m4 : m3.second)
 					{
 						size_t IB = m4.first;
-						matrix m = ms_lcaos2_lcaos2[TA][IA][TB][IB] - m4.second;
+						ModuleBase::matrix m = ms_lcaos2_lcaos2[TA][IA][TB][IB] - m4.second;
 						for( int ir=0; ir!=m.nr; ++ir )
 							for( size_t ic=0; ic!=m.nc; ++ic )
 								m(ir,ic) /= ms_lcaos2_lcaos2[TA][IA][TB][IB](ir,ic);
@@ -469,8 +469,8 @@ std::cout<<"G7"<<std::endl;
 
 test_ratio();
 
-	std::function< void( matrix &, const matrix & ) >
-		minus_matrix = []( matrix &mA, const matrix &mB ){ mA-=mB; };
+	std::function< void( ModuleBase::matrix &, const ModuleBase::matrix & ) >
+		minus_matrix = []( ModuleBase::matrix &mA, const ModuleBase::matrix &mB ){ mA-=mB; };
 	// ms_lcaos2_lcaos2 -= ms_lcaos2_lcaos2_proj_asa
 	ModuleBase::GlobalFunc::FUNC_EACH_2( ms_lcaos2_lcaos2, ms_lcaos2_lcaos2_proj_abfs, minus_matrix );
 
@@ -542,7 +542,7 @@ std::cout<<"D"<<std::endl;
 		m_lcaos_lcaos.init(1);
 		m_lcaos_lcaos.init_radial( GlobalC::ORB, GlobalC::ORB );
 		m_lcaos_lcaos.init_radial_table();
-		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>>
 			&&matrix_V = m_lcaos_lcaos.cal_overlap_matrix(index_lcaos,index_lcaos);
 
 		std::ofstream ofs("S_matrix.dat");
@@ -565,7 +565,7 @@ std::cout<<"D"<<std::endl;
 			}
 		}
 		ofs.close();
-		WARNING_QUIT( ModuleBase::GlobalFunc::TO_STRING(__FILE__), ModuleBase::GlobalFunc::TO_STRING(__LINE__) );
+		ModuleBase::WARNING_QUIT( ModuleBase::GlobalFunc::TO_STRING(__FILE__), ModuleBase::GlobalFunc::TO_STRING(__LINE__) );
 	};
 
 	// Peize Lin test
@@ -575,7 +575,7 @@ std::cout<<"D"<<std::endl;
 		m_lcaos_lcaos.init(1,this->kmesh_times);
 		m_lcaos_lcaos.init_radial( lcaos, lcaos );
 		m_lcaos_lcaos.init_radial_table();
-		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>>
 			&&matrix_V = m_lcaos_lcaos.cal_overlap_matrix(index_lcaos,index_lcaos);
 
 		std::ofstream ofs("S_matrix.dat");
@@ -598,7 +598,7 @@ std::cout<<"D"<<std::endl;
 			}
 		}
 		ofs.close();
-		WARNING_QUIT( ModuleBase::GlobalFunc::TO_STRING(__FILE__), "line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__) );
+		ModuleBase::WARNING_QUIT( ModuleBase::GlobalFunc::TO_STRING(__FILE__), "line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__) );
 	};
 
 	// Peize Lin test
@@ -613,7 +613,7 @@ std::cout<<"D1"<<std::endl;
 std::cout<<"D2"<<std::endl;
 		m_ll2_ll2.init_radial_table();
 std::cout<<"D3"<<std::endl;
-		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>>
 			&&ms_ll2_ll2 = m_ll2_ll2.cal_overlap_matrix(index_lcaos,index_lcaos);
 std::cout<<"D4"<<std::endl;
 		ofs_ms("ms_ll2_ll2",ms_ll2_ll2);
@@ -640,22 +640,22 @@ std::cout<<"E"<<std::endl;
 std::cout<<"F"<<std::endl;
 
 	// ÿһ�����Ӳ�
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>>
 		&&ms_abfs_abfs = m_abfs_abfs.cal_overlap_matrix( index_abfs, index_abfs );
 ofs_ms("ms_abfs_abfs",ms_abfs_abfs);
 
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>>
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>>
 		&&ms_lcaos2_abfs = m_abfslcaos_lcaos.cal_overlap_matrix( index_abfs, index_lcaos, index_lcaos );
 ofs_ms("ms_lcaos2_abfs",ms_lcaos2_abfs);
 
 std::cout<<"G"<<std::endl;
 
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>>
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<ModuleBase::matrix>>>>>>
 		&&ms_abfs_abfs_I = cal_I( ms_abfs_abfs, index_abfs );
 ofs_ms("ms_abfs_abfs_I",ms_abfs_abfs_I);
 
 std::cout<<"G1"<<std::endl;
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>>
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>>
 		&&ms_C = cal_C( ms_lcaos2_abfs, ms_abfs_abfs_I );
 ofs_ms("ms_C",ms_C);
 
@@ -681,11 +681,11 @@ void Exx_Abfs::test_abfs2() const{}
 // &
 // <a|a> <a|b>
 // <b|a> <b|b> .I
-std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>> Exx_Abfs::cal_I(
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &ms,
+std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<ModuleBase::matrix>>>>>> Exx_Abfs::cal_I(
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> &ms,
 	const ModuleBase::Element_Basis_Index::IndexLNM &index )
 {
-	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>> ms_I;
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<ModuleBase::matrix>>>>>> ms_I;
 
 	for( const auto &m1 : ms )
 	{
@@ -725,7 +725,7 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std:
 
 					// Peize Lin test
 //					std::cout<<TA<<"\t"<<IA<<"\t"<<TB<<"\t"<<IB<<std::endl;
-//					const matrix matrix_origin( ms_tmp.A );
+//					const ModuleBase::matrix matrix_origin( ms_tmp.A );
 //					std::cout<<matrix_origin<<std::endl;
 
 					ms_tmp.cal_inverse( Exx_Abfs::Inverse_Matrix_Double::Method::dpotrf );
@@ -739,7 +739,7 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std:
 					{
 						const size_t size_A = index[TA].count_size;
 
-						ms_I[TA][IA][TB][IB].resize( 1, std::vector<matrix>(1) );
+						ms_I[TA][IA][TB][IB].resize( 1, std::vector<ModuleBase::matrix>(1) );
 						ms_I[TA][IA][TB][IB][0][0].create( size_A, size_A );
 
 						ms_tmp.output(
@@ -750,7 +750,7 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std:
 						const size_t size_A = index[TA].count_size;
 						const size_t size_B = index[TB].count_size;
 
-						ms_I[TA][IA][TB][IB].resize( 2, std::vector<matrix>(2) );
+						ms_I[TA][IA][TB][IB].resize( 2, std::vector<ModuleBase::matrix>(2) );
 						ms_I[TA][IA][TB][IB][0][0].create( size_A, size_A );
 						ms_I[TA][IA][TB][IB][0][1].create( size_A, size_B );
 						ms_I[TA][IA][TB][IB][1][0].create( size_B, size_A );
@@ -770,11 +770,11 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std:
 }
 
 // <ij|P> * <P|P>.I
-std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> Exx_Abfs::cal_C(
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &ms_lcaos2_abfs,
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>> &ms_abfs_abfs_I )
+std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> Exx_Abfs::cal_C(
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> &ms_lcaos2_abfs,
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<ModuleBase::matrix>>>>>> &ms_abfs_abfs_I )
 {
-	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> ms_C;
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> ms_C;
 
 	for( const auto & m1 : ms_lcaos2_abfs )
 	{
@@ -821,8 +821,8 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matr
 
 // (<ij|P>*<P|P>.I) * <P|P> * (<P|P>.I*<P|kl>)
 void Exx_Abfs::cal_CVC(
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &ms_C,
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &ms_abfs_abfs ) const
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> &ms_C,
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> &ms_abfs_abfs ) const
 {
 	std::ofstream ofs("ms_CVC");
 
@@ -857,7 +857,7 @@ void Exx_Abfs::cal_CVC(
 									auto m_11 = [&](){ return m14.second[1] * ms_abfs_abfs.at(TB).at(IB).at(TD).at(ID) * transpose(m24.second[1]); };
 
 									//matrix_CVC[TA][IA][TB][IB]|[TC][IC][TD][ID] =
-									matrix mm;		// Peize Lin test
+									ModuleBase::matrix mm;		// Peize Lin test
 
 									if( TA==TB && IA==IB )
 									{
@@ -897,13 +897,13 @@ void Exx_Abfs::cal_CVC(
 }
 
 // <ij|P> * <P|P>.I * <P|ij>
-std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Exx_Abfs::cal_lcaos2_lcaos2_proj_asa(
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &ms_lcaos2_asa,
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>> &ms_asa_asa_I,
+std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> Exx_Abfs::cal_lcaos2_lcaos2_proj_asa(
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> &ms_lcaos2_asa,
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<ModuleBase::matrix>>>>>> &ms_asa_asa_I,
 	const ModuleBase::Element_Basis_Index::Range &range,
 	const ModuleBase::Element_Basis_Index::IndexLNM &index)
 {
-	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> ms_lcaos2_lcaos2_proj_asa;
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> ms_lcaos2_lcaos2_proj_asa;
 	for( const auto &m1 : ms_lcaos2_asa )
 	{
 		const size_t TA = m1.first;
@@ -919,7 +919,7 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Exx_A
 					const auto & m_lcaos2_asa = m4.second;
 					const auto & m_abfs_abfs_I = ms_asa_asa_I.at(TA).at(IA).at(TB).at(IB);
 
-					std::vector<matrix> mql(2);
+					std::vector<ModuleBase::matrix> mql(2);
 					size_t matrix_num;
 					if( TA==TB && IA==IB )
 					{
@@ -975,12 +975,12 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Exx_A
 }
 
 // <ij|P> * <P|P>.I * <P|jY>
-std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> Exx_Abfs::cal_lcaos2_jys_proj_asa(
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &ms_lcaos2_asa,
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>> &ms_asa_asa_I,
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &ms_asa_jys)
+std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> Exx_Abfs::cal_lcaos2_jys_proj_asa(
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> &ms_lcaos2_asa,
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<ModuleBase::matrix>>>>>> &ms_asa_asa_I,
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> &ms_asa_jys)
 {
-	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> ms_lcaos2_jys_proj_asa;
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> ms_lcaos2_jys_proj_asa;
 
 	for( const auto & m1 : ms_lcaos2_asa )
 	{
@@ -1006,7 +1006,7 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matr
 					}
 					else
 					{
-						std::vector<matrix> ms_tmp(2);
+						std::vector<ModuleBase::matrix> ms_tmp(2);
 						for( size_t i=0; i<2; ++i )
 							ms_tmp[i]
 							= ms_lcaos2_asa.at(TA).at(IA).at(TB).at(IB)[0]
@@ -1048,7 +1048,7 @@ void cal_R_supercell()
 /*
 void density_matrix()
 {
-	std::vector<matrix> DM_k(GlobalC::kv.nks);
+	std::vector<ModuleBase::matrix> DM_k(GlobalC::kv.nks);
 	for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 	{
 		for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
@@ -1063,7 +1063,7 @@ void density_matrix()
 		}
 	}
 
-	std::vector<size_t,std::vector<matrix>> DM_R( GlobalV::NSPIN, std::vector<matrix>(R_supercell.size()) );
+	std::vector<size_t,std::vector<ModuleBase::matrix>> DM_R( GlobalV::NSPIN, std::vector<ModuleBase::matrix>(R_supercell.size()) );
 	for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		const size_t k_start = (GlobalV::NSPIN==1) ? 0 : ((is==0) ? 0 : (GlobalC::kv.nks/2));
@@ -1072,7 +1072,7 @@ void density_matrix()
 		{
 			for( size_t ik=k_start; ik!=k_end; ++ik )
 			{
-				DM_R[is][iR] += exp(TWO_PI*IMAG_UNIT*dot(GlobalC::kv.kvec_d[ik],R_supercell[iR])) * DM[ik];
+				DM_R[is][iR] += exp(ModuleBase::TWO_PI*IMAG_UNIT*dot(GlobalC::kv.kvec_d[ik],R_supercell[iR])) * DM[ik];
 			}
 		}
 	}

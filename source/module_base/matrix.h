@@ -12,6 +12,9 @@
 
 #include<fstream>// test
 
+namespace ModuleBase
+{
+
 class matrix
 {
 	/* data */
@@ -85,5 +88,7 @@ double trace_on(const matrix &A, const matrix &B);		// mohan add 2011-01-13
 double mdot(const matrix &A, const matrix &B);			// mohan add 2011-01-13
 
 std::ostream & operator<<( std::ostream & os, const matrix & m );		// Peize Lin add 2016-09-08
+
+}
 
 #endif // MATRIX_H

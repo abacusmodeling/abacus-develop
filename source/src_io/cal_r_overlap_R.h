@@ -45,7 +45,7 @@ class cal_r_overlap_R
 	int R_minY;
 	int R_minZ;
 	
-	Vector3<double> ****psi_r_psi;
+	ModuleBase::Vector3<double> ****psi_r_psi;
 	bool allocate_psi_r_psi = false;
 
 	std::map<size_t,
