@@ -19,11 +19,8 @@ option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 option(BUILD_UNIT_TESTS "Build ABACUS unit tests" ON)
 option(GENERATE_TEST_REPORTS "Enable test report generation" OFF)
 
-
-
 include(CheckLanguage)
 check_language(CUDA)
-
 if(CMAKE_CUDA_COMPILER)
   if(NOT DEFINED USE_CUDA)
     message("CUDA components detected. \nWill build the CUDA version of ABACUS.")
@@ -39,7 +36,6 @@ else() # CUDA not found
     set(USE_CUDA OFF)
   endif()
 endif()
-
 if(USE_CUDA)
   set(CMAKE_CXX_STANDARD 14)
   set(CMAKE_CXX_EXTENSIONS ON)
@@ -51,7 +47,6 @@ if(USE_CUDA)
   include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
   add_compile_definitions(__CUDA)
 endif()
-
 
 if(ENABLE_DEEPKS)
   set(CMAKE_CXX_STANDARD 14)
@@ -231,18 +226,6 @@ endif()
 
 if(${Libxc_FOUND})
   target_link_libraries(${ABACUS_BIN_NAME} Libxc::xc)
-endif()
-if(USE_CUDA)
-  target_link_libraries(${ABACUS_BIN_NAME}
-    -lcufft
-    -lcublas
-    -lcudart
-  )
-  set_property(TARGET ${ABACUS_BIN_NAME}
-  PROPERTY CUDA_ARCHITECTURES
-  70 # V100
-  75 # T4
-  )
 endif()
 
 install(PROGRAMS ${ABACUS_BIN_PATH}
