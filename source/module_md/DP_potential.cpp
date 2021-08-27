@@ -38,9 +38,9 @@ void DP_potential::DP_pot(UnitCell_pseudo &ucell_c, double &potential, ModuleBas
 
     for(int i=0; i<ucell_c.nat;  ++i)
     {
-        force[1].x = f[3*i]/fact_f;
-        force[1].y = f[3*i+1]/fact_f;
-        force[1].z = f[3*i+2]/fact_f;
+        force[i].x = f[3*i]/fact_f;
+        force[i].y = f[3*i+1]/fact_f;
+        force[i].z = f[3*i+2]/fact_f;
     }
 
     for(int i=0; i<3; ++i)
