@@ -23,6 +23,7 @@ FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
 ##============================
 ## DeePMD-kit (need by DPMD)
 ##============================
+HONG_DPMD = -D__DPMD -DHIGH_PREC 
 DeeP_DIR = ${deepmd_root}
 #DeeP_DIR = /home/mohan/Liuyu/DeePMD/deepmd_gnu_root
 DeeP_INCLUDE_DIR = ${DeeP_DIR}/include
@@ -69,7 +70,7 @@ VPATH=../module_base\
 # Define HONG
 #==========================
 #HONG= ${HONG_FFTW} -D__MPI -DMETIS -DMKL_ILP64 -D__NORMAL -D__CMD -D__CELL
-HONG= ${HONG_FFTW} -D__MPI -DMETIS -DMKL_ILP64 -D__NORMAL -D__CMD -D__CELL -D__DPMD -DHIGH_PREC 
+HONG= ${HONG_FFTW} -D__MPI -DMETIS -DMKL_ILP64 -D__NORMAL -D__CMD -D__CELL ${HONG_DPMD}
 
 FP_OBJS_0=main.o\
 $(OBJS_MAIN)\
