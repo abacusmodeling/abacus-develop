@@ -20,22 +20,16 @@
 Under the ABACUS directory, there are the following subdirectories:
 
 - cmake/
-
   which contains relevant files for compiling the code with cmake
 - documents/
-
   which contains a copy of the manual in pdf format
 - examples/
-
   which contains some examples
 - source/
-
   which contains the source code and makefiles
 - tests/
-
   which contains test examples
 - tools/
-
   which currently contains the script for generating the numerical atomic orbitals
 
 [back to top](#download-and-install)
@@ -78,7 +72,7 @@ FFTW3;
 - The [ELPA library](https://elpa.mpcdf.mpg.de/);
 - The [CEREAL library](https://uscilab.github.io/cereal/);
 
-Alternatively, you can choose [Intel® oneAPI toolkit](https://software.intel.com/content/www/us/en/develop/tools/oneapi/commercial-base-hpc.html) (former Parallel Studio) as toolchain. The [Intel® oneAPI Base Toolkit](https://software.intel.com/content/www/us/en/develop/tools/oneapi/all-toolkits.html#base-kit) contains Intel® oneAPI Math Kernel Library (aka `MKL`), replacing `FFTW3, LAPACK,` and `ScaLAPACK`. The [Intel® oneAPI HPC Toolkit](https://software.intel.com/content/www/us/en/develop/tools/oneapi/all-toolkits.html#hpc-kit) contains Intel® MPI Library, and C++ compiler(including MPI compiler).
+Alternatively, you can choose [Intel® oneAPI toolkit](https://software.intel.com/content/www/us/en/develop/tools/oneapi/commercial-base-hpc.html) (former Parallel Studio) as toolchain. The [Intel® oneAPI Base Toolkit](https://software.intel.com/content/www/us/en/develop/tools/oneapi/all-toolkits.html#base-kit) contains Intel® oneAPI Math Kernel Library (aka `MKL`), replacing `FFTW3, LAPACK,` and `ScaLAPACK`. The [Intel® oneAPI HPC Toolkit](https://software.intel.com/content/www/us/en/develop/tools/oneapi/all-toolkits.html#hpc-kit) contains Intel® MPI Library, and C++ compiler(including MPI compiler). Please noted that building `elpa` with a different MPI library may cause conflict between MPI libraries.
 
 If you use Intel toolchain, don't forget to [set environment variables](https://software.intel.com/content/www/us/en/develop/documentation/get-started-with-intel-oneapi-render-linux/top/configure-your-system.html) before you start! `cmake` will use Intel MKL if the environment variable `MKLROOT` is set.
 
