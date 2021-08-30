@@ -8,7 +8,11 @@
 #endif
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
+#ifdef __LCAO
+void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_running, LCAO_Orbitals &orb )
+#else
 void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_running)
+#endif
 {
 	ModuleBase::TITLE("UnitCell_pseudo","read_atom_species");
 
@@ -53,7 +57,7 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 	{
 		if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "NUMERICAL_ORBITAL") )
 		{
-			GlobalC::ORB.read_in_flag = true;
+			orb.read_in_flag = true;
 			for(int i=0; i<ntype; i++)
 			{
 				std::string ofile;
@@ -73,13 +77,13 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 				//-----------------------------------
 				//ModuleBase::GlobalFunc::READ_VALUE(ifa, nfile);
 				
-				GlobalC::ORB.orbital_file.push_back(ofile);
+				orb.orbital_file.push_back(ofile);
 
 				//-----------------------------------
 				// Turn off the read in NONLOCAL file
 				// function since 2013-08-02 by mohan
 				//-----------------------------------
-				//GlobalC::ORB.nonlocal_file.push_back(nfile);
+				//orb.nonlocal_file.push_back(nfile);
 
 //				GlobalV::ofs_running << " For atom type " << i + 1 << std::endl;
 //			    GlobalV::ofs_running << " Read in numerical orbitals from file " << ofile << std::endl;
@@ -89,11 +93,12 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 		}	
 		// caoyu add 2021-03-16
 		if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "NUMERICAL_DESCRIPTOR")) {
-			ifa >> GlobalC::ORB.descriptor_file;
+			ifa >> orb.descriptor_file;
 		}
 	}
 
 	// Peize Lin add 2016-09-23
+#ifndef __CELL
 	if( Exx_Global::Hybrid_Type::HF   == GlobalC::exx_lcao.info.hybrid_type || 
 	    Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type || 
 		Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type )
@@ -108,6 +113,7 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 			}
 		}
 	}
+#endif
 #endif
 	//==========================
 	// read in lattice constant
@@ -338,7 +344,11 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 // Read atomic positions
 // return 1: no problem.
 // return 0: some problems.
+#ifdef __LCAO
+bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &ofs_running, std::ofstream &ofs_warning, LCAO_Orbitals &orb)
+#else
 bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &ofs_running, std::ofstream &ofs_warning)
+#endif
 {
 	ModuleBase::TITLE("UnitCell_pseudo","read_atom_positions");
 
@@ -452,13 +462,13 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 #ifdef __LCAO
 			if (GlobalV::BASIS_TYPE == "lcao" || GlobalV::BASIS_TYPE == "lcao_in_pw")
 			{    
-				std::ifstream ifs(GlobalC::ORB.orbital_file[it].c_str(), ios::in);  // pengfei 2014-10-13
+				std::ifstream ifs(orb.orbital_file[it].c_str(), ios::in);  // pengfei 2014-10-13
 
 				// mohan add return 2021-04-26
 				if (!ifs)
 				{
 					std::cout << " Element index " << it+1 << std::endl;
-					std::cout << " orbital file: " << GlobalC::ORB.orbital_file[it] << std::endl;
+					std::cout << " orbital file: " << orb.orbital_file[it] << std::endl;
 					ModuleBase::WARNING("read_atom_positions","ABACUS Cannot find the ORBITAL file (basis sets)");
 					return 0; // means something wrong
 				}
@@ -820,7 +830,11 @@ bool UnitCell_pseudo::check_tau(void)const
 	return 1;
 }
 
+#ifdef __LCAO
+void UnitCell_pseudo::print_stru_file(const std::string &fn, const LCAO_Orbitals &orb, const int &type)const
+#else
 void UnitCell_pseudo::print_stru_file(const std::string &fn, const int &type)const
+#endif
 {
 	ModuleBase::TITLE("UnitCell_pseudo","print_stru_file");
 	
@@ -847,9 +861,9 @@ void UnitCell_pseudo::print_stru_file(const std::string &fn, const int &type)con
 			// Turn off the read in NONLOCAL file
 			// function since 2013-08-02 by mohan
 			//-----------------------------------
-//			ofs << GlobalC::ORB.orbital_file[it] << " " << GlobalC::ORB.nonlocal_file[it] << " #local_orbital; non-local projector" << std::endl;
+//			ofs << orb.orbital_file[it] << " " << orb.nonlocal_file[it] << " #local_orbital; non-local projector" << std::endl;
 			//modified by zhengdy 2015-07-24
-                        ofs << GlobalC::ORB.orbital_file[it] << std::endl;
+                        ofs << orb.orbital_file[it] << std::endl;
 		}
 	}
 #endif
