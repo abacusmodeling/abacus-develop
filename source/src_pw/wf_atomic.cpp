@@ -403,8 +403,10 @@ void WF_atomic::atomic_wfc
                         {//atomic_wfc_nc
                             double alpha, gamman;
                             std::complex<double> fup, fdown;
-                            alpha = GlobalC::ucell.magnet.angle1_[it];
-                            gamman = -GlobalC::ucell.magnet.angle2_[it] + 0.5*ModuleBase::PI;
+                            //alpha = GlobalC::ucell.magnet.angle1_[it];
+                            //gamman = -GlobalC::ucell.magnet.angle2_[it] + 0.5*ModuleBase::PI;
+                            alpha = GlobalC::ucell.atoms[it].angle1[ia];
+                            gamman = -1 * GlobalC::ucell.atoms[it].angle2[ia] + 0.5 * ModuleBase::PI;
                             for(int m = 0;m<2*l+1;m++)
                             {
                                 const int lm = l*l +m;

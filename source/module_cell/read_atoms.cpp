@@ -653,7 +653,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
                                                 tmpid = ifpos.get();
                                         }
 					string mags;
-					cout<<"mag"<<atoms[it].mag[ia]<<"angle1"<<atoms[it].angle1[ia]<<"angle2"<<atoms[it].angle2[ia]<<'\n';
+					//cout<<"mag"<<atoms[it].mag[ia]<<"angle1"<<atoms[it].angle1[ia]<<"angle2"<<atoms[it].angle2[ia]<<'\n';
 
 					if(GlobalV::NSPIN==4)
 					{
@@ -916,11 +916,13 @@ void UnitCell_pseudo::print_stru_file(const std::string &fn, const int &type)con
 		{
 			ofs << std::endl;
 			ofs << atoms[it].label << " #label" << std::endl;
+/*
 #ifndef __CMD
 			ofs << magnet.start_magnetization[it] << " #magnetism" << std::endl;
 #else
 			ofs << "0" << " #magnetism" << std::endl;
 #endif
+*/
 			//2015-05-07, modify
 			//ofs << atoms[it].nwl << " #max angular momentum" << std::endl;
 			//xiaohui modify 2015-03-15
@@ -1009,7 +1011,7 @@ void UnitCell_pseudo::print_tau(void)const
                 << std::setw(20) << atoms[it].tau[ia].y
                 << std::setw(20) << atoms[it].tau[ia].z
 #ifndef __CMD
-				<< std::setw(20) << magnet.start_magnetization[it]
+				<< std::setw(20) << atoms[it].mag[ia]
 #else
 				<< std::setw(20) << 0
 #endif
@@ -1057,7 +1059,7 @@ void UnitCell_pseudo::print_tau(void)const
                 << std::setw(20) << atoms[it].taud[ia].y
                 << std::setw(20) << atoms[it].taud[ia].z
 #ifndef __CMD
-				<< std::setw(20) << magnet.start_magnetization[it]
+				<< std::setw(20) << atoms[it].mag[ia]
 #else
 				<< std::setw(20) << 0
 #endif
