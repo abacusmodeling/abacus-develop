@@ -545,32 +545,26 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 	{
 		r_tmp[ir] *= (ir&1) ? four_three : two_three;
 	}
-
-#ifdef __NORMAL
-	// need to be checked (avoid using Lapack)
-	for(int ik=0; ik<nk; ++ik)
+#ifdef __OPENMP
+	#pragma omp parallel for schedule(static)
+#endif
+	for (int ik = 0; ik < nk; ik++)
 	{
+#ifdef __NORMAL
 		double psi_f_tmp = 0.0; 
 		for(int ir=0; ir<nr; ++ir)
 		{
 			psi_f_tmp += r_tmp[ir]*jl[ik][ir];
 		}
 		psi_f_tmp *= pref;
-	}
 #else
-
-#ifdef __OPENMP
-	#pragma omp parallel for schedule(static)
-#endif
-	for (int ik = 0; ik < nk; ik++)
-	{
 		const double psi_f_tmp = 
 		pref * LapackConnector::dot( this->nr, ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_tmp), 1, ModuleBase::GlobalFunc::VECTOR_TO_PTR(jl[ik]), 1 ) ;
+#endif
 		this->psif[ik] = psi_f_tmp;
 		this->psik[ik] = psi_f_tmp * k_radial[ik];
 		this->psik2[ik] = this->psik[ik] * k_radial[ik];
 	}
-#endif
 	return;
 }
 
@@ -711,10 +705,6 @@ void Numerical_Orbital_Lm::plot(void)const
 		orbital_type = "L" + ModuleBase::GlobalFunc::TO_STRING(this->angular_momentum_l);	
 	}
 
-
-#ifdef __NORMAL
-
-#else
 	if(GlobalV::MY_RANK==0)
 	{
 		std::stringstream ssr, ssk, ssru ,ssdru; // 2013-08-10 pengfei
@@ -765,6 +755,5 @@ void Numerical_Orbital_Lm::plot(void)const
 		ofsdru.close(); // 13-08-10 pengfei
 	}
 
-#endif
 	return;
 }
