@@ -1,15 +1,15 @@
 FROM debian:bullseye-slim
 
-RUN apt-get update && apt-get install -y --no-install-recommends git gfortran libboost-dev libssl-dev make cmake ssh vim wget bc \
+RUN apt-get update && apt-get install -y --no-install-recommends git gfortran libssl-dev make cmake vim wget bc \
     && apt-get install -y --no-install-recommends mpich libmpich-dev
 
 ENV GIT_SSL_NO_VERIFY 1
 
-RUN cd /tmp \
-    && wget https://cmake.org/files/v3.20/cmake-3.20.5.tar.gz --no-check-certificate \
-    && tar xf cmake-3.20.5.tar.gz cmake-3.20.5/ && cd cmake-3.20.5 \
-    && ./configure && make -j8 && make install \
-    && cd /tmp && rm -rf cmake-3.20.5
+RUN export cmake_url="https://github.com/Kitware/CMake/releases/download/v3.20.0/cmake-3.20.0-linux-x86_64.sh" \
+    && wget --no-check-certificate --quiet $cmake_url \
+    && export file=$(basename "$cmake_url") \
+    && bash $file --prefix=/usr --skip-license \
+    && rm $file
 
 RUN cd /tmp \
     && git clone https://github.com/USCiLab/cereal.git \
@@ -48,7 +48,7 @@ ENV LD_LIBRARY_PATH /usr/local/lib
 RUN apt-get install -y unzip
 
 RUN cd /tmp \
-    && wget https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-1.9.0%2Bcpu.zip --no-check-certificate \
+    && wget https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-1.9.0%2Bcpu.zip --no-check-certificate --quiet \
     && unzip libtorch-shared-with-deps-1.9.0+cpu.zip \
     && cp -r libtorch/include /usr/local \
     && cp -r libtorch/lib /usr/local \
@@ -56,8 +56,8 @@ RUN cd /tmp \
     && rm -rf libtorch
 
 RUN cd /tmp \
-    && wget https://gitlab.com/libxc/libxc/-/archive/5.1.5/libxc-5.1.5.tar.gz --no-check-certificate \
-    && tar xvzf libxc-5.1.5.tar.gz \
+    && wget https://gitlab.com/libxc/libxc/-/archive/5.1.5/libxc-5.1.5.tar.gz --no-check-certificate --quiet \
+    && tar xzf libxc-5.1.5.tar.gz \
     && cd libxc-5.1.5 \
     && mkdir build \
     && cmake -B build -DBUILD_TESTING=OFF \
