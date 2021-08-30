@@ -29,20 +29,20 @@ void Run_lcao::lcao_line(void)
 		GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
 			GlobalV::ofs_running,
 			GlobalV::OUT_LEVEL,
-			GlobalC::ORB.get_rcutmax_Phi(), 
-			GlobalC::ORB.get_rcutmax_Beta(), 
+			GlobalC::ORB.get_rcutmax_Phi(),
+			GlobalC::ORB.get_rcutmax_Beta(),
 			GlobalV::GAMMA_ONLY_LOCAL);
 
 		atom_arrange::search(
 			GlobalV::SEARCH_PBC,
 			GlobalV::ofs_running,
-			GlobalC::GridD, 
-			GlobalC::ucell, 
-			GlobalV::SEARCH_RADIUS, 
+			GlobalC::GridD,
+			GlobalC::ucell,
+			GlobalV::SEARCH_RADIUS,
 			GlobalV::test_atom_input,
 			INPUT.test_just_neighbor);
 	}
-	// setup GlobalV::NBANDS 
+	// setup GlobalV::NBANDS
 	// Yu Liu add 2021-07-03
 	GlobalC::CHR.cal_nelec();
 
@@ -74,20 +74,20 @@ void Run_lcao::lcao_line(void)
     // mohan add 2021-01-30
     Print_Info::setup_parameters(GlobalC::ucell, GlobalC::kv, GlobalC::xcf);
 
-    // * reading the localized orbitals/projectors 
+    // * reading the localized orbitals/projectors
 	// * construct the interpolation tables.
 
 	GlobalC::LOWF.orb_con.set_orb_tables(
 		GlobalV::ofs_running,
-		GlobalC::UOT, 
+		GlobalC::UOT,
 		GlobalC::ORB,
 		GlobalC::ucell.ntype,
 		GlobalC::ucell.lmax,
 		INPUT.lcao_ecut,
 		INPUT.lcao_dk,
 		INPUT.lcao_dr,
-		INPUT.lcao_rmax, 
-		GlobalC::ucell.lat0, 
+		INPUT.lcao_rmax,
+		GlobalC::ucell.lat0,
 		INPUT.out_descriptor,
 		INPUT.out_r_matrix,
 		Exx_Abfs::Lmax,

@@ -725,5 +725,9 @@ bool UnitCell_pseudo::if_atoms_can_move()const
 bool UnitCell_pseudo::if_cell_can_change()const
 {
 	//need to be fixed next
-	return 1;
+	if(this->lc[0]||this->lc[1]||this->lc[2])
+	{
+		return 1;
+	}
+	return 0;
 }

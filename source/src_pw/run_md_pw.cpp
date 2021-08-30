@@ -64,11 +64,20 @@ void Run_MD_PW::md_ions_pw(void)
     {
         time_t estart = time(NULL);
 
-        Print_Info::print_screen(0, 0, istep);
+        if (GlobalV::OUT_LEVEL == "ie")
+        {
+            std::cout << " -------------------------------------------" << std::endl;
+            std::cout << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
+            std::cout << " -------------------------------------------" << std::endl;
+            GlobalV::ofs_running << " -------------------------------------------" << std::endl;
+            GlobalV::ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
+            GlobalV::ofs_running << " -------------------------------------------" << std::endl;
+        }
+
 
     //----------------------------------------------------------
     // about vdw, jiyy add vdwd3 and linpz add vdwd2
-    //----------------------------------------------------------	
+    //----------------------------------------------------------
         if(INPUT.vdw_method=="d2")
         {
             // setup vdwd2 parameters

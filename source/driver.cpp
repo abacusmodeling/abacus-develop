@@ -31,11 +31,13 @@ void Driver::init()
 	// (2) welcome to the atomic world!
 	this->atomic_world();
 
+
 	// (3) output information
 	time_t	time_finish= std::time(NULL);
 	Print_Info::print_time(time_start, time_finish);
 
 	// (4) close all of the running logs 
+
 	INPUT.close_log();
 
 	return;

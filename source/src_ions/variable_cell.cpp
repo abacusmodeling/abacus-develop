@@ -49,7 +49,7 @@ void Variable_Cell::init_after_vc(void)
 
     return;
 }
-    
+
 
 void Variable_Cell::final_calculation_after_vc(void)
 {
@@ -95,7 +95,7 @@ void Variable_Cell::final_calculation_after_vc(void)
 
     // init the grid, then the charge
     // on grid can be distributed.
-    GlobalC::Pgrid.init_final_scf(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, 
+    GlobalC::Pgrid.init_final_scf(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz,
 		GlobalC::pw.nczp, GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
 
     //=====================

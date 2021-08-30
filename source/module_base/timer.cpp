@@ -4,7 +4,8 @@
 // UPDATE : Peize Lin at 2019-11-21
 //==========================================================
 #include "timer.h"
-#include <vector>
+#include "chrono"
+#include<vector>
 
 #ifdef __MPI
 #include "mpi.h"
@@ -14,7 +15,7 @@ namespace ModuleBase
 {
 
 //----------------------------------------------------------
-// EXPLAIN :   
+// EXPLAIN :
 //----------------------------------------------------------
 bool timer::disabled = false;
 size_t timer::n_now = 0;
@@ -43,9 +44,18 @@ double timer::cpu_time(void)
 // only first call can let t0 = 0,clock begin
 // when enter this function second time , t0 > 0
 //----------------------------------------------------------
-	static clock_t t0 = clock();
-	const clock_t t1 = clock() - t0;
-	return (t1<0) ? 0 : (double)t1/CLOCKS_PER_SEC;
+	// static clock_t t0 = clock();
+	// const clock_t t1 = clock() - t0;
+	// return (t1<0) ? 0 : (double)t1/CLOCKS_PER_SEC;
+
+	// static time_t t0 = time(NULL);
+	// const time_t t1 = time(NULL);
+	// double res = difftime(t1, t0);
+	// return (res<0) ? 0 : res;
+	static auto t1 = std::chrono::system_clock::now();
+	const auto t2 = std::chrono::system_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1);
+	return double(duration.count()) * std::chrono::microseconds::period::num / std::chrono::microseconds::period::den;
 		// mohan add, abandon the cross point time 2^32 ~ -2^32 .
 }
 
@@ -56,7 +66,7 @@ void timer::tick(const std::string &class_name,const std::string &name)
 //----------------------------------------------------------
 	if (disabled)
 		return;
-	
+
 	Timer_One &timer_one = timer_pool[class_name][name];
 
 //----------------------------------------------------------
@@ -84,7 +94,14 @@ void timer::tick(const std::string &class_name,const std::string &name)
 #ifdef __MPI
 		timer_one.cpu_second += MPI_Wtime() - timer_one.cpu_start;
 #else
-		timer_one.cpu_second += cpu_time() - timer_one.cpu_start;
+		// if(class_name=="electrons"&&name=="c_bands")
+		// {
+		// 	cout<<"call times"<<timer_one.calls<<endl;
+		// 	cout<<"electrons c_bands cost time:"<<endl;
+		// 	cout<<cpu_time()<<"-"<<timer_one.cpu_start<<endl;
+		// }
+
+		timer_one.cpu_second += (cpu_time() - timer_one.cpu_start);
 #endif
 		timer_one.start_flag = true;
 	}
@@ -103,7 +120,7 @@ void timer::print_all(std::ofstream &ofs)
 {
 	constexpr double small = 0.1; // cpu = 10^6
 	// if want to print > 1s , set small = 10^6
-	
+
 	std::vector<std::pair<std::pair<std::string,std::string>,Timer_One>> timer_pool_order;
 	for(auto &timer_pool_A : timer_pool)
 	{
@@ -118,7 +135,7 @@ void timer::print_all(std::ofstream &ofs)
 			timer_pool_order[timer_one.order] = std::pair<std::pair<std::string,std::string>, Timer_One> {std::pair<std::string,std::string >{class_name,name}, timer_one};
 		}
 	}
-	
+
 	std::cout << std::setprecision(2);
 	ofs << std::setprecision(3);
 	std::cout<<"\n  |CLASS_NAME---------|NAME---------------|TIME(Sec)-----|CALLS----|AVG------|PER%-------" << std::endl;
@@ -128,11 +145,11 @@ void timer::print_all(std::ofstream &ofs)
 		const std::string &class_name = timer_pool_order_A.first.first;
 		const std::string &name = timer_pool_order_A.first.second;
 		const Timer_One &timer_one = timer_pool_order_A.second;
-		
+
 		if(timer_one.cpu_second < small)
 			continue;
-		
-		ofs  << " " 
+
+		ofs  << " "
 			// << std::setw(2)  << timer_one.level
 			 << std::setw(2)  << " "
 			 << std::setw(20) << class_name
@@ -152,7 +169,7 @@ void timer::print_all(std::ofstream &ofs)
 			 << std::setw(15) << std::setprecision(5) << timer_one.cpu_second
 			 << std::setw(10) << timer_one.calls
 			 << std::setw(10) << std::setprecision(2) << timer_one.cpu_second/timer_one.calls
-			 << std::setw(10) << timer_one.cpu_second / timer_pool_order[0].second.cpu_second * 100 << "%" << std::endl;		
+			 << std::setw(10) << timer_one.cpu_second / timer_pool_order[0].second.cpu_second * 100 << "%" << std::endl;
 	}
 	std::cout<<" ----------------------------------------------------------------------------------------"<<std::endl;
 	ofs <<" ----------------------------------------------------------------------------------------"<<std::endl;
@@ -170,14 +187,14 @@ void timer::print_all(std::ofstream &ofs)
 
 	// prepare
 	bool *print_flag = new bool[n_clock];
-	for(int i=0; i<n_clock; i++) 
+	for(int i=0; i<n_clock; i++)
 	{
 		print_flag[i] = false;
 	}
 
 	int type = 1; // 2:calls 1:total_time
 	bool non_reorder = 1;
-	
+
 	std::cout<<"\n  |CLASS_NAME---------|NAME---------------|TIME(Sec)-----|CALLS----|AVG------|PER%-------" << std::endl;
 	ofs <<"\n\n\n\n  |CLASS_NAME---------|NAME---------------|TIME(Sec)-----|CALLS----|AVG------|PER%-------" << std::endl;
 	ofs << std::setprecision(3);
@@ -195,7 +212,7 @@ void timer::print_all(std::ofstream &ofs)
 			// search in all clocks
 			for(int j=0; j<n_clock; j++)
 			{
-				if(print_flag[j]) 
+				if(print_flag[j])
 				{
 					continue;
 				}
@@ -218,7 +235,7 @@ void timer::print_all(std::ofstream &ofs)
 			}
 		}
 		print_flag[k]=true;
-	
+
 		if ((cpu_second[k] >= 0 && cpu_second[k] < small) ||
 		        (cpu_second[k] <= 0 && cpu_second[k] > -small))
 		{
@@ -232,7 +249,7 @@ void timer::print_all(std::ofstream &ofs)
 		const double average_spend_time = spend_time/calls[k];
 
 
-		ofs  << " " 
+		ofs  << " "
 			 << std::setw(2) << level[k]
 			 << std::setw(20) << class_name[k]
 			 << std::setw(20) << name[k]
@@ -244,7 +261,7 @@ void timer::print_all(std::ofstream &ofs)
 
 		std::cout << std::resetiosflags(ios::scientific);
 
-		std::cout  << " " 
+		std::cout  << " "
 		     << std::setw(2) << level[k]
 			 << std::setw(20) << class_name[k]
 			 << std::setw(20) << name[k]
@@ -252,7 +269,7 @@ void timer::print_all(std::ofstream &ofs)
 			 << std::setw(10) << calls[k]
 			 << std::setw(10) << std::setprecision(2) << average_spend_time
 			 << std::setw(10) << spend_time / cpu_second[0] * 100 << "%" << std::endl;
-			
+
 	}
 	std::cout<<" ----------------------------------------------------------------------------------------"<<std::endl;
 	ofs <<" ----------------------------------------------------------------------------------------"<<std::endl;

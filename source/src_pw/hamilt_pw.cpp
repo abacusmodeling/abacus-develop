@@ -778,7 +778,7 @@ void Hamilt_PW::diag_zheev(const int &npw_in, ModuleBase::ComplexMatrix &psi, co
             tmp1 += conj(eta[ig]) * eta[ig] ;
         }
 
-        tmp /= tmp1 ;
+		tmp = tmp * conj(tmp1) / (norm(tmp1));
 
 		tmpen[i] = tmp.real() ;
 

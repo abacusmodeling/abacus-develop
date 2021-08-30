@@ -5,8 +5,8 @@
 #==========================
 CPLUSPLUS     = icpc
 CPLUSPLUS_MPI = icpc 
-FFTW_DIR = /home/mohan/1_Software/impi_fftw-3.3.8
-OBJ_DIR = obj
+FFTW_DIR = /home/liwenfei/codes/FFTW3
+OBJ_DIR = orb_obj
 NP      = 1
 
 #==========================
@@ -33,13 +33,14 @@ OPTS = ${INCLUDES} -Ofast -std=c++11 -simd -march=native -xHost -m64 -qopenmp -W
 
 include Makefile.Objects
 
-VPATH=../src_global\
+VPATH=../module_base\
+:../src_global\
 :./\
 
 #==========================
 # Define HONG
 #==========================
-HONG= -DMETIS -DMKL_ILP64 -D__NORMAL ${HONG_FFTW} 
+HONG= -DMETIS -DMKL_ILP64 -D__NORMAL -D__ORBITAL ${HONG_FFTW} 
 
 FP_OBJS_0=main.o\
 $(OBJS_BASE)\
