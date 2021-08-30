@@ -641,10 +641,12 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 												else if ( tmpid == "angle1")
 												{
 													 ifpos >> atoms[it].angle1[ia];
+													 atoms[it].angle1[ia]=atoms[it].angle1[ia]/180 *ModuleBase::PI;
 												}
 												else if ( tmpid == "angle2")
 												{
 													 ifpos >> atoms[it].angle2[ia];
+													 atoms[it].angle2[ia]=atoms[it].angle2[ia]/180 *ModuleBase::PI;
 												}
 												
                                         }
@@ -665,6 +667,8 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 									sin(atoms[it].angle1[ia]) * sin(atoms[it].angle2[ia]);
 							atoms[it].m_loc_[ia].z = atoms[it].mag[ia] *
 									cos(atoms[it].angle1[ia]);
+							cout<<"it"<<it<<"ia"<<ia<<"x"<<atoms[it].m_loc_[ia].x<<"y"
+							<<atoms[it].m_loc_[ia].y<<"z"<<atoms[it].m_loc_[ia].z<<'\n';
 						}
 						else
 						{
