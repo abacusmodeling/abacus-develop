@@ -53,7 +53,7 @@ void Reorder_psi_plus(CUFFT_COMPLEX *dst, CUFFT_COMPLEX *src)
     {
         int ir = GlobalC::pw.FFT_wfc.ismap[is];
         kernel_reorder<<<block, thread>>>(&dst[ir*size_z], &src[ii*size_z], size_z);
-        // cudaMemcpy(&dst[ir*size_z], &src[ii*size_z], size_z*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice);
+        // CHECK_CUDA(cudaMemcpy(&dst[ir*size_z], &src[ii*size_z], size_z*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice));
         ii++;
     }
 }
@@ -68,7 +68,7 @@ void Reorder_psi_minus(CUFFT_COMPLEX *dst, CUFFT_COMPLEX *src)
     {
         int ir = GlobalC::pw.FFT_wfc.ismap[j];
         kernel_reorder<<<block, thread>>>(&dst[ii*size_z], &src[ir*size_z], size_z);
-        // cudaMemcpy(&dst[ii*size_z], &src[ir*size_z], size_z*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice);
+        // CHECK_CUDA(cudaMemcpy(&dst[ii*size_z], &src[ir*size_z], size_z*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice));
         ii++;
     }
 }
@@ -85,13 +85,13 @@ void RoundTrip_kernel(const CUFFT_COMPLEX *psi, const double *vr, const int *fft
 
     // todo : reorder psi
     // int *d_ismap;
-    // cudaMalloc((void**)&d_ismap, GlobalC::pw.FFT_wfc.nst*sizeof(int));
-    // cudaMemcpy(d_ismap, GlobalC::pw.FFT_wfc.ismap, GlobalC::pw.FFT_wfc.nst*sizeof(int), cudaMemcpyHostToDevice);
+    // CHECK_CUDA(cudaMalloc((void**)&d_ismap, GlobalC::pw.FFT_wfc.nst*sizeof(int)));
+    // CHECK_CUDA(cudaMemcpy(d_ismap, GlobalC::pw.FFT_wfc.ismap, GlobalC::pw.FFT_wfc.nst*sizeof(int), cudaMemcpyHostToDevice));
 
 
     CUFFT_COMPLEX *ordered_psi;
-    cudaMalloc((void**)&ordered_psi, GlobalC::pw.nrxx*sizeof(CUFFT_COMPLEX));
-    cudaMemset(ordered_psi, 0, GlobalC::pw.nrxx*sizeof(CUFFT_COMPLEX));
+    CHECK_CUDA(cudaMalloc((void**)&ordered_psi, GlobalC::pw.nrxx*sizeof(CUFFT_COMPLEX)));
+    CHECK_CUDA(cudaMemset(ordered_psi, 0, GlobalC::pw.nrxx*sizeof(CUFFT_COMPLEX)));
 
     Reorder_psi_plus(ordered_psi, psic);
 
@@ -115,7 +115,7 @@ void RoundTrip_kernel(const CUFFT_COMPLEX *psi, const double *vr, const int *fft
     int block3 = GlobalC::pw.nrxx / thread + 1;
     kernel_normalization<<<block3, thread>>>(GlobalC::pw.nrxx, psic, (double)(GlobalC::pw.nrxx));
 
-    cudaFree(ordered_psi);
+    CHECK_CUDA(cudaFree(ordered_psi));
 
 /*
     // todo: delete!

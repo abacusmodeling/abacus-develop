@@ -71,7 +71,8 @@ Hamilt_PW::~Hamilt_PW()
     delete[] GR_index;
     // delete[] Bec;
 #ifdef __CUDA
-    cudaFree(GR_index_d);
+	cudaFree(GR_index_d);
+    // CHECK_CUDA(cudaFree(GR_index_d));
 #endif
 }
 
@@ -98,8 +99,8 @@ void Hamilt_PW::allocate(
 	GR_index = new int[nrxx];
 
 #ifdef __CUDA
-    cudaFree(GR_index_d);
-    cudaMalloc((void**)&GR_index_d, nrxx*sizeof(int));
+    CHECK_CUDA(cudaFree(GR_index_d));
+    CHECK_CUDA(cudaMalloc((void**)&GR_index_d, nrxx*sizeof(int)));
 #endif
     // ZEROS(this->hpsi, npwx * npol);
     // ZEROS(this->spsi, npwx * npol);
@@ -148,7 +149,7 @@ void Hamilt_PW::init_k(const int ik)
     }
     // cout<<"init_K"<<endl;
 #ifdef __CUDA
-    cudaMemcpy(this->GR_index_d, GR_index, GlobalC::pw.nrxx*sizeof(int), cudaMemcpyHostToDevice);
+    CHECK_CUDA(cudaMemcpy(this->GR_index_d, GR_index, GlobalC::pw.nrxx*sizeof(int), cudaMemcpyHostToDevice));
     // delete [] GR_index_tmp;
 #endif
 
@@ -394,7 +395,7 @@ void Hamilt_PW::h_1psi_gpu( const int npw_in, const CUFFT_COMPLEX *psi,
 
 void Hamilt_PW::s_1psi_gpu(const int dim, const CUFFT_COMPLEX *psi, CUFFT_COMPLEX *spsi)
 {
-    cudaMemcpy(spsi, psi, dim*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice);
+    CHECK_CUDA(cudaMemcpy(spsi, psi, dim*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice));
     return;
 }
 
@@ -450,8 +451,8 @@ void Hamilt_PW::h_psi_gpu(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, cons
         tmpsi_in = psi_in;
 
         double* d_g2kin;
-        cudaMalloc((void**)&d_g2kin, GlobalC::wf.npwx*sizeof(double));
-        cudaMemcpy(d_g2kin, GlobalC::wf.g2kin, GlobalC::wf.npw*sizeof(double), cudaMemcpyHostToDevice);
+        CHECK_CUDA(cudaMalloc((void**)&d_g2kin, GlobalC::wf.npwx*sizeof(double)));
+        CHECK_CUDA(cudaMemcpy(d_g2kin, GlobalC::wf.g2kin, GlobalC::wf.npw*sizeof(double), cudaMemcpyHostToDevice));
         for(int ib = 0 ; ib < m; ++ib)
         {
             // cout<<"in hpsi-Kinetic, iband = "<<ib<<endl;
@@ -481,13 +482,9 @@ void Hamilt_PW::h_psi_gpu(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, cons
             tmhpsi += GlobalC::wf.npwx;
             tmpsi_in += GlobalC::wf.npwx;
         }
-        cudaFree(d_g2kin);
+        CHECK_CUDA(cudaFree(d_g2kin));
 	}
-    cudaError_t err = cudaGetLastError();
-    if (err != cudaSuccess)
-    {
-        cout << "Cuda error: "<< cudaGetErrorString(err) <<" in "<< __LINE__ << endl;
-    }
+
     ModuleBase::timer::tick("Hamilt_PW_GPU","kinetic");
 
 	//------------------------------------
@@ -503,18 +500,18 @@ void Hamilt_PW::h_psi_gpu(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, cons
         double *d_vr_eff1;
         CUFFT_COMPLEX *d_porter;
 
-        // cudaMalloc((void**)&d_GR_index, GlobalC::wf.npwx * sizeof(int));
-        cudaMalloc((void**)&d_vr_eff1, GlobalC::pw.nrxx * sizeof(double));
-        cudaMalloc((void**)&d_porter, GlobalC::pw.nrxx * sizeof(CUFFT_COMPLEX));
+        // CHECK_CUDA(cudaMalloc((void**)&d_GR_index, GlobalC::wf.npwx * sizeof(int)));
+        CHECK_CUDA(cudaMalloc((void**)&d_vr_eff1, GlobalC::pw.nrxx * sizeof(double)));
+        CHECK_CUDA(cudaMalloc((void**)&d_porter, GlobalC::pw.nrxx * sizeof(CUFFT_COMPLEX)));
 
-        cudaMemcpy(d_vr_eff1, GlobalC::pot.vr_eff1, GlobalC::pw.nrxx*sizeof(double), cudaMemcpyHostToDevice);
+        CHECK_CUDA(cudaMemcpy(d_vr_eff1, GlobalC::pot.vr_eff1, GlobalC::pw.nrxx*sizeof(double), cudaMemcpyHostToDevice));
         // cout<<"NSPIN = "<<GlobalV::NSPIN<<endl;
         for(int ib = 0 ; ib < m; ++ib)
         {
             // cout<<"in hpsi:loacl_pot, iband = "<<ib<<endl;
             // if(NSPIN!=4){
             // ZEROS( UFFT.porter, pw.nrxx);
-            cudaMemset(d_porter, 0, GlobalC::pw.nrxx * sizeof(CUFFT_COMPLEX));
+            CHECK_CUDA(cudaMemset(d_porter, 0, GlobalC::pw.nrxx * sizeof(CUFFT_COMPLEX)));
 
             GlobalC::UFFT.RoundTrip( tmpsi_in, d_vr_eff1, GR_index_d, d_porter );
 
@@ -529,20 +526,15 @@ void Hamilt_PW::h_psi_gpu(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, cons
             tmhpsi += dmax;
             tmpsi_in += dmax;
         }
-        // cudaFree(d_GR_index);
-        cudaFree(d_vr_eff1);
-        cudaFree(d_porter);
+        // CHECK_CUDA(cudaFree(d_GR_index));
+        CHECK_CUDA(cudaFree(d_vr_eff1));
+        CHECK_CUDA(cudaFree(d_porter));
 	}
 	ModuleBase::timer::tick("Hamilt_PW_GPU","vloc");
 	//------------------------------------
 	// (3) the nonlocal pseudopotential.
 	//------------------------------------
 	ModuleBase::timer::tick("Hamilt_PW_GPU","vnl");
-    err = cudaGetLastError();
-    if (err != cudaSuccess)
-    {
-        cout << "Cuda error: "<< cudaGetErrorString(err) <<" in "<< __LINE__ << endl;
-    }
 
     if(GlobalV::VNL_IN_H)
 	{
@@ -551,10 +543,10 @@ void Hamilt_PW::h_psi_gpu(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, cons
             int nkb = GlobalC::ppcell.nkb;
             CUFFT_COMPLEX *becp;
             CUFFT_COMPLEX *d_vkb_c;
-            cudaMalloc((void**)&becp, GlobalV::NPOL*m*nkb*sizeof(CUFFT_COMPLEX));
-            cudaMalloc((void**)&d_vkb_c, GlobalC::wf.npwx*nkb*sizeof(CUFFT_COMPLEX));
+            CHECK_CUDA(cudaMalloc((void**)&becp, GlobalV::NPOL*m*nkb*sizeof(CUFFT_COMPLEX)));
+            CHECK_CUDA(cudaMalloc((void**)&d_vkb_c, GlobalC::wf.npwx*nkb*sizeof(CUFFT_COMPLEX)));
 
-            cudaMemcpy(d_vkb_c, GlobalC::ppcell.vkb.c, GlobalC::wf.npwx*nkb*sizeof(CUFFT_COMPLEX), cudaMemcpyHostToDevice);
+            CHECK_CUDA(cudaMemcpy(d_vkb_c, GlobalC::ppcell.vkb.c, GlobalC::wf.npwx*nkb*sizeof(CUFFT_COMPLEX), cudaMemcpyHostToDevice));
 
             cublasOperation_t transa = CUBLAS_OP_C;
             cublasOperation_t transb = CUBLAS_OP_N;
@@ -596,8 +588,8 @@ void Hamilt_PW::h_psi_gpu(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, cons
             this->add_nonlocal_pp_gpu(hpsi, becp, d_vkb_c, m);
 
             cublasDestroy(handle);
-            cudaFree(becp);
-            cudaFree(d_vkb_c);
+            CHECK_CUDA(cudaFree(becp));
+            CHECK_CUDA(cudaFree(d_vkb_c));
             // cout<<"nonlocal end"<<endl;
 
         }
@@ -846,8 +838,8 @@ void Hamilt_PW::add_nonlocal_pp_gpu(
 	// complex<double> *ps  = new complex<double> [nkb * GlobalV::NPOL * m];
     // ZEROS(ps, GlobalV::NPOL * m * nkb);
     CUFFT_COMPLEX *ps;
-    cudaMalloc((void**)&ps, nkb * GlobalV::NPOL * m * sizeof(CUFFT_COMPLEX));
-    cudaMemset(ps, 0, GlobalV::NPOL * m * sizeof(CUFFT_COMPLEX));
+    CHECK_CUDA(cudaMalloc((void**)&ps, nkb * GlobalV::NPOL * m * sizeof(CUFFT_COMPLEX)));
+    CHECK_CUDA(cudaMemset(ps, 0, GlobalV::NPOL * m * sizeof(CUFFT_COMPLEX)));
 
     int sum = 0;
     int iat = 0;
@@ -859,11 +851,11 @@ void Hamilt_PW::add_nonlocal_pp_gpu(
         const int nproj = GlobalC::ucell.atoms[it].nh;
         const int nprojx = GlobalC::ppcell.nhm;
         double *cur_deeq;
-        cudaMalloc((void**)&cur_deeq, nprojx*nprojx*sizeof(double));
+        CHECK_CUDA(cudaMalloc((void**)&cur_deeq, nprojx*nprojx*sizeof(double)));
         for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
         {
-            cudaMemcpy(cur_deeq, &(GlobalC::ppcell.deeq(GlobalV::CURRENT_SPIN, iat, 0, 0)),
-                nprojx*nprojx*sizeof(double), cudaMemcpyHostToDevice);
+            CHECK_CUDA(cudaMemcpy(cur_deeq, &(GlobalC::ppcell.deeq(GlobalV::CURRENT_SPIN, iat, 0, 0)),
+                nprojx*nprojx*sizeof(double), cudaMemcpyHostToDevice));
 
             int thread_x = 16;
             dim3 thread(thread_x, thread_x);
@@ -877,12 +869,6 @@ void Hamilt_PW::add_nonlocal_pp_gpu(
         } //end na
     } //end nt
 	// }
-
-    cudaError_t err = cudaGetLastError();
-    if (err != cudaSuccess)
-    {
-        cout << "Cuda error: "<< cudaGetErrorString(err) <<" in "<< __LINE__ << endl;
-    }
 
     cublasOperation_t transa = CUBLAS_OP_N;
     cublasOperation_t transb = CUBLAS_OP_T;
@@ -926,14 +912,8 @@ void Hamilt_PW::add_nonlocal_pp_gpu(
             GlobalC::wf.npwx);
 	}
 
-    err = cudaGetLastError();
-    if (err != cudaSuccess)
-    {
-        cout << "Cuda error: "<< cudaGetErrorString(err) <<" in "<< __LINE__ << endl;
-    }
-
 	// delete[] ps;
-    cudaFree(ps);
+    CHECK_CUDA(cudaFree(ps));
 	cublasDestroy(handle);
     ModuleBase::timer::tick("Hamilt_PW","add_nonlocal_pp_gpu");
     return;

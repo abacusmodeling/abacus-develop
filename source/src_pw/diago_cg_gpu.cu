@@ -127,29 +127,17 @@ void Diago_CG_GPU::diag
     // cout << "Hello, CG!" << endl;
     // cout << "CG Dim = " << dim << " & " << dmx << endl;
 
-    cudaError_t err = cudaGetLastError();
-    if (err != cudaSuccess)
-    {
-        cout << "Cuda error: "<< cudaGetErrorString(err) <<" in "<< __LINE__ << endl;
-    }
-
-    cudaMalloc((void**)&sphi, dim * sizeof(CUFFT_COMPLEX));
-    cudaMalloc((void**)&scg, dim * sizeof(CUFFT_COMPLEX));
-    cudaMalloc((void**)&hphi, dim * sizeof(CUFFT_COMPLEX));
-    cudaMalloc((void**)&g, dim * sizeof(CUFFT_COMPLEX));
-    cudaMalloc((void**)&cg, dim * sizeof(CUFFT_COMPLEX));
-    cudaMalloc((void**)&g0, dim * sizeof(CUFFT_COMPLEX));
-    cudaMalloc((void**)&pphi, dim * sizeof(CUFFT_COMPLEX));
-    cudaMalloc((void**)&lagrange, n_band * sizeof(CUFFT_COMPLEX));
-    cudaMalloc((void**)&phi_m, dim * sizeof(CUFFT_COMPLEX));
+    CHECK_CUDA(cudaMalloc((void**)&sphi, dim * sizeof(CUFFT_COMPLEX)));
+    CHECK_CUDA(cudaMalloc((void**)&scg, dim * sizeof(CUFFT_COMPLEX)));
+    CHECK_CUDA(cudaMalloc((void**)&hphi, dim * sizeof(CUFFT_COMPLEX)));
+    CHECK_CUDA(cudaMalloc((void**)&g, dim * sizeof(CUFFT_COMPLEX)));
+    CHECK_CUDA(cudaMalloc((void**)&cg, dim * sizeof(CUFFT_COMPLEX)));
+    CHECK_CUDA(cudaMalloc((void**)&g0, dim * sizeof(CUFFT_COMPLEX)));
+    CHECK_CUDA(cudaMalloc((void**)&pphi, dim * sizeof(CUFFT_COMPLEX)));
+    CHECK_CUDA(cudaMalloc((void**)&lagrange, n_band * sizeof(CUFFT_COMPLEX)));
+    CHECK_CUDA(cudaMalloc((void**)&phi_m, dim * sizeof(CUFFT_COMPLEX)));
 
     // timer::tick("Diago_CG_GPU","diag");
-
-    err = cudaGetLastError();
-    if (err != cudaSuccess)
-    {
-        cout << "Cuda error: "<< cudaGetErrorString(err) <<" in "<< __LINE__ << endl;
-    }
 
 	// Init with ZERO ...
     // double em_host = 0;
@@ -158,37 +146,19 @@ void Diago_CG_GPU::diag
     {
         if (test_cg>2) GlobalV::ofs_running << "Diagonal Band : " << m << endl;
 
-        cudaMemcpy(phi_m, &phi[m*dmx], dim*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice);
+        CHECK_CUDA(cudaMemcpy(phi_m, &phi[m*dmx], dim*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice));
 
-        err = cudaGetLastError();
-        if (err != cudaSuccess)
-        {
-            cout << "Cuda error: "<< cudaGetErrorString(err) <<" in "<< __LINE__ << endl;
-        }
-
-        // cudaMemcpy(sphi, phi_m, dim * sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice);
+        // CHECK_CUDA(cudaMemcpy(sphi, phi_m, dim * sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice));
         GlobalC::hm.hpw.s_1psi_gpu(dim, phi_m, sphi);
-
-        err = cudaGetLastError();
-        if (err != cudaSuccess)
-        {
-            cout << "Cuda error: "<< cudaGetErrorString(err) <<" in "<< __LINE__ << endl;
-        }
 
         this->schmit_orth(dim, dmx, m, phi, sphi, phi_m);
 
         GlobalC::hm.hpw.h_1psi_gpu(dim, phi_m, hphi, sphi);
 
-        err = cudaGetLastError();
-        if (err != cudaSuccess)
-        {
-            cout << "Cuda error: "<< cudaGetErrorString(err) <<" in "<< __LINE__ << endl;
-        }
-
         double em_host = 0;
         em_host = ddot_real(dim, phi_m, hphi);
 
-        cudaMemcpy(&e[m], &em_host, sizeof(double), cudaMemcpyHostToDevice);
+        CHECK_CUDA(cudaMemcpy(&e[m], &em_host, sizeof(double), cudaMemcpyHostToDevice));
 
         int iter = 0;
         double gg_last = 0.0;
@@ -209,7 +179,7 @@ void Diago_CG_GPU::diag
             if ( converged ) break;
         }//end iter
 
-        cudaMemcpy(&phi[m*dmx], phi_m, dim*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice);
+        CHECK_CUDA(cudaMemcpy(&phi[m*dmx], phi_m, dim*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice));
 
         if (!converged)
         {
@@ -224,7 +194,7 @@ void Diago_CG_GPU::diag
             double* e_host;
             e_host = (double*)malloc(n_band*sizeof(double));
             ModuleBase::GlobalFunc::ZEROS(e_host, n_band);
-            cudaMemcpy(e_host, e, n_band*sizeof(double), cudaMemcpyDeviceToHost);
+            CHECK_CUDA(cudaMemcpy(e_host, e, n_band*sizeof(double), cudaMemcpyDeviceToHost));
 
             if (e_host[m]-e_host[m-1]<-2.0*eps)
             {
@@ -240,23 +210,23 @@ void Diago_CG_GPU::diag
                 // last calculated eigenvalue should be in the i-th position: reorder
                 double e0 = e_host[m];
 
-                cudaMemcpy(pphi, &phi[m*dmx], dim*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice);
+                CHECK_CUDA(cudaMemcpy(pphi, &phi[m*dmx], dim*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice));
 
                 for (int j = m;j >= i + 1;j--)
                 {
                     e_host[j]=e_host[j-1];
-                    cudaMemcpy(&phi[j*dmx], &phi[(j-1)*dmx], dim*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice);
+                    CHECK_CUDA(cudaMemcpy(&phi[j*dmx], &phi[(j-1)*dmx], dim*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice));
                 }
 
                 e_host[i] = e0;
 
-                cudaMemcpy(&phi[i*dmx], pphi, dim*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice);
+                CHECK_CUDA(cudaMemcpy(&phi[i*dmx], pphi, dim*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice));
                 // this procedure should be good if only a few inversions occur,
                 // extremely inefficient if eigenvectors are often in bad order
                 // (but this should not happen)
             } // endif
 
-            cudaMemcpy(e, e_host, n_band*sizeof(double), cudaMemcpyHostToDevice);
+            CHECK_CUDA(cudaMemcpy(e, e_host, n_band*sizeof(double), cudaMemcpyHostToDevice));
             delete [] e_host;
         } //end reorder
 
@@ -265,15 +235,15 @@ void Diago_CG_GPU::diag
     avg_iter /= n_band;
 
     // timer::tick("Diago_CG_GPU","diag");
-    cudaFree(lagrange);
-    cudaFree(pphi);
-    cudaFree(g0);
-    cudaFree(cg);
-    cudaFree(g);
-    cudaFree(hphi);
-    cudaFree(scg);
-    cudaFree(sphi);
-    cudaFree(phi_m);
+    CHECK_CUDA(cudaFree(lagrange));
+    CHECK_CUDA(cudaFree(pphi));
+    CHECK_CUDA(cudaFree(g0));
+    CHECK_CUDA(cudaFree(cg));
+    CHECK_CUDA(cudaFree(g));
+    CHECK_CUDA(cudaFree(hphi));
+    CHECK_CUDA(cudaFree(scg));
+    CHECK_CUDA(cudaFree(sphi));
+    CHECK_CUDA(cudaFree(phi_m));
 
     ModuleBase::timer::tick("Diago_CG_GPU","diag");
     return;
@@ -308,11 +278,6 @@ void Diago_CG_GPU::calculate_gradient(
     kernel_get_gredient<<<block, thread>>>(g, ppsi, dim, lambda);
     // kernel_multi_add<<<block, thread>>>(g, g, 1, ppsi, -lambda, dim);
     ModuleBase::timer::tick("Diago_CG_GPU","calculate_grad");
-    cudaError_t err = cudaGetLastError();
-    if (err != cudaSuccess)
-    {
-        cout << "Cuda error: "<< cudaGetErrorString(err) <<" in "<< __LINE__ << endl;
-    }
     return;
 }
 
@@ -407,12 +372,6 @@ void Diago_CG_GPU::calculate_gamma_cg(
     int block = dim / thread + 1;
     kernel_precondition_inverse<<<block, thread>>>(psg, sg, dim, precondition);
 
-    cudaError_t err = cudaGetLastError();
-    if (err != cudaSuccess)
-    {
-        cout << "Cuda error: "<< cudaGetErrorString(err) <<" in "<< __LINE__ << endl;
-    }
-
     // (3) Update gg_now!
     // gg_now = < g|P|sg > = < g|psg >
     const double gg_now = this->ddot_real( dim, g, psg );
@@ -428,7 +387,7 @@ void Diago_CG_GPU::calculate_gamma_cg(
         // {
         //     cg[i] = g[i];
         // }
-        cudaMemcpy(cg, g, dim*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice);
+        CHECK_CUDA(cudaMemcpy(cg, g, dim*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice));
     }
     else
     {
@@ -479,27 +438,10 @@ bool Diago_CG_GPU::update_psi(
     int block = dim / 512 + 1;
     // pw.h_1psi(dim, cg, hcg, scg); // TODO
     // to cpu
-
-    cudaError_t err = cudaGetLastError();
-    if (err != cudaSuccess)
-    {
-        cout << "Cuda error: "<< cudaGetErrorString(err) <<" in "<< __LINE__ << endl;
-    }
     GlobalC::hm.hpw.h_1psi_gpu(dim, cg, hcg, scg);
     // hpsi end
-    err = cudaGetLastError();
-    if (err != cudaSuccess)
-    {
-        cout << "Cuda error: "<< cudaGetErrorString(err) <<" in "<< __LINE__ << endl;
-    }
 
     cg_norm = sqrt( this->ddot_real(dim, cg, scg) );
-
-    err = cudaGetLastError();
-    if (err != cudaSuccess)
-    {
-        cout << "Cuda error: "<< cudaGetErrorString(err) <<" in "<< __LINE__ << endl;
-    }
 
     if (cg_norm < 1.0e-10 ) return 1;
 
@@ -571,7 +513,7 @@ void Diago_CG_GPU::schmit_orth
     // cout<<"orth, dim="<<dim<<endl;
 
     CUFFT_COMPLEX *lagrange;
-    cudaMalloc((void**)&lagrange, (m+1)*sizeof(CUFFT_COMPLEX));
+    CHECK_CUDA(cudaMalloc((void**)&lagrange, (m+1)*sizeof(CUFFT_COMPLEX)));
     int inc=1;
     int mp1 = m+1;
 
@@ -586,7 +528,7 @@ void Diago_CG_GPU::schmit_orth
     cublasZgemv(handle, trans1, dim, mp1, &ONE, psi, dmx, sphi, inc, &ZERO, lagrange, inc);
 
     double psi_norm;
-    cudaMemcpy(&psi_norm, &lagrange[m], sizeof(double), cudaMemcpyDeviceToHost);
+    CHECK_CUDA(cudaMemcpy(&psi_norm, &lagrange[m], sizeof(double), cudaMemcpyDeviceToHost));
     cublasOperation_t trans2 = CUBLAS_OP_N;
     cublasZgemv(handle, trans2, dim, m, &NEG_ONE, psi, dmx, lagrange, inc, &ONE, psi_m, inc);
 
@@ -601,7 +543,7 @@ void Diago_CG_GPU::schmit_orth
 
     cublasDestroy(handle);
     ModuleBase::timer::tick("Diago_CG_GPU","schmit_orth");
-    cudaFree(lagrange);
+    CHECK_CUDA(cudaFree(lagrange));
     return ;
 }
 
