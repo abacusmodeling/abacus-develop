@@ -74,7 +74,7 @@ class ORB_table_phi
 	void plot_table(
 		const std::string filename,
 		const int rmesh,
-		double* &column);
+		double* column);
 
 	// Peize Lin add 2017-04-24, and change all jlx in this class
 	ModuleBase::Sph_Bessel_Recursive::D2* pSB = nullptr;
