@@ -71,7 +71,7 @@ void energy::calculate_harris(const int &flag)
         if(INPUT.deepks_scf) 
 		{
 			this->etot_harris += ld.E_delta;  //caoyu add 2021-08-10
-			ld.cal_e_delta_band(LOC.wfc_dm_2d.dm_gamma[0]);
+			ld.cal_e_delta_band(LOC.wfc_dm_2d.dm_gamma);
 			this->etot_harris -= ld.e_delta_band;
 		}
 #endif
@@ -119,7 +119,7 @@ void energy::calculate_etot(void)
 	if (INPUT.deepks_scf)
 	{
 		this->etot += ld.E_delta;
-        ld.cal_e_delta_band(LOC.wfc_dm_2d.dm_gamma[0]);
+        ld.cal_e_delta_band(LOC.wfc_dm_2d.dm_gamma);
         this->etot -= ld.e_delta_band;
 	}
 #endif

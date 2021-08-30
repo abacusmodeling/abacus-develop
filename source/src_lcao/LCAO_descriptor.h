@@ -69,7 +69,7 @@ public:
 	//----------------------------------------------------------------------
 	void print_descriptor(void);
 	void print_H_V_delta(void);
-	void print_F_delta(void);
+	void print_F_delta(const string& fname);
 
 
 	//----------------------------------------------------------------------
@@ -83,8 +83,7 @@ public:
 	void save_npy_e(const double &ebase);	//Ry
 	void save_npy_f(const matrix &fbase);//Ry
 
-	void cal_e_delta_band(const matrix &dm);	//tr[rho*H_V_delta]
-
+    void cal_e_delta_band(const std::vector<matrix>& dm);	//tr[rho*H_V_delta]
 //-------------------
 // public variables 
 //-------------------

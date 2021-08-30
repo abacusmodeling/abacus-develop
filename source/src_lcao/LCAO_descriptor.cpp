@@ -558,11 +558,11 @@ void LCAO_Descriptor::cal_gdmx(const matrix &dm)
 								//  save the matrix as column major format
                                 if (KS_SOLVER == "genelpa" || KS_SOLVER == "scalapack_gvx")
                                 {
-                                    gdmx[iat][inl][m2*nm + m1] += 
+                                    gdmx[iat][inl][m1*nm + m2] += 
 									2 * dsx[inl][m1*NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*NLOCAL + nu];
-                                    gdmy[iat][inl][m2*nm + m1] += 
+                                    gdmy[iat][inl][m1*nm + m2] += 
 									2 * dsy[inl][m1*NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*NLOCAL + nu];
-                                    gdmz[iat][inl][m2*nm + m1] += 
+                                    gdmz[iat][inl][m1*nm + m2] += 
 									2 * dsz[inl][m1*NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*NLOCAL + nu];
                                 }
                                 else
@@ -676,7 +676,7 @@ void LCAO_Descriptor::deepks_pre_scf(const string& model_file)
         this->DH_V_delta_z = new double[NLOCAL * NLOCAL];
         ZEROS(DH_V_delta_x, NLOCAL * NLOCAL);
         ZEROS(DH_V_delta_y, NLOCAL * NLOCAL);
-        ZEROS(DH_V_delta_y, NLOCAL * NLOCAL);
+        ZEROS(DH_V_delta_z, NLOCAL * NLOCAL);
     }
     return;
 }
@@ -824,7 +824,9 @@ void LCAO_Descriptor::build_v_delta_alpha(const bool& calc_deri)
                                             this->gedm);
                                     //for Pulay Force
                                     //LM.set_force(iw1_all, iw2_all, nlm[0], nlm[1], nlm[2], 'N');
-                                    int index = iw2_all * NLOCAL + iw1_all;     //for genelpa
+                                    const int ir = ParaO.trace_loc_row[ iw1_all ];
+                                    const int ic = ParaO.trace_loc_col[ iw2_all ];
+                                    const long index = ir * ParaO.ncol + ic;
                                     this->DH_V_delta_x[index] += nlm[0];
                                     this->DH_V_delta_y[index] += nlm[1];
                                     this->DH_V_delta_z[index] += nlm[2];
@@ -1083,25 +1085,26 @@ void LCAO_Descriptor::add_v_delta(void)
 void LCAO_Descriptor::cal_f_delta(const matrix &dm)
 {
     TITLE("LCAO_Descriptor", "cal_f_delta");
+    this->F_delta.zero_out();
+    //1. cal gedm
+    this->cal_gedm(dm);
+    
+    //2. cal gdmx
+    this->init_gdmx();
+    this->cal_gdmx(dm);
+    
+    //3.multiply and sum for each atom
+    //3.1 Pulay term 
+    // \sum_{Inl}\sum_{mm'} <gedm, gdmx>_{mm'}
+    //notice: sum of multiplied corresponding element(mm') , not matrix multiplication !
     int iat = 0;    //check if the index same as ucell.iw2iat or not !!
     for (int it = 0;it < ucell.ntype;++it)
     {
         for (int ia = 0;ia < ucell.atoms[it].na;++ia)
         {
-            for (int inl = 0;inl < inlmax;++inl)
+            for (int inl = 0;inl < this->inlmax;++inl)
             {
                 int nm = 2 * inl_l[inl] + 1;
-
-                //1. cal gedm
-                this->cal_gedm(dm);
-                //2. cal gdmx
-                this->init_gdmx();
-                this->cal_gdmx(dm);
-
-                //3.multiply and sum for each atom
-                //3.1 Pulay term 
-                // \sum_{Inl}\sum_{mm'} <gedm, gdmx>_{mm'}
-                //notice: sum of multiplied corresponding element(mm') , not matrix multiplication !
                 for (int m1 = 0;m1 < nm;++m1)
                 {
                     for (int m2 = 0; m2 < nm;++m2)
@@ -1111,9 +1114,17 @@ void LCAO_Descriptor::cal_f_delta(const matrix &dm)
                         this->F_delta(iat, 2) += this->gedm[inl][m1 * nm + m2] * gdmz[iat][inl][m1 * nm + m2];
                     }
                 }
-                
             }//end inl
-            
+            ++iat;
+        }
+    }
+    this->print_F_delta("F_delta_pulay_old.dat");
+    this->F_delta.zero_out();
+    iat = 0;
+    for (int it = 0;it < ucell.ntype;++it)
+    {
+        for (int ia = 0;ia < ucell.atoms[it].na;++ia)
+        {
             //3.2 HF term
             double** ss = this->S_mu_alpha;
             double** dsx = this->DS_mu_alpha_x;
@@ -1133,11 +1144,11 @@ void LCAO_Descriptor::cal_f_delta(const matrix &dm)
                                 {
                                     if (KS_SOLVER == "genelpa" || KS_SOLVER == "scalapack_gvx")
                                     {
-                                        this->F_delta(iat, 0) += dm(mu, nu) * dsx[inl_index[it](ia, l, n)][m1 * NLOCAL + mu]
+                                        this->F_delta(iat, 0) -= 2*dm(mu, nu) * dsx[inl_index[it](ia, l, n)][m1 * NLOCAL + mu]
                                             * this->gedm[inl_index[it](ia, l, n)][m1 * (2 * l + 1) + m2] * ss[inl_index[it](ia, l, n)][m2 * NLOCAL + nu];
-                                        this->F_delta(iat, 1) += dm(mu, nu) * dsy[inl_index[it](ia, l, n)][m1 * NLOCAL + mu]
+                                        this->F_delta(iat, 1) -= 2*dm(mu, nu) * dsy[inl_index[it](ia, l, n)][m1 * NLOCAL + mu]
                                             * this->gedm[inl_index[it](ia, l, n)][m1 * (2 * l + 1) + m2] * ss[inl_index[it](ia, l, n)][m2 * NLOCAL + nu];
-                                        this->F_delta(iat, 2) += dm(mu, nu) * dsz[inl_index[it](ia, l, n)][m1 * NLOCAL + mu]
+                                        this->F_delta(iat, 2) -= 2*dm(mu, nu) * dsz[inl_index[it](ia, l, n)][m1 * NLOCAL + mu]
                                             * this->gedm[inl_index[it](ia, l, n)][m1 * (2 * l + 1) + m2] * ss[inl_index[it](ia, l, n)][m2 * NLOCAL + nu];
                                     }
                                     else
@@ -1158,6 +1169,7 @@ void LCAO_Descriptor::cal_f_delta(const matrix &dm)
             ++iat;
         }//end ia
     }//end it
+    this->print_F_delta("F_delta_hf_old.dat");
     //3.3 Overlap term
     //somthing in NN, which not included in Hamiltonian
     /*
@@ -1178,6 +1190,7 @@ void LCAO_Descriptor::cal_f_delta(const matrix &dm)
 void LCAO_Descriptor::cal_f_delta_hf(const matrix& dm)
 {
     TITLE("LCAO_Descriptor", "cal_f_delta_hf");
+    this->F_delta.zero_out();
     for (int iat = 0; iat < ucell.nat; ++iat)
     {
         const int it = ucell.iat2it[iat];
@@ -1266,20 +1279,23 @@ void LCAO_Descriptor::cal_f_delta_hf(const matrix& dm)
 void LCAO_Descriptor::cal_f_delta_pulay(const matrix& dm)
 {
     TITLE("LCAO_Descriptor", "cal_f_delta_pulay");
+    //this->F_delta.zero_out();
     this->build_v_delta_alpha(1);
     //this->build_v_delta_mu(1);    //, if multi-k
-    for (int mu = 0;mu < NLOCAL;++mu)
+    for (int i = 0;i < NLOCAL;++i)   //col, diff
     {
-        const int iat = ucell.iwt2iat[mu];//the atom whose force being calculated
-        for (int nu = 0;nu < NLOCAL;++nu)
+        const int iat = ucell.iwt2iat[i];//the atom whose force being calculated
+        for (int j = 0;j < NLOCAL;++j)   //row
         {
-            //for genelpa
-            this->F_delta(iat, 0) += 2 * dm(mu, nu) * this->DH_V_delta_x[nu * NLOCAL + mu];
-            this->F_delta(iat, 1) += 2 * dm(mu, nu) * this->DH_V_delta_y[nu * NLOCAL + mu];
-            this->F_delta(iat, 2) += 2 * dm(mu, nu) * this->DH_V_delta_z[nu * NLOCAL + mu];
-            //this->F_delta(iat, 0) += 4 * dm(mu, nu) * this->DH_V_delta_x[nu * NLOCAL + mu];
-            //this->F_delta(iat, 1) += 4 * dm(mu, nu) * this->DH_V_delta_y[nu * NLOCAL + mu];
-            //this->F_delta(iat, 2) += 4 * dm(mu, nu) * this->DH_V_delta_z[nu * NLOCAL + mu];
+            const int mu = ParaO.trace_loc_row[j];
+            const int nu = ParaO.trace_loc_col[i];
+            if (mu >= 0 && nu >= 0)
+            {
+                const int index = mu * ParaO.ncol + nu;
+                this->F_delta(iat, 0) += 2 * dm(mu, nu) * this->DH_V_delta_x[index];
+                this->F_delta(iat, 1) += 2 * dm(mu, nu) * this->DH_V_delta_y[index];
+                this->F_delta(iat, 2) += 2 * dm(mu, nu) * this->DH_V_delta_z[index];
+            }
         }
     }
     return;
@@ -1428,15 +1444,14 @@ void LCAO_Descriptor::print_H_V_delta(void)
 }
 
 
-void LCAO_Descriptor::print_F_delta(void)
+void LCAO_Descriptor::print_F_delta(const string& fname)
 {
     TITLE("LCAO_Descriptor", "print_F_delta");
 
     ofstream ofs;
     stringstream ss;
     // the parameter 'winput::spillage_outdir' is read from INPUTw.
-    ss << winput::spillage_outdir << "/"
-       << "F_delta.dat";
+    ss << winput::spillage_outdir << "/"<< fname ;
 
     if (MY_RANK == 0)
     {
@@ -1473,6 +1488,94 @@ void LCAO_Descriptor::print_F_delta(void)
     }
 
     ofs_running << " F_delta has been printed to " << ss.str() << endl;
+    ofs.close();
+
+    /*
+    //============for test: double check of 2 methods=============== 
+    //1. same as old method
+    matrix F_delta_old;
+    F_delta_old.create(ucell.nat, 3);
+    F_delta_old.zero_out();
+    for (int inl = 0;inl < this->inlmax;++inl)
+    {
+        int nm = 2 * inl_l[inl] + 1;
+        for (int m1 = 0;m1 < nm;++m1)
+        {
+            for (int m2 = 0;m2 < nm;++m2)
+            {
+                for (int mu = 0;mu < NLOCAL;++mu)
+                {
+                    int iat = ucell.iwt2iat[mu];
+                    for (int nu = 0;nu < NLOCAL;++nu)
+                    {
+                        F_delta_old(iat, 0) += 2*LOC.wfc_dm_2d.dm_gamma[0](mu, nu)*gedm[inl][m1 * nm + m2] * this->DS_mu_alpha_x[inl][m1 * NLOCAL + mu] * this->S_mu_alpha[inl][m2 * NLOCAL + nu];
+                        F_delta_old(iat, 1) += 2*LOC.wfc_dm_2d.dm_gamma[0](mu, nu)*gedm[inl][m1 * nm + m2] * this->DS_mu_alpha_y[inl][m1 * NLOCAL + mu] * this->S_mu_alpha[inl][m2 * NLOCAL + nu];
+                        F_delta_old(iat,2) += 2*LOC.wfc_dm_2d.dm_gamma[0](mu, nu)*gedm[inl][m1 * nm + m2] * this->DS_mu_alpha_z[inl][m1 * NLOCAL + mu] * this->S_mu_alpha[inl][m2 * NLOCAL + nu];
+                    }
+                }
+            }
+        }
+    }
+    //print F_new
+    stringstream ss1;
+    ss1 << winput::spillage_outdir << "/"
+       << "F_delta_old.dat";
+    if (MY_RANK == 0)
+    {
+        ofs.open(ss1.str().c_str());
+    }
+    for (int iat = 0;iat < ucell.nat;++iat)
+    {
+        for (int i = 0;i < 3;++i)
+        {
+            ofs<< setw(8)<< F_delta_old(iat,i)/2<< " ";
+        }
+        ofs << endl;
+    }
+    ofs.close();
+
+    //2. same as new method
+    matrix F_delta_new;
+    F_delta_new.create(ucell.nat, 3);
+    F_delta_new.zero_out();
+    for (int inl = 0;inl < this->inlmax;++inl)
+    {
+        int nm = 2 * inl_l[inl] + 1;
+        for (int m1 = 0;m1 < nm;++m1)
+        {
+            for (int m2 = 0;m2 < nm;++m2)
+            {
+                for (int mu = 0;mu < NLOCAL;++mu)
+                {
+                    for (int nu = 0;nu < NLOCAL;++nu)
+                    {
+                        int iat = ucell.iwt2iat[nu];
+                        F_delta_new(iat, 0) += 2 * LOC.wfc_dm_2d.dm_gamma[0](mu, nu) * gedm[inl][m1 * nm + m2] * this->DS_mu_alpha_x[inl][m1 * NLOCAL + mu] * this->S_mu_alpha[inl][m2 * NLOCAL + nu];
+                        F_delta_new(iat, 1) += 2*LOC.wfc_dm_2d.dm_gamma[0](mu, nu)*gedm[inl][m1 * nm + m2] * this->DS_mu_alpha_y[inl][m1 * NLOCAL + mu] * this->S_mu_alpha[inl][m2 * NLOCAL + nu];
+                        F_delta_new(iat,2) += 2*LOC.wfc_dm_2d.dm_gamma[0](mu, nu)*gedm[inl][m1 * nm + m2] * this->DS_mu_alpha_z[inl][m1 * NLOCAL + mu] * this->S_mu_alpha[inl][m2 * NLOCAL + nu];
+                    }
+                }
+            }
+        }
+    }
+    //print F_new
+    stringstream ss2;
+    ss2 << winput::spillage_outdir << "/"
+       << "F_delta_new.dat";
+    if (MY_RANK == 0)
+    {
+        ofs.open(ss2.str().c_str());
+    }
+    for (int iat = 0;iat < ucell.nat;++iat)
+    {
+        for (int i = 0;i < 3;++i)
+        {
+            ofs<< setw(8)<< F_delta_new(iat,i)/2<< " ";
+        }
+        ofs << endl;
+    }
+    ofs.close();
+*/
     return;
 }
 
@@ -1522,14 +1625,24 @@ void LCAO_Descriptor::save_npy_f(const matrix &fbase)
     return;
 }
 
-void LCAO_Descriptor::cal_e_delta_band(const matrix &dm)
+void LCAO_Descriptor::cal_e_delta_band(const std::vector<matrix> &dm)
 {
+    TITLE("LCAO_Descriptor", "cal_e_delta_band");
     this->e_delta_band = 0;
     for (int i = 0; i < NLOCAL; ++i)
     {
         for (int j = 0; j < NLOCAL; ++j)
         {
-            this->e_delta_band += dm(i,j)*this->H_V_delta[i*NLOCAL+j];
+            const int mu = ParaO.trace_loc_row[j];
+            const int nu = ParaO.trace_loc_col[i];
+            if (mu >= 0 && nu >= 0)
+            {
+                const int index = mu * ParaO.ncol + nu;
+                for (int is = 0; is < NSPIN; ++is)
+                {
+                    this->e_delta_band += dm[is](nu, mu) * this->H_V_delta[i * NLOCAL + j];
+                }
+            }
         }
     }
     return;

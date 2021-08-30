@@ -999,12 +999,12 @@ void ORB_gen_tables::snap_psialpha(
 	//TITLE ("ORB_gen_tables","snap_psialpha")
 	timer::tick("ORB_gen_tables", "snap_psialpha");
 
-    const int des_per_atom = ORB.Alpha[0].getTotal_nchi();
-    assert(des_per_atom > 0); // mohan add 2021-04-25
+    const int ln_per_atom = ORB.Alpha[0].getTotal_nchi();
+    assert(ln_per_atom > 0); 
 	
-	bool *calproj = new bool[des_per_atom];
-	int *rmesh1 = new int[des_per_atom];
-	int *rmesh2 = new int[des_per_atom];
+	bool *calproj = new bool[ln_per_atom];
+	int *rmesh1 = new int[ln_per_atom];
+	int *rmesh2 = new int[ln_per_atom];
 
 	//rcut of orbtials and projectors
 	const double Rcut1 = ORB.Phi[T1].getRcut();
@@ -1022,7 +1022,7 @@ void ORB_gen_tables::snap_psialpha(
 	// of projector, so sometimes some shorter projectors need not be
 	// calculated.
 	bool all_out = true;
-	for (int ip = 0; ip < des_per_atom; ip++)
+	for (int ip = 0; ip < ln_per_atom; ip++)
 	{
 		const double Rcut0 = ORB.Alpha[0].getRcut();
 		if (distance10 > (Rcut1 + Rcut0) || distance20 > (Rcut2 + Rcut0))
@@ -1143,12 +1143,6 @@ void ORB_gen_tables::snap_psialpha(
                 continue;
             }
             ++nb;
-            //const int next_ip = 2* L0 +1;
-
-            //////////////////////////////////////////////////////
-            /// we should consider move iterations for psi1 and psi2 from cal_fvnl_dbeta
-            /// to here --- 2021/03/20 mohan chen
-            //////////////////////////////////////////////////////
             
             // <psi1 | Beta>
             const int Opair1 = talpha.DS_Opair(Tpair1, L1, L0, N1, N0);
@@ -1329,14 +1323,14 @@ void ORB_gen_tables::snap_psialpha(
                     {
                         case 0: //calculate the overlap part.
                         {
-                            nlm[0] += term_a * term_b * gedm[inl][m01*nm+m02]; //LiuXh 2016-01-14
+                            nlm[0] += term_a * term_b * gedm[inl][m01*nm+m02]; 
                             break;
                         }
                         case 1: //calculate the derivative part.
                         {
                             for (int jr = 0; jr < 3; jr++)
                             {
-                                nlm[jr] += term_c[jr] * term_a * gedm[inl][m01*nm+m02]; //LiuXh 2016-01-14
+                                nlm[jr] += term_c[jr] * term_a * gedm[inl][m01*nm+m02];
                             }
                             break;
                         }

@@ -178,7 +178,7 @@ void LOOP_ions::opt_ions(void)
             if (INPUT.deepks_scf)
             {
                 //ld.print_H_V_delta();   //final H_delta
-                ld.cal_e_delta_band(LOC.wfc_dm_2d.dm_gamma[0]);
+                ld.cal_e_delta_band(LOC.wfc_dm_2d.dm_gamma);
                 std::cout << "E_delta_band = " << setprecision(8) << ld.e_delta_band << " Ry" << " = " << setprecision(8) << ld.e_delta_band * Ry_to_eV << " eV" << endl;
                 std::cout << "E_delta_NN= "<<setprecision(8) << ld.E_delta << " Ry" << " = "<<setprecision(8)<<ld.E_delta*Ry_to_eV<<" eV"<<endl;
             }
