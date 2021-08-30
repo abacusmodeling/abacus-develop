@@ -206,6 +206,9 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> Potential_Libxc::v_xc
 		double ec, v1cup, v1cdw, v3cup, v3cdw;
 		ModuleBase::Vector3<double> grhoup,grhodw,v2cup,v2cdw;
 
+		XC_Functional::Mgga_spin_in mgga_spin_in;
+		XC_Functional::Mgga_spin_out mgga_spin_out;
+
 	
 		const double rho_th  = 1e-8;
 		const double grho_th = 1e-12;
@@ -213,34 +216,42 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> Potential_Libxc::v_xc
 
 		for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 		{
-			rhoup = rho_in[0][ir];
-			rhodw = rho_in[1][ir];
-			rh = rhoup + rhodw;
 
-			grhoup = grho[0][ir];
-			grhodw = grho[1][ir];
-			ggrho2 = (grhoup*grhoup + grhodw*grhodw) * 4.0;
+			auto set_input_tau_spin = [&]()
+			{
+				mgga_spin_in.rhoup = rho_in[0][ir];
+				mgga_spin_in.rhodw = rho_in[1][ir];
+				rh = rho_in[0][ir] + rho_in[1][ir];
+	
+				mgga_spin_in.grhoup = grho[0][ir];
+				mgga_spin_in.grhodw = grho[1][ir];
+				ggrho2 = (grho[0][ir]*grho[0][ir] + grho[1][ir]*grho[1][ir]) * 4.0;
+	
+				mgga_spin_in.tauup = kin_r[0][ir] / ModuleBase::e2;
+				mgga_spin_in.taudw = kin_r[1][ir] / ModuleBase::e2;
+				atau = (kin_r[0][ir]+kin_r[1][ir])/ ModuleBase::e2;
+			};
 
-			tauup = kin_r[0][ir] / ModuleBase::e2;
-			taudw = kin_r[1][ir] / ModuleBase::e2;
-			atau = tauup + taudw;
+			auto set_output_tau_spin = [&]()
+			{
+				vrho[0][ir] = (mgga_spin_out.v1xup+mgga_spin_out.v1cup) * ModuleBase::e2;
+				vrho[1][ir] = (mgga_spin_out.v1xdw+mgga_spin_out.v1cdw) * ModuleBase::e2;
+	
+				h[0][ir] = (mgga_spin_out.v2xup*grhoup+mgga_spin_out.v2cup)*ModuleBase::e2;
+				h[1][ir] = (mgga_spin_out.v2xdw*grhodw+mgga_spin_out.v2cdw)*ModuleBase::e2;
+				
+				kedtaur[0][ir] = mgga_spin_out.v3xup+mgga_spin_out.v3cup;
+				kedtaur[1][ir] = mgga_spin_out.v3xdw+mgga_spin_out.v3cdw;
+	
+				etxc += (mgga_spin_out.ex+mgga_spin_out.ec) * ModuleBase::e2;
+				vtxc += (mgga_spin_out.v1xup+mgga_spin_out.v1xdw+mgga_spin_out.v1cup+mgga_spin_out.v1cdw) * ModuleBase::e2 * rh;
+			};
 
 			if (rh > rho_th && ggrho2 > grho_th && abs(atau) > tau_th)
 			{
-				vector<double> v2c;
-				XC_Functional::tau_xc_spin(rhoup, rhodw, grhoup, grhodw, tauup, taudw, ex, ec, v1xup, v1xdw, v2xup, v2xdw, v3xup, v3xdw, v1cup, v1cdw, v2cup, v2cdw, v2c, v3cup, v3cdw );
-
-				vrho[0][ir] = (v1xup+v1cup) * ModuleBase::e2;
-				vrho[1][ir] = (v1xdw+v1cdw) * ModuleBase::e2;
-
-				h[0][ir] = (v2xup*grhoup+v2cup)*ModuleBase::e2;
-				h[1][ir] = (v2xdw*grhodw+v2cdw)*ModuleBase::e2;
-				
-				kedtaur[0][ir] = v3xup+v3cup;
-				kedtaur[1][ir] = v3xdw+v3cdw;
-
-				etxc += (ex+ec) * ModuleBase::e2;
-				vtxc += (v1xup+v1xdw+v1cup+v1cdw) * ModuleBase::e2 * rh;
+				set_input_tau_spin();
+				XC_Functional::tau_xc_spin(mgga_spin_in, mgga_spin_out);
+				set_output_tau_spin();
 			}
 			else
 			{
