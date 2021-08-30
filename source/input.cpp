@@ -1707,7 +1707,7 @@ bool Input::Read(const std::string &fn)
 		{
 			read_value(ifs, soc_lambda);
 		}
-		else if (strcmp("angle1", word) == 0)
+/*		else if (strcmp("angle1", word) == 0)
 		{
 			angle1.resize(ntype);
 			for(auto &i:angle1)
@@ -1718,7 +1718,7 @@ bool Input::Read(const std::string &fn)
 			angle2.resize(ntype);
 			for (auto &i : angle2)
 				read_value(ifs, i);
-		}
+		}*/
         //else if (strcmp("epsilon0_choice", word) == 0)
         //{
         //    read_value(ifs, epsilon0_choice);
@@ -1737,6 +1737,7 @@ bool Input::Read(const std::string &fn)
 		}
 //---------------
 //start magnetic
+/*
 #ifndef __CMD
 		else if (strcmp("magmom", word) == 0)
 		{
@@ -1809,7 +1810,7 @@ bool Input::Read(const std::string &fn)
 	}
 
 #endif
-		
+*/		
 //--------------
 //----------------------------------------------------------------------------------
 //         Xin Qu added on 2020-10-29 for DFT+U

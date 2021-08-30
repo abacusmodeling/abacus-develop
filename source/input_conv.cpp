@@ -318,11 +318,12 @@ void Input_Conv::Convert(void)
 			GlobalC::dftu.J = INPUT.hund_j;               //Hund exchange parameter J(ev)
 		}
 	}
+	/*
 #ifndef __CMD
 	GlobalC::ucell.input_mag=INPUT.input_mag;
 	GlobalC::ucell.n_mag_at=INPUT.n_mag_at;
 	GlobalC::ucell.atom_mag=INPUT.atom_mag;
-#endif
+#endif*/
 //--------------------------------------------
 // added by zhengdy-soc
 //--------------------------------------------

@@ -138,6 +138,9 @@ void Atom::bcast_atom(void)
         tau = new ModuleBase::Vector3<double>[na];
 		taud = new ModuleBase::Vector3<double>[na];
         mag = new double[na];
+        angle1 = new double[na];
+        angle2 = new double[na];
+        m_loc_ = new ModuleBase::Vector3<double>[na];
     }
 
     for (int i=0;i<na;i++)
@@ -149,6 +152,11 @@ void Atom::bcast_atom(void)
         Parallel_Common::bcast_double( taud[i].y );
         Parallel_Common::bcast_double( taud[i].z );
         Parallel_Common::bcast_double( mag[i] );
+        Parallel_Common::bcast_double(angle1[i]);
+        Parallel_Common::bcast_double(angle2[i]);
+        Parallel_Common::bcast_double(m_loc_[i].x);
+        Parallel_Common::bcast_double(m_loc_[i].y);
+        Parallel_Common::bcast_double(m_loc_[i].z);
     }
 
     bcast_atom_pseudo( na );

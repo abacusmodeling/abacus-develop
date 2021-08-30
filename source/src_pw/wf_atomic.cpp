@@ -332,69 +332,71 @@ void WF_atomic::atomic_wfc
                             else
                             {//atomic_wfc_so_mag
 
-                              double alpha, gamma;
-                              std::complex<double> fup,fdown;
-                              int nc;
-                              //This routine creates two functions only in the case j=l+1/2 or exit in the other case
-                              if(fabs(j-l+0.5<1e-4)) continue;
-                              delete[] chiaux;
-                              chiaux = new double [np];
-                              //Find the functions j= l- 1/2
-                              if(l==0)
-                                 for(int ig=0;ig<np;ig++){
-                                    chiaux[ig] = flq[ig];
-                                 }
-                              else
-                              {
-                                 for(int ib = 0;ib < GlobalC::ucell.atoms[it].nchi;ib++)
-                                 {
-                                    if((GlobalC::ucell.atoms[it].lchi[ib] == l)&&(fabs(GlobalC::ucell.atoms[it].jchi[ib]-l+0.5)<1e-4))
-                                    {
-                                       nc=ib;
-                                       break;
+                                double alpha, gamma;
+                                std::complex<double> fup,fdown;
+                                int nc;
+                                //This routine creates two functions only in the case j=l+1/2 or exit in the other case
+                                if(fabs(j-l+0.5<1e-4)) continue;
+                                delete[] chiaux;
+                                chiaux = new double [np];
+                                //Find the functions j= l- 1/2
+                                if(l==0)
+                                    for(int ig=0;ig<np;ig++){
+                                        chiaux[ig] = flq[ig];
                                     }
-                                 }
-                                 for(int ig=0;ig<np;ig++)
-                                 {//Average the two functions
-                                    chiaux[ig] =  l *
-                                         ModuleBase::PolyInt::Polynomial_Interpolation(table_q,
-                                                               it, nc, table_dimension, dq, gk[ig].norm() * GlobalC::ucell.tpiba );
+                                else
+                                {
+                                    for(int ib = 0;ib < GlobalC::ucell.atoms[it].nchi;ib++)
+                                    {
+                                        if((GlobalC::ucell.atoms[it].lchi[ib] == l)&&(fabs(GlobalC::ucell.atoms[it].jchi[ib]-l+0.5)<1e-4))
+                                        {
+                                        nc=ib;
+                                        break;
+                                        }
+                                    }
+                                    for(int ig=0;ig<np;ig++)
+                                    {//Average the two functions
+                                        chiaux[ig] =  l *
+                                            ModuleBase::PolyInt::Polynomial_Interpolation(table_q,
+                                                                it, nc, table_dimension, dq, gk[ig].norm() * GlobalC::ucell.tpiba );
 
-                                    chiaux[ig] += flq[ig] * (l+1.0) ;
-                                    chiaux[ig] *= 1/(2.0*l+1.0);
-                                 }
-                              }
-                              //and construct the starting wavefunctions as in the noncollinear case.
-                              alpha = GlobalC::ucell.magnet.angle1_[it];
-                              gamma = -1 * GlobalC::ucell.magnet.angle2_[it] + 0.5 * ModuleBase::PI;
+                                        chiaux[ig] += flq[ig] * (l+1.0) ;
+                                        chiaux[ig] *= 1/(2.0*l+1.0);
+                                    }
+                                }
+                                //and construct the starting wavefunctions as in the noncollinear case.
+                                //alpha = GlobalC::ucell.magnet.angle1_[it];
+                                //gamma = -1 * GlobalC::ucell.magnet.angle2_[it] + 0.5 * ModuleBase::PI;
+                                alpha = GlobalC::ucell.atoms[it].angle1[ia];
+                                gamma = -1 * GlobalC::ucell.atoms[it].angle2[ia] + 0.5 * ModuleBase::PI;
 
-                              for(int m = 0;m<2*l+1;m++)
-                              {
-                                 const int lm = l*l +m;
-                                 if(index+2*l+1>GlobalC::ucell.natomwfc) ModuleBase::WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
-                                 for(int ig = 0;ig<np;ig++)
-                                 {
-                                     aux[ig] = sk[ig] * ylm(lm,ig) * chiaux[ig];
-                                 }
-                                 //rotate wfc as needed
-                                 //first rotation with angle alpha around (OX)
-                                 for(int ig = 0;ig<np;ig++)
-                                 {
-                                     fup = cos(0.5 * alpha) * aux[ig];
-                                     fdown = ModuleBase::IMAG_UNIT * sin(0.5* alpha) * aux[ig];
-                                     //build the orthogonal wfc
-                                     //first rotation with angle (alpha + ModuleBase::PI) around (OX)
-                                     wfcatom(index,ig) = (cos(0.5 * gamma) + ModuleBase::IMAG_UNIT * sin(0.5*gamma)) * fup;
-                                     wfcatom(index,ig+ this->npwx) = (cos(0.5 * gamma) - ModuleBase::IMAG_UNIT * sin(0.5*gamma)) * fdown;
-                                     //second rotation with angle gamma around(OZ)
-                                     fup = cos(0.5 * (alpha + ModuleBase::PI))*aux[ig];
-                                     fdown = ModuleBase::IMAG_UNIT * sin(0.5 * (alpha + ModuleBase::PI))*aux[ig];
-                                     wfcatom(index+2*l+1,ig) = (cos(0.5*gamma) + ModuleBase::IMAG_UNIT*sin(0.5*gamma))*fup;
-                                     wfcatom(index+2*l+1,ig+ this->npwx) = (cos(0.5*gamma) - ModuleBase::IMAG_UNIT*sin(0.5*gamma))*fdown;
-                                 }
-                                 index++;
-                              }
-                              index += 2*l +1;
+                                for(int m = 0;m<2*l+1;m++)
+                                {
+                                    const int lm = l*l +m;
+                                    if(index+2*l+1>GlobalC::ucell.natomwfc) ModuleBase::WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
+                                    for(int ig = 0;ig<np;ig++)
+                                    {
+                                        aux[ig] = sk[ig] * ylm(lm,ig) * chiaux[ig];
+                                    }
+                                    //rotate wfc as needed
+                                    //first rotation with angle alpha around (OX)
+                                    for(int ig = 0;ig<np;ig++)
+                                    {
+                                        fup = cos(0.5 * alpha) * aux[ig];
+                                        fdown = ModuleBase::IMAG_UNIT * sin(0.5* alpha) * aux[ig];
+                                        //build the orthogonal wfc
+                                        //first rotation with angle (alpha + ModuleBase::PI) around (OX)
+                                        wfcatom(index,ig) = (cos(0.5 * gamma) + ModuleBase::IMAG_UNIT * sin(0.5*gamma)) * fup;
+                                        wfcatom(index,ig+ this->npwx) = (cos(0.5 * gamma) - ModuleBase::IMAG_UNIT * sin(0.5*gamma)) * fdown;
+                                        //second rotation with angle gamma around(OZ)
+                                        fup = cos(0.5 * (alpha + ModuleBase::PI))*aux[ig];
+                                        fdown = ModuleBase::IMAG_UNIT * sin(0.5 * (alpha + ModuleBase::PI))*aux[ig];
+                                        wfcatom(index+2*l+1,ig) = (cos(0.5*gamma) + ModuleBase::IMAG_UNIT*sin(0.5*gamma))*fup;
+                                        wfcatom(index+2*l+1,ig+ this->npwx) = (cos(0.5*gamma) - ModuleBase::IMAG_UNIT*sin(0.5*gamma))*fdown;
+                                    }
+                                    index++;
+                                }
+                                index += 2*l +1;
                             }
                         }
                         else

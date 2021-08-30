@@ -136,7 +136,7 @@ double Magnetism::get_neldw(void)
 //	}
 //	return neldw;
 }
-
+/*
 void Magnetism::cal_ux(const int ntype)
 {
 	double amag, uxmod;
@@ -181,7 +181,7 @@ void Magnetism::cal_ux(const int ntype)
 	}
 	return;
 }
-
+*/
 bool Magnetism::judge_parallel(double a[3], ModuleBase::Vector3<double> b)
 {
    bool jp=false;
