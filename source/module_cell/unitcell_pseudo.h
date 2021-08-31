@@ -5,7 +5,9 @@
 #include "../src_pw/tools.h"
 #include "../src_io/output.h"
 #include "unitcell.h"
+#ifdef __LCAO
 #include "../module_orbital/ORB_read.h"
+#endif
 
 class UnitCell_pseudo : public UnitCell
 {
@@ -48,8 +50,8 @@ public: // member functions
 		std::ofstream &ofs_running,
 		std::ofstream &ofs_warning); // liuyu 2021-07-13, RX changed ofs_running and ofs_warning from globalV to inputs. 2021-07-24
 #ifdef __LCAO
-	void read_atom_species(std::ifstream &ifa, std::ofstream &ofs_running, LCAO_Orbitals &orb);
-	bool read_atom_positions(std::ifstream &ifpos, std::ofstream &ofs_running, std::ofstream &ofs_warning, LCAO_Orbitals &orb); // read in atomic positions
+	void read_atom_species(LCAO_Orbitals &orb, std::ifstream &ifa, std::ofstream &ofs_running);
+	bool read_atom_positions(LCAO_Orbitals &orb, std::ifstream &ifpos, std::ofstream &ofs_running, std::ofstream &ofs_warning); // read in atomic positions
 #else
 	void read_atom_species(std::ifstream &ifa, std::ofstream &ofs_running); // read in the atom information for each type of atom
 	bool read_atom_positions(std::ifstream &ifpos, std::ofstream &ofs_running, std::ofstream &ofs_warning); // read in atomic positions
@@ -57,7 +59,7 @@ public: // member functions
 	int find_type(const std::string &label);
 	void print_tau(void)const;
 #ifdef __LCAO
-	void print_stru_file(const std::string &fn, const LCAO_Orbitals &orb, const int &type=1)const; // mohan add 2011-03-22
+	void print_stru_file(const LCAO_Orbitals &orb, const std::string &fn, const int &type=1)const; // mohan add 2011-03-22
 #else
 	void print_stru_file(const std::string &fn, const int &type=1)const; // mohan add 2011-03-22
 #endif

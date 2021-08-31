@@ -86,7 +86,7 @@ void UnitCell_pseudo::setup_cell(
 			// call read_atom_species
 			//========================
 #ifdef __LCAO
-			this->read_atom_species(ifa, log, orb);
+			this->read_atom_species(orb, ifa, log);
 #else
 			this->read_atom_species(ifa, log);
 #endif
@@ -95,7 +95,7 @@ void UnitCell_pseudo::setup_cell(
 			// call read_atom_positions
 			//==========================
 #ifdef __LCAO
-			ok2 = this->read_atom_positions(ifa, log, GlobalV::ofs_warning, orb);
+			ok2 = this->read_atom_positions(orb, ifa, log, GlobalV::ofs_warning);
 #else
 			ok2 = this->read_atom_positions(ifa, log, GlobalV::ofs_warning);
 #endif
@@ -367,7 +367,7 @@ void UnitCell_pseudo::setup_cell_classic(
 			// call read_atom_species
 			//========================
 #ifdef __LCAO
-			this->read_atom_species(ifa, ofs_running, orb);
+			this->read_atom_species(orb, ifa, ofs_running);
 #else
 			this->read_atom_species(ifa, ofs_running);
 #endif
@@ -375,7 +375,7 @@ void UnitCell_pseudo::setup_cell_classic(
 			// call read_atom_positions
 			//==========================
 #ifdef __LCAO
-			ok2 = this->read_atom_positions(ifa, ofs_running, ofs_warning, orb);
+			ok2 = this->read_atom_positions(orb, ifa, ofs_running, ofs_warning);
 #else
 			ok2 = this->read_atom_positions(ifa, ofs_running, ofs_warning);
 #endif
