@@ -425,8 +425,6 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 								{
 									rho_g3d(3, ig) += swap * (atom->mag[ia] / atom->zv);
 								}
-								if(ig==GlobalC::pw.ngmc/2) 
-								cout<<"ig"<<ig<<"x"<<rho_g3d(1, ig)<<"y"<<rho_g3d(2, ig)<<"z"<<rho_g3d(1, ig)<<"\n";
 							}
 						}
 					}

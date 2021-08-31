@@ -421,7 +421,6 @@ void UnitCell::cal_ux()
         for(int ia=0;ia<atoms[it].na;ia++)
         {
             amag = pow(atoms[it].m_loc_[ia].x,2) + pow(atoms[it].m_loc_[ia].y,2) + pow(atoms[it].m_loc_[ia].z,2);
-            cout<<"amag"<<amag<<"x"<<atoms[it].m_loc_[ia].x<<"y"<<atoms[it].m_loc_[ia].y<<"z"<<atoms[it].m_loc_[ia].z<<'\n';
             if(amag > 1e-6)
             {
                 magnet.ux_[0] = atoms[it].m_loc_[ia].x;
@@ -430,7 +429,6 @@ void UnitCell::cal_ux()
                 starting_it = it;
                 starting_ia = ia;
                 magnet.lsign_ = true;
-                cout<<"un"<<"it"<<it<<"ia"<<ia;
                 break;
             }
         }
@@ -444,7 +442,6 @@ void UnitCell::cal_ux()
             if(it>starting_it || ia>starting_ia)
             {
                 magnet.lsign_ = magnet.lsign_ && judge_parallel(magnet.ux_, atoms[it].m_loc_[ia]);
-                cout<<"unc"<<"it"<<it<<"ia"<<ia;
             }
         }
 		
