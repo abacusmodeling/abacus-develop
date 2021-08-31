@@ -140,7 +140,7 @@ void Force_LCAO_k::allocate_k(void)
 	//-----------------------------
     // tips: build_ST_new --> GlobalC::ParaO.set_force 
 	bool cal_deri = true;
-	GlobalC::UHM.genH.build_ST_new ('S', cal_deri);
+	GlobalC::UHM.genH.build_ST_new ('S', cal_deri, GlobalC::ucell);
 
 	//-----------------------------------------
 	// (2) allocate for <phi | T + Vnl | dphi>
@@ -155,7 +155,7 @@ void Force_LCAO_k::allocate_k(void)
     
     // calculate dT=<phi|kin|dphi> in LCAO
     // calculate T + VNL(P1) in LCAO basis
-    GlobalC::UHM.genH.build_ST_new ('T', cal_deri);
+    GlobalC::UHM.genH.build_ST_new ('T', cal_deri, GlobalC::ucell);
 	//test(GlobalC::LM.DHloc_fixedR_x,"GlobalC::LM.DHloc_fixedR_x T part");
    
    	// calculate dVnl=<phi|dVnl|dphi> in LCAO 
