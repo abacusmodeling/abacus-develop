@@ -620,6 +620,8 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 
                                         string tmpid;
                                         tmpid = ifpos.get();
+										bool input_vec_mag=false;
+										bool input_angle_mag=false;
                                         while ( (tmpid != "\n") && (ifpos.eof()==false) && (tmpid !="#") )
                                         {
                                                 tmpid = ifpos.get() ;
@@ -640,23 +642,49 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
                                                 {
                                                         ifpos >> mv.x >> mv.y >> mv.z ;
                                                 }
-                                                else if ( tmpid == "v" )
+                                                else if ( tmpid == "v" ||tmpid == "vel" || tmpid == "velocity" )
                                                 {
                                                         ifpos >> atoms[it].vel[ia].x >> atoms[it].vel[ia].y >> atoms[it].vel[ia].z;
                                                 }
-												else if ( tmpid == "mag")
+												else if ( tmpid == "mag" || tmpid == "magmom")
 												{
-													ifpos >> atoms[it].mag[ia];
+													double tmpamg=0;
+													ifpos >> tmpamg;
+													tmp=ifpos.get();
+													while (tmp==' ')
+													{
+														tmp=ifpos.get();
+													}
+													
+													cout<<"tmp"<<tmp<<'\n';
+													if((tmp >= 48 && tmp <= 57) or tmp=='-')
+													{
+														ifpos.putback(tmp);
+														ifpos >> atoms[it].m_loc_[ia].y>>atoms[it].m_loc_[ia].z;
+														atoms[it].m_loc_[ia].x=tmpamg;
+														atoms[it].mag[ia]=sqrt(pow(atoms[it].m_loc_[ia].x,2)+pow(atoms[it].m_loc_[ia].y,2)+pow(atoms[it].m_loc_[ia].z,2));
+														input_vec_mag=true;
+														
+													}
+													else
+													{
+														ifpos.putback(tmp);
+														atoms[it].mag[ia]=tmpamg;
+													}
+													
+													// atoms[it].mag[ia];
 												}
 												else if ( tmpid == "angle1")
 												{
 													 ifpos >> atoms[it].angle1[ia];
 													 atoms[it].angle1[ia]=atoms[it].angle1[ia]/180 *ModuleBase::PI;
+													 input_angle_mag=true;
 												}
 												else if ( tmpid == "angle2")
 												{
 													 ifpos >> atoms[it].angle2[ia];
 													 atoms[it].angle2[ia]=atoms[it].angle2[ia]/180 *ModuleBase::PI;
+													 input_angle_mag=true;
 												}
 												
                                         }
@@ -671,12 +699,24 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 					{
 						if(GlobalV::NONCOLIN)
 						{
-							atoms[it].m_loc_[ia].x = atoms[it].mag[ia] *
+							if(input_angle_mag)
+							{
+								atoms[it].m_loc_[ia].x = atoms[it].mag[ia] *
 									sin(atoms[it].angle1[ia]) * cos(atoms[it].angle2[ia]);
-							atoms[it].m_loc_[ia].y = atoms[it].mag[ia] *
+								atoms[it].m_loc_[ia].y = atoms[it].mag[ia] *
 									sin(atoms[it].angle1[ia]) * sin(atoms[it].angle2[ia]);
-							atoms[it].m_loc_[ia].z = atoms[it].mag[ia] *
+								atoms[it].m_loc_[ia].z = atoms[it].mag[ia] *
 									cos(atoms[it].angle1[ia]);
+							}
+							else if (input_vec_mag)
+							{
+								double mxy=sqrt(pow(atoms[it].m_loc_[ia].x,2)+pow(atoms[it].m_loc_[ia].y,2));
+								atoms[it].angle1[ia]=atan2(mxy,atoms[it].m_loc_[ia].z);
+								if(mxy>1e-8)
+									atoms[it].angle2[ia]=atan2(atoms[it].m_loc_[ia].y,atoms[it].m_loc_[ia].x);
+									//cout<<"it"<<it<<"ia"<<ia<<"x"<<atoms[it].m_loc_[ia].x<<"y"<<atoms[it].m_loc_[ia].y<<"z"<<atoms[it].m_loc_[ia].z<<"mag"<<atoms[it].mag[ia]<<"angle1"<<atoms[it].angle1[ia]
+									//<<"angle2"<<atoms[it].angle2[ia]<<'\n';
+							}
 						}
 						else
 						{
