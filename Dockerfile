@@ -18,7 +18,10 @@ RUN cd /tmp \
 
 RUN cd /tmp \
     && git clone https://github.com/xianyi/OpenBLAS.git --single-branch --depth=1 \
-    && cd OpenBLAS && make NO_AVX512=1 FC=gfortran -j8 && make PREFIX=/usr/local install \
+    && cd OpenBLAS \
+    && cmake . \
+    && cmake --build . -j9 \
+    && cmake --install . \
     && cd /tmp && rm -rf OpenBLAS
 
 RUN cd /tmp \
