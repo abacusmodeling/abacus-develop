@@ -1,0 +1,21 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - develop
+      - reconstruction
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container: ghcr.io/deepmodeling/abacus-development-kit:gnu
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build and Test
+        run: |
+          cmake -B build
+          cmake --build build -j4
+          cmake --install build
+          ctest --test-dir build --verbose
