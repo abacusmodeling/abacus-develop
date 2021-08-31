@@ -16,24 +16,24 @@ public:
 
     static int moved;
 
-    static double ddot_real(
+    double ddot_real(
         const int & dim,
         const CUFFT_COMPLEX* psi_L,
         const CUFFT_COMPLEX* psi_R,
         const bool reduce = true) ;
 
-    static CUFFT_COMPLEX ddot(
+    CUFFT_COMPLEX ddot(
         const int & dim,
         const CUFFT_COMPLEX* psi_L,
         const CUFFT_COMPLEX* psi_R ) ;
 
-    static CUFFT_COMPLEX ddot(
+    CUFFT_COMPLEX ddot(
         const int & dim,
         const CUFFT_COMPLEX *psi, // matrix
         const int & m,
         CUFFT_COMPLEX *psik ) ;
 
-    static CUFFT_COMPLEX ddot(
+    CUFFT_COMPLEX ddot(
         const int & dim,
         const CUFFT_COMPLEX *psi_L, // matrix
         const int & m,
@@ -53,7 +53,7 @@ public:
         int &notconv,
         double &avg_iter);
 
-    static void schmit_orth(
+    void schmit_orth(
         const int &dim,
         const int &dmx,
         const int &m,
@@ -65,6 +65,7 @@ public:
 private:
 
     int test_cg;
+    cublasHandle_t diag_handle;
 
     void calculate_gradient(
         const double* precondition,

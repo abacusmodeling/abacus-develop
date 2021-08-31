@@ -95,20 +95,20 @@ void RoundTrip_kernel(const CUFFT_COMPLEX *psi, const double *vr, const int *fft
 
     Reorder_psi_plus(ordered_psi, psic);
 
-    cufftHandle cufftplan_gpu;
-    cufftPlan3d(&cufftplan_gpu, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
-    cufftExecZ2Z(cufftplan_gpu, ordered_psi, ordered_psi, CUFFT_INVERSE);
-    cufftDestroy(cufftplan_gpu);
+    // cufftHandle cufftplan_gpu;
+    // cufftPlan3d(&cufftplan_gpu, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
+    cufftExecZ2Z(GlobalC::UFFT.fft_handle, ordered_psi, ordered_psi, CUFFT_INVERSE);
+    // cufftDestroy(cufftplan_gpu);
 
     // int block3 = GlobalC::pw.nrxx / thread + 1;
     // kernel_normalization<<<block3, thread>>>(GlobalC::pw.nrxx, psic, (double)(GlobalC::pw.nrxx));
 
     kernel_roundtrip<<<block2, thread>>>(GlobalC::pw.nrxx, ordered_psi, vr);
 
-    cufftHandle cufftplan_gpu2;
-    cufftPlan3d(&cufftplan_gpu2, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
-    cufftExecZ2Z(cufftplan_gpu2, ordered_psi, ordered_psi, CUFFT_FORWARD);
-    cufftDestroy(cufftplan_gpu2);
+    // cufftHandle cufftplan_gpu2;
+    // cufftPlan3d(&cufftplan_gpu, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
+    cufftExecZ2Z(GlobalC::UFFT.fft_handle, ordered_psi, ordered_psi, CUFFT_FORWARD);
+    // cufftDestroy(cufftplan_gpu);
 
     Reorder_psi_minus(psic, ordered_psi);
 

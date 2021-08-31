@@ -77,9 +77,15 @@ __global__ void kernel_multi_add(CUFFT_COMPLEX *dst, CUFFT_COMPLEX *src1, double
 Diago_CG_GPU::Diago_CG_GPU()
 {
     test_cg=0;
+    cublasCreate(&diag_handle);
+    // cublasCreate(&ddot_handle);
 }
 
-Diago_CG_GPU::~Diago_CG_GPU() {}
+Diago_CG_GPU::~Diago_CG_GPU() 
+{
+    cublasDestroy(diag_handle);
+    // cublasDestroy(ddot_handle);
+}
 
 void Diago_CG_GPU::diag
 (
@@ -293,8 +299,8 @@ void Diago_CG_GPU::orthogonal_gradient( const int &dim, const int &dmx,
 
     int inc=1;
 
-    cublasHandle_t handle;
-    cublasCreate(&handle);
+    // cublasHandle_t handle;
+    // cublasCreate(&handle);
     cublasOperation_t trans1 = CUBLAS_OP_C;
     // ONE ZERO cufftcomplex?
     // cublasZgemv(handle, trans1, dim, m, ONE, eigenfunction, dmx, sg, inc, ZERO, lagrange, inc);
@@ -302,7 +308,7 @@ void Diago_CG_GPU::orthogonal_gradient( const int &dim, const int &dmx,
     ONE.y = ZERO.x = ZERO.y = 0.0;
     ONE.x = 1.0;
     NEG_ONE.x = -1.0;
-    cublasZgemv(handle, trans1, dim, m, &ONE, eigenfunction, dmx, sg, inc, &ZERO, lagrange, inc);
+    cublasZgemv(diag_handle, trans1, dim, m, &ONE, eigenfunction, dmx, sg, inc, &ZERO, lagrange, inc);
     /*for (int i=0; i<m; i++)
     {
         lagrange[i] = ZERO;
@@ -316,8 +322,8 @@ void Diago_CG_GPU::orthogonal_gradient( const int &dim, const int &dmx,
     // (3) orthogonal |g> and |Sg> to all states (0~m-1)
     cublasOperation_t trans2 = CUBLAS_OP_N;
 
-    cublasZgemv(handle, trans2, dim, m, &NEG_ONE, eigenfunction, dmx, lagrange, inc, &ONE, g, inc);
-    cublasZgemv(handle, trans2, dim, m, &NEG_ONE, eigenfunction, dmx, lagrange, inc, &ONE, sg, inc);
+    cublasZgemv(diag_handle, trans2, dim, m, &NEG_ONE, eigenfunction, dmx, lagrange, inc, &ONE, g, inc);
+    cublasZgemv(diag_handle, trans2, dim, m, &NEG_ONE, eigenfunction, dmx, lagrange, inc, &ONE, sg, inc);
 
     /*for (int i=0; i<m; i++)
     {
@@ -330,7 +336,7 @@ void Diago_CG_GPU::orthogonal_gradient( const int &dim, const int &dmx,
     }*/
 
     ModuleBase::timer::tick("Diago_CG_GPU","orth_grad");
-    cublasDestroy(handle);
+    // cublasDestroy(handle);
     return;
 }
 
@@ -517,20 +523,20 @@ void Diago_CG_GPU::schmit_orth
     int inc=1;
     int mp1 = m+1;
 
-    cublasHandle_t handle;
-    cublasCreate(&handle);
+    // cublasHandle_t handle;
+    // cublasCreate(&handle);
     cublasOperation_t trans1 = CUBLAS_OP_C;
 
     CUFFT_COMPLEX ONE, ZERO, NEG_ONE;
     ONE.y = ZERO.x = ZERO.y = 0.0;
     ONE.x = 1.0;
     NEG_ONE.x = -1.0;
-    cublasZgemv(handle, trans1, dim, mp1, &ONE, psi, dmx, sphi, inc, &ZERO, lagrange, inc);
+    cublasZgemv(diag_handle, trans1, dim, mp1, &ONE, psi, dmx, sphi, inc, &ZERO, lagrange, inc);
 
     double psi_norm;
     CHECK_CUDA(cudaMemcpy(&psi_norm, &lagrange[m], sizeof(double), cudaMemcpyDeviceToHost));
     cublasOperation_t trans2 = CUBLAS_OP_N;
-    cublasZgemv(handle, trans2, dim, m, &NEG_ONE, psi, dmx, lagrange, inc, &ONE, psi_m, inc);
+    cublasZgemv(diag_handle, trans2, dim, m, &NEG_ONE, psi, dmx, lagrange, inc, &ONE, psi_m, inc);
 
     psi_norm -= ddot_real(m, lagrange, lagrange); //next
     psi_norm = sqrt(psi_norm);
@@ -541,7 +547,7 @@ void Diago_CG_GPU::schmit_orth
 
     GlobalC::hm.hpw.s_1psi_gpu(dim, psi_m, sphi);
 
-    cublasDestroy(handle);
+    // cublasDestroy(handle);
     ModuleBase::timer::tick("Diago_CG_GPU","schmit_orth");
     CHECK_CUDA(cudaFree(lagrange));
     return ;
@@ -557,11 +563,11 @@ double Diago_CG_GPU::ddot_real
 )
 {
     int dim2=2*dim;
-    cublasHandle_t handle;
-    cublasCreate(&handle);
+    // cublasHandle_t handle;
+    // cublasCreate(&handle);
     double result;
-    cublasDdot(handle, dim2, (double*)psi_L, 1, (double*)psi_R, 1, &result);
-    cublasDestroy(handle);
+    cublasDdot(diag_handle, dim2, (double*)psi_L, 1, (double*)psi_R, 1, &result);
+    // cublasDestroy(handle);
     return result;
 }
 
@@ -576,12 +582,12 @@ CUFFT_COMPLEX Diago_CG_GPU::ddot
     // {
     //     result += conj(psi_L[i]) *  psi_R[i] ;
     // }
-    cublasHandle_t handle;
-    cublasCreate(&handle);
+    // cublasHandle_t handle;
+    // cublasCreate(&handle);
     CUFFT_COMPLEX result;
-    cublasZdotc(handle, dim, psi_L, 1, psi_R, 1, &result);
+    cublasZdotc(diag_handle, dim, psi_L, 1, psi_R, 1, &result);
     // Parallel_Reduce::reduce_complex_double_pool( result );
-    cublasDestroy(handle);
+    // cublasDestroy(handle);
     return result;
 }  // end of ddot
 
@@ -599,12 +605,12 @@ CUFFT_COMPLEX Diago_CG_GPU::ddot
     // {
     //     result += conj(psi(m, i)) *  psik[i] ;
     // }
-    cublasHandle_t handle;
-    cublasCreate(&handle);
+    // cublasHandle_t handle;
+    // cublasCreate(&handle);
     CUFFT_COMPLEX result;
-    cublasZdotc(handle, dim, &psi[m*dim], 1, psik, 1, &result);
+    cublasZdotc(diag_handle, dim, &psi[m*dim], 1, psik, 1, &result);
     // Parallel_Reduce::reduce_complex_double_pool( result );
-    cublasDestroy(handle);
+    // cublasDestroy(handle);
     return result;
 }  // end of ddot
 
@@ -625,12 +631,12 @@ CUFFT_COMPLEX Diago_CG_GPU::ddot
     // {
     //     result += conj( psi_L(m,i) ) * psi_R(n,i) ;
     // }
-    cublasHandle_t handle;
-    cublasCreate(&handle);
+    // cublasHandle_t handle;
+    // cublasCreate(&handle);
     CUFFT_COMPLEX result;
-    cublasZdotc(handle, dim, &psi_L[m*dim], 1, &psi_R[n*dim], 1, &result);
+    cublasZdotc(diag_handle, dim, &psi_L[m*dim], 1, &psi_R[n*dim], 1, &result);
     // Parallel_Reduce::reduce_complex_double_pool( result );
 
-    cublasDestroy(handle);
+    // cublasDestroy(handle);
     return result;
 } // end of ddot

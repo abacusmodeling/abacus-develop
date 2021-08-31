@@ -88,6 +88,7 @@ public:
 
 #ifdef __CUDA
     int *GR_index_d;
+    cublasHandle_t my_handle;
 #endif
 
 	// add contributions of h*psi from
