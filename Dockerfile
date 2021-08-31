@@ -21,7 +21,7 @@ RUN cd /tmp \
     && cd OpenBLAS && mkdir build && cd build \
     && cmake .. \
     && cmake --build . -j9 \
-    && cmake --install . --prefix /opt \
+    && cmake --install . --prefix /usr/local \
     && cd /tmp && rm -rf OpenBLAS
 
 RUN cd /tmp \
