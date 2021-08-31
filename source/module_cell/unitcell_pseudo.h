@@ -69,7 +69,7 @@ public: // member functions
 	bool set_atom_flag;//added on 2009-3-8 by mohan
 
 	// read in pseudopotential from files for each type of atom
-	void read_cell_pseudopots(const std::string &fn);
+	void read_cell_pseudopots(const std::string &fn, std::ofstream &log);
 
 	//================================================================
 	// cal_natomwfc : calculate total number of atomic wavefunctions
@@ -77,10 +77,10 @@ public: // member functions
 	// cal_nelec    : calculate total number of electrons
 	// cal_meshx	: calculate max number of mesh points in pp file
 	//================================================================
-	void cal_nwfc();
+	void cal_nwfc(std::ofstream &log);
 	//void cal_nelec();
 	void cal_meshx();
-	void cal_natomwfc(); 
+	void cal_natomwfc(std::ofstream &log); 
 	void print_unitcell_pseudo(const std::string &fn, output &outp);
 	bool check_tau(void)const; //mohan add 2011-03-03
 	bool if_atoms_can_move()const;

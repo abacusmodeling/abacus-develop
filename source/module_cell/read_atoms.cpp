@@ -85,9 +85,9 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 				//-----------------------------------
 				//orb.nonlocal_file.push_back(nfile);
 
-//				GlobalV::ofs_running << " For atom type " << i + 1 << std::endl;
-//			    GlobalV::ofs_running << " Read in numerical orbitals from file " << ofile << std::endl;
-//			    GlobalV::ofs_running << " Read in nonlocal projectors from file " << nfile << std::endl;
+//				ofs_running << " For atom type " << i + 1 << std::endl;
+//			    ofs_running << " Read in numerical orbitals from file " << ofile << std::endl;
+//			    ofs_running << " Read in nonlocal projectors from file " << nfile << std::endl;
 				
 			}
 		}	
