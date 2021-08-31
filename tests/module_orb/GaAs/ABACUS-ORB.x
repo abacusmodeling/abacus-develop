@@ -1,1 +1,1 @@
-../../../source/module_orbital/ABACUS-ORB.x
+../src/ABACUS-ORB.x
