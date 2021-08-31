@@ -194,7 +194,7 @@ int Pseudopot_upf::average_p(const double& lambda)
 					if(abs(this->jjj[old_nbeta+1]-this->lll[old_nbeta+1]-0.5)>1e-6) 
 					{
 						error = 1;
-						cout<<"warning_quit! error beta function 1 !" <<endl;
+						std::cout<<"warning_quit! error beta function 1 !" <<endl;
 						return error;
 					}
 					ind = old_nbeta +1;
@@ -205,20 +205,21 @@ int Pseudopot_upf::average_p(const double& lambda)
 					if(abs(this->jjj[old_nbeta+1]-this->lll[old_nbeta+1]+0.5)>1e-6)
 					{
 						error = 1;
-						cout<<"warning_quit! error beta function 2 !" <<endl;
+						std::cout<<"warning_quit! error beta function 2 !" <<endl;
 						return error;
 					}
 					ind = old_nbeta;
 					ind1 = old_nbeta +1;
 				}
 				double vion1 = ((l+1.0) * this->dion(ind,ind) + l * this->dion(ind1,ind1)) / (2.0*l+1.0);
+				if(std::abs(vion1)<1.0e-8) vion1 = 0.1;
 				//average beta (betar)
 				for(int ir = 0; ir<this->mesh;ir++)
 				{
 					this->beta(nb, ir) = 1.0 / (2.0 * l + 1.0) * 
-							( (l + 1.0) * sqrt(this->dion(ind,ind) / vion1) *
+							( (l + 1.0) * sqrt(std::abs(this->dion(ind,ind) / vion1)) *
 							this->beta(ind, ir) + 
-							l * sqrt(this->dion(ind1,ind1) / vion1) *
+							l * sqrt(std::abs(this->dion(ind1,ind1) / vion1)) *
 							this->beta(ind1, ir) ) ;
 				}
 				//average the dion matrix
@@ -260,7 +261,7 @@ int Pseudopot_upf::average_p(const double& lambda)
 		}
 
 		this->nwfc = new_nwfc;
-		int old_nwfc=0;
+		int old_nwfc=-1;
 		for(int nb=0; nb<this->nwfc; nb++)
 		{
 			old_nwfc++;
@@ -271,7 +272,7 @@ int Pseudopot_upf::average_p(const double& lambda)
 				if(abs(this->jchi[old_nwfc] - this->lchi[old_nwfc] + 0.5) < 1e-6)
 				{
 					if(abs(this->jchi[old_nwfc+1]-this->lchi[old_nwfc+1]-0.5)>1e-6) 
-					{error++; cout<<"warning_quit! error chi function 1 !"<<endl; return error;}
+					{error++; std::cout<<"warning_quit! error chi function 1 !"<<endl; return error;}
 	//					ModuleBase::WARNING_QUIT("average_p", "error chi function 1 !");
 					ind = old_nwfc +1;
 					ind1 = old_nwfc;
@@ -279,7 +280,7 @@ int Pseudopot_upf::average_p(const double& lambda)
 				else
 				{
 					if(abs(this->jchi[old_nwfc+1]-this->lchi[old_nwfc+1]+0.5)>1e-6)
-					{error++; cout<<"warning_quit! error chi function 2 !"<<endl; return error;}
+					{error++; std::cout<<"warning_quit! error chi function 2 !"<<endl; return error;}
 	//					ModuleBase::WARNING_QUIT("average_p", "error chi function 2 !");
 					ind = old_nwfc;
 					ind1 = old_nwfc +1;
@@ -314,7 +315,7 @@ int Pseudopot_upf::average_p(const double& lambda)
 					if(abs(this->jjj[nb+1]-this->lll[nb+1]-0.5)>1e-6) 
 					{
 						error = 1;
-						cout<<"warning_quit! error beta function 1 !" <<endl;
+						std::cout<<"warning_quit! error beta function 1 !" <<endl;
 						return error;
 					}
 					ind = nb +1;
@@ -325,17 +326,17 @@ int Pseudopot_upf::average_p(const double& lambda)
 					if(abs(this->jjj[nb+1]-this->lll[nb+1]+0.5)>1e-6)
 					{
 						error = 1;
-						cout<<"warning_quit! error beta function 2 !" <<endl;
+						std::cout<<"warning_quit! error beta function 2 !" <<endl;
 						return error;
 					}
 					ind = nb;
 					ind1 = nb +1;
 				}
 				double vion1 = ((l+1.0) * this->dion(ind,ind) + l * this->dion(ind1,ind1)) / (2.0*l+1.0);
-				if(abs(vion1)<1.0e-10) vion1 = 1.0e-10;
+				if(abs(vion1)<1.0e-10) vion1 = 0.1;
 				//average beta (betar)
-				const double sqrtDplus = sqrt(this->dion(ind,ind) / vion1);
-				const double sqrtDminus = sqrt(this->dion(ind1,ind1) / vion1);
+				const double sqrtDplus = sqrt(std::abs(this->dion(ind,ind) / vion1));
+				const double sqrtDminus = sqrt(std::abs(this->dion(ind1,ind1) / vion1));
 				this->dion(ind, ind) = vion1;
 				this->dion(ind1, ind1) = vion1;
 				for(int ir = 0; ir<this->mesh;ir++)
@@ -366,14 +367,14 @@ int Pseudopot_upf::average_p(const double& lambda)
 				if(abs(this->jchi[nb] - this->lchi[nb] + 0.5) < 1e-6)
 				{
 					if(abs(this->jchi[nb+1]-this->lchi[nb+1]-0.5)>1e-6) 
-					{error++; cout<<"warning_quit! error chi function 1 !"<<endl; return error;}
+					{error++; std::cout<<"warning_quit! error chi function 1 !"<<endl; return error;}
 					ind = nb +1;
 					ind1 = nb;
 				}
 				else
 				{
 					if(abs(this->jchi[nb+1]-this->lchi[nb+1]+0.5)>1e-6)
-					{error++; cout<<"warning_quit! error chi function 2 !"<<endl; return error;}
+					{error++; std::cout<<"warning_quit! error chi function 2 !"<<endl; return error;}
 					ind = nb;
 					ind1 = nb +1;
 				}

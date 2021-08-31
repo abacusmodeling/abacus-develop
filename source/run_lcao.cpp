@@ -22,7 +22,11 @@ void Run_lcao::lcao_line(void)
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
     // cell relaxation. b) put GlobalV::NLOCAL and GlobalV::NBANDS as input parameters
+#ifdef __LCAO
+    GlobalC::ucell.setup_cell( GlobalC::ORB, GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
+#else
     GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
+#endif
 	if(INPUT.test_just_neighbor)
 	{
 		//test_search_neighbor();
