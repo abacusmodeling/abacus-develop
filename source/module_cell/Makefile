@@ -5,18 +5,27 @@
 #==========================
 CPLUSPLUS     = icpc
 CPLUSPLUS_MPI = mpiicpc
+FFTW_DIR = /home/liwenfei/codes/FFTW3
 OBJ_DIR = cell_obj
 NP      = 8
 
 #==========================
 # LIBS and INCLUDES
 #==========================
-LIBS = -lifcore -lm -lpthread
+LIBS = -lifcore -lm -lpthread ${FFTW_LIB}
+
+#==========================
+# FFTW package needed 
+#==========================
+HONG_FFTW        = -D__FFTW3
+FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
+FFTW_LIB_DIR     = ${FFTW_DIR}/lib
+FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
 
 #==========================
 # OPTIMIZE OPTIONS
 #==========================
-INCLUDES = -I. -Icommands 
+INCLUDES = -I. -Icommands -I${FFTW_INCLUDE_DIR}
 
 # -pedantic turns off more extensions and generates more warnings
 # -xHost generates instructions for the highest instruction set available on the compilation host processor
@@ -28,13 +37,16 @@ VPATH=../module_base\
 :../src_io\
 :../src_pw\
 :../src_parallel\
+:../module_orbital\
 :./\
 :../\
 
 #==========================
 # Define HONG
 #==========================
-HONG= -DMETIS -DMKL_ILP64 -D__MPI -D__CELL -D__NORMAL
+HONG= -DMETIS -DMKL_ILP64 -D__CELL -D__NORMAL ${HONG_FFTW} -D__ORBITAL
+#HONG= -DMETIS -DMKL_ILP64 -D__CELL -D__NORMAL -D__LCAO ${HONG_FFTW} -D__ORBITAL
+HONG_MPI= -DMETIS -DMKL_ILP64 -D__MPI -D__CELL -D__NORMAL -D__LCAO
 
 FP_OBJS_0=main.o\
 $(OBJS_MAIN)\
@@ -43,6 +55,7 @@ $(OBJS_PW)\
 $(OBJS_BASE)\
 $(OBJS_CELL)\
 $(OBJS_PARALELL)\
+$(OBJS_ORB)\
 
 FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})
 
@@ -51,7 +64,7 @@ FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})
 #==========================
 cell : 
 	@ make init
-	@ make -j $(NP) parallel
+	@ make -j $(NP) serial
 
 init :
 	@ if [ ! -d $(OBJ_DIR) ]; then mkdir $(OBJ_DIR); fi
@@ -60,11 +73,14 @@ init :
 parallel : ${FP_OBJS} 
 	${CPLUSPLUS_MPI} ${OPTS} $(FP_OBJS) ${LIBS} -o ${VERSION}.x 
 
+serial : ${FP_OBJS} 
+	${CPLUSPLUS} ${OPTS} $(FP_OBJS) ${LIBS} -o ${VERSION}.x 
+
 #==========================
 # rules
 #==========================
 ${OBJ_DIR}/%.o:%.cpp
-	${CPLUSPLUS_MPI} ${OPTS} ${OPTS_MPI} -c ${HONG} $< -o $@
+	${CPLUSPLUS} ${OPTS} -c ${HONG} $< -o $@
 
 .PHONY:clean
 clean:

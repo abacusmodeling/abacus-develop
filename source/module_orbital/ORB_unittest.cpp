@@ -5,9 +5,7 @@
 #include "../module_base/global_function.h"	
 
 test_orb::test_orb()
-{
-	ofs_running.open("log.txt");
-}
+{}
 
 test_orb::~test_orb()
 {}

@@ -24,6 +24,7 @@ void calculate()
 
 	test_orb test;
 
+	test.ofs_running.open("log.txt");
 	test.count_ntype();
 	test.set_files();
 	test.set_ekcut();
