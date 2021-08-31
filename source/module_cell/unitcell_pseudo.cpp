@@ -24,6 +24,9 @@ UnitCell_pseudo::~UnitCell_pseudo()
 //Calculate various lattice related quantities for given latvec
 //==============================================================
 void UnitCell_pseudo::setup_cell(
+#ifdef __LCAO
+		LCAO_Orbitals &orb,
+#endif
 		const std::string &s_pseudopot_dir,
 		output &outp,  
 		const std::string &fn,
@@ -64,32 +67,40 @@ void UnitCell_pseudo::setup_cell(
 		if(ok)
 		{
 
-			GlobalV::ofs_running << "\n\n\n\n";
-			GlobalV::ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
-			GlobalV::ofs_running << " |                                                                    |" << std::endl;
-			GlobalV::ofs_running << " | Reading atom information in unitcell:                              |" << std::endl;
-			GlobalV::ofs_running << " | From the input file and the structure file we know the number of   |" << std::endl;
-			GlobalV::ofs_running << " | different elments in this unitcell, then we list the detail        |" << std::endl;
-			GlobalV::ofs_running << " | information for each element, especially the zeta and polar atomic |" << std::endl;
-			GlobalV::ofs_running << " | orbital number for each element. The total atom number is counted. |" << std::endl;
-			GlobalV::ofs_running << " | We calculate the nearest atom distance for each atom and show the  |" << std::endl;
-			GlobalV::ofs_running << " | Cartesian and Direct coordinates for each atom. We list the file   |" << std::endl;
-			GlobalV::ofs_running << " | address for atomic orbitals. The volume and the lattice vectors    |" << std::endl;
-			GlobalV::ofs_running << " | in real and reciprocal space is also shown.                        |" << std::endl;
-			GlobalV::ofs_running << " |                                                                    |" << std::endl;
-			GlobalV::ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
-			GlobalV::ofs_running << "\n\n\n\n";
+			log << "\n\n\n\n";
+			log << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
+			log << " |                                                                    |" << std::endl;
+			log << " | Reading atom information in unitcell:                              |" << std::endl;
+			log << " | From the input file and the structure file we know the number of   |" << std::endl;
+			log << " | different elments in this unitcell, then we list the detail        |" << std::endl;
+			log << " | information for each element, especially the zeta and polar atomic |" << std::endl;
+			log << " | orbital number for each element. The total atom number is counted. |" << std::endl;
+			log << " | We calculate the nearest atom distance for each atom and show the  |" << std::endl;
+			log << " | Cartesian and Direct coordinates for each atom. We list the file   |" << std::endl;
+			log << " | address for atomic orbitals. The volume and the lattice vectors    |" << std::endl;
+			log << " | in real and reciprocal space is also shown.                        |" << std::endl;
+			log << " |                                                                    |" << std::endl;
+			log << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
+			log << "\n\n\n\n";
 
-			GlobalV::ofs_running << " READING UNITCELL INFORMATION" << std::endl;
+			log << " READING UNITCELL INFORMATION" << std::endl;
 			//========================
 			// call read_atom_species
 			//========================
-			this->read_atom_species(ifa, GlobalV::ofs_running);
+#ifdef __LCAO
+			this->read_atom_species(ifa, log, orb);
+#else
+			this->read_atom_species(ifa, log);
+#endif
 
 			//==========================
 			// call read_atom_positions
 			//==========================
-			ok2 = this->read_atom_positions(ifa, GlobalV::ofs_running, GlobalV::ofs_warning);
+#ifdef __LCAO
+			ok2 = this->read_atom_positions(ifa, log, GlobalV::ofs_warning, orb);
+#else
+			ok2 = this->read_atom_positions(ifa, log, GlobalV::ofs_warning);
+#endif
 
 			if(ok2)
 			{
@@ -123,7 +134,7 @@ void UnitCell_pseudo::setup_cell(
 
 	// mohan add 2010-09-29
 	#ifdef __LCAO
-	GlobalC::ORB.bcast_files(ntype, GlobalV::MY_RANK);
+	orb.bcast_files(ntype, GlobalV::MY_RANK);
 	#endif
 #endif
 	
@@ -140,9 +151,9 @@ void UnitCell_pseudo::setup_cell(
 	}
 	else
 	{
-		GlobalV::ofs_running << std::endl;
-		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Volume (Bohr^3)", this->omega);
-		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Volume (A^3)", this->omega * pow(ModuleBase::BOHR_TO_A, 3));
+		log << std::endl;
+		ModuleBase::GlobalFunc::OUT(log,"Volume (Bohr^3)", this->omega);
+		ModuleBase::GlobalFunc::OUT(log,"Volume (A^3)", this->omega * pow(ModuleBase::BOHR_TO_A, 3));
 	}
 		
 	//==========================================================
@@ -160,31 +171,31 @@ void UnitCell_pseudo::setup_cell(
     this->GGT0 = G * GT;
     this->invGGT0 = GGT.Inverse();
 
-	GlobalV::ofs_running << std::endl;
-	outp.printM3(GlobalV::ofs_running,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec); 
-	outp.printM3(GlobalV::ofs_running,"Reciprocal vectors: (Cartesian coordinate: in unit of 2 pi/a_0)",G);
-//	OUT(GlobalV::ofs_running,"lattice center x",latcenter.x);
-//	OUT(GlobalV::ofs_running,"lattice center y",latcenter.y);
-//	OUT(GlobalV::ofs_running,"lattice center z",latcenter.z);
+	log << std::endl;
+	outp.printM3(log,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec); 
+	outp.printM3(log,"Reciprocal vectors: (Cartesian coordinate: in unit of 2 pi/a_0)",G);
+//	OUT(log,"lattice center x",latcenter.x);
+//	OUT(log,"lattice center y",latcenter.y);
+//	OUT(log,"lattice center z",latcenter.z);
 
 	// read in non-local pseudopotential and ouput the projectors.
 
-	GlobalV::ofs_running << "\n\n\n\n";
-	GlobalV::ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
-	GlobalV::ofs_running << " |                                                                    |" << std::endl;
-	GlobalV::ofs_running << " | Reading pseudopotentials files:                                    |" << std::endl;
-	GlobalV::ofs_running << " | The pseudopotential file is in UPF format. The 'NC' indicates that |" << std::endl;
-	GlobalV::ofs_running << " | the type of pseudopotential is 'norm conserving'. Functional of    |" << std::endl;
-	GlobalV::ofs_running << " | exchange and correlation is decided by 4 given parameters in UPF   |" << std::endl;
-	GlobalV::ofs_running << " | file.  We also read in the 'core correction' if there exists.      |" << std::endl;
-	GlobalV::ofs_running << " | Also we can read the valence electrons number and the maximal      |" << std::endl;
-	GlobalV::ofs_running << " | angular momentum used in this pseudopotential. We also read in the |" << std::endl;
-	GlobalV::ofs_running << " | trail wave function, trail atomic density and local-pseudopotential|" << std::endl;
-	GlobalV::ofs_running << " | on logrithmic grid. The non-local pseudopotential projector is also|" << std::endl;
-	GlobalV::ofs_running << " | read in if there is any.                                           |" << std::endl;
-	GlobalV::ofs_running << " |                                                                    |" << std::endl;
-	GlobalV::ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
-	GlobalV::ofs_running << "\n\n\n\n";
+	log << "\n\n\n\n";
+	log << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
+	log << " |                                                                    |" << std::endl;
+	log << " | Reading pseudopotentials files:                                    |" << std::endl;
+	log << " | The pseudopotential file is in UPF format. The 'NC' indicates that |" << std::endl;
+	log << " | the type of pseudopotential is 'norm conserving'. Functional of    |" << std::endl;
+	log << " | exchange and correlation is decided by 4 given parameters in UPF   |" << std::endl;
+	log << " | file.  We also read in the 'core correction' if there exists.      |" << std::endl;
+	log << " | Also we can read the valence electrons number and the maximal      |" << std::endl;
+	log << " | angular momentum used in this pseudopotential. We also read in the |" << std::endl;
+	log << " | trail wave function, trail atomic density and local-pseudopotential|" << std::endl;
+	log << " | on logrithmic grid. The non-local pseudopotential projector is also|" << std::endl;
+	log << " | read in if there is any.                                           |" << std::endl;
+	log << " |                                                                    |" << std::endl;
+	log << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
+	log << "\n\n\n\n";
 
 
 	this->read_cell_pseudopots(s_pseudopot_dir);
@@ -308,6 +319,9 @@ void UnitCell_pseudo::setup_cell(
 }
 
 void UnitCell_pseudo::setup_cell_classic(
+#ifdef __LCAO
+		LCAO_Orbitals &orb,
+#endif
 	const std::string &fn,
 	std::ofstream &ofs_running,
 	std::ofstream &ofs_warning)
@@ -354,11 +368,19 @@ void UnitCell_pseudo::setup_cell_classic(
 			//========================
 			// call read_atom_species
 			//========================
+#ifdef __LCAO
+			this->read_atom_species(ifa, ofs_running, orb);
+#else
 			this->read_atom_species(ifa, ofs_running);
+#endif
 			//==========================
 			// call read_atom_positions
 			//==========================
+#ifdef __LCAO
+			ok2 = this->read_atom_positions(ifa, ofs_running, ofs_warning, orb);
+#else
 			ok2 = this->read_atom_positions(ifa, ofs_running, ofs_warning);
+#endif
 			if(ok2)
 			{
 				for(int i=0;i<this->ntype;i++)
@@ -660,9 +682,9 @@ void UnitCell_pseudo::setup_cell_after_vc(
     }
     else
     {
-        GlobalV::ofs_running << std::endl;
-        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Volume (Bohr^3)", this->omega);
-        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "Volume (A^3))", this->omega * pow(ModuleBase::BOHR_TO_A, 3));
+        log << std::endl;
+        ModuleBase::GlobalFunc::OUT(log, "Volume (Bohr^3)", this->omega);
+        ModuleBase::GlobalFunc::OUT(log, "Volume (A^3))", this->omega * pow(ModuleBase::BOHR_TO_A, 3));
     }
 
     //==========================================================
@@ -700,9 +722,9 @@ Parallel_Common::bcast_double( atom->taud[ia].z );
     }
 #endif
 
-    GlobalV::ofs_running << std::endl;
-    outp.printM3(GlobalV::ofs_running,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec);
-    outp.printM3(GlobalV::ofs_running,"Reciprocal vectors: (Cartesian coordinate: in unit of 2 pi/a_0)",G);
+    log << std::endl;
+    outp.printM3(log,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec);
+    outp.printM3(log,"Reciprocal vectors: (Cartesian coordinate: in unit of 2 pi/a_0)",G);
 
     return;
 }

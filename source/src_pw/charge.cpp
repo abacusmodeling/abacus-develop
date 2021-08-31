@@ -1236,14 +1236,15 @@ void Charge::cal_nelec(void)
 			{
 				const int nbands1 = static_cast<int>(occupied_bands) + 10;
 				const int nbands2 = static_cast<int>(1.2 * occupied_bands);
-				GlobalV::NBANDS = max(nbands1, nbands2);
+				GlobalV::NBANDS = std::max(nbands1, nbands2);
+				if(GlobalV::BASIS_TYPE!="pw") GlobalV::NBANDS = std::min(GlobalV::NBANDS, GlobalV::NLOCAL);
 			}
 			else if (GlobalV::NSPIN ==2 || GlobalV::NSPIN == 4)
 			{
 				const int nbands3 = nelec + 20;
 				const int nbands4 = 1.2 * nelec;
-				GlobalV::NBANDS = max(nbands3, nbands4);
-				if(GlobalV::BASIS_TYPE!="pw") GlobalV::NBANDS = min(GlobalV::NBANDS, GlobalV::NLOCAL);
+				GlobalV::NBANDS = std::max(nbands3, nbands4);
+				if(GlobalV::BASIS_TYPE!="pw") GlobalV::NBANDS = std::min(GlobalV::NBANDS, GlobalV::NLOCAL);
 			}
 			ModuleBase::GlobalFunc::AUTO_SET("NBANDS",GlobalV::NBANDS);
 		}
