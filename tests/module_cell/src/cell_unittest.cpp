@@ -97,7 +97,6 @@ void test_cell::count_ntype()
 #ifdef __LCAO
 void test_cell_orb::build_ST_new(const char& dtype, const bool& calc_deri)
 {
-/*
     //array to store data
     double olm[3]={0.0,0.0,0.0};
 	int nnr = 0; // used onlyh for k points.
@@ -148,11 +147,13 @@ void test_cell_orb::build_ST_new(const char& dtype, const bool& calc_deri)
 							// so, here we use ParaO::in_this_processor,
 							// in build_Non... use trace_loc_row
 							// and trace_loc_col directly,
+/*
 							if ( !GlobalC::ParaO.in_this_processor(iw1_all,iw2_all) )
 							{
 								++iw2_all;
 								continue;
 							}
+*/
 
 							olm[0] = olm[1] = olm[2] = 0.0;
 
@@ -308,7 +309,6 @@ void test_cell_orb::build_ST_new(const char& dtype, const bool& calc_deri)
 			ModuleBase::WARNING_QUIT("LCAO_gen_fixedH::build_ST_new","nnr != GlobalC::LNNR.nnr");
 		}
 	}
-*/
     return;
 }
 #endif
