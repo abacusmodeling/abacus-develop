@@ -1,0 +1,9 @@
+ In SCAN_BEGIN, can't find: NUMERICAL_DESCRIPTOR block.
+ In SCAN_BEGIN, can't find: LATTICE_PARAMETERS block.
+ In SCAN_BEGIN, can't find: <PP_SPIN_ORB> block.
+ In SCAN_END, can't find: </PP_SPIN_ORB> block.
+ In SCAN_END, can't find: </UPF> block.
+ In SCAN_BEGIN, can't find: <PP_SPIN_ORB> block.
+ In SCAN_END, can't find: </PP_SPIN_ORB> block.
+ In SCAN_END, can't find: </UPF> block.
+ AUTO_SET NBANDS to 0
