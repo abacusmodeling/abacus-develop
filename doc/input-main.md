@@ -47,8 +47,6 @@
 
     - [DFT+U correction](#DFT_U-correction)
 
-    -[Start magnetization](#Start-magnetization)
-
     - [VdW correction](#vdw-correction)
 
         [vdw_method](#vdw-method) | [vdw_s6](#vdw-s6) | [vdw_s8](#vdw-s8) | [vdw_a1](#vdw-a1) | [vdw_a2](#vdw-a2) | [vdw_d](#vdw-d) | [vdw_abc](#vdw-abc) | [vdw_C6_file](#vdw-C6-file) | [vdw_C6_unit](#vdw-C6-unit) | [vdw_R0_file](#vdw-R0-file) | [vdw_R0_unit](#vdw-R0-unit) | [vdw_model](#vdw-model) | [vdw_radius](#vdw-radius) | [vdw_radius_unit](#vdw-radius-unit) | [vdw_cn_radius](#vdw-cn-radius) | [vdw_cn_radius_unit](#vdw-cn-radius-unit) | [vdw_period](#vdw-period)
@@ -1208,13 +1206,6 @@ This part of variables are used to control DFT+U correlated parameters
     - *Description*: whether turn on occupation matrix control method or not
     - *Default*: 0
 
-    [back to top](#input-file)
-
-### Start magnetization
-- magmom
-    - *Type*: Real
-    - *Description*: This set the start magnetization for each atom. The input magmom should be seperated by space and in the same order of STRU file. Different atoms with same magetic moment could be abbreviated as n\*magmom(NOTICE:No space before and after '\*').If one set the start magnetization here, they MUST NOT be specified again in STRU file(In STRU file, one could only set magnetic moment for each type of atom, but here setting different magnetic moment for the same kind of atom is allowed).
-    - *Default*: 0.0
     [back to top](#input-file)
 
 
