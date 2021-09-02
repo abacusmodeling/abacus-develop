@@ -206,9 +206,14 @@ information that comes below.
     - `mag` or `magmom` : set the start magnetization for each atom. In colinear case only one number should be given. In non-colinear case one have two choice:either set one number for the norm of magnetization here and specify two polar angle later, or set three number for the xyz commponent of magnetization here.
     - `angle1`: in non-colinear case, specify the angle between c-axis and real spin, in angle measure instead of radian measure
     - `angle2`: in non-colinear case, specify angle between a-axis and real spin in projection in ab-plane , in angle measure instead of radian measure
-    example:
+
+    e.g.:
     ```
-    0.0 0.0 0.0 0 0 0 mag 1 angle1 90 angle2 0
+    Fe
+    1
+    2
+    0.0 0.0 0.0 0 0 0 angle1 90 angle2 0
+    0.5 0.5 0.5 0 0 0 angle1 90 angle2 180
     ```
 
 [back to top](#stru-file)
