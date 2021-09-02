@@ -28,7 +28,7 @@ void calculate()
 {
 	//std::ofstream ofs("log.txt");
 	std::ofstream ofs_running("log.txt");
-	std::ofstream ofs("useless.txt");
+	//std::ofstream ofs("useless.txt");
 	std::ofstream ofs_warning("warning.txt");
 	std::ifstream ifs("INPUT");
 	UnitCell_pseudo ucell;
@@ -39,8 +39,6 @@ void calculate()
 	output out;
 	ucell.setup_cell_classic(
 	"STRU", 
-	out, 
-	ofs,
 	ofs_running,
 	ofs_warning);
 	std::cout << "set up cell classic done." << std::endl;
