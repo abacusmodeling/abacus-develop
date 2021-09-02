@@ -27,20 +27,7 @@ void calculate()
 	test.count_ntype();
 	test.set_files();
 	test.set_ekcut();
-	test.read_files();
-
-/*
-	ooo.Read_Orbitals(
-	GlobalV::ofs_running,
-	test.ntype,
-	test.lmax,
-	test.out_descriptor,
-	test.out_r_matrix,
-	test.force_flag,
-	test.my_rank);
-
-*/
-//	ooo.set_orb_tables();
+	test.set_orbs(test.lat0);
 
 	std::cout << "--------------------" << std::endl;
 	std::cout << " Have a great day! " << std::endl;
