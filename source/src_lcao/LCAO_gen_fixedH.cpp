@@ -42,7 +42,7 @@ void LCAO_gen_fixedH::calculate_NL_no(void)
 void LCAO_gen_fixedH::calculate_T_no(void)
 {
     ModuleBase::TITLE("LCAO_gen_fixedH","calculate_T_no");
-    this->build_ST_new('T', false);
+    this->build_ST_new('T', false, GlobalC::ucell);
     return;
 }
 
@@ -50,14 +50,14 @@ void LCAO_gen_fixedH::calculate_S_no(void)
 {
     ModuleBase::TITLE("LCAO_gen_fixedH", "calculate_S_no");
     ModuleBase::timer::tick("LCAO_gen_fixedH","calculate_S_no");
-	this->build_ST_new('S', false);
+	this->build_ST_new('S', false, GlobalC::ucell);
     ModuleBase::timer::tick("LCAO_gen_fixedH","calculate_S_no");
     return;
 }
 
 
 //liaochen modify interface 2010-3-22
-void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
+void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri, const UnitCell_pseudo &ucell)
 {
     ModuleBase::TITLE("LCAO_gen_fixedH","build_ST_new");
 
@@ -68,26 +68,26 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
     //\sum{T} e**{ikT} <\phi_{ia}|d\phi_{k\beta}(T)>
 	ModuleBase::Vector3<double> tau1, tau2, dtau;
 	ModuleBase::Vector3<double> dtau1, dtau2, tau0;
-    for (int T1=0; T1<GlobalC::ucell.ntype; ++T1)
+    for (int T1=0; T1<ucell.ntype; ++T1)
     {
-		Atom* atom1 = &GlobalC::ucell.atoms[T1];
+		Atom* atom1 = &ucell.atoms[T1];
         for (int I1=0; I1<atom1->na; ++I1)
         {
 			tau1 = atom1->tau[I1];
             //GlobalC::GridD.Find_atom(tau1);
-            GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+            GlobalC::GridD.Find_atom(ucell, tau1, T1, I1);
             for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ++ad)
             {
                 const int T2 = GlobalC::GridD.getType(ad);
 				const int I2 = GlobalC::GridD.getNatom(ad);
-				Atom* atom2 = &GlobalC::ucell.atoms[T2];
+				Atom* atom2 = &ucell.atoms[T2];
 				tau2 = GlobalC::GridD.getAdjacentTau(ad);
 				dtau = tau2 - tau1;
-				double distance = dtau.norm() * GlobalC::ucell.lat0;
+				double distance = dtau.norm() * ucell.lat0;
 				double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 				if(distance < rcut)
 				{
-					int iw1_all = GlobalC::ucell.itiaiw2iwt( T1, I1, 0) ; //iw1_all = combined index (it, ia, iw)
+					int iw1_all = ucell.itiaiw2iwt( T1, I1, 0) ; //iw1_all = combined index (it, ia, iw)
 
 					for(int jj=0; jj<atom1->nw*GlobalV::NPOL; ++jj)
 					{
@@ -96,7 +96,7 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 						const int N1 = atom1->iw2n[jj0];
 						const int m1 = atom1->iw2m[jj0];
 
-						int iw2_all = GlobalC::ucell.itiaiw2iwt( T2, I2, 0);//zhengdy-soc
+						int iw2_all = ucell.itiaiw2iwt( T2, I2, 0);//zhengdy-soc
 						for(int kk=0; kk<atom2->nw*GlobalV::NPOL; ++kk)
 						{
 							const int kk0 = kk/GlobalV::NPOL;
@@ -218,22 +218,22 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 				}// distance
 				else if(distance>=rcut && (!GlobalV::GAMMA_ONLY_LOCAL))
 				{
-					int start1 = GlobalC::ucell.itiaiw2iwt( T1, I1, 0);
-					int start2 = GlobalC::ucell.itiaiw2iwt( T2, I2, 0);
+					int start1 = ucell.itiaiw2iwt( T1, I1, 0);
+					int start2 = ucell.itiaiw2iwt( T2, I2, 0);
 
 					bool is_adj = false;
 					for (int ad0=0; ad0 < GlobalC::GridD.getAdjacentNum()+1; ++ad0)
 					{
 						const int T0 = GlobalC::GridD.getType(ad0);
 						//const int I0 = GlobalC::GridD.getNatom(ad0);
-						//const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
-						//const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
+						//const int iat0 = ucell.itia2iat(T0, I0);
+						//const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
 						tau0 = GlobalC::GridD.getAdjacentTau(ad0);
 						dtau1 = tau0 - tau1;
-						double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
+						double distance1 = dtau1.norm() * ucell.lat0;
 						double rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
 						dtau2 = tau0 - tau2;
-						double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
+						double distance2 = dtau2.norm() * ucell.lat0;
 						double rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
 						if( distance1 < rcut1 && distance2 < rcut2 )
 						{

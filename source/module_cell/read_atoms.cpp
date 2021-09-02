@@ -9,7 +9,7 @@
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
 #ifdef __LCAO
-void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_running, LCAO_Orbitals &orb )
+void UnitCell_pseudo::read_atom_species(LCAO_Orbitals &orb, std::ifstream &ifa, std::ofstream &ofs_running)
 #else
 void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_running)
 #endif
@@ -85,9 +85,9 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 				//-----------------------------------
 				//orb.nonlocal_file.push_back(nfile);
 
-//				GlobalV::ofs_running << " For atom type " << i + 1 << std::endl;
-//			    GlobalV::ofs_running << " Read in numerical orbitals from file " << ofile << std::endl;
-//			    GlobalV::ofs_running << " Read in nonlocal projectors from file " << nfile << std::endl;
+//				ofs_running << " For atom type " << i + 1 << std::endl;
+//			    ofs_running << " Read in numerical orbitals from file " << ofile << std::endl;
+//			    ofs_running << " Read in nonlocal projectors from file " << nfile << std::endl;
 				
 			}
 		}	
@@ -345,7 +345,7 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 // return 1: no problem.
 // return 0: some problems.
 #ifdef __LCAO
-bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &ofs_running, std::ofstream &ofs_warning, LCAO_Orbitals &orb)
+bool UnitCell_pseudo::read_atom_positions(LCAO_Orbitals &orb, std::ifstream &ifpos, std::ofstream &ofs_running, std::ofstream &ofs_warning)
 #else
 bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &ofs_running, std::ofstream &ofs_warning)
 #endif
@@ -913,7 +913,7 @@ bool UnitCell_pseudo::check_tau(void)const
 }
 
 #ifdef __LCAO
-void UnitCell_pseudo::print_stru_file(const std::string &fn, const LCAO_Orbitals &orb, const int &type)const
+void UnitCell_pseudo::print_stru_file(const LCAO_Orbitals &orb, const std::string &fn, const int &type)const
 #else
 void UnitCell_pseudo::print_stru_file(const std::string &fn, const int &type)const
 #endif
