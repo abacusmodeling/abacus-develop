@@ -49,6 +49,7 @@ class ORB_gen_tables
 		
 
 	void snap_psibeta(
+		const LCAO_Orbitals &orb,
 		double nlm[],
 		const int& job/**<[in]	job = 0 for vnl matrix elements, job = 1 for its derivatives*/,
 		const ModuleBase::Vector3<double> &R1,
