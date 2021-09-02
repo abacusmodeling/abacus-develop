@@ -55,10 +55,12 @@ Direct //Cartesian or Direct coordinate.
 Si // Element type
 0.0 // magnetism
 2 // number of atoms
-0.00 0.00 0.00 0 0 0
+0.00 0.00 0.00 0 0 0//the position of atoms and other parameter specify by key word
 0.25 0.25 0.25 1 1 1
 ```
 The LATTICE_VECTORS section is removed.
+
+
 
 [back to top](#stru-file)
 
@@ -196,6 +198,13 @@ information that comes below.
     
     The following three lines tells the elemental type (`Si`), the initial magnetic moment (`0.0`), and the number of atoms for this particular element (`2`) repsectively.
     
-    The last two lines in this example are the coordinates of atomic positions. There are six numbers in each line: the first three specifies the atomic positions and the last three control how the atom move in geometry relaxation calculations. The numbers `0 0 0` following the coordinates of the first atom means this atom are *not allowed* to move in all three directions, and the numbers `1 1 1` following the coordinates of the second atom means this atom *can* move in all three directions.
+    The last two lines in this example are the coordinates of atomic positions. There are three numbers in each line, which specifies the atomic positions, following by other parameters marked by keywords.
+
+    Several other parameters could be defined after the atom position using key word :
+    - `m` or NO key word: three numbers, which take value in 0 or 1, control how the atom move in geometry relaxation calculations. The numbers `0 0 0` following the coordinates of the first atom means this atom are *not allowed* to move in all three directions, and the numbers `1 1 1` following the coordinates of the second atom means this atom *can* move in all three directions.  
+    - `v` or `vel` or `velocity`: set the three components of initial velocity of atoms in geometry relaxation calculations.
+    - `mag` or `magmom`: set the start magnetization for each atom. In colinear case only one number should be given. In non-colinear case one have two choice:either set one number for the norm of magnetization here and specify two polar angle later, or set three number for the xyz commponent of magnetization here.
+    - `angle1`: in non-colinear case, specify the angle between c-axis and real spin
+    - `angle2`: in non-colinear case, specify angle between a-axis and real spin in projection in ab-plane
 
 [back to top](#stru-file)

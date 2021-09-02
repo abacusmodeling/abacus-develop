@@ -407,18 +407,15 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 			if(!found)
 			{
 				ofs_warning << " Label read from ATOMIC_POSITIONS is " << this->atoms[it].label << std::endl; 
-				ofs_warning << " Lable from ATOMIC_SPECIES is " << this->atom_label[it] << std::endl;
+				ofs_warning << " Label from ATOMIC_SPECIES is " << this->atom_label[it] << std::endl;
 				return 0;
 			}
 			ModuleBase::GlobalFunc::OUT(ofs_running, "atom label",atoms[it].label);
 
 #ifndef __CMD
-/*			if(!input_mag)
-			{
+
 			ModuleBase::GlobalFunc::READ_VALUE(ifpos, magnet.start_magnetization[it] );
-			}
-			
-*/
+
 #ifndef __SYMMETRY
 /*
 			if(GlobalV::NSPIN==4)//added by zhengdy-soc
@@ -608,15 +605,14 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 				{
  // modify the reading of frozen ions and velocities  -- Yuanbo Li 2021/8/20
                                         ifpos >> v.x >> v.y >> v.z;
-
                                         mv.x = true ;
                                         mv.y = true ;
                                         mv.z = true ;
                                         atoms[it].vel[ia].set(0,0,0);
-										atoms[it].m_loc_[ia].set(0,0,0);
-										atoms[it].mag[ia]=0;
+										atoms[it].mag[ia]=magnet.start_magnetization[it];
 										atoms[it].angle1[ia]=0;
 										atoms[it].angle2[ia]=0;
+										atoms[it].m_loc_[ia].set(0,0,0);
 
                                         string tmpid;
                                         tmpid = ifpos.get();
