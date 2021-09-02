@@ -86,7 +86,7 @@ void UnitCell_pseudo::setup_cell(
 			// call read_atom_species
 			//========================
 #ifdef __LCAO
-			this->read_atom_species(ifa, log, orb);
+			this->read_atom_species(orb, ifa, log);
 #else
 			this->read_atom_species(ifa, log);
 #endif
@@ -95,7 +95,7 @@ void UnitCell_pseudo::setup_cell(
 			// call read_atom_positions
 			//==========================
 #ifdef __LCAO
-			ok2 = this->read_atom_positions(ifa, log, GlobalV::ofs_warning, orb);
+			ok2 = this->read_atom_positions(orb, ifa, log, GlobalV::ofs_warning);
 #else
 			ok2 = this->read_atom_positions(ifa, log, GlobalV::ofs_warning);
 #endif
@@ -196,7 +196,7 @@ void UnitCell_pseudo::setup_cell(
 	log << "\n\n\n\n";
 
 
-	this->read_cell_pseudopots(s_pseudopot_dir);
+	this->read_cell_pseudopots(s_pseudopot_dir, log);
 	
 	if(GlobalV::MY_RANK == 0) 
 	{
@@ -297,10 +297,12 @@ void UnitCell_pseudo::setup_cell(
 	//}
 
 	// setup the total number of PAOs
-	this->cal_natomwfc();
+	this->cal_natomwfc(log);
 
+#ifdef __LCAO
 	// setup GlobalV::NLOCAL
-	this->cal_nwfc();
+	this->cal_nwfc(log);
+#endif
 
 	// setup GlobalV::NBANDS
 	//this->cal_nelec();
@@ -367,7 +369,7 @@ void UnitCell_pseudo::setup_cell_classic(
 			// call read_atom_species
 			//========================
 #ifdef __LCAO
-			this->read_atom_species(ifa, ofs_running, orb);
+			this->read_atom_species(orb, ifa, ofs_running);
 #else
 			this->read_atom_species(ifa, ofs_running);
 #endif
@@ -375,7 +377,7 @@ void UnitCell_pseudo::setup_cell_classic(
 			// call read_atom_positions
 			//==========================
 #ifdef __LCAO
-			ok2 = this->read_atom_positions(ifa, ofs_running, ofs_warning, orb);
+			ok2 = this->read_atom_positions(orb, ifa, ofs_running, ofs_warning);
 #else
 			ok2 = this->read_atom_positions(ifa, ofs_running, ofs_warning);
 #endif
@@ -433,7 +435,7 @@ void UnitCell_pseudo::setup_cell_classic(
 // 			atoms[].stapos_wf
 // 			GlobalV::NBANDS
 //===========================================
-void UnitCell_pseudo::cal_nwfc(void)
+void UnitCell_pseudo::cal_nwfc(std::ofstream &log)
 {
 	ModuleBase::TITLE("UnitCell_pseudo","cal_nwfc");
 	assert(ntype>0);
@@ -485,7 +487,7 @@ void UnitCell_pseudo::cal_nwfc(void)
 	}
 	
 	//OUT(GlobalV::ofs_running,"NLOCAL",GlobalV::NLOCAL);
-	GlobalV::ofs_running << " " << std::setw(40) << "NLOCAL" << " = " << GlobalV::NLOCAL <<std::endl;
+	log << " " << std::setw(40) << "NLOCAL" << " = " << GlobalV::NLOCAL <<std::endl;
 	//========================================================
 	// (4) set index for iat2it, iat2ia, itia2iat, itiaiw2iwt
 	//========================================================
@@ -619,7 +621,7 @@ void UnitCell_pseudo::cal_meshx()
 // 			atoms[].oc
 // 			atoms[].na
 //=========================
-void UnitCell_pseudo::cal_natomwfc(void)
+void UnitCell_pseudo::cal_natomwfc(std::ofstream &log)
 {
 	if(GlobalV::test_pseudo_cell) ModuleBase::TITLE("UnitCell_pseudo","cal_natomwfc");
 
@@ -653,7 +655,7 @@ void UnitCell_pseudo::cal_natomwfc(void)
 		}
 		natomwfc += tmp * atoms[it].na;
 	}
-	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"initial pseudo atomic orbital number",natomwfc);
+	ModuleBase::GlobalFunc::OUT(log,"initial pseudo atomic orbital number",natomwfc);
 	return;
 }
 

@@ -26,7 +26,7 @@ class LCAO_gen_fixedH
 
 	private:
 
-	void build_ST_new(const char& dtype, const bool& cal_deri);	
+	void build_ST_new(const char& dtype, const bool& cal_deri, const UnitCell_pseudo &ucell);	
 	
 	// can used in gamma algorithm.
 	void build_Nonlocal_beta (const bool& calc_deri);
