@@ -465,7 +465,7 @@ void Hamilt_PW::h_psi_gpu(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, cons
             int block = GlobalC::wf.npw / thread + 1;
             kernel_get_tmhpsi<<<block, thread>>>(GlobalC::wf.npw, tmhpsi, tmpsi_in, d_g2kin);
 
-            // if(GlobalC::::NSPIN==4){
+            // if(GlobalC::NSPIN==4){
             //     for(ig=GlobalC::wf.npw; ig < GlobalC::wf.npwx; ++ig)
             //     {
             //         tmhpsi[ig] = 0;
