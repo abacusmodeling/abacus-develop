@@ -7,6 +7,7 @@
 #define NUMERICAL_BASIS_H
 #include "../src_pw/tools.h"
 #include "bessel_basis.h"
+#include <vector>
 //==========================================================
 // CLASS :
 // NAME :  Numerical_Basis 
@@ -17,38 +18,53 @@ class Numerical_Basis
 	Numerical_Basis();
 	~Numerical_Basis();
 
-	void start_from_file_k( const int &ik, ComplexMatrix &psi);
-	void output_overlap( const ComplexMatrix *psi);
+	void start_from_file_k( const int &ik, ModuleBase::ComplexMatrix &psi);
+	void output_overlap( const ModuleBase::ComplexMatrix *psi);
 
 	private:
 
-	static bool init_label;
+	bool init_label = false;
 
-	static Bessel_Basis bessel_basis;
+	Bessel_Basis bessel_basis;
 
-	static IntArray *mu_index;
-	static void init_mu_index(void);
+	std::vector<ModuleBase::IntArray> mu_index;
+	static std::vector<ModuleBase::IntArray> init_mu_index(void);
 
-	void numerical_atomic_wfc(const int &ik,const int &np,ComplexMatrix &psi);
+	void numerical_atomic_wfc(const int &ik,const int &np,ModuleBase::ComplexMatrix &psi);
 
-	void Sq_overlap( 
-		realArray &Sq_imag,
-		realArray &Sq_real,
+	ModuleBase::ComplexArray cal_overlap_Q(
+		const int &ik, const int &np, const ModuleBase::ComplexMatrix &psi,
+		const int derivative_order ) const;
+		
+	ModuleBase::ComplexArray cal_overlap_Sq(
 		const int &ik, 
-		const int &np );
+		const int &np,
+		const int derivative_order ) const;
 
-	void jlq3d_overlap(realArray &overlap_Q1, realArray &overlap_Q2,
-		const int &ik_ibz, const int &ik, const int &np, const ComplexMatrix &psi);
+	static ModuleBase::matrix cal_overlap_V(const ModuleBase::ComplexMatrix *psi, const int derivative_order);
 
-	void output_overlap_Sq(
-		const string &name,
-		ofstream &ofs, 
-		const realArray *Sq_real, const realArray *Sq_imag);
+	ModuleBase::realArray cal_flq(const int ik, const std::vector<ModuleBase::Vector3<double>> &gk) const;
 
-	void output_overlap_Q(
-		ofstream &ofs,
-		const realArray &overlap_Q1,
-		const realArray &overlap_Q2);
+	static ModuleBase::matrix cal_ylm(const std::vector<ModuleBase::Vector3<double>> &gk);
+	
+	static void output_info(
+		std::ofstream &ofs,
+		const Bessel_Basis &bessel_basis);
+
+	static void output_k(std::ofstream &ofs);
+
+	static void output_overlap_Q(
+		std::ofstream &ofs,
+		const std::vector<ModuleBase::ComplexArray> &overlap_Q);
+
+	static void output_overlap_Sq(
+		const std::string &name,
+		std::ofstream &ofs, 
+		const std::vector<ModuleBase::ComplexArray> &overlap_Sq);
+
+	static void output_overlap_V(
+		std::ofstream &ofs,
+		const ModuleBase::matrix &overlap_V);
 
 };
 

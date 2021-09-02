@@ -21,7 +21,7 @@ class ORB_gen_tables
 	~ORB_gen_tables();
 
 	void gen_tables( 
-		ofstream &ofs_in, // mohan add 2021-05-07
+		std::ofstream &ofs_in, // mohan add 2021-05-07
 		const int &job0, 
 		LCAO_Orbitals &orb,
 		const int &Lmax_exx,
@@ -33,62 +33,62 @@ class ORB_gen_tables
 		double olm[],
 		const int &job, ///<[in]0 for matrix element of either S or T, 1 for its derivatives
 	    const char &dtype, ///<[in] derivative type, 'S' for overlap, 'T' for kinetic energy, 'D' for descriptor in deepks
-		const Vector3<double> &R1,
+		const ModuleBase::Vector3<double> &R1,
     	const int &I1,
     	const int &l1,
     	const int &m1,
     	const int &n1,
-    	const Vector3<double> &R2,
+    	const ModuleBase::Vector3<double> &R2,
     	const int &I2,
     	const int &l2,
     	const int &m2,
 		const int &n2,
 		const int &nspin,
-		complex<double> *olm1=NULL)const;
+		std::complex<double> *olm1=NULL)const;
 		
 
 	void snap_psibeta(
 		double nlm[],
 		const int& job/**<[in]	job = 0 for vnl matrix elements, job = 1 for its derivatives*/,
-		const Vector3<double> &R1,
+		const ModuleBase::Vector3<double> &R1,
 		const int &I1,
 		const int &l1,
 		const int &m1,
 		const int &n1,
-		const Vector3<double> &R2,
+		const ModuleBase::Vector3<double> &R2,
 		const int &I2,
 		const int &l2,
 		const int &m2,
 		const int &n2,
-		const Vector3<double> &Rnl,
+		const ModuleBase::Vector3<double> &Rnl,
 		const int &type,
-		const matrix &dion, // mohan add 2021-04-25
+		const ModuleBase::matrix &dion, // mohan add 2021-04-25
 		const int &nspin, // mohan add 2021-05-07
-		const ComplexArray &d_so, // mohan add 2021-04-25
+		const ModuleBase::ComplexArray &d_so, // mohan add 2021-04-25
 		const int &count_soc, // mohan add 2021-05-07
 		int* index1_soc, // mohan add 2021-05-07
 		int* index2_soc, // mohan add 2021-05-07
 		const int &nproj_in, // mohan add 2021-05-07
-		complex<double> *nlm1=NULL,
+		std::complex<double> *nlm1=NULL,
 		const int is=0)const;
 #ifdef __DEEPKS
     void snap_psialpha(
         double nlm[],
         const int& job,
-        const Vector3<double>& R1,
+        const ModuleBase::Vector3<double>& R1,
         const int& T1,
         const int& L1,
         const int& m1,
         const int& N1,
-        const Vector3<double>& R2,
+        const ModuleBase::Vector3<double>& R2,
         const int& T2,
         const int& L2,
         const int& m2,
         const int& N2,
-        const Vector3<double>& R0, // The projector.
+        const ModuleBase::Vector3<double>& R0, // The projector.
         const int& T0,
         const int& A0,  //gedm is related to specific atom
-        IntArray* inl_index,
+        ModuleBase::IntArray* inl_index,
         double** gedm    //Coefficient Matrix (non-diagonal)
         ) const;
 #endif
@@ -106,14 +106,17 @@ class ORB_gen_tables
 
 	ORB_gaunt_table MGT;
 
-	double get_distance(const Vector3<double> &R1, const Vector3<double> &R2)const;
+	double get_distance(const ModuleBase::Vector3<double> &R1, const ModuleBase::Vector3<double> &R2)const;
 
 	double lat0;
 
 };
 
-/// PLEASE try to get rid of UOT, which is a global variable
+/// PLEASE try to get rid of GlobalC::UOT, which is a global variable
 /// mohan add 2021-03-30
+namespace GlobalC
+{
 extern ORB_gen_tables UOT;
+}
 
 #endif

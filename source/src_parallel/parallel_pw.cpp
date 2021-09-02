@@ -63,7 +63,7 @@ delete[] ngm_i_number;
 void Parallel_PW::init(const double &gcut_in, const int &n1_in, const int &n2_in, const int &n3_in,
 		const int &bz, const int &nproc_in,const int &rank_in)
 {
-	if(test_pw) TITLE("Parallel_PW","init");
+	if(GlobalV::test_pw) ModuleBase::TITLE("Parallel_PW","init");
 
 	this->gcut=gcut_in;
 	this->n1=n1_in;
@@ -79,7 +79,7 @@ void Parallel_PW::init(const double &gcut_in, const int &n1_in, const int &n2_in
 	//==========================================================
 	delete[] this->npps;
 	this->npps = new int[nproc_use];
-	ZEROS(npps, nproc_use);
+	ModuleBase::GlobalFunc::ZEROS(npps, nproc_use);
 
 	const int nb3 = this->n3 / bz;
 	
@@ -89,23 +89,23 @@ void Parallel_PW::init(const double &gcut_in, const int &n1_in, const int &n2_in
 		npps[ip] *= bz;//mohan update 2011-04-22
 		if(ip < nb3%nproc_use) this->npps[ip]+=bz;
 		
-		if(test_pw)
+		if(GlobalV::test_pw)
 		{
-			ofs_running << " processor="<<ip<<" npps="<<npps[ip] << endl;
+			GlobalV::ofs_running << " processor="<<ip<<" npps="<<npps[ip] << std::endl;
 		}
 	}
 
 	delete[] this->ngm_i_number;
 	this->ngm_i_number = new int[10];
-	ZEROS(ngm_i_number, 10);
+	ModuleBase::GlobalFunc::ZEROS(ngm_i_number, 10);
 
 	return;
 }
 
 void Parallel_PW::columns_map(void)
 {
-	if(test_pw) TITLE("Parallel_PW","columns_map");
-	timer::tick("Parallel_PW","columns_map");
+	if(GlobalV::test_pw) ModuleBase::TITLE("Parallel_PW","columns_map");
+	ModuleBase::timer::tick("Parallel_PW","columns_map");
 		
 	int ibox[3];
 	
@@ -142,9 +142,9 @@ void Parallel_PW::columns_map(void)
 			// z is the fastest.
 			for (int k = -ibox[2]; k <= ibox[2]; k++)
 			{
-				Vector3<double> f(i,j,k);
+				ModuleBase::Vector3<double> f(i,j,k);
 				// g2= |f|^2 in the unit of (2Pi/lat0)^2
-				double g2 = f * (ucell.GGT * f);
+				double g2 = f * (GlobalC::ucell.GGT * f);
 
 				// gcut is from input.
 				if (g2 <= this->gcut)
@@ -161,7 +161,7 @@ void Parallel_PW::columns_map(void)
 
 					this->st[m1][m2]++;
 
-					//cout<<setw(12)<<m1+m2*this->n1<<setw(12)<<this->st[m1][m2]++<<endl;
+					//std::cout<<std::setw(12)<<m1+m2*this->n1<<std::setw(12)<<this->st[m1][m2]++<<std::endl;
 					ng++;
 					// ng: plane wave number if spheri.
 				}
@@ -182,16 +182,16 @@ void Parallel_PW::columns_map(void)
 		}
 	}
 
-	OUT(ofs_running,"number of plane waves",ng);
-	OUT(ofs_running,"number of sticks", nst);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of plane waves",ng);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of sticks", nst);
 
-	timer::tick("Parallel_PW","columns_map");
+	ModuleBase::timer::tick("Parallel_PW","columns_map");
 	return;
 }
 
 void Parallel_PW::restore_st(void)
 {
-	if(test_pw) TITLE("Parallel_PW","restore_st");
+	if(GlobalV::test_pw) ModuleBase::TITLE("Parallel_PW","restore_st");
 	
 	// assert the number of total sticks has
 	// been calculated.
@@ -199,7 +199,7 @@ void Parallel_PW::restore_st(void)
 
 	if(this->nst < nproc_use)
 	{
-		WARNING_QUIT("Parallel_PW::restore_st","nst(number of sticks in FFT xy plane) < nproc_use, too many processes used.");
+		ModuleBase::WARNING_QUIT("Parallel_PW::restore_st","nst(number of sticks in FFT xy plane) < nproc_use, too many processes used.");
 	}
 
 	//---------------------------------------
@@ -228,8 +228,8 @@ void Parallel_PW::restore_st(void)
 				this->st_j[k] = j; //i1 y
 				this->st_n[k] = this->st[i][j]; 
 
-				//cout<<setw(12)<<i<<setw(12)<<j<<setw(12)<<st_n[k]<<endl;
-				//cout<<setw(12)<<i+j*this->n1<<setw(12)<<st_n[k]<<endl;
+				//std::cout<<std::setw(12)<<i<<std::setw(12)<<j<<std::setw(12)<<st_n[k]<<std::endl;
+				//std::cout<<std::setw(12)<<i+j*this->n1<<std::setw(12)<<st_n[k]<<std::endl;
 				k++;
 			}
 		}
@@ -240,16 +240,16 @@ void Parallel_PW::restore_st(void)
 
 void Parallel_PW::columns_and_pw_distribution(void)
 {
-	if(test_pw) TITLE("Parallel_PW","columns_and_pw_distribution");
+	if(GlobalV::test_pw) ModuleBase::TITLE("Parallel_PW","columns_and_pw_distribution");
 
 	// number of sticks of each processor in one pool.
 	delete[] nst_per;
 	this->nst_per = new int[nproc_use];
-	ZEROS(nst_per, nproc_use);
+	ModuleBase::GlobalFunc::ZEROS(nst_per, nproc_use);
 	// number of planewaves of each processor in one pool.
 	delete[] npw_per;
 	this->npw_per = new int[nproc_use];
-	ZEROS(npw_per, nproc_use);
+	ModuleBase::GlobalFunc::ZEROS(npw_per, nproc_use);
 
 	//******************************************************
 	// Two choices  
@@ -260,7 +260,7 @@ void Parallel_PW::columns_and_pw_distribution(void)
 	//******************************************************
 	delete[] index;
 	this->index = new bool[this->nst];
-	ZEROS(index,nst);
+	ModuleBase::GlobalFunc::ZEROS(index,nst);
 
 	delete[] index_ip;
 	this->index_ip = new int[this->n1*this->n2];
@@ -275,7 +275,7 @@ void Parallel_PW::columns_and_pw_distribution(void)
 
 void Parallel_PW::max_pw_column(int &pw, int &max_i, int &max_j)
 {
-//	cout<<"\n ==> Parallel_PW.max_pw_column()";
+//	std::cout<<"\n ==> Parallel_PW.max_pw_column()";
 	// search in all sticks
 	int use=0;
 	for (int i = 0;i < this->nst;i++)
@@ -298,7 +298,7 @@ void Parallel_PW::max_pw_column(int &pw, int &max_i, int &max_j)
 	}
 	
 	/*
-	cout<<"\n use = "<<use
+	std::cout<<"\n use = "<<use
 		<<" index = "<<index[use]
 		<<" max_i = "<<max_i
 		<<" max_j = "<<max_j
@@ -307,7 +307,7 @@ void Parallel_PW::max_pw_column(int &pw, int &max_i, int &max_j)
 	// means the index stick has been used 
 	this->index[use] = 1;
 
-	//cout<<setw(24)<<"End max_pw_column()"<<endl;
+	//std::cout<<std::setw(24)<<"End max_pw_column()"<<std::endl;
 	return;
 }
 
@@ -318,7 +318,7 @@ void Parallel_PW::fft_dlay_set(void)
 	int ip = 0;//index of processors
 	delete[] st_start;
 	this->st_start = new int[nproc_use];
-	ZEROS(st_start, nproc_use);
+	ModuleBase::GlobalFunc::ZEROS(st_start, nproc_use);
 
 	// calculate start stick index in each
 	// processor in this pool.
@@ -328,7 +328,7 @@ void Parallel_PW::fft_dlay_set(void)
 		{
 			this->st_start[ip] += this->nst_per[i];
 		}
-//		cout<<"\n cpu="<<ip<<" st_start="<<this->st_start[ip];
+//		std::cout<<"\n cpu="<<ip<<" st_start="<<this->st_start[ip];
 	}
 
 	int nxy = this->n1 * this->n2;
@@ -337,7 +337,7 @@ void Parallel_PW::fft_dlay_set(void)
 	delete[] ismap;
 	this->isind = new int[nxy];
 	this->ismap = new int[this->nst];
-	ZEROS(ismap, nst);
+	ModuleBase::GlobalFunc::ZEROS(ismap, nst);
 
 	for (i = 0;i < nxy;i++)
 	{
@@ -346,11 +346,11 @@ void Parallel_PW::fft_dlay_set(void)
 		//so -1 has illegal meaning.
 	}
 
-//	cout << setw(12) << "isind dim" << setw(12) << nxy << endl;
-//	cout << setw(12) << "ismap dim" << setw(12) << this->nst << endl;
+//	std::cout << std::setw(12) << "isind dim" << std::setw(12) << nxy << std::endl;
+//	std::cout << std::setw(12) << "ismap dim" << std::setw(12) << this->nst << std::endl;
 
 	int *st_move = new int[nproc_use];
-	ZEROS(st_move,nproc_use);
+	ModuleBase::GlobalFunc::ZEROS(st_move,nproc_use);
 	
 	for (i = 0;i < nxy;i++)
 	{
@@ -360,7 +360,7 @@ void Parallel_PW::fft_dlay_set(void)
 
 		if (ip >= 0)
 		{
-			//cout<<setw(12)<<i<<setw(12)<<ip<<setw(12)<<nst[ip]<<endl;
+			//std::cout<<std::setw(12)<<i<<std::setw(12)<<ip<<std::setw(12)<<nst[ip]<<std::endl;
 			int is = st_move[ip] + this->st_start[ip] ;
 			this->ismap[ is ] = i;
 			
@@ -381,19 +381,19 @@ void Parallel_PW::fft_dlay_set(void)
 
 	// Don't delete this test below,it's useful !
 		/*
-		cout<<"========================================"<<endl;
-		cout<<setw(12)<<"col"<<setw(12)<<"nxy"<<endl;
+		std::cout<<"========================================"<<std::endl;
+		std::cout<<std::setw(12)<<"col"<<std::setw(12)<<"nxy"<<std::endl;
 		for(i=0;i<this->nst;i++)
 		{
-			cout<<setw(12)<<i<<setw(12)<<ismap[i]<<endl;
+			std::cout<<std::setw(12)<<i<<std::setw(12)<<ismap[i]<<std::endl;
 		}
-		cout<<"========================================"<<endl;
-		cout<<setw(12)<<"nxy"<<setw(12)<<"col(per)"<<endl;
+		std::cout<<"========================================"<<std::endl;
+		std::cout<<std::setw(12)<<"nxy"<<std::setw(12)<<"col(per)"<<std::endl;
 		for(i=0;i<nxy;i++)
 		{
 			if(this->isind[i]>=0)
 			{
-				cout<<setw(12)<<i<<setw(12)<<isind[i]<<endl;
+				std::cout<<std::setw(12)<<i<<std::setw(12)<<isind[i]<<std::endl;
 			}
 		}
 		*/	
@@ -408,7 +408,7 @@ void Parallel_PW::fft_map(
         int ggchg_time
 )
 {
-	if(test_pw) TITLE("Parallel_PW","fft_map");
+	if(GlobalV::test_pw) ModuleBase::TITLE("Parallel_PW","fft_map");
 
 	// if already found all the plane waves in this process, return.
 	if(ngm_i == ngm) return;
@@ -422,8 +422,8 @@ void Parallel_PW::fft_map(
 
 	for (int ig = 0;ig < ngmc_g_in ;ig++)
 	{
-		int m1 = (int)pw.gdirect_global[ig].x;
-		int m2 = (int)pw.gdirect_global[ig].y;
+		int m1 = (int)GlobalC::pw.gdirect_global[ig].x;
+		int m2 = (int)GlobalC::pw.gdirect_global[ig].y;
 
 		if (m1 < 0){m1 += this->n1;}
 		if (m2 < 0){m2 += this->n2;}
@@ -432,15 +432,15 @@ void Parallel_PW::fft_map(
 
 		if (this->isind[mc] >= 0)
 		{
-			if (pw.gg_global[ig] <= this->gcut)
+			if (GlobalC::pw.gg_global[ig] <= this->gcut)
 			{
 				this->ig_l2g[ngm_i] = ig;
-				if(this->gcut == pw.ggchg) // for charge, not for wave functions.
+				if(this->gcut == GlobalC::pw.ggchg) // for charge, not for wave functions.
 				{
 					// set 
-					pw.gdirect[ngm_i] = pw.gdirect_global[ig];
-					pw.gcar[ngm_i] = pw.gdirect[ngm_i]*ucell.G;
-					pw.gg[ngm_i] = pw.gg_global[ig];
+					GlobalC::pw.gdirect[ngm_i] = GlobalC::pw.gdirect_global[ig];
+					GlobalC::pw.gcar[ngm_i] = GlobalC::pw.gdirect[ngm_i]*GlobalC::ucell.G;
+					GlobalC::pw.gg[ngm_i] = GlobalC::pw.gg_global[ig];
 				}
 				++ngm_i;
 			}
@@ -452,24 +452,24 @@ void Parallel_PW::fft_map(
 	/*
 	if (ngm_i != this->npw_per[rank_use])
 	{
-		cout << setw(12) << "ngm_i = " << setw(12) << ngm_i << endl;
-		cout << setw(12) << "npw_per = " << this->npw_per[rank_use] << endl;
-		WARNING_QUIT("Parallel_PW::fft_map","ngm_i !=npw_per[rank_use]");
+		std::cout << std::setw(12) << "ngm_i = " << std::setw(12) << ngm_i << std::endl;
+		std::cout << std::setw(12) << "npw_per = " << this->npw_per[rank_use] << std::endl;
+		ModuleBase::WARNING_QUIT("Parallel_PW::fft_map","ngm_i !=npw_per[rank_use]");
 	}
 	*/
 	
-//	cout<<setw(12)<<"i"<<setw(12)<<"x"<<setw(12)<<"y"<<setw(12)<<"z"<<endl;
+//	std::cout<<std::setw(12)<<"i"<<std::setw(12)<<"x"<<std::setw(12)<<"y"<<std::setw(12)<<"z"<<std::endl;
 	for (int ig=ngm_i_record; ig<ngm_i; ig++)
 	{
 		//  Mohan fix the bug 2008-4-3 17:19
 		//	ig_l2g[i] is the index of ig_global
 		//	it tells the position in ig_global
 		//  for each plane wave in local processor
-		//  The local plane wave number is ngm_i = pw.ngmc
-		//  The total plane wave number is pw.ngmc_g
-		int x = int(pw.gdirect_global[this->ig_l2g[ig]].x);
-		int y = int(pw.gdirect_global[this->ig_l2g[ig]].y);
-		int z = int(pw.gdirect_global[this->ig_l2g[ig]].z);
+		//  The local plane wave number is ngm_i = GlobalC::pw.ngmc
+		//  The total plane wave number is GlobalC::pw.ngmc_g
+		int x = int(GlobalC::pw.gdirect_global[this->ig_l2g[ig]].x);
+		int y = int(GlobalC::pw.gdirect_global[this->ig_l2g[ig]].y);
+		int z = int(GlobalC::pw.gdirect_global[this->ig_l2g[ig]].z);
 
 		if (x < 0) x += this->n1;
 		if (y < 0) y += this->n2;
@@ -477,68 +477,68 @@ void Parallel_PW::fft_map(
 
 		const int index_now = y+x*n2;
 		
-	//	cout<<setw(12)<<x+y*n1<<setw(12)<<this->index_ip[x+y*this->n1]<<endl;
+	//	std::cout<<std::setw(12)<<x+y*n1<<std::setw(12)<<this->index_ip[x+y*this->n1]<<std::endl;
 		if(this->isind[index_now]==-1)
 		{
-			cerr<<"I don't know this grid !"<<endl;
-			cout<<setw(12)<<"xy"
-				<<setw(12)<<"isind"<<setw(12)<<"ig2fft"<<endl;
-			cout<<setw(12)<<index_now
-				<<setw(12)<<this->isind[index_now]<<setw(12)<<ig2fft[ig]<<endl;
-			WARNING_QUIT("Parallel_PW::fft_map","isind == -1 !");
+			std::cerr<<"I don't know this grid !"<<std::endl;
+			std::cout<<std::setw(12)<<"xy"
+				<<std::setw(12)<<"isind"<<std::setw(12)<<"ig2fft"<<std::endl;
+			std::cout<<std::setw(12)<<index_now
+				<<std::setw(12)<<this->isind[index_now]<<std::setw(12)<<ig2fft[ig]<<std::endl;
+			ModuleBase::WARNING_QUIT("Parallel_PW::fft_map","isind == -1 !");
 		}
 		ig2fft[ig] = z + this->isind[index_now] * this->n3;
-		//cout << "\n i=" << i << " ig2fft=" << ig2fft[i];
+		//std::cout << "\n i=" << i << " ig2fft=" << ig2fft[i];
 	}
 
 	ngm_i_record = ngm_i;
-//	cout << "\n ngm_i_record = " << ngm_i_record;
-	//cout << setw(12) << "ngm_i" << setw(12) << ngm_i << endl;
+//	std::cout << "\n ngm_i_record = " << ngm_i_record;
+	//std::cout << std::setw(12) << "ngm_i" << std::setw(12) << ngm_i << std::endl;
 
 	return;
 }
 
 
-void Parallel_PW::print_data(ofstream &print)const
+void Parallel_PW::print_data(std::ofstream &print)const
 {
-	print<<setw(12)<<"gcut"<<setw(12)<<this->gcut<<endl;
-	print<<setw(12)<<"nst"<<setw(12)<<this->nst<<endl;
-	print<<setw(12)<<"n1"<<setw(12)<<this->n1<<endl;
-	print<<setw(12)<<"n2"<<setw(12)<<this->n2<<endl;
-	print<<setw(12)<<"n3"<<setw(12)<<this->n3<<endl;
+	print<<std::setw(12)<<"gcut"<<std::setw(12)<<this->gcut<<std::endl;
+	print<<std::setw(12)<<"nst"<<std::setw(12)<<this->nst<<std::endl;
+	print<<std::setw(12)<<"n1"<<std::setw(12)<<this->n1<<std::endl;
+	print<<std::setw(12)<<"n2"<<std::setw(12)<<this->n2<<std::endl;
+	print<<std::setw(12)<<"n3"<<std::setw(12)<<this->n3<<std::endl;
 
-	print<<setw(12)<<"Processor"<<setw(12)<<"Planes"<<setw(12)<<"Columns"
-		 <<setw(12)<<"st_start"<<setw(12)<<"PWs"<<endl;
+	print<<std::setw(12)<<"Processor"<<std::setw(12)<<"Planes"<<std::setw(12)<<"Columns"
+		 <<std::setw(12)<<"st_start"<<std::setw(12)<<"PWs"<<std::endl;
 	for(int i=0;i<nproc_use;i++)
 	{
-		print<<setw(12)<<i<<setw(12)<<this->npps[i]<<setw(12)<<this->nst_per[i]
-			 <<setw(12)<<this->st_start[i]<<setw(12)<<this->npw_per[i]<<endl;
+		print<<std::setw(12)<<i<<std::setw(12)<<this->npps[i]<<std::setw(12)<<this->nst_per[i]
+			 <<std::setw(12)<<this->st_start[i]<<std::setw(12)<<this->npw_per[i]<<std::endl;
 	}
 
 
 	print<<"\n";
-	print<<"====== ismap ======="<<endl;
-	print<<setw(12)<<"Columns"<<setw(12)<<"nxy"<<endl;
+	print<<"====== ismap ======="<<std::endl;
+	print<<std::setw(12)<<"Columns"<<std::setw(12)<<"nxy"<<std::endl;
 	for(int i=0;i<this->nst;i++)
 	{
 		if(i>0)
 		{
 			if(this->ismap[i]<this->ismap[i-1])
 			{
-				print<<"--------------------------"<<endl;
+				print<<"--------------------------"<<std::endl;
 			}
 		}
-		print<<setw(12)<<i<<setw(12)<<this->ismap[i]<<endl;
+		print<<std::setw(12)<<i<<std::setw(12)<<this->ismap[i]<<std::endl;
 	}
 
 	print<<"\n";
-	print<<"====== isind ======"<<endl;
-	print<<setw(12)<<"nxy"<<setw(12)<<"Columns"<<endl;
+	print<<"====== isind ======"<<std::endl;
+	print<<std::setw(12)<<"nxy"<<std::setw(12)<<"Columns"<<std::endl;
 	for(int i=0;i<this->n1*this->n2;i++)
 	{	
 		if(this->isind[i]>=0)
 		{
-			print<<setw(12)<<i<<setw(12)<<this->isind[i]<<endl;
+			print<<std::setw(12)<<i<<std::setw(12)<<this->isind[i]<<std::endl;
 		}
 	}
 
@@ -554,7 +554,7 @@ void Parallel_PW::fft_map_after_vc(
         int ggchg_time
 )
 {
-    if(test_pw) TITLE("Parallel_PW","fft_map_after_vc");
+    if(GlobalV::test_pw) ModuleBase::TITLE("Parallel_PW","fft_map_after_vc");
 
     if(!allocate_igl2g)
     {
@@ -563,18 +563,18 @@ void Parallel_PW::fft_map_after_vc(
         allocate_igl2g = true;
     }
 
-    if(this->gcut == pw.ggchg) ngm_i2 = ngm_i_number[ggchg_time-1];
+    if(this->gcut == GlobalC::pw.ggchg) ngm_i2 = ngm_i_number[ggchg_time-1];
     for (int ig = ngm_i_record2;ig < ngm_i2;ig++)
     {
-        if(this->gcut == pw.ggchg)
+        if(this->gcut == GlobalC::pw.ggchg)
         {
-            pw.gcar[ig] = pw.gdirect[ig]*ucell.G;
-            pw.gg[ig] = pw.get_NormG_cartesian(ig);
+            GlobalC::pw.gcar[ig] = GlobalC::pw.gdirect[ig]*GlobalC::ucell.G;
+            GlobalC::pw.gg[ig] = GlobalC::pw.get_NormG_cartesian(ig);
         }
     }
 
 
-    if(this->gcut == pw.ggchg) ngm_i_record2 = ngm_i2;
+    if(this->gcut == GlobalC::pw.ggchg) ngm_i_record2 = ngm_i2;
 
     if(ggchg_time == 10) {ngm_i2 = 0; ngm_i_record2 = 0;}
 
@@ -588,7 +588,7 @@ void Parallel_PW::fft_map_final_scf(
 	const int &ngmc_g_in // cutgg_num
 )
 {
-	if(test_pw) TITLE("Parallel_PW","fft_map_final_scf");
+	if(GlobalV::test_pw) ModuleBase::TITLE("Parallel_PW","fft_map_final_scf");
 
 	// if already found all the plane waves in this process, return.
 	if(ngm_i_final_scf == ngm) return;
@@ -602,8 +602,8 @@ void Parallel_PW::fft_map_final_scf(
 
 	for (int ig = 0;ig < ngmc_g_in ;ig++)
 	{
-		int m1 = (int)pw.gdirect_global[ig].x;
-		int m2 = (int)pw.gdirect_global[ig].y;
+		int m1 = (int)GlobalC::pw.gdirect_global[ig].x;
+		int m2 = (int)GlobalC::pw.gdirect_global[ig].y;
 
 		if (m1 < 0){m1 += this->n1;}
 		if (m2 < 0){m2 += this->n2;}
@@ -612,15 +612,15 @@ void Parallel_PW::fft_map_final_scf(
 
 		if (this->isind[mc] >= 0)
 		{
-			if (pw.gg_global[ig] <= this->gcut)
+			if (GlobalC::pw.gg_global[ig] <= this->gcut)
 			{
 				this->ig_l2g[ngm_i_final_scf] = ig;
-				if(this->gcut == pw.ggchg) // for charge, not for wave functions.
+				if(this->gcut == GlobalC::pw.ggchg) // for charge, not for wave functions.
 				{
 					// set 
-					pw.gdirect[ngm_i_final_scf] = pw.gdirect_global[ig];
-					pw.gcar[ngm_i_final_scf] = pw.gdirect[ngm_i_final_scf]*ucell.G;
-					pw.gg[ngm_i_final_scf] = pw.gg_global[ig];
+					GlobalC::pw.gdirect[ngm_i_final_scf] = GlobalC::pw.gdirect_global[ig];
+					GlobalC::pw.gcar[ngm_i_final_scf] = GlobalC::pw.gdirect[ngm_i_final_scf]*GlobalC::ucell.G;
+					GlobalC::pw.gg[ngm_i_final_scf] = GlobalC::pw.gg_global[ig];
 				}
 				++ngm_i_final_scf;
 			}
@@ -633,11 +633,11 @@ void Parallel_PW::fft_map_final_scf(
 		//	ig_l2g[i] is the index of ig_global
 		//	it tells the position in ig_global
 		//  for each plane wave in local processor
-		//  The local plane wave number is ngm_i = pw.ngmc
-		//  The total plane wave number is pw.ngmc_g
-		int x = int(pw.gdirect_global[this->ig_l2g[ig]].x);
-		int y = int(pw.gdirect_global[this->ig_l2g[ig]].y);
-		int z = int(pw.gdirect_global[this->ig_l2g[ig]].z);
+		//  The local plane wave number is ngm_i = GlobalC::pw.ngmc
+		//  The total plane wave number is GlobalC::pw.ngmc_g
+		int x = int(GlobalC::pw.gdirect_global[this->ig_l2g[ig]].x);
+		int y = int(GlobalC::pw.gdirect_global[this->ig_l2g[ig]].y);
+		int z = int(GlobalC::pw.gdirect_global[this->ig_l2g[ig]].z);
 
 		if (x < 0) x += this->n1;
 		if (y < 0) y += this->n2;
@@ -645,23 +645,57 @@ void Parallel_PW::fft_map_final_scf(
 
 		const int index_now = y+x*n2;
 		
-	//	cout<<setw(12)<<x+y*n1<<setw(12)<<this->index_ip[x+y*this->n1]<<endl;
+	//	std::cout<<std::setw(12)<<x+y*n1<<std::setw(12)<<this->index_ip[x+y*this->n1]<<std::endl;
 		if(this->isind[index_now]==-1)
 		{
-			cerr<<"I don't know this grid !"<<endl;
-			cout<<setw(12)<<"xy"
-				<<setw(12)<<"isind"<<setw(12)<<"ig2fft"<<endl;
-			cout<<setw(12)<<index_now
-				<<setw(12)<<this->isind[index_now]<<setw(12)<<ig2fft[ig]<<endl;
-			WARNING_QUIT("Parallel_PW::fft_map","isind == -1 !");
+			std::cerr<<"I don't know this grid !"<<std::endl;
+			std::cout<<std::setw(12)<<"xy"
+				<<std::setw(12)<<"isind"<<std::setw(12)<<"ig2fft"<<std::endl;
+			std::cout<<std::setw(12)<<index_now
+				<<std::setw(12)<<this->isind[index_now]<<std::setw(12)<<ig2fft[ig]<<std::endl;
+			ModuleBase::WARNING_QUIT("Parallel_PW::fft_map","isind == -1 !");
 		}
 		ig2fft[ig] = z + this->isind[index_now] * this->n3;
-		//cout << "\n i=" << i << " ig2fft=" << ig2fft[i];
+		//std::cout << "\n i=" << i << " ig2fft=" << ig2fft[i];
 	}
 
 	ngm_i_record_final_scf = ngm_i_final_scf;
-//	cout << "\n ngm_i_record = " << ngm_i_record;
-	//cout << setw(12) << "ngm_i" << setw(12) << ngm_i << endl;
+//	std::cout << "\n ngm_i_record = " << ngm_i_record;
+	//std::cout << std::setw(12) << "ngm_i" << std::setw(12) << ngm_i << std::endl;
 
 	return;
 }
+
+#ifdef __MPI
+void Parallel_PW:: stick_to_pool(double *stick, const int &ir, double *out)
+{	
+	//ModuleBase::TITLE("Parallel_Grid","zpiece_to_all");
+	MPI_Status ierror;
+
+	const int is = isind[ir];
+	const int ip = index_ip[ir];
+
+	if(ip == 0 && GlobalV::RANK_IN_POOL ==0)
+	{
+		for(int iz=0; iz<n3; iz++)
+		{
+			out[is*n3+iz] = stick[iz];
+		}
+	}
+	else if(ip == GlobalV::RANK_IN_POOL )
+	{
+		MPI_Recv(stick, n3, MPI_DOUBLE, 0, ir, POOL_WORLD,&ierror);
+		for(int iz=0; iz<n3; iz++)
+		{
+			out[is*n3+iz] = stick[iz];
+		}
+	}
+	else if(GlobalV::RANK_IN_POOL==0)
+	{
+		MPI_Send(stick, n3, MPI_DOUBLE, ip, ir, POOL_WORLD);
+	}
+	
+
+	return;	
+}
+#endif

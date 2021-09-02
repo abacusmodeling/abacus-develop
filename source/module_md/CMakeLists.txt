@@ -6,7 +6,7 @@ add_library(
     MD_func.cpp
     MD_thermo.cpp
     run_md_classic.cpp
-    run_md_lcao.cpp
-    run_md_pw.cpp
-    run_md.cpp
+    LJ_potential.cpp
+    DP_potential.cpp
+    cmd_neighbor.cpp
 )

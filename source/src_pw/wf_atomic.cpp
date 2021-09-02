@@ -9,15 +9,16 @@
 
 WF_atomic::WF_atomic()
 {
-    evc  = new ComplexMatrix[1];
-    wanf2= new ComplexMatrix[1];
+    evc  = new ModuleBase::ComplexMatrix[1];
+    wanf2= new ModuleBase::ComplexMatrix[1];
+    seed = 0;
 }
 
 WF_atomic::~WF_atomic()
 {
-	if(test_deconstructor)
+	if(GlobalV::test_deconstructor)
 	{
-		cout << " ~WF_atomic()" << endl;
+		std::cout << " ~WF_atomic()" << std::endl;
 	}
     delete[] evc;
     delete[] wanf2;
@@ -30,10 +31,10 @@ WF_atomic::~WF_atomic()
 //==========================================================
 void WF_atomic::init_at_1(void)
 {
-    if (test_wf) TITLE("WF_atomic","init_at_1");
-    timer::tick("WF_atomic","init_at_1");
+    if (GlobalV::test_wf) ModuleBase::TITLE("WF_atomic","init_at_1");
+    ModuleBase::timer::tick("WF_atomic","init_at_1");
 
-	ofs_running << "\n Make real space PAO into reciprocal space." << endl;
+	GlobalV::ofs_running << "\n Make real space PAO into reciprocal space." << std::endl;
 
     this->print_PAOs();
 
@@ -41,44 +42,44 @@ void WF_atomic::init_at_1(void)
 // EXPLAIN : Find the type of atom that has most mesh points.
 //----------------------------------------------------------
     int ndm = 0;
-    for (int it=0; it<ucell.ntype; it++)
+    for (int it=0; it<GlobalC::ucell.ntype; it++)
     {
-        ndm = (ucell.atoms[it].msh > ndm) ? ucell.atoms[it].msh : ndm;
+        ndm = (GlobalC::ucell.atoms[it].msh > ndm) ? GlobalC::ucell.atoms[it].msh : ndm;
     }
-	OUT(ofs_running,"max mesh points in Pseudopotential",ndm);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"max mesh points in Pseudopotential",ndm);
 
     // needed to normalize atomic wfcs (not a bad idea in general and
     // necessary to compute correctly lda+U projections)
-    ppcell.tab_at.zero_out();
+    GlobalC::ppcell.tab_at.zero_out();
 //----------------------------------------------------------
 // EXPLAIN : If use gauss orbitals to represent aotmic
 // orbitals (controlled by parameters)
 //
 // USE GLOBAL CLASS VARIABLES :
-// NAME : ucell.atoms.nchi
-// NAME : ucell.atoms.msh(number of mesh points)
-// NAME : ucell.atoms.r
+// NAME : GlobalC::ucell.atoms.nchi
+// NAME : GlobalC::ucell.atoms.msh(number of mesh points)
+// NAME : GlobalC::ucell.atoms.r
 //----------------------------------------------------------
     const int startq = 0;
-    const double pref = FOUR_PI / sqrt(ucell.omega);
+    const double pref = ModuleBase::FOUR_PI / sqrt(GlobalC::ucell.omega);
     double *aux = new double[ndm];
     double *vchi = new double[ndm];
 
-	OUT(ofs_running,"dq(describe PAO in reciprocal space)",DQ);
-	OUT(ofs_running,"max q",NQX);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"dq(describe PAO in reciprocal space)",GlobalV::DQ);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"max q",GlobalV::NQX);
 
-    for (int it=0; it<ucell.ntype; it++)
+    for (int it=0; it<GlobalC::ucell.ntype; it++)
     {
-		Atom* atom = &ucell.atoms[it];
+		Atom* atom = &GlobalC::ucell.atoms[it];
 
-		ofs_running <<"\n number of pseudo atomic orbitals for "
-		<< atom->label << " is " << atom->nchi << endl;
+		GlobalV::ofs_running <<"\n number of pseudo atomic orbitals for "
+		<< atom->label << " is " << atom->nchi << std::endl;
 
         for (int ic=0; ic<atom->nchi ;ic++)
         {
-			//cout << "\n T=" << it << " ic=" << ic << endl;
+			//std::cout << "\n T=" << it << " ic=" << ic << std::endl;
             int nmesh;
-            if(RENORMWITHMESH)
+            if(GlobalV::RENORMWITHMESH)
                 nmesh = atom->mesh;
             else
                 nmesh = atom->msh;
@@ -90,10 +91,10 @@ void WF_atomic::init_at_1(void)
                 inner_part[ir] = atom->chi(ic,ir) * atom->chi(ic,ir);
             }
             double unit = 0.0;
-            Integral::Simpson_Integral(nmesh, inner_part, atom->rab, unit);
+            ModuleBase::Integral::Simpson_Integral(nmesh, inner_part, atom->rab, unit);
             delete[] inner_part;
 
-			ofs_running << " the unit of pseudo atomic orbital is " << unit;
+			GlobalV::ofs_running << " the unit of pseudo atomic orbital is " << unit;
 
             //=================================
             // normalize radial wave functions
@@ -112,36 +113,36 @@ void WF_atomic::init_at_1(void)
                 inner_part[ir] = atom->chi(ic,ir) * atom->chi(ic,ir);
             }
             unit = 0.0;
-            Integral::Simpson_Integral(nmesh, inner_part, atom->rab, unit);
+            ModuleBase::Integral::Simpson_Integral(nmesh, inner_part, atom->rab, unit);
             delete[] inner_part;
 
-			ofs_running << ", renormalize to " << unit << endl;
+			GlobalV::ofs_running << ", renormalize to " << unit << std::endl;
 
             if (atom->oc[ic] >= 0.0)
             {
                 const int l = atom->lchi[ic];
-                for (int iq=startq; iq<NQX; iq++)
+                for (int iq=startq; iq<GlobalV::NQX; iq++)
                 {
-                    const double q = DQ * iq;
-                    Sphbes::Spherical_Bessel(atom->msh, atom->r, q, l, aux);
+                    const double q = GlobalV::DQ * iq;
+                    ModuleBase::Sphbes::Spherical_Bessel(atom->msh, atom->r, q, l, aux);
                     for (int ir = 0;ir < atom->msh;ir++)
                     {
                         vchi[ir] = atom->chi(ic,ir) * aux[ir] * atom->r[ir];
                     }
 
                     double vqint = 0.0;
-                    Integral::Simpson_Integral(atom->msh, vchi, atom->rab, vqint);
+                    ModuleBase::Integral::Simpson_Integral(atom->msh, vchi, atom->rab, vqint);
 
-                    ppcell.tab_at(it, ic, iq) =  vqint * pref;
+                    GlobalC::ppcell.tab_at(it, ic, iq) =  vqint * pref;
                     //				if( it == 0 && ic == 0 )
                     //				{
                     //
-                    //					for (ir = 0;ir < ucell.atoms[it].msh;ir++)
-                    //						ofs_running << setprecision(20) << "\n vchi(" << ir << ")=" << vchi[ir];
-                    //					ofs_running<<"\n aux[0] = "<<aux[0];
-                    //					ofs_running<<"\n msh = "<< ucell.atoms[it].msh;
-                    //					ofs_running<<"\n tab_at : "<<ppcell.tab_at(it, ic, iq) ;
-                    //					ofs_running<<"\n pref = "<<pref;
+                    //					for (ir = 0;ir < GlobalC::ucell.atoms[it].msh;ir++)
+                    //						GlobalV::ofs_running << std::setprecision(20) << "\n vchi(" << ir << ")=" << vchi[ir];
+                    //					GlobalV::ofs_running<<"\n aux[0] = "<<aux[0];
+                    //					GlobalV::ofs_running<<"\n msh = "<< GlobalC::ucell.atoms[it].msh;
+                    //					GlobalV::ofs_running<<"\n tab_at : "<<ppcell.tab_at(it, ic, iq) ;
+                    //					GlobalV::ofs_running<<"\n pref = "<<pref;
                     //				}
                 } // enddo
             } // endif
@@ -150,20 +151,20 @@ void WF_atomic::init_at_1(void)
 
     delete [] aux;
     delete [] vchi;
-    timer::tick("WF_atomic","init_at_1");
+    ModuleBase::timer::tick("WF_atomic","init_at_1");
     return;
 }// end init_at_1
 
 void WF_atomic::print_PAOs(void)const
 {
-    if (MY_RANK!=0) return;
-    for (int it=0; it<ucell.ntype; it++)
+    if (GlobalV::MY_RANK!=0) return;
+    for (int it=0; it<GlobalC::ucell.ntype; it++)
     {
-        for (int icc=0; icc<ucell.atoms[it].nchi ;icc++)
+        for (int icc=0; icc<GlobalC::ucell.atoms[it].nchi ;icc++)
         {
             int ic = icc;
-            if(NSPIN==4) ic = icc/2;
-            string orbital_type;
+            if(GlobalV::NSPIN==4) ic = icc/2;
+            std::string orbital_type;
             if (ic == 0)  orbital_type = "S";
             else if (ic == 1) orbital_type = "P";
             else if (ic == 2) orbital_type = "D";
@@ -171,27 +172,27 @@ void WF_atomic::print_PAOs(void)const
 			else if (ic == 4) orbital_type = "G"; // liuyu add 2021-05-07
             else
             {
-				ofs_warning << "\n nchi = " << ucell.atoms[it].nchi << endl;
-                WARNING_QUIT("WF_atomic::print_PAOs", "unknown PAO type.");
+				GlobalV::ofs_warning << "\n nchi = " << GlobalC::ucell.atoms[it].nchi << std::endl;
+                ModuleBase::WARNING_QUIT("WF_atomic::print_PAOs", "unknown PAO type.");
             }
 
-            stringstream ss;
-            ss << global_out_dir
-            << ucell.atoms[it].label << "/"
-            << ucell.atoms[it].label << "-"
+            std::stringstream ss;
+            ss << GlobalV::global_out_dir
+            << GlobalC::ucell.atoms[it].label << "/"
+            << GlobalC::ucell.atoms[it].label << "-"
             << orbital_type << ".ORBITAL";
 
-            ofstream ofs(ss.str().c_str());
-            ofs << "Mesh " << ucell.atoms[it].msh;
-            ofs << "\n" << setw(15) << "Radial"
-            << setw(15) << "Psi"
-            << setw(15) << "Rab";
+            std::ofstream ofs(ss.str().c_str());
+            ofs << "Mesh " << GlobalC::ucell.atoms[it].msh;
+            ofs << "\n" << std::setw(15) << "Radial"
+            << std::setw(15) << "Psi"
+            << std::setw(15) << "Rab";
 
-            for (int i=0;i<ucell.atoms[it].msh;i++)
+            for (int i=0;i<GlobalC::ucell.atoms[it].msh;i++)
             {
-                ofs << "\n" << setw(15) << ucell.atoms[it].r[i]
-                << setw(15) << ucell.atoms[it].chi(icc,i)
-                << setw(15) << ucell.atoms[it].rab[i];
+                ofs << "\n" << std::setw(15) << GlobalC::ucell.atoms[it].r[i]
+                << std::setw(15) << GlobalC::ucell.atoms[it].chi(icc,i)
+                << std::setw(15) << GlobalC::ucell.atoms[it].rab[i];
             }
             ofs.close();
         }
@@ -207,74 +208,74 @@ void WF_atomic::print_PAOs(void)const
 //===================================================================
 // from wfcinit.f90
 
-void WF_atomic::check_psi(const ComplexMatrix *evc)const
+void WF_atomic::check_psi(const ModuleBase::ComplexMatrix *evc)const
 {
-    cout<<"\n Check psi : \n";
+    std::cout<<"\n Check psi : \n";
 
-    for (int iw=0;iw<NBANDS;iw++)
+    for (int iw=0;iw<GlobalV::NBANDS;iw++)
     {
         double sum_evc = abs2_row(this->evc[0],iw);
-        OUT("iw",iw);
-        OUT("sum_evc",sum_evc);
+        ModuleBase::GlobalFunc::OUT("iw",iw);
+        ModuleBase::GlobalFunc::OUT("sum_evc",sum_evc);
     }
 
-    for (int ik=0;ik<kv.nks;ik++)
+    for (int ik=0;ik<GlobalC::kv.nks;ik++)
     {
         double sum_evc = abs2(this->evc[ik]);
-        OUT("ik",ik);
-        OUT("sum_evc2",sum_evc);
+        ModuleBase::GlobalFunc::OUT("ik",ik);
+        ModuleBase::GlobalFunc::OUT("sum_evc2",sum_evc);
     }
-    //QUIT();
+    //ModuleBase::QUIT();
 }
 
 void WF_atomic::atomic_wfc
 (	const int ik,
   const int np,
   const int lmax_wfc,
-  ComplexMatrix &wfcatom,
-  const realArray &table_q,
+  ModuleBase::ComplexMatrix &wfcatom,
+  const ModuleBase::realArray &table_q,
   const int &table_dimension,
   const double &dq
 )const
 {
-    if (test_wf>3) TITLE("WF_atomic","atomic_wfc");
-    timer::tick("WF_atomic","atomic_wfc");
+    if (GlobalV::test_wf>3) ModuleBase::TITLE("WF_atomic","atomic_wfc");
+    ModuleBase::timer::tick("WF_atomic","atomic_wfc");
     //=========================================================
     // This routine computes the superposition of atomic
     // WF_atomictions for a given k-point.
     //=========================================================
     const int total_lm = (lmax_wfc + 1) * (lmax_wfc + 1);
-    matrix ylm(total_lm, np);
-    complex<double> *aux = new complex<double>[np];
+    ModuleBase::matrix ylm(total_lm, np);
+    std::complex<double> *aux = new std::complex<double>[np];
     double *chiaux = new double[1];
 
-    Vector3<double> *gk = new Vector3 <double> [np];
+    ModuleBase::Vector3<double> *gk = new ModuleBase::Vector3 <double> [np];
     for (int ig=0;ig<np;ig++)
     {
         gk[ig] = WF_atomic::get_1qvec_cartesian(ik, ig);
     }
     //ylm = spherical harmonics functions
-    YlmReal::Ylm_Real(total_lm, np, gk, ylm);
+    ModuleBase::YlmReal::Ylm_Real(total_lm, np, gk, ylm);
     int index = 0;
     //---------------------------------------------------------
     // Calculate G space 3D wave functions
     //---------------------------------------------------------
     double *flq = new double[np];
-    for (int it = 0;it < ucell.ntype;it++)
+    for (int it = 0;it < GlobalC::ucell.ntype;it++)
     {
-        for (int ia = 0;ia < ucell.atoms[it].na;ia++)
+        for (int ia = 0;ia < GlobalC::ucell.atoms[it].na;ia++)
         {
-			//cout << "\n it = " << it << " ia = " << ia << endl;
-            complex<double> *sk = this->get_sk(ik, it, ia);
+			//std::cout << "\n it = " << it << " ia = " << ia << std::endl;
+            std::complex<double> *sk = this->get_sk(ik, it, ia);
             //-------------------------------------------------------
             // Calculate G space 3D wave functions
             //-------------------------------------------------------
-            for (int iw = 0;iw < ucell.atoms[it].nchi;iw++)
+            for (int iw = 0;iw < GlobalC::ucell.atoms[it].nchi;iw++)
             {
-                if (ucell.atoms[it].oc[iw] >= 0.0)
+                if (GlobalC::ucell.atoms[it].oc[iw] >= 0.0)
                 {
-                    const int l = ucell.atoms[it].lchi[iw];
-                    complex<double> lphase = pow(NEG_IMAG_UNIT, l);
+                    const int l = GlobalC::ucell.atoms[it].lchi[iw];
+                    std::complex<double> lphase = pow(ModuleBase::NEG_IMAG_UNIT, l);
                     //-----------------------------------------------------
                     //  the factor i^l MUST BE PRESENT in order to produce
                     //  WF_atomictions for k=0 that are real in real space
@@ -286,18 +287,18 @@ void WF_atomic::atomic_wfc
                     for (int ig=0; ig<np; ig++)
                     {
                         flq[ig] =
-                            PolyInt::Polynomial_Interpolation(table_q,
-                                                               it, iw, table_dimension, dq, gk[ig].norm() * ucell.tpiba );
+                            ModuleBase::PolyInt::Polynomial_Interpolation(table_q,
+                                                               it, iw, table_dimension, dq, gk[ig].norm() * GlobalC::ucell.tpiba );
                     }
 
-                    if(NSPIN==4)
+                    if(GlobalV::NSPIN==4)
                     {
-                        if(ucell.atoms[it].has_so)
+                        if(GlobalC::ucell.atoms[it].has_so)
                         {
                             Soc soc;
 						    soc.rot_ylm(l+1);
-                            const double j = ucell.atoms[it].jchi[iw];
-                            if ( !(DOMAG||DOMAG_Z))
+                            const double j = GlobalC::ucell.atoms[it].jchi[iw];
+                            if ( !(GlobalV::DOMAG||GlobalV::DOMAG_Z))
                             {//atomic_wfc_so
                                 double fact[2];
                                 for(int m=-l-1;m<l+1;m++)
@@ -310,8 +311,8 @@ void WF_atomic::atomic_wfc
                                       {
                                           if(fabs(fact[is])>1e-8)
                                           {
-                                              const int ind = ppcell.lmaxkb + soc.sph_ind(l,j,m,is);
-                                              ZEROS(aux, np);
+                                              const int ind = GlobalC::ppcell.lmaxkb + soc.sph_ind(l,j,m,is);
+                                              ModuleBase::GlobalFunc::ZEROS(aux, np);
                                               for(int n1=0;n1<2*l+1;n1++){
                                                  const int lm = l*l +n1;
                                                  if(abs(soc.rotylm(n1,ind))>1e-8)
@@ -322,7 +323,7 @@ void WF_atomic::atomic_wfc
                                                  wfcatom(index, ig + this->npwx*is ) = lphase * fact[is] * sk[ig] * aux[ig] * flq[ig];
                                           }
                                           else
-                                            for(int ig=0; ig<np;ig++) wfcatom(index,ig+ this->npwx*is) = complex<double>(0.0 , 0.0);
+                                            for(int ig=0; ig<np;ig++) wfcatom(index,ig+ this->npwx*is) = std::complex<double>(0.0 , 0.0);
                                       }//is
                                       index++;
                                    }//if
@@ -332,7 +333,7 @@ void WF_atomic::atomic_wfc
                             {//atomic_wfc_so_mag
 
                               double alpha, gamma;
-                              complex<double> fup,fdown;
+                              std::complex<double> fup,fdown;
                               int nc;
                               //This routine creates two functions only in the case j=l+1/2 or exit in the other case
                               if(fabs(j-l+0.5<1e-4)) continue;
@@ -345,9 +346,9 @@ void WF_atomic::atomic_wfc
                                  }
                               else
                               {
-                                 for(int ib = 0;ib < ucell.atoms[it].nchi;ib++)
+                                 for(int ib = 0;ib < GlobalC::ucell.atoms[it].nchi;ib++)
                                  {
-                                    if((ucell.atoms[it].lchi[ib] == l)&&(fabs(ucell.atoms[it].jchi[ib]-l+0.5)<1e-4))
+                                    if((GlobalC::ucell.atoms[it].lchi[ib] == l)&&(fabs(GlobalC::ucell.atoms[it].jchi[ib]-l+0.5)<1e-4))
                                     {
                                        nc=ib;
                                        break;
@@ -356,21 +357,21 @@ void WF_atomic::atomic_wfc
                                  for(int ig=0;ig<np;ig++)
                                  {//Average the two functions
                                     chiaux[ig] =  l *
-                                         PolyInt::Polynomial_Interpolation(table_q,
-                                                               it, nc, table_dimension, dq, gk[ig].norm() * ucell.tpiba );
+                                         ModuleBase::PolyInt::Polynomial_Interpolation(table_q,
+                                                               it, nc, table_dimension, dq, gk[ig].norm() * GlobalC::ucell.tpiba );
 
                                     chiaux[ig] += flq[ig] * (l+1.0) ;
                                     chiaux[ig] *= 1/(2.0*l+1.0);
                                  }
                               }
                               //and construct the starting wavefunctions as in the noncollinear case.
-                              alpha = ucell.magnet.angle1_[it];
-                              gamma = -1 * ucell.magnet.angle2_[it] + 0.5 * PI;
+                              alpha = GlobalC::ucell.magnet.angle1_[it];
+                              gamma = -1 * GlobalC::ucell.magnet.angle2_[it] + 0.5 * ModuleBase::PI;
 
                               for(int m = 0;m<2*l+1;m++)
                               {
                                  const int lm = l*l +m;
-                                 if(index+2*l+1>ucell.natomwfc) WARNING_QUIT("wf.atomic_wfc()","error: too many wfcs");
+                                 if(index+2*l+1>GlobalC::ucell.natomwfc) ModuleBase::WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
                                  for(int ig = 0;ig<np;ig++)
                                  {
                                      aux[ig] = sk[ig] * ylm(lm,ig) * chiaux[ig];
@@ -380,16 +381,16 @@ void WF_atomic::atomic_wfc
                                  for(int ig = 0;ig<np;ig++)
                                  {
                                      fup = cos(0.5 * alpha) * aux[ig];
-                                     fdown = IMAG_UNIT * sin(0.5* alpha) * aux[ig];
+                                     fdown = ModuleBase::IMAG_UNIT * sin(0.5* alpha) * aux[ig];
                                      //build the orthogonal wfc
-                                     //first rotation with angle (alpha + PI) around (OX)
-                                     wfcatom(index,ig) = (cos(0.5 * gamma) + IMAG_UNIT * sin(0.5*gamma)) * fup;
-                                     wfcatom(index,ig+ this->npwx) = (cos(0.5 * gamma) - IMAG_UNIT * sin(0.5*gamma)) * fdown;
+                                     //first rotation with angle (alpha + ModuleBase::PI) around (OX)
+                                     wfcatom(index,ig) = (cos(0.5 * gamma) + ModuleBase::IMAG_UNIT * sin(0.5*gamma)) * fup;
+                                     wfcatom(index,ig+ this->npwx) = (cos(0.5 * gamma) - ModuleBase::IMAG_UNIT * sin(0.5*gamma)) * fdown;
                                      //second rotation with angle gamma around(OZ)
-                                     fup = cos(0.5 * (alpha + PI))*aux[ig];
-                                     fdown = IMAG_UNIT * sin(0.5 * (alpha + PI))*aux[ig];
-                                     wfcatom(index+2*l+1,ig) = (cos(0.5*gamma) + IMAG_UNIT*sin(0.5*gamma))*fup;
-                                     wfcatom(index+2*l+1,ig+ this->npwx) = (cos(0.5*gamma) - IMAG_UNIT*sin(0.5*gamma))*fdown;
+                                     fup = cos(0.5 * (alpha + ModuleBase::PI))*aux[ig];
+                                     fdown = ModuleBase::IMAG_UNIT * sin(0.5 * (alpha + ModuleBase::PI))*aux[ig];
+                                     wfcatom(index+2*l+1,ig) = (cos(0.5*gamma) + ModuleBase::IMAG_UNIT*sin(0.5*gamma))*fup;
+                                     wfcatom(index+2*l+1,ig+ this->npwx) = (cos(0.5*gamma) - ModuleBase::IMAG_UNIT*sin(0.5*gamma))*fdown;
                                  }
                                  index++;
                               }
@@ -399,13 +400,13 @@ void WF_atomic::atomic_wfc
                         else
                         {//atomic_wfc_nc
                             double alpha, gamman;
-                            complex<double> fup, fdown;
-                            alpha = ucell.magnet.angle1_[it];
-                            gamman = -ucell.magnet.angle2_[it] + 0.5*PI;
+                            std::complex<double> fup, fdown;
+                            alpha = GlobalC::ucell.magnet.angle1_[it];
+                            gamman = -GlobalC::ucell.magnet.angle2_[it] + 0.5*ModuleBase::PI;
                             for(int m = 0;m<2*l+1;m++)
                             {
                                 const int lm = l*l +m;
-                                if(index+2*l+1>ucell.natomwfc) WARNING_QUIT("wf.atomic_wfc()","error: too many wfcs");
+                                if(index+2*l+1>GlobalC::ucell.natomwfc) ModuleBase::WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
                                 for(int ig = 0;ig<np;ig++)
                                 {
                                      aux[ig] = sk[ig] * ylm(lm,ig) * flq[ig];
@@ -415,16 +416,16 @@ void WF_atomic::atomic_wfc
                                 for(int ig = 0;ig<np;ig++)
                                 {
                                      fup = cos(0.5*alpha) * aux[ig];
-                                     fdown = IMAG_UNIT * sin(0.5* alpha) * aux[ig];
+                                     fdown = ModuleBase::IMAG_UNIT * sin(0.5* alpha) * aux[ig];
                                      //build the orthogonal wfc
-                                     //first rotation with angle(alpha+PI) around(OX)
-                                     wfcatom(index,ig) = (cos(0.5 * gamman) + IMAG_UNIT * sin(0.5*gamman)) * fup;
-                                     wfcatom(index,ig+ this->npwx) = (cos(0.5 * gamman) - IMAG_UNIT * sin(0.5*gamman)) * fdown;
+                                     //first rotation with angle(alpha+ModuleBase::PI) around(OX)
+                                     wfcatom(index,ig) = (cos(0.5 * gamman) + ModuleBase::IMAG_UNIT * sin(0.5*gamman)) * fup;
+                                     wfcatom(index,ig+ this->npwx) = (cos(0.5 * gamman) - ModuleBase::IMAG_UNIT * sin(0.5*gamman)) * fdown;
                                      //second rotation with angle gamma around(OZ)
-                                     fup = cos(0.5 * (alpha + PI)) * aux[ig];
-                                     fdown = IMAG_UNIT * sin(0.5 * (alpha + PI)) * aux[ig];
-                                     wfcatom(index+2*l+1,ig) = (cos(0.5*gamman) + IMAG_UNIT*sin(0.5*gamman))*fup;
-                                     wfcatom(index+2*l+1,ig+ this->npwx) = (cos(0.5*gamman) - IMAG_UNIT*sin(0.5*gamman))*fdown;
+                                     fup = cos(0.5 * (alpha + ModuleBase::PI)) * aux[ig];
+                                     fdown = ModuleBase::IMAG_UNIT * sin(0.5 * (alpha + ModuleBase::PI)) * aux[ig];
+                                     wfcatom(index+2*l+1,ig) = (cos(0.5*gamman) + ModuleBase::IMAG_UNIT*sin(0.5*gamman))*fup;
+                                     wfcatom(index+2*l+1,ig+ this->npwx) = (cos(0.5*gamman) - ModuleBase::IMAG_UNIT*sin(0.5*gamman))*fdown;
                                 }
                                 index++;
                             }
@@ -442,8 +443,8 @@ void WF_atomic::atomic_wfc
                             wfcatom(index, ig) = lphase * sk [ig] * ylm(lm, ig) * flq[ig];
                             // very useful for debug, don't delete this
 //							if(i==24 && index==0){
-//							cout << "\n wfcatom(" << index<<","<<i<<") = " << wfcatom(index,i);
-//							cout << "\n ylm(" << lm <<","<<i<<") = " << ylm (lm,i)
+//							std::cout << "\n wfcatom(" << index<<","<<i<<") = " << wfcatom(index,i);
+//							std::cout << "\n ylm(" << lm <<","<<i<<") = " << ylm (lm,i)
 //							    << " sk[i]=" <<sk[i] << " chiq=" << chiq (it,iw,i) ;
 //							}
                         }
@@ -456,42 +457,193 @@ void WF_atomic::atomic_wfc
         } //end ia //mohan modify 2007-11-7
     } // end nt
 
-	if(test_wf)OUT(ofs_running,"wf_index",index);
+	if(GlobalV::test_wf)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wf_index",index);
 
-    if (index != ucell.natomwfc)
+    if (index != GlobalC::ucell.natomwfc)
     {
-        WARNING_QUIT("wf.atomic_wfc()","index != ucell.natomwfc");
+        ModuleBase::WARNING_QUIT("GlobalC::wf.atomic_wfc()","index != GlobalC::ucell.natomwfc");
     }
     delete[] flq;
     delete [] gk;
     delete [] aux;
     delete[] chiaux;
-    timer::tick("WF_atomic","atomic_wfc");
+    ModuleBase::timer::tick("WF_atomic","atomic_wfc");
     return;
 } //end subroutine atomic_wfc
 
-void WF_atomic::random(ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const
+void WF_atomic::random(ModuleBase::ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const
 {
     assert(iw_start >= 0);
     assert(psi.nr >= iw_end);
-    const int ng = kv.ngk[ik];
-    for (int iw = iw_start ;iw < iw_end;iw++)
+    const int ng = GlobalC::kv.ngk[ik];
+#ifdef __MPI
+    if(seed > 0)//qianrui add 2021-8-13
     {
+        srand(unsigned(seed + GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL] + ik));
+        int nxy = GlobalC::pw.ncx * GlobalC::pw.ncy;
+        int nrxx = GlobalC::pw.nrxx;
+        int nz = GlobalC::pw.ncz;
+        int *GR_index = new int [ng];
         for (int ig = 0;ig < ng;ig++)
         {
-            const double rr = std::rand()/double(RAND_MAX); //qianrui add RAND_MAX
-            const double arg= TWO_PI * std::rand()/double(RAND_MAX);
-            Vector3<double> v3 = pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
-            psi(iw,ig) = complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
+            GR_index[ig] = GlobalC::pw.ig2fftw[ GlobalC::wf.igk(ik, ig) ];
         }
-        if(NPOL==2)for (int ig = this->npwx;ig < this->npwx + ng;ig++)
+        double *stickrr = new double[nz];
+        double *stickarg = new double[nz];
+        double *tmprr = new double[nrxx];
+        double *tmparg = new double[nrxx];
+        for (int iw = iw_start ;iw < iw_end;iw++)
         {
-            const double rr = std::rand()/double(RAND_MAX);
-            const double arg= TWO_PI * std::rand()/double(RAND_MAX);
-            Vector3<double> v3 = pw.get_GPlusK_cartesian(ik, this->igk(ik, ig - this->npwx));
-            psi(iw,ig) = complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
+            int startig = 0;
+            for(int ipol = 0 ; ipol < GlobalV::NPOL ; ++ipol)
+            {
+            
+	            for(int ir=0; ir < nxy; ir++)
+	            {
+                    if(GlobalC::pw.FFT_wfc.index_ip[ir] < 0) continue;
+	            	if(GlobalV::RANK_IN_POOL==0)
+	            	{
+	            		for(int iz=0; iz<nz; iz++)
+	            		{
+	            			stickrr[ iz ] = std::rand()/double(RAND_MAX);
+                            stickarg[ iz ] = std::rand()/double(RAND_MAX);
+	            		}
+	            	}
+	            	GlobalC::pw.FFT_wfc.stick_to_pool(stickrr, ir, tmprr);
+                    GlobalC::pw.FFT_wfc.stick_to_pool(stickarg, ir, tmparg);
+	            }
+
+                for (int ig = 0;ig < ng;ig++)
+                {
+                    const double rr = tmprr[GR_index[ig]];
+                    const double arg= ModuleBase::TWO_PI * tmparg[GR_index[ig]];
+                    ModuleBase::Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
+                    psi(iw,ig+startig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
+                }
+                startig += npwx;
+            }
         }
+        delete[] stickrr;
+        delete[] stickarg;
+        delete[] tmprr;
+        delete[] tmparg;
+        delete[] GR_index;
     }
+    else
+    {
+#else
+        if(seed > 0)//qianrui add 2021-8-13
+        {
+            srand(unsigned(seed + GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL] + ik));
+        }
+#endif
+        for (int iw = iw_start ;iw < iw_end;iw++)
+        {
+            for (int ig = 0;ig < ng;ig++)
+            {
+                const double rr = std::rand()/double(RAND_MAX); //qianrui add RAND_MAX
+                const double arg= ModuleBase::TWO_PI * std::rand()/double(RAND_MAX);
+                ModuleBase::Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
+                psi(iw,ig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
+            }
+            if(GlobalV::NPOL==2)for (int ig = this->npwx;ig < this->npwx + ng;ig++)
+            {
+                const double rr = std::rand()/double(RAND_MAX);
+                const double arg= ModuleBase::TWO_PI * std::rand()/double(RAND_MAX);
+                ModuleBase::Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig - this->npwx));
+                psi(iw,ig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
+            }
+        }
+#ifdef __MPI
+    }
+#endif
+
     return;
 }
 
+void WF_atomic::atomicrandom(ModuleBase::ComplexMatrix &psi,const int iw_start,const int iw_end,const int ik)const
+{
+    assert(iw_start >= 0);
+    assert(psi.nr >= iw_end);
+    const int ng = GlobalC::kv.ngk[ik];
+#ifdef __MPI
+    if(seed > 0)//qianrui add 2021-8-13
+    {
+        srand(unsigned(seed + GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL] + ik));
+        int nxy = GlobalC::pw.ncx * GlobalC::pw.ncy;
+        int nrxx = GlobalC::pw.nrxx;
+        int nz = GlobalC::pw.ncz;
+        int *GR_index = new int [ng];
+        for (int ig = 0;ig < ng;ig++)
+        {
+            GR_index[ig] = GlobalC::pw.ig2fftw[ GlobalC::wf.igk(ik, ig) ];
+        }
+        double *stickrr = new double[nz];
+        double *stickarg = new double[nz];
+        double *tmprr = new double[nrxx];
+        double *tmparg = new double[nrxx];
+        for (int iw = iw_start ;iw < iw_end;iw++)
+        {
+            int startig = 0;
+            for(int ipol = 0 ; ipol < GlobalV::NPOL ; ++ipol)
+            {
+            
+	            for(int ir=0; ir < nxy; ir++)
+	            {
+                    if(GlobalC::pw.FFT_wfc.index_ip[ir] < 0) continue;
+	            	if(GlobalV::RANK_IN_POOL==0)
+	            	{
+	            		for(int iz=0; iz<nz; iz++)
+	            		{
+	            			stickrr[ iz ] = std::rand()/double(RAND_MAX);
+                            stickarg[ iz ] = std::rand()/double(RAND_MAX);
+	            		}
+	            	}
+	            	GlobalC::pw.FFT_wfc.stick_to_pool(stickrr, ir, tmprr);
+                    GlobalC::pw.FFT_wfc.stick_to_pool(stickarg, ir, tmparg);
+	            }
+
+                for (int ig = 0;ig < ng;ig++)
+                {
+                    const double rr = tmprr[GR_index[ig]];
+                    const double arg= ModuleBase::TWO_PI * tmparg[GR_index[ig]];
+                    psi(iw,startig+ig) *= (1.0 + 0.05 * std::complex<double>(rr * cos(arg), rr * sin(arg)));
+                }
+                startig += npwx;
+            }
+        }
+        delete[] stickrr;
+        delete[] stickarg;
+        delete[] tmprr;
+        delete[] tmparg;
+        delete[] GR_index;
+    }
+    else
+    {
+#else
+        if(seed > 0)//qianrui add 2021-8-13
+        {
+            srand(unsigned(seed + GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL] + ik));
+        }
+#endif
+        double rr, arg;
+		for (int iw = iw_start ;iw < iw_end;iw++)
+		{
+			int startig = 0;
+			for(int ip = 0 ; ip < GlobalV::NPOL; ++ip)
+			{
+				for(int ig = 0 ; ig < npw ; ++ig)
+				{
+					rr = rand()/double(RAND_MAX);
+					arg = ModuleBase::TWO_PI * rand()/double(RAND_MAX);
+					psi(iw,startig+ig) *= (1.0 + 0.05 * std::complex<double>(rr * cos(arg), rr * sin(arg)));
+				}
+				startig += npwx;
+			}
+		}
+#ifdef __MPI
+    }
+#endif
+
+    return;
+}

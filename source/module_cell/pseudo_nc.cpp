@@ -3,7 +3,7 @@
 pseudo_nc::pseudo_nc()
 {
 // pseudo_h
-	els = new string[1];
+	els = new std::string[1];
 	lchi = new int[1];
 	oc = new double[1];
 	jjj = new double[1];
@@ -53,7 +53,7 @@ pseudo_nc::~pseudo_nc()
 //---------------------------------------------------------------------
 void pseudo_nc::set_pseudo_nc(const Pseudopot_upf &upf)
 {
-	TITLE("pseudo_nc","set_pseudo_nc");
+	ModuleBase::TITLE("pseudo_nc","set_pseudo_nc");
 
 	// call subroutines
 	this->set_pseudo_h(upf);
@@ -99,7 +99,7 @@ void pseudo_nc::set_pseudo_nc(const Pseudopot_upf &upf)
 } // end subroutine set_pseudo_upf
 
 
-void pseudo_nc::print_pseudo_nc(ofstream &ofs, output &outp)
+void pseudo_nc::print_pseudo_nc(std::ofstream &ofs, output &outp)
 {
 	print_pseudo_vl(ofs, outp);
 	ofs << "\n pseudo_nc : ";
@@ -114,7 +114,7 @@ void pseudo_nc::print_pseudo_nc(ofstream &ofs, output &outp)
 
 void pseudo_nc::set_pseudo_h(const Pseudopot_upf &upf)
 {
-	TITLE("pseudo_nc::set_pseudo_h");
+	ModuleBase::TITLE("pseudo_nc::set_pseudo_h");
 	// set pseudopotential for each atom type
 	// by using the Unified Pseudopotential Format
 
@@ -143,14 +143,14 @@ void pseudo_nc::set_pseudo_h(const Pseudopot_upf &upf)
 	int ndmx = 2000; 
 	if (this->mesh > ndmx)
 	{
-		cout << "\n set_pseudo_h, too many grid points,";
+		std::cout << "\n set_pseudo_h, too many grid points,";
 	}
 
 	this->nchi = upf.nwfc;
 	this->nbeta = upf.nbeta;
 
 	delete[] els;
-	this->els = new string[nchi];
+	this->els = new std::string[nchi];
 	assert(this->els != 0);
 
 	delete[] lchi;
@@ -226,20 +226,20 @@ void pseudo_nc::set_pseudo_h(const Pseudopot_upf &upf)
 
 void pseudo_nc::set_pseudo_atom(const Pseudopot_upf &upf)
 {
-	TITLE("pseudo_nc","set_pseudo_atom");
+	ModuleBase::TITLE("pseudo_nc","set_pseudo_atom");
 
 	// mohan 2009-12-15
 	// mohan update again 2011-05-23, 
 	// in order to calculate more accurate Vna.
-	this->rcut = PSEUDORCUT;//(a.u.);
+	this->rcut = GlobalV::PSEUDORCUT;//(a.u.);
 	
 // remember to update here if you need it.
 //	rcut = 25.0; 
 
-	OUT(ofs_running,"PAO radial cut off (Bohr)",rcut);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"PAO radial cut off (Bohr)",rcut);
 	if(rcut <= 0.0)
 	{
-		WARNING_QUIT("pseudo_atom::set_pseudo_atom","PAO rcut<=0.0");
+		ModuleBase::WARNING_QUIT("pseudo_atom::set_pseudo_atom","PAO rcut<=0.0");
 	}
 
 	chi.create(nchi, mesh);
@@ -247,22 +247,22 @@ void pseudo_nc::set_pseudo_atom(const Pseudopot_upf &upf)
 	delete[] r;
 	r = new double[mesh];
 	assert(r != 0);
-	ZEROS(r, mesh);
+	ModuleBase::GlobalFunc::ZEROS(r, mesh);
 
 	delete[] rab;
 	rab = new double[mesh];
 	assert(rab != 0);
-	ZEROS(rab, mesh);
+	ModuleBase::GlobalFunc::ZEROS(rab, mesh);
 
 	delete[] rho_at;
 	rho_at  = new double[mesh];
 	assert(rho_at != 0);
-	ZEROS(rho_at,mesh);
+	ModuleBase::GlobalFunc::ZEROS(rho_at,mesh);
 
 	delete[] rho_atc;
 	rho_atc = new double[mesh];
 	assert(rho_atc != 0);
-	ZEROS(rho_atc, mesh);
+	ModuleBase::GlobalFunc::ZEROS(rho_atc, mesh);
 
 	for (int i = 0;i < nchi;i++)
 	{
@@ -328,7 +328,7 @@ void pseudo_nc::set_pseudo_atom(const Pseudopot_upf &upf)
 
 void pseudo_nc::set_pseudo_vl(const Pseudopot_upf &upf)
 {
-	TITLE("pseudo_nc","set_pseudo_vl");
+	ModuleBase::TITLE("pseudo_nc","set_pseudo_vl");
 
 	assert(mesh>0);//mohan add 2021-05-01
 
@@ -345,7 +345,7 @@ void pseudo_nc::set_pseudo_vl(const Pseudopot_upf &upf)
 } 
 
 
-void pseudo_nc::print_pseudo_atom(ofstream &ofs, output &outp)
+void pseudo_nc::print_pseudo_atom(std::ofstream &ofs, output &outp)
 {
 	print_pseudo_h(ofs, outp);
 	ofs << "\n pseudo_atom : ";
@@ -361,7 +361,7 @@ void pseudo_nc::print_pseudo_atom(ofstream &ofs, output &outp)
 }
 
 
-void pseudo_nc::print_pseudo_vl(ofstream &ofs, output &outp)
+void pseudo_nc::print_pseudo_vl(std::ofstream &ofs, output &outp)
 {
 	ofs << "\n pseudo_vl:";
 	print_pseudo_atom(ofs, outp);
@@ -369,7 +369,7 @@ void pseudo_nc::print_pseudo_vl(ofstream &ofs, output &outp)
 	ofs << "\n ----------------------------------- ";
 }
 
-void pseudo_nc::print_pseudo_h(ofstream &ofs, output &outp)
+void pseudo_nc::print_pseudo_h(std::ofstream &ofs, output &outp)
 {
     ofs << "\n pseudo_info :";
     ofs << "\n nv       " << nv;

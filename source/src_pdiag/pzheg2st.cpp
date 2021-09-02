@@ -1,38 +1,38 @@
 #include "pzheg2st.h"
-#include "pzhtrsm.h" 
+#include "pzhtrsm.h"
 
-void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,complex<double> *B,
+void pzheg2st(char isuplo,MPI_Comm comm_2D,std::complex<double> *A,LocalMatrix loc_A,std::complex<double> *B,
               LocalMatrix loc_B,int NB,int N_A)
 
 /*
  * PSEPS routine (version 1.0) --
- * Computer Network Information Center, CAS. 
+ * Computer Network Information Center, CAS.
  * December 15, 2005
- * 
+ *
  * Purpose
  * =======
- * pzheg2st transforms generalized  Hermitian eigenproblem into standard  
- * eigenproblem 
+ * pzheg2st transforms generalized  Hermitian eigenproblem into standard
+ * eigenproblem
  * computes Cholesky factorization of an N-by-N real
- * symmetric positive definite matrix B and  L-1AL-T »òU -TAU -1 with a 
- * 2D-block-cyclic in parallel. The routine introduces a new parallelization which 
+ * symmetric positive definite matrix B and  L-1AL-T ï¿½ï¿½U -TAU -1 with a
+ * 2D-block-cyclic in parallel. The routine introduces a new parallelization which
  * combines the Cholesky into the transformation from generalized to standard form.
  * Arguments
- * ========= 
- * NOTE: In the current code, matrix A employ 2D-blocked-cyclic mapping 
+ * =========
+ * NOTE: In the current code, matrix A employ 2D-blocked-cyclic mapping
  *       distribute.
  *
  *  isuplo  (global input) char
  *          = 'U' or 'u':  Upper triangles of sub( A ) and sub( B ) are stored;
  *          = 'L' or 'l':  Lower triangles of sub( A ) and sub( B ) are stored.
- *  comm_2D. (input) MPI_Comm 
+ *  comm_2D. (input) MPI_Comm
  *            2-D grid MPI communicator
  *  N_A  (global input) INTEGER
- *      The number of columns and rows to be operated on matrices A£¬N >= 0. 
+ *      The number of columns and rows to be operated on matrices Aï¿½ï¿½N >= 0.
  *  NB  (input) INTEGER
  *       blocked size of 2D blocked cyclic matrix
- *  A       (local input/local output) double precision complex pointer,
- *          pointer into the local memory to an array of dimension 
+ *  A       (local input/local output) double precision std::complex pointer,
+ *          pointer into the local memory to an array of dimension
  *          (loc_A.row_num, loc_A.col_num).
  *          On entry, this array contains the local pieces of the
  *          N-by-N Hermitian distributed matrix sub( A ). If UPLO = 'U',
@@ -40,8 +40,8 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
  *          the upper triangular part of the matrix.  If UPLO = 'L', the
  *          leading N-by-N lower triangular part of sub( A ) contains
  *          the lower triangular part of the matrix.
- *  B       (local input/local output) double precision complex pointer,
- *          pointer into the local memory to an array of dimension 
+ *  B       (local input/local output) double precision std::complex pointer,
+ *          pointer into the local memory to an array of dimension
  *         (loc_B.row_num, loc_B.col_num).
  *          On entry, this array contains the local pieces of the
  *          N-by-N Hermitian distributed matrix sub( B). If UPLO = 'U',
@@ -50,22 +50,22 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
  *          leading N-by-N lower triangular part of sub( A ) contains
  *          the lower triangular part of the matrix.
  *  loc_A and Loc_B:  (local input) struct Loc_A
- *          This struct avaible stores the information required to establish 
- *          the mapping between an object element and its corresponding 
+ *          This struct avaible stores the information required to establish
+ *          the mapping between an object element and its corresponding
  *          process and memory location.
  */
 {
-	TITLE("Parallel_Diag","pzheg2st");
-    complex<double> alpha,beta;
+	ModuleBase::TITLE("Parallel_Diag","pzheg2st");
+    std::complex<double> alpha,beta;
 
-    complex<double>* C_A = new complex<double>[NB*NB];
-    complex<double>* C_B = new complex<double>[NB*NB];
-    complex<double>* C_A1 = new complex<double>[NB*NB];
-    complex<double>* C_B1 = new complex<double>[NB*NB];
+    std::complex<double>* C_A = new std::complex<double>[NB*NB];
+    std::complex<double>* C_B = new std::complex<double>[NB*NB];
+    std::complex<double>* C_A1 = new std::complex<double>[NB*NB];
+    std::complex<double>* C_B1 = new std::complex<double>[NB*NB];
 
     int coord[2],crd[2],dim[2],iarow,iacol,iarow1,iacol1,iarow2,iacol2;
-    complex<double> U1[loc_A.row_num*NB],W1[NB*loc_A.col_num];
-    complex<double> U_1[loc_A.row_num*NB],W_1[NB*loc_A.col_num];
+    std::complex<double> U1[loc_A.row_num*NB],W1[NB*loc_A.col_num];
+    std::complex<double> U_1[loc_A.row_num*NB],W_1[NB*loc_A.col_num];
     int itype=1;
     int in,bt,i,j,k;
     int root_id;
@@ -133,18 +133,18 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
             for (i=0; i<NB; i++)
                 for (j=0; j<NB; j++)
                 {
-                    C_A1[i*NB+j]=C_B1[i*NB+j]=C_A[i*NB+j]=C_B[i*NB+j]=complex<double> (0.0,0.0);
-                   
+                    C_A1[i*NB+j]=C_B1[i*NB+j]=C_A[i*NB+j]=C_B[i*NB+j]=std::complex<double> (0.0,0.0);
+
                 }
             for (i=0; i<loc_A.row_num; i++)
                 for (j=0; j<NB; j++)
                     {
-                    U1[i*NB+j]=U_1[i*NB+j]=complex<double> (0.0,0.0);
+                    U1[i*NB+j]=U_1[i*NB+j]=std::complex<double> (0.0,0.0);
                     }
             for (i=0; i<NB; i++)
                 for (j=0; j<loc_A.col_num; j++)
                     {
-                    W1[i*loc_A.col_num+j]=W_1[i*loc_A.col_num+j]=complex<double> (0.0,0.0);
+                    W1[i*loc_A.col_num+j]=W_1[i*loc_A.col_num+j]=std::complex<double> (0.0,0.0);
 
                     }
             if (coord[0]==iarow)
@@ -170,7 +170,7 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
                 loc_B.col_pos=loc_B.col_pos+bm;
             }
             if (ki>=N_A-1) break;
-            if ((coord[0]==iarow))
+            if (coord[0]==iarow)
             {
                 transa='c';
                 transb='c';
@@ -183,17 +183,17 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
                 ldb=loc_A.col_num;
                 ldc=NB;
                 pos=loc_A.row_pos*loc_A.col_num+loc_A.col_pos;
- 
-                alpha=complex<double> (1.0,0.0);
+
+                alpha=std::complex<double> (1.0,0.0);
                 //printf("(%d,%d), in pdsyg2st n=%d bm=%d, col_pos=%d, ki=%d\n",coord[0],coord[1],n,bm,loc_A.col_pos,ki);
-                //printf("(%d,%d), in pdsyg2st n=%d \n",coord[0],coord[1],n);	
-				
+                //printf("(%d,%d), in pdsyg2st n=%d \n",coord[0],coord[1],n);
+
                 ztrsm_(&side,&uplo,&transa,&diag,&n,&m,&alpha,C_B,&ldc,&A[pos],&lda);
                 ztrsm_(&side,&uplo,&transb,&diag,&n,&m,&alpha,C_B,&ldc,&B[pos],&ldb);
 
 
-                alpha=complex<double> (-0.5,0.0);
-                beta=complex<double> (1.0,0.0);
+                alpha=std::complex<double> (-0.5,0.0);
+                beta=std::complex<double> (1.0,0.0);
 
                 zhemm_(&side,&uplo,&n,&m,&alpha,C_A,&ldc,&B[pos],&ldb,&beta,&A[pos],&lda);
 
@@ -208,11 +208,11 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
             }
             MPI_Bcast(W1,NB*loc_A.col_num,MPI_DOUBLE_COMPLEX,iarow,comm_col);
 
-			//cout << "\n Bcast done." << endl;
-			
+			//std::cout << "\n Bcast done." << std::endl;
+
             MPI_Bcast(W_1,NB*loc_A.col_num,MPI_DOUBLE_COMPLEX,iarow,comm_col);
 
-			//cout << "\n Bcast done." << endl;
+			//std::cout << "\n Bcast done." << std::endl;
             for (i=bt+1; i<b_n; i++)
             {
                 ia1=bt*NB;
@@ -235,7 +235,7 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
                 crd[1]=iacol2;
                 MPI_Cart_rank(comm_2D,crd,&rp);
 
-				//cout << "\n MPI_Cart_rank done. " << endl;
+				//std::cout << "\n MPI_Cart_rank done. " << std::endl;
                 lda=ldb=loc_A.col_num;
                 ldc=NB;
 
@@ -265,15 +265,15 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
                     MPI_Send(C_A1,NB*NB,MPI_DOUBLE_COMPLEX,rp,tag,DIAG_HPSEPS_WORLD);
                     MPI_Send(C_B1,NB*NB,MPI_DOUBLE_COMPLEX,rp,tag,DIAG_HPSEPS_WORLD);
 
-//					ofs_running << "\n MPI_Send done. " << " tag = " << tag << endl;
+//					GlobalV::ofs_running << "\n MPI_Send done. " << " tag = " << tag << std::endl;
                 }
                 else if (coord[0]==iarow2&&coord[1]==iacol2)
                 {
-					//ofs_running << "\n MPI_Recv prepare for tag = " << tag << endl;
+					//GlobalV::ofs_running << "\n MPI_Recv prepare for tag = " << tag << std::endl;
                     MPI_Recv(C_A1,NB*NB,MPI_DOUBLE_COMPLEX,sp,tag,DIAG_HPSEPS_WORLD,&status1);
                     MPI_Recv(C_B1,NB*NB,MPI_DOUBLE_COMPLEX,sp,tag,DIAG_HPSEPS_WORLD,&status2);
 
-					//ofs_running << "\n MPI_Recv done. " << endl;
+					//GlobalV::ofs_running << "\n MPI_Recv done. " << std::endl;
                     for (k=0; k<bm1; k++)
                         for (j=0; j<bn1; j++)
                         {
@@ -290,8 +290,8 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
             m=loc_A.row_num-loc_A.row_pos;
             n=loc_A.col_num-loc_A.col_pos;
             k=bm;
-            alpha=complex<double>(-1.0,0.0);
-            beta=complex<double>(1.0,0.0);
+            alpha=std::complex<double>(-1.0,0.0);
+            beta=std::complex<double>(1.0,0.0);
             lda=loc_A.col_num;
             ldb=NB;
             ldc=loc_A.col_num;
@@ -302,7 +302,7 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
                    &U_1[loc_A.row_pos*NB],&ldb,&beta,&A[pos],&ldc);
             zgemm_(&transa,&transb,&n,&m,&k,&alpha,&W_1[loc_A.col_pos],&lda,
                    &U1[loc_A.row_pos*NB],&ldb,&beta,&A[pos],&ldc);
-            if ((coord[0]==iarow))
+            if (coord[0]==iarow)
             {
                 lda=loc_A.col_num;
                 ldb=loc_A.col_num;
@@ -310,8 +310,8 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
                 n=loc_A.col_num-loc_A.col_pos;
                 ldc=NB;
                 pos=(loc_A.row_pos-bm)*loc_A.col_num+loc_A.col_pos;
-                alpha=complex<double> (-0.5,0.0);
-                beta=complex<double> (1.0,0.0);
+                alpha=std::complex<double> (-0.5,0.0);
+                beta=std::complex<double> (1.0,0.0);
                 side='r';
                 uplo='l';
                 zhemm_(&side,&uplo,&n,&m,&alpha,C_A,&ldc,&B[pos],&ldb,&beta,&A[pos],&lda);
@@ -329,18 +329,18 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
             for (i=0; i<NB; i++)
                 for (j=0; j<NB; j++)
                 {
-                    C_A[i*NB+j]=C_B[i*NB+j]=complex<double> (0.0,0.0);
+                    C_A[i*NB+j]=C_B[i*NB+j]=std::complex<double> (0.0,0.0);
 
                 }
             for (i=loc_A.row_pos; i<loc_A.row_num; i++)
                 for (j=0; j<NB; j++)
                 {
-                    U1[i*NB+j]=U_1[i*NB+j]=complex<double>(0.0,0.0);
+                    U1[i*NB+j]=U_1[i*NB+j]=std::complex<double>(0.0,0.0);
                 }
             for (i=0; i<NB; i++)
                 for (j=loc_A.col_pos; j<loc_A.col_num; j++)
                 {
-                    W1[i*loc_A.col_num+j]=W_1[i*loc_A.col_num+j]=complex<double> (0.0,0.0);
+                    W1[i*loc_A.col_num+j]=W_1[i*loc_A.col_num+j]=std::complex<double> (0.0,0.0);
                  }
             if (coord[1]==iacol)
             {
@@ -366,7 +366,7 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
                 loc_B.row_pos=loc_B.row_pos+bm;
             }
             if (ki>=N_A-1) break;
-            if ((coord[1]==iacol))
+            if (coord[1]==iacol)
             {
                 transa='c';
                 transb='c';
@@ -379,15 +379,15 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
                 ldb=loc_A.col_num;
                 ldc=NB;
                 pos=loc_A.row_pos*loc_A.col_num+loc_A.col_pos;
-                alpha=complex<double> (1.0,0.0);
+                alpha=std::complex<double> (1.0,0.0);
 
 
                 //printf("(%d,%d), in pdsyg2st n2=%d \n",coord[0],coord[1],n);
                 ztrsm_(&side,&uplo,&transa,&diag,&n,&m,&alpha,C_B,&ldc,&A[pos],&lda);
                 ztrsm_(&side,&uplo,&transb,&diag,&n,&m,&alpha,C_B,&ldc,&B[pos],&ldb);
-                alpha=complex<double>(-0.5,0.0);
+                alpha=std::complex<double>(-0.5,0.0);
 
-                beta=complex<double>(1.0,0.0);
+                beta=std::complex<double>(1.0,0.0);
 
                 zhemm_(&side,&uplo,&n,&m,&alpha,C_A,&ldc,&B[pos],&ldb,&beta,&A[pos],&lda);
                 for (i=loc_A.row_pos; i<loc_A.row_num; i++)
@@ -473,8 +473,8 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
             m=loc_A.row_num-loc_A.row_pos;
             n=loc_A.col_num-loc_A.col_pos;
             k=bm;
-            alpha=complex<double> (-1.0,0.0);
-            beta=complex<double> (1.0,0.0);
+            alpha=std::complex<double> (-1.0,0.0);
+            beta=std::complex<double> (1.0,0.0);
             lda=loc_A.col_num;
             ldb=NB;
             ldc=loc_A.col_num;
@@ -485,7 +485,7 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
                    &U_1[loc_A.row_pos*NB],&ldb,&beta,&A[pos],&ldc);
             zgemm_(&transa,&transb,&n,&m,&k,&alpha,&W_1[loc_A.col_pos],&lda,
                    &U1[loc_A.row_pos*NB],&ldb,&beta,&A[pos],&ldc);
-            if ((coord[1]==iacol))
+            if (coord[1]==iacol)
             {
                 lda=loc_A.col_num;
                 ldb=loc_A.col_num;
@@ -493,8 +493,8 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
                 m=loc_A.row_num-loc_A.row_pos;
                 n=bm;
                 pos=loc_A.row_pos*loc_A.col_num+loc_A.col_pos-bm;
-                alpha=complex<double> (-0.5,0.0);
-                beta=complex<double> (1.0,0.0);
+                alpha=std::complex<double> (-0.5,0.0);
+                beta=std::complex<double> (1.0,0.0);
                 side='l';
                 uplo='u';
                 zhemm_(&side,&uplo,&n,&m,&alpha,C_A,&ldc,&B[pos],&ldb,&beta,&A[pos],&lda);
@@ -505,11 +505,11 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
 	MPI_Comm_free(&comm_col);
 	MPI_Comm_free(&comm_row);
 	//xiaohui add 2014-01-22, test
-	//cout<<"pzhtrsm begin"<<endl;
+	//std::cout<<"pzhtrsm begin"<<std::endl;
 
 	pzhtrsm(isuplo,b_n,comm_2D,NB,N_A,A,B,loc_A,loc_B);
 	//xiaohui add 2014-01-22,test
-	//cout<<"pzhtrsm finish"<<endl;
+	//std::cout<<"pzhtrsm finish"<<std::endl;
 
 	//xiaohui modify 2014-03-05
 	//MPI_Comm_free(&comm_col);

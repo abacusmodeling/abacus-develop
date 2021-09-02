@@ -2,7 +2,7 @@
 #define GRID_H
 
 #include <stdexcept>
-#include <boost/functional/hash/hash.hpp>
+#include <functional>
 #include "sltk_util.h"
 #include "sltk_atom.h"
 #include "sltk_atom_input.h"
@@ -61,7 +61,7 @@ public:
 	~Grid();
 
 	void init(
-		ofstream &ofs,
+		std::ofstream &ofs,
 		const UnitCell &ucell, 
 		const Atom_input &input);
 
@@ -71,7 +71,7 @@ public:
 
 	//Static data
 	static const double TOLERATE_ERROR;
-	static const boost::hash<int> INT_HASHER;
+	static const std::hash<int> INT_HASHER;
 	static const char* const ERROR[3];
 
 	//Data
@@ -128,7 +128,7 @@ private:
 // 			condition , if expand_case)
 //==========================================================
 	void setMemberVariables(
-		ofstream &ofs_in, 
+		std::ofstream &ofs_in, 
 		const Atom_input &input);
 
 	void setAtomLinkArray(
@@ -136,7 +136,7 @@ private:
 		const Atom_input &input);
 
 	void setBoundaryAdjacent(
-		ofstream &ofs_in, 
+		std::ofstream &ofs_in, 
 		const Atom_input &input);
 
 //==========================================================

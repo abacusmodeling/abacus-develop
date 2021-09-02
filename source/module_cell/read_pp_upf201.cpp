@@ -2,17 +2,17 @@
 //int Number[2]; // added by zhangwenshuai
 
 //qianrui rewrite it 2021-5-10
-int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
+int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 {
-	
-    string word;
+
+    std::string word;
     int ONCVPSP;
 	//--------------------------------------
 	//-              PP_HEADER             - 
 	//--------------------------------------
-	if(!SCAN_BEGIN(ifs,"<PP_HEADER"))	WARNING_QUIT("read_pseudo_upf201","Found no PP_HEADER");
-	string *name=new string[50];
-	string *val=new string[50];
+	if(!ModuleBase::GlobalFunc::SCAN_BEGIN(ifs,"<PP_HEADER"))	ModuleBase::WARNING_QUIT("read_pseudo_upf201","Found no PP_HEADER");
+	std::string *name=new std::string[50];
+	std::string *val=new std::string[50];
 	int nparameter;
 	this->getnameval(ifs, nparameter, name, val);
 	ONCVPSP = 1;
@@ -33,20 +33,20 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			pp_type = val[ip];
 			if(pp_type!="NC") 
 			{
-				WARNING_QUIT("Pseudopot_upf::read_pseudo_header","unknown pseudo type");
+				ModuleBase::WARNING_QUIT("Pseudopot_upf::read_pseudo_header","unknown pseudo type");
 			}
 		}
 		else if(name[ip]=="relativistic"){}
 		else if(name[ip]=="is_ultrasoft"){
 			if(val[ip]=="T" || val[ip]=="TRUE" || val[ip]=="True" || val[ip]=="true")
 			{
-				WARNING_QUIT("Pseudopot_upf::read_pseudo_header","ULTRASOFT PSEUDOPOTENTIAL IS NOT SUPPORTED !!!");
+				ModuleBase::WARNING_QUIT("Pseudopot_upf::read_pseudo_header","ULTRASOFT PSEUDOPOTENTIAL IS NOT SUPPORTED !!!");
 			}
 		}
 		else if(name[ip]=="is_paw"){
 			if(val[ip]=="T" || val[ip]=="TRUE" || val[ip]=="True" || val[ip]=="true")
 			{
-				WARNING_QUIT("Pseudopot_upf::read_pseudo_header","PAW PSEUDOPOTENTIAL IS NOT SUPPORTED !!!");
+				ModuleBase::WARNING_QUIT("Pseudopot_upf::read_pseudo_header","PAW PSEUDOPOTENTIAL IS NOT SUPPORTED !!!");
 			}
 		}
 		else if(name[ip]=="is_coulomb"){}
@@ -68,7 +68,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 				nlcc = false;
 		}
 		else if(name[ip]=="functional"){
-			stringstream wdsstream(val[ip]);
+			std::stringstream wdsstream(val[ip]);
 			for( int idft = 0; idft < 4; idft++ )
 			{
 				getline(wdsstream,dft[idft],'-');
@@ -98,17 +98,17 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 		}
 		else
 		{
-			string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
-			WARNING("PP_HEADRER reading", warningstr);
+			std::string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
+			ModuleBase::WARNING("PP_HEADRER reading", warningstr);
 		}
 	}
-	
+			
 	//--------------------------------------
 	//-              PP_MESH               - 
 	//--------------------------------------
 	if(ONCVPSP == 0)
 	{
-		SCAN_BEGIN(ifs, "<PP_MESH");
+		ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_MESH");
 		this->getnameval(ifs, nparameter, name, val);
 		for(int ip = 0 ; ip < nparameter; ++ip)
 		{
@@ -119,79 +119,79 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			else if(name[ip]=="zmesh"){}
 			else
 			{
-				string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
-				WARNING("PP_MESH reading", warningstr);
+				std::string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
+				ModuleBase::WARNING("PP_MESH reading", warningstr);
 			}
 
 		}
 	}
 	else
 	{
-		SCAN_BEGIN(ifs, "<PP_MESH>");
+		ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_MESH>");
 	}
 
 	
 
-	SCAN_BEGIN(ifs, "<PP_R");
-	READ_VALUE(ifs, word); // type size columns
+	ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_R");
+	ModuleBase::GlobalFunc::READ_VALUE(ifs, word); // type size columns
 	delete[] r;
 	delete[] rab;
 	assert(mesh>0);
 	this->r = new double[mesh];
 	this->rab = new double[mesh];
-	ZEROS(r,mesh);
-	ZEROS(rab,mesh);
+	ModuleBase::GlobalFunc::ZEROS(r,mesh);
+	ModuleBase::GlobalFunc::ZEROS(rab,mesh);
 	for (int ir = 0;ir < mesh;ir++)
 	{
 		ifs >> this->r[ir];
 	}
-	SCAN_END(ifs, "</PP_R>");
+	ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_R>");
 
-	SCAN_BEGIN(ifs, "<PP_RAB");
-	READ_VALUE(ifs, word); // type size columns
+	ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_RAB");
+	ModuleBase::GlobalFunc::READ_VALUE(ifs, word); // type size columns
 	for (int ir = 0;ir < mesh;ir++)
 	{
 		ifs >> this->rab[ir];
 	}
 
-	SCAN_END(ifs, "</PP_RAB>");
-	SCAN_END(ifs, "</PP_MESH>");
+	ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_RAB>");
+	ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_MESH>");
 
 	//--------------------------------------
 	//-              PP_NLCC               - 
 	//--------------------------------------
 	if (this->nlcc)
 	{
-		SCAN_BEGIN(ifs, "<PP_NLCC");
-		READ_VALUE(ifs, word);    // type size columns
+		ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_NLCC");
+		ModuleBase::GlobalFunc::READ_VALUE(ifs, word);    // type size columns
 		delete[] rho_atc;
 		this->rho_atc = new double[mesh];
-		ZEROS(rho_atc, mesh);
+		ModuleBase::GlobalFunc::ZEROS(rho_atc, mesh);
 		for (int ir = 0;ir < mesh;ir++)
 		{
 			ifs >> this->rho_atc[ir];
 		}
-		SCAN_END(ifs, "</PP_NLCC>");
+		ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_NLCC>");
 	}
 
 	//--------------------------------------
 	//-              PP_LOCAL              - 
 	//--------------------------------------
-	SCAN_BEGIN(ifs, "<PP_LOCAL");
-	READ_VALUE(ifs, word);    // type size columns
+	ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_LOCAL");
+	ModuleBase::GlobalFunc::READ_VALUE(ifs, word);    // type size columns
 	delete[] vloc;
 	this->vloc = new double[mesh];
-	ZEROS(vloc, mesh);
+	ModuleBase::GlobalFunc::ZEROS(vloc, mesh);
 	for (int ir = 0;ir < mesh;ir++)
 	{
 		ifs >> this->vloc[ir];
 	}
-	SCAN_END(ifs, "</PP_LOCAL>");
+	ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_LOCAL>");
 
 	//--------------------------------------
 	//-            PP_NONLOCAL             - 
 	//--------------------------------------
-	SCAN_BEGIN(ifs, "<PP_NONLOCAL>");
+	ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_NONLOCAL>");
 	delete[] kkbeta;
 	delete[] lll;
 	this->kkbeta = new int[nbeta];
@@ -219,8 +219,8 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			else if(name[ip]=="ultrasoft_cutoff_radius"){}
 			else
 			{
-				string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
-				WARNING("PP_BETA reading", warningstr);
+				std::string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
+				ModuleBase::WARNING("PP_BETA reading", warningstr);
 			}
 		}
 		for (int ir=0;ir<mesh;ir++)
@@ -230,8 +230,8 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 		ifs >> word; //number of beta
 	}
 
-	SCAN_BEGIN(ifs, "<PP_DIJ");
-	READ_VALUE(ifs, word);  // type size columns
+	ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_DIJ");
+	ModuleBase::GlobalFunc::READ_VALUE(ifs, word);  // type size columns
 
 	this->nd = nbeta * nbeta;
 	for(int i=0;i<nbeta;i++)
@@ -241,26 +241,26 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			ifs >> dion(i,j);
 			if ( i != j  && dion(i,j) != 0.0 )
 			{
-				cout << " error: for i != j, Dij of Pseudopotential must be 0.0 " << endl;
+				std::cout << " error: for i != j, Dij of Pseudopotential must be 0.0 " << std::endl;
 				exit(1);
 			}
 		}
 	}
-	SCAN_END(ifs, "</PP_DIJ>");
-	SCAN_END(ifs, "</PP_NONLOCAL>");
+	ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_DIJ>");
+	ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_NONLOCAL>");
 
 	//--------------------------------------
 	//-            PP_PSWFC                - 
 	//--------------------------------------
-	SCAN_BEGIN(ifs, "<PP_PSWFC>");
+	ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_PSWFC>");
 	delete[] els;
 	delete[] lchi;
 	delete[] oc;
-	this->els = new string[nwfc];
+	this->els = new std::string[nwfc];
 	this->lchi = new int[nwfc];
 	this->oc = new double[nwfc];
-	ZEROS(lchi, nwfc); // angular momentum of each orbital
-	ZEROS(oc, nwfc);//occupation of each orbital
+	ModuleBase::GlobalFunc::ZEROS(lchi, nwfc); // angular momentum of each orbital
+	ModuleBase::GlobalFunc::ZEROS(oc, nwfc);//occupation of each orbital
 	this->chi.create(this->nwfc, this->mesh);
 	for(int iw=0;iw<nwfc;iw++)
 	{
@@ -287,8 +287,8 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			else if(name[ip]=="ultrasoft_cutoff_radius"){}
 			else
 			{
-				string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
-				WARNING("PP_CHI reading", warningstr);
+				std::string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
+				ModuleBase::WARNING("PP_CHI reading", warningstr);
 			}
 		}
 		for (int ir=0;ir<mesh;ir++)
@@ -297,26 +297,26 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 		}
 		ifs >> word; //number of chi
 	}
-	SCAN_END(ifs, "</PP_PSWFC>");
+	ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_PSWFC>");
 
 	//--------------------------------------
 	//-          PP_RHOATOM                - 
 	//--------------------------------------
-	SCAN_BEGIN(ifs, "<PP_RHOATOM");
-	READ_VALUE(ifs, word); // type size columns
+	ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_RHOATOM");
+	ModuleBase::GlobalFunc::READ_VALUE(ifs, word); // type size columns
 	delete[] rho_at;
 	this->rho_at = new double[mesh];
-	ZEROS(rho_at, mesh);
+	ModuleBase::GlobalFunc::ZEROS(rho_at, mesh);
 	for (int ir = 0;ir < mesh;ir++)
 	{
 		ifs >> this->rho_at[ir];
 	}
-	SCAN_END(ifs, "</PP_RHOATOM>");
+	ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_RHOATOM>");
 
 	//--------------------------------------
 	//-          PP_SPIN_ORB               - 
 	//--------------------------------------
-	SCAN_BEGIN(ifs, "<PP_SPIN_ORB>");
+	ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_SPIN_ORB>");
 	//added by zhengdy-soc
 	delete[] this->jchi;
 	delete[] this->jjj;
@@ -324,9 +324,9 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 	this->jchi = new double [nwfc];
 	this->jjj = new double [nbeta];
 	this->nn = new int [nwfc];
-	ZEROS(jchi,nwfc);
-	ZEROS(jjj,nbeta);
-	ZEROS(nn,nwfc);
+	ModuleBase::GlobalFunc::ZEROS(jchi,nwfc);
+	ModuleBase::GlobalFunc::ZEROS(jjj,nbeta);
+	ModuleBase::GlobalFunc::ZEROS(nn,nwfc);
 
 	for(int round=0;round<2;round++)
 	{
@@ -348,8 +348,8 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 					}
 					else
 					{
-						string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
-						WARNING("PP_RELBETA reading", warningstr);
+						std::string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
+						ModuleBase::WARNING("PP_RELBETA reading", warningstr);
 					}
 				}
 			}
@@ -380,8 +380,8 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 					}
 					else
 					{
-						string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
-						WARNING("PP_RELWFC reading", warningstr);
+						std::string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
+						ModuleBase::WARNING("PP_RELWFC reading", warningstr);
 					}
 				}
 			}
@@ -389,21 +389,33 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 		else if(round==0)
 		{
 			this->has_so = 0;
-			//	cout<<"ignore SPIN_ORB part!"<<endl;
+			//	std::cout<<"ignore SPIN_ORB part!"<<std::endl;
 			break;
 		}
 	}
-	SCAN_END(ifs, "</PP_SPIN_ORB>");
+	ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_SPIN_ORB>");
 	if (mesh%2 == 0)
 	{
 		mesh -= 1;
 	}
 	
-	SCAN_END(ifs, "</UPF>");
+	ModuleBase::GlobalFunc::SCAN_END(ifs, "</UPF>");
 	delete []name;
 	delete []val;
-	return 0;
+	
+	if(GlobalV::DFT_FUNCTIONAL!="none")
+	{
+		if(dft[0] != GlobalV::DFT_FUNCTIONAL)
+		{
+			functional_error = 1;
 
+			std::cout << " dft_functional readin is: " << GlobalV::DFT_FUNCTIONAL << std::endl;
+			std::cout << " dft_functional in pseudopot file is: " << dft[0] << std::endl;
+			GlobalV::ofs_warning << " dft_functional readin is: " << GlobalV::DFT_FUNCTIONAL << std::endl;
+			GlobalV::ofs_warning << " dft_functional in pseudopot file is: " << dft[0] << std::endl;
+		}
+	}
+	return 0;
 
 	//qianrui remove it 2020-5-10
 	/*while (ifs.good())
@@ -413,13 +425,13 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 		if(dummy=="<PP_HEADER")
 		{
 			// Read header
-			READ_VALUE(ifs, word);   // generated
-			READ_VALUE(ifs, word);   // author
-			READ_VALUE(ifs, word);   // date
-			READ_VALUE(ifs, word);   // comment
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, word);   // generated
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, word);   // author
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, word);   // date
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, word);   // comment
 
-			READ_VALUE(ifs, word);   // element
-			stringstream wdsstream(word);
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, word);   // element
+			std::stringstream wdsstream(word);
 			getline(wdsstream,this->psd,'"'); 
 			getline(wdsstream,this->psd,'"'); 
 
@@ -438,24 +450,24 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 
 			if(pp_type!="NC") 
 			{
-				WARNING_QUIT("Pseudopot_upf::read_pseudo_header","unknown pseudo type");
+				ModuleBase::WARNING_QUIT("Pseudopot_upf::read_pseudo_header","unknown pseudo type");
 			}
 
-			READ_VALUE(ifs, word);   // relativistic
-			READ_VALUE(ifs, word);   // is_ultrasoft
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, word);   // relativistic
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, word);   // is_ultrasoft
 			if ( word.find("\"T\"") < word.length() ) // zws add 20160108
 			{
-				cout << "\n WARNING: ULTRASOFT PSEUDOPOTENTIAL IS NOT SUPPORTED !!! \n" << endl;
+				std::cout << "\n WARNING: ULTRASOFT PSEUDOPOTENTIAL IS NOT SUPPORTED !!! \n" << std::endl;
 			}
-			READ_VALUE(ifs, word);   // is_paw
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, word);   // is_paw
 			if ( word.find("\"T\"") < word.length() )
 			{
-				cout << "\n WARNING: PAW PSEUDOPOTENTIAL IS NOT SUPPORTED !!! \n" << endl;
+				std::cout << "\n WARNING: PAW PSEUDOPOTENTIAL IS NOT SUPPORTED !!! \n" << std::endl;
 			}
 
-			READ_VALUE(ifs, word);   // is_coulomb
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, word);   // is_coulomb
 			ifs >> word;   // has_so
-			string so;
+			std::string so;
 
 			if(word == "has_so=\"")
 			{
@@ -478,13 +490,13 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 				this->has_so = false;
 			}
 
-			READ_VALUE(ifs, word);   // has_wfc
-			READ_VALUE(ifs, word);   // has_gipaw
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, word);   // has_wfc
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, word);   // has_gipaw
 
-			string nlc;
+			std::string nlc;
 			//char p[13] = "paw_as_gipaw";
 			ifs >> word;             // paw_as_gipaw?
-			//cout << "word.substr(0,30) = " << word.substr(0,30) << "."<< endl;
+			//std::cout << "word.substr(0,30) = " << word.substr(0,30) << "."<< std::endl;
 			if( word.substr(0,13) == "paw_as_gipaw" )
 			{
 				ONCVPSP = 0;
@@ -518,7 +530,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 				}
 			}
 
-			//cout << "nlc = " << nlc << endl;
+			//std::cout << "nlc = " << nlc << std::endl;
 
 			if (nlc == "T")
 			{
@@ -529,14 +541,14 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 				this->nlcc = false;
 			}
 
-			READ_VALUE(ifs, word);   // functional
-			//cout << "word = " << word << endl;
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, word);   // functional
+			//std::cout << "word = " << word << std::endl;
 			//                        this->dft[0]="SLA";
 			//                        this->dft[1]="PZ";
 			//                        this->dft[2]="NOGX";
 			//                        this->dft[3]="NOGC";
 
-			string funcstr;  //{zws 01-06-16
+			std::string funcstr;  //{zws 01-06-16
 			wdsstream.str("");
 			wdsstream.clear();
 			wdsstream << word;
@@ -556,16 +568,16 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			do 
 			{
 				getline(ifs, word);
-				//cout << "word       = " << word << endl;
+				//std::cout << "word       = " << word << std::endl;
 				word.erase(0,word.find_first_not_of(" ") );
 				word.erase(word.find_last_not_of(" ")+1 );
 				//word = trim(word);
-				//cout << "trim(word) = " << word << endl;
+				//std::cout << "trim(word) = " << word << std::endl;
 				get_char(word);
-				//cout << " Number = " << Number[0] << ", " << Number[1] << endl;
-				//cout << word.substr(0,Number[0])  << "__" << word.substr(Number[0]+1, Number[1]-Number[0]-1) << endl;
+				//std::cout << " Number = " << Number[0] << ", " << Number[1] << std::endl;
+				//std::cout << word.substr(0,Number[0])  << "__" << word.substr(Number[0]+1, Number[1]-Number[0]-1) << std::endl;
 				dummy = word.substr(0,Number[0]) ;
-				//cout << " dummy = " << dummy << endl;
+				//std::cout << " dummy = " << dummy << std::endl;
 				if( dummy == "z_valence=" ) 
 				{
 					this->zp = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
@@ -599,12 +611,12 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 				//break;
 
 			}while( word.substr(word.length()-1, 1) !=">" ); 
-			//cout << "word.substr(word.length()-1, 1)=" <<  word.substr(word.length()-1, 1)  << endl;
+			//std::cout << "word.substr(word.length()-1, 1)=" <<  word.substr(word.length()-1, 1)  << std::endl;
 			//exit(0);
 
 
 			//ifs >> word;   // zp
-			////cout << "word = " << word << endl;
+			////std::cout << "word = " << word << std::endl;
 			//{
 			//     if(word == "z_valence=\"")
 			//     {
@@ -617,7 +629,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			//        get_char(word);
 			//        this->zp = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
 			//     }
-			//     //cout << "zp = " << this->zp << endl;
+			//     //std::cout << "zp = " << this->zp << std::endl;
 			//}
 
 			//ifs >> word;   // total_psenergy
@@ -633,22 +645,22 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			//        get_char(word);
 			//        this->etotps = atof(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
 			//     }
-			//     //cout << "etotps = " << this->etotps << endl;
+			//     //std::cout << "etotps = " << this->etotps << std::endl;
 			//}
-			////cout << " word (total_psenergy) = " << word << endl;
+			////std::cout << " word (total_psenergy) = " << word << std::endl;
 
 
 			//if(ONCVPSP == 0)    //zws modify 20160108
 			//{
-			//	READ_VALUE(ifs, word);   // wfc_cutoff
-			//	//cout << "word = " << word << endl;
+			//	ModuleBase::GlobalFunc::READ_VALUE(ifs, word);   // wfc_cutoff
+			//	//std::cout << "word = " << word << std::endl;
 			//}
-			//READ_VALUE(ifs, word); // rho_cutoff
-			//cout << "word (cutoff) = " << word << endl;
+			//ModuleBase::GlobalFunc::READ_VALUE(ifs, word); // rho_cutoff
+			//std::cout << "word (cutoff) = " << word << std::endl;
 
 
 			//ifs >> word;             // lmax
-			////cout << "word (lmax) = " << word << endl;
+			////std::cout << "word (lmax) = " << word << std::endl;
 			//{
 			//        if(word == "l_max=\"")
 			//        {
@@ -664,17 +676,17 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 
 			//}
 
-			////cout << "lmax = " << this->lmax << endl;
+			////std::cout << "lmax = " << this->lmax << std::endl;
 
 			//if(ONCVPSP == 0)
 			//{
-			//   READ_VALUE(ifs, word);   // l_max_rho
+			//   ModuleBase::GlobalFunc::READ_VALUE(ifs, word);   // l_max_rho
 			//}
 
-			//READ_VALUE(ifs, word);   // l_local
+			//ModuleBase::GlobalFunc::READ_VALUE(ifs, word);   // l_local
 
 			//ifs >> word;   // mesh_size
-			////cout << "word (mesh) = " << word << endl;
+			////std::cout << "word (mesh) = " << word << std::endl;
 			//{
 			//     if(word == "mesh_size=\"")
 			//     {
@@ -687,13 +699,13 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			//             get_char(word);
 			//             this->mesh = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
 			//     }
-			//     //cout << "mesh = " << this->mesh << endl;
+			//     //std::cout << "mesh = " << this->mesh << std::endl;
 			//}
 
 
 
 			//ifs >> word;  // number_of_wfc
-			////cout << "word = " << word << endl;
+			////std::cout << "word = " << word << std::endl;
 			//{
 			//     if(word == "number_of_wfc=\"")
 			//     {
@@ -707,11 +719,11 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			//             get_char(word);
 			//             this->nwfc = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
 			//     }
-			//     //cout << "nwfc = " << this->nwfc << endl;
+			//     //std::cout << "nwfc = " << this->nwfc << std::endl;
 			//}
 			//     
 			//ifs >> word;   // number_of_proj
-			////cout << "word = " << word << endl;
+			////std::cout << "word = " << word << std::endl;
 			//{
 			//     if(word == "number_of_proj=\"")
 			//     {
@@ -725,18 +737,18 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			//             get_char(word);
 			//             this->nbeta = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
 			//     }
-			//     //cout << "nbeta = " << this->nbeta << endl;
+			//     //std::cout << "nbeta = " << this->nbeta << std::endl;
 			//}
 
 
 			// READ Mesh
 			if(ONCVPSP == 0)
 			{
-				SCAN_BEGIN(ifs, "<PP_MESH");
+				ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_MESH");
 			}
 			else
 			{
-				SCAN_BEGIN(ifs, "<PP_MESH>");
+				ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_MESH>");
 			}
 
 			assert(mesh>0);
@@ -749,8 +761,8 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 				ifs >> word;             // zmesh
 			}
 
-			SCAN_BEGIN(ifs, "<PP_R"); 
-			READ_VALUE(ifs, word);    // type  size  columns
+			ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_R"); 
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, word);    // type  size  columns
 
 			//                        double  rmesh0 = 1;    //{zws add160108 delete160328
 			//                        int 	nmeshdel = 0;
@@ -760,21 +772,21 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			//                            mesh       -= 1;
 			//                            nmeshdel   += 1;
 			//                        }
-			//                        cout << " mesh =" << mesh << endl;
+			//                        std::cout << " mesh =" << mesh << std::endl;
 			//                    	if (mesh%2 == 0)
 			//                    	{
 			//                    	    mesh     -= 1;
 			//                    	    nmeshdel += 1;
 			//                    	}    //}zws add 20160108
-			//                    	cout << " nmeshdel =" << nmeshdel << endl;
+			//                    	std::cout << " nmeshdel =" << nmeshdel << std::endl;
 
 
 			delete[] r;
 			delete[] rab;
 			this->r = new double[mesh];
 			this->rab = new double[mesh];
-			ZEROS(r,mesh);
-			ZEROS(rab,mesh);
+			ModuleBase::GlobalFunc::ZEROS(r,mesh);
+			ModuleBase::GlobalFunc::ZEROS(rab,mesh);
 
 
 			//                        if (nmeshdel == 0)    //{zws add160108 delete160328
@@ -789,7 +801,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			//                        {
 			//                            for ( int idel=0; idel < nmeshdel-1; idel++)
 			//                        	{
-			//                            	cout << "skip " << nmeshdel << "grid point(s) in PP mesh" << endl;
+			//                            	std::cout << "skip " << nmeshdel << "grid point(s) in PP mesh" << std::endl;
 			//                        	    double	tmpdel;
 			//                        	    ifs >> tmpdel;
 			//                        	}
@@ -802,10 +814,10 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			{
 				ifs >> this->r[ir];
 			}
-			SCAN_END(ifs, "</PP_R>");
+			ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_R>");
 
-			SCAN_BEGIN(ifs, "<PP_RAB");
-			READ_VALUE(ifs, word);    // type size columns
+			ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_RAB");
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, word);    // type size columns
 
 			//                        for ( int idel=0; idel < nmeshdel; idel++)    //{zws add 20160108
 			//                    	{
@@ -816,46 +828,46 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			{
 				ifs >> this->rab[ir];
 			}
-			SCAN_END(ifs, "</PP_RAB>");
-			SCAN_END(ifs, "</PP_MESH>");
+			ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_RAB>");
+			ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_MESH>");
 
 			// READ NLCC
 			if (this->nlcc)
 			{
-				SCAN_BEGIN(ifs, "<PP_NLCC");
-				READ_VALUE(ifs, word);    // type size columns
+				ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_NLCC");
+				ModuleBase::GlobalFunc::READ_VALUE(ifs, word);    // type size columns
 
 				assert(mesh>0);
 				delete[] rho_atc;
 				this->rho_atc = new double[mesh];
-				ZEROS(rho_atc, mesh);
+				ModuleBase::GlobalFunc::ZEROS(rho_atc, mesh);
 
 				for (ir = 0;ir < mesh;ir++)
 				{
 					ifs >> this->rho_atc[ir];
 				}
-				SCAN_END(ifs, "</PP_NLCC>");
+				ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_NLCC>");
 
 			}
 
 			// READ VLOCAL
-			SCAN_BEGIN(ifs, "<PP_LOCAL");
-			READ_VALUE(ifs, word);    // type size columns
+			ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_LOCAL");
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, word);    // type size columns
 
 			assert(mesh>0);
 			delete[] vloc;
 			this->vloc = new double[mesh];
-			ZEROS(vloc, mesh);
+			ModuleBase::GlobalFunc::ZEROS(vloc, mesh);
 
 			for (ir = 0;ir < mesh;ir++)
 			{
 				ifs >> this->vloc[ir];
 			}
 
-			SCAN_END(ifs, "</PP_LOCAL>");
+			ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_LOCAL>");
 
 			// READ NONLOCAL
-			SCAN_BEGIN(ifs, "<PP_NONLOCAL>");
+			ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_NONLOCAL>");
 
 			delete[] kkbeta;
 			delete[] lll;
@@ -897,7 +909,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 						get_char(word);
 						//idum = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
 					}
-					//cout << "idum = " << idum << endl;
+					//std::cout << "idum = " << idum << std::endl;
 				}
 
 				if(ONCVPSP == 0)
@@ -932,7 +944,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 					get_char(word);
 					this->kkbeta[i] = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
 				}
-				//cout << "kkbeta[i] = " << this->kkbeta[i] << endl;
+				//std::cout << "kkbeta[i] = " << this->kkbeta[i] << std::endl;
 
 				if(ONCVPSP ==0) 
 				{
@@ -941,7 +953,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 				}
 				else
 				{
-					READ_VALUE(ifs, word); // cutoff_radius
+					ModuleBase::GlobalFunc::READ_VALUE(ifs, word); // cutoff_radius
 				}
 
 				for (ir=0;ir<mesh;ir++)
@@ -955,8 +967,8 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			}
 
 			// READ DIJ
-			SCAN_BEGIN(ifs, "<PP_DIJ");
-			READ_VALUE(ifs, word);  // type size columns
+			ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_DIJ");
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, word);  // type size columns
 
 			this->nd = nbeta * nbeta;
 			for(i=0;i<nbeta;i++)
@@ -966,26 +978,26 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 					ifs >> dion(i,j);
 					if ( i != j  && dion(i,j) != 0.0 )
 					{
-						cout << " error: for i != j, Dij of Pseudopotential must be 0.0 " << endl;
+						std::cout << " error: for i != j, Dij of Pseudopotential must be 0.0 " << std::endl;
 						exit(1);
 					}
 				}
 			}
-			SCAN_END(ifs, "</PP_DIJ>");
+			ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_DIJ>");
 
-			SCAN_END(ifs, "</PP_NONLOCAL>");
+			ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_NONLOCAL>");
 
 			// READ PSWFC
-			SCAN_BEGIN(ifs, "<PP_PSWFC>");
+			ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_PSWFC>");
 
 			delete[] els;
 			delete[] lchi;
 			delete[] oc;
-			this->els = new string[nwfc];
+			this->els = new std::string[nwfc];
 			this->lchi = new int[nwfc];
 			this->oc = new double[nwfc];
-			ZEROS(lchi, nwfc); // angular momentum of each orbital
-			ZEROS(oc, nwfc);//occupation of each orbital
+			ModuleBase::GlobalFunc::ZEROS(lchi, nwfc); // angular momentum of each orbital
+			ModuleBase::GlobalFunc::ZEROS(oc, nwfc);//occupation of each orbital
 
 			this->chi.create(this->nwfc, this->mesh);
 			for (i=0;i<nwfc;i++)
@@ -1038,12 +1050,12 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 				}
 				get_char(word);
 				lchi[i] = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
-				//cout << " lchi[i] = " << lchi[i] << endl;
+				//std::cout << " lchi[i] = " << lchi[i] << std::endl;
 
 				ifs >> word; // >
 				if ( word !=  ">" )
 				{
-					cout << " error: bad end while reading CHI" << i <<  " of PSWFC" << endl;
+					std::cout << " error: bad end while reading CHI" << i <<  " of PSWFC" << std::endl;
 					exit(1);
 				}
 
@@ -1054,23 +1066,23 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 				ifs >> word;  // number
 			}
 
-			SCAN_END(ifs, "</PP_PSWFC>");
+			ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_PSWFC>");
 
 			// READ RHOATOM
-			SCAN_BEGIN(ifs, "<PP_RHOATOM");
-			READ_VALUE(ifs, word); // type size columns
+			ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_RHOATOM");
+			ModuleBase::GlobalFunc::READ_VALUE(ifs, word); // type size columns
 
 			delete[] rho_at;
 			this->rho_at = new double[mesh];
-			ZEROS(rho_at, mesh);
+			ModuleBase::GlobalFunc::ZEROS(rho_at, mesh);
 
 			for (ir = 0;ir < mesh;ir++)
 			{
 				ifs >> this->rho_at[ir];
 			}
-			SCAN_END(ifs, "</PP_RHOATOM>");
+			ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_RHOATOM>");
 
-			SCAN_BEGIN(ifs, "<PP_SPIN_ORB>");
+			ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_SPIN_ORB>");
 			//added by zhengdy-soc
 			delete[] this->jchi;
 			delete[] this->jjj;
@@ -1078,9 +1090,9 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			this->jchi = new double [nwfc];
 			this->jjj = new double [nbeta];
 			this->nn = new int [nwfc];
-			ZEROS(jchi,nwfc);
-			ZEROS(jjj,nbeta);
-			ZEROS(nn,nwfc);
+			ModuleBase::GlobalFunc::ZEROS(jchi,nwfc);
+			ModuleBase::GlobalFunc::ZEROS(jjj,nbeta);
+			ModuleBase::GlobalFunc::ZEROS(nn,nwfc);
 
 			for(int round=0;round<2;round++)
 			{
@@ -1147,26 +1159,26 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 				else if(round==0)
 				{
 					this->has_so = 0;
-					//	cout<<"ignore SPIN_ORB part!"<<endl;
+					//	std::cout<<"ignore SPIN_ORB part!"<<std::endl;
 					break;
 				}
 			}
-			SCAN_END(ifs, "</PP_SPIN_ORB>");
+			ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_SPIN_ORB>");
 
 			if (mesh%2 == 0)
 			{
 				mesh -= 1;
 			}
 
-			SCAN_END(ifs, "</UPF>");
+			ModuleBase::GlobalFunc::SCAN_END(ifs, "</UPF>");
 			break;
 		}
 	}
 	return 0;*/
 }
-void Pseudopot_upf:: getnameval(ifstream& ifs,int &n, string * name, string *val)
+void Pseudopot_upf:: getnameval(std::ifstream& ifs,int &n, std::string * name, std::string *val)
 {
-	string txt,word;
+	std::string txt,word;
 	//get long txt
 	ifs>>txt;
 	while(ifs>>word)
@@ -1185,7 +1197,7 @@ void Pseudopot_upf:: getnameval(ifstream& ifs,int &n, string * name, string *val
 	while(1)
 	{
 		pos = txt.find("=",pos);
-		if(pos == string::npos) break;
+		if(pos == std::string::npos) break;
 		pos++;
 		n++;
 	}
@@ -1202,8 +1214,8 @@ void Pseudopot_upf:: getnameval(ifstream& ifs,int &n, string * name, string *val
 		}
 		ll=pos2-pos;
 		name[i] = txt.substr(pos,ll);
-		//cout<<i<<" "<<name[i]<<endl;
-		string mark;
+		//std::cout<<i<<" "<<name[i]<<std::endl;
+		std::string mark;
 		bool findmark=false;
 		for(int j = 0; j < 100; ++j)//The mark can be ' or " or .
 		{
@@ -1215,12 +1227,12 @@ void Pseudopot_upf:: getnameval(ifstream& ifs,int &n, string * name, string *val
 				break;
 			}
 		}
-		if(!findmark) WARNING_QUIT("read_upf201",
+		if(!findmark) ModuleBase::WARNING_QUIT("read_upf201",
 		"The values are not in \' or \". Please improve the program in read_pp_upf201.cpp");
 		pos = pos2;
 		pos2 = txt.find(mark,pos);
 		ll=pos2-pos;
-		string tmpval = txt.substr(pos,ll);
+		std::string tmpval = txt.substr(pos,ll);
 		tmpval = trim(tmpval);
 		val[i]=tmpval;
 		pos=pos2+1;
@@ -1231,12 +1243,12 @@ void Pseudopot_upf:: getnameval(ifstream& ifs,int &n, string * name, string *val
 			else
 				break;
 		}
-		//cout<<name[i]<<"=\""<<val[i]<<"\""<<endl;
+		//std::cout<<name[i]<<"=\""<<val[i]<<"\""<<std::endl;
 	}
 	return;
 }
 
-/*void Pseudopot_upf::get_char( string ss)
+/*void Pseudopot_upf::get_char( std::string ss)
 {
     int i, q;
     //char b[1]; //LiuXh 20171109

@@ -1,6 +1,7 @@
-#ifdef __DEEPKS
 #ifndef LCAO_DESCRIPTOR_H
 #define LCAO_DESCRIPTOR_H
+#endif
+#ifdef __DEEPKS
 
 #include "../module_base/intarray.h"
 #include "../module_base/complexmatrix.h"
@@ -19,7 +20,7 @@ class LCAO_Descriptor
 {
 
 //-------------------
-// public functions 
+// public functions
 //-------------------
 public:
 
@@ -36,7 +37,7 @@ public:
 	// 1. Load DeePKS model
     // 2. Initialize the deltaV Hamiltonian matrix 
     // 3. If FORCE, initialize the matrces for force
-    void deepks_pre_scf(const string& model_file);
+    void deepks_pre_scf(const std::string& model_file);
 
 
 	//------------------------------------------------------------------------------
@@ -47,19 +48,19 @@ public:
 	// add_v_delta: add <psi|deltaV|psi> to the Hamiltonian matrix
 	// cal_f_delta: compute the force related to deltaV, input dm is density matrix
 	//------------------------------------------------------------------------------
-    void cal_projected_DM(const matrix &dm);
+    void cal_projected_DM(const ModuleBase::matrix &dm);
     void cal_descriptor(void);
-    void cal_dm_as_descriptor(const matrix& dm); // mohan add 2021-08-04
+    void cal_dm_as_descriptor(const ModuleBase::matrix& dm); // mohan add 2021-08-04
 
-    void cal_gedm(const matrix& dm);	//need to load model in this step
+    void cal_gedm(const ModuleBase::matrix& dm);	//need to load model in this step
     void build_v_delta_alpha(const bool& cal_deri);
     void build_v_delta_mu(const bool& cal_deri);
-    void cal_v_delta(const matrix& dm);
+    void cal_v_delta(const ModuleBase::matrix& dm);
     void add_v_delta(void);
 
-    void cal_f_delta_hf(const matrix& dm);
-    void cal_f_delta_pulay(const matrix& dm);
-    void cal_f_delta(const matrix& dm);
+    void cal_f_delta_hf(const ModuleBase::matrix& dm);
+    void cal_f_delta_pulay(const ModuleBase::matrix& dm);
+    void cal_f_delta(const ModuleBase::matrix& dm);
 
 
 	//----------------------------------------------------------------------
@@ -69,8 +70,7 @@ public:
 	//----------------------------------------------------------------------
 	void print_descriptor(void);
 	void print_H_V_delta(void);
-	void print_F_delta(const string& fname);
-
+	void print_F_delta(const std::string& fname);
 
 	//----------------------------------------------------------------------
 	/*These 3 functions save the [dm_eig], [e_base], [f_base]
@@ -81,9 +81,9 @@ public:
 	//----------------------------------------------------------------------
 	void save_npy_d(void);
 	void save_npy_e(const double &ebase);	//Ry
-	void save_npy_f(const matrix &fbase);//Ry
+	void save_npy_f(const ModuleBase::matrix &fbase);//Ry
 
-    void cal_e_delta_band(const std::vector<matrix>& dm);	//tr[rho*H_V_delta]
+    void cal_e_delta_band(const std::vector<ModuleBase::matrix>& dm);	//tr[rho*H_V_delta]
 //-------------------
 // public variables 
 //-------------------
@@ -98,7 +98,7 @@ public:
     double E_delta = 0.0;
     double e_delta_band=0.0;
     double* H_V_delta;
-	matrix	F_delta;
+	ModuleBase::matrix	F_delta;
 
 //-------------------
 // private variables
@@ -112,13 +112,13 @@ private:
 	// deep neural network module that provides corrected Hamiltonian term and
 	// related derivatives.
 	torch::jit::script::Module module;
-	
+
 	//density matrix: dm_gamma
 	double* dm_double;
 	// overlap between lcao and descriptor basis
-	double** S_mu_alpha;	//[tot_Inl][NLOCAL][2l+1]	caoyu modified 2021-05-07
+	double** S_mu_alpha;	//[tot_Inl][GlobalV::NLOCAL][2l+1]	caoyu modified 2021-05-07
 
-	//d(S) for f_delta:	<\psi_mu|d\alpha^I_nlm> , [tot_Inl][NLOCAL][2l+1]
+	//d(S) for f_delta:	<\psi_mu|d\alpha^I_nlm> , [tot_Inl][GlobalV::NLOCAL][2l+1]
 	double** DS_mu_alpha_x;
 	double** DS_mu_alpha_y;
 	double** DS_mu_alpha_z;
@@ -152,8 +152,8 @@ private:
 	int des_per_atom;
 
 
-	IntArray* alpha_index;
-	IntArray* inl_index;	//caoyu add 2021-05-07
+	ModuleBase::IntArray* alpha_index;
+	ModuleBase::IntArray* inl_index;	//caoyu add 2021-05-07
 	int* inl_l;	//inl_l[inl_index] = l of descriptor with inl_index
 
 //-------------------
@@ -170,8 +170,8 @@ private:
 		const double& v);
 
     void print_projected_DM(
-		ofstream &ofs,
-		ComplexMatrix &des,
+		std::ofstream &ofs,
+		ModuleBase::ComplexMatrix &des,
 		const int &it,
 		const int &ia,
 		const int &l,
@@ -186,18 +186,19 @@ private:
 		const double& vz);
 
 	void init_gdmx(void);
-    void load_model(const string& model_file);
+    void load_model(const std::string& model_file);
     
-    void cal_gdmx(const matrix& dm);	//dD/dX
+    void cal_gdmx(const ModuleBase::matrix& dm);	//dD/dX
 	void del_gdmx(void);
 
-	void getdm_double(const matrix& dm);
+	void getdm_double(const ModuleBase::matrix& dm);
 
 	void cal_descriptor_tensor(void);
 
 };
+namespace GlobalC
+{
 extern LCAO_Descriptor ld;
-
-#endif
+}
 
 #endif

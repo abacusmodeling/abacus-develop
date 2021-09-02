@@ -6,7 +6,7 @@ std::vector<double> Conv_Coulomb_Pot_K::cal_psi_ccp( const std::vector<double> &
 {
 	std::vector<double> psik2_ccp(psif.size());
 	for( size_t ik=0; ik<psif.size(); ++ik )
-		psik2_ccp[ik] = FOUR_PI * psif[ik];
+		psik2_ccp[ik] = ModuleBase::FOUR_PI * psif[ik];
 	return psik2_ccp;
 }
 
@@ -17,7 +17,7 @@ std::vector<double> Conv_Coulomb_Pot_K::cal_psi_hse(
 {
 	std::vector<double> psik2_ccp(psif.size());
 	for( size_t ik=0; ik<psif.size(); ++ik )
-		psik2_ccp[ik] = FOUR_PI * psif[ik] * (1-std::exp(-(k_radial[ik]*k_radial[ik])/(4*omega*omega)));
+		psik2_ccp[ik] = ModuleBase::FOUR_PI * psif[ik] * (1-std::exp(-(k_radial[ik]*k_radial[ik])/(4*omega*omega)));
 	return psik2_ccp;
 }
 
@@ -38,7 +38,7 @@ Numerical_Orbital_Lm Conv_Coulomb_Pot_K::cal_orbs_ccp<Numerical_Orbital_Lm>(
 		case Ccp_Type::Hse:
 			psik2_ccp = cal_psi_hse( orbs.get_psif(), orbs.get_k_radial(), parameter.at("hse_omega") );		break;
 		default:
-			throw( TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__) );		break;
+			throw( ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__) );		break;
 	}
 
 	const double dr = orbs.get_rab().back();
@@ -61,15 +61,15 @@ Numerical_Orbital_Lm Conv_Coulomb_Pot_K::cal_orbs_ccp<Numerical_Orbital_Lm>(
 		orbs.getL(),
 		orbs.getChi(),
 	    Nr,
-		VECTOR_TO_PTR(rab),
-		VECTOR_TO_PTR(r_radial),
+		ModuleBase::GlobalFunc::VECTOR_TO_PTR(rab),
+		ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial),
 		Numerical_Orbital_Lm::Psi_Type::Psik2,
-		VECTOR_TO_PTR(psik2_ccp),
+		ModuleBase::GlobalFunc::VECTOR_TO_PTR(psik2_ccp),
 		orbs.getNk(),
 		orbs.getDk(),
 		orbs.getDruniform(),
 		false,
-		true, FORCE);
+		true, GlobalV::FORCE);
 	return orbs_ccp;
 }
 

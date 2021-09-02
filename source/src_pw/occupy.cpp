@@ -7,7 +7,7 @@ Occupy::~Occupy(){}
 
 //===========================================================
 // Four smearing methods:
-// (1) do nothing 
+// (1) do nothing
 // (2) gaussian_broadening method (need 'degauss' value).
 // (3) tetrahedron method
 // (4) fixed_occupations
@@ -22,16 +22,16 @@ bool Occupy::fixed_occupations = false;
 
 void Occupy::calculate_weights(void)
 {
-	TITLE("Occupy","calculate_weights");
+	ModuleBase::TITLE("Occupy","calculate_weights");
 
 	// for test
-//	cout << " gaussian_broadening = " << use_gaussian_broadening << endl;
-//	cout << " tetrahedron_method = " << use_tetrahedron_method << endl;
-//	cout << " fixed_occupations = " << fixed_occupations << endl; 
+//	std::cout << " gaussian_broadening = " << use_gaussian_broadening << std::endl;
+//	std::cout << " tetrahedron_method = " << use_tetrahedron_method << std::endl;
+//	std::cout << " fixed_occupations = " << fixed_occupations << std::endl;
 
-	if(KS_SOLVER=="selinv")
+	if(GlobalV::KS_SOLVER=="selinv")
 	{
-		ofs_running << " Could not calculate occupation." << endl;
+		GlobalV::ofs_running << " Could not calculate occupation." << std::endl;
 		return;
 	}
 
@@ -39,101 +39,104 @@ void Occupy::calculate_weights(void)
             !use_tetrahedron_method &&
             !fixed_occupations)
     {
-        if (TWO_EFERMI)
+        if (GlobalV::TWO_EFERMI)
         {
-            iweights(kv.nks, kv.wk, NBANDS, ucell.magnet.get_nelup() , wf.ekb, en.ef_up, wf.wg, 0, kv.isk);
-            iweights(kv.nks, kv.wk, NBANDS, ucell.magnet.get_neldw() , wf.ekb, en.ef_dw, wf.wg, 1, kv.isk);
+            iweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, GlobalC::ucell.magnet.get_nelup() , GlobalC::wf.ekb, GlobalC::en.ef_up, GlobalC::wf.wg, 0, GlobalC::kv.isk);
+            iweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, GlobalC::ucell.magnet.get_neldw() , GlobalC::wf.ekb, GlobalC::en.ef_dw, GlobalC::wf.wg, 1, GlobalC::kv.isk);
 			//ef = ( ef_up + ef_dw ) / 2.0_dp need??? mohan add 2012-04-16
         }
         else
         {
 			// -1 means don't need to consider spin.
-            iweights(kv.nks, kv.wk, NBANDS, CHR.nelec, wf.ekb, en.ef, wf.wg, -1, kv.isk);
+            iweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, GlobalC::CHR.nelec, GlobalC::wf.ekb, GlobalC::en.ef, GlobalC::wf.wg, -1, GlobalC::kv.isk);
         }
     }
     else if (use_tetrahedron_method)
     {
-        WARNING_QUIT("calculate_weights","not implemented yet,coming soon!");
+        ModuleBase::WARNING_QUIT("calculate_weights","not implemented yet,coming soon!");
 //		if(my_rank == 0)
 //		{
-//			tweights(kv.nkstot, nspin, NBANDS, CHR.nelec, ntetra,tetra, wf.et, en.ef, wf.wg);
+//			tweights(GlobalC::kv.nkstot, nspin, GlobalV::NBANDS, GlobalC::CHR.nelec, ntetra,tetra, GlobalC::wf.et, GlobalC::en.ef, GlobalC::wf.wg);
 //		}
     }
     else if (use_gaussian_broadening)
     {
-		if (TWO_EFERMI)
+		if (GlobalV::TWO_EFERMI)
 		{
 			double demet_up = 0.0;
 			double demet_dw = 0.0;
-			Occupy::gweights(kv.nks, kv.wk, NBANDS, ucell.magnet.get_nelup(), gaussian_parameter, gaussian_type,
-			                 wf.ekb, en.ef_up, demet_up, wf.wg, 0, kv.isk);
-			Occupy::gweights(kv.nks, kv.wk, NBANDS, ucell.magnet.get_neldw(), gaussian_parameter, gaussian_type,
-			                 wf.ekb, en.ef_dw, demet_dw, wf.wg, 1, kv.isk);
-			en.demet = demet_up + demet_dw;
-                        
+			Occupy::gweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, GlobalC::ucell.magnet.get_nelup(), gaussian_parameter, gaussian_type,
+			                 GlobalC::wf.ekb, GlobalC::en.ef_up, demet_up, GlobalC::wf.wg, 0, GlobalC::kv.isk);
+			Occupy::gweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, GlobalC::ucell.magnet.get_neldw(), gaussian_parameter, gaussian_type,
+			                 GlobalC::wf.ekb, GlobalC::en.ef_dw, demet_dw, GlobalC::wf.wg, 1, GlobalC::kv.isk);
+			GlobalC::en.demet = demet_up + demet_dw;
+
 		}
 		else
 		{
 			// -1 means is no related to spin.
-        	Occupy::gweights(kv.nks, kv.wk, NBANDS, CHR.nelec, gaussian_parameter, gaussian_type,
-                 wf.ekb, en.ef, en.demet, wf.wg, -1, kv.isk);
+        	Occupy::gweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, GlobalC::CHR.nelec, gaussian_parameter, gaussian_type,
+                 GlobalC::wf.ekb, GlobalC::en.ef, GlobalC::en.demet, GlobalC::wf.wg, -1, GlobalC::kv.isk);
 
 		}
+
+        //qianrui fix a bug on 2021-7-21
+        Parallel_Reduce::reduce_double_allpool(GlobalC::en.demet);
     }
     else if (fixed_occupations)
     {
 		// fix occupations need nelup and neldw.
 		// mohan add 2011-04-03
-		en.ef = - 1.0e+20;
-		for (int ik = 0;ik < kv.nks ;ik++)
+		GlobalC::en.ef = - 1.0e+20;
+		for (int ik = 0;ik < GlobalC::kv.nks ;ik++)
 		{
-			for (int ibnd = 0;ibnd < NBANDS;ibnd++)
+			for (int ibnd = 0;ibnd < GlobalV::NBANDS;ibnd++)
 			{
-				if (wf.wg(ik, ibnd) > 0.0)
+				if (GlobalC::wf.wg(ik, ibnd) > 0.0)
 				{
-					en.ef = std::max( en.ef, wf.ekb[ik][ibnd]);
+					GlobalC::en.ef = std::max( GlobalC::en.ef, GlobalC::wf.ekb[ik][ibnd]);
 				}
 			}
 		}
     }
-	
-    if (TWO_EFERMI==2)
+
+    if (GlobalV::TWO_EFERMI)
     {
-		Parallel_Reduce::gather_max_double_all( en.ef_up );
-		Parallel_Reduce::gather_max_double_all( en.ef_dw );	
+		Parallel_Reduce::gather_max_double_all( GlobalC::en.ef_up );
+		Parallel_Reduce::gather_max_double_all( GlobalC::en.ef_dw );
     }
     else
     {
-		double ebotom = wf.ekb[0][0];
-		double etop = wf.ekb[0][0];
-		for(int ik=0; ik<kv.nks; ik++)
+		double ebotom = GlobalC::wf.ekb[0][0];
+		double etop = GlobalC::wf.ekb[0][0];
+		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
-			for(int ib=0; ib<NBANDS; ib++)
+			for(int ib=0; ib<GlobalV::NBANDS; ib++)
 			{
-				ebotom = min ( ebotom, wf.ekb[ik][ib] );
-				etop = max ( etop, wf.ekb[ik][ib] );
+				ebotom = min ( ebotom, GlobalC::wf.ekb[ik][ib] );
+				etop = max ( etop, GlobalC::wf.ekb[ik][ib] );
 			}
 		}
 
 		// parallel
-		Parallel_Reduce::gather_max_double_all( en.ef );
+		Parallel_Reduce::gather_max_double_all( GlobalC::en.ef );
 		Parallel_Reduce::gather_max_double_all( etop );
 		Parallel_Reduce::gather_min_double_all( ebotom );
-		
+
 		//not parallel yet!
-//		OUT(ofs_running,"Top    Energy (eV)", etop * Ry_to_eV);
-//      OUT(ofs_running,"Fermi  Energy (eV)", en.ef * Ry_to_eV);
-//		OUT(ofs_running,"Bottom Energy (eV)", ebotom * Ry_to_eV);
-//		OUT(ofs_running,"Range  Energy (eV)", etop-ebotom * Ry_to_eV);
+//		OUT(GlobalV::ofs_running,"Top    Energy (eV)", etop * ModuleBase::Ry_to_eV);
+//      OUT(GlobalV::ofs_running,"Fermi  Energy (eV)", GlobalC::en.ef * ModuleBase::Ry_to_eV);
+//		OUT(GlobalV::ofs_running,"Bottom Energy (eV)", ebotom * ModuleBase::Ry_to_eV);
+//		OUT(GlobalV::ofs_running,"Range  Energy (eV)", etop-ebotom * ModuleBase::Ry_to_eV);
     }
 
 	return;
 }
 
 
-void Occupy::decision(const string &name,const string &smearing,const double &degauss)
+void Occupy::decision(const std::string &name,const std::string &smearing,const double &degauss)
 {
-	TITLE("Occupy","decision");
+	ModuleBase::TITLE("Occupy","decision");
     use_gaussian_broadening = false;
     use_tetrahedron_method = false;
     fixed_occupations = false;
@@ -145,8 +148,8 @@ void Occupy::decision(const string &name,const string &smearing,const double &de
     {
         if ( gaussian_parameter!=0.0 )
         {
-            WARNING("smearing_decision","Fixed occupations,gauss broadening ignored");
-            AUTO_SET("gaussian_parameter",0.0);
+            ModuleBase::WARNING("smearing_decision","Fixed occupations,gauss broadening ignored");
+            ModuleBase::GlobalFunc::AUTO_SET("gaussian_parameter",0.0);
             gaussian_parameter = 0.0;
         }
     }
@@ -154,8 +157,8 @@ void Occupy::decision(const string &name,const string &smearing,const double &de
     {
         if ( gaussian_parameter!=0.0 )
         {
-            WARNING("smearing_decision","Fixed occupations,gauss broadening ignored");
-            AUTO_SET("gaussian_parameter",0.0);
+            ModuleBase::WARNING("smearing_decision","Fixed occupations,gauss broadening ignored");
+            ModuleBase::GlobalFunc::AUTO_SET("gaussian_parameter",0.0);
             gaussian_parameter = 0.0;
         }
     }
@@ -170,7 +173,7 @@ void Occupy::decision(const string &name,const string &smearing,const double &de
         use_gaussian_broadening = true;
         if ( gaussian_parameter == 0.0)
         {
-            WARNING_QUIT("smearing_decision",
+            ModuleBase::WARNING_QUIT("smearing_decision",
                          "Smearing requires gaussian broadening,but gaussian_parameter = 0(default value = 0.1)");
         }
         if ( smearing == "gaussian" || smearing == "gauss")
@@ -188,7 +191,7 @@ void Occupy::decision(const string &name,const string &smearing,const double &de
 
         else if (smearing == "marzari-vanderbilt" || smearing == "cold" || smearing == "mv")
         {
-            gaussian_type = -1; 
+            gaussian_type = -1;
         }
         else if (smearing == "fermi-dirac" || smearing == "fd")
         {
@@ -205,7 +208,7 @@ void Occupy::decision(const string &name,const string &smearing,const double &de
     }
     else
     {
-        WARNING_QUIT("occupy_decision","occupations, not implemented");
+        ModuleBase::WARNING_QUIT("occupy_decision","occupations, not implemented");
     }
     return;
 }
@@ -223,7 +226,7 @@ void Occupy::iweights
     const double &nelec, //number of electrons for this spin direction.
     double **ekb,//the array save the band energy.
     double &ef,//output: the highest occupied Kohn-Sham level.
-    matrix &wg,//output: weight for each k, each band.
+    ModuleBase::matrix &wg,//output: weight for each k, each band.
     const int &is,//the spin index now.
     const int *isk//distinguish k point belong to which spin.
 )
@@ -231,20 +234,20 @@ void Occupy::iweights
 	assert(is<2); //not include non-collinear yet!
 	double degspin;
 	bool conv = false;          // pengfei 2017-04-04
-	
-	degspin = (NSPIN == 2)? 1.0 : 2.0;
-	if(NSPIN == 4)degspin = 1.0;//added by zhengdy-soc
-	
+
+	degspin = (GlobalV::NSPIN == 2)? 1.0 : 2.0;
+	if(GlobalV::NSPIN == 4)degspin = 1.0;//added by zhengdy-soc
+
 	assert( degspin > 0.0);
 	double ib_min = nelec/degspin;
-	
+
 	int ib_min1 = ( ib_min - int(ib_min) == 0) ? int(ib_min) : int(ib_min) + 1;
-	
+
 	for(int ik=0; ik<nks && !conv; ik++)
 	{
 		for(int ib=0; ib<nband && !conv; ib++)
 		{
-			//cout << " ekb=" << ekb[ik][ib] << endl;
+			//std::cout << " ekb=" << ekb[ik][ib] << std::endl;
 			int count =0;
 			ef = ekb[ik][ib];
 			for(int ik1=0; ik1<nks; ik1++)
@@ -257,17 +260,17 @@ void Occupy::iweights
 					}
 				}
 			}
-				
-			if( (NSPIN == 2 && count == ib_min1 * nks/2) 
-				|| (NSPIN == 1 && count == ib_min1 * nks) 
-				|| ((NSPIN == 4) && count == ib_min1 * nks))
+
+			if( (GlobalV::NSPIN == 2 && count == ib_min1 * nks/2)
+				|| (GlobalV::NSPIN == 1 && count == ib_min1 * nks)
+				|| ((GlobalV::NSPIN == 4) && count == ib_min1 * nks))
 			{
 				conv = true;
 			}
 		}
 	}
-		
-	
+
+
 	for(int ik=0; ik<nks; ik++)
 	{
 		for(int ib=0; ib<nband; ib++)
@@ -287,9 +290,9 @@ void Occupy::iweights
 		}
 	}
 
-    if(conv == false && en.iter == 2)
+    if(conv == false && GlobalC::en.iter == 2)
     {
-       WARNING_QUIT("Occupied","not converged, change 'smearing' method.");
+       ModuleBase::WARNING_QUIT("Occupied","not converged, change 'smearing' method.");
     }
 
     return;
@@ -309,16 +312,16 @@ void Occupy::gweights(
     double **ekb,//save the band energy.
     double &ef,//ouput: fermi level
     double &demet,//output: energy correction for metal
-    matrix &wg,//output: weight of each band at each k point.
+    ModuleBase::matrix &wg,//output: weight of each band at each k point.
 	const int &is, // spin
 	const int *isk) // array to point out each k belong to which spin
 {
-	//TITLE("Occupy","gweights");
+	//ModuleBase::TITLE("Occupy","gweights");
     //===============================
     // Calculate the Fermi energy ef
     //===============================
     // call efermig
-    Occupy::efermig(ekb, NBANDS, nks, nelec, wk, degauss, ngauss, ef, is, isk);
+    Occupy::efermig(ekb, GlobalV::NBANDS, nks, nelec, wk, degauss, ngauss, ef, is, isk);
     demet = 0.0;
 
     for (int ik = 0;ik < nks;ik++)
@@ -326,7 +329,7 @@ void Occupy::gweights(
 		// mohan add 2011-04-03
 		if(is!=-1 && is!=isk[ik]) continue;
 
-		for (int ib = 0;ib < NBANDS;ib++)
+		for (int ib = 0;ib < GlobalV::NBANDS;ib++)
 		{
 			//================================
 			// Calculate the gaussian weights
@@ -362,7 +365,7 @@ void Occupy::efermig
 	const int *isk
 )
 {
-	//TITLE("Occupy","efermig");
+	//ModuleBase::TITLE("Occupy","efermig");
     //==================================================================
     // Finds the Fermi energy - Gaussian Broadening (Methfessel-Paxton)
     //==================================================================
@@ -370,12 +373,12 @@ void Occupy::efermig
     const int maxiter = 300;
     const double eps = 1.0e-10;
 
-	/*	
+	/*
 	for(int ik=0; ik<nks; ik++)
 	{
 		for(int i=0; i<nband; i++)
 		{
-			cout << " ib=" << i << " ekb=" << ekb[ik][i] << endl;
+			std::cout << " ib=" << i << " ekb=" << ekb[ik][i] << std::endl;
 		}
 	}
 	*/
@@ -408,17 +411,17 @@ void Occupy::efermig
 
     if ((sumkup - nelec) < -eps || (sumklw - nelec) > eps)
     {
-		cout << " SOMETHING WRONG: " << endl;
-		cout << " is = " << is << endl;
-		cout << " eup = " << eup << endl;
-		cout << " elw = " << elw << endl;
-		cout << " nband = " << nband << endl;
-		cout << " nelec = " << nelec << endl;
-		cout << " sumkup = " << sumkup << endl;
-		cout << " sumklw = " << sumklw << endl;
-		cout << " sumkup - nelec = " << sumkup - nelec << endl;
-		cout << " sumklw - nelec = " << sumklw - nelec << endl;
-		WARNING_QUIT("Occupy::efermig","ERROS in SMEARING");
+		std::cout << " SOMETHING WRONG: " << std::endl;
+		std::cout << " is = " << is << std::endl;
+		std::cout << " eup = " << eup << std::endl;
+		std::cout << " elw = " << elw << std::endl;
+		std::cout << " nband = " << nband << std::endl;
+		std::cout << " nelec = " << nelec << std::endl;
+		std::cout << " sumkup = " << sumkup << std::endl;
+		std::cout << " sumklw = " << sumklw << std::endl;
+		std::cout << " sumkup - nelec = " << sumkup - nelec << std::endl;
+		std::cout << " sumklw - nelec = " << sumklw - nelec << std::endl;
+		ModuleBase::WARNING_QUIT("Occupy::efermig","ERROS in SMEARING");
     }
 
     for (int i = 0;i < maxiter;i++)
@@ -458,17 +461,17 @@ double Occupy::sumkg(
 	const int ngauss,
 	const double &e,
 	const int &is,
-	const int *isk	
+	const int *isk
 )
 {
-	//TITLE("Occupy","sumkg");
+	//ModuleBase::TITLE("Occupy","sumkg");
     double sum2 = 0.0;
     for (int ik = 0;ik < nks; ik++)
 	{
 		if(is!=-1 && is!=isk[ik]) continue;
-	
+
 		double sum1 = 0.0;
-		for (int ib = 0;ib < NBANDS; ib++)
+		for (int ib = 0;ib < GlobalV::NBANDS; ib++)
 		{
 			//===========================
 			// call wgauss
@@ -478,13 +481,13 @@ double Occupy::sumkg(
 		sum2 += wk [ik] * sum1;
 	}
 
-	//ofs_running << "\n sum2 before reduce = " << sum2 << endl;
+	//GlobalV::ofs_running << "\n sum2 before reduce = " << sum2 << std::endl;
 
 #ifdef __MPI
 	Parallel_Reduce::reduce_double_allpool(sum2);
 #endif
 
-	//ofs_running << "\n sum2 after reduce = " << sum2 << endl;
+	//GlobalV::ofs_running << "\n sum2 after reduce = " << sum2 << std::endl;
 
     return sum2;
 } // end function sumkg
@@ -492,7 +495,7 @@ double Occupy::sumkg(
 
 double Occupy::wgauss(const double &x,const int n)
 {
-	//TITLE("Occupy","wgauss");
+	//ModuleBase::TITLE("Occupy","wgauss");
     //=====================================================================
     // This function computes the approximate theta function for the
     // iven order n, at the point x.
@@ -507,7 +510,7 @@ double Occupy::wgauss(const double &x,const int n)
     //============================
     double wga = 0.0;
     const double maxarg = 200.0;
-    
+
 	//===========================
     // Fermi-Dirac(fd) smearing
     //===========================
@@ -527,24 +530,24 @@ double Occupy::wgauss(const double &x,const int n)
         }
         return wga;
     }
-	
+
     //===================
     // Cold smearing(mv)
     //===================
     if (n == - 1)
     {
-        const double xp = x - 1.00 / SQRT2;
+        const double xp = x - 1.00 / ModuleBase::SQRT2;
         const double arg = std::min(maxarg, xp * xp);
-        wga = 0.50 * erf(xp) + 1.00 / sqrt( TWO_PI ) * std::exp(- arg) + 0.50;
+        wga = 0.50 * erf(xp) + 1.00 / sqrt( ModuleBase::TWO_PI ) * std::exp(- arg) + 0.50;
         return wga;
     }
-    
+
 	//====================
     // Methfessel-Paxton       //pengfei 2014-10-13
     //====================
     wga = 0.5 * (1 - erf(-x));
-    //wga = gauss_freq(x * SQRT2);
-    //	cout<<"\n x="<<x<<" wga="<<wga;
+    //wga = gauss_freq(x * ModuleBase::SQRT2);
+    //	std::cout<<"\n x="<<x<<" wga="<<wga;
     if (n == 0)
     {
         return wga;
@@ -557,16 +560,16 @@ double Occupy::wgauss(const double &x,const int n)
     double hp = std::exp(- arg);
     double h0 = 1.00;
     double h1 = -2.00 * x;
-    double a = 1.0 / sqrt(PI);
+    double a = 1.0 / sqrt(ModuleBase::PI);
     for (int i = 0;i < n;i++)
     {
         a = - a / ( static_cast<double>(i+1) * 4.00);
         wga = wga + a * h1 * hp;
         ++ni;
-        //cout << " wga = " <<wga<<endl;
+        //std::cout << " wga = " <<wga<<std::endl;
         h0 = 2.00 * (-x) * h1 - 2.00 * static_cast<double>(ni) * h0 ;
         ++ni;
-        
+
         h1 = 2.00 * (-x) * h0 - 2.00 * static_cast<double>(ni) * h1 ;
     }
     return wga;
@@ -619,20 +622,20 @@ double Occupy::w1gauss(const double &x,const int n)
 
     if (n == - 1)
     {
-        const double xp = x - 1.00 / SQRT2;
+        const double xp = x - 1.00 / ModuleBase::SQRT2;
         const double arg = std::min(200.0, xp*xp);
-        w1 = 1.00 / sqrt(TWO_PI) * xp * std::exp(- arg);
+        w1 = 1.00 / sqrt(ModuleBase::TWO_PI) * xp * std::exp(- arg);
         return w1;
     }
-    
-	
+
+
 	//====================
     // Methfessel-Paxton
     //====================
     const double arg = std::min(200.0, x * x);
-    w1 = - 0.50 * std::exp(- arg) / sqrt(PI);
+    w1 = - 0.50 * std::exp(- arg) / sqrt(ModuleBase::PI);
 
-	//cout << "\n x=" << x << " w1=" << w1;
+	//std::cout << "\n x=" << x << " w1=" << w1;
     if (n == 0)//specific case : gaussian smearing.
     {
         return w1;
@@ -641,7 +644,7 @@ double Occupy::w1gauss(const double &x,const int n)
 /*    double hd = 0.0;
     double hp = exp(- arg);
     int ni = 0;
-    double a = 1.0 / sqrt(PI);
+    double a = 1.0 / sqrt(ModuleBase::PI);
 
     for (int i = 0;i < n;i++)
     {
@@ -653,16 +656,16 @@ double Occupy::w1gauss(const double &x,const int n)
 		// mohan fixed bug 2010-1-10
 		// description of bug: i should not be 0.
         a = - a / ( static_cast<double>(i+1) * 4.00);//dble(i)
-        cout << " w1 == "<<w1<<endl;
+        std::cout << " w1 == "<<w1<<std::endl;
         w1 -= a * (0.50 * hp + static_cast<double>(ni) * hpm1);//dble(ni)
-        cout << " w1 == "<<w1<<endl;
+        std::cout << " w1 == "<<w1<<std::endl;
     }*/
 
     int ni = 0;
     double hp = std::exp(- arg);
     double h0 = 1.00;
     double h1 = 2.00 * x;
-    double a = 1.0 / sqrt(PI);
+    double a = 1.0 / sqrt(ModuleBase::PI);
     for (int i = 0;i < n;i++)
     {
         a = - a / ( static_cast<double>(i+1) * 4.00);
@@ -679,21 +682,21 @@ double Occupy::w1gauss(const double &x,const int n)
 
 
 void Occupy::tweights(const int nks,const int nspin,const int nband,const double &nelec,
-                      const int ntetra,const matrix &tetra, double **ekb, double &ef, matrix &wg)
+                      const int ntetra,const ModuleBase::matrix &tetra, double **ekb, double &ef, ModuleBase::matrix &wg)
 {
     //===================================================================
     // calculates weights with the tetrahedron method (Bloechl version)
-    // integer :: nks, nspin, NBANDS, ntetra, tetra (4, ntetra)
+    // integer :: nks, nspin, GlobalV::NBANDS, ntetra, tetra (4, ntetra)
     //===================================================================
 
     double e1, e2, e3, e4, c1, c2, c3, c4, dosef;
     int ik, ibnd, nt, nk, ns, i, kp1, kp2, kp3, kp4;
-	
+
 	double etetra[4];
     int itetra[4];
 
     // Calculate the Fermi energy ef
-    efermit(ekb, NBANDS, nks, nelec, nspin, ntetra, tetra, ef);
+    efermit(ekb, GlobalV::NBANDS, nks, nelec, nspin, ntetra, tetra, ef);
 
     for (ik = 0;ik < nks;ik++)
     {
@@ -719,7 +722,7 @@ void Occupy::tweights(const int nks,const int nspin,const int nband,const double
 
         for (nt = 0;nt < ntetra;nt++)
         {
-            for (ibnd = 0;ibnd < NBANDS;ibnd++)
+            for (ibnd = 0;ibnd < GlobalV::NBANDS;ibnd++)
             {
                 //======================================================
                 // etetra are the energies at the vertexes of the nt-th
@@ -732,7 +735,7 @@ void Occupy::tweights(const int nks,const int nspin,const int nband,const double
 
                 itetra[0] = 0;
 
-                hpsort(4, etetra, itetra);
+                ModuleBase::hpsort(4, etetra, itetra);
 
                 //===============================================
                 // ...sort in ascending order: e1 < e2 < e3 < e4
@@ -827,7 +830,7 @@ void Occupy::tweights(const int nks,const int nspin,const int nband,const double
     //=====================================================================
     for (ik = 0;ik < nks;ik++)
     {
-        for (ibnd = 0;ibnd < NBANDS;ibnd++)
+        for (ibnd = 0;ibnd < GlobalV::NBANDS;ibnd++)
         {
             wg(ik, ibnd) = wg(ik, ibnd) * 2.0 / nspin;
         }
@@ -836,7 +839,7 @@ void Occupy::tweights(const int nks,const int nspin,const int nband,const double
 } // end subroutine tweights
 
 
-double Occupy::wsweight(const Vector3<double> &r, Vector3<double> *rws,const int nrws)
+double Occupy::wsweight(const ModuleBase::Vector3<double> &r, ModuleBase::Vector3<double> *rws,const int nrws)
 {
     //============================================================
     // integer ir, nreq, nrws
@@ -871,7 +874,7 @@ double Occupy::wsweight(const Vector3<double> &r, Vector3<double> *rws,const int
 } // end function wsweight
 
 void Occupy::efermit(double** ekb,const int nband,const int nks,const double &nelec,const int nspin,
-                     const int ntetra,const matrix &tetra, double &ef)
+                     const int ntetra,const ModuleBase::matrix &tetra, double &ef)
 {
     //=======================================================
     // Finds the Fermi energy - tetrahedron method (Bloechl)
@@ -893,17 +896,17 @@ void Occupy::efermit(double** ekb,const int nband,const int nks,const double &ne
     //===================================
     const int nlw = max(  1, static_cast<int>( (nelec / 2.0 - 5.0) )  );
     double elw = ekb[nlw][0];
-    double eup = ekb[0][NBANDS-1];
+    double eup = ekb[0][GlobalV::NBANDS-1];
 
     for (int ik = 1;ik < nks;ik++)// do ik = 2, nks
     {
         elw = min(elw, ekb[ik][nlw]);
-        eup = max(eup, ekb[ik][NBANDS-1]);
+        eup = max(eup, ekb[ik][GlobalV::NBANDS-1]);
     }
     for (int ik = 1;ik < nks;ik++)// do ik = 2, nks
     {
         elw = min(elw, ekb[ik][nlw]);
-        eup = max(eup, ekb[ik][NBANDS-1]);
+        eup = max(eup, ekb[ik][GlobalV::NBANDS-1]);
     }
 
     //===============================
@@ -911,15 +914,15 @@ void Occupy::efermit(double** ekb,const int nband,const int nks,const double &ne
     // the number of states with eup
     // the number of states with elw
     //===============================
-    const double sumkup = sumkt(ekb, NBANDS, nks, nspin, ntetra, tetra, eup);
-    const double sumklw = sumkt(ekb, NBANDS, nks, nspin, ntetra, tetra, elw);
+    const double sumkup = sumkt(ekb, GlobalV::NBANDS, nks, nspin, ntetra, tetra, eup);
+    const double sumklw = sumkt(ekb, GlobalV::NBANDS, nks, nspin, ntetra, tetra, elw);
 
-	ofs_running << "\n sumkup = " << sumkup;
-	ofs_running << "\n sumklw = " << sumklw << endl;
+	GlobalV::ofs_running << "\n sumkup = " << sumkup;
+	GlobalV::ofs_running << "\n sumklw = " << sumklw << std::endl;
 
     if ((sumkup - nelec) < - eps || (sumklw - nelec) > eps)
     {
-        WARNING("efermit","unexpected error.");
+        ModuleBase::WARNING("efermit","unexpected error.");
     }
 
     double better = 1.0e+10;
@@ -931,7 +934,7 @@ void Occupy::efermit(double** ekb,const int nband,const int nks,const double &ne
     {
         // the number of states with ef
         ef = (eup + elw) / 2.0;
-        sumkmid = sumkt(ekb, NBANDS, nks, nspin, ntetra, tetra, ef);
+        sumkmid = sumkt(ekb, GlobalV::NBANDS, nks, nspin, ntetra, tetra, ef);
 
         if (abs(sumkmid - nelec) < better)
         {
@@ -959,7 +962,7 @@ void Occupy::efermit(double** ekb,const int nband,const int nks,const double &ne
         // unconverged exit:
         // the best available ef is used . Needed in some difficult cases
         ef = efbetter;
-        sumkmid = sumkt(ekb, NBANDS, nks, nspin, ntetra, tetra, ef);
+        sumkmid = sumkt(ekb, GlobalV::NBANDS, nks, nspin, ntetra, tetra, ef);
     }
 
     //==============================================================
@@ -967,9 +970,9 @@ void Occupy::efermit(double** ekb,const int nband,const int nks,const double &ne
     //==============================================================
     for (int ik = 0;ik < nks;ik++)
     {
-        if (ef > ekb[ik][NBANDS-1] + 1.e-4)
+        if (ef > ekb[ik][GlobalV::NBANDS-1] + 1.e-4)
         {
-            cout << "\n ef = " << ef;
+            std::cout << "\n ef = " << ef;
         }
     }
     return;
@@ -977,7 +980,7 @@ void Occupy::efermit(double** ekb,const int nband,const int nks,const double &ne
 
 
 double Occupy::sumkt(double** ekb,const int nband,const int nks,const int nspin,const int ntetra,
-                     const matrix &tetra,const double &e)
+                     const ModuleBase::matrix &tetra,const double &e)
 {
     double etetra[4];
     double sum = 0.0;
@@ -999,7 +1002,7 @@ double Occupy::sumkt(double** ekb,const int nband,const int nks,const int nspin,
 
         for (int nt = 0; nt < ntetra; nt++)
         {
-            for (int ibnd = 0; ibnd < NBANDS; ibnd++)
+            for (int ibnd = 0; ibnd < GlobalV::NBANDS; ibnd++)
             {
                 //======================================================
                 // etetra are the energies at the vertexes of the nt-th

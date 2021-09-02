@@ -14,7 +14,8 @@
 //#include "./src_parallel/mcd.h"
 #endif
 
-using namespace std;
+namespace ModuleBase
+{
 
 class IntArray
 {
@@ -72,5 +73,6 @@ private:
 	static int arrayCount;
 	void freemem();
 };
+}
 
 #endif	// IntArray class

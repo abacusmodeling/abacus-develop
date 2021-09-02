@@ -23,7 +23,7 @@ class LCAO_Orbitals
 	~LCAO_Orbitals();
 
 	void Read_Orbitals(
-		ofstream &ofs_in, // mohan add 2021-05-07
+		std::ofstream &ofs_in, // mohan add 2021-05-07
 		const int &ntype_in,
 		const int &lmax_in,
 		const int &out_descriptor, //  mohan add 2021-04-25
@@ -32,7 +32,7 @@ class LCAO_Orbitals
 		const int &my_rank); // mohan add 2021-04-26
 
 	void Read_PAO(
-		ofstream &ofs_in,
+		std::ofstream &ofs_in,
 		const int& it,
 		const bool &force_flag, // mohan add 2021-05-07
 		const int& my_rank); // mohan add 2021-04-26
@@ -49,7 +49,7 @@ class LCAO_Orbitals
 
 
 	void Read_Descriptor(
-		ofstream &ofs_in,
+		std::ofstream &ofs_in,
 		const bool &force_flag, // mohan add 2021-05-07
 		const int &my_rank);	//caoyu add 2020-3-16
 
@@ -96,9 +96,9 @@ class LCAO_Orbitals
 	// initalized in unitcell_pseudo
 	// assume ntype < 20.
 	bool read_in_flag;
-	std::vector<string> orbital_file;
-	std::vector<string> nonlocal_file;
-	string descriptor_file;	//caoyu add 2020-3-16
+	std::vector<std::string> orbital_file;
+	std::vector<std::string> nonlocal_file;
+	std::string descriptor_file;	//caoyu add 2020-3-16
 
 private:
 
@@ -115,8 +115,8 @@ private:
 	double rcutmax_Beta;	//caoyu add 2021-05-24
 
 	void read_orb_file(
-		ofstream &ofs_in,
-		ifstream &ifs, 
+		std::ofstream &ofs_in,
+		std::ifstream &ifs, 
 		const int &it, 
 		int &lmax, 
 		int &nchimax, 
@@ -129,5 +129,8 @@ private:
 /// PLEASE avoid using 'ORB' as global variable 
 ///
 ///mohan note 2021 - 03 - 23
+namespace GlobalC
+{
 extern LCAO_Orbitals ORB;
+}
 #endif

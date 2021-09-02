@@ -3,12 +3,12 @@
 
 #include "../../../src_ri/exx_abfs-inverse_matrix_double.h"
 
-matrix init_matrix();
+ModuleBase::matrix init_matrix();
 
 int inverse_matrix_double_test()
 {
-	matrix m = init_matrix();
-	matrix mI(m.nr,m.nc);
+	ModuleBase::matrix m = init_matrix();
+	ModuleBase::matrix mI(m.nr,m.nc);
 	
 	Exx_Abfs::Inverse_Matrix_Double I;
 	I.init(m.nr);
@@ -16,15 +16,15 @@ int inverse_matrix_double_test()
 	I.cal_inverse( Exx_Abfs::Inverse_Matrix_Double::Method::dsyev );
 	I.output(mI);
 	
-	ofstream ofs("m_mI.dat");
-	ofs<<m*mI<<endl;
+	std::ofstream ofs("m_mI.dat");
+	ofs<<m*mI<<std::endl;
 	ofs.close();
 	ofs.open("mI_m.dat");
-	ofs<<mI*m<<endl;
+	ofs<<mI*m<<std::endl;
 	ofs.close();
 }
 
-matrix init_matrix()
+ModuleBase::matrix init_matrix()
 {
 	constexpr int N = 427;
 	double tmp[N*N] = {
@@ -457,7 +457,7 @@ matrix init_matrix()
 		0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	-0.130416,	0,	0,	0,	0,	0,	0,	0,	0,	0.147246,	0,	0,	0,	0,	0,	0,	0,	0,	0.0362189,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	-0.0845429,	0,	0,	0,	0,	0,	0,	0,	0,	-0.487657,	0,	0,	0,	0,	0,	0,	0,	0,	0.766632
 		};
 
-	matrix m(N,N);
+	ModuleBase::matrix m(N,N);
 	for( size_t i=0; i!=N*N; ++i )
 		m.c[i] = tmp[i];
 	return m;

@@ -44,7 +44,7 @@ void ORB_table_alpha::allocate(
 	const double &dr_in,
 	const double &dk_in)
 {
-	TITLE("ORB_table_alpha", "allocate");
+	ModuleBase::TITLE("ORB_table_alpha", "allocate");
 
 	this->ntype = ntype_in; // type of elements.
 	this->lmax = lmax_in;
@@ -68,12 +68,12 @@ void ORB_table_alpha::allocate(
 		++Rmesh;
 	}
 
-	//	OUT(ofs_running,"lmax",lmax);
-	//	OUT(ofs_running,"Rmax (Bohr)",Rmax);
-	//	OUT(ofs_running,"dr (Bohr)",dr);
-	//	OUT(ofs_running,"dk",dk);
-	//	OUT(ofs_running,"nlm",nlm);
-	//	OUT(ofs_running,"kmesh",kmesh);
+	//	OUT(GlobalV::ofs_running,"lmax",lmax);
+	//	OUT(GlobalV::ofs_running,"Rmax (Bohr)",Rmax);
+	//	OUT(GlobalV::ofs_running,"dr (Bohr)",dr);
+	//	OUT(GlobalV::ofs_running,"dk",dk);
+	//	OUT(GlobalV::ofs_running,"nlm",nlm);
+	//	OUT(GlobalV::ofs_running,"kmesh",kmesh);
 
 	delete[] kpoint;
 	delete[] r;
@@ -97,7 +97,7 @@ void ORB_table_alpha::allocate(
 		rab[ir] = dr;
 	}
 
-	//	OUT(ofs_running,"allocate kpoint, r, rab, kab","Done");
+	//	OUT(GlobalV::ofs_running,"allocate kpoint, r, rab, kab","Done");
 	return;
 }
 
@@ -114,17 +114,17 @@ int ORB_table_alpha::get_rmesh(const double &R1, const double &R2)
 
 	if (rmesh <= 0)
 	{
-//		ofs_warning << "\n R1 = " << R1 << " R2 = " << R2;
-//		ofs_warning << "\n rmesh = " << rmesh;
-		cout << "\n R1 = " << R1 << " R2 = " << R2;
-		cout << "\n rmesh = " << rmesh;
-		WARNING_QUIT("ORB_table_alpha::get_rmesh", "rmesh <= 0");
+//		GlobalV::ofs_warning << "\n R1 = " << R1 << " R2 = " << R2;
+//		GlobalV::ofs_warning << "\n rmesh = " << rmesh;
+		std::cout << "\n R1 = " << R1 << " R2 = " << R2;
+		std::cout << "\n rmesh = " << rmesh;
+		ModuleBase::WARNING_QUIT("ORB_table_alpha::get_rmesh", "rmesh <= 0");
 	}
 	return rmesh;
 }
 
 void ORB_table_alpha::cal_S_PhiAlpha_R(
-	Sph_Bessel_Recursive::D2 *pSB, // mohan add 2021-03-06
+	ModuleBase::Sph_Bessel_Recursive::D2 *pSB, // mohan add 2021-03-06
 	const int &l,
 	const Numerical_Orbital_Lm &n1,
 	const Numerical_Orbital_Lm &n2,
@@ -132,8 +132,7 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 	double *rs,
 	double *drs)
 {
-	TITLE("ORB_table_alpha", "cal_S_PhiAlpha_R");
-	timer::tick("ORB_table_alpha", "S_PhiAlpha_R");
+	ModuleBase::timer::tick("ORB_table_alpha", "S_PhiAlpha_R");
 
 	assert(kmesh > 0);
 
@@ -154,7 +153,7 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 
 	for (int ir = 0; ir < rmesh; ir++)
 	{
-		ZEROS(integrated_func, kmesh);
+		ModuleBase::GlobalFunc::ZEROS(integrated_func, kmesh);
 		double temp = 0.0;
 
 		for (int ik = 0; ik < kmesh; ik++)
@@ -162,8 +161,8 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 			integrated_func[ik] = jl[ir][ik] * k1_dot_k2[ik];
 		}
 		// Call simpson integration
-		Integral::Simpson_Integral(kmesh, integrated_func, kab, temp);
-		rs[ir] = temp * FOUR_PI;
+		ModuleBase::Integral::Simpson_Integral(kmesh, integrated_func, kab, temp);
+		rs[ir] = temp * ModuleBase::FOUR_PI;
 
 		//drs
 		double temp1, temp2;
@@ -175,7 +174,7 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 				integrated_func[ik] = jlm1[ir][ik] * k1_dot_k2[ik] * kpoint[ik];
 			}
 
-			Integral::Simpson_Integral(kmesh, integrated_func, kab, temp1);
+			ModuleBase::Integral::Simpson_Integral(kmesh, integrated_func, kab, temp1);
 		}
 
 		for (int ik = 0; ik < kmesh; ik++)
@@ -183,15 +182,15 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 			integrated_func[ik] = jlp1[ir][ik] * k1_dot_k2[ik] * kpoint[ik];
 		}
 
-		Integral::Simpson_Integral(kmesh, integrated_func, kab, temp2);
+		ModuleBase::Integral::Simpson_Integral(kmesh, integrated_func, kab, temp2);
 
 		if (l == 0)
 		{
-			drs[ir] = -FOUR_PI * temp2;
+			drs[ir] = -ModuleBase::FOUR_PI * temp2;
 		}
 		else
 		{
-			drs[ir] = FOUR_PI * (temp1 * l - (l + 1) * temp2) / (2.0 * l + 1);
+			drs[ir] = ModuleBase::FOUR_PI * (temp1 * l - (l + 1) * temp2) / (2.0 * l + 1);
 		}
 	}
 
@@ -200,7 +199,7 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 	//we store Slm(R) / R**l at the fisrt point, rather than Slm(R)
 	if (l > 0)
 	{
-		ZEROS(integrated_func, kmesh);
+		ModuleBase::GlobalFunc::ZEROS(integrated_func, kmesh);
 		double temp = 0.0;
 
 		for (int ik = 0; ik < kmesh; ik++)
@@ -209,22 +208,22 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 		}
 
 		// Call simpson integration
-		Integral::Simpson_Integral(kmesh, integrated_func, kab, temp);
-		rs[0] = FOUR_PI / Mathzone_Add1::dualfac(2 * l + 1) * temp;
+		ModuleBase::Integral::Simpson_Integral(kmesh, integrated_func, kab, temp);
+		rs[0] = ModuleBase::FOUR_PI / ModuleBase::Mathzone_Add1::dualfac(2 * l + 1) * temp;
 	}
 
 	delete[] integrated_func;
 	delete[] k1_dot_k2;
 
-	timer::tick("ORB_table_alpha", "S_PhiAlpha_R");
+	ModuleBase::timer::tick("ORB_table_alpha", "S_PhiAlpha_R");
 	return;
 }
 
 void ORB_table_alpha::init_Table_Alpha(
-	Sph_Bessel_Recursive::D2 *pSB)
+	ModuleBase::Sph_Bessel_Recursive::D2 *pSB)
 {
-	TITLE("ORB_table_alpha", "init_Table_Alpha");
-	timer::tick("ORB_table_alpha", "init_Table_Alpha");
+	ModuleBase::TITLE("ORB_table_alpha", "init_Table_Alpha");
+	ModuleBase::timer::tick("ORB_table_alpha", "init_Table_Alpha");
 
 	assert(ntype > 0);
 
@@ -237,15 +236,15 @@ void ORB_table_alpha::init_Table_Alpha(
 	// <1Phi|2Alpha>
 	for (int T1 = 0; T1 < ntype; T1++) // type 1 is orbital
 	{
-		const int Lmax1 = ORB.Phi[T1].getLmax();
-		const int Lmax2 = ORB.Alpha[0].getLmax();
+		const int Lmax1 = GlobalC::ORB.Phi[T1].getLmax();
+		const int Lmax2 = GlobalC::ORB.Alpha[0].getLmax();
 		const int lmax_now = std::max(Lmax1, Lmax2);
 		int L2plus1 = 2 * lmax_now + 1;
 		//-------------------------------------------------------------
 		// how many <psi|alpha_l>
 		// here we count all possible psi with (L,N) index for type T1.
 		//-------------------------------------------------------------
-		const int pairs_chi = ORB.Phi[T1].getTotal_nchi() * ORB.Alpha[0].getTotal_nchi();
+		const int pairs_chi = GlobalC::ORB.Phi[T1].getTotal_nchi() * GlobalC::ORB.Alpha[0].getTotal_nchi();
 
 		if (pairs_chi == 0)
 		{
@@ -256,14 +255,14 @@ void ORB_table_alpha::init_Table_Alpha(
 		this->Table_DSR[0][T1] = new double **[pairs_chi];
 		this->Table_DSR[1][T1] = new double **[pairs_chi];
 
-		const double Rcut1 = ORB.Phi[T1].getRcut();
+		const double Rcut1 = GlobalC::ORB.Phi[T1].getRcut();
 		for (int L1 = 0; L1 < Lmax1 + 1; L1++)
 		{
-			for (int N1 = 0; N1 < ORB.Phi[T1].getNchi(L1); N1++)
+			for (int N1 = 0; N1 < GlobalC::ORB.Phi[T1].getNchi(L1); N1++)
 			{
 				for (int L2 = 0; L2 < Lmax2 + 1; L2++)
 				{
-					for (int N2 = 0; N2 < ORB.Alpha[0].getNchi(L2); N2++)
+					for (int N2 = 0; N2 < GlobalC::ORB.Alpha[0].getNchi(L2); N2++)
 					{
 						// get the second index.
 						const int Opair = this->DS_Opair(T1, L1, L2, N1, N2);
@@ -272,8 +271,8 @@ void ORB_table_alpha::init_Table_Alpha(
 						this->Table_DSR[0][T1][Opair] = new double *[L2plus1];
 						this->Table_DSR[1][T1][Opair] = new double *[L2plus1];
 
-						const double Rcut1 = ORB.Phi[T1].getRcut();
-						const double Rcut2 = ORB.Alpha[0].getRcut();
+						const double Rcut1 = GlobalC::ORB.Phi[T1].getRcut();
+						const double Rcut2 = GlobalC::ORB.Alpha[0].getRcut();
 						assert(Rcut1 > 0.0 && Rcut1 < 100);
 						assert(Rcut2 > 0.0 && Rcut2 < 100);
 
@@ -290,15 +289,15 @@ void ORB_table_alpha::init_Table_Alpha(
 							this->Table_DSR[0][T1][Opair][L] = new double[rmesh];
 							this->Table_DSR[1][T1][Opair][L] = new double[rmesh];
 
-							Memory::record("ORB_table_alpha", "Table_DSR",
+							ModuleBase::Memory::record("ORB_table_alpha", "Table_DSR",
 										   2 * this->ntype * pairs_chi * rmesh, "double");
 
 							//for those L whose Gaunt Coefficients = 0, we
 							//assign every element in Table_DSR as zero
 							if ((L > AL) || (L < SL) || ((L - SL) % 2 == 1))
 							{
-								ZEROS(Table_DSR[0][T1][Opair][L], rmesh);
-								ZEROS(Table_DSR[1][T1][Opair][L], rmesh);
+								ModuleBase::GlobalFunc::ZEROS(Table_DSR[0][T1][Opair][L], rmesh);
+								ModuleBase::GlobalFunc::ZEROS(Table_DSR[1][T1][Opair][L], rmesh);
 
 								continue;
 							}
@@ -306,8 +305,8 @@ void ORB_table_alpha::init_Table_Alpha(
 							this->cal_S_PhiAlpha_R(
 								pSB, // mohan add 2021-03-06
 								L,
-								ORB.Phi[T1].PhiLN(L1, N1),
-								ORB.Alpha[0].PhiLN(L2, N2), // mohan update 2011-03-07
+								GlobalC::ORB.Phi[T1].PhiLN(L1, N1),
+								GlobalC::ORB.Alpha[0].PhiLN(L2, N2), // mohan update 2011-03-07
 								rmesh,
 								this->Table_DSR[0][T1][Opair][L],
 								this->Table_DSR[1][T1][Opair][L]);
@@ -319,8 +318,8 @@ void ORB_table_alpha::init_Table_Alpha(
 	}					  // end T1
 	destroy_nr = true;
 
-	//	OUT(ofs_running,"allocate non-local potential matrix","Done");
-	timer::tick("ORB_table_alpha", "init_Table_Alpha");
+	//	OUT(GlobalV::ofs_running,"allocate non-local potential matrix","Done");
+	ModuleBase::timer::tick("ORB_table_alpha", "init_Table_Alpha");
 	return;
 }
 
@@ -331,15 +330,15 @@ void ORB_table_alpha::Destroy_Table_Alpha(void)
 		return;
 	}
 
-	const int ntype = ORB.get_ntype();
+	const int ntype = GlobalC::ORB.get_ntype();
 	for (int ir = 0; ir < 2; ir++)
 	{
 		for (int T1 = 0; T1 < ntype; T1++)
 		{
-			const int Lmax1 = ORB.Phi[T1].getLmax();
-			const int Lmax2 = ORB.Alpha[0].getLmax();
+			const int Lmax1 = GlobalC::ORB.Phi[T1].getLmax();
+			const int Lmax2 = GlobalC::ORB.Alpha[0].getLmax();
 			const int lmax_now = std::max(Lmax1, Lmax2);
-			const int pairs = ORB.Phi[T1].getTotal_nchi() * ORB.Alpha[0].getTotal_nchi();
+			const int pairs = GlobalC::ORB.Phi[T1].getTotal_nchi() * GlobalC::ORB.Alpha[0].getTotal_nchi();
 
 			// mohan fix bug 2011-03-30
 			if (pairs == 0)
@@ -365,7 +364,7 @@ void ORB_table_alpha::Destroy_Table_Alpha(void)
 
 void ORB_table_alpha::init_DS_2Lplus1(void)
 {
-	TITLE("Make_Overlap_Table", "init_DS_2Lplus1");
+	ModuleBase::TITLE("Make_Overlap_Table", "init_DS_2Lplus1");
 	assert(this->ntype > 0);
 	delete[] DS_2Lplus1;
 	DS_2Lplus1 = new int[ntype]; // 2Lmax+1 for each T1
@@ -373,17 +372,17 @@ void ORB_table_alpha::init_DS_2Lplus1(void)
 	int index = 0;
 	for (int T1 = 0; T1 < ntype; T1++)
 	{
-		this->DS_2Lplus1[T1] = max(ORB.Phi[T1].getLmax(), ORB.Alpha[0].getLmax()) * 2 + 1;
+		this->DS_2Lplus1[T1] = max(GlobalC::ORB.Phi[T1].getLmax(), GlobalC::ORB.Alpha[0].getLmax()) * 2 + 1;
 	}
 	return;
 }
 
 void ORB_table_alpha::init_DS_Opair(void)
 {
-	const int lmax = ORB.get_lmax();
-	const int nchimax = ORB.get_nchimax();
-	const int lmax_d = ORB.get_lmax_d();
-	const int nchimax_d = ORB.get_nchimax_d();
+	const int lmax = GlobalC::ORB.get_lmax();
+	const int nchimax = GlobalC::ORB.get_nchimax();
+	const int lmax_d = GlobalC::ORB.get_lmax_d();
+	const int nchimax_d = GlobalC::ORB.get_nchimax_d();
 	assert(lmax + 1 > 0);
 	assert(lmax_d + 1 > 0);
 	assert(nchimax > 0);
@@ -396,13 +395,13 @@ void ORB_table_alpha::init_DS_Opair(void)
 	for (int T1 = 0; T1 < ntype; T1++) //alpha is not related to atom type !
 	{
 		int index = 0;
-		for (int L1 = 0; L1 < ORB.Phi[T1].getLmax() + 1; L1++)
+		for (int L1 = 0; L1 < GlobalC::ORB.Phi[T1].getLmax() + 1; L1++)
 		{
-			for (int N1 = 0; N1 < ORB.Phi[T1].getNchi(L1); N1++)
+			for (int N1 = 0; N1 < GlobalC::ORB.Phi[T1].getNchi(L1); N1++)
 			{
-				for (int L2 = 0; L2 < ORB.Alpha[0].getLmax() + 1; L2++)
+				for (int L2 = 0; L2 < GlobalC::ORB.Alpha[0].getLmax() + 1; L2++)
 				{
-					for (int N2 = 0; N2 < ORB.Alpha[0].getNchi(L2); N2++)
+					for (int N2 = 0; N2 < GlobalC::ORB.Alpha[0].getNchi(L2); N2++)
 					{
 						this->DS_Opair(T1, L1, L2, N1, N2) = index;
 						++index;
@@ -418,29 +417,29 @@ void ORB_table_alpha::init_DS_Opair(void)
 //caoyu add 2021-03-20
 void ORB_table_alpha::print_Table_DSR(void)
 {
-	TITLE("ORB_table_alpha", "print_Table_DSR");
+	ModuleBase::TITLE("ORB_table_alpha", "print_Table_DSR");
 	NEW_PART("Overlap table S between lcao orbital and descriptor basis : S_{I_mu_alpha}");
 
 	ofstream ofs;
 	stringstream ss;
 	// the parameter 'winput::spillage_outdir' is read from INPUTw.
 	ss << "./S_I_mu_alpha.dat";
-	if (MY_RANK == 0)
+	if (GlobalV::MY_RANK == 0)
 	{
 		ofs.open(ss.str().c_str());
 	}
 
 	for (int T1 = 0; T1 < this->ntype; T1++)	//T1
 	{
-		const int Lmax1 = ORB.Phi[T1].getLmax();
-		const int Lmax2 = ORB.Alpha[0].getLmax();
+		const int Lmax1 = GlobalC::ORB.Phi[T1].getLmax();
+		const int Lmax2 = GlobalC::ORB.Alpha[0].getLmax();
 		for (int L1 = 0; L1 < Lmax1 + 1; L1++)
 		{
-			for (int N1 = 0; N1 < ORB.Phi[T1].getNchi(L1); N1++)
+			for (int N1 = 0; N1 < GlobalC::ORB.Phi[T1].getNchi(L1); N1++)
 			{
 				for (int L2 = 0; L2 < Lmax2 + 1; L2++)
 				{
-					for (int N2 = 0; N2 < ORB.Alpha[0].getNchi(L2); N2++)
+					for (int N2 = 0; N2 < GlobalC::ORB.Alpha[0].getNchi(L2); N2++)
 					{
 						const int Opair = this->DS_Opair(T1, L1, L2, N1, N2);	//Opair
 						//ofs <<setw(20)<< "atom_type: " << label << endl;
@@ -449,10 +448,10 @@ void ORB_table_alpha::print_Table_DSR(void)
 						for (int il = 0; il < this-> DS_2Lplus1[T1]; il++)
 						{
 							ofs << "L=" << il << endl;
-							const double Rcut1 = ORB.Phi[T1].getRcut();
-							const double Rcut2 = ORB.Alpha[0].getRcut();
+							const double Rcut1 = GlobalC::ORB.Phi[T1].getRcut();
+							const double Rcut2 = GlobalC::ORB.Alpha[0].getRcut();
 							const int rmesh = this->get_rmesh(Rcut1, Rcut2);
-							
+
 							if (Table_DSR[0][T1][Opair][il][1]==0)	//remain to be discussed
 							{
 								ofs << "S(R)=0"<<endl<<endl;

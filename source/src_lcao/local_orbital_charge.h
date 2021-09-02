@@ -24,6 +24,7 @@ class Local_Orbital_Charge
 	void allocate_gamma(const Grid_Technique &gt);
 
 	void gamma_file(const Grid_Technique &gt);
+	void cal_dk_gamma_from_2D_pub(void);
 
 
 	//-----------------
@@ -31,6 +32,7 @@ class Local_Orbital_Charge
 	//-----------------
 	void allocate_DM_k(void);
 	
+	void kpt_file(const Grid_Technique &gt);
 
 	// liaochen modify on 2010-3-23 
 	// change its state from private to public
@@ -40,9 +42,9 @@ class Local_Orbital_Charge
 	// whether to printout density matrix
 	int out_dm; // output density matrix or not.
 
-	void write_dm(const int &is, const int &iter, const string &fn, const int &precision);
+	void write_dm(const int &is, const int &iter, const std::string &fn, const int &precision);
 
-	void read_dm(const int &is, const string &fn);
+	void read_dm(const int &is, const std::string &fn);
 	
 	Wfc_Dm_2d wfc_dm_2d;		// Peize Lin test 2019-01-16
 

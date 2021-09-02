@@ -3,62 +3,62 @@
 #include "./H_Hartree_pw.h"
 
 //calculate the Hartree part in PW or LCAO base
-void Stress_Func::stress_har(matrix& sigma, const bool is_pw)
+void Stress_Func::stress_har(ModuleBase::matrix& sigma, const bool is_pw)
 {
-	timer::tick("Stress_Func","stress_har");
+	ModuleBase::timer::tick("Stress_Func","stress_har");
 	double shart;
 
-	complex<double> *Porter = UFFT.porter;
+	std::complex<double> *Porter = GlobalC::UFFT.porter;
 
 	//  Hartree potential VH(r) from n(r)
-	ZEROS( Porter, pw.nrxx );
-	for(int is=0; is<NSPIN; is++)
+	ModuleBase::GlobalFunc::ZEROS( Porter, GlobalC::pw.nrxx );
+	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		for (int ir=0; ir<pw.nrxx; ir++)
+		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			Porter[ir] += complex<double>( CHR.rho[is][ir], 0.0 );
+			Porter[ir] += std::complex<double>( GlobalC::CHR.rho[is][ir], 0.0 );
 		}
 	}
 	//=============================
 	//  bring rho (aux) to G space
 	//=============================
-	pw.FFT_chg.FFT3D(Porter, -1);
+	GlobalC::pw.FFT_chg.FFT3D(Porter, -1);
 
-	complex<double> *psic = new complex<double> [pw.nrxx];
-	double *psic0 = new double[pw.nrxx];
-	ZEROS( psic0, pw.nrxx);
-	for(int is=0; is<NSPIN; is++)
+	std::complex<double> *psic = new std::complex<double> [GlobalC::pw.nrxx];
+	double *psic0 = new double[GlobalC::pw.nrxx];
+	ModuleBase::GlobalFunc::ZEROS( psic0, GlobalC::pw.nrxx);
+	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		daxpy (pw.nrxx, 1.0, CHR.rho[is], 1, psic0, 2);
-		for (int ir=0; ir<pw.nrxx; ir++)
+		daxpy (GlobalC::pw.nrxx, 1.0, GlobalC::CHR.rho[is], 1, psic0, 2);
+		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			psic[ir] = complex<double>(psic0[ir], 0.0);
+			psic[ir] = std::complex<double>(psic0[ir], 0.0);
 		}
 	}
 
-	pw.FFT_chg.FFT3D(psic, -1) ;
+	GlobalC::pw.FFT_chg.FFT3D(psic, -1) ;
 
-	complex<double> *vh_g  = new complex<double>[pw.ngmc];
-	ZEROS(vh_g, pw.ngmc);
+	std::complex<double> *vh_g  = new std::complex<double>[GlobalC::pw.ngmc];
+	ModuleBase::GlobalFunc::ZEROS(vh_g, GlobalC::pw.ngmc);
 
 //	double ehart=0;
-	for (int ig = pw.gstart; ig<pw.ngmc; ig++)
+	for (int ig = GlobalC::pw.gstart; ig<GlobalC::pw.ngmc; ig++)
 	{
-		const int j = pw.ig2fftc[ig];
-		//const double fac = e2 * FOUR_PI / (ucell.tpiba2 * pw.gg [ig]);
+		const int j = GlobalC::pw.ig2fftc[ig];
+		//const double fac = ModuleBase::e2 * ModuleBase::FOUR_PI / (GlobalC::ucell.tpiba2 * GlobalC::pw.gg [ig]);
 		//ehart += ( conj( Porter[j] ) * Porter[j] ).real() * fac;
 		//vh_g[ig] = fac * Porter[j];
-		shart= ( conj( Porter[j] ) * Porter[j] ).real()/(ucell.tpiba2 * pw.gg [ig]);
+		shart= ( conj( Porter[j] ) * Porter[j] ).real()/(GlobalC::ucell.tpiba2 * GlobalC::pw.gg [ig]);
 		for(int l=0;l<3;l++)
 		{
 			for(int m=0;m<l+1;m++)
 			{
-				sigma(l, m) += shart * 2 * pw.get_G_cartesian_projection(ig, l) * pw.get_G_cartesian_projection(ig, m) / pw.gg[ig];
+				sigma(l, m) += shart * 2 * GlobalC::pw.get_G_cartesian_projection(ig, l) * GlobalC::pw.get_G_cartesian_projection(ig, m) / GlobalC::pw.gg[ig];
 			}
 		}
 	}
-	//	Parallel_Reduce::reduce_double_pool( en.ehart );
-	//	ehart *= 0.5 * ucell.omega;
+	//	Parallel_Reduce::reduce_double_pool( GlobalC::en.ehart );
+	//	ehart *= 0.5 * GlobalC::ucell.omega;
 	for(int l=0;l<3;l++)
 	{
 		for(int m=0;m<l+1;m++)
@@ -68,7 +68,7 @@ void Stress_Func::stress_har(matrix& sigma, const bool is_pw)
 	}
 
 //        Parallel_Reduce::reduce_double_pool( ehart );
-//        ehart *= 0.5 * ucell.omega;
+//        ehart *= 0.5 * GlobalC::ucell.omega;
         //psic(:)=(0.0,0.0)
 	if(is_pw&&INPUT.gamma_only)
 	{
@@ -76,7 +76,7 @@ void Stress_Func::stress_har(matrix& sigma, const bool is_pw)
 		{
 			for(int m=0;m<3;m++)
 			{
-				sigma(l,m) *= e2 * FOUR_PI;
+				sigma(l,m) *= ModuleBase::e2 * ModuleBase::FOUR_PI;
 			}
 		}
 	}
@@ -86,15 +86,15 @@ void Stress_Func::stress_har(matrix& sigma, const bool is_pw)
 		{
 			for(int m=0;m<3;m++)
 			{
-				sigma(l,m) *= 0.5 * e2 * FOUR_PI;
+				sigma(l,m) *= 0.5 * ModuleBase::e2 * ModuleBase::FOUR_PI;
 			}
 		}
 	}
 	
 	for(int l=0;l<3;l++)
 	{
-		if(is_pw) sigma(l,l) -= H_Hartree_pw::hartree_energy /ucell.omega;
-		else sigma(l,l) += H_Hartree_pw::hartree_energy /ucell.omega;
+		if(is_pw) sigma(l,l) -= H_Hartree_pw::hartree_energy /GlobalC::ucell.omega;
+		else sigma(l,l) += H_Hartree_pw::hartree_energy /GlobalC::ucell.omega;
 		for(int m=0;m<l;m++)
 		{
 			sigma(m,l)=sigma(l,m);
@@ -112,6 +112,6 @@ void Stress_Func::stress_har(matrix& sigma, const bool is_pw)
 	delete[] vh_g;
 	delete[] psic;
 	delete[] psic0;
-	timer::tick("Stress_Func","stress_har");
+	ModuleBase::timer::tick("Stress_Func","stress_har");
 	return;
 }

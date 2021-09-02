@@ -32,6 +32,7 @@ read_pp.o \
 read_pp_upf100.o \
 read_pp_upf201.o \
 read_pp_vwr.o \
+read_pp_blps.o \
 pseudo_nc.o \
 VL_in_pw.o\
 VNL_in_pw.o\
@@ -43,6 +44,7 @@ forces.o\
 stress_pw.o\
 stress_func_cc.o\
 stress_func_gga.o\
+stress_func_mgga.o\
 stress_func_kin.o\
 stress_func_nl.o\
 stress_func_ewa.o\
@@ -148,7 +150,6 @@ ELEC_nscf.o\
 LOOP_cell.o\
 LOOP_elec.o\
 LOOP_ions.o\
-run_md.o\
 run_md_lcao.o\
 DM_gamma.o\
 DM_k.o\
@@ -245,11 +246,13 @@ read_cell_pseudopots.o\
 read_dm.o\
 write_pot.o\
 write_rho.o\
+write_rho_cube.o\
 write_rho_dipole.o\
 write_HS.o\
 write_HS_R.o\
 write_dm.o\
 potential_libxc.o \
+potential_libxc_meta.o \
 efield.o \
 magnetism.o\
 optical.o\
@@ -285,6 +288,9 @@ diago_david.o\
 diago_cg.o\
 output.o  \
 run_md_classic.o\
+LJ_potential.o\
+DP_potential.o\
+cmd_neighbor.o\
 dos.o \
 inverse_matrix.o \
 energy.o \

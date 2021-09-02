@@ -9,7 +9,7 @@ Magnetism::Magnetism()
     this->abs_magnetization = 0.0;
     this->start_magnetization = new double[10];
 
-	m_loc_ = new Vector3<double> [1];
+	m_loc_ = new ModuleBase::Vector3<double> [1];
 	angle1_ = new double[1];
 	angle2_ = new double[1];
 }
@@ -25,60 +25,60 @@ Magnetism::~Magnetism()
 #ifndef __CELL
 void Magnetism::compute_magnetization()
 {
-    if (NSPIN==2)
+    if (GlobalV::NSPIN==2)
     {
         this->tot_magnetization = 0.00;
         this->abs_magnetization = 0.00;
 
-		//CHR.check_ne(CHR.rho[0]);
-		//CHR.check_ne(CHR.rho[1]);
-        for (int ir=0; ir<pw.nrxx; ir++)
+		//GlobalC::CHR.check_ne(GlobalC::CHR.rho[0]);
+		//GlobalC::CHR.check_ne(GlobalC::CHR.rho[1]);
+        for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
         {
-            double diff = CHR.rho[0][ir] - CHR.rho[1][ir];
+            double diff = GlobalC::CHR.rho[0][ir] - GlobalC::CHR.rho[1][ir];
             this->tot_magnetization += diff;
             this->abs_magnetization += abs(diff);
         }
 
         Parallel_Reduce::reduce_double_pool( this->tot_magnetization );
         Parallel_Reduce::reduce_double_pool( this->abs_magnetization );
-        this->tot_magnetization *= ucell.omega / pw.ncxyz;
-        this->abs_magnetization *= ucell.omega / pw.ncxyz;
+        this->tot_magnetization *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
+        this->abs_magnetization *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
 
-		OUT(ofs_running,"total magnetism (Bohr mag/cell)",this->tot_magnetization);
-		OUT(ofs_running,"absolute magnetism (Bohr mag/cell)",this->abs_magnetization);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"total magnetism (Bohr mag/cell)",this->tot_magnetization);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"absolute magnetism (Bohr mag/cell)",this->abs_magnetization);
 		
-		if(TWO_EFERMI)
+		if(GlobalV::TWO_EFERMI)
 		{
-			OUT(ofs_running,"nelup",get_nelup());
-			OUT(ofs_running,"neldw",get_neldw());
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nelup",get_nelup());
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"neldw",get_neldw());
 		}
 		else
 		{
-			OUT(ofs_running,"nelec",CHR.nelec);
+			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nelec",GlobalC::CHR.nelec);
 		}
 
-//        cout << "\n tot_mag = " << setprecision(6) << this->tot_magnetization << " Bohr mag/cell" << endl;
-  //      cout << " abs_mag = " << setprecision(6) << this->abs_magnetization << " Bohr mag/cell" << endl;
+//        std::cout << "\n tot_mag = " << std::setprecision(6) << this->tot_magnetization << " Bohr mag/cell" << std::endl;
+  //      std::cout << " abs_mag = " << std::setprecision(6) << this->abs_magnetization << " Bohr mag/cell" << std::endl;
     }
 	// noncolliear :
-	else if(NSPIN==4)
+	else if(GlobalV::NSPIN==4)
 	{
 		for(int i=0;i<3;i++)this->tot_magnetization_nc[i] = 0.00;
 		this->abs_magnetization = 0.00;
-		for (int ir=0; ir<pw.nrxx; ir++)
+		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			double diff = sqrt(pow(CHR.rho[1][ir], 2) + pow(CHR.rho[2][ir], 2) +pow(CHR.rho[3][ir], 2));
+			double diff = sqrt(pow(GlobalC::CHR.rho[1][ir], 2) + pow(GlobalC::CHR.rho[2][ir], 2) +pow(GlobalC::CHR.rho[3][ir], 2));
  
-			for(int i=0;i<3;i++)this->tot_magnetization_nc[i] += CHR.rho[i+1][ir];
+			for(int i=0;i<3;i++)this->tot_magnetization_nc[i] += GlobalC::CHR.rho[i+1][ir];
 			this->abs_magnetization += abs(diff);
 		}
 		Parallel_Reduce::reduce_double_pool( this->tot_magnetization_nc, 3 );
 		Parallel_Reduce::reduce_double_pool( this->abs_magnetization );
 
-		for(int i=0;i<3;i++)this->tot_magnetization_nc[i] *= ucell.omega / pw.ncxyz;
-		this->abs_magnetization *= ucell.omega / pw.ncxyz;
-		ofs_running<<"total magnetism (Bohr mag/cell)"<<'\t'<<this->tot_magnetization_nc[0]<<'\t'<<this->tot_magnetization_nc[1]<<'\t'<<this->tot_magnetization_nc[2]<<'\n';
-		OUT(ofs_running,"absolute magnetism (Bohr mag/cell)",this->abs_magnetization);
+		for(int i=0;i<3;i++)this->tot_magnetization_nc[i] *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
+		this->abs_magnetization *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
+		GlobalV::ofs_running<<"total magnetism (Bohr mag/cell)"<<'\t'<<this->tot_magnetization_nc[0]<<'\t'<<this->tot_magnetization_nc[1]<<'\t'<<this->tot_magnetization_nc[2]<<'\n';
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"absolute magnetism (Bohr mag/cell)",this->abs_magnetization);
 	}
 
     return;
@@ -88,16 +88,16 @@ void Magnetism::compute_magnetization()
 double Magnetism::get_nelup(void)
 {
 	double nelup = 0.0;
-	if(TWO_EFERMI)
+	if(GlobalV::TWO_EFERMI)
 	{
 //===============================================================
 //  this type of electrons are used as "fixed" magnetization.
 //===============================================================
-		nelup = 0.5 * CHR.nelec + 0.5 * tot_magnetization;
+		nelup = 0.5 * GlobalC::CHR.nelec + 0.5 * tot_magnetization;
 	}
 	else
 	{
-		nelup = 0.5 * CHR.nelec;
+		nelup = 0.5 * GlobalC::CHR.nelec;
 	}
     return nelup;
 
@@ -105,9 +105,9 @@ double Magnetism::get_nelup(void)
     // nelup = ( nelec + mcons(3,1) ) * 0.5D0
 
 //	double nelup = 0.0;
-//	for(int i=0; i<pw.ntype; i++)
+//	for(int i=0; i<GlobalC::pw.ntype; i++)
 //	{
-//		nelup += CHR.nelec * (1.0+start_magnetization[i])/2.0/pw.ntype;
+//		nelup += GlobalC::CHR.nelec * (1.0+start_magnetization[i])/2.0/GlobalC::pw.ntype;
 //	}
 //	return nelup;
 }
@@ -116,23 +116,23 @@ double Magnetism::get_nelup(void)
 double Magnetism::get_neldw(void)
 {
 	double neldw = 0.0;
-	if(TWO_EFERMI)
+	if(GlobalV::TWO_EFERMI)
 	{
 //===============================================================
 //  this type of electrons are used as "fixed" magnetization.
 //===============================================================
-		neldw = 0.5 * CHR.nelec - 0.5 * tot_magnetization;
+		neldw = 0.5 * GlobalC::CHR.nelec - 0.5 * tot_magnetization;
 	}
 	else
 	{
-		neldw = 0.5 * CHR.nelec;
+		neldw = 0.5 * GlobalC::CHR.nelec;
 	}
     return neldw ;
 
 //	double neldw = 0.0;
-//	for(int i=0; i<pw.ntype; i++)
+//	for(int i=0; i<GlobalC::pw.ntype; i++)
 //	{
-//		neldw += pw.nelec * (1.0-start_magnetization[i])/2.0/pw.ntype;
+//		neldw += GlobalC::pw.nelec * (1.0-start_magnetization[i])/2.0/GlobalC::pw.ntype;
 //	}
 //	return neldw;
 }
@@ -144,7 +144,7 @@ void Magnetism::cal_ux(const int ntype)
 	bool is_paraller;
 	//do not sign feature in teh general case
 	lsign_ = false;
-	ZEROS(ux_, 3);
+	ModuleBase::GlobalFunc::ZEROS(ux_, 3);
 
 	starting_it = 0;
 	for(int it = 0;it<ntype;it++)
@@ -170,19 +170,19 @@ void Magnetism::cal_ux(const int ntype)
 		uxmod =  pow(ux_[0],2) + pow(ux_[1],2) +pow(ux_[2],2);
 		if(uxmod<1e-6) 
 		{
-			WARNING_QUIT("cal_ux","wrong uxmod");
+			ModuleBase::WARNING_QUIT("cal_ux","wrong uxmod");
 		}
 		for(int i = 0;i<3;i++)
 		{
 			ux_[i] *= 1/sqrt(uxmod);
 		}
-		//       cout<<"    Fixed quantization axis for GGA: "
-		//<<setw(10)<<ux[0]<<"  "<<setw(10)<<ux[1]<<"  "<<setw(10)<<ux[2]<<endl;
+		//       std::cout<<"    Fixed quantization axis for GGA: "
+		//<<std::setw(10)<<ux[0]<<"  "<<std::setw(10)<<ux[1]<<"  "<<std::setw(10)<<ux[2]<<std::endl;
 	}
 	return;
 }
 
-bool Magnetism::judge_parallel(double a[3], Vector3<double> b)
+bool Magnetism::judge_parallel(double a[3], ModuleBase::Vector3<double> b)
 {
    bool jp=false;
    double cross;

@@ -1,5 +1,8 @@
 #include "matrix3.h"
 
+namespace ModuleBase
+{
+
 Matrix3::Matrix3(const double &r11, const double &r12, const double &r13,
                  const double &r21, const double &r22, const double &r23,
                  const double &r31, const double &r32, const double &r33)
@@ -188,17 +191,19 @@ bool operator!=(const Matrix3 &m1, const Matrix3 &m2)
 
 void Matrix3::print(void)const
 {
-	cout << e11 << setw(15) << e12 << setw(15) << e13 << endl ;
-	cout << e21 << setw(15) << e22 << setw(15) << e23 << endl ;
-	cout << e31 << setw(15) << e32 << setw(15) << e33 << endl ;
+	std::cout << e11 << std::setw(15) << e12 << std::setw(15) << e13 << std::endl ;
+	std::cout << e21 << std::setw(15) << e22 << std::setw(15) << e23 << std::endl ;
+	std::cout << e31 << std::setw(15) << e32 << std::setw(15) << e33 << std::endl ;
 	return;
 }
 
-matrix Matrix3::to_matrix(void)const			// Peize Lin add 2021.03.09
+ModuleBase::matrix Matrix3::to_matrix(void)const			// Peize Lin add 2021.03.09
 {
-	matrix m(3,3);
+	ModuleBase::matrix m(3,3);
 	m(0,0)=e11;	m(0,1)=e12;	m(0,2)=e13;
 	m(1,0)=e21;	m(1,1)=e22;	m(1,2)=e23;
 	m(2,0)=e31;	m(2,1)=e32;	m(2,2)=e33;
 	return m;
+}
+
 }

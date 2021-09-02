@@ -8,8 +8,8 @@
 
 Vdwd3_Parameters::Vdwd3_Parameters():
       mxc(max_elem, 1), 
-      r0ab(max_elem, vector<double>(max_elem)),
-      c6ab(3, vector<vector<vector<vector<double>>>>(5, vector<vector<vector<double>>>(5, vector<vector<double>>(max_elem, vector<double>(max_elem)))))
+      r0ab(max_elem, std::vector<double>(max_elem)),
+      c6ab(3, std::vector<std::vector<std::vector<std::vector<double>>>>(5, std::vector<std::vector<std::vector<double>>>(5, std::vector<std::vector<double>>(max_elem, std::vector<double>(max_elem)))))
 {
 	init_C6();
 	init_r2r4();
@@ -35,7 +35,7 @@ void Vdwd3_Parameters::initial_parameters(const Input &input)
             }
             else
             {
-                  this->rthr2 = pow((std::stod(input.vdw_radius) * BOHR_TO_A),2);       
+                  this->rthr2 = pow((std::stod(input.vdw_radius) * ModuleBase::BOHR_TO_A),2);       
             }
             if(input.vdw_cn_thr_unit=="Bohr")
             {
@@ -43,7 +43,7 @@ void Vdwd3_Parameters::initial_parameters(const Input &input)
             }
             else
             {  
-                  this->cn_thr2 = pow((input.vdw_cn_thr * BOHR_TO_A),2);			
+                  this->cn_thr2 = pow((input.vdw_cn_thr * ModuleBase::BOHR_TO_A),2);			
             }
       }
       else if(input.vdw_model=="period")
@@ -54,7 +54,7 @@ void Vdwd3_Parameters::initial_parameters(const Input &input)
 
 void Vdwd3_Parameters::init_C6()
 {
-	vector<double> C6_tmp={
+	std::vector<double> C6_tmp={
       0.30267000E+1,0.100E+1,0.100E+1,0.91180000E+0,0.91180000E+0
      ,0.20835000E+1,0.200E+1,0.100E+1,0.00000000E+0,0.91180000E+0
      ,0.15583000E+1,0.200E+1,0.200E+1,0.00000000E+0,0.00000000E+0
@@ -32453,8 +32453,8 @@ void Vdwd3_Parameters::init_C6()
             iatcn = limit(iat);
             jatcn = limit(jat);
 
-		mxc[iat] = max(mxc[iat], iatcn);
-		mxc[jat] = max(mxc[jat], jatcn);
+		mxc[iat] = std::max(mxc[iat], iatcn);
+		mxc[jat] = std::max(mxc[jat], jatcn);
 
 		c6ab[0][jatcn-1][iatcn-1][jat][iat] = C6_tmp[k];
 		c6ab[1][jatcn-1][iatcn-1][jat][iat] = C6_tmp[k+3];
@@ -32532,7 +32532,7 @@ void Vdwd3_Parameters::init_rcov()
 
 void Vdwd3_Parameters::init_r0ab()
 {
-      vector<double> r={
+      std::vector<double> r={
       2.1823,  1.8547,  1.7347,  2.9086,  2.5732,  3.4956,  2.3550,  
       2.5095,  2.9802,  3.0982,  2.5141,  2.3917,  2.9977,  2.9484, 
       3.2160,  2.4492,  2.2527,  3.1933,  3.0214,  2.9531,  2.9103,  
@@ -33177,8 +33177,8 @@ void Vdwd3_Parameters::init_r0ab()
       for (size_t i=0; i!=max_elem; i++)
             for (size_t j=0; j<=i; j++)
             {
-                  r0ab[j][i] = r[k]/BOHR_TO_A;
-                  r0ab[i][j] = r[k]/BOHR_TO_A;
+                  r0ab[j][i] = r[k]/ModuleBase::BOHR_TO_A;
+                  r0ab[i][j] = r[k]/ModuleBase::BOHR_TO_A;
                   k += 1;
             }
 }

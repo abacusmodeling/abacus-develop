@@ -22,7 +22,7 @@ void Gint_k_init::init(
 	const int &ncxyz_in
 	)
 {
-	TITLE(ofs_running,"Gint_k_init","init");
+	ModuleBase::TITLE(GlobalV::ofs_running,"Gint_k_init","init");
 
 	this->nbx = nbx_in;
 	this->nby = nby_in;
@@ -37,13 +37,13 @@ void Gint_k_init::init(
 	// claculate the maximal orbital numbers 
 	// for each type of atom.
 	delete[] this->nnn;
-	this->nnn = new int[ucell.ntype];
-	for(int it=0; it<ucell.ntype; it++)
+	this->nnn = new int[GlobalC::ucell.ntype];
+	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		this->nnn[it] = (ucell.atoms[it].nwl+1) * (ucell.atoms[it].nwl+1);
+		this->nnn[it] = (GlobalC::ucell.atoms[it].nwl+1) * (GlobalC::ucell.atoms[it].nwl+1);
 	}
 
-	assert( ucell.omega > 0.0);
+	assert( GlobalC::ucell.omega > 0.0);
 
 	return;
 }

@@ -22,10 +22,8 @@ class Threshold_Elec
 
     void update_ethr(const int &iter);
 
-    void iter_end(ofstream &ofs);
-
 	// this should be moved to other places, mohan note 2021-03-03
-    void print_eigenvalue(ofstream &ofs);
+    void print_eigenvalue(std::ofstream &ofs);
 };
 
 #endif

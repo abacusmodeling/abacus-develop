@@ -26,7 +26,7 @@
 // now we want to reduce them and print out,
 // we plan to reduce them one row by one row,
 // then for the first row, we need to set the
-// temparary array to 4 (NLOCAL in code),
+// temparary array to 4 (GlobalV::NLOCAL in code),
 // then we reduce first row, it will become
 // 2.2 2.3 3.6 8.4,
 // we notice that the first element and fourth
@@ -39,10 +39,10 @@
 void Local_Orbital_Charge::write_dm(
 	const int &is, 
 	const int &iter, 
-	const string &fn, 
+	const std::string &fn, 
 	const int &precision)
 {
-    TITLE("Local_Orbital_Charge","write_dm");
+    ModuleBase::TITLE("Local_Orbital_Charge","write_dm");
 
 	if (out_dm==0)
 	{
@@ -52,82 +52,82 @@ void Local_Orbital_Charge::write_dm(
 	{
 		return; 
 	}
-	timer::tick("Local_Orbital_Charge","write_dm");
+	ModuleBase::timer::tick("Local_Orbital_Charge","write_dm");
 
 	time_t start, end;
-	ofstream ofs;
+	std::ofstream ofs;
 
-	if(MY_RANK==0)
+	if(GlobalV::MY_RANK==0)
 	{
 		start = time(NULL);
 
 		ofs.open(fn.c_str());
 		if (!ofs)
 		{
-			WARNING("Charge::write_rho","Can't create Charge File!");
+			ModuleBase::WARNING("Charge::write_rho","Can't create Charge File!");
 		}
 
-		//ofs_running << "\n Output charge file." << endl;
+		//GlobalV::ofs_running << "\n Output charge file." << std::endl;
 
-		ofs << ucell.latName << endl;//1
-		ofs << " " << ucell.lat0 * BOHR_TO_A << endl;
-		ofs << " " << ucell.latvec.e11 << " " << ucell.latvec.e12 << " " << ucell.latvec.e13 << endl;
-		ofs << " " << ucell.latvec.e21 << " " << ucell.latvec.e22 << " " << ucell.latvec.e23 << endl;
-		ofs << " " << ucell.latvec.e31 << " " << ucell.latvec.e32 << " " << ucell.latvec.e33 << endl;
-		for(int it=0; it<ucell.ntype; it++)
+		ofs << GlobalC::ucell.latName << std::endl;//1
+		ofs << " " << GlobalC::ucell.lat0 * ModuleBase::BOHR_TO_A << std::endl;
+		ofs << " " << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << std::endl;
+		ofs << " " << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << std::endl;
+		ofs << " " << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << std::endl;
+		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			ofs << " " << ucell.atoms[it].label;
+			ofs << " " << GlobalC::ucell.atoms[it].label;
 		}
-		ofs << endl;
-		for(int it=0; it<ucell.ntype; it++)
+		ofs << std::endl;
+		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			ofs << " " << ucell.atoms[it].na;
+			ofs << " " << GlobalC::ucell.atoms[it].na;
 		}
-		ofs << endl;
-		ofs << "Direct" << endl;
+		ofs << std::endl;
+		ofs << "Direct" << std::endl;
 
-		for(int it=0; it<ucell.ntype; it++)
+		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			Atom* atom = &ucell.atoms[it];
-			ofs << setprecision(15);
-			for(int ia=0; ia<ucell.atoms[it].na; ia++)
+			Atom* atom = &GlobalC::ucell.atoms[it];
+			ofs << std::setprecision(15);
+			for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 			{
 				ofs << " " << atom->taud[ia].x
 					<< " " << atom->taud[ia].y
-					<< " " << atom->taud[ia].z << endl;
+					<< " " << atom->taud[ia].z << std::endl;
 			}
 		}
 
-		ofs << "\n " << NSPIN;
-		if(NSPIN==1||NSPIN==4)
+		ofs << "\n " << GlobalV::NSPIN;
+		if(GlobalV::NSPIN==1||GlobalV::NSPIN==4)
 		{
-			ofs << "\n " << en.ef << " (fermi energy)";
+			ofs << "\n " << GlobalC::en.ef << " (fermi energy)";
 		}
-		else if(NSPIN==2)
+		else if(GlobalV::NSPIN==2)
 		{
-			if(is==0)ofs << "\n " << en.ef_up << " (fermi energy for spin=1)";
-			else if(is==1)ofs << "\n " << en.ef_dw << " (fermi energy for spin=2)";
+			if(is==0)ofs << "\n " << GlobalC::en.ef_up << " (fermi energy for spin=1)";
+			else if(is==1)ofs << "\n " << GlobalC::en.ef_dw << " (fermi energy for spin=2)";
 		}
 		else
 		{
-			WARNING_QUIT("write_rho","check nspin!");
+			ModuleBase::WARNING_QUIT("write_rho","check nspin!");
 		}
 
 
-		ofs << "\n  " << NLOCAL << " " << NLOCAL << endl;
+		ofs << "\n  " << GlobalV::NLOCAL << " " << GlobalV::NLOCAL << std::endl;
 
-		ofs << setprecision(precision);
+		ofs << std::setprecision(precision);
 		ofs << scientific;
 
 	}
 
-    //ofs << "\n " << GAMMA_ONLY_LOCAL << " (GAMMA ONLY LOCAL)" << endl;
+    //ofs << "\n " << GlobalV::GAMMA_ONLY_LOCAL << " (GAMMA ONLY LOCAL)" << std::endl;
 #ifndef __MPI
-    if(GAMMA_ONLY_LOCAL)
+    if(GlobalV::GAMMA_ONLY_LOCAL)
     {
-        for(int i=0; i<NLOCAL; ++i)
+        for(int i=0; i<GlobalV::NLOCAL; ++i)
         {
-            for(int j=0; j<NLOCAL; ++j)
+            for(int j=0; j<GlobalV::NLOCAL; ++j)
             {
                 if(j%8==0) ofs << "\n";
                 ofs << " " << this->DM[is][i][j];
@@ -136,58 +136,58 @@ void Local_Orbital_Charge::write_dm(
     }
     else
     {
-        WARNING_QUIT("write_dm","not ready yet");
-        ofs << " " << LNNR.nnrg << " (nnrg)" << endl;
-        for(int i=0; i<LNNR.nnrg; ++i)
+        ModuleBase::WARNING_QUIT("write_dm","not ready yet");
+        ofs << " " << GlobalC::LNNR.nnrg << " (nnrg)" << std::endl;
+        for(int i=0; i<GlobalC::LNNR.nnrg; ++i)
         {
             if(i%8==0) ofs << "\n";
             ofs << " " << this->DM_R[is][i];
         }
     }
 #else
-    if(GAMMA_ONLY_LOCAL)
+    if(GlobalV::GAMMA_ONLY_LOCAL)
     {
         //xiaohui modify 2014-06-18
         
-        double* tmp = new double[NLOCAL];
-        int* count = new int[NLOCAL];
-        for (int i=0; i<NLOCAL; ++i)
+        double* tmp = new double[GlobalV::NLOCAL];
+        int* count = new int[GlobalV::NLOCAL];
+        for (int i=0; i<GlobalV::NLOCAL; ++i)
         {
             // when reduce, there may be 'redundance', we need to count them.
-            ZEROS(count, NLOCAL);
-            const int mu = GridT.trace_lo[i];
+            ModuleBase::GlobalFunc::ZEROS(count, GlobalV::NLOCAL);
+            const int mu = GlobalC::GridT.trace_lo[i];
             if (mu >= 0)
             {
-                for (int j=0; j<NLOCAL; ++j)
+                for (int j=0; j<GlobalV::NLOCAL; ++j)
                 {
-                    const int nu = GridT.trace_lo[j];
+                    const int nu = GlobalC::GridT.trace_lo[j];
                     if (nu >= 0)
                     {
                         count[j]=1; 
                     }
                 }
             }
-            Parallel_Reduce::reduce_int_all( count, NLOCAL );
+            Parallel_Reduce::reduce_int_all( count, GlobalV::NLOCAL );
 
             // reduce the density matrix for 'i' line.
-            ZEROS(tmp, NLOCAL);
+            ModuleBase::GlobalFunc::ZEROS(tmp, GlobalV::NLOCAL);
             if (mu >= 0)
             {
-                for (int j=0; j<NLOCAL; j++)
+                for (int j=0; j<GlobalV::NLOCAL; j++)
                 {
-                    const int nu = GridT.trace_lo[j];
+                    const int nu = GlobalC::GridT.trace_lo[j];
                     if (nu >=0)
                     {
                         tmp[j] = DM[is][mu][nu];
-                        //ofs_running << " dmi=" << i << " j=" << j << " " << DM[is][mu][nu] << endl;
+                        //GlobalV::ofs_running << " dmi=" << i << " j=" << j << " " << DM[is][mu][nu] << std::endl;
                     }
                 }
             }
-            Parallel_Reduce::reduce_double_all( tmp, NLOCAL );
+            Parallel_Reduce::reduce_double_all( tmp, GlobalV::NLOCAL );
 
-            if(MY_RANK==0)
+            if(GlobalV::MY_RANK==0)
             {
-                for (int j=0; j<NLOCAL; j++)
+                for (int j=0; j<GlobalV::NLOCAL; j++)
                 {
                     if(j%8==0) ofs << "\n";
                     if(count[j]>0)
@@ -205,9 +205,9 @@ void Local_Orbital_Charge::write_dm(
         delete[] count;
         
         //xiaohui add 2014-06-18
-        //for(int i=0; i<NLOCAL; ++i)
+        //for(int i=0; i<GlobalV::NLOCAL; ++i)
         //{
-        //  for(int j=0; j<NLOCAL; ++j)
+        //  for(int j=0; j<GlobalV::NLOCAL; ++j)
         //  {
         //      if(j%8==0) ofs << "\n";
         //      ofs << " " << this->DM[is][i][j];
@@ -217,17 +217,17 @@ void Local_Orbital_Charge::write_dm(
     }
     else
     {
-        ofs << " " << LNNR.nnrg << " (nnrg)" << endl;
-        WARNING_QUIT("local_orbital_charge","not ready to output DM_R");
+        ofs << " " << GlobalC::LNNR.nnrg << " (nnrg)" << std::endl;
+        ModuleBase::WARNING_QUIT("local_orbital_charge","not ready to output DM_R");
     }
 #endif
-	if(MY_RANK==0)
+	if(GlobalV::MY_RANK==0)
 	{
 		end = time(NULL);
-		OUT_TIME("write_rho",start,end);
+		ModuleBase::GlobalFunc::OUT_TIME("write_rho",start,end);
 		ofs.close();
 	}
-	timer::tick("Local_Orbital_Charge","write_dm");
+	ModuleBase::timer::tick("Local_Orbital_Charge","write_dm");
 
     return;
 }

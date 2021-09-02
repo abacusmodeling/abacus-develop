@@ -18,11 +18,11 @@ class pseudo_nc
 	//<PP_HEADER>
 	bool has_so;		// if .true. includes spin-orbit
 	int  nv;			// UPF file version number
-	string psd;			// Element label
-	string pp_type;		// Pseudo type ( NC or US )
+	std::string psd;			// Element label
+	std::string pp_type;		// Pseudo type ( NC or US )
 	bool tvanp;			// .true. if Ultrasoft
 	bool nlcc;			// Non linear core corrections(bool)
-	string dft[4];		// Exch-Corr type
+	std::string dft[4];		// Exch-Corr type
 	int  zv;			// z valence
 	double etotps;		// total energy
 	double ecutwfc;		// suggested cut-off for wfc
@@ -31,7 +31,7 @@ class pseudo_nc
 	int mesh;			// number of point in the radial mesh
 	int nchi;			// nwfc,number of wavefunctions
 	int nbeta;			// number of projectors
-	string *els;		// els[nchi]
+	std::string *els;		// els[nchi]
 	int *lchi;			// lchi[nchi]
 	double *oc;			// oc[nchi]
 
@@ -53,7 +53,7 @@ class pseudo_nc
 	double *rho_at;   // radial atomic charge density, rho_at[0:mesh-1]
 
 	// <PP_PSWFC>
-	matrix chi;	  // radial atomic orbitals, chi(nchi, mesh)
+	ModuleBase::matrix chi;	  // radial atomic orbitals, chi(nchi, mesh)
 
 	//other
 	int msh;          // number of points up to rcut
@@ -65,8 +65,8 @@ class pseudo_nc
 	int kkbeta;		// kkbeta(nbeta), point where the beta are zero
 
 	// <PP_DIJ>
-	matrix dion;	// dion(nbeta,nbeta)
-	matrix betar;	// (nbeta, mesh), radial beta_{mu} functions
+	ModuleBase::matrix dion;	// dion(nbeta,nbeta)
+	ModuleBase::matrix betar;	// (nbeta, mesh), radial beta_{mu} functions
 
 	// other
 	int nh;         // number of beta functions per atomic type
@@ -76,10 +76,10 @@ class pseudo_nc
 	void set_pseudo_vl(const Pseudopot_upf &upf);
 	void set_pseudo_nc(const Pseudopot_upf &upf);
 
-	void print_pseudo_h(ofstream &ofs, output &outp);
-	void print_pseudo_atom(ofstream &ofs, output &outp);
-	void print_pseudo_vl(ofstream &ofs, output &outp);
-	void print_pseudo_nc(ofstream &ofs, output &outp);
+	void print_pseudo_h(std::ofstream &ofs, output &outp);
+	void print_pseudo_atom(std::ofstream &ofs, output &outp);
+	void print_pseudo_vl(std::ofstream &ofs, output &outp);
+	void print_pseudo_nc(std::ofstream &ofs, output &outp);
 
 };
 

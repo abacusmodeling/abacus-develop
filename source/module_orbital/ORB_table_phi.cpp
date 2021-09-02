@@ -43,7 +43,7 @@ void ORB_table_phi::allocate
     const double &dk_in
 )
 {
-	TITLE("ORB_table_phi", "allocate");
+	ModuleBase::TITLE("ORB_table_phi", "allocate");
 
 	this->ntype = ntype_in;// type of elements.
 	this->lmax = lmax_in;
@@ -101,11 +101,11 @@ int ORB_table_phi::get_rmesh(const double &R1, const double &R2)
 	
 	if(rmesh <= 0)
 	{
-		//ofs_warning << "\n R1 = " << R1 << " R2 = " << R2;
-		//ofs_warning << "\n rmesh = " << rmesh;
-		cout << "\n R1 = " << R1 << " R2 = " << R2;
-		cout << "\n rmesh = " << rmesh;
-		WARNING_QUIT("ORB_table_phi::get_rmesh", "rmesh <= 0");
+		//GlobalV::ofs_warning << "\n R1 = " << R1 << " R2 = " << R2;
+		//GlobalV::ofs_warning << "\n rmesh = " << rmesh;
+		std::cout << "\n R1 = " << R1 << " R2 = " << R2;
+		std::cout << "\n rmesh = " << rmesh;
+		ModuleBase::WARNING_QUIT("ORB_table_phi::get_rmesh", "rmesh <= 0");
 	}
 	return rmesh;
 }
@@ -122,7 +122,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 	double* drs
 ) const
 {
-	timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
+	ModuleBase::timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
 
 	double* k1_dot_k2 = new double[kmesh];
 	double* k1_dot_k2_dot_kpoint = new double[kmesh];
@@ -174,13 +174,13 @@ void ORB_table_phi::cal_ST_Phi12_R
 	
 	double* integrated_func = new double[kmesh];
 	
-	const vector<vector<double>> &jlm1 = pSB->get_jlx()[l-1];
-	const vector<vector<double>> &jl = pSB->get_jlx()[l];
-	const vector<vector<double>> &jlp1 = pSB->get_jlx()[l+1];
+	const std::vector<std::vector<double>> &jlm1 = pSB->get_jlx()[l-1];
+	const std::vector<std::vector<double>> &jl = pSB->get_jlx()[l];
+	const std::vector<std::vector<double>> &jlp1 = pSB->get_jlx()[l+1];
 	
 	for (int ir = 0; ir < rmesh; ir++)
 	{
-		const vector<double> &jl_r = jl[ir];
+		const std::vector<double> &jl_r = jl[ir];
 		for (int ik=0; ik<kmesh; ++ik)
 		{
 			integrated_func[ik] = jl_r[ik] * k1_dot_k2[ik];
@@ -188,12 +188,12 @@ void ORB_table_phi::cal_ST_Phi12_R
 		// Call simpson integration
 		double temp = 0.0;
 
-		Integral::Simpson_Integral(kmesh,integrated_func,dk,temp);
-		rs[ir] = temp * FOUR_PI ;
+		ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,dk,temp);
+		rs[ir] = temp * ModuleBase::FOUR_PI ;
 		
 		// Peize Lin accelerate 2017-10-02
-		const vector<double> &jlm1_r = jlm1[ir];
-		const vector<double> &jlp1_r = jlp1[ir];
+		const std::vector<double> &jlm1_r = jlm1[ir];
+		const std::vector<double> &jlp1_r = jlp1[ir];
 		const double fac = l/(l+1.0);
 		if( l==0 )
 		{
@@ -210,8 +210,8 @@ void ORB_table_phi::cal_ST_Phi12_R
 			}
 		}
 
-		Integral::Simpson_Integral(kmesh,integrated_func,dk,temp);
-		drs[ir] = -FOUR_PI*(l+1)/(2.0*l+1) * temp;
+		ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,dk,temp);
+		drs[ir] = -ModuleBase::FOUR_PI*(l+1)/(2.0*l+1) * temp;
 	}
 
 	//liaochen modify on 2010/4/22
@@ -220,7 +220,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 
 	if (l > 0)
 	{
-		ZEROS(integrated_func,kmesh);
+		ModuleBase::GlobalFunc::ZEROS(integrated_func,kmesh);
 		double temp = 0.0;
 	
 		for (int ik = 0; ik < kmesh; ik++)
@@ -228,15 +228,15 @@ void ORB_table_phi::cal_ST_Phi12_R
 			integrated_func[ik] = k1_dot_k2[ik] * pow (kpoint[ik], l);
 		}
 		
-		Integral::Simpson_Integral(kmesh,integrated_func,kab,temp);
-		rs[0] = FOUR_PI / Mathzone_Add1::dualfac (2*l+1) * temp;
+		ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,kab,temp);
+		rs[0] = ModuleBase::FOUR_PI / ModuleBase::Mathzone_Add1::dualfac (2*l+1) * temp;
 	}
 
 	delete [] integrated_func;
 	delete [] k1_dot_k2;
 	delete [] k1_dot_k2_dot_kpoint;	
 
-	timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
+	ModuleBase::timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
 	
 	return;
 }
@@ -254,10 +254,10 @@ void ORB_table_phi::cal_ST_Phi12_R
 	double* drs
 ) const
 {
-//	TITLE("ORB_table_phi","cal_ST_Phi12_R");
-	timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
+//	ModuleBase::TITLE("ORB_table_phi","cal_ST_Phi12_R");
+	ModuleBase::timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
 
-	vector<double> k1_dot_k2(kmesh);
+	std::vector<double> k1_dot_k2(kmesh);
 	switch(job)
 	{
 		case 1: // calculate overlap
@@ -292,17 +292,17 @@ void ORB_table_phi::cal_ST_Phi12_R
 			break;
 	}
 	
-	vector<double> k1_dot_k2_dot_kpoint(kmesh);
+	std::vector<double> k1_dot_k2_dot_kpoint(kmesh);
 	for (int ik = 0; ik < kmesh; ik++)
 	{
 		k1_dot_k2_dot_kpoint[ik] = k1_dot_k2[ik] * this->kpoint[ik];
 	}
 
-	vector<double> integrated_func(kmesh);
+	std::vector<double> integrated_func(kmesh);
 	
-	const vector<vector<double>> &jlm1 = pSB->get_jlx()[l-1];
-	const vector<vector<double>> &jl = pSB->get_jlx()[l];
-	const vector<vector<double>> &jlp1 = pSB->get_jlx()[l+1];
+	const std::vector<std::vector<double>> &jlm1 = pSB->get_jlx()[l-1];
+	const std::vector<std::vector<double>> &jl = pSB->get_jlx()[l];
+	const std::vector<std::vector<double>> &jlp1 = pSB->get_jlx()[l+1];
 	
 	for( const size_t &ir : radials )
 	{
@@ -311,18 +311,18 @@ void ORB_table_phi::cal_ST_Phi12_R
 		// Actually, if(ir[ir]||dr[ir]) is enough. Double insurance for the sake of avoiding numerical errors
 		if( rs[ir] && drs[ir] )	continue;			
 		
-		const vector<double> &jl_r = jl[ir];
+		const std::vector<double> &jl_r = jl[ir];
 		for (int ik=0; ik<kmesh; ++ik)
 		{
 			integrated_func[ik] = jl_r[ik] * k1_dot_k2[ik];
 		}
 		double temp = 0.0;
 
-		Integral::Simpson_Integral(kmesh,VECTOR_TO_PTR(integrated_func),dk,temp);
-		rs[ir] = temp * FOUR_PI ;
+		ModuleBase::Integral::Simpson_Integral(kmesh,ModuleBase::GlobalFunc::VECTOR_TO_PTR(integrated_func),dk,temp);
+		rs[ir] = temp * ModuleBase::FOUR_PI ;
 		
-		const vector<double> &jlm1_r = jlm1[ir];
-		const vector<double> &jlp1_r = jlp1[ir];
+		const std::vector<double> &jlm1_r = jlm1[ir];
+		const std::vector<double> &jlp1_r = jlp1[ir];
 		const double fac = l/(l+1.0);
 		if( l==0 )
 		{
@@ -339,8 +339,8 @@ void ORB_table_phi::cal_ST_Phi12_R
 			}
 		}
 
-		Integral::Simpson_Integral(kmesh,VECTOR_TO_PTR(integrated_func),dk,temp);
-		drs[ir] = -FOUR_PI*(l+1)/(2.0*l+1) * temp;
+		ModuleBase::Integral::Simpson_Integral(kmesh,ModuleBase::GlobalFunc::VECTOR_TO_PTR(integrated_func),dk,temp);
+		drs[ir] = -ModuleBase::FOUR_PI*(l+1)/(2.0*l+1) * temp;
 	}
 
 	// cal rs[0] special
@@ -354,15 +354,15 @@ void ORB_table_phi::cal_ST_Phi12_R
 			}
 			double temp = 0.0;
 
-			Integral::Simpson_Integral(kmesh,VECTOR_TO_PTR(integrated_func),dk,temp);
+			ModuleBase::Integral::Simpson_Integral(kmesh,ModuleBase::GlobalFunc::VECTOR_TO_PTR(integrated_func),dk,temp);
 
 			// PLEASE try to make dualfac function as input parameters
 			// mohan note 2021-03-23
-			rs[0] = FOUR_PI / Mathzone_Add1::dualfac (2*l+1) * temp;
+			rs[0] = ModuleBase::FOUR_PI / ModuleBase::Mathzone_Add1::dualfac (2*l+1) * temp;
 		}
 	}
 	
-	timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
+	ModuleBase::timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
 	
 	return;
 }
@@ -373,8 +373,8 @@ void ORB_table_phi::init_Table(
 	const int &job0, 
 	LCAO_Orbitals &orb)
 {
-	TITLE("ORB_table_phi", "init_Table");
-	timer::tick("ORB_table_phi", "init_Table");
+	ModuleBase::TITLE("ORB_table_phi", "init_Table");
+	ModuleBase::timer::tick("ORB_table_phi", "init_Table");
 	const int ntype = orb.get_ntype();
 	assert( ORB_table_phi::dr > 0.0);
 	assert( OV_nTpairs>0);
@@ -515,7 +515,7 @@ void ORB_table_phi::init_Table(
 									Table_SR[0][Tpair][Opair][L] = new double[rmesh];
 									Table_SR[1][Tpair][Opair][L] = new double[rmesh];
 
-									Memory::record("ORB_table_phi","Table_SR",
+									ModuleBase::Memory::record("ORB_table_phi","Table_SR",
 									2*OV_nTpairs*pairs_chi*rmesh,"double");
 									break;
 
@@ -523,7 +523,7 @@ void ORB_table_phi::init_Table(
 									Table_TR[0][Tpair][Opair][L] = new double[rmesh];
 									Table_TR[1][Tpair][Opair][L] = new double[rmesh];
 
-									Memory::record("ORB_table_phi","Table_TR",
+									ModuleBase::Memory::record("ORB_table_phi","Table_TR",
 									2*OV_nTpairs*pairs_chi*rmesh,"double");
 									break;
 
@@ -533,7 +533,7 @@ void ORB_table_phi::init_Table(
 									Table_TR[0][Tpair][Opair][L] = new double[rmesh];
 									Table_TR[1][Tpair][Opair][L] = new double[rmesh];
 
-									Memory::record("ORB_table_phi","Table_SR&TR",
+									ModuleBase::Memory::record("ORB_table_phi","Table_SR&TR",
 									2*2*OV_nTpairs*pairs_chi*rmesh,"double");
 									break;
 								}
@@ -545,20 +545,20 @@ void ORB_table_phi::init_Table(
 									switch ( job0 )
 									{
 										case 1:
-										ZEROS (Table_SR[0][Tpair][Opair][L], rmesh);
-										ZEROS (Table_SR[1][Tpair][Opair][L], rmesh);
+										ModuleBase::GlobalFunc::ZEROS (Table_SR[0][Tpair][Opair][L], rmesh);
+										ModuleBase::GlobalFunc::ZEROS (Table_SR[1][Tpair][Opair][L], rmesh);
 										break;
 
 										case 2:
-										ZEROS (Table_TR[0][Tpair][Opair][L], rmesh);
-										ZEROS (Table_TR[1][Tpair][Opair][L], rmesh);
+										ModuleBase::GlobalFunc::ZEROS (Table_TR[0][Tpair][Opair][L], rmesh);
+										ModuleBase::GlobalFunc::ZEROS (Table_TR[1][Tpair][Opair][L], rmesh);
 										break;
 
 										case 3:
-										ZEROS (Table_SR[0][Tpair][Opair][L], rmesh);
-										ZEROS (Table_SR[1][Tpair][Opair][L], rmesh);
-										ZEROS (Table_TR[0][Tpair][Opair][L], rmesh);
-										ZEROS (Table_TR[1][Tpair][Opair][L], rmesh);
+										ModuleBase::GlobalFunc::ZEROS (Table_SR[0][Tpair][Opair][L], rmesh);
+										ModuleBase::GlobalFunc::ZEROS (Table_SR[1][Tpair][Opair][L], rmesh);
+										ModuleBase::GlobalFunc::ZEROS (Table_TR[0][Tpair][Opair][L], rmesh);
+										ModuleBase::GlobalFunc::ZEROS (Table_TR[1][Tpair][Opair][L], rmesh);
 										break;
 									}
 
@@ -630,7 +630,7 @@ void ORB_table_phi::init_Table(
 		break;
 	}
 		
-	timer::tick("ORB_table_phi", "init_Table");
+	ModuleBase::timer::tick("ORB_table_phi", "init_Table");
 	return;
 }
 
@@ -686,7 +686,7 @@ void ORB_table_phi::Destroy_Table(LCAO_Orbitals &orb)
 
 void ORB_table_phi::init_OV_Tpair(LCAO_Orbitals &orb)
 {
-	TITLE("ORB_table_phi","init_OV_Tpair");
+	ModuleBase::TITLE("ORB_table_phi","init_OV_Tpair");
     assert(ntype>0);
 
     this->OV_nTpairs = this->ntype * (this->ntype + 1) / 2;
@@ -760,33 +760,35 @@ void ORB_table_phi::init_Lmax (
 	const int mode, 
 	int &Lmax_used, 
 	int &Lmax,
-	const int &Lmax_exx) const
+	const int &Lmax_exx,
+	const LCAO_Orbitals &orb) const
 {
-	auto cal_Lmax_Phi = [](int &Lmax)
+
+	auto cal_Lmax_Phi = [](int &Lmax,const LCAO_Orbitals &orb)
 	{
 		//obtain maxL of all type
-		const int ntype = ORB.get_ntype();
+		const int ntype = orb.get_ntype();
 		for (int it = 0; it < ntype; it++)
 		{
-			Lmax = std::max(Lmax, ORB.Phi[it].getLmax());
+			Lmax = std::max(Lmax, orb.Phi[it].getLmax());
 		}
 	};
 
-	auto cal_Lmax_Beta = [](int &Lmax)
+	auto cal_Lmax_Beta = [](int &Lmax,const LCAO_Orbitals &orb)
 	{
 		// fix bug.
 		// mohan add the nonlocal part.
 		// 2011-03-07
-		const int ntype = ORB.get_ntype();
+		const int ntype = orb.get_ntype();
 		for(int it=0; it< ntype; it++)
 		{
-			Lmax = std::max(Lmax, ORB.Beta[it].getLmax());
+			Lmax = std::max(Lmax, orb.Beta[it].getLmax());
 		}
 	};
 	auto cal_Lmax_Alpha = [](int &Lmax)
 	{
 		//caoyu add 2021-08-05 for descriptor basis
-		Lmax = std::max(Lmax, ORB.get_lmax_d());
+		Lmax = std::max(Lmax, GlobalC::ORB.get_lmax_d());
 	};
 
 	
@@ -798,9 +800,8 @@ void ORB_table_phi::init_Lmax (
 			switch( mode )
 			{
 				case 1:			// used in <Phi|Phi> or <Beta|Phi>
-					cal_Lmax_Phi(Lmax);
-					cal_Lmax_Beta(Lmax);
-					cal_Lmax_Alpha(Lmax);
+					cal_Lmax_Phi(Lmax,orb);
+					cal_Lmax_Beta(Lmax,orb);
 					//use 2lmax+1 in dS
 					Lmax_used = 2*Lmax + 1;
 					break;
@@ -809,12 +810,12 @@ void ORB_table_phi::init_Lmax (
 					Lmax_used = 2*Lmax + 1;
 					break;
 				case 3:                // used in berryphase by jingan
-					cal_Lmax_Phi(Lmax);
+					cal_Lmax_Phi(Lmax,orb);
 					Lmax++;
 					Lmax_used = 2*Lmax + 1;
 					break;
 				default:
-					throw invalid_argument("ORB_table_phi::init_Lmax orb_num=2, mode error");
+					throw std::invalid_argument("ORB_table_phi::init_Lmax orb_num=2, mode error");
 					break;
 			}
 			break;
@@ -822,13 +823,13 @@ void ORB_table_phi::init_Lmax (
 			switch( mode )
 			{
 				case 1:			// used in <jY|PhiPhi> or <Abfs|PhiPhi>
-					cal_Lmax_Phi(Lmax);
+					cal_Lmax_Phi(Lmax,orb);
 					Lmax_used = 2*Lmax + 1;
 					Lmax = max(Lmax, Lmax_exx);
 					Lmax_used += Lmax_exx;
 					break;
 				default:
-					throw invalid_argument("ORB_table_phi::init_Lmax orb_num=3, mode error");
+					throw std::invalid_argument("ORB_table_phi::init_Lmax orb_num=3, mode error");
 					break;
 			}
 			break;
@@ -836,16 +837,16 @@ void ORB_table_phi::init_Lmax (
 			switch( mode )
 			{
 				case 1:			// used in <PhiPhi|PhiPhi>
-					cal_Lmax_Phi(Lmax);
+					cal_Lmax_Phi(Lmax,orb);
 					Lmax_used = 2*( 2*Lmax + 1 );
 					break;
 				default:
-					throw invalid_argument("ORB_table_phi::init_Lmax orb_num=4, mode error");
+					throw std::invalid_argument("ORB_table_phi::init_Lmax orb_num=4, mode error");
 					break;
 			}
 			break;
 		default:
-			throw invalid_argument("ORB_table_phi::init_Lmax orb_num error");
+			throw std::invalid_argument("ORB_table_phi::init_Lmax orb_num error");
 			break;
 	}
 
@@ -858,13 +859,14 @@ void ORB_table_phi::init_Table_Spherical_Bessel (
 	const int mode, 
 	int &Lmax_used, 
 	int &Lmax,
-	const int &Lmax_exx)
+	const int &Lmax_exx,
+	const LCAO_Orbitals &orb)
 {
-	TITLE("ORB_table_phi", "init_Table_Spherical_Bessel");
+	ModuleBase::TITLE("ORB_table_phi", "init_Table_Spherical_Bessel");
 
-	this->init_Lmax (orb_num,mode,Lmax_used,Lmax,Lmax_exx);		// Peize Lin add 2016-01-26
+	this->init_Lmax (orb_num,mode,Lmax_used,Lmax,Lmax_exx,orb);		// Peize Lin add 2016-01-26
 
-	for( auto & sb : Sph_Bessel_Recursive_Pool::D2::sb_pool )
+	for( auto & sb : ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool )
 	{
 		if( this->dr * this->dk == sb.get_dx() )
 		{
@@ -875,8 +877,8 @@ void ORB_table_phi::init_Table_Spherical_Bessel (
 
 	if(!pSB)
 	{
-		Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});
-		pSB = &Sph_Bessel_Recursive_Pool::D2::sb_pool.back();
+		ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});
+		pSB = &ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool.back();
 	}
 	
 	pSB->set_dx( this->dr * this->dk );
@@ -895,16 +897,16 @@ void ORB_table_phi::init_Table_Spherical_Bessel (
     int lll;
     int ir;
     int ik;
-    cout << " INPUT L:  " ; cin >> lll;
-    cout << " INPUT ir: " ; cin >> ir;
-    cout << " INPUT ik: " ; cin >> ik;
+    std::cout << " INPUT L:  " ; cin >> lll;
+    std::cout << " INPUT ir: " ; cin >> ir;
+    std::cout << " INPUT ik: " ; cin >> ik;
     double kr = r[ir] * kpoint[ik];
-    cout <<  " L=" << lll << " kr=" << kr << " J=" << jlx[lll][ir][ik] << endl;
+    std::cout <<  " L=" << lll << " kr=" << kr << " J=" << jlx[lll][ir][ik] << std::endl;
     goto once_again;
 */
 
-//	OUT(ofs_running,"lmax used to generate Jlq",Lmax_used);
-//	OUT(ofs_running,"kmesh",kmesh);
-//	OUT(ofs_running,"Rmesh",Rmesh);
-	Memory::record ("ORB_table_phi", "Jl(x)", (Lmax_used+1) * this->kmesh * this->Rmesh, "double");
+//	OUT(GlobalV::ofs_running,"lmax used to generate Jlq",Lmax_used);
+//	OUT(GlobalV::ofs_running,"kmesh",kmesh);
+//	OUT(GlobalV::ofs_running,"Rmesh",Rmesh);
+	ModuleBase::Memory::record ("ORB_table_phi", "Jl(x)", (Lmax_used+1) * this->kmesh * this->Rmesh, "double");
 }

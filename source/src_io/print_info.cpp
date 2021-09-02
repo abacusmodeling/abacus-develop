@@ -1,138 +1,134 @@
 #include "print_info.h"
+#include "../input.h"
 #include "../module_base/global_variable.h"
-#include "../src_pw/global.h"
 
 Print_Info::Print_Info(){}
 
 Print_Info::~Print_Info(){}
 
 
-void Print_Info::setup_parameters(void)
+void Print_Info::setup_parameters(UnitCell_pseudo &ucell, K_Vectors &kv, xcfunc &xcf)
 {
-	TITLE("Print_Info","setup_parameters");
+	ModuleBase::TITLE("Print_Info","setup_parameters");
 	
-    if(CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax" || CALCULATION=="nscf"
-	        || CALCULATION=="istate" || CALCULATION=="ienvelope" || CALCULATION=="md")
+    if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax" || GlobalV::CALCULATION=="nscf"
+	        || GlobalV::CALCULATION=="istate" || GlobalV::CALCULATION=="ienvelope" || GlobalV::CALCULATION=="md")
 	{
-		cout << " ---------------------------------------------------------" << endl;
-		if(CALCULATION=="scf")
+		std::cout << " ---------------------------------------------------------" << std::endl;
+		if(GlobalV::CALCULATION=="scf")
 		{
-			cout << " Self-consistent calculations for electrons" << endl;
+			std::cout << " Self-consistent calculations for electrons" << std::endl;
 		}
-		else if(CALCULATION=="test")
+		else if(GlobalV::CALCULATION=="test")
 		{
-			cout << " Test run" << endl;
+			std::cout << " Test run" << std::endl;
 		}
-		if(CALCULATION=="relax")
+		if(GlobalV::CALCULATION=="relax")
 		{
-            cout << " Ion relaxation calculations" << endl;
+            std::cout << " Ion relaxation calculations" << std::endl;
 		}
-        if(CALCULATION=="cell-relax")
+        if(GlobalV::CALCULATION=="cell-relax")
         {
-            cout << " Cell relaxation calculations" << endl;
+            std::cout << " Cell relaxation calculations" << std::endl;
         }
-		if(CALCULATION=="md")
+		if(GlobalV::CALCULATION=="md")
 		{
-			cout << " Molecular Dynamics simulations" << endl;
+			std::cout << " Molecular Dynamics simulations" << std::endl;
 
-			cout << " ---------------------------------------------------------" << endl;
+			std::cout << " ---------------------------------------------------------" << std::endl;
 
 			if(INPUT.mdp.mdtype ==1 || INPUT.mdp.mdtype==2)
 			{
-				cout << " ENSEMBLE                 : " << "NVT" << endl;
-				cout << " Qmass for NVT(a.u.)      : " << INPUT.mdp.Qmass/6.02/9.109*1e5 << endl;
+				std::cout << " ENSEMBLE                 : " << "NVT" << std::endl;
+				std::cout << " Qmass for NVT(a.u.)      : " << INPUT.mdp.Qmass/6.02/9.109*1e5 << std::endl;
 			}
 			else if(INPUT.mdp.mdtype==0)
 			{
-				cout << " ENSEMBLE                 : " << "NVE" << endl;
+				std::cout << " ENSEMBLE                 : " << "NVE" << std::endl;
 			}
 			
-			cout << " Time interval(fs)        : " << INPUT.mdp.dt << endl;
+			std::cout << " Time interval(fs)        : " << INPUT.mdp.dt << std::endl;
 		}
-		cout << " ---------------------------------------------------------" << endl;
+		std::cout << " ---------------------------------------------------------" << std::endl;
 
 
-		cout << " " << setw(8) << "SPIN"
-		     << setw(16) << "KPOINTS"
-		     << setw(12) << "PROCESSORS";
+		std::cout << " " << std::setw(8) << "SPIN"
+		     << std::setw(16) << "KPOINTS"
+		     << std::setw(12) << "PROCESSORS";
 
-		if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw")
+		if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{
-			cout << setw(12) << "NBASE";
+			std::cout << std::setw(12) << "NBASE";
 		}
 
-		cout << endl;
+		std::cout << std::endl;
 
 
 
-		cout << " " << setw(8) << NSPIN;
+		std::cout << " " << std::setw(8) << GlobalV::NSPIN;
 
-		if(GAMMA_ONLY_LOCAL)
+		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			if(COLOUR && MY_RANK==0)
+			if(GlobalV::COLOUR && GlobalV::MY_RANK==0)
 			{
 				// red
-				//printf( "\e[31m%-16s\e[0m", "Gamma");
-				printf( "[31m%-16s[0m", "Gamma");
+				printf( "\e[31m%-16s\e[0m", "Gamma");
+				//printf( "[31m%-16s[0m", "Gamma");
 			}
 			else
 			{
-				cout << setw(16) << "Gamma";
+				std::cout << std::setw(16) << "Gamma";
 			}
 		}
 		else
 		{
-			if(COLOUR && MY_RANK==0)
+			if(GlobalV::COLOUR && GlobalV::MY_RANK==0)
 			{
 				// zi
-				//printf( "\e[35m%-16d\e[0m", kv.nkstot);
-				printf( "[35m%-16d[0m", kv.nkstot);
+				printf( "\e[35m%-16d\e[0m", kv.nkstot);
+				//printf( "[35m%-16d[0m", kv.nkstot);
 			}
 			else
 			{
-				cout << setw(16) << kv.nkstot;
+				std::cout << std::setw(16) << kv.nkstot;
 			}
 		}
 
-		cout << setw(12) << NPROC;
+		std::cout << std::setw(12) << GlobalV::NPROC;
 
-		if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw")
+		if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{
-			cout << setw(12) << NLOCAL;
+			std::cout << std::setw(12) << GlobalV::NLOCAL;
 		}
 
-		cout << endl;
+		std::cout << std::endl;
 
 
 
 
-		cout << " ---------------------------------------------------------" << endl;
-		if(CALCULATION=="md" && INPUT.mdp.md_potential)
+		std::cout << " ---------------------------------------------------------" << std::endl;
+		if(GlobalV::BASIS_TYPE=="lcao") 
 		{
-			cout << " Classic Molecular Dynamics simulations" << endl;
-		}
-		else if(BASIS_TYPE=="lcao") 
-		{
-			if(COLOUR && MY_RANK==0)
+			if(GlobalV::COLOUR && GlobalV::MY_RANK==0)
 			{
-				string a = "Use Systematically Improvable Atomic bases";
-				//printf( " \e[36m%-45s\e[0m\n", a.c_str());
-				printf( " [36m%-45s[0m\n", a.c_str());
+				std::string a = "Use Systematically Improvable Atomic bases";
+				printf( " \e[36m%-45s\e[0m\n", a.c_str());
+				//printf( " [36m%-45s[0m\n", a.c_str());
 			}
 			else
 			{
-				cout << " Use Systematically Improvable Atomic bases" << endl;
+				std::cout << " Use Systematically Improvable Atomic bases" << std::endl;
 			}
 		}
-		else if(BASIS_TYPE=="lcao_in_pw")
+		else if(GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{
-			cout << " Expand Atomic bases into plane waves" << endl;
+			std::cout << " Expand Atomic bases into plane waves" << std::endl;
 		}
-		else if(BASIS_TYPE=="pw")
+		else if(GlobalV::BASIS_TYPE=="pw")
 		{
-			cout << " Use plane wave basis" << endl;
+			std::cout << " Use plane wave basis" << std::endl;
 		}
-		cout << " ---------------------------------------------------------" << endl;
+		std::cout << " ---------------------------------------------------------" << std::endl;
 
 
 
@@ -140,34 +136,34 @@ void Print_Info::setup_parameters(void)
 		// second part
 		//----------------------------------
 
-		cout << " " << setw(8) << "ELEMENT";
+		std::cout << " " << std::setw(8) << "ELEMENT";
 
-		if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw")
+		if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{
-			cout << setw(16) << "ORBITALS";
-			cout << setw(12) << "NBASE";
+			std::cout << std::setw(16) << "ORBITALS";
+			std::cout << std::setw(12) << "NBASE";
 		}
-		cout << setw(12) << "NATOM";
+		std::cout << std::setw(12) << "NATOM";
 
-		cout << setw(12) << "XC";
-		cout << endl;
+		std::cout << std::setw(12) << "XC";
+		std::cout << std::endl;
 
 
 
 		for(int it=0; it<ucell.ntype; ++it)
 		{
-			if(COLOUR && MY_RANK==0)
+			if(GlobalV::COLOUR && GlobalV::MY_RANK==0)
 			{
-				printf( " [36m%-8s[0m", ucell.atoms[it].label.c_str());
+				printf( "\e[36m%-8s\e[0m", ucell.atoms[it].label.c_str());
 			}
 			else
 			{
-				cout << " " << setw(8) << ucell.atoms[it].label;
+				std::cout << " " << std::setw(8) << ucell.atoms[it].label;
 			}
 
-			if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw")
+			if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 			{
-				stringstream orb;
+				std::stringstream orb;
 
 				int norb = 0;
 				/*for(int L=0; L<=ORB.Phi[it].getLmax(); ++L)
@@ -199,43 +195,131 @@ void Print_Info::setup_parameters(void)
 				}
 				orb << "-" << ucell.atoms[it].Rcut << "au";
 
-				if(COLOUR && MY_RANK==0)
+				if(GlobalV::COLOUR && GlobalV::MY_RANK==0)
 				{
-					//printf( "\e[36m%-16s\e[0m", orb.str().c_str());
-					//printf( "\e[36m%-12d\e[0m", norb);
-					printf( "[36m%-16s[0m", orb.str().c_str());
-					printf( "[36m%-12d[0m", norb);
+					printf( "\e[36m%-16s\e[0m", orb.str().c_str());
+					printf( "\e[36m%-12d\e[0m", norb);
+					//printf( "[36m%-16s[0m", orb.str().c_str());
+					//printf( "[36m%-12d[0m", norb);
 				}
 				else
 				{
-					cout << setw(16) << orb.str();
-					cout << setw(12) << norb;
+					std::cout << std::setw(16) << orb.str();
+					std::cout << std::setw(12) << norb;
 				}
 			}
 
 
-			cout << setw(12) << ucell.atoms[it].na;
+			std::cout << std::setw(12) << ucell.atoms[it].na;
 
 //				if(ucell.atoms[it].dft[1]=="PZ")    // pengfei Li added 2015-1-31 cancelled by zws
 //				{
-//					//cout << setw(12) << "PZ-LDA";
+//					//std::cout << std::setw(12) << "PZ-LDA";
 //
 //				}
 //				else
 //				{
-//					//cout << setw(12) << ucell.atoms[it].dft[0];
-//                                        cout << setw(12) << "PBE";
+//					//std::cout << std::setw(12) << ucell.atoms[it].dft[0];
+//                                        std::cout << std::setw(12) << "PBE";
 //				}
-			xcf.ostreamdft(cout); // zws add 20150108
-			//cout << " ( "  << setw(3) << xcf.iexch << setw(3) << xcf.icorr << setw(3) << xcf.igcx << setw(3) << xcf.igcc << ")";
-			cout << endl;
+#ifndef __CMD
+			xcf.ostreamdft(std::cout); // zws add 20150108
+#endif
+			//std::cout << " ( "  << std::setw(3) << xcf.iexch << std::setw(3) << xcf.icorr << std::setw(3) << xcf.igcx << std::setw(3) << xcf.igcc << ")";
+			std::cout << std::endl;
 		}
 
-		cout << " ---------------------------------------------------------" << endl;
-		cout << " Initial plane wave basis and FFT box" << endl;
-		cout << " ---------------------------------------------------------" << endl;
+		std::cout << " ---------------------------------------------------------" << std::endl;
+		std::cout << " Initial plane wave basis and FFT box" << std::endl;
+		std::cout << " ---------------------------------------------------------" << std::endl;
 
 	}
 
 	return;
+}
+
+void Print_Info::print_time(time_t &time_start, time_t &time_finish)
+{
+    // print out information before ABACUS ends
+	std::cout << "\n START  Time  : " << ctime(&time_start);
+	std::cout << " FINISH Time  : " << ctime(&time_finish);
+	std::cout << " TOTAL  Time  : " << difftime(time_finish, time_start) << std::endl;
+	std::cout << " SEE INFORMATION IN : " << GlobalV::global_out_dir << std::endl;
+
+	GlobalV::ofs_running << "\n Start  Time  : " << ctime(&time_start);
+	GlobalV::ofs_running << " Finish Time  : " << ctime(&time_finish);
+
+	double total_time = difftime(time_finish, time_start);
+	int hour = total_time / 3600;
+	int mins = ( total_time - 3600 * hour ) / 60;
+	int secs = total_time - 3600 * hour - 60 * mins ;
+	GlobalV::ofs_running << " Total  Time  : " << unsigned(hour) << " h "
+	    << unsigned(mins) << " mins "
+	    << unsigned(secs) << " secs "<< std::endl;
+}
+
+void Print_Info::print_scf(const int &istep, const int &iter)
+{
+    if(GlobalV::BASIS_TYPE=="pw")
+    {
+        GlobalV::ofs_running << "\n PW ALGORITHM ------------- ";
+    }
+    else
+    {
+        GlobalV::ofs_running << "\n LCAO ALGORITHM ------------- ";
+    }
+
+    if(GlobalV::CALCULATION=="scf")
+    {
+        GlobalV::ofs_running << "ELEC = " << std::setw(4) << unsigned(iter);
+    }
+    else if(GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
+	{
+		GlobalV::ofs_running << "ION = " << std::setw(4) << unsigned(istep+1)
+		    				 << "  ELEC = " << std::setw(4) << unsigned(iter);
+	}
+	else if(GlobalV::CALCULATION=="md")
+	{
+		GlobalV::ofs_running << "MD = " << std::setw(4) << unsigned(istep+1)
+		    				 << "  ELEC = " << std::setw(4) << unsigned(iter);
+	}
+
+    GlobalV::ofs_running << " --------------------------------\n";
+}
+
+void Print_Info::print_screen(const int &stress_step, const int &force_step, const int &istep)
+{
+    std::cout << " -------------------------------------------" << std::endl;
+	GlobalV::ofs_running << "\n -------------------------------------------" << std::endl;
+
+	if(GlobalV::CALCULATION=="relax") //pengfei 2014-10-13
+	{
+        std::cout << " STEP OF ION RELAXATION : " << unsigned(istep) << std::endl;
+		GlobalV::ofs_running << " STEP OF ION RELAXATION : " << unsigned(istep) << std::endl;
+	}
+    else if(GlobalV::CALCULATION=="cell-relax")
+    {
+        std::cout << " RELAX CELL : " << unsigned(stress_step) << std::endl;
+        std::cout << " RELAX IONS : " << unsigned(force_step) << " (in total: " << unsigned(istep) << ")" << std::endl;
+		GlobalV::ofs_running << " RELAX CELL : " << unsigned(stress_step) << std::endl;
+        GlobalV::ofs_running << " RELAX IONS : " << unsigned(force_step) << " (in total: " << unsigned(istep) << ")" << std::endl;
+    }
+	else if(GlobalV::CALCULATION=="scf") //add 4 lines 2015-09-06, xiaohui
+	{
+        std::cout << " SELF-CONSISTENT : " << std::endl;
+		GlobalV::ofs_running << " SELF-CONSISTENT" << std::endl;
+	}
+	else if(GlobalV::CALCULATION=="nscf") //add 4 lines 2015-09-06, xiaohui
+	{
+        std::cout << " NONSELF-CONSISTENT : " << std::endl;
+		GlobalV::ofs_running << " NONSELF-CONSISTENT" << std::endl;
+	}
+	else if(GlobalV::CALCULATION=="md")
+	{
+        std::cout << " STEP OF MOLECULAR DYNAMICS : " << unsigned(istep) << std::endl;
+		GlobalV::ofs_running << " STEP OF MOLECULAR DYNAMICS : " << unsigned(istep) << std::endl;
+	}
+		
+    std::cout << " -------------------------------------------" << std::endl;
+    GlobalV::ofs_running << " -------------------------------------------" << std::endl;
 }

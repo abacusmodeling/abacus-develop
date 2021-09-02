@@ -22,7 +22,7 @@ void Exx_Abfs::IO::output_binary( const T &data, const std::string &file_name )
 		cereal::BinaryOutputArchive ar(ofs);
 		ar(data);
 	#else
-		throw invalid_argument(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	#endif
 	ofs.close();
 }
@@ -39,7 +39,7 @@ T Exx_Abfs::IO::input_binary( const std::string &file_name )
 		cereal::BinaryInputArchive ar(ifs);
 		ar(data);
 	#else
-		throw invalid_argument(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	#endif
 	ifs.close();
 	return data;
@@ -56,7 +56,7 @@ void Exx_Abfs::IO::output_text( const T &data, const std::string &file_name )
 		cereal::JSONOutputArchive ar(ofs);
 		ar(data);
 	#else
-		throw invalid_argument(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	#endif
 	ofs.close();
 }
@@ -73,7 +73,7 @@ T Exx_Abfs::IO::input_text( const std::string &file_name )
 		cereal::JSONInputArchive ar(ifs);
 		ar(data);
 	#else
-		throw invalid_argument(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	#endif
 	ifs.close();
 	return data;
@@ -84,7 +84,7 @@ void Exx_Abfs::IO::bcast( T &data, const int rank_src, MPI_Comm mpi_comm )
 {
 	int my_rank;	MPI_Comm_rank( mpi_comm, &my_rank );
 	#ifdef USE_BOOST_SERIALIZATION
-		if(MY_RANK==rank_src)
+		if(GlobalV::MY_RANK==rank_src)
 		{
 			boost::mpi::packed_oarchive oar(mpi_comm);
 			oar << data;
@@ -102,7 +102,7 @@ void Exx_Abfs::IO::bcast( T &data, const int rank_src, MPI_Comm mpi_comm )
 			iar >> data;
 		}
 	#else
-		throw invalid_argument(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	#endif
 }
 

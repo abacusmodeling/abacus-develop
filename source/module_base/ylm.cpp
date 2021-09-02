@@ -4,14 +4,16 @@
 #include "constants.h"
 #include "timer.h"
 
-using namespace std;
+namespace ModuleBase
+{
+
 int Ylm::nlm = 0;
 std::vector<double> Ylm::ylmcoef(100);
 
 // here Lmax == max angular momentum + 1
-void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr[] )
+void Ylm::get_ylm_real( const int &Lmax, const ModuleBase::Vector3<double> &vec, double ylmr[] )
 {	
-	timer::tick ("Ylm","get_ylm_real");
+	ModuleBase::timer::tick ("Ylm","get_ylm_real");
 	//1e-9 is too large
 	const double cut0 = 1e-12;
 	// allocate space.
@@ -20,32 +22,42 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 	{
 		for(int i=0; i<Ylm::nlm; i++)
 		{
-			ylmr[i] = SQRT_INVERSE_FOUR_PI;
+			ylmr[i] = ModuleBase::SQRT_INVERSE_FOUR_PI;
 		}
 	}
 
 	double cost = 0.0; // must initialized.
 	double sint = cut0;
-	double phi;
+	double phi = 0.0;
 	
 	double vnorm = vec.norm();
-	if(vnorm < cut0) vnorm += cut0;
+
+	if(vnorm < cut0) 
+	{
+		vnorm += cut0;
+	}
 	
 	cost = vec.z / vnorm; 
 		
 	if(fabs(cost) > 1.0 - cut0)
 	{
 		cost = sgn(cost) * (1.0 - cut0);
-		//		cout << "\n" << "cost = " << cost << endl;
+		//		std::cout << "\n" << "cost = " << cost << std::endl;
 	}
 	sint = sqrt(1.0 - cost*cost);  
 
 	if(vec.x > cut0)
-	{ phi = std::atan( vec.y / vec.x );}
+	{ 
+		phi = std::atan( vec.y / vec.x );
+	}
 	else if( vec.x < -cut0 )
-	{ phi = std::atan( vec.y / vec.x ) + PI;}
+	{ 
+		phi = std::atan( vec.y / vec.x ) + ModuleBase::PI;
+	}
 	else
-	{phi = PI_HALF * ((vec.y >= 0.0) ? 1.0 : -1.0);}
+	{
+		phi = ModuleBase::PI_HALF * ((vec.y >= 0.0) ? 1.0 : -1.0);
+	}
 
 	//===============================
 	// NAME : p(Legendre Polynomials)
@@ -53,12 +65,13 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 	static double p[20][20];
 	assert(Lmax <= 20);
 
-	int m;
-	double x1;	// x2;
+	int m=0;
+	double x1=0.0;	// x2;
 	int lm = -1; // must initialized!
+
 	for (int l=0; l<Lmax; l++)
 	{
-		const double c = sqrt((2*l+1) / FOUR_PI);
+		const double c = sqrt((2*l+1) / ModuleBase::FOUR_PI);
 		if (l == 0)
 		{ 
 			p[0][0] = 1.0; 
@@ -100,7 +113,7 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 					static_cast<double>( Ylm::Fact(l - m)) / 
 					static_cast<double>( Ylm::Fact(l + m)) 
 					) 
-					*SQRT2;
+					*ModuleBase::SQRT2;
 
 			++lm;
 			ylmr[lm] = same * p[m][l] * cos(m * phi);
@@ -111,14 +124,11 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 		}
 	}// end do
 
-//	for(int l=0; l<Lmax; l++) delete[] p[l];
-//	delete[] p;
-
-	timer::tick ("Ylm", "get_ylm_real");
+	ModuleBase::timer::tick ("Ylm", "get_ylm_real");
 	return;
 }
 
-void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr[], double dylmdr[][3] )
+void Ylm::get_ylm_real( const int &Lmax, const ModuleBase::Vector3<double> &vec, double ylmr[], double dylmdr[][3] )
 {	
 	//1e-9 is too large
 	const double cut0 = 1e-12;
@@ -128,7 +138,7 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 	{
 		for(int i=0; i<Ylm::nlm; i++)
 		{
-			ylmr[i] = SQRT_INVERSE_FOUR_PI;
+			ylmr[i] = ModuleBase::SQRT_INVERSE_FOUR_PI;
 			for(int j = 0; j < 3; j++)
 			{
 				dylmdr[i][j] = 0.0;
@@ -136,36 +146,37 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 		}
 	}
 
-	//double x1, x2;
-
 	double cost = 0.0; // must initialized.
 	double sint = 0.0;
-	double phi;
+	double phi = 0.0;
 
 	double vnorm = vec.norm();
-//	cout << "\nvnorm = " << vnorm << endl;
 	
-	if(vnorm < cut0) vnorm += cut0;
+	if(vnorm < cut0) 
+	{
+		vnorm += cut0;
+	}
 	
 	cost = vec.z / vnorm; 
 		
-//	cout << "\nvec.z = " << vec.z << " cost = " << cost << endl;
-//	cout << "\nfabs(cost = " << fabs(cost) << "1-cut0 = " << 1.0-cut0 << endl;
 	if(fabs(cost) > 1.0-cut0) 
 	{
 		cost = sgn(cost) * (1.0 - cut0);
-//		cout << "\ncost = " << cost << endl;
 	}
 	sint = sqrt(1.0 - cost*cost);
 
-//	cout << "\ncost = " << cost << " sint = " << sint << endl;
-	
 	if(vec.x > cut0)
-	{ phi = std::atan( vec.y / vec.x );}
+	{ 
+		phi = std::atan( vec.y / vec.x );
+	}
 	else if( vec.x < -cut0 )
-	{ phi = std::atan( vec.y / vec.x ) + PI;}
+	{ 
+		phi = std::atan( vec.y / vec.x ) + ModuleBase::PI;
+	}
 	else
-	{phi = PI_HALF * ((vec.y >= 0.0) ? 1.0 : -1.0);}
+	{
+		phi = ModuleBase::PI_HALF * ((vec.y >= 0.0) ? 1.0 : -1.0);
+	}
 
 	//===============================
 	// NAME : p(Legendre Polynomials)
@@ -174,11 +185,11 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 	static double dp[20][20];
 	assert(Lmax <= 20);
 
-	int m;
+	int m = 0;
 	int lm = -1; // must initialized!
 	for (int l=0; l<Lmax; l++)
 	{
-		const double c = sqrt((2*l+1) / FOUR_PI);
+		const double c = sqrt((2*l+1) / ModuleBase::FOUR_PI);
 		if (l == 0)
 		{ 
 			p[0][0] = 1.0; 
@@ -202,7 +213,7 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 			{
 				p[m][l] = (cost * l3 * p[m][l1] -
 					      (l1 + m ) * p[m][l2]) / (l - m);
-			} // end do
+			}
 
 			p[l1][l] = cost * l3 * p[l1][l1];
 			
@@ -211,11 +222,10 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 			{
 				p[l][l] = -p[l][l];
 			}
-		} // end if
+		}
 
 		for(m=0; m <= l; m++)
 		{
-	//		cout << "\n l = " << l << " m = " << m << " cost = " << cost << " sint = " << sint << endl;
 			if( m == l )
 			{
 				dp[l][l] = l * cost * p[l][l] / sint;
@@ -224,8 +234,6 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 			{
 				dp[m][l] = (l * cost * p[m][l] - (l+m) * p[m][l-1]) / sint;
 			}
-
-	//		cout << "\ndp = " << dp[m][l] << endl;
 		}
 		
 		// Y_lm, m = 0
@@ -244,7 +252,7 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 					static_cast<double>( Ylm::Fact(l - m)) / 
 					static_cast<double>( Ylm::Fact(l + m)) 
 					) 
-					*SQRT2;
+					*ModuleBase::SQRT2;
 
 			++lm;
 			ylmr[lm] = same * p[m][l] * cos(m * phi);
@@ -267,8 +275,6 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 		}
 	}// end do
 
-//	for(int l=0; l<Lmax; l++) delete[] p[l];
-//	delete[] p;
 	return;
 }
 
@@ -284,8 +290,8 @@ void Ylm::rlylm
 	double rly[]
 )
 {
-//	TITLE("Ylm","rlylm");
-//	timer::tick("Ylm","rlylm");
+//	ModuleBase::TITLE("Ylm","rlylm");
+//	ModuleBase::timer::tick("Ylm","rlylm");
 
 	int MaxL = Lmax - 1;
 	
@@ -353,8 +359,8 @@ void Ylm::rlylm
 			for(int ip = 0; ip <= im; ip++)
 			{
 				double aux = Fact(im) / Fact(ip) / Fact(im - ip);
-				Am[im] += aux * pow(x, ip) * pow(y, im-ip) * cos( (im-ip) * PI / 2.0 );
-				Bm[im] += aux * pow(x, ip) * pow(y, im-ip) * sin( (im-ip) * PI / 2.0 );
+				Am[im] += aux * pow(x, ip) * pow(y, im-ip) * cos( (im-ip) * ModuleBase::PI / 2.0 );
+				Bm[im] += aux * pow(x, ip) * pow(y, im-ip) * sin( (im-ip) * ModuleBase::PI / 2.0 );
 			}
 		}
 	}
@@ -453,7 +459,7 @@ void Ylm::rlylm
 	int ic = 0;
 	for(int il = 0; il <= MaxL; il++)
 	{
-		double fac = sqrt( (2.0 * il + 1.0) / FOUR_PI );
+		double fac = sqrt( (2.0 * il + 1.0) / ModuleBase::FOUR_PI );
 			
 		//m=0
 		rly[ic] = Am[0] * zdep[il][0] * fac;
@@ -475,7 +481,7 @@ void Ylm::rlylm
 		}
 	}
 
-//	timer::tick("Ylm", "rlylm");
+//	ModuleBase::timer::tick("Ylm", "rlylm");
 	return;
 }
 
@@ -825,8 +831,8 @@ void Ylm::grad_rl_sph_harm
 	rly[7]= Ylm::ylmcoef[5]*rly[4]-Ylm::ylmcoef[6]*rly[0]*radius2 - tmp2*rly[2];//l=2,m=2
 	grly[7][0] = Ylm::ylmcoef[5]*grly[4][0]-Ylm::ylmcoef[6]*(rly[0]*tx+grly[0][0]*radius2)-Ylm::ylmcoef[4]*(x*grly[2][0]+rly[2]);
 
-//	cout << "\np1 = "<< Ylm::ylmcoef[5]*grly[4][0] << " p2 = " << -Ylm::ylmcoef[6]*rly[0]*tx
-//						<< " p3 = " << -Ylm::ylmcoef[4]*x*grly[2][0] << " p4 = " << -Ylm::ylmcoef[4]*rly[2] << endl;
+//	std::cout << "\np1 = "<< Ylm::ylmcoef[5]*grly[4][0] << " p2 = " << -Ylm::ylmcoef[6]*rly[0]*tx
+//						<< " p3 = " << -Ylm::ylmcoef[4]*x*grly[2][0] << " p4 = " << -Ylm::ylmcoef[4]*rly[2] << std::endl;
 	
 	grly[7][1] = Ylm::ylmcoef[5]*grly[4][1]-Ylm::ylmcoef[6]*(rly[0]*ty+grly[0][1]*radius2)-tmp2*grly[2][1];
 	grly[7][2] = Ylm::ylmcoef[5]*grly[4][2]-Ylm::ylmcoef[6]*(rly[0]*tz+grly[0][2]*radius2)-tmp2*grly[2][2];
@@ -1053,8 +1059,8 @@ void Ylm::grad_rl_sph_harm
 	
 void Ylm::set_coefficients(void)
 {
-	Ylm::ylmcoef[0] = 1.0 / sqrt(FOUR_PI);
-	Ylm::ylmcoef[1] = sqrt (3.0 / FOUR_PI);
+	Ylm::ylmcoef[0] = 1.0 / sqrt(ModuleBase::FOUR_PI);
+	Ylm::ylmcoef[1] = sqrt (3.0 / ModuleBase::FOUR_PI);
 	Ylm::ylmcoef[2] = sqrt (15.0) / 2.0;
 	Ylm::ylmcoef[3] = sqrt (5.0) / 2.0;
 	Ylm::ylmcoef[4] = sqrt (5.0);
@@ -1095,13 +1101,13 @@ void Ylm::set_coefficients(void)
 
 void Ylm::test1 (void)
 {
-	Vector3<double> R (20.0, 0.0, 0.0);
+	ModuleBase::Vector3<double> R (20.0, 0.0, 0.0);
 	double xdr = R.x/R.norm();
 	double ydr = R.y/R.norm();
 	double zdr = R.z/R.norm();
 	const int L = 9;
 	const double rl = std::pow( R.norm(), L);
-	cout << " rl=" << rl << endl;
+	std::cout << " rl=" << rl << std::endl;
 	Ylm::set_coefficients();
 	
 	int nu = 100;
@@ -1118,11 +1124,11 @@ void Ylm::test1 (void)
 	
 	for (int i=0; i < nu; i++)
 	{
-	//	cout << "\ni= " << i << " rlya = " << rlya[i] << " rlyb = " << rlyb[i] << endl;
+	//	std::cout << "\ni= " << i << " rlya = " << rlya[i] << " rlyb = " << rlyb[i] << std::endl;
 		double diff = fabs(rlya[i]-rlyb[i]);
 		if (diff > 1e-8) 
 		{
-			cout << "Ylm::test1, error is too large!" << endl;
+			std::cout << "Ylm::test1, error is too large!" << std::endl;
 			//WARNING_QUIT ("Ylm::test1","error is too large!");
 			exit(0);
 		}
@@ -1133,7 +1139,7 @@ void Ylm::test1 (void)
 
 void Ylm::test2 (void)
 {
-	Vector3<double> R (0.1,-0.2,0.5);
+	ModuleBase::Vector3<double> R (0.1,-0.2,0.5);
 	Ylm::set_coefficients();
 	
 	//int nu = 100;
@@ -1152,7 +1158,7 @@ void Ylm::test2 (void)
 		double diffx = fabs(grlya[i][2]-grlyb[i][2]);
 		if (diffx > 1e-8)
 		{
-			cout << "Ylm::test2, Large error in Direv X!" << endl;
+			std::cout << "Ylm::test2, Large error in Direv X!" << std::endl;
 			//WARNING_QUIT ("Ylm::test2","Large error in Direv X!");
 			exit(0);
 		}
@@ -1279,19 +1285,19 @@ void Ylm::rlylm
 			for(int ip = 0; ip <= im; ip++)
 			{
 				double aux = Fact(im) / Fact(ip) / Fact(im - ip);
-				Am[im] += aux * pow(x, ip) * pow(y, im-ip) * cos( (im-ip) * PI / 2.0 );
-				Bm[im] += aux * pow(x, ip) * pow(y, im-ip) * sin( (im-ip) * PI / 2.0 );
+				Am[im] += aux * pow(x, ip) * pow(y, im-ip) * cos( (im-ip) * ModuleBase::PI / 2.0 );
+				Bm[im] += aux * pow(x, ip) * pow(y, im-ip) * sin( (im-ip) * ModuleBase::PI / 2.0 );
 
 				if(ip > 0)
 				{
-					Gx_Am[im] += aux * ip * pow(x, ip-1) * pow(y, im-ip) * cos( (im-ip) * PI / 2.0 );
-					Gx_Bm[im] += aux * ip * pow(x, ip-1) * pow(y, im-ip) * sin( (im-ip) * PI / 2.0 );
+					Gx_Am[im] += aux * ip * pow(x, ip-1) * pow(y, im-ip) * cos( (im-ip) * ModuleBase::PI / 2.0 );
+					Gx_Bm[im] += aux * ip * pow(x, ip-1) * pow(y, im-ip) * sin( (im-ip) * ModuleBase::PI / 2.0 );
 				}
 
 				if(ip < im)
 				{
-					Gy_Am[im] += aux * pow(x, ip) * (im - ip) * pow(y, im-ip-1) * cos( (im-ip) * PI / 2.0 );
-					Gy_Bm[im] += aux * pow(x, ip) * (im - ip) * pow(y, im-ip-1) * sin( (im-ip) * PI / 2.0 );
+					Gy_Am[im] += aux * pow(x, ip) * (im - ip) * pow(y, im-ip-1) * cos( (im-ip) * ModuleBase::PI / 2.0 );
+					Gy_Bm[im] += aux * pow(x, ip) * (im - ip) * pow(y, im-ip-1) * sin( (im-ip) * ModuleBase::PI / 2.0 );
 				}
 			}
 		}
@@ -1477,7 +1483,7 @@ void Ylm::rlylm
 	int ic = 0;
 	for(int il = 0; il <= MaxL; il++)
 	{
-		double fac = sqrt( (2.0 * il + 1.0) / FOUR_PI );
+		double fac = sqrt( (2.0 * il + 1.0) / ModuleBase::FOUR_PI );
 			
 		//m=0
 		rly[ic] = Am[0] * zdep[il][0] * fac;
@@ -1514,7 +1520,7 @@ void Ylm::rlylm
 
 void Ylm::test(void)
 {
-	Vector3<double> R(0.0, 0.0, 1.0);
+	ModuleBase::Vector3<double> R(0.0, 0.0, 1.0);
 	
 	double r,r2,r3,r4,r5,r6,r7;
 	r = R.norm();
@@ -1531,11 +1537,11 @@ void Ylm::test(void)
 
 	double rly[64];
 	double grly[64][3];
-//	cout << R.x << " " << R.y << " " << R.z << endl;
+//	std::cout << R.x << " " << R.y << " " << R.z << std::endl;
 	get_ylm_real(8, R, ylm, dylmdr);
 	rlylm(8, R.x, R.y, R.z, rly, grly);
 	
-//	cout << R.x << " " << R.y << " " << R.z << endl;
+//	std::cout << R.x << " " << R.y << " " << R.z << std::endl;
 	for(int i = 0; i < 64; i++)
 	{
 		if(i >= 1 && i <= 3)
@@ -1593,7 +1599,7 @@ void Ylm::test(void)
 			ylm[i] *= pow(R.norm(), 7);
 		}
 		
-		cout << grly[i][0] << setw(20) << grly[i][1] << setw(20) << grly[i][2] << endl;
+		std::cout << grly[i][0] << std::setw(20) << grly[i][1] << std::setw(20) << grly[i][2] << std::endl;
 	}
 
 	return;
@@ -1642,4 +1648,6 @@ double Ylm::sgn(const double x)
 	if(x < 0.0) return -1.0;
 	if(x > 0.0) return 1.0;
 	return 0.0;
+}
+
 }

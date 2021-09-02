@@ -4,7 +4,7 @@
 #include "../src_pw/tools.h"
 #include "../src_parallel/parallel_orbitals.h"
 
-class LCAO_Matrix 
+class LCAO_Matrix
 {
 	friend class energy;
 	friend class Mulliken_Charge;
@@ -17,7 +17,7 @@ class LCAO_Matrix
 	void divide_HS_in_frag(const bool isGamma, Parallel_Orbitals &po);
 
 	private:
-	
+
 	void allocate_HS_gamma(const long &nloc);
 
 	void allocate_HS_k(const long &nloc);
@@ -25,7 +25,7 @@ class LCAO_Matrix
 
 	public:
 	//------------------------------
-	// H, S, Hfixed 
+	// H, S, Hfixed
 	// used in gamma only algorithm.
 	// thse matrix are used to
 	// diagonalize.
@@ -34,7 +34,7 @@ class LCAO_Matrix
 	double* Sloc;
 	double* Hloc_fixed;
 	double* Sdiag; // used in pdiag_double.cpp
-	
+
 	//------------------------------
 	// 1. Hamiltonian(vl),
 	// 2. overlap matrix Sloc2
@@ -43,15 +43,15 @@ class LCAO_Matrix
 	// these matrix are used to
 	// diagonalize.
 	//------------------------------
-	complex<double> *Hloc2;
-	complex<double> *Sloc2;
-	complex<double> *Hloc_fixed2;
-	complex<double> *Sdiag2; // used in pdiag_double.cpp
+	std::complex<double> *Hloc2;
+	std::complex<double> *Sloc2;
+	std::complex<double> *Hloc_fixed2;
+	std::complex<double> *Sdiag2; // used in pdiag_double.cpp
 	//with soc, zhengdy-soc
-/*	ComplexMatrix Hloc2_soc;
-	ComplexMatrix Sloc2_soc;
-	ComplexMatrix Hloc_fixed2_soc;
-	ComplexMatrix Sdiag2_soc;*/
+/*	ModuleBase::ComplexMatrix Hloc2_soc;
+	ModuleBase::ComplexMatrix Sloc2_soc;
+	ModuleBase::ComplexMatrix Hloc_fixed2_soc;
+	ModuleBase::ComplexMatrix Sdiag2_soc;*/
 
 
 	//------------------------------
@@ -61,7 +61,7 @@ class LCAO_Matrix
 	// these matrixed are used
 	// for 'folding_matrix' in lcao_nnr,
 	// HlocR -> Hloc2,
-	// SlocR -> Sloc2, 
+	// SlocR -> Sloc2,
 	//------------------------------
 	double* HlocR;
 	double* SlocR;
@@ -77,16 +77,17 @@ class LCAO_Matrix
 	double ****SlocR_tr;
 	double ****HR_tr;
 
+
 	complex<double> ****Hloc_fixedR_tr_soc;
 	complex<double> ****SlocR_tr_soc;
-	complex<double> ****HR_tr_soc;	
+	complex<double> ****HR_tr_soc;
 
 	// jingan add 2021-6-4
 	// Sparse form of HR and SR, the format is [R_x][R_y][R_z][orbit_row][orbit_col]
-	map<size_t, map<size_t, double>> ***HR_sparse;
-	map<size_t, map<size_t, double>> ***SR_sparse;
-	map<size_t, map<size_t, complex<double>>> ***HR_soc_sparse;
-	map<size_t, map<size_t, complex<double>>> ***SR_soc_sparse;
+	std::map<size_t, std::map<size_t, double>> ***HR_sparse;
+	std::map<size_t, std::map<size_t, double>> ***SR_sparse;
+	std::map<size_t, std::map<size_t, std::complex<double>>> ***HR_soc_sparse;
+	std::map<size_t, std::map<size_t, std::complex<double>>> ***SR_soc_sparse;
 
 
 	//========================================
@@ -113,7 +114,7 @@ class LCAO_Matrix
 	// dT + part of dVNL
 	// used in gamma only algorithm.
 	//-----------------------------------------
-	double* DHloc_fixed_x; 
+	double* DHloc_fixed_x;
 	double* DHloc_fixed_y;
 	double* DHloc_fixed_z;
 
@@ -128,7 +129,9 @@ class LCAO_Matrix
 	//----------------------------------------
 	// r_mu - r_nu
 	//----------------------------------------
-	double* DH_r;//zhengdy added 2017-07                        
+
+	double* DH_r;//zhengdy added 2017-07
+
 
 	double* stvnl11;
 	double* stvnl12;
@@ -151,69 +154,31 @@ class LCAO_Matrix
 	double* DHloc_fixed_23;
 	double* DHloc_fixed_33;
 
-	//------------------------------------------------------
-	// DESCRIPTION:
-	// set 'dtype' matrix element (iw1_all, iw2_all) with 
-	// an input value 'v'
-	//------------------------------------------------------
-	void set_HSgamma(
-		const int &iw1_all, 
-		const int &iw2_all, 
-		const double &v, 
-		const char &dtype);
 
-	void set_HSk(
-		const int &iw1_all, 
-		const int &iw2_all, 
-		const complex<double> &v, 
-		const char &dtype, 
-		const int spin = 0);
+	void set_HSgamma(const int &iw1_all, const int &iw2_all, const double &v, const char &dtype);
+	void set_HSk(const int &iw1_all, const int &iw2_all, const std::complex<double> &v, const char &dtype, const int spin = 0);
 
-	void set_force (
-		const int& iw1_all, 
-		const int& iw2_all, 
-		const double& vx, 
-		const double& vy, 
-		const double& vz, 
-		const char &dtype);
+	void set_force (const int& iw1_all, const int& iw2_all, const double& vx, const double& vy, 
+		const double& vz, const char &dtype);
+	void set_stress (const int& iw1_all, const int& iw2_all, const double& vx, const double& vy,
+		const double& vz, const char &dtype, const ModuleBase::Vector3<double> &dtau);
 
-	void set_stress (
-		const int& iw1_all, 
-		const int& iw2_all, 
-		const double& vx, 
-		const double& vy,
-		const double& vz, 
-		const char &dtype, 
-		const Vector3<double> &dtau);
-
-	void set_HR_tr(
-		const int &Rx, 
-		const int &Ry, 
-		const int &Rz, 
-		const int &iw1_all, 
-		const int &iw2_all, 
-		const double &v);
-
-	void set_HR_tr_soc(
-		const int &Rx, 
-		const int &Ry, 
-		const int &Rz, 
-		const int &iw1_all, 
-		const int &iw2_all, 
-		const complex<double> &v); //LiuXh add 2019-07-16
+	void set_HR_tr(const int &Rx, const int &Ry, const int &Rz, const int &iw1_all, const int &iw2_all, const double &v);
+	void set_HR_tr_soc(const int &Rx, const int &Ry, const int &Rz, 
+		const int &iw1_all, const int &iw2_all, const std::complex<double> &v); //LiuXh add 2019-07-16
 
 	void zeros_HSgamma(const char &mtype);
 	void zeros_HSk(const char &mtype);
 	void zeros_HSR(const char &mtype, const int &nnr);
 
-	void print_HSgamma(const char &mtype, ostream &os=cout);
-	void print_HSk(const char &mtype, const char &vtype = 'C', const double &accuracy = 1.0e-5, ostream &os=cout);
+	void print_HSgamma(const char &mtype, std::ostream &os=std::cout);
+	void print_HSk(const char &mtype, const char &vtype = 'C', const double &accuracy = 1.0e-5, std::ostream &os=std::cout);
 	void update_Hloc(void);
 	void update_Hloc2(void);
 
 	void allocate_HS_R(const int &nnr);
 
-	void output_HSk(const char &mtype, string &fn);
+	void output_HSk(const char &mtype, std::string &fn);
 	//LiuXh add 2019-07-15
 	void allocate_Hloc_fixedR_tr(void);
 	void allocate_HR_tr(void);

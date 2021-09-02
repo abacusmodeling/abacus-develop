@@ -1,26 +1,28 @@
 #include "math_polyint.h"
 #include "timer.h"
+namespace ModuleBase
+{
 
 void PolyInt::Polynomial_Interpolation
 (
-    const realArray &table,
+    const ModuleBase::realArray &table,
     const int &dim1,
     const int &dim2,
-    realArray &y,
+    ModuleBase::realArray &y,
     const int &dim_y,
     const int &table_length,
     const double &table_interval,
     const double &x				// input value
 )
 {
-    timer::tick("PolyInt","Poly_Interpo_1");
+    ModuleBase::timer::tick("PolyInt","Poly_Interpo_1");
     assert(table_interval>0.0);
     const double position = x / table_interval;
     const int iq = static_cast<int>(position);
 	if(iq>=table_length-4)
 	{
-		cout << "\n x = " << x;
-		cout << "\n iq = " << iq << " table_length = " << table_length << endl;
+		std::cout << "\n x = " << x;
+		std::cout << "\n iq = " << iq << " table_length = " << table_length << std::endl;
 	}	
     assert(iq < table_length-4);
 
@@ -34,13 +36,13 @@ void PolyInt::Polynomial_Interpolation
         table(dim1, dim2, iq+2) * x1 * x0 * x3 / 2.0 +
         table(dim1, dim2, iq+3) * x1 * x2 * x0 / 6.0 ;
 
-    timer::tick("PolyInt","Poly_Interpo_1");
+    ModuleBase::timer::tick("PolyInt","Poly_Interpo_1");
     return;
 }
 
 double PolyInt::Polynomial_Interpolation
 (
-    const realArray &table,
+    const ModuleBase::realArray &table,
     const int &dim1,
     const int &dim2,
     const int &table_length,
@@ -48,18 +50,18 @@ double PolyInt::Polynomial_Interpolation
     const double &x				// input value
 )
 {
-//	timer::tick("PolyInt","Poly_Interpo_2");
+//	ModuleBase::timer::tick("PolyInt","Poly_Interpo_2");
     assert(table_interval>0.0);
     const double position = x / table_interval;
     const int iq = static_cast<int>(position);
     
 	if(iq>table_length-4)
 	{
-		cout << "\n x = " << x;
-		cout << "\n table_interval = " << table_interval;
-		cout << "\n iq=" << iq << " table_length = " << table_length << endl;
-        cout << "\n Not enough space allocated for radial FFT: try restarting with a larger cell_factor" << endl; //LiuXh add 20180619
-        //cout << "\n Now cell_factor is: " << ppcell.cell_factor << endl; //LiuXh add 20180619
+		std::cout << "\n x = " << x;
+		std::cout << "\n table_interval = " << table_interval;
+		std::cout << "\n iq=" << iq << " table_length = " << table_length << std::endl;
+        std::cout << "\n Not enough space allocated for radial FFT: try restarting with a larger cell_factor" << std::endl; //LiuXh add 20180619
+        //std::cout << "\n Now cell_factor is: " << GlobalC::ppcell.cell_factor << std::endl; //LiuXh add 20180619
 		// mohan comment out 2021-05-06
 	}
 
@@ -74,13 +76,13 @@ double PolyInt::Polynomial_Interpolation
         table(dim1, dim2, iq+2) * x1 * x0 * x3 / 2.0 +
         table(dim1, dim2, iq+3) * x1 * x2 * x0 / 6.0 ;
 
-//	timer::tick("PolyInt","Poly_Interpo_2");
+//	ModuleBase::timer::tick("PolyInt","Poly_Interpo_2");
     return y;
 }
 
 double PolyInt::Polynomial_Interpolation            // pengfei Li 2018-3-23
 (
-    const realArray &table,
+    const ModuleBase::realArray &table,
     const int &dim1,
     const int &dim2,
 	const int &dim3,
@@ -89,16 +91,16 @@ double PolyInt::Polynomial_Interpolation            // pengfei Li 2018-3-23
     const double &x				// input value
 )
 {
-//	timer::tick("PolyInt","Poly_Interpo_3");
+//	ModuleBase::timer::tick("PolyInt","Poly_Interpo_3");
     assert(table_interval>0.0);
     const double position = x / table_interval;
     const int iq = static_cast<int>(position);
     
 	if(iq>table_length-4)
 	{
-		cout << "\n x = " << x;
-		cout << "\n table_interval = " << table_interval;
-		cout << "\n iq=" << iq << " table_length = " << table_length << endl;
+		std::cout << "\n x = " << x;
+		std::cout << "\n table_interval = " << table_interval;
+		std::cout << "\n iq=" << iq << " table_length = " << table_length << std::endl;
 	}
 	assert(iq < table_length-4);
     const double x0 = position - static_cast<double>(iq);
@@ -111,7 +113,7 @@ double PolyInt::Polynomial_Interpolation            // pengfei Li 2018-3-23
         table(dim1, dim2, dim3, iq+2) * x1 * x0 * x3 / 2.0 +
         table(dim1, dim2, dim3, iq+3) * x1 * x2 * x0 / 6.0 ;
 
-//	timer::tick("PolyInt","Poly_Interpo_3");
+//	ModuleBase::timer::tick("PolyInt","Poly_Interpo_3");
     return y;
 }
 
@@ -127,7 +129,7 @@ double PolyInt::Polynomial_Interpolation
     const double position = x / table_interval;
     const int iq = static_cast<int>(position);
 //	if(iq >= table_length-4)
-//		cout << "\n iq = " << iq << " table_length = " << table_length;
+//		std::cout << "\n iq = " << iq << " table_length = " << table_length;
   
    assert(iq < table_length-4);
     const double x0 = position - static_cast<double>(iq);
@@ -161,7 +163,7 @@ double PolyInt::Polynomial_Interpolation_xy
     {
         return ypoint[0];
     }
-    // timer::tick("PolyInt","Poly_Inter_xy");
+    // ModuleBase::timer::tick("PolyInt","Poly_Inter_xy");
 
     for (int ik = 0; ik < table_length; ik++)
     {
@@ -219,12 +221,14 @@ double PolyInt::Polynomial_Interpolation_xy
         part5 = dx1 * dx2 * dx3 * dx4 * dx6 / (-x15) / (-x25) / (-x35) / (-x45) / x56 * ypoint[position+4];
         part6 = dx1 * dx2 * dx3 * dx4 * dx5 / (-x16) / (-x26) / (-x36) / (-x46) / (-x56) * ypoint[position+5];
 
-        // 	timer::tick("PolyInt","Poly_Inter_xy");
+        // 	ModuleBase::timer::tick("PolyInt","Poly_Inter_xy");
         return part1 + part2 + part3 + part4 + part5 + part6;
     }
     else
     {
-        // 	timer::tick("PolyInt","Poly_Inter_xy");
+        // 	ModuleBase::timer::tick("PolyInt","Poly_Inter_xy");
         return ypoint[position];
     }
+}
+
 }

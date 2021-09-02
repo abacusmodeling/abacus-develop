@@ -66,7 +66,8 @@ void XC_Functional::xc(const double &rho, double &ex, double &ec, double &vx, do
 	// "psx"    PBEsol exchange                igcx =10
 	// "wcx"    Wu-Cohen                       igcx =11
 	// "hsex"   HSE06                          igcx =12
-
+	// "scan"	SCAN						   igcx =13
+	
 	// Gradient Correction on Correlation:
 	// "nogc"   none                           igcc =0 (default)
 	// "p86"    Perdew86                       igcc =1
@@ -77,6 +78,7 @@ void XC_Functional::xc(const double &rho, double &ex, double &ec, double &vx, do
 	// "meta"   TPSS meta-gga                  igcc =6
 	// "b3lp"   B3LYP (Lee-Yang-Parr*0.81)     igcc =7
 	// "psc"    PBEsol corr                    igcc =8
+	// "scan"   SCAN						   igcx =9
 
 	// Special cases (dft_shortname):
 	// "bp"    = "b88+p86"           = Becke-Perdew grad.corr.
@@ -117,9 +119,9 @@ void XC_Functional::xc(const double &rho, double &ex, double &ec, double &vx, do
 	//				pbesol	J.P. Perdew et al., PRL 100, 136406 (2008)
 	//				wc		Z. Wu and R. E. Cohen, PRB 73, 235116 (2006)
 	//              hse     Paier J, Marsman M, Hummer K, et al, JPC 124(15): 154709 (2006)
-	//cout << " " << xcf.iexch_now << " " << xcf.icorr_now << " " << xcf.igcx_now << " " << xcf.igcc_now << endl;
+	//std::cout << " " << GlobalC::xcf.iexch_now << " " << GlobalC::xcf.icorr_now << " " << GlobalC::xcf.igcx_now << " " << GlobalC::xcf.igcc_now << std::endl;
 
-	switch(xcf.iexch_now)
+	switch(GlobalC::xcf.iexch_now)
 	{
 		case 1:
 			XC_Functional::slater(rs, ex, vx);break;
@@ -133,13 +135,13 @@ void XC_Functional::xc(const double &rho, double &ex, double &ec, double &vx, do
 			vx = 0.75 * vx;
 			break;
 		case 9:
-			throw domain_error("HSE unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::domain_error("HSE unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 			break;
 		default:
 			ex = vx = 0.0;
 	}
 	
-	switch(xcf.icorr_now)
+	switch(GlobalC::xcf.icorr_now)
 	{
 		case 1:
 			XC_Functional::pz(rs, 0, ec, vc);break;
@@ -184,10 +186,10 @@ void XC_Functional::xc_spin(const double &rho, const double &zeta,
 
 	const double rs = pi34 / pow(rho, third);//wigner_sitz_radius;
 
-//	cout << " xcf.iexch_now=" << xcf.iexch_now << endl;
-//	cout << " xcf.icorr_now=" << xcf.icorr_now << endl;
+//	std::cout << " GlobalC::xcf.iexch_now=" << GlobalC::xcf.iexch_now << std::endl;
+//	std::cout << " GlobalC::xcf.icorr_now=" << GlobalC::xcf.icorr_now << std::endl;
 
-	switch(xcf.iexch_now)
+	switch(GlobalC::xcf.iexch_now)
 	{
 		case 1:
 			XC_Functional::slater_spin(rho, zeta, ex, vxup, vxdw);	break;
@@ -202,12 +204,12 @@ void XC_Functional::xc_spin(const double &rho, const double &zeta,
 			vxdw = 0.75 * vxdw;
 			break;
 		case 9:
-			throw domain_error("HSE unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	break;
+			throw std::domain_error("HSE unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));	break;
 		default:
 			ex = vxup = vxdw =0.0;
 	}
 
-	switch(xcf.icorr_now)
+	switch(GlobalC::xcf.icorr_now)
 	{
 		case 0:
 		ec = vcup = vcdw = 0.0; break;
@@ -216,7 +218,7 @@ void XC_Functional::xc_spin(const double &rho, const double &zeta,
 		case 4: //mohan fix bug 2012-05-28, case 2 to 4.
 		XC_Functional::pw_spin(rs, zeta, ec, vcup, vcdw); break;
 		default:
-		WARNING_QUIT("XC_Functional::xc_spin", "xcf.icorr_now wrong!");
+		ModuleBase::WARNING_QUIT("XC_Functional::xc_spin", "GlobalC::xcf.icorr_now wrong!");
 	}
 
 	return;
@@ -367,7 +369,7 @@ void XC_Functional::slater_rxc_spin( const double &rho, const double &z,
 //iflag=1: G. Ortiz and P. Ballone, PRB 50, 1391 (1994)
 void XC_Functional::pz(const double &rs, const int &iflag, double &ec, double &vc)
 {
-//	TITLE("XC_Functional","pz");
+//	ModuleBase::TITLE("XC_Functional","pz");
 	const double a[2] = {0.0311, 0.031091};
     const double b[2] = { -0.048, -0.046644 };
     const double c[2] = { 0.0020, 0.00419 };
@@ -402,7 +404,7 @@ void XC_Functional::pz(const double &rs, const int &iflag, double &ec, double &v
 void XC_Functional::pz_spin( const double &rs, const double &zeta, 
 	double &ec, double &vcup, double &vcdw)
 {
-//	TITLE("XC_Functional","pz_spin");
+//	ModuleBase::TITLE("XC_Functional","pz_spin");
 	double ecu, vcu, ecp, vcp ;
     static const double p43 = 4.00 / 3.0;
     static const double third = 1.0 / 3.0;
@@ -432,7 +434,7 @@ void XC_Functional::pz_spin( const double &rs, const double &zeta,
 // J.P. Perdew and A. Zunger, PRB 23, 5048 (1981)
 void XC_Functional::pz_polarized( const double &rs, double &ec, double &vc)
 {
-//	TITLE("XC_Functional","pz_polarized");
+//	ModuleBase::TITLE("XC_Functional","pz_polarized");
 	static const double a = 0.015550;
 	static const double b = -0.02690;
 	static const double c = 0.00070;
@@ -729,7 +731,7 @@ double &sx, double &v1x, double &v2x)
     
 	// numerical coefficients (NB: c2=(3 pi^2)^(1/3) )
     const double third = 1.0 / 3.0;
-    const double c1 = 0.750 / PI;
+    const double c1 = 0.750 / ModuleBase::PI;
     const double c2 = 3.0936677262801360;
     const double c5 = 4.0 * third;
     // parameters of the functional
@@ -807,6 +809,115 @@ void XC_Functional::pbec(const double &rho, const double &grho, const int &iflag
 	return;
 }
 
+//tau_xc and tau_xc_spin: interface for calling xc_mgga_exc_vxc from LIBXC
+//XC_POLARIZED, XC_UNPOLARIZED: internal flags used in LIBXC, denote the polarized(nspin=1) or unpolarized(nspin=2) calculations, definition can be found in xc.h from LIBXC
+#ifdef USE_LIBXC
+void XC_Functional::tau_xc(const double &rho, const double &grho, const double &atau, double &sx, double &sc,
+          double &v1x, double &v2x, double &v3x, double &v1c, double &v2c, double &v3c)
+{
+
+	double lapl_rho, vlapl_rho;
+	int func_id;
+    lapl_rho = grho;
+	
+//initialize X and C functionals
+	xc_func_type x_func;
+	xc_func_type c_func;
+	const int xc_polarized = XC_UNPOLARIZED;
+
+//exchange
+    if (GlobalC::xcf.igcx_now == 13)
+	{
+		xc_func_init(&x_func, 263 ,xc_polarized);
+		xc_mgga_exc_vxc(&x_func,1,&rho,&grho,&lapl_rho,&atau,&sx,&v1x,&v2x,&vlapl_rho,&v3x);
+		xc_func_end(&x_func);
+		sx = sx * rho;
+		v2x = v2x * 2.0;
+	}
+	else
+	{
+		ModuleBase::WARNING_QUIT("tau_xc","functional not implemented yet");
+	}
+
+//correlation
+	if(GlobalC::xcf.igcc_now == 9)
+	{
+		xc_func_init(&c_func, 267 ,xc_polarized);
+		xc_mgga_exc_vxc(&c_func,1,&rho,&grho,&lapl_rho,&atau,&sc,&v1c,&v2c,&vlapl_rho,&v3c);
+		xc_func_end(&c_func);
+		sc = sc * rho;
+		v2c = v2c * 2.0;
+	}
+	else
+	{
+		ModuleBase::WARNING_QUIT("tau_xc","functional not implemented yet");
+	}
+	return;
+}
+
+void XC_Functional::tau_xc_spin(const double &rhoup, const double &rhodw, const ModuleBase::Vector3<double> &grhoup, const ModuleBase::Vector3<double> &grhodw, const double &tauup, const double &taudw, double &sx, double &sc,
+          double &v1xup, double &v1xdw, double &v2xup, double &v2xdw, double &v3xup, double &v3xdw, double &v1cup, double &v1cdw, ModuleBase::Vector3<double> &v2cup, ModuleBase::Vector3<double> &v2cdw, double &v3cup, double &v3cdw)
+{
+//initialize X and C functionals
+	xc_func_type x_func;
+	xc_func_type c_func;
+	const int xc_polarized = XC_POLARIZED;
+
+	vector<double> rho, grho2, tau, v1x, v2x, v3x;
+	vector<double> v1c, v2c, v3c, lapl_rho, vlapl_rho;
+
+	rho.resize(2); grho2.resize(3); tau.resize(2);
+	v1x.resize(2); v2x.resize(3); v3x.resize(2);
+	v1c.resize(3); v2c.resize(3); v3c.resize(2);
+	lapl_rho.resize(6); vlapl_rho.resize(6);
+
+	rho[0]=rhoup; rho[1]=rhodw;
+	grho2[0]=grhoup*grhoup; grho2[1]=grhoup*grhodw; grho2[2]=grhodw*grhodw;
+	tau[0]=tauup; tau[1]=taudw;
+
+//exchange
+    if (GlobalC::xcf.igcx_now == 13)
+	{
+		xc_func_init(&x_func, 263 ,xc_polarized);
+		xc_mgga_exc_vxc(&x_func,1,rho.data(),grho2.data(),lapl_rho.data(),tau.data(),&sx,v1x.data(),v2x.data(),vlapl_rho.data(),v3x.data());
+		xc_func_end(&x_func);
+	}
+	else
+	{
+		ModuleBase::WARNING_QUIT("tau_xc_spin","functional not implemented yet");
+	}
+
+//correlation
+	if(GlobalC::xcf.igcc_now == 9)
+	{
+		xc_func_init(&c_func, 267 ,xc_polarized);
+		xc_mgga_exc_vxc(&c_func,1,rho.data(),grho2.data(),lapl_rho.data(),tau.data(),&sc,v1c.data(),v2c.data(),vlapl_rho.data(),v3c.data());
+		xc_func_end(&c_func);
+	}
+	else
+	{
+		ModuleBase::WARNING_QUIT("tau_xc_spin","functional not implemented yet");
+	}
+
+	sx = sx * (rho[0]+rho[1]);
+	v1xup = v1x[0];
+	v2xup = v2x[0] * 2.0;
+	v3xup = v3x[0];
+	v1xdw = v1x[1];
+	v2xdw = v2x[2] * 2.0;
+	v3xdw = v3x[1];
+
+	sc = sc * (rho[0]+rho[1]);
+	v1cup = v1c[0];
+	v3cup = v3c[0];
+	v1cdw = v1c[1];
+	v3cdw = v3c[1];
+
+	v2cup = v2c[0]*grhoup*2.0 + v2c[1]*grhodw;
+	v2cdw = v2c[2]*grhodw*2.0 + v2c[1]*grhoup;
+	return;
+}
+#endif
 
 void XC_Functional::gcxc(const double &rho, const double &grho, double &sx, double &sc,
           double &v1x, double &v2x, double &v1c, double &v2c)
@@ -842,54 +953,60 @@ void XC_Functional::gcxc(const double &rho, const double &grho, double &sx, doub
         v1x = 0.00;
         v2x = 0.00;
     }
-    else if (xcf.igcx_now == 1)
+    else if (GlobalC::xcf.igcx_now == 1)
     {
         XC_Functional::becke88(rho, grho, sx, v1x, v2x);
     }
-    else if (xcf.igcx_now == 2)
+    else if (GlobalC::xcf.igcx_now == 2)
     {
         XC_Functional::ggax(rho, grho, sx, v1x, v2x);
     }
-    else if (xcf.igcx_now == 3)
+    else if (GlobalC::xcf.igcx_now == 3)
     {
 		//mohan modify 2009-12-15
 		// 0 stands for PBE, 1 stands for revised PBE
         XC_Functional::pbex(rho, grho, 0, sx, v1x, v2x);
     }
-    else if (xcf.igcx_now == 4)
+    else if (GlobalC::xcf.igcx_now == 4)
     {
 		// revised PBE.
         XC_Functional::pbex(rho, grho, 1, sx, v1x, v2x);
     }
-    else if (xcf.igcx_now == 5 && xcf.igcc_now == 5)
+    else if (GlobalC::xcf.igcx_now == 5 && GlobalC::xcf.igcc_now == 5)
     {
         hcth(rho, grho, sx, v1x, v2x);
     }
-    else if (xcf.igcx_now == 6)
+    else if (GlobalC::xcf.igcx_now == 6)
     {
         optx(rho, grho, sx, v1x, v2x);
     }
-	else if (xcf.igcx_now == 8)
+	else if (GlobalC::xcf.igcx_now == 8)
 	{
 		XC_Functional::pbex (rho, grho, 0, sx, v1x, v2x);
 		sx *= 0.75;
 		v1x *= 0.75;
 		v2x *= 0.75;
 	}
-	else if (xcf.igcx_now == 10)
+	else if (GlobalC::xcf.igcx_now == 10)
 	{
 		// PBESOL
 		XC_Functional::pbex(rho, grho, 2, sx, v1x, v2x);
 	}
-	else if (xcf.igcx_now == 11)
+	else if (GlobalC::xcf.igcx_now == 11)
 	{
 		// wu cohen
 		XC_Functional::wcx (rho, grho, sx, v1x, v2x);
 	}
-	else if (xcf.igcx_now == 12)
+	else if (GlobalC::xcf.igcx_now == 12)
 	{
 		// HSE
-		throw domain_error("HSE unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		throw std::domain_error("HSE unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+	}
+	else if (GlobalC::xcf.igcx_now == 13)
+	{
+		//SCAN
+		cout << "to use SCAN, please link LIBXC" << endl;
+		throw domain_error("Check "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
     else
     {
@@ -898,8 +1015,8 @@ void XC_Functional::gcxc(const double &rho, const double &grho, double &sx, doub
         v2x = 0.00;
     } // endif
 
-	//cout << "\n igcx = " << xcf.igcx_now;
-	//cout << "\n igcc = " << xcf.igcc_now << endl;
+	//std::cout << "\n igcx = " << GlobalC::xcf.igcx_now;
+	//std::cout << "\n igcc = " << GlobalC::xcf.igcc_now << std::endl;
 
      // correlation
     if (rho <= small)
@@ -908,26 +1025,32 @@ void XC_Functional::gcxc(const double &rho, const double &grho, double &sx, doub
         v1c = 0.00;
         v2c = 0.00;
     }
-    else if (xcf.igcc_now == 1)
+    else if (GlobalC::xcf.igcc_now == 1)
     {
         perdew86(rho, grho, sc, v1c, v2c);
     }
-    else if (xcf.igcc_now == 2)
+    else if (GlobalC::xcf.igcc_now == 2)
     {
         XC_Functional::ggac(rho, grho, sc, v1c, v2c);
     }
-    else if (xcf.igcc_now == 3)
+    else if (GlobalC::xcf.igcc_now == 3)
     {
         XC_Functional::glyp(rho, grho, sc, v1c, v2c);
     }
-    else if (xcf.igcc_now == 4)
+    else if (GlobalC::xcf.igcc_now == 4)
     {
         XC_Functional::pbec(rho, grho, 0, sc, v1c, v2c);
     }
-	else if (xcf.igcc_now == 8)
+	else if (GlobalC::xcf.igcc_now == 8)
 	{
 		// PBESOL
 		XC_Functional::pbec(rho, grho, 1, sc, v1c, v2c);
+	}
+	else if (GlobalC::xcf.igcc_now == 9)
+	{
+		//SCAN
+		cout << "to use SCAN, please link LIBXC" << endl;
+		throw domain_error("Check "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
     else
     {
@@ -1067,7 +1190,7 @@ void XC_Functional::wcx(const double &rho,const double &grho, double &sx, double
   double third, c1, c2, c5, teneightyone;	// c6
   
   third = 1.0/3.0;
-  c1 = 0.75/PI;
+  c1 = 0.75/ModuleBase::PI;
   c2 = 3.093667726280136;
   c5 = 4.0 * third;
   teneightyone = 0.123456790123;

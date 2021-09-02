@@ -18,11 +18,11 @@ Local_Orbital_wfc::~Local_Orbital_wfc()
 	// used for force
 	if(allocate_aug_flag)
 	{
-		if(GAMMA_ONLY_LOCAL)
+		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			for(int is=0; is<NSPIN; is++)
+			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
-				for(int i=0; i<NBANDS; i++) 
+				for(int i=0; i<GlobalV::NBANDS; i++) 
 				{
 					delete[] this->WFC_GAMMA_aug[is][i];
 				}
@@ -33,9 +33,9 @@ Local_Orbital_wfc::~Local_Orbital_wfc()
 		//mohan add 2012-01-09
 		else
 		{
-			for(int ik=0; ik<kv.nks; ++ik)
+			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 			{
-				for(int ib=0; ib<NBANDS; ++ib)
+				for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 				{
 					delete[] this->WFC_K_aug[ik][ib];
 				}
@@ -48,21 +48,21 @@ Local_Orbital_wfc::~Local_Orbital_wfc()
 	// used for k-points.
 	if(complex_flag && this->wfck_flag)
 	{
-		for(int i=0; i<kv.nks; i++)
+		for(int i=0; i<GlobalC::kv.nks; i++)
 		{
-			//for(int j=0; j<NBANDS; j++)
+			//for(int j=0; j<GlobalV::NBANDS; j++)
 			//{
 			//	delete[] this->WFC_K[i][j];
 			//}
 			delete[] this->WFC_K[i];
-			//cout<<"delete WFC_K["<<i<<"] success"<<endl;
+			//std::cout<<"delete WFC_K["<<i<<"] success"<<std::endl;
 		}
 		delete[] this->WFC_K;
-		//cout<<"delete WFC_K success"<<endl;
-		if(NLOCAL!= 0 )
+		//std::cout<<"delete WFC_K success"<<std::endl;
+		if(GlobalV::NLOCAL!= 0 )
 		{
 			delete[] this->WFC_K_POOL;
-			//cout<<"delete WFC_K_POOL success"<<endl;
+			//std::cout<<"delete WFC_K_POOL success"<<std::endl;
 		}
 	}
 
@@ -70,20 +70,20 @@ Local_Orbital_wfc::~Local_Orbital_wfc()
 
 void Local_Orbital_wfc::allocate_k(const Grid_Technique &gt)
 {
-	TITLE("Local_Orbital_wfc","allocate_k");
-	if(NLOCAL < NBANDS)
+	ModuleBase::TITLE("Local_Orbital_wfc","allocate_k");
+	if(GlobalV::NLOCAL < GlobalV::NBANDS)
 	{
-		WARNING_QUIT("Local_Orbital_wfc::allocate","NLOCAL<NBANDS");
+		ModuleBase::WARNING_QUIT("Local_Orbital_wfc::allocate","NLOCAL<NBANDS");
 	}
 
 	// mohan add the flag 2011-03-02
 	// allocate the first part (only once!).
 	if(this->wfck_flag == false)
 	{
-		this->WFC_K = new complex<double>**[kv.nks];
-		for(int ik=0; ik<kv.nks; ik++)
+		this->WFC_K = new std::complex<double>**[GlobalC::kv.nks];
+		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
-			this->WFC_K[ik] = new complex<double>*[NBANDS];
+			this->WFC_K[ik] = new std::complex<double>*[GlobalV::NBANDS];
 		}
 		this->wfck_flag = true;
 	}
@@ -98,62 +98,62 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique &gt)
 	//if(gt.lgd != 0 && this->complex_flag == false)
 	if(gt.lgd != 0)
 	{
-		//cout<<"gt.lgd="<<gt.lgd<<" ; NLOCAL="<<NLOCAL<<endl; //delete 2015-09-06, xiaohui
-		const int page=NBANDS*gt.lgd;
-		this->WFC_K_POOL=new complex<double> [kv.nks*page];
-		ZEROS(WFC_K_POOL, kv.nks*page);
-		for(int ik=0; ik<kv.nks; ik++)
+		//std::cout<<"gt.lgd="<<gt.lgd<<" ; GlobalV::NLOCAL="<<GlobalV::NLOCAL<<std::endl; //delete 2015-09-06, xiaohui
+		const int page=GlobalV::NBANDS*gt.lgd;
+		this->WFC_K_POOL=new std::complex<double> [GlobalC::kv.nks*page];
+		ModuleBase::GlobalFunc::ZEROS(WFC_K_POOL, GlobalC::kv.nks*page);
+		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
-			for(int ib=0; ib<NBANDS; ib++)
+			for(int ib=0; ib<GlobalV::NBANDS; ib++)
 			{
 				this->WFC_K[ik][ib] = &WFC_K_POOL[ik*page+ib*gt.lgd];
-				//cout<<"ik="<<ik<<" ib="<<ib<<endl<<"WFC_K address: "<<WFC_K[ik][ib]<<" WFC_K_POOL address: "<<&WFC_K_POOL[ik*page+ib*gt.lgd]<<endl;
+				//std::cout<<"ik="<<ik<<" ib="<<ib<<std::endl<<"WFC_K address: "<<WFC_K[ik][ib]<<" WFC_K_POOL address: "<<&WFC_K_POOL[ik*page+ib*gt.lgd]<<std::endl;
 			}
-			//cout<<"set WFC_K pointer success, ik: "<<ik<<endl;
-			Memory::record("LocalOrbital_Coef","WFC_K",NBANDS*NLOCAL,"cdouble");
-			//OUT(ofs_running,"MemoryForWaveFunctions (MB)",mem);
-			//cout<<"WFC_K["<<ik<<"] use "<<mem<<" MB"<<endl;
+			//std::cout<<"set WFC_K pointer success, ik: "<<ik<<std::endl;
+			ModuleBase::Memory::record("LocalOrbital_Coef","WFC_K",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
+			//ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"MemoryForWaveFunctions (MB)",mem);
+			//std::cout<<"WFC_K["<<ik<<"] use "<<mem<<" MB"<<std::endl;
 			this->complex_flag = true;
 		}
 	}
 
-	if(wf.start_wfc == "atomic" )
+	if(GlobalC::wf.start_wfc == "atomic" )
 	{
 		
 	}
-	else if(wf.start_wfc == "file")
+	else if(GlobalC::wf.start_wfc == "file")
 	{
 		int error;
-		cout << " Read in wave functions files: " << kv.nkstot << endl;
-		for(int ik=0; ik<kv.nkstot; ++ik)
+		std::cout << " Read in wave functions files: " << GlobalC::kv.nkstot << std::endl;
+		for(int ik=0; ik<GlobalC::kv.nkstot; ++ik)
 		{
-			ofs_running << " Read in wave functions " << ik + 1 << endl;
-			error = WF_Local::read_lowf_complex( this->WFC_K[ik], ik );
+			GlobalV::ofs_running << " Read in wave functions " << ik + 1 << std::endl;
+			error = WF_Local::read_lowf_complex( this->WFC_K[ik], ik , 0);
 		}
 #ifdef __MPI
 		Parallel_Common::bcast_int(error);
 #endif
-		ofs_running << " Error=" << error << endl;
+		GlobalV::ofs_running << " Error=" << error << std::endl;
 		if(error==1)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: LOWF.dat");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: GlobalC::LOWF.dat");
 		}
 		else if(error==2)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","In wave function file, band number doesn't match");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In wave function file, band number doesn't match");
 		}
 		else if(error==3)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","In wave function file, nlocal doesn't match");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In wave function file, nlocal doesn't match");
 		}
 		else if(error==4)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","In k-dependent wave function file, k point is not correct");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In k-dependent wave function file, k point is not correct");
 		}
 	}
 	else
 	{
-		WARNING_QUIT("Local_Orbital_wfc","check the parameter: start_wfc");
+		ModuleBase::WARNING_QUIT("Local_Orbital_wfc","check the parameter: start_wfc");
 	}
 
 	return;
@@ -162,18 +162,18 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique &gt)
 
 void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
 {
-	TITLE("Local_Orbital_wfc","set_trace_aug");
-	timer::tick("Local_Orbital_wfc","set_trace_aug");
-	// this function must be called after ParaO.trace_loc_row
-	// , ParaO.trace_loc_col and GridT.trace_lo have been called.
+	ModuleBase::TITLE("Local_Orbital_wfc","set_trace_aug");
+	ModuleBase::timer::tick("Local_Orbital_wfc","set_trace_aug");
+	// this function must be called after GlobalC::ParaO.trace_loc_row
+	// , GlobalC::ParaO.trace_loc_col and GlobalC::GridT.trace_lo have been called.
 
-	if(OUT_LEVEL != "m") 
+	if(GlobalV::OUT_LEVEL != "m") 
 	{
-		ofs_running << "\n SETUP ARRAY FOR EXTRA WAVE FUNCTIONS" << endl;
+		GlobalV::ofs_running << "\n SETUP ARRAY FOR EXTRA WAVE FUNCTIONS" << std::endl;
 	}
 
-	bool* occ2d = new bool[NLOCAL];
-	for(int i=0; i<NLOCAL; i++)
+	bool* occ2d = new bool[GlobalV::NLOCAL];
+	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{
 		occ2d[i] = false;
 	}
@@ -183,10 +183,10 @@ void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
 	// because in some terms of force,
 	// we need to adapted to this. 
 	//------------------------------
-	for(int i=0; i<NLOCAL; i++)
+	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{
-		const int mu = ParaO.trace_loc_row[i];
-		const int nu = ParaO.trace_loc_col[i];
+		const int mu = GlobalC::ParaO.trace_loc_row[i];
+		const int nu = GlobalC::ParaO.trace_loc_col[i];
 		if(mu>=0 || nu>=0)
 		{
 			occ2d[i] = true;
@@ -198,8 +198,8 @@ void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
 	
 	//(2) global positions of elementes in c_aug
 	delete[] trace_aug;
-	trace_aug = new int[NLOCAL];
-	for(int i=0; i<NLOCAL; i++)
+	trace_aug = new int[GlobalV::NLOCAL];
+	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{
 		// this -1 is important.
 		trace_aug[i] = -1;
@@ -221,20 +221,20 @@ void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
 	static bool first = true;
 	if(first)
 	{
-		if(GAMMA_ONLY_LOCAL)
+		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			this->WFC_GAMMA_aug = new double**[NSPIN];
-			for(int is=0; is<NSPIN; ++is)
+			this->WFC_GAMMA_aug = new double**[GlobalV::NSPIN];
+			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{
-				this->WFC_GAMMA_aug[is] = new double*[NBANDS];
+				this->WFC_GAMMA_aug[is] = new double*[GlobalV::NBANDS];
 			}
 		}
 		else //mohan add 2012-01-08
 		{
-			this->WFC_K_aug = new complex<double>**[kv.nks];
-			for(int ik=0; ik<kv.nks; ++ik)
+			this->WFC_K_aug = new std::complex<double>**[GlobalC::kv.nks];
+			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 			{
-				this->WFC_K_aug[ik] = new complex<double>*[NBANDS];
+				this->WFC_K_aug[ik] = new std::complex<double>*[GlobalV::NBANDS];
 			}
 		}
 		first=false;
@@ -242,11 +242,11 @@ void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
 	
 	if(allocate_aug_flag)
 	{
-		if(GAMMA_ONLY_LOCAL)
+		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			for(int is=0; is<NSPIN; ++is)
+			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{
-				for(int i=0; i<NBANDS; ++i)
+				for(int i=0; i<GlobalV::NBANDS; ++i)
 				{
 					delete[] WFC_GAMMA_aug[is][i];
 				}
@@ -254,9 +254,9 @@ void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
 		}
 		else
 		{
-			for(int ik=0; ik<kv.nks; ++ik)
+			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 			{
-				for(int i=0; i<NBANDS; ++i)
+				for(int i=0; i<GlobalV::NBANDS; ++i)
 				{
 					delete[] WFC_K_aug[ik][i];
 				}
@@ -271,37 +271,37 @@ void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
     	// Create wave functions(Coefficients) in local basis.
     	// Same as evc in plane wave basis.
 		//------------------------------------------------------
-		if(GAMMA_ONLY_LOCAL)
+		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			for(int is=0; is<NSPIN; ++is)
+			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{	
-				for(int i=0; i<NBANDS; ++i)
+				for(int i=0; i<GlobalV::NBANDS; ++i)
 				{
 					this->WFC_GAMMA_aug[is][i] = new double[daug];
-					ZEROS(this->WFC_GAMMA_aug[is][i], daug);
+					ModuleBase::GlobalFunc::ZEROS(this->WFC_GAMMA_aug[is][i], daug);
 				}
 			}
-			Memory::record("LocalOrbital_Coef","WFC_GAMMA_aug",NSPIN*NBANDS*daug,"double");
+			ModuleBase::Memory::record("LocalOrbital_Coef","WFC_GAMMA_aug",GlobalV::NSPIN*GlobalV::NBANDS*daug,"double");
 		}
 		else // mohan add 2012-01-08
 		{
-			for(int ik=0; ik<kv.nks; ++ik)
+			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 			{
-				for(int i=0; i<NBANDS; ++i)
+				for(int i=0; i<GlobalV::NBANDS; ++i)
 				{
-					this->WFC_K_aug[ik][i] = new complex<double>[daug];
-					ZEROS(this->WFC_K_aug[ik][i], daug);
+					this->WFC_K_aug[ik][i] = new std::complex<double>[daug];
+					ModuleBase::GlobalFunc::ZEROS(this->WFC_K_aug[ik][i], daug);
 				}
 			}
 		}
 		allocate_aug_flag = true;
 	}
 
-	if(OUT_LEVEL != "m") 
+	if(GlobalV::OUT_LEVEL != "m") 
 	{
-		OUT(ofs_running,"daug",daug);
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"daug",daug);
 	}
 
-	timer::tick("Local_Orbital_wfc","set_trace_aug");
+	ModuleBase::timer::tick("Local_Orbital_wfc","set_trace_aug");
 	return; 
 }

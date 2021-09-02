@@ -14,8 +14,8 @@ void Hamilt::diagH_pw(
     const double *precondition,
     double &avg_iter)
 {
-	TITLE("Hamilt","diagH_pw");
-    timer::tick("Hamilt", "diagH_pw");
+	ModuleBase::TITLE("Hamilt","diagH_pw");
+    ModuleBase::timer::tick("Hamilt", "diagH_pw");
     double avg = 0.0;
 
 	// set ik0 because of mem_saver.
@@ -23,41 +23,41 @@ void Hamilt::diagH_pw(
 	// but if mem_saver is used, ik0=0.
 	int ik0 = ik;
 
-	if(CALCULATION=="nscf" && wf.mem_saver==1)
+	if(GlobalV::CALCULATION=="nscf" && GlobalC::wf.mem_saver==1)
 	{
-		if(BASIS_TYPE=="pw")
+		if(GlobalV::BASIS_TYPE=="pw")
 		{
 			// generate PAOs first, then diagonalize to get
 			// inital wavefunctions.
-			wf.diago_PAO_in_pw_k2(ik, wf.evc[0]);	
+			GlobalC::wf.diago_PAO_in_pw_k2(ik, GlobalC::wf.evc[0]);
 		}
 #ifdef __LCAO
-		else if(BASIS_TYPE=="lcao_in_pw")
+		else if(GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{
-			wf.LCAO_in_pw_k(ik, wf.wanf2[0]);
+			GlobalC::wf.LCAO_in_pw_k(ik, GlobalC::wf.wanf2[0]);
 		}
 #endif
 		ik0 = 0;
 	}
 
-    if(BASIS_TYPE=="lcao_in_pw")
+    if(GlobalV::BASIS_TYPE=="lcao_in_pw")
     {
-		if(KS_SOLVER=="lapack")
+		if(GlobalV::KS_SOLVER=="lapack")
 		{
-			assert(NLOCAL >= NBANDS);
+			assert(GlobalV::NLOCAL >= GlobalV::NBANDS);
         	this->diagH_subspace(
-				ik, 
-				NLOCAL, 
-				NBANDS, 
-				wf.wanf2[ik0], 
-				wf.evc[ik0], 
-				wf.ekb[ik]);
+				ik,
+				GlobalV::NLOCAL,
+				GlobalV::NBANDS,
+				GlobalC::wf.wanf2[ik0],
+				GlobalC::wf.evc[ik0],
+				GlobalC::wf.ekb[ik]);
 		}
 		else
 		{
-			ofs_warning << " The diago_type " << KS_SOLVER 
-				<< " not implemented yet." << endl; //xiaohui add 2013-09-02
-			WARNING_QUIT("Hamilt::diago","no implemt yet.");
+			GlobalV::ofs_warning << " The diago_type " << GlobalV::KS_SOLVER
+				<< " not implemented yet." << std::endl; //xiaohui add 2013-09-02
+			ModuleBase::WARNING_QUIT("Hamilt::diago","no implemt yet.");
 		}
     }
     else
@@ -65,37 +65,37 @@ void Hamilt::diagH_pw(
         int ntry = 0;
         int notconv = 0;
         do
-        {	
-	   		if(KS_SOLVER=="cg")
-            {			
+        {
+	   		if(GlobalV::KS_SOLVER=="cg")
+            {
 				// qian change it, because it has been executed in diago_PAO_in_pw_k2
                 if ( iter > 1 || istep > 1 ||  ntry > 0)
                 {
-                    this->diagH_subspace( 
+                    this->diagH_subspace(
 						ik,
-						NBANDS, 
-						NBANDS, 
-						wf.evc[ik0], 
-						wf.evc[ik0], 
-						wf.ekb[ik]);
+						GlobalV::NBANDS,
+						GlobalV::NBANDS,
+						GlobalC::wf.evc[ik0],
+						GlobalC::wf.evc[ik0],
+						GlobalC::wf.ekb[ik]);
 
                     avg_iter += 1.0;
                 }
                 Diago_CG cg;
-    	
+
 				bool reorder = true;
 
-				if(NPOL==1) 
+				if(GlobalV::NPOL==1)
 				{
-						cg.diag(wf.evc[ik0], wf.ekb[ik], kv.ngk[ik], wf.npwx,
-						NBANDS, precondition, ETHR,
-						DIAGO_CG_MAXITER, reorder, notconv, avg);
+						cg.diag(GlobalC::wf.evc[ik0], GlobalC::wf.ekb[ik], GlobalC::kv.ngk[ik], GlobalC::wf.npwx,
+						GlobalV::NBANDS, precondition, GlobalV::ETHR,
+						GlobalV::DIAGO_CG_MAXITER, reorder, notconv, avg);
 				}
 				else
 				{
-					cg.diag(wf.evc[ik0], wf.ekb[ik], wf.npwx*NPOL, wf.npwx*NPOL,
-						NBANDS, precondition, ETHR,
-						DIAGO_CG_MAXITER, reorder, notconv, avg);
+					cg.diag(GlobalC::wf.evc[ik0], GlobalC::wf.ekb[ik], GlobalC::wf.npwx*GlobalV::NPOL, GlobalC::wf.npwx*GlobalV::NPOL,
+						GlobalV::NBANDS, precondition, GlobalV::ETHR,
+						GlobalV::DIAGO_CG_MAXITER, reorder, notconv, avg);
 				}
 				// P.S. : nscf is the flag about reorder.
 				// if diagH_subspace is done once,
@@ -103,39 +103,39 @@ void Hamilt::diagH_pw(
 				// if diagH_subspace has not been called,
 				// we need to reorder the eigenvectors.
             }
-	   		else if(KS_SOLVER=="dav")
+	   		else if(GlobalV::KS_SOLVER=="dav")
         	{
 				Diago_David david;
-				if(NPOL==1) 
+				if(GlobalV::NPOL==1)
 				{
-					david.diag(wf.evc[ik0], wf.ekb[ik], kv.ngk[ik],
-						NBANDS, precondition, DIAGO_DAVID_NDIM,
-				 		ETHR, DIAGO_CG_MAXITER, notconv, avg);
+					david.diag(GlobalC::wf.evc[ik0], GlobalC::wf.ekb[ik], GlobalC::kv.ngk[ik],
+						GlobalV::NBANDS, precondition, GlobalV::DIAGO_DAVID_NDIM,
+				 		GlobalV::ETHR, GlobalV::DIAGO_CG_MAXITER, notconv, avg);
 				}
 				else
 				{
-					david.diag(wf.evc[ik0], wf.ekb[ik], wf.npwx*NPOL,
-						NBANDS, precondition, DIAGO_DAVID_NDIM,
-						ETHR, DIAGO_CG_MAXITER, notconv, avg);
+					david.diag(GlobalC::wf.evc[ik0], GlobalC::wf.ekb[ik], GlobalC::wf.npwx*GlobalV::NPOL,
+						GlobalV::NBANDS, precondition, GlobalV::DIAGO_DAVID_NDIM,
+						GlobalV::ETHR, GlobalV::DIAGO_CG_MAXITER, notconv, avg);
 				}
         	}
         	else
         	{
-				WARNING_QUIT("calculate_bands","Check KS_SOLVER !");
+				ModuleBase::WARNING_QUIT("calculate_bands","Check GlobalV::KS_SOLVER !");
         	}
             avg_iter += avg;
             ++ntry;
         }
         while ( this->test_exit_cond(ntry, notconv) );
 
-        if ( notconv > max(5, NBANDS/4) )
+        if ( notconv > max(5, GlobalV::NBANDS/4) )
         {
-            cout << "\n notconv = " << notconv;
-            cout << "\n Hamilt::diago', too many bands are not converged! \n";
+            std::cout << "\n notconv = " << notconv;
+            std::cout << "\n Hamilt::diago', too many bands are not converged! \n";
         }
     }
 
-	timer::tick("Hamilt","diagH_pw");
+	ModuleBase::timer::tick("Hamilt","diagH_pw");
     return;
 }
 
@@ -143,12 +143,12 @@ void Hamilt::diagH_pw(
 bool Hamilt::test_exit_cond(const int &ntry, const int &notconv)
 {
     //================================================================
-    // If this logical function is true, need to do diagH_subspace 
+    // If this logical function is true, need to do diagH_subspace
 	// and cg again.
     //================================================================
 
 	bool scf = true;
-	if(CALCULATION=="nscf") scf=false;
+	if(GlobalV::CALCULATION=="nscf") scf=false;
 
     // If ntry <=5, try to do it better, if ntry > 5, exit.
     const bool f1 = (ntry <= 5);
@@ -166,22 +166,22 @@ void Hamilt::diagH_subspace(
     const int ik,
     const int nstart,
     const int n_band,
-    const ComplexMatrix &psi,
-    ComplexMatrix &evc,
+    const ModuleBase::ComplexMatrix &psi,
+    ModuleBase::ComplexMatrix &evc,
     double *en)
 {
 	if(nstart < n_band)
 	{
-		WARNING_QUIT("diagH_subspace","nstart < n_band!");
+		ModuleBase::WARNING_QUIT("diagH_subspace","nstart < n_band!");
 	}
 
-    if(BASIS_TYPE=="pw" || BASIS_TYPE=="lcao_in_pw")
+    if(GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")
     {
         this->hpw.diagH_subspace(ik, nstart, n_band, psi, evc, en);
     }
     else
     {
-		WARNING_QUIT("diagH_subspace","Check parameters: BASIS_TYPE. ");
+		ModuleBase::WARNING_QUIT("diagH_subspace","Check parameters: GlobalV::BASIS_TYPE. ");
     }
     return;
 }
@@ -197,14 +197,14 @@ void Hamilt::diagH_subspace(
 void Hamilt::diagH_LAPACK(
 	const int nstart,
 	const int nbands,
-	const ComplexMatrix &hc,
-	const ComplexMatrix &sc,
+	const ModuleBase::ComplexMatrix &hc,
+	const ModuleBase::ComplexMatrix &sc,
 	const int ldh, // nstart
 	double *e,
-	ComplexMatrix &hvec)
+	ModuleBase::ComplexMatrix &hvec)
 {
-    TITLE("Hamilt","diagH_LAPACK");
-	timer::tick("Hamilt","diagH_LAPACK");
+    ModuleBase::TITLE("Hamilt","diagH_LAPACK");
+	ModuleBase::timer::tick("Hamilt","diagH_LAPACK");
 
     int lwork=0;
     //========================================
@@ -212,8 +212,8 @@ void Hamilt::diagH_LAPACK(
     // ILAENV returns optimal block size "nb"
     //========================================
 
-    ComplexMatrix sdum(nstart, ldh);
-    ComplexMatrix hdum;
+    ModuleBase::ComplexMatrix sdum(nstart, ldh);
+    ModuleBase::ComplexMatrix hdum;
 
     sdum = sc;
 
@@ -227,7 +227,7 @@ void Hamilt::diagH_LAPACK(
     {
         nb = std::max(1, nstart);
     }
-    
+
 	if (nb == 1 || nb >= nstart)
     {
         lwork = 2 * nstart; // mohan modify 2009-08-02
@@ -237,8 +237,8 @@ void Hamilt::diagH_LAPACK(
         lwork = (nb + 1) * nstart;
     }
 
-    complex<double> *work = new complex<double>[lwork];
-	ZEROS(work, lwork);
+    std::complex<double> *work = new std::complex<double>[lwork];
+	ModuleBase::GlobalFunc::ZEROS(work, lwork);
 	
     //=====================================================================
     // input s and (see below) h are copied so that they are not destroyed
@@ -254,9 +254,9 @@ void Hamilt::diagH_LAPACK(
     {
         rwork_dim = 7*nstart;
     }
-	
+
     double *rwork = new double[rwork_dim];
-    ZEROS( rwork, rwork_dim );
+    ModuleBase::GlobalFunc::ZEROS( rwork, rwork_dim );
 
     if (all_eigenvalues)
     {
@@ -271,14 +271,12 @@ void Hamilt::diagH_LAPACK(
         //=====================================
         // calculate only m lowest eigenvalues
         //=====================================
-        double *work2 = new double[2*lwork];
         int *iwork = new int [5*nstart];
         int *ifail = new int[nstart];
 
-        ZEROS(work2,2*lwork);
-        ZEROS(rwork,7*nstart);
-        ZEROS(iwork,5*nstart);
-        ZEROS(ifail,nstart);
+        ModuleBase::GlobalFunc::ZEROS(rwork,7*nstart);
+        ModuleBase::GlobalFunc::ZEROS(iwork,5*nstart);
+        ModuleBase::GlobalFunc::ZEROS(ifail,nstart);
 
         hdum.create(nstart, ldh);
         hdum = hc;
@@ -316,13 +314,12 @@ void Hamilt::diagH_LAPACK(
                 info    //INTEGER
         );
 
-        delete[] work2;
         delete[] iwork;
         delete[] ifail;
     }
     delete[] rwork;
     delete[] work;
 
-	timer::tick("Hamilt","diagH_LAPACK");
+	ModuleBase::timer::tick("Hamilt","diagH_LAPACK");
     return;
 }

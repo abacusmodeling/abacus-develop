@@ -6,7 +6,7 @@ double H_XC_pw::etxc;
 double H_XC_pw::vtxc;
 
 // [etxc, vtxc, v] = H_XC_pw::v_xc(...)
-std::tuple<double,double,matrix> H_XC_pw::v_xc
+std::tuple<double,double,ModuleBase::matrix> H_XC_pw::v_xc
 (
 	const int &nrxx, // number of real-space grid
 	const int &ncxyz, // total number of charge grid
@@ -14,14 +14,25 @@ std::tuple<double,double,matrix> H_XC_pw::v_xc
     const double*const*const rho_in,
 	const double*const rho_core) // core charge density
 {
-    TITLE("H_XC_pw","v_xc");
-    timer::tick("H_XC_pw","v_xc");
+    ModuleBase::TITLE("H_XC_pw","v_xc");
+    ModuleBase::timer::tick("H_XC_pw","v_xc");
 
+	#ifndef USE_LIBXC
+	if(GlobalV::DFT_META)
+	{
+		ModuleBase::WARNING_QUIT("Potential::v_of_rho","to use metaGGA, please link LIBXC");
+	}
+	#endif
     //Exchange-Correlation potential Vxc(r) from n(r)
     double et_xc = 0.0;
     double vt_xc = 0.0;
-	matrix v(NSPIN, nrxx);
+	ModuleBase::matrix v(GlobalV::NSPIN, nrxx);
 
+	if(GlobalV::VXC_IN_H == 0)
+	{
+    	ModuleBase::timer::tick("H_XC_pw","v_xc");
+    	return std::make_tuple(et_xc, vt_xc, std::move(v));
+	}
     // the square of the e charge
     // in Rydeberg unit, so * 2.0.
     double e2 = 2.0;
@@ -39,7 +50,7 @@ std::tuple<double,double,matrix> H_XC_pw::v_xc
 
     double vanishing_charge = 1.0e-10;
 
-    if (NSPIN == 1 || ( NSPIN ==4 && !DOMAG && !DOMAG_Z))
+    if (GlobalV::NSPIN == 1 || ( GlobalV::NSPIN ==4 && !GlobalV::DOMAG && !GlobalV::DOMAG_Z))
     {
         // spin-unpolarized case
         for (int ir = 0;ir < nrxx;ir++)
@@ -58,7 +69,7 @@ std::tuple<double,double,matrix> H_XC_pw::v_xc
             } // endif
         } //enddo
     }
-    else if(NSPIN ==2)
+    else if(GlobalV::NSPIN ==2)
     {
         // spin-polarized case
         neg [0] = 0;
@@ -93,7 +104,7 @@ std::tuple<double,double,matrix> H_XC_pw::v_xc
                 // call
                 XC_Functional::xc_spin(arhox, zeta, ex, ec, vx[0], vx[1], vc[0], vc[1]);
 
-                for (is = 0;is < NSPIN;is++)
+                for (is = 0;is < GlobalV::NSPIN;is++)
                 {
                     v(is, ir) = e2 * (vx[is] + vc[is]);
                 }
@@ -105,7 +116,7 @@ std::tuple<double,double,matrix> H_XC_pw::v_xc
         }
 
     }
-    else if(NSPIN == 4)//noncollinear case added by zhengdy
+    else if(GlobalV::NSPIN == 4)//noncollinear case added by zhengdy
     {
         for( ir = 0;ir<nrxx; ir++)
         {
@@ -161,6 +172,6 @@ std::tuple<double,double,matrix> H_XC_pw::v_xc
     et_xc *= omega / ncxyz;
     vt_xc *= omega / ncxyz;
 
-    timer::tick("H_XC_pw","v_xc");
+    ModuleBase::timer::tick("H_XC_pw","v_xc");
     return std::make_tuple(et_xc, vt_xc, std::move(v));
 }

@@ -26,9 +26,14 @@ class Potential_Libxc
 	// by using the input charge density rho_in and rho_core_in
 	//------------------------------------------------
 	// [etxc, vtxc, v] = v_xc(...)
-	static std::tuple<double,double,matrix> v_xc(
+	static std::tuple<double,double,ModuleBase::matrix> v_xc(
 		const double * const * const rho_in,
 		const double * const rho_core_in);
+	
+	static std::tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> v_xc_meta(
+		const double * const * const rho_in,
+		const double * const rho_core_in,
+		const double * const * const kin_r_in);
 		
 	private:
 
@@ -46,7 +51,7 @@ class Potential_Libxc
 	static std::tuple< 
 		std::vector<double>, 
 		std::vector<double>, 
-		std::vector<std::vector<Vector3<double>>> > 
+		std::vector<std::vector<ModuleBase::Vector3<double>>> > 
 	cal_input(
 		const std::vector<XC(func_type)> &funcs, 
 		const double * const * const rho_in,
@@ -57,9 +62,9 @@ class Potential_Libxc
 	//----------------------------
 	static int nspin0() // may need updates from SOC
 	{
-		if     (NSPIN==1 || (NSPIN==4 && (!DOMAG && !DOMAG_Z)))		return 1;
-		else if(NSPIN==2 || (NSPIN==4 && ( DOMAG ||  DOMAG_Z)))		return 2;
-		else throw runtime_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		if     (GlobalV::NSPIN==1 || (GlobalV::NSPIN==4 && (!GlobalV::DOMAG && !GlobalV::DOMAG_Z)))		return 1;
+		else if(GlobalV::NSPIN==2 || (GlobalV::NSPIN==4 && ( GlobalV::DOMAG ||  GlobalV::DOMAG_Z)))		return 2;
+		else throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
 };
 

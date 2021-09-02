@@ -15,50 +15,50 @@
 
 void Wfc_Dm_2d::init()
 {
-	TITLE("Wfc_Dm_2d", "init");
-	if(GAMMA_ONLY_LOCAL)
+	ModuleBase::TITLE("Wfc_Dm_2d", "init");
+	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		wfc_gamma.resize(NSPIN);
-		dm_gamma.resize(NSPIN);
+		wfc_gamma.resize(GlobalV::NSPIN);
+		dm_gamma.resize(GlobalV::NSPIN);
 	}
 	else
 	{
-		wfc_k.resize(kv.nks);
-		dm_k.resize(kv.nks);
+		wfc_k.resize(GlobalC::kv.nks);
+		dm_k.resize(GlobalC::kv.nks);
 	}
 }
 
-void Wfc_Dm_2d::cal_dm(const matrix &wg)
+void Wfc_Dm_2d::cal_dm(const ModuleBase::matrix &wg)
 {
-	TITLE("Wfc_Dm_2d", "cal_dm");
+	ModuleBase::TITLE("Wfc_Dm_2d", "cal_dm");
 	
 	#ifdef TEST_DIAG
 	{
 		static int istep=0;
-		ofstream ofs("wfc_"+TO_STRING(istep++)+"_"+TO_STRING(MY_RANK));
-		if(GAMMA_ONLY_LOCAL)
+		std::ofstream ofs("wfc_"+ModuleBase::GlobalFunc::TO_STRING(istep++)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
+		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			ofs<<wfc_gamma<<endl;
+			ofs<<wfc_gamma<<std::endl;
 		}
 		else
 		{
-			ofs<<wfc_k<<endl;
+			ofs<<wfc_k<<std::endl;
 		}
 	}
 	#endif
 	
 	// dm = wfc.T * wg * wfc.conj()
 	// dm[ik](iw1,iw2) = \sum_{ib} wfc[ik](ib,iw1).T * wg(ik,ib) * wfc[ik](ib,iw2).conj()
-	assert(wg.nc<=NLOCAL);
-	if(GAMMA_ONLY_LOCAL)
+	assert(wg.nc<=GlobalV::NLOCAL);
+	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		assert(wg.nr==NSPIN);
-		for(int is=0; is!=NSPIN; ++is)
+		assert(wg.nr==GlobalV::NSPIN);
+		for(int is=0; is!=GlobalV::NSPIN; ++is)
 		{
-			std::vector<double> wg_local(ParaO.ncol,0.0);
+			std::vector<double> wg_local(GlobalC::ParaO.ncol,0.0);
 			for(int ib_global=0; ib_global!=wg.nc; ++ib_global)
 			{
-				const int ib_local = ParaO.trace_loc_col[ib_global];
+				const int ib_local = GlobalC::ParaO.trace_loc_col[ib_global];
 				if(ib_local>=0)
 				{
 					wg_local[ib_local] = wg(is,ib_global);
@@ -66,7 +66,7 @@ void Wfc_Dm_2d::cal_dm(const matrix &wg)
 			}
 			
 			// wg_wfc(ib,iw) = wg[ib] * wfc(ib,iw);
-			matrix wg_wfc(wfc_gamma[is]);
+			ModuleBase::matrix wg_wfc(wfc_gamma[is]);
 			for(int ir=0; ir!=wg_wfc.nr; ++ir)
 			{
 				LapackConnector::scal( wg_wfc.nc, wg_local[ir], wg_wfc.c+ir*wg_wfc.nc, 1 );
@@ -79,23 +79,23 @@ void Wfc_Dm_2d::cal_dm(const matrix &wg)
 			dm_gamma[is].create( wfc_gamma[is].nr, wfc_gamma[is].nc );
 			pdgemm_(
 				&N_char, &T_char,
-				&NLOCAL, &NLOCAL, &wg.nc,
+				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &wg.nc,
 				&one_float,
-				wg_wfc.c, &one_int, &one_int, ParaO.desc,
-				wfc_gamma[is].c, &one_int, &one_int, ParaO.desc,
+				wg_wfc.c, &one_int, &one_int, GlobalC::ParaO.desc,
+				wfc_gamma[is].c, &one_int, &one_int, GlobalC::ParaO.desc,
 				&zero_float,
-				dm_gamma[is].c, &one_int, &one_int, ParaO.desc);
+				dm_gamma[is].c, &one_int, &one_int, GlobalC::ParaO.desc);
 		}
 	}
 	else
 	{
-		assert(wg.nr==kv.nks);
-		for(int ik=0; ik!=kv.nks; ++ik)
+		assert(wg.nr==GlobalC::kv.nks);
+		for(int ik=0; ik!=GlobalC::kv.nks; ++ik)
 		{
-			std::vector<double> wg_local(ParaO.ncol,0.0);
+			std::vector<double> wg_local(GlobalC::ParaO.ncol,0.0);
 			for(int ib_global=0; ib_global!=wg.nc; ++ib_global)
 			{
-				const int ib_local = ParaO.trace_loc_col[ib_global];
+				const int ib_local = GlobalC::ParaO.trace_loc_col[ib_global];
 				if(ib_local>=0)
 				{
 					wg_local[ib_local] = wg(ik,ib_global);
@@ -103,7 +103,7 @@ void Wfc_Dm_2d::cal_dm(const matrix &wg)
 			}
 
 			// wg_wfc(ib,iw) = wg[ib] * wfc(ib,iw).conj();
-			ComplexMatrix wg_wfc = conj(wfc_k[ik]);
+			ModuleBase::ComplexMatrix wg_wfc = conj(wfc_k[ik]);
 			for(int ir=0; ir!=wg_wfc.nr; ++ir)
 			{
 				LapackConnector::scal( wg_wfc.nc, wg_local[ir], wg_wfc.c+ir*wg_wfc.nc, 1 );
@@ -116,26 +116,26 @@ void Wfc_Dm_2d::cal_dm(const matrix &wg)
 			dm_k[ik].create( wfc_k[ik].nr, wfc_k[ik].nc );
 			pzgemm_(
 				&N_char, &T_char,
-				&NLOCAL, &NLOCAL, &wg.nc,
+				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &wg.nc,
 				&one_float,
-				wg_wfc.c, &one_int, &one_int, ParaO.desc,
-				wfc_k[ik].c, &one_int, &one_int, ParaO.desc,
+				wg_wfc.c, &one_int, &one_int, GlobalC::ParaO.desc,
+				wfc_k[ik].c, &one_int, &one_int, GlobalC::ParaO.desc,
 				&zero_float,
-				dm_k[ik].c, &one_int, &one_int, ParaO.desc);
+				dm_k[ik].c, &one_int, &one_int, GlobalC::ParaO.desc);
 		}
 	}
 	
 	#ifdef TEST_DIAG
 	{
 		static int istep=0;
-		ofstream ofs("dm_"+TO_STRING(istep)+"_"+TO_STRING(MY_RANK));
-		if(GAMMA_ONLY_LOCAL)
+		std::ofstream ofs("dm_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
+		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			ofs<<dm_gamma<<endl;
+			ofs<<dm_gamma<<std::endl;
 		}
 		else
 		{
-			ofs<<dm_k<<endl;
+			ofs<<dm_k<<std::endl;
 		}
 	}
 	#endif

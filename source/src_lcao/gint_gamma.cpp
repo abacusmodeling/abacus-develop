@@ -32,7 +32,7 @@ Gint_Gamma::~Gint_Gamma()
 
 void Gint_Gamma::save_atoms_on_grid(const Grid_Technique &gt)
 {
-    TITLE("Grid_Integral","save_atoms_on_grid");
+    ModuleBase::TITLE("Grid_Integral","save_atoms_on_grid");
 
     // mohan change.
     max_size = gt.max_atom;
@@ -40,7 +40,7 @@ void Gint_Gamma::save_atoms_on_grid(const Grid_Technique &gt)
 	if(max_size == 0)
 	{
 		// mohan add return 2011-03-15
-		ofs_warning << " processor " << MY_RANK << ": no atom on sub-fft-grid." << endl;
+		GlobalV::ofs_warning << " processor " << GlobalV::MY_RANK << ": no atom on sub-fft-grid." << std::endl;
 		return;
 	}
 
@@ -59,20 +59,20 @@ void Gint_Gamma::save_atoms_on_grid(const Grid_Technique &gt)
     this->x12 = new double[max_size];
     this->x03 = new double[max_size];
 
-	ZEROS(iq, max_size);
-	ZEROS(x0, max_size);
-	ZEROS(x1, max_size);
-	ZEROS(x2, max_size);
-	ZEROS(x3, max_size);
-	ZEROS(x12, max_size);
-	ZEROS(x03, max_size);
+	ModuleBase::GlobalFunc::ZEROS(iq, max_size);
+	ModuleBase::GlobalFunc::ZEROS(x0, max_size);
+	ModuleBase::GlobalFunc::ZEROS(x1, max_size);
+	ModuleBase::GlobalFunc::ZEROS(x2, max_size);
+	ModuleBase::GlobalFunc::ZEROS(x3, max_size);
+	ModuleBase::GlobalFunc::ZEROS(x12, max_size);
+	ModuleBase::GlobalFunc::ZEROS(x03, max_size);
 
 	this->vfactor = std::abs(this->latvec0.Det())/gt.ncxyz;
 
-    //OUT(ofs_running,"Max atom number on sub-FFT-grid",max_size);
-    //ofs_running << "\n dense(DIY) = " << dense;
-    //ofs_running << "\n count_dense = " << (double)count_dense/nxyz*100 << "%";
-    //ofs_running << "\n count_sparse = " << (double)count_sparse/nxyz*100 << "%" << endl;
+    //OUT(GlobalV::ofs_running,"Max atom number on sub-FFT-grid",max_size);
+    //GlobalV::ofs_running << "\n dense(DIY) = " << dense;
+    //GlobalV::ofs_running << "\n count_dense = " << (double)count_dense/nxyz*100 << "%";
+    //GlobalV::ofs_running << "\n count_sparse = " << (double)count_sparse/nxyz*100 << "%" << std::endl;
 
     return;
 }

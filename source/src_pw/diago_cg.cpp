@@ -13,7 +13,7 @@ Diago_CG::~Diago_CG() {}
 
 void Diago_CG::diag
 (
-    ComplexMatrix &phi,
+    ModuleBase::ComplexMatrix &phi,
     double *e,
     const int &dim,
     const int &dmx,
@@ -26,48 +26,48 @@ void Diago_CG::diag
     double &avg_iter
 )
 {
-    if (test_cg==1) TITLE("Diago_CG","ccgdiagg");
-    timer::tick("Diago_CG", "diag");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG","ccgdiagg");
+    ModuleBase::timer::tick("Diago_CG", "diag");
 
     avg_iter = 0.0;
     notconv = 0;
-    ZEROS(e, n_band);
+    ModuleBase::GlobalFunc::ZEROS(e, n_band);
 
     //-------------------------------------------------------------------
-    // "poor man" iterative diagonalization of a complex hermitian matrix
+    // "poor man" iterative diagonalization of a std::complex hermitian matrix
     // through preconditioned conjugate gradient algorithm
     // Band-by-band algorithm with minimal use of memory
     // Calls h_1phi and s_1phi to calculate H|phi> and S|phi>
     // Works for generalized eigenvalue problem (US pseudopotentials) as well
     //-------------------------------------------------------------------
-    complex<double> *sphi = new complex<double>[dim]();
-    complex<double> *scg  = new complex<double>[dim]();
-    complex<double> *hphi = new complex<double>[dim]();
-    complex<double> *g    = new complex<double>[dim]();
-    complex<double> *cg   = new complex<double>[dim]();
-    complex<double> *g0   = new complex<double>[dim]();
-    complex<double> *pphi = new complex<double>[dim]();
-    complex<double> *lagrange = new complex<double>[n_band]();
-    complex<double> *phi_m= new complex<double>[dim]();
-	ZEROS(sphi, dim);
-	ZEROS(scg, dim);
-	ZEROS(hphi, dim);
-	ZEROS(g, dim);
-	ZEROS(cg, dim);
-	ZEROS(g0, dim);
-	ZEROS(pphi, dim);
-	ZEROS(lagrange, n_band);
-	ZEROS(phi_m, dim);
+    std::complex<double> *sphi = new std::complex<double>[dim]();
+    std::complex<double> *scg  = new std::complex<double>[dim]();
+    std::complex<double> *hphi = new std::complex<double>[dim]();
+    std::complex<double> *g    = new std::complex<double>[dim]();
+    std::complex<double> *cg   = new std::complex<double>[dim]();
+    std::complex<double> *g0   = new std::complex<double>[dim]();
+    std::complex<double> *pphi = new std::complex<double>[dim]();
+    std::complex<double> *lagrange = new std::complex<double>[n_band]();
+    std::complex<double> *phi_m= new std::complex<double>[dim]();
+	ModuleBase::GlobalFunc::ZEROS(sphi, dim);
+	ModuleBase::GlobalFunc::ZEROS(scg, dim);
+	ModuleBase::GlobalFunc::ZEROS(hphi, dim);
+	ModuleBase::GlobalFunc::ZEROS(g, dim);
+	ModuleBase::GlobalFunc::ZEROS(cg, dim);
+	ModuleBase::GlobalFunc::ZEROS(g0, dim);
+	ModuleBase::GlobalFunc::ZEROS(pphi, dim);
+	ModuleBase::GlobalFunc::ZEROS(lagrange, n_band);
+	ModuleBase::GlobalFunc::ZEROS(phi_m, dim);
 
     for (int m=0; m<n_band; m++)
     {
-        if (test_cg>2) ofs_running << "Diagonal Band : " << m << endl;
+        if (test_cg>2) GlobalV::ofs_running << "Diagonal Band : " << m << std::endl;
         for (int i=0; i<dim; i++) phi_m[i] = phi(m, i);
 
-        hm.hpw.s_1psi(dim, phi_m, sphi); // sphi = S|psi(m)>
+        GlobalC::hm.hpw.s_1psi(dim, phi_m, sphi); // sphi = S|psi(m)>
         this->schmit_orth(dim, dmx, m, phi, sphi, phi_m);
 
-        hm.hpw.h_1psi(dim , phi_m, hphi, sphi);
+        GlobalC::hm.hpw.h_1psi(dim , phi_m, hphi, sphi);
 
         e[m] = this->ddot_real(dim, phi_m, hphi );
 
@@ -80,9 +80,9 @@ void Diago_CG::diag
         {
             this->calculate_gradient( precondition, dim, hphi, sphi, g, pphi );
             this->orthogonal_gradient( dim,dmx, g, scg, lagrange, phi, m);
-            this->calculate_gamma_cg( iter, dim, precondition, g, scg, 
+            this->calculate_gamma_cg( iter, dim, precondition, g, scg,
 			g0, cg, gg_last, cg_norm, theta, phi_m);// scg used as sg
-            converged = this->update_psi( dim, cg_norm, theta, pphi, cg, scg, phi_m , 
+            converged = this->update_psi( dim, cg_norm, theta, pphi, cg, scg, phi_m ,
 			e[m], eps, hphi, sphi); // pphi is used as hcg
             if ( converged ) break;
         }//end iter
@@ -103,7 +103,7 @@ void Diago_CG::diag
 
         if (m > 0 && reorder)
         {
-			NOTE("reorder bands!");
+			ModuleBase::GlobalFunc::NOTE("reorder bands!");
             if (e[m]-e[m-1]<-2.0*eps)
             {
                 // if the last calculated eigenvalue is not the largest...
@@ -158,18 +158,18 @@ void Diago_CG::diag
     delete [] sphi;
     delete [] phi_m;
 
-    timer::tick("Diago_CG","diag");
+    ModuleBase::timer::tick("Diago_CG","diag");
     return;
 } // end subroutine ccgdiagg
 
 
 void Diago_CG::calculate_gradient(
     const double* precondition, const int dim,
-    const complex<double> *hpsi, const complex<double> *spsi,
-    complex<double> *g, complex<double> *ppsi)
+    const std::complex<double> *hpsi, const std::complex<double> *spsi,
+    std::complex<double> *g, std::complex<double> *ppsi)
 {
-    if (test_cg==1) TITLE("Diago_CG","calculate_gradient");
-    //timer::tick("Diago_CG","grad");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG","calculate_gradient");
+    //ModuleBase::timer::tick("Diago_CG","grad");
 
     for (int i=0; i<dim; i++)
     {
@@ -196,28 +196,28 @@ void Diago_CG::calculate_gradient(
         // So here we get the gradient.
         g[i] -= lambda * ppsi[i];
     }
-    //timer::tick("Diago_CG","grad");
+    //ModuleBase::timer::tick("Diago_CG","grad");
     return;
 }
 
 
 void Diago_CG::orthogonal_gradient( const int &dim, const int &dmx,
-                                    complex<double> *g, complex<double> *sg, complex<double> *lagrange,
-                                    const ComplexMatrix &eigenfunction, const int m)
+                                    std::complex<double> *g, std::complex<double> *sg, std::complex<double> *lagrange,
+                                    const ModuleBase::ComplexMatrix &eigenfunction, const int m)
 {
-    if (test_cg==1) TITLE("Diago_CG","orthogonal_gradient");
-    //timer::tick("Diago_CG","orth_grad");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG","orthogonal_gradient");
+    //ModuleBase::timer::tick("Diago_CG","orth_grad");
 
-    hm.hpw.s_1psi(dim , g, sg);
+    GlobalC::hm.hpw.s_1psi(dim , g, sg);
     int inc=1;
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     //qianrui replace 2021-3-15
     char trans='C';
-    zgemv_(&trans,&dim,&m,&ONE,eigenfunction.c,&dmx,sg,&inc,&ZERO,lagrange,&inc);
+    zgemv_(&trans,&dim,&m,&ModuleBase::ONE,eigenfunction.c,&dmx,sg,&inc,&ModuleBase::ZERO,lagrange,&inc);
     //======================================================================
     /*for (int i=0; i<m; i++)
     {
-        lagrange[i] = ZERO;
+        lagrange[i] = ModuleBase::ZERO;
         for (int j=0; j<dim; j++)
         {
             lagrange[i] += conj( eigenfunction(i,j) ) * sg[j];
@@ -231,21 +231,21 @@ void Diago_CG::orthogonal_gradient( const int &dim, const int &dmx,
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     //qianrui replace 2021-3-15
     char trans2='N';
-    zgemv_(&trans2,&dim,&m,&NEG_ONE,eigenfunction.c,&dmx,lagrange,&inc,&ONE,g,&inc);
-    zgemv_(&trans2,&dim,&m,&NEG_ONE,eigenfunction.c,&dmx,lagrange,&inc,&ONE,sg,&inc);
+    zgemv_(&trans2,&dim,&m,&ModuleBase::NEG_ONE,eigenfunction.c,&dmx,lagrange,&inc,&ModuleBase::ONE,g,&inc);
+    zgemv_(&trans2,&dim,&m,&ModuleBase::NEG_ONE,eigenfunction.c,&dmx,lagrange,&inc,&ModuleBase::ONE,sg,&inc);
     //======================================================================
     /*for (int i=0; i<m; i++)
     {
         for (int j=0; j<dim; j++)
         {
-            const complex<double> oo = lagrange[i] * eigenfunction(i, j);
+            const std::complex<double> oo = lagrange[i] * eigenfunction(i, j);
             g[j] -= oo;
             sg[j] -= oo;
         }
     }*/
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-    //timer::tick("Diago_CG","orth_grad");
+    //ModuleBase::timer::tick("Diago_CG","orth_grad");
     return;
 }
 
@@ -253,17 +253,17 @@ void Diago_CG::calculate_gamma_cg(
     const int iter,
     const int dim,
     const double *precondition,
-    const complex<double> *g,
-    const complex<double> *sg,
-    complex<double> *psg,
-    complex<double> *cg,
+    const std::complex<double> *g,
+    const std::complex<double> *sg,
+    std::complex<double> *psg,
+    std::complex<double> *cg,
     double &gg_last,
     const double &cg_norm,
     const double &theta,
-    const complex<double> *psi_m)
+    const std::complex<double> *psi_m)
 {
-    if (test_cg==1) TITLE("Diago_CG","calculate_gamma_cg");
-    //timer::tick("Diago_CG","gamma_cg");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG","calculate_gamma_cg");
+    //ModuleBase::timer::tick("Diago_CG","gamma_cg");
     double gg_inter;
     if (iter>0)
     {
@@ -319,7 +319,7 @@ void Diago_CG::calculate_gamma_cg(
             cg[i] -= norma * psi_m[i];
         }
     }
-    //timer::tick("Diago_CG","gamma_cg");
+    //ModuleBase::timer::tick("Diago_CG","gamma_cg");
     return;
 }
 
@@ -328,18 +328,18 @@ bool Diago_CG::update_psi(
     const int dim,
     double &cg_norm,
     double &theta,
-    complex<double> *hcg,
-    const complex<double> *cg,
-    complex<double> *scg,
-    complex<double> *psi_m ,
+    std::complex<double> *hcg,
+    const std::complex<double> *cg,
+    std::complex<double> *scg,
+    std::complex<double> *psi_m ,
     double &eigenvalue,
     const double &threshold,
-    complex<double> *hpsi,
-    complex<double> *sphi)
+    std::complex<double> *hpsi,
+    std::complex<double> *sphi)
 {
-    if (test_cg==1) TITLE("Diago_CG","update_psi");
-    //timer::tick("Diago_CG","update");
-    hm.hpw.h_1psi(dim, cg, hcg, scg);
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG","update_psi");
+    //ModuleBase::timer::tick("Diago_CG","update");
+    GlobalC::hm.hpw.h_1psi(dim, cg, hcg, scg);
     cg_norm = sqrt( this->ddot_real(dim, cg, scg) );
 
     if (cg_norm < 1.0e-10 ) return 1;
@@ -358,7 +358,7 @@ bool Diago_CG::update_psi(
 
     if (e1>e2)
     {
-        theta +=  PI_HALF;
+        theta +=  ModuleBase::PI_HALF;
     }
 
     eigenvalue = min( e1, e2 );
@@ -367,20 +367,20 @@ bool Diago_CG::update_psi(
     const double cost = cos(theta);
     const double sint_norm = sin(theta)/cg_norm;
 
-//	cout << "\n cg_norm = " << this->ddot(dim, cg, cg);
-//	cout << "\n cg_norm_fac = "<< cg_norm * cg_norm;
-//	cout << "\n overlap = "  << this->ddot(dim, psi_m, psi_m);
+//	std::cout << "\n cg_norm = " << this->ddot(dim, cg, cg);
+//	std::cout << "\n cg_norm_fac = "<< cg_norm * cg_norm;
+//	std::cout << "\n overlap = "  << this->ddot(dim, psi_m, psi_m);
 
     for (int i=0; i<dim; i++)
     {
         psi_m[i] = psi_m[i] * cost + sint_norm * cg[i];
     }
 
-//	cout << "\n overlap2 = "  << this->ddot(dim, psi_m, psi_m);
+//	std::cout << "\n overlap2 = "  << this->ddot(dim, psi_m, psi_m);
 
     if ( abs(eigenvalue-e0)< threshold)
     {
-        //timer::tick("Diago_CG","update");
+        //ModuleBase::timer::tick("Diago_CG","update");
         return 1;
     }
     else
@@ -390,7 +390,7 @@ bool Diago_CG::update_psi(
             sphi[i] = sphi[i] * cost + sint_norm * scg[i];
             hpsi[i] = hpsi[i] * cost + sint_norm * hcg[i];
         }
-        //timer::tick("Diago_CG","update");
+        //ModuleBase::timer::tick("Diago_CG","update");
         return 0;
     }
 }
@@ -401,13 +401,13 @@ void Diago_CG::schmit_orth
     const int& dim,
     const int& dmx,
     const int& m,     //end
-    const ComplexMatrix &psi,
-    complex<double> *sphi,
-    complex<double> *psi_m
+    const ModuleBase::ComplexMatrix &psi,
+    std::complex<double> *sphi,
+    std::complex<double> *psi_m
 )
 {
-//	TITLE("Diago_CG","schmit_orth");
-    //timer::tick("Diago_CG","schmit_orth");
+//	ModuleBase::TITLE("Diago_CG","schmit_orth");
+    //ModuleBase::timer::tick("Diago_CG","schmit_orth");
     // orthogonalize starting eigenfunction to those already calculated
     // psi_m orthogonalize to psi(start) ~ psi(m-1)
     // Attention, the orthogonalize here read as
@@ -416,15 +416,15 @@ void Diago_CG::schmit_orth
     assert( m >= 0 );
     assert( psi.nr >= m );
 
-    complex<double> *lagrange = new complex<double>[ m+1 ];
-    ZEROS(lagrange, m+1);
+    std::complex<double> *lagrange = new std::complex<double>[ m+1 ];
+    ModuleBase::GlobalFunc::ZEROS(lagrange, m+1);
 
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     //qianrui replace 2021-3-15
     int inc=1;
     int mp1 = m+1;
     char trans='C';
-    zgemv_(&trans,&dim,&mp1,&ONE,psi.c,&dmx,sphi,&inc,&ZERO,lagrange,&inc);
+    zgemv_(&trans,&dim,&mp1,&ModuleBase::ONE,psi.c,&dmx,sphi,&inc,&ModuleBase::ZERO,lagrange,&inc);
     //======================================================================
     /*for (int j = 0; j <= m; j++)
     {
@@ -443,7 +443,7 @@ void Diago_CG::schmit_orth
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     //qianrui replace 2021-3-15
     char trans2='N';
-    zgemv_(&trans2,&dim,&m,&NEG_ONE,psi.c,&dmx,lagrange,&inc,&ONE,psi_m,&inc);
+    zgemv_(&trans2,&dim,&m,&ModuleBase::NEG_ONE,psi.c,&dmx,lagrange,&inc,&ModuleBase::ONE,psi_m,&inc);
     psi_norm -= ddot_real(m,lagrange,lagrange,false);
     //======================================================================
     /*for (int j = 0; j < m; j++)
@@ -458,14 +458,14 @@ void Diago_CG::schmit_orth
 
     if ( psi_norm <= 0.0)
     {
-		cout << " m = " << m << endl;
+		std::cout << " m = " << m << std::endl;
 		for(int j=0; j<=m; ++j)
 		{
-			cout << "\n j = " << j << " lagrange norm = " << ( conj(lagrange[j]) * lagrange[j] ).real();
+			std::cout << "j = " << j << " lagrange norm = " << ( conj(lagrange[j]) * lagrange[j] ).real()<<std::endl;
 		}
-        cout << " in diago_cg, psi norm = " << psi_norm << endl;
-		cout << " If you use GNU compiler, it may due to the zdotc is unavailable." << endl;
-        WARNING_QUIT("schmit_orth","psi_norm <= 0.0");
+        std::cout << " in diago_cg, psi norm = " << psi_norm << std::endl;
+		std::cout << " If you use GNU compiler, it may due to the zdotc is unavailable." << std::endl;
+        ModuleBase::WARNING_QUIT("schmit_orth","psi_norm <= 0.0");
     }
 
     psi_norm = sqrt(psi_norm);
@@ -474,10 +474,10 @@ void Diago_CG::schmit_orth
     {
         psi_m[ig] /= psi_norm;
     }
-    hm.hpw.s_1psi(dim, psi_m, sphi); // sphi = S|psi(m)>
+    GlobalC::hm.hpw.s_1psi(dim, psi_m, sphi); // sphi = S|psi(m)>
 
     delete [] lagrange ;
-    //timer::tick("Diago_CG","schmit_orth");
+    //ModuleBase::timer::tick("Diago_CG","schmit_orth");
     return ;
 }
 
@@ -485,8 +485,8 @@ void Diago_CG::schmit_orth
 double Diago_CG::ddot_real
 (
     const int &dim,
-    const complex<double>* psi_L,
-    const complex<double>* psi_R,
+    const std::complex<double>* psi_L,
+    const std::complex<double>* psi_R,
     const bool reduce
 )
 {
@@ -501,7 +501,7 @@ double Diago_CG::ddot_real
     if(reduce)  Parallel_Reduce::reduce_double_pool( result );
     return result;
     //======================================================================
-    /*complex<double> result(0,0);
+    /*std::complex<double> result(0,0);
     for (int i=0;i<dim;i++)
     {
         result += conj( psi_L[i] ) * psi_R[i];
@@ -511,14 +511,14 @@ double Diago_CG::ddot_real
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }
 
-complex<double> Diago_CG::ddot
+std::complex<double> Diago_CG::ddot
 (
     const int & dim,
-    const complex<double> * psi_L,
-    const complex<double> * psi_R
+    const std::complex<double> * psi_L,
+    const std::complex<double> * psi_R
 )
 {
-    complex<double> result(0, 0);
+    std::complex<double> result(0, 0);
     for (int i = 0; i < dim ; i++)
     {
         result += conj(psi_L[i]) *  psi_R[i] ;
@@ -528,15 +528,15 @@ complex<double> Diago_CG::ddot
 }  // end of ddot
 
 // this return <psi(m)|psik>
-complex<double> Diago_CG::ddot
+std::complex<double> Diago_CG::ddot
 (
     const int & dim,
-    const ComplexMatrix &psi,
+    const ModuleBase::ComplexMatrix &psi,
     const int & m,
-    complex<double> *psik
+    std::complex<double> *psik
 )
 {
-    complex<double> result(0, 0);
+    std::complex<double> result(0, 0);
     assert(dim > 0) ;
 
     for (int i = 0; i < dim ; i++)
@@ -551,16 +551,16 @@ complex<double> Diago_CG::ddot
 
 
 // this return <psi_L(m) | psi_R(n)>
-complex<double> Diago_CG::ddot
+std::complex<double> Diago_CG::ddot
 (
     const int & dim,
-    const ComplexMatrix &psi_L,
+    const ModuleBase::ComplexMatrix &psi_L,
     const int & m,
-    const ComplexMatrix &psi_R,
+    const ModuleBase::ComplexMatrix &psi_R,
     const int & n
 )
 {
-    complex<double> result = ZERO;
+    std::complex<double> result = ModuleBase::ZERO;
     assert( (dim>0) && (dim<=psi_L.nc) && (dim<=psi_R.nc) );
 
     for ( int i = 0; i < dim ; i++)

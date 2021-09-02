@@ -1,29 +1,32 @@
 #include "tool_check.h"
 #include "tool_quit.h"
 
-void CHECK_NAME(ifstream &ifs,const string &name_in,bool quit)
+namespace ModuleBase
 {
-    string name;
+
+void CHECK_NAME(std::ifstream &ifs,const std::string &name_in,bool quit)
+{
+    std::string name;
     ifs >> name;
     if ( name != name_in)
     {
 		if(quit)
 		{
-			//ofs_warning << "\n name = " <<name;
-			//ofs_warning << "\n should be = " << name_in;
-			cout << "\n name = " <<name;
-			cout << "\n should be = " << name_in;
+			//GlobalV::ofs_warning << "\n name = " <<name;
+			//GlobalV::ofs_warning << "\n should be = " << name_in;
+			std::cout << "\n name = " <<name;
+			std::cout << "\n should be = " << name_in;
         	WARNING_QUIT("CHECK_NAME","Some parameter name is wrong!");
 		}
 		else
 		{
-        	cout <<"\n Can not match : "<<name<<"(readin)  "<<name_in<<endl;
+        	std::cout <<"\n Can not match : "<<name<<"(readin)  "<<name_in<<std::endl;
 		}
     }
     return;
 }
 
-void CHECK_INT(ifstream &ifs,const int &v,bool quit)
+void CHECK_INT(std::ifstream &ifs,const int &v,bool quit)
 {
 	int v_in;
 	ifs >> v_in;
@@ -31,19 +34,19 @@ void CHECK_INT(ifstream &ifs,const int &v,bool quit)
 	{
 		if(quit)
 		{
-			cout << "\n value = " << v_in;
-			cout << "\n should be = " << v;
+			std::cout << "\n value = " << v_in;
+			std::cout << "\n should be = " << v;
 			WARNING_QUIT("CHECK_INT","Some parameter name is wrong!");
 		}
 		else
 		{
-			cout <<"\n Can not match well: "<<v_in<<"(readin)  "<<v<<endl;
+			std::cout <<"\n Can not match well: "<<v_in<<"(readin)  "<<v<<std::endl;
 		}
 	}
 	return;
 }
 
-void CHECK_DOUBLE(ifstream &ifs,const double &v,bool quit)
+void CHECK_DOUBLE(std::ifstream &ifs,const double &v,bool quit)
 {
 	const double tiny = 1.0e-5;
 	double v_in;
@@ -52,34 +55,36 @@ void CHECK_DOUBLE(ifstream &ifs,const double &v,bool quit)
 	{
 		if(quit)
 		{
-			cout << " read in value = " << v_in << endl;
-			cout << " the value should be = " << v << endl;
+			std::cout << " read in value = " << v_in << std::endl;
+			std::cout << " the value should be = " << v << std::endl;
 			WARNING_QUIT("CHECK_DOUBLE","the name of parameter wrong!");
 		}
 		else
 		{
-			cout <<" can not match well (1.0e-5): "<< v_in <<"(readin)  "<<v<<endl;
+			std::cout <<" can not match well (1.0e-5): "<< v_in <<"(readin)  "<<v<<std::endl;
 		}
 	}
 	return;
 }
 
-void CHECK_STRING(ifstream &ifs,const string &v,bool quit)
+void CHECK_STRING(std::ifstream &ifs,const std::string &v,bool quit)
 {
-	string v_in;
+	std::string v_in;
 	ifs >> v_in;
 	if( v_in != v )
 	{
 		if(quit)
 		{
-			cout << " read in value = " << v_in << endl;
-			cout << " the value should be = " << v << endl;
+			std::cout << " read in value = " << v_in << std::endl;
+			std::cout << " the value should be = " << v << std::endl;
 			WARNING_QUIT("CHECK_DOUBLE","the name of parameter wrong!");
 		}
 		else
 		{
-			cout <<" can not match well : "<<v_in<<"(readin)  "<<v<<endl;
+			std::cout <<" can not match well : "<<v_in<<"(readin)  "<<v<<std::endl;
 		}
 	}
 	return;
+}
+
 }

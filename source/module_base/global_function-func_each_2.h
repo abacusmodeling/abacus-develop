@@ -4,9 +4,13 @@
 #ifndef FUNC_EACH_2_H
 #define FUNC_EACH_2_H
 
-#include<vector>
-#include<map>
+#include <vector>
+#include <map>
 #include<functional>
+namespace ModuleBase
+{
+namespace GlobalFunc
+{
 	
 template<typename Ti, typename... T_tail>
 void FUNC_EACH_2( 
@@ -46,4 +50,6 @@ void FUNC_EACH_2(
 	}
 }
 
+}
+}
 #endif // FUNC_EACH_2_H

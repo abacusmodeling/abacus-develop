@@ -34,7 +34,6 @@ mixing_beta         0.4
 charge_extrap       second-order
 
 md_mdtype           1    //choose ensemble
-md_potential        0    //choose potential  0:Pseudopotential  1:LJ potential
 md_dt               1    //time step
 md_tfirst           700  //the first target temperature
 md_rstmd            0    //whether restart md
@@ -47,7 +46,6 @@ These MD parameters means that ABACUS will use NVT ensemble with Nosé-hoover th
 Note: *Please turn off symmetry when do MD simulation.*
 
 - md_mdtype : 0, NVE; 1, NVT; 2, velocity scaling
-- md_potential : 0, Pseudopotential  1, LJ potential
 - md_dt : time step in md simulation (fs)
 - md_tfirst : target temperature in md simulation(K), you should set parameter md_tlast and md_fixtemperature when you want to change temperature during md simulation.
 - md_rstmd : 0, no need of restart ; 1, restart with restart file, you must repalce STRU file with STRU_MD before you run the restart task.

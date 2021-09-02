@@ -6,12 +6,9 @@
 #ifndef CENTER2_ORB_ORB21_H
 #define CENTER2_ORB_ORB21_H
 
-#include<vector>
-using std::vector;
-#include<map>
-using std::map;
-#include<set>
-using std::set;
+#include <vector>
+#include <map>
+#include <set>
 
 #include "center2_orb.h"
 #include "center2_orb-orb11.h"
@@ -35,10 +32,10 @@ class Center2_Orb::Orb21
 
 	void init_radial_table();
 
-	void init_radial_table( const set<size_t> &radials );					// unit: Bohr/MOT.dr
+	void init_radial_table( const std::set<size_t> &radials );					// unit: Bohr/MOT.dr
 
 	double cal_overlap(
-		const Vector3<double> &RA, const Vector3<double> &RB,				// unit: Bohr
+		const ModuleBase::Vector3<double> &RA, const ModuleBase::Vector3<double> &RB,				// unit: Bohr
 		const int &mA1, const int &mA2, const int &mB ) const;
 		
 	private:
@@ -50,8 +47,8 @@ class Center2_Orb::Orb21
 	const ORB_table_phi &MOT;
 	const ORB_gaunt_table &MGT;	
 
-	map<int,Numerical_Orbital_Lm> nA;
-	map<int,Center2_Orb::Orb11> orb11s;
+	std::map<int,Numerical_Orbital_Lm> nA;
+	std::map<int,Center2_Orb::Orb11> orb11s;
 };
 
 // this->orb11s[LA].Table_r[LAB][ir]

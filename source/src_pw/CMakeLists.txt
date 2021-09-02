@@ -1,6 +1,4 @@
-add_library(
-    pw
-    OBJECT
+list(APPEND objects
     H_Ewald_pw.cpp
     H_Hartree_pw.cpp
     H_XC_pw.cpp
@@ -18,13 +16,12 @@ add_library(
     energy.cpp
     forces.cpp
     global.cpp
-    hamilt.cpp
-    hamilt_pw.cpp
     klist.cpp
     magnetism.cpp
     occupy.cpp
     potential.cpp
     potential_libxc.cpp
+    potential_libxc_meta.cpp
     pw_basis.cpp
     pw_complement.cpp
     soc.cpp
@@ -36,15 +33,13 @@ add_library(
     stress_func_cc.cpp
     stress_func_ewa.cpp
     stress_func_gga.cpp
+    stress_func_mgga.cpp
     stress_func_har.cpp
     stress_func_kin.cpp
     stress_func_loc.cpp
     stress_func_nl.cpp
     stress_func_print.cpp
     stress_pw.cpp
-    symm_other.cpp
-    symmetry.cpp
-    symmetry_basic.cpp
     symmetry_rho.cpp
     threshold_elec.cpp
     use_fft.cpp
@@ -61,4 +56,23 @@ add_library(
     xc_functional.cpp
     xc_gga_pw.cpp
     xc_type.cpp
+    run_md_pw.cpp)
+if(USE_CUDA)
+    list(APPEND objects
+        diago_cg_gpu.cu
+        hamilt.cu
+        hamilt_pw_gpu.cu
+        use_fft_kernel.cu
+    )
+else()
+    list(APPEND objects
+        hamilt.cpp
+        hamilt_pw.cpp
+    )
+endif()
+
+add_library(
+    pw
+    OBJECT
+    ${objects}
 )

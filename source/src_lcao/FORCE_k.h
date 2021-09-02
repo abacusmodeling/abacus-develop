@@ -20,14 +20,14 @@ class Force_LCAO_k : public Force_LCAO_gamma
 	void ftable_k (
 		const bool isforce,
 		const bool isstress,
-		matrix& foverlap,
-		matrix& ftvnl_dphi,
-		matrix& fvnl_dbeta,	
-		matrix& fvl_dphi,
-		matrix& soverlap,
-		matrix& stvnl_dphi,
-		matrix& svnl_dbeta,
-		matrix& svl_dphi
+		ModuleBase::matrix& foverlap,
+		ModuleBase::matrix& ftvnl_dphi,
+		ModuleBase::matrix& fvnl_dbeta,	
+		ModuleBase::matrix& fvl_dphi,
+		ModuleBase::matrix& soverlap,
+		ModuleBase::matrix& stvnl_dphi,
+		ModuleBase::matrix& svnl_dbeta,
+		ModuleBase::matrix& svl_dphi
 		);
 
 	// get the ds, dt, dvnl.
@@ -38,26 +38,26 @@ class Force_LCAO_k : public Force_LCAO_gamma
 	void set_EDM_k(double** dm2d, const bool with_energy);
 
 	// mohan add 2012-01-09
-	complex<double> set_EDM_k_element(
-		const complex<double> &phase,
+	std::complex<double> set_EDM_k_element(
+		const std::complex<double> &phase,
 		const bool with_energy,
-		complex<double> &coef1, complex<double> &coef2,
+		std::complex<double> &coef1, std::complex<double> &coef2,
 		const double &ekb);
 	
 	// calculate the force due to < dphi | beta > < beta | phi >
-	void cal_ftvnl_dphi_k(double** dm2d, const bool isforce, const bool isstress, matrix& ftvnl_dphi, matrix& stvnl_dphi);
+	void cal_ftvnl_dphi_k(double** dm2d, const bool isforce, const bool isstress, ModuleBase::matrix& ftvnl_dphi, ModuleBase::matrix& stvnl_dphi);
 
 	// calculate the overlap force
-	void cal_foverlap_k(const bool isforce, const bool isstress, matrix& foverlap, matrix& soverlap);
+	void cal_foverlap_k(const bool isforce, const bool isstress, ModuleBase::matrix& foverlap, ModuleBase::matrix& soverlap);
 
 	// calculate the force due to < phi | Vlocal | dphi >
-	void cal_fvl_dphi_k(double** dm2d, const bool isforce, const bool isstress, matrix& fvl_dphi, matrix& svl_dphi);
+	void cal_fvl_dphi_k(double** dm2d, const bool isforce, const bool isstress, ModuleBase::matrix& fvl_dphi, ModuleBase::matrix& svl_dphi);
 
 	// calculate the force due to < phi | dbeta > < beta | phi >
-	void cal_fvnl_dbeta_k(double** dm2d, const bool isforce, const bool isstress, matrix& fvnl_dbeta, matrix& svnl_dbeta);
+	void cal_fvnl_dbeta_k(double** dm2d, const bool isforce, const bool isstress, ModuleBase::matrix& fvnl_dbeta, ModuleBase::matrix& svnl_dbeta);
 
 
-	void test(double* mm, const string &name);
+	void test(double* mm, const std::string &name);
 
 };
 #endif

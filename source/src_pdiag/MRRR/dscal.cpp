@@ -14,7 +14,7 @@ int pdscal(int *n, double *da, double *dx, int *incx) {
 	/*  Purpose */
 	/*  ======= */
 	/* * */
-	/*     scales a vector by a constant. */
+	/*     scales a std::vector by a constant. */
 	/*     uses unrolled loops for increment equal to one. */
 	/*     jack dongarra, linpack, 3/11/78. */
 	/*     modified 3/93 to return if incx .le. 0. */

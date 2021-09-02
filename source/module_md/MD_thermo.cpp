@@ -2,9 +2,9 @@
 
 MD_thermo::MD_thermo()
 {
-    G = new Vector3<double>[1];
-    NHCeta = new Vector3<double>[1];
-    NHCpeta = new Vector3<double>[1];
+    G = new ModuleBase::Vector3<double>[1];
+    NHCeta = new ModuleBase::Vector3<double>[1];
+    NHCpeta = new ModuleBase::Vector3<double>[1];
 }
 
 MD_thermo::~MD_thermo()
@@ -20,10 +20,10 @@ void MD_thermo::init_NHC(
     const double &NVT_tau_in, 
     const double &dt_in,
     const int &NVT_control, 
-    ofstream &ofs, 
+    std::ofstream &ofs, 
     const int &numIon,
     const double &temperature,
-    const Vector3<double>* vel,
+    const ModuleBase::Vector3<double>* vel,
     const double* allmass
     )
 {
@@ -34,13 +34,13 @@ void MD_thermo::init_NHC(
     this->numIon_ = numIon;
     unsigned long init[4]={0x123, 0x234, 0x345, 0x456}, length=4;
 	init_by_array(init, length);
-	ofs<<" ...............Nose-Hoover Chain parameter initialization...............  " << endl;
-	ofs<<" Temperature =    "<< temperature << endl;
-	ofs<<" Temperature2 =    "<< temperature/K_BOLTZMAN_AU << endl;
-	ofs<<" NHC frequency =    "<< 1.0/NVT_tau_ << endl;
-	ofs<<" NHC chain =    "<< MNHC_ << endl;
-	ofs<<" Qmass  =    "<< Qmass_ << endl;
-	ofs<<" ...............................................................  " << endl;
+	ofs<<" ...............Nose-Hoover Chain parameter initialization...............  " << std::endl;
+	ofs<<" Temperature =    "<< temperature << std::endl;
+	ofs<<" Temperature2 =    "<< temperature/ModuleBase::K_BOLTZMAN_AU << std::endl;
+	ofs<<" NHC frequency =    "<< 1.0/NVT_tau_ << std::endl;
+	ofs<<" NHC chain =    "<< MNHC_ << std::endl;
+	ofs<<" Qmass  =    "<< Qmass_ << std::endl;
+	ofs<<" ...............................................................  " << std::endl;
 	w[0]=0.7845136105;
 	w[6]=0.7845136105;
 	w[1]=0.2355732134;
@@ -55,11 +55,11 @@ void MD_thermo::init_NHC(
 	}
 		
     delete[] G;	
-	G=new Vector3<double>[MNHC_*numIon_];
+	G=new ModuleBase::Vector3<double>[MNHC_*numIon_];
 	delete[] NHCeta;	
-	NHCeta=new Vector3<double>[MNHC_*numIon_];
+	NHCeta=new ModuleBase::Vector3<double>[MNHC_*numIon_];
 	delete[] NHCpeta;	
-	NHCpeta=new Vector3<double>[MNHC_*numIon_];
+	NHCpeta=new ModuleBase::Vector3<double>[MNHC_*numIon_];
 
 	for(int j=0;j<MNHC_;j++)
     {
@@ -90,7 +90,7 @@ void MD_thermo::init_NHC(
 		G[0*numIon_+k].y=pow(vel[k].y,2)*allmass[k]-1.0 * temperature;
 		G[0*numIon_+k].z=pow(vel[k].z,2)*allmass[k]-1.0 * temperature;
 	}
-	ofs << "finish NHC thermostat define" << endl; //zifei
+	//ofs << "finish NHC thermostat define" << std::endl; //zifei
 }
 
 double MD_thermo::NHChamiltonian(
@@ -102,7 +102,7 @@ double MD_thermo::NHChamiltonian(
 	double NHChamiltonian0; // The conserved quantity
 
 	NHChamiltonian0 = KE + PE ;
-//	cout << "hamiltonian0 =    "<< NHChamiltonian0 <<endl;
+//	std::cout << "hamiltonian0 =    "<< NHChamiltonian0 <<std::endl;
 
 	for(int i=0;i<numIon_;i++)
     {
@@ -114,17 +114,17 @@ double MD_thermo::NHChamiltonian(
 		}
 	}
 
-	if (!MY_RANK)
+	if (!GlobalV::MY_RANK)
     {
-        ofs_running<< " --------------------------------------------------"<<endl;
-        ofs_running<< " SUMMARY OF NVT CALCULATION"<<endl;
-        ofs_running<<" --------------------------------------------------"<<endl;
-        ofs_running<<" NVT Conservation     : "<<setw(10)<< NHChamiltonian0*2<<" (Rydberg)"<<endl;
-        ofs_running<<" NVT Temperature      : "<<setw(10)<< KE*2/(3*double(numIon_-nfrozen))/K_BOLTZMAN_AU<<" (K)"<<endl;
-        ofs_running<<" NVT Kinetic energy   : "<<setw(10)<< KE*2<<" (Rydberg)"<<endl;
-        ofs_running<<" NVT Potential energy : "<<setw(10)<< PE*2<<" (Rydberg)"<<endl;
+        GlobalV::ofs_running<< "--------------------------------------------------"<<std::endl;
+        GlobalV::ofs_running<< "            SUMMARY OF NVT CALCULATION            "<<std::endl;
+        GlobalV::ofs_running<<" --------------------------------------------------"<<std::endl;
+        GlobalV::ofs_running<<" NVT Conservation     : "<<std::setw(10)<< NHChamiltonian0*2<<" (Rydberg)"<<std::endl;
+        GlobalV::ofs_running<<" NVT Temperature      : "<<std::setw(10)<< KE*2/(3*double(numIon_-nfrozen))/ModuleBase::K_BOLTZMAN_AU<<" (K)"<<std::endl;
+        GlobalV::ofs_running<<" NVT Kinetic energy   : "<<std::setw(10)<< KE*2<<" (Rydberg)"<<std::endl;
+        GlobalV::ofs_running<<" NVT Potential energy : "<<std::setw(10)<< PE*2<<" (Rydberg)"<<std::endl;
     }
-//	cout << "hamiltonian1 =    "<< NHChamiltonian0 <<endl;
+//	std::cout << "hamiltonian1 =    "<< NHChamiltonian0 <<std::endl;
    
 	return NHChamiltonian0;
 }
@@ -289,19 +289,19 @@ double MD_thermo::genrand_res53(void)
 void MD_thermo::Integrator(
     const int control,
     const double &temperature,
-    Vector3<double>* vel,
+    ModuleBase::Vector3<double>* vel,
     const double* allmass)
 {
 	if(control == 1) NHCIntegrator(temperature, vel, allmass);
 	else if(control == 2) LGVIntegrator(temperature, vel, allmass);
 	else if(control == 3) ADSIntegrator(temperature, vel, allmass);
-	else WARNING_QUIT("MD_thermo:Integrator", "please choose available reservoir!!!");
+	else ModuleBase::WARNING_QUIT("MD_thermo:Integrator", "please choose available reservoir!!!");
 	return;
 }
 
 void MD_thermo::LGVIntegrator(
     const double &temperature,
-    Vector3<double>* vel,
+    ModuleBase::Vector3<double>* vel,
     const double* allmass
 )
 {
@@ -338,7 +338,7 @@ void MD_thermo::LGVIntegrator(
 //added by zifei
 void MD_thermo::ADSIntegrator(
     const double &temperature,
-    Vector3<double>* vel,
+    ModuleBase::Vector3<double>* vel,
     const double* allmass
 )
 {
@@ -387,7 +387,7 @@ void MD_thermo::ADSIntegrator(
 //zifei
 void MD_thermo::NHCIntegrator(
     const double &temperature,
-    Vector3<double>* vel,
+    ModuleBase::Vector3<double>* vel,
     const double* allmass
 ){
 //---------------------------------------------------------------------------
@@ -490,24 +490,24 @@ void MD_thermo::NHC_info_out(const int& step, const int& recordFreq, const int& 
 		pass =1;
 	if (!pass) return;
 
-	if(!MY_RANK){
-		stringstream ssc;
-		ssc << global_out_dir << "Restart_md.dat";
-		ofstream file(ssc.str().c_str(), ios::app);
+	if(!GlobalV::MY_RANK){
+		std::stringstream ssc;
+		ssc << GlobalV::global_out_dir << "Restart_md.dat";
+		std::ofstream file(ssc.str().c_str(), ios::app);
         file<<'\n';
-		file<<"MD_THERMOSTAT"<<endl;
-		file<<"MNHC: "<<MNHC_<<endl;
-		file<<"G: "<<endl;
+		file<<"MD_THERMOSTAT"<<std::endl;
+		file<<"MNHC: "<<MNHC_<<std::endl;
+		file<<"G: "<<std::endl;
 		for(int i=0;i<numIon_*MNHC_;i++){
-			file<<setprecision (12)<<G[i].x<<" "<<setprecision (12)<<G[i].y<<" "<<setprecision (12)<<G[i].z<<endl;
+			file<<std::setprecision (12)<<G[i].x<<" "<<std::setprecision (12)<<G[i].y<<" "<<std::setprecision (12)<<G[i].z<<std::endl;
 		}
-        file<<"NHCeta: "<<endl;
+        file<<"NHCeta: "<<std::endl;
 		for(int i=0;i<numIon_*MNHC_;i++){
-			file<<setprecision (12)<<NHCeta[i].x<<" "<<setprecision (12)<<NHCeta[i].y<<" "<<setprecision (12)<<NHCeta[i].z<<endl;
+			file<<std::setprecision (12)<<NHCeta[i].x<<" "<<std::setprecision (12)<<NHCeta[i].y<<" "<<std::setprecision (12)<<NHCeta[i].z<<std::endl;
 		}
-        file<<"NHCpeta: "<<endl;
+        file<<"NHCpeta: "<<std::endl;
 		for(int i=0;i<numIon_*MNHC_;i++){
-			file<<setprecision (12)<<NHCpeta[i].x<<" "<<setprecision (12)<<NHCpeta[i].y<<" "<<setprecision (12)<<NHCpeta[i].z<<endl;
+			file<<std::setprecision (12)<<NHCpeta[i].x<<" "<<std::setprecision (12)<<NHCpeta[i].y<<" "<<std::setprecision (12)<<NHCpeta[i].z<<std::endl;
 		}                
 		file.close();
 	}
@@ -522,11 +522,11 @@ void MD_thermo::NHC_restart()
     double *nhcg=new double[numIon_*3*MNHC_];
     double *nhcp=new double[numIon_*3*MNHC_];
     double *nhce=new double[numIon_*3*MNHC_];
-    if (!MY_RANK)
+    if (!GlobalV::MY_RANK)
 	{
-		stringstream ssc;
-		ssc << global_readin_dir << "Restart_md.dat";
-		ifstream file(ssc.str().c_str());
+		std::stringstream ssc;
+		ssc << GlobalV::global_readin_dir << "Restart_md.dat";
+		std::ifstream file(ssc.str().c_str());
 
         char word[80];
         int mnhc;
@@ -546,7 +546,7 @@ void MD_thermo::NHC_restart()
 
         if(mnhc!=MNHC_)
         {
-            cout<<"please ensure whether 'Restart_md.dat' right!"<<endl;
+            std::cout<<"please ensure whether 'Restart_md.dat' right!"<<std::endl;
             error = 1;
         }
 

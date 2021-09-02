@@ -53,12 +53,12 @@ public:
 
 private:
 	// the most important array to calculate spillage
-	realArray Faln;// (ntype, max_l+1, max_n, ik)
+	ModuleBase::realArray Faln;// (ntype, max_l+1, max_n, ik)
 
 	// Coefficients to be optimized!
-	realArray C4;
+	ModuleBase::realArray C4;
 
-	realArray TableOne;
+	ModuleBase::realArray TableOne;
 	int kmesh;
 	double Dk;
 	int Ecut_number;
@@ -73,7 +73,7 @@ private:
 	// MEMBER FUNCTIONS :
 	// NAME : readin ( read in parameters )
 	//========================================================
-	void readin(const string &name); 
+	void readin(const std::string &name); 
 	void bcast(void);
 
 	void allocate_C4(
@@ -83,7 +83,7 @@ private:
 		const int &ecut_number);
 
 	void readin_C4(
-		const string &name,
+		const std::string &name,
 		const int &ntype,
 		const int &ecut,
 		const int &rcut,

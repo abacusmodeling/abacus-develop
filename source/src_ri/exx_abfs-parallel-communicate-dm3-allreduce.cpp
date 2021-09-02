@@ -18,79 +18,79 @@
 
 void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init(
 	const MPI_Comm &mpi_comm_in,
-	const map<set<size_t>,set<size_t>> &H_atom_pairs_group)
+	const std::map<std::set<size_t>,std::set<size_t>> &H_atom_pairs_group)
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init");
 	
 	mpi_comm = mpi_comm_in;
 	MPI_Comm_size(mpi_comm, &comm_sz);
 	MPI_Comm_rank(mpi_comm, &my_rank);
 
-//	const vector<pair<bool,bool>> atom_in_2D = get_atom_in_2D();
+//	const std::vector<std::pair<bool,bool>> atom_in_2D = get_atom_in_2D();
 	H_atom_pairs_group_rank = get_H_atom_pairs_group_rank(H_atom_pairs_group);
 	get_send_recv_size(H_atom_pairs_group_rank, H_atom_pairs_group, send_size_list, recv_size);
 
-ofstream ofs(exx_lcao.test_dir.process+"dm3_"+TO_STRING(my_rank));
-//ofs<<H_atom_pairs_group<<endl;
-//ofs<<atom_in_2D<<endl;
+std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"dm3_"+ModuleBase::GlobalFunc::TO_STRING(my_rank));
+//ofs<<H_atom_pairs_group<<std::endl;
+//ofs<<atom_in_2D<<std::endl;
 //for(int rank=0; rank!=comm_sz; ++rank)
 //{
-//	ofs<<rank<<endl;
+//	ofs<<rank<<std::endl;
 //	for(const auto &i:H_atom_pairs_group_rank[rank])
-//		ofs<<"\t"<<i.first<<"\t"<<*i.second<<endl;
+//		ofs<<"\t"<<i.first<<"\t"<<*i.second<<std::endl;
 //}
-ofs<<send_size_list<<endl;
-ofs<<recv_size<<endl;
+ofs<<send_size_list<<std::endl;
+ofs<<recv_size<<std::endl;
 }
 
 
-vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>>
+std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>>
 	Exx_Abfs::Parallel::Communicate::DM3::Allreduce::a2D_to_exx(
-		vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_local) const
+		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &data_local) const
 {
-ofstream ofs(exx_lcao.test_dir.process+"dm3_"+TO_STRING(my_rank), ofstream::app);
-//ofs<<data_local<<endl<<"@@@"<<endl;;
+std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"dm3_"+ModuleBase::GlobalFunc::TO_STRING(my_rank), std::ofstream::app);
+//ofs<<data_local<<std::endl<<"@@@"<<std::endl;;
 
-	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::a2D_to_exx");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::a2D_to_exx");
 	
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> data_all(NSPIN);
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> data_all(GlobalV::NSPIN);
 
-	vector<atomic<Flag_Send>> flags_send(comm_sz);
-    vector<atomic<Flag_Recv>> flags_recv(comm_sz);
+	std::vector<atomic<Flag_Send>> flags_send(comm_sz);
+    std::vector<atomic<Flag_Recv>> flags_recv(comm_sz);
 	init_flags(flags_send, flags_recv);
 
-	vector<vector<double>> oarps_isend(comm_sz);
-	vector<vector<double>> iarps_irecv(comm_sz);
+	std::vector<std::vector<double>> oarps_isend(comm_sz);
+	std::vector<std::vector<double>> iarps_irecv(comm_sz);
 
 	int rank_send_now = my_rank;
 	auto rank_send_next = [&]()->int{ return (rank_send_now+1)%comm_sz; };
 
 	atomic_flag lock_insert = ATOMIC_FLAG_INIT;
-	vector<thread> threads;
-	vector<MPI_Request>requests_isend(comm_sz);
-	vector<MPI_Request>requests_irecv(comm_sz);
-ofs<<__LINE__<<endl;
+	std::vector<thread> threads;
+	std::vector<MPI_Request>requests_isend(comm_sz);
+	std::vector<MPI_Request>requests_irecv(comm_sz);
+ofs<<__LINE__<<std::endl;
 
 	while(!finish_judge(flags_send, flags_recv))
 	{
 		if(rank_send_next()!=my_rank && memory_enough(rank_send_next(), flags_send))
 		{
 			rank_send_now = rank_send_next();
-ofs<<__LINE__<<"\t"<<rank_send_now<<endl;
+ofs<<__LINE__<<"\t"<<rank_send_now<<std::endl;
 			flags_send[rank_send_now] = Flag_Send::begin_oar;
 			threads.push_back(std::thread(
 				&Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process, this,
 				rank_send_now, std::cref(data_local), std::ref(oarps_isend), std::ref(flags_send) ));
-ofs<<__LINE__<<"\t"<<rank_send_now<<endl;
+ofs<<__LINE__<<"\t"<<rank_send_now<<std::endl;
 		}
 		for(int rank_send=0; rank_send!=comm_sz; ++rank_send)
 		{
 			if( flags_send[rank_send] == Flag_Send::finish_oar )
 			{
-ofs<<__LINE__<<"\t"<<rank_send<<endl;
-				if(MPI_Isend( VECTOR_TO_PTR(oarps_isend[rank_send]), oarps_isend[rank_send].size(), MPI_DOUBLE, rank_send, 0, mpi_comm, &requests_isend[rank_send] )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+ofs<<__LINE__<<"\t"<<rank_send<<std::endl;
+				if(MPI_Isend( ModuleBase::GlobalFunc::VECTOR_TO_PTR(oarps_isend[rank_send]), oarps_isend[rank_send].size(), MPI_DOUBLE, rank_send, 0, mpi_comm, &requests_isend[rank_send] )!=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 				flags_send[rank_send] = Flag_Send::begin_isend;
-ofs<<__LINE__<<"\t"<<rank_send<<"\t"<<oarps_isend[rank_send].size()<<endl;
+ofs<<__LINE__<<"\t"<<rank_send<<"\t"<<oarps_isend[rank_send].size()<<std::endl;
 			}
 		}
 		for(int rank_send=0; rank_send!=comm_sz; ++rank_send)
@@ -98,10 +98,10 @@ ofs<<__LINE__<<"\t"<<rank_send<<"\t"<<oarps_isend[rank_send].size()<<endl;
 			if( flags_send[rank_send] == Flag_Send::begin_isend )
 			{
 				int flag_finish;
-				if(MPI_Test( &requests_isend[rank_send], &flag_finish, MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				if(MPI_Test( &requests_isend[rank_send], &flag_finish, MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 				if(flag_finish)
 				{
-ofs<<__LINE__<<"\t"<<rank_send<<endl;
+ofs<<__LINE__<<"\t"<<rank_send<<std::endl;
 					oarps_isend[rank_send].resize(0);	oarps_isend[rank_send].shrink_to_fit();
 					flags_send[rank_send] = Flag_Send::finish_isend;
 				}
@@ -111,17 +111,17 @@ ofs<<__LINE__<<"\t"<<rank_send<<endl;
 		{
 			MPI_Status status;
 			int flag_message;
-			if(MPI_Iprobe( MPI_ANY_SOURCE, 0, mpi_comm, &flag_message, &status )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+			if(MPI_Iprobe( MPI_ANY_SOURCE, 0, mpi_comm, &flag_message, &status )!=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 			if(flag_message)
 			{
 				int message_size;
-				if(MPI_Get_count( &status, MPI_PACKED, &message_size )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				if(MPI_Get_count( &status, MPI_PACKED, &message_size )!=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 				const int rank_recv = status.MPI_SOURCE;
-ofs<<__LINE__<<"\t"<<rank_recv<<endl;
+ofs<<__LINE__<<"\t"<<rank_recv<<std::endl;
 				iarps_irecv[rank_recv].resize(message_size);
-				if(MPI_Irecv( VECTOR_TO_PTR(iarps_irecv[rank_recv]), message_size, MPI_DOUBLE, rank_recv, 0, mpi_comm, &requests_irecv[rank_recv] )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				if(MPI_Irecv( ModuleBase::GlobalFunc::VECTOR_TO_PTR(iarps_irecv[rank_recv]), message_size, MPI_DOUBLE, rank_recv, 0, mpi_comm, &requests_irecv[rank_recv] )!=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 				flags_recv[rank_recv] = Flag_Recv::begin_irecv;
-ofs<<__LINE__<<"\t"<<rank_recv<<"\t"<<message_size<<endl;
+ofs<<__LINE__<<"\t"<<rank_recv<<"\t"<<message_size<<std::endl;
 			}
 		}
 		for(int rank_recv=0; rank_recv!=comm_sz; ++rank_recv)
@@ -129,65 +129,65 @@ ofs<<__LINE__<<"\t"<<rank_recv<<"\t"<<message_size<<endl;
 			if(flags_recv[rank_recv] == Flag_Recv::begin_irecv)
 			{
 				int flag_finish = 0;
-ofs<<__LINE__<<"\t"<<rank_recv<<"\t"<<flag_finish<<endl;
-				if(MPI_Test( &requests_irecv[rank_recv], &flag_finish, MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
-ofs<<__LINE__<<"\t"<<rank_recv<<"\t"<<flag_finish<<endl;
+ofs<<__LINE__<<"\t"<<rank_recv<<"\t"<<flag_finish<<std::endl;
+				if(MPI_Test( &requests_irecv[rank_recv], &flag_finish, MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+ofs<<__LINE__<<"\t"<<rank_recv<<"\t"<<flag_finish<<std::endl;
 				if(flag_finish)
 				{
-ofs<<__LINE__<<"\t"<<rank_recv<<"\t"<<flag_finish<<endl;
+ofs<<__LINE__<<"\t"<<rank_recv<<"\t"<<flag_finish<<std::endl;
 					flags_recv[rank_recv] = Flag_Recv::begin_iar;
 					threads.push_back(std::thread(
 						&Exx_Abfs::Parallel::Communicate::DM3::Allreduce::recv_data_process, this,
 						rank_recv, std::ref(data_all), std::ref(iarps_irecv), std::ref(flags_recv), std::ref(lock_insert) ));
-ofs<<__LINE__<<"\t"<<rank_recv<<endl;
+ofs<<__LINE__<<"\t"<<rank_recv<<std::endl;
 				}
 			}
 		}
 	}
-ofs<<__LINE__<<endl;
+ofs<<__LINE__<<std::endl;
 
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix*>>>> data_intersection = get_intersection(my_rank, data_local);
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix*>>>> data_intersection = get_intersection(my_rank, data_local);
 	while( lock_insert.test_and_set() );
 	insert_data(data_intersection, data_all);
 	lock_insert.clear();
-ofs<<__LINE__<<endl;
+ofs<<__LINE__<<std::endl;
 
 	for(int rank_send=0; rank_send!=comm_sz; ++rank_send)
 	{
 		if( flags_send[rank_send] == Flag_Send::begin_isend )
 		{
-			if(MPI_Wait( &requests_isend[rank_send], MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+			if(MPI_Wait( &requests_isend[rank_send], MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 			oarps_isend[rank_send].resize(0);		oarps_isend[rank_send].shrink_to_fit();
 			flags_send[rank_send] = Flag_Send::finish_isend;
 		}
 	}
-ofs<<__LINE__<<endl;
+ofs<<__LINE__<<std::endl;
 
 	for(std::thread &t : threads)
 		t.join();
-ofs<<__LINE__<<endl;
-//ofs<<"@@@"<<endl<<data_all<<endl;
+ofs<<__LINE__<<std::endl;
+//ofs<<"@@@"<<std::endl<<data_all<<std::endl;
 
 	return data_all;
 }
 
 
 /*
-vector<pair<bool,bool>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_atom_in_2D() const
+std::vector<std::pair<bool,bool>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_atom_in_2D() const
 {
-	vector<pair<bool,bool>> atom_in_2D(ucell.nat,{false,false});
-	for(int iwt=0; iwt<NLOCAL; ++iwt)
+	std::vector<std::pair<bool,bool>> atom_in_2D(GlobalC::ucell.nat,{false,false});
+	for(int iwt=0; iwt<GlobalV::NLOCAL; ++iwt)
 	{
-		const int iat = ucell.iwt2iat[iwt];
-		if(KS_SOLVER=="genelpa")
+		const int iat = GlobalC::ucell.iwt2iat[iwt];
+		if(GlobalV::KS_SOLVER=="genelpa")
 		{
-			if(ParaO.trace_loc_col[iwt]>=0)
+			if(GlobalC::ParaO.trace_loc_col[iwt]>=0)
 				atom_in_2D[iat].first = true;
-			if(ParaO.trace_loc_row[iwt]>=0)
+			if(GlobalC::ParaO.trace_loc_row[iwt]>=0)
 				atom_in_2D[iat].second = true;
 		}
 		else
-			throw domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::domain_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
 	return atom_in_2D;
 }
@@ -195,11 +195,11 @@ vector<pair<bool,bool>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_ato
 
 
 /*
-vector<map<size_t,shared_ptr<set<size_t>>>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_H_atom_pairs_group_rank(
-	const map<set<size_t>,set<size_t>> &H_atom_pairs_group,
-	const vector<pair<bool,bool>> &atom_in_2D) const
+std::vector<std::map<size_t,std::shared_ptr<std::set<size_t>>>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_H_atom_pairs_group_rank(
+	const std::map<std::set<size_t>,std::set<size_t>> &H_atom_pairs_group,
+	const std::vector<std::pair<bool,bool>> &atom_in_2D) const
 {
-	vector<int> H_atom_pairs_group_vector;
+	std::vector<int> H_atom_pairs_group_vector;
 	for(const auto &pairs : H_atom_pairs_group)
 	{
 		H_atom_pairs_group_vector.push_back(pairs.first.size());
@@ -208,14 +208,14 @@ vector<map<size_t,shared_ptr<set<size_t>>>> Exx_Abfs::Parallel::Communicate::DM3
 		H_atom_pairs_group_vector.insert(H_atom_pairs_group_vector.end(), pairs.second.begin(), pairs.second.end());
 	}
 
-	vector<int> rank_size(comm_sz);
-	vector<int> rank_index(comm_sz);
+	std::vector<int> rank_size(comm_sz);
+	std::vector<int> rank_index(comm_sz);
 	for(size_t i=0; i<rank_index.size(); ++i)
 		rank_index[i] = i;
 	const int myrank_size = H_atom_pairs_group_vector.size();
 	MPI_Allgatherv(
 		&myrank_size, 1, MPI_INT,
-		VECTOR_TO_PTR(rank_size), VECTOR_TO_PTR(vector<int>(comm_sz,1)), VECTOR_TO_PTR(rank_index), MPI_INT,
+		ModuleBase::GlobalFunc::VECTOR_TO_PTR(rank_size), ModuleBase::GlobalFunc::VECTOR_TO_PTR(std::vector<int>(comm_sz,1)), ModuleBase::GlobalFunc::VECTOR_TO_PTR(rank_index), MPI_INT,
 		mpi_comm );
 
 	size_t index_accumulate = 0;
@@ -224,13 +224,13 @@ vector<map<size_t,shared_ptr<set<size_t>>>> Exx_Abfs::Parallel::Communicate::DM3
 		rank_index[i] = index_accumulate;
 		index_accumulate += rank_size[i];
 	}
-	vector<int> H_atom_pairs_group_rank_vector(index_accumulate);
+	std::vector<int> H_atom_pairs_group_rank_vector(index_accumulate);
 	MPI_Allgatherv(
-		VECTOR_TO_PTR(H_atom_pairs_group_vector), H_atom_pairs_group_vector.size(), MPI_INT,
-		VECTOR_TO_PTR(H_atom_pairs_group_rank_vector), VECTOR_TO_PTR(rank_size), VECTOR_TO_PTR(rank_index), MPI_INT,
+		ModuleBase::GlobalFunc::VECTOR_TO_PTR(H_atom_pairs_group_vector), H_atom_pairs_group_vector.size(), MPI_INT,
+		ModuleBase::GlobalFunc::VECTOR_TO_PTR(H_atom_pairs_group_rank_vector), ModuleBase::GlobalFunc::VECTOR_TO_PTR(rank_size), ModuleBase::GlobalFunc::VECTOR_TO_PTR(rank_index), MPI_INT,
 		mpi_comm);
 
-	vector<map<size_t,shared_ptr<set<size_t>>>> H_atom_pairs_group_rank(comm_sz);
+	std::vector<std::map<size_t,std::shared_ptr<std::set<size_t>>>> H_atom_pairs_group_rank(comm_sz);
 	auto ptr = H_atom_pairs_group_rank_vector.begin();
 	for(int rank=0; rank!=comm_sz; ++rank)
 	{
@@ -241,7 +241,7 @@ vector<map<size_t,shared_ptr<set<size_t>>>> Exx_Abfs::Parallel::Communicate::DM3
 			const size_t atoms2_size = *ptr++;
 			if(atoms1_size&&atoms2_size)
 			{
-				shared_ptr<set<size_t>> atoms2 = make_shared<set<size_t>>();
+				std::shared_ptr<std::set<size_t>> atoms2 = make_shared<std::set<size_t>>();
 				for(int i=0; i<atoms1_size; ++i)
 				{
 					const size_t atom_require = *ptr++;
@@ -266,19 +266,19 @@ vector<map<size_t,shared_ptr<set<size_t>>>> Exx_Abfs::Parallel::Communicate::DM3
 */
 
 
-vector<map<size_t,set<size_t>>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_H_atom_pairs_group_rank(
-	const map<set<size_t>,set<size_t>> &H_atom_pairs_group) const
+std::vector<std::map<size_t,std::set<size_t>>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_H_atom_pairs_group_rank(
+	const std::map<std::set<size_t>,std::set<size_t>> &H_atom_pairs_group) const
 {
 	constexpr int tag = 0;
 
-	const vector<pair<vector<bool>,vector<bool>>> atom_in_2D_list = Exx_Abfs::Parallel::Communicate::Function::get_atom_in_2D_list(mpi_comm);
+	const std::vector<std::pair<std::vector<bool>,std::vector<bool>>> atom_in_2D_list = Exx_Abfs::Parallel::Communicate::Function::get_atom_in_2D_list(mpi_comm);
 
-	vector<MPI_Request> request(comm_sz);
-	vector<string> atom_send_str(comm_sz);
+	std::vector<MPI_Request> request(comm_sz);
+	std::vector<std::string> atom_send_str(comm_sz);
 	for(int rank_tmp=my_rank; rank_tmp!=comm_sz+my_rank; ++rank_tmp)
 	{
 		const int rank = rank_tmp%comm_sz;
-		map<size_t,set<size_t>> atom_required;
+		std::map<size_t,std::set<size_t>> atom_required;
 		for(const auto & H_atom_pairs : H_atom_pairs_group)
 			for(const size_t iat1 : H_atom_pairs.first)
 				if(atom_in_2D_list[rank].first[iat1])
@@ -288,28 +288,28 @@ vector<map<size_t,set<size_t>>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce:
 							
 		#ifdef USE_CEREAL_SERIALIZATION
 		{
-			stringstream atom_send_ss;
+			std::stringstream atom_send_ss;
 			cereal::BinaryOutputArchive ar(atom_send_ss);
 			ar(atom_required);
 			atom_send_str[rank] = atom_send_ss.str();
 		}
 		#else
-			throw invalid_argument(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		#endif
-		if( MPI_Isend( atom_send_str[rank].c_str(), atom_send_str[rank].size(), MPI_CHAR, rank, tag, mpi_comm, &request[rank] ) !=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+		if( MPI_Isend( atom_send_str[rank].c_str(), atom_send_str[rank].size(), MPI_CHAR, rank, tag, mpi_comm, &request[rank] ) !=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
 
-	vector<map<size_t,set<size_t>>> H_atom_pairs_group_rank(comm_sz);
+	std::vector<std::map<size_t,std::set<size_t>>> H_atom_pairs_group_rank(comm_sz);
 	for(int i=0; i!=comm_sz; ++i)
 	{
 		MPI_Status status;
-		if( MPI_Probe( MPI_ANY_SOURCE, tag, mpi_comm, &status ) !=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+		if( MPI_Probe( MPI_ANY_SOURCE, tag, mpi_comm, &status ) !=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		int size_recv;
-		if( MPI_Get_count( &status, MPI_CHAR, &size_recv) !=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+		if( MPI_Get_count( &status, MPI_CHAR, &size_recv) !=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 
-		vector<char> ss_buffer(size_recv);
-		if( MPI_Recv( ss_buffer.data(), size_recv, MPI_CHAR, status.MPI_SOURCE, tag, mpi_comm, MPI_STATUS_IGNORE ) !=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
-		stringstream atom_recv_ss;  
+		std::vector<char> ss_buffer(size_recv);
+		if( MPI_Recv( ss_buffer.data(), size_recv, MPI_CHAR, status.MPI_SOURCE, tag, mpi_comm, MPI_STATUS_IGNORE ) !=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+		std::stringstream atom_recv_ss;  
 		atom_recv_ss.rdbuf()->pubsetbuf(ss_buffer.data(),size_recv);
 		#ifdef USE_CEREAL_SERIALIZATION
 		{
@@ -317,18 +317,18 @@ vector<map<size_t,set<size_t>>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce:
 			ar(H_atom_pairs_group_rank[status.MPI_SOURCE]);
 		}	
 		#else
-			throw invalid_argument(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		#endif
 	}
 
-	if( MPI_Waitall( comm_sz, request.data(), MPI_STATUSES_IGNORE ) !=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+	if( MPI_Waitall( comm_sz, request.data(), MPI_STATUSES_IGNORE ) !=MPI_SUCCESS)	throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	return H_atom_pairs_group_rank;
 }
 
 void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_send_recv_size(
-	const vector<map<size_t,set<size_t>>> &H_atom_pairs_group_rank,
-	const map<set<size_t>,set<size_t>> &H_atom_pairs_group,
-	vector<size_t> &send_size_list, size_t &recv_size) const
+	const std::vector<std::map<size_t,std::set<size_t>>> &H_atom_pairs_group_rank,
+	const std::map<std::set<size_t>,std::set<size_t>> &H_atom_pairs_group,
+	std::vector<size_t> &send_size_list, size_t &recv_size) const
 {
 	send_size_list.resize(comm_sz,0);
 	for(int rank=0; rank!=comm_sz; ++rank)
@@ -337,7 +337,7 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_send_recv_size(
 		{
 			const size_t iat1 = H_pairs_tmp.first;
 			for(const size_t iat2 : H_pairs_tmp.second)
-				send_size_list[rank] += ucell.atoms[ucell.iat2it[iat1]].nw * ucell.atoms[ucell.iat2it[iat2]].nw;
+				send_size_list[rank] += GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw * GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw;
 		}
 		send_size_list[rank] *= sizeof(double);
 	}
@@ -347,9 +347,9 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_send_recv_size(
 	{
 		size_t nw1=0, nw2=0;
 		for(size_t iat1 : pairs.first)
-			nw1 += ucell.atoms[ucell.iat2it[iat1]].nw;
+			nw1 += GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw;
 		for(size_t iat2 : pairs.second)
-			nw2 += ucell.atoms[ucell.iat2it[iat2]].nw;
+			nw2 += GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw;
 		recv_size += nw1*nw1;
 	}
 	recv_size *= sizeof(double);
@@ -357,10 +357,10 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_send_recv_size(
 
 
 void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init_flags(
-	vector<atomic<Flag_Send>> &flags_send,
-	vector<atomic<Flag_Recv>> &flags_recv) const
+	std::vector<atomic<Flag_Send>> &flags_send,
+	std::vector<atomic<Flag_Recv>> &flags_recv) const
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init_flags");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init_flags");
 	
 	for(atomic<Flag_Send> &flag_send : flags_send)
 		flag_send = Flag_Send::undo;
@@ -373,8 +373,8 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init_flags(
 
 
 bool Exx_Abfs::Parallel::Communicate::DM3::Allreduce::finish_judge(
-	const vector<atomic<Flag_Send>> &flags_send,
-	const vector<atomic<Flag_Recv>> &flags_recv) const
+	const std::vector<atomic<Flag_Send>> &flags_send,
+	const std::vector<atomic<Flag_Recv>> &flags_recv) const
 {
 	for(int rank_send=0; rank_send!=comm_sz; ++rank_send)
 		if((flags_send[rank_send]!=Flag_Send::begin_isend) && (flags_send[rank_send]!=Flag_Send::finish_isend))
@@ -388,13 +388,13 @@ bool Exx_Abfs::Parallel::Communicate::DM3::Allreduce::finish_judge(
 
 bool Exx_Abfs::Parallel::Communicate::DM3::Allreduce::memory_enough(
 	const int rank_send_next,
-	const vector<atomic<Flag_Send>> &flags_send) const
+	const std::vector<atomic<Flag_Send>> &flags_send) const
 {
 	size_t memory_need = recv_size;
 	for(int rank_send=0; rank_send<comm_sz; ++rank_send)
 		if(flags_send[rank_send]==Flag_Send::begin_oar)
 			memory_need += send_size_list[rank_send];
-	const size_t memory_available = MemAvailable()*1024;
+	const size_t memory_available = ModuleBase::GlobalFunc::MemAvailable()*1024;
 	return (memory_available-memory_need>send_size_list[rank_send_next]) ? true : false;
 }
 
@@ -402,14 +402,14 @@ bool Exx_Abfs::Parallel::Communicate::DM3::Allreduce::memory_enough(
 /*
 void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process(
 	const int rank_send_now,
-	const vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_local,
-	vector<vector<double>> &oarps_isend,
-	vector<atomic<Flag_Send>> &flags_send) const
+	const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &data_local,
+	std::vector<std::vector<double>> &oarps_isend,
+	std::vector<atomic<Flag_Send>> &flags_send) const
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process");
 	
-	vector<double> &oarp = oarps_isend[rank_send_now];
-	for( int is=0; is!=NSPIN; ++is )
+	std::vector<double> &oarp = oarps_isend[rank_send_now];
+	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		oarp.push_back(-999);		const size_t index_size = oarp.size()-1;
 		auto ptr_data_A = data_local[is].begin();
@@ -433,7 +433,7 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process(
 						for(const auto &data_C : ptr_data_B->second)
 						{
 							const Abfs::Vector3_Order<int> &box2 = data_C.first;
-							const matrix &m = data_C.second;
+							const ModuleBase::matrix &m = data_C.second;
 							oarp.push_back(iat1);
 							oarp.push_back(iat2);
 							oarp.push_back(box2.x);	oarp.push_back(box2.y);	oarp.push_back(box2.z);
@@ -454,18 +454,18 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process(
 
 void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process(
 	const int rank_send_now,
-	const vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_local,
-	vector<vector<double>> &oarps_isend,
-	vector<atomic<Flag_Send>> &flags_send) const
+	const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &data_local,
+	std::vector<std::vector<double>> &oarps_isend,
+	std::vector<atomic<Flag_Send>> &flags_send) const
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process");
 	
-	const vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix*>>>> data_intersection = get_intersection(
+	const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix*>>>> data_intersection = get_intersection(
 		rank_send_now,
-		const_cast<vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>>&>(data_local));
+		const_cast<std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>>&>(data_local));
 
-	vector<double> &oarp = oarps_isend[rank_send_now];
-	for( int is=0; is!=NSPIN; ++is )
+	std::vector<double> &oarp = oarps_isend[rank_send_now];
+	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		oarp.push_back(-999);		const size_t index_size = oarp.size()-1;
 		for(const auto data_A : data_intersection[is])
@@ -477,7 +477,7 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process(
 				for(const auto data_C : data_B.second)
 				{
 					const Abfs::Vector3_Order<int> &box2 = data_C.first;
-					const matrix &m = *data_C.second;
+					const ModuleBase::matrix &m = *data_C.second;
 					oarp.push_back(iat1);
 					oarp.push_back(iat2);
 					oarp.push_back(box2.x);	oarp.push_back(box2.y);	oarp.push_back(box2.z);
@@ -491,12 +491,12 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process(
 	flags_send[rank_send_now] = Flag_Send::finish_oar;
 }
 
-vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix*>>>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_intersection(
+std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix*>>>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_intersection(
 	const int rank_send_now,
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_local) const
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &data_local) const
 {
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix*>>>> data_intersection(NSPIN);
-	for( int is=0; is!=NSPIN; ++is )
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix*>>>> data_intersection(GlobalV::NSPIN);
+	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		auto ptr_data_A = data_local[is].begin();
 		auto ptr_atom_A = H_atom_pairs_group_rank[rank_send_now].begin();
@@ -533,23 +533,23 @@ vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix*>>>> Exx_Abfs::
 
 void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::recv_data_process(
 	const int rank_recv,
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_all,
-	vector<vector<double>> &iarps_irecv,
-	vector<atomic<Flag_Recv>> &flags_recv,
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &data_all,
+	std::vector<std::vector<double>> &iarps_irecv,
+	std::vector<atomic<Flag_Recv>> &flags_recv,
 	atomic_flag &lock_insert) const
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::recv_data_process");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::recv_data_process");
 	
-	auto vector_empty = []( const vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &v ) -> bool
+	auto vector_empty = []( const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &v ) -> bool
 	{
 		for( const auto &i : v )
 			if(!i.empty())	return false;
 		return true;
 	};
 
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> data_rank(NSPIN);
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> data_rank(GlobalV::NSPIN);
 	auto ptr = iarps_irecv[rank_recv].begin();
-	for( int is=0; is!=NSPIN; ++is )
+	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		const size_t recv_size = ptr[0];
 		ptr += 1;
@@ -559,7 +559,7 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::recv_data_process(
 			const size_t iat1=ptr[0], iat2=ptr[1];
 			const Abfs::Vector3_Order<int> box2 = {ptr[2],ptr[3],ptr[4]};
 			const int nr=ptr[5], nc=ptr[6];
-			matrix &m = data_rank[is][iat1][iat2][box2];
+			ModuleBase::matrix &m = data_rank[is][iat1][iat2][box2];
 			m.create(nr,nc);
 			copy( ptr+7, ptr+7+nr*nc, m.c );
 			ptr += 7+nr*nc;
@@ -577,17 +577,17 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::recv_data_process(
 }
 
 
-matrix& Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_matrix(matrix&m)const{ return m; }
-matrix& Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_matrix(matrix*pm)const{ return *pm; }
+ModuleBase::matrix& Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_matrix(ModuleBase::matrix&m)const{ return m; }
+ModuleBase::matrix& Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_matrix(ModuleBase::matrix*pm)const{ return *pm; }
 
 
 template<typename M>
 void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::insert_data(
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,M>>>> &data_rank,
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_all) const
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,M>>>> &data_rank,
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &data_all) const
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::insert_data");
-	for( int is=0; is!=NSPIN; ++is )
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::insert_data");
+	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		auto &data_rank_is = data_rank[is];
 		auto &data_all_is = data_all[is];
@@ -603,7 +603,7 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::insert_data(
 				{
 					const Abfs::Vector3_Order<int> &box2 = data_rank_C.first;
 					auto &data_all_C = data_all_B[box2];
-					matrix &m = get_matrix(data_rank_C.second);
+					ModuleBase::matrix &m = get_matrix(data_rank_C.second);
 					if( data_all_C.c )
 						data_all_C += m;
 					else

@@ -45,13 +45,13 @@ void Numerical_Nonlocal_Lm::renew(void)
 	this->dbeta_uniform = new double[nr_uniform];
 	this->k_radial = new double[nk];
 	this->beta_k = new double[nk];
-	ZEROS(r_radial, nr);
-	ZEROS(rab, nr);
-	ZEROS(beta_r, nr);
-	ZEROS(beta_uniform, nr_uniform);
-	ZEROS(dbeta_uniform, nr_uniform);
-	ZEROS(k_radial, nk);
-	ZEROS(beta_k, nk);
+	ModuleBase::GlobalFunc::ZEROS(r_radial, nr);
+	ModuleBase::GlobalFunc::ZEROS(rab, nr);
+	ModuleBase::GlobalFunc::ZEROS(beta_r, nr);
+	ModuleBase::GlobalFunc::ZEROS(beta_uniform, nr_uniform);
+	ModuleBase::GlobalFunc::ZEROS(dbeta_uniform, nr_uniform);
+	ModuleBase::GlobalFunc::ZEROS(k_radial, nk);
+	ModuleBase::GlobalFunc::ZEROS(beta_k, nk);
 }
 
 void Numerical_Nonlocal_Lm::freemem(void)
@@ -111,7 +111,7 @@ Numerical_Nonlocal_Lm& Numerical_Nonlocal_Lm::operator=
 }
 
 void Numerical_Nonlocal_Lm::set_NL_proj(
- 	const string &label_in,
+ 	const std::string &label_in,
     const int &index_atom_type_in,
     const int &angular_momentum_l_in,
     const int &nr_in,
@@ -173,17 +173,17 @@ void Numerical_Nonlocal_Lm::extra_uniform(const double &dr_uniform_in)
 	this->dr_uniform = dr_uniform_in;
 	this->nr_uniform = static_cast<int>(rcut/dr_uniform) + 10;
 
-//	cout << " nr_uniform = " << nr_uniform << endl;
+//	std::cout << " nr_uniform = " << nr_uniform << std::endl;
 	
 	delete[] this->beta_uniform;
 	this->beta_uniform = new double[nr_uniform];
-	ZEROS (this->beta_uniform, nr_uniform);
+	ModuleBase::GlobalFunc::ZEROS (this->beta_uniform, nr_uniform);
 
 	// mohan fix bug 2011-04-14
 	// the beta_r is beta*r.
 	// and beta is beta!!!
 	double* beta = new double[nr];
-	ZEROS(beta,nr);
+	ModuleBase::GlobalFunc::ZEROS(beta,nr);
 	for(int ir=0; ir<nr; ir++)
 	{
 		assert(r_radial[ir]>0.0);
@@ -193,16 +193,16 @@ void Numerical_Nonlocal_Lm::extra_uniform(const double &dr_uniform_in)
 	for (int ir = 0; ir < this->nr_uniform; ir++)
 	{
 		double rnew = ir * dr_uniform;
-		this->beta_uniform[ir] = PolyInt::Polynomial_Interpolation_xy(this->r_radial, beta, this->nr, rnew); 
+		this->beta_uniform[ir] = ModuleBase::PolyInt::Polynomial_Interpolation_xy(this->r_radial, beta, this->nr, rnew); 
     }
 	delete[] beta;
 
 	delete[] this->dbeta_uniform;
 	this->dbeta_uniform = new double[nr_uniform];
-	ZEROS(this->dbeta_uniform, nr_uniform);
+	ModuleBase::GlobalFunc::ZEROS(this->dbeta_uniform, nr_uniform);
 	
 	double* y2 = new double[nr];
-	Mathzone_Add1::SplineD2 (r_radial, beta_r, nr, 0.0, 0.0, y2);
+	ModuleBase::Mathzone_Add1::SplineD2 (r_radial, beta_r, nr, 0.0, 0.0, y2);
 
 	double* rad = new double[nr_uniform];
 	for (int ir = 0; ir < nr_uniform; ir++)
@@ -211,7 +211,7 @@ void Numerical_Nonlocal_Lm::extra_uniform(const double &dr_uniform_in)
 	}
 	
 	double* tmp = new double[nr_uniform];
-	Mathzone_Add1::Cubic_Spline_Interpolation(r_radial, beta_r, y2, 
+	ModuleBase::Mathzone_Add1::Cubic_Spline_Interpolation(r_radial, beta_r, y2, 
 					nr, rad, nr_uniform, tmp, dbeta_uniform );
 
 	for(int ir= 0 ; ir<nr_uniform; ir++)
@@ -228,7 +228,7 @@ void Numerical_Nonlocal_Lm::extra_uniform(const double &dr_uniform_in)
 
 void Numerical_Nonlocal_Lm::get_kradial(void)
 {
-    //TITLE("Numerical_Nonlocal_Lm","get_kradial");
+    //ModuleBase::TITLE("Numerical_Nonlocal_Lm","get_kradial");
     double *jl = new double[nr];
     double *integrated_func = new double[nr];
 
@@ -238,7 +238,7 @@ void Numerical_Nonlocal_Lm::get_kradial(void)
 
     for (int ik = 0; ik < nk; ik++)
     {
-        Sphbes::Spherical_Bessel(
+        ModuleBase::Sphbes::Spherical_Bessel(
                 this->nr,
                 this->r_radial,
                 this->k_radial[ik],
@@ -251,7 +251,7 @@ void Numerical_Nonlocal_Lm::get_kradial(void)
             integrated_func[ir] = this->beta_r[ir] * this->r_radial[ir] * jl[ir];
         }
 
-        Integral::Simpson_Integral(
+        ModuleBase::Integral::Simpson_Integral(
                 this->nr,
                 integrated_func,
                 this->rab,
@@ -267,7 +267,7 @@ void Numerical_Nonlocal_Lm::get_kradial(void)
 
 void Numerical_Nonlocal_Lm::plot(const int &my_rank)const
 {
-	string orbital_type;
+	std::string orbital_type;
 	switch( this->angular_momentum_l )
 	{
 		case 0: orbital_type = "s"; break;
@@ -275,7 +275,7 @@ void Numerical_Nonlocal_Lm::plot(const int &my_rank)const
 		case 2: orbital_type = "d"; break;
 		case 3: orbital_type = "f"; break;
 		case 4: orbital_type = "g"; break;
-		default: WARNING_QUIT("Numerical_Orbital_Lm::plot","Please check in functoin.");
+		default: ModuleBase::WARNING_QUIT("Numerical_Orbital_Lm::plot","Please check in functoin.");
 	}
 
 #ifdef __NORMAL
@@ -283,38 +283,38 @@ void Numerical_Nonlocal_Lm::plot(const int &my_rank)const
 #else
 	if(my_rank==0)
 	{
-		stringstream ssr, ssk, ssru;
-		ssr << global_out_dir << this->label << "/"
+		std::stringstream ssr, ssk, ssru;
+		ssr << GlobalV::global_out_dir << this->label << "/"
 			<< this->label << "-" << orbital_type << "-proj-r.dat";
 
-		ssk << global_out_dir << this->label << "/"
+		ssk << GlobalV::global_out_dir << this->label << "/"
 			<< this->label << "-" << orbital_type << "-proj-k.dat";
 
-		ssru << global_out_dir << this->label << "/"
+		ssru << GlobalV::global_out_dir << this->label << "/"
 			<< this->label << "-" << orbital_type << "-proj-ru.dat";
 
-		ofstream ofsr(ssr.str().c_str());
-		ofstream ofsk(ssk.str().c_str());
-		ofstream ofsru(ssru.str().c_str());
+		std::ofstream ofsr(ssr.str().c_str());
+		std::ofstream ofsk(ssk.str().c_str());
+		std::ofstream ofsru(ssru.str().c_str());
 
 		if (!ofsk || !ofsr || !ofsru)
 		{
-			WARNING_QUIT("Numerical_Orbital_Lm::plot", "Can't open files!");
+			ModuleBase::WARNING_QUIT("Numerical_Orbital_Lm::plot", "Can't open files!");
 		}
 
 		for (int i = 0; i < this->nr; i++)
 		{
-			ofsr << this->r_radial[i] << " " << this->beta_r[i] << endl;
+			ofsr << this->r_radial[i] << " " << this->beta_r[i] << std::endl;
 		}
 
 		for (int i = 0; i < this->nk; i++)
 		{
-			ofsk << this->k_radial[i] << " " << this->beta_k[i] << endl;
+			ofsk << this->k_radial[i] << " " << this->beta_k[i] << std::endl;
 		}
 
 		for (int i = 0; i < this->nr_uniform; i++)
 		{
-			ofsru << i * this->dr_uniform << " " << this->beta_uniform[i] << endl;
+			ofsru << i * this->dr_uniform << " " << this->beta_uniform[i] << std::endl;
 		}
 		
 		ofsr.close();

@@ -46,7 +46,7 @@ Local_Orbital_Charge::~Local_Orbital_Charge()
     // with gamma point only
      if (this->init_DM)
 	 {
-		 for (int is=0; is<NSPIN; is++)
+		 for (int is=0; is<GlobalV::NSPIN; is++)
 		 {
 			 delete[] DM[is];
 			 delete[] DM_pool[is];
@@ -65,7 +65,7 @@ Local_Orbital_Charge::~Local_Orbital_Charge()
     // with k points
     if (this->init_DM_R)
     {
-        for(int is=0; is<NSPIN; is++)
+        for(int is=0; is<GlobalV::NSPIN; is++)
         {
             delete[] DM_R[is];
         }
@@ -77,16 +77,16 @@ Local_Orbital_Charge::~Local_Orbital_Charge()
 
 void Local_Orbital_Charge::allocate_dm_wfc(const Grid_Technique &gt)
 {
-    TITLE("Local_Orbital_Charge","allocate_dm_wfc");
+    ModuleBase::TITLE("Local_Orbital_Charge","allocate_dm_wfc");
 
-	if(GAMMA_ONLY_LOCAL)
+	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
 		// here we reset the density matrix dimension.
 		this->allocate_gamma(gt);
 	}
 	else
 	{
-		LOWF.allocate_k(gt);
+		GlobalC::LOWF.allocate_k(gt);
 		this->allocate_DM_k();
 	}
 
@@ -96,37 +96,37 @@ void Local_Orbital_Charge::allocate_dm_wfc(const Grid_Technique &gt)
 
 void Local_Orbital_Charge::sum_bands(void)
 {
-    TITLE("Local_Orbital_Charge","sum_bands");
-    timer::tick("Local_Orbital_Cha","sum_bands");
+    ModuleBase::TITLE("Local_Orbital_Charge","sum_bands");
+    ModuleBase::timer::tick("Local_Orbital_Cha","sum_bands");
 
-    en.eband = 0.0;
+    GlobalC::en.eband = 0.0;
 
     //xiaohui add 2013-09-02
-    for(int ik=0; ik<kv.nks; ik++)
+    for(int ik=0; ik<GlobalC::kv.nks; ik++)
     {
-        for (int ib=0; ib<NBANDS; ib++)
+        for (int ib=0; ib<GlobalV::NBANDS; ib++)
         {
-            en.eband += wf.ekb[ik][ib] * wf.wg(ik, ib);
+            GlobalC::en.eband += GlobalC::wf.ekb[ik][ib] * GlobalC::wf.wg(ik, ib);
         }
     } 
 
     //xiaohui add 2013-09-02
-    if(GAMMA_ONLY_LOCAL)
+    if(GlobalV::GAMMA_ONLY_LOCAL)
     {
-        if(KS_SOLVER=="selinv")
+        if(GlobalV::KS_SOLVER=="selinv")
         {
             //density matrix has already been calcualted.
         }
-        else if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")
+        else if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")
         {
             if(INPUT.new_dm>0)
             {
                 //density matrix has already been calculated.
-                timer::tick("LCAO_Charge","cal_dm_2d");
+                ModuleBase::timer::tick("LCAO_Charge","cal_dm_2d");
 
-                wfc_dm_2d.cal_dm(wf.wg);        // Peize Lin test 2019-01-16
+                wfc_dm_2d.cal_dm(GlobalC::wf.wg);        // Peize Lin test 2019-01-16
 
-                timer::tick("LCAO_Charge","cal_dm_2d");
+                ModuleBase::timer::tick("LCAO_Charge","cal_dm_2d");
 
                 this->cal_dk_gamma_from_2D(); // transform dm_gamma[is].c to this->DM[is]
             }
@@ -139,18 +139,18 @@ void Local_Orbital_Charge::sum_bands(void)
     }
     else
     {
-        NOTE("Calculate the density matrix.");
-        this->cal_dk_k( GridT );
-        if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")        // Peize Lin test 2019-05-15
+        ModuleBase::GlobalFunc::NOTE("Calculate the density matrix.");
+        this->cal_dk_k( GlobalC::GridT );
+        if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")        // Peize Lin test 2019-05-15
 		{
-            wfc_dm_2d.cal_dm(wf.wg);
+            wfc_dm_2d.cal_dm(GlobalC::wf.wg);
 		}
     }
 
 
-    for(int is=0; is<NSPIN; is++)
+    for(int is=0; is<GlobalV::NSPIN; is++)
     {
-        ZEROS( CHR.rho[is], pw.nrxx ); // mohan 2009-11-10
+        ModuleBase::GlobalFunc::ZEROS( GlobalC::CHR.rho[is], GlobalC::pw.nrxx ); // mohan 2009-11-10
     }
 
     //------------------------------------------------------------
@@ -158,28 +158,28 @@ void Local_Orbital_Charge::sum_bands(void)
     //------------------------------------------------------------
      time_t start = time(NULL);
 
-    if(GAMMA_ONLY_LOCAL)
+    if(GlobalV::GAMMA_ONLY_LOCAL)
     {
-        UHM.GG.cal_rho(LOC.DM);
+        GlobalC::UHM.GG.cal_rho(GlobalC::LOC.DM);
     }
     else
     {
-        NOTE("Calculate the charge on real space grid!");
-        UHM.GK.cal_rho_k();
+        ModuleBase::GlobalFunc::NOTE("Calculate the charge on real space grid!");
+        GlobalC::UHM.GK.cal_rho_k();
     }
 
      time_t end = time(NULL);
 
-     //ofs_running << " START_Charge Time : " << ctime(&time_charge_start);
-     //ofs_running << " END_Charge  Time : " << ctime(&time_charge_end);
-     //ofs_running << " FINAL_Charge Time : " << difftime(time_charge_end, time_charge_start) << " (Seconds)" << endl;
+     //GlobalV::ofs_running << " START_Charge Time : " << ctime(&time_charge_start);
+     //GlobalV::ofs_running << " END_Charge  Time : " << ctime(&time_charge_end);
+     //GlobalV::ofs_running << " FINAL_Charge Time : " << difftime(time_charge_end, time_charge_start) << " (Seconds)" << std::endl;
 
-    OUT_TIME("charge grid integration", start, end);
+    ModuleBase::GlobalFunc::OUT_TIME("charge grid integration", start, end);
 
 	//BLOCK_HERE("sum_bands::before renormalize rho");  
 
-	CHR.renormalize_rho();
+	GlobalC::CHR.renormalize_rho();
 
-	timer::tick("Local_Orbital_Cha","sum_bands");
+	ModuleBase::timer::tick("Local_Orbital_Cha","sum_bands");
 	return;
 }

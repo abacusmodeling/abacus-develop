@@ -3,9 +3,9 @@
 static double output_acc = 1.0e-8;
 
 //print target stress term 
-void Stress_Func::print_stress(const string &name, const matrix& f, const bool screen, bool ry)const
+void Stress_Func::print_stress(const std::string &name, const ModuleBase::matrix& f, const bool screen, bool ry)const
 {
-	ofs_running << " --------------------------- " << name << " ----------------------------" << endl;
+	GlobalV::ofs_running << " --------------------------- " << name << " ----------------------------" << std::endl;
 	
 	
 	double fac = 1.0;
@@ -15,90 +15,91 @@ void Stress_Func::print_stress(const string &name, const matrix& f, const bool s
 	 //	fac = Ry_to_eV / 0.529177;
 	}
 
-	cout << setprecision(5);
-	cout << setiosflags(ios::showpos);
+	std::cout << std::setprecision(5);
+	std::cout << std::setiosflags(ios::showpos);
 
 	if(screen)
 	{
-		cout << " ------------------- " << name << " --------------------" << endl;
+		std::cout << " ------------------- " << name << " --------------------" << std::endl;
 	
 	}
 
 	for (int i=0;i<3;i++)
 	{
-		ofs_running << setw(15)<< " ";
-		if( abs(f(i,0)) >output_acc) ofs_running << setw(15) << f(i,0) * fac;
-		else ofs_running << setw(15) << "0";
-		if( abs(f(i,1)) >output_acc) ofs_running << setw(15) << f(i,1) * fac;
-		else ofs_running << setw(15) << "0";
-		if( abs(f(i,2)) >output_acc) ofs_running << setw(15) << f(i,2) * fac;
-		else ofs_running << setw(15) << "0";
-		ofs_running << endl;
+		GlobalV::ofs_running << std::setw(15)<< " ";
+		if( abs(f(i,0)) >output_acc) GlobalV::ofs_running << std::setw(15) << f(i,0) * fac;
+		else GlobalV::ofs_running << std::setw(15) << "0";
+		if( abs(f(i,1)) >output_acc) GlobalV::ofs_running << std::setw(15) << f(i,1) * fac;
+		else GlobalV::ofs_running << std::setw(15) << "0";
+		if( abs(f(i,2)) >output_acc) GlobalV::ofs_running << std::setw(15) << f(i,2) * fac;
+		else GlobalV::ofs_running << std::setw(15) << "0";
+		GlobalV::ofs_running << std::endl;
 
 		if(screen)
 		{
-			if( abs(f(i,0)) >output_acc) cout << setw(15) << f(i,0)*fac;
-			else cout << setw(15) << "0";
-			if( abs(f(i,1)) >output_acc) cout << setw(15) << f(i,1)*fac;
-			else cout << setw(15) << "0";
-			if( abs(f(i,2)) >output_acc) cout << setw(15) << f(i,2)*fac;
-			else cout << setw(15) << "0";
-			cout << endl;
+			std::cout<<fixed;
+			if( abs(f(i,0)) >output_acc) std::cout << std::setw(15) << f(i,0)*fac;
+			else std::cout << std::setw(15) << "0";
+			if( abs(f(i,1)) >output_acc) std::cout << std::setw(15) << f(i,1)*fac;
+			else std::cout << std::setw(15) << "0";
+			if( abs(f(i,2)) >output_acc) std::cout << std::setw(15) << f(i,2)*fac;
+			else std::cout << std::setw(15) << "0";
+			std::cout << std::endl;
 		}	
 	}
 
 
-	cout << resetiosflags(ios::showpos);
+	std::cout << std::resetiosflags(ios::showpos);
 
     return;
 }
 
 //print total stress
-void Stress_Func::printstress_total(const matrix& scs, bool ry)
+void Stress_Func::printstress_total(const ModuleBase::matrix& scs, bool ry)
 {
 // zhengdy update 2016-10-08
 	double unit_transform = 1;
 
 	if(!ry)
 	{
-		unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
+		unit_transform = ModuleBase::RYDBERG_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
 	}
-//	cout.setf(ios::fixed);
+//	std::cout.setf(ios::fixed);
 
 
-	//ofs_running << setiosflags(ios::right);
- 	ofs_running << setprecision(6) << setiosflags(ios::showpos) << setiosflags(ios::fixed) << endl;
-	NEW_PART("TOTAL-STRESS (KBAR)");//Ryd/(a.u.)^3
-    cout << " ><><><><><><><><><><><><><><><><><><><><><><" << endl;
-    cout << " TOTAL-STRESS (KBAR):" << endl;
-    cout << " ><><><><><><><><><><><><><><><><><><><><><><" << endl;
+	//GlobalV::ofs_running << std::setiosflags(ios::right);
+ 	GlobalV::ofs_running << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed) << std::endl;
+	ModuleBase::GlobalFunc::NEW_PART("TOTAL-STRESS (KBAR)");//Ryd/(a.u.)^3
+    std::cout << " ><><><><><><><><><><><><><><><><><><><><><><" << std::endl;
+    std::cout << " TOTAL-STRESS (KBAR):" << std::endl;
+    std::cout << " ><><><><><><><><><><><><><><><><><><><><><><" << std::endl;
 
 //        if(INPUT.stress_set == 1)
-//        int TEST_STRESS = 1;
+//        int GlobalV::TEST_STRESS = 1;
 
- 	if(TEST_STRESS) 
+ 	if(GlobalV::TEST_STRESS) 
 	{
-		cout << setiosflags(ios::fixed) << setprecision(6);
-		cout << setiosflags(ios::showpos);
-		cout << " ------------------- TOTAL      STRESS --------------------" << endl;
-    	cout << " " << setw(8) << "STRESS" << endl;
-    	ofs_running << " " << setw(12) << "STRESS" << endl;
+		std::cout << std::fixed << std::setprecision(6);
+		std::cout << std::setiosflags(ios::showpos);
+		std::cout << " ------------------- TOTAL      STRESS --------------------" << std::endl;
+    	std::cout << " " << std::setw(8) << "STRESS" << std::endl;
+    	GlobalV::ofs_running << " " << std::setw(12) << "STRESS" << std::endl;
 	}
 
     
 	for (int i=0; i<3; i++)
 	{
 
-		//if(TEST_STRESS)
-		cout << " " << setw(15) << scs(i,0)*unit_transform << setw(15)
-			<< scs(i,1)*unit_transform << setw(15) << scs(i,2)*unit_transform << endl;
+		//if(GlobalV::TEST_STRESS)
+		std::cout << " " << std::setw(15) << scs(i,0)*unit_transform << std::setw(15)
+			<< scs(i,1)*unit_transform << std::setw(15) << scs(i,2)*unit_transform << std::endl;
 
-		ofs_running << " " << setw(15) << scs(i,0)*unit_transform << setw(15)
-			<< scs(i,1)*unit_transform << setw(15) << scs(i,2)*unit_transform << endl;
+		GlobalV::ofs_running << " " << std::setw(15) << scs(i,0)*unit_transform << std::setw(15)
+			<< scs(i,1)*unit_transform << std::setw(15) << scs(i,2)*unit_transform << std::endl;
 
 	}
-	ofs_running << setiosflags(ios::left);
-	cout << resetiosflags(ios::showpos);
+	GlobalV::ofs_running << std::setiosflags(ios::left);
+	std::cout << std::resetiosflags(ios::showpos);
 
     return;
 }

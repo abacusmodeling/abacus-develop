@@ -12,18 +12,20 @@
 #include <complex>
 #include <cassert>
 
-using namespace std;
+namespace ModuleBase
+{
 
 //==========================================================
 // GLOBAL FUNCTION :
-// NAME : WARNING( write information into ofs_warning)
+// NAME : WARNING( write information into GlobalV::ofs_warning)
 // NAME : QUIT( exit the running program)
 // NAME : WARNING_QUIT( write information into
-// 		  ofs_warning , and then quit)
+// 		  GlobalV::ofs_warning , and then quit)
 //==========================================================
-void WARNING(const string &file,const string &description);
+void WARNING(const std::string &file,const std::string &description);
 void QUIT(void);
-void WARNING_QUIT(const string &file,const string &description);
+void WARNING_QUIT(const std::string &file,const std::string &description);
 
+}
 
 #endif

@@ -39,30 +39,30 @@ class Stochastic_hchi
 	static bool initplan;
 	static bool ortho;
 
-	static complex<double> *rp_chi;
-	static complex<double> *rl_chi;
+	static std::complex<double> *rp_chi;
+	static std::complex<double> *rl_chi;
 
 	static int * GRA_index;
 	static void get_GRA_index();
 
 	static void orthogonal_to_psi_real(
-		complex<double>* wfin, 
-		complex<double> *wfout, 
+		std::complex<double>* wfin, 
+		std::complex<double> *wfout, 
 		int& ikk); //wfin & wfout are wavefunctions in real space
 
 	static void hchi_real(
-		complex<double> *wfin, 
-		complex<double> *wfout, 
+		std::complex<double> *wfin, 
+		std::complex<double> *wfout, 
 		const int m = 1); //wfin & wfout are wavefunctions in real space
 	
 	static void orthogonal_to_psi_reciprocal(
-		complex<double>* wfin, 
-		complex<double> *wfout, 
+		std::complex<double>* wfin, 
+		std::complex<double> *wfout, 
 		int& ikk); //wfin & wfout are wavefunctions in reciprocal space
 
 	static void hchi_reciprocal(
-		complex<double> *wfin, 
-		complex<double> *wfout, 
+		std::complex<double> *wfin, 
+		std::complex<double> *wfout, 
 		const int m = 1); //wfin & wfout are wavefunctions in reciprocal space
 
 	private:

@@ -61,7 +61,7 @@ class Gint_k : public Gint_k_init
 	// folding the < dphi_0 | V | phi_R> matrix to 
 	// < dphi_0i | V | phi_0j>
 	void folding_force(
-		matrix& fvl_dphi,
+		ModuleBase::matrix& fvl_dphi,
 		double* pvdpx, 
 		double* pvdpy, 
 		double* pvdpz);//mohan add 2012-1-6
@@ -69,8 +69,8 @@ class Gint_k : public Gint_k_init
 	// folding the < dphi_0 | V * R_beta | phi_R> matrix
 	// < dphi_0i | V | phi_0j>
 	void folding_stress(
-		matrix& fvl_dphi, 
-		matrix& svl_dphi,
+		ModuleBase::matrix& fvl_dphi, 
+		ModuleBase::matrix& svl_dphi,
 		double* pvdpx, 
 		double* pvdpy, 
 		double* pvdpz,
@@ -92,12 +92,12 @@ class Gint_k : public Gint_k_init
 	//------------------------------------------------------
 	// calculate the force (many k-points).
 	void fvl_k_RealSpace(
-		matrix& fvl_dphi, 
+		ModuleBase::matrix& fvl_dphi, 
 		const double* vl);//mohan add 2011-06-19
 
 	void svl_k_RealSpace(
-		matrix& fvl_dphi, 
-		matrix& svl_dphi, 
+		ModuleBase::matrix& fvl_dphi, 
+		ModuleBase::matrix& svl_dphi, 
 		const double* vl);//zhengdy add 2016-10-18
 
 	private:
@@ -227,16 +227,16 @@ class Gint_k : public Gint_k_init
 	double** pvpR;
 
 	double***** pvpR_tr; //LiuXh add 2019-07-15
-	complex<double>***** pvpR_tr_soc; //LiuXh add 2019-07-15
+	std::complex<double>***** pvpR_tr_soc; //LiuXh add 2019-07-15
 
 	// jingan add 2021-6-4
-	map<size_t, map<size_t, double>> ***pvpR_sparseMatrix;
-	map<size_t, map<size_t, complex<double>>> ***pvpR_soc_sparseMatrix;
+	std::map<size_t, std::map<size_t, double>> ***pvpR_sparseMatrix;
+	std::map<size_t, std::map<size_t, std::complex<double>>> ***pvpR_soc_sparseMatrix;
 
 	//----------------------------
 	// key variable 
 	//----------------------------
-	// dimension: [LNNR.nnrg] 
+	// dimension: [GlobalC::LNNR.nnrg] 
 	// save the < phi_0i | V | phi_Rj > in sparse H matrix.
 	double** pvpR_reduced;
 
@@ -245,8 +245,8 @@ class Gint_k : public Gint_k_init
 	//----------------------------
 	// dimension: [GridT.lgd, GridT.lgd]	
 	// used only when folding the H matrix.
-	complex<double>** pvp;
-	complex<double>** pvp_nc[4];
+	std::complex<double>** pvp;
+	std::complex<double>** pvp_nc[4];
 
 	// used only in vlocal.
 	int ik_now;

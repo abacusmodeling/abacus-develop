@@ -10,76 +10,78 @@
 #include "src_io/print_info.h"
 #include "module_symmetry/symmetry.h"
 #include "src_ions/Cell_PW.h"
+#include "src_pw/run_md_pw.h"
 
 Run_pw::Run_pw(){}
 Run_pw::~Run_pw(){}
 
 void Run_pw::plane_wave_line(void)
 {
-    TITLE("Run_pw","plane_wave_line");
-	timer::tick("Run_pw","plane_wave_line");
+    ModuleBase::TITLE("Run_pw","plane_wave_line");
+	ModuleBase::timer::tick("Run_pw","plane_wave_line");
 
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
-    // cell relaxation. b) put NLOCAL and NBANDS as input parameters
-    ucell.setup_cell( global_pseudo_dir, out, global_atom_card, ofs_running);
-    //ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running, NLOCAL, NBANDS);
+    // cell relaxation. b) put GlobalV::NLOCAL and GlobalV::NBANDS as input parameters
+    GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
+    //GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir , GlobalV::global_atom_card , GlobalV::ofs_running, GlobalV::NLOCAL, GlobalV::NBANDS);
 
-    // setup NBANDS 
+    // setup GlobalV::NBANDS 
 	// Yu Liu add 2021-07-03
-	CHR.cal_nelec();
+	GlobalC::CHR.cal_nelec();
 
     // mohan add 2010-09-06
 	// Yu Liu move here 2021-06-27
 	// because the number of element type
 	// will easily be ignored, so here
 	// I warn the user again for each type.
-	for(int it=0; it<ucell.ntype; it++)
+	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		xcf.which_dft(ucell.atoms[it].dft);
+		GlobalC::xcf.which_dft(GlobalC::ucell.atoms[it].dft);
     }
 
-    DONE(ofs_running, "SETUP UNITCELL");
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     // symmetry analysis should be performed every time the cell is changed
-    if (Symmetry::symm_flag)
+    if (ModuleSymmetry::Symmetry::symm_flag)
     {
-        symm.analy_sys();
-        DONE(ofs_running, "SYMMETRY");
+        GlobalC::symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
     // Setup the k points according to symmetry.
-    kv.set( symm, global_kpoint_card, NSPIN, ucell.G, ucell.latvec );
-    DONE(ofs_running,"INIT K-POINTS");
+    GlobalC::kv.set( GlobalC::symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec );
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT K-POINTS");
 
     // print information
     // mohan add 2021-01-30
-    Print_Info PI;
-    PI.setup_parameters();
+    Print_Info::setup_parameters(GlobalC::ucell, GlobalC::kv, GlobalC::xcf);
 
     // Initalize the plane wave basis set
-    pw.gen_pw(ofs_running, ucell, kv);
-    DONE(ofs_running,"INIT PLANEWAVE");
-    cout << " UNIFORM GRID DIM     : " << pw.nx <<" * " << pw.ny <<" * "<< pw.nz << endl;
-    cout << " UNIFORM GRID DIM(BIG): " << pw.nbx <<" * " << pw.nby <<" * "<< pw.nbz << endl;
+    GlobalC::pw.gen_pw(GlobalV::ofs_running, GlobalC::ucell, GlobalC::kv);
+    ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
+    std::cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx <<" * " << GlobalC::pw.ny <<" * "<< GlobalC::pw.nz << std::endl;
+    std::cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx <<" * " << GlobalC::pw.nby <<" * "<< GlobalC::pw.nbz << std::endl;
 
     // mohan add 2010-10-10, just to test the symmetry of a variety
     // of systems.
-    if(CALCULATION == "test")
+    if(GlobalV::CALCULATION == "test")
     {
         Cal_Test::test_memory();
-        QUIT();
+        ModuleBase::QUIT();
     }
 
     // mohan add 2010-09-13
     // initialize the real-space uniform grid for FFT and parallel
     // distribution of plane waves
-    Pgrid.init(pw.ncx, pw.ncy, pw.ncz, pw.nczp,
-        pw.nrxx, pw.nbz, pw.bz); // mohan add 2010-07-22, update 2011-05-04
+    GlobalC::Pgrid.init(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, GlobalC::pw.nczp,
+        GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
+    
+    // cout<<"after pgrid init nrxx = "<<GlobalC::pw.nrxx<<endl;
 
 //----------------------------------------------------------
 // 1 read in initial data:
-//   a lattice structure:atom_species,atom_positions,lattice vector
+//   a lattice structure:atom_species,atom_positions,lattice std::vector
 //   b k_points
 //   c pseudopotential
 // 2 setup planeware basis, FFT,structure factor, ...
@@ -90,47 +92,57 @@ void Run_pw::plane_wave_line(void)
     //=====================================
     // init charge/potential/wave functions
     //=====================================
-    CHR.allocate(NSPIN, pw.nrxx, pw.ngmc);
-    pot.allocate(pw.nrxx);
+    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
+    GlobalC::pot.allocate(GlobalC::pw.nrxx);
 
-    Cell_PW cpws;
-    cpws.opt_cells_pw();
+    if(GlobalV::CALCULATION == "md")
+    {
+        Run_MD_PW run_md_pw;
+        run_md_pw.md_cells_pw();
+    }
+    else
+    {
+        Cell_PW cpws;
+        cpws.opt_cells_pw();
+    }
+
+    // cout<<"cpws SUCCESS"<<endl;
 
 
     // caoyu add 2020-11-24, mohan updat 2021-01-03
-    if(BASIS_TYPE=="pw" && INPUT.out_descriptor==1)
+    if(GlobalV::BASIS_TYPE=="pw" && INPUT.out_descriptor==1)
     {
         Numerical_Descriptor nc;
-        nc.output_descriptor(wf.evc, INPUT.lmax_descriptor);
-        DONE(ofs_running,"GENERATE DESCRIPTOR FOR DEEPKS");
+        nc.output_descriptor(GlobalC::wf.evc, INPUT.lmax_descriptor);
+        ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"GENERATE DESCRIPTOR FOR DEEPKS");
     }
 
 
-    if(BASIS_TYPE=="pw" && winput::out_spillage) //xiaohui add 2013-09-01
+    if(GlobalV::BASIS_TYPE=="pw" && winput::out_spillage) //xiaohui add 2013-09-01
     {
-        //cout << "\n Output Spillage Information : " << endl;
+        //std::cout << "\n Output Spillage Information : " << std::endl;
         // calculate spillage value.
 #ifdef __LCAO
         if ( winput::out_spillage == 3)
         {
-            BASIS_TYPE="pw"; 
-            cout << " NLOCAL = " << NLOCAL << endl;
+            GlobalV::BASIS_TYPE="pw"; 
+            std::cout << " NLOCAL = " << GlobalV::NLOCAL << std::endl;
 
-            for (int ik=0; ik<kv.nks; ik++)
+            for (int ik=0; ik<GlobalC::kv.nks; ik++)
             {
-                wf.wanf2[ik].create(NLOCAL, wf.npwx);
-				if(BASIS_TYPE=="pw")
+                GlobalC::wf.wanf2[ik].create(GlobalV::NLOCAL, GlobalC::wf.npwx);
+				if(GlobalV::BASIS_TYPE=="pw")
                 {
-					cout << " ik=" << ik + 1 << endl;
+					std::cout << " ik=" << ik + 1 << std::endl;
 
-                    BASIS_TYPE="lcao_in_pw";
-					wf.LCAO_in_pw_k(ik, wf.wanf2[ik]);
-                    BASIS_TYPE="pw";
+                    GlobalV::BASIS_TYPE="lcao_in_pw";
+					GlobalC::wf.LCAO_in_pw_k(ik, GlobalC::wf.wanf2[ik]);
+                    GlobalV::BASIS_TYPE="pw";
                 }
             }
 
             //Spillage sp;
-            //sp.get_both(NBANDS, NLOCAL, wf.wanf2, wf.evc);
+            //sp.get_both(GlobalV::NBANDS, GlobalV::NLOCAL, GlobalC::wf.wanf2, GlobalC::wf.evc);
         }
 #endif
 
@@ -138,23 +150,21 @@ void Run_pw::plane_wave_line(void)
         if ( winput::out_spillage <= 2 )
         {
             Numerical_Basis numerical_basis;
-            numerical_basis.output_overlap(wf.evc);
-            DONE(ofs_running,"BASIS OVERLAP (Q and S) GENERATION.");
+            numerical_basis.output_overlap(GlobalC::wf.evc);
+            ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"BASIS OVERLAP (Q and S) GENERATION.");
         }
     }
 
 
-	if(Optical::opt_epsilon2 && (BASIS_TYPE=="pw" || BASIS_TYPE=="lcao_in_pw"))
+	if(Optical::opt_epsilon2 && (GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw"))
 	{
 		Optical opt;
-		opt.cal_epsilon2(NBANDS);
+		opt.cal_epsilon2(GlobalV::NBANDS);
 	}
 
 	// compute density of states
-//#ifdef __LCAO
-	en.perform_dos_pw();
-//#endif
+	GlobalC::en.perform_dos_pw();
 
-	timer::tick("Run_pw","plane_wave_line");
+	ModuleBase::timer::tick("Run_pw","plane_wave_line");
     return;
 }

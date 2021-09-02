@@ -8,7 +8,7 @@ void pdt2s(MPI_Comm comm2D,int N_A,int NB,double *A,double *X,
  *  Purpose
  *  ========
  *  pdt2s computes the eigenvectors of stardand eigenproblem by the
- *  eigenvector of  tridiagonal eigenproblem matrix using Householder vector
+ *  eigenvector of  tridiagonal eigenproblem matrix using Householder std::vector
  *  Arguments
  *  =========
  *  uplo    (global input) CHARACTER
@@ -35,15 +35,15 @@ void pdt2s(MPI_Comm comm2D,int N_A,int NB,double *A,double *X,
  *          process  and memory location.
  */
 {
-	TITLE("Parallel_Diago","pdt2s");
+	ModuleBase::TITLE("Parallel_Diago","pdt2s");
 
 	/*
-	ofs_running << "\n A matrix elements : " << endl;
+	GlobalV::ofs_running << "\n A matrix elements : " << std::endl;
 	for(int i=0; i<loc_A.row_num; i++)
 	{
 		for(int j=0; j<loc_A.col_num; j++)
 		{
-			ofs_running << A[j*loc_A.row_num+i] << endl;
+			GlobalV::ofs_running << A[j*loc_A.row_num+i] << std::endl;
 		}
 	}
 	*/

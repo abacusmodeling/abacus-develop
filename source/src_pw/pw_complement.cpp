@@ -7,12 +7,12 @@ int PW_complement::get_total_pw_number(
     const int& nx,
     const int& ny,
     const int& nz,
-    const Matrix3& GGT)
+    const ModuleBase::Matrix3& GGT)
 {
-    if (test_pw) TITLE("PW_complement","get_total_pw_number");
+    if (GlobalV::test_pw) ModuleBase::TITLE("PW_complement","get_total_pw_number");
     if (ggcut_end<=0.0)
     {
-        WARNING_QUIT("PW_complement::get_total_pw_number","ggcut <= 0.0");
+        ModuleBase::WARNING_QUIT("PW_complement::get_total_pw_number","ggcut <= 0.0");
     }
     // First, figure out the number of G-vectors within the cutoff G2max.
     int ibox[3]={0,0,0};
@@ -23,7 +23,7 @@ int PW_complement::get_total_pw_number(
     ibox[2] = int(nz / 2) + 1;
 
     // first create the auxiliary arrays for the 1D G vectors
-    Vector3<double> f;
+    ModuleBase::Vector3<double> f;
     int ngm = 0 ;
     for (int i = -ibox[0]; i <= ibox[0]; i++)
     {
@@ -48,21 +48,21 @@ int PW_complement::get_total_pw_number(
 
 void PW_complement::get_total_pw(
     double* gg,
-    Vector3<double> *ig,
+    ModuleBase::Vector3<double> *ig,
     const double& ggcut_start,
     const double& ggcut_end,
     const int& nx,
     const int& ny,
     const int& nz,
-    const Matrix3& GGT, // GGT = G*GT.
+    const ModuleBase::Matrix3& GGT, // GGT = G*GT.
     int& ngm// number of total plane waves.
 )
 {
-    if (test_pw) TITLE("PW_complement","get_total_pw");
-    timer::tick("PW_complement","get_total_pw");
+    if (GlobalV::test_pw) ModuleBase::TITLE("PW_complement","get_total_pw");
+    ModuleBase::timer::tick("PW_complement","get_total_pw");
     if (ggcut_end<=0.0)
     {
-        WARNING_QUIT("PW_complement::get_total_pw","ggcut <= 0.0");
+        ModuleBase::WARNING_QUIT("PW_complement::get_total_pw","ggcut <= 0.0");
     }
     // First, figure out the number of G-vectors within the cutoff G2max.
     int ibox[3]={0,0,0};
@@ -73,7 +73,7 @@ void PW_complement::get_total_pw(
     ibox[2] = int(nz / 2) + 1;
 
     // first create the auxiliary arrays for the 1D G vectors
-    Vector3<double> f;
+    ModuleBase::Vector3<double> f;
     int ng = 0;
     for (int i = -ibox[0]; i <= ibox[0]; i++)
     {
@@ -87,23 +87,23 @@ void PW_complement::get_total_pw(
                 double g2 = f * (GGT * f);  //G2= |f|^2 in the unit of (2Pi/lat0)^2
                 if (g2 < ggcut_end && g2 >= ggcut_start)
                 {
-                    /*** g vector indices f=(i,j,k) ***/
+                    /*** g std::vector indices f=(i,j,k) ***/
                     ig[ng] = f ;
                     gg[ng] = g2;
-                    //cout<<setw(12)<<f.x<<setw(12)<<f.y<<setw(12)<<f.z<<setw(12)<<g2<<endl;
+                    //std::cout<<std::setw(12)<<f.x<<std::setw(12)<<f.y<<std::setw(12)<<f.z<<std::setw(12)<<g2<<std::endl;
                     ++ng;
                 }
             }
         }
     }
 
-    //cout << "\n ng = " << ng;
-    timer::tick("PW_complement","get_total_pw");
+    //std::cout << "\n ng = " << ng;
+    ModuleBase::timer::tick("PW_complement","get_total_pw");
     return;
 }
 
 void PW_complement::get_FFT_dimension(
-    const Matrix3 &latvec,
+    const ModuleBase::Matrix3 &latvec,
     const double &ggcut,
     int &nx_tmp,
     int &ny_tmp,
@@ -112,13 +112,13 @@ void PW_complement::get_FFT_dimension(
 	const int &by,
 	const int &bz)
 {
-    if (test_pw) TITLE("PW_complement","get_FFT_dimension");
+    if (GlobalV::test_pw) ModuleBase::TITLE("PW_complement","get_FFT_dimension");
     // read in the FFT dimension (Nx, Ny, Nz) from INPUT,
     // if Nx*Ny*Nz >0,use the input
     // FFT grid, otherwise generate the FFT grid in the code.
 
     int i = 0;
-    Vector3<double> lat;
+    ModuleBase::Vector3<double> lat;
     int ibox[3]={0,0,0};
 
     // ibox[i] are the minimal FFT dimensions,
@@ -210,12 +210,12 @@ void PW_complement::get_FFT_dimension(
     int nxyz_tmp = 0;
     nxyz_tmp = nx_tmp * ny_tmp * nz_tmp;
 
-    if (test_pw > 1)
+    if (GlobalV::test_pw > 1)
     {
-        OUT(ofs_running,"nx",nx_tmp);
-        OUT(ofs_running,"ny",ny_tmp);
-        OUT(ofs_running,"nz",nz_tmp);
-        OUT(ofs_running,"nxyz",nxyz_tmp);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nx",nx_tmp);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"ny",ny_tmp);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nz",nz_tmp);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nxyz",nxyz_tmp);
     }
     return;
 }
@@ -225,24 +225,24 @@ void PW_complement::get_FFT_dimension(
 // MEMBER FUNCTION :
 // NAME : PW_Basis::setup_GVectors
 // Second part of the initialization : find out all G
-// vectors that |G|^2<=G2max and map it into a one
+// vectors that |G|^2<=G2max and std::map it into a one
 // dimentional array G1d in the increase order of |G|^2.
 // Next generate the indices between the 1D array and
 // the 3D G-grid and the FFT grid.
 // generate : gg_global, g_global, ig_global
 //==========================================================
 void PW_complement::setup_GVectors(
-    const Matrix3& G,
+    const ModuleBase::Matrix3& G,
     const int &ngmc_g_in,
     double* gg,
-    Vector3<double>* ig,
-    Vector3<double>* g)
+    ModuleBase::Vector3<double>* ig,
+    ModuleBase::Vector3<double>* g)
 {
-    if (test_pw) TITLE("PW_complement","setup_GVectors");
-    timer::tick("PW_complement","setup_GVectors");
+    if (GlobalV::test_pw) ModuleBase::TITLE("PW_complement","setup_GVectors");
+    ModuleBase::timer::tick("PW_complement","setup_GVectors");
 
-    int *ind = new int[ngmc_g_in];// auxiliary array for the 1d G vector index
-    ZEROS( ind, ngmc_g_in );
+    int *ind = new int[ngmc_g_in];// auxiliary array for the 1d G std::vector index
+    ModuleBase::GlobalFunc::ZEROS( ind, ngmc_g_in );
     ind[0] = 0;//ind[0]=0, meaning ind[] is not initialized.
 
     //----------------------------------------------------------
@@ -250,24 +250,24 @@ void PW_complement::setup_GVectors(
     // sort the norm of the G vectors of G1d[] in the ascending
     // order
     //----------------------------------------------------------
-    heapsort(ngmc_g_in, gg, ind);
+    ModuleBase::heapsort(ngmc_g_in, gg, ind);
 
     /***************************************************************/
     // adjust G1d[NG] according to the new order.
     // establish the link between the 1d array and 3d grid,
     // i.e. give the position "i" in 1d array,
-    // G1d[i] is the vector in 3d grid, G1d2[i] is its norm.
+    // G1d[i] is the std::vector in 3d grid, G1d2[i] is its norm.
     /***************************************************************/
 
-    Vector3<double> *igsort = new Vector3<double>[ngmc_g_in];
+    ModuleBase::Vector3<double> *igsort = new ModuleBase::Vector3<double>[ngmc_g_in];
     for (int i=0;i<ngmc_g_in;i++)
     {
         igsort[i] = ig[ind[i]];
-	//	cout << i << " " << ind[i] << " " << ig[ind[i]].x << " " << ig[ind[i]].y << " " << ig[ind[i]].z << endl;
+	//	std::cout << i << " " << ind[i] << " " << ig[ind[i]].x << " " << ig[ind[i]].y << " " << ig[ind[i]].z << std::endl;
     }
 
 	/* remain to be done by someone. mohan note 2011-07-23
-	Vector3<double> change;
+	ModuleBase::Vector3<double> change;
 	for(int i=0; i<ngmc_g_in; ++i)
 	{
 		for(int j=i; j<ngmc_g_in; ++j)
@@ -304,12 +304,12 @@ void PW_complement::setup_GVectors(
     for (int i=0; i<ngmc_g_in; i++)
     {
         g[i] = ig[i] * G;
-        // g vector (in 2*pi/lat0), E_k=g*g*(2*pi/lat0)^2
-	//	cout << i << " " << ig[i].x << " " << ig[i].y << " " << ig[i].z << endl;
+        // g std::vector (in 2*pi/lat0), E_k=g*g*(2*pi/lat0)^2
+	//	std::cout << i << " " << ig[i].x << " " << ig[i].y << " " << ig[i].z << std::endl;
     }
 
 
-    timer::tick("PW_complement","setup_GVectors");
+    ModuleBase::timer::tick("PW_complement","setup_GVectors");
     return;
 }
 
@@ -327,18 +327,18 @@ void PW_complement::get_ngmw(const int &ngmc, const double& ggwfc2, const double
         }
     }
     ngmw = ng;
-	OUT(ofs_running,"ngmw",ngmw);
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"ngmw",ngmw);
     return;
 }
 
 void PW_complement::get_ig2fftw(const int &ngmw, const int &nx, const int &ny, const int &nz,
-                                const Vector3<double> *gvec_direct, int *ig2fftw)
+                                const ModuleBase::Vector3<double> *gvec_direct, int *ig2fftw)
 {
     //=====================================================================
     // establish the mapping between 1d array and the FFT box.for wfc
     //=====================================================================
     // firt , get ngmw = number of plane waves for wave functions.
-    if (test_pw) TITLE("PW_complement","get_ig2fftw");
+    if (GlobalV::test_pw) ModuleBase::TITLE("PW_complement","get_ig2fftw");
 
     for (int ig=0; ig<ngmw; ig++)
     {
@@ -356,23 +356,23 @@ void PW_complement::get_ig2fftw(const int &ngmw, const int &nx, const int &ny, c
 
 
 void PW_complement::get_ig2fftc(const int &ngmc, const int &ncx, const int &ncy, const int &ncz,
-                                const Vector3<double> *ig, int* ig1, int *ig2, int *ig3, int *ig2fftc)
+                                const ModuleBase::Vector3<double> *ig, int* ig1, int *ig2, int *ig3, int *ig2fftc)
 {
     //=================================================================
     // set ig2fftc & ig2fftw with the correct fft correspondence
     //=================================================================
-    if (test_pw) TITLE("PW_Basis","get_ig2fftc");
+    if (GlobalV::test_pw) ModuleBase::TITLE("PW_Basis","get_ig2fftc");
     // see ggen.f90, set ig2fftc ith the correct fft correspondence Page 4/6
 
-    ZEROS(ig2fftc, ngmc);
-    ZEROS(ig1, ngmc);
-    ZEROS(ig2, ngmc);
-    ZEROS(ig3, ngmc);
+    ModuleBase::GlobalFunc::ZEROS(ig2fftc, ngmc);
+    ModuleBase::GlobalFunc::ZEROS(ig1, ngmc);
+    ModuleBase::GlobalFunc::ZEROS(ig2, ngmc);
+    ModuleBase::GlobalFunc::ZEROS(ig3, ngmc);
 
-    Memory::record("PW_complement","ig2fftc",ngmc,"int");
-    Memory::record("PW_complement","ig1",ngmc,"int");
-    Memory::record("PW_complement","ig2",ngmc,"int");
-    Memory::record("PW_complement","ig3",ngmc,"int");
+    ModuleBase::Memory::record("PW_complement","ig2fftc",ngmc,"int");
+    ModuleBase::Memory::record("PW_complement","ig1",ngmc,"int");
+    ModuleBase::Memory::record("PW_complement","ig2",ngmc,"int");
+    ModuleBase::Memory::record("PW_complement","ig3",ngmc,"int");
 
     for (int i = 0; i < ngmc;i++)
     {
@@ -396,22 +396,22 @@ void PW_complement::get_ig2fftc(const int &ngmc, const int &ncx, const int &ncy,
 void PW_complement::get_total_pw_after_vc(
         double* gg0,
         double* gg,
-        Vector3<double> *ig,
+        ModuleBase::Vector3<double> *ig,
         const double& ggcut_start,
         const double& ggcut_end,
         const int& nx,
         const int& ny,
         const int& nz,
-        const Matrix3& GGT, // GGT = G*GT.
-        const Matrix3& GGT0,
+        const ModuleBase::Matrix3& GGT, // GGT = G*GT.
+        const ModuleBase::Matrix3& GGT0,
         int& ngm// number of total plane waves.
 )
 {
-    if (test_pw) TITLE("PW_complement","get_total_pw");
-    timer::tick("PW_complement","get_total_pw");
+    if (GlobalV::test_pw) ModuleBase::TITLE("PW_complement","get_total_pw");
+    ModuleBase::timer::tick("PW_complement","get_total_pw");
     if (ggcut_end<=0.0)
     {
-        WARNING_QUIT("PW_complement::get_total_pw","ggcut <= 0.0");
+        ModuleBase::WARNING_QUIT("PW_complement::get_total_pw","ggcut <= 0.0");
     }
 
     int ibox[3]={0,0,0};
@@ -420,7 +420,7 @@ void PW_complement::get_total_pw_after_vc(
     ibox[1] = int(ny / 2) + 1;
     ibox[2] = int(nz / 2) + 1;
 
-    Vector3<double> f;
+    ModuleBase::Vector3<double> f;
     int ng = 0;
     //int ng2 = 0;
     for (int i = -ibox[0]; i <= ibox[0]; i++)
@@ -445,6 +445,6 @@ void PW_complement::get_total_pw_after_vc(
             }
         }
     }
-    timer::tick("PW_complement","get_total_pw");
+    ModuleBase::timer::tick("PW_complement","get_total_pw");
     return;
 }

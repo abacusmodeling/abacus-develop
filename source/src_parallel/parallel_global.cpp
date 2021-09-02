@@ -21,7 +21,7 @@ MPI_Comm PARAPW_WORLD; // qianrui add it for sto-dft 2021-4-14
 MPI_Comm GRID_WORLD; // mohan add 2012-01-13z
 MPI_Comm DIAG_WORLD; // mohan add 2012-01-13
 
-void Parallel_Global::myProd(complex<double> *in,complex<double> *inout,int *len,MPI_Datatype *dptr)
+void Parallel_Global::myProd(std::complex<double> *in,std::complex<double> *inout,int *len,MPI_Datatype *dptr)
 {
 	for(int i=0;i<*len;i++)
 	{
@@ -29,7 +29,7 @@ void Parallel_Global::myProd(complex<double> *in,complex<double> *inout,int *len
 //		(*inout).imag()=(*inout).imag()+(*in).imag();
 
 		// mohan updat 2011-09-21
-		(*inout)=complex<double>((*inout).real()+(*in).real(),(*inout).imag()+(*in).imag());
+		(*inout)=std::complex<double>((*inout).real()+(*in).real(),(*inout).imag()+(*in).imag());
 
 		in++;
 		inout++;
@@ -45,11 +45,11 @@ void Parallel_Global::split_diag_world(const int &diag_np)
 	assert(diag_np>0);
 	// number of processors in each 'grid group'.
 	int* group_grid_np = new int[diag_np];
-	ZEROS(group_grid_np, diag_np);
+	ModuleBase::GlobalFunc::ZEROS(group_grid_np, diag_np);
 	// average processors in each 'grid group'
-	int ave = NPROC/diag_np;
+	int ave = GlobalV::NPROC/diag_np;
 	// remain processors.
-	int remain = NPROC - ave * diag_np;
+	int remain = GlobalV::NPROC - ave * diag_np;
 
 	for(int i=0; i<diag_np; ++i)
 	{
@@ -69,25 +69,25 @@ void Parallel_Global::split_diag_world(const int &diag_np)
 	for(int i=0; i<diag_np; ++i)
 	{
 		np_now += group_grid_np[i];
-		if(MY_RANK < np_now)
+		if(GlobalV::MY_RANK < np_now)
 		{
 			key = i;
-			color = group_grid_np[i] - (np_now - MY_RANK);
+			color = group_grid_np[i] - (np_now - GlobalV::MY_RANK);
 			break;
 		}
 	}
 
 	MPI_Comm_split(MPI_COMM_WORLD, color, key, &DIAG_WORLD);
-	MPI_Comm_rank(DIAG_WORLD, &DRANK);
-	MPI_Comm_size(DIAG_WORLD, &DSIZE);
-	DCOLOR=color;
+	MPI_Comm_rank(DIAG_WORLD, &GlobalV::DRANK);
+	MPI_Comm_size(DIAG_WORLD, &GlobalV::DSIZE);
+	GlobalV::DCOLOR=color;
 
 
 	delete[] group_grid_np;
 #else
-	DCOLOR=0; //mohan fix bug 2012-02-04
-	DRANK=0;
-	DSIZE=1;
+	GlobalV::DCOLOR=0; //mohan fix bug 2012-02-04
+	GlobalV::DRANK=0;
+	GlobalV::DSIZE=1;
 #endif
 	return;
 }
@@ -100,11 +100,11 @@ void Parallel_Global::split_grid_world(const int &diag_np)
 	assert(diag_np>0);
 	// number of processors in each 'grid group'.
 	int* group_grid_np = new int[diag_np];
-	ZEROS(group_grid_np, diag_np);
+	ModuleBase::GlobalFunc::ZEROS(group_grid_np, diag_np);
 	// average processors in each 'grid group'
-	int ave = NPROC/diag_np;
+	int ave = GlobalV::NPROC/diag_np;
 	// remain processors.
-	int remain = NPROC - ave * diag_np;
+	int remain = GlobalV::NPROC - ave * diag_np;
 
 	for(int i=0; i<diag_np; ++i)
 	{
@@ -124,22 +124,22 @@ void Parallel_Global::split_grid_world(const int &diag_np)
 	for(int i=0; i<diag_np; ++i)
 	{
 		np_now += group_grid_np[i];
-		if(MY_RANK < np_now)
+		if(GlobalV::MY_RANK < np_now)
 		{
 			color = i;
-			key = group_grid_np[i] - (np_now - MY_RANK);
+			key = group_grid_np[i] - (np_now - GlobalV::MY_RANK);
 			break;
 		}
 	}
 
 	MPI_Comm_split(MPI_COMM_WORLD, color, key, &GRID_WORLD);
-	MPI_Comm_rank(GRID_WORLD, &GRANK);
-	MPI_Comm_size(GRID_WORLD, &GSIZE);
+	MPI_Comm_rank(GRID_WORLD, &GlobalV::GRANK);
+	MPI_Comm_size(GRID_WORLD, &GlobalV::GSIZE);
 
 	delete[] group_grid_np;
 #else
-	GRANK=0;  //mohan fix bug 2012-02-04
-	GSIZE=1;
+	GlobalV::GRANK=0;  //mohan fix bug 2012-02-04
+	GlobalV::GSIZE=1;
 #endif
 	return;
 }
@@ -149,12 +149,12 @@ void Parallel_Global::read_mpi_parameters(int argc,char **argv)
 #if defined __MPI
 //for test
 /*
-    cout << "\n Hello! Test MPI NOW : argc = "<<argc<<endl;
+    std::cout << "\n Hello! Test MPI NOW : argc = "<<argc<<std::endl;
     for(int i=0;i<argc;i++)
     {
-        cout<<"\n argv["<<i<<"]="<<argv[i];
+        std::cout<<"\n argv["<<i<<"]="<<argv[i];
     }
-    cout<<endl;
+    std::cout<<std::endl;
 */
 
 	#ifdef _OPENMP
@@ -165,26 +165,26 @@ void Parallel_Global::read_mpi_parameters(int argc,char **argv)
 	int provided;
 	MPI_Init_thread(&argc,&argv,MPI_THREAD_FUNNELED,&provided);
 	if( provided != MPI_THREAD_FUNNELED )
-		ofs_warning<<"MPI_Init_thread request "<<MPI_THREAD_FUNNELED<<" but provide "<<provided<<endl;
+		GlobalV::ofs_warning<<"MPI_Init_thread request "<<MPI_THREAD_FUNNELED<<" but provide "<<provided<<std::endl;
 //----------------------------------------------------------
 // int atoi ( const char * str );
-// atoi : Convert string to int type
-// atof : Convert string to double type
-// atol : Convert string to long int type
+// atoi : Convert std::string to int type
+// atof : Convert std::string to double type
+// atol : Convert std::string to long int type
 //----------------------------------------------------------
-//  NPOOL = atoi(argv[1]); // mohan abandon 2010-06-09
+//  GlobalV::NPOOL = atoi(argv[1]); // mohan abandon 2010-06-09
 
-	// get the size --> NPROC
-	// get the rank --> MY_RANK
-	MPI_Comm_size(MPI_COMM_WORLD,&NPROC);
-	MPI_Comm_rank(MPI_COMM_WORLD,&MY_RANK);
+	// get the size --> GlobalV::NPROC
+	// get the rank --> GlobalV::MY_RANK
+	MPI_Comm_size(MPI_COMM_WORLD,&GlobalV::NPROC);
+	MPI_Comm_rank(MPI_COMM_WORLD,&GlobalV::MY_RANK);
 
 
 
 	// for test
-	for (int i=0; i<NPROC; i++)
+	for (int i=0; i<GlobalV::NPROC; i++)
     {
-        if (MY_RANK == i)
+        if (GlobalV::MY_RANK == i)
         {
 			if(i==0)
 			{
@@ -198,41 +198,41 @@ void Parallel_Global::read_mpi_parameters(int argc,char **argv)
 				*/
 				//xiaohui modify 2015-03-25
 				/*
-				cout << " *********************************************************" << endl;
-				cout << " *                                                       *" << endl;
-				cout << " *                  WELCOME TO MESIA                     *" << endl;
-				cout << " *                                                       *" << endl;
-				cout << " *       'Massive Electronic simulation based on         *" << endl;
-				cout << " *        Systematically Improvable Atomic bases'        *" << endl;
-				cout << " *                                                       *" << endl;
-				cout << " *********************************************************" << endl;
+				std::cout << " *********************************************************" << std::endl;
+				std::cout << " *                                                       *" << std::endl;
+				std::cout << " *                  WELCOME TO MESIA                     *" << std::endl;
+				std::cout << " *                                                       *" << std::endl;
+				std::cout << " *       'Massive Electronic simulation based on         *" << std::endl;
+				std::cout << " *        Systematically Improvable Atomic bases'        *" << std::endl;
+				std::cout << " *                                                       *" << std::endl;
+				std::cout << " *********************************************************" << std::endl;
 				*/
-				cout << " *********************************************************" << endl;
-				cout << " *                                                       *" << endl;
-				cout << " *                  WELCOME TO ABACUS                    *" << endl;
-				cout << " *                                                       *" << endl;
-				cout << " *            'Atomic-orbital Based Ab-initio            *" << endl;
-				cout << " *                  Computation at UStc'                 *" << endl;
-				cout << " *                                                       *" << endl;
-                cout << " *          Website: http://abacus.ustc.edu.cn/          *" << endl;
-                cout << " *                                                       *" << endl;
-				cout << " *********************************************************" << endl;
+				std::cout << " *********************************************************" << std::endl;
+				std::cout << " *                                                       *" << std::endl;
+				std::cout << " *                  WELCOME TO ABACUS                    *" << std::endl;
+				std::cout << " *                                                       *" << std::endl;
+				std::cout << " *            'Atomic-orbital Based Ab-initio            *" << std::endl;
+				std::cout << " *                  Computation at UStc'                 *" << std::endl;
+				std::cout << " *                                                       *" << std::endl;
+                std::cout << " *          Website: http://abacus.ustc.edu.cn/          *" << std::endl;
+                std::cout << " *                                                       *" << std::endl;
+				std::cout << " *********************************************************" << std::endl;
 
-				//cout << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+				//std::cout << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
     			time_t  time_now = time(NULL);
-    			cout << " " << ctime(&time_now);
+    			std::cout << " " << ctime(&time_now);
 			}
-//            cout << " PROCESSOR " << setw(4) << MY_RANK+1 << " IS READY." << endl;
+//            std::cout << " PROCESSOR " << std::setw(4) << GlobalV::MY_RANK+1 << " IS READY." << std::endl;
         }
         MPI_Barrier(MPI_COMM_WORLD);
     }
 
 	// This section can be chosen !!
 	// mohan 2011-03-15
-    if (MY_RANK != 0 )
+    if (GlobalV::MY_RANK != 0 )
     {
-        //cout.rdbuf(NULL);
-		cout.setstate(ios::failbit);//qianrui modify 2020-10-14
+        //std::cout.rdbuf(NULL);
+		std::cout.setstate(ios::failbit);//qianrui modify 2020-10-14
     }
 	// end test
 

@@ -1,97 +1,92 @@
-# This is the Makefile of ABACUS-MD API
+# This is the Makefile of ABACUS-CMD API
 
 #==========================
 # Compiler information 
 #==========================
-CPLUSPLUS     = icpc
-CPLUSPLUS_MPI = mpiicpc
+CPLUSPLUS     = g++
+CPLUSPLUS_MPI = mpicxx
 OBJ_DIR = md_obj
 NP      = 8
 
 ##==========================
-## FFTW package needed 
+## FFTW3 
 ##==========================
-#FFTW_DIR = /home/qianrui/intelcompile/impi_fftw
-#FFTW_DIR = /home/mohan/1_Software/impi_fftw-3.3.8
 HONG_FFTW        = -D__FFTW3
-#FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
-FFTW_INCLUDE_DIR = ${MKLROOT}/include/fftw
-#FFTW_LIB_DIR     = ${FFTW_DIR}/lib
-#FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
+#FFTW_INCLUDE_DIR = ${MKLROOT}/include/fftw
+FFTW_DIR = /usr/local/fftw
+#FFTW_DIR = /home/dell/packages/fftw3_gnu
+#FFTW_DIR = /home/mohan/1_Software/g_fftw3.3.8_serial
+FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
+FFTW_LIB_DIR     = ${FFTW_DIR}/lib
+FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
 
-##==========================
-## FFTW package needed 
-##==========================
-#BOOST_DIR = /home/mohan/1_Software/impi_boost-1.70.0
-BOOST_DIR = /home/qianrui/intelcompile/impi_boost
-BOOST_INCLUDE_DIR = ${BOOST_DIR}/include
+##============================
+## DeePMD-kit (need by DPMD)
+##============================
+HONG_DPMD = -D__DPMD -DHIGH_PREC 
+DeeP_DIR = ${deepmd_root}
+#DeeP_DIR = /home/mohan/Liuyu/DeePMD/deepmd_gnu_root
+DeeP_INCLUDE_DIR = ${DeeP_DIR}/include
+DeeP_LIB_DIR = ${DeeP_DIR}/lib
+DeeP_LIB = -L${DeeP_LIB_DIR} -ldeepmd_cc -ldeepmd_op -ldeepmd_op_cuda -Wl,-rpath=${DeeP_LIB_DIR}
 
-#==========================
-# LAPACK package needed 
-#==========================
-LAPACK_DIR    		= $(MKLROOT)
-LAPACK_INCLUDE_DIR	= ${LAPACK_DIR}/include 
-LAPACK_LIB_DIR		= ${LAPACK_DIR}/lib/intel64
-LAPACK_LIB 			= -L${LAPACK_LIB_DIR} -Wl,--start-group -lmkl_intel_lp64 -lmkl_intel_thread\
-					  -lmkl_core -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64 -Wl,--end-group -Wl,-rpath=${LAPACK_LIB_DIR}
-
-##==========================
-## LIBXC package needed 
-##==========================
-#LIBXC_DIR    		= /home/qianrui/intelcompile/intel_libxc4.3.4
-#LIBXC_INCLUDE_DIR	= ${LIBXC_DIR}/include 
-#LIBXC_LIB_DIR		= ${LIBXC_DIR}/lib
-#LIBXC_LIB 			= -L${LIBXC_LIB_DIR} -Wl,-rpath=${LIBXC_LIB_DIR} -lxc
+##============================
+## TensorFlow (need by DPMD)
+##============================
+TensorFlow_DIR = ${tensorflow_root}
+#TensorFlow_DIR = /home/mohan/Liuyu/soft/tensorflow/tensorflow_root
+TensorFlow_INCLUDE_DIR = ${TensorFlow_DIR}/include
+TensorFlow_LIB_DIR = ${TensorFlow_DIR}/lib
+TensorFlow_LIB = -L${TensorFlow_LIB_DIR} -ltensorflow_cc -Wl,-rpath=${TensorFlow_LIB_DIR}
 
 #==========================
 # LIBS and INCLUDES
 #==========================
-LIBS = -lifcore -lm -lpthread ${FFTW_LIB} ${LAPACK_LIB}
+#LIBS = -lifcore -lm -lpthread ${FFTW_LIB}
+LIBS = -lm -lpthread -openmp -lstdc++ ${FFTW_LIB} ${DeeP_LIB} ${TensorFlow_LIB} -Wl,--no-as-needed
+
+#INCLUDES = -I. -Icommands -I${FFTW_INCLUDE_DIR}
+INCLUDES = -g -I. -Icommands -I${FFTW_INCLUDE_DIR} -I${DeeP_INCLUDE_DIR} -I${TensorFlow_INCLUDE_DIR}
 
 #==========================
 # OPTIMIZE OPTIONS
 #==========================
-INCLUDES = -I. -Icommands -I${FFTW_INCLUDE_DIR} -I${LAPACK_INCLUDE_DIR} -I${BOOST_INCLUDE_DIR}
-
 # -pedantic turns off more extensions and generates more warnings
 # -xHost generates instructions for the highest instruction set available on the compilation host processor
-OPTS = ${INCLUDES} -Ofast -std=c++11 -simd -march=native -xHost -m64 -qopenmp -Werror -Wall -pedantic -g
+#OPTS = ${INCLUDES} -Ofast -std=c++11 -simd -march=native -xHost -m64 -qopenmp -Werror -Wall -pedantic -g
+OPTS = ${INCLUDES} -Ofast  -std=c++11 -march=native -Wall -fpermissive -fopenmp
 
 include Makefile.Objects
 
-VPATH=../src_global\
-:../module_base\
+VPATH=../module_base\
+:../module_neighbor\
 :../module_cell\
 :../src_parallel\
 :../src_io\
-:../src_ions\
-:../src_pw\
-:../src_lcao\
 :./\
 :../\
 
 #==========================
 # Define HONG
 #==========================
-HONG= ${HONG_FFTW} -D__LCAO -D__MPI -DMETIS -DMKL_ILP64 -D__NORMAL -DEXX_H_COMM=2 -D__MD
+#HONG= ${HONG_FFTW} -D__MPI -DMETIS -DMKL_ILP64 -D__NORMAL -D__CMD -D__CELL
+HONG= ${HONG_FFTW} -D__MPI -DMETIS -DMKL_ILP64 -D__NORMAL -D__CMD -D__CELL ${HONG_DPMD}
 
 FP_OBJS_0=main.o\
 $(OBJS_MAIN)\
 $(OBJS_BASE)\
 $(OBJS_CELL)\
 $(OBJS_MD)\
-$(OBJS_PW)\
-$(OBJS_LCAO)\
 $(OBJS_IO)\
-${OBJS_IONS}\
-${OBJS_PARALLEL}\
+$(OBJS_PARALELL)\
+$(OBJS_NEIGHBOR)\
 
 FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})
 
 #==========================
 # MAKING OPTIONS
 #==========================
-md : 
+cmd : 
 	@ make init
 	@ make -j $(NP) parallel
 
@@ -105,8 +100,6 @@ parallel : ${FP_OBJS}
 #==========================
 # rules
 #==========================
-${OBJ_DIR}/main.o:../main.cpp
-	${CPLUSPLUS_MPI} ${OPTS} ${OPTS_MPI} -c ${HONG} ../main.cpp -o ${OBJ_DIR}/main.o
 ${OBJ_DIR}/%.o:%.cpp
 	${CPLUSPLUS_MPI} ${OPTS} ${OPTS_MPI} -c ${HONG} $< -o $@
 

@@ -19,14 +19,14 @@ class Force_LCAO_gamma
 	void ftable_gamma (
 		const bool isforce,
 		const bool isstress,
-		matrix& foverlap,
-		matrix& ftvnl_dphi,
-		matrix& fvnl_dbeta,	
-		matrix& fvl_dphi,
-		matrix& soverlap,
-		matrix& stvnl_dphi,
-		matrix& svnl_dbeta,
-		matrix& svl_dphi
+		ModuleBase::matrix& foverlap,
+		ModuleBase::matrix& ftvnl_dphi,
+		ModuleBase::matrix& fvnl_dbeta,	
+		ModuleBase::matrix& fvl_dphi,
+		ModuleBase::matrix& soverlap,
+		ModuleBase::matrix& stvnl_dphi,
+		ModuleBase::matrix& svnl_dbeta,
+		ModuleBase::matrix& svl_dphi
 		);
 
 	// get the ds, dt, dvnl.
@@ -36,14 +36,14 @@ class Force_LCAO_gamma
 
 	void average_force(double* fm);
 
-	void test_gamma(double* mm, const string &name);
+	void test_gamma(double* mm, const std::string &name);
 
 
 	//-------------------------------------------------------------
 	// forces reated to overlap matrix
 	// forces related to energy density matrix 
 	//-------------------------------------------------------------
-	void set_EDM_gamma(matrix& dm, bool with_energy);
+	void set_EDM_gamma(ModuleBase::matrix& dm, bool with_energy);
 
 	double set_EDM_element(const int &ii, const int &jj, const bool with_energy, 
 	 double*** coef1, double*** coef2, const int &is);
@@ -51,56 +51,56 @@ class Force_LCAO_gamma
 	void cal_foverlap(
 		const bool isforce, 
 		const bool isstress, 
-		matrix& foverlap, 
-		matrix& soverlap);	
+		ModuleBase::matrix& foverlap, 
+		ModuleBase::matrix& soverlap);	
 
 	//-------------------------------------------------------------
 	// forces related to kinetic and non-local pseudopotentials
 	//--------------------------------------------------------------
 	void cal_ftvnl_dphi(
-		matrix& dm2d, 
+		ModuleBase::matrix& dm2d, 
 		const bool isforce, 
 		const bool isstress, 
-		matrix& ftvnl_dphi, 
-		matrix& stvnl_dphi);
+		ModuleBase::matrix& ftvnl_dphi, 
+		ModuleBase::matrix& stvnl_dphi);
 
 	void cal_ftvnl_dphi(
-		const std::vector<matrix> &dm2d, 
+		const std::vector<ModuleBase::matrix> &dm2d, 
 		const bool isforce, 
 		const bool isstress, 
-		matrix& ftvnl_dphi, 
-		matrix& stvnl_dphi);
+		ModuleBase::matrix& ftvnl_dphi, 
+		ModuleBase::matrix& stvnl_dphi);
 
 	void cal_fvnl_dbeta(
-		matrix& dm2d, 
+		ModuleBase::matrix& dm2d, 
 		const bool isforce, 
 		const bool isstress, 
-		matrix& fvnl_dbeta, 
-		matrix& svnl_dbeta);
+		ModuleBase::matrix& fvnl_dbeta, 
+		ModuleBase::matrix& svnl_dbeta);
 
 	void cal_fvnl_dbeta(
-		const std::vector<matrix> &dm2d, 
+		const std::vector<ModuleBase::matrix> &dm2d, 
 		const bool isforce, 
 		const bool isstress, 
-		matrix& fvnl_dbeta, 
-		matrix& svnl_dbeta);
+		ModuleBase::matrix& fvnl_dbeta, 
+		ModuleBase::matrix& svnl_dbeta);
 
 	//-------------------------------------------
 	// forces related to local pseudopotentials
 	//-------------------------------------------
 	void cal_fvl_dphi(
-		matrix& dm2d, 
+		ModuleBase::matrix& dm2d, 
 		const bool isforce, 
 		const bool isstress, 
-		matrix& fvl_dphi, 
-		matrix& svl_dphi);
+		ModuleBase::matrix& fvl_dphi, 
+		ModuleBase::matrix& svl_dphi);
 
 	void cal_fvl_dphi(
-		const std::vector<matrix> &dm2d, 
+		const std::vector<ModuleBase::matrix> &dm2d, 
 		const bool isforce, 
 		const bool isstress, 
-		matrix& fvl_dphi, 
-		matrix& svl_dphi);
+		ModuleBase::matrix& fvl_dphi, 
+		ModuleBase::matrix& svl_dphi);
 
 };
 #endif

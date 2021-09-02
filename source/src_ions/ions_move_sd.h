@@ -9,7 +9,7 @@ public:
     ~Ions_Move_SD();
 
     void allocate(void);
-    void start(const matrix& force, const double &etot);
+    void start(const ModuleBase::matrix& force, const double &etot);
 
 private:
 

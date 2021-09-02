@@ -4,6 +4,8 @@
 #include "timer.h"
 #include "global_function.h"
 
+namespace ModuleBase
+{
 Sph_Bessel::Sph_Bessel()
 {
 	eps = 1.0e-10;
@@ -26,7 +28,7 @@ void Sph_Bessel::jlx(
 	double *jl	//jl(1:msh) = j_l(q*r(i)),spherical bessel function
 )
 {
-    timer::tick("Sph_Bessel","jlx");
+    ModuleBase::timer::tick("Sph_Bessel","jlx");
     double x1;
     int i, ir, ir0;
 
@@ -44,7 +46,7 @@ void Sph_Bessel::jlx(
     {
         if (l == -1)
         {
-            cout << "\n sph_bes, j_{-1}(0) ????";
+            std::cout << "\n sph_bes, j_{-1}(0) ????";
         }
         else if (l == 0)
         {
@@ -71,7 +73,7 @@ void Sph_Bessel::jlx(
         {
             if (l == -1)
             {
-                cout << "\n sph_bes, j_{-1}(0) ?//?";
+                std::cout << "\n sph_bes, j_{-1}(0) ?//?";
             }
             else if (l == 0)
             {
@@ -191,10 +193,10 @@ void Sph_Bessel::jlx(
         }//mohan modify 2007-11-20 reduce cos , sin , q*r[ir] times;
         else
         {
-            cout << "\n error in sph_bes, l out of {-1 ... 6},l = " << l ;
+            std::cout << "\n error in sph_bes, l out of {-1 ... 6},l = " << l ;
         }
     }
-    timer::tick("Sph_Bessel","jlx");
+    ModuleBase::timer::tick("Sph_Bessel","jlx");
     return;
 }
 
@@ -208,13 +210,13 @@ double Sph_Bessel::jlx7(const int &n, const double &x)
     double order, rj, rjp, ry, ryp;
     if (n < 0 || x <= 0.0)
     {
-		cout << "Sph_Bessel::jlx7,bad arguments in sphbes" << endl;
-        //WARNING_QUIT("Sph_Bessel::jlx7","bad arguments in sphbes");
+		std::cout << "Sph_Bessel::jlx7,bad arguments in sphbes" << std::endl;
+        //ModuleBase::WARNING_QUIT("Sph_Bessel::jlx7","bad arguments in sphbes");
 		exit(0); // mohan add 2021-05-05
     }
 	order = n + 0.5;
 	BESSJY(x, order, &rj, &ry, &rjp, &ryp);
-	int RTPIO2=1.2533141;
+	double RTPIO2=1.2533141;
 	const double factor = RTPIO2 / sqrt(x);
 	return factor*rj;
 }
@@ -226,10 +228,10 @@ void Sph_Bessel::BESSJY(double x, double xnu, double *rj, double *ry, double *rj
 		   fact3,ff,gam,gam1,gam2,gammi,gampl,h,p,pimu,pimu2,q,r,rjl,
 		   rjl1,rjmu,rjp1,rjpl,rjtemp,ry1,rymu,rymup,rytemp,sum,sum1,
 		   temp,w,x2,xi,xi2,xmu,xmu2;
-	if (x <= 0.0 || xnu < 0.0) 
+	if (x <= 0.0 || xnu < 0.0)
 	{
-		cout << "Sph_Bessel::BESSJY, bad arguments in bessjy" << endl;
-		//WARNING_QUIT("Sph_Bessel::BESSJY","bad arguments in bessjy");
+		std::cout << "Sph_Bessel::BESSJY, bad arguments in bessjy" << std::endl;
+		//ModuleBase::WARNING_QUIT("Sph_Bessel::BESSJY","bad arguments in bessjy");
 		exit(0);
 	}
 	nl=(x < xmin ? (int)(xnu+0.5) : IMAX(0,(int)(xnu-x+1.5)));
@@ -237,8 +239,8 @@ void Sph_Bessel::BESSJY(double x, double xnu, double *rj, double *ry, double *rj
 	xmu2=xmu*xmu;
 	xi=1.0/x;
 	xi2=2.0*xi;
-	w=xi2/pi; 
-	isign=1; 
+	w=xi2/pi;
+	isign=1;
 	h=xnu*xi;
 	if (h < fpmin) h=fpmin;
 	b=xi2*xnu;
@@ -256,13 +258,13 @@ void Sph_Bessel::BESSJY(double x, double xnu, double *rj, double *ry, double *rj
 		if (d < 0.0) isign = -isign;
 		if (fabs(del-1.0) < eps) break;
 	}
-	if (i > maxit) 
+	if (i > maxit)
 	{
-		cout << "Sph_Bessel::BESSJY, x too large in bessjy; try asymptotic expansion" << endl;
-		//WARNING_QUIT("Sph_Bessel::BESSJY","x too large in bessjy; try asymptotic expansion");
+		std::cout << "Sph_Bessel::BESSJY, x too large in bessjy; try asymptotic expansion" << std::endl;
+		//ModuleBase::WARNING_QUIT("Sph_Bessel::BESSJY","x too large in bessjy; try asymptotic expansion");
 		exit(0);
 	}
-	rjl=isign*fpmin; 
+	rjl=isign*fpmin;
 	rjpl=h*rjl;
 	rjl1=rjl;
 	rjp1=rjpl;
@@ -274,8 +276,8 @@ void Sph_Bessel::BESSJY(double x, double xnu, double *rj, double *ry, double *rj
 		rjl=rjtemp;
 	}
 	if (rjl == 0.0) rjl=eps;
-	f=rjpl/rjl; 
-	if (x < xmin) { 
+	f=rjpl/rjl;
+	if (x < xmin) {
 		x2=0.5*x;
 		pimu=pi*xmu;
 		fact = (fabs(pimu) < eps ? 1.0 : pimu/sin(pimu));
@@ -283,10 +285,10 @@ void Sph_Bessel::BESSJY(double x, double xnu, double *rj, double *ry, double *rj
 		e=xmu*d;
 		fact2 = (fabs(e) < eps ? 1.0 : sinh(e)/e);
 		this->BESCHB(xmu,&gam1,&gam2,&gampl,&gammi);
-		ff=2.0/pi*fact*(gam1*cosh(e)+gam2*fact2*d); 
+		ff=2.0/pi*fact*(gam1*cosh(e)+gam2*fact2*d);
 		e=exp(e);
-		p=e/(gampl*pi); 
-		q=1.0/(e*pi*gammi); 
+		p=e/(gampl*pi);
+		q=1.0/(e*pi*gammi);
 		pimu2=0.5*pimu;
 		fact3 = (fabs(pimu2) < eps ? 1.0 : sin(pimu2)/pimu2);
 		r=pi*pimu2*fact3*fact3;
@@ -305,16 +307,16 @@ void Sph_Bessel::BESSJY(double x, double xnu, double *rj, double *ry, double *rj
 			sum1 += del1;
 			if (fabs(del) < (1.0+fabs(sum))*eps) break;
 		}
-		if (i > maxit) 
+		if (i > maxit)
 		{
-			cout << "Sph_Bessel::BESSJY, bessy series failed to converge" << endl;
-			//WARNING_QUIT("Sph_Bessel::BESSJY","bessy series failed to converge");
+			std::cout << "Sph_Bessel::BESSJY, bessy series failed to converge" << std::endl;
+			//ModuleBase::WARNING_QUIT("Sph_Bessel::BESSJY","bessy series failed to converge");
 			exit(0); // mohan add 2021-05-05
 		}
 		rymu = -sum;
 		ry1 = -sum1*xi2;
 		rymup=xmu*xi*rymu-ry1;
-		rjmu=w/(rymup-f*rymu); 
+		rjmu=w/(rymup-f*rymu);
 	} else {
 		a=0.25-xmu2;
 		p = -0.5*xi;
@@ -352,15 +354,15 @@ void Sph_Bessel::BESSJY(double x, double xnu, double *rj, double *ry, double *rj
 			p=temp;
 			if (fabs(dlr-1.0)+fabs(dli) < eps) break;
 		}
-		if (i > maxit) 
+		if (i > maxit)
 		{
-			cout << "Sph_Bessel::BESSJY, cf2 failed in bessjy" << endl;
-			//WARNING_QUIT("Sph_Bessel::BESSJY","cf2 failed in bessjy");
+			std::cout << "Sph_Bessel::BESSJY, cf2 failed in bessjy" << std::endl;
+			//ModuleBase::WARNING_QUIT("Sph_Bessel::BESSJY","cf2 failed in bessjy");
 			exit(0); // mohan add 2021-05-05
 		}
-		gam=(p-f)/q; 
+		gam=(p-f)/q;
 		rjmu=sqrt(w/((p-f)*gam+q));
-		
+
 		//rjmu=SIGN(rjmu,rjl);
 		if (rjl >=0 ) rjmu = fabs(rjmu);
 		else rjmu = -fabs(rjmu);
@@ -370,16 +372,16 @@ void Sph_Bessel::BESSJY(double x, double xnu, double *rj, double *ry, double *rj
 		ry1=xmu*xi*rymu-rymup;
 	}
 	fact=rjmu/rjl;
-	*rj=rjl1*fact; 		
+	*rj=rjl1*fact;
 	*rjp=rjp1*fact;
-	for (i=1;i<=nl;i++) { 
+	for (i=1;i<=nl;i++) {
 		rytemp=(xmu+i)*xi2*ry1-rymu;
 		rymu=ry1;
 		ry1=rytemp;
 	}
 	*ry=rymu;
 	*ryp=xnu*xi*rymu-ry1;
-}	
+}
 
 int Sph_Bessel::IMAX(int a, int b)
 {
@@ -399,8 +401,8 @@ void Sph_Bessel::BESCHB(double x, double *gam1, double *gam2, double *gampl, dou
                              1.2719271366546e-3, -4.9717367042e-6, -3.31261198e-8,
                              2.423096e-10, -1.702e-13, -1.49e-15
                          };
-    xx = 8.0 * x * x - 1.0; 
-	//Multiply x by 2 to make range be .1 to 1,and then 
+    xx = 8.0 * x * x - 1.0;
+	//Multiply x by 2 to make range be .1 to 1,and then
 	// apply transformation for evaluating even Chebyshev series.
     *gam1 = CHEBEV(-1.0, 1.0, c1, NUSE1, xx);
     *gam2 = CHEBEV(-1.0, 1.0, c2, NUSE2, xx);
@@ -413,7 +415,7 @@ double Sph_Bessel::CHEBEV(double a, double b, double c[], int m, double x)
 {
     double d = 0.0, dd = 0.0, sv, y, y2;
     int j;
-    if ((x - a)*(x - b) > 0.0) cout << "x not in range in routine chebev" << endl;
+    if ((x - a)*(x - b) > 0.0) std::cout << "x not in range in routine chebev" << std::endl;
     y2 = 2.0 * (y = (2.0 * x - a - b) / (b - a));
     for (j = m - 1;j >= 1;j--)
     {
@@ -422,4 +424,6 @@ double Sph_Bessel::CHEBEV(double a, double b, double c[], int m, double x)
         dd = sv;
     }
     return y*d - dd + 0.5*c[0];
+}
+
 }

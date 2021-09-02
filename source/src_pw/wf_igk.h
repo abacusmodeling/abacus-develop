@@ -19,7 +19,7 @@ class WF_igk
 	//---------------------------------------------------
     int npwx;
     int npw;
-    IntArray igk;
+    ModuleBase::IntArray igk;
     double *g2kin;
 
 	public:
@@ -33,12 +33,12 @@ class WF_igk
 
     double* get_qvec_cartesian(const int &ik);
 
-    Vector3<double> get_1qvec_cartesian(const int ik,const int ig)const;
+    ModuleBase::Vector3<double> get_1qvec_cartesian(const int ik,const int ig)const;
 
-    complex<double>* get_sk(const int ik, const int it, const int ia)const;
+    std::complex<double>* get_sk(const int ik, const int it, const int ia)const;
 
 	// pengfei 2016-11-23
-    complex<double>* get_skq(int ik, int it, int ia, Vector3<double> q);
+    std::complex<double>* get_skq(int ik, int it, int ia, ModuleBase::Vector3<double> q);
 
 };
 #endif

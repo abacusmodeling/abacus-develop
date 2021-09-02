@@ -29,7 +29,7 @@ CellSet::CellSet()
 int Grid::Hash_one_hit = 0;
 const double Grid::TOLERATE_ERROR = 1.0E-5;
 
-const boost::hash<int> Grid::INT_HASHER = boost::hash<int>();
+const std::hash<int> Grid::INT_HASHER=std::hash<int>();
 
 const char* const Grid::ERROR[3] =
 {
@@ -44,7 +44,7 @@ const char* const Grid::ERROR[3] =
 
 Grid::Grid(const int &test_grid_in):test_grid(test_grid_in)
 {
-//	TITLE("Grid","Grid");
+//	ModuleBase::TITLE("Grid","Grid");
 //----------------------------------------------------------
 // EXPLAIN : init_cell_flag (use this flag in case memory
 // leak)
@@ -60,11 +60,11 @@ Grid::~Grid()
 }
 
 void Grid::init(
-	ofstream &ofs_in,
+	std::ofstream &ofs_in,
 	const UnitCell &ucell, 
 	const Atom_input &input)
 {
-	TITLE("SLTK_Grid", "init");
+	ModuleBase::TITLE("SLTK_Grid", "init");
 
 	this->setMemberVariables(ofs_in, input);
 	this->setAtomLinkArray(ucell, input);
@@ -78,22 +78,22 @@ void Grid::init(
 // NAME : setMemberVariables(read in data from Atom_input)
 //==========================================================
 void Grid::setMemberVariables(
-	ofstream &ofs_in, //  output data to ofs
+	std::ofstream &ofs_in, //  output data to ofs
 	const Atom_input &input)
 {
-	TITLE("SLTK_Grid", "setMemberVariables");
+	ModuleBase::TITLE("SLTK_Grid", "setMemberVariables");
 
 	// mohan add 2010-09-05
 	AdjacentSet::call_times = 0;
 
 	this->natom = input.getAmount();
-	if(test_grid)OUT(ofs_in, "natom", natom);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in, "natom", natom);
 
 	this->pbc = input.getBoundary();
-	if(test_grid)OUT(ofs_in, "PeriodicBoundary", this->pbc);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in, "PeriodicBoundary", this->pbc);
 
 	this->sradius = input.getRadius();
-	if(test_grid)OUT(ofs_in, "Radius(unit:lat0)", sradius);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in, "Radius(unit:lat0)", sradius);
 
 	for (int i = 0;i < 3;i++)
 	{
@@ -103,22 +103,22 @@ void Grid::setMemberVariables(
 	}
 
 	this->lat_now = input.getLatNow();
-	if(test_grid)OUT(ofs_in,"lat0(unit:Bohr)", lat_now);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in,"lat0(unit:Bohr)", lat_now);
 
 	this->expand_flag = input.getExpandFlag();
-	if(test_grid)OUT(ofs_in,"Expand_flag", expand_flag);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in,"Expand_flag", expand_flag);
 	
-	// output vector
-	if(test_grid)OUT(ofs_in,"Vec1",vec1[0],vec1[1],vec1[2]);
-	if(test_grid)OUT(ofs_in,"Vec2",vec2[0],vec2[1],vec2[2]);
-	if(test_grid)OUT(ofs_in,"Vec3",vec3[0],vec3[1],vec3[2]);
+	// output std::vector
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in,"Vec1",vec1[0],vec1[1],vec1[2]);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in,"Vec2",vec2[0],vec2[1],vec2[2]);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in,"Vec3",vec3[0],vec3[1],vec3[2]);
 
 	// output grid length
 	this->grid_length[0] = input.Clength0();
 	this->grid_length[1] = input.Clength1();
 	this->grid_length[2] = input.Clength2();
 
-	if(test_grid)OUT(ofs_in,"Grid_length",grid_length[0],grid_length[1],grid_length[2]);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in,"Grid_length",grid_length[0],grid_length[1],grid_length[2]);
 //----------------------------------------------------------
 // EXPLAIN : (d_minX,d_minY,d_minZ)minimal value of
 // x[] ,y[] , z[]
@@ -126,21 +126,21 @@ void Grid::setMemberVariables(
 	this->d_minX = input.minX();
 	this->d_minY = input.minY();
 	this->d_minZ = input.minZ();
-	if(test_grid)OUT(ofs_in,"MinCoordinate",d_minX,d_minY,d_minZ);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in,"MinCoordinate",d_minX,d_minY,d_minZ);
 //----------------------------------------------------------
 //layer: grid layer after expand
 //----------------------------------------------------------
 	this->cell_x_length = input.getCellXLength();
 	this->cell_y_length = input.getCellYLength();
 	this->cell_z_length = input.getCellZLength();
-	if(test_grid)OUT(ofs_in,"CellLength(unit: lat0)",cell_x_length,cell_y_length,cell_z_length);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in,"CellLength(unit: lat0)",cell_x_length,cell_y_length,cell_z_length);
 //----------------------------------------------------------
 // set dx, dy, dz
 //----------------------------------------------------------
 	this->dx = input.getCellX();
 	this->dy = input.getCellY();
 	this->dz = input.getCellZ();
-	if(test_grid)OUT(ofs_in,"CellNumber",dx,dy,dz);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in,"CellNumber",dx,dy,dz);
 
 	Cell = new CellSet**[dx];
 	for (int i = 0;i < dx;i++)
@@ -176,20 +176,20 @@ void Grid::setAtomLinkArray(const UnitCell &ucell, const Atom_input &input)
 		if(natom<100)
 		{
 			ofs_running<<"\n Print Cache Atoms : "<<natom;
-			ofs_running<<"\n"<<setw(12)<<"X"<<setw(12)<<"Y"<<setw(12)<<"Z";
+			ofs_running<<"\n"<<std::setw(12)<<"X"<<std::setw(12)<<"Y"<<std::setw(12)<<"Z";
 			for(int i=0;i<natom;i++)
 			{
-				cout<<"\n"<<setw(6)<<i
-				<<setw(12)<<pointCache[i].fatom.x()
-				<<setw(12)<<pointCache[i].fatom.y()
-				<<setw(12)<<pointCache[i].fatom.z()
-				<<setw(12)<<pointCache[i].fatom.getType()
-				<<setw(12)<<pointCache[i].fatom.getNatom();
+				std::cout<<"\n"<<std::setw(6)<<i
+				<<std::setw(12)<<pointCache[i].fatom.x()
+				<<std::setw(12)<<pointCache[i].fatom.y()
+				<<std::setw(12)<<pointCache[i].fatom.z()
+				<<std::setw(12)<<pointCache[i].fatom.getType()
+				<<std::setw(12)<<pointCache[i].fatom.getNatom();
 			}
 		}
 	*/
 
-//	if (test_grid) DONE(ofs_running, "Build_Cache");
+//	if (test_grid) ModuleBase::GlobalFunc::DONE(ofs_running, "Build_Cache");
 
 //----------------------------------------------------------
 // CALL MEMBER FUNCTION :
@@ -197,11 +197,11 @@ void Grid::setAtomLinkArray(const UnitCell &ucell, const Atom_input &input)
 //----------------------------------------------------------
 	this->Build_Cell();
 
-//	if (test_grid) DONE(ofs_running, "Build_Cell");
+//	if (test_grid) ModuleBase::GlobalFunc::DONE(ofs_running, "Build_Cell");
 
 	this->Build_Hash_Table(ucell, pointCache);
 
-//	if (test_grid) DONE(ofs_running, "Build_Hash_Table");
+//	if (test_grid) ModuleBase::GlobalFunc::DONE(ofs_running, "Build_Hash_Table");
 
 //----------------------------------------------------------
 // WARNING : Don't Deleete this testing code.
@@ -210,10 +210,10 @@ void Grid::setAtomLinkArray(const UnitCell &ucell, const Atom_input &input)
 //	int find_conflict = 0;
 //    for(int i=0;i<natom;i++)
 //    {
-//        ofs_running<<"\n"<<setw(6)<<i
-//        <<setw(12)<<atomlink[i].fatom.x()
-//        <<setw(12)<<atomlink[i].fatom.y()
-//        <<setw(12)<<atomlink[i].fatom.z();
+//        ofs_running<<"\n"<<std::setw(6)<<i
+//        <<std::setw(12)<<atomlink[i].fatom.x()
+//        <<std::setw(12)<<atomlink[i].fatom.y()
+//        <<std::setw(12)<<atomlink[i].fatom.z();
 //        if(atomlink[i].next_p != cordon_p && atomlink[i].next_p != NullPtr)
 //        {
 //      	ofs_running<<"\n Hash Link Array : ";
@@ -221,9 +221,9 @@ void Grid::setAtomLinkArray(const UnitCell &ucell, const Atom_input &input)
 //            for(;temp->next_p != NullPtr; temp = temp->next_p)
 //          {
 //				find_conflict++;
-//				ofs_running<<"\n"<<setw(12)<<temp->fatom.x()
-//				<<setw(12)<<temp->fatom.y()
-//				<<setw(12)<<temp->fatom.z();
+//				ofs_running<<"\n"<<std::setw(12)<<temp->fatom.x()
+//				<<std::setw(12)<<temp->fatom.y()
+//				<<std::setw(12)<<temp->fatom.z();
 //           }
 //		}
 //  }
@@ -231,17 +231,17 @@ void Grid::setAtomLinkArray(const UnitCell &ucell, const Atom_input &input)
 
 	this->Fold_Hash_Table();
 
-//	if (test_grid) DONE(ofs_running, "Fold_Hash_Table");
+//	if (test_grid) ModuleBase::GlobalFunc::DONE(ofs_running, "Fold_Hash_Table");
 
 //----------------------------------------------------------
 // EXPLAIN : Don't Deleete this testing code.
 //----------------------------------------------------------
 //    for(int i=0;i<natom;i++)
 //  {
-//        ofs_running<<"\n"<<setw(6)<<i
-//        <<setw(12)<<atomlink[i].fatom.x()
-//        <<setw(12)<<atomlink[i].fatom.y()
-//        <<setw(12)<<atomlink[i].fatom.z();
+//        ofs_running<<"\n"<<std::setw(6)<<i
+//        <<std::setw(12)<<atomlink[i].fatom.x()
+//        <<std::setw(12)<<atomlink[i].fatom.y()
+//        <<std::setw(12)<<atomlink[i].fatom.z();
 //  }
 	delete[] pointCache;
 
@@ -249,10 +249,10 @@ void Grid::setAtomLinkArray(const UnitCell &ucell, const Atom_input &input)
 }
 
 void Grid::setBoundaryAdjacent(
-	ofstream &ofs_in,
+	std::ofstream &ofs_in,
 	const Atom_input &input)
 {
-	if (test_grid) TITLE(ofs_in, "Grid", "setBoundaryAdjacent");
+	if (test_grid) ModuleBase::TITLE(ofs_in, "Grid", "setBoundaryAdjacent");
 
 	if (expand_flag)
 	{
@@ -266,7 +266,7 @@ void Grid::setBoundaryAdjacent(
 		this->Construct_Adjacent_begin();
 	}
 
-	if(test_grid)OUT(ofs_in,"Adjacent_set call times",AdjacentSet::call_times);
+	if(test_grid)ModuleBase::GlobalFunc::OUT(ofs_in,"Adjacent_set call times",AdjacentSet::call_times);
 
 	if (!expand_flag)
 	{
@@ -285,10 +285,10 @@ void Grid::setBoundaryAdjacent(
 //		/ static_cast<double>(Cell[0][0][0].length));
 	}
 
-	Memory::record("AdjacentSet", "offset", AdjacentSet::call_times, "short");
-	Memory::record("AdjacentSet", "box", AdjacentSet::call_times, "short");
+	ModuleBase::Memory::record("AdjacentSet", "offset", AdjacentSet::call_times, "short");
+	ModuleBase::Memory::record("AdjacentSet", "box", AdjacentSet::call_times, "short");
 
-	//if (test_grid)DONE(ofs_in, "Construct_Adjacent");
+	//if (test_grid)ModuleBase::GlobalFunc::DONE(ofs_in, "Construct_Adjacent");
 
 	return;
 }
@@ -305,7 +305,7 @@ bool Grid::Push(const UnitCell &ucell, const FAtom &atom)
 	int c=0; //mohan update 2021-06-22
 	this->In_Which_Cell(ucell, a, b, c, atom);
 
-//	if(test_grid) ofs_running << setw(5) << a << setw(5) << b << setw(5) << c;
+//	if(test_grid) ofs_running << std::setw(5) << a << std::setw(5) << b << std::setw(5) << c;
 	
 	//======================================================
 	// dx, dy, dz is max cell in each direction ,respectly.
@@ -313,12 +313,12 @@ bool Grid::Push(const UnitCell &ucell, const FAtom &atom)
 	if (a < dx && a >= 0 && b < dy && b >= 0 && c < dz && c >= 0)
 	{
 		++ this->Cell[a][b][c].length;
-//		if(test_grid) ofs_running << setw(10) << this->Cell[a][b][c].length << endl;
+//		if(test_grid) ofs_running << std::setw(10) << this->Cell[a][b][c].length << std::endl;
 		return true;
 	}
 	else
 	{
-//		if(test_grid) ofs_running << setw(10) << " no cell in" << endl; 
+//		if(test_grid) ofs_running << std::setw(10) << " no cell in" << std::endl; 
 		return false;
 	}
 }
@@ -326,16 +326,16 @@ bool Grid::Push(const UnitCell &ucell, const FAtom &atom)
 
 AtomLink* Grid::Build_Cache(const UnitCell &ucell, const Atom_input &input)
 {
-//	if (test_grid)TITLE(ofs_running, "Grid", "Build_Cache");
+//	if (test_grid)ModuleBase::TITLE(ofs_running, "Grid", "Build_Cache");
 	AtomLink* const start = new AtomLink[natom+1];
-	Memory::record("grid", "AtomLink", natom, "AtomLink");
+	ModuleBase::Memory::record("grid", "AtomLink", natom, "AtomLink");
 
 	// the pointer stay at the end of atom.
 	//const AtomLink* const end = start + natom + 1;
 
 	AtomLink* current = start;
 
-//	if(test_grid) ofs_running << " total atom number is " << natom << endl;
+//	if(test_grid) ofs_running << " total atom number is " << natom << std::endl;
 	for (int i = 0;i < natom;i++)
 	{
 //----------------------------------------------------------
@@ -359,7 +359,7 @@ AtomLink* Grid::Build_Cache(const UnitCell &ucell, const Atom_input &input)
 
 void Grid::Build_Cell(void)
 {
-	TITLE("SLTK_Grid", "Build_Cell");
+	ModuleBase::TITLE("SLTK_Grid", "Build_Cell");
 
 	delete[] this->atomlink;
 	this->atomlink = new AtomLink[this->natom];
@@ -369,7 +369,7 @@ void Grid::Build_Cell(void)
 
 	AtomLink* cellAddress = this->atomlink;
 
-//	if (test_grid)ofs_running << " Cell_length(number of atoms) " << endl;
+//	if (test_grid)ofs_running << " Cell_length(number of atoms) " << std::endl;
 
 	for (int i = 0; i < this->dx; ++i)
 	{
@@ -384,10 +384,10 @@ void Grid::Build_Cell(void)
 				if (test_grid)
 				{
 /*
-					ofs_running << setw(6) << i 
-					<< setw(6) << j 
-					<< setw(6) << k
-					<< setw(10) << Cell[i][j][k].length << endl;
+					ofs_running << std::setw(6) << i 
+					<< std::setw(6) << j 
+					<< std::setw(6) << k
+					<< std::setw(10) << Cell[i][j][k].length << std::endl;
 */
 				}
 			}
@@ -417,7 +417,7 @@ void Grid::In_Which_Cell(const UnitCell &ucell, int &a, int &b, int &c, const FA
 // d_minX, d_minY, d_minZ must be the cell origin
 //----------------------------------------------------------
 		double directx, directy, directz;
-		Mathzone::Cartesian_to_Direct(
+		ModuleBase::Mathzone::Cartesian_to_Direct(
 		    atom.x(), atom.y(), atom.z(),
 		    vec1[0], vec1[1], vec1[2],
 		    vec2[0], vec2[1], vec2[2],
@@ -442,19 +442,19 @@ void Grid::In_Which_Cell(const UnitCell &ucell, int &a, int &b, int &c, const FA
                 b = static_cast<int>(directy - now_y_d - this->d_minY + 0.5 );
                 c = static_cast<int>(directz - now_z_d - this->d_minZ + 0.5 );
 
-		//ofs_running << setw(8) << atom.x() << setw(8) << atom.y() << setw(8) << atom.z()
-		//<< setw(12) << directx << setw(12) << directy << setw(12) << directz
-		//<< setw(6) << a << setw(6) << b << setw(6) << c << endl;
+		//ofs_running << std::setw(8) << atom.x() << std::setw(8) << atom.y() << std::setw(8) << atom.z()
+		//<< std::setw(12) << directx << std::setw(12) << directy << std::setw(12) << directz
+		//<< std::setw(6) << a << std::setw(6) << b << std::setw(6) << c << std::endl;
 	
 	/*	
 		if(a==0 && b==4 && c==0)
 		{
-			cout << setprecision(25) << endl;
-			cout << " save_add=" << save_add << endl;
-			cout << atom.x() << " " << atom.y() << " " << atom.z() << endl;
-			cout << " directy=" << directy << " d_minX=" << d_minY << " b=" << b << endl;
-			cout << " (int)directy=" << (int)directy << " (int)d_minY=" << (int)d_minY << " static_cast<int>( (directx - this->d_minX) )=" << static_cast<int>( (directy - this->d_minY) ) << endl;
-			cout << endl;
+			std::cout << std::setprecision(25) << std::endl;
+			std::cout << " save_add=" << save_add << std::endl;
+			std::cout << atom.x() << " " << atom.y() << " " << atom.z() << std::endl;
+			std::cout << " directy=" << directy << " d_minX=" << d_minY << " b=" << b << std::endl;
+			std::cout << " (int)directy=" << (int)directy << " (int)d_minY=" << (int)d_minY << " static_cast<int>( (directx - this->d_minX) )=" << static_cast<int>( (directy - this->d_minY) ) << std::endl;
+			std::cout << std::endl;
 			int ok;
 			cin >> ok;
 		}
@@ -477,15 +477,15 @@ void Grid::In_Which_Cell(const UnitCell &ucell, int &a, int &b, int &c, const FA
 		c = static_cast<int>(std::floor((atom.z() - this->d_minZ) / this->cell_z_length));
 
 		/*
-		cout<<"\n"<<setw(12)<<atom.x()
-		<<setw(12)<<atom.y()
-		<<setw(12)<<atom.z()
-		<<setw(6)<<a
-		<<setw(6)<<b
-		<<setw(6)<<c
-		<<setw(12)<<d_minX
-		<<setw(12)<<d_minY
-		<<setw(12)<<d_minZ;
+		std::cout<<"\n"<<std::setw(12)<<atom.x()
+		<<std::setw(12)<<atom.y()
+		<<std::setw(12)<<atom.z()
+		<<std::setw(6)<<a
+		<<std::setw(6)<<b
+		<<std::setw(6)<<c
+		<<std::setw(12)<<d_minX
+		<<std::setw(12)<<d_minY
+		<<std::setw(12)<<d_minZ;
 		*/
 	}
 
@@ -506,7 +506,7 @@ AtomLink* Grid::getHashCode(const UnitCell &ucell, const FAtom& atom)const
 
 void Grid::Build_Hash_Table(const UnitCell &ucell, AtomLink* const pointCache)
 {
-	TITLE("SLTK_Grid", "Build_Hash_Table");
+	ModuleBase::TITLE("SLTK_Grid", "Build_Hash_Table");
 
 	AtomLink* current = pointCache;
 
@@ -562,7 +562,7 @@ void Grid::Build_Hash_Table(const UnitCell &ucell, AtomLink* const pointCache)
 
 void Grid::Fold_Hash_Table()
 {
-	TITLE("SLTK_Grid", "Fold_Hash_Table");
+	ModuleBase::TITLE("SLTK_Grid", "Fold_Hash_Table");
 
 	struct AtomLinkPointStack
 	{
@@ -608,7 +608,7 @@ void Grid::Fold_Hash_Table()
 			{
 				AtomLink* current = this->Cell[i][j][k].address;
 				//			ofs_running<<"\n i = "<<i<<" j = "<<j<<" k = "<<k
-				//			<<"\n length = "<<this->Cell[i][j][k].length<<endl;
+				//			<<"\n length = "<<this->Cell[i][j][k].length<<std::endl;
 				const AtomLink* const end = current + this->Cell[i][j][k].length;
 
 				bool *push_i = new bool[Cell[i][j][k].length] ;
@@ -713,7 +713,7 @@ void Grid::Construct_Adjacent_expand(
 	const int true_j, 
 	const int true_k)
 {
-//	if (test_grid)TITLE(ofs_running, "Grid", "Construct_Adjacent_expand");
+//	if (test_grid)ModuleBase::TITLE(ofs_running, "Grid", "Construct_Adjacent_expand");
 
 //----------------------------------------------------------
 // EXPlAIN : In expand grid case, use
@@ -777,7 +777,7 @@ void Grid::Construct_Adjacent_expand(
 		}
 		else
 		{
-			WARNING_QUIT("Construct_Adjacent_expand", "\n Expand case, must use periodic boundary.");
+			ModuleBase::WARNING_QUIT("Construct_Adjacent_expand", "\n Expand case, must use periodic boundary.");
 		}
 	}
 	return;
@@ -789,7 +789,7 @@ void Grid::Construct_Adjacent_expand_periodic(
 	const int true_k, 
 	const int true_ia)
 {
-//	if (test_grid)TITLE(ofs_running, "Grid", "Construct_Adjacent_expand_periodic");
+//	if (test_grid)ModuleBase::TITLE(ofs_running, "Grid", "Construct_Adjacent_expand_periodic");
 
 	for (int i = 0;i < this->dx;i++)
 	{
@@ -810,7 +810,7 @@ void Grid::Construct_Adjacent_expand_periodic(
 
 void Grid::Construct_Adjacent_begin(void)
 {
-//	if (test_grid)TITLE(ofs_running, "Grid", "Construct_Adjacent_begin");
+//	if (test_grid)ModuleBase::TITLE(ofs_running, "Grid", "Construct_Adjacent_begin");
 
 //----------------------------------------------------------
 // EXPLAIN : Searching in all cells in this grid
@@ -830,11 +830,11 @@ void Grid::Construct_Adjacent_begin(void)
 					if (test_grid > 2)
 					{
 /*
-						ofs_running << "\n" << setw(15) << "Atom"
-						<< setw(15) << Cell[i][j][k].address[ia].fatom.x()
-						<< setw(15) << Cell[i][j][k].address[ia].fatom.y()
-						<< setw(15) << Cell[i][j][k].address[ia].fatom.z()
-						<< setw(10) << Cell[i][j][k].address[ia].fatom.getType();
+						ofs_running << "\n" << std::setw(15) << "Atom"
+						<< std::setw(15) << Cell[i][j][k].address[ia].fatom.x()
+						<< std::setw(15) << Cell[i][j][k].address[ia].fatom.y()
+						<< std::setw(15) << Cell[i][j][k].address[ia].fatom.z()
+						<< std::setw(10) << Cell[i][j][k].address[ia].fatom.getType();
 */
 					}
 
@@ -873,7 +873,7 @@ void Grid::Construct_Adjacent_nature
     const int ia
 )
 {
-//	if(test_grid)TITLE(ofs_running,"Grid","Construct_Adjacent_nature");
+//	if(test_grid)ModuleBase::TITLE(ofs_running,"Grid","Construct_Adjacent_nature");
 	for (int i2 = i - 1;i2 <= i + 1;i2++)
 	{
 		if (i2<dx && i2 >= 0)
@@ -908,7 +908,7 @@ void Grid::Construct_Adjacent_periodic
     const int ia
 )
 {
-//	if(test_grid)TITLE(ofs_running,"Grid","Construct_Adjacent_periodic");
+//	if(test_grid)ModuleBase::TITLE(ofs_running,"Grid","Construct_Adjacent_periodic");
 	bool first_i = true;
 
 	for (int i2 = i - 1;i2 <= i + 1;i2++)
@@ -1096,9 +1096,9 @@ void Grid::Construct_Adjacent_final
 		{
 /*
 			ofs_running << "\n"
-			<< setw(15) << x2 << setw(15) << y2 << setw(15) << z2
-			<< setw(10) << Cell[i2][j2][k2].address[ia2].fatom.getType()
-			<< setw(10) << dr;
+			<< std::setw(15) << x2 << std::setw(15) << y2 << std::setw(15) << z2
+			<< std::setw(10) << Cell[i2][j2][k2].address[ia2].fatom.getType()
+			<< std::setw(10) << dr;
 */
 		}
 	}

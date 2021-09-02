@@ -53,7 +53,7 @@ class Stochastic_Iter
 
     double *spolyv;
 
-    string stotype;
+    std::string stotype;
 
 	private:
     

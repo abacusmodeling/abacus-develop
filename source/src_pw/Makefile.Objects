@@ -75,9 +75,11 @@ diago_cg.o\
 electrons.o \
 efield.o \
 energy.o \
+energy_dos_pw.o\
+dos.o\
 forces.o\
 global.o \
-hamilt_pw.o \
+hamilt_pw_gpu.o \
 hamilt.o \
 H_Ewald_pw.o\
 H_Hartree_pw.o\
@@ -87,6 +89,7 @@ magnetism.o\
 occupy.o\
 potential.o \
 potential_libxc.o \
+potential_libxc_meta.o \
 pw_basis.o\
 pw_complement.o\
 soc.o\
@@ -98,6 +101,7 @@ sto_che.o\
 stress_pw.o\
 stress_func_cc.o\
 stress_func_gga.o\
+stress_func_mgga.o\
 stress_func_kin.o\
 stress_func_nl.o\
 stress_func_ewa.o\
@@ -110,6 +114,7 @@ symmetry_rho.o \
 symm_other.o \
 threshold_elec.o\
 use_fft.o\
+use_fft_kernel.o\
 vdwd2.o\
 vdwd2_parameters.o\
 vdwd3.o\
@@ -124,7 +129,8 @@ xc_2.o\
 xc_3.o \
 xc_gga_pw.o \
 xc_type.o \
-xc_functional.o
+xc_functional.o \
+diago_cg_gpu.o
 
 OBJS_IO=berryphase.o\
 epsilon0_pwscf.o\
@@ -137,6 +143,7 @@ read_atoms.o\
 read_cell_pseudopots.o\
 write_pot.o\
 write_rho.o\
+write_rho_cube.o\
 chi0_standard.o\
 numerical_basis.o\
 numerical_descriptor.o\
@@ -154,6 +161,7 @@ read_pp.o \
 read_pp_upf100.o \
 read_pp_upf201.o \
 read_pp_vwr.o \
+read_pp_blps.o \
 unitcell_pseudo.o\
 atom_pseudo.o\
 

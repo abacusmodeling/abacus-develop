@@ -1,5 +1,3 @@
-/* mymath1.cpp file */
-
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -7,6 +5,9 @@
 #include <cmath>
 #include <cstdlib>
 #include "mymath.h"
+
+namespace ModuleBase
+{
 
 typedef double real;
 #ifdef __FFTW3
@@ -47,9 +48,9 @@ void simpson(const int mesh,const double *func,const double *rab, double &asum)
 
     if (mesh%2==0) 	//( mesh+1 - ( (mesh+1) / 2 ) * 2 != 1 )
     {
-        cout << "\n error in subroutine simpson ";
-        cout << "\n routine assumes mesh is odd but mesh = "
-             << mesh << endl;
+        std::cout << "\n error in subroutine simpson ";
+        std::cout << "\n routine assumes mesh is odd but mesh = "
+             << mesh << std::endl;
         // write(*,*) '***error in subroutine radlg';
         // write(*,*) 'routine assumes mesh is odd but mesh =',mesh+1,??;
         exit(0);
@@ -81,7 +82,7 @@ void simpson_cp90(int mesh, double *func, double *rab, double intg)
     int i;
 
     if (mesh < 8)
-        cout << "\n simpson , few mesh points,8 " << endl;
+        std::cout << "\n simpson , few mesh points,8 " << std::endl;
 
     c[0] = 109.0 / 48.0;
 
@@ -105,26 +106,13 @@ void simpson_cp90(int mesh, double *func, double *rab, double intg)
 } //end subroutine simpson_cp90
 
 
-/*===============================================================
-!
-! Copyright (C) 2002 FPMD group
-! This file is distributed under the terms of the
-! GNU General Public License. See the file `License'
-! in the root directory of the present distribution,
-! or http://www.gnu.org/copyleft/gpl.txt .
-*/
-
 void simpson_fpmd(int n, double *func, double dx, double s)
 {
-    // INTEGER, INTENT(IN) ::  N
-    // REAL(dbl), INTENT(IN)  ::  func(N), dx
-    // REAL(dbl), INTENT(OUT) ::  S
-
-    double c0, c1, c2, c3;
-    int i;
-    //  REAL(dbl) :: C1,C2,C3,C4
-    //  PARAMETER(C1=109.d0/48.d0,C2=-5.d0/48.d0, C3=63.d0/48.d0,C4=49.d0/48.d0)
-    //  INTEGER I
+    double c0=0.0;
+	double c1=0.0;
+	double c2=0.0;
+	double c3=0.0;
+    int i=0;
 
     c0 = 109.0 / 48.0;
     c1 = -5.0 / 48.0;
@@ -136,10 +124,10 @@ void simpson_fpmd(int n, double *func, double dx, double s)
     s = s + func[2] * c2;
     s = s + func[3] * c3;
 
-    for (i = 4;i < n - 5;i++) 	// DO I = 5, (N-5)
+    for (i = 4;i < n - 5;i++)
     {
         s = s + func[i];
-    } //  END DO
+    }
 
     s = s + func[n-4] * c3;
 
@@ -152,15 +140,7 @@ void simpson_fpmd(int n, double *func, double dx, double s)
     s = s * dx;
 
     return;
-}//  END SUBROUTINE simpson_fpmd
-
-/*****************************************************
-! Copyright (C) 2002-2003 PWSCF+CP group
-! This file is distributed under the terms of the
-! GNU General Public License. See the file `License'
-! in the root directory of the present distribution,
-! or http://www.gnu.org/copyleft/gpl.txt .
-********************************************************/
+}
 
 // Error function
 double my_erf(double x)
@@ -206,6 +186,7 @@ double my_erf(double x)
     return erf0;
 }
 
+
 // complementary error function
 double my_erfc(double x)
 {
@@ -245,32 +226,36 @@ double my_erfc(double x)
         x2 = x * x;
         xm2 = (1.0 / ax) * (1.0 / ax);
         erfc0 = (1.0 / ax) * exp(- x2) * (pim1 + xm2 * (p3 [0]
-                                          + xm2 * (p3 [1] + xm2 * (p3 [2] + xm2 * (p3 [3]
-                                                                   + xm2 * p3 [4] )))) / (q3 [0] + xm2 * (q3 [1] + xm2 * (q3 [2] + xm2 *
-                                                                                                          (q3 [3] + xm2 * q3 [4])))));
+                + xm2 * (p3 [1] + xm2 * (p3 [2] + xm2 * (p3 [3]
+                + xm2 * p3 [4] )))) / (q3 [0] + xm2 * (q3 [1] + xm2 * (q3 [2] + xm2 *
+                (q3 [3] + xm2 * q3 [4])))));
     }
-    else if (ax > 0.470)
-    {
-        x2 = x * x;
-        erfc0 = exp(- x2) * (p2 [0] + ax * (p2 [1] +
-                                            ax * (p2 [2] + ax * (p2 [3] +
-                                                                 ax * (p2 [4] + ax * (p2 [5] +
-                                                                                      ax * (p2 [6] + ax * p2 [7]))))))) /
-                (q2 [0] + ax * (q2 [1] + ax * (q2 [2] +
-                                               ax * (q2 [3] + ax * (q2 [4] +
-                                                                    ax * (q2 [5] +ax *(q2 [6] +
-                                                                                       ax * q2 [7])))))));
-    }
-    else
+	else if (ax > 0.470)
+	{
+		x2 = x * x;
+		erfc0 = exp(- x2) * (p2 [0] + ax * (p2 [1] +
+					ax * (p2 [2] + ax * (p2 [3] +
+							ax * (p2 [4] + ax * (p2 [5] +
+									ax * (p2 [6] + ax * p2 [7]))))))) /
+			(q2 [0] + ax * (q2 [1] + ax * (q2 [2] +
+										   ax * (q2 [3] + ax * (q2 [4] +
+												   ax * (q2 [5] +ax *(q2 [6] +
+														   ax * q2 [7])))))));
+	}
+	else
     {
         erfc0 = 1.0 - my_erf(ax) ;
     }
 
     // erf(-x)=-erf(x)  =>  erfc(-x) = 2-erfc(x)
-    if (x < 0.0) erfc0 = 2.0 - erfc0;
+    if (x < 0.0) 
+	{
+		erfc0 = 2.0 - erfc0;
+	}
 
     return erfc0 ;
 } //end function erfc
+
 
 double gauss_freq(double x)
 {
@@ -278,3 +263,4 @@ double gauss_freq(double x)
     return g_freq;
 } //end function gauss_freq
 
+}

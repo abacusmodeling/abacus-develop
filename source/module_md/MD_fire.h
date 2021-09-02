@@ -10,9 +10,9 @@ class MD_fire
         ~MD_fire(){};
         void check_FIRE(
             const int& numIon, 
-            const Vector3<double>* force,
+            const ModuleBase::Vector3<double>* force,
             double& deltaT, 
-            Vector3<double>* vel);
+            ModuleBase::Vector3<double>* vel);
     private:
         double alpha_start ;//alpha_start begin
         double alpha;//alpha begin

@@ -14,23 +14,25 @@
 #include "memory.h"
 #endif
 
+namespace ModuleBase
+{
 //==========================================================
 // GLOBAL FUNCTION :
-// NAME : WARNING( write information into ofs_warning)
+// NAME : WARNING( write information into GlobalV::ofs_warning)
 // NAME : QUIT( exit the running program)
 // NAME : WARNING_QUIT( write information into
-// 		  ofs_warning , and then quit)
+// 		  GlobalV::ofs_warning , and then quit)
 //==========================================================
-void WARNING(const string &file,const string &description)
+void WARNING(const std::string &file,const std::string &description)
 {
 #ifdef __NORMAL
 
 #else
 
-    if (MY_RANK==0)
+    if (GlobalV::MY_RANK==0)
     {
-//		cout << "\n "<<file<<"  Warning : "<<description<<endl;
-        ofs_warning << " " << file <<"  warning : "<< description<<endl;
+//		std::cout << "\n "<<file<<"  Warning : "<<description<<std::endl;
+        GlobalV::ofs_warning << " " << file <<"  warning : "<< description<<std::endl;
     }
 #endif
     return;
@@ -42,15 +44,15 @@ void QUIT(void)
 #ifdef __NORMAL
 
 #else
-    timer::finish(ofs_running , !MY_RANK);
+    ModuleBase::timer::finish(GlobalV::ofs_running , !GlobalV::MY_RANK);
 
-    Global_File::close_all_log(MY_RANK);
+    ModuleBase::Global_File::close_all_log(GlobalV::MY_RANK);
 
-    if (MY_RANK==0)
+    if (GlobalV::MY_RANK==0)
     {
-        Memory::print_all( ofs_running ) ;
+        ModuleBase::Memory::print_all( GlobalV::ofs_running ) ;
     }
-    cout<<" See output information in : "<<global_out_dir<<endl;
+    std::cout<<" See output information in : "<<GlobalV::global_out_dir<<std::endl;
 #endif
 
 #ifdef __MPI
@@ -60,17 +62,17 @@ void QUIT(void)
 }
 
 
-void WARNING_QUIT(const string &file,const string &description)
+void WARNING_QUIT(const std::string &file,const std::string &description)
 {
 #ifdef __NORMAL
 
-		cout << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-		cout << "                         NOTICE                           " << endl;
-		cout << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+		std::cout << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+		std::cout << "                         NOTICE                           " << std::endl;
+		std::cout << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
 
 #else
 
-    //cout<<" ----------- SOMETHING TO WARN YOU ! -------" << endl;
+    //std::cout<<" ----------- SOMETHING TO WARN YOU ! -------" << std::endl;
 	// 41: red background
 	// 42: green background
 	// 31: red
@@ -80,52 +82,54 @@ void WARNING_QUIT(const string &file,const string &description)
 	// 35: zi
 	// 36: qing
 	// 37: white
-	if(COLOUR)
+	if(GlobalV::COLOUR)
 	{
 		//printf( "\e[32m%s\e[0m\n", " -------------- SOMETHING TO WARN YOU ! ------------");
 		//printf( " \e[32m%s\e[0m\n", description.c_str());
 		//printf( " \e[32m%s\e[0m", "CHECK IN FILE : ");
-		//printf( "\e[32m%s\e[0m", global_out_dir.c_str());
+		//printf( "\e[32m%s\e[0m", GlobalV::global_out_dir.c_str());
 		//printf( "\e[32m%s\e[0m\n", "warning.log"); 
 		//printf( "\e[32m%s\e[0m\n", " ---------------------------------------------------"); 
 		printf( "[32m%s[0m\n", " -------------- SOMETHING TO WARN YOU ! ------------");
 		printf( " [32m%s[0m\n", description.c_str());
 		printf( " [32m%s[0m", "CHECK IN FILE : ");
-		printf( "[32m%s[0m", global_out_dir.c_str());
+		printf( "[32m%s[0m", GlobalV::global_out_dir.c_str());
 		printf( "[32m%s[0m\n", "warning.log"); 
 		printf( "[32m%s[0m\n", " ---------------------------------------------------"); 
 	}
 	else
 	{
-		cout << " " << endl;
-		cout << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-		cout << "                         NOTICE                           " << endl;
-		cout << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-		cout << " " << endl;
-		cout << " " << description << endl;
-		cout << " CHECK IN FILE : " << global_out_dir << "warning.log" << endl;
-		cout << " " << endl;
-		cout << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-		cout << "                         NOTICE                           " << endl;
-		cout << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+		std::cout << " " << std::endl;
+		std::cout << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+		std::cout << "                         NOTICE                           " << std::endl;
+		std::cout << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+		std::cout << " " << std::endl;
+		std::cout << " " << description << std::endl;
+		std::cout << " CHECK IN FILE : " << GlobalV::global_out_dir << "warning.log" << std::endl;
+		std::cout << " " << std::endl;
+		std::cout << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+		std::cout << "                         NOTICE                           " << std::endl;
+		std::cout << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
 
 
-		ofs_running << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-		ofs_running << "                         NOTICE                           " << endl;
-		ofs_running << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-		ofs_running << endl;
-		ofs_running << " " << description << endl;
-		ofs_running << " CHECK IN FILE : " << global_out_dir << "warning.log" << endl;
-		ofs_running << endl;
-		ofs_running << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-		ofs_running << "                         NOTICE                           " << endl;
-		ofs_running << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+		GlobalV::ofs_running << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+		GlobalV::ofs_running << "                         NOTICE                           " << std::endl;
+		GlobalV::ofs_running << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+		GlobalV::ofs_running << std::endl;
+		GlobalV::ofs_running << " " << description << std::endl;
+		GlobalV::ofs_running << " CHECK IN FILE : " << GlobalV::global_out_dir << "warning.log" << std::endl;
+		GlobalV::ofs_running << std::endl;
+		GlobalV::ofs_running << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+		GlobalV::ofs_running << "                         NOTICE                           " << std::endl;
+		GlobalV::ofs_running << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
 	}
 
 	WARNING(file,description);
-    ofs_running<<" Check in file : "<<global_out_dir<<"warning.log"<<endl;
+    GlobalV::ofs_running<<" Check in file : "<<GlobalV::global_out_dir<<"warning.log"<<std::endl;
 
 #endif
 
     QUIT();
+}
+
 }

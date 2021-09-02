@@ -15,25 +15,28 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-using namespace std;
+namespace ModuleBase
+{
+namespace GlobalFunc
+{
 
-void NOTE(const string &words)
+void NOTE(const std::string &words)
 {
 	return;
-	if(ofs_running)
+	if(GlobalV::ofs_running)
 	{
-		//ofs_running << " *********************************************************************************" << endl;
-		ofs_running << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-		ofs_running << " " << words << endl;
-		ofs_running << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+		//GlobalV::ofs_running << " *********************************************************************************" << std::endl;
+		GlobalV::ofs_running << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+		GlobalV::ofs_running << " " << words << std::endl;
+		GlobalV::ofs_running << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
 	}
 }
 
-void NEW_PART(const string &words)
+void NEW_PART(const std::string &words)
 {
-	ofs_running << "\n ><><><><><><><><><><><><><><><><><><><><><><" << endl;
-	ofs_running << "\n " << words << endl;
-	ofs_running << "\n ><><><><><><><><><><><><><><><><><><><><><><\n" << endl;
+	GlobalV::ofs_running << "\n ><><><><><><><><><><><><><><><><><><><><><><" << std::endl;
+	GlobalV::ofs_running << "\n " << words << std::endl;
+	GlobalV::ofs_running << "\n ><><><><><><><><><><><><><><><><><><><><><><\n" << std::endl;
 	return;
 }
 
@@ -42,9 +45,9 @@ void NEW_PART(const string &words)
 // GLOBAL FUNCTION :
 // NAME : OUT( output date for checking )
 //==========================================================
-void OUT(ofstream &ofs,const string &name)
+void OUT(std::ofstream &ofs,const std::string &name)
 {
-    ofs<<"\n"<<setw(18)<<name<<endl;
+    ofs<<"\n"<<std::setw(18)<<name<<std::endl;
     return;
 }
 
@@ -52,19 +55,19 @@ void OUT(ofstream &ofs,const string &name)
 // GLOBAL FUNCTION :
 // NAME : MAKE_DIR( make dir ,using system function)
 //==========================================================
-void MAKE_DIR(const string &fn)
+void MAKE_DIR(const std::string &fn)
 {
-//	TITLE("global_function","MAKE_DIR");
-    if (MY_RANK==0)
+//	ModuleBase::TITLE("global_function","MAKE_DIR");
+    if (GlobalV::MY_RANK==0)
     {
-        stringstream ss;
+        std::stringstream ss;
         ss << " test -d " << fn << " || mkdir " << fn ;
 //----------------------------------------------------------
 // EXPLAIN : 'system' function return '0' if success
 //----------------------------------------------------------
         if ( system( ss.str().c_str() ) )
         {
-            WARNING_QUIT( "MAKE_DIR", fn );
+            ModuleBase::WARNING_QUIT( "MAKE_DIR", fn );
         }
     }
 #ifdef __MPI
@@ -74,16 +77,16 @@ void MAKE_DIR(const string &fn)
 }
 
 
-void DONE(ofstream &ofs,const string &description, const bool only_rank0)
+void DONE(std::ofstream &ofs,const std::string &description, const bool only_rank0)
 {
     if (only_rank0)
     {
-        if (MY_RANK==0)
+        if (GlobalV::MY_RANK==0)
         {
      //       ofs << " ---------------------------------------------------------------------------------\n";
             ofs << " DONE : " << description;
-            ofs << " Time : "<< timer::print_until_now() << " (SEC)" ;
-			ofs << endl << endl;
+            ofs << " Time : "<< ModuleBase::timer::print_until_now() << " (SEC)" ;
+			ofs << std::endl << std::endl;
      //       ofs << "\n ---------------------------------------------------------------------------------\n";
         }
     }
@@ -91,13 +94,13 @@ void DONE(ofstream &ofs,const string &description, const bool only_rank0)
     {
      //   ofs << " ---------------------------------------------------------------------------------\n";
         ofs << " DONE : " << description;
-        ofs << " Time : "<< timer::print_until_now() << " (SEC)" ;
-		ofs << endl << endl;
+        ofs << " Time : "<< ModuleBase::timer::print_until_now() << " (SEC)" ;
+		ofs << std::endl << std::endl;
      //   ofs << "\n ---------------------------------------------------------------------------------\n";
     }
-//   	cout << "\n---------------------------------------------------------------------------------\n";
-    cout << " DONE(" << setw(10) << timer::print_until_now() <<" SEC) : "<< description << endl;
-//   	cout << "\n---------------------------------------------------------------------------------\n";
+//   	std::cout << "\n---------------------------------------------------------------------------------\n";
+    std::cout << " DONE(" << std::setw(10) << ModuleBase::timer::print_until_now() <<" SEC) : "<< description << std::endl;
+//   	std::cout << "\n---------------------------------------------------------------------------------\n";
     return;
 }
 
@@ -106,39 +109,39 @@ void DONE(ofstream &ofs,const string &description, const bool only_rank0)
 // NAME : TEST_LEVEL
 // control the test_level
 //==========================================================
-void TEST_LEVEL(const string &name)
+void TEST_LEVEL(const std::string &name)
 {
     bool disable = true;
     if (disable) return;
 
     if (name == "none")
     {
-        test_wf = 0;
-        test_potential = 0;
-        test_charge = 0;
+        GlobalV::test_wf = 0;
+        GlobalV::test_potential = 0;
+        GlobalV::test_charge = 0;
     }
     else if (name == "init_potential")
     {
-        test_wf = 1;
-        test_potential = 1;
-        test_charge = 1;
+        GlobalV::test_wf = 1;
+        GlobalV::test_potential = 1;
+        GlobalV::test_charge = 1;
     }
     else if (name == "init_read")
     {
-        test_input = 1;
-        test_winput = 1;
-        test_kpoint = 1;
-        test_atom = 1;
-        test_unitcell = 1;
+        GlobalV::test_input = 1;
+        GlobalV::test_winput = 1;
+        GlobalV::test_kpoint = 1;
+        GlobalV::test_atom = 1;
+        GlobalV::test_unitcell = 1;
 #ifndef __EPM
-        test_pseudo_cell = 1;
+        GlobalV::test_pseudo_cell = 1;
 #else
         test_epm_unitcell = 1;
 #endif
     }
     else if (name == "pw_init")
     {
-        test_pw = 1;
+        GlobalV::test_pw = 1;
 
     }
 
@@ -146,9 +149,9 @@ void TEST_LEVEL(const string &name)
 }
 
 
-bool SCAN_BEGIN(ifstream &ifs, const string &TargetName, const bool restart)
+bool SCAN_BEGIN(std::ifstream &ifs, const std::string &TargetName, const bool restart)
 {
-    string SearchName;
+    std::string SearchName;
     bool find = false;
     if (restart)
     {
@@ -167,41 +170,41 @@ bool SCAN_BEGIN(ifstream &ifs, const string &TargetName, const bool restart)
     }
     if (!find)
     {
-        ofs_warning<<" In SCAN_BEGIN, can't find: "<<TargetName<<" block."<<endl;
+        GlobalV::ofs_warning<<" In SCAN_BEGIN, can't find: "<<TargetName<<" block."<<std::endl;
     }
     return find;
 }
 
 
-void SCAN_END(ifstream &ifs, const string &TargetName)
+void SCAN_END(std::ifstream &ifs, const std::string &TargetName)
 {
-    string SearchName;
+    std::string SearchName;
     ifs >> SearchName;
     if ( SearchName != TargetName)
     {
-        ofs_warning<<" In SCAN_END, can't find: "<<TargetName<<" block."<<endl;
+        GlobalV::ofs_warning<<" In SCAN_END, can't find: "<<TargetName<<" block."<<std::endl;
     }
     return;
 }
 
-void BLOCK_HERE( const string &description)
+void BLOCK_HERE( const std::string &description)
 {
 //	return;
-	cout << "\n********************************************";
-    cout << "\n Here is a Block, 1: go on 0: quit";
-    cout << "\n " << description;
-	cout << "\n********************************************" << endl;
+	std::cout << "\n********************************************";
+    std::cout << "\n Here is a Block, 1: go on 0: quit";
+    std::cout << "\n " << description;
+	std::cout << "\n********************************************" << std::endl;
     bool go_on = false;
-	if(MY_RANK==0)
+	if(GlobalV::MY_RANK==0)
 	{
     	cin >> go_on;
 	}
 
 #ifdef __MPI
 	int swap = go_on;
-	if(MY_RANK == 0)swap = go_on;
+	if(GlobalV::MY_RANK == 0)swap = go_on;
 	MPI_Bcast(&swap, 1, MPI_INT, 0, MPI_COMM_WORLD);
-	if(MY_RANK != 0)go_on = static_cast<bool>( swap );
+	if(GlobalV::MY_RANK != 0)go_on = static_cast<bool>( swap );
 #endif
 	if(go_on)
 	{
@@ -209,23 +212,23 @@ void BLOCK_HERE( const string &description)
 	}
 	else
 	{
-		QUIT();
+		ModuleBase::QUIT();
 	}
 }
 
 
-void OUT_TIME(const string &name, time_t &start, time_t &end)
+void OUT_TIME(const std::string &name, time_t &start, time_t &end)
 {
 	double mini = difftime(end, start)/60.0;
 	if(mini>0.1)
 	{
-		ofs_warning << setprecision(2);
-		ofs_warning << " -------------------------------------------------------" << endl;
-		ofs_warning << " NAME < " << name << " > = " << endl;
-		ofs_warning << " -> " << ctime(&start) << " -> " << ctime(&end);	
-		ofs_warning << " TIME = " << mini << " [Minutes]" << endl;
-		ofs_warning << " -------------------------------------------------------" << endl;
-		ofs_warning << setprecision(6);
+		GlobalV::ofs_warning << std::setprecision(2);
+		GlobalV::ofs_warning << " -------------------------------------------------------" << std::endl;
+		GlobalV::ofs_warning << " NAME < " << name << " > = " << std::endl;
+		GlobalV::ofs_warning << " -> " << ctime(&start) << " -> " << ctime(&end);	
+		GlobalV::ofs_warning << " TIME = " << mini << " [Minutes]" << std::endl;
+		GlobalV::ofs_warning << " -------------------------------------------------------" << std::endl;
+		GlobalV::ofs_warning << std::setprecision(6);
 	}
 }
 
@@ -233,10 +236,10 @@ size_t MemAvailable()
 {
 	size_t mem_sum = 0;
 	int i=0;
-	ifstream ifs("/proc/meminfo");
+	std::ifstream ifs("/proc/meminfo");
 	while(ifs.good())
 	{
-		string label, size, kB;
+		std::string label, size, kB;
 		ifs>>label>>size>>kB;
 		if(label=="MemAvailable:")
 			return std::stol(size);
@@ -248,5 +251,8 @@ size_t MemAvailable()
 		if(i==3)
 			return mem_sum;
 	}
-	throw runtime_error("read /proc/meminfo error in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+	throw std::runtime_error("read /proc/meminfo error in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+}
+
+}
 }

@@ -6,9 +6,9 @@
 #include "../../../module_base/element_basis_index.h"
 #include "element_basis_index-test.h"
 
-Element_Basis_Index::Range construct_range()
+ModuleBase::Element_Basis_Index::Range construct_range()
 {
-	Element_Basis_Index::Range range;
+	ModuleBase::Element_Basis_Index::Range range;
 	range.resize(2);
 	
 	range[0].resize(3);
@@ -28,11 +28,11 @@ Element_Basis_Index::Range construct_range()
 
 int main()
 {
-	const Element_Basis_Index::Range range = construct_range();
-	cout<<"range:"<<endl<<range<<endl;
+	const ModuleBase::Element_Basis_Index::Range range = construct_range();
+	std::cout<<"range:"<<std::endl<<range<<std::endl;
 	
-	const Element_Basis_Index::IndexLNM index = Element_Basis_Index::construct_index( range );
-	cout<<"index:"<<endl<<index<<endl;
+	const ModuleBase::Element_Basis_Index::IndexLNM index = ModuleBase::Element_Basis_Index::construct_index( range );
+	std::cout<<"index:"<<std::endl<<index<<std::endl;
 
 	return 0;
 }

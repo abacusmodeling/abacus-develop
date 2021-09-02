@@ -62,6 +62,9 @@ class LCAO_nnr
 	int nbox;
 };
 
+namespace GlobalC
+{
 extern LCAO_nnr LNNR;
+}
 
 #endif 
