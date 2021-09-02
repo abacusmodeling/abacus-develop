@@ -30,6 +30,7 @@ class ORB_gen_tables
 	void set_unit(const double& v) { lat0 = v; }
 	
 	void snap_psipsi(
+		const LCAO_Orbitals &orb,
 		double olm[],
 		const int &job, ///<[in]0 for matrix element of either S or T, 1 for its derivatives
 	    const char &dtype, ///<[in] derivative type, 'S' for overlap, 'T' for kinetic energy, 'D' for descriptor in deepks

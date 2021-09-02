@@ -85,6 +85,7 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri, con
 				dtau = tau2 - tau1;
 				double distance = dtau.norm() * ucell.lat0;
 				double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
+
 				if(distance < rcut)
 				{
 					int iw1_all = ucell.itiaiw2iwt( T1, I1, 0) ; //iw1_all = combined index (it, ia, iw)
@@ -125,7 +126,7 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri, con
 							{
 								// PLEASE use UOT as an input parameter of this subroutine
 								// mohan add 2021-03-30
-								GlobalC::UOT.snap_psipsi( olm, 0, dtype, tau1, 
+								GlobalC::UOT.snap_psipsi( GlobalC::ORB, olm, 0, dtype, tau1, 
 										T1, L1, m1, N1, GlobalC::GridD.getAdjacentTau(ad), 
 										T2, L2, m2, N2, GlobalV::NSPIN,
 										olm2//for soc
@@ -168,7 +169,7 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri, con
 							}
 							else // calculate the derivative
 							{
-								GlobalC::UOT.snap_psipsi( olm, 1, dtype, 
+								GlobalC::UOT.snap_psipsi( GlobalC::ORB, olm, 1, dtype, 
 									tau1, T1, L1, m1, N1,
 									GlobalC::GridD.getAdjacentTau(ad), T2, L2, m2, N2, GlobalV::NSPIN
 									);

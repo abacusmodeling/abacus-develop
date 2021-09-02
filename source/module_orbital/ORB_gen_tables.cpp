@@ -572,6 +572,7 @@ void ORB_gen_tables::snap_psibeta(
 }
 
 void ORB_gen_tables::snap_psipsi(
+	const LCAO_Orbitals &orb,
 	double olm[],
 	const int &job,	   //0, 1
 	const char &dtype, // derivative type: S or T
@@ -602,8 +603,8 @@ void ORB_gen_tables::snap_psipsi(
 	/// judge if there exist overlap
 	double distance = Numerical_Orbital::get_distance() * this->lat0;
 
-	const double Rcut1 = GlobalC::ORB.Phi[T1].getRcut();
-	const double Rcut2 = (dtype == 'D' ? GlobalC::ORB.Alpha[0].getRcut() : GlobalC::ORB.Phi[T2].getRcut());	//caoyu modified 2021-05-08
+	const double Rcut1 = orb.Phi[T1].getRcut();
+	const double Rcut2 = (dtype == 'D' ? orb.Alpha[0].getRcut() : orb.Phi[T2].getRcut());	//caoyu modified 2021-05-08
 
 	if (job == 0)
 	{
