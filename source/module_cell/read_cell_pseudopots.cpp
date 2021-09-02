@@ -42,7 +42,7 @@ void UnitCell_pseudo::read_cell_pseudopots(const std::string &pp_dir, std::ofstr
 					upf.set_empty_element();			
 				}
 				//average pseudopotential if needed
-				error_ap = upf.average_p(INPUT.soc_lambda); //added by zhengdy 2020-10-20
+				error_ap = upf.average_p(GlobalV::soc_lambda); //added by zhengdy 2020-10-20
 			}
 		}
 

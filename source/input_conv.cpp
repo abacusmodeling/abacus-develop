@@ -347,6 +347,7 @@ void Input_Conv::Convert(void)
 			GlobalV::DOMAG_Z = true;
 		}
 		GlobalV::LSPINORB = INPUT.lspinorb;
+		GlobalV::soc_lambda = INPUT.soc_lambda;
 
 		delete[] GlobalC::ucell.magnet.m_loc_;
 		delete[] GlobalC::ucell.magnet.angle1_;
