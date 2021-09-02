@@ -63,7 +63,7 @@ Hamilt_PW::Hamilt_PW()
     // GR_index = new int[1];
     // Bec = new complex<double>[1];
 #ifdef __CUDA
-	cublasCreate(&my_handle);
+	cublasCreate(&hpw_handle);
 #endif
 }
 
@@ -75,7 +75,7 @@ Hamilt_PW::~Hamilt_PW()
     // delete[] Bec;
 #ifdef __CUDA
 	cudaFree(GR_index_d);
-	cublasDestroy(my_handle);
+	cublasDestroy(hpw_handle);
     // CHECK_CUDA(cudaFree(GR_index_d));
 #endif
 }
@@ -565,13 +565,13 @@ void Hamilt_PW::h_psi_gpu(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, cons
             if(m==1 && GlobalV::NPOL==1)
             {
                 int inc = 1;
-                cublasZgemv(my_handle, transa, GlobalC::wf.npw, nkb, &ONE, d_vkb_c, GlobalC::wf.npwx, psi_in, inc, &ZERO, becp, inc);
+                cublasZgemv(hpw_handle, transa, GlobalC::wf.npw, nkb, &ONE, d_vkb_c, GlobalC::wf.npwx, psi_in, inc, &ZERO, becp, inc);
 
             }
             else
             {
                 int npm = GlobalV::NPOL * m;
-                cublasZgemm(my_handle, transa, transb, nkb, npm, GlobalC::wf.npw, &ONE, d_vkb_c, GlobalC::wf.npwx, psi_in, GlobalC::wf.npwx, &ZERO, becp, nkb);
+                cublasZgemm(hpw_handle, transa, transb, nkb, npm, GlobalC::wf.npw, &ONE, d_vkb_c, GlobalC::wf.npwx, psi_in, GlobalC::wf.npwx, &ZERO, becp, nkb);
 
             }
 
@@ -884,7 +884,7 @@ void Hamilt_PW::add_nonlocal_pp_gpu(
 	if(GlobalV::NPOL==1 && m==1)
 	{
 		int inc = 1;
-        cublasZgemv(my_handle,
+        cublasZgemv(hpw_handle,
             transa,
             GlobalC::wf.npw,
             GlobalC::ppcell.nkb,
@@ -900,7 +900,7 @@ void Hamilt_PW::add_nonlocal_pp_gpu(
 	else
 	{
 		int npm = GlobalV::NPOL*m;
-        cublasZgemm(my_handle,
+        cublasZgemm(hpw_handle,
             transa,
             transb,
             GlobalC::wf.npw,
