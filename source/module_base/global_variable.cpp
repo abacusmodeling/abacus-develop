@@ -177,6 +177,7 @@ bool DOMAG    = false;
 bool DOMAG_Z  = false;
 int NPOL      = 1;
 int PRENSPIN  = 1;
+double soc_lambda = 1.0;
 
 bool FINAL_SCF = false; //LiuXh add 20180619
 }
