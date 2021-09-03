@@ -205,7 +205,11 @@ void Electrons::self_consistent(const int &istep)
 		// output the new eigenvalues and wave functions.
         this->c_bands(istep);
 
-        if (check_stop_now()) return;
+        if (check_stop_now())
+        {
+            ModuleBase::timer::tick("Electrons","self_consistent");
+            return;
+        } 
 
         GlobalC::en.eband  = 0.0;
         GlobalC::en.demet  = 0.0;

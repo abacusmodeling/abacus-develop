@@ -607,6 +607,7 @@ void Symmetry::lattice_type(
                                             //std::cout << "mat = " << n11 <<" " <<n12<<" "<<n13<<" "<<n21<<" "<<n22<<" "<<n23<<" "<<n31<<" "<<n32<<" "<<n33<<std::endl;
 											
                                             brav = standard_lat(r1, r2, r3, cel_const);
+                                            
 //                                            if(brav == 8)
 //                                            {
 //                                               std::cout << "mat = " << n11 <<" " <<n12<<" "<<n13<<" "<<n21<<" "<<n22<<" "<<n23<<" "<<n31<<" "<<n32<<" "<<n33<<std::endl;
@@ -685,10 +686,13 @@ void Symmetry::lattice_type(
             }
         }
     }
+    
     for (int i = 0; i < 6; ++i)
     {
         cel_const[i] = temp_const[i];
     }
+
+
 
 //        std::cout << "a1 = " << v1.x << " " << v1.y << " " << v1.z <<std::endl;
 //        std::cout << "a1 = " << v2.x << " " << v2.y << " " << v2.z <<std::endl;
