@@ -85,6 +85,7 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri, con
 				dtau = tau2 - tau1;
 				double distance = dtau.norm() * ucell.lat0;
 				double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
+
 				if(distance < rcut)
 				{
 					int iw1_all = ucell.itiaiw2iwt( T1, I1, 0) ; //iw1_all = combined index (it, ia, iw)
@@ -125,7 +126,7 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri, con
 							{
 								// PLEASE use UOT as an input parameter of this subroutine
 								// mohan add 2021-03-30
-								GlobalC::UOT.snap_psipsi( olm, 0, dtype, tau1, 
+								GlobalC::UOT.snap_psipsi( GlobalC::ORB, olm, 0, dtype, tau1, 
 										T1, L1, m1, N1, GlobalC::GridD.getAdjacentTau(ad), 
 										T2, L2, m2, N2, GlobalV::NSPIN,
 										olm2//for soc
@@ -168,7 +169,7 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri, con
 							}
 							else // calculate the derivative
 							{
-								GlobalC::UOT.snap_psipsi( olm, 1, dtype, 
+								GlobalC::UOT.snap_psipsi( GlobalC::ORB, olm, 1, dtype, 
 									tau1, T1, L1, m1, N1,
 									GlobalC::GridD.getAdjacentTau(ad), T2, L2, m2, N2, GlobalV::NSPIN
 									);
@@ -349,6 +350,7 @@ void LCAO_gen_fixedH::test_Nonlocal()
 									++count;
 									double nlm[3]={0,0,0};
 									GlobalC::UOT.snap_psibeta(
+											GlobalC::ORB,
 											nlm, 0, tau1, T1,
 											atom1->iw2l[ j0 ], // L1
 											atom1->iw2m[ j0 ], // m1
@@ -542,6 +544,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 									{
 										int is0 = (j-j0*GlobalV::NPOL) + (k-k0*GlobalV::NPOL)*2;
 										GlobalC::UOT.snap_psibeta(
+												GlobalC::ORB,
 												nlm, 0, tau1, T1,
 												atom1->iw2l[ j0 ], // L1
 												atom1->iw2m[ j0 ], // m1
@@ -585,6 +588,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 										if(GlobalV::GAMMA_ONLY_LOCAL)
 										{
 											GlobalC::UOT.snap_psibeta(
+													GlobalC::ORB,
 													nlm, 1, 
 													tau1, 
 													T1,
@@ -613,6 +617,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 											// origin: < psi1 | beta > < beta | dpsi2/dtau >
 											//now: < psi1/dtau | beta > < beta | psi2 >
 											GlobalC::UOT.snap_psibeta(
+													GlobalC::ORB,
 													nlm, 1, 
 													tau2, 
 													T2,
@@ -744,6 +749,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 								if(!calc_deri)
 								{
 									GlobalC::UOT.snap_psibeta(
+											GlobalC::ORB,
 											nlm, 0, tau1, T1,
 											atom1->iw2l[ iw1_0 ], // L1
 											atom1->iw2m[ iw1_0 ], // m1
@@ -776,6 +782,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 								else  // calculate force
 								{
 									GlobalC::UOT.snap_psibeta(
+											GlobalC::ORB,
 											nlm, 1, tau1, T1,
 											atom1->iw2l[ iw1_0 ], // L1
 											atom1->iw2m[ iw1_0 ], // m1
