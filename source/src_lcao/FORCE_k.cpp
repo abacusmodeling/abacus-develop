@@ -140,7 +140,7 @@ void Force_LCAO_k::allocate_k(void)
 	//-----------------------------
     // tips: build_ST_new --> GlobalC::ParaO.set_force 
 	bool cal_deri = true;
-	GlobalC::UHM.genH.build_ST_new ('S', cal_deri);
+	GlobalC::UHM.genH.build_ST_new ('S', cal_deri, GlobalC::ucell);
 
 	//-----------------------------------------
 	// (2) allocate for <phi | T + Vnl | dphi>
@@ -155,7 +155,7 @@ void Force_LCAO_k::allocate_k(void)
     
     // calculate dT=<phi|kin|dphi> in LCAO
     // calculate T + VNL(P1) in LCAO basis
-    GlobalC::UHM.genH.build_ST_new ('T', cal_deri);
+    GlobalC::UHM.genH.build_ST_new ('T', cal_deri, GlobalC::ucell);
 	//test(GlobalC::LM.DHloc_fixedR_x,"GlobalC::LM.DHloc_fixedR_x T part");
    
    	// calculate dVnl=<phi|dVnl|dphi> in LCAO 
@@ -814,6 +814,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 									double nlm[3]={0,0,0};
 
 									GlobalC::UOT.snap_psibeta(
+											GlobalC::ORB,
 											nlm, 1,
 											tau2,
 											T2,
@@ -837,6 +838,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 									if(isstress)
 									{
 										GlobalC::UOT.snap_psibeta(
+											GlobalC::ORB,
 											nlm1, 1,
 											tau1,
 											T1,

@@ -257,7 +257,7 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
                                     olm[0] = olm[1] = olm[2] = 0.0;
                                     if (!calc_deri)
                                     {
-                                        GlobalC::UOT.snap_psipsi(olm, 0, 'D', tau1,
+                                        GlobalC::UOT.snap_psipsi(GlobalC::ORB, olm, 0, 'D', tau1,
                                                 T1, L1, m1, N1, GlobalC::GridD.getAdjacentTau(ad),
                                                 T2, L2, m2, N2, GlobalV::NSPIN);
                                         if (GlobalV::GAMMA_ONLY_LOCAL)
@@ -271,7 +271,7 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
                                     }
                                     else
                                     {
-                                        GlobalC::UOT.snap_psipsi(olm, 1, 'D', tau1,
+                                        GlobalC::UOT.snap_psipsi(GlobalC::ORB, olm, 1, 'D', tau1,
                                             T1, L1, m1, N1, GlobalC::GridD.getAdjacentTau(ad),
                                             T2, L2, m2, N2, GlobalV::NSPIN);
                                         if (GlobalV::GAMMA_ONLY_LOCAL)
