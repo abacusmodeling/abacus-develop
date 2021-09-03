@@ -18,9 +18,11 @@ public:
 
 #ifndef __CMD
     Magnetism magnet;  // magnetism Yu Liu 2021-07-03
-    bool input_mag;//if start magnetization defined in INPUT instead of STRU,this is true
-	double *atom_mag;
-	int n_mag_at;
+    void cal_ux();
+    bool judge_parallel(double a[3],ModuleBase::Vector3<double> b);
+    //bool input_mag;//if start magnetization defined in INPUT instead of STRU,this is true
+	//double *atom_mag;
+	//int n_mag_at;
 #endif
 
     int ntype;// number of atom species in UnitCell

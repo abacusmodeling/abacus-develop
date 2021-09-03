@@ -407,19 +407,17 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 			if(!found)
 			{
 				ofs_warning << " Label read from ATOMIC_POSITIONS is " << this->atoms[it].label << std::endl; 
-				ofs_warning << " Lable from ATOMIC_SPECIES is " << this->atom_label[it] << std::endl;
+				ofs_warning << " Label from ATOMIC_SPECIES is " << this->atom_label[it] << std::endl;
 				return 0;
 			}
 			ModuleBase::GlobalFunc::OUT(ofs_running, "atom label",atoms[it].label);
 
 #ifndef __CMD
-			if(!input_mag)
-			{
+
 			ModuleBase::GlobalFunc::READ_VALUE(ifpos, magnet.start_magnetization[it] );
-			}
-			
 
 #ifndef __SYMMETRY
+/*
 			if(GlobalV::NSPIN==4)//added by zhengdy-soc
 			{
 				if(GlobalV::NONCOLIN)
@@ -453,7 +451,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 			{
 				ModuleBase::GlobalFunc::OUT(ofs_running, "start magnetization","FALSE");
 			}
-
+*/
 			//===========================================
 			// (2) read in numerical orbital information
 			// int atoms[it].nwl
@@ -598,6 +596,9 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 				atoms[it].vel = new ModuleBase::Vector3<double>[na];
        			atoms[it].mbl = new ModuleBase::Vector3<int>[na];
 				atoms[it].mag = new double[na];
+				atoms[it].angle1 = new double[na];
+				atoms[it].angle2 = new double[na];
+				atoms[it].m_loc_ = new ModuleBase::Vector3<double>[na];
 				atoms[it].mass = this->atom_mass[it]; //mohan add 2011-11-07 
 				ModuleBase::GlobalFunc::ZEROS(atoms[it].mag,na);
 				for (int ia = 0;ia < na; ia++)
@@ -608,46 +609,135 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
                                         mv.y = true ;
                                         mv.z = true ;
                                         atoms[it].vel[ia].set(0,0,0);
+										atoms[it].mag[ia]=magnet.start_magnetization[it];
+										atoms[it].angle1[ia]=0;
+										atoms[it].angle2[ia]=0;
+										atoms[it].m_loc_[ia].set(0,0,0);
+
                                         string tmpid;
                                         tmpid = ifpos.get();
+										bool input_vec_mag=false;
+										bool input_angle_mag=false;
                                         while ( (tmpid != "\n") && (ifpos.eof()==false) && (tmpid !="#") )
                                         {
                                                 tmpid = ifpos.get() ;
                                                 // old method of reading frozen ions
-                                                int tmp = (int)tmpid[0];
+                                                char tmp = (char)tmpid[0];
                                                 if ( tmp >= 48 && tmp <= 57 )
                                                 {
                                                         mv.x = std::stoi(tmpid);
                                                         ifpos >> mv.y >> mv.z ;
                                                 }
                                                 // new method of reading frozen ions and velocities
+												if ( tmp >= 'a' && tmp <='z')
+												{
+													ifpos.putback(tmp);
+													ifpos >> tmpid;
+												}
                                                 if ( tmpid == "m" )
                                                 {
                                                         ifpos >> mv.x >> mv.y >> mv.z ;
                                                 }
-                                                else if ( tmpid == "v" )
+                                                else if ( tmpid == "v" ||tmpid == "vel" || tmpid == "velocity" )
                                                 {
                                                         ifpos >> atoms[it].vel[ia].x >> atoms[it].vel[ia].y >> atoms[it].vel[ia].z;
                                                 }
+												else if ( tmpid == "mag" || tmpid == "magmom")
+												{
+													double tmpamg=0;
+													ifpos >> tmpamg;
+													tmp=ifpos.get();
+													while (tmp==' ')
+													{
+														tmp=ifpos.get();
+													}
+													
+													cout<<"tmp"<<tmp<<'\n';
+													if((tmp >= 48 && tmp <= 57) or tmp=='-')
+													{
+														ifpos.putback(tmp);
+														ifpos >> atoms[it].m_loc_[ia].y>>atoms[it].m_loc_[ia].z;
+														atoms[it].m_loc_[ia].x=tmpamg;
+														atoms[it].mag[ia]=sqrt(pow(atoms[it].m_loc_[ia].x,2)+pow(atoms[it].m_loc_[ia].y,2)+pow(atoms[it].m_loc_[ia].z,2));
+														input_vec_mag=true;
+														
+													}
+													else
+													{
+														ifpos.putback(tmp);
+														atoms[it].mag[ia]=tmpamg;
+													}
+													
+													// atoms[it].mag[ia];
+												}
+												else if ( tmpid == "angle1")
+												{
+													 ifpos >> atoms[it].angle1[ia];
+													 atoms[it].angle1[ia]=atoms[it].angle1[ia]/180 *ModuleBase::PI;
+													 input_angle_mag=true;
+												}
+												else if ( tmpid == "angle2")
+												{
+													 ifpos >> atoms[it].angle2[ia];
+													 atoms[it].angle2[ia]=atoms[it].angle2[ia]/180 *ModuleBase::PI;
+													 input_angle_mag=true;
+												}
+												
                                         }
 					while ( (tmpid != "\n") && (ifpos.eof()==false) )
                                         {
                                                 tmpid = ifpos.get();
                                         }
 					string mags;
-					atoms[it].mag[ia] = 0.0;
-// define mag for each atom instead of each type of atom
-#ifndef __CMD
-					if(input_mag)
+					//cout<<"mag"<<atoms[it].mag[ia]<<"angle1"<<atoms[it].angle1[ia]<<"angle2"<<atoms[it].angle2[ia]<<'\n';
+
+					if(GlobalV::NSPIN==4)
 					{
-						if(nat > n_mag_at) 
+						if(GlobalV::NONCOLIN)
 						{
-							ModuleBase::WARNING_QUIT("read_atoms","Number of defined magnetic moment not equal to number of atoms");
+							if(input_angle_mag)
+							{
+								atoms[it].m_loc_[ia].x = atoms[it].mag[ia] *
+									sin(atoms[it].angle1[ia]) * cos(atoms[it].angle2[ia]);
+								atoms[it].m_loc_[ia].y = atoms[it].mag[ia] *
+									sin(atoms[it].angle1[ia]) * sin(atoms[it].angle2[ia]);
+								atoms[it].m_loc_[ia].z = atoms[it].mag[ia] *
+									cos(atoms[it].angle1[ia]);
+							}
+							else if (input_vec_mag)
+							{
+								double mxy=sqrt(pow(atoms[it].m_loc_[ia].x,2)+pow(atoms[it].m_loc_[ia].y,2));
+								atoms[it].angle1[ia]=atan2(mxy,atoms[it].m_loc_[ia].z);
+								if(mxy>1e-8)
+									atoms[it].angle2[ia]=atan2(atoms[it].m_loc_[ia].y,atoms[it].m_loc_[ia].x);
+									//cout<<"it"<<it<<"ia"<<ia<<"x"<<atoms[it].m_loc_[ia].x<<"y"<<atoms[it].m_loc_[ia].y<<"z"<<atoms[it].m_loc_[ia].z<<"mag"<<atoms[it].mag[ia]<<"angle1"<<atoms[it].angle1[ia]
+									//<<"angle2"<<atoms[it].angle2[ia]<<'\n';
+							}
 						}
-						atoms[it].mag[ia] = atom_mag[nat-na+ia];
+						else
+						{
+							atoms[it].m_loc_[ia].x = 0;
+							atoms[it].m_loc_[ia].y = 0;
+							atoms[it].m_loc_[ia].z = atoms[it].mag[ia];
+						}
+
+						ModuleBase::GlobalFunc::OUT(ofs_running, "noncollinear magnetization_x",atoms[it].m_loc_[ia].x);
+						ModuleBase::GlobalFunc::OUT(ofs_running, "noncollinear magnetization_y",atoms[it].m_loc_[ia].y);
+						ModuleBase::GlobalFunc::OUT(ofs_running, "noncollinear magnetization_z",atoms[it].m_loc_[ia].z);
+
+						ModuleBase::GlobalFunc::ZEROS(magnet.ux_ ,3);
 					}
-					
-#endif
+					else if(GlobalV::NSPIN==2)
+					{
+						atoms[it].m_loc_[ia].x = atoms[it].mag[ia];
+						ModuleBase::GlobalFunc::OUT(ofs_running, "start magnetization",atoms[it].mag[ia]);
+					}
+					else if(GlobalV::NSPIN==1)
+					{
+						ModuleBase::GlobalFunc::OUT(ofs_running, "start magnetization","FALSE");
+					}
+
+			
 					if(Coordinate=="Direct")
 					{
 						// change v from direct to cartesian,
@@ -728,15 +818,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 			}// end na
 		}//end for ntype
 	}// end scan_begin
-#ifndef __CMD
-	if(input_mag)
-	{
-		if (this->n_mag_at != this->nat)
-		{
-			ModuleBase::WARNING_QUIT("read_atoms","Number of defined magnetic moment not equal to number of atoms");
-		}
-	}
-#endif
+
 //check if any atom can move in MD
 	if(!this->if_atoms_can_move() && GlobalV::CALCULATION=="md")
 	{
@@ -886,11 +968,13 @@ void UnitCell_pseudo::print_stru_file(const std::string &fn, const int &type)con
 		{
 			ofs << std::endl;
 			ofs << atoms[it].label << " #label" << std::endl;
+/*
 #ifndef __CMD
 			ofs << magnet.start_magnetization[it] << " #magnetism" << std::endl;
 #else
 			ofs << "0" << " #magnetism" << std::endl;
 #endif
+*/
 			//2015-05-07, modify
 			//ofs << atoms[it].nwl << " #max angular momentum" << std::endl;
 			//xiaohui modify 2015-03-15
@@ -979,7 +1063,7 @@ void UnitCell_pseudo::print_tau(void)const
                 << std::setw(20) << atoms[it].tau[ia].y
                 << std::setw(20) << atoms[it].tau[ia].z
 #ifndef __CMD
-				<< std::setw(20) << magnet.start_magnetization[it]
+				<< std::setw(20) << atoms[it].mag[ia]
 #else
 				<< std::setw(20) << 0
 #endif
@@ -1027,7 +1111,7 @@ void UnitCell_pseudo::print_tau(void)const
                 << std::setw(20) << atoms[it].taud[ia].y
                 << std::setw(20) << atoms[it].taud[ia].z
 #ifndef __CMD
-				<< std::setw(20) << magnet.start_magnetization[it]
+				<< std::setw(20) << atoms[it].mag[ia]
 #else
 				<< std::setw(20) << 0
 #endif

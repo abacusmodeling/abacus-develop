@@ -350,9 +350,10 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ModuleBase::Complex
 										}
 									}
 									//and construct the starting wavefunctions as in the noncollinear case.
-									alpha = GlobalC::ucell.magnet.angle1_[it];
-									gamma = -1 * GlobalC::ucell.magnet.angle2_[it] + 0.5 * ModuleBase::PI;
-
+									//alpha = GlobalC::ucell.magnet.angle1_[it];
+									//gamma = -1 * GlobalC::ucell.magnet.angle2_[it] + 0.5 * ModuleBase::PI;
+									alpha = GlobalC::ucell.atoms[it].angle1[ia];
+									gamma = -1 * GlobalC::ucell.atoms[it].angle2[ia] + 0.5 * ModuleBase::PI;
 									for(int m = 0;m<2*L+1;m++)
 									{
 										const int lm = L*L +m;
@@ -386,8 +387,10 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ModuleBase::Complex
 							{//atomic_wfc_nc
 								double alpha, gamman;
 								std::complex<double> fup, fdown;
-								alpha = GlobalC::ucell.magnet.angle1_[it];
-								gamman = -GlobalC::ucell.magnet.angle2_[it] + 0.5*ModuleBase::PI;
+								//alpha = GlobalC::ucell.magnet.angle1_[it];
+								//gamman = -GlobalC::ucell.magnet.angle2_[it] + 0.5*ModuleBase::PI;
+								alpha = GlobalC::ucell.atoms[it].angle1[ia];
+								gamman = -GlobalC::ucell.atoms[it].angle2[ia] + 0.5*ModuleBase::PI;
 								for(int m = 0;m<2*L+1;m++)
 								{
 									const int lm = L*L +m;
@@ -567,8 +570,10 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ModuleBase::Comp
 										}
 									}
 									//and construct the starting wavefunctions as in the noncollinear case.
-									alpha = GlobalC::ucell.magnet.angle1_[it];
-									gamma = -1 * GlobalC::ucell.magnet.angle2_[it] + 0.5 * ModuleBase::PI;
+									//alpha = GlobalC::ucell.magnet.angle1_[it];
+									//gamma = -1 * GlobalC::ucell.magnet.angle2_[it] + 0.5 * ModuleBase::PI;
+									alpha = GlobalC::ucell.atoms[it].angle1[ia];
+									gamma = -1 * GlobalC::ucell.atoms[it].angle2[ia] + 0.5 * ModuleBase::PI;
 
 									for(int m = 0;m<2*L+1;m++)
 									{
@@ -603,8 +608,10 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ModuleBase::Comp
 							{//atomic_wfc_nc
 								double alpha, gamman;
 								std::complex<double> fup, fdown;
-								alpha = GlobalC::ucell.magnet.angle1_[it];
-								gamman = -GlobalC::ucell.magnet.angle2_[it] + 0.5*ModuleBase::PI;
+								//alpha = GlobalC::ucell.magnet.angle1_[it];
+								//gamman = -GlobalC::ucell.magnet.angle2_[it] + 0.5*ModuleBase::PI;
+								alpha = GlobalC::ucell.atoms[it].angle1[ia];
+								gamman = -GlobalC::ucell.atoms[it].angle2[ia]+ 0.5*ModuleBase::PI;
 								for(int m = 0;m<2*L+1;m++)
 								{
 									const int lm = L*L +m;
