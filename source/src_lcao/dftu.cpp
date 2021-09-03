@@ -77,7 +77,7 @@ void DFTU::init(
 {
     ModuleBase::TITLE("DFTU", "init");
 
-	// please, do not use 'INPUT' directly in the class!
+
 	// needs reconstructions in future
 	// global parameters, need to be removed in future
 	const int npol = GlobalV::NPOL; // number of polarization directions
@@ -985,8 +985,11 @@ void DFTU::cal_energy_correction(const int istep)
 {
 	ModuleBase::TITLE("DFTU", "cal_energy_correction");
 	ModuleBase::timer::tick("DFTU", "cal_energy_correction");
-	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!omc) && istep==0 && this->iter_dftu==1) return;
-
+	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!omc) && istep==0 && this->iter_dftu==1)
+	{
+		ModuleBase::timer::tick("DFTU", "cal_energy_correction"); 
+		return;
+	}
 	this->EU = 0.0;
 	double EU_dc = 0.0;
 	

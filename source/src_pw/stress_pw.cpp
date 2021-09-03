@@ -117,6 +117,7 @@ void Stress_PW::cal_stress(ModuleBase::matrix& sigmatot)
 		this->print_stress("NLCC    STRESS",sigmaxcc,GlobalV::TEST_STRESS,ry);
 		this->print_stress("TOTAL    STRESS",sigmatot,GlobalV::TEST_STRESS,ry);
 	}
+	ModuleBase::timer::tick("Stress_PW","cal_stress");
 	return;
     
 }
