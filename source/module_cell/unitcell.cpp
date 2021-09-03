@@ -20,9 +20,9 @@ UnitCell::UnitCell()
     nat = 0;
     namax = 0;
     nwmax = 0;
-#ifndef __CMD
+    
     input_mag = 0; // RX 2021-9-2
-#endif
+
     iat2it = nullptr;
     iat2ia = nullptr;
 	iwt2iat = nullptr;

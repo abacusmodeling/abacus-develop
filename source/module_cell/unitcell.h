@@ -18,10 +18,10 @@ public:
 
 #ifndef __CMD
     Magnetism magnet;  // magnetism Yu Liu 2021-07-03
-    bool input_mag;//if start magnetization defined in INPUT instead of STRU,this is true
+#endif
+    bool input_mag;  //if start magnetization defined in INPUT instead of STRU,this is true
 	double *atom_mag;
 	int n_mag_at;
-#endif
 
     int ntype;// number of atom species in UnitCell
     int nat; // total number of atoms of all species in unitcell
