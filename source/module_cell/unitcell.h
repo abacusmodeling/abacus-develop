@@ -20,7 +20,7 @@ public:
     Magnetism magnet;  // magnetism Yu Liu 2021-07-03
     void cal_ux();
     bool judge_parallel(double a[3],ModuleBase::Vector3<double> b);
-    //bool input_mag;//if start magnetization defined in INPUT instead of STRU,this is true
+    bool input_mag;//if start magnetization defined in INPUT instead of STRU,this is true
 	//double *atom_mag;
 	//int n_mag_at;
 #endif
