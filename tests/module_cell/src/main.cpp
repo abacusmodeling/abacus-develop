@@ -34,13 +34,14 @@ void calculate()
 	test.setup_cell();
 
 #ifdef __LCAO
+	test.setup_kpt();
 	test.set_ekcut();
 	test.set_orbs(test.ucell.lat0);
 	test.prep_neighbour();
-	test.alloc_ST_gamma();
+	test.alloc_ST();
 	test.build_ST_new('S');
 	test.build_ST_new('T');
-	test.print_ST_gamma();
+	test.print_ST();
 #endif
     return;
 }

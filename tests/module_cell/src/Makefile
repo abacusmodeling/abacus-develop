@@ -57,9 +57,9 @@ $(OBJS_IO)\
 $(OBJS_PW)\
 $(OBJS_BASE)\
 $(OBJS_CELL)\
-$(OBJS_PARALELL)\
 $(OBJS_ORB)\
 $(OBJS_NEIGHBOR)\
+#$(OBJS_PARALELL)\
 
 FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})
 
