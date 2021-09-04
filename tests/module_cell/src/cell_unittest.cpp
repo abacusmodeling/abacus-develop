@@ -95,11 +95,61 @@ void test_cell::count_ntype()
 #endif
 
 #ifdef __LCAO
-void test_cell_orb::build_ST_new(const char& dtype, const bool& calc_deri)
+void test_cell_orb::alloc_ST_gamma()
+{
+	Sgamma = new double*[GlobalV::NLOCAL];
+	Tgamma = new double*[GlobalV::NLOCAL];
+	for(int i=0; i<GlobalV::NLOCAL; i++)
+	{
+		Sgamma[i] = new double[GlobalV::NLOCAL];
+		Tgamma[i] = new double[GlobalV::NLOCAL];
+		for(int j=0; j<GlobalV::NLOCAL; j++)
+		{
+			Sgamma[i][j] = 0.0;
+			Tgamma[i][j] = 0.0;
+		}
+	}
+}
+
+void test_cell_orb::print_ST_gamma()
+{
+
+	std::ofstream ofs_s("mat_S.dat");
+	std::ofstream ofs_t("mat_T.dat");
+	for(int i=0; i<GlobalV::NLOCAL; i++)
+	{
+		for(int j=0; j<GlobalV::NLOCAL; j++)
+		{
+			int index = i * GlobalV::NLOCAL+j;
+			ofs_s << index << " " << Sgamma[i][j] << endl;
+			ofs_t << i << " " << j << " " << Tgamma[i][j] << endl;
+		}
+	}
+
+}
+
+void test_cell_orb::prep_neighbour()
+{
+    GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
+        ofs_running,
+        GlobalV::OUT_LEVEL,
+        ORB.get_rcutmax_Phi(),
+        ORB.get_rcutmax_Beta(),
+        GAMMA_ONLY_LOCAL);
+
+    atom_arrange::search(
+        GlobalV::SEARCH_PBC,
+        ofs_running,
+        Test_Cell::GridD,
+        ucell,
+        GlobalV::SEARCH_RADIUS,
+        GlobalV::test_atom_input);
+}
+
+void test_cell_orb::build_ST_new(const char& dtype)
 {
     //array to store data
     double olm[3]={0.0,0.0,0.0};
-	int nnr = 0; // used onlyh for k points.
 
     //\sum{T} e**{ikT} <\phi_{ia}|d\phi_{k\beta}(T)>
 	ModuleBase::Vector3<double> tau1, tau2, dtau;
@@ -124,7 +174,7 @@ void test_cell_orb::build_ST_new(const char& dtype, const bool& calc_deri)
 				if(distance < rcut)
 				{
 					int iw1_all = ucell.itiaiw2iwt( T1, I1, 0) ; //iw1_all = combined index (it, ia, iw)
-
+					
 					for(int jj=0; jj<atom1->nw*GlobalV::NPOL; ++jj)
 					{
 						const int jj0 = jj/GlobalV::NPOL;
@@ -140,175 +190,28 @@ void test_cell_orb::build_ST_new(const char& dtype, const bool& calc_deri)
 							const int N2 = atom2->iw2n[kk0];
 							const int m2 = atom2->iw2m[kk0];
 
-							// mohan add 2010-06-29
-							// this is in fact the same as in build_Nonlocal_mu,
-							// the difference is that here we use {L,N,m} for ccycle,
-							// build_Nonlocal_mu use atom.nw for cycle.
-							// so, here we use ParaO::in_this_processor,
-							// in build_Non... use trace_loc_row
-							// and trace_loc_col directly,
-/*
-							if ( !GlobalC::ParaO.in_this_processor(iw1_all,iw2_all) )
-							{
-								++iw2_all;
-								continue;
-							}
-*/
-
 							olm[0] = olm[1] = olm[2] = 0.0;
 
 							std::complex<double> olm1[4]={ModuleBase::ZERO, ModuleBase::ZERO, ModuleBase::ZERO, ModuleBase::ZERO};
 							std::complex<double> *olm2 = &olm1[0];
-							if(!calc_deri)
-							{
-								// PLEASE use UOT as an input parameter of this subroutine
-								// mohan add 2021-03-30
-								GlobalC::UOT.snap_psipsi( olm, 0, dtype, tau1, 
-										T1, L1, m1, N1, Test_Cell::GridD.getAdjacentTau(ad), 
-										T2, L2, m2, N2, GlobalV::NSPIN,
-										olm2//for soc
-										);
-
-								if(GlobalV::GAMMA_ONLY_LOCAL)
-								{
-									// mohan add 2010-06-29
-									// set the value in Hloc and Sloc
-									// according to trace_loc_row and trace_loc_col
-									// the last paramete: 1 for Sloc, 2 for Hloc
-									// and 3 for Hloc_fixed.
-									GlobalC::LM.set_HSgamma(iw1_all, iw2_all, olm[0], dtype);
-								}
-								else // k point algorithm
-								{
-									// mohan add 2010-10
-									// set the values in SlocR and Hloc_fixedR.
-									// which is a 1D array.
-									if(dtype=='S')
-									{
-										if(GlobalV::NSPIN!=4) GlobalC::LM.SlocR[nnr] = olm[0];
-										else
-										{//only has diagonal term here.
-												int is = (jj-jj0*GlobalV::NPOL) + (kk-kk0*GlobalV::NPOL)*2;
-											GlobalC::LM.SlocR_soc[nnr] = olm1[is];
-										}
-									}
-									else if(dtype=='T')
-									{
-										if(GlobalV::NSPIN!=4) GlobalC::LM.Hloc_fixedR[nnr] = olm[0];// <phi|kin|d phi>
-										else
-										{//only has diagonal term here.
-												int is = (jj-jj0*GlobalV::NPOL) + (kk-kk0*GlobalV::NPOL)*2;
-											GlobalC::LM.Hloc_fixedR_soc[nnr] = olm1[is];
-										}
-									}
-									++nnr;
-								}
-							}
-							else // calculate the derivative
-							{
-								GlobalC::UOT.snap_psipsi( olm, 1, dtype, 
-									tau1, T1, L1, m1, N1,
-									Test_Cell::GridD.getAdjacentTau(ad), T2, L2, m2, N2, GlobalV::NSPIN
+							// PLEASE use UOT as an input parameter of this subroutine
+							// mohan add 2021-03-30
+							OGT.snap_psipsi( ORB, olm, 0, dtype,
+									tau1, T1, L1, m1, N1, 
+									tau2, T2, L2, m2, N2,
+									GlobalV::NSPIN,	olm2//for soc
 									);
-
-								if(GlobalV::GAMMA_ONLY_LOCAL)
-								{
-									GlobalC::LM.set_force (iw1_all, iw2_all,	olm[0], olm[1], olm[2], dtype);
-									if(GlobalV::STRESS) GlobalC::LM.set_stress (iw1_all, iw2_all, olm[0], olm[1], olm[2], dtype, dtau);
-								}
-								else // k point algorithm
-								{
-									if(dtype=='S')
-									{
-										GlobalC::LM.DSloc_Rx[nnr] = olm[0];
-										GlobalC::LM.DSloc_Ry[nnr] = olm[1];
-										GlobalC::LM.DSloc_Rz[nnr] = olm[2];
-										if(GlobalV::STRESS)
-										{
-											GlobalC::LM.DH_r[nnr*3] = dtau.x;
-											GlobalC::LM.DH_r[nnr*3 + 1] = dtau.y;
-											GlobalC::LM.DH_r[nnr*3 + 2] = dtau.z;
-										}
-									}
-									else if(dtype=='T')
-									{
-										// notice the 'sign'
-										GlobalC::LM.DHloc_fixedR_x[nnr] = olm[0];
-										GlobalC::LM.DHloc_fixedR_y[nnr] = olm[1];
-										GlobalC::LM.DHloc_fixedR_z[nnr] = olm[2];
-										if(GlobalV::STRESS)
-										{
-											GlobalC::LM.stvnl11[nnr] = olm[0] * dtau.x;
-											GlobalC::LM.stvnl12[nnr] = olm[0] * dtau.y;
-											GlobalC::LM.stvnl13[nnr] = olm[0] * dtau.z;
-											GlobalC::LM.stvnl22[nnr] = olm[1] * dtau.y;
-											GlobalC::LM.stvnl23[nnr] = olm[1] * dtau.z;
-											GlobalC::LM.stvnl33[nnr] = olm[2] * dtau.z;
-										}
-									}
-									++nnr;
-								}
-							}
+							if(dtype=='S') Sgamma[iw1_all][iw2_all]+=olm[0];
+							if(dtype=='T') Tgamma[iw1_all][iw2_all]+=olm[0];
 							++iw2_all;
 						}// nw2 
 						++iw1_all;
 					}// nw1
 				}// distance
-				else if(distance>=rcut && (!GlobalV::GAMMA_ONLY_LOCAL))
-				{
-					int start1 = ucell.itiaiw2iwt( T1, I1, 0);
-					int start2 = ucell.itiaiw2iwt( T2, I2, 0);
-
-					bool is_adj = false;
-					for (int ad0=0; ad0 < Test_Cell::GridD.getAdjacentNum()+1; ++ad0)
-					{
-						const int T0 = Test_Cell::GridD.getType(ad0);
-						//const int I0 = Test_Cell::GridD.getNatom(ad0);
-						//const int iat0 = ucell.itia2iat(T0, I0);
-						//const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
-						tau0 = Test_Cell::GridD.getAdjacentTau(ad0);
-						dtau1 = tau0 - tau1;
-						double distance1 = dtau1.norm() * ucell.lat0;
-						double rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
-						dtau2 = tau0 - tau2;
-						double distance2 = dtau2.norm() * ucell.lat0;
-						double rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
-						if( distance1 < rcut1 && distance2 < rcut2 )
-						{
-							is_adj = true;
-							break;
-						}
-					}//ad0
-
-
-					if( is_adj )
-					{
-						for(int jj=0; jj<atom1->nw * GlobalV::NPOL; ++jj)
-						{
-							const int mu = GlobalC::ParaO.trace_loc_row[start1+jj];
-							if(mu<0)continue; 
-							for(int kk=0; kk<atom2->nw * GlobalV::NPOL; ++kk)
-							{
-								const int nu = GlobalC::ParaO.trace_loc_col[start2+kk];
-								if(nu<0)continue;
-								++nnr;
-							}//kk
-						}//jj
-					}
-				}//distance
 			}// ad
 		}// I1
 	}// T1
 
-	if(!GlobalV::GAMMA_ONLY_LOCAL)
-	{
-		if(nnr != GlobalC::LNNR.nnr)
-		{
-			std::cout << " nnr=" << nnr << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << std::endl;
-			GlobalV::ofs_running << " nnr=" << nnr << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << std::endl;
-			ModuleBase::WARNING_QUIT("LCAO_gen_fixedH::build_ST_new","nnr != GlobalC::LNNR.nnr");
-		}
-	}
     return;
 }
 #endif

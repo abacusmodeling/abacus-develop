@@ -28,7 +28,7 @@ dr2                 1e-9
 niter               100
 
 #stress             1
-#noncolin           1
+noncolin           1
 lspinorb            1
 
 basis_type          pw

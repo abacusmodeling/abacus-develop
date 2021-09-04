@@ -36,11 +36,10 @@ void UnitCell_pseudo::setup_cell(
 	// (1) init mag
 	assert(ntype>0);
 #ifndef __CMD
-	if(!input_mag)
-	{
-		delete[] magnet.start_magnetization;
+
+	delete[] magnet.start_magnetization;
 	magnet.start_magnetization = new double[this->ntype];
-	}	
+
 #endif
 
 	// (2) init *Atom class array.

@@ -1,10 +1,12 @@
 #include "../../../source/module_cell/unitcell_pseudo.h"
 #include "../../../source/src_parallel/parallel_global.h"
+#include "../../../source/module_base/global_variable.h"
 
 #ifdef __LCAO
 #include "../../module_orb/src/ORB_unittest.h"
 #include "../../../source/module_orbital/ORB_read.h" // to use 'ORB' -- mohan 2021-01-30
 #include "../../../source/module_neighbor/sltk_grid_driver.h"
+#include "../../../source/module_neighbor/sltk_atom_arrange.h"
 
 namespace Test_Cell
 {
@@ -30,7 +32,11 @@ public:
 	UnitCell_pseudo ucell;
 	output out;
 
-#ifndef __LCAO
+#ifdef __LCAO
+	int GAMMA_ONLY_LOCAL = 1;
+	double **Sgamma;
+	double **Tgamma;
+#else
 	std::ofstream ofs_running;
 	int ntype;
 #endif
@@ -39,7 +45,10 @@ public:
 	void setup_cell();
 
 #ifdef __LCAO
-	void build_ST_new(const char& dtype, const bool& calc_deri);
+	void prep_neighbour();
+	void alloc_ST_gamma();
+	void build_ST_new(const char& dtype);
+	void print_ST_gamma();
 #else
 	void count_ntype(); //from STRU, count types of elements
 #endif

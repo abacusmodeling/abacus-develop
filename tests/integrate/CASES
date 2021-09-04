@@ -11,6 +11,7 @@
 103_PW_OU_CS_CF
 104_PW_AF_magnetic
 104_PW_FM_magnetic
+104_PW_NC_magnetic
 105_PW_FD_smearing
 105_PW_FX_smearing
 105_PW_GA_smearing
@@ -75,3 +76,4 @@
 601_NO_TDDFT_N2_vel
 601_NO_TDDFT_N2_occ
 701_LJ_Ar
+

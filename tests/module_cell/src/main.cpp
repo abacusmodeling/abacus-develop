@@ -35,8 +35,12 @@ void calculate()
 
 #ifdef __LCAO
 	test.set_ekcut();
-	test.read_files();
-	test.build_ST_new('S',false);
+	test.set_orbs(test.ucell.lat0);
+	test.prep_neighbour();
+	test.alloc_ST_gamma();
+	test.build_ST_new('S');
+	test.build_ST_new('T');
+	test.print_ST_gamma();
 #endif
     return;
 }
