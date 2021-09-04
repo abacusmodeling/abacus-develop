@@ -676,7 +676,7 @@ void energy::perform_dos(void)
 		 //----------------------------------------------------------
 
 		 //double b = INPUT.b_coef;
-		 double b = bcoeff;
+		 double b = sqrt(2.0)*bcoeff;
 		 for(int i=0;i<number;i++)
 		 {
 			 double Gauss=0.0;
