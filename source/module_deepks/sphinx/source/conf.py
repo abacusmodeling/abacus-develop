@@ -15,6 +15,7 @@
 # sys.path.insert(0, os.path.abspath('.'))
 import os
 import sys
+import textwrap
 sys.path.append( "/usr/local/lib/python3.9/site-packages/breathe" )
 
 # -- Project information -----------------------------------------------------
