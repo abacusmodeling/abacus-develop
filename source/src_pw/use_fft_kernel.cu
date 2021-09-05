@@ -45,6 +45,7 @@ __global__ void kernel_reorder(CUFFT_COMPLEX *dst, CUFFT_COMPLEX *src, int size)
 
 void Reorder_psi_plus(CUFFT_COMPLEX *dst, CUFFT_COMPLEX *src)
 {
+    ModuleBase::timer::tick("Use_FFT","reorder_psi_plus");
     int ii = 0;
     int size_z = GlobalC::pw.FFT_wfc.npps[0];
     int thread = 512;
@@ -56,10 +57,12 @@ void Reorder_psi_plus(CUFFT_COMPLEX *dst, CUFFT_COMPLEX *src)
         // CHECK_CUDA(cudaMemcpy(&dst[ir*size_z], &src[ii*size_z], size_z*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice));
         ii++;
     }
+    ModuleBase::timer::tick("Use_FFT","reorder_psi_plus");
 }
 
 void Reorder_psi_minus(CUFFT_COMPLEX *dst, CUFFT_COMPLEX *src)
 {
+    ModuleBase::timer::tick("Use_FFT","reorder_psi_minus");
     int ii = 0;
     int size_z = GlobalC::pw.FFT_wfc.npps[0];
     int thread = 512;
@@ -71,6 +74,7 @@ void Reorder_psi_minus(CUFFT_COMPLEX *dst, CUFFT_COMPLEX *src)
         // CHECK_CUDA(cudaMemcpy(&dst[ii*size_z], &src[ir*size_z], size_z*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice));
         ii++;
     }
+    ModuleBase::timer::tick("Use_FFT","reorder_psi_minus");
 }
 
 
