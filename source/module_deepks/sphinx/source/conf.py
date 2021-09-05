@@ -71,9 +71,18 @@ exhale_args = {
     # Suggested optional arguments
     "createTreeView":        True,
     # TIP: if using the sphinx-bootstrap-theme, you need
-    # "treeViewIsBootstrap": True,
-    #"exhaleExecutesDoxygen": True,
-    #"exhaleDoxygenStdin":    "INPUT = ../../src_lcao"
+    "treeViewIsBootstrap": True,
+    "exhaleExecutesDoxygen": True,
+    "exhaleDoxygenStdin":    textwrap.dedent('''
+		PROJECT_NAME = module_deepks
+		INPUT = ../../../src_lcao
+		PROJECT_BRIEF = "DeePKS: Generate descriptors, load a model and calculate energy and force."
+		FILE_PATTERNS = LCAO_descriptor*
+		EXTRACT_ALL = YES
+		USE_MATHJAX = YES
+		GENERATE_XML = YES
+		ENABLE_PREPROCESSING = NO
+	''')
 }
 
 # Tell sphinx what the primary language being documented is.
