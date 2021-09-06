@@ -28,7 +28,7 @@ class ORB_table_beta
 	/// T stands for atom type.
 	///O stands for orbitals.
 	///
-	void init_NL_Tpair(void);
+	void init_NL_Tpair(LCAO_Orbitals &orb);
 
     void init_NL_Opair(LCAO_Orbitals &orb);
 
@@ -37,7 +37,7 @@ class ORB_table_beta
 	ModuleBase::IntArray NL_Opair;
 	ModuleBase::IntArray NL_L2plus1;
 
-	void init_Table_Beta(ModuleBase::Sph_Bessel_Recursive::D2 *pSB);
+	void init_Table_Beta(ModuleBase::Sph_Bessel_Recursive::D2 *pSB, LCAO_Orbitals &orb);
 
 	void Destroy_Table_Beta(LCAO_Orbitals &orb);
 

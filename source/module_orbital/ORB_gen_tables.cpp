@@ -62,15 +62,15 @@ void ORB_gen_tables::gen_tables(
 	MOT.init_OV_Opair(orb);
 
 	// NL: nonlocal
-	tbeta.init_NL_Tpair();
+	tbeta.init_NL_Tpair(orb);
 	tbeta.init_NL_Opair(orb); // add 2009-5-8
 
 	//caoyu add 2021-03-18
 	// DS: Descriptor
 	if (out_descriptor>0)
 	{
-		talpha.init_DS_Opair();
-		talpha.init_DS_2Lplus1();
+		talpha.init_DS_Opair(orb);
+		talpha.init_DS_2Lplus1(orb);
 	}
 
 	//////////////////////////////
@@ -96,12 +96,12 @@ void ORB_gen_tables::gen_tables(
 
 	//calculate S(R) for interpolation
 	MOT.init_Table(job0, orb);
-	tbeta.init_Table_Beta(MOT.pSB); // add 2009-5-8
+	tbeta.init_Table_Beta(MOT.pSB, orb); // add 2009-5-8
 
 	//caoyu add 2021-03-18
 	if (out_descriptor>0)
 	{
-		talpha.init_Table_Alpha(MOT.pSB);
+		talpha.init_Table_Alpha(MOT.pSB, orb);
 		//talpha.print_Table_DSR();
 	}
 

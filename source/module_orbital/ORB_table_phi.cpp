@@ -807,10 +807,10 @@ void ORB_table_phi::init_Lmax (
 			Lmax = std::max(Lmax, orb.Beta[it].getLmax());
 		}
 	};
-	auto cal_Lmax_Alpha = [](int &Lmax)
+	auto cal_Lmax_Alpha = [](int &Lmax,const LCAO_Orbitals &orb)
 	{
 		//caoyu add 2021-08-05 for descriptor basis
-		Lmax = std::max(Lmax, GlobalC::ORB.get_lmax_d());
+		Lmax = std::max(Lmax, orb.get_lmax_d());
 	};
 
 	
