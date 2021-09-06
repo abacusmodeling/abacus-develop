@@ -609,7 +609,9 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
                                         mv.y = true ;
                                         mv.z = true ;
                                         atoms[it].vel[ia].set(0,0,0);
+#ifndef __CMD
 										atoms[it].mag[ia]=magnet.start_magnetization[it];
+#endif										
 										atoms[it].angle1[ia]=0;
 										atoms[it].angle2[ia]=0;
 										atoms[it].m_loc_[ia].set(0,0,0);
@@ -725,7 +727,9 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 						ModuleBase::GlobalFunc::OUT(ofs_running, "noncollinear magnetization_y",atoms[it].m_loc_[ia].y);
 						ModuleBase::GlobalFunc::OUT(ofs_running, "noncollinear magnetization_z",atoms[it].m_loc_[ia].z);
 
+#ifndef __CMD
 						ModuleBase::GlobalFunc::ZEROS(magnet.ux_ ,3);
+#endif						
 					}
 					else if(GlobalV::NSPIN==2)
 					{
@@ -968,13 +972,13 @@ void UnitCell_pseudo::print_stru_file(const std::string &fn, const int &type)con
 		{
 			ofs << std::endl;
 			ofs << atoms[it].label << " #label" << std::endl;
-/*
+
 #ifndef __CMD
 			ofs << magnet.start_magnetization[it] << " #magnetism" << std::endl;
 #else
 			ofs << "0" << " #magnetism" << std::endl;
 #endif
-*/
+
 			//2015-05-07, modify
 			//ofs << atoms[it].nwl << " #max angular momentum" << std::endl;
 			//xiaohui modify 2015-03-15

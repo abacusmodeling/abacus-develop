@@ -405,7 +405,7 @@ bool UnitCell::judge_big_cell(void)
 }
 
 
-
+#ifndef __CMD
 void UnitCell::cal_ux()
 {
 	double amag, uxmod;
@@ -462,6 +462,7 @@ void UnitCell::cal_ux()
 	}
 	return;
 }
+#endif
 
 bool UnitCell::judge_parallel(double a[3], ModuleBase::Vector3<double> b)
 {

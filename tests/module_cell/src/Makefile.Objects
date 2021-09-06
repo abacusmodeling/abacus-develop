@@ -6,14 +6,15 @@ VERSION= ABACUS-cell
 HEADERS= *.h
 
 OBJS_MAIN=input.o\
+klist.o\
 
 OBJS_IO=output.o\
 
 OBJS_PW=magnetism.o\
 
-OBJS_PARALELL=parallel_reduce.o\
-parallel_common.o\
-parallel_global.o\
+#OBJS_PARALELL=parallel_reduce.o\
+#parallel_common.o\
+#parallel_global.o\
 
 OBJS_BASE=math_integral.o\
 math_sphbes.o\
