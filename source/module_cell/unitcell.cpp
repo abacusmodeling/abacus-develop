@@ -21,8 +21,6 @@ UnitCell::UnitCell()
     namax = 0;
     nwmax = 0;
     
-    input_mag = 0; // RX 2021-9-2
-
     iat2it = nullptr;
     iat2ia = nullptr;
 	iwt2iat = nullptr;
