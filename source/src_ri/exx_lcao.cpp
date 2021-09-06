@@ -1538,6 +1538,23 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Mo
 			const size_t iat2 = atom_pairs_core[i_atom_pair].second;
 			
 			//ofs_thread<<iat1<<"\t"<<iat2<<std::endl;
+
+			auto add_Hexx_one = [&HexxR_tmp, iat1, iat2, this](
+				const ModuleBase::matrix &Hexx_one, const size_t is, const size_t iat_I, const size_t iat_J, const Abfs::Vector3_Order<int> &box_IJ )
+			{
+				if(iat1!=iat2)
+				{
+					const ModuleBase::matrix Hexx_one_T = transpose(Hexx_one);
+					if( ModuleBase::matrix * const HexxR_ptr = static_cast<ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat_J, iat_I, Abfs::Vector3_Order<int>(-box_IJ)%this->Born_von_Karman_period )) )
+						*HexxR_ptr += Hexx_one_T;
+					else
+						HexxR_tmp[is][iat_J][iat_I][Abfs::Vector3_Order<int>(-box_IJ)%this->Born_von_Karman_period] = std::move(Hexx_one_T);
+				}	
+				if( ModuleBase::matrix * const HexxR_ptr = static_cast<ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat_I, iat_J, Abfs::Vector3_Order<int>(box_IJ)%this->Born_von_Karman_period )) )
+					*HexxR_ptr += Hexx_one;
+				else
+					HexxR_tmp[is][iat_I][iat_J][Abfs::Vector3_Order<int>(box_IJ)%this->Born_von_Karman_period] = std::move(Hexx_one);
+			};
 			
 			for( const auto & Cp1s : Cps.at(iat1) )
 			{
@@ -1620,20 +1637,7 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Mo
 														index_lcaos[it3].count_size * index_abfs[it1].count_size,
 														-2, C_13, DVC_32 );
 													if( cauchy.postcalD( Hexx_12 ) )
-													{
-														if(iat1!=iat2)
-														{
-															const ModuleBase::matrix Hexx_21 = transpose(Hexx_12);
-															if( ModuleBase::matrix * const HexxR_ptr = static_cast<ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat2, iat1, Abfs::Vector3_Order<int>(-box2)%Born_von_Karman_period )) )
-																*HexxR_ptr += Hexx_21;
-															else
-																HexxR_tmp[is][iat2][iat1][Abfs::Vector3_Order<int>(-box2)%Born_von_Karman_period] = std::move(Hexx_21);
-														}
-														if( ModuleBase::matrix * const HexxR_ptr = static_cast<ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat1, iat2, Abfs::Vector3_Order<int>(box2)%Born_von_Karman_period )) )
-															*HexxR_ptr += Hexx_12;
-														else
-															HexxR_tmp[is][iat1][iat2][Abfs::Vector3_Order<int>(box2)%Born_von_Karman_period] = std::move(Hexx_12);
-													}
+														add_Hexx_one(Hexx_12, is, iat1, iat2, box2);
 												}
 											}
 										}	// end case 4
@@ -1658,20 +1662,7 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Mo
 														index_lcaos[it1].count_size * index_abfs[it1].count_size,
 														-2, C_13_T, DVC_12 );
 													if( cauchy.postcalD( Hexx_32 ) )
-													{
-														if(iat1!=iat2)
-														{
-															const ModuleBase::matrix Hexx_23 = transpose(Hexx_32);
-															if( ModuleBase::matrix * const HexxR_ptr = static_cast<ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat2, iat3, Abfs::Vector3_Order<int>(-box2+box3)%Born_von_Karman_period )) )
-																*HexxR_ptr += Hexx_23;
-															else
-																HexxR_tmp[is][iat2][iat3][Abfs::Vector3_Order<int>(-box2+box3)%Born_von_Karman_period] = std::move(Hexx_23);
-														}
-														if( ModuleBase::matrix * const HexxR_ptr = static_cast<ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat3, iat2, Abfs::Vector3_Order<int>(box2-box3)%Born_von_Karman_period )) )
-															*HexxR_ptr += Hexx_32;
-														else
-															HexxR_tmp[is][iat3][iat2][Abfs::Vector3_Order<int>(box2-box3)%Born_von_Karman_period] = std::move(Hexx_32);
-													}
+														add_Hexx_one(Hexx_32, is, iat3, iat2, box2-box3);
 												}
 											}
 										}	// end case 3
@@ -1696,20 +1687,7 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Mo
 														index_lcaos[it3].count_size * index_abfs[it1].count_size,
 														-2, C_13, DVC_34 );
 													if( cauchy.postcalD( Hexx_14 ) )
-													{
-														if(iat1!=iat2)
-														{
-															const ModuleBase::matrix Hexx_41 = transpose(Hexx_14);
-															if( ModuleBase::matrix * const HexxR_ptr = static_cast<ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat4, iat1, Abfs::Vector3_Order<int>(-box2-box4)%Born_von_Karman_period )) )
-																*HexxR_ptr += Hexx_41;
-															else
-																HexxR_tmp[is][iat4][iat1][Abfs::Vector3_Order<int>(-box2-box4)%Born_von_Karman_period] = std::move(Hexx_41);
-														}	
-														if( ModuleBase::matrix * const HexxR_ptr = static_cast<ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat1, iat4, Abfs::Vector3_Order<int>(box2+box4)%Born_von_Karman_period )) )
-															*HexxR_ptr += Hexx_14;
-														else
-															HexxR_tmp[is][iat1][iat4][Abfs::Vector3_Order<int>(box2+box4)%Born_von_Karman_period] = std::move(Hexx_14);
-														}
+														add_Hexx_one(Hexx_14, is, iat1, iat4, box2+box4);
 												}
 											}
 										}	// end case 2
@@ -1734,20 +1712,7 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Mo
 														index_lcaos[it1].count_size * index_abfs[it1].count_size,
 														-2, C_13_T, DVC_14 );
 													if( cauchy.postcalD( Hexx_34 ) )
-													{
-														if(iat1!=iat2)
-														{
-															const ModuleBase::matrix Hexx_43 = transpose(Hexx_34);
-															if( ModuleBase::matrix * const HexxR_ptr = static_cast<ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat4, iat3, Abfs::Vector3_Order<int>(-box2+box3-box4)%Born_von_Karman_period )) )
-																*HexxR_ptr += Hexx_43;
-															else
-																HexxR_tmp[is][iat4][iat3][Abfs::Vector3_Order<int>(-box2+box3-box4)%Born_von_Karman_period] = std::move(Hexx_43);
-														}	
-														if( ModuleBase::matrix * const HexxR_ptr = static_cast<ModuleBase::matrix*const>(ModuleBase::GlobalFunc::MAP_EXIST( HexxR_tmp[is], iat3, iat4, Abfs::Vector3_Order<int>(box2-box3+box4)%Born_von_Karman_period )) )
-															*HexxR_ptr += Hexx_34;
-														else
-															HexxR_tmp[is][iat3][iat4][Abfs::Vector3_Order<int>(box2-box3+box4)%Born_von_Karman_period] = std::move(Hexx_34);
-													}
+														add_Hexx_one(Hexx_34, is, iat3, iat4, box2-box3+box4);
 												}
 											}
 										}	// end case 1
