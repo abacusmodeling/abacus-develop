@@ -116,6 +116,7 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, std::o
   //      std::cout << "a1 = " << a2.x << " " << a2.y << " " << a2.z <<std::endl;
   //      std::cout << "a1 = " << a3.x << " " << a3.y << " " << a3.z <<std::endl;
 
+
 	// the atom position coordinates are changed to 
 	// crystal coordinates of a1,a2,a3
 	ModuleBase::Matrix3 new_lat;
@@ -149,6 +150,7 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, std::o
 			++iat;
 		}
 	}
+
 
 	Symm_Other::print1(ibrav, cel_const, ofs_running);
 
@@ -607,7 +609,6 @@ void Symmetry::lattice_type(
                                             //std::cout << "mat = " << n11 <<" " <<n12<<" "<<n13<<" "<<n21<<" "<<n22<<" "<<n23<<" "<<n31<<" "<<n32<<" "<<n33<<std::endl;
 											
                                             brav = standard_lat(r1, r2, r3, cel_const);
-                                            
 //                                            if(brav == 8)
 //                                            {
 //                                               std::cout << "mat = " << n11 <<" " <<n12<<" "<<n13<<" "<<n21<<" "<<n22<<" "<<n23<<" "<<n31<<" "<<n32<<" "<<n33<<std::endl;
@@ -686,14 +687,6 @@ void Symmetry::lattice_type(
             }
         }
     }
-    
-    for (int i = 0; i < 6; ++i)
-    {
-        cel_const[i] = temp_const[i];
-    }
-
-
-
 //        std::cout << "a1 = " << v1.x << " " << v1.y << " " << v1.z <<std::endl;
 //        std::cout << "a1 = " << v2.x << " " << v2.y << " " << v2.z <<std::endl;
 //        std::cout << "a1 = " << v3.x << " " << v3.y << " " << v3.z <<std::endl;
