@@ -21,7 +21,6 @@ public:
     void cal_ux();
 #endif
     bool judge_parallel(double a[3],ModuleBase::Vector3<double> b);
-    bool input_mag;//if start magnetization defined in INPUT instead of STRU,this is true
 	double *atom_mag;
 	int n_mag_at;
 
