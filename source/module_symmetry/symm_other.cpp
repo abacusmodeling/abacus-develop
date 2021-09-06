@@ -56,28 +56,28 @@ void Symm_Other::print1(const int &ibrav, const double *cel_const, std::ofstream
 	else if(ibrav==9)
 	{
 		ModuleBase::GlobalFunc::OUT(ofs_running,"BRAVAIS","BODY CENTERED ORTHORHOMBIC CELL");
-    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTAddNT A",cel_const[0]);
+    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTANT A",cel_const[0]);
 		ModuleBase::GlobalFunc::OUT(ofs_running,"B/A RATIO",cel_const[1]);
 		ModuleBase::GlobalFunc::OUT(ofs_running,"C/A RATIO",cel_const[2]);
 	}
 	else if(ibrav==10)
 	{
 		ModuleBase::GlobalFunc::OUT(ofs_running,"BRAVAIS","FACE CENTERED ORTHORHOMBIC CELL");
-    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTAddNT A",cel_const[0]);
+    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTANT A",cel_const[0]);
 		ModuleBase::GlobalFunc::OUT(ofs_running,"B/A RATIO",cel_const[1]);
 		ModuleBase::GlobalFunc::OUT(ofs_running,"C/A RATIO",cel_const[2]);
 	}
 	else if(ibrav==11)
 	{
 		ModuleBase::GlobalFunc::OUT(ofs_running,"BRAVAIS","BASE CENTERED ORTHORHOMBIC CELL");
-    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTAddNT A",cel_const[0]);
+    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTANT A",cel_const[0]);
 		ModuleBase::GlobalFunc::OUT(ofs_running,"B/A RATIO",cel_const[1]);
 		ModuleBase::GlobalFunc::OUT(ofs_running,"C/A RATIO",cel_const[2]);
 	}
 	else if(ibrav==12)
 	{
 		ModuleBase::GlobalFunc::OUT(ofs_running,"BRAVAIS","SIMPLE MONOLINIC CELL");
-    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTAddNT A",cel_const[0]);
+    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTANT A",cel_const[0]);
 		ModuleBase::GlobalFunc::OUT(ofs_running,"B/A RATIO",cel_const[1]);
 		ModuleBase::GlobalFunc::OUT(ofs_running,"C/A RATIO",cel_const[2]);
 		ModuleBase::GlobalFunc::OUT(ofs_running,"COS(BETA)",cel_const[4]);
@@ -85,7 +85,7 @@ void Symm_Other::print1(const int &ibrav, const double *cel_const, std::ofstream
 	else if(ibrav==13)
 	{
 		ModuleBase::GlobalFunc::OUT(ofs_running,"BRAVAIS","BASED CENTERED MONOLINIC CELL");
-    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTAddNT A",cel_const[0]);
+    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTANT A",cel_const[0]);
 		ModuleBase::GlobalFunc::OUT(ofs_running,"B/A RATIO",cel_const[1]);
 		ModuleBase::GlobalFunc::OUT(ofs_running,"C/A RATIO",cel_const[2]);
 		ModuleBase::GlobalFunc::OUT(ofs_running,"COS(BETA)",cel_const[4]);	
@@ -93,7 +93,7 @@ void Symm_Other::print1(const int &ibrav, const double *cel_const, std::ofstream
 	else if(ibrav==14)
 	{
 		ModuleBase::GlobalFunc::OUT(ofs_running,"BRAVAIS","TRICLINIC CELL");
-    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTAddNT A",cel_const[0]);
+    	ModuleBase::GlobalFunc::OUT(ofs_running,"LATTICE CONSTANT A",cel_const[0]);
 		ModuleBase::GlobalFunc::OUT(ofs_running,"B/A RATIO",cel_const[1]);
 		ModuleBase::GlobalFunc::OUT(ofs_running,"C/A RATIO",cel_const[2]);
 		ModuleBase::GlobalFunc::OUT(ofs_running,"COS(ALPHA)",cel_const[3]);	

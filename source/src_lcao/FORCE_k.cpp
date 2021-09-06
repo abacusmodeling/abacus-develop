@@ -919,7 +919,11 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 	ModuleBase::TITLE("Force_LCAO_k","cal_fvl_dphi_k");
 	ModuleBase::timer::tick("Force_LCAO_k","cal_fvl_dphi_k");
 
-	if(!isforce&&!isstress) return;
+	if(!isforce&&!isstress) 
+	{
+		ModuleBase::timer::tick("Force_LCAO_k","cal_fvl_dphi_k");
+		return;
+	}
 	assert(GlobalC::LM.DHloc_fixedR_x!=NULL);
 	assert(GlobalC::LM.DHloc_fixedR_y!=NULL);
 	assert(GlobalC::LM.DHloc_fixedR_z!=NULL);
