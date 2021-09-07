@@ -8,6 +8,7 @@
 #include "ORB_read.h"
 #include "../module_base/vector3.h"
 #include "../module_base/matrix.h"
+#include <vector>
 
 /// used to be 'Use_Overlap_Table',
 /// now the name is 'ORB_gen_tables'
@@ -74,6 +75,19 @@ class ORB_gen_tables
 		std::complex<double> *nlm1=NULL,
 		const int is=0)const;
 
+	void snap_psibeta_half(
+		const LCAO_Orbitals &orb,
+		std::vector<double> &nlm,
+		const ModuleBase::Vector3<double> &R1,
+		const int &T1,
+		const int &L1,
+		const int &m1,
+		const int &N1,
+		const ModuleBase::Vector3<double> &R0, // The projector.
+		const int &T0,
+		const ModuleBase::matrix &dion, // mohan add 2021-04-25
+		int &natomwfc,
+		const bool &mult_D);
 	/// set as public because in hamilt_linear, 
 	/// we need to destroy the tables: SR,TR,NR
 	/// after ionic optimization is done.

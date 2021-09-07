@@ -3,6 +3,7 @@
 #include "../src_pw/wavefunc.h"
 #include "LCAO_nnr.h"
 #include "global_fp.h"
+#include <vector>
 
 LCAO_gen_fixedH::LCAO_gen_fixedH()
 {}
@@ -35,6 +36,7 @@ void LCAO_gen_fixedH::calculate_NL_no(void)
     	this->build_Nonlocal_mu(false);
 //		this->test_Nonlocal();
 	}
+
     return;
 }
 
@@ -673,7 +675,6 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 	return;
 }
 
-
 void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liuyu 2021-04-07
 {
     ModuleBase::TITLE("LCAO_gen_fixedH","build_Nonlocal_beta");
@@ -722,8 +723,8 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 					double distance = dtau.norm() * GlobalC::ucell.lat0;
 					double rcut = Rcut(T1,T2);
 					//double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
-					if(distance < rcut)
-					{
+//					if(distance < rcut)
+//					{
 						// ------------- enter the nnr increaing zone --------------
 						//for (int iw1=0; iw1<atom1->nw*GlobalV::NPOL; ++iw1)
 						for (int iw1=0; iw1<nw1_tot; ++iw1)
@@ -732,6 +733,22 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 							const int iw1_local = GlobalC::ParaO.trace_loc_row[iw1_all];
 							if(iw1_local < 0)continue;
 							const int iw1_0 = iw1/GlobalV::NPOL;
+
+							std::vector<double> nlm1;
+							int natomwfc;
+
+							if(!calc_deri && GlobalV::NSPIN!=4)
+							{
+								GlobalC::UOT.snap_psibeta_half(
+									GlobalC::ORB,
+									nlm1, tau1, T1,
+									atom1->iw2l[ iw1_0 ], // L1
+									atom1->iw2m[ iw1_0 ], // m1
+									atom1->iw2n[ iw1_0 ], // N1
+									GlobalC::ucell.atoms[T0].tau[I0], T0, //R0,T0
+									GlobalC::ucell.atoms[T0].dion,
+									natomwfc, 1);
+							}
 
 							// mohan fix bug 2010-12-20
 							// atom2[T2] -> atom2.
@@ -746,29 +763,49 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 								double nlm[3];
 								nlm[0] = nlm[1] = nlm[2] = 0.0;
 
+								std::vector<double> nlm2;
 								if(!calc_deri)
 								{
-									GlobalC::UOT.snap_psibeta(
-											GlobalC::ORB,
-											nlm, 0, tau1, T1,
-											atom1->iw2l[ iw1_0 ], // L1
-											atom1->iw2m[ iw1_0 ], // m1
-											atom1->iw2n[ iw1_0 ], // N1
-											tau2, T2,
-											atom2->iw2l[ iw2_0 ], // L2
-											atom2->iw2m[ iw2_0 ], // m2
-											atom2->iw2n[ iw2_0 ], // n2
-											GlobalC::ucell.atoms[T0].tau[I0], T0, GlobalC::ucell.atoms[T0].dion, GlobalV::NSPIN,
-											GlobalC::ucell.atoms[T0].d_so,
-											GlobalC::ucell.atoms[T0].non_zero_count_soc[0], // index stands for spin
-											GlobalC::ucell.atoms[T0].index1_soc[0],
-											GlobalC::ucell.atoms[T0].index2_soc[0],
-											GlobalC::ucell.atoms[T0].nproj_soc
-											);
 
+									int natomwfc1;
+									if(GlobalV::NSPIN!=4)
+									{
+										GlobalC::UOT.snap_psibeta_half(
+											GlobalC::ORB,
+											nlm2, tau2, T2,
+											atom1->iw2l[ iw2_0 ], // L1
+											atom1->iw2m[ iw2_0 ], // m1
+											atom1->iw2n[ iw2_0 ], // N1
+											GlobalC::ucell.atoms[T0].tau[I0], T0,
+											GlobalC::ucell.atoms[T0].dion,
+											natomwfc1, 0);
+										assert(natomwfc==natomwfc1);
+										for(int ib=0;ib<natomwfc;ib++) nlm[0]+= nlm1[ib]*nlm2[ib];
+									}
+									else
+									{
+
+										GlobalC::UOT.snap_psibeta(
+												GlobalC::ORB,
+												nlm, 0, tau1, T1,
+												atom1->iw2l[ iw1_0 ], // L1
+												atom1->iw2m[ iw1_0 ], // m1
+												atom1->iw2n[ iw1_0 ], // N1
+												tau2, T2,
+												atom2->iw2l[ iw2_0 ], // L2
+												atom2->iw2m[ iw2_0 ], // m2
+												atom2->iw2n[ iw2_0 ], // n2
+												GlobalC::ucell.atoms[T0].tau[I0], T0, GlobalC::ucell.atoms[T0].dion, GlobalV::NSPIN,
+												GlobalC::ucell.atoms[T0].d_so,
+												GlobalC::ucell.atoms[T0].non_zero_count_soc[0], // index stands for spin
+												GlobalC::ucell.atoms[T0].index1_soc[0],
+												GlobalC::ucell.atoms[T0].index2_soc[0],
+												GlobalC::ucell.atoms[T0].nproj_soc
+												);
+									}
 									//if(GlobalV::GAMMA_ONLY_LOCAL)
 									//{
-										GlobalC::LM.set_HSgamma(iw1_all,iw2_all,nlm[0],'N');//N stands for nonlocal.
+									GlobalC::LM.set_HSgamma(iw1_all,iw2_all,nlm[0],'N');//N stands for nonlocal.
 										//if(ad!=ad2) GlobalC::LM.set_HSgamma(iw2_all,iw1_all,nlm[0],'N'); //add by liuyu 20210406
 									//}
 								//	else
@@ -815,7 +852,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 								}
 							}// end iw2
 						}// end iw1
-					} // end distance
+//					} // end distance
                 }// end ad2
 				// mohan add 2011-06-16
 
