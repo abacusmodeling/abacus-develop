@@ -52,7 +52,11 @@ void Force_Stress_LCAO::getForceStress(
     ModuleBase::TITLE("Force_Stress_LCAO","getForceStress");
 	ModuleBase::timer::tick("Force_Stress_LCAO","getForceStress");
 	
-	if(!isforce&&!isstress) return;
+	if(!isforce&&!isstress)
+	{
+		ModuleBase::timer::tick("Force_Stress_LCAO","getForceStress");
+		return;
+	} 
 
 	const int nat = GlobalC::ucell.nat;
 

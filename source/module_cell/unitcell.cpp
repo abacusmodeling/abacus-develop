@@ -20,7 +20,7 @@ UnitCell::UnitCell()
     nat = 0;
     namax = 0;
     nwmax = 0;
-    input_mag = 0; // RX 2021-9-2
+    
     iat2it = nullptr;
     iat2ia = nullptr;
 	iwt2iat = nullptr;
@@ -405,7 +405,7 @@ bool UnitCell::judge_big_cell(void)
 }
 
 
-
+#ifndef __CMD
 void UnitCell::cal_ux()
 {
 	double amag, uxmod;
@@ -462,6 +462,7 @@ void UnitCell::cal_ux()
 	}
 	return;
 }
+#endif
 
 bool UnitCell::judge_parallel(double a[3], ModuleBase::Vector3<double> b)
 {

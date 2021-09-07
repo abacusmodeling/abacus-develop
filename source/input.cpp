@@ -510,7 +510,6 @@ bool Input::Read(const std::string &fn)
     }
 
     ifs.rdstate();
-	input_mag=false;
     while (ifs.good())
     {
         ifs >> word1;
@@ -1811,7 +1810,6 @@ bool Input::Read(const std::string &fn)
 				atom_mag[i]=mags[n_m];
 				cout<<"atom_mag"<<atom_mag[i];
 			}	
-	input_mag=true;
 	}
 
 #endif
