@@ -8,6 +8,7 @@
 #include "ORB_read.h"
 #include "../module_base/vector3.h"
 #include "../module_base/matrix.h"
+#include "../module_cell/setup_nonlocal.h"
 
 /// used to be 'Use_Overlap_Table',
 /// now the name is 'ORB_gen_tables'
@@ -25,7 +26,10 @@ class ORB_gen_tables
 		const int &job0, 
 		LCAO_Orbitals &orb,
 		const int &Lmax_exx,
-		const int& out_descriptor///<[in] whether to generate descriptors
+		const int& out_descriptor,///<[in] whether to generate descriptors
+		const int &nprojmax, 
+		const int* nproj,
+		const Numerical_Nonlocal* beta_
 	);
 	void set_unit(const double& v) { lat0 = v; }
 	
@@ -50,6 +54,7 @@ class ORB_gen_tables
 
 	void snap_psibeta(
 		const LCAO_Orbitals &orb,
+		const InfoNonlocal& infoNL_,
 		double nlm[],
 		const int& job/**<[in]	job = 0 for vnl matrix elements, job = 1 for its derivatives*/,
 		const ModuleBase::Vector3<double> &R1,
@@ -68,8 +73,8 @@ class ORB_gen_tables
 		const int &nspin, // mohan add 2021-05-07
 		const ModuleBase::ComplexArray &d_so, // mohan add 2021-04-25
 		const int &count_soc, // mohan add 2021-05-07
-		int* index1_soc, // mohan add 2021-05-07
-		int* index2_soc, // mohan add 2021-05-07
+		const int* index1_soc, // mohan add 2021-05-07
+		const int* index2_soc, // mohan add 2021-05-07
 		const int &nproj_in, // mohan add 2021-05-07
 		std::complex<double> *nlm1=NULL,
 		const int is=0)const;
