@@ -773,9 +773,9 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 										GlobalC::UOT.snap_psibeta_half(
 											GlobalC::ORB,
 											nlm2, tau2, T2,
-											atom1->iw2l[ iw2_0 ], // L1
-											atom1->iw2m[ iw2_0 ], // m1
-											atom1->iw2n[ iw2_0 ], // N1
+											atom2->iw2l[ iw2_0 ], // L1
+											atom2->iw2m[ iw2_0 ], // m1
+											atom2->iw2n[ iw2_0 ], // N1
 											GlobalC::ucell.atoms[T0].tau[I0], T0,
 											GlobalC::ucell.atoms[T0].dion,
 											natomwfc1, 0);
