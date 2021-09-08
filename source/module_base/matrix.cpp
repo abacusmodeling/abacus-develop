@@ -371,7 +371,7 @@ std::ostream & operator<<( std::ostream & os, const matrix & m )
 	{
 		for( int ic=0; ic!=m.nc; ++ic )
 		{
-			if(abs(m(ir,ic))>1E-10)
+			if(std::abs(m(ir,ic))>1E-10)
 				os<<m(ir,ic)<<"\t";
 			else
 				os<<0<<"\t";
