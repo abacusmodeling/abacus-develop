@@ -559,7 +559,7 @@ std::cout<<"D"<<std::endl;
 					{
 						const size_t IB = m4.first;
 						ofs<<TA<<"\t"<<IA<<"\t"<<TB<<"\t"<<IB<<std::endl;
-						ofs<<m4.second<<std::endl;
+						m4.second.print(ofs, 1E-10)<<std::endl;
 					}
 				}
 			}
@@ -592,7 +592,7 @@ std::cout<<"D"<<std::endl;
 					{
 						const size_t IB = m4.first;
 						ofs<<TA<<"\t"<<IA<<"\t"<<TB<<"\t"<<IB<<std::endl;
-						ofs<<m4.second<<std::endl;
+						m4.second.print(ofs, 1E-10)<<std::endl;
 					}
 				}
 			}
@@ -884,7 +884,7 @@ void Exx_Abfs::cal_CVC(
 
 									// Peize Lin test
 									ofs<<IA<<"\t"<<IB<<"\t"<<IC<<"\t"<<ID<<std::endl;
-									ofs<<mm<<std::endl;
+									mm.print(ofs, 1E-10)<<std::endl;
 								}
 							}
 						}

@@ -55,7 +55,9 @@ static void ofs_matrixes( const std::string & file_name, const ModuleBase::matri
 {
 	std::ofstream ofs(file_name,std::ofstream::app);
 	if(flag_print_content)
-		ofs<<ms<<std::endl;	
+	{
+		ms.print(ofs, 1E-10)<<std::endl;
+	}
 	ofs.close();
 }
 static void ofs_matrixes( const std::string & file_name, const ModuleBase::ComplexMatrix & ms, const bool flag_print_content=true )

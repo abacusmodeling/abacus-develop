@@ -74,6 +74,8 @@ public:
 	double absmax() const;				// Peize Lin add 2018-07-02
 
 	double norm() const;				// Peize Lin add 2018-08-12
+
+	std::ostream & print( std::ostream & os, const double threshold=0.0 ) const;
 };
 
 
@@ -87,7 +89,7 @@ matrix transpose(const matrix &m);
 double trace_on(const matrix &A, const matrix &B);		// mohan add 2011-01-13
 double mdot(const matrix &A, const matrix &B);			// mohan add 2011-01-13
 
-std::ostream & operator<<( std::ostream & os, const matrix & m );		// Peize Lin add 2016-09-08
+//std::ostream & operator<<( std::ostream & os, const matrix & m );		// Peize Lin add 2016-09-08
 
 }
 

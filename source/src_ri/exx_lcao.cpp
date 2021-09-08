@@ -81,9 +81,9 @@ Exx_Lcao::Exx_Lcao( const Exx_Global::Exx_Info &info_global )
 		};
 		auto print_matrix = [](const ModuleBase::matrix &m1,const ModuleBase::matrix &m2,const ModuleBase::matrix &m3)
 		{
-			std::cout<<m1<<std::endl;
-			std::cout<<m2<<std::endl;
-			std::cout<<m3<<std::endl;
+			m1.print(std::cout, 1E-10)<<std::endl;
+			m2.print(std::cout, 1E-10)<<std::endl;
+			m3.print(std::cout, 1E-10)<<std::endl;
 			std::cout<<"============================="<<std::endl<<std::endl;
 		};
 		{
@@ -500,7 +500,7 @@ void Exx_Lcao::init()
 			}
 		}
 		ModuleBase::ComplexMatrix cm = ModuleBase::ComplexMatrix(m) * exp( -ModuleBase::TWO_PI*ModuleBase::IMAG_UNIT* 1.0/3.0 );
-		std::cout<<m<<std::endl;
+		m.print(std::cout, 1E-10)<<std::endl;
 		std::cout<<cm<<std::endl;
 	};
 
@@ -698,8 +698,8 @@ ofs_mpi<<range_abfs<<std::endl;
 		mll.init_radial(GlobalC::ORB, GlobalC::ORB);
 		mll.init_radial_table();
 		std::ofstream ofsS("S.dat");
-		ofsS<<mll.cal_overlap_matrix(0,0,GlobalC::ucell.atoms[0].tau[0],GlobalC::ucell.atoms[0].tau[0],index_lcaos,index_lcaos)<<std::endl<<std::endl;
-		ofsS<<mll.cal_overlap_matrix(0,0,GlobalC::ucell.atoms[0].tau[0],GlobalC::ucell.atoms[0].tau[1],index_lcaos,index_lcaos)<<std::endl<<std::endl;
+		mll.cal_overlap_matrix(0,0,GlobalC::ucell.atoms[0].tau[0],GlobalC::ucell.atoms[0].tau[0],index_lcaos,index_lcaos).print(ofsS, 1E-10)<<std::endl<<std::endl;
+		mll.cal_overlap_matrix(0,0,GlobalC::ucell.atoms[0].tau[0],GlobalC::ucell.atoms[0].tau[1],index_lcaos,index_lcaos).print(ofsS, 1E-10)<<std::endl<<std::endl;
 	};
 
 gettimeofday( &t_start, NULL);
@@ -757,7 +757,7 @@ ofs_mpi.close();
 			rwlock_Vw,
 			Cws,
 			Vws);
-		std::cout<<*C<<std::endl;
+		C->print(std::cout, 1E-10)<<std::endl;
 		
 		pthread_rwlock_destroy(&rwlock_Cw);
 		pthread_rwlock_destroy(&rwlock_Vw);
@@ -781,7 +781,8 @@ ofs_mpi.close();
 		const ModuleBase::matrix m_overlap_coulomb = m_lcaos_ccp.cal_overlap_matrix( 0,0, {0,0,0},{0,0,0}, index_lcaos,index_lcaos );
 
 		std::ofstream ofs("matrix_overlap.dat");
-		ofs<<m_overlap<<std::endl<<m_overlap_coulomb<<std::endl;
+		m_overlap.print(ofs, 1E-10)<<std::endl;
+		m_overlap_coulomb.print(ofs, 1E-10)<<std::endl;
 		ofs.close();
 	};
 }
@@ -1097,7 +1098,7 @@ ofs_mpi.close();
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{		
 				std::ofstream ofs("Hexx_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(is)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
-				ofs<<this->Hexx_para.HK_Gamma_m2D[is]<<std::endl;
+				this->Hexx_para.HK_Gamma_m2D[is].print(ofs, 1E-10)<<std::endl;
 			}
 		}
 		else
@@ -1117,7 +1118,7 @@ ofs_mpi.close();
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{		
 				std::ofstream ofs("wfc_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(is)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
-				ofs<<GlobalC::LOC.wfc_dm_2d.wfc_gamma[is]<<std::endl;
+				GlobalC::LOC.wfc_dm_2d.wfc_gamma[is].print(ofs, 1E-10)<<std::endl;
 			}
 		}
 		else
@@ -1125,7 +1126,7 @@ ofs_mpi.close();
 			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 			{
 				std::ofstream ofs("wfc_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(ik)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
-				ofs<<GlobalC::LOC.wfc_dm_2d.wfc_gamma[ik]<<std::endl;
+				GlobalC::LOC.wfc_dm_2d.wfc_gamma[ik].print(ofs, 1E-10)<<std::endl;
 			}
 		}
 	};
