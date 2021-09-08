@@ -39,4 +39,3 @@ unitcell.o\
 unitcell_pseudo.o\
 read_atoms.o\
 read_cell_pseudopots.o\
-setup_nonlocal.o\

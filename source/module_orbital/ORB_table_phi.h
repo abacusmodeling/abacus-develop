@@ -60,8 +60,7 @@ class ORB_table_phi
 		int &Lmax_used, 
 		int &Lmax,
 		const int &Lmax_exx,
-		const LCAO_Orbitals &orb,
-		const Numerical_Nonlocal* beta_) const;
+		const LCAO_Orbitals &orb) const;
 
 	void init_Table_Spherical_Bessel(
 		const int orb_num, 
@@ -69,8 +68,7 @@ class ORB_table_phi
 		int &Lmax_used, 
 		int &Lmax,
 		const int &Lmax_exx,
-		const LCAO_Orbitals &orb,
-		const Numerical_Nonlocal* beta_);
+		const LCAO_Orbitals &orb);
 
 	//Wenfei 2021-8-26, plot table elements against R
 	void plot_table(

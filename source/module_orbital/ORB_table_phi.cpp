@@ -783,8 +783,7 @@ void ORB_table_phi::init_Lmax (
 	int &Lmax_used, 
 	int &Lmax,
 	const int &Lmax_exx,
-	const LCAO_Orbitals &orb,
-	const Numerical_Nonlocal* beta_) const
+	const LCAO_Orbitals &orb) const
 {
 
 	auto cal_Lmax_Phi = [](int &Lmax,const LCAO_Orbitals &orb)
@@ -797,7 +796,7 @@ void ORB_table_phi::init_Lmax (
 		}
 	};
 
-	auto cal_Lmax_Beta = [](int &Lmax,const LCAO_Orbitals &orb, const Numerical_Nonlocal* beta_)
+	auto cal_Lmax_Beta = [](int &Lmax,const LCAO_Orbitals &orb)
 	{
 		// fix bug.
 		// mohan add the nonlocal part.
@@ -805,7 +804,7 @@ void ORB_table_phi::init_Lmax (
 		const int ntype = orb.get_ntype();
 		for(int it=0; it< ntype; it++)
 		{
-			Lmax = std::max(Lmax, beta_[it].getLmax());
+			Lmax = std::max(Lmax, orb.Beta[it].getLmax());
 		}
 	};
 	auto cal_Lmax_Alpha = [](int &Lmax)
@@ -824,7 +823,7 @@ void ORB_table_phi::init_Lmax (
 			{
 				case 1:			// used in <Phi|Phi> or <Beta|Phi>
 					cal_Lmax_Phi(Lmax,orb);
-					cal_Lmax_Beta(Lmax,orb, beta_);
+					cal_Lmax_Beta(Lmax,orb);
 					//use 2lmax+1 in dS
 					Lmax_used = 2*Lmax + 1;
 					break;
@@ -883,12 +882,11 @@ void ORB_table_phi::init_Table_Spherical_Bessel (
 	int &Lmax_used, 
 	int &Lmax,
 	const int &Lmax_exx,
-	const LCAO_Orbitals &orb,
-	const Numerical_Nonlocal* beta_)
+	const LCAO_Orbitals &orb)
 {
 	ModuleBase::TITLE("ORB_table_phi", "init_Table_Spherical_Bessel");
 
-	this->init_Lmax (orb_num,mode,Lmax_used,Lmax,Lmax_exx,orb, beta_);		// Peize Lin add 2016-01-26
+	this->init_Lmax (orb_num,mode,Lmax_used,Lmax,Lmax_exx,orb);		// Peize Lin add 2016-01-26
 
 	for( auto & sb : ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool )
 	{

@@ -13,5 +13,4 @@ add_library(
     unitcell_pseudo.cpp
     read_atoms.cpp
     read_cell_pseudopots.cpp
-    setup_nonlocal.cpp
 )

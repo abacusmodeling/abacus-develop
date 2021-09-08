@@ -18,10 +18,7 @@ void ORB_gen_tables::gen_tables(
 	const int &job0,
 	LCAO_Orbitals &orb,
 	const int &Lmax_exx,
-	const int &out_descriptor,
-	const int &nprojmax, 
-	const int* nproj,
-	const Numerical_Nonlocal* beta_)
+	const int &out_descriptor)
 {
 	ModuleBase::TITLE("ORB_gen_tables", "gen_tables");
 	ModuleBase::timer::tick("ORB_gen_tables", "gen_tables");
@@ -65,8 +62,8 @@ void ORB_gen_tables::gen_tables(
 	MOT.init_OV_Opair(orb);
 
 	// NL: nonlocal
-	tbeta.init_NL_Tpair(orb.Phi, beta_);
-	tbeta.init_NL_Opair(orb, nprojmax, nproj); // add 2009-5-8
+	tbeta.init_NL_Tpair();
+	tbeta.init_NL_Opair(orb); // add 2009-5-8
 
 	//caoyu add 2021-03-18
 	// DS: Descriptor
@@ -95,11 +92,11 @@ void ORB_gen_tables::gen_tables(
 	int Lmax = 0;
 
 
-	MOT.init_Table_Spherical_Bessel(orb_num, mode, Lmax_used, Lmax, Lmax_exx, orb, beta_);
+	MOT.init_Table_Spherical_Bessel(orb_num, mode, Lmax_used, Lmax, Lmax_exx, orb);
 
 	//calculate S(R) for interpolation
 	MOT.init_Table(job0, orb);
-	tbeta.init_Table_Beta(MOT.pSB, orb.Phi, beta_, nproj); // add 2009-5-8
+	tbeta.init_Table_Beta(MOT.pSB); // add 2009-5-8
 
 	//caoyu add 2021-03-18
 	if (out_descriptor>0)
@@ -124,7 +121,6 @@ void ORB_gen_tables::gen_tables(
 
 void ORB_gen_tables::snap_psibeta(
 	const LCAO_Orbitals &orb,
-	const InfoNonlocal& infoNL_,
 	double nlm[],
 	const int &job,
 	const ModuleBase::Vector3<double> &R1,
@@ -143,8 +139,8 @@ void ORB_gen_tables::snap_psibeta(
 	const int &nspin,
 	const ModuleBase::ComplexArray &d_so, // mohan add 2021-05-07
 	const int &count_soc, // mohan add 2021-05-07
-	const int* index1_soc, // mohan add 2021-05-07
-	const int* index2_soc, // mohan add 2021-05-07
+	int* index1_soc, // mohan add 2021-05-07
+	int* index2_soc, // mohan add 2021-05-07
 	const int &nproj_in, // mohan add 2021-05-07
 	std::complex<double> *nlm1,
 	const int is) const
@@ -165,7 +161,7 @@ void ORB_gen_tables::snap_psibeta(
 		has_so = 1;
 	}
 
-	const int nproj = infoNL_.nproj[T0];
+	const int nproj = orb.nproj[T0];
 	assert(nproj>0); // mohan add 2021-04-25
 	
 	bool *calproj = new bool[nproj];
@@ -191,7 +187,7 @@ void ORB_gen_tables::snap_psibeta(
 	bool all_out = true;
 	for (int ip = 0; ip < nproj; ip++)
 	{
-		const double Rcut0 = infoNL_.Beta[T0].Proj[ip].getRcut();
+		const double Rcut0 = orb.Beta[T0].Proj[ip].getRcut();
 		if (distance10 > (Rcut1 + Rcut0) || distance20 > (Rcut2 + Rcut0))
 		{
 			calproj[ip] = false;
@@ -322,7 +318,7 @@ void ORB_gen_tables::snap_psibeta(
 		}
 
 		//const int L0 = orb.Beta[T0].getL_Beta(nb); // mohan delete the variable 2021-05-07
-		const int L0 = infoNL_.Beta[T0].Proj[nb].getL(); // mohan add 2021-05-07
+		const int L0 = orb.Beta[T0].Proj[nb].getL(); // mohan add 2021-05-07
 		//const int next_ip = 2* L0 +1;
 
 		//////////////////////////////////////////////////////

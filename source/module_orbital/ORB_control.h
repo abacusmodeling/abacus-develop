@@ -27,16 +27,12 @@ class ORB_control
 		const int &out_r_matrix, // mohan add 2021-04-26
 		const int &Lmax_exx,
 		const bool &force_flag, // mohan add 2021-05-07
-		const int &my_rank,  // mohan add 2021-04-26;
-		const int &nprojmax, 
-		const int* nproj,
-		const Numerical_Nonlocal* beta_); 
+		const int &my_rank); // mohan add 2021-04-26;
 
     void clear_after_ions(
 		ORB_gen_tables &OGT, 
 		LCAO_Orbitals &orb,
-		const int &out_descriptor,
-		const int* nproj_);
+		const int &out_descriptor);
 
 };
 #endif
