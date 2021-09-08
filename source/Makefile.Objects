@@ -176,7 +176,6 @@ pdiag_double.o \
 pdiag_basic.o \
 pdiag_common.o \
 subgrid_oper.o \
-GenELPA.o \
 conv_coulomb_pot.o \
 conv_coulomb_pot_k.o \
 center2_orb-orb11.o \
