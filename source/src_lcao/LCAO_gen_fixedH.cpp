@@ -25,7 +25,14 @@ void LCAO_gen_fixedH::calculate_NL_no(void)
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
 	  	//for gamma only.
-  		this->build_Nonlocal_beta(false);
+		if(GlobalV::NSPIN!=4)
+		{
+  			this->build_Nonlocal_beta_new();
+		}
+		else
+		{
+  			this->build_Nonlocal_beta(false);
+		}
 	}
 	else
 	{
@@ -675,6 +682,144 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 	return;
 }
 
+void LCAO_gen_fixedH::build_Nonlocal_beta_new() //update by liuyu 2021-04-07
+{
+    ModuleBase::TITLE("LCAO_gen_fixedH","build_Nonlocal_beta_new");
+    ModuleBase::timer::tick ("LCAO_gen_fixedH","build_Nonlocal_beta_new");
+
+    for (int T0 = 0; T0 < GlobalC::ucell.ntype; T0++)
+    {
+		Atom* atom0 = &GlobalC::ucell.atoms[T0]; 
+        for (int I0 =0; I0< atom0->na; I0++)
+        {
+			//=======================================================
+			//Step1:	
+			//saves <beta|psi>, where beta runs over L0,M0 on atom I0
+			//and psi runs over atomic basis sets on the current core
+			//=======================================================
+			std::vector<std::vector<std::vector<double>>> nlm_tot;
+			std::vector<std::vector<int>> iw2index;
+            //GlobalC::GridD.Find_atom( atom0->tau[I0] );
+            GlobalC::GridD.Find_atom(GlobalC::ucell, atom0->tau[I0] ,T0, I0);
+
+			//outermost loop : all adjacent atoms
+			nlm_tot.resize(GlobalC::GridD.getAdjacentNum()+1);
+			iw2index.resize(GlobalC::GridD.getAdjacentNum()+1);
+
+            for (int ad=0; ad<GlobalC::GridD.getAdjacentNum()+1 ; ++ad)
+            {
+                const int T1 = GlobalC::GridD.getType(ad);
+                const int I1 = GlobalC::GridD.getNatom(ad);
+                const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
+
+                const ModuleBase::Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau(ad);
+				const Atom* atom1 = &GlobalC::ucell.atoms[T1];
+				const int nw1_tot = atom1->nw*GlobalV::NPOL;
+				
+				//middle loop : atomic basis on current processor (either row or column)
+				nlm_tot[ad].clear();
+				iw2index[ad].resize(GlobalV::NLOCAL);
+				for (auto &x : iw2index[ad])
+				{
+    				x=-1;
+				}
+
+				int indexw = 0;
+				for (int iw1=0; iw1<nw1_tot; ++iw1)
+				{
+					const int iw1_all = start1 + iw1;
+					const int iw1_local = GlobalC::ParaO.trace_loc_row[iw1_all];
+					const int iw2_local = GlobalC::ParaO.trace_loc_col[iw1_all];
+					if(iw1_local < 0 && iw2_local < 0)continue;
+					const int iw1_0 = iw1/GlobalV::NPOL;
+					std::vector<double> nlm;
+					//inner loop : all projectors (L0,M0)
+					GlobalC::UOT.snap_psibeta_half(
+						GlobalC::ORB,
+						nlm, tau1, T1,
+						atom1->iw2l[ iw1_0 ], // L1
+						atom1->iw2m[ iw1_0 ], // m1
+						atom1->iw2n[ iw1_0 ], // N1
+						GlobalC::ucell.atoms[T0].tau[I0], T0); //R0,T0
+
+					nlm_tot[ad].push_back(nlm);
+					iw2index[ad][iw1_all]=indexw;
+					indexw+=1;
+				}//end iw
+				assert(indexw==nlm_tot[ad].size());
+			}//end ad
+
+			//=======================================================
+			//Step2:	
+			//calculate sum_(L0,M0) beta<psi_i|beta><beta|psi_j>
+			//and accumulate the value to Hloc_fixed(i,j)
+			//=======================================================
+
+			for (int ad1=0; ad1<GlobalC::GridD.getAdjacentNum()+1 ; ++ad1)
+            {
+                const int T1 = GlobalC::GridD.getType(ad1);
+                const int I1 = GlobalC::GridD.getNatom(ad1);
+                const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
+                const ModuleBase::Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau(ad1);
+				const Atom* atom1 = &GlobalC::ucell.atoms[T1];
+				const int nw1_tot = atom1->nw*GlobalV::NPOL;
+
+				for (int ad2=0; ad2 < GlobalC::GridD.getAdjacentNum()+1 ; ad2++)
+				{
+					const int T2 = GlobalC::GridD.getType(ad2);
+					const int I2 = GlobalC::GridD.getNatom(ad2);
+					const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
+					const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad2);
+					const Atom* atom2 = &GlobalC::ucell.atoms[T2];
+					const int nw2_tot = atom2->nw*GlobalV::NPOL;
+					for (int iw1=0; iw1<nw1_tot; ++iw1)
+					{
+						const int iw1_all = start1 + iw1;
+						const int iw1_local = GlobalC::ParaO.trace_loc_row[iw1_all];
+						if(iw1_local < 0)continue;
+						const int iw1_0 = iw1/GlobalV::NPOL;
+						for (int iw2=0; iw2<nw2_tot; ++iw2)
+						{
+							const int iw2_all = start2 + iw2;
+							const int iw2_local = GlobalC::ParaO.trace_loc_col[iw2_all];
+							if(iw2_local < 0)continue;
+							const int iw2_0 = iw2/GlobalV::NPOL;
+
+							int ind1 = iw2index[ad1][iw1_all];
+							int ind2 = iw2index[ad2][iw2_all];
+							assert(ind1!=-1 && ind2!=-1);
+
+							std::vector<double> nlm1 = nlm_tot[ad1][ind1];
+							std::vector<double> nlm2 = nlm_tot[ad2][ind2];
+
+							assert(nlm1.size()==nlm2.size());
+
+							double nlm=0.0;
+							const int nproj = GlobalC::ORB.nproj[T0];
+							int ib = 0;
+							for (int nb = 0; nb < nproj; nb++)
+							{
+								const int L0 = GlobalC::ORB.Beta[T0].Proj[nb].getL();
+								for(int m=0;m<2*L0+1;m++)
+								{
+									nlm += nlm1[ib]*nlm2[ib]*GlobalC::ucell.atoms[T0].dion(nb,nb);
+									ib+=1;
+								}
+							}
+							assert(ib==nlm1.size());
+							GlobalC::LM.set_HSgamma(iw1_all,iw2_all,nlm,'N');
+						}//iw2
+					}//iw1
+				}//ad2
+			}//ad1
+
+		}//end I0
+	}//end T0
+	
+    ModuleBase::timer::tick ("LCAO_gen_fixedH","build_Nonlocal_beta_new");
+	return;
+}
+
 void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liuyu 2021-04-07
 {
     ModuleBase::TITLE("LCAO_gen_fixedH","build_Nonlocal_beta");
@@ -735,9 +880,9 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 							const int iw1_0 = iw1/GlobalV::NPOL;
 
 							std::vector<double> nlm1;
-							int natomwfc;
 
-							if(!calc_deri && GlobalV::NSPIN!=4)
+							//if(!calc_deri && GlobalV::NSPIN!=4)
+							if(false) //this method turns out to be slower!
 							{
 								GlobalC::UOT.snap_psibeta_half(
 									GlobalC::ORB,
@@ -745,9 +890,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 									atom1->iw2l[ iw1_0 ], // L1
 									atom1->iw2m[ iw1_0 ], // m1
 									atom1->iw2n[ iw1_0 ], // N1
-									GlobalC::ucell.atoms[T0].tau[I0], T0, //R0,T0
-									GlobalC::ucell.atoms[T0].dion,
-									natomwfc, 1);
+									GlobalC::ucell.atoms[T0].tau[I0], T0);
 							}
 
 							// mohan fix bug 2010-12-20
@@ -766,9 +909,8 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 								std::vector<double> nlm2;
 								if(!calc_deri)
 								{
-
-									int natomwfc1;
-									if(GlobalV::NSPIN!=4)
+									//if(GlobalV::NSPIN!=4)
+									if(false) //this method turns out to be slower!
 									{
 										GlobalC::UOT.snap_psibeta_half(
 											GlobalC::ORB,
@@ -776,11 +918,20 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 											atom2->iw2l[ iw2_0 ], // L1
 											atom2->iw2m[ iw2_0 ], // m1
 											atom2->iw2n[ iw2_0 ], // N1
-											GlobalC::ucell.atoms[T0].tau[I0], T0,
-											GlobalC::ucell.atoms[T0].dion,
-											natomwfc1, 0);
-										assert(natomwfc==natomwfc1);
-										for(int ib=0;ib<natomwfc;ib++) nlm[0]+= nlm1[ib]*nlm2[ib];
+											GlobalC::ucell.atoms[T0].tau[I0], T0);
+										assert(nlm1.size()==nlm2.size());
+										int ib = 0;
+										const int nproj = GlobalC::ORB.nproj[T0];
+										for (int nb = 0; nb < nproj; nb++)
+										{
+											const int L0 = GlobalC::ORB.Beta[T0].Proj[nb].getL();
+											for(int m=0;m<2*L0+1;m++)
+											{
+												nlm[0] += nlm1[ib]*nlm2[ib]*GlobalC::ucell.atoms[T0].dion(nb,nb);
+												ib+=1;
+											}
+										}
+										assert(ib==nlm1.size());
 									}
 									else
 									{

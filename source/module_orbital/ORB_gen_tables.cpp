@@ -128,10 +128,7 @@ void ORB_gen_tables::snap_psibeta_half(
 	const int &m1,
 	const int &N1,
 	const ModuleBase::Vector3<double> &R0, // The projector.
-	const int &T0,
-	const ModuleBase::matrix &dion, // mohan add 2021-04-25
-	int &natomwfc,
-	const bool &mult_D)
+	const int &T0)const // mohan add 2021-04-25)
 {
 	ModuleBase::timer::tick("ORB_gen_tables", "snap_psibeta_half");
 
@@ -143,7 +140,7 @@ void ORB_gen_tables::snap_psibeta_half(
 	int *rmesh1 = new int[nproj];
 
 	//Count number of projectors (l,m)
-	natomwfc = 0;
+	int natomwfc = 0;
 	for (int ip = 0;ip < nproj;ip++)
 	{
 		//============================
@@ -154,6 +151,11 @@ void ORB_gen_tables::snap_psibeta_half(
 		natomwfc += 2* L0 +1;
 	}
 	nlm.resize(natomwfc);
+	for (auto &x : nlm)
+	{
+    	x=0.0;
+	}
+
 
 	//rcut of orbtials and projectors
 	//in our calculation, we always put orbital phi at the left side of <phi|beta>
@@ -316,14 +318,9 @@ void ORB_gen_tables::snap_psibeta_half(
 			//===============================================
 			// THIRD PART: SAVE THE VALUE FOR ALL PROJECTS.
 			//===============================================
-			if(mult_D)
-			{
-				nlm[index] = term_a  * dion(nb, nb); //LiuXh 2016-01-14
-			}
-			else
-			{
-				nlm[index] = term_a;
-			}
+
+			nlm[index] = term_a;
+
 			index += 1;
 		} // end m0
 	}// end nb
