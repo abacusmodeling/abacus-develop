@@ -1,0 +1,36 @@
+FROM debian:bullseye-slim
+
+RUN apt-get update && apt-get install -y cmake git gnupg gcc g++ sudo wget vim unzip
+
+RUN cd /tmp && \
+	wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB && \
+	apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB && \
+	rm GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB && \
+	echo "deb https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+
+RUN apt-get update --allow-unauthenticated \
+	&& apt-get install -y  \
+		intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic \
+		intel-oneapi-compiler-fortran \
+		intel-oneapi-mkl-devel \
+		intel-oneapi-mpi-devel
+
+SHELL ["/bin/bash", "-c"]
+RUN source /opt/intel/oneapi/setvars.sh \
+	&& cd /tmp \
+	&& git clone https://github.com/darelbeida/elpa.git -b ELPA_2016.05.004-openblas --single-branch --depth=1 \
+	&& cd elpa && mkdir build && cd build \
+	&& ../configure \
+		CC=/opt/intel/oneapi/mpi/latest/bin/mpiicc \
+		CXX=/opt/intel/oneapi/mpi/latest/bin/mpiicpc \
+		FC=/opt/intel/oneapi/mpi/latest/bin/mpiifort \
+		FCFLAGS="-mkl=cluster" \
+	&& make -j8 \
+	&& make PREFIX=/usr/local install \
+	&& ln -s /usr/local/include/elpa-2016.05.004/elpa /usr/local/include/ \
+	&& cd /tmp && rm -rf elpa
+
+RUN cd /tmp \
+	&& git clone https://github.com/USCiLab/cereal.git \
+	&& cp -r cereal/include /usr/local \
+	&& rm -rf cereal
