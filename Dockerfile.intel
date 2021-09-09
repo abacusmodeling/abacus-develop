@@ -1,6 +1,6 @@
 FROM debian:bullseye-slim
 
-RUN apt-get update && apt-get install -y cmake git gnupg gcc g++ sudo wget vim unzip
+RUN apt-get update && apt-get install -y bc cmake git gnupg gcc g++ sudo wget vim unzip
 
 RUN cd /tmp && \
 	wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB && \
