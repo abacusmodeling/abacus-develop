@@ -129,6 +129,8 @@ void DFTU::init(
 		this->iwt2m.at(i) = -1;
 		this->iwt2ipol.at(i) = -1;
 	}
+
+	int num_locale=0;
 	//it:index of type of atom
 	for(int it=0; it<cell.ntype; ++it)
 	{				
@@ -161,6 +163,7 @@ void DFTU::init(
 
 						locale_save.at(iat).at(l).at(n).at(0).create(2*l+1, 2*l+1);
 						locale_save.at(iat).at(l).at(n).at(1).create(2*l+1, 2*l+1);
+						num_locale+=(2*l+1)*(2*l+1)*2;
 					}
 					else if(nspin==4) //SOC
 					{
@@ -169,6 +172,7 @@ void DFTU::init(
 
 						locale.at(iat).at(l).at(n).at(0).create((2*l+1)*npol, (2*l+1)*npol);
 						locale_save.at(iat).at(l).at(n).at(0).create((2*l+1)*npol, (2*l+1)*npol);
+						num_locale+=(2*l+1)*(2*l+1)*npol*npol;
 					}												
 				}
 			}
@@ -264,7 +268,8 @@ void DFTU::init(
 			this->local_occup_bcast();
 		}
 	}
-	ModuleBase::Memory::record("DFTU","locale",GlobalV::NLOCAL*GlobalV::NLOCAL,"double");
+	//cout<<"num_locale"<<num_locale<<"nlocal"<<GlobalV::NLOCAL;
+	ModuleBase::Memory::record("DFTU","locale",num_locale,"double");
 	//this->out_numorb();
 
   //GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__ << std::endl;
@@ -295,16 +300,14 @@ void DFTU::cal_occup_m_k(const int iter)
 					if(GlobalV::NSPIN==4)
 					{
 						locale_save[iat][l][n][0] = locale[iat][l][n][0];
-
-            locale[iat][l][n][0].zero_out();
+            			locale[iat][l][n][0].zero_out();
 					}
 					else if(GlobalV::NSPIN==1 || GlobalV::NSPIN==2)
 					{
 						locale_save[iat][l][n][0] = locale[iat][l][n][0];
 						locale_save[iat][l][n][1] = locale[iat][l][n][1];
-
-            locale[iat][l][n][0].zero_out();
-            locale[iat][l][n][1].zero_out();
+						locale[iat][l][n][0].zero_out();
+						locale[iat][l][n][1].zero_out();
 					}
 				}
 			}			
@@ -333,16 +336,16 @@ void DFTU::cal_occup_m_k(const int iter)
 				&beta, 
 				&srho[0], &one_int, &one_int, GlobalC::ParaO.desc);
 
-    const int spin = GlobalC::kv.isk[ik];
-    for(int it=0; it<GlobalC::ucell.ntype; it++)
-	  {
-	  	const int NL = GlobalC::ucell.atoms[it].nwl + 1;
-	  	const int LC = orbital_corr[it];
-  
-	  	if(LC == -1) continue;
+    	const int spin = GlobalC::kv.isk[ik];
+    	for(int it=0; it<GlobalC::ucell.ntype; it++)
+	  	{
+			const int NL = GlobalC::ucell.atoms[it].nwl + 1;
+			const int LC = orbital_corr[it];
+	
+			if(LC == -1) continue;
 
-		  for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
-		  {		
+		  	for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
+		  	{		
 		  	const int iat = GlobalC::ucell.itia2iat(it, ia);
 
 		  	for(int l=0; l<NL; l++)
@@ -396,19 +399,19 @@ void DFTU::cal_occup_m_k(const int iter)
 		  					}//m1
 		  				}//ipol0
 		  			}//m0
-		  		}//end n
+		  			}//end n
 		  		// this->print(it, iat, l, N, iter);
-		  	}//end l
-		  }//end ia
-	  }//end it
+		  		}//end l
+		  	}//end ia
+	  	}//end it
 	}//ik
 
-  for(int it=0; it<GlobalC::ucell.ntype; it++)
+  	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-	  const int NL = GlobalC::ucell.atoms[it].nwl + 1;
-	  const int LC = orbital_corr[it];
+	  	const int NL = GlobalC::ucell.atoms[it].nwl + 1;
+	  	const int LC = orbital_corr[it];
   
-	  if(LC == -1) continue;
+	  	if(LC == -1) continue;
 
 		for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{		
@@ -426,58 +429,57 @@ void DFTU::cal_occup_m_k(const int iter)
 				// }
 				if(l!=orbital_corr[it]) continue;
 
-	  		const int N = GlobalC::ucell.atoms[it].l_nchi[l];
+	  			const int N = GlobalC::ucell.atoms[it].l_nchi[l];
 
-	  		for(int n=0; n<N; n++)
-	  		{
-	  		 	// if(!Yukawa && n!=0) continue;
-	  			if(n!=0) continue;
-	  			// set the local occupation mumber matrix of spin up and down zeros
+				for(int n=0; n<N; n++)
+				{
+					// if(!Yukawa && n!=0) continue;
+					if(n!=0) continue;
+					// set the local occupation mumber matrix of spin up and down zeros
 
 					if(GlobalV::NSPIN==1 || GlobalV::NSPIN==4)
 					{
-            ModuleBase::matrix temp(locale[iat][l][n][0]);
+						ModuleBase::matrix temp(locale[iat][l][n][0]);
 						MPI_Allreduce( &temp(0,0), &locale[iat][l][n][0](0,0), (2*l+1)*GlobalV::NPOL*(2*l+1)*GlobalV::NPOL,
-										      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
+												MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 					}
 					else if(GlobalV::NSPIN==2)
 					{
-            ModuleBase::matrix temp0(locale[iat][l][n][0]);
+						ModuleBase::matrix temp0(locale[iat][l][n][0]);
 						MPI_Allreduce( &temp0(0,0), &locale[iat][l][n][0](0,0), (2*l+1)*(2*l+1),
-										      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
+												MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 
 						ModuleBase::matrix temp1(locale[iat][l][n][1]);
 						MPI_Allreduce( &temp1(0,0), &locale[iat][l][n][1](0,0), (2*l+1)*(2*l+1),
-										      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
+												MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 					}
 				
 					// for the case spin independent calculation
 					switch(GlobalV::NSPIN)
 					{
-					  case 1:
-              locale[iat][l][n][0] += transpose(locale[iat][l][n][0]);
-              locale[iat][l][n][0] *= 0.5;
-              locale[iat][l][n][1] += locale[iat][l][n][0];
-					  	break;
+						case 1:
+						locale[iat][l][n][0] += transpose(locale[iat][l][n][0]);
+						locale[iat][l][n][0] *= 0.5;
+						locale[iat][l][n][1] += locale[iat][l][n][0];
+						break;
 
-					  case 2:
-					  	for(int is=0; is<GlobalV::NSPIN; is++)
-                locale[iat][l][n][is] += transpose(locale[iat][l][n][is]);
-					  	break;
+						case 2:
+						for(int is=0; is<GlobalV::NSPIN; is++)
+							locale[iat][l][n][is] += transpose(locale[iat][l][n][is]);
+						break;
 
-					  case 4: //SOC
-					  	locale[iat][l][n][0] += transpose(locale[iat][l][n][0]);
-					  	break;
+						case 4: //SOC
+						locale[iat][l][n][0] += transpose(locale[iat][l][n][0]);
+						break;
 
-					  default:
-					  	std::cout << "Not supported NSPIN parameter" << std::endl;
-					  	exit(0);			
+						default:
+						std::cout << "Not supported NSPIN parameter" << std::endl;
+						exit(0);			
 					}
-
-	  		}//end n
+				}//end n
 	  		// this->print(it, iat, l, N, iter);
-	  	}//end l
-	  }//end ia
+	  		}//end l
+	  	}//end ia
 	}//end it
 
 	//GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << std::endl;
@@ -507,9 +509,8 @@ void DFTU::cal_occup_m_gamma(const int iter)
 				{									
 					locale_save[iat][l][n][0] = locale[iat][l][n][0];
 					locale_save[iat][l][n][1] = locale[iat][l][n][1];	
-
-          locale[iat][l][n][0].zero_out();
-          locale[iat][l][n][1].zero_out();				
+					locale[iat][l][n][0].zero_out();
+					locale[iat][l][n][1].zero_out();				
 				}
 			}			
 		}
@@ -1150,7 +1151,11 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, std::complex<d
 {
 	ModuleBase::TITLE("DFTU", "cal_eff_pot_mat");
 	ModuleBase::timer::tick("DFTU", "cal_eff_pot_mat");
- 	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!omc) && istep==0 && this->iter_dftu==1) return;
+ 	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!omc) && istep==0 && this->iter_dftu==1)
+	{
+		ModuleBase::timer::tick("DFTU", "cal_eff_pot_mat");
+		return;
+	} 
 	
 	int spin = GlobalC::kv.isk[ik];
 
@@ -1233,7 +1238,11 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 {
 	ModuleBase::TITLE("DFTU", "cal_eff_pot_mat");
 	ModuleBase::timer::tick("DFTU", "cal_eff_pot_mat");
- 	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!omc) && istep==0 && this->iter_dftu==1) return;
+ 	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!omc) && istep==0 && this->iter_dftu==1)
+	{
+		ModuleBase::timer::tick("DFTU", "cal_eff_pot_mat");
+		return;
+	} 
 	
 	int spin = GlobalC::kv.isk[ik];
 
