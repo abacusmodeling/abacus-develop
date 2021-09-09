@@ -268,9 +268,8 @@ void DFTU::init(
 			this->local_occup_bcast();
 		}
 	}
-	//cout<<"num_locale"<<num_locale<<"nlocal"<<GlobalV::NLOCAL;
+	
 	ModuleBase::Memory::record("DFTU","locale",num_locale,"double");
-	//this->out_numorb();
 
   //GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__ << std::endl;
     return;
@@ -1167,10 +1166,10 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, std::complex<d
 	//=============================================================
 	const char transN = 'N', transT = 'T';
 	const int  one_int = 1;
-  const std::complex<double> zero(0.0,0.0), half(0.5,0.0), one(1.0,0.0);
+  	const std::complex<double> zero(0.0,0.0), half(0.5,0.0), one(1.0,0.0);
 
 	std::vector<std::complex<double>> VU(GlobalC::ParaO.nloc);
-  this->cal_VU_pot_mat_complex(spin, true, &VU[0]);
+  	this->cal_VU_pot_mat_complex(spin, true, &VU[0]);
 
 	pzgemm_(&transN, &transN,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
@@ -1180,15 +1179,15 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, std::complex<d
 		&zero,
 		eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
 
-  for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
+  	for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
     VU[irc] = eff_pot[irc];
   
-  //pztranc(m, n, alpha, a, ia, ja, desca, beta, c, ic, jc, descc)
-  pztranc_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
-           &one, 
-           &VU[0], &one_int, &one_int, GlobalC::ParaO.desc, 
-           &one, 
-           eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
+  	//pztranc(m, n, alpha, a, ia, ja, desca, beta, c, ic, jc, descc)
+  	pztranc_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
+		&one, 
+		&VU[0], &one_int, &one_int, GlobalC::ParaO.desc, 
+		&one, 
+		eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
 
 	//code for testing whther the effective potential is Hermitian
 	/*
@@ -1257,7 +1256,7 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 	const double alpha = 1.0, beta = 0.0, half=0.5, one=1.0;
 
 	std::vector<double> VU(GlobalC::ParaO.nloc);
-  this->cal_VU_pot_mat_real(spin, 1, &VU[0]);
+  	this->cal_VU_pot_mat_real(spin, 1, &VU[0]);
 
 	pdgemm_(&transN, &transN,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
@@ -1267,15 +1266,15 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 		&beta,
 		eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
 
-  for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
-    VU[irc] = eff_pot[irc];
+  	for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
+    	VU[irc] = eff_pot[irc];
   
-  // pdtran(m, n, alpha, a, ia, ja, desca, beta, c, ic, jc, descc)
-  pdtran_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
-          &one, 
-          &VU[0], &one_int, &one_int, GlobalC::ParaO.desc, 
-          &one, 
-          eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
+	// pdtran(m, n, alpha, a, ia, ja, desca, beta, c, ic, jc, descc)
+	pdtran_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
+		&one, 
+		&VU[0], &one_int, &one_int, GlobalC::ParaO.desc, 
+		&one, 
+		eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
 
 	//code for testing whther the effective potential is Hermitian
 	/*
@@ -1438,14 +1437,14 @@ void DFTU::output()
 
 void DFTU::cal_eff_pot_mat_R_double(const int ispin, double* SR, double* HR)
 {
-  const char transN = 'N', transT = 'T';
+  	const char transN = 'N', transT = 'T';
 	const int  one_int = 1;
 	const double alpha = 1.0, beta = 0.0, one=1.0, half=0.5;
 
-  for(int i=0; i<GlobalC::ParaO.nloc; i++) HR[i] = 0.0;
+  	for(int i=0; i<GlobalC::ParaO.nloc; i++) HR[i] = 0.0;
 
-  std::vector<double> VU(GlobalC::ParaO.nloc);
-  this->cal_VU_pot_mat_real(ispin, 1, &VU[0]);
+	std::vector<double> VU(GlobalC::ParaO.nloc);
+	this->cal_VU_pot_mat_real(ispin, 1, &VU[0]);
 
 	pdgemm_(&transN, &transN,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
@@ -1458,11 +1457,11 @@ void DFTU::cal_eff_pot_mat_R_double(const int ispin, double* SR, double* HR)
 	for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
 		VU[irc] = HR[irc];
 
-  pdtran_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
-          &one, 
-          &VU[0], &one_int, &one_int, GlobalC::ParaO.desc, 
-          &one, 
-          HR, &one_int, &one_int, GlobalC::ParaO.desc);
+  	pdtran_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
+	  &one, 
+	  &VU[0], &one_int, &one_int, GlobalC::ParaO.desc, 
+	  &one, 
+	  HR, &one_int, &one_int, GlobalC::ParaO.desc);
 
   return;
 }
@@ -1470,15 +1469,15 @@ void DFTU::cal_eff_pot_mat_R_double(const int ispin, double* SR, double* HR)
 void DFTU::cal_eff_pot_mat_R_complex_double(
   const int ispin, std::complex<double>* SR, std::complex<double>* HR)
 {
-  const char transN = 'N', transT = 'T';
+  	const char transN = 'N', transT = 'T';
 	const int  one_int = 1;
 	const std::complex<double> alpha(1.0,0.0), beta(0.0,0.0);
-  const std::complex<double> zero(0.0,0.0), half(0.5,0.0), one(1.0,0.0);
+  	const std::complex<double> zero(0.0,0.0), half(0.5,0.0), one(1.0,0.0);
 
-  for(int i=0; i<GlobalC::ParaO.nloc; i++) HR[i] = zero;
+  	for(int i=0; i<GlobalC::ParaO.nloc; i++) HR[i] = zero;
 
-  std::vector<std::complex<double>> VU(GlobalC::ParaO.nloc);
-  this->cal_VU_pot_mat_complex(ispin, 1, &VU[0]);
+  	std::vector<std::complex<double>> VU(GlobalC::ParaO.nloc);
+  	this->cal_VU_pot_mat_complex(ispin, 1, &VU[0]);
 
 	pzgemm_(&transN, &transN,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
@@ -1489,23 +1488,23 @@ void DFTU::cal_eff_pot_mat_R_complex_double(
 		HR, &one_int, &one_int, GlobalC::ParaO.desc);
 
 	for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
-	  VU[irc] = HR[irc];
+	  	VU[irc] = HR[irc];
 
-  pztranc_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
-           &one, 
-           &VU[0], &one_int, &one_int, GlobalC::ParaO.desc, 
-           &one, 
-           HR, &one_int, &one_int, GlobalC::ParaO.desc);
+  	pztranc_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
+		&one, 
+		&VU[0], &one_int, &one_int, GlobalC::ParaO.desc, 
+		&one, 
+		HR, &one_int, &one_int, GlobalC::ParaO.desc);
 
-  return;
+  	return;
 }
 
 void DFTU::folding_overlap_matrix(const int ik, std::complex<double>* Sk)
 {
-  ModuleBase::TITLE("DFTU","folding_overlap_matrix"); 
+  	ModuleBase::TITLE("DFTU","folding_overlap_matrix"); 
 	ModuleBase::timer::tick("DFTU","folding_overlap_matrix");
 
-  ModuleBase::GlobalFunc::ZEROS(Sk, GlobalC::ParaO.nloc);
+  	ModuleBase::GlobalFunc::ZEROS(Sk, GlobalC::ParaO.nloc);
 
 	int iat = 0;
 	int index = 0;
@@ -1604,15 +1603,15 @@ void DFTU::folding_overlap_matrix(const int ik, std::complex<double>* Sk)
 
 							if(nu<0)continue;
 							//const int iic = mu*GlobalC::ParaO.ncol+nu;
-              int iic;
-              if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
-              {
-                  iic=mu+nu*GlobalC::ParaO.nrow;
-              }
-              else
-              {
-                  iic=mu*GlobalC::ParaO.ncol+nu;
-              }
+							int iic;
+							if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+							{
+								iic=mu+nu*GlobalC::ParaO.nrow;
+							}
+							else
+							{
+								iic=mu*GlobalC::ParaO.ncol+nu;
+							}
 
 							//########################### EXPLAIN ###############################
 							// 1. overlap matrix with k point

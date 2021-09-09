@@ -72,25 +72,25 @@ void DFTU_RELAX::force_stress()
 			this->stress_dftu.at(dim).at(1) = 0.0;
 			this->stress_dftu.at(dim).at(2) = 0.0;
 		}
-  }
+  	}
 
-  if(GlobalV::GAMMA_ONLY_LOCAL)
-  {
-    const char transN = 'N', transT = 'T';
-	  const int  one_int = 1;
-	  const double alpha = 1.0, beta = 0.0;
+	if(GlobalV::GAMMA_ONLY_LOCAL)
+	{
+    	const char transN = 'N', transT = 'T';
+	  	const int  one_int = 1;
+	  	const double alpha = 1.0, beta = 0.0;
 
-    std::vector<double> rho_VU(GlobalC::ParaO.nloc);
+    	std::vector<double> rho_VU(GlobalC::ParaO.nloc);
 
-    for(int ik=0; ik<GlobalC::kv.nks; ik++)
-	  {
+    	for(int ik=0; ik<GlobalC::kv.nks; ik++)
+	  	{
 		  
-	  	const int spin = GlobalC::kv.isk[ik];
+	  		const int spin = GlobalC::kv.isk[ik];
 
-      double* VU = new double [GlobalC::ParaO.nloc];
-      this->cal_VU_pot_mat_real(spin, false, VU);
-	  ModuleBase::timer::tick("DFTU_RELAX", "cal_rho_VU");
-      pdgemm_(&transT, &transN,
+			double* VU = new double [GlobalC::ParaO.nloc];
+			this->cal_VU_pot_mat_real(spin, false, VU);
+			ModuleBase::timer::tick("DFTU_RELAX", "cal_rho_VU");
+			pdgemm_(&transT, &transN,
 					    &GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 					    &alpha, 
 					    GlobalC::LOC.wfc_dm_2d.dm_gamma[spin].c, &one_int, &one_int, GlobalC::ParaO.desc, 
@@ -98,28 +98,28 @@ void DFTU_RELAX::force_stress()
 					    &beta,
 					    &rho_VU[0], &one_int, &one_int, GlobalC::ParaO.desc);
 
-      delete [] VU;
-		ModuleBase::timer::tick("DFTU_RELAX", "cal_rho_VU");
-      if(GlobalV::FORCE) this->cal_force_gamma(&rho_VU[0]);
-      if(GlobalV::STRESS) this->cal_stress_gamma(&rho_VU[0]);
-    }//ik
-  }
-  else
-  {
-    const char transN = 'N', transT = 'T';
-	  const int  one_int = 1;
-	  const std::complex<double> alpha(1.0,0.0), beta(0.0,0.0);
+      		delete [] VU;
+			ModuleBase::timer::tick("DFTU_RELAX", "cal_rho_VU");
+      		if(GlobalV::FORCE) this->cal_force_gamma(&rho_VU[0]);
+      		if(GlobalV::STRESS) this->cal_stress_gamma(&rho_VU[0]);
+    	}//ik
+  	}
+  	else
+  	{
+    	const char transN = 'N', transT = 'T';
+	  	const int  one_int = 1;
+	  	const std::complex<double> alpha(1.0,0.0), beta(0.0,0.0);
 
-    std::vector<std::complex<double>> rho_VU(GlobalC::ParaO.nloc);
+    	std::vector<std::complex<double>> rho_VU(GlobalC::ParaO.nloc);
 
-    for(int ik=0; ik<GlobalC::kv.nks; ik++)
-	  {
-	  	const int spin = GlobalC::kv.isk[ik];
+    	for(int ik=0; ik<GlobalC::kv.nks; ik++)
+	  	{
+	  		const int spin = GlobalC::kv.isk[ik];
 
-      std::complex<double>* VU = new std::complex<double> [GlobalC::ParaO.nloc];
-      this->cal_VU_pot_mat_complex(spin, false, VU);
-	  ModuleBase::timer::tick("DFTU_RELAX", "cal_rho_VU");
-      pzgemm_(&transT, &transN,
+			std::complex<double>* VU = new std::complex<double> [GlobalC::ParaO.nloc];
+			this->cal_VU_pot_mat_complex(spin, false, VU);
+			ModuleBase::timer::tick("DFTU_RELAX", "cal_rho_VU");
+			pzgemm_(&transT, &transN,
 					    &GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 					    &alpha, 
 					    GlobalC::LOC.wfc_dm_2d.dm_k[ik].c, &one_int, &one_int, GlobalC::ParaO.desc, 
@@ -127,13 +127,13 @@ void DFTU_RELAX::force_stress()
 					    &beta,
 					    &rho_VU[0], &one_int, &one_int, GlobalC::ParaO.desc);
 
-      delete [] VU;
-	  ModuleBase::timer::tick("DFTU_RELAX", "cal_rho_VU");
+      		delete [] VU;
+	  		ModuleBase::timer::tick("DFTU_RELAX", "cal_rho_VU");
 
-      if(GlobalV::FORCE) this->cal_force_k(ik, &rho_VU[0]);
-      if(GlobalV::STRESS) cal_stress_k(ik, &rho_VU[0]);
-    }//ik
-  }
+      		if(GlobalV::FORCE) this->cal_force_k(ik, &rho_VU[0]);
+      		if(GlobalV::STRESS) cal_stress_k(ik, &rho_VU[0]);
+    	}//ik
+  	}
 
 	if(GlobalV::FORCE)
 	{
@@ -468,19 +468,18 @@ double DFTU_RELAX::get_onebody_eff_pot
 
 void DFTU_RELAX::cal_VU_pot_mat_complex(const int spin, const bool newlocale, std::complex<double>* VU)
 {
-  ModuleBase::TITLE("DFTU_RELAX","cal_VU_pot_mat_complex"); 
-	// ModuleBase::timer::tick("DFTU","folding_overlap_matrix");
-  ModuleBase::GlobalFunc::ZEROS(VU, GlobalC::ParaO.nloc);
+	ModuleBase::TITLE("DFTU_RELAX","cal_VU_pot_mat_complex"); 
+	ModuleBase::GlobalFunc::ZEROS(VU, GlobalC::ParaO.nloc);
 
-  for(int it=0; it<GlobalC::ucell.ntype; ++it)
+	for(int it=0; it<GlobalC::ucell.ntype; ++it)
 	{
-    if(INPUT.orbital_corr[it]==-1) continue;
+    	if(INPUT.orbital_corr[it]==-1) continue;
 		for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{
-      const int iat = GlobalC::ucell.itia2iat(it, ia);
+      		const int iat = GlobalC::ucell.itia2iat(it, ia);
 			for(int L=0; L<=GlobalC::ucell.atoms[it].nwl; L++)
 			{			
-        if(L!=INPUT.orbital_corr[it] ) continue;
+        		if(L!=INPUT.orbital_corr[it] ) continue;
 
 				for(int n=0; n<GlobalC::ucell.atoms[it].l_nchi[L]; n++)
 				{
@@ -492,29 +491,29 @@ void DFTU_RELAX::cal_VU_pot_mat_complex(const int spin, const bool newlocale, st
 			    // {
 			    	if(n!=0) continue;
 			    // }
-          for(int m1=0; m1<2*L+1; m1++)
-          {
-            for(int ipol1=0; ipol1<GlobalV::NPOL; ipol1++)
-		  		  {
-		  			  const int mu = GlobalC::ParaO.trace_loc_row[this->iatlnmipol2iwt[iat][L][n][m1][ipol1]];
-              if(mu<0) continue;
+          			for(int m1=0; m1<2*L+1; m1++)
+          			{
+            			for(int ipol1=0; ipol1<GlobalV::NPOL; ipol1++)
+		  		  		{
+		  			  		const int mu = GlobalC::ParaO.trace_loc_row[this->iatlnmipol2iwt[iat][L][n][m1][ipol1]];
+              				if(mu<0) continue;
 
-              for(int m2=0; m2<2*L+1; m2++)
-              {
-                for(int ipol2=0; ipol2<GlobalV::NPOL; ipol2++)
-                {
-                  const int nu = GlobalC::ParaO.trace_loc_col[this->iatlnmipol2iwt[iat][L][n][m2][ipol2]];
-                  if(nu<0) continue;
+              				for(int m2=0; m2<2*L+1; m2++)
+              				{
+                				for(int ipol2=0; ipol2<GlobalV::NPOL; ipol2++)
+                				{
+                 					const int nu = GlobalC::ParaO.trace_loc_col[this->iatlnmipol2iwt[iat][L][n][m2][ipol2]];
+                  					if(nu<0) continue;
 
-                  int m1_all = m1 + (2*L+1)*ipol1;
-			            int m2_all = m2 + (2*L+1)*ipol2;
+                  					int m1_all = m1 + (2*L+1)*ipol1;
+			            			int m2_all = m2 + (2*L+1)*ipol2;
                   
-                  double val = get_onebody_eff_pot(it, iat, L, n, spin, m1_all, m2_all, cal_type, newlocale);
-			            VU[nu*GlobalC::ParaO.nrow + mu] = std::complex<double>(val, 0.0);
-                }//ipol2
-              }//m2
-            }//ipol1
-          }//m1
+                  					double val = get_onebody_eff_pot(it, iat, L, n, spin, m1_all, m2_all, cal_type, newlocale);
+			            			VU[nu*GlobalC::ParaO.nrow + mu] = std::complex<double>(val, 0.0);
+                				}//ipol2
+              				}//m2
+            			}//ipol1
+          			}//m1
 				}//n
 			}//l
 		}//ia	
@@ -525,19 +524,19 @@ void DFTU_RELAX::cal_VU_pot_mat_complex(const int spin, const bool newlocale, st
 
 void DFTU_RELAX::cal_VU_pot_mat_real(const int spin, const bool newlocale, double* VU)
 {
-  ModuleBase::TITLE("DFTU_RELAX","cal_VU_pot_mat_real"); 
-	// ModuleBase::timer::tick("DFTU","folding_overlap_matrix");
-  ModuleBase::GlobalFunc::ZEROS(VU, GlobalC::ParaO.nloc);
+	ModuleBase::TITLE("DFTU_RELAX","cal_VU_pot_mat_real"); 
+		// ModuleBase::timer::tick("DFTU","folding_overlap_matrix");
+	ModuleBase::GlobalFunc::ZEROS(VU, GlobalC::ParaO.nloc);
 
-  for(int it=0; it<GlobalC::ucell.ntype; ++it)
+  	for(int it=0; it<GlobalC::ucell.ntype; ++it)
 	{
-    if(INPUT.orbital_corr[it]==-1) continue;
+    	if(INPUT.orbital_corr[it]==-1) continue;
 		for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{
-      const int iat = GlobalC::ucell.itia2iat(it, ia);
+      		const int iat = GlobalC::ucell.itia2iat(it, ia);
 			for(int L=0; L<=GlobalC::ucell.atoms[it].nwl; L++)
 			{			
-        if(L!=INPUT.orbital_corr[it] ) continue;
+        		if(L!=INPUT.orbital_corr[it] ) continue;
 
 				for(int n=0; n<GlobalC::ucell.atoms[it].l_nchi[L]; n++)
 				{
@@ -549,28 +548,28 @@ void DFTU_RELAX::cal_VU_pot_mat_real(const int spin, const bool newlocale, doubl
 			    // {
 			    	if(n!=0) continue;
 			    // }
-          for(int m1=0; m1<2*L+1; m1++)
-          {
-            for(int ipol1=0; ipol1<GlobalV::NPOL; ipol1++)
-		  		  {
-		  			  const int mu = GlobalC::ParaO.trace_loc_row[this->iatlnmipol2iwt[iat][L][n][m1][ipol1]];
-              if(mu<0) continue;
-              for(int m2=0; m2<2*L+1; m2++)
-              {
-                for(int ipol2=0; ipol2<GlobalV::NPOL; ipol2++)
-                {
-                  const int nu = GlobalC::ParaO.trace_loc_col[this->iatlnmipol2iwt[iat][L][n][m2][ipol2]];
-                  if(nu<0) continue;
+          			for(int m1=0; m1<2*L+1; m1++)
+          			{
+            			for(int ipol1=0; ipol1<GlobalV::NPOL; ipol1++)
+		  		  		{
+		  			  		const int mu = GlobalC::ParaO.trace_loc_row[this->iatlnmipol2iwt[iat][L][n][m1][ipol1]];
+              				if(mu<0) continue;
+              				for(int m2=0; m2<2*L+1; m2++)
+              				{
+                				for(int ipol2=0; ipol2<GlobalV::NPOL; ipol2++)
+                				{
+									const int nu = GlobalC::ParaO.trace_loc_col[this->iatlnmipol2iwt[iat][L][n][m2][ipol2]];
+									if(nu<0) continue;
 
-                  int m1_all = m1 + (2*L+1)*ipol1;
-			            int m2_all = m2 + (2*L+1)*ipol2;
+                  					int m1_all = m1 + (2*L+1)*ipol1;
+			            			int m2_all = m2 + (2*L+1)*ipol2;
                   
-                  VU[nu*GlobalC::ParaO.nrow + mu] = this->get_onebody_eff_pot(it, iat, L, n, spin, m1_all, m2_all, cal_type, newlocale);
+                  					VU[nu*GlobalC::ParaO.nrow + mu] = this->get_onebody_eff_pot(it, iat, L, n, spin, m1_all, m2_all, cal_type, newlocale);
 
-                }//ipol2
-              }//m2
-            }//ipol1
-          }//m1
+                				}//ipol2
+              				}//m2
+            			}//ipol1
+          			}//m1
 				}//n
 			}//l
 		}//ia	
@@ -581,85 +580,85 @@ void DFTU_RELAX::cal_VU_pot_mat_real(const int spin, const bool newlocale, doubl
 
 void DFTU_RELAX::fold_dSR_gamma(const int dim1, const int dim2, double* dSR_gamma)
 {
-  ModuleBase::TITLE("DFTU_RELAX","fold_dSR_gamma");
+	ModuleBase::TITLE("DFTU_RELAX","fold_dSR_gamma");
 
-  ModuleBase::GlobalFunc::ZEROS(dSR_gamma, GlobalC::ParaO.nloc);
+	ModuleBase::GlobalFunc::ZEROS(dSR_gamma, GlobalC::ParaO.nloc);
 
-  double* dS_ptr;
-  if(dim1==0) dS_ptr =  GlobalC::LM.DSloc_x;
-  else if(dim1==1) dS_ptr =  GlobalC::LM.DSloc_y;
-  else if(dim1==2) dS_ptr =  GlobalC::LM.DSloc_z;
+	double* dS_ptr;
+	if(dim1==0) dS_ptr =  GlobalC::LM.DSloc_x;
+	else if(dim1==1) dS_ptr =  GlobalC::LM.DSloc_y;
+	else if(dim1==2) dS_ptr =  GlobalC::LM.DSloc_z;
 
-  int nnr = 0;
+  	int nnr = 0;
 	ModuleBase::Vector3<double> tau1, tau2, dtau;
 	ModuleBase::Vector3<double> dtau1, dtau2, tau0;
-  for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
-  {
-	  Atom* atom1 = &GlobalC::ucell.atoms[T1];
-    for(int I1=0; I1<atom1->na; ++I1)
-    {
-		  tau1 = atom1->tau[I1];
-      const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);    
-      GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
-      for(int ad=0; ad<GlobalC::GridD.getAdjacentNum()+1; ++ad)
-      {
-        const int T2 = GlobalC::GridD.getType(ad);
-			  const int I2 = GlobalC::GridD.getNatom(ad);
-        const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-			  Atom* atom2 = &GlobalC::ucell.atoms[T2];
-			  tau2 = GlobalC::GridD.getAdjacentTau(ad);
-			  dtau = tau2 - tau1;
-			  double distance = dtau.norm() * GlobalC::ucell.lat0;
-			  double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
-        bool adj = false;
-			  if(distance < rcut) adj = true;
-			  else if(distance >= rcut)
-			  {
-			  	for (int ad0 = 0; ad0 < GlobalC::GridD.getAdjacentNum()+1; ++ad0)
-			  	{
-			  		const int T0 = GlobalC::GridD.getType(ad0); 
-			  		const int I0 = GlobalC::GridD.getNatom(ad0); 
-			  		const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
-			  		const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
-			  		tau0 = GlobalC::GridD.getAdjacentTau(ad0);
-			  		dtau1 = tau0 - tau1;
-			  		dtau2 = tau0 - tau2;
-			  		double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
-			  		double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
-			  		double rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
-			  		double rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
-			  		if( distance1 < rcut1 && distance2 < rcut2 )
+  	for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
+  	{
+	  	Atom* atom1 = &GlobalC::ucell.atoms[T1];
+		for(int I1=0; I1<atom1->na; ++I1)
+		{
+		  	tau1 = atom1->tau[I1];
+			const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);    
+			GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+			for(int ad=0; ad<GlobalC::GridD.getAdjacentNum()+1; ++ad)
+			{
+				const int T2 = GlobalC::GridD.getType(ad);
+				const int I2 = GlobalC::GridD.getNatom(ad);
+				const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
+				Atom* atom2 = &GlobalC::ucell.atoms[T2];
+				tau2 = GlobalC::GridD.getAdjacentTau(ad);
+				dtau = tau2 - tau1;
+				double distance = dtau.norm() * GlobalC::ucell.lat0;
+				double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
+        		bool adj = false;
+				if(distance < rcut) adj = true;
+				else if(distance >= rcut)
+				{
+			  		for (int ad0 = 0; ad0 < GlobalC::GridD.getAdjacentNum()+1; ++ad0)
 			  		{
-			  			adj = true;
-			  			break;
+						const int T0 = GlobalC::GridD.getType(ad0); 
+						const int I0 = GlobalC::GridD.getNatom(ad0); 
+						const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
+						const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
+						tau0 = GlobalC::GridD.getAdjacentTau(ad0);
+						dtau1 = tau0 - tau1;
+						dtau2 = tau0 - tau2;
+						double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
+						double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
+						double rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
+						double rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
+						if( distance1 < rcut1 && distance2 < rcut2 )
+						{
+							adj = true;
+							break;
+						}
 			  		}
-			  	}
-			  }	
+			  	}	
 
-			  if(adj)
-			  {
-			  	for(int jj=0; jj<atom1->nw*GlobalV::NPOL; ++jj)
-			  	{
-            const int jj0 = jj/GlobalV::NPOL;
-            const int iw1_all = start1 + jj0; 
-            const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
-				    if(mu<0)continue;
+				if(adj)
+				{
+					for(int jj=0; jj<atom1->nw*GlobalV::NPOL; ++jj)
+					{
+						const int jj0 = jj/GlobalV::NPOL;
+						const int iw1_all = start1 + jj0; 
+						const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
+				    	if(mu<0)continue;
 
-			  		for(int kk=0; kk<atom2->nw*GlobalV::NPOL; ++kk)
-			  		{
-              const int kk0 = kk/GlobalV::NPOL;
-              const int iw2_all = start2 + kk0;
-					    const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
-					    if(nu<0)continue;
+						for(int kk=0; kk<atom2->nw*GlobalV::NPOL; ++kk)
+						{
+							const int kk0 = kk/GlobalV::NPOL;
+							const int iw2_all = start2 + kk0;
+							const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
+							if(nu<0)continue;
 
-              dSR_gamma[nu*GlobalC::ParaO.nrow + mu] += dS_ptr[nnr]*GlobalC::LM.DH_r[nnr*3+dim2];
+              				dSR_gamma[nu*GlobalC::ParaO.nrow + mu] += dS_ptr[nnr]*GlobalC::LM.DH_r[nnr*3+dim2];
 
-			  			++nnr;
-			  		}// kk
-			    }// jj
-			  }// adj
-		  }// ad
-	  }// I1
+			  				++nnr;
+			  			}// kk
+			    	}// jj
+			  	}// adj
+		  	}// ad
+	  	}// I1
 	}// T1
 
 	return;
@@ -788,79 +787,79 @@ void DFTU_RELAX::fold_dSR_k(const int ik, const int dim1, const int dim2, std::c
 		  	tau1 = atom1->tau[I1];
       		const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);    
 
-      GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
-      for(int ad=0; ad<GlobalC::GridD.getAdjacentNum()+1; ++ad)
-      {
-        const int T2 = GlobalC::GridD.getType(ad);
-			  const int I2 = GlobalC::GridD.getNatom(ad);
-        const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
+      		GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+			for(int ad=0; ad<GlobalC::GridD.getAdjacentNum()+1; ++ad)
+			{
+				const int T2 = GlobalC::GridD.getType(ad);
+				const int I2 = GlobalC::GridD.getNatom(ad);
+				const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 
-			  Atom* atom2 = &GlobalC::ucell.atoms[T2];
+				Atom* atom2 = &GlobalC::ucell.atoms[T2];
 
-			  tau2 = GlobalC::GridD.getAdjacentTau(ad);
-			  dtau = tau2 - tau1;
+				tau2 = GlobalC::GridD.getAdjacentTau(ad);
+				dtau = tau2 - tau1;
 
-			  double distance = dtau.norm() * GlobalC::ucell.lat0;
-			  double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
+				double distance = dtau.norm() * GlobalC::ucell.lat0;
+				double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 
-        bool adj = false;
-			  if(distance < rcut) adj = true;
-			  else if(distance >= rcut)
-			  {
-			  	for (int ad0 = 0; ad0 < GlobalC::GridD.getAdjacentNum()+1; ++ad0)
-			  	{
-			  		const int T0 = GlobalC::GridD.getType(ad0); 
-			  		const int I0 = GlobalC::GridD.getNatom(ad0); 
-			  		const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
-			  		const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
-
-			  		tau0 = GlobalC::GridD.getAdjacentTau(ad0);
-			  		dtau1 = tau0 - tau1;
-			  		dtau2 = tau0 - tau2;
-
-			  		double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
-			  		double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
-
-			  		double rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
-			  		double rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
-
-			  		if( distance1 < rcut1 && distance2 < rcut2 )
+				bool adj = false;
+				if(distance < rcut) adj = true;
+				else if(distance >= rcut)
+				{
+					for (int ad0 = 0; ad0 < GlobalC::GridD.getAdjacentNum()+1; ++ad0)
 			  		{
-			  			adj = true;
-			  			break;
+						const int T0 = GlobalC::GridD.getType(ad0); 
+						const int I0 = GlobalC::GridD.getNatom(ad0); 
+						const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
+						const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
+
+						tau0 = GlobalC::GridD.getAdjacentTau(ad0);
+						dtau1 = tau0 - tau1;
+						dtau2 = tau0 - tau2;
+
+						double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
+						double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
+
+						double rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
+						double rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
+
+						if( distance1 < rcut1 && distance2 < rcut2 )
+						{
+							adj = true;
+							break;
+						}
 			  		}
-			  	}
-			  }				
+			  	}				
 
-			  if(adj)
-			  {
-			  	for(int jj=0; jj<atom1->nw*GlobalV::NPOL; ++jj)
-			  	{
-            const int jj0 = jj/GlobalV::NPOL;
-            const int iw1_all = start1 + jj0; 
-            const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
-				    if(mu<0)continue;
-
-			  		for(int kk=0; kk<atom2->nw*GlobalV::NPOL; ++kk)
+				if(adj)
+				{
+			  		for(int jj=0; jj<atom1->nw*GlobalV::NPOL; ++jj)
 			  		{
-              const int kk0 = kk/GlobalV::NPOL;
-              const int iw2_all = start2 + kk0;
-					    const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
-					    if(nu<0)continue;
+						const int jj0 = jj/GlobalV::NPOL;
+						const int iw1_all = start1 + jj0; 
+						const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
+				    	if(mu<0)continue;
+
+						for(int kk=0; kk<atom2->nw*GlobalV::NPOL; ++kk)
+						{
+							const int kk0 = kk/GlobalV::NPOL;
+							const int iw2_all = start2 + kk0;
+							const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
+							if(nu<0)continue;
               	
-			  			ModuleBase::Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
-			  			const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * ModuleBase::TWO_PI;
-			  			const std::complex<double> kphase( cos(arg),  sin(arg) );
+							ModuleBase::Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
+							const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * ModuleBase::TWO_PI;
+							const std::complex<double> kphase( cos(arg),  sin(arg) );
 
-			  			dSR_k[nu*GlobalC::ParaO.nrow + mu] += dSm_ptr[nnr]*GlobalC::LM.DH_r[nnr*3+dim2]*kphase;														
+			  				dSR_k[nu*GlobalC::ParaO.nrow + mu] += dSm_ptr[nnr]*GlobalC::LM.DH_r[nnr*3+dim2]*kphase;														
 
-			  			++nnr;
-			  		}// kk
-			    }// jj
-			  }// adj
+			  				++nnr;
+			  			}// kk
+			    	}// jj
+			  	}// adj
         
-		  }// ad
-	  }// I1
+		  	}// ad
+	  	}// I1
 	}// T1
 
 	return;
