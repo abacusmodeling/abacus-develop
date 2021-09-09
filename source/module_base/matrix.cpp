@@ -383,6 +383,7 @@ std::ostream & operator<<( std::ostream & os, const matrix & m )
 }
 */
 
+// Peize Lin add 2021.09.08
 std::ostream & matrix::print( std::ostream & os, const double threshold ) const
 {
 	for( int ir=0; ir!=this->nr; ++ir )

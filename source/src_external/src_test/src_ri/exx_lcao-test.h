@@ -64,7 +64,7 @@ static void ofs_matrixes( const std::string & file_name, const ModuleBase::Compl
 {
 	std::ofstream ofs(file_name,std::ofstream::app);
 	if(flag_print_content)
-		ofs<<ms<<std::endl;	
+		ms.print(ofs, 1E-10, 1E-10)<<std::endl;	
 	ofs.close();
 }
 

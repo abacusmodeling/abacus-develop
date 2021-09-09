@@ -501,7 +501,7 @@ void Exx_Lcao::init()
 		}
 		ModuleBase::ComplexMatrix cm = ModuleBase::ComplexMatrix(m) * exp( -ModuleBase::TWO_PI*ModuleBase::IMAG_UNIT* 1.0/3.0 );
 		m.print(std::cout, 1E-10)<<std::endl;
-		std::cout<<cm<<std::endl;
+		cm.print(std::cout, 1E-10, 1E-10)<<std::endl;
 	};
 
 	auto test_nrm2 = []()
@@ -976,7 +976,7 @@ ofs_mpi.close();
 		for(int ik=0; ik!=Hexx_para.HK_K_m2D.size(); ++ik)
 		{
 			ofs<<"@\t"<<ik<<std::endl;
-			ofs<<Hexx_para.HK_K_m2D[ik]<<std::endl;
+			Hexx_para.HK_K_m2D[ik].print(ofs, 1E-10, 1E-10)<<std::endl;
 		};
 		ofs.close();
 	};
@@ -1106,7 +1106,7 @@ ofs_mpi.close();
 			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 			{
 				std::ofstream ofs("Hexx_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(ik)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
-				ofs<<this->Hexx_para.HK_K_m2D[ik]<<std::endl;
+				this->Hexx_para.HK_K_m2D[ik].print(ofs, 1E-10, 1E-10)<<std::endl;
 			}
 		}
 	};
