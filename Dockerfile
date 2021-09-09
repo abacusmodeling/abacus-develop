@@ -1,15 +1,9 @@
 FROM debian:bullseye-slim
 
-RUN apt-get update && apt-get install -y --no-install-recommends git gfortran libssl-dev make cmake vim wget bc \
+RUN apt-get update && apt-get install -y --no-install-recommends git gfortran libssl-dev make cmake vim wget bc unzip \
     && apt-get install -y --no-install-recommends mpich libmpich-dev
 
 ENV GIT_SSL_NO_VERIFY 1
-
-RUN export cmake_url="https://github.com/Kitware/CMake/releases/download/v3.20.0/cmake-3.20.0-linux-x86_64.sh" \
-    && wget --no-check-certificate --quiet $cmake_url \
-    && export file=$(basename "$cmake_url") \
-    && bash $file --prefix=/usr --skip-license \
-    && rm $file
 
 RUN cd /tmp \
     && git clone https://github.com/USCiLab/cereal.git \
@@ -18,10 +12,7 @@ RUN cd /tmp \
 
 RUN cd /tmp \
     && git clone https://github.com/xianyi/OpenBLAS.git --single-branch --depth=1 \
-    && cd OpenBLAS && mkdir build && cd build \
-    && cmake .. \
-    && cmake --build . -j9 \
-    && cmake --install . --prefix /usr/local \
+    && cd OpenBLAS && make NO_AVX512=1 FC=gfortran -j8 && make PREFIX=/usr/local install \
     && cd /tmp && rm -rf OpenBLAS
 
 RUN cd /tmp \
@@ -33,7 +24,7 @@ RUN cd /tmp \
     && git clone https://github.com/darelbeida/elpa.git -b ELPA_2016.05.004-openblas --single-branch --depth=1 \
     && cd elpa && mkdir build && cd build \
     && ../configure CFLAGS="-O3 -march=native -mavx2 -mfma -funsafe-loop-optimizations -funsafe-math-optimizations -ftree-vect-loop-version -ftree-vectorize" \
-        FCFLAGS="-O2 -mavx" \
+    FCFLAGS="-O2 -mavx" \
     && make -j8 && make PREFIX=/usr/local install \
     && ln -s /usr/local/include/elpa-2016.05.004/elpa /usr/local/include/ \
     && cd /tmp && rm -rf elpa
@@ -45,10 +36,6 @@ RUN cd /tmp \
     && ./configure --enable-mpi-fortran --enable-orterun-prefix-by-default FC=gfortran \
     && make -j8 && make PREFIX=/usr/local install \
     && cd /tmp && rm -rf fftw-3.3.9 && rm fftw-3.3.9.tar.gz
-
-ENV LD_LIBRARY_PATH /usr/local/lib
-
-RUN apt-get install -y unzip
 
 RUN cd /tmp \
     && wget https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-1.9.0%2Bcpu.zip --no-check-certificate --quiet \
