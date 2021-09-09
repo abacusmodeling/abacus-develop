@@ -6,9 +6,6 @@ on:
       - develop
       - reconstruction
 
-env:
-  CONTAINER: ${{ github.repository }}:gnu
-
 jobs:
   build_container_and_push:
     runs-on: ubuntu-latest
