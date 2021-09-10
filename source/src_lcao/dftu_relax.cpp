@@ -319,14 +319,14 @@ void DFTU_RELAX::cal_stress_gamma(const double* rho_VU)
 	const int  one_int = 1;
 	const double zero = 0.0, minus_half=-0.5, one=1.0;
 
-  std::vector<double> dSR_gamma(GlobalC::ParaO.nloc);
-  std::vector<double> dm_VU_sover(GlobalC::ParaO.nloc);
+	std::vector<double> dSR_gamma(GlobalC::ParaO.nloc);
+	std::vector<double> dm_VU_sover(GlobalC::ParaO.nloc);
 
 	for(int dim1=0; dim1<3; dim1++)
 	{
 		for(int dim2=dim1; dim2<3; dim2++)
 		{	
-      this->fold_dSR_gamma(dim1, dim2, &dSR_gamma[0]);
+      		this->fold_dSR_gamma(dim1, dim2, &dSR_gamma[0]);
 
 			pdgemm_(&transN, &transN,
 				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
