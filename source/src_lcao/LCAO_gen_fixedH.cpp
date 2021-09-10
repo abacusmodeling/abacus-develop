@@ -4,6 +4,7 @@
 #include "LCAO_nnr.h"
 #include "global_fp.h"
 #include <vector>
+#include <unordered_map>
 
 LCAO_gen_fixedH::LCAO_gen_fixedH()
 {}
@@ -85,6 +86,7 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri, con
 			tau1 = atom1->tau[I1];
             //GlobalC::GridD.Find_atom(tau1);
             GlobalC::GridD.Find_atom(ucell, tau1, T1, I1);
+			std::cout << "number of neighbors, I : " << I1 << " " << GlobalC::GridD.getAdjacentNum()+1 << std::endl;
             for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ++ad)
             {
                 const int T2 = GlobalC::GridD.getType(ad);
@@ -697,14 +699,13 @@ void LCAO_gen_fixedH::build_Nonlocal_beta_new() //update by liuyu 2021-04-07
 			//saves <beta|psi>, where beta runs over L0,M0 on atom I0
 			//and psi runs over atomic basis sets on the current core
 			//=======================================================
-			std::vector<std::vector<std::vector<double>>> nlm_tot;
-			std::vector<std::vector<int>> iw2index;
+			std::vector<std::unordered_map<int,std::vector<double>>> nlm_tot;
+
             //GlobalC::GridD.Find_atom( atom0->tau[I0] );
             GlobalC::GridD.Find_atom(GlobalC::ucell, atom0->tau[I0] ,T0, I0);
 
 			//outermost loop : all adjacent atoms
 			nlm_tot.resize(GlobalC::GridD.getAdjacentNum()+1);
-			iw2index.resize(GlobalC::GridD.getAdjacentNum()+1);
 
             for (int ad=0; ad<GlobalC::GridD.getAdjacentNum()+1 ; ++ad)
             {
@@ -718,13 +719,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta_new() //update by liuyu 2021-04-07
 				
 				//middle loop : atomic basis on current processor (either row or column)
 				nlm_tot[ad].clear();
-				iw2index[ad].resize(GlobalV::NLOCAL);
-				for (auto &x : iw2index[ad])
-				{
-    				x=-1;
-				}
 
-				int indexw = 0;
 				for (int iw1=0; iw1<nw1_tot; ++iw1)
 				{
 					const int iw1_all = start1 + iw1;
@@ -742,11 +737,8 @@ void LCAO_gen_fixedH::build_Nonlocal_beta_new() //update by liuyu 2021-04-07
 						atom1->iw2n[ iw1_0 ], // N1
 						GlobalC::ucell.atoms[T0].tau[I0], T0); //R0,T0
 
-					nlm_tot[ad].push_back(nlm);
-					iw2index[ad][iw1_all]=indexw;
-					indexw+=1;
+					nlm_tot[ad].insert({iw1_all,nlm});
 				}//end iw
-				assert(indexw==nlm_tot[ad].size());
 			}//end ad
 
 			//=======================================================
@@ -785,12 +777,8 @@ void LCAO_gen_fixedH::build_Nonlocal_beta_new() //update by liuyu 2021-04-07
 							if(iw2_local < 0)continue;
 							const int iw2_0 = iw2/GlobalV::NPOL;
 
-							int ind1 = iw2index[ad1][iw1_all];
-							int ind2 = iw2index[ad2][iw2_all];
-							assert(ind1!=-1 && ind2!=-1);
-
-							std::vector<double> nlm1 = nlm_tot[ad1][ind1];
-							std::vector<double> nlm2 = nlm_tot[ad2][ind2];
+							std::vector<double> nlm1 = nlm_tot[ad1][iw1_all];
+							std::vector<double> nlm2 = nlm_tot[ad2][iw2_all];
 
 							assert(nlm1.size()==nlm2.size());
 
