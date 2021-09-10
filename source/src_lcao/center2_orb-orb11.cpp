@@ -83,13 +83,13 @@ void Center2_Orb::Orb11::init_radial_table( const std::set<size_t> &radials )
 }
 
 double Center2_Orb::Orb11::cal_overlap(
-	const Vector3<double> &RA, const Vector3<double> &RB,
+	const ModuleBase::Vector3<double> &RA, const ModuleBase::Vector3<double> &RB,
 	const int &mA, const int &mB) const
 {	
 	const double tiny1 = 1e-12;		// why 1e-12?
 	const double tiny2 = 1e-10;		// why 1e-10?
 
-	const Vector3<double> delta_R = RB-RA;
+	const ModuleBase::Vector3<double> delta_R = RB-RA;
 	const double distance_true = delta_R.norm();
 	const double distance = (distance_true>=tiny1) ? distance_true : distance_true+tiny1;
 	const double RcutA = nA.getRcut();
@@ -100,7 +100,7 @@ double Center2_Orb::Orb11::cal_overlap(
 	const int LB = nB.getL();
 
 	std::vector<double> rly;
-	Ylm::rl_sph_harm (
+	ModuleBase::Ylm::rl_sph_harm (
 		LA+LB,											// max LAB
 		delta_R.x, delta_R.y, delta_R.z,
 		rly);

@@ -30,7 +30,7 @@ void Stress_Func::stress_kin(ModuleBase::matrix& sigma)
 	{
 		kfac[i]=1;
 	}
-	double factor=TWO_PI/GlobalC::ucell.lat0;
+	double factor=ModuleBase::TWO_PI/GlobalC::ucell.lat0;
 
 	for(int ik=0;ik<GlobalC::kv.nks;ik++)
 	{
@@ -96,7 +96,7 @@ void Stress_Func::stress_kin(ModuleBase::matrix& sigma)
 		{
 			for(int m=0;m<3;m++)
 			{
-				s_kin[l][m] *= 2.0*e2/GlobalC::ucell.omega;
+				s_kin[l][m] *= 2.0*ModuleBase::e2/GlobalC::ucell.omega;
 			}
 		}
 	}
@@ -106,7 +106,7 @@ void Stress_Func::stress_kin(ModuleBase::matrix& sigma)
 		{
 			for(int m=0;m<3;m++)
 			{
-				s_kin[l][m] *= e2/GlobalC::ucell.omega;
+				s_kin[l][m] *= ModuleBase::e2/GlobalC::ucell.omega;
 			}
 		}
 	}

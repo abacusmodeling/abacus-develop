@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include "DP_potential.h"
 #ifdef __DPMD
 #include "deepmd/DeepPot.h"
@@ -7,11 +8,16 @@ DP_potential::DP_potential(){}
 
 DP_potential::~DP_potential(){}
 
-void DP_potential::DP_pot(UnitCell_pseudo &ucell_c, double &potential, Vector3<double> *force, ModuleBase::matrix &stress)
+void DP_potential::DP_pot(UnitCell_pseudo &ucell_c, double &potential, ModuleBase::Vector3<double> *force, ModuleBase::matrix &stress)
 {
 #ifdef __DPMD
-    TITLE("DP_potential", "DP_pot");
-    timer::tick("DP_potential", "DP_pot");
+    ModuleBase::TITLE("DP_potential", "DP_pot");
+    ModuleBase::timer::tick("DP_potential", "DP_pot");
+
+    if(access("graph.pb", 0) == -1)
+    {
+        ModuleBase::WARNING_QUIT("DP_pot", "Can not find greph.pb !");
+    }
 
     deepmd::DeepPot dp ("graph.pb");
 
@@ -25,24 +31,29 @@ void DP_potential::DP_pot(UnitCell_pseudo &ucell_c, double &potential, Vector3<d
 
     dp.compute (potential, f, v, coord, atype, cell);
 
+    potential/=ModuleBase::Ry_to_eV;
+
+    double fact_f = ModuleBase::ANGSTROM_AU*ModuleBase::Ry_to_eV;
+    double fact_v = ModuleBase::ANGSTROM_AU*pow(ModuleBase::Ry_to_eV, 3);
+
     for(int i=0; i<ucell_c.nat;  ++i)
     {
-        force[1].x = f[3*i];
-        force[1].y = f[3*i+1];
-        force[1].z = f[3*i+2];
+        force[i].x = f[3*i]/fact_f;
+        force[i].y = f[3*i+1]/fact_f;
+        force[i].z = f[3*i+2]/fact_f;
     }
 
     for(int i=0; i<3; ++i)
     {
         for(int j=0; j<3; ++j)
         {
-            stress(i, j) = v[3*i+j];
+            stress(i, j) = v[3*i+j]/fact_v;
         }
     }
 
-    timer::tick("DP_potential", "DP_pot");
+    ModuleBase::timer::tick("DP_potential", "DP_pot");
 #else
-    WARNING_QUIT("DP_pot", "Please recompile with -D__DPMD !");
+    ModuleBase::WARNING_QUIT("DP_pot", "Please recompile with -D__DPMD !");
 #endif
 }
 

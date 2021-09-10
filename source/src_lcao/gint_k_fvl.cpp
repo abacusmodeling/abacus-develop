@@ -7,12 +7,12 @@
 
 void Gint_k::fvl_k_RealSpace(ModuleBase::matrix& fvl_dphi, const double *vl)
 {
-	TITLE("Gint_k","cal_force");
-	timer::tick("Gint_k","cal_force");
+	ModuleBase::TITLE("Gint_k","cal_force");
+	ModuleBase::timer::tick("Gint_k","cal_force");
 
 	if(!this->reduced)
 	{
-		WARNING_QUIT("Gint_k::cal_force_k","The force with k can only with reduced H.");
+		ModuleBase::WARNING_QUIT("Gint_k::cal_force_k","The force with k can only with reduced H.");
 	}
 
 	int nnrg = GlobalC::LNNR.nnrg;
@@ -194,7 +194,7 @@ void Gint_k::fvl_k_RealSpace(ModuleBase::matrix& fvl_dphi, const double *vl)
 
         delete[] ylma;
     }
-	timer::tick("Gint_k","cal_force");
+	ModuleBase::timer::tick("Gint_k","cal_force");
 	return;
 }
 
@@ -203,12 +203,12 @@ void Gint_k::svl_k_RealSpace(
 	ModuleBase::matrix& svl_dphi, 
 	const double *vl)
 {
-	TITLE("Gint_k","cal_stress");
-	timer::tick("Gint_k","cal_stress");
+	ModuleBase::TITLE("Gint_k","cal_stress");
+	ModuleBase::timer::tick("Gint_k","cal_stress");
 
 	if(!this->reduced)
 	{
-		WARNING_QUIT("Gint_k::cal_stress_k","The stress with k can only with reduced H.");
+		ModuleBase::WARNING_QUIT("Gint_k::cal_stress_k","The stress with k can only with reduced H.");
 	}
 
 	int nnrg = GlobalC::LNNR.nnrg;
@@ -411,7 +411,7 @@ void Gint_k::svl_k_RealSpace(
 
 		delete[] ylma;
 	}
-	timer::tick("Gint_k","cal_stress");
+	ModuleBase::timer::tick("Gint_k","cal_stress");
 	return;
 }
 
@@ -570,7 +570,7 @@ void Gint_k::evaluate_vl_stress(
 
 				if(offset == -1 )
                 {
-                    WARNING_QUIT("gint_k","evaluate_vl_force wrong");
+                    ModuleBase::WARNING_QUIT("gint_k","evaluate_vl_force wrong");
                 }
                 assert(offset < GlobalC::LNNR.nad[iat]);
 
@@ -845,7 +845,7 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
 
                                 if(offset == -1 )
                 {
-                    WARNING_QUIT("gint_k","evaluate_vl_force wrong");
+                    ModuleBase::WARNING_QUIT("gint_k","evaluate_vl_force wrong");
                 }
                 assert(offset < GlobalC::LNNR.nad[iat]);
 
@@ -1028,7 +1028,7 @@ void Gint_k::set_ijk_atom_force(
 			}
 
 			// get the 'phi' and 'dphi'.
-			Ylm::grad_rl_sph_harm(GlobalC::ucell.atoms[it].nwl, dr[ib][id][0], dr[ib][id][1], dr[ib][id][2], rly, grly);
+			ModuleBase::Ylm::grad_rl_sph_harm(GlobalC::ucell.atoms[it].nwl, dr[ib][id][0], dr[ib][id][1], dr[ib][id][2], rly, grly);
 
 //			Ylm::sph_harm ( GlobalC::ucell.atoms[it].nwl,
 //					dr[ib][id][0] / distance[ib][id],

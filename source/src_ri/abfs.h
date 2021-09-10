@@ -79,7 +79,7 @@ public:
 		pthread_rwlock_t &rwlock_Vw,
 		std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,std::weak_ptr<ModuleBase::matrix>>>> &Vws );		
 		
-//	static std::map<size_t,std::vector<Abfs::Vector3_Order<int>>> get_adjs( const size_t &T, const Vector3<double> &tau_cartesian );
+//	static std::map<size_t,std::vector<Abfs::Vector3_Order<int>>> get_adjs( const size_t &T, const ModuleBase::Vector3<double> &tau_cartesian );
 	static std::map<size_t,std::vector<Abfs::Vector3_Order<int>>> get_adjs( const size_t &iat );
 	static std::vector<std::map<size_t,std::vector<Abfs::Vector3_Order<int>>>> get_adjs();
 	static std::map<std::set<size_t>,std::set<size_t>> get_H_pairs_core_group( const std::vector<std::pair<size_t,size_t>> &atom_pairs );

@@ -32,15 +32,15 @@ public:
 
     void compute_magnetization();
 
-    Vector3<double> *m_loc_;   //magnetization for each element along c-axis
+    ModuleBase::Vector3<double> *m_loc_;   //magnetization for each element along c-axis
 	double *angle1_;           //angle between c-axis and real spin std::vector
 	double *angle2_;           //angle between a-axis and real spin std::vector projection in ab-plane
-    void cal_ux(const int ntype);
+    //void cal_ux(const int ntype);
     double ux_[3];
 	bool lsign_;
 
 private:
-    bool judge_parallel(double a[3],Vector3<double> b);
+    bool judge_parallel(double a[3],ModuleBase::Vector3<double> b);
 
 };
 

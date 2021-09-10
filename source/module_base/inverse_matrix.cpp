@@ -51,7 +51,7 @@ void Inverse_Matrix_Complex::init(const int &dim_in)
 
 void Inverse_Matrix_Complex::using_zheev( const ModuleBase::ComplexMatrix &Sin, ModuleBase::ComplexMatrix &Sout)
 {
-	timer::tick("Inverse","using_zheev");
+	ModuleBase::timer::tick("Inverse","using_zheev");
 	this->A = Sin;
 
     //LapackConnector::zhegv( 1, 'V', 'U', nwan , A ,  nwan , B , nwan , e, work2 , 80 , rwork , &info );
@@ -66,13 +66,13 @@ void Inverse_Matrix_Complex::using_zheev( const ModuleBase::ComplexMatrix &Sin, 
 	}
 
     Sout = this->A * this->EA;
-	timer::tick("Inverse","using_zheev");
+	ModuleBase::timer::tick("Inverse","using_zheev");
     return;
 }
 
 void Inverse_Matrix_Complex::using_zpotrf( const ModuleBase::ComplexMatrix &Sin)
 {
-//	timer::tick("Inverse","using_zpotrf");
+//	ModuleBase::timer::tick("Inverse","using_zpotrf");
 
 	for(int i=0; i<dim; i++)
 	{
@@ -87,7 +87,7 @@ void Inverse_Matrix_Complex::using_zpotrf( const ModuleBase::ComplexMatrix &Sin)
 	if(info!=0)
 	{
 		std::cout << "\n info_zpotrf = " << info;
-		QUIT();
+		ModuleBase::QUIT();
 	}
 	
 	LapackConnector::zpotri('U',dim,A,dim,&info);
@@ -95,9 +95,9 @@ void Inverse_Matrix_Complex::using_zpotrf( const ModuleBase::ComplexMatrix &Sin)
 	if(info!=0)
 	{
 		std::cout << "\n info_zpotri = " << info;
-		QUIT();
+		ModuleBase::QUIT();
 	}
-//	timer::tick("Inverse","using_zpotrf");
+//	ModuleBase::timer::tick("Inverse","using_zpotrf");
 	return;
 }
 

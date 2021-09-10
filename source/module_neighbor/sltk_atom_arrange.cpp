@@ -21,7 +21,7 @@ double atom_arrange::set_sr_NL(
 	const double &rcutmax_Beta, 
 	const bool gamma_only_local)
 {
-	TITLE("atom_arrange","set_sr_NL");
+	ModuleBase::TITLE("atom_arrange","set_sr_NL");
 
 	if(output_level != "m") //xiaohui add 'output_level', 2015-09-16
 	{
@@ -69,7 +69,7 @@ double atom_arrange::set_sr_NL(
 // mohan update 2011-03-10
 void atom_arrange::set_sr_OV(void)
 {
-	TITLE("atom_arrange","set_sr_OV");
+	ModuleBase::TITLE("atom_arrange","set_sr_OV");
 	double longest_orb_rcut = 0.0;
 	for(int it=0; it<ucell.ntype; it++)
 	{
@@ -95,8 +95,8 @@ void atom_arrange::search(
 	const int &test_atom_in,
 	const bool test_only)
 {
-	TITLE("atom_arrange", "search");
-	timer::tick("atom_arrange","search");
+	ModuleBase::TITLE("atom_arrange", "search");
+	ModuleBase::timer::tick("atom_arrange","search");
 
 	assert( search_radius_bohr > 0.0 );
 
@@ -149,8 +149,8 @@ void atom_arrange::search(
 				
 				for(int ad=0; ad < grid_d.getAdjacentNum()+1; ad++)
 				{
-					Vector3<double> tau = grid_d.getAdjacentTau(ad);
-					Vector3<int> box = grid_d.getBox(ad);
+					ModuleBase::Vector3<double> tau = grid_d.getAdjacentTau(ad);
+					ModuleBase::Vector3<int> box = grid_d.getBox(ad);
 					std::cout << std::setw(15) << tau.x << " " << std::setw(15) << tau.y << " " << std::setw(15) << tau.z << " " 
 					<< std::setw(8) << box.x << std::setw(8) << box.y << std::setw(8) << box.z << std::endl;
 				}
@@ -160,7 +160,7 @@ void atom_arrange::search(
 		exit(0);//just test neighboring searching!
 	}
 	
-	timer::tick("atom_arrange","search");
+	ModuleBase::timer::tick("atom_arrange","search");
 	return;
 }
 

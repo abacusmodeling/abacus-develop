@@ -19,7 +19,7 @@ Force_Stress_LCAO::~Force_Stress_LCAO (){}
 
 void Force_Stress_LCAO::allocate(void)
 {
-    TITLE("Force_Stress_LCAO","allocate");
+    ModuleBase::TITLE("Force_Stress_LCAO","allocate");
 
     // reduce memory occupy by vlocal
     delete[] GlobalC::ParaO.sender_local_index;
@@ -49,10 +49,14 @@ void Force_Stress_LCAO::getForceStress(
 	ModuleBase::matrix &fcs,
 	ModuleBase::matrix &scs)
 {
-    TITLE("Force_Stress_LCAO","getForceStress");
-	timer::tick("Force_Stress_LCAO","getForceStress");
+    ModuleBase::TITLE("Force_Stress_LCAO","getForceStress");
+	ModuleBase::timer::tick("Force_Stress_LCAO","getForceStress");
 	
-	if(!isforce&&!isstress) return;
+	if(!isforce&&!isstress)
+	{
+		ModuleBase::timer::tick("Force_Stress_LCAO","getForceStress");
+		return;
+	} 
 
 	const int nat = GlobalC::ucell.nat;
 
@@ -261,6 +265,13 @@ void Force_Stress_LCAO::getForceStress(
 				{
 					fcs(iat, i) += force_dftu(iat, i);
 				}
+#ifdef __DEEPKS
+				// mohan add 2021-08-04
+				if (INPUT.deepks_scf)
+				{
+					fcs(iat, i) += ld.F_delta(iat, i);
+				}
+#endif
 				//sum total force for correction
 				sum += fcs(iat, i);
 			}
@@ -283,6 +294,7 @@ void Force_Stress_LCAO::getForceStress(
 		{
 			this->forceSymmetry(fcs);
 		}
+
 #ifdef __DEEPKS
 		//DeePKS force, caoyu add 2021-06-03
 		if (INPUT.deepks_scf)
@@ -366,7 +378,7 @@ void Force_Stress_LCAO::getForceStress(
 				GlobalV::ofs_running << " " << std::setw(8) << iat;
 				for(int i=0; i<3; i++)
 				{
-					if( abs( fcs(iat,i)*Ry_to_eV/0.529177 ) < Force_Stress_LCAO::force_invalid_threshold_ev)
+					if( abs( fcs(iat,i)*ModuleBase::Ry_to_eV/0.529177 ) < Force_Stress_LCAO::force_invalid_threshold_ev)
 					{
 						fcs(iat,i) = 0.0;
 						GlobalV::ofs_running << std::setw(5) << "1";
@@ -472,7 +484,7 @@ void Force_Stress_LCAO::getForceStress(
 		sc_pw.printstress_total(scs, ry);
 
 		double unit_transform = 0.0;
-		unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
+		unit_transform = ModuleBase::RYDBERG_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
 		double external_stress[3] = {GlobalV::PRESS1,GlobalV::PRESS2,GlobalV::PRESS3};
 
 		for(int i=0;i<3;i++)
@@ -482,7 +494,7 @@ void Force_Stress_LCAO::getForceStress(
 		GlobalV::PRESSURE = (scs(0,0)+scs(1,1)+scs(2,2))/3;
 	}//end of stress calculation
 	
-	timer::tick("Force_LCAO","start_force");
+	ModuleBase::timer::tick("Force_LCAO","start_force");
 	return;
 }
 
@@ -496,7 +508,7 @@ void Force_Stress_LCAO::print_force(const std::string &name, ModuleBase::matrix&
 
 	if(!ry)
 	{
-	 	fac = Ry_to_eV / 0.529177;
+	 	fac = ModuleBase::Ry_to_eV / 0.529177;
 	}
 
 	std::cout << std::setprecision(5);
@@ -550,12 +562,12 @@ void Force_Stress_LCAO::print_force(const std::string &name, ModuleBase::matrix&
 
 void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, ModuleBase::matrix& fcs)
 {
-	TITLE("Force_Stress_LCAO","printforce_total");
+	ModuleBase::TITLE("Force_Stress_LCAO","printforce_total");
 	double unit_transform = 1;
 
 	if(!ry)
 	{
-		unit_transform = Ry_to_eV / 0.529177;
+		unit_transform = ModuleBase::Ry_to_eV / 0.529177;
 	}
 //	std::cout.setf(ios::fixed);
 
@@ -576,19 +588,21 @@ void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, Mod
 
 		for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 		{
-			ofs << "   " << fcs(iat,0)*Ry_to_eV / 0.529177
-				<< "   " << fcs(iat,1)*Ry_to_eV / 0.529177
-				<< "   " << fcs(iat,2)*Ry_to_eV / 0.529177 << std::endl;
+			ofs << "   " << fcs(iat,0)*ModuleBase::Ry_to_eV / 0.529177
+				<< "   " << fcs(iat,1)*ModuleBase::Ry_to_eV / 0.529177
+				<< "   " << fcs(iat,2)*ModuleBase::Ry_to_eV / 0.529177 << std::endl;
 		}
 		ofs.close();
 	}
 
  	if(istestf)
 	{
-		std::cout << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed) << std::endl;
-		std::cout << " ------------------- TOTAL      FORCE --------------------" << std::endl;
-    	std::cout << " " << std::setw(8) << "Atom" << std::setw(15) << "x" << std::setw(15) << "y" << std::setw(15) << "z" << std::endl;
-    	GlobalV::ofs_running << " " << std::setw(12) << "Atom" << std::setw(15) << "x" << std::setw(15) << "y" << std::setw(15) << "z" << std::endl;
+		cout << setprecision(6);
+		//cout << setiosflags(ios::showpos);
+		//cout << setiosflags(ios::fixed) << endl;
+		cout << " ------------------- TOTAL      FORCE --------------------" << endl;
+    	cout << " " << setw(8) << "Atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << endl;
+    	GlobalV::ofs_running << " " << setw(12) << "Atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << endl;
 	}
 
     iat=0;

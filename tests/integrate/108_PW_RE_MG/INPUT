@@ -12,9 +12,10 @@ pseudo_type     upf201
 ecutwfc			20
 dr2				1e-9
 niter			100
+force           1
 
 #Parameters (3.Relaxation)
-nstep           10
+nstep           2
 force_thr_ev    0.01
 move_method     cg
 

@@ -3,7 +3,7 @@
 
 bool Charge::read_rho(const int &is, const std::string &fn, double* rho) //add by dwan
 {
-    TITLE("Charge","read_rho");
+    ModuleBase::TITLE("Charge","read_rho");
     std::ifstream ifs(fn.c_str());
     if (!ifs) 
 	{
@@ -21,25 +21,25 @@ bool Charge::read_rho(const int &is, const std::string &fn, double* rho) //add b
 	ifs >> name;
     
 	// check lattice constant, unit is Angstrom
-	CHECK_DOUBLE(ifs,GlobalC::ucell.lat0 * 0.529177,quit);
-    CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e11,quit);
-    CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e12,quit);
-    CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e13,quit);
-    CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e21,quit);
-    CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e22,quit);
-    CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e23,quit);
-    CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e31,quit);
-    CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e32,quit);
-    CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e33,quit);
+	ModuleBase::CHECK_DOUBLE(ifs,GlobalC::ucell.lat0 * 0.529177,quit);
+    ModuleBase::CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e11,quit);
+    ModuleBase::CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e12,quit);
+    ModuleBase::CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e13,quit);
+    ModuleBase::CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e21,quit);
+    ModuleBase::CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e22,quit);
+    ModuleBase::CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e23,quit);
+    ModuleBase::CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e31,quit);
+    ModuleBase::CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e32,quit);
+    ModuleBase::CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e33,quit);
 
 	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		CHECK_STRING(ifs,GlobalC::ucell.atoms[it].label,quit);
+		ModuleBase::CHECK_STRING(ifs,GlobalC::ucell.atoms[it].label,quit);
 	}
 
 	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		CHECK_DOUBLE(ifs,GlobalC::ucell.atoms[it].na,quit);
+		ModuleBase::CHECK_DOUBLE(ifs,GlobalC::ucell.atoms[it].na,quit);
 	}
 
 	std::string coordinate;
@@ -49,13 +49,13 @@ bool Charge::read_rho(const int &is, const std::string &fn, double* rho) //add b
 	{
 		for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{
-			CHECK_DOUBLE(ifs,GlobalC::ucell.atoms[it].taud[ia].x,quit);
-			CHECK_DOUBLE(ifs,GlobalC::ucell.atoms[it].taud[ia].y,quit);
-			CHECK_DOUBLE(ifs,GlobalC::ucell.atoms[it].taud[ia].z,quit);
+			ModuleBase::CHECK_DOUBLE(ifs,GlobalC::ucell.atoms[it].taud[ia].x,quit);
+			ModuleBase::CHECK_DOUBLE(ifs,GlobalC::ucell.atoms[it].taud[ia].y,quit);
+			ModuleBase::CHECK_DOUBLE(ifs,GlobalC::ucell.atoms[it].taud[ia].z,quit);
 		}
 	}
 
-	if(GlobalV::NSPIN != 4) CHECK_INT(ifs, GlobalV::NSPIN);
+	if(GlobalV::NSPIN != 4) ModuleBase::CHECK_INT(ifs, GlobalV::NSPIN);
 	else
 	{
 		ModuleBase::GlobalFunc::READ_VALUE(ifs, GlobalV::PRENSPIN);
@@ -72,11 +72,11 @@ bool Charge::read_rho(const int &is, const std::string &fn, double* rho) //add b
 	}
 	else 
 	{
-		WARNING_QUIT("read_rho","check nspin!");
+		ModuleBase::WARNING_QUIT("read_rho","check nspin!");
 	}
-	CHECK_INT(ifs, GlobalC::pw.ncx);	
-	CHECK_INT(ifs, GlobalC::pw.ncy);	
-	CHECK_INT(ifs, GlobalC::pw.ncz);	
+	ModuleBase::CHECK_INT(ifs, GlobalC::pw.ncx);	
+	ModuleBase::CHECK_INT(ifs, GlobalC::pw.ncy);	
+	ModuleBase::CHECK_INT(ifs, GlobalC::pw.ncz);	
 
 #ifndef __MPI
 	GlobalV::ofs_running << " Read SPIN = " << is+1 << " charge now." << std::endl;

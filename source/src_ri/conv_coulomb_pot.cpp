@@ -61,7 +61,7 @@ void Conv_Coulomb_Pot::cal_conv_coulomb_pot()
 	}
 
 	// 4pi/(2L+1)
-	const double coefficient = 4*PI/(2*orb.getL()+1);
+	const double coefficient = 4*ModuleBase::PI/(2*orb.getL()+1);
 	for( size_t ir=0; ir!=orb.getNr(); ++ir )
 	{
 		conv_coulomb_pot[ir] *= coefficient;

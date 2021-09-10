@@ -59,17 +59,25 @@ class ORB_table_phi
 		const int mode, 
 		int &Lmax_used, 
 		int &Lmax,
-		const int &Lmax_exx) const;
+		const int &Lmax_exx,
+		const LCAO_Orbitals &orb) const;
 
 	void init_Table_Spherical_Bessel(
 		const int orb_num, 
 		const int mode, 
 		int &Lmax_used, 
 		int &Lmax,
-		const int &Lmax_exx);
+		const int &Lmax_exx,
+		const LCAO_Orbitals &orb);
+
+	//Wenfei 2021-8-26, plot table elements against R
+	void plot_table(
+		const std::string filename,
+		const int rmesh,
+		double* column);
 
 	// Peize Lin add 2017-04-24, and change all jlx in this class
-	Sph_Bessel_Recursive::D2* pSB = nullptr;
+	ModuleBase::Sph_Bessel_Recursive::D2* pSB = nullptr;
 
 	///
 	/// make the index, in order to get the element from Table_SR and Table_TR quickly.

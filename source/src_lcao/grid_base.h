@@ -12,7 +12,7 @@ class Grid_Base
 {
 public:
 	void init( 
-		const Matrix3 &latvec_in, 
+		const ModuleBase::Matrix3 &latvec_in, 
 		const double &lat0_in, 
 		const int &nx_in,
 		const int &ny_in,
@@ -33,31 +33,31 @@ protected:
 
 	void get_rcut_max(void);
 	void edge_grid_points(
-		const Vector3<double> &R10,
-		const Vector3<double> &R20,
-		const Vector3<double> &max_direct_coodinate,
-		const Vector3<double> &min_direct_coodinate);
+		const ModuleBase::Vector3<double> &R10,
+		const ModuleBase::Vector3<double> &R20,
+		const ModuleBase::Vector3<double> &max_direct_coodinate,
+		const ModuleBase::Vector3<double> &min_direct_coodinate);
 	
 	void get_small_box( 
-		const Vector3<double> &tau, 
+		const ModuleBase::Vector3<double> &tau, 
 		const int &T,
-		Vector3<double> &tau_max_direct,
-		Vector3<double> &tau_min_direct);
+		ModuleBase::Vector3<double> &tau_max_direct,
+		ModuleBase::Vector3<double> &tau_min_direct);
 
 	int* ijk_index;
 
-	Matrix3 latvec;
-	Matrix3 latvec0;
+	ModuleBase::Matrix3 latvec;
+	ModuleBase::Matrix3 latvec0;
 
-	Vector3<double> a1;
-	Vector3<double> a2;
-	Vector3<double> a3;
+	ModuleBase::Vector3<double> a1;
+	ModuleBase::Vector3<double> a2;
+	ModuleBase::Vector3<double> a3;
 
 	double a1_len;
 	double a2_len;
 	double a3_len;
 
-	Vector3<double> da_d;
+	ModuleBase::Vector3<double> da_d;
 
 	double da1;
 	double da2;
@@ -68,7 +68,7 @@ protected:
 	int nz;
 	int nxyz;
 
-	Vector3<double> *cartesian;
+	ModuleBase::Vector3<double> *cartesian;
 
 	double lat0;
 
@@ -76,7 +76,7 @@ protected:
 
 	double *Rcut_max;
 
-	Vector3<double> *Rcut_max_direct;
+	ModuleBase::Vector3<double> *Rcut_max_direct;
 
 	int grid_number;
 	int grid_number_last;
@@ -87,8 +87,8 @@ protected:
 	double Rcut1;
 	double Rcut2;
 	
-	Vector3<double> *dR1;
-	Vector3<double> *dR2;
+	ModuleBase::Vector3<double> *dR1;
+	ModuleBase::Vector3<double> *dR2;
 
 	const Numerical_Orbital_Lm* pointer1;
 	const Numerical_Orbital_Lm* pointer2;
@@ -98,8 +98,8 @@ protected:
 	int index1;
 	int index2;
 
-	Vector3<int> edge_min;
-	Vector3<int> edge_max;
+	ModuleBase::Vector3<int> edge_min;
+	ModuleBase::Vector3<int> edge_max;
 
 	enum cal_type{ cal_charge, cal_local } job;
 	

@@ -86,7 +86,7 @@ void PW_Basis::set
 	const int &bz_in
 )
 {
-    TITLE("PW_Basis","set");
+    ModuleBase::TITLE("PW_Basis","set");
     this->gamma_only = gamma_only_in;
     this->ecutwfc = ecutwfc_in;
     this->ecutrho = ecutrho_in,
@@ -102,7 +102,7 @@ void PW_Basis::set
 
     if (ecutwfc <= 0.00)
     {
-        WARNING_QUIT("PW_Basis::set","ecutwfc < 0 is not allowed !");
+        ModuleBase::WARNING_QUIT("PW_Basis::set","ecutwfc < 0 is not allowed !");
     }
 
     if (ecutrho <= 0.00)
@@ -114,7 +114,7 @@ void PW_Basis::set
         this->wfac = ecutrho/ecutwfc;
         if (wfac <= 1.0)
         {
-            WARNING_QUIT("input","GlobalC::pw.wfac <= 1.0 is not allowed !");
+            ModuleBase::WARNING_QUIT("input","GlobalC::pw.wfac <= 1.0 is not allowed !");
         }
     }
     return;
@@ -124,8 +124,8 @@ void PW_Basis::set
 // initialize of plane wave basis.
 void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_Vectors &Klist_in)
 {
-    TITLE("PW_Basis","gen_pw");
-    timer::tick("PW_Basis","gen_pw");
+    ModuleBase::TITLE("PW_Basis","gen_pw");
+    ModuleBase::timer::tick("PW_Basis","gen_pw");
 
 
 	GlobalV::ofs_running << "\n\n\n\n";
@@ -231,8 +231,8 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
             delete[] gdirect_global;
             delete[] gcar_global;
             gg_global = new double[cutgg_num_now];
-            gdirect_global = new Vector3<double>[cutgg_num_now];
-            gcar_global = new Vector3<double>[cutgg_num_now];
+            gdirect_global = new ModuleBase::Vector3<double>[cutgg_num_now];
+            gcar_global = new ModuleBase::Vector3<double>[cutgg_num_now];
 
 			//GlobalV::ofs_running << " setup |g|^2" << std::endl;
             PW_complement::get_total_pw(gg_global, gdirect_global, ggchg_start, ggchg_end,
@@ -322,15 +322,15 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
 
         delete[] gg_global;
         gg_global = new double[ngmc_g];// store the |G|^2 of the 1d array
-        Memory::record("PW_complement","gg_global",ngmc_g,"double");
+        ModuleBase::Memory::record("PW_complement","gg_global",ngmc_g,"double");
 
         delete[] gdirect_global;
-        gdirect_global = new Vector3<double>[ngmc_g];// indices of G vectors
-        Memory::record("PW_complement","gdirect_global",ngmc_g,"Vector3<double>");
+        gdirect_global = new ModuleBase::Vector3<double>[ngmc_g];// indices of G vectors
+        ModuleBase::Memory::record("PW_complement","gdirect_global",ngmc_g,"ModuleBase::Vector3<double>");
 
         delete[] gcar_global;
-        gcar_global = new Vector3<double>[ngmc_g];
-        Memory::record("PW_complement","gcar",ngmc_g,"Vector3<double>");
+        gcar_global = new ModuleBase::Vector3<double>[ngmc_g];
+        ModuleBase::Memory::record("PW_complement","gcar",ngmc_g,"ModuleBase::Vector3<double>");
 
         PW_complement::get_total_pw(gg_global, gdirect_global, 0.0, ggchg, ncx, ncy, ncz, Ucell->GGT, ngmc_g);
         PW_complement::setup_GVectors(Ucell->G, ngmc_g, gg_global, gdirect_global, gcar_global);
@@ -359,17 +359,17 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
     this->setup_structure_factor();
 
 //	this->printPW("src_check/check_pw.txt");
-    timer::tick("PW_Basis","gen_pw");
+    ModuleBase::timer::tick("PW_Basis","gen_pw");
     return;
 }
 
 void PW_Basis::setup_gg(void)
 {
-    TITLE("PW_Basis","setup_gg");
+    ModuleBase::TITLE("PW_Basis","setup_gg");
 
     if (Ucell->tpiba2 <= 0)
     {
-        WARNING_QUIT("PW_Basis::setup_gg","tpiba2 <= 0");
+        ModuleBase::WARNING_QUIT("PW_Basis::setup_gg","tpiba2 <= 0");
     }
     this->ggpsi = this->ecutwfc / Ucell->tpiba2;
     //=================================
@@ -417,7 +417,7 @@ void PW_Basis::setup_gg(void)
 //  Set up crystal structure parameters.
 void PW_Basis::setup_FFT_dimension(void)
 {
-    if (GlobalV::test_pw) TITLE("PW_Basis","setup_FFT_dimension");
+    if (GlobalV::test_pw) ModuleBase::TITLE("PW_Basis","setup_FFT_dimension");
 
     this->nxyz = nx * ny * nz;
     this->ncxyz = ncx * ncy * ncz;
@@ -472,7 +472,7 @@ void PW_Basis::setup_FFT_dimension(void)
 #ifdef __MPI
 void PW_Basis::divide_fft_grid(void)
 {
-    TITLE("PW_Basis","divide_fft_grid");
+    ModuleBase::TITLE("PW_Basis","divide_fft_grid");
 
     //----------------------------------------------
     // set charge/potential grid : nrxx
@@ -550,8 +550,8 @@ void PW_Basis::divide_fft_grid(void)
     delete[] gg;
     this->ig2fftc = new int[ngmc];
     this->ig2fftw = new int[ngmw];
-    this->gdirect = new Vector3<double>[ngmc];
-    this->gcar  = new Vector3<double>[ngmc];
+    this->gdirect = new ModuleBase::Vector3<double>[ngmc];
+    this->gcar  = new ModuleBase::Vector3<double>[ngmc];
     this->gg = new double[ngmc];
     return;
 }
@@ -567,7 +567,7 @@ void PW_Basis::divide_fft_grid(void)
 
 void PW_Basis::get_MPI_GVectors(void)
 {
-    if (GlobalV::test_pw) TITLE("PW_Basis","get_MPI_GVectors");
+    if (GlobalV::test_pw) ModuleBase::TITLE("PW_Basis","get_MPI_GVectors");
 
     delete[] ig1;
     delete[] ig2;
@@ -609,8 +609,8 @@ void PW_Basis::get_MPI_GVectors(void)
 #else
 void PW_Basis::get_GVectors(void)
 {
-    if (GlobalV::test_pw) TITLE("PW_Basis","get_GVectors");
-    timer::tick("PW_Basis","get_GVectors");
+    if (GlobalV::test_pw) ModuleBase::TITLE("PW_Basis","get_GVectors");
+    ModuleBase::timer::tick("PW_Basis","get_GVectors");
 
     this->nrxx = this->ncxyz;
     this->ngmc=this->ngmc_g;
@@ -652,20 +652,20 @@ void PW_Basis::get_GVectors(void)
     delete[] ig2fftw;
     ig2fftw = new int[ngmw];
 	ModuleBase::GlobalFunc::ZEROS(ig2fftw, ngmw);
-    Memory::record("PW_complement","ig2fftw",ngmw,"int");
+    ModuleBase::Memory::record("PW_complement","ig2fftw",ngmw,"int");
     ModuleBase::GlobalFunc::ZEROS(ig2fftw, ngmw);
 
     PW_complement::get_ig2fftw(ngmw, nx, ny, nz, gdirect, ig2fftw);
 
-    timer::tick("PW_Basis","get_GVectors");
+    ModuleBase::timer::tick("PW_Basis","get_GVectors");
     return;
 }//end get_GVectors;
 #endif
 
 void PW_Basis::get_nggm(const int ngmc_local)
 {
-    TITLE("PW_Basis","get_nggm");
-    timer::tick("PW_Basis","get_nggm");
+    ModuleBase::TITLE("PW_Basis","get_nggm");
+    ModuleBase::timer::tick("PW_Basis","get_nggm");
 
 //	GlobalV::ofs_running << " calculate the norm of G vectors." << std::endl;
     //*********************************************
@@ -728,7 +728,7 @@ void PW_Basis::get_nggm(const int ngmc_local)
 	if(GlobalV::test_pw)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"gstart",gstart);
 
     delete[] tmp;
-    timer::tick("PW_Basis","get_nggm");
+    ModuleBase::timer::tick("PW_Basis","get_nggm");
     return;
 }
 
@@ -736,12 +736,12 @@ void PW_Basis::get_nggm(const int ngmc_local)
 //  Calculate structure factor
 void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add OpenMP 2021.04.01
 {
-    TITLE("PW_Basis","setup_structure_factor");
-    timer::tick("PW_Basis","setup_struc_factor");
-    const std::complex<double> ci_tpi = NEG_IMAG_UNIT * TWO_PI;
+    ModuleBase::TITLE("PW_Basis","setup_structure_factor");
+    ModuleBase::timer::tick("PW_Basis","setup_struc_factor");
+    const std::complex<double> ci_tpi = ModuleBase::NEG_IMAG_UNIT * ModuleBase::TWO_PI;
 
     this->strucFac.create(Ucell->ntype, this->ngmc);
-    Memory::record("PW_Basis","struc_fac", Ucell->ntype*this->ngmc,"complexmatrix");
+    ModuleBase::Memory::record("PW_Basis","struc_fac", Ucell->ntype*this->ngmc,"complexmatrix");
 
 //	std::string outstr;
 //	outstr = GlobalV::global_out_dir + "strucFac.dat"; 
@@ -750,13 +750,13 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
     for (int it=0; it<Ucell->ntype; it++)
     {
 		const int na = Ucell->atoms[it].na;
-		const Vector3<double> * const tau = Ucell->atoms[it].tau;
+		const ModuleBase::Vector3<double> * const tau = Ucell->atoms[it].tau;
 
 		#pragma omp parallel for schedule(static)
         for (int ig=0; ig<this->ngmc; ig++)
         {
-			const Vector3<double> gcar_ig = gcar[ig];
-            std::complex<double> sum_phase = ZERO;
+			const ModuleBase::Vector3<double> gcar_ig = gcar[ig];
+            std::complex<double> sum_phase = ModuleBase::ZERO;
             for (int ia=0; ia<na; ia++)
             {
                 // e^{-i G*tau}
@@ -773,11 +773,11 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
     this->eigts2.create(Ucell->nat, 2*this->ncy + 1);
     this->eigts3.create(Ucell->nat, 2*this->ncz + 1);
 
-    Memory::record("PW_Basis","eigts1",Ucell->nat*2*this->ncx + 1,"complexmatrix");
-    Memory::record("PW_Basis","eigts2",Ucell->nat*2*this->ncy + 1,"complexmatrix");
-    Memory::record("PW_Basis","eigts3",Ucell->nat*2*this->ncz + 1,"complexmatrix");
+    ModuleBase::Memory::record("PW_Basis","eigts1",Ucell->nat*2*this->ncx + 1,"complexmatrix");
+    ModuleBase::Memory::record("PW_Basis","eigts2",Ucell->nat*2*this->ncy + 1,"complexmatrix");
+    ModuleBase::Memory::record("PW_Basis","eigts3",Ucell->nat*2*this->ncz + 1,"complexmatrix");
 
-    Vector3<double> gtau;
+    ModuleBase::Vector3<double> gtau;
     int inat = 0;
     for (i = 0; i < Ucell->ntype; i++)
     {
@@ -806,14 +806,14 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
             inat++;
         }
     }
-    timer::tick("PW_Basis","setup_struc_factor");
+    ModuleBase::timer::tick("PW_Basis","setup_struc_factor");
     return;
 }
 
 #ifdef __MPI
 void PW_Basis::columns_and_pw_distribution_2(void)
 {
-    TITLE("PW_Basis","columns_and_pw_distribution_2");
+    ModuleBase::TITLE("PW_Basis","columns_and_pw_distribution_2");
 
     // time count the number of sticks in charge grid.
     int time=0;
@@ -1005,7 +1005,7 @@ void PW_Basis::columns_and_pw_distribution_2(void)
             GlobalV::ofs_running<<" too many sticks for cpu = "<<ip<<std::endl;
             GlobalV::ofs_running<<" ngrid is = "<< ngrid << std::endl;
             GlobalV::ofs_running<<" In fact , non_zero_grid = "<< non_zero_grid << std::endl;
-            WARNING_QUIT("PW_Basis::columns_and_pw_distribution_2","conflict about pw distribution.");
+            ModuleBase::WARNING_QUIT("PW_Basis::columns_and_pw_distribution_2","conflict about pw distribution.");
         }
     }
 
@@ -1024,7 +1024,7 @@ void PW_Basis::columns_and_pw_distribution_2(void)
 
 	if(no_pw>0)
 	{
-		WARNING_QUIT("distribution of pw","some processor has no plane waves!");
+		ModuleBase::WARNING_QUIT("distribution of pw","some processor has no plane waves!");
 	}
 
 
@@ -1036,8 +1036,8 @@ void PW_Basis::columns_and_pw_distribution_2(void)
 //20180515
 void PW_Basis::update_gvectors(std::ofstream &runlog, const UnitCell &Ucell_in)
 {
-    TITLE("PW_Basis","update_gvectors");
-    timer::tick("PW_Basis","update_gvectors");
+    ModuleBase::TITLE("PW_Basis","update_gvectors");
+    ModuleBase::timer::tick("PW_Basis","update_gvectors");
 
 #ifdef __MPI
     bool cutgg_flag = true;
@@ -1075,8 +1075,8 @@ void PW_Basis::update_gvectors(std::ofstream &runlog, const UnitCell &Ucell_in)
             int cutgg_num_now2 = cutgg_num_table[ii];
             gg_global0 = new double[cutgg_num_now2];
             gg_global = new double[cutgg_num_now2];
-            gdirect_global = new Vector3<double>[cutgg_num_now2];
-            gcar_global = new Vector3<double>[cutgg_num_now2];
+            gdirect_global = new ModuleBase::Vector3<double>[cutgg_num_now2];
+            gcar_global = new ModuleBase::Vector3<double>[cutgg_num_now2];
 
             PW_complement::get_total_pw_after_vc(gg_global0, gg_global, gdirect_global, ggchg_start, ggchg_end,
                     ncx, ncy, ncz, Ucell->GGT, Ucell->GGT0, ngmc_g);
@@ -1102,7 +1102,7 @@ void PW_Basis::update_gvectors(std::ofstream &runlog, const UnitCell &Ucell_in)
 
     this->setup_structure_factor();
 
-    timer::tick("PW_Basis","update_gvectors");
+    ModuleBase::timer::tick("PW_Basis","update_gvectors");
 
 
     return;

@@ -39,7 +39,7 @@ void Mathzone::To_Polar_Coordinate
     double small = 1.0e-9;
     if (r < small)
     {
-        theta = PI/2.0;
+        theta = ModuleBase::PI/2.0;
     }
     else
     {
@@ -54,21 +54,21 @@ void Mathzone::To_Polar_Coordinate
     }
     else if (  x_cartesian < small  )
     {
-        phi = atan( y_cartesian / x_cartesian ) + PI;
+        phi = atan( y_cartesian / x_cartesian ) + ModuleBase::PI;
     }
     else if ( x_cartesian > small && y_cartesian < -small)
     {
-        phi = atan( y_cartesian/x_cartesian ) + TWO_PI;
+        phi = atan( y_cartesian/x_cartesian ) + ModuleBase::TWO_PI;
     }
     else
     {
-        phi = PI/2.0 * ( (y_cartesian >= 0.0) ? 1.0 : -1.0);
+        phi = ModuleBase::PI/2.0 * ( (y_cartesian >= 0.0) ? 1.0 : -1.0);
     }
 //----------------------------------------------------------
-// degress = radians / PI * 180
+// degress = radians / ModuleBase::PI * 180
 //----------------------------------------------------------
-    theta = theta/PI*180;
-    phi = phi/PI*180;
+    theta = theta/ModuleBase::PI*180;
+    phi = phi/ModuleBase::PI*180;
 
 //	OUT("r",r);
 //	OUT("theta(degree)",theta);

@@ -7,19 +7,19 @@ Magnetism::Magnetism()
 {
     this->tot_magnetization = 0.0;
     this->abs_magnetization = 0.0;
-    this->start_magnetization = new double[10];
+    //this->start_magnetization = new double[10];
 
-	m_loc_ = new Vector3<double> [1];
-	angle1_ = new double[1];
-	angle2_ = new double[1];
+	//m_loc_ = new ModuleBase::Vector3<double> [1];
+	//angle1_ = new double[1];
+	//angle2_ = new double[1];
 }
 
 Magnetism::~Magnetism()
 {
-    delete[] this->start_magnetization;
-	delete[] m_loc_;
-	delete[] angle1_;
-	delete[] angle2_;
+    //delete[] this->start_magnetization;
+	//delete[] m_loc_;
+	//delete[] angle1_;
+	//delete[] angle2_;
 }
 
 #ifndef __CELL
@@ -136,7 +136,7 @@ double Magnetism::get_neldw(void)
 //	}
 //	return neldw;
 }
-
+/*
 void Magnetism::cal_ux(const int ntype)
 {
 	double amag, uxmod;
@@ -170,7 +170,7 @@ void Magnetism::cal_ux(const int ntype)
 		uxmod =  pow(ux_[0],2) + pow(ux_[1],2) +pow(ux_[2],2);
 		if(uxmod<1e-6) 
 		{
-			WARNING_QUIT("cal_ux","wrong uxmod");
+			ModuleBase::WARNING_QUIT("cal_ux","wrong uxmod");
 		}
 		for(int i = 0;i<3;i++)
 		{
@@ -181,8 +181,8 @@ void Magnetism::cal_ux(const int ntype)
 	}
 	return;
 }
-
-bool Magnetism::judge_parallel(double a[3], Vector3<double> b)
+*/
+bool Magnetism::judge_parallel(double a[3], ModuleBase::Vector3<double> b)
 {
    bool jp=false;
    double cross;

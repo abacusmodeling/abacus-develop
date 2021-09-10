@@ -24,8 +24,8 @@ class Grid_BigCell: public Grid_MeshCell
 	double bigcell_vec2[3];
 	double bigcell_vec3[3];
 
-	Matrix3 bigcell_latvec0;
-	Matrix3 bigcell_GT;
+	ModuleBase::Matrix3 bigcell_latvec0;
+	ModuleBase::Matrix3 bigcell_GT;
 	//---------------------------------
 
 

@@ -565,7 +565,7 @@ std::cout<<"D"<<std::endl;
 			}
 		}
 		ofs.close();
-		WARNING_QUIT( ModuleBase::GlobalFunc::TO_STRING(__FILE__), ModuleBase::GlobalFunc::TO_STRING(__LINE__) );
+		ModuleBase::WARNING_QUIT( ModuleBase::GlobalFunc::TO_STRING(__FILE__), ModuleBase::GlobalFunc::TO_STRING(__LINE__) );
 	};
 
 	// Peize Lin test
@@ -598,7 +598,7 @@ std::cout<<"D"<<std::endl;
 			}
 		}
 		ofs.close();
-		WARNING_QUIT( ModuleBase::GlobalFunc::TO_STRING(__FILE__), "line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__) );
+		ModuleBase::WARNING_QUIT( ModuleBase::GlobalFunc::TO_STRING(__FILE__), "line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__) );
 	};
 
 	// Peize Lin test
@@ -1072,7 +1072,7 @@ void density_matrix()
 		{
 			for( size_t ik=k_start; ik!=k_end; ++ik )
 			{
-				DM_R[is][iR] += exp(TWO_PI*IMAG_UNIT*dot(GlobalC::kv.kvec_d[ik],R_supercell[iR])) * DM[ik];
+				DM_R[is][iR] += exp(ModuleBase::TWO_PI*IMAG_UNIT*dot(GlobalC::kv.kvec_d[ik],R_supercell[iR])) * DM[ik];
 			}
 		}
 	}

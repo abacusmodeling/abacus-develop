@@ -40,7 +40,7 @@ void Exx_Abfs::Inverse_Matrix_Double::using_dpotrf()
 	{
 		std::cout << "\n info_dpotrf = " << info <<std::endl;
 		GlobalV::ofs_warning<<A<<std::endl;
-		QUIT();
+		ModuleBase::QUIT();
 	}
 
 	LapackConnector::dpotri('U',dim,A,dim,&info);
@@ -49,7 +49,7 @@ void Exx_Abfs::Inverse_Matrix_Double::using_dpotrf()
 	{
 		std::cout << "\n info_dpotri = " << info <<std::endl;
 		GlobalV::ofs_warning<<A<<std::endl;
-		QUIT();
+		ModuleBase::QUIT();
 	}
 	
 	copy_down_triangle();

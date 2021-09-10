@@ -2,6 +2,7 @@
 #define ORB_TABLE_ALPHA_H
 
 #include "ORB_atomic_lm.h"
+#include "ORB_read.h" 
 #include "../module_base/sph_bessel_recursive.h"
 
 //caoyu add 2021-03-17
@@ -27,17 +28,17 @@ public:
 
 	
 	/// O stands for orbitals.
-	void init_DS_Opair(void);
+	void init_DS_Opair(LCAO_Orbitals &orb);
 
-	void init_DS_2Lplus1(void);
+	void init_DS_2Lplus1(LCAO_Orbitals &orb);
 
 	ModuleBase::IntArray DS_Opair;
 
 	int *DS_2Lplus1;
 
-	void init_Table_Alpha(Sph_Bessel_Recursive::D2 *pSB);
+	void init_Table_Alpha(ModuleBase::Sph_Bessel_Recursive::D2 *pSB, LCAO_Orbitals &orb);
 
-	void Destroy_Table_Alpha(void);
+	void Destroy_Table_Alpha(LCAO_Orbitals &orb);
 
 	static int get_rmesh(const double &R1, const double &R2);
 
@@ -54,7 +55,7 @@ public:
 private:
 
 	void cal_S_PhiAlpha_R(
-		Sph_Bessel_Recursive::D2 *pSB, // mohan add 2021-03-06
+		ModuleBase::Sph_Bessel_Recursive::D2 *pSB, // mohan add 2021-03-06
 		const int &l,
 		const Numerical_Orbital_Lm &n1,
 		const Numerical_Orbital_Lm &n2,

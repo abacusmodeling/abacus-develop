@@ -3,7 +3,7 @@
 #ifdef __LCAO
 void Dos::calculate_Mulliken(const std::string &fa)
 {
-	TITLE("Dos","calculate_Mulliken");
+	ModuleBase::TITLE("Dos","calculate_Mulliken");
 	std::ofstream ofs;
 	
 	if(GlobalV::MY_RANK==0)
@@ -128,7 +128,7 @@ void Dos::calculate_Mulliken(const std::string &fa)
 	}
 	else
 	{
-		WARNING_QUIT("Mulliken Charge","Not implement yet.");	
+		ModuleBase::WARNING_QUIT("Mulliken Charge","Not implement yet.");	
 	}	
 	
 
@@ -154,7 +154,7 @@ bool Dos::calculate_dos
 	double** ekb//store energy for each k point and each band
 )
 {
-	TITLE("Dos","calculae_dos");
+	ModuleBase::TITLE("Dos","calculae_dos");
 	std::ofstream ofs;
 	if(GlobalV::MY_RANK==0)
 	{
@@ -167,12 +167,12 @@ bool Dos::calculate_dos
 
 	if(de_ev <= 0)
 	{
-		WARNING("DOS::calculate_dos","de <= 0 ");
+		ModuleBase::WARNING("DOS::calculate_dos","de <= 0 ");
 		return 0; 
 	}
 	else if(emax_ev < emin_ev)
 	{
-		WARNING("calculate_dos","emax_ev < emin_ev");
+		ModuleBase::WARNING("calculate_dos","emax_ev < emin_ev");
 		return 0;
 	}
 
@@ -181,7 +181,7 @@ bool Dos::calculate_dos
 	if(npoints <= 0)
 	{
 		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"npoints",npoints);
-		WARNING("calculate_dos","npoints < 0");
+		ModuleBase::WARNING("calculate_dos","npoints < 0");
 		return 0;
 	}
 	if(GlobalV::MY_RANK==0)
@@ -214,7 +214,7 @@ bool Dos::calculate_dos
 				for(int ib = 0; ib < nbands; ib++)
 				{
 					//  compare et and e_old(e_new) in ev unit.
-					if( ekb[ik][ib]*Ry_to_eV >= e_old && ekb[ik][ib]*Ry_to_eV < e_new)
+					if( ekb[ik][ib]*ModuleBase::Ry_to_eV >= e_old && ekb[ik][ib]*ModuleBase::Ry_to_eV < e_new)
 					{
 						// because count is 'double' type,so
 						// we can't write count++ or ++count
@@ -304,7 +304,7 @@ void Dos::nscf_fermi_surface(const std::string &out_band_dir,
 
 				for(int ib = 0; ib < nband; ib++)
 				{
-					ofs << " " << ekb[ik_now][ib] * Ry_to_eV;
+					ofs << " " << ekb[ik_now][ib] * ModuleBase::Ry_to_eV;
 				}
 				ofs << std::endl;
 
@@ -337,7 +337,7 @@ void Dos::nscf_band(
 	const double &fermie,
 	double** ekb)
 {
-	TITLE("Dos","nscf_band");
+	ModuleBase::TITLE("Dos","nscf_band");
 
 #ifdef __MPI
 	if(GlobalV::MY_RANK==0)
@@ -362,7 +362,7 @@ void Dos::nscf_band(
 					ofs << ik+1;
 					for(int ib = 0; ib < nband; ib++)
 					{
-						ofs << " " << (ekb[ik_now+is*nks][ib]-fermie) * Ry_to_eV;
+						ofs << " " << (ekb[ik_now+is*nks][ib]-fermie) * ModuleBase::Ry_to_eV;
 					}
 					ofs << std::endl;
 					ofs.close();	
@@ -384,7 +384,7 @@ void Dos::nscf_band(
 				ofs<<std::setw(12)<<ik;
 				for(int ib = 0; ib < nband; ib++)
 				{
-					ofs <<std::setw(12)<< ekb[ik][ib] * Ry_to_eV;
+					ofs <<std::setw(12)<< ekb[ik][ib] * ModuleBase::Ry_to_eV;
 				}
 				ofs<<std::endl;
 			}
@@ -405,7 +405,7 @@ void Dos::nscf_band(
 			ofs<<std::setw(12)<<ik + 1;
 			for(int ibnd = 0; ibnd < nband; ibnd++)
 			{
-				ofs <<std::setw(15) << (ekb[ik][ibnd]-fermie) * Ry_to_eV;
+				ofs <<std::setw(15) << (ekb[ik][ibnd]-fermie) * ModuleBase::Ry_to_eV;
 			}
 			ofs<<std::endl;
 		}

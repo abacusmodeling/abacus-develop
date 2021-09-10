@@ -32,7 +32,7 @@ read_pp.o \
 read_pp_upf100.o \
 read_pp_upf201.o \
 read_pp_vwr.o \
-read_pp_blps.o\
+read_pp_blps.o \
 pseudo_nc.o \
 VL_in_pw.o\
 VNL_in_pw.o\

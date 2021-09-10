@@ -8,6 +8,9 @@
 #include "vector3.h"
 #include "matrix.h"
 
+namespace ModuleBase
+{
+
 class Matrix3
 {
 	/* data */
@@ -43,8 +46,8 @@ Matrix3 operator /(const Matrix3 &m,const double &s);		//m/s
 Matrix3 operator *(const Matrix3 &m1,const  Matrix3 &m2);	//m1*m2
 Matrix3 operator *(const Matrix3 &m,const double &s);		//m*s
 Matrix3 operator *(const double &s, const Matrix3 &m);		//s*m
-template<typename T> Vector3<double> operator *(const Matrix3 &m, const Vector3<T> &u);	//m*u				// Peize Lin change Vector3<T> 2017-01-10
-template<typename T> Vector3<double> operator *(const Vector3<T> &u, const Matrix3 &m);	//u*m				// Peize Lin change Vector3<T> 2017-01-10
+template<typename T> ModuleBase::Vector3<double> operator *(const Matrix3 &m, const ModuleBase::Vector3<T> &u);	//m*u				// Peize Lin change ModuleBase::Vector3<T> 2017-01-10
+template<typename T> ModuleBase::Vector3<double> operator *(const ModuleBase::Vector3<T> &u, const Matrix3 &m);	//u*m				// Peize Lin change ModuleBase::Vector3<T> 2017-01-10
 
 bool operator ==(const Matrix3 &m1, const Matrix3 &m2); //whether m1 == m2
 bool operator !=(const Matrix3 &m1, const Matrix3 &m2); //whethor m1 != m2
@@ -54,20 +57,22 @@ bool operator !=(const Matrix3 &m1, const Matrix3 &m2); //whethor m1 != m2
 
 //m*u
 template<typename T>
-Vector3<double> operator *(const Matrix3 &m, const Vector3<T> &u)
+ModuleBase::Vector3<double> operator *(const Matrix3 &m, const ModuleBase::Vector3<T> &u)
 {
-	return Vector3<double>(m.e11*u.x + m.e12*u.y + m.e13*u.z,
+	return ModuleBase::Vector3<double>(m.e11*u.x + m.e12*u.y + m.e13*u.z,
 	                       m.e21*u.x + m.e22*u.y + m.e23*u.z,
 	                       m.e31*u.x + m.e32*u.y + m.e33*u.z);
 }
 
 //u*m
 template<typename T>
-Vector3<double> operator *(const Vector3<T> &u, const Matrix3 &m)
+ModuleBase::Vector3<double> operator *(const ModuleBase::Vector3<T> &u, const Matrix3 &m)
 {
-	return Vector3<double>(u.x*m.e11 + u.y*m.e21 + u.z*m.e31,
+	return ModuleBase::Vector3<double>(u.x*m.e11 + u.y*m.e21 + u.z*m.e31,
 	                       u.x*m.e12 + u.y*m.e22 + u.z*m.e32,
 	                       u.x*m.e13 + u.y*m.e23 + u.z*m.e33);
+}
+
 }
 
 #endif // MATRIX3_H

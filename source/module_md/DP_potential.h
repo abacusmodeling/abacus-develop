@@ -19,7 +19,7 @@ public:
 
     static void DP_pot(UnitCell_pseudo &ucell_c, 
                 double &potential, 
-                Vector3<double> *force, 
+                ModuleBase::Vector3<double> *force, 
                 ModuleBase::matrix &stress);
     
 };

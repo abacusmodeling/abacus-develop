@@ -13,7 +13,7 @@
 void pzgseps(MPI_Comm comm_2D,int n,int nb,int &egnum, std::complex<double> *A, std::complex<double> *B,std::complex<double> *Z,double *eigen,
              LocalMatrix LM, char uplo, int &loc_size,int &loc_pos)
 {
-    TITLE("Parrallel_Diago","pzgseps");
+    ModuleBase::TITLE("Parrallel_Diago","pzgseps");
     int i,j,count=0,k=0,incx=1;
     int color,key,err;
 
@@ -69,7 +69,7 @@ void pzgseps(MPI_Comm comm_2D,int n,int nb,int &egnum, std::complex<double> *A, 
 	if(wrong_input > 0)
 	{
 		GlobalV::ofs_running << "\n col_num == 0 || row_num == 0" << std::endl;
-		WARNING_QUIT("pzgseps","col_num == 0 || row_num == 0");
+		ModuleBase::WARNING_QUIT("pzgseps","col_num == 0 || row_num == 0");
 	}
 
 	pzheg2st(uplo,comm_2D,A,LM,B,LM,nb,n);

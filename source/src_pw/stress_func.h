@@ -95,14 +95,14 @@ class Stress_Func
 	void dylmr2 (
 			const int nylm,
 			const int ngy,
-			Vector3<double> *gk,
+			ModuleBase::Vector3<double> *gk,
 			ModuleBase::matrix &dylm,
 			const int ipol);	//used in get_dvnl1()
 	void get_dvnl2(
 			ModuleBase::ComplexMatrix &vkb,
 			const int ik);		//used in nonlocal part in PW basis
 	double Polynomial_Interpolation_nl(
-			const realArray &table,
+			const ModuleBase::realArray &table,
 			const int &dim1,
 			const int &dim2,
 			const double &table_interval,

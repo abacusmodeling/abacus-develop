@@ -5,8 +5,8 @@
 
 void Stress_PW::cal_stress(ModuleBase::matrix& sigmatot)
 {
-	TITLE("Stress_PW","cal_stress");
-	timer::tick("Stress_PW","cal_stress");    
+	ModuleBase::TITLE("Stress_PW","cal_stress");
+	ModuleBase::timer::tick("Stress_PW","cal_stress");    
 
 	// total stress
 	sigmatot.create(3,3);
@@ -117,6 +117,7 @@ void Stress_PW::cal_stress(ModuleBase::matrix& sigmatot)
 		this->print_stress("NLCC    STRESS",sigmaxcc,GlobalV::TEST_STRESS,ry);
 		this->print_stress("TOTAL    STRESS",sigmatot,GlobalV::TEST_STRESS,ry);
 	}
+	ModuleBase::timer::tick("Stress_PW","cal_stress");
 	return;
     
 }

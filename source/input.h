@@ -50,6 +50,7 @@ class Input
 	bool set_vel;           // read velocity from STRU or not  liuyu 2021-07-14
 
     bool symmetry;			// turn on symmetry or not
+    double symmetry_prec;   // LiuXh add 2021-08-12, accuracy for symmetry
 	int npool; 				// ecch pool is for one k point
 
     bool berry_phase;		// berry phase calculation
@@ -304,7 +305,7 @@ class Input
 	std::string vdw_R0_file;
 	std::string vdw_R0_unit;		    //"Bohr" or "Angstrom"
 	std::string vdw_model;			//"period" or "radius"
-	Vector3<int> vdw_period;
+	ModuleBase::Vector3<int> vdw_period;
 
 //==========================================================
 // Spectrum
@@ -348,7 +349,6 @@ class Input
 	//double  ocp_kb[10000];
 	int     lcao_box[3];           // the scale for searching the existence of the overlap <i,0|j,R>
 	int    mulliken;//qifeng add 2019-9-10
-	bool input_mag;
 	double* atom_mag;
 	int n_mag_at;
 	//added by zhengdy-soc
@@ -449,10 +449,10 @@ class Input
 //==========================================================
 // DeepKS -- added by caoyu and mohan
 //==========================================================
-    int out_descriptor; // output descritpor for deepks. caoyu added 2020-11-24, mohan modified 2021-01-03
-	int lmax_descriptor; // lmax used in descriptor, mohan added 2021-01-03
-	int deepks_scf;	//if set 1, a trained model would be needed to cal V_delta and F_delta
-	std::string model_file;		//needed when deepks_scf=1
+    int out_descriptor; // (need libnpy) output descritpor for deepks. caoyu added 2020-11-24, mohan modified 2021-01-03
+	int lmax_descriptor; //lmax used in descriptor, mohan added 2021-01-03
+	int deepks_scf;	//(need libnpy and libtorch) if set 1, a trained model would be needed to cal V_delta and F_delta
+	string model_file;		//needed when deepks_scf=1
 
 //==========================================================
 // variables for test only

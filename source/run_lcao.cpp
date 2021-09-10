@@ -16,33 +16,37 @@ Run_lcao::~Run_lcao(){}
 
 void Run_lcao::lcao_line(void)
 {
-    TITLE("Run_lcao","lcao_line");
-	timer::tick("Run_lcao","lcao_line");
+    ModuleBase::TITLE("Run_lcao","lcao_line");
+	ModuleBase::timer::tick("Run_lcao","lcao_line");
 
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
     // cell relaxation. b) put GlobalV::NLOCAL and GlobalV::NBANDS as input parameters
+#ifdef __LCAO
+    GlobalC::ucell.setup_cell( GlobalC::ORB, GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
+#else
     GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
+#endif
 	if(INPUT.test_just_neighbor)
 	{
 		//test_search_neighbor();
 		GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
 			GlobalV::ofs_running,
 			GlobalV::OUT_LEVEL,
-			GlobalC::ORB.get_rcutmax_Phi(), 
-			GlobalC::ORB.get_rcutmax_Beta(), 
+			GlobalC::ORB.get_rcutmax_Phi(),
+			GlobalC::ORB.get_rcutmax_Beta(),
 			GlobalV::GAMMA_ONLY_LOCAL);
 
 		atom_arrange::search(
 			GlobalV::SEARCH_PBC,
 			GlobalV::ofs_running,
-			GlobalC::GridD, 
-			GlobalC::ucell, 
-			GlobalV::SEARCH_RADIUS, 
+			GlobalC::GridD,
+			GlobalC::ucell,
+			GlobalV::SEARCH_RADIUS,
 			GlobalV::test_atom_input,
 			INPUT.test_just_neighbor);
 	}
-	// setup GlobalV::NBANDS 
+	// setup GlobalV::NBANDS
 	// Yu Liu add 2021-07-03
 	GlobalC::CHR.cal_nelec();
 
@@ -74,20 +78,20 @@ void Run_lcao::lcao_line(void)
     // mohan add 2021-01-30
     Print_Info::setup_parameters(GlobalC::ucell, GlobalC::kv, GlobalC::xcf);
 
-    // * reading the localized orbitals/projectors 
+    // * reading the localized orbitals/projectors
 	// * construct the interpolation tables.
 
 	GlobalC::LOWF.orb_con.set_orb_tables(
 		GlobalV::ofs_running,
-		GlobalC::UOT, 
+		GlobalC::UOT,
 		GlobalC::ORB,
 		GlobalC::ucell.ntype,
 		GlobalC::ucell.lmax,
 		INPUT.lcao_ecut,
 		INPUT.lcao_dk,
 		INPUT.lcao_dr,
-		INPUT.lcao_rmax, 
-		GlobalC::ucell.lat0, 
+		INPUT.lcao_rmax,
+		GlobalC::ucell.lat0,
 		INPUT.out_descriptor,
 		INPUT.out_r_matrix,
 		Exx_Abfs::Lmax,
@@ -112,7 +116,7 @@ void Run_lcao::lcao_line(void)
     if(GlobalV::CALCULATION == "test")
     {
         Cal_Test::test_memory();
-        QUIT();
+        ModuleBase::QUIT();
     }
 
     // initialize the real-space uniform grid for FFT and parallel
@@ -156,6 +160,6 @@ void Run_lcao::lcao_line(void)
 		GlobalC::en.perform_dos();
 	}
 
-	timer::tick("Run_lcao","lcao_line");
+	ModuleBase::timer::tick("Run_lcao","lcao_line");
     return;
 }

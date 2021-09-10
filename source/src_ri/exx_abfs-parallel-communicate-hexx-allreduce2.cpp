@@ -14,7 +14,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::init(
 	const MPI_Comm &mpi_comm_in,
 	const set<std::pair<size_t,size_t>> &H_atom_pairs_core)
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::init");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::init");
 	
 	mpi_comm = mpi_comm_in;
 	MPI_Comm_size(mpi_comm, &comm_sz);
@@ -32,7 +32,7 @@ Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::exx_to_a2D(
 std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"Hmpi_"+ModuleBase::GlobalFunc::TO_STRING(my_rank), std::ofstream::app);
 timeval t_all;	gettimeofday(&t_all,NULL);
 
-	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::exx_to_a2D");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::exx_to_a2D");
 	
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> data_all(GlobalV::NSPIN);
 //ofs<<__LINE__<<std::endl;
@@ -165,7 +165,7 @@ std::vector<size_t> Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::get_send_
 	const set<std::pair<size_t,size_t>> &H_atom_pairs_core,
 	const std::vector<std::pair<std::vector<bool>,std::vector<bool>>> &atom_in_2D_list) const
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::get_send_size_list");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::get_send_size_list");
 	std::vector<size_t> send_size_list(comm_sz,0);
 	for(const auto &H_atom_pair : H_atom_pairs_core)
 	{

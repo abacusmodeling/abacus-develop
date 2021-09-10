@@ -18,7 +18,7 @@ Ions_Move_SD::~Ions_Move_SD()
 
 void Ions_Move_SD::allocate(void)
 {
-    TITLE("Ions_Move_SD","allocate");
+    ModuleBase::TITLE("Ions_Move_SD","allocate");
     assert( dim > 0);
 	delete[] grad_saved;
     delete[] pos_saved;
@@ -28,7 +28,7 @@ void Ions_Move_SD::allocate(void)
 
 void Ions_Move_SD::start(const ModuleBase::matrix& force, const double& etot_in)
 {
-    TITLE("Ions_Move_SD","start");
+    ModuleBase::TITLE("Ions_Move_SD","start");
 
 	assert(dim>0);
 	assert(grad_saved!=0);
@@ -114,7 +114,7 @@ void Ions_Move_SD::cal_tradius_sd(void)const
 	}
 	else
 	{
-		WARNING_QUIT("Ions_Move_SD::cal_tradius_sd","istep < 1!");	
+		ModuleBase::WARNING_QUIT("Ions_Move_SD::cal_tradius_sd","istep < 1!");	
 	}
 	if(GlobalV::OUT_LEVEL=="ie")
 	{

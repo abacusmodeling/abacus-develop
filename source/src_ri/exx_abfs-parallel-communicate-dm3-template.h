@@ -11,14 +11,14 @@ const ModuleBase::matrix &Exx_Abfs::Parallel::Communicate::DM3::D_phase(
 ModuleBase::matrix Exx_Abfs::Parallel::Communicate::DM3::D_phase(
 	const ModuleBase::ComplexMatrix &DK, const int ik, const Abfs::Vector3_Order<int> &box2) const
 {
-	return (DK * exp( -TWO_PI*IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (box2*GlobalC::ucell.latvec)) )).real();
+	return (DK * exp( -ModuleBase::TWO_PI*ModuleBase::IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (box2*GlobalC::ucell.latvec)) )).real();
 }
 
 
 template<typename Tmatrix> std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>>
 Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<Tmatrix> &DK_2D, const double threshold_D) const
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::DM3::K_to_R");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM3::K_to_R");
 
 	/*{
 		static int istep=0;
@@ -30,7 +30,7 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<Tmatrix> &DK_2D, 
 	
 	const std::map<int,int> nspin_2D = {{1,1}, {2,2}, {4,1}};
 	const std::map<int,double> SPIN_multiple = {{1,0.5}, {2,1}, {4,1}};							// ???
-	const Abfs::Vector3_Order<int> Born_von_Karman_period = Vector3<int>{GlobalC::kv.nmp[0],GlobalC::kv.nmp[1],GlobalC::kv.nmp[2]};
+	const Abfs::Vector3_Order<int> Born_von_Karman_period = ModuleBase::Vector3<int>{GlobalC::kv.nmp[0],GlobalC::kv.nmp[1],GlobalC::kv.nmp[2]};
 	const std::vector<Abfs::Vector3_Order<int>> supercell_boxes = Abfs::get_Born_von_Karmen_boxes(Born_von_Karman_period);
 	for(const Abfs::Vector3_Order<int> &box2 : supercell_boxes)
 	{

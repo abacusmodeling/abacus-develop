@@ -13,11 +13,40 @@ project(ABACUS
 
 option(ENABLE_DEEPKS "Enable DeePKS functionality" OFF)
 option(ENABLE_LIBXC "Enable LibXC functionality" OFF)
+option(USE_CUDA "Enable support to CUDA." OFF)
 
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
-option(BUILD_UNIT_TESTS "Build ABACUS unit tests" ON)
+option(BUILD_TESTING "Build ABACUS unit tests" OFF)
 option(GENERATE_TEST_REPORTS "Enable test report generation" OFF)
 
+include(CheckLanguage)
+check_language(CUDA)
+if(CMAKE_CUDA_COMPILER)
+  if(NOT DEFINED USE_CUDA)
+    message("CUDA components detected. \nWill build the CUDA version of ABACUS.")
+    set(USE_CUDA ON)
+  else()
+    if(NOT USE_CUDA)
+      message(WARNING "CUDA components detected, but USE_CUDA set to OFF. \nNOT building CUDA version of ABACUS.")
+    endif()
+  endif()
+else() # CUDA not found
+  if (USE_CUDA)
+    message(FATAL_ERROR "USE_CUDA set but no CUDA components found.")
+    set(USE_CUDA OFF)
+  endif()
+endif()
+if(USE_CUDA)
+  set(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_CXX_EXTENSIONS ON)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+  set(CMAKE_CUDA_STANDARD 14)
+  set(CMAKE_CUDA_STANDARD_REQUIRED ON)
+  set(CMAKE_CUDA_HOST_COMPILER ${CMAKE_CXX_COMPILER})
+  enable_language(CUDA)
+  include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
+  add_compile_definitions(__CUDA)
+endif()
 
 if(ENABLE_DEEPKS)
   set(CMAKE_CXX_STANDARD 14)
@@ -37,7 +66,8 @@ if(ENABLE_ASAN)
     -fsanitize=address
   )
 else()
-  add_compile_options(-O2 -g -Wno-write-strings)
+  add_compile_options(-O2 -g)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-write-strings" )
 endif()
 
 set(ABACUS_BIN_NAME abacus)
@@ -53,10 +83,6 @@ find_package(ELPA REQUIRED)
 find_package(MPI REQUIRED)
 find_package(Threads REQUIRED)
 find_package(OpenMP REQUIRED)
-
-if(DEFINED MKL_DIR)
-  set(MKL_DIR_CACHE "${MKL_DIR}")
-endif()
 
 include(FetchContent)
 
@@ -96,7 +122,11 @@ if(ENABLE_LIBXC)
   endif()
 endif()
 
-if(DEFINED MKL_DIR_CACHE)
+if(DEFINED ENV{MKLROOT} AND NOT DEFINED MKLROOT)
+    set(MKLROOT "$ENV{MKLROOT}")
+endif()
+
+if(MKLROOT)
   find_package(IntelMKL REQUIRED)
   add_definitions(-D__MKL -DMKL_ILP64)
   include_directories(${MKL_INCLUDE_DIRS} ${MKL_INCLUDE_DIRS}/fftw)
@@ -153,7 +183,7 @@ target_link_libraries(${ABACUS_BIN_NAME}
     Threads::Threads
 )
 
-if(DEFINED MKL_DIR_CACHE)
+if(MKLROOT)
   target_link_libraries(${ABACUS_BIN_NAME}
     -lifcore
     IntelMKL::MKL
@@ -168,15 +198,29 @@ else()
   )
 endif()
 
-# if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+if(CMAKE_COMPILER_IS_GNUCXX)
 target_link_libraries(${ABACUS_BIN_NAME}
   -lgfortran
 )
-# endif()
+endif()
 
 if(ENABLE_DEEPKS)
   target_link_libraries(${ABACUS_BIN_NAME}
     ${TORCH_LIBRARIES}
+  )
+endif()
+
+if(USE_CUDA)
+  target_link_libraries(${ABACUS_BIN_NAME}
+    -lcufft
+    -lcublas
+    -lcudart
+  )
+  set_property(TARGET ${ABACUS_BIN_NAME}
+  PROPERTY CUDA_ARCHITECTURES
+  60 # P100
+  70 # V100
+  75 # T4
   )
 endif()
 

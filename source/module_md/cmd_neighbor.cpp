@@ -26,9 +26,9 @@ CMD_neighbor::~CMD_neighbor()
 // In big cell, for atom i,
 // at most one mirror atom of atom j is its adjent atom
 //------------------------------------------------------
-Vector3<double> CMD_neighbor::cell_periodic(const Vector3<double> a, const Vector3<double> b)
+ModuleBase::Vector3<double> CMD_neighbor::cell_periodic(const ModuleBase::Vector3<double> a, const ModuleBase::Vector3<double> b)
 {
-	Vector3<double> temp = a-b;
+	ModuleBase::Vector3<double> temp = a-b;
 	while(temp.x<-0.5) temp.x+=1;
 	while(temp.x>0.5) temp.x-=1;
 	while(temp.y<-0.5) temp.y+=1;
@@ -41,8 +41,8 @@ Vector3<double> CMD_neighbor::cell_periodic(const Vector3<double> a, const Vecto
 //build the neighbor list
 void CMD_neighbor::neighbor(UnitCell_pseudo &ucell_c)
 {
-    TITLE("CMD_neighbor", "Neighbor");
-    timer::tick("CMD_neighbor", "Neighbor");
+    ModuleBase::TITLE("CMD_neighbor", "Neighbor");
+    ModuleBase::timer::tick("CMD_neighbor", "Neighbor");
 
     delete[] nlist;
     for(int i=0; i<dim; i++)
@@ -77,14 +77,14 @@ void CMD_neighbor::neighbor(UnitCell_pseudo &ucell_c)
             {
                 int T1 = ucell_c.iat2it[i];
                 int I1 = ucell_c.iat2ia[i];
-                Vector3<double> taud1 = ucell_c.atoms[T1].taud[I1];
+                ModuleBase::Vector3<double> taud1 = ucell_c.atoms[T1].taud[I1];
 
                 int T2 = ucell_c.iat2it[j];
                 int I2 = ucell_c.iat2ia[j];
-                Vector3<double> taud2 = ucell_c.atoms[T2].taud[I2];
+                ModuleBase::Vector3<double> taud2 = ucell_c.atoms[T2].taud[I2];
 
-			    Vector3<double> tempd = cell_periodic(taud1,taud2);
-                Vector3<double> temp;
+			    ModuleBase::Vector3<double> tempd = cell_periodic(taud1,taud2);
+                ModuleBase::Vector3<double> temp;
                 ModuleBase::Mathzone::Direct_to_Cartesian(
 			        tempd.x, tempd.y, tempd.z,
 			        ucell_c.latvec.e11, ucell_c.latvec.e12, ucell_c.latvec.e13,
@@ -121,7 +121,7 @@ void CMD_neighbor::neighbor(UnitCell_pseudo &ucell_c)
     delete[] list_local;
 #endif
 
-    timer::tick("CMD_neighbor", "Neighbor");
+    ModuleBase::timer::tick("CMD_neighbor", "Neighbor");
     return;
 }
 

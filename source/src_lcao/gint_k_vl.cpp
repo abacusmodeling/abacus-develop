@@ -121,7 +121,7 @@ inline int find_offset(const int size, const int grid_index,
 			GlobalV::ofs_running << " ad=" << iii << " find_R2=" << GlobalC::LNNR.find_R2[iat1][iii] << std::endl;
 		}
 		GlobalV::ofs_warning << " The adjacent atom found by 	 is not found by SLTK_Adjacent program!" << std::endl;
-		WARNING_QUIT("gint_k","evaluate_pvpR_reduced wrong");
+		ModuleBase::WARNING_QUIT("gint_k","evaluate_pvpR_reduced wrong");
 	}
 	assert(offset < GlobalC::LNNR.nad[iat1]);
 	return offset;
@@ -187,7 +187,7 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r,
 			//	Ylm::get_ylm_real(this->nnn[it], this->dr[id], ylma);
 			if (distance[ib][id] < 1.0E-9) distance[ib][id] += 1.0E-9;
 			
-			Ylm::sph_harm (	GlobalC::ucell.atoms[it].nwl,
+			ModuleBase::Ylm::sph_harm (	GlobalC::ucell.atoms[it].nwl,
 					dr[0] / distance[ib][id],
 					dr[1] / distance[ib][id],
 					dr[2] / distance[ib][id],
@@ -323,11 +323,11 @@ inline void cal_pvpR_reduced(int size, int LD_pool, int grid_index,
 
 void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const int spin)
 {
-	TITLE("Gint_k","cal_vlocal_k");
+	ModuleBase::TITLE("Gint_k","cal_vlocal_k");
 
 	if(!pvpR_alloc_flag)
 	{
-		WARNING_QUIT("Gint_k::destroy_pvpR","pvpR has not been allocated yet!");
+		ModuleBase::WARNING_QUIT("Gint_k::destroy_pvpR","pvpR has not been allocated yet!");
 	}
 	else
 	{
@@ -349,7 +349,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 		}
 	}
 
-	timer::tick("Gint_k","vlocal");
+	ModuleBase::timer::tick("Gint_k","vlocal");
 
 	// it's a uniform grid to save orbital values, so the delta_r is a constant.
 	double delta_r = GlobalC::ORB.dr_uniform;
@@ -491,7 +491,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 		delete[] block_index;
 	}	
 
-	timer::tick("Gint_k","vlocal");
+	ModuleBase::timer::tick("Gint_k","vlocal");
 	return;
 }
 
@@ -697,7 +697,7 @@ void Gint_k::evaluate_pvpR_reduced(
                         GlobalV::ofs_running << " ad=" << iii << " find_R2=" << GlobalC::LNNR.find_R2[iat][iii] << std::endl;
                     }
 					GlobalV::ofs_warning << " The adjacent atom found by gt is not found by SLTK_Adjacent program!" << std::endl;
-                    WARNING_QUIT("gint_k","evaluate_pvpR_reduced wrong");
+                    ModuleBase::WARNING_QUIT("gint_k","evaluate_pvpR_reduced wrong");
                 }
                 assert(offset < GlobalC::LNNR.nad[iat]);
 

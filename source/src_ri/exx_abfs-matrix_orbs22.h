@@ -39,8 +39,8 @@ public:
 	ModuleBase::matrix cal_overlap_matrix(  
 		const size_t TA, 
 		const size_t TB, 
-		const Vector3<double> &tauA,
-		const Vector3<double> &tauB,  
+		const ModuleBase::Vector3<double> &tauA,
+		const ModuleBase::Vector3<double> &tauB,  
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_A1, 
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_A2,
 		const ModuleBase::Element_Basis_Index::IndexLNM &index_B1,

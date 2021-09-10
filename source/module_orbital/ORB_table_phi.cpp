@@ -43,7 +43,7 @@ void ORB_table_phi::allocate
     const double &dk_in
 )
 {
-	TITLE("ORB_table_phi", "allocate");
+	ModuleBase::TITLE("ORB_table_phi", "allocate");
 
 	this->ntype = ntype_in;// type of elements.
 	this->lmax = lmax_in;
@@ -105,7 +105,7 @@ int ORB_table_phi::get_rmesh(const double &R1, const double &R2)
 		//GlobalV::ofs_warning << "\n rmesh = " << rmesh;
 		std::cout << "\n R1 = " << R1 << " R2 = " << R2;
 		std::cout << "\n rmesh = " << rmesh;
-		WARNING_QUIT("ORB_table_phi::get_rmesh", "rmesh <= 0");
+		ModuleBase::WARNING_QUIT("ORB_table_phi::get_rmesh", "rmesh <= 0");
 	}
 	return rmesh;
 }
@@ -122,7 +122,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 	double* drs
 ) const
 {
-	timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
+	ModuleBase::timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
 
 	double* k1_dot_k2 = new double[kmesh];
 	double* k1_dot_k2_dot_kpoint = new double[kmesh];
@@ -189,7 +189,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 		double temp = 0.0;
 
 		ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,dk,temp);
-		rs[ir] = temp * FOUR_PI ;
+		rs[ir] = temp * ModuleBase::FOUR_PI ;
 		
 		// Peize Lin accelerate 2017-10-02
 		const std::vector<double> &jlm1_r = jlm1[ir];
@@ -211,7 +211,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 		}
 
 		ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,dk,temp);
-		drs[ir] = -FOUR_PI*(l+1)/(2.0*l+1) * temp;
+		drs[ir] = -ModuleBase::FOUR_PI*(l+1)/(2.0*l+1) * temp;
 	}
 
 	//liaochen modify on 2010/4/22
@@ -229,14 +229,14 @@ void ORB_table_phi::cal_ST_Phi12_R
 		}
 		
 		ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,kab,temp);
-		rs[0] = FOUR_PI / ModuleBase::Mathzone_Add1::dualfac (2*l+1) * temp;
+		rs[0] = ModuleBase::FOUR_PI / ModuleBase::Mathzone_Add1::dualfac (2*l+1) * temp;
 	}
 
 	delete [] integrated_func;
 	delete [] k1_dot_k2;
 	delete [] k1_dot_k2_dot_kpoint;	
 
-	timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
+	ModuleBase::timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
 	
 	return;
 }
@@ -254,8 +254,8 @@ void ORB_table_phi::cal_ST_Phi12_R
 	double* drs
 ) const
 {
-//	TITLE("ORB_table_phi","cal_ST_Phi12_R");
-	timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
+//	ModuleBase::TITLE("ORB_table_phi","cal_ST_Phi12_R");
+	ModuleBase::timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
 
 	std::vector<double> k1_dot_k2(kmesh);
 	switch(job)
@@ -319,7 +319,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 		double temp = 0.0;
 
 		ModuleBase::Integral::Simpson_Integral(kmesh,ModuleBase::GlobalFunc::VECTOR_TO_PTR(integrated_func),dk,temp);
-		rs[ir] = temp * FOUR_PI ;
+		rs[ir] = temp * ModuleBase::FOUR_PI ;
 		
 		const std::vector<double> &jlm1_r = jlm1[ir];
 		const std::vector<double> &jlp1_r = jlp1[ir];
@@ -340,7 +340,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 		}
 
 		ModuleBase::Integral::Simpson_Integral(kmesh,ModuleBase::GlobalFunc::VECTOR_TO_PTR(integrated_func),dk,temp);
-		drs[ir] = -FOUR_PI*(l+1)/(2.0*l+1) * temp;
+		drs[ir] = -ModuleBase::FOUR_PI*(l+1)/(2.0*l+1) * temp;
 	}
 
 	// cal rs[0] special
@@ -358,11 +358,11 @@ void ORB_table_phi::cal_ST_Phi12_R
 
 			// PLEASE try to make dualfac function as input parameters
 			// mohan note 2021-03-23
-			rs[0] = FOUR_PI / ModuleBase::Mathzone_Add1::dualfac (2*l+1) * temp;
+			rs[0] = ModuleBase::FOUR_PI / ModuleBase::Mathzone_Add1::dualfac (2*l+1) * temp;
 		}
 	}
 	
-	timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
+	ModuleBase::timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
 	
 	return;
 }
@@ -373,8 +373,8 @@ void ORB_table_phi::init_Table(
 	const int &job0, 
 	LCAO_Orbitals &orb)
 {
-	TITLE("ORB_table_phi", "init_Table");
-	timer::tick("ORB_table_phi", "init_Table");
+	ModuleBase::TITLE("ORB_table_phi", "init_Table");
+	ModuleBase::timer::tick("ORB_table_phi", "init_Table");
 	const int ntype = orb.get_ntype();
 	assert( ORB_table_phi::dr > 0.0);
 	assert( OV_nTpairs>0);
@@ -469,7 +469,17 @@ void ORB_table_phi::init_Table(
 
 			const int rmesh = this->get_rmesh( Rcut1, Rcut2);
 			assert( rmesh < this->Rmesh );
-			
+#ifdef __ORBITAL
+    		std::stringstream ss1;
+    		ss1 << "./Table_SR0";
+		    std::string command1 = "test -d " + ss1.str() + " || mkdir " + ss1.str();
+   			std::system( command1.c_str() );
+
+    		std::stringstream ss2;
+    		ss2 << "./Table_TR0";
+		    std::string command2 = "test -d " + ss2.str() + " || mkdir " + ss2.str();
+   			std::system( command2.c_str() );
+#endif
 			for (int L1 = 0; L1 < Lmax1 + 1; L1++)
 			{
 				for (int N1 = 0; N1 < orb.Phi[T1].getNchi(L1); N1++)
@@ -515,7 +525,7 @@ void ORB_table_phi::init_Table(
 									Table_SR[0][Tpair][Opair][L] = new double[rmesh];
 									Table_SR[1][Tpair][Opair][L] = new double[rmesh];
 
-									Memory::record("ORB_table_phi","Table_SR",
+									ModuleBase::Memory::record("ORB_table_phi","Table_SR",
 									2*OV_nTpairs*pairs_chi*rmesh,"double");
 									break;
 
@@ -523,7 +533,7 @@ void ORB_table_phi::init_Table(
 									Table_TR[0][Tpair][Opair][L] = new double[rmesh];
 									Table_TR[1][Tpair][Opair][L] = new double[rmesh];
 
-									Memory::record("ORB_table_phi","Table_TR",
+									ModuleBase::Memory::record("ORB_table_phi","Table_TR",
 									2*OV_nTpairs*pairs_chi*rmesh,"double");
 									break;
 
@@ -533,7 +543,7 @@ void ORB_table_phi::init_Table(
 									Table_TR[0][Tpair][Opair][L] = new double[rmesh];
 									Table_TR[1][Tpair][Opair][L] = new double[rmesh];
 
-									Memory::record("ORB_table_phi","Table_SR&TR",
+									ModuleBase::Memory::record("ORB_table_phi","Table_SR&TR",
 									2*2*OV_nTpairs*pairs_chi*rmesh,"double");
 									break;
 								}
@@ -606,6 +616,18 @@ void ORB_table_phi::init_Table(
 										break;
 									}
 								}
+#ifdef __ORBITAL
+								int plot_length = 20;						
+		
+								std::stringstream ss_sr;
+								ss_sr << "Table_SR0/"<<Tpair<<Opair<<L<<".dat";
+								std::string filename1 = ss_sr.str();
+								plot_table(filename1,plot_length,Table_SR[0][Tpair][Opair][L]);
+								std::stringstream ss_tr;
+								ss_tr << "Table_TR0/"<<Tpair<<Opair<<L<<".dat";
+								std::string filename2 = ss_tr.str();
+								plot_table(filename2,plot_length,Table_TR[0][Tpair][Opair][L]);
+#endif
 							}//end m
 						}
 					}//end jl
@@ -630,7 +652,7 @@ void ORB_table_phi::init_Table(
 		break;
 	}
 		
-	timer::tick("ORB_table_phi", "init_Table");
+	ModuleBase::timer::tick("ORB_table_phi", "init_Table");
 	return;
 }
 
@@ -686,7 +708,7 @@ void ORB_table_phi::Destroy_Table(LCAO_Orbitals &orb)
 
 void ORB_table_phi::init_OV_Tpair(LCAO_Orbitals &orb)
 {
-	TITLE("ORB_table_phi","init_OV_Tpair");
+	ModuleBase::TITLE("ORB_table_phi","init_OV_Tpair");
     assert(ntype>0);
 
     this->OV_nTpairs = this->ntype * (this->ntype + 1) / 2;
@@ -760,30 +782,38 @@ void ORB_table_phi::init_Lmax (
 	const int mode, 
 	int &Lmax_used, 
 	int &Lmax,
-	const int &Lmax_exx) const
+	const int &Lmax_exx,
+	const LCAO_Orbitals &orb) const
 {
-	auto cal_Lmax_Phi = [](int &Lmax)
+
+	auto cal_Lmax_Phi = [](int &Lmax,const LCAO_Orbitals &orb)
 	{
 		//obtain maxL of all type
-		const int ntype = GlobalC::ORB.get_ntype();
+		const int ntype = orb.get_ntype();
 		for (int it = 0; it < ntype; it++)
 		{
-			Lmax = std::max(Lmax, GlobalC::ORB.Phi[it].getLmax());
+			Lmax = std::max(Lmax, orb.Phi[it].getLmax());
 		}
 	};
 
-	auto cal_Lmax_Beta = [](int &Lmax)
+	auto cal_Lmax_Beta = [](int &Lmax,const LCAO_Orbitals &orb)
 	{
 		// fix bug.
 		// mohan add the nonlocal part.
 		// 2011-03-07
-		const int ntype = GlobalC::ORB.get_ntype();
+		const int ntype = orb.get_ntype();
 		for(int it=0; it< ntype; it++)
 		{
-			Lmax = std::max(Lmax, GlobalC::ORB.Beta[it].getLmax());
+			Lmax = std::max(Lmax, orb.Beta[it].getLmax());
 		}
 	};
+	auto cal_Lmax_Alpha = [](int &Lmax,const LCAO_Orbitals &orb)
+	{
+		//caoyu add 2021-08-05 for descriptor basis
+		Lmax = std::max(Lmax, orb.get_lmax_d());
+	};
 
+	
 	Lmax = -1;
 	
 	switch( orb_num )
@@ -792,8 +822,8 @@ void ORB_table_phi::init_Lmax (
 			switch( mode )
 			{
 				case 1:			// used in <Phi|Phi> or <Beta|Phi>
-					cal_Lmax_Phi(Lmax);
-					cal_Lmax_Beta(Lmax);
+					cal_Lmax_Phi(Lmax,orb);
+					cal_Lmax_Beta(Lmax,orb);
 					//use 2lmax+1 in dS
 					Lmax_used = 2*Lmax + 1;
 					break;
@@ -802,7 +832,7 @@ void ORB_table_phi::init_Lmax (
 					Lmax_used = 2*Lmax + 1;
 					break;
 				case 3:                // used in berryphase by jingan
-					cal_Lmax_Phi(Lmax);
+					cal_Lmax_Phi(Lmax,orb);
 					Lmax++;
 					Lmax_used = 2*Lmax + 1;
 					break;
@@ -815,7 +845,7 @@ void ORB_table_phi::init_Lmax (
 			switch( mode )
 			{
 				case 1:			// used in <jY|PhiPhi> or <Abfs|PhiPhi>
-					cal_Lmax_Phi(Lmax);
+					cal_Lmax_Phi(Lmax,orb);
 					Lmax_used = 2*Lmax + 1;
 					Lmax = max(Lmax, Lmax_exx);
 					Lmax_used += Lmax_exx;
@@ -829,7 +859,7 @@ void ORB_table_phi::init_Lmax (
 			switch( mode )
 			{
 				case 1:			// used in <PhiPhi|PhiPhi>
-					cal_Lmax_Phi(Lmax);
+					cal_Lmax_Phi(Lmax,orb);
 					Lmax_used = 2*( 2*Lmax + 1 );
 					break;
 				default:
@@ -851,13 +881,14 @@ void ORB_table_phi::init_Table_Spherical_Bessel (
 	const int mode, 
 	int &Lmax_used, 
 	int &Lmax,
-	const int &Lmax_exx)
+	const int &Lmax_exx,
+	const LCAO_Orbitals &orb)
 {
-	TITLE("ORB_table_phi", "init_Table_Spherical_Bessel");
+	ModuleBase::TITLE("ORB_table_phi", "init_Table_Spherical_Bessel");
 
-	this->init_Lmax (orb_num,mode,Lmax_used,Lmax,Lmax_exx);		// Peize Lin add 2016-01-26
+	this->init_Lmax (orb_num,mode,Lmax_used,Lmax,Lmax_exx,orb);		// Peize Lin add 2016-01-26
 
-	for( auto & sb : Sph_Bessel_Recursive_Pool::D2::sb_pool )
+	for( auto & sb : ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool )
 	{
 		if( this->dr * this->dk == sb.get_dx() )
 		{
@@ -868,8 +899,8 @@ void ORB_table_phi::init_Table_Spherical_Bessel (
 
 	if(!pSB)
 	{
-		Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});
-		pSB = &Sph_Bessel_Recursive_Pool::D2::sb_pool.back();
+		ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});
+		pSB = &ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool.back();
 	}
 	
 	pSB->set_dx( this->dr * this->dk );
@@ -899,5 +930,20 @@ void ORB_table_phi::init_Table_Spherical_Bessel (
 //	OUT(GlobalV::ofs_running,"lmax used to generate Jlq",Lmax_used);
 //	OUT(GlobalV::ofs_running,"kmesh",kmesh);
 //	OUT(GlobalV::ofs_running,"Rmesh",Rmesh);
-	Memory::record ("ORB_table_phi", "Jl(x)", (Lmax_used+1) * this->kmesh * this->Rmesh, "double");
+	ModuleBase::Memory::record ("ORB_table_phi", "Jl(x)", (Lmax_used+1) * this->kmesh * this->Rmesh, "double");
 }
+
+void ORB_table_phi::plot_table(
+	const std::string filename,
+	const int rmesh,
+	double* column)
+{
+	std::ofstream ofs;
+	ofs.open(filename.c_str());
+	ofs << "ir    table_entry" << std::endl;
+	for(int ir=0;ir<rmesh;ir++)
+	{
+		ofs<<setw(4) << ir << "  " << column[ir]<<std::endl;
+	}
+}
+

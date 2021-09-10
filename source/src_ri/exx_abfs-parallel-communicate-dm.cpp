@@ -10,7 +10,7 @@
 /*
 void Exx_Abfs::Parallel::Communicate::DM::set_atom_in_exx( const set<std::pair<size_t,size_t>> &H_atom_pairs_core )
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::DM::set_atom_in_exx");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM::set_atom_in_exx");
 	
 	atom_in_exx.row.resize(GlobalC::ucell.nat);
 	atom_in_exx.col.resize(GlobalC::ucell.nat);
@@ -102,7 +102,7 @@ void Exx_Abfs::Parallel::Communicate::DM::cal_DM(
 	const set<std::pair<size_t,size_t>> &H_atom_pairs_core,
 	const double threshold )
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::DM::cal_DM");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM::cal_DM");
 	
 std::ofstream ofs_time("time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
@@ -163,7 +163,7 @@ Exx_Abfs::Parallel::Communicate::DM::LOC_to_grid(
 	const Abfs::Vector3_Order<int> &Born_von_Karman_period,
 	const double threshold ) const
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::DM::LOC_to_grid");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM::LOC_to_grid");
 	
 	const double SPIN_multiple = 0.5*GlobalV::NSPIN;
 	

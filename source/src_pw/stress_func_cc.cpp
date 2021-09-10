@@ -5,7 +5,7 @@
 //NLCC term, need to be tested
 void Stress_Func::stress_cc(ModuleBase::matrix& sigma, const bool is_pw)
 {
-	timer::tick("Stress_Func","stress_cc");
+	ModuleBase::timer::tick("Stress_Func","stress_cc");
         
 	int nt,ng,l,m,ir;
 	double fact=1.0;
@@ -29,6 +29,7 @@ void Stress_Func::stress_cc(ModuleBase::matrix& sigma, const bool is_pw)
 
 	if(judge==0) 
 	{
+		ModuleBase::timer::tick("Stress_Func","stress_cc");
 		return;
 	}
 
@@ -133,7 +134,7 @@ void Stress_Func::stress_cc(ModuleBase::matrix& sigma, const bool is_pw)
 	delete[] rhocg;
 	delete[] psic;
 
-	timer::tick("Stress_Func","stress_cc");
+	ModuleBase::timer::tick("Stress_Func","stress_cc");
 	return;
 }
 
@@ -184,7 +185,7 @@ void Stress_Func::deriv_drhoc
 			aux [ir] = r [ir] * rhoc [ir] * (r [ir] * cos (gx * r [ir] ) / gx - sin (gx * r [ir] ) / pow(gx,2));
 		}//ir
 		ModuleBase::Integral::Simpson_Integral(mesh, aux, rab, rhocg1);
-		drhocg [igl] = FOUR_PI / GlobalC::ucell.omega * rhocg1;
+		drhocg [igl] = ModuleBase::FOUR_PI / GlobalC::ucell.omega * rhocg1;
 	}//igl
 	
 	delete [] aux;

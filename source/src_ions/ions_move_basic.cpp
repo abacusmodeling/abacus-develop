@@ -22,7 +22,7 @@ int Ions_Move_Basic::out_stru=0;
 
 void Ions_Move_Basic::setup_gradient(double* pos, double *grad, const ModuleBase::matrix &force)
 {
-	TITLE("Ions_Move_Basic","setup_gradient");
+	ModuleBase::TITLE("Ions_Move_Basic","setup_gradient");
 	
 	assert(GlobalC::ucell.ntype>0);
 	assert(pos!=NULL);
@@ -66,7 +66,7 @@ void Ions_Move_Basic::setup_gradient(double* pos, double *grad, const ModuleBase
 
 void Ions_Move_Basic::move_atoms(double *move, double *pos)
 {
-	TITLE("Ions_Move_Basic","move_atoms");
+	ModuleBase::TITLE("Ions_Move_Basic","move_atoms");
 
 	assert(move!=NULL);
 	assert(pos!=NULL);
@@ -124,7 +124,7 @@ void Ions_Move_Basic::move_atoms(double *move, double *pos)
 
 void Ions_Move_Basic::check_converged(const double *grad)
 {
-	TITLE("Ions_Move_Basic","check_converged");
+	ModuleBase::TITLE("Ions_Move_Basic","check_converged");
 	assert(dim>0);
 
 	//------------------------------------------------
@@ -151,8 +151,8 @@ void Ions_Move_Basic::check_converged(const double *grad)
 
 	if(GlobalV::OUT_LEVEL=="ie")
 	{
-		std::cout << " ETOT DIFF (eV)       : " << Ions_Move_Basic::ediff*Ry_to_eV << std::endl;
-		std::cout << " LARGEST GRAD (eV/A)  : " << Ions_Move_Basic::largest_grad * Ry_to_eV / 0.529177 << std::endl;
+		std::cout << " ETOT DIFF (eV)       : " << Ions_Move_Basic::ediff*ModuleBase::Ry_to_eV << std::endl;
+		std::cout << " LARGEST GRAD (eV/A)  : " << Ions_Move_Basic::largest_grad * ModuleBase::Ry_to_eV / 0.529177 << std::endl;
 	}
 	
 	const double etot_diff = std::abs(Ions_Move_Basic::ediff);
@@ -171,7 +171,7 @@ void Ions_Move_Basic::check_converged(const double *grad)
 	{
 		GlobalV::ofs_running << "\n Ion relaxation is converged!" << std::endl;
 		GlobalV::ofs_running << "\n Energy difference (Ry) = " << etot_diff << std::endl;
-		GlobalV::ofs_running << "\n Largest gradient is (eV/A) = " << largest_grad * Ry_to_eV / 0.529177 << std::endl;
+		GlobalV::ofs_running << "\n Largest gradient is (eV/A) = " << largest_grad * ModuleBase::Ry_to_eV / 0.529177 << std::endl;
 
 		Ions_Move_Basic::converged = true;
 		++ Ions_Move_Basic::update_iter;
@@ -179,7 +179,7 @@ void Ions_Move_Basic::check_converged(const double *grad)
 	else
 	{
 		GlobalV::ofs_running << "\n Ion relaxation is not converged yet (threshold is " 
-		<< GlobalV::FORCE_THR * Ry_to_eV / 0.529177 << ")" << std::endl;
+		<< GlobalV::FORCE_THR * ModuleBase::Ry_to_eV / 0.529177 << ")" << std::endl;
 		//std::cout << "\n etot_diff=" << etot_diff << " etot_thr=" << etot_thr
 		//<< " largest_grad=" << largest_grad << " force_thr=" << GlobalV::FORCE_THR << std::endl;
 		Ions_Move_Basic::converged = false;
@@ -191,7 +191,7 @@ void Ions_Move_Basic::check_converged(const double *grad)
 
 void Ions_Move_Basic::terminate(void)
 {
-	TITLE("Ions_Move_Basic","terminate");
+	ModuleBase::TITLE("Ions_Move_Basic","terminate");
 	if(Ions_Move_Basic::converged)
 	{
 		GlobalV::ofs_running << " end of geometry optimization"<<std::endl;
@@ -289,7 +289,7 @@ void Ions_Move_Basic::second_order(
 	double &best_e
 	)
 {
-	TITLE("Ions_Move_Basic","second_order");
+	ModuleBase::TITLE("Ions_Move_Basic","second_order");
 
 	// (1) E = ax^2 + bx + c
 	// |x> is the movement,or the trust radius 
@@ -309,10 +309,10 @@ void Ions_Move_Basic::second_order(
 	best_x = -0.5 * b / a; 
 	best_e = a*best_x*best_x+b*best_x+e0;
 	GlobalV::ofs_running << " The next E should be ( 2nd order interpolation)" 
-	<< best_e * Ry_to_eV << " eV" << std::endl;
+	<< best_e * ModuleBase::Ry_to_eV << " eV" << std::endl;
 
 	std::cout << " The next E should be ( 2nd order interpolation)" 
-	<< best_e * Ry_to_eV << " eV" << std::endl;
+	<< best_e * ModuleBase::Ry_to_eV << " eV" << std::endl;
 	
 	return;
 }

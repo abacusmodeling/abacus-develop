@@ -16,7 +16,7 @@ class Grid_Base_Beta
 public:
 
 	void prepare( 
-		const Matrix3 &latvec_in, 
+		const ModuleBase::Matrix3 &latvec_in, 
 		const double &lat0_in);
 
 protected:
@@ -31,8 +31,8 @@ protected:
 	double* rho1; // about charge
 	double **density_kernel;
 	double vfactor;
-	Matrix3 latvec;
-	Matrix3 latvec0;
+	ModuleBase::Matrix3 latvec;
+	ModuleBase::Matrix3 latvec0;
 	int* nnn;
 	double lat0;
 	enum cal_type{ cal_charge, cal_local, cal_vnlb } job;

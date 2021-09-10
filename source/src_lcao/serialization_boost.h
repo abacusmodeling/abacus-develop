@@ -20,9 +20,9 @@ namespace boost
 {
 	namespace serialization
 	{
-		// Vector3<T>								Peize Lin add 2018-07-01
+		// ModuleBase::Vector3<T>								Peize Lin add 2018-07-01
 		template<typename Archive, typename T>
-		inline void serialize(Archive & ar, Vector3<T> & v, const unsigned int version)
+		inline void serialize(Archive & ar, ModuleBase::Vector3<T> & v, const unsigned int version)
 		{
 			ar & v.x;
 			ar & v.y;
@@ -91,7 +91,7 @@ namespace boost
 
 #include <boost/serialization/collection_traits.hpp>
 
-BOOST_SERIALIZATION_COLLECTION_TRAITS(Vector3)
+BOOST_SERIALIZATION_COLLECTION_TRAITS(ModuleBase::Vector3)
 BOOST_SERIALIZATION_COLLECTION_TRAITS(Abfs::Vector3_Order)
 
 #endif

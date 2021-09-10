@@ -8,9 +8,13 @@
 #endif
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
+#ifdef __LCAO
+void UnitCell_pseudo::read_atom_species(LCAO_Orbitals &orb, std::ifstream &ifa, std::ofstream &ofs_running)
+#else
 void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_running)
+#endif
 {
-	TITLE("UnitCell_pseudo","read_atom_species");
+	ModuleBase::TITLE("UnitCell_pseudo","read_atom_species");
 
 	delete[] atom_label;
     delete[] atom_mass;
@@ -53,7 +57,7 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 	{
 		if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "NUMERICAL_ORBITAL") )
 		{
-			GlobalC::ORB.read_in_flag = true;
+			orb.read_in_flag = true;
 			for(int i=0; i<ntype; i++)
 			{
 				std::string ofile;
@@ -73,27 +77,28 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 				//-----------------------------------
 				//ModuleBase::GlobalFunc::READ_VALUE(ifa, nfile);
 				
-				GlobalC::ORB.orbital_file.push_back(ofile);
+				orb.orbital_file.push_back(ofile);
 
 				//-----------------------------------
 				// Turn off the read in NONLOCAL file
 				// function since 2013-08-02 by mohan
 				//-----------------------------------
-				//GlobalC::ORB.nonlocal_file.push_back(nfile);
+				//orb.nonlocal_file.push_back(nfile);
 
-//				GlobalV::ofs_running << " For atom type " << i + 1 << std::endl;
-//			    GlobalV::ofs_running << " Read in numerical orbitals from file " << ofile << std::endl;
-//			    GlobalV::ofs_running << " Read in nonlocal projectors from file " << nfile << std::endl;
+//				ofs_running << " For atom type " << i + 1 << std::endl;
+//			    ofs_running << " Read in numerical orbitals from file " << ofile << std::endl;
+//			    ofs_running << " Read in nonlocal projectors from file " << nfile << std::endl;
 				
 			}
 		}	
 		// caoyu add 2021-03-16
 		if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "NUMERICAL_DESCRIPTOR")) {
-			ifa >> GlobalC::ORB.descriptor_file;
+			ifa >> orb.descriptor_file;
 		}
 	}
 
 	// Peize Lin add 2016-09-23
+#ifndef __CELL
 	if( Exx_Global::Hybrid_Type::HF   == GlobalC::exx_lcao.info.hybrid_type || 
 	    Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type || 
 		Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type )
@@ -109,6 +114,7 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 		}
 	}
 #endif
+#endif
 	//==========================
 	// read in lattice constant
 	//==========================
@@ -117,12 +123,12 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 		ModuleBase::GlobalFunc::READ_VALUE(ifa, lat0);
 		if(lat0<=0.0)
 		{
-			WARNING_QUIT("read_atom_species","lat0<=0.0");
+			ModuleBase::WARNING_QUIT("read_atom_species","lat0<=0.0");
 		}
 		lat0_angstrom = lat0 * 0.529177 ;
 		ModuleBase::GlobalFunc::OUT(ofs_running,"lattice constant (Bohr)",lat0);
 		ModuleBase::GlobalFunc::OUT(ofs_running,"lattice constant (Angstrom)",lat0_angstrom);
-		this->tpiba  = TWO_PI / lat0;
+		this->tpiba  = ModuleBase::TWO_PI / lat0;
 		this->tpiba2 = tpiba * tpiba;
 	}
 
@@ -144,13 +150,13 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 		}
 		if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
 		{
-			WARNING_QUIT("UnitCell_pseudo::read_atom_species","do not use LATTICE_PARAMETERS without explicit specification of lattice type");
+			ModuleBase::WARNING_QUIT("UnitCell_pseudo::read_atom_species","do not use LATTICE_PARAMETERS without explicit specification of lattice type");
 		}
 	}//supply lattice vectors
 	else{
 		if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "LATTICE_VECTORS") )
 		{
-			WARNING_QUIT("UnitCell_pseudo::read_atom_species","do not use LATTICE_VECTORS along with explicit specification of lattice type");
+			ModuleBase::WARNING_QUIT("UnitCell_pseudo::read_atom_species","do not use LATTICE_VECTORS along with explicit specification of lattice type");
 		}
 		if(latName=="sc"){//simple-cubic
 			latvec.e11 = 1.0; latvec.e12 = 0.0; latvec.e13 = 0.0;
@@ -316,7 +322,7 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 		}
 		else{ 
 			std::cout << "latname is : " << latName << std::endl;
-			WARNING_QUIT("UnitCell_pseudo::read_atom_species","latname not supported!");
+			ModuleBase::WARNING_QUIT("UnitCell_pseudo::read_atom_species","latname not supported!");
 		}
 	}
 
@@ -338,9 +344,13 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 // Read atomic positions
 // return 1: no problem.
 // return 0: some problems.
+#ifdef __LCAO
+bool UnitCell_pseudo::read_atom_positions(LCAO_Orbitals &orb, std::ifstream &ifpos, std::ofstream &ofs_running, std::ofstream &ofs_warning)
+#else
 bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &ofs_running, std::ofstream &ofs_warning)
+#endif
 {
-	TITLE("UnitCell_pseudo","read_atom_positions");
+	ModuleBase::TITLE("UnitCell_pseudo","read_atom_positions");
 
 	if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifpos, "ATOMIC_POSITIONS"))
 	{
@@ -355,7 +365,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 			&& Coordinate != "Cartesian_angstrom_center_xyz"
 			)
 		{
-			WARNING("read_atom_position","Cartesian or Direct?");
+			ModuleBase::WARNING("read_atom_position","Cartesian or Direct?");
 			ofs_warning << " There are several options for you:" << std::endl;
 			ofs_warning << " Direct" << std::endl;
 			ofs_warning << " Cartesian_angstrom" << std::endl;
@@ -367,8 +377,8 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 			return 0; // means something wrong
 		}
 
-		Vector3<double> v;
-		Vector3<int> mv;
+		ModuleBase::Vector3<double> v;
+		ModuleBase::Vector3<int> mv;
 		int na = 0;
 		this->nat = 0;
 
@@ -397,19 +407,17 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 			if(!found)
 			{
 				ofs_warning << " Label read from ATOMIC_POSITIONS is " << this->atoms[it].label << std::endl; 
-				ofs_warning << " Lable from ATOMIC_SPECIES is " << this->atom_label[it] << std::endl;
+				ofs_warning << " Label from ATOMIC_SPECIES is " << this->atom_label[it] << std::endl;
 				return 0;
 			}
 			ModuleBase::GlobalFunc::OUT(ofs_running, "atom label",atoms[it].label);
 
 #ifndef __CMD
-			if(!input_mag)
-			{
+
 			ModuleBase::GlobalFunc::READ_VALUE(ifpos, magnet.start_magnetization[it] );
-			}
-			
 
 #ifndef __SYMMETRY
+/*
 			if(GlobalV::NSPIN==4)//added by zhengdy-soc
 			{
 				if(GlobalV::NONCOLIN)
@@ -443,7 +451,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 			{
 				ModuleBase::GlobalFunc::OUT(ofs_running, "start magnetization","FALSE");
 			}
-
+*/
 			//===========================================
 			// (2) read in numerical orbital information
 			// int atoms[it].nwl
@@ -452,14 +460,14 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 #ifdef __LCAO
 			if (GlobalV::BASIS_TYPE == "lcao" || GlobalV::BASIS_TYPE == "lcao_in_pw")
 			{    
-				std::ifstream ifs(GlobalC::ORB.orbital_file[it].c_str(), ios::in);  // pengfei 2014-10-13
+				std::ifstream ifs(orb.orbital_file[it].c_str(), ios::in);  // pengfei 2014-10-13
 
 				// mohan add return 2021-04-26
 				if (!ifs)
 				{
 					std::cout << " Element index " << it+1 << std::endl;
-					std::cout << " orbital file: " << GlobalC::ORB.orbital_file[it] << std::endl;
-					WARNING("read_atom_positions","ABACUS Cannot find the ORBITAL file (basis sets)");
+					std::cout << " orbital file: " << orb.orbital_file[it] << std::endl;
+					ModuleBase::WARNING("read_atom_positions","ABACUS Cannot find the ORBITAL file (basis sets)");
 					return 0; // means something wrong
 				}
 
@@ -573,7 +581,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 			this->nat += na;
 			if (na <= 0) 
 			{
-				WARNING("read_atom_positions"," atom number < 0.");
+				ModuleBase::WARNING("read_atom_positions"," atom number < 0.");
 				return 0;
 			}
 			if (na > 0)
@@ -583,11 +591,14 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 				delete[] atoms[it].vel;
        			delete[] atoms[it].mbl;
 				delete[] atoms[it].mag;
-       			atoms[it].tau = new Vector3<double>[na];
-       			atoms[it].taud = new Vector3<double>[na];
-				atoms[it].vel = new Vector3<double>[na];
-       			atoms[it].mbl = new Vector3<int>[na];
+       			atoms[it].tau = new ModuleBase::Vector3<double>[na];
+       			atoms[it].taud = new ModuleBase::Vector3<double>[na];
+				atoms[it].vel = new ModuleBase::Vector3<double>[na];
+       			atoms[it].mbl = new ModuleBase::Vector3<int>[na];
 				atoms[it].mag = new double[na];
+				atoms[it].angle1 = new double[na];
+				atoms[it].angle2 = new double[na];
+				atoms[it].m_loc_ = new ModuleBase::Vector3<double>[na];
 				atoms[it].mass = this->atom_mass[it]; //mohan add 2011-11-07 
 				ModuleBase::GlobalFunc::ZEROS(atoms[it].mag,na);
 				for (int ia = 0;ia < na; ia++)
@@ -598,46 +609,139 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
                                         mv.y = true ;
                                         mv.z = true ;
                                         atoms[it].vel[ia].set(0,0,0);
+#ifndef __CMD
+										atoms[it].mag[ia]=magnet.start_magnetization[it];
+#endif										
+										atoms[it].angle1[ia]=0;
+										atoms[it].angle2[ia]=0;
+										atoms[it].m_loc_[ia].set(0,0,0);
+
                                         string tmpid;
                                         tmpid = ifpos.get();
+										bool input_vec_mag=false;
+										bool input_angle_mag=false;
                                         while ( (tmpid != "\n") && (ifpos.eof()==false) && (tmpid !="#") )
                                         {
                                                 tmpid = ifpos.get() ;
                                                 // old method of reading frozen ions
-                                                int tmp = (int)tmpid[0];
+                                                char tmp = (char)tmpid[0];
                                                 if ( tmp >= 48 && tmp <= 57 )
                                                 {
                                                         mv.x = std::stoi(tmpid);
                                                         ifpos >> mv.y >> mv.z ;
                                                 }
                                                 // new method of reading frozen ions and velocities
+												if ( tmp >= 'a' && tmp <='z')
+												{
+													ifpos.putback(tmp);
+													ifpos >> tmpid;
+												}
                                                 if ( tmpid == "m" )
                                                 {
                                                         ifpos >> mv.x >> mv.y >> mv.z ;
                                                 }
-                                                else if ( tmpid == "v" )
+                                                else if ( tmpid == "v" ||tmpid == "vel" || tmpid == "velocity" )
                                                 {
                                                         ifpos >> atoms[it].vel[ia].x >> atoms[it].vel[ia].y >> atoms[it].vel[ia].z;
                                                 }
+												else if ( tmpid == "mag" || tmpid == "magmom")
+												{
+													double tmpamg=0;
+													ifpos >> tmpamg;
+													tmp=ifpos.get();
+													while (tmp==' ')
+													{
+														tmp=ifpos.get();
+													}
+													
+													cout<<"tmp"<<tmp<<'\n';
+													if((tmp >= 48 && tmp <= 57) or tmp=='-')
+													{
+														ifpos.putback(tmp);
+														ifpos >> atoms[it].m_loc_[ia].y>>atoms[it].m_loc_[ia].z;
+														atoms[it].m_loc_[ia].x=tmpamg;
+														atoms[it].mag[ia]=sqrt(pow(atoms[it].m_loc_[ia].x,2)+pow(atoms[it].m_loc_[ia].y,2)+pow(atoms[it].m_loc_[ia].z,2));
+														input_vec_mag=true;
+														
+													}
+													else
+													{
+														ifpos.putback(tmp);
+														atoms[it].mag[ia]=tmpamg;
+													}
+													
+													// atoms[it].mag[ia];
+												}
+												else if ( tmpid == "angle1")
+												{
+													 ifpos >> atoms[it].angle1[ia];
+													 atoms[it].angle1[ia]=atoms[it].angle1[ia]/180 *ModuleBase::PI;
+													 input_angle_mag=true;
+												}
+												else if ( tmpid == "angle2")
+												{
+													 ifpos >> atoms[it].angle2[ia];
+													 atoms[it].angle2[ia]=atoms[it].angle2[ia]/180 *ModuleBase::PI;
+													 input_angle_mag=true;
+												}
+												
                                         }
 					while ( (tmpid != "\n") && (ifpos.eof()==false) )
                                         {
                                                 tmpid = ifpos.get();
                                         }
 					string mags;
-					atoms[it].mag[ia] = 0.0;
-// define mag for each atom instead of each type of atom
-#ifndef __CMD
-					if(input_mag)
+					//cout<<"mag"<<atoms[it].mag[ia]<<"angle1"<<atoms[it].angle1[ia]<<"angle2"<<atoms[it].angle2[ia]<<'\n';
+
+					if(GlobalV::NSPIN==4)
 					{
-						if(nat > n_mag_at) 
+						if(GlobalV::NONCOLIN)
 						{
-							WARNING_QUIT("read_atoms","Number of defined magnetic moment not equal to number of atoms");
+							if(input_angle_mag)
+							{
+								atoms[it].m_loc_[ia].x = atoms[it].mag[ia] *
+									sin(atoms[it].angle1[ia]) * cos(atoms[it].angle2[ia]);
+								atoms[it].m_loc_[ia].y = atoms[it].mag[ia] *
+									sin(atoms[it].angle1[ia]) * sin(atoms[it].angle2[ia]);
+								atoms[it].m_loc_[ia].z = atoms[it].mag[ia] *
+									cos(atoms[it].angle1[ia]);
+							}
+							else if (input_vec_mag)
+							{
+								double mxy=sqrt(pow(atoms[it].m_loc_[ia].x,2)+pow(atoms[it].m_loc_[ia].y,2));
+								atoms[it].angle1[ia]=atan2(mxy,atoms[it].m_loc_[ia].z);
+								if(mxy>1e-8)
+									atoms[it].angle2[ia]=atan2(atoms[it].m_loc_[ia].y,atoms[it].m_loc_[ia].x);
+									//cout<<"it"<<it<<"ia"<<ia<<"x"<<atoms[it].m_loc_[ia].x<<"y"<<atoms[it].m_loc_[ia].y<<"z"<<atoms[it].m_loc_[ia].z<<"mag"<<atoms[it].mag[ia]<<"angle1"<<atoms[it].angle1[ia]
+									//<<"angle2"<<atoms[it].angle2[ia]<<'\n';
+							}
 						}
-						atoms[it].mag[ia] = atom_mag[nat-na+ia];
+						else
+						{
+							atoms[it].m_loc_[ia].x = 0;
+							atoms[it].m_loc_[ia].y = 0;
+							atoms[it].m_loc_[ia].z = atoms[it].mag[ia];
+						}
+
+						ModuleBase::GlobalFunc::OUT(ofs_running, "noncollinear magnetization_x",atoms[it].m_loc_[ia].x);
+						ModuleBase::GlobalFunc::OUT(ofs_running, "noncollinear magnetization_y",atoms[it].m_loc_[ia].y);
+						ModuleBase::GlobalFunc::OUT(ofs_running, "noncollinear magnetization_z",atoms[it].m_loc_[ia].z);
+
+#ifndef __CMD
+						ModuleBase::GlobalFunc::ZEROS(magnet.ux_ ,3);
+#endif						
 					}
-					
-#endif
+					else if(GlobalV::NSPIN==2)
+					{
+						atoms[it].m_loc_[ia].x = atoms[it].mag[ia];
+						ModuleBase::GlobalFunc::OUT(ofs_running, "start magnetization",atoms[it].mag[ia]);
+					}
+					else if(GlobalV::NSPIN==1)
+					{
+						ModuleBase::GlobalFunc::OUT(ofs_running, "start magnetization","FALSE");
+					}
+
+			
 					if(Coordinate=="Direct")
 					{
 						// change v from direct to cartesian,
@@ -718,19 +822,11 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 			}// end na
 		}//end for ntype
 	}// end scan_begin
-#ifndef __CMD
-	if(input_mag)
-	{
-		if (this->n_mag_at != this->nat)
-		{
-			WARNING_QUIT("read_atoms","Number of defined magnetic moment not equal to number of atoms");
-		}
-	}
-#endif
+
 //check if any atom can move in MD
 	if(!this->if_atoms_can_move() && GlobalV::CALCULATION=="md")
 	{
-		WARNING("read_atoms", "no atom can move in MD!");
+		ModuleBase::WARNING("read_atoms", "no atom can move in MD!");
 		return 0;
 	} 
 
@@ -760,10 +856,10 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 
 bool UnitCell_pseudo::check_tau(void)const
 {
-	TITLE("UnitCell_pseudo","check_tau");
-	timer::tick("UnitCell_pseudo","check_tau");
+	ModuleBase::TITLE("UnitCell_pseudo","check_tau");
+	ModuleBase::timer::tick("UnitCell_pseudo","check_tau");
 	
-	Vector3<double> diff = 0.0;
+	ModuleBase::Vector3<double> diff = 0.0;
 	double norm = 0.0;
 	double tolerence_bohr = 1.0e-3;
 
@@ -812,17 +908,21 @@ bool UnitCell_pseudo::check_tau(void)const
 			}
 			//GlobalV::ofs_running << " " << std::setw(5) << atoms[T1].label << std::setw(6) << I1+1 
 			//<< std::setw(20) << shortest_norm  
-			//<< std::setw(20) << shortest_norm * BOHR_TO_A << std::endl;
+			//<< std::setw(20) << shortest_norm * ModuleBase::BOHR_TO_A << std::endl;
 		}
 	}
 
-	timer::tick("UnitCell_pseudo","check_tau");
+	ModuleBase::timer::tick("UnitCell_pseudo","check_tau");
 	return 1;
 }
 
+#ifdef __LCAO
+void UnitCell_pseudo::print_stru_file(const LCAO_Orbitals &orb, const std::string &fn, const int &type)const
+#else
 void UnitCell_pseudo::print_stru_file(const std::string &fn, const int &type)const
+#endif
 {
-	TITLE("UnitCell_pseudo","print_stru_file");
+	ModuleBase::TITLE("UnitCell_pseudo","print_stru_file");
 	
 	if(GlobalV::MY_RANK!=0) return;
 
@@ -847,9 +947,9 @@ void UnitCell_pseudo::print_stru_file(const std::string &fn, const int &type)con
 			// Turn off the read in NONLOCAL file
 			// function since 2013-08-02 by mohan
 			//-----------------------------------
-//			ofs << GlobalC::ORB.orbital_file[it] << " " << GlobalC::ORB.nonlocal_file[it] << " #local_orbital; non-local projector" << std::endl;
+//			ofs << orb.orbital_file[it] << " " << orb.nonlocal_file[it] << " #local_orbital; non-local projector" << std::endl;
 			//modified by zhengdy 2015-07-24
-                        ofs << GlobalC::ORB.orbital_file[it] << std::endl;
+                        ofs << orb.orbital_file[it] << std::endl;
 		}
 	}
 #endif
@@ -872,11 +972,13 @@ void UnitCell_pseudo::print_stru_file(const std::string &fn, const int &type)con
 		{
 			ofs << std::endl;
 			ofs << atoms[it].label << " #label" << std::endl;
+
 #ifndef __CMD
 			ofs << magnet.start_magnetization[it] << " #magnetism" << std::endl;
 #else
 			ofs << "0" << " #magnetism" << std::endl;
 #endif
+
 			//2015-05-07, modify
 			//ofs << atoms[it].nwl << " #max angular momentum" << std::endl;
 			//xiaohui modify 2015-03-15
@@ -929,7 +1031,7 @@ void UnitCell_pseudo::print_stru_file(const std::string &fn, const int &type)con
 
 void UnitCell_pseudo::print_tau(void)const
 {
-    TITLE("UnitCell_pseudo","print_tau");
+    ModuleBase::TITLE("UnitCell_pseudo","print_tau");
     if(Coordinate == "Cartesian" || Coordinate == "Cartesian_angstrom")
     {
         GlobalV::ofs_running << "\n CARTESIAN COORDINATES ( UNIT = " << lat0 << " Bohr )." << std::endl;
@@ -965,7 +1067,7 @@ void UnitCell_pseudo::print_tau(void)const
                 << std::setw(20) << atoms[it].tau[ia].y
                 << std::setw(20) << atoms[it].tau[ia].z
 #ifndef __CMD
-				<< std::setw(20) << magnet.start_magnetization[it]
+				<< std::setw(20) << atoms[it].mag[ia]
 #else
 				<< std::setw(20) << 0
 #endif
@@ -1013,7 +1115,7 @@ void UnitCell_pseudo::print_tau(void)const
                 << std::setw(20) << atoms[it].taud[ia].y
                 << std::setw(20) << atoms[it].taud[ia].z
 #ifndef __CMD
-				<< std::setw(20) << magnet.start_magnetization[it]
+				<< std::setw(20) << atoms[it].mag[ia]
 #else
 				<< std::setw(20) << 0
 #endif
@@ -1034,7 +1136,7 @@ void UnitCell_pseudo::print_tau(void)const
 
 int UnitCell_pseudo::find_type(const std::string &label)
 {
-	if(GlobalV::test_pseudo_cell) TITLE("UnitCell_pseudo","find_type");
+	if(GlobalV::test_pseudo_cell) ModuleBase::TITLE("UnitCell_pseudo","find_type");
 	assert(ntype>0);
 	for(int it=0;it<ntype;it++)
 	{
@@ -1043,7 +1145,7 @@ int UnitCell_pseudo::find_type(const std::string &label)
 			return it;
 		}
 	}
-	WARNING_QUIT("UnitCell_pseudo::find_type","Can not find the atom type!");
+	ModuleBase::WARNING_QUIT("UnitCell_pseudo::find_type","Can not find the atom type!");
 	return -1;
 }
 

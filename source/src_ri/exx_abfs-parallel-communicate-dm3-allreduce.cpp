@@ -20,7 +20,7 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init(
 	const MPI_Comm &mpi_comm_in,
 	const std::map<std::set<size_t>,std::set<size_t>> &H_atom_pairs_group)
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init");
 	
 	mpi_comm = mpi_comm_in;
 	MPI_Comm_size(mpi_comm, &comm_sz);
@@ -51,7 +51,7 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Mo
 std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"dm3_"+ModuleBase::GlobalFunc::TO_STRING(my_rank), std::ofstream::app);
 //ofs<<data_local<<std::endl<<"@@@"<<std::endl;;
 
-	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::a2D_to_exx");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::a2D_to_exx");
 	
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> data_all(GlobalV::NSPIN);
 
@@ -360,7 +360,7 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init_flags(
 	std::vector<atomic<Flag_Send>> &flags_send,
 	std::vector<atomic<Flag_Recv>> &flags_recv) const
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init_flags");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init_flags");
 	
 	for(atomic<Flag_Send> &flag_send : flags_send)
 		flag_send = Flag_Send::undo;
@@ -406,7 +406,7 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process(
 	std::vector<std::vector<double>> &oarps_isend,
 	std::vector<atomic<Flag_Send>> &flags_send) const
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process");
 	
 	std::vector<double> &oarp = oarps_isend[rank_send_now];
 	for( int is=0; is!=GlobalV::NSPIN; ++is )
@@ -458,7 +458,7 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process(
 	std::vector<std::vector<double>> &oarps_isend,
 	std::vector<atomic<Flag_Send>> &flags_send) const
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process");
 	
 	const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix*>>>> data_intersection = get_intersection(
 		rank_send_now,
@@ -538,7 +538,7 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::recv_data_process(
 	std::vector<atomic<Flag_Recv>> &flags_recv,
 	atomic_flag &lock_insert) const
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::recv_data_process");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::recv_data_process");
 	
 	auto vector_empty = []( const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &v ) -> bool
 	{
@@ -586,7 +586,7 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::insert_data(
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,M>>>> &data_rank,
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &data_all) const
 {
-	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::insert_data");
+	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::insert_data");
 	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		auto &data_rank_is = data_rank[is];

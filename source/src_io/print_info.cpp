@@ -9,7 +9,7 @@ Print_Info::~Print_Info(){}
 
 void Print_Info::setup_parameters(UnitCell_pseudo &ucell, K_Vectors &kv, xcfunc &xcf)
 {
-	TITLE("Print_Info","setup_parameters");
+	ModuleBase::TITLE("Print_Info","setup_parameters");
 	
     if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax" || GlobalV::CALCULATION=="nscf"
 	        || GlobalV::CALCULATION=="istate" || GlobalV::CALCULATION=="ienvelope" || GlobalV::CALCULATION=="md")

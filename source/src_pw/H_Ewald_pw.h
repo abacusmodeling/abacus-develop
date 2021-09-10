@@ -26,12 +26,12 @@ class H_Ewald_pw
 	private:
 
     static void rgen(
-        const Vector3<double> &dtau,
+        const ModuleBase::Vector3<double> &dtau,
         const double &rmax,
         int *irr,
-        const Matrix3 &at,
-        const Matrix3 &bg,
-        Vector3<double> *r,
+        const ModuleBase::Matrix3 &at,
+        const ModuleBase::Matrix3 &bg,
+        ModuleBase::Vector3<double> *r,
         double *r2,
         int  &nrm
     );

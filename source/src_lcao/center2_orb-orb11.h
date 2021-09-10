@@ -32,7 +32,7 @@ class Center2_Orb::Orb11
 	void init_radial_table( const std::set<size_t> &radials );				// unit: Bohr/MOT.dr
 
 	double cal_overlap(
-		const Vector3<double> &RA, const Vector3<double> &RB,			// unit: Bohr
+		const ModuleBase::Vector3<double> &RA, const ModuleBase::Vector3<double> &RB,			// unit: Bohr
 		const int &mA, const int &mB) const;
 		
 	private:

@@ -43,7 +43,7 @@ void ORB_table_beta::allocate
     const double &dk_in
 )
 {
-	TITLE("ORB_table_beta", "allocate");
+	ModuleBase::TITLE("ORB_table_beta", "allocate");
 
 	this->ntype = ntype_in;// type of elements.
 	this->lmax = lmax_in;
@@ -114,7 +114,7 @@ int ORB_table_beta::get_rmesh(const double &R1, const double &R2)
 		//GlobalV::ofs_warning << "\n rmesh = " << rmesh;
 		std::cout << "\n R1 = " << R1 << " R2 = " << R2;
 		std::cout << "\n rmesh = " << rmesh;
-		WARNING_QUIT("ORB_table_beta::get_rmesh", "rmesh <= 0");
+		ModuleBase::WARNING_QUIT("ORB_table_beta::get_rmesh", "rmesh <= 0");
 	}
 	return rmesh;
 }
@@ -122,7 +122,7 @@ int ORB_table_beta::get_rmesh(const double &R1, const double &R2)
 
 
 void ORB_table_beta::cal_VNL_PhiBeta_R(
-		Sph_Bessel_Recursive::D2 *pSB, // mohan add 2021-03-06
+		ModuleBase::Sph_Bessel_Recursive::D2 *pSB, // mohan add 2021-03-06
 		const int &l,
 		const Numerical_Orbital_Lm &n1,
 		const Numerical_Nonlocal_Lm &n2,
@@ -130,7 +130,7 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 		double *rs,
 		double *drs)
 {
-	timer::tick ("ORB_table_beta", "VNL_PhiBeta_R");
+	ModuleBase::timer::tick ("ORB_table_beta", "VNL_PhiBeta_R");
 
 	assert(kmesh > 0);
 
@@ -159,7 +159,7 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 		}
 		// Call simpson integration
 		ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,kab,temp);
-		rs[ir] = temp * FOUR_PI;
+		rs[ir] = temp * ModuleBase::FOUR_PI;
 		
 		//drs
 		double temp1, temp2;
@@ -184,11 +184,11 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 		
 		if (l == 0)
 		{
-			drs[ir] = -FOUR_PI*temp2;
+			drs[ir] = -ModuleBase::FOUR_PI*temp2;
 		}
 		else
 		{
-			drs[ir] = FOUR_PI*(temp1*l-(l+1)*temp2)/(2.0*l+1);
+			drs[ir] = ModuleBase::FOUR_PI*(temp1*l-(l+1)*temp2)/(2.0*l+1);
 		}
 	}
 	
@@ -207,21 +207,21 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 		
 		// Call simpson integration
 		ModuleBase::Integral::Simpson_Integral(kmesh,integrated_func,kab,temp);
-		rs[0] = FOUR_PI / ModuleBase::Mathzone_Add1::dualfac (2*l+1) * temp;
+		rs[0] = ModuleBase::FOUR_PI / ModuleBase::Mathzone_Add1::dualfac (2*l+1) * temp;
 	}
 	
 	delete [] integrated_func;
 	delete[] k1_dot_k2;
 
-	timer::tick ("ORB_table_beta", "VNL_PhiBeta_R");
+	ModuleBase::timer::tick ("ORB_table_beta", "VNL_PhiBeta_R");
 	return;
 }
 
 
-void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
+void ORB_table_beta::init_Table_Beta(ModuleBase::Sph_Bessel_Recursive::D2 *pSB, LCAO_Orbitals &orb)
 {
-	TITLE("ORB_table_beta", "init_Table_Beta");
-	timer::tick("ORB_table_beta", "init_Table_Beta");
+	ModuleBase::TITLE("ORB_table_beta", "init_Table_Beta");
+	ModuleBase::timer::tick("ORB_table_beta", "init_Table_Beta");
 
 	// (1) allocate 1st dimension ( overlap, derivative)
 	this->Table_NR = new double****[2];
@@ -236,14 +236,14 @@ void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
 		{
 			// Tpair: type std::pair.
 			const int Tpair=this->NL_Tpair(T1,T2);
-			const int Lmax1 = GlobalC::ORB.Phi[T1].getLmax();			
-			const int NBeta = GlobalC::ORB.nproj[T2];
+			const int Lmax1 = orb.Phi[T1].getLmax();			
+			const int NBeta = orb.nproj[T2];
 			
 			//-------------------------------------------------------------
 			// how many <psi|beta_l>
 			// here we count all possible psi with (L,N) index for type T1.
 			//-------------------------------------------------------------
-			const int pairs_chi = GlobalC::ORB.Phi[T1].getTotal_nchi() * NBeta;
+			const int pairs_chi = orb.Phi[T1].getTotal_nchi() * NBeta;
 
 			// CAUTION!!!
 			// no matter nchi = 0 or NBeta = 0,
@@ -256,18 +256,18 @@ void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
 
             const int T12_2Lplus1 = this->NL_L2plus1(T1,T2);
 
-			const double Rcut1 = GlobalC::ORB.Phi[T1].getRcut();
+			const double Rcut1 = orb.Phi[T1].getRcut();
 			for (int L1 = 0; L1 < Lmax1 + 1; L1++)
             {
-                for (int N1 = 0; N1 < GlobalC::ORB.Phi[T1].getNchi(L1); N1++)
+                for (int N1 = 0; N1 < orb.Phi[T1].getNchi(L1); N1++)
 				{
 					// number of projectors.
 					for (int nb = 0; nb < NBeta; nb ++)
 					{
-						//const int L2 = GlobalC::ORB.Beta[T2].getL_Beta(nb); // mohan delete the variable 2021-05-07
-						const int L2 = GlobalC::ORB.Beta[T2].Proj[nb].getL(); // mohan add 2021-05-07
+						//const int L2 = orb.Beta[T2].getL_Beta(nb); // mohan delete the variable 2021-05-07
+						const int L2 = orb.Beta[T2].Proj[nb].getL(); // mohan add 2021-05-07
 
-						const double Rcut2 = GlobalC::ORB.Beta[T2].Proj[nb].getRcut();
+						const double Rcut2 = orb.Beta[T2].Proj[nb].getRcut();
 
 						const int Opair = this->NL_Opair(Tpair,L1,N1,nb);
 						assert( Opair < pairs_chi );
@@ -289,7 +289,7 @@ void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
 							this->Table_NR[0][Tpair][Opair][L] = new double[rmesh];
 							this->Table_NR[1][Tpair][Opair][L] = new double[rmesh];
 
-							Memory::record("ORB_table_beta","Table_NR",
+							ModuleBase::Memory::record("ORB_table_beta","Table_NR",
 							2*NL_nTpairs*pairs_chi*rmesh,"double");
 
 							//for those L whose Gaunt Coefficients = 0, we
@@ -302,13 +302,13 @@ void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
 								continue;
 							}
 
-							assert(nb < GlobalC::ORB.nproj[T2]);	
+							assert(nb < orb.nproj[T2]);	
 
 							this->cal_VNL_PhiBeta_R(
 								pSB, // mohan add 2021-03-06
 								L,
-                                GlobalC::ORB.Phi[T1].PhiLN(L1,N1),
-                                GlobalC::ORB.Beta[T2].Proj[nb], // mohan update 2011-03-07
+                                orb.Phi[T1].PhiLN(L1,N1),
+                                orb.Beta[T2].Proj[nb], // mohan update 2011-03-07
                                 rmesh,
 								this->Table_NR[0][Tpair][Opair][L],
 								this->Table_NR[1][Tpair][Opair][L]);
@@ -322,7 +322,7 @@ void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
 
 
 //	OUT(GlobalV::ofs_running,"allocate non-local potential matrix","Done");
-	timer::tick("ORB_table_beta", "init_Table_Beta");
+	ModuleBase::timer::tick("ORB_table_beta", "init_Table_Beta");
 	return;
 }
 
@@ -362,9 +362,9 @@ void ORB_table_beta::Destroy_Table_Beta(LCAO_Orbitals &orb)
 }
 
 
-void ORB_table_beta::init_NL_Tpair(void)
+void ORB_table_beta::init_NL_Tpair(LCAO_Orbitals &orb)
 {
-	TITLE("ORB_table_beta","init_NL_index");
+	ModuleBase::TITLE("ORB_table_beta","init_NL_index");
 	assert(ntype>0);
 	this->NL_nTpairs = this->ntype * this->ntype;	
 	this->NL_Tpair.create( this->ntype, this->ntype);
@@ -382,7 +382,7 @@ void ORB_table_beta::init_NL_Tpair(void)
 
 			 // the std::pair < psi | beta >
 			 // be careful! This is not a symmetry matrix.
-			 this->NL_L2plus1(T1,T0) = std::max(GlobalC::ORB.Phi[T1].getLmax(), GlobalC::ORB.Beta[T0].getLmax() )*2+1;
+			 this->NL_L2plus1(T1,T0) = std::max(orb.Phi[T1].getLmax(), orb.Beta[T0].getLmax() )*2+1;
 			 
 			 // there are special situations:
 			 // for example, two H atom without projector.
@@ -393,7 +393,7 @@ void ORB_table_beta::init_NL_Tpair(void)
 			 // however, there are no projectors.
 			 if(NL_L2plus1(T1,T0) <= 0)
 			 {
-				WARNING_QUIT("ORB_table_beta::init_paris_nonlocal_type","NL_L2plus1<=0");
+				ModuleBase::WARNING_QUIT("ORB_table_beta::init_paris_nonlocal_type","NL_L2plus1<=0");
 			 }
 		}
 	}
@@ -411,7 +411,7 @@ void ORB_table_beta::init_NL_Opair(LCAO_Orbitals &orb)
 	// may have bug if we use all H!
 	if( nprojmax == 0)
 	{
-		WARNING("ORB_table_beta","nproj for nonlocal pseudopotetials are zero, it must be all H atoms");
+		ModuleBase::WARNING("ORB_table_beta","nproj for nonlocal pseudopotetials are zero, it must be all H atoms");
 		return;
 	}
 	assert( NL_nTpairs > 0);

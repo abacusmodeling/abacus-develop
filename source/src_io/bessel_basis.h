@@ -53,12 +53,12 @@ public:
 
 private:
 	// the most important array to calculate spillage
-	realArray Faln;// (ntype, max_l+1, max_n, ik)
+	ModuleBase::realArray Faln;// (ntype, max_l+1, max_n, ik)
 
 	// Coefficients to be optimized!
-	realArray C4;
+	ModuleBase::realArray C4;
 
-	realArray TableOne;
+	ModuleBase::realArray TableOne;
 	int kmesh;
 	double Dk;
 	int Ecut_number;

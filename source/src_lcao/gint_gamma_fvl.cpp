@@ -14,10 +14,10 @@
 // calcualte the forces related to grid
 void Gint_Gamma::cal_force(const double*const vlocal)
 {
-    timer::tick("Gint_Gamma","cal_force");
+    ModuleBase::timer::tick("Gint_Gamma","cal_force");
     this->save_atoms_on_grid(GlobalC::GridT);
     this->gamma_force(vlocal);
-    timer::tick("Gint_Gamma","cal_force");
+    ModuleBase::timer::tick("Gint_Gamma","cal_force");
 }
 
 inline void cal_psir_ylm_dphi(
@@ -31,7 +31,7 @@ inline void cal_psir_ylm_dphi(
 	double*const*const dphix, 
 	double*const*const dphiy, 
 	double*const*const dphiz,
-	realArray& drr)
+	ModuleBase::realArray& drr)
 {    
     for (int id=0; id<na_grid; id++)
     {
@@ -92,7 +92,7 @@ inline void cal_psir_ylm_dphi(
             // <<<
             // Ylm::rlylm(GlobalC::ucell.atoms[it].nwl+1, dr[id].x, dr[id].y, dr[id].z, rly, grly);
             // Ylm::rlylm(GlobalC::ucell.atoms[it].nwl+1, dr[id].x, dr[id].y, dr[id].z, rly, grly);
-            Ylm::grad_rl_sph_harm(GlobalC::ucell.atoms[it].nwl, dr[0], dr[1], dr[2], rly, grly);
+            ModuleBase::Ylm::grad_rl_sph_harm(GlobalC::ucell.atoms[it].nwl, dr[0], dr[1], dr[2], rly, grly);
 
             // 1E-7 is necessary in case of R is just on one grid
             // the following code is about interpolation,
@@ -258,7 +258,7 @@ inline void cal_meshball_DGridV(
 	double*const*const DGridV_x,  double*const*const DGridV_y,  double*const*const DGridV_z,
 	double*const*const DGridV_11, double*const*const DGridV_12, double*const*const DGridV_13,
 	double*const*const DGridV_22, double*const*const DGridV_23, double*const*const DGridV_33,
-	realArray& drr)
+	ModuleBase::realArray& drr)
 {
     const char transa='N', transb='T';
     const double alpha=-1.0, beta=1.0;
@@ -463,8 +463,8 @@ inline void cal_meshball_DGridV(
 
 void Gint_Gamma::gamma_force(const double*const vlocal) const
 {
-    TITLE("Grid_Integral","gamma_force");
-    timer::tick("Gint_Gamma","gamma_force");
+    ModuleBase::TITLE("Grid_Integral","gamma_force");
+    ModuleBase::timer::tick("Gint_Gamma","gamma_force");
     // GlobalC::GridT.lgd: local grid dimension (sub-FFT-mesh).
     int DGridV_Size=GlobalC::GridT.lgd*GlobalC::GridT.lgd;
     //OUT(GlobalV::ofs_running,"Enter gamma_force, DGridV_Size", DGridV_Size);
@@ -501,7 +501,7 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
             DGridV_23[i] = &DGridV_stress_pool[i*GlobalC::GridT.lgd+4*DGridV_Size];
             DGridV_33[i] = &DGridV_stress_pool[i*GlobalC::GridT.lgd+5*DGridV_Size];
         }
-        Memory::record("Gint_Gamma","DGridV_stress",6*GlobalC::GridT.lgd*GlobalC::GridT.lgd,"double");
+        ModuleBase::Memory::record("Gint_Gamma","DGridV_stress",6*GlobalC::GridT.lgd*GlobalC::GridT.lgd,"double");
     }
     for (int i=0; i<GlobalC::GridT.lgd; ++i)
     {
@@ -509,7 +509,7 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
         DGridV_y[i] = &DGridV_pool[i*GlobalC::GridT.lgd+DGridV_Size];
         DGridV_z[i] = &DGridV_pool[i*GlobalC::GridT.lgd+2*DGridV_Size];
     }
-    Memory::record("Gint_Gamma","DGridV",3*GlobalC::GridT.lgd*GlobalC::GridT.lgd,"double");
+    ModuleBase::Memory::record("Gint_Gamma","DGridV",3*GlobalC::GridT.lgd*GlobalC::GridT.lgd,"double");
     //OUT(GlobalV::ofs_running,"DGridV was allocated");
 
     // it's a uniform grid to save orbital values, so the delta_r is a constant.
@@ -549,7 +549,7 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
             cal_flag[i] = new bool[max_size];
         }
 
-        realArray drr;//rewrite drr form by zhengdy-2019-04-02
+        ModuleBase::realArray drr;//rewrite drr form by zhengdy-2019-04-02
         if(GlobalV::STRESS)
         {
             drr.create(max_size, GlobalC::pw.bxyz, 3);
@@ -570,7 +570,7 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
     		}
         }*/
         //OUT(GlobalV::ofs_running,"Data were prepared");
-        //timer::tick("Gint_Gamma","prepare");
+        //ModuleBase::timer::tick("Gint_Gamma","prepare");
         for (int i=0; i< GlobalC::GridT.nbx; i++)
         {
             const int ibx = i*GlobalC::pw.bx; 
@@ -637,13 +637,13 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
 
     }//end if, replace goto line
 //ENDandRETURN:
-    timer::tick("Gint_Gamma","gamma_force");
+    ModuleBase::timer::tick("Gint_Gamma","gamma_force");
 #ifdef __MPI
-    timer::tick("Gint_Gamma","gamma_force_wait");
+    ModuleBase::timer::tick("Gint_Gamma","gamma_force_wait");
 	MPI_Barrier(MPI_COMM_WORLD);
-    timer::tick("Gint_Gamma","gamma_force_wait");
+    ModuleBase::timer::tick("Gint_Gamma","gamma_force_wait");
 #endif
-    timer::tick("Gint_Gamma","gamma_force2");
+    ModuleBase::timer::tick("Gint_Gamma","gamma_force2");
 
 
     //OUT(GlobalV::ofs_running,"Start reduce DGridV");
@@ -801,7 +801,7 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
     //     }
     // }
     // delete[] tmp;
-    timer::tick("Gint_Gamma","gamma_force2");   
+    ModuleBase::timer::tick("Gint_Gamma","gamma_force2");   
     
     //delete DGridV_x,y,z
     delete [] DGridV_x;

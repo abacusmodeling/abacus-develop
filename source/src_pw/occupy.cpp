@@ -22,7 +22,7 @@ bool Occupy::fixed_occupations = false;
 
 void Occupy::calculate_weights(void)
 {
-	TITLE("Occupy","calculate_weights");
+	ModuleBase::TITLE("Occupy","calculate_weights");
 
 	// for test
 //	std::cout << " gaussian_broadening = " << use_gaussian_broadening << std::endl;
@@ -53,7 +53,7 @@ void Occupy::calculate_weights(void)
     }
     else if (use_tetrahedron_method)
     {
-        WARNING_QUIT("calculate_weights","not implemented yet,coming soon!");
+        ModuleBase::WARNING_QUIT("calculate_weights","not implemented yet,coming soon!");
 //		if(my_rank == 0)
 //		{
 //			tweights(GlobalC::kv.nkstot, nspin, GlobalV::NBANDS, GlobalC::CHR.nelec, ntetra,tetra, GlobalC::wf.et, GlobalC::en.ef, GlobalC::wf.wg);
@@ -124,10 +124,10 @@ void Occupy::calculate_weights(void)
 		Parallel_Reduce::gather_min_double_all( ebotom );
 
 		//not parallel yet!
-//		OUT(GlobalV::ofs_running,"Top    Energy (eV)", etop * Ry_to_eV);
-//      OUT(GlobalV::ofs_running,"Fermi  Energy (eV)", GlobalC::en.ef * Ry_to_eV);
-//		OUT(GlobalV::ofs_running,"Bottom Energy (eV)", ebotom * Ry_to_eV);
-//		OUT(GlobalV::ofs_running,"Range  Energy (eV)", etop-ebotom * Ry_to_eV);
+//		OUT(GlobalV::ofs_running,"Top    Energy (eV)", etop * ModuleBase::Ry_to_eV);
+//      OUT(GlobalV::ofs_running,"Fermi  Energy (eV)", GlobalC::en.ef * ModuleBase::Ry_to_eV);
+//		OUT(GlobalV::ofs_running,"Bottom Energy (eV)", ebotom * ModuleBase::Ry_to_eV);
+//		OUT(GlobalV::ofs_running,"Range  Energy (eV)", etop-ebotom * ModuleBase::Ry_to_eV);
     }
 
 	return;
@@ -136,7 +136,7 @@ void Occupy::calculate_weights(void)
 
 void Occupy::decision(const std::string &name,const std::string &smearing,const double &degauss)
 {
-	TITLE("Occupy","decision");
+	ModuleBase::TITLE("Occupy","decision");
     use_gaussian_broadening = false;
     use_tetrahedron_method = false;
     fixed_occupations = false;
@@ -148,7 +148,7 @@ void Occupy::decision(const std::string &name,const std::string &smearing,const 
     {
         if ( gaussian_parameter!=0.0 )
         {
-            WARNING("smearing_decision","Fixed occupations,gauss broadening ignored");
+            ModuleBase::WARNING("smearing_decision","Fixed occupations,gauss broadening ignored");
             ModuleBase::GlobalFunc::AUTO_SET("gaussian_parameter",0.0);
             gaussian_parameter = 0.0;
         }
@@ -157,7 +157,7 @@ void Occupy::decision(const std::string &name,const std::string &smearing,const 
     {
         if ( gaussian_parameter!=0.0 )
         {
-            WARNING("smearing_decision","Fixed occupations,gauss broadening ignored");
+            ModuleBase::WARNING("smearing_decision","Fixed occupations,gauss broadening ignored");
             ModuleBase::GlobalFunc::AUTO_SET("gaussian_parameter",0.0);
             gaussian_parameter = 0.0;
         }
@@ -173,7 +173,7 @@ void Occupy::decision(const std::string &name,const std::string &smearing,const 
         use_gaussian_broadening = true;
         if ( gaussian_parameter == 0.0)
         {
-            WARNING_QUIT("smearing_decision",
+            ModuleBase::WARNING_QUIT("smearing_decision",
                          "Smearing requires gaussian broadening,but gaussian_parameter = 0(default value = 0.1)");
         }
         if ( smearing == "gaussian" || smearing == "gauss")
@@ -208,7 +208,7 @@ void Occupy::decision(const std::string &name,const std::string &smearing,const 
     }
     else
     {
-        WARNING_QUIT("occupy_decision","occupations, not implemented");
+        ModuleBase::WARNING_QUIT("occupy_decision","occupations, not implemented");
     }
     return;
 }
@@ -292,7 +292,7 @@ void Occupy::iweights
 
     if(conv == false && GlobalC::en.iter == 2)
     {
-       WARNING_QUIT("Occupied","not converged, change 'smearing' method.");
+       ModuleBase::WARNING_QUIT("Occupied","not converged, change 'smearing' method.");
     }
 
     return;
@@ -316,7 +316,7 @@ void Occupy::gweights(
 	const int &is, // spin
 	const int *isk) // array to point out each k belong to which spin
 {
-	//TITLE("Occupy","gweights");
+	//ModuleBase::TITLE("Occupy","gweights");
     //===============================
     // Calculate the Fermi energy ef
     //===============================
@@ -365,7 +365,7 @@ void Occupy::efermig
 	const int *isk
 )
 {
-	//TITLE("Occupy","efermig");
+	//ModuleBase::TITLE("Occupy","efermig");
     //==================================================================
     // Finds the Fermi energy - Gaussian Broadening (Methfessel-Paxton)
     //==================================================================
@@ -421,7 +421,7 @@ void Occupy::efermig
 		std::cout << " sumklw = " << sumklw << std::endl;
 		std::cout << " sumkup - nelec = " << sumkup - nelec << std::endl;
 		std::cout << " sumklw - nelec = " << sumklw - nelec << std::endl;
-		WARNING_QUIT("Occupy::efermig","ERROS in SMEARING");
+		ModuleBase::WARNING_QUIT("Occupy::efermig","ERROS in SMEARING");
     }
 
     for (int i = 0;i < maxiter;i++)
@@ -464,7 +464,7 @@ double Occupy::sumkg(
 	const int *isk
 )
 {
-	//TITLE("Occupy","sumkg");
+	//ModuleBase::TITLE("Occupy","sumkg");
     double sum2 = 0.0;
     for (int ik = 0;ik < nks; ik++)
 	{
@@ -495,7 +495,7 @@ double Occupy::sumkg(
 
 double Occupy::wgauss(const double &x,const int n)
 {
-	//TITLE("Occupy","wgauss");
+	//ModuleBase::TITLE("Occupy","wgauss");
     //=====================================================================
     // This function computes the approximate theta function for the
     // iven order n, at the point x.
@@ -536,9 +536,9 @@ double Occupy::wgauss(const double &x,const int n)
     //===================
     if (n == - 1)
     {
-        const double xp = x - 1.00 / SQRT2;
+        const double xp = x - 1.00 / ModuleBase::SQRT2;
         const double arg = std::min(maxarg, xp * xp);
-        wga = 0.50 * erf(xp) + 1.00 / sqrt( TWO_PI ) * std::exp(- arg) + 0.50;
+        wga = 0.50 * erf(xp) + 1.00 / sqrt( ModuleBase::TWO_PI ) * std::exp(- arg) + 0.50;
         return wga;
     }
 
@@ -546,7 +546,7 @@ double Occupy::wgauss(const double &x,const int n)
     // Methfessel-Paxton       //pengfei 2014-10-13
     //====================
     wga = 0.5 * (1 - erf(-x));
-    //wga = gauss_freq(x * SQRT2);
+    //wga = gauss_freq(x * ModuleBase::SQRT2);
     //	std::cout<<"\n x="<<x<<" wga="<<wga;
     if (n == 0)
     {
@@ -560,7 +560,7 @@ double Occupy::wgauss(const double &x,const int n)
     double hp = std::exp(- arg);
     double h0 = 1.00;
     double h1 = -2.00 * x;
-    double a = 1.0 / sqrt(PI);
+    double a = 1.0 / sqrt(ModuleBase::PI);
     for (int i = 0;i < n;i++)
     {
         a = - a / ( static_cast<double>(i+1) * 4.00);
@@ -622,9 +622,9 @@ double Occupy::w1gauss(const double &x,const int n)
 
     if (n == - 1)
     {
-        const double xp = x - 1.00 / SQRT2;
+        const double xp = x - 1.00 / ModuleBase::SQRT2;
         const double arg = std::min(200.0, xp*xp);
-        w1 = 1.00 / sqrt(TWO_PI) * xp * std::exp(- arg);
+        w1 = 1.00 / sqrt(ModuleBase::TWO_PI) * xp * std::exp(- arg);
         return w1;
     }
 
@@ -633,7 +633,7 @@ double Occupy::w1gauss(const double &x,const int n)
     // Methfessel-Paxton
     //====================
     const double arg = std::min(200.0, x * x);
-    w1 = - 0.50 * std::exp(- arg) / sqrt(PI);
+    w1 = - 0.50 * std::exp(- arg) / sqrt(ModuleBase::PI);
 
 	//std::cout << "\n x=" << x << " w1=" << w1;
     if (n == 0)//specific case : gaussian smearing.
@@ -644,7 +644,7 @@ double Occupy::w1gauss(const double &x,const int n)
 /*    double hd = 0.0;
     double hp = exp(- arg);
     int ni = 0;
-    double a = 1.0 / sqrt(PI);
+    double a = 1.0 / sqrt(ModuleBase::PI);
 
     for (int i = 0;i < n;i++)
     {
@@ -665,7 +665,7 @@ double Occupy::w1gauss(const double &x,const int n)
     double hp = std::exp(- arg);
     double h0 = 1.00;
     double h1 = 2.00 * x;
-    double a = 1.0 / sqrt(PI);
+    double a = 1.0 / sqrt(ModuleBase::PI);
     for (int i = 0;i < n;i++)
     {
         a = - a / ( static_cast<double>(i+1) * 4.00);
@@ -735,7 +735,7 @@ void Occupy::tweights(const int nks,const int nspin,const int nband,const double
 
                 itetra[0] = 0;
 
-                hpsort(4, etetra, itetra);
+                ModuleBase::hpsort(4, etetra, itetra);
 
                 //===============================================
                 // ...sort in ascending order: e1 < e2 < e3 < e4
@@ -839,7 +839,7 @@ void Occupy::tweights(const int nks,const int nspin,const int nband,const double
 } // end subroutine tweights
 
 
-double Occupy::wsweight(const Vector3<double> &r, Vector3<double> *rws,const int nrws)
+double Occupy::wsweight(const ModuleBase::Vector3<double> &r, ModuleBase::Vector3<double> *rws,const int nrws)
 {
     //============================================================
     // integer ir, nreq, nrws
@@ -922,7 +922,7 @@ void Occupy::efermit(double** ekb,const int nband,const int nks,const double &ne
 
     if ((sumkup - nelec) < - eps || (sumklw - nelec) > eps)
     {
-        WARNING("efermit","unexpected error.");
+        ModuleBase::WARNING("efermit","unexpected error.");
     }
 
     double better = 1.0e+10;

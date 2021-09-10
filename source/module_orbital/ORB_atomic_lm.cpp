@@ -184,7 +184,7 @@ void Numerical_Orbital_Lm::copy_parameter(
 	/***********************************************************
 	be careful! LiaoChen modify on 2010/4/21
 	************************************************************/
-//	this->dk = PI / rcut / 2.0;
+//	this->dk = ModuleBase::PI / rcut / 2.0;
 //	this->nk = this->nr;
 
 	r_radial.resize(nr);
@@ -210,7 +210,7 @@ void Numerical_Orbital_Lm::copy_parameter(
 
 void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool &force_flag)
 {
-	timer::tick("NOrbital_Lm", "extra_uniform");
+	ModuleBase::timer::tick("NOrbital_Lm", "extra_uniform");
 	
 	//---------------------------------------------
 	// set the dr, fixed by liaochen.
@@ -311,7 +311,7 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool
 	delete [] y2;
 	delete [] rad;
 	delete [] tmp;
-	timer::tick("NOrbital_Lm", "extra_uniform");
+	ModuleBase::timer::tick("NOrbital_Lm", "extra_uniform");
 }
 
 void Numerical_Orbital_Lm::use_uniform(const double &dr_uniform_in)
@@ -397,7 +397,7 @@ void Numerical_Orbital_Lm::cal_kradial(void)
 	double *jl = new double[nr];
 	double *integrated_func = new double[nr];
 
-	const double pref = sqrt( 2.0 / PI );
+	const double pref = sqrt( 2.0 / ModuleBase::PI );
 	//Sbt method
 	
 	/*
@@ -458,7 +458,7 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 	for( size_t ir=1; ir<this->nr; ++ir )
 		assert( dr == this->rab[ir] );
 
-	Sph_Bessel_Recursive::D2* pSB = nullptr;
+	ModuleBase::Sph_Bessel_Recursive::D2* pSB = nullptr;
 	for( auto & sb : Sph_Bessel_Recursive_Pool::D2::sb_pool )
 		if( this->dk * dr == sb.get_dx() )
 		{
@@ -475,7 +475,7 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 	const std::vector<std::vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
 
 	std::vector<double> integrated_func( this->nr );
-	const double pref = sqrt( 2.0 / PI );
+	const double pref = sqrt( 2.0 / ModuleBase::PI );
 
 	std::vector<double> psir2(nr);
 	for( size_t ir=0; ir!=nr; ++ir )
@@ -510,8 +510,8 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 		assert( dr == this->rab[ir] );
 	}
 
-	Sph_Bessel_Recursive::D2* pSB = nullptr;
-	for( auto & sb : Sph_Bessel_Recursive_Pool::D2::sb_pool )
+	ModuleBase::Sph_Bessel_Recursive::D2* pSB = nullptr;
+	for( auto & sb : ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool )
 	{
 		if( this->dk * dr == sb.get_dx() )
 		{
@@ -522,14 +522,14 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 
 	if(!pSB)
 	{
-		Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});
-		pSB = &Sph_Bessel_Recursive_Pool::D2::sb_pool.back();
+		ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});
+		pSB = &ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool.back();
 	}
 	pSB->set_dx( this->dk * dr );
 	pSB->cal_jlx( this->angular_momentum_l, this->nk, this->nr );
 	const std::vector<std::vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
 
-	const double pref = sqrt( 2.0 / PI );
+	const double pref = sqrt( 2.0 / ModuleBase::PI );
 
 	std::vector<double> r_tmp(nr);
 	for( int ir=0; ir!=nr; ++ir )
@@ -545,32 +545,26 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 	{
 		r_tmp[ir] *= (ir&1) ? four_three : two_three;
 	}
-
-#ifdef __NORMAL
-	// need to be checked (avoid using Lapack)
-	for(int ik=0; ik<nk; ++ik)
+#ifdef __OPENMP
+	#pragma omp parallel for schedule(static)
+#endif
+	for (int ik = 0; ik < nk; ik++)
 	{
+#ifdef __NORMAL
 		double psi_f_tmp = 0.0; 
 		for(int ir=0; ir<nr; ++ir)
 		{
 			psi_f_tmp += r_tmp[ir]*jl[ik][ir];
 		}
 		psi_f_tmp *= pref;
-	}
 #else
-
-#ifdef __OPENMP
-	#pragma omp parallel for schedule(static)
-#endif
-	for (int ik = 0; ik < nk; ik++)
-	{
 		const double psi_f_tmp = 
 		pref * LapackConnector::dot( this->nr, ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_tmp), 1, ModuleBase::GlobalFunc::VECTOR_TO_PTR(jl[ik]), 1 ) ;
+#endif
 		this->psif[ik] = psi_f_tmp;
 		this->psik[ik] = psi_f_tmp * k_radial[ik];
 		this->psik2[ik] = this->psik[ik] * k_radial[ik];
 	}
-#endif
 	return;
 }
 
@@ -585,8 +579,8 @@ void Numerical_Orbital_Lm::cal_rradial_sbpool(void)
 		assert( dr == this->rab[ir] );
 	}
 
-	Sph_Bessel_Recursive::D2* pSB = nullptr;
-	for( auto & sb : Sph_Bessel_Recursive_Pool::D2::sb_pool )
+	ModuleBase::Sph_Bessel_Recursive::D2* pSB = nullptr;
+	for( auto & sb : ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool )
 	{
 		if( dr * dk == sb.get_dx() )
 		{
@@ -597,8 +591,8 @@ void Numerical_Orbital_Lm::cal_rradial_sbpool(void)
 
 	if(!pSB)
 	{
-		Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});
-		pSB = &Sph_Bessel_Recursive_Pool::D2::sb_pool.back();
+		ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});
+		pSB = &ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool.back();
 	}
 
 	pSB->set_dx( dr * dk );
@@ -606,7 +600,7 @@ void Numerical_Orbital_Lm::cal_rradial_sbpool(void)
 
 	const std::vector<std::vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
 
-	const double pref = sqrt(2.0/PI);
+	const double pref = sqrt(2.0/ModuleBase::PI);
 
 	std::vector<double> k_tmp(nk);
 
@@ -648,7 +642,7 @@ void Numerical_Orbital_Lm::cal_rradial_sbpool(void)
 //===============================================
 void Numerical_Orbital_Lm::norm_test(void)const
 {
-//	TITLE(ofs_onscaling, "Numerical_Orbital_Lm", "norm_test");
+//	ModuleBase::TITLE(ofs_onscaling, "Numerical_Orbital_Lm", "norm_test");
 	//double asum_r = 0.0;
 	//double asum_k = 0.0;
 
@@ -682,7 +676,7 @@ void Numerical_Orbital_Lm::norm_test(void)const
 
 void Numerical_Orbital_Lm::plot(void)const
 {
-	TITLE("Numerical_Orbital_Lm","plot");
+	ModuleBase::TITLE("Numerical_Orbital_Lm","plot");
 	
 	std::string orbital_type;
 	// Peize Lin update 2016-08-31
@@ -711,10 +705,6 @@ void Numerical_Orbital_Lm::plot(void)const
 		orbital_type = "L" + ModuleBase::GlobalFunc::TO_STRING(this->angular_momentum_l);	
 	}
 
-
-#ifdef __NORMAL
-
-#else
 	if(GlobalV::MY_RANK==0)
 	{
 		std::stringstream ssr, ssk, ssru ,ssdru; // 2013-08-10 pengfei
@@ -737,7 +727,7 @@ void Numerical_Orbital_Lm::plot(void)const
 
 		if (!ofsk || !ofsr || !ofsru || !ofsdru) // 2013-08-10 pengfei
 		{
-			WARNING("Numerical_Orbital_Lm : plot", "Can't open files !");
+			ModuleBase::WARNING("Numerical_Orbital_Lm : plot", "Can't open files !");
 		}
 
 		for (int i = 0; i < this->nr; i++)
@@ -765,6 +755,5 @@ void Numerical_Orbital_Lm::plot(void)const
 		ofsdru.close(); // 13-08-10 pengfei
 	}
 
-#endif
 	return;
 }

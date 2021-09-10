@@ -23,8 +23,8 @@ bool Symmetry::symm_flag=false;
 void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, std::ofstream &ofs_running)
 {
     if (available == false) return;
-    TITLE("Symmetry","init");
-	timer::tick("Symmetry","analy_sys");
+    ModuleBase::TITLE("Symmetry","init");
+	ModuleBase::timer::tick("Symmetry","analy_sys");
 
 	ofs_running << "\n\n\n\n";
 	ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
@@ -67,7 +67,7 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, std::o
     this->a2 = ucell.a2;
     this->a3 = ucell.a3;
 
-	Matrix3 latvec1;
+	ModuleBase::Matrix3 latvec1;
 	latvec1.e11 = a1.x; latvec1.e12 = a1.y; latvec1.e13 = a1.z;
 	latvec1.e21 = a2.x; latvec1.e22 = a2.y; latvec1.e23 = a2.z;
 	latvec1.e31 = a3.x; latvec1.e32 = a3.y; latvec1.e33 = a3.z;
@@ -95,7 +95,7 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, std::o
             this->itmin_start = istart[it];
         }
 
-        Vector3<double> vec;
+        ModuleBase::Vector3<double> vec;
         for (int ia = 0; ia < ucell.atoms[it].na; ++ia)
         {
             dirpos[3*count + 0] = atom->taud[ia].x;
@@ -119,7 +119,7 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, std::o
 
 	// the atom position coordinates are changed to 
 	// crystal coordinates of a1,a2,a3
-	Matrix3 new_lat;
+	ModuleBase::Matrix3 new_lat;
 	new_lat.e11=a1.x; new_lat.e12=a1.y; new_lat.e13=a1.z;
 	new_lat.e21=a2.x; new_lat.e22=a2.y; new_lat.e23=a2.z;
 	new_lat.e31=a3.x; new_lat.e32=a3.y; new_lat.e33=a3.z;
@@ -185,9 +185,9 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, std::o
 // be givin in matrix form
 //---------------------------------------------------
 int Symmetry::standard_lat(
-    Vector3<double> &a,
-    Vector3<double> &b,
-    Vector3<double> &c,
+    ModuleBase::Vector3<double> &a,
+    ModuleBase::Vector3<double> &b,
+    ModuleBase::Vector3<double> &c,
     double *cel_const
 )
 {
@@ -233,9 +233,9 @@ int Symmetry::standard_lat(
 //		OUT(GlobalV::ofs_running,"alpha  = ", alpha );
 //		OUT(GlobalV::ofs_running,"beta   = " ,beta  );
 //		OUT(GlobalV::ofs_running,"gamma  = " ,gamma );
-        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"ALPHA (DEGREE)", acos(alpha)/PI*180.0 );
-        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"BETA  (DEGREE)" ,acos(beta)/PI*180.0  );
-        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"GAMMA (DEGREE)" ,acos(gamma)/PI*180.0 );
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"ALPHA (DEGREE)", acos(alpha)/ModuleBase::PI*180.0 );
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"BETA  (DEGREE)" ,acos(beta)/ModuleBase::PI*180.0  );
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"GAMMA (DEGREE)" ,acos(gamma)/ModuleBase::PI*180.0 );
         first = false;
     }
 
@@ -486,16 +486,16 @@ int Symmetry::standard_lat(
 }
 
 void Symmetry::lattice_type(
-    Vector3<double> &v1,
-    Vector3<double> &v2,
-    Vector3<double> &v3,
+    ModuleBase::Vector3<double> &v1,
+    ModuleBase::Vector3<double> &v2,
+    ModuleBase::Vector3<double> &v3,
     int &brav,
     double *cel_const,
     std::string &bravname,
     const UnitCell_pseudo &ucell
 )
 {
-    TITLE("Symmetry","lattice_type");
+    ModuleBase::TITLE("Symmetry","lattice_type");
 //      std::cout << "v1 = " << v1.x << " " << v1.y << " " << v1.z <<std::endl;
 //      std::cout << "v2 = " << v2.x << " " << v2.y << " " << v2.z <<std::endl;
 //      std::cout << "v3 = " << v3.x << " " << v3.y << " " << v3.z <<std::endl;
@@ -568,9 +568,9 @@ void Symmetry::lattice_type(
     //then we should find the best lattice vectors to make much easier the determination of the lattice symmetry
     //the method is to contrast the combination of the shortest vectors and determine their symmmetry
 
-    Vector3<double> r1, r2, r3;
-    Vector3<double> w1, w2, w3;
-    Vector3<double> q1, q2, q3;
+    ModuleBase::Vector3<double> r1, r2, r3;
+    ModuleBase::Vector3<double> w1, w2, w3;
+    ModuleBase::Vector3<double> q1, q2, q3;
 
     int nif = 0;
     for (int n33 = -2; n33 < 3; ++n33)
@@ -591,7 +591,7 @@ void Symmetry::lattice_type(
                                 {
                                     for (int n11 = -2; n11 < 3; ++n11)
                                     {
-                                        Matrix3 mat(n11, n12, n13, n21, n22, n23, n31, n32, n33);
+                                        ModuleBase::Matrix3 mat(n11, n12, n13, n21, n22, n23, n31, n32, n33);
 
                                         if (equal(mat.Det(),1.0))
                                         {
@@ -818,7 +818,7 @@ void Symmetry::lattice_type(
 void Symmetry::change_lattice(void)
 {
     //if lattice vectors are changed, do the coordinates conversion
-    if (GlobalV::test_symmetry) TITLE("Symmetry","change_lattice");
+    if (GlobalV::test_symmetry) ModuleBase::TITLE("Symmetry","change_lattice");
 
 	change = 0;
 
@@ -844,7 +844,7 @@ void Symmetry::change_lattice(void)
 void Symmetry::pricell(const UnitCell_pseudo &ucell)
 {
     //detect the generating cell (primitive cell) of a supercell
-    if (GlobalV::test_symmetry) TITLE("Symmetry","pricell");
+    if (GlobalV::test_symmetry) ModuleBase::TITLE("Symmetry","pricell");
 
     // part 1 of pricell
     for (int it = 0; it < ntype; it++)
@@ -1005,7 +1005,7 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
     double first;
     int plane;
 
-    Vector3<double> b1, b2, b3;
+    ModuleBase::Vector3<double> b1, b2, b3;
 
     //find first 'yz'-plane:
     first = ptrans[0];
@@ -1068,10 +1068,10 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
     //analyse the data and get the symmetry infomation
 //	std::cout<<"calculating the properties!"<<std::endl;
 
-    Vector3<double> zero(0.0,0.0,0.0);
+    ModuleBase::Vector3<double> zero(0.0,0.0,0.0);
     if (p1 == zero || p2 == zero || p3 == zero)
     {
-		WARNING_QUIT("Symmetry::pricell","At least one of the primitive std::vector is (0,0,0).");
+		ModuleBase::WARNING_QUIT("Symmetry::pricell","At least one of the primitive std::vector is (0,0,0).");
     }
 
     double celvolume = 0;
@@ -1125,7 +1125,7 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
 
 void Symmetry::getgroup(int &nrot, int &nrotk, std::ofstream &ofs_running)
 {
-    TITLE("Symmetry","getgroup");
+    ModuleBase::TITLE("Symmetry","getgroup");
 
 	//--------------------------------------------------------------------------------
     //GETGRP (L347 symlib.f VASP)
@@ -1134,9 +1134,9 @@ void Symmetry::getgroup(int &nrot, int &nrotk, std::ofstream &ofs_running)
     //the symmetry of the pure translation lattice without any basic.
 	//--------------------------------------------------------------------------------
 
-    Matrix3 zero(0,0,0,0,0,0,0,0,0);
-    Matrix3 help[48];
-    Vector3<double> temp[48];
+    ModuleBase::Matrix3 zero(0,0,0,0,0,0,0,0,0);
+    ModuleBase::Matrix3 help[48];
+    ModuleBase::Vector3<double> temp[48];
 
     nrot = 0;
     nrotk = 0;
@@ -1224,7 +1224,7 @@ void Symmetry::getgroup(int &nrot, int &nrotk, std::ofstream &ofs_running)
     return;
 }
 
-void Symmetry::checksym(Matrix3 &s, Vector3<double> &gtrans, double* pos)
+void Symmetry::checksym(ModuleBase::Matrix3 &s, ModuleBase::Vector3<double> &gtrans, double* pos)
 {
 	//----------------------------------------------
     // checks whether a point group symmetry element 
@@ -1232,7 +1232,7 @@ void Symmetry::checksym(Matrix3 &s, Vector3<double> &gtrans, double* pos)
 	//----------------------------------------------
     // the start atom index.
     bool no_diff = 0;
-    Vector3<double> trans(2.0, 2.0, 2.0);
+    ModuleBase::Vector3<double> trans(2.0, 2.0, 2.0);
     s_flag = 0;
 
     for (int it = 0; it < ntype; it++)
@@ -1300,7 +1300,7 @@ void Symmetry::checksym(Matrix3 &s, Vector3<double> &gtrans, double* pos)
 	print_pos(rotpos, nat);
 	*/
 
-    Vector3<double> diff;
+    ModuleBase::Vector3<double> diff;
 
 	//---------------------------------------------------------
     // itmin_start = the start atom positions of species itmin
@@ -1415,8 +1415,8 @@ void Symmetry::checksym(Matrix3 &s, Vector3<double> &gtrans, double* pos)
 void Symmetry::rho_symmetry( double *rho,
                              const int &nr1, const int &nr2, const int &nr3)
 {
-//  if (GlobalV::test_symmetry)TITLE("Symmetry","rho_symmetry");
-    timer::tick("Symmetry","rho_symmetry");
+//  if (GlobalV::test_symmetry)ModuleBase::TITLE("Symmetry","rho_symmetry");
+    ModuleBase::timer::tick("Symmetry","rho_symmetry");
 
     //for fft commensuration
 	//nrotk : the number of space operations.
@@ -1441,7 +1441,7 @@ void Symmetry::rho_symmetry( double *rho,
 
 
 	// get the remaining rotation matrix.
-	std::array<Matrix3, 48> gmatrix_fft;
+	std::array<ModuleBase::Matrix3, 48> gmatrix_fft;
 
     int counter = 0;
     for (int i=0; i<48; ++i)
@@ -1504,12 +1504,12 @@ void Symmetry::rho_symmetry( double *rho,
     delete[] ri;
     delete[] rj;
     delete[] rk;
-    timer::tick("Symmetry","rho_symmetry");
+    ModuleBase::timer::tick("Symmetry","rho_symmetry");
 }
 
 void Symmetry::force_symmetry(ModuleBase::matrix &force , double* pos, const UnitCell_pseudo &ucell)   // pengfei 2016-12-20
 {
-	TITLE("Symmetry","force_symmetry");
+	ModuleBase::TITLE("Symmetry","force_symmetry");
 	double *protpos;
 	double *tot_force;
 	int *n;
@@ -1719,7 +1719,7 @@ void Symmetry::stress_symmetry(ModuleBase::matrix& sigma, const UnitCell_pseudo 
 
 void Symmetry::write(void)
 {
-    if (GlobalV::test_symmetry) TITLE("Symmetry","write");
+    if (GlobalV::test_symmetry) ModuleBase::TITLE("Symmetry","write");
     GlobalV::ofs_running<<std::endl;
     GlobalV::ofs_running<<"\n The point group serial number is "<<pgnumber<<"."<<std::endl;
     GlobalV::ofs_running<<"\n Its Schoenflies name is "<<pgname<<"."<<std::endl;

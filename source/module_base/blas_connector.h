@@ -2,7 +2,6 @@
 #define BLAS_CONNECTOR_H
 
 #include <complex>
-using namespace std;
 
 extern "C"
 {

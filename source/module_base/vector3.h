@@ -8,7 +8,8 @@
 #include <cmath>
 #include <iostream>
 #include <iomanip>
-using namespace std;
+namespace ModuleBase
+{
 
 template <class T>
 class Vector3
@@ -99,6 +100,6 @@ template<class T> static std::ostream & operator << ( std::ostream &os, const Ve
 	return os;
 }
 
-
+}
 
 #endif

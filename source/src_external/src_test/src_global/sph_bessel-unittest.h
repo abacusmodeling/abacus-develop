@@ -26,7 +26,7 @@ static void Sph_Bessel_timetest(
 	const std::vector<double> rpoint = generate_point( dR, Rmesh );
 	const std::vector<double> kpoint = generate_point( dk, kmesh );
 	
-	Sph_Bessel SB;
+	ModuleBase::Sph_Bessel SB;
 	for (int l = 0; l < Lmax+1; l++)
 	{
 		std::vector<std::vector<double>> jlx( Rmesh, std::vector<double>(kmesh) );
