@@ -241,11 +241,6 @@ void Force_Stress_LCAO::getForceStress(
 					+ fcc(iat, i) //nonlinear core correction force (pw)
 					+ fscc(iat, i);//self consistent corretion force (pw)
 
-				// Force contribution from DFT+U, Quxin add on 20201029
-				if(INPUT.dft_plus_u)
-				{
-					fcs(iat, i) += force_dftu(iat, i);
-				}
 				//VDW force of vdwd2 or vdwd3
 				if(GlobalC::vdwd2_para.flag_vdwd2||GlobalC::vdwd3_para.flag_vdwd3)
 				{
