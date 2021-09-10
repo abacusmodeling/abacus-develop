@@ -9,7 +9,10 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: ghcr.io/${{ github.repository_owner }}/abacus-development-kit:gnu
+    strategy:
+      matrix:
+        dockerfile: ["gnu","intel","cuda"]
+    container: ghcr.io/${{ github.repository_owner }}/abacus-development-kit:${{ matrix.dockerfile }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
