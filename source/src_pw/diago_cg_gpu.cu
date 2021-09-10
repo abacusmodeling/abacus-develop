@@ -265,7 +265,7 @@ void Diago_CG_GPU::calculate_gradient(
     ModuleBase::timer::tick("Diago_CG_GPU","calculate_grad");
 
     int thread = 512;
-    int block = dim / thread + 1;
+    int block = (dim + thread - 1) / thread;
 
     // kernel_precondition(data, res, size, precondition)
     // (2) PH|psi> : g[i] = hpsi[i]/precondition[i]
@@ -375,7 +375,7 @@ void Diago_CG_GPU::calculate_gamma_cg(
     // }
 
     int thread = 512;
-    int block = dim / thread + 1;
+    int block = (dim + thread - 1) / thread;
     kernel_precondition_inverse<<<block, thread>>>(psg, sg, dim, precondition);
 
     // (3) Update gg_now!
@@ -441,7 +441,7 @@ bool Diago_CG_GPU::update_psi(
     if (test_cg==1) ModuleBase::TITLE("Diago_CG_GPU","update_psi");
     ModuleBase::timer::tick("Diago_CG_GPU","update_psi");
     int thread = 512;
-    int block = dim / 512 + 1;
+    int block = (dim + thread - 1) / thread;
     // pw.h_1psi(dim, cg, hcg, scg); // TODO
     // to cpu
     GlobalC::hm.hpw.h_1psi_gpu(dim, cg, hcg, scg);
@@ -542,7 +542,7 @@ void Diago_CG_GPU::schmit_orth
     psi_norm = sqrt(psi_norm);
 
     int thread = 512;
-    int block = dim / 512 + 1;
+    int block = (dim + thread - 1) / thread;
     kernel_normalization<<<block, thread>>>(psi_m, dim, psi_norm);
 
     GlobalC::hm.hpw.s_1psi_gpu(dim, psi_m, sphi);

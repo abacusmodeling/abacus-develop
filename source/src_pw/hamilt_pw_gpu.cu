@@ -392,7 +392,7 @@ void Hamilt_PW::h_1psi_gpu( const int npw_in, const CUFFT_COMPLEX *psi,
     this->h_psi_gpu(psi, hpsi);
 
     int thread = 512;
-    int block = npw_in / thread + 1;
+    int block = (npw_in + thread - 1) / thread;
     kernel_copy<<<thread, block>>>(npw_in, spsi, psi);
     return;
 }
@@ -462,7 +462,7 @@ void Hamilt_PW::h_psi_gpu(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, cons
             // cout<<"in hpsi-Kinetic, iband = "<<ib<<endl;
 
             int thread = 512;
-            int block = GlobalC::wf.npw / thread + 1;
+            int block = (GlobalC::wf.npw + thread - 1) / thread;
             kernel_get_tmhpsi<<<block, thread>>>(GlobalC::wf.npw, tmhpsi, tmpsi_in, d_g2kin);
 
             // if(GlobalC::NSPIN==4){
@@ -524,7 +524,7 @@ void Hamilt_PW::h_psi_gpu(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, cons
             //     tmhpsi[j] += UFFT.porter[ GR_index[j] ];
             // }
             int thread = 512;
-            int block = GlobalC::wf.npw / thread + 1;
+            int block = (GlobalC::wf.npw + thread - 1) / thread;
             kernel_add_tmhpsi<<<block, thread>>>(GlobalC::wf.npw, tmhpsi, d_porter, GR_index_d);
 
             tmhpsi += dmax;
@@ -863,7 +863,7 @@ void Hamilt_PW::add_nonlocal_pp_gpu(
 
             int thread_x = 16;
             dim3 thread(thread_x, thread_x);
-            dim3 block((nproj+thread_x-1)/thread_x, (m+thread_x-1)/thread_x);
+            dim3 block((nproj+thread_x-1) / thread_x, (m+thread_x-1) / thread_x);
             // dim3 block(1, 1, 1);
 
             kernel_addpp<<<block, thread>>>(ps, cur_deeq, becp, nproj, nprojx, sum, m, nkb);

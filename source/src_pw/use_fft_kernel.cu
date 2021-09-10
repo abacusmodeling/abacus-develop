@@ -50,7 +50,7 @@ __global__ void kernel_reorder(CUFFT_COMPLEX *dst, CUFFT_COMPLEX *src, int size)
 //     int ii = 0;
 //     int size_z = GlobalC::pw.FFT_wfc.npps[0];
 //     int thread = 512;
-//     int block = size_z / 512 + 1;
+//     int block = (size_z + thread - 1) / thread;
 //     for(int is=0; is<GlobalC::pw.FFT_wfc.nst; is++)
 //     {
 //         int ir = GlobalC::pw.FFT_wfc.ismap[is];
@@ -67,7 +67,7 @@ __global__ void kernel_reorder(CUFFT_COMPLEX *dst, CUFFT_COMPLEX *src, int size)
 //     int ii = 0;
 //     int size_z = GlobalC::pw.FFT_wfc.npps[0];
 //     int thread = 512;
-//     int block = size_z / 512 + 1;
+//     int block = (size_z + thread - 1) / thread;
 //     for(int j=0; j<GlobalC::pw.FFT_wfc.nst; j++)
 //     {
 //         int ir = GlobalC::pw.FFT_wfc.ismap[j];
@@ -83,8 +83,8 @@ void RoundTrip_kernel(const CUFFT_COMPLEX *psi, const double *vr, const int *fft
 {
     // (1) set value
     int thread = 512;
-    int block = GlobalC::wf.npw / thread + 1;
-    int block2 = GlobalC::pw.nrxx / thread + 1;
+    int block = (GlobalC::wf.npw + thread - 1) / thread;
+    int block2 = (GlobalC::pw.nrxx + thread - 1) / thread;
     kernel_set<<<block, thread>>>(GlobalC::wf.npw, psic, psi, fft_index);
 
     // CUFFT_COMPLEX *ordered_psi;
@@ -98,7 +98,7 @@ void RoundTrip_kernel(const CUFFT_COMPLEX *psi, const double *vr, const int *fft
     cufftExecZ2Z(GlobalC::UFFT.fft_handle, psic, psic, CUFFT_INVERSE);
     // cufftDestroy(cufftplan_gpu);
 
-    // int block3 = GlobalC::pw.nrxx / thread + 1;
+    // int block3 = (GlobalC::pw.nrxx + thread - 1) / thread;
     // kernel_normalization<<<block3, thread>>>(GlobalC::pw.nrxx, psic, (double)(GlobalC::pw.nrxx));
 
     kernel_roundtrip<<<block2, thread>>>(GlobalC::pw.nrxx, psic, vr);
@@ -110,7 +110,7 @@ void RoundTrip_kernel(const CUFFT_COMPLEX *psi, const double *vr, const int *fft
 
     // Reorder_psi_minus(psic, ordered_psi);
 
-    int block3 = GlobalC::pw.nrxx / thread + 1;
+    int block3 = (GlobalC::pw.nrxx + thread - 1) / thread;
     kernel_normalization<<<block3, thread>>>(GlobalC::pw.nrxx, psic, (double)(GlobalC::pw.nrxx));
 
     // CHECK_CUDA(cudaFree(ordered_psi));
