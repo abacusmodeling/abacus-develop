@@ -260,11 +260,6 @@ void Force_Stress_LCAO::getForceStress(
 				{
 					fcs(iat, i) += fefield(iat, i);
 				}
-				//DFT plus U force
-				if(INPUT.dft_plus_u)
-				{
-					fcs(iat, i) += force_dftu(iat, i);
-				}
 #ifdef __DEEPKS
 				// mohan add 2021-08-04
 				if (INPUT.deepks_scf)
