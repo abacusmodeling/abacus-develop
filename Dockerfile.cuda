@@ -1,11 +1,4 @@
-# Use abacus-development-kit:intel for oneAPI.
 FROM ghcr.io/deepmodeling/abacus-development-kit:gnu
 
-RUN apt-get update && apt-get install -y gnupg software-properties-common
-# Install CUDA components following the instructions on
-# https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Debian&target_version=10&target_type=deb_network
-RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/debian10/x86_64/7fa2af80.pub \
-	&& add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/debian10/x86_64/ /" \
-	&& add-apt-repository contrib \
-	&& apt-get update \
-	&& apt-get -y install cuda
+RUN wget https://developer.download.nvidia.com/compute/cuda/11.4.2/local_installers/cuda_11.4.2_470.57.02_linux.run --no-check-certificate --quiet \
+	&& sh cuda_11.4.2_470.57.02_linux.run --toolkit --silent
