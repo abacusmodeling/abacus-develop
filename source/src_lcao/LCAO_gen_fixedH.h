@@ -30,6 +30,7 @@ class LCAO_gen_fixedH
 	
 	// can used in gamma algorithm.
 	void build_Nonlocal_beta (const bool& calc_deri);
+	void build_Nonlocal_beta_new ();
 
 	// used if k point is used,
 	// also can used in gamma algorithm.

@@ -119,7 +119,7 @@ void ORB_control::clear_after_ions(
 	//caoyu add 2021-03-18
     if (out_descriptor>0) 
 	{
-        OGT.talpha.Destroy_Table_Alpha();
+        OGT.talpha.Destroy_Table_Alpha(orb);
     }
     return;
 }
