@@ -11,7 +11,7 @@
 extern "C"
 {
     #include "Cblacs.h"
-    #include <elpa/elpa.h>
+	#include "my_elpa.h"
 	#include "../module_base/scalapack_connector.h"
 }
 #include "pdgseps.h"
