@@ -597,7 +597,7 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex_3(const int &ik, complex<double>
 
 	//alpha = (1.0, 0.0);
 	//beta = (0.0, 0.0);
-	char transb = 'T';
+	char transb = 'T'; //This place requires subsequent testing of different transb.
 	int descb = 0; 
 
 	double alpha_1 = 1.0;
@@ -611,8 +611,8 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex_3(const int &ik, complex<double>
 		&transa, &transb,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 		&alpha_1,
-		Htmp1, &one_int, &one_int, GlobalC::ParaO.desc,
-		Htmp2, &one_int, &one_int, GlobalC::ParaO.desc, 
+		Htmp2, &one_int, &one_int, GlobalC::ParaO.desc,
+		Htmp1, &one_int, &one_int, GlobalC::ParaO.desc, 
 		&beta_1,
 		Htmp3, &one_int, &one_int, GlobalC::ParaO.desc);
 
