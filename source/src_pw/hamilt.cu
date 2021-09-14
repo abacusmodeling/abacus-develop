@@ -10,6 +10,23 @@
 Hamilt::Hamilt() {}
 Hamilt::~Hamilt() {}
 
+__global__ void cast_d2f(float *dst, double *src, int size)
+{
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if(i < size)
+    {
+        dst[i] = __double2float_rn(src[i]);
+    }
+}
+
+__global__ void cast_f2d(double *dst, float *src, int size)
+{
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if(i < size)
+    {
+        dst[i] = (double)(src[i]);
+    }
+}
 
 void Hamilt::diagH_pw(
     const int &istep,
@@ -85,7 +102,7 @@ void Hamilt::diagH_pw(
 
                     avg_iter += 1.0;
                 }
-                Diago_CG_GPU cg_gpu;
+                Diago_CG_GPU<double, double2> cg_gpu;
 				bool reorder = true;
 
 				CUFFT_COMPLEX *d_wf_evc;
@@ -93,6 +110,12 @@ void Hamilt::diagH_pw(
                 int DIM_CG_GPU = GlobalC::kv.ngk[ik];
                 int DIM_CG_GPU2 = GlobalC::wf.npwx * GlobalV::NPOL;
                 double *d_precondition;
+
+                // float2 *f_wf_evc;
+                // float *f_wf_ekb;
+                // int DIM_CG_GPU = GlobalC::kv.ngk[ik];
+                // int DIM_CG_GPU2 = GlobalC::wf.npwx * GlobalV::NPOL;
+                // float *d_precondition;
 
 				if(GlobalV::NPOL==1)
 				{
@@ -103,6 +126,15 @@ void Hamilt::diagH_pw(
                     CHECK_CUDA(cudaMemcpy(d_wf_evc, GlobalC::wf.evc[ik0].c, GlobalV::NBANDS * GlobalC::wf.npwx * sizeof(CUFFT_COMPLEX), cudaMemcpyHostToDevice));
                     // CHECK_CUDA(cudaMemcpy(d_wf_ekb, wf.ekb[ik], NBANDS * sizeof(double), cudaMemcpyHostToDevice));
                     CHECK_CUDA(cudaMemcpy(d_precondition, precondition, DIM_CG_GPU * sizeof(double), cudaMemcpyHostToDevice));
+                    
+                    // CHECK_CUDA(cudaMalloc((void**)&f_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx * sizeof(float2)));
+                    // CHECK_CUDA(cudaMalloc((void**)&f_wf_ekb, GlobalV::NBANDS * sizeof(float)));
+                    // CHECK_CUDA(cudaMalloc((void**)&f_precondition, DIM_CG_GPU * sizeof(float)));
+                    // int thread = 512;
+                    // int block = GlobalV::NBANDS * GlobalC::wf.npwx / thread + 1;
+                    // int block2 = DIM_CG_GPU / thread + 1;
+                    // cast_d2f<<<block, thread>>>(f_wf_evc, d_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx)
+                    // cast_d2f<<<block, thread>>>(f_precondition, d_precondition, )
 
                     cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
                     cg_gpu.diag(d_wf_evc, d_wf_ekb, DIM_CG_GPU, GlobalC::wf.npwx,

@@ -5,8 +5,9 @@
 #include "cufft.h"
 #include "cublas_v2.h"
 
-typedef cufftDoubleComplex CUFFT_COMPLEX;
+// typedef cufftDoubleComplex CUFFT_COMPLEX;
 
+template<class T, class T2>
 class Diago_CG_GPU
 {
 public:
@@ -16,50 +17,50 @@ public:
 
     static int moved;
 
-    double ddot_real(
+    T ddot_real(
         const int & dim,
-        const CUFFT_COMPLEX* psi_L,
-        const CUFFT_COMPLEX* psi_R,
+        const T2* psi_L,
+        const T2* psi_R,
         const bool reduce = true) ;
 
-    CUFFT_COMPLEX ddot(
+    T2 ddot(
         const int & dim,
-        const CUFFT_COMPLEX* psi_L,
-        const CUFFT_COMPLEX* psi_R ) ;
+        const T2* psi_L,
+        const T2* psi_R ) ;
 
-    CUFFT_COMPLEX ddot(
+    T2 ddot(
         const int & dim,
-        const CUFFT_COMPLEX *psi, // matrix
+        const T2 *psi, // matrix
         const int & m,
-        CUFFT_COMPLEX *psik ) ;
+        T2 *psik ) ;
 
-    CUFFT_COMPLEX ddot(
+    T2 ddot(
         const int & dim,
-        const CUFFT_COMPLEX *psi_L, // matrix
+        const T2 *psi_L, // matrix
         const int & m,
-        const CUFFT_COMPLEX *psi_R, // matrix
+        const T2 *psi_R, // matrix
         const int & n) ;
 
     void diag(
-        CUFFT_COMPLEX *phi, // matrix
-        double *e,
+        T2 *phi, // matrix
+        T *e,
         const int &dim,
         const int &dmx,
         const int &n_band,
-        const double *precondition,
-        const double &eps,
+        const T *precondition,
+        const T &eps,
         const int &maxter,
         const bool &reorder,
         int &notconv,
-        double &avg_iter);
+        T &avg_iter);
 
     void schmit_orth(
         const int &dim,
         const int &dmx,
         const int &m,
-        const CUFFT_COMPLEX *psi, // matrix
-        CUFFT_COMPLEX *spsi,
-        CUFFT_COMPLEX *psi_m
+        const T2 *psi, // matrix
+        T2 *spsi,
+        T2 *psi_m
     );
 
 private:
@@ -68,47 +69,47 @@ private:
     cublasHandle_t diag_handle;
 
     void calculate_gradient(
-        const double* precondition,
+        const T* precondition,
         const int dim,
-        const CUFFT_COMPLEX *hpsi,
-        const CUFFT_COMPLEX *spsi,
-        CUFFT_COMPLEX *g,
-        CUFFT_COMPLEX *pspsi);
+        const T2 *hpsi,
+        const T2 *spsi,
+        T2 *g,
+        T2 *pspsi);
 
     void orthogonal_gradient(
         const int &dim,
         const int &dmx,
-        CUFFT_COMPLEX *g,
-        CUFFT_COMPLEX *sg,
-        CUFFT_COMPLEX *lagrange,
-        const CUFFT_COMPLEX *eigenfunction, // matrix
+        T2 *g,
+        T2 *sg,
+        T2 *lagrange,
+        const T2 *eigenfunction, // matrix
         const int m);
 
     void calculate_gamma_cg(
         const int iter,
         const int dim,
-        const double *precondition,
-        const CUFFT_COMPLEX *g,
-        const CUFFT_COMPLEX *sg,
-        CUFFT_COMPLEX *psg,
-        CUFFT_COMPLEX *cg,
-        double &gg_last,
-        const double &cg0,
-        const double &theta,
-        const CUFFT_COMPLEX *psi_m);
+        const T *precondition,
+        const T2 *g,
+        const T2 *sg,
+        T2 *psg,
+        T2 *cg,
+        T &gg_last,
+        const T &cg0,
+        const T &theta,
+        const T2 *psi_m);
 
     bool update_psi(
         const int dim,
-        double &cg_norm,
-        double &theta,
-        CUFFT_COMPLEX *hcg,
-        const CUFFT_COMPLEX *cg,
-        CUFFT_COMPLEX *scg,
-        CUFFT_COMPLEX *psi_m ,
-        double &eigenvalue,
-        const double &threshold,
-        CUFFT_COMPLEX *hpsi,
-        CUFFT_COMPLEX *spsi);
+        T &cg_norm,
+        T &theta,
+        T2 *hcg,
+        const T2 *cg,
+        T2 *scg,
+        T2 *psi_m ,
+        T &eigenvalue,
+        const T &threshold,
+        T2 *hpsi,
+        T2 *spsi);
 
 };
 # endif

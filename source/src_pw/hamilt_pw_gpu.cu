@@ -177,8 +177,8 @@ void Hamilt_PW::diagH_subspace(
     ModuleBase::ComplexMatrix &evc,
     double *en)
 {
-    ModuleBase::TITLE("Hamilt_PW","diagH_subspace");
-    ModuleBase::timer::tick("Hamilt_PW","diagH_subspace");
+    ModuleBase::TITLE("Hamilt_PW_GPU","diagH_subspace");
+    ModuleBase::timer::tick("Hamilt_PW_GPU","diagH_subspace");
 
 	assert(nstart!=0);
 	assert(n_band!=0);
@@ -382,7 +382,7 @@ void Hamilt_PW::diagH_subspace(
 
     //out.printcm_norm("hvec",hvec,1.0e-8);
 
-    ModuleBase::timer::tick("Hamilt_PW","diagH_subspace");
+    ModuleBase::timer::tick("Hamilt_PW_GPU","diagH_subspace");
     return;
 }
 

@@ -13,7 +13,7 @@ project(ABACUS
 
 option(ENABLE_DEEPKS "Enable DeePKS functionality" OFF)
 option(ENABLE_LIBXC "Enable LibXC functionality" OFF)
-option(USE_CUDA "Enable support to CUDA." ON)
+option(USE_CUDA "Enable support to CUDA." OFF)
 
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 option(BUILD_TESTING "Build ABACUS unit tests" OFF)
