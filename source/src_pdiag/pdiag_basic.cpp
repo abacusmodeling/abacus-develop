@@ -117,13 +117,16 @@ void Pdiag_Basic::set_parameters(void)
 		}
 	}//xiaohui add 2014-12-21
 
-	Z_LOC = new double*[GlobalV::NSPIN];
-	for(int is=0; is<GlobalV::NSPIN; is++)
-	{
-		Z_LOC[is] = new double[loc_size * GlobalV::NLOCAL];
-		ModuleBase::GlobalFunc::ZEROS(Z_LOC[is], loc_size * GlobalV::NLOCAL);
-	}
-	alloc_Z_LOC = true;//xiaohui add 2014-12-22
+    if (GlobalV::KS_SOLVER=="hpseps") //LiuXh add 2021-09-06, clear memory, Z_LOC only used in hpseps solver
+    {
+	    Z_LOC = new double*[GlobalV::NSPIN];
+	    for(int is=0; is<GlobalV::NSPIN; is++)
+	    {
+		    Z_LOC[is] = new double[loc_size * GlobalV::NLOCAL];
+		    ModuleBase::GlobalFunc::ZEROS(Z_LOC[is], loc_size * GlobalV::NLOCAL);
+	    }
+	    alloc_Z_LOC = true;//xiaohui add 2014-12-22
+    }
 
     if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"lastband_in_proc",lastband_in_proc);
     if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"lastband_number",lastband_number);
@@ -503,230 +506,6 @@ void Pdiag_Basic::data_distribution(
 
 #ifdef __MPI
 #include "../src_pw/occupy.h"
-void Pdiag_Basic::gath_eig(MPI_Comm comm,int n,double **wfc,double *Z)
-{
-    ModuleBase::TITLE("Pdiag_Basic","gath_eig");
-    time_t time_start = time(NULL);
-//  GlobalV::ofs_running << " Start gath_eig Time : " << ctime(&time_start);
-
-    int i,j,k;
-    int nprocs,myid;
-    MPI_Status status;
-    MPI_Comm_size(comm,&nprocs);
-    MPI_Comm_rank(comm,&myid);
-
-    double **ctot;
-
-	// mohan add 2010-07-03
-	// the occupied bands are useless
-	// for calculating charge density.
-	if(GlobalV::DRANK>lastband_in_proc)
-	{
-		delete[] Z;
-	}
-
-	// first we need to collect all
-	// the occupied bands.
-	// GlobalV::NBANDS * GlobalV::NLOCAL	
-	if(myid==0)
-	{
-		ctot = new double*[GlobalV::NBANDS];
-    	for (int i=0; i<GlobalV::NBANDS; i++)
-    	{
-        	ctot[i] = new double[GlobalV::NLOCAL];
-        	ModuleBase::GlobalFunc::ZEROS(ctot[i], GlobalV::NLOCAL);
-    	}
-    	ModuleBase::Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"double");
-	}
-
-    k=0;
-    if (myid==0)
-    {
-        // mohan add nbnd0 2010-07-02
-        int nbnd0 = -1;
-        if (GlobalV::NBANDS < loc_sizes[0])
-        {
-			// means all bands in this processor
-			// is needed ( is occupied)
-            nbnd0 = GlobalV::NBANDS;
-        }
-        else
-        {
-			// means this processor only save
-			// part of GlobalV::NBANDS.
-            nbnd0 = loc_sizes[0];
-        }
-        if(testpb) GlobalV::ofs_running << " nbnd in processor 0 is " << nbnd0 << std::endl;
-
-//printf("from 0 to %d\n",nbnd0-1);
-        for (i=0; i<nbnd0; i++)
-        {
-            for (j=0; j<GlobalV::NLOCAL; j++)
-            {
-				// change the order in processor 0.
-				// the contribution from processor 0.
-                ctot[k][j]=Z[j*loc_sizes[0]+i];
-            }
-            k++;
-        }
-		// Z is useless in processor 0 now.
-		delete[] Z;
-    }
-    MPI_Barrier(comm);
-
-
-    for (i=1; i<= this->lastband_in_proc; i++)
-    {
-        // mohan fix bug 2010-07-02
-        // rows indicates the data structure of Z.
-        // mpi_times indicates the data distribution
-        // time, each time send a band.
-        int rows = loc_sizes[i];
-        int mpi_times;
-        if (i==lastband_in_proc)
-        {
-            mpi_times = lastband_number;
-        }
-        else
-        {
-            mpi_times = loc_sizes[i];
-        }
-        if(testpb)GlobalV::ofs_running << " nbnd in processor " << i << " is " << mpi_times << std::endl;
-        if (myid==i)
-        {
-            for (j=0; j<mpi_times; j++)
-            {
-                int tag = j;
-                double *send = new double[n];
-                int count = 0;
-
-                for (int m=0; m<rows*n; m++)
-                {
-                    if (m%rows==j)
-                    {
-                        send[count] = Z[m];
-                        ++count;
-                    }
-                }
-
-				// send the data to processor 0.
-                MPI_Send(send,n,MPI_DOUBLE,0,tag,comm);
-
-                delete[] send;
-            }
-			// third part to delete Z;
-			delete[] Z;
-        }
-        else if (myid==0)
-        {
-            int col=0;
-            for (j=0; j<mpi_times; j++)
-            {
-                double *ctmp = new double[GlobalV::NLOCAL];
-                ModuleBase::GlobalFunc::ZEROS(ctmp, GlobalV::NLOCAL);
-                int tag = j;
-                
-				// Processor 0 receive the data from other processors.
-				MPI_Recv(ctmp,n,MPI_DOUBLE,i,tag,comm,&status);
-
-                for (int m=0; m<GlobalV::NLOCAL; m++)
-                {
-                    ctot[k][m]=ctmp[m];
-//					GlobalV::ofs_running << " receive Z=" << ctmp[m] << std::endl;
-                }
-                k++;
-
-                delete[] ctmp;
-            }
-        }
-        //MPI_Barrier(comm);
-    }
-    if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Final k",k);
-/*
-if(myid==0){
-	double *vect=new double[GlobalV::NLOCAL*GlobalV::NBANDS];
-	double *form=new double[GlobalV::NBANDS*GlobalV::NBANDS];
-	int x,y;
-	for(x=0;x<GlobalV::NBANDS;x++){
-		for(y=0;y<GlobalV::NLOCAL;y++){
-			vect[x*GlobalV::NLOCAL+y]=ctot[x][y];
-		}
-	}
-		char chT='T';
-		char chN='N';
-		int	ne = GlobalV::NBANDS;
-		int m1, n1, k1;
-		double ONE=1.0,ZERO=0.0;
-		m1 = ne;
-		n1 = ne;
-		k1 = GlobalV::NLOCAL;
-		dgemm_(&chT, &chN, &m1, &n1, &k1, &ONE, vect, &k1, vect, &k1, &ZERO, form, &m1);
-		double di=0.0,oth=0.0;
-		for(x=0;x<ne;x++){
-			for(y=0;y<ne;y++){
-				if(x==y){
-					di+=fabs(form[x*ne+y]);
-				}else{
-					oth+=fabs(form[x*ne+y]);
-				}
-			}
-		}
-		di-=ne;
-		printf("\n\n\ndi=%.16lf\n\n\nother=%.16lf\n\n\n",di,oth);
-		//assert(0>1);
-}
-*/
-MPI_Barrier(comm);
-
-	// mohan add 2010-09-10
-	// output the wave function if required.
-	// this is a bad position to output wave functions.
-	// but it works!
-    if(this->out_lowf)
-	{
-		// read is in ../src_algorithms/wf_local.cpp
-		std::stringstream ss;
-		ss << GlobalV::global_out_dir << "LOWF_GAMMA_S" << GlobalV::CURRENT_SPIN+1 << ".dat";
-		// mohan add 2012-04-03, because we need the occupations for the
-		// first iteration. 
-		Occupy::calculate_weights();
-		WF_Local::write_lowf( ss.str(), ctot );//mohan add 2010-09-09        
-	}
-
-	// mohan add 2010-09-10
-	// distribution of local wave functions 
-	// to each processor.
-	// only used for GlobalV::GAMMA_ONLY_LOCAL
-	WF_Local::distri_lowf( ctot, wfc);
-
-	// mohan 2010-09-26
-	// distribution of augmented wave functions.
-	// mohan fix bug 2011-01-03
-	// the third dimension of WFC_GAMMA_aug may be zero.
-	// mohan fix bug 2011-03-03
-	// when the third dimension is zero, we don't need to call
-	// this function, however, as proc 0, it needs all the procssors
-	// to give reports to it.
-	//	std::cout << " block distri_lowf_aug" << std::endl;
-	// mohan update 2021-02-12, delte BFIELD option
-	WF_Local::distri_lowf_aug( ctot, GlobalC::LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN]); 
-
-	// clean staff.
-	if(myid==0)
-	{
-    	for (int i=0; i<GlobalV::NBANDS; i++)
-    	{
-        	delete[] ctot[i];
-    	}
-    	delete[] ctot;
-	}
-
-    time_t time_end = time(NULL);
-    //GlobalV::ofs_running << " End   gath_eig Time : " << ctime(&time_end);
-	ModuleBase::GlobalFunc::OUT_TIME("gather eigenvalues",time_start,time_end);
-    return;
-}
-
 void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **cc,std::complex<double> *Z, const int &ik)
 {
     ModuleBase::TITLE("Pdiag_Basic","gath_eig_complex");
@@ -1121,6 +900,234 @@ void Pdiag_Basic::gath_full_eig_complex(MPI_Comm comm,int n,std::complex<double>
     //GlobalV::ofs_running << " End   gath_full_eig Time : " << ctime(&time_end);
 	ModuleBase::GlobalFunc::OUT_TIME("gather full eigenvalues",time_start,time_end);
 
+    return;
+}
+#endif
+
+//LiuXh add 2021-09-06, clear memory, totwfc and WFC_GAMMA_aug not used now
+#ifdef __MPI
+#include "../src_pw/occupy.h"
+void Pdiag_Basic::gath_eig(MPI_Comm comm,int n,double *Z)
+{
+    ModuleBase::TITLE("Pdiag_Basic","gath_eig");
+    time_t time_start = time(NULL);
+//  GlobalV::ofs_running << " Start gath_eig Time : " << ctime(&time_start);
+
+    int i,j,k;
+    int nprocs,myid;
+    MPI_Status status;
+    MPI_Comm_size(comm,&nprocs);
+    MPI_Comm_rank(comm,&myid);
+
+    double **ctot;
+
+	// mohan add 2010-07-03
+	// the occupied bands are useless
+	// for calculating charge density.
+	if(GlobalV::DRANK>lastband_in_proc)
+	{
+		delete[] Z;
+	}
+
+	// first we need to collect all
+	// the occupied bands.
+	// GlobalV::NBANDS * GlobalV::NLOCAL	
+	if(myid==0)
+	{
+		ctot = new double*[GlobalV::NBANDS];
+    	for (int i=0; i<GlobalV::NBANDS; i++)
+    	{
+        	ctot[i] = new double[GlobalV::NLOCAL];
+        	ModuleBase::GlobalFunc::ZEROS(ctot[i], GlobalV::NLOCAL);
+    	}
+    	ModuleBase::Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"double");
+	}
+
+    k=0;
+    if (myid==0)
+    {
+        // mohan add nbnd0 2010-07-02
+        int nbnd0 = -1;
+        if (GlobalV::NBANDS < loc_sizes[0])
+        {
+			// means all bands in this processor
+			// is needed ( is occupied)
+            nbnd0 = GlobalV::NBANDS;
+        }
+        else
+        {
+			// means this processor only save
+			// part of GlobalV::NBANDS.
+            nbnd0 = loc_sizes[0];
+        }
+        if(testpb) GlobalV::ofs_running << " nbnd in processor 0 is " << nbnd0 << std::endl;
+
+//printf("from 0 to %d\n",nbnd0-1);
+        for (i=0; i<nbnd0; i++)
+        {
+            for (j=0; j<GlobalV::NLOCAL; j++)
+            {
+				// change the order in processor 0.
+				// the contribution from processor 0.
+                ctot[k][j]=Z[j*loc_sizes[0]+i];
+            }
+            k++;
+        }
+		// Z is useless in processor 0 now.
+		delete[] Z;
+    }
+    MPI_Barrier(comm);
+
+
+    for (i=1; i<= this->lastband_in_proc; i++)
+    {
+        // mohan fix bug 2010-07-02
+        // rows indicates the data structure of Z.
+        // mpi_times indicates the data distribution
+        // time, each time send a band.
+        int rows = loc_sizes[i];
+        int mpi_times;
+        if (i==lastband_in_proc)
+        {
+            mpi_times = lastband_number;
+        }
+        else
+        {
+            mpi_times = loc_sizes[i];
+        }
+        if(testpb)GlobalV::ofs_running << " nbnd in processor " << i << " is " << mpi_times << std::endl;
+        if (myid==i)
+        {
+            for (j=0; j<mpi_times; j++)
+            {
+                int tag = j;
+                double *send = new double[n];
+                int count = 0;
+
+                for (int m=0; m<rows*n; m++)
+                {
+                    if (m%rows==j)
+                    {
+                        send[count] = Z[m];
+                        ++count;
+                    }
+                }
+
+				// send the data to processor 0.
+                MPI_Send(send,n,MPI_DOUBLE,0,tag,comm);
+
+                delete[] send;
+            }
+			// third part to delete Z;
+			delete[] Z;
+        }
+        else if (myid==0)
+        {
+            int col=0;
+            for (j=0; j<mpi_times; j++)
+            {
+                double *ctmp = new double[GlobalV::NLOCAL];
+                ModuleBase::GlobalFunc::ZEROS(ctmp, GlobalV::NLOCAL);
+                int tag = j;
+                
+				// Processor 0 receive the data from other processors.
+				MPI_Recv(ctmp,n,MPI_DOUBLE,i,tag,comm,&status);
+
+                for (int m=0; m<GlobalV::NLOCAL; m++)
+                {
+                    ctot[k][m]=ctmp[m];
+//					GlobalV::ofs_running << " receive Z=" << ctmp[m] << std::endl;
+                }
+                k++;
+
+                delete[] ctmp;
+            }
+        }
+        //MPI_Barrier(comm);
+    }
+    if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Final k",k);
+/*
+if(myid==0){
+	double *vect=new double[GlobalV::NLOCAL*GlobalV::NBANDS];
+	double *form=new double[GlobalV::NBANDS*GlobalV::NBANDS];
+	int x,y;
+	for(x=0;x<GlobalV::NBANDS;x++){
+		for(y=0;y<GlobalV::NLOCAL;y++){
+			vect[x*GlobalV::NLOCAL+y]=ctot[x][y];
+		}
+	}
+		char chT='T';
+		char chN='N';
+		int	ne = GlobalV::NBANDS;
+		int m1, n1, k1;
+		double ONE=1.0,ZERO=0.0;
+		m1 = ne;
+		n1 = ne;
+		k1 = GlobalV::NLOCAL;
+		dgemm_(&chT, &chN, &m1, &n1, &k1, &ONE, vect, &k1, vect, &k1, &ZERO, form, &m1);
+		double di=0.0,oth=0.0;
+		for(x=0;x<ne;x++){
+			for(y=0;y<ne;y++){
+				if(x==y){
+					di+=fabs(form[x*ne+y]);
+				}else{
+					oth+=fabs(form[x*ne+y]);
+				}
+			}
+		}
+		di-=ne;
+		printf("\n\n\ndi=%.16lf\n\n\nother=%.16lf\n\n\n",di,oth);
+		//assert(0>1);
+}
+*/
+MPI_Barrier(comm);
+
+	// mohan add 2010-09-10
+	// output the wave function if required.
+	// this is a bad position to output wave functions.
+	// but it works!
+    if(this->out_lowf)
+	{
+		// read is in ../src_algorithms/wf_local.cpp
+		std::stringstream ss;
+		ss << GlobalV::global_out_dir << "LOWF_GAMMA_S" << GlobalV::CURRENT_SPIN+1 << ".dat";
+		// mohan add 2012-04-03, because we need the occupations for the
+		// first iteration. 
+		Occupy::calculate_weights();
+		WF_Local::write_lowf( ss.str(), ctot );//mohan add 2010-09-09        
+	}
+
+	// mohan add 2010-09-10
+	// distribution of local wave functions 
+	// to each processor.
+	// only used for GlobalV::GAMMA_ONLY_LOCAL
+	//WF_Local::distri_lowf( ctot, wfc);
+
+	// mohan 2010-09-26
+	// distribution of augmented wave functions.
+	// mohan fix bug 2011-01-03
+	// the third dimension of WFC_GAMMA_aug may be zero.
+	// mohan fix bug 2011-03-03
+	// when the third dimension is zero, we don't need to call
+	// this function, however, as proc 0, it needs all the procssors
+	// to give reports to it.
+	//	std::cout << " block distri_lowf_aug" << std::endl;
+	// mohan update 2021-02-12, delte BFIELD option
+	//WF_Local::distri_lowf_aug( ctot, GlobalC::LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN]); 
+
+	// clean staff.
+	if(myid==0)
+	{
+    	for (int i=0; i<GlobalV::NBANDS; i++)
+    	{
+        	delete[] ctot[i];
+    	}
+    	delete[] ctot;
+	}
+
+    time_t time_end = time(NULL);
+    //GlobalV::ofs_running << " End   gath_eig Time : " << ctime(&time_end);
+	ModuleBase::GlobalFunc::OUT_TIME("gather eigenvalues",time_start,time_end);
     return;
 }
 #endif
