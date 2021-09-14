@@ -73,7 +73,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		}
 
 		// SGO: sub_grid_operation
-		GlobalC::SGO.cal_totwfc();
+		//GlobalC::SGO.cal_totwfc(); //LiuXh modify 2021-09-06, clear memory, totwfc not used now
 
 		//--------------------------------------
 		// DIAG GROUP OPERATION HERE
@@ -82,7 +82,8 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		{
 			Diago_LCAO_Matrix DLM;
 			// the temperary array totwfc only have one spin direction.
-			DLM.solve_double_matrix(ik, GlobalC::SGO.totwfc[0], GlobalC::LOC.wfc_dm_2d.wfc_gamma[ik]);
+			//DLM.solve_double_matrix(ik, GlobalC::SGO.totwfc[0], GlobalC::LOC.wfc_dm_2d.wfc_gamma[ik]);
+			DLM.solve_double_matrix(ik, GlobalC::LOC.wfc_dm_2d.wfc_gamma[ik]); //LiuXh modify 2021-09-06, clear memory, totwfc not used now
 		}
 		else
 		{
@@ -99,7 +100,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 #endif
 		// distribute the wave functions again.
 		// delete the function -- mohan 2021-02-09
-		GlobalC::SGO.dis_subwfc();
+		//GlobalC::SGO.dis_subwfc(); //LiuXh modify 2021-09-06, clear memory, totwfc and WFC_GAMMA not used now
 	}// end k points
 			
 	ModuleBase::timer::tick("ELEC_cband_gamma","cal_bands");

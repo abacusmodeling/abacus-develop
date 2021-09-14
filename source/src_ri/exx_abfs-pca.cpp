@@ -94,7 +94,7 @@ ofs<<"TIME@LapackConnector::dsyev\t"<<time_during(t_start)<<std::endl;
 			if( info )
 			{
 				std::cout<<std::endl<<"info_dsyev = "<<info<<std::endl;
-				GlobalV::ofs_warning<<mm<<std::endl;
+				mm.print(GlobalV::ofs_warning)<<std::endl;
 				std::cout<<"in file "<<__FILE__<<" line "<<__LINE__<<std::endl;
 				ModuleBase::QUIT();
 			}
