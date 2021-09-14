@@ -197,5 +197,7 @@ extern int test_deconstructor;
 
 extern bool FINAL_SCF; //LiuXh add 20180619
 
+extern bool out_descriptor; //zhengdy add 20210910
+
 }
 #endif

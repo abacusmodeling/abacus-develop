@@ -85,9 +85,9 @@ void UnitCell_pseudo::setup_cell(
 			// call read_atom_species
 			//========================
 #ifdef __LCAO
-			this->read_atom_species(orb, ifa, log);
+			const int error = this->read_atom_species(orb, ifa, log);
 #else
-			this->read_atom_species(ifa, log);
+			const int error = this->read_atom_species(ifa, log);
 #endif
 
 			//==========================
