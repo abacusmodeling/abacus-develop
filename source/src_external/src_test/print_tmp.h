@@ -29,7 +29,7 @@ void print_matrixess(const std::map<size_t,std::map<size_t,std::map<Abfs::Vector
 			for( const auto & c3 : c2.second )
 			{
 				ofs<<c1.first<<"\t"<<c2.first<<"\t"<<c3.first<<std::endl;
-				ofs<<*c3.second.lock()<<std::endl;
+				c3.second.lock()->print(ofs, 1E-10)<<std::endl;
 			}
 }
 
@@ -40,6 +40,6 @@ void print_matrixess(const std::map<size_t,std::map<size_t,std::map<Abfs::Vector
 			for( const auto & c3 : c2.second )
 			{
 				ofs<<c1.first<<"\t"<<c2.first<<"\t"<<c3.first<<std::endl;
-				ofs<<*c3.second<<std::endl;
+				c3.second->print(ofs, 1E-10)<<std::endl;
 			}
 }

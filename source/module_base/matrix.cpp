@@ -364,6 +364,7 @@ double mdot(const matrix &A, const matrix &B)
     return sum;
 }
 
+/*
 // Peize Lin add 2016-09-08
 std::ostream & operator<<( std::ostream & os, const matrix & m )
 {
@@ -371,13 +372,31 @@ std::ostream & operator<<( std::ostream & os, const matrix & m )
 	{
 		for( int ic=0; ic!=m.nc; ++ic )
 		{
-			if(abs(m(ir,ic))>1E-10)
+			if(std::abs(m(ir,ic))>1E-10)
 				os<<m(ir,ic)<<"\t";
 			else
 				os<<0<<"\t";
 		}
 		os<<std::endl;
 	}	
+	return os;
+}
+*/
+
+// Peize Lin add 2021.09.08
+std::ostream & matrix::print( std::ostream & os, const double threshold ) const
+{
+	for( int ir=0; ir!=this->nr; ++ir )
+	{
+		for( int ic=0; ic!=this->nc; ++ic )
+		{
+			if(std::abs((*this)(ir,ic))>threshold)
+				os<<(*this)(ir,ic)<<"\t";
+			else
+				os<<0<<"\t";
+		}
+		os<<std::endl;
+	}
 	return os;
 }
 

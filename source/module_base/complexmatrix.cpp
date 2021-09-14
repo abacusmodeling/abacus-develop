@@ -412,4 +412,25 @@ ComplexMatrix conj(const ComplexMatrix &m)
 		cm.c[i] = conj(m.c[i]);
 	return cm;
 }
+
+// Peize Lin add 2021.09.08
+std::ostream & ComplexMatrix::print( std::ostream & os, const double threshold_norm, const double threshold_imag ) const
+{
+	for( int ir=0; ir!=this->nr; ++ir )
+	{
+		for( int ic=0; ic!=this->nc; ++ic )
+			if(std::norm((*this)(ir,ic))>threshold_norm)
+			{
+				if(std::imag((*this)(ir,ic))>threshold_imag)
+					os<<(*this)(ir,ic)<<"\t";
+				else
+					os<<std::real((*this)(ir,ic))<<"\t";
+			}
+			else
+				os<<0<<"\t";
+		os<<std::endl;
+	}	
+	return os;
+}
+
 }

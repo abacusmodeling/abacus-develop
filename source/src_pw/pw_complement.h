@@ -40,7 +40,7 @@ void get_total_pw_after_vc(double* ig2sort0, double* ig2sort, ModuleBase::Vector
                   const ModuleBase::Matrix3& GGT0,
                   int& ngm); // number of total plane waves.
 
-#ifndef __MPI
+// #ifndef __MPI
 
 void get_ngmw(const int &ngmc, const double& ggwfc2, const double* gg_global, int &ngmw);
 
@@ -53,7 +53,7 @@ void get_ig2fftw(const int &ngmw, const int &nx, const int &ny, const int &nz,
 //==========================================================
 void get_ig2fftc(const int &ngmc, const int &ncx, const int &ncy, const int &ncz,
                  const ModuleBase::Vector3<double> *ig, int* ig1, int *ig2, int *ig3, int *ig2fftc);
-#endif
+// #endif
 }
 
 
