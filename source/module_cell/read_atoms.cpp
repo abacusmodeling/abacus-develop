@@ -9,12 +9,14 @@
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
 #ifdef __LCAO
-void UnitCell_pseudo::read_atom_species(LCAO_Orbitals &orb, std::ifstream &ifa, std::ofstream &ofs_running)
+int UnitCell_pseudo::read_atom_species(LCAO_Orbitals &orb, std::ifstream &ifa, std::ofstream &ofs_running)
 #else
-void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_running)
+int UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_running)
 #endif
 {
 	ModuleBase::TITLE("UnitCell_pseudo","read_atom_species");
+
+	int error = 0;//0 for correct, >0 for warning and quit
 
 	delete[] atom_label;
     delete[] atom_mass;
@@ -92,8 +94,14 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 			}
 		}	
 		// caoyu add 2021-03-16
-		if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "NUMERICAL_DESCRIPTOR")) {
-			ifa >> orb.descriptor_file;
+		if(GlobalV::out_descriptor)
+		{
+			if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "NUMERICAL_DESCRIPTOR")) {
+				ifa >> orb.descriptor_file;
+			}
+		}
+		else{
+			orb.descriptor_file = orb.orbital_file[0];
 		}
 	}
 
@@ -338,7 +346,7 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 	a3.x = latvec.e31;
 	a3.y = latvec.e32;
 	a3.z = latvec.e33;
-	return;
+	return 0;
 }
 
 // Read atomic positions

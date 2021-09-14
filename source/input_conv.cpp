@@ -42,6 +42,7 @@ void Input_Conv::Convert(void)
 	GlobalC::ucell.ntype = INPUT.ntype;
 	GlobalC::ucell.lmaxmax = INPUT.lmaxmax;
 	GlobalC::ucell.set_vel = INPUT.set_vel;
+	GlobalV::out_descriptor = INPUT.out_descriptor;
 
     GlobalV::NBANDS = INPUT.nbands;
 	GlobalC::wf.seed = INPUT.seed;

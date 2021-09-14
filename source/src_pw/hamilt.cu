@@ -10,6 +10,23 @@
 Hamilt::Hamilt() {}
 Hamilt::~Hamilt() {}
 
+__global__ void cast_d2f(float *dst, double *src, int size)
+{
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if(i < size)
+    {
+        dst[i] = __double2float_rn(src[i]);
+    }
+}
+
+__global__ void cast_f2d(double *dst, float *src, int size)
+{
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if(i < size)
+    {
+        dst[i] = (double)(src[i]);
+    }
+}
 
 void Hamilt::diagH_pw(
     const int &istep,
@@ -18,8 +35,8 @@ void Hamilt::diagH_pw(
     const double *precondition,
     double &avg_iter)
 {
-	TITLE("Hamilt","diagH_pw");
-    timer::tick("Hamilt", "diagH_pw");
+	ModuleBase::TITLE("Hamilt","diagH_pw");
+    ModuleBase::timer::tick("Hamilt", "diagH_pw");
     double avg = 0.0;
 
 	// set ik0 because of mem_saver.
@@ -61,7 +78,7 @@ void Hamilt::diagH_pw(
 		{
 			GlobalV::ofs_warning << " The diago_type " << GlobalV::KS_SOLVER
 				<< " not implemented yet." << std::endl; //xiaohui add 2013-09-02
-			WARNING_QUIT("Hamilt::diago","no implemt yet.");
+            ModuleBase::WARNING_QUIT("Hamilt::diago","no implemt yet.");
 		}
     }
     else
@@ -85,7 +102,7 @@ void Hamilt::diagH_pw(
 
                     avg_iter += 1.0;
                 }
-                Diago_CG_GPU cg_gpu;
+                Diago_CG_GPU<double, double2> cg_gpu;
 				bool reorder = true;
 
 				CUFFT_COMPLEX *d_wf_evc;
@@ -94,51 +111,70 @@ void Hamilt::diagH_pw(
                 int DIM_CG_GPU2 = GlobalC::wf.npwx * GlobalV::NPOL;
                 double *d_precondition;
 
+                // float2 *f_wf_evc;
+                // float *f_wf_ekb;
+                // int DIM_CG_GPU = GlobalC::kv.ngk[ik];
+                // int DIM_CG_GPU2 = GlobalC::wf.npwx * GlobalV::NPOL;
+                // float *d_precondition;
+
 				if(GlobalV::NPOL==1)
 				{
-                    cudaMalloc((void**)&d_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx * sizeof(CUFFT_COMPLEX));
-                    cudaMalloc((void**)&d_wf_ekb, GlobalV::NBANDS * sizeof(double));
-                    cudaMalloc((void**)&d_precondition, DIM_CG_GPU * sizeof(double));
+                    CHECK_CUDA(cudaMalloc((void**)&d_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx * sizeof(CUFFT_COMPLEX)));
+                    CHECK_CUDA(cudaMalloc((void**)&d_wf_ekb, GlobalV::NBANDS * sizeof(double)));
+                    CHECK_CUDA(cudaMalloc((void**)&d_precondition, DIM_CG_GPU * sizeof(double)));
 
-                    cudaMemcpy(d_wf_evc, GlobalC::wf.evc[ik0].c, GlobalV::NBANDS * GlobalC::wf.npwx * sizeof(CUFFT_COMPLEX), cudaMemcpyHostToDevice);
-                    // cudaMemcpy(d_wf_ekb, wf.ekb[ik], NBANDS * sizeof(double), cudaMemcpyHostToDevice);
-                    cudaMemcpy(d_precondition, precondition, DIM_CG_GPU * sizeof(double), cudaMemcpyHostToDevice);
+                    CHECK_CUDA(cudaMemcpy(d_wf_evc, GlobalC::wf.evc[ik0].c, GlobalV::NBANDS * GlobalC::wf.npwx * sizeof(CUFFT_COMPLEX), cudaMemcpyHostToDevice));
+                    // CHECK_CUDA(cudaMemcpy(d_wf_ekb, wf.ekb[ik], NBANDS * sizeof(double), cudaMemcpyHostToDevice));
+                    CHECK_CUDA(cudaMemcpy(d_precondition, precondition, DIM_CG_GPU * sizeof(double), cudaMemcpyHostToDevice));
+                    
+                    // CHECK_CUDA(cudaMalloc((void**)&f_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx * sizeof(float2)));
+                    // CHECK_CUDA(cudaMalloc((void**)&f_wf_ekb, GlobalV::NBANDS * sizeof(float)));
+                    // CHECK_CUDA(cudaMalloc((void**)&f_precondition, DIM_CG_GPU * sizeof(float)));
+                    // int thread = 512;
+                    // int block = GlobalV::NBANDS * GlobalC::wf.npwx / thread + 1;
+                    // int block2 = DIM_CG_GPU / thread + 1;
+                    // cast_d2f<<<block, thread>>>(f_wf_evc, d_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx)
+                    // cast_d2f<<<block, thread>>>(f_precondition, d_precondition, )
 
+                    cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
                     cg_gpu.diag(d_wf_evc, d_wf_ekb, DIM_CG_GPU, GlobalC::wf.npwx,
                         GlobalV::NBANDS, d_precondition, GlobalV::ETHR,
                         GlobalV::DIAGO_CG_MAXITER, reorder, notconv, avg);
+                    cufftDestroy(GlobalC::UFFT.fft_handle);
 
                     // to cpu
-                    cudaMemcpy(GlobalC::wf.evc[ik0].c, d_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx * sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
-                    cudaMemcpy(GlobalC::wf.ekb[ik], d_wf_ekb, GlobalV::NBANDS * sizeof(double), cudaMemcpyDeviceToHost);
+                    CHECK_CUDA(cudaMemcpy(GlobalC::wf.evc[ik0].c, d_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx * sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost));
+                    CHECK_CUDA(cudaMemcpy(GlobalC::wf.ekb[ik], d_wf_ekb, GlobalV::NBANDS * sizeof(double), cudaMemcpyDeviceToHost));
 
-                    cudaFree(d_wf_evc);
-                    cudaFree(d_wf_ekb);
-                    cudaFree(d_precondition);
+                    CHECK_CUDA(cudaFree(d_wf_evc));
+                    CHECK_CUDA(cudaFree(d_wf_ekb));
+                    CHECK_CUDA(cudaFree(d_precondition));
 				}
 				else
 				{
                     // to gpu
-                    cudaMalloc((void**)&d_wf_evc, GlobalV::NBANDS * DIM_CG_GPU2 * sizeof(CUFFT_COMPLEX));
-                    cudaMalloc((void**)&d_wf_ekb, GlobalV::NBANDS * sizeof(double));
-                    cudaMalloc((void**)&d_precondition, DIM_CG_GPU2 * sizeof(double));
+                    CHECK_CUDA(cudaMalloc((void**)&d_wf_evc, GlobalV::NBANDS * DIM_CG_GPU2 * sizeof(CUFFT_COMPLEX)));
+                    CHECK_CUDA(cudaMalloc((void**)&d_wf_ekb, GlobalV::NBANDS * sizeof(double)));
+                    CHECK_CUDA(cudaMalloc((void**)&d_precondition, DIM_CG_GPU2 * sizeof(double)));
 
-                    cudaMemcpy(d_wf_evc, GlobalC::wf.evc[ik0].c, GlobalV::NBANDS * DIM_CG_GPU2 * sizeof(CUFFT_COMPLEX), cudaMemcpyHostToDevice);
-                    // cudaMemcpy(d_wf_ekb, GlobalC::wf.ekb[ik], GlobalV::NBANDS * sizeof(double), cudaMemcpyHostToDevice);
-                    cudaMemcpy(d_precondition, precondition, DIM_CG_GPU2 * sizeof(double), cudaMemcpyHostToDevice);
+                    CHECK_CUDA(cudaMemcpy(d_wf_evc, GlobalC::wf.evc[ik0].c, GlobalV::NBANDS * DIM_CG_GPU2 * sizeof(CUFFT_COMPLEX), cudaMemcpyHostToDevice));
+                    // CHECK_CUDA(cudaMemcpy(d_wf_ekb, GlobalC::wf.ekb[ik], GlobalV::NBANDS * sizeof(double), cudaMemcpyHostToDevice));
+                    CHECK_CUDA(cudaMemcpy(d_precondition, precondition, DIM_CG_GPU2 * sizeof(double), cudaMemcpyHostToDevice));
                     // do things
+                    cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
 
                     cg_gpu.diag(d_wf_evc, d_wf_ekb, DIM_CG_GPU2, DIM_CG_GPU2,
                         GlobalV::NBANDS, d_precondition, GlobalV::ETHR,
                         GlobalV::DIAGO_CG_MAXITER, reorder, notconv, avg);
+                    cufftDestroy(GlobalC::UFFT.fft_handle);
 
                     // to cpu
-                    cudaMemcpy(GlobalC::wf.evc[ik0].c, d_wf_evc, GlobalV::NBANDS * DIM_CG_GPU2 * sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
-                    cudaMemcpy(GlobalC::wf.ekb[ik], d_wf_ekb, GlobalV::NBANDS * sizeof(double), cudaMemcpyDeviceToHost);
+                    CHECK_CUDA(cudaMemcpy(GlobalC::wf.evc[ik0].c, d_wf_evc, GlobalV::NBANDS * DIM_CG_GPU2 * sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost));
+                    CHECK_CUDA(cudaMemcpy(GlobalC::wf.ekb[ik], d_wf_ekb, GlobalV::NBANDS * sizeof(double), cudaMemcpyDeviceToHost));
 
-                    cudaFree(d_wf_evc);
-                    cudaFree(d_wf_ekb);
-                    cudaFree(d_precondition);
+                    CHECK_CUDA(cudaFree(d_wf_evc));
+                    CHECK_CUDA(cudaFree(d_wf_ekb));
+                    CHECK_CUDA(cudaFree(d_precondition));
 				}
 				// P.S. : nscf is the flag about reorder.
 				// if diagH_subspace is done once,
@@ -164,7 +200,7 @@ void Hamilt::diagH_pw(
         	}
         	else
         	{
-				WARNING_QUIT("calculate_bands","Check GlobalV::KS_SOLVER !");
+				ModuleBase::WARNING_QUIT("calculate_bands","Check GlobalV::KS_SOLVER !");
         	}
             avg_iter += avg;
             ++ntry;
@@ -178,7 +214,7 @@ void Hamilt::diagH_pw(
         }
     }
 
-	timer::tick("Hamilt","diagH_pw");
+	ModuleBase::timer::tick("Hamilt","diagH_pw");
     return;
 }
 
@@ -209,13 +245,13 @@ void Hamilt::diagH_subspace(
     const int ik,
     const int nstart,
     const int n_band,
-    const ComplexMatrix &psi,
-    ComplexMatrix &evc,
+    const ModuleBase::ComplexMatrix &psi,
+    ModuleBase::ComplexMatrix &evc,
     double *en)
 {
 	if(nstart < n_band)
 	{
-		WARNING_QUIT("diagH_subspace","nstart < n_band!");
+		ModuleBase::WARNING_QUIT("diagH_subspace","nstart < n_band!");
 	}
 
     if(GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")
@@ -224,7 +260,7 @@ void Hamilt::diagH_subspace(
     }
     else
     {
-		WARNING_QUIT("diagH_subspace","Check parameters: GlobalV::BASIS_TYPE. ");
+		ModuleBase::WARNING_QUIT("diagH_subspace","Check parameters: GlobalV::BASIS_TYPE. ");
     }
     return;
 }
@@ -240,14 +276,14 @@ void Hamilt::diagH_subspace(
 void Hamilt::diagH_LAPACK(
 	const int nstart,
 	const int nbands,
-	const ComplexMatrix &hc,
-	const ComplexMatrix &sc,
+	const ModuleBase::ComplexMatrix &hc,
+	const ModuleBase::ComplexMatrix &sc,
 	const int ldh, // nstart
 	double *e,
-	ComplexMatrix &hvec)
+	ModuleBase::ComplexMatrix &hvec)
 {
-    TITLE("Hamilt","diagH_LAPACK");
-	timer::tick("Hamilt","diagH_LAPACK");
+    ModuleBase::TITLE("Hamilt","diagH_LAPACK");
+	ModuleBase::timer::tick("Hamilt","diagH_LAPACK");
 
     int lwork=0;
     //========================================
@@ -255,8 +291,8 @@ void Hamilt::diagH_LAPACK(
     // ILAENV returns optimal block size "nb"
     //========================================
 
-    ComplexMatrix sdum(nstart, ldh);
-    ComplexMatrix hdum;
+    ModuleBase::ComplexMatrix sdum(nstart, ldh);
+    ModuleBase::ComplexMatrix hdum;
 
     sdum = sc;
 
@@ -281,7 +317,7 @@ void Hamilt::diagH_LAPACK(
     }
 
     std::complex<double> *work = new std::complex<double>[lwork];
-	ZEROS(work, lwork);
+	ModuleBase::GlobalFunc::ZEROS(work, lwork);
 
     //=====================================================================
     // input s and (see below) h are copied so that they are not destroyed
@@ -299,7 +335,7 @@ void Hamilt::diagH_LAPACK(
     }
 
     double *rwork = new double[rwork_dim];
-    ZEROS( rwork, rwork_dim );
+    ModuleBase::GlobalFunc::ZEROS( rwork, rwork_dim );
 
     if (all_eigenvalues)
     {
@@ -317,9 +353,9 @@ void Hamilt::diagH_LAPACK(
         int *iwork = new int [5*nstart];
         int *ifail = new int[nstart];
 
-        ZEROS(rwork,7*nstart);
-        ZEROS(iwork,5*nstart);
-        ZEROS(ifail,nstart);
+        ModuleBase::GlobalFunc::ZEROS(rwork,7*nstart);
+        ModuleBase::GlobalFunc::ZEROS(iwork,5*nstart);
+        ModuleBase::GlobalFunc::ZEROS(ifail,nstart);
 
         hdum.create(nstart, ldh);
         hdum = hc;
@@ -363,6 +399,6 @@ void Hamilt::diagH_LAPACK(
     delete[] rwork;
     delete[] work;
 
-	timer::tick("Hamilt","diagH_LAPACK");
+	ModuleBase::timer::tick("Hamilt","diagH_LAPACK");
     return;
 }
