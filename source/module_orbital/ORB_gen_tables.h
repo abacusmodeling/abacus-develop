@@ -82,14 +82,15 @@ class ORB_gen_tables
 	void snap_psibeta_half(
 		const LCAO_Orbitals &orb,
 		const InfoNonlocal &infoNL_,
-		std::vector<double> &nlm,
+		std::vector<std::vector<double>> &nlm,
 		const ModuleBase::Vector3<double> &R1,
 		const int &T1,
 		const int &L1,
 		const int &m1,
 		const int &N1,
 		const ModuleBase::Vector3<double> &R0, // The projector.
-		const int &T0)const; // mohan add 2021-04-25);
+		const int &T0,
+		const bool &calc_deri)const; // mohan add 2021-04-25);
 	/// set as public because in hamilt_linear, 
 	/// we need to destroy the tables: SR,TR,NR
 	/// after ionic optimization is done.

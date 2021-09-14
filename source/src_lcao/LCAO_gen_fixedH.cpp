@@ -720,7 +720,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta_new() //update by liuyu 2021-04-07
                 const ModuleBase::Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau(ad);
 				const Atom* atom1 = &GlobalC::ucell.atoms[T1];
 				const int nw1_tot = atom1->nw*GlobalV::NPOL;
-				
+
 				//middle loop : atomic basis on current processor (either row or column)
 				nlm_tot[ad].clear();
 
@@ -731,7 +731,10 @@ void LCAO_gen_fixedH::build_Nonlocal_beta_new() //update by liuyu 2021-04-07
 					const int iw2_local = GlobalC::ParaO.trace_loc_col[iw1_all];
 					if(iw1_local < 0 && iw2_local < 0)continue;
 					const int iw1_0 = iw1/GlobalV::NPOL;
-					std::vector<double> nlm;
+					std::vector<std::vector<double>> nlm;
+					//2D, but first dimension is only 1 here
+					//for force, the right hand side is the gradient
+					//and the first dimension is then 3
 					//inner loop : all projectors (L0,M0)
 					GlobalC::UOT.snap_psibeta_half(
 						GlobalC::ORB,
@@ -740,9 +743,9 @@ void LCAO_gen_fixedH::build_Nonlocal_beta_new() //update by liuyu 2021-04-07
 						atom1->iw2l[ iw1_0 ], // L1
 						atom1->iw2m[ iw1_0 ], // m1
 						atom1->iw2n[ iw1_0 ], // N1
-						GlobalC::ucell.atoms[T0].tau[I0], T0); //R0,T0
+						GlobalC::ucell.atoms[T0].tau[I0], T0, 0); //R0,T0
 
-					nlm_tot[ad].insert({iw1_all,nlm});
+					nlm_tot[ad].insert({iw1_all,nlm[0]});
 				}//end iw
 			}//end ad
 
@@ -872,7 +875,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 							if(iw1_local < 0)continue;
 							const int iw1_0 = iw1/GlobalV::NPOL;
 
-							std::vector<double> nlm1;
+							std::vector<std::vector<double>> nlm1;
 
 							//if(!calc_deri && GlobalV::NSPIN!=4)
 							if(false) //this method turns out to be slower!
@@ -884,7 +887,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 									atom1->iw2l[ iw1_0 ], // L1
 									atom1->iw2m[ iw1_0 ], // m1
 									atom1->iw2n[ iw1_0 ], // N1
-									GlobalC::ucell.atoms[T0].tau[I0], T0);
+									GlobalC::ucell.atoms[T0].tau[I0], T0, 0);
 							}
 
 							// mohan fix bug 2010-12-20
@@ -900,7 +903,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 								double nlm[3];
 								nlm[0] = nlm[1] = nlm[2] = 0.0;
 
-								std::vector<double> nlm2;
+								std::vector<std::vector<double>> nlm2;
 								if(!calc_deri)
 								{
 									//if(GlobalV::NSPIN!=4)

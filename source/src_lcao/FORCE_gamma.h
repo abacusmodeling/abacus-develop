@@ -85,6 +85,20 @@ class Force_LCAO_gamma
 		ModuleBase::matrix& fvnl_dbeta, 
 		ModuleBase::matrix& svnl_dbeta);
 
+	void cal_fvnl_dbeta_new(
+		ModuleBase::matrix& dm2d, 
+		const bool isforce, 
+		const bool isstress, 
+		ModuleBase::matrix& fvnl_dbeta, 
+		ModuleBase::matrix& svnl_dbeta);
+
+	void cal_fvnl_dbeta_new(
+		const std::vector<ModuleBase::matrix> &dm2d, 
+		const bool isforce, 
+		const bool isstress, 
+		ModuleBase::matrix& fvnl_dbeta, 
+		ModuleBase::matrix& svnl_dbeta);
+
 	//-------------------------------------------
 	// forces related to local pseudopotentials
 	//-------------------------------------------
