@@ -180,4 +180,6 @@ int PRENSPIN  = 1;
 double soc_lambda = 1.0;
 
 bool FINAL_SCF = false; //LiuXh add 20180619
+
+bool out_descriptor = false; //zhengdy add 20210910
 }

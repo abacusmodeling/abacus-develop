@@ -322,20 +322,20 @@ void Force_Stress_LCAO::getForceStress(
 			//regular force terms test.
 			//-----------------------------
 			//this->print_force("OVERLAP    FORCE",foverlap,1,ry);
-			f_pw.print("OVERLAP    FORCE", fcs,0);
+			f_pw.print("OVERLAP    FORCE", foverlap,0);
 			//  this->print_force("TVNL_DPHI  force",ftvnl_dphi,GlobalV::TEST_FORCE);
 			//  this->print_force("VNL_DBETA  force",fvnl_dbeta,GlobalV::TEST_FORCE);
 			//this->print_force("T_VNL      FORCE",ftvnl,1,ry);
-			f_pw.print("T_VNL      FORCE", fcs,0);
-			f_pw.print("VL_dPHI    FORCE", fcs,0);
+			f_pw.print("T_VNL      FORCE", ftvnl,0);
+			f_pw.print("VL_dPHI    FORCE", fvl_dphi,0);
 			//this->print_force("VL_dPHI    FORCE",fvl_dphi,1,ry);
 			//this->print_force("VL_dVL     FORCE",fvl_dvl,1,ry);
-			f_pw.print("VL_dVL     FORCE", fcs,0);
-			f_pw.print("EWALD      FORCE", fcs,0);
+			f_pw.print("VL_dVL     FORCE", fvl_dvl,0);
+			f_pw.print("EWALD      FORCE", fewalds,0);
 			// 	this->print_force("VLOCAL     FORCE",fvlocal,GlobalV::TEST_FORCE);
 			//this->print_force("EWALD      FORCE",fewalds,1,ry);
-			f_pw.print("NLCC       FORCE", fcs,0);
-			f_pw.print("SCC        FORCE", fcs,0);
+			f_pw.print("NLCC       FORCE", fcc,0);
+			f_pw.print("SCC        FORCE", fscc,0);
 			//this->print_force("NLCC       FORCE",fcc,1,ry);
 			//this->print_force("SCC        FORCE",fscc,1,ry);
 			//-------------------------------
@@ -343,12 +343,12 @@ void Force_Stress_LCAO::getForceStress(
 			//-------------------------------
 			if(GlobalV::EFIELD)
 			{
-				f_pw.print("EFIELD     FORCE", fcs,0);
+				f_pw.print("EFIELD     FORCE", fefield,0);
 				//this->print_force("EFIELD     FORCE",fefield,1,ry);
 			}
 			if(GlobalC::vdwd2_para.flag_vdwd2||GlobalC::vdwd3_para.flag_vdwd3)
 			{
-				f_pw.print("VDW        FORCE", fcs,0);
+				f_pw.print("VDW        FORCE", force_vdw,0);
 				//this->print_force("VDW        FORCE",force_vdw,1,ry);
 			}
 #ifdef __DEEPKS
