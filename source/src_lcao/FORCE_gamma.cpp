@@ -34,7 +34,14 @@ void Force_LCAO_gamma::ftable_gamma (
     if(INPUT.new_dm>0)
     {
         this->cal_ftvnl_dphi(GlobalC::LOC.wfc_dm_2d.dm_gamma, isforce, isstress, ftvnl_dphi, stvnl_dphi);
-        this->cal_fvnl_dbeta_new(GlobalC::LOC.wfc_dm_2d.dm_gamma, isforce, isstress, fvnl_dbeta, svnl_dbeta);
+        if(GlobalV::NSPIN==4)
+        {
+            this->cal_fvnl_dbeta(GlobalC::LOC.wfc_dm_2d.dm_gamma, isforce, isstress, fvnl_dbeta, svnl_dbeta);
+        }
+        else
+        {
+            this->cal_fvnl_dbeta_new(GlobalC::LOC.wfc_dm_2d.dm_gamma, isforce, isstress, fvnl_dbeta, svnl_dbeta);
+        }
         this->cal_fvl_dphi(GlobalC::LOC.wfc_dm_2d.dm_gamma, isforce, isstress, fvl_dphi, svl_dphi);
 
         //quxin added for DFT+U
@@ -55,7 +62,14 @@ void Force_LCAO_gamma::ftable_gamma (
         ModuleBase::timer::tick("Force_LCAO_gamma","cal_dm_grid");
 
         this->cal_ftvnl_dphi(dm2d, isforce, isstress, ftvnl_dphi, stvnl_dphi);
-        this->cal_fvnl_dbeta_new(GlobalC::LOC.wfc_dm_2d.dm_gamma, isforce, isstress, fvnl_dbeta, svnl_dbeta);
+        if(GlobalV::NSPIN==4)
+        {
+            this->cal_fvnl_dbeta(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
+        }
+        else
+        {
+            this->cal_fvnl_dbeta_new(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
+        }
 
         //quxin added for DFT+U
         if(INPUT.dft_plus_u) GlobalC::dftu.force_stress();
