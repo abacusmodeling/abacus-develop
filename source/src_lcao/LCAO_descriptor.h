@@ -45,8 +45,7 @@ class LCAO_Descriptor {
     //------------------------------------------------------------------------------
     void cal_projected_DM(const ModuleBase::matrix &dm);
     void cal_descriptor(void);
-    void
-    cal_dm_as_descriptor(const ModuleBase::matrix &dm); // mohan add 2021-08-04
+    void cal_dm_as_descriptor(const ModuleBase::matrix &dm); // mohan add 2021-08-04
     void cal_v_delta(const ModuleBase::matrix &dm);
     void add_v_delta(void);
     void cal_f_delta(const ModuleBase::matrix &dm);
@@ -62,8 +61,6 @@ class LCAO_Descriptor {
 
     void cal_v_delta(const std::string &model_file); //<psi|V_delta|psi>
     void cal_f_delta(ModuleBase::matrix &dm);        // pytorch term remaining!
-    void print_H_V_delta();
-    void print_F_delta();
 
     //----------------------------------------------------------------------
     /*These 3 functions save the [dm_eig], [e_base], [f_base]
@@ -157,7 +154,7 @@ and get l_e_delta and l_f_delta corresponding to the exact e,f data.*/
     void cal_gdmx(ModuleBase::matrix &dm); // dD/dX
     void del_gdmx();
 
-    void getdm_double(const matrix &dm);
+    void getdm_double(const ModuleBase::matrix &dm);
 
     void cal_descriptor_tensor(void);
 };
