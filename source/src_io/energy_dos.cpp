@@ -579,10 +579,10 @@ void energy::perform_dos(void)
 					 }
 
 					 out << "<"<<"/"<<"data"<<">" <<std::endl;
-
+					 out << "<"<<"/"<<"orbital"<<">" <<std::endl;
 				 }//j
 			 }//i
-			 out << "<"<<"/"<<"orbital"<<">" <<std::endl;
+
 			 out << "<"<<"/"<<"pdos"<<">" <<std::endl;
 			 out.close();}
 		 {  std::stringstream os;

@@ -711,7 +711,7 @@ void Numerical_Basis::output_overlap_V(
 	if (GlobalV::MY_RANK==0)
     {
         ofs << "\n<OVERLAP_V>" <<std::endl;;
-		ofs << overlap_V;
+		overlap_V.print(ofs);
 		ofs << "</OVERLAP_V>" <<std::endl;
 	}
 }

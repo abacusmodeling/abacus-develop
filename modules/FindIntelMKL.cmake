@@ -6,17 +6,13 @@
 #  MKL_FOUND        - True if mkl found.
 #
 
-find_path(MKL_INCLUDE_DIR mkl_dfti.h HINTS ${MKL_DIR_CACHE}/include)
+find_path(MKL_INCLUDE_DIR mkl_dfti.h HINTS ${MKLROOT}/include)
 
-find_library(MKL_INTEL NAMES mkl_intel_lp64 HINTS ${MKL_DIR_CACHE}/lib ${MKL_DIR_CACHE}/lib/intel64)
-
-find_library(MKL_INTEL_THREAD NAMES mkl_intel_thread HINTS ${MKL_DIR_CACHE}/lib ${MKL_DIR_CACHE}/lib/intel64)
-
-find_library(MKL_CORE NAMES mkl_core HINTS ${MKL_DIR_CACHE}/lib ${MKL_DIR_CACHE}/lib/intel64)
-
-find_library(MKL_SCALAPACK NAMES mkl_scalapack_lp64 HINTS ${MKL_DIR_CACHE}/lib ${MKL_DIR_CACHE}/lib/intel64)
-
-find_library(MKL_BLACS_INTELMPI NAMES mkl_blacs_intelmpi_lp64 HINTS ${MKL_DIR_CACHE}/lib ${MKL_DIR_CACHE}/lib/intel64)
+find_library(MKL_INTEL NAMES mkl_intel_lp64 HINTS ${MKLROOT}/lib ${MKLROOT}/lib/intel64)
+find_library(MKL_INTEL_THREAD NAMES mkl_intel_thread HINTS ${MKLROOT}/lib ${MKLROOT}/lib/intel64)
+find_library(MKL_CORE NAMES mkl_core HINTS ${MKLROOT}/lib ${MKLROOT}/lib/intel64)
+find_library(MKL_SCALAPACK NAMES mkl_scalapack_lp64 HINTS ${MKLROOT}/lib ${MKLROOT}/lib/intel64)
+find_library(MKL_BLACS_INTELMPI NAMES mkl_blacs_intelmpi_lp64 HINTS ${MKLROOT}/lib ${MKLROOT}/lib/intel64)
 
 include(FindPackageHandleStandardArgs)
 # handle the QUIETLY and REQUIRED arguments and set MKL_FOUND to TRUE
