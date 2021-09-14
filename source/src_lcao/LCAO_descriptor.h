@@ -2,10 +2,10 @@
 #ifndef LCAO_DESCRIPTOR_H
 #define LCAO_DESCRIPTOR_H
 
-#include "../module_base/intarray.h"
 #include "../module_base/complexmatrix.h"
-#include <torch/script.h>
+#include "../module_base/intarray.h"
 #include "../src_pw/global.h"
+#include <torch/script.h>
 
 //------------------------------------------------------------------------------
 // This class computes the descriptors for each atom from LCAO basis set,
@@ -15,179 +15,153 @@
 //
 // caoyu add 2021-03-29
 //
-class LCAO_Descriptor
-{
+class LCAO_Descriptor {
 
-//-------------------
-// public functions
-//-------------------
-public:
-
+    //-------------------
+    // public functions
+    //-------------------
+  public:
     explicit LCAO_Descriptor();
     ~LCAO_Descriptor();
 
-	// index of descriptor in all atoms
-	void init(const int lm, const int nm, const int tot_inl);
+    // index of descriptor in all atoms
+    void init(const int lm, const int nm, const int tot_inl);
 
-	// cal S_alpha_mu: overlap between lcao basis Phi and descriptor basis Al
+    // cal S_alpha_mu: overlap between lcao basis Phi and descriptor basis Al
     void build_S_descriptor(const bool &calc_deri);
 
+    // 1. Load DeePKS model
+    // 2. Initialize the deltaV Hamiltonian matrix
+    void deepks_pre_scf(const string &model_file);
 
-	// 1. Load DeePKS model
-	// 2. Initialize the deltaV Hamiltonian matrix
-	void deepks_pre_scf(const string& model_file);
-
-
-	//------------------------------------------------------------------------------
-	// cal_projected_DM: pdm = S_alpha_mu * inv(Sloc) * DM * inv(Sloc) * S_nu_beta
-	// cal_descriptor: EIGENVALUE of pdm in block of I_n_l
-	// cal_dm_as_descriptor: compute the descriptor for each atom
-	// cal_v_delta: compute <psi|deltaV|psi>
-	// add_v_delta: add <psi|deltaV|psi> to the Hamiltonian matrix
-	// cal_f_delta: compute the force related to deltaV, input dm is density matrix
-	//------------------------------------------------------------------------------
-    void cal_projected_DM(const matrix &dm);
+    //------------------------------------------------------------------------------
+    // cal_projected_DM: pdm = S_alpha_mu * inv(Sloc) * DM * inv(Sloc) *
+    // S_nu_beta cal_descriptor: EIGENVALUE of pdm in block of I_n_l
+    // cal_dm_as_descriptor: compute the descriptor for each atom
+    // cal_v_delta: compute <psi|deltaV|psi>
+    // add_v_delta: add <psi|deltaV|psi> to the Hamiltonian matrix
+    // cal_f_delta: compute the force related to deltaV, input dm is density
+    // matrix
+    //------------------------------------------------------------------------------
+    void cal_projected_DM(const ModuleBase::matrix &dm);
     void cal_descriptor(void);
-	void cal_dm_as_descriptor(const matrix &dm); // mohan add 2021-08-04
-	void cal_v_delta(const matrix& dm);
-	void add_v_delta(void);
-	void cal_f_delta(const matrix& dm);
+    void
+    cal_dm_as_descriptor(const ModuleBase::matrix &dm); // mohan add 2021-08-04
+    void cal_v_delta(const ModuleBase::matrix &dm);
+    void add_v_delta(void);
+    void cal_f_delta(const ModuleBase::matrix &dm);
 
+    //----------------------------------------------------------------------
+    // print_descriptors: print descriptors based on LCAO basis
+    // print_H_V_delta: print the deltaV matrix in LCAO basis
+    // print_F_delta: print the force related to deltaV for each atom
+    //----------------------------------------------------------------------
+    void print_descriptor(void);
+    void print_H_V_delta(void);
+    void print_F_delta(void);
 
-	//----------------------------------------------------------------------
-	// print_descriptors: print descriptors based on LCAO basis
-	// print_H_V_delta: print the deltaV matrix in LCAO basis
-	// print_F_delta: print the force related to deltaV for each atom
-	//----------------------------------------------------------------------
-	void print_descriptor(void);
-	void print_H_V_delta(void);
-	void print_F_delta(void);
+    void cal_v_delta(const std::string &model_file); //<psi|V_delta|psi>
+    void cal_f_delta(ModuleBase::matrix &dm);        // pytorch term remaining!
+    void print_H_V_delta();
+    void print_F_delta();
 
-	//----------------------------------------------------------------------
-	// print_descriptors: print descriptors based on LCAO basis
-	// print_H_V_delta: print the deltaV matrix in LCAO basis
-	// print_F_delta: print the force related to deltaV for each atom
-	//----------------------------------------------------------------------
-	void print_descriptor(void);
-	void print_H_V_delta(void);
-	void print_F_delta(void);
+    //----------------------------------------------------------------------
+    /*These 3 functions save the [dm_eig], [e_base], [f_base]
+    of current configuration as .npy file, when deepks_scf = 1.
+    After a full group of consfigurations are calculated,
+we need a python script to 'load' and 'torch.cat' these .npy files,
+and get l_e_delta and l_f_delta corresponding to the exact e,f data.*/
+    void save_npy_d();
+    void save_npy_e(double &ebase);             // Ry
+    void save_npy_f(ModuleBase::matrix &fbase); // Ry
 
-	void cal_v_delta(const std::string& model_file);//<psi|V_delta|psi>
-	void cal_f_delta(ModuleBase::matrix& dm);	//pytorch term remaining!
-	void print_H_V_delta();
-	void print_F_delta();
+    // F_delta: in Ry/Bohr, force due to the correction term
+    //------------------------------------------------------
+    double E_delta = 0.0;
+    double *H_V_delta;
+    // deepks F_delta(Ry/Bohr), to be added to atom force
+    ModuleBase::matrix F_delta;
 
-	//----------------------------------------------------------------------
-	/*These 3 functions save the [dm_eig], [e_base], [f_base]
-	of current configuration as .npy file, when deepks_scf = 1.
-	After a full group of consfigurations are calculated,
-    we need a python script to 'load' and 'torch.cat' these .npy files,
-    and get l_e_delta and l_f_delta corresponding to the exact e,f data.*/
-	void save_npy_d();
-	void save_npy_e(double& ebase);	//Ry
-	void save_npy_f(ModuleBase::matrix& fbase);//Ry
+    //-------------------
+    // private variables
+    //-------------------
+  private:
+    int lmaxd = 0;
+    int nmaxd = 0;
+    int inlmax = 0;
 
-	//F_delta: in Ry/Bohr, force due to the correction term
-	//------------------------------------------------------
-	double E_delta = 0.0;
-	double* H_V_delta;
-	//deepks F_delta(Ry/Bohr), to be added to atom force
-	ModuleBase::matrix	F_delta;
+    // deep neural network module that provides corrected Hamiltonian term and
+    // related derivatives.
+    torch::jit::script::Module module;
 
-//-------------------
-// private variables
-//-------------------
-private:
+    // density matrix: dm_gamma
+    double *dm_double;
+    // overlap between lcao and descriptor basis
+    double **S_mu_alpha; //[tot_Inl][GlobalV::NLOCAL][2l+1]	caoyu modified
+                         //2021-05-07
 
-	int lmaxd = 0;
-	int nmaxd = 0;
-	int inlmax = 0;
+    // d(S) for f_delta:	<\psi_mu|d\alpha^I_nlm> ,
+    // [tot_Inl][GlobalV::NLOCAL][2l+1]
+    double **DS_mu_alpha_x;
+    double **DS_mu_alpha_y;
+    double **DS_mu_alpha_z;
 
-	// deep neural network module that provides corrected Hamiltonian term and
-	// related derivatives.
-	torch::jit::script::Module module;
+    // projected density matrix
+    double **pdm; //[tot_Inl][2l+1][2l+1]	caoyu modified 2021-05-07
+    std::vector<torch::Tensor> pdm_tensor;
 
-	//density matrix: dm_gamma
-	double* dm_double;
-	// overlap between lcao and descriptor basis
-	double** S_mu_alpha;	//[tot_Inl][GlobalV::NLOCAL][2l+1]	caoyu modified 2021-05-07
-
-	//d(S) for f_delta:	<\psi_mu|d\alpha^I_nlm> , [tot_Inl][GlobalV::NLOCAL][2l+1]
-	double** DS_mu_alpha_x;
-	double** DS_mu_alpha_y;
-	double** DS_mu_alpha_z;
-
-	// projected density matrix
-	double** pdm;	//[tot_Inl][2l+1][2l+1]	caoyu modified 2021-05-07
-	std::vector<torch::Tensor> pdm_tensor;
-
-	// descriptors
+    // descriptors
     double *d;
-	std::vector<torch::Tensor> d_tensor;
+    std::vector<torch::Tensor> d_tensor;
 
-	//gedm:dE/dD, [tot_Inl][2l+1][2l+1]	(E: Hartree)
-	std::vector<torch::Tensor> gedm_tensor;
+    // gedm:dE/dD, [tot_Inl][2l+1][2l+1]	(E: Hartree)
+    std::vector<torch::Tensor> gedm_tensor;
 
-	//gdmx: dD/dX		\sum_{mu,nu} 4*c_mu*c_nu * <dpsi_mu/dx|alpha_m><alpha_m'|psi_nu>
-	double*** gdmx;	//[natom][tot_Inl][2l+1][2l+1]
-	double*** gdmy;
-	double*** gdmz;
+    // gdmx: dD/dX		\sum_{mu,nu} 4*c_mu*c_nu *
+    // <dpsi_mu/dx|alpha_m><alpha_m'|psi_nu>
+    double ***gdmx; //[natom][tot_Inl][2l+1][2l+1]
+    double ***gdmy;
+    double ***gdmz;
 
-	//dE/dD, autograd from loaded model(E: Ry)
-	double** gedm;	//[tot_Inl][2l+1][2l+1]
+    // dE/dD, autograd from loaded model(E: Ry)
+    double **gedm; //[tot_Inl][2l+1][2l+1]
 
-	int n_descriptor;
+    int n_descriptor;
 
-	// \sum_L{Nchi(L)*(2L+1)}
-	int des_per_atom;
+    // \sum_L{Nchi(L)*(2L+1)}
+    int des_per_atom;
 
+    ModuleBase::IntArray *alpha_index;
+    ModuleBase::IntArray *inl_index; // caoyu add 2021-05-07
+    int *inl_l; // inl_l[inl_index] = l of descriptor with inl_index
 
-	ModuleBase::IntArray* alpha_index;
-	ModuleBase::IntArray* inl_index;	//caoyu add 2021-05-07
-	int* inl_l;	//inl_l[inl_index] = l of descriptor with inl_index
+    //-------------------
+    // private functions
+    //-------------------
+  private:
+    void init_index(void); // index of descriptor in all atoms
 
-//-------------------
-// private functions
-//-------------------
-private:
+    void set_S_mu_alpha(const int &iw1_all, const int &inl, const int &im,
+                        const double &v);
 
-	void init_index(void);	// index of descriptor in all atoms
+    void print_projected_DM(std::ofstream &ofs, ModuleBase::ComplexMatrix &des,
+                            const int &it, const int &ia, const int &l,
+                            const int &n);
 
-	void set_S_mu_alpha(
-		const int &iw1_all,
-		const int& inl,
-		const int& im,
-		const double& v);
+    void set_DS_mu_alpha(const int &iw1_all, const int &inl, const int &im,
+                         const double &vx, const double &vy, const double &vz);
 
-    void print_projected_DM(
-		std::ofstream &ofs,
-		ModuleBase::ComplexMatrix &des,
-		const int &it,
-		const int &ia,
-		const int &l,
-		const int& n);
+    void init_gdmx();
+    void load_model(const std::string &model_file);
+    void cal_gedm();                       // need to load model in this step
+    void cal_gdmx(ModuleBase::matrix &dm); // dD/dX
+    void del_gdmx();
 
-	void set_DS_mu_alpha(
-	const int& iw1_all,
-	const int& inl,
-	const int& im,
-	const double& vx,
-	const double& vy,
-	const double& vz);
+    void getdm_double(const matrix &dm);
 
-	void init_gdmx();
-	void load_model(const std::string& model_file);
-	void cal_gedm();	//need to load model in this step
-	void cal_gdmx(ModuleBase::matrix& dm);	//dD/dX
-	void del_gdmx();
-
-	void getdm_double(const matrix& dm);
-
-	void cal_descriptor_tensor(void);
-
+    void cal_descriptor_tensor(void);
 };
-namespace GlobalC
-{
+namespace GlobalC {
 extern LCAO_Descriptor ld;
 }
 
