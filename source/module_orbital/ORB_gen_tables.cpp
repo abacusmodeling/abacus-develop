@@ -18,7 +18,10 @@ void ORB_gen_tables::gen_tables(
 	const int &job0,
 	LCAO_Orbitals &orb,
 	const int &Lmax_exx,
-	const int &out_descriptor)
+	const int &out_descriptor,
+	const int &nprojmax, 
+	const int* nproj,
+	const Numerical_Nonlocal* beta_)
 {
 	ModuleBase::TITLE("ORB_gen_tables", "gen_tables");
 	ModuleBase::timer::tick("ORB_gen_tables", "gen_tables");
@@ -62,8 +65,8 @@ void ORB_gen_tables::gen_tables(
 	MOT.init_OV_Opair(orb);
 
 	// NL: nonlocal
-	tbeta.init_NL_Tpair(orb);
-	tbeta.init_NL_Opair(orb); // add 2009-5-8
+	tbeta.init_NL_Tpair(orb.Phi, beta_);
+	tbeta.init_NL_Opair(orb, nprojmax, nproj); // add 2009-5-8
 
 	//caoyu add 2021-03-18
 	// DS: Descriptor
@@ -92,11 +95,11 @@ void ORB_gen_tables::gen_tables(
 	int Lmax = 0;
 
 
-	MOT.init_Table_Spherical_Bessel(orb_num, mode, Lmax_used, Lmax, Lmax_exx, orb);
+	MOT.init_Table_Spherical_Bessel(orb_num, mode, Lmax_used, Lmax, Lmax_exx, orb, beta_);
 
 	//calculate S(R) for interpolation
 	MOT.init_Table(job0, orb);
-	tbeta.init_Table_Beta(MOT.pSB, orb); // add 2009-5-8
+	tbeta.init_Table_Beta(MOT.pSB, orb.Phi, beta_, nproj); // add 2009-5-8
 
 	//caoyu add 2021-03-18
 	if (out_descriptor>0)
@@ -121,23 +124,34 @@ void ORB_gen_tables::gen_tables(
 
 void ORB_gen_tables::snap_psibeta_half(
 	const LCAO_Orbitals &orb,
-	std::vector<double> &nlm,
+	const InfoNonlocal &infoNL_,
+	std::vector<std::vector<double>> &nlm,
 	const ModuleBase::Vector3<double> &R1,
 	const int &T1,
 	const int &L1,
 	const int &m1,
 	const int &N1,
 	const ModuleBase::Vector3<double> &R0, // The projector.
-	const int &T0)const // mohan add 2021-04-25)
+	const int &T0,
+	const bool &calc_deri)const // mohan add 2021-04-25)
 {
 	ModuleBase::timer::tick("ORB_gen_tables", "snap_psibeta_half");
 
 	//find number of projectors on atom R0
-	const int nproj = orb.nproj[T0];
+	const int nproj = infoNL_.nproj[T0];
 	assert(nproj>0); // mohan add 2021-04-25
 
 	bool *calproj = new bool[nproj];
 	int *rmesh1 = new int[nproj];
+
+	if(calc_deri)
+	{
+		nlm.resize(4);
+	}
+	else
+	{
+		nlm.resize(1);
+	}
 
 	//Count number of projectors (l,m)
 	int natomwfc = 0;
@@ -147,15 +161,18 @@ void ORB_gen_tables::snap_psibeta_half(
 		// Use pseudo-atomic orbitals
 		//============================
 		
-		const int L0 = orb.Beta[T0].Proj[ip].getL(); // mohan add 2021-05-07
+		const int L0 = infoNL_.Beta[T0].Proj[ip].getL(); // mohan add 2021-05-07
 		natomwfc += 2* L0 +1;
 	}
-	nlm.resize(natomwfc);
-	for (auto &x : nlm)
-	{
-    	x=0.0;
-	}
 
+	for(int dim=0;dim<nlm.size();dim++)
+	{
+		nlm[dim].resize(natomwfc);
+		for (auto &x : nlm[dim])
+		{
+    		x=0.0;
+		}
+	}
 
 	//rcut of orbtials and projectors
 	//in our calculation, we always put orbital phi at the left side of <phi|beta>
@@ -167,7 +184,7 @@ void ORB_gen_tables::snap_psibeta_half(
 	bool all_out = true;
 	for (int ip = 0; ip < nproj; ip++)
 	{
-		const double Rcut0 = orb.Beta[T0].Proj[ip].getRcut();
+		const double Rcut0 = infoNL_.Beta[T0].Proj[ip].getRcut();
 		if (distance10 > (Rcut1 + Rcut0))
 		{
 			calproj[ip] = false;
@@ -229,9 +246,16 @@ void ORB_gen_tables::snap_psibeta_half(
 
 	// Peize Lin change rlya, rlyb, grlyb 2016-08-26
 	std::vector<double> rlya;
-	std::vector<double> rlyb;
+	std::vector<std::vector<double>> grlya;
 
-	ModuleBase::Ylm::rl_sph_harm(T1_2Lplus1 - 1, dRa.x, dRa.y, dRa.z, rlya);
+	if(!calc_deri)
+	{
+		ModuleBase::Ylm::rl_sph_harm(T1_2Lplus1 - 1, dRa.x, dRa.y, dRa.z, rlya);
+	}
+	else
+	{
+		ModuleBase::Ylm::grad_rl_sph_harm(T1_2Lplus1 - 1, dRa.x, dRa.y, dRa.z, rlya, grlya);
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	/// Formula :               T1            T0
@@ -240,11 +264,10 @@ void ORB_gen_tables::snap_psibeta_half(
 	///\f]
 	//////////////////////////////////////////////////////////////////////////
 
-
 	int index = 0; //(l,m index of projector)
 	for (int nb = 0; nb < nproj; nb++)
 	{
-		const int L0 = orb.Beta[T0].Proj[nb].getL(); // mohan add 2021-05-07
+		const int L0 = infoNL_.Beta[T0].Proj[nb].getL(); // mohan add 2021-05-07
 		if (!calproj[nb])
 		{
 			index += 2*L0 + 1;
@@ -263,10 +286,8 @@ void ORB_gen_tables::snap_psibeta_half(
 
 			//loop of {lmn}
 			double term_a = 0.0;
+			double term_a_gr[3] = {0,0,0};
 
-			//=============
-			// FIRST PART
-			//=============
 			for (int L = 0; L < T1_2Lplus1; L++)
 			{
 				//triangle rule for gaunt coefficients
@@ -282,6 +303,9 @@ void ORB_gen_tables::snap_psibeta_half(
 				double i_exp = pow(-1.0, (L1 - L0 - L) / 2);
 				double rl1 = pow(distance10, L);
 				double Interp_Vnla = 0.0;
+				double Interp_Vnla_gr = 0.0;
+
+//this part is for both deri and not deri
 				if (distance10 > tiny2)
 				{
 					curr = tbeta.Table_NR[0][Tpair1][Opair1][L];
@@ -303,6 +327,32 @@ void ORB_gen_tables::snap_psibeta_half(
 					Interp_Vnla = i_exp * tbeta.Table_NR[0][Tpair1][Opair1][L][0];
 				}
 
+//this part is for deri only
+				if(calc_deri)
+				{
+					if (distance10 > tiny2)
+					{
+						curr = tbeta.Table_NR[1][Tpair1][Opair1][L];
+
+						if (iqa >= rmesh1[nb] - 4)
+						{
+							Interp_Vnla_gr = 0.0;
+						}
+						else
+						{
+							Interp_Vnla_gr = i_exp * (x123a * curr[iqa] 
+							+ x120a * curr[iqa + 3] 
+							+ x032a * curr[iqa + 1] 
+							- x031a * curr[iqa + 2]);
+						}
+						Interp_Vnla_gr = Interp_Vnla_gr / pow(distance10, L) - Interp_Vnla * L / distance10;
+					}
+					else
+					{
+						Interp_Vnla_gr = 0.0;
+					}
+				}
+
 				/////////////////////////////////////
 				///  Overlap value = S_from_table * G * Ylm
 				////////////////////////////////////
@@ -310,8 +360,29 @@ void ORB_gen_tables::snap_psibeta_half(
 				{
 					int gindexa = L * L + m;
 					//double tmpGaunt = this->MGT.Get_Gaunt_SH(L1, m1, L0, m0, L, m);
-					double tmpGaunt = this->MGT.Gaunt_Coefficients(gindex1, gindex0, gindexa);
-					term_a += tmpGaunt * Interp_Vnla * rlya[MGT.get_lm_index(L, m)];
+					double tmpGaunt, tmpGaunt1;
+					if(calc_deri)
+					{
+						tmpGaunt = this->MGT.Gaunt_Coefficients(gindex1, gindex0, gindexa);
+						tmpGaunt1= this->MGT.Gaunt_Coefficients(gindex0, gindex1, gindexa);
+					}
+					else
+					{
+						tmpGaunt = this->MGT.Gaunt_Coefficients(gindex0, gindex1, gindexa);
+					}
+					const int lm = MGT.get_lm_index(L, m);
+					
+					term_a += tmpGaunt * Interp_Vnla * rlya[lm];
+					if(calc_deri)
+					{
+						double tt1 = tmpGaunt1 * Interp_Vnla_gr * rlya[lm] / distance10;
+						double tt2 = tmpGaunt1 * Interp_Vnla;
+
+						for (int ir = 0; ir < 3; ir++)
+						{
+							term_a_gr[ir] += tt1 * unit_vec_dRa[ir] + tt2 * grlya[lm][ir];
+						}
+					}
 				}
 			} //end L
 
@@ -319,7 +390,18 @@ void ORB_gen_tables::snap_psibeta_half(
 			// THIRD PART: SAVE THE VALUE FOR ALL PROJECTS.
 			//===============================================
 
-			nlm[index] = term_a;
+			if(!calc_deri)
+			{
+				nlm[0][index] = term_a;
+			}
+			else
+			{
+				nlm[0][index] = term_a;
+				for(int dim=1;dim<4;dim++)
+				{
+					nlm[dim][index] = term_a_gr[dim-1];
+				}
+			}
 
 			index += 1;
 		} // end m0
@@ -333,6 +415,7 @@ void ORB_gen_tables::snap_psibeta_half(
 
 void ORB_gen_tables::snap_psibeta(
 	const LCAO_Orbitals &orb,
+	const InfoNonlocal& infoNL_,
 	double nlm[],
 	const int &job,
 	const ModuleBase::Vector3<double> &R1,
@@ -351,8 +434,8 @@ void ORB_gen_tables::snap_psibeta(
 	const int &nspin,
 	const ModuleBase::ComplexArray &d_so, // mohan add 2021-05-07
 	const int &count_soc, // mohan add 2021-05-07
-	int* index1_soc, // mohan add 2021-05-07
-	int* index2_soc, // mohan add 2021-05-07
+	const int* index1_soc, // mohan add 2021-05-07
+	const int* index2_soc, // mohan add 2021-05-07
 	const int &nproj_in, // mohan add 2021-05-07
 	std::complex<double> *nlm1,
 	const int is) const
@@ -373,7 +456,7 @@ void ORB_gen_tables::snap_psibeta(
 		has_so = 1;
 	}
 
-	const int nproj = orb.nproj[T0];
+	const int nproj = infoNL_.nproj[T0];
 	assert(nproj>0); // mohan add 2021-04-25
 	
 	bool *calproj = new bool[nproj];
@@ -399,7 +482,7 @@ void ORB_gen_tables::snap_psibeta(
 	bool all_out = true;
 	for (int ip = 0; ip < nproj; ip++)
 	{
-		const double Rcut0 = orb.Beta[T0].Proj[ip].getRcut();
+		const double Rcut0 = infoNL_.Beta[T0].Proj[ip].getRcut();
 		if (distance10 > (Rcut1 + Rcut0) || distance20 > (Rcut2 + Rcut0))
 		{
 			calproj[ip] = false;
@@ -530,7 +613,7 @@ void ORB_gen_tables::snap_psibeta(
 		}
 
 		//const int L0 = orb.Beta[T0].getL_Beta(nb); // mohan delete the variable 2021-05-07
-		const int L0 = orb.Beta[T0].Proj[nb].getL(); // mohan add 2021-05-07
+		const int L0 = infoNL_.Beta[T0].Proj[nb].getL(); // mohan add 2021-05-07
 		//const int next_ip = 2* L0 +1;
 
 		//////////////////////////////////////////////////////

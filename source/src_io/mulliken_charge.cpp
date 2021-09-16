@@ -174,7 +174,7 @@ void Mulliken_Charge::cal_mulliken(void)
 				GlobalV::ofs_running,
 				GlobalV::OUT_LEVEL,
 				GlobalC::ORB.get_rcutmax_Phi(), 
-				GlobalC::ORB.get_rcutmax_Beta(), 
+				GlobalC::ucell.infoNL.get_rcutmax_Beta(), 
 				GlobalV::GAMMA_ONLY_LOCAL);
 
 			atom_arrange::search(
@@ -186,22 +186,37 @@ void Mulliken_Charge::cal_mulliken(void)
 				GlobalV::test_atom_input);//qifeng-2019-01-21
 
 			// 2021-04-16
-			GlobalC::LOWF.orb_con.set_orb_tables(
+				GlobalC::LOWF.orb_con.read_orb_first(
 					GlobalV::ofs_running,
-					GlobalC::UOT, 
 					GlobalC::ORB,
 					GlobalC::ucell.ntype,
 					GlobalC::ucell.lmax,
 					INPUT.lcao_ecut,
 					INPUT.lcao_dk,
 					INPUT.lcao_dr,
-					INPUT.lcao_rmax, 
-					GlobalC::ucell.lat0, 
+					INPUT.lcao_rmax,
 					INPUT.out_descriptor,
 					INPUT.out_r_matrix,
-					Exx_Abfs::Lmax,
 					GlobalV::FORCE,
 					GlobalV::MY_RANK);
+					
+				GlobalC::ucell.infoNL.setupNonlocal(
+					GlobalC::ucell.ntype,
+					GlobalC::ucell.atoms,
+					GlobalV::ofs_running,
+					GlobalC::ORB
+				);
+
+				GlobalC::LOWF.orb_con.set_orb_tables(
+					GlobalV::ofs_running,
+					GlobalC::UOT,
+					GlobalC::ORB,
+					GlobalC::ucell.lat0,
+					INPUT.out_descriptor,
+					Exx_Abfs::Lmax,
+					GlobalC::ucell.infoNL.nprojmax,
+					GlobalC::ucell.infoNL.nproj,
+					GlobalC::ucell.infoNL.Beta);
 
 
 
@@ -268,7 +283,7 @@ void Mulliken_Charge::cal_mulliken(void)
 				GlobalV::SEARCH_RADIUS, 
 				GlobalV::test_atom_input);
 #endif
-			GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, INPUT.out_descriptor);
+			GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, INPUT.out_descriptor, GlobalC::ucell.infoNL.nproj);
 
 		}//else                     
 		MPI_Reduce(MecMulP[is], DecMulP[is] , GlobalV::NLOCAL , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);

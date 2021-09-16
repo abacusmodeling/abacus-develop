@@ -28,7 +28,7 @@ public:
     void cal_err
     (
         const int &npw,
-        ComplexMatrix &psi,
+        ModuleBase::ComplexMatrix &psi,
         const int &nband,
         double *em,
         double *err
@@ -38,7 +38,7 @@ public:
 
 	friend class Diago_David;
 	// friend class Diago_CG;
-    friend class Diago_CG_GPU;
+    template<class T, class T2> friend class Diago_CG_GPU;
 	friend class Exx_Lip;
 	friend class Hamilt;
     friend class Stochastic_Iter;
@@ -46,8 +46,8 @@ public:
 	void diagH_subspace(const int ik,
                   const int nstart,
                   const int nbnd,
-                  const ComplexMatrix &psi,
-                  ComplexMatrix &evc,
+                  const ModuleBase::ComplexMatrix &psi,
+                  ModuleBase::ComplexMatrix &evc,
                   double *en);
 
     void h_1psi_gpu(
@@ -88,6 +88,7 @@ public:
 
 #ifdef __CUDA
     int *GR_index_d;
+    cublasHandle_t hpw_handle;
 #endif
 
 	// add contributions of h*psi from
@@ -119,7 +120,7 @@ public:
                           const std::complex<double> * psi_R )const ;
 
     std::complex<double> ddot( const int & npw,
-                          const ComplexMatrix &psi,
+                          const ModuleBase::ComplexMatrix &psi,
                           const int & m,
                           const std::complex<double> *psik )const ;
 
@@ -128,7 +129,7 @@ public:
     void diag_zheev
     (
         const int& npw,
-        ComplexMatrix& psi,
+        ModuleBase::ComplexMatrix& psi,
         const int& nband,
         double *em,
         double *err

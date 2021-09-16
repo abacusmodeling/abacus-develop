@@ -132,7 +132,7 @@ private:
     void divide_fft_grid(void);
     void get_MPI_GVectors(void);
     void columns_and_pw_distribution_2(void);
-#else
+// #else
     void get_GVectors(void);
 #endif
 

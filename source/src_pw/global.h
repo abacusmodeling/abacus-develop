@@ -26,6 +26,19 @@
 #include "../src_lcao/exx_lip.h"
 #include "../src_parallel/ft.h"
 
+#ifdef __CUDA
+#define CHECK_CUDA(func)\
+{\
+    cudaError_t status = (func);\
+    if(status != cudaSuccess)\
+    {\
+        printf("CUDA API failed at line %d with error: %s (%d)\n",\
+            __LINE__, cudaGetErrorString(status), status);\
+    }\
+}
+#endif
+
+
 //==========================================================
 // EXPLAIN : define "GLOBAL CLASS"
 //==========================================================
