@@ -74,4 +74,5 @@
 401_NP_KP_spd
 601_NO_TDDFT_N2_vel
 601_NO_TDDFT_N2_occ
+603_NO_deepks_d_H2O_scf_lda2pbe
 701_LJ_Ar
