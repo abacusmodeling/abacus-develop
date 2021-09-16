@@ -30,12 +30,12 @@ public:
 	const int& ny(void)const{return plan_ny;}
 	const int& nz(void)const{return plan_nz;}
 	const int& nxyz(void)const{return nxx;}
-#ifdef __MPI
+// #ifdef __MPI
 	void setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nxx,const bool in_pool);
-#else
+// #else
 	void setupFFT3D(const int nx, const int ny, const int nz);
 	void setupFFT3D_2(void);
-#endif
+// #endif
 private:
 	double scale_xyz;
 	int plan_nx,plan_ny,plan_nz;
@@ -43,7 +43,7 @@ private:
 	bool FFTWsetupwasdone;
 	int test;
 	std::complex<double> *aux4plan;
-#ifdef __MPI
+// #ifdef __MPI
 	void P3DFFT(std::complex<double> *psi, const int sign);
 	void fftxy(std::complex<double> *psi, const int sign);
 	void fftz(std::complex<double> *psi_in, const int sign, std::complex<double> *psi_out);
@@ -66,7 +66,7 @@ private:
 	int *sdis;
 	int *rdis;
 	int *sum;
-#else
+// #else
 	void SFFT3D(std::complex<double> *data, const int sign);
 
 #if defined __FFTW2
@@ -76,7 +76,7 @@ private:
 	fftw_plan plus_plan;
 	fftw_plan minus_plan;
 #endif
-#endif
+// #endif
 };
 
 #endif

@@ -68,8 +68,11 @@ void FFT::FFT3D(std::complex<double> *psi,const int sign)
 	ModuleBase::timer::tick("FFT","FFT3D");
 
 #ifdef __MPI
+#ifdef __CUDA
+	SFFT3D(psi,sign);
+#else
 	P3DFFT(psi,sign);
-
+#endif
 #else
 	SFFT3D(psi,sign);
 #endif
@@ -102,7 +105,7 @@ void FFT::FFT3D(matrix &psi, const int sign)
 
 
 
-#ifndef __MPI
+// #ifndef __MPI
 
 void FFT::setupFFT3D(const int nx, const int ny, const int nz)
 {
@@ -212,7 +215,7 @@ void FFT::SFFT3D(std::complex<double> *psi, const int sign)
 }
 
 
-#elif defined __MPI
+// #elif defined __MPI
 
 void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nxx_in,const bool in_pool2)
 {
@@ -729,4 +732,4 @@ void FFT::scatter(std::complex<double> *psi, int sign)
 	//ModuleBase::timer::tick("FFT","scatter");
 	return;
 }
-#endif // __MPI
+// #endif // __MPI

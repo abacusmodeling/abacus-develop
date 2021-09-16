@@ -86,7 +86,7 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri, con
 			tau1 = atom1->tau[I1];
             //GlobalC::GridD.Find_atom(tau1);
             GlobalC::GridD.Find_atom(ucell, tau1, T1, I1);
-			std::cout << "number of neighbors, I : " << I1 << " " << GlobalC::GridD.getAdjacentNum()+1 << std::endl;
+
             for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ++ad)
             {
                 const int T2 = GlobalC::GridD.getType(ad);
@@ -706,23 +706,32 @@ void LCAO_gen_fixedH::build_Nonlocal_beta_new() //update by liuyu 2021-04-07
 			std::vector<std::unordered_map<int,std::vector<double>>> nlm_tot;
 
             //GlobalC::GridD.Find_atom( atom0->tau[I0] );
+			const ModuleBase::Vector3<double> tau0 = atom0->tau[I0];
             GlobalC::GridD.Find_atom(GlobalC::ucell, atom0->tau[I0] ,T0, I0);
 
 			//outermost loop : all adjacent atoms
 			nlm_tot.resize(GlobalC::GridD.getAdjacentNum()+1);
+			const double Rcut_Beta = GlobalC::ucell.infoNL.Beta[T0].get_rcut_max();
 
             for (int ad=0; ad<GlobalC::GridD.getAdjacentNum()+1 ; ++ad)
             {
                 const int T1 = GlobalC::GridD.getType(ad);
                 const int I1 = GlobalC::GridD.getNatom(ad);
                 const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
+				const double Rcut_AO1 = GlobalC::ORB.Phi[T1].getRcut();
 
                 const ModuleBase::Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau(ad);
 				const Atom* atom1 = &GlobalC::ucell.atoms[T1];
 				const int nw1_tot = atom1->nw*GlobalV::NPOL;
-				
+
 				//middle loop : atomic basis on current processor (either row or column)
 				nlm_tot[ad].clear();
+
+				const double dist1 = (tau1-tau0).norm() * GlobalC::ucell.lat0;
+				if (dist1 > Rcut_Beta + Rcut_AO1)
+				{
+					continue;
+				}
 
 				for (int iw1=0; iw1<nw1_tot; ++iw1)
 				{
@@ -731,7 +740,10 @@ void LCAO_gen_fixedH::build_Nonlocal_beta_new() //update by liuyu 2021-04-07
 					const int iw2_local = GlobalC::ParaO.trace_loc_col[iw1_all];
 					if(iw1_local < 0 && iw2_local < 0)continue;
 					const int iw1_0 = iw1/GlobalV::NPOL;
-					std::vector<double> nlm;
+					std::vector<std::vector<double>> nlm;
+					//2D, but first dimension is only 1 here
+					//for force, the right hand side is the gradient
+					//and the first dimension is then 3
 					//inner loop : all projectors (L0,M0)
 					GlobalC::UOT.snap_psibeta_half(
 						GlobalC::ORB,
@@ -740,9 +752,9 @@ void LCAO_gen_fixedH::build_Nonlocal_beta_new() //update by liuyu 2021-04-07
 						atom1->iw2l[ iw1_0 ], // L1
 						atom1->iw2m[ iw1_0 ], // m1
 						atom1->iw2n[ iw1_0 ], // N1
-						GlobalC::ucell.atoms[T0].tau[I0], T0); //R0,T0
+						GlobalC::ucell.atoms[T0].tau[I0], T0, 0); //R0,T0
 
-					nlm_tot[ad].insert({iw1_all,nlm});
+					nlm_tot[ad].insert({iw1_all,nlm[0]});
 				}//end iw
 			}//end ad
 
@@ -760,6 +772,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta_new() //update by liuyu 2021-04-07
                 const ModuleBase::Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau(ad1);
 				const Atom* atom1 = &GlobalC::ucell.atoms[T1];
 				const int nw1_tot = atom1->nw*GlobalV::NPOL;
+				const double Rcut_AO1 = GlobalC::ORB.Phi[T1].getRcut();
 
 				for (int ad2=0; ad2 < GlobalC::GridD.getAdjacentNum()+1 ; ad2++)
 				{
@@ -769,6 +782,17 @@ void LCAO_gen_fixedH::build_Nonlocal_beta_new() //update by liuyu 2021-04-07
 					const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad2);
 					const Atom* atom2 = &GlobalC::ucell.atoms[T2];
 					const int nw2_tot = atom2->nw*GlobalV::NPOL;
+					
+					const double Rcut_AO2 = GlobalC::ORB.Phi[T2].getRcut();
+                	const double dist1 = (tau1-tau0).norm() * GlobalC::ucell.lat0;
+                	const double dist2 = (tau2-tau0).norm() * GlobalC::ucell.lat0;
+
+					if (dist1 > Rcut_Beta + Rcut_AO1
+							|| dist2 > Rcut_Beta + Rcut_AO2)
+					{
+						continue;
+					}					
+
 					for (int iw1=0; iw1<nw1_tot; ++iw1)
 					{
 						const int iw1_all = start1 + iw1;
@@ -872,7 +896,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 							if(iw1_local < 0)continue;
 							const int iw1_0 = iw1/GlobalV::NPOL;
 
-							std::vector<double> nlm1;
+							std::vector<std::vector<double>> nlm1;
 
 							//if(!calc_deri && GlobalV::NSPIN!=4)
 							if(false) //this method turns out to be slower!
@@ -884,7 +908,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 									atom1->iw2l[ iw1_0 ], // L1
 									atom1->iw2m[ iw1_0 ], // m1
 									atom1->iw2n[ iw1_0 ], // N1
-									GlobalC::ucell.atoms[T0].tau[I0], T0);
+									GlobalC::ucell.atoms[T0].tau[I0], T0, 0);
 							}
 
 							// mohan fix bug 2010-12-20
@@ -900,7 +924,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 								double nlm[3];
 								nlm[0] = nlm[1] = nlm[2] = 0.0;
 
-								std::vector<double> nlm2;
+								std::vector<std::vector<double>> nlm2;
 								if(!calc_deri)
 								{
 									//if(GlobalV::NSPIN!=4)
