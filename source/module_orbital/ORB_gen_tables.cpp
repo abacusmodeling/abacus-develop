@@ -125,14 +125,15 @@ void ORB_gen_tables::gen_tables(
 void ORB_gen_tables::snap_psibeta_half(
 	const LCAO_Orbitals &orb,
 	const InfoNonlocal &infoNL_,
-	std::vector<double> &nlm,
+	std::vector<std::vector<double>> &nlm,
 	const ModuleBase::Vector3<double> &R1,
 	const int &T1,
 	const int &L1,
 	const int &m1,
 	const int &N1,
 	const ModuleBase::Vector3<double> &R0, // The projector.
-	const int &T0)const // mohan add 2021-04-25)
+	const int &T0,
+	const bool &calc_deri)const // mohan add 2021-04-25)
 {
 	ModuleBase::timer::tick("ORB_gen_tables", "snap_psibeta_half");
 
@@ -142,6 +143,15 @@ void ORB_gen_tables::snap_psibeta_half(
 
 	bool *calproj = new bool[nproj];
 	int *rmesh1 = new int[nproj];
+
+	if(calc_deri)
+	{
+		nlm.resize(4);
+	}
+	else
+	{
+		nlm.resize(1);
+	}
 
 	//Count number of projectors (l,m)
 	int natomwfc = 0;
@@ -154,12 +164,15 @@ void ORB_gen_tables::snap_psibeta_half(
 		const int L0 = infoNL_.Beta[T0].Proj[ip].getL(); // mohan add 2021-05-07
 		natomwfc += 2* L0 +1;
 	}
-	nlm.resize(natomwfc);
-	for (auto &x : nlm)
-	{
-    	x=0.0;
-	}
 
+	for(int dim=0;dim<nlm.size();dim++)
+	{
+		nlm[dim].resize(natomwfc);
+		for (auto &x : nlm[dim])
+		{
+    		x=0.0;
+		}
+	}
 
 	//rcut of orbtials and projectors
 	//in our calculation, we always put orbital phi at the left side of <phi|beta>
@@ -233,9 +246,16 @@ void ORB_gen_tables::snap_psibeta_half(
 
 	// Peize Lin change rlya, rlyb, grlyb 2016-08-26
 	std::vector<double> rlya;
-	std::vector<double> rlyb;
+	std::vector<std::vector<double>> grlya;
 
-	ModuleBase::Ylm::rl_sph_harm(T1_2Lplus1 - 1, dRa.x, dRa.y, dRa.z, rlya);
+	if(!calc_deri)
+	{
+		ModuleBase::Ylm::rl_sph_harm(T1_2Lplus1 - 1, dRa.x, dRa.y, dRa.z, rlya);
+	}
+	else
+	{
+		ModuleBase::Ylm::grad_rl_sph_harm(T1_2Lplus1 - 1, dRa.x, dRa.y, dRa.z, rlya, grlya);
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	/// Formula :               T1            T0
@@ -243,7 +263,6 @@ void ORB_gen_tables::snap_psibeta_half(
 	/// 			<\psi1_{L1,N1}|\Beta_{L0,m0}>
 	///\f]
 	//////////////////////////////////////////////////////////////////////////
-
 
 	int index = 0; //(l,m index of projector)
 	for (int nb = 0; nb < nproj; nb++)
@@ -267,10 +286,8 @@ void ORB_gen_tables::snap_psibeta_half(
 
 			//loop of {lmn}
 			double term_a = 0.0;
+			double term_a_gr[3] = {0,0,0};
 
-			//=============
-			// FIRST PART
-			//=============
 			for (int L = 0; L < T1_2Lplus1; L++)
 			{
 				//triangle rule for gaunt coefficients
@@ -286,6 +303,9 @@ void ORB_gen_tables::snap_psibeta_half(
 				double i_exp = pow(-1.0, (L1 - L0 - L) / 2);
 				double rl1 = pow(distance10, L);
 				double Interp_Vnla = 0.0;
+				double Interp_Vnla_gr = 0.0;
+
+//this part is for both deri and not deri
 				if (distance10 > tiny2)
 				{
 					curr = tbeta.Table_NR[0][Tpair1][Opair1][L];
@@ -307,6 +327,32 @@ void ORB_gen_tables::snap_psibeta_half(
 					Interp_Vnla = i_exp * tbeta.Table_NR[0][Tpair1][Opair1][L][0];
 				}
 
+//this part is for deri only
+				if(calc_deri)
+				{
+					if (distance10 > tiny2)
+					{
+						curr = tbeta.Table_NR[1][Tpair1][Opair1][L];
+
+						if (iqa >= rmesh1[nb] - 4)
+						{
+							Interp_Vnla_gr = 0.0;
+						}
+						else
+						{
+							Interp_Vnla_gr = i_exp * (x123a * curr[iqa] 
+							+ x120a * curr[iqa + 3] 
+							+ x032a * curr[iqa + 1] 
+							- x031a * curr[iqa + 2]);
+						}
+						Interp_Vnla_gr = Interp_Vnla_gr / pow(distance10, L) - Interp_Vnla * L / distance10;
+					}
+					else
+					{
+						Interp_Vnla_gr = 0.0;
+					}
+				}
+
 				/////////////////////////////////////
 				///  Overlap value = S_from_table * G * Ylm
 				////////////////////////////////////
@@ -314,8 +360,29 @@ void ORB_gen_tables::snap_psibeta_half(
 				{
 					int gindexa = L * L + m;
 					//double tmpGaunt = this->MGT.Get_Gaunt_SH(L1, m1, L0, m0, L, m);
-					double tmpGaunt = this->MGT.Gaunt_Coefficients(gindex1, gindex0, gindexa);
-					term_a += tmpGaunt * Interp_Vnla * rlya[MGT.get_lm_index(L, m)];
+					double tmpGaunt, tmpGaunt1;
+					if(calc_deri)
+					{
+						tmpGaunt = this->MGT.Gaunt_Coefficients(gindex1, gindex0, gindexa);
+						tmpGaunt1= this->MGT.Gaunt_Coefficients(gindex0, gindex1, gindexa);
+					}
+					else
+					{
+						tmpGaunt = this->MGT.Gaunt_Coefficients(gindex0, gindex1, gindexa);
+					}
+					const int lm = MGT.get_lm_index(L, m);
+					
+					term_a += tmpGaunt * Interp_Vnla * rlya[lm];
+					if(calc_deri)
+					{
+						double tt1 = tmpGaunt1 * Interp_Vnla_gr * rlya[lm] / distance10;
+						double tt2 = tmpGaunt1 * Interp_Vnla;
+
+						for (int ir = 0; ir < 3; ir++)
+						{
+							term_a_gr[ir] += tt1 * unit_vec_dRa[ir] + tt2 * grlya[lm][ir];
+						}
+					}
 				}
 			} //end L
 
@@ -323,7 +390,18 @@ void ORB_gen_tables::snap_psibeta_half(
 			// THIRD PART: SAVE THE VALUE FOR ALL PROJECTS.
 			//===============================================
 
-			nlm[index] = term_a;
+			if(!calc_deri)
+			{
+				nlm[0][index] = term_a;
+			}
+			else
+			{
+				nlm[0][index] = term_a;
+				for(int dim=1;dim<4;dim++)
+				{
+					nlm[dim][index] = term_a_gr[dim-1];
+				}
+			}
 
 			index += 1;
 		} // end m0
