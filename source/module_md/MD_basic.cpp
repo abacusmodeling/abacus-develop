@@ -614,9 +614,11 @@ void MD_basic::outStressMD(const ModuleBase::matrix& stress, const double& twice
     {
         press += stress(i,i)/3;
     }
+    double press_no = press;
     press += 2*twiceKE/3/ucell.omega; //output virtual press = 2/3 *Ek/V + sum(sigma[i][i])/3
     const double unit_transform = ModuleBase::RYDBERG_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8 ;
     GlobalV::ofs_running<<"Virtual Pressure is "<<press*unit_transform<<" Kbar "<<std::endl;
+    GlobalV::ofs_running<<"Virial is "<<press_no*unit_transform<<" Kbar "<<std::endl;
 }
 
 //turn cartesian coordinate changes to direct changes

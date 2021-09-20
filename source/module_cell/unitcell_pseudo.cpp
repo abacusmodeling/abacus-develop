@@ -318,6 +318,9 @@ void UnitCell_pseudo::setup_cell(
 }
 
 void UnitCell_pseudo::setup_cell_classic(
+#ifdef __LCAO
+	LCAO_Orbitals &orb,
+#endif
 	const std::string &fn,
 	std::ofstream &ofs_running,
 	std::ofstream &ofs_warning)
