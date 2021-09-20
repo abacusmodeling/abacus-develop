@@ -196,7 +196,7 @@ void Pdiag_Basic::mat_2d(MPI_Comm vu,
     // (2.1) row_b : how many blocks for this processor. (at least)
     LM.row_b=block/dim[0];
 
-    // (2.2) row_b : how many blocks in thie processor.
+    // (2.2) row_b : how many blocks in this processor.
     // if there are blocks remain, some processors add 1.
     if (coord[0]<block%dim[0])
     {

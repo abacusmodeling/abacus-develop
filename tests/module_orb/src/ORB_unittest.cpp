@@ -2,12 +2,9 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-#include "../module_base/global_function.h"	
 
 test_orb::test_orb()
-{
-	ofs_running.open("log.txt");
-}
+{}
 
 test_orb::~test_orb()
 {}
@@ -48,11 +45,11 @@ void test_orb::set_ekcut()
 	return;
 }
 
-void test_orb::read_files()
+void test_orb::set_orbs(const double &lat0_in)
 {
 	for(int it=0;it<ntype;it++)
 	{
-		std::cout << "read from orbital_file : " << ORB.orbital_file[it] << std::endl;
+		std::cout << "read and set from orbital_file : " << ORB.orbital_file[it] << std::endl;
 		ooo.set_orb_tables(ofs_running,
 			OGT,
 			ORB,
@@ -62,7 +59,7 @@ void test_orb::read_files()
 			lcao_dk,
 			lcao_dr,
 			lcao_rmax,
-			lat0,
+			lat0_in,
 			out_descriptor,
 			out_r_matrix,
 			lmax,

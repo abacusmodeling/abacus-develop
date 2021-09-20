@@ -63,6 +63,7 @@ extern bool     DOMAG;    //1 : calculate the magnetism with x, y, z component
 extern bool     DOMAG_Z;  //1 : constrain the magnetism to z axis
 extern int      NPOL;     //1 : no soc; 2 : has soc
 extern int      PRENSPIN; //NSPIN used before, for restart with soc
+extern double   soc_lambda; //soc modulator factor, from 0 to 1
 
 
 extern int		DIAGO_PROC;			// 12.1 number of processors used to diag.
@@ -195,6 +196,8 @@ extern int test_ion_dynamics;
 extern int test_deconstructor;
 
 extern bool FINAL_SCF; //LiuXh add 20180619
+
+extern bool out_descriptor; //zhengdy add 20210910
 
 }
 #endif

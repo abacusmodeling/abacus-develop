@@ -42,6 +42,7 @@ void Input_Conv::Convert(void)
 	GlobalC::ucell.ntype = INPUT.ntype;
 	GlobalC::ucell.lmaxmax = INPUT.lmaxmax;
 	GlobalC::ucell.set_vel = INPUT.set_vel;
+	GlobalV::out_descriptor = INPUT.out_descriptor;
 
     GlobalV::NBANDS = INPUT.nbands;
 	GlobalC::wf.seed = INPUT.seed;
@@ -319,11 +320,11 @@ void Input_Conv::Convert(void)
 			GlobalC::dftu.J = INPUT.hund_j;               //Hund exchange parameter J(ev)
 		}
 	}
+	/*
 #ifndef __CMD
-	GlobalC::ucell.input_mag=INPUT.input_mag;
 	GlobalC::ucell.n_mag_at=INPUT.n_mag_at;
 	GlobalC::ucell.atom_mag=INPUT.atom_mag;
-#endif
+#endif*/
 //--------------------------------------------
 // added by zhengdy-soc
 //--------------------------------------------
@@ -347,6 +348,7 @@ void Input_Conv::Convert(void)
 			GlobalV::DOMAG_Z = true;
 		}
 		GlobalV::LSPINORB = INPUT.lspinorb;
+		GlobalV::soc_lambda = INPUT.soc_lambda;
 
 		delete[] GlobalC::ucell.magnet.m_loc_;
 		delete[] GlobalC::ucell.magnet.angle1_;
