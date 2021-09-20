@@ -44,9 +44,6 @@ public: // member functions
 		const std::string &fn, 
 		std::ofstream &log);
 	void setup_cell_classic(
-#ifdef __LCAO
-		LCAO_Orbitals &orb,
-#endif
 		const std::string &fn, 
 		std::ofstream &ofs_running,
 		std::ofstream &ofs_warning); // liuyu 2021-07-13, RX changed ofs_running and ofs_warning from globalV to inputs. 2021-07-24
