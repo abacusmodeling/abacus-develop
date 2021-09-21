@@ -267,7 +267,11 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
     setAlltoallvParameter(GlobalC::ParaO.comm_2D, GlobalC::ParaO.blacs_ctxt, GlobalC::ParaO.nb);
 
 	// Peize Lin test 2019-01-16
-    wfc_dm_2d.init();
+    if (GlobalV::KS_SOLVER=="genelpa") //LiuXh add 2021-09-06, clear memory, _2d only used in genelpa solver
+    {
+        wfc_dm_2d.init();
+    }
+
 	if(GlobalC::wf.start_wfc=="file")
 	{
 		this->gamma_file(gt);

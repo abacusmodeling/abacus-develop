@@ -56,9 +56,11 @@ PW_Basis::~PW_Basis()
 	delete [] cutgg_num_table;
 
 #ifdef __MPI
+#ifndef __CUDA
     delete [] gcar;
     delete [] gdirect;
     delete [] gg;
+#endif
 #endif
 
     delete [] ggs;
@@ -168,6 +170,9 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
 	}
 
 #ifdef __MPI
+#ifdef __CUDA
+    bool cutgg_flag = false;
+#else
     this->divide_fft_grid();
     bool cutgg_flag = true;
 
@@ -181,6 +186,7 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
 	//{
 	//	GlobalV::ofs_running << " Turn on the cutgg function." << std::endl;
 	//}
+#endif
 #else
 	// mohan update 2011-09-21
 	this->nbzp=nbz; //nbz shoud equal nz for single proc.
@@ -336,6 +342,11 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
         PW_complement::setup_GVectors(Ucell->G, ngmc_g, gg_global, gdirect_global, gcar_global);
 
 #ifdef __MPI
+#ifdef __CUDA
+        this->get_GVectors();
+        FFT_wfc.setupFFT3D(this->nx, this->ny,this->nz);
+        FFT_chg.setupFFT3D(this->ncx, this->ncy,this->ncz);
+#else
         //FFT_chg.fft_map(this->ig2fftc, this->ngmc, ngmc_g);
         //FFT_wfc.fft_map(this->ig2fftw, this->ngmw, ngmc_g);
         FFT_chg.fft_map(this->ig2fftc, this->ngmc, ngmc_g, 0); //LiuXh add 20180619
@@ -345,6 +356,7 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
 
         FFT_wfc.setup_MPI_FFT3D(this->nx, this->ny, this->nz,this->nrxx,1);
         FFT_chg.setup_MPI_FFT3D(this->ncx, this->ncy, this->ncz,this->nrxx,1);
+#endif
 #else
         this->get_GVectors();
         FFT_wfc.setupFFT3D(this->nx, this->ny,this->nz);
@@ -604,7 +616,7 @@ void PW_Basis::get_MPI_GVectors(void)
     }
     //=====================================
 }//end setup_mpi_GVectors
-#else
+// #else
 void PW_Basis::get_GVectors(void)
 {
     if (GlobalV::test_pw) ModuleBase::TITLE("PW_Basis","get_GVectors");

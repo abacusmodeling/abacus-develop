@@ -481,6 +481,12 @@ void WF_atomic::random(ModuleBase::ComplexMatrix &psi,const int iw_start,const i
     assert(psi.nr >= iw_end);
     const int ng = GlobalC::kv.ngk[ik];
 #ifdef __MPI
+#ifdef __CUDA
+    if(seed > 0)//qianrui add 2021-8-13
+    {
+        srand(unsigned(seed + GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL] + ik));
+    }
+#else
     if(seed > 0)//qianrui add 2021-8-13
     {
         srand(unsigned(seed + GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL] + ik));
@@ -535,6 +541,7 @@ void WF_atomic::random(ModuleBase::ComplexMatrix &psi,const int iw_start,const i
     }
     else
     {
+#endif
 #else
         if(seed > 0)//qianrui add 2021-8-13
         {
@@ -559,7 +566,9 @@ void WF_atomic::random(ModuleBase::ComplexMatrix &psi,const int iw_start,const i
             }
         }
 #ifdef __MPI
+#ifndef __CUDA
     }
+#endif
 #endif
 
     return;

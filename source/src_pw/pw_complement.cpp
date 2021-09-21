@@ -314,7 +314,7 @@ void PW_complement::setup_GVectors(
 }
 
 
-#ifndef __MPI
+// #ifndef __MPI
 void PW_complement::get_ngmw(const int &ngmc, const double& ggwfc2, const double* gg_global, int &ngmw)
 {
     int ng = 0;
@@ -389,7 +389,7 @@ void PW_complement::get_ig2fftc(const int &ngmc, const int &ncx, const int &ncy,
     }
     return;
 }
-#endif
+// #endif
 
 //LiuXh add a new function here,
 //20180515
