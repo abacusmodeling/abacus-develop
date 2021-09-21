@@ -182,6 +182,7 @@ void Input_Conv::Convert(void)
 	GlobalV::NB2D = INPUT.nb2d;
 	GlobalV::NURSE = INPUT.nurse;
 	GlobalV::COLOUR = INPUT.colour;
+	GlobalC::pw.nbspline = INPUT.nbspline;
 	GlobalV::T_IN_H = INPUT.t_in_h;
 	GlobalV::VL_IN_H = INPUT.vl_in_h;
 	GlobalV::VNL_IN_H = INPUT.vnl_in_h;
