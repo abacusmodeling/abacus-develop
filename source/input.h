@@ -160,6 +160,7 @@ class Input
 	int nb2d;				// matrix 2d division.
 
 	int nurse;				// used for debug.
+	int nbspline;           // the order of B-spline basis(>=0) if it is -1 (default), B-spline for Sturcture Factor isnot used.
 
 	bool colour;			// used for fun.
 
