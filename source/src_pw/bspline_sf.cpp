@@ -117,7 +117,7 @@ void PW_Basis:: bsplinecoef(complex<double> *b1, complex<double> *b2, complex<do
         complex<double> fracx=0;
         for(int io = 0 ; io < norder - 1 ; ++io)
         {
-            fracx += bsp.bezier_ele(io)*exp(ci_tpi*double(ix)/double(nx)*io);
+            fracx += bsp.bezier_ele(io)*exp(ci_tpi*double(ix)/double(nx)*double(io));
         }
         b1[ix] = exp(ci_tpi*double(norder*ix)/double(nx))/fracx;
     }
@@ -126,7 +126,7 @@ void PW_Basis:: bsplinecoef(complex<double> *b1, complex<double> *b2, complex<do
         complex<double> fracy=0;
         for(int io = 0 ; io < norder - 1 ; ++io)
         {
-            fracy += bsp.bezier_ele(io)*exp(ci_tpi*double(iy)/double(ny)*io);
+            fracy += bsp.bezier_ele(io)*exp(ci_tpi*double(iy)/double(ny)*double(io));
         }
         b2[iy] = exp(ci_tpi*double(norder*iy)/double(ny))/fracy;
     }
@@ -135,7 +135,7 @@ void PW_Basis:: bsplinecoef(complex<double> *b1, complex<double> *b2, complex<do
         complex<double> fracz=0;
         for(int io = 0 ; io < norder - 1 ; ++io)
         {
-            fracz += bsp.bezier_ele(io)*exp(ci_tpi*double(iz)/double(nz)*io);
+            fracz += bsp.bezier_ele(io)*exp(ci_tpi*double(iz)/double(nz)*double(io));
         }
         b3[iz] = exp(ci_tpi*double(norder*iz)/double(nz))/fracz;
     }
