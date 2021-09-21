@@ -221,15 +221,15 @@ void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
 	static bool first = true;
 	if(first)
 	{
-		if(GlobalV::GAMMA_ONLY_LOCAL)
-		{
+		if(!GlobalV::GAMMA_ONLY_LOCAL)
+		/*{
 			this->WFC_GAMMA_aug = new double**[GlobalV::NSPIN];
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{
 				this->WFC_GAMMA_aug[is] = new double*[GlobalV::NBANDS];
 			}
 		}
-		else //mohan add 2012-01-08
+		else //mohan add 2012-01-08*/
 		{
 			this->WFC_K_aug = new std::complex<double>**[GlobalC::kv.nks];
 			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
@@ -242,8 +242,8 @@ void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
 	
 	if(allocate_aug_flag)
 	{
-		if(GlobalV::GAMMA_ONLY_LOCAL)
-		{
+		if(!GlobalV::GAMMA_ONLY_LOCAL)
+		/*{
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{
 				for(int i=0; i<GlobalV::NBANDS; ++i)
@@ -252,7 +252,7 @@ void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
 				}
 			}
 		}
-		else
+		else*/
 		{
 			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 			{
@@ -271,8 +271,8 @@ void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
     	// Create wave functions(Coefficients) in local basis.
     	// Same as evc in plane wave basis.
 		//------------------------------------------------------
-		if(GlobalV::GAMMA_ONLY_LOCAL)
-		{
+		if(!GlobalV::GAMMA_ONLY_LOCAL)
+		/*{
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{	
 				for(int i=0; i<GlobalV::NBANDS; ++i)
@@ -283,7 +283,7 @@ void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
 			}
 			ModuleBase::Memory::record("LocalOrbital_Coef","WFC_GAMMA_aug",GlobalV::NSPIN*GlobalV::NBANDS*daug,"double");
 		}
-		else // mohan add 2012-01-08
+		else // mohan add 2012-01-08*/
 		{
 			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 			{
