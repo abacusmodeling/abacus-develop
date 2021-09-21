@@ -93,7 +93,7 @@ void PW_Basis::bspline_sf(const int norder)
            int idx = int(gcar[ig].x+this->nx)%this->nx;
            int idy = int(gcar[ig].y+this->ny)%this->ny;
            int idz = int(gcar[ig].z+this->nz)%this->nz;
-           strucFac(it,ig) *= ( b1[idx] * b2[idy] * b3[idz] * this->ncxyz );
+           strucFac(it,ig) *= ( b1[idx] * b2[idy] * b3[idz] * double(this->ncxyz) );
         }
     }   
     delete[] r;
