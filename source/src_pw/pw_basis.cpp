@@ -368,8 +368,6 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
 
     this->get_nggm(this->ngmc);
 
-    this->setup_structure_factor();
-
 //	this->printPW("src_check/check_pw.txt");
     ModuleBase::timer::tick("PW_Basis","gen_pw");
     return;
@@ -758,23 +756,32 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
 //	std::string outstr;
 //	outstr = GlobalV::global_out_dir + "strucFac.dat"; 
 //	std::ofstream ofs( outstr.c_str() ) ;
-
-    for (int it=0; it<Ucell->ntype; it++)
+    bool usebspline;
+    if(nbspline >= 0)   usebspline = true;
+    else    usebspline = false;
+    
+    if(usebspline)
     {
-		const int na = Ucell->atoms[it].na;
-		const ModuleBase::Vector3<double> * const tau = Ucell->atoms[it].tau;
-
-		#pragma omp parallel for schedule(static)
-        for (int ig=0; ig<this->ngmc; ig++)
+        this->bspline_sf(nbspline);
+    }
+    else
+    {
+        for (int it=0; it<Ucell->ntype; it++)
         {
-			const ModuleBase::Vector3<double> gcar_ig = gcar[ig];
-            std::complex<double> sum_phase = ModuleBase::ZERO;
-            for (int ia=0; ia<na; ia++)
+	    	const int na = Ucell->atoms[it].na;
+	    	const ModuleBase::Vector3<double> * const tau = Ucell->atoms[it].tau;
+		    #pragma omp parallel for schedule(static)
+            for (int ig=0; ig<this->ngmc; ig++)
             {
-                // e^{-i G*tau}
-                sum_phase += exp( ci_tpi * (gcar_ig * tau[ia]) );
+		    	const ModuleBase::Vector3<double> gcar_ig = gcar[ig];
+                std::complex<double> sum_phase = ModuleBase::ZERO;
+                for (int ia=0; ia<na; ia++)
+                {
+                    // e^{-i G*tau}
+                    sum_phase += exp( ci_tpi * (gcar_ig * tau[ia]) );
+                }
+                this->strucFac(it,ig) = sum_phase;
             }
-            this->strucFac(it,ig) = sum_phase;
         }
     }
 
@@ -818,7 +825,7 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
             inat++;
         }
     }
-    ModuleBase::timer::tick("PW_Basis","setup_struc_factor");
+    ModuleBase::timer::tick("PW_Basis","setup_struc_factor"); 
     return;
 }
 
