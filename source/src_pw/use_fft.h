@@ -7,7 +7,7 @@
 
 #include "cufft.h"
 #include "use_fft_kernel.h"
-typedef cufftDoubleComplex CUFFT_COMPLEX;
+// typedef cufftDoubleComplex CUFFT_COMPLEX;
 
 #endif
 
@@ -53,7 +53,11 @@ class Use_FFT
 
 #ifdef __CUDA
 	cufftHandle fft_handle;
-	void RoundTrip(const CUFFT_COMPLEX *psi, const double *vr, const int *fft_index, CUFFT_COMPLEX *psic)
+	void RoundTrip(const float2 *psi, const float *vr, const int *fft_index, float2 *psic)
+	{
+		RoundTrip_kernel(psi, vr, fft_index, psic);
+	}
+	void RoundTrip(const double2 *psi, const double *vr, const int *fft_index, double2 *psic)
 	{
 		RoundTrip_kernel(psi, vr, fft_index, psic);
 	}

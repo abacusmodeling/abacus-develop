@@ -52,6 +52,12 @@ public:
 
     void h_1psi_gpu(
         const int npw,
+        const float2 *psi1d,
+        float2 *hpsi,
+        float2 *spsi);
+    
+    void h_1psi_gpu(
+        const int npw,
         const CUFFT_COMPLEX *psi1d,
         CUFFT_COMPLEX *hpsi,
         CUFFT_COMPLEX *spsi);
@@ -63,10 +69,20 @@ public:
         std::complex<double> *spsi);
 
     void h_psi_gpu(
+		const float2 *psi,
+		float2 *hpsi,
+		const int m = 1); 
+    
+    void h_psi_gpu(
 		const CUFFT_COMPLEX *psi,
 		CUFFT_COMPLEX *hpsi,
-		const int m = 1); // qianrui add a default parameter 2021-3-31
+		const int m = 1); 
 
+    void s_1psi_gpu(
+        const int npw,
+        const float2 *psi,
+        float2 *spsi);
+    
     void s_1psi_gpu(
         const int npw,
         const CUFFT_COMPLEX *psi,
@@ -94,6 +110,12 @@ public:
 	// add contributions of h*psi from
 	// non-local pseduopotentials
 	void add_nonlocal_pp_gpu(
+		float2 *hpsi_in,
+		const float2 *becp,
+		const float2 *d_vkb_c,
+		const int m);
+    
+    void add_nonlocal_pp_gpu(
 		CUFFT_COMPLEX *hpsi_in,
 		const CUFFT_COMPLEX *becp,
 		const CUFFT_COMPLEX *d_vkb_c,

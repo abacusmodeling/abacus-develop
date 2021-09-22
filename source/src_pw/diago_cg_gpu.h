@@ -17,28 +17,52 @@ public:
 
     static int moved;
 
-    T ddot_real(
+    float ddot_real(
         const int & dim,
-        const T2* psi_L,
-        const T2* psi_R,
+        const float2* psi_L,
+        const float2* psi_R,
         const bool reduce = true) ;
 
-    T2 ddot(
+    double ddot_real(
         const int & dim,
-        const T2* psi_L,
-        const T2* psi_R ) ;
+        const double2* psi_L,
+        const double2* psi_R,
+        const bool reduce = true) ;
 
-    T2 ddot(
+    float2 ddot(
         const int & dim,
-        const T2 *psi, // matrix
-        const int & m,
-        T2 *psik ) ;
+        const float2* psi_L,
+        const float2* psi_R ) ;
 
-    T2 ddot(
+    double2 ddot(
         const int & dim,
-        const T2 *psi_L, // matrix
+        const double2* psi_L,
+        const double2* psi_R ) ;
+
+    float2 ddot(
+        const int & dim,
+        const float2 *psi, // matrix
         const int & m,
-        const T2 *psi_R, // matrix
+        float2 *psik ) ;
+
+    double2 ddot(
+        const int & dim,
+        const double2 *psi, // matrix
+        const int & m,
+        double2 *psik ) ;
+
+    float2 ddot(
+        const int & dim,
+        const float2 *psi_L, // matrix
+        const int & m,
+        const float2 *psi_R, // matrix
+        const int & n) ;
+    
+    double2 ddot(
+        const int & dim,
+        const double2 *psi_L, // matrix
+        const int & m,
+        const double2 *psi_R, // matrix
         const int & n) ;
 
     void diag(
@@ -52,15 +76,24 @@ public:
         const int &maxter,
         const bool &reorder,
         int &notconv,
-        T &avg_iter);
+        double &avg_iter);
 
     void schmit_orth(
         const int &dim,
         const int &dmx,
         const int &m,
-        const T2 *psi, // matrix
-        T2 *spsi,
-        T2 *psi_m
+        const float2 *psi, // matrix
+        float2 *spsi,
+        float2 *psi_m
+    );
+
+    void schmit_orth(
+        const int &dim,
+        const int &dmx,
+        const int &m,
+        const double2 *psi, // matrix
+        double2 *spsi,
+        double2 *psi_m
     );
 
 private:
@@ -79,10 +112,19 @@ private:
     void orthogonal_gradient(
         const int &dim,
         const int &dmx,
-        T2 *g,
-        T2 *sg,
-        T2 *lagrange,
-        const T2 *eigenfunction, // matrix
+        float2 *g,
+        float2 *sg,
+        float2 *lagrange,
+        const float2 *eigenfunction, // matrix
+        const int m);
+    
+    void orthogonal_gradient(
+        const int &dim,
+        const int &dmx,
+        double2 *g,
+        double2 *sg,
+        double2 *lagrange,
+        const double2 *eigenfunction, // matrix
         const int m);
 
     void calculate_gamma_cg(

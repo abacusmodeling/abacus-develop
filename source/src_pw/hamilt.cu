@@ -10,7 +10,9 @@
 Hamilt::Hamilt() {}
 Hamilt::~Hamilt() {}
 
-__global__ void cast_d2f(float *dst, double *src, int size)
+// in tools.h
+
+__global__ void hamilt_cast_d2f(float *dst, double *src, int size)
 {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     if(i < size)
@@ -19,7 +21,7 @@ __global__ void cast_d2f(float *dst, double *src, int size)
     }
 }
 
-__global__ void cast_f2d(double *dst, float *src, int size)
+__global__ void hamilt_cast_f2d(double *dst, float *src, int size)
 {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     if(i < size)
@@ -27,6 +29,27 @@ __global__ void cast_f2d(double *dst, float *src, int size)
         dst[i] = (double)(src[i]);
     }
 }
+
+__global__ void hamilt_cast_d2f(float2 *dst, double2 *src, int size)
+{
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if(i < size)
+    {
+        dst[i].x = __double2float_rn(src[i].x);
+        dst[i].y = __double2float_rn(src[i].y);
+    }
+}
+
+__global__ void hamilt_cast_f2d(double2 *dst, float2 *src, int size)
+{
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if(i < size)
+    {
+        dst[i].x = (double)(src[i].x);
+        dst[i].y = (double)(src[i].y);
+    }
+}
+
 
 void Hamilt::diagH_pw(
     const int &istep,
@@ -102,7 +125,10 @@ void Hamilt::diagH_pw(
 
                     avg_iter += 1.0;
                 }
-                Diago_CG_GPU<double, double2> cg_gpu;
+
+                // Diago_CG_GPU<float, float2> f_cg_gpu;
+                Diago_CG_GPU<double, double2> d_cg_gpu;
+                
 				bool reorder = true;
 
 				CUFFT_COMPLEX *d_wf_evc;
@@ -111,11 +137,11 @@ void Hamilt::diagH_pw(
                 int DIM_CG_GPU2 = GlobalC::wf.npwx * GlobalV::NPOL;
                 double *d_precondition;
 
-                // float2 *f_wf_evc;
-                // float *f_wf_ekb;
+                float2 *f_wf_evc;
+                float *f_wf_ekb;
                 // int DIM_CG_GPU = GlobalC::kv.ngk[ik];
                 // int DIM_CG_GPU2 = GlobalC::wf.npwx * GlobalV::NPOL;
-                // float *d_precondition;
+                float *f_precondition;
 
 				if(GlobalV::NPOL==1)
 				{
@@ -127,21 +153,34 @@ void Hamilt::diagH_pw(
                     // CHECK_CUDA(cudaMemcpy(d_wf_ekb, wf.ekb[ik], NBANDS * sizeof(double), cudaMemcpyHostToDevice));
                     CHECK_CUDA(cudaMemcpy(d_precondition, precondition, DIM_CG_GPU * sizeof(double), cudaMemcpyHostToDevice));
                     
-                    // CHECK_CUDA(cudaMalloc((void**)&f_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx * sizeof(float2)));
-                    // CHECK_CUDA(cudaMalloc((void**)&f_wf_ekb, GlobalV::NBANDS * sizeof(float)));
-                    // CHECK_CUDA(cudaMalloc((void**)&f_precondition, DIM_CG_GPU * sizeof(float)));
-                    // int thread = 512;
-                    // int block = GlobalV::NBANDS * GlobalC::wf.npwx / thread + 1;
-                    // int block2 = DIM_CG_GPU / thread + 1;
-                    // cast_d2f<<<block, thread>>>(f_wf_evc, d_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx)
-                    // cast_d2f<<<block, thread>>>(f_precondition, d_precondition, )
-
+                    // cast to float
+                    // if(istep < 3)
+                    // {
+                    //     CHECK_CUDA(cudaMalloc((void**)&f_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx * sizeof(float2)));
+                    //     CHECK_CUDA(cudaMalloc((void**)&f_wf_ekb, GlobalV::NBANDS * sizeof(float)));
+                    //     CHECK_CUDA(cudaMalloc((void**)&f_precondition, DIM_CG_GPU * sizeof(float)));
+                    //     int thread = 512;
+                    //     int block = GlobalV::NBANDS * GlobalC::wf.npwx / thread + 1;
+                    //     int block2 = GlobalV::NBANDS / thread + 1;
+                    //     int block3 = DIM_CG_GPU / thread + 1;
+                    //     hamilt_cast_d2f<<<block, thread>>>(f_wf_evc, d_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx);
+                    //     hamilt_cast_d2f<<<block3, thread>>>(f_precondition, d_precondition, DIM_CG_GPU);
+                    //     cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_C2C);
+                    //     f_cg_gpu.diag(f_wf_evc, f_wf_ekb, DIM_CG_GPU, GlobalC::wf.npwx,
+                    //         GlobalV::NBANDS, f_precondition, GlobalV::ETHR,
+                    //         GlobalV::DIAGO_CG_MAXITER, reorder, notconv, avg);
+                    //     hamilt_cast_f2d<<<block, thread>>>(d_wf_evc, f_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx);
+                    //     hamilt_cast_f2d<<<block2, thread>>>(d_wf_ekb, f_wf_ekb, GlobalV::NBANDS);
+                    // }
+                    // else
+                    // {
                     cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
-                    cg_gpu.diag(d_wf_evc, d_wf_ekb, DIM_CG_GPU, GlobalC::wf.npwx,
+                    d_cg_gpu.diag(d_wf_evc, d_wf_ekb, DIM_CG_GPU, GlobalC::wf.npwx,
                         GlobalV::NBANDS, d_precondition, GlobalV::ETHR,
                         GlobalV::DIAGO_CG_MAXITER, reorder, notconv, avg);
+                    // }
+                    
                     cufftDestroy(GlobalC::UFFT.fft_handle);
-
                     // to cpu
                     CHECK_CUDA(cudaMemcpy(GlobalC::wf.evc[ik0].c, d_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx * sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost));
                     CHECK_CUDA(cudaMemcpy(GlobalC::wf.ekb[ik], d_wf_ekb, GlobalV::NBANDS * sizeof(double), cudaMemcpyDeviceToHost));
@@ -150,6 +189,8 @@ void Hamilt::diagH_pw(
                     CHECK_CUDA(cudaFree(d_wf_ekb));
                     CHECK_CUDA(cudaFree(d_precondition));
 				}
+                // comment this to debug.
+                
 				else
 				{
                     // to gpu
@@ -163,7 +204,7 @@ void Hamilt::diagH_pw(
                     // do things
                     cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
 
-                    cg_gpu.diag(d_wf_evc, d_wf_ekb, DIM_CG_GPU2, DIM_CG_GPU2,
+                    d_cg_gpu.diag(d_wf_evc, d_wf_ekb, DIM_CG_GPU2, DIM_CG_GPU2,
                         GlobalV::NBANDS, d_precondition, GlobalV::ETHR,
                         GlobalV::DIAGO_CG_MAXITER, reorder, notconv, avg);
                     cufftDestroy(GlobalC::UFFT.fft_handle);
@@ -176,6 +217,7 @@ void Hamilt::diagH_pw(
                     CHECK_CUDA(cudaFree(d_wf_ekb));
                     CHECK_CUDA(cudaFree(d_precondition));
 				}
+                
 				// P.S. : nscf is the flag about reorder.
 				// if diagH_subspace is done once,
 				// we don't need to reorder the eigenvectors order.

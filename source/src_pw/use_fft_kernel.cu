@@ -2,7 +2,8 @@
 #include "global.h"
 #include "cufft.h"
 
-__global__ void kernel_set(int size, CUFFT_COMPLEX *dst, const CUFFT_COMPLEX *src, const int *index_list)
+template<class T2>
+__global__ void kernel_set(int size, T2 *dst, const T2 *src, const int *index_list)
 {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     int p = index_list[idx];
@@ -13,7 +14,8 @@ __global__ void kernel_set(int size, CUFFT_COMPLEX *dst, const CUFFT_COMPLEX *sr
     }
 }
 
-__global__ void kernel_roundtrip(int size, CUFFT_COMPLEX *dst, const double *src)
+template<class T, class T2>
+__global__ void kernel_roundtrip(int size, T2 *dst, const T *src)
 {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if(idx < size)
@@ -23,7 +25,8 @@ __global__ void kernel_roundtrip(int size, CUFFT_COMPLEX *dst, const double *src
     }
 }
 
-__global__ void kernel_normalization(int size, CUFFT_COMPLEX *data, double norm)
+template<class T, class T2>
+__global__ void kernel_normalization(int size, T2 *data, T norm)
 {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if(idx < size)
@@ -79,13 +82,52 @@ __global__ void kernel_reorder(CUFFT_COMPLEX *dst, CUFFT_COMPLEX *src, int size)
 // }
 
 
-void RoundTrip_kernel(const CUFFT_COMPLEX *psi, const double *vr, const int *fft_index, CUFFT_COMPLEX *psic)
+void RoundTrip_kernel(const float2 *psi, const float *vr, const int *fft_index, float2 *psic)
 {
     // (1) set value
     int thread = 512;
     int block = (GlobalC::wf.npw + thread - 1) / thread;
     int block2 = (GlobalC::pw.nrxx + thread - 1) / thread;
-    kernel_set<<<block, thread>>>(GlobalC::wf.npw, psic, psi, fft_index);
+    kernel_set<float2><<<block, thread>>>(GlobalC::wf.npw, psic, psi, fft_index);
+
+    // CUFFT_COMPLEX *ordered_psi;
+    // CHECK_CUDA(cudaMalloc((void**)&ordered_psi, GlobalC::pw.nrxx*sizeof(CUFFT_COMPLEX)));
+    // CHECK_CUDA(cudaMemset(ordered_psi, 0, GlobalC::pw.nrxx*sizeof(CUFFT_COMPLEX)));
+
+    // Reorder_psi_plus(ordered_psi, psic);
+
+    // cufftHandle cufftplan_gpu;
+    // cufftPlan3d(&cufftplan_gpu, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
+    cufftExecC2C(GlobalC::UFFT.fft_handle, psic, psic, CUFFT_INVERSE);
+    // cufftDestroy(cufftplan_gpu);
+
+    // int block3 = (GlobalC::pw.nrxx + thread - 1) / thread;
+    // kernel_normalization<<<block3, thread>>>(GlobalC::pw.nrxx, psic, (double)(GlobalC::pw.nrxx));
+
+    kernel_roundtrip<float, float2><<<block2, thread>>>(GlobalC::pw.nrxx, psic, vr);
+
+    // cufftHandle cufftplan_gpu2;
+    // cufftPlan3d(&cufftplan_gpu, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
+    cufftExecC2C(GlobalC::UFFT.fft_handle, psic, psic, CUFFT_FORWARD);
+    // cufftDestroy(cufftplan_gpu);
+
+    // Reorder_psi_minus(psic, ordered_psi);
+
+    int block3 = (GlobalC::pw.nrxx + thread - 1) / thread;
+    kernel_normalization<float, float2><<<block3, thread>>>(GlobalC::pw.nrxx, psic, (double)(GlobalC::pw.nrxx));
+
+    // CHECK_CUDA(cudaFree(ordered_psi));
+
+    return;
+}
+
+void RoundTrip_kernel(const double2 *psi, const double *vr, const int *fft_index, double2 *psic)
+{
+    // (1) set value
+    int thread = 512;
+    int block = (GlobalC::wf.npw + thread - 1) / thread;
+    int block2 = (GlobalC::pw.nrxx + thread - 1) / thread;
+    kernel_set<double2><<<block, thread>>>(GlobalC::wf.npw, psic, psi, fft_index);
 
     // CUFFT_COMPLEX *ordered_psi;
     // CHECK_CUDA(cudaMalloc((void**)&ordered_psi, GlobalC::pw.nrxx*sizeof(CUFFT_COMPLEX)));
@@ -101,7 +143,7 @@ void RoundTrip_kernel(const CUFFT_COMPLEX *psi, const double *vr, const int *fft
     // int block3 = (GlobalC::pw.nrxx + thread - 1) / thread;
     // kernel_normalization<<<block3, thread>>>(GlobalC::pw.nrxx, psic, (double)(GlobalC::pw.nrxx));
 
-    kernel_roundtrip<<<block2, thread>>>(GlobalC::pw.nrxx, psic, vr);
+    kernel_roundtrip<double, double2><<<block2, thread>>>(GlobalC::pw.nrxx, psic, vr);
 
     // cufftHandle cufftplan_gpu2;
     // cufftPlan3d(&cufftplan_gpu, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
@@ -111,7 +153,7 @@ void RoundTrip_kernel(const CUFFT_COMPLEX *psi, const double *vr, const int *fft
     // Reorder_psi_minus(psic, ordered_psi);
 
     int block3 = (GlobalC::pw.nrxx + thread - 1) / thread;
-    kernel_normalization<<<block3, thread>>>(GlobalC::pw.nrxx, psic, (double)(GlobalC::pw.nrxx));
+    kernel_normalization<double, double2><<<block3, thread>>>(GlobalC::pw.nrxx, psic, (double)(GlobalC::pw.nrxx));
 
     // CHECK_CUDA(cudaFree(ordered_psi));
 
