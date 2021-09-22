@@ -174,7 +174,14 @@ void Force_LCAO_gamma::allocate_gamma(void)
     
     //GlobalC::UHM.genH.build_Nonlocal_beta (cal_deri);
     //ModuleBase::timer::tick("Force_LCAO_gamma","build_Nonlocal_mu");
-    GlobalC::UHM.genH.build_Nonlocal_mu (cal_deri);
+	if(GlobalV::NSPIN==4)
+	{
+		GlobalC::UHM.genH.build_Nonlocal_mu (cal_deri);
+	}
+	else
+	{
+		GlobalC::UHM.genH.build_Nonlocal_mu_new (cal_deri);
+	}
     //ModuleBase::timer::tick("Force_LCAO_gamma","build_Nonlocal_mu");
     //test_gamma(GlobalC::LM.DHloc_fixed_x, "dHloc_fixed_x Vnl part");
 
