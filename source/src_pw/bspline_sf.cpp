@@ -88,9 +88,9 @@ void PW_Basis::bspline_sf(const int norder)
         this->bsplinecoef(b1,b2,b3,norder);
         for(int ig = 0 ; ig < ngmc ; ++ig)
         {
-           int idx = int(gdirect[ig].x+this->nx)%this->nx;
-           int idy = int(gdirect[ig].y+this->ny)%this->ny;
-           int idz = int(gdirect[ig].z+this->nz)%this->nz;
+           int idx = int(gdirect[ig].x+0.1+this->nx)%this->nx;
+           int idy = int(gdirect[ig].y+0.1+this->ny)%this->ny;
+           int idz = int(gdirect[ig].z+0.1+this->nz)%this->nz;
            strucFac(it,ig) *= ( b1[idx] * b2[idy] * b3[idz] * double(this->ncxyz) );
         }
     }   
