@@ -178,6 +178,7 @@ void Input::Default(void)
 	trust_radius_max = 0.8; // bohr
 	trust_radius_min = 1e-5;
 	trust_radius_ini = 0.5; //bohr
+	nbspline = -1;
 //----------------------------------------------------------
 // ecutwfc
 //----------------------------------------------------------
@@ -896,6 +897,10 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("colour", word) == 0)
         {
             read_value(ifs, colour);
+        }
+		else if (strcmp("nbspline", word) == 0)
+        {
+            read_value(ifs, nbspline);
         }
         else if (strcmp("t_in_h", word) == 0)
         {
@@ -2184,6 +2189,7 @@ void Input::Bcast()
 	Parallel_Common::bcast_int( nb2d );
 	Parallel_Common::bcast_int( nurse );
 	Parallel_Common::bcast_bool( colour );
+	Parallel_Common::bcast_int( nbspline );
 	Parallel_Common::bcast_int( t_in_h );
 	Parallel_Common::bcast_int( vl_in_h );
 	Parallel_Common::bcast_int( vnl_in_h );
