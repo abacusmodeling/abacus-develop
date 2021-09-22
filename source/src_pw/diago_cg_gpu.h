@@ -5,8 +5,6 @@
 #include "cufft.h"
 #include "cublas_v2.h"
 
-// typedef cufftDoubleComplex CUFFT_COMPLEX;
-
 template<class T, class T2>
 class Diago_CG_GPU
 {

@@ -7,7 +7,6 @@
 
 #include "cufft.h"
 #include "use_fft_kernel.h"
-// typedef cufftDoubleComplex CUFFT_COMPLEX;
 
 #endif
 

@@ -453,8 +453,8 @@ void Hamilt_PW::h_1psi_gpu( const int npw_in, const float2 *psi,
     return;
 }
 
-void Hamilt_PW::h_1psi_gpu( const int npw_in, const CUFFT_COMPLEX *psi,
-	CUFFT_COMPLEX *hpsi, CUFFT_COMPLEX *spsi)
+void Hamilt_PW::h_1psi_gpu( const int npw_in, const double2 *psi,
+	double2 *hpsi, double2 *spsi)
 {
 	this->h_psi_gpu(psi, hpsi);
 
@@ -470,9 +470,9 @@ void Hamilt_PW::s_1psi_gpu(const int dim, const float2 *psi, float2 *spsi)
     return;
 }
 
-void Hamilt_PW::s_1psi_gpu(const int dim, const CUFFT_COMPLEX *psi, CUFFT_COMPLEX *spsi)
+void Hamilt_PW::s_1psi_gpu(const int dim, const double2 *psi, double2 *spsi)
 {
-    CHECK_CUDA(cudaMemcpy(spsi, psi, dim*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice));
+    CHECK_CUDA(cudaMemcpy(spsi, psi, dim*sizeof(double2), cudaMemcpyDeviceToDevice));
     return;
 }
 
@@ -721,7 +721,7 @@ void Hamilt_PW::h_psi_gpu(const float2 *psi_in, float2 *hpsi, const int m)
     return;
 }
 
-void Hamilt_PW::h_psi_gpu(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, const int m)
+void Hamilt_PW::h_psi_gpu(const double2 *psi_in, double2 *hpsi, const int m)
 {
     ModuleBase::timer::tick("Hamilt_PW_GPU","h_psi");
     // int i = 0;
@@ -737,8 +737,8 @@ void Hamilt_PW::h_psi_gpu(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, cons
 	//------------------------------------
 	//(1) the kinetical energy.
 	//------------------------------------
-	CUFFT_COMPLEX *tmhpsi;
-	const CUFFT_COMPLEX *tmpsi_in;
+	double2 *tmhpsi;
+	const double2 *tmpsi_in;
     ModuleBase::timer::tick("Hamilt_PW_GPU","kinetic");
  	if(GlobalV::T_IN_H)
 	{
@@ -796,11 +796,11 @@ void Hamilt_PW::h_psi_gpu(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, cons
         tmpsi_in = psi_in;
         // int *d_GR_index;
         double *d_vr_eff1;
-        CUFFT_COMPLEX *d_porter;
+        double2 *d_porter;
 
         // CHECK_CUDA(cudaMalloc((void**)&d_GR_index, GlobalC::wf.npwx * sizeof(int)));
         CHECK_CUDA(cudaMalloc((void**)&d_vr_eff1, GlobalC::pw.nrxx * sizeof(double)));
-        CHECK_CUDA(cudaMalloc((void**)&d_porter, GlobalC::pw.nrxx * sizeof(CUFFT_COMPLEX)));
+        CHECK_CUDA(cudaMalloc((void**)&d_porter, GlobalC::pw.nrxx * sizeof(double2)));
 
         CHECK_CUDA(cudaMemcpy(d_vr_eff1, GlobalC::pot.vr_eff1, GlobalC::pw.nrxx*sizeof(double), cudaMemcpyHostToDevice));
         // cout<<"NSPIN = "<<GlobalV::NSPIN<<endl;
@@ -809,7 +809,7 @@ void Hamilt_PW::h_psi_gpu(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, cons
             // cout<<"in hpsi:loacl_pot, iband = "<<ib<<endl;
             // if(NSPIN!=4){
             // ZEROS( UFFT.porter, pw.nrxx);
-            CHECK_CUDA(cudaMemset(d_porter, 0, GlobalC::pw.nrxx * sizeof(CUFFT_COMPLEX)));
+            CHECK_CUDA(cudaMemset(d_porter, 0, GlobalC::pw.nrxx * sizeof(double2)));
 
             GlobalC::UFFT.RoundTrip( tmpsi_in, d_vr_eff1, GR_index_d, d_porter );
 
@@ -842,12 +842,12 @@ void Hamilt_PW::h_psi_gpu(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, cons
         if ( GlobalC::ppcell.nkb > 0)
         {
             int nkb = GlobalC::ppcell.nkb;
-            CUFFT_COMPLEX *becp;
-            CUFFT_COMPLEX *d_vkb_c;
-            CHECK_CUDA(cudaMalloc((void**)&becp, GlobalV::NPOL*m*nkb*sizeof(CUFFT_COMPLEX)));
-            CHECK_CUDA(cudaMalloc((void**)&d_vkb_c, GlobalC::wf.npwx*nkb*sizeof(CUFFT_COMPLEX)));
+            double2 *becp;
+            double2 *d_vkb_c;
+            CHECK_CUDA(cudaMalloc((void**)&becp, GlobalV::NPOL*m*nkb*sizeof(double2)));
+            CHECK_CUDA(cudaMalloc((void**)&d_vkb_c, GlobalC::wf.npwx*nkb*sizeof(double2)));
 
-            CHECK_CUDA(cudaMemcpy(d_vkb_c, GlobalC::ppcell.vkb.c, GlobalC::wf.npwx*nkb*sizeof(CUFFT_COMPLEX), cudaMemcpyHostToDevice));
+            CHECK_CUDA(cudaMemcpy(d_vkb_c, GlobalC::ppcell.vkb.c, GlobalC::wf.npwx*nkb*sizeof(double2), cudaMemcpyHostToDevice));
 
             cublasOperation_t transa = CUBLAS_OP_C;
             cublasOperation_t transb = CUBLAS_OP_N;
@@ -857,7 +857,7 @@ void Hamilt_PW::h_psi_gpu(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, cons
 			// cout<<"===== vkbc ===="<<endl;
 			// print_test<double2>(d_vkb_c, 15);
 
-            CUFFT_COMPLEX ONE, ZERO;
+            double2 ONE, ZERO;
             ONE.y = ZERO.x = ZERO.y = 0.0;
             ONE.x = 1.0;
             // NEG_ONE.x = -1.0;
@@ -878,13 +878,13 @@ void Hamilt_PW::h_psi_gpu(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, cons
             // complex<double> *hpsi_cpu = new complex<double>[GlobalC::wf.npw*GlobalV::NPOL];
             // complex<double> *becp_cpu = new complex<double>[GlobalV::NPOL*m*nkb];
 
-            // cudaMemcpy(becp_cpu, becp, GlobalV::NPOL*m*nkb*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
+            // cudaMemcpy(becp_cpu, becp, GlobalV::NPOL*m*nkb*sizeof(double2), cudaMemcpyDeviceToHost);
 
-            // cudaMemcpy(hpsi_cpu, hpsi, GlobalC::wf.npw*GlobalV::NPOL*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
+            // cudaMemcpy(hpsi_cpu, hpsi, GlobalC::wf.npw*GlobalV::NPOL*sizeof(double2), cudaMemcpyDeviceToHost);
 
             // this->add_nonlocal_pp(hpsi_cpu, becp_cpu, m);
 
-            // cudaMemcpy(hpsi, hpsi_cpu, GlobalC::wf.npw*GlobalV::NPOL*sizeof(CUFFT_COMPLEX), cudaMemcpyHostToDevice);
+            // cudaMemcpy(hpsi, hpsi_cpu, GlobalC::wf.npw*GlobalV::NPOL*sizeof(double2), cudaMemcpyHostToDevice);
 
             // delete [] hpsi_cpu;
             // delete [] becp_cpu;
@@ -1251,9 +1251,9 @@ void Hamilt_PW::add_nonlocal_pp_gpu(
 }
 
 void Hamilt_PW::add_nonlocal_pp_gpu(
-	CUFFT_COMPLEX *hpsi_in,
-	const CUFFT_COMPLEX *becp,
-    const CUFFT_COMPLEX *d_vkb_c,
+	double2 *hpsi_in,
+	const double2 *becp,
+    const double2 *d_vkb_c,
 	const int m)
 {
     ModuleBase::timer::tick("Hamilt_PW","add_nonlocal_pp_gpu");
@@ -1263,9 +1263,9 @@ void Hamilt_PW::add_nonlocal_pp_gpu(
 
 	// complex<double> *ps  = new complex<double> [nkb * GlobalV::NPOL * m];
     // ZEROS(ps, GlobalV::NPOL * m * nkb);
-    CUFFT_COMPLEX *ps;
-    CHECK_CUDA(cudaMalloc((void**)&ps, nkb * GlobalV::NPOL * m * sizeof(CUFFT_COMPLEX)));
-    CHECK_CUDA(cudaMemset(ps, 0, GlobalV::NPOL * m * sizeof(CUFFT_COMPLEX)));
+    double2 *ps;
+    CHECK_CUDA(cudaMalloc((void**)&ps, nkb * GlobalV::NPOL * m * sizeof(double2)));
+    CHECK_CUDA(cudaMemset(ps, 0, GlobalV::NPOL * m * sizeof(double2)));
 
     int sum = 0;
     int iat = 0;
@@ -1315,7 +1315,7 @@ void Hamilt_PW::add_nonlocal_pp_gpu(
     cublasOperation_t transb = CUBLAS_OP_T;
     // cublasHandle_t handle;
     // cublasCreate(&handle);
-    CUFFT_COMPLEX ONE;
+    double2 ONE;
     ONE.y = 0.0;
     ONE.x = 1.0;
 	if(GlobalV::NPOL==1 && m==1)

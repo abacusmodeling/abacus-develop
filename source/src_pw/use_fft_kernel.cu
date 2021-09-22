@@ -36,7 +36,7 @@ __global__ void kernel_normalization(int size, T2 *data, T norm)
     }
 }
 
-__global__ void kernel_reorder(CUFFT_COMPLEX *dst, CUFFT_COMPLEX *src, int size)
+__global__ void kernel_reorder(double2 *dst, double2 *src, int size)
 {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if(idx < size)
@@ -47,7 +47,7 @@ __global__ void kernel_reorder(CUFFT_COMPLEX *dst, CUFFT_COMPLEX *src, int size)
 }
 
 // Donghs fix 2021.9.8
-// void Reorder_psi_plus(CUFFT_COMPLEX *dst, CUFFT_COMPLEX *src)
+// void Reorder_psi_plus(double2 *dst, double2 *src)
 // {
 //     ModuleBase::timer::tick("Use_FFT","reorder_psi_plus");
 //     int ii = 0;
@@ -58,13 +58,13 @@ __global__ void kernel_reorder(CUFFT_COMPLEX *dst, CUFFT_COMPLEX *src, int size)
 //     {
 //         int ir = GlobalC::pw.FFT_wfc.ismap[is];
 //         kernel_reorder<<<block, thread>>>(&dst[ir*size_z], &src[ii*size_z], size_z);
-//         // CHECK_CUDA(cudaMemcpy(&dst[ir*size_z], &src[ii*size_z], size_z*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice));
+//         // CHECK_CUDA(cudaMemcpy(&dst[ir*size_z], &src[ii*size_z], size_z*sizeof(double2), cudaMemcpyDeviceToDevice));
 //         ii++;
 //     }
 //     ModuleBase::timer::tick("Use_FFT","reorder_psi_plus");
 // }
 
-// void Reorder_psi_minus(CUFFT_COMPLEX *dst, CUFFT_COMPLEX *src)
+// void Reorder_psi_minus(double2 *dst, double2 *src)
 // {
 //     ModuleBase::timer::tick("Use_FFT","reorder_psi_minus");
 //     int ii = 0;
@@ -75,7 +75,7 @@ __global__ void kernel_reorder(CUFFT_COMPLEX *dst, CUFFT_COMPLEX *src, int size)
 //     {
 //         int ir = GlobalC::pw.FFT_wfc.ismap[j];
 //         kernel_reorder<<<block, thread>>>(&dst[ii*size_z], &src[ir*size_z], size_z);
-//         // CHECK_CUDA(cudaMemcpy(&dst[ii*size_z], &src[ir*size_z], size_z*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice));
+//         // CHECK_CUDA(cudaMemcpy(&dst[ii*size_z], &src[ir*size_z], size_z*sizeof(double2), cudaMemcpyDeviceToDevice));
 //         ii++;
 //     }
 //     ModuleBase::timer::tick("Use_FFT","reorder_psi_minus");
@@ -90,9 +90,9 @@ void RoundTrip_kernel(const float2 *psi, const float *vr, const int *fft_index, 
     int block2 = (GlobalC::pw.nrxx + thread - 1) / thread;
     kernel_set<float2><<<block, thread>>>(GlobalC::wf.npw, psic, psi, fft_index);
 
-    // CUFFT_COMPLEX *ordered_psi;
-    // CHECK_CUDA(cudaMalloc((void**)&ordered_psi, GlobalC::pw.nrxx*sizeof(CUFFT_COMPLEX)));
-    // CHECK_CUDA(cudaMemset(ordered_psi, 0, GlobalC::pw.nrxx*sizeof(CUFFT_COMPLEX)));
+    // double2 *ordered_psi;
+    // CHECK_CUDA(cudaMalloc((void**)&ordered_psi, GlobalC::pw.nrxx*sizeof(double2)));
+    // CHECK_CUDA(cudaMemset(ordered_psi, 0, GlobalC::pw.nrxx*sizeof(double2)));
 
     // Reorder_psi_plus(ordered_psi, psic);
 
@@ -129,9 +129,9 @@ void RoundTrip_kernel(const double2 *psi, const double *vr, const int *fft_index
     int block2 = (GlobalC::pw.nrxx + thread - 1) / thread;
     kernel_set<double2><<<block, thread>>>(GlobalC::wf.npw, psic, psi, fft_index);
 
-    // CUFFT_COMPLEX *ordered_psi;
-    // CHECK_CUDA(cudaMalloc((void**)&ordered_psi, GlobalC::pw.nrxx*sizeof(CUFFT_COMPLEX)));
-    // CHECK_CUDA(cudaMemset(ordered_psi, 0, GlobalC::pw.nrxx*sizeof(CUFFT_COMPLEX)));
+    // double2 *ordered_psi;
+    // CHECK_CUDA(cudaMalloc((void**)&ordered_psi, GlobalC::pw.nrxx*sizeof(double2)));
+    // CHECK_CUDA(cudaMemset(ordered_psi, 0, GlobalC::pw.nrxx*sizeof(double2)));
 
     // Reorder_psi_plus(ordered_psi, psic);
 

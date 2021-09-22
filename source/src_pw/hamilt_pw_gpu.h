@@ -6,7 +6,6 @@
 #ifdef __CUDA
 #include "cufft.h"
 #include "cublas_v2.h"
-typedef cufftDoubleComplex CUFFT_COMPLEX;
 #endif
 
 class Hamilt_PW
@@ -58,9 +57,9 @@ public:
     
     void h_1psi_gpu(
         const int npw,
-        const CUFFT_COMPLEX *psi1d,
-        CUFFT_COMPLEX *hpsi,
-        CUFFT_COMPLEX *spsi);
+        const double2 *psi1d,
+        double2 *hpsi,
+        double2 *spsi);
 
     void h_1psi(
         const int npw,
@@ -74,8 +73,8 @@ public:
 		const int m = 1); 
     
     void h_psi_gpu(
-		const CUFFT_COMPLEX *psi,
-		CUFFT_COMPLEX *hpsi,
+		const double2 *psi,
+		double2 *hpsi,
 		const int m = 1); 
 
     void s_1psi_gpu(
@@ -85,8 +84,8 @@ public:
     
     void s_1psi_gpu(
         const int npw,
-        const CUFFT_COMPLEX *psi,
-        CUFFT_COMPLEX *spsi);
+        const double2 *psi,
+        double2 *spsi);
 
     void s_1psi(
         const int npw,
@@ -116,9 +115,9 @@ public:
 		const int m);
     
     void add_nonlocal_pp_gpu(
-		CUFFT_COMPLEX *hpsi_in,
-		const CUFFT_COMPLEX *becp,
-		const CUFFT_COMPLEX *d_vkb_c,
+		double2 *hpsi_in,
+		const double2 *becp,
+		const double2 *d_vkb_c,
 		const int m);
 
     void add_nonlocal_pp(
