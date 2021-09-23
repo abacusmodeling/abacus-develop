@@ -285,7 +285,11 @@ void MD_func::printpos(const std::string& file, const int& iter, const int& reco
 	ss << GlobalV::global_out_dir << "STRU_MD";
 
 	//zhengdy modify 2015-05-06, outputfile "STRU_Restart"
+#ifdef __LCAO
+	unit_in.print_stru_file(GlobalC::ORB, ss.str(),2);
+#else
 	unit_in.print_stru_file(ss.str(),2);
+#endif
 
 	return;
 }

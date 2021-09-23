@@ -178,6 +178,7 @@ void Input::Default(void)
 	trust_radius_max = 0.8; // bohr
 	trust_radius_min = 1e-5;
 	trust_radius_ini = 0.5; //bohr
+	nbspline = -1;
 //----------------------------------------------------------
 // ecutwfc
 //----------------------------------------------------------
@@ -510,7 +511,6 @@ bool Input::Read(const std::string &fn)
     }
 
     ifs.rdstate();
-	input_mag=false;
     while (ifs.good())
     {
         ifs >> word1;
@@ -897,6 +897,10 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("colour", word) == 0)
         {
             read_value(ifs, colour);
+        }
+		else if (strcmp("nbspline", word) == 0)
+        {
+            read_value(ifs, nbspline);
         }
         else if (strcmp("t_in_h", word) == 0)
         {
@@ -1712,7 +1716,7 @@ bool Input::Read(const std::string &fn)
 		{
 			read_value(ifs, soc_lambda);
 		}
-		else if (strcmp("angle1", word) == 0)
+/*		else if (strcmp("angle1", word) == 0)
 		{
 			angle1.resize(ntype);
 			for(auto &i:angle1)
@@ -1723,7 +1727,7 @@ bool Input::Read(const std::string &fn)
 			angle2.resize(ntype);
 			for (auto &i : angle2)
 				read_value(ifs, i);
-		}
+		}*/
         //else if (strcmp("epsilon0_choice", word) == 0)
         //{
         //    read_value(ifs, epsilon0_choice);
@@ -1742,6 +1746,7 @@ bool Input::Read(const std::string &fn)
 		}
 //---------------
 //start magnetic
+/*
 #ifndef __CMD
 		else if (strcmp("magmom", word) == 0)
 		{
@@ -1810,11 +1815,10 @@ bool Input::Read(const std::string &fn)
 				atom_mag[i]=mags[n_m];
 				cout<<"atom_mag"<<atom_mag[i];
 			}	
-	input_mag=true;
 	}
 
 #endif
-		
+*/		
 //--------------
 //----------------------------------------------------------------------------------
 //         Xin Qu added on 2020-10-29 for DFT+U
@@ -2185,6 +2189,7 @@ void Input::Bcast()
 	Parallel_Common::bcast_int( nb2d );
 	Parallel_Common::bcast_int( nurse );
 	Parallel_Common::bcast_bool( colour );
+	Parallel_Common::bcast_int( nbspline );
 	Parallel_Common::bcast_int( t_in_h );
 	Parallel_Common::bcast_int( vl_in_h );
 	Parallel_Common::bcast_int( vnl_in_h );

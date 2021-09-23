@@ -198,11 +198,11 @@ else()
   )
 endif()
 
-# if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+if(CMAKE_COMPILER_IS_GNUCXX)
 target_link_libraries(${ABACUS_BIN_NAME}
   -lgfortran
 )
-# endif()
+endif()
 
 if(ENABLE_DEEPKS)
   target_link_libraries(${ABACUS_BIN_NAME}

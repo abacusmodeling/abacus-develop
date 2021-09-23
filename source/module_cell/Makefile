@@ -29,7 +29,6 @@ VPATH=../module_base\
 :../src_pw\
 :../src_parallel\
 :./\
-:../\
 
 #==========================
 # Define HONG
@@ -37,7 +36,6 @@ VPATH=../module_base\
 HONG= -DMETIS -DMKL_ILP64 -D__MPI -D__CELL -D__NORMAL
 
 FP_OBJS_0=main.o\
-$(OBJS_MAIN)\
 $(OBJS_IO)\
 $(OBJS_PW)\
 $(OBJS_BASE)\

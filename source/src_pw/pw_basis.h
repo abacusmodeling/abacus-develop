@@ -122,17 +122,20 @@ public:
     int ngmw; // num. of G vectors within ggwfc2 in each proc.
 	// std::map: 1D G std::vector -> wave function in FFT grid
     int *ig2fftw; // dimension: [ngmw]
+    int nbspline;
 
 	// structure factor (ntype, ngmc)
     ModuleBase::ComplexMatrix strucFac;
-    void setup_structure_factor(void); 		// Calculate structur factors
+    void setup_structure_factor(void); 		// Calculate structure factors
+    void bspline_sf(const int); //calculate structure factors through Cardinal B-spline interpolation
+    void bsplinecoef(complex<double> *b1, complex<double> *b2, complex<double> *b3, const int norder);
 
 private:
 #ifdef __MPI
     void divide_fft_grid(void);
     void get_MPI_GVectors(void);
     void columns_and_pw_distribution_2(void);
-#else
+// #else
     void get_GVectors(void);
 #endif
 

@@ -86,6 +86,7 @@ math_polyint.o\
 math_integral.o\
 math_ylmreal.o\
 mathzone_add1.o\
+math_bspline.o\
 integral.o \
 polint.o \
 sph_bessel.o \
@@ -279,6 +280,7 @@ dftu_relax.o\
 OBJS_COMMON=atom_spec.o \
 unitcell.o \
 pw_basis.o\
+bspline_sf.o\
 hamilt.o \
 pw_complement.o\
 wf_local.o \
@@ -309,6 +311,7 @@ symmetry_rho.o \
 symm_other.o \
 eximport.o \
 mulliken_charge.o\
+setup_nonlocal.o\
 
 OBJS_PDIAG=pdgseps.o \
 pzgseps.o \
