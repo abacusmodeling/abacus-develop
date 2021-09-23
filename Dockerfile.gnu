@@ -24,7 +24,7 @@ RUN cd /tmp \
     && wget https://elpa.mpcdf.mpg.de/software/tarball-archive/Releases/2021.05.002/elpa-2021.05.002.tar.gz --no-check-certificate --quiet \
     && tar xzf elpa-2021.05.002.tar.gz && rm elpa-2021.05.002.tar.gz \
     && cd elpa-2021.05.002 && mkdir build && cd build \
-    && ../configure CFLAGS="-O3 -march=native -mavx2 -mfma -funsafe-loop-optimizations -funsafe-math-optimizations -ftree-vect-loop-version -ftree-vectorize" \
+    && ../configure CFLAGS="-O3 -march=native -funsafe-loop-optimizations -funsafe-math-optimizations -ftree-vect-loop-version -ftree-vectorize" \
     FCFLAGS="-O2 -mavx" \
     && make -j8 && make PREFIX=/usr/local install \
     && ln -s /usr/local/include/elpa-2021.05.002/elpa /usr/local/include/ \
