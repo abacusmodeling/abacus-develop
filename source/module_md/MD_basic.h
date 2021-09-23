@@ -33,7 +33,7 @@ class MD_basic
 	int step_rst_;
 	int step_;
 	double energy_;
-	int nfrozen_;
+	int frozen_freedom_;
 	double oldEtot_;
 
 	//allocable variaints
