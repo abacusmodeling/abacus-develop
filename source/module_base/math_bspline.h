@@ -4,11 +4,11 @@
 namespace ModuleBase
 {
 
-// qianrui add 2021-09-14
 
 //
 //DESCRIPTION:
 //   A class to treat Cardinal B-spline interpolation.
+//   qianrui created 2021-09-14
 //MATH:
 //   Only uniform nodes are considered: xm-x[m-1]=Dx(>= 0) for control node: X={x0,x1,...,xm};
 //   Any function p(x) can be written by
