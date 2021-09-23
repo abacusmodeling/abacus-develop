@@ -77,7 +77,6 @@ public:
     void print_cell(std::ofstream &ofs, output &outp)const;
     void print_cell_xyz(const std::string &fn)const;
     void print_cell_cif(const std::string &fn)const;
-    const double& getNelec(void)const {return electrons_number;}
 
     void update_pos_tau(const double* pos);
     void update_pos_taud(const ModuleBase::Vector3<double>* posd_in);
@@ -88,8 +87,6 @@ public:
     bool judge_big_cell(void);
 
 protected:
-
-    double electrons_number;
 
     double *atom_mass;
     std::string *atom_label;
