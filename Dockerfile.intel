@@ -35,13 +35,14 @@ ENV CC=/opt/intel/oneapi/mpi/latest/bin/mpiicc \
 SHELL ["/bin/bash", "-c"]
 RUN source /opt/intel/oneapi/setvars.sh \
 	&& cd /tmp \
-	&& git clone https://github.com/darelbeida/elpa.git -b ELPA_2016.05.004-openblas --single-branch --depth=1 \
-	&& cd elpa && mkdir build && cd build \
+	&& wget https://elpa.mpcdf.mpg.de/software/tarball-archive/Releases/2021.05.002/elpa-2021.05.002.tar.gz \
+	&& tar xzf elpa-2021.05.002.tar.gz  && rm elpa-2021.05.002.tar.gz \
+	&& cd elpa-2021.05.002 && mkdir build && cd build \
 	&& ../configure FCFLAGS="-mkl=cluster" \
 	&& make -j8 \
 	&& make PREFIX=/usr/local install \
-	&& ln -s /usr/local/include/elpa-2016.05.004/elpa /usr/local/include/ \
-	&& cd /tmp && rm -rf elpa
+	&& ln -s /usr/local/include/elpa-2021.05.002/elpa /usr/local/include/ \
+	&& cd /tmp && rm -rf elpa-2021.05.002
 
 RUN cd /tmp \
 	&& git clone https://github.com/USCiLab/cereal.git \
