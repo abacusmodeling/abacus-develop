@@ -1,6 +1,6 @@
 FROM debian:bullseye-slim
 
-RUN apt-get update && apt-get install -y bc cmake git gnupg gcc g++ sudo wget vim unzip
+RUN apt-get update && apt-get install -y bc cmake git gnupg gcc g++ python3 sudo wget vim unzip
 
 # Following steps by https://software.intel.com/content/www/us/en/develop/documentation/installation-guide-for-intel-oneapi-toolkits-linux/top/installation/install-using-package-managers/apt.html .
 RUN cd /tmp && \
