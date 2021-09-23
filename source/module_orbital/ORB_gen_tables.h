@@ -17,22 +17,22 @@ class ORB_gen_tables
 	public:
 
 	friend class ORB_control;
-	
+
 	ORB_gen_tables();
 	~ORB_gen_tables();
 
-	void gen_tables( 
+	void gen_tables(
 		std::ofstream &ofs_in, // mohan add 2021-05-07
-		const int &job0, 
+		const int &job0,
 		LCAO_Orbitals &orb,
 		const int &Lmax_exx,
 		const int& out_descriptor,///<[in] whether to generate descriptors
-		const int &nprojmax, 
+		const int &nprojmax,
 		const int* nproj,
 		const Numerical_Nonlocal* beta_
 	);
 	void set_unit(const double& v) { lat0 = v; }
-	
+
 	void snap_psipsi(
 		const LCAO_Orbitals &orb,
 		double olm[],
@@ -50,7 +50,7 @@ class ORB_gen_tables
 		const int &n2,
 		const int &nspin,
 		std::complex<double> *olm1=NULL)const;
-		
+
 
 	void snap_psibeta(
 		const LCAO_Orbitals &orb,
@@ -91,7 +91,29 @@ class ORB_gen_tables
 		const ModuleBase::Vector3<double> &R0, // The projector.
 		const int &T0,
 		const bool &calc_deri)const; // mohan add 2021-04-25);
-	/// set as public because in hamilt_linear, 
+	/// set as public because in hamilt_linear,
+#ifdef __DEEPKS
+    void snap_psialpha(
+        double nlm[],
+        const int& job,
+        const ModuleBase::Vector3<double>& R1,
+        const int& T1,
+        const int& L1,
+        const int& m1,
+        const int& N1,
+        const ModuleBase::Vector3<double>& R2,
+        const int& T2,
+        const int& L2,
+        const int& m2,
+        const int& N2,
+        const ModuleBase::Vector3<double>& R0, // The projector.
+        const int& T0,
+        const int& A0,  //gedm is related to specific atom
+        ModuleBase::IntArray* inl_index,
+        double** gedm    //Coefficient Matrix (non-diagonal)
+        ) const;
+#endif
+    /// set as public because in hamilt_linear,
 	/// we need to destroy the tables: SR,TR,NR
 	/// after ionic optimization is done.
 	ORB_table_phi MOT;
