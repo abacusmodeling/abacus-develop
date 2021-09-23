@@ -55,7 +55,7 @@ class Force_LCAO_k : public Force_LCAO_gamma
 
 	// calculate the force due to < phi | dbeta > < beta | phi >
 	void cal_fvnl_dbeta_k(double** dm2d, const bool isforce, const bool isstress, ModuleBase::matrix& fvnl_dbeta, ModuleBase::matrix& svnl_dbeta);
-
+	void cal_fvnl_dbeta_k_new(double** dm2d, const bool isforce, const bool isstress, ModuleBase::matrix& fvnl_dbeta, ModuleBase::matrix& svnl_dbeta);
 
 	void test(double* mm, const std::string &name);
 
