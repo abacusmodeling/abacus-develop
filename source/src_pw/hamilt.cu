@@ -126,8 +126,8 @@ void Hamilt::diagH_pw(
                     avg_iter += 1.0;
                 }
 
-                // Diago_CG_GPU<float, float2> f_cg_gpu;
-                Diago_CG_GPU<double, double2> d_cg_gpu;
+                // Diago_CG_CUDA<float, float2> f_cg_gpu;
+                Diago_CG_CUDA<double, double2> d_cg_gpu;
                 
 				bool reorder = true;
 

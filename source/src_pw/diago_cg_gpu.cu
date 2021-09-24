@@ -3,7 +3,7 @@
 #include "global.h"
 
 template<class T, class T2>
-int Diago_CG_GPU<T, T2>::moved = 0;
+int Diago_CG_CUDA<T, T2>::moved = 0;
 
 template<class T, class T2>
 __global__ void kernel_normalization(T2 *data, int size, T norm)
@@ -83,7 +83,7 @@ __global__ void kernel_multi_add(T2 *dst, T2 *src1, T a1, const T2 *src2, T a2, 
 }
 
 template<class T, class T2>
-Diago_CG_GPU<T, T2>::Diago_CG_GPU()
+Diago_CG_CUDA<T, T2>::Diago_CG_CUDA()
 {
     test_cg=0;
     cublasCreate(&diag_handle);
@@ -91,7 +91,7 @@ Diago_CG_GPU<T, T2>::Diago_CG_GPU()
 }
 
 template<class T, class T2>
-Diago_CG_GPU<T, T2>::~Diago_CG_GPU() 
+Diago_CG_CUDA<T, T2>::~Diago_CG_CUDA() 
 {
     cublasDestroy(diag_handle);
     // cublasDestroy(ddot_handle);
@@ -110,7 +110,7 @@ void test_print(T *data, int size)
 }
 
 template<class T, class T2>
-void Diago_CG_GPU<T, T2>::diag
+void Diago_CG_CUDA<T, T2>::diag
 (
     T2 *phi, // matrix nband*dim
     T *e,
@@ -128,8 +128,8 @@ void Diago_CG_GPU<T, T2>::diag
 
     // cout<<"begin diago fft dim"<<GlobalC::pw.nx<<" "<<GlobalC::pw.ny<<" "<<GlobalC::pw.nz<<endl;
     // cout << &GlobalC::pw << endl;
-    if (test_cg==1) ModuleBase::TITLE("Diago_CG_GPU","diag");
-    ModuleBase::timer::tick("Diago_CG_GPU","diag");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG_CUDA","diag");
+    ModuleBase::timer::tick("Diago_CG_CUDA","diag");
 
     avg_iter = 0.0;
     notconv = 0;
@@ -166,7 +166,7 @@ void Diago_CG_GPU<T, T2>::diag
     CHECK_CUDA(cudaMalloc((void**)&lagrange, n_band * sizeof(T2)));
     CHECK_CUDA(cudaMalloc((void**)&phi_m, dim * sizeof(T2)));
 
-    // timer::tick("Diago_CG_GPU","diag");
+    // timer::tick("Diago_CG_CUDA","diag");
 
 	// Init with ZERO ...
     // T em_host = 0;
@@ -284,7 +284,7 @@ void Diago_CG_GPU<T, T2>::diag
 
     avg_iter /= n_band;
 
-    // timer::tick("Diago_CG_GPU","diag");
+    // timer::tick("Diago_CG_CUDA","diag");
     CHECK_CUDA(cudaFree(lagrange));
     CHECK_CUDA(cudaFree(pphi));
     CHECK_CUDA(cudaFree(g0));
@@ -295,19 +295,19 @@ void Diago_CG_GPU<T, T2>::diag
     CHECK_CUDA(cudaFree(sphi));
     CHECK_CUDA(cudaFree(phi_m));
 
-    ModuleBase::timer::tick("Diago_CG_GPU","diag");
+    ModuleBase::timer::tick("Diago_CG_CUDA","diag");
     return;
 } // end subroutine ccgdiagg
 
 
 template<class T, class T2>
-void Diago_CG_GPU<T, T2>::calculate_gradient(
+void Diago_CG_CUDA<T, T2>::calculate_gradient(
     const T* precondition, const int dim,
     const T2 *hpsi, const T2 *spsi,
     T2 *g, T2 *ppsi)
 {
-    if (test_cg==1) ModuleBase::TITLE("Diago_CG_GPU","calculate_gradient");
-    ModuleBase::timer::tick("Diago_CG_GPU","calculate_grad");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG_CUDA","calculate_gradient");
+    ModuleBase::timer::tick("Diago_CG_CUDA","calculate_grad");
 
     int thread = 512;
     int block = (dim + thread - 1) / thread;
@@ -328,18 +328,18 @@ void Diago_CG_GPU<T, T2>::calculate_gradient(
     // Update g !
     kernel_get_gredient<T, T2><<<block, thread>>>(g, ppsi, dim, lambda);
     // kernel_multi_add<<<block, thread>>>(g, g, 1, ppsi, -lambda, dim);
-    ModuleBase::timer::tick("Diago_CG_GPU","calculate_grad");
+    ModuleBase::timer::tick("Diago_CG_CUDA","calculate_grad");
     return;
 }
 
 
 template<class T, class T2>
-void Diago_CG_GPU<T, T2>::orthogonal_gradient( const int &dim, const int &dmx,
+void Diago_CG_CUDA<T, T2>::orthogonal_gradient( const int &dim, const int &dmx,
                                     float2 *g, float2 *sg, float2 *lagrange,
                                     const float2 *eigenfunction, const int m)
 {
-    if (test_cg==1) ModuleBase::TITLE("Diago_CG_GPU","orthogonal_gradient");
-    ModuleBase::timer::tick("Diago_CG_GPU","orth_grad");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG_CUDA","orthogonal_gradient");
+    ModuleBase::timer::tick("Diago_CG_CUDA","orth_grad");
 
     GlobalC::hm.hpw.s_1psi_gpu(dim, g, sg);
 
@@ -381,18 +381,18 @@ void Diago_CG_GPU<T, T2>::orthogonal_gradient( const int &dim, const int &dmx,
         }
     }*/
 
-    ModuleBase::timer::tick("Diago_CG_GPU","orth_grad");
+    ModuleBase::timer::tick("Diago_CG_CUDA","orth_grad");
     // cublasDestroy(handle);
     return;
 }
 
 template<class T, class T2>
-void Diago_CG_GPU<T, T2>::orthogonal_gradient( const int &dim, const int &dmx,
+void Diago_CG_CUDA<T, T2>::orthogonal_gradient( const int &dim, const int &dmx,
                                     double2 *g, double2 *sg, double2 *lagrange,
                                     const double2 *eigenfunction, const int m)
 {
-    if (test_cg==1) ModuleBase::TITLE("Diago_CG_GPU","orthogonal_gradient");
-    ModuleBase::timer::tick("Diago_CG_GPU","orth_grad");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG_CUDA","orthogonal_gradient");
+    ModuleBase::timer::tick("Diago_CG_CUDA","orth_grad");
 
     GlobalC::hm.hpw.s_1psi_gpu(dim, g, sg);
 
@@ -434,13 +434,13 @@ void Diago_CG_GPU<T, T2>::orthogonal_gradient( const int &dim, const int &dmx,
         }
     }*/
 
-    ModuleBase::timer::tick("Diago_CG_GPU","orth_grad");
+    ModuleBase::timer::tick("Diago_CG_CUDA","orth_grad");
     // cublasDestroy(handle);
     return;
 }
 
 template<class T, class T2>
-void Diago_CG_GPU<T, T2>::calculate_gamma_cg(
+void Diago_CG_CUDA<T, T2>::calculate_gamma_cg(
     const int iter,
     const int dim,
     const T *precondition,
@@ -453,8 +453,8 @@ void Diago_CG_GPU<T, T2>::calculate_gamma_cg(
     const T &theta,
     const T2 *psi_m)
 {
-    if (test_cg==1) ModuleBase::TITLE("Diago_CG_GPU","calculate_gamma_cg");
-    ModuleBase::timer::tick("Diago_CG_GPU","gamma_cg");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG_CUDA","calculate_gamma_cg");
+    ModuleBase::timer::tick("Diago_CG_CUDA","gamma_cg");
     T gg_inter;
     if (iter>0)
     {
@@ -520,13 +520,13 @@ void Diago_CG_GPU<T, T2>::calculate_gamma_cg(
 
         kernel_get_normacg<T, T2><<<block, thread>>>(dim, cg, psi_m, norma);
     }
-    ModuleBase::timer::tick("Diago_CG_GPU","gamma_cg");
+    ModuleBase::timer::tick("Diago_CG_CUDA","gamma_cg");
     return;
 }
 
 
 template<class T, class T2>
-bool Diago_CG_GPU<T, T2>::update_psi(
+bool Diago_CG_CUDA<T, T2>::update_psi(
     const int dim,
     T &cg_norm,
     T &theta,
@@ -539,8 +539,8 @@ bool Diago_CG_GPU<T, T2>::update_psi(
     T2 *hpsi,
     T2 *sphi)
 {
-    if (test_cg==1) ModuleBase::TITLE("Diago_CG_GPU","update_psi");
-    ModuleBase::timer::tick("Diago_CG_GPU","update_psi");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG_CUDA","update_psi");
+    ModuleBase::timer::tick("Diago_CG_CUDA","update_psi");
     int thread = 512;
     int block = (dim + thread - 1) / thread;
     // pw.h_1psi(dim, cg, hcg, scg); // TODO
@@ -590,7 +590,7 @@ bool Diago_CG_GPU<T, T2>::update_psi(
 
     if ( abs(eigenvalue-e0)< threshold)
     {
-        ModuleBase::timer::tick("Diago_CG_GPU","update_psi");
+        ModuleBase::timer::tick("Diago_CG_CUDA","update_psi");
         return 1;
     }
     else
@@ -602,13 +602,13 @@ bool Diago_CG_GPU<T, T2>::update_psi(
         // }
         kernel_multi_add<T, T2><<<block, thread>>>(sphi, sphi, cost, scg, sint_norm, dim);
         kernel_multi_add<T, T2><<<block, thread>>>(hpsi, hpsi, cost, hcg, sint_norm, dim);
-        ModuleBase::timer::tick("Diago_CG_GPU","update_psi");
+        ModuleBase::timer::tick("Diago_CG_CUDA","update_psi");
         return 0;
     }
 }
 
 template<class T, class T2>
-void Diago_CG_GPU<T, T2>::schmit_orth
+void Diago_CG_CUDA<T, T2>::schmit_orth
 (
     const int& dim,
     const int& dmx,
@@ -618,7 +618,7 @@ void Diago_CG_GPU<T, T2>::schmit_orth
     float2 *psi_m
 )
 {
-    ModuleBase::timer::tick("Diago_CG_GPU","schmit_orth");
+    ModuleBase::timer::tick("Diago_CG_CUDA","schmit_orth");
     assert( m >= 0 );
     // cout<<"orth, dim="<<dim<<endl;
 
@@ -652,13 +652,13 @@ void Diago_CG_GPU<T, T2>::schmit_orth
     GlobalC::hm.hpw.s_1psi_gpu(dim, psi_m, sphi);
 
     // cublasDestroy(handle);
-    ModuleBase::timer::tick("Diago_CG_GPU","schmit_orth");
+    ModuleBase::timer::tick("Diago_CG_CUDA","schmit_orth");
     CHECK_CUDA(cudaFree(lagrange));
     return ;
 }
 
 template<class T, class T2>
-void Diago_CG_GPU<T, T2>::schmit_orth
+void Diago_CG_CUDA<T, T2>::schmit_orth
 (
     const int& dim,
     const int& dmx,
@@ -668,7 +668,7 @@ void Diago_CG_GPU<T, T2>::schmit_orth
     double2 *psi_m
 )
 {
-    ModuleBase::timer::tick("Diago_CG_GPU","schmit_orth");
+    ModuleBase::timer::tick("Diago_CG_CUDA","schmit_orth");
     assert( m >= 0 );
     // cout<<"orth, dim="<<dim<<endl;
 
@@ -702,13 +702,13 @@ void Diago_CG_GPU<T, T2>::schmit_orth
     GlobalC::hm.hpw.s_1psi_gpu(dim, psi_m, sphi);
 
     // cublasDestroy(handle);
-    ModuleBase::timer::tick("Diago_CG_GPU","schmit_orth");
+    ModuleBase::timer::tick("Diago_CG_CUDA","schmit_orth");
     CHECK_CUDA(cudaFree(lagrange));
     return ;
 }
 
 template<class T, class T2>
-float Diago_CG_GPU<T, T2>::ddot_real
+float Diago_CG_CUDA<T, T2>::ddot_real
 (
     const int &dim,
     const float2* psi_L,
@@ -723,7 +723,7 @@ float Diago_CG_GPU<T, T2>::ddot_real
 }
 
 template<class T, class T2>
-double Diago_CG_GPU<T, T2>::ddot_real
+double Diago_CG_CUDA<T, T2>::ddot_real
 (
     const int &dim,
     const double2* psi_L,
@@ -739,7 +739,7 @@ double Diago_CG_GPU<T, T2>::ddot_real
 
 
 template<class T, class T2>
-float2 Diago_CG_GPU<T, T2>::ddot
+float2 Diago_CG_CUDA<T, T2>::ddot
 (
     const int & dim,
     const float2 * psi_L,
@@ -752,7 +752,7 @@ float2 Diago_CG_GPU<T, T2>::ddot
 }  // end of ddot
 
 template<class T, class T2>
-double2 Diago_CG_GPU<T, T2>::ddot
+double2 Diago_CG_CUDA<T, T2>::ddot
 (
     const int & dim,
     const double2 * psi_L,
@@ -766,7 +766,7 @@ double2 Diago_CG_GPU<T, T2>::ddot
 
 
 template<class T, class T2>
-float2 Diago_CG_GPU<T, T2>::ddot
+float2 Diago_CG_CUDA<T, T2>::ddot
 (
     const int & dim,
     const float2 *psi, //complex
@@ -785,7 +785,7 @@ float2 Diago_CG_GPU<T, T2>::ddot
 }  // end of ddot
 
 template<class T, class T2>
-double2 Diago_CG_GPU<T, T2>::ddot
+double2 Diago_CG_CUDA<T, T2>::ddot
 (
     const int & dim,
     const double2 *psi, //complex
@@ -806,7 +806,7 @@ double2 Diago_CG_GPU<T, T2>::ddot
 
 // this return <psi_L(m) | psi_R(n)>
 template<class T, class T2>
-float2 Diago_CG_GPU<T, T2>::ddot
+float2 Diago_CG_CUDA<T, T2>::ddot
 (
     const int & dim,
     const float2 *psi_L,
@@ -827,7 +827,7 @@ float2 Diago_CG_GPU<T, T2>::ddot
 } // end of ddot
 
 template<class T, class T2>
-double2 Diago_CG_GPU<T, T2>::ddot
+double2 Diago_CG_CUDA<T, T2>::ddot
 (
     const int & dim,
     const double2 *psi_L,
@@ -847,5 +847,5 @@ double2 Diago_CG_GPU<T, T2>::ddot
     return result;
 } // end of ddot
 
-template class Diago_CG_GPU<double, double2>;
-// template class Diago_CG_GPU<float, float2>;
+template class Diago_CG_CUDA<double, double2>;
+// template class Diago_CG_CUDA<float, float2>;

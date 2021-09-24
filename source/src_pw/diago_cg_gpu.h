@@ -6,12 +6,12 @@
 #include "cublas_v2.h"
 
 template<class T, class T2>
-class Diago_CG_GPU
+class Diago_CG_CUDA
 {
 public:
 
-    Diago_CG_GPU();
-    ~Diago_CG_GPU();
+    Diago_CG_CUDA();
+    ~Diago_CG_CUDA();
 
     static int moved;
 

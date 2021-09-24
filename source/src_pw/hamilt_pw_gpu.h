@@ -37,7 +37,7 @@ public:
 
 	friend class Diago_David;
 	// friend class Diago_CG;
-    template<class T, class T2> friend class Diago_CG_GPU;
+    template<class T, class T2> friend class Diago_CG_CUDA;
 	friend class Exx_Lip;
 	friend class Hamilt;
     friend class Stochastic_Iter;

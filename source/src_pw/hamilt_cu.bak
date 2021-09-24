@@ -2,7 +2,7 @@
 #include "global.h"
 #include "hamilt.h"
 #include "diago_cg.h"
-#include "diago_cg_gpu.h" // Diago_CG_GPU
+#include "diago_cg_gpu.h" // Diago_CG_CUDA
 #include "diago_david.h"
 #include "cuda_runtime.h"
 #include "time.h"
@@ -86,7 +86,7 @@ void Hamilt::diagH_pw(
                     avg_iter += 1.0;
                 }
                 // Diago_CG cg;
-    	        Diago_CG_GPU cg_gpu;
+    	        Diago_CG_CUDA cg_gpu;
 				bool reorder = true;
 
                 CUFFT_COMPLEX *d_wf_evc;
