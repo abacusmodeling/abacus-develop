@@ -43,7 +43,7 @@
 
     - [Molecular dynamics](#molecular-dynamics)
 
-        [md_type](#md-type) | [md_potential](#md-potential) | [md_rstmd](#md-rstmd) | [md_dt](#md-dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_dumpmdfred](#md-dumpmdfred) | [md_fixtemperature](#md-fixtemperature) | [NVT_control](#nvt-control) | [NVT_tau](#nvt-tau) | [MNHC](#mnhc) | [md_ediff](#md-ediff) | [md_ediffg](#md-ediffg) | [rcut_lj](#rcut_lj) | [epsilon_lj](#epsilon_lj) | [sigma_lj](#sigma_lj)
+        [md_type](#md-type) | [md_potential](#md-potential) | [md_rstmd](#md-rstmd) | [md_dt](#md_dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_dumpmdfred](#md-dumpmdfred) | [md_fixtemperature](#md-fixtemperature) | [NVT_control](#nvt-control) | [NVT_tau](#nvt-tau) | [MNHC](#mnhc) | [md_ediff](#md-ediff) | [md_ediffg](#md-ediffg) | [rcut_lj](#rcut_lj) | [epsilon_lj](#epsilon_lj) | [sigma_lj](#sigma_lj)
 
     - [DFT+U correction](#DFT_U-correction)
 
