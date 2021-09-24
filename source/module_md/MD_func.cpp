@@ -157,7 +157,7 @@ void MD_func::InitVelocity(
 			}
 		}
       
-		int ion;
+		int ion = 0;
 		for(ion=0;ion<numIon;ion++){
 			vel[ion]/=sqrt(allmass[ion]*9.01938e-31);				 
 		}

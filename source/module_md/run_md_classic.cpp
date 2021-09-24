@@ -126,7 +126,8 @@ void Run_MD_CLASSIC::md_force_stress(double &potential)
 			potential = LJ_potential::Lennard_Jones(
 								this->ucell_c,
 								grid_neigh,
-								this->force);
+								this->force,
+								this->stress);
 		}
 	}
 	else if(INPUT.mdp.md_potential == "DP")

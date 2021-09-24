@@ -14,6 +14,12 @@ MD_basic::MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
 	temperature_=mdp.tfirst/3.1577464e5;
 
 
+    // CMD parameters
+    mdp.rcut_lj *= ModuleBase::ANGSTROM_AU;
+	mdp.epsilon_lj /= ModuleBase::Ry_to_eV;
+	mdp.sigma_lj *= ModuleBase::ANGSTROM_AU;
+
+
 	//other parameter default
 	outputstressperiod_ = 1 ;// The period to output stress
 //	ucell.nat=ucell.nat;

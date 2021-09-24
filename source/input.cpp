@@ -1257,17 +1257,14 @@ bool Input::Read(const std::string &fn)
 		else if (strcmp("rcut_lj",word) == 0)
 		{
 			read_value(ifs, mdp.rcut_lj);
-			mdp.rcut_lj*=ModuleBase::ANGSTROM_AU;
 		}
 		else if (strcmp("epsilon_lj",word) == 0)
 		{
 			read_value(ifs, mdp.epsilon_lj);
-			mdp.epsilon_lj/=ModuleBase::Ry_to_eV;
 		}
 		else if (strcmp("sigma_lj",word) == 0)
 		{
 			read_value(ifs, mdp.sigma_lj);
-			mdp.sigma_lj*=ModuleBase::ANGSTROM_AU;
 		}
 		else if (strcmp("md_potential",word) == 0)
 		{
