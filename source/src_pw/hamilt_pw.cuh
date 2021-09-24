@@ -49,13 +49,13 @@ public:
                   ModuleBase::ComplexMatrix &evc,
                   double *en);
 
-    void h_1psi_gpu(
+    void h_1psi_cuda(
         const int npw,
         const float2 *psi1d,
         float2 *hpsi,
         float2 *spsi);
     
-    void h_1psi_gpu(
+    void h_1psi_cuda(
         const int npw,
         const double2 *psi1d,
         double2 *hpsi,
@@ -67,22 +67,22 @@ public:
         std::complex<double> *hpsi,
         std::complex<double> *spsi);
 
-    void h_psi_gpu(
+    void h_psi_cuda(
 		const float2 *psi,
 		float2 *hpsi,
 		const int m = 1); 
     
-    void h_psi_gpu(
+    void h_psi_cuda(
 		const double2 *psi,
 		double2 *hpsi,
 		const int m = 1); 
 
-    void s_1psi_gpu(
+    void s_1psi_cuda(
         const int npw,
         const float2 *psi,
         float2 *spsi);
     
-    void s_1psi_gpu(
+    void s_1psi_cuda(
         const int npw,
         const double2 *psi,
         double2 *spsi);
@@ -108,13 +108,13 @@ public:
 
 	// add contributions of h*psi from
 	// non-local pseduopotentials
-	void add_nonlocal_pp_gpu(
+	void add_nonlocal_pp_cuda(
 		float2 *hpsi_in,
 		const float2 *becp,
 		const float2 *d_vkb_c,
 		const int m);
     
-    void add_nonlocal_pp_gpu(
+    void add_nonlocal_pp_cuda(
 		double2 *hpsi_in,
 		const double2 *becp,
 		const double2 *d_vkb_c,

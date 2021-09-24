@@ -3,7 +3,7 @@
 
 #include "tools.h"
 #ifdef __CUDA
-#include "hamilt_pw_gpu.h"
+#include "hamilt_pw.cuh"
 #else
 #include "hamilt_pw.h"
 #endif

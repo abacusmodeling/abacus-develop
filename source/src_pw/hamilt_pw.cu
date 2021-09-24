@@ -1,6 +1,6 @@
 #include "tools.h"
 #include "global.h"
-#include "hamilt_pw_gpu.h"
+#include "hamilt_pw.cuh"
 #include "../module_base/blas_connector.h"
 #include "../src_io/optical.h" // only get judgement to calculate optical matrix or not.
 #include "myfunc.h"
@@ -442,10 +442,10 @@ void Hamilt_PW::diagH_subspace(
     return;
 }
 
-void Hamilt_PW::h_1psi_gpu( const int npw_in, const float2 *psi,
+void Hamilt_PW::h_1psi_cuda( const int npw_in, const float2 *psi,
                         float2 *hpsi, float2 *spsi)
 {
-    this->h_psi_gpu(psi, hpsi);
+    this->h_psi_cuda(psi, hpsi);
 
     int thread = 512;
     int block = (npw_in + thread - 1) / thread;
@@ -453,10 +453,10 @@ void Hamilt_PW::h_1psi_gpu( const int npw_in, const float2 *psi,
     return;
 }
 
-void Hamilt_PW::h_1psi_gpu( const int npw_in, const double2 *psi,
+void Hamilt_PW::h_1psi_cuda( const int npw_in, const double2 *psi,
 	double2 *hpsi, double2 *spsi)
 {
-	this->h_psi_gpu(psi, hpsi);
+	this->h_psi_cuda(psi, hpsi);
 
 	int thread = 512;
 	int block = (npw_in + thread - 1) / thread;
@@ -464,13 +464,13 @@ void Hamilt_PW::h_1psi_gpu( const int npw_in, const double2 *psi,
 	return;
 }
 
-void Hamilt_PW::s_1psi_gpu(const int dim, const float2 *psi, float2 *spsi)
+void Hamilt_PW::s_1psi_cuda(const int dim, const float2 *psi, float2 *spsi)
 {
     CHECK_CUDA(cudaMemcpy(spsi, psi, dim*sizeof(float2), cudaMemcpyDeviceToDevice));
     return;
 }
 
-void Hamilt_PW::s_1psi_gpu(const int dim, const double2 *psi, double2 *spsi)
+void Hamilt_PW::s_1psi_cuda(const int dim, const double2 *psi, double2 *spsi)
 {
     CHECK_CUDA(cudaMemcpy(spsi, psi, dim*sizeof(double2), cudaMemcpyDeviceToDevice));
     return;
@@ -503,7 +503,7 @@ void Hamilt_PW::s_1psi
 	return;
 }
 
-void Hamilt_PW::h_psi_gpu(const float2 *psi_in, float2 *hpsi, const int m)
+void Hamilt_PW::h_psi_cuda(const float2 *psi_in, float2 *hpsi, const int m)
 {
     ModuleBase::timer::tick("Hamilt_PW_GPU","h_psi");
     // int i = 0;
@@ -696,7 +696,7 @@ void Hamilt_PW::h_psi_gpu(const float2 *psi_in, float2 *hpsi, const int m)
 			// cout<<"===== becp before add nonloaclpp ===="<<endl;
 			// print_test<float2>(becp, 15);
 
-            this->add_nonlocal_pp_gpu(hpsi, becp, f_vkb_c, m);
+            this->add_nonlocal_pp_cuda(hpsi, becp, f_vkb_c, m);
 
             // cublasDestroy(handle);
             CHECK_CUDA(cudaFree(becp));
@@ -721,7 +721,7 @@ void Hamilt_PW::h_psi_gpu(const float2 *psi_in, float2 *hpsi, const int m)
     return;
 }
 
-void Hamilt_PW::h_psi_gpu(const double2 *psi_in, double2 *hpsi, const int m)
+void Hamilt_PW::h_psi_cuda(const double2 *psi_in, double2 *hpsi, const int m)
 {
     ModuleBase::timer::tick("Hamilt_PW_GPU","h_psi");
     // int i = 0;
@@ -892,7 +892,7 @@ void Hamilt_PW::h_psi_gpu(const double2 *psi_in, double2 *hpsi, const int m)
 			// cout<<"===== becp before add nonloaclpp ===="<<endl;
 			// print_test<double2>(becp, 15);
 
-            this->add_nonlocal_pp_gpu(hpsi, becp, d_vkb_c, m);
+            this->add_nonlocal_pp_cuda(hpsi, becp, d_vkb_c, m);
 
             // cublasDestroy(handle);
             CHECK_CUDA(cudaFree(becp));
@@ -1133,13 +1133,13 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 }
 
 
-void Hamilt_PW::add_nonlocal_pp_gpu(
+void Hamilt_PW::add_nonlocal_pp_cuda(
 	float2 *hpsi_in,
 	const float2 *becp,
     const float2 *f_vkb_c,
 	const int m)
 {
-    ModuleBase::timer::tick("Hamilt_PW","add_nonlocal_pp_gpu");
+    ModuleBase::timer::tick("Hamilt_PW","add_nonlocal_pp_cuda");
 
 	// number of projectors
 	int nkb = GlobalC::ppcell.nkb;
@@ -1246,17 +1246,17 @@ void Hamilt_PW::add_nonlocal_pp_gpu(
 	// delete[] ps;
     CHECK_CUDA(cudaFree(ps));
 	// cublasDestroy(handle);
-    ModuleBase::timer::tick("Hamilt_PW","add_nonlocal_pp_gpu");
+    ModuleBase::timer::tick("Hamilt_PW","add_nonlocal_pp_cuda");
     return;
 }
 
-void Hamilt_PW::add_nonlocal_pp_gpu(
+void Hamilt_PW::add_nonlocal_pp_cuda(
 	double2 *hpsi_in,
 	const double2 *becp,
     const double2 *d_vkb_c,
 	const int m)
 {
-    ModuleBase::timer::tick("Hamilt_PW","add_nonlocal_pp_gpu");
+    ModuleBase::timer::tick("Hamilt_PW","add_nonlocal_pp_cuda");
 
 	// number of projectors
 	int nkb = GlobalC::ppcell.nkb;
@@ -1356,7 +1356,7 @@ void Hamilt_PW::add_nonlocal_pp_gpu(
 	// delete[] ps;
     CHECK_CUDA(cudaFree(ps));
 	// cublasDestroy(handle);
-    ModuleBase::timer::tick("Hamilt_PW","add_nonlocal_pp_gpu");
+    ModuleBase::timer::tick("Hamilt_PW","add_nonlocal_pp_cuda");
     return;
 }
 

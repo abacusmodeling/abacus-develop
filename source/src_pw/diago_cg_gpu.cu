@@ -179,14 +179,14 @@ void Diago_CG_CUDA<T, T2>::diag
         CHECK_CUDA(cudaMemcpy(phi_m, &phi[m*dmx], dim*sizeof(T2), cudaMemcpyDeviceToDevice));
 
         // CHECK_CUDA(cudaMemcpy(sphi, phi_m, dim * sizeof(T2), cudaMemcpyDeviceToDevice));
-        GlobalC::hm.hpw.s_1psi_gpu(dim, phi_m, sphi);
+        GlobalC::hm.hpw.s_1psi_cuda(dim, phi_m, sphi);
 
         this->schmit_orth(dim, dmx, m, phi, sphi, phi_m);
 
         // cout<<"====phi_m after schmit===="<<endl;
         // test_print<T2>(phi_m, 15);
 
-        GlobalC::hm.hpw.h_1psi_gpu(dim, phi_m, hphi, sphi);
+        GlobalC::hm.hpw.h_1psi_cuda(dim, phi_m, hphi, sphi);
 
         // cout<<"====hphi after hpsi===="<<endl;
         // test_print<T2>(hphi, 15);
@@ -341,7 +341,7 @@ void Diago_CG_CUDA<T, T2>::orthogonal_gradient( const int &dim, const int &dmx,
     if (test_cg==1) ModuleBase::TITLE("Diago_CG_CUDA","orthogonal_gradient");
     ModuleBase::timer::tick("Diago_CG_CUDA","orth_grad");
 
-    GlobalC::hm.hpw.s_1psi_gpu(dim, g, sg);
+    GlobalC::hm.hpw.s_1psi_cuda(dim, g, sg);
 
     int inc=1;
 
@@ -394,7 +394,7 @@ void Diago_CG_CUDA<T, T2>::orthogonal_gradient( const int &dim, const int &dmx,
     if (test_cg==1) ModuleBase::TITLE("Diago_CG_CUDA","orthogonal_gradient");
     ModuleBase::timer::tick("Diago_CG_CUDA","orth_grad");
 
-    GlobalC::hm.hpw.s_1psi_gpu(dim, g, sg);
+    GlobalC::hm.hpw.s_1psi_cuda(dim, g, sg);
 
     int inc=1;
 
@@ -545,7 +545,7 @@ bool Diago_CG_CUDA<T, T2>::update_psi(
     int block = (dim + thread - 1) / thread;
     // pw.h_1psi(dim, cg, hcg, scg); // TODO
     // to cpu
-    GlobalC::hm.hpw.h_1psi_gpu(dim, cg, hcg, scg);
+    GlobalC::hm.hpw.h_1psi_cuda(dim, cg, hcg, scg);
     // hpsi end
 
     cg_norm = sqrt( this->ddot_real(dim, cg, scg) );
@@ -649,7 +649,7 @@ void Diago_CG_CUDA<T, T2>::schmit_orth
     int block = (dim + thread - 1) / thread;
     kernel_normalization<float, float2><<<block, thread>>>(psi_m, dim, psi_norm);
 
-    GlobalC::hm.hpw.s_1psi_gpu(dim, psi_m, sphi);
+    GlobalC::hm.hpw.s_1psi_cuda(dim, psi_m, sphi);
 
     // cublasDestroy(handle);
     ModuleBase::timer::tick("Diago_CG_CUDA","schmit_orth");
@@ -699,7 +699,7 @@ void Diago_CG_CUDA<T, T2>::schmit_orth
     int block = (dim + thread - 1) / thread;
     kernel_normalization<double, double2><<<block, thread>>>(psi_m, dim, psi_norm);
 
-    GlobalC::hm.hpw.s_1psi_gpu(dim, psi_m, sphi);
+    GlobalC::hm.hpw.s_1psi_cuda(dim, psi_m, sphi);
 
     // cublasDestroy(handle);
     ModuleBase::timer::tick("Diago_CG_CUDA","schmit_orth");
