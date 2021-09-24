@@ -1,4 +1,4 @@
-#include "diago_cg_gpu.h"
+#include "diago_cg.cuh"
 #include "cuda_runtime.h"
 #include "global.h"
 

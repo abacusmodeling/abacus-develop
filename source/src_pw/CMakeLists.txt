@@ -59,7 +59,7 @@ list(APPEND objects
     run_md_pw.cpp)
 if(USE_CUDA)
     list(APPEND objects
-        diago_cg_gpu.cu
+        diago_cg.cu
         hamilt.cu
         hamilt_pw.cu
         use_fft_kernel.cu

@@ -48,7 +48,6 @@ class Hamilt
 		ModuleBase::ComplexMatrix &hvec); // output: eigenvectors
 
     Hamilt_PW hpw;
-	// Hamilt_PW_GPU hpw_gpu;
 
 private:
 

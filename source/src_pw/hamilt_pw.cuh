@@ -1,5 +1,5 @@
-#ifndef HAMILT_PW_GPU_H
-#define HAMILT_PW_GPU_H
+#ifndef HAMILT_PW_CUH
+#define HAMILT_PW_CUH
 
 #include "tools.h"
 
