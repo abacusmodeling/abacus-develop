@@ -11,22 +11,19 @@ MD_basic::MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     ucell(unit_in)
 {	
 	mdp.dt=mdp.dt/fundamentalTime/1e15;
-	temperature_=mdp.tfirst/3.1577464e5;
+	temperature_=mdp.tfirst/ModuleBase::Hartree_to_K;
 
 
     // CMD parameters
     mdp.rcut_lj *= ModuleBase::ANGSTROM_AU;
-	mdp.epsilon_lj /= ModuleBase::Ry_to_eV;
+	mdp.epsilon_lj /= ModuleBase::Hartree_to_eV;
 	mdp.sigma_lj *= ModuleBase::ANGSTROM_AU;
 
 
 	//other parameter default
 	outputstressperiod_ = 1 ;// The period to output stress
-//	ucell.nat=ucell.nat;
-//	ntype=ucell.ntype;
 	step_rst_=0;
     step_=0;
-//	ucell.latvec=ucell.latvec;
 
     vel=new ModuleBase::Vector3<double>[ucell.nat]; 
 	cart_change=new ModuleBase::Vector3<double>[ucell.nat];
@@ -36,7 +33,23 @@ MD_basic::MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
 	//force=new ModuleBase::Vector3<double>[ucell.nat];
 
     nfrozen_ = mdf.getMassMbl(ucell, allmass, ionmbl);
-    mdf.InitVelocity(ucell.nat, temperature_, fundamentalTime, allmass, vel);
+    if (ucell.set_vel)    //  Yuanbo Li 2021-08-01
+    {
+        int iat=0;    //initialize velocity of atoms from STRU  liuyu 2021-07-14
+        for(int it=0; it<ucell.ntype; ++it)
+        {
+            for(int ia=0; ia<ucell.atoms[it].na; ++ia)
+            {
+                vel[iat] = ucell.atoms[it].vel[ia];
+                ++iat;
+            }
+        }
+        assert(iat==ucell.nat);
+    }
+    else
+    {
+        mdf.InitVelocity(ucell.nat, temperature_, fundamentalTime, allmass, vel);
+    }
 
     //MD starting setup
     if(mdp.rstMD)
@@ -78,21 +91,7 @@ MD_basic::MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
 	//tau = 1.0/(NVT_tau*fundamentalTime*1e15);
 	// Q=KbT*tau**2
         
-    if (ucell.set_vel)    //  Yuanbo Li 2021-08-01
-    {
-        int iat=0;    //initialize velocity of atoms from STRU  liuyu 2021-07-14
-        for(int it=0; it<ucell.ntype; ++it)
-        {
-            for(int ia=0; ia<ucell.atoms[it].na; ++ia)
-            {
-                vel[iat] = ucell.atoms[it].vel[ia];
-                ++iat;
-            }
-        }
-        assert(iat==ucell.nat);
-    }   
-        
-    mdp.Qmass=mdp.Qmass/6.02/9.109*1e5;
+    mdp.Qmass=mdp.Qmass/ModuleBase::AU_to_MASS;
 	if(mdp.Qmass<1e-10)
     {
         mdp.Qmass = pow(mdp.NVT_tau,2)*temperature_;///beta;
@@ -621,8 +620,8 @@ void MD_basic::outStressMD(const ModuleBase::matrix& stress, const double& twice
         press += stress(i,i)/3;
     }
     double press_no = press;
-    press += 2*twiceKE/3/ucell.omega; //output virtual press = 2/3 *Ek/V + sum(sigma[i][i])/3
-    const double unit_transform = ModuleBase::RYDBERG_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8 ;
+    press += twiceKE/3/ucell.omega; //output virtual press = 2/3 *Ek/V + sum(sigma[i][i])/3
+    const double unit_transform = ModuleBase::HARTREE_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8 ;
     GlobalV::ofs_running<<"Virtual Pressure is "<<press*unit_transform<<" Kbar "<<std::endl;
     GlobalV::ofs_running<<"Virial is "<<press_no*unit_transform<<" Kbar "<<std::endl;
 }

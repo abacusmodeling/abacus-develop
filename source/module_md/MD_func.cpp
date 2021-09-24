@@ -110,6 +110,37 @@ double MD_func::GetAtomKE(const int& numIon, const ModuleBase::Vector3<double>* 
 	return ke;
 }
 
+void MD_func::InitVel(
+	const int& numIon, 
+	const double& temperature, 
+	const double& fundamentalTime, 
+	const double* allmass,
+	ModuleBase::Vector3<double>* vel)
+{
+	if(!GlobalV::MY_RANK)
+	{
+		srand(time(0));
+		ModuleBase::Vector3<double> average; 
+		average.set(0,0,0);
+
+		for(int i=0; i<numIon; ++i)
+		{
+			vel[i].x = rand()/double(RAND_MAX)-0.5;
+			vel[i].y = rand()/double(RAND_MAX)-0.5;
+			vel[i].z = rand()/double(RAND_MAX)-0.5;
+			average = average + vel[i];
+		}
+
+
+	}
+
+
+#ifdef __MPI
+	MPI_Bcast(vel,numIon*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
+#endif
+	return;
+}
+
 void MD_func::InitVelocity(
 	const int& numIon, 
 	const double& temperature, 
@@ -253,7 +284,7 @@ int MD_func::getMassMbl(const UnitCell_pseudo &unit_in, double* allmass, ModuleB
 	int nfrozen=0;
 	for(int it=0;it<unit_in.ntype;it++){
 		for(int i=0;i<unit_in.atoms[it].na;i++){
-			allmass[ion]=unit_in.atoms[it].mass/6.02/9.109*1e5;
+			allmass[ion]=unit_in.atoms[it].mass/ModuleBase::AU_to_MASS;
 			ionmbl[ion]=unit_in.atoms[it].mbl[i];
 			if (ionmbl[ion].x==0||ionmbl[ion].y==0||ionmbl[ion].z==0) nfrozen++;
 

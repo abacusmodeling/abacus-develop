@@ -12,7 +12,6 @@ epsilon_lj      0.01062
 sigma_lj        3.360
 
 force           1
-stress          1
 
 md_mdtype       1
 md_dt           10

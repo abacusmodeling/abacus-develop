@@ -33,8 +33,8 @@ void DP_potential::DP_pot(UnitCell_pseudo &ucell_c, double &potential, ModuleBas
 
     potential/=ModuleBase::Ry_to_eV;
 
-    double fact_f = ModuleBase::ANGSTROM_AU*ModuleBase::Ry_to_eV;
-    double fact_v = ModuleBase::ANGSTROM_AU*pow(ModuleBase::Ry_to_eV, 3);
+    double fact_f = ModuleBase::Hartree_to_eV*ModuleBase::ANGSTROM_AU;
+    double fact_v = ModuleBase::Hartree_to_eV*pow(ModuleBase::ANGSTROM_AU, 3);
 
     for(int i=0; i<ucell_c.nat;  ++i)
     {

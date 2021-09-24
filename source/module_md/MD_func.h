@@ -19,6 +19,13 @@ class MD_func
 		const double& fundamentalTime, 
 		const double* allmass,
 		ModuleBase::Vector3<double>* vel);
+	
+	void MD_func::InitVel(
+		const int& numIon, 
+		const double& temperature, 
+		const double& fundamentalTime, 
+		const double* allmass,
+		ModuleBase::Vector3<double>* vel);
 
 //	void ReadNewTemp(int step);
 	std::string intTurnTostring(long int iter,std::string path);
