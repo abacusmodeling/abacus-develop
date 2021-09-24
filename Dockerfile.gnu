@@ -25,7 +25,7 @@ RUN cd /tmp \
     && tar xzf elpa-2021.05.002.tar.gz && rm elpa-2021.05.002.tar.gz \
     && cd elpa-2021.05.002 && mkdir build && cd build \
     && ../configure CFLAGS="-O3 -march=native -funsafe-loop-optimizations -funsafe-math-optimizations -ftree-vect-loop-version -ftree-vectorize" \
-    FCFLAGS="-O2 -mavx" \
+    FCFLAGS="-O2 -mavx" --disable-avx512 \
     && make -j8 && make PREFIX=/usr/local install \
     && ln -s /usr/local/include/elpa-2021.05.002/elpa /usr/local/include/ \
     && cd /tmp && rm -rf elpa-2021.05.002
