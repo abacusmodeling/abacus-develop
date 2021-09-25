@@ -20,11 +20,22 @@ class MD_func
 		const double* allmass,
 		ModuleBase::Vector3<double>* vel);
 	
-	void MD_func::InitVel(
-		const int& numIon, 
+	void InitVel(
+		const UnitCell_pseudo &unit_in, 
 		const double& temperature, 
-		const double& fundamentalTime, 
 		const double* allmass,
+		const ModuleBase::Vector3<int>* ionmbl,
+		ModuleBase::Vector3<double>* vel);
+
+	void ReadVel(
+		const UnitCell_pseudo &unit_in, 
+		ModuleBase::Vector3<double>* vel);
+
+	void RandomVel(
+		const int& numIon, 
+		const double& temperature,
+		const double* allmass,
+		const ModuleBase::Vector3<int>* ionmbl,
 		ModuleBase::Vector3<double>* vel);
 
 //	void ReadNewTemp(int step);

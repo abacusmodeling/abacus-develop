@@ -30,26 +30,26 @@ MD_basic::MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
 	tauDirectChange=new ModuleBase::Vector3<double>[ucell.nat];
 	allmass=new double[ucell.nat];
 	ionmbl=new ModuleBase::Vector3<int>[ucell.nat];
-	//force=new ModuleBase::Vector3<double>[ucell.nat];
 
     frozen_freedom_ = mdf.getMassMbl(ucell, allmass, ionmbl);
-    if (ucell.set_vel)    //  Yuanbo Li 2021-08-01
-    {
-        int iat=0;    //initialize velocity of atoms from STRU  liuyu 2021-07-14
-        for(int it=0; it<ucell.ntype; ++it)
-        {
-            for(int ia=0; ia<ucell.atoms[it].na; ++ia)
-            {
-                vel[iat] = ucell.atoms[it].vel[ia];
-                ++iat;
-            }
-        }
-        assert(iat==ucell.nat);
-    }
-    else
-    {
-        mdf.InitVelocity(ucell.nat, temperature_, fundamentalTime, allmass, vel);
-    }
+    mdf.InitVel(unit_in, temperature_, allmass, ionmbl, vel);
+    // if (ucell.set_vel)    //  Yuanbo Li 2021-08-01
+    // {
+    //     int iat=0;    //initialize velocity of atoms from STRU  liuyu 2021-07-14
+    //     for(int it=0; it<ucell.ntype; ++it)
+    //     {
+    //         for(int ia=0; ia<ucell.atoms[it].na; ++ia)
+    //         {
+    //             vel[iat] = ucell.atoms[it].vel[ia];
+    //             ++iat;
+    //         }
+    //     }
+    //     assert(iat==ucell.nat);
+    // }
+    // else
+    // {
+    //     mdf.InitVelocity(ucell.nat, temperature_, fundamentalTime, allmass, vel);
+    // }
 
     //MD starting setup
     if(mdp.rstMD)
@@ -144,7 +144,7 @@ void MD_basic::runNVT(int step1, double potential, ModuleBase::Vector3<double> *
 //	if (step_!=1)mdf.ReadNewTemp( step_ );
 	
 	std::cout << " ------------------------------------------------------------" << std::endl;
-	std::cout << " Target temperature  : " << temperature_/ModuleBase::K_BOLTZMAN_AU << " (K)"<< std::endl;
+	std::cout << " Target temperature  : " << temperature_*ModuleBase::Hartree_to_K << " (K)"<< std::endl;
 	
 	if(step_==1||step_%mdp.fixTemperature==1)
     {
@@ -181,7 +181,7 @@ void MD_basic::runNVT(int step1, double potential, ModuleBase::Vector3<double> *
 	// big loop
 	//-----------------------------------------------
 	std::cout<<" "<<std::left<<std::setw(12)<<"MD_STEP"<<std::left<<std::setw(12)<< "SystemE"<<std::left<<std::setw(12)<< "Conserved"<<std::left<<std::setw(12)<< "DeltaE"<<std::left<<std::setw(12)<< "Temperature"<<std::endl;
-	std::cout<<" "<<std::left<<std::setw(12)<<step_<<std::left<<std::setw(12)<< energy_<<std::left<<std::setw(12)<< hamiltonian<<std::left<<std::setw(12)<< energy_-oldEtot_<<std::left<<std::setw(12)<<twiceKE/(double(3*ucell.nat-frozen_freedom_))/ModuleBase::K_BOLTZMAN_AU<<std::endl;
+	std::cout<<" "<<std::left<<std::setw(12)<<step_<<std::left<<std::setw(12)<< energy_<<std::left<<std::setw(12)<< hamiltonian<<std::left<<std::setw(12)<< energy_-oldEtot_<<std::left<<std::setw(12)<<twiceKE/(double(3*ucell.nat-frozen_freedom_))*ModuleBase::Hartree_to_K<<std::endl;
 	std::cout << " ------------------------------------------------------------" << std::endl;
 
 	oldEtot_=energy_;
@@ -619,11 +619,12 @@ void MD_basic::outStressMD(const ModuleBase::matrix& stress, const double& twice
     {
         press += stress(i,i)/3;
     }
-    double press_no = press;
+    double virial = press;
     press += twiceKE/3/ucell.omega; //output virtual press = 2/3 *Ek/V + sum(sigma[i][i])/3
     const double unit_transform = ModuleBase::HARTREE_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8 ;
     GlobalV::ofs_running<<"Virtual Pressure is "<<press*unit_transform<<" Kbar "<<std::endl;
-    GlobalV::ofs_running<<"Virial is "<<press_no*unit_transform<<" Kbar "<<std::endl;
+    GlobalV::ofs_running<<"Virial Term is "<<virial*unit_transform<<" Kbar "<<std::endl;
+    GlobalV::ofs_running<<"Kenetic Term is "<<(press-virial)*unit_transform<<" Kbar "<<std::endl;
 }
 
 //turn cartesian coordinate changes to direct changes
