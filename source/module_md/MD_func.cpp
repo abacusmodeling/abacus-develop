@@ -250,17 +250,19 @@ int MD_func::getMassMbl(const UnitCell_pseudo &unit_in, double* allmass, ModuleB
 //some prepared information
 //mass and degree of freedom
 	int ion=0;
-	int nfrozen=0;
+	int frozen_freedom=0;
 	for(int it=0;it<unit_in.ntype;it++){
 		for(int i=0;i<unit_in.atoms[it].na;i++){
 			allmass[ion]=unit_in.atoms[it].mass/6.02/9.109*1e5;
 			ionmbl[ion]=unit_in.atoms[it].mbl[i];
-			if (ionmbl[ion].x==0||ionmbl[ion].y==0||ionmbl[ion].z==0) nfrozen++;
+			if (ionmbl[ion].x==0) frozen_freedom++;
+			if (ionmbl[ion].y==0) frozen_freedom++;
+			if (ionmbl[ion].z==0) frozen_freedom++;
 
 			ion++;
 		}
 	}
-	return nfrozen;
+	return frozen_freedom;
 }
 
 void MD_func::printpos(const std::string& file, const int& iter, const int& recordFreq, const UnitCell_pseudo& unit_in)
@@ -308,13 +310,13 @@ void MD_func::scalevel(
 	{
 		for(int i=0;i<numIon;i++)
 		{
-			vel[i]*=sqrt(3*(numIon-nfrozen)*temperature/ke/2);
+			vel[i]*=sqrt((3*numIon-nfrozen)*temperature/ke/2);
 		}
 	}
 	return;
 }
 
-double MD_func::Conserved(const double KE, const double PE, const int number){
+double MD_func::Conserved(const double KE, const double PE, const int nfreedom){
 //---------------------------------------------------------------------------
 //   This function calculates the conserved quantity for the NVE system. 
 //----------------------------------------------------------------------------
@@ -333,7 +335,7 @@ double MD_func::Conserved(const double KE, const double PE, const int number){
         GlobalV::ofs_running<< "            SUMMARY OF NVE CALCULATION            "<<std::endl;
         GlobalV::ofs_running<<" --------------------------------------------------"<<std::endl;  
 		GlobalV::ofs_running<< "NVE Conservation     : "<< Conserved<<" (Hartree)"<<std::endl;
-		GlobalV::ofs_running<< "NVE Temperature      : "<< 2*KE/(3*number)/ModuleBase::K_BOLTZMAN_AU<<" (K)"<<std::endl;
+		GlobalV::ofs_running<< "NVE Temperature      : "<< 2*KE/(nfreedom)/ModuleBase::K_BOLTZMAN_AU<<" (K)"<<std::endl;
 		GlobalV::ofs_running<< "NVE Kinetic energy   : "<< KE<<" (Hartree)"<<std::endl;
 		GlobalV::ofs_running<< "NVE Potential energy : "<< PE<<" (Hartree)"<<std::endl;
 	}

@@ -23,13 +23,13 @@ void PW_Basis::bspline_sf(const int norder)
     complex<double> *b2 = new complex<double> [ny];
     complex<double> *b3 = new complex<double> [nz];
     GlobalC::UFFT.allocate();
-
-    ModuleBase::GlobalFunc::ZEROS(r,ncxyz);
+    
 
     for (int it=0; it<Ucell->ntype; it++)
     {
 		const int na = Ucell->atoms[it].na;
 		const ModuleBase::Vector3<double> * const taud = Ucell->atoms[it].taud;
+        ModuleBase::GlobalFunc::ZEROS(r,ncxyz);
 
         //A parallel algorithm can be added in the future.
         for(int ia = 0 ; ia < na ; ++ia)
@@ -49,17 +49,16 @@ void PW_Basis::bspline_sf(const int norder)
             bsx.getbslpine(dx);
             bsy.getbslpine(dy);
             bsz.getbslpine(dz);
-            //for(int ix =0 ; ix <= norder ; ++ix)    cout<<dx<<" "<<bsx.bezier_ele(ix)<<endl;
 
             for(int iz = 0 ; iz <= norder ; ++iz)
             {
-                int icz = int(nz-iz+floor(gridz))%nz;
+                int icz = int(nz*10-iz+floor(gridz))%nz;
                 for(int iy = 0 ; iy <= norder ; ++iy)
                 {
-                    int icy = int(ny-iy+floor(gridy))%ny;
+                    int icy = int(ny*10-iy+floor(gridy))%ny;
                     for(int ix = 0 ; ix <= norder ; ++ix )
                     {
-                        int icx = int(nx-ix+floor(gridx))%nx;
+                        int icx = int(nx*10-ix+floor(gridx))%nx;
                         r[icz*ny*nx + icx*ny + icy] += bsz.bezier_ele(iz) 
                                                  * bsy.bezier_ele(iy) 
                                                  * bsx.bezier_ele(ix); 
@@ -86,13 +85,12 @@ void PW_Basis::bspline_sf(const int norder)
 
         //It should be optimized with r2c
         GlobalC::UFFT.ToReciSpace(tmpr, &strucFac(it,0));
-
         this->bsplinecoef(b1,b2,b3,norder);
         for(int ig = 0 ; ig < ngmc ; ++ig)
         {
-           int idx = int(gcar[ig].x+this->nx)%this->nx;
-           int idy = int(gcar[ig].y+this->ny)%this->ny;
-           int idz = int(gcar[ig].z+this->nz)%this->nz;
+           int idx = int(gdirect[ig].x+0.1+this->nx)%this->nx;
+           int idy = int(gdirect[ig].y+0.1+this->ny)%this->ny;
+           int idz = int(gdirect[ig].z+0.1+this->nz)%this->nz;
            strucFac(it,ig) *= ( b1[idx] * b2[idy] * b3[idz] * double(this->ncxyz) );
         }
     }   
