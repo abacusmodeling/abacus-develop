@@ -848,4 +848,4 @@ double2 Diago_CG_CUDA<T, T2>::ddot
 } // end of ddot
 
 template class Diago_CG_CUDA<double, double2>;
-// template class Diago_CG_CUDA<float, float2>;
+template class Diago_CG_CUDA<float, float2>;
