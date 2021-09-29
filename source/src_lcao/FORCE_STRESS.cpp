@@ -196,9 +196,11 @@ void Force_Stress_LCAO::getForceStress(
 	ModuleBase::matrix stress_dftu;
 	if (INPUT.dft_plus_u)
 	{
-		if(isforce)
-		{
-			force_dftu.create(nat, 3);
+		// Quxin add for DFT+U on 20201029
+		GlobalC::dftu.force_stress();
+		
+        if (isforce) {
+            force_dftu.create(nat, 3);
 		}
 		if(isstress)
 		{

@@ -1,6 +1,5 @@
 #include "FORCE_gamma.h"
 #include "../src_pw/global.h"
-#include "dftu.h"  //Quxin add for DFT+U on 20201029
 
 Force_LCAO_gamma::Force_LCAO_gamma ()
 {}
@@ -44,8 +43,6 @@ void Force_LCAO_gamma::ftable_gamma (
         }
         this->cal_fvl_dphi(GlobalC::LOC.wfc_dm_2d.dm_gamma, isforce, isstress, fvl_dphi, svl_dphi);
 
-        //quxin added for DFT+U
-        if(INPUT.dft_plus_u) GlobalC::dftu.force_stress();
     }
     else
     {
@@ -71,8 +68,6 @@ void Force_LCAO_gamma::ftable_gamma (
             this->cal_fvnl_dbeta_new(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
         }
 
-        //quxin added for DFT+U
-        if(INPUT.dft_plus_u) GlobalC::dftu.force_stress();
 
         // calculate < dphi | V | phi > on real space grid.
         this->cal_fvl_dphi(dm2d, isforce, isstress, fvl_dphi, svl_dphi);
