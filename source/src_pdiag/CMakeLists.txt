@@ -3,7 +3,6 @@ add_subdirectory(MRRR)
 add_library(
     pdiag
     OBJECT
-    GenELPA.cpp
     pdgseps.cpp
     pdiag_basic.cpp
     pdiag_common.cpp

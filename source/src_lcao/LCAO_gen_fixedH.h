@@ -34,7 +34,8 @@ class LCAO_gen_fixedH
 
 	// used if k point is used,
 	// also can used in gamma algorithm.
-	void build_Nonlocal_mu (const bool &calc_deri); 
+	void build_Nonlocal_mu (const bool &calc_deri);
+	void build_Nonlocal_mu_new (const bool &calc_deri); 
 	void test_Nonlocal(void);
 
 };

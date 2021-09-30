@@ -11,18 +11,30 @@
 extern "C"
 {
     #include "Cblacs.h"
-//    #include "pblas.h"
-//    #include "scalapack.h"
-    #include "my_elpa.h"
+	#include "my_elpa.h"
 	#include "../module_base/scalapack_connector.h"
 }
-#include "GenELPA.h"
 #include "pdgseps.h"
 #include "pzgseps.h"
 #include "../module_base/lapack_connector.h"
 #endif
 
 #include "../src_external/src_test/test_function.h"
+
+inline int globalIndex(int localIndex, int nblk, int nprocs, int myproc)
+{
+    int iblock, gIndex;
+    iblock=localIndex/nblk;
+    gIndex=(iblock*nprocs+myproc)*nblk+localIndex%nblk;
+    return gIndex;
+}
+
+
+inline int localIndex(int globalIndex, int nblk, int nprocs, int& myproc)
+{
+    myproc=int((globalIndex%(nblk*nprocs))/nblk);
+    return int(globalIndex/(nblk*nprocs))*nblk+globalIndex%nblk;
+}
 
 inline int cart2blacs(
 	MPI_Comm comm_2D,
@@ -31,9 +43,7 @@ inline int cart2blacs(
 	int N,
 	int nblk,
 	int lld,
-	int *desc,
-	int &mpi_comm_rows,
-	int &mpi_comm_cols)
+	int *desc)
 {
 #ifdef __MPI
     int my_blacs_ctxt;
@@ -52,7 +62,6 @@ inline int cart2blacs(
     Cblacs_get(comm_2D_f, 0, &my_blacs_ctxt);
     Cblacs_gridmap(&my_blacs_ctxt, usermap, nprows, nprows, npcols);
     Cblacs_gridinfo(my_blacs_ctxt, &nprows, &npcols, &myprow, &mypcol);
-    info=elpa_get_communicators(comm_2D, myprow, mypcol, &mpi_comm_rows, &mpi_comm_cols);
     delete[] usermap;
     int ISRC=0;
     descinit_(desc, &N, &N, &nblk, &nblk, &ISRC, &ISRC, &my_blacs_ctxt, &lld, &info);
@@ -61,6 +70,34 @@ inline int cart2blacs(
 #else
     return 0;
 #endif
+}
+
+inline int set_elpahandle(elpa_t &handle, int *desc, int local_nrows, int local_ncols)
+{
+  int error;
+  int nprows, npcols, myprow, mypcol;
+  Cblacs_gridinfo(desc[1], &nprows, &npcols, &myprow, &mypcol);
+  elpa_init(20210430);
+  handle = elpa_allocate(&error);
+  elpa_set_integer(handle, "na", desc[2], &error);
+  elpa_set_integer(handle, "nev", desc[2], &error);
+
+  elpa_set_integer(handle, "local_nrows", local_nrows, &error);
+
+  elpa_set_integer(handle, "local_ncols", local_ncols, &error);
+
+  elpa_set_integer(handle, "nblk", desc[4], &error);
+
+  elpa_set_integer(handle, "mpi_comm_parent", MPI_Comm_c2f(MPI_COMM_WORLD), &error);
+
+  elpa_set_integer(handle, "process_row", myprow, &error);
+
+  elpa_set_integer(handle, "process_col", mypcol, &error);
+
+  elpa_set_integer(handle, "blacs_context", desc[1], &error);
+   /* Setup */
+  elpa_setup(handle);   /* Set tunables */
+  return 0;
 }
 
 inline int q2CTOT(
@@ -459,7 +496,7 @@ void Pdiag_Double::divide_HS_2d
 	// init blacs context for genelpa
     if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")
     {
-        blacs_ctxt=cart2blacs(comm_2D, dim0, dim1, GlobalV::NLOCAL, nb, nrow, desc, mpi_comm_rows, mpi_comm_cols);
+        blacs_ctxt=cart2blacs(comm_2D, dim0, dim1, GlobalV::NLOCAL, nb, nrow, desc);
     }
 #else // single processor used.
 	this->nb = GlobalV::NLOCAL;
@@ -492,6 +529,402 @@ void Pdiag_Double::divide_HS_2d
 	if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"MatrixInfo.row_num",MatrixInfo.row_num);
 	if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"MatrixInfo.col_num",MatrixInfo.col_num);
 	if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nloc",nloc);
+	return;
+}
+
+void Pdiag_Double::diago_double_begin(
+	const int &ik, // k-point index
+	ModuleBase::matrix &wfc_2d, // wave functions in 2d
+	double* h_mat, // hamiltonian matrix
+	double* s_mat, // overlap matrix
+	double* ekb) // eigenvalues for each k-point and band
+{
+	#ifdef TEST_DIAG
+	{
+		static int istep = 0;
+		auto print_matrix_C = [&](const std::string &file_name, double*m)
+		{
+			std::ofstream ofs(file_name+"-C_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
+			for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
+			{
+				for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
+				{
+					const int index=ic*GlobalC::ParaO.nrow+ir;
+					if(abs(m[index])>1E-10)
+						ofs<<m[index]<<"\t";
+					else
+						ofs<<0<<"\t";
+				}
+				ofs<<std::endl;
+			}
+		};
+		auto print_matrix_F = [&](const std::string &file_name, double*m)
+		{
+			std::ofstream ofs(file_name+"-F_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
+			for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
+			{
+				for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
+				{
+					const int index=ic*GlobalC::ParaO.nrow+ir;
+					if(abs(m[index])>1E-10)
+						ofs<<m[index]<<"\t";
+					else
+						ofs<<0<<"\t";
+				}
+				ofs<<std::endl;
+			}
+		};
+		print_matrix_F("H_gamma", h_mat);
+		print_matrix_F("S_gamma", s_mat);
+		print_matrix_C("H_gamma", h_mat);
+		print_matrix_C("S_gamma", s_mat);
+		++istep;
+	}
+	#endif
+
+#ifdef __MPI
+	ModuleBase::TITLE("Pdiag_Double","diago_begin");
+	assert(this->loc_size > 0);
+	assert(GlobalV::NLOCAL > 0);
+
+	char uplo='U';
+	const int inc=1;
+
+    int nprocs, myid;
+    MPI_Status status;
+    MPI_Comm_size(comm_2D, &nprocs);
+    MPI_Comm_rank(comm_2D, &myid);
+
+	// parallel diagonalize the
+	// H | psi > = S | psi >
+	// problem.
+	int loc_pos;
+
+	double* Stmp = GlobalC::LM.Sdiag;
+
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"start solver, GlobalV::KS_SOLVER",GlobalV::KS_SOLVER);
+    if(GlobalV::KS_SOLVER=="hpseps")
+    {
+        double *eigen = new double[GlobalV::NLOCAL];
+        ModuleBase::GlobalFunc::ZEROS(eigen, GlobalV::NLOCAL);
+
+        double* Z = new double[this->loc_size * GlobalV::NLOCAL];
+        ModuleBase::GlobalFunc::ZEROS(Z, this->loc_size * GlobalV::NLOCAL);
+
+        ModuleBase::Memory::record("Pdiag_Double","Z",loc_size * GlobalV::NLOCAL,"double");
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","pdgseps");
+		LapackConnector::copy(nloc, s_mat, inc, Stmp, inc);
+		pdgseps(comm_2D, GlobalV::NLOCAL, nb, h_mat, Stmp, Z, eigen, this->MatrixInfo, uplo, this->loc_size, loc_pos);
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","pdgseps");
+
+        if(myid <= lastband_in_proc)
+        {
+            for(int i=0; i<loc_sizes[myid]; i++)
+            {
+                for(int n=0; n<GlobalV::NLOCAL; n++)
+                {
+                    Z_LOC[ik][n*loc_sizes[myid] + i] = Z[n*loc_sizes[myid] + i];
+                }
+            }
+        }
+
+        // the eigenvalues.
+        //xiaohui modify 2014-06-15, move to the top
+        LapackConnector::copy(GlobalV::NBANDS, eigen, inc, ekb, inc);
+        delete[] eigen;
+        //=====================================
+        // gather the eigenvectors and
+        // distribute them to each processor
+        // Z is delete in gath_eig
+        //=====================================
+
+        //xiaohui modify 2014-06-18
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig");
+        this->gath_eig(DIAG_HPSEPS_WORLD, GlobalV::NLOCAL, Z);
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig");
+        //delete[] Z; //LiuXh 20171109
+	}// HPSEPS method
+    else if(GlobalV::KS_SOLVER=="genelpa")
+    {
+        double *eigen = new double[GlobalV::NLOCAL];
+        ModuleBase::GlobalFunc::ZEROS(eigen, GlobalV::NLOCAL);
+
+        long maxnloc; // maximum number of elements in local matrix
+        MPI_Reduce(&nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, comm_2D);
+        MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, comm_2D);
+		wfc_2d.create(this->ncol,this->nrow);			// Fortran order
+
+        int is_already_decomposed, elpa_error;
+        static elpa_t handle;
+
+        if(GlobalC::CHR.get_new_e_iteration())
+        {
+            ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_set");
+            LapackConnector::copy(nloc, s_mat, inc, Stmp, inc);
+            set_elpahandle(handle, desc, nrow, ncol);
+            is_already_decomposed=0;
+            ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_set");
+        }
+        else
+        {
+            is_already_decomposed=1;
+        }
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_solve");
+        elpa_generalized_eigenvectors_d(handle, h_mat, Stmp, eigen, wfc_2d.c, is_already_decomposed, &elpa_error);
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_solve");
+
+    	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"K-S equation was solved by genelpa2");
+        LapackConnector::copy(GlobalV::NBANDS, eigen, inc, ekb, inc);
+        delete[] eigen;
+	    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"eigenvalues were copied to ekb");
+
+		// convert wave function to band distribution
+			// and calculate the density matrix in the tranditional way
+			// redistribute eigenvectors to wfc / wfc_aug
+
+		ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig");
+		int pos=0;
+		for(int i=0; i<myid; ++i)
+		{
+			pos+=loc_sizes[i];
+		}
+		int naroc[2]; // maximum number of row or column
+		double **ctot;
+
+		if(this->out_lowf && myid==0)
+		{
+			ctot = new double*[GlobalV::NBANDS];
+			for (int i=0; i<GlobalV::NBANDS; i++)
+			{
+				ctot[i] = new double[GlobalV::NLOCAL];
+				ModuleBase::GlobalFunc::ZEROS(ctot[i], GlobalV::NLOCAL);
+			}
+			ModuleBase::Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"double");
+		}
+
+        double *work=new double[maxnloc]; // work/buffer matrix
+        int info;
+		for(int iprow=0; iprow<dim0; ++iprow)
+		{
+			for(int ipcol=0; ipcol<dim1; ++ipcol)
+			{
+				const int coord[2]={iprow, ipcol};
+				int src_rank;
+				MPI_Cart_rank(comm_2D, coord, &src_rank);
+				if(myid==src_rank)
+				{
+					LapackConnector::copy(nloc, wfc_2d.c, inc, work, inc);
+					naroc[0]=nrow;
+					naroc[1]=ncol;
+				}
+				info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, comm_2D);
+				info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, src_rank, comm_2D);
+
+				if(out_lowf)
+				{
+					if(INPUT.new_dm==0)
+					{
+						// mohan delete Bfield option 2021-02-12
+						//info=q2ZLOC_WFC_WFCAUG_CTOT(myid, pos, naroc, nb,
+						//	dim0, dim1, iprow, ipcol, this->loc_size,
+						//	work, Z_LOC[ik], wfc, GlobalC::LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN], ctot);
+					}
+					else
+					{
+						info=q2CTOT(myid, naroc, nb,
+							dim0, dim1, iprow, ipcol, this->loc_size,
+							work, ctot);
+					}
+				}//out_lowf
+				else
+				{
+					// mohan update 2021-02-12, delete Bfield option
+					//info=q2ZLOC_WFC_WFCAUG(pos, naroc, nb,
+					//	dim0, dim1, iprow, ipcol, this->loc_size,
+					//	work, Z_LOC[ik], wfc, GlobalC::LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN]);
+				}
+			}//loop ipcol
+		}//loop iprow
+
+		if(out_lowf && myid==0)
+		{
+			std::stringstream ss;
+			ss << GlobalV::global_out_dir << "LOWF_GAMMA_S" << GlobalV::CURRENT_SPIN+1 << ".dat";
+			// mohan add 2012-04-03, because we need the occupations for the
+				// first iteration.
+			WF_Local::write_lowf( ss.str(), ctot );//mohan add 2010-09-09
+			for (int i=0; i<GlobalV::NBANDS; i++)
+			{
+				delete[] ctot[i];
+			}
+			delete[] ctot;
+		}
+
+		delete[] work;
+		ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig");
+	} // GenELPA method
+	else if(GlobalV::KS_SOLVER=="lapack_gv")
+	{
+		wfc_2d.create(this->ncol, this->nrow, false);
+		memcpy( wfc_2d.c, h_mat, sizeof(double)*this->ncol*this->nrow );
+		ModuleBase::matrix s_tmp(this->ncol, this->nrow, false);
+		memcpy( s_tmp.c, s_mat, sizeof(double)*this->ncol*this->nrow );
+		std::vector<double> ekb_tmp(GlobalV::NLOCAL,0);
+
+		const char jobz='V', uplo='U';
+		const int itype=1;
+		int lwork=-1, info=0;
+		std::vector<double> work(1,0);
+		dsygv_(&itype, &jobz, &uplo, &GlobalV::NLOCAL, wfc_2d.c, &GlobalV::NLOCAL,
+			s_tmp.c, &GlobalV::NLOCAL, ekb_tmp.data(), work.data(), &lwork, &info);
+
+		if(info)
+		{
+			throw std::runtime_error("info="+ModuleBase::GlobalFunc::TO_STRING(info)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+		}
+
+		lwork = work[0];
+		work.resize(lwork);
+
+		dsygv_(&itype, &jobz, &uplo, &GlobalV::NLOCAL, wfc_2d.c, &GlobalV::NLOCAL,
+			s_tmp.c, &GlobalV::NLOCAL, ekb_tmp.data(), work.data(), &lwork, &info);
+
+		if(info)
+		{
+			throw std::runtime_error("info="+ModuleBase::GlobalFunc::TO_STRING(info)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+		}
+		memcpy( ekb, ekb_tmp.data(), sizeof(double)*GlobalV::NBANDS );
+
+		if(INPUT.new_dm==0)
+		{
+			throw std::domain_error("INPUT.new_dm must be 1. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+		}
+	}
+	else if(GlobalV::KS_SOLVER=="lapack_gvx")
+	{
+		ModuleBase::matrix h_tmp(this->ncol, this->nrow, false);
+		memcpy( h_tmp.c, h_mat, sizeof(double)*this->ncol*this->nrow );
+		ModuleBase::matrix s_tmp(this->ncol, this->nrow, false);
+		memcpy( s_tmp.c, s_mat, sizeof(double)*this->ncol*this->nrow );
+		wfc_2d.create(this->ncol, this->nrow, false);
+
+		const char jobz='V', range='I', uplo='U';
+		const int itype=1, il=1, iu=GlobalV::NBANDS;
+		int M=0, lwork=-1, info=0;
+		const double abstol=0;
+		std::vector<double> work(1,0);
+		std::vector<int> iwork(5*GlobalV::NLOCAL,0);
+		std::vector<int> ifail(GlobalV::NLOCAL,0);
+
+		dsygvx_(&itype, &jobz, &range, &uplo,
+			&GlobalV::NLOCAL, h_tmp.c, &GlobalV::NLOCAL, s_tmp.c, &GlobalV::NLOCAL, NULL, NULL, &il, &iu, &abstol,
+			&M, ekb, wfc_2d.c, &GlobalV::NLOCAL, work.data(), &lwork, iwork.data(), ifail.data(), &info);
+
+		if(info)
+		{
+			throw std::runtime_error("info="+ModuleBase::GlobalFunc::TO_STRING(info)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+		}
+
+		lwork = work[0];
+		work.resize(lwork);
+		dsygvx_(&itype, &jobz, &range, &uplo,
+			&GlobalV::NLOCAL, h_tmp.c, &GlobalV::NLOCAL, s_tmp.c, &GlobalV::NLOCAL, NULL, NULL, &il, &iu, &abstol,
+			&M, ekb, wfc_2d.c, &GlobalV::NLOCAL, work.data(), &lwork, iwork.data(), ifail.data(), &info);
+
+		if(info)
+		{
+			throw std::runtime_error("info="+ModuleBase::GlobalFunc::TO_STRING(info)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+		}
+		if(M!=GlobalV::NBANDS)
+		{
+			throw std::runtime_error("M="+ModuleBase::GlobalFunc::TO_STRING(M)+". GlobalV::NBANDS="+ModuleBase::GlobalFunc::TO_STRING(GlobalV::NBANDS)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+		}
+
+		if(INPUT.new_dm==0)
+		{
+			throw std::domain_error("INPUT.new_dm must be 1. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+		}
+	}
+	else if(GlobalV::KS_SOLVER=="scalapack_gvx")
+	{
+		ModuleBase::matrix h_tmp(this->ncol, this->nrow, false);
+		memcpy( h_tmp.c, h_mat, sizeof(double)*this->ncol*this->nrow );
+		ModuleBase::matrix s_tmp(this->ncol, this->nrow, false);
+		memcpy( s_tmp.c, s_mat, sizeof(double)*this->ncol*this->nrow );
+		wfc_2d.create(this->ncol, this->nrow, false);
+
+		const char jobz='V', range='I', uplo='U';
+		const int itype=1, il=1, iu=GlobalV::NBANDS, one=1;
+		int M=0, NZ=0, lwork=-1, liwork=-1, info=0;
+		const double abstol=0, orfac=-1;
+		std::vector<double> work(1,0);
+		std::vector<int> iwork(1,0);
+		std::vector<int> ifail(GlobalV::NLOCAL,0);
+		std::vector<int> iclustr(2*GlobalV::DSIZE);
+		std::vector<double> gap(GlobalV::DSIZE);
+
+		pdsygvx_(&itype, &jobz, &range, &uplo,
+			&GlobalV::NLOCAL, h_tmp.c, &one, &one, desc, s_tmp.c, &one, &one, desc,
+			NULL, NULL, &il, &iu, &abstol,
+			&M, &NZ, ekb, &orfac, wfc_2d.c, &one, &one, desc,
+			work.data(), &lwork, iwork.data(), &liwork, ifail.data(), iclustr.data(), gap.data(), &info);
+
+		GlobalV::ofs_running<<"lwork="<<work[0]<<"\t"<<"liwork="<<iwork[0]<<std::endl;
+		lwork = work[0];
+		work.resize(lwork,0);
+		liwork = iwork[0];
+		iwork.resize(liwork,0);
+
+		pdsygvx_(&itype, &jobz, &range, &uplo,
+			&GlobalV::NLOCAL, h_tmp.c, &one, &one, desc, s_tmp.c, &one, &one, desc,
+			NULL, NULL, &il, &iu, &abstol,
+			&M, &NZ, ekb, &orfac, wfc_2d.c, &one, &one, desc,
+			work.data(), &lwork, iwork.data(), &liwork, ifail.data(), iclustr.data(), gap.data(), &info);
+
+		GlobalV::ofs_running<<"M="<<M<<"\t"<<"NZ="<<NZ<<std::endl;
+
+		if(info)
+		{
+			throw std::runtime_error("info="+ModuleBase::GlobalFunc::TO_STRING(info)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+		}
+		if(M!=GlobalV::NBANDS)
+		{
+			throw std::runtime_error("M="+ModuleBase::GlobalFunc::TO_STRING(M)+". GlobalV::NBANDS="+ModuleBase::GlobalFunc::TO_STRING(GlobalV::NBANDS)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+		}
+		if(M!=NZ)
+		{
+			throw std::runtime_error("M="+ModuleBase::GlobalFunc::TO_STRING(M)+". NZ="+ModuleBase::GlobalFunc::TO_STRING(NZ)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+		}
+		if(INPUT.new_dm==0)
+		{
+			throw std::domain_error("INPUT.new_dm must be 1. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+		}
+	}
+    //delete[] Stmp; //LiuXh 20171109
+#endif
+
+#ifdef TEST_DIAG
+	{
+		static int istep = 0;
+		{
+			std::ofstream ofs("ekb_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
+			for(int ib=0; ib<GlobalV::NBANDS; ++ib)
+			{
+				ofs<<ekb[ib]<<std::endl;
+			}
+		}
+		{
+			std::ofstream ofs("wfc-C_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
+			ofs<<wfc_2d<<std::endl;
+		}
+		{
+			std::ofstream ofs("wfc-F_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
+			ofs<<transpose(wfc_2d)<<std::endl;
+		}
+		++istep;
+	}
+#endif
+
 	return;
 }
 
@@ -620,37 +1053,23 @@ void Pdiag_Double::diago_complex_begin(
         long maxnloc; // maximum number of elements in local matrix
         MPI_Reduce(&nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, comm_2D);
         MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, comm_2D);
-		wfc_2d.create(this->ncol,this->nrow);			// Fortran order
-        std::complex<double> *work=new std::complex<double>[maxnloc]; // work/buffer matrix
-        bool wantEigenVector=true;
-        bool wantDebug=true;
-        int info;
-        // int comm_2D_f=MPI_Comm_c2f(comm_2D);
-        MPI_Comm comm_2D_f = comm_2D;
+        wfc_2d.create(this->ncol,this->nrow);            // Fortran order
 
-        int THIS_REAL_ELPA_KERNEL_API=9;
-        ModuleBase::timer::tick("Diago_LCAO_Matrix","genelpa");
         LapackConnector::copy(nloc, cs_mat, inc, Stmp, inc);
-        int method=0;
-        //info=pzSolveGenEigen2(GlobalV::NBANDS, GlobalV::NLOCAL, nrow, ncol, desc,
-        //                      ch_mat, Stmp, eigen, wfc_2d.c, work,
-        //                      comm_2D_f, blacs_ctxt,
-        //                      method, THIS_REAL_ELPA_KERNEL_API,
-        //                      wantEigenVector, wantDebug);
-        //ModuleBase::timer::tick("Diago_LCAO_Matrix","genelpa");
-        ModuleBase::timer::tick("Diago_LCAO_Matrix","genelpa1");
-        info=pzDecomposeRightMatrix2(GlobalV::NLOCAL, nrow, ncol, desc,
-                                    Stmp, eigen, wfc_2d.c, work,
-                                    comm_2D_f, mpi_comm_rows, mpi_comm_cols,
-                                    method, THIS_REAL_ELPA_KERNEL_API);
-        ModuleBase::timer::tick("Diago_LCAO_Matrix","genelpa1");
-        ModuleBase::timer::tick("Diago_LCAO_Matrix","genelpa2");
-        info=pzSolveEigen2(GlobalV::NBANDS, GlobalV::NLOCAL, nrow, ncol, desc,
-                    ch_mat, Stmp, eigen, wfc_2d.c, work,
-                    comm_2D_f, mpi_comm_rows, mpi_comm_cols, method,
-                    THIS_REAL_ELPA_KERNEL_API,
-                    wantEigenVector, wantDebug);
-        ModuleBase::timer::tick("Diago_LCAO_Matrix","genelpa2");
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_set");
+        static elpa_t handle;
+
+        if(GlobalC::CHR.get_new_e_iteration())
+        {
+            set_elpahandle(handle, desc, nrow, ncol);
+        }
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_set");
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_solve");
+        int elpa_derror;
+        elpa_generalized_eigenvectors_dc(handle, reinterpret_cast<double _Complex*>(ch_mat),
+                                         reinterpret_cast<double _Complex*>(Stmp),
+                                         eigen, reinterpret_cast<double _Complex*>(wfc_2d.c), 0, &elpa_derror);
+        ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_solve");
 
         // the eigenvalues.
         LapackConnector::copy(GlobalV::NBANDS, eigen, inc, ekb, inc);
@@ -658,7 +1077,9 @@ void Pdiag_Double::diago_complex_begin(
 
         //change eigenvector matrix from block-cycle distribute matrix to column-divided distribute matrix
         ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig_complex");
+        std::complex<double> *work=new std::complex<double>[maxnloc]; // work/buffer matrix
         int naroc[2]; // maximum number of row or column
+        int info;
         for(int iprow=0; iprow<dim0; ++iprow)
         {
             for(int ipcol=0; ipcol<dim1; ++ipcol)
@@ -921,409 +1342,3 @@ void Pdiag_Double::readin(
     delete[] Z;
 }
 #endif
-
-//LiuXh add 2021-09-06, clear memory, totwfc not used now
-void Pdiag_Double::diago_double_begin(
-	const int &ik, // k-point index
-	ModuleBase::matrix &wfc_2d, // wave functions in 2d
-	double* h_mat, // hamiltonian matrix
-	double* s_mat, // overlap matrix
-	double* ekb) // eigenvalues for each k-point and band
-{
-	#ifdef TEST_DIAG
-	{
-		static int istep = 0;
-		auto print_matrix_C = [&](const std::string &file_name, double*m)
-		{
-			std::ofstream ofs(file_name+"-C_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
-			for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
-			{
-				for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
-				{
-					const int index=ic*GlobalC::ParaO.nrow+ir;
-					if(abs(m[index])>1E-10)
-						ofs<<m[index]<<"\t";
-					else
-						ofs<<0<<"\t";
-				}
-				ofs<<std::endl;
-			}
-		};
-		auto print_matrix_F = [&](const std::string &file_name, double*m)
-		{
-			std::ofstream ofs(file_name+"-F_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
-			for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
-			{
-				for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
-				{
-					const int index=ic*GlobalC::ParaO.nrow+ir;
-					if(abs(m[index])>1E-10)
-						ofs<<m[index]<<"\t";
-					else
-						ofs<<0<<"\t";
-				}
-				ofs<<std::endl;
-			}
-		};
-		print_matrix_F("H_gamma", h_mat);
-		print_matrix_F("S_gamma", s_mat);
-		print_matrix_C("H_gamma", h_mat);
-		print_matrix_C("S_gamma", s_mat);
-		++istep;
-	}
-	#endif
-
-#ifdef __MPI
-    ModuleBase::TITLE("Pdiag_Double","diago_begin");
-	assert(this->loc_size > 0);
-	assert(GlobalV::NLOCAL > 0);
-
-	char uplo='U';
-	const int inc=1;
-
-    int nprocs, myid;
-    MPI_Status status;
-    MPI_Comm_size(comm_2D, &nprocs);
-    MPI_Comm_rank(comm_2D, &myid);
-
-	// parallel diagonalize the
-	// H | psi > = S | psi >
-	// problem.
-	int loc_pos;
-
-	double* Stmp = GlobalC::LM.Sdiag;
-
-    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"start solver, GlobalV::KS_SOLVER",GlobalV::KS_SOLVER);
-    if(GlobalV::KS_SOLVER=="hpseps")
-    {
-        double *eigen = new double[GlobalV::NLOCAL];
-        ModuleBase::GlobalFunc::ZEROS(eigen, GlobalV::NLOCAL);
-
-        double* Z = new double[this->loc_size * GlobalV::NLOCAL];
-        ModuleBase::GlobalFunc::ZEROS(Z, this->loc_size * GlobalV::NLOCAL);
-
-        ModuleBase::Memory::record("Pdiag_Double","Z",loc_size * GlobalV::NLOCAL,"double");
-        ModuleBase::timer::tick("Diago_LCAO_Matrix","pdgseps");
-        LapackConnector::copy(nloc, s_mat, inc, Stmp, inc);
-        pdgseps(comm_2D, GlobalV::NLOCAL, nb, h_mat, Stmp, Z, eigen, this->MatrixInfo, uplo, this->loc_size, loc_pos);
-        ModuleBase::timer::tick("Diago_LCAO_Matrix","pdgseps");
-
-        if(myid <= lastband_in_proc)
-        {
-            for(int i=0; i<loc_sizes[myid]; i++)
-            {
-                for(int n=0; n<GlobalV::NLOCAL; n++)
-                {
-                    Z_LOC[ik][n*loc_sizes[myid] + i] = Z[n*loc_sizes[myid] + i];
-                }
-            }
-        }
-
-        // the eigenvalues.
-        //xiaohui modify 2014-06-15, move to the top
-        LapackConnector::copy(GlobalV::NBANDS, eigen, inc, ekb, inc);
-        delete[] eigen;
-        //=====================================
-        // gather the eigenvectors and
-        // distribute them to each processor
-        // Z is delete in gath_eig
-        //=====================================
-
-        //xiaohui modify 2014-06-18
-        ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig");
-        this->gath_eig(DIAG_HPSEPS_WORLD, GlobalV::NLOCAL, Z);
-        ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig");
-        //delete[] Z; //LiuXh 20171109
-	}// HPSEPS method
-    else if(GlobalV::KS_SOLVER=="genelpa")
-    {
-        double *eigen = new double[GlobalV::NLOCAL];
-        ModuleBase::GlobalFunc::ZEROS(eigen, GlobalV::NLOCAL);
-
-        long maxnloc; // maximum number of elements in local matrix
-        MPI_Reduce(&nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, comm_2D);
-        MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, comm_2D);
-		wfc_2d.create(this->ncol,this->nrow);			// Fortran order
-
-        double *work=new double[maxnloc]; // work/buffer matrix
-        static int method;
-        bool wantEigenVector=true;
-        bool wantDebug=true;
-        int info;
-        // int comm_2D_f=MPI_Comm_c2f(comm_2D);
-        MPI_Comm comm_2D_f = comm_2D;
-
-        int THIS_REAL_ELPA_KERNEL_API=12;
-        int useQR=0;						// may be changed to input parameter sometime
-
-        if(GlobalC::CHR.get_new_e_iteration())
-        {
-            ModuleBase::timer::tick("Diago_LCAO_Matrix","genelpa1");
-            method=0;
-        	LapackConnector::copy(nloc, s_mat, inc, Stmp, inc);
-            info=pdDecomposeRightMatrix2(GlobalV::NLOCAL, nrow, ncol, desc,
-                                        Stmp, eigen, wfc_2d.c, work,
-                                        comm_2D_f, mpi_comm_rows, mpi_comm_cols,
-                                        method, THIS_REAL_ELPA_KERNEL_API, useQR);
-            ModuleBase::timer::tick("Diago_LCAO_Matrix","genelpa1");
-        }
-        ModuleBase::timer::tick("Diago_LCAO_Matrix","genelpa2");
-        info=pdSolveEigen2(GlobalV::NBANDS, GlobalV::NLOCAL, nrow, ncol, desc,
-                          h_mat, Stmp, eigen, wfc_2d.c, work,
-                          comm_2D_f, mpi_comm_rows, mpi_comm_cols, method,
-                          THIS_REAL_ELPA_KERNEL_API, useQR,
-                          wantEigenVector, wantDebug);
-        ModuleBase::timer::tick("Diago_LCAO_Matrix","genelpa2");
-
-    	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"K-S equation was solved by genelpa2");
-        LapackConnector::copy(GlobalV::NBANDS, eigen, inc, ekb, inc);
-        delete[] eigen;
-	    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"eigenvalues were copied to ekb");
-
-		// convert wave function to band distribution
-			// and calculate the density matrix in the tranditional way
-			// redistribute eigenvectors to wfc / wfc_aug
-
-		ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig");
-		int pos=0;
-		for(int i=0; i<myid; ++i)
-		{
-			pos+=loc_sizes[i];
-		}
-		int naroc[2]; // maximum number of row or column
-		double **ctot;
-
-		if(this->out_lowf && myid==0)
-		{
-			ctot = new double*[GlobalV::NBANDS];
-			for (int i=0; i<GlobalV::NBANDS; i++)
-			{
-				ctot[i] = new double[GlobalV::NLOCAL];
-				ModuleBase::GlobalFunc::ZEROS(ctot[i], GlobalV::NLOCAL);
-			}
-			ModuleBase::Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"double");
-		}
-
-		for(int iprow=0; iprow<dim0; ++iprow)
-		{
-			for(int ipcol=0; ipcol<dim1; ++ipcol)
-			{
-				const int coord[2]={iprow, ipcol};
-				int src_rank;
-				MPI_Cart_rank(comm_2D, coord, &src_rank);
-				if(myid==src_rank)
-				{
-					LapackConnector::copy(nloc, wfc_2d.c, inc, work, inc);
-					naroc[0]=nrow;
-					naroc[1]=ncol;
-				}
-				info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, comm_2D);
-				info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, src_rank, comm_2D);
-
-				if(out_lowf)
-				{
-					if(INPUT.new_dm==0)
-					{
-						// mohan delete Bfield option 2021-02-12
-						//info=q2ZLOC_WFC_WFCAUG_CTOT(myid, pos, naroc, nb,
-						//	dim0, dim1, iprow, ipcol, this->loc_size,
-						//	work, Z_LOC[ik], wfc, GlobalC::LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN], ctot);
-					}
-					else
-					{
-						info=q2CTOT(myid, naroc, nb,
-							dim0, dim1, iprow, ipcol, this->loc_size,
-							work, ctot);
-					}
-				}//out_lowf
-				else
-				{
-					// mohan update 2021-02-12, delete Bfield option
-					//info=q2ZLOC_WFC_WFCAUG(pos, naroc, nb,
-					//	dim0, dim1, iprow, ipcol, this->loc_size,
-					//	work, Z_LOC[ik], wfc, GlobalC::LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN]);
-				}
-			}//loop ipcol
-		}//loop iprow
-
-		if(out_lowf && myid==0)
-		{
-			std::stringstream ss;
-			ss << GlobalV::global_out_dir << "LOWF_GAMMA_S" << GlobalV::CURRENT_SPIN+1 << ".dat";
-			// mohan add 2012-04-03, because we need the occupations for the
-				// first iteration.
-			WF_Local::write_lowf( ss.str(), ctot );//mohan add 2010-09-09
-			for (int i=0; i<GlobalV::NBANDS; i++)
-			{
-				delete[] ctot[i];
-			}
-			delete[] ctot;
-		}
-
-		delete[] work;
-		ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig");
-	} // GenELPA method
-	else if(GlobalV::KS_SOLVER=="lapack_gv")
-	{
-		wfc_2d.create(this->ncol, this->nrow, false);
-		memcpy( wfc_2d.c, h_mat, sizeof(double)*this->ncol*this->nrow );
-		ModuleBase::matrix s_tmp(this->ncol, this->nrow, false);
-		memcpy( s_tmp.c, s_mat, sizeof(double)*this->ncol*this->nrow );
-		std::vector<double> ekb_tmp(GlobalV::NLOCAL,0);
-
-		const char jobz='V', uplo='U';
-		const int itype=1;
-		int lwork=-1, info=0;
-		std::vector<double> work(1,0);
-		dsygv_(&itype, &jobz, &uplo, &GlobalV::NLOCAL, wfc_2d.c, &GlobalV::NLOCAL,
-			s_tmp.c, &GlobalV::NLOCAL, ekb_tmp.data(), work.data(), &lwork, &info);
-
-		if(info)
-		{
-			throw std::runtime_error("info="+ModuleBase::GlobalFunc::TO_STRING(info)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		}
-
-		lwork = work[0];
-		work.resize(lwork);
-
-		dsygv_(&itype, &jobz, &uplo, &GlobalV::NLOCAL, wfc_2d.c, &GlobalV::NLOCAL,
-			s_tmp.c, &GlobalV::NLOCAL, ekb_tmp.data(), work.data(), &lwork, &info);
-
-		if(info)
-		{
-			throw std::runtime_error("info="+ModuleBase::GlobalFunc::TO_STRING(info)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		}
-		memcpy( ekb, ekb_tmp.data(), sizeof(double)*GlobalV::NBANDS );
-
-		if(INPUT.new_dm==0)
-		{
-			throw std::domain_error("INPUT.new_dm must be 1. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		}
-	}
-	else if(GlobalV::KS_SOLVER=="lapack_gvx")
-	{
-		ModuleBase::matrix h_tmp(this->ncol, this->nrow, false);
-		memcpy( h_tmp.c, h_mat, sizeof(double)*this->ncol*this->nrow );
-		ModuleBase::matrix s_tmp(this->ncol, this->nrow, false);
-		memcpy( s_tmp.c, s_mat, sizeof(double)*this->ncol*this->nrow );
-		wfc_2d.create(this->ncol, this->nrow, false);
-
-		const char jobz='V', range='I', uplo='U';
-		const int itype=1, il=1, iu=GlobalV::NBANDS;
-		int M=0, lwork=-1, info=0;
-		const double abstol=0;
-		std::vector<double> work(1,0);
-		std::vector<int> iwork(5*GlobalV::NLOCAL,0);
-		std::vector<int> ifail(GlobalV::NLOCAL,0);
-
-		dsygvx_(&itype, &jobz, &range, &uplo,
-			&GlobalV::NLOCAL, h_tmp.c, &GlobalV::NLOCAL, s_tmp.c, &GlobalV::NLOCAL, NULL, NULL, &il, &iu, &abstol,
-			&M, ekb, wfc_2d.c, &GlobalV::NLOCAL, work.data(), &lwork, iwork.data(), ifail.data(), &info);
-
-		if(info)
-		{
-			throw std::runtime_error("info="+ModuleBase::GlobalFunc::TO_STRING(info)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		}
-
-		lwork = work[0];
-		work.resize(lwork);
-		dsygvx_(&itype, &jobz, &range, &uplo,
-			&GlobalV::NLOCAL, h_tmp.c, &GlobalV::NLOCAL, s_tmp.c, &GlobalV::NLOCAL, NULL, NULL, &il, &iu, &abstol,
-			&M, ekb, wfc_2d.c, &GlobalV::NLOCAL, work.data(), &lwork, iwork.data(), ifail.data(), &info);
-
-		if(info)
-		{
-			throw std::runtime_error("info="+ModuleBase::GlobalFunc::TO_STRING(info)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		}
-		if(M!=GlobalV::NBANDS)
-		{
-			throw std::runtime_error("M="+ModuleBase::GlobalFunc::TO_STRING(M)+". GlobalV::NBANDS="+ModuleBase::GlobalFunc::TO_STRING(GlobalV::NBANDS)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		}
-
-		if(INPUT.new_dm==0)
-		{
-			throw std::domain_error("INPUT.new_dm must be 1. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		}
-	}
-	else if(GlobalV::KS_SOLVER=="scalapack_gvx")
-	{
-		ModuleBase::matrix h_tmp(this->ncol, this->nrow, false);
-		memcpy( h_tmp.c, h_mat, sizeof(double)*this->ncol*this->nrow );
-		ModuleBase::matrix s_tmp(this->ncol, this->nrow, false);
-		memcpy( s_tmp.c, s_mat, sizeof(double)*this->ncol*this->nrow );
-		wfc_2d.create(this->ncol, this->nrow, false);
-
-		const char jobz='V', range='I', uplo='U';
-		const int itype=1, il=1, iu=GlobalV::NBANDS, one=1;
-		int M=0, NZ=0, lwork=-1, liwork=-1, info=0;
-		const double abstol=0, orfac=-1;
-		std::vector<double> work(1,0);
-		std::vector<int> iwork(1,0);
-		std::vector<int> ifail(GlobalV::NLOCAL,0);
-		std::vector<int> iclustr(2*GlobalV::DSIZE);
-		std::vector<double> gap(GlobalV::DSIZE);
-
-		pdsygvx_(&itype, &jobz, &range, &uplo,
-			&GlobalV::NLOCAL, h_tmp.c, &one, &one, desc, s_tmp.c, &one, &one, desc,
-			NULL, NULL, &il, &iu, &abstol,
-			&M, &NZ, ekb, &orfac, wfc_2d.c, &one, &one, desc,
-			work.data(), &lwork, iwork.data(), &liwork, ifail.data(), iclustr.data(), gap.data(), &info);
-
-		GlobalV::ofs_running<<"lwork="<<work[0]<<"\t"<<"liwork="<<iwork[0]<<std::endl;
-		lwork = work[0];
-		work.resize(lwork,0);
-		liwork = iwork[0];
-		iwork.resize(liwork,0);
-
-		pdsygvx_(&itype, &jobz, &range, &uplo,
-			&GlobalV::NLOCAL, h_tmp.c, &one, &one, desc, s_tmp.c, &one, &one, desc,
-			NULL, NULL, &il, &iu, &abstol,
-			&M, &NZ, ekb, &orfac, wfc_2d.c, &one, &one, desc,
-			work.data(), &lwork, iwork.data(), &liwork, ifail.data(), iclustr.data(), gap.data(), &info);
-
-		GlobalV::ofs_running<<"M="<<M<<"\t"<<"NZ="<<NZ<<std::endl;
-
-		if(info)
-		{
-			throw std::runtime_error("info="+ModuleBase::GlobalFunc::TO_STRING(info)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		}
-		if(M!=GlobalV::NBANDS)
-		{
-			throw std::runtime_error("M="+ModuleBase::GlobalFunc::TO_STRING(M)+". GlobalV::NBANDS="+ModuleBase::GlobalFunc::TO_STRING(GlobalV::NBANDS)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		}
-		if(M!=NZ)
-		{
-			throw std::runtime_error("M="+ModuleBase::GlobalFunc::TO_STRING(M)+". NZ="+ModuleBase::GlobalFunc::TO_STRING(NZ)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		}
-		if(INPUT.new_dm==0)
-		{
-			throw std::domain_error("INPUT.new_dm must be 1. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		}
-	}
-    //delete[] Stmp; //LiuXh 20171109
-#endif
-
-#ifdef TEST_DIAG
-	{
-		static int istep = 0;
-		{
-			std::ofstream ofs("ekb_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
-			for(int ib=0; ib<GlobalV::NBANDS; ++ib)
-			{
-				ofs<<ekb[ib]<<std::endl;
-			}
-		}
-		{
-			std::ofstream ofs("wfc-C_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
-			ofs<<wfc_2d<<std::endl;
-		}
-		{
-			std::ofstream ofs("wfc-F_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
-			ofs<<transpose(wfc_2d)<<std::endl;
-		}
-		++istep;
-	}
-#endif
-
-	return;
-}

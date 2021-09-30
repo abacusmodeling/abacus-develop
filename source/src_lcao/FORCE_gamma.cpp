@@ -1,5 +1,8 @@
 #include "FORCE_gamma.h"
 #include "../src_pw/global.h"
+#ifdef __DEEPKS
+#include "LCAO_descriptor.h"//caoyu add for deepks on 20210813
+#endif
 
 Force_LCAO_gamma::Force_LCAO_gamma ()
 {}
@@ -73,7 +76,29 @@ void Force_LCAO_gamma::ftable_gamma (
         this->cal_fvl_dphi(dm2d, isforce, isstress, fvl_dphi, svl_dphi);
 
     }
-	if(isforce)
+    
+    //caoyu add for DeePKS
+#ifdef __DEEPKS
+    if (INPUT.deepks_scf)
+    {
+        //=======method 1: dgemm==============
+        //ld.build_S_descriptor(1);   //for F_delta calculation
+        //ld.cal_f_delta(LOC.wfc_dm_2d.dm_gamma[0]);
+        //ld.print_F_delta("F_delta_old.dat");
+
+        
+        //=======method 2: snap_psialpha========
+        
+        GlobalC::ld.cal_gedm(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
+        GlobalC::ld.cal_f_delta_hf(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
+        //ld.print_F_delta("F_delta_hf.dat");
+        GlobalC::ld.cal_f_delta_pulay(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
+        //ld.print_F_delta("F_delta_pulay.dat");
+        GlobalC::ld.print_F_delta("F_delta.dat");
+    }
+#endif
+    
+    if (isforce)
 	{
         Parallel_Reduce::reduce_double_pool( foverlap.c, foverlap.nr * foverlap.nc);
         Parallel_Reduce::reduce_double_pool( ftvnl_dphi.c, ftvnl_dphi.nr * ftvnl_dphi.nc);
@@ -169,7 +194,14 @@ void Force_LCAO_gamma::allocate_gamma(void)
     
     //GlobalC::UHM.genH.build_Nonlocal_beta (cal_deri);
     //ModuleBase::timer::tick("Force_LCAO_gamma","build_Nonlocal_mu");
-    GlobalC::UHM.genH.build_Nonlocal_mu (cal_deri);
+	if(GlobalV::NSPIN==4)
+	{
+		GlobalC::UHM.genH.build_Nonlocal_mu (cal_deri);
+	}
+	else
+	{
+		GlobalC::UHM.genH.build_Nonlocal_mu_new (cal_deri);
+	}
     //ModuleBase::timer::tick("Force_LCAO_gamma","build_Nonlocal_mu");
     //test_gamma(GlobalC::LM.DHloc_fixed_x, "dHloc_fixed_x Vnl part");
 
