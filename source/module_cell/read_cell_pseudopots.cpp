@@ -4,16 +4,13 @@
 //#include "../module_orbital/ORB_read.h" // to use 'ORB' -- mohan 2021-01-30
 #endif
 
-#ifndef __CELL
-#include "../src_pw/global.h"
-#endif
 
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
 //==========================================================
 // Read pseudopotential according to the dir
 //==========================================================
-void UnitCell_pseudo::read_cell_pseudopots(const std::string &pp_dir)
+void UnitCell_pseudo::read_cell_pseudopots(const std::string &pp_dir, std::ofstream &log)
 {
 	ModuleBase::TITLE("UnitCell_pseudo","read_cell_pseudopots");
 	// setup reading log for pseudopot_upf
@@ -42,7 +39,7 @@ void UnitCell_pseudo::read_cell_pseudopots(const std::string &pp_dir)
 					upf.set_empty_element();			
 				}
 				//average pseudopotential if needed
-				error_ap = upf.average_p(INPUT.soc_lambda); //added by zhengdy 2020-10-20
+				error_ap = upf.average_p(GlobalV::soc_lambda); //added by zhengdy 2020-10-20
 			}
 		}
 
@@ -82,23 +79,23 @@ void UnitCell_pseudo::read_cell_pseudopots(const std::string &pp_dir)
 //			upf.print_pseudo_upf( ofs );
 			atoms[i].set_pseudo_nc( upf );
 
-			GlobalV::ofs_running << "\n Read in pseudopotential file is " << pseudo_fn[i] << std::endl;
-			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"pseudopotential type",atoms[i].pp_type);
-			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"functional Ex", atoms[i].dft[0]);
-			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"functional Ec", atoms[i].dft[1]);
-			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"functional GCEx", atoms[i].dft[2]);
-			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"functional GCEc", atoms[i].dft[3]);
-			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nonlocal core correction", atoms[i].nlcc);
-//			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"spin orbital",atoms[i].has_so);
-			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"valence electrons", atoms[i].zv);
-			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"lmax", atoms[i].lmax);
-			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of zeta", atoms[i].nchi);
-			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of projectors", atoms[i].nbeta);
+			log << "\n Read in pseudopotential file is " << pseudo_fn[i] << std::endl;
+			ModuleBase::GlobalFunc::OUT(log,"pseudopotential type",atoms[i].pp_type);
+			ModuleBase::GlobalFunc::OUT(log,"functional Ex", atoms[i].dft[0]);
+			ModuleBase::GlobalFunc::OUT(log,"functional Ec", atoms[i].dft[1]);
+			ModuleBase::GlobalFunc::OUT(log,"functional GCEx", atoms[i].dft[2]);
+			ModuleBase::GlobalFunc::OUT(log,"functional GCEc", atoms[i].dft[3]);
+			ModuleBase::GlobalFunc::OUT(log,"nonlocal core correction", atoms[i].nlcc);
+//			ModuleBase::GlobalFunc::OUT(log,"spin orbital",atoms[i].has_so);
+			ModuleBase::GlobalFunc::OUT(log,"valence electrons", atoms[i].zv);
+			ModuleBase::GlobalFunc::OUT(log,"lmax", atoms[i].lmax);
+			ModuleBase::GlobalFunc::OUT(log,"number of zeta", atoms[i].nchi);
+			ModuleBase::GlobalFunc::OUT(log,"number of projectors", atoms[i].nbeta);
 			for(int ib=0; ib<atoms[i].nbeta; ib++)
 			{
-				ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"L of projector", atoms[i].lll[ib]);
+				ModuleBase::GlobalFunc::OUT(log,"L of projector", atoms[i].lll[ib]);
 			}
-//			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Grid Mesh Number", atoms[i].mesh);
+//			ModuleBase::GlobalFunc::OUT(log,"Grid Mesh Number", atoms[i].mesh);
 		}
 		if(upf.functional_error == 1)
 		{
@@ -111,11 +108,11 @@ void UnitCell_pseudo::read_cell_pseudopots(const std::string &pp_dir)
 			atoms[i].dft[3].clear();
 			if(GlobalV::MY_RANK==0)
 			{
-				GlobalV::ofs_running << "\n XC functional updated to : " << std::endl;
-				ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"functional Ex", atoms[i].dft[0]);
-				ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"functional Ec", atoms[i].dft[1]);
-				ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"functional GCEx", atoms[i].dft[2]);
-				ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"functional GCEc", atoms[i].dft[3]);
+				log << "\n XC functional updated to : " << std::endl;
+				ModuleBase::GlobalFunc::OUT(log,"functional Ex", atoms[i].dft[0]);
+				ModuleBase::GlobalFunc::OUT(log,"functional Ec", atoms[i].dft[1]);
+				ModuleBase::GlobalFunc::OUT(log,"functional GCEx", atoms[i].dft[2]);
+				ModuleBase::GlobalFunc::OUT(log,"functional GCEc", atoms[i].dft[3]);
 			}
 		}
 			

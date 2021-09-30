@@ -10,6 +10,7 @@ void Stress_Func::stress_gga(ModuleBase::matrix& sigma)
      
 	if (GlobalC::xcf.igcx == 0  &&  GlobalC::xcf.igcc == 0)
 	{
+		ModuleBase::timer::tick("Stress_Func","stress_gga");
 		return;
 	} 
 	double sigma_gradcorr[3][3];

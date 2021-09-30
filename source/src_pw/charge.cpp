@@ -209,7 +209,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 		const int startmag_type = [&]()->int
 		{
 			if(GlobalV::NSPIN==4)		//zhengdy-soc, type 2 is still wrong.
-				return 1;
+				return 2;
 			for(int it=0; it<GlobalC::ucell.ntype; it++)
 				for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 					if(GlobalC::ucell.atoms[it].mag[ia]!=0.0)
@@ -331,7 +331,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 				else if(spin_number_need==2)
 				{
 					if(startmag_type==1)
-					{
+					{ cout<<"this should not be called";
 						for (int ig = 0; ig < GlobalC::pw.ngmc ; ig++)
 						{
 							const std::complex<double> swap = GlobalC::pw.strucFac(it, ig)* rho_lgl[GlobalC::pw.ig2ngg[ig]];
@@ -375,7 +375,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 				{
 					//noncolinear case
 					if(startmag_type == 1)
-					{
+					{cout<<"this would not be call";
 						for (int ig = 0; ig < GlobalC::pw.ngmc ; ig++)
 						{
 							const std::complex<double> swap = GlobalC::pw.strucFac(it, ig)* rho_lgl[GlobalC::pw.ig2ngg[ig]];
@@ -415,11 +415,11 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 								if(GlobalV::DOMAG)
 								{
 									rho_g3d(1, ig) += swap * (atom->mag[ia] / atom->zv) 
-										* sin(GlobalC::ucell.magnet.angle1_[it]) * cos(GlobalC::ucell.magnet.angle2_[it]);
+										* sin(atom->angle1[ia]) * cos(atom->angle2[ia]);
 									rho_g3d(2, ig) += swap * (atom->mag[ia] / atom->zv) 
-										* sin(GlobalC::ucell.magnet.angle1_[it]) * sin(GlobalC::ucell.magnet.angle2_[it]);
+										* sin(atom->angle1[ia]) * sin(atom->angle2[ia]);
 									rho_g3d(3, ig) += swap * (atom->mag[ia] / atom->zv) 
-										* cos(GlobalC::ucell.magnet.angle1_[it]);
+										* cos(atom->angle1[ia]);
 								}
 								else if(GlobalV::DOMAG_Z)
 								{

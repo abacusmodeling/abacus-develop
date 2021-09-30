@@ -1,6 +1,8 @@
 #include "FORCE_gamma.h"
 #include "../src_pw/global.h"
-#include "dftu.h"  //Quxin add for DFT+U on 20201029
+#ifdef __DEEPKS
+#include "LCAO_descriptor.h"//caoyu add for deepks on 20210813
+#endif
 
 Force_LCAO_gamma::Force_LCAO_gamma ()
 {}
@@ -34,11 +36,16 @@ void Force_LCAO_gamma::ftable_gamma (
     if(INPUT.new_dm>0)
     {
         this->cal_ftvnl_dphi(GlobalC::LOC.wfc_dm_2d.dm_gamma, isforce, isstress, ftvnl_dphi, stvnl_dphi);
-        this->cal_fvnl_dbeta(GlobalC::LOC.wfc_dm_2d.dm_gamma, isforce, isstress, fvnl_dbeta, svnl_dbeta);
+        if(GlobalV::NSPIN==4)
+        {
+            this->cal_fvnl_dbeta(GlobalC::LOC.wfc_dm_2d.dm_gamma, isforce, isstress, fvnl_dbeta, svnl_dbeta);
+        }
+        else
+        {
+            this->cal_fvnl_dbeta_new(GlobalC::LOC.wfc_dm_2d.dm_gamma, isforce, isstress, fvnl_dbeta, svnl_dbeta);
+        }
         this->cal_fvl_dphi(GlobalC::LOC.wfc_dm_2d.dm_gamma, isforce, isstress, fvl_dphi, svl_dphi);
 
-        //quxin added for DFT+U
-        if(INPUT.dft_plus_u) GlobalC::dftu.force_stress();
     }
     else
     {
@@ -55,16 +62,43 @@ void Force_LCAO_gamma::ftable_gamma (
         ModuleBase::timer::tick("Force_LCAO_gamma","cal_dm_grid");
 
         this->cal_ftvnl_dphi(dm2d, isforce, isstress, ftvnl_dphi, stvnl_dphi);
-        this->cal_fvnl_dbeta(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
+        if(GlobalV::NSPIN==4)
+        {
+            this->cal_fvnl_dbeta(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
+        }
+        else
+        {
+            this->cal_fvnl_dbeta_new(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
+        }
 
-        //quxin added for DFT+U
-        if(INPUT.dft_plus_u) GlobalC::dftu.force_stress();
 
         // calculate < dphi | V | phi > on real space grid.
         this->cal_fvl_dphi(dm2d, isforce, isstress, fvl_dphi, svl_dphi);
 
     }
-	if(isforce)
+    
+    //caoyu add for DeePKS
+#ifdef __DEEPKS
+    if (INPUT.deepks_scf)
+    {
+        //=======method 1: dgemm==============
+        //ld.build_S_descriptor(1);   //for F_delta calculation
+        //ld.cal_f_delta(LOC.wfc_dm_2d.dm_gamma[0]);
+        //ld.print_F_delta("F_delta_old.dat");
+
+        
+        //=======method 2: snap_psialpha========
+        
+        GlobalC::ld.cal_gedm(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
+        GlobalC::ld.cal_f_delta_hf(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
+        //ld.print_F_delta("F_delta_hf.dat");
+        GlobalC::ld.cal_f_delta_pulay(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
+        //ld.print_F_delta("F_delta_pulay.dat");
+        GlobalC::ld.print_F_delta("F_delta.dat");
+    }
+#endif
+    
+    if (isforce)
 	{
         Parallel_Reduce::reduce_double_pool( foverlap.c, foverlap.nr * foverlap.nc);
         Parallel_Reduce::reduce_double_pool( ftvnl_dphi.c, ftvnl_dphi.nr * ftvnl_dphi.nc);
@@ -136,7 +170,7 @@ void Force_LCAO_gamma::allocate_gamma(void)
     //calculate dS in LCAO basis
     // tips: build_ST_new --> GlobalC::ParaO.set_force 
     //ModuleBase::timer::tick("Force_LCAO_gamma","build_S_new");
-    GlobalC::UHM.genH.build_ST_new ('S', cal_deri);
+    GlobalC::UHM.genH.build_ST_new ('S', cal_deri, GlobalC::ucell);
     //ModuleBase::timer::tick("Force_LCAO_gamma","build_S_new");
 
     ModuleBase::Memory::record("force_lo", "dS", GlobalC::ParaO.nloc*3, "double");
@@ -154,13 +188,20 @@ void Force_LCAO_gamma::allocate_gamma(void)
     //calculate dT
     //calculate T + VNL(P1) in LCAO basis
     //ModuleBase::timer::tick("Force_LCAO_gamma","build_T_new");
-    GlobalC::UHM.genH.build_ST_new ('T', cal_deri);
+    GlobalC::UHM.genH.build_ST_new ('T', cal_deri, GlobalC::ucell);
     //ModuleBase::timer::tick("Force_LCAO_gamma","build_T_new");
     //test_gamma(GlobalC::LM.DHloc_fixed_x, "dHloc_fixed_x T part");
     
     //GlobalC::UHM.genH.build_Nonlocal_beta (cal_deri);
     //ModuleBase::timer::tick("Force_LCAO_gamma","build_Nonlocal_mu");
-    GlobalC::UHM.genH.build_Nonlocal_mu (cal_deri);
+	if(GlobalV::NSPIN==4)
+	{
+		GlobalC::UHM.genH.build_Nonlocal_mu (cal_deri);
+	}
+	else
+	{
+		GlobalC::UHM.genH.build_Nonlocal_mu_new (cal_deri);
+	}
     //ModuleBase::timer::tick("Force_LCAO_gamma","build_Nonlocal_mu");
     //test_gamma(GlobalC::LM.DHloc_fixed_x, "dHloc_fixed_x Vnl part");
 

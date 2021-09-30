@@ -534,7 +534,6 @@ void Pdiag_Double::divide_HS_2d
 
 void Pdiag_Double::diago_double_begin(
 	const int &ik, // k-point index
-	double **wfc, // wave functions
 	ModuleBase::matrix &wfc_2d, // wave functions in 2d
 	double* h_mat, // hamiltonian matrix
 	double* s_mat, // overlap matrix
@@ -641,7 +640,7 @@ void Pdiag_Double::diago_double_begin(
 
         //xiaohui modify 2014-06-18
         ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig");
-        this->gath_eig(DIAG_HPSEPS_WORLD, GlobalV::NLOCAL, wfc, Z);
+        this->gath_eig(DIAG_HPSEPS_WORLD, GlobalV::NLOCAL, Z);
         ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig");
         //delete[] Z; //LiuXh 20171109
 	}// HPSEPS method
@@ -726,9 +725,9 @@ void Pdiag_Double::diago_double_begin(
 					if(INPUT.new_dm==0)
 					{
 						// mohan delete Bfield option 2021-02-12
-						info=q2ZLOC_WFC_WFCAUG_CTOT(myid, pos, naroc, nb,
-							dim0, dim1, iprow, ipcol, this->loc_size,
-							work, Z_LOC[ik], wfc, GlobalC::LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN], ctot);
+						//info=q2ZLOC_WFC_WFCAUG_CTOT(myid, pos, naroc, nb,
+						//	dim0, dim1, iprow, ipcol, this->loc_size,
+						//	work, Z_LOC[ik], wfc, GlobalC::LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN], ctot);
 					}
 					else
 					{
@@ -740,9 +739,9 @@ void Pdiag_Double::diago_double_begin(
 				else
 				{
 					// mohan update 2021-02-12, delete Bfield option
-					info=q2ZLOC_WFC_WFCAUG(pos, naroc, nb,
-						dim0, dim1, iprow, ipcol, this->loc_size,
-						work, Z_LOC[ik], wfc, GlobalC::LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN]);
+					//info=q2ZLOC_WFC_WFCAUG(pos, naroc, nb,
+					//	dim0, dim1, iprow, ipcol, this->loc_size,
+					//	work, Z_LOC[ik], wfc, GlobalC::LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN]);
 				}
 			}//loop ipcol
 		}//loop iprow
@@ -928,7 +927,6 @@ void Pdiag_Double::diago_double_begin(
 
 	return;
 }
-
 
 void Pdiag_Double::diago_complex_begin(
 	const int &ik,

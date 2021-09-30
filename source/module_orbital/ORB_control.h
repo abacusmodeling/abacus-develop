@@ -11,28 +11,38 @@ class ORB_control
     ORB_control();
     ~ORB_control();
 
+	//first step: read orbital file
+	void read_orb_first(
+	std::ofstream &ofs_in, 
+	LCAO_Orbitals &orb,
+	const int &ntype, // mohan add 2021-04-26
+	const int &lmax, // mohan add 2021-04-26 
+	const double &lcao_ecut_in, // mohan add 2021-04-16
+	const double &lcao_dk_in, // mohan add 2021-04-16
+	const double &lcao_dr_in, // mohan add 2021-04-16
+	const double &lcao_rmax_in, // mohan add 2021-04-16
+	const int &out_descriptor,
+	const int &out_r_matrix,
+	const bool &force_flag, // mohan add 2021-05-07
+	const int &my_rank // mohan add 2021-04-26
+	);
     /// Generate the S(overlap),T,NL matrix.
     void set_orb_tables(
-		std::ofstream &ofs_in, // mohan add 2021-05-07
+		std::ofstream &ofs_in,
 		ORB_gen_tables &OGT, 
 		LCAO_Orbitals &orb,
-		const int &ntype, ///< number of speceies, mohan add 2021-04-26
-		const int &lmax, ///< value of Lmax for basis, mohan add 2021-04-26 
-		const double &lcao_ecut_in, // mohan add 2021-04-16
-		const double &lcao_dk_in, // mohan add 2021-04-16
-		const double &lcao_dr_in, // mohan add 2021-04-16
-		const double &lcao_rmax_in, // mohan add 2021-04-16
 		const double &lat0,
-		const int &out_descriptor, // mohan add 2021-04-25
-		const int &out_r_matrix, // mohan add 2021-04-26
+		const int &out_descriptor,
 		const int &Lmax_exx,
-		const bool &force_flag, // mohan add 2021-05-07
-		const int &my_rank); // mohan add 2021-04-26;
+		const int &nprojmax, 
+		const int* nproj,
+		const Numerical_Nonlocal* beta_); 
 
     void clear_after_ions(
 		ORB_gen_tables &OGT, 
 		LCAO_Orbitals &orb,
-		const int &out_descriptor);
+		const int &out_descriptor,
+		const int* nproj_);
 
 };
 #endif

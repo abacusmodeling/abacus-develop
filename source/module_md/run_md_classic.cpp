@@ -33,7 +33,11 @@ void Run_MD_CLASSIC::classic_md_line(void)
     ModuleBase::timer::tick("Run_MD_CLASSIC", "classic_md_line");
 
 	// Setup the unitcell.
+#ifdef __LCAO
+	ucell_c.setup_cell_classic(GlobalC::ORB, GlobalV::global_atom_card, GlobalV::ofs_running, GlobalV::ofs_warning);
+#else
     ucell_c.setup_cell_classic(GlobalV::global_atom_card, GlobalV::ofs_running, GlobalV::ofs_warning);
+#endif
 	ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     this->md_allocate_ions();
@@ -104,7 +108,8 @@ void Run_MD_CLASSIC::md_force_stress(double &potential)
 			potential = LJ_potential::Lennard_Jones(
 								this->ucell_c,
 								cmd_neigh,
-								this->force);
+								this->force,
+								this->stress);
 		}
 		else
 		{
