@@ -186,12 +186,9 @@ void LOOP_ions::opt_ions(void)
             if (INPUT.deepks_scf)
             {
                 //ld.print_H_V_delta();   //final H_delta
-                if (FORCE)
-                {
-                    GlobalC::ld.build_S_descriptor(1);   //for F_delta calculation
-                    GlobalC::ld.cal_f_delta(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
-                    GlobalC::ld.print_F_delta();
-                }
+                GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma);
+                std::cout << "E_delta_band = " << std::setprecision(8) << GlobalC::ld.e_delta_band << " Ry" << " = " << std::setprecision(8) << GlobalC::ld.e_delta_band * ModuleBase::Ry_to_eV << " eV" << std::endl;
+                std::cout << "E_delta_NN= "<<std::setprecision(8) << GlobalC::ld.E_delta << " Ry" << " = "<<std::setprecision(8)<<GlobalC::ld.E_delta*ModuleBase::Ry_to_eV<<" eV"<<std::endl;
             }
         }
 #endif
