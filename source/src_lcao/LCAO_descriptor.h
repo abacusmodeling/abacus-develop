@@ -3,10 +3,10 @@
 #endif
 #ifdef __DEEPKS
 
-#include "../module_base/complexmatrix.h"
 #include "../module_base/intarray.h"
-#include "../src_pw/global.h"
+#include "../module_base/complexmatrix.h"
 #include <torch/script.h>
+#include "../src_pw/global.h"
 
 //------------------------------------------------------------------------------
 // This class computes the descriptors for each atom from LCAO basis set,
@@ -16,20 +16,22 @@
 //
 // caoyu add 2021-03-29
 //
-class LCAO_Descriptor {
+class LCAO_Descriptor
+{
 
-    //-------------------
-    // public functions
-    //-------------------
-  public:
+//-------------------
+// public functions
+//-------------------
+public:
+
     explicit LCAO_Descriptor();
     ~LCAO_Descriptor();
 
     // index of descriptor in all atoms
-     //only for descriptor part, not including scf
+    //only for descriptor part, not including scf
     void init(const int lm, const int nm, const int tot_inl);
 
-    // cal S_alpha_mu: overlap between lcao basis Phi and descriptor basis Al
+	// cal S_alpha_mu: overlap between lcao basis Phi and descriptor basis Al
     void build_S_descriptor(const bool &calc_deri);
 
 
@@ -132,50 +134,50 @@ private:
 
 	// descriptors
     double *d;
-    std::vector<torch::Tensor> d_tensor;
+	std::vector<torch::Tensor> d_tensor;
 
-    // gedm:dE/dD, [tot_Inl][2l+1][2l+1]	(E: Hartree)
-    std::vector<torch::Tensor> gedm_tensor;
+	//gedm:dE/dD, [tot_Inl][2l+1][2l+1]	(E: Hartree)
+	std::vector<torch::Tensor> gedm_tensor;
 
-    // gdmx: dD/dX		\sum_{mu,nu} 4*c_mu*c_nu *
-    // <dpsi_mu/dx|alpha_m><alpha_m'|psi_nu>
-    double ***gdmx; //[natom][tot_Inl][2l+1][2l+1]
-    double ***gdmy;
-    double ***gdmz;
+	//gdmx: dD/dX		\sum_{mu,nu} 4*c_mu*c_nu * <dpsi_mu/dx|alpha_m><alpha_m'|psi_nu>
+	double*** gdmx;	//[natom][tot_Inl][2l+1][2l+1]
+	double*** gdmy;
+	double*** gdmz;
 
-    // dE/dD, autograd from loaded model(E: Ry)
-    double **gedm; //[tot_Inl][2l+1][2l+1]
+	//dE/dD, autograd from loaded model(E: Ry)
+	double** gedm;	//[tot_Inl][2l+1][2l+1]
 
-    int n_descriptor;
+	int n_descriptor;
 
-    // \sum_L{Nchi(L)*(2L+1)}
-    int des_per_atom;
+	// \sum_L{Nchi(L)*(2L+1)}
+	int des_per_atom;
 
-    ModuleBase::IntArray *alpha_index;
-    ModuleBase::IntArray *inl_index; // caoyu add 2021-05-07
-    int *inl_l; // inl_l[inl_index] = l of descriptor with inl_index
 
-    //-------------------
-    // private functions
-    //-------------------
-  private:
-    void init_index(void); // index of descriptor in all atoms
+	ModuleBase::IntArray* alpha_index;
+	ModuleBase::IntArray* inl_index;	//caoyu add 2021-05-07
+	int* inl_l;	//inl_l[inl_index] = l of descriptor with inl_index
 
-    void set_S_mu_alpha(const int &iw1_all, const int &inl, const int &im,
-                        const double &v);
+//-------------------
+// private functions
+//-------------------
+private:
 
-    void print_projected_DM(std::ofstream &ofs, ModuleBase::ComplexMatrix &des,
-                            const int &it, const int &ia, const int &l,
-                            const int &n);
+	void init_index(void);	// index of descriptor in all atoms
 
-    void set_DS_mu_alpha(const int &iw1_all, const int &inl, const int &im,
-                         const double &vx, const double &vy, const double &vz);
+	void set_S_mu_alpha(
+		const int &iw1_all,
+		const int& inl,
+		const int& im,
+		const double& v);
 
-    void init_gdmx();
-    void load_model(const std::string &model_file);
-    void cal_gedm();                       // need to load model in this step
-    void cal_gdmx(ModuleBase::matrix &dm); // dD/dX
-    void del_gdmx();
+    void print_projected_DM(
+		std::ofstream &ofs,
+		ModuleBase::ComplexMatrix &des,
+		const int &it,
+		const int &ia,
+		const int &l,
+		const int& n);
+
 	void set_DS_mu_alpha(
 		const int& iw1_all,
 		const int& inl,
@@ -192,11 +194,11 @@ private:
 
 	void getdm_double(const ModuleBase::matrix& dm);
 
-    void getdm_double(const ModuleBase::matrix &dm);
+	void cal_descriptor_tensor(void);
 
-    void cal_descriptor_tensor(void);
 };
-namespace GlobalC {
+namespace GlobalC
+{
 extern LCAO_Descriptor ld;
 }
 
