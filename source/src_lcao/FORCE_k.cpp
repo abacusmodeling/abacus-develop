@@ -188,7 +188,7 @@ void Force_LCAO_k::allocate_k(void)
 	}
 	//test(GlobalC::LM.DHloc_fixedR_x,"GlobalC::LM.DHloc_fixedR_x Vnl part");
 
-	ModuleBase::timer::tick("Force_LCAO_k","allocate");
+	ModuleBase::timer::tick("Force_LCAO_k","allocate_k");
 	return;
 }
 
