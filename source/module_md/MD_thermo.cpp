@@ -120,7 +120,7 @@ double MD_thermo::NHChamiltonian(
         GlobalV::ofs_running<< "            SUMMARY OF NVT CALCULATION            "<<std::endl;
         GlobalV::ofs_running<<" --------------------------------------------------"<<std::endl;
         GlobalV::ofs_running<<" NVT Conservation     : "<<std::setw(10)<< NHChamiltonian0*2<<" (Rydberg)"<<std::endl;
-        GlobalV::ofs_running<<" NVT Temperature      : "<<std::setw(10)<< KE*2/(3*double(numIon_-nfrozen))/ModuleBase::K_BOLTZMAN_AU<<" (K)"<<std::endl;
+        GlobalV::ofs_running<<" NVT Temperature      : "<<std::setw(10)<< KE*2/(double(3*numIon_-nfrozen))/ModuleBase::K_BOLTZMAN_AU<<" (K)"<<std::endl;
         GlobalV::ofs_running<<" NVT Kinetic energy   : "<<std::setw(10)<< KE*2<<" (Rydberg)"<<std::endl;
         GlobalV::ofs_running<<" NVT Potential energy : "<<std::setw(10)<< PE*2<<" (Rydberg)"<<std::endl;
     }

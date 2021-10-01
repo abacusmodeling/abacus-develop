@@ -162,7 +162,7 @@ We also provide some [information](doc/developers.md) for developers.
 - [Modularization and module tests](doc/developers.md#modularization-and-module-tests)
 - [Contributing to ABACUS](doc/developers.md#contributing-to-abacus)
     - [Making pull requests](doc/developers.md#making-pull-requests)
-    - [Providing uniy tests](doc/developers.md#providing-unit-tests)
+    - [Providing unit tests](doc/developers.md#providing-unit-tests)
     - [Upating documentation](doc/developers.md#updating-documentation)
     - [Macros](doc/developers.md#macros)
     - [Comment style for documentation](doc/developers.md#comment-style-for-documentation)
