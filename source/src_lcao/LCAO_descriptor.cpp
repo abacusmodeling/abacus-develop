@@ -1610,33 +1610,32 @@ void LCAO_Descriptor::save_npy_d(void)
 }
 
 
-void LCAO_Descriptor::save_npy_e(const double &ebase)
+void LCAO_Descriptor::save_npy_e(const double &e, const std::string &e_file)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "save_npy_e");
     //save e_base
     const long unsigned eshape[] = { 1 };
-    vector<double> npy_ebase;
-    npy_ebase.push_back(ebase);
-    npy::SaveArrayAsNumpy("e_base.npy", false, 1, eshape, npy_ebase);
+    vector<double> npy_e;
+    npy_e.push_back(e);
+    npy::SaveArrayAsNumpy(e_file, false, 1, eshape, npy_e);
     return;
 }
 
-
-void LCAO_Descriptor::save_npy_f(const ModuleBase::matrix &fbase)
+void LCAO_Descriptor::save_npy_f(const ModuleBase::matrix &f, const std::string &f_file)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "save_npy_f");
     //save f_base
     //caution: unit: Rydberg/Bohr
     const long unsigned fshape[] = {(long unsigned) GlobalC::ucell.nat, 3 };
-    vector<double> npy_fbase;
+    vector<double> npy_f;
     for (int iat = 0;iat < GlobalC::ucell.nat;++iat)
     {
         for (int i = 0;i < 3;i++)
         {
-            npy_fbase.push_back(fbase(iat, i));
+            npy_f.push_back(f(iat, i));
         }
     }
-    npy::SaveArrayAsNumpy("f_base.npy", false, 2, fshape, npy_fbase);
+    npy::SaveArrayAsNumpy(f_file, false, 2, fshape, npy_f);
     return;
 }
 

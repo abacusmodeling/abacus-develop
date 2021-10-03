@@ -101,8 +101,8 @@ public:
     /// Unit of force: Ry/Bohr
     ///----------------------------------------------------------------------
 	void save_npy_d(void);
-	void save_npy_e(const double &ebase/**<[in] \f$E_{base}\f$, 'en.etot', in Ry*/);
-	void save_npy_f(const ModuleBase::matrix &fbase/**<[in] \f$F_{base}\f$, in Ry/Bohr*/);
+	void save_npy_e(const double &e/**<[in] \f$E_{base}\f$ or \f$E_{tot}\f$, in Ry*/, const std::string &e_file);
+	void save_npy_f(const ModuleBase::matrix &fbase/**<[in] \f$F_{base}\f$ or \f$F_{tot}\f$, in Ry/Bohr*/, const std::string &f_file);
 
     ///calculate \f$tr(\rho H_\delta), \rho = \sum_i{c_{i, \mu}c_{i,\nu}} \f$ (for gamma_only)
     void cal_e_delta_band(const std::vector<ModuleBase::matrix>& dm/**<[in] density matrix*/);

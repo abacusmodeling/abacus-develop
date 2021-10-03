@@ -295,7 +295,8 @@ void Force_Stress_LCAO::getForceStress(
 		//DeePKS force, caoyu add 2021-06-03
 		if (INPUT.deepks_scf)
 		{
-			GlobalC::ld.save_npy_f(fcs);	//save fbase
+			GlobalC::ld.save_npy_f(fcs, "f_tot.npy"); //Ty/Bohr, F_tot
+            GlobalC::ld.save_npy_f(fcs - GlobalC::ld.F_delta, "f_base.npy"); //Ry/Bohr, F_base
 		}
 #endif
 		// print Rydberg force or not
