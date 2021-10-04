@@ -94,8 +94,8 @@ private:
 	int lmax;
 	int nchimax;
 
-	int lmax_d;	//caoyu add 2021-03-17
-	int nchimax_d;	//caoyu add 2021-03-17
+	int lmax_d;	//max l of descriptor orbitals
+	int nchimax_d;	//max number of descriptor orbitals per l
 
 	double rcutmax_Phi;	//caoyu add 2021-05-24
 
