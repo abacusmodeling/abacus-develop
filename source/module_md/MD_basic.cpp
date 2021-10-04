@@ -31,8 +31,8 @@ MD_basic::MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
 	allmass=new double[ucell.nat];
 	ionmbl=new ModuleBase::Vector3<int>[ucell.nat];
 
-    frozen_freedom_ = mdf.getMassMbl(ucell, allmass, ionmbl);
-    mdf.InitVel(unit_in, temperature_, allmass, ionmbl, vel);
+    //frozen_freedom_ = mdf.getMassMbl(ucell, allmass, ionmbl);
+    mdf.InitVel(unit_in, temperature_, allmass, frozen_freedom_, ionmbl, vel);
     // if (ucell.set_vel)    //  Yuanbo Li 2021-08-01
     // {
     //     int iat=0;    //initialize velocity of atoms from STRU  liuyu 2021-07-14

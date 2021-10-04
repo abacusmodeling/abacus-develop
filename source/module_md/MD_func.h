@@ -23,8 +23,9 @@ class MD_func
 	void InitVel(
 		const UnitCell_pseudo &unit_in, 
 		const double& temperature, 
-		const double* allmass,
-		const ModuleBase::Vector3<int>* ionmbl,
+		double* allmass,
+		int& frozen_freedom,
+		ModuleBase::Vector3<int>* ionmbl,
 		ModuleBase::Vector3<double>* vel);
 
 	void ReadVel(
@@ -35,6 +36,7 @@ class MD_func
 		const int& numIon, 
 		const double& temperature,
 		const double* allmass,
+		const int& frozen_freedom,
 		const ModuleBase::Vector3<int>* ionmbl,
 		ModuleBase::Vector3<double>* vel);
 

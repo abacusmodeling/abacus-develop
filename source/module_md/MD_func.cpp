@@ -135,51 +135,52 @@ void MD_func::RandomVel(
 	const int& numIon, 
 	const double& temperature, 
 	const double* allmass,
+	const int& frozen_freedom,
 	const ModuleBase::Vector3<int>* ionmbl,
 	ModuleBase::Vector3<double>* vel)
 {
 	if(!GlobalV::MY_RANK)
 	{
 		srand(time(0));
-		ModuleBase::Vector3<int> freedom;   // freedom along x, y, z
 		ModuleBase::Vector3<double> average;
-		freedom.set(numIon, numIon, numIon);
+		ModuleBase::Vector3<double> mass;
 		average.set(0,0,0);
+		mass.set(0,0,0);
 		for(int i=0; i<numIon; i++)
 		{
 			if(ionmbl[i].x==0)
 			{
 				vel[i].x = 0;
-				freedom.x--;
 			}
 			else
 			{
 				vel[i].x = rand()/double(RAND_MAX)-0.5;
+				mass.x += allmass[i];
 			}
 			if(ionmbl[i].y==0)
 			{
 				vel[i].y = 0;
-				freedom.y--;
 			}
 			else
 			{
 				vel[i].y = rand()/double(RAND_MAX)-0.5;
+				mass.y += allmass[i];
 			}
 			if(ionmbl[i].z==0)
 			{
 				vel[i].z = 0;
-				freedom.z--;
 			}
 			else
 			{
 				vel[i].z = rand()/double(RAND_MAX)-0.5;
+				mass.z += allmass[i];
 			}
-			average = average + vel[i];
+			average += allmass[i]*vel[i];
 		}
 
-		average.x = average.x / freedom.x;
-		average.y = average.y / freedom.y;
-		average.z = average.z / freedom.z;
+		average.x = average.x / mass.x;
+		average.y = average.y / mass.y;
+		average.z = average.z / mass.z;
 
 		for(int i=0; i<numIon; i++)
     	{
@@ -188,7 +189,7 @@ void MD_func::RandomVel(
 			if(ionmbl[i].z) vel[i].z -= average.z;
 		}
 	
-		double factor = 0.5*(freedom.x+freedom.y+freedom.z )*temperature/GetAtomKE(numIon, vel, allmass);
+		double factor = 0.5*(3*numIon-frozen_freedom)*temperature/GetAtomKE(numIon, vel, allmass);
 		for(int i=0; i<numIon; i++)
     	{
         	vel[i] = vel[i]*sqrt(factor);
@@ -204,17 +205,20 @@ void MD_func::RandomVel(
 void MD_func::InitVel(
 	const UnitCell_pseudo &unit_in, 
 	const double& temperature, 
-	const double* allmass,
-	const ModuleBase::Vector3<int>* ionmbl,
+	double* allmass,
+	int& frozen_freedom,
+	ModuleBase::Vector3<int>* ionmbl,
 	ModuleBase::Vector3<double>* vel)
 {
-	if (unit_in.set_vel)
+	frozen_freedom = getMassMbl(unit_in, allmass, ionmbl);
+
+	if(unit_in.set_vel)
     {
         ReadVel(unit_in, vel);
     }
     else
     {
-        RandomVel(unit_in.nat, temperature, allmass, ionmbl, vel);
+        RandomVel(unit_in.nat, temperature, allmass, frozen_freedom, ionmbl, vel);
     }
 }
 

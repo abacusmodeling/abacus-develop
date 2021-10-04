@@ -31,7 +31,7 @@ void DP_potential::DP_pot(UnitCell_pseudo &ucell_c, double &potential, ModuleBas
 
     dp.compute (potential, f, v, coord, atype, cell);
 
-    potential/=ModuleBase::Ry_to_eV;
+    potential/=ModuleBase::Hartree_to_eV;
 
     double fact_f = ModuleBase::Hartree_to_eV*ModuleBase::ANGSTROM_AU;
     double fact_v = ModuleBase::Hartree_to_eV*pow(ModuleBase::ANGSTROM_AU, 3);
