@@ -554,8 +554,15 @@ void ELEC_scf::scf(const int &istep)
 #ifdef __DEEPKS
 				if (INPUT.out_descriptor)	//caoyu add 2021-06-04
 				{
-					GlobalC::ld.save_npy_e(GlobalC::en.etot, "e_tot.npy");
-					GlobalC::ld.save_npy_e(GlobalC::en.etot-GlobalC::ld.E_delta+GlobalC::ld.e_delta_band, "e_base.npy");//ebase :no deepks E_delta including
+                    GlobalC::ld.save_npy_e(GlobalC::en.etot, "e_tot.npy");
+                    if (INPUT.deepks_scf) {
+                        GlobalC::ld.save_npy_e(GlobalC::en.etot - GlobalC::ld.E_delta + GlobalC::ld.e_delta_band, "e_base.npy");//ebase :no deepks E_delta including
+                    }
+                    else
+                    {
+                        GlobalC::ld.save_npy_e(GlobalC::en.etot, "e_base.npy");  // no scf, e_tot=e_base
+                    }
+
 				}
 #endif
 			}
