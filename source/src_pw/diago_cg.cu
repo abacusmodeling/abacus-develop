@@ -175,6 +175,7 @@ void Diago_CG_CUDA<T, T2>::diag
     {
         if (test_cg>2) GlobalV::ofs_running << "Diagonal Band : " << m << endl;
         // cout<<"====band====="<<m<<endl;
+        cudaDeviceSynchronize();
 
         CHECK_CUDA(cudaMemcpy(phi_m, &phi[m*dmx], dim*sizeof(T2), cudaMemcpyDeviceToDevice));
 
