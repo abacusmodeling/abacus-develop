@@ -8,13 +8,13 @@
 
 namespace std
 {
-    template<> struct hash<ModuleBase::Vector3<double>>
+    template<> struct hash<ModuleBase::Vector3<float>>
     {
-        std::size_t operator()(ModuleBase::Vector3<double> const& v) const noexcept
+        std::size_t operator()(ModuleBase::Vector3<float> const& v) const noexcept
         {
-            std::size_t v1 = std::hash<double>{}(v.x);
-            std::size_t v2 = std::hash<double>{}(v.y);
-			std::size_t v3 = std::hash<double>{}(v.z);
+            std::size_t v1 = std::hash<float>{}(v.x);
+            std::size_t v2 = std::hash<float>{}(v.y);
+			std::size_t v3 = std::hash<float>{}(v.z);
             return v1 ^ v2 ^ v3; // or use boost::hash_combine
         }
     };
@@ -460,8 +460,8 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
 
 		//Step 1 : generate <psi|beta>
 		//type of atom; distance; atomic basis; projectors
-		std::vector<std::unordered_map<ModuleBase::Vector3<double>,std::unordered_map<int,std::vector<double>>,std::hash<ModuleBase::Vector3<double>>>> nlm_tot;
-		std::vector<std::unordered_map<ModuleBase::Vector3<double>,std::unordered_map<int,std::vector<std::vector<double>>>,std::hash<ModuleBase::Vector3<double>>>> nlm_tot1;
+		std::vector<std::unordered_map<ModuleBase::Vector3<float>,std::unordered_map<int,std::vector<double>>,std::hash<ModuleBase::Vector3<float>>>> nlm_tot;
+		std::vector<std::unordered_map<ModuleBase::Vector3<float>,std::unordered_map<int,std::vector<std::vector<double>>>,std::hash<ModuleBase::Vector3<float>>>> nlm_tot1;
 		if(!calc_deri)
 		{
 			nlm_tot.resize(GlobalC::ucell.ntype);
@@ -500,12 +500,15 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
 
 			const ModuleBase::Vector3<double> dtau = tau1-tau;
 			const double dist1 = dtau.norm() * GlobalC::ucell.lat0;
+			
 			if (dist1 > Rcut_Beta + Rcut_AO1)
 			{
 				continue;
 			}
 			std::unordered_map<int,std::vector<double>> nlm_cur;
 			std::unordered_map<int,std::vector<std::vector<double>>> nlm_cur1;
+			const ModuleBase::Vector3<float> dtau_f = (float(dtau.x),float(dtau.y),float(dtau.z));
+			
 			if(!calc_deri)
 			{
 				nlm_cur.clear();
@@ -545,11 +548,11 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
 			}//end iw
 			if(!calc_deri)
 			{
-				nlm_tot[T1][dtau]=nlm_cur;
+				nlm_tot[T1][dtau_f]=nlm_cur;
 			}
 			else
 			{
-				nlm_tot1[T1][dtau]=nlm_cur1;
+				nlm_tot1[T1][dtau_f]=nlm_cur1;
 			}
 		}//end ad
 
@@ -561,6 +564,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
 		int nnr = 0;
 		ModuleBase::Vector3<double> tau1, tau2, dtau;
 		ModuleBase::Vector3<double> dtau1, dtau2, tau0;
+		ModuleBase::Vector3<float> dtau1_f, dtau2_f;
 		double distance = 0.0;
 		double rcut = 0.0;
 		double rcut1, rcut2;
@@ -676,12 +680,13 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
 									if(distance1 < rcut1 && distance2 < rcut2)
 									{
 										//const Atom* atom0 = &GlobalC::ucell.atoms[T0];
+										dtau1_f = (float(dtau1.x),float(dtau1.y),float(dtau1.z));
+										dtau2_f = (float(dtau2.x),float(dtau2.y),float(dtau2.z));
 
 										if(!calc_deri)
 										{
-
-											std::vector<double> nlm_1=nlm_tot[T1][-dtau1][iw1_all];
-											std::vector<double> nlm_2=nlm_tot[T2][-dtau2][iw2_all];
+											std::vector<double> nlm_1=nlm_tot[T1][-dtau1_f][iw1_all];
+											std::vector<double> nlm_2=nlm_tot[T2][-dtau2_f][iw2_all];
 											double nlm_tmp = 0.0;
 
 											const int nproj = GlobalC::ucell.infoNL.nproj[T0];
@@ -723,12 +728,12 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
 												double nlm[3]={0,0,0};
 
 												// sum all projectors for one atom.
-												std::vector<double> nlm_1 = nlm_tot1[T1][-dtau1][iw1_all][0];
+												std::vector<double> nlm_1 = nlm_tot1[T1][-dtau1_f][iw1_all][0];
 												std::vector<std::vector<double>> nlm_2;
 												nlm_2.resize(3);
 												for(int i=0;i<3;i++)
 												{
-													nlm_2[i] = nlm_tot1[T2][-dtau2][iw2_all][i+1];
+													nlm_2[i] = nlm_tot1[T2][-dtau2_f][iw2_all][i+1];
 												}
 
 												assert(nlm_1.size()==nlm_2[0].size());
@@ -758,12 +763,12 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
 												double nlm[3]={0,0,0};
 
 												// sum all projectors for one atom.
-												std::vector<double> nlm_1 = nlm_tot1[T2][-dtau2][iw2_all][0];
+												std::vector<double> nlm_1 = nlm_tot1[T2][-dtau2_f][iw2_all][0];
 												std::vector<std::vector<double>> nlm_2;
 												nlm_2.resize(3);
 												for(int i=0;i<3;i++)
 												{
-													nlm_2[i] = nlm_tot1[T1][-dtau1][iw1_all][i+1];
+													nlm_2[i] = nlm_tot1[T1][-dtau1_f][iw1_all][i+1];
 												}
 
 												assert(nlm_1.size()==nlm_2[0].size());
