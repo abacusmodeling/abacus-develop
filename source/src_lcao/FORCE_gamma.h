@@ -116,5 +116,13 @@ class Force_LCAO_gamma
 		ModuleBase::matrix& fvl_dphi, 
 		ModuleBase::matrix& svl_dphi);
 
+	void calFvnlDbeta(
+		const std::vector<ModuleBase::matrix> &dm2d, 
+		const bool &isforce, 
+		const bool &isstress, 
+		ModuleBase::matrix& fvnl_dbeta, 
+		ModuleBase::matrix& svnl_dbeta,
+		const int &vnl_method);
+
 };
 #endif

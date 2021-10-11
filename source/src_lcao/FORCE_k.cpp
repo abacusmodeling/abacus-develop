@@ -69,14 +69,7 @@ void Force_LCAO_k::ftable_k (
 	// ---------------------------------------
 	this->cal_fvl_dphi_k(dm2d, isforce, isstress, fvl_dphi, svl_dphi);
 
-	if(GlobalV::NSPIN==4)
-	{
-		this->cal_fvnl_dbeta_k(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
-	}
-	else
-	{
-		this->cal_fvnl_dbeta_k_new(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
-	}
+	this->calFvnlDbeta(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta, GlobalV::vnl_method);
 
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
@@ -1310,4 +1303,25 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 	return;
 }
 
-
+void Force_LCAO_k::calFvnlDbeta(
+	double** dm2d, 
+	const bool &isforce, 
+	const bool &isstress, 
+	ModuleBase::matrix& fvnl_dbeta, 
+	ModuleBase::matrix& svnl_dbeta,
+	const int &vnl_method)
+{
+	ModuleBase::TITLE("Force_LCAO_k", "calFvnlDbeta");
+	if(GlobalV::NSPIN==4 || vnl_method == 0)
+	{
+		this->cal_fvnl_dbeta_k(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
+	}
+	else if(vnl_method == 1)
+	{
+		this->cal_fvnl_dbeta_k_new(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
+	}
+	else 
+    {
+        ModuleBase::WARNING_QUIT("Force_LCAO_k","This method has not been implemented");
+    }
+}
