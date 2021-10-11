@@ -187,14 +187,7 @@ void Force_LCAO_gamma::allocate_gamma(void)
     
     //GlobalC::UHM.genH.build_Nonlocal_beta (cal_deri);
     //ModuleBase::timer::tick("Force_LCAO_gamma","build_Nonlocal_mu");
-	if(GlobalV::NSPIN==4)
-	{
-		GlobalC::UHM.genH.build_Nonlocal_mu (cal_deri);
-	}
-	else
-	{
-		GlobalC::UHM.genH.build_Nonlocal_mu_new (cal_deri);
-	}
+	this->NonlocalDphi(GlobalV::NSPIN, GlobalV::vnl_method, cal_deri);
     //ModuleBase::timer::tick("Force_LCAO_gamma","build_Nonlocal_mu");
     //test_gamma(GlobalC::LM.DHloc_fixed_x, "dHloc_fixed_x Vnl part");
 
@@ -276,4 +269,21 @@ void Force_LCAO_gamma::calFvnlDbeta
     {
         ModuleBase::WARNING_QUIT("Force_LCAO_gamma","This method has not been implemented");
     }
+}
+
+void Force_LCAO_gamma::NonlocalDphi(const int& nspin, const int& vnl_method, const bool& cal_deri)
+{
+	ModuleBase::TITLE("Force_LCAO_gamma", "NonlocalDphi");
+	if(nspin==4 || vnl_method == 0)
+	{
+		GlobalC::UHM.genH.build_Nonlocal_mu (cal_deri);
+	}
+	else if(vnl_method == 1)
+	{
+		GlobalC::UHM.genH.build_Nonlocal_mu_new (cal_deri);
+	}
+	else
+	{
+		ModuleBase::WARNING_QUIT("Force_LCAO_gamma","This method has not been implemented");
+	}
 }

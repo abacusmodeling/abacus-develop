@@ -171,14 +171,7 @@ void Force_LCAO_k::allocate_k(void)
 	//test(GlobalC::LM.DHloc_fixedR_x,"GlobalC::LM.DHloc_fixedR_x T part");
    
    	// calculate dVnl=<phi|dVnl|dphi> in LCAO 
-	if(GlobalV::NSPIN==4)
-	{
-		GlobalC::UHM.genH.build_Nonlocal_mu (cal_deri);
-	}
-	else
-	{
-		GlobalC::UHM.genH.build_Nonlocal_mu_new (cal_deri);
-	}
+	this->NonlocalDphi(GlobalV::NSPIN, GlobalV::vnl_method, cal_deri);
 	//test(GlobalC::LM.DHloc_fixedR_x,"GlobalC::LM.DHloc_fixedR_x Vnl part");
 
 	ModuleBase::timer::tick("Force_LCAO_k","allocate_k");

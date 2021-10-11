@@ -124,5 +124,8 @@ class Force_LCAO_gamma
 		ModuleBase::matrix& svnl_dbeta,
 		const int &vnl_method);
 
+	public:
+	// calculate dVnl=<phi|dVnl|dphi> in LCAO
+	void NonlocalDphi(const int& nspin, const int& vnl_method, const bool& cal_deri);
 };
 #endif
