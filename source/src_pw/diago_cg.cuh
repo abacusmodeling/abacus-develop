@@ -64,6 +64,7 @@ public:
     void diag(
         T2 *phi, // matrix
         T *e,
+        T2 *vkb_c,
         const int &dim,
         const int &dmx,
         const int &n_band,
@@ -147,7 +148,8 @@ private:
         T &eigenvalue,
         const T &threshold,
         T2 *hpsi,
-        T2 *spsi);
+        T2 *spsi,
+        T2 *vkb_c);
 
 };
 # endif

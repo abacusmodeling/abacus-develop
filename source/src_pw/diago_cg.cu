@@ -114,6 +114,7 @@ void Diago_CG_CUDA<T, T2>::diag
 (
     T2 *phi, // matrix nband*dim
     T *e,
+    T2 *vkb_c,
     const int &dim,
     const int &dmx,
     const int &n_band,
@@ -187,7 +188,7 @@ void Diago_CG_CUDA<T, T2>::diag
         // cout<<"====phi_m after schmit===="<<endl;
         // test_print<T2>(phi_m, 15);
 
-        GlobalC::hm.hpw.h_1psi_cuda(dim, phi_m, hphi, sphi);
+        GlobalC::hm.hpw.h_1psi_cuda(dim, phi_m, hphi, sphi, vkb_c);
 
         // cout<<"====hphi after hpsi===="<<endl;
         // test_print<T2>(hphi, 15);
@@ -220,7 +221,7 @@ void Diago_CG_CUDA<T, T2>::diag
             this->calculate_gamma_cg( iter, dim, precondition, g, scg,
 			    g0, cg, gg_last, cg_norm, theta, phi_m);// scg used as sg
             converged = this->update_psi( dim, cg_norm, theta, pphi, cg, scg, phi_m ,
-			    em_host, eps, hphi, sphi); // pphi is used as hcg
+			    em_host, eps, hphi, sphi, vkb_c); // pphi is used as hcg
             
             // cout<<"====hphi after update===="<<endl;
             // test_print<T2>(hphi, 15);
@@ -538,7 +539,8 @@ bool Diago_CG_CUDA<T, T2>::update_psi(
     T &eigenvalue,
     const T &threshold,
     T2 *hpsi,
-    T2 *sphi)
+    T2 *sphi,
+    T2 *vkb_c)
 {
     if (test_cg==1) ModuleBase::TITLE("Diago_CG_CUDA","update_psi");
     ModuleBase::timer::tick("Diago_CG_CUDA","update_psi");
@@ -546,7 +548,7 @@ bool Diago_CG_CUDA<T, T2>::update_psi(
     int block = (dim + thread - 1) / thread;
     // pw.h_1psi(dim, cg, hcg, scg); // TODO
     // to cpu
-    GlobalC::hm.hpw.h_1psi_cuda(dim, cg, hcg, scg);
+    GlobalC::hm.hpw.h_1psi_cuda(dim, cg, hcg, scg, vkb_c);
     // hpsi end
 
     cg_norm = sqrt( this->ddot_real(dim, cg, scg) );

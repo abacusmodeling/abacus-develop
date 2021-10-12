@@ -53,13 +53,15 @@ public:
         const int npw,
         const float2 *psi1d,
         float2 *hpsi,
-        float2 *spsi);
+        float2 *spsi,
+        float2 *vkb_c);
     
     void h_1psi_cuda(
         const int npw,
         const double2 *psi1d,
         double2 *hpsi,
-        double2 *spsi);
+        double2 *spsi,
+        double2 *vkb_c);
 
     void h_1psi(
         const int npw,
@@ -70,11 +72,13 @@ public:
     void h_psi_cuda(
 		const float2 *psi,
 		float2 *hpsi,
+        float2 *vkb_c,
 		const int m = 1); 
     
     void h_psi_cuda(
 		const double2 *psi,
 		double2 *hpsi,
+        double2 *vkb_c,
 		const int m = 1); 
 
     void s_1psi_cuda(
