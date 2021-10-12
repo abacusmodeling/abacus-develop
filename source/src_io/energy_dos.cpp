@@ -208,7 +208,7 @@ void energy::perform_dos(void)
 
 //scale up a little bit so the end peaks are displaced better
 		double delta=(emax-emin)*dos_scale;
-		std::cout << dos_scale;
+		//std::cout << dos_scale;
 		emax=emax+delta/2.0;
 		emin=emin-delta/2.0;
 
@@ -477,7 +477,7 @@ void energy::perform_dos(void)
 		 {  std::stringstream ps;
 			 ps << GlobalV::global_out_dir << "TDOS";
 			 std::ofstream out(ps.str().c_str());
-			 if (GlobalV::NSPIN==1)
+			 if (GlobalV::NSPIN==1||GlobalV::NSPIN==4)
 			 {
 
 				 for (int n=0; n<npoints; ++n)
@@ -545,7 +545,10 @@ void energy::perform_dos(void)
 
 			 out << "<"<<"pdos"<<">" <<std::endl;
 			 out << "<"<<"nspin"<<">" << GlobalV::NSPIN<< "<"<<"/"<<"nspin"<<">"<< std::endl;
-			 out << "<"<<"norbitals"<<">" <<std::setw(2) <<GlobalV::NLOCAL<< "<"<<"/"<<"norbitals"<<">"<< std::endl;
+			 if (GlobalV::NSPIN==4)
+			 	out << "<"<<"norbitals"<<">" <<std::setw(2) <<GlobalV::NLOCAL/2<< "<"<<"/"<<"norbitals"<<">"<< std::endl;
+			 else
+			 	out << "<"<<"norbitals"<<">" <<std::setw(2) <<GlobalV::NLOCAL<< "<"<<"/"<<"norbitals"<<">"<< std::endl;
 			 out << "<"<<"energy"<<"_"<<"values units"<<"="<<"\""<<"eV"<<"\""<<">"<<std::endl;
 
 			 for (int n=0; n<npoints; ++n)
@@ -559,6 +562,7 @@ void energy::perform_dos(void)
 				 int a = GlobalC::ucell.iat2ia[i];
 				 int t = GlobalC::ucell.iat2it[i];
 				 Atom* atom1 = &GlobalC::ucell.atoms[t];
+				 const int s0 = GlobalC::ucell.itiaiw2iwt(t, a, 0);
 				 for(int j=0; j<atom1->nw; ++j)
 				 {
 					 const int L1 = atom1->iw2l[j];
@@ -592,6 +596,14 @@ void energy::perform_dos(void)
 							 out <<std::setw(20)<< pdos[0](w,n)<< std::setw(30)<< pdos[1](w,n)<<std::endl;
 						 }//n
 					 }
+					 else if (GlobalV::NSPIN==4)
+					 {
+						 int w0 = w-s0;
+						 for (int n=0; n<npoints; ++n)
+						 {
+							 out <<std::setw(20)<<pdos[0](s0+2*w0,n)+pdos[0](s0+2*w0+1,n)<<std::endl;
+						 }//n
+					 } 
 
 					 out << "<"<<"/"<<"data"<<">" <<std::endl;
 					 out << "<"<<"/"<<"orbital"<<">" <<std::endl;
