@@ -210,7 +210,7 @@ void MD_func::InitVel(
 	ModuleBase::Vector3<int>* ionmbl,
 	ModuleBase::Vector3<double>* vel)
 {
-	frozen_freedom = getMassMbl(unit_in, allmass, ionmbl);
+	//frozen_freedom = getMassMbl(unit_in, allmass, ionmbl);
 
 	if(unit_in.set_vel)
     {
@@ -357,7 +357,10 @@ std::string MD_func::intTurnTostring(long int iter, std::string path)
 	return path;
 }
 
-int MD_func::getMassMbl(const UnitCell_pseudo &unit_in, double* allmass, ModuleBase::Vector3<int>* ionmbl)
+int MD_func::getMassMbl(const UnitCell_pseudo &unit_in, 
+			const MD_parameters &mdp,
+			double* allmass, 
+			ModuleBase::Vector3<int>* ionmbl)
 {
 //some prepared information
 //mass and degree of freedom
@@ -374,6 +377,13 @@ int MD_func::getMassMbl(const UnitCell_pseudo &unit_in, double* allmass, ModuleB
 			ion++;
 		}
 	}
+
+	// the center of mass is fixed except for NVT Anderson
+	if(!(mdp.mdtype==1 && mdp.NVT_control==3))
+	{
+		frozen_freedom += 3;
+	}
+
 	return frozen_freedom;
 }
 
