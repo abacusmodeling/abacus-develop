@@ -24,8 +24,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/modules)
 set(ABACUS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/source)
 set(ABACUS_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 set(ABACUS_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/${ABACUS_BIN_NAME})
-
 include_directories(${ABACUS_SOURCE_DIR})
+add_executable(${ABACUS_BIN_NAME} source/main.cpp)
 
 find_package(Cereal REQUIRED)
 include_directories(${Cereal_INCLUDE_DIRS})
@@ -158,10 +158,6 @@ add_compile_definitions(
 )
 
 add_subdirectory(source)
-
-add_executable(${ABACUS_BIN_NAME}
-    source/main.cpp
-)
 
 target_link_libraries(${ABACUS_BIN_NAME}
     base
