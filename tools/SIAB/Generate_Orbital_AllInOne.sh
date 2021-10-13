@@ -36,6 +36,17 @@ echo " *          Start to Generate Orbital for LCAO           * "
 echo " *                                                       * "
 echo " ********************************************************* "
 
+function completelyNewCalc(){
+                echo " "
+                echo " Completely New SIA Calculation ... "
+                mkdir -p Old
+                if ( test -f "ORBITAL_RESULTS.txt" ); then
+                    echo " Move Old Orbital files: ORBITAL_RESULTS.txt to Old/"  
+                    mv "ORBITAL_RESULTS.txt" Old/  
+                    echo " Move Old INPUT   files: INPUT to Old/"
+                    mv  "INPUT" Old/
+                fi
+}
 
 time_start=`date +%s`
 #-----------------------------------------------------------------
@@ -63,8 +74,8 @@ if [ -z "$EXE_mpi" ]; then
     else
         cpu_num=`cat $hostfpath |wc -l`
     fi
-    echo " cpu_num=$cpu_num"
-    echo " hostfpath=$hostfpath"
+    echo "        cpu_num = $cpu_num"
+    echo "      hostfpath = $hostfpath"
     EXE_mpi="mpirun -np $cpu_num -hostfile ../$hostfpath " 
 fi
 echo "        EXE_mpi = $EXE_mpi " 
@@ -129,7 +140,7 @@ echo "         Pseudo = $pseudofile"
 
 # (0.1.15) get the smearing
 degauss=`grep -E "^\s*sigma " $InputFile | awk -F "sigma " '{print $0}' | awk '{print $2}'`
-echo "        sigma = $degauss"
+echo "          sigma = $degauss"
 
 
 #
@@ -155,10 +166,13 @@ maxL=`grep -E "^\s*maxL" $InputFile | awk -F "maxL" '{print $0}' | awk '{print $
 
 # (0.x.x) check info (include Level) for each STRU 
 nSTRU=`grep -E "^\s*BLSTRU" $InputFile | wc -l`
+#nSTRU=`grep -o "^\s*ListSTRU\s*[^#]*" W/ORBITAL_INPUT_DZP |wc -w |awk '{print $1-1}'`
 echo "          nSTRU = $nSTRU"
 #
-LevelEnd[0]=0
+LevelBegin[0]=0
+EndLevel[0]=0
 SkipSTRU[0]=0
+RestartSTRU[0]=0
 ListSTRU[0]=" "
 for((iSTRU=1;iSTRU<=$nSTRU;iSTRU++))
 do
@@ -175,9 +189,12 @@ do
     #BL_number=`echo "$info" | awk '// {print NF}'`
     echo "   BL_number[$iSTRU] = ${BL_number[iSTRU]}, info[$iSTRU] =" ${info[iSTRU]}
     
-    LevelEnd[iSTRU]=`grep -E "^\s*Level" $InputFile |awk -F "Level" '{print $0}' \\
+    EndLevel[iSTRU]=`grep -E "^\s*Level" $InputFile |awk -F "Level" '{print $0}' \\
                 |awk -v iSTRU=$iSTRU '{print $(iSTRU+1) }'`
-    echo "    LevelEnd[$iSTRU] = ${LevelEnd[iSTRU]}"
+    echo "    EndLevel[$iSTRU] = ${EndLevel[iSTRU]}"
+    BeginLevel[iSTRU]=`grep -E "^\s*BeginLevel" $InputFile |awk -F "BeginLevel" '{print $0}' \\
+                |awk -v iSTRU=$iSTRU '{print $(iSTRU+1) }'`
+    echo "  BeginLevel[$iSTRU] = ${BeginLevel[iSTRU]}"
     
     # (0.1.4)get the nbands
     nbands[iSTRU]=`grep -E "^\s*nbands" $InputFile | awk -F "nbands" '{print $0}' \\
@@ -189,18 +206,30 @@ do
                     |awk -v iSTRU=$iSTRU '{print $(iSTRU+1) }'`
     echo "   ref_bands[$iSTRU] = ${ref_bands[iSTRU]}"
 
+    RestartSTRU[iSTRU]=`grep -E "^\s*RestartSTRU" $InputFile \\
+                    | awk -F "$RestartSTRU" '{print $0}' \\
+                    | awk -v iSTRU=$iSTRU '{print $(iSTRU+1) }'`
+    echo " RestartSTRU[$iSTRU] = ${RestartSTRU[iSTRU]}"
+    #if [ ! -n "${RestartSTRU[iSTRU]}" ]; then
+    #    RestartSTRU[iSTRU]=0
+    #    echo " set RestartSTRU[$iSTRU]=0 "
+    #fi
+
 
     SkipSTRU[iSTRU]=0
     if ( test -n "`grep -E "^\s*SkipSTRU" $InputFile`" ); then
-    SkipSTRU[iSTRU]=`grep -E "^\s*SkipSTRU" $InputFile  | awk -F "$SkipSTRU" '{print $0}' \\
-                    |awk -v iSTRU=$iSTRU '{print $(iSTRU+1) }'`
+        SkipSTRU[iSTRU]=`grep -E "^\s*SkipSTRU" $InputFile  \\
+                    | awk -F "$SkipSTRU" '{print $0}' \\
+                    | awk -v iSTRU=$iSTRU '{print $(iSTRU+1) }'`
     fi
     echo "    SkipSTRU[$iSTRU] = ${SkipSTRU[iSTRU]}"
+
 done  # first cicle of iSTRU 
 if [ "$nSTRU" == "1" ]; then 
     SkipSTRU[1]=0 
 fi
 
+#exit 0
 
 # (0.1.8)get the level
 #Level=`grep "Level" $InputFile | awk -F "level" '{print $0}' | awk '{print $2}'`
@@ -245,7 +274,7 @@ if ( test $Step_S_in != " " )
 then
 Step_S=$Step_S_in
 else
-Step_S=20                                     #default
+Step_S=30                                     #default
 fi
 
 Step_K_in=`grep -E "^\s*Step_K" $InputFile \\
@@ -254,7 +283,7 @@ if ( test $Step_K_in != " ")
 then
 Step_K=$Step_K_in
 else
-Step_K=15                                     #default
+Step_K=20                                     #default
 fi
 
 Delta_kappa_in=`grep -E "^\s*Delta_kappa" $InputFile \\
@@ -291,7 +320,7 @@ do
 
 
     ### (1.4.1.5) enter the third big cicle: iSTRU  
-    echo " nSTRU = $nSTRU "
+    echo "    nSTRU = $nSTRU "
     for((iSTRU=1;iSTRU<=$nSTRU;iSTRU++))   
     do
         if ( test ${SkipSTRU[iSTRU]} -eq 1 ); then 
@@ -299,6 +328,160 @@ do
         continue;
         fi
 	    echo "        |run  cicle: iSTRU=$iSTRU"
+
+
+
+        ### (1.4.3) mkdir of rcut
+        test -d $rcut || mkdir $rcut
+        # (1.4.3.1)
+        cd $rcut
+        
+        iSTRULeft=`expr $iSTRU \- 1`
+        if [ "${BeginLevel[iSTRU]}" == "" ] ; then
+            BeginLevel[$iSTRU]=$((${EndLevel[iSTRULeft]}+1))
+            echo -e "\n not found BeginLevel[$iSTRU], use: EndLevel[iSTRULeft]+1"
+        fi
+        echo -e "\n BeginLevel[iSTRU]=${BeginLevel[iSTRU]},  EndLevel[iSTRU]=${EndLevel[iSTRU]} "
+        
+
+
+        ### set if restart from previous SIA runs 
+        ### if ( test SkipSTRU[`expr $iSTRU - 1`] -eq 1 ) ; then
+        #ifRestart=${RestartSTRU[$iSTRU]}
+        if [ "${RestartSTRU[$iSTRU]}" == "" ] ; then
+            if [ $iSTRU -gt 1 ] ; then
+                RestartSTRU[$iSTRU]=1
+            else
+                RestartSTRU[$iSTRU]=0
+            fi
+        fi
+
+
+        echo " RestartSTRU[$iSTRU] = ${RestartSTRU[$iSTRU]} "
+        if [ ${RestartSTRU[$iSTRU]} -eq 0 ] ; then 
+                completelyNewCalc
+        else
+            if [ $iSTRU -gt 1 ]; then
+
+                echo " "
+                echo " Current *.dat/*.txt ... will be considered previous calc. results of STRU${iSTRULeft} "
+                #
+                #if [ -f "ORBITAL_RESULTS.txt" ] ; then
+                #    echo " Found file: ORBITAL_RESULTS.txt, continue ... "
+                #else
+                #    echo " Can't find: ORBITAL_RESULTS.txt, exiting ... "
+                #    exit
+                #fi
+                # 
+                # 
+                if [ ! -f "STRU${iSTRULeft}.ORBITAL_RESULTS.txt" ]; then
+                    echo " Move Previous Orbital files and Rename as STRU${iSTRULeft}.*"
+                    #
+                    if ( test -f "ORBITAL_RESULTS.txt" ); then
+                        mv  "ORBITAL_RESULTS.txt"  "STRU${iSTRULeft}.ORBITAL_RESULTS.txt"
+                    fi
+                    #
+                    if ( test -f "INPUT" ); then
+                        mv  "INPUT" "STRU${iSTRULeft}.INPUT"
+                    fi
+                    #
+                    if ( test -f "ORBITAL_${id}U.dat" ); then
+                        mv  "ORBITAL_${id}U.dat" "STRU${iSTRULeft}.ORBITAL_${id}U.dat"
+                    fi
+                    #
+                    if ( test -f "ORBITAL_${id}L.dat" ); then
+                        mv  "ORBITAL_${id}L.dat" "STRU${iSTRULeft}.ORBITAL_${id}L.dat"
+                    fi
+                    #
+                    if ( test -f "ORBITAL_ECUT.txt" ); then
+                        mv  "ORBITAL_ECUT.txt"  "STRU${iSTRULeft}.ORBITAL_ECUT.txt"
+                    fi
+                    #
+                    if ( test -f "ORBITAL_KINETIC.txt" ); then
+                        mv  "ORBITAL_KINETIC.txt"  "STRU${iSTRULeft}.ORBITAL_KINETIC.txt"
+                    fi
+                    #
+                    if ( test -f "ORBITAL_PLOTL.dat" ); then
+                        mv  "ORBITAL_PLOTL.dat"  "STRU${iSTRULeft}.ORBITAL_PLOTL.dat"
+                    fi
+                    #
+                    if ( test -f "ORBITAL_PLOTU.dat" ); then
+                        mv  "ORBITAL_PLOTU.dat"  "STRU${iSTRULeft}.ORBITAL_PLOTU.dat"
+                    fi
+                    #
+                    if ( test -f "ORBITAL_PLOTUK.dat" ); then
+                        mv  "ORBITAL_PLOTUK.dat"  "STRU${iSTRULeft}.ORBITAL_PLOTUK.dat"
+                    fi
+                    #
+                    if ( test -f "running_1.txt" ); then
+                        mv  "running_1.txt" "STRU${iSTRULeft}.running_1.txt"
+                    fi
+                    #
+                fi
+                # 
+                if [ -f "STRU${iSTRULeft}.ORBITAL_RESULTS.txt" ] ; then
+                    echo " Found file: STRU${iSTRULeft}.ORBITAL_RESULTS.txt, copy as ORBITAL_RESULTS.txt ... " 
+                    cp -ap "STRU${iSTRULeft}.ORBITAL_RESULTS.txt"  "ORBITAL_RESULTS.txt"  
+                else
+                    echo " Not found file: STRU${iSTRULeft}.ORBITAL_RESULTS.txt, exiting ... "
+                    exit 
+                fi
+            else 
+                echo " Current *.dat/*.txt ... will be considered previous calc. results of STRU${iSTRU} "
+                echo " Before SIA Calculation: mv ... & cp ... "
+                echo " Move: INPUT/*.dat/*.txt to Old/ "
+                mkdir -p Old
+                #
+                if ( test -f "INPUT" ); then
+                    mv  "INPUT"                    "Old/INPUT"
+                fi
+                if ( test -f "ORBITAL_${id}U.dat" ); then
+                    mv  "ORBITAL_${id}U.dat"            "Old/ORBITAL_${id}U.dat"
+                fi
+                if ( test -f "ORBITAL_${id}L.dat" ); then
+                    mv  "ORBITAL_${id}L.dat"            "Old/ORBITAL_${id}L.dat"
+                fi
+                if ( test -f "ORBITAL_ECUT.txt" ); then
+                    mv  "ORBITAL_ECUT.txt"              "Old/ORBITAL_ECUT.txt"
+                fi
+                if ( test -f "ORBITAL_KINETIC.txt" ); then
+                    mv  "ORBITAL_KINETIC.txt"           "Old/ORBITAL_KINETIC.txt"
+                fi
+                if ( test -f "ORBITAL_PLOTL.dat" ); then
+                    mv  "ORBITAL_PLOTL.dat"             "Old/ORBITAL_PLOTL.dat"
+                fi
+                if ( test -f "ORBITAL_PLOTU.dat" ); then
+                    mv  "ORBITAL_PLOTU.dat"             "Old/ORBITAL_PLOTU.dat"
+                fi
+                if ( test -f "ORBITAL_PLOTUK.dat" ); then
+                    mv  "ORBITAL_PLOTUK.dat"            "Old/ORBITAL_PLOTUK.dat"
+                fi
+                if ( test -f "running_1.txt" ); then
+                    mv  "running_1.txt"                 "Old/running_1.txt"
+                fi
+                #
+                echo " Copy ORBITAL_RESULTS.txt to Old/ "
+                if ( test -f "ORBITAL_RESULTS.txt" ); then
+                    cp -avp  "ORBITAL_RESULTS.txt"      "Old/ORBITAL_RESULTS.txt"
+                fi
+                #
+                echo " Start (SIA) Calculation:"
+            fi
+            echo " "
+            echo " Restart from Previous Result: ORBITAL_RESULTS.txt "
+            if [ -f "ORBITAL_RESULTS.txt" ] ; then
+                echo " Found file: ORBITAL_RESULTS.txt " 
+            else
+                echo " Not found file: ORBITAL_RESULTS.txt, exiting ... "
+                exit 
+            fi
+        fi  # which:: if [ ${RestartSTRU[$iSTRU]} -eq 0 ] ; then 
+        echo " "
+
+        
+
+        ### (1.4.3.5) exit the rcut dir
+        cd ..
 
 
 
@@ -314,8 +497,6 @@ do
 	        dis3=$(echo "scale=5;$BL * 0.81649 "|bc)
 	        dis4=$(echo "scale=5;$BL * 0.28867 "|bc)
             echo "            |run  cicle: BL=$BL"
-
-
 
 if [ "${ListSTRU[iSTRU]}" == "dimer" ]; then
 na=2
@@ -445,30 +626,34 @@ EOF
 
 let count++
 
+        echo " pwd:"
+        pwd 
+        if [ ${RestartSTRU[$iSTRU]} -eq 2 ]; then #  grep -E "^\s*RestartSTRU" ../$InputFile  > /dev/null 2>&1 ; then 
+            echo " Skip_Calculation: $EXE_mpi $EXE_pw"
+        else 
+            # (1.4.2.6)
+            #test -e ../node_openmpi && cp ../node_openmpi .
+            #-------------
+            #on Dirac
+            #-------------
+            #/opt/openmpi/bin/mpirun -np $cpu_number -machinefile node_openmpi $exe
+            #-------------
+            #on Einstein
+            #-------------
+            #mpiexec -np $cpu_num -machinefile node_openmpi $EXE_pw
+            #mpiexec -np $1 -machinefile $EXE_pw
+            
+            #exit
+            #mpiexec -n 12  -machinefile $PBS_NODEFILE $EXE_pw >> Log.txt
+            #mpirun -np $cpu_num $EXE_pw
+            #mpirun -hostfile "../$hostfpath"  $EXE_pw
+            #mpirun -np $cpu_num -hostfile "../$hostfpath"  $EXE_pw
 
-
-# (1.4.2.6)
-#test -e ../node_openmpi && cp ../node_openmpi .
-#-------------
-#on Dirac
-#-------------
-#/opt/openmpi/bin/mpirun -np $cpu_number -machinefile node_openmpi $exe
-#-------------
-#on Einstein
-#-------------
-#mpiexec -np $cpu_num -machinefile node_openmpi $EXE_pw
-#mpiexec -np $1 -machinefile $EXE_pw
-
-#echo "skip $EXE_pw"
-#exit
-#mpiexec -n 12  -machinefile $PBS_NODEFILE $EXE_pw >> Log.txt
-#mpirun -np $cpu_num $EXE_pw
-#mpirun -hostfile "../$hostfpath"  $EXE_pw
-#mpirun -np $cpu_num -hostfile "../$hostfpath"  $EXE_pw
-
-
-echo " $EXE_mpi $EXE_pw "
-$EXE_mpi $EXE_pw 
+            echo " $EXE_mpi $EXE_pw "
+            $EXE_mpi $EXE_pw 
+            #echo " Skip_Calculation: $EXE_mpi $EXE_pw"
+        fi
+        echo ""
 
 
 
@@ -477,115 +662,21 @@ $EXE_mpi $EXE_pw
 
 
 
-    ### (1.4.3) mkdir of rcut
-    test -d $rcut || mkdir $rcut
-    # (1.4.3.1)
-    cd $rcut
-    
-    iSTRULeft=`expr $iSTRU \- 1`
-    echo -e "\n iSTRULeft=$iSTRULeft, LevelEnd[iSTRULeft]=${LevelEnd[iSTRULeft]} "
-    
-    ### set if restart from previous SIA runs 
-    ### if ( test SkipSTRU[`expr $iSTRU - 1`] -eq 1 ) ; then
-    if ( test $iSTRU -gt 1 ) ; then
-        ifRestart=1
-    
-        echo " "
-        echo " Restart from Previous SIA Calculation ... "
-        echo " "
-        #
-        #if [ -f "ORBITAL_RESULTS.txt" ] ; then
-        #    echo " Found file: ORBITAL_RESULTS.txt, continue ... "
-        #else
-        #    echo " Can't find: ORBITAL_RESULTS.txt, exiting ... "
-        #    exit 
-        #fi
-        # 
-        # 
-        if [ ! -f "STRU${iSTRULeft}.ORBITAL_RESULTS.txt" ]; then
-            echo " Move Old Orbital files and Rename as STRU${iSTRULeft}.*"
-            #
-            if ( test -f "ORBITAL_RESULTS.txt" ); then
-                mv  "ORBITAL_RESULTS.txt"  "STRU${iSTRULeft}.ORBITAL_RESULTS.txt"
-            fi
-            #
-            if ( test -f "INPUT" ); then
-                mv  "INPUT" "STRU${iSTRULeft}.INPUT"
-            fi
-            #
-            if ( test -f "ORBITAL_${id}U.dat" ); then
-                mv  "ORBITAL_${id}U.dat" "STRU${iSTRULeft}.ORBITAL_${id}U.dat"
-            fi
-            #
-            if ( test -f "ORBITAL_${id}L.dat" ); then
-                mv  "ORBITAL_${id}L.dat" "STRU${iSTRULeft}.ORBITAL_${id}L.dat"
-            fi
-            #
-            if ( test -f "ORBITAL_ECUT.txt" ); then
-                mv  "ORBITAL_ECUT.txt"  "STRU${iSTRULeft}.ORBITAL_ECUT.txt"
-            fi
-            #
-            if ( test -f "ORBITAL_KINETIC.txt" ); then
-                mv  "ORBITAL_KINETIC.txt"  "STRU${iSTRULeft}.ORBITAL_KINETIC.txt"
-            fi
-            #
-            if ( test -f "ORBITAL_PLOTL.dat" ); then
-                mv  "ORBITAL_PLOTL.dat"  "STRU${iSTRULeft}.ORBITAL_PLOTL.dat"
-            fi
-            #
-            if ( test -f "ORBITAL_PLOTU.dat" ); then
-                mv  "ORBITAL_PLOTU.dat"  "STRU${iSTRULeft}.ORBITAL_PLOTU.dat"
-            fi
-            #
-            if ( test -f "ORBITAL_PLOTUK.dat" ); then
-                mv  "ORBITAL_PLOTUK.dat"  "STRU${iSTRULeft}.ORBITAL_PLOTUK.dat"
-            fi
-            #
-            if ( test -f "running_1.txt" ); then
-                mv  "running_1.txt" "STRU${iSTRULeft}.running_1.txt"
-            fi
-            #
-        fi
-        # 
-        if [ -f "STRU${iSTRULeft}.ORBITAL_RESULTS.txt" ] ; then
-            echo " Found file: STRU${iSTRULeft}.ORBITAL_RESULTS.txt, copy as ORBITAL_RESULTS.txt ... " 
-            cp -ap "STRU${iSTRULeft}.ORBITAL_RESULTS.txt"  "ORBITAL_RESULTS.txt"  
-        else
-            echo " Not found file: STRU${iSTRULeft}.ORBITAL_RESULTS.txt, exiting ... "
-            exit 
-        fi
-    #
-    else
-        ifRestart=0
-        echo " "
-        echo " Completely New SIA Calculation ... "
-    fi
-    echo " ifRestart=$ifRestart"
-    echo " "
+        # (1.4.3.1)
+        cd $rcut
 
 
 
-
-
-
-
-
-
-
-
-
-
-    ###if [ "${EXE_orbital##*.}" != "py" ]; 
-    if [ "${EXE_orbital:0-3:3}" != ".py" ]; 
-    then 
-        echo -e " Using Old Simulated Annealing Method \n" 
-
+        ###if [ "${EXE_orbital##*.}" != "py" ]; 
+        if [ "${EXE_orbital:0-3:3}" != ".py" ]; 
+        then 
+            echo -e " Using Simulated Annealing Method \n" 
 
     ### (1.4.3.2) prepare for the INPUT file
 cat > INPUT << EOF
 <PW_QS>
 1                       // if or not calculate the spillage. 1/0
-$ifRestart                       // restart or not. 1/0
+$(( ${RestartSTRU[$iSTRU]} > 0 ))                       // restart or not. 1/0
 1                       // if or not output the file. 1/0
 ${BL_number[iSTRU]}          // number of structures.
 EOF
@@ -644,26 +735,26 @@ $Delta_kappa        // Delta kappa
 <BANDS>
 1                   // to control the number of bands.(Yes1/No0)
 1                   // int, the start band index(>0).
-${ref_bands[iSTRU]}          // int, the ed band index(<provied bands).
+${ref_bands[$iSTRU]}          // int, the ed band index(<provied bands).
 </BANDS>
 
 EOF
 
 cat >> INPUT << EOF
 <OPTIMIZE>
-${LevelEnd[iSTRU]}             // Number of levels.
+${EndLevel[$iSTRU]}             // Number of levels.
 label / na / skip / lmax / each L /
 EOF
 
 
-for((i=1;i<=${LevelEnd[iSTRU]};i++))
+for((i=1;i<=${EndLevel[iSTRU]};i++))
 do
-if ( test $i -gt ${LevelEnd[iSTRULeft]} ) 
-then
-    leveltype="new "
-else
-    leveltype="skip"
-fi
+    if [ $i -ge ${BeginLevel[iSTRU]} -a $i -le ${EndLevel[iSTRU]} ] 
+    then
+        leveltype="new "
+    else
+        leveltype="skip"
+    fi
 #echo "leveltype=$leveltype"
 cat >> INPUT << EOF
 $id $na $leveltype ${Llevels[i]}
@@ -705,11 +796,11 @@ EOF
 
 
 
-else 
-    echo -e " Using New PyTorch Gradient Method \n" 
+        else # begin from if [ "${EXE_orbital:0-3:3}" != ".py" ]; 
+            echo -e " Using PyTorch Gradient Method \n" 
 
-    ### len(dis[info["input"]["element"]]),
-    ### (1.4.3.2) prepare INPUT file in json for PyTorch program
+            ### len(dis[info["input"]["element"]]),
+            ### (1.4.3.2) prepare INPUT file in json for PyTorch program
 
 cat > INPUT << EOF
 {
@@ -738,21 +829,28 @@ cat >> INPUT << EOF
 EOF
 
 
-echo  " LevelEnd[STRUs]: (${LevelEnd[@]}), iSTRULeft: $iSTRULeft, iSTRU: $iSTRU "
-C_init_from_file="false"
+echo  " iSTRULeft: $iSTRULeft, iSTRU: $iSTRU "
+echo  " BeginLevel[STRUs]: (${BeginLevel[@]}) "
+echo  " EndLevel[STRUs]: (${EndLevel[@]}) "
+#if   [ $ifRestart -eq 0 ] ; then
+#    C_init_from_file="false"
+#elif [ $ifRestart -eq 1 ] ; then
+#    C_init_from_file="true"
+#fi
+
 LValueMax=0
 for LValue in {0..4} ;
 do 
     numL[$LValue]=0
 done
 
-for((i=1;i<=${LevelEnd[iSTRU]};i++))
+for((i=1;i<=${EndLevel[iSTRU]};i++))
 do
-    if [ $i -le ${LevelEnd[iSTRULeft]} ]; 
-    then
-        C_init_from_file="true"
-        #echo " Level:$i, C_init_from_file = " $C_init_from_file
-    fi
+    #if [ $i -le ${EndLevel[iSTRULeft]} ]; 
+    #then
+    #    C_init_from_file="true"
+    #    #echo " Level:$i, C_init_from_file = " $C_init_from_file
+    #fi
 
     Llevels_i=( ${Llevels[i]} )
     for LValue in {0..4} ;
@@ -769,7 +867,6 @@ do
     done 
 done
 echo    " numL = ${numL[@]}, LValueMax = $LValueMax "
-echo -e " C_init_from_file = $C_init_from_file \n"
 
 
 for((LValue=0; LValue<${LValueMax}; LValue++))
@@ -803,6 +900,11 @@ do
             1, 
 EOF
 done
+if [ ${RestartSTRU[$iSTRU]} -ge 1 ] ; then 
+    lr_value=0.0001
+else
+    lr_value=0.01
+fi
     cat >> INPUT << EOF
             1
             ],
@@ -815,20 +917,27 @@ done
         "Ecut": {
             "$element": $ecut
         },
-    	"lr":  0.01
+    	"lr":  $lr_value
     },
     "C_init_info": {
 EOF
-if [ "$C_init_from_file" == "true" ]; then
+
+C_init_file="ORBITAL_RESULTS.txt"
+if [ ${RestartSTRU[$iSTRU]} -ge 1 ] ; then  ## [ "$C_init_from_file" == "true" ]; then
     cat >> INPUT << EOF
-        "init_from_file": $C_init_from_file,
-        "C_init_file"   : "ORBITAL_RESULTS.txt"
+        "init_from_file": true,
+        "C_init_file"   : "$C_init_file"
 EOF
-else
+    echo -e " init_from_file : true \n C_init_file : $C_init_file \n "
+elif [ ${RestartSTRU[$iSTRU]} -eq 0 ] ; then
     cat >> INPUT << EOF
-        "init_from_file": $C_init_from_file
+        "init_from_file": false
 EOF
+    echo -e " init_from_file : false \n "
+else 
+    exit
 fi
+
     cat >> INPUT << EOF
     },
     "V_info": {
@@ -844,37 +953,39 @@ module load anaconda3
 sleep 2
 source activate pytorch110
 #conda activate pytorch110 
-echo " Use Python2: " `which python2`
-echo " Use Python3: " `which python3`
+conda info --envs
+echo " Python2 Version: " `which python2`
+echo " Python3 Version: " `which python3`
 echo "" 
-fi
-#cat INPUT
+
+        fi  # begin from: if [ "${EXE_orbital:0-3:3}" != ".py" ];
+        #cat INPUT
 
 
 
-#mpiexec -n 1 -machinefile $PBS_NODEFILE $EXE_orbital >> Log.txt
-echo " Run $EXE_orbital"
-echo ""
-$EXE_orbital 
-#mpirun -np cpu_num $EXE_orbital
+        #mpiexec -n 1 -machinefile $PBS_NODEFILE $EXE_orbital >> Log.txt
+        echo " Run $EXE_orbital"
+        echo ""
+        $EXE_orbital 
+        #mpirun -np cpu_num $EXE_orbital
 
 
 
-if [ "${EXE_orbital:0-3:3}" == ".py" ]; then
-echo "" 
-unset  OMP_NUM_THREADS
-echo " Back to OMP_NUM_THREADS = $OMP_NUM_THREADS "
-sleep 2
-#source deactivate pytorch110
-conda deactivate
-module unload anaconda3
-module load python/2.7.12-sq-tk-test
-#sleep2
-echo " Back to Python2: " `which python2`
-echo " Back to Python3: " `which python3`
-fi
+        if [ "${EXE_orbital:0-3:3}" == ".py" ]; then
+            echo "" 
+            unset  OMP_NUM_THREADS
+            echo " Back to OMP_NUM_THREADS = $OMP_NUM_THREADS "
+            sleep 2
+            #source deactivate pytorch110
+            conda deactivate
+            module unload anaconda3
+            module load python/2.7.12-sq-tk-test
+            #sleep2
+            echo " Back to Python2: " `which python2`
+            echo " Back to Python3: " `which python3`
+        fi
 
-exit
+        #exit
 
     ### (1.4.3.5) exit the rcut dir
     cd ..
@@ -895,5 +1006,6 @@ done
 # end cicle (1): targets
 
 time_end=`date +%s`
-echo -e " Time (Shell)  :    $(($time_end - $time_start)) \n"
+time_passed=$(($time_end - $time_start)) 
+echo -e " Time :   $time_passed  \n"
 
