@@ -40,7 +40,7 @@ void LCAO_gen_fixedH::calculate_NL_no(void)
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
 	  	//for gamma only.
-		if(GlobalV::NSPIN!=4)
+		if(GlobalV::NSPIN!=4 && GlobalV::vnl_method == 1)
 		{
   			this->build_Nonlocal_beta_new();
 		}
@@ -55,7 +55,7 @@ void LCAO_gen_fixedH::calculate_NL_no(void)
 		// only if search_radius is 
 		// (Phi.rcutmax + Beta.rcutmax)*2.
 		// check in sltk_atom_arrange.
-    	if(GlobalV::NSPIN!=4)
+    	if(GlobalV::NSPIN!=4 && GlobalV::vnl_method == 1)
 		{
 			this->build_Nonlocal_mu_new(false);
 		}

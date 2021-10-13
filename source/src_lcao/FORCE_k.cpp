@@ -1,6 +1,5 @@
 #include "FORCE_k.h"
 #include "../src_pw/global.h"
-#include "dftu.h"  //Quxin add for DFT+U on 20201029
 #include <unordered_map>
 
 Force_LCAO_k::Force_LCAO_k ()
@@ -64,22 +63,13 @@ void Force_LCAO_k::ftable_k (
 	
 	this->cal_ftvnl_dphi_k(dm2d, isforce, isstress, ftvnl_dphi, stvnl_dphi);
 
-	//Quxin add for DFT+U on 20201029
-	if(INPUT.dft_plus_u) GlobalC::dftu.force_stress();
 
 	// ---------------------------------------
 	// doing on the real space grid.
 	// ---------------------------------------
 	this->cal_fvl_dphi_k(dm2d, isforce, isstress, fvl_dphi, svl_dphi);
 
-	if(GlobalV::NSPIN==4)
-	{
-		this->cal_fvnl_dbeta_k(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
-	}
-	else
-	{
-		this->cal_fvnl_dbeta_k_new(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
-	}
+	this->calFvnlDbeta(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta, GlobalV::vnl_method);
 
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
@@ -181,17 +171,10 @@ void Force_LCAO_k::allocate_k(void)
 	//test(GlobalC::LM.DHloc_fixedR_x,"GlobalC::LM.DHloc_fixedR_x T part");
    
    	// calculate dVnl=<phi|dVnl|dphi> in LCAO 
-	if(GlobalV::NSPIN==4)
-	{
-		GlobalC::UHM.genH.build_Nonlocal_mu (cal_deri);
-	}
-	else
-	{
-		GlobalC::UHM.genH.build_Nonlocal_mu_new (cal_deri);
-	}
+	this->NonlocalDphi(GlobalV::NSPIN, GlobalV::vnl_method, cal_deri);
 	//test(GlobalC::LM.DHloc_fixedR_x,"GlobalC::LM.DHloc_fixedR_x Vnl part");
 
-	ModuleBase::timer::tick("Force_LCAO_k","allocate");
+	ModuleBase::timer::tick("Force_LCAO_k","allocate_k");
 	return;
 }
 
@@ -1313,4 +1296,25 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 	return;
 }
 
-
+void Force_LCAO_k::calFvnlDbeta(
+	double** dm2d, 
+	const bool &isforce, 
+	const bool &isstress, 
+	ModuleBase::matrix& fvnl_dbeta, 
+	ModuleBase::matrix& svnl_dbeta,
+	const int &vnl_method)
+{
+	ModuleBase::TITLE("Force_LCAO_k", "calFvnlDbeta");
+	if(GlobalV::NSPIN==4 || vnl_method == 0)
+	{
+		this->cal_fvnl_dbeta_k(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
+	}
+	else if(vnl_method == 1)
+	{
+		this->cal_fvnl_dbeta_k_new(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
+	}
+	else 
+    {
+        ModuleBase::WARNING_QUIT("Force_LCAO_k","This method has not been implemented");
+    }
+}

@@ -1,6 +1,5 @@
 #include "FORCE_gamma.h"
 #include "../src_pw/global.h"
-#include "dftu.h"  //Quxin add for DFT+U on 20201029
 #ifdef __DEEPKS
 #include "LCAO_descriptor.h"//caoyu add for deepks on 20210813
 #endif
@@ -37,18 +36,9 @@ void Force_LCAO_gamma::ftable_gamma (
     if(INPUT.new_dm>0)
     {
         this->cal_ftvnl_dphi(GlobalC::LOC.wfc_dm_2d.dm_gamma, isforce, isstress, ftvnl_dphi, stvnl_dphi);
-        if(GlobalV::NSPIN==4)
-        {
-            this->cal_fvnl_dbeta(GlobalC::LOC.wfc_dm_2d.dm_gamma, isforce, isstress, fvnl_dbeta, svnl_dbeta);
-        }
-        else
-        {
-            this->cal_fvnl_dbeta_new(GlobalC::LOC.wfc_dm_2d.dm_gamma, isforce, isstress, fvnl_dbeta, svnl_dbeta);
-        }
+        this->calFvnlDbeta(GlobalC::LOC.wfc_dm_2d.dm_gamma, isforce, isstress, fvnl_dbeta, svnl_dbeta, GlobalV::vnl_method);
         this->cal_fvl_dphi(GlobalC::LOC.wfc_dm_2d.dm_gamma, isforce, isstress, fvl_dphi, svl_dphi);
 
-        //quxin added for DFT+U
-        if(INPUT.dft_plus_u) GlobalC::dftu.force_stress();
     }
     else
     {
@@ -74,8 +64,6 @@ void Force_LCAO_gamma::ftable_gamma (
             this->cal_fvnl_dbeta_new(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
         }
 
-        //quxin added for DFT+U
-        if(INPUT.dft_plus_u) GlobalC::dftu.force_stress();
 
         // calculate < dphi | V | phi > on real space grid.
         this->cal_fvl_dphi(dm2d, isforce, isstress, fvl_dphi, svl_dphi);
@@ -199,14 +187,7 @@ void Force_LCAO_gamma::allocate_gamma(void)
     
     //GlobalC::UHM.genH.build_Nonlocal_beta (cal_deri);
     //ModuleBase::timer::tick("Force_LCAO_gamma","build_Nonlocal_mu");
-	if(GlobalV::NSPIN==4)
-	{
-		GlobalC::UHM.genH.build_Nonlocal_mu (cal_deri);
-	}
-	else
-	{
-		GlobalC::UHM.genH.build_Nonlocal_mu_new (cal_deri);
-	}
+	this->NonlocalDphi(GlobalV::NSPIN, GlobalV::vnl_method, cal_deri);
     //ModuleBase::timer::tick("Force_LCAO_gamma","build_Nonlocal_mu");
     //test_gamma(GlobalC::LM.DHloc_fixed_x, "dHloc_fixed_x Vnl part");
 
@@ -263,4 +244,46 @@ void Force_LCAO_gamma::test_gamma(double* mm, const std::string &name)
         std::cout << std::endl;
     }
     return;
+}
+
+void Force_LCAO_gamma::calFvnlDbeta
+(
+    const std::vector<ModuleBase::matrix> &dm2d, 
+	const bool &isforce, 
+	const bool &isstress, 
+	ModuleBase::matrix& fvnl_dbeta, 
+	ModuleBase::matrix& svnl_dbeta,
+    const int &vnl_method
+)
+{
+    ModuleBase::TITLE("Force_LCAO_gamma", "calFvnlDbeta");
+    if(GlobalV::NSPIN==4 || vnl_method == 0)
+    {
+        this->cal_fvnl_dbeta(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
+    }
+    else if(vnl_method == 1)
+    {
+        this->cal_fvnl_dbeta_new(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
+    }
+    else 
+    {
+        ModuleBase::WARNING_QUIT("Force_LCAO_gamma","This method has not been implemented");
+    }
+}
+
+void Force_LCAO_gamma::NonlocalDphi(const int& nspin, const int& vnl_method, const bool& cal_deri)
+{
+	ModuleBase::TITLE("Force_LCAO_gamma", "NonlocalDphi");
+	if(nspin==4 || vnl_method == 0)
+	{
+		GlobalC::UHM.genH.build_Nonlocal_mu (cal_deri);
+	}
+	else if(vnl_method == 1)
+	{
+		GlobalC::UHM.genH.build_Nonlocal_mu_new (cal_deri);
+	}
+	else
+	{
+		ModuleBase::WARNING_QUIT("Force_LCAO_gamma","This method has not been implemented");
+	}
 }
