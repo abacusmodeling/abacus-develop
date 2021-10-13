@@ -1387,15 +1387,15 @@ void LCAO_Descriptor::cal_gedm(const ModuleBase::matrix &dm)
     //forward
     std::vector<torch::jit::IValue> inputs;
     //input_dim:(natom, des_per_atom)
-    inputs.push_back(torch::cat(d_tensor, /*dim=*/0).reshape({ GlobalC::ucell.nat, des_per_atom }));
+    inputs.push_back(torch::cat(this->d_tensor, /*dim=*/0).reshape({ GlobalC::ucell.nat, this->des_per_atom }));
     std::vector<torch::Tensor> ec;
     ec.push_back(module.forward(inputs).toTensor());    //Hartree
     this->E_delta = ec[0].item().toDouble() * 2;//Ry; *2 is for Hartree to Ry
     
     //cal gedm
-    std::vector<torch::Tensor> grad_shell;
-    grad_shell.push_back(torch::ones_like(ec[0]));
-    this->gedm_tensor = torch::autograd::grad(ec, this->pdm_tensor, grad_shell);
+    std::vector<torch::Tensor> gedm_shell;
+    gedm_shell.push_back(torch::ones_like(ec[0]));
+    this->gedm_tensor = torch::autograd::grad(ec, this->pdm_tensor, gedm_shell, /*retain_grad=*/true);
 
     //gedm_tensor(Hartree) to gedm(Ry)
     for (int inl = 0;inl < inlmax;++inl)
@@ -1414,6 +1414,38 @@ void LCAO_Descriptor::cal_gedm(const ModuleBase::matrix &dm)
     return;
 }
 
+void LCAO_Descriptor::cal_gvdm()
+{
+    ModuleBase::TITLE("LCAO_Descriptor", "cal_gvdm");
+    //cal gevdm(d(EigenValue(D))/dD)
+    int nlmax = inlmax/GlobalC::ucell.nat;
+    for (int nl=0;nl<nlmax;++nl)
+    {
+        std::vector<torch::Tensor> avmmv;
+        for (int iat = 0;iat<GlobalC::ucell.nat;++iat)
+        {
+            int inl = iat*nlmax+nl;
+            int nm = 2*this->inl_l[inl]+1;
+            //repeat each block for nm times in an additional dimension
+            torch::Tensor tmp_x = this->pdm_tensor[inl].reshape({nm, nm}).unsqueeze(0).repeat({nm, 1, 1});
+            torch::Tensor tmp_y = std::get<0>(torch::symeig(tmp_x, true));
+            torch::Tensor tmp_yshell = torch::eye(nm, torch::TensorOptions().dtype(torch::kFloat64));
+            std::vector<torch::Tensor> tmp_rpt;     //repeated-pdm-tensor (x)
+            std::vector<torch::Tensor> tmp_rdt; //repeated-d-tensor (y)
+            std::vector<torch::Tensor> tmp_gst; //gvx-shell
+            tmp_rpt.push_back(tmp_x);
+            tmp_rdt.push_back(tmp_y);
+            tmp_gst.push_back(tmp_yshell);
+            std::vector<torch::Tensor> tmp_res;
+            tmp_res = torch::autograd::grad(tmp_rdt, tmp_rpt, tmp_gst, false, false, /*allow_unused*/true); //nm(v)**nm*nm
+            avmmv.push_back(tmp_res[0]);
+        }
+        torch::Tensor avmm = torch::stack(avmmv, 0); //nat*nv**nm*nm
+        this->gevdm_vector.push_back(avmm);
+    }
+    assert(this->gevdm_vector.size() == nlmax);
+    return;
+}
 
 void LCAO_Descriptor::print_H_V_delta(void)
 {
@@ -1639,6 +1671,30 @@ void LCAO_Descriptor::save_npy_f(const ModuleBase::matrix &f, const std::string 
     return;
 }
 
+void LCAO_Descriptor::save_npy_gvx(void)
+{
+    ModuleBase::TITLE("LCAO_Descriptor", "save_npy_gvx");
+    //save grad_vx.npy (when  force label is in use)
+    //unit: /Bohr
+    const long unsigned gshape[] = {(long unsigned) GlobalC::ucell.nat, 3, GlobalC::ucell.nat, this->des_per_atom};
+    vector<double> npy_gvx;
+    for (int ibt = 0;ibt < GlobalC::ucell.nat;++ibt)
+    {
+        for (int i = 0;i < 3;i++)
+        {
+            for (int iat = 0;iat < GlobalC::ucell.nat;++iat)
+            {
+                for(int p=0;p<this->des_per_atom;++p)
+                {
+                    npy_gvx.push_back(this->gvx_tensor.index({ ibt, i, iat, p }).item().toDouble());
+                }
+            }
+        }
+    }
+    npy::SaveArrayAsNumpy("grad_vx.npy", false, 4, gshape, npy_gvx);
+    return;
+}
+
 void LCAO_Descriptor::cal_e_delta_band(const std::vector<ModuleBase::matrix> &dm)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "cal_e_delta_band");
@@ -1662,3 +1718,71 @@ void LCAO_Descriptor::cal_e_delta_band(const std::vector<ModuleBase::matrix> &dm
     return;
 }
 #endif
+
+void LCAO_Descriptor::cal_gvx(const ModuleBase::matrix &dm)
+{
+    ModuleBase::TITLE("LCAO_Descriptor","cal_gvx");
+    //preconditions
+    this->cal_gvdm();
+
+    this->build_S_descriptor(1);
+    this->init_gdmx();
+    this->cal_gdmx(dm); //checked
+
+    //make gdmx as tensor
+    int nlmax = this->inlmax/GlobalC::ucell.nat;
+    for (int nl=0;nl<nlmax;++nl)
+    {
+        std::vector<torch::Tensor> bmmv;
+        for (int ibt=0;ibt<GlobalC::ucell.nat;++ibt)
+        {
+            std::vector<torch::Tensor> xmmv;
+            for (int i=0;i<3;++i)
+            {
+                std::vector<torch::Tensor> ammv;
+                for (int iat=0; iat<GlobalC::ucell.nat; ++iat)
+                {
+                    int inl = iat*nlmax + nl;
+                    int nm = 2*this->inl_l[inl]+1;
+                    std::vector<double> mmv;
+                    for (int m1=0;m1<nm;++m1)
+                    {
+                        for(int m2=0;m2<nm;++m2)
+                        {
+                            if(i==0) mmv.push_back(this->gdmx[ibt][inl][m1*nm+m2]);
+                            if(i==1) mmv.push_back(this->gdmy[ibt][inl][m1*nm+m2]);
+                            if(i==2) mmv.push_back(this->gdmz[ibt][inl][m1*nm+m2]);
+                        }
+                    }//nm^2
+                    torch::Tensor mm = torch::tensor(mmv, torch::TensorOptions().dtype(torch::kFloat64) ).reshape({nm, nm});    //nm*nm
+                    ammv.push_back(mm);
+                }
+                torch::Tensor amm = torch::stack(ammv, 0);  //nat*nm*nm
+                xmmv.push_back(amm);
+            }
+            torch::Tensor bmm = torch::stack(xmmv, 0);  //3*nat*nm*nm
+            bmmv.push_back(bmm); 
+        }
+        this->gdmr_vector.push_back(torch::stack(bmmv, 0)); //nbt*3*nat*nm*nm
+    }
+    assert(this->gdmr_vector.size()==nlmax);
+
+    std::cout<<"gdmr-ok"<<std::endl;
+    std::cout << nlmax <<" " << this->gdmr_vector.size()<<" "<<this->gevdm_vector.size()<<std::endl;
+    //einsum for each inl: 
+    std::vector<torch::Tensor> gvx_vector;
+    for (int nl = 0;nl<nlmax;++nl)
+    {
+        gvx_vector.push_back(at::einsum("bxamn, avmn->bxav", {this->gdmr_vector[nl], this->gevdm_vector[nl]}));
+    }//
+    
+    // cat nv-> \sum_nl(nv) = \sum_nl(nm_nl)=des_per_atom
+    this->gvx_tensor = torch::cat(gvx_vector, -1);
+
+    assert(this->gvx_tensor.size(0) == GlobalC::ucell.nat);
+    assert(this->gvx_tensor.size(1) == 3);
+    assert(this->gvx_tensor.size(2) == GlobalC::ucell.nat);
+    assert(this->gvx_tensor.size(3) == this->des_per_atom);
+
+    return;
+}

@@ -299,6 +299,8 @@ void Force_Stress_LCAO::getForceStress(
             if (INPUT.deepks_scf)
             {
                 GlobalC::ld.save_npy_f(fcs - GlobalC::ld.F_delta, "f_base.npy"); //Ry/Bohr, F_base
+				GlobalC::ld.cal_gvx(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
+				GlobalC::ld.save_npy_gvx();//  /Bohr, grad_vx
             }
             else
             {

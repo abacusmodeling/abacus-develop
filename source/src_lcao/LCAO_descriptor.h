@@ -57,6 +57,17 @@ public:
 
     ///calculate \f$\frac{dE_\delta}{dD^I_{nlmm'}}\f$
     void cal_gedm(const ModuleBase::matrix& dm/**< [in] density matrix*/);	//need to load model in this step
+
+    ///calculate \f$\frac{d\mathbf{d^I_{nl}}}{dX}=\frac{d\mathbf{d^I_{nl}}}{dD^I_{nlmm'}}*\frac{dD^I_{nlmm'}}{dX}\f$
+    ///----------------------------------------------------
+    ///m, n: 2*l+1
+    ///v: eigenvalues of dm , 2*l+1
+    ///a,b: natom 
+    /// - (a: the center of descriptor orbitals
+    /// - b: the atoms whose force being calculated)
+    ///gvdm*gdmx->gvx
+    ///----------------------------------------------------
+    void cal_gvx(const ModuleBase::matrix &dm);
     
     ///calculate \f$\sum_{I}\sum_{nlmm'}\langle\phi_\mu|\alpha^I_{nlm}\rangle{\frac{dE}{dD^I_{nlmm'}}}\langle\alpha^I_{nlm'}|\phi_\nu\rangle\f$ (for gamma_only)
     void build_v_delta_alpha(const bool& cal_deri/**< [in] 0 for 3-center intergration, 1 for its derivation*/);
@@ -103,6 +114,7 @@ public:
 	void save_npy_d(void);
 	void save_npy_e(const double &e/**<[in] \f$E_{base}\f$ or \f$E_{tot}\f$, in Ry*/, const std::string &e_file);
 	void save_npy_f(const ModuleBase::matrix &fbase/**<[in] \f$F_{base}\f$ or \f$F_{tot}\f$, in Ry/Bohr*/, const std::string &f_file);
+    void save_npy_gvx(void);
 
     ///calculate \f$tr(\rho H_\delta), \rho = \sum_i{c_{i, \mu}c_{i,\nu}} \f$ (for gamma_only)
     void cal_e_delta_band(const std::vector<ModuleBase::matrix>& dm/**<[in] density matrix*/);
@@ -166,6 +178,16 @@ private:
 	///dE/dD, autograd from loaded model(E: Ry)
 	double** gedm;	//[tot_Inl][2l+1][2l+1]
 
+    //gvx:d(d)/dX, [natom][3][natom][des_per_atom]
+    torch::Tensor gvx_tensor;
+
+    //d(d)/dD, autograd from torch::symeig
+    std::vector<torch::Tensor> gevdm_vector;
+
+    //dD/dX, tensor form of gdmx
+    std::vector<torch::Tensor> gdmr_vector;
+
+
     ///size of descriptor(projector) basis set
     int n_descriptor;
 
@@ -209,7 +231,8 @@ private:
 	void init_gdmx(void);
     void load_model(const std::string& model_file);
     
-    void cal_gdmx(const ModuleBase::matrix& dm);	//dD/dX
+    void cal_gvdm();    //called when force=1, precondition of cal_gvx
+    void cal_gdmx(const ModuleBase::matrix& dm);	//dD/dX, precondition of cal_gvx
 	void del_gdmx(void);
 
 	void getdm_double(const ModuleBase::matrix& dm);
