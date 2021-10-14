@@ -421,6 +421,14 @@ inline int q2WFC_WFCAUG_CTOT_complex(
     return 0;
 }
 
+inline bool ifElpaHandle(const bool& newIteration, const bool& ifNSCF)
+{
+    int doHandle = false;
+	if(newIteration) doHandle = true;
+	if(ifNSCF) doHandle = true;
+	return doHandle;
+}
+
 Pdiag_Double::Pdiag_Double()
 {
 	// default value of nb is 1,
@@ -657,7 +665,7 @@ void Pdiag_Double::diago_double_begin(
         int is_already_decomposed, elpa_error;
         static elpa_t handle;
 
-        if(GlobalC::CHR.get_new_e_iteration())
+        if(ifElpaHandle(GlobalC::CHR.get_new_e_iteration(), (GlobalV::CALCULATION=="nscf")))
         {
             ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_set");
             LapackConnector::copy(nloc, s_mat, inc, Stmp, inc);
@@ -1059,7 +1067,7 @@ void Pdiag_Double::diago_complex_begin(
         ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_set");
         static elpa_t handle;
 
-        if(GlobalC::CHR.get_new_e_iteration())
+        if(ifElpaHandle(GlobalC::CHR.get_new_e_iteration(), (GlobalV::CALCULATION=="nscf")))
         {
             set_elpahandle(handle, desc, nrow, ncol);
         }

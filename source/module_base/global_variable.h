@@ -199,5 +199,8 @@ extern bool FINAL_SCF; //LiuXh add 20180619
 
 extern bool out_descriptor; //zhengdy add 20210910
 
+//method for dealing with non-local potential in Hamiltonian matrix, 0 for old, 1 for new
+extern int vnl_method;
+
 }
 #endif

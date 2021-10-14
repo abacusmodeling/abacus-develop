@@ -19,6 +19,24 @@ option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 option(BUILD_TESTING "Build ABACUS unit tests" OFF)
 option(GENERATE_TEST_REPORTS "Enable test report generation" OFF)
 
+set(ABACUS_BIN_NAME abacus)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/modules)
+set(ABACUS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/source)
+set(ABACUS_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+set(ABACUS_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/${ABACUS_BIN_NAME})
+include_directories(${ABACUS_SOURCE_DIR})
+add_executable(${ABACUS_BIN_NAME} source/main.cpp)
+
+find_package(Cereal REQUIRED)
+include_directories(${Cereal_INCLUDE_DIRS})
+find_package(ELPA REQUIRED)
+include_directories(${ELPA_INCLUDE_DIR})
+find_package(MPI REQUIRED)
+include_directories(${MPI_CXX_INCLUDE_PATH})
+find_package(Threads REQUIRED)
+find_package(OpenMP REQUIRED)
+
+set(CMAKE_CXX_STANDARD 11)
 include(CheckLanguage)
 check_language(CUDA)
 if(CMAKE_CUDA_COMPILER)
@@ -44,14 +62,19 @@ if(USE_CUDA)
   set(CMAKE_CUDA_STANDARD_REQUIRED ON)
   set(CMAKE_CUDA_HOST_COMPILER ${CMAKE_CXX_COMPILER})
   enable_language(CUDA)
+  target_link_libraries(${ABACUS_BIN_NAME}
+    -lcufft
+    -lcublas
+    -lcudart
+  )
+  set_property(TARGET ${ABACUS_BIN_NAME}
+  PROPERTY CUDA_ARCHITECTURES
+  60 # P100
+  70 # V100
+  75 # T4
+  )
   include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
   add_compile_definitions(__CUDA)
-endif()
-
-if(ENABLE_DEEPKS)
-  set(CMAKE_CXX_STANDARD 14)
-else()
-  set(CMAKE_CXX_STANDARD 11)
 endif()
 
 if(ENABLE_ASAN)
@@ -70,30 +93,12 @@ else()
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-write-strings" )
 endif()
 
-set(ABACUS_BIN_NAME abacus)
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/modules)
-set(ABACUS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/source)
-set(ABACUS_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
-set(ABACUS_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/${ABACUS_BIN_NAME})
-
-include_directories(${ABACUS_SOURCE_DIR})
-
-find_package(Cereal REQUIRED)
-find_package(ELPA REQUIRED)
-find_package(MPI REQUIRED)
-find_package(Threads REQUIRED)
-find_package(OpenMP REQUIRED)
-
-include(FetchContent)
-
-include_directories(
-  ${Cereal_INCLUDE_DIRS}
-  ${MPI_CXX_INCLUDE_PATH}
-)
 
 if(ENABLE_DEEPKS)
+  set(CMAKE_CXX_STANDARD 14)
   find_package(Torch REQUIRED)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
+  include(FetchContent)
   FetchContent_Declare(
     libnpy
     GIT_REPOSITORY https://github.com.cnpmjs.org/llohse/libnpy.git
@@ -103,7 +108,8 @@ if(ENABLE_DEEPKS)
     ${libnpy_SOURCE_DIR}
     ${TORCH_INCLUDE_DIRS}
   )
-  add_definitions(-D__DEEPKS)
+  target_link_libraries(${ABACUS_BIN_NAME} ${TORCH_LIBRARIES})
+  add_compile_definitions(__DEEPKS)
 endif()
 
 if(DEFINED Libxc_DIR)
@@ -114,8 +120,7 @@ if(ENABLE_LIBXC)
   if(${Libxc_FOUND})
     message("Using Libxc.")
     add_compile_definitions(USE_LIBXC)
-    # applying -DUSING_Libxc definition
-    # target_compile_definitions(${ABACUS_BIN_NAME} PRIVATE $<TARGET_PROPERTY:Libxc::xc,INTERFACE_COMPILE_DEFINITIONS>)
+    target_link_libraries(${ABACUS_BIN_NAME} Libxc::xc)
     include_directories(${Libxc_INCLUDE_DIRS})
   else()
     message(WARNING "Will not use Libxc.")
@@ -125,7 +130,6 @@ endif()
 if(DEFINED ENV{MKLROOT} AND NOT DEFINED MKLROOT)
     set(MKLROOT "$ENV{MKLROOT}")
 endif()
-
 if(MKLROOT)
   find_package(IntelMKL REQUIRED)
   add_definitions(-D__MKL -DMKL_ILP64)
@@ -154,10 +158,6 @@ add_compile_definitions(
 )
 
 add_subdirectory(source)
-
-add_executable(${ABACUS_BIN_NAME}
-    source/main.cpp
-)
 
 target_link_libraries(${ABACUS_BIN_NAME}
     base
@@ -202,30 +202,6 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 target_link_libraries(${ABACUS_BIN_NAME}
   -lgfortran
 )
-endif()
-
-if(ENABLE_DEEPKS)
-  target_link_libraries(${ABACUS_BIN_NAME}
-    ${TORCH_LIBRARIES}
-  )
-endif()
-
-if(USE_CUDA)
-  target_link_libraries(${ABACUS_BIN_NAME}
-    -lcufft
-    -lcublas
-    -lcudart
-  )
-  set_property(TARGET ${ABACUS_BIN_NAME}
-  PROPERTY CUDA_ARCHITECTURES
-  60 # P100
-  70 # V100
-  75 # T4
-  )
-endif()
-
-if(${Libxc_FOUND})
-  target_link_libraries(${ABACUS_BIN_NAME} Libxc::xc)
 endif()
 
 install(PROGRAMS ${ABACUS_BIN_PATH}
