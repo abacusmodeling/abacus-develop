@@ -7,20 +7,6 @@
 #include <unordered_map>
 #include <map>
 
-namespace std
-{
-    template<> struct hash<ModuleBase::Vector3<float>>
-    {
-        std::size_t operator()(ModuleBase::Vector3<float> const& v) const noexcept
-        {
-            std::size_t v1 = std::hash<float>{}(v.x);
-            std::size_t v2 = std::hash<float>{}(v.y);
-			std::size_t v3 = std::hash<float>{}(v.z);
-            return v1 ^ v2 ^ v3; // or use boost::hash_combine
-        }
-    };
-}
-
 LCAO_gen_fixedH::LCAO_gen_fixedH()
 {}
 

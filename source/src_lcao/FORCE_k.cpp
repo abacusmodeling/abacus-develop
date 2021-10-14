@@ -11,20 +11,6 @@ Force_LCAO_k::~Force_LCAO_k ()
 {
 }
 
-namespace std
-{
-    template<> struct hash<ModuleBase::Vector3<double>>
-    {
-        std::size_t operator()(ModuleBase::Vector3<double> const& v) const noexcept
-        {
-            std::size_t v1 = std::hash<double>{}(v.x);
-            std::size_t v2 = std::hash<double>{}(v.y);
-			std::size_t v3 = std::hash<double>{}(v.z);
-            return v1 ^ v2 ^ v3; // or use boost::hash_combine
-        }
-    };
-}
-
 #include "LCAO_nnr.h"
 // be called in Force_LCAO::start_force_calculation
 void Force_LCAO_k::ftable_k (
