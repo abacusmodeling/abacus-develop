@@ -132,18 +132,23 @@ endif()
 if(ENABLE_DEEPKS)
   set(CMAKE_CXX_STANDARD 14)
   find_package(Torch REQUIRED)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
-  include(FetchContent)
-  FetchContent_Declare(
-    libnpy
-    GIT_REPOSITORY https://github.com.cnpmjs.org/llohse/libnpy.git
-  )
-  FetchContent_MakeAvailable(libnpy)
-  include_directories(
-    ${libnpy_SOURCE_DIR}
-    ${TORCH_INCLUDE_DIRS}
-  )
+  include_directories(${TORCH_INCLUDE_DIRS})
   target_link_libraries(${ABACUS_BIN_NAME} ${TORCH_LIBRARIES})
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
+
+  find_path(libnpy_SOURCE_DIR
+    npy.hpp
+    HINTS ${libnpy_INCLUDE_DIR}
+  )
+  if(NOT libnpy_SOURCE_DIR)
+  include(FetchContent)
+    FetchContent_Declare(
+      libnpy
+      GIT_REPOSITORY https://github.com.cnpmjs.org/llohse/libnpy.git
+    )
+    FetchContent_MakeAvailable(libnpy)
+  endif()
+  include_directories(${libnpy_SOURCE_DIR})
   add_compile_definitions(__DEEPKS)
 endif()
 
