@@ -11,7 +11,7 @@
 extern "C"
 {
     #include "Cblacs.h"
-	#include "my_elpa.h"
+    #include "my_elpa.h"
 	#include "../module_base/scalapack_connector.h"
 }
 #include "pdgseps.h"
@@ -95,6 +95,8 @@ inline int set_elpahandle(elpa_t &handle, int *desc, int local_nrows, int local_
   elpa_set_integer(handle, "process_col", mypcol, &error);
 
   elpa_set_integer(handle, "blacs_context", desc[1], &error);
+
+  elpa_set_integer(handle, "cannon_for_generalized", 0, &error);
    /* Setup */
   elpa_setup(handle);   /* Set tunables */
   return 0;
