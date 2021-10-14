@@ -29,12 +29,25 @@ add_executable(${ABACUS_BIN_NAME} source/main.cpp)
 
 find_package(Cereal REQUIRED)
 include_directories(${Cereal_INCLUDE_DIRS})
+add_compile_definitions(USE_CEREAL_SERIALIZATION)
+
 find_package(ELPA REQUIRED)
 include_directories(${ELPA_INCLUDE_DIR})
+target_link_libraries(${ABACUS_BIN_NAME} ELPA::ELPA)
+
 find_package(MPI REQUIRED)
 include_directories(${MPI_CXX_INCLUDE_PATH})
+target_link_libraries(${ABACUS_BIN_NAME} MPI::MPI_CXX)
+add_compile_definitions(__MPI)
+
 find_package(Threads REQUIRED)
+target_link_libraries(${ABACUS_BIN_NAME} Threads::Threads)
+
 find_package(OpenMP REQUIRED)
+target_link_libraries(${ABACUS_BIN_NAME} OpenMP::OpenMP_CXX)
+add_compile_options(${OpenMP_CXX_FLAGS})
+add_compile_definitions(__OPENMP)
+
 
 set(CMAKE_CXX_STANDARD 11)
 include(CheckLanguage)
@@ -134,19 +147,26 @@ if(MKLROOT)
   find_package(IntelMKL REQUIRED)
   add_definitions(-D__MKL -DMKL_ILP64)
   include_directories(${MKL_INCLUDE_DIRS} ${MKL_INCLUDE_DIRS}/fftw)
+  target_link_libraries(${ABACUS_BIN_NAME}
+    -lifcore
+    IntelMKL::MKL
+  )
 else()
   find_package(FFTW3 REQUIRED)
   find_package(LAPACK REQUIRED)
   find_package(ScaLAPACK REQUIRED)
   include_directories(${FFTW3_INCLUDE_DIRS})
+  target_link_libraries(${ABACUS_BIN_NAME}
+    FFTW3::FFTW3
+    LAPACK::LAPACK
+    ScaLAPACK::ScaLAPACK
+  )
 endif()
 
 add_compile_definitions(
   __EXX
   __FFTW3
   __FP
-  __MPI
-  __OPENMP
   __SELINV
   __LCAO
   METIS
@@ -154,7 +174,6 @@ add_compile_definitions(
   EXX_H_COMM=2
   TEST_EXX_LCAO=0
   TEST_EXX_RADIAL=1
-  USE_CEREAL_SERIALIZATION
 )
 
 add_subdirectory(source)
@@ -177,27 +196,7 @@ target_link_libraries(${ABACUS_BIN_NAME}
     ri
     driver
     -lm
-    ELPA::ELPA
-    MPI::MPI_CXX
-    OpenMP::OpenMP_CXX
-    Threads::Threads
 )
-
-if(MKLROOT)
-  target_link_libraries(${ABACUS_BIN_NAME}
-    -lifcore
-    IntelMKL::MKL
-    OpenMP::OpenMP_CXX
-  )
-else()
-  target_link_libraries(${ABACUS_BIN_NAME}
-    FFTW3::FFTW3
-    ScaLAPACK::ScaLAPACK
-    LAPACK::LAPACK
-    OpenMP::OpenMP_CXX
-  )
-endif()
-
 if(CMAKE_COMPILER_IS_GNUCXX)
 target_link_libraries(${ABACUS_BIN_NAME}
   -lgfortran
