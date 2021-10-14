@@ -7,13 +7,17 @@ LJ_potential::~LJ_potential(){}
 
 double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c, 
                     Grid_Driver &grid_neigh, 
-                    ModuleBase::Vector3<double> *force)
+                    ModuleBase::Vector3<double> *force,
+                    ModuleBase::matrix &stress)
 {
     ModuleBase::TITLE("LJ_potential", "Lennard_Jones");
     ModuleBase::timer::tick("LJ_potential", "Lennard_Jones");
 
     double distance, potential = 0; //initialize
     int index = 0;
+    double virial[6];
+    ModuleBase::GlobalFunc::ZEROS(virial, 6);    // initialize
+
     ModuleBase::Vector3<double> tau1, tau2, dtau;
     for(int it=0; it<ucell_c.ntype; ++it)
     {
@@ -31,12 +35,23 @@ double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c,
                 if(distance <= INPUT.mdp.rcut_lj)
 			    {
 				    potential += LJ_energy(distance) - LJ_energy(INPUT.mdp.rcut_lj);
-				    force[index] += LJ_force(distance, dtau);
+                    ModuleBase::Vector3<double> f_ij = LJ_force(distance, dtau);
+				    force[index] += f_ij;
+                    LJ_virial(virial, f_ij, dtau);
 			    }
             }
             index++;
 	    }
     }
+
+    // Post treatment for virial
+    stress(0, 0) = virial[0]/(2.0*ucell_c.omega);
+    stress(1, 1) = virial[1]/(2.0*ucell_c.omega);
+    stress(2, 2) = virial[2]/(2.0*ucell_c.omega);
+    stress(0, 1) = stress(1, 0) = virial[3]/(2.0*ucell_c.omega);
+    stress(0, 2) = stress(2, 0) = virial[4]/(2.0*ucell_c.omega);
+    stress(1, 2) = stress(2, 1) = virial[5]/(2.0*ucell_c.omega);
+
     ModuleBase::timer::tick("LJ_potential", "Lennard_Jones");
 	return potential/2.0;
 }
