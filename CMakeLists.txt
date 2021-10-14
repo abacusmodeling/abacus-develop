@@ -28,7 +28,7 @@ include_directories(${ABACUS_SOURCE_DIR})
 add_executable(${ABACUS_BIN_NAME} source/main.cpp)
 
 find_package(Cereal REQUIRED)
-include_directories(${Cereal_INCLUDE_DIRS})
+include_directories(${Cereal_INCLUDE_DIR})
 add_compile_definitions(USE_CEREAL_SERIALIZATION)
 
 find_package(ELPA REQUIRED)
