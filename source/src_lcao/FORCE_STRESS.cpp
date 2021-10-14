@@ -196,9 +196,11 @@ void Force_Stress_LCAO::getForceStress(
 	ModuleBase::matrix stress_dftu;
 	if (INPUT.dft_plus_u)
 	{
-		if(isforce)
-		{
-			force_dftu.create(nat, 3);
+		// Quxin add for DFT+U on 20201029
+		GlobalC::dftu.force_stress();
+		
+        if (isforce) {
+            force_dftu.create(nat, 3);
 		}
 		if(isstress)
 		{
@@ -264,7 +266,7 @@ void Force_Stress_LCAO::getForceStress(
 				// mohan add 2021-08-04
 				if (INPUT.deepks_scf)
 				{
-					fcs(iat, i) += ld.F_delta(iat, i);
+					fcs(iat, i) += GlobalC::ld.F_delta(iat, i);
 				}
 #endif
 				//sum total force for correction
@@ -489,7 +491,7 @@ void Force_Stress_LCAO::getForceStress(
 		GlobalV::PRESSURE = (scs(0,0)+scs(1,1)+scs(2,2))/3;
 	}//end of stress calculation
 	
-	ModuleBase::timer::tick("Force_LCAO","start_force");
+	ModuleBase::timer::tick("Force_Stress_LCAO","getForceStress");
 	return;
 }
 

@@ -27,6 +27,8 @@ LCAO_Orbitals::LCAO_Orbitals()
 
 	this->dr_uniform = 0.001;
 
+	this->lmax_d = 0;
+	this->nchimax_d = 0;
 }
 
 LCAO_Orbitals::~LCAO_Orbitals()

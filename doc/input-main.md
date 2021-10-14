@@ -3,7 +3,7 @@
 - [List of keywords](#list-of-keywords)
     - [System variables](#system-variables)
 
-        [suffix](#suffix) | [ntype](#ntype) | [calculation](#calculation) | [dft_functional](#dft-functional) | [pseudo_type](#pseudo-type) | [npool](#npool) | [symmetry](#symmetry) | [pseudo_rcut](#pseudo-rcut) | [renormwithmesh](#renormwithmesh) | [nelec](#nelec) | [tot_magnetization](#tot-magnetization) | [mem_saver](#mem-saver) | [latname](#latname) | [start_wfc](#start-wfc) | [seed](#seed) | [start_charge](#start-charge) | [start_pot](#start-pot) | [set_vel](#set_vel) | [diago_proc](#diago_proc) 
+        [suffix](#suffix) | [ntype](#ntype) | [calculation](#calculation) | [dft_functional](#dft-functional) | [pseudo_type](#pseudo-type) | [npool](#npool) | [symmetry](#symmetry) | [pseudo_rcut](#pseudo-rcut) | [renormwithmesh](#renormwithmesh) | [nelec](#nelec) | [tot_magnetization](#tot-magnetization) | [mem_saver](#mem-saver) | [latname](#latname) | [start_wfc](#start-wfc) | [seed](#seed) | [start_charge](#start-charge) | [start_pot](#start-pot) | [set_vel](#set_vel) | [diago_proc](#diago_proc) | [nbspline](#nbspline)
 
     - [Variables related to input files](#variables-related-to-input-files)
 
@@ -43,7 +43,7 @@
 
     - [Molecular dynamics](#molecular-dynamics)
 
-        [md_type](#md-type) | [md_potential](#md-potential) | [md_rstmd](#md-rstmd) | [md_dt](#md-dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_dumpmdfred](#md-dumpmdfred) | [md_fixtemperature](#md-fixtemperature) | [NVT_control](#nvt-control) | [NVT_tau](#nvt-tau) | [MNHC](#mnhc) | [md_ediff](#md-ediff) | [md_ediffg](#md-ediffg) | [rcut_lj](#rcut_lj) | [epsilon_lj](#epsilon_lj) | [sigma_lj](#sigma_lj)
+        [md_type](#md-type) | [md_potential](#md-potential) | [md_rstmd](#md-rstmd) | [md_dt](#md_dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_dumpmdfred](#md-dumpmdfred) | [md_fixtemperature](#md-fixtemperature) | [NVT_control](#nvt-control) | [NVT_tau](#nvt-tau) | [MNHC](#mnhc) | [md_ediff](#md-ediff) | [md_ediffg](#md-ediffg) | [rcut_lj](#rcut_lj) | [epsilon_lj](#epsilon_lj) | [sigma_lj](#sigma_lj)
 
     - [DFT+U correction](#DFT_U-correction)
 
@@ -294,6 +294,14 @@ This part of variables are used to control general system parameters.
     - *Type*: Integer
     - *Descrption*: If set to a positive number, then it specifies the number of threads used for carrying out diagonalization. Must be less than or equal to total number of MPI threads. Also, when cg diagonalization is used, diago_proc must be same as total number of MPI threads. If set to 0, then it will be set to the number of MPI threads. Normally, it is fine just leaving it to default value.
     - *Default*: 0
+
+    [back to top](#input-file)
+
+- nbspline<a id="nbspline"></a>
+    - *Type*: Integer
+    - *Descrption*: If set to a natural number, a Cardinal B-spline interpolation will be used to calculate Structure Factor. "nbspline" represents the order of B-spline basis and larger one can get more accurate results but cost more.
+    It is turned off by default.
+    - *Default*: -1
 
     [back to top](#input-file)
 

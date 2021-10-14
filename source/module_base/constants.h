@@ -41,6 +41,7 @@ const std::complex<double> NEG_IMAG_UNIT(0.0,-1.0);
 //==========================================================
 const double K_BOLTZMAN_SI    = 1.3806504e-23;// J K^-1
 const double K_BOLTZMAN_AU    = 3.1667e-6;// Hartree K^-1
+const double Hartree_to_K     = 3.1577464e5; // Hartree to K
 //const double K_BOLTZMAN_RY    = 6.3335e-6;// Rydberg K^-1; mohan add 2010-09-03
 //const double K_BOLTZMAN_EV    = 8.6173e-5; // eV; mohan add 2010-09-03
 //const double K_BOLTZMAN_M1_AU = 315795.260;// Hartree^-1 K
@@ -80,6 +81,8 @@ const double Hartree_to_eV = 27.211396;// slcbb  // 27.21138344; // eV
 const double Ry_to_eV = 13.605698;				// 13.60569172; // conversion from Ry to eV
 //const double eV_to_kelvin = 1.16044;  			// from ev to Kelvin
 const double NA = 6.02214129e23;				// mol
+const double EMASS_SI = 9.1093826e-31;         // mass of electron (kg)
+const double AU_to_MASS = NA*EMASS_SI*1e3;     // mass a.u. to g/mol
 
 const double HARTREE_SI = 4.35974394e-18; //J
 const double RYDBERG_SI =  HARTREE_SI/2.0; //J
