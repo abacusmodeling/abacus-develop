@@ -14,7 +14,7 @@ project(ABACUS
 option(ENABLE_DEEPKS "Enable DeePKS functionality" OFF)
 option(ENABLE_LIBXC "Enable LibXC functionality" OFF)
 option(USE_CUDA "Enable support to CUDA." OFF)
-
+option(USE_OPENMP " Enable OpenMP in abacus." OFF)
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 option(BUILD_TESTING "Build ABACUS unit tests" OFF)
 option(GENERATE_TEST_REPORTS "Enable test report generation" OFF)
@@ -43,11 +43,12 @@ add_compile_definitions(__MPI)
 find_package(Threads REQUIRED)
 target_link_libraries(${ABACUS_BIN_NAME} Threads::Threads)
 
-find_package(OpenMP REQUIRED)
-target_link_libraries(${ABACUS_BIN_NAME} OpenMP::OpenMP_CXX)
-add_compile_options(${OpenMP_CXX_FLAGS})
-add_compile_definitions(__OPENMP)
-
+if(USE_OPENMP)
+  find_package(OpenMP REQUIRED)
+  target_link_libraries(${ABACUS_BIN_NAME} OpenMP::OpenMP_CXX)
+  add_compile_options(${OpenMP_CXX_FLAGS})
+  add_compile_definitions(__OPENMP)
+endif()
 
 set(CMAKE_CXX_STANDARD 11)
 include(CheckLanguage)
