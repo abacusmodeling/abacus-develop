@@ -106,6 +106,28 @@ else()
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-write-strings" )
 endif()
 
+if(DEFINED ENV{MKLROOT} AND NOT DEFINED MKLROOT)
+    set(MKLROOT "$ENV{MKLROOT}")
+endif()
+if(MKLROOT)
+  find_package(IntelMKL REQUIRED)
+  add_definitions(-D__MKL -DMKL_ILP64)
+  include_directories(${MKL_INCLUDE_DIRS} ${MKL_INCLUDE_DIRS}/fftw)
+  target_link_libraries(${ABACUS_BIN_NAME}
+    -lifcore
+    IntelMKL::MKL
+  )
+else()
+  find_package(FFTW3 REQUIRED)
+  find_package(LAPACK REQUIRED)
+  find_package(ScaLAPACK REQUIRED)
+  include_directories(${FFTW3_INCLUDE_DIRS})
+  target_link_libraries(${ABACUS_BIN_NAME}
+    FFTW3::FFTW3
+    LAPACK::LAPACK
+    ScaLAPACK::ScaLAPACK
+  )
+endif()
 
 if(ENABLE_DEEPKS)
   set(CMAKE_CXX_STANDARD 14)
@@ -138,29 +160,6 @@ if(ENABLE_LIBXC)
   else()
     message(WARNING "Will not use Libxc.")
   endif()
-endif()
-
-if(DEFINED ENV{MKLROOT} AND NOT DEFINED MKLROOT)
-    set(MKLROOT "$ENV{MKLROOT}")
-endif()
-if(MKLROOT)
-  find_package(IntelMKL REQUIRED)
-  add_definitions(-D__MKL -DMKL_ILP64)
-  include_directories(${MKL_INCLUDE_DIRS} ${MKL_INCLUDE_DIRS}/fftw)
-  target_link_libraries(${ABACUS_BIN_NAME}
-    -lifcore
-    IntelMKL::MKL
-  )
-else()
-  find_package(FFTW3 REQUIRED)
-  find_package(LAPACK REQUIRED)
-  find_package(ScaLAPACK REQUIRED)
-  include_directories(${FFTW3_INCLUDE_DIRS})
-  target_link_libraries(${ABACUS_BIN_NAME}
-    FFTW3::FFTW3
-    LAPACK::LAPACK
-    ScaLAPACK::ScaLAPACK
-  )
 endif()
 
 add_compile_definitions(
