@@ -4,7 +4,7 @@
 
 Use_FFT::Use_FFT()
 {
-	porter = new std::complex<double>[GlobalC::pw.nrxx];
+	porter = new std::complex<double>[1]; //qianrui fix a bug
 }
 
 Use_FFT::~Use_FFT()

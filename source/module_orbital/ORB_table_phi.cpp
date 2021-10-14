@@ -469,7 +469,7 @@ void ORB_table_phi::init_Table(
 
 			const int rmesh = this->get_rmesh( Rcut1, Rcut2);
 			assert( rmesh < this->Rmesh );
-/*			
+#ifdef __ORBITAL
     		std::stringstream ss1;
     		ss1 << "./Table_SR0";
 		    std::string command1 = "test -d " + ss1.str() + " || mkdir " + ss1.str();
@@ -479,7 +479,7 @@ void ORB_table_phi::init_Table(
     		ss2 << "./Table_TR0";
 		    std::string command2 = "test -d " + ss2.str() + " || mkdir " + ss2.str();
    			std::system( command2.c_str() );
-*/
+#endif
 			for (int L1 = 0; L1 < Lmax1 + 1; L1++)
 			{
 				for (int N1 = 0; N1 < orb.Phi[T1].getNchi(L1); N1++)
@@ -616,16 +616,18 @@ void ORB_table_phi::init_Table(
 										break;
 									}
 								}
-/*
+#ifdef __ORBITAL
+								int plot_length = 20;						
+		
 								std::stringstream ss_sr;
 								ss_sr << "Table_SR0/"<<Tpair<<Opair<<L<<".dat";
 								std::string filename1 = ss_sr.str();
-								plot_table(filename1,rmesh,Table_SR[0][Tpair][Opair][L]);
+								plot_table(filename1,plot_length,Table_SR[0][Tpair][Opair][L]);
 								std::stringstream ss_tr;
 								ss_tr << "Table_TR0/"<<Tpair<<Opair<<L<<".dat";
 								std::string filename2 = ss_tr.str();
-								plot_table(filename2,rmesh,Table_TR[0][Tpair][Opair][L]);
-*/
+								plot_table(filename2,plot_length,Table_TR[0][Tpair][Opair][L]);
+#endif
 							}//end m
 						}
 					}//end jl
@@ -781,7 +783,8 @@ void ORB_table_phi::init_Lmax (
 	int &Lmax_used, 
 	int &Lmax,
 	const int &Lmax_exx,
-	const LCAO_Orbitals &orb) const
+	const LCAO_Orbitals &orb,
+	const Numerical_Nonlocal* beta_) const
 {
 
 	auto cal_Lmax_Phi = [](int &Lmax,const LCAO_Orbitals &orb)
@@ -794,7 +797,7 @@ void ORB_table_phi::init_Lmax (
 		}
 	};
 
-	auto cal_Lmax_Beta = [](int &Lmax,const LCAO_Orbitals &orb)
+	auto cal_Lmax_Beta = [](int &Lmax,const LCAO_Orbitals &orb, const Numerical_Nonlocal* beta_)
 	{
 		// fix bug.
 		// mohan add the nonlocal part.
@@ -802,13 +805,13 @@ void ORB_table_phi::init_Lmax (
 		const int ntype = orb.get_ntype();
 		for(int it=0; it< ntype; it++)
 		{
-			Lmax = std::max(Lmax, orb.Beta[it].getLmax());
+			Lmax = std::max(Lmax, beta_[it].getLmax());
 		}
 	};
-	auto cal_Lmax_Alpha = [](int &Lmax)
+	auto cal_Lmax_Alpha = [](int &Lmax, const LCAO_Orbitals &orb)
 	{
 		//caoyu add 2021-08-05 for descriptor basis
-		Lmax = std::max(Lmax, GlobalC::ORB.get_lmax_d());
+		Lmax = std::max(Lmax, orb.get_lmax_d());
 	};
 
 	
@@ -821,7 +824,7 @@ void ORB_table_phi::init_Lmax (
 			{
 				case 1:			// used in <Phi|Phi> or <Beta|Phi>
 					cal_Lmax_Phi(Lmax,orb);
-					cal_Lmax_Beta(Lmax,orb);
+					cal_Lmax_Beta(Lmax,orb, beta_);
 					//use 2lmax+1 in dS
 					Lmax_used = 2*Lmax + 1;
 					break;
@@ -880,11 +883,12 @@ void ORB_table_phi::init_Table_Spherical_Bessel (
 	int &Lmax_used, 
 	int &Lmax,
 	const int &Lmax_exx,
-	const LCAO_Orbitals &orb)
+	const LCAO_Orbitals &orb,
+	const Numerical_Nonlocal* beta_)
 {
 	ModuleBase::TITLE("ORB_table_phi", "init_Table_Spherical_Bessel");
 
-	this->init_Lmax (orb_num,mode,Lmax_used,Lmax,Lmax_exx,orb);		// Peize Lin add 2016-01-26
+	this->init_Lmax (orb_num,mode,Lmax_used,Lmax,Lmax_exx,orb, beta_);		// Peize Lin add 2016-01-26
 
 	for( auto & sb : ModuleBase::Sph_Bessel_Recursive_Pool::D2::sb_pool )
 	{

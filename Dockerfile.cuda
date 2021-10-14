@@ -1,0 +1,6 @@
+FROM ghcr.io/deepmodeling/abacus-development-kit:gnu
+
+RUN wget https://developer.download.nvidia.com/compute/cuda/11.4.2/local_installers/cuda_11.4.2_470.57.02_linux.run --no-check-certificate --quiet \
+	&& sh cuda_11.4.2_470.57.02_linux.run --toolkit --silent \
+	&& rm cuda_11.4.2_470.57.02_linux.run
+ENV PATH=/usr/local/cuda/bin:$PATH

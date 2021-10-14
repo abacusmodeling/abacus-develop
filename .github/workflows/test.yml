@@ -35,7 +35,7 @@ jobs:
     name: Do the job on the runner
     needs: start-runner # required to start the main job when the runner is ready
     runs-on: ${{ needs.start-runner.outputs.label }} # run the job on the newly created runner
-    container: ghcr.io/deepmodeling/abacus-development-kit:gnu
+    container: ghcr.io/deepmodeling/abacus-development-kit:intel
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -48,7 +48,7 @@ jobs:
           cmake -B build -DBUILD_TESTING=ON
           cmake --build build -j16
           cmake --install build
-          ctest --test-dir build --verbose
+          cmake --build build --target test ARGS="-V"
   stop-runner:
     name: Stop self-hosted EC2 runner
     needs:

@@ -35,7 +35,7 @@ public:
     ModuleBase::Vector3<double> *m_loc_;   //magnetization for each element along c-axis
 	double *angle1_;           //angle between c-axis and real spin std::vector
 	double *angle2_;           //angle between a-axis and real spin std::vector projection in ab-plane
-    void cal_ux(const int ntype);
+    //void cal_ux(const int ntype);
     double ux_[3];
 	bool lsign_;
 

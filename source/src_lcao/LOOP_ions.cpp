@@ -186,12 +186,9 @@ void LOOP_ions::opt_ions(void)
             if (INPUT.deepks_scf)
             {
                 //ld.print_H_V_delta();   //final H_delta
-                if (FORCE)
-                {
-                    GlobalC::ld.build_S_descriptor(1);   //for F_delta calculation
-                    GlobalC::ld.cal_f_delta(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
-                    GlobalC::ld.print_F_delta();
-                }
+                GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma);
+                std::cout << "E_delta_band = " << std::setprecision(8) << GlobalC::ld.e_delta_band << " Ry" << " = " << std::setprecision(8) << GlobalC::ld.e_delta_band * ModuleBase::Ry_to_eV << " eV" << std::endl;
+                std::cout << "E_delta_NN= "<<std::setprecision(8) << GlobalC::ld.E_delta << " Ry" << " = "<<std::setprecision(8)<<GlobalC::ld.E_delta*ModuleBase::Ry_to_eV<<" eV"<<std::endl;
             }
         }
 #endif
@@ -470,7 +467,7 @@ void LOOP_ions::final_scf(void)
 		GlobalV::ofs_running,
 		GlobalV::OUT_LEVEL,
 		GlobalC::ORB.get_rcutmax_Phi(),
-		GlobalC::ORB.get_rcutmax_Beta(),
+		GlobalC::ucell.infoNL.get_rcutmax_Beta(),
 		GlobalV::GAMMA_ONLY_LOCAL);
 
     atom_arrange::search(
@@ -510,7 +507,7 @@ void LOOP_ions::final_scf(void)
     // after ParaO and GridT,
     // this information is used to calculate
     // the force.
-    GlobalC::LOWF.set_trace_aug(GlobalC::GridT);
+    //GlobalC::LOWF.set_trace_aug(GlobalC::GridT); //LiuXh modify 2021-09-06, clear memory, WFC_GAMMA_aug not used now
 
 	GlobalC::LOC.allocate_dm_wfc(GlobalC::GridT);
 

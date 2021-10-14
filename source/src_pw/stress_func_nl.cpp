@@ -8,8 +8,11 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma){
 	ModuleBase::timer::tick("Stress_Func","stres_nl");
 	
 	const int nkb = GlobalC::ppcell.nkb;
-	if(nkb == 0) return;
-
+	if(nkb == 0) 
+	{
+		ModuleBase::timer::tick("Stress_Func","stres_nl");
+		return;
+	}
 	double sigmanlc[3][3];
 	for(int l=0;l<3;l++)
 	{

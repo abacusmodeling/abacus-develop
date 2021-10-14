@@ -18,10 +18,11 @@ public:
 
 #ifndef __CMD
     Magnetism magnet;  // magnetism Yu Liu 2021-07-03
-    bool input_mag;//if start magnetization defined in INPUT instead of STRU,this is true
+    void cal_ux();
+#endif
+    bool judge_parallel(double a[3],ModuleBase::Vector3<double> b);
 	double *atom_mag;
 	int n_mag_at;
-#endif
 
     int ntype;// number of atom species in UnitCell
     int nat; // total number of atoms of all species in unitcell
@@ -76,7 +77,6 @@ public:
     void print_cell(std::ofstream &ofs, output &outp)const;
     void print_cell_xyz(const std::string &fn)const;
     void print_cell_cif(const std::string &fn)const;
-    const double& getNelec(void)const {return electrons_number;}
 
     void update_pos_tau(const double* pos);
     void update_pos_taud(const ModuleBase::Vector3<double>* posd_in);
@@ -87,8 +87,6 @@ public:
     bool judge_big_cell(void);
 
 protected:
-
-    double electrons_number;
 
     double *atom_mass;
     std::string *atom_label;

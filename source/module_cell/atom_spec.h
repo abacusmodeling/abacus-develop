@@ -36,8 +36,10 @@ public:
     ModuleBase::Vector3<double> *vel;// velocities of each atom in this type.
 
 	double* mag;
-	double angle1;//spin angle, added by zhengdy-soc
-	double angle2;
+	double* angle1;//spin angle, added by zhengdy-soc
+	double* angle2;
+    ModuleBase::Vector3<double> *m_loc_;
+
 
     void print_Atom(std::ofstream &ofs, output &outp);
 #ifdef __MPI
