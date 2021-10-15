@@ -5,20 +5,7 @@
 #include "global_fp.h"
 #include <vector>
 #include <unordered_map>
-
-namespace std
-{
-    template<> struct hash<ModuleBase::Vector3<double>>
-    {
-        std::size_t operator()(ModuleBase::Vector3<double> const& v) const noexcept
-        {
-            std::size_t v1 = std::hash<double>{}(v.x);
-            std::size_t v2 = std::hash<double>{}(v.y);
-			std::size_t v3 = std::hash<double>{}(v.z);
-            return v1 ^ v2 ^ v3; // or use boost::hash_combine
-        }
-    };
-}
+#include <map>
 
 LCAO_gen_fixedH::LCAO_gen_fixedH()
 {}
@@ -40,7 +27,7 @@ void LCAO_gen_fixedH::calculate_NL_no(void)
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
 	  	//for gamma only.
-		if(GlobalV::NSPIN!=4)
+		if(GlobalV::NSPIN!=4 && GlobalV::vnl_method == 1)
 		{
   			this->build_Nonlocal_beta_new();
 		}
@@ -55,7 +42,7 @@ void LCAO_gen_fixedH::calculate_NL_no(void)
 		// only if search_radius is 
 		// (Phi.rcutmax + Beta.rcutmax)*2.
 		// check in sltk_atom_arrange.
-    	if(GlobalV::NSPIN!=4)
+    	if(GlobalV::NSPIN!=4 && GlobalV::vnl_method == 1)
 		{
 			this->build_Nonlocal_mu_new(false);
 		}
@@ -441,6 +428,7 @@ void LCAO_gen_fixedH::test_Nonlocal()
 	return;
 }
 
+typedef std::tuple<int,int,int,int> key_tuple;
 
 #include "record_adj.h" //mohan add 2012-07-06
 void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
@@ -460,31 +448,20 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
 
 		//Step 1 : generate <psi|beta>
 		//type of atom; distance; atomic basis; projectors
-		std::vector<std::unordered_map<ModuleBase::Vector3<double>,std::unordered_map<int,std::vector<double>>,std::hash<ModuleBase::Vector3<double>>>> nlm_tot;
-		std::vector<std::unordered_map<ModuleBase::Vector3<double>,std::unordered_map<int,std::vector<std::vector<double>>>,std::hash<ModuleBase::Vector3<double>>>> nlm_tot1;
-		if(!calc_deri)
-		{
-			nlm_tot.resize(GlobalC::ucell.ntype);
-		}
-		else
-		{
-			nlm_tot1.resize(GlobalC::ucell.ntype);
-		}
+		std::map<key_tuple,std::unordered_map<int,std::vector<double>>> nlm_tot;
+		std::map<key_tuple,std::unordered_map<int,std::vector<std::vector<double>>>> nlm_tot1;
 
 		const double Rcut_Beta = GlobalC::ucell.infoNL.Beta[it].get_rcut_max();
 		const ModuleBase::Vector3<double> tau = GlobalC::ucell.atoms[it].tau[ia];
         GlobalC::GridD.Find_atom(GlobalC::ucell, tau ,it, ia);
 
-		for(int i=0;i<GlobalC::ucell.ntype;i++)
+		if(!calc_deri)
 		{
-			if(!calc_deri)
-			{
-				nlm_tot[i].clear();
-			}
-			else
-			{
-				nlm_tot1[i].clear();
-			}
+			nlm_tot.clear();
+		}
+		else
+		{
+			nlm_tot1.clear();
 		}
 
 		for (int ad=0; ad<GlobalC::GridD.getAdjacentNum()+1 ; ++ad)
@@ -499,13 +476,15 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
 			const int nw1_tot = atom1->nw*GlobalV::NPOL;
 
 			const ModuleBase::Vector3<double> dtau = tau1-tau;
-			const double dist1 = dtau.norm() * GlobalC::ucell.lat0;
-			if (dist1 > Rcut_Beta + Rcut_AO1)
+			const double dist1 = dtau.norm2() * pow(GlobalC::ucell.lat0,2);
+			
+			if (dist1 > pow(Rcut_Beta + Rcut_AO1,2))
 			{
 				continue;
 			}
 			std::unordered_map<int,std::vector<double>> nlm_cur;
 			std::unordered_map<int,std::vector<std::vector<double>>> nlm_cur1;
+			
 			if(!calc_deri)
 			{
 				nlm_cur.clear();
@@ -543,13 +522,20 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
 					nlm_cur1.insert({iw1_all,nlm});
 				}
 			}//end iw
+
+			const int iat1=GlobalC::ucell.itia2iat(T1, I1);
+			const int rx1=GlobalC::GridD.getBox(ad).x;
+			const int ry1=GlobalC::GridD.getBox(ad).y;
+			const int rz1=GlobalC::GridD.getBox(ad).z;
+			key_tuple key_1(iat1,rx1,ry1,rz1);
+
 			if(!calc_deri)
 			{
-				nlm_tot[T1][dtau]=nlm_cur;
+				nlm_tot[key_1]=nlm_cur;
 			}
 			else
 			{
-				nlm_tot1[T1][dtau]=nlm_cur1;
+				nlm_tot1[key_1]=nlm_cur1;
 			}
 		}//end ad
 
@@ -561,6 +547,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
 		int nnr = 0;
 		ModuleBase::Vector3<double> tau1, tau2, dtau;
 		ModuleBase::Vector3<double> dtau1, dtau2, tau0;
+		ModuleBase::Vector3<float> dtau1_f, dtau2_f;
 		double distance = 0.0;
 		double rcut = 0.0;
 		double rcut1, rcut2;
@@ -576,7 +563,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
 			{
 				//GlobalC::GridD.Find_atom( atom1->tau[I1] );
 				GlobalC::GridD.Find_atom(GlobalC::ucell, atom1->tau[I1] ,T1, I1);
-				//const int iat1 = GlobalC::ucell.itia2iat(T1, I1);
+				const int iat1 = GlobalC::ucell.itia2iat(T1, I1);
 				const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 				tau1 = atom1->tau[I1];
 
@@ -587,17 +574,22 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
 					const Atom* atom2 = &GlobalC::ucell.atoms[T2];
 					
 					const int I2 = GlobalC::GridD.getNatom(ad2);
-					//const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
+					const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
 					const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 					tau2 = GlobalC::GridD.getAdjacentTau(ad2);
 
 					bool is_adj = false;
+
+					const int rx2=GlobalC::GridD.getBox(ad2).x;
+					const int ry2=GlobalC::GridD.getBox(ad2).y;
+					const int rz2=GlobalC::GridD.getBox(ad2).z;
+
 						
 					dtau = tau2 - tau1;
-					distance = dtau.norm() * GlobalC::ucell.lat0;
+					distance = dtau.norm2() * pow(GlobalC::ucell.lat0,2);
 					// this rcut is in order to make nnr consistent 
 					// with other matrix.
-					rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
+					rcut = pow(GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut(),2);
 					if(distance < rcut) is_adj = true;
 					else if(distance >= rcut)
 					{
@@ -614,11 +606,11 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
 							dtau1 = tau0 - tau1;
 							dtau2 = tau0 - tau2;
 
-							const double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
-							const double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
+							const double distance1 = dtau1.norm2() * pow(GlobalC::ucell.lat0,2);
+							const double distance2 = dtau2.norm2() * pow(GlobalC::ucell.lat0,2);
 
-							rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max();
-							rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max();
+							rcut1 = pow(GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max(),2);
+							rcut2 = pow(GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max(),2);
 
 							if( distance1 < rcut1 && distance2 < rcut2 )
 							{
@@ -658,7 +650,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
 									if(T0!=it || I0!=ia) continue;
 
 									// mohan add 2010-12-19
-									if( GlobalC::ucell.infoNL.nproj[T0] == 0) continue; 
+									if( GlobalC::ucell.infoNL.nproj[T0] == 0) continue;
 
 									//const int I0 = GlobalC::GridD.getNatom(ad0);
 									//const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
@@ -666,22 +658,26 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
 
 									dtau1 = tau0 - tau1;
 									dtau2 = tau0 - tau2;
-									const double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
-									const double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
+									const double distance1 = dtau1.norm2() * pow(GlobalC::ucell.lat0,2);
+									const double distance2 = dtau2.norm2() * pow(GlobalC::ucell.lat0,2);
 
 									// seems a bug here!! mohan 2011-06-17
-									rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max();
-									rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max();
+									rcut1 = pow(GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max(),2);
+									rcut2 = pow(GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max(),2);
 
 									if(distance1 < rcut1 && distance2 < rcut2)
 									{
 										//const Atom* atom0 = &GlobalC::ucell.atoms[T0];
+										const int rx0=GlobalC::GridD.getBox(ad0).x;
+										const int ry0=GlobalC::GridD.getBox(ad0).y;
+										const int rz0=GlobalC::GridD.getBox(ad0).z;
+										key_tuple key1(iat1,-rx0,-ry0,-rz0);
+										key_tuple key2(iat2,rx2-rx0,ry2-ry0,rz2-rz0);
 
 										if(!calc_deri)
 										{
-
-											std::vector<double> nlm_1=nlm_tot[T1][-dtau1][iw1_all];
-											std::vector<double> nlm_2=nlm_tot[T2][-dtau2][iw2_all];
+											std::vector<double> nlm_1=nlm_tot[key1][iw1_all];
+											std::vector<double> nlm_2=nlm_tot[key2][iw2_all];
 											double nlm_tmp = 0.0;
 
 											const int nproj = GlobalC::ucell.infoNL.nproj[T0];
@@ -712,7 +708,10 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
 											}
 											else
 											{
-												GlobalC::LM.Hloc_fixedR[nnr] += nlm_tmp;
+												if( nlm_tmp!=0.0 )
+												{
+													GlobalC::LM.Hloc_fixedR[nnr] += nlm_tmp;
+												}
 											}
 										}// calc_deri
 										else // calculate the derivative
@@ -723,12 +722,12 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
 												double nlm[3]={0,0,0};
 
 												// sum all projectors for one atom.
-												std::vector<double> nlm_1 = nlm_tot1[T1][-dtau1][iw1_all][0];
+												std::vector<double> nlm_1 = nlm_tot1[key1][iw1_all][0];
 												std::vector<std::vector<double>> nlm_2;
 												nlm_2.resize(3);
 												for(int i=0;i<3;i++)
 												{
-													nlm_2[i] = nlm_tot1[T2][-dtau2][iw2_all][i+1];
+													nlm_2[i] = nlm_tot1[key2][iw2_all][i+1];
 												}
 
 												assert(nlm_1.size()==nlm_2[0].size());
@@ -758,12 +757,12 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
 												double nlm[3]={0,0,0};
 
 												// sum all projectors for one atom.
-												std::vector<double> nlm_1 = nlm_tot1[T2][-dtau2][iw2_all][0];
+												std::vector<double> nlm_1 = nlm_tot1[key2][iw2_all][0];
 												std::vector<std::vector<double>> nlm_2;
 												nlm_2.resize(3);
 												for(int i=0;i<3;i++)
 												{
-													nlm_2[i] = nlm_tot1[T1][-dtau1][iw1_all][i+1];
+													nlm_2[i] = nlm_tot1[key1][iw1_all][i+1];
 												}
 
 												assert(nlm_1.size()==nlm_2[0].size());

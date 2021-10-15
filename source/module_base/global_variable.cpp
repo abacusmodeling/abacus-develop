@@ -182,4 +182,6 @@ double soc_lambda = 1.0;
 bool FINAL_SCF = false; //LiuXh add 20180619
 
 bool out_descriptor = false; //zhengdy add 20210910
+
+int vnl_method = 1; //set defauld vnl method as old, added by zhengdy 2021-10-11
 }

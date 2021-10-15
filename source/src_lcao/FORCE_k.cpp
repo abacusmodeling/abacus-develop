@@ -1,7 +1,7 @@
 #include "FORCE_k.h"
 #include "../src_pw/global.h"
-#include "dftu.h"  //Quxin add for DFT+U on 20201029
 #include <unordered_map>
+#include <map>
 
 Force_LCAO_k::Force_LCAO_k ()
 {
@@ -9,20 +9,6 @@ Force_LCAO_k::Force_LCAO_k ()
 
 Force_LCAO_k::~Force_LCAO_k ()
 {
-}
-
-namespace std
-{
-    template<> struct hash<ModuleBase::Vector3<double>>
-    {
-        std::size_t operator()(ModuleBase::Vector3<double> const& v) const noexcept
-        {
-            std::size_t v1 = std::hash<double>{}(v.x);
-            std::size_t v2 = std::hash<double>{}(v.y);
-			std::size_t v3 = std::hash<double>{}(v.z);
-            return v1 ^ v2 ^ v3; // or use boost::hash_combine
-        }
-    };
 }
 
 #include "LCAO_nnr.h"
@@ -64,22 +50,13 @@ void Force_LCAO_k::ftable_k (
 	
 	this->cal_ftvnl_dphi_k(dm2d, isforce, isstress, ftvnl_dphi, stvnl_dphi);
 
-	//Quxin add for DFT+U on 20201029
-	if(INPUT.dft_plus_u) GlobalC::dftu.force_stress();
 
 	// ---------------------------------------
 	// doing on the real space grid.
 	// ---------------------------------------
 	this->cal_fvl_dphi_k(dm2d, isforce, isstress, fvl_dphi, svl_dphi);
 
-	if(GlobalV::NSPIN==4)
-	{
-		this->cal_fvnl_dbeta_k(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
-	}
-	else
-	{
-		this->cal_fvnl_dbeta_k_new(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
-	}
+	this->calFvnlDbeta(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta, GlobalV::vnl_method);
 
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
@@ -181,17 +158,10 @@ void Force_LCAO_k::allocate_k(void)
 	//test(GlobalC::LM.DHloc_fixedR_x,"GlobalC::LM.DHloc_fixedR_x T part");
    
    	// calculate dVnl=<phi|dVnl|dphi> in LCAO 
-	if(GlobalV::NSPIN==4)
-	{
-		GlobalC::UHM.genH.build_Nonlocal_mu (cal_deri);
-	}
-	else
-	{
-		GlobalC::UHM.genH.build_Nonlocal_mu_new (cal_deri);
-	}
+	this->NonlocalDphi(GlobalV::NSPIN, GlobalV::vnl_method, cal_deri);
 	//test(GlobalC::LM.DHloc_fixedR_x,"GlobalC::LM.DHloc_fixedR_x Vnl part");
 
-	ModuleBase::timer::tick("Force_LCAO_k","allocate");
+	ModuleBase::timer::tick("Force_LCAO_k","allocate_k");
 	return;
 }
 
@@ -938,6 +908,8 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 	return;
 }
 
+typedef std::tuple<int,int,int,int> key_tuple;
+
 // must consider three-center H matrix.
 void Force_LCAO_k::cal_fvnl_dbeta_k_new(
 	double** dm2d, 
@@ -959,17 +931,12 @@ void Force_LCAO_k::cal_fvnl_dbeta_k_new(
 		//Step 1 : generate <psi|beta>
 		//type of atom; distance; atomic basis; projectors
 
-		std::vector<std::unordered_map<ModuleBase::Vector3<double>,std::unordered_map<int,std::vector<std::vector<double>>>,std::hash<ModuleBase::Vector3<double>>>> nlm_tot;
-		nlm_tot.resize(GlobalC::ucell.ntype);
+		std::map<key_tuple,std::unordered_map<int,std::vector<std::vector<double>>>> nlm_tot;
+		nlm_tot.clear();
 
 		const double Rcut_Beta = GlobalC::ucell.infoNL.Beta[it].get_rcut_max();
 		const ModuleBase::Vector3<double> tau = GlobalC::ucell.atoms[it].tau[ia];
         GlobalC::GridD.Find_atom(GlobalC::ucell, tau ,it, ia);
-
-		for(int i=0;i<GlobalC::ucell.ntype;i++)
-		{
-			nlm_tot[i].clear();
-		}
 
 		for (int ad=0; ad<GlobalC::GridD.getAdjacentNum()+1 ; ++ad)
 		{
@@ -983,8 +950,8 @@ void Force_LCAO_k::cal_fvnl_dbeta_k_new(
 			const int nw1_tot = atom1->nw*GlobalV::NPOL;
 
 			const ModuleBase::Vector3<double> dtau = tau1-tau;
-			const double dist1 = dtau.norm() * GlobalC::ucell.lat0;
-			if (dist1 > Rcut_Beta + Rcut_AO1)
+			const double dist1 = dtau.norm2() * pow(GlobalC::ucell.lat0,2);
+			if (dist1 > pow(Rcut_Beta + Rcut_AO1,2))
 			{
 				continue;
 			}
@@ -1015,8 +982,12 @@ void Force_LCAO_k::cal_fvnl_dbeta_k_new(
 
 				nlm_cur.insert({iw1_all,nlm});
 			}//end iw
-
-			nlm_tot[T1][dtau]=nlm_cur;
+			const int iat1=GlobalC::ucell.itia2iat(T1, I1);
+			const int rx1=GlobalC::GridD.getBox(ad).x;
+			const int ry1=GlobalC::GridD.getBox(ad).y;
+			const int rz1=GlobalC::GridD.getBox(ad).z;
+			key_tuple key_1(iat1,rx1,ry1,rz1);
+			nlm_tot[key_1]=nlm_cur;
 		}//end ad
 
 		//=======================================================
@@ -1049,6 +1020,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k_new(
 				tau1 = atom1->tau[I1];
 
 				GlobalC::GridD.Find_atom(GlobalC::ucell, tau1 ,T1, I1);
+				const int iat1 = GlobalC::ucell.itia2iat(T1, I1);
 				const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 
 				for (int ad2=0; ad2<GlobalC::GridD.getAdjacentNum()+1 ; ++ad2)
@@ -1056,7 +1028,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k_new(
 					const int T2 = GlobalC::GridD.getType(ad2);
 					const Atom* atom2 = &GlobalC::ucell.atoms[T2];
 					const int I2 = GlobalC::GridD.getNatom(ad2);
-					//const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
+					const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
 					const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 					tau2 = GlobalC::GridD.getAdjacentTau(ad2);
 
@@ -1096,6 +1068,11 @@ void Force_LCAO_k::cal_fvnl_dbeta_k_new(
 
 					if(is_adj)
 					{
+
+						const int rx2=GlobalC::GridD.getBox(ad2).x;
+						const int ry2=GlobalC::GridD.getBox(ad2).y;
+						const int rz2=GlobalC::GridD.getBox(ad2).z;
+
 						// < psi1 | all projectors | psi2 >
 						// ----------------------------- enter the nnr increaing zone -------------------------
 						for (int j=0; j<atom1->nw; ++j)
@@ -1139,14 +1116,20 @@ void Force_LCAO_k::cal_fvnl_dbeta_k_new(
 
 									if(distance1 < rcut1 && distance2 < rcut2)
 									{
+										const int rx0=GlobalC::GridD.getBox(ad0).x;
+										const int ry0=GlobalC::GridD.getBox(ad0).y;
+										const int rz0=GlobalC::GridD.getBox(ad0).z;
+										key_tuple key1(iat1,-rx0,-ry0,-rz0);
+										key_tuple key2(iat2,rx2-rx0,ry2-ry0,rz2-rz0);
+
 										//const Atom* atom0 = &GlobalC::ucell.atoms[T0];
 										double nlm[3]={0,0,0};
-										std::vector<double> nlm_1 = nlm_tot[T2][-dtau2][iw2_all][0];
+										std::vector<double> nlm_1 = nlm_tot[key2][iw2_all][0];
 										std::vector<std::vector<double>> nlm_2;
 										nlm_2.resize(3);
 										for(int i=0;i<3;i++)
 										{
-											nlm_2[i] = nlm_tot[T1][-dtau1][iw1_all][i+1];
+											nlm_2[i] = nlm_tot[key1][iw1_all][i+1];
 										}
 
 										assert(nlm_1.size()==nlm_2[0].size());
@@ -1170,12 +1153,12 @@ void Force_LCAO_k::cal_fvnl_dbeta_k_new(
 										double nlm1[3]={0,0,0};
 										if(isstress)
 										{
-											std::vector<double> nlm_1 = nlm_tot[T1][-dtau1][iw1_all][0];
+											std::vector<double> nlm_1 = nlm_tot[key1][iw1_all][0];
 											std::vector<std::vector<double>> nlm_2;
 											nlm_2.resize(3);
 											for(int i=0;i<3;i++)
 											{
-												nlm_2[i] = nlm_tot[T2][-dtau2][iw2_all][i+1];
+												nlm_2[i] = nlm_tot[key2][iw2_all][i+1];
 											}
 
 											assert(nlm_1.size()==nlm_2[0].size());
@@ -1313,4 +1296,25 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 	return;
 }
 
-
+void Force_LCAO_k::calFvnlDbeta(
+	double** dm2d, 
+	const bool &isforce, 
+	const bool &isstress, 
+	ModuleBase::matrix& fvnl_dbeta, 
+	ModuleBase::matrix& svnl_dbeta,
+	const int &vnl_method)
+{
+	ModuleBase::TITLE("Force_LCAO_k", "calFvnlDbeta");
+	if(GlobalV::NSPIN==4 || vnl_method == 0)
+	{
+		this->cal_fvnl_dbeta_k(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
+	}
+	else if(vnl_method == 1)
+	{
+		this->cal_fvnl_dbeta_k_new(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
+	}
+	else 
+    {
+        ModuleBase::WARNING_QUIT("Force_LCAO_k","This method has not been implemented");
+    }
+}
