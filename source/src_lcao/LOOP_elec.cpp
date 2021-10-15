@@ -52,7 +52,7 @@ void LOOP_elec::set_matrix_grid(void)
 		GlobalV::ofs_running,
 		GlobalV::OUT_LEVEL,
 		GlobalC::ORB.get_rcutmax_Phi(), 
-		GlobalC::ORB.get_rcutmax_Beta(), 
+		GlobalC::ucell.infoNL.get_rcutmax_Beta(), 
 		GlobalV::GAMMA_ONLY_LOCAL);
 
 	atom_arrange::search(
@@ -99,7 +99,7 @@ void LOOP_elec::before_solver(const int &istep)
 	// after ParaO and GridT, 
 	// this information is used to calculate
 	// the force.
-	GlobalC::LOWF.set_trace_aug(GlobalC::GridT);
+	GlobalC::LOWF.set_trace_aug(GlobalC::GridT); //LiuXh modify 2021-09-06, clear memory, WFC_GAMMA_aug not used now
 
 	// init density kernel and wave functions.
 	GlobalC::LOC.allocate_dm_wfc(GlobalC::GridT);

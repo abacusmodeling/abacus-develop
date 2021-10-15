@@ -10,7 +10,7 @@
 Evolve_LCAO_Matrix::Evolve_LCAO_Matrix(){}
 Evolve_LCAO_Matrix::~Evolve_LCAO_Matrix(){}
 
-void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, std::complex<double>** cc, std::complex<double>** cc_init)const
+void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, std::complex<double>** cc, ModuleBase::ComplexMatrix &wfc_2d)const
 {
 	ModuleBase::TITLE("Evolve_LCAO_Matrix","evolve_complex_matrix");
 	time_t time_start = time(NULL);
@@ -26,7 +26,7 @@ void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, std::complex<doubl
 #endif
 */
 		//this->using_LAPACK_complex(ik, cc, cc_init);
-		this->using_ScaLAPACK_complex_3(ik, cc, cc_init);
+		this->using_ScaLAPACK_complex_3(ik, cc, wfc_2d);
 	}
 	else
 	{
@@ -461,7 +461,7 @@ int localIndex(int globalIndex, int nblk, int nprocs, int& myproc)
 
 */
 
-int Evolve_LCAO_Matrix::using_ScaLAPACK_complex_3(const int &ik, complex<double>** c, complex<double>** c_init)const
+int Evolve_LCAO_Matrix::using_ScaLAPACK_complex_3(const int &ik, complex<double>** c, ModuleBase::ComplexMatrix &wfc_2d)const
 {
 	ModuleBase::TITLE("Evolve_LCAO_Matrix","using_ScaLAPACK_complex");
 
@@ -531,10 +531,10 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex_3(const int &ik, complex<double>
 
 	//cout << "*Htmp2: " << *Htmp2 << endl;
 
-	complex<double> alpha = (1.0, 0.0);
+	complex<double> alpha = {1.0, 0.0};
 	char transa = 'N';
 	int desca = 0; 
-	complex<double> beta = (0.0, -0.5)*0.02*41.34;  // this need modify
+	complex<double> beta = {0.0, -0.5*0.02*41.34};  // this need modify
 	int descc = 0;
 
 	//cout << "begin03:" << endl;
@@ -548,7 +548,7 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex_3(const int &ik, complex<double>
 		Htmp1, &one_int, &one_int, GlobalC::ParaO.desc);
 
 	//beta = (0.0, 0.5)*INPUT.md_dt;
-	beta = (0.0, 0.5)*0.02*41.34; // this need modify
+	beta = {0.0, 0.5*0.02*41.34}; // this need modify
 
 	//cout << "*Htmp1: " << *Htmp1 << endl;
 	//cout << "Htmp2: " << *Htmp2 << endl;
@@ -573,22 +573,31 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex_3(const int &ik, complex<double>
 		Htmp2, &one_int, &one_int, GlobalC::ParaO.desc,
 		ipiv,  &info);
 
-        int LWORK=3*GlobalV::NLOCAL-1; //tmp
-        complex<double> * WORK = new complex<double>[LWORK];
-	int iWORK=3*GlobalV::NLOCAL-1;
-	int liWORK=3*GlobalV::NLOCAL-1;
-        ModuleBase::GlobalFunc::ZEROS(WORK, LWORK);
+	int LWORK=-1, liWORK=-1;
+	std::vector<std::complex<double>> WORK(1,0);
+	std::vector<int> iWORK(1,0);
+
 
 	//cout << "begin05:" << endl;
 
 	pzgetri_(
 		&GlobalV::NLOCAL, 
 		Htmp2, &one_int, &one_int, GlobalC::ParaO.desc,
-		ipiv,  WORK,  &LWORK, &iWORK, &liWORK, &info);
+		ipiv,  WORK.data(),  &LWORK, iWORK.data(), &liWORK, &info);
+
+	LWORK = WORK[0].real();
+	WORK.resize(LWORK, 0);
+	liWORK = iWORK[0];
+	iWORK.resize(liWORK, 0);
+
+	pzgetri_(
+		&GlobalV::NLOCAL, 
+		Htmp2, &one_int, &one_int, GlobalC::ParaO.desc,
+		ipiv,  WORK.data(),  &LWORK, iWORK.data(), &liWORK, &info);
 
 	//alpha = (1.0, 0.0);
 	//beta = (0.0, 0.0);
-	char transb = 'T';
+	char transb = 'T'; //This place requires subsequent testing of different transb.
 	int descb = 0; 
 
 	double alpha_1 = 1.0;
@@ -597,31 +606,30 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex_3(const int &ik, complex<double>
 	//cout << "*Htmp2: " << *Htmp2 << endl;
 	//cout << "begin06:" << endl;
 	
-/*
+
 	pzgemm_(
 		&transa, &transb,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 		&alpha_1,
-		Htmp1, &one_int, &one_int, GlobalC::ParaO.desc,
-		Htmp2, &one_int, &one_int, GlobalC::ParaO.desc, 
+		Htmp2, &one_int, &one_int, GlobalC::ParaO.desc,
+		Htmp1, &one_int, &one_int, GlobalC::ParaO.desc, 
 		&beta_1,
 		Htmp3, &one_int, &one_int, GlobalC::ParaO.desc);
-*/
+
 	
 
 	//cout << "U_operator Success!!!" <<endl;
 
-/*
 	pzgemv_(
 		&transa,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
 		&alpha_1,
-		Htmp2, &one_int, &one_int, GlobalC::ParaO.desc,
-		&wfc_2d, &one_int, &one_int, GlobalC::ParaO.desc, &nloc, 
+		Htmp3, &one_int, &one_int, GlobalC::ParaO.desc,
+		wfc_2d.c, &one_int, &one_int, GlobalC::ParaO.desc, &one_int, 
 		&beta_1,
-		&wfc_2d, &one_int, &one_int, GlobalC::ParaO.desc, &one_int
-                );
-*/
+		wfc_2d.c, &one_int, &one_int, GlobalC::ParaO.desc, &one_int
+        );
+
 
 
         // the eigenvalues.

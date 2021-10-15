@@ -85,6 +85,20 @@ class Force_LCAO_gamma
 		ModuleBase::matrix& fvnl_dbeta, 
 		ModuleBase::matrix& svnl_dbeta);
 
+	void cal_fvnl_dbeta_new(
+		ModuleBase::matrix& dm2d, 
+		const bool isforce, 
+		const bool isstress, 
+		ModuleBase::matrix& fvnl_dbeta, 
+		ModuleBase::matrix& svnl_dbeta);
+
+	void cal_fvnl_dbeta_new(
+		const std::vector<ModuleBase::matrix> &dm2d, 
+		const bool isforce, 
+		const bool isstress, 
+		ModuleBase::matrix& fvnl_dbeta, 
+		ModuleBase::matrix& svnl_dbeta);
+
 	//-------------------------------------------
 	// forces related to local pseudopotentials
 	//-------------------------------------------
@@ -102,5 +116,16 @@ class Force_LCAO_gamma
 		ModuleBase::matrix& fvl_dphi, 
 		ModuleBase::matrix& svl_dphi);
 
+	void calFvnlDbeta(
+		const std::vector<ModuleBase::matrix> &dm2d, 
+		const bool &isforce, 
+		const bool &isstress, 
+		ModuleBase::matrix& fvnl_dbeta, 
+		ModuleBase::matrix& svnl_dbeta,
+		const int &vnl_method);
+
+	public:
+	// calculate dVnl=<phi|dVnl|dphi> in LCAO
+	void NonlocalDphi(const int& nspin, const int& vnl_method, const bool& cal_deri);
 };
 #endif

@@ -56,9 +56,11 @@ PW_Basis::~PW_Basis()
 	delete [] cutgg_num_table;
 
 #ifdef __MPI
+#ifndef __CUDA
     delete [] gcar;
     delete [] gdirect;
     delete [] gg;
+#endif
 #endif
 
     delete [] ggs;
@@ -168,6 +170,9 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
 	}
 
 #ifdef __MPI
+#ifdef __CUDA
+    bool cutgg_flag = false;
+#else
     this->divide_fft_grid();
     bool cutgg_flag = true;
 
@@ -181,6 +186,7 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
 	//{
 	//	GlobalV::ofs_running << " Turn on the cutgg function." << std::endl;
 	//}
+#endif
 #else
 	// mohan update 2011-09-21
 	this->nbzp=nbz; //nbz shoud equal nz for single proc.
@@ -336,6 +342,11 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
         PW_complement::setup_GVectors(Ucell->G, ngmc_g, gg_global, gdirect_global, gcar_global);
 
 #ifdef __MPI
+#ifdef __CUDA
+        this->get_GVectors();
+        FFT_wfc.setupFFT3D(this->nx, this->ny,this->nz);
+        FFT_chg.setupFFT3D(this->ncx, this->ncy,this->ncz);
+#else
         //FFT_chg.fft_map(this->ig2fftc, this->ngmc, ngmc_g);
         //FFT_wfc.fft_map(this->ig2fftw, this->ngmw, ngmc_g);
         FFT_chg.fft_map(this->ig2fftc, this->ngmc, ngmc_g, 0); //LiuXh add 20180619
@@ -345,6 +356,7 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
 
         FFT_wfc.setup_MPI_FFT3D(this->nx, this->ny, this->nz,this->nrxx,1);
         FFT_chg.setup_MPI_FFT3D(this->ncx, this->ncy, this->ncz,this->nrxx,1);
+#endif
 #else
         this->get_GVectors();
         FFT_wfc.setupFFT3D(this->nx, this->ny,this->nz);
@@ -355,8 +367,6 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
     }
 
     this->get_nggm(this->ngmc);
-
-    this->setup_structure_factor();
 
 //	this->printPW("src_check/check_pw.txt");
     ModuleBase::timer::tick("PW_Basis","gen_pw");
@@ -606,7 +616,7 @@ void PW_Basis::get_MPI_GVectors(void)
     }
     //=====================================
 }//end setup_mpi_GVectors
-#else
+// #else
 void PW_Basis::get_GVectors(void)
 {
     if (GlobalV::test_pw) ModuleBase::TITLE("PW_Basis","get_GVectors");
@@ -746,23 +756,32 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
 //	std::string outstr;
 //	outstr = GlobalV::global_out_dir + "strucFac.dat"; 
 //	std::ofstream ofs( outstr.c_str() ) ;
-
-    for (int it=0; it<Ucell->ntype; it++)
+    bool usebspline;
+    if(nbspline >= 0)   usebspline = true;
+    else    usebspline = false;
+    
+    if(usebspline)
     {
-		const int na = Ucell->atoms[it].na;
-		const ModuleBase::Vector3<double> * const tau = Ucell->atoms[it].tau;
-
-		#pragma omp parallel for schedule(static)
-        for (int ig=0; ig<this->ngmc; ig++)
+        this->bspline_sf(nbspline);
+    }
+    else
+    {
+        for (int it=0; it<Ucell->ntype; it++)
         {
-			const ModuleBase::Vector3<double> gcar_ig = gcar[ig];
-            std::complex<double> sum_phase = ModuleBase::ZERO;
-            for (int ia=0; ia<na; ia++)
+	    	const int na = Ucell->atoms[it].na;
+	    	const ModuleBase::Vector3<double> * const tau = Ucell->atoms[it].tau;
+		    #pragma omp parallel for schedule(static)
+            for (int ig=0; ig<this->ngmc; ig++)
             {
-                // e^{-i G*tau}
-                sum_phase += exp( ci_tpi * (gcar_ig * tau[ia]) );
+		    	const ModuleBase::Vector3<double> gcar_ig = gcar[ig];
+                std::complex<double> sum_phase = ModuleBase::ZERO;
+                for (int ia=0; ia<na; ia++)
+                {
+                    // e^{-i G*tau}
+                    sum_phase += exp( ci_tpi * (gcar_ig * tau[ia]) );
+                }
+                this->strucFac(it,ig) = sum_phase;
             }
-            this->strucFac(it,ig) = sum_phase;
         }
     }
 
@@ -806,7 +825,7 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
             inat++;
         }
     }
-    ModuleBase::timer::tick("PW_Basis","setup_struc_factor");
+    ModuleBase::timer::tick("PW_Basis","setup_struc_factor"); 
     return;
 }
 

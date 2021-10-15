@@ -98,6 +98,8 @@ void Variable_Cell::final_calculation_after_vc(void)
     GlobalC::Pgrid.init_final_scf(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz,
 		GlobalC::pw.nczp, GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
 
+    // Calculate Structure factor
+    GlobalC::pw.setup_structure_factor();
     //=====================
     // init potential
     //=====================
