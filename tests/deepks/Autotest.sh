@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ABACUS executable path
-abacus=/home/mohan/Liuyu/DeePKS/abacus-develop/bin/ABACUS.mpi
+abacus=/home/fortneu49/abacus-develop/bin/ABACUS.mpi
 # number of mpi processes
 np=1
 # threshold with unit: eV
@@ -188,10 +188,10 @@ for dir in $testdir; do
 		test -d OUT.autotest || exit 0
 		if test -z $g
 		then
-			../tools/catch_properties.sh result.out
+			../../integrate/tools/catch_properties.sh result.out
 			check_out result.out
 		else
-			../tools/catch_properties.sh result.ref
+			../../integrate/tools/catch_properties.sh result.ref
 		fi
 	}
 	echo ""
