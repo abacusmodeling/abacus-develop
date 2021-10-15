@@ -23,7 +23,11 @@ void Run_pw::plane_wave_line(void)
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
     // cell relaxation. b) put GlobalV::NLOCAL and GlobalV::NBANDS as input parameters
+#ifdef __LCAO
+    GlobalC::ucell.setup_cell( GlobalC::ORB, GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
+#else
     GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
+#endif
     //GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir , GlobalV::global_atom_card , GlobalV::ofs_running, GlobalV::NLOCAL, GlobalV::NBANDS);
 
     // setup GlobalV::NBANDS 
@@ -76,9 +80,12 @@ void Run_pw::plane_wave_line(void)
     // distribution of plane waves
     GlobalC::Pgrid.init(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, GlobalC::pw.nczp,
         GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
-    
-    // cout<<"after pgrid init nrxx = "<<GlobalC::pw.nrxx<<endl;
+        
 
+    // Calculate Structure factor
+    GlobalC::pw.setup_structure_factor();
+    // cout<<"after pgrid init nrxx = "<<GlobalC::pw.nrxx<<endl;
+    
 //----------------------------------------------------------
 // 1 read in initial data:
 //   a lattice structure:atom_species,atom_positions,lattice std::vector

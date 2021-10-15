@@ -29,7 +29,8 @@ public:
     explicit LCAO_Descriptor();
     ~LCAO_Descriptor();
 
-    ///only for descriptor part, not including scf
+    ///Allocate memory and calculate the index of descriptor in all atoms. 
+    ///(only for descriptor part, not including scf)
     void init(const int lm/**< [in] max angular momentum quantum number: 'L'*/,
         const int nm/**< [in] max orbital number with the same 'L', for each 'L'*/,
         const int tot_inl/**< [in] total number of radial orbitals (sum of atoms 'I', angular number 'L' and orbital number 'N') */);
@@ -119,7 +120,7 @@ public:
     ///calculate \f$tr(\rho H_\delta), \rho = \sum_i{c_{i, \mu}c_{i,\nu}} \f$ (for gamma_only)
     void cal_e_delta_band(const std::vector<ModuleBase::matrix>& dm/**<[in] density matrix*/);
 //-------------------
-// public variables 
+// public variables
 //-------------------
 public:
     

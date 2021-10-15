@@ -205,7 +205,11 @@ void Electrons::self_consistent(const int &istep)
 		// output the new eigenvalues and wave functions.
         this->c_bands(istep);
 
-        if (check_stop_now()) return;
+        if (check_stop_now())
+        {
+            ModuleBase::timer::tick("Electrons","self_consistent");
+            return;
+        } 
 
         GlobalC::en.eband  = 0.0;
         GlobalC::en.demet  = 0.0;
@@ -546,7 +550,7 @@ void Electrons::c_bands(const int &istep)
         avg_iter /= static_cast<double>(GlobalC::kv.nkstot);
     }
     delete [] h_diag;
-    ModuleBase::timer::tick("electrons","c_bands");
+    ModuleBase::timer::tick("Electrons","c_bands");
     return;
 } // END SUBROUTINE c_bands_k
 

@@ -24,9 +24,9 @@ public:
 		MNHC=4;
 
 		md_potential = "FP";
-		rcut_lj = 8.5*ModuleBase::ANGSTROM_AU;
-		epsilon_lj = 0.01032/ModuleBase::Ry_to_eV;
-		sigma_lj = 3.405*ModuleBase::ANGSTROM_AU;
+		rcut_lj = 8.5;        // \AA
+		epsilon_lj = 0.01032; // eV
+		sigma_lj = 3.405;     // \AA
 	};
     ~MD_parameters(){};
 
@@ -48,9 +48,9 @@ public:
 
 	/*Classic MD*/              // liuyu 2021-07-30
 	std::string md_potential;   // choose potential: LJ, DP, FP
-	double rcut_lj;             // cutoff radius of LJ potential (Bohr)
-	double epsilon_lj;          // the value of epsilon for LJ potential
-	double sigma_lj;            // the value of sigma for LJ potential
+	double rcut_lj;             // cutoff radius of LJ potential (\AA)
+	double epsilon_lj;          // the value of epsilon for LJ potential (eV)
+	double sigma_lj;            // the value of sigma for LJ potential (\AA)
 };
 
 

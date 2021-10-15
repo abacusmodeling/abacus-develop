@@ -119,22 +119,19 @@ void Local_Orbital_Charge::sum_bands(void)
         }
         else if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")
         {
-            if(INPUT.new_dm>0)
-            {
-                //density matrix has already been calculated.
-                ModuleBase::timer::tick("LCAO_Charge","cal_dm_2d");
+            //LiuXh modify 2021-09-06, clear memory, cal_dk_gamma() not used for genelpa solver.
+            //density matrix has already been calculated.
+            ModuleBase::timer::tick("LCAO_Charge","cal_dm_2d");
 
-                wfc_dm_2d.cal_dm(GlobalC::wf.wg);        // Peize Lin test 2019-01-16
+            wfc_dm_2d.cal_dm(GlobalC::wf.wg);        // Peize Lin test 2019-01-16
 
-                ModuleBase::timer::tick("LCAO_Charge","cal_dm_2d");
+            ModuleBase::timer::tick("LCAO_Charge","cal_dm_2d");
 
-                this->cal_dk_gamma_from_2D(); // transform dm_gamma[is].c to this->DM[is]
-            }
-            else
-            {
-                //xiaohui modify 2014-06-18
-                this->cal_dk_gamma();//calculate the density matrix.
-            }
+            this->cal_dk_gamma_from_2D(); // transform dm_gamma[is].c to this->DM[is]
+        }
+        else if(GlobalV::KS_SOLVER=="hpseps") //LiuXh add 2021-09-06, used for hpseps solver
+        {
+            this->cal_dk_gamma();//calculate the density matrix.
         }
     }
     else
