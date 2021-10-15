@@ -4,6 +4,8 @@
 #include "winput.h"
 #include "../module_base/math_ylmreal.h"
 #include <cstring>
+#include <functional>
+#include <algorithm>
 
 Numerical_Basis::Numerical_Basis() {}
 Numerical_Basis::~Numerical_Basis() {}
@@ -275,31 +277,39 @@ ModuleBase::ComplexArray Numerical_Basis::cal_overlap_Sq(
                                     for (int m1=0; m1<2*l1+1; m1++) // 1.6
                                     {
                                         const int lm1 = l1*l1+m1;
-                                        std::vector<std::complex<double>> about_ig(np, std::complex<double>(0.0,0.0));
+                                        const int iwt1 = this->mu_index[T1](I1,l1,ic1,m1);
+										
+                                        std::vector<std::complex<double>> about_ig1(np, std::complex<double>(0.0,0.0));
                                         for (int ig=0; ig<np; ig++)
-                                        {
-//                                          about_ig[ig] = conj( lphase1 * sk1[ig] * ylm(lm1, ig) );
-                                            about_ig[ig] = conj( lphase1 * sk1[ig] * ylm(lm1, ig) ) * pow(gk[ig].norm2(),derivative_order);		// Peize Lin add for dpsi 2020.04.23
-                                        }
+                                            about_ig1[ig] = conj( lphase1 * sk1[ig] * ylm(lm1, ig) ) * pow(gk[ig].norm2(),derivative_order);		// Peize Lin add for dpsi 2020.04.23
+										
                                         for (int m2=0; m2<2*l2+1; m2++) // 2.6
                                         {
                                             const int lm2 = l2*l2+m2;
-                                            const int iwt1 = this->mu_index[T1](I1,l1,ic1,m1);
                                             const int iwt2 = this->mu_index[T2](I2,l2,ic2,m2);
+                                            
+                                            std::vector<std::complex<double>> about_ig2(np, std::complex<double>(0.0,0.0));
+                                            for (int ig=0; ig<np; ++ig)
+                                                about_ig2[ig] = lphase2 * sk2[ig] * ylm(lm2, ig) * about_ig1[ig];
+                                            
+                                            /* same as:
                                             for (int ig=0; ig<np; ig++)
-                                            {
-                                                const std::complex<double> about_ig3= lphase2 * sk2[ig] * ylm(lm2, ig)
-                                                                                 * about_ig[ig];
-
-                                                for (int ie1=0; ie1 < enumber; ie1++) // 1.4
-                                                {
-                                                    for (int ie2=0; ie2 < enumber; ie2++) // 2.4
-                                                    {
+                                                for (int ie1=0; ie1 < enumber; ie1++)
+                                                    for (int ie2=0; ie2 < enumber; ie2++)
                                                         overlap_Sq( iwt1, iwt2, ie1, ie2) += 
-                                                            about_ig3 * flq(l1,ie1,ig) * flq(l2,ie2,ig);
-                                                    }
-                                                }
-                                            }
+                                                            about_ig2[ig] * flq(l1,ie1,ig) * flq(l2,ie2,ig);
+                                            */
+                                            
+                                            ModuleBase::ComplexMatrix about_ig3_1(enumber,np);
+                                            std::copy( &flq(l1,0,0), &flq(l1,0,0)+enumber*np, about_ig3_1.c );
+                                            
+                                            ModuleBase::ComplexMatrix about_ig3_2(enumber,np);
+                                            for(int ie2=0; ie2<enumber; ++ie2)
+                                                std::transform( &flq(l2,ie2,0), &flq(l2,ie2,0)+np, about_ig2.data(), about_ig3_2.c+ie2*np, std::multiplies<std::complex<double>>() );
+
+                                            LapackConnector::gemm('N', 'T', enumber, enumber, np,
+                                                1.0, about_ig3_1.c, np, about_ig3_2.c, np, 
+                                                1.0, &overlap_Sq(iwt1,iwt2,0,0), enumber);
                                         }
                                     }
                                 }
