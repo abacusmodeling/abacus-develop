@@ -966,7 +966,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 	//------------------------------------
 	//(2) the local potential.
 	//-----------------------------------
-	// timer::tick("Hamilt_PW","vloc");
+    ModuleBase::timer::tick("Hamilt_PW","vloc");
 	if(GlobalV::VL_IN_H)
 	{
 		tmhpsi = hpsi;
@@ -1022,7 +1022,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 			tmpsi_in += dmax;
 		}
 	}
-	// timer::tick("Hamilt_PW","vloc");
+    ModuleBase::timer::tick("Hamilt_PW","vloc");
 
 	//------------------------------------
 	// (3) the nonlocal pseudopotential.
@@ -1091,7 +1091,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 			//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 		}
 	}
-	// timer::tick("Hamilt_PW","vnl");
+    ModuleBase::timer::tick("Hamilt_PW","vnl");
 	//------------------------------------
 	// (4) the metaGGA part
 	//------------------------------------
