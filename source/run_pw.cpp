@@ -117,7 +117,7 @@ void Run_pw::plane_wave_line(void)
 
 
     // caoyu add 2020-11-24, mohan updat 2021-01-03
-    if(GlobalV::BASIS_TYPE=="pw" && INPUT.out_descriptor==1)
+    if(GlobalV::BASIS_TYPE=="pw" && GlobalV::out_descriptor==1)
     {
         Numerical_Descriptor nc;
         nc.output_descriptor(GlobalC::wf.evc, INPUT.lmax_descriptor);

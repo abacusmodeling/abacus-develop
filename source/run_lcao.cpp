@@ -89,7 +89,7 @@ void Run_lcao::lcao_line(void)
 		INPUT.lcao_dk,
 		INPUT.lcao_dr,
 		INPUT.lcao_rmax,
-		INPUT.out_descriptor,
+		GlobalV::out_descriptor,
 		INPUT.out_r_matrix,
 		GlobalV::FORCE,
 		GlobalV::MY_RANK);
@@ -106,7 +106,7 @@ void Run_lcao::lcao_line(void)
 		GlobalC::UOT,
 		GlobalC::ORB,
 		GlobalC::ucell.lat0,
-		INPUT.out_descriptor,
+		GlobalV::out_descriptor,
 		Exx_Abfs::Lmax,
 		GlobalC::ucell.infoNL.nprojmax,
 		GlobalC::ucell.infoNL.nproj,

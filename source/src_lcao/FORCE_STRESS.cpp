@@ -264,7 +264,7 @@ void Force_Stress_LCAO::getForceStress(
 				}
 #ifdef __DEEPKS
 				// mohan add 2021-08-04
-				if (INPUT.deepks_scf)
+				if (GlobalV::deepks_scf)
 				{
 					fcs(iat, i) += GlobalC::ld.F_delta(iat, i);
 				}
@@ -294,10 +294,10 @@ void Force_Stress_LCAO::getForceStress(
 
 #ifdef __DEEPKS
 		//DeePKS force, caoyu add 2021-06-03
-		if (INPUT.out_descriptor)
+		if (GlobalV::out_descriptor)
 		{
             GlobalC::ld.save_npy_f(fcs, "f_tot.npy"); //Ty/Bohr, F_tot
-            if (INPUT.deepks_scf)
+            if (GlobalV::deepks_scf)
             {
                 GlobalC::ld.save_npy_f(fcs - GlobalC::ld.F_delta, "f_base.npy"); //Ry/Bohr, F_base
 				GlobalC::ld.cal_gvx(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
@@ -366,7 +366,7 @@ void Force_Stress_LCAO::getForceStress(
 			}
 #ifdef __DEEPKS
 			//caoyu add 2021-06-03
-			if (INPUT.deepks_scf)
+			if (GlobalV::deepks_scf)
 			{
 				this->print_force("DeePKS 	FORCE", GlobalC::ld.F_delta, 1, ry);
 			}

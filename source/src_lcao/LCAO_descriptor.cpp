@@ -58,7 +58,7 @@ LCAO_Descriptor::~LCAO_Descriptor()
     }
     delete[] pdm;
     //=======2. "deepks_scf" part==========
-    if (INPUT.deepks_scf)
+    if (GlobalV::deepks_scf)
     {
         //delete gedm**
         for (int inl = 0;inl < this->inlmax;inl++)

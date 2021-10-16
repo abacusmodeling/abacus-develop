@@ -552,10 +552,10 @@ void ELEC_scf::scf(const int &istep)
 					GlobalV::ofs_running << " " << GlobalV::global_out_dir << " final etot is " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
 				}
 #ifdef __DEEPKS
-				if (INPUT.out_descriptor)	//caoyu add 2021-06-04
+				if (GlobalV::out_descriptor)	//caoyu add 2021-06-04
 				{
                     GlobalC::ld.save_npy_e(GlobalC::en.etot, "e_tot.npy");
-                    if (INPUT.deepks_scf) {
+                    if (GlobalV::deepks_scf) {
                         GlobalC::ld.save_npy_e(GlobalC::en.etot - GlobalC::ld.E_delta + GlobalC::ld.e_delta_band, "e_base.npy");//ebase :no deepks E_delta including
                     }
                     else
