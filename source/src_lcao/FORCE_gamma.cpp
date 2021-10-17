@@ -72,12 +72,12 @@ void Force_LCAO_gamma::ftable_gamma (
     
     //caoyu add for DeePKS
 #ifdef __DEEPKS
-    if (INPUT.deepks_scf)
+    if (GlobalV::deepks_scf)
     {
         //=======method 1: dgemm==============
-        //ld.build_S_descriptor(1);   //for F_delta calculation
-        //ld.cal_f_delta(LOC.wfc_dm_2d.dm_gamma[0]);
-        //ld.print_F_delta("F_delta_old.dat");
+        //GlobalC::ld.build_S_descriptor(1);   //for F_delta calculation
+        //GlobalC::ld.cal_f_delta(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
+        //GlobalC::ld.print_F_delta("F_delta_old.dat");
 
         
         //=======method 2: snap_psialpha========
