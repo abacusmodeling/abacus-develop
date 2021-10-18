@@ -12,7 +12,7 @@ RUN cd /tmp \
 
 RUN cd /tmp \
     && git clone https://github.com/xianyi/OpenBLAS.git --single-branch --depth=1 \
-    && cd OpenBLAS && make NO_AVX512=1 FC=gfortran -j8 && make PREFIX=/usr/local install \
+    && cd OpenBLAS && make USE_OPENMP=1 NO_AVX512=1 FC=gfortran -j8 && make PREFIX=/usr/local install \
     && cd /tmp && rm -rf OpenBLAS
 
 RUN cd /tmp \
@@ -21,16 +21,17 @@ RUN cd /tmp \
     && cd /tmp && rm -rf scalapack
 
 RUN cd /tmp \
-    && git clone https://github.com/darelbeida/elpa.git -b ELPA_2016.05.004-openblas --single-branch --depth=1 \
-    && cd elpa && mkdir build && cd build \
-    && ../configure CFLAGS="-O3 -march=native -mavx2 -mfma -funsafe-loop-optimizations -funsafe-math-optimizations -ftree-vect-loop-version -ftree-vectorize" \
-    FCFLAGS="-O2 -mavx" \
+    && wget https://elpa.mpcdf.mpg.de/software/tarball-archive/Releases/2021.05.002/elpa-2021.05.002.tar.gz --no-check-certificate --quiet \
+    && tar xzf elpa-2021.05.002.tar.gz && rm elpa-2021.05.002.tar.gz \
+    && cd elpa-2021.05.002 && mkdir build && cd build \
+    && ../configure CFLAGS="-O3 -march=native -funsafe-loop-optimizations -funsafe-math-optimizations -ftree-vect-loop-version -ftree-vectorize" \
+    FCFLAGS="-O2 -mavx" --disable-avx512 \
     && make -j8 && make PREFIX=/usr/local install \
-    && ln -s /usr/local/include/elpa-2016.05.004/elpa /usr/local/include/ \
-    && cd /tmp && rm -rf elpa
+    && ln -s /usr/local/include/elpa-2021.05.002/elpa /usr/local/include/ \
+    && cd /tmp && rm -rf elpa-2021.05.002
 
 RUN cd /tmp \
-    && wget http://www.fftw.org/fftw-3.3.9.tar.gz \
+    && wget http://www.fftw.org/fftw-3.3.9.tar.gz --no-check-certificate --quiet \
     && tar zxvf fftw-3.3.9.tar.gz \
     && cd fftw-3.3.9 \
     && ./configure --enable-mpi-fortran --enable-orterun-prefix-by-default FC=gfortran \

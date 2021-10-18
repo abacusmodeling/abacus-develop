@@ -18,20 +18,7 @@ Local_Orbital_wfc::~Local_Orbital_wfc()
 	// used for force
 	if(allocate_aug_flag)
 	{
-		if(GlobalV::GAMMA_ONLY_LOCAL)
-		{
-			for(int is=0; is<GlobalV::NSPIN; is++)
-			{
-				for(int i=0; i<GlobalV::NBANDS; i++) 
-				{
-					delete[] this->WFC_GAMMA_aug[is][i];
-				}
-				delete[] this->WFC_GAMMA_aug[is];
-			}
-			delete[] this->WFC_GAMMA_aug;
-		}
-		//mohan add 2012-01-09
-		else
+		if(!GlobalV::GAMMA_ONLY_LOCAL)
 		{
 			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 			{

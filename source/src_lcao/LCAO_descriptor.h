@@ -27,7 +27,8 @@ public:
     explicit LCAO_Descriptor();
     ~LCAO_Descriptor();
 
-     //only for descriptor part, not including scf
+    // index of descriptor in all atoms
+    //only for descriptor part, not including scf
     void init(const int lm, const int nm, const int tot_inl);
 
 	// cal S_alpha_mu: overlap between lcao basis Phi and descriptor basis Al
@@ -35,7 +36,7 @@ public:
 
 
 	// 1. Load DeePKS model
-    // 2. Initialize the deltaV Hamiltonian matrix 
+    // 2. Initialize the deltaV Hamiltonian matrix
     // 3. If FORCE, initialize the matrces for force
     void deepks_pre_scf(const std::string& model_file);
 
@@ -85,14 +86,14 @@ public:
 
     void cal_e_delta_band(const std::vector<ModuleBase::matrix>& dm);	//tr[rho*H_V_delta]
 //-------------------
-// public variables 
+// public variables
 //-------------------
 public:
 
 	//------------------------------------------------------
     //E_delta: in Ry, correction energy provided by NN
     //e_delta_band: tr(dm*H_V_delta)
-    //H_V_delta: correction term to the Hamiltonian matrix 
+    //H_V_delta: correction term to the Hamiltonian matrix
 	//F_delta: in Ry/Bohr, force due to the correction term
 	//------------------------------------------------------
     double E_delta = 0.0;
@@ -187,7 +188,7 @@ private:
 
 	void init_gdmx(void);
     void load_model(const std::string& model_file);
-    
+
     void cal_gdmx(const ModuleBase::matrix& dm);	//dD/dX
 	void del_gdmx(void);
 
