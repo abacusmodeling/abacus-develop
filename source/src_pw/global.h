@@ -27,13 +27,81 @@
 #include "../src_parallel/ft.h"
 
 #ifdef __CUDA
+static const char *_cublasGetErrorEnum(cublasStatus_t error)
+{
+    switch (error)
+    {
+        case CUBLAS_STATUS_SUCCESS:
+            return "CUBLAS_STATUS_SUCCESS";
+        case CUBLAS_STATUS_NOT_INITIALIZED:
+            return "CUBLAS_STATUS_NOT_INITIALIZED";
+        case CUBLAS_STATUS_ALLOC_FAILED:
+            return "CUBLAS_STATUS_ALLOC_FAILED";
+        case CUBLAS_STATUS_INVALID_VALUE:
+            return "CUBLAS_STATUS_INVALID_VALUE";
+        case CUBLAS_STATUS_ARCH_MISMATCH:
+            return "CUBLAS_STATUS_ARCH_MISMATCH";
+        case CUBLAS_STATUS_MAPPING_ERROR:
+            return "CUBLAS_STATUS_MAPPING_ERROR";
+        case CUBLAS_STATUS_EXECUTION_FAILED:
+            return "CUBLAS_STATUS_EXECUTION_FAILED";
+        case CUBLAS_STATUS_INTERNAL_ERROR:
+            return "CUBLAS_STATUS_INTERNAL_ERROR";
+    }
+    return "<unknown>";
+}
+
+static const char *_cusolverGetErrorEnum(cusolverStatus_t error)
+{
+    switch (error)
+    {
+        case CUSOLVER_STATUS_SUCCESS:
+            return "CUSOLVER_STATUS_SUCCESS";
+        case CUSOLVER_STATUS_NOT_INITIALIZED:
+            return "CUSOLVER_STATUS_NOT_INITIALIZED";
+        case CUSOLVER_STATUS_ALLOC_FAILED:
+            return "CUSOLVER_STATUS_ALLOC_FAILED";
+        case CUSOLVER_STATUS_INVALID_VALUE:
+            return "CUSOLVER_STATUS_INVALID_VALUE";
+        case CUSOLVER_STATUS_ARCH_MISMATCH:
+            return "CUSOLVER_STATUS_ARCH_MISMATCH";
+        case CUSOLVER_STATUS_MATRIX_TYPE_NOT_SUPPORTED:
+            return "CUSOLVER_STATUS_MATRIX_TYPE_NOT_SUPPORTED";
+        case CUSOLVER_STATUS_EXECUTION_FAILED:
+            return "CUSOLVER_STATUS_EXECUTION_FAILED";
+        case CUSOLVER_STATUS_INTERNAL_ERROR:
+            return "CUSOLVER_STATUS_INTERNAL_ERROR";
+    }
+    return "<unknown>";
+}
+
 #define CHECK_CUDA(func)\
 {\
     cudaError_t status = (func);\
     if(status != cudaSuccess)\
     {\
-        printf("CUDA API failed at line %d with error: %s (%d)\n",\
-            __LINE__, cudaGetErrorString(status), status);\
+        printf("In File %s : CUDA API failed at line %d with error: %s (%d)\n",\
+            __FILE__, __LINE__, cudaGetErrorString(status), status);\
+    }\
+}
+
+#define CHECK_CUBLAS(func)\
+{\
+    cublasStatus_t status = (func);\
+    if(status != CUBLAS_STATUS_SUCCESS)\
+    {\
+        printf("In File %s : CUBLAS API failed at line %d with error: %s (%d)\n",\
+            __FILE__, __LINE__, _cublasGetErrorEnum(status), status);\
+    }\
+}
+
+#define CHECK_CUSOLVER(func)\
+{\
+    cusolverStatus_t status = (func);\
+    if(status != CUSOLVER_STATUS_SUCCESS)\
+    {\
+        printf("In File %s : CUSOLVER API failed at line %d with error: %s (%d)\n",\
+            __FILE__, __LINE__, _cusolverGetErrorEnum(status), status);\
     }\
 }
 #endif

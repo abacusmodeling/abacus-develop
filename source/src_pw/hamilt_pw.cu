@@ -5,6 +5,28 @@
 #include "../src_io/optical.h" // only get judgement to calculate optical matrix or not.
 #include "myfunc.h"
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // in tools.h
 
 __global__ void cast_d2f(float *dst, double *src, int size)
@@ -102,7 +124,7 @@ template<class T>
 void print_test(T *data, int size)
 {
     T *h_data = (T*)malloc(size * sizeof(T));
-    cudaMemcpy(h_data, data, size*sizeof(T), cudaMemcpyDeviceToHost);
+    CHECK_CUDA(cudaMemcpy(h_data, data, size*sizeof(T), cudaMemcpyDeviceToHost));
     cout<<sizeof(h_data[0])<<endl;
     for(int i=0;i<size;i++){
         cout<<h_data[i].x<<" "<<h_data[i].y<<endl;
@@ -119,7 +141,7 @@ Hamilt_PW::Hamilt_PW()
     // GR_index = new int[1];
     // Bec = new complex<double>[1];
 #ifdef __CUDA
-	cublasCreate(&hpw_handle);
+	CHECK_CUBLAS(cublasCreate(&hpw_handle));
 #endif
 }
 
@@ -130,8 +152,8 @@ Hamilt_PW::~Hamilt_PW()
     delete[] GR_index;
     // delete[] Bec;
 #ifdef __CUDA
-	cudaFree(GR_index_d);
-	cublasDestroy(hpw_handle);
+	CHECK_CUDA(cudaFree(GR_index_d));
+	CHECK_CUBLAS(cublasDestroy(hpw_handle));
     // CHECK_CUDA(cudaFree(GR_index_d));
 #endif
 }
@@ -143,7 +165,7 @@ void Hamilt_PW::allocate(
 	const int &nkb,
 	const int &nrxx)
 {
-    ModuleBase::TITLE("Hamilt_PW_GPU","allocate");
+    ModuleBase::TITLE("Hamilt_PW_CUDA","allocate");
 
 	assert(npwx > 0);
 	assert(npol > 0);
@@ -172,7 +194,7 @@ void Hamilt_PW::allocate(
 
 void Hamilt_PW::init_k(const int ik)
 {
-    ModuleBase::TITLE("Hamilt_PW_GPU","init_k");
+    ModuleBase::TITLE("Hamilt_PW_CUDA","init_k");
 	// mohan add 2010-09-30
 	// (1) Which spin to use.
 	if(GlobalV::NSPIN==2)
@@ -233,8 +255,8 @@ void Hamilt_PW::diagH_subspace(
     ModuleBase::ComplexMatrix &evc,
     double *en)
 {
-    ModuleBase::TITLE("Hamilt_PW_GPU","diagH_subspace");
-    ModuleBase::timer::tick("Hamilt_PW_GPU","diagH_subspace");
+    ModuleBase::TITLE("Hamilt_PW_CUDA","diagH_subspace");
+    ModuleBase::timer::tick("Hamilt_PW_CUDA","diagH_subspace");
 
 	assert(nstart!=0);
 	assert(n_band!=0);
@@ -438,7 +460,206 @@ void Hamilt_PW::diagH_subspace(
 
     //out.printcm_norm("hvec",hvec,1.0e-8);
 
-    ModuleBase::timer::tick("Hamilt_PW_GPU","diagH_subspace");
+    ModuleBase::timer::tick("Hamilt_PW_CUDA","diagH_subspace");
+    return;
+}
+
+
+void Hamilt_PW::diagH_subspace_cuda(
+    const int ik,
+    const int nstart,
+    const int n_band,
+    const double2 *psi_c, // matrix
+    double2 *evc, // matrix
+    double *en,
+	double2 *vkb_c)
+{
+    ModuleBase::TITLE("Hamilt_PW_CUDA","diagH_subspace_cuda");
+    ModuleBase::timer::tick("Hamilt_PW_CUDA","diagH_subspace_cuda");
+
+	assert(nstart!=0);
+	assert(n_band!=0);
+
+	double2* hc;
+	double2* tmp_hc;
+	double2* sc;
+	double2* hvec;
+	CHECK_CUDA(cudaMalloc((void**)&hc, nstart*nstart*sizeof(double2)));
+	CHECK_CUDA(cudaMalloc((void**)&tmp_hc, nstart*nstart*sizeof(double2)));
+	CHECK_CUDA(cudaMalloc((void**)&sc, nstart*nstart*sizeof(double2)));
+	CHECK_CUDA(cudaMalloc((void**)&hvec, nstart*n_band*sizeof(double2)));
+	
+	int dmin = 0;
+	int dmax = 0;
+	const int npw = GlobalC::kv.ngk[ik];
+
+	// cout<<"npw:"<<npw<<endl;
+	// cout<<"npwx"<<GlobalC::wf.npwx<<endl;
+
+	if(GlobalV::NSPIN != 4)
+	{
+		dmin = npw;
+		dmax = GlobalC::wf.npwx;
+	}
+	else
+	{
+		dmin = GlobalC::wf.npwx*GlobalV::NPOL;
+		dmax = GlobalC::wf.npwx*GlobalV::NPOL;
+	}
+
+	// //qianrui improve this part 2021-3-14
+	// std::complex<double> *aux=new std::complex<double> [dmax*nstart];
+	// std::complex<double> *paux = aux;
+	// std::complex<double> *ppsi = psi.c;
+
+	double2* aux;
+	CHECK_CUDA(cudaMalloc((void**)&aux, dmax*nstart*sizeof(double2)));
+	double2* paux = aux;
+	// const double2* ppsi = psi_c; // ?
+
+	//qianrui replace it
+	// cout<<"psi before hpsi"<<endl;
+	// print_test<double2>((double2*)psi_c, 10);
+	this->h_psi_cuda(psi_c, aux, vkb_c, nstart); // TODO: vkb_c  nstart!=1 ?
+	// cout<<"aux after hpsi"<<endl;
+	// print_test<double2>(aux, 10);
+
+	double2 ONE, ZERO;
+	ONE.y = ZERO.x = ZERO.y = 0.0;
+	ONE.x = 1.0;
+
+	cublasOperation_t trans1 = CUBLAS_OP_C;
+	cublasOperation_t trans2 = CUBLAS_OP_N;
+	CHECK_CUBLAS(cublasZgemm(hpw_handle, trans1, trans2, nstart, nstart, dmin, &ONE, psi_c, dmax, aux, dmax, &ZERO, tmp_hc, nstart));
+	// hc=transpose(hc,false); // TODO: transpose
+	
+	// use 'geam' API todo transpose.
+	double2 t_alpha, t_beta;
+	t_alpha.y = t_beta.x = t_beta.y = 0.0;
+	t_alpha.x = 1.0;
+	CHECK_CUBLAS(cublasZgeam(hpw_handle, CUBLAS_OP_T, CUBLAS_OP_T, nstart, nstart, &t_alpha, tmp_hc, nstart, &t_beta, tmp_hc, nstart, hc, nstart));
+
+	CHECK_CUBLAS(cublasZgemm(hpw_handle, trans1, trans2, nstart, nstart, dmin, &ONE, psi_c, dmax, psi_c, dmax, &ZERO, tmp_hc, nstart));
+	// sc=transpose(sc,false); // TODO: transpose
+	CHECK_CUBLAS(cublasZgeam(hpw_handle, CUBLAS_OP_T, CUBLAS_OP_T, nstart, nstart, &t_alpha, tmp_hc, nstart, &t_beta, tmp_hc, nstart, sc, nstart));
+
+	CHECK_CUDA(cudaFree(aux));
+
+	// if(GlobalV::NPROC_IN_POOL>1)
+	// {
+	// 	Parallel_Reduce::reduce_complex_double_pool( hc.c, nstart*nstart );
+	// 	Parallel_Reduce::reduce_complex_double_pool( sc.c, nstart*nstart );
+	// }
+
+	// after generation of H and S matrix, diag them
+
+	ModuleBase::ComplexMatrix h_hc(nstart, nstart);
+    ModuleBase::ComplexMatrix h_sc(nstart, nstart);
+    ModuleBase::ComplexMatrix h_hvec(nstart,n_band);
+
+	double *h_en = new double[n_band];
+
+	CHECK_CUDA(cudaMemcpy(h_hc.c, hc, nstart*nstart*sizeof(double2), cudaMemcpyDeviceToHost));
+	CHECK_CUDA(cudaMemcpy(h_sc.c, sc, nstart*nstart*sizeof(double2), cudaMemcpyDeviceToHost));
+	// CHECK_CUDA(cudaMemcpy(h_hvec.c, hvec, nstart*n_band*sizeof(double2), cudaMemcpyDeviceToHost));
+
+	// cout<<"hello? begin lapack"<<endl;
+	GlobalC::hm.diagH_LAPACK(nstart, n_band, h_hc, h_sc, nstart, h_en, h_hvec);
+	// cout<<"after lapack"<<endl;
+	CHECK_CUDA(cudaMemcpy(hvec, h_hvec.c, nstart*n_band*sizeof(double2), cudaMemcpyHostToDevice));
+	CHECK_CUDA(cudaMemcpy(en, h_en, n_band*sizeof(double), cudaMemcpyHostToDevice));
+    delete [] h_en;
+
+	// GlobalC::hm.diagH_CUSOLVER(nstart, n_band, hc, sc, nstart, en, hvec);
+	// TODO: diagH_CUSOLVER
+
+	// Peize Lin add 2019-03-09
+	/*
+	#ifdef __LCAO
+		if("lcao_in_pw"==GlobalV::BASIS_TYPE)
+		{
+			switch(GlobalC::exx_global.info.hybrid_type)
+			{
+				case Exx_Global::Hybrid_Type::HF:
+				case Exx_Global::Hybrid_Type::PBE0:
+				case Exx_Global::Hybrid_Type::HSE:
+					GlobalC::exx_lip.k_pack->hvec_array[ik] = hvec;
+					break;
+			}
+		}
+	#endif
+	*/
+
+	std::cout << std::setprecision(5);
+
+	if((GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") && GlobalV::CALCULATION=="nscf" && !Optical::opt_epsilon2)
+	{
+		GlobalV::ofs_running << " Not do zgemm to get evc." << std::endl;
+	}
+	else if((GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw")
+		&& ( GlobalV::CALCULATION == "scf" || GlobalV::CALCULATION == "md" || GlobalV::CALCULATION == "relax")) //pengfei 2014-10-13
+	{
+		// because psi and evc are different here,
+		// I think if psi and evc are the same,
+		// there may be problems, mohan 2011-01-01
+		// char transa = 'N';
+		// char transb = 'T';
+		// zgemm_( &transa,
+		// 		&transb,
+		// 		&dmax, // m: row of A,C
+		// 		&n_band, // n: col of B,C
+		// 		&nstart, // k: col of A, row of B
+		// 		&ModuleBase::ONE, // alpha
+		// 		psi.c, // A
+		// 		&dmax, // LDA: if(N) max(1,m) if(T) max(1,k)
+		// 		hvec.c, // B
+		// 		&n_band, // LDB: if(N) max(1,k) if(T) max(1,n)
+		// 		&ModuleBase::ZERO,  // belta
+		// 		evc.c, // C
+		// 		&dmax ); // LDC: if(N) max(1, m)
+		cublasOperation_t transa = CUBLAS_OP_N;
+		cublasOperation_t transb = CUBLAS_OP_T;
+		double2 ONE, ZERO;
+		ONE.y = ZERO.x = ZERO.y = 0.0;
+		ONE.x = 1.0;
+		CHECK_CUBLAS(cublasZgemm(hpw_handle, transa, transb, dmax, n_band, nstart, &ONE, psi_c, dmax, hvec, n_band, &ZERO, evc, dmax));
+	}
+	else
+	{
+		// As the evc and psi may refer to the same matrix, we first
+		// create a temporary matrix to story the result. (by wangjp)
+		// qianrui improve this part 2021-3-13
+		// char transa = 'N';
+		// char transb = 'T';
+		cublasOperation_t transa = CUBLAS_OP_N;
+		cublasOperation_t transb = CUBLAS_OP_T;
+		
+		double2 ONE, ZERO;
+		ONE.y = ZERO.x = ZERO.y = 0.0;
+		ONE.x = 1.0;
+		
+		double2 *evctmp;
+		CHECK_CUDA(cudaMalloc((void**)&evctmp, n_band*dmin*sizeof(double2)));
+		CHECK_CUBLAS(cublasZgemm(hpw_handle, transa, transb, dmin, n_band, nstart, &ONE, psi_c, dmax, hvec, n_band, &ZERO, evctmp, dmin));
+		
+		for(int ib=0; ib<n_band; ib++)
+		{
+			// for(int ig=0; ig<dmin; ig++)
+			// {
+			// 	evc(ib,ig) = evctmp(ib,ig);
+			// }
+			CHECK_CUDA(cudaMemcpy(&evc[ib*dmax], &evctmp[ib*dmin], dmin*sizeof(double2), cudaMemcpyDeviceToDevice));
+		}
+		CHECK_CUDA(cudaFree(evctmp));
+		cudaDeviceSynchronize();
+	}
+
+	CHECK_CUDA(cudaFree(hc));
+	CHECK_CUDA(cudaFree(tmp_hc));
+	CHECK_CUDA(cudaFree(sc));
+	CHECK_CUDA(cudaFree(hvec));
+
+    ModuleBase::timer::tick("Hamilt_PW_CUDA","diagH_subspace_cuda");
     return;
 }
 
@@ -505,7 +726,7 @@ void Hamilt_PW::s_1psi
 
 void Hamilt_PW::h_psi_cuda(const float2 *psi_in, float2 *hpsi, float2 *vkb_c, const int m)
 {
-    ModuleBase::timer::tick("Hamilt_PW_GPU","h_psi");
+    ModuleBase::timer::tick("Hamilt_PW_CUDA","h_psi");
     // int i = 0;
     // int j = 0;
     // int ig= 0;
@@ -521,7 +742,7 @@ void Hamilt_PW::h_psi_cuda(const float2 *psi_in, float2 *hpsi, float2 *vkb_c, co
 	//------------------------------------
 	float2 *tmhpsi;
 	const float2 *tmpsi_in;
-    ModuleBase::timer::tick("Hamilt_PW_GPU","kinetic");
+    ModuleBase::timer::tick("Hamilt_PW_CUDA","kinetic");
  	if(GlobalV::T_IN_H)
 	{
         tmhpsi = hpsi;
@@ -570,7 +791,7 @@ void Hamilt_PW::h_psi_cuda(const float2 *psi_in, float2 *hpsi, float2 *vkb_c, co
 		CHECK_CUDA(cudaFree(f_g2kin));
 	}
 
-    ModuleBase::timer::tick("Hamilt_PW_GPU","kinetic");
+    ModuleBase::timer::tick("Hamilt_PW_CUDA","kinetic");
 
 	// cout<<"======after hpsi part I======="<<endl;
 	// print_test<float2>(hpsi, 15);
@@ -578,7 +799,7 @@ void Hamilt_PW::h_psi_cuda(const float2 *psi_in, float2 *hpsi, float2 *vkb_c, co
 	//------------------------------------
 	//(2) the local potential.
 	//-----------------------------------
-	ModuleBase::timer::tick("Hamilt_PW_GPU","vloc");
+	ModuleBase::timer::tick("Hamilt_PW_CUDA","vloc");
     //  ...
 	if(GlobalV::VL_IN_H)
 	{
@@ -627,11 +848,11 @@ void Hamilt_PW::h_psi_cuda(const float2 *psi_in, float2 *hpsi, float2 *vkb_c, co
 		CHECK_CUDA(cudaFree(f_vr_eff1));
         CHECK_CUDA(cudaFree(f_porter));
 	}
-	ModuleBase::timer::tick("Hamilt_PW_GPU","vloc");
+	ModuleBase::timer::tick("Hamilt_PW_CUDA","vloc");
 	//------------------------------------
 	// (3) the nonlocal pseudopotential.
 	//------------------------------------
-	ModuleBase::timer::tick("Hamilt_PW_GPU","vnl");
+	ModuleBase::timer::tick("Hamilt_PW_CUDA","vnl");
 
 	// cout<<"======after hpsi part II======="<<endl;
 	// print_test<float2>(hpsi, 15);
@@ -656,7 +877,7 @@ void Hamilt_PW::h_psi_cuda(const float2 *psi_in, float2 *hpsi, float2 *vkb_c, co
             cublasOperation_t transa = CUBLAS_OP_C;
             cublasOperation_t transb = CUBLAS_OP_N;
             // cublasHandle_t handle;
-            // cublasCreate(&handle);
+            // CHECK_CUBLAS(cublasCreate(&handle));
 
             float2 ONE, ZERO;
             ONE.y = ZERO.x = ZERO.y = 0.0;
@@ -669,26 +890,26 @@ void Hamilt_PW::h_psi_cuda(const float2 *psi_in, float2 *hpsi, float2 *vkb_c, co
             if(m==1 && GlobalV::NPOL==1)
             {
                 int inc = 1;
-                cublasCgemv(hpw_handle, transa, GlobalC::wf.npw, nkb, &ONE, vkb_c, GlobalC::wf.npwx, psi_in, inc, &ZERO, becp, inc);
+                CHECK_CUBLAS(cublasCgemv(hpw_handle, transa, GlobalC::wf.npw, nkb, &ONE, vkb_c, GlobalC::wf.npwx, psi_in, inc, &ZERO, becp, inc));
 
             }
             else
             {
                 int npm = GlobalV::NPOL * m;
-                cublasCgemm(hpw_handle, transa, transb, nkb, npm, GlobalC::wf.npw, &ONE, vkb_c, GlobalC::wf.npwx, psi_in, GlobalC::wf.npwx, &ZERO, becp, nkb);
+                CHECK_CUBLAS(cublasCgemm(hpw_handle, transa, transb, nkb, npm, GlobalC::wf.npw, &ONE, vkb_c, GlobalC::wf.npwx, psi_in, GlobalC::wf.npwx, &ZERO, becp, nkb));
 
             }
 
             // complex<double> *hpsi_cpu = new complex<double>[GlobalC::wf.npw*GlobalV::NPOL];
             // complex<double> *becp_cpu = new complex<double>[GlobalV::NPOL*m*nkb];
 
-            // cudaMemcpy(becp_cpu, becp, GlobalV::NPOL*m*nkb*sizeof(float2), cudaMemcpyDeviceToHost);
+            // CHECK_CUDA(cudaMemcpy(becp_cpu, becp, GlobalV::NPOL*m*nkb*sizeof(float2), cudaMemcpyDeviceToHost));
 
-            // cudaMemcpy(hpsi_cpu, hpsi, GlobalC::wf.npw*GlobalV::NPOL*sizeof(float2), cudaMemcpyDeviceToHost);
+            // CHECK_CUDA(cudaMemcpy(hpsi_cpu, hpsi, GlobalC::wf.npw*GlobalV::NPOL*sizeof(float2), cudaMemcpyDeviceToHost));
 
             // this->add_nonlocal_pp(hpsi_cpu, becp_cpu, m);
 
-            // cudaMemcpy(hpsi, hpsi_cpu, GlobalC::wf.npw*GlobalV::NPOL*sizeof(float2), cudaMemcpyHostToDevice);
+            // CHECK_CUDA(cudaMemcpy(hpsi, hpsi_cpu, GlobalC::wf.npw*GlobalV::NPOL*sizeof(float2), cudaMemcpyHostToDevice));
 
             // delete [] hpsi_cpu;
             // delete [] becp_cpu;
@@ -698,7 +919,7 @@ void Hamilt_PW::h_psi_cuda(const float2 *psi_in, float2 *hpsi, float2 *vkb_c, co
 
             this->add_nonlocal_pp_cuda(hpsi, becp, vkb_c, m);
 
-            // cublasDestroy(handle);
+            // CHECK_CUBLAS(cublasDestroy(handle));
             CHECK_CUDA(cudaFree(becp));
             // CHECK_CUDA(cudaFree(d_vkb_c));
 			// CHECK_CUDA(cudaFree(f_vkb_c));
@@ -707,7 +928,7 @@ void Hamilt_PW::h_psi_cuda(const float2 *psi_in, float2 *hpsi, float2 *vkb_c, co
         }
     }
 
-    ModuleBase::timer::tick("Hamilt_PW_GPU","vnl");
+    ModuleBase::timer::tick("Hamilt_PW_CUDA","vnl");
 
 	// cout<<"======after hpsi part III======="<<endl;
 	// print_test<float2>(hpsi, 15);
@@ -717,13 +938,13 @@ void Hamilt_PW::h_psi_cuda(const float2 *psi_in, float2 *hpsi, float2 *vkb_c, co
 	//------------------------------------
     // TODO: add metaGGA part
 
-    ModuleBase::timer::tick("Hamilt_PW_GPU","h_psi");
+    ModuleBase::timer::tick("Hamilt_PW_CUDA","h_psi");
     return;
 }
 
 void Hamilt_PW::h_psi_cuda(const double2 *psi_in, double2 *hpsi, double2 *vkb_c, const int m)
 {
-    ModuleBase::timer::tick("Hamilt_PW_GPU","h_psi");
+    ModuleBase::timer::tick("Hamilt_PW_CUDA","h_psi");
     // int i = 0;
     // int j = 0;
     // int ig= 0;
@@ -739,7 +960,7 @@ void Hamilt_PW::h_psi_cuda(const double2 *psi_in, double2 *hpsi, double2 *vkb_c,
 	//------------------------------------
 	double2 *tmhpsi;
 	const double2 *tmpsi_in;
-    ModuleBase::timer::tick("Hamilt_PW_GPU","kinetic");
+    ModuleBase::timer::tick("Hamilt_PW_CUDA","kinetic");
  	if(GlobalV::T_IN_H)
 	{
         tmhpsi = hpsi;
@@ -780,15 +1001,15 @@ void Hamilt_PW::h_psi_cuda(const double2 *psi_in, double2 *hpsi, double2 *vkb_c,
         CHECK_CUDA(cudaFree(d_g2kin));
 	}
 
-    ModuleBase::timer::tick("Hamilt_PW_GPU","kinetic");
+    ModuleBase::timer::tick("Hamilt_PW_CUDA","kinetic");
 
 	// cout<<"======after hpsi part I======="<<endl;
-	// print_test<double2>(hpsi, 15);
+	// print_test<double2>(hpsi, 10);
 
 	//------------------------------------
 	//(2) the local potential.
 	//-----------------------------------
-	ModuleBase::timer::tick("Hamilt_PW_GPU","vloc");
+	ModuleBase::timer::tick("Hamilt_PW_CUDA","vloc");
     //  ...
 	if(GlobalV::VL_IN_H)
 	{
@@ -810,8 +1031,19 @@ void Hamilt_PW::h_psi_cuda(const double2 *psi_in, double2 *hpsi, double2 *vkb_c,
             // if(NSPIN!=4){
             // ZEROS( UFFT.porter, pw.nrxx);
             CHECK_CUDA(cudaMemset(d_porter, 0, GlobalC::pw.nrxx * sizeof(double2)));
-
+			// cout<<"m:"<<m<<endl;
+			// cout<<"grindex:"<<endl;
+			// int *GR_index_h = new int[10];
+			// CHECK_CUDA(cudaMemcpy(GR_index_h, GR_index_d, 10*sizeof(int), cudaMemcpyDeviceToHost));
+			// for(int i=0;i<10;i++)
+			// {
+			// 	cout<<GR_index_h[i]<<endl;
+			// }
+			
             GlobalC::UFFT.RoundTrip( tmpsi_in, d_vr_eff1, GR_index_d, d_porter );
+
+			// cout<<"dporter"<<endl;
+			// print_test<double2>(d_porter, 10);
 
             // for (j = 0;j < wf.npw;j++)
             // {
@@ -828,14 +1060,14 @@ void Hamilt_PW::h_psi_cuda(const double2 *psi_in, double2 *hpsi, double2 *vkb_c,
         CHECK_CUDA(cudaFree(d_vr_eff1));
         CHECK_CUDA(cudaFree(d_porter));
 	}
-	ModuleBase::timer::tick("Hamilt_PW_GPU","vloc");
+	ModuleBase::timer::tick("Hamilt_PW_CUDA","vloc");
 
 	// cout<<"======after hpsi part II======="<<endl;
-	// print_test<double2>(hpsi, 15);
+	// print_test<double2>(hpsi, 10);
 	//------------------------------------
 	// (3) the nonlocal pseudopotential.
 	//------------------------------------
-	ModuleBase::timer::tick("Hamilt_PW_GPU","vnl");
+	ModuleBase::timer::tick("Hamilt_PW_CUDA","vnl");
 
     if(GlobalV::VNL_IN_H)
 	{
@@ -852,7 +1084,7 @@ void Hamilt_PW::h_psi_cuda(const double2 *psi_in, double2 *hpsi, double2 *vkb_c,
             cublasOperation_t transa = CUBLAS_OP_C;
             cublasOperation_t transb = CUBLAS_OP_N;
             // cublasHandle_t handle;
-            // cublasCreate(&handle);
+            // CHECK_CUBLAS(cublasCreate(&handle));
 
 			// cout<<"===== vkbc ===="<<endl;
 			// print_test<double2>(d_vkb_c, 15);
@@ -865,26 +1097,26 @@ void Hamilt_PW::h_psi_cuda(const double2 *psi_in, double2 *hpsi, double2 *vkb_c,
             if(m==1 && GlobalV::NPOL==1)
             {
                 int inc = 1;
-                cublasZgemv(hpw_handle, transa, GlobalC::wf.npw, nkb, &ONE, vkb_c, GlobalC::wf.npwx, psi_in, inc, &ZERO, becp, inc);
+                CHECK_CUBLAS(cublasZgemv(hpw_handle, transa, GlobalC::wf.npw, nkb, &ONE, vkb_c, GlobalC::wf.npwx, psi_in, inc, &ZERO, becp, inc));
 
             }
             else
             {
                 int npm = GlobalV::NPOL * m;
-                cublasZgemm(hpw_handle, transa, transb, nkb, npm, GlobalC::wf.npw, &ONE, vkb_c, GlobalC::wf.npwx, psi_in, GlobalC::wf.npwx, &ZERO, becp, nkb);
+                CHECK_CUBLAS(cublasZgemm(hpw_handle, transa, transb, nkb, npm, GlobalC::wf.npw, &ONE, vkb_c, GlobalC::wf.npwx, psi_in, GlobalC::wf.npwx, &ZERO, becp, nkb));
 
             }
 
             // complex<double> *hpsi_cpu = new complex<double>[GlobalC::wf.npw*GlobalV::NPOL];
             // complex<double> *becp_cpu = new complex<double>[GlobalV::NPOL*m*nkb];
 
-            // cudaMemcpy(becp_cpu, becp, GlobalV::NPOL*m*nkb*sizeof(double2), cudaMemcpyDeviceToHost);
+            // CHECK_CUDA(cudaMemcpy(becp_cpu, becp, GlobalV::NPOL*m*nkb*sizeof(double2), cudaMemcpyDeviceToHost));
 
-            // cudaMemcpy(hpsi_cpu, hpsi, GlobalC::wf.npw*GlobalV::NPOL*sizeof(double2), cudaMemcpyDeviceToHost);
+            // CHECK_CUDA(cudaMemcpy(hpsi_cpu, hpsi, GlobalC::wf.npw*GlobalV::NPOL*sizeof(double2), cudaMemcpyDeviceToHost));
 
             // this->add_nonlocal_pp(hpsi_cpu, becp_cpu, m);
 
-            // cudaMemcpy(hpsi, hpsi_cpu, GlobalC::wf.npw*GlobalV::NPOL*sizeof(double2), cudaMemcpyHostToDevice);
+            // CHECK_CUDA(cudaMemcpy(hpsi, hpsi_cpu, GlobalC::wf.npw*GlobalV::NPOL*sizeof(double2), cudaMemcpyHostToDevice));
 
             // delete [] hpsi_cpu;
             // delete [] becp_cpu;
@@ -894,7 +1126,7 @@ void Hamilt_PW::h_psi_cuda(const double2 *psi_in, double2 *hpsi, double2 *vkb_c,
 
             this->add_nonlocal_pp_cuda(hpsi, becp, vkb_c, m);
 
-            // cublasDestroy(handle);
+            // CHECK_CUBLAS(cublasDestroy(handle));
             CHECK_CUDA(cudaFree(becp));
             // CHECK_CUDA(cudaFree(d_vkb_c));
             // cout<<"nonlocal end"<<endl;
@@ -902,16 +1134,16 @@ void Hamilt_PW::h_psi_cuda(const double2 *psi_in, double2 *hpsi, double2 *vkb_c,
         }
     }
 
-    ModuleBase::timer::tick("Hamilt_PW_GPU","vnl");
+    ModuleBase::timer::tick("Hamilt_PW_CUDA","vnl");
 	// cout<<"======after hpsi part III======="<<endl;
-	// print_test<double2>(hpsi, 15);
+	// print_test<double2>(hpsi, 10);
 
     //------------------------------------
 	// (4) the metaGGA part
 	//------------------------------------
     // TODO: add metaGGA part
 
-    ModuleBase::timer::tick("Hamilt_PW_GPU","h_psi");
+    ModuleBase::timer::tick("Hamilt_PW_CUDA","h_psi");
     return;
 }
 
@@ -1091,7 +1323,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 			//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 		}
 	}
-	// timer::tick("Hamilt_PW","vnl");
+	ModuleBase::timer::tick("Hamilt_PW","vnl");
 	//------------------------------------
 	// (4) the metaGGA part
 	//------------------------------------
@@ -1139,7 +1371,7 @@ void Hamilt_PW::add_nonlocal_pp_cuda(
     const float2 *f_vkb_c,
 	const int m)
 {
-    ModuleBase::timer::tick("Hamilt_PW","add_nonlocal_pp_cuda");
+    ModuleBase::timer::tick("Hamilt_PW_CUDA","add_nonlocal_pp");
 
 	// number of projectors
 	int nkb = GlobalC::ppcell.nkb;
@@ -1186,7 +1418,7 @@ void Hamilt_PW::add_nonlocal_pp_cuda(
 
 			// cout<<"===== f_deeq before add pp kernel ===="<<endl;
 			// float* test_deeq = (float*)malloc(15*sizeof(float));
-			// cudaMemcpy(test_deeq, f_cur_deeq, 15*sizeof(float), cudaMemcpyDeviceToHost);
+			// CHECK_CUDA(cudaMemcpy(test_deeq, f_cur_deeq, 15*sizeof(float), cudaMemcpyDeviceToHost));
 			// for(int i=0;i<15;i++){
 			// 	cout<<test_deeq[i]<<endl;
 			// }
@@ -1204,14 +1436,14 @@ void Hamilt_PW::add_nonlocal_pp_cuda(
     cublasOperation_t transa = CUBLAS_OP_N;
     cublasOperation_t transb = CUBLAS_OP_T;
     // cublasHandle_t handle;
-    // cublasCreate(&handle);
+    // CHECK_CUBLAS(cublasCreate(&handle);
     float2 ONE;
     ONE.y = 0.0;
     ONE.x = 1.0;
 	if(GlobalV::NPOL==1 && m==1)
 	{
 		int inc = 1;
-        cublasCgemv(hpw_handle,
+        CHECK_CUBLAS(cublasCgemv(hpw_handle,
             transa,
             GlobalC::wf.npw,
             GlobalC::ppcell.nkb,
@@ -1222,12 +1454,12 @@ void Hamilt_PW::add_nonlocal_pp_cuda(
 			inc,
 			&ONE,
 			hpsi_in,
-			inc);
+			inc));
 	}
 	else
 	{
 		int npm = GlobalV::NPOL*m;
-        cublasCgemm(hpw_handle,
+        CHECK_CUBLAS(cublasCgemm(hpw_handle,
             transa,
             transb,
             GlobalC::wf.npw,
@@ -1240,13 +1472,13 @@ void Hamilt_PW::add_nonlocal_pp_cuda(
             npm,
             &ONE,
             hpsi_in,
-            GlobalC::wf.npwx);
+            GlobalC::wf.npwx));
 	}
 
 	// delete[] ps;
     CHECK_CUDA(cudaFree(ps));
-	// cublasDestroy(handle);
-    ModuleBase::timer::tick("Hamilt_PW","add_nonlocal_pp_cuda");
+	// CHECK_CUBLAS(cublasDestroy(handle));
+    ModuleBase::timer::tick("Hamilt_PW_CUDA","add_nonlocal_pp");
     return;
 }
 
@@ -1256,7 +1488,7 @@ void Hamilt_PW::add_nonlocal_pp_cuda(
     const double2 *d_vkb_c,
 	const int m)
 {
-    ModuleBase::timer::tick("Hamilt_PW","add_nonlocal_pp_cuda");
+    ModuleBase::timer::tick("Hamilt_PW_CUDA","add_nonlocal_pp");
 
 	// number of projectors
 	int nkb = GlobalC::ppcell.nkb;
@@ -1296,7 +1528,7 @@ void Hamilt_PW::add_nonlocal_pp_cuda(
 
 			// cout<<"===== f_deeq before add pp kernel ===="<<endl;
 			// double* test_deeq = (double*)malloc(15*sizeof(double));
-			// cudaMemcpy(test_deeq, cur_deeq, 15*sizeof(double), cudaMemcpyDeviceToHost);
+			// CHECK_CUDA(cudaMemcpy(test_deeq, cur_deeq, 15*sizeof(double), cudaMemcpyDeviceToHost));
 			// for(int i=0;i<15;i++){
 			// 	cout<<test_deeq[i]<<endl;
 			// }
@@ -1314,14 +1546,14 @@ void Hamilt_PW::add_nonlocal_pp_cuda(
     cublasOperation_t transa = CUBLAS_OP_N;
     cublasOperation_t transb = CUBLAS_OP_T;
     // cublasHandle_t handle;
-    // cublasCreate(&handle);
+    // CHECK_CUBLAS(cublasCreate(&handle));
     double2 ONE;
     ONE.y = 0.0;
     ONE.x = 1.0;
 	if(GlobalV::NPOL==1 && m==1)
 	{
 		int inc = 1;
-        cublasZgemv(hpw_handle,
+        CHECK_CUBLAS(cublasZgemv(hpw_handle,
             transa,
             GlobalC::wf.npw,
             GlobalC::ppcell.nkb,
@@ -1332,12 +1564,12 @@ void Hamilt_PW::add_nonlocal_pp_cuda(
 			inc,
 			&ONE,
 			hpsi_in,
-			inc);
+			inc));
 	}
 	else
 	{
 		int npm = GlobalV::NPOL*m;
-        cublasZgemm(hpw_handle,
+        CHECK_CUBLAS(cublasZgemm(hpw_handle,
             transa,
             transb,
             GlobalC::wf.npw,
@@ -1350,13 +1582,13 @@ void Hamilt_PW::add_nonlocal_pp_cuda(
             npm,
             &ONE,
             hpsi_in,
-            GlobalC::wf.npwx);
+            GlobalC::wf.npwx));
 	}
 
 	// delete[] ps;
     CHECK_CUDA(cudaFree(ps));
-	// cublasDestroy(handle);
-    ModuleBase::timer::tick("Hamilt_PW","add_nonlocal_pp_cuda");
+	// CHECK_CUBLAS(cublasDestroy(handle));
+    ModuleBase::timer::tick("Hamilt_PW_CUDA","add_nonlocal_pp");
     return;
 }
 

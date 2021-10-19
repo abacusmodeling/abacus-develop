@@ -47,6 +47,26 @@ class Hamilt
 		double *e, // output: eigenvalues
 		ModuleBase::ComplexMatrix &hvec); // output: eigenvectors
 
+#ifdef __CUDA
+	void diagH_subspace_cuda(
+		const int ik,
+		const int nstart,
+		const int n_band,
+		const double2* psi,
+		double2* evc,
+		double *en,
+		double2 *d_ekb_c);
+
+	void diagH_CUSOLVER(
+		const int nstart,
+		const int nbands,
+		double2* hc,  // nstart * nstart
+		double2* sc,  // nstart * nstart
+		const int ldh, // nstart
+		double *e,
+		double2* hvec);
+#endif
+
     Hamilt_PW hpw;
 
 private:

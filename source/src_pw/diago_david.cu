@@ -614,14 +614,14 @@ void Diago_David_CUDA::SchmitOrth
     // replace with 'gemv'.
     // TODO: Global handle ...
     cublasHandle_t diag_handle;
-    cublasCreate(&diag_handle);
+    CHECK_CUBLAS(cublasCreate(&diag_handle));
     cublasOperation_t trans1 = CUBLAS_OP_C;
 
     double2 ONE, ZERO, NEG_ONE;
     ONE.y = ZERO.x = ZERO.y = 0.0;
     ONE.x = 1.0;
     NEG_ONE.x = -1.0;
-    cublasZgemv(diag_handle, trans1, npw, m+1, &ONE, psi, npw, spsi, 1, &ZERO, lagrange, 1);
+    CHECK_CUBLAS(cublasZgemv(diag_handle, trans1, npw, m+1, &ONE, psi, npw, spsi, 1, &ZERO, lagrange, 1));
     
 //	out.printr1_d("lagrange", lagrange, m+1 );
 
@@ -631,7 +631,7 @@ void Diago_David_CUDA::SchmitOrth
 //	std::cout << "m = " << m << std::endl;
 
     cublasOperation_t trans2 = CUBLAS_OP_N;
-    cublasZgemv(diag_handle, trans2, npw, m, &NEG_ONE, psi, npw, lagrange, 1, &ONE, psi_m, 1);
+    CHECK_CUBLAS(cublasZgemv(diag_handle, trans2, npw, m, &NEG_ONE, psi, npw, lagrange, 1, &ONE, psi_m, 1));
     // TODO: ddot_real
     psi_norm -= ddot_real(m, lagrange, lagrange);
     assert(psi_norm > 0.0);

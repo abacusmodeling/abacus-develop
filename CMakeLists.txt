@@ -215,6 +215,7 @@ if(USE_CUDA)
     -lcufft
     -lcublas
     -lcudart
+    -lcusolver
   )
   set_property(TARGET ${ABACUS_BIN_NAME}
   PROPERTY CUDA_ARCHITECTURES

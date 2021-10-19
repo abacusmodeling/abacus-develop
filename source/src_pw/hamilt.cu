@@ -5,8 +5,6 @@
 #include "diago_cg.cuh"
 #include "cufft.h"
 
-
-
 Hamilt::Hamilt() {}
 Hamilt::~Hamilt() {}
 
@@ -113,52 +111,73 @@ void Hamilt::diagH_pw(
 	   		if(GlobalV::KS_SOLVER=="cg")
             {
 				// qian change it, because it has been executed in diago_PAO_in_pw_k2
+                
+                double2 *d_wf_evc;
+                double *d_wf_ekb;
+                double2 *d_vkb_c;
+
+                int nkb = GlobalC::ppcell.nkb;
+                if(iter < 0)
+                {
+                    cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_C2C);
+                }
+                else
+                {
+                    cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
+                }
+
+                CHECK_CUDA(cudaMalloc((void**)&d_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx * GlobalV::NPOL * sizeof(double2)));
+                CHECK_CUDA(cudaMalloc((void**)&d_wf_ekb, GlobalV::NBANDS * sizeof(double)));
+
+                CHECK_CUDA(cudaMemcpy(d_wf_evc, 
+                            GlobalC::wf.evc[ik0].c, 
+                            GlobalV::NBANDS * GlobalC::wf.npwx * GlobalV::NPOL * sizeof(double2), cudaMemcpyHostToDevice));
+
+                CHECK_CUDA(cudaMalloc((void**)&d_vkb_c, GlobalC::wf.npwx*nkb*sizeof(double2)));
+                CHECK_CUDA(cudaMemcpy(d_vkb_c, GlobalC::ppcell.vkb.c, GlobalC::wf.npwx*nkb*sizeof(double2), cudaMemcpyHostToDevice));
+                
                 if ( iter > 1 || istep > 1 ||  ntry > 0)
                 {
-                    this->diagH_subspace(
+                    this->diagH_subspace_cuda(
 						ik,
 						GlobalV::NBANDS,
 						GlobalV::NBANDS,
-						GlobalC::wf.evc[ik0],
-						GlobalC::wf.evc[ik0],
-						GlobalC::wf.ekb[ik]);
+						d_wf_evc,
+						d_wf_evc,
+						d_wf_ekb,
+                        d_vkb_c);
 
                     avg_iter += 1.0;
                 }
+                // cout<<"end subspace"<<endl;
+                // TODO: add evc & ekb
 
                 Diago_CG_CUDA<float, float2> f_cg_cuda;
                 Diago_CG_CUDA<double, double2> d_cg_cuda;
                 
 				bool reorder = true;
 
-				double2 *d_wf_evc;
-                double *d_wf_ekb;
+				
                 int DIM_CG_CUDA = GlobalC::kv.ngk[ik];
                 int DIM_CG_CUDA2 = GlobalC::wf.npwx * GlobalV::NPOL;
                 double *d_precondition;
 
                 float2 *f_wf_evc;
                 float *f_wf_ekb;
-                // int DIM_CG_CUDA = GlobalC::kv.ngk[ik];
-                // int DIM_CG_CUDA2 = GlobalC::wf.npwx * GlobalV::NPOL;
                 float *f_precondition;
-
-                double2 *d_vkb_c;
                 float2 *f_vkb_c;
-
-                int nkb = GlobalC::ppcell.nkb;
 
 				if(GlobalV::NPOL==1)
 				{
-                    CHECK_CUDA(cudaMalloc((void**)&d_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx * sizeof(double2)));
-                    CHECK_CUDA(cudaMalloc((void**)&d_wf_ekb, GlobalV::NBANDS * sizeof(double)));
+                    // CHECK_CUDA(cudaMalloc((void**)&d_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx * sizeof(double2)));
+                    // CHECK_CUDA(cudaMalloc((void**)&d_wf_ekb, GlobalV::NBANDS * sizeof(double)));
                     CHECK_CUDA(cudaMalloc((void**)&d_precondition, DIM_CG_CUDA * sizeof(double)));
                     
                     // Add d_vkb_c
-                    CHECK_CUDA(cudaMalloc((void**)&d_vkb_c, GlobalC::wf.npwx*nkb*sizeof(double2)));
-                    CHECK_CUDA(cudaMemcpy(d_vkb_c, GlobalC::ppcell.vkb.c, GlobalC::wf.npwx*nkb*sizeof(double2), cudaMemcpyHostToDevice));
+                    // CHECK_CUDA(cudaMalloc((void**)&d_vkb_c, GlobalC::wf.npwx*nkb*sizeof(double2)));
+                    // CHECK_CUDA(cudaMemcpy(d_vkb_c, GlobalC::ppcell.vkb.c, GlobalC::wf.npwx*nkb*sizeof(double2), cudaMemcpyHostToDevice));
 
-                    CHECK_CUDA(cudaMemcpy(d_wf_evc, GlobalC::wf.evc[ik0].c, GlobalV::NBANDS * GlobalC::wf.npwx * sizeof(double2), cudaMemcpyHostToDevice));
+                    // CHECK_CUDA(cudaMemcpy(d_wf_evc, GlobalC::wf.evc[ik0].c, GlobalV::NBANDS * GlobalC::wf.npwx * sizeof(double2), cudaMemcpyHostToDevice));
                     // CHECK_CUDA(cudaMemcpy(d_wf_ekb, wf.ekb[ik], NBANDS * sizeof(double), cudaMemcpyHostToDevice));
                     CHECK_CUDA(cudaMemcpy(d_precondition, precondition, DIM_CG_CUDA * sizeof(double), cudaMemcpyHostToDevice));
                     // cout<<"ITER: "<<iter<<endl;
@@ -185,7 +204,7 @@ void Hamilt::diagH_pw(
                         hamilt_cast_d2f<<<block3, thread>>>(f_precondition, d_precondition, DIM_CG_CUDA);
                         // add vkb_c parameter
                         hamilt_cast_d2f<<<block4, thread>>>(f_vkb_c, d_vkb_c, GlobalC::wf.npwx*nkb);
-                        cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_C2C);
+                        // cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_C2C);
                         // cout<<"Do float CG ..."<<endl;
                         f_cg_cuda.diag(f_wf_evc, f_wf_ekb, f_vkb_c, DIM_CG_CUDA, GlobalC::wf.npwx,
                             GlobalV::NBANDS, f_precondition, GlobalV::ETHR,
@@ -197,7 +216,8 @@ void Hamilt::diagH_pw(
                     }
                     else
                     {
-                        cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
+                        // cout<<"begin cg!!"<<endl;
+                        // cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
                         // cout<<"Do double CG ..."<<endl;
                         d_cg_cuda.diag(d_wf_evc, d_wf_ekb, d_vkb_c, DIM_CG_CUDA, GlobalC::wf.npwx,
                             GlobalV::NBANDS, d_precondition, GlobalV::ETHR,
@@ -209,9 +229,9 @@ void Hamilt::diagH_pw(
                     CHECK_CUDA(cudaMemcpy(GlobalC::wf.evc[ik0].c, d_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx * sizeof(double2), cudaMemcpyDeviceToHost));
                     CHECK_CUDA(cudaMemcpy(GlobalC::wf.ekb[ik], d_wf_ekb, GlobalV::NBANDS * sizeof(double), cudaMemcpyDeviceToHost));
 
-                    CHECK_CUDA(cudaFree(d_wf_evc));
-                    CHECK_CUDA(cudaFree(d_wf_ekb));
-                    CHECK_CUDA(cudaFree(d_vkb_c))
+                    // CHECK_CUDA(cudaFree(d_wf_evc));
+                    // CHECK_CUDA(cudaFree(d_wf_ekb));
+                    // CHECK_CUDA(cudaFree(d_vkb_c))
                     CHECK_CUDA(cudaFree(d_precondition));
 				}
                 // comment this to debug.
@@ -219,11 +239,11 @@ void Hamilt::diagH_pw(
 				else
 				{
                     // to gpu
-                    CHECK_CUDA(cudaMalloc((void**)&d_wf_evc, GlobalV::NBANDS * DIM_CG_CUDA2 * sizeof(double2)));
-                    CHECK_CUDA(cudaMalloc((void**)&d_wf_ekb, GlobalV::NBANDS * sizeof(double)));
+                    // CHECK_CUDA(cudaMalloc((void**)&d_wf_evc, GlobalV::NBANDS * DIM_CG_CUDA2 * sizeof(double2)));
+                    // CHECK_CUDA(cudaMalloc((void**)&d_wf_ekb, GlobalV::NBANDS * sizeof(double)));
                     CHECK_CUDA(cudaMalloc((void**)&d_precondition, DIM_CG_CUDA2 * sizeof(double)));
 
-                    CHECK_CUDA(cudaMemcpy(d_wf_evc, GlobalC::wf.evc[ik0].c, GlobalV::NBANDS * DIM_CG_CUDA2 * sizeof(double2), cudaMemcpyHostToDevice));
+                    // CHECK_CUDA(cudaMemcpy(d_wf_evc, GlobalC::wf.evc[ik0].c, GlobalV::NBANDS * DIM_CG_CUDA2 * sizeof(double2), cudaMemcpyHostToDevice));
                     // CHECK_CUDA(cudaMemcpy(d_wf_ekb, GlobalC::wf.ekb[ik], GlobalV::NBANDS * sizeof(double), cudaMemcpyHostToDevice));
                     CHECK_CUDA(cudaMemcpy(d_precondition, precondition, DIM_CG_CUDA2 * sizeof(double), cudaMemcpyHostToDevice));
                     // do things
@@ -238,10 +258,14 @@ void Hamilt::diagH_pw(
                     CHECK_CUDA(cudaMemcpy(GlobalC::wf.evc[ik0].c, d_wf_evc, GlobalV::NBANDS * DIM_CG_CUDA2 * sizeof(double2), cudaMemcpyDeviceToHost));
                     CHECK_CUDA(cudaMemcpy(GlobalC::wf.ekb[ik], d_wf_ekb, GlobalV::NBANDS * sizeof(double), cudaMemcpyDeviceToHost));
 
-                    CHECK_CUDA(cudaFree(d_wf_evc));
-                    CHECK_CUDA(cudaFree(d_wf_ekb));
+                    // CHECK_CUDA(cudaFree(d_wf_evc));
+                    // CHECK_CUDA(cudaFree(d_wf_ekb));
                     CHECK_CUDA(cudaFree(d_precondition));
 				}
+
+                CHECK_CUDA(cudaFree(d_wf_evc));
+                CHECK_CUDA(cudaFree(d_wf_ekb));
+                CHECK_CUDA(cudaFree(d_vkb_c))
                 
 				// P.S. : nscf is the flag about reorder.
 				// if diagH_subspace is done once,
@@ -332,6 +356,31 @@ void Hamilt::diagH_subspace(
     return;
 }
 
+void Hamilt::diagH_subspace_cuda(
+    const int ik,
+    const int nstart,
+    const int n_band,
+    const double2* psi,
+    double2* evc,
+    double *en,
+    double2 *d_vkb_c)
+{
+	if(nstart < n_band)
+	{
+		ModuleBase::WARNING_QUIT("diagH_subspace_cuda","nstart < n_band!");
+	}
+
+    if(GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")
+    {
+        this->hpw.diagH_subspace_cuda(ik, nstart, n_band, psi, evc, en, d_vkb_c);
+    }
+    else
+    {
+		ModuleBase::WARNING_QUIT("diagH_subspace_cuda","Check parameters: GlobalV::BASIS_TYPE. ");
+    }
+    return;
+}
+
 
 
 //====================================================================
@@ -343,14 +392,22 @@ void Hamilt::diagH_subspace(
 void Hamilt::diagH_LAPACK(
 	const int nstart,
 	const int nbands,
-	const ModuleBase::ComplexMatrix &hc,
-	const ModuleBase::ComplexMatrix &sc,
+	const ModuleBase::ComplexMatrix &hc, // nstart * nstart
+	const ModuleBase::ComplexMatrix &sc, // nstart * nstart
 	const int ldh, // nstart
 	double *e,
-	ModuleBase::ComplexMatrix &hvec)
+	ModuleBase::ComplexMatrix &hvec)  // nstart * n_band
 {
     ModuleBase::TITLE("Hamilt","diagH_LAPACK");
 	ModuleBase::timer::tick("Hamilt","diagH_LAPACK");
+
+    // cout<<"in diagH_lapack"<<endl;
+    // cout<<nstart<<endl;
+    // cout<<nbands<<endl;
+    // cout<<"hc: "<<hc.nr<<" "<<hc.nc<<endl;
+    // cout<<"sc: "<<sc.nr<<" "<<sc.nc<<endl;
+    // cout<<ldh<<endl;
+    // cout<<"hvec: "<<hvec.nr<<" "<<hvec.nc<<endl;
 
     int lwork=0;
     //========================================
@@ -469,3 +526,135 @@ void Hamilt::diagH_LAPACK(
 	ModuleBase::timer::tick("Hamilt","diagH_LAPACK");
     return;
 }
+
+
+void Hamilt::diagH_CUSOLVER(
+	const int nstart,
+	const int nbands,
+	double2* hc,  // nstart * nstart
+	double2* sc,  // nstart * nstart
+	const int ldh, // nstart
+	double *e,
+	double2* hvec)  // nstart * n_band
+{
+    ModuleBase::TITLE("Hamilt","diagH_CUSOLVER");
+	ModuleBase::timer::tick("Hamilt","diagH_CUSOLVER");
+
+    // cout<<"diagh lapack cuda!!"<<endl;
+
+    // cout<<nstart<<" "<<nbands<<endl;
+
+    double2 *sdum;
+    double2 *hdum;
+    CHECK_CUDA(cudaMalloc((void**)&sdum, nstart*ldh*sizeof(double2)));
+    CHECK_CUDA(cudaMalloc((void**)&hdum, nstart*ldh*sizeof(double2)));
+
+    sdum = sc;
+    int *device_info;
+    int h_meig = 0;
+    CHECK_CUDA(cudaMalloc((void**)&device_info, sizeof(int)));
+    const bool all_eigenvalues = (nstart == nbands);
+
+    cusolverDnHandle_t cusolver_handle;
+    CHECK_CUSOLVER(cusolverDnCreate(&cusolver_handle));
+
+    if (all_eigenvalues)
+    {
+        // cout<<"all!"<<endl;
+        //===========================
+        // calculate all eigenvalues
+        //===========================
+        hvec = hc;
+        // use cusolver
+        int cusolver_lwork = 0;
+        CHECK_CUSOLVER(cusolverDnZhegvd_bufferSize(
+            cusolver_handle,
+            // TODO : handle
+            CUSOLVER_EIG_TYPE_1,
+            CUSOLVER_EIG_MODE_VECTOR,
+            CUBLAS_FILL_MODE_UPPER,
+            nstart,
+            hvec,
+            ldh,
+            sdum,
+            ldh,
+            e,
+            &cusolver_lwork));
+        // cout<<"work_space: "<<cusolver_lwork<<endl;
+        double2 *cusolver_work;
+        CHECK_CUDA(cudaMalloc((void**)&cusolver_work, cusolver_lwork*sizeof(double2)));
+        CHECK_CUSOLVER(cusolverDnZhegvd(
+            cusolver_handle,
+            CUSOLVER_EIG_TYPE_1,
+            CUSOLVER_EIG_MODE_VECTOR,
+            CUBLAS_FILL_MODE_UPPER,
+            nstart,
+            hvec,
+            ldh,
+            sdum,
+            ldh,
+            e,
+            cusolver_work,
+            cusolver_lwork,
+            device_info));
+        CHECK_CUDA(cudaFree(cusolver_work));
+        // CHECK_CUDA(cudaFree(device_info));
+    }
+    else
+    {
+        cout<<"not all"<<endl;
+        hdum = hc;
+        int cusolver_lwork = 0;
+        CHECK_CUSOLVER(cusolverDnZhegvdx_bufferSize(
+            cusolver_handle,
+            CUSOLVER_EIG_TYPE_1,
+            CUSOLVER_EIG_MODE_VECTOR,
+            CUSOLVER_EIG_RANGE_I,
+            CUBLAS_FILL_MODE_UPPER,
+            nstart,
+            hdum,
+            ldh,
+            sdum,
+            ldh,
+            0.0,
+            0.0,
+            1,
+            nbands,
+            &h_meig,
+            e,
+            &cusolver_lwork));
+        double2 *cusolver_work;
+        CHECK_CUDA(cudaMalloc((void**)&cusolver_work, cusolver_lwork*sizeof(double2)));
+        CHECK_CUSOLVER(cusolverDnZhegvdx(
+            cusolver_handle,
+            CUSOLVER_EIG_TYPE_1,
+            CUSOLVER_EIG_MODE_VECTOR,
+            CUSOLVER_EIG_RANGE_I,
+            CUBLAS_FILL_MODE_UPPER,
+            nstart,
+            hdum,
+            ldh,
+            sdum,
+            ldh,
+            0.0,
+            0.0,
+            1,
+            nbands,
+            &h_meig, // ?
+            e,
+            cusolver_work,
+            cusolver_lwork,
+            device_info
+        ));
+        CHECK_CUDA(cudaFree(cusolver_work));
+    }
+    cudaDeviceSynchronize();
+    // cout<<"end zhegv"<<endl;
+    CHECK_CUDA(cudaFree(device_info));
+    // CHECK_CUDA(cudaFree(cusolver_work));
+    CHECK_CUSOLVER(cusolverDnDestroy(cusolver_handle));
+
+	ModuleBase::timer::tick("Hamilt","diagH_CUSOLVER");
+    return;
+}
+

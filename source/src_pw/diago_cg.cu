@@ -86,22 +86,22 @@ template<class T, class T2>
 Diago_CG_CUDA<T, T2>::Diago_CG_CUDA()
 {
     test_cg=0;
-    cublasCreate(&diag_handle);
-    // cublasCreate(&ddot_handle);
+    CHECK_CUBLAS(cublasCreate(&diag_handle));
+    // CHECK_CUBLAS(cublasCreate(&ddot_handle));
 }
 
 template<class T, class T2>
 Diago_CG_CUDA<T, T2>::~Diago_CG_CUDA() 
 {
-    cublasDestroy(diag_handle);
-    // cublasDestroy(ddot_handle);
+    CHECK_CUBLAS(cublasDestroy(diag_handle));
+    // CHECK_CUBLAS(cublasDestroy(ddot_handle));
 }
 
 template<class T>
 void test_print(T *data, int size)
 {
     T *h_data = (T*)malloc(size * sizeof(T));
-    cudaMemcpy(h_data, data, size*sizeof(T), cudaMemcpyDeviceToHost);
+    CHECK_CUDA(cudaMemcpy(h_data, data, size*sizeof(T), cudaMemcpyDeviceToHost));
     cout<<sizeof(h_data[0])<<endl;
     for(int i=0;i<size;i++){
         cout<<h_data[i].x<<" "<<h_data[i].y<<endl;
@@ -226,7 +226,7 @@ void Diago_CG_CUDA<T, T2>::diag
             // cout<<"====hphi after update===="<<endl;
             // test_print<T2>(hphi, 15);
 
-            cudaMemcpy(&e[m], &em_host, sizeof(T), cudaMemcpyHostToDevice);
+            CHECK_CUDA(cudaMemcpy(&e[m], &em_host, sizeof(T), cudaMemcpyHostToDevice));
             if ( converged ) break;
         }//end iter
 
@@ -351,12 +351,12 @@ void Diago_CG_CUDA<T, T2>::orthogonal_gradient( const int &dim, const int &dmx,
     // cublasCreate(&handle);
     cublasOperation_t trans1 = CUBLAS_OP_C;
     // ONE ZERO cufftcomplex?
-    // cublasZgemv(handle, trans1, dim, m, ONE, eigenfunction, dmx, sg, inc, ZERO, lagrange, inc);
+    // CHECK_CUBLAS(cublasZgemv(handle, trans1, dim, m, ONE, eigenfunction, dmx, sg, inc, ZERO, lagrange, inc));
     float2 ONE, ZERO, NEG_ONE;
     ONE.y = ZERO.x = ZERO.y = 0.0;
     ONE.x = 1.0;
     NEG_ONE.x = -1.0;
-    cublasCgemv(diag_handle, trans1, dim, m, &ONE, eigenfunction, dmx, sg, inc, &ZERO, lagrange, inc);
+    CHECK_CUBLAS(cublasCgemv(diag_handle, trans1, dim, m, &ONE, eigenfunction, dmx, sg, inc, &ZERO, lagrange, inc));
     /*for (int i=0; i<m; i++)
     {
         lagrange[i] = ZERO;
@@ -370,8 +370,8 @@ void Diago_CG_CUDA<T, T2>::orthogonal_gradient( const int &dim, const int &dmx,
     // (3) orthogonal |g> and |Sg> to all states (0~m-1)
     cublasOperation_t trans2 = CUBLAS_OP_N;
 
-    cublasCgemv(diag_handle, trans2, dim, m, &NEG_ONE, eigenfunction, dmx, lagrange, inc, &ONE, g, inc);
-    cublasCgemv(diag_handle, trans2, dim, m, &NEG_ONE, eigenfunction, dmx, lagrange, inc, &ONE, sg, inc);
+    CHECK_CUBLAS(cublasCgemv(diag_handle, trans2, dim, m, &NEG_ONE, eigenfunction, dmx, lagrange, inc, &ONE, g, inc));
+    CHECK_CUBLAS(cublasCgemv(diag_handle, trans2, dim, m, &NEG_ONE, eigenfunction, dmx, lagrange, inc, &ONE, sg, inc));
 
     /*for (int i=0; i<m; i++)
     {
@@ -384,7 +384,7 @@ void Diago_CG_CUDA<T, T2>::orthogonal_gradient( const int &dim, const int &dmx,
     }*/
 
     ModuleBase::timer::tick("Diago_CG_CUDA","orth_grad");
-    // cublasDestroy(handle);
+    // CHECK_CUBLAS(cublasDestroy(handle));
     return;
 }
 
@@ -401,15 +401,15 @@ void Diago_CG_CUDA<T, T2>::orthogonal_gradient( const int &dim, const int &dmx,
     int inc=1;
 
     // cublasHandle_t handle;
-    // cublasCreate(&handle);
+    // CHECK_CUBLAS(cublasCreate(&handle));
     cublasOperation_t trans1 = CUBLAS_OP_C;
     // ONE ZERO cufftcomplex?
-    // cublasZgemv(handle, trans1, dim, m, ONE, eigenfunction, dmx, sg, inc, ZERO, lagrange, inc);
+    // CHECK_CUBLAS(cublasZgemv(handle, trans1, dim, m, ONE, eigenfunction, dmx, sg, inc, ZERO, lagrange, inc));
     double2 ONE, ZERO, NEG_ONE;
     ONE.y = ZERO.x = ZERO.y = 0.0;
     ONE.x = 1.0;
     NEG_ONE.x = -1.0;
-    cublasZgemv(diag_handle, trans1, dim, m, &ONE, eigenfunction, dmx, sg, inc, &ZERO, lagrange, inc);
+    CHECK_CUBLAS(cublasZgemv(diag_handle, trans1, dim, m, &ONE, eigenfunction, dmx, sg, inc, &ZERO, lagrange, inc));
     /*for (int i=0; i<m; i++)
     {
         lagrange[i] = ZERO;
@@ -423,8 +423,8 @@ void Diago_CG_CUDA<T, T2>::orthogonal_gradient( const int &dim, const int &dmx,
     // (3) orthogonal |g> and |Sg> to all states (0~m-1)
     cublasOperation_t trans2 = CUBLAS_OP_N;
 
-    cublasZgemv(diag_handle, trans2, dim, m, &NEG_ONE, eigenfunction, dmx, lagrange, inc, &ONE, g, inc);
-    cublasZgemv(diag_handle, trans2, dim, m, &NEG_ONE, eigenfunction, dmx, lagrange, inc, &ONE, sg, inc);
+    CHECK_CUBLAS(cublasZgemv(diag_handle, trans2, dim, m, &NEG_ONE, eigenfunction, dmx, lagrange, inc, &ONE, g, inc));
+    CHECK_CUBLAS(cublasZgemv(diag_handle, trans2, dim, m, &NEG_ONE, eigenfunction, dmx, lagrange, inc, &ONE, sg, inc));
 
     /*for (int i=0; i<m; i++)
     {
@@ -437,7 +437,7 @@ void Diago_CG_CUDA<T, T2>::orthogonal_gradient( const int &dim, const int &dmx,
     }*/
 
     ModuleBase::timer::tick("Diago_CG_CUDA","orth_grad");
-    // cublasDestroy(handle);
+    // CHECK_CUBLAS(cublasDestroy(handle));
     return;
 }
 
@@ -631,19 +631,19 @@ void Diago_CG_CUDA<T, T2>::schmit_orth
     int mp1 = m+1;
 
     // cublasHandle_t handle;
-    // cublasCreate(&handle);
+    // CHECK_CUBLAS(cublasCreate(&handle));
     cublasOperation_t trans1 = CUBLAS_OP_C;
 
     float2 ONE, ZERO, NEG_ONE;
     ONE.y = ZERO.x = ZERO.y = 0.0;
     ONE.x = 1.0;
     NEG_ONE.x = -1.0;
-    cublasCgemv(diag_handle, trans1, dim, mp1, &ONE, psi, dmx, sphi, inc, &ZERO, lagrange, inc);
+    CHECK_CUBLAS(cublasCgemv(diag_handle, trans1, dim, mp1, &ONE, psi, dmx, sphi, inc, &ZERO, lagrange, inc));
 
     float psi_norm;
     CHECK_CUDA(cudaMemcpy(&psi_norm, &lagrange[m], sizeof(float), cudaMemcpyDeviceToHost));
     cublasOperation_t trans2 = CUBLAS_OP_N;
-    cublasCgemv(diag_handle, trans2, dim, m, &NEG_ONE, psi, dmx, lagrange, inc, &ONE, psi_m, inc);
+    CHECK_CUBLAS(cublasCgemv(diag_handle, trans2, dim, m, &NEG_ONE, psi, dmx, lagrange, inc, &ONE, psi_m, inc));
 
     psi_norm -= ddot_real(m, lagrange, lagrange); //next
     psi_norm = sqrt(psi_norm);
@@ -654,7 +654,7 @@ void Diago_CG_CUDA<T, T2>::schmit_orth
 
     GlobalC::hm.hpw.s_1psi_cuda(dim, psi_m, sphi);
 
-    // cublasDestroy(handle);
+    // CHECK_CUBLAS(cublasDestroy(handle));
     ModuleBase::timer::tick("Diago_CG_CUDA","schmit_orth");
     CHECK_CUDA(cudaFree(lagrange));
     return ;
@@ -681,19 +681,19 @@ void Diago_CG_CUDA<T, T2>::schmit_orth
     int mp1 = m+1;
 
     // cublasHandle_t handle;
-    // cublasCreate(&handle);
+    // CHECK_CUBLAS(cublasCreate(&handle));
     cublasOperation_t trans1 = CUBLAS_OP_C;
 
     double2 ONE, ZERO, NEG_ONE;
     ONE.y = ZERO.x = ZERO.y = 0.0;
     ONE.x = 1.0;
     NEG_ONE.x = -1.0;
-    cublasZgemv(diag_handle, trans1, dim, mp1, &ONE, psi, dmx, sphi, inc, &ZERO, lagrange, inc);
+    CHECK_CUBLAS(cublasZgemv(diag_handle, trans1, dim, mp1, &ONE, psi, dmx, sphi, inc, &ZERO, lagrange, inc));
 
     double psi_norm;
     CHECK_CUDA(cudaMemcpy(&psi_norm, &lagrange[m], sizeof(double), cudaMemcpyDeviceToHost));
     cublasOperation_t trans2 = CUBLAS_OP_N;
-    cublasZgemv(diag_handle, trans2, dim, m, &NEG_ONE, psi, dmx, lagrange, inc, &ONE, psi_m, inc);
+    CHECK_CUBLAS(cublasZgemv(diag_handle, trans2, dim, m, &NEG_ONE, psi, dmx, lagrange, inc, &ONE, psi_m, inc));
 
     psi_norm -= ddot_real(m, lagrange, lagrange); //next
     psi_norm = sqrt(psi_norm);
@@ -704,7 +704,7 @@ void Diago_CG_CUDA<T, T2>::schmit_orth
 
     GlobalC::hm.hpw.s_1psi_cuda(dim, psi_m, sphi);
 
-    // cublasDestroy(handle);
+    // CHECK_CUBLAS(cublasDestroy(handle));
     ModuleBase::timer::tick("Diago_CG_CUDA","schmit_orth");
     CHECK_CUDA(cudaFree(lagrange));
     return ;
@@ -721,7 +721,7 @@ float Diago_CG_CUDA<T, T2>::ddot_real
 {
     int dim2=2*dim;
     float result;
-    cublasSdot(diag_handle, dim2, (float*)psi_L, 1, (float*)psi_R, 1, &result);
+    CHECK_CUBLAS(cublasSdot(diag_handle, dim2, (float*)psi_L, 1, (float*)psi_R, 1, &result));
     return result;
 }
 
@@ -736,7 +736,7 @@ double Diago_CG_CUDA<T, T2>::ddot_real
 {
     int dim2=2*dim;
     double result;
-    cublasDdot(diag_handle, dim2, (double*)psi_L, 1, (double*)psi_R, 1, &result);
+    CHECK_CUBLAS(cublasDdot(diag_handle, dim2, (double*)psi_L, 1, (double*)psi_R, 1, &result));
     return result;
 }
 
@@ -750,7 +750,7 @@ float2 Diago_CG_CUDA<T, T2>::ddot
 )
 {
     float2 result;
-    cublasCdotc(diag_handle, dim, psi_L, 1, psi_R, 1, &result);
+    CHECK_CUBLAS(cublasCdotc(diag_handle, dim, psi_L, 1, psi_R, 1, &result));
     return result;
 }  // end of ddot
 
@@ -763,7 +763,7 @@ double2 Diago_CG_CUDA<T, T2>::ddot
 )
 {
     double2 result;
-    cublasZdotc(diag_handle, dim, psi_L, 1, psi_R, 1, &result);
+    CHECK_CUBLAS(cublasZdotc(diag_handle, dim, psi_L, 1, psi_R, 1, &result));
     return result;
 }  // end of ddot
 
@@ -783,7 +783,7 @@ float2 Diago_CG_CUDA<T, T2>::ddot
     //     result += conj(psi(m, i)) *  psik[i] ;
     // }
     float2 result;
-    cublasCdotc(diag_handle, dim, &psi[m*dim], 1, psik, 1, &result);
+    CHECK_CUBLAS(cublasCdotc(diag_handle, dim, &psi[m*dim], 1, psik, 1, &result));
     return result;
 }  // end of ddot
 
@@ -802,7 +802,7 @@ double2 Diago_CG_CUDA<T, T2>::ddot
     //     result += conj(psi(m, i)) *  psik[i] ;
     // }
     double2 result;
-    cublasZdotc(diag_handle, dim, &psi[m*dim], 1, psik, 1, &result);
+    CHECK_CUBLAS(cublasZdotc(diag_handle, dim, &psi[m*dim], 1, psik, 1, &result));
     return result;
 }  // end of ddot
 
@@ -825,7 +825,7 @@ float2 Diago_CG_CUDA<T, T2>::ddot
     //     result += conj( psi_L(m,i) ) * psi_R(n,i) ;
     // }
     float2 result;
-    cublasCdotc(diag_handle, dim, &psi_L[m*dim], 1, &psi_R[n*dim], 1, &result);
+    CHECK_CUBLAS(cublasCdotc(diag_handle, dim, &psi_L[m*dim], 1, &psi_R[n*dim], 1, &result));
     return result;
 } // end of ddot
 
@@ -846,7 +846,7 @@ double2 Diago_CG_CUDA<T, T2>::ddot
     //     result += conj( psi_L(m,i) ) * psi_R(n,i) ;
     // }
     double2 result;
-    cublasZdotc(diag_handle, dim, &psi_L[m*dim], 1, &psi_R[n*dim], 1, &result);
+    CHECK_CUBLAS(cublasZdotc(diag_handle, dim, &psi_L[m*dim], 1, &psi_R[n*dim], 1, &result));
     return result;
 } // end of ddot
 

@@ -129,6 +129,23 @@ void RoundTrip_kernel(const double2 *psi, const double *vr, const int *fft_index
     int block2 = (GlobalC::pw.nrxx + thread - 1) / thread;
     kernel_set<double2><<<block, thread>>>(GlobalC::wf.npw, psic, psi, fft_index);
 
+    // cout<<"In fft"<<endl;
+    // double2 *hos_psi = (double2*)malloc(10*sizeof(double2));
+    // double2 *hos_psic = (double2*)malloc(10*sizeof(double2)); 
+    // CHECK_CUDA(cudaMemcpy(hos_psi, psi, 10*sizeof(double2), cudaMemcpyDeviceToHost));
+    // CHECK_CUDA(cudaMemcpy(hos_psic, psic, 10*sizeof(double2), cudaMemcpyDeviceToHost));
+    
+    // cout<<"hospsi"<<endl;
+    // for(int i=0;i<10;i++){
+    //     cout<<hos_psi[i].x<<" "<<hos_psi[i].y<<endl;
+    // }
+    // cout<<"hospsi-c"<<endl;
+    // for(int i=0;i<10;i++){
+    //     cout<<hos_psic[i].x<<" "<<hos_psic[i].y<<endl;
+    // }
+    // delete [] hos_psi;
+    // delete [] hos_psic;
+    
     // double2 *ordered_psi;
     // CHECK_CUDA(cudaMalloc((void**)&ordered_psi, GlobalC::pw.nrxx*sizeof(double2)));
     // CHECK_CUDA(cudaMemset(ordered_psi, 0, GlobalC::pw.nrxx*sizeof(double2)));
@@ -142,6 +159,14 @@ void RoundTrip_kernel(const double2 *psi, const double *vr, const int *fft_index
 
     // int block3 = (GlobalC::pw.nrxx + thread - 1) / thread;
     // kernel_normalization<<<block3, thread>>>(GlobalC::pw.nrxx, psic, (double)(GlobalC::pw.nrxx));
+
+    // double2 *hos_psic_aft = (double2*)malloc(10*sizeof(double2)); 
+    // CHECK_CUDA(cudaMemcpy(hos_psic_aft, psic, 10*sizeof(double2), cudaMemcpyDeviceToHost));
+    // cout<<"hospsi-c after fft"<<endl;
+    // for(int i=0;i<10;i++){
+    //     cout<<hos_psic_aft[i].x<<" "<<hos_psic_aft[i].y<<endl;
+    // }
+    // delete [] hos_psic_aft;
 
     kernel_roundtrip<double, double2><<<block2, thread>>>(GlobalC::pw.nrxx, psic, vr);
 

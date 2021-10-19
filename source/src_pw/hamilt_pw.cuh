@@ -6,6 +6,7 @@
 #ifdef __CUDA
 #include "cufft.h"
 #include "cublas_v2.h"
+#include "cusolverDn.h"
 #endif
 
 class Hamilt_PW
@@ -48,6 +49,15 @@ public:
                   const ModuleBase::ComplexMatrix &psi,
                   ModuleBase::ComplexMatrix &evc,
                   double *en);
+    
+    void diagH_subspace_cuda(
+        const int ik,
+        const int nstart,
+        const int n_band,
+        const double2 *psi_c, // matrix
+        double2 *evc, // matrix
+        double *en,
+        double2 *vkb_c);
 
     void h_1psi_cuda(
         const int npw,
