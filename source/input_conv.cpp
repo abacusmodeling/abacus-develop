@@ -98,6 +98,7 @@ void Input_Conv::Convert(void)
 	GlobalV::STRESS = INPUT.stress;
 
 
+
 	// pengfei Li add 2018-11-11
 	if(INPUT.fixed_axes == "None")
 	{
@@ -181,6 +182,7 @@ void Input_Conv::Convert(void)
 	GlobalV::NB2D = INPUT.nb2d;
 	GlobalV::NURSE = INPUT.nurse;
 	GlobalV::COLOUR = INPUT.colour;
+	GlobalC::pw.nbspline = INPUT.nbspline;
 	GlobalV::T_IN_H = INPUT.t_in_h;
 	GlobalV::VL_IN_H = INPUT.vl_in_h;
 	GlobalV::VNL_IN_H = INPUT.vnl_in_h;
@@ -319,11 +321,11 @@ void Input_Conv::Convert(void)
 			GlobalC::dftu.J = INPUT.hund_j;               //Hund exchange parameter J(ev)
 		}
 	}
+	/*
 #ifndef __CMD
-	GlobalC::ucell.input_mag=INPUT.input_mag;
 	GlobalC::ucell.n_mag_at=INPUT.n_mag_at;
 	GlobalC::ucell.atom_mag=INPUT.atom_mag;
-#endif
+#endif*/
 //--------------------------------------------
 // added by zhengdy-soc
 //--------------------------------------------
@@ -347,6 +349,7 @@ void Input_Conv::Convert(void)
 			GlobalV::DOMAG_Z = true;
 		}
 		GlobalV::LSPINORB = INPUT.lspinorb;
+		GlobalV::soc_lambda = INPUT.soc_lambda;
 
 		delete[] GlobalC::ucell.magnet.m_loc_;
 		delete[] GlobalC::ucell.magnet.angle1_;
@@ -627,4 +630,11 @@ void Input_Conv::Convert(void)
 
 	ModuleBase::timer::tick("Input_Conv","Convert");
     return;
+
+	//-----------------------------------------------
+	//caoyu add for DeePKS
+	//-----------------------------------------------
+	GlobalV::out_descriptor = INPUT.out_descriptor; 
+	GlobalV::deepks_scf = INPUT.deepks_scf;
+	
 }

@@ -176,22 +176,19 @@ void LOOP_ions::opt_ions(void)
 		}
         //caoyu add 2021-03-31
 #ifdef __DEEPKS
-        if (INPUT.out_descriptor)
+        if (GlobalV::out_descriptor)
         {
             //ld.init(ORB.get_lmax_d(), ORB.get_nchimax_d(), ucell.nat* ORB.Alpha[0].getTotal_nchi());
             //ld.build_S_descriptor(0);  //cal overlap, no need dm
             GlobalC::ld.cal_projected_DM(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);  //need dm
             GlobalC::ld.cal_descriptor();    //final descriptor
             GlobalC::ld.save_npy_d();            //libnpy needed
-            if (INPUT.deepks_scf)
+            if (GlobalV::deepks_scf)
             {
                 //ld.print_H_V_delta();   //final H_delta
-                if (FORCE)
-                {
-                    GlobalC::ld.build_S_descriptor(1);   //for F_delta calculation
-                    GlobalC::ld.cal_f_delta(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
-                    GlobalC::ld.print_F_delta();
-                }
+                GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma);
+                std::cout << "E_delta_band = " << std::setprecision(8) << GlobalC::ld.e_delta_band << " Ry" << " = " << std::setprecision(8) << GlobalC::ld.e_delta_band * ModuleBase::Ry_to_eV << " eV" << std::endl;
+                std::cout << "E_delta_NN= "<<std::setprecision(8) << GlobalC::ld.E_delta << " Ry" << " = "<<std::setprecision(8)<<GlobalC::ld.E_delta*ModuleBase::Ry_to_eV<<" eV"<<std::endl;
             }
         }
 #endif
@@ -470,7 +467,7 @@ void LOOP_ions::final_scf(void)
 		GlobalV::ofs_running,
 		GlobalV::OUT_LEVEL,
 		GlobalC::ORB.get_rcutmax_Phi(),
-		GlobalC::ORB.get_rcutmax_Beta(),
+		GlobalC::ucell.infoNL.get_rcutmax_Beta(),
 		GlobalV::GAMMA_ONLY_LOCAL);
 
     atom_arrange::search(

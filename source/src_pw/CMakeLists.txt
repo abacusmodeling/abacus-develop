@@ -23,6 +23,7 @@ list(APPEND objects
     potential_libxc.cpp
     potential_libxc_meta.cpp
     pw_basis.cpp
+    bspline_sf.cpp
     pw_complement.cpp
     soc.cpp
     sto_che.cpp

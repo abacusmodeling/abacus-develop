@@ -13,12 +13,49 @@ project(ABACUS
 
 option(ENABLE_DEEPKS "Enable DeePKS functionality" OFF)
 option(ENABLE_LIBXC "Enable LibXC functionality" OFF)
+<<<<<<< HEAD
 option(USE_CUDA "Enable support to CUDA." ON)
 
+=======
+option(USE_CUDA "Enable support to CUDA." OFF)
+option(USE_OPENMP " Enable OpenMP in abacus." ON)
+>>>>>>> afc908953c78e3b486fbe98a9e5085f3ad43a664
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 option(BUILD_TESTING "Build ABACUS unit tests" OFF)
 option(GENERATE_TEST_REPORTS "Enable test report generation" OFF)
 
+set(ABACUS_BIN_NAME abacus)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/modules)
+set(ABACUS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/source)
+set(ABACUS_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+set(ABACUS_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/${ABACUS_BIN_NAME})
+include_directories(${ABACUS_SOURCE_DIR})
+add_executable(${ABACUS_BIN_NAME} source/main.cpp)
+
+find_package(Cereal REQUIRED)
+include_directories(${Cereal_INCLUDE_DIR})
+add_compile_definitions(USE_CEREAL_SERIALIZATION)
+
+find_package(ELPA REQUIRED)
+include_directories(${ELPA_INCLUDE_DIR})
+target_link_libraries(${ABACUS_BIN_NAME} ELPA::ELPA)
+
+find_package(MPI REQUIRED)
+include_directories(${MPI_CXX_INCLUDE_PATH})
+target_link_libraries(${ABACUS_BIN_NAME} MPI::MPI_CXX)
+add_compile_definitions(__MPI)
+
+find_package(Threads REQUIRED)
+target_link_libraries(${ABACUS_BIN_NAME} Threads::Threads)
+
+if(USE_OPENMP)
+  find_package(OpenMP REQUIRED)
+  target_link_libraries(${ABACUS_BIN_NAME} OpenMP::OpenMP_CXX)
+  add_compile_options(${OpenMP_CXX_FLAGS})
+  add_compile_definitions(__OPENMP)
+endif()
+
+set(CMAKE_CXX_STANDARD 11)
 include(CheckLanguage)
 check_language(CUDA)
 if(CMAKE_CUDA_COMPILER)
@@ -44,14 +81,19 @@ if(USE_CUDA)
   set(CMAKE_CUDA_STANDARD_REQUIRED ON)
   set(CMAKE_CUDA_HOST_COMPILER ${CMAKE_CXX_COMPILER})
   enable_language(CUDA)
+  target_link_libraries(${ABACUS_BIN_NAME}
+    -lcufft
+    -lcublas
+    -lcudart
+  )
+  set_property(TARGET ${ABACUS_BIN_NAME}
+  PROPERTY CUDA_ARCHITECTURES
+  60 # P100
+  70 # V100
+  75 # T4
+  )
   include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
   add_compile_definitions(__CUDA)
-endif()
-
-if(ENABLE_DEEPKS)
-  set(CMAKE_CXX_STANDARD 14)
-else()
-  set(CMAKE_CXX_STANDARD 11)
 endif()
 
 if(ENABLE_ASAN)
@@ -70,40 +112,50 @@ else()
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-write-strings" )
 endif()
 
-set(ABACUS_BIN_NAME abacus)
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/modules)
-set(ABACUS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/source)
-set(ABACUS_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
-set(ABACUS_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/${ABACUS_BIN_NAME})
-
-include_directories(${ABACUS_SOURCE_DIR})
-
-find_package(Cereal REQUIRED)
-find_package(ELPA REQUIRED)
-find_package(MPI REQUIRED)
-find_package(Threads REQUIRED)
-find_package(OpenMP REQUIRED)
-
-include(FetchContent)
-
-include_directories(
-  ${Cereal_INCLUDE_DIRS}
-  ${MPI_CXX_INCLUDE_PATH}
-)
+if(DEFINED ENV{MKLROOT} AND NOT DEFINED MKLROOT)
+    set(MKLROOT "$ENV{MKLROOT}")
+endif()
+if(MKLROOT)
+  find_package(IntelMKL REQUIRED)
+  add_definitions(-D__MKL -DMKL_ILP64)
+  include_directories(${MKL_INCLUDE_DIRS} ${MKL_INCLUDE_DIRS}/fftw)
+  target_link_libraries(${ABACUS_BIN_NAME}
+    -lifcore
+    IntelMKL::MKL
+  )
+else()
+  find_package(FFTW3 REQUIRED)
+  find_package(LAPACK REQUIRED)
+  find_package(ScaLAPACK REQUIRED)
+  include_directories(${FFTW3_INCLUDE_DIRS})
+  target_link_libraries(${ABACUS_BIN_NAME}
+    FFTW3::FFTW3
+    LAPACK::LAPACK
+    ScaLAPACK::ScaLAPACK
+  )
+endif()
 
 if(ENABLE_DEEPKS)
+  set(CMAKE_CXX_STANDARD 14)
   find_package(Torch REQUIRED)
+  include_directories(${TORCH_INCLUDE_DIRS})
+  target_link_libraries(${ABACUS_BIN_NAME} ${TORCH_LIBRARIES})
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
-  FetchContent_Declare(
-    libnpy
-    GIT_REPOSITORY https://github.com.cnpmjs.org/llohse/libnpy.git
+
+  find_path(libnpy_SOURCE_DIR
+    npy.hpp
+    HINTS ${libnpy_INCLUDE_DIR}
   )
-  FetchContent_MakeAvailable(libnpy)
-  include_directories(
-    ${libnpy_SOURCE_DIR}
-    ${TORCH_INCLUDE_DIRS}
-  )
-  add_definitions(-D__DEEPKS)
+  if(NOT libnpy_SOURCE_DIR)
+  include(FetchContent)
+    FetchContent_Declare(
+      libnpy
+      GIT_REPOSITORY https://github.com.cnpmjs.org/llohse/libnpy.git
+    )
+    FetchContent_MakeAvailable(libnpy)
+  endif()
+  include_directories(${libnpy_SOURCE_DIR})
+  add_compile_definitions(__DEEPKS)
 endif()
 
 if(DEFINED Libxc_DIR)
@@ -114,35 +166,17 @@ if(ENABLE_LIBXC)
   if(${Libxc_FOUND})
     message("Using Libxc.")
     add_compile_definitions(USE_LIBXC)
-    # applying -DUSING_Libxc definition
-    # target_compile_definitions(${ABACUS_BIN_NAME} PRIVATE $<TARGET_PROPERTY:Libxc::xc,INTERFACE_COMPILE_DEFINITIONS>)
+    target_link_libraries(${ABACUS_BIN_NAME} Libxc::xc)
     include_directories(${Libxc_INCLUDE_DIRS})
   else()
     message(WARNING "Will not use Libxc.")
   endif()
 endif()
 
-if(DEFINED ENV{MKLROOT} AND NOT DEFINED MKLROOT)
-    set(MKLROOT "$ENV{MKLROOT}")
-endif()
-
-if(MKLROOT)
-  find_package(IntelMKL REQUIRED)
-  add_definitions(-D__MKL -DMKL_ILP64)
-  include_directories(${MKL_INCLUDE_DIRS} ${MKL_INCLUDE_DIRS}/fftw)
-else()
-  find_package(FFTW3 REQUIRED)
-  find_package(LAPACK REQUIRED)
-  find_package(ScaLAPACK REQUIRED)
-  include_directories(${FFTW3_INCLUDE_DIRS})
-endif()
-
 add_compile_definitions(
   __EXX
   __FFTW3
   __FP
-  __MPI
-  __OPENMP
   __SELINV
   __LCAO
   METIS
@@ -150,14 +184,9 @@ add_compile_definitions(
   EXX_H_COMM=2
   TEST_EXX_LCAO=0
   TEST_EXX_RADIAL=1
-  USE_CEREAL_SERIALIZATION
 )
 
 add_subdirectory(source)
-
-add_executable(${ABACUS_BIN_NAME}
-    source/main.cpp
-)
 
 target_link_libraries(${ABACUS_BIN_NAME}
     base
@@ -177,31 +206,12 @@ target_link_libraries(${ABACUS_BIN_NAME}
     ri
     driver
     -lm
-    ELPA::ELPA
-    MPI::MPI_CXX
-    OpenMP::OpenMP_CXX
-    Threads::Threads
 )
-
-if(MKLROOT)
-  target_link_libraries(${ABACUS_BIN_NAME}
-    -lifcore
-    IntelMKL::MKL
-    OpenMP::OpenMP_CXX
-  )
-else()
-  target_link_libraries(${ABACUS_BIN_NAME}
-    FFTW3::FFTW3
-    ScaLAPACK::ScaLAPACK
-    LAPACK::LAPACK
-    OpenMP::OpenMP_CXX
-  )
-endif()
-
-# if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+if(CMAKE_COMPILER_IS_GNUCXX)
 target_link_libraries(${ABACUS_BIN_NAME}
   -lgfortran
 )
+<<<<<<< HEAD
 # endif()
 
 if(ENABLE_DEEPKS)
@@ -227,6 +237,8 @@ endif()
 
 if(${Libxc_FOUND})
   target_link_libraries(${ABACUS_BIN_NAME} Libxc::xc)
+=======
+>>>>>>> afc908953c78e3b486fbe98a9e5085f3ad43a664
 endif()
 
 install(PROGRAMS ${ABACUS_BIN_PATH}

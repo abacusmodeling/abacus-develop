@@ -1,6 +1,6 @@
-Fe Ferromagnetic
+Fe Anti-ferromagnetic
 NSPIN 2
 pw
-init magnet: up + up
+init magnet: up + down
 SG15
 

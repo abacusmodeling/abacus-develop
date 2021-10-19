@@ -52,7 +52,11 @@ void Force_Stress_LCAO::getForceStress(
     ModuleBase::TITLE("Force_Stress_LCAO","getForceStress");
 	ModuleBase::timer::tick("Force_Stress_LCAO","getForceStress");
 	
-	if(!isforce&&!isstress) return;
+	if(!isforce&&!isstress)
+	{
+		ModuleBase::timer::tick("Force_Stress_LCAO","getForceStress");
+		return;
+	} 
 
 	const int nat = GlobalC::ucell.nat;
 
@@ -192,9 +196,11 @@ void Force_Stress_LCAO::getForceStress(
 	ModuleBase::matrix stress_dftu;
 	if (INPUT.dft_plus_u)
 	{
-		if(isforce)
-		{
-			force_dftu.create(nat, 3);
+		// Quxin add for DFT+U on 20201029
+		GlobalC::dftu.force_stress();
+		
+        if (isforce) {
+            force_dftu.create(nat, 3);
 		}
 		if(isstress)
 		{
@@ -256,16 +262,11 @@ void Force_Stress_LCAO::getForceStress(
 				{
 					fcs(iat, i) += fefield(iat, i);
 				}
-				//DFT plus U force
-				if(INPUT.dft_plus_u)
-				{
-					fcs(iat, i) += force_dftu(iat, i);
-				}
 #ifdef __DEEPKS
 				// mohan add 2021-08-04
-				if (INPUT.deepks_scf)
+				if (GlobalV::deepks_scf)
 				{
-					fcs(iat, i) += ld.F_delta(iat, i);
+					fcs(iat, i) += GlobalC::ld.F_delta(iat, i);
 				}
 #endif
 				//sum total force for correction
@@ -293,10 +294,21 @@ void Force_Stress_LCAO::getForceStress(
 
 #ifdef __DEEPKS
 		//DeePKS force, caoyu add 2021-06-03
-		if (INPUT.deepks_scf)
+		if (GlobalV::out_descriptor)
 		{
-			GlobalC::ld.save_npy_f(fcs);	//save fbase
-		}
+            GlobalC::ld.save_npy_f(fcs, "f_tot.npy"); //Ty/Bohr, F_tot
+            if (GlobalV::deepks_scf)
+            {
+                GlobalC::ld.save_npy_f(fcs - GlobalC::ld.F_delta, "f_base.npy"); //Ry/Bohr, F_base
+				GlobalC::ld.cal_gvx(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
+				GlobalC::ld.save_npy_gvx();//  /Bohr, grad_vx
+            }
+            else
+            {
+                GlobalC::ld.save_npy_f(fcs, "f_base.npy"); //no scf, F_base=F_tot
+            }
+
+        }
 #endif
 		// print Rydberg force or not
 		bool ry = false;
@@ -323,20 +335,20 @@ void Force_Stress_LCAO::getForceStress(
 			//regular force terms test.
 			//-----------------------------
 			//this->print_force("OVERLAP    FORCE",foverlap,1,ry);
-			f_pw.print("OVERLAP    FORCE", fcs,0);
+			f_pw.print("OVERLAP    FORCE", foverlap,0);
 			//  this->print_force("TVNL_DPHI  force",ftvnl_dphi,GlobalV::TEST_FORCE);
 			//  this->print_force("VNL_DBETA  force",fvnl_dbeta,GlobalV::TEST_FORCE);
 			//this->print_force("T_VNL      FORCE",ftvnl,1,ry);
-			f_pw.print("T_VNL      FORCE", fcs,0);
-			f_pw.print("VL_dPHI    FORCE", fcs,0);
+			f_pw.print("T_VNL      FORCE", ftvnl,0);
+			f_pw.print("VL_dPHI    FORCE", fvl_dphi,0);
 			//this->print_force("VL_dPHI    FORCE",fvl_dphi,1,ry);
 			//this->print_force("VL_dVL     FORCE",fvl_dvl,1,ry);
-			f_pw.print("VL_dVL     FORCE", fcs,0);
-			f_pw.print("EWALD      FORCE", fcs,0);
+			f_pw.print("VL_dVL     FORCE", fvl_dvl,0);
+			f_pw.print("EWALD      FORCE", fewalds,0);
 			// 	this->print_force("VLOCAL     FORCE",fvlocal,GlobalV::TEST_FORCE);
 			//this->print_force("EWALD      FORCE",fewalds,1,ry);
-			f_pw.print("NLCC       FORCE", fcs,0);
-			f_pw.print("SCC        FORCE", fcs,0);
+			f_pw.print("NLCC       FORCE", fcc,0);
+			f_pw.print("SCC        FORCE", fscc,0);
 			//this->print_force("NLCC       FORCE",fcc,1,ry);
 			//this->print_force("SCC        FORCE",fscc,1,ry);
 			//-------------------------------
@@ -344,17 +356,17 @@ void Force_Stress_LCAO::getForceStress(
 			//-------------------------------
 			if(GlobalV::EFIELD)
 			{
-				f_pw.print("EFIELD     FORCE", fcs,0);
+				f_pw.print("EFIELD     FORCE", fefield,0);
 				//this->print_force("EFIELD     FORCE",fefield,1,ry);
 			}
 			if(GlobalC::vdwd2_para.flag_vdwd2||GlobalC::vdwd3_para.flag_vdwd3)
 			{
-				f_pw.print("VDW        FORCE", fcs,0);
+				f_pw.print("VDW        FORCE", force_vdw,0);
 				//this->print_force("VDW        FORCE",force_vdw,1,ry);
 			}
 #ifdef __DEEPKS
 			//caoyu add 2021-06-03
-			if (INPUT.deepks_scf)
+			if (GlobalV::deepks_scf)
 			{
 				this->print_force("DeePKS 	FORCE", GlobalC::ld.F_delta, 1, ry);
 			}
@@ -490,7 +502,7 @@ void Force_Stress_LCAO::getForceStress(
 		GlobalV::PRESSURE = (scs(0,0)+scs(1,1)+scs(2,2))/3;
 	}//end of stress calculation
 	
-	ModuleBase::timer::tick("Force_LCAO","start_force");
+	ModuleBase::timer::tick("Force_Stress_LCAO","getForceStress");
 	return;
 }
 

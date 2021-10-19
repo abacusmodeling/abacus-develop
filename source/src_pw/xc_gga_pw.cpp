@@ -24,7 +24,8 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 	if(GlobalV::NSPIN==4&&(GlobalV::DOMAG||GlobalV::DOMAG_Z)) nspin0 = 2;
 	if(GlobalV::NSPIN==4)
 	{
-		if(GlobalC::xcf.igcx != 0  ||  GlobalC::xcf.igcc != 0) GlobalC::ucell.magnet.cal_ux(GlobalC::ucell.ntype);
+		//if(GlobalC::xcf.igcx != 0  ||  GlobalC::xcf.igcc != 0) GlobalC::ucell.magnet.cal_ux(GlobalC::ucell.ntype);
+		if(GlobalC::xcf.igcx != 0  ||  GlobalC::xcf.igcc != 0) GlobalC::ucell.cal_ux();
 	}
 
 	assert(nspin0>0);

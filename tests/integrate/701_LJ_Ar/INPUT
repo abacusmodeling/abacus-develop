@@ -4,6 +4,7 @@ suffix          autotest
 ntype			1	
 calculation     md
 basis_type      pw
+read_file_dir   ./
 nstep           1
 
 md_potential    LJ
@@ -16,3 +17,4 @@ force           1
 md_mdtype       1
 md_dt           10
 md_tfirst       120
+md_rstmd        1

@@ -334,7 +334,7 @@ void energy::perform_dos(void)
 					GlobalV::ofs_running,
 					GlobalV::OUT_LEVEL,
 					GlobalC::ORB.get_rcutmax_Phi(), 
-					GlobalC::ORB.get_rcutmax_Beta(), 
+					GlobalC::ucell.infoNL.get_rcutmax_Beta(), 
 					GlobalV::GAMMA_ONLY_LOCAL);
 
 				atom_arrange::search(
@@ -346,27 +346,42 @@ void energy::perform_dos(void)
 					GlobalV::test_atom_input);//qifeng-2019-01-21
 
 				// mohan update 2021-04-16
+				GlobalC::LOWF.orb_con.read_orb_first(
+					GlobalV::ofs_running,
+					GlobalC::ORB,
+					GlobalC::ucell.ntype,
+					GlobalC::ucell.lmax,
+					INPUT.lcao_ecut,
+					INPUT.lcao_dk,
+					INPUT.lcao_dr,
+					INPUT.lcao_rmax,
+					GlobalV::out_descriptor,
+					INPUT.out_r_matrix,
+					GlobalV::FORCE,
+					GlobalV::MY_RANK);
+					
+				GlobalC::ucell.infoNL.setupNonlocal(
+					GlobalC::ucell.ntype,
+					GlobalC::ucell.atoms,
+					GlobalV::ofs_running,
+					GlobalC::ORB
+				);
+
 				GlobalC::LOWF.orb_con.set_orb_tables(
-						GlobalV::ofs_running,
-						GlobalC::UOT, 
-						GlobalC::ORB,
-						GlobalC::ucell.ntype,
-						GlobalC::ucell.lmax,
-						INPUT.lcao_ecut,
-						INPUT.lcao_dk,
-						INPUT.lcao_dr,
-						INPUT.lcao_rmax, 
-						GlobalC::ucell.lat0, 
-						INPUT.out_descriptor,
-						INPUT.out_r_matrix,
-						Exx_Abfs::Lmax,
-						GlobalV::FORCE,
-						GlobalV::MY_RANK);
+					GlobalV::ofs_running,
+					GlobalC::UOT,
+					GlobalC::ORB,
+					GlobalC::ucell.lat0,
+					GlobalV::out_descriptor,
+					Exx_Abfs::Lmax,
+					GlobalC::ucell.infoNL.nprojmax,
+					GlobalC::ucell.infoNL.nproj,
+					GlobalC::ucell.infoNL.Beta);
 
 				GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
 				GlobalC::LM.zeros_HSR('S', GlobalC::LNNR.nnr);
 				GlobalC::UHM.genH.calculate_S_no();
-				GlobalC::UHM.genH.build_ST_new('S', false);
+				GlobalC::UHM.genH.build_ST_new('S', false, GlobalC::ucell);
 				std::vector<ModuleBase::ComplexMatrix> Mulk;
 				Mulk.resize(1);
 				Mulk[0].create(GlobalC::ParaO.ncol,GlobalC::ParaO.nrow);
@@ -450,7 +465,7 @@ void energy::perform_dos(void)
 					GlobalV::test_atom_input);
 #endif
 				// mohan update 2021-02-10
-				GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, INPUT.out_descriptor);
+				GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
 			}//else
 
 		 MPI_Reduce(pdosk[is].c, pdos[is].c , NUM , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);
@@ -676,7 +691,7 @@ void energy::perform_dos(void)
 		 //----------------------------------------------------------
 
 		 //double b = INPUT.b_coef;
-		 double b = bcoeff;
+		 double b = sqrt(2.0)*bcoeff;
 		 for(int i=0;i<number;i++)
 		 {
 			 double Gauss=0.0;

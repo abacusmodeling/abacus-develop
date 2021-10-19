@@ -160,6 +160,7 @@ class Input
 	int nb2d;				// matrix 2d division.
 
 	int nurse;				// used for debug.
+	int nbspline;           // the order of B-spline basis(>=0) if it is -1 (default), B-spline for Sturcture Factor isnot used.
 
 	bool colour;			// used for fun.
 
@@ -349,7 +350,6 @@ class Input
 	//double  ocp_kb[10000];
 	int     lcao_box[3];           // the scale for searching the existence of the overlap <i,0|j,R>
 	int    mulliken;//qifeng add 2019-9-10
-	bool input_mag;
 	double* atom_mag;
 	int n_mag_at;
 	//added by zhengdy-soc

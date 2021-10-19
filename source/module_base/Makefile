@@ -5,8 +5,8 @@
 #==========================
 CPLUSPLUS     = mpiicpc
 CPLUSPLUS_MPI = mpiicpc 
-FFTW_DIR = /home/lrx/ABACUS/fftw3.3.9/fftw
-LAPACK_DIR = /opt/intel/compilers_and_libraries_2017.8.262/linux/mkl
+FFTW_DIR = ${MKLROOT}/include/fftw
+LAPACK_DIR = ${MKLROOT}
 HONG_LAPACK        = -D__MKL -DMKL_ILP64
 LAPACK_INCLUDE_DIR = ${LAPACK_DIR}/include
 LAPACK_LIB_DIR     = ${LAPACK_DIR}/lib/intel64
@@ -17,16 +17,16 @@ NP      = 4
 #==========================
 # LIBS and INCLUDES
 #==========================
-LIBS = -lifcore -lm -lpthread -lfftw3 -L${FFTW_DIR}/lib ${LAPACK_LIB}
+LIBS = -lifcore -lm -lpthread ${LAPACK_LIB}
 
 #==========================
 # OPTIMIZE OPTIONS
 #==========================
-INCLUDES = -I. -Icommands -I${FFTW_DIR}/include -I${LAPACK_INCLUDE_DIR}
+INCLUDES = -I. -Icommands -I${FFTW_DIR} -I${LAPACK_INCLUDE_DIR}
 
 # -pedantic turns off more extensions and generates more warnings
 # -xHost generates instructions for the highest instruction set available on the compilation host processor
-OPTS = ${INCLUDES} -Ofast -std=c++11 -simd -march=native -xHost -m64 -qopenmp -Werror -Wall -pedantic -g
+OPTS = ${INCLUDES} -Ofast -std=c++11 -simd -march=native -m64 -qopenmp -Werror -Wall -pedantic -g
 
 include Makefile.Objects
 
@@ -66,3 +66,4 @@ ${OBJ_DIR}/%.o:%.cpp
 .PHONY:clean
 clean:
 	@ if [ -d $(OBJ_DIR) ]; then rm -rf $(OBJ_DIR); fi
+	@ if [ -e ${VERSION}.x ]; then rm -f ${VERSION}.x; fi

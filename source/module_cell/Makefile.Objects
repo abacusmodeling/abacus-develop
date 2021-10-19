@@ -5,8 +5,6 @@
 VERSION= ABACUS-cell
 HEADERS= *.h
 
-OBJS_MAIN=input.o\
-
 OBJS_IO=output.o\
 
 OBJS_PW=magnetism.o\
@@ -39,3 +37,4 @@ unitcell.o\
 unitcell_pseudo.o\
 read_atoms.o\
 read_cell_pseudopots.o\
+setup_nonlocal.o\

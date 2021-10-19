@@ -107,10 +107,18 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-
 	
 #ifdef __DEEPKS	//caoyu add 2021-07-26 for DeePKS
 
-	if (INPUT.deepks_scf)
-	{
-		ld.cal_v_delta(LOC.wfc_dm_2d.dm_gamma[0]);
-		ld.add_v_delta();
+	if (GlobalV::deepks_scf)
+    {
+        //========method 1========
+        //ld.cal_v_delta(LOC.wfc_dm_2d.dm_gamma[0]);
+
+        //========method 2========
+        //ld.cal_gedm(LOC.wfc_dm_2d.dm_gamma[0]);
+        //ld.build_v_delta_alpha(0);
+        GlobalC::ld.cal_gedm(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
+        GlobalC::ld.build_v_delta_mu(0);
+        
+        GlobalC::ld.add_v_delta();
 	}
 	
 #endif
@@ -440,8 +448,8 @@ void LCAO_Hamilt::calculate_STN_R(void)
                         double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
                         double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
 
-                        double rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
-                        double rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
+                        double rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max();
+                        double rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max();
 
                         if( distance1 < rcut1 && distance2 < rcut2 )
                         {
@@ -566,8 +574,8 @@ void LCAO_Hamilt::calculate_STN_R_sparse(const double &sparse_threshold)
                         double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
                         double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
 
-                        double rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
-                        double rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
+                        double rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max();
+                        double rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max();
 
                         if( distance1 < rcut1 && distance2 < rcut2 )
                         {
