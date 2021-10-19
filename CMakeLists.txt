@@ -13,13 +13,8 @@ project(ABACUS
 
 option(ENABLE_DEEPKS "Enable DeePKS functionality" OFF)
 option(ENABLE_LIBXC "Enable LibXC functionality" OFF)
-<<<<<<< HEAD
 option(USE_CUDA "Enable support to CUDA." ON)
-
-=======
-option(USE_CUDA "Enable support to CUDA." OFF)
 option(USE_OPENMP " Enable OpenMP in abacus." ON)
->>>>>>> afc908953c78e3b486fbe98a9e5085f3ad43a664
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 option(BUILD_TESTING "Build ABACUS unit tests" OFF)
 option(GENERATE_TEST_REPORTS "Enable test report generation" OFF)
@@ -51,7 +46,7 @@ target_link_libraries(${ABACUS_BIN_NAME} Threads::Threads)
 if(USE_OPENMP)
   find_package(OpenMP REQUIRED)
   target_link_libraries(${ABACUS_BIN_NAME} OpenMP::OpenMP_CXX)
-  add_compile_options(${OpenMP_CXX_FLAGS})
+  # add_compile_options(${OpenMP_CXX_FLAGS})
   add_compile_definitions(__OPENMP)
 endif()
 
@@ -85,6 +80,7 @@ if(USE_CUDA)
     -lcufft
     -lcublas
     -lcudart
+    -lcusolver
   )
   set_property(TARGET ${ABACUS_BIN_NAME}
   PROPERTY CUDA_ARCHITECTURES
@@ -211,34 +207,6 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 target_link_libraries(${ABACUS_BIN_NAME}
   -lgfortran
 )
-<<<<<<< HEAD
-# endif()
-
-if(ENABLE_DEEPKS)
-  target_link_libraries(${ABACUS_BIN_NAME}
-    ${TORCH_LIBRARIES}
-  )
-endif()
-
-if(USE_CUDA)
-  target_link_libraries(${ABACUS_BIN_NAME}
-    -lcufft
-    -lcublas
-    -lcudart
-    -lcusolver
-  )
-  set_property(TARGET ${ABACUS_BIN_NAME}
-  PROPERTY CUDA_ARCHITECTURES
-  60 # P100
-  70 # V100
-  75 # T4
-  )
-endif()
-
-if(${Libxc_FOUND})
-  target_link_libraries(${ABACUS_BIN_NAME} Libxc::xc)
-=======
->>>>>>> afc908953c78e3b486fbe98a9e5085f3ad43a664
 endif()
 
 install(PROGRAMS ${ABACUS_BIN_PATH}
