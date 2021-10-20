@@ -13,6 +13,7 @@
 #include <torch/script.h>
 #include <torch/csrc/autograd/autograd.h>
 #include <npy.hpp>
+#include <torch/csrc/api/include/torch/linalg.h>
 
 namespace GlobalC
 {
@@ -1351,7 +1352,8 @@ void LCAO_Descriptor::cal_descriptor_tensor(void)
     {
         torch::Tensor vd;
         std::tuple<torch::Tensor, torch::Tensor> d_v(this->d_tensor[inl], vd);
-        d_v = torch::symeig(pdm_tensor[inl], /*eigenvalues=*/true, /*upper=*/true);
+        //d_v = torch::symeig(pdm_tensor[inl], /*eigenvalues=*/true, /*upper=*/true);
+        d_v = torch::linalg::eigh(pdm_tensor[inl], /*uplo*/"U");
         d_tensor[inl] = std::get<0>(d_v);
     }
     return;
@@ -1382,7 +1384,7 @@ void LCAO_Descriptor::cal_gedm(const ModuleBase::matrix &dm)
     //-----prepare for autograd---------
     this->cal_projected_DM(dm);
     this->cal_descriptor();
-    this->cal_descriptor_tensor();  //use torch::symeig
+    this->cal_descriptor_tensor();  //use torch::linalg::eigh
     //-----prepared-----------------------
     //forward
     std::vector<torch::jit::IValue> inputs;
@@ -1395,7 +1397,7 @@ void LCAO_Descriptor::cal_gedm(const ModuleBase::matrix &dm)
     //cal gedm
     std::vector<torch::Tensor> gedm_shell;
     gedm_shell.push_back(torch::ones_like(ec[0]));
-    this->gedm_tensor = torch::autograd::grad(ec, this->pdm_tensor, gedm_shell, /*retain_grad=*/true);
+    this->gedm_tensor = torch::autograd::grad(ec, this->pdm_tensor, gedm_shell, /*retain_grad=*/true, /*create_graph=*/false, /*allow_unused=*/true);
 
     //gedm_tensor(Hartree) to gedm(Ry)
     for (int inl = 0;inl < inlmax;++inl)
@@ -1428,7 +1430,8 @@ void LCAO_Descriptor::cal_gvdm()
             int nm = 2*this->inl_l[inl]+1;
             //repeat each block for nm times in an additional dimension
             torch::Tensor tmp_x = this->pdm_tensor[inl].reshape({nm, nm}).unsqueeze(0).repeat({nm, 1, 1});
-            torch::Tensor tmp_y = std::get<0>(torch::symeig(tmp_x, true));
+            //torch::Tensor tmp_y = std::get<0>(torch::symeig(tmp_x, true));
+            torch::Tensor tmp_y = std::get<0>(torch::linalg::eigh(tmp_x, "U"));
             torch::Tensor tmp_yshell = torch::eye(nm, torch::TensorOptions().dtype(torch::kFloat64));
             std::vector<torch::Tensor> tmp_rpt;     //repeated-pdm-tensor (x)
             std::vector<torch::Tensor> tmp_rdt; //repeated-d-tensor (y)

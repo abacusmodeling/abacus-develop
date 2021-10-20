@@ -182,7 +182,7 @@ private:
     //gvx:d(d)/dX, [natom][3][natom][des_per_atom]
     torch::Tensor gvx_tensor;
 
-    //d(d)/dD, autograd from torch::symeig
+    //d(d)/dD, autograd from torch::linalg::eigh
     std::vector<torch::Tensor> gevdm_vector;
 
     //dD/dX, tensor form of gdmx
