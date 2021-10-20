@@ -97,6 +97,9 @@ void Input::Print(const std::string &fn)const
 	// for deepks
 	ModuleBase::GlobalFunc::OUTP(ofs,"out_descriptor",out_descriptor,">0 compute descriptor for deepks");
 	ModuleBase::GlobalFunc::OUTP(ofs,"lmax_descriptor",lmax_descriptor,">0 lmax used in descriptor for deepks");
+	ModuleBase::GlobalFunc::OUTP(ofs,"deepks_scf",deepks_scf,">0 load a model and mix int in SCF");
+	ModuleBase::GlobalFunc::OUTP(ofs,"deepks_scf",model_file,"file dir of traced pytorch model: 'model.ptg");
+
 
 	ofs << "\n#Parameters (4.LCAO)" << std::endl;
 	ModuleBase::GlobalFunc::OUTP(ofs,"basis_type",basis_type,"PW; LCAO in pw; LCAO");
