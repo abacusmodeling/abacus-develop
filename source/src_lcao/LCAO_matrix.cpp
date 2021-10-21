@@ -1,5 +1,8 @@
 #include "LCAO_matrix.h"
 #include "global_fp.h"
+#ifdef __DEEPKS
+#include "../src_parallel/parallel_deepks.h"
+#endif
 
 LCAO_Matrix::LCAO_Matrix()
 {
@@ -61,6 +64,13 @@ void LCAO_Matrix::divide_HS_in_frag(const bool isGamma, Parallel_Orbitals &po)
 	// for 2d: calculate po.nloc first, then trace_loc_row and trace_loc_col
 	// for O(N): calculate the three together.
 	po.set_trace();
+#ifdef __DEEPKS
+	if(GlobalV::out_descriptor)
+	{
+		GlobalC::ParaD.set_nlocal(MPI_COMM_WORLD);
+		GlobalC::ParaD.set_loc_orb(MPI_COMM_WORLD);
+	}
+#endif
 
 	// (3) allocate for S, H_fixed, H, and S_diag
 	if(isGamma)

@@ -7,7 +7,9 @@
 #include "../module_base/complexmatrix.h"
 #include <torch/script.h>
 #include "../src_pw/global.h"
-
+#ifdef __MPI
+#include "../src_parallel/parallel_deepks.h"
+#endif
 ///
 /// This class computes the descriptors for each atom from LCAO basis set,
 /// interfaces with pytorch to obtain the correction potential in LCAO basis,

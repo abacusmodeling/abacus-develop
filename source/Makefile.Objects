@@ -225,6 +225,7 @@ parallel_reduce.o\
 parallel_pw.o\
 ft.o\
 parallel_grid.o\
+parallel_deepks.o \
 
 OBJS_FIRST_PRINCIPLES=$(OBJS_MAIN)\
 $(OBJS_PW)\

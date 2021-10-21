@@ -200,6 +200,12 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "build_S_descriptor");
     //array to store data
+
+    if (!GlobalV::GAMMA_ONLY_LOCAL)
+    {
+        ModuleBase::WARNING_QUIT("LCAO_Descriptor::build_S_descriptor", "muti-kpoint method for descriptor is not implemented yet! ");
+    }
+
     double olm[3] = {0.0, 0.0, 0.0};
 
     //\sum{T} e**{ikT} <\phi_{ia}|d\phi_{k\beta}(T)>	//???
@@ -234,47 +240,66 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
                         const int N1 = atom1->iw2n[jj0];
                         const int m1 = atom1->iw2m[jj0];
 
-                        for (int L2 = 0; L2 <= GlobalC::ORB.Alpha[0].getLmax(); ++L2)
+                        int iw1_local=GlobalC::ParaD.trace_loc_orb[iw1_all];
+                        if(iw1_local<0)
                         {
-                            for (int N2 = 0; N2 < GlobalC::ORB.Alpha[0].getNchi(L2); ++N2)
+                            ++iw1_all;
+                        }
+                        else
+                        {
+                            for (int L2 = 0; L2 <= GlobalC::ORB.Alpha[0].getLmax(); ++L2)
                             {
-                                for (int m2 = 0; m2 < 2 * L2 + 1; ++m2)
+                                for (int N2 = 0; N2 < GlobalC::ORB.Alpha[0].getNchi(L2); ++N2)
                                 {
-                                    olm[0] = olm[1] = olm[2] = 0.0;
-                                    if (!calc_deri)
+                                    for (int m2 = 0; m2 < 2 * L2 + 1; ++m2)
                                     {
-                                        GlobalC::UOT.snap_psipsi(GlobalC::ORB, olm, 0, 'D', tau1,
+                                        olm[0] = olm[1] = olm[2] = 0.0;
+                                        if (!calc_deri)
+                                        {
+                                            GlobalC::UOT.snap_psipsi(GlobalC::ORB, olm, 0, 'D', tau1,
+                                                    T1, L1, m1, N1, GlobalC::GridD.getAdjacentTau(ad),
+                                                    T2, L2, m2, N2, GlobalV::NSPIN);
+                                            if (GlobalV::GAMMA_ONLY_LOCAL)
+                                            {
+                                                this->set_S_mu_alpha(iw1_all, inl_index[T2](I2,L2,N2), m2, olm[0]);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            GlobalC::UOT.snap_psipsi(GlobalC::ORB, olm, 1, 'D', tau1,
                                                 T1, L1, m1, N1, GlobalC::GridD.getAdjacentTau(ad),
                                                 T2, L2, m2, N2, GlobalV::NSPIN);
-                                        if (GlobalV::GAMMA_ONLY_LOCAL)
-                                        {
-                                            this->set_S_mu_alpha(iw1_all, inl_index[T2](I2,L2,N2), m2, olm[0]);
+                                            if (GlobalV::GAMMA_ONLY_LOCAL)
+                                            {
+                                                this->set_DS_mu_alpha(iw1_all, inl_index[T2](I2,L2,N2), m2, olm[0], olm[1], olm[2]);
+                                            }
                                         }
-                                    }
-                                    else
-                                    {
-                                        GlobalC::UOT.snap_psipsi(GlobalC::ORB, olm, 1, 'D', tau1,
-                                            T1, L1, m1, N1, GlobalC::GridD.getAdjacentTau(ad),
-                                            T2, L2, m2, N2, GlobalV::NSPIN);
-                                        if (GlobalV::GAMMA_ONLY_LOCAL)
-                                        {
-                                            this->set_DS_mu_alpha(iw1_all, inl_index[T2](I2,L2,N2), m2, olm[0], olm[1], olm[2]);
-                                        }
-                                    }
 
-                                } //m2
-                            }     //N2
-                        }         //nw2(L2)
-                        ++iw1_all;
+                                    } //m2
+                                }     //N2
+                            }         //nw2(L2)
+                            ++iw1_all;
+                        }
                     } // nw1
                 }     // distance
             }         // ad
         } // I1
     }     // T1
-    if (!GlobalV::GAMMA_ONLY_LOCAL)
+
+#ifdef __MPI
+    GlobalC::ParaD.allsum_S_mu_alpha(this->inlmax,GlobalV::NLOCAL*(2*this->lmaxd+1),this->S_mu_alpha);
+#endif
+
+    /*
+    for(int inl=0;inl<this->inlmax;inl++)
     {
-        ModuleBase::WARNING_QUIT("LCAO_Descriptor::build_S_descriptor", "muti-kpoint method for descriptor is not implemented yet! ");
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"inl:",inl);
+        for(int j=0;j<GlobalV::NLOCAL*(2*this->lmaxd+1);j++)
+        {
+            GlobalV::ofs_running << "j,s_mu_alpha: " << j << " " << this->S_mu_alpha[inl][j] << std::endl;
+        }
     }
+    */
     return;
 }
 
