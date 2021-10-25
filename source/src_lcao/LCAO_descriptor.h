@@ -74,6 +74,7 @@ public:
     
     ///calculate \f$\sum_{I}\sum_{nlmm'}\langle\phi_\mu|\alpha^I_{nlm}\rangle{\frac{dE}{dD^I_{nlmm'}}}\langle\alpha^I_{nlm'}|\phi_\nu\rangle\f$ (for gamma_only)
     void build_v_delta_alpha(const bool& cal_deri/**< [in] 0 for 3-center intergration, 1 for its derivation*/);
+    void build_v_delta_alpha_new(const bool& cal_deri/**< [in] 0 for 3-center intergration, 1 for its derivation*/);
     
     ///calculate \f$\sum_{I}\sum_{nlmm'}\langle\phi_\mu|\alpha^I_{nlm}\rangle{\frac{dE}{dD^I_{nlmm'}}}\langle\alpha^I_{nlm'}|\phi_\nu\rangle\f$ (for multi-k)
     void build_v_delta_mu(const bool &cal_deri/**< [in] 0 for 3-center intergration, 1 for its derivation*/);
