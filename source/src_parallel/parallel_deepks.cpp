@@ -115,14 +115,14 @@ void Parallel_deepks::set_loc_orb
 #endif
 }
 
-void Parallel_deepks::allsum_S_mu_alpha(
-	int inlmax, //first dimension of S_mu_alpha
-	int ndim, //secohd dimension of S_mu_alpha
-	double** S_mu_alpha)
+void Parallel_deepks::allsum_deepks(
+	int inlmax, //first dimension
+	int ndim, //second dimension
+	double** mat)
 {
     for(int inl=0;inl<inlmax;inl++)
     {
-        Parallel_Reduce::reduce_double_all(S_mu_alpha[inl],ndim);
+        Parallel_Reduce::reduce_double_all(mat[inl],ndim);
     }
 }
 #endif

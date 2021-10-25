@@ -39,12 +39,12 @@ class Parallel_deepks
 #endif
 	);
 
-	//collect S_mu_alpha from all ranks
-	void allsum_S_mu_alpha(
+	//collect a double layer double pointer from all ranks
+	//used for S_mu_alpha and pdm
+	void allsum_deepks(
 		int inlmax, //first dimension of S_mu_alpha
 		int ndim, //secohd dimension of S_mu_alpha
-		double** S_mu_alpha);
-
+		double** mat);
 };
 
 namespace GlobalC

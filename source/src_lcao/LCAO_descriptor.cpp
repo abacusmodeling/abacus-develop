@@ -287,7 +287,7 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
     }     // T1
 
 #ifdef __MPI
-    GlobalC::ParaD.allsum_S_mu_alpha(this->inlmax,GlobalV::NLOCAL*(2*this->lmaxd+1),this->S_mu_alpha);
+    GlobalC::ParaD.allsum_deepks(this->inlmax,GlobalV::NLOCAL*(2*this->lmaxd+1),this->S_mu_alpha);
 #endif
 
     /*
@@ -355,6 +355,134 @@ void LCAO_Descriptor::cal_dm_as_descriptor(const ModuleBase::matrix &dm)
 void LCAO_Descriptor::cal_projected_DM(const ModuleBase::matrix &dm)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "cal_projected_DM");
+    ModuleBase::timer::tick("LCAO_Descriptor","cal_projected_DM"); 
+    const int pdm_size = (this->lmaxd * 2 + 1) * (this->lmaxd * 2 + 1);
+#ifdef __MPI
+
+    if(GlobalV::NPROC>1)
+    {
+        //This is for first SCF iteration, when density matrix is not available yet
+        if(dm.nr == 0 && dm.nc ==0)
+        {
+            ModuleBase::timer::tick("LCAO_Descriptor","cal_projected_DM"); 
+            return;
+        }
+        //step 1: get S_alpha_mu and S_nu_beta
+        double **ss = this->S_mu_alpha;
+
+        //step 2 : multiply: cal A=ST*DM*S
+        //A(im1,im2) = sum iw1 sum iw2 S(iw1,im1) * dm(iw1,iw2) * S(iw2,im2)
+        // = sum iw1 S(iw1,im1) * X(iw1,im2)
+        // where X(iw1,im2) = sum iw2 dm(iw1,iw2) * S(iw2,im2)
+        for (int inl = 0;inl < inlmax;inl++)
+        {
+            ModuleBase::GlobalFunc::ZEROS(this->pdm[inl], pdm_size);
+            int nm = 2 * inl_l[inl] + 1;
+            const int tmp_pdm_size = GlobalV::NLOCAL * nm;
+            double* tmp_pdm = new double[tmp_pdm_size]; // saves X(iw1,im2)
+
+            //for each pair index1=(iw1,im2)
+            for(int iw1 = 0; iw1 < GlobalV::NLOCAL; iw1++)
+            {
+                int iw1_local = GlobalC::ParaO.trace_loc_col[iw1];
+                if(iw1_local < 0) continue;
+                const int ir1 = iw1;
+
+                ModuleBase::GlobalFunc::ZEROS(tmp_pdm, tmp_pdm_size);
+
+                for(int im2=0;im2<nm;im2++)
+                {
+                    const int ic2 = im2;
+
+                    int index1;
+                    if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx") // save the matrix as column major format
+                    {
+                        index1 = ic2 * GlobalV::NLOCAL + ir1;
+                    }
+                    else
+                    {
+                        index1 = ir1 * nm  + ic2; //row: lcao orbitals; col: descriptor basis                        
+                    }
+
+                    //calculates X(iw1,im2) = sum iw2 dm(iw1,iw2) * S(iw2,im2)
+                    for(int iw2=0; iw2 < GlobalV::NLOCAL; iw2++)
+                    {
+                        int iw2_local = GlobalC::ParaO.trace_loc_row[iw2];
+                        if(iw2_local < 0) continue;
+                        const int ir2 = iw2;
+
+                        int index2;
+                        if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx") // save the matrix as column major format
+                        {
+                            index2 = ic2 * GlobalV::NLOCAL + ir2;
+                        }
+                        else
+                        {
+                            index2 = ir2 * nm  + ic2; //row: lcao orbitals; col: descriptor basis                        
+                        }
+                        double element = ss[inl][index2]* dm(iw1_local,iw2_local);
+                        tmp_pdm[index1] += element;
+                    }
+
+                    //for each im1 : accumulates S(iw1,im1) * X(iw1,im2)
+                    for(int im1=0;im1<nm;im1++)
+                    {
+                        const int ic1 = im1;
+                        int index3;
+                        if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx") // save the matrix as column major format
+                        {
+                            index3 = ic1 * GlobalV::NLOCAL + ir1;
+                        }
+                        else
+                        {
+                            index3 = ir1 * nm  + ic1; //row: lcao orbitals; col: descriptor basis                        
+                        }
+                        double element = tmp_pdm[index1] * ss[inl][index3];
+                        int ind = im1 + im2 * nm;
+                        this->pdm[inl][ind] += element;
+                    }
+                }
+            }
+            delete[] tmp_pdm;
+        }
+
+        //step 3 : gather from all ranks
+        GlobalC::ParaD.allsum_deepks(this->inlmax,pdm_size,this->pdm);
+    }
+    else
+    {
+        //step 1: get dm: the coefficient of wfc, not charge density
+        //now,  dm is an input arg of this func, but needed converting to double*
+        this->getdm_double(dm);
+
+        //step 2: get S_alpha_mu and S_nu_beta
+        double **ss = this->S_mu_alpha;
+
+        //step 3 : multiply: cal ST*DM*S
+        
+        //init tmp_pdm*
+        const int tmp_pdm_size = GlobalV::NLOCAL * (lmaxd*2+1);
+        double* tmp_pdm = new double[tmp_pdm_size];
+        ModuleBase::GlobalFunc::ZEROS(tmp_pdm, tmp_pdm_size);
+        for (int inl = 0;inl < inlmax;inl++)
+        {   
+            int nm = 2 * inl_l[inl] + 1;   //1,3,5,...
+            const char t = 'T';  //transpose
+            const char nt = 'N'; //non transpose
+            const double alpha = 1;
+            const double beta = 0;
+            double *a = this->dm_double;
+            double *b = ss[inl];
+            double *c = tmp_pdm;
+            dgemm_(&nt, &nt, &GlobalV::NLOCAL, &nm, &GlobalV::NLOCAL, &alpha, a, &GlobalV::NLOCAL, b, &GlobalV::NLOCAL, &beta, c, &GlobalV::NLOCAL); //DM*S
+            a = ss[inl];
+            b = c;
+            c = this->pdm[inl];
+            dgemm_(&t, &nt, &nm, &nm, &GlobalV::NLOCAL, &alpha, a, &GlobalV::NLOCAL, b, &GlobalV::NLOCAL, &beta, c, &nm); //ST*DM*S
+        }
+        delete[] tmp_pdm;
+    }
+#else
     //step 1: get dm: the coefficient of wfc, not charge density
     //now,  dm is an input arg of this func, but needed converting to double*
     this->getdm_double(dm);
@@ -368,7 +496,6 @@ void LCAO_Descriptor::cal_projected_DM(const ModuleBase::matrix &dm)
     const int tmp_pdm_size = GlobalV::NLOCAL * (lmaxd*2+1);
     double* tmp_pdm = new double[tmp_pdm_size];
     ModuleBase::GlobalFunc::ZEROS(tmp_pdm, tmp_pdm_size);
-
     for (int inl = 0;inl < inlmax;inl++)
     {   
         int nm = 2 * inl_l[inl] + 1;   //1,3,5,...
@@ -385,8 +512,10 @@ void LCAO_Descriptor::cal_projected_DM(const ModuleBase::matrix &dm)
         c = this->pdm[inl];
         dgemm_(&t, &nt, &nm, &nm, &GlobalV::NLOCAL, &alpha, a, &GlobalV::NLOCAL, b, &GlobalV::NLOCAL, &beta, c, &nm); //ST*DM*S
     }
-    
     delete[] tmp_pdm;
+#endif
+
+    ModuleBase::timer::tick("LCAO_Descriptor","cal_projected_DM"); 
     return;
 }
 
@@ -395,6 +524,7 @@ void LCAO_Descriptor::cal_descriptor(void)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "cal_descriptor");
     delete[] d;
+
     d = new double[this->n_descriptor];
     const int lmax = GlobalC::ORB.get_lmax_d();
     int id = 0;
@@ -1665,7 +1795,10 @@ void LCAO_Descriptor::save_npy_d(void)
         npy_des.push_back(this->d[i]);
     }
     const long unsigned dshape[] = {(long unsigned) GlobalC::ucell.nat, (long unsigned) this->des_per_atom };
-    npy::SaveArrayAsNumpy("dm_eig.npy", false, 2, dshape, npy_des);
+    if (GlobalV::MY_RANK == 0)
+    {
+        npy::SaveArrayAsNumpy("dm_eig.npy", false, 2, dshape, npy_des);
+    }
     return;
 }
 
