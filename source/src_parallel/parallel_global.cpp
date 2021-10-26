@@ -157,15 +157,18 @@ void Parallel_Global::read_mpi_parameters(int argc,char **argv)
     std::cout<<std::endl;
 */
 
-	#ifdef _OPENMP
+#ifdef _OPENMP
 //	omp_set_nested(true);					// Peize Lin add 2018-02-13
-	#endif
+#endif
 
-//	MPI_Init(&argc,&argv);					// Peize Lin change 2018-07-12
+#ifdef _OPENMP
 	int provided;
 	MPI_Init_thread(&argc,&argv,MPI_THREAD_FUNNELED,&provided);
 	if( provided != MPI_THREAD_FUNNELED )
 		GlobalV::ofs_warning<<"MPI_Init_thread request "<<MPI_THREAD_FUNNELED<<" but provide "<<provided<<std::endl;
+#else
+	MPI_Init(&argc,&argv);					// Peize Lin change 2018-07-12
+#endif
 //----------------------------------------------------------
 // int atoi ( const char * str );
 // atoi : Convert std::string to int type
