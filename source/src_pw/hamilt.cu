@@ -5,8 +5,18 @@
 #include "diago_cg.cuh"
 #include "cufft.h"
 
-Hamilt::Hamilt() {}
-Hamilt::~Hamilt() {}
+Hamilt::Hamilt() 
+{
+#ifdef __CUDA
+    CHECK_CUSOLVER(cusolverDnCreate(&cusolver_handle));
+#endif
+}
+Hamilt::~Hamilt() 
+{
+#ifdef __CUDA
+    CHECK_CUSOLVER(cusolverDnDestroy(cusolver_handle));
+#endif
+}
 
 // in tools.h
 
@@ -149,8 +159,6 @@ void Hamilt::diagH_pw(
 
                     avg_iter += 1.0;
                 }
-                // cout<<"end subspace"<<endl;
-                // TODO: add evc & ekb
 
                 Diago_CG_CUDA<float, float2> f_cg_cuda;
                 Diago_CG_CUDA<double, double2> d_cg_cuda;
@@ -401,6 +409,7 @@ void Hamilt::diagH_LAPACK(
     ModuleBase::TITLE("Hamilt","diagH_LAPACK");
 	ModuleBase::timer::tick("Hamilt","diagH_LAPACK");
 
+    // Print info ... 
     // cout<<"in diagH_lapack"<<endl;
     // cout<<nstart<<endl;
     // cout<<nbands<<endl;
@@ -540,31 +549,36 @@ void Hamilt::diagH_CUSOLVER(
     ModuleBase::TITLE("Hamilt","diagH_CUSOLVER");
 	ModuleBase::timer::tick("Hamilt","diagH_CUSOLVER");
 
-    // cout<<"diagh lapack cuda!!"<<endl;
+    // cout<<"diagh cusolver!!"<<endl;
 
     // cout<<nstart<<" "<<nbands<<endl;
 
     double2 *sdum;
     double2 *hdum;
     CHECK_CUDA(cudaMalloc((void**)&sdum, nstart*ldh*sizeof(double2)));
-    CHECK_CUDA(cudaMalloc((void**)&hdum, nstart*ldh*sizeof(double2)));
+    // CHECK_CUDA(cudaMalloc((void**)&hdum, nstart*ldh*sizeof(double2)));
 
-    sdum = sc;
+    // sdum = sc;
+    CHECK_CUDA(cudaMemcpy(sdum, sc, nstart*ldh*sizeof(double2), cudaMemcpyDeviceToDevice));
+    cudaDeviceSynchronize();
+
     int *device_info;
     int h_meig = 0;
     CHECK_CUDA(cudaMalloc((void**)&device_info, sizeof(int)));
     const bool all_eigenvalues = (nstart == nbands);
 
-    cusolverDnHandle_t cusolver_handle;
-    CHECK_CUSOLVER(cusolverDnCreate(&cusolver_handle));
+    // cusolverDnHandle_t cusolver_handle;
+    // CHECK_CUSOLVER(cusolverDnCreate(&cusolver_handle));
 
-    if (all_eigenvalues)
+    if (all_eigenvalues) // nstart = nbands
     {
-        // cout<<"all!"<<endl;
         //===========================
         // calculate all eigenvalues
         //===========================
-        hvec = hc;
+        // hvec = hc;
+        // repalce "=" with memcpy!
+        CHECK_CUDA(cudaMemcpy(hvec, hc, nstart*nbands*sizeof(double2), cudaMemcpyDeviceToDevice));
+        cudaDeviceSynchronize();
         // use cusolver
         int cusolver_lwork = 0;
         CHECK_CUSOLVER(cusolverDnZhegvd_bufferSize(
@@ -600,10 +614,13 @@ void Hamilt::diagH_CUSOLVER(
         CHECK_CUDA(cudaFree(cusolver_work));
         // CHECK_CUDA(cudaFree(device_info));
     }
-    else
+    else // nstart != nbands
     {
-        cout<<"not all"<<endl;
-        hdum = hc;
+        // cout<<"not all"<<endl;
+        CHECK_CUDA(cudaMalloc((void**)&hdum, nstart*ldh*sizeof(double2)));
+        // hdum = hc;
+        CHECK_CUDA(cudaMemcpy(hdum, hc, nstart*ldh*sizeof(double2), cudaMemcpyDeviceToDevice));
+        cudaDeviceSynchronize();
         int cusolver_lwork = 0;
         CHECK_CUSOLVER(cusolverDnZhegvdx_bufferSize(
             cusolver_handle,
@@ -652,7 +669,7 @@ void Hamilt::diagH_CUSOLVER(
     // cout<<"end zhegv"<<endl;
     CHECK_CUDA(cudaFree(device_info));
     // CHECK_CUDA(cudaFree(cusolver_work));
-    CHECK_CUSOLVER(cusolverDnDestroy(cusolver_handle));
+    // CHECK_CUSOLVER(cusolverDnDestroy(cusolver_handle));
 
 	ModuleBase::timer::tick("Hamilt","diagH_CUSOLVER");
     return;

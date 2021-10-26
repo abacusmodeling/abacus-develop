@@ -5,30 +5,6 @@
 #include "../src_io/optical.h" // only get judgement to calculate optical matrix or not.
 #include "myfunc.h"
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// in tools.h
-
 __global__ void cast_d2f(float *dst, double *src, int size)
 {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
@@ -282,8 +258,8 @@ void Hamilt_PW::diagH_subspace(
 
 	//qianrui improve this part 2021-3-14
 	std::complex<double> *aux=new std::complex<double> [dmax*nstart];
-	std::complex<double> *paux = aux;
-	std::complex<double> *ppsi = psi.c;
+	// std::complex<double> *paux = aux;
+	// std::complex<double> *ppsi = psi.c;
 
 	//qianrui replace it
 	this->h_psi(psi.c, aux, nstart);
@@ -514,7 +490,7 @@ void Hamilt_PW::diagH_subspace_cuda(
 
 	double2* aux;
 	CHECK_CUDA(cudaMalloc((void**)&aux, dmax*nstart*sizeof(double2)));
-	double2* paux = aux;
+	// double2* paux = aux;
 	// const double2* ppsi = psi_c; // ?
 
 	//qianrui replace it
@@ -553,6 +529,8 @@ void Hamilt_PW::diagH_subspace_cuda(
 
 	// after generation of H and S matrix, diag them
 
+	// Method1 : Do with diagH_LAPACK
+
 	ModuleBase::ComplexMatrix h_hc(nstart, nstart);
     ModuleBase::ComplexMatrix h_sc(nstart, nstart);
     ModuleBase::ComplexMatrix h_hvec(nstart,n_band);
@@ -561,17 +539,14 @@ void Hamilt_PW::diagH_subspace_cuda(
 
 	CHECK_CUDA(cudaMemcpy(h_hc.c, hc, nstart*nstart*sizeof(double2), cudaMemcpyDeviceToHost));
 	CHECK_CUDA(cudaMemcpy(h_sc.c, sc, nstart*nstart*sizeof(double2), cudaMemcpyDeviceToHost));
-	// CHECK_CUDA(cudaMemcpy(h_hvec.c, hvec, nstart*n_band*sizeof(double2), cudaMemcpyDeviceToHost));
 
-	// cout<<"hello? begin lapack"<<endl;
 	GlobalC::hm.diagH_LAPACK(nstart, n_band, h_hc, h_sc, nstart, h_en, h_hvec);
-	// cout<<"after lapack"<<endl;
 	CHECK_CUDA(cudaMemcpy(hvec, h_hvec.c, nstart*n_band*sizeof(double2), cudaMemcpyHostToDevice));
 	CHECK_CUDA(cudaMemcpy(en, h_en, n_band*sizeof(double), cudaMemcpyHostToDevice));
     delete [] h_en;
-
+	
+	// Method2 : Do with diagH_CUSOLVER
 	// GlobalC::hm.diagH_CUSOLVER(nstart, n_band, hc, sc, nstart, en, hvec);
-	// TODO: diagH_CUSOLVER
 
 	// Peize Lin add 2019-03-09
 	/*
@@ -641,7 +616,8 @@ void Hamilt_PW::diagH_subspace_cuda(
 		double2 *evctmp;
 		CHECK_CUDA(cudaMalloc((void**)&evctmp, n_band*dmin*sizeof(double2)));
 		CHECK_CUBLAS(cublasZgemm(hpw_handle, transa, transb, dmin, n_band, nstart, &ONE, psi_c, dmax, hvec, n_band, &ZERO, evctmp, dmin));
-		
+		// cout<<"evctmp before cpy back"<<endl;
+		// print_test<double2>(evctmp, 15);
 		for(int ib=0; ib<n_band; ib++)
 		{
 			// for(int ig=0; ig<dmin; ig++)
@@ -1151,7 +1127,7 @@ void Hamilt_PW::h_psi_cuda(const double2 *psi_in, double2 *hpsi, double2 *vkb_c,
 void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *hpsi, const int m)
 {
     ModuleBase::timer::tick("Hamilt_PW","h_psi_cpu");
-    int i = 0;
+    // int i = 0;
     int j = 0;
     int ig= 0;
 

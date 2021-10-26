@@ -48,6 +48,7 @@ class Hamilt
 		ModuleBase::ComplexMatrix &hvec); // output: eigenvectors
 
 #ifdef __CUDA
+	cusolverDnHandle_t cusolver_handle;
 	void diagH_subspace_cuda(
 		const int ik,
 		const int nstart,
