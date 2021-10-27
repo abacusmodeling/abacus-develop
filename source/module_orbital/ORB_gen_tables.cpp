@@ -1280,6 +1280,284 @@ double ORB_gen_tables::get_distance(const ModuleBase::Vector3<double> &R1, const
 }
 
 #ifdef __DEEPKS
+
+void ORB_gen_tables::snap_psialpha_half(
+		std::vector<std::vector<double>> &nlm,
+		const int& job,
+		const ModuleBase::Vector3<double>& R1,
+		const int& T1,
+		const int& L1,
+		const int& m1,
+		const int& N1,
+		const ModuleBase::Vector3<double>& R0, // The projector.
+		const int& T0,
+		const int& I0,
+		ModuleBase::IntArray* inl_index
+	) const
+{
+	ModuleBase::timer::tick("ORB_gen_tables", "snap_psialpha_half");
+
+    const int ln_per_atom = GlobalC::ORB.Alpha[0].getTotal_nchi();
+    assert(ln_per_atom > 0); 
+	
+	bool *calproj = new bool[ln_per_atom];
+	int *rmesh1 = new int[ln_per_atom];
+
+	if(job==0)
+	{
+		nlm.resize(1); //only energy
+	}
+	else if(job==1)
+	{
+		nlm.resize(4); //energy+force
+	}
+
+	int nproj = 0;
+    for (int L0 = 0; L0 <= GlobalC::ORB.Alpha[0].getLmax();++L0)
+    {
+        for (int N0 = 0;N0 < GlobalC::ORB.Alpha[0].getNchi(L0);++N0)
+        {
+			nproj += (2 * L0 + 1);
+		}
+	}
+
+	for(int dim=0;dim<nlm.size();dim++)
+	{
+		nlm[dim].resize(nproj);
+		for (auto &x : nlm[dim])
+		{
+    		x=0.0;
+		}
+	}
+
+	//rcut of orbtials and projectors
+	const double Rcut1 = GlobalC::ORB.Phi[T1].getRcut();
+
+	//in our calculation, we always put orbital phi at the left side of <phi|alpha>
+	const ModuleBase::Vector3<double> dRa = (R0 - R1) * this->lat0;
+	double distance10 = dRa.norm();
+
+	bool all_out = true;
+	for (int ip = 0; ip < ln_per_atom; ip++)
+	{
+		const double Rcut0 = GlobalC::ORB.Alpha[0].getRcut();
+		if (distance10 > (Rcut1 + Rcut0))
+		{
+			calproj[ip] = false;
+		}
+		else
+		{
+			all_out = false;
+			calproj[ip] = true;
+			//length of table for interpolation
+			rmesh1[ip] = talpha.get_rmesh(Rcut1, Rcut0);
+		}
+	}
+
+	if (all_out)
+	{
+		delete[] calproj;
+		delete[] rmesh1;
+		ModuleBase::timer::tick("ORB_gen_tables", "snap_psialpha_half");
+		return;
+	}
+
+	//FOR INTERPOLATION
+	double *curr; //current pointer
+
+	double psa = distance10 / talpha.dr;
+	int iqa = static_cast<int>(psa);
+	double x0a = psa - static_cast<double>(iqa);
+	double x1a = 1.0 - x0a;
+	double x2a = 2.0 - x0a;
+	double x3a = 3.0 - x0a;
+	double x123a = x1a * x2a * x3a / 6.0;
+	double x120a = x1a * x2a * x0a / 6.0;
+	double x032a = x0a * x3a * x2a / 2.0;
+	double x031a = x0a * x3a * x1a / 2.0;
+
+	//UNIT VECTOR
+
+	double unit_vec_dRa[3];
+	unit_vec_dRa[0] = dRa.x;
+	unit_vec_dRa[1] = dRa.y;
+	unit_vec_dRa[2] = dRa.z;
+
+	//special case for R = 0;
+	const double tiny1 = 1e-12;
+	const double tiny2 = 1e-10;
+
+	if (distance10 < tiny1)
+	{
+		distance10 += tiny1;
+	}
+
+	// Find three dimension of 'Table_DSR' '
+	const int Tpair1 = T1;
+	const int T1_2Lplus1 = talpha.DS_2Lplus1[T1];
+
+	//gaunt index
+	const int gindex1 = L1 * L1 + m1;
+	std::vector<double> rlya;
+	std::vector<std::vector<double>> grlya;
+
+	if (job == 0)
+	{
+		ModuleBase::Ylm::rl_sph_harm(T1_2Lplus1 - 1, dRa.x, dRa.y, dRa.z, rlya);
+	}
+	else
+	{
+		ModuleBase::Ylm::grad_rl_sph_harm(T1_2Lplus1 - 1, dRa.x, dRa.y, dRa.z, rlya, grlya);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	/// Formula :               T1            T0
+	/// \f[
+	/// 			<\psi1_{L1,N1}|\Beta_{L0,m0}>
+	///\f]
+	//////////////////////////////////////////////////////////////////////////
+
+	int ip = 0; //for L0,N0,m0
+    int nb = 0; //for L0, N0
+
+    for (int L0 = 0; L0 <= GlobalC::ORB.Alpha[0].getLmax();++L0)
+    {
+        for (int N0 = 0;N0 < GlobalC::ORB.Alpha[0].getNchi(L0);++N0)
+        {
+            if (!calproj[nb])
+            {
+				ip += 2*L0 + 1;
+                continue;
+            }
+            ++nb;
+            
+            // <psi1 | Beta>
+            const int Opair1 = talpha.DS_Opair(Tpair1, L1, L0, N1, N0);
+            const int inl = inl_index[T0](I0, L0, N0);
+            for (int m0 = 0;m0 < 2 * L0 + 1;m0++)
+            {
+				int gindex0 = L0 * L0 + m0;
+				double term_a = 0.0;
+				double term_a_gr[3] = {0,0,0};
+
+				for (int L = 0; L < T1_2Lplus1; L++)
+				{
+					//triangle rule for gaunt coefficients
+					int AL = L1 + L0;
+					int SL = abs(L1 - L0);
+					if ((L > AL) || (L < SL) || ((L - SL) % 2 == 1))
+					{
+						continue;
+					}
+
+					//prefac = (i)^{lphi - lbeta - l}
+					//R0-R1 ==> <phi|beta>
+					double i_exp = pow(-1.0, (L1 - L0 - L) / 2);
+					double rl1 = pow(distance10, L);
+					double Interp_Vnla = 0.0;
+					double Interp_Vnla_gr = 0.0;
+
+					//this part is for both deri and not deri
+					if (distance10 > tiny2)
+					{
+						curr = talpha.Table_DSR[0][Tpair1][Opair1][L];
+						if (iqa >= rmesh1[nb] - 4)
+						{
+							Interp_Vnla = 0.0;
+						}
+						else
+						{
+							Interp_Vnla = i_exp * (x123a * curr[iqa] 
+							+ x120a * curr[iqa + 3] 
+							+ x032a * curr[iqa + 1] 
+							- x031a * curr[iqa + 2]);
+						}
+						Interp_Vnla /= rl1;
+					}
+					else
+					{
+						Interp_Vnla = i_exp * talpha.Table_DSR[0][Tpair1][Opair1][L][0];
+					}
+
+					//this part is for deri only
+					if(job==1)
+					{
+						if (distance10 > tiny2)
+						{
+							curr = talpha.Table_DSR[1][Tpair1][Opair1][L];
+
+							if (iqa >= rmesh1[nb] - 4)
+							{
+								Interp_Vnla_gr = 0.0;
+							}
+							else
+							{
+								Interp_Vnla_gr = i_exp * (x123a * curr[iqa] 
+								+ x120a * curr[iqa + 3] 
+								+ x032a * curr[iqa + 1] 
+								- x031a * curr[iqa + 2]);
+							}
+							Interp_Vnla_gr = Interp_Vnla_gr / pow(distance10, L) - Interp_Vnla * L / distance10;
+						}
+						else
+						{
+							Interp_Vnla_gr = 0.0;
+						}
+					}
+						/////////////////////////////////////
+						///  Overlap value = S_from_table * G * Ylm
+						////////////////////////////////////
+					for (int m = 0; m < 2 * L + 1; m++)
+					{
+						int gindexa = L * L + m;
+						//double tmpGaunt = this->MGT.Get_Gaunt_SH(L1, m1, L0, m0, L, m);
+						double tmpGaunt, tmpGaunt1;
+						if(job==1)
+						{
+							tmpGaunt = this->MGT.Gaunt_Coefficients(gindex1, gindex0, gindexa);
+							tmpGaunt1= this->MGT.Gaunt_Coefficients(gindex0, gindex1, gindexa);
+						}
+						else
+						{
+							tmpGaunt = this->MGT.Gaunt_Coefficients(gindex0, gindex1, gindexa);
+						}
+						const int lm = MGT.get_lm_index(L, m);
+						
+						term_a += tmpGaunt * Interp_Vnla * rlya[lm];
+						if(job==1)
+						{
+							double tt1 = tmpGaunt1 * Interp_Vnla_gr * rlya[lm] / distance10;
+							double tt2 = tmpGaunt1 * Interp_Vnla;
+							for (int ir = 0; ir < 3; ir++)
+							{
+								term_a_gr[ir] += tt1 * unit_vec_dRa[ir] + tt2 * grlya[lm][ir];
+							}
+						}
+					}
+				}//end L
+
+				//===============================================
+				// THIRD PART: SAVE THE VALUE FOR ALL PROJECTS.
+				//===============================================
+
+				if(job==0)
+				{
+					nlm[0][ip] = term_a;
+				}
+				else if(job==1)
+				{
+					nlm[0][ip] = term_a;
+					for(int dim=1;dim<4;dim++)
+					{
+						nlm[dim][ip] = term_a_gr[dim-1];
+					}
+				}
+
+				ip+=1;
+			}//end m0
+		}//end N0
+	}//end L0
+}
 //caoyu add 2021-08-30
 void ORB_gen_tables::snap_psialpha(
     double nlm[],

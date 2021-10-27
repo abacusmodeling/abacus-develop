@@ -7,7 +7,9 @@
 #include "../module_base/complexmatrix.h"
 #include <torch/script.h>
 #include "../src_pw/global.h"
-
+#ifdef __MPI
+#include "../src_parallel/parallel_deepks.h"
+#endif
 ///
 /// This class computes the descriptors for each atom from LCAO basis set,
 /// interfaces with pytorch to obtain the correction potential in LCAO basis,
@@ -72,6 +74,7 @@ public:
     
     ///calculate \f$\sum_{I}\sum_{nlmm'}\langle\phi_\mu|\alpha^I_{nlm}\rangle{\frac{dE}{dD^I_{nlmm'}}}\langle\alpha^I_{nlm'}|\phi_\nu\rangle\f$ (for gamma_only)
     void build_v_delta_alpha(const bool& cal_deri/**< [in] 0 for 3-center intergration, 1 for its derivation*/);
+    void build_v_delta_alpha_new(const bool& cal_deri/**< [in] 0 for 3-center intergration, 1 for its derivation*/);
     
     ///calculate \f$\sum_{I}\sum_{nlmm'}\langle\phi_\mu|\alpha^I_{nlm}\rangle{\frac{dE}{dD^I_{nlmm'}}}\langle\alpha^I_{nlm'}|\phi_\nu\rangle\f$ (for multi-k)
     void build_v_delta_mu(const bool &cal_deri/**< [in] 0 for 3-center intergration, 1 for its derivation*/);
@@ -84,6 +87,7 @@ public:
 
     ///compute Hellmann-Feynman term of the force contribution of \f$E_\delta\f$
     void cal_f_delta_hf(const ModuleBase::matrix& dm/**< [in] density matrix*/);
+    void cal_f_delta_hf_new(const ModuleBase::matrix& dm/**< [in] density matrix*/);
     
     ///compute Pulay  term of the force contribution of \f$E_\delta\f$
     void cal_f_delta_pulay(const ModuleBase::matrix& dm/**< [in] density matrix*/);
