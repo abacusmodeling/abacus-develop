@@ -11,3 +11,8 @@ add_library(
     parallel_reduce.cpp
     subgrid_oper.cpp
 )
+
+if(ENABLE_DEEPKS)
+	target_sources(parallel PRIVATE parallel_deepks.cpp)
+endif()
+
