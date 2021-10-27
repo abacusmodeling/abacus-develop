@@ -115,11 +115,13 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-
         //========method 2========
         //ld.cal_gedm(LOC.wfc_dm_2d.dm_gamma[0]);
         //ld.build_v_delta_alpha(0);
-        GlobalC::ld.cal_gedm(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
+        
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
+			GlobalC::ld.cal_gedm(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
 			//GlobalC::ld.build_v_delta_alpha(0);
 			GlobalC::ld.build_v_delta_alpha_new(0);
+			GlobalC::ld.add_v_delta();
 		}
 		else
 		{
@@ -127,7 +129,7 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-
 		}
         //GlobalC::ld.build_v_delta_mu(0);
         
-        //GlobalC::ld.add_v_delta();
+        
 	}
 	
 #endif

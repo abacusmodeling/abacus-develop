@@ -1503,36 +1503,34 @@ void ORB_gen_tables::snap_psialpha_half(
 						{
 							Interp_Vnla_gr = 0.0;
 						}
-
+					}
 						/////////////////////////////////////
 						///  Overlap value = S_from_table * G * Ylm
 						////////////////////////////////////
-						for (int m = 0; m < 2 * L + 1; m++)
+					for (int m = 0; m < 2 * L + 1; m++)
+					{
+						int gindexa = L * L + m;
+						//double tmpGaunt = this->MGT.Get_Gaunt_SH(L1, m1, L0, m0, L, m);
+						double tmpGaunt, tmpGaunt1;
+						if(job==1)
 						{
-							int gindexa = L * L + m;
-							//double tmpGaunt = this->MGT.Get_Gaunt_SH(L1, m1, L0, m0, L, m);
-							double tmpGaunt, tmpGaunt1;
-							if(job==1)
+							tmpGaunt = this->MGT.Gaunt_Coefficients(gindex1, gindex0, gindexa);
+							tmpGaunt1= this->MGT.Gaunt_Coefficients(gindex0, gindex1, gindexa);
+						}
+						else
+						{
+							tmpGaunt = this->MGT.Gaunt_Coefficients(gindex0, gindex1, gindexa);
+						}
+						const int lm = MGT.get_lm_index(L, m);
+						
+						term_a += tmpGaunt * Interp_Vnla * rlya[lm];
+						if(job==1)
+						{
+							double tt1 = tmpGaunt1 * Interp_Vnla_gr * rlya[lm] / distance10;
+							double tt2 = tmpGaunt1 * Interp_Vnla;
+							for (int ir = 0; ir < 3; ir++)
 							{
-								tmpGaunt = this->MGT.Gaunt_Coefficients(gindex1, gindex0, gindexa);
-								tmpGaunt1= this->MGT.Gaunt_Coefficients(gindex0, gindex1, gindexa);
-							}
-							else
-							{
-								tmpGaunt = this->MGT.Gaunt_Coefficients(gindex0, gindex1, gindexa);
-							}
-							const int lm = MGT.get_lm_index(L, m);
-							
-							term_a += tmpGaunt * Interp_Vnla * rlya[lm];
-							if(job==1)
-							{
-								double tt1 = tmpGaunt1 * Interp_Vnla_gr * rlya[lm] / distance10;
-								double tt2 = tmpGaunt1 * Interp_Vnla;
-
-								for (int ir = 0; ir < 3; ir++)
-								{
-									term_a_gr[ir] += tt1 * unit_vec_dRa[ir] + tt2 * grlya[lm][ir];
-								}
+								term_a_gr[ir] += tt1 * unit_vec_dRa[ir] + tt2 * grlya[lm][ir];
 							}
 						}
 					}

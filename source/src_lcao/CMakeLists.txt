@@ -63,4 +63,6 @@ add_library(
 
 if(ENABLE_DEEPKS)
     target_sources(lcao PRIVATE LCAO_descriptor.cpp)
+    target_sources(lcao PRIVATE LCAO_descriptor_new.cpp)
+    target_sources(lcao PRIVATE LCAO_descriptor_old.cpp)
 endif()

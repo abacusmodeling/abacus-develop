@@ -87,6 +87,7 @@ public:
 
     ///compute Hellmann-Feynman term of the force contribution of \f$E_\delta\f$
     void cal_f_delta_hf(const ModuleBase::matrix& dm/**< [in] density matrix*/);
+    void cal_f_delta_hf_new(const ModuleBase::matrix& dm/**< [in] density matrix*/);
     
     ///compute Pulay  term of the force contribution of \f$E_\delta\f$
     void cal_f_delta_pulay(const ModuleBase::matrix& dm/**< [in] density matrix*/);
