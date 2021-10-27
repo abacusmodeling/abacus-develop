@@ -355,7 +355,7 @@ void energy::perform_dos(void)
 					INPUT.lcao_dk,
 					INPUT.lcao_dr,
 					INPUT.lcao_rmax,
-					INPUT.out_descriptor,
+					GlobalV::out_descriptor,
 					INPUT.out_r_matrix,
 					GlobalV::FORCE,
 					GlobalV::MY_RANK);
@@ -372,7 +372,7 @@ void energy::perform_dos(void)
 					GlobalC::UOT,
 					GlobalC::ORB,
 					GlobalC::ucell.lat0,
-					INPUT.out_descriptor,
+					GlobalV::out_descriptor,
 					Exx_Abfs::Lmax,
 					GlobalC::ucell.infoNL.nprojmax,
 					GlobalC::ucell.infoNL.nproj,
@@ -465,7 +465,7 @@ void energy::perform_dos(void)
 					GlobalV::test_atom_input);
 #endif
 				// mohan update 2021-02-10
-				GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, INPUT.out_descriptor, GlobalC::ucell.infoNL.nproj);
+				GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
 			}//else
 
 		 MPI_Reduce(pdosk[is].c, pdos[is].c , NUM , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);

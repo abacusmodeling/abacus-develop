@@ -3,8 +3,8 @@ H 1.008 H_ONCV_PBE-1.0.upf
 O 15.9994 O_ONCV_PBE-1.0.upf
 
 NUMERICAL_ORBITAL
-../tools/PP_ORB/H_gga_8au_60Ry_2s1p.orb
-../tools/PP_ORB/O_gga_7au_60Ry_2s2p1d.orb
+../../integrate/tools/PP_ORB/H_gga_8au_60Ry_2s1p.orb
+../../integrate/tools/PP_ORB/O_gga_6au_60Ry_2s2p1d.orb
 
 NUMERICAL_DESCRIPTOR
 jle.orb

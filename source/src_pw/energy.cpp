@@ -68,7 +68,7 @@ void energy::calculate_harris(const int &flag)
 		}
 #endif
 #ifdef __DEEPKS
-        if(INPUT.deepks_scf) 
+        if(GlobalV::deepks_scf) 
 		{
 			this->etot_harris += GlobalC::ld.E_delta;  //caoyu add 2021-08-10
 			GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma);
@@ -116,7 +116,7 @@ void energy::calculate_etot(void)
 	}
 #endif
 #ifdef __DEEPKS
-	if (INPUT.deepks_scf)
+	if (GlobalV::deepks_scf)
 	{
 		this->etot += GlobalC::ld.E_delta;
         GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma);
@@ -171,7 +171,7 @@ void energy::print_etot(
 			}
 			this->print_format("E_exx", exx);
 #ifdef __DEEPKS
-			if (INPUT.deepks_scf)	//caoyu add 2021-08-10
+			if (GlobalV::deepks_scf)	//caoyu add 2021-08-10
 			{
 				this->print_format("E_DeePKS", GlobalC::ld.E_delta);
 			}
