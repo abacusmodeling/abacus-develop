@@ -5,7 +5,10 @@
 #include "exx_abfs-inverse_matrix_double.h"
 #include "../src_pw/global.h"
 #include "../module_base/global_function.h"
+
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 
 #ifdef __MKL
 #include <mkl_service.h>
@@ -44,7 +47,9 @@ std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_pt
 #endif
 	
 	std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,std::shared_ptr<ModuleBase::matrix>>>> Cs;
+#ifdef _OPENMP
 	#pragma omp parallel for
+#endif
 	for( int i_iat1=0; i_iat1<atom_centres_vector.size(); ++i_iat1 )
 	{
 		const size_t iat1 = atom_centres_vector[i_iat1];
@@ -65,7 +70,9 @@ std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_pt
 					it1, it2, -tau1+tau2+(box2*GlobalC::ucell.latvec), 
 					m_abfs_abfs, m_abfslcaos_lcaos, index_abfs, index_lcaos, 
 					threshold, true, rwlock_Cw, rwlock_Vw, Cws, Vws );
+#ifdef _OPENMP
 				#pragma omp critical(Abfs_cal_Cs)
+#endif
 				Cs[iat1][iat2][box2] = C;
 			}
 		}
@@ -180,7 +187,9 @@ std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_pt
 	std::vector<Abfs::Vector3_Order<int>> Coulomb_potential_boxes = get_Coulomb_potential_boxes(rmesh_times);
 
 	std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,std::shared_ptr<ModuleBase::matrix>>>> Vs;
+#ifdef _OPENMP
 	#pragma omp parallel for
+#endif
 	for( int i_atom_pair=0; i_atom_pair<atom_pairs.size(); ++i_atom_pair )
 	{
 		const size_t iat1 = atom_pairs[i_atom_pair].first;
@@ -203,7 +212,9 @@ std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,std::shared_pt
 					it1, it2, delta_R, 
 					m_abfs_abfs, index_abfs, 
 					threshold, true, rwlock_Vw, Vws );
+#ifdef _OPENMP					
 				#pragma omp critical(Abfs_cal_Vs)
+#endif
 				Vs[iat1][iat2][box2] = V;
 			}
 		}

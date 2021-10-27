@@ -4,7 +4,10 @@
 #include "../module_base/timer.h"
 #include "../module_base/math_integral.h"
 #include "../module_base/math_sphbes.h"
+
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 
 Numerical_Orbital_Lm::Numerical_Orbital_Lm()
 {
@@ -224,7 +227,7 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool
 
 	// do interpolation here to make grid more dense
 
-#ifdef __OPENMP
+#ifdef _OPENMP
 	#pragma omp parallel for schedule(static)
 #endif
 	for (int ir = 0; ir < this->nr_uniform; ir++)
@@ -266,10 +269,10 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool
 		case 3: ModuleBase::Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 100000.0, 100000.0, y2); break;
 		case 4: ModuleBase::Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
 		default: 
-			//GlobalV::ofs_warning << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << std::endl;
-			//GlobalV::ofs_warning << " Check file " << __FILE__ << " line " << __LINE__ <<std::endl;
-			std::cout << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << std::endl;
-			std::cout << " Check file " << __FILE__ << " line " << __LINE__ <<std::endl;
+			GlobalV::ofs_warning << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << std::endl;
+			GlobalV::ofs_warning << " Check file " << __FILE__ << " line " << __LINE__ <<std::endl;
+			//std::cout << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << std::endl;
+			//std::cout << " Check file " << __FILE__ << " line " << __LINE__ <<std::endl;
 			ModuleBase::Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
 	}
 
@@ -545,7 +548,7 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 	{
 		r_tmp[ir] *= (ir&1) ? four_three : two_three;
 	}
-#ifdef __OPENMP
+#ifdef _OPENMP
 	#pragma omp parallel for schedule(static)
 #endif
 	for (int ik = 0; ik < nk; ik++)
