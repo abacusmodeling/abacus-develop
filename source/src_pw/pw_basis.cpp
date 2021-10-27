@@ -6,7 +6,10 @@
 #include "tools.h"
 #include "pw_basis.h"
 #include "pw_complement.h"
+
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 
 PW_Basis::PW_Basis()
 {
@@ -770,7 +773,9 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
         {
 	    	const int na = Ucell->atoms[it].na;
 	    	const ModuleBase::Vector3<double> * const tau = Ucell->atoms[it].tau;
+#ifdef _OPENMP
 		    #pragma omp parallel for schedule(static)
+#endif
             for (int ig=0; ig<this->ngmc; ig++)
             {
 		    	const ModuleBase::Vector3<double> gcar_ig = gcar[ig];
