@@ -1,6 +1,6 @@
 #ifndef LCAO_DESCRIPTOR_H
 #define LCAO_DESCRIPTOR_H
-#endif
+
 #ifdef __DEEPKS
 
 #include "../module_base/intarray.h"
@@ -254,4 +254,5 @@ namespace GlobalC
 extern LCAO_Descriptor ld;
 }
 
+#endif
 #endif
