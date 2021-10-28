@@ -199,11 +199,6 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
     ModuleBase::TITLE("LCAO_Descriptor", "build_S_descriptor");
     //array to store data
 
-    if (!GlobalV::GAMMA_ONLY_LOCAL)
-    {
-        ModuleBase::WARNING_QUIT("LCAO_Descriptor::build_S_descriptor", "muti-kpoint method for descriptor is not implemented yet! ");
-    }
-
     double olm[3] = {0.0, 0.0, 0.0};
 
     //\sum{T} e**{ikT} <\phi_{ia}|d\phi_{k\beta}(T)>	//???
@@ -257,20 +252,14 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
                                             GlobalC::UOT.snap_psipsi(GlobalC::ORB, olm, 0, 'D', tau1,
                                                     T1, L1, m1, N1, GlobalC::GridD.getAdjacentTau(ad),
                                                     T2, L2, m2, N2, GlobalV::NSPIN);
-                                            if (GlobalV::GAMMA_ONLY_LOCAL)
-                                            {
-                                                this->set_S_mu_alpha(iw1_all, inl_index[T2](I2,L2,N2), m2, olm[0]);
-                                            }
+                                            this->set_S_mu_alpha(iw1_all, inl_index[T2](I2,L2,N2), m2, olm[0]);
                                         }
                                         else
                                         {
                                             GlobalC::UOT.snap_psipsi(GlobalC::ORB, olm, 1, 'D', tau1,
                                                 T1, L1, m1, N1, GlobalC::GridD.getAdjacentTau(ad),
                                                 T2, L2, m2, N2, GlobalV::NSPIN);
-                                            if (GlobalV::GAMMA_ONLY_LOCAL)
-                                            {
                                                 this->set_DS_mu_alpha(iw1_all, inl_index[T2](I2,L2,N2), m2, olm[0], olm[1], olm[2]);
-                                            }
                                         }
 
                                     } //m2
@@ -288,7 +277,7 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
     GlobalC::ParaD.allsum_deepks(this->inlmax,GlobalV::NLOCAL*(2*this->lmaxd+1),this->S_mu_alpha);
 #endif
 
-    /*
+/*    
     for(int inl=0;inl<this->inlmax;inl++)
     {
         ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"inl:",inl);
@@ -297,7 +286,7 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
             GlobalV::ofs_running << "j,s_mu_alpha: " << j << " " << this->S_mu_alpha[inl][j] << std::endl;
         }
     }
-    */
+*/    
     return;
 }
 
