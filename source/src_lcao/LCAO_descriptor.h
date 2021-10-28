@@ -5,8 +5,12 @@
 
 #include "../module_base/intarray.h"
 #include "../module_base/complexmatrix.h"
-#include <torch/script.h>
 #include "../src_pw/global.h"
+
+#include <torch/script.h>
+#include <torch/csrc/autograd/autograd.h>
+#include <npy.hpp>
+#include <torch/csrc/api/include/torch/linalg.h>
 #ifdef __MPI
 #include "../src_parallel/parallel_deepks.h"
 #endif
