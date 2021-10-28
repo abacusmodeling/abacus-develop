@@ -10,11 +10,6 @@
 #include "../src_pw/global.h"
 #include "../src_io/winput.h"
 
-#include <torch/script.h>
-#include <torch/csrc/autograd/autograd.h>
-#include <npy.hpp>
-#include <torch/csrc/api/include/torch/linalg.h>
-
 void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "build_v_delta_alpha_new");

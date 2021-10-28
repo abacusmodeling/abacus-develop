@@ -433,4 +433,34 @@ std::ostream & ComplexMatrix::print( std::ostream & os, const double threshold_n
 	return os;
 }
 
+ModuleBase::matrix ComplexMatrix::dble(void)
+{
+	ModuleBase::matrix a;
+	a.create(this->nr, this->nc);
+	for(int i=0;i<this->nr;i++)
+	{
+		for(int j=0;j<this->nc;j++)
+		{
+			a(i,j) = std::real((*this)(i,j));
+		}
+	}
+	return a;
+}
+
+bool ComplexMatrix::checkreal(void)
+{
+	const double tiny = 1e-12;
+	for(int i=0;i<this->nr;i++)
+	{
+		for(int j=0;j<this->nc;j++)
+		{
+			if(std::imag((*this)(i,j)) > tiny)
+			{
+				return 0;
+			}
+		}
+	}
+	return 1;
+}
+
 }
