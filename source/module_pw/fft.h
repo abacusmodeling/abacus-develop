@@ -23,10 +23,25 @@ public:
 	FFT();
 	~FFT();
 	void initfft(int nx_in, int ny_in , int nz_in, int ns_in, int nplane_in, int ffttype_in);
-	void setupFFT3D();
-	void executeFFT3D();
-	void cleanFFT3D();
+	void setupSFFT();
+	void initpland();
+	void initpland_mpi();
+#ifdef __MIX_PRECISION
+	void initplanf();
+	void initplanf_mpi();
+#endif
+	void cleanFFT();
 
+	void executefor(fftw_complex *, fftw_complex*, int n);
+	void executebac(fftw_complex *, fftw_complex*, int n);
+	void executer2c(double *, fftw_complex*, int n);
+	void executec2r(fftw_complex *, fftw_complex*, int n);
+#ifdef __MIX_PRECISION
+	void executeffor(fftwf_complex *, fftwf_complex*, int n);
+	void executefbac(fftwf_complex *, fftwf_complex*, int n);
+	void executefr2c(float *, fftwf_complex*, int n);
+	void executefc2r(fftwf_complex *, float*, int n);
+#endif
 
 public:
 	int nx,ny,nz;
