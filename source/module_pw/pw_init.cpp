@@ -133,18 +133,14 @@ void PW_Basis:: initgrids(
 //Init some parameters
 void PW_Basis:: initparameters(
     bool gamma_only_in,
-    double ecut_in,
-    int nks_in, //number of k points in this pool
-    ModuleBase::Vector3<double> *kvec_d_in, // Direct coordinates of k points
-    int poolnproc_in, // Number of processors in this pool
-    int poolrank_in, // Rank in this pool
+    double ggecut_in,
+    int poolnproc_in,
+    int poolrank_in,
     int distribution_type_in,
 )
 {
     this->gamma_only = gamma_only_in;
-    this->ggecut = ecut_in;
-    this->nks = nks_in;
-    this->kvec_d = kvec_d_in;
+    this->ggecut = ggecut_in;
     this->poolnproc = poolnproc_in;
     this->poolrank = poolrank_in;
     this->distribution_type = distribution_type_in;
