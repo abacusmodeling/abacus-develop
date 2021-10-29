@@ -13,7 +13,10 @@
 void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "build_v_delta_alpha_new");
-    ModuleBase::GlobalFunc::ZEROS(this->H_V_delta,GlobalC::ParaO.nloc); //init before calculate
+    if(GlobalV::GAMMA_ONLY_LOCAL)
+    {
+        ModuleBase::GlobalFunc::ZEROS(this->H_V_delta,GlobalC::ParaO.nloc); //init before calculate
+    }
 
     const double Rcut_Alpha = GlobalC::ORB.Alpha[0].getRcut();
     //same for all types of atoms
@@ -32,6 +35,7 @@ void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri)
 		Atom* atom0 = &GlobalC::ucell.atoms[T0]; 
         for (int I0 =0; I0< atom0->na; I0++)
         {
+            const int iat = GlobalC::ucell.itia2iat(T0,I0);
 			//=======================================================
 			//Step1:	
 			//saves <beta|psi>, where beta runs over L0,M0 on atom I0
@@ -44,7 +48,14 @@ void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri)
             GlobalC::GridD.Find_atom(GlobalC::ucell, atom0->tau[I0] ,T0, I0);
 
 			//outermost loop : all adjacent atoms
-			nlm_tot.resize(GlobalC::GridD.getAdjacentNum()+1);
+            if(GlobalV::GAMMA_ONLY_LOCAL)
+            {
+			    nlm_tot.resize(GlobalC::GridD.getAdjacentNum()+1);
+            }
+            else
+            {
+                this->nlm_k[iat].resize(GlobalC::GridD.getAdjacentNum()+1);
+            }
 
             for (int ad=0; ad<GlobalC::GridD.getAdjacentNum()+1 ; ++ad)
             {
@@ -58,8 +69,14 @@ void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri)
 				const int nw1_tot = atom1->nw*GlobalV::NPOL;
 
 				//middle loop : atomic basis on current processor (either row or column)
-				nlm_tot[ad].clear();
-
+                if(GlobalV::GAMMA_ONLY_LOCAL)
+				{
+                    nlm_tot[ad].clear();
+                }
+                else
+                {
+                    this->nlm_k[iat][ad].clear();
+                }
 				const double dist1 = (tau1-tau0).norm() * GlobalC::ucell.lat0;
 
 				if (dist1 > Rcut_Alpha + Rcut_AO1)
@@ -85,9 +102,22 @@ void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri)
 						atom1->iw2m[ iw1_0 ], // m1
 						atom1->iw2n[ iw1_0 ], // N1
 						GlobalC::ucell.atoms[T0].tau[I0], T0, I0, this->inl_index); //R0,T0
-					nlm_tot[ad].insert({iw1_all,nlm});
+                    if(GlobalV::GAMMA_ONLY_LOCAL)
+                    {
+					    nlm_tot[ad].insert({iw1_all,nlm});
+                    }
+                    else
+                    {
+                        this->nlm_k[iat][ad].insert({iw1_all,nlm});
+                    }
 				}//end iw
 			}//end ad
+
+            if(!GlobalV::GAMMA_ONLY_LOCAL)
+            {
+                //saves <alpha(0)|psi(R)>, to be used later 
+                continue;
+            }
 			//=======================================================
 			//Step2:	
 			//calculate sum_(L0,M0) alpha<psi_i|alpha><alpha|psi_j>

@@ -157,6 +157,11 @@ void LOOP_elec::before_solver(const int &istep)
 		{
 			//load a model
 			GlobalC::ld.deepks_pre_scf(INPUT.model_file);	//caoyu add 2021-07-26
+			if(!GlobalV::GAMMA_ONLY_LOCAL)
+			{
+				//if multi-k, build and save <psi(0)|alpha(R)> at beginning
+				GlobalC::ld.build_v_delta_alpha_new(0);
+			}
 		}
 	}
 #endif
