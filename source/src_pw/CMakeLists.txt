@@ -12,7 +12,7 @@ list(APPEND objects
     diago_cg.cpp
     diago_david.cpp
     efield.cpp
-    electrons.cpp
+    # electrons.cpp
     energy.cpp
     forces.cpp
     global.cpp
@@ -61,6 +61,7 @@ list(APPEND objects
 if(USE_CUDA)
     list(APPEND objects
         diago_cg.cu
+        electrons.cu
         hamilt.cu
         hamilt_pw.cu
         use_fft_kernel.cu
@@ -69,6 +70,8 @@ else()
     list(APPEND objects
         hamilt.cpp
         hamilt_pw.cpp
+        diago_cg.cpp
+        electrons.cpp
     )
 endif()
 
