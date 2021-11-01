@@ -8,10 +8,18 @@
 #include "../src_pw/global.h"
 #include <unordered_map>
 
-#include <torch/script.h>
-#include <torch/csrc/autograd/autograd.h>
-#include <npy.hpp>
-#include <torch/csrc/api/include/torch/linalg.h>
+#include "torch/script.h"
+#include "torch/csrc/autograd/autograd.h"
+#include "npy.hpp"
+#include "torch/csrc/api/include/torch/linalg.h"
+
+#include "LCAO_matrix.h"
+#include "../module_base/lapack_connector.h"
+#include "../module_base/intarray.h"
+#include "../module_base/complexmatrix.h"
+#include "global_fp.h"
+#include "../src_pw/global.h"
+#include "../src_io/winput.h"
 #ifdef __MPI
 #include "../src_parallel/parallel_deepks.h"
 #endif
@@ -94,9 +102,11 @@ public:
     ///compute Hellmann-Feynman term of the force contribution of \f$E_\delta\f$
     void cal_f_delta_hf(const ModuleBase::matrix& dm/**< [in] density matrix*/);
     void cal_f_delta_hf_new(const ModuleBase::matrix& dm/**< [in] density matrix*/);
+    void cal_f_delta_hf_k_new(const std::vector<ModuleBase::ComplexMatrix>& dm/**<[in] density matrix*/);
     
     ///compute Pulay  term of the force contribution of \f$E_\delta\f$
     void cal_f_delta_pulay(const ModuleBase::matrix& dm/**< [in] density matrix*/);
+    void cal_f_delta_k_pulay(const std::vector<ModuleBase::ComplexMatrix>& dm/**<[in] density matrix*/);
     
     ///compute the force contribution of \f$E_\delta\f$
     void cal_f_delta(const ModuleBase::matrix& dm/**< [in] density matrix*/);

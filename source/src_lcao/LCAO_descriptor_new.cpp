@@ -2,13 +2,6 @@
 #ifdef __DEEPKS
 
 #include "LCAO_descriptor.h"
-#include "LCAO_matrix.h"
-#include "../module_base/lapack_connector.h"
-#include "../module_base/intarray.h"
-#include "../module_base/complexmatrix.h"
-#include "global_fp.h"
-#include "../src_pw/global.h"
-#include "../src_io/winput.h"
 
 void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri)
 {
