@@ -116,20 +116,11 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-
         //ld.cal_gedm(LOC.wfc_dm_2d.dm_gamma[0]);
         //ld.build_v_delta_alpha(0);
         
-		if(GlobalV::GAMMA_ONLY_LOCAL)
-		{
-			GlobalC::ld.cal_gedm(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
-			//GlobalC::ld.build_v_delta_alpha(0);
-			GlobalC::ld.build_v_delta_alpha_new(0);
-			GlobalC::ld.add_v_delta();
-		}
-		else
-		{
-
-		}
-        //GlobalC::ld.build_v_delta_mu(0);
-        
-        
+		GlobalC::ld.cal_gedm(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
+		//GlobalC::ld.build_v_delta_alpha(0);
+		GlobalC::ld.build_v_delta_alpha_new(0);
+		GlobalC::ld.add_v_delta();
+        //GlobalC::ld.build_v_delta_mu(0);    
 	}
 	
 #endif
@@ -281,6 +272,14 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 //	std::cout << " Folding matrix here." << std::endl;
 	GlobalC::LM.update_Hloc2();
 
+#ifdef __DEEPKS	//caoyu add 2021-07-26 for DeePKS
+
+	if (GlobalV::deepks_scf)
+    {
+		//calculate dV from saved <alpha(0)|psi(R)>
+		GlobalC::ld.add_v_delta_k(ik);
+	}
+#endif
 /*
 	if(GlobalV::NURSE)
 	{

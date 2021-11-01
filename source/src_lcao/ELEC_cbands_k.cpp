@@ -5,6 +5,7 @@
 #include "../src_pw/symmetry_rho.h"
 #include "LCAO_evolve.h"
 #include "dftu.h"
+#include "LCAO_descriptor.h"
 
 ELEC_cbands_k::ELEC_cbands_k(){};
 ELEC_cbands_k::~ELEC_cbands_k(){};
@@ -18,7 +19,31 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 	int start_spin = -1;
 	uhm.GK.reset_spin(start_spin);
 	uhm.GK.allocate_pvpR();
-						
+
+#ifdef __DEEPKS
+	if (GlobalV::deepks_scf)
+    {
+		//step 1 : accumulate density matrix
+		if(GlobalV::NPOOL!=1)
+		{
+			ModuleBase::WARNING_QUIT("opt_ions","deepks not compatible with npool>1 now");
+		}
+		ModuleBase::ComplexMatrix dm_k_all;
+		dm_k_all.create(GlobalC::LOC.wfc_dm_2d.dm_k[0].nr, GlobalC::LOC.wfc_dm_2d.dm_k[0].nc);
+		for(int ik=0;ik<GlobalC::kv.nks;ik++)
+		{
+			ModuleBase::scale_accumulate(1.0,GlobalC::LOC.wfc_dm_2d.dm_k[ik],dm_k_all);
+		}
+		if(!dm_k_all.checkreal())
+		{
+			ModuleBase::WARNING_QUIT("opt_ions","accumulated density matrix not real!!");
+		}
+
+		//step 2 : obtain density matrix; calculate dE/dD
+		GlobalC::ld.cal_gedm(dm_k_all.dble());
+	}
+#endif
+
 	// pool parallization in future -- mohan note 2021-02-09
 	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{	

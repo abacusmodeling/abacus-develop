@@ -181,4 +181,217 @@ void LCAO_Descriptor::cal_f_delta(const ModuleBase::matrix &dm)
     this->del_gdmx();
     return;
 }
+
+//for multi-k, search adjacent atoms from mu
+void LCAO_Descriptor::build_v_delta_mu(const bool& calc_deri)
+{
+    ModuleBase::TITLE("LCAO_Descriptor", "build_v_delta_mu");
+    ModuleBase::GlobalFunc::ZEROS(this->H_V_delta, GlobalV::NLOCAL * GlobalV::NLOCAL); //init before calculate
+    //timer::tick ("LCAO_gen_fixedH","build_Nonlocal_mu");
+
+    // < phi1 | beta > < beta | phi2 >
+	// phi1 is within the unitcell.
+	// while beta is in the supercell.
+	// while phi2 is in the supercell.
+
+	int nnr = 0;
+	ModuleBase::Vector3<double> tau1, tau2, dtau;
+	ModuleBase::Vector3<double> dtau1, dtau2, tau0;
+	double distance = 0.0;
+	double distance1, distance2;
+	double rcut = 0.0;
+	double rcut1, rcut2;
+		
+//	Record_adj RA;
+//	RA.for_2d();
+
+	// psi1
+    for (int T1 = 0; T1 < GlobalC::ucell.ntype; ++T1)
+    {
+		const Atom* atom1 = &GlobalC::ucell.atoms[T1];
+        for (int I1 =0; I1< atom1->na; ++I1)
+        {
+            //GlobalC::GridD.Find_atom( atom1->tau[I1] );
+            GlobalC::GridD.Find_atom(GlobalC::ucell, atom1->tau[I1] ,T1, I1);
+			//const int iat1 = GlobalC::ucell.itia2iat(T1, I1);
+			const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
+            tau1 = atom1->tau[I1];
+
+			// psi2
+            for (int ad2=0; ad2<GlobalC::GridD.getAdjacentNum()+1; ++ad2)
+			{
+				const int T2 = GlobalC::GridD.getType(ad2);
+				const Atom* atom2 = &GlobalC::ucell.atoms[T2];
+                
+				const int I2 = GlobalC::GridD.getNatom(ad2);
+				//const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
+                const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
+                tau2 = GlobalC::GridD.getAdjacentTau(ad2);
+
+				bool is_adj = false;
+					
+				dtau = tau2 - tau1;
+				distance = dtau.norm() * GlobalC::ucell.lat0;
+				// this rcut is in order to make nnr consistent 
+				// with other matrix.
+				rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
+				if(distance < rcut) is_adj = true;
+				else if(distance >= rcut)
+				{
+                    for (int ad0 = 0; ad0 < GlobalC::GridD.getAdjacentNum()+1; ++ad0)
+                    {
+						const int T0 = GlobalC::GridD.getType(ad0);
+						//const int I0 = GlobalC::GridD.getNatom(ad0);
+						//const int T0 = RA.info[iat1][ad0][3];
+						//const int I0 = RA.info[iat1][ad0][4];
+                        //const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
+                        //const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
+
+                        tau0 = GlobalC::GridD.getAdjacentTau(ad0);
+                        dtau1 = tau0 - tau1;
+                        dtau2 = tau0 - tau2;
+
+                        double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
+                        double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
+
+                        rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Alpha[0].getRcut();
+                        rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Alpha[0].getRcut();
+
+                        if( distance1 < rcut1 && distance2 < rcut2 )
+                        {
+                            is_adj = true;
+                            break;
+                        }
+                    }
+				}
+
+
+				if(is_adj)
+				{
+					// < psi1 | all projectors | psi2 >
+					// ----------------------------- enter the nnr increaing zone -------------------------
+					for (int j=0; j<atom1->nw*GlobalV::NPOL; j++)
+					{
+						const int j0 = j/GlobalV::NPOL;//added by zhengdy-soc
+						const int iw1_all = start1 + j;
+						const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
+						if(mu < 0)continue; 
+
+						// fix a serious bug: atom2[T2] -> atom2
+						// mohan 2010-12-20
+						for (int k=0; k<atom2->nw*GlobalV::NPOL; k++)
+						{
+							const int k0 = k/GlobalV::NPOL;
+							const int iw2_all = start2 + k;
+							const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];						
+							if(nu < 0)continue;
+
+
+							//(3) run over all projectors in nonlocal pseudopotential.
+							for (int ad0=0; ad0 < GlobalC::GridD.getAdjacentNum()+1 ; ++ad0)
+							{
+								const int T0 = GlobalC::GridD.getType(ad0);
+                                const int I0 = GlobalC::GridD.getNatom(ad0);
+								tau0 = GlobalC::GridD.getAdjacentTau(ad0);
+
+								dtau1 = tau0 - tau1;
+								dtau2 = tau0 - tau2;
+								distance1 = dtau1.norm() * GlobalC::ucell.lat0;
+								distance2 = dtau2.norm() * GlobalC::ucell.lat0;
+
+								// seems a bug here!! mohan 2011-06-17
+								rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Alpha[0].getRcut();
+								rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Alpha[0].getRcut();
+
+								if(distance1 < rcut1 && distance2 < rcut2)
+								{
+									//const Atom* atom0 = &GlobalC::ucell.atoms[T0];
+									double nlm[3]={0,0,0};
+									if(!calc_deri)
+									{
+										GlobalC::UOT.snap_psialpha(
+												nlm, 0, tau1, T1,
+												atom1->iw2l[ j0 ], // L1
+												atom1->iw2m[ j0 ], // m1
+												atom1->iw2n[ j0 ], // N1
+												tau2, T2,
+												atom2->iw2l[ k0 ], // L2
+												atom2->iw2m[ k0 ], // m2
+												atom2->iw2n[ k0 ], // n2
+												tau0, T0, I0,
+                                                this->inl_index,
+                                                this->gedm);
+
+
+										if(GlobalV::GAMMA_ONLY_LOCAL)
+										{
+											// mohan add 2010-12-20
+											if( nlm[0]!=0.0 )
+											{
+                                                //GlobalC::LM.set_HSgamma(iw1_all,iw2_all,nlm[0],'N');//N stands for nonlocal.
+                                                int index = iw2_all * GlobalV::NLOCAL + iw1_all;     //for genelpa
+                                                this->H_V_delta[index] += nlm[0];
+                                            }
+										}
+										else
+                                        {
+                                            //for multi-k, not prepared yet 
+                                        }
+									}// calc_deri
+									else // calculate the derivative
+									{
+										if(GlobalV::GAMMA_ONLY_LOCAL)
+										{
+                                            GlobalC::UOT.snap_psialpha(
+                                                    nlm, 1, tau1, T1,
+                                                    atom1->iw2l[ j0 ], // L1
+                                                    atom1->iw2m[ j0 ], // m1
+                                                    atom1->iw2n[ j0 ], // N1
+                                                    tau2, T2,
+                                                    atom2->iw2l[ k0 ], // L2
+                                                    atom2->iw2m[ k0 ], // m2
+                                                    atom2->iw2n[ k0 ], // n2
+                                                    tau0, T0, I0,
+                                                    this->inl_index,
+                                                    this->gedm);
+
+											// sum all projectors for one atom.
+											//GlobalC::LM.set_force (iw1_all, iw2_all,	nlm[0], nlm[1], nlm[2], 'N');
+										}
+										else
+										{
+											// mohan change the order on 2011-06-17
+											// origin: < psi1 | beta > < beta | dpsi2/dtau >
+											//now: < psi1/dtau | beta > < beta | psi2 >
+											GlobalC::UOT.snap_psialpha(
+													nlm, 1, tau2, T2,
+													atom2->iw2l[ k0 ], // L2
+													atom2->iw2m[ k0 ], // m2
+													atom2->iw2n[ k0 ], // n2
+													tau1, T1,
+													atom1->iw2l[ j0 ], // L1
+													atom1->iw2m[ j0 ], // m1
+													atom1->iw2n[ j0 ], // N1
+                                                    tau0, T0, I0,
+                                                    this->inl_index,
+                                                    this->gedm);
+
+											//GlobalC::LM.DHloc_fixedR_x[nnr] += nlm[0];
+											//GlobalC::LM.DHloc_fixedR_y[nnr] += nlm[1];
+											//GlobalC::LM.DHloc_fixedR_z[nnr] += nlm[2];
+										}
+									}//!calc_deri
+								}// distance
+							} // ad0
+							++nnr;
+						}// k
+					} // j 
+				}// end is_adj
+			} // ad2
+		} // I1
+	} // T1
+
+    //timer::tick ("LCAO_gen_fixedH","build_Nonlocal_mu");
+	return;
+}
 #endif

@@ -6,6 +6,7 @@
 #include "../module_base/intarray.h"
 #include "../module_base/complexmatrix.h"
 #include "../src_pw/global.h"
+#include <unordered_map>
 
 #include <torch/script.h>
 #include <torch/csrc/autograd/autograd.h>
@@ -88,6 +89,7 @@ public:
     
     ///add \f$H_{\delta, \mu\nu}\f$ to the Hamiltonian matrix
     void add_v_delta(void);
+    void add_v_delta_k(const int &ik);
 
     ///compute Hellmann-Feynman term of the force contribution of \f$E_\delta\f$
     void cal_f_delta_hf(const ModuleBase::matrix& dm/**< [in] density matrix*/);
@@ -127,6 +129,7 @@ public:
 
     ///calculate \f$tr(\rho H_\delta), \rho = \sum_i{c_{i, \mu}c_{i,\nu}} \f$ (for gamma_only)
     void cal_e_delta_band(const std::vector<ModuleBase::matrix>& dm/**<[in] density matrix*/);
+    void cal_e_delta_band_k(const std::vector<ModuleBase::ComplexMatrix>& dm/**<[in] density matrix*/);
 //-------------------
 // public variables
 //-------------------
@@ -138,6 +141,7 @@ public:
     double e_delta_band = 0.0;
     ///Correction term to the Hamiltonian matrix: \f$\langle\psi|V_\delta|\psi\rangle\f$
     double* H_V_delta;
+    std::complex<double>** H_V_delta_k;
     ///(Unit: Ry/Bohr) Total Force due to the DeePKS correction term \f$E_{\delta}\f$
     ModuleBase::matrix	F_delta;
 
@@ -167,6 +171,9 @@ private:
     double* DH_V_delta_x;
     double* DH_V_delta_y;
     double* DH_V_delta_z;
+
+    // saves <psi(0)|alpha(R)>, for k point
+    std::vector<std::vector<std::unordered_map<int,std::vector<std::vector<double>>>>> nlm_k;
 
     // projected density matrix
 	double** pdm;	//[tot_Inl][2l+1][2l+1]	caoyu modified 2021-05-07
