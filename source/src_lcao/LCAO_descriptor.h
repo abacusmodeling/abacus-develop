@@ -182,6 +182,10 @@ private:
     double* DH_V_delta_y;
     double* DH_V_delta_z;
 
+    std::complex<double>** DH_V_delta_x_k;
+    std::complex<double>** DH_V_delta_y_k;
+    std::complex<double>** DH_V_delta_z_k;
+
     // saves <psi(0)|alpha(R)>, for k point
     std::vector<std::vector<std::unordered_map<int,std::vector<std::vector<double>>>>> nlm_k;
 
