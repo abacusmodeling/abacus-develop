@@ -38,6 +38,8 @@ For comments that need to be shown in documents, these formats should be used --
 
 A helpful VS Code extension -- Doxygen Documentation Generator, can help you formating comments.
 
+An practical example is class [LCAO_Descriptor](https://github.com/deepmodeling/abacus-develop/blob/deepks/source/src_lcao/LCAO_descriptor.h), the effects can be seen on [readthedocs page](https://abacus-deepks.readthedocs.io/en/latest/DeePKS_API/classLCAO__Descriptor.html#exhale-class-classLCAO-Descriptor)
+
 - Detailed Comment Block
     ```
     /**

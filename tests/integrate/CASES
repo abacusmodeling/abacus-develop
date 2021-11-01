@@ -6,6 +6,7 @@
 101_PW_VW_pseudopots
 102_PW_DA_davidson
 103_PW_15_CS_CF
+103_PW_15_CS_CF_bspline
 103_PW_CF_CS_S1_smallg
 103_PW_CF_CS_S2_smallg
 103_PW_OU_CS_CF
@@ -75,5 +76,5 @@
 401_NP_KP_spd
 601_NO_TDDFT_N2_vel
 601_NO_TDDFT_N2_occ
-701_LJ_Ar
+#701_LJ_Ar
 

@@ -80,9 +80,12 @@ void Run_pw::plane_wave_line(void)
     // distribution of plane waves
     GlobalC::Pgrid.init(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, GlobalC::pw.nczp,
         GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
-    
-    // cout<<"after pgrid init nrxx = "<<GlobalC::pw.nrxx<<endl;
+        
 
+    // Calculate Structure factor
+    GlobalC::pw.setup_structure_factor();
+    // cout<<"after pgrid init nrxx = "<<GlobalC::pw.nrxx<<endl;
+    
 //----------------------------------------------------------
 // 1 read in initial data:
 //   a lattice structure:atom_species,atom_positions,lattice std::vector
@@ -114,7 +117,7 @@ void Run_pw::plane_wave_line(void)
 
 
     // caoyu add 2020-11-24, mohan updat 2021-01-03
-    if(GlobalV::BASIS_TYPE=="pw" && INPUT.out_descriptor==1)
+    if(GlobalV::BASIS_TYPE=="pw" && GlobalV::out_descriptor==1)
     {
         Numerical_Descriptor nc;
         nc.output_descriptor(GlobalC::wf.evc, INPUT.lmax_descriptor);

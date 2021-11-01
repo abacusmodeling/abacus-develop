@@ -107,10 +107,18 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-
 	
 #ifdef __DEEPKS	//caoyu add 2021-07-26 for DeePKS
 
-	if (INPUT.deepks_scf)
-	{
-		ld.cal_v_delta(LOC.wfc_dm_2d.dm_gamma[0]);
-		ld.add_v_delta();
+	if (GlobalV::deepks_scf)
+    {
+        //========method 1========
+        //ld.cal_v_delta(LOC.wfc_dm_2d.dm_gamma[0]);
+
+        //========method 2========
+        //ld.cal_gedm(LOC.wfc_dm_2d.dm_gamma[0]);
+        //ld.build_v_delta_alpha(0);
+        GlobalC::ld.cal_gedm(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
+        GlobalC::ld.build_v_delta_mu(0);
+        
+        GlobalC::ld.add_v_delta();
 	}
 	
 #endif

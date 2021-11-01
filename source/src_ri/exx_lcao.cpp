@@ -23,6 +23,10 @@
 
 #include <thread>
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 #ifdef __MKL
 #include <mkl_service.h>
 #endif
@@ -1443,10 +1447,14 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Mo
 #endif
 	
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> HexxR(GlobalV::NSPIN);
+#ifdef _OPENMP
 	omp_lock_t Hexx_lock;
 	omp_init_lock(&Hexx_lock);
+#endif
 	
+#ifdef _OPENMP
 	#pragma omp parallel
+#endif
 	{
 		// m_new( i2, i1, i3 ) = m( i1, i2, i3 )
 		auto transform = [](
@@ -1532,7 +1540,9 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Mo
 		
 		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> HexxR_tmp(GlobalV::NSPIN);
 	
+#ifdef _OPENMP
 		#pragma omp for
+#endif
 		for(size_t i_atom_pair=0; i_atom_pair<atom_pairs_core.size(); ++i_atom_pair)
 		{		
 			const size_t iat1 = atom_pairs_core[i_atom_pair].first;
@@ -1724,24 +1734,40 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Mo
 						}	// end for box4
 					}	// end for box3
 					
+#ifdef _OPENMP
 					if( !vector_empty(HexxR_tmp) && omp_test_lock(&Hexx_lock) )
 					{
 						insert_matrixes(HexxR,HexxR_tmp);
 						omp_unset_lock(&Hexx_lock);
 					}
+#else
+					if( !vector_empty(HexxR_tmp) )
+					{
+						insert_matrixes(HexxR,HexxR_tmp);
+					}
+#endif
 				}	// end for iat4
 			}	// end for iat3
 		}	// end omp for i_atom_pair
 
+#ifdef _OPENMP
 		if(!vector_empty(HexxR_tmp))
 		{
 			omp_set_lock(&Hexx_lock);
 			insert_matrixes(HexxR,HexxR_tmp);
 			omp_unset_lock(&Hexx_lock);
-		}	
+		}
+#else
+		if(!vector_empty(HexxR_tmp))
+		{
+			insert_matrixes(HexxR,HexxR_tmp);
+		}
+#endif
 	} // end omp parallel
 
+#ifdef _OPENMP
 	omp_destroy_lock(&Hexx_lock);
+#endif
 	
 #ifdef __MKL
     mkl_set_num_threads(mkl_threads);

@@ -110,6 +110,118 @@ double MD_func::GetAtomKE(const int& numIon, const ModuleBase::Vector3<double>* 
 	return ke;
 }
 
+// Read Velocity from STRU liuyu 2021-09-24
+void MD_func::ReadVel(
+	const UnitCell_pseudo &unit_in, 
+	ModuleBase::Vector3<double>* vel)
+{
+	int iat=0;
+    for(int it=0; it<unit_in.ntype; ++it)
+    {
+        for(int ia=0; ia<unit_in.atoms[it].na; ++ia)
+        {
+            vel[iat] = unit_in.atoms[it].vel[ia];
+			if(unit_in.atoms[it].mbl[ia].x==0) vel[iat].x = 0;
+			if(unit_in.atoms[it].mbl[ia].y==0) vel[iat].y = 0;
+			if(unit_in.atoms[it].mbl[ia].z==0) vel[iat].z = 0;
+            ++iat;
+        }
+    }
+    assert(iat==unit_in.nat);
+}
+
+// Initial velocity randomly
+void MD_func::RandomVel(
+	const int& numIon, 
+	const double& temperature, 
+	const double* allmass,
+	const int& frozen_freedom,
+	const ModuleBase::Vector3<int>* ionmbl,
+	ModuleBase::Vector3<double>* vel)
+{
+	if(!GlobalV::MY_RANK)
+	{
+		srand(time(0));
+		ModuleBase::Vector3<double> average;
+		ModuleBase::Vector3<double> mass;
+		average.set(0,0,0);
+		mass.set(0,0,0);
+		for(int i=0; i<numIon; i++)
+		{
+			if(ionmbl[i].x==0)
+			{
+				vel[i].x = 0;
+			}
+			else
+			{
+				vel[i].x = rand()/double(RAND_MAX)-0.5;
+				mass.x += allmass[i];
+			}
+			if(ionmbl[i].y==0)
+			{
+				vel[i].y = 0;
+			}
+			else
+			{
+				vel[i].y = rand()/double(RAND_MAX)-0.5;
+				mass.y += allmass[i];
+			}
+			if(ionmbl[i].z==0)
+			{
+				vel[i].z = 0;
+			}
+			else
+			{
+				vel[i].z = rand()/double(RAND_MAX)-0.5;
+				mass.z += allmass[i];
+			}
+			average += allmass[i]*vel[i];
+		}
+
+		average.x = average.x / mass.x;
+		average.y = average.y / mass.y;
+		average.z = average.z / mass.z;
+
+		for(int i=0; i<numIon; i++)
+    	{
+			if(ionmbl[i].x) vel[i].x -= average.x;
+			if(ionmbl[i].y) vel[i].y -= average.y;
+			if(ionmbl[i].z) vel[i].z -= average.z;
+		}
+	
+		double factor = 0.5*(3*numIon-frozen_freedom)*temperature/GetAtomKE(numIon, vel, allmass);
+		for(int i=0; i<numIon; i++)
+    	{
+        	vel[i] = vel[i]*sqrt(factor);
+    	}
+	}
+
+#ifdef __MPI
+	MPI_Bcast(vel,numIon*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
+#endif
+	return;
+}
+
+void MD_func::InitVel(
+	const UnitCell_pseudo &unit_in, 
+	const double& temperature, 
+	double* allmass,
+	int& frozen_freedom,
+	ModuleBase::Vector3<int>* ionmbl,
+	ModuleBase::Vector3<double>* vel)
+{
+	//frozen_freedom = getMassMbl(unit_in, allmass, ionmbl);
+
+	if(unit_in.set_vel)
+    {
+        ReadVel(unit_in, vel);
+    }
+    else
+    {
+        RandomVel(unit_in.nat, temperature, allmass, frozen_freedom, ionmbl, vel);
+    }
+}
+
 void MD_func::InitVelocity(
 	const int& numIon, 
 	const double& temperature, 
@@ -157,7 +269,7 @@ void MD_func::InitVelocity(
 			}
 		}
       
-		int ion;
+		int ion = 0;
 		for(ion=0;ion<numIon;ion++){
 			vel[ion]/=sqrt(allmass[ion]*9.01938e-31);				 
 		}
@@ -245,22 +357,34 @@ std::string MD_func::intTurnTostring(long int iter, std::string path)
 	return path;
 }
 
-int MD_func::getMassMbl(const UnitCell_pseudo &unit_in, double* allmass, ModuleBase::Vector3<int>* ionmbl)
+int MD_func::getMassMbl(const UnitCell_pseudo &unit_in, 
+			const MD_parameters &mdp,
+			double* allmass, 
+			ModuleBase::Vector3<int>* ionmbl)
 {
 //some prepared information
 //mass and degree of freedom
 	int ion=0;
-	int nfrozen=0;
+	int frozen_freedom=0;
 	for(int it=0;it<unit_in.ntype;it++){
 		for(int i=0;i<unit_in.atoms[it].na;i++){
-			allmass[ion]=unit_in.atoms[it].mass/6.02/9.109*1e5;
+			allmass[ion]=unit_in.atoms[it].mass/ModuleBase::AU_to_MASS;
 			ionmbl[ion]=unit_in.atoms[it].mbl[i];
-			if (ionmbl[ion].x==0||ionmbl[ion].y==0||ionmbl[ion].z==0) nfrozen++;
+			if (ionmbl[ion].x==0) frozen_freedom++;
+			if (ionmbl[ion].y==0) frozen_freedom++;
+			if (ionmbl[ion].z==0) frozen_freedom++;
 
 			ion++;
 		}
 	}
-	return nfrozen;
+
+	// the center of mass is fixed except for NVT Anderson
+	if(!(mdp.mdtype==1 && mdp.NVT_control==3))
+	{
+		frozen_freedom += 3;
+	}
+
+	return frozen_freedom;
 }
 
 void MD_func::printpos(const std::string& file, const int& iter, const int& recordFreq, const UnitCell_pseudo& unit_in)
@@ -308,13 +432,13 @@ void MD_func::scalevel(
 	{
 		for(int i=0;i<numIon;i++)
 		{
-			vel[i]*=sqrt(3*(numIon-nfrozen)*temperature/ke/2);
+			vel[i]*=sqrt((3*numIon-nfrozen)*temperature/ke/2);
 		}
 	}
 	return;
 }
 
-double MD_func::Conserved(const double KE, const double PE, const int number){
+double MD_func::Conserved(const double KE, const double PE, const int nfreedom){
 //---------------------------------------------------------------------------
 //   This function calculates the conserved quantity for the NVE system. 
 //----------------------------------------------------------------------------
@@ -333,7 +457,7 @@ double MD_func::Conserved(const double KE, const double PE, const int number){
         GlobalV::ofs_running<< "            SUMMARY OF NVE CALCULATION            "<<std::endl;
         GlobalV::ofs_running<<" --------------------------------------------------"<<std::endl;  
 		GlobalV::ofs_running<< "NVE Conservation     : "<< Conserved<<" (Hartree)"<<std::endl;
-		GlobalV::ofs_running<< "NVE Temperature      : "<< 2*KE/(3*number)/ModuleBase::K_BOLTZMAN_AU<<" (K)"<<std::endl;
+		GlobalV::ofs_running<< "NVE Temperature      : "<< 2*KE/(nfreedom)*ModuleBase::Hartree_to_K<<" (K)"<<std::endl;
 		GlobalV::ofs_running<< "NVE Kinetic energy   : "<< KE<<" (Hartree)"<<std::endl;
 		GlobalV::ofs_running<< "NVE Potential energy : "<< PE<<" (Hartree)"<<std::endl;
 	}

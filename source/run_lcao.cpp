@@ -89,7 +89,7 @@ void Run_lcao::lcao_line(void)
 		INPUT.lcao_dk,
 		INPUT.lcao_dr,
 		INPUT.lcao_rmax,
-		INPUT.out_descriptor,
+		GlobalV::out_descriptor,
 		INPUT.out_r_matrix,
 		GlobalV::FORCE,
 		GlobalV::MY_RANK);
@@ -106,7 +106,7 @@ void Run_lcao::lcao_line(void)
 		GlobalC::UOT,
 		GlobalC::ORB,
 		GlobalC::ucell.lat0,
-		INPUT.out_descriptor,
+		GlobalV::out_descriptor,
 		Exx_Abfs::Lmax,
 		GlobalC::ucell.infoNL.nprojmax,
 		GlobalC::ucell.infoNL.nproj,
@@ -137,7 +137,8 @@ void Run_lcao::lcao_line(void)
     // distribution of plane waves
     GlobalC::Pgrid.init(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, GlobalC::pw.nczp,
         GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
-
+	// Calculate Structure factor
+    GlobalC::pw.setup_structure_factor();
 
 	// Inititlize the charge density.
     GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
