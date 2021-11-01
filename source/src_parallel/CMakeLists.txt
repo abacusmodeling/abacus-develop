@@ -1,6 +1,4 @@
-add_library(
-    parallel
-    OBJECT
+list(APPEND objects
     ft.cpp
     parallel_common.cpp
     parallel_global.cpp
@@ -13,6 +11,11 @@ add_library(
 )
 
 if(ENABLE_DEEPKS)
-	target_sources(parallel PRIVATE parallel_deepks.cpp)
+list(APPEND objects parallel_deepks.cpp)
 endif()
 
+add_library(
+    parallel
+    OBJECT
+    ${objects}
+)
