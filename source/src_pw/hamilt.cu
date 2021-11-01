@@ -129,11 +129,11 @@ void Hamilt::diagH_pw(
                 int nkb = GlobalC::ppcell.nkb;
                 if(iter < 0)
                 {
-                    cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_C2C);
+                    CHECK_CUFFT(cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_C2C));
                 }
                 else
                 {
-                    cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
+                    CHECK_CUFFT(cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z));
                 }
 
                 CHECK_CUDA(cudaMalloc((void**)&d_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx * GlobalV::NPOL * sizeof(double2)));
@@ -212,7 +212,7 @@ void Hamilt::diagH_pw(
                         hamilt_cast_d2f<<<block3, thread>>>(f_precondition, d_precondition, DIM_CG_CUDA);
                         // add vkb_c parameter
                         hamilt_cast_d2f<<<block4, thread>>>(f_vkb_c, d_vkb_c, GlobalC::wf.npwx*nkb);
-                        // cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_C2C);
+                        // CHECK_CUFFT(cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_C2C));
                         // cout<<"Do float CG ..."<<endl;
                         f_cg_cuda.diag(f_wf_evc, f_wf_ekb, f_vkb_c, DIM_CG_CUDA, GlobalC::wf.npwx,
                             GlobalV::NBANDS, f_precondition, GlobalV::ETHR,
@@ -225,14 +225,14 @@ void Hamilt::diagH_pw(
                     else
                     {
                         // cout<<"begin cg!!"<<endl;
-                        // cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
+                        // CHECK_CUFFT(cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z));
                         // cout<<"Do double CG ..."<<endl;
                         d_cg_cuda.diag(d_wf_evc, d_wf_ekb, d_vkb_c, DIM_CG_CUDA, GlobalC::wf.npwx,
                             GlobalV::NBANDS, d_precondition, GlobalV::ETHR,
                             GlobalV::DIAGO_CG_MAXITER, reorder, notconv, avg);
                     }
-                    
-                    cufftDestroy(GlobalC::UFFT.fft_handle);
+                    // TODO destroy handle
+                    CHECK_CUFFT(cufftDestroy(GlobalC::UFFT.fft_handle));
                     // to cpu
                     CHECK_CUDA(cudaMemcpy(GlobalC::wf.evc[ik0].c, d_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx * sizeof(double2), cudaMemcpyDeviceToHost));
                     CHECK_CUDA(cudaMemcpy(GlobalC::wf.ekb[ik], d_wf_ekb, GlobalV::NBANDS * sizeof(double), cudaMemcpyDeviceToHost));
@@ -255,12 +255,12 @@ void Hamilt::diagH_pw(
                     // CHECK_CUDA(cudaMemcpy(d_wf_ekb, GlobalC::wf.ekb[ik], GlobalV::NBANDS * sizeof(double), cudaMemcpyHostToDevice));
                     CHECK_CUDA(cudaMemcpy(d_precondition, precondition, DIM_CG_CUDA2 * sizeof(double), cudaMemcpyHostToDevice));
                     // do things
-                    cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
+                    CHECK_CUFFT(cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z));
 
                     d_cg_cuda.diag(d_wf_evc, d_wf_ekb, d_vkb_c, DIM_CG_CUDA2, DIM_CG_CUDA2,
                         GlobalV::NBANDS, d_precondition, GlobalV::ETHR,
                         GlobalV::DIAGO_CG_MAXITER, reorder, notconv, avg);
-                    cufftDestroy(GlobalC::UFFT.fft_handle);
+                    CHECK_CUFFT(cufftDestroy(GlobalC::UFFT.fft_handle));
 
                     // to cpu
                     CHECK_CUDA(cudaMemcpy(GlobalC::wf.evc[ik0].c, d_wf_evc, GlobalV::NBANDS * DIM_CG_CUDA2 * sizeof(double2), cudaMemcpyDeviceToHost));

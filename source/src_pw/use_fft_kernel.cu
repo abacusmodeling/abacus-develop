@@ -97,9 +97,10 @@ void RoundTrip_kernel(const float2 *psi, const float *vr, const int *fft_index, 
     // Reorder_psi_plus(ordered_psi, psic);
 
     // cufftHandle cufftplan_gpu;
-    // cufftPlan3d(&cufftplan_gpu, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
-    cufftExecC2C(GlobalC::UFFT.fft_handle, psic, psic, CUFFT_INVERSE);
-    // cufftDestroy(cufftplan_gpu);
+    // CHECK_CUFFT(cufftPlan3d(&cufftplan_gpu, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z));
+    CHECK_CUFFT(cufftExecC2C(GlobalC::UFFT.fft_handle, psic, psic, CUFFT_INVERSE));
+    cudaDeviceSynchronize();
+    // CHECK_CUFFT(cufftDestroy(cufftplan_gpu));
 
     // int block3 = (GlobalC::pw.nrxx + thread - 1) / thread;
     // kernel_normalization<<<block3, thread>>>(GlobalC::pw.nrxx, psic, (double)(GlobalC::pw.nrxx));
@@ -107,9 +108,10 @@ void RoundTrip_kernel(const float2 *psi, const float *vr, const int *fft_index, 
     kernel_roundtrip<float, float2><<<block2, thread>>>(GlobalC::pw.nrxx, psic, vr);
 
     // cufftHandle cufftplan_gpu2;
-    // cufftPlan3d(&cufftplan_gpu, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
-    cufftExecC2C(GlobalC::UFFT.fft_handle, psic, psic, CUFFT_FORWARD);
-    // cufftDestroy(cufftplan_gpu);
+    // CHECK_CUFFT(cufftPlan3d(&cufftplan_gpu, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z));
+    CHECK_CUFFT(cufftExecC2C(GlobalC::UFFT.fft_handle, psic, psic, CUFFT_FORWARD));
+    cudaDeviceSynchronize();
+    // CHECK_CUFFT(cufftDestroy(cufftplan_gpu));
 
     // Reorder_psi_minus(psic, ordered_psi);
 
@@ -153,9 +155,10 @@ void RoundTrip_kernel(const double2 *psi, const double *vr, const int *fft_index
     // Reorder_psi_plus(ordered_psi, psic);
 
     // cufftHandle cufftplan_gpu;
-    // cufftPlan3d(&cufftplan_gpu, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
-    cufftExecZ2Z(GlobalC::UFFT.fft_handle, psic, psic, CUFFT_INVERSE);
-    // cufftDestroy(cufftplan_gpu);
+    // CHECK_CUFFT(cufftPlan3d(&cufftplan_gpu, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z));
+    CHECK_CUFFT(cufftExecZ2Z(GlobalC::UFFT.fft_handle, psic, psic, CUFFT_INVERSE));
+    cudaDeviceSynchronize();
+    // CHECK_CUFFT(cufftDestroy(cufftplan_gpu));
 
     // int block3 = (GlobalC::pw.nrxx + thread - 1) / thread;
     // kernel_normalization<<<block3, thread>>>(GlobalC::pw.nrxx, psic, (double)(GlobalC::pw.nrxx));
@@ -171,9 +174,10 @@ void RoundTrip_kernel(const double2 *psi, const double *vr, const int *fft_index
     kernel_roundtrip<double, double2><<<block2, thread>>>(GlobalC::pw.nrxx, psic, vr);
 
     // cufftHandle cufftplan_gpu2;
-    // cufftPlan3d(&cufftplan_gpu, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z);
-    cufftExecZ2Z(GlobalC::UFFT.fft_handle, psic, psic, CUFFT_FORWARD);
-    // cufftDestroy(cufftplan_gpu);
+    // CHECK_CUFFT(cufftPlan3d(&cufftplan_gpu, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z));
+    CHECK_CUFFT(cufftExecZ2Z(GlobalC::UFFT.fft_handle, psic, psic, CUFFT_FORWARD));
+    cudaDeviceSynchronize();
+    // CHECK_CUFFT(cufftDestroy(cufftplan_gpu));
 
     // Reorder_psi_minus(psic, ordered_psi);
 
