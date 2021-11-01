@@ -2,6 +2,14 @@
 #ifdef __DEEPKS
 
 #include "LCAO_descriptor.h"
+#include "LCAO_matrix.h"
+#include "../module_base/lapack_connector.h"
+#include "../module_base/intarray.h"
+#include "../module_base/complexmatrix.h"
+#include "global_fp.h"
+#include "../src_pw/global.h"
+#include "../src_io/winput.h"
+
 
 namespace GlobalC
 {
@@ -771,33 +779,15 @@ void LCAO_Descriptor::deepks_pre_scf(const string& model_file)
             ModuleBase::GlobalFunc::ZEROS(DS_mu_alpha_z[inl], GlobalV::NLOCAL * (2 * this->lmaxd + 1));
         }
         //init DH_V_delta*
-        if(GlobalV::GAMMA_ONLY_LOCAL)
-        {
-            delete[] DH_V_delta_x;
-            delete[] DH_V_delta_y;
-            delete[] DH_V_delta_z;
-            this->DH_V_delta_x = new double[GlobalC::ParaO.nloc];
-            this->DH_V_delta_y = new double [GlobalC::ParaO.nloc];
-            this->DH_V_delta_z = new double[GlobalC::ParaO.nloc];
-            ModuleBase::GlobalFunc::ZEROS(DH_V_delta_x, GlobalC::ParaO.nloc);
-            ModuleBase::GlobalFunc::ZEROS(DH_V_delta_y, GlobalC::ParaO.nloc);
-            ModuleBase::GlobalFunc::ZEROS(DH_V_delta_z, GlobalC::ParaO.nloc);
-        }
-        else
-        {
-            DH_V_delta_x_k = new std::complex<double>* [GlobalC::kv.nks];
-            DH_V_delta_y_k = new std::complex<double>* [GlobalC::kv.nks];
-            DH_V_delta_z_k = new std::complex<double>* [GlobalC::kv.nks];
-            for(int ik=0;ik<GlobalC::kv.nks;ik++)
-            {
-                this->DH_V_delta_x_k[ik] = new std::complex<double>[GlobalC::ParaO.nloc];
-                this->DH_V_delta_y_k[ik] = new std::complex<double>[GlobalC::ParaO.nloc];
-                this->DH_V_delta_z_k[ik] = new std::complex<double>[GlobalC::ParaO.nloc];
-                ModuleBase::GlobalFunc::ZEROS(this->DH_V_delta_x_k[ik], GlobalC::ParaO.nloc);
-                ModuleBase::GlobalFunc::ZEROS(this->DH_V_delta_y_k[ik], GlobalC::ParaO.nloc);
-                ModuleBase::GlobalFunc::ZEROS(this->DH_V_delta_z_k[ik], GlobalC::ParaO.nloc);
-            }
-        }
+        delete[] DH_V_delta_x;
+        delete[] DH_V_delta_y;
+        delete[] DH_V_delta_z;
+        this->DH_V_delta_x = new double[GlobalC::ParaO.nloc];
+        this->DH_V_delta_y = new double [GlobalC::ParaO.nloc];
+        this->DH_V_delta_z = new double[GlobalC::ParaO.nloc];
+        ModuleBase::GlobalFunc::ZEROS(DH_V_delta_x, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS(DH_V_delta_y, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS(DH_V_delta_z, GlobalC::ParaO.nloc);
     }
     if(!GlobalV::GAMMA_ONLY_LOCAL)
     {
