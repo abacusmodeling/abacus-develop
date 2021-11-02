@@ -4,6 +4,8 @@
 FFT::FFT()
 {
 	nx = ny = nz = 2;
+	nxy = 4;
+	nxyz = 8;
 	ns = 1; 
 	nplane = 1;
 	mpifft = false; 
@@ -40,17 +42,19 @@ void FFT:: initfft(int nx_in, int ny_in , int nz_in, int ns_in, int nplane_in, b
 	this->ns = ns_in;
 	this->nplane = nplane_in;
 	this->mpifft = mpifft_in;
+	this->nxy = this->nx * this-> ny;
+	this->nxyz = this->nxy * this->nz;
 	if(!this->mpifft)
 	{
-		c_gspace  = fftw_malloc(sizeof(fftw_complex) * this->nz * this->ns);
-		r_gspace = fftw_malloc(sizeof(double) * this->nz * this->ns);
-		c_rspace  = fftw_malloc(sizeof(fftw_complex) * this->nx * this->ny * nplane);
-		r_rspace = fftw_malloc(sizeof(double) * this->nx * this->ny * nplane);
+		c_gspace  = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * this->nz * this->ns);
+		r_gspace = (fftw_complex*)fftw_malloc(sizeof(double) * this->nz * this->ns);
+		c_rspace  = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * this->nx * this->ny * nplane);
+		r_rspace = (fftw_complex*)fftw_malloc(sizeof(double) * this->nx * this->ny * nplane);
 #ifdef __MIX_PRECISION
-		cf_gspace  = fftw_malloc(sizeof(fftwf_complex) * this->nz * this->ns);
-		rf_gspace = fftw_malloc(sizeof(float) * this->nz * this->ns);
-		cf_rspace  = fftw_malloc(sizeof(fftwf_complex) * this->nx * this->ny * nplane);
-		rf_rspace = fftw_malloc(sizeof(float) * this->nx * this->ny * nplane);
+		cf_gspace  = (fftwf_complex*)fftw_malloc(sizeof(fftwf_complex) * this->nz * this->ns);
+		rf_gspace = (fftwf_complex*)fftw_malloc(sizeof(float) * this->nz * this->ns);
+		cf_rspace  = (fftwf_complex*)fftw_malloc(sizeof(fftwf_complex) * this->nx * this->ny * nplane);
+		rf_rspace = (fftwf_complex*)fftw_malloc(sizeof(float) * this->nx * this->ny * nplane);
 #endif
 	}
 	else
@@ -87,46 +91,45 @@ void FFT :: initpland()
 	//                              1 D
 	//---------------------------------------------------------
 
-	//               fftw_plan_many_dft(int rank, const int *n, int howmany,
+	//               fftw_plan_many_dft(int rank,          const int *n,       int howmany,
 	//					                fftw_complex *in,  const int *inembed, int istride, int idist, 
 	//					                fftw_complex *out, const int *onembed, int ostride, int odist, int sign, unsigned flags);
-	this->plan1for = fftw_plan_many_dft( 1,   &this->nz,  this->ns,  
-										c_gspace,   &this->nz,  1,  this->nz,
-										c_gspace,  &this->nz,  1,  this->nz,  FFTW_FORWARD,  FFTW_MEASURE);
+	this->plan1for = fftw_plan_many_dft(     1,    &this->nz,  this->ns,  
+					    (fftw_complex*) c_gspace,  &this->nz,  1,  this->nz,
+					    (fftw_complex*) c_gspace,  &this->nz,  1,  this->nz,  FFTW_FORWARD,  FFTW_MEASURE);
 	
-	this->plan1bac = fftw_plan_many_dft( 1,   &this->nz,  this->ns,  
-										c_gspace,   &this->nz,  1,  this->nz,
-										c_gspace,  &this->nz,  1,  this->nz,  FFTW_BACKWARD,  FFTW_MEASURE);
+	this->plan1bac = fftw_plan_many_dft(     1,    &this->nz,  this->ns,  
+						(fftw_complex*) c_gspace,  &this->nz,  1,  this->nz,
+						(fftw_complex*) c_gspace,  &this->nz,  1,  this->nz,  FFTW_BACKWARD,  FFTW_MEASURE);
 	
-	this->plan1r2c = fftw_plan_many_dft_r2c( 1,   &this->nz,  this->ns,  
-										r_gspace,   &this->nz,  1,  this->nz,
-										c_gspace,  &this->nz,  1,  this->nz,  FFTW_MEASURE);
+	this->plan1r2c = fftw_plan_many_dft_r2c( 1,    &this->nz,  this->ns,  
+										r_gspace,  &this->nz,  1,  this->nz,
+						(fftw_complex*) c_gspace,  &this->nz,  1,  this->nz,  FFTW_MEASURE);
 	
 	this->plan1c2r = fftw_plan_many_dft_c2r( 1,   &this->nz,  this->ns,  
-										c_gspace,  &this->nz,  1,  this->nz,
-										r_gspace,   &this->nz,  1,  this->nz,  FFTW_MEASURE);
+						(fftw_complex*) c_gspace, &this->nz,  1,  this->nz,
+										r_gspace, &this->nz,  1,  this->nz,  FFTW_MEASURE);
 
 	//---------------------------------------------------------
 	//                              2 D
 	//---------------------------------------------------------
-	int nxy = this->nx * this-> ny;
 	
-	int * nrank = {2, 2};
-	this->plan1for = fftw_plan_many_dft( 2,   nrank,  this->nz,  
-										c_rspace,   nrank,  1,  nxy,
-										c_rspace,  nrank,  1,  nxy,  FFTW_FORWARD,  FFTW_MEASURE);
+	int * nrank = {this->nx, this->ny};
+	this->plan2for = fftw_plan_many_dft(       2,   nrank,  this->nz,  
+						(fftw_complex*) c_rspace,   nrank,  this->nz,   1,
+						(fftw_complex*) c_rspace,   nrank,  this->nz,   1,  FFTW_FORWARD,  FFTW_MEASURE);
+
+	this->plan2bac = fftw_plan_many_dft(       2,   nrank,  this->nz,  
+						(fftw_complex*) c_rspace,   nrank,  this->nz,   1,
+						(fftw_complex*) c_rspace,   nrank,  this->nz,   1,  FFTW_BACKWARD,  FFTW_MEASURE);
 	
-	this->plan1bac = fftw_plan_many_dft( 2,   nrank,  this->nz,  
-										c_rspace,   nrank,  1,  nxy,
-										c_rspace,  nrank,  1,  nxy,  FFTW_BACKWARD,  FFTW_MEASURE);
+	this->plan2r2c = fftw_plan_many_dft_r2c(   2,   nrank,  this->nz,  
+										r_rspace,   nrank,  this->nz,   1,
+						(fftw_complex*) c_rspace,   nrank,  this->nz,   1,  FFTW_MEASURE);
 	
-	this->plan1r2c = fftw_plan_many_dft_r2c( 2,   nrank,  this->nz,  
-										r_rspace,    nrank,  1,  nxy,
-										c_rspace,  nrank,  1,  nxy,  FFTW_MEASURE);
-	
-	this->plan1c2r = fftw_plan_many_dft_c2r( 2,   nrank,  this->nz,  
-										c_rspace,   nrank,  1,  nxy,
-										r_rspace,    nrank,  1,  nxy,  FFTW_MEASURE);
+	this->plan2c2r = fftw_plan_many_dft_c2r(   2,   nrank,  this->nz,  
+						(fftw_complex*) c_rspace,   nrank,  this->nz,   1,
+										r_rspace,   nrank,  this->nz,   1,  FFTW_MEASURE);
 	destroyp = false;
 }
 
@@ -137,46 +140,45 @@ void FFT :: initplanf()
 	//                              1 D
 	//---------------------------------------------------------
 
-	//               fftw_plan_many_dft(int rank, const int *n, int howmany,
+	//              fftwf_plan_many_dft(int rank,          const int *n,       int howmany,
 	//					                fftw_complex *in,  const int *inembed, int istride, int idist, 
 	//					                fftw_complex *out, const int *onembed, int ostride, int odist, int sign, unsigned flags);
-	this->plan1for = fftw_plan_many_dft( 1,   &this->nz,  this->ns,  
-										c_gspace,   &this->nz,  1,  this->nz,
-										c_gspace,  &this->nz,  1,  this->nz,  FFTW_FORWARD,  FFTW_MEASURE);
+	this->planf1for = fftwf_plan_many_dft(     1,  &this->nz,  this->ns,  
+						(fftwf_complex*)c_gspace,  &this->nz,  1,  this->nz,
+						(fftwf_complex*)c_gspace,  &this->nz,  1,  this->nz,  FFTW_FORWARD,  FFTW_MEASURE);
 	
-	this->plan1bac = fftw_plan_many_dft( 1,   &this->nz,  this->ns,  
-										c_gspace,   &this->nz,  1,  this->nz,
-										c_gspace,  &this->nz,  1,  this->nz,  FFTW_BACKWARD,  FFTW_MEASURE);
+	this->planf1bac = fftwf_plan_many_dft(     1,  &this->nz,  this->ns,  
+						(fftwf_complex*)c_gspace,  &this->nz,  1,  this->nz,
+						(fftwf_complex*)c_gspace,  &this->nz,  1,  this->nz,  FFTW_BACKWARD,  FFTW_MEASURE);
 	
-	this->plan1r2c = fftw_plan_many_dft_r2c( 1,   &this->nz,  this->ns,  
-										r_gspace,   &this->nz,  1,  this->nz,
-										c_gspace,  &this->nz,  1,  this->nz,  FFTW_MEASURE);
+	this->planf1r2c = fftwf_plan_many_dft_r2c( 1,  &this->nz,  this->ns,  
+										r_gspace,  &this->nz,  1,  this->nz,
+						(fftwf_complex*)c_gspace,  &this->nz,  1,  this->nz,  FFTW_MEASURE);
 	
-	this->plan1c2r = fftw_plan_many_dft_c2r( 1,   &this->nz,  this->ns,  
-										c_gspace,  &this->nz,  1,  this->nz,
-										r_gspace,   &this->nz,  1,  this->nz,  FFTW_MEASURE);
+	this->planf1c2r = fftwf_plan_many_dft_c2r( 1, &this->nz,  this->ns,  
+						(fftwf_complex*)c_gspace, &this->nz,  1,  this->nz,
+										r_gspace, &this->nz,  1,  this->nz,  FFTW_MEASURE);
 
 	//---------------------------------------------------------
 	//                              2 D
 	//---------------------------------------------------------
-	int nxy = this->nx * this-> ny;
 	
 	int * nrank = {2, 2};
-	this->plan1for = fftw_plan_many_dft( 2,   nrank,  this->nz,  
-										c_rspace,   nrank,  1,  nxy,
-										c_rspace,  nrank,  1,  nxy,  FFTW_FORWARD,  FFTW_MEASURE);
+	this->planf2for = fftwf_plan_many_dft(     2,   nrank,  this->nz,  
+						(fftwf_complex*)c_rspace,   nrank,  this->nz,   1,
+						(fftwf_complex*)c_rspace,   nrank,  this->nz,   1,  FFTW_FORWARD,  FFTW_MEASURE);
 	
-	this->plan1bac = fftw_plan_many_dft( 2,   nrank,  this->nz,  
-										c_rspace,   nrank,  1,  nxy,
-										c_rspace,  nrank,  1,  nxy,  FFTW_BACKWARD,  FFTW_MEASURE);
+	this->planf2bac = fftwf_plan_many_dft(     2,   nrank,  this->nz,  
+						(fftwf_complex*)c_rspace,   nrank,  this->nz,   1,
+						(fftwf_complex*)c_rspace,   nrank,  this->nz,   1,  FFTW_BACKWARD,  FFTW_MEASURE);
 	
-	this->plan1r2c = fftw_plan_many_dft_r2c( 2,   nrank,  this->nz,  
-										r_rspace,    nrank,  1,  nxy,
-										c_rspace,  nrank,  1,  nxy,  FFTW_MEASURE);
+	this->planf2r2c = fftwf_plan_many_dft_r2c( 2,   nrank,  this->nz,  
+										r_rspace,   nrank,  this->nz,   1,
+						(fftwf_complex*)c_rspace,   nrank,  this->nz,   1,  FFTW_MEASURE);
 	
-	this->plan1c2r = fftw_plan_many_dft_c2r( 2,   nrank,  this->nz,  
-										c_rspace,   nrank,  1,  nxy,
-										r_rspace,    nrank,  1,  nxy,  FFTW_MEASURE);
+	this->planf2c2r = fftwf_plan_many_dft_c2r( 2,   nrank,  this->nz,  
+						(fftwf_complex*)c_rspace,   nrank,  this->nz,   1,
+										r_rspace,   nrank,  this->nz,   1,  FFTW_MEASURE);
 	destroypf = false;
 }
 #endif

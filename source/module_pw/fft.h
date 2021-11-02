@@ -1,6 +1,8 @@
 #ifndef FFT_H
 #define FFT_H
 
+#include <complex>
+
 #include "fftw3.h"
 #if defined(__FFTW3_MPI) && defined(__MPI)
 #include <fftw3-mpi.h>
@@ -16,7 +18,8 @@
 #endif
 
 
-class FFT: public Parallel_PW
+
+class FFT
 {
 public:
 
@@ -24,12 +27,6 @@ public:
 	~FFT();
 	void initfft(int nx_in, int ny_in , int nz_in, int ns_in, int nplane_in, bool mpifft_in = false);
 	void setupFFT();
-	void initpland();
-	void initpland_mpi();
-#ifdef __MIX_PRECISION
-	void initplanf();
-	void initplanf_mpi();
-#endif
 	void cleanFFT();
 
 	void executefftw(string instr);
@@ -37,18 +34,27 @@ public:
 	void executefftwf(string instr);
 #endif
 
+private:
+	void initpland();
+	void initpland_mpi();
+#ifdef __MIX_PRECISION
+	void initplanf();
+	void initplanf_mpi();
+#endif
+	
 public:
 	int nx,ny,nz;
+	int nxy,nxyz;
 	int ns; //number of sticks
 	int nplane; //number of x-y planes
 	bool mpifft; // if use mpi fft, only used when define __FFTW3_MPI
-	fftw_complex * c_gspace; //complex number space for g, [ns * nz]
-	fftw_complex * c_rspace; //complex number space for r, [nplane * nx *ny]
+	complex<double> * c_gspace; //complex number space for g, [ns * nz]
+	complex<double> * c_rspace; //complex number space for r, [nplane * nx *ny]
 	double *r_gspace; //real number space for g, [ns * nz]
 	double *r_rspace; //real number space for r, [nplane * nx *ny]
 #ifdef __MIX_PRECISION
-	fftwf_complex * cf_gspace; //complex number space for g, [ns * nz]
-	fftwf_complex * cf_rspace; //complex number space for r, [nplane * nx *ny]
+	complex<float> * cf_gspace; //complex number space for g, [ns * nz]
+	complex<float> * cf_rspace; //complex number space for r, [nplane * nx *ny]
 	float *rf_gspace; //real number space for g, [ns * nz]
 	float *rf_rspace; //real number space for r, [nplane * nx *ny]
 #endif

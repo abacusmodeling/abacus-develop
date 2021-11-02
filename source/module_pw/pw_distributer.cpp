@@ -18,3 +18,8 @@ void PW_Basis::distribute_r()
     this->nrxx = this->numz[this->poolrank];
     return;
 }
+
+void PW_Basis::gatherplane()
+{
+    
+}

@@ -6,7 +6,9 @@ PW_Basis::PW_Basis()
     is2ir = NULL;
     gdirect = NULL;		
     gcar = NULL; 
-    gg = NULL;  
+    gg = NULL;
+    startz = NULL;
+    numz = NULL;  
 }
 PW_Basis:: ~PW_Basis()
 {
