@@ -538,7 +538,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
 				nlm_tot1[key_1]=nlm_cur1;
 			}
 		}//end ad
-
+	}
 		//=======================================================
 		//Step2:	
 		//calculate sum_(L0,M0) beta<psi_i|beta><beta|psi_j>
@@ -625,6 +625,192 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
 					{
 						// < psi1 | all projectors | psi2 >
 						// ----------------------------- enter the nnr increaing zone -------------------------
+						for (int ad0=0; ad0 < GlobalC::GridD.getAdjacentNum()+1 ; ++ad0)
+						{
+							const int T0 = GlobalC::GridD.getType(ad0);
+							const int I0 = GlobalC::GridD.getNatom(ad0);
+							if(T0!=it || I0!=ia) continue;
+
+							// mohan add 2010-12-19
+							if( GlobalC::ucell.infoNL.nproj[T0] == 0) continue;
+
+							//const int I0 = GlobalC::GridD.getNatom(ad0);
+							//const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
+							tau0 = GlobalC::GridD.getAdjacentTau(ad0);
+
+							dtau1 = tau0 - tau1;
+							dtau2 = tau0 - tau2;
+							const double distance1 = dtau1.norm2() * pow(GlobalC::ucell.lat0,2);
+							const double distance2 = dtau2.norm2() * pow(GlobalC::ucell.lat0,2);
+
+							// seems a bug here!! mohan 2011-06-17
+							rcut1 = pow(GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max(),2);
+							rcut2 = pow(GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max(),2);
+
+							if(distance1 >= rcut1 || distance2 >= rcut2)
+							{
+								continue;
+							}
+							//const Atom* atom0 = &GlobalC::ucell.atoms[T0];
+							const int rx0=GlobalC::GridD.getBox(ad0).x;
+							const int ry0=GlobalC::GridD.getBox(ad0).y;
+							const int rz0=GlobalC::GridD.getBox(ad0).z;
+							key_tuple key1(iat1,-rx0,-ry0,-rz0);
+							key_tuple key2(iat2,rx2-rx0,ry2-ry0,rz2-rz0);
+							
+							std::unordered_map<int,std::vector<double>> *nlm_cur1_e; //left hand side, for energy
+							std::unordered_map<int,std::vector<std::vector<double>>> *nlm_cur1_f; //lhs, for force
+							std::unordered_map<int,std::vector<double>> *nlm_cur2_e; //rhs, for energy
+							std::unordered_map<int,std::vector<std::vector<double>>> *nlm_cur2_f; //rhs, for force
+
+							if(!calc_deri)
+							{
+								nlm_cur1_e = &nlm_tot[iat][key1];
+								nlm_cur2_e = &nlm_tot[iat][key2];
+							}
+							else
+							{
+								nlm_cur1_f = &nlm_tot1[key1];
+								nlm_cur2_f = &nlm_tot1[key2];
+							}
+					
+							int nnr_inner = 0;
+							
+							for (int j=0; j<atom1->nw*GlobalV::NPOL; j++)
+							{
+								const int j0 = j/GlobalV::NPOL;//added by zhengdy-soc
+								const int iw1_all = start1 + j;
+								const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
+								if(mu < 0)continue; 
+
+								// fix a serious bug: atom2[T2] -> atom2
+								// mohan 2010-12-20
+								for (int k=0; k<atom2->nw*GlobalV::NPOL; k++)
+								{
+									const int k0 = k/GlobalV::NPOL;
+									const int iw2_all = start2 + k;
+									const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];						
+									if(nu < 0)continue;
+
+									if(!calc_deri)
+									{
+										std::vector<double> nlm_1=(*nlm_cur1_e)[iw1_all];
+										std::vector<double> nlm_2=(*nlm_cur2_e)[iw2_all];
+										double nlm_tmp = 0.0;
+
+										const int nproj = GlobalC::ucell.infoNL.nproj[T0];
+										int ib = 0;
+										for (int nb = 0; nb < nproj; nb++)
+										{
+											const int L0 = GlobalC::ucell.infoNL.Beta[T0].Proj[nb].getL();
+											for(int m=0;m<2*L0+1;m++)
+											{
+												if(nlm_1[ib]!=0.0 && nlm_2[ib]!=0.0)
+												{
+													nlm_tmp += nlm_1[ib]*nlm_2[ib]*GlobalC::ucell.atoms[T0].dion(nb,nb);
+												}
+												ib+=1;
+											}
+										}
+										assert(ib==nlm_1.size());
+
+										if(GlobalV::GAMMA_ONLY_LOCAL)
+										{
+											// mohan add 2010-12-20
+											if( nlm_tmp!=0.0 )
+											{
+												// GlobalV::ofs_running << std::setw(10) << iw1_all << std::setw(10) 
+												// << iw2_all << std::setw(20) << nlm[0] << std::endl; 
+												GlobalC::LM.set_HSgamma(iw1_all,iw2_all,nlm_tmp,'N');//N stands for nonlocal.
+											}
+										}
+										else
+										{
+											if( nlm_tmp!=0.0 )
+											{
+												GlobalC::LM.Hloc_fixedR[nnr+nnr_inner] += nlm_tmp;
+											}
+										}
+									}// calc_deri
+									else // calculate the derivative
+									{
+										if(GlobalV::GAMMA_ONLY_LOCAL)
+										{
+											double nlm[3]={0,0,0};
+
+											// sum all projectors for one atom.
+											std::vector<double> nlm_1 = (*nlm_cur1_f)[iw1_all][0];
+											std::vector<std::vector<double>> nlm_2;
+											nlm_2.resize(3);
+											for(int i=0;i<3;i++)
+											{
+												nlm_2[i] = (*nlm_cur2_f)[iw2_all][i+1];
+											}
+
+											assert(nlm_1.size()==nlm_2[0].size());
+
+											const int nproj = GlobalC::ucell.infoNL.nproj[T0];
+											int ib = 0;
+											for (int nb = 0; nb < nproj; nb++)
+											{
+												const int L0 = GlobalC::ucell.infoNL.Beta[T0].Proj[nb].getL();
+												for(int m=0;m<2*L0+1;m++)
+												{
+													for(int ir=0;ir<3;ir++)
+													{
+														nlm[ir] += nlm_2[ir][ib]*nlm_1[ib]*GlobalC::ucell.atoms[T0].dion(nb,nb);
+													}
+													ib+=1;
+												}
+											}
+											assert(ib==nlm_1.size());
+											GlobalC::LM.set_force (iw1_all, iw2_all, nlm[0], nlm[1], nlm[2], 'N');
+										}
+										else
+										{
+											// mohan change the order on 2011-06-17
+											// origin: < psi1 | beta > < beta | dpsi2/dtau >
+											//now: < psi1/dtau | beta > < beta | psi2 >
+											double nlm[3]={0,0,0};
+
+											// sum all projectors for one atom.
+											std::vector<double> nlm_1 = (*nlm_cur2_f)[iw2_all][0];
+											std::vector<std::vector<double>> nlm_2;
+											nlm_2.resize(3);
+											for(int i=0;i<3;i++)
+											{
+												nlm_2[i] = (*nlm_cur1_f)[iw1_all][i+1];
+											}
+
+											assert(nlm_1.size()==nlm_2[0].size());
+
+											const int nproj = GlobalC::ucell.infoNL.nproj[T0];
+											int ib = 0;
+											for (int nb = 0; nb < nproj; nb++)
+											{
+												const int L0 = GlobalC::ucell.infoNL.Beta[T0].Proj[nb].getL();
+												for(int m=0;m<2*L0+1;m++)
+												{
+													for(int ir=0;ir<3;ir++)
+													{
+														nlm[ir] += nlm_2[ir][ib]*nlm_1[ib]*GlobalC::ucell.atoms[T0].dion(nb,nb);
+													}
+													ib+=1;
+												}
+											}
+											assert(ib==nlm_1.size());
+
+											GlobalC::LM.DHloc_fixedR_x[nnr+nnr_inner] += nlm[0];
+											GlobalC::LM.DHloc_fixedR_y[nnr+nnr_inner] += nlm[1];
+											GlobalC::LM.DHloc_fixedR_z[nnr+nnr_inner] += nlm[2];
+										}
+									}//!calc_deri
+									nnr_inner++;
+								}// k
+							} // j 
+						} // ad0
+
+						//outer circle : accumulate nnr
 						for (int j=0; j<atom1->nw*GlobalV::NPOL; j++)
 						{
 							const int j0 = j/GlobalV::NPOL;//added by zhengdy-soc
@@ -641,160 +827,10 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
 								const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];						
 								if(nu < 0)continue;
 
-
-								//(3) run over all projectors in nonlocal pseudopotential.
-								for (int ad0=0; ad0 < GlobalC::GridD.getAdjacentNum()+1 ; ++ad0)
-								{
-									const int T0 = GlobalC::GridD.getType(ad0);
-									const int I0 = GlobalC::GridD.getNatom(ad0);
-									if(T0!=it || I0!=ia) continue;
-
-									// mohan add 2010-12-19
-									if( GlobalC::ucell.infoNL.nproj[T0] == 0) continue;
-
-									//const int I0 = GlobalC::GridD.getNatom(ad0);
-									//const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
-									tau0 = GlobalC::GridD.getAdjacentTau(ad0);
-
-									dtau1 = tau0 - tau1;
-									dtau2 = tau0 - tau2;
-									const double distance1 = dtau1.norm2() * pow(GlobalC::ucell.lat0,2);
-									const double distance2 = dtau2.norm2() * pow(GlobalC::ucell.lat0,2);
-
-									// seems a bug here!! mohan 2011-06-17
-									rcut1 = pow(GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max(),2);
-									rcut2 = pow(GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max(),2);
-
-									if(distance1 < rcut1 && distance2 < rcut2)
-									{
-										//const Atom* atom0 = &GlobalC::ucell.atoms[T0];
-										const int rx0=GlobalC::GridD.getBox(ad0).x;
-										const int ry0=GlobalC::GridD.getBox(ad0).y;
-										const int rz0=GlobalC::GridD.getBox(ad0).z;
-										key_tuple key1(iat1,-rx0,-ry0,-rz0);
-										key_tuple key2(iat2,rx2-rx0,ry2-ry0,rz2-rz0);
-
-										if(!calc_deri)
-										{
-											std::vector<double> nlm_1=nlm_tot[key1][iw1_all];
-											std::vector<double> nlm_2=nlm_tot[key2][iw2_all];
-											double nlm_tmp = 0.0;
-
-											const int nproj = GlobalC::ucell.infoNL.nproj[T0];
-											int ib = 0;
-											for (int nb = 0; nb < nproj; nb++)
-											{
-												const int L0 = GlobalC::ucell.infoNL.Beta[T0].Proj[nb].getL();
-												for(int m=0;m<2*L0+1;m++)
-												{
-													if(nlm_1[ib]!=0.0 && nlm_2[ib]!=0.0)
-													{
-														nlm_tmp += nlm_1[ib]*nlm_2[ib]*GlobalC::ucell.atoms[T0].dion(nb,nb);
-													}
-													ib+=1;
-												}
-											}
-											assert(ib==nlm_1.size());
-
-											if(GlobalV::GAMMA_ONLY_LOCAL)
-											{
-												// mohan add 2010-12-20
-												if( nlm_tmp!=0.0 )
-												{
-													// GlobalV::ofs_running << std::setw(10) << iw1_all << std::setw(10) 
-													// << iw2_all << std::setw(20) << nlm[0] << std::endl; 
-													GlobalC::LM.set_HSgamma(iw1_all,iw2_all,nlm_tmp,'N');//N stands for nonlocal.
-												}
-											}
-											else
-											{
-												if( nlm_tmp!=0.0 )
-												{
-													GlobalC::LM.Hloc_fixedR[nnr] += nlm_tmp;
-												}
-											}
-										}// calc_deri
-										else // calculate the derivative
-										{
-
-											if(GlobalV::GAMMA_ONLY_LOCAL)
-											{
-												double nlm[3]={0,0,0};
-
-												// sum all projectors for one atom.
-												std::vector<double> nlm_1 = nlm_tot1[key1][iw1_all][0];
-												std::vector<std::vector<double>> nlm_2;
-												nlm_2.resize(3);
-												for(int i=0;i<3;i++)
-												{
-													nlm_2[i] = nlm_tot1[key2][iw2_all][i+1];
-												}
-
-												assert(nlm_1.size()==nlm_2[0].size());
-
-												const int nproj = GlobalC::ucell.infoNL.nproj[T0];
-												int ib = 0;
-												for (int nb = 0; nb < nproj; nb++)
-												{
-													const int L0 = GlobalC::ucell.infoNL.Beta[T0].Proj[nb].getL();
-													for(int m=0;m<2*L0+1;m++)
-													{
-														for(int ir=0;ir<3;ir++)
-														{
-															nlm[ir] += nlm_2[ir][ib]*nlm_1[ib]*GlobalC::ucell.atoms[T0].dion(nb,nb);
-														}
-														ib+=1;
-													}
-												}
-												assert(ib==nlm_1.size());
-												GlobalC::LM.set_force (iw1_all, iw2_all, nlm[0], nlm[1], nlm[2], 'N');
-											}
-											else
-											{
-												// mohan change the order on 2011-06-17
-												// origin: < psi1 | beta > < beta | dpsi2/dtau >
-												//now: < psi1/dtau | beta > < beta | psi2 >
-												double nlm[3]={0,0,0};
-
-												// sum all projectors for one atom.
-												std::vector<double> nlm_1 = nlm_tot1[key2][iw2_all][0];
-												std::vector<std::vector<double>> nlm_2;
-												nlm_2.resize(3);
-												for(int i=0;i<3;i++)
-												{
-													nlm_2[i] = nlm_tot1[key1][iw1_all][i+1];
-												}
-
-												assert(nlm_1.size()==nlm_2[0].size());
-
-												const int nproj = GlobalC::ucell.infoNL.nproj[T0];
-												int ib = 0;
-												for (int nb = 0; nb < nproj; nb++)
-												{
-													const int L0 = GlobalC::ucell.infoNL.Beta[T0].Proj[nb].getL();
-													for(int m=0;m<2*L0+1;m++)
-													{
-														for(int ir=0;ir<3;ir++)
-														{
-															nlm[ir] += nlm_2[ir][ib]*nlm_1[ib]*GlobalC::ucell.atoms[T0].dion(nb,nb);
-														}
-														ib+=1;
-													}
-												}
-												assert(ib==nlm_1.size());
-
-												GlobalC::LM.DHloc_fixedR_x[nnr] += nlm[0];
-												GlobalC::LM.DHloc_fixedR_y[nnr] += nlm[1];
-												GlobalC::LM.DHloc_fixedR_z[nnr] += nlm[2];
-											}
-										}//!calc_deri
-									}// distance
-								} // ad0
-								++nnr;
-							}// k
-						} // j 
+								nnr++;
+							}
+						}
 					}// end is_adj
-					//----------------------------------------------------------------------------------
 				} // ad2
 			} // I1
 		} // T1
