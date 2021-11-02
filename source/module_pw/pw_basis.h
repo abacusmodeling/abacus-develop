@@ -4,14 +4,13 @@
 #include "../module_base/matrix.h"
 #include "../module_base/matrix3.h"
 #include "../module_base/vector3.h"
-#include "../src_pw/klist.h"
 #include <assert.h>
 //
 //A class which can convert a function of "r" to the corresponding linear 
 // superposition of plane waves (real space to reciprocal space)
 // or convert a linear superposition of plane waves to the function 
 // of "r" (reciprocal to real).
-//plane waves: <r|g,k>=1/sqrt(V)*exp(i(k+g)r)
+//plane waves: <r|g>=1/sqrt(V)*exp(igr)
 //
 class PW_Basis
 {
@@ -22,26 +21,24 @@ public:
 
     //Init the grids for FFT
     void initgrids(
-        ModuleBase::Matrix3 latvec_in; // Unitcell lattice vectors
-        ModuleBase::Matrix3 G_in; // reciprocal lattice vector (2pi*inv(R) )
+        ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
+        ModuleBase::Matrix3 G_in, // reciprocal lattice vector (2pi*inv(R) )
         double gridecut
     );
     //Init the grids for FFT
     void initgrids(
-        ModuleBase::Matrix3 latvec_in; // Unitcell lattice vectors
-        ModuleBase::Matrix3 G_in; // reciprocal lattice vector (2pi*inv(R) )
+        ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
+        ModuleBase::Matrix3 G_in, // reciprocal lattice vector (2pi*inv(R) )
         int nx_in, int ny_in, int nz_in
     );
 
     //Init some parameters
     void initparameters(
         bool gamma_only_in,
-        double ecut_in,
-        int nk_in, //number of k points in this pool
-        ModuleBase::Vector3<double> *kvec_d, // Direct coordinates of k points
+        double ggecut_in,
         int poolnproc_in, // Number of processors in this pool
         int poolrank_in, // Rank in this pool
-        int distribution_type_in,
+        int distribution_type_in
     );
 
     //distribute plane waves to different processors
@@ -68,7 +65,7 @@ public:
 
 private:
     bool gamma_only;	// only half g are used.
-    double ggecut;    //Energy cut off for g^2 
+    double ggecut;    //Energy cut off for g^2/2 
     ModuleBase::Matrix3 latvec; // Unitcell lattice vectors, unit in bohr
     ModuleBase::Matrix3 G; // reciprocal lattice vector, unit in 
     ModuleBase::Matrix3 GT; // traspose of G
@@ -76,8 +73,6 @@ private:
     int distribution_type;
     int poolnproc;
     int poolrank;
-    int nks;
-    ModuleBase::Vector3<double> *kvec_d;
 
     //distribute plane waves to different processors
     void distribution_method1();

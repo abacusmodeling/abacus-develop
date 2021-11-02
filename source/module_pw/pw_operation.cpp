@@ -1,8 +1,13 @@
-ModuleBase::Vector3<double> get_GPlusK_cartesian(const int ik, const int ig) const {
-    assert(ig>=0 && ig<this->ngmc && ik>=0 && ik<Klist->nks);
-    ModuleBase::Vector3<double> g_temp_ = Klist->kvec_c[ik] + this->gcar[ig];
+#include "pw_basis_k.h"
+#include "pw_basis.h"
+
+ModuleBase::Vector3<double> PW_Basis_K:: get_GPlusK_cartesian(const int ik, const int ig) const {
+    assert(ig>=0 && ig<this->npw && ik>=0 && ik<this->nks);
+    ModuleBase::Vector3<double> g_temp_ = this->kvec_c[ik] + this->gcar[ig];
     return g_temp_;
 };
+
+
 double get_GPlusK_cartesian_projection(const int ik, const int ig, const int axis) const
 {
     assert(ig >= 0 && ig < this->ngmc && ik >= 0 && ik < Klist->nks && axis >= 0 && axis <= 2);
