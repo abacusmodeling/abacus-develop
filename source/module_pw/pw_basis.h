@@ -49,12 +49,14 @@ public:
 public:
     //reciprocal-space
     int *ig2isz; // map ig to (is, iz).
-    int *istot2ixy; // istot2ixy[is]: ix + iy * nx of is^th stick among all sticks.
+    int *ixy2is; //map ixy to is
+    int *istot2ixy; // istot2ixy[istot]: ix + iy * nx of is^th stick among all sticks.
     int *is2ixy; // is2ixy[is]: ix + iy * nx of is^th stick among sticks on current proc.
     int *ixy2ip; // ixy2ip[ix + iy * nx]: ip of proc which contains stick on (ix, iy).
     int *startis; // startis[ip]: starting is stick in the ip^th proc.
     int *nst_per; // number of sticks on each core.
     int nst; //num. of sticks in current proc.
+    int nstot; //num. of sticks in total.
     int npw; //num. of plane waves in current proc.
     //real space
     int nrxx; //num. of real space grids
@@ -148,7 +150,7 @@ private:
 //===============================================
 public:
 	// FFT dimensions for wave functions.
-	int nx, ny, nz, nxyz,nxy;
+	int nx, ny, nz, nxyz, nxy;
     FFT ft;
 
     void real2recip(double * in, complex<double> * out); //in:(nplane,nx*ny)  ; out(nz, ns)
@@ -156,10 +158,11 @@ public:
     void recip2real(complex<double> * in, double *out); //in:(nz, ns)  ; out(nplane,nx*ny)
     void recip2real(complex<double> * in, complex<double> * out); //in:(nz, ns)  ; out(nplane,nx*ny)
 
-    void gatherplane();
-    void gatherstick();
-    void distributeplane();
-    void distributestick();
+    void gatherp_scatters(complex<double> *in, complex<double> *out); //gather planes and scatter sticks of all processors
+    void gathers_scatterp(complex<double> *in, complex<double> *out); //gather sticks of and scatter planes of all processors
+    void gatherp_scatters_gamma(complex<double> *in, complex<double> *out); //gather planes and scatter sticks of all processors, used when gamma_only
+    void gathers_scatterp_gamma(complex<double> *in, complex<double> *out); //gather sticks of and scatter planes of all processors, used when gamma only
+
     
     
    
