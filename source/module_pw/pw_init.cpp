@@ -102,6 +102,7 @@ void PW_Basis:: initgrids(
     this->ny = ibox[1];
     this->nz = ibox[2];
     this->nxyz = this->nx * this->ny * this->nz;
+    this->nxy = this->nx * this->ny;
     delete[] ibox;
 
     

@@ -4,7 +4,9 @@
 #include "../module_base/matrix.h"
 #include "../module_base/matrix3.h"
 #include "../module_base/vector3.h"
-#include <assert.h>
+#include <complex>
+#include "fft.h"
+
 //
 //A class which can convert a function of "r" to the corresponding linear 
 // superposition of plane waves (real space to reciprocal space)
@@ -41,13 +43,8 @@ public:
         int distribution_type_in
     );
 
-    //distribute plane waves to different processors
-    void distribute_g();
-
-    //distribute real-space grids to different processors
-    void distribute_r();
 //===============================================
-// distribution maps
+//                 distribution maps
 //===============================================
 public:
     //reciprocal-space
@@ -60,9 +57,24 @@ public:
     int nst; //num. of sticks in current proc.
     int npw; //num. of plane waves in current proc.
     //real space
-    int nrxx;
+    int nrxx; //num. of real space grids
     int *startz; //startz[ip]: starting z plane in the ip-th proc. in current POOL_WORLD 
 	int *numz; //numz[ip]: num. of z planes in the ip-th proc. in current POOL_WORLD
+
+    ModuleBase::Vector3<double> *gdirect;		//(= *G1d) ; // ig = new Vector igc[ngmc]
+    ModuleBase::Vector3<double> *gcar;   			//G vectors in cartesian corrdinate
+    double *gg;       	// modulus (G^2) of G vectors [ngmc]
+    //gg[ng]=ig[ng]*GGT*ig[ng]/(lat0*lat0)=g[ng]*g[ng] (/lat0*lat0)
+	// gg_global dimension: [cutgg_num_now] (save memory skill is used)
+
+    //distribute plane waves to different processors
+    void distribute_g();
+
+    //distribute real-space grids to different processors
+    void distribute_r();
+
+    //distribute plane waves to different processors
+    void distribution_method1();
 
 
    
@@ -77,6 +89,7 @@ private:
     int distribution_type;
     int poolnproc;
     int poolrank;
+   
 
     //distribute plane waves to different processors
     void distribution_method1();
@@ -131,21 +144,25 @@ private:
     );
 
 //===============================================
-// Part 2: FFT dimensions in real space
+//                  FFT
 //===============================================
 public:
 	// FFT dimensions for wave functions.
-	int nx, ny, nz, nxyz;
-	// FFT dimensions for charge/potential.
+	int nx, ny, nz, nxyz,nxy;
+    FFT ft;
+
+    void real2recip(double * in, complex<double> * out); //in:(nplane,nx*ny)  ; out(nz, ns)
+    void real2recip(complex<double> * in, complex<double> * out); //in:(nplane,nx*ny)  ; out(nz, ns)
+    void recip2real(complex<double> * in, double *out); //in:(nz, ns)  ; out(nplane,nx*ny)
+    void recip2real(complex<double> * in, complex<double> * out); //in:(nz, ns)  ; out(nplane,nx*ny)
+
+    void gatherplane();
+    void gatherstick();
+    void distributeplane();
+    void distributestick();
     
-    int seed;
     
-    
-    ModuleBase::Vector3<double> *gdirect;		//(= *G1d) ; // ig = new Vector igc[ngmc]
-    ModuleBase::Vector3<double> *gcar;   			//G vectors in cartesian corrdinate
-    double *gg;       	// modulus (G^2) of G vectors [ngmc]
-    //gg[ng]=ig[ng]*GGT*ig[ng]/(lat0*lat0)=g[ng]*g[ng] (/lat0*lat0)
-	// gg_global dimension: [cutgg_num_now] (save memory skill is used)
+   
 
 
 };
