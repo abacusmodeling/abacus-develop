@@ -3,4 +3,4 @@ matrix.o\
 matrix3.o\
 vector3.o\
 tool_quit.o\
-
+parallel_global.o

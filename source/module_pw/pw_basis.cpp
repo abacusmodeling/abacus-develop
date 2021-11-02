@@ -13,6 +13,8 @@ PW_Basis::PW_Basis()
     gg = NULL;
     startz = NULL;
     numz = NULL;  
+    poolnproc = 1;
+    poolrank = 0;
 }
 PW_Basis:: ~PW_Basis()
 {
