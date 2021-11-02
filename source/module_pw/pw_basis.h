@@ -157,10 +157,12 @@ public:
     void real2recip(complex<double> * in, complex<double> * out); //in:(nplane,nx*ny)  ; out(nz, ns)
     void recip2real(complex<double> * in, double *out); //in:(nz, ns)  ; out(nplane,nx*ny)
     void recip2real(complex<double> * in, complex<double> * out); //in:(nz, ns)  ; out(nplane,nx*ny)
-#ifdef __MPI
+
     void gatherp_scatters(complex<double> *in, complex<double> *out); //gather planes and scatter sticks of all processors
     void gathers_scatterp(complex<double> *in, complex<double> *out); //gather sticks of and scatter planes of all processors
-#endif
+    void gatherp_scatters_gamma(complex<double> *in, complex<double> *out); //gather planes and scatter sticks of all processors, used when gamma_only
+    void gathers_scatterp_gamma(complex<double> *in, complex<double> *out); //gather sticks of and scatter planes of all processors, used when gamma only
+
     
     
    
