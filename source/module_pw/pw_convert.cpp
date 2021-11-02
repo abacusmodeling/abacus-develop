@@ -3,6 +3,11 @@
 #include "pw_basis.h"
 #include "../module_base/global_function.h"
 
+//
+//transform real space to reciprocal space
+//in: (nplane,nx,ny)
+//out: (nz, ns)
+//
 void PW_Basis:: real2recip(complex<double> * in, complex<double> * out)
 {
     for(int ir = 0 ; ir < this->nrxx ; ++ir)
@@ -11,22 +16,22 @@ void PW_Basis:: real2recip(complex<double> * in, complex<double> * out)
     }
     this->ft.executefftw("2for");
 
-    for(int is = 0 ; is < this->ns ; ++is)
-    {
-        int ixy = is2ixy[is];
-        for(int iz = 0 ; iz < this->nz ; ++iz)
-        {
-            this->ft.c_gspace[is*nz+iz] = this->ft.c_rspace[ixy*nz+iz];
-        }
-    }
+    this->gatherp_scatters(this->ft.c_rspace, this->ft.c_gspace);
+    
     this->ft.executefftw("1for");
 
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
         out[ig] = this->ft.c_gspace[this->ig2fft[ig]];
     }
+    return;
 }
 
+//
+//transform real space to reciprocal space
+//in: (nplane,nx,ny)
+//out: (nz, ns)
+//
 void PW_Basis:: real2recip(double * in, complex<double> * out)
 {
     for(int ir = 0 ; ir < this->nrxx ; ++ir)
@@ -35,26 +40,22 @@ void PW_Basis:: real2recip(double * in, complex<double> * out)
     }
     this->ft.executefftw("2r2c");
 
-    int hx = int ((nx + 2)/2);
-    for(int is = 0 ; is < this->ns ; ++is)
-    {
-        int ixy = is2ixy[is];
-        int ix = ixy % this->ny;
-        int iy = int( ixy / this->ny);
-        int ihxy = ix + iy * hx;
-        for(int iz = 0 ; iz < this->nz ; ++iz)
-        {
-            this->ft.c_gspace[is*nz+iz] = this->ft.c_rspace[ihxy*nz+iz];
-        }
-    }
+    this->gatherp_scatters(this->ft.c_rspace, this->ft.c_gspace)
+    
     this->ft.executefftw("1for");
 
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
         out[ig] = this->ft.c_gspace[this->ig2fft[ig]];
     }
+    return;
 }
 
+//
+//transform real space to reciprocal space
+//in: (nz,ns)
+//out: (nplane, nx, ny)
+//
 void PW_Basis:: recip2real(complex<double> * in, complex<double> * out)
 {
     for(int igg = 0 ; igg < this->ns * this->nz ; ++igg)
@@ -66,26 +67,23 @@ void PW_Basis:: recip2real(complex<double> * in, complex<double> * out)
         this->ft.c_gspace[this->ig2fft[ig]] = in[ig];
     }
     this->ft.executefftw("1bac");
-    for(int ir = 0 ; ir < this->nrxx ; ++ir)
-    {
-        this->ft.c_rspace[ir] = 0.0;
-    }
-    for(int is = 0 ; is < this->ns ; ++is)
-    {
-        int ixy = is2ixy[is];
-        for(int iz = 0 ; iz < this->nz ; ++iz)
-        {
-            this->ft.c_rspace[ixy*nz+iz] = this->ft.c_gspace[is*nz+iz];
-        }
-    }
+
+    this->gathers_scatterp(this->ft.c_gspace,this->ft.c_rspace);
+    
     this->ft.executefftw("2bac");
 
     for(int ir = 0 ; ir < this->nrxx ; ++ir)
     {
         out[ir] = this->ft.c_rspace[ir];
     }
+    return;
 }
 
+//
+//transform real space to reciprocal space
+//in: (nz,ns)
+//out: (nplane, nx, ny)
+//
 void PW_Basis:: recip2real(complex<double> * in, double * out)
 {
     for(int igg = 0 ; igg < this->ns * this->nz ; ++igg)
@@ -97,26 +95,14 @@ void PW_Basis:: recip2real(complex<double> * in, double * out)
         this->ft.c_gspace[this->ig2fft[ig]] = in[ig];
     }
     this->ft.executefftw("1bac");
-    for(int ir = 0 ; ir < this->nrxx ; ++ir)
-    {
-        this->ft.c_rspace[ir] = 0.0;
-    }
-    int hx = int ((nx + 2)/2);
-    for(int is = 0 ; is < this->ns ; ++is)
-    {
-        int ixy = is2ixy[is];
-        int ix = ixy % this->ny;
-        int iy = int( ixy / this->ny);
-        int ihxy = ix + iy * hx;
-        for(int iz = 0 ; iz < this->nz ; ++iz)
-        {
-            this->ft.c_rspace[ihxy*nz+iz] = this->ft.c_gspace[is*nz+iz];
-        }
-    }
+    
+    this->gathers_scatterp(this->ft.c_gspace, this->ft.c_rspace)
+
     this->ft.executefftw("2c2r");
 
     for(int ir = 0 ; ir < this->nrxx ; ++ir)
     {
         out[ir] = this->ft.r_rspace[ir];
     }
+    return;
 }

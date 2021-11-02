@@ -154,7 +154,7 @@ void PW_Basis::distribution_method1()
         MPI_Recv(&is2ip, tot_nst, MPI_INT, 0, 0, POOL_WORLD);
         MPI_Recv(&ixy2ip, nxy, MPI_INT, 0, 0, POOL_WORLD);
         MPI_Recv(&istot2ixy, tot_nst, MPI_INT, 0, 0, POOL_WORLD);
-        MPI_Recv(&ixy2istot, tot_nst, MPI_INT, 0, 0, POOL_WORLD);
+        MPI_Recv(&ixy2istot, nxy, MPI_INT, 0, 0, POOL_WORLD);
     }
 
     this->gcar = new ModuleBase::Vector3<double>[this->npw];
