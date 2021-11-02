@@ -3,11 +3,11 @@
 //
 //distribute plane waves to different cores
 //Known: G, GT, GGT, nx, ny, nz, poolnproc, poolrank, ggecut
-//output: ig2fft[ig], is2ir[is], gg[ig], gcar[ig], gdirect[ig], nst
+//output: ig2isz[ig], istot2ixy[is], is2ixy[is], ixy2ip[ixy], startis[ip], nst_per[ip], gg[ig], gcar[ig], gdirect[ig], nst
 //
 void PW_Basis::distribute_g()
 {
-    if(this->divide_type == 1)
+    if(this->distribution_type == 1)
     {
         this->distribution_method1();
     }
@@ -18,14 +18,29 @@ void PW_Basis::distribute_g()
     return;
 }
 
+//
+// Distribute planewaves in reciprocal space to coreors.
+// Firstly, divide the sphere in reciprocal space into sticks, which are vertical to x-y plane.
+// Secondly, distribute these sticks to coreors.
+//Known: G, GT, GGT, nx, ny, nz, poolnproc, poolrank, ggecut
+//output: ig2isz[ig], istot2ixy[is], is2ixy[is], ixy2ip[ixy], startis[ip], nst_per[ip], gg[ig], gcar[ig], gdirect[ig], nst
+//
 void PW_Basis::distribution_method1()
 {
+    // initial the variables needed by all proc.
+    const int nxy = this->nx * this->ny; // number of points in x-y plane.
+    int tot_npw = 0;                     // total number of planewaves.
+    int tot_nst = 0;                     // total number of sticks.
+    int st_start = 0;                    // index of the first stick on current proc.
+    int *st_i = NULL;                    // x or x + nx (if x < 0) of stick.
+    int *st_j = NULL;                    // y or y + ny (if y < 0) of stick.
+    int *st_bottom = NULL;               // minimum z of stick.
+    int *st_length = NULL;               // number of planewaves in stick.
+    int *is2ip = NULL;                   // ip of core that contains is^th stick, map is to ip.
+
     if (poolrank == 0)
     {
-        // (1) Count the total number of planewaves (tot_npw) and sticks (tot_nst).
-        const int nxy = this->nx * this->ny;                // number of points in x-y plane.
-        int tot_npw = 0;                                    // total number of planewaves.
-        int tot_nst = 0;                                    // total number of sticks.
+        // (1) Count the total number of planewaves (tot_npw) and sticks (tot_nst).                  
         
         // Actually we will scan [(2 * ibox[0] + 1) * (2 * ibox[1] + 1)] points on x-y plane,
         // but we define st_length2D with (nx * ny) points here, because we assume that the diameter
@@ -40,10 +55,10 @@ void PW_Basis::distribution_method1()
         // (2) Collect all planewaves and the x, y indexs, length, bottom of the sticks.
         double *gg_global = new double[tot_npw];                // the modulus of all planewaves.
         ModuleBase::Vector3<double>* gdirect_global = new ModuleBase::Vector3<double>[tot_npw]; // direct coordinates of planewaves.
-        int *st_i = new int[tot_nst];                           // x or x + nx (if x < 0) of stick.
-        int *st_j = new int[tot_nst];                           // y or y + ny (if y < 0) of stick.
-        int *st_bottom = new int[tot_nst];                      // minimum z of stick.
-        int *st_length = new int[tot_nst];                      // number of planewaves in stick.
+        st_i = new int[tot_nst];                           // x or x + nx (if x < 0) of stick.
+        st_j = new int[tot_nst];                           // y or y + ny (if y < 0) of stick.
+        st_bottom = new int[tot_nst];                      // minimum z of stick.
+        st_length = new int[tot_nst];                      // number of planewaves in stick.
         
         this->collect_pw_st(tot_npw, tot_nst, st_length2D, st_bottom2D, gg_global, gdirect_global, st_i, st_j, st_length, st_bottom);
 
@@ -51,25 +66,27 @@ void PW_Basis::distribution_method1()
         delete[] st_bottom2D;
 
         // (3) Distribute sticks to cores.
-        int *npw_per = new int[this->poolnproc]; // number of planewaves on each core.
-        int *nst_per = new int[this->poolnproc]; // number of sticks on each core.
+        int *npw_per = new int[this->poolnproc];  // number of planewaves on each core.
+        this->nst_per = new int[this->poolnproc]; // number of sticks on each core.
         ModuleBase::GlobalFunc::ZEROS(npw_per, poolnproc);
-        ModuleBase::GlobalFunc::ZEROS(nst_per, poolnproc);
-        int *is2ip = new int[tot_nst];           // ip of core that contains is^th stick, map is to ip.
+        ModuleBase::GlobalFunc::ZEROS(this->nst_per, poolnproc);
+        is2ip = new int[tot_nst];                 // ip of core that contains is^th stick, map is to ip.
         for (int i = 0; i < tot_nst; i++)
         {
-            is2ip[i] = -1;                       // meaning this stick has not been distributed.
+            is2ip[i] = -1;                        // meaning this stick has not been distributed.
         }
-        int *ir2ip = new int[nxy];               // ip of core which contains stick on (x, y).
+        this->ixy2ip = new int[nxy];              // ip of core which contains stick on (x, y).
         for (int i = 0; i < nx * ny; i++)
         {
-            ir2ip[i] = -1;                       // meaning this stick has not been distributed or there is no stick on (x, y).
+            this->ixy2ip[i] = -1;                 // meaning this stick has not been distributed or there is no stick on (x, y).
         }
+        this->startis = new int[poolnproc];
+        ModuleBase::GlobalFunc::ZEROS(startis, poolnproc);
 
-        this->divide_sticks(tot_npw, tot_nst, st_i, st_j, st_length, npw_per, nst_per, is2ip, ir2ip);
+        this->divide_sticks(tot_npw, tot_nst, st_i, st_j, st_length, npw_per, this->nst_per, is2ip);
+        this->get_istot2ixy(tot_nst, st_i, st_j, is2ip);
 
         // (4) Divide planewaves to each core, construct gg2D and gdirect2D.
-
         double **gg2D = new double*[poolnproc];  // the i^th row contains the modulus of planewaves that belong to the i^th core.
         ModuleBase::Vector3<double> **gdirect2D = new ModuleBase::Vector3<double>*[poolnproc]; // the i^th row contains the direct coordinates of planewaves that belong to the i^th core.
         for (int ip = 0; ip < poolnproc; ip++)
@@ -78,15 +95,14 @@ void PW_Basis::distribution_method1()
             gdirect2D[ip] = new ModuleBase::Vector3<double>[npw_per[ip]];
         }
 
-        this->divide_pw(tot_npw, gg_global, gdirect_global, ir2ip, gg2D, gdirect2D);
+        this->divide_pw(tot_npw, gg_global, gdirect_global, gg2D, gdirect2D);
 
         delete[] gg_global;
         delete[] gdirect_global;
-        delete[] ir2ip;
 
         // (5) Send gg, gdirect, npw_per, nst[poolrank], st_* to all cores.
         this->npw = npw_per[0];
-        this->nst = nst_per[0];
+        this->nst = this->nst_per[0];
         this->gg = gg2D[0];
         this->gdirect = gdirect2D[0];
         for (int ip = 1; ip < this->poolnproc; ip++)
@@ -94,7 +110,7 @@ void PW_Basis::distribution_method1()
             MPI_Send(&tot_npw, 1, MPI_INT, ip, 0, POOL_WORLD);
             MPI_Send(&tot_nst, 1, MPI_INT, ip, 0, POOL_WORLD);
             MPI_Send(&npw_per[ip], 1, MPI_INT, ip, 0, POOL_WORLD);
-            MPI_Send(&nst_per, poolnproc, MPI_INT, ip, 0, POOL_WORLD);
+            MPI_Send(&this->nst_per[ip], 1, MPI_INT, ip, 0, POOL_WORLD);
             MPI_Send(&gg2D[ip], npw_per[ip], MPI_DOUBLE, ip, 0, POOL_WORLD);
             MPI_Send(&gdirect2D[ip], npw_per[ip]*3, MPI_DOUBLE, ip, 0, POOL_WORLD); // I'm not sure about the send size and type here.
             MPI_Send(&st_i, tot_nst, MPI_INT, ip, 0, POOL_WORLD);
@@ -103,7 +119,7 @@ void PW_Basis::distribution_method1()
             MPI_Send(&st_bottom, tot_nst, MPI_INT, ip, 0, POOL_WORLD);
             MPI_Send(&is2ip, tot_nst, MPI_INT, ip, 0, POOL_WORLD);
         }
-        for (int ip = 0; i)
+        for (int ip = 0; ip < this->poolnproc; ip++)
         {
             delete[] gg2D[ip];
             delete[] gdirect2D[ip];
@@ -114,14 +130,17 @@ void PW_Basis::distribution_method1()
     }
     else
     {
-        int nxy = this->nx * this->ny;
         MPI_Recv(&tot_npw, 1, MPI_INT, 0, 0, POOL_WORLD);
         MPI_Recv(&tot_nst, 1, MPI_INT, 0, 0, POOL_WORLD);
         MPI_Recv(&npw, 1, MPI_INT, 0, 0, POOL_WORLD);  // number of planewaves in current proc.
-        MPI_Recv(&nst_per, poolnproc, MPI_INT, 0, 0, POOL_WORLD);
-        this->nst = nst_per[poolrank];
+        MPI_Recv(&nst, 1, MPI_INT, 0, 0, POOL_WORLD);
         MPI_Recv(&gg, npw, MPI_DOUBLE, 0, 0, POOL_WORLD);
         MPI_Recv(&gdirect, npw*3, MPI_DOUBLE, 0, 0, POOL_WORLD); // I'm not sure about the send size and type here.
+        st_i = new int[tot_nst];
+        st_j = new int[tot_nst];
+        st_length = new int[tot_nst];
+        st_bottom = new int[tot_nst];
+        is2ip = new int [tot_nst];
         MPI_Recv(&st_i, tot_nst, MPI_INT, 0, 0, POOL_WORLD);
         MPI_Recv(&st_j, tot_nst, MPI_INT, 0, 0, POOL_WORLD);
         MPI_Recv(&st_length, tot_nst, MPI_INT, 0, 0, POOL_WORLD);
@@ -135,16 +154,14 @@ void PW_Basis::distribution_method1()
         gcar[i] = gdirect[i] * this->G;
     }
 
-    // (6) Construct ig2fft and is2ir. 
-    
-    this->get_ig2fft_is2ir(st_i, st_j, st_bottom, st_leghth, is2ip, nst_per);
+    // (6) Construct ig2isz and is2ixy. 
+    this->get_ig2isz_is2ixy(tot_nst, st_i, st_j, st_bottom, st_length, is2ip);
 
-    delete[] st_i;
-    delete[] st_j;
-    delete[] st_bottom;
-    delete[] st_length;
-    delete[] is2ip;
-    delete[] nst_per;
+    if (st_i != NULL) delete[] st_i;
+    if (st_j != NULL) delete[] st_j;
+    if (st_bottom != NULL) delete[] st_bottom;
+    if (st_length != NULL) delete[] st_length;
+    if (is2ip != NULL) delete[] is2ip;
 
     return;
 }
@@ -193,14 +210,14 @@ void PW_Basis::count_pw_st(
                 double modulus = f * (this->GGT * f);
                 if (modulus <= this->ggecut)
                 {
-                    if (length == 0) st_bottom[index] = iz; // length == 0 means this point is the bottom of stick (x, y).
+                    if (length == 0) st_bottom2D[index] = iz; // length == 0 means this point is the bottom of stick (x, y).
                     ++tot_npw;
                     ++length;
                 }
             }
             if (length > 0)
             {
-                st_length[index] = length;
+                st_length2D[index] = length;
                 ++tot_nst;
             }
         }
@@ -317,12 +334,12 @@ void PW_Basis::collect_pw_st(
 }
 
 //
-// (3) Distribute sticks to cores.
+// (3-1) Distribute sticks to cores.
 // We have rearranged sticks in the order of length decreasing, so that we will distribute the longest stick preferentially here.
 // For each stick, we find the core that contains the least planewaves firstly, and distribute the stick to it,
-// then update npw_per, nst_per, is2ip and ir2ip.
+// then update npw_per, this->nst_per, is2ip and this->ixy2ip.
 // known: tot_npw, tot_nst, st_i, st_j, st_length
-// output: npw_per, nst_per, is2ip, ir2ip
+// output: npw_per, this->nst_per, is2ip, this->ixy2ip
 //
 void PW_Basis::divide_sticks(
     const int tot_npw,  // total number of planewaves.
@@ -332,8 +349,7 @@ void PW_Basis::divide_sticks(
     int* st_length,     // the stick on (x, y) consists of st_length[x*ny+y] planewaves.
     int* npw_per,       // number of planewaves on each core.
     int* nst_per,       // number of sticks on each core.
-    int* is2ip,         // ip of core containing is^th stick, map is to ip.
-    int* ir2ip          // store the ip of proc which contains stick on (x, y).
+    int* is2ip          // ip of core containing is^th stick, map is to ip.
 )
 {
     int ipmin = 0; // The ip of core containing least number of planewaves.
@@ -342,7 +358,7 @@ void PW_Basis::divide_sticks(
         // find the ip of core containing the least planewaves.
         for (int ip = 0; ip < this->poolnproc; ip++)
         {
-            const int ngrid = this->nx * this->ny * this->nrxx[ip]; // number of real space planewaves on this core.
+            const int ngrid = this->nx * this->ny * this->nrxx;     // number of real space planewaves on this core.
             const int non_zero_grid = nst_per[ip] * this->nz;       // number of reciprocal planewaves on this core.
             const int npwmin = npw_per[ipmin];
             const int npw_ip = npw_per[ip];
@@ -367,71 +383,96 @@ void PW_Basis::divide_sticks(
         nst_per[ipmin]++;
         npw_per[ipmin] += st_length[is];
         is2ip[is] = ipmin;
-        ir2ip[st_i[is] * this->ny + st_j[is]] = ipmin;
+        this->ixy2ip[st_j[is] * this->nx + st_i[is]] = ipmin;
     }
+    for (int ip = 1; ip < poolnproc; ip++)
+    {
+        this->startis[ip] = this->startis[ip - 1] + nst_per[ip - 1];
+    }
+    return;
+}
+
+//
+// (3-2) Rearrange sticks in the order of the ip of core increasing, (st_start + st_move) is the new index of sticks.
+// Then get istot2ixy (istot2ixy[is]: ix + iy * nx of is^th stick among all sticks) on the first core.
+// known: tot_nst, st_i, st_j, is2ip, this->startis
+// output: istot2ixy
+//
+void PW_Basis::get_istot2ixy(
+    const int tot_nst,  // total number of sticks.
+    int* st_i,          // x or x + nx (if x < 0) of stick.
+    int* st_j,          // y or y + ny (if y < 0) of stick.
+    int* is2ip         // ip of core containing is^th stick, map is to ip.
+)
+{
+    assert(this->poolrank == 0);
+    this->istot2ixy = new int[tot_nst];
+    ModuleBase::GlobalFunc::ZEROS(this->istot2ixy, poolnproc);
+
+    int* st_move = new int[this->poolnproc]; // st_move[ip]: this is the st_move^th stick on ip^th core.
+    ModuleBase::GlobalFunc::ZEROS(st_move, poolnproc);
+
+    for (int is = 0; is < tot_nst; is++)
+    {
+        int ip = is2ip[is];
+        this->istot2ixy[this->startis[ip] + st_move[ip]] = st_j[is] * nx + st_i[is];
+        st_move[ip]++;
+    }
+    delete[] st_move;
     return;
 }
 //
 // (4) Divide planewaves to each core, construct gg2D and gdirect2D.
 // gg2D is a 2D array, the i^th row contains the planewaves that belong to the i^th core, and so is gdirect2D.
 // Hence, we can send i^th row of gg2D and gdirect2D to i^th core instead of sending whole gg_global and gdirect_global.
-// For each planewave, we map its x, y coordinates to the ip of core that contains it with ir2ip.
-// known: tot_npw, gg_global, gdirect_global, ir2ip
+// For each planewave, we map its x, y coordinates to the ip of core that contains it with this->ixy2ip.
+// known: tot_npw, gg_global, gdirect_global, this->ixy2ip
 // output: gg2D, gdirect2D
 //
 void PW_Basis::divide_pw(
     const int tot_npw,                          // total number of planewaves.
     double* gg_global,                          // the modulus of all planewaves.
     ModuleBase::Vector3<double>*gdirect_global, // direct coordinates of planewaves.
-    int* ir2ip,                                 // store the ip of proc which contains stick on (x, y).
-    double* gg2D,                               // the i^th row contains the modulus of planewaves that belong to the i^th core.
-    ModuleBase::Vector3<double>*gdirect2D       // the i^th row contains the direct coordinates of planewaves that belong to the i^th core.
+    double** gg2D,                               // the i^th row contains the modulus of planewaves that belong to the i^th core.
+    ModuleBase::Vector3<double>**gdirect2D       // the i^th row contains the direct coordinates of planewaves that belong to the i^th core.
 )
 {
     int* pw_found = new int[this->poolnproc]; // how many planewaves have been found.
-    ModuleBase::GlobalFunc::ZEROS(this->poolnproc, pw_found);
+    ModuleBase::GlobalFunc::ZEROS(pw_found, this->poolnproc);
     for (int ig = 0; ig < tot_npw; ig++)
     {
         int x = gdirect_global[ig].x;
         int y = gdirect_global[ig].y;
         if (x < 0) x += nx;
         if (y < 0) y += ny;
-        int ip = ir2ip[x * ny + y];
+        int ip = this->ixy2ip[y * nx + x];
         gg2D[ip][pw_found[ip]] = gg_global[ig];
-        gdirect2D[ip][pw_found[ip]] = gdirect2D[ig];
+        gdirect2D[ip][pw_found[ip]] = gdirect_global[ig];
         pw_found[ip]++;
     }
     delete[] pw_found;
     return;
 }
 //
-// (6) Construct ig2fft and is2ir.
-// is2ir contains the x-coordinate and y-coordinate of sticks on current core.
-// ig2fft contains the z-coordinate of planewaves on current core.  
+// (6) Construct ig2isz and is2ixy.
+// is2ixy contains the x-coordinate and y-coordinate of sticks on current core.
+// ig2isz contains the z-coordinate of planewaves on current core.  
 //
-void PW_Basis::get_ig2fft_is2ir(
+void PW_Basis::get_ig2isz_is2ixy(
+    const int tot_nst,  // total number of sticks.
     int* st_i,          // x or x + nx (if x < 0) of stick.
     int* st_j,          // y or y + ny (if y < 0) of stick.
     int* st_bottom,     // minimum z of stick, stored in 1d array with tot_nst elements.
     int* st_length,     // the stick on (x, y) consists of st_length[x*ny+y] planewaves.
-    int* is2ip,         // ip of core containing is^th stick, map is to ip.
-    int* nst_per        // number of sticks on each core.
+    int* is2ip          // ip of core containing is^th stick, map is to ip.
 )
 {
-    // we will rearrange sticks in the order of the ip of core increasing next.
-    // (st_start + st_move) is the new index of sticks.
-    int st_start = 0;               // index of the first stick belong to this core.
-    for (int ip = 0; ip < this->poolrank - 1; ip++)
-    {
-        st_start += nst_per[ip];
-    }
-
-    this->ig2fft = new int[this->npw]; // map ig to the z coordinate of this planewave.
-    ModuleBase::GlobalFunc::ZEROS(ig2fft, npw);
-    this->is2ir = new int[this->nst]; // map is (index of sticks) to ir (x * ny + y).
+    this->ig2isz = new int[this->npw]; // map ig to the z coordinate of this planewave.
+    ModuleBase::GlobalFunc::ZEROS(ig2isz, npw);
+    this->is2ixy = new int[this->nst]; // map is (index of sticks) to ixy (ix + iy * nx).
     for (int i = 0; i < nst; i++) 
     {
-        is2ir[i] = -1;              // meaning this stick doesn't belong to current core.
+        is2ixy[i] = -1;
     }
 
     int st_move = 0; // this is the st_move^th stick on current core.
@@ -440,15 +481,15 @@ void PW_Basis::get_ig2fft_is2ir(
     {
         if (is2ip[is] == poolrank)
         {
-            int zstart = st_bottom;
+            int zstart = st_bottom[is];
             for (int ig = 0; ig < st_length[is]; ig++)
             {
                 int z = ig + zstart; // z-coordinate of this planewave.
                 if (z < 0) z += nz;
-                this->ig2fft[pw_filled] = st_move * nz + z;
-                this->is2ir[st_start + st_move] = st_i[is] * ny + st_j[is];
+                this->ig2isz[pw_filled] = st_move * nz + z;
                 pw_filled++;
             }
+            this->is2ixy[st_move] = st_j[is] * nx + st_i[is];
             st_move++;
         }
         if (st_move == this->nst && pw_filled == this->npw) break;
