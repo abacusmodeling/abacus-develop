@@ -18,6 +18,13 @@ void PW_Basis::distribute_g()
     return;
 }
 
+//
+// Distribute planewaves in reciprocal space to coreors.
+// Firstly, divide the sphere in reciprocal space into sticks, which are vertical to x-y plane.
+// Secondly, distribute these sticks to coreors.
+//Known: G, GT, GGT, nx, ny, nz, poolnproc, poolrank, ggecut
+//output: ig2isz[ig], istot2ixy[is], is2ixy[is], ixy2ip[ixy], startis[ip], nst_per[ip], gg[ig], gcar[ig], gdirect[ig], nst
+//
 void PW_Basis::distribution_method1()
 {
     // initial the variables needed by all proc.
