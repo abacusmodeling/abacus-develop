@@ -10,7 +10,9 @@ PW_Basis::PW_Basis()
     nst_per = NULL;
     gdirect = NULL;		
     gcar = NULL; 
-    gg = NULL;  
+    gg = NULL;
+    startz = NULL;
+    numz = NULL;  
 }
 PW_Basis:: ~PW_Basis()
 {

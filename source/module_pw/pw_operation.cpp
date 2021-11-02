@@ -1,5 +1,6 @@
 #include "pw_basis_k.h"
 #include "pw_basis.h"
+#include <assert.h>
 
 ModuleBase::Vector3<double> PW_Basis_K:: get_GPlusK_cartesian(const int ik, const int ig) const {
     assert(ig>=0 && ig<this->npw && ik>=0 && ik<this->nks);

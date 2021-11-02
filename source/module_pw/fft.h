@@ -1,6 +1,8 @@
 #ifndef FFT_H
 #define FFT_H
 
+#include <complex>
+
 #include "fftw3.h"
 #if defined(__FFTW3_MPI) && defined(__MPI)
 #include <fftw3-mpi.h>
@@ -16,38 +18,46 @@
 #endif
 
 
-class FFT: public Parallel_PW
+
+class FFT
 {
 public:
 
 	FFT();
 	~FFT();
-	void initfft(int nx_in, int ny_in , int nz_in, int ns_in, int nplane_in, int ffttype_in);
-	void setupSFFT();
+	void initfft(int nx_in, int ny_in , int nz_in, int ns_in, int nplane_in, bool mpifft_in = false);
+	void setupFFT();
+	void cleanFFT();
+
+	void executefftw(string instr);
+#ifdef __MIX_PRECISION
+	void executefftwf(string instr);
+#endif
+
+private:
 	void initpland();
 	void initpland_mpi();
 #ifdef __MIX_PRECISION
 	void initplanf();
 	void initplanf_mpi();
 #endif
-	void cleanFFT();
-
-	void executefor(fftw_complex *, fftw_complex*, int n);
-	void executebac(fftw_complex *, fftw_complex*, int n);
-	void executer2c(double *, fftw_complex*, int n);
-	void executec2r(fftw_complex *, fftw_complex*, int n);
-#ifdef __MIX_PRECISION
-	void executeffor(fftwf_complex *, fftwf_complex*, int n);
-	void executefbac(fftwf_complex *, fftwf_complex*, int n);
-	void executefr2c(float *, fftwf_complex*, int n);
-	void executefc2r(fftwf_complex *, float*, int n);
-#endif
-
+	
 public:
 	int nx,ny,nz;
+	int nxy,nxyz;
 	int ns; //number of sticks
 	int nplane; //number of x-y planes
-	int ffttype; // type of FFT
+	bool mpifft; // if use mpi fft, only used when define __FFTW3_MPI
+	complex<double> * c_gspace; //complex number space for g, [ns * nz]
+	complex<double> * c_rspace; //complex number space for r, [nplane * nx *ny]
+	double *r_gspace; //real number space for g, [ns * nz]
+	double *r_rspace; //real number space for r, [nplane * nx *ny]
+#ifdef __MIX_PRECISION
+	complex<float> * cf_gspace; //complex number space for g, [ns * nz]
+	complex<float> * cf_rspace; //complex number space for r, [nplane * nx *ny]
+	float *rf_gspace; //real number space for g, [ns * nz]
+	float *rf_rspace; //real number space for r, [nplane * nx *ny]
+#endif
 
 
 private:
@@ -61,6 +71,7 @@ private:
 	fftw_plan plan2_for;
 	fftw_plan plan2_bac;
 #ifdef __MIX_PRECISION
+	bool destroypf;
 	fftwf_plan planf1_r2c;
 	fftwf_plan planf1_c2r;
 	fftwf_plan planf2_r2c;

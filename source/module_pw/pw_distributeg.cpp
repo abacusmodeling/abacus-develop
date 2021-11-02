@@ -1,7 +1,7 @@
 #include "pw_basis.h"
 
 //
-//distribute plane waves to different coreors
+//distribute plane waves to different cores
 //Known: G, GT, GGT, nx, ny, nz, poolnproc, poolrank, ggecut
 //output: ig2fft[ig], is2ir[is], gg[ig], gcar[ig], gdirect[ig], nst
 //
