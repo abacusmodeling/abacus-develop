@@ -52,7 +52,7 @@ public:
     int *ixy2is; //map ixy to is
     int *istot2ixy; // istot2ixy[istot]: ix + iy * nx of is^th stick among all sticks.
     int *is2ixy; // is2ixy[is]: ix + iy * nx of is^th stick among sticks on current proc.
-    int *ixy2ip; // store the ip of proc which contains stick on (x, y).
+    int *ixy2ip; // ixy2ip[ix + iy * nx]: ip of proc which contains stick on (ix, iy).
     int *startis; // startis[ip]: starting is stick in the ip^th proc.
     int *nst_per; // number of sticks on each core.
     int nst; //num. of sticks in current proc.
@@ -123,22 +123,27 @@ private:
         int* nst_per,       // number of sticks on each core.
         int* is2ip         // ip of core containing is^th stick, map is to ip.         
     );
+    void get_istot2ixy(
+        const int tot_nst,  // total number of sticks.
+        int* st_i,          // x or x + nx (if x < 0) of stick.
+        int* st_j,          // y or y + ny (if y < 0) of stick.
+        int* is2ip          // ip of core containing is^th stick, map is to ip.
+    );
     void divide_pw(
         const int tot_npw,                          // total number of planewaves.
         double* gg_global,                          // the modulus of all planewaves.
         ModuleBase::Vector3<double>*gdirect_global, // direct coordinates of planewaves.
-        double* gg2D,                               // the i^th row contains the modulus of planewaves that belong to the i^th core.
-        ModuleBase::Vector3<double>*gdirect2D       // the i^th row contains the direct coordinates of planewaves that belong to the i^th core.
+        double** gg2D,                               // the i^th row contains the modulus of planewaves that belong to the i^th core.
+        ModuleBase::Vector3<double>**gdirect2D       // the i^th row contains the direct coordinates of planewaves that belong to the i^th core.
     );
-    void get_ig2fft_is2ir(    
+    void get_ig2isz_is2ixy(
+        const int tot_nst,  // total number of sticks.
         int* st_i,          // x or x + nx (if x < 0) of stick.
         int* st_j,          // y or y + ny (if y < 0) of stick.
         int* st_bottom,     // minimum z of stick, stored in 1d array with tot_nst elements.
         int* st_length,     // the stick on (x, y) consists of st_length[x*ny+y] planewaves.
-        int* is2ip,         // ip of core containing is^th stick, map is to ip.
-        int* nst_per       // number of sticks on each core.
+        int* is2ip          // ip of core containing is^th stick, map is to ip.
     );
-
 
 //===============================================
 //                  FFT
