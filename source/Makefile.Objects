@@ -176,6 +176,7 @@ global_fp.o \
 pdiag_double.o \
 pdiag_basic.o \
 pdiag_common.o \
+diag_scalapack_gvx.o \
 subgrid_oper.o \
 conv_coulomb_pot.o \
 conv_coulomb_pot_k.o \
