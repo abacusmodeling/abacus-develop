@@ -3,6 +3,10 @@
 #include <unordered_map>
 #include <map>
 
+#ifdef __DEEPKS
+#include "LCAO_descriptor.h"
+#endif
+
 Force_LCAO_k::Force_LCAO_k ()
 {
 }
@@ -23,7 +27,12 @@ void Force_LCAO_k::ftable_k (
 		ModuleBase::matrix& soverlap,
 		ModuleBase::matrix& stvnl_dphi,
 		ModuleBase::matrix& svnl_dbeta,
+#ifdef __DEEPKS
+		ModuleBase::matrix& svl_dphi,
+		ModuleBase::matrix& svnl_dalpha
+#else
 		ModuleBase::matrix& svl_dphi
+#endif
 		)
 {
     ModuleBase::TITLE("Force_LCAO_k", "ftable_k");
@@ -57,6 +66,40 @@ void Force_LCAO_k::ftable_k (
 	this->cal_fvl_dphi_k(dm2d, isforce, isstress, fvl_dphi, svl_dphi);
 
 	this->calFvnlDbeta(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta, GlobalV::vnl_method);
+
+#ifdef __DEEPKS
+    if (GlobalV::deepks_scf)
+    {
+       	//step 1 : accumulate density matrix
+		if(GlobalV::NPOOL!=1)
+		{
+			ModuleBase::WARNING_QUIT("opt_ions","deepks not compatible with npool>1 now");
+		}
+		ModuleBase::ComplexMatrix dm_k_all;
+		dm_k_all.create(GlobalC::LOC.wfc_dm_2d.dm_k[0].nr, GlobalC::LOC.wfc_dm_2d.dm_k[0].nc);
+		for(int ik=0;ik<GlobalC::kv.nks;ik++)
+		{
+			ModuleBase::scale_accumulate(1.0,GlobalC::LOC.wfc_dm_2d.dm_k[ik],dm_k_all);
+		}
+		if(!dm_k_all.checkreal())
+		{
+			ModuleBase::WARNING_QUIT("opt_ions","accumulated density matrix not real!!");
+		}
+
+		//step 2 : obtain density matrix; calculate dE/dD
+		GlobalC::ld.cal_gedm(dm_k_all.dble());
+
+        GlobalC::ld.cal_f_delta_hf_k_new(GlobalC::LOC.wfc_dm_2d.dm_k,isstress,svnl_dalpha);
+        //ld.print_F_delta("F_delta_hf.dat");
+        GlobalC::ld.cal_f_delta_k_pulay(GlobalC::LOC.wfc_dm_2d.dm_k);
+        //ld.print_F_delta("F_delta_pulay.dat");
+        GlobalC::ld.print_F_delta("F_delta.dat");
+#ifdef __MPI
+        Parallel_Reduce::reduce_double_all(GlobalC::ld.F_delta.c,GlobalC::ld.F_delta.nr*GlobalC::ld.F_delta.nc);
+#endif
+    }
+#endif
+
 
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{

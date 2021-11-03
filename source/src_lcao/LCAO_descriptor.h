@@ -101,8 +101,8 @@ public:
 
     ///compute Hellmann-Feynman term of the force contribution of \f$E_\delta\f$
     void cal_f_delta_hf(const ModuleBase::matrix& dm/**< [in] density matrix*/);
-    void cal_f_delta_hf_new(const ModuleBase::matrix& dm/**< [in] density matrix*/);
-    void cal_f_delta_hf_k_new(const std::vector<ModuleBase::ComplexMatrix>& dm/**<[in] density matrix*/);
+    void cal_f_delta_hf_new(const ModuleBase::matrix& dm/**< [in] density matrix*/, const bool isstress, ModuleBase::matrix& svnl_dalpha);
+    void cal_f_delta_hf_k_new(const std::vector<ModuleBase::ComplexMatrix>& dm/**<[in] density matrix*/, const bool isstress, ModuleBase::matrix& svnl_dalpha);
     
     ///compute Pulay  term of the force contribution of \f$E_\delta\f$
     void cal_f_delta_pulay(const ModuleBase::matrix& dm/**< [in] density matrix*/);
@@ -181,6 +181,10 @@ private:
     double* DH_V_delta_x;
     double* DH_V_delta_y;
     double* DH_V_delta_z;
+
+    std::complex<double>** DH_V_delta_x_k;
+    std::complex<double>** DH_V_delta_y_k;
+    std::complex<double>** DH_V_delta_z_k;
 
     // saves <psi(0)|alpha(R)>, for k point
     std::vector<std::vector<std::unordered_map<int,std::vector<std::vector<double>>>>> nlm_k;

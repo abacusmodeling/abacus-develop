@@ -21,7 +21,12 @@ void Force_LCAO_gamma::ftable_gamma (
 	ModuleBase::matrix& soverlap,
 	ModuleBase::matrix& stvnl_dphi,
 	ModuleBase::matrix& svnl_dbeta,
+#ifdef __DEEPKS
+	ModuleBase::matrix& svl_dphi,
+	ModuleBase::matrix& svnl_dalpha)
+#else
 	ModuleBase::matrix& svl_dphi)
+#endif
 {
     ModuleBase::TITLE("Force_LCAO_gamma", "ftable");
     ModuleBase::timer::tick("Force_LCAO_gamma","ftable_gamma");
@@ -83,7 +88,7 @@ void Force_LCAO_gamma::ftable_gamma (
         //=======method 2: snap_psialpha========
         
         GlobalC::ld.cal_gedm(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
-        GlobalC::ld.cal_f_delta_hf_new(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
+        GlobalC::ld.cal_f_delta_hf_new(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],isstress, svnl_dalpha);
         //ld.print_F_delta("F_delta_hf.dat");
         GlobalC::ld.cal_f_delta_pulay(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
         //ld.print_F_delta("F_delta_pulay.dat");
