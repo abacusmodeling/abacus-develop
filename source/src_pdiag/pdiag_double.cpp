@@ -857,54 +857,8 @@ void Pdiag_Double::diago_double_begin(
 	}
 	else if(GlobalV::KS_SOLVER=="scalapack_gvx")
 	{
-		ModuleBase::matrix h_tmp(this->ncol, this->nrow, false);
-		memcpy( h_tmp.c, h_mat, sizeof(double)*this->ncol*this->nrow );
-		ModuleBase::matrix s_tmp(this->ncol, this->nrow, false);
-		memcpy( s_tmp.c, s_mat, sizeof(double)*this->ncol*this->nrow );
-		wfc_2d.create(this->ncol, this->nrow, false);
+		diag_scalapack_gvx.pdsygvx_diag(this->desc, this->ncol, this->nrow, h_mat, s_mat, ekb, wfc_2d);		// Peize Lin add 2021.11.02
 
-		const char jobz='V', range='I', uplo='U';
-		const int itype=1, il=1, iu=GlobalV::NBANDS, one=1;
-		int M=0, NZ=0, lwork=-1, liwork=-1, info=0;
-		const double abstol=0, orfac=-1;
-		std::vector<double> work(1,0);
-		std::vector<int> iwork(1,0);
-		std::vector<int> ifail(GlobalV::NLOCAL,0);
-		std::vector<int> iclustr(2*GlobalV::DSIZE);
-		std::vector<double> gap(GlobalV::DSIZE);
-
-		pdsygvx_(&itype, &jobz, &range, &uplo,
-			&GlobalV::NLOCAL, h_tmp.c, &one, &one, desc, s_tmp.c, &one, &one, desc,
-			NULL, NULL, &il, &iu, &abstol,
-			&M, &NZ, ekb, &orfac, wfc_2d.c, &one, &one, desc,
-			work.data(), &lwork, iwork.data(), &liwork, ifail.data(), iclustr.data(), gap.data(), &info);
-
-		GlobalV::ofs_running<<"lwork="<<work[0]<<"\t"<<"liwork="<<iwork[0]<<std::endl;
-		lwork = work[0];
-		work.resize(lwork,0);
-		liwork = iwork[0];
-		iwork.resize(liwork,0);
-
-		pdsygvx_(&itype, &jobz, &range, &uplo,
-			&GlobalV::NLOCAL, h_tmp.c, &one, &one, desc, s_tmp.c, &one, &one, desc,
-			NULL, NULL, &il, &iu, &abstol,
-			&M, &NZ, ekb, &orfac, wfc_2d.c, &one, &one, desc,
-			work.data(), &lwork, iwork.data(), &liwork, ifail.data(), iclustr.data(), gap.data(), &info);
-
-		GlobalV::ofs_running<<"M="<<M<<"\t"<<"NZ="<<NZ<<std::endl;
-
-		if(info)
-		{
-			throw std::runtime_error("info="+ModuleBase::GlobalFunc::TO_STRING(info)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		}
-		if(M!=GlobalV::NBANDS)
-		{
-			throw std::runtime_error("M="+ModuleBase::GlobalFunc::TO_STRING(M)+". GlobalV::NBANDS="+ModuleBase::GlobalFunc::TO_STRING(GlobalV::NBANDS)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		}
-		if(M!=NZ)
-		{
-			throw std::runtime_error("M="+ModuleBase::GlobalFunc::TO_STRING(M)+". NZ="+ModuleBase::GlobalFunc::TO_STRING(NZ)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		}
 		if(INPUT.new_dm==0)
 		{
 			throw std::domain_error("INPUT.new_dm must be 1. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
@@ -1151,52 +1105,7 @@ void Pdiag_Double::diago_complex_begin(
     } // GenELPA method
 	else if(GlobalV::KS_SOLVER=="scalapack_gvx")
 	{
-		ModuleBase::ComplexMatrix h_tmp(this->ncol, this->nrow, false);
-		memcpy( h_tmp.c, ch_mat, sizeof(std::complex<double>)*this->ncol*this->nrow );
-		ModuleBase::ComplexMatrix s_tmp(this->ncol, this->nrow, false);
-		memcpy( s_tmp.c, cs_mat, sizeof(std::complex<double>)*this->ncol*this->nrow );
-		wfc_2d.create(this->ncol, this->nrow, false);
-
-		const char jobz='V', range='I', uplo='U';
-		const int itype=1, il=1, iu=GlobalV::NBANDS, one=1;
-		int M=0, NZ=0, lwork=-1, lrwork=-1, liwork=-1, info=0;
-		const double abstol=0, orfac=-1;
-		std::vector<std::complex<double>> work(1,0);
-		std::vector<double> rwork(1,0);
-		std::vector<int> iwork(1,0);
-		std::vector<int> ifail(GlobalV::NLOCAL,0);
-		std::vector<int> iclustr(2*GlobalV::DSIZE);
-		std::vector<double> gap(GlobalV::DSIZE);
-
-		pzhegvx_(&itype, &jobz, &range, &uplo,
-			&GlobalV::NLOCAL, h_tmp.c, &one, &one, desc, s_tmp.c, &one, &one, desc,
-			NULL, NULL, &il, &iu, &abstol,
-			&M, &NZ, ekb, &orfac, wfc_2d.c, &one, &one, desc,
-			work.data(), &lwork, rwork.data(), &lrwork,
-			iwork.data(), &liwork, ifail.data(), iclustr.data(), gap.data(), &info);
-		if (info)
-			throw std::runtime_error("info=" + ModuleBase::GlobalFunc::TO_STRING(info) + ". " + ModuleBase::GlobalFunc::TO_STRING(__FILE__) + " line " + ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		GlobalV::ofs_running<<"lwork="<<work[0]<<"\t"<<"liwork="<<iwork[0]<<std::endl;
-		lwork = work[0].real();
-		work.resize(lwork,0);
-		lrwork = rwork[0];
-		rwork.resize(lrwork,0);
-		liwork = iwork[0];
-		iwork.resize(liwork,0);
-		pzhegvx_(&itype, &jobz, &range, &uplo,
-			&GlobalV::NLOCAL, h_tmp.c, &one, &one, desc, s_tmp.c, &one, &one, desc,
-			NULL, NULL, &il, &iu, &abstol,
-			&M, &NZ, ekb, &orfac, wfc_2d.c, &one, &one, desc,
-			work.data(), &lwork, rwork.data(), &lrwork,
-			iwork.data(), &liwork, ifail.data(), iclustr.data(), gap.data(), &info);
-		GlobalV::ofs_running<<"M="<<M<<"\t"<<"NZ="<<NZ<<std::endl;
-
-		if(info)
-			throw std::runtime_error("info="+ModuleBase::GlobalFunc::TO_STRING(info)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		if(M!=GlobalV::NBANDS)
-			throw std::runtime_error("M="+ModuleBase::GlobalFunc::TO_STRING(M)+". GlobalV::NBANDS="+ModuleBase::GlobalFunc::TO_STRING(GlobalV::NBANDS)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		if(M!=NZ)
-			throw std::runtime_error("M="+ModuleBase::GlobalFunc::TO_STRING(M)+". NZ="+ModuleBase::GlobalFunc::TO_STRING(NZ)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+		diag_scalapack_gvx.pzhegvx_diag(this->desc, this->ncol, this->nrow, ch_mat, cs_mat, ekb, wfc_2d);		// Peize Lin add 2021.11.02
 
 //		if(INPUT.new_dm==0)
 //			throw std::domain_error("INPUT.new_dm must be 1. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
@@ -1205,9 +1114,10 @@ void Pdiag_Double::diago_complex_begin(
 			//change eigenvector matrix from block-cycle distribute matrix to column-divided distribute matrix
 			ModuleBase::timer::tick("Diago_LCAO_Matrix","gath_eig_complex");
 
+			int info;
 			long maxnloc; // maximum number of elements in local matrix
-			MPI_Reduce(&nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, comm_2D);
-			MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, comm_2D);
+			info=MPI_Reduce(&nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, comm_2D);
+			info=MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, comm_2D);
 			std::complex<double> *work=new std::complex<double>[maxnloc]; // work/buffer matrix
 
 			int naroc[2]; // maximum number of row or column
@@ -1217,7 +1127,7 @@ void Pdiag_Double::diago_complex_begin(
 				{
 					const int coord[2]={iprow, ipcol};
 					int src_rank;
-					MPI_Cart_rank(comm_2D, coord, &src_rank);
+					info=MPI_Cart_rank(comm_2D, coord, &src_rank);
 					if(myid==src_rank)
 					{
 						LapackConnector::copy(nloc, wfc_2d.c, inc, work, inc);
