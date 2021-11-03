@@ -4,9 +4,7 @@ on:
   pull_request_target:
     branches:
       - develop
-      - reconstruction
-      - newelpa
-
+      - ABACUS_2.2.0_beta
 jobs:
 
   start-runner:
