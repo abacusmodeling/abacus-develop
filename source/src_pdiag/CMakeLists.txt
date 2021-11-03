@@ -21,4 +21,5 @@ add_library(
     pzst2g.cpp
     pzsteiz.cpp
     pzt2s.cpp
+    diag_scalapack_gvx.cpp
 )
