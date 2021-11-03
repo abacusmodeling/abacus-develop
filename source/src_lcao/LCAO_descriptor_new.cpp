@@ -285,7 +285,7 @@ void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri)
 
 }
 
-void LCAO_Descriptor::cal_f_delta_hf_new(const ModuleBase::matrix& dm)
+void LCAO_Descriptor::cal_f_delta_hf_new(const ModuleBase::matrix& dm, const bool isstress, ModuleBase::matrix& svnl_dalpha)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "cal_f_delta_hf_new");
     this->F_delta.zero_out();
@@ -389,6 +389,18 @@ void LCAO_Descriptor::cal_f_delta_hf_new(const ModuleBase::matrix& dm)
                         continue;
                     }					
 
+                    double r0[3];
+                    double r1[3];
+                    if(isstress)
+                    {
+                        r1[0] = ( tau1.x - tau0.x) ;
+                        r1[1] = ( tau1.y - tau0.y) ;
+                        r1[2] = ( tau1.z - tau0.z) ;
+                        r0[0] = ( tau2.x - tau0.x) ;
+                        r0[1] = ( tau2.y - tau0.y) ;
+                        r0[2] = ( tau2.z - tau0.z) ;
+                    }
+
                     for (int iw1=0; iw1<nw1_tot; ++iw1)
                     {
                         const int iw1_all = start1 + iw1;
@@ -402,6 +414,7 @@ void LCAO_Descriptor::cal_f_delta_hf_new(const ModuleBase::matrix& dm)
                             if(iw2_local < 0)continue;
 
                             double nlm[3]={0,0,0};
+                            double nlm_t[3] = {0,0,0}; //for stress
                             std::vector<double> nlm1 = nlm_tot[ad1][iw1_all][0];
                             std::vector<std::vector<double>> nlm2;
                             nlm2.resize(3);
@@ -440,20 +453,73 @@ void LCAO_Descriptor::cal_f_delta_hf_new(const ModuleBase::matrix& dm)
                             this->F_delta(iat, 1) -= 2 * dm(iw1_local, iw2_local) * nlm[1];
                             this->F_delta(iat, 2) -= 2 * dm(iw1_local, iw2_local) * nlm[2];
 
+                            if(isstress)
+                            {
+                                nlm1 = nlm_tot[ad2][iw2_all][0];
+                                for(int i=0;i<3;i++)
+                                {
+                                    nlm2[i] = nlm_tot[ad1][iw1_all][i+1];
+                                }
+
+                                assert(nlm1.size()==nlm2[0].size());                                
+
+                                int ib=0;
+                                for (int L0 = 0; L0 <= GlobalC::ORB.Alpha[0].getLmax();++L0)
+                                {
+                                    for (int N0 = 0;N0 < GlobalC::ORB.Alpha[0].getNchi(L0);++N0)
+                                    {
+                                        const int inl = this->inl_index[T0](I0, L0, N0);
+                                        const int nm = 2*L0+1;
+                                        for (int m1 = 0;m1 < nm; ++m1)
+                                        {
+                                            for (int m2 = 0; m2 < nm; ++m2)
+                                            {
+                                                for(int dim=0;dim<3;dim++)
+                                                {                                            
+                                                    nlm_t[dim] += this->gedm[inl][m1*nm+m2]*nlm1[ib+m1]*nlm2[dim][ib+m2];
+                                                }
+                                            }
+                                        }
+                                        ib+=nm;
+                                    }
+                                }
+                                assert(ib==nlm1.size());
+
+                                for(int ipol=0;ipol<3;ipol++)
+                                {
+                                    svnl_dalpha(0,ipol) -= dm(iw1_local, iw2_local) * (nlm[0] * r0[ipol] + nlm_t[0] * r1[ipol])* -1;
+                                    svnl_dalpha(1,ipol) -= dm(iw1_local, iw2_local) * (nlm[1] * r0[ipol] + nlm_t[1] * r1[ipol])* -1;
+                                    svnl_dalpha(2,ipol) -= dm(iw1_local, iw2_local) * (nlm[2] * r0[ipol] + nlm_t[2] * r1[ipol])* -1;
+                                }
+                            }
                         }//iw2
                     }//iw1
                 }//ad2
             }//ad1
         }//end I0
     }//end T0
+
+    if(isstress)
+    {
+        for(int i=0;i<3;i++)
+        {
+            for(int j=0;j<3;j++)
+            {
+                svnl_dalpha(i,j) *=  GlobalC::ucell.lat0 / GlobalC::ucell.omega;
+            }
+        }
+    }
 }
 
-void LCAO_Descriptor::cal_f_delta_hf_k_new(const std::vector<ModuleBase::ComplexMatrix>& dm/**<[in] density matrix*/)
+void LCAO_Descriptor::cal_f_delta_hf_k_new(const std::vector<ModuleBase::ComplexMatrix>& dm/**<[in] density matrix*/, const bool isstress, ModuleBase::matrix& svnl_dalpha)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "cal_f_delta_hf_k_new");
     this->F_delta.zero_out();
     ModuleBase::ComplexMatrix F_delta_k;
     F_delta_k.create(this->F_delta.nr,this->F_delta.nc);
+
+    ModuleBase::ComplexMatrix svnl_dalpha_k;
+    svnl_dalpha_k.create(3,3);
 
     const double Rcut_Alpha = GlobalC::ORB.Alpha[0].getRcut();
     for (int T0 = 0; T0 < GlobalC::ucell.ntype; T0++)
@@ -556,7 +622,19 @@ void LCAO_Descriptor::cal_f_delta_hf_k_new(const std::vector<ModuleBase::Complex
                     {
                         continue;
                     }
-                    
+
+                    double r0[3];
+                    double r1[3];
+                    if(isstress)
+                    {
+                        r1[0] = ( tau1.x - tau0.x) ;
+                        r1[1] = ( tau1.y - tau0.y) ;
+                        r1[2] = ( tau1.z - tau0.z) ;
+                        r0[0] = ( tau2.x - tau0.x) ;
+                        r0[1] = ( tau2.y - tau0.y) ;
+                        r0[2] = ( tau2.z - tau0.z) ;
+                    }
+
                     for (int iw1=0; iw1<nw1_tot; ++iw1)
                     {
                         const int iw1_all = start1 + iw1;
@@ -570,6 +648,7 @@ void LCAO_Descriptor::cal_f_delta_hf_k_new(const std::vector<ModuleBase::Complex
                             if(iw2_local < 0)continue;
 
                             double nlm[3]={0,0,0};
+                            double nlm_t[3] = {0,0,0}; //for stress
                             std::vector<double> nlm1 = nlm_tot[ad1][iw1_all][0];
                             std::vector<std::vector<double>> nlm2;
                             nlm2.resize(3);
@@ -612,6 +691,50 @@ void LCAO_Descriptor::cal_f_delta_hf_k_new(const std::vector<ModuleBase::Complex
                                 F_delta_k(iat, 1) -= 2 * dm[ik](iw1_local, iw2_local) * nlm[1] * kphase;
                                 F_delta_k(iat, 2) -= 2 * dm[ik](iw1_local, iw2_local) * nlm[2] * kphase;
                             }
+
+                            if(isstress)
+                            {
+                                nlm1 = nlm_tot[ad2][iw2_all][0];
+                                for(int i=0;i<3;i++)
+                                {
+                                    nlm2[i] = nlm_tot[ad1][iw1_all][i+1];
+                                }
+
+                                assert(nlm1.size()==nlm2[0].size());                                
+
+                                int ib=0;
+                                for (int L0 = 0; L0 <= GlobalC::ORB.Alpha[0].getLmax();++L0)
+                                {
+                                    for (int N0 = 0;N0 < GlobalC::ORB.Alpha[0].getNchi(L0);++N0)
+                                    {
+                                        const int inl = this->inl_index[T0](I0, L0, N0);
+                                        const int nm = 2*L0+1;
+                                        for (int m1 = 0;m1 < nm; ++m1)
+                                        {
+                                            for (int m2 = 0; m2 < nm; ++m2)
+                                            {
+                                                for(int dim=0;dim<3;dim++)
+                                                {                                            
+                                                    nlm_t[dim] += this->gedm[inl][m1*nm+m2]*nlm1[ib+m1]*nlm2[dim][ib+m2];
+                                                }
+                                            }
+                                        }
+                                        ib+=nm;
+                                    }
+                                }
+                                assert(ib==nlm1.size());
+                                for(int ik=0;ik<GlobalC::kv.nks;ik++)
+                                {
+                                    const double arg = ( GlobalC::kv.kvec_d[ik] * (dR2-dR1) ) * ModuleBase::TWO_PI;
+                                    const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );                                    
+                                    for(int ipol=0;ipol<3;ipol++)
+                                    {
+                                        svnl_dalpha_k(0,ipol) -= dm[ik](iw1_local, iw2_local) * kphase * (nlm[0] * r0[ipol] + nlm_t[0] * r1[ipol])* -1;
+                                        svnl_dalpha_k(1,ipol) -= dm[ik](iw1_local, iw2_local) * kphase * (nlm[1] * r0[ipol] + nlm_t[1] * r1[ipol])* -1;
+                                        svnl_dalpha_k(2,ipol) -= dm[ik](iw1_local, iw2_local) * kphase * (nlm[2] * r0[ipol] + nlm_t[2] * r1[ipol])* -1;
+                                    }
+                                }
+                            }
                         }//iw2
                     }//iw1
                 }//ad2
@@ -624,6 +747,22 @@ void LCAO_Descriptor::cal_f_delta_hf_k_new(const std::vector<ModuleBase::Complex
         ModuleBase::WARNING_QUIT("cal_f_delta_hf_k","Force should be real!");
     }
     this->F_delta = F_delta_k.dble();
+
+    if(isstress)
+    {
+        if(!svnl_dalpha_k.checkreal())
+        {
+            ModuleBase::WARNING_QUIT("cal_f_delta_hf_k","Stress should be real!");
+        }
+
+        for(int i=0;i<3;i++)
+        {
+            for(int j=0;j<3;j++)
+            {
+                svnl_dalpha(i,j) =  svnl_dalpha_k(i,j).real() * GlobalC::ucell.lat0 / GlobalC::ucell.omega;
+            }
+        }
+    }
 }
 
 void LCAO_Descriptor::cal_f_delta_k_pulay(const std::vector<ModuleBase::ComplexMatrix>& dm/**<[in] density matrix*/)

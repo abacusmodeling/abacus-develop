@@ -27,7 +27,12 @@ void Force_LCAO_k::ftable_k (
 		ModuleBase::matrix& soverlap,
 		ModuleBase::matrix& stvnl_dphi,
 		ModuleBase::matrix& svnl_dbeta,
+#ifdef __DEEPKS
+		ModuleBase::matrix& svl_dphi,
+		ModuleBase::matrix& svnl_dalpha
+#else
 		ModuleBase::matrix& svl_dphi
+#endif
 		)
 {
     ModuleBase::TITLE("Force_LCAO_k", "ftable_k");
@@ -84,7 +89,7 @@ void Force_LCAO_k::ftable_k (
 		//step 2 : obtain density matrix; calculate dE/dD
 		GlobalC::ld.cal_gedm(dm_k_all.dble());
 
-        GlobalC::ld.cal_f_delta_hf_k_new(GlobalC::LOC.wfc_dm_2d.dm_k);
+        GlobalC::ld.cal_f_delta_hf_k_new(GlobalC::LOC.wfc_dm_2d.dm_k,isstress,svnl_dalpha);
         //ld.print_F_delta("F_delta_hf.dat");
         GlobalC::ld.cal_f_delta_k_pulay(GlobalC::LOC.wfc_dm_2d.dm_k);
         //ld.print_F_delta("F_delta_pulay.dat");

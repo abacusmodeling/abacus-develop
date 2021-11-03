@@ -101,8 +101,8 @@ public:
 
     ///compute Hellmann-Feynman term of the force contribution of \f$E_\delta\f$
     void cal_f_delta_hf(const ModuleBase::matrix& dm/**< [in] density matrix*/);
-    void cal_f_delta_hf_new(const ModuleBase::matrix& dm/**< [in] density matrix*/);
-    void cal_f_delta_hf_k_new(const std::vector<ModuleBase::ComplexMatrix>& dm/**<[in] density matrix*/);
+    void cal_f_delta_hf_new(const ModuleBase::matrix& dm/**< [in] density matrix*/, const bool isstress, ModuleBase::matrix& svnl_dalpha);
+    void cal_f_delta_hf_k_new(const std::vector<ModuleBase::ComplexMatrix>& dm/**<[in] density matrix*/, const bool isstress, ModuleBase::matrix& svnl_dalpha);
     
     ///compute Pulay  term of the force contribution of \f$E_\delta\f$
     void cal_f_delta_pulay(const ModuleBase::matrix& dm/**< [in] density matrix*/);
