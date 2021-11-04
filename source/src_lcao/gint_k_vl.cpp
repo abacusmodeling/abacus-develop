@@ -8,6 +8,14 @@
 #include "../module_base/blas_connector.h"
 //#include <mkl_cblas.h>
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
+#ifdef __MKL
+#include <mkl_service.h>
+#endif
+
 inline int find_offset(const int size, const int grid_index, 
 				const int ibx, const int jby, const int kbz, 
 				const int bx, const int by, const int bz, 
@@ -351,6 +359,18 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 
 	ModuleBase::timer::tick("Gint_k","vlocal");
 
+#ifdef __MKL
+    const int mkl_threads = mkl_get_max_threads();
+    mkl_set_num_threads(1);
+#endif
+
+#ifdef _OPENMP
+    #pragma omp parallel
+    {
+        double* pvpR_reduced_thread;
+        pvpR_reduced_thread = new double[GlobalC::LNNR.nnrg];
+        ModuleBase::GlobalFunc::ZEROS(pvpR_reduced_thread, GlobalC::LNNR.nnrg);
+#endif
 	// it's a uniform grid to save orbital values, so the delta_r is a constant.
 	double delta_r = GlobalC::ORB.dr_uniform;
 	// possible max atom number in real space grid. 
@@ -415,6 +435,9 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 	double* vldr3 = new double[bxyz];
 	ModuleBase::GlobalFunc::ZEROS(vldr3, bxyz);
 
+#ifdef _OPENMP
+        #pragma omp for
+#endif
 	for(int i=0; i<nbx; i++)
 	{
 		const int ibx=i*GlobalC::pw.bx;
@@ -457,11 +480,19 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 
 				if(this->reduced)
 				{
+#ifdef _OPENMP
+					cal_pvpR_reduced(size, LD_pool, grid_index, 
+									ibx, jby, kbz, 
+									block_size, at, block_index, block_iw, 
+									vldr3, psir_ylm, psir_vlbr3, 
+									distance, cal_flag, pvpR_reduced_thread);
+#else
 					cal_pvpR_reduced(size, LD_pool, grid_index, 
 									ibx, jby, kbz, 
 									block_size, at, block_index, block_iw, 
 									vldr3, psir_ylm, psir_vlbr3, 
 									distance, cal_flag, this->pvpR_reduced[spin]);
+#endif
 				}
 				else
 				{
@@ -471,6 +502,15 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 			}// int k
 		}// int j
 	} // int i
+
+#ifdef _OPENMP
+        #pragma omp critical(cal_vl_k)
+        for(int innrg=0; innrg<GlobalC::LNNR.nnrg; innrg++)
+        {
+            pvpR_reduced[spin][innrg] += pvpR_reduced_thread[innrg];
+        }
+        delete[] pvpR_reduced_thread;
+#endif
 
 	delete[] vldr3;
 	if(max_size!=0)
@@ -489,7 +529,14 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 		delete[] block_iw;
 		delete[] block_size;
 		delete[] block_index;
-	}	
+	}
+#ifdef _OPENMP
+    } // end omp
+#endif
+
+#ifdef __MKL
+    mkl_set_num_threads(mkl_threads);
+#endif
 
 	ModuleBase::timer::tick("Gint_k","vlocal");
 	return;
