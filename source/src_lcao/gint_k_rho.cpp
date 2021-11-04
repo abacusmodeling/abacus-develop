@@ -8,7 +8,7 @@
 #include "../module_base/blas_connector.h"
 #include "global_fp.h" // mohan add 2021-01-30
 
-#ifdef __OPENMP
+#ifdef _OPENMP
 #include <omp.h>
 #endif
 
@@ -408,7 +408,7 @@ void Gint_k::cal_rho_k(void)
     mkl_set_num_threads(1);
 #endif
 
-#ifdef __OPENMP
+#ifdef _OPENMP
     #pragma omp parallel
     {
 #endif
@@ -471,7 +471,7 @@ void Gint_k::cal_rho_k(void)
 	const int ncyz = GlobalC::pw.ncy*GlobalC::pw.nczp;
 	const int nbyz = nby*nbz;	
 
-#ifdef __OPENMP
+#ifdef _OPENMP
     #pragma omp for
 #endif
 	for(int i=0; i<nbx; i++)
@@ -532,7 +532,7 @@ void Gint_k::cal_rho_k(void)
     }	
 
 //	std::cout << " calculate the charge density from density matrix " << std::endl;
-#ifdef __OPENMP
+#ifdef _OPENMP
     } //end omp
 #endif
 

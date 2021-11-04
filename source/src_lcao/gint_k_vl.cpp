@@ -8,7 +8,7 @@
 #include "../module_base/blas_connector.h"
 //#include <mkl_cblas.h>
 
-#ifdef __OPENMP
+#ifdef _OPENMP
 #include <omp.h>
 #endif
 
@@ -364,7 +364,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
     mkl_set_num_threads(1);
 #endif
 
-#ifdef __OPENMP
+#ifdef _OPENMP
     #pragma omp parallel
     {
         double* pvpR_reduced_thread;
@@ -435,7 +435,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 	double* vldr3 = new double[bxyz];
 	ModuleBase::GlobalFunc::ZEROS(vldr3, bxyz);
 
-#ifdef __OPENMP
+#ifdef _OPENMP
         #pragma omp for
 #endif
 	for(int i=0; i<nbx; i++)
@@ -480,7 +480,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 
 				if(this->reduced)
 				{
-#ifdef __OPENMP
+#ifdef _OPENMP
 					cal_pvpR_reduced(size, LD_pool, grid_index, 
 									ibx, jby, kbz, 
 									block_size, at, block_index, block_iw, 
@@ -503,7 +503,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 		}// int j
 	} // int i
 
-#ifdef __OPENMP
+#ifdef _OPENMP
         #pragma omp critical(cal_vl_k)
         for(int innrg=0; innrg<GlobalC::LNNR.nnrg; innrg++)
         {
@@ -530,7 +530,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 		delete[] block_size;
 		delete[] block_index;
 	}
-#ifdef __OPENMP
+#ifdef _OPENMP
     } // end omp
 #endif
 
