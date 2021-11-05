@@ -629,12 +629,13 @@ void Input_Conv::Convert(void)
 	}
 
 	ModuleBase::timer::tick("Input_Conv","Convert");
-    return;
-
 	//-----------------------------------------------
 	//caoyu add for DeePKS
 	//-----------------------------------------------
+	#ifdef __DEEPKS
 	GlobalV::out_descriptor = INPUT.out_descriptor; 
 	GlobalV::deepks_scf = INPUT.deepks_scf;
+	#endif
 	
+    return;
 }

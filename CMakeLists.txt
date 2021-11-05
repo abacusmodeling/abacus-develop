@@ -47,7 +47,7 @@ if(USE_OPENMP)
   find_package(OpenMP REQUIRED)
   target_link_libraries(${ABACUS_BIN_NAME} OpenMP::OpenMP_CXX)
   add_compile_options(${OpenMP_CXX_FLAGS})
-  add_compile_definitions(__OPENMP)
+  #add_compile_definitions(_OPENMP)
 endif()
 
 set(CMAKE_CXX_STANDARD 11)
@@ -135,7 +135,7 @@ if(ENABLE_DEEPKS)
   find_package(Torch REQUIRED)
   include_directories(${TORCH_INCLUDE_DIRS})
   target_link_libraries(${ABACUS_BIN_NAME} ${TORCH_LIBRARIES})
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
+  add_compile_options(${TORCH_CXX_FLAGS})
 
   find_path(libnpy_SOURCE_DIR
     npy.hpp

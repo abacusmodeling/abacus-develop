@@ -10,6 +10,10 @@
 
 #include "global_fp.h" // mohan add 2021-01-30
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 #ifdef __MKL
 #include <mkl_service.h>
 #endif
@@ -316,7 +320,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 	mkl_set_num_threads(std::max(1,mkl_threads/GlobalC::GridT.nbx));		// Peize Lin update 2021.01.20
 #endif
 
-#ifdef __OPENMP
+#ifdef _OPENMP
 	#pragma omp parallel
 #endif
 	{
@@ -344,7 +348,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 
 			const int LD_pool = max_size*GlobalC::ucell.nwmax;
 
-#ifdef __OPENMP
+#ifdef _OPENMP
 			#pragma omp for
 #endif
 			for (int i=0; i< nbx; i++)
@@ -419,7 +423,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 				}// j
 			}// i
 
-#ifdef __OPENMP
+#ifdef _OPENMP
 			#pragma omp critical(cal_vl)
 #endif
 			{

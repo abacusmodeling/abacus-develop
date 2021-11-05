@@ -294,7 +294,7 @@ void Force_Stress_LCAO::getForceStress(
 
 #ifdef __DEEPKS
 		//DeePKS force, caoyu add 2021-06-03
-		if (GlobalV::out_descriptor)
+		if (GlobalV::out_descriptor && GlobalV::NPROC<=1) //not parallelized yet
 		{
             GlobalC::ld.save_npy_f(fcs, "f_tot.npy"); //Ty/Bohr, F_tot
             if (GlobalV::deepks_scf)

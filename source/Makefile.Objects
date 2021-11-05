@@ -164,6 +164,8 @@ LCAO_nnr.o \
 LCAO_diago.o\
 LCAO_evolve.o\
 LCAO_descriptor.o\
+LCAO_descriptor_old.o\
+LCAO_descriptor_new.o\
 ylm.o\
 FORCE_STRESS.o\
 FORCE_gamma.o\
@@ -176,6 +178,7 @@ global_fp.o \
 pdiag_double.o \
 pdiag_basic.o \
 pdiag_common.o \
+diag_scalapack_gvx.o \
 subgrid_oper.o \
 conv_coulomb_pot.o \
 conv_coulomb_pot_k.o \
@@ -225,6 +228,7 @@ parallel_reduce.o\
 parallel_pw.o\
 ft.o\
 parallel_grid.o\
+parallel_deepks.o \
 
 OBJS_FIRST_PRINCIPLES=$(OBJS_MAIN)\
 $(OBJS_PW)\
