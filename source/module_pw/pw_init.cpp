@@ -6,7 +6,7 @@
 //Output: nx, ny, nz, nxyz, latvec, G, GT, GGT
 //
 void PW_Basis:: initgrids(
-        ModuleBase::Matrix3 latvec_in // Unitcell lattice vectors
+        ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
         double gridecut
 )
 {
@@ -115,7 +115,7 @@ void PW_Basis:: initgrids(
 //Output: nx, ny, nz, nxyz, latvec, G, GT, GGT
 //
 void PW_Basis:: initgrids(
-    ModuleBase::Matrix3 latvec_in // Unitcell lattice vectors
+    ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
     int nx_in, int ny_in, int nz_in
 )
 {
