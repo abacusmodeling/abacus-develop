@@ -35,8 +35,8 @@ public:
 #endif
 
 private:
-	void initpland();
-	void initpland_mpi();
+	void initplan();
+	void initplan_mpi();
 #ifdef __MIX_PRECISION
 	void initplanf();
 	void initplanf_mpi();
