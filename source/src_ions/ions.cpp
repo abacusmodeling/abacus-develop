@@ -183,12 +183,6 @@ void Ions::opt_ions_pw(void)
 			elec_sto.scf_stochastic(istep-1);
 			eiter = elec_sto.iter;
 		}
-	
-
-		if(GlobalV::CALCULATION=="relax"|| GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="cell-relax")
-		{
-			CE.update_all_pos(GlobalC::ucell);
-		}
 
 		if(GlobalC::pot.out_potential == 2)
 		{
@@ -367,6 +361,8 @@ bool Ions::if_do_cellrelax()
 bool Ions::do_relax(const int& istep, int& jstep, const ModuleBase::matrix& ionic_force, const double& total_energy)
 {
 	ModuleBase::TITLE("Ions","do_relax");
+	CE.update_istep(jstep);
+	CE.update_all_pos(GlobalC::ucell);
 	IMM.cal_movement(istep, jstep, ionic_force, total_energy);
 	++jstep;
 	return IMM.get_converged();
@@ -386,6 +382,7 @@ void Ions::reset_after_relax(const int& istep)
 	GlobalV::ofs_running << " Setup the extrapolated charge." << std::endl;
 	// charge extrapolation if istep>0.
 	CE.extrapolate_charge();
+	CE.save_pos_next(GlobalC::ucell);
 
 	GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << std::endl;
 	// calculate the new potential accordint to
