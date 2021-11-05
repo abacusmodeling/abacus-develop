@@ -556,7 +556,7 @@ void ELEC_scf::scf(const int &istep)
 				{
                     GlobalC::ld.save_npy_e(GlobalC::en.etot, "e_tot.npy");
                     if (GlobalV::deepks_scf) {
-                        GlobalC::ld.save_npy_e(GlobalC::en.etot - GlobalC::ld.E_delta + GlobalC::ld.e_delta_band, "e_base.npy");//ebase :no deepks E_delta including
+                        GlobalC::ld.save_npy_e(GlobalC::en.etot - GlobalC::ld.E_delta, "e_base.npy");//ebase :no deepks E_delta including
                     }
                     else
                     {
