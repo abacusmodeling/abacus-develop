@@ -122,7 +122,7 @@ class Opt_Orbital:
 		
 		
 		
-	def cal_V(self,Q,S,info):
+	def cal_V(self,Q,S,info,V_info):
 		"""
 		  <\psi|\psi> = <\psi|\phi> * <\phi|\phi>^{-1} * <\phi|psi>
 		  V[ist][ib]
@@ -138,7 +138,9 @@ class Opt_Orbital:
 		Z = ND_list(info.Nst)
 		for ist in range(info.Nst):
 			# V[ist][ib1,ib2]
-			V[ist] = torch_complex.mm( coef[ist], Q[ist].t().conj() ).real
+			V_tmp = torch_complex.mm( coef[ist], Q[ist].t().conj() ).real
+			if V_info["same_band"]:		V[ist] = V_tmp.diag().sqrt()
+			else:						V[ist] = V_tmp.sqrt()
 		return V
 		
 		
@@ -158,13 +160,11 @@ class Opt_Orbital:
 			V_linear_2 = Q_linear[ist].mm(coef[ist].t().conj()).real
 			V_linear_3 = coef[ist].mm(Q_linear[ist].t().conj()).real
 			if V_info["same_band"]:
-				V_diag = V[ist].diag()
-				Z = V_diag.sqrt()
-				V_linear[ist] = -V_linear_1.diag()/V_diag + V_linear_2.diag()/Z + V_linear_3.diag()/Z
-			else:
-				V_matrix = V[ist]
-				Z = V_matrix.sqrt()
-				V_linear[ist] = -V_linear_1/V_matrix + V_linear_2/Z + V_linear_3/Z
+				V_linear_1 = V_linear_1.diag()
+				V_linear_2 = V_linear_2.diag()
+				V_linear_3 = V_linear_3.diag()
+			Z = V[ist]
+			V_linear[ist] = (-V_linear_1/Z + V_linear_2 + V_linear_3) / Z
 		return V_linear
 			
 	
