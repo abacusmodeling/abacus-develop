@@ -62,16 +62,16 @@ def main():
 					S_linear = opt_orb.change_index_S(opt_orb.cal_S(SI_linear[i],C,info),info)
 					V_linear[i] = opt_orb.cal_V_linear(Q,S,Q_linear,S_linear,V,info,V_info)
 
-			if V_info["same_band"]:
-				cal_Spillage = lambda V_delta :		\
-					sum( Vi[:info.Nb_true[ist]].sum() * info.weight[ist] for ist,Vi in enumerate(V_delta) )		\
-					/ sum( Nb_true*weight for Nb_true,weight in zip(info.Nb_true,info.weight) )
-			else:
-				cal_Spillage = lambda V_delta :		\
-					sum( Vi[:info.Nb_true[ist],:info.Nb_true[ist]].sum() * info.weight[ist] for ist,Vi in enumerate(V_delta) )		\
-					/ sum( Nb_true**2*weight for Nb_true,weight in zip(info.Nb_true,info.weight) )
+			def cal_Spillage(V_delta):
+				if V_info["same_band"]:
+					return 	sum( Vi[:info.Nb_true[ist]].sum() * info.weight[ist] for ist,Vi in enumerate(V_delta) )		\
+							/ sum( Nb_true*weight for Nb_true,weight in zip(info.Nb_true,info.weight) )
+				else:
+					return 	sum( Vi[:info.Nb_true[ist],:info.Nb_true[ist]].sum() * info.weight[ist] for ist,Vi in enumerate(V_delta) )		\
+							/ sum( Nb_true**2*weight for Nb_true,weight in zip(info.Nb_true,info.weight) )
 
-			cal_delta = lambda VI,V: ( ((VIi-Vi)/VIi).abs() for VIi,Vi in zip(VI,V) )		# abs or **2?
+			def cal_delta(VI, V):
+				return ( ((VIi-Vi)/VIi).abs() for VIi,Vi in zip(VI,V) )		# abs or **2?
 			
 			Spillage = 2*cal_Spillage(cal_delta(VI,V))
 			if "linear" in file_list.keys():
