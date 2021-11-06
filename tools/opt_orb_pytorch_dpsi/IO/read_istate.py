@@ -6,6 +6,7 @@ import itertools
 from pprint import pprint
 from icecream import ic
 
+# occ[ik][ib]
 def read_istate(file_name):
 	nspin0 = get_nspin0(file_name)
 	if nspin0==1:	occ = [[]]

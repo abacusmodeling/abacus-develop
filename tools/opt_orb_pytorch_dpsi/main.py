@@ -9,6 +9,7 @@ import torch
 import numpy as np
 import time
 import torch_optimizer 
+import IO.cal_weight
 
 def main():
 	seed = int(1000*time.time())%(2**32)
@@ -16,7 +17,9 @@ def main():
 	print("seed:",seed)
 	time_start = time.time()
 
-	file_list, info_true, C_init_info, V_info = IO.read_json.read_json("input.json")
+	file_list, info_true, weight_info, C_init_info, V_info = IO.read_json.read_json("input.json")
+
+	weight = IO.cal_weight.cal_weight(weight_info, file_list["origin"])
 
 	QI,SI,VI,info = IO.read_QSV.read_file(info_true,file_list["origin"],V_info)
 	print(info)
@@ -60,9 +63,13 @@ def main():
 					V_linear[i] = opt_orb.cal_V_linear(Q,S,Q_linear,S_linear,V,info,V_info)
 
 			if V_info["same_band"]:
-				cal_Spillage = lambda V_delta : sum( Vi[:info.Nb_true[ist]].sum() * info.weight[ist] for ist,Vi in enumerate(V_delta) ) / sum( Nb_true*weight for Nb_true,weight in zip(info.Nb_true,info.weight) )
+				cal_Spillage = lambda V_delta :		\
+					sum( Vi[:info.Nb_true[ist]].sum() * info.weight[ist] for ist,Vi in enumerate(V_delta) )		\
+					/ sum( Nb_true*weight for Nb_true,weight in zip(info.Nb_true,info.weight) )
 			else:
-				cal_Spillage = lambda V_delta : sum( Vi[:info.Nb_true[ist],:info.Nb_true[ist]].sum() * info.weight[ist] for ist,Vi in enumerate(V_delta) ) / sum( Nb_true**2*weight for Nb_true,weight in zip(info.Nb_true,info.weight) )
+				cal_Spillage = lambda V_delta :		\
+					sum( Vi[:info.Nb_true[ist],:info.Nb_true[ist]].sum() * info.weight[ist] for ist,Vi in enumerate(V_delta) )		\
+					/ sum( Nb_true**2*weight for Nb_true,weight in zip(info.Nb_true,info.weight) )
 			cal_delta = lambda VI,V: ( ((VIi-Vi.diag().sqrt())/VIi).abs() for VIi,Vi in zip(VI,V) )		# abs or **2?
 			Spillage = 2*cal_Spillage(cal_delta(VI,V))
 

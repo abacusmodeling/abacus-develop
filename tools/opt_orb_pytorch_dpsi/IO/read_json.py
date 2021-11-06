@@ -12,7 +12,7 @@ def read_json(file_name):
 		info.__dict__[info_attr] = info_value
 	info.Nl = { it:len(Nu) for it,Nu in info.Nu.items() }
 		
-	return input["file_list"], info, input["C_init_info"], input["V_info"]
+	return input["file_list"], info, input["weight"], input["C_init_info"], input["V_info"]
 
 	""" file_name
 	{
@@ -20,21 +20,21 @@ def read_json(file_name):
 		{
 			"origin":
 			[
-				"/public/udata/linpz/try/SIA/pytorch/test/many_atoms/S2/S2.psi.dat",
-				"/public/udata/linpz/try/SIA/pytorch/test/many_atoms/SO2/SO2.psi.dat",
-				"/public/udata/linpz/try/SIA/pytorch/test/many_atoms/SO/SO.psi.dat"
+				"~/S2/OUT.ABACUS/S2.psi.dat",
+				"~/SO2/OUT.ABACUS/SO2.psi.dat",
+				"~/SO/OUT.ABACUS/SO.psi.dat"
 			],
 			"linear":
 			[
 				[
-					"/public/udata/linpz/try/SIA/pytorch/test/many_atoms/S2/S2.dpsi.dat",
-					"/public/udata/linpz/try/SIA/pytorch/test/many_atoms/SO2/SO2.dpsi.dat",
-					"/public/udata/linpz/try/SIA/pytorch/test/many_atoms/SO/SO.dpsi.dat"				
+					"~/S2/OUT.ABACUS/S2.dpsi.dat",
+					"~/SO2/OUT.ABACUS/SO2.dpsi.dat",
+					"~/SO/OUT.ABACUS/SO.dpsi.dat"				
 				],
 				[
-					"/public/udata/linpz/try/SIA/pytorch/test/many_atoms/S2/S2.ddpsi.dat",
-					"/public/udata/linpz/try/SIA/pytorch/test/many_atoms/SO2/SO2.ddpsi.dat",
-					"/public/udata/linpz/try/SIA/pytorch/test/many_atoms/SO/SO.ddpsi.dat"				
+					"~/S2/OUT.ABACUS/S2.ddpsi.dat",
+					"~/SO2/OUT.ABACUS/SO2.ddpsi.dat",
+					"~/SO/OUT.ABACUS/SO.ddpsi.dat"				
 				]
 			]
 		},
@@ -42,14 +42,23 @@ def read_json(file_name):
 		{
 			"Nt_all":	["S","O"],
 			"Nu":		{"S":[3,3,2],"O":[3,3,2]},
-			"Nb_true":	[7,9,7],
-			"weight":	[2,3,1.5],
 			"Rcut":		{"S":10,"O":10},
 			"dr":		{"S":0.01,"O":0.01},
 			"Ecut":		{"S":100,"O":100},
 			"lr":		0.01,
 			"cal_T":	true,
 			"cal_smooth":	true
+		},
+		"weight":
+		{
+			"stru":	[2,3,1.5],
+			"bands_range":	[7,9,7],					# "bands_range" and "bands_file" only once
+			"bands_file":
+			[
+				"~/S2/OUT.ABACUS/istate.info",
+				"~/SO2/OUT.ABACUS/istate.info",
+				"~/SO/OUT.ABACUS/istate.info"
+			]
 		},
 		"C_init_info":
 		{
