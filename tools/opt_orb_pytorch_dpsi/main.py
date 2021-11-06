@@ -53,7 +53,7 @@ def main():
 
 			Q = opt_orb.change_index_Q(opt_orb.cal_Q(QI,C,info),info)
 			S = opt_orb.change_index_S(opt_orb.cal_S(SI,C,info),info)
-			V = opt_orb.cal_V(Q,S,info)
+			V = opt_orb.cal_V(Q,S,info,V_info)
 
 			if "linear" in file_list.keys():
 				V_linear = [None] * len(file_list["linear"])
@@ -70,13 +70,13 @@ def main():
 				cal_Spillage = lambda V_delta :		\
 					sum( Vi[:info.Nb_true[ist],:info.Nb_true[ist]].sum() * info.weight[ist] for ist,Vi in enumerate(V_delta) )		\
 					/ sum( Nb_true**2*weight for Nb_true,weight in zip(info.Nb_true,info.weight) )
-			cal_delta = lambda VI,V: ( ((VIi-Vi.diag().sqrt())/VIi).abs() for VIi,Vi in zip(VI,V) )		# abs or **2?
-			Spillage = 2*cal_Spillage(cal_delta(VI,V))
 
+			cal_delta = lambda VI,V: ( ((VIi-Vi)/VIi).abs() for VIi,Vi in zip(VI,V) )		# abs or **2?
+			
+			Spillage = 2*cal_Spillage(cal_delta(VI,V))
 			if "linear" in file_list.keys():
-				cal_delta_linear = lambda VI,V: ( ((VIi-Vi)/VIi).abs() for VIi,Vi in zip(VI,V) )		# abs or **2?
 				for i in range(len(file_list["linear"])):
-					Spillage += cal_Spillage(cal_delta_linear(VI_linear[i],V_linear[i]))
+					Spillage += cal_Spillage(cal_delta(VI_linear[i],V_linear[i]))
 
 			if info.cal_T:
 				T = opt_orb.cal_T(C,E)
