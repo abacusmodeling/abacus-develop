@@ -63,12 +63,14 @@ def main():
 					V_linear[i] = opt_orb.cal_V_linear(Q,S,Q_linear,S_linear,V,info,V_info)
 
 			def cal_Spillage(V_delta):
-				if V_info["same_band"]:
-					return 	sum( Vi[:info.Nb_true[ist]].sum() * info.weight[ist] for ist,Vi in enumerate(V_delta) )		\
-							/ sum( Nb_true*weight for Nb_true,weight in zip(info.Nb_true,info.weight) )
-				else:
-					return 	sum( Vi[:info.Nb_true[ist],:info.Nb_true[ist]].sum() * info.weight[ist] for ist,Vi in enumerate(V_delta) )		\
-							/ sum( Nb_true**2*weight for Nb_true,weight in zip(info.Nb_true,info.weight) )
+				Spillage = torch.Tensor([0])
+				for ist, Vi_delta in enumerate(V_delta):
+					if V_info["same_band"]:
+						weight_ist = weight[ist]
+					else:
+						weight_ist = torch.tensordot(weight[ist], weight[ist], dims=0)
+					Spillage += (Vi_delta * weight_ist).sum() / weight_ist.sum()
+				return Spillage
 
 			def cal_delta(VI, V):
 				return ( ((VIi-Vi)/VIi).abs() for VIi,Vi in zip(VI,V) )		# abs or **2?

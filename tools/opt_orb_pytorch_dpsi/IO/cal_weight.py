@@ -1,5 +1,5 @@
 import IO.read_istate
-import numpy as np
+import torch
 import re
 
 def cal_weight(info_weight, stru_file_list=None):
@@ -21,7 +21,7 @@ def cal_weight(info_weight, stru_file_list=None):
 
 		st_weight = []													# st_weight[ist][ib]
 		for weight_stru, bands_range, nbands_ist in zip(info_weight["stru"], info_weight["bands_range"], nbands):
-			st_weight_tmp = np.zeros((nbands_ist,))
+			st_weight_tmp = torch.zeros((nbands_ist,))
 			st_weight_tmp[:bands_range] = weight_stru
 			st_weight.append( st_weight_tmp )
 

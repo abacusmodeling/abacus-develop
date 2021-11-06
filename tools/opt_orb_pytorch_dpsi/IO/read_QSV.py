@@ -83,10 +83,7 @@ def read_file(info,file_list,V_info):
 	info_all.Nt = repeat_Nk(info_true.Nt)
 	info_all.Na = repeat_Nk(info_true.Na)
 	info_all.Nb = repeat_Nk(info_true.Nb)
-	if len(info_all.Nb_true) != info_all.Nst:
-		info_all.Nb_true = repeat_Nk(info.Nb_true)
 	info_all.Ne = info_true.Ne
-	info_all.weight = list(itertools.chain.from_iterable([np.array(wk)*ws for wk,ws in zip(info_true.weight,info.weight)]))	# info_true.weight[ist][ik] * info.weight[ist]
 
 	return QI,SI,VI,info_all
 
