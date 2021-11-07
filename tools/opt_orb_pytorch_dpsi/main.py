@@ -23,14 +23,9 @@ def main():
 	weight = IO.cal_weight.cal_weight(weight_info, V_info["same_band"], file_list["origin"])
 
 	QI,SI,VI,info = IO.read_QSV.read_file(info_true,file_list["origin"],V_info)
-	print(info)
+	print(info, flush=True)
 	if "linear" in file_list.keys():
-		QI_linear = [None] * len(file_list["linear"])
-		SI_linear = [None] * len(file_list["linear"])
-		VI_linear = [None] * len(file_list["linear"])
-		info_linear = [None] * len(file_list["linear"])
-		for i in range(len(file_list["linear"])):
-			QI_linear[i],SI_linear[i],VI_linear[i],info_linear[i] = IO.read_QSV.read_file(info_true,file_list["linear"][i],V_info)
+		QI_linear, SI_linear, VI_linear, info_linear = list(zip(*( IO.read_QSV.read_file(info_true,file,V_info) for file in file_list["linear"] )))
 
 	if C_init_info["init_from_file"]:
 		C, C_read_index = IO.func_C.read_C_init( C_init_info["C_init_file"], info )
@@ -81,10 +76,16 @@ def main():
 				T = opt_orb.cal_T(C,E)
 				if not "TSrate" in vars():	TSrate = torch.abs(0.002*Spillage/T).data[0]
 				Loss = Spillage + TSrate*T
-				print(Spillage.item(),T.item(),Loss.item(),file=S_file,sep="\t")
 			else:
 				Loss = Spillage
-				print(Spillage.item(),file=S_file,sep="\t")
+
+			if info.cal_T:
+				print_content = [istep, Spillage.item(), T.item(), Loss.item()]
+			else:
+				print_content = [istep, Spillage.item()]
+			print(*print_content, sep="\t", file=S_file, flush=True)
+			if not istep%100:
+				print(*print_content, sep="\t", flush=True)
 
 			if Loss.item() < loss_old:
 				loss_old = Loss.item()

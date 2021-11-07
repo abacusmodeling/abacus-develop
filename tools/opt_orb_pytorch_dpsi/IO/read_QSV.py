@@ -17,7 +17,6 @@ def read_file(info,file_list,V_info):
 	info_true.Nb = ND_list(info_true.Nst)
 	info_true.Nk = ND_list(info_true.Nst)
 	info_true.Ne = dict()
-	info_true.weight = ND_list(info_true.Nst,element="list()")
 	QI=[];	SI=[];	VI=[]
 
 	for ist_true,file_name in enumerate(file_list):
@@ -47,9 +46,6 @@ def read_file(info,file_list,V_info):
 			Ne_tmp = int(file.readline().split()[0])
 			for it in info_true.Nt[ist_true]:
 				info_true.Ne[it] = Ne_tmp
-			ignore_line(file,1)
-			for ik in range(info_true.Nk[ist_true]):
-				info_true.weight[ist_true].append(float(file.readline().split()[-1]))
 
 	for ist_true,file_name in enumerate(file_list):
 		with open(file_name,"r") as file:
