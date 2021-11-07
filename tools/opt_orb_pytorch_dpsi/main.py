@@ -19,7 +19,7 @@ def main():
 
 	file_list, info_true, weight_info, C_init_info, V_info = IO.read_json.read_json("input.json")
 
-	weight = IO.cal_weight.cal_weight(weight_info, file_list["origin"])
+	weight = IO.cal_weight.cal_weight(weight_info, V_info["same_band"], file_list["origin"])
 
 	QI,SI,VI,info = IO.read_QSV.read_file(info_true,file_list["origin"],V_info)
 	print(info)
@@ -65,11 +65,7 @@ def main():
 			def cal_Spillage(V_delta):
 				Spillage = torch.Tensor([0])
 				for ist, Vi_delta in enumerate(V_delta):
-					if V_info["same_band"]:
-						weight_ist = weight[ist]
-					else:
-						weight_ist = torch.tensordot(weight[ist], weight[ist], dims=0)
-					Spillage += (Vi_delta * weight_ist).sum() / weight_ist.sum()
+					Spillage += (Vi_delta * weight[ist]).sum()
 				return Spillage
 
 			def cal_delta(VI, V):

@@ -1,8 +1,10 @@
 import IO.read_istate
 import torch
 import re
+import functools
+import operator
 
-def cal_weight(info_weight, stru_file_list=None):
+def cal_weight(info_weight, flag_same_band, stru_file_list=None):
 	""" weight[ist][ib] """
 
 	if "bands_file" in info_weight.keys():
@@ -13,7 +15,6 @@ def cal_weight(info_weight, stru_file_list=None):
 		for weight_stru, file_name in zip(info_weight["stru"], info_weight["bands_file"]):
 			occ = IO.read_istate.read_istate(file_name)
 			weight += [occ_k * weight_stru for occ_k in occ]
-		return weight
 
 	elif "bands_range" in info_weight.keys():
 		k_weight = read_k_weight(stru_file_list)						# k_weight[ist][ik]
@@ -29,10 +30,20 @@ def cal_weight(info_weight, stru_file_list=None):
 		for ist,_ in enumerate(k_weight):
 			for ik,_ in enumerate(k_weight[ist]):
 				weight.append(st_weight[ist] * k_weight[ist][ik])
-		return weight
 
 	else:
 		raise IOError('"bands_file" and "bands_range" must once')
+
+
+	if not flag_same_band:
+		for ist,_ in enumerate(weight):
+			weight[ist] = torch.tensordot(weight[ist], weight[ist], dims=0)
+
+
+	normalization = functools.reduce(operator.add, map(sum, weight), 0)
+	weight = list(map(lambda x:x/normalization, weight))
+
+	return weight
 
 
 def read_k_weight(stru_file_list):
