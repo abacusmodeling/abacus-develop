@@ -34,3 +34,6 @@ def change_to_cuda(s):
 	else:
 		print(s)
 		raise TypeError("change_to_cuda")
+
+def update0(t):
+	return t.masked_fill(mask=(t==0), value=1E-10)

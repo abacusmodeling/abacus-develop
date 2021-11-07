@@ -10,6 +10,7 @@ import numpy as np
 import time
 import torch_optimizer 
 import IO.cal_weight
+import util
 
 def main():
 	seed = int(1000*time.time())%(2**32)
@@ -69,7 +70,7 @@ def main():
 				return Spillage
 
 			def cal_delta(VI, V):
-				return ( ((VIi-Vi)/VIi).abs() for VIi,Vi in zip(VI,V) )		# abs or **2?
+				return ( ((VIi-Vi)/util.update0(VIi)).abs() for VIi,Vi in zip(VI,V) )		# abs or **2?
 			
 			Spillage = 2*cal_Spillage(cal_delta(VI,V))
 			if "linear" in file_list.keys():
@@ -83,7 +84,7 @@ def main():
 				print(Spillage.item(),T.item(),Loss.item(),file=S_file,sep="\t")
 			else:
 				Loss = Spillage
-				print(Spillage.item(),Loss.item(),file=S_file,sep="\t")
+				print(Spillage.item(),file=S_file,sep="\t")
 
 			if Loss.item() < loss_old:
 				loss_old = Loss.item()

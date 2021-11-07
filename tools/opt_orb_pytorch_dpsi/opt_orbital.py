@@ -1,4 +1,5 @@
 from util import ND_list
+import util
 import torch_complex
 import functools
 import itertools
@@ -163,7 +164,7 @@ class Opt_Orbital:
 				V_linear_1 = V_linear_1.diag()
 				V_linear_2 = V_linear_2.diag()
 				V_linear_3 = V_linear_3.diag()
-			Z = V[ist]
+			Z = util.update0(V[ist])
 			V_linear[ist] = (-V_linear_1/Z + V_linear_2 + V_linear_3) / Z
 		return V_linear
 			

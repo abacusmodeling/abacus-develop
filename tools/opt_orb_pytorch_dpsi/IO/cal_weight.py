@@ -40,7 +40,7 @@ def cal_weight(info_weight, flag_same_band, stru_file_list=None):
 			weight[ist] = torch.tensordot(weight[ist], weight[ist], dims=0)
 
 
-	normalization = functools.reduce(operator.add, map(sum, weight), 0)
+	normalization = functools.reduce(operator.add, map(torch.sum, weight), 0)
 	weight = list(map(lambda x:x/normalization, weight))
 
 	return weight

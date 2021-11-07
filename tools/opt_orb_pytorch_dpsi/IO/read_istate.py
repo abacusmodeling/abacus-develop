@@ -1,10 +1,6 @@
 import re
-import numpy as np
-import functools
+import torch
 import itertools
-
-from pprint import pprint
-from icecream import ic
 
 # occ[ik][ib]
 def read_istate(file_name):
@@ -13,7 +9,6 @@ def read_istate(file_name):
 	elif nspin0==2:	occ = [[],[]]
 	with open(file_name,"r") as file:
 		content = file.read().split("BAND")
-		ic(len(content))
 		for content_k in content[1:]:
 			content_k = content_k.split("\n")
 			k = get_k(content_k[0])
@@ -29,7 +24,7 @@ def read_istate(file_name):
 						occ[0][-1].append(float(line[2]))
 						occ[1][-1].append(float(line[4]))
 			for ispin in range(nspin0):
-				occ[ispin][-1] = np.array(occ[ispin][-1])
+				occ[ispin][-1] = torch.Tensor(occ[ispin][-1])
 	occ = list(itertools.chain(*occ))
 	return occ
 
