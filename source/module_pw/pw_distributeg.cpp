@@ -27,6 +27,10 @@ void PW_Basis::distribute_g()
 //
 void PW_Basis::distribution_method1()
 {
+    // if use gamma point only, when convert real function f(r) to F(k) = FFT(f),
+    // we have F(-k) = F(k)*, so that only half of planewaves are needed.
+    if (this->gamma_only) this->nx = int(this->nx / 2) + 1;
+
     // initial the variables needed by all proc.
     const int nxy = this->nx * this->ny; // number of points in x-y plane.
     int tot_npw = 0;                     // total number of planewaves.
@@ -60,7 +64,7 @@ void PW_Basis::distribution_method1()
         st_bottom = new int[tot_nst];                      // minimum z of stick.
         st_length = new int[tot_nst];                      // number of planewaves in stick.
         
-        this->collect_pw_st(tot_npw, tot_nst, st_length2D, st_bottom2D, gg_global, gdirect_global, st_i, st_j, st_length, st_bottom);
+        this->collect_pw_st(&tot_npw, &tot_nst, st_length2D, st_bottom2D, gg_global, gdirect_global, st_i, st_j, st_length, st_bottom);
 
         delete[] st_length2D;
         delete[] st_bottom2D;
@@ -107,22 +111,34 @@ void PW_Basis::distribution_method1()
         this->nst = nst_per[0];
         this->gg = gg2D[0];
         this->gdirect = gdirect2D[0];
+
+        MPI_Bcast(&tot_npw, 1, MPI_INT, 0, POOL_WORLD);
+        MPI_Bcast(&tot_nst, 1, MPI_INT, 0, POOL_WORLD);
+        MPI_Bcast(&st_i, tot_nst, MPI_INT, 0, POOL_WORLD);
+        MPI_Bcast(&st_j, tot_nst, MPI_INT, 0, POOL_WORLD);
+        MPI_Bcast(&st_length, tot_nst, MPI_INT, 0, POOL_WORLD);
+        MPI_Bcast(&st_bottom, tot_nst, MPI_INT, 0, POOL_WORLD);
+        MPI_Bcast(&is2ip, tot_nst, MPI_INT, 0, POOL_WORLD);
+        MPI_Bcast(&ixy2ip, nxy, MPI_INT, 0, POOL_WORLD);
+        MPI_Bcast(&istot2ixy, tot_nst, MPI_INT, 0, POOL_WORLD);
+        MPI_Bcast(&ixy2istot, nxy, MPI_INT, 0, POOL_WORLD);
+        
         for (int ip = 1; ip < this->poolnproc; ip++)
         {
-            MPI_Send(&tot_npw, 1, MPI_INT, ip, 0, POOL_WORLD);
-            MPI_Send(&tot_nst, 1, MPI_INT, ip, 0, POOL_WORLD);
+            // MPI_Send(&tot_npw, 1, MPI_INT, ip, 0, POOL_WORLD);
+            // MPI_Send(&tot_nst, 1, MPI_INT, ip, 0, POOL_WORLD);
             MPI_Send(&npw_per[ip], 1, MPI_INT, ip, 0, POOL_WORLD);
             MPI_Send(&nst_per[ip], 1, MPI_INT, ip, 0, POOL_WORLD);
             MPI_Send(&gg2D[ip], npw_per[ip], MPI_DOUBLE, ip, 0, POOL_WORLD);
             MPI_Send(&gdirect2D[ip], npw_per[ip]*3, MPI_DOUBLE, ip, 0, POOL_WORLD); // I'm not sure about the send size and type here.
-            MPI_Send(&st_i, tot_nst, MPI_INT, ip, 0, POOL_WORLD);
-            MPI_Send(&st_j, tot_nst, MPI_INT, ip, 0, POOL_WORLD);
-            MPI_Send(&st_length, tot_nst, MPI_INT, ip, 0, POOL_WORLD);
-            MPI_Send(&st_bottom, tot_nst, MPI_INT, ip, 0, POOL_WORLD);
-            MPI_Send(&is2ip, tot_nst, MPI_INT, ip, 0, POOL_WORLD);
-            MPI_Send(&ixy2ip, nxy, MPI_INT, ip, 0, POOL_WORLD);
-            MPI_Send(&istot2ixy, tot_nst, MPI_INT, ip, 0, POOL_WORLD);
-            MPI_Send(&ixy2istot, nxy, MPI_INT, ip, 0, POOL_WORLD);
+            // MPI_Send(&st_i, tot_nst, MPI_INT, ip, 0, POOL_WORLD);
+            // MPI_Send(&st_j, tot_nst, MPI_INT, ip, 0, POOL_WORLD);
+            // MPI_Send(&st_length, tot_nst, MPI_INT, ip, 0, POOL_WORLD);
+            // MPI_Send(&st_bottom, tot_nst, MPI_INT, ip, 0, POOL_WORLD);
+            // MPI_Send(&is2ip, tot_nst, MPI_INT, ip, 0, POOL_WORLD);
+            // MPI_Send(&ixy2ip, nxy, MPI_INT, ip, 0, POOL_WORLD);
+            // MPI_Send(&istot2ixy, tot_nst, MPI_INT, ip, 0, POOL_WORLD);
+            // MPI_Send(&ixy2istot, nxy, MPI_INT, ip, 0, POOL_WORLD);
         }
         for (int ip = 0; ip < this->poolnproc; ip++)
         {
@@ -136,25 +152,26 @@ void PW_Basis::distribution_method1()
     }
     else
     {
-        MPI_Recv(&tot_npw, 1, MPI_INT, 0, 0, POOL_WORLD);
-        MPI_Recv(&tot_nst, 1, MPI_INT, 0, 0, POOL_WORLD);
-        MPI_Recv(&npw, 1, MPI_INT, 0, 0, POOL_WORLD);  // number of planewaves in current proc.
-        MPI_Recv(&nst, 1, MPI_INT, 0, 0, POOL_WORLD);
-        MPI_Recv(&gg, npw, MPI_DOUBLE, 0, 0, POOL_WORLD);
-        MPI_Recv(&gdirect, npw*3, MPI_DOUBLE, 0, 0, POOL_WORLD); // I'm not sure about the send size and type here.
-        st_i = new int[tot_nst];
-        st_j = new int[tot_nst];
-        st_length = new int[tot_nst];
-        st_bottom = new int[tot_nst];
-        is2ip = new int [tot_nst];
-        MPI_Recv(&st_i, tot_nst, MPI_INT, 0, 0, POOL_WORLD);
-        MPI_Recv(&st_j, tot_nst, MPI_INT, 0, 0, POOL_WORLD);
-        MPI_Recv(&st_length, tot_nst, MPI_INT, 0, 0, POOL_WORLD);
-        MPI_Recv(&st_bottom, tot_nst, MPI_INT, 0, 0, POOL_WORLD);
-        MPI_Recv(&is2ip, tot_nst, MPI_INT, 0, 0, POOL_WORLD);
-        MPI_Recv(&ixy2ip, nxy, MPI_INT, 0, 0, POOL_WORLD);
-        MPI_Recv(&istot2ixy, tot_nst, MPI_INT, 0, 0, POOL_WORLD);
-        MPI_Recv(&ixy2istot, nxy, MPI_INT, 0, 0, POOL_WORLD);
+        MPI_Status ierror;
+        // MPI_Recv(&tot_npw, 1, MPI_INT, 0, 0, POOL_WORLD, &ierror);
+        // MPI_Recv(&tot_nst, 1, MPI_INT, 0, 0, POOL_WORLD, &ierror);
+        MPI_Recv(&npw, 1, MPI_INT, 0, 0, POOL_WORLD, &ierror);  // number of planewaves in current proc.
+        MPI_Recv(&nst, 1, MPI_INT, 0, 0, POOL_WORLD, &ierror);
+        MPI_Recv(&gg, npw, MPI_DOUBLE, 0, 0, POOL_WORLD, &ierror);
+        MPI_Recv(&gdirect, npw*3, MPI_DOUBLE, 0, 0, POOL_WORLD, &ierror); // I'm not sure about the send size and type here.
+        // st_i = new int[tot_nst];
+        // st_j = new int[tot_nst];
+        // st_length = new int[tot_nst];
+        // st_bottom = new int[tot_nst];
+        // is2ip = new int [tot_nst];
+        // MPI_Recv(&st_i, tot_nst, MPI_INT, 0, 0, POOL_WORLD, &ierror);
+        // MPI_Recv(&st_j, tot_nst, MPI_INT, 0, 0, POOL_WORLD, &ierror);
+        // MPI_Recv(&st_length, tot_nst, MPI_INT, 0, 0, POOL_WORLD, &ierror);
+        // MPI_Recv(&st_bottom, tot_nst, MPI_INT, 0, 0, POOL_WORLD, &ierror);
+        // MPI_Recv(&is2ip, tot_nst, MPI_INT, 0, 0, POOL_WORLD, &ierror);
+        // MPI_Recv(&ixy2ip, nxy, MPI_INT, 0, 0, POOL_WORLD, &ierror);
+        // MPI_Recv(&istot2ixy, tot_nst, MPI_INT, 0, 0, POOL_WORLD, &ierror);
+        // MPI_Recv(&ixy2istot, nxy, MPI_INT, 0, 0, POOL_WORLD, &ierror);
     }
 
     this->gcar = new ModuleBase::Vector3<double>[this->npw];
@@ -195,7 +212,15 @@ void PW_Basis::count_pw_st(
     ibox[2] = int(this->nz / 2) + 1;                    // scan z from -ibox[2] to ibox[2].
 
     ModuleBase::Vector3<double> f;
-    for (int ix = -ibox[0]; ix <= ibox[0]; ix++)
+
+    int ix_start = -ibox[0]; // determine the scaning area along x-direct, if gamma-only, only positive axis is used.
+    int ix_end = ibos[0];
+    if (this->gamma_only)
+    {
+        ix_start = 0;
+        ix_end = this->nx;
+    }
+    for (int ix = ix_start; ix <= ix_end; ix++)
     {
         for (int iy = -ibox[1]; iy <= ibox[1]; iy++)
         {
@@ -271,7 +296,15 @@ void PW_Basis::collect_pw_st(
     ModuleBase::Vector3<double> f;
     int ig = 0; // index of planewave.
     int is = 0; // index of stick.
-    for (int ix = -ibox[0]; ix <= ibox[0]; ix++)
+
+    int ix_start = -ibox[0]; // determine the scaning area along x-direct, if gamma-only, only positive axis is used.
+    int ix_end = ibos[0];
+    if (this->gamma_only)
+    {
+        ix_start = 0;
+        ix_end = this->nx;
+    }
+    for (int ix = ix_start; ix <= ix_end; ix++)
     {
         for (int iy = -ibox[1]; iy <= ibox[1]; iy++)
         {
@@ -416,7 +449,7 @@ void PW_Basis::get_istot2ixy(
     int* is2ip         // ip of core containing is^th stick, map is to ip.
 )
 {
-    assert(this->poolrank == 0); // because other core has no this->startnsz_per.
+    assert(this->poolrank == 0);
     this->istot2ixy = new int[tot_nst];
     ModuleBase::GlobalFunc::ZEROS(this->istot2ixy, poolnproc);
     this->ixy2istot = new int[this->nx * this->ny];
