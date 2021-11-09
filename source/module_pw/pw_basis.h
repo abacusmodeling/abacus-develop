@@ -24,13 +24,11 @@ public:
     //Init the grids for FFT
     void initgrids(
         ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
-        ModuleBase::Matrix3 G_in, // reciprocal lattice vector (2pi*inv(R) )
         double gridecut
     );
     //Init the grids for FFT
     void initgrids(
         ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
-        ModuleBase::Matrix3 G_in, // reciprocal lattice vector (2pi*inv(R) )
         int nx_in, int ny_in, int nz_in
     );
 

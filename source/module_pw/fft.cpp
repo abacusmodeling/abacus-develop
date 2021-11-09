@@ -68,7 +68,7 @@ void FFT:: setupFFT()
 {
 	if(!this->mpifft)
 	{
-		this->initpland();
+		this->initplan();
 #ifdef __MIX_PRECISION
 		this->initplanf();
 #endif
@@ -76,7 +76,7 @@ void FFT:: setupFFT()
 #if defined(__FFTW3_MPI) && defined(__MPI)
 	else
 	{
-		this->initpland_mpi();
+		this->initplan_mpi();
 #ifdef __MIX_PRECISION
 		this->initplanf_mpi();
 #endif
@@ -85,7 +85,7 @@ void FFT:: setupFFT()
 	return;
 }
 	
-void FFT :: initpland()
+void FFT :: initplan()
 {
 	//---------------------------------------------------------
 	//                              1 D
@@ -183,7 +183,7 @@ void FFT :: initplanf()
 }
 #endif
 
-void FFT :: initpland_mpi()
+void FFT :: initplan_mpi()
 {
 
 }
