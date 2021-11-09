@@ -46,13 +46,15 @@ public:
 //===============================================
 public:
     //reciprocal-space
+    // only on first proc.
+    int *startnsz_per; // startnsz_per[ip]: starting is * nz stick in the ip^th proc.
+    int *nstnz_per; // nz * nst(number of sticks) on each core.
+    // on all proc.
     int *ig2isz; // map ig to (is, iz).
-    int *ixy2is; //map ixy to is
-    int *istot2ixy; // istot2ixy[istot]: ix + iy * nx of is^th stick among all sticks.
+    int *istot2ixy; // istot2ixy[is]: ix + iy * nx of is^th stick among all sticks.
+    int *ixy2istot; // ixy2istot[ix + iy * nx]: is of stick on (ix, iy) among all sticks.
     int *is2ixy; // is2ixy[is]: ix + iy * nx of is^th stick among sticks on current proc.
     int *ixy2ip; // ixy2ip[ix + iy * nx]: ip of proc which contains stick on (ix, iy).
-    int *startis; // startis[ip]: starting is stick in the ip^th proc.
-    int *nst_per; // number of sticks on each core.
     int nst; //num. of sticks in current proc.
     int nstot; //num. of sticks in total.
     int npw; //num. of plane waves in current proc.
