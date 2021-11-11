@@ -199,6 +199,8 @@ void Gint_k::fvl_k_RealSpace(ModuleBase::matrix& fvl_dphi, const double *vl)
 }
 
 void Gint_k::svl_k_RealSpace(
+	const bool isforce,
+	const bool isstress,
 	ModuleBase::matrix& fvl_dphi, 
 	ModuleBase::matrix& svl_dphi, 
 	const double *vl)
@@ -223,24 +225,40 @@ void Gint_k::svl_k_RealSpace(
 	}
 
 	// to store < phi | vlocal | dphi>
-	double* pvdpx = new double[nnrg];
-	double* pvdpy = new double[nnrg];
-	double* pvdpz = new double[nnrg];
-	double* pvdp11 = new double[nnrg];
-	double* pvdp22 = new double[nnrg];
-	double* pvdp33 = new double[nnrg];
-	double* pvdp12 = new double[nnrg];
-	double* pvdp13 = new double[nnrg];
-	double* pvdp23 = new double[nnrg];
-	ModuleBase::GlobalFunc::ZEROS(pvdpx, nnrg);
-	ModuleBase::GlobalFunc::ZEROS(pvdpy, nnrg);
-	ModuleBase::GlobalFunc::ZEROS(pvdpz, nnrg);
-	ModuleBase::GlobalFunc::ZEROS(pvdp11, nnrg);
-	ModuleBase::GlobalFunc::ZEROS(pvdp22, nnrg);
-	ModuleBase::GlobalFunc::ZEROS(pvdp33, nnrg);
-	ModuleBase::GlobalFunc::ZEROS(pvdp12, nnrg);
-	ModuleBase::GlobalFunc::ZEROS(pvdp13, nnrg);
-	ModuleBase::GlobalFunc::ZEROS(pvdp23, nnrg);
+	double* pvdpx;
+	double* pvdpy;
+	double* pvdpz;
+	double* pvdp11;
+	double* pvdp22;
+	double* pvdp33;
+	double* pvdp12;
+	double* pvdp13;
+	double* pvdp23;
+	if(isforce)
+	{
+		pvdpx = new double[nnrg];
+		pvdpy = new double[nnrg];
+		pvdpz = new double[nnrg];
+		ModuleBase::GlobalFunc::ZEROS(pvdpx, nnrg);
+		ModuleBase::GlobalFunc::ZEROS(pvdpy, nnrg);
+		ModuleBase::GlobalFunc::ZEROS(pvdpz, nnrg);
+	}
+	if(isstress)
+	{
+		pvdp11 = new double[nnrg];
+		pvdp22 = new double[nnrg];
+		pvdp33 = new double[nnrg];
+		pvdp12 = new double[nnrg];
+		pvdp13 = new double[nnrg];
+		pvdp23 = new double[nnrg];
+		ModuleBase::GlobalFunc::ZEROS(pvdp11, nnrg);
+		ModuleBase::GlobalFunc::ZEROS(pvdp22, nnrg);
+		ModuleBase::GlobalFunc::ZEROS(pvdp33, nnrg);
+		ModuleBase::GlobalFunc::ZEROS(pvdp12, nnrg);
+		ModuleBase::GlobalFunc::ZEROS(pvdp13, nnrg);
+		ModuleBase::GlobalFunc::ZEROS(pvdp23, nnrg);
+	}
+	
 
 
 	const double delta_r = GlobalC::ORB.dr_uniform;
@@ -352,11 +370,21 @@ void Gint_k::svl_k_RealSpace(
 				}
 				//std::cout<<"loop  "<<i<<" "<<j<<" "<<k<<std::endl;//test
 
-				this->evaluate_vl_stress(grid_index, size,i,j,k,
+				if(isforce)
+				{
+					this->evaluate_vl_force(grid_index, size,i,j,k,
 						psir_ylm, cal_flag, vldr3, distance,
 						dphi_x, dphi_y, dphi_z,
 						pvdpx, pvdpy, pvdpz,
+						GlobalC::GridT);
+				}
+				if(isstress)
+				{
+					this->evaluate_vl_stress(grid_index, size,i,j,k,
+						psir_ylm, cal_flag, vldr3, distance,
+						dphi_x, dphi_y, dphi_z,
 						pvdp11, pvdp22, pvdp33, pvdp12, pvdp13, pvdp23, dr,GlobalC::GridT);
+				}
 			}// int k
 		}// int j
 	} // int i
@@ -367,19 +395,25 @@ void Gint_k::svl_k_RealSpace(
 	//---------------------------------------
 
 	//GlobalC::LM.DHloc_fixedR_x
-	this->folding_stress(fvl_dphi, svl_dphi, pvdpx, pvdpy, pvdpz,
+	this->folding_stress(isforce, isstress, fvl_dphi, svl_dphi, pvdpx, pvdpy, pvdpz,
 			pvdp11, pvdp22, pvdp33, pvdp12, pvdp13, pvdp23);
 
-	delete[] pvdpx;
-	delete[] pvdpy;
-	delete[] pvdpz;
-	delete[] pvdp11;
-	delete[] pvdp22;
-	delete[] pvdp33;
-	delete[] pvdp12;
-	delete[] pvdp13;
-	delete[] pvdp23;
-
+	if(isforce)
+	{
+		delete[] pvdpx;
+		delete[] pvdpy;
+		delete[] pvdpz;
+	}
+	if(isstress)
+	{
+		delete[] pvdp11;
+		delete[] pvdp22;
+		delete[] pvdp33;
+		delete[] pvdp12;
+		delete[] pvdp13;
+		delete[] pvdp23;
+	}
+	
 	delete[] vldr3;
 	if(max_size!=0)
 	{
@@ -429,9 +463,6 @@ void Gint_k::evaluate_vl_stress(
 	double*** dphi_x, 
 	double*** dphi_y, 
 	double*** dphi_z,
-	double* pvdpx, 
-	double* pvdpy, 
-	double* pvdpz, 
 	double* pvdp11, 
 	double* pvdp22, 
 	double* pvdp33, 
@@ -611,10 +642,6 @@ void Gint_k::evaluate_vl_stress(
 
 						for (iw1p=psi1; iw1p < end1; ++ iw1p)
 						{
-							//vpsir1 = iw1p[0] * vldr3[ib];
-							vpsir1 = iw1px[0] * vldr3[ib];
-							vpsir2 = iw1py[0] * vldr3[ib];
-							vpsir3 = iw1pz[0] * vldr3[ib];
                             vpsir11 = iw1px[0] * vldr3[ib] * dr[ib][ia1][0];
                             vpsir22 = iw1py[0] * vldr3[ib] * dr[ib][ia1][1];
                             vpsir33 = iw1pz[0] * vldr3[ib] * dr[ib][ia1][2];
@@ -635,16 +662,10 @@ void Gint_k::evaluate_vl_stress(
 							//---------------------------------
 							// only correct for one processor
 							//---------------------------------
-//							pvp1 = &GlobalC::LM.DHloc_fixedR_x[iww];
-//							pvp2 = &GlobalC::LM.DHloc_fixedR_y[iww];
-//							pvp3 = &GlobalC::LM.DHloc_fixedR_z[iww];
 
 							//--------------------------------------
 							// store phi_i(r) vlocal(r) * dphi_j(r)
 							//--------------------------------------
-							pvp1 = &pvdpx[iww]; //mohan add 2012-1-6
-							pvp2 = &pvdpy[iww];
-							pvp3 = &pvdpz[iww];
 
                             pvp11 = &pvdp11[iww]; //zhengdy add 2017/3/28
                             pvp22 = &pvdp22[iww];
@@ -662,43 +683,17 @@ void Gint_k::evaluate_vl_stress(
 							for(iw2p=psi2; iw2p < end2; ++iw2p,
 								++iw2px, ++iw2py, ++iw2pz)
 							{
-								// the main difference to calculate
-								// the force is that the whole 
-								// matrix should be calculated!
-								//if( iw1_lo > iw2_lo)
-								//{
-								//	++iw2_lo;
-								//	++pvp1;
-								//	++pvp2;
-								//	++pvp3;
-								//	continue;
-								//}
-								// mohan tmp
 
 						// bug here!!!!!!!!!!!!!!!!!!!!!!!!!!!
 						// DM(R) * psi1(r) * v(r) * psi2_R(r)
-								pvp1[0] += dmR2[0] * vpsir1 * iw2p[0];
-								pvp2[0] += dmR2[0] * vpsir2 * iw2p[0];
-								pvp3[0] += dmR2[0] * vpsir3 * iw2p[0];
                                 pvp11[0] += dmR2[0] * vpsir11 * iw2p[0] ;
                                 pvp22[0] += dmR2[0] * vpsir22 * iw2p[0] ;
                                 pvp33[0] += dmR2[0] * vpsir33 * iw2p[0] ;
                                 pvp12[0] += dmR2[0] * vpsir12 * iw2p[0] ;
                                 pvp13[0] += dmR2[0] * vpsir13 * iw2p[0] ;
                                 pvp23[0] += dmR2[0] * vpsir23 * iw2p[0] ;
-//								pvp1[0] += vpsir1 * iw2p[0];
-//								pvp2[0] += vpsir2 * iw2p[0];
-//								pvp3[0] += vpsir3 * iw2p[0];
-						// bug here!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-								//pvp1[0] -= vpsir1 * iw2px[0];
-								//pvp2[0] -= vpsir1 * iw2py[0];
-								//pvp3[0] -= vpsir1 * iw2pz[0];
 
 								++iw2_lo;
-								++pvp1;
-								++pvp2;
-								++pvp3;
                                 ++pvp11;
                                 ++pvp22;
                                 ++pvp33;
