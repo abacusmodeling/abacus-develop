@@ -1,5 +1,8 @@
 #include "pw_basis.h"
 
+namespace ModulePW
+{
+
 PW_Basis::PW_Basis()
 {
     ig2isz = NULL;
@@ -17,6 +20,7 @@ PW_Basis::PW_Basis()
     poolnproc = 1;
     poolrank = 0;
 }
+
 PW_Basis:: ~PW_Basis()
 {
     if(ig2isz != NULL) delete[] ig2isz;
@@ -31,4 +35,6 @@ PW_Basis:: ~PW_Basis()
     if(gg != NULL) delete[] gg;
     if(startz != NULL) delete[] startz;
     if(numz != NULL) delete[] numz;
+}
+
 }

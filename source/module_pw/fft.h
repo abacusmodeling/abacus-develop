@@ -2,6 +2,7 @@
 #define FFT_H
 
 #include <complex>
+#include <string>
 
 #include "fftw3.h"
 #if defined(__FFTW3_MPI) && defined(__MPI)
@@ -17,7 +18,8 @@
 #endif
 #endif
 
-
+namespace ModulePW
+{
 
 class FFT
 {
@@ -29,9 +31,9 @@ public:
 	void setupFFT();
 	void cleanFFT();
 
-	void executefftw(string instr);
+	void executefftw(std::string instr);
 #ifdef __MIX_PRECISION
-	void executefftwf(string instr);
+	void executefftwf(std::string instr);
 #endif
 
 private:
@@ -48,13 +50,13 @@ public:
 	int ns; //number of sticks
 	int nplane; //number of x-y planes
 	bool mpifft; // if use mpi fft, only used when define __FFTW3_MPI
-	complex<double> * c_gspace; //complex number space for g, [ns * nz]
-	complex<double> * c_rspace; //complex number space for r, [nplane * nx *ny]
+	std::complex<double> * c_gspace; //complex number space for g, [ns * nz]
+	std::complex<double> * c_rspace; //complex number space for r, [nplane * nx *ny]
 	double *r_gspace; //real number space for g, [ns * nz]
 	double *r_rspace; //real number space for r, [nplane * nx *ny]
 #ifdef __MIX_PRECISION
-	complex<float> * cf_gspace; //complex number space for g, [ns * nz]
-	complex<float> * cf_rspace; //complex number space for r, [nplane * nx *ny]
+	std::complex<float> * cf_gspace; //complex number space for g, [ns * nz]
+	std::complex<float> * cf_rspace; //complex number space for r, [nplane * nx *ny]
 	float *rf_gspace; //real number space for g, [ns * nz]
 	float *rf_rspace; //real number space for r, [nplane * nx *ny]
 #endif
@@ -83,6 +85,7 @@ private:
 #endif
 
 };
+}
 
 #endif
 

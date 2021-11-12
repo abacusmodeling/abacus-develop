@@ -1,5 +1,7 @@
 #include "./pw_basis.h"
 
+namespace ModulePW
+{
 //
 //Init the grids for FFT
 //Input: lattice vectors of the cell, Energy cut off for G^2/2
@@ -49,51 +51,39 @@ void PW_Basis:: initgrids(
         //int n7 = 0;
         bool done_factoring = false;
 	
-		// mohan add 2011-04-22
-		int s;
-		if(i==0) s=bx;
-		else if(i==1) s=by;
-		else if(i==2) s=bz;
 		int ns = 0;
         // increase ibox[i] by 1 until it is totally factorizable by (2,3,5,7) 
         do
         {
             ibox[i] += 1;
 			b = ibox[i];          
-			if( ibox[i] % s != 0) 
-			{
-				b = -1; // meaning less
-			}
-			else
-			{
-				//n2 = n3 = n5 = n7 = 0;
-				n2 = n3 = n5 = ns = 0;
-				done_factoring = false;
 
-				while (!done_factoring)
+			//n2 = n3 = n5 = n7 = 0;
+			n2 = n3 = n5 = ns = 0;
+			done_factoring = false;
+			while (!done_factoring)
+			{
+				if (b % 2 == 0) 
 				{
-					if (b % 2 == 0) 
-					{
-						n2++;
-						b /= 2;
-						continue;
-					}
-					if (b % 3 == 0) 
-					{
-						n3++;
-						b /= 3;
-						continue;
-					}
-					if (b % 5 == 0) 
-					{
-						n5++;
-						b /= 5;
-						continue;
-					}
-					//if (b%7==0) { n7++; b /= 7; continue; }
-					done_factoring = true;
+					n2++;
+					b /= 2;
+					continue;
 				}
-			}//
+				if (b % 3 == 0) 
+				{
+					n3++;
+					b /= 3;
+					continue;
+				}
+				if (b % 5 == 0) 
+				{
+					n5++;
+					b /= 5;
+					continue;
+				}
+				//if (b%7==0) { n7++; b /= 7; continue; }
+				done_factoring = true;
+			}
         }
         while (b != 1);
         //  b==1 means fftbox[i] is (2,3,5,7) factorizable 
@@ -137,7 +127,7 @@ void PW_Basis:: initparameters(
     double ggecut_in,
     int poolnproc_in,
     int poolrank_in,
-    int distribution_type_in,
+    int distribution_type_in
 )
 {
     this->gamma_only = gamma_only_in;
@@ -147,3 +137,4 @@ void PW_Basis:: initparameters(
     this->distribution_type = distribution_type_in;
 }
 
+}

@@ -7,6 +7,9 @@
 #include <complex>
 #include "fft.h"
 
+namespace ModulePW
+{
+
 //
 //A class which can convert a function of "r" to the corresponding linear 
 // superposition of plane waves (real space to reciprocal space)
@@ -56,12 +59,14 @@ public:
     int *is2ixy; // is2ixy[is]: ix + iy * nx of is^th stick among sticks on current proc.
     int *ixy2ip; // ixy2ip[ix + iy * nx]: ip of proc which contains stick on (ix, iy).
     int nst; //num. of sticks in current proc.
+    int nstnz;
     int nstot; //num. of sticks in total.
     int npw; //num. of plane waves in current proc.
     //real space
     int nrxx; //num. of real space grids
     int *startz; //startz[ip]: starting z plane in the ip-th proc. in current POOL_WORLD 
 	int *numz; //numz[ip]: num. of z planes in the ip-th proc. in current POOL_WORLD
+    int nplane; //num. of planes in current proc.
 
     ModuleBase::Vector3<double> *gdirect;		//(= *G1d) ; // ig = new Vector igc[ngmc]
     ModuleBase::Vector3<double> *gcar;   			//G vectors in cartesian corrdinate
@@ -93,8 +98,6 @@ private:
     int poolrank;
    
 
-    //distribute plane waves to different processors
-    void distribution_method1();
     void count_pw_st(
         int &tot_npw,     // total number of planewaves.
         int &tot_nst,     // total number of sticks.
@@ -153,15 +156,15 @@ public:
 	int nx, ny, nz, nxyz, nxy;
     FFT ft;
 
-    void real2recip(double * in, complex<double> * out); //in:(nplane,nx*ny)  ; out(nz, ns)
-    void real2recip(complex<double> * in, complex<double> * out); //in:(nplane,nx*ny)  ; out(nz, ns)
-    void recip2real(complex<double> * in, double *out); //in:(nz, ns)  ; out(nplane,nx*ny)
-    void recip2real(complex<double> * in, complex<double> * out); //in:(nz, ns)  ; out(nplane,nx*ny)
+    void real2recip(double * in, std::complex<double> * out); //in:(nplane,nx*ny)  ; out(nz, ns)
+    void real2recip(std::complex<double> * in, std::complex<double> * out); //in:(nplane,nx*ny)  ; out(nz, ns)
+    void recip2real(std::complex<double> * in, double *out); //in:(nz, ns)  ; out(nplane,nx*ny)
+    void recip2real(std::complex<double> * in, std::complex<double> * out); //in:(nz, ns)  ; out(nplane,nx*ny)
 
-    void gatherp_scatters(complex<double> *in, complex<double> *out); //gather planes and scatter sticks of all processors
-    void gathers_scatterp(complex<double> *in, complex<double> *out); //gather sticks of and scatter planes of all processors
-    void gatherp_scatters_gamma(complex<double> *in, complex<double> *out); //gather planes and scatter sticks of all processors, used when gamma_only
-    void gathers_scatterp_gamma(complex<double> *in, complex<double> *out); //gather sticks of and scatter planes of all processors, used when gamma only
+    void gatherp_scatters(std::complex<double> *in, std::complex<double> *out); //gather planes and scatter sticks of all processors
+    void gathers_scatterp(std::complex<double> *in, std::complex<double> *out); //gather sticks of and scatter planes of all processors
+    void gatherp_scatters_gamma(std::complex<double> *in, std::complex<double> *out); //gather planes and scatter sticks of all processors, used when gamma_only
+    void gathers_scatterp_gamma(std::complex<double> *in, std::complex<double> *out); //gather sticks of and scatter planes of all processors, used when gamma only
 
     
     
@@ -169,4 +172,6 @@ public:
 
 
 };
+
+}
 #endif //PlaneWave class
