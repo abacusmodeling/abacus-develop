@@ -15,7 +15,6 @@ public:
 
     void classic_md_line(void);
     void md_force_stress(double &potential);
-    void md_allocate_ions(void);
 
     ModuleBase::Vector3<double> *force;  //force of each atom
 	ModuleBase::matrix stress;           //stress for this lattice

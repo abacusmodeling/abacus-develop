@@ -32,7 +32,8 @@ void Run_MD_CLASSIC::classic_md_line(void)
 #endif
 	ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
-    this->md_allocate_ions();
+    delete[] this->force;
+	this->force = new ModuleBase::Vector3<double>[ucell_c.nat];
 
     MD_basic mdb(INPUT.mdp, ucell_c);
     int mdtype = INPUT.mdp.mdtype;
@@ -152,13 +153,4 @@ void Run_MD_CLASSIC::md_force_stress(double &potential)
 	}
 
 	ModuleBase::timer::tick("Run_MD_CLASSIC", "md_force_stress");
-}
-
-
-void Run_MD_CLASSIC::md_allocate_ions(void)
-{
-	int pos_dim = ucell_c.nat * 3;
-
-	delete[] this->force;
-	this->force = new ModuleBase::Vector3<double>[ucell_c.nat];
 }

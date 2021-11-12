@@ -21,14 +21,13 @@ class MD_basic
 	int getRealStep();
 
 	private:
-    MD_func mdf;
+    //MD_func mdf;
     MD_thermo mdt;
 	MD_parameters &mdp;
 	UnitCell_pseudo &ucell;
 	MD_fire fire;
 
 	double temperature_;
-	const static double fundamentalTime;
 	int outputstressperiod_;
 	int step_rst_;
 	int step_;

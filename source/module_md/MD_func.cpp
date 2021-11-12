@@ -222,6 +222,7 @@ void MD_func::InitVel(
     }
 }
 
+/*
 void MD_func::InitVelocity(
 	const int& numIon, 
 	const double& temperature, 
@@ -284,7 +285,7 @@ void MD_func::InitVelocity(
 	MPI_Bcast(vel,numIon*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
 #endif
 	return;
-}
+}*/
 
 /*void MD_func::ReadNewTemp(int step )
 {
