@@ -74,7 +74,7 @@ void PW_Basis:: recip2real(complex<double> * in, complex<double> * out)
 
     for(int ir = 0 ; ir < this->nrxx ; ++ir)
     {
-        out[ir] = this->ft.c_rspace[ir];
+        out[ir] = this->ft.c_rspace[ir] / this->nxyz;
     }
     return;
 }
@@ -102,7 +102,7 @@ void PW_Basis:: recip2real(complex<double> * in, double * out)
 
     for(int ir = 0 ; ir < this->nrxx ; ++ir)
     {
-        out[ir] = this->ft.r_rspace[ir];
+        out[ir] = this->ft.r_rspace[ir] / this->nxyz;
     }
     return;
 }

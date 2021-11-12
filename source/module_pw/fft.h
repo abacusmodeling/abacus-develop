@@ -62,8 +62,8 @@ public:
 
 private:
 	bool destroyp;
-	fftw_plan plan1_r2c;
-	fftw_plan plan1_c2r;
+	//fftw_plan plan1_r2c;
+	//fftw_plan plan1_c2r;
 	fftw_plan plan2_r2c;
 	fftw_plan plan2_c2r;
 	fftw_plan plan1_for;
@@ -72,8 +72,8 @@ private:
 	fftw_plan plan2_bac;
 #ifdef __MIX_PRECISION
 	bool destroypf;
-	fftwf_plan planf1_r2c;
-	fftwf_plan planf1_c2r;
+	//fftwf_plan planf1_r2c;
+	//fftwf_plan planf1_c2r;
 	fftwf_plan planf2_r2c;
 	fftwf_plan planf2_c2r;
 	fftwf_plan planf1_for;
