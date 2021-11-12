@@ -209,6 +209,8 @@ void PW_Basis::distribution_method1()
         // MPI_Recv(&ixy2istot, nxy, MPI_INT, 0, 0, POOL_WORLD, &ierror);
 #endif
     }
+    
+    this->nstnz = this->nst * this->nz;
 
     this->gcar = new ModuleBase::Vector3<double>[this->npw];
     for (int i = 0; i < this->npw; i++)
