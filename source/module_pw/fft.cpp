@@ -94,6 +94,7 @@ void FFT :: initplan()
 	//               fftw_plan_many_dft(int rank,          const int *n,       int howmany,
 	//					                fftw_complex *in,  const int *inembed, int istride, int idist, 
 	//					                fftw_complex *out, const int *onembed, int ostride, int odist, int sign, unsigned flags);
+	
 	this->plan1for = fftw_plan_many_dft(     1,    &this->nz,  this->ns,  
 					    (fftw_complex*) c_gspace,  &this->nz,  1,  this->nz,
 					    (fftw_complex*) c_gspace,  &this->nz,  1,  this->nz,  FFTW_FORWARD,  FFTW_MEASURE);
@@ -102,13 +103,13 @@ void FFT :: initplan()
 						(fftw_complex*) c_gspace,  &this->nz,  1,  this->nz,
 						(fftw_complex*) c_gspace,  &this->nz,  1,  this->nz,  FFTW_BACKWARD,  FFTW_MEASURE);
 	
-	this->plan1r2c = fftw_plan_many_dft_r2c( 1,    &this->nz,  this->ns,  
-										r_gspace,  &this->nz,  1,  this->nz,
-						(fftw_complex*) c_gspace,  &this->nz,  1,  this->nz,  FFTW_MEASURE);
+	// this->plan1r2c = fftw_plan_many_dft_r2c( 1,    &this->nz,  this->ns,  
+	// 									r_gspace,  &this->nz,  1,  this->nz,
+	// 					(fftw_complex*) c_gspace,  &this->nz,  1,  this->nz,  FFTW_MEASURE);
 	
-	this->plan1c2r = fftw_plan_many_dft_c2r( 1,   &this->nz,  this->ns,  
-						(fftw_complex*) c_gspace, &this->nz,  1,  this->nz,
-										r_gspace, &this->nz,  1,  this->nz,  FFTW_MEASURE);
+	// this->plan1c2r = fftw_plan_many_dft_c2r( 1,   &this->nz,  this->ns,  
+	// 					(fftw_complex*) c_gspace, &this->nz,  1,  this->nz,
+	// 									r_gspace, &this->nz,  1,  this->nz,  FFTW_MEASURE);
 
 	//---------------------------------------------------------
 	//                              2 D
@@ -143,6 +144,7 @@ void FFT :: initplanf()
 	//              fftwf_plan_many_dft(int rank,          const int *n,       int howmany,
 	//					                fftw_complex *in,  const int *inembed, int istride, int idist, 
 	//					                fftw_complex *out, const int *onembed, int ostride, int odist, int sign, unsigned flags);
+	
 	this->planf1for = fftwf_plan_many_dft(     1,  &this->nz,  this->ns,  
 						(fftwf_complex*)c_gspace,  &this->nz,  1,  this->nz,
 						(fftwf_complex*)c_gspace,  &this->nz,  1,  this->nz,  FFTW_FORWARD,  FFTW_MEASURE);
@@ -151,13 +153,13 @@ void FFT :: initplanf()
 						(fftwf_complex*)c_gspace,  &this->nz,  1,  this->nz,
 						(fftwf_complex*)c_gspace,  &this->nz,  1,  this->nz,  FFTW_BACKWARD,  FFTW_MEASURE);
 	
-	this->planf1r2c = fftwf_plan_many_dft_r2c( 1,  &this->nz,  this->ns,  
-										r_gspace,  &this->nz,  1,  this->nz,
-						(fftwf_complex*)c_gspace,  &this->nz,  1,  this->nz,  FFTW_MEASURE);
+	// this->planf1r2c = fftwf_plan_many_dft_r2c( 1,  &this->nz,  this->ns,  
+	// 									r_gspace,  &this->nz,  1,  this->nz,
+	// 					(fftwf_complex*)c_gspace,  &this->nz,  1,  this->nz,  FFTW_MEASURE);
 	
-	this->planf1c2r = fftwf_plan_many_dft_c2r( 1, &this->nz,  this->ns,  
-						(fftwf_complex*)c_gspace, &this->nz,  1,  this->nz,
-										r_gspace, &this->nz,  1,  this->nz,  FFTW_MEASURE);
+	// this->planf1c2r = fftwf_plan_many_dft_c2r( 1, &this->nz,  this->ns,  
+	// 					(fftwf_complex*)c_gspace, &this->nz,  1,  this->nz,
+	// 									r_gspace, &this->nz,  1,  this->nz,  FFTW_MEASURE);
 
 	//---------------------------------------------------------
 	//                              2 D
@@ -200,8 +202,8 @@ void FFT:: cleanFFT()
 	if(destroyp==true) return;
 	fftw_destroy_plan(plan1for);
 	fftw_destroy_plan(plan1bac);
-	fftw_destroy_plan(plan1r2c);
-	fftw_destroy_plan(plan1c2r);
+	// fftw_destroy_plan(plan1r2c);
+	// fftw_destroy_plan(plan1c2r);
 	fftw_destroy_plan(plan2for);
 	fftw_destroy_plan(plan2bac);
 	fftw_destroy_plan(plan2r2c);
@@ -212,8 +214,8 @@ void FFT:: cleanFFT()
 	if(destroypf==true) return;
 	fftw_destroy_plan(planf1for);
 	fftw_destroy_plan(planf1bac);
-	fftw_destroy_plan(planf1r2c);
-	fftw_destroy_plan(planf1c2r);
+	// fftw_destroy_plan(planf1r2c);
+	// fftw_destroy_plan(planf1c2r);
 	fftw_destroy_plan(planf2for);
 	fftw_destroy_plan(planf2bac);
 	fftw_destroy_plan(planf2r2c);
@@ -234,12 +236,12 @@ void executefftw(string instr);
 		fftw_execute_dft(this->plan1bac);
 	else if(instr == "2bac")
 		fftw_execute_dft(this->plan2bac);
-	else if(instr == "1r2c")
-		fftw_execute_dft(this->plan1r2c);
+	// else if(instr == "1r2c")
+	// 	fftw_execute_dft(this->plan1r2c);
 	else if(instr == "2r2c")
 		fftw_execute_dft(this->plan2r2c);
-	else if(instr == "1c2r")
-		fftw_execute_dft(this->plan1c2r);
+	// else if(instr == "1c2r")
+	// 	fftw_execute_dft(this->plan1c2r);
 	else if(instr == "2c2r")
 		fftw_execute_dft(this->plan2c2r);
 	else
@@ -259,12 +261,12 @@ void executefftwf(string instr);
 		fftwf_execute_dft(this->planf1bac);
 	else if(instr == "2bac")
 		fftwf_execute_dft(this->planf2bac);
-	else if(instr == "1r2c")
-		fftwf_execute_dft(this->planf1r2c);
+	// else if(instr == "1r2c")
+	// 	fftwf_execute_dft(this->planf1r2c);
 	else if(instr == "2r2c")
 		fftwf_execute_dft(this->planf2r2c);
-	else if(instr == "1c2r")
-		fftwf_execute_dft(this->planf1c2r);
+	// else if(instr == "1c2r")
+	// 	fftwf_execute_dft(this->planf1c2r);
 	else if(instr == "2c2r")
 		fftwf_execute_dft(this->planf2c2r);
 	else
