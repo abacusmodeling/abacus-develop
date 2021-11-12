@@ -3,7 +3,7 @@
 //
 //distribute plane waves to different cores
 //Known: G, GT, GGT, nx, ny, nz, poolnproc, poolrank, ggecut
-//output: ig2isz[ig], istot2ixy[is], ixy2istot[ixy], is2ixy[is], ixy2ip[ixy], startnsz_per[ip], nstnz_per[ip], gg[ig], gcar[ig], gdirect[ig], nst
+//output: ig2isz[ig], istot2ixy[is], ixy2istot[ixy], is2ixy[is], ixy2ip[ixy], startnsz_per[ip], nstnz_per[ip], gg[ig], gcar[ig], gdirect[ig], nst, nstot
 //
 void PW_Basis::distribute_g()
 {
@@ -55,6 +55,7 @@ void PW_Basis::distribution_method1()
         ModuleBase::GlobalFunc::ZEROS(st_bottom2D, nxy);
 
         this->count_pw_st(tot_npw, tot_nst, st_length2D, st_bottom2D);
+        this->nstot = tot_nst;
 
         // (2) Collect all planewaves and the x, y indexs, length, bottom of the sticks.
         double *gg_global = new double[tot_npw];                // the modulus of all planewaves.
@@ -69,6 +70,8 @@ void PW_Basis::distribution_method1()
         delete[] st_length2D;
         delete[] st_bottom2D;
 
+#ifdef __MPI
+        // Parallel line
         // (3) Distribute sticks to cores.
         int *npw_per = new int[this->poolnproc];  // number of planewaves on each core.
         int *nst_per = new int[this->poolnproc]; // number of sticks on each core.
@@ -149,9 +152,41 @@ void PW_Basis::distribution_method1()
         delete[] gdirect2D;
         delete[] npw_per;
         delete[] nst_per;
+#else
+        // Serial line
+        this->npw = tot_npw;
+        this->nst = tot_nst;
+        this->gg = gg_global;
+        this->gdirect = gdirect_global;
+        delete[] gg_global;
+        delete[] gdirect_global;
+
+        this->nstnz_per = new int[1]{0};
+        this->startnsz_per = new int[1]{0};
+
+        this->ixy2istot = new int[nxy];
+        this->istot2ixy = new int[tot_nst];
+        this->ixy2ip = new int[nxy];              // ip of core which contains stick on (x, y).
+        for (int i = 0; i < nxy; i++)
+        {
+            ixy2istot[i] = -1;
+            ixy2ip[i] = -1;
+        }
+        for (int is = 0; is < tot_nst; is++)
+        {
+            int index = st_i[is] + st_j[is] * nx;
+            ixy2istot[index] = is;
+            istot2ixy[is] = index;
+            ixy2ip[index] = 0;
+        }
+
+        is2ip = new int[tot_nst];
+        ModuleBase::GlobalFunc::ZEROS(is2ip, tot_nst);
+#endif
     }
     else
     {
+#ifdef __MPI
         MPI_Status ierror;
         // MPI_Recv(&tot_npw, 1, MPI_INT, 0, 0, POOL_WORLD, &ierror);
         // MPI_Recv(&tot_nst, 1, MPI_INT, 0, 0, POOL_WORLD, &ierror);
@@ -172,6 +207,7 @@ void PW_Basis::distribution_method1()
         // MPI_Recv(&ixy2ip, nxy, MPI_INT, 0, 0, POOL_WORLD, &ierror);
         // MPI_Recv(&istot2ixy, tot_nst, MPI_INT, 0, 0, POOL_WORLD, &ierror);
         // MPI_Recv(&ixy2istot, nxy, MPI_INT, 0, 0, POOL_WORLD, &ierror);
+#endif
     }
 
     this->gcar = new ModuleBase::Vector3<double>[this->npw];
