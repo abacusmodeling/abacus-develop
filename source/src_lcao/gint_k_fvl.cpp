@@ -393,11 +393,9 @@ void Gint_k::svl_k_RealSpace(
 	// Folding R here
 	//---------------------------------------
 
-ModuleBase::timer::tick("Gint_k","folding_force_stress");
 	//GlobalC::LM.DHloc_fixedR_x
 	this->folding_stress(isforce, isstress, fvl_dphi, svl_dphi, pvdpx, pvdpy, pvdpz,
 			pvdp11, pvdp22, pvdp33, pvdp12, pvdp13, pvdp23);
-ModuleBase::timer::tick("Gint_k","folding_force_stress");
 
 	if(isforce)
 	{
@@ -477,14 +475,10 @@ void Gint_k::evaluate_vl_stress(
 	double *psi1, *psi2;
 	double *iw1p, *iw2p;
 	double *iw1px, *iw1py, *iw1pz;//extra pointer compared to non-force grid integration.
-	double *iw2px, *iw2py, *iw2pz;//extra pointer compared to non-force grid integration.
 	double *end1, *end2;
-	double *pvp1, *pvp2, *pvp3;//extra pointer
-        double *pvp11, *pvp22, *pvp33, *pvp12, *pvp13, *pvp23;
-	int iw1_lo, iw2_lo;
+    double *pvp11, *pvp22, *pvp33, *pvp12, *pvp13, *pvp23;
 	int iwi, iww;
-	double vpsir1, vpsir2, vpsir3;//extra pointer
-        double vpsir11, vpsir22, vpsir33, vpsir12, vpsir13, vpsir23;//extra pointer
+    double vpsir11, vpsir22, vpsir33, vpsir12, vpsir13, vpsir23;//extra pointer
 	double *psix, *psiy, *psiz;
 
 
@@ -514,8 +508,6 @@ void Gint_k::evaluate_vl_stress(
 		const int iat = gt.which_atom[mcell_index1];
         const int T1 = GlobalC::ucell.iat2it[iat];
         const int I1 = GlobalC::ucell.iat2ia[iat];
-        const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
-		const int iw1_start = gt.trace_lo[start1];
         Atom *atom1 = &GlobalC::ucell.atoms[T1];
 	
         //~~~~~~~~~~~~~~~~
@@ -557,9 +549,6 @@ void Gint_k::evaluate_vl_stress(
 //---------------------------------------------------------
             {
                 Atom *atom2 = &GlobalC::ucell.atoms[T2];
-                const int I2 = GlobalC::ucell.iat2ia[iat2];
-                const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-				const int iw2_start = gt.trace_lo[start2];
 
 	            //---------------
                 // get cell R2.
@@ -630,8 +619,7 @@ void Gint_k::evaluate_vl_stress(
 						
 						
 						end1 = psi1 + atom1->nw;
-						end2 = psi2 + atom2->nw;
-						iw1_lo = iw1_start;	
+						end2 = psi2 + atom2->nw;	
 						//------------------------------------
 						// circle for wave functions of atom 1.
 						//------------------------------------
@@ -653,7 +641,6 @@ void Gint_k::evaluate_vl_stress(
 							++iw1py;
 							++iw1pz;
 
-							iw2_lo = iw2_start;
 							iww = iatw + iwi;// -1 because ++iww from below.
 
 							dmR2 = &dmR[iww]; //mohan add 2012-01-05
@@ -677,12 +664,7 @@ void Gint_k::evaluate_vl_stress(
 							//------------------------------------
 							// circle for wave functions of atom 2.
 							//------------------------------------
-							iw2px = psix;
-							iw2py = psiy;
-							iw2pz = psiz;
-
-							for(iw2p=psi2; iw2p < end2; ++iw2p,
-								++iw2px, ++iw2py, ++iw2pz)
+							for(iw2p=psi2; iw2p < end2; ++iw2p)
 							{
 
 						// bug here!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -694,7 +676,6 @@ void Gint_k::evaluate_vl_stress(
                                 pvp13[0] += dmR2[0] * vpsir13 * iw2p[0] ;
                                 pvp23[0] += dmR2[0] * vpsir23 * iw2p[0] ;
 
-								++iw2_lo;
                                 ++pvp11;
                                 ++pvp22;
                                 ++pvp33;
@@ -704,7 +685,6 @@ void Gint_k::evaluate_vl_stress(
 						//density matrix
 								++dmR2;
 							}
-							++iw1_lo;
 						}// iw
 					}//end flag
 				}//end ib
@@ -727,10 +707,8 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
         double *psi1, *psi2;    
         double *iw1p, *iw2p;
         double *iw1px, *iw1py, *iw1pz;//extra pointer compared to non-force grid integration.
-        double *iw2px, *iw2py, *iw2pz;//extra pointer compared to non-force grid integration.
         double *end1, *end2;
         double *pvp1, *pvp2, *pvp3;//extra pointer
-        int iw1_lo, iw2_lo;
         int iwi, iww;
         double vpsir1, vpsir2, vpsir3;//extra pointer
         double *psix, *psiy, *psiz;
@@ -761,8 +739,6 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
 			const int iat = gt.which_atom[mcell_index1];
 			const int T1 = GlobalC::ucell.iat2it[iat];
 			const int I1 = GlobalC::ucell.iat2ia[iat];
-			const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
-			const int iw1_start = gt.trace_lo[start1];
 			Atom *atom1 = &GlobalC::ucell.atoms[T1];
 
 			//~~~~~~~~~~~~~~~~
@@ -804,9 +780,6 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
 //---------------------------------------------------------
             	{
 					Atom *atom2 = &GlobalC::ucell.atoms[T2];
-					const int I2 = GlobalC::ucell.iat2ia[iat2];
-					const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-                    const int iw2_start = gt.trace_lo[start2];
 
                     //---------------
                 	// get cell R2.
@@ -871,7 +844,6 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
 
 							end1 = psi1 + atom1->nw;
 							end2 = psi2 + atom2->nw;
-							iw1_lo = iw1_start;
 							//------------------------------------
 							// circle for wave functions of atom 1.
 							//------------------------------------
@@ -890,7 +862,6 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
 								++iw1py;
 								++iw1pz;
 
-								iw2_lo = iw2_start;
 								iww = iatw + iwi;// -1 because ++iww from below.
 
 								dmR2 = &dmR[iww]; //mohan add 2012-01-05
@@ -907,12 +878,7 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
 								//------------------------------------
 								// circle for wave functions of atom 2.
 								//------------------------------------
-								iw2px = psix;
-								iw2py = psiy;
-								iw2pz = psiz;
-
-								for(iw2p=psi2; iw2p < end2; ++iw2p,
-										++iw2px, ++iw2py, ++iw2pz)
+								for(iw2p=psi2; iw2p < end2; ++iw2p)
 								{
 									// the main difference to calculate
 									// the force is that the whole 
@@ -923,14 +889,12 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
 									pvp2[0] += dmR2[0] * vpsir2 * iw2p[0];
 									pvp3[0] += dmR2[0] * vpsir3 * iw2p[0];
 
-									++iw2_lo;
 									++pvp1;
 									++pvp2;
 									++pvp3;
 									//density matrix
 									++dmR2;
 								}
-								++iw1_lo;
                             }// iw
                         }//end flag
                 	}//end ib
