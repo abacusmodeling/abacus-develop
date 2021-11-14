@@ -8,7 +8,7 @@ def random_C_init(info):
 	for it in info.Nt_all:
 		C[it] = ND_list(info.Nl[it])
 		for il in range(info.Nl[it]):
-			C[it][il] = torch.tensor(np.random.uniform(-1,1, (info.Ne[it], info.Nu[it][il])), dtype=torch.float32, requires_grad=True)
+			C[it][il] = torch.tensor(np.random.uniform(-1,1, (info.Ne[it], info.Nu[it][il])), dtype=torch.float64, requires_grad=True)
 	return C
 	
 	

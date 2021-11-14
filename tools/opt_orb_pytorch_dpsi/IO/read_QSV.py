@@ -93,8 +93,8 @@ def read_QI(info,ist,data):
 		QI[it] = ND_list(info.Nl[it])
 		for il in range(info.Nl[it]):
 			QI[it][il] = torch_complex.ComplexTensor(
-				np.empty((info.Nb[ist],info.Na[ist][it],info.Nm(il),info.Ne[it]),dtype=np.float32),
-				np.empty((info.Nb[ist],info.Na[ist][it],info.Nm(il),info.Ne[it]),dtype=np.float32) )
+				np.empty((info.Nb[ist],info.Na[ist][it],info.Nm(il),info.Ne[it]),dtype=np.float64),
+				np.empty((info.Nb[ist],info.Na[ist][it],info.Nm(il),info.Ne[it]),dtype=np.float64) )
 	for ib in range(info.Nb[ist]):
 		for it in info.Nt[ist]:
 			for ia in range(info.Na[ist][it]):
@@ -107,7 +107,7 @@ def read_QI(info,ist,data):
 		for il in range(info.Nl[it]):
 			QI[it][il] = torch_complex.ComplexTensor(
 				torch.from_numpy(QI[it][il].real).view(-1,info.Ne[it]),
-				torch.from_numpy(QI[it][il].imag).view(-1,info.Ne[it])).conj()				
+				torch.from_numpy(QI[it][il].imag).view(-1,info.Ne[it])).conj()
 	return QI
 
 
@@ -119,8 +119,8 @@ def read_SI(info,ist,data):
 		SI[it1,it2] = ND_list(info.Nl[it1],info.Nl[it2])
 		for il1,il2 in itertools.product( range(info.Nl[it1]), range(info.Nl[it2]) ):
 			SI[it1,it2][il1][il2] = torch_complex.ComplexTensor(
-				np.empty((info.Na[ist][it1],info.Nm(il1),info.Ne[it1],info.Na[ist][it2],info.Nm(il2),info.Ne[it2]),dtype=np.float32),
-				np.empty((info.Na[ist][it1],info.Nm(il1),info.Ne[it1],info.Na[ist][it2],info.Nm(il2),info.Ne[it2]),dtype=np.float32) )
+				np.empty((info.Na[ist][it1],info.Nm(il1),info.Ne[it1],info.Na[ist][it2],info.Nm(il2),info.Ne[it2]),dtype=np.float64),
+				np.empty((info.Na[ist][it1],info.Nm(il1),info.Ne[it1],info.Na[ist][it2],info.Nm(il2),info.Ne[it2]),dtype=np.float64) )
 	for it1 in info.Nt[ist]:
 		for ia1 in range(info.Na[ist][it1]):
 			for il1 in range(info.Nl[it1]):
@@ -146,17 +146,17 @@ def read_VI(info,V_info,ist,data):
 	if V_info["same_band"]:
 		""" VI[ib]	<psi|psi> """
 		if V_info["init_from_file"]:
-			VI = np.empty(info.Nb[ist],dtype=np.float32)
+			VI = np.empty(info.Nb[ist],dtype=np.float64)
 			for ib in range(info.Nb[ist]):
 				VI.data[ib] = next(data)
 		else:
-			VI = np.ones(info.Nb[ist],dtype=np.float32)
+			VI = np.ones(info.Nb[ist],dtype=np.float64)
 	else:
 		""" VI[ib1,ib2]	<psi|psi> """
 		if V_info["init_from_file"]:
-			VI = np.empty((info.Nb[ist],info.Nb[ist]),dtype=np.float32)
+			VI = np.empty((info.Nb[ist],info.Nb[ist]),dtype=np.float64)
 			for ib1,ib2 in itertools.product( range(info.Nb[ist]), range(info.Nb[ist]) ):
 				VI[ib1,ib2] = next(data)
 		else:
-			VI = np.eye(info.Nb[ist],info.Nb[ist],dtype=np.float32)
+			VI = np.eye(info.Nb[ist],info.Nb[ist],dtype=np.float64)
 	return torch.from_numpy(VI)

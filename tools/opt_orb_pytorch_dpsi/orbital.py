@@ -76,5 +76,5 @@ def set_E(info,Rcut):
 	eigenvalue = { it:find_eigenvalue(info.Nl[it],info.Ne[it]) for it in info.Nt_all }
 	E = dict()
 	for it in Rcut:
-		E[it] = torch.from_numpy(( eigenvalue[it]/Rcut[it] ).astype("float32"))
+		E[it] = torch.from_numpy(( eigenvalue[it]/Rcut[it] ).astype("float64"))
 	return E
