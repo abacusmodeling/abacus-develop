@@ -149,7 +149,7 @@ if(ENABLE_DEEPKS)
     )
     FetchContent_MakeAvailable(libnpy)
   endif()
-  include_directories(${libnpy_SOURCE_DIR})
+  include_directories(${libnpy_SOURCE_DIR}/include)
   add_compile_definitions(__DEEPKS)
 endif()
 
