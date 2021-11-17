@@ -304,13 +304,19 @@ void Force_Stress_LCAO::getForceStress(
 
 #ifdef __DEEPKS
 		//DeePKS force, caoyu add 2021-06-03
-		if (GlobalV::out_descriptor && GlobalV::NPROC<=1) //not parallelized yet
+		if (GlobalV::out_descriptor) //not parallelized yet
 		{
-            GlobalC::ld.save_npy_f(fcs, "f_tot.npy"); //Ty/Bohr, F_tot
+			if(GlobalV::MY_RANK==0)
+			{
+            	GlobalC::ld.save_npy_f(fcs, "f_tot.npy"); //Ty/Bohr, F_tot
+			}
             if (GlobalV::deepks_scf)
             {
-                GlobalC::ld.save_npy_f(fcs - GlobalC::ld.F_delta, "f_base.npy"); //Ry/Bohr, F_base
-				if(GlobalV::GAMMA_ONLY_LOCAL)
+				if(GlobalV::MY_RANK==0)
+				{
+                	GlobalC::ld.save_npy_f(fcs - GlobalC::ld.F_delta, "f_base.npy"); //Ry/Bohr, F_base
+				}
+				if(GlobalV::GAMMA_ONLY_LOCAL && GlobalV::NPROC<=1)
 				{
 					GlobalC::ld.cal_gvx(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
 					GlobalC::ld.save_npy_gvx();//  /Bohr, grad_vx
@@ -319,7 +325,10 @@ void Force_Stress_LCAO::getForceStress(
             }
             else
             {
-                GlobalC::ld.save_npy_f(fcs, "f_base.npy"); //no scf, F_base=F_tot
+				if(GlobalV::MY_RANK==0)
+				{
+                	GlobalC::ld.save_npy_f(fcs, "f_base.npy"); //no scf, F_base=F_tot
+				}
             }
 
         }

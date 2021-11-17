@@ -182,7 +182,7 @@ void DFTU_RELAX::cal_force_k(const int ik, const std::complex<double>* rho_VU)
 	ModuleBase::TITLE("DFTU_RELAX", "cal_force_k");
 	ModuleBase::timer::tick("DFTU_RELAX",  "cal_force_k");
 
-	const char transN = 'N';
+	const char transN = 'N', transC='C';
 	const int  one_int = 1;
 	const std::complex<double> zero(0.0,0.0), one(1.0,0.0);
 
@@ -191,17 +191,17 @@ void DFTU_RELAX::cal_force_k(const int ik, const std::complex<double>* rho_VU)
 
 	for(int dim=0; dim<3; dim++)
 	{
-    this->fold_dSm_k(ik, dim, &dSm_k[0]);
+    	this->fold_dSm_k(ik, dim, &dSm_k[0]);
     
-		pzgemm_(&transN, &transN,
+		pzgemm_(&transN, &transC,
 			&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 			&one, 
-			rho_VU, &one_int, &one_int, GlobalC::ParaO.desc, 
-			&dSm_k[0], &one_int, &one_int, GlobalC::ParaO.desc,
+			&dSm_k[0], &one_int, &one_int, GlobalC::ParaO.desc, 
+			rho_VU, &one_int, &one_int, GlobalC::ParaO.desc,
 			&zero,
 			&dm_VU_dSm[0], &one_int, &one_int, GlobalC::ParaO.desc);
 
-    for(int ir=0; ir<GlobalC::ParaO.nrow; ir++)
+    	for(int ir=0; ir<GlobalC::ParaO.nrow; ir++)
 		{
 			const int iwt1 = GlobalC::ParaO.MatrixInfo.row_set[ir];
 			const int iat1 = GlobalC::ucell.iwt2iat[iwt1];
@@ -211,10 +211,66 @@ void DFTU_RELAX::cal_force_k(const int ik, const std::complex<double>* rho_VU)
 				const int iwt2 = GlobalC::ParaO.MatrixInfo.col_set[ic];
 				const int irc = ic*GlobalC::ParaO.nrow + ir;
 
-				if(iwt1==iwt2) this->force_dftu[iat1][dim] += 2.0*dm_VU_dSm[irc].real();
+				if(iwt1==iwt2) this->force_dftu[iat1][dim] += dm_VU_dSm[irc].real();
 
 			}//end ic
 		}//end ir
+
+    	pzgemm_(&transN, &transN,
+			&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
+			&one, 
+			&dSm_k[0], &one_int, &one_int, GlobalC::ParaO.desc, 
+			rho_VU, &one_int, &one_int, GlobalC::ParaO.desc,
+			&zero,
+			&dm_VU_dSm[0], &one_int, &one_int, GlobalC::ParaO.desc);
+
+    	for(int it=0; it<GlobalC::ucell.ntype; it++)
+	  	{
+		  	const int NL = GlobalC::ucell.atoms[it].nwl + 1;
+		  	const int LC = orbital_corr[it];
+	
+			if(LC == -1) continue;
+		  	for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
+		  	{		
+		  		const int iat = GlobalC::ucell.itia2iat(it, ia);
+
+		  		for(int l=0; l<NL; l++)
+		  		{				
+		  		// if(Yukawa)
+		  		// {
+		  			// if(l<orbital_corr[it]) continue;
+		  		// }
+		  		// else
+		  		// {
+		  			// if(l!=orbital_corr[it]) continue;
+		  		// }
+		  		if(l!=orbital_corr[it]) continue;
+
+		  		const int N = GlobalC::ucell.atoms[it].l_nchi[l];
+  
+		  		for(int n=0; n<N; n++)
+		  		{
+		  		 	// if(!Yukawa && n!=0) continue;
+		  			if(n!=0) continue;
+
+		  			//Calculate the local occupation number matrix			
+		  			for(int m=0; m<2*l+1; m++)
+		  			{
+		  				for(int ipol=0; ipol<GlobalV::NPOL; ipol++)
+		  				{
+		  					const int iwt = this->iatlnmipol2iwt[iat][l][n][m][ipol];
+		  					const int mu = GlobalC::ParaO.trace_loc_row[iwt];
+		  					const int nu = GlobalC::ParaO.trace_loc_col[iwt];
+
+                			if(mu<0 || nu<0) continue;
+
+                			this->force_dftu[iat][dim] += dm_VU_dSm[nu*GlobalC::ParaO.nrow+mu].real();
+              			}
+            		}//
+          		}//n
+        	}//l
+      	}//ia
+    }//it
 
 	}//end dim
 	ModuleBase::timer::tick("DFTU_RELAX",  "cal_force_k");
@@ -270,7 +326,7 @@ void DFTU_RELAX::cal_force_gamma(const double* rho_VU)
 {
 	ModuleBase::TITLE("DFTU_RELAX", "cal_force_gamma");
 	ModuleBase::timer::tick("DFTU_RELAX", "cal_force_gamma");
-	const char transN = 'N';
+	const char transN = 'N', transT='T';
 	const int  one_int = 1;
 	const double one = 1.0, zero = 0.0, minus_one=-1.0;
 	
@@ -278,20 +334,20 @@ void DFTU_RELAX::cal_force_gamma(const double* rho_VU)
 	
 	for(int dim=0; dim<3; dim++)
 	{
-    double* tmp_ptr;
-    if(dim==0) tmp_ptr = GlobalC::LM.DSloc_x;
-    else if(dim==1) tmp_ptr = GlobalC::LM.DSloc_y;
-    else if(dim==2) tmp_ptr = GlobalC::LM.DSloc_z;
+		double* tmp_ptr;
+		if(dim==0) tmp_ptr = GlobalC::LM.DSloc_x;
+		else if(dim==1) tmp_ptr = GlobalC::LM.DSloc_y;
+		else if(dim==2) tmp_ptr = GlobalC::LM.DSloc_z;
 
-		pdgemm_(&transN, &transN,
+		pdgemm_(&transN, &transT,
 			&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 			&one, 
-			rho_VU, &one_int, &one_int, GlobalC::ParaO.desc, 
-			tmp_ptr, &one_int, &one_int, GlobalC::ParaO.desc,
+			tmp_ptr, &one_int, &one_int, GlobalC::ParaO.desc, 
+			rho_VU, &one_int, &one_int, GlobalC::ParaO.desc,
 			&zero,
 			&dm_VU_dSm[0], &one_int, &one_int, GlobalC::ParaO.desc);
 
-    for(int ir=0; ir<GlobalC::ParaO.nrow; ir++)
+    	for(int ir=0; ir<GlobalC::ParaO.nrow; ir++)
 		{
 			const int iwt1 = GlobalC::ParaO.MatrixInfo.row_set[ir];
 			const int iat1 = GlobalC::ucell.iwt2iat[iwt1];
@@ -301,10 +357,67 @@ void DFTU_RELAX::cal_force_gamma(const double* rho_VU)
 				const int iwt2 = GlobalC::ParaO.MatrixInfo.col_set[ic];
 				const int irc = ic*GlobalC::ParaO.nrow + ir;
 
-				if(iwt1==iwt2) this->force_dftu[iat1][dim] += 2.0*dm_VU_dSm[irc];
+				if(iwt1==iwt2) this->force_dftu[iat1][dim] += dm_VU_dSm[irc];
 
 			}//end ic
 		}//end ir
+
+    	pdgemm_(&transN, &transT,
+			&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
+			&one, 
+			tmp_ptr, &one_int, &one_int, GlobalC::ParaO.desc, 
+			rho_VU, &one_int, &one_int, GlobalC::ParaO.desc,
+			&zero,
+			&dm_VU_dSm[0], &one_int, &one_int, GlobalC::ParaO.desc);
+
+    	for(int it=0; it<GlobalC::ucell.ntype; it++)
+	  	{
+		  	const int NL = GlobalC::ucell.atoms[it].nwl + 1;
+		  	const int LC = orbital_corr[it];
+	
+			if(LC == -1) continue;
+		  	for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
+		  	{		
+		  		const int iat = GlobalC::ucell.itia2iat(it, ia);
+
+		  		for(int l=0; l<NL; l++)
+		  		{				
+		  		// if(Yukawa)
+		  		// {
+		  			// if(l<orbital_corr[it]) continue;
+		  		// }
+		  		// else
+		  		// {
+		  			// if(l!=orbital_corr[it]) continue;
+		  		// }
+		  			if(l!=orbital_corr[it]) continue;
+
+		  			const int N = GlobalC::ucell.atoms[it].l_nchi[l];
+  
+		  			for(int n=0; n<N; n++)
+		  			{
+		  		 	// if(!Yukawa && n!=0) continue;
+		  				if(n!=0) continue;
+
+		  			//Calculate the local occupation number matrix			
+						for(int m=0; m<2*l+1; m++)
+						{
+							for(int ipol=0; ipol<GlobalV::NPOL; ipol++)
+							{
+								const int iwt = this->iatlnmipol2iwt[iat][l][n][m][ipol];
+								const int mu = GlobalC::ParaO.trace_loc_row[iwt];
+								const int nu = GlobalC::ParaO.trace_loc_col[iwt];
+
+								if(mu<0 || nu<0) continue;
+
+								this->force_dftu[iat][dim] += dm_VU_dSm[nu*GlobalC::ParaO.nrow+mu];
+							}
+            			}//
+          			}//n
+        		}//l
+      		}//ia
+    	}//it
+
 	}// end dim
 	ModuleBase::timer::tick("DFTU_RELAX", "cal_force_gamma");
 

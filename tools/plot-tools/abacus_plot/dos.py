@@ -1,7 +1,7 @@
 '''
 Date: 2021-08-18 11:05:00
 LastEditors: jiyuyang
-LastEditTime: 2021-08-26 12:07:08
+LastEditTime: 2021-10-08 14:44:26
 Mail: jiyuyang@mail.ustc.edu.cn, 1041176461@qq.com
 '''
 
@@ -169,14 +169,21 @@ class DosPlot:
 
         elif nsplit == 3:
             energy, dos_up, dos_dw = res
-            vb, cb = cls.set_vcband(
-                energy_minus_efermi(energy, efermi), dos_up, prec)
-            energy = np.concatenate((vb.band, cb.band))
-            dos_dw = -dos_dw
-            ax.plot(energy, dos_up, lw=0.8, c='gray',
-                    linestyle='-', label=r'$TDOS \uparrow$')
-            ax.plot(energy, dos_up, lw=0.8, c='gray',
-                    linestyle='--', label=r'$TDOS \downarrow$')
+            if shift:
+                vb, cb = cls.set_vcband(
+                    energy_minus_efermi(energy, efermi), dos_up, prec)
+                energy = np.concatenate((vb.band, cb.band))
+                dos_dw = -dos_dw
+                ax.plot(energy, dos_up, lw=0.8, c='gray',
+                        linestyle='-', label=r'$TDOS \uparrow$')
+                ax.plot(energy, dos_up, lw=0.8, c='gray',
+                        linestyle='--', label=r'$TDOS \downarrow$')
+            else:
+                dos_dw = -dos_dw
+                ax.plot(energy, dos_up, lw=0.8, c='gray',
+                        linestyle='-', label=r'$TDOS \uparrow$')
+                ax.plot(energy, dos_up, lw=0.8, c='gray',
+                        linestyle='--', label=r'$TDOS \downarrow$')
 
         return ax, energy_range, dos_range
 
