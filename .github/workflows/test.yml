@@ -4,9 +4,10 @@ on:
   pull_request_target:
     branches:
       - develop
-      - reconstruction
-      - newelpa
-
+      - update_MD
+      - ABACUS_2.2.0_beta
+      - deepks
+      - planewave
 jobs:
 
   start-runner:

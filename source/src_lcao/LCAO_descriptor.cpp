@@ -1783,5 +1783,4 @@ void LCAO_Descriptor::cal_gvx(const ModuleBase::matrix &dm)
 
     return;
 }
-
 #endif
