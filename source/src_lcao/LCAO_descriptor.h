@@ -24,14 +24,21 @@
 #include "../src_parallel/parallel_deepks.h"
 #endif
 ///
-/// This class computes the descriptors for each atom from LCAO basis set,
-/// interfaces with pytorch to obtain the correction potential in LCAO basis,
-/// and computes the forces according to the correction potential.
+/// This class contains subroutines for realization of the DeePKS method
+/// In essential, it is a machine-learned correction term to the XC potential
+/// in the form of delta_V=|alpha> V(D) <alpha|, where D is a list of descriptors
+/// The subroutines may be roughly grouped into 3 groups
+/// 1. generation of projected density matrices pdm=sum_i,occ <phi_i|alpha><alpha|phi_i>
+///    and then descriptors D=eig(pdm)
+///    as well as their gradients with regard to atomic position, dD/dX
+/// 2. loading the model, which requires interfaces with pytorch
+/// 3. apply the correction potential, delta_V, in Kohn-Sham Hamiltonian and calculation of force, stress
 /// 
 /// For details of DeePKS method, you can refer to [DeePKS paper](https://pubs.acs.org/doi/10.1021/acs.jctc.0c00872).
 ///
 //
 // caoyu add 2021-03-29
+// wenfei modified 2021-11-17
 //
 class LCAO_Descriptor
 {
@@ -58,7 +65,6 @@ public:
     /// 2. Initialize the deltaV Hamiltonian matrix 
     /// 3. If FORCE, initialize the matrces for force
     void deepks_pre_scf(const std::string& model_file/**< [in] path of a traced model file, provided by deepks-kit*/);
-
 
     //S_alpha_mu * DM  * S_nu_beta
     ///calculate projected density matrix:

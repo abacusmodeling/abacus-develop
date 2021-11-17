@@ -71,6 +71,9 @@ LCAO_Descriptor::~LCAO_Descriptor()
     }
 }
 
+//===============================
+//Part 1. deals with generation of descriptors as well as labels
+//===============================
 
 void LCAO_Descriptor::init(
 	const int lm, // max L for descriptor 
@@ -182,14 +185,15 @@ void LCAO_Descriptor::init_index(void)
 	return;
 }
 
+//this subroutine calculates the inner product between projectors and atomic basis
+//<alpha|chi> as well as its derivative d/dX <alpha|chi>
+//the former is recorded in array S_mu_alpha; the latter in arrays DS_mu_alpha_x,y,z
 void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "build_S_descriptor");
     //array to store data
 
     double olm[3] = {0.0, 0.0, 0.0};
-
-    //\sum{T} e**{ikT} <\phi_{ia}|d\phi_{k\beta}(T)>	//???
     ModuleBase::Vector3<double> tau1, tau2, dtau;
     ModuleBase::Vector3<double> dtau1, dtau2, tau0;
     for (int T1 = 0; T1 < GlobalC::ucell.ntype; ++T1)
@@ -304,7 +308,8 @@ void LCAO_Descriptor::set_S_mu_alpha(
 }
 
 
-
+//this subroutine performs the calculation of projected density matrices
+//pdm_m,m'=\sum_{mu,nu} rho_{mu,nu} <chi_mu|alpha_m><alpha_m'|chi_nu>
 void LCAO_Descriptor::cal_projected_DM(const ModuleBase::matrix &dm)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "cal_projected_DM");
@@ -475,7 +480,7 @@ void LCAO_Descriptor::cal_projected_DM(const ModuleBase::matrix &dm)
     return;
 }
 
-
+//the eigenvalues of pdm are descriptors
 void LCAO_Descriptor::cal_descriptor(void)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "cal_descriptor");
@@ -555,7 +560,7 @@ void LCAO_Descriptor::cal_descriptor(void)
 }
 
 
-
+//for checking purpose
 void LCAO_Descriptor::print_projected_DM(
 	ofstream& ofs, 
 	ModuleBase::ComplexMatrix& des, 
@@ -652,7 +657,8 @@ void LCAO_Descriptor::getdm_double(const ModuleBase::matrix &dm)
 	return;
 }
 
-
+//this subroutine calculates the gradient of projected density matrices
+//gdmx_m,m = d/dX sum_{mu,nu} rho_{mu,nu} <chi_mu|alpha_m><alpha_m'|chi_nu>
 void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "cal_gdmx");
@@ -698,13 +704,15 @@ void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm)
 								//  save the matrix as column major format
                                 if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx")
                                 {
+                                    //(d/dX<chi_mu|alpha_m>)<chi_nu|alpha_m'>
                                     gdmx[iat][inl][m1*nm + m2] += 
 									dsx[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
                                     gdmy[iat][inl][m1*nm + m2] += 
 									dsy[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
                                     gdmz[iat][inl][m1*nm + m2] += 
 									dsz[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
-                                    
+
+                                    //(d/dX<chi_nu|alpha_m'>)<chi_mu|alpha_m>
                                     gdmx[iat][inl][m2*nm + m1] += 
 									dsx[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
                                     gdmy[iat][inl][m2*nm + m1] += 
@@ -804,6 +812,9 @@ void LCAO_Descriptor::del_gdmx(void)
     return;
 }
 
+//===============================
+//Part 2. deals with application of correction dV to Hamiltonian and force
+//===============================
 
 void LCAO_Descriptor::deepks_pre_scf(const string& model_file)
 {
@@ -1036,7 +1047,7 @@ void LCAO_Descriptor::add_v_delta(void)
     }
     else
     {
-		ModuleBase::WARNING_QUIT("add_v_delta","not implemented yet.");
+		ModuleBase::WARNING_QUIT("add_v_delta","should not be used for multi-k; use add_v_delta_k instead");
         //call set_HSk, complex Matrix
     }
 	return;
@@ -1152,6 +1163,7 @@ void LCAO_Descriptor::add_v_delta_k(const int &ik)
     }
 }
 
+//The hellmann-feynmann term in force
 void LCAO_Descriptor::cal_f_delta_hf(const ModuleBase::matrix& dm)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "cal_f_delta_hf");
@@ -1241,6 +1253,8 @@ void LCAO_Descriptor::cal_f_delta_hf(const ModuleBase::matrix& dm)
     }//!iat
     return;
 }
+
+//the pulay term in force
 void LCAO_Descriptor::cal_f_delta_pulay(const ModuleBase::matrix& dm)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "cal_f_delta_pulay");
@@ -1266,6 +1280,75 @@ void LCAO_Descriptor::cal_f_delta_pulay(const ModuleBase::matrix& dm)
     return;
 }
 
+void LCAO_Descriptor::cal_e_delta_band(const std::vector<ModuleBase::matrix> &dm)
+{
+    ModuleBase::TITLE("LCAO_Descriptor", "cal_e_delta_band");
+    this->e_delta_band = 0;
+    for (int i = 0; i < GlobalV::NLOCAL; ++i)
+    {
+        for (int j = 0; j < GlobalV::NLOCAL; ++j)
+        {
+            const int mu = GlobalC::ParaO.trace_loc_row[j];
+            const int nu = GlobalC::ParaO.trace_loc_col[i];
+            
+            if (mu >= 0 && nu >= 0)
+            {                
+                const int index=nu*GlobalC::ParaO.nrow+mu;
+                for (int is = 0; is < GlobalV::NSPIN; ++is)
+                {
+                    this->e_delta_band += dm[is](nu, mu) * this->H_V_delta[index];
+                }
+            }
+        }
+    }
+    Parallel_Reduce::reduce_double_all(this->e_delta_band);
+    return;
+}
+
+void LCAO_Descriptor::cal_e_delta_band_k(const std::vector<ModuleBase::ComplexMatrix> &dm)
+{
+    ModuleBase::TITLE("LCAO_Descriptor", "cal_e_delta_band");
+    std::complex<double> e_delta_band_k=std::complex<double>(0.0,0.0);
+    for (int i = 0; i < GlobalV::NLOCAL; ++i)
+    {
+        for (int j = 0; j < GlobalV::NLOCAL; ++j)
+        {
+            const int mu = GlobalC::ParaO.trace_loc_row[j];
+            const int nu = GlobalC::ParaO.trace_loc_col[i];
+            
+            if (mu >= 0 && nu >= 0)
+            {                
+                int iic;
+                if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+                {
+                    iic=mu+nu*GlobalC::ParaO.nrow;
+                }
+                else
+                {
+                    iic=mu*GlobalC::ParaO.ncol+nu;
+                }
+                for(int ik=0;ik<GlobalC::kv.nks;ik++)
+                {
+                    e_delta_band_k += dm[ik](nu, mu) * this->H_V_delta_k[ik][iic];
+                }
+            }
+        }
+    }
+    Parallel_Reduce::reduce_complex_double_all(e_delta_band_k);
+    if(e_delta_band_k.imag()>1e-12)
+    {
+        GlobalV::ofs_running << "e_delta_band_k : " << e_delta_band_k << std::endl;
+        ModuleBase::WARNING_QUIT("e_delta_band_k","energy should be real!");
+    }
+    this->e_delta_band = e_delta_band_k.real();
+    return;
+}
+
+//============================
+//Part 3. deals with io as well as interface with libtorch
+//============================
+
+//calculates descriptors from projected density matrices
 void LCAO_Descriptor::cal_descriptor_tensor(void)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "cal_descriptor_tensor");
@@ -1311,6 +1394,75 @@ void LCAO_Descriptor::cal_descriptor_tensor(void)
     return;
 }
 
+//calculates gradient of descriptors from gradient of projected density matrices
+void LCAO_Descriptor::cal_gvx(const ModuleBase::matrix &dm)
+{
+    ModuleBase::TITLE("LCAO_Descriptor","cal_gvx");
+    //preconditions
+    this->cal_gvdm();
+
+    this->build_S_descriptor(1);
+    this->init_gdmx();
+    this->cal_gdmx(dm); //checked
+
+    //make gdmx as tensor
+    int nlmax = this->inlmax/GlobalC::ucell.nat;
+    for (int nl=0;nl<nlmax;++nl)
+    {
+        std::vector<torch::Tensor> bmmv;
+        for (int ibt=0;ibt<GlobalC::ucell.nat;++ibt)
+        {
+            std::vector<torch::Tensor> xmmv;
+            for (int i=0;i<3;++i)
+            {
+                std::vector<torch::Tensor> ammv;
+                for (int iat=0; iat<GlobalC::ucell.nat; ++iat)
+                {
+                    int inl = iat*nlmax + nl;
+                    int nm = 2*this->inl_l[inl]+1;
+                    std::vector<double> mmv;
+                    for (int m1=0;m1<nm;++m1)
+                    {
+                        for(int m2=0;m2<nm;++m2)
+                        {
+                            if(i==0) mmv.push_back(this->gdmx[ibt][inl][m1*nm+m2]);
+                            if(i==1) mmv.push_back(this->gdmy[ibt][inl][m1*nm+m2]);
+                            if(i==2) mmv.push_back(this->gdmz[ibt][inl][m1*nm+m2]);
+                        }
+                    }//nm^2
+                    torch::Tensor mm = torch::tensor(mmv, torch::TensorOptions().dtype(torch::kFloat64) ).reshape({nm, nm});    //nm*nm
+                    ammv.push_back(mm);
+                }
+                torch::Tensor amm = torch::stack(ammv, 0);  //nat*nm*nm
+                xmmv.push_back(amm);
+            }
+            torch::Tensor bmm = torch::stack(xmmv, 0);  //3*nat*nm*nm
+            bmmv.push_back(bmm); 
+        }
+        this->gdmr_vector.push_back(torch::stack(bmmv, 0)); //nbt*3*nat*nm*nm
+    }
+    assert(this->gdmr_vector.size()==nlmax);
+
+    std::cout<<"gdmr-ok"<<std::endl;
+    std::cout << nlmax <<" " << this->gdmr_vector.size()<<" "<<this->gevdm_vector.size()<<std::endl;
+    //einsum for each inl: 
+    std::vector<torch::Tensor> gvx_vector;
+    for (int nl = 0;nl<nlmax;++nl)
+    {
+        gvx_vector.push_back(at::einsum("bxamn, avmn->bxav", {this->gdmr_vector[nl], this->gevdm_vector[nl]}));
+    }//
+    
+    // cat nv-> \sum_nl(nv) = \sum_nl(nm_nl)=des_per_atom
+    this->gvx_tensor = torch::cat(gvx_vector, -1);
+
+    assert(this->gvx_tensor.size(0) == GlobalC::ucell.nat);
+    assert(this->gvx_tensor.size(1) == 3);
+    assert(this->gvx_tensor.size(2) == GlobalC::ucell.nat);
+    assert(this->gvx_tensor.size(3) == this->des_per_atom);
+
+    return;
+}
+
 void LCAO_Descriptor::load_model(const string& model_file)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "load_model");
@@ -1328,6 +1480,7 @@ void LCAO_Descriptor::load_model(const string& model_file)
 	return;
 }
 
+//obtain from the machine learning model dE_delta/dDescriptor
 void LCAO_Descriptor::cal_gedm(const ModuleBase::matrix &dm)
 {
     //using this->pdm_tensor
@@ -1367,6 +1520,7 @@ void LCAO_Descriptor::cal_gedm(const ModuleBase::matrix &dm)
     return;
 }
 
+//dE_delta/dDescriptor * dDescriptor / dprojected density matrix
 void LCAO_Descriptor::cal_gvdm()
 {
     ModuleBase::TITLE("LCAO_Descriptor", "cal_gvdm");
@@ -1652,135 +1806,4 @@ void LCAO_Descriptor::save_npy_gvx(void)
     return;
 }
 
-void LCAO_Descriptor::cal_e_delta_band(const std::vector<ModuleBase::matrix> &dm)
-{
-    ModuleBase::TITLE("LCAO_Descriptor", "cal_e_delta_band");
-    this->e_delta_band = 0;
-    for (int i = 0; i < GlobalV::NLOCAL; ++i)
-    {
-        for (int j = 0; j < GlobalV::NLOCAL; ++j)
-        {
-            const int mu = GlobalC::ParaO.trace_loc_row[j];
-            const int nu = GlobalC::ParaO.trace_loc_col[i];
-            
-            if (mu >= 0 && nu >= 0)
-            {                
-                const int index=nu*GlobalC::ParaO.nrow+mu;
-                for (int is = 0; is < GlobalV::NSPIN; ++is)
-                {
-                    this->e_delta_band += dm[is](nu, mu) * this->H_V_delta[index];
-                }
-            }
-        }
-    }
-    Parallel_Reduce::reduce_double_all(this->e_delta_band);
-    return;
-}
-
-void LCAO_Descriptor::cal_e_delta_band_k(const std::vector<ModuleBase::ComplexMatrix> &dm)
-{
-    ModuleBase::TITLE("LCAO_Descriptor", "cal_e_delta_band");
-    std::complex<double> e_delta_band_k=std::complex<double>(0.0,0.0);
-    for (int i = 0; i < GlobalV::NLOCAL; ++i)
-    {
-        for (int j = 0; j < GlobalV::NLOCAL; ++j)
-        {
-            const int mu = GlobalC::ParaO.trace_loc_row[j];
-            const int nu = GlobalC::ParaO.trace_loc_col[i];
-            
-            if (mu >= 0 && nu >= 0)
-            {                
-                int iic;
-                if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
-                {
-                    iic=mu+nu*GlobalC::ParaO.nrow;
-                }
-                else
-                {
-                    iic=mu*GlobalC::ParaO.ncol+nu;
-                }
-                for(int ik=0;ik<GlobalC::kv.nks;ik++)
-                {
-                    e_delta_band_k += dm[ik](nu, mu) * this->H_V_delta_k[ik][iic];
-                }
-            }
-        }
-    }
-    Parallel_Reduce::reduce_complex_double_all(e_delta_band_k);
-    if(e_delta_band_k.imag()>1e-12)
-    {
-        GlobalV::ofs_running << "e_delta_band_k : " << e_delta_band_k << std::endl;
-        ModuleBase::WARNING_QUIT("e_delta_band_k","energy should be real!");
-    }
-    this->e_delta_band = e_delta_band_k.real();
-    return;
-}
-
-void LCAO_Descriptor::cal_gvx(const ModuleBase::matrix &dm)
-{
-    ModuleBase::TITLE("LCAO_Descriptor","cal_gvx");
-    //preconditions
-    this->cal_gvdm();
-
-    this->build_S_descriptor(1);
-    this->init_gdmx();
-    this->cal_gdmx(dm); //checked
-
-    //make gdmx as tensor
-    int nlmax = this->inlmax/GlobalC::ucell.nat;
-    for (int nl=0;nl<nlmax;++nl)
-    {
-        std::vector<torch::Tensor> bmmv;
-        for (int ibt=0;ibt<GlobalC::ucell.nat;++ibt)
-        {
-            std::vector<torch::Tensor> xmmv;
-            for (int i=0;i<3;++i)
-            {
-                std::vector<torch::Tensor> ammv;
-                for (int iat=0; iat<GlobalC::ucell.nat; ++iat)
-                {
-                    int inl = iat*nlmax + nl;
-                    int nm = 2*this->inl_l[inl]+1;
-                    std::vector<double> mmv;
-                    for (int m1=0;m1<nm;++m1)
-                    {
-                        for(int m2=0;m2<nm;++m2)
-                        {
-                            if(i==0) mmv.push_back(this->gdmx[ibt][inl][m1*nm+m2]);
-                            if(i==1) mmv.push_back(this->gdmy[ibt][inl][m1*nm+m2]);
-                            if(i==2) mmv.push_back(this->gdmz[ibt][inl][m1*nm+m2]);
-                        }
-                    }//nm^2
-                    torch::Tensor mm = torch::tensor(mmv, torch::TensorOptions().dtype(torch::kFloat64) ).reshape({nm, nm});    //nm*nm
-                    ammv.push_back(mm);
-                }
-                torch::Tensor amm = torch::stack(ammv, 0);  //nat*nm*nm
-                xmmv.push_back(amm);
-            }
-            torch::Tensor bmm = torch::stack(xmmv, 0);  //3*nat*nm*nm
-            bmmv.push_back(bmm); 
-        }
-        this->gdmr_vector.push_back(torch::stack(bmmv, 0)); //nbt*3*nat*nm*nm
-    }
-    assert(this->gdmr_vector.size()==nlmax);
-
-    std::cout<<"gdmr-ok"<<std::endl;
-    std::cout << nlmax <<" " << this->gdmr_vector.size()<<" "<<this->gevdm_vector.size()<<std::endl;
-    //einsum for each inl: 
-    std::vector<torch::Tensor> gvx_vector;
-    for (int nl = 0;nl<nlmax;++nl)
-    {
-        gvx_vector.push_back(at::einsum("bxamn, avmn->bxav", {this->gdmr_vector[nl], this->gevdm_vector[nl]}));
-    }//
-    
-    // cat nv-> \sum_nl(nv) = \sum_nl(nm_nl)=des_per_atom
-    this->gvx_tensor = torch::cat(gvx_vector, -1);
-
-    assert(this->gvx_tensor.size(0) == GlobalC::ucell.nat);
-    assert(this->gvx_tensor.size(1) == 3);
-    assert(this->gvx_tensor.size(2) == GlobalC::ucell.nat);
-    assert(this->gvx_tensor.size(3) == this->des_per_atom);
-
-    return;
-}
 #endif
