@@ -2,13 +2,14 @@ INPUT_PARAMETERS
 #Parameters (1.General)
 suffix			autotest
 calculation     	scf
-ntype			2
-nbands			6
+dft_functional	        pbe	
+ntype			3
+nbands			12
 symmetry		0
 
 #Parameters (2.Iteration)
 ecutwfc			50
-dr2			1e-6
+dr2			5e-7
 niter			50
 
 #Parameters (3.Basis)
@@ -26,7 +27,8 @@ mixing_beta		0.4
 #Parameters (6.File)
 out_descriptor          1 
 lmax_descriptor		2
-newdm			1
-deepks_scf		1
-model_file		model_lda_pbe_18.ptg
-force			1
+newdm                 1
+deepks_scf            1
+force                 1
+model_file            model.ptg
+
