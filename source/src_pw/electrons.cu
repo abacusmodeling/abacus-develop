@@ -156,7 +156,7 @@ void Electrons::self_consistent(const int &istep)
     Symmetry_rho srho;
     for(int is=0; is<GlobalV::NSPIN; is++)
     {
-        srho.begin(is, GlobalC::CHR,GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
+        srho.begin(is, GlobalC::CHR, GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
     }
 
     // conv_elec is a member of Threshold_Elec
@@ -195,6 +195,8 @@ void Electrons::self_consistent(const int &istep)
         // automatically updated during self consistency.
         //this->update_ethr(iter);
         if(GlobalV::FINAL_SCF && iter==1) GlobalV::ETHR = 1.0e-2;
+        
+        // Note: use GlobalC::CHR.nelec in update ethr
         else this->update_ethr(iter);
         if(GlobalV::FINAL_SCF && iter==1)
         {
@@ -206,6 +208,8 @@ void Electrons::self_consistent(const int &istep)
 
 		// mohan move harris functional to here, 2012-06-05
 		// use 'rho(in)' and 'v_h and v_xc'(in)
+        // calculate en.deband_harris (double)
+        // GlobalC::en is still on CPU.
 		GlobalC::en.calculate_harris(1);
 
 		// first_iter_again:					// Peize Lin delete 2019-05-01
@@ -224,6 +228,8 @@ void Electrons::self_consistent(const int &istep)
 #endif
         //(2) save change density as previous charge,
         // prepared fox mixing.
+        
+        // save charge (small function)
         GlobalC::CHR.save_rho_before_sum_band();
 
 		bool onescf = false;
@@ -246,6 +252,8 @@ void Electrons::self_consistent(const int &istep)
 
         //(4) calculate weights of each band.
         Occupy::calculate_weights();
+        // only use wf.ekb[]
+        // wf.evc should not be move to Host.
 
         //(5) calculate new charge density according to
         // new wave functions.
@@ -499,7 +507,7 @@ void Electrons::c_bands(const int &istep)
 
     int precondition_type = 2;
 
-    double *h_diag;
+    double *h_diag; // this is precondition parameter ...
     CHECK_CUDA(cudaMalloc((void**)&h_diag, GlobalC::wf.npwx * GlobalV::NPOL * sizeof(double)));
 
     avg_iter = 0.0;
@@ -564,7 +572,9 @@ void Electrons::c_bands(const int &istep)
         // only use diagH_subspace.
         //=============================================================
         double avg_iter_k = 0.0;
+        // h_diag: precondition
         GlobalC::hm.diagH_pw(istep, this->iter, ik, h_diag, avg_iter_k);
+        // this function change wf.evc[ik0] wf.ekb[ik]
 
         avg_iter += avg_iter_k;
 
