@@ -2,8 +2,12 @@
 
 sum_file(){
 	line=`grep -vc '^$' $1`
+	inc=1
+	if ! test -z $2; then
+		inc=$2
+	fi	
 	sum=0.0
-	for (( num=1 ; num<=$line ; num++ ));do
+	for (( num=1 ; num<=$line ; num+=$inc ));do
 		value_line=(` sed -n "$num p" $1 | head -n1 `)
 		colume=`echo ${#value_line[@]}`
 		for (( col=0 ; col<$colume ; col++ ));do
@@ -104,3 +108,10 @@ fi
 #echo $total_band
 ttot=`grep $word $running_path | awk '{print $3}'`
 echo "totaltimeref $ttot" >>$1
+
+if ! test -z "$out_descriptor" && [ $out_descriptor -eq 1 ]; then
+	sed '/n_des/d' descriptor.dat > des_tmp.txt
+	total_des=`sum_file des_tmp.txt 5`
+	rm des_tmp.txt
+	echo "totaldes $total_des" >>$1
+fi

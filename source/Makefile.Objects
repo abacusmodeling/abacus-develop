@@ -165,7 +165,8 @@ LCAO_diago.o\
 LCAO_evolve.o\
 LCAO_descriptor.o\
 LCAO_descriptor_old.o\
-LCAO_descriptor_new.o\
+LCAO_descriptor_io.o\
+LCAO_descriptor_dV.o\
 ylm.o\
 FORCE_STRESS.o\
 FORCE_gamma.o\

@@ -387,4 +387,218 @@ void LCAO_Descriptor::build_v_delta_mu(const bool& calc_deri)
     //timer::tick ("LCAO_gen_fixedH","build_Nonlocal_mu");
 	return;
 }
+
+//for GAMMA_ONLY, search adjacent atoms from I0
+void LCAO_Descriptor::build_v_delta_alpha(const bool& calc_deri)
+{
+    ModuleBase::TITLE("LCAO_Descriptor", "build_v_delta_alpha");
+    ModuleBase::GlobalFunc::ZEROS(this->H_V_delta, GlobalV::NLOCAL * GlobalV::NLOCAL); //init before calculate
+
+    std::vector<double> Rcut;
+	for(int it1=0; it1<GlobalC::ucell.ntype; ++it1)
+        Rcut.push_back(GlobalC::ORB.Phi[it1].getRcut() + GlobalC::ORB.Alpha[0].getRcut());
+    
+    for (int T0 = 0;T0 < GlobalC::ucell.ntype;++T0)
+    {
+        for (int I0 = 0;I0 < GlobalC::ucell.atoms[T0].na;++I0)
+        {
+            const ModuleBase::Vector3<double> tau0 = GlobalC::ucell.atoms[T0].tau[I0];
+            //Rcut in this function may need to be changed ?! (I think the range of adjacent atoms here should be rcut(phi)+rcut(alpha))
+            GlobalC::GridD.Find_atom(GlobalC::ucell, tau0, T0, I0);
+
+            //adj atom pairs
+            for (int ad1 = 0;ad1 < GlobalC::GridD.getAdjacentNum() + 1;++ad1)
+            {
+                const int T1 = GlobalC::GridD.getType(ad1);
+                const int I1 = GlobalC::GridD.getNatom(ad1);
+				//const int iat1 = GlobalC::ucell.itia2iat(T1, I1);
+                const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
+                const ModuleBase::Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau(ad1);
+                const Atom* atom1 = &GlobalC::ucell.atoms[T1];
+                const int nw1_tot = atom1->nw * GlobalV::NPOL;
+                for (int ad2 = 0;ad2 < GlobalC::GridD.getAdjacentNum() + 1;++ad2)
+                {
+                    const int T2 = GlobalC::GridD.getType(ad2);
+					const int I2 = GlobalC::GridD.getNatom(ad2);
+					const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
+					const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad2);
+					const Atom* atom2 = &GlobalC::ucell.atoms[T2];
+                    const int nw2_tot = atom2->nw * GlobalV::NPOL;
+
+                    ModuleBase::Vector3<double> dtau10 = tau1 - tau0;
+                    ModuleBase::Vector3<double> dtau20 = tau2 - tau0;
+                    double distance10 = dtau10.norm() * GlobalC::ucell.lat0;
+                    double distance20 = dtau20.norm() * GlobalC::ucell.lat0;
+                    
+                    if (distance10 < Rcut[T1] && distance20 < Rcut[T2])
+                    {
+                        for (int iw1=0; iw1<nw1_tot; ++iw1)
+						{
+							const int iw1_all = start1 + iw1;
+							const int iw1_local = GlobalC::ParaO.trace_loc_row[iw1_all];
+							if(iw1_local < 0)continue;
+							const int iw1_0 = iw1/GlobalV::NPOL;
+
+							for (int iw2=0; iw2<nw2_tot; ++iw2)
+							{
+								const int iw2_all = start2 + iw2;
+								const int iw2_local = GlobalC::ParaO.trace_loc_col[iw2_all];
+								if(iw2_local < 0)continue;
+								const int iw2_0 = iw2/GlobalV::NPOL;
+
+								double nlm[3];
+								nlm[0] = nlm[1] = nlm[2] = 0.0;
+
+								if(!calc_deri)
+								{
+									GlobalC::UOT.snap_psialpha(
+											nlm, 0, tau1, T1,
+											atom1->iw2l[ iw1_0 ], // L1
+											atom1->iw2m[ iw1_0 ], // m1
+											atom1->iw2n[ iw1_0 ], // N1
+											tau2, T2,
+											atom2->iw2l[ iw2_0 ], // L2
+											atom2->iw2m[ iw2_0 ], // m2
+											atom2->iw2n[ iw2_0 ], // n2
+											GlobalC::ucell.atoms[T0].tau[I0], T0, I0, 
+                                            this->inl_index,
+                                            this->gedm);
+                                    int index=iw2_local*GlobalC::ParaO.nrow+iw1_local;
+                                    this->H_V_delta[index] += nlm[0];
+                                }
+								else  // calculate force
+								{
+									GlobalC::UOT.snap_psialpha(
+											nlm, 1, tau1, T1,
+											atom1->iw2l[ iw1_0 ], // L1
+											atom1->iw2m[ iw1_0 ], // m1
+											atom1->iw2n[ iw1_0 ], // N1
+											tau2, T2,
+											atom2->iw2l[ iw2_0 ], // L2
+											atom2->iw2m[ iw2_0 ], // m2
+											atom2->iw2n[ iw2_0 ], // n2
+											GlobalC::ucell.atoms[T0].tau[I0], T0, I0, 
+                                            this->inl_index,
+                                            this->gedm);
+                                    //for Pulay Force
+                                    //GlobalC::LM.set_force(iw1_all, iw2_all, nlm[0], nlm[1], nlm[2], 'N');
+                                    const int ir = GlobalC::ParaO.trace_loc_row[ iw1_all ];
+                                    const int ic = GlobalC::ParaO.trace_loc_col[ iw2_all ];
+                                    const long index = ir * GlobalC::ParaO.ncol + ic;
+                                    this->DH_V_delta_x[index] += nlm[0];
+                                    this->DH_V_delta_y[index] += nlm[1];
+                                    this->DH_V_delta_z[index] += nlm[2];
+                                }
+							}// end iw2
+						}// end iw1
+					} // end distance
+                }//end ad2
+            }//end ad1
+        }//end I0
+    }//end T0
+
+    /*
+    for(int iw1=0;iw1<GlobalV::NLOCAL;iw1++)
+    {
+        for(int iw2=0;iw2<GlobalV::NLOCAL;iw2++)
+        {
+            GlobalV::ofs_running << H_V_delta[iw1*GlobalV::NLOCAL+iw2] << " ";
+        }
+        GlobalV::ofs_running << std::endl;
+    }
+    */
+    return;
+}
+
+//The hellmann-feynmann term in force
+void LCAO_Descriptor::cal_f_delta_hf(const ModuleBase::matrix& dm)
+{
+    ModuleBase::TITLE("LCAO_Descriptor", "cal_f_delta_hf");
+    this->F_delta.zero_out();
+    for (int iat = 0; iat < GlobalC::ucell.nat; ++iat)
+    {
+        const int it = GlobalC::ucell.iat2it[iat];
+        const int ia = GlobalC::ucell.iat2ia[iat];
+        const ModuleBase::Vector3<double> tau0 = GlobalC::ucell.atoms[it].tau[ia];
+		GlobalC::GridD.Find_atom(GlobalC::ucell, GlobalC::ucell.atoms[it].tau[ia] ,it, ia);
+		const double Rcut_Alpha = GlobalC::ORB.Alpha[0].getRcut();
+
+        //FOLLOWING ARE CONTRIBUTIONS FROM
+        //VNL DUE TO PROJECTOR'S DISPLACEMENT
+        for (int ad1 =0 ; ad1 < GlobalC::GridD.getAdjacentNum()+1; ad1++)
+        {
+            const int T1 = GlobalC::GridD.getType (ad1);
+            const Atom* atom1 = &GlobalC::ucell.atoms[T1];
+            const int I1 = GlobalC::GridD.getNatom (ad1);
+            const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
+			const ModuleBase::Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau (ad1);
+			const double Rcut_AO1 = GlobalC::ORB.Phi[T1].getRcut();
+
+            for (int ad2 =0 ; ad2 < GlobalC::GridD.getAdjacentNum()+1; ad2++)
+            {
+                const int T2 = GlobalC::GridD.getType (ad2);
+                const Atom* atom2 = &GlobalC::ucell.atoms[T2];
+                const int I2 = GlobalC::GridD.getNatom (ad2);
+                const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
+                const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau (ad2);
+                const double Rcut_AO2 = GlobalC::ORB.Phi[T2].getRcut();
+
+                const double dist1 = (tau1-tau0).norm() * GlobalC::ucell.lat0;
+                const double dist2 = (tau2-tau0).norm() * GlobalC::ucell.lat0;
+
+                if (dist1 > Rcut_Alpha + Rcut_AO1
+                        || dist2 > Rcut_Alpha + Rcut_AO2)
+                {
+                    continue;
+                }
+
+                for (int jj = 0; jj < GlobalC::ucell.atoms[T1].nw; jj++)
+                {
+                    const int iw1_all = start1 + jj;
+                    const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
+                    if(mu<0) continue;
+                    for (int kk = 0; kk < GlobalC::ucell.atoms[T2].nw; kk++)
+                    {
+                        const int iw2_all = start2 + kk;
+                        const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
+                        if(nu<0) continue;
+                    
+                        double nlm[3] = {0,0,0};
+                                
+                        GlobalC::UOT.snap_psialpha(
+                            nlm, 1,
+                            tau1, T1,
+                            atom1->iw2l[jj], // L2
+                            atom1->iw2m[jj], // m2
+                            atom1->iw2n[jj], // N2
+                            tau2, T2,
+                            atom2->iw2l[kk], // L1
+                            atom2->iw2m[kk], // m1
+                            atom2->iw2n[kk], // n1
+                            tau0, it, ia, 
+                            this->inl_index,
+                            this->gedm); // mohan  add 2021-05-07
+
+                        double nlm1[3] = {0,0,0};
+
+                        const int index = mu * GlobalC::ParaO.ncol + nu;
+
+                        // HF term is minus, only one projector for each atom force.
+
+                        double sum_dm = 0.0;
+                        //remaining: sum for is
+                        this->F_delta(iat, 0) -= 2 * dm(mu, nu) * nlm[0];
+                        this->F_delta(iat, 1) -= 2 * dm(mu, nu) * nlm[1];
+                        this->F_delta(iat, 2) -= 2 * dm(mu, nu) * nlm[2];
+                        //this->F_delta(iat, 0) -= 4 * dm(mu, nu) * nlm[0];   //2 for v_delta(not calculated togethor), 2 for e_delta
+                        //this->F_delta(iat, 1) -= 4 * dm(mu, nu) * nlm[1];
+                        //this->F_delta(iat, 2) -= 4 * dm(mu, nu) * nlm[2];
+                    }//!kk
+                }//!ad2
+            }//!jj
+        }//!ad1
+    }//!iat
+    return;
+}
+
 #endif
