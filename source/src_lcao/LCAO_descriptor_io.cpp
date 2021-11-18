@@ -8,11 +8,6 @@
 //subroutines that deals with io as well as interface with libtorch
 //============================
 
-namespace GlobalC
-{
-    LCAO_Descriptor ld;
-}
-
 //calculates descriptors from projected density matrices
 void LCAO_Descriptor::cal_descriptor_tensor(void)
 {
@@ -108,8 +103,6 @@ void LCAO_Descriptor::cal_gvx(const ModuleBase::matrix &dm)
     }
     assert(this->gdmr_vector.size()==nlmax);
 
-    std::cout<<"gdmr-ok"<<std::endl;
-    std::cout << nlmax <<" " << this->gdmr_vector.size()<<" "<<this->gevdm_vector.size()<<std::endl;
     //einsum for each inl: 
     std::vector<torch::Tensor> gvx_vector;
     for (int nl = 0;nl<nlmax;++nl)

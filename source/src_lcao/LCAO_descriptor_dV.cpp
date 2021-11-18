@@ -11,10 +11,6 @@
 //for some of them, the older version can be found in LCAO_descriptor_old
 //===============================
 
-namespace GlobalC
-{
-    LCAO_Descriptor ld;
-}
 
 void LCAO_Descriptor::deepks_pre_scf(const string& model_file)
 {
