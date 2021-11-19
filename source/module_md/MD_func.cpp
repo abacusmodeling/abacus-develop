@@ -1,4 +1,11 @@
 #include "MD_func.h"
+#include "cmd_neighbor.h"
+#include "LJ_potential.h"
+#include "DP_potential.h"
+#include "../input.h"
+#include "../module_neighbor/sltk_atom_arrange.h"
+#include "../module_neighbor/sltk_grid_driver.h"
+#include "../module_base/global_variable.h"
 
 bool MD_func::RestartMD(const int& numIon, ModuleBase::Vector3<double>* vel, int& step_rst)
 {
@@ -220,6 +227,117 @@ void MD_func::InitVel(
     {
         RandomVel(unit_in.nat, temperature, allmass, frozen_freedom, ionmbl, vel);
     }
+}
+
+void MD_func::InitPos(
+	const UnitCell_pseudo &unit_in, 
+	ModuleBase::Vector3<double>* pos)
+{
+	int ion=0;
+	for(int it=0;it<unit_in.ntype;it++){
+		for(int i=0;i<unit_in.atoms[it].na;i++)
+		{
+			pos[ion]=unit_in.atoms[it].tau[i];
+			ion++;
+		}
+	}
+}
+
+//calculate potential, force and virial
+void MD_func::force_virial(const MD_parameters &mdp,
+		const UnitCell_pseudo &unit_in,
+		double &potential,
+		ModuleBase::Vector3<double> *force,
+		ModuleBase::matrix &stress)
+{
+	ModuleBase::TITLE("MD_func", "force_stress");
+    ModuleBase::timer::tick("MD_func", "force_stress");
+
+	if(mdp.md_potential == "LJ")
+	{
+		bool which_method = unit_in.judge_big_cell();
+		if(which_method)
+		{
+			CMD_neighbor cmd_neigh;
+			cmd_neigh.neighbor(unit_in);
+
+			potential = LJ_potential::Lennard_Jones(
+								unit_in,
+								cmd_neigh,
+								force,
+								stress);
+		}
+		else
+		{
+			Grid_Driver grid_neigh(GlobalV::test_deconstructor, GlobalV::test_grid_driver, GlobalV::test_grid);
+			atom_arrange::search(
+					GlobalV::SEARCH_PBC,
+					GlobalV::ofs_running,
+					grid_neigh,
+					unit_in, 
+					GlobalV::SEARCH_RADIUS, 
+					GlobalV::test_atom_input,
+					INPUT.test_just_neighbor);
+
+			potential = LJ_potential::Lennard_Jones(
+								unit_in,
+								grid_neigh,
+								force,
+								stress);
+		}
+	}
+	else if(mdp.md_potential == "DP")
+	{
+		DP_potential::DP_pot(unit_in, potential, force, stress);
+	}
+	else if(mdp.md_potential == "FP")
+	{
+		ModuleBase::WARNING_QUIT("md_force_stress", "FPMD is only available in integrated program or PW module ！");
+	}
+	else
+	{
+		ModuleBase::WARNING_QUIT("md_force_stress", "Unsupported MD potential ！");
+	}
+
+	ModuleBase::GlobalFunc::NEW_PART("   TOTAL-FORCE (eV/Angstrom)");
+	GlobalV::ofs_running << std::endl;
+	GlobalV::ofs_running << " atom    x              y              z" << std::endl;
+	const double fac = ModuleBase::Hartree_to_eV*ModuleBase::ANGSTROM_AU;
+	int iat = 0;
+	for(int it=0; it<unit_in.ntype; ++it)
+	{
+		for(int ia=0; ia<unit_in.atoms[it].na; ++ia)
+		{
+			std::stringstream ss;
+			ss << unit_in.atoms[it].label << ia+1;
+			GlobalV::ofs_running << " " << std::left << std::setw(8) << ss.str()
+						  		<< std::setw(15) << std::setiosflags(ios::fixed) << std::setprecision(6) << force[iat].x*fac
+						  		<< std::setw(15) << std::setiosflags(ios::fixed) << std::setprecision(6) << force[iat].y*fac
+						  		<< std::setw(15) << std::setiosflags(ios::fixed) << std::setprecision(6) << force[iat].z*fac
+						  		<< std::endl;
+			iat++;
+		}
+	}
+
+	ModuleBase::timer::tick("Run_MD_CLASSIC", "md_force_stress");
+}
+
+void MD_func::outStress(const UnitCell_pseudo &unit_in,
+		const ModuleBase::matrix &stress, 
+		const double &kenetic)
+{
+	GlobalV::ofs_running<<"\noutput Pressure for check!"<<std::endl;
+    double press = 0.0;
+    for(int i=0;i<3;i++)
+    {
+        press += stress(i,i)/3;
+    }
+    double virial = press;
+    press += 2*kenetic/3/unit_in.omega; //output virtual press = 2/3 *Ek/V + sum(sigma[i][i])/3
+    const double unit_transform = ModuleBase::HARTREE_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
+    GlobalV::ofs_running<<"Virtual Pressure is "<<press*unit_transform<<" Kbar "<<std::endl;
+    GlobalV::ofs_running<<"Virial Term is "<<virial*unit_transform<<" Kbar "<<std::endl;
+    GlobalV::ofs_running<<"Kenetic Term is "<<(press-virial)*unit_transform<<" Kbar "<<std::endl;
 }
 
 /*

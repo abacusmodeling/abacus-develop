@@ -84,7 +84,7 @@ public:
     void bcast_atoms_tau();
     void save_cartesian_position(double* pos)const;
 
-    bool judge_big_cell(void);
+    bool judge_big_cell(void)const;
 
 protected:
 

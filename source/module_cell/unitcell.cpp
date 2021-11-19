@@ -386,7 +386,7 @@ void UnitCell::save_cartesian_position(double* pos)const
     return;
 }
 
-bool UnitCell::judge_big_cell(void)
+bool UnitCell::judge_big_cell(void)const
 {
 	double diameter = 2*GlobalV::SEARCH_RADIUS;
 

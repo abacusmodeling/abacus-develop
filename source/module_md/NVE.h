@@ -1,0 +1,18 @@
+#ifndef NVE_H
+#define NVE_H
+
+#include "verlet.h"
+
+class NVE : public Verlet
+{
+public:
+    NVE(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in);
+    ~NVE();
+
+    void setup();
+    void first_half();
+    void second_half();
+
+};
+
+#endif

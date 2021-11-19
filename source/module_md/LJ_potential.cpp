@@ -5,7 +5,7 @@ LJ_potential::LJ_potential(){}
 
 LJ_potential::~LJ_potential(){}
 
-double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c, 
+double LJ_potential::Lennard_Jones(const UnitCell_pseudo &ucell_c, 
                     Grid_Driver &grid_neigh, 
                     ModuleBase::Vector3<double> *force,
                     ModuleBase::matrix &stress)
@@ -56,7 +56,7 @@ double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c,
 	return potential/2.0;
 }
 
-double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c, 
+double LJ_potential::Lennard_Jones(const UnitCell_pseudo &ucell_c, 
                     CMD_neighbor &cmd_neigh,
                     ModuleBase::Vector3<double> *force,
                     ModuleBase::matrix &stress)

@@ -15,6 +15,10 @@ class MD_func
     static void mdRestartOut(const int& step, const int& recordFreq, const int& numIon, ModuleBase::Vector3<double>* vel);
 	static double GetAtomKE(const int& numIon, const ModuleBase::Vector3<double>* vel, const double* allmass);
 	
+	static void InitPos(
+		const UnitCell_pseudo &unit_in, 
+		ModuleBase::Vector3<double>* pos); // this function can be merged into getMassMbl later
+
 	static void InitVel(
 		const UnitCell_pseudo &unit_in, 
 		const double& temperature, 
@@ -34,6 +38,17 @@ class MD_func
 		const int& frozen_freedom,
 		const ModuleBase::Vector3<int>* ionmbl,
 		ModuleBase::Vector3<double>* vel);
+
+	static void force_virial(
+		const MD_parameters &mdp,
+		const UnitCell_pseudo &unit_in,
+		double &potential,
+		ModuleBase::Vector3<double> *force,
+		ModuleBase::matrix &stress);
+
+	static void outStress(const UnitCell_pseudo &unit_in, 
+		const ModuleBase::matrix &stress, 
+		const double &kenetic);
 
 //	void ReadNewTemp(int step);
 	static std::string intTurnTostring(long int iter,std::string path);
