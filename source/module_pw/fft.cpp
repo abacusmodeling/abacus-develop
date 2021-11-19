@@ -165,7 +165,7 @@ void FFT :: initplanf()
 	//                              2 D
 	//---------------------------------------------------------
 	
-	int * nrank = {2, 2};
+	int * nrank = {this->nx, this->ny};
 	this->planf2for = fftwf_plan_many_dft(     2,   nrank,  this->nz,  
 						(fftwf_complex*)c_rspace,   nrank,  this->nz,   1,
 						(fftwf_complex*)c_rspace,   nrank,  this->nz,   1,  FFTW_FORWARD,  FFTW_MEASURE);
