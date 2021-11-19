@@ -12,34 +12,39 @@ NP      = 12
 # Options
 #==========================
 #Only MPI
-HONG = -D__MPI
+HONG = -D__MPI -D__NORMAL
 
 #Mix Precision
-#HONG = -D__MIX_PRECISION
+#HONG = -D__MIX_PRECISION -D__NORMAL
 
 #Cuda
-#HONG = -D__MPI -D__CUDA
+#HONG = -D__MPI -D__CUDA -D__NORMAL
 
 #Cuda & Mix Precision
-#HONG = -D__MPI -D__CUDA -D__MIX_PRECISION
+#HONG = -D__MPI -D__CUDA -D__MIX_PRECISION -D__NORMAL
 
 #==========================
 # Objects
 #==========================
-VPATH=../src_parallel\
-:../module_base
+VPATH=../../src_parallel\
+:../../module_base\
+:../
 
 PW_OBJS_0=intarray.o\
 matrix.o\
 matrix3.o\
 tool_quit.o\
+mymath3.o\
+timer.o\
+global_variable.o\
 parallel_global.o\
 pw_basis.o\
 pw_distributer.o\
 pw_gatherscatter.o\
 pw_init.o\
 pw_transform.o\
-pw_distributeg.o
+pw_distributeg.o\
+fft.o
 
 PW_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${PW_OBJS_0})
 
@@ -80,7 +85,7 @@ init :
 	@ if [ ! -d $(OBJ_DIR)/README ]; then echo "This directory contains all of the .o files" > $(OBJ_DIR)/README; fi
 
 parallel : ${PW_OBJS}
-	${CPLUSPLUS_MPI} ${OPTS} test1.cpp ${LIBS} -o test1.exe 
+	${CPLUSPLUS_MPI} ${OPTS} test1.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test1.exe 
 #	${CPLUSPLUS_MPI} ${OPTS} $(PW_OBJS) ${OBJ_DIR}/test2.o ${LIBS} -o test2.exe 
 
 ${OBJ_DIR}/%.o:%.cpp

@@ -46,6 +46,7 @@ public:
 public:
     //operator
     ModuleBase::Vector3<double> get_GPlusK_cartesian(const int ik, const int ig) const;
-    
+    double get_GPlusK_cartesian_projection(const int ik, const int ig, const int axis) const;
+    double get_SquareGPlusK_cartesian(const int ik, const int ig) const;
 };
 #endif //PlaneWave_K class
