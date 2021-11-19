@@ -1,13 +1,13 @@
-#include "pw_basis.h"
+#include "../pw_basis.h"
+#include "test_tool.h"
 
-#include "iostream"
-
-int main()
+int main(int argc,char **argv)
 {
+
     ModuleBase::Matrix3 latvec = ModuleBase::Matrix3(1,0,0,0,1,0,0,0,1);
-    bool gamma_only = false;
-    double ecut = 10;
-    int nproc, nrank;
+    // bool gamma_only = false;
+    // double ecut = 10;
+    // int nproc, nrank;
     int distribution_type = 1;
 
     // MPI_Comm_size(POOL_WORLD, &nproc);
@@ -33,4 +33,12 @@ int main()
             
     //     }
     // }
+    int nproc, myrank;
+    int nproc_in_pool, npool, mypool, rank_in_pool;
+    setupmpi(argc,argv,nproc, myrank);
+    divide_pools(nproc, myrank, nproc_in_pool, npool, mypool, rank_in_pool);
+    ModulePW::PW_Basis pwtest;
+
+
+    return 0;
 }

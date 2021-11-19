@@ -1,5 +1,7 @@
 #include "fft.h"
 #include "../module_base/tool_quit.h"
+namespace ModulePW
+{
 
 FFT::FFT()
 {
@@ -46,15 +48,15 @@ void FFT:: initfft(int nx_in, int ny_in , int nz_in, int ns_in, int nplane_in, b
 	this->nxyz = this->nxy * this->nz;
 	if(!this->mpifft)
 	{
-		c_gspace  = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * this->nz * this->ns);
-		r_gspace = (fftw_complex*)fftw_malloc(sizeof(double) * this->nz * this->ns);
-		c_rspace  = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * this->nx * this->ny * nplane);
-		r_rspace = (fftw_complex*)fftw_malloc(sizeof(double) * this->nx * this->ny * nplane);
+		c_gspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * this->nz * this->ns);
+		r_gspace = (double *) fftw_malloc(sizeof(double) * this->nz * this->ns);
+		c_rspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * this->nx * this->ny * nplane);
+		r_rspace = (double *) fftw_malloc(sizeof(double) * this->nx * this->ny * nplane);
 #ifdef __MIX_PRECISION
-		cf_gspace  = (fftwf_complex*)fftw_malloc(sizeof(fftwf_complex) * this->nz * this->ns);
-		rf_gspace = (fftwf_complex*)fftw_malloc(sizeof(float) * this->nz * this->ns);
-		cf_rspace  = (fftwf_complex*)fftw_malloc(sizeof(fftwf_complex) * this->nx * this->ny * nplane);
-		rf_rspace = (fftwf_complex*)fftw_malloc(sizeof(float) * this->nx * this->ny * nplane);
+		cf_gspace  = (std::complex<float> *)fftw_malloc(sizeof(fftwf_complex) * this->nz * this->ns);
+		rf_gspace = (float *)fftw_malloc(sizeof(float) * this->nz * this->ns);
+		cf_rspace  = (std::complex<float> *)fftw_malloc(sizeof(fftwf_complex) * this->nx * this->ny * nplane);
+		rf_rspace = (float *)fftw_malloc(sizeof(float) * this->nx * this->ny * nplane);
 #endif
 	}
 	else
@@ -115,7 +117,7 @@ void FFT :: initplan()
 	//                              2 D
 	//---------------------------------------------------------
 	
-	int * nrank = {this->nx, this->ny};
+	int nrank[2] = {this->nx, this->ny};
 	this->plan2for = fftw_plan_many_dft(       2,   nrank,  this->nz,  
 						(fftw_complex*) c_rspace,   nrank,  this->nz,   1,
 						(fftw_complex*) c_rspace,   nrank,  this->nz,   1,  FFTW_FORWARD,  FFTW_MEASURE);
@@ -165,7 +167,7 @@ void FFT :: initplanf()
 	//                              2 D
 	//---------------------------------------------------------
 	
-	int * nrank = {2, 2};
+	int nrank[2] = {this->nx, this->ny};
 	this->planf2for = fftwf_plan_many_dft(     2,   nrank,  this->nz,  
 						(fftwf_complex*)c_rspace,   nrank,  this->nz,   1,
 						(fftwf_complex*)c_rspace,   nrank,  this->nz,   1,  FFTW_FORWARD,  FFTW_MEASURE);
@@ -226,24 +228,24 @@ void FFT:: cleanFFT()
 	return;
 }
 
-void executefftw(string instr);
+void FFT::executefftw(std::string instr)
 {
 	if(instr == "1for")
-		fftw_execute_dft(this->plan1for);
+		fftw_execute(this->plan1for);
 	else if(instr == "2for")
-		fftw_execute_dft(this->plan2for);
+		fftw_execute(this->plan2for);
 	else if(instr == "1bac")
-		fftw_execute_dft(this->plan1bac);
+		fftw_execute(this->plan1bac);
 	else if(instr == "2bac")
-		fftw_execute_dft(this->plan2bac);
+		fftw_execute(this->plan2bac);
 	// else if(instr == "1r2c")
-	// 	fftw_execute_dft(this->plan1r2c);
+	// 	fftw_execute(this->plan1r2c);
 	else if(instr == "2r2c")
-		fftw_execute_dft(this->plan2r2c);
+		fftw_execute(this->plan2r2c);
 	// else if(instr == "1c2r")
 	// 	fftw_execute_dft(this->plan1c2r);
 	else if(instr == "2c2r")
-		fftw_execute_dft(this->plan2c2r);
+		fftw_execute(this->plan2c2r);
 	else
 	{
 		ModuleBase::WARNING_QUIT("FFT", "Wrong input for excutefftw");
@@ -251,28 +253,28 @@ void executefftw(string instr);
 }
 
 #ifdef __MIX_PRECISION
-void executefftwf(string instr);
+void executefftwf(std::string instr)
 {
 	if(instr == "1for")
-		fftwf_execute_dft(this->planf1for);
+		fftwf_execute(this->planf1for);
 	else if(instr == "2for")
-		fftwf_execute_dft(this->planf2for);
+		fftwf_execute(this->planf2for);
 	else if(instr == "1bac")
-		fftwf_execute_dft(this->planf1bac);
+		fftwf_execute(this->planf1bac);
 	else if(instr == "2bac")
-		fftwf_execute_dft(this->planf2bac);
+		fftwf_execute(this->planf2bac);
 	// else if(instr == "1r2c")
-	// 	fftwf_execute_dft(this->planf1r2c);
+	// 	fftwf_execute(this->planf1r2c);
 	else if(instr == "2r2c")
-		fftwf_execute_dft(this->planf2r2c);
+		fftwf_execute(this->planf2r2c);
 	// else if(instr == "1c2r")
-	// 	fftwf_execute_dft(this->planf1c2r);
+	// 	fftwf_execute(this->planf1c2r);
 	else if(instr == "2c2r")
-		fftwf_execute_dft(this->planf2c2r);
+		fftwf_execute(this->planf2c2r);
 	else
 	{
 		ModuleBase::WARNING_QUIT("FFT", "Wrong input for excutefftwf");
 	}
 }
 #endif
-
+}

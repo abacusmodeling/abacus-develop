@@ -99,6 +99,7 @@ private:
     int poolrank;
    
 
+// for both distributeg_method1 and distributeg_method2
     void count_pw_st(
         int &tot_npw,     // total number of planewaves.
         int &tot_nst,     // total number of sticks.
@@ -117,6 +118,7 @@ private:
         int* st_length,                                 // number of planewaves in stick, stored in 1d array with tot_nst elements.
         int* st_bottom                                  // minimum z of stick, stored in 1d array with tot_nst elements.
     );
+// for distributeg_method1
     void divide_sticks(
         const int tot_npw,  // total number of planewaves.
         const int tot_nst,  // total number of sticks.
@@ -148,7 +150,7 @@ private:
         int* st_length,     // the stick on (x, y) consists of st_length[x*ny+y] planewaves.
         int* is2ip          // ip of core containing is^th stick, map is to ip.
     );
-
+// for distributeg_method2
     void divide_sticks2(
         const int tot_npw,  // total number of planewaves.
         const int tot_nst,  // total number of sticks.
