@@ -317,11 +317,6 @@ void LCAO_Descriptor::cal_projected_DM(const ModuleBase::matrix &dm)
     ModuleBase::timer::tick("LCAO_Descriptor","cal_projected_DM"); 
     const int pdm_size = (this->lmaxd * 2 + 1) * (this->lmaxd * 2 + 1);
 
-/* for checking purpose    
-    std::ifstream ifs("dm");
-    ModuleBase::matrix dm1(dm.nr,dm.nc);
-*/
-
     if(GlobalV::NPROC>1)
     {
 #ifdef __MPI
@@ -416,7 +411,11 @@ void LCAO_Descriptor::cal_projected_DM(const ModuleBase::matrix &dm)
     }
     else //serial; or mpi with nproc=1
     {
-/* for checking purpose
+// for checking purpose
+/*
+        std::ifstream ifs("dm");
+        ModuleBase::matrix dm1(dm.nr,dm.nc);
+
         if(dm.nc>0)
         {
             for (int mu=0;mu<GlobalV::NLOCAL;mu++)
@@ -429,7 +428,8 @@ void LCAO_Descriptor::cal_projected_DM(const ModuleBase::matrix &dm)
                 }
             }
         }
-*/
+*/      
+//
         //step 1: get dm: the coefficient of wfc, not charge density
         //now,  dm is an input arg of this func, but needed converting to double*
         this->getdm_double(dm);
@@ -462,10 +462,12 @@ void LCAO_Descriptor::cal_projected_DM(const ModuleBase::matrix &dm)
         delete[] tmp_pdm;
     }
 
-/* for checking purpose
-    for(int inl=0;inl<inlmax;inl++)
+// for checking purpose
+/*
+    for(int inl=0;inl<inlmax;inl++) 
     {
         int dim = 2 * inl_l[inl] + 1;
+        if(dim>1) continue; //print s orbitals for checking
         for (int m = 0; m < dim; m++)
         {
             for (int m2 = 0; m2 < dim; m2++)
@@ -477,6 +479,7 @@ void LCAO_Descriptor::cal_projected_DM(const ModuleBase::matrix &dm)
         GlobalV::ofs_running << std::endl;
     }
 */
+//
     ModuleBase::timer::tick("LCAO_Descriptor","cal_projected_DM"); 
     return;
 }
@@ -605,7 +608,7 @@ void LCAO_Descriptor::print_descriptor(void)
             {
                 if ((id - id0) > 0 && (id - id0) % 8 == 0)
                     ofs << std::endl;
-                ofs << d[id] << " ";
+                ofs << std::setprecision(10) << d[id] << " ";
             }
             ofs << std::endl << std::endl;
         }
@@ -665,7 +668,8 @@ void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm)
     ModuleBase::TITLE("LCAO_Descriptor", "cal_gdmx");
     //get DS_alpha_mu and S_nu_beta
 
-/* for checking purpose    
+// for checking purpose
+/*    
     std::ifstream ifs("dm");
     ModuleBase::matrix dm1(dm.nr,dm.nc);
 
@@ -679,17 +683,23 @@ void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm)
         }
     }
 */
+//
     double** ss = this->S_mu_alpha;
     double** dsx = this->DS_mu_alpha_x;
     double** dsy = this->DS_mu_alpha_y;
     double** dsz = this->DS_mu_alpha_z;
+    int nlmax = inlmax/GlobalC::ucell.nat;
+
     for (int inl = 0;inl < inlmax;inl++)
     {
         //dE/dD will be multiplied in cal_f_delta, here only calculate dD/dx_I
         int nm = 2 * inl_l[inl] + 1;   //1,3,5,...
+        const int ibt = inl/nlmax; //the atom on which alpha is located
+
         for (int mu =0; mu < GlobalV::NLOCAL;++mu) 
         {
-            const int iat = GlobalC::ucell.iwt2iat[mu];//the atom whose force being calculated
+            const int iat = GlobalC::ucell.iwt2iat[mu];//the atom on which chi_mu is located
+            
             for (int nu= 0;nu < GlobalV::NLOCAL; ++nu)
             {
                 //const int mu = GlobalC::ParaO.trace_loc_row[j];
@@ -705,7 +715,7 @@ void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm)
 								//  save the matrix as column major format
                                 if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx")
                                 {
-                                    //(d/dX<chi_mu|alpha_m>)<chi_nu|alpha_m'>
+                                    //(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'>
                                     gdmx[iat][inl][m1*nm + m2] += 
 									dsx[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
                                     gdmy[iat][inl][m1*nm + m2] += 
@@ -713,13 +723,29 @@ void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm)
                                     gdmz[iat][inl][m1*nm + m2] += 
 									dsz[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
 
-                                    //(d/dX<chi_nu|alpha_m'>)<chi_mu|alpha_m>
+                                    //(<d/dX chi_nu|alpha_m'>)<chi_mu|alpha_m>
                                     gdmx[iat][inl][m2*nm + m1] += 
 									dsx[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
                                     gdmy[iat][inl][m2*nm + m1] += 
 									dsy[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
                                     gdmz[iat][inl][m2*nm + m1] += 
 									dsz[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
+
+                                    //(<chi_mu|d/dX alpha_m>)<chi_nu|alpha_m'> = -(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'>
+                                    gdmx[ibt][inl][m1*nm + m2] -= 
+                                    dsx[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
+                                    gdmy[ibt][inl][m1*nm + m2] -= 
+									dsy[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
+                                    gdmz[ibt][inl][m1*nm + m2] -= 
+									dsz[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
+
+                                    //(<chi_nu|d/dX alpha_m'>)<chi_mu|alpha_m> = -(<d/dX chi_nu|alpha_m'>)<chi_mu|alpha_m>
+                                    gdmx[ibt][inl][m2*nm + m1] -= 
+									dsx[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
+                                    gdmy[ibt][inl][m2*nm + m1] -= 
+									dsy[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
+                                    gdmz[ibt][inl][m2*nm + m1] -= 
+									dsz[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];                                
                                 }
                                 else
                                 {
@@ -736,6 +762,20 @@ void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm)
 									dsy[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
                                     gdmz[iat][inl][m2*nm + m1] += 
 									dsz[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
+
+                                    gdmx[ibt][inl][m1*nm + m2] -= 
+									dsx[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
+                                    gdmy[ibt][inl][m1*nm + m2] -= 
+									dsy[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
+                                    gdmz[ibt][inl][m1*nm + m2] -= 
+									dsz[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
+                                    
+                                    gdmx[ibt][inl][m2*nm + m1] -= 
+									dsx[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
+                                    gdmy[ibt][inl][m2*nm + m1] -= 
+									dsy[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
+                                    gdmz[ibt][inl][m2*nm + m1] -= 
+									dsz[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
                                 }
                             }
                         }//end m2
@@ -745,7 +785,8 @@ void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm)
         }//end mu
     }//end inl
 
-/* for checking purpose
+// for checking purpose
+/*
     GlobalV::ofs_running << "gdmx" << std::endl;
     for(int iat=0;iat<GlobalC::ucell.nat;iat++)
     {
@@ -753,6 +794,7 @@ void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm)
         for(int inl = 0;inl < inlmax;inl++)
         {
             int nm = 2 * inl_l[inl] + 1;
+            if(nm>1) continue; //print s orbitals for checking
             for (int m1 = 0;m1 < nm;++m1)
             {
                 for (int m2 = 0;m2 < nm;++m2)
@@ -764,7 +806,46 @@ void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm)
             GlobalV::ofs_running << std::endl;
         }
     }
+    GlobalV::ofs_running << "gdmy" << std::endl;
+    for(int iat=0;iat<GlobalC::ucell.nat;iat++)
+    {
+        GlobalV::ofs_running << iat << std::endl;
+        for(int inl = 0;inl < inlmax;inl++)
+        {
+            int nm = 2 * inl_l[inl] + 1;
+            if(nm>1) continue; //print s orbitals for checking
+            for (int m1 = 0;m1 < nm;++m1)
+            {
+                for (int m2 = 0;m2 < nm;++m2)
+                {
+                    int index = m1 * nm + m2;
+                    GlobalV::ofs_running << std::setprecision(10) << gdmy[iat][inl][index] << " ";
+                }
+            }
+            GlobalV::ofs_running << std::endl;
+        }
+    }
+    GlobalV::ofs_running << "gdmz" << std::endl;
+    for(int iat=0;iat<GlobalC::ucell.nat;iat++)
+    {
+        GlobalV::ofs_running << iat << std::endl;
+        for(int inl = 0;inl < inlmax;inl++)
+        {
+            int nm = 2 * inl_l[inl] + 1;
+            if(nm>1) continue; //print s orbitals for checking
+            for (int m1 = 0;m1 < nm;++m1)
+            {
+                for (int m2 = 0;m2 < nm;++m2)
+                {
+                    int index = m1 * nm + m2;
+                    GlobalV::ofs_running << std::setprecision(10) << gdmz[iat][inl][index] << " ";
+                }
+            }
+            GlobalV::ofs_running << std::endl;
+        }
+    }
 */
+//
     return;
 }
 

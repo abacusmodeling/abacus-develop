@@ -5,7 +5,7 @@
 #include "npy.hpp"
 //============================
 //DeePKS Part 3
-//subroutines that deals with io as well as interface with libtorch
+//subroutines that deals with io as well as interface with libtorch, libnpy
 //============================
 
 //calculates descriptors from projected density matrices

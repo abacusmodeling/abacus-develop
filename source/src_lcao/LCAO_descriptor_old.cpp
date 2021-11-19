@@ -70,6 +70,8 @@ void LCAO_Descriptor::cal_dm_as_descriptor(const ModuleBase::matrix &dm)
 	return;
 }
 
+//Note: with the modified gdmx, we can not longer use this subroutine
+//for calculating force!!!
 void LCAO_Descriptor::cal_f_delta(const ModuleBase::matrix &dm)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "cal_f_delta");
