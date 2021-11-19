@@ -69,6 +69,8 @@ class Gint_k : public Gint_k_init
 	// folding the < dphi_0 | V * R_beta | phi_R> matrix
 	// < dphi_0i | V | phi_0j>
 	void folding_stress(
+		const bool isforce,
+		const bool isstress,
 		ModuleBase::matrix& fvl_dphi, 
 		ModuleBase::matrix& svl_dphi,
 		double* pvdpx, 
@@ -96,6 +98,8 @@ class Gint_k : public Gint_k_init
 		const double* vl);//mohan add 2011-06-19
 
 	void svl_k_RealSpace(
+		const bool isforce,
+		const bool isstress,
 		ModuleBase::matrix& fvl_dphi, 
 		ModuleBase::matrix& svl_dphi, 
 		const double* vl);//zhengdy add 2016-10-18
@@ -204,9 +208,6 @@ class Gint_k : public Gint_k_init
 		double*** dphi_x, 
 		double*** dphi_y, 
 		double*** dphi_z,
-		double* pvdpx, 
-		double* pvdpy, 
-		double* pvdpz,
 		double* pvdp11, 
 		double* pvdp22, 
 		double* pvdp33, 
