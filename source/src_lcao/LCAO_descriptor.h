@@ -10,7 +10,6 @@
 
 #include "torch/script.h"
 #include "torch/csrc/autograd/autograd.h"
-#include "npy.hpp"
 #include "torch/csrc/api/include/torch/linalg.h"
 
 #include "LCAO_matrix.h"

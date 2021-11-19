@@ -2,7 +2,7 @@
 #ifdef __DEEPKS
 
 #include "LCAO_descriptor.h"
-
+#include "npy.hpp"
 //============================
 //DeePKS Part 3
 //subroutines that deals with io as well as interface with libtorch
@@ -178,7 +178,7 @@ void LCAO_Descriptor::cal_gedm(const ModuleBase::matrix &dm)
     return;
 }
 
-//dE_delta/dDescriptor * dDescriptor / dprojected density matrix
+//dDescriptor / dprojected density matrix
 void LCAO_Descriptor::cal_gvdm()
 {
     ModuleBase::TITLE("LCAO_Descriptor", "cal_gvdm");
