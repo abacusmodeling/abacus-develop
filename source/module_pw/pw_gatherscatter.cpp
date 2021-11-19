@@ -23,8 +23,8 @@ void PW_Basis:: gatherp_scatters(complex<double> *in, complex<double> *out)
         return;
     }
 #ifdef __MPI
-    complex<double> * tmp;
-    if(this->poolrank == 0) tmp = new complex<double> [this->nz * this->nstot];
+    std::complex<double> * tmp;
+    if(this->poolrank == 0) tmp = new std::complex<double> [this->nz * this->nstot];
     
     //gather planes of different processors
     for(int ixy = 0 ; ixy < this->nxy ; ++ixy)
@@ -64,8 +64,8 @@ void PW_Basis:: gatherp_scatters_gamma(complex<double> *in, complex<double> *out
         return;
     }
 #ifdef __MPI
-    complex<double> * tmp;
-    if(this->poolrank == 0) tmp = new complex<double> [this->nz * this->nstot];
+    std::complex<double> * tmp;
+    if(this->poolrank == 0) tmp = new std::complex<double> [this->nz * this->nstot];
     
     //gather planes of different processors
     for(int ixy = 0 ; ixy < this->ny * hx ; ++ixy)
@@ -106,8 +106,8 @@ void PW_Basis:: gathers_scatterp(complex<double> *in, complex<double> *out)
     }
 #ifdef __MPI
     if(this->poolnproc == 1) return;
-    complex<double> * tmp;
-    if(this->poolrank == 0) tmp = new complex<double> [this->nz * this->nstot];
+   std::complex<double> * tmp;
+    if(this->poolrank == 0) tmp = new std::complex<double> [this->nz * this->nstot];
 
     //scatter sticks to different processors
     MPI_Gatherv(in, this->nstnz, mpicomplex, tmp,
@@ -149,8 +149,8 @@ void PW_Basis:: gathers_scatterp_gamma(complex<double> *in, complex<double> *out
     }
 #ifdef __MPI
     if(this->poolnproc == 1) return;
-    complex<double> * tmp;
-    if(this->poolrank == 0) tmp = new complex<double> [this->nz * this->nstot];
+    std::complex<double> * tmp;
+    if(this->poolrank == 0) tmp = new std::complex<double> [this->nz * this->nstot];
 
     //scatter sticks to different processors
     MPI_Gatherv(in, this->nstnz, mpicomplex, tmp,

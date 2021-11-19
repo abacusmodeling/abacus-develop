@@ -66,22 +66,22 @@ private:
 	bool destroyp;
 	//fftw_plan plan1_r2c;
 	//fftw_plan plan1_c2r;
-	fftw_plan plan2_r2c;
-	fftw_plan plan2_c2r;
-	fftw_plan plan1_for;
-	fftw_plan plan1_bac;
-	fftw_plan plan2_for;
-	fftw_plan plan2_bac;
+	fftw_plan plan2r2c;
+	fftw_plan plan2c2r;
+	fftw_plan plan1for;
+	fftw_plan plan1bac;
+	fftw_plan plan2for;
+	fftw_plan plan2bac;
 #ifdef __MIX_PRECISION
 	bool destroypf;
 	//fftwf_plan planf1_r2c;
 	//fftwf_plan planf1_c2r;
-	fftwf_plan planf2_r2c;
-	fftwf_plan planf2_c2r;
-	fftwf_plan planf1_for;
-	fftwf_plan planf1_bac;
-	fftwf_plan planf2_for;
-	fftwf_plan planf2_bac;
+	fftwf_plan planf2r2c;
+	fftwf_plan planf2c2r;
+	fftwf_plan planf1for;
+	fftwf_plan planf1bac;
+	fftwf_plan planf2for;
+	fftwf_plan planf2bac;
 #endif
 
 };
