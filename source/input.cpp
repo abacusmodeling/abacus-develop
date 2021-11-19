@@ -1997,9 +1997,9 @@ bool Input::Read(const std::string &fn)
 			exit(0);
 		}
 
-		if(strcmp("genelpa", ks_solver.c_str())!=0)
+		if(strcmp("genelpa", ks_solver.c_str())!=0 && strcmp(ks_solver.c_str(),"scalapack_gvx")!=0 )
 		{
-			std::cout << " WRONG ARGUMENTS OF ks_solver in DFT+U routine, only genelpa is support " << std::endl;
+			std::cout << " WRONG ARGUMENTS OF ks_solver in DFT+U routine, only genelpa and scalapack_gvx are supportted " << std::endl;
 			exit(0);
 		}
 
