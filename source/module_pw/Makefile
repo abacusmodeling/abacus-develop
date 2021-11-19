@@ -38,7 +38,8 @@ pw_basis.o\
 pw_distributer.o\
 pw_gatherscatter.o\
 pw_init.o\
-pw_transform.o
+pw_transform.o\
+pw_distributeg.o
 
 PW_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${PW_OBJS_0})
 

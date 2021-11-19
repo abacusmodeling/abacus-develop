@@ -59,7 +59,7 @@ public:
     int *is2ixy; // is2ixy[is]: ix + iy * nx of is^th stick among sticks on current proc.
     int *ixy2ip; // ixy2ip[ix + iy * nx]: ip of proc which contains stick on (ix, iy).
     int nst; //num. of sticks in current proc.
-    int nstnz;
+    int nstnz; // nst * nz
     int nstot; //num. of sticks in total.
     int npw; //num. of plane waves in current proc.
     //real space
