@@ -302,6 +302,36 @@ void UnitCell::update_pos_tau(const double* pos)
     return;
 }
 
+void UnitCell::update_pos_tau(const ModuleBase::Vector3<double>* posd_in)
+{
+    int iat = 0;
+	for(int it = 0; it < this->ntype; ++it)
+	{
+		Atom* atom = &this->atoms[it];
+		for(int ia = 0; ia < atom->na; ++ia)
+		{		
+			if(atom->mbl[ia].x!=0)
+			{
+				atom->tau[ia].x = posd_in[iat].x / this->lat0;
+			}
+			if(atom->mbl[ia].y!=0)
+			{
+				atom->tau[ia].y = posd_in[iat].y / this->lat0;
+			}
+			if(atom->mbl[ia].z!=0)
+			{
+				atom->tau[ia].z = posd_in[iat].z / this->lat0;
+			}
+
+			// the direct coordinates also need to be updated.
+			atom->taud[ia] = atom->tau[ia] * this->GT;
+			iat++;
+		}
+	}
+	assert(iat == this->nat);
+    return;
+}
+
 void UnitCell::update_pos_taud(const ModuleBase::Vector3<double>* posd_in)
 {
     int iat = 0;

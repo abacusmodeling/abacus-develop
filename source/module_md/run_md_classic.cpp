@@ -24,52 +24,48 @@ void Run_MD_CLASSIC::classic_md_line(void)
 #endif
 	ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
-	// if(INPUT.mdp.mdtype==0)
-	// {
-	// 	NVE verlet;
-	// }
+    // determine the mdtype
+    Verlet *verlet;
+    if(INPUT.mdp.mdtype==0)
+    {
+        verlet = new NVE(INPUT.mdp, ucell_c); 
+    }
+    else if(INPUT.mdp.mdtype==1)
+    {
+        verlet = new NVE(INPUT.mdp, ucell_c); 
+    }
 
-	bool stop = false;
+    bool stop = false;
 
-	NVE verlet(INPUT.mdp, ucell_c);
-	verlet.setup();
+    // md cycle
+    while (verlet->step_ <= (GlobalV::NSTEP + verlet->step_rst_) && !stop)
+    {
+        Print_Info::print_screen(0, 0, verlet->step_);
+        if(verlet->step_ == verlet->step_rst_)
+        {
+            verlet->setup();
+        }
+        else
+        {
+            verlet->first_half();
 
-	return;
+            // update force and virial due to the update of atom positions
+            MD_func::force_virial(verlet->mdp, verlet->ucell, verlet->potential, verlet->force, verlet->stress);
 
-    // while (istep <= GlobalV::NSTEP && !stop)
-    // {
-	// 	time_t fstart = time(NULL);
+            verlet->second_half();
 
-    //     Print_Info::print_screen(0, 0, istep);
+            MD_func::kinetic_stress(verlet->ucell, verlet->vel, verlet->allmass, verlet->kinetic, verlet->stress);
+        }
 
-	// 	this->md_force_stress(potential);
+        verlet->outputMD();
 
-	// 	if (mdtype == 1 || mdtype == 2)
-    //     {
-    //         mdb.runNVT(istep, potential, force, stress);
-    //     }
-    //     else if (mdtype == 0)
-    //     {
-    //         mdb.runNVE(istep, potential, force, stress);
-    //     }
-    //     else if (mdtype == -1)
-    //     {
-    //         stop = mdb.runFIRE(istep, potential, force, stress);
-    //     }
-    //     else
-    //     {
-    //         ModuleBase::WARNING_QUIT("md_cells_classic", "mdtype should be -1~2!");
-    //     }
+        verlet->step_++;
+    }
 
-    //     time_t fend = time(NULL);
-
-	// 	++istep;
-    // }
-
-	// GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
-    // GlobalV::ofs_running << std::setprecision(16);
-    // GlobalV::ofs_running << " !FINAL_ETOT_IS " << potential*ModuleBase::Hartree_to_eV << " eV" << std::endl; 
-    // GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
+	GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
+    GlobalV::ofs_running << std::setprecision(16);
+    GlobalV::ofs_running << " !FINAL_ETOT_IS " << verlet->potential*ModuleBase::Hartree_to_eV << " eV" << std::endl; 
+    GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
     ModuleBase::timer::tick("Run_MD_CLASSIC", "md_cells_classic");
     return;

@@ -13,7 +13,6 @@ class MD_func
 
 	static bool RestartMD(const int& numIon, ModuleBase::Vector3<double>* vel, int& step_rst);
     static void mdRestartOut(const int& step, const int& recordFreq, const int& numIon, ModuleBase::Vector3<double>* vel);
-	static double GetAtomKE(const int& numIon, const ModuleBase::Vector3<double>* vel, const double* allmass);
 	
 	static void InitPos(
 		const UnitCell_pseudo &unit_in, 
@@ -44,6 +43,18 @@ class MD_func
 		const UnitCell_pseudo &unit_in,
 		double &potential,
 		ModuleBase::Vector3<double> *force,
+		ModuleBase::matrix &stress);
+
+	static double GetAtomKE(
+		const int &numIon,
+		const ModuleBase::Vector3<double> *vel, 
+		const double *allmass);
+
+	static void kinetic_stress(
+		const UnitCell_pseudo &unit_in,
+		const ModuleBase::Vector3<double> *vel, 
+		const double *allmass, 
+		double &kinetic,
 		ModuleBase::matrix &stress);
 
 	static void outStress(const UnitCell_pseudo &unit_in, 

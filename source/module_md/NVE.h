@@ -12,6 +12,7 @@ public:
     void setup();
     void first_half();
     void second_half();
+    void outputMD();
 
 };
 

@@ -10,8 +10,10 @@ public:
     Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in);
     ~Verlet();
 
-    //void init();
-    //void setup();
+    virtual void setup();
+    virtual void first_half();
+    virtual void second_half();
+    virtual void outputMD();
 
     MD_parameters &mdp;
 	UnitCell_pseudo &ucell;
@@ -30,6 +32,7 @@ public:
     ModuleBase::Vector3<double> *force;  // force of each atom
 	ModuleBase::matrix stress;           // stress for this lattice
     double potential;                    // potential energy
+    double kinetic;                      // kinetic energy
 
 };
 

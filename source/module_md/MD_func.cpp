@@ -101,20 +101,63 @@ void MD_func::mdRestartOut(const int& step, const int& recordFreq, const int& nu
 	return;
 }
 
-double MD_func::GetAtomKE(const int& numIon, const ModuleBase::Vector3<double>* vel, const double * allmass){
+double MD_func::GetAtomKE(
+		const int &numIon,
+		const ModuleBase::Vector3<double> *vel, 
+		const double *allmass)
+{
+	double ke = 0;
+
+	for(int ion=0; ion<numIon; ++ion)
+	{
+		ke += 0.5 * allmass[ion] * vel[ion].norm2();
+	}
+
+	return ke;
+}
+
+void MD_func::kinetic_stress(
+		const UnitCell_pseudo &unit_in,
+		const ModuleBase::Vector3<double> *vel, 
+		const double *allmass, 
+		double &kinetic,
+		ModuleBase::matrix &stress)
+{
 //---------------------------------------------------------------------------
 // DESCRIPTION:
-//   This function calculates the classical kinetic energy of a group of atoms.
+//   This function calculates the classical kinetic energy of atoms
+//   and its contribution to stress.
 //----------------------------------------------------------------------------
 
-	double ke = 0.0;
+	kinetic = MD_func::GetAtomKE(unit_in.nat, vel, allmass);
 
-	// kinetic energy = \sum_{i} 1/2*m_{i}*(vx^2+vy^2+vz^2)
-	for(int ion=0;ion<numIon;ion++){
-		ke +=   0.5 * allmass[ion] * (vel[ion].x*vel[ion].x+vel[ion].y*vel[ion].y+vel[ion].z*vel[ion].z);
+	ModuleBase::matrix temp;
+	temp.create(3,3);    // initialize
+
+	for(int ion=0; ion<unit_in.nat; ++ion)
+	{
+		temp(0, 0) += allmass[ion] * vel[ion].x * vel[ion].x;
+		temp(0, 1) += allmass[ion] * vel[ion].x * vel[ion].y;
+		temp(0, 2) += allmass[ion] * vel[ion].x * vel[ion].z;
+		temp(1, 1) += allmass[ion] * vel[ion].y * vel[ion].y;
+		temp(1, 2) += allmass[ion] * vel[ion].y * vel[ion].z;
+		temp(2, 2) += allmass[ion] * vel[ion].z * vel[ion].z;
 	}
-	//std::cout<<"in GetAtomKE KE="<< ke<<std::endl;
-	return ke;
+
+	for(int i=0; i<3; ++i)
+	{
+		for(int j=0; j<3; ++j)
+		{
+			if(j<i) 
+			{
+				stress(i, j) = stress(j, i);
+			}
+			else
+			{
+				stress(i, j) += temp(i, j)/unit_in.omega;
+			}
+		}
+	}
 }
 
 // Read Velocity from STRU liuyu 2021-09-24
@@ -217,8 +260,6 @@ void MD_func::InitVel(
 	ModuleBase::Vector3<int>* ionmbl,
 	ModuleBase::Vector3<double>* vel)
 {
-	//frozen_freedom = getMassMbl(unit_in, allmass, ionmbl);
-
 	if(unit_in.set_vel)
     {
         ReadVel(unit_in, vel);
@@ -234,10 +275,11 @@ void MD_func::InitPos(
 	ModuleBase::Vector3<double>* pos)
 {
 	int ion=0;
-	for(int it=0;it<unit_in.ntype;it++){
+	for(int it=0;it<unit_in.ntype;it++)
+	{
 		for(int i=0;i<unit_in.atoms[it].na;i++)
 		{
-			pos[ion]=unit_in.atoms[it].tau[i];
+			pos[ion] = unit_in.atoms[it].tau[i]*unit_in.lat0;
 			ion++;
 		}
 	}
@@ -308,6 +350,10 @@ void MD_func::force_virial(const MD_parameters &mdp,
 	{
 		for(int ia=0; ia<unit_in.atoms[it].na; ++ia)
 		{
+			// if(unit_in.atoms[it].mbl[ia].x==0) force[iat].x=0;
+			// if(unit_in.atoms[it].mbl[ia].y==0) force[iat].y=0;
+			// if(unit_in.atoms[it].mbl[ia].z==0) force[iat].z=0;
+
 			std::stringstream ss;
 			ss << unit_in.atoms[it].label << ia+1;
 			GlobalV::ofs_running << " " << std::left << std::setw(8) << ss.str()
@@ -332,12 +378,31 @@ void MD_func::outStress(const UnitCell_pseudo &unit_in,
     {
         press += stress(i,i)/3;
     }
-    double virial = press;
-    press += 2*kenetic/3/unit_in.omega; //output virtual press = 2/3 *Ek/V + sum(sigma[i][i])/3
+    double virial = press-2*kenetic/3/unit_in.omega;
     const double unit_transform = ModuleBase::HARTREE_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
     GlobalV::ofs_running<<"Virtual Pressure is "<<press*unit_transform<<" Kbar "<<std::endl;
     GlobalV::ofs_running<<"Virial Term is "<<virial*unit_transform<<" Kbar "<<std::endl;
     GlobalV::ofs_running<<"Kenetic Term is "<<(press-virial)*unit_transform<<" Kbar "<<std::endl;
+
+	//const double unit_transform = ModuleBase::HARTREE_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
+	GlobalV::ofs_running << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed) << std::endl;
+	// std::cout << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed) << std::endl;
+	ModuleBase::GlobalFunc::NEW_PART("TOTAL-STRESS (KBAR)");
+    // std::cout << " ><><><><><><><><><><><><><><><><><><><><><><" << std::endl;
+    // std::cout << " TOTAL-STRESS (KBAR):" << std::endl;
+    // std::cout << " ><><><><><><><><><><><><><><><><><><><><><><" << std::endl;
+
+	for (int i=0; i<3; i++)
+	{
+		// std::cout << " " << std::setw(15) << stress(i,0)*unit_transform << std::setw(15)
+		// 	<< stress(i,1)*unit_transform << std::setw(15) << stress(i,2)*unit_transform << std::endl;
+
+		GlobalV::ofs_running << " " << std::setw(15) << stress(i,0)*unit_transform << std::setw(15)
+			<< stress(i,1)*unit_transform << std::setw(15) << stress(i,2)*unit_transform << std::endl;
+
+	}
+	GlobalV::ofs_running << std::setiosflags(ios::left);
+	// std::cout << std::resetiosflags(ios::showpos);
 }
 
 /*

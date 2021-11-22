@@ -22,7 +22,6 @@ Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
 	mdp.sigma_lj *= ModuleBase::ANGSTROM_AU;
 
     step_rst_=0;
-    step_=0;
 
     frozen_freedom_ = MD_func::getMassMbl(ucell, mdp, allmass, ionmbl);
     MD_func::InitPos(ucell, pos);
@@ -39,6 +38,8 @@ Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     {
         MD_func::InitVel(ucell, temperature_, allmass, frozen_freedom_, ionmbl, vel);
     }
+
+    step_=step_rst_;
 }
 
 Verlet::~Verlet()
@@ -49,3 +50,11 @@ Verlet::~Verlet()
     delete []ionmbl;
     delete []force;
 }
+
+void Verlet::setup(){}
+
+void Verlet::first_half(){}
+
+void Verlet::second_half(){}
+
+void Verlet::outputMD(){}

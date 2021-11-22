@@ -422,6 +422,21 @@ void UnitCell_pseudo::setup_cell_classic(
 		ModuleBase::GlobalFunc::OUT(ofs_running,"Volume (A^3)", this->omega * pow(ModuleBase::BOHR_TO_A, 3));
 	}
 
+	//==========================================================
+	// Calculate recip. lattice vectors and dot products
+	// latvec have the unit of lat0, but G has the unit 2Pi/lat0
+	//==========================================================
+	this->GT = latvec.Inverse();
+	this->G  = GT.Transpose();
+	this->GGT = G * GT;
+	this->invGGT = GGT.Inverse();
+
+    //LiuXh add 20180515
+    this->GT0 = latvec.Inverse();
+    this->G0  = GT.Transpose();
+    this->GGT0 = G * GT;
+    this->invGGT0 = GGT.Inverse();
+
 	this->set_iat2itia();
 }
 
