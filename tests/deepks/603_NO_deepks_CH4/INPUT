@@ -9,7 +9,7 @@ symmetry		0
 
 #Parameters (2.Iteration)
 ecutwfc			50
-dr2			1e-7
+dr2			1e-8
 niter			50
 
 #Parameters (3.Basis)
