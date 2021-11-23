@@ -11,4 +11,5 @@ add_library(
     cmd_neighbor.cpp
 	verlet.cpp
 	NVE.cpp
+    MSST.cpp
 )

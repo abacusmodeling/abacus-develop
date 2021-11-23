@@ -1270,6 +1270,22 @@ bool Input::Read(const std::string &fn)
 		{
 			read_value(ifs, mdp.md_potential);
 		}
+		else if (strcmp("direction",word) == 0)
+		{
+			read_value(ifs, mdp.direction);
+		}
+		else if (strcmp("velocity",word) == 0)
+		{
+			read_value(ifs, mdp.velocity);
+		}
+		else if (strcmp("viscosity",word) == 0)
+		{
+			read_value(ifs, mdp.viscosity);
+		}
+		else if (strcmp("tscale",word) == 0)
+		{
+			read_value(ifs, mdp.tscale);
+		}
 //----------------------------------------------------------
 // tddft
 // Fuxiang He add 2016-10-26
@@ -2284,6 +2300,10 @@ void Input::Bcast()
 		Parallel_Common::bcast_double(mdp.epsilon_lj);
 		Parallel_Common::bcast_double(mdp.sigma_lj);
 		Parallel_Common::bcast_string(mdp.md_potential);
+		Parallel_Common::bcast_int(mdp.direction);
+		Parallel_Common::bcast_double(mdp.velocity);
+		Parallel_Common::bcast_double(mdp.viscosity);
+		Parallel_Common::bcast_double(mdp.tscale);
 /* 	// Peize Lin add 2014-04-07
 	Parallel_Common::bcast_bool( vdwD2 );
 	Parallel_Common::bcast_double( vdwD2_scaling );

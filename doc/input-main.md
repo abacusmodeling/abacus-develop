@@ -43,7 +43,7 @@
 
     - [Molecular dynamics](#molecular-dynamics)
 
-        [md_type](#md-type) | [md_potential](#md-potential) | [md_rstmd](#md-rstmd) | [md_dt](#md_dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_dumpmdfred](#md-dumpmdfred) | [md_fixtemperature](#md-fixtemperature) | [NVT_control](#nvt-control) | [NVT_tau](#nvt-tau) | [MNHC](#mnhc) | [md_ediff](#md-ediff) | [md_ediffg](#md-ediffg) | [rcut_lj](#rcut_lj) | [epsilon_lj](#epsilon_lj) | [sigma_lj](#sigma_lj)
+        [md_type](#md-type) | [md_potential](#md-potential) | [md_rstmd](#md-rstmd) | [md_dt](#md_dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_dumpmdfred](#md-dumpmdfred) | [md_fixtemperature](#md-fixtemperature) | [NVT_control](#nvt-control) | [NVT_tau](#nvt-tau) | [MNHC](#mnhc) | [md_ediff](#md-ediff) | [md_ediffg](#md-ediffg) | [rcut_lj](#rcut_lj) | [epsilon_lj](#epsilon_lj) | [sigma_lj](#sigma_lj) | [direction](#direction) | [velocity](#velocity) | [viscosity](#viscosity) | [tscale](#tscale)
 
     - [DFT+U correction](#DFT_U-correction)
 
@@ -1171,6 +1171,35 @@ This part of variables are used to control the molecular dynamics calculations.
     - *Default*: 3.405 (for He)
 
     [back to top](#input-file)
+
+- direction<a id="direction"></a>
+    - *Type*: Integer
+    - *Description*: the direction of shock wave
+    - *Default*: 2 (z direction)
+
+    [back to top](#input-file)
+
+- velocity<a id="velocity"></a>
+    - *Type*: Real
+    - *Description*: the velocity of shock wave (\AA/fs)
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+- viscosity<a id="viscosity"></a>
+    - *Type*: Real
+    - *Description*: artificial viscosity (mass/length/time)
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+- tscale<a id="tscale"></a>
+    - *Type*: Real
+    - *Description*: reduction in initial temperature (0~1) used to compress volume 
+    - *Default*: 0
+
+    [back to top](#input-file)
+
 
 ### DFT+U correction
 This part of variables are used to control DFT+U correlated parameters

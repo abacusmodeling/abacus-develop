@@ -17,6 +17,7 @@ DP_potential.o\
 cmd_neighbor.o\
 verlet.o\
 NVE.o\
+MSST.o\
 
 OBJS_BASE=matrix3.o\
 matrix.o\

@@ -14,8 +14,6 @@ void NVE::setup()
     MD_func::force_virial(mdp, ucell, potential, force, stress);
     MD_func::kinetic_stress(ucell, vel, allmass, kinetic, stress);
 
-    temperature_ = 2*kinetic/(double(3*ucell.nat-frozen_freedom_))*ModuleBase::Hartree_to_K;
-
     ModuleBase::timer::tick("NVE", "setup");
 }
 
@@ -77,6 +75,8 @@ void NVE::outputMD()
 {
     ModuleBase::TITLE("NVE", "outputMD");
     ModuleBase::timer::tick("NVE", "outputMD");
+
+    temperature_ = 2*kinetic/(double(3*ucell.nat-frozen_freedom_))*ModuleBase::Hartree_to_K;
 
     const double unit_transform = ModuleBase::HARTREE_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
     double press = 0.0;

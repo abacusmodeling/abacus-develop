@@ -1,11 +1,9 @@
 #include "run_md_classic.h"
 #include "MD_basic.h"
-#include "LJ_potential.h"
-#include "DP_potential.h"
-#include "cmd_neighbor.h"
-#include "../src_io/print_info.h"
-#include "../input.h"
 #include "NVE.h"
+#include "MSST.h"
+#include "../input.h"
+#include "../src_io/print_info.h"
 
 Run_MD_CLASSIC::Run_MD_CLASSIC(){}
 
@@ -33,6 +31,10 @@ void Run_MD_CLASSIC::classic_md_line(void)
     else if(INPUT.mdp.mdtype==1)
     {
         verlet = new NVE(INPUT.mdp, ucell_c); 
+    }
+    else if(INPUT.mdp.mdtype==4)
+    {
+        verlet = new MSST(INPUT.mdp, ucell_c); 
     }
 
     bool stop = false;
