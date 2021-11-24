@@ -269,8 +269,8 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool
 		case 3: ModuleBase::Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 100000.0, 100000.0, y2); break;
 		case 4: ModuleBase::Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
 		default: 
-			GlobalV::ofs_warning << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << std::endl;
-			GlobalV::ofs_warning << " Check file " << __FILE__ << " line " << __LINE__ <<std::endl;
+			//GlobalV::ofs_warning << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << std::endl;
+			//GlobalV::ofs_warning << " Check file " << __FILE__ << " line " << __LINE__ <<std::endl;
 			//std::cout << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << std::endl;
 			//std::cout << " Check file " << __FILE__ << " line " << __LINE__ <<std::endl;
 			ModuleBase::Mathzone_Add1::SplineD2 (ModuleBase::GlobalFunc::VECTOR_TO_PTR(r_radial), ModuleBase::GlobalFunc::VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
