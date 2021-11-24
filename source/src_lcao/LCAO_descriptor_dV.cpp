@@ -515,9 +515,9 @@ void LCAO_Descriptor::cal_f_delta_hf_new(const ModuleBase::matrix& dm, const boo
 
                                 for(int ipol=0;ipol<3;ipol++)
                                 {
-                                    svnl_dalpha(0,ipol) -= dm(iw1_local, iw2_local) * (nlm[0] * r0[ipol] + nlm_t[0] * r1[ipol])* -1;
-                                    svnl_dalpha(1,ipol) -= dm(iw1_local, iw2_local) * (nlm[1] * r0[ipol] + nlm_t[1] * r1[ipol])* -1;
-                                    svnl_dalpha(2,ipol) -= dm(iw1_local, iw2_local) * (nlm[2] * r0[ipol] + nlm_t[2] * r1[ipol])* -1;
+                                    svnl_dalpha(0,ipol) -= dm(iw1_local, iw2_local) * (nlm[0] * r0[ipol] + nlm_t[0] * r1[ipol])* -1.0;
+                                    svnl_dalpha(1,ipol) -= dm(iw1_local, iw2_local) * (nlm[1] * r0[ipol] + nlm_t[1] * r1[ipol])* -1.0;
+                                    svnl_dalpha(2,ipol) -= dm(iw1_local, iw2_local) * (nlm[2] * r0[ipol] + nlm_t[2] * r1[ipol])* -1.0;
                                 }
                             }
                         }//iw2
@@ -760,9 +760,9 @@ void LCAO_Descriptor::cal_f_delta_hf_k_new(const std::vector<ModuleBase::Complex
                                     const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );                                    
                                     for(int ipol=0;ipol<3;ipol++)
                                     {
-                                        svnl_dalpha_k(0,ipol) -= dm[ik](iw1_local, iw2_local) * kphase * (nlm[0] * r0[ipol] + nlm_t[0] * r1[ipol])* -1;
-                                        svnl_dalpha_k(1,ipol) -= dm[ik](iw1_local, iw2_local) * kphase * (nlm[1] * r0[ipol] + nlm_t[1] * r1[ipol])* -1;
-                                        svnl_dalpha_k(2,ipol) -= dm[ik](iw1_local, iw2_local) * kphase * (nlm[2] * r0[ipol] + nlm_t[2] * r1[ipol])* -1;
+                                        svnl_dalpha_k(0,ipol) -= dm[ik](iw1_local, iw2_local) * kphase * (nlm[0] * r0[ipol] + nlm_t[0] * r1[ipol])* -1.0;
+                                        svnl_dalpha_k(1,ipol) -= dm[ik](iw1_local, iw2_local) * kphase * (nlm[1] * r0[ipol] + nlm_t[1] * r1[ipol])* -1.0;
+                                        svnl_dalpha_k(2,ipol) -= dm[ik](iw1_local, iw2_local) * kphase * (nlm[2] * r0[ipol] + nlm_t[2] * r1[ipol])* -1.0;
                                     }
                                 }
                             }
