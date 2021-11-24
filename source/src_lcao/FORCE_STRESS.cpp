@@ -316,12 +316,38 @@ void Force_Stress_LCAO::getForceStress(
 				{
                 	GlobalC::ld.save_npy_f(fcs - GlobalC::ld.F_delta, "f_base.npy"); //Ry/Bohr, F_base
 				}
-				if(GlobalV::GAMMA_ONLY_LOCAL && GlobalV::NPROC<=1)
+
+				if(GlobalV::GAMMA_ONLY_LOCAL)
 				{
 					GlobalC::ld.cal_gvx(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
-					GlobalC::ld.save_npy_gvx();//  /Bohr, grad_vx
+					if(GlobalV::MY_RANK==0)
+					{
+						GlobalC::ld.save_npy_gvx();//  /Bohr, grad_vx
+					}
 				}
-				//multi-k not implemented yet
+				else
+				{
+					if(GlobalV::NPOOL!=1)
+					{
+						ModuleBase::WARNING_QUIT("opt_ions","deepks not compatible with npool>1 now");
+					}
+					ModuleBase::ComplexMatrix dm_k_all;
+					dm_k_all.create(GlobalC::LOC.wfc_dm_2d.dm_k[0].nr, GlobalC::LOC.wfc_dm_2d.dm_k[0].nc);
+					for(int ik=0;ik<GlobalC::kv.nks;ik++)
+					{
+						ModuleBase::scale_accumulate(1.0,GlobalC::LOC.wfc_dm_2d.dm_k[ik],dm_k_all);
+					}
+					if(!dm_k_all.checkreal())
+					{
+						ModuleBase::WARNING_QUIT("opt_ions","accumulated density matrix not real!!");
+					}
+					
+					GlobalC::ld.cal_gvx(dm_k_all.dble());
+					if(GlobalV::MY_RANK==0)
+					{
+						GlobalC::ld.save_npy_gvx();//  /Bohr, grad_vx
+					}
+				}
             }
             else
             {

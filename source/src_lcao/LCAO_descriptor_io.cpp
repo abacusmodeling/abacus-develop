@@ -65,58 +65,61 @@ void LCAO_Descriptor::cal_gvx(const ModuleBase::matrix &dm)
     this->init_gdmx();
     this->cal_gdmx(dm); //checked
 
-    //make gdmx as tensor
-    int nlmax = this->inlmax/GlobalC::ucell.nat;
-    for (int nl=0;nl<nlmax;++nl)
+    if(GlobalV::MY_RANK==0)
     {
-        std::vector<torch::Tensor> bmmv;
-        for (int ibt=0;ibt<GlobalC::ucell.nat;++ibt)
+        //make gdmx as tensor
+        int nlmax = this->inlmax/GlobalC::ucell.nat;
+        for (int nl=0;nl<nlmax;++nl)
         {
-            std::vector<torch::Tensor> xmmv;
-            for (int i=0;i<3;++i)
+            std::vector<torch::Tensor> bmmv;
+            for (int ibt=0;ibt<GlobalC::ucell.nat;++ibt)
             {
-                std::vector<torch::Tensor> ammv;
-                for (int iat=0; iat<GlobalC::ucell.nat; ++iat)
+                std::vector<torch::Tensor> xmmv;
+                for (int i=0;i<3;++i)
                 {
-                    int inl = iat*nlmax + nl;
-                    int nm = 2*this->inl_l[inl]+1;
-                    std::vector<double> mmv;
-                    for (int m1=0;m1<nm;++m1)
+                    std::vector<torch::Tensor> ammv;
+                    for (int iat=0; iat<GlobalC::ucell.nat; ++iat)
                     {
-                        for(int m2=0;m2<nm;++m2)
+                        int inl = iat*nlmax + nl;
+                        int nm = 2*this->inl_l[inl]+1;
+                        std::vector<double> mmv;
+                        for (int m1=0;m1<nm;++m1)
                         {
-                            if(i==0) mmv.push_back(this->gdmx[ibt][inl][m1*nm+m2]);
-                            if(i==1) mmv.push_back(this->gdmy[ibt][inl][m1*nm+m2]);
-                            if(i==2) mmv.push_back(this->gdmz[ibt][inl][m1*nm+m2]);
-                        }
-                    }//nm^2
-                    torch::Tensor mm = torch::tensor(mmv, torch::TensorOptions().dtype(torch::kFloat64) ).reshape({nm, nm});    //nm*nm
-                    ammv.push_back(mm);
+                            for(int m2=0;m2<nm;++m2)
+                            {
+                                if(i==0) mmv.push_back(this->gdmx[ibt][inl][m1*nm+m2]);
+                                if(i==1) mmv.push_back(this->gdmy[ibt][inl][m1*nm+m2]);
+                                if(i==2) mmv.push_back(this->gdmz[ibt][inl][m1*nm+m2]);
+                            }
+                        }//nm^2
+                        torch::Tensor mm = torch::tensor(mmv, torch::TensorOptions().dtype(torch::kFloat64) ).reshape({nm, nm});    //nm*nm
+                        ammv.push_back(mm);
+                    }
+                    torch::Tensor amm = torch::stack(ammv, 0);  //nat*nm*nm
+                    xmmv.push_back(amm);
                 }
-                torch::Tensor amm = torch::stack(ammv, 0);  //nat*nm*nm
-                xmmv.push_back(amm);
+                torch::Tensor bmm = torch::stack(xmmv, 0);  //3*nat*nm*nm
+                bmmv.push_back(bmm); 
             }
-            torch::Tensor bmm = torch::stack(xmmv, 0);  //3*nat*nm*nm
-            bmmv.push_back(bmm); 
+            this->gdmr_vector.push_back(torch::stack(bmmv, 0)); //nbt*3*nat*nm*nm
         }
-        this->gdmr_vector.push_back(torch::stack(bmmv, 0)); //nbt*3*nat*nm*nm
+        assert(this->gdmr_vector.size()==nlmax);
+
+        //einsum for each inl: 
+        std::vector<torch::Tensor> gvx_vector;
+        for (int nl = 0;nl<nlmax;++nl)
+        {
+            gvx_vector.push_back(at::einsum("bxamn, avmn->bxav", {this->gdmr_vector[nl], this->gevdm_vector[nl]}));
+        }//
+        
+        // cat nv-> \sum_nl(nv) = \sum_nl(nm_nl)=des_per_atom
+        this->gvx_tensor = torch::cat(gvx_vector, -1);
+
+        assert(this->gvx_tensor.size(0) == GlobalC::ucell.nat);
+        assert(this->gvx_tensor.size(1) == 3);
+        assert(this->gvx_tensor.size(2) == GlobalC::ucell.nat);
+        assert(this->gvx_tensor.size(3) == this->des_per_atom);
     }
-    assert(this->gdmr_vector.size()==nlmax);
-
-    //einsum for each inl: 
-    std::vector<torch::Tensor> gvx_vector;
-    for (int nl = 0;nl<nlmax;++nl)
-    {
-        gvx_vector.push_back(at::einsum("bxamn, avmn->bxav", {this->gdmr_vector[nl], this->gevdm_vector[nl]}));
-    }//
-    
-    // cat nv-> \sum_nl(nv) = \sum_nl(nm_nl)=des_per_atom
-    this->gvx_tensor = torch::cat(gvx_vector, -1);
-
-    assert(this->gvx_tensor.size(0) == GlobalC::ucell.nat);
-    assert(this->gvx_tensor.size(1) == 3);
-    assert(this->gvx_tensor.size(2) == GlobalC::ucell.nat);
-    assert(this->gvx_tensor.size(3) == this->des_per_atom);
 
     return;
 }
