@@ -253,6 +253,7 @@ void Input::Default(void)
 
     out_potential = 0;
     out_wf = 0;
+    out_wf_r = 0;
 	out_dos = 0;
     out_band = 0;
 	out_hs = 0;
@@ -1060,6 +1061,10 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("out_wf", word) == 0)
         {
             read_value(ifs, out_wf);
+        }
+        else if (strcmp("out_wf_r", word) == 0)
+        {
+            read_value(ifs, out_wf_r);
         }
 		//mohan add 20090909
         else if (strcmp("out_dos", word) == 0)
@@ -2227,6 +2232,7 @@ void Input::Bcast()
 
 	Parallel_Common::bcast_int(out_potential);
     Parallel_Common::bcast_int( out_wf );
+    Parallel_Common::bcast_int( out_wf_r );
 	Parallel_Common::bcast_int( out_dos );
         Parallel_Common::bcast_int( out_band );
 	Parallel_Common::bcast_int( out_hs );
