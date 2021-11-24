@@ -77,15 +77,6 @@ void Stress_Func::printstress_total(const ModuleBase::matrix& scs, bool ry)
 //        if(INPUT.stress_set == 1)
 //        int GlobalV::TEST_STRESS = 1;
 
- 	if(GlobalV::TEST_STRESS) 
-	{
-		std::cout << std::fixed << std::setprecision(6);
-		std::cout << std::setiosflags(ios::showpos);
-		std::cout << " ------------------- TOTAL      STRESS --------------------" << std::endl;
-    	std::cout << " " << std::setw(8) << "STRESS" << std::endl;
-    	GlobalV::ofs_running << " " << std::setw(12) << "STRESS" << std::endl;
-	}
-
     
 	for (int i=0; i<3; i++)
 	{

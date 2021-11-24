@@ -315,6 +315,8 @@ void Gint_k::folding_force(
 // fold the <phi | vl * R_beta|dphi(R_alpha)> * DM(R) to 
 // calculate the stress.
 void Gint_k::folding_stress(
+	const bool isforce,
+	const bool isstress,
 	ModuleBase::matrix& fvl_dphi, 
 	ModuleBase::matrix& svl_dphi,
 	double* pvdpx, 
@@ -328,245 +330,351 @@ void Gint_k::folding_stress(
 	double* pvdp23)
 {
 	ModuleBase::TITLE("Gint_k","folding_stress");
-	ModuleBase::timer::tick("Gint_k","folding_stress");
+	if(!isforce&&!isstress) return;
 
 	const int lgd = GlobalC::GridT.lgd;
 
-	double** ppx;
-	double** ppy;
-	double** ppz;
-
-	double** pp11;
-	double** pp22;
-	double** pp33;
-	double** pp12;
-	double** pp13;
-	double** pp23;
-
-	double r0[3],rt[3];
-
-	if(GlobalC::GridT.lgd>0)
+	if(isforce)
 	{
-		ppx = new double*[lgd];
-		ppy = new double*[lgd];
-		ppz = new double*[lgd];
+		ModuleBase::timer::tick("Gint_k","folding_force");
 
-		pp11 = new double*[lgd];
-		pp22 = new double*[lgd];
-		pp33 = new double*[lgd];
-		pp12 = new double*[lgd];
-		pp13 = new double*[lgd];
-		pp23 = new double*[lgd];
-
-		for(int i=0; i<lgd; i++)
+		double** ppx;
+		double** ppy;
+		double** ppz;
+		if(lgd>0)
 		{
-			ppx[i] = new double[lgd];
-			ppy[i] = new double[lgd];
-			ppz[i] = new double[lgd];
-			ModuleBase::GlobalFunc::ZEROS( ppx[i], lgd);
-			ModuleBase::GlobalFunc::ZEROS( ppy[i], lgd);
-			ModuleBase::GlobalFunc::ZEROS( ppz[i], lgd);
-
-			pp11[i] = new double[lgd];
-			pp22[i] = new double[lgd];
-			pp33[i] = new double[lgd];
-			ModuleBase::GlobalFunc::ZEROS( pp11[i], lgd);
-			ModuleBase::GlobalFunc::ZEROS( pp22[i], lgd);
-			ModuleBase::GlobalFunc::ZEROS( pp33[i], lgd);
-			pp12[i] = new double[lgd];
-			pp13[i] = new double[lgd];
-			pp23[i] = new double[lgd];
-			ModuleBase::GlobalFunc::ZEROS( pp12[i], lgd);
-			ModuleBase::GlobalFunc::ZEROS( pp13[i], lgd);
-			ModuleBase::GlobalFunc::ZEROS( pp23[i], lgd);
-
-		}
-	}
-	ModuleBase::Vector3<double> tau1, dtau;
-	for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
-	{
-		const Atom* atom1 = &GlobalC::ucell.atoms[T1];
-                
-		for (int I1 =0; I1< atom1->na; ++I1)
-		{
-			const int iat = GlobalC::ucell.itia2iat(T1,I1);
-			if(GlobalC::GridT.in_this_processor[iat])
+			ppx = new double*[lgd];
+			ppy = new double*[lgd];
+			ppz = new double*[lgd];
+			for(int i=0; i<lgd; i++)
 			{
-				assert( lgd > 0 );
-
-				const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
-				// get the start positions of elements.
-				const int DM_start = GlobalC::LNNR.nlocstartg[iat];
-				// get the coordinates of adjacent atoms.
-				tau1 = atom1->tau[I1];
-				//GlobalC::GridD.Find_atom(tau1);
-				GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
-				// search for the adjacent atoms.
-				int nad = 0;
-				for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ++ad)
-				{
-					// get iat2
-					const int T2 = GlobalC::GridD.getType(ad);
-					const int I2 = GlobalC::GridD.getNatom(ad);
-
-					const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad);
-					const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
-					if(GlobalC::GridT.in_this_processor[iat2])
-					{
-						Atom* atom2 = &GlobalC::ucell.atoms[T2];
-						dtau = GlobalC::GridD.getAdjacentTau(ad) - tau1;
-						double distance = dtau.norm() * GlobalC::ucell.lat0;
-						double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
-						if(distance < rcut)
-						{
-							const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-							int ixxx = DM_start + GlobalC::LNNR.find_R2st[iat][nad];
-							for(int iw=0; iw<atom1->nw; iw++)
-							{
-								const int iw_all = start1+iw;
-								const int iw_local = GlobalC::GridT.trace_lo[iw_all];
-								// iw1_lo
-								double *vijx = ppx[iw_local];
-								double *vijy = ppy[iw_local];
-								double *vijz = ppz[iw_local];
-
-								double *vij11 = pp11[iw_local];
-								double *vij22 = pp22[iw_local];
-								double *vij33 = pp33[iw_local];
-								double *vij12 = pp12[iw_local];
-								double *vij13 = pp13[iw_local];
-								double *vij23 = pp23[iw_local];
-
-								//just fold R to normal matrix.
-								double *vRx = &pvdpx[ixxx];
-								double *vRy = &pvdpy[ixxx];
-								double *vRz = &pvdpz[ixxx];
-
-								double *vR11 = &pvdp11[ixxx]; 
-								double *vR22 = &pvdp22[ixxx];
-								double *vR33 = &pvdp33[ixxx];
-								double *vR12 = &pvdp12[ixxx]; 
-								double *vR13 = &pvdp13[ixxx];
-								double *vR23 = &pvdp23[ixxx];
-
-
-								int* iw2_lo = &GlobalC::GridT.trace_lo[start2];
-								int* iw2_end = iw2_lo + atom2->nw;
-
-								for(; iw2_lo<iw2_end; ++iw2_lo, ++vRx, ++vRy, ++vRz,++vR11, 
-									++vR22,++vR33,++vR12,++vR13,++vR23)
-								{
-									vijx[iw2_lo[0]] += vRx[0];
-									vijy[iw2_lo[0]] += vRy[0];
-									vijz[iw2_lo[0]] += vRz[0];
-
-									vij11[iw2_lo[0]] += vR11[0];
-									vij22[iw2_lo[0]] += vR22[0];
-									vij33[iw2_lo[0]] += vR33[0];
-									vij12[iw2_lo[0]] += vR12[0];
-									vij13[iw2_lo[0]] += vR13[0];
-									vij23[iw2_lo[0]] += vR23[0];
-
-								}
-								ixxx += atom2->nw;
-							}
-							++nad;
-						}//end distance<rcut
-					}
-				}//end ad
+				ppx[i] = new double[lgd];
+				ppy[i] = new double[lgd];
+				ppz[i] = new double[lgd];
+				ModuleBase::GlobalFunc::ZEROS( ppx[i], lgd);
+				ModuleBase::GlobalFunc::ZEROS( ppy[i], lgd);
+				ModuleBase::GlobalFunc::ZEROS( ppz[i], lgd);
 			}
-		}//end ia
-	}//end it
-
-	double* tmp = new double[GlobalV::NLOCAL*3];
-	double* tmp1 = new double[GlobalV::NLOCAL*6];
-	for(int i=0; i<GlobalV::NLOCAL; ++i)
-	{
-		ModuleBase::GlobalFunc::ZEROS(tmp, 3*GlobalV::NLOCAL);
-		ModuleBase::GlobalFunc::ZEROS(tmp1, 6*GlobalV::NLOCAL);
-		const int mug = GlobalC::GridT.trace_lo[i];
-		// if the row element is on this processor
-		if(mug>=0)
+		}
+		ModuleBase::Vector3<double> tau1, dtau;
+		for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
 		{
-			//GlobalV::ofs_running << " i=" << i << " mug=" << mug << std::endl;
-			for(int j=0; j<GlobalV::NLOCAL; ++j)
+			const Atom* atom1 = &GlobalC::ucell.atoms[T1];
+					
+			for (int I1 =0; I1< atom1->na; ++I1)
 			{
-				const int nug = GlobalC::GridT.trace_lo[j];
-				// if the col element is on this process or
-				if(nug>=0)
+				const int iat = GlobalC::ucell.itia2iat(T1,I1);
+				if(GlobalC::GridT.in_this_processor[iat])
 				{
+					assert( lgd > 0 );
+
+					const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
+					// get the start positions of elements.
+					const int DM_start = GlobalC::LNNR.nlocstartg[iat];
+					// get the coordinates of adjacent atoms.
+					tau1 = atom1->tau[I1];
+					//GlobalC::GridD.Find_atom(tau1);
+					GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+					// search for the adjacent atoms.
+					int nad = 0;
+					for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ++ad)
+					{
+						// get iat2
+						const int T2 = GlobalC::GridD.getType(ad);
+						const int I2 = GlobalC::GridD.getNatom(ad);
+
+						const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad);
+						const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
+						if(GlobalC::GridT.in_this_processor[iat2])
+						{
+							Atom* atom2 = &GlobalC::ucell.atoms[T2];
+							dtau = GlobalC::GridD.getAdjacentTau(ad) - tau1;
+							double distance = dtau.norm() * GlobalC::ucell.lat0;
+							double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
+							if(distance < rcut)
+							{
+								const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
+
+								//index for iteration below
+								const int* iw2_lo = &GlobalC::GridT.trace_lo[start2];
+								const int* iw2_end = iw2_lo + atom2->nw;
+
+								int ixxx = DM_start + GlobalC::LNNR.find_R2st[iat][nad];
+								for(int iw=0; iw<atom1->nw; iw++)
+								{
+									const int iw_all = start1+iw;
+									const int iw_local = GlobalC::GridT.trace_lo[iw_all];
+									// iw1_lo
+									double *vijx = ppx[iw_local];
+									double *vijy = ppy[iw_local];
+									double *vijz = ppz[iw_local];
+
+									//just fold R to normal matrix.
+									double *vRx = &pvdpx[ixxx];
+									double *vRy = &pvdpy[ixxx];
+									double *vRz = &pvdpz[ixxx];
+
+									for(auto iteration=iw2_lo; iteration<iw2_end; ++iteration, ++vRx, ++vRy, ++vRz)
+									{
+										vijx[iteration[0]] += vRx[0];
+										vijy[iteration[0]] += vRy[0];
+										vijz[iteration[0]] += vRz[0];
+									}
+
+									ixxx += atom2->nw;
+								}
+								++nad;
+							}//end distance<rcut
+						}
+					}//end ad
+				}
+			}//end ia
+		}//end it
+
+		double* tmp = new double[GlobalV::NLOCAL*3];
+		for(int i=0; i<GlobalV::NLOCAL; ++i)
+		{
+			ModuleBase::GlobalFunc::ZEROS(tmp, 3*GlobalV::NLOCAL);
+			const int mug = GlobalC::GridT.trace_lo[i];
+			// if the row element is on this processor
+			if(mug>=0)
+			{
+				//GlobalV::ofs_running << " i=" << i << " mug=" << mug << std::endl;
+				for(int j=0; j<GlobalV::NLOCAL; ++j)
+				{
+					const int nug = GlobalC::GridT.trace_lo[j];
+					// if the col element is on this process or
+					if(nug>=0)
+					{
 						const int index = 3*j;
 						tmp[index] = ppx[mug][nug];
 						tmp[index+1] = ppy[mug][nug];
 						tmp[index+2] = ppz[mug][nug];
-
-						const int index1 = 6*j;
-						tmp1[index1] = pp11[mug][nug];
-						tmp1[index1+1] = pp22[mug][nug];
-						tmp1[index1+2] = pp33[mug][nug];
-						tmp1[index1+3] = pp12[mug][nug];
-						tmp1[index1+4] = pp13[mug][nug];
-						tmp1[index1+5] = pp23[mug][nug];
-
+					}
 				}
 			}
-		}
-		// collect the matrix after folding.
-		Parallel_Reduce::reduce_double_pool( tmp, GlobalV::NLOCAL*3 );
-		Parallel_Reduce::reduce_double_pool( tmp1, GlobalV::NLOCAL*6 );
-		for (int j=0; j<GlobalV::NLOCAL; j++)
-		{
-			if (!GlobalC::ParaO.in_this_processor(i,j))
+			// collect the matrix after folding.
+			Parallel_Reduce::reduce_double_pool( tmp, GlobalV::NLOCAL*3 );
+			for (int j=0; j<GlobalV::NLOCAL; j++)
 			{
-				continue;
+				if (!GlobalC::ParaO.in_this_processor(i,j))
+				{
+					continue;
+				}
+				const int iat = GlobalC::ucell.iwt2iat[i];
+				const int index = 3*j;
+				fvl_dphi(iat,0) += 2.0*tmp[index];
+				fvl_dphi(iat,1) += 2.0*tmp[index+1];
+				fvl_dphi(iat,2) += 2.0*tmp[index+2];
 			}
-			const int iat = GlobalC::ucell.iwt2iat[i];
-			const int index = 3*j;
-			const int index1 = 6*j;
-			fvl_dphi(iat,0) += 2.0*tmp[index];
-			fvl_dphi(iat,1) += 2.0*tmp[index+1];
-			fvl_dphi(iat,2) += 2.0*tmp[index+2];
-
-			svl_dphi(0,0) -= 2.0*tmp1[index1];
-			svl_dphi(1,1) -= 2.0*tmp1[index1+1];
-			svl_dphi(2,2) -= 2.0*tmp1[index1+2];
-			svl_dphi(0,1) -= 2.0*tmp1[index1+3];
-			svl_dphi(0,2) -= 2.0*tmp1[index1+4];
-			svl_dphi(1,2) -= 2.0*tmp1[index1+5];
 		}
-	}
-	delete[] tmp;
-	delete[] tmp1;
-	if(GlobalC::GridT.lgd > 0)
-	{
-		//-------------------------
-		// delete the tmp matrix.
-		//-------------------------
-		for(int i=0; i<GlobalC::GridT.lgd; i++)
+		delete[] tmp;
+
+		if(lgd > 0)
 		{
-			delete[] ppx[i];
-			delete[] ppy[i];
-			delete[] ppz[i];
-
-			delete[] pp11[i];
-			delete[] pp22[i];
-			delete[] pp33[i];
-			delete[] pp12[i];
-			delete[] pp13[i];
-			delete[] pp23[i];
+			//-------------------------
+			// delete the tmp matrix.
+			//-------------------------
+			for(int i=0; i<lgd; i++)
+			{
+				delete[] ppx[i];
+				delete[] ppy[i];
+				delete[] ppz[i];
+			}
+			delete[] ppx;
+			delete[] ppy;
+			delete[] ppz;
 		}
-		delete[] ppx;
-		delete[] ppy;
-		delete[] ppz;
-
-		delete[] pp11;
-		delete[] pp22;
-		delete[] pp33;
-		delete[] pp12;
-		delete[] pp13;
-		delete[] pp23;
+		ModuleBase::timer::tick("Gint_k","folding_force");
 	}
-	ModuleBase::timer::tick("Gint_k","folding_stress");
+	if(isstress)
+	{
+		ModuleBase::timer::tick("Gint_k","folding_stress");
+
+		double** pp11;
+		double** pp22;
+		double** pp33;
+		double** pp12;
+		double** pp13;
+		double** pp23;
+
+		if(lgd>0)
+		{
+			pp11 = new double*[lgd];
+			pp22 = new double*[lgd];
+			pp33 = new double*[lgd];
+			pp12 = new double*[lgd];
+			pp13 = new double*[lgd];
+			pp23 = new double*[lgd];
+			for(int i=0; i<lgd; i++)
+			{
+				pp11[i] = new double[lgd];
+				pp22[i] = new double[lgd];
+				pp33[i] = new double[lgd];
+				ModuleBase::GlobalFunc::ZEROS( pp11[i], lgd);
+				ModuleBase::GlobalFunc::ZEROS( pp22[i], lgd);
+				ModuleBase::GlobalFunc::ZEROS( pp33[i], lgd);
+				pp12[i] = new double[lgd];
+				pp13[i] = new double[lgd];
+				pp23[i] = new double[lgd];
+				ModuleBase::GlobalFunc::ZEROS( pp12[i], lgd);
+				ModuleBase::GlobalFunc::ZEROS( pp13[i], lgd);
+				ModuleBase::GlobalFunc::ZEROS( pp23[i], lgd);
+			}
+		}
+		ModuleBase::Vector3<double> tau1, dtau;
+		for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
+		{
+			const Atom* atom1 = &GlobalC::ucell.atoms[T1];
+					
+			for (int I1 =0; I1< atom1->na; ++I1)
+			{
+				const int iat = GlobalC::ucell.itia2iat(T1,I1);
+				if(GlobalC::GridT.in_this_processor[iat])
+				{
+					assert( lgd > 0 );
+
+					const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
+					// get the start positions of elements.
+					const int DM_start = GlobalC::LNNR.nlocstartg[iat];
+					// get the coordinates of adjacent atoms.
+					tau1 = atom1->tau[I1];
+					//GlobalC::GridD.Find_atom(tau1);
+					GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+					// search for the adjacent atoms.
+					int nad = 0;
+					for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ++ad)
+					{
+						// get iat2
+						const int T2 = GlobalC::GridD.getType(ad);
+						const int I2 = GlobalC::GridD.getNatom(ad);
+
+						const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad);
+						const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
+						if(GlobalC::GridT.in_this_processor[iat2])
+						{
+							Atom* atom2 = &GlobalC::ucell.atoms[T2];
+							dtau = GlobalC::GridD.getAdjacentTau(ad) - tau1;
+							double distance2 = dtau.norm2() * pow(GlobalC::ucell.lat0, 2.0);
+							double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
+							if(distance2 < pow(rcut,2.0))
+							{
+								const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
+
+								//index for iteration below
+								const int* iw2_lo = &GlobalC::GridT.trace_lo[start2];
+								const int* iw2_end = iw2_lo + atom2->nw;
+
+								int ixxx = DM_start + GlobalC::LNNR.find_R2st[iat][nad];
+								for(int iw=0; iw<atom1->nw; iw++)
+								{
+									const int iw_all = start1+iw;
+									const int iw_local = GlobalC::GridT.trace_lo[iw_all];
+
+									double *vij11 = pp11[iw_local];
+									double *vij22 = pp22[iw_local];
+									double *vij33 = pp33[iw_local];
+									double *vij12 = pp12[iw_local];
+									double *vij13 = pp13[iw_local];
+									double *vij23 = pp23[iw_local];
+
+									double *vR11 = &pvdp11[ixxx]; 
+									double *vR22 = &pvdp22[ixxx];
+									double *vR33 = &pvdp33[ixxx];
+									double *vR12 = &pvdp12[ixxx]; 
+									double *vR13 = &pvdp13[ixxx];
+									double *vR23 = &pvdp23[ixxx];
+
+									for(auto iteration=iw2_lo; iteration<iw2_end; ++iteration, ++vR11, 
+										++vR22,++vR33,++vR12,++vR13,++vR23)
+									{
+										vij11[iteration[0]] += vR11[0];
+										vij22[iteration[0]] += vR22[0];
+										vij33[iteration[0]] += vR33[0];
+										vij12[iteration[0]] += vR12[0];
+										vij13[iteration[0]] += vR13[0];
+										vij23[iteration[0]] += vR23[0];
+									}
+
+									ixxx += atom2->nw;
+								}
+								++nad;
+							}//end distance<rcut
+						}
+					}//end ad
+				}
+			}//end ia
+		}//end it
+
+		double* tmp1 = new double[GlobalV::NLOCAL*6];
+		for(int i=0; i<GlobalV::NLOCAL; ++i)
+		{
+			ModuleBase::GlobalFunc::ZEROS(tmp1, 6*GlobalV::NLOCAL);
+			const int mug = GlobalC::GridT.trace_lo[i];
+			// if the row element is on this processor
+			if(mug>=0)
+			{
+				//GlobalV::ofs_running << " i=" << i << " mug=" << mug << std::endl;
+				for(int j=0; j<GlobalV::NLOCAL; ++j)
+				{
+					const int nug = GlobalC::GridT.trace_lo[j];
+					// if the col element is on this process or
+					if(nug>=0)
+					{
+							const int index1 = 6*j;
+							tmp1[index1] = pp11[mug][nug];
+							tmp1[index1+1] = pp22[mug][nug];
+							tmp1[index1+2] = pp33[mug][nug];
+							tmp1[index1+3] = pp12[mug][nug];
+							tmp1[index1+4] = pp13[mug][nug];
+							tmp1[index1+5] = pp23[mug][nug];
+
+					}
+				}
+			}
+			// collect the matrix after folding.
+			Parallel_Reduce::reduce_double_pool( tmp1, GlobalV::NLOCAL*6 );
+			for (int j=0; j<GlobalV::NLOCAL; j++)
+			{
+				if (!GlobalC::ParaO.in_this_processor(i,j))
+				{
+					continue;
+				}
+				const int index1 = 6*j;
+				svl_dphi(0,0) -= 2.0*tmp1[index1];
+				svl_dphi(1,1) -= 2.0*tmp1[index1+1];
+				svl_dphi(2,2) -= 2.0*tmp1[index1+2];
+				svl_dphi(0,1) -= 2.0*tmp1[index1+3];
+				svl_dphi(0,2) -= 2.0*tmp1[index1+4];
+				svl_dphi(1,2) -= 2.0*tmp1[index1+5];
+			}
+		}
+
+		delete[] tmp1;
+
+		if(lgd > 0)
+		{
+			//-------------------------
+			// delete the tmp matrix.
+			//-------------------------
+			for(int i=0; i<lgd; i++)
+			{
+				delete[] pp11[i];
+				delete[] pp22[i];
+				delete[] pp33[i];
+				delete[] pp12[i];
+				delete[] pp13[i];
+				delete[] pp23[i];
+			}
+			delete[] pp11;
+			delete[] pp22;
+			delete[] pp33;
+			delete[] pp12;
+			delete[] pp13;
+			delete[] pp23;
+		}
+		ModuleBase::timer::tick("Gint_k","folding_stress");
+	}
 	return;
 }
 
