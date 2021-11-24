@@ -26,6 +26,8 @@ namespace HS_Matrix
 	void saving_HS_complex(std::complex<double> *Hloc, std::complex<double>* Sloc, bool bit, const int &out_hs); //LiuXh, 2017-03-21
 
 	void save_HS_complex(std::complex<double> *H, std::complex<double> *S, bool bit); //LiuXh, 2017-03-21
+
+  void save_SR_sparse(const double &sparse_threshold, const bool &binary, const std::string file);
 }
 
 #endif

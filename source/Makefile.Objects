@@ -277,6 +277,7 @@ variable_cell.o\
 dftu.o\
 dftu_yukawa.o\
 dftu_relax.o\
+dmft.o\
 
 OBJS_COMMON=atom_spec.o \
 unitcell.o \
