@@ -267,7 +267,16 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
     }     // T1
 
 #ifdef __MPI
-    GlobalC::ParaD.allsum_deepks(this->inlmax,GlobalV::NLOCAL*(2*this->lmaxd+1),this->S_mu_alpha);
+    if(calc_deri)
+    {
+        GlobalC::ParaD.allsum_deepks(this->inlmax,GlobalV::NLOCAL*(2*this->lmaxd+1),this->DS_mu_alpha_x);
+        GlobalC::ParaD.allsum_deepks(this->inlmax,GlobalV::NLOCAL*(2*this->lmaxd+1),this->DS_mu_alpha_y);
+        GlobalC::ParaD.allsum_deepks(this->inlmax,GlobalV::NLOCAL*(2*this->lmaxd+1),this->DS_mu_alpha_z);
+    }
+    else
+    {
+        GlobalC::ParaD.allsum_deepks(this->inlmax,GlobalV::NLOCAL*(2*this->lmaxd+1),this->S_mu_alpha);
+    }
 #endif
 
 /*    
@@ -699,92 +708,101 @@ void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm)
         for (int mu =0; mu < GlobalV::NLOCAL;++mu) 
         {
             const int iat = GlobalC::ucell.iwt2iat[mu];//the atom on which chi_mu is located
+            int iw1 = GlobalC::ParaO.trace_loc_col[mu];
+            if(iw1 < 0) continue;
             
             for (int nu= 0;nu < GlobalV::NLOCAL; ++nu)
             {
-                //const int mu = GlobalC::ParaO.trace_loc_row[j];
-                //const int nu = GlobalC::ParaO.trace_loc_col[i];
-                if (mu >= 0 && nu >= 0)
+                int iw2 = GlobalC::ParaO.trace_loc_row[nu];
+                if(iw2 < 0) continue;
+
+                for (int m1 = 0;m1 < nm;++m1)
                 {
-                    for (int m1 = 0;m1 < nm;++m1)
+                    for (int m2 = 0;m2 < nm;++m2)
                     {
-                        for (int m2 = 0;m2 < nm;++m2)
+                        for (int is = 0;is < GlobalV::NSPIN;++is)
                         {
-                            for (int is = 0;is < GlobalV::NSPIN;++is)
+                            //  save the matrix as column major format
+                            if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx")
                             {
-								//  save the matrix as column major format
-                                if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx")
-                                {
-                                    //(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'>
-                                    gdmx[iat][inl][m1*nm + m2] += 
-									dsx[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
-                                    gdmy[iat][inl][m1*nm + m2] += 
-									dsy[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
-                                    gdmz[iat][inl][m1*nm + m2] += 
-									dsz[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
+                                //mu->iw1,nu->iw2
+                                //(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'>
+                                gdmx[iat][inl][m1*nm + m2] += 
+                                dsx[inl][m1*GlobalV::NLOCAL + mu] * dm(iw1, iw2) * ss[inl][m2*GlobalV::NLOCAL + nu];
+                                gdmy[iat][inl][m1*nm + m2] += 
+                                dsy[inl][m1*GlobalV::NLOCAL + mu] * dm(iw1, iw2) * ss[inl][m2*GlobalV::NLOCAL + nu];
+                                gdmz[iat][inl][m1*nm + m2] += 
+                                dsz[inl][m1*GlobalV::NLOCAL + mu] * dm(iw1, iw2) * ss[inl][m2*GlobalV::NLOCAL + nu];
 
-                                    //(<d/dX chi_nu|alpha_m'>)<chi_mu|alpha_m>
-                                    gdmx[iat][inl][m2*nm + m1] += 
-									dsx[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
-                                    gdmy[iat][inl][m2*nm + m1] += 
-									dsy[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
-                                    gdmz[iat][inl][m2*nm + m1] += 
-									dsz[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
+                                //(<d/dX chi_nu|alpha_m'>)<chi_mu|alpha_m>
+                                gdmx[iat][inl][m2*nm + m1] += 
+                                dsx[inl][m1*GlobalV::NLOCAL + mu] * dm(iw1, iw2) * ss[inl][m2*GlobalV::NLOCAL + nu];
+                                gdmy[iat][inl][m2*nm + m1] += 
+                                dsy[inl][m1*GlobalV::NLOCAL + mu] * dm(iw1, iw2) * ss[inl][m2*GlobalV::NLOCAL + nu];
+                                gdmz[iat][inl][m2*nm + m1] += 
+                                dsz[inl][m1*GlobalV::NLOCAL + mu] * dm(iw1, iw2) * ss[inl][m2*GlobalV::NLOCAL + nu];
 
-                                    //(<chi_mu|d/dX alpha_m>)<chi_nu|alpha_m'> = -(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'>
-                                    gdmx[ibt][inl][m1*nm + m2] -= 
-                                    dsx[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
-                                    gdmy[ibt][inl][m1*nm + m2] -= 
-									dsy[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
-                                    gdmz[ibt][inl][m1*nm + m2] -= 
-									dsz[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
+                                //(<chi_mu|d/dX alpha_m>)<chi_nu|alpha_m'> = -(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'>
+                                gdmx[ibt][inl][m1*nm + m2] -= 
+                                dsx[inl][m1*GlobalV::NLOCAL + mu] * dm(iw1, iw2) * ss[inl][m2*GlobalV::NLOCAL + nu];
+                                gdmy[ibt][inl][m1*nm + m2] -= 
+                                dsy[inl][m1*GlobalV::NLOCAL + mu] * dm(iw1, iw2) * ss[inl][m2*GlobalV::NLOCAL + nu];
+                                gdmz[ibt][inl][m1*nm + m2] -= 
+                                dsz[inl][m1*GlobalV::NLOCAL + mu] * dm(iw1, iw2) * ss[inl][m2*GlobalV::NLOCAL + nu];
 
-                                    //(<chi_nu|d/dX alpha_m'>)<chi_mu|alpha_m> = -(<d/dX chi_nu|alpha_m'>)<chi_mu|alpha_m>
-                                    gdmx[ibt][inl][m2*nm + m1] -= 
-									dsx[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
-                                    gdmy[ibt][inl][m2*nm + m1] -= 
-									dsy[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];
-                                    gdmz[ibt][inl][m2*nm + m1] -= 
-									dsz[inl][m1*GlobalV::NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*GlobalV::NLOCAL + nu];                                
-                                }
-                                else
-                                {
-                                    gdmx[iat][inl][m1*nm + m2] += 
-									dsx[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
-                                    gdmy[iat][inl][m1*nm + m2] += 
-									dsy[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
-                                    gdmz[iat][inl][m1*nm + m2] += 
-									dsz[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
-                                    
-                                    gdmx[iat][inl][m2*nm + m1] += 
-									dsx[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
-                                    gdmy[iat][inl][m2*nm + m1] += 
-									dsy[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
-                                    gdmz[iat][inl][m2*nm + m1] += 
-									dsz[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
-
-                                    gdmx[ibt][inl][m1*nm + m2] -= 
-									dsx[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
-                                    gdmy[ibt][inl][m1*nm + m2] -= 
-									dsy[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
-                                    gdmz[ibt][inl][m1*nm + m2] -= 
-									dsz[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
-                                    
-                                    gdmx[ibt][inl][m2*nm + m1] -= 
-									dsx[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
-                                    gdmy[ibt][inl][m2*nm + m1] -= 
-									dsy[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
-                                    gdmz[ibt][inl][m2*nm + m1] -= 
-									dsz[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
-                                }
+                                //(<chi_nu|d/dX alpha_m'>)<chi_mu|alpha_m> = -(<d/dX chi_nu|alpha_m'>)<chi_mu|alpha_m>
+                                gdmx[ibt][inl][m2*nm + m1] -= 
+                                dsx[inl][m1*GlobalV::NLOCAL + mu] * dm(iw1, iw2) * ss[inl][m2*GlobalV::NLOCAL + nu];
+                                gdmy[ibt][inl][m2*nm + m1] -= 
+                                dsy[inl][m1*GlobalV::NLOCAL + mu] * dm(iw1, iw2) * ss[inl][m2*GlobalV::NLOCAL + nu];
+                                gdmz[ibt][inl][m2*nm + m1] -= 
+                                dsz[inl][m1*GlobalV::NLOCAL + mu] * dm(iw1, iw2) * ss[inl][m2*GlobalV::NLOCAL + nu];                                
                             }
-                        }//end m2
-                    } //end m1
-                }//end if
-            }//end nu
-        }//end mu
-    }//end inl
+                            else
+                            {
+                                gdmx[iat][inl][m1*nm + m2] += 
+                                dsx[inl][mu*nm + m1] * dm(iw1, iw2) * ss[inl][nu*nm + m2];
+                                gdmy[iat][inl][m1*nm + m2] += 
+                                dsy[inl][mu*nm + m1] * dm(iw1, iw2) * ss[inl][nu*nm + m2];
+                                gdmz[iat][inl][m1*nm + m2] += 
+                                dsz[inl][mu*nm + m1] * dm(iw1, iw2) * ss[inl][nu*nm + m2];
+                                
+                                gdmx[iat][inl][m2*nm + m1] += 
+                                dsx[inl][mu*nm + m1] * dm(iw1, iw2) * ss[inl][nu*nm + m2];
+                                gdmy[iat][inl][m2*nm + m1] += 
+                                dsy[inl][mu*nm + m1] * dm(iw1, iw2) * ss[inl][nu*nm + m2];
+                                gdmz[iat][inl][m2*nm + m1] += 
+                                dsz[inl][mu*nm + m1] * dm(iw1, iw2) * ss[inl][nu*nm + m2];
 
+                                gdmx[ibt][inl][m1*nm + m2] -= 
+                                dsx[inl][mu*nm + m1] * dm(iw1, iw2) * ss[inl][nu*nm + m2];
+                                gdmy[ibt][inl][m1*nm + m2] -= 
+                                dsy[inl][mu*nm + m1] * dm(iw1, iw2) * ss[inl][nu*nm + m2];
+                                gdmz[ibt][inl][m1*nm + m2] -= 
+                                dsz[inl][mu*nm + m1] * dm(iw1, iw2) * ss[inl][nu*nm + m2];
+                                
+                                gdmx[ibt][inl][m2*nm + m1] -= 
+                                dsx[inl][mu*nm + m1] * dm(iw1, iw2) * ss[inl][nu*nm + m2];
+                                gdmy[ibt][inl][m2*nm + m1] -= 
+                                dsy[inl][mu*nm + m1] * dm(iw1, iw2) * ss[inl][nu*nm + m2];
+                                gdmz[ibt][inl][m2*nm + m1] -= 
+                                dsz[inl][mu*nm + m1] * dm(iw1, iw2) * ss[inl][nu*nm + m2];
+                            }
+                        }
+                    }//end m2
+                } //end m1
+            }//end nu
+        }//end mu     
+    }//end inl
+#ifdef __MPI
+    const int gdm_size = (this->lmaxd * 2 + 1) * (this->lmaxd * 2 + 1);
+    for(int iat=0;iat<GlobalC::ucell.nat;iat++)
+    {
+        GlobalC::ParaD.allsum_deepks(this->inlmax,gdm_size,this->gdmx[iat]);
+        GlobalC::ParaD.allsum_deepks(this->inlmax,gdm_size,this->gdmy[iat]);
+        GlobalC::ParaD.allsum_deepks(this->inlmax,gdm_size,this->gdmz[iat]);
+    }
+#endif   
 // for checking purpose
 /*
     GlobalV::ofs_running << "gdmx" << std::endl;
