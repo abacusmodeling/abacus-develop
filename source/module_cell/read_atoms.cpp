@@ -618,7 +618,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
                                         mv.z = true ;
                                         atoms[it].vel[ia].set(0,0,0);
 #ifndef __CMD
-										atoms[it].mag[ia]=magnet.start_magnetization[it];
+										//atoms[it].mag[ia]=magnet.start_magnetization[it];//if this line is used, default startmag_type would be 2
 #endif										
 										atoms[it].angle1[ia]=0;
 										atoms[it].angle2[ia]=0;
