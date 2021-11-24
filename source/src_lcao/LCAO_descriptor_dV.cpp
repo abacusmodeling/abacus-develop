@@ -259,9 +259,9 @@ void LCAO_Descriptor::cal_f_delta_pulay(const ModuleBase::matrix& dm)
             if (mu >= 0 && nu >= 0)
             {
                 const int index = mu * GlobalC::ParaO.ncol + nu;
-                this->F_delta(iat, 0) += 2 * dm(nu, mu) * this->DH_V_delta_x[index];
-                this->F_delta(iat, 1) += 2 * dm(nu, mu) * this->DH_V_delta_y[index];
-                this->F_delta(iat, 2) += 2 * dm(nu, mu) * this->DH_V_delta_z[index];
+                this->F_delta(iat, 0) += 2.0 * dm(nu, mu) * this->DH_V_delta_x[index];
+                this->F_delta(iat, 1) += 2.0 * dm(nu, mu) * this->DH_V_delta_y[index];
+                this->F_delta(iat, 2) += 2.0 * dm(nu, mu) * this->DH_V_delta_z[index];
             }
         }
     }
@@ -292,9 +292,9 @@ void LCAO_Descriptor::cal_f_delta_k_pulay(const std::vector<ModuleBase::ComplexM
                 std::complex<double> f[3];
                 for(int ik=0;ik<GlobalC::kv.nks;ik++)
                 {
-                    f[0]+= 2 * dm[ik](nu, mu) * this->DH_V_delta_x_k[ik][index];
-                    f[1]+= 2 * dm[ik](nu, mu) * this->DH_V_delta_y_k[ik][index];
-                    f[2]+= 2 * dm[ik](nu, mu) * this->DH_V_delta_z_k[ik][index];
+                    f[0]+= 2.0 * dm[ik](nu, mu) * this->DH_V_delta_x_k[ik][index];
+                    f[1]+= 2.0 * dm[ik](nu, mu) * this->DH_V_delta_y_k[ik][index];
+                    f[2]+= 2.0 * dm[ik](nu, mu) * this->DH_V_delta_z_k[ik][index];
                 }
                 if(f[0].imag()>1e-12 || f[1].imag()>1e-12 || f[2].imag()>1e-12)
                 {
@@ -515,9 +515,9 @@ void LCAO_Descriptor::cal_f_delta_hf_new(const ModuleBase::matrix& dm, const boo
 
                                 for(int ipol=0;ipol<3;ipol++)
                                 {
-                                    svnl_dalpha(0,ipol) -= dm(iw1_local, iw2_local) * (nlm[0] * r0[ipol] + nlm_t[0] * r1[ipol])* -1;
-                                    svnl_dalpha(1,ipol) -= dm(iw1_local, iw2_local) * (nlm[1] * r0[ipol] + nlm_t[1] * r1[ipol])* -1;
-                                    svnl_dalpha(2,ipol) -= dm(iw1_local, iw2_local) * (nlm[2] * r0[ipol] + nlm_t[2] * r1[ipol])* -1;
+                                    svnl_dalpha(0,ipol) -= dm(iw1_local, iw2_local) * (nlm[0] * r0[ipol] + nlm_t[0] * r1[ipol])* -1.0;
+                                    svnl_dalpha(1,ipol) -= dm(iw1_local, iw2_local) * (nlm[1] * r0[ipol] + nlm_t[1] * r1[ipol])* -1.0;
+                                    svnl_dalpha(2,ipol) -= dm(iw1_local, iw2_local) * (nlm[2] * r0[ipol] + nlm_t[2] * r1[ipol])* -1.0;
                                 }
                             }
                         }//iw2
@@ -718,9 +718,9 @@ void LCAO_Descriptor::cal_f_delta_hf_k_new(const std::vector<ModuleBase::Complex
                             {
                                 const double arg = ( GlobalC::kv.kvec_d[ik] * (dR2-dR1) ) * ModuleBase::TWO_PI;
                                 const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );
-                                F_delta_k(iat, 0) -= 2 * dm[ik](iw1_local, iw2_local) * nlm[0] * kphase;
-                                F_delta_k(iat, 1) -= 2 * dm[ik](iw1_local, iw2_local) * nlm[1] * kphase;
-                                F_delta_k(iat, 2) -= 2 * dm[ik](iw1_local, iw2_local) * nlm[2] * kphase;
+                                F_delta_k(iat, 0) -= 2.0 * dm[ik](iw1_local, iw2_local) * nlm[0] * kphase;
+                                F_delta_k(iat, 1) -= 2.0 * dm[ik](iw1_local, iw2_local) * nlm[1] * kphase;
+                                F_delta_k(iat, 2) -= 2.0 * dm[ik](iw1_local, iw2_local) * nlm[2] * kphase;
                             }
 
                             if(isstress)
@@ -760,9 +760,9 @@ void LCAO_Descriptor::cal_f_delta_hf_k_new(const std::vector<ModuleBase::Complex
                                     const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );                                    
                                     for(int ipol=0;ipol<3;ipol++)
                                     {
-                                        svnl_dalpha_k(0,ipol) -= dm[ik](iw1_local, iw2_local) * kphase * (nlm[0] * r0[ipol] + nlm_t[0] * r1[ipol])* -1;
-                                        svnl_dalpha_k(1,ipol) -= dm[ik](iw1_local, iw2_local) * kphase * (nlm[1] * r0[ipol] + nlm_t[1] * r1[ipol])* -1;
-                                        svnl_dalpha_k(2,ipol) -= dm[ik](iw1_local, iw2_local) * kphase * (nlm[2] * r0[ipol] + nlm_t[2] * r1[ipol])* -1;
+                                        svnl_dalpha_k(0,ipol) -= dm[ik](iw1_local, iw2_local) * kphase * (nlm[0] * r0[ipol] + nlm_t[0] * r1[ipol])* -1.0;
+                                        svnl_dalpha_k(1,ipol) -= dm[ik](iw1_local, iw2_local) * kphase * (nlm[1] * r0[ipol] + nlm_t[1] * r1[ipol])* -1.0;
+                                        svnl_dalpha_k(2,ipol) -= dm[ik](iw1_local, iw2_local) * kphase * (nlm[2] * r0[ipol] + nlm_t[2] * r1[ipol])* -1.0;
                                     }
                                 }
                             }
