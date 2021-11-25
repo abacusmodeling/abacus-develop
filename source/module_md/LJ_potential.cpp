@@ -34,7 +34,7 @@ double LJ_potential::Lennard_Jones(const UnitCell_pseudo &ucell_c,
                 distance = dtau.norm();
                 if(distance <= INPUT.mdp.rcut_lj)
 			    {
-				    potential += LJ_energy(distance) - LJ_energy(INPUT.mdp.rcut_lj);
+				    potential += LJ_energy(distance); // - LJ_energy(INPUT.mdp.rcut_lj);
                     ModuleBase::Vector3<double> f_ij = LJ_force(distance, dtau);
 				    force[index] += f_ij;
                     LJ_virial(virial, f_ij, dtau);
@@ -95,7 +95,7 @@ double LJ_potential::Lennard_Jones(const UnitCell_pseudo &ucell_c,
 
 			if(distance <= INPUT.mdp.rcut_lj)
 			{
-				potential += LJ_energy(distance) - LJ_energy(INPUT.mdp.rcut_lj);
+				potential += LJ_energy(distance); // - LJ_energy(INPUT.mdp.rcut_lj);
                 ModuleBase::Vector3<double> f_ij = LJ_force(distance, temp*ucell_c.lat0);
 				force[i] = force[i] + f_ij;
                 LJ_virial(virial, f_ij, temp*ucell_c.lat0);

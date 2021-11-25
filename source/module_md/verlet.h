@@ -30,6 +30,7 @@ public:
     ModuleBase::Vector3<double> *vel;    // atom velocity
     ModuleBase::Vector3<int> *ionmbl;    // atom is frozen or not
     ModuleBase::Vector3<double> *force;  // force of each atom
+    ModuleBase::matrix virial;           // virial for this lattice
 	ModuleBase::matrix stress;           // stress for this lattice
     double potential;                    // potential energy
     double kinetic;                      // kinetic energy

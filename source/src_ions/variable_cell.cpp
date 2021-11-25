@@ -9,7 +9,7 @@ void Variable_Cell::init_after_vc(void)
 {
 	ModuleBase::TITLE("Variable_Cell","init_after_vc");
 
-    GlobalC::ucell.setup_cell_after_vc(GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
+    GlobalC::ucell.setup_cell_after_vc(GlobalV::ofs_running);
     ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     if(ModuleSymmetry::Symmetry::symm_flag)
@@ -72,7 +72,7 @@ void Variable_Cell::final_calculation_after_vc(void)
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running," ------------------------------------------------------------------------------------");
 
     // (5) Setup the unitcell.
-    GlobalC::ucell.setup_cell_after_vc(GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
+    GlobalC::ucell.setup_cell_after_vc(GlobalV::ofs_running);
     ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     // (6) symmetry analysize.

@@ -57,9 +57,8 @@ class MD_func
 		double &kinetic,
 		ModuleBase::matrix &stress);
 
-	static void outStress(const UnitCell_pseudo &unit_in, 
-		const ModuleBase::matrix &stress, 
-		const double &kenetic);
+	static void outStress(const ModuleBase::matrix &virial, 
+		const ModuleBase::matrix &stress);
 
 //	void ReadNewTemp(int step);
 	static std::string intTurnTostring(long int iter,std::string path);

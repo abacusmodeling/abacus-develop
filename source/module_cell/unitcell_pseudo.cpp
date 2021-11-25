@@ -28,7 +28,6 @@ void UnitCell_pseudo::setup_cell(
 		LCAO_Orbitals &orb,
 #endif
 		const std::string &s_pseudopot_dir,
-		output &outp,  
 		const std::string &fn,
 		std::ofstream &log)
 {
@@ -169,8 +168,8 @@ void UnitCell_pseudo::setup_cell(
     this->invGGT0 = GGT.Inverse();
 
 	log << std::endl;
-	outp.printM3(log,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec); 
-	outp.printM3(log,"Reciprocal vectors: (Cartesian coordinate: in unit of 2 pi/a_0)",G);
+	output::printM3(log,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec); 
+	output::printM3(log,"Reciprocal vectors: (Cartesian coordinate: in unit of 2 pi/a_0)",G);
 //	OUT(log,"lattice center x",latcenter.x);
 //	OUT(log,"lattice center y",latcenter.y);
 //	OUT(log,"lattice center z",latcenter.z);
@@ -677,17 +676,8 @@ void UnitCell_pseudo::cal_natomwfc(std::ofstream &log)
 
 //LiuXh add a new function here,
 //20180515
-void UnitCell_pseudo::setup_cell_after_vc(
-        const std::string &s_pseudopot_dir,
-		output &outp,
-        const std::string &fn, std::ofstream &log)
+void UnitCell_pseudo::setup_cell_after_vc(std::ofstream &log)
 {
-    if(GlobalV::MY_RANK == 0)
-    {
-        //std::ifstream ifa(fn.c_str(), ios::in);
-        //this->read_atom_species_after_vc(ifa);
-    }
-
     assert(lat0 > 0.0);
     this->omega = abs(latvec.Det()) * this->lat0 * lat0 * lat0;
     if(this->omega <= 0)
@@ -737,8 +727,8 @@ Parallel_Common::bcast_double( atom->taud[ia].z );
 #endif
 
     log << std::endl;
-    outp.printM3(log,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec);
-    outp.printM3(log,"Reciprocal vectors: (Cartesian coordinate: in unit of 2 pi/a_0)",G);
+    output::printM3(log,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec);
+    output::printM3(log,"Reciprocal vectors: (Cartesian coordinate: in unit of 2 pi/a_0)",G);
 
     return;
 }

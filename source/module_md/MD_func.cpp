@@ -154,7 +154,7 @@ void MD_func::kinetic_stress(
 			}
 			else
 			{
-				stress(i, j) += temp(i, j)/unit_in.omega;
+				stress(i, j) = temp(i, j)/unit_in.omega;
 			}
 		}
 	}
@@ -368,21 +368,19 @@ void MD_func::force_virial(const MD_parameters &mdp,
 	ModuleBase::timer::tick("Run_MD_CLASSIC", "md_force_stress");
 }
 
-void MD_func::outStress(const UnitCell_pseudo &unit_in,
-		const ModuleBase::matrix &stress, 
-		const double &kenetic)
+void MD_func::outStress(const ModuleBase::matrix &virial, const ModuleBase::matrix &stress)
 {
 	GlobalV::ofs_running<<"\noutput Pressure for check!"<<std::endl;
-    double press = 0.0;
+    double stress_scalar = 0.0, virial_scalar = 0.0;
     for(int i=0;i<3;i++)
     {
-        press += stress(i,i)/3;
+        stress_scalar += stress(i,i)/3;
+		virial_scalar += virial(i,i)/3;
     }
-    double virial = press-2*kenetic/3/unit_in.omega;
     const double unit_transform = ModuleBase::HARTREE_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
-    GlobalV::ofs_running<<"Virtual Pressure is "<<press*unit_transform<<" Kbar "<<std::endl;
-    GlobalV::ofs_running<<"Virial Term is "<<virial*unit_transform<<" Kbar "<<std::endl;
-    GlobalV::ofs_running<<"Kenetic Term is "<<(press-virial)*unit_transform<<" Kbar "<<std::endl;
+    GlobalV::ofs_running<<"Virtual Pressure is "<<stress_scalar*unit_transform<<" Kbar "<<std::endl;
+    GlobalV::ofs_running<<"Virial Term is "<<virial_scalar*unit_transform<<" Kbar "<<std::endl;
+    GlobalV::ofs_running<<"Kenetic Term is "<<(stress_scalar-virial_scalar)*unit_transform<<" Kbar "<<std::endl;
 
 	//const double unit_transform = ModuleBase::HARTREE_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
 	GlobalV::ofs_running << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed) << std::endl;

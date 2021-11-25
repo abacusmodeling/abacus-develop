@@ -52,11 +52,13 @@ void Run_MD_CLASSIC::classic_md_line(void)
             verlet->first_half();
 
             // update force and virial due to the update of atom positions
-            MD_func::force_virial(verlet->mdp, verlet->ucell, verlet->potential, verlet->force, verlet->stress);
+            MD_func::force_virial(verlet->mdp, verlet->ucell, verlet->potential, verlet->force, verlet->virial);
 
             verlet->second_half();
 
             MD_func::kinetic_stress(verlet->ucell, verlet->vel, verlet->allmass, verlet->kinetic, verlet->stress);
+
+            verlet->stress +=  verlet->virial;
         }
 
         verlet->outputMD();

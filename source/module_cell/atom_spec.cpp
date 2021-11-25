@@ -134,11 +134,11 @@ void Atom::bcast_atom(void)
         assert(na!=0);
         delete[] tau;
 		delete[] taud;
-	delete[] vel;
+	    delete[] vel;
         delete[] mag;
         tau = new ModuleBase::Vector3<double>[na];
 		taud = new ModuleBase::Vector3<double>[na];
-	vel = new ModuleBase::Vector3<double>[na];
+	    vel = new ModuleBase::Vector3<double>[na];
         mag = new double[na];
         angle1 = new double[na];
         angle2 = new double[na];
@@ -153,9 +153,9 @@ void Atom::bcast_atom(void)
         Parallel_Common::bcast_double( taud[i].x );
         Parallel_Common::bcast_double( taud[i].y );
         Parallel_Common::bcast_double( taud[i].z );
-	Parallel_Common::bcast_double( vel[i].x );
-	Parallel_Common::bcast_double( vel[i].y );
-	Parallel_Common::bcast_double( vel[i].z );
+	    Parallel_Common::bcast_double( vel[i].x );
+	    Parallel_Common::bcast_double( vel[i].y );
+	    Parallel_Common::bcast_double( vel[i].z );
         Parallel_Common::bcast_double( mag[i] );
         Parallel_Common::bcast_double(angle1[i]);
         Parallel_Common::bcast_double(angle2[i]);

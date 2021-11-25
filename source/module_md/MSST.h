@@ -13,6 +13,20 @@ public:
     void first_half();
     void second_half();
     void outputMD();
+    double extra_term();
+    double vel_sum();
+    void rescale(double volume);
+
+    ModuleBase::Vector3<double> *old_v;
+    ModuleBase::Vector3<double> dilation;      // dilation scale
+    ModuleBase::Vector3<double> omega;         // time derivative of volume
+    double p0;               // initial pressure
+    double v0;               // initial volume
+    double e0;               // initial energy
+    double totmass;          // total mass of the cell
+    double lag_pos;          // Lagrangian location of cell
+    double vsum;             // sum over v^2
+
 };
 
 #endif

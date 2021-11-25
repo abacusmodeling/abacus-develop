@@ -296,6 +296,9 @@ run_md_classic.o\
 LJ_potential.o\
 DP_potential.o\
 cmd_neighbor.o\
+verlet.o\
+NVE.o\
+MSST.o\
 dos.o \
 inverse_matrix.o \
 energy.o \

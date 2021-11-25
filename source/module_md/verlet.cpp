@@ -5,11 +5,14 @@ Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     mdp(MD_para_in),
     ucell(unit_in)
 {
+    std::cout << "verlet" << std::endl;
+
     allmass = new double [ucell.nat];
     pos = new ModuleBase::Vector3<double> [ucell.nat];
     vel = new ModuleBase::Vector3<double> [ucell.nat];
     ionmbl = new ModuleBase::Vector3<int> [ucell.nat];
     force = new ModuleBase::Vector3<double> [ucell.nat];
+    virial.create(3,3);
     stress.create(3,3);
 
     // convert to a.u. unit

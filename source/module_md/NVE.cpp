@@ -11,8 +11,9 @@ void NVE::setup()
     ModuleBase::TITLE("NVE", "setup");
     ModuleBase::timer::tick("NVE", "setup");
 
-    MD_func::force_virial(mdp, ucell, potential, force, stress);
+    MD_func::force_virial(mdp, ucell, potential, force, virial);
     MD_func::kinetic_stress(ucell, vel, allmass, kinetic, stress);
+    stress += virial;
 
     ModuleBase::timer::tick("NVE", "setup");
 }
@@ -85,7 +86,7 @@ void NVE::outputMD()
         press += stress(i,i)/3;
     }
 
-    std::cout << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed) << std::endl;
+    std::cout << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed);
     std::cout << " " << std::left << std::setw(20) << "Energy" 
             << std::left << std::setw(20) << "Potential" 
             << std::left << std::setw(20) << "Kinetic" 
@@ -98,7 +99,7 @@ void NVE::outputMD()
             << std::left << std::setw(20) << press*unit_transform <<std::endl;
 	std::cout << " ------------------------------------------------------------" << std::endl;
 
-    MD_func::outStress(ucell, stress, kinetic);
+    MD_func::outStress(virial, stress);
 
     ModuleBase::timer::tick("NVE", "outputMD");
 }
