@@ -221,14 +221,14 @@ void Occupy::decision(const std::string &name,const std::string &smearing,const 
 void Occupy::iweights
 (
     const int nks, //number of k points.
-    const double *wk,//weight of each k point (consider symmetry).
+    const std::vector<double> &wk,//weight of each k point (consider symmetry).
     const int nband,//number of bands.
     const double &nelec, //number of electrons for this spin direction.
     double **ekb,//the array save the band energy.
     double &ef,//output: the highest occupied Kohn-Sham level.
     ModuleBase::matrix &wg,//output: weight for each k, each band.
     const int &is,//the spin index now.
-    const int *isk//distinguish k point belong to which spin.
+    const std::vector<int> &isk//distinguish k point belong to which spin.
 )
 {
 	assert(is<2); //not include non-collinear yet!
@@ -304,7 +304,7 @@ void Occupy::iweights
 //==========================================================
 void Occupy::gweights(
     const int nks,//number of k points.
-    const double *wk,//weight of each k point(symmetry considered).
+    const std::vector<double> &wk,//weight of each k point(symmetry considered).
     const int nband,//number of bands.
     const double &nelec,//number of electrons.
     const double &degauss,//parameter input by user.
@@ -314,7 +314,7 @@ void Occupy::gweights(
     double &demet,//output: energy correction for metal
     ModuleBase::matrix &wg,//output: weight of each band at each k point.
 	const int &is, // spin
-	const int *isk) // array to point out each k belong to which spin
+	const std::vector<int> &isk) // array to point out each k belong to which spin
 {
 	//ModuleBase::TITLE("Occupy","gweights");
     //===============================
@@ -357,12 +357,12 @@ void Occupy::efermig
     const int nband,
     const int nks,
     const double &nelec,
-    const double *wk,
+    const std::vector<double> &wk,
     const double &degauss,
     const int ngauss,
     double &ef,
 	const int &is,
-	const int *isk
+	const std::vector<int> &isk
 )
 {
 	//ModuleBase::TITLE("Occupy","efermig");
@@ -456,12 +456,12 @@ double Occupy::sumkg(
 	double** ekb,
 	const int nband,
 	const int nks,
-	const double *wk,
+	const std::vector<double> &wk,
 	const double &degauss,
 	const int ngauss,
 	const double &e,
 	const int &is,
-	const int *isk
+	const std::vector<int> &isk
 )
 {
 	//ModuleBase::TITLE("Occupy","sumkg");

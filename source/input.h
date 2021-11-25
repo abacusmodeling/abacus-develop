@@ -222,6 +222,7 @@ class Input
 	int out_dm; // output density matrix.
 	int out_potential;		// yes or no
     int out_wf;			// 0: no; 1: txt; 2: dat
+    int out_wf_r;			// 0: no; 1: yes
 	int out_dos;			// dos calculation. mohan add 20090909
     int out_band;                   // band calculation pengfei 2014-10-13
 	int out_hs;			// output H matrix and S matrix in local basis.
