@@ -1,0 +1,402 @@
+ 
+ ********************************************************* 
+ *                                                       * 
+ *          Start to Generate Orbital for LCAO           * 
+ *                                                       * 
+ ********************************************************* 
+      InputFile = ORBITAL_INPUT_TZDP
+        EXE_mpi = /opt/hpcx/2.9.0/ompi-icc/2019.update5/bin/mpirun -np 8 
+    Host1_NCore = 8
+         EXE_pw = /gpfs/home/nic/wszhang/abacus/wszhang@github/abacus-develop/bin/ABACUS.mpi 
+        targets = 14_Si_100
+     Pseudo_dir = /gpfs/home/nic/wszhang/abacus/CIF_POT/SG15_ONCV_PBE-1.0 
+           ecut = 60
+    rcut_number = 1, info_r = ( 6 )
+         Pseudo = Si_ONCV_PBE-1.0.upf
+          sigma = 0.01
+          nSTRU = 2
+        STRU[1] = dimer
+   BL_number[1] = 5, info[1] = 1.8 2.0 2.3 2.8 3.8
+    EndLevel[1] = 2
+  BeginLevel[1] = 
+      nbands[1] = 8.0
+   ref_bands[1] = 4.0
+ RestartSTRU[1] = 0
+    SkipSTRU[1] = 1
+        STRU[2] = dimer
+   BL_number[2] = 3, info[2] = 1.9 2.1 2.6
+    EndLevel[2] = 3
+  BeginLevel[2] = 
+      nbands[2] = 8.0
+   ref_bands[2] = 4.0
+ RestartSTRU[2] = 1
+    SkipSTRU[2] = 0
+ -------------------------------------------------------> Si
+ The dir exist: 14_Si_100
+    |run  cicle: rcut=6
+    nSTRU = 2 
+        |skip cicle: iSTRU=1
+        |run  cicle: iSTRU=2
+
+ not found BeginLevel[2], use: EndLevel[iSTRULeft]+1
+
+ BeginLevel[iSTRU]=3,  EndLevel[iSTRU]=3 
+ RestartSTRU[2] = 1 
+ 
+ Current *.dat/*.txt ... will be considered previous calculation results of STRU1 
+ Move Previous Orbital files and Rename as STRU1.*
+ Found file: STRU1.ORBITAL_RESULTS.txt, copy as ORBITAL_RESULTS.txt ... 
+ 
+ Restart from Previous Result: ORBITAL_RESULTS.txt 
+ Found file: ORBITAL_RESULTS.txt 
+ 
+            |run  cicle: BL=1.9
+ na=2
+ pwd:
+/gpfs/home/nic/wszhang/abacus/wszhang@github/abacus-develop/tools/SIAB/example3_Si_PTG_dpsi/14_Si_100
+ /opt/hpcx/2.9.0/ompi-icc/2019.update5/bin/mpirun -np 8 /gpfs/home/nic/wszhang/abacus/wszhang@github/abacus-develop/bin/ABACUS.mpi 
+ *********************************************************
+ *                                                       *
+ *                  WELCOME TO ABACUS                    *
+ *                                                       *
+ *            'Atomic-orbital Based Ab-initio            *
+ *                  Computation at UStc'                 *
+ *                                                       *
+ *          Website: http://abacus.ustc.edu.cn/          *
+ *                                                       *
+ *********************************************************
+ Thu Nov 25 16:06:29 2021
+ MAKE THE DIR         : OUT.Si-6-1.9/
+ DONE(0.130319   SEC) : SETUP UNITCELL
+ DONE(0.130631   SEC) : INIT K-POINTS
+ ---------------------------------------------------------
+ Self-consistent calculations for electrons
+ ---------------------------------------------------------
+ SPIN    KPOINTS         PROCESSORS  
+ 1       1               8           
+ ---------------------------------------------------------
+ Use plane wave basis
+ ---------------------------------------------------------
+ ELEMENT NATOM       XC          
+ Si      2           PBE
+ ---------------------------------------------------------
+ Initial plane wave basis and FFT box
+ ---------------------------------------------------------
+ DONE(0.382816   SEC) : INIT PLANEWAVE
+ UNIFORM GRID DIM     : 100 * 100 * 100
+ UNIFORM GRID DIM(BIG): 100 * 100 * 100
+ MEMORY FOR PSI (MB)  : 0.955933
+ DONE(0.446262   SEC) : LOCAL POTENTIAL
+ DONE(0.464041   SEC) : NON-LOCAL POTENTIAL
+ START POTENTIAL      : atomic
+ DONE(0.560588   SEC) : INIT POTENTIAL
+ DONE(0.67927    SEC) : INIT BASIS
+ -------------------------------------------
+ SELF-CONSISTENT : 
+ -------------------------------------------
+ ITER   ETOT(eV)       EDIFF(eV)      DRHO2      CG_ITER    TIME(S)    
+ CG1    -2.071926e+02  0.000000e+00   1.590e-01  8.875e+00  9.100e-01  
+ CG2    -2.075887e+02  -3.960283e-01  7.134e-02  3.000e+00  6.800e-01  
+ CG3    -2.077300e+02  -1.413109e-01  5.329e-03  2.125e+00  6.500e-01  
+ CG4    -2.077560e+02  -2.600854e-02  1.506e-03  3.625e+00  6.800e-01  
+ CG5    -2.077582e+02  -2.212627e-03  6.467e-04  2.375e+00  6.600e-01  
+ CG6    -2.077598e+02  -1.607807e-03  1.736e-04  2.375e+00  6.600e-01  
+ CG7    -2.077601e+02  -2.492942e-04  2.771e-05  2.375e+00  6.400e-01  
+ CG8    -2.077601e+02  -1.488501e-05  3.607e-05  2.500e+00  6.600e-01  
+ CG9    -2.077601e+02  -3.050218e-05  3.118e-06  2.000e+00  6.500e-01  
+ CG10   -2.077601e+02  7.317911e-07   2.016e-06  2.375e+00  6.500e-01  
+ CG11   -2.077601e+02  -2.149047e-06  1.917e-07  2.000e+00  6.200e-01  
+ CG12   -2.077601e+02  -7.195539e-07  2.509e-08  3.750e+00  6.800e-01  
+ DONE(1.131e+01  SEC) : cal_overlap_Q
+ DONE(1.174e+01  SEC) : cal_overlap_Sq
+ DONE(1.224e+01  SEC) : cal_overlap_Q
+ DONE(1.268e+01  SEC) : cal_overlap_Sq
+ DONE(1.277e+01  SEC) : BASIS OVERLAP (Q and S) GENERATION.
+
+  |CLASS_NAME---------|NAME---------------|TIME(Sec)-----|CALLS----|AVG------|PER%-------
+                       total               12.774         25        0.51      1e+02     %
+   Run_pw              plane_wave_line     12.724         1         13        1e+02     %
+   PW_Basis            gen_pw              0.25202        1         0.25      2         %
+   Cell_PW             opt_cells_pw        8.933          1         8.9       70        %
+   FFT                 FFT3D               1.8891         1071      0.0018    15        %
+   Potential           v_of_rho            0.80021        13        0.062     6.3       %
+   H_XC_pw             v_xc                0.69737        13        0.054     5.5       %
+   wavefunc            wfcinit             0.11855        1         0.12      0.93      %
+   Hamilt_PW           diagH_subspace      0.37052        12        0.031     2.9       %
+   Hamilt_PW           h_psi               1.5274         319       0.0048    12        %
+   Hamilt_PW           vloc                1.4292         319       0.0045    11        %
+   Ions                opt_ions_pw         8.6458         1         8.6       68        %
+   Electrons           self_consistent     8.6457         1         8.6       68        %
+   Electrons           c_bands             1.6179         12        0.13      13        %
+   Hamilt              diagH_pw            1.5826         12        0.13      12        %
+   Diago_CG            diag                1.2446         12        0.1       9.7       %
+   Charge              sum_band            0.75477        12        0.063     5.9       %
+   Charge              rho_mpi             0.43632        12        0.036     3.4       %
+   Charge              mix_rho             0.21447        12        0.018     1.7       %
+   Spillage            TableONe            1.6522         1         1.7       13        %
+   Numerical_Basis     cal_overlap_Q       0.73111        2         0.37      5.7       %
+   Numerical_Basis     cal_overlap_Sq      0.87398        2         0.44      6.8       %
+ ----------------------------------------------------------------------------------------
+
+ START  Time  : Thu Nov 25 16:06:29 2021
+ FINISH Time  : Thu Nov 25 16:06:41 2021
+ TOTAL  Time  : 12
+ SEE INFORMATION IN : OUT.Si-6-1.9/
+
+            |run  cicle: BL=2.1
+ na=2
+ pwd:
+/gpfs/home/nic/wszhang/abacus/wszhang@github/abacus-develop/tools/SIAB/example3_Si_PTG_dpsi/14_Si_100
+ /opt/hpcx/2.9.0/ompi-icc/2019.update5/bin/mpirun -np 8 /gpfs/home/nic/wszhang/abacus/wszhang@github/abacus-develop/bin/ABACUS.mpi 
+ *********************************************************
+ *                                                       *
+ *                  WELCOME TO ABACUS                    *
+ *                                                       *
+ *            'Atomic-orbital Based Ab-initio            *
+ *                  Computation at UStc'                 *
+ *                                                       *
+ *          Website: http://abacus.ustc.edu.cn/          *
+ *                                                       *
+ *********************************************************
+ Thu Nov 25 16:06:42 2021
+ MAKE THE DIR         : OUT.Si-6-2.1/
+ DONE(0.120501   SEC) : SETUP UNITCELL
+ DONE(0.120847   SEC) : INIT K-POINTS
+ ---------------------------------------------------------
+ Self-consistent calculations for electrons
+ ---------------------------------------------------------
+ SPIN    KPOINTS         PROCESSORS  
+ 1       1               8           
+ ---------------------------------------------------------
+ Use plane wave basis
+ ---------------------------------------------------------
+ ELEMENT NATOM       XC          
+ Si      2           PBE
+ ---------------------------------------------------------
+ Initial plane wave basis and FFT box
+ ---------------------------------------------------------
+ DONE(0.37851    SEC) : INIT PLANEWAVE
+ UNIFORM GRID DIM     : 100 * 100 * 100
+ UNIFORM GRID DIM(BIG): 100 * 100 * 100
+ MEMORY FOR PSI (MB)  : 0.955933
+ DONE(0.40929    SEC) : LOCAL POTENTIAL
+ DONE(0.419254   SEC) : NON-LOCAL POTENTIAL
+ START POTENTIAL      : atomic
+ DONE(0.499667   SEC) : INIT POTENTIAL
+ DONE(0.61873    SEC) : INIT BASIS
+ -------------------------------------------
+ SELF-CONSISTENT : 
+ -------------------------------------------
+ ITER   ETOT(eV)       EDIFF(eV)      DRHO2      CG_ITER    TIME(S)    
+ CG1    -2.080583e+02  0.000000e+00   8.310e-02  8.375e+00  8.800e-01  
+ CG2    -2.083506e+02  -2.923638e-01  3.062e-02  3.500e+00  6.900e-01  
+ CG3    -2.084049e+02  -5.430326e-02  5.037e-03  2.000e+00  6.500e-01  
+ CG4    -2.084209e+02  -1.601529e-02  3.435e-03  2.750e+00  6.600e-01  
+ CG5    -2.084222e+02  -1.230053e-03  4.407e-04  2.000e+00  6.600e-01  
+ CG6    -2.084229e+02  -6.914610e-04  5.909e-05  2.625e+00  6.700e-01  
+ CG7    -2.084229e+02  -7.900361e-05  5.150e-05  3.500e+00  6.900e-01  
+ CG8    -2.084231e+02  -1.357157e-04  5.985e-06  2.125e+00  6.400e-01  
+ CG9    -2.084231e+02  -9.145199e-06  1.722e-06  3.000e+00  7.000e-01  
+ CG10   -2.084231e+02  -1.628943e-08  3.646e-07  2.250e+00  6.300e-01  
+ CG11   -2.084231e+02  -1.495313e-06  6.127e-09  2.750e+00  6.500e-01  
+ DONE(1.055e+01  SEC) : cal_overlap_Q
+ DONE(1.098e+01  SEC) : cal_overlap_Sq
+ DONE(1.147e+01  SEC) : cal_overlap_Q
+ DONE(1.193e+01  SEC) : cal_overlap_Sq
+ DONE(1.204e+01  SEC) : BASIS OVERLAP (Q and S) GENERATION.
+
+  |CLASS_NAME---------|NAME---------------|TIME(Sec)-----|CALLS----|AVG------|PER%-------
+                       total               12.043         25        0.48      1e+02     %
+   Run_pw              plane_wave_line     11.973         1         12        99        %
+   PW_Basis            gen_pw              0.25748        1         0.26      2.1       %
+   Cell_PW             opt_cells_pw        8.2125         1         8.2       68        %
+   FFT                 FFT3D               1.7734         994       0.0018    15        %
+   Potential           v_of_rho            0.74675        12        0.062     6.2       %
+   H_XC_pw             v_xc                0.65026        12        0.054     5.4       %
+   wavefunc            wfcinit             0.11894        1         0.12      0.99      %
+   Hamilt_PW           diagH_subspace      0.34805        11        0.032     2.9       %
+   Hamilt_PW           h_psi               1.4432         298       0.0048    12        %
+   Hamilt_PW           vloc                1.348          298       0.0045    11        %
+   Ions                opt_ions_pw         7.9811         1         8         66        %
+   Electrons           self_consistent     7.9811         1         8         66        %
+   Electrons           c_bands             1.5255         11        0.14      13        %
+   Hamilt              diagH_pw            1.4974         11        0.14      12        %
+   Diago_CG            diag                1.1823         11        0.11      9.8       %
+   Charge              sum_band            0.68711        11        0.062     5.7       %
+   Charge              rho_mpi             0.39981        11        0.036     3.3       %
+   Charge              mix_rho             0.19565        11        0.018     1.6       %
+   Spillage            TableONe            1.6197         1         1.6       13        %
+   Numerical_Basis     cal_overlap_Q       0.72958        2         0.36      6.1       %
+   Numerical_Basis     cal_overlap_Sq      0.89045        2         0.45      7.4       %
+ ----------------------------------------------------------------------------------------
+
+ START  Time  : Thu Nov 25 16:06:42 2021
+ FINISH Time  : Thu Nov 25 16:06:54 2021
+ TOTAL  Time  : 12
+ SEE INFORMATION IN : OUT.Si-6-2.1/
+
+            |run  cicle: BL=2.6
+ na=2
+ pwd:
+/gpfs/home/nic/wszhang/abacus/wszhang@github/abacus-develop/tools/SIAB/example3_Si_PTG_dpsi/14_Si_100
+ /opt/hpcx/2.9.0/ompi-icc/2019.update5/bin/mpirun -np 8 /gpfs/home/nic/wszhang/abacus/wszhang@github/abacus-develop/bin/ABACUS.mpi 
+ *********************************************************
+ *                                                       *
+ *                  WELCOME TO ABACUS                    *
+ *                                                       *
+ *            'Atomic-orbital Based Ab-initio            *
+ *                  Computation at UStc'                 *
+ *                                                       *
+ *          Website: http://abacus.ustc.edu.cn/          *
+ *                                                       *
+ *********************************************************
+ Thu Nov 25 16:06:55 2021
+ MAKE THE DIR         : OUT.Si-6-2.6/
+ DONE(0.0957106  SEC) : SETUP UNITCELL
+ DONE(0.095953   SEC) : INIT K-POINTS
+ ---------------------------------------------------------
+ Self-consistent calculations for electrons
+ ---------------------------------------------------------
+ SPIN    KPOINTS         PROCESSORS  
+ 1       1               8           
+ ---------------------------------------------------------
+ Use plane wave basis
+ ---------------------------------------------------------
+ ELEMENT NATOM       XC          
+ Si      2           PBE
+ ---------------------------------------------------------
+ Initial plane wave basis and FFT box
+ ---------------------------------------------------------
+ DONE(0.303248   SEC) : INIT PLANEWAVE
+ UNIFORM GRID DIM     : 100 * 100 * 100
+ UNIFORM GRID DIM(BIG): 100 * 100 * 100
+ MEMORY FOR PSI (MB)  : 0.955933
+ DONE(0.37463    SEC) : LOCAL POTENTIAL
+ DONE(0.388902   SEC) : NON-LOCAL POTENTIAL
+ START POTENTIAL      : atomic
+ DONE(0.476625   SEC) : INIT POTENTIAL
+ DONE(0.58517    SEC) : INIT BASIS
+ -------------------------------------------
+ SELF-CONSISTENT : 
+ -------------------------------------------
+ ITER   ETOT(eV)       EDIFF(eV)      DRHO2      CG_ITER    TIME(S)    
+ CG1    -2.081021e+02  0.000000e+00   4.659e-02  4.500e+00  1.160e+00  
+ CG2    -2.080622e+02  3.989041e-02   1.294e-02  2.000e+00  6.400e-01  
+ CG3    -2.080786e+02  -1.636656e-02  3.554e-03  2.625e+00  6.700e-01  
+ CG4    -2.080845e+02  -5.921014e-03  4.198e-04  2.250e+00  6.400e-01  
+ CG5    -2.080858e+02  -1.319291e-03  2.377e-05  2.750e+00  6.800e-01  
+ CG6    -2.080859e+02  -8.446123e-05  3.934e-06  3.750e+00  7.000e-01  
+ CG7    -2.080859e+02  -9.124889e-06  2.623e-06  3.125e+00  6.900e-01  
+ CG8    -2.080859e+02  -6.073974e-06  1.260e-07  2.750e+00  6.800e-01  
+ CG9    -2.080859e+02  -4.755934e-07  1.240e-08  9.250e+00  8.700e-01  
+ DONE(9.777e+00  SEC) : cal_overlap_Q
+ DONE(1.023e+01  SEC) : cal_overlap_Sq
+ DONE(1.073e+01  SEC) : cal_overlap_Q
+ DONE(1.117e+01  SEC) : cal_overlap_Sq
+ DONE(1.127e+01  SEC) : BASIS OVERLAP (Q and S) GENERATION.
+
+  |CLASS_NAME---------|NAME---------------|TIME(Sec)-----|CALLS----|AVG------|PER%-------
+                       total               11.27          25        0.45      1e+02     %
+   Run_pw              plane_wave_line     11.2           1         11        99        %
+   PW_Basis            gen_pw              0.20717        1         0.21      1.8       %
+   Cell_PW             opt_cells_pw        7.5529         1         7.6       67        %
+   FFT                 FFT3D               1.8173         1040      0.0017    16        %
+   Potential           v_of_rho            0.62436        10        0.062     5.5       %
+   H_XC_pw             v_xc                0.54181        10        0.054     4.8       %
+   wavefunc            wfcinit             0.10842        1         0.11      0.96      %
+   Hamilt_PW           diagH_subspace      0.29611        9         0.033     2.6       %
+   Hamilt_PW           h_psi               1.602          351       0.0046    14        %
+   Hamilt_PW           vloc                1.4954         351       0.0043    13        %
+   Hamilt_PW           vnl                 0.10008        351       0.00029   0.89      %
+   Ions                opt_ions_pw         7.2789         1         7.3       65        %
+   Electrons           self_consistent     7.2788         1         7.3       65        %
+   Electrons           c_bands             1.6969         10        0.17      15        %
+   Hamilt              diagH_pw            1.6675         10        0.17      15        %
+   Diago_CG            diag                1.4047         10        0.14      12        %
+   Charge              sum_band            0.63893        10        0.064     5.7       %
+   Charge              rho_mpi             0.37624        10        0.038     3.3       %
+   Charge              mix_rho             0.16674        10        0.017     1.5       %
+   Spillage            TableONe            1.582          1         1.6       14        %
+   Numerical_Basis     cal_overlap_Q       0.7304         2         0.37      6.5       %
+   Numerical_Basis     cal_overlap_Sq      0.89227        2         0.45      7.9       %
+ ----------------------------------------------------------------------------------------
+
+ START  Time  : Thu Nov 25 16:06:55 2021
+ FINISH Time  : Thu Nov 25 16:07:06 2021
+ TOTAL  Time  : 11
+ SEE INFORMATION IN : OUT.Si-6-2.6/
+
+ Using PyTorch Gradient Method V2 (include dpsi) 
+
+ iSTRULeft: 1, iSTRU: 2 
+ BeginLevel[STRUs]: ( 3) 
+ EndLevel[STRUs]: (0 2 3) 
+ numL = 3 3 2 0 0, LValueMax = 2 
+ init_from_file : true, 
+ C_init_file : ORBITAL_RESULTS.txt, 
+ opt_C_read: false
+
+ Set OMP_NUM_THREADS = 8 
+ Python2 Version:  /usr/bin/python2
+ Python3 Version:  /opt/anaconda3/bin/python3
+
+ Run /home/nic/wszhang/abacus/wszhang@github/abacus-develop/tools/opt_orb_pytorch_dpsi/main.py
+
+3.7.4 (default, Aug 13 2019, 20:35:49) 
+[GCC 7.3.0]
+seed: 1445088339
+../OUT.Si-6-1.9/orb_matrix.0.dat
+Si 3 3
+../OUT.Si-6-2.1/orb_matrix.0.dat
+Si 3 3
+../OUT.Si-6-2.6/orb_matrix.0.dat
+Si 3 3
+read QI: 0 0
+read SI: 0 0
+read VI: 0 0
+read QI: 1 0
+read SI: 1 0
+read VI: 1 0
+read QI: 2 0
+read SI: 2 0
+read VI: 2 0
+Nt_all	['Si']
+Nu	{'Si': [3, 3, 2]}
+Rcut	{'Si': 6}
+dr	{'Si': 0.01}
+Ecut	{'Si': 60}
+lr	0.0001
+cal_T	True
+cal_smooth	True
+Nl	{'Si': 3}
+Nst	3
+Nt	[['Si'], ['Si'], ['Si']]
+Na	[{'Si': 2}, {'Si': 2}, {'Si': 2}]
+Nb	[8, 8, 8]
+Ne	{'Si': 14}
+../OUT.Si-6-1.9/orb_matrix.1.dat
+Si 3 3
+../OUT.Si-6-2.1/orb_matrix.1.dat
+Si 3 3
+../OUT.Si-6-2.6/orb_matrix.1.dat
+Si 3 3
+read QI: 0 0
+read SI: 0 0
+read VI: 0 0
+read QI: 1 0
+read SI: 1 0
+read VI: 1 0
+read QI: 2 0
+read SI: 2 0
+read VI: 2 0
+
+See "Spillage.dat" for detail status: 
+istep             Spillage             T.item()                 Loss
+0	0.050616305321455	0.044232144951820374	0.050717536360025406
+100	0.04970861226320267	0.04320823773741722	0.04980750009417534
+Time (PyTorch):     24.225666284561157
+
+
+ unset OMP_NUM_THREADS 
+ Total Time:   65  
+

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import IO.read_QSV
 import IO.print_QSV
 import IO.func_C
@@ -18,7 +20,7 @@ def main():
 	print("seed:",seed)
 	time_start = time.time()
 
-	file_list, info_true, weight_info, C_init_info, V_info = IO.read_json.read_json("input.json")
+	file_list, info_true, weight_info, C_init_info, V_info = IO.read_json.read_json("INPUT")
 
 	weight = IO.cal_weight.cal_weight(weight_info, V_info["same_band"], file_list["origin"])
 
@@ -44,8 +46,13 @@ def main():
 
 	with open("Spillage.dat","w") as S_file:
 
+		print( "\nSee \"Spillage.dat\" for detail status: " , flush=True )
+		if info.cal_T:
+			print( '%5s'%"istep", "%20s"%"Spillage", "%20s"%"T.item()", "%20s"%"Loss", flush=True )
+		else:
+			print( '%5s'%"istep", "%20s"%"Spillage", flush=True ) 
 		loss_old = np.inf
-		for istep in range(10000):
+		for istep in range(200):
 
 			Q = opt_orb.change_index_Q(opt_orb.cal_Q(QI,C,info),info)
 			S = opt_orb.change_index_S(opt_orb.cal_S(SI,C,info),info)
@@ -111,13 +118,13 @@ def main():
 		IO.print_orbital.print_orbital(orb,info)
 		IO.print_orbital.plot_orbital(orb,info.Rcut,info.dr)
 
-		IO.func_C.write_C("C.dat",info,C_old)
+		IO.func_C.write_C("ORBITAL_RESULTS.txt",info,C_old,Spillage)
 
-		print("time:\t",time.time()-time_start)
+		print("Time (PyTorch):     %s\n"%(time.time()-time_start), flush=True )
 
 
 if __name__=="__main__":
 	import sys
 	np.set_printoptions(threshold=sys.maxsize, linewidth=10000)
-	
+	print( sys.version, flush=True  ) 
 	main()

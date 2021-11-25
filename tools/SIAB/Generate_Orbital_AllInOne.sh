@@ -1,11 +1,12 @@
 #!/bin/bash
 # author mohan 
 # edit by Pengfei Li 2013-6-4
-# edit by WenShuai Zhang (2016-11-30) with changelog:
-# 1. fix bugs when read "ORBITAL_INPUT" for lines begin with "#" or " ".
+# maintained by WenShuai Zhang (since 2016-11-30) with changelog:
+# 1. fix bugs when reading "ORBITAL_INPUT" for lines begin with "#" or " ".
 # 2. add support for generating orbital with multi different types of structures together, 
 #    such as dimer STRU & tetramer STRU and so on.
-#
+# 3. add support for opt_orb_pytorch_dpsi generator
+
 args=$@
 if [ "$args" == "--help" -o "$args" == "-h" ] ; then 
     echo " Usage:    ./ThisScript.sh  <Input File Name> "
@@ -99,7 +100,8 @@ echo "         EXE_pw = $EXE_pw "
 
 # (0.1.2)get SIA
 EXE_orbital=`grep -E "^\s*EXE_orbital" $InputFile | awk -F "EXE_orbital" '{print $0}' | awk '{print $2}'`
-echo "    EXE_orbital = $EXE_orbital " 
+chmod +x "$EXE_orbital"
+
 
 # (0.1.3)get the targets element and id
 targets=`grep -E "^\s*targets" $InputFile | awk -F "targets" '{print $0}' | awk '{print $2}'`
@@ -364,7 +366,7 @@ do
             if [ $iSTRU -gt 1 ]; then
 
                 echo " "
-                echo " Current *.dat/*.txt ... will be considered previous calc. results of STRU${iSTRULeft} "
+                echo " Current *.dat/*.txt ... will be considered previous calculation results of STRU${iSTRULeft} "
                 #
                 #if [ -f "ORBITAL_RESULTS.txt" ] ; then
                 #    echo " Found file: ORBITAL_RESULTS.txt, continue ... "
@@ -578,6 +580,7 @@ cat > INPUTw << EOF
 WANNIER_PARAMETERS
 rcut 10
 out_spillage 2
+spillage_outdir OUT.$element-$rcut-$BL
 EOF
 
 
@@ -598,7 +601,6 @@ EOF
 cat > INPUT << EOF
 INPUT_PARAMETERS
 suffix              $element-$rcut-$BL
-latname             $element-$rcut-$BL
 atom_file           $name.stru
 pseudo_dir          $Pseudo_dir
 kpoint_file         KPOINTS
@@ -651,6 +653,9 @@ let count++
 
             echo " $EXE_mpi $EXE_pw "
             $EXE_mpi $EXE_pw 
+            
+            #mv test.0.dat  OUT.$element-$rcut-$BL/orb_matrix.0.dat
+            #mv test.1.dat  OUT.$element-$rcut-$BL/orb_matrix.1.dat
             #echo " Skip_Calculation: $EXE_mpi $EXE_pw"
         fi
         echo ""
@@ -687,7 +692,7 @@ while [ $count_files -le ${BL_number[iSTRU]} ]
 do
     BL=`echo "${info[iSTRU]}" | awk '{print $'$count_files'}' ` 
     cat >> INPUT << EOF
-../$element-$rcut-$BL.$lat0.dat
+../OUT.$element-$rcut-$BL/orb_matrix.0.dat
 EOF
     let count_files++
 done
@@ -796,8 +801,240 @@ EOF
 
 
 
-        else # begin from if [ "${EXE_orbital:0-3:3}" != ".py" ]; 
-            echo -e " Using PyTorch Gradient Method \n" 
+
+
+
+
+
+
+
+
+
+
+
+        elif [ "${EXE_orbital:0-12:12}" == "dpsi/main.py"  ]; then  # begin from if [ "${EXE_orbital:0-3:3}" != ".py" ]; 
+            echo -e " Using PyTorch Gradient Method V2 (include dpsi) \n" 
+
+            ### len(dis[info["input"]["element"]]),
+            ### (1.4.3.2) prepare INPUT file in json for PyTorch program
+
+cat > INPUT << EOF
+{
+    "file_list":
+    {
+        "origin":
+        [  
+EOF
+
+count_files=1
+while [ $count_files -lt ${BL_number[iSTRU]} ]
+do
+    BL=`echo "${info[iSTRU]}" | awk '{print $'$count_files'}' ` 
+    cat >> INPUT << EOF
+            "../OUT.$element-$rcut-$BL/orb_matrix.0.dat",
+EOF
+    let count_files++
+done
+BL=`echo "${info[iSTRU]}" | awk '{print $'$count_files'}' ` 
+cat >> INPUT << EOF
+            "../OUT.$element-$rcut-$BL/orb_matrix.0.dat"
+        ],
+        "linear":
+        [
+            [ 
+EOF
+
+count_files=1
+while [ $count_files -lt ${BL_number[iSTRU]} ]
+do
+    BL=`echo "${info[iSTRU]}" | awk '{print $'$count_files'}' ` 
+    cat >> INPUT << EOF
+            "../OUT.$element-$rcut-$BL/orb_matrix.1.dat",
+EOF
+    let count_files++
+done
+BL=`echo "${info[iSTRU]}" | awk '{print $'$count_files'}' ` 
+cat >> INPUT << EOF
+            "../OUT.$element-$rcut-$BL/orb_matrix.1.dat"
+            ]
+        ]
+EOF
+
+cat >> INPUT << EOF
+
+    },
+    "info":
+    {
+        "Nt_all": [
+            "$element"
+            ],
+        "Nu": {
+            "$element": [
+EOF
+
+
+if [ ${RestartSTRU[$iSTRU]} -ge 1 ] ; then 
+    lr_value=0.0001
+else
+    lr_value=0.01
+fi
+echo  " iSTRULeft: $iSTRULeft, iSTRU: $iSTRU "
+echo  " BeginLevel[STRUs]: (${BeginLevel[@]}) "
+echo  " EndLevel[STRUs]: (${EndLevel[@]}) "
+#if   [ $ifRestart -eq 0 ] ; then
+#    C_init_from_file="false"
+#elif [ $ifRestart -eq 1 ] ; then
+#    C_init_from_file="true"
+#fi
+
+
+LValueMax=0
+for LValue in {0..4} ;
+do 
+    numL[$LValue]=0
+done
+
+for((i=1;i<=${EndLevel[iSTRU]};i++))
+do
+    #if [ $i -le ${EndLevel[iSTRULeft]} ]; 
+    #then
+    #    C_init_from_file="true"
+    #    #echo " Level:$i, C_init_from_file = " $C_init_from_file
+    #fi
+
+    Llevels_i=( ${Llevels[i]} )
+    for LValue in {0..4} ;
+    do 
+        nAdd=${Llevels_i[$LValue+1]}
+        #echo " nAdd = $nAdd"
+        if [ "$nAdd" != "" ]; then 
+            numL[$LValue]=$(( ${numL[$LValue]} + $nAdd ))
+
+            if [ $LValueMax -lt $LValue ]; then 
+                LValueMax=$LValue
+            fi
+        fi
+    done 
+done
+echo    " numL = ${numL[@]}, LValueMax = $LValueMax "
+
+for((LValue=0; LValue<${LValueMax}; LValue++))
+do
+    cat >> INPUT << EOF
+                ${numL[$LValue]}, 
+EOF
+done
+
+    cat >> INPUT << EOF
+                ${numL[$LValueMax]}
+                ]
+        },
+        "Rcut": {
+            "$element": $rcut 
+        },
+        "dr": {
+            "$element": 0.01
+        },
+        "Ecut": {
+            "$element": $ecut
+        },
+    	"lr":  $lr_value,
+        "cal_T":    true,
+        "cal_smooth": true
+    },
+	"weight":
+	{
+        "stru": [
+EOF
+
+for((i_BL=1; i_BL<${BL_number[iSTRU]}; i_BL++))
+do
+    cat >> INPUT << EOF
+            1, 
+EOF
+done
+    cat >> INPUT << EOF
+            1
+         ],
+EOF
+
+
+if [ 2 -ge 1 ] ; then     
+    cat >> INPUT << EOF
+        "bands_range": [
+EOF
+for((i_BL=1; i_BL<${BL_number[iSTRU]}; i_BL++))
+do
+    cat >> INPUT << EOF
+            `printf %.0f ${ref_bands[iSTRU]}`, 
+EOF
+done
+    cat >> INPUT << EOF
+            `printf %.0f ${ref_bands[iSTRU]}`
+         ]
+EOF
+else
+    cat >> INPUT << EOF
+        "bands_file": [
+         ]
+EOF
+fi    
+
+
+    cat >> INPUT << EOF
+    },
+    "C_init_info":
+    {
+EOF
+C_init_file="ORBITAL_RESULTS.txt"
+if [ ${RestartSTRU[$iSTRU]} -ge 1 ] ; then  ## [ "$C_init_from_file" == "true" ]; then
+    cat >> INPUT << EOF
+        "init_from_file": true,
+        "C_init_file"   : "$C_init_file",
+        "opt_C_read"    : false
+EOF
+    echo -e " init_from_file : true, \n C_init_file : $C_init_file, \n opt_C_read: false\n"
+elif [ ${RestartSTRU[$iSTRU]} -eq 0 ] ; then
+    cat >> INPUT << EOF
+        "init_from_file": false
+EOF
+    echo -e " init_from_file : false \n "
+else 
+    exit
+fi
+
+    cat >> INPUT << EOF
+    },
+    "V_info": 
+    {
+        "same_band":		true,
+        "init_from_file":	true
+    }
+}
+EOF
+
+
+export OMP_NUM_THREADS=$Host1_NCore
+echo " Set OMP_NUM_THREADS = $OMP_NUM_THREADS "
+echo " Python2 Version: " `which python2`
+echo " Python3 Version: " `which python3`
+echo "" 
+
+
+
+
+        
+        
+        
+
+
+
+
+
+
+
+        else # begin from: if [ "${EXE_orbital:0-3:3}" != ".py" ];
+            echo -e " Using Previous PyTorch Gradient Method \n" 
 
             ### len(dis[info["input"]["element"]]),
             ### (1.4.3.2) prepare INPUT file in json for PyTorch program
@@ -812,13 +1049,13 @@ while [ $count_files -lt ${BL_number[iSTRU]} ]
 do
     BL=`echo "${info[iSTRU]}" | awk '{print $'$count_files'}' ` 
     cat >> INPUT << EOF
-        "../$element-$rcut-$BL.$lat0.dat",
+        "../OUT.$element-$rcut-$BL/orb_matrix.0.dat",
 EOF
     let count_files++
 done
     BL=`echo "${info[iSTRU]}" | awk '{print $'$count_files'}' ` 
 cat >> INPUT << EOF
-        "../$element-$rcut-$BL.$lat0.dat"
+        "../OUT.$element-$rcut-$BL/orb_matrix.0.dat"
     ],
     "info": {
         "Nt_all": [
@@ -917,7 +1154,9 @@ fi
         "Ecut": {
             "$element": $ecut
         },
-    	"lr":  $lr_value
+    	"lr":  $lr_value,
+        "cal_T":    false,
+        "cal_smooth": true
     },
     "C_init_info": {
 EOF
@@ -946,14 +1185,11 @@ fi
     }
 }
 EOF
+
+
+
 export OMP_NUM_THREADS=$Host1_NCore
 echo " Set OMP_NUM_THREADS = $OMP_NUM_THREADS "
-module unload python/2.7.12-sq-tk-test
-module load anaconda3
-sleep 2
-source activate pytorch110
-#conda activate pytorch110 
-conda info --envs
 echo " Python2 Version: " `which python2`
 echo " Python3 Version: " `which python3`
 echo "" 
@@ -974,15 +1210,11 @@ echo ""
         if [ "${EXE_orbital:0-3:3}" == ".py" ]; then
             echo "" 
             unset  OMP_NUM_THREADS
-            echo " Back to OMP_NUM_THREADS = $OMP_NUM_THREADS "
-            sleep 2
-            #source deactivate pytorch110
-            conda deactivate
-            module unload anaconda3
-            module load python/2.7.12-sq-tk-test
-            #sleep2
-            echo " Back to Python2: " `which python2`
-            echo " Back to Python3: " `which python3`
+            echo " unset OMP_NUM_THREADS "
+            #... 
+            #echo " Back to Python2: " `which python2`
+            #echo " Back to Python3: " `which python3`
+            sleep 1
         fi
 
         #exit
@@ -1007,5 +1239,5 @@ done
 
 time_end=`date +%s`
 time_passed=$(($time_end - $time_start)) 
-echo -e " Time :   $time_passed  \n"
+echo -e " Total Time:   $time_passed  \n"
 
