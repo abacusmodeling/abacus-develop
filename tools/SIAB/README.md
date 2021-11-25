@@ -22,16 +22,17 @@ Please use the absolute path for each each file and directory.
 
 ##  (2) set up dependence env
 Then, we set up the dependence env for ABACUS and SIAB, such as:
-'''
-module load hpcx/2.9.0/hpcx-intel-2019.update5 mkl/2019.update5 elpa/2019.05.002/hpcx-intel-2019.update5
-'''
+
+```bash
+$ module load hpcx/2.9.0/hpcx-intel-2019.update5 mkl/2019.update5 elpa/2019.05.002/hpcx-intel-2019.update5
+```
 Especially for SIAB with 'PyTorch Gradient' approach, we need pytorch v1.1.0.
 
 
 ### how to install pytorch:
 Take the HanHai20@USTC system for example:
 
-''' bash
+```bash
 $ module load gcc/7.5.0min      #:optional, larger version gcc may not be necessary.
 $ module load anaconda3
 $ module list
@@ -50,15 +51,15 @@ $ source deactivate  #or: conda deactivate
 $ source activate pytorch110  #or: conda activate pytorch110
 $ pip3 install --user scipy numpy
 $ pip3 install --user torch_optimizer
-'''
+```
 
 
 ## (3) run generation
 Finally, 'cd' into an example folder, and run command like this:
 
-''' bash
-../Generate_Orbital_AllInOne.sh ORBITAL_INPUT_DZP
-# or
-bsub -q idle -n 8 -oo running.log ../Generate_Orbital_AllInOne.sh ORBITAL_INPUT_DZP
-'''
+```bash
+$ ../Generate_Orbital_AllInOne.sh ORBITAL_INPUT_DZP
+ or
+$ bsub -q idle -n 8 -oo running.log ../Generate_Orbital_AllInOne.sh ORBITAL_INPUT_DZP
+```
 
