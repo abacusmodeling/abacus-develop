@@ -221,7 +221,7 @@ void Input::Default(void)
 //----------------------------------------------------------
     dr2 = 1.0e-9;
     niter = 40;
-    nstep = 1;
+    this->nstep = 0;
 	out_stru = 0;
 //----------------------------------------------------------
 // occupation
@@ -947,7 +947,7 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("nstep", word) == 0)
         {
-            read_value(ifs, nstep);
+            read_value(ifs, this->nstep);
         }
         else if (strcmp("out_stru", word) == 0)
         {
@@ -2199,7 +2199,7 @@ void Input::Bcast()
 
     Parallel_Common::bcast_double( dr2 );
     Parallel_Common::bcast_int( niter );
-    Parallel_Common::bcast_int( nstep );
+    Parallel_Common::bcast_int( this->nstep );
 	Parallel_Common::bcast_int( out_stru ); //mohan add 2012-03-23
 
     //Parallel_Common::bcast_string( occupations );
@@ -2556,7 +2556,7 @@ void Input::Check(void)
 			std::cout<<"sorry, can't calculate force with soc now, would be implement in next version!"<<std::endl;
 		}
 */
-                nstep = 1;
+                this->nstep = 1;
 
     }
 	else if (calculation == "scf-sto")  // qianrui 2021-2-20
@@ -2566,6 +2566,7 @@ void Input::Check(void)
                         mem_saver = 0;
                         ModuleBase::GlobalFunc::AUTO_SET("mem_savre","0");
                 }
+				this->nstep = 1;
     }
     else if (calculation == "relax")  // pengfei 2014-10-13
     {
@@ -2575,12 +2576,13 @@ void Input::Check(void)
                         ModuleBase::GlobalFunc::AUTO_SET("mem_savre","0");
                 }
                 force = 1;
+				if(! this->nstep) this->nstep = 50;
     }
 
     else if (calculation == "nscf")
     {
 		GlobalV::CALCULATION = "nscf";
-        nstep = 1;
+        this->nstep = 1;
 		out_stru = 0;
 
 		//if (local_basis == 0 && linear_scaling == 0) xiaohui modify 2013-09-01
@@ -2604,7 +2606,7 @@ void Input::Check(void)
 	else if(calculation == "istate")
 	{
 		GlobalV::CALCULATION = "istate";
-		nstep = 1;
+		this->nstep = 1;
 		out_stru = 0;
 		out_dos = 0;
                 out_band = 0;
@@ -2625,7 +2627,7 @@ void Input::Check(void)
 	else if(calculation == "ienvelope")
 	{
 		GlobalV::CALCULATION = "ienvelope"; // mohan fix 2011-11-04
-		nstep = 1;
+		this->nstep = 1;
 		out_stru = 0;
 		out_dos = 0;
                 out_band = 0;
@@ -2647,6 +2649,10 @@ void Input::Check(void)
 		GlobalV::CALCULATION = "md";
 		symmetry = false;
 		force = 1;
+		if(this->nstep==0){
+			GlobalV::ofs_running<<"nstep should be set. Autoset nstep to 50!"<<endl;
+			this->nstep = 50;
+		}
         if(!out_md_control) out_level = "m";//zhengdy add 2019-04-07
 
         //deal with input parameters , 2019-04-30
@@ -2677,9 +2683,11 @@ void Input::Check(void)
 	{
 		force = 1;
 		stress = 1;
+		if(! this->nstep) this->nstep = 50;
 	}
 	else if(calculation == "test")
 	{
+		this->nstep = 1;
 	}
     else
     {

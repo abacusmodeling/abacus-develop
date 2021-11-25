@@ -264,6 +264,7 @@ void Forces::print(const std::string &name, const ModuleBase::matrix &f, bool ry
 
 	GlobalV::ofs_running << " " << std::setw(8) << "atom" << std::setw(15) << "x" << std::setw(15) << "y" << std::setw(15) << "z" << std::endl;
 	GlobalV::ofs_running << std::setiosflags(ios::showpos);
+    GlobalV::ofs_running << std::setprecision(8);
 
 	const double fac = ModuleBase::Ry_to_eV / 0.529177;
 	

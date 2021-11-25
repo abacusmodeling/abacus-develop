@@ -331,7 +331,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 				else if(spin_number_need==2)
 				{
 					if(startmag_type==1)
-					{ cout<<"this should not be called";
+					{
 						for (int ig = 0; ig < GlobalC::pw.ngmc ; ig++)
 						{
 							const std::complex<double> swap = GlobalC::pw.strucFac(it, ig)* rho_lgl[GlobalC::pw.ig2ngg[ig]];
@@ -375,7 +375,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 				{
 					//noncolinear case
 					if(startmag_type == 1)
-					{cout<<"this would not be call";
+					{
 						for (int ig = 0; ig < GlobalC::pw.ngmc ; ig++)
 						{
 							const std::complex<double> swap = GlobalC::pw.strucFac(it, ig)* rho_lgl[GlobalC::pw.ig2ngg[ig]];
