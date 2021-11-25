@@ -54,19 +54,30 @@ def copy_C(C,info):
 	
 	
 	
-def write_C(file_name,info,C):
+def write_C(file_name,info,C,Spillage):
 	with open(file_name,"w") as file:
 		print("<Coefficient>", file=file)
-		print("\tTotal number of radial orbitals.", file=file)
+		#print("\tTotal number of radial orbitals.", file=file)
+		nTotal = 0
+		for it,C_t in C.items():
+			for il,C_tl in enumerate(C_t):
+				for iu in range(C_tl.size()[1]):
+					nTotal += 1 
+			#nTotal = sum(info["Nu"][it])
+		print("\t %s Total number of radial orbitals."%nTotal , file=file) 
+		#print("\tTotal number of radial orbitals.", file=file)
 		for it,C_t in C.items():
 			for il,C_tl in enumerate(C_t):
 				for iu in range(C_tl.size()[1]):
 					print("\tType\tL\tZeta-Orbital", file=file)
 					print(f"\t  {info.Nt_all.index(it)+1} \t{il}\t    {iu+1}", file=file)
 					for ie in range(C_tl.size()[0]):
-						print("\t", C_tl[ie,iu].item(), file=file)
+						print("\t", '%18.14f'%C_tl[ie,iu].item(), file=file)
 		print("</Coefficient>", file=file)
-	
+		print("<Mkb>", file=file)
+		print("Left spillage = %.10e"%Spillage.item(), file=file)
+		print("</Mkb>", file=file)
+
 	
 #def init_C(info):
 #	""" C[it][il][ie,iu] """
