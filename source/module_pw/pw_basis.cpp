@@ -39,7 +39,7 @@ PW_Basis:: ~PW_Basis()
     if(numz != NULL) delete[] numz;
 }
 
-void PW_Basis::distribute()
+void PW_Basis::setuptransform()
 {
     this->distribute_r();
     this->distribute_g();

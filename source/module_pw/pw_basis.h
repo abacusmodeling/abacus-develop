@@ -77,7 +77,7 @@ public:
 	// gg_global dimension: [cutgg_num_now] (save memory skill is used)
 
     //distribute plane waves and grids and set up fft
-    void distribute();
+    void setuptransform();
     
     //distribute plane waves to different processors
     void distribute_g();

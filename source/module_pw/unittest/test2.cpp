@@ -1,3 +1,6 @@
+//---------------------------------------------
+// TEST for FFT
+//---------------------------------------------
 #include "../pw_basis.h"
 #include "../../module_base/matrix3.h"
 #include "test_tool.h"
@@ -30,7 +33,7 @@ int main(int argc,char **argv)
     //init
     pwtest.initgrids(lat0,latvec,4*wfcecut);
     pwtest.initparameters(false,wfcecut,nproc_in_pool,rank_in_pool,1);
-    pwtest.distribute();
+    pwtest.setuptransform();
 
     int npw = pwtest.npw;
     int nrxx = pwtest.nrxx;
