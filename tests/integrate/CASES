@@ -70,6 +70,7 @@
 304_NO_GO_AF
 304_NO_GO_FM
 307_NO_GO_OH
+320_NO_GO_MD_FIRE
 345_NO_GO_BS
 
 401_NP_KP_sp
@@ -78,3 +79,17 @@
 601_NO_TDDFT_N2_occ
 #701_LJ_Ar
 
+801_PW_LT_sc
+802_PW_LT_fcc
+803_PW_LT_bcc
+804_PW_LT_hexagonal
+805_PW_LT_trigonal
+806_PW_LT_st
+807_PW_LT_bct
+808_PW_LT_so
+809_PW_LT_baco
+810_PW_LT_fco
+811_PW_LT_bco
+812_PW_LT_sm
+813_PW_LT_bacm
+814_PW_LT_triclinic
