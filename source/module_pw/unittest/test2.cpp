@@ -2,12 +2,10 @@
 // TEST for FFT
 //---------------------------------------------
 #include "../pw_basis.h"
-#include "../../module_base/matrix3.h"
 #include "test_tool.h"
 #include "../../module_base/constants.h"
 #include "../../module_base/global_function.h"
 #include <iostream>
-#include <complex>
 
 using namespace std;
 int main(int argc,char **argv)
