@@ -76,6 +76,9 @@ public:
     //gg[ng]=ig[ng]*GGT*ig[ng]/(lat0*lat0)=g[ng]*g[ng] (/lat0*lat0)
 	// gg_global dimension: [cutgg_num_now] (save memory skill is used)
 
+    //distribute plane waves and grids and set up fft
+    void setuptransform();
+    
     //distribute plane waves to different processors
     void distribute_g();
 

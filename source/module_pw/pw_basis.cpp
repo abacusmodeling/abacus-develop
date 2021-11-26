@@ -39,6 +39,14 @@ PW_Basis:: ~PW_Basis()
     if(numz != NULL) delete[] numz;
 }
 
+void PW_Basis::setuptransform()
+{
+    this->distribute_r();
+    this->distribute_g();
+    this->ft.initfft(this->bignx,this->ny,this->nz,this->nst,this->nplane);
+    this->ft.setupFFT();
+}
+
 //
 // Collect planewaves on current core, and construct gg, gdirect, gcar according to ig2isz and is2ixy.
 // is2ixy contains the x-coordinate and y-coordinate of sticks on current core.
