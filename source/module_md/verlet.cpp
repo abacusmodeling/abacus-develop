@@ -29,6 +29,8 @@ Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     frozen_freedom_ = MD_func::getMassMbl(ucell, mdp, allmass, ionmbl);
     MD_func::InitPos(ucell, pos);
 
+    std::cout << mdp.rstMD << "  " << ucell.set_vel << std::endl;
+
     if(mdp.rstMD)
     {
         if(!MD_func::RestartMD(ucell.nat, vel, step_rst_))

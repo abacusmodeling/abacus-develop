@@ -16,6 +16,8 @@ public:
     double extra_term();
     double vel_sum();
     void rescale(double volume);
+    void propagate_vel();
+    void propagate_voldot();
 
     ModuleBase::Vector3<double> *old_v;
     ModuleBase::Vector3<double> dilation;      // dilation scale

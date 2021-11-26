@@ -70,59 +70,23 @@ void MSST::first_half()
     ModuleBase::timer::tick("MSST", "first_half");
 
     const int sd = mdp.direction;
-    double p_current = stress(sd, sd);
     const double dthalf = 0.5 * mdp.dt;
 
     energy_ = potential + kinetic;
 
-    double p_msst = mdp.velocity * mdp.velocity * totmass * (v0 - ucell.omega) / (v0 * v0);
-    double const_A = totmass * (p_current - p0 - p_msst) / mdp.Qmass;
-    double const_B = totmass * mdp.viscosity / (mdp.Qmass * ucell.omega);
-
-    // prevent the increase of volume
-    if(ucell.omega > v0 && const_A > 0)
-    {
-        const_A = -const_A;
-    }
-
-    // avoid singularity at B = 0 with Taylor expansion
-    double fac1 = const_B * dthalf;
-    if(fac1 > 1e-6)
-    {
-        omega[sd] = (omega[sd] + const_A * (exp(fac1) - 1) / const_B) * exp(-fac1);
-    }
-    else
-    {
-        omega[sd] += (const_A - const_B * omega[sd]) * dthalf + 
-            0.5 * (const_B * const_B * omega[sd] - const_A * const_B) * dthalf * dthalf;
-    }
+    // propagate the time derivative of volume 1/2 step
+    propagate_voldot();
 
     vsum = vel_sum();
 
-    // propagate velocity sum 1/2 step by temporarily propagating the velocities
-    double fac2 = mdp.viscosity * pow(omega[sd], 2) / (vsum * ucell.omega);
-    for(int i=0; i<ucell.nat; ++i)
+    // save the velocities
+    for(int i; i<ucell.nat; ++i)
     {
         old_v[i] = vel[i];
-        ModuleBase::Vector3<double> const_C = force[i] / allmass[i];
-        ModuleBase::Vector3<double> const_D;
-        const_D.set(fac2/allmass[i], fac2/allmass[i], fac2/allmass[i]);
-        const_D[sd] -= 2 * omega[sd] / ucell.omega;
-
-        for(int k=0; k<3; ++k)
-        {
-            if( fabs(dthalf*const_D[k]) > 1e-6 )
-            {
-                double expd = exp(dthalf*const_D[k]);
-                vel[i][k] = expd * ( const_C[k] + const_D[k] * vel[i][k] - const_C[k] / expd ) / const_D[k];
-            }
-            else
-            {
-                vel[i][k] += ( const_C[k] + const_D[k] * vel[i][k] ) * dthalf + 
-                    0.5 * (const_D[k] * const_D[k] * vel[i][k] + const_C[k] * const_D[k] ) * dthalf * dthalf;
-            }
-        }
     }
+
+    // propagate velocity sum 1/2 step by temporarily propagating the velocities
+    propagate_vel();
 
     vsum = vel_sum();
 
@@ -133,28 +97,7 @@ void MSST::first_half()
     }
 
     // propagate velocities 1/2 step using the new velocity sum
-    fac2 = mdp.viscosity * pow(omega[sd], 2) / (vsum * ucell.omega);
-    for(int i=0; i<ucell.nat; ++i)
-    {
-        ModuleBase::Vector3<double> const_C = force[i] / allmass[i];
-        ModuleBase::Vector3<double> const_D;
-        const_D.set(fac2/allmass[i], fac2/allmass[i], fac2/allmass[i]);
-        const_D[sd] -= 2 * omega[sd] / ucell.omega;
-
-        for(int k=0; k<3; ++k)
-        {
-            if( fabs(dthalf*const_D[k]) > 1e-6 )
-            {
-                double expd = exp(dthalf*const_D[k]);
-                vel[i][k] = expd * ( const_C[k] + const_D[k] * vel[i][k] - const_C[k] / expd ) / const_D[k];
-            }
-            else
-            {
-                vel[i][k] += ( const_C[k] + const_D[k] * vel[i][k] ) * dthalf + 
-                    0.5 * (const_D[k] * const_D[k] * vel[i][k] + const_C[k] * const_D[k] ) * dthalf * dthalf;
-            }
-        }
-    }
+    propagate_vel();
 
     // propagate volume 1/2 step
     double vol = ucell.omega + omega[sd] * dthalf;
@@ -179,7 +122,31 @@ void MSST::first_half()
     ModuleBase::timer::tick("MSST", "first_half");
 }
 
-void MSST::second_half(){}
+void MSST::second_half()
+{
+    ModuleBase::TITLE("MSST", "second_half");
+    ModuleBase::timer::tick("MSST", "second_half");
+
+    const int sd = mdp.direction;
+    const double dthalf = 0.5 * mdp.dt;
+
+    energy_ = potential + kinetic;
+
+    // propagate velocities 1/2 step
+    propagate_vel();
+
+    vsum = vel_sum();
+    MD_func::kinetic_stress(ucell, vel, allmass, kinetic, stress);
+    stress += virial;
+
+    // propagate the time derivative of volume 1/2 step
+    propagate_voldot();
+
+    // calculate Lagrangian position
+    lag_pos -= mdp.velocity * ucell.omega / v0 * mdp.dt;
+
+    ModuleBase::timer::tick("MSST", "second_half");
+}
 
 void MSST::outputMD(){}
 
@@ -204,6 +171,8 @@ void MSST::rescale(double volume)
 {
     int sd = mdp.direction;
 
+    std::cout << __FILE__ << __LINE__ << volume << std::endl;
+
     dilation[sd] = volume/ucell.omega;
     ucell.latvec.e11 *= dilation[0];
     ucell.latvec.e22 *= dilation[1];
@@ -216,5 +185,62 @@ void MSST::rescale(double volume)
     for(int i=0; i<ucell.nat; ++i)
     {
         vel[i][sd] *= dilation[sd];
+    }
+}
+
+void MSST::propagate_vel()
+{
+    const int sd = mdp.direction;
+    const double dthalf = 0.5 * mdp.dt;
+    const double fac = mdp.viscosity * pow(omega[sd], 2) / (vsum * ucell.omega);
+
+    for(int i=0; i<ucell.nat; ++i)
+    {
+        ModuleBase::Vector3<double> const_C = force[i] / allmass[i];
+        ModuleBase::Vector3<double> const_D;
+        const_D.set(fac/allmass[i], fac/allmass[i], fac/allmass[i]);
+        const_D[sd] -= 2 * omega[sd] / ucell.omega;
+
+        for(int k=0; k<3; ++k)
+        {
+            if( fabs(dthalf*const_D[k]) > 1e-6 )
+            {
+                double expd = exp(dthalf*const_D[k]);
+                vel[i][k] = expd * ( const_C[k] + const_D[k] * vel[i][k] - const_C[k] / expd ) / const_D[k];
+            }
+            else
+            {
+                vel[i][k] += ( const_C[k] + const_D[k] * vel[i][k] ) * dthalf + 
+                    0.5 * (const_D[k] * const_D[k] * vel[i][k] + const_C[k] * const_D[k] ) * dthalf * dthalf;
+            }
+        }
+    }
+}
+
+void MSST::propagate_voldot()
+{
+    const int sd = mdp.direction;
+    const double dthalf = 0.5 * mdp.dt;
+    double p_current = stress(sd, sd);
+    double p_msst = mdp.velocity * mdp.velocity * totmass * (v0 - ucell.omega) / (v0 * v0);
+    double const_A = totmass * (p_current - p0 - p_msst) / mdp.Qmass;
+    double const_B = totmass * mdp.viscosity / (mdp.Qmass * ucell.omega);
+
+    // prevent the increase of volume
+    if(ucell.omega > v0 && const_A > 0)
+    {
+        const_A = -const_A;
+    }
+
+    // avoid singularity at B = 0 with Taylor expansion
+    double fac = const_B * dthalf;
+    if(fac > 1e-6)
+    {
+        omega[sd] = (omega[sd] + const_A * (exp(fac) - 1) / const_B) * exp(-fac);
+    }
+    else
+    {
+        omega[sd] += (const_A - const_B * omega[sd]) * dthalf + 
+            0.5 * (const_B * const_B * omega[sd] - const_A * const_B) * dthalf * dthalf;
     }
 }
