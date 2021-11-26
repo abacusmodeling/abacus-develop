@@ -1,4 +1,6 @@
 #include "pw_basis.h"
+#include "../module_base/global_function.h"
+
 namespace ModulePW
 {
 //
@@ -8,6 +10,10 @@ namespace ModulePW
 //
 void PW_Basis::distribute_r()
 {
+    this->numz = new int[this->poolnproc];
+    this->startz = new int[this->poolnproc];
+    ModuleBase::GlobalFunc::ZEROS(this->numz, this->poolnproc);
+
     int npz = this->nz / this->poolnproc;
     int modz = this->nz % this->poolnproc;
     this->startz[0] = 0;
@@ -18,7 +24,7 @@ void PW_Basis::distribute_r()
         if(ip < this->poolnproc - 1)   this->startz[ip+1] += numz[ip];
         if(ip == this->poolrank) this->nplane = numz[ip];
     }
-    this->nrxx = this->numz[this->poolrank];
+    this->nrxx = this->numz[this->poolrank] * this->nxy;
     return;
 }
 
