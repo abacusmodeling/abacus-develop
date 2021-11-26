@@ -71,53 +71,53 @@ int main(int argc,char **argv)
                     double modulus = v * (GGT * v);
                     if (modulus <= ggecut)
                     {
-                        if (modulus == 0)
-                        {
-                            tmp[ix*ny*nz + iy*nz + iz]=1.0;
-                        } 
-                        else 
-                        {
-                            tmp[ix*ny*nz + iy*nz + iz]=1.0;
-                        }
+                        tmp[ix*ny*nz + iy*nz + iz]=1.0/(modulus+1);
                     }
                 }
             }   
-            fftw_plan pp = fftw_plan_dft_3d(nz,ny,nx,(fftw_complex *) tmp, (fftw_complex *) tmp, FFTW_BACKWARD, FFTW_ESTIMATE);
-            fftw_execute(pp);
-            fftw_free(pp);
-            
-            //output
-            cout << "old method\n";
-            ModuleBase::Vector3<double> delta_g(double((int(nx/2)+1))/nx, double((int(ny/2)+1))/ny, double((int(ny/2)+1))/nz); 
-            for(int i = 0 ; i < nx*ny ; i+=1)
-            {
-                int ix = i / (ny * nz);
-                int iy = (i - ix*ny*nz)/ nz;
-                int iz = i % nz;
-                ModuleBase::Vector3<double> real_r(ix, iy, iz);
-                double phase_im = delta_g * real_r;
-                complex<double> phase(0,ModuleBase::TWO_PI * phase_im);
-                tmp[i] /= nxyz;
-                tmp[i] *= exp(phase);
-                cout<<tmp[i]<<" ";
-            }
-            cout<<endl;
         }
+        fftw_plan pp = fftw_plan_dft_3d(nz,ny,nx,(fftw_complex *) tmp, (fftw_complex *) tmp, FFTW_BACKWARD, FFTW_ESTIMATE);
+        fftw_execute(pp);
+        fftw_free(pp);
+        
+        //output
+        cout << "old method\n";
+        ModuleBase::Vector3<double> delta_g(double((int(nx/2)+1))/nx, double((int(ny/2)+1))/ny, double((int(ny/2)+1))/nz); 
+        for(int i = 0 ; i < nx*ny ; i+=1)
+        {
+            int ix = i / (ny * nz);
+            int iy = (i - ix*ny*nz)/ nz;
+            int iz = i % nz;
+            ModuleBase::Vector3<double> real_r(ix, iy, iz);
+            double phase_im = delta_g * real_r;
+            complex<double> phase(0,ModuleBase::TWO_PI * phase_im);
+            tmp[i] /= nxyz;
+            tmp[i] *= exp(phase);
+            cout<<tmp[i]<<" ";
+        }
+        cout<<endl;
+    }
     
     complex<double> * rhog = new complex<double> [npw];
     for(int ig = 0 ; ig < npw ; ++ig)
     {
-        rhog[ig] = 1.0/pwtest.gg[ig];
-        cout<<pwtest.gg[ig]<<setw(4);
+        rhog[ig] = 1.0/(pwtest.gg[ig]+1);
     }    
     complex<double> * rhor = new complex<double> [nrxx];
     pwtest.recip2real(rhog,rhor);
-    cout << "new method\n";
-    for(int i = 0 ; i < nx*ny ; i+=1)
+
+    int ip = 0;
+    if (myrank == ip)
     {
-        cout<<rhor[i]<<" ";
+        cout << "new method\n";
+        cout << "ip   " << ip << endl;
+        for(int i = 0 ; i < nx*ny ; i+=1)
+        {
+            cout<<rhor[i]<<" ";
+        }
+        cout<<endl;            
     }
-    cout<<endl;
+
 
     return 0;
 }
