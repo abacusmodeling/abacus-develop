@@ -13,6 +13,7 @@ void PW_Basis::distribute_r()
     this->numz = new int[this->poolnproc];
     this->startz = new int[this->poolnproc];
     ModuleBase::GlobalFunc::ZEROS(this->numz, this->poolnproc);
+    ModuleBase::GlobalFunc::ZEROS(this->startz, this->poolnproc);
 
     int npz = this->nz / this->poolnproc;
     int modz = this->nz % this->poolnproc;
