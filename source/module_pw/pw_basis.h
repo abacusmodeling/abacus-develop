@@ -90,6 +90,8 @@ public:
     void distribution_method1(); // x varies fast
     void distribution_method2(); // y varies fast
 
+    void collect_local_pw();
+
     void collect_tot_pw(
         double* gg_global,
         ModuleBase::Vector3<double> *gdirect_global,

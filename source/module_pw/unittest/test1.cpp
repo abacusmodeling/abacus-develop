@@ -5,7 +5,7 @@
 int main(int argc,char **argv)
 {
     ModuleBase::Matrix3 latvec(1,0,0,0,1,0,0,0,1);
-    bool gamma_only = false;
+    bool gamma_only = true;
     double ecut = 100;
     double lat0 = 1;
     int nproc, myrank;
@@ -46,6 +46,21 @@ int main(int argc,char **argv)
                 for (int ixy = 0; ixy < nxy; ixy++) std::cout << pwtest.ixy2ip[ixy] << std::setw(4);
                 std::cout << "\n";
             }
+            std::cout << "ig2isz    ";
+            for (int ig = 0; ig < pwtest.npw; ++ig) std::cout << pwtest.ig2isz[ig] << std::setw(4);
+            std::cout << "\nis2ixy    ";
+            for (int is = 0; is < pwtest.nst; ++is) std::cout << pwtest.is2ixy[is] << std::setw(4);
+            std::cout << "\n";
+        }
+    }
+    MPI_Barrier(POOL_WORLD);
+    pwtest.collect_local_pw();
+    for (int ip = 0; ip < nproc; ip++)
+    {
+        MPI_Barrier(POOL_WORLD);
+        if (rank_in_pool == ip)
+        {
+            std::cout<<"ip:  "<<ip<<'\n';
             std::cout << "gg    gdirect    gcar\n";
             for (int ig = 0; ig < pwtest.npw; ++ig)
             {
@@ -58,25 +73,24 @@ int main(int argc,char **argv)
             std::cout << "\n";
         }
     }
-    MPI_Barrier(POOL_WORLD);
 
-    if (rank_in_pool == 0)
-    {
-        std::cout << "tot_npw   " << tot_npw << "\n";
-        double* gg_global = new double[tot_npw];
-        ModuleBase::Vector3<double> *gdirect_global = new ModuleBase::Vector3<double>[tot_npw];
-        ModuleBase::Vector3<double> *gcar_global = new ModuleBase::Vector3<double>[tot_npw];
-        pwtest.collect_tot_pw(gg_global, gdirect_global, gcar_global);
-        std::cout<<"gg_global    gdirect_global    gcar_global\n";
-        for (int ig = 0; ig < tot_npw; ++ig)
-        {
-            std::cout << gg_global[ig] << std::setw(4) << gdirect_global[ig] << std::setw(4) << gcar_global[ig];
-            std::cout << "\n";
-        }
-        std::cout<<"done"<<"\n";
-        delete[] gg_global;
-        delete[] gdirect_global;
-        delete[] gcar_global;
-    }
+    // if (rank_in_pool == 0)
+    // {
+    //     std::cout << "tot_npw   " << tot_npw << "\n";
+    //     double* gg_global = new double[tot_npw];
+    //     ModuleBase::Vector3<double> *gdirect_global = new ModuleBase::Vector3<double>[tot_npw];
+    //     ModuleBase::Vector3<double> *gcar_global = new ModuleBase::Vector3<double>[tot_npw];
+    //     pwtest.collect_tot_pw(gg_global, gdirect_global, gcar_global);
+    //     std::cout<<"gg_global    gdirect_global    gcar_global\n";
+    //     for (int ig = 0; ig < tot_npw; ++ig)
+    //     {
+    //         std::cout << gg_global[ig] << std::setw(4) << gdirect_global[ig] << std::setw(4) << gcar_global[ig];
+    //         std::cout << "\n";
+    //     }
+    //     std::cout<<"done"<<"\n";
+    //     delete[] gg_global;
+    //     delete[] gdirect_global;
+    //     delete[] gcar_global;
+    // }
     return 0;
 }
