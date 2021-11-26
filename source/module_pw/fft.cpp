@@ -5,9 +5,8 @@ namespace ModulePW
 
 FFT::FFT()
 {
-	nx = ny = nz = 2;
-	nxy = 4;
-	nxyz = 8;
+	bignx = nx = ny = nz = 2;
+	bignxy = nxy = 4;
 	ns = 1; 
 	nplane = 1;
 	mpifft = false; 
@@ -36,8 +35,9 @@ FFT::~FFT()
 #endif
 }
 
-void FFT:: initfft(int nx_in, int ny_in , int nz_in, int ns_in, int nplane_in, bool mpifft_in)
+void FFT:: initfft(int bignx_in, int nx_in, int ny_in , int nz_in, int ns_in, int nplane_in, bool mpifft_in)
 {
+	this->bignx = bignx_in;
 	this->nx = nx_in;
 	this->ny = ny_in;
 	this->nz = nz_in;
@@ -45,18 +45,18 @@ void FFT:: initfft(int nx_in, int ny_in , int nz_in, int ns_in, int nplane_in, b
 	this->nplane = nplane_in;
 	this->mpifft = mpifft_in;
 	this->nxy = this->nx * this-> ny;
-	this->nxyz = this->nxy * this->nz;
+	this->bignxy = this->bignx * this-> ny;
 	if(!this->mpifft)
 	{
 		c_gspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * this->nz * this->ns);
 		r_gspace = (double *) fftw_malloc(sizeof(double) * this->nz * this->ns);
-		c_rspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * this->nx * this->ny * nplane);
-		r_rspace = (double *) fftw_malloc(sizeof(double) * this->nx * this->ny * nplane);
+		c_rspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * this->bignxy * nplane);
+		r_rspace = (double *) fftw_malloc(sizeof(double) * this->bignxy * nplane);
 #ifdef __MIX_PRECISION
 		cf_gspace  = (std::complex<float> *)fftw_malloc(sizeof(fftwf_complex) * this->nz * this->ns);
 		rf_gspace = (float *)fftw_malloc(sizeof(float) * this->nz * this->ns);
-		cf_rspace  = (std::complex<float> *)fftw_malloc(sizeof(fftwf_complex) * this->nx * this->ny * nplane);
-		rf_rspace = (float *)fftw_malloc(sizeof(float) * this->nx * this->ny * nplane);
+		cf_rspace  = (std::complex<float> *)fftw_malloc(sizeof(fftwf_complex) * this->bignxy * nplane);
+		rf_rspace = (float *)fftw_malloc(sizeof(float) * this->bignxy * nplane);
 #endif
 	}
 	else
@@ -117,7 +117,7 @@ void FFT :: initplan()
 	//                              2 D
 	//---------------------------------------------------------
 	
-	int nrank[2] = {this->nx, this->ny};
+	int nrank[2] = {this->bignx, this->ny};
 	this->plan2for = fftw_plan_many_dft(       2,   nrank,  this->nz,  
 						(fftw_complex*) c_rspace,   nrank,  this->nz,   1,
 						(fftw_complex*) c_rspace,   nrank,  this->nz,   1,  FFTW_FORWARD,  FFTW_MEASURE);
@@ -167,7 +167,7 @@ void FFT :: initplanf()
 	//                              2 D
 	//---------------------------------------------------------
 	
-	int nrank[2] = {this->nx, this->ny};
+	int nrank[2] = {this->bignx, this->ny};
 	this->planf2for = fftwf_plan_many_dft(     2,   nrank,  this->nz,  
 						(fftwf_complex*)c_rspace,   nrank,  this->nz,   1,
 						(fftwf_complex*)c_rspace,   nrank,  this->nz,   1,  FFTW_FORWARD,  FFTW_MEASURE);

@@ -1,6 +1,7 @@
 #include "fft.h"
 #include <complex>
 #include "pw_basis.h"
+#include <cassert>
 #include "../module_base/global_function.h"
 
 namespace ModulePW
@@ -13,6 +14,7 @@ namespace ModulePW
 //
 void PW_Basis:: real2recip(std::complex<double> * in, std::complex<double> * out)
 {
+    assert(this->gamma_only == false);
     for(int ir = 0 ; ir < this->nrxx ; ++ir)
     {
         this->ft.c_rspace[ir] = in[ir];
@@ -37,6 +39,7 @@ void PW_Basis:: real2recip(std::complex<double> * in, std::complex<double> * out
 //
 void PW_Basis:: real2recip(double * in, std::complex<double> * out)
 {
+    assert(this->gamma_only == true);
     for(int ir = 0 ; ir < this->nrxx ; ++ir)
     {
         this->ft.r_rspace[ir] = in[ir];
@@ -61,6 +64,7 @@ void PW_Basis:: real2recip(double * in, std::complex<double> * out)
 //
 void PW_Basis:: recip2real(std::complex<double> * in, std::complex<double> * out)
 {
+    assert(this->gamma_only == false);
     for(int igg = 0 ; igg < this->nst * this->nz ; ++igg)
     {
         this->ft.c_gspace[igg] = 0.0;
@@ -89,6 +93,7 @@ void PW_Basis:: recip2real(std::complex<double> * in, std::complex<double> * out
 //
 void PW_Basis:: recip2real(std::complex<double> * in, double * out)
 {
+    assert(this->gamma_only == true);
     for(int igg = 0 ; igg < this->nst * this->nz ; ++igg)
     {
         this->ft.c_gspace[igg] = 0.0;
