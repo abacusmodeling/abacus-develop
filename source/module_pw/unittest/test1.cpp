@@ -72,6 +72,9 @@ int main(int argc,char **argv)
             std::cout << gg_global[ig] << std::setw(4) << gdirect_global[ig] << std::setw(4) << gcar_global[ig];
             std::cout << "\n";
         }
+        delete[] gg_global;
+        delete[] gdirect_global;
+        delete[] gcar_global;
     }
     return 0;
 }
