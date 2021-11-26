@@ -40,6 +40,55 @@ PW_Basis:: ~PW_Basis()
 }
 
 //
+// Collect planewaves on current core, and construct gg, gdirect, gcar according to ig2isz and is2ixy.
+// is2ixy contains the x-coordinate and y-coordinate of sticks on current core.
+// ig2isz contains the z-coordinate of planewaves on current core.
+// We will scan the sticks on current core and find the planewaves on them, then store the information into corresponding arrays.
+// known: ig2isz, is2ixy
+// output: gg, gdirect, gcar
+// 
+void PW_Basis::collect_local_pw()
+{
+    if(gg != NULL) delete[] gg;
+    if(gdirect != NULL) delete[] gdirect;
+    if(gcar != NULL) delete[] gcar;
+    this->gg = new double[this->npw];
+    this->gdirect = new ModuleBase::Vector3<double>[this->npw];
+    this->gcar = new ModuleBase::Vector3<double>[this->npw];
+
+    ModuleBase::Vector3<double> f;
+    int pw_filled = 0; // how many current core's planewaves have been found.
+    for (int is = 0; is < this->nst; ++is)
+    {
+        int ix = this->is2ixy[is] % this->nx;
+        int iy = this->is2ixy[is] / this->nx;
+        if (ix >= int(this->nx/2) + 1 && this->gamma_only == false) ix -= this->nx;
+        if (iy >= int(this->ny/2) + 1) iy -= this->ny;
+        for (int ig = pw_filled; ig < this->npw; ++ig)
+        {
+            if (this->ig2isz[ig] < (is + 1) * this->nz) // meaning this pw belongs to is^th sticks.
+            {
+                int iz = this->ig2isz[ig] % this->nz;
+                if (iz >= int(this->nz/2) + 1) iz -= this->nz;
+                f.x = ix;
+                f.y = iy;
+                f.z = iz;
+                this->gg[pw_filled] = f * (this->GGT * f);
+                this->gdirect[pw_filled] = f;
+                this->gcar[pw_filled] = f * this->G;
+                pw_filled++;
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+    assert(pw_filled == this->npw);
+    return;
+}
+
+//
 // Collect total planewaves, store moduli to gg_global, direct coordinates to gdirect_global, and Cartesian coordinates to gcar_global,
 // planewaves are stored in the order of modulus increasing.
 // known: nx, ny, nz, ggcut
