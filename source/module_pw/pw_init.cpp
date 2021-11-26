@@ -1,4 +1,5 @@
 #include "./pw_basis.h"
+#include "../module_base/constants.h"
 
 namespace ModulePW
 {
@@ -8,11 +9,13 @@ namespace ModulePW
 //Output: nx, ny, nz, nxyz, latvec, G, GT, GGT
 //
 void PW_Basis:: initgrids(
+        double lat0_in, //unit length (unit in bohr)
         ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
         double gridecut
 )
 {
     //init latice
+    this->lat0 = lat0_in;
     this->latvec = latvec_in;
     this->GT = latvec.Inverse();
 	this->G  = GT.Transpose();
@@ -22,7 +25,9 @@ void PW_Basis:: initgrids(
     //------------------------------------------------------------
     //-------------------------init grids-------------------------
     //------------------------------------------------------------
-     ModuleBase::Vector3<double> lat;
+    double tpiba2 = ModuleBase::TWO_PI * ModuleBase::TWO_PI / this->lat0 / this->lat0;
+    gridecut = gridecut / tpiba2;
+    ModuleBase::Vector3<double> lat;
     int *ibox = new int[3];// ibox[i] are the minimal FFT dimensions,
     
     lat.x = latvec.e11;
@@ -88,11 +93,19 @@ void PW_Basis:: initgrids(
         while (b != 1);
         //  b==1 means fftbox[i] is (2,3,5,7) factorizable 
     }
-    this->nx = ibox[0];
+    this->bignx = ibox[0];
     this->ny = ibox[1];
     this->nz = ibox[2];
-    this->nxyz = this->nx * this->ny * this->nz;
+    this->bignxy = this->bignx * this->ny;
+    this->bignxyz = this->bignxy * this->nz;
+    
+
+    // if use gamma point only, when convert real function f(r) to F(k) = FFT(f),
+    // we have F(-k) = F(k)*, so that only half of planewaves are needed.
+    if (this->gamma_only)   this->nx = int(this->bignx / 2) + 1;
+    else                    this->nx = bignx;
     this->nxy = this->nx * this->ny;
+    this->nxyz = this->nxy * this->nz;
     delete[] ibox;
 
     
@@ -105,18 +118,29 @@ void PW_Basis:: initgrids(
 //Output: nx, ny, nz, nxyz, latvec, G, GT, GGT
 //
 void PW_Basis:: initgrids(
+    double lat0_in,
     ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
-    int nx_in, int ny_in, int nz_in
+    int bignx_in, int ny_in, int nz_in
 )
 {
+    this->lat0 = lat0_in;
     this->latvec = latvec_in;
     this->GT = latvec.Inverse();
 	this->G  = GT.Transpose();
 	this->GGT = G * GT;
-    this->nx = nx_in;
+    this->bignx = bignx_in;
     this->ny = ny_in;
     this->nz = nz_in;
-    this->nxyz = this->nx * this->ny * this->nz;
+    this->bignxy = this->bignx * this->ny;
+    this->bignxyz = this->bignxy * this->nz;
+
+    // if use gamma point only, when convert real function f(r) to F(k) = FFT(f),
+    // we have F(-k) = F(k)*, so that only half of planewaves are needed.
+    if (this->gamma_only)   this->nx = int(this->bignx / 2) + 1;
+    else                    this->nx = bignx;
+    this->nxy = this->nx * this->ny;
+    this->nxyz = this->nxy * this->nz;
+
     return;
 }
 
@@ -124,14 +148,15 @@ void PW_Basis:: initgrids(
 //Init some parameters
 void PW_Basis:: initparameters(
     bool gamma_only_in,
-    double ggecut_in,
+    double pwecut_in,
     int poolnproc_in,
     int poolrank_in,
     int distribution_type_in
 )
 {
     this->gamma_only = gamma_only_in;
-    this->ggecut = ggecut_in;
+    double tpiba2 = ModuleBase::TWO_PI * ModuleBase::TWO_PI / this->lat0 / this->lat0;
+    this->ggecut = pwecut_in / tpiba2;
     this->poolnproc = poolnproc_in;
     this->poolrank = poolrank_in;
     this->distribution_type = distribution_type_in;
