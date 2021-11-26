@@ -6,7 +6,7 @@ int main(int argc,char **argv)
 {
     ModuleBase::Matrix3 latvec(1,0,0,0,1,0,0,0,1);
     bool gamma_only = false;
-    double ecut = 1;
+    double ecut = 100;
     double lat0 = 1;
     int nproc, myrank;
     int nproc_in_pool, npool, mypool, rank_in_pool;
@@ -17,7 +17,7 @@ int main(int argc,char **argv)
     int distribution_type = 1;
     ModulePW::PW_Basis pwtest;
 
-    pwtest.initgrids(lat0,latvec, ecut);
+    pwtest.initgrids(lat0, latvec, ecut);
     pwtest.initparameters(gamma_only, ecut, nproc, rank_in_pool, distribution_type);
     pwtest.distribute_r();
     pwtest.distribute_g();
@@ -73,6 +73,10 @@ int main(int argc,char **argv)
             std::cout << gg_global[ig] << std::setw(4) << gdirect_global[ig] << std::setw(4) << gcar_global[ig];
             std::cout << "\n";
         }
+        std::cout<<"done"<<"\n";
+        delete[] gg_global;
+        delete[] gdirect_global;
+        delete[] gcar_global;
     }
     return 0;
 }
