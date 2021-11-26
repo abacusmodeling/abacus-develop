@@ -34,12 +34,8 @@ void PW_Basis::distribute_g()
 //
 void PW_Basis::distribution_method1()
 {
-    // if use gamma point only, when convert real function f(r) to F(k) = FFT(f),
-    // we have F(-k) = F(k)*, so that only half of planewaves are needed.
-    if (this->gamma_only) this->nx = int(this->nx / 2) + 1;
 
     // initial the variables needed by all proc.
-    const int nxy = this->nx * this->ny; // number of points in x-y plane.
     int tot_npw = 0;                     // total number of planewaves.
     int tot_nst = 0;                     // total number of sticks.
     int st_start = 0;                    // index of the first stick on current proc.

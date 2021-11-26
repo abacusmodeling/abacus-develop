@@ -26,19 +26,21 @@ public:
 
     //Init the grids for FFT
     void initgrids(
-        ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
-        double gridecut
+        double lat0_in, //unit length (unit in bohr)
+        ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors (unit in lat0) 
+        double gridecut //unit in Ry, ecut to set up grids
     );
     //Init the grids for FFT
     void initgrids(
+        double lat0_in,
         ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
-        int nx_in, int ny_in, int nz_in
+        int bignx_in, int ny_in, int nz_in
     );
 
     //Init some parameters
     void initparameters(
         bool gamma_only_in,
-        double ggecut_in,
+        double pwecut_in, //unit in Ry, ecut to decides plane waves
         int poolnproc_in, // Number of processors in this pool
         int poolrank_in, // Rank in this pool
         int distribution_type_in
@@ -88,9 +90,10 @@ public:
 
 private:
     bool gamma_only;	// only half g are used.
-    double ggecut;    //Energy cut off for g^2/2 
-    ModuleBase::Matrix3 latvec; // Unitcell lattice vectors, unit in bohr
-    ModuleBase::Matrix3 G; // reciprocal lattice vector, unit in 
+    double ggecut;    //Energy cut off for g^2/2, unit in 1/lat0^2, ggecut=ecutwfc(Ry)*lat0^2/4pi^2
+    double lat0;     //unit length for lattice, unit in bohr
+    ModuleBase::Matrix3 latvec; // Unitcell lattice vectors, unit in lat0
+    ModuleBase::Matrix3 G; // reciprocal lattice vector, unit in 1/lat0
     ModuleBase::Matrix3 GT; // traspose of G
     ModuleBase::Matrix3 GGT; // GGT = G*GT
     int distribution_type;
@@ -154,6 +157,7 @@ private:
 public:
 	// FFT dimensions for wave functions.
 	int nx, ny, nz, nxyz, nxy;
+    int bignx, bignxyz, bignxy; // Gamma_only: nx = int(bignx/2)-1 , others: nx = bignx
     FFT ft;
 
     void real2recip(double * in, std::complex<double> * out); //in:(nplane,nx*ny)  ; out(nz, ns)
