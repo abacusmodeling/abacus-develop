@@ -43,7 +43,7 @@ void PW_Basis::setuptransform()
 {
     this->distribute_r();
     this->distribute_g();
-    this->ft.initfft(this->bignx,this->ny,this->nz,this->nst,this->nplane);
+    this->ft.initfft(this->bignx,this->nx,this->ny,this->nz,this->nst,this->nplane);
     this->ft.setupFFT();
 }
 
