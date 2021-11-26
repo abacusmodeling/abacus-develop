@@ -98,17 +98,8 @@ void PW_Basis:: initgrids(
     this->nz = ibox[2];
     this->bignxy = this->bignx * this->ny;
     this->bignxyz = this->bignxy * this->nz;
-    
 
-    // if use gamma point only, when convert real function f(r) to F(k) = FFT(f),
-    // we have F(-k) = F(k)*, so that only half of planewaves are needed.
-    if (this->gamma_only)   this->nx = int(this->bignx / 2) + 1;
-    else                    this->nx = bignx;
-    this->nxy = this->nx * this->ny;
-    this->nxyz = this->nxy * this->nz;
-    delete[] ibox;
-
-    
+    delete[] ibox;    
     return;
 }
 
@@ -134,13 +125,6 @@ void PW_Basis:: initgrids(
     this->bignxy = this->bignx * this->ny;
     this->bignxyz = this->bignxy * this->nz;
 
-    // if use gamma point only, when convert real function f(r) to F(k) = FFT(f),
-    // we have F(-k) = F(k)*, so that only half of planewaves are needed.
-    if (this->gamma_only)   this->nx = int(this->bignx / 2) + 1;
-    else                    this->nx = bignx;
-    this->nxy = this->nx * this->ny;
-    this->nxyz = this->nxy * this->nz;
-
     return;
 }
 
@@ -155,6 +139,13 @@ void PW_Basis:: initparameters(
 )
 {
     this->gamma_only = gamma_only_in;
+    // if use gamma point only, when convert real function f(r) to F(k) = FFT(f),
+    // we have F(-k) = F(k)*, so that only half of planewaves are needed.
+    if (this->gamma_only)   this->nx = int(this->bignx / 2) + 1;
+    else                    this->nx = bignx;
+    this->nxy = this->nx * this->ny;
+    this->nxyz = this->nxy * this->nz;
+
     double tpiba2 = ModuleBase::TWO_PI * ModuleBase::TWO_PI / this->lat0 / this->lat0;
     this->ggecut = pwecut_in / tpiba2;
     this->poolnproc = poolnproc_in;

@@ -37,4 +37,12 @@ PW_Basis:: ~PW_Basis()
     if(numz != NULL) delete[] numz;
 }
 
+void PW_Basis::distribute()
+{
+    this->distribute_r();
+    this->distribute_g();
+    this->ft.initfft(this->bignx,this->ny,this->nz,this->nst,this->nplane);
+    this->ft.setupFFT();
+}
+
 }
