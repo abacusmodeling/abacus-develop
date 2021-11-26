@@ -22,7 +22,7 @@ void PW_Basis::distribute_r()
     {
         this->numz[ip] = npz;
         if(ip < modz)   this->numz[ip]++;
-        if(ip < this->poolnproc - 1)   this->startz[ip+1] += numz[ip];
+        if(ip < this->poolnproc - 1)   this->startz[ip+1] = this->startz[ip] + numz[ip];
         if(ip == this->poolrank) this->nplane = numz[ip];
     }
     this->nrxx = this->numz[this->poolrank] * this->nxy;
