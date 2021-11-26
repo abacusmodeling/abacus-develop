@@ -54,12 +54,12 @@ public:
 	bool mpifft; // if use mpi fft, only used when define __FFTW3_MPI
 	std::complex<double> * c_gspace; //complex number space for g, [ns * nz]
 	std::complex<double> * c_rspace; //complex number space for r, [nplane * nx *ny]
-	double *r_gspace; //real number space for g, [ns * nz]
+	//double *r_gspace; //real number space for g, [ns * nz]
 	double *r_rspace; //real number space for r, [nplane * nx *ny]
 #ifdef __MIX_PRECISION
 	std::complex<float> * cf_gspace; //complex number space for g, [ns * nz]
 	std::complex<float> * cf_rspace; //complex number space for r, [nplane * nx *ny]
-	float *rf_gspace; //real number space for g, [ns * nz]
+	//float *rf_gspace; //real number space for g, [ns * nz]
 	float *rf_rspace; //real number space for r, [nplane * nx *ny]
 #endif
 
