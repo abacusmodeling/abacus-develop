@@ -14,10 +14,10 @@ void PW_Basis::distribute_g()
     {
         this->distribution_method1();
     }
-    else if(this->distribution_type == 2)
-    {
-        this->distribution_method2();
-    }
+    // else if(this->distribution_type == 2)
+    // {
+    //     this->distribution_method2();
+    // }
     else
     {
         ModuleBase::WARNING_QUIT("divide", "No such division type.");

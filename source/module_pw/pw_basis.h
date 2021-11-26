@@ -84,7 +84,11 @@ public:
     void distribution_method1(); // x varies fast
     void distribution_method2(); // y varies fast
 
-
+    void collect_tot_pw(
+        double* gg_global,
+        ModuleBase::Vector3<double> *gdirect_global,
+        ModuleBase::Vector3<double> *gcar_global
+    ); 
    
 
 private:
@@ -106,13 +110,10 @@ private:
         int* st_length2D, // the number of planewaves that belong to the stick located on (x, y).
         int* st_bottom2D  // the z-coordinate of the bottom of stick on (x, y).
     );
-    void collect_pw_st(
-        const int tot_npw,                              // total number of planewaves.
+    void collect_st(
         const int tot_nst,                              // total number of sticks.
         int* st_length2D,                               // the number of planewaves that belong to the stick located on (x, y), stored in 2d x-y plane.
         int* st_bottom2D,                               // the z-coordinate of the bottom of stick on (x, y), stored in 2d x-y plane.
-        double* gg_global,                              // the modulus of all planewaves.
-        ModuleBase::Vector3<double> *gdirect_global,    // direct coordinates of planewaves.
         int* st_i,                                      // x or x + nx (if x < 0) of stick.
         int* st_j,                                      // y or y + ny (if y < 0) of stick.
         int* st_length,                                 // number of planewaves in stick, stored in 1d array with tot_nst elements.
@@ -134,13 +135,6 @@ private:
         int* st_i,          // x or x + nx (if x < 0) of stick.
         int* st_j,          // y or y + ny (if y < 0) of stick.
         int* is2ip          // ip of core containing is^th stick, map is to ip.
-    );
-    void divide_pw(
-        const int tot_npw,                          // total number of planewaves.
-        double* gg_global,                          // the modulus of all planewaves.
-        ModuleBase::Vector3<double>*gdirect_global, // direct coordinates of planewaves.
-        double** gg2D,                               // the i^th row contains the modulus of planewaves that belong to the i^th core.
-        ModuleBase::Vector3<double>**gdirect2D       // the i^th row contains the direct coordinates of planewaves that belong to the i^th core.
     );
     void get_ig2isz_is2ixy(
         const int tot_nst,  // total number of sticks.
@@ -166,13 +160,6 @@ private:
         int* st_i,          // x or x + nx (if x < 0) of stick.
         int* st_j,          // y or y + ny (if y < 0) of stick.
         int* is2ip          // ip of core containing is^th stick, map is to ip.
-    );
-    void divide_pw2(
-        const int tot_npw,                          // total number of planewaves.
-        double* gg_global,                          // the modulus of all planewaves.
-        ModuleBase::Vector3<double>*gdirect_global, // direct coordinates of planewaves.
-        double** gg2D,                               // the i^th row contains the modulus of planewaves that belong to the i^th core.
-        ModuleBase::Vector3<double>**gdirect2D       // the i^th row contains the direct coordinates of planewaves that belong to the i^th core.
     );
     void get_ig2isz_is2ixy2(
         const int tot_nst,  // total number of sticks.

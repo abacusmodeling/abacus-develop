@@ -71,5 +71,7 @@ void divide_pools(const int &nproc, const int &myrank, int &nproc_in_pool, int &
 
     MPI_Comm_split(MPI_COMM_WORLD,mypool,key,&POOL_WORLD);
 
+    delete[] nproc_pool;
+    delete[] startpro_pool;
     return;
 }
