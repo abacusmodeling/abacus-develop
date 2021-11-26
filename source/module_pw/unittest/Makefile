@@ -87,7 +87,7 @@ init :
 
 parallel : ${PW_OBJS}
 	${CPLUSPLUS_MPI} ${OPTS} test1.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test1.exe 
-#	${CPLUSPLUS_MPI} ${OPTS} $(PW_OBJS) ${OBJ_DIR}/test2.o ${LIBS} -o test2.exe 
+	${CPLUSPLUS_MPI} ${OPTS} test2.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test2.exe 
 
 ${OBJ_DIR}/%.o:%.cpp
 	${CPLUSPLUS_MPI} ${OPTS} -c ${HONG} $< -o $@
@@ -96,3 +96,4 @@ ${OBJ_DIR}/%.o:%.cpp
 clean:
 	@ if [ -d $(OBJ_DIR) ]; then rm -rf $(OBJ_DIR); fi
 	@ if [ -e test1.exe ]; then rm -f test1.exe; fi
+	@ if [ -e test2.exe ]; then rm -f test2.exe; fi
