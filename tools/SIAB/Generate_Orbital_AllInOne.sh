@@ -169,6 +169,12 @@ maxL=`grep -E "^\s*maxL" $InputFile | awk -F "maxL" '{print $0}' | awk '{print $
 # (0.x.x) check info (include Level) for each STRU 
 nSTRU=`grep -E "^\s*BLSTRU" $InputFile | wc -l`
 #nSTRU=`grep -o "^\s*ListSTRU\s*[^#]*" W/ORBITAL_INPUT_DZP |wc -w |awk '{print $1-1}'`
+if [[ "$nSTRU" == "0" ]] ; then 
+    nSTRU=`grep -E "^\s*Dis" $InputFile | wc -l`
+    if [ "$nSTRU" != "1" ]; then  
+        echo "error: input file has more than one line for Dis argument, please use the BLSTRU* "
+    fi
+fi
 echo "          nSTRU = $nSTRU"
 #
 LevelBegin[0]=0
@@ -180,23 +186,27 @@ for((iSTRU=1;iSTRU<=$nSTRU;iSTRU++))
 do
     ListSTRU[iSTRU]=`grep -E "^\s*ListSTRU " $InputFile |awk -F "ListSTRU" '{print $0}' \\
                 |awk -v iSTRU=$iSTRU '{print $(iSTRU+1) }'`
+    ListSTRU[iSTRU]=${ListSTRU[iSTRU]:-dimer}
     echo "        STRU[$iSTRU] = ${ListSTRU[iSTRU]}"
 
 
-    info[iSTRU]=`grep -E "^\s*BLSTRU$iSTRU" $InputFile | awk -F "BLSTRU$iSTRU" '{print $2}'`
-    BL_number[iSTRU]=`echo "${info[iSTRU]}" | awk '// {print NF}'`
-
+    BLSTRU[iSTRU]=`grep -E "^\s*BLSTRU$iSTRU" $InputFile | awk -F "BLSTRU$iSTRU" '{print $2}'`
+    if [[ -z "${BLSTRU[iSTRU]}" ]] && [[ "$iSTRU=1" ]] ; then 
+        BLSTRU[iSTRU]=`grep -E "^\s*Dis" $InputFile | awk -F "Dis" '{print $2}'`
+    fi
+    BL_number[iSTRU]=`echo "${BLSTRU[iSTRU]}" | awk '// {print NF}'`
     # (0.1.11) calculate the number of different dimers or trimers.
-    #info=`grep "Dis1" $InputFile | awk -F "Dis1" '{print $2}'`
-    #BL_number=`echo "$info" | awk '// {print NF}'`
-    echo "   BL_number[$iSTRU] = ${BL_number[iSTRU]}, info[$iSTRU] =" ${info[iSTRU]}
+    #BLSTRU=`grep "Dis1" $InputFile | awk -F "Dis1" '{print $2}'`
+    #BL_number=`echo "$BLSTRU" | awk '// {print NF}'`
+    echo "   BL_number[$iSTRU] = ${BL_number[iSTRU]}"
+    echo "      BLSTRU[$iSTRU] ="  ${BLSTRU[iSTRU]} "  :Bond Length for each STRU"
     
     EndLevel[iSTRU]=`grep -E "^\s*Level" $InputFile |awk -F "Level" '{print $0}' \\
                 |awk -v iSTRU=$iSTRU '{print $(iSTRU+1) }'`
     echo "    EndLevel[$iSTRU] = ${EndLevel[iSTRU]}"
     BeginLevel[iSTRU]=`grep -E "^\s*BeginLevel" $InputFile |awk -F "BeginLevel" '{print $0}' \\
                 |awk -v iSTRU=$iSTRU '{print $(iSTRU+1) }'`
-    echo "  BeginLevel[$iSTRU] = ${BeginLevel[iSTRU]}"
+    echo "  BeginLevel[$iSTRU] = ${BeginLevel[iSTRU]:-auto/default}"
     
     # (0.1.4)get the nbands
     nbands[iSTRU]=`grep -E "^\s*nbands" $InputFile | awk -F "nbands" '{print $0}' \\
@@ -211,7 +221,7 @@ do
     RestartSTRU[iSTRU]=`grep -E "^\s*RestartSTRU" $InputFile \\
                     | awk -F "$RestartSTRU" '{print $0}' \\
                     | awk -v iSTRU=$iSTRU '{print $(iSTRU+1) }'`
-    echo " RestartSTRU[$iSTRU] = ${RestartSTRU[iSTRU]}"
+    echo " RestartSTRU[$iSTRU] = ${RestartSTRU[iSTRU]:-auto/default}"
     #if [ ! -n "${RestartSTRU[iSTRU]}" ]; then
     #    RestartSTRU[iSTRU]=0
     #    echo " set RestartSTRU[$iSTRU]=0 "
@@ -230,8 +240,6 @@ done  # first cicle of iSTRU
 if [ "$nSTRU" == "1" ]; then 
     SkipSTRU[1]=0 
 fi
-
-#exit 0
 
 # (0.1.8)get the level
 #Level=`grep "Level" $InputFile | awk -F "level" '{print $0}' | awk '{print $2}'`
@@ -493,7 +501,7 @@ do
 	    do
 
 	        # (1.4.2.0) calculate the Bond Length for iSTRU
-	        BL=`echo "${info[iSTRU]}" | awk '{print $'$count'}' ` 
+	        BL=`echo "${BLSTRU[iSTRU]}" | awk '{print $'$count'}' ` 
             dis1=$(echo "scale=5;$BL * 0.86603 "|bc)
             dis2=$(echo "scale=5;$BL * 0.5     "|bc)
 	        dis3=$(echo "scale=5;$BL * 0.81649 "|bc)
@@ -690,7 +698,7 @@ EOF
 count_files=1
 while [ $count_files -le ${BL_number[iSTRU]} ]
 do
-    BL=`echo "${info[iSTRU]}" | awk '{print $'$count_files'}' ` 
+    BL=`echo "${BLSTRU[iSTRU]}" | awk '{print $'$count_files'}' ` 
     cat >> INPUT << EOF
 ../OUT.$element-$rcut-$BL/orb_matrix.0.dat
 EOF
@@ -829,13 +837,13 @@ EOF
 count_files=1
 while [ $count_files -lt ${BL_number[iSTRU]} ]
 do
-    BL=`echo "${info[iSTRU]}" | awk '{print $'$count_files'}' ` 
+    BL=`echo "${BLSTRU[iSTRU]}" | awk '{print $'$count_files'}' ` 
     cat >> INPUT << EOF
             "../OUT.$element-$rcut-$BL/orb_matrix.0.dat",
 EOF
     let count_files++
 done
-BL=`echo "${info[iSTRU]}" | awk '{print $'$count_files'}' ` 
+BL=`echo "${BLSTRU[iSTRU]}" | awk '{print $'$count_files'}' ` 
 cat >> INPUT << EOF
             "../OUT.$element-$rcut-$BL/orb_matrix.0.dat"
         ],
@@ -847,13 +855,13 @@ EOF
 count_files=1
 while [ $count_files -lt ${BL_number[iSTRU]} ]
 do
-    BL=`echo "${info[iSTRU]}" | awk '{print $'$count_files'}' ` 
+    BL=`echo "${BLSTRU[iSTRU]}" | awk '{print $'$count_files'}' ` 
     cat >> INPUT << EOF
             "../OUT.$element-$rcut-$BL/orb_matrix.1.dat",
 EOF
     let count_files++
 done
-BL=`echo "${info[iSTRU]}" | awk '{print $'$count_files'}' ` 
+BL=`echo "${BLSTRU[iSTRU]}" | awk '{print $'$count_files'}' ` 
 cat >> INPUT << EOF
             "../OUT.$element-$rcut-$BL/orb_matrix.1.dat"
             ]
@@ -1047,13 +1055,13 @@ EOF
 count_files=1
 while [ $count_files -lt ${BL_number[iSTRU]} ]
 do
-    BL=`echo "${info[iSTRU]}" | awk '{print $'$count_files'}' ` 
+    BL=`echo "${BLSTRU[iSTRU]}" | awk '{print $'$count_files'}' ` 
     cat >> INPUT << EOF
         "../OUT.$element-$rcut-$BL/orb_matrix.0.dat",
 EOF
     let count_files++
 done
-    BL=`echo "${info[iSTRU]}" | awk '{print $'$count_files'}' ` 
+    BL=`echo "${BLSTRU[iSTRU]}" | awk '{print $'$count_files'}' ` 
 cat >> INPUT << EOF
         "../OUT.$element-$rcut-$BL/orb_matrix.0.dat"
     ],
