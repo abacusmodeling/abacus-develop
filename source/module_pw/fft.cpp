@@ -117,7 +117,7 @@ void FFT :: initplan()
 	//                              2 D
 	//---------------------------------------------------------
 	
-	int nrank[2] = {this->bignx, this->ny};
+	int nrank[2] = {this->ny,this->bignx};
 	this->plan2for = fftw_plan_many_dft(       2,   nrank,  this->nplane,  
 						(fftw_complex*) c_rspace,   nrank,  this->nplane,   1,
 						(fftw_complex*) c_rspace,   nrank,  this->nplane,   1,  FFTW_FORWARD,  FFTW_MEASURE);
@@ -167,7 +167,7 @@ void FFT :: initplanf()
 	//                              2 D
 	//---------------------------------------------------------
 	
-	int nrank[2] = {this->bignx, this->ny};
+	int nrank[2] = {this->ny,this->bignx};
 	this->planf2for = fftwf_plan_many_dft(     2,   nrank,  this->nplane,  
 						(fftwf_complex*)c_rspace,   nrank,  this->nplane,   1,
 						(fftwf_complex*)c_rspace,   nrank,  this->nplane,   1,  FFTW_FORWARD,  FFTW_MEASURE);

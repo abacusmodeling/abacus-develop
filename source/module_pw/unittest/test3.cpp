@@ -6,6 +6,8 @@
 #include "../../module_base/constants.h"
 #include "../../module_base/global_function.h"
 #include <iostream>
+#include <iomanip>
+#include "mpi.h"
 
 using namespace std;
 int main(int argc,char **argv)
@@ -22,7 +24,7 @@ int main(int argc,char **argv)
     lat0 = 5;
     ModuleBase::Matrix3 la(1, 0, 0, 0, 1, 0, 0, 0, 1);
     latvec = la;
-    wfcecut = 5;
+    wfcecut = 20;
     npool = 1;
     gamma_only = true;
     //--------------------------------------------------
@@ -30,6 +32,7 @@ int main(int argc,char **argv)
     //setup mpi
     setupmpi(argc,argv,nproc, myrank);
     divide_pools(nproc, myrank, nproc_in_pool, npool, mypool, rank_in_pool);
+    //cout<<nproc<<" d "<<myrank<<" d "<<nproc_in_pool<<" "<<npool<<" "<<mypool<<" "<<rank_in_pool<<endl;
     
     //init
     pwtest.initgrids(lat0,latvec,4*wfcecut);
@@ -39,11 +42,12 @@ int main(int argc,char **argv)
 
     int npw = pwtest.npw;
     int nrxx = pwtest.nrxx;
-    nx = pwtest.nx;
+    nx = pwtest.bignx;
     ny = pwtest.ny;
     nz = pwtest.nz;
+    int nplane = pwtest.nplane;
     int nxyz = nx * ny * nz;
-    cout<<"FFT: "<<nx<<" "<<ny<<" "<<nz<<endl;
+    if(myrank == 0) cout<<"FFT: "<<nx<<" "<<ny<<" "<<nz<<endl;
     double tpiba2 = ModuleBase::TWO_PI * ModuleBase::TWO_PI / lat0 / lat0;
     double ggecut = wfcecut / tpiba2;
     ModuleBase::Matrix3 GT,G,GGT;
@@ -62,15 +66,14 @@ int main(int argc,char **argv)
                 for(int iz = 0 ; iz < nz ; ++iz)
                 {
                     tmp[ix*ny*nz + iy*nz + iz]=0.0;
-                    double vx = ix -  int(nx/2)+1;
-                    double vy = iy -  int(ny/2)+1;
-                    double vz = iz -  int(nz/2)+1;
+                    double vx = ix -  int(nx/2);
+                    double vy = iy -  int(ny/2);
+                    double vz = iz -  int(nz/2);
                     ModuleBase::Vector3<double> v(vx,vy,vz);
                     double modulus = v * (GGT * v);
                     if (modulus <= ggecut)
                     {
-                        if(vx >= 0)     tmp[ix*ny*nz + iy*nz + iz]=+1.0;
-                        else            tmp[ix*ny*nz + iy*nz + iz]=-1.0;
+                        tmp[ix*ny*nz + iy*nz + iz]=1.0/(modulus+1);
                     }
                 }
             }   
@@ -80,19 +83,21 @@ int main(int argc,char **argv)
         fftw_free(pp);
         
         //output
-        cout << "old method\n";
-        ModuleBase::Vector3<double> delta_g(double((int(nx/2)+1))/nx, double((int(ny/2)+1))/ny, double((int(ny/2)+1))/nz); 
-        for(int i = 0 ; i < nx*ny ; i+=1)
+        cout << "reference\n";
+        ModuleBase::Vector3<double> delta_g(double(int(nx/2))/nx, double(int(ny/2))/ny, double(int(ny/2))/nz); 
+        for(int ixy = 0 ; ixy < nx * ny ; ixy+=30)
         {
-            int ix = i / (ny * nz);
-            int iy = (i - ix*ny*nz)/ nz;
-            int iz = i % nz;
-            ModuleBase::Vector3<double> real_r(ix, iy, iz);
-            double phase_im = delta_g * real_r;
-            complex<double> phase(0,ModuleBase::TWO_PI * phase_im);
-            tmp[i] /= nxyz;
-            tmp[i] *= exp(phase);
-            cout<<tmp[i]<<" ";
+            for(int iz = 0 ; iz < nz ; ++iz)
+            {
+                int ix = ixy / ny;
+                int iy = ixy % ny;
+                ModuleBase::Vector3<double> real_r(ix, iy, iz);
+                double phase_im = delta_g * real_r;
+                complex<double> phase(0,ModuleBase::TWO_PI * phase_im);
+                tmp[ixy * nz + iz] /= nxyz;
+                tmp[ixy * nz + iz] *= exp(phase);
+                cout<<setprecision(5)<<setiosflags(ios::left)<<setw(15)<<tmp[ixy * nz + iz].real();
+            }
         }
         cout<<endl;
     }
@@ -100,16 +105,29 @@ int main(int argc,char **argv)
     complex<double> * rhog = new complex<double> [npw];
     for(int ig = 0 ; ig < npw ; ++ig)
     {
-        rhog[ig] = 1.0;
+        rhog[ig] = 1.0/(pwtest.gg[ig]+1);
     }    
-    double* rhor = new double[nrxx];
+    double *rhor = new double [nrxx];
     pwtest.recip2real(rhog,rhor);
-    cout << "new method\n";
-    for(int i = 0 ; i < pwtest.nx*pwtest.ny ; i+=1)
+    if(myrank == 0)     cout << "new pw module\n";
+    MPI_Barrier(MPI_COMM_WORLD);
+    for(int ixy = 0 ; ixy < nx * ny ; ixy+=30)
     {
-        cout<<rhor[i]<<" ";
+        for(int ip = 0 ; ip < nproc ; ++ip)
+        {
+        if (myrank == ip)
+        {
+            for(int iz = 0 ; iz < nplane ; ++iz)
+            {
+                cout<<setprecision(5)<<setiosflags(ios::left)<<setw(15)<<rhor[ixy*nplane+iz];
+            }
+        }
+        MPI_Barrier(MPI_COMM_WORLD);            
+        } 
     }
-    cout<<endl;
+    
+    if(myrank == 0)             cout<<endl<<endl;
+    MPI_Barrier(MPI_COMM_WORLD);
 
     return 0;
 }
