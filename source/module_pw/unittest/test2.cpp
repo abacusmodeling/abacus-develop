@@ -24,7 +24,7 @@ int main(int argc,char **argv)
     lat0 = 5;
     ModuleBase::Matrix3 la(1, 0, 0, 0, 1, 0, 0, 0, 1);
     latvec = la;
-    wfcecut = 5;
+    wfcecut = 20;
     npool = 1;
     gamma_only = false;
     //--------------------------------------------------
@@ -66,9 +66,9 @@ int main(int argc,char **argv)
                 for(int iz = 0 ; iz < nz ; ++iz)
                 {
                     tmp[ix*ny*nz + iy*nz + iz]=0.0;
-                    double vx = ix -  int(nx/2)+1;
-                    double vy = iy -  int(ny/2)+1;
-                    double vz = iz -  int(nz/2)+1;
+                    double vx = ix -  int(nx/2);
+                    double vy = iy -  int(ny/2);
+                    double vz = iz -  int(nz/2);
                     ModuleBase::Vector3<double> v(vx,vy,vz);
                     double modulus = v * (GGT * v);
                     if (modulus <= ggecut)
@@ -83,9 +83,9 @@ int main(int argc,char **argv)
         fftw_free(pp);
         
         //output
-        cout << "old method\n";
-        ModuleBase::Vector3<double> delta_g(double((int(nx/2)+1))/nx, double((int(ny/2)+1))/ny, double((int(ny/2)+1))/nz); 
-        for(int ixy = 0 ; ixy < nx * ny ; ixy+=10)
+        cout << "reference\n";
+        ModuleBase::Vector3<double> delta_g(double(int(nx/2))/nx, double(int(ny/2))/ny, double(int(ny/2))/nz); 
+        for(int ixy = 0 ; ixy < nx * ny ; ixy+=30)
         {
             for(int iz = 0 ; iz < nz ; ++iz)
             {
@@ -109,9 +109,9 @@ int main(int argc,char **argv)
     }    
     complex<double> * rhor = new complex<double> [nrxx];
     pwtest.recip2real(rhog,rhor);
-    if(myrank == 0)     cout << "new method\n";
+    if(myrank == 0)     cout << "new pw module\n";
     MPI_Barrier(MPI_COMM_WORLD);
-    for(int ixy = 0 ; ixy < nx * ny ; ixy+=10)
+    for(int ixy = 0 ; ixy < nx * ny ; ixy+=30)
     {
         for(int ip = 0 ; ip < nproc ; ++ip)
         {
