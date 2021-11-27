@@ -69,7 +69,8 @@ int main(int argc,char **argv)
                     double modulus = v * (GGT * v);
                     if (modulus <= ggecut)
                     {
-                        tmp[ix*ny*nz + iy*nz + iz]=1.0;
+                        if(vx >= 0)     tmp[ix*ny*nz + iy*nz + iz]=+1.0;
+                        else            tmp[ix*ny*nz + iy*nz + iz]=-1.0;
                     }
                 }
             }   

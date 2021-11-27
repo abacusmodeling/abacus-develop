@@ -6,6 +6,7 @@
 #include "../../module_base/constants.h"
 #include "../../module_base/global_function.h"
 #include <iostream>
+#include "mpi.h"
 
 using namespace std;
 int main(int argc,char **argv)
@@ -30,6 +31,7 @@ int main(int argc,char **argv)
     //setup mpi
     setupmpi(argc,argv,nproc, myrank);
     divide_pools(nproc, myrank, nproc_in_pool, npool, mypool, rank_in_pool);
+    //cout<<nproc<<" d "<<myrank<<" d "<<nproc_in_pool<<" "<<npool<<" "<<mypool<<" "<<rank_in_pool<<endl;
     
     //init
     pwtest.initgrids(lat0,latvec,4*wfcecut);
@@ -103,17 +105,19 @@ int main(int argc,char **argv)
     }    
     complex<double> * rhor = new complex<double> [nrxx];
     pwtest.recip2real(rhog,rhor);
-
-    int ip = 0;
-    if (myrank == ip)
+    for(int ip = 0 ; ip < nproc ; ++ip)
     {
-        cout << "new method\n";
-        cout << "ip   " << ip << endl;
-        for(int i = 0 ; i < nx*ny ; i+=1)
+        if (myrank == ip)
         {
-            cout<<rhor[i]<<" ";
+            cout << "new method\n";
+            cout << "ip   " << ip << endl;
+            for(int i = 0 ; i < nx*ny ; i+=1)
+            {
+                cout<<rhor[i]<<" ";
+            }
+            cout<<endl;            
         }
-        cout<<endl;            
+        MPI_Barrier(MPI_COMM_WORLD);
     }
 
 
