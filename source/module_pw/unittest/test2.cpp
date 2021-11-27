@@ -6,6 +6,7 @@
 #include "../../module_base/constants.h"
 #include "../../module_base/global_function.h"
 #include <iostream>
+#include <iomanip>
 #include "mpi.h"
 
 using namespace std;
@@ -44,8 +45,9 @@ int main(int argc,char **argv)
     nx = pwtest.nx;
     ny = pwtest.ny;
     nz = pwtest.nz;
+    int nplane = pwtest.nplane;
     int nxyz = nx * ny * nz;
-    cout<<"FFT: "<<nx<<" "<<ny<<" "<<nz<<endl;
+    if(myrank == 0) cout<<"FFT: "<<nx<<" "<<ny<<" "<<nz<<endl;
     double tpiba2 = ModuleBase::TWO_PI * ModuleBase::TWO_PI / lat0 / lat0;
     double ggecut = wfcecut / tpiba2;
     ModuleBase::Matrix3 GT,G,GGT;
@@ -83,17 +85,19 @@ int main(int argc,char **argv)
         //output
         cout << "old method\n";
         ModuleBase::Vector3<double> delta_g(double((int(nx/2)+1))/nx, double((int(ny/2)+1))/ny, double((int(ny/2)+1))/nz); 
-        for(int i = 0 ; i < nx*ny ; i+=1)
+        for(int ixy = 0 ; ixy < nx * ny ; ixy+=10)
         {
-            int ix = i / (ny * nz);
-            int iy = (i - ix*ny*nz)/ nz;
-            int iz = i % nz;
-            ModuleBase::Vector3<double> real_r(ix, iy, iz);
-            double phase_im = delta_g * real_r;
-            complex<double> phase(0,ModuleBase::TWO_PI * phase_im);
-            tmp[i] /= nxyz;
-            tmp[i] *= exp(phase);
-            cout<<tmp[i]<<" ";
+            for(int iz = 0 ; iz < nz ; ++iz)
+            {
+                int ix = ixy / ny;
+                int iy = ixy % ny;
+                ModuleBase::Vector3<double> real_r(ix, iy, iz);
+                double phase_im = delta_g * real_r;
+                complex<double> phase(0,ModuleBase::TWO_PI * phase_im);
+                tmp[ixy * nz + iz] /= nxyz;
+                tmp[ixy * nz + iz] *= exp(phase);
+                cout<<setprecision(5)<<setiosflags(ios::left)<<setw(15)<<tmp[ixy * nz + iz].real();
+            }
         }
         cout<<endl;
     }
@@ -105,21 +109,26 @@ int main(int argc,char **argv)
     }    
     complex<double> * rhor = new complex<double> [nrxx];
     pwtest.recip2real(rhog,rhor);
-    for(int ip = 0 ; ip < nproc ; ++ip)
+    if(myrank == 0)     cout << "new method\n";
+    MPI_Barrier(MPI_COMM_WORLD);
+    for(int ixy = 0 ; ixy < nx * ny ; ixy+=10)
     {
+        for(int ip = 0 ; ip < nproc ; ++ip)
+        {
         if (myrank == ip)
         {
-            cout << "new method\n";
-            cout << "ip   " << ip << endl;
-            for(int i = 0 ; i < nx*ny ; i+=1)
+            for(int iz = 0 ; iz < nplane ; ++iz)
             {
-                cout<<rhor[i]<<" ";
+                cout<<setprecision(5)<<setiosflags(ios::left)<<setw(15)<<rhor[ixy*nplane+iz].real();
             }
-            cout<<endl;            
         }
-        MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Barrier(MPI_COMM_WORLD);            
+        }
+        
     }
-
+    
+    if(myrank == 0)             cout<<endl<<endl;
+    MPI_Barrier(MPI_COMM_WORLD);
 
     return 0;
 }
