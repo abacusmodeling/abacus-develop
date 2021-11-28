@@ -50,34 +50,36 @@ def main():
 		if info.cal_T:
 			print( '%5s'%"istep", "%20s"%"Spillage", "%20s"%"T.item()", "%20s"%"Loss", flush=True )
 		else:
-			print( '%5s'%"istep", "%20s"%"Spillage", flush=True ) 
+			print( '%5s'%"istep", "%20s"%"Spillage", flush=True )
+
 		loss_old = np.inf
 		for istep in range(200):
 
-			Q = opt_orb.change_index_Q(opt_orb.cal_Q(QI,C,info),info)
-			S = opt_orb.change_index_S(opt_orb.cal_S(SI,C,info),info)
-			V = opt_orb.cal_V(Q,S,info,V_info)
+			Spillage = 0
+			for ist in range(info.Nst):
 
-			if "linear" in file_list.keys():
-				V_linear = [None] * len(file_list["linear"])
-				for i in range(len(file_list["linear"])):
-					Q_linear = opt_orb.change_index_Q(opt_orb.cal_Q(QI_linear[i],C,info),info)
-					S_linear = opt_orb.change_index_S(opt_orb.cal_S(SI_linear[i],C,info),info)
-					V_linear[i] = opt_orb.cal_V_linear(Q,S,Q_linear,S_linear,V,info,V_info)
+				Q = opt_orb.change_index_Q(opt_orb.cal_Q(QI[ist],C,info,ist),info,ist)
+				S = opt_orb.change_index_S(opt_orb.cal_S(SI[ist],C,info,ist),info,ist)
+				V = opt_orb.cal_V(Q,S,V_info)
 
-			def cal_Spillage(V_delta):
-				Spillage = torch.Tensor([0])
-				for ist, Vi_delta in enumerate(V_delta):
-					Spillage += (Vi_delta * weight[ist]).sum()
-				return Spillage
+				if "linear" in file_list.keys():
+					V_linear = [None] * len(file_list["linear"])
+					for i in range(len(file_list["linear"])):
+						Q_linear = opt_orb.change_index_Q(opt_orb.cal_Q(QI_linear[i][ist],C,info,ist),info,ist)
+						S_linear = opt_orb.change_index_S(opt_orb.cal_S(SI_linear[i][ist],C,info,ist),info,ist)
+						V_linear[i] = opt_orb.cal_V_linear(Q,S,Q_linear,S_linear,V,V_info)
 
-			def cal_delta(VI, V):
-				return ( ((VIi-Vi)/util.update0(VIi)).abs() for VIi,Vi in zip(VI,V) )		# abs or **2?
-			
-			Spillage = 2*cal_Spillage(cal_delta(VI,V))
-			if "linear" in file_list.keys():
-				for i in range(len(file_list["linear"])):
-					Spillage += cal_Spillage(cal_delta(VI_linear[i],V_linear[i]))
+				def cal_Spillage(V_delta):
+					Spillage = (V_delta * weight[ist]).sum()
+					return Spillage
+
+				def cal_delta(VI, V):
+					return ((VI[ist]-V)/util.update0(VI[ist])).abs()		# abs or **2?
+				
+				Spillage += 2*cal_Spillage(cal_delta(VI,V))
+				if "linear" in file_list.keys():
+					for i in range(len(file_list["linear"])):
+						Spillage += cal_Spillage(cal_delta(VI_linear[i],V_linear[i]))
 
 			if info.cal_T:
 				T = opt_orb.cal_T(C,E)
