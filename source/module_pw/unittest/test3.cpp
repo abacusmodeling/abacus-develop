@@ -21,12 +21,12 @@ int main(int argc,char **argv)
     double lat0;
     bool gamma_only;
     //--------------------------------------------------
-    lat0 = 2;
-    ModuleBase::Matrix3 la(1, 1, 0, 0, 2, 0, 0, 0, 2);
+    lat0 = 4;
+    ModuleBase::Matrix3 la(1, 1, 0, 1, 0, 1, 0, 1, 1);
     latvec = la;
-    wfcecut = 10;
+    wfcecut = 20;
     npool = 1;
-    gamma_only = false;
+    gamma_only = true;
     //--------------------------------------------------
     
     //setup mpi
@@ -35,7 +35,7 @@ int main(int argc,char **argv)
     //cout<<nproc<<" d "<<myrank<<" d "<<nproc_in_pool<<" "<<npool<<" "<<mypool<<" "<<rank_in_pool<<endl;
     
     //init
-    pwtest.initgrids(lat0,latvec,wfcecut);
+    pwtest.initgrids(lat0,latvec,1.5*wfcecut);
     //pwtest.initgrids(lat0,latvec,5,7,7);
     pwtest.initparameters(gamma_only,wfcecut,nproc_in_pool,rank_in_pool,1);
     pwtest.setuptransform();
@@ -43,7 +43,7 @@ int main(int argc,char **argv)
 
     int npw = pwtest.npw;
     int nrxx = pwtest.nrxx;
-    nx = pwtest.nx;
+    nx = pwtest.bignx;
     ny = pwtest.ny;
     nz = pwtest.nz;
     int nplane = pwtest.nplane;
@@ -73,8 +73,9 @@ int main(int argc,char **argv)
                     double modulus = v * (GGT * v);
                     if (modulus <= ggecut)
                     {
-                        tmp[iy*nx*nz + ix*nz + iz]=1.0/(modulus+1) + ModuleBase::IMAG_UNIT / (abs(v.x+1) + 1);
-                        //tmp[iy*nx*nz + ix*nz + iz] = 1.0;
+                        tmp[iy*nx*nz + ix*nz + iz] = 1.0/(modulus+1);
+                        if(vx > 0) tmp[iy*nx*nz + ix*nz + iz]+=ModuleBase::IMAG_UNIT / (abs(v.x+1) + 1);
+                        else if(vx < 0) tmp[iy*nx*nz + ix*nz + iz]-=ModuleBase::IMAG_UNIT / (abs(-v.x+1) + 1);
                     }
                 }
             }   
@@ -85,7 +86,7 @@ int main(int argc,char **argv)
         //output
         cout << "reference\n";
         ModuleBase::Vector3<double> delta_g(double(int(nx/2))/nx, double(int(ny/2))/ny, double(int(ny/2))/nz); 
-        for(int ixy = 0 ; ixy < nx * ny ; ixy+=5)
+        for(int ixy = 0 ; ixy < nx * ny ; ixy+=20)
         {
             for(int iz = 0 ; iz < nz ; ++iz)
             {
@@ -96,7 +97,7 @@ int main(int argc,char **argv)
                 complex<double> phase(0,ModuleBase::TWO_PI * phase_im);
                 tmp[ixy * nz + iz] /= nxyz;
                 tmp[ixy * nz + iz] *= exp(phase);
-                cout<<setprecision(5)<<setiosflags(ios::left)<<setw(30)<<tmp[ixy * nz + iz];
+                cout<<setprecision(5)<<setiosflags(ios::left)<<setw(15)<<tmp[ixy * nz + iz].real();
             }
         }
         cout<<endl;
@@ -105,15 +106,14 @@ int main(int argc,char **argv)
     complex<double> * rhog = new complex<double> [npw];
     for(int ig = 0 ; ig < npw ; ++ig)
     {
-        rhog[ig] = 1.0/(pwtest.gg[ig]+1) + ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ig].x+1) + 1);
-        //rhog[ig] = 1.0/(pwtest.gg[ig]+1);
-        //rhog[ig] = 1.0;
+        rhog[ig] = 1.0/(pwtest.gg[ig]+1);
+        if(pwtest.gdirect[ig].x > 0) rhog[ig]+=ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ig].x+1) + 1);
     }    
-    complex<double> * rhor = new complex<double> [nrxx];
+    double * rhor = new double [nrxx];
     pwtest.recip2real(rhog,rhor);
     if(myrank == 0)     cout << "new pw module\n";
     MPI_Barrier(MPI_COMM_WORLD);
-    for(int ixy = 0 ; ixy < nx * ny ; ixy+=5)
+    for(int ixy = 0 ; ixy < nx * ny ; ixy+=20)
     {
         for(int ip = 0 ; ip < nproc ; ++ip)
         {
@@ -121,7 +121,7 @@ int main(int argc,char **argv)
         {
             for(int iz = 0 ; iz < nplane ; ++iz)
             {
-                cout<<setprecision(5)<<setiosflags(ios::left)<<setw(30)<<rhor[ixy*nplane+iz];
+                cout<<setprecision(5)<<setiosflags(ios::left)<<setw(15)<<rhor[ixy*nplane+iz];
             }
         }
         MPI_Barrier(MPI_COMM_WORLD);            

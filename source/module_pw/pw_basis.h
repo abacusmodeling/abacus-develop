@@ -57,9 +57,11 @@ public:
     int *nstnz_per; // nz * nst(number of sticks) on each core.
     // on all proc.
     int *ig2isz; // map ig to (is, iz).
-    int *istot2ixy; // istot2ixy[is]: ix + iy * nx of is^th stick among all sticks.
+    int *istot2bigixy; // istot2bigixy[is]: ix + iy * bignx of is^th stick among all sticks.
+    //int *istot2ixy; // istot2bigixy[is]: ix + iy * nx of is^th stick among all sticks.
     int *ixy2istot; // ixy2istot[ix + iy * nx]: is of stick on (ix, iy) among all sticks.
-    int *is2ixy; // is2ixy[is]: ix + iy * nx of is^th stick among sticks on current proc.
+    int *is2bigixy; // is2bigixy[is]: ix + iy * bignx of is^th stick among sticks on current proc.
+    //int *is2ixy; // is2ixy[is]: ix + iy * bignx of is^th stick among sticks on current proc.
     int *ixy2ip; // ixy2ip[ix + iy * nx]: ip of proc which contains stick on (ix, iy).
     int nst; //num. of sticks in current proc.
     int nstnz; // nst * nz
@@ -88,7 +90,7 @@ public:
 
     //distribute plane waves to different processors
     void distribution_method1(); // x varies fast
-    void distribution_method2(); // y varies fast
+    // void distribution_method2(); // y varies fast
 
     void collect_local_pw();
 
@@ -115,12 +117,10 @@ private:
 // for both distributeg_method1 and distributeg_method2
     void count_pw_st(
         int &tot_npw,     // total number of planewaves.
-        int &tot_nst,     // total number of sticks.
         int* st_length2D, // the number of planewaves that belong to the stick located on (x, y).
         int* st_bottom2D  // the z-coordinate of the bottom of stick on (x, y).
     );
     void collect_st(
-        const int tot_nst,                              // total number of sticks.
         int* st_length2D,                               // the number of planewaves that belong to the stick located on (x, y), stored in 2d x-y plane.
         int* st_bottom2D,                               // the z-coordinate of the bottom of stick on (x, y), stored in 2d x-y plane.
         int* st_i,                                      // x or x + nx (if x < 0) of stick.
@@ -131,7 +131,6 @@ private:
 // for distributeg_method1
     void divide_sticks(
         const int tot_npw,  // total number of planewaves.
-        const int tot_nst,  // total number of sticks.
         int* st_i,          // x or x + nx (if x < 0) of stick.
         int* st_j,          // y or y + ny (if y < 0) of stick.
         int* st_length,     // the stick on (x, y) consists of st_length[x*ny+y] planewaves.
@@ -139,14 +138,12 @@ private:
         int* nst_per,       // number of sticks on each core.
         int* is2ip         // ip of core containing is^th stick, map is to ip.         
     );
-    void get_istot2ixy(
-        const int tot_nst,  // total number of sticks.
+    void get_istot2bigixy(
         int* st_i,          // x or x + nx (if x < 0) of stick.
         int* st_j,          // y or y + ny (if y < 0) of stick.
         int* is2ip          // ip of core containing is^th stick, map is to ip.
     );
-    void get_ig2isz_is2ixy(
-        const int tot_nst,  // total number of sticks.
+    void get_ig2isz_is2bigixy(
         int* st_i,          // x or x + nx (if x < 0) of stick.
         int* st_j,          // y or y + ny (if y < 0) of stick.
         int* st_bottom,     // minimum z of stick, stored in 1d array with tot_nst elements.
@@ -154,30 +151,27 @@ private:
         int* is2ip          // ip of core containing is^th stick, map is to ip.
     );
 // for distributeg_method2
-    void divide_sticks2(
-        const int tot_npw,  // total number of planewaves.
-        const int tot_nst,  // total number of sticks.
-        int* st_i,          // x or x + nx (if x < 0) of stick.
-        int* st_j,          // y or y + ny (if y < 0) of stick.
-        int* st_length,     // the stick on (x, y) consists of st_length[x*ny+y] planewaves.
-        int* npw_per,       // number of planewaves on each core.
-        int* nst_per,       // number of sticks on each core.
-        int* is2ip         // ip of core containing is^th stick, map is to ip.         
-    );
-    void get_istot2ixy2(
-        const int tot_nst,  // total number of sticks.
-        int* st_i,          // x or x + nx (if x < 0) of stick.
-        int* st_j,          // y or y + ny (if y < 0) of stick.
-        int* is2ip          // ip of core containing is^th stick, map is to ip.
-    );
-    void get_ig2isz_is2ixy2(
-        const int tot_nst,  // total number of sticks.
-        int* st_i,          // x or x + nx (if x < 0) of stick.
-        int* st_j,          // y or y + ny (if y < 0) of stick.
-        int* st_bottom,     // minimum z of stick, stored in 1d array with tot_nst elements.
-        int* st_length,     // the stick on (x, y) consists of st_length[x*ny+y] planewaves.
-        int* is2ip          // ip of core containing is^th stick, map is to ip.
-    );
+    // void divide_sticks2(
+    //     const int tot_npw,  // total number of planewaves.
+    //     int* st_i,          // x or x + nx (if x < 0) of stick.
+    //     int* st_j,          // y or y + ny (if y < 0) of stick.
+    //     int* st_length,     // the stick on (x, y) consists of st_length[x*ny+y] planewaves.
+    //     int* npw_per,       // number of planewaves on each core.
+    //     int* nst_per,       // number of sticks on each core.
+    //     int* is2ip         // ip of core containing is^th stick, map is to ip.         
+    // );
+    // void get_istot2bigixy2(
+    //     int* st_i,          // x or x + nx (if x < 0) of stick.
+    //     int* st_j,          // y or y + ny (if y < 0) of stick.
+    //     int* is2ip          // ip of core containing is^th stick, map is to ip.
+    // );
+    // void get_ig2isz_is2ixy2(
+    //     int* st_i,          // x or x + nx (if x < 0) of stick.
+    //     int* st_j,          // y or y + ny (if y < 0) of stick.
+    //     int* st_bottom,     // minimum z of stick, stored in 1d array with tot_nst elements.
+    //     int* st_length,     // the stick on (x, y) consists of st_length[x*ny+y] planewaves.
+    //     int* is2ip          // ip of core containing is^th stick, map is to ip.
+    // );
 
 //===============================================
 //                  FFT

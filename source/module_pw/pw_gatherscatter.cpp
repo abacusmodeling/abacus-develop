@@ -14,10 +14,10 @@ void PW_Basis:: gatherp_scatters(complex<double> *in, complex<double> *out)
     {
         for(int is = 0 ; is < this->nst ; ++is)
         {
-            int ixy = is2ixy[is];
+            int bigixy = this->is2bigixy[is];
             for(int iz = 0 ; iz < this->nz ; ++iz)
             {
-                out[is*nz+iz] = in[ixy*nz+iz];
+                out[is*nz+iz] = in[bigixy*nz+iz];
             }
         }
         return;
@@ -96,10 +96,10 @@ void PW_Basis:: gathers_scatterp(complex<double> *in, complex<double> *out)
         }
         for(int is = 0 ; is < this->nst ; ++is)
         {
-            int ixy = is2ixy[is];
+            int bigixy = is2bigixy[is];
             for(int iz = 0 ; iz < this->nz ; ++iz)
             {
-                out[ixy*nz+iz] = in[is*nz+iz];
+                out[bigixy*nz+iz] = in[is*nz+iz];
             }
         }
         return;
@@ -116,8 +116,8 @@ void PW_Basis:: gathers_scatterp(complex<double> *in, complex<double> *out)
     for(int ir = 0 ; ir < this->nrxx ; ++ir) out[ir] = 0.0;
     for(int istot = 0 ; istot < this->nstot ; ++istot)
     {
-        int ixy = this->istot2ixy[istot];
-        MPI_Scatterv(&tmp[istot*this->nz], this->numz,this->startz, mpicomplex, &out[ixy*this->nplane], 
+        int bigixy = this->istot2bigixy[istot];
+        MPI_Scatterv(&tmp[istot*this->nz], this->numz,this->startz, mpicomplex, &out[bigixy*this->nplane], 
                     this->nplane,mpicomplex,0,POOL_WORLD);
     }
 #endif

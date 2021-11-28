@@ -8,9 +8,11 @@ namespace ModulePW
 PW_Basis::PW_Basis()
 {
     ig2isz = NULL;
-    istot2ixy = NULL;  
+    istot2bigixy = NULL;  
+    //istot2ixy = NULL;  
     ixy2istot = NULL;
-    is2ixy = NULL;
+    //is2ixy = NULL;
+    is2bigixy = NULL;
     ixy2ip = NULL; 
     startnsz_per = NULL;
     nstnz_per = NULL;
@@ -26,9 +28,11 @@ PW_Basis::PW_Basis()
 PW_Basis:: ~PW_Basis()
 {
     if(ig2isz != NULL) delete[] ig2isz;
-    if(istot2ixy != NULL) delete[] istot2ixy;
+    //if(istot2ixy != NULL) delete[] istot2ixy;
+    if(istot2bigixy != NULL) delete[] istot2bigixy;
     if(ixy2istot != NULL) delete[] ixy2istot;
-    if(is2ixy != NULL) delete[] is2ixy;
+    //if(is2ixy != NULL) delete[] is2ixy;
+    if(is2bigixy != NULL) delete[] is2bigixy;
     if(ixy2ip != NULL) delete[] ixy2ip;
     if(startnsz_per != NULL) delete[] startnsz_per;
     if(nstnz_per != NULL) delete[] nstnz_per;
@@ -68,9 +72,9 @@ void PW_Basis::collect_local_pw()
     int pw_filled = 0; // how many current core's planewaves have been found.
     for (int is = 0; is < this->nst; ++is)
     {
-        int ix = this->is2ixy[is] % this->nx;
-        int iy = this->is2ixy[is] / this->nx;
-        if (ix >= int(this->nx/2) + 1 && this->gamma_only == false) ix -= this->nx;
+        int ix = this->is2bigixy[is] % this->bignx;
+        int iy = this->is2bigixy[is] / this->bignx;
+        if (ix >= int(this->bignx/2) + 1) ix -= this->bignx;
         if (iy >= int(this->ny/2) + 1) iy -= this->ny;
         for (int ig = pw_filled; ig < this->npw; ++ig)
         {
