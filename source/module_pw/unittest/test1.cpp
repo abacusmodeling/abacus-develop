@@ -39,7 +39,7 @@ int main(int argc,char **argv)
                 std::cout << "\nstartnsz_per ";
                 for (int ip = 0; ip < nproc; ip++) std::cout << pwtest.startnsz_per[ip] << std::setw(4);
                 std::cout << "\nistot2ixy ";
-                for (int is = 0; is < pwtest.nstot; is++) std::cout << pwtest.istot2ixy[is] << std::setw(4);
+                for (int is = 0; is < pwtest.nstot; is++) std::cout << pwtest.istot2bigixy[is] << std::setw(4);
                 std::cout << "\nixy2istot ";
                 for (int ixy = 0; ixy < nxy; ixy++) std::cout << pwtest.ixy2istot[ixy] << std::setw(4);
                 std::cout << "\nixy2ip ";
@@ -49,7 +49,7 @@ int main(int argc,char **argv)
             std::cout << "ig2isz    ";
             for (int ig = 0; ig < pwtest.npw; ++ig) std::cout << pwtest.ig2isz[ig] << std::setw(4);
             std::cout << "\nis2ixy    ";
-            for (int is = 0; is < pwtest.nst; ++is) std::cout << pwtest.is2ixy[is] << std::setw(4);
+            for (int is = 0; is < pwtest.nst; ++is) std::cout << pwtest.is2bigixy[is] << std::setw(4);
             std::cout << "\n";
         }
     }
@@ -69,7 +69,7 @@ int main(int argc,char **argv)
             std::cout << "ig2isz    ";
             for (int ig = 0; ig < pwtest.npw; ++ig) std::cout << pwtest.ig2isz[ig] << std::setw(4);
             std::cout << "\nis2ixy    ";
-            for (int is = 0; is < pwtest.nst; ++is) std::cout << pwtest.is2ixy[is] << std::setw(4);
+            for (int is = 0; is < pwtest.nst; ++is) std::cout << pwtest.is2bigixy[is] << std::setw(4);
             std::cout << "\n";
         }
     }
