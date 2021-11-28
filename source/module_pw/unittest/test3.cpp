@@ -129,6 +129,28 @@ int main(int argc,char **argv)
     }
     
     if(myrank == 0)             cout<<endl<<endl;
+    if(myrank == nproc - 1)
+    {
+        cout<<"before transform: "<<endl;
+        for(int ig = 0 ; ig < npw ; ig+=4)
+        {
+            cout<<rhog[ig]<<" ";
+        }
+        cout<<endl;
+    }
+    
+    pwtest.real2recip(rhor,rhog);
+    
+    if(myrank == nproc - 1)
+    {
+        cout<<"after transform:"<<endl;
+        for(int ig = 0 ; ig < npw ; ig+=4)
+        {
+            cout<<rhog[ig]<<" ";
+        }
+        cout<<endl;
+    }
+
     MPI_Barrier(MPI_COMM_WORLD);
 
     return 0;

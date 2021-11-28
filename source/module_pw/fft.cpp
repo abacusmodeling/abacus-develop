@@ -13,10 +13,12 @@ FFT::FFT()
 	destroyp = true;
 	c_rspace = c_gspace = NULL;
 	r_rspace = NULL;
+	//r_gspace = NULL
 #ifdef __MIX_PRECISION
 	destroypf = true;
 	cf_rspace = cf_gspace = NULL;
 	rf_rspace = NULL;
+	//rf_gspace = NULL
 #endif
 }
 
