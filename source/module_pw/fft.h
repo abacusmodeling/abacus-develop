@@ -27,7 +27,7 @@ public:
 
 	FFT();
 	~FFT();
-	void initfft(int nx_in, int bigny_in, int ny_in , int nz_in, int ns_in, int nplane_in, bool mpifft_in = false);
+	void initfft(int nx_in, int bigny_in, int nz_in, int ns_in, int nplane_in, int nfft_in, bool gamma_only_in, bool mpifft_in = false);
 	void setupFFT();
 	void cleanFFT();
 
@@ -51,7 +51,7 @@ public:
 	int bignxy;
 	int ns; //number of sticks
 	int nplane; //number of x-y planes
-	bool mpifft; // if use mpi fft, only used when define __FFTW3_MPI
+	int nfftgroup; // number of fft in a group
 	std::complex<double> * c_gspace; //complex number space for g, [ns * nz]
 	std::complex<double> * c_rspace; //complex number space for r, [nplane * nx *ny]
 	//double *r_gspace; //real number space for g, [ns * nz]
@@ -65,7 +65,9 @@ public:
 
 
 private:
+	bool gamma_only;
 	bool destroyp;
+	bool mpifft; // if use mpi fft, only used when define __FFTW3_MPI
 	//fftw_plan plan1_r2c;
 	//fftw_plan plan1_c2r;
 	fftw_plan plan2r2c;

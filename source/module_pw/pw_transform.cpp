@@ -65,10 +65,11 @@ void PW_Basis:: real2recip(double * in, std::complex<double> * out)
 void PW_Basis:: recip2real(std::complex<double> * in, std::complex<double> * out)
 {
     assert(this->gamma_only == false);
-    for(int igg = 0 ; igg < this->nst * this->nz ; ++igg)
-    {
-        this->ft.c_gspace[igg] = 0.0;
-    }
+    ModuleBase::GlobalFunc::ZEROS(ft.c_gspace, this->nst * this->nz);
+    // for(int igg = 0 ; igg < this->nst * this->nz ; ++igg)
+    // {
+    //     this->ft.c_gspace[igg] = 0.0;
+    // }
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
         this->ft.c_gspace[this->ig2isz[ig]] = in[ig];
@@ -94,10 +95,11 @@ void PW_Basis:: recip2real(std::complex<double> * in, std::complex<double> * out
 void PW_Basis:: recip2real(std::complex<double> * in, double * out)
 {
     assert(this->gamma_only == true);
-    for(int igg = 0 ; igg < this->nst * this->nz ; ++igg)
-    {
-        this->ft.c_gspace[igg] = 0.0;
-    }
+    ModuleBase::GlobalFunc::ZEROS(ft.c_gspace, this->nst * this->nz);
+    // for(int igg = 0 ; igg < this->nst * this->nz ; ++igg)
+    // {
+    //     this->ft.c_gspace[igg] = 0.0;
+    // }
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
         this->ft.c_gspace[this->ig2isz[ig]] = in[ig];

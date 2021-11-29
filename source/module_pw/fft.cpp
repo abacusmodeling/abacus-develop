@@ -11,6 +11,8 @@ FFT::FFT()
 	nplane = 1;
 	mpifft = false; 
 	destroyp = true;
+	nfftgroup = 1;
+	gamma_only = false;
 	c_rspace = c_gspace = NULL;
 	r_rspace = NULL;
 	//r_gspace = NULL
@@ -37,17 +39,20 @@ FFT::~FFT()
 #endif
 }
 
-void FFT:: initfft(int nx_in, int bigny_in, int ny_in , int nz_in, int ns_in, int nplane_in, bool mpifft_in)
+void FFT:: initfft(int nx_in, int bigny_in, int nz_in, int ns_in, int nplane_in, int nfftgroup_in, bool gamma_only_in, bool mpifft_in)
 {
+	this->gamma_only = gamma_only_in;
 	this->nx = nx_in;
 	this->bigny = bigny_in;
-	this->ny = ny_in;
+	if(this->gamma_only) this->ny = int(bigny/2) +1;
+	else	this->ny = this->bigny;
 	this->nz = nz_in;
 	this->ns = ns_in;
 	this->nplane = nplane_in;
 	this->mpifft = mpifft_in;
 	this->nxy = this->nx * this-> ny;
 	this->bignxy = this->nx * this->bigny;
+	this->nfftgroup = nfftgroup_in;
 	if(!this->mpifft)
 	{
 		c_gspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * this->nz * this->ns);
