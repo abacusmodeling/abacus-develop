@@ -35,7 +35,7 @@ public:
     void initgrids(
         double lat0_in,
         ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
-        int bignx_in, int ny_in, int nz_in
+        int nx_in, int bigny_in, int nz_in
     );
 
     //Init some parameters
@@ -179,7 +179,7 @@ private:
 public:
 	// FFT dimensions for wave functions.
 	int nx, ny, nz, nxyz, nxy;
-    int bignx, bignxyz, bignxy; // Gamma_only: nx = int(bignx/2)-1 , others: nx = bignx
+    int bigny, bignxyz, bignxy; // Gamma_only: ny = int(bigny/2)-1 , others: ny = bigny
     FFT ft;
 
     void real2recip(double * in, std::complex<double> * out); //in:(nplane,nx*ny)  ; out(nz, ns)

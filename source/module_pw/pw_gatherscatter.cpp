@@ -32,14 +32,16 @@ void PW_Basis:: gatherp_scatters(complex<double> *in, complex<double> *out)
         if(this->ixy2ip[ixy] == -1) continue;
         int istot = 0;
         if(this->poolrank == 0) istot = this->ixy2istot[ixy];
-        MPI_Gatherv(&in[ixy*this->nplane], this->nplane, mpicomplex, &tmp[istot*this->nz], 
+        int bigixy = (ixy / ny) * bigny + ixy % ny;
+        MPI_Gatherv(&in[bigixy*this->nplane], this->nplane, mpicomplex, &tmp[istot*this->nz], 
                     this->numz,this->startz,mpicomplex,0,POOL_WORLD);
     }
     
     //scatter sticks to different processors
     MPI_Scatterv(tmp, this->nstnz_per, this->startnsz_per,mpicomplex,out,
                     this->nstnz,mpicomplex,0, POOL_WORLD); 
-    delete[] tmp;
+    
+    if(this->poolrank == 0) delete[] tmp;
 #endif
     return;
 }
@@ -80,7 +82,7 @@ void PW_Basis:: gatherp_scatters(complex<double> *in, complex<double> *out)
 //     //scatter sticks to different processors
 //     MPI_Scatterv(tmp, this->nstnz_per, this->startnsz_per,mpicomplex,out,
 //                     this->nstnz,mpicomplex,0, POOL_WORLD);
-//     delete[] tmp;
+//     if(this->poolrank == 0) delete[] tmp;
 // #endif
 //     return;
 // }
@@ -120,6 +122,7 @@ void PW_Basis:: gathers_scatterp(complex<double> *in, complex<double> *out)
         MPI_Scatterv(&tmp[istot*this->nz], this->numz,this->startz, mpicomplex, &out[bigixy*this->nplane], 
                     this->nplane,mpicomplex,0,POOL_WORLD);
     }
+    if(this->poolrank == 0) delete[] tmp;
 #endif
     return;
 }
@@ -163,6 +166,7 @@ void PW_Basis:: gathers_scatterp(complex<double> *in, complex<double> *out)
 //         MPI_Scatterv(&tmp[istot*this->nz], this->numz,this->startz, mpicomplex, &out[ixy*this->nplane], 
 //                     this->nplane,mpicomplex,0,POOL_WORLD);
 //     }
+//     if(this->poolrank == 0) delete []tmp;
 // #endif
 //     return;
 // }

@@ -86,8 +86,8 @@ init :
 	@ if [ ! -d $(OBJ_DIR)/README ]; then echo "This directory contains all of the .o files" > $(OBJ_DIR)/README; fi
 
 parallel : ${PW_OBJS}
-	${CPLUSPLUS_MPI} ${OPTS} test1.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test1.exe 
-	${CPLUSPLUS_MPI} ${OPTS} test2.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test2.exe 
+#	${CPLUSPLUS_MPI} ${OPTS} test1.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test1.exe 
+#	${CPLUSPLUS_MPI} ${OPTS} test2.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test2.exe 
 	${CPLUSPLUS_MPI} ${OPTS} test3.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test3.exe 
 
 ${OBJ_DIR}/%.o:%.cpp
