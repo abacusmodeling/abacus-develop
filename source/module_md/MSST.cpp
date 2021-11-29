@@ -39,27 +39,34 @@ void MSST::setup()
     MD_func::kinetic_stress(ucell, vel, allmass, kinetic, stress);
     stress += virial;
 
-    lag_pos = 0;
-    v0 = ucell.omega;
-    p0 = stress(sd, sd);
-    e0 = potential + kinetic;
-
-    if(kinetic > 0 && mdp.tscale > 0)
+    if(mdp.rstMD)
     {
-        double fac1 = mdp.tscale * totmass * 2.0 * kinetic / mdp.Qmass;
-        omega[sd] = -1.0 * sqrt(fac1);
-        double fac2 = omega[sd] / v0;
-
-        std::cout << "initial strain rate = " << fac2 << "    tscale = " << mdp.tscale << std::endl;
-
-        for(int i=0; i<ucell.nat; ++i)
-        {
-            vel[i] *= sqrt(1.0 - mdp.tscale);
-        }
+        restart();
     }
+    else
+    {
+        lag_pos = 0;
+        v0 = ucell.omega;
+        p0 = stress(sd, sd);
+        e0 = potential + kinetic;
 
-    MD_func::kinetic_stress(ucell, vel, allmass, kinetic, stress);
-    stress += virial;
+        if(kinetic > 0 && mdp.tscale > 0)
+        {
+            double fac1 = mdp.tscale * totmass * 2.0 * kinetic / mdp.Qmass;
+            omega[sd] = -1.0 * sqrt(fac1);
+            double fac2 = omega[sd] / v0;
+
+            std::cout << "initial strain rate = " << fac2 << "    tscale = " << mdp.tscale << std::endl;
+
+            for(int i=0; i<ucell.nat; ++i)
+            {
+                vel[i] *= sqrt(1.0 - mdp.tscale);
+            }
+        }
+
+        MD_func::kinetic_stress(ucell, vel, allmass, kinetic, stress);
+        stress += virial;
+    }
 
     ModuleBase::timer::tick("MSST", "setup");
 }
@@ -148,7 +155,87 @@ void MSST::second_half()
     ModuleBase::timer::tick("MSST", "second_half");
 }
 
-void MSST::outputMD(){}
+void MSST::outputMD()
+{
+    ModuleBase::TITLE("MSST", "outputMD");
+    ModuleBase::timer::tick("MSST", "outputMD");
+
+    temperature_ = 2*kinetic/(double(3*ucell.nat-frozen_freedom_))*ModuleBase::Hartree_to_K;
+
+    const double unit_transform = ModuleBase::HARTREE_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
+    double press = 0.0;
+    for(int i=0;i<3;i++)
+    {
+        press += stress(i,i)/3;
+    }
+
+    std::cout << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed);
+    std::cout << " " << std::left << std::setw(20) << "Energy" 
+            << std::left << std::setw(20) << "Potential" 
+            << std::left << std::setw(20) << "Kinetic" 
+            << std::left << std::setw(20) << "Temperature" 
+            << std::left << std::setw(20) << "Pressure (KBAR)" <<std::endl;
+    std::cout << " " << std::left << std::setw(20) << potential+kinetic
+            << std::left << std::setw(20) << potential
+            << std::left << std::setw(20) << kinetic
+            << std::left << std::setw(20) << temperature_
+            << std::left << std::setw(20) << press*unit_transform <<std::endl;
+	std::cout << " ------------------------------------------------------------" << std::endl;
+
+    MD_func::outStress(virial, stress);
+
+    ModuleBase::timer::tick("MSST", "outputMD");
+}
+
+void MSST::write_restart()
+{
+    if(!GlobalV::MY_RANK)
+    {
+		std::stringstream ssc;
+		ssc << GlobalV::global_out_dir << "Restart_md.dat";
+		std::ofstream file(ssc.str().c_str());
+
+        file << step_ << std::endl;
+		file << omega[mdp.direction] << std::endl;
+        file << e0 << std::endl;
+        file << v0 << std::endl;
+        file << p0 << std::endl;
+        file << lag_pos << std::endl;
+
+		file.close();
+	}
+}
+
+void MSST::restart()
+{
+    if(!GlobalV::MY_RANK)
+    {
+		std::stringstream ssc;
+		ssc << GlobalV::global_out_dir << "Restart_md.dat";
+		std::ifstream file(ssc.str().c_str());
+
+        if(!file)
+		{
+			std::cout<< "please ensure whether 'Restart_md.dat' exists!" << std::endl;
+            ModuleBase::WARNING_QUIT("MSST", "no Restart_md.dat ！");
+		}
+
+		file >> step_rst_ >> omega[mdp.direction] >> e0 >> v0 >> p0 >> lag_pos;
+
+		file.close();
+	}
+
+#ifdef __MPI
+	MPI_Bcast(&step_rst_, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	MPI_Bcast(&omega[mdp.direction], 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&e0, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&v0, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&p0, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&lag_pos, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+#endif
+
+    step_ = step_rst_;
+}
 
 double MSST::extra_term()
 {
@@ -170,8 +257,6 @@ double MSST::vel_sum()
 void MSST::rescale(double volume)
 {
     int sd = mdp.direction;
-
-    std::cout << __FILE__ << __LINE__ << volume << std::endl;
 
     dilation[sd] = volume/ucell.omega;
     ucell.latvec.e11 *= dilation[0];

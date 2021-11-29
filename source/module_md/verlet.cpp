@@ -5,8 +5,6 @@ Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     mdp(MD_para_in),
     ucell(unit_in)
 {
-    std::cout << "verlet" << std::endl;
-
     allmass = new double [ucell.nat];
     pos = new ModuleBase::Vector3<double> [ucell.nat];
     vel = new ModuleBase::Vector3<double> [ucell.nat];
@@ -24,27 +22,13 @@ Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
 	mdp.epsilon_lj /= ModuleBase::Hartree_to_eV;
 	mdp.sigma_lj *= ModuleBase::ANGSTROM_AU;
 
-    step_rst_=0;
+    step_ = 0;
+    step_rst_ = 0;
+    if(mdp.rstMD) unit_in.set_vel = 1;
 
     frozen_freedom_ = MD_func::getMassMbl(ucell, mdp, allmass, ionmbl);
     MD_func::InitPos(ucell, pos);
-
-    std::cout << mdp.rstMD << "  " << ucell.set_vel << std::endl;
-
-    if(mdp.rstMD)
-    {
-        if(!MD_func::RestartMD(ucell.nat, vel, step_rst_))
-        {
-			std::cout<<"error in restart MD!"<<std::endl;
-			return;
-		}
-    }
-    else
-    {
-        MD_func::InitVel(ucell, temperature_, allmass, frozen_freedom_, ionmbl, vel);
-    }
-
-    step_=step_rst_;
+    MD_func::InitVel(ucell, temperature_, allmass, frozen_freedom_, ionmbl, vel);
 }
 
 Verlet::~Verlet()
@@ -63,3 +47,7 @@ void Verlet::first_half(){}
 void Verlet::second_half(){}
 
 void Verlet::outputMD(){}
+
+void Verlet::write_restart(){}
+
+void Verlet::restart(){}

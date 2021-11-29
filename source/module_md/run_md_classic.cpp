@@ -42,7 +42,6 @@ void Run_MD_CLASSIC::classic_md_line(void)
     // md cycle
     while (verlet->step_ <= (GlobalV::NSTEP + verlet->step_rst_) && !stop)
     {
-        Print_Info::print_screen(0, 0, verlet->step_);
         if(verlet->step_ == verlet->step_rst_)
         {
             verlet->setup();
@@ -61,7 +60,10 @@ void Run_MD_CLASSIC::classic_md_line(void)
             verlet->stress +=  verlet->virial;
         }
 
+        Print_Info::print_screen(0, 0, verlet->step_);
         verlet->outputMD();
+
+        verlet->write_restart();
 
         verlet->step_++;
     }

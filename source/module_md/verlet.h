@@ -14,6 +14,8 @@ public:
     virtual void first_half();
     virtual void second_half();
     virtual void outputMD();
+    virtual void write_restart();
+    virtual void restart();
 
     MD_parameters &mdp;
 	UnitCell_pseudo &ucell;

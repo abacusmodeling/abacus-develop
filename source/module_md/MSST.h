@@ -13,6 +13,8 @@ public:
     void first_half();
     void second_half();
     void outputMD();
+    void write_restart();
+    void restart();
     double extra_term();
     double vel_sum();
     void rescale(double volume);

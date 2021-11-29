@@ -103,3 +103,42 @@ void NVE::outputMD()
 
     ModuleBase::timer::tick("NVE", "outputMD");
 }
+
+void NVE::write_restart()
+{
+    if(!GlobalV::MY_RANK)
+    {
+		std::stringstream ssc;
+		ssc << GlobalV::global_out_dir << "Restart_md.dat";
+		std::ofstream file(ssc.str().c_str());
+
+        file << step_ << std::endl;
+		file.close();
+	}
+}
+
+void NVE::restart()
+{
+    if(!GlobalV::MY_RANK)
+    {
+		std::stringstream ssc;
+		ssc << GlobalV::global_out_dir << "Restart_md.dat";
+		std::ifstream file(ssc.str().c_str());
+
+        if(!file)
+		{
+			std::cout<< "please ensure whether 'Restart_md.dat' exists!" << std::endl;
+            ModuleBase::WARNING_QUIT("MSST", "no Restart_md.dat ！");
+		}
+
+		file >> step_rst_;
+
+		file.close();
+	}
+
+#ifdef __MPI
+	MPI_Bcast(&step_rst_, 1, MPI_INT, 0, MPI_COMM_WORLD);
+#endif
+
+    step_ = step_rst_;
+}
