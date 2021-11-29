@@ -1,6 +1,5 @@
 from util import *
 import torch
-import torch_complex
 import itertools
 import numpy as np
 import re
@@ -92,22 +91,17 @@ def read_QI(info,ist,data):
 	for it in info.Nt[ist]:
 		QI[it] = ND_list(info.Nl[it])
 		for il in range(info.Nl[it]):
-			QI[it][il] = torch_complex.ComplexTensor(
-				np.empty((info.Nb[ist],info.Na[ist][it],info.Nm(il),info.Ne[it]),dtype=np.float64),
-				np.empty((info.Nb[ist],info.Na[ist][it],info.Nm(il),info.Ne[it]),dtype=np.float64) )
+			QI[it][il] = torch.zeros((info.Nb[ist],info.Na[ist][it],info.Nm(il),info.Ne[it]), dtype=torch.complex128)
 	for ib in range(info.Nb[ist]):
 		for it in info.Nt[ist]:
 			for ia in range(info.Na[ist][it]):
 				for il in range(info.Nl[it]):
 					for im in range(info.Nm(il)):
 						for ie in range(info.Ne[it]):
-							QI[it][il].real[ib,ia,im,ie] = next(data)
-							QI[it][il].imag[ib,ia,im,ie] = next(data)
+							QI[it][il][ib,ia,im,ie] = complex(next(data), next(data))
 	for it in info.Nt[ist]:
 		for il in range(info.Nl[it]):
-			QI[it][il] = torch_complex.ComplexTensor(
-				torch.from_numpy(QI[it][il].real).view(-1,info.Ne[it]),
-				torch.from_numpy(QI[it][il].imag).view(-1,info.Ne[it])).conj()
+			QI[it][il] = QI[it][il].view(-1,info.Ne[it]).conj()
 	return QI
 
 
@@ -118,9 +112,7 @@ def read_SI(info,ist,data):
 	for it1,it2 in itertools.product( info.Nt[ist], info.Nt[ist] ):
 		SI[it1,it2] = ND_list(info.Nl[it1],info.Nl[it2])
 		for il1,il2 in itertools.product( range(info.Nl[it1]), range(info.Nl[it2]) ):
-			SI[it1,it2][il1][il2] = torch_complex.ComplexTensor(
-				np.empty((info.Na[ist][it1],info.Nm(il1),info.Ne[it1],info.Na[ist][it2],info.Nm(il2),info.Ne[it2]),dtype=np.float64),
-				np.empty((info.Na[ist][it1],info.Nm(il1),info.Ne[it1],info.Na[ist][it2],info.Nm(il2),info.Ne[it2]),dtype=np.float64) )
+			SI[it1,it2][il1][il2] = torch.zeros((info.Na[ist][it1],info.Nm(il1),info.Ne[it1],info.Na[ist][it2],info.Nm(il2),info.Ne[it2]), dtype=torch.complex128)
 	for it1 in info.Nt[ist]:
 		for ia1 in range(info.Na[ist][it1]):
 			for il1 in range(info.Nl[it1]):
@@ -131,13 +123,12 @@ def read_SI(info,ist,data):
 								for im2 in range(info.Nm(il2)):
 									for ie1 in range(info.Ne[it1]):
 										for ie2 in range(info.Ne[it2]):
-											SI[it1,it2][il1][il2].real[ia1,im1,ie1,ia2,im2,ie2] = next(data)
-											SI[it1,it2][il1][il2].imag[ia1,im1,ie1,ia2,im2,ie2] = next(data)
-	for it1,it2 in itertools.product( info.Nt[ist], info.Nt[ist] ):
-		for il1,il2 in itertools.product( range(info.Nl[it1]), range(info.Nl[it2]) ):	
-			SI[it1,it2][il1][il2] = torch_complex.ComplexTensor(
-				torch.from_numpy(SI[it1,it2][il1][il2].real),
-				torch.from_numpy(SI[it1,it2][il1][il2].imag))
+											SI[it1,it2][il1][il2][ia1,im1,ie1,ia2,im2,ie2] = complex(next(data), next(data))
+#	for it1,it2 in itertools.product( info.Nt[ist], info.Nt[ist] ):
+#		for il1,il2 in itertools.product( range(info.Nl[it1]), range(info.Nl[it2]) ):	
+#			SI[it1,it2][il1][il2] = torch_complex.ComplexTensor(
+#				torch.from_numpy(SI[it1,it2][il1][il2].real),
+#				torch.from_numpy(SI[it1,it2][il1][il2].imag))
 	return SI
 
 

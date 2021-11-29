@@ -1,6 +1,5 @@
 from util import ND_list
 import util
-import torch_complex
 import functools
 import itertools
 import torch
@@ -19,7 +18,7 @@ class Opt_Orbital:
 
 		for it in info.Nt[ist]:
 			for il in range(info.Nl[it]):
-				Q[it][il] = torch_complex.mm( QI[it][il], C[it][il] ).view(info.Nb[ist],-1)
+				Q[it][il] = torch.mm( QI[it][il], C[it][il].to(torch.complex128) ).view(info.Nb[ist],-1)
 		return Q
 
 		
@@ -37,18 +36,18 @@ class Opt_Orbital:
 		for it1,it2 in itertools.product( info.Nt[ist], info.Nt[ist] ):
 			for il1,il2 in itertools.product( range(info.Nl[it1]), range(info.Nl[it2]) ):
 				# SI_C[ia1*im1*ie1*ia2*im2,iu2]
-				SI_C = torch_complex.mm( 
+				SI_C = torch.mm( 
 					SI[it1,it2][il1][il2].view(-1,info.Ne[it2]), 
-					C[it2][il2] )
+					C[it2][il2].to(torch.complex128) )
 				# SI_C[ia1*im1,ie1,ia2*im2*iu2]
 				SI_C = SI_C.view( info.Na[ist][it1]*info.Nm(il1), info.Ne[it1], -1 )
 				# Ct[iu1,ie1]
-				Ct = C[it1][il1].t()
-				C_mm = functools.partial(torch_complex.mm,Ct)
+				Ct = C[it1][il1].t().to(torch.complex128)
+				C_mm = functools.partial(torch.mm,Ct)
 				# C_SI_C[ia1*im1][iu1,ia2*im2*iu2]
 				C_SI_C = list(map( C_mm, SI_C ))
 				# C_SI_C[ia1*im1*iu1,ia2*im2*iu2]
-				C_SI_C = torch_complex.cat( C_SI_C, dim=0 )
+				C_SI_C = torch.cat( C_SI_C, dim=0 )
 #???				C_SI_C = C_SI_C.view(info.Na[ist][it1]*info.Nm(il1)*info.Nu[it1][il1],-1)
 				S[it1,it2][il1][il2] = C_SI_C
 		return S
@@ -69,11 +68,11 @@ class Opt_Orbital:
 				# S_tt[il1][ia1*im1*iu1,il2*ia2*im2*iu2]
 				S_tt = ND_list(info.Nl[it1])
 				for il1 in range(info.Nl[it1]):
-					S_tt[il1] = torch_complex.cat( S[it1,it2][il1], dim=1 )
-				S_t[it2] = torch_complex.cat( S_tt, dim=0 )
-			S_[it1] = torch_complex.cat( list(S_t.values()), dim=1 )
+					S_tt[il1] = torch.cat( S[it1,it2][il1], dim=1 )
+				S_t[it2] = torch.cat( S_tt, dim=0 )
+			S_[it1] = torch.cat( list(S_t.values()), dim=1 )
 		# S_cat[it1*il1*iat*im1*iu1,iat2*il2*ia2*im2*iu2]
-		S_cat = torch_complex.cat( list(S_.values()), dim=0 )	
+		S_cat = torch.cat( list(S_.values()), dim=0 )	
 		return S_cat
 		
 		
@@ -91,10 +90,10 @@ class Opt_Orbital:
 			for it in info.Nt[ist]:
 				# Q_ts[il][ia*im*iu]
 				Q_ts = [ Q_tl[ib] for Q_tl in Q[it] ]
-				Q_[it] = torch_complex.cat(Q_ts)
-			Q_b[ib] = torch_complex.cat(list(Q_.values())).view(1,-1)
+				Q_[it] = torch.cat(Q_ts)
+			Q_b[ib] = torch.cat(list(Q_.values())).view(1,-1)
 		# Q_cat[ib,it*il*ia*im*iu]
-		Q_cat = torch_complex.cat( Q_b, dim=0 )
+		Q_cat = torch.cat( Q_b, dim=0 )
 		return Q_cat
 			
 			
@@ -107,8 +106,8 @@ class Opt_Orbital:
 		  coef[ib,it*il*ia*im*iu]
 			= Q[ib,it1*il1*ia1*im1*iu1] * S{[it1*il1*iat*im1*iu1,iat2*il2*ia2*im2*iu2]}^{-1}
 		"""
-		S_I = torch_complex.inverse(S)
-		coef = torch_complex.mm(Q, S_I)
+		S_I = torch.inverse(S)
+		coef = torch.mm(Q, S_I)
 		return coef
 		
 		
@@ -122,7 +121,7 @@ class Opt_Orbital:
 		  	= sum_{it1,ia1,il1,im1,iu1} sum_{it2,ia2,il2,im2,iu2}
 		  	Q[ib1,it1*il1*ia1*im1*iu1] * S{[it1*il1*iat*im1*iu1,iat2*il2*ia2*im2*iu2]}^{-1} * Q[ib2,it2*il2*ia2*im2*iu2]
 		"""
-		V = torch_complex.mm( coef, Q.t().conj() ).real
+		V = torch.mm( coef, Q.t().conj() ).real
 		return V
 
 
