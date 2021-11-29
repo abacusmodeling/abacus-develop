@@ -1427,6 +1427,7 @@ void ORB_gen_tables::snap_psialpha_half(
             if (!calproj[nb])
             {
 				ip += 2*L0 + 1;
+				++nb;
                 continue;
             }
             ++nb;
@@ -1557,6 +1558,9 @@ void ORB_gen_tables::snap_psialpha_half(
 			}//end m0
 		}//end N0
 	}//end L0
+	assert(nb==ln_per_atom);
+	ModuleBase::timer::tick("ORB_gen_tables", "snap_psialpha_half");
+	return;
 }
 //caoyu add 2021-08-30
 void ORB_gen_tables::snap_psialpha(
