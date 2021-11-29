@@ -77,14 +77,6 @@ void energy::calculate_harris(const int &flag)
 			}
 			else
 			{
-                for(int ik=0;ik<GlobalC::kv.nks;ik++)
-                {
-                	if(!GlobalC::LOC.wfc_dm_2d.dm_k[ik].checkreal())
-                	{
-						GlobalV::ofs_running << "ik=" << std::endl;
-                    	ModuleBase::WARNING_QUIT("opt_ions","accumulated density matrix not real!!");
-                	}
-				}
 				GlobalC::ld.cal_e_delta_band_k(GlobalC::LOC.wfc_dm_2d.dm_k);
 			}
 			this->etot_harris -= GlobalC::ld.e_delta_band;
@@ -140,14 +132,6 @@ void energy::calculate_etot(void)
 		}
 		else
 		{
-			for(int ik=0;ik<GlobalC::kv.nks;ik++)
-			{
-				if(!GlobalC::LOC.wfc_dm_2d.dm_k[ik].checkreal())
-				{
-					GlobalV::ofs_running << "ik=" << std::endl;
-					ModuleBase::WARNING_QUIT("opt_ions","accumulated density matrix not real!!");
-				}
-			}
 			GlobalC::ld.cal_e_delta_band_k(GlobalC::LOC.wfc_dm_2d.dm_k);
 		}
         this->etot -= GlobalC::ld.e_delta_band;

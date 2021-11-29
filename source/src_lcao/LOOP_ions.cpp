@@ -216,14 +216,6 @@ void LOOP_ions::opt_ions(void)
                 }
                 else
                 {
-                    for(int ik=0;ik<GlobalC::kv.nks;ik++)
-                    {
-                        if(!GlobalC::LOC.wfc_dm_2d.dm_k[ik].checkreal())
-                        {
-                            GlobalV::ofs_running << "ik=" << std::endl;
-                            ModuleBase::WARNING_QUIT("opt_ions","accumulated density matrix not real!!");
-                        }
-                    }
                     GlobalC::ld.cal_e_delta_band_k(GlobalC::LOC.wfc_dm_2d.dm_k);
                 }
                 std::cout << "E_delta_band = " << std::setprecision(8) << GlobalC::ld.e_delta_band << " Ry" << " = " << std::setprecision(8) << GlobalC::ld.e_delta_band * ModuleBase::Ry_to_eV << " eV" << std::endl;

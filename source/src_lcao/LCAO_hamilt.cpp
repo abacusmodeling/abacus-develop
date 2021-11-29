@@ -117,8 +117,6 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-
         //ld.build_v_delta_alpha(0);
         
 		GlobalC::ld.cal_gedm(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
-		//GlobalC::ld.build_v_delta_alpha(0);
-		GlobalC::ld.build_v_delta_alpha_new(0);
 		GlobalC::ld.add_v_delta();
         //GlobalC::ld.build_v_delta_mu(0);    
 	}

@@ -90,10 +90,7 @@ void LCAO_Descriptor::deepks_pre_scf(const string& model_file)
             }           
         }
     }
-    if(!GlobalV::GAMMA_ONLY_LOCAL)
-    {
-        this->nlm_k.resize(GlobalC::ucell.nat);
-    }
+    this->nlm_save.resize(GlobalC::ucell.nat);
     return;
 }
 
@@ -102,30 +99,107 @@ void LCAO_Descriptor::deepks_pre_scf(const string& model_file)
 void LCAO_Descriptor::add_v_delta(void)
 {
     ModuleBase::TITLE("LCAO_DESCRIPTOR", "add_v_delta");
+    ModuleBase::timer::tick ("LCAO_gen_fixedH","add_v_delta");
+    ModuleBase::GlobalFunc::ZEROS(this->H_V_delta,GlobalC::ParaO.nloc); //init before calculate
 
-    if (GlobalV::GAMMA_ONLY_LOCAL)
+    const double Rcut_Alpha = GlobalC::ORB.Alpha[0].getRcut();
+
+    for (int T0 = 0; T0 < GlobalC::ucell.ntype; T0++)
     {
-        for (int iw1 = 0;iw1 < GlobalV::NLOCAL;++iw1)
+		Atom* atom0 = &GlobalC::ucell.atoms[T0]; 
+        for (int I0 =0; I0< atom0->na; I0++)
         {
-            for (int iw2 = 0;iw2 < GlobalV::NLOCAL;++iw2)
+            const int iat = GlobalC::ucell.itia2iat(T0,I0);
+            const ModuleBase::Vector3<double> tau0 = atom0->tau[I0];
+            GlobalC::GridD.Find_atom(GlobalC::ucell, atom0->tau[I0] ,T0, I0);
+
+            for (int ad1=0; ad1<GlobalC::GridD.getAdjacentNum()+1 ; ++ad1)
             {
-				if (!GlobalC::ParaO.in_this_processor(iw1,iw2))
+                const int T1 = GlobalC::GridD.getType(ad1);
+                const int I1 = GlobalC::GridD.getNatom(ad1);
+                const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
+                const ModuleBase::Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau(ad1);
+				const Atom* atom1 = &GlobalC::ucell.atoms[T1];
+				const int nw1_tot = atom1->nw*GlobalV::NPOL;
+				const double Rcut_AO1 = GlobalC::ORB.Phi[T1].getRcut(); 
+
+				for (int ad2=0; ad2 < GlobalC::GridD.getAdjacentNum()+1 ; ad2++)
 				{
-					continue;
-				}
-                
-                int iw1_local=GlobalC::ParaO.trace_loc_row[iw1];
-                int iw2_local=GlobalC::ParaO.trace_loc_col[iw2];
-                int index = iw2_local * GlobalC::ParaO.nrow+ iw1_local;
-                GlobalC::LM.set_HSgamma(iw1, iw2, this->H_V_delta[index], 'L');
-            }
+					const int T2 = GlobalC::GridD.getType(ad2);
+					const int I2 = GlobalC::GridD.getNatom(ad2);
+                    GlobalV::ofs_running << "t2,i2 : " << T2 << " " << I2 << std::endl;
+					const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
+					const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad2);
+					const Atom* atom2 = &GlobalC::ucell.atoms[T2];
+					const int nw2_tot = atom2->nw*GlobalV::NPOL;
+					
+					const double Rcut_AO2 = GlobalC::ORB.Phi[T2].getRcut();
+                	const double dist1 = (tau1-tau0).norm() * GlobalC::ucell.lat0;
+                	const double dist2 = (tau2-tau0).norm() * GlobalC::ucell.lat0;
+
+					if (dist1 > Rcut_Alpha + Rcut_AO1
+							|| dist2 > Rcut_Alpha + Rcut_AO2)
+					{
+						continue;
+					}
+
+					for (int iw1=0; iw1<nw1_tot; ++iw1)
+					{
+						const int iw1_all = start1 + iw1;
+						const int iw1_local = GlobalC::ParaO.trace_loc_row[iw1_all];
+						if(iw1_local < 0)continue;
+						const int iw1_0 = iw1/GlobalV::NPOL;
+						for (int iw2=0; iw2<nw2_tot; ++iw2)
+						{
+							const int iw2_all = start2 + iw2;
+							const int iw2_local = GlobalC::ParaO.trace_loc_col[iw2_all];
+							if(iw2_local < 0)continue;
+							const int iw2_0 = iw2/GlobalV::NPOL;
+
+                            double nlm=0.0;
+                            std::vector<double> nlm1 = this->nlm_save[iat][ad1][iw1_all][0];
+                            std::vector<double> nlm2 = this->nlm_save[iat][ad2][iw2_all][0];
+
+                            assert(nlm1.size()==nlm2.size());
+                            int ib=0;
+                            for (int L0 = 0; L0 <= GlobalC::ORB.Alpha[0].getLmax();++L0)
+                            {
+                                for (int N0 = 0;N0 < GlobalC::ORB.Alpha[0].getNchi(L0);++N0)
+                                {
+                                    const int inl = this->inl_index[T0](I0, L0, N0);
+                                    const int nm = 2*L0+1;
+                                    for (int m1 = 0;m1 < 2 * L0 + 1;++m1)
+                                    {
+                                        for (int m2 = 0; m2 < 2 * L0 + 1; ++m2)
+                                        {
+                                            nlm += this->gedm[inl][m1*nm+m2]*nlm1[ib+m1]*nlm2[ib+m2];
+                                        }
+                                    }
+                                    ib+=nm;
+                                }
+                            }
+
+                            assert(ib==nlm1.size());
+                            
+                            int iic;
+
+                            if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+                            {
+                                iic=iw1_local+iw2_local*GlobalC::ParaO.nrow;
+                            }
+                            else
+                            {
+                                iic=iw1_local*GlobalC::ParaO.ncol+iw2_local;
+                            }
+                            this->H_V_delta[iic] += nlm;
+                            GlobalC::LM.Hloc[iic] += nlm;
+						}//iw2
+					}//iw1
+				}//ad2
+			}//ad1
         }
     }
-    else
-    {
-		ModuleBase::WARNING_QUIT("add_v_delta","should not be used for multi-k; use add_v_delta_k instead");
-        //call set_HSk, complex Matrix
-    }
+    ModuleBase::timer::tick ("LCAO_gen_fixedH","add_v_delta");
 	return;
 }
 
@@ -196,8 +270,8 @@ void LCAO_Descriptor::add_v_delta_k(const int &ik)
 							const int iw2_0 = iw2/GlobalV::NPOL;
 
                             double nlm=0.0;
-                            std::vector<double> nlm1 = this->nlm_k[iat][ad1][iw1_all][0];
-                            std::vector<double> nlm2 = this->nlm_k[iat][ad2][iw2_all][0];
+                            std::vector<double> nlm1 = this->nlm_save[iat][ad1][iw1_all][0];
+                            std::vector<double> nlm2 = this->nlm_save[iat][ad2][iw2_all][0];
 
                             assert(nlm1.size()==nlm2.size());
                             int ib=0;
@@ -870,10 +944,7 @@ void LCAO_Descriptor::cal_e_delta_band_k(const std::vector<ModuleBase::ComplexMa
 void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "build_v_delta_alpha_new");
-    if(GlobalV::GAMMA_ONLY_LOCAL)
-    {
-        ModuleBase::GlobalFunc::ZEROS(this->H_V_delta,GlobalC::ParaO.nloc); //init before calculate
-    }
+    ModuleBase::timer::tick ("LCAO_Descriptor","build_v_delta_alpha_new");
 
     const double Rcut_Alpha = GlobalC::ORB.Alpha[0].getRcut();
     //same for all types of atoms
@@ -894,25 +965,16 @@ void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri)
         {
             const int iat = GlobalC::ucell.itia2iat(T0,I0);
 			//=======================================================
-			//Step1:	
-			//saves <beta|psi>, where beta runs over L0,M0 on atom I0
+            //Step 1 :	
+			//saves <alpha|psi>, where alpha runs over all projectors
 			//and psi runs over atomic basis sets on the current core
 			//=======================================================
-			std::vector<std::unordered_map<int,std::vector<std::vector<double>>>> nlm_tot;
 
-            //GlobalC::GridD.Find_atom( atom0->tau[I0] );
 			const ModuleBase::Vector3<double> tau0 = atom0->tau[I0];
             GlobalC::GridD.Find_atom(GlobalC::ucell, atom0->tau[I0] ,T0, I0);
 
 			//outermost loop : all adjacent atoms
-            if(GlobalV::GAMMA_ONLY_LOCAL)
-            {
-			    nlm_tot.resize(GlobalC::GridD.getAdjacentNum()+1);
-            }
-            else
-            {
-                this->nlm_k[iat].resize(GlobalC::GridD.getAdjacentNum()+1);
-            }
+            this->nlm_save[iat].resize(GlobalC::GridD.getAdjacentNum()+1);
 
             for (int ad=0; ad<GlobalC::GridD.getAdjacentNum()+1 ; ++ad)
             {
@@ -926,14 +988,9 @@ void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri)
 				const int nw1_tot = atom1->nw*GlobalV::NPOL;
 
 				//middle loop : atomic basis on current processor (either row or column)
-                if(GlobalV::GAMMA_ONLY_LOCAL)
-				{
-                    nlm_tot[ad].clear();
-                }
-                else
-                {
-                    this->nlm_k[iat][ad].clear();
-                }
+
+                this->nlm_save[iat][ad].clear();
+
 				const double dist1 = (tau1-tau0).norm() * GlobalC::ucell.lat0;
 
 				if (dist1 > Rcut_Alpha + Rcut_AO1)
@@ -959,24 +1016,18 @@ void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri)
 						atom1->iw2m[ iw1_0 ], // m1
 						atom1->iw2n[ iw1_0 ], // N1
 						GlobalC::ucell.atoms[T0].tau[I0], T0, I0, this->inl_index); //R0,T0
-                    if(GlobalV::GAMMA_ONLY_LOCAL)
-                    {
-					    nlm_tot[ad].insert({iw1_all,nlm});
-                    }
-                    else
-                    {
-                        this->nlm_k[iat][ad].insert({iw1_all,nlm});
-                    }
+                    
+                    this->nlm_save[iat][ad].insert({iw1_all,nlm});
 				}//end iw
 			}//end ad
 
-            if(!GlobalV::GAMMA_ONLY_LOCAL && !calc_deri)
+            if(!calc_deri)
             {
-                //saves <alpha(0)|psi(R)>, to be used later 
                 continue;
             }
-			//=======================================================
-			//Step2:	
+
+    	    //=======================================================
+            //Step 2 :	
 			//calculate sum_(L0,M0) alpha<psi_i|alpha><alpha|psi_j>
 			//and accumulate the value to H_V_delta(i,j)
             //as well as the counterpart in forces, if required
@@ -1033,26 +1084,12 @@ void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri)
                                 double nlm[3]={0,0,0};
                                 std::vector<double> nlm1;
                                 std::vector<std::vector<double>> nlm2;
-                                if(GlobalV::GAMMA_ONLY_LOCAL)
-                                {
-                                    nlm1 = nlm_tot[ad1][iw1_all][0];
-                                }
-                                else
-                                {
-                                    nlm1 = nlm_k[iat][ad1][iw1_all][0];
-                                }
+                                nlm1 = nlm_save[iat][ad1][iw1_all][0];
                                 
                                 nlm2.resize(3);
                                 for(int dim=0;dim<3;dim++)
                                 {
-                                    if(GlobalV::GAMMA_ONLY_LOCAL)
-                                    {
-                                        nlm2[dim] = nlm_tot[ad2][iw2_all][dim+1];
-                                    }
-                                    else
-                                    {
-                                        nlm2[dim] = nlm_k[iat][ad2][iw2_all][dim+1];
-                                    }
+                                    nlm2[dim] = nlm_save[iat][ad2][iw2_all][dim+1];
                                 }
 
                                 assert(nlm1.size()==nlm2[0].size());
@@ -1099,36 +1136,6 @@ void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri)
                                 }
 
                             }
-                            else
-                            {
-                                std::vector<double> nlm1 = nlm_tot[ad1][iw1_all][0];
-                                std::vector<double> nlm2 = nlm_tot[ad2][iw2_all][0];
-
-                                assert(nlm1.size()==nlm2.size());
-							    double nlm=0.0;
-							    int ib = 0;
-
-                                for (int L0 = 0; L0 <= GlobalC::ORB.Alpha[0].getLmax();++L0)
-                                {
-                                    for (int N0 = 0;N0 < GlobalC::ORB.Alpha[0].getNchi(L0);++N0)
-                                    {
-                                        const int inl = this->inl_index[T0](I0, L0, N0);
-                                        const int nm = 2*L0+1;
-                                        for (int m01 = 0;m01 < nm;++m01)
-                                        {
-                                            for (int m02 = 0; m02 < nm; ++m02)
-                                            {
-                                                nlm += this->gedm[inl][m01*nm+m02]*nlm1[ib+m01]*nlm2[ib+m02];
-                                            }
-                                        }
-                                        ib+=(2*L0+1);
-                                    }
-                                }
-                                int index = iw2_local * GlobalC::ParaO.nrow+ iw1_local;     //for genelpa
-                                this->H_V_delta[index] += nlm;
-
-                                assert(ib==nlm1.size());
-                            }
 						}//iw2
 					}//iw1
 				}//ad2
@@ -1145,7 +1152,7 @@ void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri)
         GlobalV::ofs_running << std::endl;
     }
 */
-    ModuleBase::timer::tick ("LCAO_gen_fixedH","build_Nonlocal_alpha_new");
+    ModuleBase::timer::tick ("LCAO_Descriptor","build_v_delta_alpha_new");
 	return;
 
 }
