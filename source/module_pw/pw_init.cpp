@@ -93,10 +93,10 @@ void PW_Basis:: initgrids(
         while (b != 1);
         //  b==1 means fftbox[i] is (2,3,5,7) factorizable 
     }
-    this->bignx = ibox[0];
-    this->ny = ibox[1];
+    this->nx = ibox[0];
+    this->bigny = ibox[1];
     this->nz = ibox[2];
-    this->bignxy = this->bignx * this->ny;
+    this->bignxy = this->nx * this->bigny;
     this->bignxyz = this->bignxy * this->nz;
 
     delete[] ibox;    
@@ -111,7 +111,7 @@ void PW_Basis:: initgrids(
 void PW_Basis:: initgrids(
     double lat0_in,
     ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
-    int bignx_in, int ny_in, int nz_in
+    int nx_in, int bigny_in, int nz_in
 )
 {
     this->lat0 = lat0_in;
@@ -119,10 +119,10 @@ void PW_Basis:: initgrids(
     this->GT = latvec.Inverse();
 	this->G  = GT.Transpose();
 	this->GGT = G * GT;
-    this->bignx = bignx_in;
-    this->ny = ny_in;
+    this->nx = nx_in;
+    this->bigny = bigny_in;
     this->nz = nz_in;
-    this->bignxy = this->bignx * this->ny;
+    this->bignxy = this->nx * this->bigny;
     this->bignxyz = this->bignxy * this->nz;
 
     return;
@@ -141,8 +141,8 @@ void PW_Basis:: initparameters(
     this->gamma_only = gamma_only_in;
     // if use gamma point only, when convert real function f(r) to F(k) = FFT(f),
     // we have F(-k) = F(k)*, so that only half of planewaves are needed.
-    if (this->gamma_only)   this->nx = int(this->bignx / 2) + 1;
-    else                    this->nx = bignx;
+    if (this->gamma_only)   this->ny = int(this->bigny / 2) + 1;
+    else                    this->ny = bigny;
     this->nxy = this->nx * this->ny;
     this->nxyz = this->nxy * this->nz;
 

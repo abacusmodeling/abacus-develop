@@ -27,7 +27,7 @@ public:
 
 	FFT();
 	~FFT();
-	void initfft(int bignx_in, int nx_in, int ny_in , int nz_in, int ns_in, int nplane_in, bool mpifft_in = false);
+	void initfft(int nx_in, int bigny_in, int ny_in , int nz_in, int ns_in, int nplane_in, bool mpifft_in = false);
 	void setupFFT();
 	void cleanFFT();
 
@@ -47,7 +47,7 @@ private:
 public:
 	int nx,ny,nz;
 	int nxy;
-	int bignx;
+	int bigny;
 	int bignxy;
 	int ns; //number of sticks
 	int nplane; //number of x-y planes

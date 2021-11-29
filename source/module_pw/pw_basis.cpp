@@ -47,7 +47,7 @@ void PW_Basis::setuptransform()
 {
     this->distribute_r();
     this->distribute_g();
-    this->ft.initfft(this->bignx,this->nx,this->ny,this->nz,this->nst,this->nplane);
+    this->ft.initfft(this->nx,this->bigny,this->ny,this->nz,this->nst,this->nplane);
     this->ft.setupFFT();
 }
 
@@ -72,10 +72,10 @@ void PW_Basis::collect_local_pw()
     int pw_filled = 0; // how many current core's planewaves have been found.
     for (int is = 0; is < this->nst; ++is)
     {
-        int ix = this->is2bigixy[is] % this->bignx;
-        int iy = this->is2bigixy[is] / this->bignx;
-        if (ix >= int(this->bignx/2) + 1) ix -= this->bignx;
-        if (iy >= int(this->ny/2) + 1) iy -= this->ny;
+        int ix = this->is2bigixy[is] / this->bigny;
+        int iy = this->is2bigixy[is] % this->bigny;
+        if (ix >= int(this->nx/2) + 1) ix -= this->nx;
+        if (iy >= int(this->bigny/2) + 1) iy -= this->bigny;
         for (int ig = pw_filled; ig < this->npw; ++ig)
         {
             if (this->ig2isz[ig] < (is + 1) * this->nz) // meaning this pw belongs to is^th sticks.

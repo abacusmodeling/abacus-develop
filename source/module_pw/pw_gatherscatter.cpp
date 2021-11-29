@@ -32,7 +32,7 @@ void PW_Basis:: gatherp_scatters(complex<double> *in, complex<double> *out)
         if(this->ixy2ip[ixy] == -1) continue;
         int istot = 0;
         if(this->poolrank == 0) istot = this->ixy2istot[ixy];
-        int bigixy = (ixy / nx) * bignx + ixy % nx;
+        int bigixy = (ixy / ny) * bigny + ixy % ny;
         MPI_Gatherv(&in[bigixy*this->nplane], this->nplane, mpicomplex, &tmp[istot*this->nz], 
                     this->numz,this->startz,mpicomplex,0,POOL_WORLD);
     }
