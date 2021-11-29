@@ -76,7 +76,7 @@ void PW_Basis::distribution_method1()
         int *npw_per = new int[this->poolnproc];  // number of planewaves on each core.
         int *nst_per = new int[this->poolnproc]; // number of sticks on each core.
         this->nstnz_per = new int[this->poolnproc]; // nz * nst(number of sticks) on each core.
-        this->startnsz_per = new int[poolnproc];
+        this->startnsz_per = new int[this->poolnproc];
         ModuleBase::GlobalFunc::ZEROS(npw_per, poolnproc);
         ModuleBase::GlobalFunc::ZEROS(nst_per, poolnproc);
         ModuleBase::GlobalFunc::ZEROS(this->nstnz_per, poolnproc);
