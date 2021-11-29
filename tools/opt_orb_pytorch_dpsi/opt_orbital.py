@@ -113,16 +113,15 @@ class Opt_Orbital:
 		
 		
 		
-	def cal_V(self,Q,S):
+	def cal_V(self,coef,Q):
+		# coef[ib,it*il*ia*im*iu]
+		# Q[ib,it*il*ia*im*iu]
 		"""
 		  <\psi|\psi> = <\psi|\phi> * <\phi|\phi>^{-1} * <\phi|psi>
 		  V[ib1,ib2]
 		  	= sum_{it1,ia1,il1,im1,iu1} sum_{it2,ia2,il2,im2,iu2}
 		  	Q[ib1,it1*il1*ia1*im1*iu1] * S{[it1*il1*iat*im1*iu1,iat2*il2*ia2*im2*iu2]}^{-1} * Q[ib2,it2*il2*ia2*im2*iu2]
 		"""
-		coef = self.cal_coef(Q,S)				# coef[ib,it*il*ia*im*iu]
-		
-		# V[ib1,ib2]
 		V = torch_complex.mm( coef, Q.t().conj() ).real
 		return V
 
@@ -139,15 +138,15 @@ class Opt_Orbital:
 		return V_origin		
 		
 		
-	def cal_V_linear(self,Q,S,Q_linear,S_linear,V,V_info):
-		# Q[ib,it*il*ia*im*iu]
-		# S[it1*il1*iat*im1*iu1,iat2*il2*ia2*im2*iu2]
+	def cal_V_linear(self,coef,Q_linear,S_linear,V,V_info):
+		# coef[ib,it*il*ia*im*iu]
+		# Q_linear[ib,it*il*ia*im*iu]
+		# S_linear[it1*il1*iat*im1*iu1,iat2*il2*ia2*im2*iu2]
+		# V[ib1,ib2]
 		"""
 		  V_linear[ib]
 		  V_linear[ib1,ib2]
-		"""
-		coef = self.cal_coef(Q,S)							# coef[ib,it*il*ia*im*iu]
-		
+		"""		
 		V_linear_1 = coef.mm(S_linear).mm(coef.t().conj()).real
 		V_linear_2 = Q_linear.mm(coef.t().conj()).real
 		V_linear_3 = coef.mm(Q_linear.t().conj()).real

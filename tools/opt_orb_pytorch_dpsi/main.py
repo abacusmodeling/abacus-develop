@@ -60,7 +60,8 @@ def main():
 
 				Q = opt_orb.change_index_Q(opt_orb.cal_Q(QI[ist],C,info,ist),info,ist)
 				S = opt_orb.change_index_S(opt_orb.cal_S(SI[ist],C,info,ist),info,ist)
-				V = opt_orb.cal_V(Q,S)
+				coef = opt_orb.cal_coef(Q,S)
+				V = opt_orb.cal_V(coef,Q)
 				V_origin = opt_orb.cal_V_origin(V,V_info)
 
 				if "linear" in file_list.keys():
@@ -68,7 +69,7 @@ def main():
 					for i in range(len(file_list["linear"])):
 						Q_linear = opt_orb.change_index_Q(opt_orb.cal_Q(QI_linear[i][ist],C,info,ist),info,ist)
 						S_linear = opt_orb.change_index_S(opt_orb.cal_S(SI_linear[i][ist],C,info,ist),info,ist)
-						V_linear[i] = opt_orb.cal_V_linear(Q,S,Q_linear,S_linear,V,V_info)
+						V_linear[i] = opt_orb.cal_V_linear(coef,Q_linear,S_linear,V,V_info)
 
 				def cal_Spillage(V_delta):
 					Spillage = (V_delta * weight[ist]).sum()
@@ -129,5 +130,5 @@ def main():
 if __name__=="__main__":
 	import sys
 	np.set_printoptions(threshold=sys.maxsize, linewidth=10000)
-	print( sys.version, flush=True  ) 
+	print( sys.version, flush=True ) 
 	main()
