@@ -24,7 +24,7 @@ def main():
 
 	weight = IO.cal_weight.cal_weight(weight_info, V_info["same_band"], file_list["origin"])
 
-	QI,SI,VI,info = IO.read_QSV.read_file(info_true,file_list["origin"],V_info)
+	QI,SI,VI_origin,info = IO.read_QSV.read_file(info_true,file_list["origin"],V_info)
 	print(info, flush=True)
 	if "linear" in file_list.keys():
 		QI_linear, SI_linear, VI_linear, info_linear = list(zip(*( IO.read_QSV.read_file(info_true,file,V_info) for file in file_list["linear"] )))
@@ -60,7 +60,8 @@ def main():
 
 				Q = opt_orb.change_index_Q(opt_orb.cal_Q(QI[ist],C,info,ist),info,ist)
 				S = opt_orb.change_index_S(opt_orb.cal_S(SI[ist],C,info,ist),info,ist)
-				V = opt_orb.cal_V(Q,S,V_info)
+				V = opt_orb.cal_V(Q,S)
+				V_origin = opt_orb.cal_V_origin(V,V_info)
 
 				if "linear" in file_list.keys():
 					V_linear = [None] * len(file_list["linear"])
@@ -76,7 +77,7 @@ def main():
 				def cal_delta(VI, V):
 					return ((VI[ist]-V)/util.update0(VI[ist])).abs()		# abs or **2?
 				
-				Spillage += 2*cal_Spillage(cal_delta(VI,V))
+				Spillage += 2*cal_Spillage(cal_delta(VI_origin,V_origin))
 				if "linear" in file_list.keys():
 					for i in range(len(file_list["linear"])):
 						Spillage += cal_Spillage(cal_delta(VI_linear[i],V_linear[i]))

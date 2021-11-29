@@ -113,12 +113,9 @@ class Opt_Orbital:
 		
 		
 		
-	def cal_V(self,Q,S,V_info):
+	def cal_V(self,Q,S):
 		"""
 		  <\psi|\psi> = <\psi|\phi> * <\phi|\phi>^{-1} * <\phi|psi>
-		  V[ib]
-		  	= sum_{it1,ia1,il1,im1,iu1} sum_{it2,ia2,il2,im2,iu2}
-		  	Q[ib,it1*il1*ia1*im1*iu1] * S{[it1*il1*iat*im1*iu1,iat2*il2*ia2*im2*iu2]}^{-1} * Q[ib,it2*il2*ia2*im2*iu2]		
 		  V[ib1,ib2]
 		  	= sum_{it1,ia1,il1,im1,iu1} sum_{it2,ia2,il2,im2,iu2}
 		  	Q[ib1,it1*il1*ia1*im1*iu1] * S{[it1*il1*iat*im1*iu1,iat2*il2*ia2*im2*iu2]}^{-1} * Q[ib2,it2*il2*ia2*im2*iu2]
@@ -126,11 +123,20 @@ class Opt_Orbital:
 		coef = self.cal_coef(Q,S)				# coef[ib,it*il*ia*im*iu]
 		
 		# V[ib1,ib2]
-		V_tmp = torch_complex.mm( coef, Q.t().conj() ).real
-		if V_info["same_band"]:		V = V_tmp.diag().sqrt()
-		else:						V = V_tmp.sqrt()
+		V = torch_complex.mm( coef, Q.t().conj() ).real
 		return V
-		
+
+
+	def cal_V_origin(self,V,V_info):
+		# V[ib1,ib2]
+		"""
+		  <\psi|\psi> = <\psi|\phi> * <\phi|\phi>^{-1} * <\phi|psi>
+		  V_origin[ib]	
+		  V_origin[ib1,ib2]
+		"""			
+		if V_info["same_band"]:		V_origin = V.diag().sqrt()
+		else:						V_origin = V.sqrt()
+		return V_origin		
 		
 		
 	def cal_V_linear(self,Q,S,Q_linear,S_linear,V,V_info):
@@ -149,7 +155,9 @@ class Opt_Orbital:
 			V_linear_1 = V_linear_1.diag()
 			V_linear_2 = V_linear_2.diag()
 			V_linear_3 = V_linear_3.diag()
-		Z = util.update0(V)
+		if V_info["same_band"]:		Z = V.diag().sqrt()
+		else:						Z = V.sqrt()
+		Z = util.update0(Z)
 		V_linear = (-V_linear_1/Z + V_linear_2 + V_linear_3) / Z
 		return V_linear
 			
