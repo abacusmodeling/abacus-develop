@@ -27,7 +27,7 @@
 
     - [Variables related to program output](#variables-related-to-program-output)
 
-        [mulliken](#mulliken) | [out_charge](#out-charge) | [out_potential](#out-potential) | [out_dm](#out-dm) | [out_wf](#out-wf) | [out_lowf](#out-lowf) | [out_dos](#out-dos) | [out_band](#out-band) | [out_stru](#out-stru) | [out_level](#out_level) | [out_alllog](#out-alllog) | [out_hs](#out-hs) | [out_r](#out-r) | [out_hs2](#out-hs2)
+        [mulliken](#mulliken) | [out_charge](#out-charge) | [out_potential](#out-potential) | [out_dm](#out-dm) | [out_wf](#out-wf) | [out_lowf](#out-lowf) | [out_dos](#out-dos) | [out_band](#out-band) | [out_stru](#out-stru) | [out_level](#out_level) | [out_alllog](#out-alllog) | [out_hs](#out-hs) | [out_r](#out-r) | [out_hs2](#out-hs2) | [out_element_info](#out-element-info) 
 
     - [Density of states](#density-of-states)
 
@@ -827,6 +827,23 @@ This part of variables are used to control the output of properties.
 - out_hs2<a id="out-hs2"></a>
     - *Type*: Boolean
     - *Description*: Only for LCAO and not gamma_only calculations. When set to 1, ABACUS will generate two files starting with `data-HR-sparse` and `data-SR-sparse` that store the Hamiltonian and S matrix in real space, respectively, as functions of R, in units of lattice vectors.
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+- out_element_info<a id="out-element-info"></a>
+    - *Type*: Boolean
+    - *Description*: When set to 1, ABACUS will generate a new directory under OUT.suffix path named as element name such as 'Si', which contained files "Si-d1-orbital-dru.dat  Si-p2-orbital-k.dat    Si-s2-orbital-dru.dat
+    Si-d1-orbital-k.dat    Si-p2-orbital-r.dat    Si-s2-orbital-k.dat
+    Si-d1-orbital-r.dat    Si-p2-orbital-ru.dat   Si-s2-orbital-r.dat
+    Si-d1-orbital-ru.dat   Si-p-proj-k.dat        Si-s2-orbital-ru.dat
+    Si.NONLOCAL            Si-p-proj-r.dat        Si-s-proj-k.dat
+    Si-p1-orbital-dru.dat  Si-p-proj-ru.dat       Si-s-proj-r.dat
+    Si-p1-orbital-k.dat    Si-s1-orbital-dru.dat  Si-s-proj-ru.dat
+    Si-p1-orbital-r.dat    Si-s1-orbital-k.dat    v_loc_g.dat
+    Si-p1-orbital-ru.dat   Si-s1-orbital-r.dat
+    Si-p2-orbital-dru.dat  Si-s1-orbital-ru.dat " for example.
+
     - *Default*: 0
 
     [back to top](#input-file)

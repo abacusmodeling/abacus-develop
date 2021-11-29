@@ -265,6 +265,7 @@ void Input::Default(void)
 	dos_edelta_ev = 0.01;//(ev)
 	dos_scale = 0.01;
     b_coef = 0.07;
+	out_element_info = false;
 //----------------------------------------------------------
 // LCAO
 //----------------------------------------------------------
@@ -1091,6 +1092,10 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("out_alllog", word) == 0)
         {
             read_value(ifs, out_alllog);
+        }
+		else if (strcmp("out_element_info", word) == 0)
+        {
+            read_value(ifs, out_element_info);
         }
         else if (strcmp("dos_emin_ev", word) == 0)
         {
@@ -2234,6 +2239,7 @@ void Input::Bcast()
 	Parallel_Common::bcast_int( out_r_matrix ); // jingan add 2019-8-14
 	Parallel_Common::bcast_bool( out_lowf );
 	Parallel_Common::bcast_bool( out_alllog );
+	Parallel_Common::bcast_bool( out_element_info );
 
 	Parallel_Common::bcast_double( dos_emin_ev );
 	Parallel_Common::bcast_double( dos_emax_ev );

@@ -83,6 +83,7 @@ void Input_Conv::Convert(void)
     GlobalV::PRESS1 = INPUT.press1;
     GlobalV::PRESS2 = INPUT.press2;
     GlobalV::PRESS3 = INPUT.press3;
+	GlobalV::out_element_info = INPUT.out_element_info;
 #ifdef __LCAO
 	Force_Stress_LCAO::force_invalid_threshold_ev = INPUT.force_thr_ev2;
 #endif
