@@ -2,6 +2,7 @@
 #include "MD_basic.h"
 #include "NVE.h"
 #include "MSST.h"
+#include "NVT_ADS.h"
 #include "../input.h"
 #include "../src_io/print_info.h"
 
@@ -30,7 +31,7 @@ void Run_MD_CLASSIC::classic_md_line(void)
     }
     else if(INPUT.mdp.mdtype==1)
     {
-        verlet = new NVE(INPUT.mdp, ucell_c); 
+        verlet = new NVT_ADS(INPUT.mdp, ucell_c);
     }
     else if(INPUT.mdp.mdtype==4)
     {

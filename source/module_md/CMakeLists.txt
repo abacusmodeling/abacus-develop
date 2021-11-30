@@ -12,4 +12,5 @@ add_library(
 	verlet.cpp
 	NVE.cpp
     MSST.cpp
+    NVT_ADS.cpp
 )

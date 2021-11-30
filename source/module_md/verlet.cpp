@@ -40,11 +40,49 @@ Verlet::~Verlet()
     delete []force;
 }
 
-void Verlet::setup(){}
+void Verlet::setup()
+{
+    if(mdp.rstMD)
+    {
+        restart();
+    }
 
-void Verlet::first_half(){}
+    MD_func::force_virial(mdp, ucell, potential, force, virial);
+    MD_func::kinetic_stress(ucell, vel, allmass, kinetic, stress);
+    stress += virial;
+}
 
-void Verlet::second_half(){}
+void Verlet::first_half()
+{
+    for(int i=0; i<ucell.nat; ++i)
+    {
+        for(int k=0; k<3; ++k)
+        {
+            if(ionmbl[i][k])
+            {
+                pos[i][k] += vel[i][k]*mdp.dt + 0.5*force[i][k]*mdp.dt*mdp.dt/allmass[i];
+                vel[i][k] += 0.5*force[i][k]*mdp.dt/allmass[i];
+            }
+        }
+    }
+
+    ucell.update_pos_tau(pos);
+    ucell.periodic_boundary_adjustment();
+}
+
+void Verlet::second_half()
+{
+    for(int i=0; i<ucell.nat; ++i)
+    {
+        for(int k=0; k<3; ++k)
+        {
+            if(ionmbl[i][k])
+            {
+                vel[i][k] += 0.5*force[i][k]*mdp.dt/allmass[i];
+            }
+        }
+    }
+}
 
 void Verlet::outputMD()
 {
@@ -73,6 +111,44 @@ void Verlet::outputMD()
     MD_func::outStress(virial, stress);
 }
 
-void Verlet::write_restart(){}
+void Verlet::write_restart()
+{
+    if(!GlobalV::MY_RANK)
+    {
+		std::stringstream ssc;
+		ssc << GlobalV::global_out_dir << "Restart_md.dat";
+		std::ofstream file(ssc.str().c_str());
 
-void Verlet::restart(){}
+        file << step_ << std::endl;
+		file.close();
+	}
+#ifdef __MPI
+	MPI_Barrier(MPI_COMM_WORLD);
+#endif
+}
+
+void Verlet::restart()
+{
+    if(!GlobalV::MY_RANK)
+    {
+		std::stringstream ssc;
+		ssc << GlobalV::global_out_dir << "Restart_md.dat";
+		std::ifstream file(ssc.str().c_str());
+
+        if(!file)
+		{
+			std::cout<< "please ensure whether 'Restart_md.dat' exists!" << std::endl;
+            ModuleBase::WARNING_QUIT("MSST", "no Restart_md.dat ！");
+		}
+
+		file >> step_rst_;
+
+		file.close();
+	}
+
+#ifdef __MPI
+	MPI_Bcast(&step_rst_, 1, MPI_INT, 0, MPI_COMM_WORLD);
+#endif
+
+    step_ = step_rst_;
+}
