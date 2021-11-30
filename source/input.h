@@ -230,6 +230,7 @@ class Input
 	int out_r_matrix;   // jingan add 2019-8-14, output r(R) matrix.
 	bool out_lowf;			// output the wave functions in local basis.
 	bool out_alllog; 		// output all logs.
+	bool out_element_info; // output infomation of all element
 
 	double dos_emin_ev;
 	double dos_emax_ev;
