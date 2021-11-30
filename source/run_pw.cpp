@@ -49,7 +49,7 @@ void Run_pw::plane_wave_line(void)
     // symmetry analysis should be performed every time the cell is changed
     if (ModuleSymmetry::Symmetry::symm_flag)
     {
-        GlobalC::symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
+        GlobalC::symm.analy_sys(GlobalC::ucell, GlobalV::ofs_running);
         ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 

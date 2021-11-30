@@ -74,7 +74,7 @@ public:
 public:
     UnitCell();
     ~UnitCell();
-    void print_cell(std::ofstream &ofs, output &outp)const;
+    void print_cell(std::ofstream &ofs)const;
     void print_cell_xyz(const std::string &fn)const;
     void print_cell_cif(const std::string &fn)const;
 

@@ -78,7 +78,7 @@ void Atom::set_index(void)
     return;
 }
 
-void Atom::print_Atom(std::ofstream &ofs, output &outp)
+void Atom::print_Atom(std::ofstream &ofs)
 {
     //OUT(ofs,"print_Atom()");
     ModuleBase::GlobalFunc::OUT(ofs,"label",label);
@@ -95,7 +95,7 @@ void Atom::print_Atom(std::ofstream &ofs, output &outp)
     //===================
     this->print_atom(ofs);
 
-    outp.printv31_d(ofs,"atom_position(cartesian)",tau,na);
+    output::printv31_d(ofs,"atom_position(cartesian)",tau,na);
     /*
     for (int i = 0;i < na;i++)
     {

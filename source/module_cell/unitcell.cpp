@@ -148,7 +148,7 @@ void UnitCell::bcast_unitcell2(void)
 }
 #endif
 
-void UnitCell::print_cell(std::ofstream &ofs, output &outp)const
+void UnitCell::print_cell(std::ofstream &ofs)const
 {
     if (GlobalV::test_unitcell) ModuleBase::TITLE("UnitCell","print_cell");
 
@@ -162,10 +162,10 @@ void UnitCell::print_cell(std::ofstream &ofs, output &outp)const
     ModuleBase::GlobalFunc::OUT(ofs,"tpiba",tpiba);
     ModuleBase::GlobalFunc::OUT(ofs,"omega",omega);
 
-    outp.printM3(ofs,"Lattices Vector (R) : ", latvec);
-    outp.printM3(ofs ,"Supercell lattice vector : ", latvec_supercell);
-    outp.printM3(ofs, "Reciprocal lattice Vector (G): ", G);
-    outp.printM3(ofs, "GGT : ", GGT);
+    output::printM3(ofs,"Lattices Vector (R) : ", latvec);
+    output::printM3(ofs ,"Supercell lattice vector : ", latvec_supercell);
+    output::printM3(ofs, "Reciprocal lattice Vector (G): ", G);
+    output::printM3(ofs, "GGT : ", GGT);
 
     ofs<<std::endl;
     return;

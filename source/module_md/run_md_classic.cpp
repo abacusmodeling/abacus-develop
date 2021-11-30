@@ -66,7 +66,11 @@ void Run_MD_CLASSIC::classic_md_line(void)
         verlet->ucell.update_vel(verlet->vel);
         std::stringstream file;
         file << GlobalV::global_out_dir << "STRU_MD_" << verlet->step_;
+#ifdef __LCAO
+        verlet->ucell.print_stru_file(GlobalC::ORB, file.str(), 2, 1);
+#else
         verlet->ucell.print_stru_file(file.str(), 2, 1);
+#endif
         verlet->write_restart();
 
         verlet->step_++;
