@@ -25,20 +25,13 @@ void NVE::first_half()
 
     for(int i=0; i<ucell.nat; ++i)
     {
-        if(ionmbl[i].x)
+        for(int k=0; k<3; ++k)
         {
-            pos[i].x += vel[i].x*mdp.dt + 0.5*force[i].x*mdp.dt*mdp.dt/allmass[i];
-            vel[i].x += 0.5*force[i].x*mdp.dt/allmass[i];
-        }
-        if(ionmbl[i].y)
-        {
-            pos[i].y += vel[i].y*mdp.dt + 0.5*force[i].y*mdp.dt*mdp.dt/allmass[i];
-            vel[i].y += 0.5*force[i].y*mdp.dt/allmass[i];
-        }
-        if(ionmbl[i].z)
-        {
-            pos[i].z += vel[i].z*mdp.dt + 0.5*force[i].z*mdp.dt*mdp.dt/allmass[i];
-            vel[i].z += 0.5*force[i].z*mdp.dt/allmass[i];
+            if(ionmbl[i][k])
+            {
+                pos[i][k] += vel[i][k]*mdp.dt + 0.5*force[i][k]*mdp.dt*mdp.dt/allmass[i];
+                vel[i][k] += 0.5*force[i][k]*mdp.dt/allmass[i];
+            }
         }
     }
 
@@ -55,17 +48,12 @@ void NVE::second_half()
 
     for(int i=0; i<ucell.nat; ++i)
     {
-        if(ionmbl[i].x)
+        for(int k=0; k<3; ++k)
         {
-            vel[i].x += 0.5*force[i].x*mdp.dt/allmass[i];
-        }
-        if(ionmbl[i].y)
-        {
-            vel[i].y += 0.5*force[i].y*mdp.dt/allmass[i];
-        }
-        if(ionmbl[i].z)
-        {
-            vel[i].z += 0.5*force[i].z*mdp.dt/allmass[i];
+            if(ionmbl[i][k])
+            {
+                vel[i][k] += 0.5*force[i][k]*mdp.dt/allmass[i];
+            }
         }
     }
 
@@ -115,6 +103,9 @@ void NVE::write_restart()
         file << step_ << std::endl;
 		file.close();
 	}
+#ifdef __MPI
+	MPI_Barrier(MPI_COMM_WORLD);
+#endif
 }
 
 void NVE::restart()

@@ -204,6 +204,9 @@ void MSST::write_restart()
 
 		file.close();
 	}
+#ifdef __MPI
+	MPI_Barrier(MPI_COMM_WORLD);
+#endif
 }
 
 void MSST::restart()

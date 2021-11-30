@@ -348,6 +348,21 @@ void UnitCell::update_pos_taud(const ModuleBase::Vector3<double>* posd_in)
     this->periodic_boundary_adjustment();
 }
 
+void UnitCell::update_vel(const ModuleBase::Vector3<double>* vel_in)
+{
+    int iat = 0;
+    for(int it=0; it<this->ntype; ++it)
+    {
+        Atom* atom = &this->atoms[it];
+        for(int ia=0; ia<atom->na; ++ia)
+        {
+            this->atoms[it].vel[ia] = vel_in[iat];
+            ++iat;
+        }
+    }
+    assert(iat == this->nat);
+}
+
 void UnitCell::periodic_boundary_adjustment()
 {
     //----------------------------------------------

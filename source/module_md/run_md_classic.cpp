@@ -63,6 +63,10 @@ void Run_MD_CLASSIC::classic_md_line(void)
         Print_Info::print_screen(0, 0, verlet->step_);
         verlet->outputMD();
 
+        verlet->ucell.update_vel(verlet->vel);
+        std::stringstream file;
+        file << GlobalV::global_out_dir << "STRU_MD_" << verlet->step_;
+        verlet->ucell.print_stru_file(file.str(), 2, 1);
         verlet->write_restart();
 
         verlet->step_++;

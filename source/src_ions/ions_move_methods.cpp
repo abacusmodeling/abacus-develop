@@ -79,9 +79,9 @@ void Ions_Move_Methods::cal_movement(const int &istep, const int &force_step, co
 	//GlobalC::ucell.print_stru_file(ss.str(),1);
 	ss << "_D";
 #ifdef __LCAO
-	GlobalC::ucell.print_stru_file(GlobalC::ORB,ss.str(),2);
+	GlobalC::ucell.print_stru_file(GlobalC::ORB,ss.str(), 2, 0);
 #else
-	GlobalC::ucell.print_stru_file(ss.str(),2);
+	GlobalC::ucell.print_stru_file(ss.str(), 2, 0);
 #endif
 
 	return;

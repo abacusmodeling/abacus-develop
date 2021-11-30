@@ -136,12 +136,13 @@ void MD_func::kinetic_stress(
 
 	for(int ion=0; ion<unit_in.nat; ++ion)
 	{
-		temp(0, 0) += allmass[ion] * vel[ion].x * vel[ion].x;
-		temp(0, 1) += allmass[ion] * vel[ion].x * vel[ion].y;
-		temp(0, 2) += allmass[ion] * vel[ion].x * vel[ion].z;
-		temp(1, 1) += allmass[ion] * vel[ion].y * vel[ion].y;
-		temp(1, 2) += allmass[ion] * vel[ion].y * vel[ion].z;
-		temp(2, 2) += allmass[ion] * vel[ion].z * vel[ion].z;
+		for(int i=0; i<3; ++i)
+		{
+			for(int j=i; j<3; ++j)
+			{
+				temp(i, j) += allmass[ion] * vel[ion][i] * vel[ion][j];
+			}
+		}
 	}
 
 	for(int i=0; i<3; ++i)
@@ -198,45 +199,30 @@ void MD_func::RandomVel(
 		mass.set(0,0,0);
 		for(int i=0; i<numIon; i++)
 		{
-			if(ionmbl[i].x==0)
+			for(int k=0; k<3; ++k)
 			{
-				vel[i].x = 0;
-			}
-			else
-			{
-				vel[i].x = rand()/double(RAND_MAX)-0.5;
-				mass.x += allmass[i];
-			}
-			if(ionmbl[i].y==0)
-			{
-				vel[i].y = 0;
-			}
-			else
-			{
-				vel[i].y = rand()/double(RAND_MAX)-0.5;
-				mass.y += allmass[i];
-			}
-			if(ionmbl[i].z==0)
-			{
-				vel[i].z = 0;
-			}
-			else
-			{
-				vel[i].z = rand()/double(RAND_MAX)-0.5;
-				mass.z += allmass[i];
+				if(ionmbl[i][k]==0)
+				{
+					vel[i][k] = 0;
+				}
+				else
+				{
+					vel[i][k] = rand()/double(RAND_MAX)-0.5;
+					mass[k] += allmass[i];
+				}
 			}
 			average += allmass[i]*vel[i];
 		}
 
-		average.x = average.x / mass.x;
-		average.y = average.y / mass.y;
-		average.z = average.z / mass.z;
-
 		for(int i=0; i<numIon; i++)
     	{
-			if(ionmbl[i].x) vel[i].x -= average.x;
-			if(ionmbl[i].y) vel[i].y -= average.y;
-			if(ionmbl[i].z) vel[i].z -= average.z;
+			for(int k=0; k<3; ++k)
+			{
+				if(ionmbl[i][k])
+				{
+					vel[i][k] -= average[k] / mass[k];
+				}
+			}
 		}
 	
 		double factor = 0.5*(3*numIon-frozen_freedom)*temperature/GetAtomKE(numIon, vel, allmass);
@@ -592,9 +578,9 @@ void MD_func::printpos(const std::string& file, const int& iter, const int& reco
 
 	//zhengdy modify 2015-05-06, outputfile "STRU_Restart"
 #ifdef __LCAO
-	unit_in.print_stru_file(GlobalC::ORB, ss.str(),2);
+	unit_in.print_stru_file(GlobalC::ORB, ss.str(), 2, 1);
 #else
-	unit_in.print_stru_file(ss.str(),2);
+	unit_in.print_stru_file(ss.str(), 2, 1);
 #endif
 
 	return;
