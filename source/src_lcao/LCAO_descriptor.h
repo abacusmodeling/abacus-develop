@@ -125,6 +125,8 @@ public:
     ///gvdm*gdmx->gvx
     ///----------------------------------------------------
     void cal_gvx(const ModuleBase::matrix &dm);
+    void cal_gvx_k(const std::vector<ModuleBase::ComplexMatrix>& dm);
+
 
     ///print descriptors based on LCAO basis
     void print_descriptor(void);
@@ -306,6 +308,7 @@ private:
 //d/dX D_{Inl,mm'}
 	void init_gdmx(void);
     void cal_gdmx(const ModuleBase::matrix& dm);	//dD/dX, precondition of cal_gvx
+    void cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm);	//dD/dX, precondition of cal_gvx
 	void del_gdmx(void);
 
 //===============================

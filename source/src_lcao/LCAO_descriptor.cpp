@@ -989,6 +989,209 @@ void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm)
     return;
 }
 
+void LCAO_Descriptor::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm)
+{
+    ModuleBase::TITLE("LCAO_Descriptor", "cal_gdmx");
+
+    std::complex<double> ***gdmx_complex;
+    std::complex<double> ***gdmy_complex;
+    std::complex<double> ***gdmz_complex;
+    int size = (2 * lmaxd + 1) * (2 * lmaxd + 1);
+
+    gdmx_complex = new complex<double>** [GlobalC::ucell.nat];
+    gdmy_complex = new complex<double>** [GlobalC::ucell.nat];
+    gdmz_complex = new complex<double>** [GlobalC::ucell.nat];
+
+    for (int iat = 0;iat < GlobalC::ucell.nat;iat++)
+    {
+        gdmx_complex[iat] = new complex<double>* [inlmax];
+        gdmy_complex[iat] = new complex<double>* [inlmax];
+        gdmz_complex[iat] = new complex<double>* [inlmax];
+        for (int inl = 0;inl < inlmax;inl++)
+        {
+            gdmx_complex[iat][inl] = new complex<double> [size];
+            ModuleBase::GlobalFunc::ZEROS(gdmx_complex[iat][inl], size);
+            gdmy_complex[iat][inl] = new complex<double> [size];
+            ModuleBase::GlobalFunc::ZEROS(gdmy_complex[iat][inl], size);
+            gdmz_complex[iat][inl] = new complex<double> [size];
+            ModuleBase::GlobalFunc::ZEROS(gdmz_complex[iat][inl], size);
+        }
+    }
+
+    const double Rcut_Alpha = GlobalC::ORB.Alpha[0].getRcut();
+
+    for (int T0 = 0; T0 < GlobalC::ucell.ntype; T0++)
+    {
+		Atom* atom0 = &GlobalC::ucell.atoms[T0]; 
+        for (int I0 =0; I0< atom0->na; I0++)
+        {
+            const int iat = GlobalC::ucell.itia2iat(T0,I0);
+            const ModuleBase::Vector3<double> tau0 = atom0->tau[I0];
+            GlobalC::GridD.Find_atom(GlobalC::ucell, atom0->tau[I0] ,T0, I0);
+
+            for (int ad1=0; ad1<GlobalC::GridD.getAdjacentNum()+1 ; ++ad1)
+            {
+                const int T1 = GlobalC::GridD.getType(ad1);
+                const int I1 = GlobalC::GridD.getNatom(ad1);
+                const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
+                
+                const ModuleBase::Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau(ad1);
+				const Atom* atom1 = &GlobalC::ucell.atoms[T1];
+				const int nw1_tot = atom1->nw*GlobalV::NPOL;
+				const double Rcut_AO1 = GlobalC::ORB.Phi[T1].getRcut();
+
+                ModuleBase::Vector3<double> dR1(GlobalC::GridD.getBox(ad1).x, GlobalC::GridD.getBox(ad1).y, GlobalC::GridD.getBox(ad1).z); 
+
+				for (int ad2=0; ad2 < GlobalC::GridD.getAdjacentNum()+1 ; ad2++)
+				{
+					const int T2 = GlobalC::GridD.getType(ad2);
+					const int I2 = GlobalC::GridD.getNatom(ad2);
+					const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
+                    const int ibt = GlobalC::ucell.itia2iat(T2,I2);
+					const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad2);
+					const Atom* atom2 = &GlobalC::ucell.atoms[T2];
+					const int nw2_tot = atom2->nw*GlobalV::NPOL;
+                    ModuleBase::Vector3<double> dR2(GlobalC::GridD.getBox(ad2).x, GlobalC::GridD.getBox(ad2).y, GlobalC::GridD.getBox(ad2).z);
+					
+					const double Rcut_AO2 = GlobalC::ORB.Phi[T2].getRcut();
+                	const double dist1 = (tau1-tau0).norm() * GlobalC::ucell.lat0;
+                	const double dist2 = (tau2-tau0).norm() * GlobalC::ucell.lat0;
+
+					if (dist1 > Rcut_Alpha + Rcut_AO1
+							|| dist2 > Rcut_Alpha + Rcut_AO2)
+					{
+						continue;
+					}
+
+					for (int iw1=0; iw1<nw1_tot; ++iw1)
+					{
+						const int iw1_all = start1 + iw1;
+						const int iw1_local = GlobalC::ParaO.trace_loc_row[iw1_all];
+						if(iw1_local < 0)continue;
+						const int iw1_0 = iw1/GlobalV::NPOL;
+						for (int iw2=0; iw2<nw2_tot; ++iw2)
+						{
+							const int iw2_all = start2 + iw2;
+							const int iw2_local = GlobalC::ParaO.trace_loc_col[iw2_all];
+							if(iw2_local < 0)continue;
+							const int iw2_0 = iw2/GlobalV::NPOL;
+
+                            std::vector<double> nlm1 = this->nlm_save[iat][ad1][iw1_all][0];
+                            std::vector<std::vector<double>> nlm2 = this->nlm_save[iat][ad2][iw2_all];
+
+                            assert(nlm1.size()==nlm2[0].size());
+                            for(int ik=0;ik<GlobalC::kv.nks;ik++)
+                            {
+                                const double arg = ( GlobalC::kv.kvec_d[ik] * (dR2-dR1) ) * ModuleBase::TWO_PI;
+                                const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );
+                                int ib=0;
+                                for (int L0 = 0; L0 <= GlobalC::ORB.Alpha[0].getLmax();++L0)
+                                {
+                                    for (int N0 = 0;N0 < GlobalC::ORB.Alpha[0].getNchi(L0);++N0)
+                                    {
+                                        const int inl = this->inl_index[T0](I0, L0, N0);
+                                        const int nm = 2*L0+1;
+                                        for (int m1 = 0;m1 < 2 * L0 + 1;++m1)
+                                        {
+                                            for (int m2 = 0; m2 < 2 * L0 + 1; ++m2)
+                                            {
+                                                //ibt : on which iw2 is located
+                                                //iat : on which alpha is located
+
+                                                //(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'>
+                                                gdmx_complex[ibt][inl][m1*nm + m2] += 
+                                                    nlm2[1][ib+m2] * dm[ik](iw2_local, iw1_local) * nlm1[ib+m1] * kphase;
+                                                gdmy_complex[ibt][inl][m1*nm + m2] += 
+                                                    nlm2[2][ib+m2] * dm[ik](iw2_local, iw1_local) * nlm1[ib+m1] * kphase;
+                                                gdmz_complex[ibt][inl][m1*nm + m2] += 
+                                                    nlm2[3][ib+m2] * dm[ik](iw2_local, iw1_local) * nlm1[ib+m1] * kphase;
+
+                                                //(<d/dX chi_mu|alpha_m'>)<chi_nu|alpha_m>
+                                                gdmx_complex[ibt][inl][m2*nm + m1] += 
+                                                    nlm2[1][ib+m2] * dm[ik](iw2_local, iw1_local) * nlm1[ib+m1] * kphase;
+                                                gdmy_complex[ibt][inl][m2*nm + m1] += 
+                                                    nlm2[2][ib+m2] * dm[ik](iw2_local, iw1_local) * nlm1[ib+m1] * kphase;
+                                                gdmz_complex[ibt][inl][m2*nm + m1] += 
+                                                    nlm2[3][ib+m2] * dm[ik](iw2_local, iw1_local) * nlm1[ib+m1] * kphase;
+
+                                                //(<chi_mu|d/dX alpha_m>)<chi_nu|alpha_m'> = -(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'>
+                                                gdmx_complex[iat][inl][m1*nm + m2] -= 
+                                                    nlm2[1][ib+m2] * dm[ik](iw2_local, iw1_local) * nlm1[ib+m1] * kphase;
+                                                gdmy_complex[iat][inl][m1*nm + m2] -= 
+                                                    nlm2[2][ib+m2] * dm[ik](iw2_local, iw1_local) * nlm1[ib+m1] * kphase;
+                                                gdmz_complex[iat][inl][m1*nm + m2] -= 
+                                                    nlm2[3][ib+m2] * dm[ik](iw2_local, iw1_local) * nlm1[ib+m1] * kphase;
+
+                                                //(<chi_nu|d/dX alpha_m'>)<chi_mu|alpha_m> = -(<d/dX chi_nu|alpha_m'>)<chi_mu|alpha_m>
+                                                gdmx_complex[iat][inl][m2*nm + m1] -= 
+                                                    nlm2[1][ib+m2] * dm[ik](iw2_local, iw1_local) * nlm1[ib+m1] * kphase;
+                                                gdmy_complex[iat][inl][m2*nm + m1] -= 
+                                                    nlm2[2][ib+m2] * dm[ik](iw2_local, iw1_local) * nlm1[ib+m1] * kphase;
+                                                gdmz_complex[iat][inl][m2*nm + m1] -= 
+                                                    nlm2[3][ib+m2] * dm[ik](iw2_local, iw1_local) * nlm1[ib+m1] * kphase; 
+
+                                            }
+                                        }
+                                        ib+=nm;
+                                    }
+                                }
+                                assert(ib==nlm1.size());
+                            }//ik
+						}//iw2
+					}//iw1
+				}//ad2
+			}//ad1
+        }//I0
+    }//T0
+
+    for (int iat = 0;iat < GlobalC::ucell.nat;iat++)
+    {
+        for (int inl = 0;inl < inlmax;inl++)
+        {
+            int size = (2 * lmaxd + 1) * (2 * lmaxd + 1);
+            for(int ind = 0; ind <size; ind++)
+            {
+                if(gdmx_complex[iat][inl][ind].imag()>1.0e-8)
+                {
+                    ModuleBase::WARNING_QUIT("gdm_k","gdmx_complex not real!");
+                }
+                this->gdmx[iat][inl][ind] = gdmx_complex[iat][inl][ind].real();
+
+                if(gdmy_complex[iat][inl][ind].imag()>1.0e-8)
+                {
+                    ModuleBase::WARNING_QUIT("gdm_k","gdmy_complex not real!");
+                }
+                this->gdmy[iat][inl][ind] = gdmy_complex[iat][inl][ind].real();
+
+                if(gdmz_complex[iat][inl][ind].imag()>1.0e-8)
+                {
+                    ModuleBase::WARNING_QUIT("gdm_k","gdmz_complex not real!");
+                }
+                this->gdmz[iat][inl][ind] = gdmz_complex[iat][inl][ind].real();        
+            }
+            delete[] gdmx_complex[iat][inl];
+            delete[] gdmy_complex[iat][inl];
+            delete[] gdmz_complex[iat][inl];
+        }
+        delete[] gdmx_complex[iat];
+        delete[] gdmy_complex[iat];
+        delete[] gdmz_complex[iat];
+    }
+    delete[] gdmx_complex;
+    delete[] gdmy_complex;
+    delete[] gdmz_complex;
+
+#ifdef __MPI
+    const int gdm_size = (this->lmaxd * 2 + 1) * (this->lmaxd * 2 + 1);
+    for(int iat=0;iat<GlobalC::ucell.nat;iat++)
+    {
+        GlobalC::ParaD.allsum_deepks(this->inlmax,gdm_size,this->gdmx[iat]);
+        GlobalC::ParaD.allsum_deepks(this->inlmax,gdm_size,this->gdmy[iat]);
+        GlobalC::ParaD.allsum_deepks(this->inlmax,gdm_size,this->gdmz[iat]);
+    }
+#endif
+    return;
+}
 
 void LCAO_Descriptor::init_gdmx(void)
 {
