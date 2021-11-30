@@ -6,41 +6,41 @@ import torch
 
 class Opt_Orbital:
 		
-	def cal_Q(self,QI,C,info,ist):
+	def cal_Q(self,QI,C,info_stru,info_element):
 		"""
 		  <\psi|\phi> = <\psi|jY> * <jY|\phi>
 		  Q[it][il][ib,ia*im*iu]
 		  	= sum_{q} QI[it][il][ib*ia*im,ie] * C[it][il][ie,iu]
 		"""
 		Q = dict()
-		for it in info.Nt[ist]:
-			Q[it] = ND_list(info.Nl[it])
+		for it in info_stru.Na.keys():
+			Q[it] = ND_list(info_element[it].Nl)
 
-		for it in info.Nt[ist]:
-			for il in range(info.Nl[it]):
-				Q[it][il] = torch.mm( QI[it][il], C[it][il].to(torch.complex128) ).view(info.Nb[ist],-1)
+		for it in info_stru.Na.keys():
+			for il in range(info_element[it].Nl):
+				Q[it][il] = torch.mm( QI[it][il], C[it][il].to(torch.complex128) ).view(info_stru.Nb,-1)
 		return Q
 
 		
 		
-	def cal_S(self,SI,C,info,ist):
+	def cal_S(self,SI,C,info_stru,info_element):
 		"""
 		  <\phi|\phi> = <\phi|jY> * <jY|jY> * <jY|\phi>
 		  S[it1,it2][il1][il2][ia1*im1*iu1,ia2*im2*iu2]
 		  	= sum_{ie1 ie2} C^*[it1][il1][ie1,iu1] * SI[it1,it2][il1][il2][ia1,im1,ie1,ia2,im2,ie2] * C[it2][[il2][ie2,iu2]
 		"""
 		S = dict()
-		for it1,it2 in itertools.product( info.Nt[ist], info.Nt[ist] ):
-			S[it1,it2] = ND_list(info.Nl[it1],info.Nl[it2])
+		for it1,it2 in itertools.product( info_stru.Na.keys(), info_stru.Na.keys() ):
+			S[it1,it2] = ND_list(info_element[it1].Nl, info_element[it2].Nl)
 
-		for it1,it2 in itertools.product( info.Nt[ist], info.Nt[ist] ):
-			for il1,il2 in itertools.product( range(info.Nl[it1]), range(info.Nl[it2]) ):
+		for it1,it2 in itertools.product( info_stru.Na.keys(), info_stru.Na.keys() ):
+			for il1,il2 in itertools.product( range(info_element[it1].Nl), range(info_element[it2].Nl) ):
 				# SI_C[ia1*im1*ie1*ia2*im2,iu2]
 				SI_C = torch.mm( 
-					SI[it1,it2][il1][il2].view(-1,info.Ne[it2]), 
+					SI[it1,it2][il1][il2].view(-1,info_element[it2].Ne), 
 					C[it2][il2].to(torch.complex128) )
 				# SI_C[ia1*im1,ie1,ia2*im2*iu2]
-				SI_C = SI_C.view( info.Na[ist][it1]*info.Nm(il1), info.Ne[it1], -1 )
+				SI_C = SI_C.view( info_stru.Na[it1]*util.Nm(il1), info_element[it1].Ne, -1 )
 				# Ct[iu1,ie1]
 				Ct = C[it1][il1].t().to(torch.complex128)
 				C_mm = functools.partial(torch.mm,Ct)
@@ -48,26 +48,26 @@ class Opt_Orbital:
 				C_SI_C = list(map( C_mm, SI_C ))
 				# C_SI_C[ia1*im1*iu1,ia2*im2*iu2]
 				C_SI_C = torch.cat( C_SI_C, dim=0 )
-#???				C_SI_C = C_SI_C.view(info.Na[ist][it1]*info.Nm(il1)*info.Nu[it1][il1],-1)
+#???				C_SI_C = C_SI_C.view(info_stru.Na[it1]*util.Nm(il1)*info_element[it1].Nu[il1],-1)
 				S[it1,it2][il1][il2] = C_SI_C
 		return S
 		
 		
 		
-	def change_index_S(self,S,info,ist):							# S[it1,it2][il1][il2][ia1*im1*iu1,ia2*im2*iu2]
+	def change_index_S(self,S,info_stru,info_element):							# S[it1,it2][il1][il2][ia1*im1*iu1,ia2*im2*iu2]
 		"""
 		  <\phi|\phi>
 		  S_cat[it1*il1*iat*im1*iu1,iat2*il2*ia2*im2*iu2]
 		"""
 		# S_[it1][il1*ia1*im1*iu1,it2*il2*ia2*im2*iu2]
 		S_ = dict()
-		for it1 in info.Nt[ist]:
+		for it1 in info_stru.Na.keys():
 			# S_t[it2][il1*ia1*im1*iu1,il2*ia2*im2*iu2]
 			S_t = dict()
-			for it2 in info.Nt[ist]:
+			for it2 in info_stru.Na.keys():
 				# S_tt[il1][ia1*im1*iu1,il2*ia2*im2*iu2]
-				S_tt = ND_list(info.Nl[it1])
-				for il1 in range(info.Nl[it1]):
+				S_tt = ND_list(info_element[it1].Nl)
+				for il1 in range(info_element[it1].Nl):
 					S_tt[il1] = torch.cat( S[it1,it2][il1], dim=1 )
 				S_t[it2] = torch.cat( S_tt, dim=0 )
 			S_[it1] = torch.cat( list(S_t.values()), dim=1 )
@@ -77,17 +77,17 @@ class Opt_Orbital:
 		
 		
 		
-	def change_index_Q(self,Q,info,ist):					# Q[it][il][ib,ia*im*iu]
+	def change_index_Q(self,Q,info_stru):					# Q[it][il][ib,ia*im*iu]
 		"""
 		  <\psi|\phi>
 		  Q_cat[ib,it*il*ia*im*iu]
 		"""
 		# Q_b[ib][0,it*il*ia*im*iu]
-		Q_b = ND_list(info.Nb[ist])
-		for ib in range(info.Nb[ist]):
+		Q_b = ND_list(info_stru.Nb)
+		for ib in range(info_stru.Nb):
 			# Q_[it][il*ia*im*iu]
 			Q_ = dict()
-			for it in info.Nt[ist]:
+			for it in info_stru.Na.keys():
 				# Q_ts[il][ia*im*iu]
 				Q_ts = [ Q_tl[ib] for Q_tl in Q[it] ]
 				Q_[it] = torch.cat(Q_ts)

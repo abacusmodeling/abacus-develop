@@ -71,6 +71,7 @@ def read_file(info,file_list,V_info):
 			print("read VI:",ist_true,ik)
 			vi = read_VI(info_true,V_info,ist_true,data)
 			VI.append( vi )
+	print()
 
 	info_all = copy.deepcopy(info)
 	info_all.Nst = sum(info_true.Nk,0)

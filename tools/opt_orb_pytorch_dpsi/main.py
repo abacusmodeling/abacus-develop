@@ -13,6 +13,8 @@ import time
 import torch_optimizer 
 import IO.cal_weight
 import util
+import IO.change_info
+import pprint
 
 def main():
 	seed = int(1000*time.time())%(2**32)
@@ -24,42 +26,50 @@ def main():
 
 	weight = IO.cal_weight.cal_weight(weight_info, V_info["same_band"], file_list["origin"])
 
-	QI,SI,VI_origin,info = IO.read_QSV.read_file(info_true,file_list["origin"],V_info)
-	print(info, flush=True)
+	QI,SI,VI_origin,info_kst = IO.read_QSV.read_file(info_true,file_list["origin"],V_info)
 	if "linear" in file_list.keys():
 		QI_linear, SI_linear, VI_linear, info_linear = list(zip(*( IO.read_QSV.read_file(info_true,file,V_info) for file in file_list["linear"] )))
 
+	info_stru, info_element, info_opt = IO.change_info.change_info(info_kst,weight)
+
+	print(pprint.pformat(info_stru), end="\n"*2, flush=True)
+	print(pprint.pformat(info_element,width=40), end="\n"*2, flush=True)
+	print(pprint.pformat(info_opt,width=40), end="\n"*2, flush=True)
+
 	if C_init_info["init_from_file"]:
-		C, C_read_index = IO.func_C.read_C_init( C_init_info["C_init_file"], info )
+		C, C_read_index = IO.func_C.read_C_init( C_init_info["C_init_file"], info_element )
 	else:
-		C = IO.func_C.random_C_init(info)
-	E = orbital.set_E(info,info.Rcut)
-	orbital.normalize( orbital.generate_orbital(info,C,E,info.Rcut,info.dr), info.dr,C,flag_norm_C=True)
+		C = IO.func_C.random_C_init(info_element)
+	E = orbital.set_E(info_element)
+	orbital.normalize(
+		orbital.generate_orbital(info_element,C,E),
+		{it:info_element[it].dr for it in info_element},
+		C, flag_norm_C=True)
 
 	opt_orb = opt_orbital.Opt_Orbital()
 
-	#opt = torch.optim.Adam(sum( ([c.real,c.imag] for c in sum(C,[])), []), lr=info.lr, eps=1e-8)
-	#opt = torch.optim.Adam( sum(C.values(),[]), lr=info.lr, eps=1e-20, weight_decay=info.weight_decay)
-	#opt = radam.RAdam( sum(C.values(),[]), lr=info.lr, eps=1e-20 )
-	opt = torch_optimizer.SWATS( sum(C.values(),[]), lr=info.lr, eps=1e-20 )
+	#opt = torch.optim.Adam(sum( ([c.real,c.imag] for c in sum(C,[])), []), lr=info_opt.lr, eps=1e-8)
+	#opt = torch.optim.Adam( sum(C.values(),[]), lr=info_opt.lr, eps=1e-20, weight_decay=info_opt.weight_decay)
+	#opt = radam.RAdam( sum(C.values(),[]), lr=info_opt.lr, eps=1e-20 )
+	opt = torch_optimizer.SWATS( sum(C.values(),[]), lr=info_opt.lr, eps=1e-20 )
 
 
 	with open("Spillage.dat","w") as S_file:
 
 		print( "\nSee \"Spillage.dat\" for detail status: " , flush=True )
-		if info.cal_T:
+		if info_opt.cal_T:
 			print( '%5s'%"istep", "%20s"%"Spillage", "%20s"%"T.item()", "%20s"%"Loss", flush=True )
 		else:
 			print( '%5s'%"istep", "%20s"%"Spillage", flush=True )
 
 		loss_old = np.inf
-		for istep in range(200):
+		for istep in range(3):
 
 			Spillage = 0
-			for ist in range(info.Nst):
+			for ist in range(len(info_stru)):
 
-				Q = opt_orb.change_index_Q(opt_orb.cal_Q(QI[ist],C,info,ist),info,ist)
-				S = opt_orb.change_index_S(opt_orb.cal_S(SI[ist],C,info,ist),info,ist)
+				Q = opt_orb.change_index_Q(opt_orb.cal_Q(QI[ist],C,info_stru[ist],info_element),info_stru[ist])
+				S = opt_orb.change_index_S(opt_orb.cal_S(SI[ist],C,info_stru[ist],info_element),info_stru[ist],info_element)
 				coef = opt_orb.cal_coef(Q,S)
 				V = opt_orb.cal_V(coef,Q)
 				V_origin = opt_orb.cal_V_origin(V,V_info)
@@ -67,8 +77,8 @@ def main():
 				if "linear" in file_list.keys():
 					V_linear = [None] * len(file_list["linear"])
 					for i in range(len(file_list["linear"])):
-						Q_linear = opt_orb.change_index_Q(opt_orb.cal_Q(QI_linear[i][ist],C,info,ist),info,ist)
-						S_linear = opt_orb.change_index_S(opt_orb.cal_S(SI_linear[i][ist],C,info,ist),info,ist)
+						Q_linear = opt_orb.change_index_Q(opt_orb.cal_Q(QI_linear[i][ist],C,info_stru[ist],info_element),info_stru[ist])
+						S_linear = opt_orb.change_index_S(opt_orb.cal_S(SI_linear[i][ist],C,info_stru[ist],info_element),info_stru[ist],info_element)
 						V_linear[i] = opt_orb.cal_V_linear(coef,Q_linear,S_linear,V,V_info)
 
 				def cal_Spillage(V_delta):
@@ -83,14 +93,14 @@ def main():
 					for i in range(len(file_list["linear"])):
 						Spillage += cal_Spillage(cal_delta(VI_linear[i],V_linear[i]))
 
-			if info.cal_T:
+			if info_opt.cal_T:
 				T = opt_orb.cal_T(C,E)
 				if not "TSrate" in vars():	TSrate = torch.abs(0.002*Spillage/T).data[0]
 				Loss = Spillage + TSrate*T
 			else:
 				Loss = Spillage
 
-			if info.cal_T:
+			if info_opt.cal_T:
 				print_content = [istep, Spillage.item(), T.item(), Loss.item()]
 			else:
 				print_content = [istep, Spillage.item()]
@@ -100,7 +110,7 @@ def main():
 
 			if Loss.item() < loss_old:
 				loss_old = Loss.item()
-				C_old = IO.func_C.copy_C(C,info)
+				C_old = IO.func_C.copy_C(C,info_element)
 				flag_finish = 0
 			else:
 				flag_finish += 1
@@ -113,16 +123,27 @@ def main():
 				for it,il,iu in C_read_index:
 					C[it][il].grad[:,iu] = 0
 			opt.step()
-	#		orbital.normalize( orbital.generate_orbital(info,C,E,info.Rcut,info.dr), info.dr,C,flag_norm_C=True)
+	#		orbital.normalize(
+	# 			orbital.generate_orbital(info_element,C,E),
+	# 			{it:info_element[it].dr for it in info_element},
+	# 			C, flag_norm_C=True)
 
-		orb = orbital.generate_orbital(info,C_old,E,info.Rcut,info.dr)
-		if info.cal_smooth:
-			orbital.smooth_orbital(orb,info.Rcut,info.dr,0.1)
-		orbital.orth(orb,info.dr)
-		IO.print_orbital.print_orbital(orb,info)
-		IO.print_orbital.plot_orbital(orb,info.Rcut,info.dr)
+		orb = orbital.generate_orbital(info_element,C_old,E)
+		if info_opt.cal_smooth:
+			orbital.smooth_orbital(
+				orb,
+				{it:info_element[it].Rcut for it in info_element}, {it:info_element[it].dr for it in info_element},
+				0.1)
+		orbital.orth(
+			orb,
+			{it:info_element[it].dr for it in info_element})
+		IO.print_orbital.print_orbital(orb,info_element)
+		IO.print_orbital.plot_orbital(
+			orb,
+			{it:info_element[it].Rcut for it in info_element},
+			{it:info_element[it].dr for it in info_element})
 
-		IO.func_C.write_C("ORBITAL_RESULTS.txt",info,C_old,Spillage)
+		IO.func_C.write_C("ORBITAL_RESULTS.txt",C_old,Spillage)
 
 		print("Time (PyTorch):     %s\n"%(time.time()-time_start), flush=True )
 
