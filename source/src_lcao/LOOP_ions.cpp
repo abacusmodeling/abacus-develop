@@ -186,24 +186,12 @@ void LOOP_ions::opt_ions(void)
             }
             else
             {
-                //step 1 : collect density matrices
-                if(GlobalV::NPOOL!=1)
+                if(!GlobalV::deepks_scf)
                 {
-                    ModuleBase::WARNING_QUIT("opt_ions","deepks not compatible with npool>1 now");
+                    GlobalC::ld.resize_nlm();
+                    GlobalC::ld.build_v_delta_alpha_new(0);
                 }
-                ModuleBase::ComplexMatrix dm_k_all;
-                dm_k_all.create(GlobalC::LOC.wfc_dm_2d.dm_k[0].nr, GlobalC::LOC.wfc_dm_2d.dm_k[0].nc);
-                for(int ik=0;ik<GlobalC::kv.nks;ik++)
-                {
-                    ModuleBase::scale_accumulate(1.0,GlobalC::LOC.wfc_dm_2d.dm_k[ik],dm_k_all);
-                }
-                if(!dm_k_all.checkreal())
-                {
-                    ModuleBase::WARNING_QUIT("opt_ions","accumulated density matrix not real!!");
-                }
-
-                //step 2 : calculate descriptor
-                GlobalC::ld.cal_projected_DM(dm_k_all.dble());  //need dm
+                GlobalC::ld.cal_projected_DM_k(GlobalC::LOC.wfc_dm_2d.dm_k);  //need dm
             }
             GlobalC::ld.cal_descriptor();    //final descriptor
             GlobalC::ld.save_npy_d();            //libnpy needed

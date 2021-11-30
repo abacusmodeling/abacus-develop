@@ -493,6 +493,125 @@ void LCAO_Descriptor::cal_projected_DM(const ModuleBase::matrix &dm)
     return;
 }
 
+void LCAO_Descriptor::cal_projected_DM_k(const std::vector<ModuleBase::ComplexMatrix>& dm)
+{
+
+    std::complex<double> **pdm_complex;
+    pdm_complex = new std::complex<double>* [this->inlmax];
+    const int pdm_size = (this->lmaxd * 2 + 1) * (this->lmaxd * 2 + 1);
+    for(int inl=0;inl<this->inlmax;inl++)
+    {
+        pdm_complex[inl] = new std::complex<double> [pdm_size];
+        ModuleBase::GlobalFunc::ZEROS(pdm_complex[inl],pdm_size);
+    }
+    const double Rcut_Alpha = GlobalC::ORB.Alpha[0].getRcut();
+
+    for (int T0 = 0; T0 < GlobalC::ucell.ntype; T0++)
+    {
+		Atom* atom0 = &GlobalC::ucell.atoms[T0]; 
+        for (int I0 =0; I0< atom0->na; I0++)
+        {
+            const int iat = GlobalC::ucell.itia2iat(T0,I0);
+            const ModuleBase::Vector3<double> tau0 = atom0->tau[I0];
+            GlobalC::GridD.Find_atom(GlobalC::ucell, atom0->tau[I0] ,T0, I0);
+
+            for (int ad1=0; ad1<GlobalC::GridD.getAdjacentNum()+1 ; ++ad1)
+            {
+                const int T1 = GlobalC::GridD.getType(ad1);
+                const int I1 = GlobalC::GridD.getNatom(ad1);
+                const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
+                const ModuleBase::Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau(ad1);
+				const Atom* atom1 = &GlobalC::ucell.atoms[T1];
+				const int nw1_tot = atom1->nw*GlobalV::NPOL;
+				const double Rcut_AO1 = GlobalC::ORB.Phi[T1].getRcut();
+
+                ModuleBase::Vector3<double> dR1(GlobalC::GridD.getBox(ad1).x, GlobalC::GridD.getBox(ad1).y, GlobalC::GridD.getBox(ad1).z); 
+
+				for (int ad2=0; ad2 < GlobalC::GridD.getAdjacentNum()+1 ; ad2++)
+				{
+					const int T2 = GlobalC::GridD.getType(ad2);
+					const int I2 = GlobalC::GridD.getNatom(ad2);
+					const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
+					const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad2);
+					const Atom* atom2 = &GlobalC::ucell.atoms[T2];
+					const int nw2_tot = atom2->nw*GlobalV::NPOL;
+                    ModuleBase::Vector3<double> dR2(GlobalC::GridD.getBox(ad2).x, GlobalC::GridD.getBox(ad2).y, GlobalC::GridD.getBox(ad2).z);
+					
+					const double Rcut_AO2 = GlobalC::ORB.Phi[T2].getRcut();
+                	const double dist1 = (tau1-tau0).norm() * GlobalC::ucell.lat0;
+                	const double dist2 = (tau2-tau0).norm() * GlobalC::ucell.lat0;
+
+					if (dist1 > Rcut_Alpha + Rcut_AO1
+							|| dist2 > Rcut_Alpha + Rcut_AO2)
+					{
+						continue;
+					}
+
+					for (int iw1=0; iw1<nw1_tot; ++iw1)
+					{
+						const int iw1_all = start1 + iw1;
+						const int iw1_local = GlobalC::ParaO.trace_loc_row[iw1_all];
+						if(iw1_local < 0)continue;
+						const int iw1_0 = iw1/GlobalV::NPOL;
+						for (int iw2=0; iw2<nw2_tot; ++iw2)
+						{
+							const int iw2_all = start2 + iw2;
+							const int iw2_local = GlobalC::ParaO.trace_loc_col[iw2_all];
+							if(iw2_local < 0)continue;
+							const int iw2_0 = iw2/GlobalV::NPOL;
+
+                            std::vector<double> nlm1 = this->nlm_save[iat][ad1][iw1_all][0];
+                            std::vector<double> nlm2 = this->nlm_save[iat][ad2][iw2_all][0];
+
+                            assert(nlm1.size()==nlm2.size());
+                            for(int ik=0;ik<GlobalC::kv.nks;ik++)
+                            {
+                                const double arg = ( GlobalC::kv.kvec_d[ik] * (dR2-dR1) ) * ModuleBase::TWO_PI;
+                                const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );
+                                int ib=0;
+                                for (int L0 = 0; L0 <= GlobalC::ORB.Alpha[0].getLmax();++L0)
+                                {
+                                    for (int N0 = 0;N0 < GlobalC::ORB.Alpha[0].getNchi(L0);++N0)
+                                    {
+                                        const int inl = this->inl_index[T0](I0, L0, N0);
+                                        const int nm = 2*L0+1;
+                                        for (int m1 = 0;m1 < 2 * L0 + 1;++m1)
+                                        {
+                                            for (int m2 = 0; m2 < 2 * L0 + 1; ++m2)
+                                            {
+                                                pdm_complex[inl][m1*nm+m2] += nlm1[ib+m1]*nlm2[ib+m2]*dm[ik](iw1_local,iw2_local);
+                                            }
+                                        }
+                                        ib+=nm;
+                                    }
+                                }
+                                assert(ib==nlm1.size());
+                            }//ik
+						}//iw2
+					}//iw1
+				}//ad2
+			}//ad1
+        }//I0
+    }//T0
+
+    for(int inl=0;inl<inlmax;inl++)
+    {
+        for(int ind=0;ind<pdm_size;ind++)
+        {
+            if(pdm_complex[inl][ind].imag()>1.0e-8)
+            {
+                ModuleBase::WARNING_QUIT("pdm_k","pdm_complex not real!");
+            }
+            this->pdm[inl][ind] = pdm_complex[inl][ind].real();
+        }
+        delete[] pdm_complex[inl];
+    }
+    delete[] pdm_complex;
+
+    return;
+    
+}
+
 //the eigenvalues of pdm are descriptors
 void LCAO_Descriptor::cal_descriptor(void)
 {

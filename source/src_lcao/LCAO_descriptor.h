@@ -71,6 +71,7 @@ public:
     ///calculate projected density matrix:
     ///pdm = sum_i,occ <phi_i|alpha1><alpha2|phi_k>
     void cal_projected_DM(const ModuleBase::matrix& dm/**< [in] density matrix*/);
+    void cal_projected_DM_k(const std::vector<ModuleBase::ComplexMatrix>& dm);
 
     ///EIGENVALUE of pdm in block of I_n_l
     void cal_descriptor(void);
@@ -84,7 +85,8 @@ public:
     /// 2. Initialize the deltaV Hamiltonian matrix 
     /// 3. If FORCE, initialize the matrces for force
     void deepks_pre_scf(const std::string& model_file/**< [in] path of a traced model file, provided by deepks-kit*/);
-    
+    void resize_nlm();
+
     ///add dV to the Hamiltonian matrix
     void add_v_delta(void);
     void add_v_delta_k(const int &ik);

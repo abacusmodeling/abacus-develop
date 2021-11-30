@@ -1291,8 +1291,7 @@ void ORB_gen_tables::snap_psialpha_half(
 		const int& N1,
 		const ModuleBase::Vector3<double>& R0, // The projector.
 		const int& T0,
-		const int& I0,
-		ModuleBase::IntArray* inl_index
+		const int& I0
 	) const
 {
 	ModuleBase::timer::tick("ORB_gen_tables", "snap_psialpha_half");
@@ -1430,12 +1429,11 @@ void ORB_gen_tables::snap_psialpha_half(
 				++nb;
                 continue;
             }
-            ++nb;
             
             // <psi1 | Beta>
             const int Opair1 = talpha.DS_Opair(Tpair1, L1, L0, N1, N0);
-            const int inl = inl_index[T0](I0, L0, N0);
-            for (int m0 = 0;m0 < 2 * L0 + 1;m0++)
+ 
+            for (int m0 = 0;m0 < 2 * L0 + 1;++m0)
             {
 				int gindex0 = L0 * L0 + m0;
 				double term_a = 0.0;
@@ -1556,9 +1554,10 @@ void ORB_gen_tables::snap_psialpha_half(
 
 				ip+=1;
 			}//end m0
+			++nb;
 		}//end N0
 	}//end L0
-	assert(nb==ln_per_atom);
+
 	ModuleBase::timer::tick("ORB_gen_tables", "snap_psialpha_half");
 	return;
 }

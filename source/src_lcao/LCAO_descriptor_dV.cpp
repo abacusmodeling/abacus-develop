@@ -94,6 +94,12 @@ void LCAO_Descriptor::deepks_pre_scf(const string& model_file)
     return;
 }
 
+void LCAO_Descriptor::resize_nlm()
+{
+    this->nlm_save.resize(GlobalC::ucell.nat);
+    return;
+}
+
 //this subroutine adds dV to the Kohn-Sham Hamiltonian
 //for gamma_only calculations
 void LCAO_Descriptor::add_v_delta(void)
@@ -450,7 +456,7 @@ void LCAO_Descriptor::cal_f_delta_hf_new(const ModuleBase::matrix& dm, const boo
 						atom1->iw2l[ iw1_0 ], // L1
 						atom1->iw2m[ iw1_0 ], // m1
 						atom1->iw2n[ iw1_0 ], // N1
-						GlobalC::ucell.atoms[T0].tau[I0], T0, I0, this->inl_index); //R0,T0
+						GlobalC::ucell.atoms[T0].tau[I0], T0, I0); //R0,T0
 
                     nlm_tot[ad].insert({iw1_all,nlm});
                 }//end iw
@@ -684,7 +690,7 @@ void LCAO_Descriptor::cal_f_delta_hf_k_new(const std::vector<ModuleBase::Complex
 						atom1->iw2l[ iw1_0 ], // L1
 						atom1->iw2m[ iw1_0 ], // m1
 						atom1->iw2n[ iw1_0 ], // N1
-						GlobalC::ucell.atoms[T0].tau[I0], T0, I0, this->inl_index); //R0,T0
+						GlobalC::ucell.atoms[T0].tau[I0], T0, I0); //R0,T0
 
                     nlm_tot[ad].insert({iw1_all,nlm});
                 }//end iw
@@ -1015,8 +1021,8 @@ void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri)
 						atom1->iw2l[ iw1_0 ], // L1
 						atom1->iw2m[ iw1_0 ], // m1
 						atom1->iw2n[ iw1_0 ], // N1
-						GlobalC::ucell.atoms[T0].tau[I0], T0, I0, this->inl_index); //R0,T0
-                    
+						GlobalC::ucell.atoms[T0].tau[I0], T0, I0); //R0,T0
+
                     this->nlm_save[iat][ad].insert({iw1_all,nlm});
 				}//end iw
 			}//end ad
