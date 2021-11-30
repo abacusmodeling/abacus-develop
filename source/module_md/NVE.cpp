@@ -11,6 +11,11 @@ void NVE::setup()
     ModuleBase::TITLE("NVE", "setup");
     ModuleBase::timer::tick("NVE", "setup");
 
+    if(mdp.rstMD)
+    {
+        restart();
+    }
+
     MD_func::force_virial(mdp, ucell, potential, force, virial);
     MD_func::kinetic_stress(ucell, vel, allmass, kinetic, stress);
     stress += virial;
@@ -62,34 +67,7 @@ void NVE::second_half()
 
 void NVE::outputMD()
 {
-    ModuleBase::TITLE("NVE", "outputMD");
-    ModuleBase::timer::tick("NVE", "outputMD");
-
-    temperature_ = 2*kinetic/(double(3*ucell.nat-frozen_freedom_))*ModuleBase::Hartree_to_K;
-
-    const double unit_transform = ModuleBase::HARTREE_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
-    double press = 0.0;
-    for(int i=0;i<3;i++)
-    {
-        press += stress(i,i)/3;
-    }
-
-    std::cout << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed);
-    std::cout << " " << std::left << std::setw(20) << "Energy" 
-            << std::left << std::setw(20) << "Potential" 
-            << std::left << std::setw(20) << "Kinetic" 
-            << std::left << std::setw(20) << "Temperature" 
-            << std::left << std::setw(20) << "Pressure (KBAR)" <<std::endl;
-    std::cout << " " << std::left << std::setw(20) << potential+kinetic
-            << std::left << std::setw(20) << potential
-            << std::left << std::setw(20) << kinetic
-            << std::left << std::setw(20) << temperature_
-            << std::left << std::setw(20) << press*unit_transform <<std::endl;
-	std::cout << " ------------------------------------------------------------" << std::endl;
-
-    MD_func::outStress(virial, stress);
-
-    ModuleBase::timer::tick("NVE", "outputMD");
+    Verlet::outputMD();
 }
 
 void NVE::write_restart()

@@ -81,6 +81,7 @@ void Run_MD_CLASSIC::classic_md_line(void)
     GlobalV::ofs_running << " !FINAL_ETOT_IS " << verlet->potential*ModuleBase::Hartree_to_eV << " eV" << std::endl; 
     GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
+    delete verlet;
     ModuleBase::timer::tick("Run_MD_CLASSIC", "md_cells_classic");
     return;
 }

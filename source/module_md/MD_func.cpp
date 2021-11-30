@@ -351,7 +351,7 @@ void MD_func::force_virial(const MD_parameters &mdp,
 		}
 	}
 
-	ModuleBase::timer::tick("Run_MD_CLASSIC", "md_force_stress");
+	ModuleBase::timer::tick("MD_func", "md_force_stress");
 }
 
 void MD_func::outStress(const ModuleBase::matrix &virial, const ModuleBase::matrix &stress)

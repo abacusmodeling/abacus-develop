@@ -8,7 +8,7 @@ class Verlet
 {
 public:
     Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in);
-    ~Verlet();
+    virtual ~Verlet();
 
     virtual void setup();
     virtual void first_half();
