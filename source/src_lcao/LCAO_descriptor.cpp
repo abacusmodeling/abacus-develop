@@ -579,7 +579,7 @@ void LCAO_Descriptor::cal_projected_DM_k(const std::vector<ModuleBase::ComplexMa
                                         {
                                             for (int m2 = 0; m2 < 2 * L0 + 1; ++m2)
                                             {
-                                                pdm_complex[inl][m1*nm+m2] += nlm1[ib+m1]*nlm2[ib+m2]*dm[ik](iw1_local,iw2_local);
+                                                pdm_complex[inl][m1*nm+m2] += nlm1[ib+m1]*nlm2[ib+m2]*dm[ik](iw2_local,iw1_local);
                                             }
                                         }
                                         ib+=nm;
@@ -607,6 +607,9 @@ void LCAO_Descriptor::cal_projected_DM_k(const std::vector<ModuleBase::ComplexMa
         delete[] pdm_complex[inl];
     }
     delete[] pdm_complex;
+#ifdef __MPI
+        GlobalC::ParaD.allsum_deepks(this->inlmax,pdm_size,this->pdm);
+#endif
 
     return;
     
