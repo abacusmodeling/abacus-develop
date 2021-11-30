@@ -14,10 +14,10 @@ void PW_Basis:: gatherp_scatters(complex<double> *in, complex<double> *out)
     {
         for(int is = 0 ; is < this->nst ; ++is)
         {
-            int bigixy = this->is2bigixy[is];
+            int ixy = this->is2ixy[is];
             for(int iz = 0 ; iz < this->nz ; ++iz)
             {
-                out[is*nz+iz] = in[bigixy*nz+iz];
+                out[is*nz+iz] = in[ixy*nz+iz];
             }
         }
         return;
@@ -32,8 +32,7 @@ void PW_Basis:: gatherp_scatters(complex<double> *in, complex<double> *out)
         if(this->ixy2ip[ixy] == -1) continue;
         int istot = 0;
         if(this->poolrank == 0) istot = this->ixy2istot[ixy];
-        int bigixy = (ixy / ny) * bigny + ixy % ny;
-        MPI_Gatherv(&in[bigixy*this->nplane], this->nplane, mpicomplex, &tmp[istot*this->nz], 
+        MPI_Gatherv(&in[ixy*this->nplane], this->nplane, mpicomplex, &tmp[istot*this->nz], 
                     this->numz,this->startz,mpicomplex,0,POOL_WORLD);
     }
     
@@ -98,10 +97,10 @@ void PW_Basis:: gathers_scatterp(complex<double> *in, complex<double> *out)
         }
         for(int is = 0 ; is < this->nst ; ++is)
         {
-            int bigixy = is2bigixy[is];
+            int ixy = is2ixy[is];
             for(int iz = 0 ; iz < this->nz ; ++iz)
             {
-                out[bigixy*nz+iz] = in[is*nz+iz];
+                out[ixy*nz+iz] = in[is*nz+iz];
             }
         }
         return;
@@ -118,8 +117,8 @@ void PW_Basis:: gathers_scatterp(complex<double> *in, complex<double> *out)
     for(int ir = 0 ; ir < this->nrxx ; ++ir) out[ir] = 0.0;
     for(int istot = 0 ; istot < this->nstot ; ++istot)
     {
-        int bigixy = this->istot2bigixy[istot];
-        MPI_Scatterv(&tmp[istot*this->nz], this->numz,this->startz, mpicomplex, &out[bigixy*this->nplane], 
+        int ixy = this->istot2ixy[istot];
+        MPI_Scatterv(&tmp[istot*this->nz], this->numz,this->startz, mpicomplex, &out[ixy*this->nplane], 
                     this->nplane,mpicomplex,0,POOL_WORLD);
     }
     if(this->poolrank == 0) delete[] tmp;

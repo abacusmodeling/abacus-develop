@@ -57,11 +57,9 @@ public:
     int *nstnz_per; // nz * nst(number of sticks) on each core.
     // on all proc.
     int *ig2isz; // map ig to (is, iz).
-    int *istot2bigixy; // istot2bigixy[is]: ix + iy * bignx of is^th stick among all sticks.
-    //int *istot2ixy; // istot2bigixy[is]: ix + iy * nx of is^th stick among all sticks.
+    int *istot2ixy; // istot2ixy[is]: ix + iy * nx of is^th stick among all sticks.
     int *ixy2istot; // ixy2istot[ix + iy * nx]: is of stick on (ix, iy) among all sticks.
-    int *is2bigixy; // is2bigixy[is]: ix + iy * bignx of is^th stick among sticks on current proc.
-    //int *is2ixy; // is2ixy[is]: ix + iy * bignx of is^th stick among sticks on current proc.
+    int *is2ixy; // is2ixy[is]: ix + iy * bignx of is^th stick among sticks on current proc.
     int *ixy2ip; // ixy2ip[ix + iy * nx]: ip of proc which contains stick on (ix, iy).
     int nst; //num. of sticks in current proc.
     int nstnz; // nst * nz
@@ -138,12 +136,12 @@ private:
         int* nst_per,       // number of sticks on each core.
         int* is2ip         // ip of core containing is^th stick, map is to ip.         
     );
-    void get_istot2bigixy(
+    void get_istot2ixy(
         int* st_i,          // x or x + nx (if x < 0) of stick.
         int* st_j,          // y or y + ny (if y < 0) of stick.
         int* is2ip          // ip of core containing is^th stick, map is to ip.
     );
-    void get_ig2isz_is2bigixy(
+    void get_ig2isz_is2ixy(
         int* st_i,          // x or x + nx (if x < 0) of stick.
         int* st_j,          // y or y + ny (if y < 0) of stick.
         int* st_bottom,     // minimum z of stick, stored in 1d array with tot_nst elements.
@@ -160,7 +158,7 @@ private:
     //     int* nst_per,       // number of sticks on each core.
     //     int* is2ip         // ip of core containing is^th stick, map is to ip.         
     // );
-    // void get_istot2bigixy2(
+    // void get_istot2ixy2(
     //     int* st_i,          // x or x + nx (if x < 0) of stick.
     //     int* st_j,          // y or y + ny (if y < 0) of stick.
     //     int* is2ip          // ip of core containing is^th stick, map is to ip.
