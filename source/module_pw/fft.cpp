@@ -58,12 +58,18 @@ void FFT:: initfft(int nx_in, int bigny_in, int nz_in, int ns_in, int nplane_in,
 		c_gspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * this->nz * this->ns);
 		//r_gspace = (double *) fftw_malloc(sizeof(double) * this->nz * this->ns);
 		c_rspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * this->bignxy * nplane);
-		r_rspace = (double *) fftw_malloc(sizeof(double) * this->bignxy * nplane);
+		if(this->gamma_only)
+		{
+			r_rspace = (double *) fftw_malloc(sizeof(double) * this->bignxy * nplane);
+		}
 #ifdef __MIX_PRECISION
 		cf_gspace  = (std::complex<float> *)fftw_malloc(sizeof(fftwf_complex) * this->nz * this->ns);
 		//rf_gspace = (float *)fftw_malloc(sizeof(float) * this->nz * this->ns);
 		cf_rspace  = (std::complex<float> *)fftw_malloc(sizeof(fftwf_complex) * this->bignxy * nplane);
-		rf_rspace = (float *)fftw_malloc(sizeof(float) * this->bignxy * nplane);
+		if(this->gamma_only)
+		{
+			rf_rspace = (float *)fftw_malloc(sizeof(float) * this->bignxy * nplane);
+		}
 #endif
 	}
 	else
@@ -125,21 +131,22 @@ void FFT :: initplan()
 	//---------------------------------------------------------
 	
 	int nrank[2] = {this->nx,this->bigny};
+	int *embed = NULL;
 	this->plan2for = fftw_plan_many_dft(       2,   nrank,  this->nplane,  
-						(fftw_complex*) c_rspace,   nrank,  this->nplane,   1,
-						(fftw_complex*) c_rspace,   nrank,  this->nplane,   1,  FFTW_FORWARD,  FFTW_MEASURE);
+						(fftw_complex*) c_rspace,   embed,  this->nplane,   1,
+						(fftw_complex*) c_rspace,   embed,  this->nplane,   1,  FFTW_FORWARD,  FFTW_MEASURE);
 
 	this->plan2bac = fftw_plan_many_dft(       2,   nrank,  this->nplane,  
-						(fftw_complex*) c_rspace,   nrank,  this->nplane,   1,
-						(fftw_complex*) c_rspace,   nrank,  this->nplane,   1,  FFTW_BACKWARD,  FFTW_MEASURE);
+						(fftw_complex*) c_rspace,   embed,  this->nplane,   1,
+						(fftw_complex*) c_rspace,   embed,  this->nplane,   1,  FFTW_BACKWARD,  FFTW_MEASURE);
 	
 	this->plan2r2c = fftw_plan_many_dft_r2c(   2,   nrank,  this->nplane,  
-										r_rspace,   nrank,  this->nplane,   1,
-						(fftw_complex*) c_rspace,   nrank,  this->nplane,   1,  FFTW_MEASURE);
+										r_rspace,   embed,  this->nplane,   1,
+						(fftw_complex*) c_rspace,   embed,  this->nplane,   1,  FFTW_MEASURE);
 	
 	this->plan2c2r = fftw_plan_many_dft_c2r(   2,   nrank,  this->nplane,  
-						(fftw_complex*) c_rspace,   nrank,  this->nplane,   1,
-										r_rspace,   nrank,  this->nplane,   1,  FFTW_MEASURE);
+						(fftw_complex*) c_rspace,   embed,  this->nplane,   1,
+										r_rspace,   embed,  this->nplane,   1,  FFTW_MEASURE);
 	destroyp = false;
 }
 
