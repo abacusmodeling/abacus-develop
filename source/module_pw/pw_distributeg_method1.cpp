@@ -20,7 +20,6 @@ void PW_Basis::distribution_method1()
     // initial the variables needed by all proc.
     int tot_npw = 0;                     // total number of planewaves.
     this->nstot = 0;                     // total number of sticks.
-    int st_start = 0;                    // index of the first stick on current proc.
     int *st_i = NULL;                    // x or x + nx (if x < 0) of stick.
     int *st_j = NULL;                    // y or y + ny (if y < 0) of stick.
     int *st_bottom = NULL;               // minimum z of stick.
@@ -290,7 +289,6 @@ void PW_Basis::collect_st(
     ibox[2] = int(this->nz / 2) + 1;                    // scan z from -ibox[2] to ibox[2].
 
     ModuleBase::Vector3<double> f;
-    int ig = 0; // index of planewave.
     int is = 0; // index of stick.
 
     int iy_start = -ibox[1]; // determine the scaning area along x-direct, if gamma-only, only positive axis is used.
@@ -351,10 +349,8 @@ void PW_Basis::collect_st(
     st_sorted_index[0] = 0;
     ModuleBase::heapsort(this->nstot, temp_st_length, st_sorted_index); // sort st_* in the order of length decreasing.
 
-    int index = 0;  // indexs in the order of length decreasing.
     for (int istot = 0; istot < this->nstot; ++istot)
     {
-        index = (this->nstot - 1) - istot;
         st_length[istot] = static_cast<int>(temp_st_length[istot]);
         st_i[istot] = temp_st_i[st_sorted_index[istot]];
         st_j[istot] = temp_st_j[st_sorted_index[istot]];

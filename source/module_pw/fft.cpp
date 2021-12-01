@@ -118,7 +118,6 @@ void FFT :: initplan()
 	this->plan1bac = fftw_plan_many_dft(     1,    &this->nz,  this->ns,  
 						(fftw_complex*) c_gspace,  &this->nz,  1,  this->nz,
 						(fftw_complex*) c_gspace2,  &this->nz,  1,  this->nz,  FFTW_BACKWARD,  FFTW_MEASURE);
-	
 
 	//---------------------------------------------------------
 	//                              2 D
@@ -128,11 +127,11 @@ void FFT :: initplan()
 	int *embed = NULL;
 	this->plan2for = fftw_plan_many_dft(       2,   nrank,  this->nplane,  
 						(fftw_complex*) c_rspace,   embed,  this->nplane,   1,
-						(fftw_complex*) c_rspace2,   embed,  this->nplane,   1,  FFTW_FORWARD,  FFTW_MEASURE);
+						(fftw_complex*) c_rspace2,  embed,  this->nplane,   1,  FFTW_FORWARD,  FFTW_MEASURE);
 
 	this->plan2bac = fftw_plan_many_dft(       2,   nrank,  this->nplane,  
 						(fftw_complex*) c_rspace,   embed,  this->nplane,   1,
-						(fftw_complex*) c_rspace2,   embed,  this->nplane,   1,  FFTW_BACKWARD,  FFTW_MEASURE);
+						(fftw_complex*) c_rspace2,  embed,  this->nplane,   1,  FFTW_BACKWARD,  FFTW_MEASURE);
 	
 	this->plan2r2c = fftw_plan_many_dft_r2c(   2,   nrank,  this->nplane,  
 										r_rspace,   embed,  this->nplane,   1,
@@ -209,7 +208,7 @@ void FFT:: cleanFFT()
 	fftw_destroy_plan(plan2bac);
 	fftw_destroy_plan(plan2r2c);
 	fftw_destroy_plan(plan2c2r);
-	destroyp == true;
+	destroyp = true;
 
 #ifdef __MIX_PRECISION
 	if(destroypf==true) return;
@@ -219,7 +218,7 @@ void FFT:: cleanFFT()
 	fftw_destroy_plan(planf2bac);
 	fftw_destroy_plan(planf2r2c);
 	fftw_destroy_plan(planf2c2r);
-	destroypf == true;
+	destroypf = true;
 #endif
 
 	return;
