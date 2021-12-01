@@ -9,4 +9,8 @@ add_library(
     LJ_potential.cpp
     DP_potential.cpp
     cmd_neighbor.cpp
+	verlet.cpp
+	NVE.cpp
+    MSST.cpp
+    NVT_ADS.cpp
 )

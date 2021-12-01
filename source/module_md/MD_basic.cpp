@@ -4,13 +4,11 @@
 //define in MD_basic.h
 //class MD_basic
 
-const double MD_basic::fundamentalTime = 2.418884326505e-17;
-
 MD_basic::MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     mdp(MD_para_in),
     ucell(unit_in)
 {	
-	mdp.dt=mdp.dt/fundamentalTime/1e15;
+	mdp.dt=mdp.dt/ModuleBase::AU_to_FS;
 	temperature_=mdp.tfirst/ModuleBase::Hartree_to_K;
 
 
@@ -31,8 +29,8 @@ MD_basic::MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
 	allmass=new double[ucell.nat];
 	ionmbl=new ModuleBase::Vector3<int>[ucell.nat];
 
-    frozen_freedom_ = mdf.getMassMbl(ucell, mdp, allmass, ionmbl);
-    mdf.InitVel(ucell, temperature_, allmass, frozen_freedom_, ionmbl, vel);
+    frozen_freedom_ = MD_func::getMassMbl(ucell, mdp, allmass, ionmbl);
+    MD_func::InitVel(ucell, temperature_, allmass, frozen_freedom_, ionmbl, vel);
     // if (ucell.set_vel)    //  Yuanbo Li 2021-08-01
     // {
     //     int iat=0;    //initialize velocity of atoms from STRU  liuyu 2021-07-14
@@ -48,31 +46,31 @@ MD_basic::MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     // }
     // else
     // {
-    //     mdf.InitVelocity(ucell.nat, temperature_, fundamentalTime, allmass, vel);
+    //     MD_func::InitVelocity(ucell.nat, temperature_, fundamentalTime, allmass, vel);
     // }
 
     //MD starting setup
     if(mdp.rstMD)
     {
-        if(!mdf.RestartMD(ucell.nat, vel, step_rst_))
+        if(!MD_func::RestartMD(ucell.nat, vel, step_rst_))
         {
 			std::cout<<"error in restart MD!"<<std::endl;
 			return;
 		}
     }
 /*	if(!mdp.rstMD){
-		frozen_freedom_ = mdf.getMassMbl(ucell, allmass, ionmbl);
-		//mdf.gettauDirectChange(ucell, tauDirectChange);
+		frozen_freedom_ = MD_func::getMassMbl(ucell, allmass, ionmbl);
+		//MD_func::gettauDirectChange(ucell, tauDirectChange);
 		//A fresh new MD: Do not restart MD
-		mdf.InitVelocity(ucell.nat, temperature_, fundamentalTime, allmass, vel) ;
+		MD_func::InitVelocity(ucell.nat, temperature_, fundamentalTime, allmass, vel) ;
 		// Initialize thermostat, and barostat
 		
 	}
 	else{
-		frozen_freedom_ = mdf.getMassMbl(ucell, allmass, ionmbl);
-		//mdf.gettauDirectChange(ucell, tauDirectChange);
-		mdf.InitVelocity(ucell.nat, temperature_, fundamentalTime, allmass, vel) ;
-		if(!mdf.RestartMD(ucell.nat, vel, step_rst_)){
+		frozen_freedom_ = MD_func::getMassMbl(ucell, allmass, ionmbl);
+		//MD_func::gettauDirectChange(ucell, tauDirectChange);
+		MD_func::InitVelocity(ucell.nat, temperature_, fundamentalTime, allmass, vel) ;
+		if(!MD_func::RestartMD(ucell.nat, vel, step_rst_)){
 			std::cout<<"error in restart MD!"<<std::endl;
 			return;
 		}
@@ -86,7 +84,7 @@ MD_basic::MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
 	}
 	else
 	{
-		mdp.NVT_tau /= fundamentalTime*1e15;
+		mdp.NVT_tau /= ModuleBase::AU_to_FS;
 	}
 	//tau = 1.0/(NVT_tau*fundamentalTime*1e15);
 	// Q=KbT*tau**2
@@ -141,7 +139,7 @@ void MD_basic::runNVT(int step1, double potential, ModuleBase::Vector3<double> *
 	//the real MD step
 	
 	//change target temperature
-//	if (step_!=1)mdf.ReadNewTemp( step_ );
+//	if (step_!=1)MD_func::ReadNewTemp( step_ );
 	
 	std::cout << " ------------------------------------------------------------" << std::endl;
 	std::cout << " Target temperature  : " << temperature_*ModuleBase::Hartree_to_K << " (K)"<< std::endl;
@@ -154,11 +152,11 @@ void MD_basic::runNVT(int step1, double potential, ModuleBase::Vector3<double> *
 			if(ionmbl[k].y==0)vel[k].y=0;
 			if(ionmbl[k].z==0)vel[k].z=0;
 		}
-		mdf.scalevel(ucell.nat, frozen_freedom_, temperature_, vel, allmass);
+		MD_func::scalevel(ucell.nat, frozen_freedom_, temperature_, vel, allmass);
 	}
 
 	// get the kinetic energy
-	double twiceKE = mdf.GetAtomKE(ucell.nat, vel, allmass);
+	double twiceKE = MD_func::GetAtomKE(ucell.nat, vel, allmass);
 	twiceKE = twiceKE * 2;
 
 	//print total stress + stress_MD
@@ -172,7 +170,7 @@ void MD_basic::runNVT(int step1, double potential, ModuleBase::Vector3<double> *
 		if(ionmbl[k].y==0)force[k].y=0;
 		if(ionmbl[k].z==0)force[k].z=0;
 	}
-	double maxForce = mdf.MAXVALF(ucell.nat, force);
+	double maxForce = MD_func::MAXVALF(ucell.nat, force);
 
 	energy_=potential;
 
@@ -208,14 +206,14 @@ void MD_basic::runNVT(int step1, double potential, ModuleBase::Vector3<double> *
                 temperature_,
                 frozen_freedom_);
         }
-        else hamiltonian = mdf.Conserved(twiceKE/2, energy_, 3*ucell.nat-frozen_freedom_);
+        else hamiltonian = MD_func::Conserved(twiceKE/2, energy_, 3*ucell.nat-frozen_freedom_);
 	    this->update_half_velocity(force);
 	}
 	else 
     {
 		this->update_half_velocity(force);
 		
-		twiceKE=mdf.GetAtomKE(ucell.nat, vel, allmass);
+		twiceKE=MD_func::GetAtomKE(ucell.nat, vel, allmass);
 		twiceKE = 2 * twiceKE;
 		if(mdp.NVT_control==1)
         {
@@ -225,19 +223,19 @@ void MD_basic::runNVT(int step1, double potential, ModuleBase::Vector3<double> *
                 temperature_,
                 frozen_freedom_);
         } 
-		else hamiltonian = mdf.Conserved(twiceKE/2, energy_, ucell.nat-frozen_freedom_);
+		else hamiltonian = MD_func::Conserved(twiceKE/2, energy_, ucell.nat-frozen_freedom_);
         //Note: side scheme position before
         //Now turn to middle scheme. 
 		this->update_half_velocity(force);
 	}
 
 	// Update the Non-Wrapped cartesion coordinates
-    if(mdp.mdtype==2) mdf.scalevel(ucell.nat, frozen_freedom_, temperature_, vel, allmass);//choose velocity scaling method
+    if(mdp.mdtype==2) MD_func::scalevel(ucell.nat, frozen_freedom_, temperature_, vel, allmass);//choose velocity scaling method
 
     update_half_direct(1);
 	
 	mdt.Integrator(mdp.NVT_control, temperature_, vel, allmass);//thermostat interact with velocity
-    twiceKE=mdf.GetAtomKE(ucell.nat, vel, allmass);
+    twiceKE=MD_func::GetAtomKE(ucell.nat, vel, allmass);
     twiceKE = 2 * twiceKE;
 	
 	update_half_direct(0);
@@ -267,7 +265,7 @@ void MD_basic::runNVT(int step1, double potential, ModuleBase::Vector3<double> *
     }
     oldEtot_=energy_;
     //output basic restart info
-    mdf.mdRestartOut(step_, mdp.recordFreq, ucell.nat, vel);
+    MD_func::mdRestartOut(step_, mdp.recordFreq, ucell.nat, vel);
     //output NHC thermo restart info
     if(mdp.NVT_control==1) mdt.NHC_info_out(step_, mdp.recordFreq, ucell.nat);
 
@@ -308,10 +306,10 @@ void MD_basic::runNVE(int step1, double potential, ModuleBase::Vector3<double> *
         }
 	if (ucell.set_vel==false)   // Yuanbo Li 2021/8/20
 	{
-	mdf.scalevel(ucell.nat, frozen_freedom_, temperature_, vel, allmass);
+	MD_func::scalevel(ucell.nat, frozen_freedom_, temperature_, vel, allmass);
 	}
     }
-    double twiceKE=mdf.GetAtomKE(ucell.nat, vel, allmass);
+    double twiceKE=MD_func::GetAtomKE(ucell.nat, vel, allmass);
     twiceKE = twiceKE * 2;
 
     double tempNow = twiceKE/(double(3*ucell.nat-frozen_freedom_))/ModuleBase::K_BOLTZMAN_AU;
@@ -330,12 +328,12 @@ void MD_basic::runNVE(int step1, double potential, ModuleBase::Vector3<double> *
     }
 
     //std::cout<<"begin maxForce"<<std::endl;
-    double maxForce = mdf.MAXVALF(ucell.nat, force);
+    double maxForce = MD_func::MAXVALF(ucell.nat, force);
     //std::cout<<"maxForce: "<<sqrt(maxForce)<<std::endl; 
 
     energy_=potential;
 
-    //double conservedE = mdf.Conserved(twiceKE/2, energy_, 3*ucell.nat-frozen_freedom_);
+    //double conservedE = MD_func::Conserved(twiceKE/2, energy_, 3*ucell.nat-frozen_freedom_);
 
     // Output the message to the screen.
     // std::cout << " ------------------------------------------------------------" << std::endl;
@@ -348,7 +346,7 @@ void MD_basic::runNVE(int step1, double potential, ModuleBase::Vector3<double> *
 	this->update_half_velocity(force);
     // (2) 2nd step of Verlet-Velocity 
     // Update the Non-Wrapped cartesion coordinate
-    twiceKE = mdf.GetAtomKE(ucell.nat, vel, allmass);
+    twiceKE = MD_func::GetAtomKE(ucell.nat, vel, allmass);
     twiceKE = 2 * twiceKE;
     if(step_!=1||mdp.rstMD==1)this->update_half_velocity(force);
     update_half_direct(1);
@@ -369,7 +367,7 @@ void MD_basic::runNVE(int step1, double potential, ModuleBase::Vector3<double> *
 
 
     // calculate the conserved quantity during MD 
-    double hamiltonian = mdf.Conserved(twiceKE/2, energy_, 3*ucell.nat-frozen_freedom_);
+    double hamiltonian = MD_func::Conserved(twiceKE/2, energy_, 3*ucell.nat-frozen_freedom_);
 
     //std::cout<< std::setprecision (9)<<hamiltonian<<" "<< std::setprecision (9)<<twiceKE/2<<std::endl;
 
@@ -388,7 +386,7 @@ void MD_basic::runNVE(int step1, double potential, ModuleBase::Vector3<double> *
 	std::cout << " ------------------------------------------------------------" << std::endl;
 
     oldEtot_=energy_;
-    mdf.mdRestartOut(step_, mdp.recordFreq, ucell.nat, vel);
+    MD_func::mdRestartOut(step_, mdp.recordFreq, ucell.nat, vel);
 
     //std::cout<<"(NVE): this step finished."<<std::endl;
     // if (!GlobalV::MY_RANK)
@@ -441,9 +439,9 @@ bool MD_basic::runFIRE(int step1, double potential, ModuleBase::Vector3<double> 
             if(ionmbl[k].z==0)vel[k].z=0;
         }
     //      if(frozen_freedom_==0)RemoveMovementOfCenterOfMass();
-        mdf.scalevel(ucell.nat, frozen_freedom_, temperature_, vel, allmass);
+        MD_func::scalevel(ucell.nat, frozen_freedom_, temperature_, vel, allmass);
     }
-    double twiceKE=mdf.GetAtomKE(ucell.nat, vel, allmass);
+    double twiceKE=MD_func::GetAtomKE(ucell.nat, vel, allmass);
     twiceKE = twiceKE * 2;
 
     double tempNow = twiceKE/(double(3*ucell.nat-frozen_freedom_))/ModuleBase::K_BOLTZMAN_AU;
@@ -457,12 +455,12 @@ bool MD_basic::runFIRE(int step1, double potential, ModuleBase::Vector3<double> 
     }
 
     //std::cout<<"begin maxForce"<<std::endl;
-    double maxForce = mdf.MAXVALF(ucell.nat, force);
+    double maxForce = MD_func::MAXVALF(ucell.nat, force);
     //std::cout<<"maxForce: "<<sqrt(maxForce)<<std::endl; 
     
     energy_=potential;
 
-    // double conservedE = mdf.Conserved(twiceKE/2, energy_, 3*ucell.nat-frozen_freedom_);
+    // double conservedE = MD_func::Conserved(twiceKE/2, energy_, 3*ucell.nat-frozen_freedom_);
 
     // std::cout << " ------------------------------------------------------------" << std::endl;
     // std::cout << " "<<std::left<<std::setw(12)<<"FIRE_STEP"<<std::left<<std::setw(12)<< "SystemE"<<std::left<<std::setw(12)<< "Conserved"<<std::left<<std::setw(12)<< "DeltaE"<<std::left<<std::setw(12)<< "Temperature"<<std::endl;
@@ -485,7 +483,7 @@ bool MD_basic::runFIRE(int step1, double potential, ModuleBase::Vector3<double> 
 
     // (2) 2nd step of Verlet-Velocity 
     // Update the Non-Wrapped cartesion coordinate
-    twiceKE = mdf.GetAtomKE(ucell.nat, vel, allmass);
+    twiceKE = MD_func::GetAtomKE(ucell.nat, vel, allmass);
     twiceKE = 2 * twiceKE;
     if(step_!=1)this->update_half_velocity(force);
 
@@ -535,7 +533,7 @@ bool MD_basic::runFIRE(int step1, double potential, ModuleBase::Vector3<double> 
     save_output_position();
     maxStep = sqrt(maxStep)*mdp.dt;
 
-    double hamiltonian = mdf.Conserved(twiceKE/2, energy_, 3 * ucell.nat - frozen_freedom_);
+    double hamiltonian = MD_func::Conserved(twiceKE/2, energy_, 3 * ucell.nat - frozen_freedom_);
 
     // Output the message to the screen.
     if (!GlobalV::MY_RANK)
@@ -600,9 +598,9 @@ void MD_basic::update_half_direct(const bool is_restart)
 void MD_basic::save_output_position()
 {
     std::string posOutName("md_pos_");
-	posOutName=mdf.intTurnTostring(step_,posOutName);
+	posOutName=MD_func::intTurnTostring(step_,posOutName);
 	ucell.update_pos_taud(tauDirectChange);
-	mdf.printpos(posOutName, step_, mdp.recordFreq, ucell);
+	MD_func::printpos(posOutName, step_, mdp.recordFreq, ucell);
 }
 
 int MD_basic::getRealStep()

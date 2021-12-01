@@ -23,10 +23,17 @@ public:
 		ediffg=1e-3;
 		MNHC=4;
 
+		// Classic MD 
 		md_potential = "FP";
-		rcut_lj = 8.5;        // \AA
-		epsilon_lj = 0.01032; // eV
-		sigma_lj = 3.405;     // \AA
+		rcut_lj = 8.5;        
+		epsilon_lj = 0.01032; 
+		sigma_lj = 3.405;     
+
+		// MSST
+		direction = 2;
+		velocity = 0;
+		viscosity = 0;
+		tscale = 0.01;
 	};
     ~MD_parameters(){};
 
@@ -46,11 +53,19 @@ public:
 	double ediffg;      //parameter for constrain
     int fixTemperature;
 
-	/*Classic MD*/              // liuyu 2021-07-30
+	// Classic MD               // liuyu 2021-07-30
 	std::string md_potential;   // choose potential: LJ, DP, FP
 	double rcut_lj;             // cutoff radius of LJ potential (\AA)
 	double epsilon_lj;          // the value of epsilon for LJ potential (eV)
 	double sigma_lj;            // the value of sigma for LJ potential (\AA)
+
+	// MSST
+	int direction;              // shock direction: 0, 1, 2
+	double velocity;            // shock velocity (\AA/fs)
+	//double Qmass;             // cell mass-like parameter (mass^2/length^4)
+	double viscosity;           // artificial viscosity (mass/length/time)
+	double tscale;              // reduction in initial temperature (0~1)
+
 };
 
 

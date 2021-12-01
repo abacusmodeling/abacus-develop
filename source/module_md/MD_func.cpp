@@ -1,4 +1,11 @@
 #include "MD_func.h"
+#include "cmd_neighbor.h"
+#include "LJ_potential.h"
+#include "DP_potential.h"
+#include "../input.h"
+#include "../module_neighbor/sltk_atom_arrange.h"
+#include "../module_neighbor/sltk_grid_driver.h"
+#include "../module_base/global_variable.h"
 
 bool MD_func::RestartMD(const int& numIon, ModuleBase::Vector3<double>* vel, int& step_rst)
 {
@@ -94,20 +101,64 @@ void MD_func::mdRestartOut(const int& step, const int& recordFreq, const int& nu
 	return;
 }
 
-double MD_func::GetAtomKE(const int& numIon, const ModuleBase::Vector3<double>* vel, const double * allmass){
+double MD_func::GetAtomKE(
+		const int &numIon,
+		const ModuleBase::Vector3<double> *vel, 
+		const double *allmass)
+{
+	double ke = 0;
+
+	for(int ion=0; ion<numIon; ++ion)
+	{
+		ke += 0.5 * allmass[ion] * vel[ion].norm2();
+	}
+
+	return ke;
+}
+
+void MD_func::kinetic_stress(
+		const UnitCell_pseudo &unit_in,
+		const ModuleBase::Vector3<double> *vel, 
+		const double *allmass, 
+		double &kinetic,
+		ModuleBase::matrix &stress)
+{
 //---------------------------------------------------------------------------
 // DESCRIPTION:
-//   This function calculates the classical kinetic energy of a group of atoms.
+//   This function calculates the classical kinetic energy of atoms
+//   and its contribution to stress.
 //----------------------------------------------------------------------------
 
-	double ke = 0.0;
+	kinetic = MD_func::GetAtomKE(unit_in.nat, vel, allmass);
 
-	// kinetic energy = \sum_{i} 1/2*m_{i}*(vx^2+vy^2+vz^2)
-	for(int ion=0;ion<numIon;ion++){
-		ke +=   0.5 * allmass[ion] * (vel[ion].x*vel[ion].x+vel[ion].y*vel[ion].y+vel[ion].z*vel[ion].z);
+	ModuleBase::matrix temp;
+	temp.create(3,3);    // initialize
+
+	for(int ion=0; ion<unit_in.nat; ++ion)
+	{
+		for(int i=0; i<3; ++i)
+		{
+			for(int j=i; j<3; ++j)
+			{
+				temp(i, j) += allmass[ion] * vel[ion][i] * vel[ion][j];
+			}
+		}
 	}
-	//std::cout<<"in GetAtomKE KE="<< ke<<std::endl;
-	return ke;
+
+	for(int i=0; i<3; ++i)
+	{
+		for(int j=0; j<3; ++j)
+		{
+			if(j<i) 
+			{
+				stress(i, j) = stress(j, i);
+			}
+			else
+			{
+				stress(i, j) = temp(i, j)/unit_in.omega;
+			}
+		}
+	}
 }
 
 // Read Velocity from STRU liuyu 2021-09-24
@@ -148,45 +199,30 @@ void MD_func::RandomVel(
 		mass.set(0,0,0);
 		for(int i=0; i<numIon; i++)
 		{
-			if(ionmbl[i].x==0)
+			for(int k=0; k<3; ++k)
 			{
-				vel[i].x = 0;
-			}
-			else
-			{
-				vel[i].x = rand()/double(RAND_MAX)-0.5;
-				mass.x += allmass[i];
-			}
-			if(ionmbl[i].y==0)
-			{
-				vel[i].y = 0;
-			}
-			else
-			{
-				vel[i].y = rand()/double(RAND_MAX)-0.5;
-				mass.y += allmass[i];
-			}
-			if(ionmbl[i].z==0)
-			{
-				vel[i].z = 0;
-			}
-			else
-			{
-				vel[i].z = rand()/double(RAND_MAX)-0.5;
-				mass.z += allmass[i];
+				if(ionmbl[i][k]==0)
+				{
+					vel[i][k] = 0;
+				}
+				else
+				{
+					vel[i][k] = rand()/double(RAND_MAX)-0.5;
+					mass[k] += allmass[i];
+				}
 			}
 			average += allmass[i]*vel[i];
 		}
 
-		average.x = average.x / mass.x;
-		average.y = average.y / mass.y;
-		average.z = average.z / mass.z;
-
 		for(int i=0; i<numIon; i++)
     	{
-			if(ionmbl[i].x) vel[i].x -= average.x;
-			if(ionmbl[i].y) vel[i].y -= average.y;
-			if(ionmbl[i].z) vel[i].z -= average.z;
+			for(int k=0; k<3; ++k)
+			{
+				if(ionmbl[i][k])
+				{
+					vel[i][k] -= average[k] / mass[k];
+				}
+			}
 		}
 	
 		double factor = 0.5*(3*numIon-frozen_freedom)*temperature/GetAtomKE(numIon, vel, allmass);
@@ -210,8 +246,6 @@ void MD_func::InitVel(
 	ModuleBase::Vector3<int>* ionmbl,
 	ModuleBase::Vector3<double>* vel)
 {
-	//frozen_freedom = getMassMbl(unit_in, allmass, ionmbl);
-
 	if(unit_in.set_vel)
     {
         ReadVel(unit_in, vel);
@@ -222,6 +256,140 @@ void MD_func::InitVel(
     }
 }
 
+void MD_func::InitPos(
+	const UnitCell_pseudo &unit_in, 
+	ModuleBase::Vector3<double>* pos)
+{
+	int ion=0;
+	for(int it=0;it<unit_in.ntype;it++)
+	{
+		for(int i=0;i<unit_in.atoms[it].na;i++)
+		{
+			pos[ion] = unit_in.atoms[it].tau[i]*unit_in.lat0;
+			ion++;
+		}
+	}
+}
+
+//calculate potential, force and virial
+void MD_func::force_virial(const MD_parameters &mdp,
+		const UnitCell_pseudo &unit_in,
+		double &potential,
+		ModuleBase::Vector3<double> *force,
+		ModuleBase::matrix &stress)
+{
+	ModuleBase::TITLE("MD_func", "force_stress");
+    ModuleBase::timer::tick("MD_func", "force_stress");
+
+	if(mdp.md_potential == "LJ")
+	{
+		bool which_method = unit_in.judge_big_cell();
+		if(which_method)
+		{
+			CMD_neighbor cmd_neigh;
+			cmd_neigh.neighbor(unit_in);
+
+			potential = LJ_potential::Lennard_Jones(
+								unit_in,
+								cmd_neigh,
+								force,
+								stress);
+		}
+		else
+		{
+			Grid_Driver grid_neigh(GlobalV::test_deconstructor, GlobalV::test_grid_driver, GlobalV::test_grid);
+			atom_arrange::search(
+					GlobalV::SEARCH_PBC,
+					GlobalV::ofs_running,
+					grid_neigh,
+					unit_in, 
+					GlobalV::SEARCH_RADIUS, 
+					GlobalV::test_atom_input,
+					INPUT.test_just_neighbor);
+
+			potential = LJ_potential::Lennard_Jones(
+								unit_in,
+								grid_neigh,
+								force,
+								stress);
+		}
+	}
+	else if(mdp.md_potential == "DP")
+	{
+		DP_potential::DP_pot(unit_in, potential, force, stress);
+	}
+	else if(mdp.md_potential == "FP")
+	{
+		ModuleBase::WARNING_QUIT("md_force_stress", "FPMD is only available in integrated program or PW module ！");
+	}
+	else
+	{
+		ModuleBase::WARNING_QUIT("md_force_stress", "Unsupported MD potential ！");
+	}
+
+	ModuleBase::GlobalFunc::NEW_PART("   TOTAL-FORCE (eV/Angstrom)");
+	GlobalV::ofs_running << std::endl;
+	GlobalV::ofs_running << " atom    x              y              z" << std::endl;
+	const double fac = ModuleBase::Hartree_to_eV*ModuleBase::ANGSTROM_AU;
+	int iat = 0;
+	for(int it=0; it<unit_in.ntype; ++it)
+	{
+		for(int ia=0; ia<unit_in.atoms[it].na; ++ia)
+		{
+			// if(unit_in.atoms[it].mbl[ia].x==0) force[iat].x=0;
+			// if(unit_in.atoms[it].mbl[ia].y==0) force[iat].y=0;
+			// if(unit_in.atoms[it].mbl[ia].z==0) force[iat].z=0;
+
+			std::stringstream ss;
+			ss << unit_in.atoms[it].label << ia+1;
+			GlobalV::ofs_running << " " << std::left << std::setw(8) << ss.str()
+						  		<< std::setw(15) << std::setiosflags(ios::fixed) << std::setprecision(6) << force[iat].x*fac
+						  		<< std::setw(15) << std::setiosflags(ios::fixed) << std::setprecision(6) << force[iat].y*fac
+						  		<< std::setw(15) << std::setiosflags(ios::fixed) << std::setprecision(6) << force[iat].z*fac
+						  		<< std::endl;
+			iat++;
+		}
+	}
+
+	ModuleBase::timer::tick("MD_func", "md_force_stress");
+}
+
+void MD_func::outStress(const ModuleBase::matrix &virial, const ModuleBase::matrix &stress)
+{
+	GlobalV::ofs_running<<"\noutput Pressure for check!"<<std::endl;
+    double stress_scalar = 0.0, virial_scalar = 0.0;
+    for(int i=0;i<3;i++)
+    {
+        stress_scalar += stress(i,i)/3;
+		virial_scalar += virial(i,i)/3;
+    }
+    const double unit_transform = ModuleBase::HARTREE_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
+    GlobalV::ofs_running<<"Virtual Pressure is "<<stress_scalar*unit_transform<<" Kbar "<<std::endl;
+    GlobalV::ofs_running<<"Virial Term is "<<virial_scalar*unit_transform<<" Kbar "<<std::endl;
+    GlobalV::ofs_running<<"Kenetic Term is "<<(stress_scalar-virial_scalar)*unit_transform<<" Kbar "<<std::endl;
+
+	//const double unit_transform = ModuleBase::HARTREE_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
+	GlobalV::ofs_running << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed) << std::endl;
+	// std::cout << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed) << std::endl;
+	ModuleBase::GlobalFunc::NEW_PART("TOTAL-STRESS (KBAR)");
+    // std::cout << " ><><><><><><><><><><><><><><><><><><><><><><" << std::endl;
+    // std::cout << " TOTAL-STRESS (KBAR):" << std::endl;
+    // std::cout << " ><><><><><><><><><><><><><><><><><><><><><><" << std::endl;
+
+	for (int i=0; i<3; i++)
+	{
+		// std::cout << " " << std::setw(15) << stress(i,0)*unit_transform << std::setw(15)
+		// 	<< stress(i,1)*unit_transform << std::setw(15) << stress(i,2)*unit_transform << std::endl;
+
+		GlobalV::ofs_running << " " << std::setw(15) << stress(i,0)*unit_transform << std::setw(15)
+			<< stress(i,1)*unit_transform << std::setw(15) << stress(i,2)*unit_transform << std::endl;
+
+	}
+	GlobalV::ofs_running << std::setiosflags(ios::left);
+	// std::cout << std::resetiosflags(ios::showpos);
+}
+
+/*
 void MD_func::InitVelocity(
 	const int& numIon, 
 	const double& temperature, 
@@ -284,7 +452,7 @@ void MD_func::InitVelocity(
 	MPI_Bcast(vel,numIon*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
 #endif
 	return;
-}
+}*/
 
 /*void MD_func::ReadNewTemp(int step )
 {
@@ -410,9 +578,9 @@ void MD_func::printpos(const std::string& file, const int& iter, const int& reco
 
 	//zhengdy modify 2015-05-06, outputfile "STRU_Restart"
 #ifdef __LCAO
-	unit_in.print_stru_file(GlobalC::ORB, ss.str(),2);
+	unit_in.print_stru_file(GlobalC::ORB, ss.str(), 2, 1);
 #else
-	unit_in.print_stru_file(ss.str(),2);
+	unit_in.print_stru_file(ss.str(), 2, 1);
 #endif
 
 	return;
