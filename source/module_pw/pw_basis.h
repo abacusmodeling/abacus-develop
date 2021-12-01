@@ -88,7 +88,8 @@ public:
 
     //distribute plane waves to different processors
     void distribution_method1(); // x varies fast
-    // void distribution_method2(); // y varies fast
+    void distribution_method2(); // sticks sorted according to ixy
+    // void distribution_method3(); // y varies fast
 
     void collect_local_pw();
 
@@ -118,6 +119,11 @@ private:
         int* st_length2D, // the number of planewaves that belong to the stick located on (x, y).
         int* st_bottom2D  // the z-coordinate of the bottom of stick on (x, y).
     );
+    void get_ig2isz_is2ixy(
+        int* st_bottom,     // minimum z of stick, stored in 1d array with tot_nst elements.
+        int* st_length     // the stick on (x, y) consists of st_length[x*ny+y] planewaves.
+    );
+// for distributeg_method1
     void collect_st(
         int* st_length2D,                               // the number of planewaves that belong to the stick located on (x, y), stored in 2d x-y plane.
         int* st_bottom2D,                               // the z-coordinate of the bottom of stick on (x, y), stored in 2d x-y plane.
@@ -125,9 +131,7 @@ private:
         int* st_j,                                      // y or y + ny (if y < 0) of stick.
         int* st_length                                 // number of planewaves in stick, stored in 1d array with tot_nst elements.
     );
-// for distributeg_method1
     void divide_sticks(
-        const int tot_npw,  // total number of planewaves.
         int* st_i,          // x or x + nx (if x < 0) of stick.
         int* st_j,          // y or y + ny (if y < 0) of stick.
         int* st_length,     // the stick on (x, y) consists of st_length[x*ny+y] planewaves.
@@ -138,11 +142,15 @@ private:
         int* st_i,          // x or x + nx (if x < 0) of stick.
         int* st_j          // y or y + ny (if y < 0) of stick.
     );
-    void get_ig2isz_is2ixy(
-        int* st_bottom,     // minimum z of stick, stored in 1d array with tot_nst elements.
-        int* st_length     // the stick on (x, y) consists of st_length[x*ny+y] planewaves.
-    );
 // for distributeg_method2
+    void divide_sticks2(
+        int* nst_per       // number of sticks on each core.
+    );
+    void create_maps(
+        int* st_length2D,  // the number of planewaves that belong to the stick located on (x, y), stored in 2d x-y plane.
+        int* npw_per       // number of planewaves on each core.
+    );
+// for distributeg_method3
     // void divide_sticks2(
     //     const int tot_npw,  // total number of planewaves.
     //     int* st_i,          // x or x + nx (if x < 0) of stick.
