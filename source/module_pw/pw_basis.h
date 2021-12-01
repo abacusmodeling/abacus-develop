@@ -123,8 +123,7 @@ private:
         int* st_bottom2D,                               // the z-coordinate of the bottom of stick on (x, y), stored in 2d x-y plane.
         int* st_i,                                      // x or x + nx (if x < 0) of stick.
         int* st_j,                                      // y or y + ny (if y < 0) of stick.
-        int* st_length,                                 // number of planewaves in stick, stored in 1d array with tot_nst elements.
-        int* st_bottom                                  // minimum z of stick, stored in 1d array with tot_nst elements.
+        int* st_length                                 // number of planewaves in stick, stored in 1d array with tot_nst elements.
     );
 // for distributeg_method1
     void divide_sticks(
@@ -133,20 +132,15 @@ private:
         int* st_j,          // y or y + ny (if y < 0) of stick.
         int* st_length,     // the stick on (x, y) consists of st_length[x*ny+y] planewaves.
         int* npw_per,       // number of planewaves on each core.
-        int* nst_per,       // number of sticks on each core.
-        int* is2ip         // ip of core containing is^th stick, map is to ip.         
+        int* nst_per       // number of sticks on each core.
     );
     void get_istot2ixy(
         int* st_i,          // x or x + nx (if x < 0) of stick.
-        int* st_j,          // y or y + ny (if y < 0) of stick.
-        int* is2ip          // ip of core containing is^th stick, map is to ip.
+        int* st_j          // y or y + ny (if y < 0) of stick.
     );
     void get_ig2isz_is2ixy(
-        int* st_i,          // x or x + nx (if x < 0) of stick.
-        int* st_j,          // y or y + ny (if y < 0) of stick.
         int* st_bottom,     // minimum z of stick, stored in 1d array with tot_nst elements.
-        int* st_length,     // the stick on (x, y) consists of st_length[x*ny+y] planewaves.
-        int* is2ip          // ip of core containing is^th stick, map is to ip.
+        int* st_length     // the stick on (x, y) consists of st_length[x*ny+y] planewaves.
     );
 // for distributeg_method2
     // void divide_sticks2(
