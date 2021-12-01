@@ -21,6 +21,7 @@ int main(int argc,char **argv)
     pwtest.initparameters(gamma_only, ecut, nproc, rank_in_pool, distribution_type);
     pwtest.distribute_r();
     pwtest.distribute_g();
+    MPI_Barrier(POOL_WORLD);
 
     int tot_npw = 0;
     int nxy = pwtest.nx * pwtest.ny;
