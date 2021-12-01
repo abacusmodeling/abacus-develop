@@ -52,7 +52,7 @@ void PW_Basis::count_pw_st(
     if (this->gamma_only)
     {
         iy_start = 0;
-        iy_end = this->ny;
+        iy_end = this->ny - 1;
     }
     for (int ix = -ibox[0]; ix <= ibox[0]; ++ix)
     {
