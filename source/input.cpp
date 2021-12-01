@@ -137,7 +137,6 @@ void Input::Default(void)
 
 	opt_epsilon2 = false;//mohan add 2010-03-24
 	opt_nbands = 0;
-    lda_plus_u = false;
 //----------------------------------------------------------
 // electrons / spin
 //----------------------------------------------------------
@@ -662,10 +661,6 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("opt_nbands", word) == 0)// bands for optical calculations
         {
             read_value(ifs, opt_nbands);
-        }
-        else if (strcmp("lda_plus_u", word) == 0)// lda + u
-        {
-            read_value(ifs, lda_plus_u);
         }
 //----------------------------------------------------------
 // electrons / spin
@@ -2126,7 +2121,6 @@ void Input::Bcast()
 
     Parallel_Common::bcast_bool( opt_epsilon2 );
     Parallel_Common::bcast_int( opt_nbands );
-    Parallel_Common::bcast_bool( lda_plus_u );
 
 	Parallel_Common::bcast_string( dft_functional );
     Parallel_Common::bcast_int( nspin );

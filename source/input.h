@@ -87,7 +87,6 @@ class Input
 //==========================================================
 	bool opt_epsilon2;		// true : calculate the dielectric functions
 	int  opt_nbands;		// number of bands for optical transition matrix
-    bool lda_plus_u;		// true : lda plus u calculation
 
 //==========================================================
 // electrons / spin
