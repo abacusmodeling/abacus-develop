@@ -11,16 +11,14 @@ FFT::FFT()
 	nplane = 1;
 	mpifft = false; 
 	destroyp = true;
-	nfftgroup = 1;
 	gamma_only = false;
 	c_rspace = c_gspace = NULL;
+	c_rspace2 = c_gspace2 = NULL;
 	r_rspace = NULL;
-	//r_gspace = NULL
 #ifdef __MIX_PRECISION
 	destroypf = true;
 	cf_rspace = cf_gspace = NULL;
 	rf_rspace = NULL;
-	//rf_gspace = NULL
 #endif
 }
 
@@ -29,17 +27,17 @@ FFT::~FFT()
 	this->cleanFFT();
 	if(c_gspace!=NULL) fftw_free(c_gspace);
 	if(c_rspace!=NULL) fftw_free(c_rspace);
-	//if(r_gspace!=NULL) fftw_free(r_gspace);
+	if(c_gspace2!=NULL) fftw_free(c_gspace2);
+	if(c_rspace2!=NULL) fftw_free(c_rspace2);
 	if(r_rspace!=NULL) fftw_free(r_rspace);
 #ifdef __MIX_PRECISION
 	if(cf_gspace!=NULL) fftw_free(cf_gspace);
 	if(cf_rspace!=NULL) fftw_free(cf_rspace);
-	//if(rf_gspace!=NULL) fftw_free(rf_gspace);
 	if(rf_rspace!=NULL) fftw_free(rf_rspace);
 #endif
 }
 
-void FFT:: initfft(int nx_in, int bigny_in, int nz_in, int ns_in, int nplane_in, int nfftgroup_in, bool gamma_only_in, bool mpifft_in)
+void FFT:: initfft(int nx_in, int bigny_in, int nz_in, int ns_in, int nplane_in, bool gamma_only_in, bool mpifft_in)
 {
 	this->gamma_only = gamma_only_in;
 	this->nx = nx_in;
@@ -52,19 +50,22 @@ void FFT:: initfft(int nx_in, int bigny_in, int nz_in, int ns_in, int nplane_in,
 	this->mpifft = mpifft_in;
 	this->nxy = this->nx * this-> ny;
 	this->bignxy = this->nx * this->bigny;
-	this->nfftgroup = nfftgroup_in;
 	if(!this->mpifft)
 	{
+		//out-of-place fft is faster than in-place fft
 		c_gspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * this->nz * this->ns);
-		//r_gspace = (double *) fftw_malloc(sizeof(double) * this->nz * this->ns);
+		c_gspace2  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * this->nz * this->ns);
 		c_rspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * this->bignxy * nplane);
 		if(this->gamma_only)
 		{
 			r_rspace = (double *) fftw_malloc(sizeof(double) * this->bignxy * nplane);
 		}
+		else
+		{
+			c_rspace2  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * this->bignxy * nplane);
+		}
 #ifdef __MIX_PRECISION
 		cf_gspace  = (std::complex<float> *)fftw_malloc(sizeof(fftwf_complex) * this->nz * this->ns);
-		//rf_gspace = (float *)fftw_malloc(sizeof(float) * this->nz * this->ns);
 		cf_rspace  = (std::complex<float> *)fftw_malloc(sizeof(fftwf_complex) * this->bignxy * nplane);
 		if(this->gamma_only)
 		{
@@ -112,19 +113,12 @@ void FFT :: initplan()
 	
 	this->plan1for = fftw_plan_many_dft(     1,    &this->nz,  this->ns,  
 					    (fftw_complex*) c_gspace,  &this->nz,  1,  this->nz,
-					    (fftw_complex*) c_gspace,  &this->nz,  1,  this->nz,  FFTW_FORWARD,  FFTW_MEASURE);
+					    (fftw_complex*) c_gspace2,  &this->nz,  1,  this->nz,  FFTW_FORWARD,  FFTW_MEASURE);
 	
 	this->plan1bac = fftw_plan_many_dft(     1,    &this->nz,  this->ns,  
 						(fftw_complex*) c_gspace,  &this->nz,  1,  this->nz,
-						(fftw_complex*) c_gspace,  &this->nz,  1,  this->nz,  FFTW_BACKWARD,  FFTW_MEASURE);
+						(fftw_complex*) c_gspace2,  &this->nz,  1,  this->nz,  FFTW_BACKWARD,  FFTW_MEASURE);
 	
-	// this->plan1r2c = fftw_plan_many_dft_r2c( 1,    &this->nz,  this->ns,  
-	// 									r_gspace,  &this->nz,  1,  this->nz,
-	// 					(fftw_complex*) c_gspace,  &this->nz,  1,  this->nz,  FFTW_MEASURE);
-	
-	// this->plan1c2r = fftw_plan_many_dft_c2r( 1,   &this->nz,  this->ns,  
-	// 					(fftw_complex*) c_gspace, &this->nz,  1,  this->nz,
-	// 									r_gspace, &this->nz,  1,  this->nz,  FFTW_MEASURE);
 
 	//---------------------------------------------------------
 	//                              2 D
@@ -134,11 +128,11 @@ void FFT :: initplan()
 	int *embed = NULL;
 	this->plan2for = fftw_plan_many_dft(       2,   nrank,  this->nplane,  
 						(fftw_complex*) c_rspace,   embed,  this->nplane,   1,
-						(fftw_complex*) c_rspace,   embed,  this->nplane,   1,  FFTW_FORWARD,  FFTW_MEASURE);
+						(fftw_complex*) c_rspace2,   embed,  this->nplane,   1,  FFTW_FORWARD,  FFTW_MEASURE);
 
 	this->plan2bac = fftw_plan_many_dft(       2,   nrank,  this->nplane,  
 						(fftw_complex*) c_rspace,   embed,  this->nplane,   1,
-						(fftw_complex*) c_rspace,   embed,  this->nplane,   1,  FFTW_BACKWARD,  FFTW_MEASURE);
+						(fftw_complex*) c_rspace2,   embed,  this->nplane,   1,  FFTW_BACKWARD,  FFTW_MEASURE);
 	
 	this->plan2r2c = fftw_plan_many_dft_r2c(   2,   nrank,  this->nplane,  
 										r_rspace,   embed,  this->nplane,   1,
@@ -169,13 +163,6 @@ void FFT :: initplanf()
 						(fftwf_complex*)c_gspace,  &this->nz,  1,  this->nz,
 						(fftwf_complex*)c_gspace,  &this->nz,  1,  this->nz,  FFTW_BACKWARD,  FFTW_MEASURE);
 	
-	// this->planf1r2c = fftwf_plan_many_dft_r2c( 1,  &this->nz,  this->ns,  
-	// 									r_gspace,  &this->nz,  1,  this->nz,
-	// 					(fftwf_complex*)c_gspace,  &this->nz,  1,  this->nz,  FFTW_MEASURE);
-	
-	// this->planf1c2r = fftwf_plan_many_dft_c2r( 1, &this->nz,  this->ns,  
-	// 					(fftwf_complex*)c_gspace, &this->nz,  1,  this->nz,
-	// 									r_gspace, &this->nz,  1,  this->nz,  FFTW_MEASURE);
 
 	//---------------------------------------------------------
 	//                              2 D
@@ -218,8 +205,6 @@ void FFT:: cleanFFT()
 	if(destroyp==true) return;
 	fftw_destroy_plan(plan1for);
 	fftw_destroy_plan(plan1bac);
-	// fftw_destroy_plan(plan1r2c);
-	// fftw_destroy_plan(plan1c2r);
 	fftw_destroy_plan(plan2for);
 	fftw_destroy_plan(plan2bac);
 	fftw_destroy_plan(plan2r2c);
@@ -230,8 +215,6 @@ void FFT:: cleanFFT()
 	if(destroypf==true) return;
 	fftw_destroy_plan(planf1for);
 	fftw_destroy_plan(planf1bac);
-	// fftw_destroy_plan(planf1r2c);
-	// fftw_destroy_plan(planf1c2r);
 	fftw_destroy_plan(planf2for);
 	fftw_destroy_plan(planf2bac);
 	fftw_destroy_plan(planf2r2c);
@@ -252,12 +235,8 @@ void FFT::executefftw(std::string instr)
 		fftw_execute(this->plan1bac);
 	else if(instr == "2bac")
 		fftw_execute(this->plan2bac);
-	// else if(instr == "1r2c")
-	// 	fftw_execute(this->plan1r2c);
 	else if(instr == "2r2c")
 		fftw_execute(this->plan2r2c);
-	// else if(instr == "1c2r")
-	// 	fftw_execute_dft(this->plan1c2r);
 	else if(instr == "2c2r")
 		fftw_execute(this->plan2c2r);
 	else
@@ -277,12 +256,8 @@ void executefftwf(std::string instr)
 		fftwf_execute(this->planf1bac);
 	else if(instr == "2bac")
 		fftwf_execute(this->planf2bac);
-	// else if(instr == "1r2c")
-	// 	fftwf_execute(this->planf1r2c);
 	else if(instr == "2r2c")
 		fftwf_execute(this->planf2r2c);
-	// else if(instr == "1c2r")
-	// 	fftwf_execute(this->planf1c2r);
 	else if(instr == "2c2r")
 		fftwf_execute(this->planf2c2r);
 	else

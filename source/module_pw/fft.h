@@ -27,7 +27,7 @@ public:
 
 	FFT();
 	~FFT();
-	void initfft(int nx_in, int bigny_in, int nz_in, int ns_in, int nplane_in, int nfft_in, bool gamma_only_in, bool mpifft_in = false);
+	void initfft(int nx_in, int bigny_in, int nz_in, int ns_in, int nplane_in, bool gamma_only_in, bool mpifft_in = false);
 	void setupFFT();
 	void cleanFFT();
 
@@ -51,15 +51,12 @@ public:
 	int bignxy;
 	int ns; //number of sticks
 	int nplane; //number of x-y planes
-	int nfftgroup; // number of fft in a group
-	std::complex<double> * c_gspace; //complex number space for g, [ns * nz]
-	std::complex<double> * c_rspace; //complex number space for r, [nplane * nx *ny]
-	//double *r_gspace; //real number space for g, [ns * nz]
+	std::complex<double> * c_gspace, *c_gspace2; //complex number space for g, [ns * nz]
+	std::complex<double> * c_rspace, *c_rspace2;//complex number space for r, [nplane * nx *ny]
 	double *r_rspace; //real number space for r, [nplane * nx *ny]
 #ifdef __MIX_PRECISION
 	std::complex<float> * cf_gspace; //complex number space for g, [ns * nz]
 	std::complex<float> * cf_rspace; //complex number space for r, [nplane * nx *ny]
-	//float *rf_gspace; //real number space for g, [ns * nz]
 	float *rf_rspace; //real number space for r, [nplane * nx *ny]
 #endif
 
@@ -68,8 +65,6 @@ private:
 	bool gamma_only;
 	bool destroyp;
 	bool mpifft; // if use mpi fft, only used when define __FFTW3_MPI
-	//fftw_plan plan1_r2c;
-	//fftw_plan plan1_c2r;
 	fftw_plan plan2r2c;
 	fftw_plan plan2c2r;
 	fftw_plan plan1for;
@@ -78,8 +73,6 @@ private:
 	fftw_plan plan2bac;
 #ifdef __MIX_PRECISION
 	bool destroypf;
-	//fftwf_plan planf1_r2c;
-	//fftwf_plan planf1_c2r;
 	fftwf_plan planf2r2c;
 	fftwf_plan planf2c2r;
 	fftwf_plan planf1for;
