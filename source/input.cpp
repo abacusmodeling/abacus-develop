@@ -158,7 +158,6 @@ void Input::Default(void)
     symmetry=false;
 	set_vel=false;
     symmetry_prec = 1.0e-5; //LiuXh add 2021-08-12, accuracy for symmetry
-	mlwf_flag=false;
     force=0;
     force_set=false;
     force_thr=1.0e-3;
@@ -730,10 +729,6 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("symmetry_prec", word) == 0) //LiuXh add 2021-08-12, accuracy for symmetry
         {
             read_value(ifs, symmetry_prec);
-        }
-        else if (strcmp("mlwf_flag", word) == 0)
-        {
-            read_value(ifs, mlwf_flag);
         }
         else if (strcmp("force", word) == 0)
         {
@@ -2148,7 +2143,6 @@ void Input::Bcast()
     Parallel_Common::bcast_bool( symmetry );
 	Parallel_Common::bcast_bool( set_vel );  //liuyu 2021-07-14
     Parallel_Common::bcast_double( symmetry_prec ); //LiuXh add 2021-08-12, accuracy for symmetry
-    Parallel_Common::bcast_bool( mlwf_flag );
     Parallel_Common::bcast_int( force );
     Parallel_Common::bcast_bool( force_set );
     Parallel_Common::bcast_double( force_thr);

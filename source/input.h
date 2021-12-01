@@ -63,8 +63,6 @@ class Input
 	std::string NNKP;            // add by jingan for wannier90
 	std::string wannier_spin;    // add by jingan for wannier90
 
-	bool mlwf_flag; 		// add by mohan
-
 //==========================================================
 // Stochastic DFT
 //==========================================================
