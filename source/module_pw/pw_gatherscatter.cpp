@@ -23,7 +23,7 @@ void PW_Basis:: gatherp_scatters(complex<double> *in, complex<double> *out)
         return;
     }
 #ifdef __MPI
-    std::complex<double> * tmp;
+    std::complex<double> * tmp = NULL;
     if(this->poolrank == 0) tmp = new std::complex<double> [this->nz * this->nstot];
     
     //gather planes of different processors
@@ -40,7 +40,7 @@ void PW_Basis:: gatherp_scatters(complex<double> *in, complex<double> *out)
     MPI_Scatterv(tmp, this->nstnz_per, this->startnsz_per,mpicomplex,out,
                     this->nstnz,mpicomplex,0, POOL_WORLD); 
     
-    if(this->poolrank == 0) delete[] tmp;
+    if(tmp!=NULL) delete[] tmp;
 #endif
     return;
 }
@@ -107,7 +107,7 @@ void PW_Basis:: gathers_scatterp(complex<double> *in, complex<double> *out)
     }
 #ifdef __MPI
     if(this->poolnproc == 1) return;
-    std::complex<double> * tmp;
+    std::complex<double> * tmp = NULL;
     if(this->poolrank == 0) tmp = new std::complex<double> [this->nz * this->nstot];
 
     //scatter sticks to different processors
@@ -121,7 +121,7 @@ void PW_Basis:: gathers_scatterp(complex<double> *in, complex<double> *out)
         MPI_Scatterv(&tmp[istot*this->nz], this->numz,this->startz, mpicomplex, &out[ixy*this->nplane], 
                     this->nplane,mpicomplex,0,POOL_WORLD);
     }
-    if(this->poolrank == 0) delete[] tmp;
+    if(tmp!=NULL) delete[] tmp;
 #endif
     return;
 }
