@@ -2,8 +2,8 @@
 #==========================
 # Compiler information 
 #==========================
-CPLUSPLUS     = icpc
-CPLUSPLUS_MPI = mpiicpc
+CPLUSPLUS     = g++
+CPLUSPLUS_MPI = mpicxx
 CUDA_COMPILE = nvcc
 OBJ_DIR = pw_obj
 NP      = 12
@@ -53,14 +53,11 @@ PW_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${PW_OBJS_0})
 ## FFTW package needed 
 ##==========================
 #Use fftw package
-#FFTW_DIR = /home/qianrui/intelcompile/impi_fftw
-#FFTW_LIB_DIR     = ${FFTW_DIR}/lib
-#FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
-#FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
+FFTW_DIR = /home/qianrui/gnucompile/g_fftw-3.3.8
+FFTW_LIB_DIR     = ${FFTW_DIR}/lib
+FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
+FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
 
-#Use mkl_fftw
-FFTW_INCLUDE_DIR = ${MKLROOT}/include/fftw
-FFTW_LIB = -Wl,--start-group -lmkl_intel_lp64  -lmkl_core -lmkl_intel_thread -Wl,--end-group
 
 
 ##==========================
@@ -72,8 +69,7 @@ FFTW_LIB = -Wl,--start-group -lmkl_intel_lp64  -lmkl_core -lmkl_intel_thread -Wl
 # CUDA_LIB			= -L${CUDA_LIB_DIR} -lcufft -lcublas -lcudart
 
 LIBS = ${FFTW_LIB} ${CUDA_LIB}
-OPTS = -I${FFTW_INCLUDE_DIR} ${HONG} -Ofast -std=c++11 -simd -m64 -qopenmp -Wall -pedantic -g
-
+OPTS = -I${FFTW_INCLUDE_DIR} ${HONG} -Ofast -march=native -std=c++11 -Wall -g 
 #==========================
 # MAKING OPTIONS
 #==========================
