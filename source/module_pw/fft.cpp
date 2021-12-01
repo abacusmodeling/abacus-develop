@@ -125,21 +125,26 @@ void FFT :: initplan()
 	
 	int nrank[2] = {this->nx,this->bigny};
 	int *embed = NULL;
-	this->plan2for = fftw_plan_many_dft(       2,   nrank,  this->nplane,  
-						(fftw_complex*) c_rspace,   embed,  this->nplane,   1,
-						(fftw_complex*) c_rspace2,  embed,  this->nplane,   1,  FFTW_FORWARD,  FFTW_MEASURE);
+	if(this->gamma_only)
+	{
+		this->plan2r2c = fftw_plan_many_dft_r2c(   2,   nrank,  this->nplane,  
+											r_rspace,   embed,  this->nplane,   1,
+							(fftw_complex*) c_rspace,   embed,  this->nplane,   1,  FFTW_MEASURE);
 
-	this->plan2bac = fftw_plan_many_dft(       2,   nrank,  this->nplane,  
-						(fftw_complex*) c_rspace,   embed,  this->nplane,   1,
-						(fftw_complex*) c_rspace2,  embed,  this->nplane,   1,  FFTW_BACKWARD,  FFTW_MEASURE);
-	
-	this->plan2r2c = fftw_plan_many_dft_r2c(   2,   nrank,  this->nplane,  
-										r_rspace,   embed,  this->nplane,   1,
-						(fftw_complex*) c_rspace,   embed,  this->nplane,   1,  FFTW_MEASURE);
-	
-	this->plan2c2r = fftw_plan_many_dft_c2r(   2,   nrank,  this->nplane,  
-						(fftw_complex*) c_rspace,   embed,  this->nplane,   1,
-										r_rspace,   embed,  this->nplane,   1,  FFTW_MEASURE);
+		this->plan2c2r = fftw_plan_many_dft_c2r(   2,   nrank,  this->nplane,  
+							(fftw_complex*) c_rspace,   embed,  this->nplane,   1,
+											r_rspace,   embed,  this->nplane,   1,  FFTW_MEASURE);
+	}
+	else
+	{
+		this->plan2for = fftw_plan_many_dft(       2,   nrank,  this->nplane,  
+							(fftw_complex*) c_rspace,   embed,  this->nplane,   1,
+							(fftw_complex*) c_rspace2,  embed,  this->nplane,   1,  FFTW_FORWARD,  FFTW_MEASURE);
+
+		this->plan2bac = fftw_plan_many_dft(       2,   nrank,  this->nplane,  
+							(fftw_complex*) c_rspace,   embed,  this->nplane,   1,
+							(fftw_complex*) c_rspace2,  embed,  this->nplane,   1,  FFTW_BACKWARD,  FFTW_MEASURE);
+	}
 	destroyp = false;
 }
 
@@ -168,21 +173,27 @@ void FFT :: initplanf()
 	//---------------------------------------------------------
 	
 	int nrank[2] = {this->nx,this->bigny};
-	this->planf2for = fftwf_plan_many_dft(     2,   nrank,  this->nplane,  
-						(fftwf_complex*)c_rspace,   nrank,  this->nplane,   1,
-						(fftwf_complex*)c_rspace,   nrank,  this->nplane,   1,  FFTW_FORWARD,  FFTW_MEASURE);
 	
-	this->planf2bac = fftwf_plan_many_dft(     2,   nrank,  this->nplane,  
-						(fftwf_complex*)c_rspace,   nrank,  this->nplane,   1,
-						(fftwf_complex*)c_rspace,   nrank,  this->nplane,   1,  FFTW_BACKWARD,  FFTW_MEASURE);
-	
-	this->planf2r2c = fftwf_plan_many_dft_r2c( 2,   nrank,  this->nplane,  
-										r_rspace,   nrank,  this->nplane,   1,
-						(fftwf_complex*)c_rspace,   nrank,  this->nplane,   1,  FFTW_MEASURE);
-	
-	this->planf2c2r = fftwf_plan_many_dft_c2r( 2,   nrank,  this->nplane,  
-						(fftwf_complex*)c_rspace,   nrank,  this->nplane,   1,
-										r_rspace,   nrank,  this->nplane,   1,  FFTW_MEASURE);
+	if(this->gamma_only)
+	{
+		this->planf2r2c = fftwf_plan_many_dft_r2c( 2,   nrank,  this->nplane,  
+											r_rspace,   nrank,  this->nplane,   1,
+							(fftwf_complex*)c_rspace,   nrank,  this->nplane,   1,  FFTW_MEASURE);
+
+		this->planf2c2r = fftwf_plan_many_dft_c2r( 2,   nrank,  this->nplane,  
+							(fftwf_complex*)c_rspace,   nrank,  this->nplane,   1,
+											r_rspace,   nrank,  this->nplane,   1,  FFTW_MEASURE);
+	}
+	else
+	{
+		this->planf2for = fftwf_plan_many_dft(     2,   nrank,  this->nplane,  
+							(fftwf_complex*)c_rspace,   nrank,  this->nplane,   1,
+							(fftwf_complex*)c_rspace,   nrank,  this->nplane,   1,  FFTW_FORWARD,  FFTW_MEASURE);
+
+		this->planf2bac = fftwf_plan_many_dft(     2,   nrank,  this->nplane,  
+							(fftwf_complex*)c_rspace,   nrank,  this->nplane,   1,
+							(fftwf_complex*)c_rspace,   nrank,  this->nplane,   1,  FFTW_BACKWARD,  FFTW_MEASURE);
+	}
 	destroypf = false;
 }
 #endif
@@ -204,20 +215,32 @@ void FFT:: cleanFFT()
 	if(destroyp==true) return;
 	fftw_destroy_plan(plan1for);
 	fftw_destroy_plan(plan1bac);
-	fftw_destroy_plan(plan2for);
-	fftw_destroy_plan(plan2bac);
-	fftw_destroy_plan(plan2r2c);
-	fftw_destroy_plan(plan2c2r);
+	if(this->gamma_only)
+	{
+		fftw_destroy_plan(plan2r2c);
+		fftw_destroy_plan(plan2c2r);
+	}
+	else
+	{
+		fftw_destroy_plan(plan2for);
+		fftw_destroy_plan(plan2bac);
+	}
 	destroyp = true;
 
 #ifdef __MIX_PRECISION
 	if(destroypf==true) return;
 	fftw_destroy_plan(planf1for);
 	fftw_destroy_plan(planf1bac);
-	fftw_destroy_plan(planf2for);
-	fftw_destroy_plan(planf2bac);
-	fftw_destroy_plan(planf2r2c);
-	fftw_destroy_plan(planf2c2r);
+	if(this->gamma_only)
+	{
+		fftw_destroy_plan(planf2r2c);
+		fftw_destroy_plan(planf2c2r);
+	}
+	else
+	{
+		fftw_destroy_plan(planf2for);
+		fftw_destroy_plan(planf2bac);
+	}
 	destroypf = true;
 #endif
 

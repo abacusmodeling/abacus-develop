@@ -55,7 +55,7 @@ PW_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${PW_OBJS_0})
 #Use fftw package
 #FFTW_DIR = /home/qianrui/intelcompile/impi_fftw
 #FFTW_LIB_DIR     = ${FFTW_DIR}/lib
-#FFTW_INCLUDE_DIR = ${FFTW_DIR}/lib
+#FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
 #FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
 
 #Use mkl_fftw
