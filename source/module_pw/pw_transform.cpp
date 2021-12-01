@@ -79,7 +79,7 @@ void PW_Basis:: recip2real(std::complex<double> * in, std::complex<double> * out
 
     for(int ir = 0 ; ir < this->nrxx ; ++ir)
     {
-        out[ir] = this->ft.c_rspace2[ir] / this->bignxyz;
+        out[ir] = this->ft.c_rspace2[ir] / double(this->bignxyz);
     }
     return;
 }

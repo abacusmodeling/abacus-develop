@@ -2,8 +2,8 @@
 #==========================
 # Compiler information 
 #==========================
-CPLUSPLUS     = icpc
-CPLUSPLUS_MPI = mpiicpc
+CPLUSPLUS     = g++
+CPLUSPLUS_MPI = mpicxx
 CUDA_COMPILE = nvcc
 OBJ_DIR = pw_obj
 NP      = 12
@@ -45,7 +45,6 @@ pw_init.o\
 pw_transform.o\
 pw_distributeg.o\
 pw_distributeg_method1.o\
-pw_distributeg_method2.o\
 fft.o
 
 PW_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${PW_OBJS_0})
@@ -54,14 +53,11 @@ PW_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${PW_OBJS_0})
 ## FFTW package needed 
 ##==========================
 #Use fftw package
-#FFTW_DIR = /home/qianrui/intelcompile/impi_fftw
-#FFTW_LIB_DIR     = ${FFTW_DIR}/lib
-#FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
-#FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
+FFTW_DIR = /home/qianrui/gnucompile/g_fftw-3.3.8
+FFTW_LIB_DIR     = ${FFTW_DIR}/lib
+FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
+FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
 
-#Use mkl_fftw
-FFTW_INCLUDE_DIR = ${MKLROOT}/include/fftw
-FFTW_LIB = -Wl,--start-group -lmkl_intel_lp64  -lmkl_core -lmkl_intel_thread -Wl,--end-group
 
 
 ##==========================
@@ -73,8 +69,7 @@ FFTW_LIB = -Wl,--start-group -lmkl_intel_lp64  -lmkl_core -lmkl_intel_thread -Wl
 # CUDA_LIB			= -L${CUDA_LIB_DIR} -lcufft -lcublas -lcudart
 
 LIBS = ${FFTW_LIB} ${CUDA_LIB}
-OPTS = -I${FFTW_INCLUDE_DIR} ${HONG} -Ofast -std=c++11 -simd -m64 -qopenmp -Wall -pedantic -g
-
+OPTS = -I${FFTW_INCLUDE_DIR} ${HONG} -Ofast -std=c++11 -Wall -g 
 #==========================
 # MAKING OPTIONS
 #==========================
@@ -90,9 +85,6 @@ parallel : ${PW_OBJS}
 	${CPLUSPLUS_MPI} ${OPTS} test1.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test1.exe 
 	${CPLUSPLUS_MPI} ${OPTS} test2.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test2.exe 
 	${CPLUSPLUS_MPI} ${OPTS} test3.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test3.exe 
-	${CPLUSPLUS_MPI} ${OPTS} test2-1.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test2-1.exe 
-	${CPLUSPLUS_MPI} ${OPTS} test2-2.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test2-2.exe 
-	${CPLUSPLUS_MPI} ${OPTS} test2-3.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test2-3.exe 
 
 ${OBJ_DIR}/%.o:%.cpp
 	${CPLUSPLUS_MPI} ${OPTS} -c ${HONG} $< -o $@
@@ -103,6 +95,3 @@ clean:
 	@ if [ -e test1.exe ]; then rm -f test1.exe; fi
 	@ if [ -e test2.exe ]; then rm -f test2.exe; fi
 	@ if [ -e test3.exe ]; then rm -f test3.exe; fi
-	@ if [ -e test2-1.exe ]; then rm -f test2-1.exe; fi
-	@ if [ -e test2-2.exe ]; then rm -f test2-2.exe; fi
-	@ if [ -e test2-3.exe ]; then rm -f test2-3.exe; fi
