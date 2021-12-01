@@ -475,12 +475,21 @@ void PW_Basis::get_ig2isz_is2ixy(
     int* st_length2D     // the stick on (x, y) consists of st_length[x*ny+y] planewaves.
 )
 {
+    if (this->npw == 0)
+    {
+        this->ig2isz = new int[1]; // map ig to the z coordinate of this planewave.
+        this->ig2isz[0] = 0;
+        this->is2ixy = new int[1]; // map is (index of sticks) to ixy (ix + iy * nx).
+        this->is2ixy[0] = -1;
+        return;
+    }
+
     this->ig2isz = new int[this->npw]; // map ig to the z coordinate of this planewave.
     ModuleBase::GlobalFunc::ZEROS(this->ig2isz, this->npw);
     this->is2ixy = new int[this->nst]; // map is (index of sticks) to ixy (ix + iy * nx).
     for (int is = 0; is < this->nst; ++is) 
     {
-        is2ixy[is] = -1;
+        this->is2ixy[is] = -1;
     }
 
     int st_move = 0; // this is the st_move^th stick on current core.
