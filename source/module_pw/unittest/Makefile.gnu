@@ -69,7 +69,7 @@ FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
 # CUDA_LIB			= -L${CUDA_LIB_DIR} -lcufft -lcublas -lcudart
 
 LIBS = ${FFTW_LIB} ${CUDA_LIB}
-OPTS = -I${FFTW_INCLUDE_DIR} ${HONG} -Ofast -march=native -std=c++11 -Wall -g 
+OPTS = -I${FFTW_INCLUDE_DIR} ${HONG} -Ofast -std=c++11 -Wall -g 
 #==========================
 # MAKING OPTIONS
 #==========================

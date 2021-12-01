@@ -55,7 +55,7 @@ int main(int argc,char **argv)
     GT = latvec.Inverse();
 	G  = GT.Transpose();
 	GGT = G * GT;
-    complex<double> *tmp;
+    complex<double> *tmp = NULL;
     if(myrank == 0)
     {
         tmp = new complex<double> [nx*ny*nz];
@@ -155,6 +155,6 @@ int main(int argc,char **argv)
     MPI_Barrier(MPI_COMM_WORLD);
     delete [] rhog;
     delete [] rhor;
-    if(myrank == 0) delete [] tmp; 
+    if(tmp!=NULL) delete []tmp;
     return 0;
 }
