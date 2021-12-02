@@ -487,9 +487,10 @@ void LCAO_Descriptor::build_v_delta_alpha(const bool& calc_deri)
                                     const int ir = GlobalC::ParaO.trace_loc_row[ iw1_all ];
                                     const int ic = GlobalC::ParaO.trace_loc_col[ iw2_all ];
                                     const long index = ir * GlobalC::ParaO.ncol + ic;
-                                    this->DH_V_delta_x[index] += nlm[0];
-                                    this->DH_V_delta_y[index] += nlm[1];
-                                    this->DH_V_delta_z[index] += nlm[2];
+                                    //this->DH_V_delta_x[index] += nlm[0];
+                                    //this->DH_V_delta_y[index] += nlm[1];
+                                    //this->DH_V_delta_z[index] += nlm[2];
+                                    //not used anymore
                                 }
 							}// end iw2
 						}// end iw1

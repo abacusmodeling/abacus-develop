@@ -88,14 +88,11 @@ void Force_LCAO_gamma::ftable_gamma (
         //=======method 2: snap_psialpha========
         
         GlobalC::ld.cal_gedm(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
-        GlobalC::ld.cal_f_delta_hf_new(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],isstress, svnl_dalpha);
-        //ld.print_F_delta("F_delta_hf.dat");
-        GlobalC::ld.cal_f_delta_pulay(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
-        //ld.print_F_delta("F_delta_pulay.dat");
-        GlobalC::ld.print_F_delta("F_delta.dat");
+        GlobalC::ld.cal_f_delta_new(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],isstress, svnl_dalpha);
 #ifdef __MPI
         Parallel_Reduce::reduce_double_all(GlobalC::ld.F_delta.c,GlobalC::ld.F_delta.nr*GlobalC::ld.F_delta.nc);
 #endif
+        GlobalC::ld.print_F_delta("F_delta.dat");
     }
 #endif
     

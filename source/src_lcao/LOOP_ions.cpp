@@ -178,35 +178,24 @@ void LOOP_ions::opt_ions(void)
 #ifdef __DEEPKS
         if (GlobalV::out_descriptor)
         {
-            //ld.init(ORB.get_lmax_d(), ORB.get_nchimax_d(), ucell.nat* ORB.Alpha[0].getTotal_nchi());
-            //ld.build_S_descriptor(0);  //cal overlap, no need dm
+            if(!GlobalV::deepks_scf)
+            {
+                GlobalC::ld.resize_nlm();
+                GlobalC::ld.build_v_delta_alpha_new(0);
+            }
+
             if(GlobalV::GAMMA_ONLY_LOCAL)
             {
                 GlobalC::ld.cal_projected_DM(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);  //need dm
             }
             else
             {
-                //step 1 : collect density matrices
-                if(GlobalV::NPOOL!=1)
-                {
-                    ModuleBase::WARNING_QUIT("opt_ions","deepks not compatible with npool>1 now");
-                }
-                ModuleBase::ComplexMatrix dm_k_all;
-                dm_k_all.create(GlobalC::LOC.wfc_dm_2d.dm_k[0].nr, GlobalC::LOC.wfc_dm_2d.dm_k[0].nc);
-                for(int ik=0;ik<GlobalC::kv.nks;ik++)
-                {
-                    ModuleBase::scale_accumulate(1.0,GlobalC::LOC.wfc_dm_2d.dm_k[ik],dm_k_all);
-                }
-                if(!dm_k_all.checkreal())
-                {
-                    ModuleBase::WARNING_QUIT("opt_ions","accumulated density matrix not real!!");
-                }
-
-                //step 2 : calculate descriptor
-                GlobalC::ld.cal_projected_DM(dm_k_all.dble());  //need dm
+                GlobalC::ld.cal_projected_DM_k(GlobalC::LOC.wfc_dm_2d.dm_k);  //need dm
             }
+
             GlobalC::ld.cal_descriptor();    //final descriptor
             GlobalC::ld.save_npy_d();            //libnpy needed
+            
             if (GlobalV::deepks_scf)
             {
                 //ld.print_H_V_delta();   //final H_delta
@@ -216,14 +205,6 @@ void LOOP_ions::opt_ions(void)
                 }
                 else
                 {
-                    for(int ik=0;ik<GlobalC::kv.nks;ik++)
-                    {
-                        if(!GlobalC::LOC.wfc_dm_2d.dm_k[ik].checkreal())
-                        {
-                            GlobalV::ofs_running << "ik=" << std::endl;
-                            ModuleBase::WARNING_QUIT("opt_ions","accumulated density matrix not real!!");
-                        }
-                    }
                     GlobalC::ld.cal_e_delta_band_k(GlobalC::LOC.wfc_dm_2d.dm_k);
                 }
                 std::cout << "E_delta_band = " << std::setprecision(8) << GlobalC::ld.e_delta_band << " Ry" << " = " << std::setprecision(8) << GlobalC::ld.e_delta_band * ModuleBase::Ry_to_eV << " eV" << std::endl;
