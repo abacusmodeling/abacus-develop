@@ -27,7 +27,7 @@
 
     - [Variables related to program output](#variables-related-to-program-output)
 
-        [mulliken](#mulliken) | [out_charge](#out-charge) | [out_potential](#out-potential) | [out_dm](#out-dm) | [out_wf](#out-wf) | [out_lowf](#out-lowf) | [out_dos](#out-dos) | [out_band](#out-band) | [out_stru](#out-stru) | [out_level](#out_level) | [out_alllog](#out-alllog) | [out_hs](#out-hs) | [out_r](#out-r) | [out_hs2](#out-hs2) | [out_element_info](#out-element-info) 
+        [mulliken](#mulliken) | [out_charge](#out-charge) | [out_potential](#out-potential) | [out_dm](#out-dm) | [out_wf](#out-wf) | [out_lowf](#out-lowf) | [out_dos](#out-dos) | [out_band](#out-band) | [out_stru](#out-stru) | [out_level](#out_level) | [out_alllog](#out-alllog) | [out_hs](#out-hs) | [out_r](#out-r) | [out_hs2](#out-hs2) | [out_element_info](#out-element-info) | [restart_save](#restart_save) | [restart_load](#restart_load)
 
     - [Density of states](#density-of-states)
 
@@ -607,7 +607,7 @@ calculations.
 
 
 - ocp<a id="ocp"></a>
-    - *Type*: bool
+    - *Type*: Boolean
     - *Description*: option for choose whether calcualting constrained DFT or not.
     Only used for TDDFT.
     - *Default*:0
@@ -864,6 +864,24 @@ This part of variables are used to control the output of properties.
 
     [back to top](#input-file)
 
+- restart_save<a id="restart_save"></a>
+    - *Type*: Boolean
+    - *Description*: Only for LCAO, store charge density file and H matrix file every scf step for restart.
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+- restart_load<a id="restart_load"></a>
+    - *Type*: Boolean
+    - *Description*: Only for LCAO, used for restart, only if that:
+        * set restart_save as true and do scf calculation before.
+        * please ensure suffix is same with calculation before and density file and H matrix file is exist. 
+
+      restart from stored density file and H matrix file.
+    - *Default*: 0
+    
+    [back to top](#input-file)
+
 ### Density of states
 This part of variables are used to control the calculation of DOS.
 
@@ -892,7 +910,7 @@ This part of variables are used to control the calculation of DOS.
 This part of variables are used to control the addition of an external electric field. It is achieved by adding a saw-like potential to the local ionic potential.
 
 - efield<a id="efield"></a>
-    - *Type*: Bool
+    - *Type*: Boolean
     - *Description*: Controls whether to add the external electric field. When set to 1, the electric field is turned on. When set to 0, there is no electric field.
     - *Default*: 0.
 
@@ -930,7 +948,7 @@ This part of variables are used to control the addition of an external electric 
 This part of variables are used to control the usage of DeePKS method (a comprehensive data-driven approach to improve accuracy of DFT).
 
 - out_descriptor<a id="out-descriptor"></a>
-    - *Type*: Bool
+    - *Type*: Boolean
     - *Description*: when set to 1, ABACUS will calculate and output descriptor for DeePKS training. In `LCAO` calculation, a path of *.orb file is needed to be specified under `NUMERICAL_DESCRIPTOR`in `STRU`file. For example: 
     ```
     NUMERICAL_ORBITAL
@@ -950,7 +968,7 @@ This part of variables are used to control the usage of DeePKS method (a compreh
 
     [back to top](#input-file)
 - deepks_scf<a id="deepks-scf"></a>
-    - *Type*: Bool
+    - *Type*: Boolean
     - *Description*: only when deepks is enabled in `LCAO` calculation can this variable set to 1. Then, a trained, traced model file is needed for self-consistant field iteration in DeePKS method.
     - *Default*: 0
 
@@ -1104,7 +1122,7 @@ This part of variables are used to control the molecular dynamics calculations.
     [back to top](#input-file)
 
 - md_rstmd<a id="md-rstmd"></a>
-    - *Type*: Bool
+    - *Type*: Boolean
     - *Description*: to control whether restart md.
         - 0:When set to 0, ABACUS will calculate md normolly.
         - 1:When set to 1, ABACUS will calculate md from last step in your test before.
@@ -1208,7 +1226,7 @@ This part of variables are used to control the molecular dynamics calculations.
 ### DFT+U correction
 This part of variables are used to control DFT+U correlated parameters
 - dft_plus_u 
-    - *Type*: Bool
+    - *Type*: Boolean
     - *Description*: If set to 1, ABCUS will calculate plus U correction, which is especially important for correlated electron.
     - *Default*: 0
 
@@ -1236,14 +1254,14 @@ This part of variables are used to control DFT+U correlated parameters
     [back to top](#input-file)
 
 - yukawa_potential
-    - *Type*: Bool
+    - *Type*: Boolean
     - *Description*: whether use the local screen Coulomb potential method to calculate the value of U and J. If this is set to 1, hubbard_u and hund_j do not need to be specified.
     - *Default*: 0
 
     [back to top](#input-file)
 
 - omc 
-    - *Type*: Bool
+    - *Type*: Boolean
     - *Description*: whether turn on occupation matrix control method or not
     - *Default*: 0
 
