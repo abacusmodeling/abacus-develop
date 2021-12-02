@@ -26,7 +26,7 @@ Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     step_rst_ = 0;
     if(mdp.rstMD) unit_in.set_vel = 1;
 
-    frozen_freedom_ = MD_func::getMassMbl(ucell, mdp, allmass, ionmbl);
+    //frozen_freedom_ = MD_func::getMassMbl(ucell, mdp, allmass, ionmbl);
     MD_func::InitPos(ucell, pos);
     MD_func::InitVel(ucell, temperature_, allmass, frozen_freedom_, ionmbl, vel);
 }

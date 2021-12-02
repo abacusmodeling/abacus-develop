@@ -31,6 +31,7 @@ class MD_func
 		const double& temperature,
 		const double* allmass,
 		const int& frozen_freedom,
+		const ModuleBase::Vector3<int> frozen,
 		const ModuleBase::Vector3<int>* ionmbl,
 		ModuleBase::Vector3<double>* vel);
 
@@ -62,9 +63,9 @@ class MD_func
 		const ModuleBase::Vector3<double> *force);
 
 	static std::string intTurnTostring(long int iter,std::string path);
-	static int getMassMbl(const UnitCell_pseudo &unit_in, 
-		const MD_parameters &mdp,
+	static void getMassMbl(const UnitCell_pseudo &unit_in, 
 		double* allmass, 
+		ModuleBase::Vector3<int> &frozen,
 		ModuleBase::Vector3<int>* ionmbl);
     static void printpos(const std::string& file, const int& iter, const int& recordFreq, const UnitCell_pseudo& unit_in);
     static void scalevel(

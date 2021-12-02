@@ -187,6 +187,7 @@ void MD_func::RandomVel(
 	const double& temperature, 
 	const double* allmass,
 	const int& frozen_freedom,
+	const ModuleBase::Vector3<int> frozen,
 	const ModuleBase::Vector3<int>* ionmbl,
 	ModuleBase::Vector3<double>* vel)
 {
@@ -218,7 +219,7 @@ void MD_func::RandomVel(
     	{
 			for(int k=0; k<3; ++k)
 			{
-				if(ionmbl[i][k])
+				if(ionmbl[i][k] && frozen[k]==0)
 				{
 					vel[i][k] -= average[k] / mass[k];
 				}
@@ -246,13 +247,20 @@ void MD_func::InitVel(
 	ModuleBase::Vector3<int>* ionmbl,
 	ModuleBase::Vector3<double>* vel)
 {
+	ModuleBase::Vector3<int> frozen;
+	getMassMbl(unit_in, allmass, frozen, ionmbl);
+	frozen_freedom = frozen.x + frozen.y + frozen.z;
+	if(frozen.x == 0) ++frozen_freedom;
+	if(frozen.y == 0) ++frozen_freedom;
+	if(frozen.z == 0) ++frozen_freedom;
+
 	if(unit_in.set_vel)
     {
         ReadVel(unit_in, vel);
     }
     else
     {
-        RandomVel(unit_in.nat, temperature, allmass, frozen_freedom, ionmbl, vel);
+        RandomVel(unit_in.nat, temperature, allmass, frozen_freedom, frozen, ionmbl, vel);
     }
 }
 
@@ -538,17 +546,15 @@ std::string MD_func::intTurnTostring(long int iter, std::string path)
 	return path;
 }
 
-int MD_func::getMassMbl(const UnitCell_pseudo &unit_in, 
-			const MD_parameters &mdp,
+void MD_func::getMassMbl(const UnitCell_pseudo &unit_in, 
 			double* allmass, 
+			ModuleBase::Vector3<int> &frozen,
 			ModuleBase::Vector3<int>* ionmbl)
 {
 //some prepared information
 //mass and degree of freedom
 	int ion=0;
-	ModuleBase::Vector3<int> frozen;
 	frozen.set(0,0,0);
-	int frozen_freedom=0;
 	for(int it=0;it<unit_in.ntype;it++){
 		for(int i=0;i<unit_in.atoms[it].na;i++)
 		{
@@ -561,14 +567,6 @@ int MD_func::getMassMbl(const UnitCell_pseudo &unit_in,
 			ion++;
 		}
 	}
-
-	for(int i=0; i<3; ++i)
-	{
-		if(frozen[i] == 0) ++frozen[i];
-		frozen_freedom += frozen[i];
-	}
-
-	return frozen_freedom;
 }
 
 void MD_func::printpos(const std::string& file, const int& iter, const int& recordFreq, const UnitCell_pseudo& unit_in)
