@@ -546,23 +546,26 @@ int MD_func::getMassMbl(const UnitCell_pseudo &unit_in,
 //some prepared information
 //mass and degree of freedom
 	int ion=0;
+	ModuleBase::Vector3<int> frozen;
+	frozen.set(0,0,0);
 	int frozen_freedom=0;
 	for(int it=0;it<unit_in.ntype;it++){
-		for(int i=0;i<unit_in.atoms[it].na;i++){
+		for(int i=0;i<unit_in.atoms[it].na;i++)
+		{
 			allmass[ion]=unit_in.atoms[it].mass/ModuleBase::AU_to_MASS;
 			ionmbl[ion]=unit_in.atoms[it].mbl[i];
-			if (ionmbl[ion].x==0) frozen_freedom++;
-			if (ionmbl[ion].y==0) frozen_freedom++;
-			if (ionmbl[ion].z==0) frozen_freedom++;
+			if (ionmbl[ion].x==0) ++frozen.x;
+			if (ionmbl[ion].y==0) ++frozen.y;
+			if (ionmbl[ion].z==0) ++frozen.z;
 
 			ion++;
 		}
 	}
 
-	// the center of mass is fixed except for NVT Anderson
-	if(!(mdp.mdtype==1 && mdp.NVT_control==3))
+	for(int i=0; i<3; ++i)
 	{
-		frozen_freedom += 3;
+		if(frozen[i] == 0) ++frozen[i];
+		frozen_freedom += frozen[i];
 	}
 
 	return frozen_freedom;
