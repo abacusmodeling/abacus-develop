@@ -299,6 +299,7 @@ cmd_neighbor.o\
 verlet.o\
 NVE.o\
 MSST.o\
+NVT_ADS.o\
 dos.o \
 inverse_matrix.o \
 energy.o \

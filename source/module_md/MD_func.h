@@ -14,9 +14,7 @@ class MD_func
 	static bool RestartMD(const int& numIon, ModuleBase::Vector3<double>* vel, int& step_rst);
     static void mdRestartOut(const int& step, const int& recordFreq, const int& numIon, ModuleBase::Vector3<double>* vel);
 	
-	static void InitPos(
-		const UnitCell_pseudo &unit_in, 
-		ModuleBase::Vector3<double>* pos); // this function can be merged into getMassMbl later
+	static void InitPos( const UnitCell_pseudo &unit_in, ModuleBase::Vector3<double>* pos);
 
 	static void InitVel(
 		const UnitCell_pseudo &unit_in, 
@@ -26,9 +24,7 @@ class MD_func
 		ModuleBase::Vector3<int>* ionmbl,
 		ModuleBase::Vector3<double>* vel);
 
-	static void ReadVel(
-		const UnitCell_pseudo &unit_in, 
-		ModuleBase::Vector3<double>* vel);
+	static void ReadVel(const UnitCell_pseudo &unit_in, ModuleBase::Vector3<double>* vel);
 
 	static void RandomVel(
 		const int& numIon, 
@@ -57,10 +53,14 @@ class MD_func
 		double &kinetic,
 		ModuleBase::matrix &stress);
 
-	static void outStress(const ModuleBase::matrix &virial, 
-		const ModuleBase::matrix &stress);
+	static void outStress(const ModuleBase::matrix &virial, const ModuleBase::matrix &stress);
 
-//	void ReadNewTemp(int step);
+	static void MDdump(
+		const int &step, 
+		const int &natom,
+		const ModuleBase::matrix &virial, 
+		const ModuleBase::Vector3<double> *force);
+
 	static std::string intTurnTostring(long int iter,std::string path);
 	static int getMassMbl(const UnitCell_pseudo &unit_in, 
 		const MD_parameters &mdp,

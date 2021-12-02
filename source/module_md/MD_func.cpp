@@ -327,30 +327,6 @@ void MD_func::force_virial(const MD_parameters &mdp,
 		ModuleBase::WARNING_QUIT("md_force_stress", "Unsupported MD potential ！");
 	}
 
-	ModuleBase::GlobalFunc::NEW_PART("   TOTAL-FORCE (eV/Angstrom)");
-	GlobalV::ofs_running << std::endl;
-	GlobalV::ofs_running << " atom    x              y              z" << std::endl;
-	const double fac = ModuleBase::Hartree_to_eV*ModuleBase::ANGSTROM_AU;
-	int iat = 0;
-	for(int it=0; it<unit_in.ntype; ++it)
-	{
-		for(int ia=0; ia<unit_in.atoms[it].na; ++ia)
-		{
-			// if(unit_in.atoms[it].mbl[ia].x==0) force[iat].x=0;
-			// if(unit_in.atoms[it].mbl[ia].y==0) force[iat].y=0;
-			// if(unit_in.atoms[it].mbl[ia].z==0) force[iat].z=0;
-
-			std::stringstream ss;
-			ss << unit_in.atoms[it].label << ia+1;
-			GlobalV::ofs_running << " " << std::left << std::setw(8) << ss.str()
-						  		<< std::setw(15) << std::setiosflags(ios::fixed) << std::setprecision(6) << force[iat].x*fac
-						  		<< std::setw(15) << std::setiosflags(ios::fixed) << std::setprecision(6) << force[iat].y*fac
-						  		<< std::setw(15) << std::setiosflags(ios::fixed) << std::setprecision(6) << force[iat].z*fac
-						  		<< std::endl;
-			iat++;
-		}
-	}
-
 	ModuleBase::timer::tick("MD_func", "md_force_stress");
 }
 
@@ -368,25 +344,16 @@ void MD_func::outStress(const ModuleBase::matrix &virial, const ModuleBase::matr
     GlobalV::ofs_running<<"Virial Term is "<<virial_scalar*unit_transform<<" Kbar "<<std::endl;
     GlobalV::ofs_running<<"Kenetic Term is "<<(stress_scalar-virial_scalar)*unit_transform<<" Kbar "<<std::endl;
 
-	//const double unit_transform = ModuleBase::HARTREE_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
 	GlobalV::ofs_running << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed) << std::endl;
-	// std::cout << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed) << std::endl;
 	ModuleBase::GlobalFunc::NEW_PART("TOTAL-STRESS (KBAR)");
-    // std::cout << " ><><><><><><><><><><><><><><><><><><><><><><" << std::endl;
-    // std::cout << " TOTAL-STRESS (KBAR):" << std::endl;
-    // std::cout << " ><><><><><><><><><><><><><><><><><><><><><><" << std::endl;
-
 	for (int i=0; i<3; i++)
 	{
-		// std::cout << " " << std::setw(15) << stress(i,0)*unit_transform << std::setw(15)
-		// 	<< stress(i,1)*unit_transform << std::setw(15) << stress(i,2)*unit_transform << std::endl;
-
-		GlobalV::ofs_running << " " << std::setw(15) << stress(i,0)*unit_transform << std::setw(15)
-			<< stress(i,1)*unit_transform << std::setw(15) << stress(i,2)*unit_transform << std::endl;
+		GlobalV::ofs_running << " " << std::setw(15) << stress(i,0)*unit_transform 
+			<< std::setw(15)<< stress(i,1)*unit_transform 
+			<< std::setw(15) << stress(i,2)*unit_transform << std::endl;
 
 	}
 	GlobalV::ofs_running << std::setiosflags(ios::left);
-	// std::cout << std::resetiosflags(ios::showpos);
 }
 
 /*
@@ -503,6 +470,52 @@ void MD_func::InitVelocity(
 
 	return;
 }*/
+
+void MD_func::MDdump(const int &step, 
+		const int &natom,
+		const ModuleBase::matrix &virial, 
+		const ModuleBase::Vector3<double> *force)
+{
+	if(GlobalV::MY_RANK) return;
+
+	std::stringstream file;
+    file << GlobalV::global_out_dir << "MD_dump";
+	std::ofstream ofs;
+	if(step == 0)
+	{
+		ofs.open(file.str(), ios::trunc);
+	}
+	else
+	{
+		ofs.open(file.str(), ios::app);
+	}
+
+	const double unit_virial = ModuleBase::HARTREE_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
+	const double unit_force = ModuleBase::Hartree_to_eV*ModuleBase::ANGSTROM_AU;
+
+	ofs << "MDstep:  " << step << std::endl;
+
+	ofs << "VIRIAL (KBAR)" << std::endl;
+	ofs << std::setprecision(12) << std::setiosflags(ios::fixed);
+	for(int i=0; i<3; ++i)
+	{
+		ofs << std::setw(18) << virial(i, 0) * unit_virial 
+			<< std::setw(18) << virial(i, 1) * unit_virial 
+			<< std::setw(18) << virial(i, 2) * unit_virial << std::endl;
+	}
+
+	ofs << "\nFORCE (eV/Angstrom)" << std::endl;
+	for(int i=0; i<natom; ++i)
+	{
+		ofs << std::setw(18) << force[i].x * unit_force 
+			<< std::setw(18) << force[i].y * unit_force 
+			<< std::setw(18) << force[i].z * unit_force << std::endl;
+	}
+
+	ofs << std::endl;
+	ofs << std::endl;
+	ofs.close();
+}
 
 //int to std::string and add to output path
 std::string MD_func::intTurnTostring(long int iter, std::string path)
