@@ -19,7 +19,7 @@
 
     - [Electronic structure](#electronic-structure)
     
-        [basis_type](#basis-type) | [ks_solver](#ks-solver) | [nbands](#nbands) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [occupations](#occupations) | [smearing](#smearing) | [sigma](#sigma) | [mixing_type](#mixing-type) | [mixing_beta](#mixing-beta) | [mixing_ndim](#mixing-ndim) | [mixing_gg0](#mixing-gg0) | [gamma_only](#gamma-only) | [printe](#printe) | [niter](#niter) | [dr2](#dr2) | [charge_extrap](#charge-extrap)
+        [basis_type](#basis-type) | [ks_solver](#ks-solver) | [nbands](#nbands) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [occupations](#occupations) | [smearing](#smearing) | [sigma](#sigma) | [mixing_type](#mixing-type) | [mixing_beta](#mixing-beta) | [mixing_ndim](#mixing-ndim) | [mixing_gg0](#mixing-gg0) | [gamma_only](#gamma-only) | [printe](#printe) | [niter](#niter) | [dr2](#dr2) | [charge_extrap](#charge-extrap) | [ocp](#ocp) | [ocp_set](#ocp_set)
 
     - [Geometry relaxation](#geometry-relaxation)
     
@@ -602,6 +602,22 @@ calculations.
         - first-order: first-order extrapolation
         - second-order: second-order extrapolation
     - *Default*:atomic
+
+    [back to top](#input-file)
+
+
+- ocp<a id="ocp"></a>
+    - *Type*: bool
+    - *Description*: option for choose whether calcualting constrained DFT or not.
+    Only used for TDDFT.
+    - *Default*:0
+
+    [back to top](#input-file)
+
+- ocp_set<a id="ocp_set"></a>
+    - *Type*: string
+    - *Description*: If ocp is true, the ocp_set is a string to set the number of occupancy, like 1 10 * 1 0 1 representing the 13 band occupancy, 12th band occupancy 0 and the rest 1, the code is parsing this string into an array through a regular expression.
+    - *Default*:none
 
     [back to top](#input-file)
 
