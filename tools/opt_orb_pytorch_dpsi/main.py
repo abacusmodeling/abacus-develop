@@ -26,15 +26,20 @@ def main():
 
 	weight = IO.cal_weight.cal_weight(weight_info, V_info["same_band"], file_list["origin"])
 
-	QI,SI,VI_origin,info_kst = IO.read_QSV.read_file(info_true,file_list["origin"],V_info)
-	if "linear" in file_list.keys():
-		QI_linear, SI_linear, VI_linear, info_linear = list(zip(*( IO.read_QSV.read_file(info_true,file,V_info) for file in file_list["linear"] )))
+	info_kst = IO.read_QSV.read_file_head(info_true,file_list["origin"])
 
 	info_stru, info_element, info_opt = IO.change_info.change_info(info_kst,weight)
+	info_max = IO.change_info.get_info_max(info_stru, info_element)
 
-	print(pprint.pformat(info_stru), end="\n"*2, flush=True)
-	print(pprint.pformat(info_element,width=40), end="\n"*2, flush=True)
-	print(pprint.pformat(info_opt,width=40), end="\n"*2, flush=True)
+	print("info_kst:", info_kst, sep="\n", end="\n"*2, flush=True)
+	print("info_stru:", pprint.pformat(info_stru), sep="\n", end="\n"*2, flush=True)
+	print("info_element:", pprint.pformat(info_element,width=40), sep="\n", end="\n"*2, flush=True)
+	print("info_opt:", pprint.pformat(info_opt,width=40), sep="\n", end="\n"*2, flush=True)
+	print("info_max:", pprint.pformat(info_max), sep="\n", end="\n"*2, flush=True)
+
+	QI,SI,VI_origin = IO.read_QSV.read_QSV(info_stru, info_element, file_list["origin"], V_info)
+	if "linear" in file_list.keys():
+		QI_linear, SI_linear, VI_linear = list(zip(*( IO.read_QSV.read_QSV(info_stru, info_element, file, V_info) for file in file_list["linear"] )))
 
 	if C_init_info["init_from_file"]:
 		C, C_read_index = IO.func_C.read_C_init( C_init_info["C_init_file"], info_element )
@@ -63,7 +68,7 @@ def main():
 			print( '%5s'%"istep", "%20s"%"Spillage", flush=True )
 
 		loss_old = np.inf
-		for istep in range(3):
+		for istep in range(200):
 
 			Spillage = 0
 			for ist in range(len(info_stru)):
