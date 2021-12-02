@@ -14,7 +14,6 @@ public:
     
 
     void classic_md_line(void);
-    void md_force_stress(double &potential);
     
 };
 

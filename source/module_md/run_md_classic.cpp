@@ -64,15 +64,19 @@ void Run_MD_CLASSIC::classic_md_line(void)
         Print_Info::print_screen(0, 0, verlet->step_);
         verlet->outputMD();
 
-        verlet->ucell.update_vel(verlet->vel);
-        std::stringstream file;
-        file << GlobalV::global_out_dir << "STRU_MD_" << verlet->step_;
+        if((verlet->step_ - verlet->step_rst_) % verlet->mdp.recordFreq == 0)
+        {
+            verlet->ucell.update_vel(verlet->vel);
+            std::stringstream file;
+            file << GlobalV::global_out_dir << "STRU_MD_" << verlet->step_;
 #ifdef __LCAO
-        verlet->ucell.print_stru_file(GlobalC::ORB, file.str(), 2, 1);
+            verlet->ucell.print_stru_file(GlobalC::ORB, file.str(), 1, 1);
 #else
-        verlet->ucell.print_stru_file(file.str(), 2, 1);
+            verlet->ucell.print_stru_file(file.str(), 1, 1);
 #endif
-        verlet->write_restart();
+            MD_func::MDdump(verlet->step_, verlet->ucell.nat, verlet->virial, verlet->force);
+            verlet->write_restart();
+        }
 
         verlet->step_++;
     }
