@@ -131,7 +131,7 @@ void LCAO_Descriptor::cal_gvx_k(const std::vector<ModuleBase::ComplexMatrix>& dm
     this->cal_gvdm();
 
     this->init_gdmx();
-    this->cal_gdmx_k(dm); //checked
+    this->cal_gdmx_k(dm);
 
     if(GlobalV::MY_RANK==0)
     {
@@ -216,6 +216,45 @@ void LCAO_Descriptor::cal_gedm(const ModuleBase::matrix &dm)
     ModuleBase::TITLE("LCAO_Descriptor", "cal_gedm");
     //-----prepare for autograd---------
     this->cal_projected_DM(dm);
+    this->cal_descriptor();
+    this->cal_descriptor_tensor();  //use torch::linalg::eigh
+    //-----prepared-----------------------
+    //forward
+    std::vector<torch::jit::IValue> inputs;
+    //input_dim:(natom, des_per_atom)
+    inputs.push_back(torch::cat(this->d_tensor, /*dim=*/0).reshape({ GlobalC::ucell.nat, this->des_per_atom }));
+    std::vector<torch::Tensor> ec;
+    ec.push_back(module.forward(inputs).toTensor());    //Hartree
+    this->E_delta = ec[0].item().toDouble() * 2;//Ry; *2 is for Hartree to Ry
+    
+    //cal gedm
+    std::vector<torch::Tensor> gedm_shell;
+    gedm_shell.push_back(torch::ones_like(ec[0]));
+    this->gedm_tensor = torch::autograd::grad(ec, this->pdm_tensor, gedm_shell, /*retain_grad=*/true, /*create_graph=*/false, /*allow_unused=*/true);
+
+    //gedm_tensor(Hartree) to gedm(Ry)
+    for (int inl = 0;inl < inlmax;++inl)
+    {
+        int nm = 2 * inl_l[inl] + 1;
+        for (int m1 = 0;m1 < nm;++m1)
+        {
+            for (int m2 = 0;m2 < nm;++m2)
+            {
+                int index = m1 * nm + m2;
+                //*2 is for Hartree to Ry
+                this->gedm[inl][index] = this->gedm_tensor[inl].index({ m1,m2 }).item().toDouble() * 2;
+            }
+        }
+    }
+    return;
+}
+
+void LCAO_Descriptor::cal_gedm_k(const std::vector<ModuleBase::ComplexMatrix>& dm)
+{
+    //using this->pdm_tensor
+    ModuleBase::TITLE("LCAO_Descriptor", "cal_gedm");
+    //-----prepare for autograd---------
+    this->cal_projected_DM_k(dm);
     this->cal_descriptor();
     this->cal_descriptor_tensor();  //use torch::linalg::eigh
     //-----prepared-----------------------

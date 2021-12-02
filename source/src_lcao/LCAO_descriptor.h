@@ -94,13 +94,11 @@ public:
     //calculates sum_(L0,M0) alpha<psi_i|alpha><alpha|psi_j>
     void build_v_delta_alpha_new(const bool& cal_deri/**< [in] 0 for 3-center intergration, 1 for its derivation*/);
 
-    //Hellman-Feymann term in force
-    void cal_f_delta_hf_new(const ModuleBase::matrix& dm/**< [in] density matrix*/, const bool isstress, ModuleBase::matrix& svnl_dalpha);
-    void cal_f_delta_hf_k_new(const std::vector<ModuleBase::ComplexMatrix>& dm/**<[in] density matrix*/, const bool isstress, ModuleBase::matrix& svnl_dalpha);
-    
-    ///compute Pulay term of the force
-    void cal_f_delta_pulay(const ModuleBase::matrix& dm/**< [in] density matrix*/);
-    void cal_f_delta_k_pulay(const std::vector<ModuleBase::ComplexMatrix>& dm/**<[in] density matrix*/);
+    //for gamma only, pulay and HF terms of force are calculated together
+    void cal_f_delta_new(const ModuleBase::matrix& dm/**< [in] density matrix*/, const bool isstress, ModuleBase::matrix& svnl_dalpha);
+
+    //for multi-k, pulay and HF terms of force are calculated together
+    void cal_f_delta_k(const std::vector<ModuleBase::ComplexMatrix>& dm/**<[in] density matrix*/, const bool isstress, ModuleBase::matrix& svnl_dalpha);
 
     ///calculate tr(\rho V_delta)
     void cal_e_delta_band(const std::vector<ModuleBase::matrix>& dm/**<[in] density matrix*/);
@@ -114,6 +112,7 @@ public:
 
     ///calculate partial of energy correction to descriptors
     void cal_gedm(const ModuleBase::matrix& dm/**< [in] density matrix*/);	//need to load model in this step
+    void cal_gedm_k(const std::vector<ModuleBase::ComplexMatrix>& dm);	//need to load model in this step
 
     ///calculates gradient of descriptors w.r.t atomic positions
     ///----------------------------------------------------
@@ -210,14 +209,6 @@ private:
 	double** DS_mu_alpha_x;
 	double** DS_mu_alpha_y;
 	double** DS_mu_alpha_z;
-
-    double* DH_V_delta_x;
-    double* DH_V_delta_y;
-    double* DH_V_delta_z;
-
-    std::complex<double>** DH_V_delta_x_k;
-    std::complex<double>** DH_V_delta_y_k;
-    std::complex<double>** DH_V_delta_z_k;
 
     // saves <psi(0)|alpha(R)>
     std::vector<std::vector<std::unordered_map<int,std::vector<std::vector<double>>>>> nlm_save;

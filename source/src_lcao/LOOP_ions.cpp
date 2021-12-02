@@ -178,23 +178,24 @@ void LOOP_ions::opt_ions(void)
 #ifdef __DEEPKS
         if (GlobalV::out_descriptor)
         {
-            //ld.init(ORB.get_lmax_d(), ORB.get_nchimax_d(), ucell.nat* ORB.Alpha[0].getTotal_nchi());
-            //ld.build_S_descriptor(0);  //cal overlap, no need dm
+            if(!GlobalV::deepks_scf)
+            {
+                GlobalC::ld.resize_nlm();
+                GlobalC::ld.build_v_delta_alpha_new(0);
+            }
+
             if(GlobalV::GAMMA_ONLY_LOCAL)
             {
                 GlobalC::ld.cal_projected_DM(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);  //need dm
             }
             else
             {
-                if(!GlobalV::deepks_scf)
-                {
-                    GlobalC::ld.resize_nlm();
-                    GlobalC::ld.build_v_delta_alpha_new(0);
-                }
                 GlobalC::ld.cal_projected_DM_k(GlobalC::LOC.wfc_dm_2d.dm_k);  //need dm
             }
+
             GlobalC::ld.cal_descriptor();    //final descriptor
             GlobalC::ld.save_npy_d();            //libnpy needed
+            
             if (GlobalV::deepks_scf)
             {
                 //ld.print_H_V_delta();   //final H_delta

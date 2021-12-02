@@ -21,9 +21,6 @@ LCAO_Descriptor::LCAO_Descriptor()
     d = new double[1];
     H_V_delta = new double[1];
     dm_double = new double[1];
-    DH_V_delta_x = new double[1];
-    DH_V_delta_y = new double[1];
-    DH_V_delta_z = new double[1];
 }
 
 LCAO_Descriptor::~LCAO_Descriptor()
@@ -34,9 +31,6 @@ LCAO_Descriptor::~LCAO_Descriptor()
     delete[] d;
     delete[] H_V_delta;
     delete[] dm_double;
-    delete[] DH_V_delta_x;
-    delete[] DH_V_delta_y;
-    delete[] DH_V_delta_z;
 
     //=======1. "out_descriptor" part==========
     //delete S_mu_alpha**
@@ -496,14 +490,19 @@ void LCAO_Descriptor::cal_projected_DM(const ModuleBase::matrix &dm)
 void LCAO_Descriptor::cal_projected_DM_k(const std::vector<ModuleBase::ComplexMatrix>& dm)
 {
 
-    std::complex<double> **pdm_complex;
-    pdm_complex = new std::complex<double>* [this->inlmax];
-    const int pdm_size = (this->lmaxd * 2 + 1) * (this->lmaxd * 2 + 1);
-    for(int inl=0;inl<this->inlmax;inl++)
+    ModuleBase::timer::tick("LCAO_Descriptor","cal_projected_DM_k");
+
+    if(dm[0].nr == 0 && dm[0].nc ==0)
     {
-        pdm_complex[inl] = new std::complex<double> [pdm_size];
-        ModuleBase::GlobalFunc::ZEROS(pdm_complex[inl],pdm_size);
+        return;
     }
+
+    const int pdm_size = (this->lmaxd * 2 + 1) * (this->lmaxd * 2 + 1);
+    for(int inl=0;inl<inlmax;inl++)
+    {
+        ModuleBase::GlobalFunc::ZEROS(pdm[inl],pdm_size);
+    }
+
     const double Rcut_Alpha = GlobalC::ORB.Alpha[0].getRcut();
 
     for (int T0 = 0; T0 < GlobalC::ucell.ntype; T0++)
@@ -559,34 +558,44 @@ void LCAO_Descriptor::cal_projected_DM_k(const std::vector<ModuleBase::ComplexMa
 							const int iw2_local = GlobalC::ParaO.trace_loc_col[iw2_all];
 							if(iw2_local < 0)continue;
 							const int iw2_0 = iw2/GlobalV::NPOL;
+ 
+                            double dm_current;
+                            std::complex<double> tmp = 0.0;
+                            for(int ik=0;ik<GlobalC::kv.nks;ik++)
+                            {
+                                const double arg = ( GlobalC::kv.kvec_d[ik] * (dR1-dR2) ) * ModuleBase::TWO_PI;
+                                const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );
+                                tmp += dm[ik](iw2_local,iw1_local)*kphase;
+                            }
+                            if(tmp.imag()>1.0e-8)
+                            {
+                                GlobalV::ofs_running << "dm_current not real : " << tmp << "\n";
+                            }
+                            dm_current=tmp.real();
 
                             std::vector<double> nlm1 = this->nlm_save[iat][ad1][iw1_all][0];
                             std::vector<double> nlm2 = this->nlm_save[iat][ad2][iw2_all][0];
-
                             assert(nlm1.size()==nlm2.size());
-                            for(int ik=0;ik<GlobalC::kv.nks;ik++)
+
+                            int ib=0;
+                            for (int L0 = 0; L0 <= GlobalC::ORB.Alpha[0].getLmax();++L0)
                             {
-                                const double arg = ( GlobalC::kv.kvec_d[ik] * (dR2-dR1) ) * ModuleBase::TWO_PI;
-                                const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );
-                                int ib=0;
-                                for (int L0 = 0; L0 <= GlobalC::ORB.Alpha[0].getLmax();++L0)
+                                for (int N0 = 0;N0 < GlobalC::ORB.Alpha[0].getNchi(L0);++N0)
                                 {
-                                    for (int N0 = 0;N0 < GlobalC::ORB.Alpha[0].getNchi(L0);++N0)
+                                    const int inl = this->inl_index[T0](I0, L0, N0);
+                                    const int nm = 2*L0+1;
+                                    for (int m1 = 0;m1 < 2 * L0 + 1;++m1)
                                     {
-                                        const int inl = this->inl_index[T0](I0, L0, N0);
-                                        const int nm = 2*L0+1;
-                                        for (int m1 = 0;m1 < 2 * L0 + 1;++m1)
+                                        for (int m2 = 0; m2 < 2 * L0 + 1; ++m2)
                                         {
-                                            for (int m2 = 0; m2 < 2 * L0 + 1; ++m2)
-                                            {
-                                                pdm_complex[inl][m1*nm+m2] += nlm1[ib+m1]*nlm2[ib+m2]*dm[ik](iw2_local,iw1_local);
-                                            }
+                                            int ind = m1*nm + m2;
+                                            pdm[inl][ind] += dm_current*nlm1[ib+m1]*nlm2[ib+m2];
                                         }
-                                        ib+=nm;
                                     }
+                                    ib+=nm;
                                 }
-                                assert(ib==nlm1.size());
-                            }//ik
+                            }
+                            assert(ib==nlm1.size());               
 						}//iw2
 					}//iw1
 				}//ad2
@@ -594,23 +603,10 @@ void LCAO_Descriptor::cal_projected_DM_k(const std::vector<ModuleBase::ComplexMa
         }//I0
     }//T0
 
-    for(int inl=0;inl<inlmax;inl++)
-    {
-        for(int ind=0;ind<pdm_size;ind++)
-        {
-            if(pdm_complex[inl][ind].imag()>1.0e-8)
-            {
-                ModuleBase::WARNING_QUIT("pdm_k","pdm_complex not real!");
-            }
-            this->pdm[inl][ind] = pdm_complex[inl][ind].real();
-        }
-        delete[] pdm_complex[inl];
-    }
-    delete[] pdm_complex;
 #ifdef __MPI
-        GlobalC::ParaD.allsum_deepks(this->inlmax,pdm_size,this->pdm);
+    GlobalC::ParaD.allsum_deepks(this->inlmax,pdm_size,this->pdm);
 #endif
-
+    ModuleBase::timer::tick("LCAO_Descriptor","cal_projected_DM_k");
     return;
     
 }
@@ -993,28 +989,15 @@ void LCAO_Descriptor::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& d
 {
     ModuleBase::TITLE("LCAO_Descriptor", "cal_gdmx");
 
-    std::complex<double> ***gdmx_complex;
-    std::complex<double> ***gdmy_complex;
-    std::complex<double> ***gdmz_complex;
     int size = (2 * lmaxd + 1) * (2 * lmaxd + 1);
-
-    gdmx_complex = new complex<double>** [GlobalC::ucell.nat];
-    gdmy_complex = new complex<double>** [GlobalC::ucell.nat];
-    gdmz_complex = new complex<double>** [GlobalC::ucell.nat];
 
     for (int iat = 0;iat < GlobalC::ucell.nat;iat++)
     {
-        gdmx_complex[iat] = new complex<double>* [inlmax];
-        gdmy_complex[iat] = new complex<double>* [inlmax];
-        gdmz_complex[iat] = new complex<double>* [inlmax];
         for (int inl = 0;inl < inlmax;inl++)
         {
-            gdmx_complex[iat][inl] = new complex<double> [size];
-            ModuleBase::GlobalFunc::ZEROS(gdmx_complex[iat][inl], size);
-            gdmy_complex[iat][inl] = new complex<double> [size];
-            ModuleBase::GlobalFunc::ZEROS(gdmy_complex[iat][inl], size);
-            gdmz_complex[iat][inl] = new complex<double> [size];
-            ModuleBase::GlobalFunc::ZEROS(gdmz_complex[iat][inl], size);
+            ModuleBase::GlobalFunc::ZEROS(gdmx[iat][inl], size);
+            ModuleBase::GlobalFunc::ZEROS(gdmy[iat][inl], size);
+            ModuleBase::GlobalFunc::ZEROS(gdmz[iat][inl], size);
         }
     }
 
@@ -1076,67 +1059,60 @@ void LCAO_Descriptor::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& d
 							if(iw2_local < 0)continue;
 							const int iw2_0 = iw2/GlobalV::NPOL;
 
+                            double dm_current;
+                            std::complex<double> tmp = 0.0;
+                            for(int ik=0;ik<GlobalC::kv.nks;ik++)
+                            {
+                                const double arg = ( GlobalC::kv.kvec_d[ik] * (dR1-dR2) ) * ModuleBase::TWO_PI;
+                                const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );
+                                tmp += dm[ik](iw2_local,iw1_local)*kphase;
+                            }
+                            if(tmp.imag()>1.0e-8)
+                            {
+                                GlobalV::ofs_running << "dm_current not real : " << tmp << "\n";
+                            }
+                            dm_current=tmp.real();
+
                             std::vector<double> nlm1 = this->nlm_save[iat][ad1][iw1_all][0];
                             std::vector<std::vector<double>> nlm2 = this->nlm_save[iat][ad2][iw2_all];
 
                             assert(nlm1.size()==nlm2[0].size());
-                            for(int ik=0;ik<GlobalC::kv.nks;ik++)
+
+                            int ib=0;
+                            for (int L0 = 0; L0 <= GlobalC::ORB.Alpha[0].getLmax();++L0)
                             {
-                                const double arg = ( GlobalC::kv.kvec_d[ik] * (dR2-dR1) ) * ModuleBase::TWO_PI;
-                                const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );
-                                int ib=0;
-                                for (int L0 = 0; L0 <= GlobalC::ORB.Alpha[0].getLmax();++L0)
+                                for (int N0 = 0;N0 < GlobalC::ORB.Alpha[0].getNchi(L0);++N0)
                                 {
-                                    for (int N0 = 0;N0 < GlobalC::ORB.Alpha[0].getNchi(L0);++N0)
+                                    const int inl = this->inl_index[T0](I0, L0, N0);
+                                    const int nm = 2*L0+1;
+                                    for (int m1 = 0;m1 < 2 * L0 + 1;++m1)
                                     {
-                                        const int inl = this->inl_index[T0](I0, L0, N0);
-                                        const int nm = 2*L0+1;
-                                        for (int m1 = 0;m1 < 2 * L0 + 1;++m1)
+                                        for (int m2 = 0; m2 < 2 * L0 + 1; ++m2)
                                         {
-                                            for (int m2 = 0; m2 < 2 * L0 + 1; ++m2)
-                                            {
-                                                //ibt : on which iw2 is located
-                                                //iat : on which alpha is located
+                                            //ibt : on which iw2 is located
+                                            //iat : on which alpha is located
 
-                                                //(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'>
-                                                gdmx_complex[ibt][inl][m1*nm + m2] += 
-                                                    nlm2[1][ib+m2] * dm[ik](iw2_local, iw1_local) * nlm1[ib+m1] * kphase;
-                                                gdmy_complex[ibt][inl][m1*nm + m2] += 
-                                                    nlm2[2][ib+m2] * dm[ik](iw2_local, iw1_local) * nlm1[ib+m1] * kphase;
-                                                gdmz_complex[ibt][inl][m1*nm + m2] += 
-                                                    nlm2[3][ib+m2] * dm[ik](iw2_local, iw1_local) * nlm1[ib+m1] * kphase;
+                                            double fact_x = (nlm2[1][ib+m2] * nlm1[ib+m1] + nlm2[1][ib+m2] * nlm1[ib+m1]) * dm_current;
+                                            double fact_y = (nlm2[2][ib+m2] * nlm1[ib+m1] + nlm2[2][ib+m2] * nlm1[ib+m1]) * dm_current;
+                                            double fact_z = (nlm2[3][ib+m2] * nlm1[ib+m1] + nlm2[3][ib+m2] * nlm1[ib+m1]) * dm_current;
 
-                                                //(<d/dX chi_mu|alpha_m'>)<chi_nu|alpha_m>
-                                                gdmx_complex[ibt][inl][m2*nm + m1] += 
-                                                    nlm2[1][ib+m2] * dm[ik](iw2_local, iw1_local) * nlm1[ib+m1] * kphase;
-                                                gdmy_complex[ibt][inl][m2*nm + m1] += 
-                                                    nlm2[2][ib+m2] * dm[ik](iw2_local, iw1_local) * nlm1[ib+m1] * kphase;
-                                                gdmz_complex[ibt][inl][m2*nm + m1] += 
-                                                    nlm2[3][ib+m2] * dm[ik](iw2_local, iw1_local) * nlm1[ib+m1] * kphase;
+                                            //(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'> + (<d/dX chi_nu|alpha_m'>)<chi_mu|alpha_m>
+                                            gdmx[ibt][inl][m1*nm + m2] += fact_x;
+                                            gdmy[ibt][inl][m1*nm + m2] += fact_y;                                               
+                                            gdmz[ibt][inl][m1*nm + m2] += fact_z;
 
-                                                //(<chi_mu|d/dX alpha_m>)<chi_nu|alpha_m'> = -(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'>
-                                                gdmx_complex[iat][inl][m1*nm + m2] -= 
-                                                    nlm2[1][ib+m2] * dm[ik](iw2_local, iw1_local) * nlm1[ib+m1] * kphase;
-                                                gdmy_complex[iat][inl][m1*nm + m2] -= 
-                                                    nlm2[2][ib+m2] * dm[ik](iw2_local, iw1_local) * nlm1[ib+m1] * kphase;
-                                                gdmz_complex[iat][inl][m1*nm + m2] -= 
-                                                    nlm2[3][ib+m2] * dm[ik](iw2_local, iw1_local) * nlm1[ib+m1] * kphase;
+                                            //(<chi_mu|d/dX alpha_m>)<chi_nu|alpha_m'> + (<chi_nu|d/dX alpha_m'>)<chi_mu|alpha_m>
+                                            // = -(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'> - (<d/dX chi_nu|alpha_m'>)<chi_mu|alpha_m>
+                                            gdmx[iat][inl][m1*nm + m2] -= fact_x;                                               
+                                            gdmy[iat][inl][m1*nm + m2] -= fact_y;                                               
+                                            gdmz[iat][inl][m1*nm + m2] -= fact_z;
 
-                                                //(<chi_nu|d/dX alpha_m'>)<chi_mu|alpha_m> = -(<d/dX chi_nu|alpha_m'>)<chi_mu|alpha_m>
-                                                gdmx_complex[iat][inl][m2*nm + m1] -= 
-                                                    nlm2[1][ib+m2] * dm[ik](iw2_local, iw1_local) * nlm1[ib+m1] * kphase;
-                                                gdmy_complex[iat][inl][m2*nm + m1] -= 
-                                                    nlm2[2][ib+m2] * dm[ik](iw2_local, iw1_local) * nlm1[ib+m1] * kphase;
-                                                gdmz_complex[iat][inl][m2*nm + m1] -= 
-                                                    nlm2[3][ib+m2] * dm[ik](iw2_local, iw1_local) * nlm1[ib+m1] * kphase; 
-
-                                            }
                                         }
-                                        ib+=nm;
                                     }
+                                    ib+=nm;
                                 }
-                                assert(ib==nlm1.size());
-                            }//ik
+                            }
+                            assert(ib==nlm1.size());
 						}//iw2
 					}//iw1
 				}//ad2
@@ -1144,50 +1120,12 @@ void LCAO_Descriptor::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& d
         }//I0
     }//T0
 
-    for (int iat = 0;iat < GlobalC::ucell.nat;iat++)
-    {
-        for (int inl = 0;inl < inlmax;inl++)
-        {
-            int size = (2 * lmaxd + 1) * (2 * lmaxd + 1);
-            for(int ind = 0; ind <size; ind++)
-            {
-                if(gdmx_complex[iat][inl][ind].imag()>1.0e-8)
-                {
-                    ModuleBase::WARNING_QUIT("gdm_k","gdmx_complex not real!");
-                }
-                this->gdmx[iat][inl][ind] = gdmx_complex[iat][inl][ind].real();
-
-                if(gdmy_complex[iat][inl][ind].imag()>1.0e-8)
-                {
-                    ModuleBase::WARNING_QUIT("gdm_k","gdmy_complex not real!");
-                }
-                this->gdmy[iat][inl][ind] = gdmy_complex[iat][inl][ind].real();
-
-                if(gdmz_complex[iat][inl][ind].imag()>1.0e-8)
-                {
-                    ModuleBase::WARNING_QUIT("gdm_k","gdmz_complex not real!");
-                }
-                this->gdmz[iat][inl][ind] = gdmz_complex[iat][inl][ind].real();        
-            }
-            delete[] gdmx_complex[iat][inl];
-            delete[] gdmy_complex[iat][inl];
-            delete[] gdmz_complex[iat][inl];
-        }
-        delete[] gdmx_complex[iat];
-        delete[] gdmy_complex[iat];
-        delete[] gdmz_complex[iat];
-    }
-    delete[] gdmx_complex;
-    delete[] gdmy_complex;
-    delete[] gdmz_complex;
-
 #ifdef __MPI
-    const int gdm_size = (this->lmaxd * 2 + 1) * (this->lmaxd * 2 + 1);
     for(int iat=0;iat<GlobalC::ucell.nat;iat++)
     {
-        GlobalC::ParaD.allsum_deepks(this->inlmax,gdm_size,this->gdmx[iat]);
-        GlobalC::ParaD.allsum_deepks(this->inlmax,gdm_size,this->gdmy[iat]);
-        GlobalC::ParaD.allsum_deepks(this->inlmax,gdm_size,this->gdmz[iat]);
+        GlobalC::ParaD.allsum_deepks(this->inlmax,size,this->gdmx[iat]);
+        GlobalC::ParaD.allsum_deepks(this->inlmax,size,this->gdmy[iat]);
+        GlobalC::ParaD.allsum_deepks(this->inlmax,size,this->gdmz[iat]);
     }
 #endif
     return;

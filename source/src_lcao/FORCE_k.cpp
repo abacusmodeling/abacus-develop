@@ -70,33 +70,13 @@ void Force_LCAO_k::ftable_k (
 #ifdef __DEEPKS
     if (GlobalV::deepks_scf)
     {
-       	//step 1 : accumulate density matrix
-		if(GlobalV::NPOOL!=1)
-		{
-			ModuleBase::WARNING_QUIT("opt_ions","deepks not compatible with npool>1 now");
-		}
-		ModuleBase::ComplexMatrix dm_k_all;
-		dm_k_all.create(GlobalC::LOC.wfc_dm_2d.dm_k[0].nr, GlobalC::LOC.wfc_dm_2d.dm_k[0].nc);
-		for(int ik=0;ik<GlobalC::kv.nks;ik++)
-		{
-			ModuleBase::scale_accumulate(1.0,GlobalC::LOC.wfc_dm_2d.dm_k[ik],dm_k_all);
-		}
-		if(!dm_k_all.checkreal())
-		{
-			ModuleBase::WARNING_QUIT("opt_ions","accumulated density matrix not real!!");
-		}
+		GlobalC::ld.cal_gedm_k(GlobalC::LOC.wfc_dm_2d.dm_k);
 
-		//step 2 : obtain density matrix; calculate dE/dD
-		GlobalC::ld.cal_gedm(dm_k_all.dble());
-
-        GlobalC::ld.cal_f_delta_hf_k_new(GlobalC::LOC.wfc_dm_2d.dm_k,isstress,svnl_dalpha);
-        //ld.print_F_delta("F_delta_hf.dat");
-        GlobalC::ld.cal_f_delta_k_pulay(GlobalC::LOC.wfc_dm_2d.dm_k);
-        //ld.print_F_delta("F_delta_pulay.dat");
-        GlobalC::ld.print_F_delta("F_delta.dat");
+        GlobalC::ld.cal_f_delta_k(GlobalC::LOC.wfc_dm_2d.dm_k,isstress,svnl_dalpha);
 #ifdef __MPI
         Parallel_Reduce::reduce_double_all(GlobalC::ld.F_delta.c,GlobalC::ld.F_delta.nr*GlobalC::ld.F_delta.nc);
 #endif
+        GlobalC::ld.print_F_delta("F_delta.dat");
     }
 #endif
 
@@ -382,6 +362,10 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 			{
 				for(int iv=0; iv<irr; ++iv)
 				{
+					if(std::abs(vvv[is][iv].imag())>1.0e-8)
+					{
+						GlobalV::ofs_running << "vvv : " << iv << " " << is << " " << vvv[is][iv] << "\n";
+					}
 					dm2d[is][gstart+iv] = vvv[is][iv].real();
 				}
             //xiaohui add 2014-03-17, add "if(irr > 0)"
@@ -419,7 +403,7 @@ std::complex<double> Force_LCAO_k::set_EDM_k_element(
 	}
 	//--------------------------------------
 	// for density matrix
-	// \sum E(i)*psi(mu)*psi(nu)
+	// \sum exp(iRk)*psi(mu)*psi(nu)
 	//--------------------------------------
 	else
 	{
