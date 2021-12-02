@@ -8,14 +8,14 @@ void LOOP_ions::output_HS_R(void)
 {
     ModuleBase::TITLE("LOOP_ions","output_HS_R"); 
     ModuleBase::timer::tick("LOOP_ions","output_HS_R"); 
-	
-	// add by jingan for out r_R matrix 2019.8.14
-	if(INPUT.out_r_matrix)
-	{
-		cal_r_overlap_R r_matrix;
-		r_matrix.init();
-		r_matrix.out_r_overlap_R(GlobalV::NSPIN);
-	}
+    
+    // add by jingan for out r_R matrix 2019.8.14
+    if(INPUT.out_r_matrix)
+    {
+        cal_r_overlap_R r_matrix;
+        r_matrix.init();
+        r_matrix.out_r_overlap_R(GlobalV::NSPIN);
+    }
 
     // Parameters for HR and SR output
     double sparse_threshold = 1e-10;
@@ -28,10 +28,8 @@ void LOOP_ions::output_HS_R(void)
         // GlobalC::UHM.GK.distribute_pvpR_tr();
         // HS_Matrix::save_HSR_tr(0);
 
-        // jingan add 2021-6-4
+        // jingan add 2021-6-4, modify 2021-12-2
         GlobalC::UHM.calculate_HSR_sparse(0, sparse_threshold);
-        HS_Matrix::save_HSR_sparse(0, sparse_threshold, binary);
-        GlobalC::UHM.destroy_all_HSR_sparse();
     }
     ///*
     else if(GlobalV::NSPIN==2)
@@ -46,13 +44,13 @@ void LOOP_ions::output_HS_R(void)
         //         {
         //             GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
         //         }
-        	    	
+                    
         //         if(!GlobalV::GAMMA_ONLY_LOCAL)
         //         {
         //             if(GlobalV::VL_IN_H)
         //             {
-		// 				//GlobalC::UHM.GK.cal_vlocal_k(GlobalC::pot.vrs1,GridT);
-		// 				GlobalC::UHM.GK.cal_vlocal_k(GlobalC::pot.vr_eff1, GlobalC::GridT, GlobalV::CURRENT_SPIN);
+        // 				//GlobalC::UHM.GK.cal_vlocal_k(GlobalC::pot.vrs1,GridT);
+        // 				GlobalC::UHM.GK.cal_vlocal_k(GlobalC::pot.vr_eff1, GlobalC::GridT, GlobalV::CURRENT_SPIN);
         //             }
         //         }
         //         GlobalC::UHM.GK.cal_vlocal_R(GlobalV::CURRENT_SPIN);
@@ -75,21 +73,26 @@ void LOOP_ions::output_HS_R(void)
                 {
                     GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
                 }
-        	    	
+                    
                 if(!GlobalV::GAMMA_ONLY_LOCAL)
                 {
                     if(GlobalV::VL_IN_H)
                     {
-						//GlobalC::UHM.GK.cal_vlocal_k(GlobalC::pot.vrs1,GridT);
-						GlobalC::UHM.GK.cal_vlocal_k(GlobalC::pot.vr_eff1, GlobalC::GridT, GlobalV::CURRENT_SPIN);
+                        //GlobalC::UHM.GK.cal_vlocal_k(GlobalC::pot.vrs1,GridT);
+                        GlobalC::UHM.GK.cal_vlocal_k(GlobalC::pot.vr_eff1, GlobalC::GridT, GlobalV::CURRENT_SPIN);
                     }
                 }
+
                 GlobalC::UHM.calculate_HSR_sparse(GlobalV::CURRENT_SPIN, sparse_threshold);
-                HS_Matrix::save_HSR_sparse(GlobalV::CURRENT_SPIN, sparse_threshold, binary);
-                GlobalC::UHM.destroy_all_HSR_sparse();
             }
         }
     }
+
+    std::string SR_filename = "data-SR-sparse_SPIN0.csr";
+    std::string HR_filename_up = "data-HR-sparse_SPIN0.csr";
+    std::string HR_filename_down = "data-HR-sparse_SPIN1.csr";
+    HS_Matrix::save_HSR_sparse(sparse_threshold, binary, SR_filename, HR_filename_up, HR_filename_down);
+    GlobalC::UHM.destroy_all_HSR_sparse();
 
     if(!GlobalV::GAMMA_ONLY_LOCAL) //LiuXh 20181011
     {
