@@ -732,7 +732,7 @@ void DFTU_RELAX::fold_dSm_k(const int ik, const int dim, std::complex<double>* d
 			  			const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * TWO_PI;
 			  			const std::complex<double> kphase( cos(arg),  sin(arg) );
 
-              			dSm_k[nu*GlobalC::ParaO.nrow + mu] += dSm_ptr[nnr]*kphase;
+              dSm_k[nu*GlobalC::ParaO.nrow + mu] += dSm_ptr[nnr]*kphase;
 
 			  			++nnr;
 			  		}// kk

@@ -257,10 +257,10 @@ void Force_Stress_LCAO::getForceStress(
 					fcs(iat, i) += fefield(iat, i);
 				}
 				//DFT plus U force
-				if(INPUT.dft_plus_u)
-				{
-					fcs(iat, i) += force_dftu(iat, i);
-				}
+				// if(INPUT.dft_plus_u)
+				// {
+				// 	fcs(iat, i) += force_dftu(iat, i);
+				// }
 				//sum total force for correction
 				sum += fcs(iat, i);
 			}

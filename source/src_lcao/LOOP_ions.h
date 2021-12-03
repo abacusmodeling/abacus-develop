@@ -6,6 +6,8 @@
 #include "../src_pw/charge_extra.h"
 #include "../src_ions/lattice_change_methods.h"
 
+#include <fstream>
+
 class LOOP_ions
 {
 
@@ -18,6 +20,7 @@ class LOOP_ions
 
 	void opt_ions(void);
 	void output_HS_R(void); //LiuXh add 2019-07-15
+  void output_S_R(std::string file);
 
 	private:
 

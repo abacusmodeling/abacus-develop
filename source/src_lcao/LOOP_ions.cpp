@@ -17,6 +17,7 @@
 #include "../src_pw/vdwd3.h"
 #include "../src_pw/vdwd2_parameters.h"
 #include "../src_pw/vdwd3_parameters.h"
+#include "dmft.h"
 #ifdef __DEEPKS
 #include "LCAO_descriptor.h"
 #endif
@@ -174,6 +175,13 @@ void LOOP_ions::opt_ions(void)
 		{
 			this->output_HS_R(); //LiuXh add 2019-07-15
 		}
+
+    if(INPUT.dft_plus_dmft)
+    {
+      this->output_S_R("outputs_to_DMFT/overlap_matrix/SR.csr");
+      GlobalC::dmft.out_to_dmft();
+    }
+
         //caoyu add 2021-03-31
 #ifdef __DEEPKS
         if (INPUT.out_descriptor)
@@ -548,5 +556,22 @@ void LOOP_ions::final_scf(void)
         GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
     }
 
+    return;
+}
+
+void LOOP_ions::output_S_R(std::string file)
+{
+    TITLE("LOOP_ions","output_S_R"); 
+    timer::tick("LOOP_ions","output_S_R");
+
+    // Parameters SR output
+    double sparse_threshold = 1e-10;
+    bool binary = false; // output binary file
+
+    GlobalC::UHM.calculate_STN_R_sparse(sparse_threshold);
+    HS_Matrix::save_SR_sparse(sparse_threshold, binary, file);
+    GlobalC::UHM.destroy_all_HSR_sparse();
+
+    timer::tick("LOOP_ions","output_S_R"); 
     return;
 }
