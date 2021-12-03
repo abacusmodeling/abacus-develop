@@ -9,6 +9,7 @@
 
 int main(int argc, char **argv)
 {
+    srand(time(0));
     Parallel_Global::read_mpi_parameters(argc,argv);
 
     //----------------------------------------------------------

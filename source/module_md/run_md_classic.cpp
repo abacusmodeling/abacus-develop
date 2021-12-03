@@ -61,11 +61,11 @@ void Run_MD_CLASSIC::classic_md_line(void)
             verlet->stress +=  verlet->virial;
         }
 
-        Print_Info::print_screen(0, 0, verlet->step_);
-        verlet->outputMD();
-
         if((verlet->step_ - verlet->step_rst_) % verlet->mdp.recordFreq == 0)
         {
+            Print_Info::print_screen(0, 0, verlet->step_);
+            verlet->outputMD();
+            
             verlet->ucell.update_vel(verlet->vel);
             std::stringstream file;
             file << GlobalV::global_out_dir << "STRU_MD_" << verlet->step_;

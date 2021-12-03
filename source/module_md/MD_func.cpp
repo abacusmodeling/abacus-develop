@@ -7,6 +7,36 @@
 #include "../module_neighbor/sltk_grid_driver.h"
 #include "../module_base/global_variable.h"
 
+double MD_func::gaussrand()
+{
+    static double V1, V2, S;
+    static int phase = 0;
+    double X;
+     
+    if ( phase == 0 ) 
+    {
+        do 
+        {
+            double U1 = rand()/double(RAND_MAX);
+            double U2 = rand()/double(RAND_MAX);
+             
+            V1 = 2.0 * U1 - 1.0;
+            V2 = 2.0 * U2 - 1.0;
+            S = V1 * V1 + V2 * V2;
+        } while(S >= 1 || S == 0);
+         
+        X = V1 * sqrt(-2.0 * log(S) / S);
+    } 
+    else
+    {
+        X = V2 * sqrt(-2.0 * log(S) / S);
+    }
+
+    phase = 1 - phase;
+ 
+    return X;
+}
+
 bool MD_func::RestartMD(const int& numIon, ModuleBase::Vector3<double>* vel, int& step_rst)
 {
 	int error(0);
@@ -193,7 +223,6 @@ void MD_func::RandomVel(
 {
 	if(!GlobalV::MY_RANK)
 	{
-		srand(time(0));
 		ModuleBase::Vector3<double> average;
 		ModuleBase::Vector3<double> mass;
 		average.set(0,0,0);

@@ -14,8 +14,9 @@ Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     stress.create(3,3);
 
     // convert to a.u. unit
-    mdp.dt/=ModuleBase::AU_to_FS;
-	temperature_=mdp.tfirst/ModuleBase::Hartree_to_K;
+    mdp.dt /= ModuleBase::AU_to_FS;
+	temperature_ = mdp.tfirst/ModuleBase::Hartree_to_K;
+    t_last = mdp.tlast/ModuleBase::Hartree_to_K;
 
     // LJ parameters
     mdp.rcut_lj *= ModuleBase::ANGSTROM_AU;
@@ -86,6 +87,18 @@ void Verlet::second_half()
 
 void Verlet::outputMD()
 {
+    if(GlobalV::MY_RANK) return;
+
+	std::ofstream ofs;
+	if(step_ == step_rst_)
+	{
+		ofs.open("run.log", ios::trunc);
+	}
+	else
+	{
+		ofs.open("run.log", ios::app);
+	}
+
     temperature_ = 2*kinetic/(double(3*ucell.nat-frozen_freedom_))*ModuleBase::Hartree_to_K;
 
     const double unit_transform = ModuleBase::HARTREE_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
@@ -107,8 +120,24 @@ void Verlet::outputMD()
             << std::left << std::setw(20) << temperature_
             << std::left << std::setw(20) << press*unit_transform <<std::endl;
 	std::cout << " ------------------------------------------------------------" << std::endl;
-
     MD_func::outStress(virial, stress);
+
+    if(step_ == step_rst_)
+	{
+		ofs << std::left << std::setw(20) << "Step" 
+            << std::left << std::setw(20) << "Energy" 
+            << std::left << std::setw(20) << "Potential" 
+            << std::left << std::setw(20) << "Kinetic" 
+            << std::left << std::setw(20) << "Temperature" 
+            << std::left << std::setw(20) << "Pressure (KBAR)" <<std::endl;
+	}
+    ofs << std::left << std::setw(20) << step_
+        << std::left << std::setw(20) << potential+kinetic
+        << std::left << std::setw(20) << potential
+        << std::left << std::setw(20) << kinetic
+        << std::left << std::setw(20) << temperature_
+        << std::left << std::setw(20) << press*unit_transform <<std::endl;
+    ofs.close();
 }
 
 void Verlet::write_restart()

@@ -22,6 +22,7 @@ public:
 
     // All parameters are in a.u. unit.
     double temperature_;
+    double t_last;
     int step_;
     int step_rst_;
     double energy_;
