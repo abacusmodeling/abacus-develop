@@ -89,7 +89,7 @@ public:
 
     ///add dV to the Hamiltonian matrix
     void add_v_delta(void);
-    void add_v_delta_k(const int &ik);
+    void add_v_delta_k(void);
     
     //calculates sum_(L0,M0) alpha<psi_i|alpha><alpha|psi_j>
     void build_v_delta_alpha_new(const bool& cal_deri/**< [in] 0 for 3-center intergration, 1 for its derivation*/);
@@ -183,6 +183,8 @@ public:
     double e_delta_band = 0.0;
     ///Correction term to the Hamiltonian matrix: \f$\langle\psi|V_\delta|\psi\rangle\f$
     double* H_V_delta;
+
+    double* H_V_deltaR;
     std::complex<double>** H_V_delta_k;
     ///(Unit: Ry/Bohr) Total Force due to the DeePKS correction term \f$E_{\delta}\f$
     ModuleBase::matrix	F_delta;
@@ -212,6 +214,9 @@ private:
 
     // saves <psi(0)|alpha(R)>
     std::vector<std::vector<std::unordered_map<int,std::vector<std::vector<double>>>>> nlm_save;
+    
+    typedef std::tuple<int,int,int,int> key_tuple;
+    std::vector<std::map<key_tuple,std::unordered_map<int,std::vector<std::vector<double>>>>> nlm_save_k;
 
     // projected density matrix
 	double** pdm;	//[tot_Inl][2l+1][2l+1]	caoyu modified 2021-05-07

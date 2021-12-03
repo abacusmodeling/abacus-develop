@@ -260,16 +260,7 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 	// (Hloc2 += Hloc_fixed2), (std::complex matrix)
 	//------------------------------------------
 //	std::cout << " Folding matrix here." << std::endl;
-	GlobalC::LM.update_Hloc2();
-
-#ifdef __DEEPKS	//caoyu add 2021-07-26 for DeePKS
-
-	if (GlobalV::deepks_scf)
-    {
-		//calculate dV from saved <alpha(0)|psi(R)>
-		GlobalC::ld.add_v_delta_k(ik);
-	}
-#endif
+	GlobalC::LM.update_Hloc2(ik);
 /*
 	if(GlobalV::NURSE)
 	{
