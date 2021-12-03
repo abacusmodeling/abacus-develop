@@ -3,36 +3,36 @@
 #include "vdwd2.h"
 #include "vdwd3.h"
 
-void Stress_PW::cal_stress(matrix& sigmatot)
+void Stress_PW::cal_stress(ModuleBase::matrix& sigmatot)
 {
-	TITLE("Stress_PW","cal_stress");
-	timer::tick("Stress_PW","cal_stress");    
+	ModuleBase::TITLE("Stress_PW","cal_stress");
+	ModuleBase::timer::tick("Stress_PW","cal_stress");    
 
 	// total stress
 	sigmatot.create(3,3);
-	matrix sigmaxc;
+	ModuleBase::matrix sigmaxc;
 	// exchange-correlation stress
 	sigmaxc.create(3,3);
 	// hartree stress
-	matrix sigmahar;
+	ModuleBase::matrix sigmahar;
 	sigmahar.create(3,3);
 	// electron kinetic stress
-	matrix sigmakin;
+	ModuleBase::matrix sigmakin;
 	sigmakin.create(3,3);
 	// local pseudopotential stress
-	matrix sigmaloc;
+	ModuleBase::matrix sigmaloc;
 	sigmaloc.create(3,3);
 	// non-local pseudopotential stress
-	matrix sigmanl;
+	ModuleBase::matrix sigmanl;
 	sigmanl.create(3,3);
 	// Ewald stress
-	matrix sigmaewa;
+	ModuleBase::matrix sigmaewa;
 	sigmaewa.create(3,3);
 	// non-linear core correction stress
-	matrix sigmaxcc;
+	ModuleBase::matrix sigmaxcc;
 	sigmaxcc.create(3,3);
 	// vdw stress
-	matrix sigmavdw;
+	ModuleBase::matrix sigmavdw;
 	sigmavdw.create(3,3);
 
 	for(int i=0;i<3;i++)
@@ -117,13 +117,14 @@ void Stress_PW::cal_stress(matrix& sigmatot)
 		this->print_stress("NLCC    STRESS",sigmaxcc,GlobalV::TEST_STRESS,ry);
 		this->print_stress("TOTAL    STRESS",sigmatot,GlobalV::TEST_STRESS,ry);
 	}
+	ModuleBase::timer::tick("Stress_PW","cal_stress");
 	return;
     
 }
 
-void Stress_PW::stress_vdw(matrix& sigma)
+void Stress_PW::stress_vdw(ModuleBase::matrix& sigma)
 {
-	matrix force;
+	ModuleBase::matrix force;
 	if(GlobalC::vdwd2_para.flag_vdwd2) //Peize Lin add 2014-04-04, update 2021-03-09
 	{
 		Vdwd2 vdwd2(GlobalC::ucell,GlobalC::vdwd2_para);

@@ -11,9 +11,9 @@ Atom::Atom()
     Rcut = 0.0; // pengfei Li 16-2-29
     type = 0;
     stapos_wf = 0;
-    tau = new Vector3<double>[1];
-    taud = new Vector3<double>[1];
-    vel = new Vector3<double>[1];
+    tau = new ModuleBase::Vector3<double>[1];
+    taud = new ModuleBase::Vector3<double>[1];
+    vel = new ModuleBase::Vector3<double>[1];
     mag = new double[1];
     l_nchi = new int[1];
     iw2l = new int[1];
@@ -112,7 +112,7 @@ void Atom::print_Atom(std::ofstream &ofs, output &outp)
 #ifdef __MPI
 void Atom::bcast_atom(void)
 {
-    if (GlobalV::test_atom) TITLE("Atom","bcast_atom");
+    if (GlobalV::test_atom) ModuleBase::TITLE("Atom","bcast_atom");
 
     Parallel_Common::bcast_int( type );
     Parallel_Common::bcast_int( na );
@@ -134,10 +134,15 @@ void Atom::bcast_atom(void)
         assert(na!=0);
         delete[] tau;
 		delete[] taud;
+	delete[] vel;
         delete[] mag;
-        tau = new Vector3<double>[na];
-		taud = new Vector3<double>[na];
+        tau = new ModuleBase::Vector3<double>[na];
+		taud = new ModuleBase::Vector3<double>[na];
+	vel = new ModuleBase::Vector3<double>[na];
         mag = new double[na];
+        angle1 = new double[na];
+        angle2 = new double[na];
+        m_loc_ = new ModuleBase::Vector3<double>[na];
     }
 
     for (int i=0;i<na;i++)
@@ -148,7 +153,15 @@ void Atom::bcast_atom(void)
         Parallel_Common::bcast_double( taud[i].x );
         Parallel_Common::bcast_double( taud[i].y );
         Parallel_Common::bcast_double( taud[i].z );
+	Parallel_Common::bcast_double( vel[i].x );
+	Parallel_Common::bcast_double( vel[i].y );
+	Parallel_Common::bcast_double( vel[i].z );
         Parallel_Common::bcast_double( mag[i] );
+        Parallel_Common::bcast_double(angle1[i]);
+        Parallel_Common::bcast_double(angle2[i]);
+        Parallel_Common::bcast_double(m_loc_[i].x);
+        Parallel_Common::bcast_double(m_loc_[i].y);
+        Parallel_Common::bcast_double(m_loc_[i].z);
     }
 
     bcast_atom_pseudo( na );

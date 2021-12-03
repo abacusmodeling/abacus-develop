@@ -6,7 +6,8 @@
 
 // test
 #include <iostream>
-using namespace std;
+namespace ModuleBase
+{
 
 inline matrix::matrix( const int nrows, const int ncols, const bool flag_zero )
 	:nr(nrows), nc(ncols), c(nullptr)
@@ -74,6 +75,7 @@ inline const double & matrix::operator()(const int ir,const int ic) const
 {
 	assert(ir>=0);	assert(ir<nr);	assert(ic>=0);	assert(ic<nc);
 	return c[ir*nc+ic];
+}
 }
 
 #endif

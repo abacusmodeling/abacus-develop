@@ -12,7 +12,7 @@ LOOP_cell::~LOOP_cell(){}
 
 void LOOP_cell::opt_cell(void)
 {
-	TITLE("LOOP_cell","opt_cell");
+	ModuleBase::TITLE("LOOP_cell","opt_cell");
 
     // Initialize the local wave functions.
     // npwx, eigenvalues, and weights
@@ -70,7 +70,7 @@ void LOOP_cell::opt_cell(void)
 	ions.opt_ions();
 
 	// mohan update 2021-02-10
-    GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, INPUT.out_descriptor);
+    GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
 	
 	return;
 }

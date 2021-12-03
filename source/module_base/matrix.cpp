@@ -9,7 +9,6 @@
 #include <cstdlib>
 #include <limits>
 
-using namespace std;
 #include "matrix.h"
 
 #ifdef __NORMAL
@@ -24,6 +23,8 @@ using namespace std;
 // ********************************************************
 
 //int matrix::mCount = 0;
+namespace ModuleBase
+{
 
 void matrixAlloc()
 {
@@ -32,7 +33,7 @@ void matrixAlloc()
 	std::cout << "Allocation error for Matrix" << std::endl;
 	exit(0);
 #else
-	WARNING_QUIT("matrix","Allocation error for Matrix");
+	ModuleBase::WARNING_QUIT("matrix","Allocation error for Matrix");
 #endif
 }
 
@@ -43,9 +44,9 @@ matrix::matrix( const int nrows, const int ncols, const bool flag_zero )
 {
 	if( nr && nc )
 	{
-		auto handler_old = set_new_handler(matrixAlloc);
+		auto handler_old = std::set_new_handler(matrixAlloc);
 		c = new double[nr*nc];
-		set_new_handler(handler_old);
+		std::set_new_handler(handler_old);
 		if(flag_zero)	this->zero_out();
 	}
 }
@@ -57,9 +58,9 @@ matrix::matrix( const matrix &m_in )
 {
 	if( nr && nc )
 	{
-		auto handler_old = set_new_handler(matrixAlloc);
+		auto handler_old = std::set_new_handler(matrixAlloc);
 		c = new double[nr*nc];
-		set_new_handler(handler_old);
+		std::set_new_handler(handler_old);
 		memcpy( c, m_in.c, nr*nc*sizeof(double) );
 	}
 }
@@ -135,16 +136,16 @@ void matrix::create( const int nrow, const int ncol, const bool flag_zero )
 			if( size!=nr*nc )
 			{
 				delete[] c;
-				auto handler_old = set_new_handler(matrixAlloc);			
+				auto handler_old = std::set_new_handler(matrixAlloc);			
 				c = new double[size];
-				set_new_handler(handler_old);
+				std::set_new_handler(handler_old);
 			}
 		}
 		else
 		{
-			auto handler_old = set_new_handler(matrixAlloc);
+			auto handler_old = std::set_new_handler(matrixAlloc);
 			c = new double[nrow * ncol];
-			set_new_handler(handler_old);
+			std::set_new_handler(handler_old);
 		}			
 			
 		nr = nrow;
@@ -363,6 +364,7 @@ double mdot(const matrix &A, const matrix &B)
     return sum;
 }
 
+/*
 // Peize Lin add 2016-09-08
 std::ostream & operator<<( std::ostream & os, const matrix & m )
 {
@@ -370,13 +372,31 @@ std::ostream & operator<<( std::ostream & os, const matrix & m )
 	{
 		for( int ic=0; ic!=m.nc; ++ic )
 		{
-			if(abs(m(ir,ic))>1E-10)
+			if(std::abs(m(ir,ic))>1E-10)
 				os<<m(ir,ic)<<"\t";
 			else
 				os<<0<<"\t";
 		}
 		os<<std::endl;
 	}	
+	return os;
+}
+*/
+
+// Peize Lin add 2021.09.08
+std::ostream & matrix::print( std::ostream & os, const double threshold ) const
+{
+	for( int ir=0; ir!=this->nr; ++ir )
+	{
+		for( int ic=0; ic!=this->nc; ++ic )
+		{
+			if(std::abs((*this)(ir,ic))>threshold)
+				os<<(*this)(ir,ic)<<"\t";
+			else
+				os<<0<<"\t";
+		}
+		os<<std::endl;
+	}
 	return os;
 }
 
@@ -427,4 +447,6 @@ double matrix::norm() const
 #else
 	return LapackConnector::nrm2(nr*nc,c,1);
 #endif
+}
+
 }

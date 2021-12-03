@@ -3,13 +3,16 @@
 #include "../module_base/math_ylmreal.h"
 
 //calculate the nonlocal pseudopotential stress in PW
-void Stress_Func::stress_nl(matrix& sigma){
-	TITLE("Stress_Func","stres_nl");
-	timer::tick("Stress_Func","stres_nl");
+void Stress_Func::stress_nl(ModuleBase::matrix& sigma){
+	ModuleBase::TITLE("Stress_Func","stres_nl");
+	ModuleBase::timer::tick("Stress_Func","stres_nl");
 	
 	const int nkb = GlobalC::ppcell.nkb;
-	if(nkb == 0) return;
-
+	if(nkb == 0) 
+	{
+		ModuleBase::timer::tick("Stress_Func","stres_nl");
+		return;
+	}
 	double sigmanlc[3][3];
 	for(int l=0;l<3;l++)
 	{
@@ -68,7 +71,7 @@ void Stress_Func::stress_nl(matrix& sigma){
 				
 		get_dvnl2(vkb2,ik);
 
-		Vector3<double> qvec;
+		ModuleBase::Vector3<double> qvec;
 		double qvec0[3];
 				
 		for (int ipol = 0; ipol<3; ipol++)
@@ -214,7 +217,7 @@ void Stress_Func::stress_nl(matrix& sigma){
 	}//end symmetry
 	
 	//  this->print(GlobalV::ofs_running, "nonlocal stress", stresnl);
-	timer::tick("Stress_Func","stres_nl");
+	ModuleBase::timer::tick("Stress_Func","stres_nl");
 	return;
 }
  
@@ -225,7 +228,7 @@ void Stress_Func::get_dvnl1
 	const int ipol
 )
 {
-	if(GlobalV::test_pp) TITLE("Stress_Func","get_dvnl1");
+	if(GlobalV::test_pp) ModuleBase::TITLE("Stress_Func","get_dvnl1");
 
 	const int lmaxkb = GlobalC::ppcell.lmaxkb;
 	if(lmaxkb < 0)
@@ -236,13 +239,13 @@ void Stress_Func::get_dvnl1
 	const int npw = GlobalC::kv.ngk[ik];
 	const int nhm = GlobalC::ppcell.nhm;
 	int ig, ia, nb, ih;
-	matrix vkb1(nhm, npw);
+	ModuleBase::matrix vkb1(nhm, npw);
 	vkb1.zero_out();
 	double *vq = new double[npw];
 	const int x1= (lmaxkb + 1)*(lmaxkb + 1);
 
-	matrix dylm(x1, npw);
-	Vector3<double> *gk = new Vector3<double>[npw];
+	ModuleBase::matrix dylm(x1, npw);
+	ModuleBase::Vector3<double> *gk = new ModuleBase::Vector3<double>[npw];
 	for (ig = 0;ig < npw;ig++)
 	{
 		gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
@@ -270,7 +273,7 @@ void Stress_Func::get_dvnl1
 				//cout << "\n gk[ig] = " << gk[ig].x << " " << gk[ig].y << " " << gk[ig].z;
 				//cout << "\n gk.norm = " << gnorm;
 
-				vq [ig] = PolyInt::Polynomial_Interpolation(
+				vq [ig] = ModuleBase::PolyInt::Polynomial_Interpolation(
 						GlobalC::ppcell.tab, it, nb, GlobalV::NQX, GlobalV::DQ, gnorm );
 
 			} // enddo
@@ -299,7 +302,7 @@ void Stress_Func::get_dvnl1
 			std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
 			for (ih = 0;ih < nh;ih++)
 			{
-				std::complex<double> pref = pow( NEG_IMAG_UNIT, GlobalC::ppcell.nhtol(it, ih));      //?
+				std::complex<double> pref = pow( ModuleBase::NEG_IMAG_UNIT, GlobalC::ppcell.nhtol(it, ih));      //?
 				for (ig = 0;ig < npw;ig++)
 				{
 					vkb(jkb, ig) = vkb1(ih, ig) * sk [ig] * pref;
@@ -317,8 +320,8 @@ void Stress_Func::get_dvnl1
 void Stress_Func::get_dvnl2(ModuleBase::ComplexMatrix &vkb,
 		const int ik)
 {
-	if(GlobalV::test_pp) TITLE("Stress","get_dvnl2");
-//	timer::tick("Stress","get_dvnl2");
+	if(GlobalV::test_pp) ModuleBase::TITLE("Stress","get_dvnl2");
+//	ModuleBase::timer::tick("Stress","get_dvnl2");
 
 	const int lmaxkb = GlobalC::ppcell.lmaxkb;
 	if(lmaxkb < 0)
@@ -329,17 +332,17 @@ void Stress_Func::get_dvnl2(ModuleBase::ComplexMatrix &vkb,
 	const int npw = GlobalC::kv.ngk[ik];
 	const int nhm = GlobalC::ppcell.nhm;
 	int ig, ia, nb, ih;
-	matrix vkb1(nhm, npw);
+	ModuleBase::matrix vkb1(nhm, npw);
 	double *vq = new double[npw];
 	const int x1= (lmaxkb + 1)*(lmaxkb + 1);
 
-	matrix ylm(x1, npw);
-	Vector3<double> *gk = new Vector3<double>[npw];
+	ModuleBase::matrix ylm(x1, npw);
+	ModuleBase::Vector3<double> *gk = new ModuleBase::Vector3<double>[npw];
 	for (ig = 0;ig < npw;ig++)
 	{
 		gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
 	}
-	YlmReal::Ylm_Real(x1, npw, gk, ylm);
+	ModuleBase::YlmReal::Ylm_Real(x1, npw, gk, ylm);
 
 	int jkb = 0;
 	for(int it = 0;it < GlobalC::ucell.ntype;it++)
@@ -385,7 +388,7 @@ void Stress_Func::get_dvnl2(ModuleBase::ComplexMatrix &vkb,
 			std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
 			for (ih = 0;ih < nh;ih++)
 			{
-				std::complex<double> pref = pow( NEG_IMAG_UNIT, GlobalC::ppcell.nhtol(it, ih));      //?
+				std::complex<double> pref = pow( ModuleBase::NEG_IMAG_UNIT, GlobalC::ppcell.nhtol(it, ih));      //?
 				for (ig = 0;ig < npw;ig++)
 				{
 					vkb(jkb, ig) = vkb1(ih, ig) * sk [ig] * pref;
@@ -398,7 +401,7 @@ void Stress_Func::get_dvnl2(ModuleBase::ComplexMatrix &vkb,
 
 	delete [] gk;
 	delete [] vq;
-//	timer::tick("Stress","get_dvnl2");
+//	ModuleBase::timer::tick("Stress","get_dvnl2");
 
 	return;
 }
@@ -408,14 +411,14 @@ void Stress_Func::get_dvnl2(ModuleBase::ComplexMatrix &vkb,
 
 double Stress_Func::Polynomial_Interpolation_nl
 (
-    const realArray &table,
+    const ModuleBase::realArray &table,
     const int &dim1,
     const int &dim2,
     const double &table_interval,
     const double &x                             // input value
 )
 {
-//      timer::tick("Mathzone","Poly_Interpo_2");
+
 	assert(table_interval>0.0);
 	const double position = x  / table_interval;
 	const int iq = static_cast<int>(position);
@@ -430,15 +433,15 @@ double Stress_Func::Polynomial_Interpolation_nl
 			table(dim1, dim2, iq+2) * (+x1*x3-x0*x3-x0*x1) / 2.0 +
 			table(dim1, dim2, iq+3) * (+x1*x2-x0*x2-x0*x1) / 6.0 )/table_interval ;
 
-//      timer::tick("Mathzone","Poly_Interpo_2");
+
 	return y;
 }
 
 void Stress_Func::dylmr2 (
 	const int nylm,
 	const int ngy,
-	Vector3<double> *gk,
-	matrix &dylm,
+	ModuleBase::Vector3<double> *gk,
+	ModuleBase::matrix &dylm,
 	const int ipol)
 {
   //-----------------------------------------------------------------------
@@ -463,14 +466,14 @@ void Stress_Func::dylmr2 (
 	const double delta = 1e-6;
 	double *dg, *dgi;
 
-	matrix ylmaux;
+	ModuleBase::matrix ylmaux;
 	// dg is the finite increment for numerical derivation:
 	// dg = delta |G| = delta * sqrt(gg)
 	// dgi= 1 /(delta * sqrt(gg))
 	// gx = g +/- dg
 
 
-	Vector3<double> *gx = new Vector3<double> [ngy];
+	ModuleBase::Vector3<double> *gx = new ModuleBase::Vector3<double> [ngy];
 	 
 
 	dg = new double [ngy];
@@ -508,7 +511,7 @@ void Stress_Func::dylmr2 (
 	}
 	//$OMP END PARALLEL DO
 
-	YlmReal::Ylm_Real(nylm, ngy, gx, dylm);
+	ModuleBase::YlmReal::Ylm_Real(nylm, ngy, gx, dylm);
 	//$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(ig)
 	for(ig = 0;ig< ngy;ig++)
 	{
@@ -521,7 +524,7 @@ void Stress_Func::dylmr2 (
 	}
 	//$OMP END PARALLEL DO
 
-	YlmReal::Ylm_Real(nylm, ngy, gx, ylmaux);
+	ModuleBase::YlmReal::Ylm_Real(nylm, ngy, gx, ylmaux);
 
 
 	//  zaxpy ( - 1.0, ylmaux, 1, dylm, 1);

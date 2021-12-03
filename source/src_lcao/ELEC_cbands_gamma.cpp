@@ -13,8 +13,8 @@ ELEC_cbands_gamma::~ELEC_cbands_gamma(){};
 
 void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 {
-	TITLE("ELEC_cbands_gamma","cal_bands");
-	timer::tick("ELEC_cband_gamma","cal_bands");
+	ModuleBase::TITLE("ELEC_cbands_gamma","cal_bands");
+	ModuleBase::timer::tick("ELEC_cband_gamma","cal_bands");
 
 	assert(GlobalV::NSPIN == GlobalC::kv.nks);
 						
@@ -38,7 +38,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		
 		if(!uhm.init_s)
     	{
-    	    WARNING_QUIT("Hamilt_Linear::solve_using_cg","Need init S matrix firstly");
+    	    ModuleBase::WARNING_QUIT("Hamilt_Linear::solve_using_cg","Need init S matrix firstly");
     	}
 
 		//--------------------------------------------
@@ -73,7 +73,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		}
 
 		// SGO: sub_grid_operation
-		GlobalC::SGO.cal_totwfc();
+		//GlobalC::SGO.cal_totwfc(); //LiuXh modify 2021-09-06, clear memory, totwfc not used now
 
 		//--------------------------------------
 		// DIAG GROUP OPERATION HERE
@@ -82,7 +82,8 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		{
 			Diago_LCAO_Matrix DLM;
 			// the temperary array totwfc only have one spin direction.
-			DLM.solve_double_matrix(ik, GlobalC::SGO.totwfc[0], GlobalC::LOC.wfc_dm_2d.wfc_gamma[ik]);
+			//DLM.solve_double_matrix(ik, GlobalC::SGO.totwfc[0], GlobalC::LOC.wfc_dm_2d.wfc_gamma[ik]);
+			DLM.solve_double_matrix(ik, GlobalC::LOC.wfc_dm_2d.wfc_gamma[ik]); //LiuXh modify 2021-09-06, clear memory, totwfc not used now
 		}
 		else
 		{
@@ -90,7 +91,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 			GlobalV::ofs_running << " no diagonalization." << std::endl;
 #else
 			std::cout << " DCOLOR=" << GlobalV::DCOLOR << std::endl;
-			WARNING_QUIT("ELEC_cbands_gamma::cal_bands","no diagonalization");
+			ModuleBase::WARNING_QUIT("ELEC_cbands_gamma::cal_bands","no diagonalization");
 #endif
 
 		}
@@ -99,10 +100,10 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 #endif
 		// distribute the wave functions again.
 		// delete the function -- mohan 2021-02-09
-		GlobalC::SGO.dis_subwfc();
+		//GlobalC::SGO.dis_subwfc(); //LiuXh modify 2021-09-06, clear memory, totwfc and WFC_GAMMA not used now
 	}// end k points
 			
-	timer::tick("ELEC_cband_gamma","cal_bands");
+	ModuleBase::timer::tick("ELEC_cband_gamma","cal_bands");
 	return;	
 }
 

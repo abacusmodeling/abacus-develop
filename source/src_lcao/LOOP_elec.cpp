@@ -21,12 +21,14 @@
 #include "../src_ri/exx_opt_orb.h"
 #include "../src_pw/vdwd2.h"
 #include "../src_pw/vdwd3.h"
-
+#ifdef __DEEPKS
+#include "LCAO_descriptor.h"
+#endif
 
 void LOOP_elec::solve_elec_stru(const int &istep)
 {
-    TITLE("LOOP_elec","solve_elec_stru"); 
-    timer::tick("LOOP_elec","solve_elec_stru"); 
+    ModuleBase::TITLE("LOOP_elec","solve_elec_stru"); 
+    ModuleBase::timer::tick("LOOP_elec","solve_elec_stru"); 
 
 	// prepare HS matrices, prepare grid integral
 	this->set_matrix_grid();
@@ -35,22 +37,22 @@ void LOOP_elec::solve_elec_stru(const int &istep)
 	// do self-interaction calculations / nscf/ tddft, etc. 
 	this->solver(istep);
 
-    timer::tick("LOOP_elec","solve_elec_stru"); 
+    ModuleBase::timer::tick("LOOP_elec","solve_elec_stru"); 
 	return;
 }
 
 
 void LOOP_elec::set_matrix_grid(void)
 {
-    TITLE("LOOP_elec","set_matrix_grid"); 
-    timer::tick("LOOP_elec","set_matrix_grid"); 
+    ModuleBase::TITLE("LOOP_elec","set_matrix_grid"); 
+    ModuleBase::timer::tick("LOOP_elec","set_matrix_grid"); 
 
 	// (1) Find adjacent atoms for each atom.
 	GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
 		GlobalV::ofs_running,
 		GlobalV::OUT_LEVEL,
 		GlobalC::ORB.get_rcutmax_Phi(), 
-		GlobalC::ORB.get_rcutmax_Beta(), 
+		GlobalC::ucell.infoNL.get_rcutmax_Beta(), 
 		GlobalV::GAMMA_ONLY_LOCAL);
 
 	atom_arrange::search(
@@ -83,21 +85,21 @@ void LOOP_elec::set_matrix_grid(void)
 		GlobalC::LNNR.cal_nnrg(GlobalC::GridT);
 	}
 
-    timer::tick("LOOP_elec","set_matrix_grid"); 
+    ModuleBase::timer::tick("LOOP_elec","set_matrix_grid"); 
 	return;
 }
 
 
 void LOOP_elec::before_solver(const int &istep)
 {
-    TITLE("LOOP_elec","before_solver"); 
-    timer::tick("LOOP_elec","before_solver"); 
+    ModuleBase::TITLE("LOOP_elec","before_solver"); 
+    ModuleBase::timer::tick("LOOP_elec","before_solver"); 
 
 	// set the augmented orbitals index.
 	// after ParaO and GridT, 
 	// this information is used to calculate
 	// the force.
-	GlobalC::LOWF.set_trace_aug(GlobalC::GridT);
+	GlobalC::LOWF.set_trace_aug(GlobalC::GridT); //LiuXh modify 2021-09-06, clear memory, WFC_GAMMA_aug not used now
 
 	// init density kernel and wave functions.
 	GlobalC::LOC.allocate_dm_wfc(GlobalC::GridT);
@@ -143,16 +145,30 @@ void LOOP_elec::before_solver(const int &istep)
 
 
 	// (9) compute S, T, Vnl, Vna matrix.
-	GlobalC::UHM.set_lcao_matrices();
+    GlobalC::UHM.set_lcao_matrices();
+    
+#ifdef __DEEPKS
+	//init deepks
+	if (GlobalV::out_descriptor)
+	{
+		GlobalC::ld.init(GlobalC::ORB.get_lmax_d(), GlobalC::ORB.get_nchimax_d(), GlobalC::ucell.nat * GlobalC::ORB.Alpha[0].getTotal_nchi());
+		GlobalC::ld.build_S_descriptor(0);  //init overlap table
+		if (GlobalV::deepks_scf)
+		{
+			//load a model
+			GlobalC::ld.deepks_pre_scf(INPUT.model_file);	//caoyu add 2021-07-26
+		}
+	}
+#endif
 
-    timer::tick("LOOP_elec","before_solver"); 
+    ModuleBase::timer::tick("LOOP_elec","before_solver"); 
 	return;
 }
 
 void LOOP_elec::solver(const int &istep)
 {
-    TITLE("LOOP_elec","solver"); 
-    timer::tick("LOOP_elec","solver"); 
+    ModuleBase::TITLE("LOOP_elec","solver"); 
+    ModuleBase::timer::tick("LOOP_elec","solver"); 
 
 	// self consistent calculations for electronic ground state
 	if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md"
@@ -229,10 +245,10 @@ void LOOP_elec::solver(const int &istep)
 	}
 	else
 	{
-		WARNING_QUIT("LOOP_elec::solver","CALCULATION type not supported");
+		ModuleBase::WARNING_QUIT("LOOP_elec::solver","CALCULATION type not supported");
 	}
 
-    timer::tick("LOOP_elec","solver"); 
+    ModuleBase::timer::tick("LOOP_elec","solver"); 
 	return;
 }
 

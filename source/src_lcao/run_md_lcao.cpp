@@ -19,7 +19,7 @@
 
 Run_MD_LCAO::Run_MD_LCAO()
 {
-    force=new Vector3<double>[GlobalC::ucell.nat];
+    force=new ModuleBase::Vector3<double>[GlobalC::ucell.nat];
 }
 
 Run_MD_LCAO::~Run_MD_LCAO() 
@@ -30,7 +30,7 @@ Run_MD_LCAO::~Run_MD_LCAO()
 
 void Run_MD_LCAO::opt_cell(void)
 {
-	TITLE("Run_MD_LCAO","opt_cell");
+	ModuleBase::TITLE("Run_MD_LCAO","opt_cell");
 
     // Initialize the local wave functions.
     // npwx, eigenvalues, and weights
@@ -60,8 +60,8 @@ void Run_MD_LCAO::opt_cell(void)
 
 void Run_MD_LCAO::opt_ions(void)
 {
-    TITLE("Run_MD_LCAO","opt_ions"); 
-    timer::tick("Run_MD_LCAO","opt_ions"); 
+    ModuleBase::TITLE("Run_MD_LCAO","opt_ions"); 
+    ModuleBase::timer::tick("Run_MD_LCAO","opt_ions"); 
 		
     if(GlobalV::OUT_LEVEL=="i")
     {
@@ -158,7 +158,7 @@ void Run_MD_LCAO::opt_ions(void)
         }
         else
         {
-            WARNING_QUIT("opt_ions", "mdtype should be -1~2!");
+            ModuleBase::WARNING_QUIT("opt_ions", "mdtype should be -1~2!");
         }
 
         if(GlobalC::pot.out_potential == 2)
@@ -202,11 +202,11 @@ void Run_MD_LCAO::opt_ions(void)
             std::cout << std::setiosflags(ios::scientific)
             << " " << std::setw(7) << ss.str()
             << std::setw(5) << ELEC_scf::iter
-            << std::setw(18) << std::setprecision(6) << GlobalC::en.etot * Ry_to_eV;
+            << std::setw(18) << std::setprecision(6) << GlobalC::en.etot * ModuleBase::Ry_to_eV;
 
             std::cout << std::setprecision(2) << std::setiosflags(ios::scientific)
-            << std::setw(10) << IMM.get_ediff() * Ry_to_eV * 1000
-            << std::setw(10) << IMM.get_largest_grad() * Ry_to_eV / BOHR_TO_A;
+            << std::setw(10) << IMM.get_ediff() * ModuleBase::Ry_to_eV * 1000
+            << std::setw(10) << IMM.get_largest_grad() * ModuleBase::Ry_to_eV / ModuleBase::BOHR_TO_A;
 
             std::cout << std::resetiosflags(ios::scientific)
             << std::setprecision(2) << std::setw(10) << etime_min + ftime_min;
@@ -222,15 +222,15 @@ void Run_MD_LCAO::opt_ions(void)
 	}
 
 	// mohan update 2021-02-10
-    GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, INPUT.out_descriptor);
+    GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
 
-    timer::tick("Run_MD_LCAO","opt_ions"); 
+    ModuleBase::timer::tick("Run_MD_LCAO","opt_ions"); 
     return;
 }
 
 void Run_MD_LCAO::final_scf(void)
 {
-    TITLE("Run_MD_LCAO","final_scf"); 
+    ModuleBase::TITLE("Run_MD_LCAO","final_scf"); 
 
     GlobalV::FINAL_SCF = true;
 
@@ -240,7 +240,7 @@ void Run_MD_LCAO::final_scf(void)
 		GlobalV::ofs_running, 
 		GlobalV::OUT_LEVEL, 
 		GlobalC::ORB.get_rcutmax_Phi(), 
-		GlobalC::ORB.get_rcutmax_Beta(), 
+		GlobalC::ucell.infoNL.get_rcutmax_Beta(), 
 		GlobalV::GAMMA_ONLY_LOCAL);
 
     atom_arrange::search(
@@ -309,16 +309,16 @@ void Run_MD_LCAO::final_scf(void)
 
     GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
     GlobalV::ofs_running << std::setprecision(16);
-    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl; 
+    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl; 
     GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
     return;
 }
 
-void Run_MD_LCAO::callInteraction_LCAO(const int& numIon, Vector3<double>* force, matrix& stress_lcao)
+void Run_MD_LCAO::callInteraction_LCAO(const int& numIon, ModuleBase::Vector3<double>* force, ModuleBase::matrix& stress_lcao)
 {
 //to call the force of each atom
-	matrix fcs;//temp force matrix
+	ModuleBase::matrix fcs;//temp force matrix
 	Force_Stress_LCAO FSL;
 	FSL.allocate (); 
 	FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS, GlobalV::TEST_FORCE, GlobalV::TEST_STRESS, fcs, stress_lcao);

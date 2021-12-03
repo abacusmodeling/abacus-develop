@@ -12,12 +12,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <vector>
-
+#include <sstream>
 Input INPUT;
 
 void Input::Init(const std::string &fn)
 {
-	timer::tick("Input","Init");
+	ModuleBase::timer::tick("Input","Init");
     this->Default();
 
     bool success = this->Read(fn);
@@ -29,7 +29,7 @@ void Input::Init(const std::string &fn)
 #endif
 	if(input_error ==1 )
 	{
-		WARNING_QUIT("Input","Bad parameter, please check the input parameters in file INPUT");
+		ModuleBase::WARNING_QUIT("Input","Bad parameter, please check the input parameters in file INPUT");
 	}
 
 #ifdef __MPI
@@ -37,7 +37,7 @@ void Input::Init(const std::string &fn)
 #endif
 	if(!success)
 	{
-		WARNING_QUIT("Input::Init","Error during readin parameters.");
+		ModuleBase::WARNING_QUIT("Input::Init","Error during readin parameters.");
 	}
 #ifdef __MPI
     Bcast();
@@ -67,11 +67,11 @@ void Input::Init(const std::string &fn)
 	//GlobalV::ofs_running << "    Version: Parallel, under ALPHA test" << std::endl;
     GlobalV::ofs_running << "    Version: Parallel, in development" << std::endl;
 	GlobalV::ofs_running << "    Processor Number is " << GlobalV::NPROC << std::endl;
-	TITLE("Input","init");
-	TITLE("Input","Bcast");
+	ModuleBase::TITLE("Input","init");
+	ModuleBase::TITLE("Input","Bcast");
 #else
 	GlobalV::ofs_running << "    This is SERIES version." << std::endl;
-	TITLE("Input","init");
+	ModuleBase::TITLE("Input","init");
 #endif
     	GlobalV::ofs_running << "    Start Time is " << ctime(&time_now);
 	GlobalV::ofs_running << "                                                                                     " << std::endl;
@@ -88,13 +88,13 @@ void Input::Init(const std::string &fn)
 
 	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"pseudo_type", pseudo_type); // mohan add 2013-05-20 (xiaohui add 2013-06-23, GlobalV::global_pseudo_type -> pseudo_type)
 
-	timer::tick("Input","Init");
+	ModuleBase::timer::tick("Input","Init");
     return;
 }
 
 void Input::Default(void)
 {
-    TITLE("Input","Default");
+    ModuleBase::TITLE("Input","Default");
 //----------------------------------------------------------
 // main parameters
 //----------------------------------------------------------
@@ -118,7 +118,7 @@ void Input::Default(void)
     nbands = 0;
 	nbands_sto = 0;
 	nbands_istate = 5;
-	seed = 0;
+	seed = 1;
 	nche_sto = 0;
 	seed_sto = 0;
 	stotype = "pw";
@@ -178,6 +178,7 @@ void Input::Default(void)
 	trust_radius_max = 0.8; // bohr
 	trust_radius_min = 1e-5;
 	trust_radius_ini = 0.5; //bohr
+	nbspline = -1;
 //----------------------------------------------------------
 // ecutwfc
 //----------------------------------------------------------
@@ -220,7 +221,7 @@ void Input::Default(void)
 //----------------------------------------------------------
     dr2 = 1.0e-9;
     niter = 40;
-    nstep = 1;
+    this->nstep = 0;
 	out_stru = 0;
 //----------------------------------------------------------
 // occupation
@@ -252,6 +253,7 @@ void Input::Default(void)
 
     out_potential = 0;
     out_wf = 0;
+    out_wf_r = 0;
 	out_dos = 0;
     out_band = 0;
 	out_hs = 0;
@@ -264,6 +266,7 @@ void Input::Default(void)
 	dos_edelta_ev = 0.01;//(ev)
 	dos_scale = 0.01;
     b_coef = 0.07;
+	out_element_info = false;
 //----------------------------------------------------------
 // LCAO
 //----------------------------------------------------------
@@ -306,7 +309,7 @@ void Input::Default(void)
 	vdwD2_R0_unit="A";
 	vdwD2_model="radius";
 	vdwD2_period = {3,3,3};
-	vdwD2_radius=30.0/BOHR_TO_A;
+	vdwD2_radius=30.0/ModuleBase::BOHR_TO_A;
 	vdwD2_radius_unit="Bohr"; */
 
 //----------------------------------------------------------
@@ -475,7 +478,7 @@ void Input::Default(void)
 
 bool Input::Read(const std::string &fn)
 {
-    TITLE("Input","Read");
+    ModuleBase::TITLE("Input","Read");
 
     if (GlobalV::MY_RANK!=0) return false;
 
@@ -515,7 +518,6 @@ bool Input::Read(const std::string &fn)
     }
 
     ifs.rdstate();
-
     while (ifs.good())
     {
         ifs >> word1;
@@ -573,13 +575,13 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, ntype);
 			if (ntype <= 0)
-				WARNING_QUIT("Input", "ntype must > 0");
+				ModuleBase::WARNING_QUIT("Input", "ntype must > 0");
 		}
         else if (strcmp("nbands", word) == 0)// number of atom bands
         {
             read_value(ifs, nbands);
 			if (nbands <= 0)
-				WARNING_QUIT("Input", "NBANDS must > 0");
+				ModuleBase::WARNING_QUIT("Input", "NBANDS must > 0");
 		}
 		else if (strcmp("nbands_sto", word) == 0)//number of stochastic bands
         {
@@ -590,7 +592,7 @@ bool Input::Read(const std::string &fn)
             read_value(ifs, nbands_istate);
 			// Originally disabled in line 2401.
 			// if (nbands_istate < 0)
-			// 	WARNING_QUIT("Input", "NBANDS_ISTATE must > 0");
+			// 	ModuleBase::WARNING_QUIT("Input", "NBANDS_ISTATE must > 0");
 		}
 		else if (strcmp("nche_sto", word) == 0)// Chebyshev expansion order
         {
@@ -893,7 +895,7 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, nb2d);
 			if (nb2d < 0)
-				WARNING_QUIT("Input", "nb2d must > 0");
+				ModuleBase::WARNING_QUIT("Input", "nb2d must > 0");
 		}
         else if (strcmp("nurse", word) == 0)
         {
@@ -902,6 +904,10 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("colour", word) == 0)
         {
             read_value(ifs, colour);
+        }
+		else if (strcmp("nbspline", word) == 0)
+        {
+            read_value(ifs, nbspline);
         }
         else if (strcmp("t_in_h", word) == 0)
         {
@@ -948,7 +954,7 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("nstep", word) == 0)
         {
-            read_value(ifs, nstep);
+            read_value(ifs, this->nstep);
         }
         else if (strcmp("out_stru", word) == 0)
         {
@@ -1062,6 +1068,10 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, out_wf);
         }
+        else if (strcmp("out_wf_r", word) == 0)
+        {
+            read_value(ifs, out_wf_r);
+        }
 		//mohan add 20090909
         else if (strcmp("out_dos", word) == 0)
         {
@@ -1092,6 +1102,10 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("out_alllog", word) == 0)
         {
             read_value(ifs, out_alllog);
+        }
+		else if (strcmp("out_element_info", word) == 0)
+        {
+            read_value(ifs, out_element_info);
         }
         else if (strcmp("dos_emin_ev", word) == 0)
         {
@@ -1257,18 +1271,19 @@ bool Input::Read(const std::string &fn)
 //----------------------------------------------------------
 		else if (strcmp("rcut_lj",word) == 0)
 		{
-			read_value(ifs,mdp.rcut_lj );
-			mdp.rcut_lj*=ANGSTROM_AU;
+			read_value(ifs, mdp.rcut_lj);
 		}
 		else if (strcmp("epsilon_lj",word) == 0)
 		{
-			read_value(ifs,mdp.epsilon_lj );
-			mdp.epsilon_lj/=Ry_to_eV;
+			read_value(ifs, mdp.epsilon_lj);
 		}
 		else if (strcmp("sigma_lj",word) == 0)
 		{
-			read_value(ifs,mdp.sigma_lj );
-			mdp.sigma_lj*=ANGSTROM_AU;
+			read_value(ifs, mdp.sigma_lj);
+		}
+		else if (strcmp("md_potential",word) == 0)
+		{
+			read_value(ifs, mdp.md_potential);
 		}
 //----------------------------------------------------------
 // tddft
@@ -1713,7 +1728,7 @@ bool Input::Read(const std::string &fn)
 		{
 			read_value(ifs, soc_lambda);
 		}
-		else if (strcmp("angle1", word) == 0)
+/*		else if (strcmp("angle1", word) == 0)
 		{
 			angle1.resize(ntype);
 			for(auto &i:angle1)
@@ -1724,7 +1739,7 @@ bool Input::Read(const std::string &fn)
 			angle2.resize(ntype);
 			for (auto &i : angle2)
 				read_value(ifs, i);
-		}
+		}*/
         //else if (strcmp("epsilon0_choice", word) == 0)
         //{
         //    read_value(ifs, epsilon0_choice);
@@ -1741,6 +1756,82 @@ bool Input::Read(const std::string &fn)
 		{
 			read_value(ifs, test_just_neighbor);
 		}
+//---------------
+//start magnetic
+/*
+#ifndef __CMD
+		else if (strcmp("magmom", word) == 0)
+		{
+			n_mag_at=0;
+			stringstream sstr;
+			string s;
+			getline(ifs,s);
+			sstr.str(s);
+			int tmplength=s.length();
+    		int at_per_mag[tmplength];
+    		double mags[tmplength];
+    		int n_magmom=0;
+			s="";
+			//1 3*2 6*1 
+			while(sstr.good())
+			{
+				sstr>>s;
+				string s1;
+				string s2;
+				bool mul=0;// if this parameter is the form n*m
+				for(int i=0;i<s.size();i++)
+				{
+					if ((s[i]>='0'&& s[i]<='9') or s[i]=='.' or s[i]=='+' or s[i]=='-')
+					{
+						s1.push_back(s[i]);
+					} 
+					else if (s[i]=='*')
+					{
+						s2=s1;
+						s1="";
+						mul=true;
+					}
+					else
+					{
+						std::cout<<"Unrecognized character"<<s[i]<<"when reading start magnetism";
+						exit(0);
+					}
+				}
+				cout<<"s1 "<<s1<<" s2 "<<s2<<'h'<<n_mag_at<<"\n";
+				double mag=stoi(s1);
+				if(mul)
+				{
+					int num=stoi(s2);
+					mags[n_magmom]=mag;
+	    			at_per_mag[n_magmom]=num;
+					n_mag_at+=num;
+				}
+				else
+				{
+					mags[n_magmom]=mag;
+	    			at_per_mag[n_magmom]=1;
+					n_mag_at+=1;
+				}
+				n_magmom+=1;
+			}
+			atom_mag = new double[n_mag_at];
+			int n_m=0;// the n_m value of magmom
+			int n_n=0;//how many magmom has been defined
+			for(int i=0;i<n_mag_at;i++)
+			{
+				if (i-n_n>=at_per_mag[n_m])
+				{
+					n_n+=at_per_mag[n_m];
+					n_m+=1;
+				}
+				atom_mag[i]=mags[n_m];
+				cout<<"atom_mag"<<atom_mag[i];
+			}	
+	}
+
+#endif
+*/		
+//--------------
 //----------------------------------------------------------------------------------
 //         Xin Qu added on 2020-10-29 for DFT+U
 //----------------------------------------------------------------------------------
@@ -1861,7 +1952,7 @@ bool Input::Read(const std::string &fn)
 				for(int i=0; i<ntype; i++)
 				{
 					ifs >> hubbard_u[i];
-					hubbard_u[i] /= Ry_to_eV;
+					hubbard_u[i] /= ModuleBase::Ry_to_eV;
 				}
 			}
 			else if (strcmp("hund_j",word)==0)
@@ -1869,7 +1960,7 @@ bool Input::Read(const std::string &fn)
 				for(int i=0;i<ntype;i++)
 				{
 					ifs >> hund_j[i];
-					hund_j[i] /= Ry_to_eV;
+					hund_j[i] /= ModuleBase::Ry_to_eV;
 				}
 			}
 			else if(strcmp("orbital_corr", word)==0)
@@ -1928,9 +2019,9 @@ bool Input::Read(const std::string &fn)
 			exit(0);
 		}
 
-		if(strcmp("genelpa", ks_solver.c_str())!=0)
+		if(strcmp("genelpa", ks_solver.c_str())!=0 && strcmp(ks_solver.c_str(),"scalapack_gvx")!=0 )
 		{
-			std::cout << " WRONG ARGUMENTS OF ks_solver in DFT+U routine, only genelpa is support " << std::endl;
+			std::cout << " WRONG ARGUMENTS OF ks_solver in DFT+U routine, only genelpa and scalapack_gvx are supportted " << std::endl;
 			exit(0);
 		}
 
@@ -2108,7 +2199,7 @@ void Input::Default_2(void)          //jiyy add 2019-08-04
 #ifdef __MPI
 void Input::Bcast()
 {
-    TITLE("Input","Bcast");
+    ModuleBase::TITLE("Input","Bcast");
 
 //	std::cout << "\n Bcast()" << std::endl;
 //----------------------------------------------------------
@@ -2210,6 +2301,7 @@ void Input::Bcast()
 	Parallel_Common::bcast_int( nb2d );
 	Parallel_Common::bcast_int( nurse );
 	Parallel_Common::bcast_bool( colour );
+	Parallel_Common::bcast_int( nbspline );
 	Parallel_Common::bcast_int( t_in_h );
 	Parallel_Common::bcast_int( vl_in_h );
 	Parallel_Common::bcast_int( vnl_in_h );
@@ -2222,7 +2314,7 @@ void Input::Bcast()
 
     Parallel_Common::bcast_double( dr2 );
     Parallel_Common::bcast_int( niter );
-    Parallel_Common::bcast_int( nstep );
+    Parallel_Common::bcast_int( this->nstep );
 	Parallel_Common::bcast_int( out_stru ); //mohan add 2012-03-23
 
     //Parallel_Common::bcast_string( occupations );
@@ -2250,6 +2342,7 @@ void Input::Bcast()
 
 	Parallel_Common::bcast_int(out_potential);
     Parallel_Common::bcast_int( out_wf );
+    Parallel_Common::bcast_int( out_wf_r );
 	Parallel_Common::bcast_int( out_dos );
         Parallel_Common::bcast_int( out_band );
 	Parallel_Common::bcast_int( out_hs );
@@ -2257,6 +2350,7 @@ void Input::Bcast()
 	Parallel_Common::bcast_int( out_r_matrix ); // jingan add 2019-8-14
 	Parallel_Common::bcast_bool( out_lowf );
 	Parallel_Common::bcast_bool( out_alllog );
+	Parallel_Common::bcast_bool( out_element_info );
 
 	Parallel_Common::bcast_double( dos_emin_ev );
 	Parallel_Common::bcast_double( dos_emax_ev );
@@ -2306,6 +2400,7 @@ void Input::Bcast()
 		Parallel_Common::bcast_double(mdp.rcut_lj);
 		Parallel_Common::bcast_double(mdp.epsilon_lj);
 		Parallel_Common::bcast_double(mdp.sigma_lj);
+		Parallel_Common::bcast_string(mdp.md_potential);
 /* 	// Peize Lin add 2014-04-07
 	Parallel_Common::bcast_bool( vdwD2 );
 	Parallel_Common::bcast_double( vdwD2_scaling );
@@ -2493,12 +2588,12 @@ void Input::Bcast()
 
 void Input::Check(void)
 {
-    TITLE("Input","Check");
+    ModuleBase::TITLE("Input","Check");
 
-	if(nbands < 0) WARNING_QUIT("Input","NBANDS must > 0");
-//	if(nbands_istate < 0) WARNING_QUIT("Input","NBANDS_ISTATE must > 0");
-	if(nb2d < 0) WARNING_QUIT("Input","nb2d must > 0");
-	if(ntype <= 0) WARNING_QUIT("Input","ntype must > 0");
+	if(nbands < 0) ModuleBase::WARNING_QUIT("Input","NBANDS must > 0");
+//	if(nbands_istate < 0) ModuleBase::WARNING_QUIT("Input","NBANDS_ISTATE must > 0");
+	if(nb2d < 0) ModuleBase::WARNING_QUIT("Input","nb2d must > 0");
+	if(ntype <= 0) ModuleBase::WARNING_QUIT("Input","ntype must > 0");
 
 	//std::cout << "diago_proc=" << diago_proc << std::endl;
 	//std::cout << " NPROC=" << GlobalV::NPROC << std::endl;
@@ -2515,51 +2610,51 @@ void Input::Check(void)
 	//if(!local_basis && diago_type=="lapack") xiaohui modify 2013-09-01
 	//if(basis_type=="pw" && ks_solver=="lapack") xiaohui modify 2013-09-04 //xiaohui add 2013-09-01
 	//{
-	//	WARNING_QUIT("Input","lapack can not be used in plane wave basis.");
+	//	ModuleBase::WARNING_QUIT("Input","lapack can not be used in plane wave basis.");
 	//} xiaohui modify 2013-09-04
 
 	//xiaohui move 4 lines, 2015-09-30
 	//if(symmetry)
 	//{
-	//	WARNING("Input","symmetry is only correct for total energy calculations now,not for nonlocal force." );
+	//	ModuleBase::WARNING("Input","symmetry is only correct for total energy calculations now,not for nonlocal force." );
 	//}
 
     if (efield && symmetry)
     {
         symmetry = false;
-        WARNING_QUIT("Input","Presently no symmetry can be used with electric field");
+        ModuleBase::WARNING_QUIT("Input","Presently no symmetry can be used with electric field");
     }
 
     if (efield && nspin>2)
     {
-        WARNING_QUIT("Input","nspin>2 not available with electric field.");
+        ModuleBase::WARNING_QUIT("Input","nspin>2 not available with electric field.");
     }
 
 	if (edir < 1 || edir > 3)
 	{
-		WARNING_QUIT("Input","edir should be 1, 2 or 3.");
+		ModuleBase::WARNING_QUIT("Input","edir should be 1, 2 or 3.");
 	}
 
 	if (emaxpos < 0.0 || emaxpos >= 1.0)
 	{
-		WARNING_QUIT("Input","emaxpos should be [0,1)");
+		ModuleBase::WARNING_QUIT("Input","emaxpos should be [0,1)");
 	}
 
 	if (eopreg < 0.0 || eopreg >= 1.0)
 	{
-		WARNING_QUIT("Input","eopreg should be [0,1)");
+		ModuleBase::WARNING_QUIT("Input","eopreg should be [0,1)");
 	}
 
 
 
     if (nbands < 0)
     {
-        WARNING_QUIT("Input","nbands < 0 is not allowed !");
+        ModuleBase::WARNING_QUIT("Input","nbands < 0 is not allowed !");
     }
 
     if (nelec < 0.0)
     {
-        WARNING_QUIT("Input","nelec < 0 is not allowed !");
+        ModuleBase::WARNING_QUIT("Input","nelec < 0 is not allowed !");
     }
 
 //----------------------------------------------------------
@@ -2583,7 +2678,7 @@ void Input::Check(void)
 			std::cout<<"sorry, can't calculate force with soc now, would be implement in next version!"<<std::endl;
 		}
 */
-                nstep = 1;
+                this->nstep = 1;
 
     }
 	else if (calculation == "scf-sto")  // qianrui 2021-2-20
@@ -2593,6 +2688,7 @@ void Input::Check(void)
                         mem_saver = 0;
                         ModuleBase::GlobalFunc::AUTO_SET("mem_savre","0");
                 }
+				this->nstep = 1;
     }
     else if (calculation == "relax")  // pengfei 2014-10-13
     {
@@ -2602,12 +2698,13 @@ void Input::Check(void)
                         ModuleBase::GlobalFunc::AUTO_SET("mem_savre","0");
                 }
                 force = 1;
+				if(! this->nstep) this->nstep = 50;
     }
 
     else if (calculation == "nscf")
     {
 		GlobalV::CALCULATION = "nscf";
-        nstep = 1;
+        this->nstep = 1;
 		out_stru = 0;
 
 		//if (local_basis == 0 && linear_scaling == 0) xiaohui modify 2013-09-01
@@ -2625,13 +2722,13 @@ void Input::Check(void)
 		}
 		if (out_dos == 3 && symmetry)
 		{
-			WARNING_QUIT("Input::Check","symmetry can't be used for out_dos==3(Fermi Surface Plotting) by now.");
+			ModuleBase::WARNING_QUIT("Input::Check","symmetry can't be used for out_dos==3(Fermi Surface Plotting) by now.");
 		}
     }
 	else if(calculation == "istate")
 	{
 		GlobalV::CALCULATION = "istate";
-		nstep = 1;
+		this->nstep = 1;
 		out_stru = 0;
 		out_dos = 0;
                 out_band = 0;
@@ -2646,13 +2743,13 @@ void Input::Check(void)
 		//if(!local_basis || !linear_scaling) xiaohui modify 2013-09-01
 		if(basis_type == "pw") //xiaohui add 2013-09-01
 		{
-			WARNING_QUIT("Input::Check","calculate = istate is only availble for LCAO.");
+			ModuleBase::WARNING_QUIT("Input::Check","calculate = istate is only availble for LCAO.");
 		}
 	}
 	else if(calculation == "ienvelope")
 	{
 		GlobalV::CALCULATION = "ienvelope"; // mohan fix 2011-11-04
-		nstep = 1;
+		this->nstep = 1;
 		out_stru = 0;
 		out_dos = 0;
                 out_band = 0;
@@ -2666,7 +2763,7 @@ void Input::Check(void)
 		//if(!local_basis || !linear_scaling) xiaohui modify 2013-09-01
 		if(basis_type == "pw") //xiaohui add 2013-09-01
 		{
-			WARNING_QUIT("Input::Check","calculate = istate is only availble for LCAO.");
+			ModuleBase::WARNING_QUIT("Input::Check","calculate = istate is only availble for LCAO.");
 		}
 	}
 	else if(calculation == "md") // mohan add 2011-11-04
@@ -2674,12 +2771,16 @@ void Input::Check(void)
 		GlobalV::CALCULATION = "md";
 		symmetry = false;
 		force = 1;
+		if(this->nstep==0){
+			GlobalV::ofs_running<<"nstep should be set. Autoset nstep to 50!"<<endl;
+			this->nstep = 50;
+		}
         if(!out_md_control) out_level = "m";//zhengdy add 2019-04-07
 
         //deal with input parameters , 2019-04-30
-        //if(basis_type == "pw" ) WARNING_QUIT("Input::Check","calculate = MD is only availble for LCAO.");
-        if(mdp.dt < 0) WARNING_QUIT("Input::Check","time interval of MD calculation should be set!");
-        if(mdp.tfirst < 0) WARNING_QUIT("Input::Check","temperature of MD calculation should be set!");
+        //if(basis_type == "pw" ) ModuleBase::WARNING_QUIT("Input::Check","calculate = MD is only availble for LCAO.");
+        if(mdp.dt < 0) ModuleBase::WARNING_QUIT("Input::Check","time interval of MD calculation should be set!");
+        if(mdp.tfirst < 0) ModuleBase::WARNING_QUIT("Input::Check","temperature of MD calculation should be set!");
         if(mdp.tlast  < 0.0) mdp.tlast = mdp.tfirst;
         if(mdp.tfirst!=mdp.tlast)
         {
@@ -2704,35 +2805,37 @@ void Input::Check(void)
 	{
 		force = 1;
 		stress = 1;
+		if(! this->nstep) this->nstep = 50;
 	}
 	else if(calculation == "test")
 	{
+		this->nstep = 1;
 	}
     else
     {
-        WARNING_QUIT("Input","check 'calculation' !");
+        ModuleBase::WARNING_QUIT("Input","check 'calculation' !");
     }
     if (start_pot != "atomic" && start_pot != "file")
     {
-        WARNING_QUIT("Input","wrong 'start_pot',not 'atomic', 'file',please check");
+        ModuleBase::WARNING_QUIT("Input","wrong 'start_pot',not 'atomic', 'file',please check");
     }
 	//xiaohui modify 2014-05-10, extra_pot value changes to 0~7
 	//if (extra_pot <0 ||extra_pot > 7)
 	//{
-	//	WARNING_QUIT("Input","wrong 'extra_pot',neither 0~7.");
+	//	ModuleBase::WARNING_QUIT("Input","wrong 'extra_pot',neither 0~7.");
 	//}xiaohui modify 2015-02-01
 	if(gamma_only_local==0)
 	{
 		if(out_dm==1)
 		{
-			WARNING_QUIT("Input","out_dm with k-point algorithm is not implemented yet.");
+			ModuleBase::WARNING_QUIT("Input","out_dm with k-point algorithm is not implemented yet.");
 		}
 	}
 
 	//if(extra_pot==4 && local_basis==0) xiaohui modify 2013-09-01
 	if(charge_extrap=="dm" && basis_type=="pw") //xiaohui add 2013-09-01, xiaohui modify 2015-02-01
 	{
-		WARNING_QUIT("Input","wrong 'charge_extrap=dm' is only available for local orbitals.");//xiaohui modify 2015-02-01
+		ModuleBase::WARNING_QUIT("Input","wrong 'charge_extrap=dm' is only available for local orbitals.");//xiaohui modify 2015-02-01
 	}
 
 	if(charge_extrap=="dm" || force>1)
@@ -2760,20 +2863,20 @@ void Input::Check(void)
     if (start_wfc != "atomic" && start_wfc != "atomic+random" && start_wfc != "random" &&
             start_wfc != "file")
     {
-        WARNING_QUIT("Input","wrong start_wfc, please use 'atomic' or 'random' or 'file' ");
+        ModuleBase::WARNING_QUIT("Input","wrong start_wfc, please use 'atomic' or 'random' or 'file' ");
     }
 
     if (nbands > 100000)
     {
-        WARNING_QUIT("Input","nbnd >100000, out of range");
+        ModuleBase::WARNING_QUIT("Input","nbnd >100000, out of range");
     }
     if ( nelec > 0 && nbands > 0 && nelec > 2*nbands )
     {
-        WARNING_QUIT("Input","nelec > 2*nbnd , bands not enough!");
+        ModuleBase::WARNING_QUIT("Input","nelec > 2*nbnd , bands not enough!");
     }
     if (nspin < 1  || nspin > 4)
     {
-        WARNING_QUIT("Input","nspin out of range!");
+        ModuleBase::WARNING_QUIT("Input","nspin out of range!");
     }
 
 
@@ -2794,27 +2897,27 @@ void Input::Check(void)
 		}
 		else if(ks_solver=="genelpa") //yshen add 2016-07-20
 		{
-			WARNING_QUIT("Input","genelpa can not be used with plane wave basis.");
+			ModuleBase::WARNING_QUIT("Input","genelpa can not be used with plane wave basis.");
 		}
 		else if(ks_solver=="scalapack_gvx") //Peize Lin add 2020.11.14
 		{
-			WARNING_QUIT("Input","scalapack_gvx can not be used with plane wave basis.");
+			ModuleBase::WARNING_QUIT("Input","scalapack_gvx can not be used with plane wave basis.");
 		}
 		else if(ks_solver=="hpseps")
 		{
-			WARNING_QUIT("Input","hpseps can not be used with plane wave basis."); //xiaohui add 2013-09-04
+			ModuleBase::WARNING_QUIT("Input","hpseps can not be used with plane wave basis."); //xiaohui add 2013-09-04
 		}
 		else if(ks_solver=="selinv")
 		{
-			WARNING_QUIT("Input","selinv can not be used with plane wave basis."); //xiaohui add 2013-09-04
+			ModuleBase::WARNING_QUIT("Input","selinv can not be used with plane wave basis."); //xiaohui add 2013-09-04
 		}
 		else if(ks_solver=="lapack")
 		{
-			WARNING_QUIT("Input","lapack can not be used with plane wave basis.");
+			ModuleBase::WARNING_QUIT("Input","lapack can not be used with plane wave basis.");
 		}
 		else
 		{
-			WARNING_QUIT("Input","please check the ks_solver parameter!");
+			ModuleBase::WARNING_QUIT("Input","please check the ks_solver parameter!");
 		}
 	}
 	else if(basis_type=="lcao")
@@ -2826,14 +2929,14 @@ void Input::Check(void)
 			}
 			else if (ks_solver == "cg")
 			{
-				WARNING_QUIT("Input","not ready for cg method in lcao ."); //xiaohui add 2013-09-04
+				ModuleBase::WARNING_QUIT("Input","not ready for cg method in lcao ."); //xiaohui add 2013-09-04
 			}
 			else if (ks_solver == "genelpa")
 			{
 #ifdef __MPI
 //				GlobalV::ofs_warning << "genelpa is under testing" << std::endl;
 #else
-				WARNING_QUIT("Input","genelpa can not be used for series version.");
+				ModuleBase::WARNING_QUIT("Input","genelpa can not be used for series version.");
 #endif
             }
 			else if (ks_solver == "scalapack_gvx")
@@ -2841,54 +2944,54 @@ void Input::Check(void)
 #ifdef __MPI
 				GlobalV::ofs_warning << "scalapack_gvx is under testing" << std::endl;
 #else
-				WARNING_QUIT("Input","scalapack_gvx can not be used for series version.");
+				ModuleBase::WARNING_QUIT("Input","scalapack_gvx can not be used for series version.");
 #endif
             }
 			else if (ks_solver == "hpseps")
 			{
 #ifdef __MPI
 				GlobalV::ofs_warning << "It's not a good choice to use hpseps!" << std::endl;
-				if(gamma_only) WARNING_QUIT("Input","hpseps can not be used for gamma_only.");
+				if(gamma_only) ModuleBase::WARNING_QUIT("Input","hpseps can not be used for gamma_only.");
 #else
-				WARNING_QUIT("Input","hpseps can not be used for series version.");
+				ModuleBase::WARNING_QUIT("Input","hpseps can not be used for series version.");
 #endif
 			}
 			else if (ks_solver == "lapack")
 			{
 #ifdef __MPI
-				WARNING_QUIT("Input","ks_solver=lapack is not an option for parallel version of ABACUS (try hpseps).");
+				ModuleBase::WARNING_QUIT("Input","ks_solver=lapack is not an option for parallel version of ABACUS (try hpseps).");
 #else
 				GlobalV::ofs_warning << " It's ok to use lapack." << std::endl;
 #endif
 			}
 			else if (ks_solver == "selinv")
 			{
-				WARNING_QUIT("Input","not ready for selinv method in lcao .");
+				ModuleBase::WARNING_QUIT("Input","not ready for selinv method in lcao .");
 			}
 			else if(ks_solver == "linear_scaling")
 			{
-				WARNING_QUIT("Input","not ready for linear_scaling method in lcao .");
+				ModuleBase::WARNING_QUIT("Input","not ready for linear_scaling method in lcao .");
 			}
 			else
 			{
-				WARNING_QUIT("Input","please check the ks_solver parameter!");
+				ModuleBase::WARNING_QUIT("Input","please check the ks_solver parameter!");
 			}
 	}
 	else if(basis_type=="lcao_in_pw")
 	{
 		if( ks_solver != "lapack" )
 		{
-			WARNING_QUIT("Input","LCAO in plane wave can only done with lapack.");
+			ModuleBase::WARNING_QUIT("Input","LCAO in plane wave can only done with lapack.");
 		}
 	}
 	else
 	{
-		WARNING_QUIT("Input","please check the basis_type parameter!");
+		ModuleBase::WARNING_QUIT("Input","please check the basis_type parameter!");
 	}
 
 	if(basis_type=="pw" && gamma_only)
 	{
-		WARNING_QUIT("Input","gamma_only not implemented for plane wave now.");
+		ModuleBase::WARNING_QUIT("Input","gamma_only not implemented for plane wave now.");
 	}
 
 	if(basis_type=="pw" || basis_type=="lcao_in_pw")
@@ -2903,7 +3006,7 @@ void Input::Check(void)
 
 	if(basis_type=="lcao" && !gamma_only_local) //xiaohui add 2013-09-01. Attention! Maybe there is some problem.
 	{
-		WARNING("Input","gamma_only_local algorithm is not used.");
+		ModuleBase::WARNING("Input","gamma_only_local algorithm is not used.");
 	}
 
 	// new rule, mohan add 2012-02-11
@@ -2913,7 +3016,7 @@ void Input::Check(void)
 	{
 		if(diago_proc!=GlobalV::NPROC)
 		{
-			WARNING("Input","when CG is used for diago, diago_proc==GlobalV::NPROC");
+			ModuleBase::WARNING("Input","when CG is used for diago, diago_proc==GlobalV::NPROC");
 			diago_proc=GlobalV::NPROC;
 		}
 	}
@@ -2927,19 +3030,19 @@ void Input::Check(void)
 		}
 		else
 		{
-			WARNING_QUIT("Input","lapack can not be used when nproc > 1");
+			ModuleBase::WARNING_QUIT("Input","lapack can not be used when nproc > 1");
 		}
 	}
 
 	// pengfei add 13-8-10 a new method cg to bfgs
 	if(ion_dynamics!= "sd" && ion_dynamics!="cg" && ion_dynamics!="bfgs" && ion_dynamics!="cg_bfgs")
 	{
-		 WARNING_QUIT("Input","ion_dynamics can only be sd, cg, bfgs or cg_bfgs.");
+		 ModuleBase::WARNING_QUIT("Input","ion_dynamics can only be sd, cg, bfgs or cg_bfgs.");
 	}
 
 	if(opt_epsilon2==true && opt_nbands==0)
 	{
-		WARNING_QUIT("Input","please Input the opt_nbands for optical properties calculations");
+		ModuleBase::WARNING_QUIT("Input","please Input the opt_nbands for optical properties calculations");
 	}
 
 	if(basis_type=="pw")
@@ -2950,15 +3053,15 @@ void Input::Check(void)
 	}
 	else if(bx>10)
 	{
-		WARNING_QUIT("Input","bx is too large!");
+		ModuleBase::WARNING_QUIT("Input","bx is too large!");
 	}
 	else if(by>10)
 	{
-		WARNING_QUIT("Input","by is too large!");
+		ModuleBase::WARNING_QUIT("Input","by is too large!");
 	}
 	else if(bz>10)
 	{
-		WARNING_QUIT("Input","bz is too large!");
+		ModuleBase::WARNING_QUIT("Input","bz is too large!");
 	}
 
 	if(basis_type=="lcao")
@@ -2976,41 +3079,41 @@ void Input::Check(void)
 	{
 		if( (vdw_C6_unit!="Jnm6/mol") && (vdw_C6_unit!="eVA6") )
 		{
-			WARNING_QUIT("Input","vdw_C6_unit must be Jnm6/mol or eVA6");
+			ModuleBase::WARNING_QUIT("Input","vdw_C6_unit must be Jnm6/mol or eVA6");
 		}
 		if( (vdw_R0_unit!="A") && (vdw_R0_unit!="Bohr") )
 		{
-			WARNING_QUIT("Input","vdw_R0_unit must be A or Bohr");
+			ModuleBase::WARNING_QUIT("Input","vdw_R0_unit must be A or Bohr");
 		}
 		if( (vdw_model!="radius") && (vdw_model!="period") )
 		{
-			WARNING_QUIT("Input","vdw_model must be radius or period");
+			ModuleBase::WARNING_QUIT("Input","vdw_model must be radius or period");
 		}
 		if( (vdw_period.x<=0) || (vdw_period.y<=0) || (vdw_period.z<=0) )
 		{
-			WARNING_QUIT("Input","vdw_period <= 0 is not allowd");
+			ModuleBase::WARNING_QUIT("Input","vdw_period <= 0 is not allowd");
 		}
 		if( std::stod(vdw_radius)<=0 )
 		{
-			WARNING_QUIT("Input","vdw_radius <= 0 is not allowd");
+			ModuleBase::WARNING_QUIT("Input","vdw_radius <= 0 is not allowd");
 		}
 		if( (vdw_radius_unit!="A") && (vdw_radius_unit!="Bohr") )
 		{
-			WARNING_QUIT("Input","vdw_radius_unit must be A or Bohr");
+			ModuleBase::WARNING_QUIT("Input","vdw_radius_unit must be A or Bohr");
 		}
 		if( vdw_cn_thr<=0 )
 		{
-			WARNING_QUIT("Input","vdw_cn_thr <= 0 is not allowd");
+			ModuleBase::WARNING_QUIT("Input","vdw_cn_thr <= 0 is not allowd");
 		}
 		if( (vdw_cn_thr_unit!="A") && (vdw_cn_thr_unit!="Bohr") )
 		{
-			WARNING_QUIT("Input","vdw_cn_thr_unit must be A or Bohr");
+			ModuleBase::WARNING_QUIT("Input","vdw_cn_thr_unit must be A or Bohr");
 		}
 	}
 
 	if(spectral_type!="None" && spectral_type!="eels" && spectral_type!="absorption")
 	{
-		WARNING_QUIT("INPUT","spectral_type must be eels or absorption !");
+		ModuleBase::WARNING_QUIT("INPUT","spectral_type must be eels or absorption !");
 	}
 
 	// pengfei 2016-12-14
@@ -3018,23 +3121,23 @@ void Input::Check(void)
 	{
 		if( system_type!="bulk" && system_type!="surface")
 		{
-			WARNING_QUIT("Input","system must be bulk or surface");
+			ModuleBase::WARNING_QUIT("Input","system must be bulk or surface");
 		}
 		if( kernel_type!="rpa")
 		{
-			WARNING_QUIT("Input","Now kernel_type must be rpa!");
+			ModuleBase::WARNING_QUIT("Input","Now kernel_type must be rpa!");
 		}
 		if( q_start[0] == 0 && q_start[1] == 0 && q_start[2] == 0)
 		{
-			WARNING_QUIT("INPUT","Gamma point is not allowed!");
+			ModuleBase::WARNING_QUIT("INPUT","Gamma point is not allowed!");
 		}
 		if( q_direct[0] == 0 && q_direct[1] == 0 && q_direct[2] == 0)
 		{
-			WARNING_QUIT("INPUT","You must choose a direction!");
+			ModuleBase::WARNING_QUIT("INPUT","You must choose a direction!");
 		}
 		//if( oband > nbands)
 		//{
-		//	WARNING_QUIT("INPUT","oband must <= nbands");
+		//	ModuleBase::WARNING_QUIT("INPUT","oband must <= nbands");
 		//}
         //        if( oband == 1)
         //        {
@@ -3048,51 +3151,51 @@ void Input::Check(void)
 		exx_hybrid_type!="hse" &&
 		exx_hybrid_type!="opt_orb")
 	{
-		WARNING_QUIT("INPUT","exx_hybrid_type must be no or hf or pbe0 or hse or opt_orb");
+		ModuleBase::WARNING_QUIT("INPUT","exx_hybrid_type must be no or hf or pbe0 or hse or opt_orb");
 	}
 
 	if(exx_hybrid_type=="hf" || exx_hybrid_type=="pbe0" || exx_hybrid_type=="hse")
 	{
 		if(exx_hybrid_alpha<0 || exx_hybrid_alpha>1)
 		{
-			WARNING_QUIT("INPUT","must 0 < exx_hybrid_alpha < 1");
+			ModuleBase::WARNING_QUIT("INPUT","must 0 < exx_hybrid_alpha < 1");
 		}
 		if(exx_hybrid_step<=0)
 		{
-			WARNING_QUIT("INPUT","must exx_hybrid_step > 0");
+			ModuleBase::WARNING_QUIT("INPUT","must exx_hybrid_step > 0");
 		}
 		if(exx_ccp_rmesh_times<1)
 		{
-			WARNING_QUIT("INPUT","must exx_ccp_rmesh_times >= 1");
+			ModuleBase::WARNING_QUIT("INPUT","must exx_ccp_rmesh_times >= 1");
 		}
 		if(exx_distribute_type!="htime"
 			&& exx_distribute_type!="kmeans2"
 			&& exx_distribute_type!="kmeans1"
 			&& exx_distribute_type!="order")
 		{
-			WARNING_QUIT("INPUT","exx_distribute_type must be htime or kmeans2 or kmeans1");
+			ModuleBase::WARNING_QUIT("INPUT","exx_distribute_type must be htime or kmeans2 or kmeans1");
 		}
 	}
 	if(exx_hybrid_type=="opt_orb")
 	{
 		if(exx_opt_orb_lmax<0)
 		{
-			WARNING_QUIT("INPUT","exx_opt_orb_lmax must >=0");
+			ModuleBase::WARNING_QUIT("INPUT","exx_opt_orb_lmax must >=0");
 		}
 		if(exx_opt_orb_ecut<0)
 		{
-			WARNING_QUIT("INPUT","exx_opt_orb_ecut must >=0");
+			ModuleBase::WARNING_QUIT("INPUT","exx_opt_orb_ecut must >=0");
 		}
 		if(exx_opt_orb_tolerence<0)
 		{
-			WARNING_QUIT("INPUT","exx_opt_orb_tolerence must >=0");
+			ModuleBase::WARNING_QUIT("INPUT","exx_opt_orb_tolerence must >=0");
 		}
 	}
 
 	//2015-06-15, xiaohui
 	if(mixing_mode == "pulay" && mixing_gg0 > 0.0)
 	{
-		WARNING("Input","To use pulay-kerker mixing method, please set mixing_type=pulay-kerker");
+		ModuleBase::WARNING("Input","To use pulay-kerker mixing method, please set mixing_type=pulay-kerker");
 	}
 
 	if(berry_phase)
@@ -3100,21 +3203,21 @@ void Input::Check(void)
 		if(basis_type == "pw")
 		{
 			if( !(calculation=="nscf") )
-				WARNING_QUIT("Input","calculate berry phase, please set calculation = nscf");
+				ModuleBase::WARNING_QUIT("Input","calculate berry phase, please set calculation = nscf");
 		}
 		else if(basis_type == "lcao" && (ks_solver == "genelpa" || ks_solver == "scalapack_gvx"))
 		{
 			if( !(calculation=="nscf") )
-				WARNING_QUIT("Input","calculate berry phase, please set calculation = nscf");
+				ModuleBase::WARNING_QUIT("Input","calculate berry phase, please set calculation = nscf");
 		}
 		else
 		{
-			WARNING_QUIT("Input","calculate berry phase, please set basis_type = pw or lcao");
+			ModuleBase::WARNING_QUIT("Input","calculate berry phase, please set basis_type = pw or lcao");
 		}
 
 		if( !(gdir==1||gdir==2||gdir==3) )
 		{
-			WARNING_QUIT("Input","calculate berry phase, please set gdir = 1 or 2 or 3");
+			ModuleBase::WARNING_QUIT("Input","calculate berry phase, please set gdir = 1 or 2 or 3");
 		}
 	}
 
@@ -3123,18 +3226,18 @@ void Input::Check(void)
 		if(basis_type == "pw" || basis_type == "lcao")
 		{
 			if( !(calculation=="nscf") )
-				WARNING_QUIT("Input","to use towannier90, please set calculation = nscf");
+				ModuleBase::WARNING_QUIT("Input","to use towannier90, please set calculation = nscf");
 		}
 		else
 		{
-			WARNING_QUIT("Input","to use towannier90, please set basis_type = pw or lcao");
+			ModuleBase::WARNING_QUIT("Input","to use towannier90, please set basis_type = pw or lcao");
 		}
 
 		if(nspin == 2)
 		{
 			if( !(wannier_spin=="up"||wannier_spin=="down") )
 			{
-				WARNING_QUIT("Input","to use towannier90, please set wannier_spin = up or down");
+				ModuleBase::WARNING_QUIT("Input","to use towannier90, please set wannier_spin = up or down");
 			}
 		}
 	}
@@ -3146,7 +3249,7 @@ void Input::Check(void)
 	}
 	else if( system( ss.c_str() ))
 	{
-		WARNING_QUIT("Input","please set right files directory for reading in.");
+		ModuleBase::WARNING_QUIT("Input","please set right files directory for reading in.");
 	}
 	else
 	{

@@ -2,14 +2,14 @@
 #include "../src_pw/global.h"
 
 void Force_LCAO_gamma::cal_fvl_dphi(
-	matrix& dm2d, 
+	ModuleBase::matrix& dm2d, 
 	const bool isforce, 
 	const bool isstress, 
-	matrix& fvl_dphi, 
-	matrix& svl_dphi)
+	ModuleBase::matrix& fvl_dphi, 
+	ModuleBase::matrix& svl_dphi)
 {   
-    TITLE("Force_LCAO_gamma","cal_fvl_dphi");
-    timer::tick("Force_LCAO_gamma","cal_fvl_dphi");
+    ModuleBase::TITLE("Force_LCAO_gamma","cal_fvl_dphi");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_fvl_dphi");
 	
 	if(isforce)
 	{
@@ -138,21 +138,21 @@ void Force_LCAO_gamma::cal_fvl_dphi(
     delete[] tmpDHz;
 
 
-    timer::tick("Force_LCAO_gamma","cal_fvl_dphi");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_fvl_dphi");
     return;
 }
 
 
 
 void Force_LCAO_gamma::cal_fvl_dphi(
-	const std::vector<matrix> &dm2d, 
+	const std::vector<ModuleBase::matrix> &dm2d, 
 	const bool isforce, 
 	const bool isstress, 
-	matrix& fvl_dphi, 
-	matrix& svl_dphi)
+	ModuleBase::matrix& fvl_dphi, 
+	ModuleBase::matrix& svl_dphi)
 {   
-    TITLE("Force_LCAO_gamma","cal_fvl_dphi");
-    timer::tick("Force_LCAO_gamma","cal_fvl_dphi");
+    ModuleBase::TITLE("Force_LCAO_gamma","cal_fvl_dphi");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_fvl_dphi");
 
     ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_x, GlobalC::ParaO.nloc);
     ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_y, GlobalC::ParaO.nloc);
@@ -274,6 +274,6 @@ void Force_LCAO_gamma::cal_fvl_dphi(
     delete[] tmpDHy;
     delete[] tmpDHz;
 
-    timer::tick("Force_LCAO_gamma", "cal_fvl_dphi");
+    ModuleBase::timer::tick("Force_LCAO_gamma", "cal_fvl_dphi");
     return;
 }

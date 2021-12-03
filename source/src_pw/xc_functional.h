@@ -31,11 +31,29 @@ class XC_Functional
           double &v1x, double &v2x, double &v1c, double &v2c);
 
 #ifdef USE_LIBXC
+	struct Mgga_spin_in
+	{
+		double rhoup, rhodw;//electron densities
+		ModuleBase::Vector3<double> grhoup, grhodw;//gradient of electron densities
+		double tauup, taudw;//kinetic energy densities
+	};
+
+	struct Mgga_spin_out
+	{
+		double ex, ec;//xc energy densities
+		double v1xup, v1xdw;//vx: lda part
+		double v2xup, v2xdw;//vx: gga part
+		double v3xup, v3xdw;//vx: mgga part
+		double v1cup, v1cdw;//vc: lda part
+		ModuleBase::Vector3<double> v2cup, v2cdw;
+		std::vector<double> v2c;//vc: gga part, two different formats	
+		double v3cup, v3cdw;//vc: mgga part
+	};	
+	
 	// mGGA
 	static void tau_xc(const double &rho, const double &grho, const double &atau, double &sx, double &sc,
           double &v1x, double &v2x, double &v3x, double &v1c, double &v2c, double &v3c);
-	static void tau_xc_spin(const double &rhoup, const double &rhodw, const Vector3<double> &grhoup, const Vector3<double> &grhodw, const double &tauup, const double &taudw, double &sx, double &sc,
-          double &v1xup, double &v1xdw, double &v2xup, double &v2xdw, double &v3xup, double &v3xdw, double &v1cup, double &v1cdw, Vector3<double> &v2cup, Vector3<double> &v2cdw, double &v3cup, double &v3cdw);
+	static void tau_xc_spin(const Mgga_spin_in &mgga_spin_in, Mgga_spin_out &mgga_spin_out);
 #endif
 
 	// PBEx, PBEc

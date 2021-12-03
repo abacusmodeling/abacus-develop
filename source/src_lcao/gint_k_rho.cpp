@@ -8,6 +8,14 @@
 #include "../module_base/blas_connector.h"
 #include "global_fp.h" // mohan add 2021-01-30
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
+#ifdef __MKL
+#include <mkl_service.h>
+#endif
+
 inline void setVindex(const int ncyz, const int ibx, const int jby, const int kbz, int* vindex)
 {				
 	int bindex = 0;
@@ -97,7 +105,7 @@ inline void cal_psir_ylm(
 			//	Ylm::get_ylm_real(this->nnn[it], this->dr[id], ylma);
 			if (distance < 1.0E-9) distance += 1.0E-9;
 			
-			Ylm::sph_harm (	GlobalC::ucell.atoms[it].nwl,
+			ModuleBase::Ylm::sph_harm (	GlobalC::ucell.atoms[it].nwl,
 					dr[0] / distance,
 					dr[1] / distance,
 					dr[2] / distance,
@@ -207,7 +215,7 @@ inline void cal_band_rho(
 					std::cout << " size1=" << ia1 << " size2=" << ia1 << std::endl;
                     std::cout << " iat1=" << iat1 << " iat2=" << iat1 << std::endl;
                     std::cout << " dR=" << dRx << " " << dRy << " " << dRz << std::endl;
-					WARNING_QUIT("gint_k","evaluate_pDMp wrong");
+					ModuleBase::WARNING_QUIT("gint_k","evaluate_pDMp wrong");
 				}
 				//const int offset=AllOffset[ia1][ia2];
 				assert(offset < GlobalC::LNNR.nad[iat1]);
@@ -246,7 +254,7 @@ inline void cal_band_rho(
 					std::cout << " size1=" << ia1 << " size2=" << ia1 << std::endl;
                     std::cout << " iat1=" << iat1 << " iat2=" << iat1 << std::endl;
                     std::cout << " dR=" << dRx << " " << dRy << " " << dRz << std::endl;
-					WARNING_QUIT("gint_k","evaluate_pDMp wrong");
+					ModuleBase::WARNING_QUIT("gint_k","evaluate_pDMp wrong");
 				}
 				//const int offset=AllOffset[ia1][ia2];
 				assert(offset < GlobalC::LNNR.nad[iat1]);
@@ -310,7 +318,7 @@ inline void cal_band_rho(
                         std::cout << " dR=" << dRx << " " << dRy << " " << dRz << std::endl;
                         std::cout << " R1=" << R1x << " " << R1y << " " << R1z << std::endl;
                         std::cout << " R2=" << R2x << " " << R2y << " " << R2z << std::endl;
-    					WARNING_QUIT("gint_k","evaluate_pDMp wrong");
+    					ModuleBase::WARNING_QUIT("gint_k","evaluate_pDMp wrong");
     				}				
     				assert(offset < GlobalC::LNNR.nad[iat1]);
 
@@ -359,7 +367,7 @@ inline void cal_band_rho(
                         std::cout << " dR=" << dRx << " " << dRy << " " << dRz << std::endl;
                         std::cout << " R1=" << R1x << " " << R1y << " " << R1z << std::endl;
                         std::cout << " R2=" << R2x << " " << R2y << " " << R2z << std::endl;
-    					WARNING_QUIT("gint_k","evaluate_pDMp wrong");
+    					ModuleBase::WARNING_QUIT("gint_k","evaluate_pDMp wrong");
     				}				
     				assert(offset < GlobalC::LNNR.nad[iat1]);
 
@@ -392,9 +400,18 @@ inline void cal_band_rho(
 
 void Gint_k::cal_rho_k(void)
 {
-	TITLE("Gint_k","cal_rho_k");
-	timer::tick("Gint_k","cal_rho_k");
+	ModuleBase::TITLE("Gint_k","cal_rho_k");
+	ModuleBase::timer::tick("Gint_k","cal_rho_k");
 
+#ifdef __MKL
+    const int mkl_threads = mkl_get_max_threads();
+    mkl_set_num_threads(1);
+#endif
+
+#ifdef _OPENMP
+    #pragma omp parallel
+    {
+#endif
 	const double delta_r = GlobalC::ORB.dr_uniform;
 	// it is an uniform grid to save orbital values, so the delta_r is a constant.
 	const int max_size = GlobalC::GridT.max_atom;
@@ -453,6 +470,10 @@ void Gint_k::cal_rho_k(void)
 	
 	const int ncyz = GlobalC::pw.ncy*GlobalC::pw.nczp;
 	const int nbyz = nby*nbz;	
+
+#ifdef _OPENMP
+    #pragma omp for
+#endif
 	for(int i=0; i<nbx; i++)
 	{
 		const int ibx = i*GlobalC::pw.bx; // mohan add 2012-03-25
@@ -466,11 +487,11 @@ void Gint_k::cal_rho_k(void)
 				const int size = GlobalC::GridT.how_many_atoms[grid_index];
 				if(size==0) continue;
 				setVindex(ncyz, ibx, jby, kbz, vindex);
-				//timer::tick("Gint_k","cal_psir_ylm");
+				//ModuleBase::timer::tick("Gint_k","cal_psir_ylm");
 				cal_psir_ylm(size, grid_index, delta_r,
 						at, uc, block_index, block_iw, block_size, 
 						cal_flag, psir_ylm);
-				//timer::tick("Gint_k","cal_psir_ylm");
+				//ModuleBase::timer::tick("Gint_k","cal_psir_ylm");
 
 				cal_band_rho(
 					size, 
@@ -511,8 +532,15 @@ void Gint_k::cal_rho_k(void)
     }	
 
 //	std::cout << " calculate the charge density from density matrix " << std::endl;
+#ifdef _OPENMP
+    } //end omp
+#endif
 
-	timer::tick("Gint_k","cal_rho_k");
+#ifdef __MKL
+    mkl_set_num_threads(mkl_threads);
+#endif
+
+	ModuleBase::timer::tick("Gint_k","cal_rho_k");
 	return;
 }
 
@@ -648,7 +676,7 @@ void Gint_k::evaluate_pDMp(
                     std::cout << " dR=" << dRx << " " << dRy << " " << dRz << std::endl;
                     std::cout << " R1=" << R1x << " " << R1y << " " << R1z << std::endl;
                     std::cout << " R2=" << R2x << " " << R2y << " " << R2z << std::endl;
-					WARNING_QUIT("gint_k","evaluate_pDMp wrong");
+					ModuleBase::WARNING_QUIT("gint_k","evaluate_pDMp wrong");
 				}
 				assert(offset < GlobalC::LNNR.nad[iat]);
 

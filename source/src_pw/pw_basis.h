@@ -122,17 +122,20 @@ public:
     int ngmw; // num. of G vectors within ggwfc2 in each proc.
 	// std::map: 1D G std::vector -> wave function in FFT grid
     int *ig2fftw; // dimension: [ngmw]
+    int nbspline;
 
 	// structure factor (ntype, ngmc)
     ModuleBase::ComplexMatrix strucFac;
-    void setup_structure_factor(void); 		// Calculate structur factors
+    void setup_structure_factor(void); 		// Calculate structure factors
+    void bspline_sf(const int); //calculate structure factors through Cardinal B-spline interpolation
+    void bsplinecoef(complex<double> *b1, complex<double> *b2, complex<double> *b3, const int norder);
 
 private:
 #ifdef __MPI
     void divide_fft_grid(void);
     void get_MPI_GVectors(void);
     void columns_and_pw_distribution_2(void);
-#else
+// #else
     void get_GVectors(void);
 #endif
 
@@ -142,26 +145,26 @@ private:
 // Part 5: G vectors, |G|^2, G index [ngmc] 
 //===============================================
 public:
-    Vector3<double> *gdirect;		//(= *G1d) ; // ig = new Vector igc[ngmc],
-    Vector3<double> *gdirect_global;	//(= *G1d) ; // ig = new Vector igc[ngmc],
+    ModuleBase::Vector3<double> *gdirect;		//(= *G1d) ; // ig = new Vector igc[ngmc],
+    ModuleBase::Vector3<double> *gdirect_global;	//(= *G1d) ; // ig = new Vector igc[ngmc],
     // store the 3D G std::vector coordinates for charge density grid;
     // ig.x, ig.y, ig.z should be integers !!!
     // G vectors are in order of increasing G^2
     // can be shared by charge density/potential and wave functions.
 
-    Vector3<double> *gcar;   			//G vectors in cartesian corrdinate
-    Vector3<double> *gcar_global;   	//G vectors in cartesian corrdinate
+    ModuleBase::Vector3<double> *gcar;   			//G vectors in cartesian corrdinate
+    ModuleBase::Vector3<double> *gcar_global;   	//G vectors in cartesian corrdinate
     //g=ig*G ?? HLX (05-26-06): need to check if this is ok!
     //tau is also defined in Cartesian coordintes unit lat0
-    Vector3<double> get_GPlusK_cartesian(const int ik, const int ig) const {
+    ModuleBase::Vector3<double> get_GPlusK_cartesian(const int ik, const int ig) const {
         assert(ig>=0 && ig<this->ngmc && ik>=0 && ik<Klist->nks);
-        Vector3<double> g_temp_ = Klist->kvec_c[ik] + this->gcar[ig];
+        ModuleBase::Vector3<double> g_temp_ = Klist->kvec_c[ik] + this->gcar[ig];
         return g_temp_;
     };
     double get_GPlusK_cartesian_projection(const int ik, const int ig, const int axis) const
     {
         assert(ig >= 0 && ig < this->ngmc && ik >= 0 && ik < Klist->nks && axis >= 0 && axis <= 2);
-        Vector3<double> g_temp_ = Klist->kvec_c[ik] + this->gcar[ig];
+        ModuleBase::Vector3<double> g_temp_ = Klist->kvec_c[ik] + this->gcar[ig];
         if (axis == 0)
         {
             return g_temp_.x;
@@ -179,10 +182,10 @@ public:
     double get_SquareGPlusK_cartesian(const int ik, const int ig) const 
     {
         assert(ig >= 0 && ig < this->ngmc && ik >= 0 && ik < Klist->nks);
-        Vector3<double> g_temp_ = Klist->kvec_c[ik] + this->gcar[ig];
+        ModuleBase::Vector3<double> g_temp_ = Klist->kvec_c[ik] + this->gcar[ig];
         return (g_temp_ * g_temp_);
     };
-    Vector3<double> get_G_cartesian(const int ig) const 
+    ModuleBase::Vector3<double> get_G_cartesian(const int ig) const 
     {
         assert(ig>=0 && ig<this->ngmc);
         return this->gcar[ig];

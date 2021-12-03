@@ -7,7 +7,7 @@ Variable_Cell::~Variable_Cell(){}
 
 void Variable_Cell::init_after_vc(void)
 {
-	TITLE("Variable_Cell","init_after_vc");
+	ModuleBase::TITLE("Variable_Cell","init_after_vc");
 
     GlobalC::ucell.setup_cell_after_vc(GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
     ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
@@ -49,11 +49,11 @@ void Variable_Cell::init_after_vc(void)
 
     return;
 }
-    
+
 
 void Variable_Cell::final_calculation_after_vc(void)
 {
-	TITLE("Variable_Cell","final_after_vc");
+	ModuleBase::TITLE("Variable_Cell","final_after_vc");
 
     std::cout<<" -----------------------------------------------------------------"<<std::endl;
 
@@ -95,9 +95,11 @@ void Variable_Cell::final_calculation_after_vc(void)
 
     // init the grid, then the charge
     // on grid can be distributed.
-    GlobalC::Pgrid.init_final_scf(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, 
+    GlobalC::Pgrid.init_final_scf(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz,
 		GlobalC::pw.nczp, GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
 
+    // Calculate Structure factor
+    GlobalC::pw.setup_structure_factor();
     //=====================
     // init potential
     //=====================

@@ -55,7 +55,7 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,std::complex<double> *A,LocalMatrix l
  *          process and memory location.
  */
 {
-	TITLE("Parallel_Diag","pzheg2st");
+	ModuleBase::TITLE("Parallel_Diag","pzheg2st");
     std::complex<double> alpha,beta;
 
     std::complex<double>* C_A = new std::complex<double>[NB*NB];

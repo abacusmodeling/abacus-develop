@@ -2,6 +2,9 @@
 #include <stddef.h> // use size_t
 #include <cassert>
 
+namespace ModuleBase
+{
+
 Integral::Integral(){}
 
 Integral::~Integral(){}
@@ -217,4 +220,6 @@ void Integral::Simpson_Integral_alltoinf
         asum[i] = asum_all - asum[i];
 	}
 	return;
+}
+
 }

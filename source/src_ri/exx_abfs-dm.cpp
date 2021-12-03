@@ -14,7 +14,7 @@ void Exx_Abfs::DM::cal_DM(
 	const std::set<std::pair<size_t,size_t>> &atom_pairs,
 	const std::vector<Abfs::Vector3_Order<int>> &Born_von_Karman_boxes)
 {
-	TITLE("Exx_Abfs::DM::cal_DM");
+	ModuleBase::TITLE("Exx_Abfs::DM::cal_DM");
 	
 	cal_DMk_mixing( GlobalC::CHR, atom_pairs );
 
@@ -25,12 +25,12 @@ void Exx_Abfs::DM::cal_DM(
 		const size_t it1 = GlobalC::ucell.iat2it[iat1];
 		const size_t it2 = GlobalC::ucell.iat2it[iat2];
 
-		for( const Vector3<int> &box : Born_von_Karman_boxes )
+		for( const ModuleBase::Vector3<int> &box : Born_von_Karman_boxes )
 		{
-			DMr[iat1][iat2][box] = std::vector<matrix>( GlobalV::NSPIN, {GlobalC::ucell.atoms[it1].nw,GlobalC::ucell.atoms[it2].nw} );
+			DMr[iat1][iat2][box] = std::vector<ModuleBase::matrix>( GlobalV::NSPIN, {GlobalC::ucell.atoms[it1].nw,GlobalC::ucell.atoms[it2].nw} );
 			for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 			{
-				DMr[iat1][iat2][box][GlobalC::kv.isk[ik]] += ( DMk[iat1][iat2][ik] * exp( -TWO_PI*IMAG_UNIT* (GlobalC::kv.kvec_c[ik]* (box*GlobalC::ucell.latvec)) ) ).real();
+				DMr[iat1][iat2][box][GlobalC::kv.isk[ik]] += ( DMk[iat1][iat2][ik] * exp( -ModuleBase::TWO_PI*ModuleBase::IMAG_UNIT* (GlobalC::kv.kvec_c[ik]* (box*GlobalC::ucell.latvec)) ) ).real();
 			}
 		}
 	}
@@ -42,7 +42,7 @@ void Exx_Abfs::DM::cal_DMk_mixing(
 	const Charge_Broyden &charge,
 	const std::set<std::pair<size_t,size_t>> &atom_pairs )
 {
-	TITLE("Exx_Abfs::DM::cal_DMk_mixing");
+	ModuleBase::TITLE("Exx_Abfs::DM::cal_DMk_mixing");
 
 	if(flag_mix)
 	{
@@ -85,7 +85,7 @@ void Exx_Abfs::DM::cal_DMk_mixing(
 
 std::map<size_t,std::map<size_t,std::vector<ModuleBase::ComplexMatrix>>> Exx_Abfs::DM::cal_DMk_raw( const std::set<std::pair<size_t,size_t>> &atom_pairs ) const
 {
-	TITLE("Exx_Abfs::DM::cal_DMk_raw");
+	ModuleBase::TITLE("Exx_Abfs::DM::cal_DMk_raw");
 
 	const double SPIN_multiple = 0.5*GlobalV::NSPIN;
 	
@@ -115,7 +115,7 @@ std::map<size_t,std::map<size_t,std::vector<ModuleBase::ComplexMatrix>>> Exx_Abf
 							// we need to fix this function in near future.
 							// -- mohan add 2021-02-09
 							//---------------------------------------------------------
-							WARNING_QUIT("Exx_Abfs::DM::cal_DMk_raw","need to update GlobalC::LOWF.WFC_GAMMA");
+							ModuleBase::WARNING_QUIT("Exx_Abfs::DM::cal_DMk_raw","need to update GlobalC::LOWF.WFC_GAMMA");
 //							DMk_raw[iat1][iat2][ik](iw1,iw2) += GlobalC::wf.wg(ik,ib) 
 //								* GlobalC::LOWF.WFC_GAMMA[ik][ib][GlobalC::ucell.itiaiw2iwt(it1,ia1,iw1)] 
 //								* GlobalC::LOWF.WFC_GAMMA[ik][ib][GlobalC::ucell.itiaiw2iwt(it2,ia2,iw2)];
@@ -148,7 +148,7 @@ void Exx_Abfs::DM::plain_mixing(
 	const Charge_Broyden &charge,
 	const std::set<std::pair<size_t,size_t>> &atom_pairs)
 {
-	TITLE("Exx_Abfs::DM::plain_mixing");
+	ModuleBase::TITLE("Exx_Abfs::DM::plain_mixing");
 
 	if(DMk.empty())
 		DMk = cal_DMk_raw(atom_pairs);

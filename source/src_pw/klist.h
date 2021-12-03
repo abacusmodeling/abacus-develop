@@ -3,21 +3,22 @@
 
 #include "tools.h"
 #include "../module_symmetry/symmetry.h"
+#include <vector>
 
 class K_Vectors
 {
 public:
 
-    Vector3<double> *kvec_c;		// Cartesian coordinates of k points
-    Vector3<double> *kvec_d;		// Direct coordinates of k points
-    Vector3<double> *kvec_d_ibz;	// ibz Direct coordinates of k points
+    std::vector<ModuleBase::Vector3<double>> kvec_c;		// Cartesian coordinates of k points
+    std::vector<ModuleBase::Vector3<double>> kvec_d;		// Direct coordinates of k points
+    std::vector<ModuleBase::Vector3<double>> kvec_d_ibz;	// ibz Direct coordinates of k points
 
-    double *wk;						// wk, weight of k points
-    double *wk_ibz;					// ibz kpoint wk ,weight of k points
+    std::vector<double> wk;						// wk, weight of k points
+    std::vector<double> wk_ibz;					// ibz kpoint wk ,weight of k points
 
-    int *ngk;						// ngk, number of plane waves for each k point
-    int *isk;						// distinguish spin up and down k points
-    int *ibz2bz;					// mohan added 2009-05-18
+    std::vector<int> ngk;						// ngk, number of plane waves for each k point
+    std::vector<int> isk;						// distinguish spin up and down k points
+    std::vector<int> ibz2bz;					// mohan added 2009-05-18
 
     int nks;						// number of k points in this pool(processor, up+dw)
     int nkstot;						// total number of k points
@@ -32,8 +33,8 @@ public:
         const ModuleSymmetry::Symmetry &symm,
         const std::string &k_file_name,
         const int& nspin,
-        const Matrix3 &reciprocal_vec,
-        const Matrix3 &latvec);
+        const ModuleBase::Matrix3 &reciprocal_vec,
+        const ModuleBase::Matrix3 &latvec);
 
     void ibz_kpoint( const ModuleSymmetry::Symmetry &symm);
     //LiuXh add 20180515
@@ -41,8 +42,8 @@ public:
             const ModuleSymmetry::Symmetry &symm,
             const std::string &k_file_name,
             const int& nspin,
-            const Matrix3 &reciprocal_vec,
-            const Matrix3 &latvec);
+            const ModuleBase::Matrix3 &reciprocal_vec,
+            const ModuleBase::Matrix3 &latvec);
 
 private:
     int nspin;
@@ -62,7 +63,7 @@ private:
 
     // step 2 : set both kvec and kved; normalize weight
     void update_use_ibz( void );
-    void set_both_kvec(const Matrix3 &G,const Matrix3 &R);
+    void set_both_kvec(const ModuleBase::Matrix3 &G,const ModuleBase::Matrix3 &R);
     void normalize_wk( const int &degspin );
 
     // step 3 : mpi kpoints information.
@@ -79,7 +80,7 @@ private:
     //bool read_kpoints_after_vc(const std::string &fn); //LiuXh add 20180515
     //void Monkhorst_Pack_after_vc(const int *nmp_in,const double *koffset_in,const int tipo); //LiuXh add 20180515
     void mpi_k_after_vc(); //LiuXh add 20180515
-    void set_both_kvec_after_vc(const Matrix3 &G,const Matrix3 &R);
+    void set_both_kvec_after_vc(const ModuleBase::Matrix3 &G,const ModuleBase::Matrix3 &R);
     void set_kup_and_kdw_after_vc();
 };
 

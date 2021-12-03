@@ -121,7 +121,7 @@ public:
 		const double emin_ev, // minimal energy in ev.
 		const int nks, // number of k points included.
 		const int nbands, // number of nbands included.
-		const matrix &et// store energy for each k point
+		const ModuleBase::matrix &et// store energy for each k point
 		                    // and each band
 	);
 

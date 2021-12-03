@@ -11,8 +11,8 @@ H_Ewald_pw::~H_Ewald_pw(){};
 
 void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 {
-    TITLE("H_Ewald_pw","compute_ewald");
-    timer::tick("H_Ewald_pw","compute_ewald");
+    ModuleBase::TITLE("H_Ewald_pw","compute_ewald");
+    ModuleBase::timer::tick("H_Ewald_pw","compute_ewald");
 
 //----------------------------------------------------------
 // Calculates Ewald energy with both G- and R-space terms.
@@ -29,8 +29,8 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
     double ewaldr=0.0;
     double ewalds=0.0;
 
-    Vector3<double> dtau ;
-    Vector3<double> *r;
+    ModuleBase::Vector3<double> dtau ;
+    ModuleBase::Vector3<double> *r;
     double *r2;
     double rmax=0.0;
     double rr=0.0;
@@ -48,7 +48,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
     // used to optimize alpha
 
 	if(GlobalV::test_energy)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"mxr",mxr);
-    r  = new Vector3<double>[mxr];
+    r  = new ModuleBase::Vector3<double>[mxr];
     r2 = new double[mxr];
     int* irr = new int[mxr];
 
@@ -70,9 +70,9 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 
         if (alpha <= 0.0)
         {
-            WARNING_QUIT("ewald","Can't find optimal alpha.");
+            ModuleBase::WARNING_QUIT("ewald","Can't find optimal alpha.");
         }
-        upperbound = 2.0 * charge * charge * sqrt(2.0 * alpha / TWO_PI) *
+        upperbound = 2.0 * charge * charge * sqrt(2.0 * alpha / ModuleBase::TWO_PI) *
                      erfc(sqrt(cell.tpiba2 * pwb.ggchg / 4.0 / alpha));
     }
     while (upperbound > 1.0e-7);
@@ -106,7 +106,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 
     for (int ig=pwb.gstart; ig<pwb.ngmc; ig++)
     {
-        std::complex<double> rhon = ZERO;
+        std::complex<double> rhon = ModuleBase::ZERO;
         for (int it=0; it<cell.ntype; it++)
         {
             rhon += static_cast<double>( cell.atoms[it].zv ) * conj( pwb.strucFac(it, ig));
@@ -118,7 +118,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
         }
     }
 
-    ewaldg = FOUR_PI / cell.omega * ewaldg;
+    ewaldg = ModuleBase::FOUR_PI / cell.omega * ewaldg;
 
 //	std::cout << "\n ewaldg = " << ewaldg;
 
@@ -127,7 +127,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 	{
     	for (int it = 0; it < cell.ntype;it++)
     	{
-        	ewaldg = ewaldg - cell.atoms[it].na * cell.atoms[it].zv * cell.atoms[it].zv * sqrt(8.0 / TWO_PI * alpha);
+        	ewaldg = ewaldg - cell.atoms[it].na * cell.atoms[it].zv * cell.atoms[it].zv * sqrt(8.0 / ModuleBase::TWO_PI * alpha);
 		}
     }//mohan modify 2007-11-7, 2010-07-26
 
@@ -177,7 +177,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
         }//nt1
     } // endif
 
-    ewalds = 0.50 * e2 * (ewaldg + ewaldr);
+    ewalds = 0.50 * ModuleBase::e2 * (ewaldg + ewaldr);
 
 	// mohan fix bug 2010-07-26
     Parallel_Reduce::reduce_double_pool( ewalds );
@@ -196,18 +196,18 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 	// set the Ewald energy, mohan add 2021-02-25
 	H_Ewald_pw::ewald_energy = ewalds; 
 
-    timer::tick("H_Ewald_pw","compute_ewald");
+    ModuleBase::timer::tick("H_Ewald_pw","compute_ewald");
     return;
 } // end function ewald
 
 
 void H_Ewald_pw::rgen(
-    const Vector3<double> &dtau,
+    const ModuleBase::Vector3<double> &dtau,
     const double &rmax,
     int *irr,
-    const Matrix3 &latvec,
-    const Matrix3 &G,
-    Vector3<double> *r,
+    const ModuleBase::Matrix3 &latvec,
+    const ModuleBase::Matrix3 &G,
+    ModuleBase::Vector3<double> *r,
     double *r2,
     int &nrm)
 {
@@ -245,8 +245,8 @@ void H_Ewald_pw::rgen(
     // index of swapping
     // used for swapping
 
-    Vector3<double> t;
-    Vector3<double> t1;
+    ModuleBase::Vector3<double> t;
+    ModuleBase::Vector3<double> t1;
     double tt=0.0;
     double bg1[3]={0,0,0};
     // buffer contains the actual r
@@ -293,7 +293,7 @@ void H_Ewald_pw::rgen(
         {
             for (k = -nm3; k <= nm3; k++)
             {
-                Vector3<double> t1(i,j,k);
+                ModuleBase::Vector3<double> t1(i,j,k);
 //				out.printV3(t1);
                 t = t1 * latvec; // bug ! first '*latvec', second '-dtau'.
                 t = t - dtau; // bug ! t = t - dtau, not t1 = t1 -tau;
@@ -322,7 +322,7 @@ void H_Ewald_pw::rgen(
     irr[0] = 0;
     if (nrm > 1)
     {
-        heapsort(nrm, r2, irr);
+        ModuleBase::heapsort(nrm, r2, irr);
     }
 
 	// mohan fix bug 2011-06-07

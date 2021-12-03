@@ -14,7 +14,7 @@
 
 Run_MD_PW::Run_MD_PW()
 {
-    force=new Vector3<double>[GlobalC::ucell.nat];
+    force=new ModuleBase::Vector3<double>[GlobalC::ucell.nat];
 }
 
 Run_MD_PW::~Run_MD_PW()
@@ -24,8 +24,8 @@ Run_MD_PW::~Run_MD_PW()
 
 void Run_MD_PW::md_ions_pw(void)
 {
-    TITLE("Run_MD_PW", "md_ions_pw");
-    timer::tick("Run_MD_PW", "md_ions_pw");
+    ModuleBase::TITLE("Run_MD_PW", "md_ions_pw");
+    ModuleBase::timer::tick("Run_MD_PW", "md_ions_pw");
 
     if (GlobalV::OUT_LEVEL == "i")
     {
@@ -43,11 +43,7 @@ void Run_MD_PW::md_ions_pw(void)
     }
 
     // allocation for ion movement.
-    if (GlobalV::FORCE)
-    {
-        IMM.allocate();
-        CE.allocate_ions();
-    }
+    CE.allocate_ions();
 
     if (GlobalV::STRESS) // pengfei Li 2018-05-14
     {
@@ -62,13 +58,20 @@ void Run_MD_PW::md_ions_pw(void)
 
     while (istep <= GlobalV::NSTEP && !stop)
     {
-        time_t estart = time(NULL);
+        if (GlobalV::OUT_LEVEL == "ie" || GlobalV::OUT_LEVEL == "i")
+        {
+            std::cout << " -------------------------------------------" << std::endl;
+            std::cout << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
+            std::cout << " -------------------------------------------" << std::endl;
+            GlobalV::ofs_running << " -------------------------------------------" << std::endl;
+            GlobalV::ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
+            GlobalV::ofs_running << " -------------------------------------------" << std::endl;
+        }
 
-        Print_Info::print_screen(0, 0, istep);
 
     //----------------------------------------------------------
     // about vdw, jiyy add vdwd3 and linpz add vdwd2
-    //----------------------------------------------------------	
+    //----------------------------------------------------------
         if(INPUT.vdw_method=="d2")
         {
             // setup vdwd2 parameters
@@ -151,9 +154,6 @@ void Run_MD_PW::md_ions_pw(void)
             GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
         }
 
-        time_t eend = time(NULL);
-        time_t fstart = time(NULL);
-
         this->callInteraction_PW(GlobalC::ucell.nat, force, stress);
         double potential = GlobalC::en.etot/2;
 
@@ -171,10 +171,8 @@ void Run_MD_PW::md_ions_pw(void)
         }
         else
         {
-            WARNING_QUIT("opt_ions", "mdtype should be -1~2!");
+            ModuleBase::WARNING_QUIT("opt_ions", "mdtype should be -1~2!");
         }
-
-        time_t fend = time(NULL);
 
         CE.save_pos_next(GlobalC::ucell);
 
@@ -189,25 +187,6 @@ void Run_MD_PW::md_ions_pw(void)
         //GlobalV::ofs_running << " Setup the new wave functions?\n" << std::endl;
         GlobalC::wf.wfcinit();
 
-        if (GlobalV::OUT_LEVEL == "i")
-        {
-            double etime_min = difftime(eend, estart) / 60.0;
-            double ftime_min = difftime(fend, fstart) / 60.0;
-            std::stringstream ss;
-            ss << GlobalV::MOVE_IONS << istep;
-
-            std::cout << " " << std::setw(7) << ss.str()
-                 << std::setw(5) << eiter
-                 << std::setw(15) << std::setprecision(6) << GlobalC::en.etot * Ry_to_eV
-                 << std::setw(15) << IMM.get_ediff() * Ry_to_eV
-                 << std::setprecision(3)
-                 << std::setw(15) << IMM.get_largest_grad() * Ry_to_eV / 0.529177
-                 << std::setw(15) << IMM.get_trust_radius()
-                 << std::setw(8) << IMM.get_update_iter()
-                 << std::setprecision(2) << std::setw(11) << etime_min
-                 << std::setw(11) << ftime_min << std::endl;
-        }
-
         ++istep;
     }
 
@@ -216,14 +195,14 @@ void Run_MD_PW::md_ions_pw(void)
         std::cout << " ION DYNAMICS FINISHED :)" << std::endl;
     }
 
-    timer::tick("Run_MD_PW", "md_ions_pw");
+    ModuleBase::timer::tick("Run_MD_PW", "md_ions_pw");
     return;
 }
 
 void Run_MD_PW::md_cells_pw()
 {
-    TITLE("Run_MD_PW", "md_cells_pw");
-    timer::tick("Run_MD_PW", "md_cells_pw");
+    ModuleBase::TITLE("Run_MD_PW", "md_cells_pw");
+    ModuleBase::timer::tick("Run_MD_PW", "md_cells_pw");
 
     GlobalC::wf.allocate(GlobalC::kv.nks);
 
@@ -298,16 +277,16 @@ void Run_MD_PW::md_cells_pw()
 
     GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
     GlobalV::ofs_running << std::setprecision(16);
-    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
+    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
     GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
-    timer::tick("Run_MD_PW", "md_cells_pw");
+    ModuleBase::timer::tick("Run_MD_PW", "md_cells_pw");
 }
 
-void Run_MD_PW::callInteraction_PW(const int& numIon, Vector3<double>* force, matrix& stress_pw)
+void Run_MD_PW::callInteraction_PW(const int& numIon, ModuleBase::Vector3<double>* force, ModuleBase::matrix& stress_pw)
 {
 //to call the force of each atom
-	matrix fcs;//temp force matrix
+	ModuleBase::matrix fcs;//temp force ModuleBase::matrix
 	Forces ff;
 	ff.init(fcs);
 	for(int ion=0;ion<numIon;ion++){

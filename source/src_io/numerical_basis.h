@@ -27,8 +27,8 @@ class Numerical_Basis
 
 	Bessel_Basis bessel_basis;
 
-	std::vector<IntArray> mu_index;
-	static std::vector<IntArray> init_mu_index(void);
+	std::vector<ModuleBase::IntArray> mu_index;
+	static std::vector<ModuleBase::IntArray> init_mu_index(void);
 
 	void numerical_atomic_wfc(const int &ik,const int &np,ModuleBase::ComplexMatrix &psi);
 
@@ -41,11 +41,11 @@ class Numerical_Basis
 		const int &np,
 		const int derivative_order ) const;
 
-	static matrix cal_overlap_V(const ModuleBase::ComplexMatrix *psi, const int derivative_order);
+	static ModuleBase::matrix cal_overlap_V(const ModuleBase::ComplexMatrix *psi, const int derivative_order);
 
-	realArray cal_flq(const int ik, const std::vector<Vector3<double>> &gk) const;
+	ModuleBase::realArray cal_flq(const int ik, const std::vector<ModuleBase::Vector3<double>> &gk) const;
 
-	static matrix cal_ylm(const std::vector<Vector3<double>> &gk);
+	static ModuleBase::matrix cal_ylm(const std::vector<ModuleBase::Vector3<double>> &gk);
 	
 	static void output_info(
 		std::ofstream &ofs,
@@ -64,7 +64,7 @@ class Numerical_Basis
 
 	static void output_overlap_V(
 		std::ofstream &ofs,
-		const matrix &overlap_V);
+		const ModuleBase::matrix &overlap_V);
 
 };
 

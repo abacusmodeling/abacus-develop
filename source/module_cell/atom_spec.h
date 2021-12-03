@@ -31,13 +31,15 @@ public:
     int stapos_wf; // start position of wave functions
 
     std::string label; // atomic symbol
-    Vector3<double> *tau;// Cartesian coordinates of each atom in this type.
-	Vector3<double> *taud;// Direct coordinates of each atom in this type.
-    Vector3<double> *vel;// velocities of each atom in this type.
+    ModuleBase::Vector3<double> *tau;// Cartesian coordinates of each atom in this type.
+	ModuleBase::Vector3<double> *taud;// Direct coordinates of each atom in this type.
+    ModuleBase::Vector3<double> *vel;// velocities of each atom in this type.
 
 	double* mag;
-	double angle1;//spin angle, added by zhengdy-soc
-	double angle2;
+	double* angle1;//spin angle, added by zhengdy-soc
+	double* angle2;
+    ModuleBase::Vector3<double> *m_loc_;
+
 
     void print_Atom(std::ofstream &ofs, output &outp);
 #ifdef __MPI

@@ -13,7 +13,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include(FetchContent)
 FetchContent_Declare(
   googletest
-  GIT_REPOSITORY https://github.com.cnpmjs.org/google/googletest.git
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG "origin/main"
 )
 FetchContent_MakeAvailable(googletest)
 include_directories(${ABACUS_SOURCE_DIR})
@@ -31,11 +32,14 @@ endfunction(AddTest)
 
 get_target_property(ABACUS_LINK_LIBRARIES ${ABACUS_BIN_NAME} LINK_LIBRARIES)
 
+set(TEST_BASE_DIR ${CMAKE_SOURCE_DIR}/source/module_base)
+include_directories(${TEST_BASE_DIR})
+
 AddTest(
   TARGET base_matrix3
-  SOURCES ${ABACUS_TEST_DIR}/module_base/matrix3.cpp
+  SOURCES ${ABACUS_TEST_DIR}/module_base/test_matrix3.cpp
 )
 AddTest(
   TARGET base_blas_connector
-  SOURCES ${ABACUS_TEST_DIR}/module_base/blas_connector.cpp
+  SOURCES ${ABACUS_TEST_DIR}/module_base/test_blas_connector.cpp
 )

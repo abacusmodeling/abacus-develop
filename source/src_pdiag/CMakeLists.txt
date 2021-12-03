@@ -3,7 +3,6 @@ add_subdirectory(MRRR)
 add_library(
     pdiag
     OBJECT
-    GenELPA.cpp
     pdgseps.cpp
     pdiag_basic.cpp
     pdiag_common.cpp
@@ -22,4 +21,5 @@ add_library(
     pzst2g.cpp
     pzsteiz.cpp
     pzt2s.cpp
+    diag_scalapack_gvx.cpp
 )

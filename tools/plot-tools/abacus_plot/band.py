@@ -1,7 +1,7 @@
 '''
 Date: 2021-05-08 11:47:09
 LastEditors: jiyuyang
-LastEditTime: 2021-08-21 22:41:41
+LastEditTime: 2021-08-26 12:07:22
 Mail: jiyuyang@mail.ustc.edu.cn, 1041176461@qq.com
 '''
 
@@ -123,13 +123,14 @@ class BandPlot:
         plt.savefig(outfile)
 
     @classmethod
-    def singleplot(cls, datafile: PathLike, kptfile: str = [], efermi: float = 0, energy_range: Sequence[float] = [], label: str = None, color: str = None, outfile: PathLike = 'band.png'):
+    def singleplot(cls, datafile: PathLike, kptfile: str = [], efermi: float = 0, energy_range: Sequence[float] = [], shift: bool = False, label: str = None, color: str = None, outfile: PathLike = 'band.png'):
         """Plot band structure using data file
 
         :params datafile: string of band date file
         :params kptfile: k-point file
         :params efermi: Fermi level in unit eV
         :params energy_range: range of energy to plot, its length equals to two
+        :params shift: if sets True, it will calculate band gap. This parameter usually is suitable for semiconductor and insulator. Default: False
         :params label: band label. Default: ''
         :params color: band color. Default: 'black'
         :params outfile: band picture file name. Default: 'band.png'
@@ -142,26 +143,30 @@ class BandPlot:
             color = 'black'
 
         kpoints, energy = cls.read(datafile)
-        vb, cb = cls.set_vcband(energy_minus_efermi(energy, efermi))
-
-        ax.plot(kpoints, np.vstack((vb.band, cb.band)).T,
-                lw=0.8, color=color, label=label)
-        cls.info(kpt.full_kpath, vb, cb)
+        if shift:
+            vb, cb = cls.set_vcband(energy_minus_efermi(energy, efermi))
+            ax.plot(kpoints, np.vstack((vb.band, cb.band)).T,
+                    lw=0.8, color=color, label=label)
+            cls.info(kpt.full_kpath, vb, cb)
+        else:
+            ax.plot(kpoints, energy_minus_efermi(energy, efermi),
+                    lw=0.8, color=color, label=label)
         index = kpt.label_special_k
         cls._set_figure(ax, index, energy_range)
 
         plt.savefig(outfile)
 
     @classmethod
-    def multiplot(cls, datafile: Sequence[PathLike], kptfile: str = '', efermi: Sequence[float] = [], energy_range: Sequence[float] = [], label: Sequence[str] = None, color: Sequence[str] = None, outfile: PathLike = 'band.png'):
+    def multiplot(cls, datafile: Sequence[PathLike], kptfile: str = '', efermi: Sequence[float] = [], energy_range: Sequence[float] = [], shift: bool = True, label: Sequence[str] = None, color: Sequence[str] = None, outfile: PathLike = 'band.png'):
         """Plot more than two band structures using data file
 
         :params datafile: list of path of band date file 
         :params kptfile: k-point file
         :params efermi: list of Fermi levels in unit eV, its length equals to `filename`
         :params energy_range: range of energy to plot, its length equals to two
-        :params label: list of band labels, its length equals to `filename`.
-        :params color: list of band colors, its length equals to `filename`.
+        :params shift: if sets True, it will calculate band gap. This parameter usually is suitable for semiconductor and insulator. Default: False
+        :params label: list of band labels, its length equals to `filename`
+        :params color: list of band colors, its length equals to `filename`
         :params outfile: band picture file name. Default: 'band.png'
         """
 
@@ -179,17 +184,21 @@ class BandPlot:
         emax = np.inf
         for i, file in enumerate(datafile):
             kpoints, energy = cls.read(file)
-            vb, cb = cls.set_vcband(energy_minus_efermi(energy, efermi[i]))
-            energy_min = np.min(vb.band)
-            energy_max = np.max(cb.band)
-            if energy_min > emin:
-                emin = energy_min
-            if energy_max < emax:
-                emax = energy_max
+            if shift:
+                vb, cb = cls.set_vcband(energy_minus_efermi(energy, efermi[i]))
+                energy_min = np.min(vb.band)
+                energy_max = np.max(cb.band)
+                if energy_min > emin:
+                    emin = energy_min
+                if energy_max < emax:
+                    emax = energy_max
 
-            ax.plot(kpoints, np.vstack((vb.band, cb.band)).T,
-                    lw=0.8, color=color[i], label=label[i])
-            cls.info(kpt.full_kpath, vb, cb)
+                ax.plot(kpoints, np.vstack((vb.band, cb.band)).T,
+                        lw=0.8, color=color[i], label=label[i])
+                cls.info(kpt.full_kpath, vb, cb)
+            else:
+                ax.plot(kpoints, energy_minus_efermi(energy, efermi[i]),
+                        lw=0.8, color=color[i], label=label[i])
 
         index = kpt.label_special_k
         cls._set_figure(ax, index, energy_range)

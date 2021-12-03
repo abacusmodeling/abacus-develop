@@ -8,6 +8,8 @@
 
 #include "matrix.h"
 #include <cstring>
+namespace ModuleBase
+{
 
 // !!! Attention: c is very dangerous, may point to somewhere deleted
 
@@ -49,4 +51,5 @@ inline matrix Matrix_Wrapper::to_matrix()
 	return m;
 }
 
+}
 #endif

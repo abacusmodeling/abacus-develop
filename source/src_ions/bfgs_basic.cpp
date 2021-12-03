@@ -61,7 +61,7 @@ void BFGS_Basic::allocate_basic(void)
 
 void BFGS_Basic::update_inverse_hessian(void)
 {
-//  TITLE("Ions_Move_BFGS","update_inverse_hessian");
+//  ModuleBase::TITLE("Ions_Move_BFGS","update_inverse_hessian");
  	assert(dim>0);
 
     double *s = new double [dim];
@@ -213,7 +213,7 @@ void BFGS_Basic::save_bfgs(void)
 //we should get a new direction in this case
 void BFGS_Basic::new_step(void)
 {
-	TITLE("BFGS_Basic","new_step");
+	ModuleBase::TITLE("BFGS_Basic","new_step");
 
 	//--------------------------------------------------------------------
 	++ Ions_Move_Basic::update_iter;
@@ -268,7 +268,7 @@ void BFGS_Basic::new_step(void)
 	}
 	else if(bfgs_ndim > 1)
 	{
-		WARNING_QUIT("Ions_Move_BFGS","bfgs_ndim > 1 not implemented yet");
+		ModuleBase::WARNING_QUIT("Ions_Move_BFGS","bfgs_ndim > 1 not implemented yet");
 	}
 
 	//--------------------------------------------------------------------
@@ -311,7 +311,7 @@ void BFGS_Basic::new_step(void)
 //trust radius determine the step length
 void BFGS_Basic::compute_trust_radius(void)
 {
-    TITLE("BFGS_Basic","compute_trust_radius");
+    ModuleBase::TITLE("BFGS_Basic","compute_trust_radius");
 
     // (1) judge 1
     double dot = dot_func(grad_p, move_p, dim);
@@ -371,7 +371,7 @@ void BFGS_Basic::compute_trust_radius(void)
         {
             //the history has already been reset at the previous step
             //something is going wrongsomething is going wrong
-            WARNING_QUIT("bfgs","bfgs history already reset at previous step, we got trapped!");
+            ModuleBase::WARNING_QUIT("bfgs","bfgs history already reset at previous step, we got trapped!");
         }
         GlobalV::ofs_running<<" Resetting BFGS history." << std::endl;
         this->reset_hessian();

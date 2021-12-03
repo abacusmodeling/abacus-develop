@@ -160,6 +160,7 @@ class Input
 	int nb2d;				// matrix 2d division.
 
 	int nurse;				// used for debug.
+	int nbspline;           // the order of B-spline basis(>=0) if it is -1 (default), B-spline for Sturcture Factor isnot used.
 
 	bool colour;			// used for fun.
 
@@ -221,6 +222,7 @@ class Input
 	int out_dm; // output density matrix.
 	int out_potential;		// yes or no
     int out_wf;			// 0: no; 1: txt; 2: dat
+    int out_wf_r;			// 0: no; 1: yes
 	int out_dos;			// dos calculation. mohan add 20090909
     int out_band;                   // band calculation pengfei 2014-10-13
 	int out_hs;			// output H matrix and S matrix in local basis.
@@ -228,6 +230,7 @@ class Input
 	int out_r_matrix;   // jingan add 2019-8-14, output r(R) matrix.
 	bool out_lowf;			// output the wave functions in local basis.
 	bool out_alllog; 		// output all logs.
+	bool out_element_info; // output infomation of all element
 
 	double dos_emin_ev;
 	double dos_emax_ev;
@@ -305,7 +308,7 @@ class Input
 	std::string vdw_R0_file;
 	std::string vdw_R0_unit;		    //"Bohr" or "Angstrom"
 	std::string vdw_model;			//"period" or "radius"
-	Vector3<int> vdw_period;
+	ModuleBase::Vector3<int> vdw_period;
 
 //==========================================================
 // Spectrum
@@ -349,6 +352,8 @@ class Input
 	//double  ocp_kb[10000];
 	int     lcao_box[3];           // the scale for searching the existence of the overlap <i,0|j,R>
 	int    mulliken;//qifeng add 2019-9-10
+	double* atom_mag;
+	int n_mag_at;
 	//added by zhengdy-soc
 	bool noncolin;
 	bool lspinorb;
@@ -452,10 +457,10 @@ class Input
 //==========================================================
 // DeepKS -- added by caoyu and mohan
 //==========================================================
-    int out_descriptor; // output descritpor for deepks. caoyu added 2020-11-24, mohan modified 2021-01-03
-	int lmax_descriptor; // lmax used in descriptor, mohan added 2021-01-03
-	int deepks_scf;	//if set 1, a trained model would be needed to cal V_delta and F_delta
-	std::string model_file;		//needed when deepks_scf=1
+    int out_descriptor; // (need libnpy) output descritpor for deepks. caoyu added 2020-11-24, mohan modified 2021-01-03
+	int lmax_descriptor; //lmax used in descriptor, mohan added 2021-01-03
+	int deepks_scf;	//(need libnpy and libtorch) if set 1, a trained model would be needed to cal V_delta and F_delta
+	string model_file;		//needed when deepks_scf=1
 
 //==========================================================
 // variables for test only

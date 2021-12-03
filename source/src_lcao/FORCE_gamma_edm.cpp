@@ -26,10 +26,10 @@ double Force_LCAO_gamma::set_EDM_element(
 }
 
 //#include "../src_develop/src_siao/selinv.h"
-void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
+void Force_LCAO_gamma::set_EDM_gamma(ModuleBase::matrix& dm, bool with_energy)
 {
-    TITLE("Force_LCAO_gamma","set_EDM_gamma");
-    timer::tick("Force_LCAO_gamma","set_EDM");
+    ModuleBase::TITLE("Force_LCAO_gamma","set_EDM_gamma");
+    ModuleBase::timer::tick("Force_LCAO_gamma","set_EDM");
 
 #ifdef __SELINV
 //xiaohui modified 2013-03-23, adding "/*"
@@ -637,7 +637,7 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 		}// end i
 	}//end ispin
 #endif //2015-09-06, xiaohui
-    timer::tick("Force_LCAO_gamma","set_EDM");
+    ModuleBase::timer::tick("Force_LCAO_gamma","set_EDM");
     return;
 }
 
@@ -647,18 +647,18 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 void Force_LCAO_gamma::cal_foverlap(
 	const bool isforce, 
 	const bool isstress, 
-	matrix& foverlap, 
-	matrix& soverlap)
+	ModuleBase::matrix& foverlap, 
+	ModuleBase::matrix& soverlap)
 {
-    TITLE("Force_LCAO_gamma","cal_foverlap");
-    timer::tick("Force_LCAO_gamma","cal_foverlap");
+    ModuleBase::TITLE("Force_LCAO_gamma","cal_foverlap");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_foverlap");
 
     // set energy density matrix.
     if(INPUT.new_dm>0)
     {
-        timer::tick("Force_LCAO_gamma","cal_edm_2d");
+        ModuleBase::timer::tick("Force_LCAO_gamma","cal_edm_2d");
 
-        matrix wgEkb;
+        ModuleBase::matrix wgEkb;
         wgEkb.create(GlobalV::NSPIN, GlobalV::NBANDS);
 
         for(int is=0; is<GlobalV::NSPIN; is++)
@@ -674,7 +674,7 @@ void Force_LCAO_gamma::cal_foverlap(
         wfc_edm_2d.wfc_gamma=GlobalC::LOC.wfc_dm_2d.wfc_gamma;
         wfc_edm_2d.cal_dm(wgEkb);
 
-        timer::tick("Force_LCAO_gamma","cal_edm_2d");
+        ModuleBase::timer::tick("Force_LCAO_gamma","cal_edm_2d");
 
         for(int i=0; i<GlobalV::NLOCAL; i++)
         {
@@ -716,8 +716,8 @@ void Force_LCAO_gamma::cal_foverlap(
     }
     else
     {
-        timer::tick("Force_LCAO_gamma","cal_edm_grid");
-        matrix edm2d;
+        ModuleBase::timer::tick("Force_LCAO_gamma","cal_edm_grid");
+        ModuleBase::matrix edm2d;
 		edm2d.create(GlobalV::NSPIN, GlobalC::ParaO.nloc);
 
         bool with_energy = true;
@@ -726,7 +726,7 @@ void Force_LCAO_gamma::cal_foverlap(
 
 		this->set_EDM_gamma(edm2d, with_energy);
 
-        timer::tick("Force_LCAO_gamma","cal_edm_grid");
+        ModuleBase::timer::tick("Force_LCAO_gamma","cal_edm_grid");
 
         //summation \sum_{i,j} E(i,j)*dS(i,j)
         //BEGIN GlobalV::CALCULATION OF GlobalV::FORCE OF EACH ATOM
@@ -788,6 +788,6 @@ void Force_LCAO_gamma::cal_foverlap(
             }
         }
     }
-    timer::tick("Force_LCAO_gamma","cal_foverlap");
+    ModuleBase::timer::tick("Force_LCAO_gamma","cal_foverlap");
     return;
 }

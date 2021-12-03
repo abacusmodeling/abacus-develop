@@ -57,7 +57,7 @@ void OUT(std::ofstream &ofs,const std::string &name)
 //==========================================================
 void MAKE_DIR(const std::string &fn)
 {
-//	TITLE("global_function","MAKE_DIR");
+//	ModuleBase::TITLE("global_function","MAKE_DIR");
     if (GlobalV::MY_RANK==0)
     {
         std::stringstream ss;
@@ -67,7 +67,7 @@ void MAKE_DIR(const std::string &fn)
 //----------------------------------------------------------
         if ( system( ss.str().c_str() ) )
         {
-            WARNING_QUIT( "MAKE_DIR", fn );
+            ModuleBase::WARNING_QUIT( "MAKE_DIR", fn );
         }
     }
 #ifdef __MPI
@@ -85,7 +85,7 @@ void DONE(std::ofstream &ofs,const std::string &description, const bool only_ran
         {
      //       ofs << " ---------------------------------------------------------------------------------\n";
             ofs << " DONE : " << description;
-            ofs << " Time : "<< timer::print_until_now() << " (SEC)" ;
+            ofs << " Time : "<< ModuleBase::timer::print_until_now() << " (SEC)" ;
 			ofs << std::endl << std::endl;
      //       ofs << "\n ---------------------------------------------------------------------------------\n";
         }
@@ -94,12 +94,12 @@ void DONE(std::ofstream &ofs,const std::string &description, const bool only_ran
     {
      //   ofs << " ---------------------------------------------------------------------------------\n";
         ofs << " DONE : " << description;
-        ofs << " Time : "<< timer::print_until_now() << " (SEC)" ;
+        ofs << " Time : "<< ModuleBase::timer::print_until_now() << " (SEC)" ;
 		ofs << std::endl << std::endl;
      //   ofs << "\n ---------------------------------------------------------------------------------\n";
     }
 //   	std::cout << "\n---------------------------------------------------------------------------------\n";
-    std::cout << " DONE(" << std::setw(10) << timer::print_until_now() <<" SEC) : "<< description << std::endl;
+    std::cout << " DONE(" << std::setw(10) << ModuleBase::timer::print_until_now() <<" SEC) : "<< description << std::endl;
 //   	std::cout << "\n---------------------------------------------------------------------------------\n";
     return;
 }
@@ -212,7 +212,7 @@ void BLOCK_HERE( const std::string &description)
 	}
 	else
 	{
-		QUIT();
+		ModuleBase::QUIT();
 	}
 }
 

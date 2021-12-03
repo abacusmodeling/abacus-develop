@@ -3,7 +3,7 @@
 - [List of keywords](#list-of-keywords)
     - [System variables](#system-variables)
 
-        [suffix](#suffix) | [ntype](#ntype) | [calculation](#calculation) | [dft_functional](#dft-functional) | [pseudo_type](#pseudo-type) | [npool](#npool) | [symmetry](#symmetry) | [pseudo_rcut](#pseudo-rcut) | [renormwithmesh](#renormwithmesh) | [nelec](#nelec) | [tot_magnetization](#tot-magnetization) | [mem_saver](#mem-saver) | [latname](#latname) | [start_wfc](#start-wfc) | [seed](#seed) | [start_charge](#start-charge) | [start_pot](#start-pot) | [set_vel](#set_vel) | [diago_proc](#diago_proc) 
+        [suffix](#suffix) | [ntype](#ntype) | [calculation](#calculation) | [dft_functional](#dft-functional) | [pseudo_type](#pseudo-type) | [npool](#npool) | [symmetry](#symmetry) | [pseudo_rcut](#pseudo-rcut) | [renormwithmesh](#renormwithmesh) | [nelec](#nelec) | [tot_magnetization](#tot-magnetization) | [mem_saver](#mem-saver) | [latname](#latname) | [start_wfc](#start-wfc) | [seed](#seed) | [start_charge](#start-charge) | [start_pot](#start-pot) | [set_vel](#set_vel) | [diago_proc](#diago_proc) | [nbspline](#nbspline)
 
     - [Variables related to input files](#variables-related-to-input-files)
 
@@ -27,7 +27,7 @@
 
     - [Variables related to program output](#variables-related-to-program-output)
 
-        [mulliken](#mulliken) | [out_charge](#out-charge) | [out_potential](#out-potential) | [out_dm](#out-dm) | [out_wf](#out-wf) | [out_lowf](#out-lowf) | [out_dos](#out-dos) | [out_band](#out-band) | [out_stru](#out-stru) | [out_level](#out_level) | [out_alllog](#out-alllog) | [out_hs](#out-hs) | [out_r](#out-r) | [out_hs2](#out-hs2)
+        [mulliken](#mulliken) | [out_charge](#out-charge) | [out_potential](#out-potential) | [out_dm](#out-dm) | [out_wf](#out-wf) | [out_lowf](#out-lowf) | [out_dos](#out-dos) | [out_band](#out-band) | [out_stru](#out-stru) | [out_level](#out_level) | [out_alllog](#out-alllog) | [out_hs](#out-hs) | [out_r](#out-r) | [out_hs2](#out-hs2) | [out_element_info](#out-element-info) 
 
     - [Density of states](#density-of-states)
 
@@ -36,10 +36,6 @@
     - [Electric field](#electric-field)
     
         [efield](#efield) | [edir](#edir) | [emaxpos](#emaxpos) | [eopreg](#eopreg) | [eamp](#eamp)
-        
-    - [DeePKS](#deepks)
-
-        [out_descriptor](#out-descriptor) | [lmax_descriptor](#lmax-descriptor) | [deepks_scf](#deepks-scf) | [model_file](#model-file)
     
     - [Exact exchange](#exact-exchange) (under tests)
     
@@ -47,11 +43,14 @@
 
     - [Molecular dynamics](#molecular-dynamics)
 
-        [md_type](#md-type) | [md_rstmd](#md-rstmd) | [md_dt](#md-dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_dumpmdfred](#md-dumpmdfred) | [md_fixtemperature](#md-fixtemperature) | [NVT_control](#nvt-control) | [NVT_tau](#nvt-tau) | [MNHC](#mnhc) | [md_ediff](#md-ediff) | [md_ediffg](#md-ediffg) | [rcut_lj](#rcut_lj) | [epsilon_lj](#epsilon_lj) | [sigma_lj](#sigma_lj)
+        [md_type](#md-type) | [md_potential](#md-potential) | [md_rstmd](#md-rstmd) | [md_dt](#md_dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_dumpmdfred](#md-dumpmdfred) | [md_fixtemperature](#md-fixtemperature) | [NVT_control](#nvt-control) | [NVT_tau](#nvt-tau) | [MNHC](#mnhc) | [md_ediff](#md-ediff) | [md_ediffg](#md-ediffg) | [rcut_lj](#rcut_lj) | [epsilon_lj](#epsilon_lj) | [sigma_lj](#sigma_lj)
+
+    - [DFT+U correction](#DFT_U-correction)
 
     - [VdW correction](#vdw-correction)
 
         [vdw_method](#vdw-method) | [vdw_s6](#vdw-s6) | [vdw_s8](#vdw-s8) | [vdw_a1](#vdw-a1) | [vdw_a2](#vdw-a2) | [vdw_d](#vdw-d) | [vdw_abc](#vdw-abc) | [vdw_C6_file](#vdw-C6-file) | [vdw_C6_unit](#vdw-C6-unit) | [vdw_R0_file](#vdw-R0-file) | [vdw_R0_unit](#vdw-R0-unit) | [vdw_model](#vdw-model) | [vdw_radius](#vdw-radius) | [vdw_radius_unit](#vdw-radius-unit) | [vdw_cn_radius](#vdw-cn-radius) | [vdw_cn_radius_unit](#vdw-cn-radius-unit) | [vdw_period](#vdw-period)
+        
     - [Berry phase and wannier90 interface](#berry-phase-and-wannier90-interface)
     
         [berry_phase](#berry-phase) | [gdir](#gdir) | [towannier90](#towannier90) | [nnkpfile](#nnkpfile) | [wannier_spin](#wannier-spin) | [tddft](#tddft)  [vext](#vext) | [vext_dire](#vext-dire) 
@@ -59,6 +58,9 @@
     - [Variables useful for debugging](#variables-useful-for-debugging)
 
         [nurse](#nurse) | [t_in_h](#t-in-h) | [vl_in_h](#vl-in-h) | [vnl_in_h](#vnl-in-h) | [test_force](#test-force) | [test_stress](#test-stress) | [colour](#colour) | [new_dm](#new-dm) | [test_just_neighbor](#test-just-neighbor)
+    - [DeePKS](#deepks)
+    
+        [out_descriptor](#out-descriptor) | [lmax_descriptor](#lmax-descriptor) | [deepks_scf](#deepks-scf) | [model_file](#model-file)
 
     [back to main page](../README.md)
 
@@ -171,6 +173,7 @@ This part of variables are used to control general system parameters.
         - upf : .UPF format
         - vwr : .vwr format
         - upf201 : the new UPF format
+        - blps : bulk local pseudopotential
     - *Default* : upf
 
     [back to top](#input-file)
@@ -291,6 +294,14 @@ This part of variables are used to control general system parameters.
     - *Type*: Integer
     - *Descrption*: If set to a positive number, then it specifies the number of threads used for carrying out diagonalization. Must be less than or equal to total number of MPI threads. Also, when cg diagonalization is used, diago_proc must be same as total number of MPI threads. If set to 0, then it will be set to the number of MPI threads. Normally, it is fine just leaving it to default value.
     - *Default*: 0
+
+    [back to top](#input-file)
+
+- nbspline<a id="nbspline"></a>
+    - *Type*: Integer
+    - *Descrption*: If set to a natural number, a Cardinal B-spline interpolation will be used to calculate Structure Factor. "nbspline" represents the order of B-spline basis and larger one can get more accurate results but cost more.
+    It is turned off by default.
+    - *Default*: -1
 
     [back to top](#input-file)
 
@@ -511,7 +522,7 @@ calculations.
     - *Description*: It indicates which occupation and smearing method is used in the calculation.
         - fixed: use fixed occupations.
         - gauss or gaussian: use gaussian smearing method.
-        - mp: use methfessel-paxton smearing method.
+        - mp: use methfessel-paxton smearing method. The method recommends for metals. 
     - *Default*: fixed
 
     [back to top](#input-file)
@@ -820,6 +831,23 @@ This part of variables are used to control the output of properties.
 
     [back to top](#input-file)
 
+- out_element_info<a id="out-element-info"></a>
+    - *Type*: Boolean
+    - *Description*: When set to 1, ABACUS will generate a new directory under OUT.suffix path named as element name such as 'Si', which contained files "Si-d1-orbital-dru.dat  Si-p2-orbital-k.dat    Si-s2-orbital-dru.dat
+    Si-d1-orbital-k.dat    Si-p2-orbital-r.dat    Si-s2-orbital-k.dat
+    Si-d1-orbital-r.dat    Si-p2-orbital-ru.dat   Si-s2-orbital-r.dat
+    Si-d1-orbital-ru.dat   Si-p-proj-k.dat        Si-s2-orbital-ru.dat
+    Si.NONLOCAL            Si-p-proj-r.dat        Si-s-proj-k.dat
+    Si-p1-orbital-dru.dat  Si-p-proj-ru.dat       Si-s-proj-r.dat
+    Si-p1-orbital-k.dat    Si-s1-orbital-dru.dat  Si-s-proj-ru.dat
+    Si-p1-orbital-r.dat    Si-s1-orbital-k.dat    v_loc_g.dat
+    Si-p1-orbital-ru.dat   Si-s1-orbital-r.dat
+    Si-p2-orbital-dru.dat  Si-s1-orbital-ru.dat " for example.
+
+    - *Default*: 0
+
+    [back to top](#input-file)
+
 ### Density of states
 This part of variables are used to control the calculation of DOS.
 
@@ -946,24 +974,8 @@ This part of variables are relevant when using hybrid functionals
     - *Default*: 0.11
 
     [back to top](#input-file)
-
-- exx_separate_loop<a id="exx-separate-loop"></a>
-    - *Type*: Boolean
-    - *Description*: When hybrid functional is used, the Hamiltonian can be partitioned into H=H<sub>LDA/GGA</sub>+F<sub>X</sub>. Updating of the latter takes more computational effort. As a result, we devise a double-SCF procedure, which is adopted when setting exx_separate_loop=1. In the procedure, the inner loop converges H<sub>LDA/GGA</sub> while F<sub>X</sub> is fixed. While in the outer loop, F<sub>X</sub> achieves self-consistency. On the other hand, if exx_separate is set to 0, only a single SCF is used to converge H. **Note: only pulay and plain mixing are allowed if exx_separate_loop = 0**
-    - *Default*: 1
-
-    [back to top](#input-file)
-
-- exx_hybrid_step<a id="exx-hybrid-step"></a>
-    - *Type*: Integer
-    - *Description*: If exx_separate_loop is set to 1, this gives the maximum steps allowed in the inner loop.
-    - *Default*: 100
-
-    [back to top](#input-file)
-
-- exx_lambda<a id="exx-lambda"></a>
-    - *Type*: Real
-    - *Description*: This parameter is only relevant when using hybrid functional with lcao in pw basis set (i.e. when basis_type="lcao_in_pw") to treat the divergence of Coulomb potential at g=0 in reciprocal space. There we damp the divergence with function e^(-&gamma;g).
+adial integration for pseudopotentials, in Bohr.
+@@ -214,6 +279,13 @@ This part of variables are used to control general system para
     - *Default*: 0.3
 
     [back to top](#input-file)
@@ -1064,6 +1076,17 @@ This part of variables are used to control the molecular dynamics calculations.
     - *Default*: 1
 
     [back to top](#input-file)
+
+- md_potential<a id="md-potential"></a>
+    - *Type*: String
+    - *Description*: choose the potential type.
+        - FP: First-Principles MD;
+        - LJ: Leonard Jones potential;
+        - DP: DeeP potential;
+    - *Default*: FP
+
+    [back to top](#input-file)
+
 - md_rstmd<a id="md-rstmd"></a>
     - *Type*: Bool
     - *Description*: to control whether restart md.
@@ -1165,6 +1188,51 @@ This part of variables are used to control the molecular dynamics calculations.
     - *Default*: 3.405 (for He)
 
     [back to top](#input-file)
+
+### DFT+U correction
+This part of variables are used to control DFT+U correlated parameters
+- dft_plus_u 
+    - *Type*: Bool
+    - *Description*: If set to 1, ABCUS will calculate plus U correction, which is especially important for correlated electron.
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+- orbital_corr
+    - *Type*: Int
+    - *Description*: $l_1,l_2,l_3,\ldots$ for atom type 1,2,3 respectively.(usually 2 for d electrons and 3 for f electrons) .Specify which orbits need plus U correction for each atom. If set to -1, the correction would not be calculate for this atom.
+    - *Default*: None
+
+    [back to top](#input-file)
+
+- hubbard_u
+    - *Type*: Real
+    - *Description*: Hubbard Coulomb interaction parameter U(ev) in plus U correction,which should be specified for each atom unless Yukawa potential is use. ABACUS use a simplified scheme which only need U and J for each atom.
+    - *Default*: 0.0 
+
+    [back to top](#input-file)
+
+- hund_j
+    - *Type*: Real
+    - *Description*: Hund exchange parameter J(ev) in plus U correction ,which should be specified for each atom unless Yukawa potential is use. ABACUS use a simplified scheme which only need U and J for each atom.
+    - *Default*: 0.0 
+
+    [back to top](#input-file)
+
+- yukawa_potential
+    - *Type*: Bool
+    - *Description*: whether use the local screen Coulomb potential method to calculate the value of U and J. If this is set to 1, hubbard_u and hund_j do not need to be specified.
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+- omc 
+    - *Type*: Bool
+    - *Description*: whether turn on occupation matrix control method or not
+    - *Default*: 0
+
+    [back to top](#input-file)
+
 
 ### VdW correction
 This part of variables are used to control vdW-corrected related parameters.

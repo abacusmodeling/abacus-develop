@@ -12,11 +12,11 @@
 //#include <boost/archive/binary_oarchive.hpp>
 //#include <boost/archive/binary_iarchive.hpp>
 
-template<typename T> class Abfs::Vector3_Order: public Vector3<T>
+template<typename T> class Abfs::Vector3_Order: public ModuleBase::Vector3<T>
 {
 public: 
-	Vector3_Order(const Vector3<T> &v):Vector3<T>(v){}
-	Vector3_Order(const T &x,const T &y,const T &z):Vector3<T>(x,y,z){}
+	Vector3_Order(const ModuleBase::Vector3<T> &v):ModuleBase::Vector3<T>(v){}
+	Vector3_Order(const T &x,const T &y,const T &z):ModuleBase::Vector3<T>(x,y,z){}
 	Vector3_Order()=default;
 };
 

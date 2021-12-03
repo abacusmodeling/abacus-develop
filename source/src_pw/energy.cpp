@@ -16,6 +16,9 @@
 #include "H_Ewald_pw.h"
 #include "H_Hartree_pw.h"
 #include "H_XC_pw.h"
+#ifdef __DEEPKS
+#include "../src_lcao/LCAO_descriptor.h"
+#endif
 
 
 energy::energy()
@@ -42,7 +45,7 @@ energy::~energy()
 
 void energy::calculate_harris(const int &flag)
 {
-//	TITLE("energy","calculate_harris");
+//	ModuleBase::TITLE("energy","calculate_harris");
 	
 	if(flag==1)
 	{
@@ -64,6 +67,14 @@ void energy::calculate_harris(const int &flag)
 			this->etot_harris += GlobalC::dftu.EU;  //Energy correction from DFT+U; Quxin adds on 20201029
 		}
 #endif
+#ifdef __DEEPKS
+        if(GlobalV::deepks_scf) 
+		{
+			this->etot_harris += GlobalC::ld.E_delta;  //caoyu add 2021-08-10
+			GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma);
+			this->etot_harris -= GlobalC::ld.e_delta_band;
+		}
+#endif
 	}
 	
 	return;
@@ -71,7 +82,7 @@ void energy::calculate_harris(const int &flag)
 
 void energy::calculate_etot(void)
 {
-	TITLE("energy","calculate_etot");
+	ModuleBase::TITLE("energy","calculate_etot");
 	//std::cout << "\n demet in etot = " << demet << std::endl;
 	this->etot = eband + deband 
 	+ (H_XC_pw::etxc - etxcc) 
@@ -104,7 +115,15 @@ void energy::calculate_etot(void)
 		this->etot += GlobalC::dftu.EU;																	  
 	}
 #endif
-	return;	
+#ifdef __DEEPKS
+	if (GlobalV::deepks_scf)
+	{
+		this->etot += GlobalC::ld.E_delta;
+        GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma);
+        this->etot -= GlobalC::ld.e_delta_band;
+	}
+#endif
+	return;
 }
 
 void energy::print_etot(
@@ -117,7 +136,7 @@ void energy::print_etot(
 	const double &avg_iter,
 	bool print)
 {
-	TITLE("energy","print_etot");
+	ModuleBase::TITLE("energy","print_etot");
 	this->iter = iter_in;
 
 	GlobalV::ofs_running << std::setprecision(12);
@@ -129,30 +148,36 @@ void energy::print_etot(
 	{
 		if(GlobalV::BASIS_TYPE=="pw")ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Error Threshold",ethr); //xiaohui add 2013-09-02
 
-		if( this->printe>0 && ( (iter+1) % this->printe == 0 || converged || iter == GlobalV::NITER) )	
+		if (this->printe > 0 && ((iter + 1) % this->printe == 0 || converged || iter == GlobalV::NITER))
 		{
 			GlobalV::ofs_running << "\n " << std::setw(12) << "Energy" << std::setw(30) << "Rydberg" << std::setw(30) << "eV" << std::endl;
-			this->print_format("E_KohnSham",etot);
-			this->print_format("E_Harris",etot_harris);
-			this->print_format("E_band",eband);
-			this->print_format("E_one_elec",eband+deband);
-			this->print_format("E_Hartree",H_Hartree_pw::hartree_energy);
-			this->print_format("E_xc",H_XC_pw::etxc-etxcc);
-			this->print_format("E_Ewald",H_Ewald_pw::ewald_energy);
-			this->print_format("E_demet",demet); //mohan add 2011-12-02
-			this->print_format("E_descf",descf);
-			this->print_format("E_efield",Efield::etotefield);
-			if(GlobalC::vdwd2_para.flag_vdwd2)					//Peize Lin add 2014-04, update 2021-03-09
+			this->print_format("E_KohnSham", etot);
+			this->print_format("E_Harris", etot_harris);
+			this->print_format("E_band", eband);
+			this->print_format("E_one_elec", eband + deband);
+			this->print_format("E_Hartree", H_Hartree_pw::hartree_energy);
+			this->print_format("E_xc", H_XC_pw::etxc - etxcc);
+			this->print_format("E_Ewald", H_Ewald_pw::ewald_energy);
+			this->print_format("E_demet", demet); //mohan add 2011-12-02
+			this->print_format("E_descf", descf);
+			this->print_format("E_efield", Efield::etotefield);
+			if (GlobalC::vdwd2_para.flag_vdwd2)					//Peize Lin add 2014-04, update 2021-03-09
 			{
-				this->print_format("E_vdwD2",evdw);
+				this->print_format("E_vdwD2", evdw);
 			}
 			if(GlobalC::vdwd3_para.flag_vdwd3)					//jiyy add 2019-05, update 2021-05-02
 			{
-				this->print_format("E_vdwD3",evdw);
+				this->print_format("E_vdwD3", evdw);
 			}
-			this->print_format("E_exx",exx);
+			this->print_format("E_exx", exx);
+#ifdef __DEEPKS
+			if (GlobalV::deepks_scf)	//caoyu add 2021-08-10
+			{
+				this->print_format("E_DeePKS", GlobalC::ld.E_delta);
+			}
+#endif
 		}
-		else
+			else
 		{
 			GlobalV::ofs_running << "\n " << std::setw(12) << "Energy" << std::setw(30) << "Rydberg" << std::setw(30) << "eV" << std::endl;
 			this->print_format("E_KohnSham",etot);
@@ -206,7 +231,7 @@ void energy::print_etot(
 	}
 	else
 	{
-		WARNING_QUIT("Energy","print_etot");
+		ModuleBase::WARNING_QUIT("Energy","print_etot");
 	}
     ss << label << iter;
 	//xiaohui add 2013-09-02
@@ -260,8 +285,8 @@ void energy::print_etot(
 					//printf( "[32m%-14e[0m", dr2);
 				}
 				// 34 is blue
-				printf( "\e[36m%-15f\e[0m", GlobalC::en.etot*Ry_to_eV);	
-				//printf( "[36m%-15f[0m", GlobalC::en.etot*Ry_to_eV);	
+				printf( "\e[36m%-15f\e[0m", GlobalC::en.etot*ModuleBase::Ry_to_eV);	
+				//printf( "[36m%-15f[0m", GlobalC::en.etot*ModuleBase::Ry_to_eV);	
 				std::cout << std::setprecision(3);
 	//			std::cout << std::setw(11) << GlobalC::en.eband;
 	//			std::cout << std::setw(11) << H_Hartree_pw::hartree_energy;
@@ -293,8 +318,8 @@ void energy::print_etot(
 				std::cout<<std::setw(10)<<GlobalC::ucell.magnet.abs_magnetization;
 			}
 			std::cout << std::setprecision(6);
-			std::cout << std::setw(15) << GlobalC::en.etot*Ry_to_eV;
-                        std::cout << std::setw(15) << (GlobalC::en.etot - GlobalC::en.etot_old) *Ry_to_eV;  //pengfei Li added 2015-1-31
+			std::cout << std::setw(15) << GlobalC::en.etot*ModuleBase::Ry_to_eV;
+                        std::cout << std::setw(15) << (GlobalC::en.etot - GlobalC::en.etot_old) *ModuleBase::Ry_to_eV;  //pengfei Li added 2015-1-31
                         std::cout << std::setprecision(3);
                         std::cout << std::setw(11) << dr2;
 			std::cout << std::setprecision(3);
@@ -331,7 +356,7 @@ void energy::print_format(const std::string &name, const double &value)
 	std::stringstream name2;
 	name2 << name;
 	GlobalV::ofs_running << " " << std::setw(12) << name2.str() << std::setw(30) <<  value 
-	<< std::setw(30) << value * Ry_to_eV << std::endl;
+	<< std::setw(30) << value * ModuleBase::Ry_to_eV << std::endl;
 	GlobalV::ofs_running << std::resetiosflags(ios::showpos);
 	return;
 }
@@ -394,7 +419,7 @@ double energy::delta_e(void)
 
 void energy::delta_escf(void)
 {
-	TITLE("energy","delta_escf");
+	ModuleBase::TITLE("energy","delta_escf");
     this->descf = 0.0;
 
 	// now rho1 is "mixed" charge density
@@ -453,7 +478,7 @@ void energy::print_band(const int &ik)
 	}
 	if(wrong)
     {
-        WARNING_QUIT("Threshold_Elec::print_eigenvalue","Eigenvalues are too large!");
+        ModuleBase::WARNING_QUIT("Threshold_Elec::print_eigenvalue","Eigenvalues are too large!");
     }
 
 
@@ -476,7 +501,7 @@ void energy::print_band(const int &ik)
 				for(int ib=0;ib<GlobalV::NBANDS;ib++)
 				{
 					GlobalV::ofs_running << " "<< std::setw(6) << ib+1  
-						<< std::setw(15) << GlobalC::wf.ekb[ik][ib] * Ry_to_eV;
+						<< std::setw(15) << GlobalC::wf.ekb[ik][ib] * ModuleBase::Ry_to_eV;
 					// for the first electron iteration, we don't have the energy
 					// spectrum, so we can't get the occupations. 
 					GlobalV::ofs_running << std::setw(15) << GlobalC::wf.wg(ik,ib);
@@ -492,7 +517,7 @@ void energy::print_band(const int &ik)
 #ifdef __LCAO
 void energy::set_exx()
 {
-	TITLE("energy", "set_exx");
+	ModuleBase::TITLE("energy", "set_exx");
 
 	auto exx_energy = []() -> double
 	{

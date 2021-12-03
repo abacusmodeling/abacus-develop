@@ -12,7 +12,7 @@ class MD_thermo
     void Integrator(
         const int control,
         const double &temperature,
-        Vector3<double>* vel,
+        ModuleBase::Vector3<double>* vel,
         const double* allmass
         );
     void init_NHC(
@@ -24,7 +24,7 @@ class MD_thermo
         std::ofstream &ofs, 
         const int &numIon,
         const double &temperature,
-        const Vector3<double>* vel,
+        const ModuleBase::Vector3<double>* vel,
         const double* allmass
         );
     double NHChamiltonian(
@@ -40,17 +40,17 @@ class MD_thermo
     private:    
     void ADSIntegrator(
         const double &temperature,
-        Vector3<double>* vel,
+        ModuleBase::Vector3<double>* vel,
         const double* allmass
     );
 	void LGVIntegrator(
         const double &temperature,
-        Vector3<double>* vel,
+        ModuleBase::Vector3<double>* vel,
         const double* allmass
     );
 	void NHCIntegrator(
         const double &temperature,
-        Vector3<double>* vel,
+        ModuleBase::Vector3<double>* vel,
         const double* allmass
     );
 
@@ -90,9 +90,9 @@ class MD_thermo
     int numIon_;
 
     //need to be allocated
-    Vector3<double> *G; //parameter in NHC
-    Vector3<double> *NHCeta; //NHC position
-    Vector3<double> *NHCpeta; //NHC momentum
+    ModuleBase::Vector3<double> *G; //parameter in NHC
+    ModuleBase::Vector3<double> *NHCeta; //NHC position
+    ModuleBase::Vector3<double> *NHCpeta; //NHC momentum
 
 };
 

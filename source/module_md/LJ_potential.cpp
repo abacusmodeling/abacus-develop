@@ -7,14 +7,18 @@ LJ_potential::~LJ_potential(){}
 
 double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c, 
                     Grid_Driver &grid_neigh, 
-                    Vector3<double> *force)
+                    ModuleBase::Vector3<double> *force,
+                    ModuleBase::matrix &stress)
 {
-    TITLE("LJ_potential", "Lennard_Jones");
-    timer::tick("LJ_potential", "Lennard_Jones");
+    ModuleBase::TITLE("LJ_potential", "Lennard_Jones");
+    ModuleBase::timer::tick("LJ_potential", "Lennard_Jones");
 
     double distance, potential = 0; //initialize
     int index = 0;
-    Vector3<double> tau1, tau2, dtau;
+    double virial[6];
+    ModuleBase::GlobalFunc::ZEROS(virial, 6);    // initialize
+
+    ModuleBase::Vector3<double> tau1, tau2, dtau;
     for(int it=0; it<ucell_c.ntype; ++it)
     {
         Atom* atom1 = &ucell_c.atoms[it];
@@ -31,24 +35,38 @@ double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c,
                 if(distance <= INPUT.mdp.rcut_lj)
 			    {
 				    potential += LJ_energy(distance) - LJ_energy(INPUT.mdp.rcut_lj);
-				    force[index] += LJ_force(distance, dtau);
+                    ModuleBase::Vector3<double> f_ij = LJ_force(distance, dtau);
+				    force[index] += f_ij;
+                    LJ_virial(virial, f_ij, dtau);
 			    }
             }
             index++;
 	    }
     }
-    timer::tick("LJ_potential", "Lennard_Jones");
+
+    // Post treatment for virial
+    stress(0, 0) = virial[0]/(2.0*ucell_c.omega);
+    stress(1, 1) = virial[1]/(2.0*ucell_c.omega);
+    stress(2, 2) = virial[2]/(2.0*ucell_c.omega);
+    stress(0, 1) = stress(1, 0) = virial[3]/(2.0*ucell_c.omega);
+    stress(0, 2) = stress(2, 0) = virial[4]/(2.0*ucell_c.omega);
+    stress(1, 2) = stress(2, 1) = virial[5]/(2.0*ucell_c.omega);
+
+    ModuleBase::timer::tick("LJ_potential", "Lennard_Jones");
 	return potential/2.0;
 }
 
 double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c, 
                     CMD_neighbor &cmd_neigh,
-                    Vector3<double> *force)
+                    ModuleBase::Vector3<double> *force,
+                    ModuleBase::matrix &stress)
 {
-    TITLE("LJ_potential", "Lennard_Jones");
-    timer::tick("LJ_potential", "Lennard_Jones");
+    ModuleBase::TITLE("LJ_potential", "Lennard_Jones");
+    ModuleBase::timer::tick("LJ_potential", "Lennard_Jones");
 
-    double potential = 0; //initialize
+    double potential = 0; // initialize
+    double virial[6];
+    ModuleBase::GlobalFunc::ZEROS(virial, 6);    // initialize
 
 	for(int i=0; i<ucell_c.nat; i++)
 	{	
@@ -56,17 +74,17 @@ double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c,
 
         int T1 = ucell_c.iat2it[i];
         int I1 = ucell_c.iat2ia[i];
-        Vector3<double> taud1 = ucell_c.atoms[T1].taud[I1];
+        ModuleBase::Vector3<double> taud1 = ucell_c.atoms[T1].taud[I1];
 
 		for(int j=0; j<cmd_neigh.nlist[i]; j++)
 		{
             int T2 = ucell_c.iat2it[cmd_neigh.list[i][j]];
             int I2 = ucell_c.iat2ia[cmd_neigh.list[i][j]];
-            Vector3<double> taud2 = ucell_c.atoms[T2].taud[I2];
+            ModuleBase::Vector3<double> taud2 = ucell_c.atoms[T2].taud[I2];
 
-			Vector3<double> tempd = cmd_neigh.cell_periodic(taud1,taud2);
-            Vector3<double> temp;
-            Mathzone::Direct_to_Cartesian(
+			ModuleBase::Vector3<double> tempd = cmd_neigh.cell_periodic(taud1,taud2);
+            ModuleBase::Vector3<double> temp;
+            ModuleBase::Mathzone::Direct_to_Cartesian(
 			tempd.x, tempd.y, tempd.z,
 			ucell_c.latvec.e11, ucell_c.latvec.e12, ucell_c.latvec.e13,
 			ucell_c.latvec.e21, ucell_c.latvec.e22, ucell_c.latvec.e23,
@@ -78,11 +96,22 @@ double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c,
 			if(distance <= INPUT.mdp.rcut_lj)
 			{
 				potential += LJ_energy(distance) - LJ_energy(INPUT.mdp.rcut_lj);
-				force[i] = force[i] + LJ_force(distance, temp*ucell_c.lat0);
+                ModuleBase::Vector3<double> f_ij = LJ_force(distance, temp*ucell_c.lat0);
+				force[i] = force[i] + f_ij;
+                LJ_virial(virial, f_ij, temp*ucell_c.lat0);
 			}
 		}
 	}
-    timer::tick("LJ_potential", "Lennard_Jones");
+
+    // Post treatment for virial
+    stress(0, 0) = virial[0]/(2.0*ucell_c.omega);
+    stress(1, 1) = virial[1]/(2.0*ucell_c.omega);
+    stress(2, 2) = virial[2]/(2.0*ucell_c.omega);
+    stress(0, 1) = stress(1, 0) = virial[3]/(2.0*ucell_c.omega);
+    stress(0, 2) = stress(2, 0) = virial[4]/(2.0*ucell_c.omega);
+    stress(1, 2) = stress(2, 1) = virial[5]/(2.0*ucell_c.omega);
+
+    ModuleBase::timer::tick("LJ_potential", "Lennard_Jones");
 	return potential/2.0;
 }
 
@@ -91,8 +120,18 @@ double LJ_potential::LJ_energy(const double d)
 	return 4*INPUT.mdp.epsilon_lj*( pow(INPUT.mdp.sigma_lj/d, 12) - pow(INPUT.mdp.sigma_lj/d, 6) );
 }
 
-Vector3<double> LJ_potential::LJ_force(const double d, const Vector3<double> dr)
+ModuleBase::Vector3<double> LJ_potential::LJ_force(const double d, const ModuleBase::Vector3<double> dr)
 {
 	double coff = 4*INPUT.mdp.epsilon_lj*( 12*pow(INPUT.mdp.sigma_lj/d, 12) - 6*pow(INPUT.mdp.sigma_lj/d, 6) )/pow(d,2);
 	return dr*coff;
+}
+
+void LJ_potential::LJ_virial(double *virial, const ModuleBase::Vector3<double> &force, const ModuleBase::Vector3<double> &dtau)
+{
+    virial[0] += dtau.x * force.x;
+    virial[1] += dtau.y * force.y;
+    virial[2] += dtau.z * force.z;
+    virial[3] += dtau.x * force.y;
+    virial[4] += dtau.x * force.z;
+    virial[5] += dtau.y * force.z;
 }

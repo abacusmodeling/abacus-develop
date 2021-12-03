@@ -24,7 +24,7 @@ static void of_abfs_cpp( const std::string &file_name, const std::vector<std::ve
 			}
 }
 
-static void cout_matrix_4( const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &matrix )
+static void cout_matrix_4( const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> &matrix )
 {
 	for( const auto & m1 : matrix )
 	{
@@ -42,7 +42,7 @@ static void cout_matrix_4( const std::map<size_t,std::map<size_t,std::map<size_t
 						const auto & m = m4.second;
 						
 						std::cout<<TA<<"\t"<<IA<<"\t"<<TB<<"\t"<<IB<<std::endl;
-						std::cout<<m<<std::endl;
+						m.print(std::cout, 1E-10)<<std::endl;
 					}
 				}
 			}
@@ -52,43 +52,43 @@ static void cout_matrix_4( const std::map<size_t,std::map<size_t,std::map<size_t
 
 static void ofs_ms( 
 	const std::string& file_name, 
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &ms )
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,ModuleBase::matrix>>>> &ms )
 {
 	std::ofstream ofs(file_name.c_str());
 	ofs<<"0000"<<std::endl;
-	ofs<<ms.at(0).at(0).at(0).at(0)<<std::endl;
+	ms.at(0).at(0).at(0).at(0).print(ofs, 1E-10)<<std::endl;
 	ofs<<"0001"<<std::endl;
-	ofs<<ms.at(0).at(0).at(0).at(1)<<std::endl;
+	ms.at(0).at(0).at(0).at(1).print(ofs, 1E-10)<<std::endl;
 	ofs.close();
 }
 
 static void ofs_ms( 
 	const std::string& file_name, 
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &ms )
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<ModuleBase::matrix>>>>> &ms )
 {
 	std::ofstream ofs(file_name.c_str());
 	ofs<<"0000"<<std::endl;
 	for( const auto m : ms.at(0).at(0).at(0).at(0) )
-		ofs<<m<<std::endl;
+		m.print(ofs, 1E-10)<<std::endl;
 	ofs<<"0001"<<std::endl;
 	for( const auto m : ms.at(0).at(0).at(0).at(1) )
-		ofs<<m<<std::endl;
+		m.print(ofs, 1E-10)<<std::endl;
 	ofs.close();
 }
 
 static void ofs_ms( 
 	const std::string& file_name, 
-	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>> &ms )
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<ModuleBase::matrix>>>>>> &ms )
 {
 	std::ofstream ofs(file_name.c_str());
 	ofs<<"0000"<<std::endl;
 	for( const auto m1 : ms.at(0).at(0).at(0).at(0) )
 		for( const auto m2 : m1 )
-			ofs<<m2<<std::endl;
+			m2.print(ofs, 1E-10)<<std::endl;
 	ofs<<"0001"<<std::endl;
 	for( const auto m1 : ms.at(0).at(0).at(0).at(1) )
 		for( const auto m2 : m1 )
-			ofs<<m2<<std::endl;
+			m2.print(ofs, 1E-10)<<std::endl;
 	ofs.close();	
 }
 

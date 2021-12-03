@@ -14,7 +14,7 @@ berryphase::~berryphase()
 
 void berryphase::get_occupation_bands()
 {
-	double occupied_bands = static_cast<double>(GlobalC::CHR.nelec/DEGSPIN);	
+	double occupied_bands = static_cast<double>(GlobalC::CHR.nelec/ModuleBase::DEGSPIN);	
 	if( (occupied_bands - std::floor(occupied_bands)) > 0.0 )
 	{
 		occupied_bands = std::floor(occupied_bands) + 1.0;
@@ -23,7 +23,7 @@ void berryphase::get_occupation_bands()
 	occ_nbands = (int) occupied_bands;
 	if(occ_nbands > GlobalV::NBANDS) 
 	{
-		WARNING_QUIT("berryphase::get_occupation_bands","not enough bands for berryphase, increase band numbers.");
+		ModuleBase::WARNING_QUIT("berryphase::get_occupation_bands","not enough bands for berryphase, increase band numbers.");
 	}
 	//GlobalV::ofs_running << "the berryphase's occ_nbands is " << occ_nbands << std::endl;
 }
@@ -31,7 +31,7 @@ void berryphase::get_occupation_bands()
 void berryphase::lcao_init()
 {
 	#ifdef __LCAO
-	TITLE("berryphase","lcao_init");
+	ModuleBase::TITLE("berryphase","lcao_init");
 	lcao_method.init();
 	lcao_method.cal_R_number();
 	lcao_method.cal_orb_overlap();
@@ -42,7 +42,7 @@ void berryphase::lcao_init()
 // this routine 依赖于 kpoint的mp生成方式
 void berryphase::set_kpoints(const int direction)
 {
-	TITLE("berryphase","set_kpoints");
+	ModuleBase::TITLE("berryphase","set_kpoints");
 
 	const int mp_x = GlobalC::kv.nmp[0]; // x,y,z方向k点的数目
 	const int mp_y = GlobalC::kv.nmp[1];
@@ -223,8 +223,8 @@ double berryphase::stringPhase(int index_str, int nbands)
 	ModuleBase::ComplexMatrix mat(nbands,nbands);
 	int ik_1;
 	int ik_2;
-	Vector3<double> G(0.0,0.0,0.0);
-	Vector3<double> dk = GlobalC::kv.kvec_c[ k_index[index_str][1] ] - GlobalC::kv.kvec_c[ k_index[index_str][0] ];
+	ModuleBase::Vector3<double> G(0.0,0.0,0.0);
+	ModuleBase::Vector3<double> dk = GlobalC::kv.kvec_c[ k_index[index_str][1] ] - GlobalC::kv.kvec_c[ k_index[index_str][0] ];
 	//GlobalV::ofs_running << "the std::string index is " << index_str << std::endl;
 	
 	for(int k_start = 0; k_start < (nppstr-1); k_start++)
@@ -247,17 +247,17 @@ double berryphase::stringPhase(int index_str, int nbands)
 						{
 							if(direction == 1) 
 							{
-								Vector3<double> tem_G(1.0,0.0,0.0);
+								ModuleBase::Vector3<double> tem_G(1.0,0.0,0.0);
 								G = tem_G;
 							}
 							if(direction == 2)
 							{
-								Vector3<double> tem_G(0.0,1.0,0.0);
+								ModuleBase::Vector3<double> tem_G(0.0,1.0,0.0);
 								G = tem_G;
 							}
 							if(direction == 3)
 							{
-								Vector3<double> tem_G(0.0,0.0,1.0);
+								ModuleBase::Vector3<double> tem_G(0.0,0.0,1.0);
 								G = tem_G;
 							}
 							
@@ -274,17 +274,17 @@ double berryphase::stringPhase(int index_str, int nbands)
 						{
 							if(direction == 1) 
 							{
-								Vector3<double> tem_G(1.0,0.0,0.0);
+								ModuleBase::Vector3<double> tem_G(1.0,0.0,0.0);
 								G = tem_G;
 							}
 							if(direction == 2)
 							{
-								Vector3<double> tem_G(0.0,1.0,0.0);
+								ModuleBase::Vector3<double> tem_G(0.0,1.0,0.0);
 								G = tem_G;
 							}
 							if(direction == 3)
 							{
-								Vector3<double> tem_G(0.0,0.0,1.0);
+								ModuleBase::Vector3<double> tem_G(0.0,0.0,1.0);
 								G = tem_G;
 							}
 							
@@ -399,7 +399,7 @@ void berryphase::Berry_Phase(int nbands, double &pdl_elec_tot, int &mod_elec_tot
 	{
 		cphik[istring] = cphik[istring] / cave;
 		dtheta = atan2(cphik[istring].imag(),cphik[istring].real());
-		phik[istring] = (theta0 + dtheta) / (2 * PI);
+		phik[istring] = (theta0 + dtheta) / (2 * ModuleBase::PI);
 		phik_ave = phik_ave + wistring[istring] * phik[istring];
 		// test by jingan
 		//GlobalV::ofs_running << "phik[" << istring << "] = " << phik[istring] << std::endl;
@@ -461,9 +461,9 @@ void berryphase::Macroscopic_polarization()
 	double polarization_ion[3]; // 指的是晶格矢量R1，R2，R3方向
 	ModuleBase::GlobalFunc::ZEROS(polarization_ion,3);
 	// 倒格矢
-	Vector3<double> rcell_1(GlobalC::ucell.G.e11,GlobalC::ucell.G.e12,GlobalC::ucell.G.e13);
-	Vector3<double> rcell_2(GlobalC::ucell.G.e21,GlobalC::ucell.G.e22,GlobalC::ucell.G.e23);
-	Vector3<double> rcell_3(GlobalC::ucell.G.e31,GlobalC::ucell.G.e32,GlobalC::ucell.G.e33);
+	ModuleBase::Vector3<double> rcell_1(GlobalC::ucell.G.e11,GlobalC::ucell.G.e12,GlobalC::ucell.G.e13);
+	ModuleBase::Vector3<double> rcell_2(GlobalC::ucell.G.e21,GlobalC::ucell.G.e22,GlobalC::ucell.G.e23);
+	ModuleBase::Vector3<double> rcell_3(GlobalC::ucell.G.e31,GlobalC::ucell.G.e32,GlobalC::ucell.G.e33);
 	int *mod_ion = new int[GlobalC::ucell.nat];
 	double *pdl_ion_R1 = new double[GlobalC::ucell.nat];
 	double *pdl_ion_R2 = new double[GlobalC::ucell.nat];
@@ -582,7 +582,7 @@ void berryphase::Macroscopic_polarization()
 			// calculate total polarization,add electron part and ions part
 			double total_polarization = pdl_elec_tot + polarization_ion[0] ;
 			
-			Vector3<double> polarization_xyz = GlobalC::ucell.a1;
+			ModuleBase::Vector3<double> polarization_xyz = GlobalC::ucell.a1;
 			polarization_xyz.normalize();
 			polarization_xyz = total_polarization * polarization_xyz;
 
@@ -617,7 +617,7 @@ void berryphase::Macroscopic_polarization()
 			// calculate total polarization,add electron part and ions part
 			double total_polarization = pdl_elec_tot + polarization_ion[1] ;
 			
-			Vector3<double> polarization_xyz = GlobalC::ucell.a2;
+			ModuleBase::Vector3<double> polarization_xyz = GlobalC::ucell.a2;
 			polarization_xyz.normalize();
 			polarization_xyz = total_polarization * polarization_xyz;
 		
@@ -652,7 +652,7 @@ void berryphase::Macroscopic_polarization()
 			// calculate total polarization,add electron part and ions part
 			double total_polarization = pdl_elec_tot + polarization_ion[2] ;
 			
-			Vector3<double> polarization_xyz = GlobalC::ucell.a3;
+			ModuleBase::Vector3<double> polarization_xyz = GlobalC::ucell.a3;
 			polarization_xyz.normalize();
 			polarization_xyz = total_polarization * polarization_xyz;
 
@@ -672,7 +672,7 @@ void berryphase::Macroscopic_polarization()
 	return;
 }
 
-std::string berryphase::outFormat(const double polarization, const double modulus, const Vector3<double> project)
+std::string berryphase::outFormat(const double polarization, const double modulus, const ModuleBase::Vector3<double> project)
 {
 	std::stringstream outStr;
 	outStr << std::setw(12) << fixed << std::setprecision(7) << polarization << "  (mod " ;

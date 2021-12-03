@@ -21,7 +21,12 @@
 typedef fftw_complex FFTW_COMPLEX;
 
 //#include <unistd.h>
+#ifdef _OPENMP
 #include <omp.h>
+#endif
+
+namespace ModuleBase
+{
 
 bool Mathzone_Add1::flag_jlx_expand_coef = false;
 double** Mathzone_Add1::c_ln_c = nullptr;
@@ -40,7 +45,7 @@ Mathzone_Add1::~Mathzone_Add1()
  * *******************************************/
 void Mathzone_Add1::expand_coef_jlx()
 {
-	timer::tick("Mathzone_Add1","expand_coef_jlx");
+	ModuleBase::timer::tick("Mathzone_Add1","expand_coef_jlx");
 
 	int ir, il, in;
 	const int L = 20;
@@ -94,7 +99,7 @@ void Mathzone_Add1::expand_coef_jlx()
 		}
 	}
 
-	timer::tick("Mathzone_Add1","expand_coef_jlx");
+	ModuleBase::timer::tick("Mathzone_Add1","expand_coef_jlx");
 	return;
 }
 
@@ -108,7 +113,7 @@ void Mathzone_Add1::Spherical_Bessel
 	double *sjp
 )
 {
-	timer::tick ("Mathzone_Add1","Spherical_Bessel");
+	ModuleBase::timer::tick ("Mathzone_Add1","Spherical_Bessel");
 	
 	assert (l <= Mathzone_Add1::sph_lmax);
 	
@@ -166,7 +171,7 @@ void Mathzone_Add1::Spherical_Bessel
 		}
 	}
 
-	timer::tick ("Mathzone_Add1","Spherical_Bessel");
+	ModuleBase::timer::tick ("Mathzone_Add1","Spherical_Bessel");
 	
 	return;
 
@@ -179,7 +184,7 @@ double Mathzone_Add1::uni_simpson
 	const double& dr
 )
 {
-	timer::tick("Mathzone_Add1","uni_simpson");
+	ModuleBase::timer::tick("Mathzone_Add1","uni_simpson");
 	
 	assert(mshr >= 3);
 	
@@ -219,7 +224,7 @@ double Mathzone_Add1::uni_simpson
 		sum += 2.0 * func[idx];
 	}
 
-	timer::tick("Mathzone_Add1","uni_simpson");
+	ModuleBase::timer::tick("Mathzone_Add1","uni_simpson");
 	return sum * dr / 3.0;
 }
 
@@ -236,7 +241,7 @@ void Mathzone_Add1::uni_radfft
 	double* phik
 )
 {
-	timer::tick ("Mathzone_Add1","uni_radfft");
+	ModuleBase::timer::tick ("Mathzone_Add1","uni_radfft");
 	
 	//allocate memory
 	double* fi = new double[mshr];
@@ -253,7 +258,7 @@ void Mathzone_Add1::uni_radfft
 	for (int ik = 0; ik < mshk; ik++)
 	{
 		//calculate spherical bessel
-		Sphbes::Spherical_Bessel(mshr, ri, arr_k[ik], aml, jl);
+		ModuleBase::Sphbes::Spherical_Bessel(mshr, ri, arr_k[ik], aml, jl);
 		
 		//functions to be integrated
 		for (int ir = 0; ir < mshr; ir++)
@@ -269,14 +274,14 @@ void Mathzone_Add1::uni_radfft
 	delete[] fi_cp;
 	delete[] jl;
 
-	timer::tick("Mathzone_Add1","uni_radfft");
+	ModuleBase::timer::tick("Mathzone_Add1","uni_radfft");
 
 	return;
 }
 
 void Mathzone_Add1::Sph_Bes (double x, int lmax, double *sb, double *dsb) 
 {
-	timer::tick("Mathzone_Add1","Spherical_Bessel");
+	ModuleBase::timer::tick("Mathzone_Add1","Spherical_Bessel");
 	
   	int m, n, nmax;
   	double j0, j1, sf, tmp, si, co, ix;	// j0p, j1p, ix2
@@ -391,7 +396,7 @@ void Mathzone_Add1::Sph_Bes (double x, int lmax, double *sb, double *dsb)
   	/* free tsb */
   	delete [] tsb;
 
-  	timer::tick("Mathzone_Add1","Spherical_Bessel");
+  	ModuleBase::timer::tick("Mathzone_Add1","Spherical_Bessel");
 
   	return;
 }
@@ -411,7 +416,7 @@ void Mathzone_Add1::Sbt_new
 	double* fk
 )
 {
-	timer::tick ("Mathzone_Add1","Sbt_new");
+	ModuleBase::timer::tick ("Mathzone_Add1","Sbt_new");
 
 	//check parameter
 	assert (mshr >= 1);
@@ -436,7 +441,7 @@ void Mathzone_Add1::Sbt_new
 	{
 		std::cout << "\nhigh order interpolation is not available!" << std::endl;
 		exit(0); // mohan add 2021-05-06
-		//QUIT();
+		//ModuleBase::QUIT();
 	}
 	
 	/**********************************
@@ -629,7 +634,7 @@ void Mathzone_Add1::Sbt_new
 	delete [] fr3;
 	delete [] polint_coef;
 	
-	timer::tick ("Mathzone_Add1","Sbt_new");
+	ModuleBase::timer::tick ("Mathzone_Add1","Sbt_new");
 	return;
 }
 
@@ -677,7 +682,7 @@ double Mathzone_Add1::pol_seg_int
 	if (ik == 110) 
 	{
 		std::cout << "val = " << val << std::endl;
-		QUIT ();
+		ModuleBase::QUIT ();
 	}
 	*/
 	return val;
@@ -692,7 +697,7 @@ double Mathzone_Add1::fourier_sine_transform
 	const double& k
 )
 {
-	timer::tick ("Mathzone_Add1","Fsin");
+	ModuleBase::timer::tick ("Mathzone_Add1","Fsin");
 	double val = 0.0;
 	double* sinf = new double[mshr];
 	for (int ir = 0; ir < mshr; ir++)
@@ -701,7 +706,7 @@ double Mathzone_Add1::fourier_sine_transform
 	}
 	val = uni_simpson (sinf, mshr, dr);	
 	delete[] sinf;
-	timer::tick ("Mathzone_Add1","Fsin");
+	ModuleBase::timer::tick ("Mathzone_Add1","Fsin");
 	return val;
 }
 
@@ -714,7 +719,7 @@ double Mathzone_Add1::fourier_cosine_transform
 	const double& k
 )
 {
-	timer::tick ("Mathzone_Add1","Fcos");
+	ModuleBase::timer::tick ("Mathzone_Add1","Fcos");
 	double val = 0.0;
 	double* cosf = new double[mshr];
 	for (int ir = 0; ir < mshr; ir++)
@@ -724,7 +729,7 @@ double Mathzone_Add1::fourier_cosine_transform
 
 	val = uni_simpson (cosf, mshr, dr);	
 	delete[] cosf;
-	timer::tick ("Mathzone_Add1","Fcos");
+	ModuleBase::timer::tick ("Mathzone_Add1","Fcos");
 	return val;
 }
 
@@ -751,8 +756,8 @@ void Mathzone_Add1::test ()
 	
 	for (int ik = 0; ik < dim; ik++)
 	{
-		double diff = fk[ik]- sqrt(PI/4/ci)/pow(2.0*ci, l+1)* std::pow(rad[ik], l) * exp(-rad[ik]*rad[ik]/4/ci);
-		std::cout << rad[ik] << " " << fk[ik] << " " << sqrt(PI/4/ci)/pow(2.0*ci, l+1)*pow(rad[ik], l)*exp(-rad[ik]*rad[ik]/4/ci)
+		double diff = fk[ik]- sqrt(ModuleBase::PI/4/ci)/pow(2.0*ci, l+1)* std::pow(rad[ik], l) * exp(-rad[ik]*rad[ik]/4/ci);
+		std::cout << rad[ik] << " " << fk[ik] << " " << sqrt(ModuleBase::PI/4/ci)/pow(2.0*ci, l+1)*pow(rad[ik], l)*exp(-rad[ik]*rad[ik]/4/ci)
 		<< " "	<< std::log(fabs(diff))/std::log(10.0) << std::endl;
 	}
 
@@ -771,7 +776,7 @@ void Mathzone_Add1::test2 ()
 	double rmax = 20;
 	double dr = rmax/(N-1);
 
-	double dk = PI / rmax /2;
+	double dk = ModuleBase::PI / rmax /2;
 //	double kmax = PI / dr; 
 //	double dk = dr;
 	
@@ -798,13 +803,13 @@ void Mathzone_Add1::test2 ()
 		std::cout << kad[ik] << " " << fk[ik] << " " << sqrt(PI/4/ci)/pow(2*ci, l+1)*pow(kad[ik], l)*exp(-kad[ik]*kad[ik]/4/ci)
 		<< " "	<< log(fabs(diff))/log(10) << std::endl;
 	}
-	QUIT ();
+	ModuleBase::QUIT ();
 */
 	Sbt_new (polint_order, l, rad, dr, N, kad, dk, N, fk, 0, fr);
 
 	for (int ir = 0; ir < N; ir++)
 	{
-		std::cout << ir*dr << " " << func[ir] << " " << fr[ir] *2.0 / PI << " " << std::log(fabs(fr[ir]*2.0/PI-func[ir]))/std::log(10.0) << std::endl;
+		std::cout << ir*dr << " " << func[ir] << " " << fr[ir] *2.0 / ModuleBase::PI << " " << std::log(fabs(fr[ir]*2.0/ModuleBase::PI-func[ir]))/std::log(10.0) << std::endl;
 	}
 	
 
@@ -824,7 +829,7 @@ double Mathzone_Add1::Polynomial_Interpolation
 	const double& x
 )
 {
-	timer::tick("Mathzone_Add1","Polynomial_Interpolation");
+	ModuleBase::timer::tick("Mathzone_Add1","Polynomial_Interpolation");
 
 	int i, m, ns;
 	double 	den, dif, dift, ho, hp, w, rs, drs;
@@ -865,7 +870,7 @@ double Mathzone_Add1::Polynomial_Interpolation
 			if(den == 0.0) 
 			{
 				std::cout << "Two Xs are equal" << std::endl;
-				// WARNING_QUIT("Mathzone_Add1::Polynomial_Interpolation","Two Xs are equal");
+				// ModuleBase::WARNING_QUIT("Mathzone_Add1::Polynomial_Interpolation","Two Xs are equal");
 				exit(0); // mohan update 2021-05-06
 			}
 			den = w / den;
@@ -883,7 +888,7 @@ double Mathzone_Add1::Polynomial_Interpolation
 	delete[] dn;
 	
 	return rs;
-	timer::tick("Mathzone_Add1","Polynomial_Interpolation");
+	ModuleBase::timer::tick("Mathzone_Add1","Polynomial_Interpolation");
 
 }
 
@@ -898,7 +903,7 @@ void Mathzone_Add1::SplineD2 // modified by pengfei 13-8-8 add second derivative
 	double* y2
 )
 {
-	timer::tick("Mathzone_Add1","SplineD2");
+	ModuleBase::timer::tick("Mathzone_Add1","SplineD2");
 	
 	double dx1, dx2, dy1, dy2, p, qn, sig, un;
 	double *u;
@@ -959,7 +964,7 @@ void Mathzone_Add1::SplineD2 // modified by pengfei 13-8-8 add second derivative
 
 	delete[] u;
 
-	timer::tick("Mathzone_Add1","SplineD2");
+	ModuleBase::timer::tick("Mathzone_Add1","SplineD2");
 }
 
 // Peize Lin add openmp 2019-12-13	
@@ -975,9 +980,11 @@ void Mathzone_Add1::Cubic_Spline_Interpolation
 	double * const dy
 )
 {	
-	timer::tick("Mathzone_Add1","Cubic_Spline_Interpolation");
+	ModuleBase::timer::tick("Mathzone_Add1","Cubic_Spline_Interpolation");
 
+#ifdef _OPENMP
 	#pragma omp parallel for schedule(static)
+#endif
 	for(int m = 0; m < rsize ; m++)
 	{
 		int klo = 0;
@@ -999,7 +1006,7 @@ void Mathzone_Add1::Cubic_Spline_Interpolation
 		if(h == 0.0) 
 		{
 			std::cout << "Cubic_Spline_Interpolation, h == 0.0 so that cannot be divided" << std::endl;
-			//WARNING_QUIT("Cubic_Spline_Interpolation","h == 0.0 so that cannot be divided");
+			//ModuleBase::WARNING_QUIT("Cubic_Spline_Interpolation","h == 0.0 so that cannot be divided");
 			exit(0);
 		}
 
@@ -1014,7 +1021,7 @@ void Mathzone_Add1::Cubic_Spline_Interpolation
 		y[m] = y_tmp;
 	}
 
-	timer::tick("Mathzone_Add1","Cubic_Spline_Interpolation");
+	ModuleBase::timer::tick("Mathzone_Add1","Cubic_Spline_Interpolation");
 }
 
 // Interpolation for Numerical Orbitals
@@ -1027,7 +1034,7 @@ double Mathzone_Add1::RadialF
 	const double& R
 )
 {
-  timer::tick("Mathzone_Add1","RadialF");
+  ModuleBase::timer::tick("Mathzone_Add1","RadialF");
   
   int mp_min, mp_max, m;
   double h1, h2, h3, f1, f2, f3, f4;
@@ -1130,7 +1137,7 @@ double Mathzone_Add1::RadialF
 
   result = f;
 
-  timer::tick("Mathzone_Add1","RadialF");
+  ModuleBase::timer::tick("Mathzone_Add1","RadialF");
   return result;
 }
 
@@ -1226,7 +1233,7 @@ void Mathzone_Add1::Uni_Deriv_Phi
 	double *phind
 )
 {
-	timer::tick("Mathzone_Add1", "Uni_Deriv_Phi");
+	ModuleBase::timer::tick("Mathzone_Add1", "Uni_Deriv_Phi");
 	int FFT_NR = 2*mesh-1;  // FFT_NR = 16019
 	// std::cout << "\n mesh=" << mesh << ", radf[8010]=" << radf[8010] <<  ", radf[8009]=" << radf[8009] ;
 	// mesh=8010, radf[8010]=4.396478951532926e-01, radf[8009]=0.000000000000000e+00
@@ -1280,7 +1287,7 @@ void Mathzone_Add1::Uni_Deriv_Phi
 #endif
 
 	
-	double dk_uniform = TWO_PI / FFT_NR / dr;
+	double dk_uniform = ModuleBase::TWO_PI / FFT_NR / dr;
 	
 	//for (int ik = 0; ik < FFT_NR/2; ik++)
 	//{
@@ -1358,5 +1365,7 @@ void Mathzone_Add1::Uni_Deriv_Phi
 	fftw_destroy_plan (p1);
 	fftw_destroy_plan (p2);	
 	
-	timer::tick("Mathzone_Add1", "Uni_Deriv_Phi");
+	ModuleBase::timer::tick("Mathzone_Add1", "Uni_Deriv_Phi");
+}
+
 }

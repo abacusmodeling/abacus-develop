@@ -29,8 +29,8 @@ void ELEC_evolve::evolve_psi(
 	LCAO_Hamilt &uhm,
 	std::complex<double> ***wfc)
 {
-	TITLE("ELEC_evolve","eveolve_psi");
-	timer::tick("ELEC_evolve","evolve_psi");
+	ModuleBase::TITLE("ELEC_evolve","eveolve_psi");
+	ModuleBase::timer::tick("ELEC_evolve","evolve_psi");
 
 	int start_spin = -1;
 	uhm.GK.reset_spin(start_spin);
@@ -86,7 +86,7 @@ void ELEC_evolve::evolve_psi(
 
 		if(!uhm.init_s)
     	{
-    	    WARNING_QUIT("Hamilt_Linear::solve_using_cg","Need init S matrix firstly");
+    	    ModuleBase::WARNING_QUIT("Hamilt_Linear::solve_using_cg","Need init S matrix firstly");
     	}
 
 		//--------------------------------------------
@@ -126,17 +126,17 @@ void ELEC_evolve::evolve_psi(
 
 		if(diago)
 		{
-			timer::tick("Efficience","diago_k");
+			ModuleBase::timer::tick("Efficience","diago_k");
 			Diago_LCAO_Matrix DLM;
 			DLM.solve_complex_matrix(ik, GlobalC::LOWF.WFC_K[ik], GlobalC::LOC.wfc_dm_2d.wfc_k[ik]);
-			timer::tick("Efficience","diago_k");
+			ModuleBase::timer::tick("Efficience","diago_k");
 		}
 		else
 		{
-			timer::tick("Efficience","evolve_k");
+			ModuleBase::timer::tick("Efficience","evolve_k");
 			Evolve_LCAO_Matrix ELM;
-			ELM.evolve_complex_matrix(ik, GlobalC::LOWF.WFC_K[ik], wfc[ik]);
-			timer::tick("Efficience","evolve_k");
+			ELM.evolve_complex_matrix(ik, GlobalC::LOWF.WFC_K[ik], GlobalC::LOC.wfc_dm_2d.wfc_k[ik]);
+			ModuleBase::timer::tick("Efficience","evolve_k");
 		}
 	} // end k
 
@@ -146,7 +146,7 @@ void ELEC_evolve::evolve_psi(
 		uhm.GK.destroy_pvpR();
 	}
 
-	timer::tick("ELEC_evolve","evolve_psi");
+	ModuleBase::timer::tick("ELEC_evolve","evolve_psi");
 	return;
 }
 
@@ -156,7 +156,7 @@ void ELEC_evolve::evolve_complex_matrix(
 	std::complex<double>** cc,
 	std::complex<double>** cc_init)const
 {
-	TITLE("Evolve_LCAO_Matrix","evolve_complex_matrix");
+	ModuleBase::TITLE("Evolve_LCAO_Matrix","evolve_complex_matrix");
 	time_t time_start = time(NULL);
 	GlobalV::ofs_running << " Start Time : " << ctime(&time_start);
 
@@ -173,7 +173,7 @@ void ELEC_evolve::evolve_complex_matrix(
 	}
 	else
 	{
-		WARNING_QUIT("ELEC_evolve","only tddft==1 cando evolve");
+		ModuleBase::WARNING_QUIT("ELEC_evolve","only tddft==1 cando evolve");
 	}
 
 	time_t time_end = time(NULL);
@@ -184,7 +184,7 @@ void ELEC_evolve::evolve_complex_matrix(
 
 void ELEC_evolve::using_LAPACK_complex(const int &ik, std::complex<double>** c, std::complex<double>** c_init)const
 {
-	TITLE("ELEC_evolve","using_LAPACK_complex");
+	ModuleBase::TITLE("ELEC_evolve","using_LAPACK_complex");
 
 //	Calculate the U operator
 

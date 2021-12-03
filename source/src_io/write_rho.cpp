@@ -9,7 +9,7 @@ void Charge::write_rho(
 	const int &precision, 
 	const bool for_plot)
 {
-    TITLE("Charge","write_rho");
+    ModuleBase::TITLE("Charge","write_rho");
 
     if (out_charge==0) 
 	{
@@ -30,7 +30,7 @@ void Charge::write_rho(
 		ofs.open(fn.c_str());
     	if (!ofs)
     	{
-        	WARNING("Charge::write_rho","Can't create Charge File!");
+        	ModuleBase::WARNING("Charge::write_rho","Can't create Charge File!");
     	}	
 
 		//GlobalV::ofs_running << "\n Output charge file." << std::endl;
@@ -82,7 +82,7 @@ void Charge::write_rho(
 			}
 			else
 			{
-				WARNING_QUIT("write_rho","check nspin!");
+				ModuleBase::WARNING_QUIT("write_rho","check nspin!");
 			}
 		}
 		ofs << "\n  " << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz << std::endl;

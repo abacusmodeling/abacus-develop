@@ -23,8 +23,8 @@ int ELEC_scf::iter=0;
 
 void ELEC_scf::scf(const int &istep)
 {
-	TITLE("ELEC_scf","scf");
-	timer::tick("ELEC_scf","scf");
+	ModuleBase::TITLE("ELEC_scf","scf");
+	ModuleBase::timer::tick("ELEC_scf","scf");
 
 	// (1) calculate ewald energy.
 	// mohan update 2021-02-25
@@ -268,7 +268,7 @@ void ELEC_scf::scf(const int &istep)
 
 		if(conv_elec)
 		{
-			timer::tick("ELEC_scf","scf");
+			ModuleBase::timer::tick("ELEC_scf","scf");
 			return;
 		}
 
@@ -534,7 +534,7 @@ void ELEC_scf::scf(const int &istep)
 			if(conv_elec)
 			{
 				GlobalV::ofs_running << "\n charge density convergence is achieved" << std::endl;
-            	GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
+            	GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
 			}
 
 			if(GlobalV::OUT_LEVEL != "m") 
@@ -546,15 +546,23 @@ void ELEC_scf::scf(const int &istep)
 			{
  				//xiaohui add "OUT_LEVEL", 2015-09-16
 				if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << std::setprecision(16);
-				if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " EFERMI = " << GlobalC::en.ef * Ry_to_eV << " eV" << std::endl;
+				if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " EFERMI = " << GlobalC::en.ef * ModuleBase::Ry_to_eV << " eV" << std::endl;
 				if(GlobalV::OUT_LEVEL=="ie")
 				{
-					GlobalV::ofs_running << " " << GlobalV::global_out_dir << " final etot is " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
+					GlobalV::ofs_running << " " << GlobalV::global_out_dir << " final etot is " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
 				}
 #ifdef __DEEPKS
-				if (INPUT.deepks_scf)	//caoyu add 2021-06-04
+				if (GlobalV::out_descriptor)	//caoyu add 2021-06-04
 				{
-					GlobalC::ld.save_npy_e(GlobalC::en.etot);//ebase = etot, no deepks E_delta including
+                    GlobalC::ld.save_npy_e(GlobalC::en.etot, "e_tot.npy");
+                    if (GlobalV::deepks_scf) {
+                        GlobalC::ld.save_npy_e(GlobalC::en.etot - GlobalC::ld.E_delta + GlobalC::ld.e_delta_band, "e_base.npy");//ebase :no deepks E_delta including
+                    }
+                    else
+                    {
+                        GlobalC::ld.save_npy_e(GlobalC::en.etot, "e_base.npy");  // no scf, e_tot=e_base
+                    }
+
 				}
 #endif
 			}
@@ -566,7 +574,7 @@ void ELEC_scf::scf(const int &istep)
 			}
 
 //			ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"ELECTRONS CONVERGED!");
-			timer::tick("ELEC_scf","scf");
+			ModuleBase::timer::tick("ELEC_scf","scf");
 			return;
 		}
 	}
@@ -577,14 +585,14 @@ void ELEC_scf::scf(const int &istep)
 		delete[] WFC_init;
 	}
 
-	timer::tick("ELEC_scf","scf");
+	ModuleBase::timer::tick("ELEC_scf","scf");
 	return;
 }
 
 
 void ELEC_scf::init_mixstep_final_scf(void)
 {
-    TITLE("ELEC_scf","init_mixstep_final_scf");
+    ModuleBase::TITLE("ELEC_scf","init_mixstep_final_scf");
 
     GlobalC::CHR.irstep=0;
     GlobalC::CHR.idstep=0;

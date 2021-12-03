@@ -16,33 +16,37 @@ Run_lcao::~Run_lcao(){}
 
 void Run_lcao::lcao_line(void)
 {
-    TITLE("Run_lcao","lcao_line");
-	timer::tick("Run_lcao","lcao_line");
+    ModuleBase::TITLE("Run_lcao","lcao_line");
+	ModuleBase::timer::tick("Run_lcao","lcao_line");
 
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
     // cell relaxation. b) put GlobalV::NLOCAL and GlobalV::NBANDS as input parameters
+#ifdef __LCAO
+    GlobalC::ucell.setup_cell( GlobalC::ORB, GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
+#else
     GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
+#endif
 	if(INPUT.test_just_neighbor)
 	{
 		//test_search_neighbor();
 		GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
 			GlobalV::ofs_running,
 			GlobalV::OUT_LEVEL,
-			GlobalC::ORB.get_rcutmax_Phi(), 
-			GlobalC::ORB.get_rcutmax_Beta(), 
+			GlobalC::ORB.get_rcutmax_Phi(),
+			GlobalC::ucell.infoNL.get_rcutmax_Beta(),
 			GlobalV::GAMMA_ONLY_LOCAL);
 
 		atom_arrange::search(
 			GlobalV::SEARCH_PBC,
 			GlobalV::ofs_running,
-			GlobalC::GridD, 
-			GlobalC::ucell, 
-			GlobalV::SEARCH_RADIUS, 
+			GlobalC::GridD,
+			GlobalC::ucell,
+			GlobalV::SEARCH_RADIUS,
 			GlobalV::test_atom_input,
 			INPUT.test_just_neighbor);
 	}
-	// setup GlobalV::NBANDS 
+	// setup GlobalV::NBANDS
 	// Yu Liu add 2021-07-03
 	GlobalC::CHR.cal_nelec();
 
@@ -74,25 +78,39 @@ void Run_lcao::lcao_line(void)
     // mohan add 2021-01-30
     Print_Info::setup_parameters(GlobalC::ucell, GlobalC::kv, GlobalC::xcf);
 
-    // * reading the localized orbitals/projectors 
+    // * reading the localized orbitals/projectors
 	// * construct the interpolation tables.
-
-	GlobalC::LOWF.orb_con.set_orb_tables(
+	GlobalC::LOWF.orb_con.read_orb_first(
 		GlobalV::ofs_running,
-		GlobalC::UOT, 
 		GlobalC::ORB,
 		GlobalC::ucell.ntype,
 		GlobalC::ucell.lmax,
 		INPUT.lcao_ecut,
 		INPUT.lcao_dk,
 		INPUT.lcao_dr,
-		INPUT.lcao_rmax, 
-		GlobalC::ucell.lat0, 
-		INPUT.out_descriptor,
+		INPUT.lcao_rmax,
+		GlobalV::out_descriptor,
 		INPUT.out_r_matrix,
-		Exx_Abfs::Lmax,
 		GlobalV::FORCE,
 		GlobalV::MY_RANK);
+		
+	GlobalC::ucell.infoNL.setupNonlocal(
+		GlobalC::ucell.ntype,
+		GlobalC::ucell.atoms,
+		GlobalV::ofs_running,
+		GlobalC::ORB
+	);
+
+	GlobalC::LOWF.orb_con.set_orb_tables(
+		GlobalV::ofs_running,
+		GlobalC::UOT,
+		GlobalC::ORB,
+		GlobalC::ucell.lat0,
+		GlobalV::out_descriptor,
+		Exx_Abfs::Lmax,
+		GlobalC::ucell.infoNL.nprojmax,
+		GlobalC::ucell.infoNL.nproj,
+		GlobalC::ucell.infoNL.Beta);
 
 	// * allocate H and S matrices according to computational resources
 	// * set the 'trace' between local H/S and global H/S
@@ -112,14 +130,15 @@ void Run_lcao::lcao_line(void)
     if(GlobalV::CALCULATION == "test")
     {
         Cal_Test::test_memory();
-        QUIT();
+        ModuleBase::QUIT();
     }
 
     // initialize the real-space uniform grid for FFT and parallel
     // distribution of plane waves
     GlobalC::Pgrid.init(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, GlobalC::pw.nczp,
         GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
-
+	// Calculate Structure factor
+    GlobalC::pw.setup_structure_factor();
 
 	// Inititlize the charge density.
     GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
@@ -156,6 +175,6 @@ void Run_lcao::lcao_line(void)
 		GlobalC::en.perform_dos();
 	}
 
-	timer::tick("Run_lcao","lcao_line");
+	ModuleBase::timer::tick("Run_lcao","lcao_line");
     return;
 }

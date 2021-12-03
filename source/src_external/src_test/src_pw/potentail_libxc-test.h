@@ -2,7 +2,7 @@ void test_libxc_parameter()
 {
 	auto test_parameter_PBE0 = [&]()
 	{
-		TITLE("test_parameter_PBE0");
+		ModuleBase::TITLE("test_parameter_PBE0");
 		xc_func_type func;
 		xc_func_init( &func, XC_HYB_GGA_XC_PBEH, XC_POLARIZED );
 		
@@ -10,7 +10,7 @@ void test_libxc_parameter()
 	};
 	auto test_parameter_HSE = [&]()
 	{
-		TITLE("test_parameter_HSE");
+		ModuleBase::TITLE("test_parameter_HSE");
 		xc_func_type func;
 		xc_func_init( &func, XC_HYB_GGA_XC_HSE06, XC_POLARIZED );
 		

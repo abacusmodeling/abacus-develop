@@ -32,7 +32,7 @@ inline int localIndex(int globalIndex, int nblk, int nprocs, int& myproc)
 int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt, int nblk)
 {
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"enter setAlltoallvParameter, nblk", nblk);
-    timer::tick("LCAO_Charge","newDM_index");
+    ModuleBase::timer::tick("LCAO_Charge","newDM_index");
     // setup blacs parameters
     int nprows=0;	
 	int npcols=0;
@@ -200,7 +200,7 @@ int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt
     }
     // ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"last sender_2D_index",sender_2D_index[lgd_now*lgd_now-1]);
     delete[] receiver_2D_index;
-    timer::tick("LCAO_Charge","newDM_index");
+    ModuleBase::timer::tick("LCAO_Charge","newDM_index");
     return 0;
 }
 
@@ -209,7 +209,7 @@ int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt
 // positions change
 void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
 {
-     TITLE("Local_Orbital_Charge","allocate_gamma");
+     ModuleBase::TITLE("Local_Orbital_Charge","allocate_gamma");
 
     // mohan fix serious bug 2010-09-06
     this->lgd_now = gt.lgd;
@@ -248,7 +248,7 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
 			{
 				DM[is][i] = &DM_pool[is][i*lgd_now];
 			}
-			Memory::record("LocalOrbital_Charge","Density_Kernal",GlobalV::NSPIN*lgd_now*lgd_now,"double");
+			ModuleBase::Memory::record("LocalOrbital_Charge","Density_Kernal",GlobalV::NSPIN*lgd_now*lgd_now,"double");
 		}
 		this->init_DM = true;
         this->lgd_last = lgd_now;
@@ -261,13 +261,14 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
     }
     else
     {
-        WARNING_QUIT("Local_Orbital_Charge::allocate","lgd<0!Something Wrong!");
+        ModuleBase::WARNING_QUIT("Local_Orbital_Charge::allocate","lgd<0!Something Wrong!");
     }
     
     setAlltoallvParameter(GlobalC::ParaO.comm_2D, GlobalC::ParaO.blacs_ctxt, GlobalC::ParaO.nb);
 
 	// Peize Lin test 2019-01-16
     wfc_dm_2d.init();
+
 	if(GlobalC::wf.start_wfc=="file")
 	{
 		this->gamma_file(gt);
@@ -278,7 +279,7 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
 
 void Local_Orbital_Charge::gamma_file(const Grid_Technique &gt)
 {
-	TITLE("Local_Orbital_Charge","gamma_file");
+	ModuleBase::TITLE("Local_Orbital_Charge","gamma_file");
 
 	int error;
 	std::cout << " Read in gamma point wave function files " << std::endl;
@@ -299,19 +300,19 @@ void Local_Orbital_Charge::gamma_file(const Grid_Technique &gt)
 		GlobalV::ofs_running << " Error=" << error << std::endl;
 		if(error==1)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: GlobalC::LOWF.dat");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: GlobalC::LOWF.dat");
 		}
 		else if(error==2)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","In wave function file, band number doesn't match");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In wave function file, band number doesn't match");
 		}
 		else if(error==3)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","In wave function file, nlocal doesn't match");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In wave function file, nlocal doesn't match");
 		}
 		else if(error==4)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","In k-dependent wave function file, k point is not correct");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In k-dependent wave function file, k point is not correct");
 		}
 
 	}//loop ispin
@@ -319,7 +320,7 @@ void Local_Orbital_Charge::gamma_file(const Grid_Technique &gt)
 
 void Local_Orbital_Charge::cal_dk_gamma_from_2D_pub(void)
 {
-    TITLE("Local_Orbital_Charge","cal_dk_gamma_from_2D_pub");
+    ModuleBase::TITLE("Local_Orbital_Charge","cal_dk_gamma_from_2D_pub");
 
 	cal_dk_gamma_from_2D();
 }
@@ -327,7 +328,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D_pub(void)
 // transform dm_gamma[is].c to this->DM[is]
 void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
 {
-    timer::tick("LCAO_Charge","dm_2dTOgrid");
+    ModuleBase::timer::tick("LCAO_Charge","dm_2dTOgrid");
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"cal_dk_gamma_from_2D, GlobalV::NSPIN", GlobalV::NSPIN);
 
     for(int is=0; is<GlobalV::NSPIN; ++is)
@@ -438,15 +439,15 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
             GlobalV::ofs_running<<"=========================================\n";
         }
     }
-    timer::tick("LCAO_Charge","dm_2dTOgrid");
+    ModuleBase::timer::tick("LCAO_Charge","dm_2dTOgrid");
 	return;
 }
 
 //--------------------------------------------------------------
 void Local_Orbital_Charge::cal_dk_gamma(void)
 {
-    TITLE("Local_Orbital_Charge","cal_density_kernal");
-    timer::tick("LocalOrbital_Charge","cal_dk_gamma");
+    ModuleBase::TITLE("Local_Orbital_Charge","cal_density_kernal");
+    ModuleBase::timer::tick("LocalOrbital_Charge","cal_dk_gamma");
 
     assert(GlobalV::NSPIN==GlobalC::kv.nks);
 
@@ -494,7 +495,7 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 		}
 	}
 
-	matrix wg_local(GlobalV::NSPIN,band_local);
+	ModuleBase::matrix wg_local(GlobalV::NSPIN,band_local);
 	for(int id=0, Total_Bands=0; id <= lastband_in_proc; ++id)
 	{
 		if(myid == id)
@@ -512,7 +513,7 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 
 	for( int is=0; is<GlobalV::NSPIN; ++is )
 	{
-		matrix Z_wg( GlobalV::NLOCAL, band_local );
+		ModuleBase::matrix Z_wg( GlobalV::NLOCAL, band_local );
 		if(myid <= lastband_in_proc)
 		{
 			for(int iw=0; iw<GlobalV::NLOCAL; iw++)
@@ -526,9 +527,9 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 
 		const int row_col = (GlobalV::NLOCAL%300) ? GlobalV::NLOCAL/300+1 : GlobalV::NLOCAL/300;
 
-		matrix Z_row;
-		matrix Z_col;
-		matrix rho_row_col;
+		ModuleBase::matrix Z_row;
+		ModuleBase::matrix Z_col;
+		ModuleBase::matrix rho_row_col;
 
 		for(int row_count=0; row_count<row_col; row_count++)
 		{
@@ -626,6 +627,6 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 	}  // end for is    
 #endif //2015-09-06, xiaohui
 
-    timer::tick("LocalOrbital_Charge","cal_dk_gamma");
+    ModuleBase::timer::tick("LocalOrbital_Charge","cal_dk_gamma");
     return;
 }

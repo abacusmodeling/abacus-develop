@@ -10,7 +10,7 @@ using namespace std;
 
 UnitCell::UnitCell()
 {
-    if (GlobalV::test_unitcell) TITLE("unitcell","Constructor");
+    if (GlobalV::test_unitcell) ModuleBase::TITLE("unitcell","Constructor");
     Coordinate = "Direct";
     latName = "none";
     lat0 = 0.0;
@@ -20,7 +20,7 @@ UnitCell::UnitCell()
     nat = 0;
     namax = 0;
     nwmax = 0;
-
+    
     iat2it = nullptr;
     iat2ia = nullptr;
 	iwt2iat = nullptr;
@@ -30,12 +30,12 @@ UnitCell::UnitCell()
 	lc = new int[3];
     itiaiw2iwt.create(1,1,1);
 
-    latvec = Matrix3();
-    latvec_supercell = Matrix3();
-    G = Matrix3();
-    GT = Matrix3();
-    GGT = Matrix3();
-    invGGT = Matrix3();
+    latvec = ModuleBase::Matrix3();
+    latvec_supercell = ModuleBase::Matrix3();
+    G = ModuleBase::Matrix3();
+    GT = ModuleBase::Matrix3();
+    GGT = ModuleBase::Matrix3();
+    invGGT = ModuleBase::Matrix3();
 
     tpiba = 0.0;
     tpiba2 = 0.0;
@@ -62,7 +62,7 @@ UnitCell::~UnitCell()
 #ifdef __MPI
 void UnitCell::bcast_unitcell(void)
 {
-    if (GlobalV::test_unitcell)TITLE("UnitCell","bcast_unitcell");
+    if (GlobalV::test_unitcell)ModuleBase::TITLE("UnitCell","bcast_unitcell");
     Parallel_Common::bcast_string( Coordinate );
     Parallel_Common::bcast_int( nat );
 
@@ -150,7 +150,7 @@ void UnitCell::bcast_unitcell2(void)
 
 void UnitCell::print_cell(std::ofstream &ofs, output &outp)const
 {
-    if (GlobalV::test_unitcell) TITLE("UnitCell","print_cell");
+    if (GlobalV::test_unitcell) ModuleBase::TITLE("UnitCell","print_cell");
 
     ModuleBase::GlobalFunc::OUT(ofs,"print_unitcell()");
 
@@ -173,7 +173,7 @@ void UnitCell::print_cell(std::ofstream &ofs, output &outp)const
 
 void UnitCell::print_cell_cif(const std::string &fn)const
 {
-	if (GlobalV::test_unitcell) TITLE("UnitCell","print_cell_cif");
+	if (GlobalV::test_unitcell) ModuleBase::TITLE("UnitCell","print_cell_cif");
 	
 	if(GlobalV::MY_RANK!=0) return;//xiaohui add 2015-03-15
 
@@ -196,9 +196,9 @@ void UnitCell::print_cell_cif(const std::string &fn)const
 	//ofs << "_cell_angle_beta " << "90.00" << std::endl; 
 	//ofs << "_cell_angle_gamma " << "90.00" << std::endl; 
 	//xiaohui modify alpha, beta and gamma 2015-09-29
-	double angle_alpha = acos((a2 * a3) / (a2.norm() * a3.norm())) /PI*180.0;
-	double angle_beta = acos((a1 * a3) / (a1.norm() * a3.norm())) /PI*180.0;
-	double angle_gamma = acos((a1 * a2) / (a1.norm() * a2.norm())) /PI*180.0;
+	double angle_alpha = acos((a2 * a3) / (a2.norm() * a3.norm())) /ModuleBase::PI*180.0;
+	double angle_beta = acos((a1 * a3) / (a1.norm() * a3.norm())) /ModuleBase::PI*180.0;
+	double angle_gamma = acos((a1 * a2) / (a1.norm() * a2.norm())) /ModuleBase::PI*180.0;
 	ofs << "_cell_angle_alpha " << angle_alpha << std::endl;
 	ofs << "_cell_angle_beta " << angle_beta << std::endl;
 	ofs << "_cell_angle_gamma " << angle_gamma << std::endl;
@@ -226,7 +226,7 @@ void UnitCell::print_cell_cif(const std::string &fn)const
 
 void UnitCell::print_cell_xyz(const std::string &fn)const
 {
-    if (GlobalV::test_unitcell) TITLE("UnitCell","print_cell_xyz");
+    if (GlobalV::test_unitcell) ModuleBase::TITLE("UnitCell","print_cell_xyz");
 
 	if(GlobalV::MY_RANK!=0) return;//xiaohui add 2015-03-15
 
@@ -302,7 +302,7 @@ void UnitCell::update_pos_tau(const double* pos)
     return;
 }
 
-void UnitCell::update_pos_taud(const Vector3<double>* posd_in)
+void UnitCell::update_pos_taud(const ModuleBase::Vector3<double>* posd_in)
 {
     int iat = 0;
     for(int it = 0;it < this->ntype;it++)
@@ -348,7 +348,7 @@ void UnitCell::periodic_boundary_adjustment()
 				GlobalV::ofs_warning << " it=" << it+1 << " ia=" << ia+1 << std::endl;
 				GlobalV::ofs_warning << "d=" << atom->taud[ia].x << " " << 
 				atom->taud[ia].y << " " << atom->taud[ia].z << std::endl;
-				WARNING_QUIT("Ions_Move_Basic::move_ions","the movement of atom is larger than the length of cell.");
+				ModuleBase::WARNING_QUIT("Ions_Move_Basic::move_ions","the movement of atom is larger than the length of cell.");
 			}
 
 			atom->tau[ia] = atom->taud[ia] * this->latvec;
@@ -402,4 +402,73 @@ bool UnitCell::judge_big_cell(void)
 	{
 		return 0;
 	}
+}
+
+
+#ifndef __CMD
+void UnitCell::cal_ux()
+{
+	double amag, uxmod;
+	int starting_it = 0;
+    int starting_ia = 0;
+	bool is_paraller;
+	//do not sign feature in teh general case
+	magnet.lsign_ = false;
+	ModuleBase::GlobalFunc::ZEROS(magnet.ux_, 3);
+
+	for(int it = 0;it<ntype;it++)
+	{
+        for(int ia=0;ia<atoms[it].na;ia++)
+        {
+            amag = pow(atoms[it].m_loc_[ia].x,2) + pow(atoms[it].m_loc_[ia].y,2) + pow(atoms[it].m_loc_[ia].z,2);
+            if(amag > 1e-6)
+            {
+                magnet.ux_[0] = atoms[it].m_loc_[ia].x;
+                magnet.ux_[1] = atoms[it].m_loc_[ia].y;
+                magnet.ux_[2] = atoms[it].m_loc_[ia].z;
+                starting_it = it;
+                starting_ia = ia;
+                magnet.lsign_ = true;
+                break;
+            }
+        }
+        if (magnet.lsign_) break;
+	}
+	//whether the initial magnetizations is parallel
+	for(int it = starting_it; it<ntype;it++)
+	{
+        for(int ia=0;ia<atoms[it].na;ia++)
+        {
+            if(it>starting_it || ia>starting_ia)
+            {
+                magnet.lsign_ = magnet.lsign_ && judge_parallel(magnet.ux_, atoms[it].m_loc_[ia]);
+            }
+        }
+		
+	}
+	if(magnet.lsign_)
+	{
+		uxmod =  pow(magnet.ux_[0],2) + pow(magnet.ux_[1],2) +pow(magnet.ux_[2],2);
+		if(uxmod<1e-6) 
+		{
+			ModuleBase::WARNING_QUIT("cal_ux","wrong uxmod");
+		}
+		for(int i = 0;i<3;i++)
+		{
+			magnet.ux_[i] *= 1/sqrt(uxmod);
+		}
+		//       std::cout<<"    Fixed quantization axis for GGA: "
+		//<<std::setw(10)<<ux[0]<<"  "<<std::setw(10)<<ux[1]<<"  "<<std::setw(10)<<ux[2]<<std::endl;
+	}
+	return;
+}
+#endif
+
+bool UnitCell::judge_parallel(double a[3], ModuleBase::Vector3<double> b)
+{
+   bool jp=false;
+   double cross;
+   cross = pow((a[1]*b.z-a[2]*b.y),2) +  pow((a[2]*b.x-a[0]*b.z),2) + pow((a[0]*b.y-a[1]*b.x),2);
+   jp = (fabs(cross)<1e-6);
+   return jp;
 }

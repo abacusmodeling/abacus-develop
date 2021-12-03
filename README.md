@@ -79,6 +79,7 @@ make sure these files are prepared and stored in the working directory.
 
     Specifications of the STRU file can be found in this [short instruction](doc/input-stru.md).
 - The k-point file
+
     The default name is KPT. It contains the information of the k-grid setting for the Brillouin zone sampling.
 
     Specification of the k-point file can be found in this [short instruction](doc/input-kpt.md).
@@ -88,10 +89,10 @@ make sure these files are prepared and stored in the working directory.
 
     More information on pseudopotentials is given [here](doc/features.md#pseudopotentials).
 
-- The numerical orbital file
+- The numerical orbital files
 
-    When doing calculations with atomic orbital basis, it’s necessary to prepare a numerical orbital file for each element in the system. Generally, the numerical orbital file should be prepared by the user, which will be described later. The filename for each element’s numerical orbital basis needs to be specified in the `STRU` file. However, in case that the numerical orbital files are stored in a location different from the working ddirectory, then a full path to access the orbital files have to be specified in the `STRU` file.
-    ABACUS provides atomic basis sets of different accuracy levels for most elements commonly used. Users can download these basis sets from our [website](http://abacus.ustc.edu.cn/pseudo.html). Moreover, users can generate basis themselves, and the procedure is provided in this [short introduction](doc/generate-basis.md).
+    When performing calculations with numerical atomic orbital basis, it is necessary to prepare a numerical orbital file for each element in the system. Generally, the numerical orbital file should be prepared by the user, which will be described later. The filename for each element’s numerical orbital basis needs to be specified in the `STRU` file. However, in case that the numerical orbital files are stored in a location different from the working directory, then a full path to access the orbital files have to be specified in the `STRU` file.
+    ABACUS provides numerical atomic basis sets of different accuracy levels for most elements commonly used. Users can download these basis sets from the [website](http://abacus.ustc.edu.cn/pseudo.html). Moreover, users can generate numerical atomic orbitals by themselves, and the procedure is provided in this [short introduction](doc/generate-basis.md).
 
 [back to top](#readme-top)
 
@@ -161,7 +162,7 @@ We also provide some [information](doc/developers.md) for developers.
 - [Modularization and module tests](doc/developers.md#modularization-and-module-tests)
 - [Contributing to ABACUS](doc/developers.md#contributing-to-abacus)
     - [Making pull requests](doc/developers.md#making-pull-requests)
-    - [Providing uniy tests](doc/developers.md#providing-unit-tests)
+    - [Providing unit tests](doc/developers.md#providing-unit-tests)
     - [Upating documentation](doc/developers.md#updating-documentation)
     - [Macros](doc/developers.md#macros)
     - [Comment style for documentation](doc/developers.md#comment-style-for-documentation)

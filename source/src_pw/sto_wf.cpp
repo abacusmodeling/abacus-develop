@@ -109,7 +109,7 @@ void Stochastic_WF::init(void)
         chi0[0].create(nchip,ndim,false);
         for(int i=0; i<chi0[0].size; ++i)
         {
-            chi0[0].c[i]=exp(2*PI*rand()/double(RAND_MAX)*ui) / sqrt(double(nchi));
+            chi0[0].c[i]=exp(2*ModuleBase::PI*rand()/double(RAND_MAX)*ui) / sqrt(double(nchi));
         }
     }
     

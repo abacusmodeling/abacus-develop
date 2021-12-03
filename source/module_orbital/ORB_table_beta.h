@@ -3,7 +3,7 @@
 
 #include "ORB_read.h" // use LCAO_Orbitals
 #include "ORB_atomic_lm.h" // use Numerical_Orbital_Lm
-#include "../module_base/sph_bessel_recursive.h" // use Sph_Bessel_Recursive
+#include "../module_base/sph_bessel_recursive.h" // use ModuleBase::Sph_Bessel_Recursive
 
 class ORB_table_beta
 {
@@ -28,18 +28,30 @@ class ORB_table_beta
 	/// T stands for atom type.
 	///O stands for orbitals.
 	///
-	void init_NL_Tpair(void);
+	void init_NL_Tpair(
+		const Numerical_Orbital* phi_,
+		const Numerical_Nonlocal* beta_
+	);
 
-    void init_NL_Opair(LCAO_Orbitals &orb);
+    void init_NL_Opair(
+		LCAO_Orbitals &orb,
+		const int nprojmax,
+		const int* nproj);
 
 	int NL_nTpairs;
-	IntArray NL_Tpair;
-	IntArray NL_Opair;
-	IntArray NL_L2plus1;
+	ModuleBase::IntArray NL_Tpair;
+	ModuleBase::IntArray NL_Opair;
+	ModuleBase::IntArray NL_L2plus1;
 
-	void init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB);
+	void init_Table_Beta(
+		ModuleBase::Sph_Bessel_Recursive::D2 *pSB,
+		const Numerical_Orbital* phi_,
+		const Numerical_Nonlocal* beta_,
+		const int* nproj_);
 
-	void Destroy_Table_Beta(LCAO_Orbitals &orb);
+	void Destroy_Table_Beta(const int& ntype,
+	const Numerical_Orbital* phi_,
+	const int* nproj_);
 
 	static int get_rmesh( const double &R1, const double &R2);
 
@@ -50,7 +62,7 @@ class ORB_table_beta
 	private:
 
 	void cal_VNL_PhiBeta_R(
-		Sph_Bessel_Recursive::D2 *pSB, // mohan add 2021-03-06
+		ModuleBase::Sph_Bessel_Recursive::D2 *pSB, // mohan add 2021-03-06
         const int &l,
         const Numerical_Orbital_Lm &n1,
         const Numerical_Nonlocal_Lm &n2,

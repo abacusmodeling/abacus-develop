@@ -19,21 +19,21 @@ public:
     Forces();
     ~Forces();
 
-    void init(matrix& matrix);
+    void init(ModuleBase::matrix& force);
 
 private:
 
     int nat;
 	static double output_acc;
 
-    void cal_force_loc(matrix& forcelc);
-    void cal_force_ew(matrix& forceion);
-    void cal_force_cc(matrix& forcecc);
-    void cal_force_nl(matrix& forcenl);
-    void cal_force_scc(matrix& forcescc);
+    void cal_force_loc(ModuleBase::matrix& forcelc);
+    void cal_force_ew(ModuleBase::matrix& forceion);
+    void cal_force_cc(ModuleBase::matrix& forcecc);
+    void cal_force_nl(ModuleBase::matrix& forcenl);
+    void cal_force_scc(ModuleBase::matrix& forcescc);
 
-    static void print( const std::string &name, const matrix &f, bool rv=true );
-    static void print_to_files( std::ofstream &ofs, const std::string &name, const matrix &f );
+    static void print( const std::string &name, const ModuleBase::matrix &f, bool rv=true );
+    static void print_to_files( std::ofstream &ofs, const std::string &name, const ModuleBase::matrix &f );
 };
 
 #endif

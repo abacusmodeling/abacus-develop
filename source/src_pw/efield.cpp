@@ -15,7 +15,7 @@ double Efield::bmod;
 
 void Efield::add_efield(const double*const rho, double* v_in)
 {
-	TITLE("Efield","add_efield");
+	ModuleBase::TITLE("Efield","add_efield");
 
 	if(!GlobalV::EFIELD) return;
 
@@ -41,7 +41,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 	else
 	{
 		throw range_error("Efield::add_efield, edir is < 1 or > 3. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		//WARNING_QUIT("Efield::add_efield","edir is < 1 or > 3.");
+		//ModuleBase::WARNING_QUIT("Efield::add_efield","edir is < 1 or > 3.");
 	}
 //	std::cout << " bvec=" << bvec[0] << " " << bvec[1] << " " << bvec[2] << std::endl;
 
@@ -53,10 +53,10 @@ void Efield::add_efield(const double*const rho, double* v_in)
 	double e_dipole = 0.0;
 	double ion_dipole = 0.0;
 
-	// e2 is 2.0, means the square of the electron charge
+	// ModuleBase::e2 is 2.0, means the square of the electron charge
 	// calculation of dipole
 
-	matrix fdip(GlobalC::ucell.nat, 3);
+	ModuleBase::matrix fdip(GlobalC::ucell.nat, 3);
 
 	if(GlobalV::DIPOLE)
 	{
@@ -66,7 +66,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 		tot_dipole = ion_dipole - e_dipole;
 		Parallel_Reduce::reduce_double_all(tot_dipole);
 		// calculate the correction to total energy
-		etotefield = -e2*(eamp-tot_dipole/2.0)*tot_dipole*GlobalC::ucell.omega/FOUR_PI;
+		etotefield = -ModuleBase::e2*(eamp-tot_dipole/2.0)*tot_dipole*GlobalC::ucell.omega/ModuleBase::FOUR_PI;
 		// calculate the force
 		if(GlobalV::FORCE)
 		{
@@ -78,7 +78,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 				{
 					for(int jj=0; jj<3; ++jj)
 					{
-						fdip(iat, jj) = e2 *(eamp - tot_dipole)*GlobalC::ucell.atoms[it].zv*bvec[jj]/bmod;
+						fdip(iat, jj) = ModuleBase::e2 *(eamp - tot_dipole)*GlobalC::ucell.atoms[it].zv*bvec[jj]/bmod;
 					}
 //					std::cout << std::setw(15) << fdip(iat, 0) 
 //					<< std::setw(15) << fdip(iat, 1)
@@ -92,7 +92,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 	{
 		// dipole correction is not active
 		this->compute_ion_dip(emaxpos, eopreg, edir, ion_dipole, bmod, bvec);
-		this->etotefield=-e2*eamp*ion_dipole*GlobalC::ucell.omega/FOUR_PI;
+		this->etotefield=-ModuleBase::e2*eamp*ion_dipole*GlobalC::ucell.omega/ModuleBase::FOUR_PI;
 		// calculate the force
 		if(GlobalV::FORCE)
 		{
@@ -105,7 +105,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 				{
 					for(int jj=0; jj<3; ++jj)
 					{
-						fdip(iat, jj) = e2 *eamp * GlobalC::ucell.atoms[it].zv * bvec[jj]/bmod;
+						fdip(iat, jj) = ModuleBase::e2 *eamp * GlobalC::ucell.atoms[it].zv * bvec[jj]/bmod;
 					}
 //					std::cout << std::setw(15) << fdip(iat, 0) 
 //					<< std::setw(15) << fdip(iat, 1)
@@ -121,8 +121,8 @@ void Efield::add_efield(const double*const rho, double* v_in)
 	const double length = (1.0-eopreg)*(GlobalC::ucell.lat0*
 		std::sqrt(avec[0]*avec[0]+avec[1]*avec[1]+avec[2]*avec[2]));
 
-	const double vamp = e2*(eamp-tot_dipole)*length;
-	//const double fac = GlobalC::ucell.omega/FOUR_PI;
+	const double vamp = ModuleBase::e2*(eamp-tot_dipole)*length;
+	//const double fac = GlobalC::ucell.omega/ModuleBase::FOUR_PI;
 
 //	std::cout << " Elec. dipole = " << e_dipole << " (Ry au), also = " 
 //	<< e_dipole * debye << " (debye)" << std::endl; 
@@ -165,7 +165,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 		for(int ip=0; ip<npoi; ++ip)
 		{
 			const double sawarg = (double)ip/(double)npoi;
-			value = e2 * (eamp - tot_dipole) *
+			value = ModuleBase::e2 * (eamp - tot_dipole) *
 				saw(emaxpos, eopreg, sawarg) * (GlobalC::ucell.lat0/bmod);
 			ofs << ip << " " << value << std::endl;
 		}
@@ -188,7 +188,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 		else if (edir == 3) sawarg = (double)k/(double)GlobalC::pw.ncz;
 		else throw range_error("Efield::add_efield, edir is < 1 or > 3. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 
-     	value = e2 * (eamp - tot_dipole) * 
+     	value = ModuleBase::e2 * (eamp - tot_dipole) * 
 			saw(emaxpos, eopreg, sawarg) * (GlobalC::ucell.lat0/bmod);
 
 		/*
@@ -209,7 +209,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 void Efield::compute_el_dip(const double &emaxpos, const double &eopreg,
 	const int &edir, const double*const rho, double &e_dipole)const
 {
-	TITLE("Efield","compute_el_dip");
+	ModuleBase::TITLE("Efield","compute_el_dip");
 
 
 	return;
@@ -218,7 +218,7 @@ void Efield::compute_el_dip(const double &emaxpos, const double &eopreg,
 void Efield::compute_ion_dip(const double &emaxpos, const double &eopreg,
 	const int &edir, double &ion_dipole, const double &bmod_in, const double *bvec_in)const
 {
-	TITLE("Efield","compute_ion_dip");
+	ModuleBase::TITLE("Efield","compute_ion_dip");
 
 	// Calculate IONIC dipole
 	// 
@@ -238,7 +238,7 @@ void Efield::compute_ion_dip(const double &emaxpos, const double &eopreg,
 				+ atom->tau[ia].z * bvec_in[2];
 
 			ion_dipole += atom->zv * this->saw(emaxpos,eopreg, tvectb )
-			 * (GlobalC::ucell.lat0/bmod_in) * (FOUR_PI/GlobalC::ucell.omega);
+			 * (GlobalC::ucell.lat0/bmod_in) * (ModuleBase::FOUR_PI/GlobalC::ucell.omega);
 
 //			std::cout << "--------------------------------------" << std::endl;
 //			std::cout << " tvectb=" << tvectb << std::endl;
@@ -269,7 +269,7 @@ double Efield::saw(const double &emaxpos, const double &eopreg, const double &x)
 	return sawout;
 }
 
-void Efield::compute_force(matrix &fdip)
+void Efield::compute_force(ModuleBase::matrix &fdip)
 {
 	assert(bmod>0);
 	int iat = 0;
@@ -279,7 +279,7 @@ void Efield::compute_force(matrix &fdip)
 		{
 			for(int jj=0; jj<3; ++jj)
 			{
-				fdip(iat, jj) = e2 * Efield::eamp * GlobalC::ucell.atoms[it].zv * Efield::bvec[jj]/Efield::bmod;
+				fdip(iat, jj) = ModuleBase::e2 * Efield::eamp * GlobalC::ucell.atoms[it].zv * Efield::bvec[jj]/Efield::bmod;
 			}
 			++iat;
 		}

@@ -24,7 +24,7 @@ Ions_Move_BFGS::~Ions_Move_BFGS()
 
 void Ions_Move_BFGS::allocate()
 {
-	TITLE("Ions_Move_BFGS","init");
+	ModuleBase::TITLE("Ions_Move_BFGS","init");
 	if(init_done) return;
 	this->allocate_basic();
 
@@ -35,9 +35,9 @@ void Ions_Move_BFGS::allocate()
 	return;
 }
 
-void Ions_Move_BFGS::start(const matrix& force, const double &energy_in)
+void Ions_Move_BFGS::start(const ModuleBase::matrix& force, const double &energy_in)
 {
-	TITLE("Ions_Move_BFGS","start");
+	ModuleBase::TITLE("Ions_Move_BFGS","start");
 	
 	// istep must be set eariler.
 
@@ -81,7 +81,7 @@ void Ions_Move_BFGS::start(const matrix& force, const double &energy_in)
 
 void Ions_Move_BFGS::restart_bfgs(void)
 {
-	TITLE("Ions_Move_BFGS","restart_bfgs");
+	ModuleBase::TITLE("Ions_Move_BFGS","restart_bfgs");
 	
 	using namespace Ions_Move_Basic;
 
@@ -158,7 +158,7 @@ void Ions_Move_BFGS::restart_bfgs(void)
 
 void Ions_Move_BFGS::bfgs_routine(void)
 {	
-	TITLE("Ions_Move_BFGS","bfgs_routine");
+	ModuleBase::TITLE("Ions_Move_BFGS","bfgs_routine");
 	using namespace Ions_Move_Basic;
 	
 	//the bfgs algorithm starts here
@@ -255,7 +255,7 @@ void Ions_Move_BFGS::bfgs_routine(void)
 			{
 				// the history has already been reset at the previous step
 				// something is going wrong
-				WARNING_QUIT("move_ions","trust radius is too small! Break down.");
+				ModuleBase::WARNING_QUIT("move_ions","trust radius is too small! Break down.");
 			}
 
 			this->reset_hessian();
@@ -299,7 +299,7 @@ void Ions_Move_BFGS::bfgs_routine(void)
 
 	if(norm < 1.0e-16)
 	{
-		WARNING_QUIT("Ions_Move_BFGS","'BFGS: move-length unreasonably short");
+		ModuleBase::WARNING_QUIT("Ions_Move_BFGS","'BFGS: move-length unreasonably short");
 	}
 	else
 	{

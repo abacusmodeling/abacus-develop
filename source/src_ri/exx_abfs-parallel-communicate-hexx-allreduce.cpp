@@ -12,7 +12,7 @@
 
 Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::Allreduce(
 	const MPI_Comm & mpi_comm_in,
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local_in )
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &data_local_in )
 	:mpi_comm(mpi_comm_in),
 	 data_local(data_local_in),
 	 lock_insert(ATOMIC_FLAG_INIT)
@@ -74,7 +74,7 @@ Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::~Allreduce()
 
 
 
-std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>>
+std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>>
 Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::exx_to_a2D()
 {
 	auto clear_oars = [&]( std::vector<MPI_Request> &requests, boost::dynamic_bitset<> &flags, std::vector<boost::mpi::packed_oarchive*> &oarps, const std::string &s )
@@ -234,14 +234,14 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::ask( const int rank_delta
 
 void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::recv_data_process( const int rank_data )
 {
-	auto vector_empty = []( const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> & v ) -> bool
+	auto vector_empty = []( const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::Matrix_Wrapper>>>> & v ) -> bool
 	{
 		for( const auto &i : v )
 			if(!i.empty())	return false;
 		return true;
 	};
 
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> data_rank;
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::Matrix_Wrapper>>>> data_rank;
 	*iarps_recv_data[rank_data] >> data_rank;
 	iarps_recv_data[rank_data]->resize(0);
 
@@ -266,7 +266,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::recv_data_process( const 
 
 
 void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::insert_data(
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> &data_rank )
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::Matrix_Wrapper>>>> &data_rank )
 {
 	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
@@ -333,17 +333,17 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::send_data_process( const 
 	*iarps_atom_asked[rank_asked] >> atom_asked;
 	iarps_atom_asked[rank_asked]->resize(0);
 
-	const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> matrix_wrapped = get_data_local_wrapper(atom_asked);
+	const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::Matrix_Wrapper>>>> matrix_wrapped = get_data_local_wrapper(atom_asked);
 	*oarps_isend_data[rank_asked] << matrix_wrapped;
 
 	*flags_isend_data[rank_asked] = 1;
 }
 
 
-std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>>
+std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::Matrix_Wrapper>>>>
 Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::get_data_local_wrapper( const std::pair<std::vector<bool>,std::vector<bool>> &atom_asked ) const
 {
-	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> mw(GlobalV::NSPIN);
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::Matrix_Wrapper>>>> mw(GlobalV::NSPIN);
 	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		auto &data_local_is = data_local[is];

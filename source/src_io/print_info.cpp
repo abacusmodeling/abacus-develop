@@ -9,7 +9,7 @@ Print_Info::~Print_Info(){}
 
 void Print_Info::setup_parameters(UnitCell_pseudo &ucell, K_Vectors &kv, xcfunc &xcf)
 {
-	TITLE("Print_Info","setup_parameters");
+	ModuleBase::TITLE("Print_Info","setup_parameters");
 	
     if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax" || GlobalV::CALCULATION=="nscf"
 	        || GlobalV::CALCULATION=="istate" || GlobalV::CALCULATION=="ienvelope" || GlobalV::CALCULATION=="md")
@@ -40,7 +40,7 @@ void Print_Info::setup_parameters(UnitCell_pseudo &ucell, K_Vectors &kv, xcfunc 
 			if(INPUT.mdp.mdtype ==1 || INPUT.mdp.mdtype==2)
 			{
 				std::cout << " ENSEMBLE                 : " << "NVT" << std::endl;
-				std::cout << " Qmass for NVT(a.u.)      : " << INPUT.mdp.Qmass/6.02/9.109*1e5 << std::endl;
+				std::cout << " Qmass for NVT(a.u.)      : " << INPUT.mdp.Qmass/ModuleBase::AU_to_MASS << std::endl;
 			}
 			else if(INPUT.mdp.mdtype==0)
 			{

@@ -19,7 +19,7 @@
 #include "../src_pw/vdwd3_parameters.h"
 #include "dmft.h"
 #ifdef __DEEPKS
-#include "LCAO_descriptor.h"
+#include "LCAO_descriptor.h"    //caoyu add 2021-07-26
 #endif
 
 LOOP_ions::LOOP_ions()
@@ -30,8 +30,8 @@ LOOP_ions::~LOOP_ions()
 
 void LOOP_ions::opt_ions(void)
 {
-    TITLE("LOOP_ions","opt_ions");
-    timer::tick("LOOP_ions","opt_ions");
+    ModuleBase::TITLE("LOOP_ions","opt_ions");
+    ModuleBase::timer::tick("LOOP_ions","opt_ions");
 
     if(GlobalV::OUT_LEVEL=="i")
     {
@@ -187,24 +187,19 @@ void LOOP_ions::opt_ions(void)
 
         //caoyu add 2021-03-31
 #ifdef __DEEPKS
-        if (INPUT.out_descriptor)
+        if (GlobalV::out_descriptor)
         {
-            GlobalC::ld.init(GlobalC::ORB.get_lmax_d(), GlobalC::ORB.get_nchimax_d(), GlobalC::ucell.nat* GlobalC::ORB.Alpha[0].getTotal_nchi());
-            GlobalC::ld.build_S_descriptor(0);  //derivation not needed yet
-            GlobalC::ld.cal_projected_DM();
-            GlobalC::ld.cal_descriptor();
-            if (INPUT.deepks_scf)
+            //ld.init(ORB.get_lmax_d(), ORB.get_nchimax_d(), ucell.nat* ORB.Alpha[0].getTotal_nchi());
+            //ld.build_S_descriptor(0);  //cal overlap, no need dm
+            GlobalC::ld.cal_projected_DM(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);  //need dm
+            GlobalC::ld.cal_descriptor();    //final descriptor
+            GlobalC::ld.save_npy_d();            //libnpy needed
+            if (GlobalV::deepks_scf)
             {
-                GlobalC::ld.build_S_descriptor(1);   //for F_delta calculation
-                GlobalC::ld.cal_v_delta(INPUT.model_file);
-                GlobalC::ld.print_H_V_delta();
-                GlobalC::ld.save_npy_d();
-                if (GlobalV::FORCE)
-                {
-                    GlobalC::ld.cal_f_delta(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
-                    GlobalC::ld.print_F_delta();
-                }
-
+                //ld.print_H_V_delta();   //final H_delta
+                GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma);
+                std::cout << "E_delta_band = " << std::setprecision(8) << GlobalC::ld.e_delta_band << " Ry" << " = " << std::setprecision(8) << GlobalC::ld.e_delta_band * ModuleBase::Ry_to_eV << " eV" << std::endl;
+                std::cout << "E_delta_NN= "<<std::setprecision(8) << GlobalC::ld.E_delta << " Ry" << " = "<<std::setprecision(8)<<GlobalC::ld.E_delta*ModuleBase::Ry_to_eV<<" eV"<<std::endl;
             }
         }
 #endif
@@ -233,11 +228,11 @@ void LOOP_ions::opt_ions(void)
             std::cout << std::setiosflags(ios::scientific)
             << " " << std::setw(7) << ss.str()
             << std::setw(5) << ELEC_scf::iter
-            << std::setw(18) << std::setprecision(6) << GlobalC::en.etot * Ry_to_eV;
+            << std::setw(18) << std::setprecision(6) << GlobalC::en.etot * ModuleBase::Ry_to_eV;
 
             std::cout << std::setprecision(2) << std::setiosflags(ios::scientific)
-            << std::setw(10) << IMM.get_ediff() * Ry_to_eV * 1000
-            << std::setw(10) << IMM.get_largest_grad() * Ry_to_eV / BOHR_TO_A;
+            << std::setw(10) << IMM.get_ediff() * ModuleBase::Ry_to_eV * 1000
+            << std::setw(10) << IMM.get_largest_grad() * ModuleBase::Ry_to_eV / ModuleBase::BOHR_TO_A;
             //<< std::setw(12) << IMM.get_trust_radius();
 
             std::cout << std::resetiosflags(ios::scientific)
@@ -261,13 +256,13 @@ void LOOP_ions::opt_ions(void)
     {
         GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
         GlobalV::ofs_running << std::setprecision(16);
-        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
+        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
         GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
     }
 
 
-    timer::tick("LOOP_ions","opt_ions"); 
+    ModuleBase::timer::tick("LOOP_ions","opt_ions"); 
     return;
 }
 
@@ -277,18 +272,18 @@ bool LOOP_ions::force_stress(
 	int &force_step,
 	int &stress_step)
 {
-    TITLE("LOOP_ions","force_stress");
+    ModuleBase::TITLE("LOOP_ions","force_stress");
 
     if(!GlobalV::FORCE && !GlobalV::STRESS)
     {
         return 1;
     }
-    timer::tick("LOOP_ions","force_stress");
+    ModuleBase::timer::tick("LOOP_ions","force_stress");
 
 	// set force matrix
-	matrix fcs;
+	ModuleBase::matrix fcs;
 	// set stress matrix
-	matrix scs;
+	ModuleBase::matrix scs;
 	Force_Stress_LCAO FSL;
 	FSL.allocate ();
 	FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS, GlobalV::TEST_FORCE, GlobalV::TEST_STRESS, fcs, scs);
@@ -466,12 +461,12 @@ xiaohui modify 2014-08-09*/
 
     return 0;
 
-    timer::tick("LOOP_ions","force_stress");
+    ModuleBase::timer::tick("LOOP_ions","force_stress");
 }
 
 void LOOP_ions::final_scf(void)
 {
-    TITLE("LOOP_ions","final_scf");
+    ModuleBase::TITLE("LOOP_ions","final_scf");
 
     GlobalV::FINAL_SCF = true;
 
@@ -483,7 +478,7 @@ void LOOP_ions::final_scf(void)
 		GlobalV::ofs_running,
 		GlobalV::OUT_LEVEL,
 		GlobalC::ORB.get_rcutmax_Phi(),
-		GlobalC::ORB.get_rcutmax_Beta(),
+		GlobalC::ucell.infoNL.get_rcutmax_Beta(),
 		GlobalV::GAMMA_ONLY_LOCAL);
 
     atom_arrange::search(
@@ -523,7 +518,7 @@ void LOOP_ions::final_scf(void)
     // after ParaO and GridT,
     // this information is used to calculate
     // the force.
-    GlobalC::LOWF.set_trace_aug(GlobalC::GridT);
+    //GlobalC::LOWF.set_trace_aug(GlobalC::GridT); //LiuXh modify 2021-09-06, clear memory, WFC_GAMMA_aug not used now
 
 	GlobalC::LOC.allocate_dm_wfc(GlobalC::GridT);
 
@@ -555,7 +550,7 @@ void LOOP_ions::final_scf(void)
     {
         GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
         GlobalV::ofs_running << std::setprecision(16);
-        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
+        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
         GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
     }
 

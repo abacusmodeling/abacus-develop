@@ -21,12 +21,13 @@
 #include "src_lcao/FORCE_STRESS.h"
 #include "src_lcao/local_orbital_charge.h"
 #include "src_lcao/ELEC_evolve.h"
+#include "src_lcao/dftu.h"
 #endif
 
 void Input_Conv::Convert(void)
 {
-    TITLE("Input_Conv","Convert");
-	timer::tick("Input_Conv","Convert");
+    ModuleBase::TITLE("Input_Conv","Convert");
+	ModuleBase::timer::tick("Input_Conv","Convert");
 //----------------------------------------------------------
 // main parameters / electrons / spin ( 10/16 )
 //----------------------------------------------------------
@@ -82,6 +83,7 @@ void Input_Conv::Convert(void)
     GlobalV::PRESS1 = INPUT.press1;
     GlobalV::PRESS2 = INPUT.press2;
     GlobalV::PRESS3 = INPUT.press3;
+	GlobalV::out_element_info = INPUT.out_element_info;
 #ifdef __LCAO
 	Force_Stress_LCAO::force_invalid_threshold_ev = INPUT.force_thr_ev2;
 #endif
@@ -95,6 +97,7 @@ void Input_Conv::Convert(void)
 	Ions_Move_Basic::out_stru = INPUT.out_stru; //mohan add 2012-03-23
 
 	GlobalV::STRESS = INPUT.stress;
+
 
 
 	// pengfei Li add 2018-11-11
@@ -136,7 +139,7 @@ void Input_Conv::Convert(void)
 	}
 	else
 	{
-		WARNING_QUIT("Input", "fixed_axes should be None,a,b,c,ab,ac,bc or abc!");
+		ModuleBase::WARNING_QUIT("Input", "fixed_axes should be None,a,b,c,ab,ac,bc or abc!");
 	}
 
 	GlobalV::MOVE_IONS = INPUT.ion_dynamics;
@@ -180,6 +183,7 @@ void Input_Conv::Convert(void)
 	GlobalV::NB2D = INPUT.nb2d;
 	GlobalV::NURSE = INPUT.nurse;
 	GlobalV::COLOUR = INPUT.colour;
+	GlobalC::pw.nbspline = INPUT.nbspline;
 	GlobalV::T_IN_H = INPUT.t_in_h;
 	GlobalV::VL_IN_H = INPUT.vl_in_h;
 	GlobalV::VNL_IN_H = INPUT.vnl_in_h;
@@ -305,6 +309,24 @@ void Input_Conv::Convert(void)
 		GlobalC::epsilon0_vasp.eta = INPUT.eta;
 	}
 
+	if(INPUT.dft_plus_u)
+	{
+		GlobalC::dftu.dftu_type = INPUT.dftu_type;
+		GlobalC::dftu.double_counting = INPUT.double_counting;
+		GlobalC::dftu.Yukawa = INPUT.yukawa_potential;
+		GlobalC::dftu.omc=INPUT.omc;
+		GlobalC::dftu.orbital_corr=INPUT.orbital_corr;
+		if(!INPUT.yukawa_potential)
+		{
+			GlobalC::dftu.U = INPUT.hubbard_u;            //Hubbard Coulomb interaction parameter U(ev)
+			GlobalC::dftu.J = INPUT.hund_j;               //Hund exchange parameter J(ev)
+		}
+	}
+	/*
+#ifndef __CMD
+	GlobalC::ucell.n_mag_at=INPUT.n_mag_at;
+	GlobalC::ucell.atom_mag=INPUT.atom_mag;
+#endif*/
 //--------------------------------------------
 // added by zhengdy-soc
 //--------------------------------------------
@@ -328,17 +350,18 @@ void Input_Conv::Convert(void)
 			GlobalV::DOMAG_Z = true;
 		}
 		GlobalV::LSPINORB = INPUT.lspinorb;
+		GlobalV::soc_lambda = INPUT.soc_lambda;
 
 		delete[] GlobalC::ucell.magnet.m_loc_;
 		delete[] GlobalC::ucell.magnet.angle1_;
 		delete[] GlobalC::ucell.magnet.angle2_;
-		GlobalC::ucell.magnet.m_loc_ = new Vector3<double> [INPUT.ntype];
+		GlobalC::ucell.magnet.m_loc_ = new ModuleBase::Vector3<double> [INPUT.ntype];
 		GlobalC::ucell.magnet.angle1_ = new double[INPUT.ntype];
 		GlobalC::ucell.magnet.angle2_ = new double[INPUT.ntype];
 		for (int i = 0; i < INPUT.ntype; i++)
 		{
-			GlobalC::ucell.magnet.angle1_[i] = INPUT.angle1[i] / 180 * PI;
-			GlobalC::ucell.magnet.angle2_[i] = INPUT.angle2[i] / 180 * PI;
+			GlobalC::ucell.magnet.angle1_[i] = INPUT.angle1[i] / 180 * ModuleBase::PI;
+			GlobalC::ucell.magnet.angle2_[i] = INPUT.angle2[i] / 180 * ModuleBase::PI;
 		}
 #ifdef __MPI
 //			Parallel_Common::bcast_double(GlobalC::ucell.magnet.angle1_[i]);
@@ -347,7 +370,7 @@ void Input_Conv::Convert(void)
 	}
 	else{
 		delete[] GlobalC::ucell.magnet.m_loc_;
-		GlobalC::ucell.magnet.m_loc_ = new Vector3<double> [INPUT.ntype];
+		GlobalC::ucell.magnet.m_loc_ = new ModuleBase::Vector3<double> [INPUT.ntype];
 		GlobalV::LSPINORB = false;
 		GlobalV::NONCOLIN = false;
 		GlobalV::DOMAG = false;
@@ -377,9 +400,7 @@ void Input_Conv::Convert(void)
 
 
 	// jiyy add 2020.10.11
-	GlobalV::ocp = INPUT.ocp;
-     //ocp_n = INPUT.ocp_n;
-    GlobalV::ocp_set = INPUT.ocp_set;
+	// fix bugs of ocp_set   --  Yuanbo Li 2021/8/17
     if(GlobalV::ocp == 1)
 	{
 		int count = 0;
@@ -571,6 +592,7 @@ void Input_Conv::Convert(void)
 	GlobalC::CHR.nelec = INPUT.nelec;
 	GlobalC::pot.out_potential = INPUT.out_potential;
     GlobalC::wf.out_wf = INPUT.out_wf;
+    GlobalC::wf.out_wf_r = INPUT.out_wf_r;
 	GlobalC::en.out_dos = INPUT.out_dos;
     GlobalC::en.out_band = INPUT.out_band;
 #ifdef __LCAO
@@ -603,11 +625,18 @@ void Input_Conv::Convert(void)
 	{
 		if(GlobalV::BASIS_TYPE != "pw")
 		{
-			 WARNING_QUIT("Input_conv","add metaGGA for pw first");
+			 ModuleBase::WARNING_QUIT("Input_conv","add metaGGA for pw first");
 		}
 		GlobalV::DFT_META = 1;
 	}
 
-	timer::tick("Input_Conv","Convert");
+	ModuleBase::timer::tick("Input_Conv","Convert");
     return;
+
+	//-----------------------------------------------
+	//caoyu add for DeePKS
+	//-----------------------------------------------
+	GlobalV::out_descriptor = INPUT.out_descriptor; 
+	GlobalV::deepks_scf = INPUT.deepks_scf;
+	
 }

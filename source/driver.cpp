@@ -20,10 +20,10 @@ Driver::~Driver(){}
 
 void Driver::init()
 {
-	TITLE("Driver","init");
+	ModuleBase::TITLE("Driver","init");
 
 	time_t time_start = std::time(NULL);
-	timer::start();
+	ModuleBase::timer::start();
 
 	// (1) read the input parameters.
 	this->reading();
@@ -31,11 +31,13 @@ void Driver::init()
 	// (2) welcome to the atomic world!
 	this->atomic_world();
 
+
 	// (3) output information
 	time_t	time_finish= std::time(NULL);
 	Print_Info::print_time(time_start, time_finish);
 
 	// (4) close all of the running logs 
+
 	INPUT.close_log();
 
 	return;
@@ -44,7 +46,7 @@ void Driver::init()
 
 void Driver::reading(void)
 {
-	timer::tick("Driver","reading");
+	ModuleBase::timer::tick("Driver","reading");
 
 	// (1) read INPUT 
 	INPUT.Init( GlobalV::global_in_card );
@@ -75,13 +77,13 @@ void Driver::reading(void)
     INPUT.Print( ss1.str() );
     //ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"READING CARDS");
 
-	timer::tick("Driver","reading");
+	ModuleBase::timer::tick("Driver","reading");
 	return;
 }
 
 void Driver::atomic_world(void)
 {
-	TITLE("Driver","atomic_world");
+	ModuleBase::TITLE("Driver","atomic_world");
 
 	//--------------------------------------------------
 	// choose basis sets:
@@ -100,9 +102,9 @@ void Driver::atomic_world(void)
 	}
 #endif
 
-	timer::finish( GlobalV::ofs_running );
+	ModuleBase::timer::finish( GlobalV::ofs_running );
 
-	Memory::print_all( GlobalV::ofs_running ) ;
+	ModuleBase::Memory::print_all( GlobalV::ofs_running ) ;
 
 	return;
 }

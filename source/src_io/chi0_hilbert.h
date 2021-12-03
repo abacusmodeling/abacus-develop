@@ -35,7 +35,7 @@ class Chi0_hilbert
 	double fermi_level;     // the change the fermi level(Ry)
 	bool coulomb_cutoff;    // turn on or off the Coulomb_cutoff 0/1  (The Z axis must be set to be a vacuum layer)
 	bool kmesh_interpolation;       // calculting <i,0|j,R>
-	double qcar[100][3];    // the Cartesian position of q points(unit: 2*PI/lat0) 
+	double qcar[100][3];    // the Cartesian position of q points(unit: 2*ModuleBase::PI/lat0) 
 	int lcao_box[3];        // the scale for searching the existence of the overlap <i,0|j,R>
 	
 	int dim_para;
@@ -74,7 +74,7 @@ class Chi0_hilbert
 	void C_inverse(int n, std::complex<double>** a);
 	void plot_chi0(int iq);
 	
-	Vector3<double> *all_gcar;
+	ModuleBase::Vector3<double> *all_gcar;
 	std::complex<double> **chi0;
 	std::complex<double> **chi;
 
@@ -111,8 +111,8 @@ private:
 	std::complex<double> **rpa1;
 	std::complex<double> **chi_para;
 
-	Vector3<int> ***R; 
-	Vector3<double> ***Rcar; 
+	ModuleBase::Vector3<int> ***R; 
+	ModuleBase::Vector3<double> ***Rcar; 
 	int ** Rmax;
 	int NR;
 	std::complex<double> ****overlap;

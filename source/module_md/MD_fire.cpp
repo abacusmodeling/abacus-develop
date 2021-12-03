@@ -15,9 +15,9 @@ MD_fire::MD_fire()
 
 void MD_fire::check_FIRE(
     const int& numIon, 
-    const Vector3<double>* force,
+    const ModuleBase::Vector3<double>* force,
     double& deltaT, 
-    Vector3<double>* vel)
+    ModuleBase::Vector3<double>* vel)
 {
     if(dt_max<0) dt_max = deltaT * 2.5; //initial dt_max
 	double P(0.0);

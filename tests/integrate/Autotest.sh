@@ -9,7 +9,7 @@ threshold=0.0000001
 # check accuracy
 ca=8
 # regex of case name
-case="^[^#].*_PW_.*$"
+case="^[^#].*_.*$"
 # enable AddressSanitizer
 sanitize=false
 
@@ -66,12 +66,11 @@ check_out(){
 		#--------------------------------------------------
 		# calculated value
 		#--------------------------------------------------
-		cal=`grep "$key" $outfile | awk '{printf "%.'$ca'f\n",$2}'`
+		cal=`grep "$key" result.out | awk '{printf "%.'$ca'f\n",$2}'`
 
 		#--------------------------------------------------
 		# reference value
 		#--------------------------------------------------
-
 		ref=`grep "$key" result.ref | awk '{printf "%.'$ca'f\n",$2}'`
 
 		#--------------------------------------------------
@@ -84,7 +83,7 @@ check_out(){
 		if [ $key == "totaltimeref" ]; then
 			# echo "time=$cal ref=$ref"
 			break
-		fi
+		fi		
 
 
 		#--------------------------------------------------

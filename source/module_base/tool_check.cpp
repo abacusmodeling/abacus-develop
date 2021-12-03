@@ -1,6 +1,9 @@
 #include "tool_check.h"
 #include "tool_quit.h"
 
+namespace ModuleBase
+{
+
 void CHECK_NAME(std::ifstream &ifs,const std::string &name_in,bool quit)
 {
     std::string name;
@@ -82,4 +85,6 @@ void CHECK_STRING(std::ifstream &ifs,const std::string &v,bool quit)
 		}
 	}
 	return;
+}
+
 }

@@ -25,7 +25,7 @@
 
 void energy::perform_dos(void)
 {
-	TITLE("energy","perform_dos");
+	ModuleBase::TITLE("energy","perform_dos");
 
 
     if(out_dos !=0 || out_band !=0)
@@ -134,7 +134,7 @@ void energy::perform_dos(void)
 						<<std::setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<std::endl;
 						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
-							ofsi2<<std::setw(6)<<ib+1<<std::setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV<<std::setw(25)<<GlobalC::wf.wg(ik,ib)<<std::endl;
+							ofsi2<<std::setw(6)<<ib+1<<std::setw(25)<<GlobalC::wf.ekb[ik][ib]* ModuleBase::Ry_to_eV<<std::setw(25)<<GlobalC::wf.wg(ik,ib)<<std::endl;
 						}
 						ofsi2 <<std::endl;
 						ofsi2 <<std::endl;
@@ -155,9 +155,9 @@ void energy::perform_dos(void)
 						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
 							ofsi2<<std::setw(6)<<ib+1
-							<<std::setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV
+							<<std::setw(25)<<GlobalC::wf.ekb[ik][ib]* ModuleBase::Ry_to_eV
 							<<std::setw(25)<<GlobalC::wf.wg(ik,ib)
-							<<std::setw(25)<<GlobalC::wf.ekb[(ik+GlobalC::kv.nks/2)][ib]* Ry_to_eV
+							<<std::setw(25)<<GlobalC::wf.ekb[(ik+GlobalC::kv.nks/2)][ib]* ModuleBase::Ry_to_eV
 							<<std::setw(25)<<GlobalC::wf.wg(ik+GlobalC::kv.nks/2,ib)<<std::endl;
 						}
 						ofsi2 <<std::endl;
@@ -203,12 +203,12 @@ void energy::perform_dos(void)
 		Parallel_Reduce::gather_min_double_all(emin);
 #endif
 
-		emax *= Ry_to_eV;
-		emin *= Ry_to_eV;
+		emax *= ModuleBase::Ry_to_eV;
+		emin *= ModuleBase::Ry_to_eV;
 
 //scale up a little bit so the end peaks are displaced better
 		double delta=(emax-emin)*dos_scale;
-		std::cout << dos_scale;
+		//std::cout << dos_scale;
 		emax=emax+delta/2.0;
 		emin=emin-delta/2.0;
 
@@ -246,7 +246,7 @@ void energy::perform_dos(void)
 
 
 		const int np=npoints;
-		matrix*  pdosk = new matrix[nspin0];
+		ModuleBase::matrix*  pdosk = new ModuleBase::matrix[nspin0];
 
 		for(int is=0; is<nspin0; ++is)
 		{
@@ -257,7 +257,7 @@ void energy::perform_dos(void)
 
 
 		}
-		matrix*  pdos = new matrix[nspin0];
+		ModuleBase::matrix*  pdos = new ModuleBase::matrix[nspin0];
 		for(int is=0; is<nspin0; ++is)
 		{
 			pdos[is].create(GlobalV::NLOCAL,np,true);
@@ -276,12 +276,12 @@ void energy::perform_dos(void)
 		{
 			if(GlobalV::GAMMA_ONLY_LOCAL)
 			{
-				std::vector<matrix>   Mulk;
+				std::vector<ModuleBase::matrix>   Mulk;
 				Mulk.resize(1);
 				Mulk[0].create(GlobalC::ParaO.ncol,GlobalC::ParaO.nrow);
 
 
-				matrix Dwf = D.wfc_gamma[is];
+				ModuleBase::matrix Dwf = D.wfc_gamma[is];
 				for (int i=0; i<GlobalV::NBANDS; ++i)		  
 				{     
 					ModuleBase::GlobalFunc::ZEROS(waveg, GlobalV::NLOCAL);
@@ -290,7 +290,7 @@ void energy::perform_dos(void)
 					for (int n=0; n<npoints; ++n)		  
 					{  
 						double en=emin+n * de_ev;
-						double en0=GlobalC::wf.ekb[0][i]*Ry_to_eV;
+						double en0=GlobalC::wf.ekb[0][i]*ModuleBase::Ry_to_eV;
 						double de = en-en0;
 						double de2 = 0.5*de * de;
 						Gauss[n] = GlobalC::kv.wk[0]*exp(-de2/a/a)/b;
@@ -334,7 +334,7 @@ void energy::perform_dos(void)
 					GlobalV::ofs_running,
 					GlobalV::OUT_LEVEL,
 					GlobalC::ORB.get_rcutmax_Phi(), 
-					GlobalC::ORB.get_rcutmax_Beta(), 
+					GlobalC::ucell.infoNL.get_rcutmax_Beta(), 
 					GlobalV::GAMMA_ONLY_LOCAL);
 
 				atom_arrange::search(
@@ -346,27 +346,42 @@ void energy::perform_dos(void)
 					GlobalV::test_atom_input);//qifeng-2019-01-21
 
 				// mohan update 2021-04-16
+				GlobalC::LOWF.orb_con.read_orb_first(
+					GlobalV::ofs_running,
+					GlobalC::ORB,
+					GlobalC::ucell.ntype,
+					GlobalC::ucell.lmax,
+					INPUT.lcao_ecut,
+					INPUT.lcao_dk,
+					INPUT.lcao_dr,
+					INPUT.lcao_rmax,
+					GlobalV::out_descriptor,
+					INPUT.out_r_matrix,
+					GlobalV::FORCE,
+					GlobalV::MY_RANK);
+					
+				GlobalC::ucell.infoNL.setupNonlocal(
+					GlobalC::ucell.ntype,
+					GlobalC::ucell.atoms,
+					GlobalV::ofs_running,
+					GlobalC::ORB
+				);
+
 				GlobalC::LOWF.orb_con.set_orb_tables(
-						GlobalV::ofs_running,
-						GlobalC::UOT, 
-						GlobalC::ORB,
-						GlobalC::ucell.ntype,
-						GlobalC::ucell.lmax,
-						INPUT.lcao_ecut,
-						INPUT.lcao_dk,
-						INPUT.lcao_dr,
-						INPUT.lcao_rmax, 
-						GlobalC::ucell.lat0, 
-						INPUT.out_descriptor,
-						INPUT.out_r_matrix,
-						Exx_Abfs::Lmax,
-						GlobalV::FORCE,
-						GlobalV::MY_RANK);
+					GlobalV::ofs_running,
+					GlobalC::UOT,
+					GlobalC::ORB,
+					GlobalC::ucell.lat0,
+					GlobalV::out_descriptor,
+					Exx_Abfs::Lmax,
+					GlobalC::ucell.infoNL.nprojmax,
+					GlobalC::ucell.infoNL.nproj,
+					GlobalC::ucell.infoNL.Beta);
 
 				GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
 				GlobalC::LM.zeros_HSR('S', GlobalC::LNNR.nnr);
 				GlobalC::UHM.genH.calculate_S_no();
-				GlobalC::UHM.genH.build_ST_new('S', false);
+				GlobalC::UHM.genH.build_ST_new('S', false, GlobalC::ucell);
 				std::vector<ModuleBase::ComplexMatrix> Mulk;
 				Mulk.resize(1);
 				Mulk[0].create(GlobalC::ParaO.ncol,GlobalC::ParaO.nrow);
@@ -394,7 +409,7 @@ void energy::perform_dos(void)
 							for (int n=0; n<npoints; ++n)		  
 							{  
 								double en=emin+n * de_ev;
-								double en0=GlobalC::wf.ekb[ik][i]*Ry_to_eV;
+								double en0=GlobalC::wf.ekb[ik][i]*ModuleBase::Ry_to_eV;
 								double de = en-en0;
 								double de2 = 0.5*de * de;
 								Gauss[n] = GlobalC::kv.wk[ik]*exp(-de2/a/a)/b;
@@ -450,7 +465,7 @@ void energy::perform_dos(void)
 					GlobalV::test_atom_input);
 #endif
 				// mohan update 2021-02-10
-				GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, INPUT.out_descriptor);
+				GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
 			}//else
 
 		 MPI_Reduce(pdosk[is].c, pdos[is].c , NUM , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);
@@ -462,7 +477,7 @@ void energy::perform_dos(void)
 		 {  std::stringstream ps;
 			 ps << GlobalV::global_out_dir << "TDOS";
 			 std::ofstream out(ps.str().c_str());
-			 if (GlobalV::NSPIN==1)
+			 if (GlobalV::NSPIN==1||GlobalV::NSPIN==4)
 			 {
 
 				 for (int n=0; n<npoints; ++n)
@@ -530,7 +545,10 @@ void energy::perform_dos(void)
 
 			 out << "<"<<"pdos"<<">" <<std::endl;
 			 out << "<"<<"nspin"<<">" << GlobalV::NSPIN<< "<"<<"/"<<"nspin"<<">"<< std::endl;
-			 out << "<"<<"norbitals"<<">" <<std::setw(2) <<GlobalV::NLOCAL<< "<"<<"/"<<"norbitals"<<">"<< std::endl;
+			 if (GlobalV::NSPIN==4)
+			 	out << "<"<<"norbitals"<<">" <<std::setw(2) <<GlobalV::NLOCAL/2<< "<"<<"/"<<"norbitals"<<">"<< std::endl;
+			 else
+			 	out << "<"<<"norbitals"<<">" <<std::setw(2) <<GlobalV::NLOCAL<< "<"<<"/"<<"norbitals"<<">"<< std::endl;
 			 out << "<"<<"energy"<<"_"<<"values units"<<"="<<"\""<<"eV"<<"\""<<">"<<std::endl;
 
 			 for (int n=0; n<npoints; ++n)
@@ -544,6 +562,7 @@ void energy::perform_dos(void)
 				 int a = GlobalC::ucell.iat2ia[i];
 				 int t = GlobalC::ucell.iat2it[i];
 				 Atom* atom1 = &GlobalC::ucell.atoms[t];
+				 const int s0 = GlobalC::ucell.itiaiw2iwt(t, a, 0);
 				 for(int j=0; j<atom1->nw; ++j)
 				 {
 					 const int L1 = atom1->iw2l[j];
@@ -577,6 +596,14 @@ void energy::perform_dos(void)
 							 out <<std::setw(20)<< pdos[0](w,n)<< std::setw(30)<< pdos[1](w,n)<<std::endl;
 						 }//n
 					 }
+					 else if (GlobalV::NSPIN==4)
+					 {
+						 int w0 = w-s0;
+						 for (int n=0; n<npoints; ++n)
+						 {
+							 out <<std::setw(20)<<pdos[0](s0+2*w0,n)+pdos[0](s0+2*w0+1,n)<<std::endl;
+						 }//n
+					 } 
 
 					 out << "<"<<"/"<<"data"<<">" <<std::endl;
 					 out << "<"<<"/"<<"orbital"<<">" <<std::endl;
@@ -676,7 +703,7 @@ void energy::perform_dos(void)
 		 //----------------------------------------------------------
 
 		 //double b = INPUT.b_coef;
-		 double b = bcoeff;
+		 double b = sqrt(2.0)*bcoeff;
 		 for(int i=0;i<number;i++)
 		 {
 			 double Gauss=0.0;

@@ -28,15 +28,15 @@ void Ions_Move_Methods::allocate()
 	}
 	else
 	{
-		WARNING("Ions_Move_Methods::init","the parameter GlobalV::MOVE_IONS is not correct.");
+		ModuleBase::WARNING("Ions_Move_Methods::init","the parameter GlobalV::MOVE_IONS is not correct.");
 	}
 	return;
 }
 
-//void Ions_Move_Methods::cal_movement(const int &istep, const matrix &f, const double &etot)
-void Ions_Move_Methods::cal_movement(const int &istep, const int &force_step, const matrix &f, const double &etot)
+//void Ions_Move_Methods::cal_movement(const int &istep, const ModuleBase::matrix &f, const double &etot)
+void Ions_Move_Methods::cal_movement(const int &istep, const int &force_step, const ModuleBase::matrix &f, const double &etot)
 {
-	TITLE("Ions_Move_Methods","init");
+	ModuleBase::TITLE("Ions_Move_Methods","init");
 
 	//Ions_Move_Basic::istep = istep;
     Ions_Move_Basic::istep = force_step;
@@ -62,7 +62,7 @@ void Ions_Move_Methods::cal_movement(const int &istep, const int &force_step, co
         }
 	else
 	{
-		WARNING("Ions_Move_Methods::init","the parameter GlobalV::MOVE_IONS is not correct.");
+		ModuleBase::WARNING("Ions_Move_Methods::init","the parameter GlobalV::MOVE_IONS is not correct.");
 	}
 
 	// print the atom positions for convinience.
@@ -78,7 +78,11 @@ void Ions_Move_Methods::cal_movement(const int &istep, const int &force_step, co
 	//xiaohui modify 2015-03-15, cancel outputfile "STRU_ION"
 	//GlobalC::ucell.print_stru_file(ss.str(),1);
 	ss << "_D";
+#ifdef __LCAO
+	GlobalC::ucell.print_stru_file(GlobalC::ORB,ss.str(),2);
+#else
 	GlobalC::ucell.print_stru_file(ss.str(),2);
+#endif
 
 	return;
 }

@@ -3,6 +3,14 @@
 
 #include "tools.h"
 
+#ifdef __CUDA
+
+#include "cufft.h"
+#include "use_fft_kernel.h"
+typedef cufftDoubleComplex CUFFT_COMPLEX;
+
+#endif
+
 class Use_FFT
 {
 	public:
@@ -27,24 +35,31 @@ class Use_FFT
 	// From G space to real space. wave functions.
 	void ToRealSpace(const std::complex<double> *vg, std::complex<double> *vr);
 
-	void ToRealSpace(const int &is, const ModuleBase::ComplexMatrix &vg, matrix &v);
+	void ToRealSpace(const int &is, const ModuleBase::ComplexMatrix &vg, ModuleBase::matrix &v);
 
 	//---------------------------------------------------------------------
 
 	// From real space to G space.
 	void ToReciSpace(const double* vr, std::complex<double> *vg);
-	
+
 
 	//---------------------------------------------------------------------
-	
+
 	void RoundTrip(
 	    const std::complex<double> *psi,
 		const double *vr,
 		const int *_index,
 		std::complex<double> *psic);
 
-	private:
+#ifdef __CUDA
+	cufftHandle fft_handle;
+	void RoundTrip(const CUFFT_COMPLEX *psi, const double *vr, const int *fft_index, CUFFT_COMPLEX *psic)
+	{
+		RoundTrip_kernel(psi, vr, fft_index, psic);
+	}
+#endif
 
+private:
 
 };
 

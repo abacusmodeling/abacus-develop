@@ -16,12 +16,13 @@ class wavefunc : public WF_atomic
     void allocate_ekb_wg(const int nks);
 
     int out_wf; //qianrui modify 2020-10-19
+    int out_wf_r=0; // Peize Lin add 2021.11.21
 
     // et    : (nks,nbnd),eigenvalues of the hamiltonian
     // wg	 : the weight of each k point and band
 	double **ekb;		   // band energy at each k point, each band.
 	bool   allocate_ekb;   // flag
-    matrix wg;
+    ModuleBase::matrix wg;
 
     // start_wfc : "random",or "atomic" or "file"
     std::string start_wfc;
@@ -36,7 +37,7 @@ class wavefunc : public WF_atomic
 	// wanf2: save given localized orbitals. 
 	// mohan_to_qianrui: move the LCAO_in_pw_k and LCAO_in_pw_k_q to wavefunc_in_pw.h 
 	void LCAO_in_pw_k(const int &ik, ModuleBase::ComplexMatrix &wvf);
-	void LCAO_in_pw_k_q(const int &ik, ModuleBase::ComplexMatrix &wvf, Vector3<double> q);   // pengfei 2016-11-23
+	void LCAO_in_pw_k_q(const int &ik, ModuleBase::ComplexMatrix &wvf, ModuleBase::Vector3<double> q);   // pengfei 2016-11-23
 
 	// evc: get the initial wave functions from diagnalized the PAO
 	// orbitals first.
@@ -56,7 +57,7 @@ class wavefunc : public WF_atomic
 
     private: // pengfei 2016-11-23
 
-    Vector3<int> ***R;
+    ModuleBase::Vector3<int> ***R;
     int ** Rmax;
 };
 

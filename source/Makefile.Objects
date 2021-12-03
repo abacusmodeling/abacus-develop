@@ -32,6 +32,7 @@ read_pp.o \
 read_pp_upf100.o \
 read_pp_upf201.o \
 read_pp_vwr.o \
+read_pp_blps.o \
 pseudo_nc.o \
 VL_in_pw.o\
 VNL_in_pw.o\
@@ -85,6 +86,7 @@ math_polyint.o\
 math_integral.o\
 math_ylmreal.o\
 mathzone_add1.o\
+math_bspline.o\
 integral.o \
 polint.o \
 sph_bessel.o \
@@ -174,8 +176,8 @@ global_fp.o \
 pdiag_double.o \
 pdiag_basic.o \
 pdiag_common.o \
+diag_scalapack_gvx.o \
 subgrid_oper.o \
-GenELPA.o \
 conv_coulomb_pot.o \
 conv_coulomb_pot_k.o \
 center2_orb-orb11.o \
@@ -250,6 +252,7 @@ write_rho_dipole.o\
 write_HS.o\
 write_HS_R.o\
 write_dm.o\
+write_wfc_realspace.o\
 potential_libxc.o \
 potential_libxc_meta.o \
 efield.o \
@@ -280,6 +283,7 @@ dmft.o \
 OBJS_COMMON=atom_spec.o \
 unitcell.o \
 pw_basis.o\
+bspline_sf.o\
 hamilt.o \
 pw_complement.o\
 wf_local.o \
@@ -289,6 +293,7 @@ diago_cg.o\
 output.o  \
 run_md_classic.o\
 LJ_potential.o\
+DP_potential.o\
 cmd_neighbor.o\
 dos.o \
 inverse_matrix.o \
@@ -309,6 +314,7 @@ symmetry_rho.o \
 symm_other.o \
 eximport.o \
 mulliken_charge.o\
+setup_nonlocal.o\
 
 OBJS_PDIAG=pdgseps.o \
 pzgseps.o \
