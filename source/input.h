@@ -63,8 +63,6 @@ class Input
 	std::string NNKP;            // add by jingan for wannier90
 	std::string wannier_spin;    // add by jingan for wannier90
 
-	bool mlwf_flag; 		// add by mohan
-
 //==========================================================
 // Stochastic DFT
 //==========================================================
@@ -89,7 +87,6 @@ class Input
 //==========================================================
 	bool opt_epsilon2;		// true : calculate the dielectric functions
 	int  opt_nbands;		// number of bands for optical transition matrix
-    bool lda_plus_u;		// true : lda plus u calculation
 
 //==========================================================
 // electrons / spin

@@ -194,7 +194,6 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"test_stress", test_stress, "test the force");
 	
 	ofs << "\n#Parameters (13.Other Methods)" << std::endl;
-	ModuleBase::GlobalFunc::OUTP(ofs,"mlwf_flag",mlwf_flag,"turn MLWF on or off");
 	ModuleBase::GlobalFunc::OUTP(ofs,"opt_epsilon2",opt_epsilon2,"calculate the dielectic function");
 	ModuleBase::GlobalFunc::OUTP(ofs,"opt_nbands",opt_nbands,"number of bands for optical calculation");
 	

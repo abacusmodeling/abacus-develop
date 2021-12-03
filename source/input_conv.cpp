@@ -399,8 +399,10 @@ void Input_Conv::Convert(void)
 
 
 
-	// jiyy add 2020.10.11
-	// fix bugs of ocp_set   --  Yuanbo Li 2021/8/17
+	// setting for constrained DFT, jiyy add 2020.10.11
+	// For example, when we studying nitrogen-vacancy center, 
+	// it requires an additional excitation of an electron conduction band to simulate the excited state,
+	// used for TDDFT only.
     if(GlobalV::ocp == 1)
 	{
 		int count = 0;
