@@ -24,6 +24,7 @@ namespace ModuleDMFT
   void DFT_DMFT_interface::init(Input& in, UnitCell_pseudo& cell)
   {
     TITLE("DFT_DMFT_interface", "init");
+    // Initialize some variables, e.g., U, J, and transfrom between iat, l, n, m and iwt
 
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {
@@ -111,6 +112,7 @@ namespace ModuleDMFT
 
   void DFT_DMFT_interface::out_k_weight()
   {
+    // Output weight of k-points
     TITLE("DFT_DMFT_interface", "out_k_weight");  
 
     if(GlobalV::MY_RANK!=0) return;
@@ -143,6 +145,7 @@ namespace ModuleDMFT
 
   void DFT_DMFT_interface::out_kvector()
   {
+    // Output k vector
     TITLE("DFT_DMFT_interface", "out_kvector");
 
     if(GlobalV::MY_RANK!=0) return;
@@ -175,6 +178,7 @@ namespace ModuleDMFT
 
   void DFT_DMFT_interface::out_correlated_atom_info()
   {
+    //Output the infomation of correlated atoms
     TITLE("DFT_DMFT_interface", "out_correlated_atom_info");
     
     if(GlobalV::MY_RANK!=0) return;
@@ -248,6 +252,7 @@ namespace ModuleDMFT
   void DFT_DMFT_interface::out_eigen_vector(
     const std::vector<ModuleBase::ComplexMatrix>& wfc )
   {
+    //Output wave functions
     TITLE("DFT_DMFT_interface", "out_eigen_vector");
     
     const int soc = GlobalV::NSPIN==4 ? 1 : 0;
@@ -315,6 +320,7 @@ namespace ModuleDMFT
     const double Ef, 
     const double Nelec )
   {
+    //Output bands information
     TITLE("DFT_DMFT_interface", "out_correlated_atom_info");
     
     if(GlobalV::MY_RANK!=0) return;
@@ -360,6 +366,8 @@ namespace ModuleDMFT
 
   void DFT_DMFT_interface::out_Sk()
   {
+    //output overlap matrix on k points, used for test
+
     const std::complex<double> zero(0.0,0.0);
 
     const int nks_tot = GlobalV::NSPIN==2 ? (int)GlobalC::kv.nks/2 : GlobalC::kv.nks;

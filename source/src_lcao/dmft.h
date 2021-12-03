@@ -28,8 +28,8 @@ namespace ModuleDMFT
 
     static int mag_num2m_index(const int m);
 
-//TESTS
-void out_Sk();
+    //TESTS
+    void out_Sk();
 
     private:
     void out_k_weight();

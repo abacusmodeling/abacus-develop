@@ -178,7 +178,10 @@ void LOOP_ions::opt_ions(void)
 
     if(INPUT.dft_plus_dmft)
     {
+      // Output sparse overlap matrix S(R)
       this->output_S_R("outputs_to_DMFT/overlap_matrix/SR.csr");
+      
+      // Output wave functions, bands, k-points information, and etc.
       GlobalC::dmft.out_to_dmft();
     }
 
