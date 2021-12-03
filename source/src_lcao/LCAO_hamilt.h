@@ -29,6 +29,7 @@ class LCAO_Hamilt
     void calculat_HR_dftu_sparse(const int &current_spin, const double &sparse_threshold);
     void calculat_HR_dftu_soc_sparse(const int &current_spin, const double &sparse_threshold);
     void calculate_HSR_sparse(const int &current_spin, const double &sparse_threshold);
+    void calculate_HR_exx_sparse(const int &current_spin, const double &sparse_threshold);
     void clear_zero_elements(const int &current_spin, const double &sparse_threshold);
     void destroy_all_HSR_sparse(void);
 
