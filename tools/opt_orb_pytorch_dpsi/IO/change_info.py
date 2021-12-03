@@ -13,6 +13,8 @@ def change_info(info_old, weight_old):
 		info_stru[ist].Nb = weight.shape[0]
 
 	info_element = addict.Dict()
+	for it_index,it in enumerate(info_old.Nt_all):
+		info_element[it].index = it_index
 	for it,Nu in info_old.Nu.items():
 		info_element[it].Nu = Nu
 		info_element[it].Nl = len(Nu)
