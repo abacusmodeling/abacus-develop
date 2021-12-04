@@ -128,29 +128,29 @@ def main():
 				for it,il,iu in C_read_index:
 					C[it][il].grad[:,iu] = 0
 			opt.step()
-	#		orbital.normalize(
-	# 			orbital.generate_orbital(info_element,C,E),
-	# 			{it:info_element[it].dr for it in info_element},
-	# 			C, flag_norm_C=True)
+			#orbital.normalize(
+			#	orbital.generate_orbital(info_element,C,E),
+			#	{it:info_element[it].dr for it in info_element},
+			#	C, flag_norm_C=True)
 
-		orb = orbital.generate_orbital(info_element,C_old,E)
-		if info_opt.cal_smooth:
-			orbital.smooth_orbital(
-				orb,
-				{it:info_element[it].Rcut for it in info_element}, {it:info_element[it].dr for it in info_element},
-				0.1)
-		orbital.orth(
+	orb = orbital.generate_orbital(info_element,C_old,E)
+	if info_opt.cal_smooth:
+		orbital.smooth_orbital(
 			orb,
-			{it:info_element[it].dr for it in info_element})
-		IO.print_orbital.print_orbital(orb,info_element)
-		IO.print_orbital.plot_orbital(
-			orb,
-			{it:info_element[it].Rcut for it in info_element},
-			{it:info_element[it].dr for it in info_element})
+			{it:info_element[it].Rcut for it in info_element}, {it:info_element[it].dr for it in info_element},
+			0.1)
+	orbital.orth(
+		orb,
+		{it:info_element[it].dr for it in info_element})
+	IO.print_orbital.print_orbital(orb,info_element)
+	IO.print_orbital.plot_orbital(
+		orb,
+		{it:info_element[it].Rcut for it in info_element},
+		{it:info_element[it].dr for it in info_element})
 
-		IO.func_C.write_C("ORBITAL_RESULTS.txt",C_old,Spillage)
+	IO.func_C.write_C("ORBITAL_RESULTS.txt",C_old,Spillage)
 
-		print("Time (PyTorch):     %s\n"%(time.time()-time_start), flush=True )
+	print("Time (PyTorch):     %s\n"%(time.time()-time_start), flush=True )
 
 
 if __name__=="__main__":

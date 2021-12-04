@@ -60,9 +60,9 @@ namespace Write_Wfc_Realspace
 	//           t0  t1  t2  t3  t4  t5  t6  t7
 	//          -------------------------------->
 	//  rank0    k0  k1  k2  k3  k4  k5
-	//             \   \   \   \   \   \ 
+	//             \   \   \   \   \   \
 	//  rank1        k0  k1  k2  k3  k4  k5
-	//                 \   \   \   \   \   \ 
+	//                 \   \   \   \   \   \
 	//  rank2            k0  k1  k2  k3  k4  k5
 
 
