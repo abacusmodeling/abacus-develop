@@ -22,6 +22,11 @@ namespace HS_Matrix
         const std::string &HR_filename_up, 
         const std::string &HR_filename_down
     );
+    void save_SR_sparse(
+        const double &sparse_threshold, 
+        const bool &binary,  
+        const std::string &SR_filename
+    );
     void output_single_R(std::ofstream &ofs, const std::map<size_t, std::map<size_t, double>> &XR, const double &sparse_threshold, const bool &binary);
     void output_soc_single_R(std::ofstream &ofs, const std::map<size_t, std::map<size_t, std::complex<double>>> &XR, const double &sparse_threshold, const bool &binary);
 

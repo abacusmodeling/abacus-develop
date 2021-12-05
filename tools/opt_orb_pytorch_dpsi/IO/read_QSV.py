@@ -61,7 +61,7 @@ def read_QSV(info_stru, info_element, file_list, V_info):
 	ist = 0
 	for ist_true,file_name in enumerate(file_list):
 		with open(file_name,"r") as file:
-			Nk = int(re.compile(r"(\d)+\s+nks").search(file.read()).group(1))
+			Nk = int(re.compile(r"(\d+)\s+nks").search(file.read()).group(1))
 		with open(file_name,"r") as file:
 			data = re.compile(r"<OVERLAP_Q>(.+)</OVERLAP_Q>", re.S).search(file.read())
 			data = map(float,data.group(1).split())

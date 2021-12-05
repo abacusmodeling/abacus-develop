@@ -171,19 +171,19 @@ void LOOP_ions::opt_ions(void)
             GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
         }
 
-        if(GlobalC::ParaO.out_hsR)
-		{
-			this->output_HS_R(); //LiuXh add 2019-07-15
-		}
-
     if(INPUT.dft_plus_dmft)
     {
       // Output sparse overlap matrix S(R)
-      this->output_S_R("outputs_to_DMFT/overlap_matrix/SR.csr");
+      this->output_SR("outputs_to_DMFT/overlap_matrix/SR.csr");
       
       // Output wave functions, bands, k-points information, and etc.
       GlobalC::dmft.out_to_dmft();
     }
+
+        if(GlobalC::ParaO.out_hsR)
+		{
+			this->output_HS_R(); //LiuXh add 2019-07-15
+		}
 
         //caoyu add 2021-03-31
 #ifdef __DEEPKS
@@ -557,19 +557,3 @@ void LOOP_ions::final_scf(void)
     return;
 }
 
-void LOOP_ions::output_S_R(std::string file)
-{
-    TITLE("LOOP_ions","output_S_R"); 
-    timer::tick("LOOP_ions","output_S_R");
-
-    // Parameters SR output
-    double sparse_threshold = 1e-10;
-    bool binary = false; // output binary file
-
-    GlobalC::UHM.calculate_STN_R_sparse(sparse_threshold);
-    HS_Matrix::save_SR_sparse(sparse_threshold, binary, file);
-    GlobalC::UHM.destroy_all_HSR_sparse();
-
-    timer::tick("LOOP_ions","output_S_R"); 
-    return;
-}

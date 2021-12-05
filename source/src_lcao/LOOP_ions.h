@@ -19,8 +19,14 @@ class LOOP_ions
 	LOOP_elec LOE;
 
 	void opt_ions(void);
-	void output_HS_R(void); //LiuXh add 2019-07-15
-  void output_S_R(std::string file);
+	void output_HS_R(
+        const std::string &SR_filename="data-SR-sparse_SPIN0.csr",
+        const std::string &HR_filename_up="data-HR-sparse_SPIN0.csr",
+        const std::string HR_filename_down="data-HR-sparse_SPIN1.csr",
+        const bool &binary=false, 
+        const double &sparse_threshold=1e-10
+    ); //LiuXh add 2019-07-15, modify in 2021-12-3
+    void output_SR(const std::string &SR_filename, const bool &binary=false, const double &sparse_threshold=1e-10);
 
 	private:
 

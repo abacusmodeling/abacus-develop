@@ -71,7 +71,7 @@ class Opt_Orbital:
 					S_tt[il1] = torch.cat( S[it1,it2][il1], dim=1 )
 				S_t[it2] = torch.cat( S_tt, dim=0 )
 			S_[it1] = torch.cat( list(S_t.values()), dim=1 )
-		# S_cat[it1*il1*iat*im1*iu1,iat2*il2*ia2*im2*iu2]
+		# S_cat[it1*il1*ia1*im1*iu1,it2*il2*ia2*im2*iu2]
 		S_cat = torch.cat( list(S_.values()), dim=0 )	
 		return S_cat
 		
@@ -100,11 +100,11 @@ class Opt_Orbital:
 	
 	def cal_coef(self,Q,S):
 		# Q[ib,it*il*ia*im*iu]
-		# S[it1*il1*iat*im1*iu1,iat2*il2*ia2*im2*iu2]
+		# S[it1*il1*ia1*im1*iu1,it2*il2*ia2*im2*iu2]
 		"""
 		  <\psi|\phi> * <\phi|\phi>^{-1}
 		  coef[ib,it*il*ia*im*iu]
-			= Q[ib,it1*il1*ia1*im1*iu1] * S{[it1*il1*iat*im1*iu1,iat2*il2*ia2*im2*iu2]}^{-1}
+			= Q[ib,it1*il1*ia1*im1*iu1] * S{[it1*il1*ia1*im1*iu1,it2*il2*ia2*im2*iu2]}^{-1}
 		"""
 		S_I = torch.inverse(S)
 		coef = torch.mm(Q, S_I)
@@ -119,7 +119,7 @@ class Opt_Orbital:
 		  <\psi|\psi> = <\psi|\phi> * <\phi|\phi>^{-1} * <\phi|psi>
 		  V[ib1,ib2]
 		  	= sum_{it1,ia1,il1,im1,iu1} sum_{it2,ia2,il2,im2,iu2}
-		  	Q[ib1,it1*il1*ia1*im1*iu1] * S{[it1*il1*iat*im1*iu1,iat2*il2*ia2*im2*iu2]}^{-1} * Q[ib2,it2*il2*ia2*im2*iu2]
+		  	Q[ib1,it1*il1*ia1*im1*iu1] * S{[it1*il1*ia1*im1*iu1,it2*il2*ia2*im2*iu2]}^{-1} * Q[ib2,it2*il2*ia2*im2*iu2]
 		"""
 		V = torch.mm( coef, Q.t().conj() ).real
 		return V
@@ -140,7 +140,7 @@ class Opt_Orbital:
 	def cal_V_linear(self,coef,Q_linear,S_linear,V,V_info):
 		# coef[ib,it*il*ia*im*iu]
 		# Q_linear[ib,it*il*ia*im*iu]
-		# S_linear[it1*il1*iat*im1*iu1,iat2*il2*ia2*im2*iu2]
+		# S_linear[it1*il1*ia1*im1*iu1,it2*il2*ia2*im2*iu2]
 		# V[ib1,ib2]
 		"""
 		  V_linear[ib]

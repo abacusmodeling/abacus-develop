@@ -2045,7 +2045,7 @@ bool Input::Read(const std::string &fn)
 				for(int i=0; i<ntype; i++)
 				{
 					ifs >> hubbard_u[i];
-					hubbard_u[i] /= Ry_to_eV;
+					hubbard_u[i] /= ModuleBase::Ry_to_eV;
 				}
 			}
 			else if (strcmp("hund_j", word)==0)
@@ -2053,7 +2053,7 @@ bool Input::Read(const std::string &fn)
 				for(int i=0;i<ntype;i++)
 				{
 					ifs >> hund_j[i];
-					hund_j[i] /= Ry_to_eV;
+					hund_j[i] /= ModuleBase::Ry_to_eV;
 				}
 			}
 			else if(strcmp("orbital_corr", word)==0)

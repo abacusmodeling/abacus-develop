@@ -1145,6 +1145,138 @@ void HS_Matrix::save_HSR_sparse(
     return;
 }
 
+void HS_Matrix::save_SR_sparse(
+    const double &sparse_threshold, 
+    const bool &binary,  
+    const std::string &SR_filename
+)
+{
+    ModuleBase::TITLE("HS_Matrix","save_SR_sparse");
+    ModuleBase::timer::tick("HS_Matrix","save_SR_sparse");
+
+    auto &all_R_coor_ptr = GlobalC::LM.all_R_coor;
+    auto &SR_sparse_ptr = GlobalC::LM.SR_sparse;
+    auto &SR_soc_sparse_ptr = GlobalC::LM.SR_soc_sparse;
+
+    int total_R_num = all_R_coor_ptr.size();
+    int output_R_number = 0;
+    int *S_nonzero_num = nullptr;
+
+    S_nonzero_num = new int[total_R_num];
+    ModuleBase::GlobalFunc::ZEROS(S_nonzero_num, total_R_num);
+
+    int count = 0;
+    for (auto &R_coor : all_R_coor_ptr)
+    {
+        if (GlobalV::NSPIN != 4)
+        {
+            auto iter = SR_sparse_ptr.find(R_coor);
+            if (iter != SR_sparse_ptr.end())
+            {
+                for (auto &row_loop : iter->second)
+                {
+                    S_nonzero_num[count] += row_loop.second.size();
+                }
+            }
+        }
+        else
+        {
+            auto iter = SR_soc_sparse_ptr.find(R_coor);
+            if (iter != SR_soc_sparse_ptr.end())
+            {
+                for (auto &row_loop : iter->second)
+                {
+                    S_nonzero_num[count] += row_loop.second.size();
+                }
+            }
+        }
+
+        count++;
+    }
+
+    Parallel_Reduce::reduce_int_all(S_nonzero_num, total_R_num);
+
+    for (int index = 0; index < total_R_num; ++index)
+    {
+        if (S_nonzero_num[index] != 0)
+        {
+            output_R_number++;
+        }
+    }
+
+    std::stringstream sss;
+    sss << GlobalV::global_out_dir << SR_filename;
+    std::ofstream g2;
+
+    if(GlobalV::DRANK==0)
+    {
+        if (binary)
+        {
+            g2.open(sss.str().c_str(), ios::binary);
+            g2.write(reinterpret_cast<char *>(&GlobalV::NLOCAL), sizeof(int));
+            g2.write(reinterpret_cast<char *>(&output_R_number), sizeof(int));
+        }
+        else
+        {
+            g2.open(sss.str().c_str());
+            g2 << "Matrix Dimension of S(R): " << GlobalV::NLOCAL <<std::endl;
+            g2 << "Matrix number of S(R): " << output_R_number << std::endl;
+        }
+    }
+
+    count = 0;
+    for (auto &R_coor : all_R_coor_ptr)
+    {
+        int dRx = R_coor.x;
+        int dRy = R_coor.y;
+        int dRz = R_coor.z;
+
+        if (S_nonzero_num[count] == 0)
+        {
+            count++;
+            continue;
+        }
+
+        if (GlobalV::DRANK == 0)
+        {
+            if (binary)
+            {
+                g2.write(reinterpret_cast<char *>(&dRx), sizeof(int));
+                g2.write(reinterpret_cast<char *>(&dRy), sizeof(int));
+                g2.write(reinterpret_cast<char *>(&dRz), sizeof(int));
+                g2.write(reinterpret_cast<char *>(&S_nonzero_num[count]), sizeof(int));
+            }
+            else
+            {
+                g2 << dRx << " " << dRy << " " << dRz << " " << S_nonzero_num[count] << std::endl;
+            }
+        }
+
+        if (GlobalV::NSPIN != 4)
+        {
+            output_single_R(g2, SR_sparse_ptr[R_coor], sparse_threshold, binary);
+        }
+        else
+        {
+            output_soc_single_R(g2, SR_soc_sparse_ptr[R_coor], sparse_threshold, binary);
+        }
+
+        count++;
+
+    }
+
+    if(GlobalV::DRANK==0) 
+    {
+        g2.close();
+    }
+
+    delete[] S_nonzero_num;
+    S_nonzero_num = nullptr;
+
+    ModuleBase::timer::tick("HS_Matrix","save_SR_sparse");
+    return;
+}
+
 void HS_Matrix::output_single_R(std::ofstream &ofs, const std::map<size_t, std::map<size_t, double>> &XR, const double &sparse_threshold, const bool &binary)
 {
     double *line = nullptr;
