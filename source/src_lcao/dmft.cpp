@@ -23,7 +23,7 @@ namespace ModuleDMFT
 {
   void DFT_DMFT_interface::init(Input& in, UnitCell_pseudo& cell)
   {
-    TITLE("DFT_DMFT_interface", "init");
+    ModuleBase::TITLE("DFT_DMFT_interface", "init");
     // Initialize some variables, e.g., U, J, and transfrom between iat, l, n, m and iwt
 
     if(GlobalV::GAMMA_ONLY_LOCAL)
@@ -94,7 +94,7 @@ namespace ModuleDMFT
 
   void DFT_DMFT_interface::out_to_dmft()
   {
-    TITLE("DFT_DMFT_interface", "out_to_dmft");
+    ModuleBase::TITLE("DFT_DMFT_interface", "out_to_dmft");
     
     this->out_kvector();
 
@@ -113,7 +113,7 @@ namespace ModuleDMFT
   void DFT_DMFT_interface::out_k_weight()
   {
     // Output weight of k-points
-    TITLE("DFT_DMFT_interface", "out_k_weight");  
+    ModuleBase::TITLE("DFT_DMFT_interface", "out_k_weight");  
 
     if(GlobalV::MY_RANK!=0) return;
 
@@ -146,7 +146,7 @@ namespace ModuleDMFT
   void DFT_DMFT_interface::out_kvector()
   {
     // Output k vector
-    TITLE("DFT_DMFT_interface", "out_kvector");
+    ModuleBase::TITLE("DFT_DMFT_interface", "out_kvector");
 
     if(GlobalV::MY_RANK!=0) return;
 
@@ -179,7 +179,7 @@ namespace ModuleDMFT
   void DFT_DMFT_interface::out_correlated_atom_info()
   {
     //Output the infomation of correlated atoms
-    TITLE("DFT_DMFT_interface", "out_correlated_atom_info");
+    ModuleBase::TITLE("DFT_DMFT_interface", "out_correlated_atom_info");
     
     if(GlobalV::MY_RANK!=0) return;
 
@@ -209,9 +209,9 @@ namespace ModuleDMFT
         ofs << "atom    " << atom_count << std::endl;
         ofs << "angular_moment    " << this->corr_L[it] << std::endl;
         ofs << std::setw(6) << std::fixed << std::setprecision(2)
-            << this->U[it]*Ry_to_eV
+            << this->U[it]*ModuleBase::Ry_to_eV
             << std::setw(6) << std::fixed << std::setprecision(2)
-            << this->J[it]*Ry_to_eV 
+            << this->J[it]*ModuleBase::Ry_to_eV 
             << std::setw(4) << mag << std::endl;
 
         for(int l=0; l<GlobalC::ucell.atoms[it].nwl+1; l++)
@@ -253,7 +253,7 @@ namespace ModuleDMFT
     const std::vector<ModuleBase::ComplexMatrix>& wfc )
   {
     //Output wave functions
-    TITLE("DFT_DMFT_interface", "out_eigen_vector");
+    ModuleBase::TITLE("DFT_DMFT_interface", "out_eigen_vector");
     
     const int soc = GlobalV::NSPIN==4 ? 1 : 0;
     const int nks_tot = GlobalV::NSPIN==2 ? (int)GlobalC::kv.nks/2 : GlobalC::kv.nks;
@@ -321,7 +321,7 @@ namespace ModuleDMFT
     const double Nelec )
   {
     //Output bands information
-    TITLE("DFT_DMFT_interface", "out_correlated_atom_info");
+    ModuleBase::TITLE("DFT_DMFT_interface", "out_correlated_atom_info");
     
     if(GlobalV::MY_RANK!=0) return;
 
