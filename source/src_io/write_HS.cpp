@@ -1205,7 +1205,7 @@ void HS_Matrix::save_SR_sparse(
     }
 
     std::stringstream sss;
-    sss << GlobalV::global_out_dir << SR_filename;
+    sss << SR_filename;
     std::ofstream g2;
 
     if(GlobalV::DRANK==0)
