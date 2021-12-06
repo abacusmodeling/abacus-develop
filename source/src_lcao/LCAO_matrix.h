@@ -174,7 +174,7 @@ class LCAO_Matrix
 	void print_HSgamma(const char &mtype, std::ostream &os=std::cout);
 	void print_HSk(const char &mtype, const char &vtype = 'C', const double &accuracy = 1.0e-5, std::ostream &os=std::cout);
 	void update_Hloc(void);
-	void update_Hloc2(void);
+	void update_Hloc2(const int &ik);
 
 	void allocate_HS_R(const int &nnr);
 

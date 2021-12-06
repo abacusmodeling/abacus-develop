@@ -518,6 +518,7 @@ void LCAO_Descriptor::cal_projected_DM_k(const std::vector<ModuleBase::ComplexMa
             {
                 const int T1 = GlobalC::GridD.getType(ad1);
                 const int I1 = GlobalC::GridD.getNatom(ad1);
+                const int ibt1 = GlobalC::ucell.itia2iat(T1,I1);
                 const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
                 const ModuleBase::Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau(ad1);
 				const Atom* atom1 = &GlobalC::ucell.atoms[T1];
@@ -530,6 +531,7 @@ void LCAO_Descriptor::cal_projected_DM_k(const std::vector<ModuleBase::ComplexMa
 				{
 					const int T2 = GlobalC::GridD.getType(ad2);
 					const int I2 = GlobalC::GridD.getNatom(ad2);
+                    const int ibt2 = GlobalC::ucell.itia2iat(T2,I2);
 					const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 					const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad2);
 					const Atom* atom2 = &GlobalC::ucell.atoms[T2];
@@ -573,8 +575,10 @@ void LCAO_Descriptor::cal_projected_DM_k(const std::vector<ModuleBase::ComplexMa
                             }
                             dm_current=tmp.real();
 
-                            std::vector<double> nlm1 = this->nlm_save[iat][ad1][iw1_all][0];
-                            std::vector<double> nlm2 = this->nlm_save[iat][ad2][iw2_all][0];
+                            key_tuple key_1(ibt1,dR1.x,dR1.y,dR1.z);
+                            key_tuple key_2(ibt2,dR2.x,dR2.y,dR2.z);
+                            std::vector<double> nlm1 = this->nlm_save_k[iat][key_1][iw1_all][0];
+                            std::vector<double> nlm2 = this->nlm_save_k[iat][key_2][iw2_all][0];
                             assert(nlm1.size()==nlm2.size());
 
                             int ib=0;
@@ -1016,6 +1020,7 @@ void LCAO_Descriptor::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& d
             {
                 const int T1 = GlobalC::GridD.getType(ad1);
                 const int I1 = GlobalC::GridD.getNatom(ad1);
+                const int ibt1 = GlobalC::ucell.itia2iat(T1,I1);
                 const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
                 
                 const ModuleBase::Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau(ad1);
@@ -1030,7 +1035,7 @@ void LCAO_Descriptor::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& d
 					const int T2 = GlobalC::GridD.getType(ad2);
 					const int I2 = GlobalC::GridD.getNatom(ad2);
 					const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-                    const int ibt = GlobalC::ucell.itia2iat(T2,I2);
+                    const int ibt2 = GlobalC::ucell.itia2iat(T2,I2);
 					const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad2);
 					const Atom* atom2 = &GlobalC::ucell.atoms[T2];
 					const int nw2_tot = atom2->nw*GlobalV::NPOL;
@@ -1072,9 +1077,11 @@ void LCAO_Descriptor::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& d
                                 GlobalV::ofs_running << "dm_current not real : " << tmp << "\n";
                             }
                             dm_current=tmp.real();
-
-                            std::vector<double> nlm1 = this->nlm_save[iat][ad1][iw1_all][0];
-                            std::vector<std::vector<double>> nlm2 = this->nlm_save[iat][ad2][iw2_all];
+                            
+                            key_tuple key_1(ibt1,dR1.x,dR1.y,dR1.z);
+                            key_tuple key_2(ibt2,dR2.x,dR2.y,dR2.z);
+                            std::vector<double> nlm1 = this->nlm_save_k[iat][key_1][iw1_all][0];
+                            std::vector<std::vector<double>> nlm2 = this->nlm_save_k[iat][key_2][iw2_all];
 
                             assert(nlm1.size()==nlm2[0].size());
 
@@ -1097,9 +1104,9 @@ void LCAO_Descriptor::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& d
                                             double fact_z = (nlm2[3][ib+m2] * nlm1[ib+m1] + nlm2[3][ib+m2] * nlm1[ib+m1]) * dm_current;
 
                                             //(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'> + (<d/dX chi_nu|alpha_m'>)<chi_mu|alpha_m>
-                                            gdmx[ibt][inl][m1*nm + m2] += fact_x;
-                                            gdmy[ibt][inl][m1*nm + m2] += fact_y;                                               
-                                            gdmz[ibt][inl][m1*nm + m2] += fact_z;
+                                            gdmx[ibt2][inl][m1*nm + m2] += fact_x;
+                                            gdmy[ibt2][inl][m1*nm + m2] += fact_y;                                               
+                                            gdmz[ibt2][inl][m1*nm + m2] += fact_z;
 
                                             //(<chi_mu|d/dX alpha_m>)<chi_nu|alpha_m'> + (<chi_nu|d/dX alpha_m'>)<chi_mu|alpha_m>
                                             // = -(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'> - (<d/dX chi_nu|alpha_m'>)<chi_mu|alpha_m>
