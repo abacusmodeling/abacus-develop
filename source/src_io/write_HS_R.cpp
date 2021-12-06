@@ -3,8 +3,16 @@
 #include "../src_pw/global.h"
 #include "write_HS.h"
 
-
-void LOOP_ions::output_HS_R(void)
+// if 'binary=true', output binary file.
+// The 'sparse_threshold' is the accuracy of the sparse matrix. 
+// If the absolute value of the matrix element is less than or equal to the 'sparse_threshold', it will be ignored.
+void LOOP_ions::output_HS_R(
+    const std::string &SR_filename,
+    const std::string &HR_filename_up,
+    const std::string HR_filename_down,
+    const bool &binary, 
+    const double &sparse_threshold
+)
 {
     ModuleBase::TITLE("LOOP_ions","output_HS_R"); 
     ModuleBase::timer::tick("LOOP_ions","output_HS_R"); 
@@ -16,10 +24,6 @@ void LOOP_ions::output_HS_R(void)
         r_matrix.init();
         r_matrix.out_r_overlap_R(GlobalV::NSPIN);
     }
-
-    // Parameters for HR and SR output
-    double sparse_threshold = 1e-10;
-    bool binary = false; // output binary file
 
     if(GlobalV::NSPIN==1||GlobalV::NSPIN==4)
     {
@@ -88,9 +92,6 @@ void LOOP_ions::output_HS_R(void)
         }
     }
 
-    std::string SR_filename = "data-SR-sparse_SPIN0.csr";
-    std::string HR_filename_up = "data-HR-sparse_SPIN0.csr";
-    std::string HR_filename_down = "data-HR-sparse_SPIN1.csr";
     HS_Matrix::save_HSR_sparse(sparse_threshold, binary, SR_filename, HR_filename_up, HR_filename_down);
     GlobalC::UHM.destroy_all_HSR_sparse();
 
@@ -100,5 +101,19 @@ void LOOP_ions::output_HS_R(void)
     } //LiuXh 20181011
 
     ModuleBase::timer::tick("LOOP_ions","output_HS_R"); 
+    return;
+}
+
+
+void LOOP_ions::output_SR(const std::string &SR_filename, const bool &binary, const double &sparse_threshold)
+{
+    ModuleBase::TITLE("LOOP_ions","output_SR");
+    ModuleBase::timer::tick("LOOP_ions","output_SR"); 
+
+    GlobalC::UHM.calculate_SR_sparse(sparse_threshold);
+    HS_Matrix::save_SR_sparse(sparse_threshold, binary, SR_filename);
+    GlobalC::UHM.destroy_all_HSR_sparse();
+
+    ModuleBase::timer::tick("LOOP_ions","output_SR");
     return;
 }
