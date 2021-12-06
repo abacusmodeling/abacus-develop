@@ -34,19 +34,21 @@ class Numerical_Basis
 
 	ModuleBase::ComplexArray cal_overlap_Q(
 		const int &ik, const int &np, const ModuleBase::ComplexMatrix &psi,
-		const int derivative_order ) const;
+		const double derivative_order ) const;
 		
 	ModuleBase::ComplexArray cal_overlap_Sq(
 		const int &ik, 
 		const int &np,
-		const int derivative_order ) const;
+		const double derivative_order ) const;
 
-	static ModuleBase::matrix cal_overlap_V(const ModuleBase::ComplexMatrix *psi, const int derivative_order);
+	static ModuleBase::matrix cal_overlap_V(const ModuleBase::ComplexMatrix *psi, const double derivative_order);
 
 	ModuleBase::realArray cal_flq(const int ik, const std::vector<ModuleBase::Vector3<double>> &gk) const;
 
 	static ModuleBase::matrix cal_ylm(const std::vector<ModuleBase::Vector3<double>> &gk);
 	
+	static std::vector<double> cal_gpow (const std::vector<ModuleBase::Vector3<double>> &gk, const double derivative_order);
+
 	static void output_info(
 		std::ofstream &ofs,
 		const Bessel_Basis &bessel_basis);
