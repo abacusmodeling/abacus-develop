@@ -21,13 +21,13 @@ void PW_Basis:: real2recip(std::complex<double> * in, std::complex<double> * out
     }
     this->ft.executefftw("2for");
 
-    this->gatherp_scatters(this->ft.c_rspace2, this->ft.c_gspace);
+    this->gatherp_scatters(this->ft.c_rspace, this->ft.c_gspace);
     
     this->ft.executefftw("1for");
 
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
-        out[ig] = this->ft.c_gspace2[this->ig2isz[ig]];
+        out[ig] = this->ft.c_gspace[this->ig2isz[ig]];
     }
     return;
 }
@@ -44,6 +44,20 @@ void PW_Basis:: real2recip(double * in, std::complex<double> * out)
     {
         this->ft.r_rspace[ir] = in[ir];
     }
+    // r2c in place
+    // int padny = 2 * ny;
+    // int nyp = this->bigny * this->nplane;
+    // for(int ix = 0 ; ix < this->nx ; ++ix)
+    // {
+    //     for(int iy = 0 ; iy < this->bigny ; ++iy)
+    //     {
+    //         for(int iz = 0 ; iz < this->nplane; ++iz)
+    //         {
+    //             this->ft.r_rspace[ix*padny * nplane * 2 + iy * this->nplane * 2 + iz * 2 ] = in[ix*nyp + iy * this->nplane + iz];
+    //         }
+    //     }
+    // }
+
     this->ft.executefftw("2r2c");
 
     this->gatherp_scatters(this->ft.c_rspace, this->ft.c_gspace);
@@ -52,7 +66,7 @@ void PW_Basis:: real2recip(double * in, std::complex<double> * out)
 
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
-        out[ig] = this->ft.c_gspace2[this->ig2isz[ig]];
+        out[ig] = this->ft.c_gspace[this->ig2isz[ig]];
     }
     return;
 }
@@ -73,14 +87,15 @@ void PW_Basis:: recip2real(std::complex<double> * in, std::complex<double> * out
     }
     this->ft.executefftw("1bac");
 
-    this->gathers_scatterp(this->ft.c_gspace2,this->ft.c_rspace);
+    this->gathers_scatterp(this->ft.c_gspace,this->ft.c_rspace);
 
     this->ft.executefftw("2bac");
-
+    
     for(int ir = 0 ; ir < this->nrxx ; ++ir)
     {
-        out[ir] = this->ft.c_rspace2[ir] / double(this->bignxyz);
+        out[ir] = this->ft.c_rspace[ir] / double(this->bignxyz);
     }
+
     return;
 }
 
@@ -100,7 +115,7 @@ void PW_Basis:: recip2real(std::complex<double> * in, double * out)
     }
     this->ft.executefftw("1bac");
     
-    this->gathers_scatterp(this->ft.c_gspace2, this->ft.c_rspace);
+    this->gathers_scatterp(this->ft.c_gspace, this->ft.c_rspace);
 
     this->ft.executefftw("2c2r");
 
@@ -108,6 +123,19 @@ void PW_Basis:: recip2real(std::complex<double> * in, double * out)
     {
         out[ir] = this->ft.r_rspace[ir] / this->bignxyz;
     }
+    // c2r in place
+    // int padny = 2 * ny;
+    // int nyp = this->bigny * this->nplane;
+    // for(int ix = 0 ; ix < this->nx ; ++ix)
+    // {
+    //     for(int iy = 0 ; iy < this->bigny ; ++iy)
+    //     {
+    //         for(int iz = 0 ; iz < this->nplane; ++iz)
+    //         {
+    //             out[ix*nyp + iy * this->nplane + iz] = this->ft.r_rspace[ix*padny * nplane *2 + iy * this->nplane*2 + iz*2] / double(this->bignxyz);
+    //         }
+    //     }
+    // }
     return;
 }
 
