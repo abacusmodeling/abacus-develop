@@ -16,16 +16,18 @@ public:
     void write_restart();
     void restart();
     void integrate();
+    void temp_target();
+    void update_mass();
 
     double t_target;       // target temperature
     const static int nc = 1;
-    const static int nsy = 7;
+    const static int nsy = 1;
     double w[nsy];         // scale evolution operator
 
     double *Q;             // MHC mass
     double *G;             // parameter in NHC
-    double *NHCeta;        // NHC position
-    double *NHCveta;       // NHC velocity
+    double *eta;        // NHC position
+    double *veta;       // NHC velocity
 
 };
 

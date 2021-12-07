@@ -51,6 +51,8 @@ void Verlet::setup()
     MD_func::force_virial(mdp, ucell, potential, force, virial);
     MD_func::kinetic_stress(ucell, vel, allmass, kinetic, stress);
     stress += virial;
+
+    temperature_ = 2*kinetic/(double(3*ucell.nat-frozen_freedom_))*ModuleBase::Hartree_to_K;
 }
 
 void Verlet::first_half()
