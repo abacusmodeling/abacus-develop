@@ -236,7 +236,7 @@ void MD_basic::runNVT(int step1, double potential, ModuleBase::Vector3<double> *
 
     update_half_direct(1);
 	
-	mdt.Integrator(mdp.NVT_control, temperature_, vel, allmass);//thermostat interact with velocity
+	mdt.Integrator(mdp.NVT_control, temperature_, vel, allmass, ucell.nat);//thermostat interact with velocity
     twiceKE=mdf.GetAtomKE(ucell.nat, vel, allmass);
     twiceKE = 2 * twiceKE;
 	
