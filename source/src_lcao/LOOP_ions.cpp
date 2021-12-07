@@ -17,6 +17,7 @@
 #include "../src_pw/vdwd3.h"
 #include "../src_pw/vdwd2_parameters.h"
 #include "../src_pw/vdwd3_parameters.h"
+#include "dmft.h"
 #ifdef __DEEPKS
 #include "LCAO_descriptor.h"    //caoyu add 2021-07-26
 #endif
@@ -170,10 +171,20 @@ void LOOP_ions::opt_ions(void)
             GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
         }
 
+    if(INPUT.dft_plus_dmft)
+    {
+      // Output sparse overlap matrix S(R)
+      this->output_SR("outputs_to_DMFT/overlap_matrix/SR.csr");
+      
+      // Output wave functions, bands, k-points information, and etc.
+      GlobalC::dmft.out_to_dmft();
+    }
+
         if(GlobalC::ParaO.out_hsR)
 		{
 			this->output_HS_R(); //LiuXh add 2019-07-15
 		}
+
         //caoyu add 2021-03-31
 #ifdef __DEEPKS
         if (GlobalV::out_descriptor)
@@ -545,3 +556,4 @@ void LOOP_ions::final_scf(void)
 
     return;
 }
+
