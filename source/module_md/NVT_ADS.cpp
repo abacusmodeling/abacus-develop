@@ -43,7 +43,7 @@ void NVT_ADS::second_half()
     {
         if(rand()/double(RAND_MAX) <= 1.0/nraise)
         {
-            deviation = sqrt(t_last / allmass[i]);
+            deviation = sqrt(mdp.tlast / allmass[i]);
             for(int k=0; k<3; ++k)
             {
                 if(ionmbl[i][k]) 

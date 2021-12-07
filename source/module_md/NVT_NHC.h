@@ -17,6 +17,7 @@ public:
     void restart();
     void integrate();
 
+    double t_target;       // target temperature
     const static int nc = 1;
     const static int nsy = 7;
     double w[nsy];         // scale evolution operator

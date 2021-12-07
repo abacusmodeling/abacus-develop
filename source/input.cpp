@@ -1286,6 +1286,10 @@ bool Input::Read(const std::string &fn)
 		{
 			read_value(ifs, mdp.tscale);
 		}
+		else if (strcmp("md_tfreq",word) == 0)
+		{
+			read_value(ifs, mdp.tfreq);
+		}
 //----------------------------------------------------------
 // tddft
 // Fuxiang He add 2016-10-26
@@ -2304,6 +2308,7 @@ void Input::Bcast()
 		Parallel_Common::bcast_double(mdp.velocity);
 		Parallel_Common::bcast_double(mdp.viscosity);
 		Parallel_Common::bcast_double(mdp.tscale);
+		Parallel_Common::bcast_double(mdp.tfreq);
 /* 	// Peize Lin add 2014-04-07
 	Parallel_Common::bcast_bool( vdwD2 );
 	Parallel_Common::bcast_double( vdwD2_scaling );

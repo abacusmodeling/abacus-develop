@@ -15,8 +15,9 @@ Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
 
     // convert to a.u. unit
     mdp.dt /= ModuleBase::AU_to_FS;
-	temperature_ = mdp.tfirst/ModuleBase::Hartree_to_K;
-    t_last = mdp.tlast/ModuleBase::Hartree_to_K;
+    mdp.tfirst /= ModuleBase::Hartree_to_K;
+    mdp.tlast /= ModuleBase::Hartree_to_K;
+    temperature_ = mdp.tfirst;
 
     // LJ parameters
     mdp.rcut_lj *= ModuleBase::ANGSTROM_AU;

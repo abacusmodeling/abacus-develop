@@ -3,6 +3,8 @@
 
 NVT_NHC::NVT_NHC(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in) : Verlet(MD_para_in, unit_in)
 {
+    t_target = mdp.tfirst;
+
     // convert to a.u. unit
     if(mdp.Qmass < ucell.nat) mdp.Qmass = ucell.nat;
     mdp.Qmass /= ModuleBase::AU_to_MASS;
@@ -18,7 +20,7 @@ NVT_NHC::NVT_NHC(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in) : Verlet(M
     {
         if(i>0) Q[i] = mdp.Qmass / (3*ucell.nat - frozen_freedom_);
         NHCeta[i] = rand()/double(RAND_MAX) - 0.5;
-        NHCveta[i] = MD_func::gaussrand() * sqrt(t_last / Q[i]);
+        NHCveta[i] = MD_func::gaussrand() * sqrt(t_target / Q[i]);
     }
 
     w[0] = 0.784513610477560;
@@ -45,10 +47,10 @@ void NVT_NHC::setup()
 
     Verlet::setup();
 
-    G[0] = (2*kinetic - (3*ucell.nat - frozen_freedom_)*t_last) / Q[0];
+    G[0] = (2*kinetic - (3*ucell.nat - frozen_freedom_)*t_target) / Q[0];
     for(int m=1; m<mdp.MNHC; ++m)
     {
-        G[m] = (Q[m-1]*NHCveta[m-1]*NHCveta[m-1]-t_last) / Q[m];
+        G[m] = (Q[m-1]*NHCveta[m-1]*NHCveta[m-1]-t_target) / Q[m];
     }
 
     ModuleBase::timer::tick("NVT_NHC", "setup");
@@ -101,10 +103,10 @@ void NVT_NHC::integrate()
     double KE = kinetic;
 
     // update force
-    G[0] = (2*KE - (3*ucell.nat - frozen_freedom_)*t_last) / Q[0];
+    G[0] = (2*KE - (3*ucell.nat - frozen_freedom_)*t_target) / Q[0];
     // for(int m=1; m<mdp.MNHC; ++m)
     // {
-    //     G[m] = (Q[m-1]*NHCveta[m-1]*NHCveta[m-1]-t_last) / Q[m];
+    //     G[m] = (Q[m-1]*NHCveta[m-1]*NHCveta[m-1]-t_target) / Q[m];
     // }
 
     for(int i=0; i<nc; ++i)
@@ -136,17 +138,17 @@ void NVT_NHC::integrate()
             {
                 if(m==0)
                 {
-                    G[m] = (2*KE - (3*ucell.nat - frozen_freedom_)*t_last) / Q[m];
+                    G[m] = (2*KE - (3*ucell.nat - frozen_freedom_)*t_target) / Q[m];
                 }
                 else
                 {
-                    G[m] = (Q[m-1]*NHCveta[m-1]*NHCveta[m-1]-t_last) / Q[m];
+                    G[m] = (Q[m-1]*NHCveta[m-1]*NHCveta[m-1]-t_target) / Q[m];
                 }
                 
                 double aa = exp(-NHCveta[m+1]*delta/8.0);
                 NHCveta[m] = NHCveta[m] * aa * aa + G[m] * aa * delta /4.0;
             }
-            G[mdp.MNHC-1] = (Q[mdp.MNHC-2]*NHCveta[mdp.MNHC-2]*NHCveta[mdp.MNHC-2]-t_last) / Q[mdp.MNHC-1];
+            G[mdp.MNHC-1] = (Q[mdp.MNHC-2]*NHCveta[mdp.MNHC-2]*NHCveta[mdp.MNHC-2]-t_target) / Q[mdp.MNHC-1];
             NHCveta[mdp.MNHC-1] += G[mdp.MNHC-1] * delta /4.0;
         }
     }
