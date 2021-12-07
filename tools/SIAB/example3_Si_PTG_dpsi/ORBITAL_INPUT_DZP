@@ -1,12 +1,13 @@
-
 #1.exe_dir
 #--------------------------------------------------------------------------------
-EXE_mpi      mpijob 
+#EXE_mpi      mpijob 
+EXE_mpi      /opt/hpcx/2.9.0/ompi-icc/2019.update5/bin/mpirun -np 8
 
-EXE_pw       /home/nic/wszhang/eclipse_project/abacus-NewGit/ABACUS.1.0.0/bin/20190930.fix0621.ABACUS.mpi
+#EXE_pw       /home/nic/wszhang/eclipse_project/abacus-NewGit/ABACUS.1.0.0/bin/20190930.fix0621.ABACUS.mpi
+EXE_pw       /gpfs/home/nic/wszhang/abacus/wszhang@github/abacus-develop/bin/ABACUS.mpi
 
-EXE_orbital   /home/nic/wszhang/eclipse_project/abacus-NewGit/ABACUS.1.0.0/tools/SIAB/SimulatedAnnealing/source/SIA_s.exe
-#EXE_orbital  /home/nic/wszhang/eclipse_project/abacus-NewGit/ABACUS.1.0.0/tools/SIAB/PyTorchGradient/source/main.py
+EXE_orbital  /home/nic/wszhang/abacus/wszhang@github/abacus-develop/tools/opt_orb_pytorch_dpsi/main.py
+
 #--------------------------------------------------------------------------------
 #( In this part, the direction of the two used exe is provided )
 
@@ -16,9 +17,10 @@ EXE_orbital   /home/nic/wszhang/eclipse_project/abacus-NewGit/ABACUS.1.0.0/tools
 targets     14_Si_100  # element
 ref_bands   4.0 # reference bands
 nbands      8.0 # num of bands for calculate
-Ecut        100  # cutoff energy (in Ry)
+Ecut        60  # cutoff energy (in Ry)
 Rcut        6  # cutoff radius (in a.u.)
-Pseudo_dir  /home/nic/wszhang/eclipse_project/delta_dft/CIF_POT/SG15_ONCV_PBE-1.0/
+#Pseudo_dir  /home/nic/wszhang/eclipse_project/delta_dft/CIF_POT/SG15_ONCV_PBE-1.0/
+Pseudo_dir  /gpfs/home/nic/wszhang/abacus/CIF_POT/SG15_ONCV_PBE-1.0
 Pseudo      Si_ONCV_PBE-1.0.upf
 sigma       0.01          # energy range for gauss smearing (in Ry) 
 #--------------------------------------------------------------------------------
@@ -27,7 +29,7 @@ sigma       0.01          # energy range for gauss smearing (in Ry)
 #3.structure information
 #--------------------------------------------------------------------------------
 #the Bond Length list for each STRU
-BLSTRU1    1.8 2.0
+BLSTRU1    1.8 2.0 2.3 2.8 3.8
 # if skip the orbital optimization for each STRU (1:skip, 0:not skip).
 SkipSTRU   0  
 # set the objective structure list to fit for orbital optimization

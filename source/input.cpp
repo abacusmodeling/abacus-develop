@@ -251,6 +251,7 @@ void Input::Default(void)
 
     out_potential = 0;
     out_wf = 0;
+    out_wf_r = 0;
 	out_dos = 0;
     out_band = 0;
 	out_hs = 0;
@@ -437,6 +438,11 @@ void Input::Default(void)
 	double_counting = 1;
 	omc = false;
 	dftu_type = 2;
+
+//==========================================================
+//    DFT+DMFT     Xin Qu added on 2020-08
+//==========================================================
+    dft_plus_dmft = false;  
 
     return;
 }
@@ -1025,6 +1031,10 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, out_wf);
         }
+        else if (strcmp("out_wf_r", word) == 0)
+        {
+            read_value(ifs, out_wf_r);
+        }
 		//mohan add 20090909
         else if (strcmp("out_dos", word) == 0)
         {
@@ -1584,7 +1594,14 @@ bool Input::Read(const std::string &fn)
         else if(strcmp("orbital_corr",word)==0) ifs.ignore(150,'\n');
 		else if(strcmp("omc",word)==0) ifs.ignore(150,'\n');
 		else if(strcmp("yukawa_lambda",word)==0) ifs.ignore(150,'\n');
-//---------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------
+//         Xin Qu added on 2020-08 for DFT+DMFT
+//----------------------------------------------------------------------------------
+		else if(strcmp("dft_plus_dmft",word)==0)
+		{
+			ifs >> dft_plus_dmft;
+		}
+//----------------------------------------------------------------------------------
         else
         {
 			//xiaohui add 2015-09-15
@@ -1730,7 +1747,7 @@ bool Input::Read(const std::string &fn)
 				exit(0);
 			}
 
-			if( (orbital_corr[i]==-1) && (orbital_corr[i]==0) && (orbital_corr[i]!=1) && (orbital_corr[i]!=2) && (orbital_corr[i]!=3) )
+			if( (orbital_corr[i]!=-1) && (orbital_corr[i]!=0) && (orbital_corr[i]!=1) && (orbital_corr[i]!=2) && (orbital_corr[i]!=3) )
 			{
 				std::cout << " WRONG ARGUMENTS OF orbital_corr " << std::endl;
 				exit(0);
@@ -1752,6 +1769,99 @@ bool Input::Read(const std::string &fn)
 		if(strcmp("genelpa", ks_solver.c_str())!=0 && strcmp(ks_solver.c_str(),"scalapack_gvx")!=0 )
 		{
 			std::cout << " WRONG ARGUMENTS OF ks_solver in DFT+U routine, only genelpa and scalapack_gvx are supportted " << std::endl;
+			exit(0);
+		}
+
+	}
+
+//----------------------------------------------------------
+//       DFT+DMFT    Xin Qu  added on 2020-08
+//----------------------------------------------------------
+	if(dft_plus_dmft)
+	{
+		ifs.clear();
+    ifs.seekg(0);  //move to the beginning of the file
+    ifs.rdstate();
+    while (ifs.good())
+    {
+  		ifs >> word1;
+  		strtolower(word1, word);     //convert uppercase std::string to lower case; word1 --> word
+
+			if(strcmp("hubbard_u", word)==0)
+			{
+				for(int i=0; i<ntype; i++)
+				{
+					ifs >> hubbard_u[i];
+					hubbard_u[i] /= ModuleBase::Ry_to_eV;
+				}
+			}
+			else if (strcmp("hund_j", word)==0)
+			{
+				for(int i=0;i<ntype;i++)
+				{
+					ifs >> hund_j[i];
+					hund_j[i] /= ModuleBase::Ry_to_eV;
+				}
+			}
+			else if(strcmp("orbital_corr", word)==0)
+			{
+				for(int i=0;i<ntype;i++)
+				{
+					ifs >> orbital_corr[i];
+				}
+			}
+			else ifs.ignore(150, '\n');
+
+			if (ifs.eof() != 0) break;
+		}
+
+		for(int i=0; i<ntype; i++)
+		{
+
+			if(hubbard_u[i]<-1.0e-3)
+			{
+				std::cout << " WRONG ARGUMENTS OF hubbard_u " << std::endl;
+				exit(0);
+			}
+
+			if(hund_j[i]<-1.0e-3)
+			{
+				std::cout << " WRONG ARGUMENTS OF hund_j " << std::endl;
+				exit(0);
+			}
+
+			if( (orbital_corr[i]!=-1) && (orbital_corr[i]!=0) && (orbital_corr[i]!=1) && (orbital_corr[i]!=2) && (orbital_corr[i]!=3) )
+			{
+				std::cout << " WRONG ARGUMENTS OF orbital_corr " << std::endl;
+				exit(0);
+			}
+		}
+
+		bool dmft_flag = false;
+		for(int i=0; i<ntype; i++)
+		{
+			if(orbital_corr[i] != -1)
+      {
+        dmft_flag = true;
+        break;
+      }
+		}
+
+    if(!dmft_flag)
+    {
+      std::cout << "No atoms are correlated!!!" << std::endl;
+		  exit(0);
+    }
+
+		if(strcmp("lcao", basis_type.c_str())!=0)
+		{
+			std::cout << " WRONG ARGUMENTS OF basis_type, only lcao is support " << std::endl;
+			exit(0);
+		}
+
+		if(strcmp("genelpa", ks_solver.c_str())!=0)
+		{
+			std::cout << " WRONG ARGUMENTS OF ks_solver in DFT+DMFT routine, only genelpa is support " << std::endl;
 			exit(0);
 		}
 
@@ -1977,6 +2087,7 @@ void Input::Bcast()
 
 	Parallel_Common::bcast_int(out_potential);
     Parallel_Common::bcast_int( out_wf );
+    Parallel_Common::bcast_int( out_wf_r );
 	Parallel_Common::bcast_int( out_dos );
         Parallel_Common::bcast_int( out_band );
 	Parallel_Common::bcast_int( out_hs );
@@ -2190,7 +2301,7 @@ void Input::Bcast()
 //-----------------------------------------------------------------------------------
 //DFT+U (added by Quxin 2020-10-29)
 //-----------------------------------------------------------------------------------
-    Parallel_Common::bcast_bool( dft_plus_u );
+  Parallel_Common::bcast_bool( dft_plus_u );
 	Parallel_Common::bcast_bool( yukawa_potential );
 	Parallel_Common::bcast_bool( omc );
 	Parallel_Common::bcast_int(dftu_type);
@@ -2209,6 +2320,11 @@ void Input::Bcast()
 		Parallel_Common::bcast_double(hund_j[i]);
 		Parallel_Common::bcast_int(orbital_corr[i]);
 	}
+
+//-----------------------------------------------------------------------------------
+//DFT+DMFT (added by Quxin 2020-08)
+//-----------------------------------------------------------------------------------
+  Parallel_Common::bcast_bool( dft_plus_dmft );
 
     return;
 }

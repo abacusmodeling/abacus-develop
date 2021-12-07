@@ -219,6 +219,7 @@ class Input
 	int out_dm; // output density matrix.
 	int out_potential;		// yes or no
     int out_wf;			// 0: no; 1: txt; 2: dat
+    int out_wf_r;			// 0: no; 1: yes
 	int out_dos;			// dos calculation. mohan add 20090909
     int out_band;                   // band calculation pengfei 2014-10-13
 	int out_hs;			// output H matrix and S matrix in local basis.
@@ -444,6 +445,11 @@ class Input
 
 	int dftu_type;                  //1:rotationally invarient formalism; 2:simplified form(default)
 	int double_counting;            // 1:FLL(fully localized limit)(default); 2:AMF(around mean field)
+
+//==========================================================
+//    DFT+DMFT       Xin Qu added on 2021-08
+//==========================================================
+  bool dft_plus_dmft;                //true:DFT+U correction; false：standard DFT calcullation(default)
 
 //==========================================================
 // DeepKS -- added by caoyu and mohan
