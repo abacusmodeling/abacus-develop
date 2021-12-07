@@ -59,6 +59,7 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"out_charge",out_charge,">0 output charge density for selected electron steps");
 	ModuleBase::GlobalFunc::OUTP(ofs,"out_potential",out_potential,"output realspace potential");
 	ModuleBase::GlobalFunc::OUTP(ofs,"out_wf",out_wf,"output wave functions");
+	ModuleBase::GlobalFunc::OUTP(ofs,"out_wf_r",out_wf_r,"output wave functions in realspace");
 	ModuleBase::GlobalFunc::OUTP(ofs,"out_dos",out_dos,"output energy and dos");
 	ModuleBase::GlobalFunc::OUTP(ofs,"out_band",out_band,"output energy and band structure");
 	ModuleBase::GlobalFunc::OUTP(ofs,"restart_save",restart_save,"print to disk every step for restart");

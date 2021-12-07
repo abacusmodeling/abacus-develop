@@ -594,6 +594,7 @@ void Input_Conv::Convert(void)
 	GlobalC::CHR.nelec = INPUT.nelec;
 	GlobalC::pot.out_potential = INPUT.out_potential;
     GlobalC::wf.out_wf = INPUT.out_wf;
+    GlobalC::wf.out_wf_r = INPUT.out_wf_r;
 	GlobalC::en.out_dos = INPUT.out_dos;
     GlobalC::en.out_band = INPUT.out_band;
 #ifdef __LCAO

@@ -10,6 +10,7 @@
 #include "../src_pw/pw_basis.h"
 #include "../src_io/print_info.h"
 #include "variable_cell.h" // mohan add 2021-02-01
+#include "src_io/write_wfc_realspace.h"
 
 void Ions::opt_ions_pw(void)
 {
@@ -240,6 +241,11 @@ void Ions::opt_ions_pw(void)
 	{
 		std::cout << " ION DYNAMICS FINISHED :)" << std::endl;
 	}
+
+	if(GlobalC::wf.out_wf_r == 1)				// Peize Lin add 2021.11.21
+	{
+		Write_Wfc_Realspace::write_wfc_realspace_1(GlobalC::wf.evc, "wfc_realspace");
+	}	
 
 	ModuleBase::timer::tick("Ions","opt_ions_pw");
     return;
