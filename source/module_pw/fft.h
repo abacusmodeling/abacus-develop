@@ -51,6 +51,7 @@ public:
 	int bignxy;
 	int ns; //number of sticks
 	int nplane; //number of x-y planes
+	int maxgrids; // max between nz * ns and bignxy * nplane
 	std::complex<double> * c_gspace, *c_gspace2; //complex number space for g, [ns * nz]
 	std::complex<double> * c_rspace, *c_rspace2;//complex number space for r, [nplane * nx *ny]
 	double *r_rspace; //real number space for r, [nplane * nx *ny]
@@ -65,12 +66,20 @@ private:
 	bool gamma_only;
 	bool destroyp;
 	bool mpifft; // if use mpi fft, only used when define __FFTW3_MPI
-	fftw_plan plan2r2c;
-	fftw_plan plan2c2r;
-	fftw_plan plan1for;
-	fftw_plan plan1bac;
-	fftw_plan plan2for;
-	fftw_plan plan2bac;
+	// fftw_plan plan2r2c;
+	// fftw_plan plan2c2r;
+	// fftw_plan plan1for;
+	// fftw_plan plan1bac;
+	// fftw_plan plan2for;
+	// fftw_plan plan2bac;
+	fftw_plan planzfor;
+	fftw_plan planzbac;
+	fftw_plan planxfor;
+	fftw_plan planxbac;
+	fftw_plan planyfor;
+	fftw_plan planybac;
+	fftw_plan planyr2c;
+	fftw_plan planyc2r;
 #ifdef __MIX_PRECISION
 	bool destroypf;
 	fftwf_plan planf2r2c;

@@ -93,6 +93,8 @@ parallel : ${PW_OBJS}
 	${CPLUSPLUS_MPI} ${OPTS} test2-1.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test2-1.exe 
 	${CPLUSPLUS_MPI} ${OPTS} test2-2.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test2-2.exe 
 	${CPLUSPLUS_MPI} ${OPTS} test2-3.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test2-3.exe 
+	${CPLUSPLUS_MPI} ${OPTS} test_t1.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test_t1.exe 
+	${CPLUSPLUS_MPI} ${OPTS} test_t2.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test_t2.exe 
 
 ${OBJ_DIR}/%.o:%.cpp
 	${CPLUSPLUS_MPI} ${OPTS} -c ${HONG} $< -o $@
@@ -106,3 +108,5 @@ clean:
 	@ if [ -e test2-1.exe ]; then rm -f test2-1.exe; fi
 	@ if [ -e test2-2.exe ]; then rm -f test2-2.exe; fi
 	@ if [ -e test2-3.exe ]; then rm -f test2-3.exe; fi
+	@ if [ -e test_t1.exe ]; then rm -f test_t1.exe; fi
+	@ if [ -e test_t2.exe ]; then rm -f test_t2.exe; fi
