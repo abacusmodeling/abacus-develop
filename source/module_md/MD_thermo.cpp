@@ -290,11 +290,12 @@ void MD_thermo::Integrator(
     const int control,
     const double &temperature,
     ModuleBase::Vector3<double>* vel,
-    const double* allmass)
+    const double* allmass,
+    const int& numIon)
 {
 	if(control == 1) NHCIntegrator(temperature, vel, allmass);
-	else if(control == 2) LGVIntegrator(temperature, vel, allmass);
-	else if(control == 3) ADSIntegrator(temperature, vel, allmass);
+	else if(control == 2) LGVIntegrator(temperature, vel, allmass, numIon);
+	else if(control == 3) ADSIntegrator(temperature, vel, allmass, numIon);
 	else ModuleBase::WARNING_QUIT("MD_thermo:Integrator", "please choose available reservoir!!!");
 	return;
 }
@@ -302,7 +303,8 @@ void MD_thermo::Integrator(
 void MD_thermo::LGVIntegrator(
     const double &temperature,
     ModuleBase::Vector3<double>* vel,
-    const double* allmass
+    const double* allmass,
+    const int& numIon
 )
 {
 //---------------------------------------------------------------------------
@@ -315,7 +317,7 @@ void MD_thermo::LGVIntegrator(
 	//c1k=e^(-gamma*dt)
 	double c2k=sqrt(1.0-c1k*c1k);
 
-    for(int iatom=0;iatom<numIon_;iatom++)
+    for(int iatom=0;iatom<numIon;iatom++)
     {
         randomx = gaussrand();
         tempV = vel[iatom].x;
@@ -339,7 +341,8 @@ void MD_thermo::LGVIntegrator(
 void MD_thermo::ADSIntegrator(
     const double &temperature,
     ModuleBase::Vector3<double>* vel,
-    const double* allmass
+    const double* allmass,
+    const int& numIon
 )
 {
 //---------------------------------------------------------------------------
@@ -354,7 +357,7 @@ void MD_thermo::ADSIntegrator(
 
 	double nu = 1/ NVT_tau_;
 
-    for(int iatom=0;iatom<numIon_;iatom++)
+    for(int iatom=0;iatom<numIon;iatom++)
     {
         uniform_random = genrand_real2() ;
 
@@ -363,13 +366,10 @@ void MD_thermo::ADSIntegrator(
         //if(uniform_random < 0.3 ) {
             ranx=sqrt(allmass[iatom] * temperature);
             ranx *= gaussrand();
-
             rany=sqrt(allmass[iatom] * temperature);
             rany *= gaussrand();
-
             ranz=sqrt(allmass[iatom] * temperature);
             ranz *= gaussrand();
-            
             vel[iatom].x=ranx/allmass[iatom];
             vel[iatom].y=rany/allmass[iatom];
             vel[iatom].z=ranz/allmass[iatom];
