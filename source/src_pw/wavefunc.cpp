@@ -297,7 +297,7 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ModuleBase::ComplexMatrix &wvf)
 	}
 	else if(start_wfc=="random")
 	{
-			this->random(wfcatom,0,GlobalV::NBANDS,ik);
+		this->random(wfcatom,0,GlobalV::NBANDS,ik);
 	}
 
 	// (7) Diago with cg method.

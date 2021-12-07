@@ -2,11 +2,19 @@
 #define HAMILT_H
 
 #include "tools.h"
+
+#if ((defined __CUDA) || (defined __ROCM))
+
 #ifdef __CUDA
 #include "hamilt_pw.cuh"
 #else
+#include "hamilt_pw_hip.h"
+#endif
+
+#else
 #include "hamilt_pw.h"
 #endif
+
 class Hamilt
 {
 	public:
@@ -66,6 +74,27 @@ class Hamilt
 		const int ldh, // nstart
 		double *e,
 		double2* hvec);
+#endif
+
+#ifdef __ROCM
+	// rocsolver_handle rocsolver_handle;
+	void diagH_subspace_cuda(
+		const int ik,
+		const int nstart,
+		const int n_band,
+		const hipblasDoubleComplex* psi,
+		hipblasDoubleComplex* evc,
+		double *en,
+		hipblasDoubleComplex *d_ekb_c);
+
+	void diagH_CUSOLVER(
+		const int nstart,
+		const int nbands,
+		hipblasDoubleComplex* hc,  // nstart * nstart
+		hipblasDoubleComplex* sc,  // nstart * nstart
+		const int ldh, // nstart
+		double *e,
+		hipblasDoubleComplex* hvec);
 #endif
 
     Hamilt_PW hpw;

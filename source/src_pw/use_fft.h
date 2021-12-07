@@ -4,11 +4,14 @@
 #include "tools.h"
 
 #ifdef __CUDA
-
 #include "cufft.h"
 #include "use_fft_kernel.h"
-
 #endif
+
+#ifdef __ROCM
+#include "hipfft.h"
+#include "use_fft_kernel.h"
+#endif 
 
 class Use_FFT
 {
@@ -57,6 +60,18 @@ class Use_FFT
 		RoundTrip_kernel(psi, vr, fft_index, psic);
 	}
 	void RoundTrip(const double2 *psi, const double *vr, const int *fft_index, double2 *psic)
+	{
+		RoundTrip_kernel(psi, vr, fft_index, psic);
+	}
+#endif
+
+#ifdef __ROCM
+	hipfftHandle fft_handle;
+	void RoundTrip(const hipblasComplex *psi, const float *vr, const int *fft_index, hipblasComplex *psic)
+	{
+		RoundTrip_kernel(psi, vr, fft_index, psic);
+	}
+	void RoundTrip(const hipblasDoubleComplex *psi, const double *vr, const int *fft_index, hipblasDoubleComplex *psic)
 	{
 		RoundTrip_kernel(psi, vr, fft_index, psic);
 	}

@@ -1,7 +1,10 @@
 # ifndef DIAGO_CG_CUH
 # define DIAGO_CG_CUH
+
+#ifdef __CUDA
 #include "cufft.h"
 #include "cublas_v2.h"
+#endif
 
 template<class T, class T2>
 class Diago_CG_CUDA
@@ -96,7 +99,13 @@ public:
 private:
 
     int test_cg;
+#ifdef __CUDA
     cublasHandle_t diag_handle;
+#endif
+
+#ifdef __ROCM
+    hipblasHandle_t diag_handle;
+#endif
 
     void calculate_gradient(
         const T* precondition,

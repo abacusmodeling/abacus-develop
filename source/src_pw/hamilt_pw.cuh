@@ -9,6 +9,12 @@
 #include "cusolverDn.h"
 #endif
 
+#ifdef __ROCM
+#include "hipfft.h"
+#include "hipblas.h"
+#include "rocsolver.h"
+#endif
+
 class Hamilt_PW
 {
 

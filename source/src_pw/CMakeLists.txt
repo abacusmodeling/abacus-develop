@@ -66,6 +66,14 @@ if(USE_CUDA)
         hamilt_pw.cu
         use_fft_kernel.cu
     )
+elseif(USE_ROCM)
+    list(APPEND objects
+        diago_cg_hip.cpp
+        electrons_hip.cpp
+        hamilt_hip.cpp
+        hamilt_pw_hip.cpp
+        use_fft_kernel_hip.cpp
+    )
 else()
     list(APPEND objects
         hamilt.cpp

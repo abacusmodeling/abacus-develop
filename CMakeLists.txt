@@ -8,12 +8,13 @@ project(ABACUS
     VERSION 2.2.0
     DESCRIPTION "ABACUS is an electronic structure package based on DFT."
     HOMEPAGE_URL "https://github.com/deepmodeling/abacus-develop"
-    LANGUAGES CXX
+    # LANGUAGES CXX
 )
 
 option(ENABLE_DEEPKS "Enable DeePKS functionality" OFF)
 option(ENABLE_LIBXC "Enable LibXC functionality" OFF)
-option(USE_CUDA "Enable support to CUDA." ON)
+option(USE_CUDA "Enable support to CUDA." OFF)
+option(USE_ROCM "Enable support to ROCm." ON)
 option(USE_OPENMP " Enable OpenMP in abacus." ON)
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 option(BUILD_TESTING "Build ABACUS unit tests" OFF)
@@ -46,7 +47,7 @@ target_link_libraries(${ABACUS_BIN_NAME} Threads::Threads)
 if(USE_OPENMP)
   find_package(OpenMP REQUIRED)
   target_link_libraries(${ABACUS_BIN_NAME} OpenMP::OpenMP_CXX)
-  # add_compile_options(${OpenMP_CXX_FLAGS})
+  add_compile_options(${OpenMP_CXX_FLAGS})
   add_compile_definitions(__OPENMP)
 endif()
 
@@ -90,6 +91,35 @@ if(USE_CUDA)
   )
   include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
   add_compile_definitions(__CUDA)
+endif()
+
+if(USE_ROCM)
+  set(CMAKE_CXX_STANDARD 11) 
+  SET(CMAKE_HIP_STANDARD 11)
+  # set(CMAKE_CXX_STANDARD_REQUIRED True) 
+  list(APPEND CMAKE_PREFIX_PATH /opt/rocm/hip /opt/rocm)
+  list(APPEND CMAKE_SYSTEM_PREFIX_PATH "/opt/rocm/hip")
+  include_directories(
+    /opt/rocm/hip/include
+    /opt/rocm/hipfft/include
+    /opt/rocm/hipblas/include
+    /opt/rocm/rocsolver/include
+  )
+  # find_package(ROCM REQUIRED)
+  find_package(hip REQUIRED)
+  find_package(hipfft REQUIRED)
+  find_package(hipblas REQUIRED)
+  find_package(rocsolver REQUIRED)
+  target_link_libraries(${ABACUS_BIN_NAME}
+    hip::device
+    hip::host
+    hip::hipfft
+    roc::hipblas
+    roc::rocsolver
+  )
+  add_compile_definitions(__ROCM)
+  # set (HIP_HIPCC_FLAGS -hc; -fno-gpu-rdc; --amdgpu-target=gfx906)
+  # add_compile_definitions(__HIP_PLATFORM_HCC__)
 endif()
 
 if(ENABLE_ASAN)

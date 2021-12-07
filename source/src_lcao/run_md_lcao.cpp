@@ -30,6 +30,7 @@ Run_MD_LCAO::~Run_MD_LCAO()
 
 void Run_MD_LCAO::opt_cell(void)
 {
+    cout<<" in opt cell" << endl;
 	ModuleBase::TITLE("Run_MD_LCAO","opt_cell");
 
     // Initialize the local wave functions.
@@ -37,15 +38,16 @@ void Run_MD_LCAO::opt_cell(void)
     // npwx may change according to cell change
     // this function belongs to cell LOOP
     GlobalC::wf.allocate_ekb_wg(GlobalC::kv.nks);
-
+    
+    cout<<"allocate ekb wg finish"<<endl;
     // Initialize the FFT.
     // this function belongs to cell LOOP
     GlobalC::UFFT.allocate();
-
+    cout <<"allocate ufft finish"<<endl;
     // output is GlobalC::ppcell.vloc 3D local pseudopotentials
     // this function belongs to cell LOOP
     GlobalC::ppcell.init_vloc(GlobalC::pw.nggm, GlobalC::ppcell.vloc);
-
+    cout << "allocate ppcell finish"<<endl;
     // Initialize the sum of all local potentials.
     // if ion_step==0, read in/initialize the potentials
     // this function belongs to ions LOOP
