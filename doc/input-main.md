@@ -53,7 +53,11 @@
         
     - [Berry phase and wannier90 interface](#berry-phase-and-wannier90-interface)
     
-        [berry_phase](#berry-phase) | [gdir](#gdir) | [towannier90](#towannier90) | [nnkpfile](#nnkpfile) | [wannier_spin](#wannier-spin) | [tddft](#tddft)  [vext](#vext) | [vext_dire](#vext-dire) 
+        [berry_phase](#berry-phase) | [gdir](#gdir) | [towannier90](#towannier90) | [nnkpfile](#nnkpfile) | [wannier_spin](#wannier-spin)
+        
+    - [TDDFT: time dependent density functional theory](#TDDFT-doc)
+    
+        [tddft](#tddft) | [td_dr2](#td_dr2) | [td_dt](#td_dt) | [td_force_dt](#td_force_dt) | [td_vext](#td_vext) | [td_vext_dire](#td_vext_dire) | [td_timescale](#td_timescale) | [td_vexttype](#td_vexttype) | [td_vextout](#td_vextout) | [td_dipoleout](#td_dipoleout)
 
     - [Variables useful for debugging](#variables-useful-for-debugging)
 
@@ -1412,6 +1416,8 @@ This part of variables are used to control berry phase and wannier90 interfacae 
     - *Default*: up
 
     [back to top](#input-file)
+
+### TDDFT: time dependent density functional theory
 - tddft<a id="tddft"></a>
     - *Type*: Integer
     - *Description*:
@@ -1420,7 +1426,25 @@ This part of variables are used to control berry phase and wannier90 interfacae 
     - *Default*: 0
 
     [back to top](#input-file)
-- vext<a id="vext"></a>
+- td_dr2<a id="td_dr2"></a>
+    - *Type*: Double
+    - *Description*: Accuracy of electron convergence when doing time-dependent evolution.
+    - *Default*: 1e-9
+
+    [back to top](#input-file)
+- td_dt<a id="td_dt"></a>
+    - *Type*: Double
+    - *Description*: Time-dependent evolution time step. (fs)
+    - *Default*: 0.02
+
+    [back to top](#input-file)
+- td_force_dt<a id="td_force_dt"></a>
+    - *Type*: Double
+    - *Description*: Time-dependent evolution force changes time step. (fs)
+    - *Default*: 0.02
+
+    [back to top](#input-file)
+- td_vext<a id="td_vext"></a>
     - *Type*: Integer
     - *Description*:
         - 1: add a laser material interaction (extern laser field).
@@ -1428,13 +1452,44 @@ This part of variables are used to control berry phase and wannier90 interfacae 
     - *Default*: 0
 
     [back to top](#input-file)
-- vext_dire<a id="vext-dire"></a>
+- td_vext_dire<a id="td_vext_dire"></a>
     - *Type*: Integer
     - *Description*:
         - 1: the direction of external light field is along x axis.
         - 2: the direction of external light field is along y axis.
         - 3: the direction of external light field is along z axis.
     - *Default*: 1
+
+    [back to top](#input-file)
+- td_timescale<a id="td_timescale"></a>
+    - *Type*: Double
+    - *Description*: Time range of external electric field application. (fs)
+    - *Default*: 0.5
+
+    [back to top](#input-file)
+- td_vexttype<a id="td_vexttype"></a>
+    - *Type*: Integer
+    - *Description*:
+        - 1: Gaussian-type light field.
+        - 2: Delta function form light field.
+        - 3: Trigonometric function form light field.
+    - *Default*: 1
+
+    [back to top](#input-file)
+- td_vextout<a id="td_vextout"></a>
+    - *Type*: Integer
+    - *Description*:
+        - 1: Output external electric field.
+        - 0: do not Output external electric field.
+    - *Default*: 0
+
+    [back to top](#input-file)
+- td_dipoleout<a id="td_dipoleout"></a>
+    - *Type*: Integer
+    - *Description*:
+        - 1: Output dipole.
+        - 0: do not Output dipole.
+    - *Default*: 0
 
     [back to top](#input-file)
 
