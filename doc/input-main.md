@@ -47,6 +47,8 @@
 
     - [DFT+U correction](#DFT_U-correction)
 
+        [dft_plus_u](#dft_plus_u) | [orbital_corr](#orbital_corr) | [hubbard_u](#hubbard_u) | [hund_j](#hund_j) | [yukawa_potential](#yukawa_potential) | [omc](#omc)
+
     - [VdW correction](#vdw-correction)
 
         [vdw_method](#vdw-method) | [vdw_s6](#vdw-s6) | [vdw_s8](#vdw-s8) | [vdw_a1](#vdw-a1) | [vdw_a2](#vdw-a2) | [vdw_d](#vdw-d) | [vdw_abc](#vdw-abc) | [vdw_C6_file](#vdw-C6-file) | [vdw_C6_unit](#vdw-C6-unit) | [vdw_R0_file](#vdw-R0-file) | [vdw_R0_unit](#vdw-R0-unit) | [vdw_model](#vdw-model) | [vdw_radius](#vdw-radius) | [vdw_radius_unit](#vdw-radius-unit) | [vdw_cn_radius](#vdw-cn-radius) | [vdw_cn_radius_unit](#vdw-cn-radius-unit) | [vdw_period](#vdw-period)
@@ -54,7 +56,7 @@
     - [Berry phase and wannier90 interface](#berry-phase-and-wannier90-interface)
     
         [berry_phase](#berry-phase) | [gdir](#gdir) | [towannier90](#towannier90) | [nnkpfile](#nnkpfile) | [wannier_spin](#wannier-spin)
-        
+
     - [TDDFT: time dependent density functional theory](#TDDFT-doc)
     
         [tddft](#tddft) | [td_dr2](#td_dr2) | [td_dt](#td_dt) | [td_force_dt](#td_force_dt) | [td_vext](#td_vext) | [td_vext_dire](#td_vext_dire) | [td_timescale](#td_timescale) | [td_vexttype](#td_vexttype) | [td_vextout](#td_vextout) | [td_dipoleout](#td_dipoleout)
@@ -950,6 +952,7 @@ This part of variables are used to control the addition of an external electric 
 
 ### DeePKS
 This part of variables are used to control the usage of DeePKS method (a comprehensive data-driven approach to improve accuracy of DFT).
+Warning: this function is not robust enough for version 2.2.0. Please try these variables in https://github.com/deepmodeling/abacus-develop/tree/deepks .
 
 - out_descriptor<a id="out-descriptor"></a>
     - *Type*: Boolean
@@ -1171,7 +1174,7 @@ This part of variables are used to control the molecular dynamics calculations.
 - NVT_control<a id="nvt-control"></a> 
     - *Type*: Integer
     - *Description*: Specifies which type of thermostat is used.
-        - 1: Nose-Hoover
+        - 1: Nose-Hoover-chains
         - 2: Langevin
         - 3: Andersen
     - *Default*: 1
@@ -1229,42 +1232,42 @@ This part of variables are used to control the molecular dynamics calculations.
 
 ### DFT+U correction
 This part of variables are used to control DFT+U correlated parameters
-- dft_plus_u 
+- dft_plus_u<a id="dft_plus_u"></a>
     - *Type*: Boolean
     - *Description*: If set to 1, ABCUS will calculate plus U correction, which is especially important for correlated electron.
     - *Default*: 0
 
     [back to top](#input-file)
 
-- orbital_corr
+- orbital_corr<a id="orbital_corr"></a>
     - *Type*: Int
     - *Description*: $l_1,l_2,l_3,\ldots$ for atom type 1,2,3 respectively.(usually 2 for d electrons and 3 for f electrons) .Specify which orbits need plus U correction for each atom. If set to -1, the correction would not be calculate for this atom.
     - *Default*: None
 
     [back to top](#input-file)
 
-- hubbard_u
+- hubbard_u<a id="hubbard_u"></a>
     - *Type*: Real
     - *Description*: Hubbard Coulomb interaction parameter U(ev) in plus U correction,which should be specified for each atom unless Yukawa potential is use. ABACUS use a simplified scheme which only need U and J for each atom.
     - *Default*: 0.0 
 
     [back to top](#input-file)
 
-- hund_j
+- hund_j<a id="hund_j"></a>
     - *Type*: Real
     - *Description*: Hund exchange parameter J(ev) in plus U correction ,which should be specified for each atom unless Yukawa potential is use. ABACUS use a simplified scheme which only need U and J for each atom.
     - *Default*: 0.0 
 
     [back to top](#input-file)
 
-- yukawa_potential
+- yukawa_potential<a id="yukawa_potential"></a>
     - *Type*: Boolean
     - *Description*: whether use the local screen Coulomb potential method to calculate the value of U and J. If this is set to 1, hubbard_u and hund_j do not need to be specified.
     - *Default*: 0
 
     [back to top](#input-file)
 
-- omc 
+- omc<a id="omc"></a> 
     - *Type*: Boolean
     - *Description*: whether turn on occupation matrix control method or not
     - *Default*: 0
