@@ -132,7 +132,8 @@ Hamilt_PW::~Hamilt_PW()
     // delete[] Bec;
 #ifdef __ROCM
 	CHECK_CUDA(hipFree(GR_index_d));
-	CHECK_CUBLAS(hipblasDestroy(hpw_handle));
+	if(hpw_handle)
+		CHECK_CUBLAS(hipblasDestroy(hpw_handle));
     // CHECK_CUDA(hipFree(GR_index_d));
 #endif
 }
@@ -157,12 +158,15 @@ void Hamilt_PW::allocate(
     // delete[] Bec;
 
 	delete [] GR_index;
-	GR_index = new int[nrxx];
+	GR_index = new int[npwx];
 
 #ifdef __ROCM
-    CHECK_CUDA(hipFree(GR_index_d));
+	if(GR_index_d)
+	{
+		CHECK_CUDA(hipFree(GR_index_d));
+	}
+    
     // CHECK_CUDA(hipMalloc((void**)&GR_index_d, npwx*sizeof(int)));
-	cout<<"malloc success:"<<npwx<<endl;
 #endif
     // ZEROS(this->hpsi, npwx * npol);
     // ZEROS(this->spsi, npwx * npol);
