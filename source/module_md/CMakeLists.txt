@@ -13,4 +13,5 @@ add_library(
 	NVE.cpp
     MSST.cpp
     NVT_ADS.cpp
+    NVT_NHC.cpp
 )

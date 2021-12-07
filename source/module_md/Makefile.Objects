@@ -19,6 +19,7 @@ verlet.o\
 NVE.o\
 MSST.o\
 NVT_ADS.o\
+NVT_NHC.o\
 
 OBJS_BASE=matrix3.o\
 matrix.o\
