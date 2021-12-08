@@ -224,6 +224,7 @@ void PW_Basis::collect_st(
         iy_start = 0;
         iy_end = this->ny - 1;
     }
+    this->liy = this->riy = 0;
     for (int ix = -ibox[0]; ix <= ibox[0]; ++ix)
     {
         for (int iy = iy_start; iy <= iy_end; ++iy)
@@ -258,6 +259,8 @@ void PW_Basis::collect_st(
                     temp_st_i[is] = x;
                     temp_st_j[is] = y;
                     temp_st_length[is] = static_cast<double>(st_length2D[index]);
+                    if(iy < this->riy) this->riy = iy;
+                    if(iy > this->liy) this->liy = iy;
                     ++is;
                     std::cout << "is   " << is << '\n'; 
                 }   
@@ -265,7 +268,8 @@ void PW_Basis::collect_st(
         }
     }
     assert(is == this->nstot);
-
+    if(riy <= 0) riy += this->ny;
+    std::cout<<"liy "<<liy<<" ; riy "<<riy<<std::endl;
     std::cout<<"collect sticks done\n";
 
     // As we will distribute the longest sticks preferentially in Step(3), we rearrange st_* in the order of length decreasing.

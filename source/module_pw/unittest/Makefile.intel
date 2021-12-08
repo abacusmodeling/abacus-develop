@@ -72,6 +72,7 @@ FFTW_LIB = -Wl,--start-group -lmkl_intel_lp64  -lmkl_core -lmkl_intel_thread -Wl
 # CUDA_LIB_DIR		= ${CUDA_DIR}/lib64
 # CUDA_LIB			= -L${CUDA_LIB_DIR} -lcufft -lcublas -lcudart
 
+#LIBS = ${FFTW_LIB} ${CUDA_LIB} -ltcmalloc -lprofiler
 LIBS = ${FFTW_LIB} ${CUDA_LIB}
 OPTS = -I${FFTW_INCLUDE_DIR} ${HONG} -Ofast -std=c++11 -simd -m64 -qopenmp -Wall -pedantic -g
 
