@@ -21,7 +21,7 @@ void PW_Basis:: real2recip(std::complex<double> * in, std::complex<double> * out
     }
     this->ft.executefftw("2for");
 
-    this->gatherp_scatters(this->ft.c_rspace, this->ft.c_gspace);
+    this->gatherp_scatters2(this->ft.c_rspace, this->ft.c_gspace);
     
     this->ft.executefftw("1for");
 
@@ -60,7 +60,7 @@ void PW_Basis:: real2recip(double * in, std::complex<double> * out)
 
     this->ft.executefftw("2r2c");
 
-    this->gatherp_scatters(this->ft.c_rspace, this->ft.c_gspace);
+    this->gatherp_scatters2(this->ft.c_rspace, this->ft.c_gspace);
     
     this->ft.executefftw("1for");
 
@@ -87,7 +87,7 @@ void PW_Basis:: recip2real(std::complex<double> * in, std::complex<double> * out
     }
     this->ft.executefftw("1bac");
 
-    this->gathers_scatterp(this->ft.c_gspace,this->ft.c_rspace);
+    this->gathers_scatterp2(this->ft.c_gspace,this->ft.c_rspace);
 
     this->ft.executefftw("2bac");
     
@@ -115,7 +115,7 @@ void PW_Basis:: recip2real(std::complex<double> * in, double * out)
     }
     this->ft.executefftw("1bac");
     
-    this->gathers_scatterp(this->ft.c_gspace, this->ft.c_rspace);
+    this->gathers_scatterp2(this->ft.c_gspace, this->ft.c_rspace);
 
     this->ft.executefftw("2c2r");
 

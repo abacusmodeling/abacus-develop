@@ -37,7 +37,7 @@ FFT::~FFT()
 #endif
 }
 
-void FFT:: initfft(int nx_in, int bigny_in, int nz_in, int ns_in, int nplane_in, bool gamma_only_in, bool mpifft_in)
+void FFT:: initfft(int nx_in, int bigny_in, int nz_in, int ns_in, int nplane_in, int nproc_in, bool gamma_only_in, bool mpifft_in)
 {
 	this->gamma_only = gamma_only_in;
 	this->nx = nx_in;
@@ -47,6 +47,7 @@ void FFT:: initfft(int nx_in, int bigny_in, int nz_in, int ns_in, int nplane_in,
 	this->nz = nz_in;
 	this->ns = ns_in;
 	this->nplane = nplane_in;
+	this->nproc = nproc_in;
 	this->mpifft = mpifft_in;
 	this->nxy = this->nx * this-> ny;
 	this->bignxy = this->nx * this->bigny;
@@ -54,7 +55,8 @@ void FFT:: initfft(int nx_in, int bigny_in, int nz_in, int ns_in, int nplane_in,
 	if(!this->mpifft)
 	{
 		//It seems in-place fft is faster than out-of-place fft
-		c_gspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * this->nz * this->ns);
+		if(this->nproc == 1) 	c_gspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * this->nz * this->ns);
+		else					c_gspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * maxgrids);
 		//c_gspace2  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * this->nz * this->ns);
 		if(this->gamma_only)
 		{
@@ -69,8 +71,8 @@ void FFT:: initfft(int nx_in, int bigny_in, int nz_in, int ns_in, int nplane_in,
 		}
 		else
 		{
-			c_rspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * this->bignxy * nplane);
-			//c_rspace2  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * this->bignxy * nplane);
+			if(this->nproc == 1) c_rspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * this->bignxy * nplane);
+			else 				 c_rspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * maxgrids);
 		}
 #ifdef __MIX_PRECISION
 		cf_gspace  = (std::complex<float> *)fftw_malloc(sizeof(fftwf_complex) * this->nz * this->ns);

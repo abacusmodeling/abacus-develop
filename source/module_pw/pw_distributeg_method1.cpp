@@ -30,7 +30,7 @@ void PW_Basis::distribution_method1()
     this->nstot = 0;                     // total number of sticks.
     int *st_bottom2D = NULL;             // st_bottom2D[ixy], minimum z of stick on (x, y).
     int *st_length2D = NULL;             // st_length2D[ixy], number of planewaves in stick on (x, y).
-
+    this->nst_per = new int[this->poolnproc]; // number of sticks on each core.
     if (poolrank == 0)
     {
         // (1) Count the total number of planewaves (tot_npw) and sticks (this->nstot).                  
@@ -73,11 +73,10 @@ void PW_Basis::distribution_method1()
 
         // (3) Distribute sticks to cores.
         int *npw_per = new int[this->poolnproc];  // number of planewaves on each core.
-        int *nst_per = new int[this->poolnproc]; // number of sticks on each core.
         this->nstnz_per = new int[this->poolnproc]; // nz * nst(number of sticks) on each core.
         this->startnsz_per = new int[this->poolnproc];
         ModuleBase::GlobalFunc::ZEROS(npw_per, poolnproc);
-        ModuleBase::GlobalFunc::ZEROS(nst_per, poolnproc);
+        ModuleBase::GlobalFunc::ZEROS(this->nst_per, poolnproc);
         ModuleBase::GlobalFunc::ZEROS(this->nstnz_per, poolnproc);
         ModuleBase::GlobalFunc::ZEROS(startnsz_per, poolnproc);
         
@@ -86,7 +85,7 @@ void PW_Basis::distribution_method1()
         {
             this->ixy2ip[ixy] = -1;                 // meaning this stick has not been distributed or there is no stick on (x, y).
         }
-        this->divide_sticks(st_i, st_j, st_length, npw_per, nst_per);
+        this->divide_sticks(st_i, st_j, st_length, npw_per);
         delete[] st_length;
 
          // for test -----------------------------------------------------------------------------
@@ -113,7 +112,6 @@ void PW_Basis::distribution_method1()
             MPI_Send(&nst_per[ip], 1, MPI_INT, ip, 0, POOL_WORLD);
         }
         delete[] npw_per;
-        delete[] nst_per;
 
 #else
         // Serial line
@@ -172,6 +170,7 @@ void PW_Basis::distribution_method1()
     MPI_Bcast(this->ixy2ip, this->nxy, MPI_INT, 0, POOL_WORLD);
     MPI_Bcast(this->istot2ixy, this->nstot, MPI_INT, 0, POOL_WORLD);
     MPI_Bcast(this->ixy2istot, this->nxy, MPI_INT, 0, POOL_WORLD);
+    MPI_Bcast(this->nst_per, this->poolnproc, MPI_INT, 0 , POOL_WORLD);
 
     std::cout << "Bcast done\n";
 #endif
@@ -304,8 +303,7 @@ void PW_Basis::divide_sticks(
     int* st_i,          // x or x + nx (if x < 0) of stick.
     int* st_j,          // y or y + ny (if y < 0) of stick.
     int* st_length,     // the stick on (x, y) consists of st_length[x*ny+y] planewaves.
-    int* npw_per,       // number of planewaves on each core.
-    int* nst_per       // number of sticks on each core.
+    int* npw_per       // number of planewaves on each core.
 )
 {
     int ipmin = 0; // The ip of core containing least number of planewaves.
@@ -322,25 +320,25 @@ void PW_Basis::divide_sticks(
 
             if (npw_ip == 0)
             {
-                if (non_zero_grid + nz < this->nrxx) // assert reciprocal planewaves is less than real space planewaves.
-                {
+                // if (non_zero_grid + nz < this->nrxx) // assert reciprocal planewaves is less than real space planewaves.
+                // {
                     ipmin = ip;
                     break;
-                }
+                // }
             }
             else if (npw_ip < npwmin)
             {
-                if (non_zero_grid + nz < this->nrxx) // assert reciprocal planewaves is less than real space planewaves.
-                {
+                // if (non_zero_grid + nz < this->nrxx) // assert reciprocal planewaves is less than real space planewaves.
+                // {
                     ipmin = ip;
-                }
+                // }
             }
             else if (npw_ip == npwmin && nst_ip < nstmin)
             {
-                if (non_zero_grid + nz < this->nrxx)
-                {
+                // if (non_zero_grid + nz < this->nrxx)
+                // {
                     ipmin = ip;
-                }
+                // }
             }
         }
         nst_per[ipmin]++;
