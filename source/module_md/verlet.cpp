@@ -17,7 +17,6 @@ Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     mdp.dt /= ModuleBase::AU_to_FS;
     mdp.tfirst /= ModuleBase::Hartree_to_K;
     mdp.tlast /= ModuleBase::Hartree_to_K;
-    temperature_ = mdp.tfirst;
 
     // LJ parameters
     mdp.rcut_lj *= ModuleBase::ANGSTROM_AU;
@@ -29,7 +28,7 @@ Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     if(mdp.rstMD) unit_in.set_vel = 1;
 
     MD_func::InitPos(ucell, pos);
-    MD_func::InitVel(ucell, temperature_, allmass, frozen_freedom_, ionmbl, vel);
+    MD_func::InitVel(ucell, mdp.tfirst, allmass, frozen_freedom_, ionmbl, vel);
 }
 
 Verlet::~Verlet()

@@ -3,6 +3,9 @@
 
 NVT_NHC::NVT_NHC(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in) : Verlet(MD_para_in, unit_in)
 {
+    // convert to a.u. unit
+    mdp.tfreq *= ModuleBase::AU_to_FS;
+
     // init NHC
     Q = new double [mdp.MNHC];
 	G = new double [mdp.MNHC];
@@ -14,15 +17,15 @@ NVT_NHC::NVT_NHC(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in) : Verlet(M
         eta[i] = veta[i] = G[i] = 0;
     }
 
-    w[0] = 1;
+    //w[0] = 1;
 
-    // w[0] = 0.784513610477560;
-	// w[6] = 0.784513610477560;
-	// w[1] = 0.235573213359357;
-	// w[5] = 0.235573213359357;
-	// w[2] = -1.17767998417887;
-	// w[4] = -1.17767998417887;
-	// w[3] = 1-w[0]-w[1]-w[2]-w[4]-w[5]-w[6];
+    w[0] = 0.784513610477560;
+	w[6] = 0.784513610477560;
+	w[1] = 0.235573213359357;
+	w[5] = 0.235573213359357;
+	w[2] = -1.17767998417887;
+	w[4] = -1.17767998417887;
+	w[3] = 1-w[0]-w[1]-w[2]-w[4]-w[5]-w[6];
 }
 
 NVT_NHC::~NVT_NHC()
@@ -105,7 +108,14 @@ void NVT_NHC::integrate()
     update_mass();
 
     // update force
-    G[0] = (2*KE - (3*ucell.nat - frozen_freedom_)*t_target) / Q[0];
+    if(Q[0] > 0) 
+    {
+        G[0] = (2*KE - (3*ucell.nat - frozen_freedom_)*t_target) / Q[0];
+    }
+    else 
+    {
+        G[0] = 0;
+    }
 
     for(int i=0; i<nc; ++i)
     {
@@ -125,6 +135,16 @@ void NVT_NHC::integrate()
             scale *= exp(-veta[0]*delta/2.0);
             KE = kinetic * scale * scale;
 
+            // update force
+            if(Q[0] > 0) 
+            {
+                G[0] = (2*KE - (3*ucell.nat - frozen_freedom_)*t_target) / Q[0];
+            }
+            else 
+            {
+                G[0] = 0;
+            }
+
             // propogate eta
             for(int m=0; m<mdp.MNHC; ++m)
             {
@@ -134,19 +154,11 @@ void NVT_NHC::integrate()
             // propogate veta
             for(int m=0; m<mdp.MNHC-1; ++m)
             {
-                if(m==0)
-                {
-                    G[m] = (2*KE - (3*ucell.nat - frozen_freedom_)*t_target) / Q[m];
-                }
-                else
-                {
-                    G[m] = (Q[m-1]*veta[m-1]*veta[m-1]-t_target) / Q[m];
-                }
-                
                 double aa = exp(-veta[m+1]*delta/8.0);
                 veta[m] = veta[m] * aa * aa + G[m] * aa * delta /4.0;
+
+                G[m+1] = (Q[m]*veta[m]*veta[m]-t_target) / Q[m+1];
             }
-            G[mdp.MNHC-1] = (Q[mdp.MNHC-2]*veta[mdp.MNHC-2]*veta[mdp.MNHC-2]-t_target) / Q[mdp.MNHC-1];
             veta[mdp.MNHC-1] += G[mdp.MNHC-1] * delta /4.0;
         }
     }
@@ -159,7 +171,7 @@ void NVT_NHC::integrate()
 
 void NVT_NHC::temp_target()
 {
-    double delta = step_ / GlobalV::NSTEP;
+    double delta = (double)step_ / GlobalV::NSTEP;
     t_target = mdp.tfirst + delta * (mdp.tlast - mdp.tfirst);
 }
 

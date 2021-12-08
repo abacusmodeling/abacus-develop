@@ -21,13 +21,13 @@ public:
 
     double t_target;       // target temperature
     const static int nc = 1;
-    const static int nsy = 1;
+    const static int nsy = 7;
     double w[nsy];         // scale evolution operator
 
     double *Q;             // MHC mass
-    double *G;             // parameter in NHC
-    double *eta;        // NHC position
-    double *veta;       // NHC velocity
+    double *G;             // NHC acceleration
+    double *eta;           // NHC position
+    double *veta;          // NHC velocity
 
 };
 
