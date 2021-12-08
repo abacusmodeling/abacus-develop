@@ -36,7 +36,7 @@ FFT::~FFT()
 #endif
 }
 
-void FFT:: initfft(int nx_in, int bigny_in, int nz_in, int ns_in, int nplane_in, int nproc_in, bool gamma_only_in, bool mpifft_in)
+void FFT:: initfft(int nx_in, int bigny_in, int nz_in, int lix_in, int rix_in, int ns_in, int nplane_in, int nproc_in, bool gamma_only_in, bool mpifft_in)
 {
 	this->gamma_only = gamma_only_in;
 	this->nx = nx_in;
@@ -45,6 +45,8 @@ void FFT:: initfft(int nx_in, int bigny_in, int nz_in, int ns_in, int nplane_in,
 	else	this->ny = this->bigny;
 	this->nz = nz_in;
 	this->ns = ns_in;
+	this->lix = lix_in;
+	this->rix = rix_in;
 	this->nplane = nplane_in;
 	this->nproc = nproc_in;
 	this->mpifft = mpifft_in;
@@ -330,7 +332,11 @@ void FFT::fftxyfor(std::complex<double>* & in, std::complex<double>* & out)
 {
 	int npy = this->nplane * this-> ny;
 	fftw_execute_dft( this->planxfor, (fftw_complex *)in, (fftw_complex *)out);
-	for (int i=0; i<this->nx;++i)
+	for (int i=0; i<=this->lix;++i)
+	{
+		fftw_execute_dft( this->planyfor, (fftw_complex*)&in[i*npy], (fftw_complex*)&out[i*npy] );
+	}
+	for (int i=this->rix; i<this->nx;++i)
 	{
 		fftw_execute_dft( this->planyfor, (fftw_complex*)&in[i*npy], (fftw_complex*)&out[i*npy] );
 	}
@@ -341,7 +347,11 @@ void FFT::fftxybac(std::complex<double>* & in, std::complex<double>* & out)
 {
 	int npy = this->nplane * this-> ny;
 		
-	for (int i=0; i<this->nx;++i)
+	for (int i=0; i<=this->lix;++i)
+	{
+		fftw_execute_dft( this->planybac, (fftw_complex*)&in[i*npy], (fftw_complex*)&out[i*npy] );
+	}
+	for (int i=this->rix; i<this->nx;++i)
 	{
 		fftw_execute_dft( this->planybac, (fftw_complex*)&in[i*npy], (fftw_complex*)&out[i*npy] );
 	}

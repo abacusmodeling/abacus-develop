@@ -8,7 +8,7 @@ namespace ModulePW
 PW_Basis::PW_Basis()
 {
     ig2isz = NULL;
-    istot2ixy = NULL;   
+    istot2bigixy = NULL;   
     ixy2istot = NULL;
     is2ixy = NULL;
     ixy2ip = NULL; 
@@ -31,7 +31,7 @@ PW_Basis::PW_Basis()
 PW_Basis:: ~PW_Basis()
 {
     if(ig2isz != NULL) delete[] ig2isz;
-    if(istot2ixy != NULL) delete[] istot2ixy;
+    if(istot2bigixy != NULL) delete[] istot2bigixy;
     if(ixy2istot != NULL) delete[] ixy2istot;
     if(is2ixy != NULL) delete[] is2ixy;
     if(ixy2ip != NULL) delete[] ixy2ip;
@@ -54,7 +54,7 @@ void PW_Basis::setuptransform()
     this->distribute_r();
     this->distribute_g();
     this->getstartgr();
-    this->ft.initfft(this->nx,this->bigny,this->nz,this->nst,this->nplane,this->poolnproc,this->gamma_only);
+    this->ft.initfft(this->nx,this->bigny,this->nz,this->lix,this->rix,this->nst,this->nplane,this->poolnproc,this->gamma_only);
     this->ft.setupFFT();
 }
 

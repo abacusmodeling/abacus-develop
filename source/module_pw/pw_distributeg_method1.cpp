@@ -20,7 +20,7 @@ namespace ModulePW
 // 
 // Secondly, distribute these sticks to coreors.
 //Known: G, GT, GGT, ny, nx, nz, poolnproc, poolrank, ggecut
-//output: ig2isz[ig], istot2ixy[is], ixy2istot[nxy], is2ixy[is], ixy2ip[ixy], startnsz_per[ip], nst_per[ip], nst
+//output: ig2isz[ig], istot2bigixy[is], ixy2istot[nxy], is2ixy[is], ixy2ip[ixy], startnsz_per[ip], nst_per[ip], nst
 //
 void PW_Basis::distribution_method1()
 {
@@ -95,7 +95,7 @@ void PW_Basis::distribution_method1()
         std::cout << std::endl;
         // --------------------------------------------------------------------------------------
 
-        this->get_istot2ixy(st_i, st_j);
+        this->get_istot2bigixy(st_i, st_j);
         delete[] st_i;
         delete[] st_j;
         // for test -----------------------------------------------------------------------------
@@ -124,7 +124,7 @@ void PW_Basis::distribution_method1()
         this->startnsz_per[0] = 0;
 
         this->ixy2istot = new int[nxy];
-        this->istot2ixy = new int[this->nstot];
+        this->istot2bigixy = new int[this->nstot];
         this->ixy2ip = new int[nxy];              // ip of core which contains stick on (x, y).
         int st_move = 0;
         for (int ixy = 0; ixy < nxy; ++ixy)
@@ -132,7 +132,7 @@ void PW_Basis::distribution_method1()
             if (st_length2D[ixy] > 0)
             {
                 this->ixy2istot[ixy] = st_move;
-                this->istot2ixy[st_move] = ixy;
+                this->istot2bigixy[st_move] = ixy / ny * bigny + ixy % ny;
                 this->ixy2ip[ixy] = 0;
                 st_move++;
             }
@@ -156,19 +156,21 @@ void PW_Basis::distribution_method1()
 #ifdef __MPI
     MPI_Bcast(&tot_npw, 1, MPI_INT, 0, POOL_WORLD);
     MPI_Bcast(&this->nstot, 1, MPI_INT, 0, POOL_WORLD);
+    MPI_Bcast(&lix, 1, MPI_INT, 0, POOL_WORLD);
+    MPI_Bcast(&rix, 1, MPI_INT, 0, POOL_WORLD);
     if (this->poolrank != 0)
     {
         st_bottom2D = new int[this->nxy];                      // minimum z of stick.
         st_length2D = new int[this->nxy];                      // number of planewaves in stick.
         this->ixy2ip = new int[this->nxy];              // ip of core which contains stick on (x, y).
         this->ixy2istot = new int[this->nxy];
-        this->istot2ixy = new int[this->nstot];
+        this->istot2bigixy = new int[this->nstot];
     }
 
     MPI_Bcast(st_length2D, this->nxy, MPI_INT, 0, POOL_WORLD);
     MPI_Bcast(st_bottom2D, this->nxy, MPI_INT, 0, POOL_WORLD);
     MPI_Bcast(this->ixy2ip, this->nxy, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(this->istot2ixy, this->nstot, MPI_INT, 0, POOL_WORLD);
+    MPI_Bcast(this->istot2bigixy, this->nstot, MPI_INT, 0, POOL_WORLD);
     MPI_Bcast(this->ixy2istot, this->nxy, MPI_INT, 0, POOL_WORLD);
     MPI_Bcast(this->nst_per, this->poolnproc, MPI_INT, 0 , POOL_WORLD);
 
@@ -265,7 +267,6 @@ void PW_Basis::collect_st(
         }
     }
     assert(is == this->nstot);
-
     std::cout<<"collect sticks done\n";
 
     // As we will distribute the longest sticks preferentially in Step(3), we rearrange st_* in the order of length decreasing.
@@ -362,25 +363,25 @@ void PW_Basis::divide_sticks(
 //
 // (3-2) Rearrange sticks in the order of the ip of core increasing, in each core, sticks are sorted in the order of ixy increasing.
 // (st_start + st_move) is the new index of sticks.
-// Then get istot2ixy (istot2ixy[is]: iy + ix * ny of is^th stick among all sticks) on the first core
+// Then get istot2bigixy (istot2bigixy[is]: iy + ix * ny of is^th stick among all sticks) on the first core
 // and ixy2istot (ixy2istot[iy + ix * ny]: is of stick on (iy, ix) among all sticks).
 // known: this->nstot, st_i, st_j, this->startnsz_per
-// output: istot2ixy, ixy2istot
+// output: istot2bigixy, ixy2istot
 //
-void PW_Basis::get_istot2ixy(
+void PW_Basis::get_istot2bigixy(
     int* st_i,          // x or x + nx (if x < 0) of stick.
     int* st_j          // y or y + ny (if y < 0) of stick.
 )
 {
     assert(this->poolrank == 0);
     this->ixy2istot = new int[this->nx * this->ny];
-    this->istot2ixy = new int[this->nstot];
+    this->istot2bigixy = new int[this->nstot];
     int* st_move = new int[this->poolnproc]; // st_move[ip]: this is the st_move^th stick on ip^th core.
     for (int ixy = 0; ixy < this->nx * this->ny; ++ixy)
     {
         this->ixy2istot[ixy] = -1;
     }
-    ModuleBase::GlobalFunc::ZEROS(this->istot2ixy, this->nstot);
+    ModuleBase::GlobalFunc::ZEROS(this->istot2bigixy, this->nstot);
     ModuleBase::GlobalFunc::ZEROS(st_move, this->poolnproc);
 
     for (int ixy = 0; ixy < this->nxy; ++ixy)
@@ -388,7 +389,7 @@ void PW_Basis::get_istot2ixy(
         int ip = this->ixy2ip[ixy];
         if (ip != -1)
         {        
-            this->istot2ixy[this->startnsz_per[ip] / this->nz + st_move[ip]] = ixy;
+            this->istot2bigixy[this->startnsz_per[ip] / this->nz + st_move[ip]] = (ixy / ny)*bigny + ixy % ny;
             this->ixy2istot[ixy] = this->startnsz_per[ip] / this->nz + st_move[ip];
             st_move[ip]++;
         }

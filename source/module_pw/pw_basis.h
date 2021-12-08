@@ -58,7 +58,7 @@ public:
     int *nst_per;// nst on each core
     // on all proc.
     int *ig2isz; // map ig to (is, iz).
-    int *istot2ixy; // istot2ixy[is]: ix + iy * nx of is^th stick among all sticks.
+    int *istot2bigixy; // istot2bigixy[is]: iy + ix * bigny of is^th stick among all sticks.
     int *ixy2istot; // ixy2istot[ix + iy * nx]: is of stick on (ix, iy) among all sticks.
     int *is2ixy; // is2ixy[is]: ix + iy * bignx of is^th stick among sticks on current proc.
     int *ixy2ip; // ixy2ip[ix + iy * nx]: ip of proc which contains stick on (ix, iy).
@@ -144,14 +144,12 @@ private:
         int* st_length,     // the stick on (x, y) consists of st_length[x*ny+y] planewaves.
         int* npw_per       // number of planewaves on each core.
     );
-    void get_istot2ixy(
+    void get_istot2bigixy(
         int* st_i,          // x or x + nx (if x < 0) of stick.
         int* st_j          // y or y + ny (if y < 0) of stick.
     );
 // for distributeg_method2
-    void divide_sticks2(
-        int* nst_per       // number of sticks on each core.
-    );
+    void divide_sticks2();
     void create_maps(
         int* st_length2D,  // the number of planewaves that belong to the stick located on (x, y), stored in 2d x-y plane.
         int* npw_per       // number of planewaves on each core.
@@ -186,6 +184,7 @@ public:
 	// FFT dimensions for wave functions.
 	int nx, ny, nz, nxyz, nxy;
     int bigny, bignxyz, bignxy; // Gamma_only: ny = int(bigny/2)-1 , others: ny = bigny
+    int lix,rix;// lix: the left edge of the pw ball; rix: the right edge of the pw ball
     int maxgrids; // max between nz * ns and bignxy * nplane
     FFT ft;
 
@@ -196,8 +195,8 @@ public:
 
     void gatherp_scatters(std::complex<double> *in, std::complex<double> *out); //gather planes and scatter sticks of all processors
     void gathers_scatterp(std::complex<double> *in, std::complex<double> *out); //gather sticks of and scatter planes of all processors
-    void gathers_scatterp2(std::complex<double> *in, std::complex<double> *out); //gather sticks of and scatter planes of all processors
-    void gatherp_scatters2(std::complex<double> *in, std::complex<double> *out); //gather sticks of and scatter planes of all processors
+    // void gathers_scatterp2(std::complex<double> *in, std::complex<double> *out); //gather sticks of and scatter planes of all processors
+    // void gatherp_scatters2(std::complex<double> *in, std::complex<double> *out); //gather sticks of and scatter planes of all processors
     void gatherp_scatters_gamma(std::complex<double> *in, std::complex<double> *out); //gather planes and scatter sticks of all processors, used when gamma_only
     void gathers_scatterp_gamma(std::complex<double> *in, std::complex<double> *out); //gather sticks of and scatter planes of all processors, used when gamma only
 
