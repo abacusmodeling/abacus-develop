@@ -298,7 +298,7 @@ This part of variables are used to control general system parameters.
 
 - diago_proc<a id="diago_proc"></a>
     - *Type*: Integer
-    - *Descrption*: If set to a positive number, then it specifies the number of threads used for carrying out diagonalization. Must be less than or equal to total number of MPI threads. Also, when cg diagonalization is used, diago_proc must be same as total number of MPI threads. If set to 0, then it will be set to the number of MPI threads. Normally, it is fine just leaving it to default value.
+    - *Descrption*: If set to a positive number, then it specifies the number of threads used for carrying out diagonalization. Must be less than or equal to total number of MPI threads. Also, when cg diagonalization is used, diago_proc must be same as total number of MPI threads. If set to 0, then it will be set to the number of MPI threads. Normally, it is fine just leaving it to default value. Only used for pw base.
     - *Default*: 0
 
     [back to top](#input-file)
