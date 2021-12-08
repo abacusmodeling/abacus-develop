@@ -116,7 +116,7 @@ void DONE(std::ofstream &ofs,const std::string &description, bool only_rank0 = f
 template<class T, class TI>
 inline void ZEROS(std::complex<T> *u,const TI n)		// Peize Lin change int to TI at 2020.03.03
 {
-    if(n <= 0) return;
+    assert(n>=0);
     for (TI i=0;i<n;i++)
     {
         u[i] = std::complex<T>(0.0,0.0);

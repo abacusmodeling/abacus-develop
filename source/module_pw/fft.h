@@ -27,7 +27,7 @@ public:
 
 	FFT();
 	~FFT();
-	void initfft(int nx_in, int bigny_in, int nz_in, int ns_in, int nplane_in, bool gamma_only_in, bool mpifft_in = false);
+	void initfft(int nx_in, int bigny_in, int nz_in, int ns_in, int nplane_in, int nproc_in, bool gamma_only_in, bool mpifft_in = false);
 	void setupFFT();
 	void cleanFFT();
 
@@ -52,6 +52,7 @@ public:
 	int ns; //number of sticks
 	int nplane; //number of x-y planes
 	int maxgrids; // max between nz * ns and bignxy * nplane
+	int nproc; // number of proc.
 	std::complex<double> * c_gspace, *c_gspace2; //complex number space for g, [ns * nz]
 	std::complex<double> * c_rspace, *c_rspace2;//complex number space for r, [nplane * nx *ny]
 	double *r_rspace; //real number space for r, [nplane * nx *ny]
