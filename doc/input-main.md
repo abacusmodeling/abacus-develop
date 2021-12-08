@@ -23,7 +23,7 @@
 
     - [Geometry relaxation](#geometry-relaxation)
     
-        [nstep](#nstep) | [force](#force) | [force_thr](#force-thr) | [force_thr_ev](#force-thr-ev) | [force_set](#force-set) | [bfgs_w1](#bfgs-w1) | [bfgs_w2](#bfgs-w2) | [trust_radius_max](#trust-radius-max) | [trust_radius_min](#trust-radius-min) | [trust_radius_ini](#trust-radius-ini) | [stress](#stress) | [stress_thr](#stress-thr) | [press](#press) | [fixed_axes](#fixed-axes) | [move_method](#move-method) | [cg_threshold](#cg-threshold) | [cell_factor](#cell-factor)
+        [nstep](#nstep) | [force](#force) | [force_thr](#force-thr) | [force_thr_ev](#force-thr-ev) | [force_set](#force-set) | [bfgs_w1](#bfgs-w1) | [bfgs_w2](#bfgs-w2) | [trust_radius_max](#trust-radius-max) | [trust_radius_min](#trust-radius-min) | [trust_radius_ini](#trust-radius-ini) | [stress](#stress) | [stress_thr](#stress-thr) | [press1, press2, press3](#press) | [fixed_axes](#fixed-axes) | [move_method](#move-method) | [cg_threshold](#cg-threshold) | [cell_factor](#cell-factor)
 
     - [Variables related to program output](#variables-related-to-program-output)
 
@@ -709,11 +709,11 @@ This part of variables are used to control the geometry relaxation.
 - stress_thr<a id="stress-thr"></a>
     - *Type*: Real
     - *Description*: The threshold of the stress convergence, it indicates the largest stress among all the directions, the unit is KBar,
-    - *Default*: 10
+    - *Default*: 0.01
 
     [back to top](#input-file)
 
-- press1, 2, 3<a id="press"></a>
+- press1, press2, press3<a id="press"></a>
     - *Type*: Real
     - *Description*: the external pressures along three axes,the compressive stress is taken to be positive, the unit is KBar.
     - *Default*: 0
