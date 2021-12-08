@@ -17,13 +17,13 @@ void PW_Basis:: real2recip(std::complex<double> * in, std::complex<double> * out
     assert(this->gamma_only == false);
     for(int ir = 0 ; ir < this->nrxx ; ++ir)
     {
-        this->ft.c_rspace[ir] = in[ir];
+        this->ft.c_gspace[ir] = in[ir];
     }
-    this->ft.executefftw("2for");
+    this->ft.fftxyfor(ft.c_gspace,ft.c_gspace);
 
-    this->gatherp_scatters2(this->ft.c_rspace, this->ft.c_gspace);
+    this->gatherp_scatters2(this->ft.c_gspace, this->ft.c_gspace2);
     
-    this->ft.executefftw("1for");
+    this->ft.fftzfor(ft.c_gspace2,ft.c_gspace);
 
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
@@ -58,11 +58,11 @@ void PW_Basis:: real2recip(double * in, std::complex<double> * out)
     //     }
     // }
 
-    this->ft.executefftw("2r2c");
+    this->ft.fftxyr2c(ft.r_rspace,ft.c_gspace);
 
-    this->gatherp_scatters2(this->ft.c_rspace, this->ft.c_gspace);
+    this->gatherp_scatters2(this->ft.c_gspace, this->ft.c_gspace2);
     
-    this->ft.executefftw("1for");
+    this->ft.fftzfor(ft.c_gspace2,ft.c_gspace);
 
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
@@ -85,15 +85,15 @@ void PW_Basis:: recip2real(std::complex<double> * in, std::complex<double> * out
     {
         this->ft.c_gspace[this->ig2isz[ig]] = in[ig];
     }
-    this->ft.executefftw("1bac");
+    this->ft.fftzbac(ft.c_gspace, ft.c_gspace2);
 
-    this->gathers_scatterp2(this->ft.c_gspace,this->ft.c_rspace);
+    this->gathers_scatterp2(this->ft.c_gspace2,this->ft.c_gspace);
 
-    this->ft.executefftw("2bac");
+    this->ft.fftxybac(ft.c_gspace,ft.c_gspace);
     
     for(int ir = 0 ; ir < this->nrxx ; ++ir)
     {
-        out[ir] = this->ft.c_rspace[ir] / double(this->bignxyz);
+        out[ir] = this->ft.c_gspace[ir] / double(this->bignxyz);
     }
 
     return;
@@ -113,11 +113,11 @@ void PW_Basis:: recip2real(std::complex<double> * in, double * out)
     {
         this->ft.c_gspace[this->ig2isz[ig]] = in[ig];
     }
-    this->ft.executefftw("1bac");
+   this->ft.fftzbac(ft.c_gspace, ft.c_gspace2);
     
-    this->gathers_scatterp2(this->ft.c_gspace, this->ft.c_rspace);
+    this->gathers_scatterp2(this->ft.c_gspace2, this->ft.c_gspace);
 
-    this->ft.executefftw("2c2r");
+    this->ft.fftxyc2r(ft.c_gspace,ft.r_rspace);
 
     for(int ir = 0 ; ir < this->nrxx ; ++ir)
     {

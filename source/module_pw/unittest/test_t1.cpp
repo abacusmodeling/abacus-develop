@@ -51,11 +51,7 @@ int main(int argc,char **argv)
     nx = pwtest.nx;
     ny = pwtest.ny;
     nz = pwtest.nz;
-    int nplane = pwtest.nplane;
-    int nxyz = nx * ny * nz;
     if(myrank == 0) cout<<"FFT: "<<nx<<" "<<ny<<" "<<nz<<endl;
-    double tpiba2 = ModuleBase::TWO_PI * ModuleBase::TWO_PI / lat0 / lat0;
-    double ggecut = wfcecut / tpiba2;
     ModuleBase::Matrix3 GT,G,GGT;
     GT = latvec.Inverse();
 	G  = GT.Transpose();
