@@ -31,7 +31,13 @@ public:
 	void setupFFT();
 	void cleanFFT();
 
-	void executefftw(std::string instr);
+	void fftzfor(std::complex<double>* & in, std::complex<double>* & out);
+	void fftzbac(std::complex<double>* & in, std::complex<double>* & out);
+	void fftxyfor(std::complex<double>* & in, std::complex<double>* & out);
+	void fftxybac(std::complex<double>* & in, std::complex<double>* & out);
+	void fftxyr2c(double * &in, std::complex<double>* & out);
+	void fftxyc2r(std::complex<double>* & in, double* & out);
+
 #ifdef __MIX_PRECISION
 	void executefftwf(std::string instr);
 #endif

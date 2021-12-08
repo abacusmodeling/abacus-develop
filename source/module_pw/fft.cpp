@@ -1,5 +1,4 @@
 #include "fft.h"
-#include "../module_base/tool_quit.h"
 namespace ModulePW
 {
 
@@ -136,7 +135,7 @@ void FFT :: initplan()
 	//                              2 D
 	//---------------------------------------------------------
 	
-	int nrank[2] = {this->nx,this->bigny};
+	//int nrank[2] = {this->nx,this->bigny};
 	int *embed = NULL;
 	if(this->gamma_only)
 	{
@@ -301,79 +300,77 @@ void FFT:: cleanFFT()
 	return;
 }
 
-void FFT::executefftw(std::string instr)
+void FFT::fftzfor(std::complex<double>* & in, std::complex<double>* & out)
 {
-	if(instr == "1for")
-	{
-		// for(int i = 0 ; i < this->ns ; ++i)
-		// {
-		// 	fftw_execute_dft(this->planzfor,(fftw_complex *)&c_gspace[i*nz],(fftw_complex *)&c_gspace[i*nz]);
-		// }
-		fftw_execute_dft(this->planzfor,(fftw_complex *)c_gspace,(fftw_complex *)c_gspace);
-		// fftw_execute(this->planzfor);
-	}
-	else if(instr == "1bac")
-	{
-		// for(int i = 0 ; i < this->ns ; ++i)
-		// {
-		// 	fftw_execute_dft(this->planzbac,(fftw_complex *)&c_gspace[i*nz],(fftw_complex *)&c_gspace[i*nz]);
-		// }
-		fftw_execute_dft(this->planzbac,(fftw_complex *)c_gspace,(fftw_complex *)c_gspace);
-		// fftw_execute(this->planzbac);
-	}	
-	else if(instr == "2for")
-	{
-		int npy = this->nplane * this-> ny;
-		fftw_execute_dft( this->planxfor, (fftw_complex *)c_rspace, (fftw_complex *)c_rspace);
-		for (int i=0; i<this->nx;++i)
-		{
-			fftw_execute_dft( this->planyfor, (fftw_complex*)&c_rspace[i*npy], (fftw_complex*)&c_rspace[i*npy] );
-		}
-		// fftw_execute(this->plan2for);
-	}
-	else if(instr == "2bac")
-	{
-		// fftw_execute(this->plan2bac);
-		int npy = this->nplane * this-> ny;
-		
-		for (int i=0; i<this->nx;++i)
-		{
-			fftw_execute_dft( this->planybac, (fftw_complex*)&c_rspace[i*npy], (fftw_complex*)&c_rspace[i*npy] );
-		}
-		fftw_execute_dft( this->planxbac, (fftw_complex *)c_rspace, (fftw_complex *)c_rspace);
-		
-	}
-	else if(instr == "2r2c")
-	{
-		// fftw_execute(this->plan2r2c);
-		//int npy = this->nplane * this-> ny;
-		int bignpy = this->nplane * this-> bigny;
-		// int padnpy = this->nplane * this-> ny * 2;
-		for (int i=0; i<this->nx;++i)
-		{
-			fftw_execute_dft_r2c( this->planyr2c, &r_rspace[i*bignpy], (fftw_complex*)&c_rspace[i*bignpy] );
-			// fftw_execute_dft_r2c( this->planyfor, &r_rspace[4*i*padnpy], (fftw_complex*)&c_rspace[i*padnpy] );
-		}
-		fftw_execute_dft( this->planxfor, (fftw_complex *)c_rspace, (fftw_complex *)c_rspace);
-	}
-	else if(instr == "2c2r")
-	{
-		// fftw_execute(this->plan2c2r);
-		//int npy = this->nplane * this-> ny;
-		int bignpy = this->nplane * this-> bigny;
-		// int padnpy = this->nplane * this-> ny * 2;
-		fftw_execute_dft( this->planxbac, (fftw_complex *)c_rspace, (fftw_complex *)c_rspace);
-		for (int i=0; i<this->nx;++i)
-		{
-			fftw_execute_dft_c2r( this->planyc2r, (fftw_complex*)&c_rspace[i*bignpy], &r_rspace[i*bignpy] );
-			// fftw_execute_dft_c2r( this->planybac, (fftw_complex*)&c_rspace[i*padnpy], &r_rspace[4*i*padnpy] );
-		}
-	}
-	else
-	{
-		ModuleBase::WARNING_QUIT("FFT", "Wrong input for excutefftw");
-	}
+	// for(int i = 0 ; i < this->ns ; ++i)
+	// {
+	// 	fftw_execute_dft(this->planzfor,(fftw_complex *)&in[i*nz],(fftw_complex *)&out[i*nz]);
+	// }
+	fftw_execute_dft(this->planzfor,(fftw_complex *)in,(fftw_complex *)out);
+	return;
 }
+
+void FFT::fftzbac(std::complex<double>* & in, std::complex<double>* & out)
+{
+	// for(int i = 0 ; i < this->ns ; ++i)
+	// {
+	// 	fftw_execute_dft(this->planzbac,(fftw_complex *)&c_gspace[i*nz],(fftw_complex *)&c_gspace[i*nz]);
+	// }
+	fftw_execute_dft(this->planzbac,(fftw_complex *)in, (fftw_complex *)out);
+	return;
+}
+
+void FFT::fftxyfor(std::complex<double>* & in, std::complex<double>* & out)
+{
+	int npy = this->nplane * this-> ny;
+	fftw_execute_dft( this->planxfor, (fftw_complex *)in, (fftw_complex *)out);
+	for (int i=0; i<this->nx;++i)
+	{
+		fftw_execute_dft( this->planyfor, (fftw_complex*)&in[i*npy], (fftw_complex*)&out[i*npy] );
+	}
+	return;
+}
+
+void FFT::fftxybac(std::complex<double>* & in, std::complex<double>* & out)
+{
+	int npy = this->nplane * this-> ny;
+		
+	for (int i=0; i<this->nx;++i)
+	{
+		fftw_execute_dft( this->planybac, (fftw_complex*)&in[i*npy], (fftw_complex*)&out[i*npy] );
+	}
+	fftw_execute_dft( this->planxbac, (fftw_complex *)in, (fftw_complex *)out);
+	return;
+}
+
+void FFT::fftxyr2c(double* &in, std::complex<double>* & out)
+{
+	//int npy = this->nplane * this-> ny;
+	int bignpy = this->nplane * this-> bigny;
+	// int padnpy = this->nplane * this-> ny * 2;
+	for (int i=0; i<this->nx;++i)
+	{
+		fftw_execute_dft_r2c( this->planyr2c, &in[i*bignpy], (fftw_complex*)&out[i*bignpy] );
+		// fftw_execute_dft_r2c( this->planyfor, &r_rspace[4*i*padnpy], (fftw_complex*)&c_rspace[i*padnpy] );
+	}
+	fftw_execute_dft( this->planxfor, (fftw_complex *)out, (fftw_complex *)out);
+	return;
+}
+
+void FFT::fftxyc2r(std::complex<double>* & in, double* & out)
+{
+	//int npy = this->nplane * this-> ny;
+	int bignpy = this->nplane * this-> bigny;
+	// int padnpy = this->nplane * this-> ny * 2;
+	fftw_execute_dft( this->planxbac, (fftw_complex *)in, (fftw_complex *)in);
+	for (int i=0; i<this->nx;++i)
+	{
+		fftw_execute_dft_c2r( this->planyc2r, (fftw_complex*)&in[i*bignpy], &out[i*bignpy] );
+		// fftw_execute_dft_c2r( this->planybac, (fftw_complex*)&c_rspace[i*padnpy], &r_rspace[4*i*padnpy] );
+	}
+	return;
+}
+
 
 #ifdef __MIX_PRECISION
 void executefftwf(std::string instr)
@@ -390,10 +387,6 @@ void executefftwf(std::string instr)
 		fftwf_execute(this->planf2r2c);
 	else if(instr == "2c2r")
 		fftwf_execute(this->planf2c2r);
-	else
-	{
-		ModuleBase::WARNING_QUIT("FFT", "Wrong input for excutefftwf");
-	}
 }
 #endif
 }

@@ -27,7 +27,7 @@ void PW_Basis::distribution_method2()
     // initial the variables needed by all proc.
     int tot_npw = 0;                     // total number of planewaves.
     this->nstot = 0;                     // total number of sticks.
-    int st_start = 0;                    // index of the first stick on current proc.
+   // int st_start = 0;                    // index of the first stick on current proc.
     int *st_bottom2D = NULL;             // st_bottom2D[ixy], minimum z of stick on (x, y).
     int *st_length2D = NULL;             // st_length2D[ixy], number of planewaves in stick on (x, y).
 
