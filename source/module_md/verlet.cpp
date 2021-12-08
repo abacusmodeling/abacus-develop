@@ -169,7 +169,7 @@ void Verlet::restart()
         if(!file)
 		{
 			std::cout<< "please ensure whether 'Restart_md.dat' exists!" << std::endl;
-            ModuleBase::WARNING_QUIT("MSST", "no Restart_md.dat ！");
+            ModuleBase::WARNING_QUIT("verlet", "no Restart_md.dat ！");
 		}
 
 		file >> step_rst_;

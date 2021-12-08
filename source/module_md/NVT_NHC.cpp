@@ -89,13 +89,69 @@ void NVT_NHC::outputMD()
 
 void NVT_NHC::write_restart()
 {
-    Verlet::write_restart();
+    if(!GlobalV::MY_RANK)
+    {
+		std::stringstream ssc;
+		ssc << GlobalV::global_out_dir << "Restart_md.dat";
+		std::ofstream file(ssc.str().c_str());
+
+        file << step_ << std::endl;
+        file << mdp.MNHC << std::endl;
+        for(int i=0; i<mdp.MNHC; ++i)
+        {
+            file << eta[i] << "   ";
+        }
+        file << std::endl;
+        for(int i=0; i<mdp.MNHC; ++i)
+        {
+            file << veta[i] << "   ";
+        }
+		file.close();
+	}
+#ifdef __MPI
+	MPI_Barrier(MPI_COMM_WORLD);
+#endif
 }
 
 void NVT_NHC::restart()
 {
-    std::cout << "NHC" << std::endl;
-    Verlet::restart();
+    if(!GlobalV::MY_RANK)
+    {
+		std::stringstream ssc;
+		ssc << GlobalV::global_out_dir << "Restart_md.dat";
+		std::ifstream file(ssc.str().c_str());
+
+        if(!file)
+		{
+			std::cout<< "Please ensure whether 'Restart_md.dat' exists !" << std::endl;
+            ModuleBase::WARNING_QUIT("NVT_NHC", "no Restart_md.dat ！");
+		}
+        double Mnum;
+		file >> step_rst_ >> Mnum;
+        if(Mnum != mdp.MNHC)
+		{
+			std::cout<< "Num of NHC is not the same !" << std::endl;
+            ModuleBase::WARNING_QUIT("NVT_NHC", "no Restart_md.dat ！");
+		}
+        for(int i=0; i<mdp.MNHC; ++i)
+        {
+            file >> eta[i];
+        }
+        for(int i=0; i<mdp.MNHC; ++i)
+        {
+            file >> veta[i];
+        }
+
+		file.close();
+	}
+
+#ifdef __MPI
+	MPI_Bcast(&step_rst_, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(eta, mdp.MNHC, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(veta, mdp.MNHC, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+#endif
+
+    step_ = step_rst_;
 }
 
 void NVT_NHC::integrate()
