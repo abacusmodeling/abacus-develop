@@ -184,7 +184,7 @@ public:
 	// FFT dimensions for wave functions.
 	int nx, ny, nz, nxyz, nxy;
     int bigny, bignxyz, bignxy; // Gamma_only: ny = int(bigny/2)-1 , others: ny = bigny
-    int liy,riy;// liy: the left edge of the pw ball; riy: the right edge of the pw ball
+    int lix,rix;// lix: the left edge of the pw ball; rix: the right edge of the pw ball
     int maxgrids; // max between nz * ns and bignxy * nplane
     FFT ft;
 

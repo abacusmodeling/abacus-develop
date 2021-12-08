@@ -27,7 +27,8 @@ public:
 
 	FFT();
 	~FFT();
-	void initfft(int nx_in, int bigny_in, int nz_in, int ns_in, int nplane_in, int nproc_in, bool gamma_only_in, bool mpifft_in = false);
+	void initfft(int nx_in, int bigny_in, int nz_in, int lix_in, int rix_in, int ns_in, int nplane_in, 
+				 int nproc_in, bool gamma_only_in, bool mpifft_in = false);
 	void setupFFT();
 	void cleanFFT();
 
@@ -55,6 +56,7 @@ public:
 	int nxy;
 	int bigny;
 	int bignxy;
+	int lix,rix;// lix: the left edge of the pw ball; rix: the right edge of the pw ball
 	int ns; //number of sticks
 	int nplane; //number of x-y planes
 	int maxgrids; // max between nz * ns and bignxy * nplane

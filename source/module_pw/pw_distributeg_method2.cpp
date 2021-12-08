@@ -105,6 +105,8 @@ void PW_Basis::distribution_method2()
 #ifdef __MPI
     MPI_Bcast(&tot_npw, 1, MPI_INT, 0, POOL_WORLD);
     MPI_Bcast(&this->nstot, 1, MPI_INT, 0, POOL_WORLD);
+    MPI_Bcast(&lix, 1, MPI_INT, 0, POOL_WORLD);
+    MPI_Bcast(&rix, 1, MPI_INT, 0, POOL_WORLD);
     MPI_Bcast(this->nst_per, this->poolnproc, MPI_INT, 0 , POOL_WORLD);
     if (this->poolrank != 0)
     {
