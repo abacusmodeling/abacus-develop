@@ -21,7 +21,7 @@ void PW_Basis:: real2recip(std::complex<double> * in, std::complex<double> * out
     }
     this->ft.fftxyfor(ft.c_gspace,ft.c_gspace);
 
-    this->gatherp_scatters2(this->ft.c_gspace, this->ft.c_gspace2);
+    this->gatherp_scatters(this->ft.c_gspace, this->ft.c_gspace2);
     
     this->ft.fftzfor(ft.c_gspace2,ft.c_gspace);
 
@@ -60,7 +60,7 @@ void PW_Basis:: real2recip(double * in, std::complex<double> * out)
 
     this->ft.fftxyr2c(ft.r_rspace,ft.c_gspace);
 
-    this->gatherp_scatters2(this->ft.c_gspace, this->ft.c_gspace2);
+    this->gatherp_scatters(this->ft.c_gspace, this->ft.c_gspace2);
     
     this->ft.fftzfor(ft.c_gspace2,ft.c_gspace);
 
@@ -87,7 +87,7 @@ void PW_Basis:: recip2real(std::complex<double> * in, std::complex<double> * out
     }
     this->ft.fftzbac(ft.c_gspace, ft.c_gspace2);
 
-    this->gathers_scatterp2(this->ft.c_gspace2,this->ft.c_gspace);
+    this->gathers_scatterp(this->ft.c_gspace2,this->ft.c_gspace);
 
     this->ft.fftxybac(ft.c_gspace,ft.c_gspace);
     
@@ -115,7 +115,7 @@ void PW_Basis:: recip2real(std::complex<double> * in, double * out)
     }
    this->ft.fftzbac(ft.c_gspace, ft.c_gspace2);
     
-    this->gathers_scatterp2(this->ft.c_gspace2, this->ft.c_gspace);
+    this->gathers_scatterp(this->ft.c_gspace2, this->ft.c_gspace);
 
     this->ft.fftxyc2r(ft.c_gspace,ft.r_rspace);
 
