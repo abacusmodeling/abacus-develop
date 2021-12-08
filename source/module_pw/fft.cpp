@@ -54,8 +54,9 @@ void FFT:: initfft(int nx_in, int bigny_in, int nz_in, int ns_in, int nplane_in,
 	if(!this->mpifft)
 	{
 		//It seems in-place fft is faster than out-of-place fft
-		if(this->nproc == 1) 	c_gspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * this->nz * this->ns);
-		else					c_gspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * maxgrids);
+		// if(this->nproc == 1) 	c_gspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * this->nz * this->ns);
+		// else					c_gspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * maxgrids);
+		c_gspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * maxgrids);
 		//c_gspace2  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * this->nz * this->ns);
 		if(this->gamma_only)
 		{
@@ -70,9 +71,11 @@ void FFT:: initfft(int nx_in, int bigny_in, int nz_in, int ns_in, int nplane_in,
 		}
 		else
 		{
-			if(this->nproc == 1) c_rspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * this->bignxy * nplane);
-			else 				 c_rspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * maxgrids);
+			// if(this->nproc == 1) c_rspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * this->bignxy * nplane);
+			// else 				 c_rspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * maxgrids);
+			c_rspace  = (std::complex<double> *) fftw_malloc(sizeof(fftw_complex) * maxgrids);
 		}
+		c_gspace2 = c_rspace;
 #ifdef __MIX_PRECISION
 		cf_gspace  = (std::complex<float> *)fftw_malloc(sizeof(fftwf_complex) * this->nz * this->ns);
 		cf_rspace  = (std::complex<float> *)fftw_malloc(sizeof(fftwf_complex) * this->bignxy * nplane);
@@ -120,13 +123,14 @@ void FFT :: initplan()
 	//					                fftw_complex *in,  const int *inembed, int istride, int idist, 
 	//					                fftw_complex *out, const int *onembed, int ostride, int odist, int sign, unsigned flags);
 	
+	//It is better to use out-of-place fft for stride = 1.
 	this->planzfor = fftw_plan_many_dft(     1,    &this->nz,  this->ns,  
 					    (fftw_complex*) c_gspace,  &this->nz,  1,  this->nz,
-					    (fftw_complex*) c_gspace,  &this->nz,  1,  this->nz,  FFTW_FORWARD,  FFTW_MEASURE);
+					    (fftw_complex*) c_gspace2,  &this->nz,  1,  this->nz,  FFTW_FORWARD,  FFTW_MEASURE);
 	
 	this->planzbac = fftw_plan_many_dft(     1,    &this->nz,  this->ns,  
 						(fftw_complex*) c_gspace,  &this->nz,  1,  this->nz,
-						(fftw_complex*) c_gspace,  &this->nz,  1,  this->nz,  FFTW_BACKWARD,  FFTW_MEASURE);
+						(fftw_complex*) c_gspace2,  &this->nz,  1,  this->nz,  FFTW_BACKWARD,  FFTW_MEASURE);
 
 	// this->planzfor = fftw_plan_dft_1d(this->nz,(fftw_complex*) c_gspace,(fftw_complex*) c_gspace, FFTW_FORWARD,  FFTW_MEASURE);
 	// this->planzbac = fftw_plan_dft_1d(this->nz,(fftw_complex*) c_gspace,(fftw_complex*) c_gspace,FFTW_BACKWARD,  FFTW_MEASURE);
@@ -183,6 +187,8 @@ void FFT :: initplan()
 		// 	this->plan2bac = fftw_plan_many_dft(       2,   nrank,  this->nplane,  
 		// 						(fftw_complex*) c_rspace,   embed,  this->nplane,   1,
 		// 						(fftw_complex*) c_rspace,   embed,  this->nplane,   1,  FFTW_BACKWARD,  FFTW_MEASURE);
+
+		//It is better to use in-place for stride > 1
 		int npy = this->nplane * this->ny;
 		this->planxfor  = fftw_plan_many_dft(  1, &this->nx,	npy,	 (fftw_complex *)c_rspace, 		  embed, npy,     1,
 				(fftw_complex *)c_rspace, 	 embed, npy,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
