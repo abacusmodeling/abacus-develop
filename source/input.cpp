@@ -2342,6 +2342,10 @@ void Input::Check(void)
 
 	//std::cout << "diago_proc=" << diago_proc << std::endl;
 	//std::cout << " NPROC=" << GlobalV::NPROC << std::endl;
+	if(diago_proc>1 && basis_type=="lcao")
+	{
+		ModuleBase::WARNING_QUIT("Input", "please don't set diago_proc with lcao base");
+	}
 	if(diago_proc<=0)
 	{
 		diago_proc = GlobalV::NPROC;

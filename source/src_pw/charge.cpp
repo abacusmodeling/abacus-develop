@@ -209,7 +209,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 		const int startmag_type = [&]()->int
 		{
 			if(GlobalV::NSPIN==4)		//zhengdy-soc, type 2 is still wrong.
-				return 2;
+				return 1;
 			for(int it=0; it<GlobalC::ucell.ntype; it++)
 				for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 					if(GlobalC::ucell.atoms[it].mag[ia]!=0.0)
