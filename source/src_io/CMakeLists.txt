@@ -23,6 +23,7 @@ add_library(
     print_info.cpp
     read_dm.cpp
     read_rho.cpp
+    read_txt_tools.cpp
     restart.cpp
     rwstream.cpp
     to_wannier90.cpp
