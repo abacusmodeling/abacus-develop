@@ -310,6 +310,7 @@ bool LOOP_ions::force_stress(
 
             if(IMM.get_converged() || (istep==GlobalV::NSTEP))
             {
+                ModuleBase::timer::tick("LOOP_ions","force_stress");
                 return 1; // 1 means converged
             }
             else // ions are not converged
@@ -325,10 +326,12 @@ bool LOOP_ions::force_stress(
                     GlobalC::pot.init_pot( istep, GlobalC::pw.strucFac );
                 }
             }
+            ModuleBase::timer::tick("LOOP_ions","force_stress");
             return 0;
         }
         else
         {
+            ModuleBase::timer::tick("LOOP_ions","force_stress");
             return 1;
         }
 
@@ -378,6 +381,7 @@ xiaohui modify 2014-08-09*/
            	converged_stress = LCM.get_converged();
            	if(converged_stress)
            	{
+                ModuleBase::timer::tick("LOOP_ions","force_stress");
                	return 1;
            	}
            	else
@@ -386,11 +390,13 @@ xiaohui modify 2014-08-09*/
                	GlobalC::pot.init_pot(stress_step, GlobalC::pw.strucFac);
 
                	++stress_step;
+                ModuleBase::timer::tick("LOOP_ions","force_stress");
                	return 0;
            	}
 		}
         else
         {
+            ModuleBase::timer::tick("LOOP_ions","force_stress");
             return 1;
         }
 	}
@@ -420,6 +426,7 @@ xiaohui modify 2014-08-09*/
             	    converged_stress = LCM.get_converged();
             	    if(converged_stress)
             	    {
+                        ModuleBase::timer::tick("LOOP_ions","force_stress");
                 	    return 1;
             	    }
             	    else
@@ -428,11 +435,13 @@ xiaohui modify 2014-08-09*/
                 	    GlobalC::pot.init_pot(stress_step, GlobalC::pw.strucFac);
 
                 	    ++stress_step;
+                        ModuleBase::timer::tick("LOOP_ions","force_stress");
                 	    return 0;
                     }
                 }
                 else
                 {
+                    ModuleBase::timer::tick("LOOP_ions","force_stress");
                     return 1;
                 }
 
@@ -450,18 +459,18 @@ xiaohui modify 2014-08-09*/
                     GlobalC::pot.init_pot( istep, GlobalC::pw.strucFac );
                 }
                 ++force_step;
+                ModuleBase::timer::tick("LOOP_ions","force_stress");
                 return 0;
             }
         }
         else
         {
+            ModuleBase::timer::tick("LOOP_ions","force_stress");
             return 1;
         }
     }
-
-    return 0;
-
     ModuleBase::timer::tick("LOOP_ions","force_stress");
+    return 0;
 }
 
 void LOOP_ions::final_scf(void)
