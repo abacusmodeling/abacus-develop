@@ -35,9 +35,9 @@ int main(int argc,char **argv)
     setupmpi(argc,argv,nproc, myrank);
     divide_pools(nproc, myrank, nproc_in_pool, npool, mypool, rank_in_pool);
     //cout<<nproc<<" d "<<myrank<<" d "<<nproc_in_pool<<" "<<npool<<" "<<mypool<<" "<<rank_in_pool<<endl;
-    MPI_Barrier(MPI_COMM_WORLD);
-    //if(myrank==0) ProfilerStart("test0.prof");
-    //if(myrank==1) ProfilerStart("test1.prof");
+    // MPI_Barrier(MPI_COMM_WORLD);
+    // if(myrank==0) ProfilerStart("test0.prof");
+    // if(myrank==1) ProfilerStart("test1.prof");
     
     //init
     pwtest.initgrids(lat0,latvec,wfcecut);
@@ -85,7 +85,7 @@ int main(int argc,char **argv)
     cout<<"spend "<<fftduration<<"s\n";
     
     if(tmp!=NULL) delete []tmp; 
-    MPI_Barrier(MPI_COMM_WORLD);
-    //if(myrank==0) ProfilerStop();
+    // MPI_Barrier(MPI_COMM_WORLD);
+    // ProfilerStop();
     return 0;
 }
