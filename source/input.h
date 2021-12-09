@@ -450,6 +450,11 @@ class Input
 	int double_counting;            // 1:FLL(fully localized limit)(default); 2:AMF(around mean field)
 
 //==========================================================
+//    DFT+DMFT       Xin Qu added on 2021-08
+//==========================================================
+  bool dft_plus_dmft;                //true:DFT+U correction; false：standard DFT calcullation(default)
+
+//==========================================================
 // DeepKS -- added by caoyu and mohan
 //==========================================================
     int out_descriptor; // (need libnpy) output descritpor for deepks. caoyu added 2020-11-24, mohan modified 2021-01-03

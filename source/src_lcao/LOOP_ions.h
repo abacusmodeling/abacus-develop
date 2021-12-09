@@ -6,6 +6,8 @@
 #include "../src_pw/charge_extra.h"
 #include "../src_ions/lattice_change_methods.h"
 
+#include <fstream>
+
 class LOOP_ions
 {
 
