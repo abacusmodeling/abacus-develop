@@ -61,8 +61,7 @@ public:
 	int nplane; //number of x-y planes
 	int maxgrids; // max between nz * ns and bignxy * nplane
 	int nproc; // number of proc.
-	std::complex<double> * c_gspace, *c_gspace2; //complex number space for g, [ns * nz]
-	std::complex<double> * c_rspace, *c_rspace2;//complex number space for r, [nplane * nx *ny]
+	std::complex<double> *aux1, *aux2; //fft space, [maxgrids]
 	double *r_rspace; //real number space for r, [nplane * nx *ny]
 #ifdef __MIX_PRECISION
 	std::complex<float> * cf_gspace; //complex number space for g, [ns * nz]
