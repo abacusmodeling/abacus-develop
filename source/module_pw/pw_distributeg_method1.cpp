@@ -156,8 +156,8 @@ void PW_Basis::distribution_method1()
 #ifdef __MPI
     MPI_Bcast(&tot_npw, 1, MPI_INT, 0, POOL_WORLD);
     MPI_Bcast(&this->nstot, 1, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(&lix, 1, MPI_INT, 0, POOL_WORLD);
-    MPI_Bcast(&rix, 1, MPI_INT, 0, POOL_WORLD);
+    MPI_Bcast(&liy, 1, MPI_INT, 0, POOL_WORLD);
+    MPI_Bcast(&riy, 1, MPI_INT, 0, POOL_WORLD);
     if (this->poolrank != 0)
     {
         st_bottom2D = new int[this->nxy];                      // minimum z of stick.
