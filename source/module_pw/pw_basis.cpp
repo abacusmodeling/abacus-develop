@@ -54,7 +54,7 @@ void PW_Basis::setuptransform()
     this->distribute_r();
     this->distribute_g();
     this->getstartgr();
-    this->ft.initfft(this->nx,this->bigny,this->nz,this->lix,this->rix,this->nst,this->nplane,this->poolnproc,this->gamma_only);
+    this->ft.initfft(this->nx,this->bigny,this->nz,this->liy,this->riy,this->nst,this->nplane,this->poolnproc,this->gamma_only);
     this->ft.setupFFT();
 }
 
