@@ -5,6 +5,8 @@ Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     mdp(MD_para_in),
     ucell(unit_in)
 {
+    stop = false;
+
     allmass = new double [ucell.nat];
     pos = new ModuleBase::Vector3<double> [ucell.nat];
     vel = new ModuleBase::Vector3<double> [ucell.nat];
@@ -62,8 +64,8 @@ void Verlet::first_half()
         {
             if(ionmbl[i][k])
             {
-                pos[i][k] += vel[i][k]*mdp.dt + 0.5*force[i][k]*mdp.dt*mdp.dt/allmass[i];
                 vel[i][k] += 0.5*force[i][k]*mdp.dt/allmass[i];
+                pos[i][k] += vel[i][k]*mdp.dt;
             }
         }
     }

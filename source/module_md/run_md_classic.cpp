@@ -43,10 +43,8 @@ void Run_MD_CLASSIC::classic_md_line(void)
         verlet = new MSST(INPUT.mdp, ucell_c); 
     }
 
-    bool stop = false;
-
     // md cycle
-    while (verlet->step_ <= (GlobalV::NSTEP + verlet->step_rst_) && !stop)
+    while (verlet->step_ <= (GlobalV::NSTEP + verlet->step_rst_) && !verlet->stop)
     {
         if(verlet->step_ == verlet->step_rst_)
         {
@@ -92,6 +90,6 @@ void Run_MD_CLASSIC::classic_md_line(void)
     GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
     delete verlet;
-    ModuleBase::timer::tick("Run_MD_CLASSIC", "md_cells_classic");
+    ModuleBase::timer::tick("Run_MD_CLASSIC", "classic_md_line");
     return;
 }

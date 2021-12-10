@@ -19,6 +19,7 @@ public:
 
     MD_parameters &mdp;
 	UnitCell_pseudo &ucell;
+    bool stop;                           // MD stop or not
 
     // All parameters are in a.u. unit.
     double temperature_;

@@ -14,4 +14,5 @@ add_library(
     MSST.cpp
     NVT_ADS.cpp
     NVT_NHC.cpp
+    FIRE.cpp
 )
