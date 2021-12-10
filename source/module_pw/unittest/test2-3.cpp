@@ -8,6 +8,7 @@
 #include <iostream>
 #include <iomanip>
 #include "mpi.h"
+#include "../../module_base/timer.h"
 
 using namespace std;
 int main(int argc,char **argv)
@@ -33,6 +34,7 @@ int main(int argc,char **argv)
     setupmpi(argc,argv,nproc, myrank);
     divide_pools(nproc, myrank, nproc_in_pool, npool, mypool, rank_in_pool);
     //cout<<nproc<<" d "<<myrank<<" d "<<nproc_in_pool<<" "<<npool<<" "<<mypool<<" "<<rank_in_pool<<endl;
+    ModuleBase::timer::start();
     
     //init
     pwtest.initgrids(lat0,latvec,1.5*wfcecut);
@@ -55,10 +57,10 @@ int main(int argc,char **argv)
     GT = latvec.Inverse();
 	G  = GT.Transpose();
 	GGT = G * GT;
-    
+    complex<double> *tmp = NULL;
     if(myrank == 0)
     {
-        complex<double> *tmp = new complex<double> [nx*ny*nz];
+        tmp = new complex<double> [nx*ny*nz];
         for(int ix = 0 ; ix < nx ; ++ix)
         {
             for(int iy = 0 ; iy < ny ; ++iy)
@@ -81,7 +83,8 @@ int main(int argc,char **argv)
             }   
         }
         fftw_plan pp = fftw_plan_dft_3d(nx,ny,nz,(fftw_complex *) tmp, (fftw_complex *) tmp, FFTW_BACKWARD, FFTW_ESTIMATE);
-        fftw_execute(pp);     
+        fftw_execute(pp);  
+        fftw_destroy_plan(pp);    
         
         //output
         cout << "reference\n";
@@ -152,6 +155,10 @@ int main(int argc,char **argv)
     }
 
     MPI_Barrier(MPI_COMM_WORLD);
+    if(rank_in_pool==0) ModuleBase::timer::finish(GlobalV::ofs_running, true);
 
+    delete [] rhog;
+    delete [] rhor;
+    if(tmp!=NULL) delete []tmp;
     return 0;
 }

@@ -146,8 +146,8 @@ void timer::print_all(std::ofstream &ofs)
 		const std::string &name = timer_pool_order_A.first.second;
 		const Timer_One &timer_one = timer_pool_order_A.second;
 
-		if(timer_one.cpu_second < small)
-			continue;
+		// if(timer_one.cpu_second < small)
+		// 	continue;
 
 		ofs  << " "
 			// << std::setw(2)  << timer_one.level

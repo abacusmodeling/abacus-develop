@@ -8,6 +8,7 @@
 #include <iostream>
 #include <iomanip>
 #include "mpi.h"
+#include "../../module_base/timer.h"
 
 using namespace std;
 int main(int argc,char **argv)
@@ -33,6 +34,7 @@ int main(int argc,char **argv)
     setupmpi(argc,argv,nproc, myrank);
     divide_pools(nproc, myrank, nproc_in_pool, npool, mypool, rank_in_pool);
     //cout<<nproc<<" d "<<myrank<<" d "<<nproc_in_pool<<" "<<npool<<" "<<mypool<<" "<<rank_in_pool<<endl;
+    ModuleBase::timer::start();
     
     //init
     pwtest.initgrids(lat0,latvec,1.5*wfcecut);
@@ -151,6 +153,7 @@ int main(int argc,char **argv)
         }
         cout<<endl;
     }
+    if(rank_in_pool==0) ModuleBase::timer::finish(GlobalV::ofs_running, true);
 
     MPI_Barrier(MPI_COMM_WORLD);
     delete [] rhog;

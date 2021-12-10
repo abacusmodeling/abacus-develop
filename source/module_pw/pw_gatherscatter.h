@@ -1,5 +1,6 @@
 #include "pw_basis.h"
 #include "../module_base/global_function.h"
+#include "../module_base/timer.h"
 #include "typeinfo"
 #ifdef __MPI
 #include "mpi.h"
@@ -15,6 +16,8 @@ namespace ModulePW
 template<typename T>
 void PW_Basis:: gatherp_scatters(complex<T> *in, complex<T> *out)
 {
+    ModuleBase::timer::tick("PW_Basis", "gatherp_scatters");
+    
     if(this->poolnproc == 1) //In this case nst=nstot, nz = nplane, 
     {
         for(int is = 0 ; is < this->nst ; ++is)
@@ -61,6 +64,7 @@ void PW_Basis:: gatherp_scatters(complex<T> *in, complex<T> *out)
 	}
    
 #endif
+    ModuleBase::timer::tick("PW_Basis", "gatherp_scatters");
     return;
 }
 
@@ -72,6 +76,7 @@ void PW_Basis:: gatherp_scatters(complex<T> *in, complex<T> *out)
 template<typename T>
 void PW_Basis:: gathers_scatterp(complex<T> *in, complex<T> *out)
 {
+    ModuleBase::timer::tick("PW_Basis", "gatherp_scatterp");
     
     if(this->poolnproc == 1) //In this case nrxx=nx*ny*nz, nst = nstot, 
     {
@@ -121,6 +126,7 @@ void PW_Basis:: gathers_scatterp(complex<T> *in, complex<T> *out)
 	}
 
 #endif
+    ModuleBase::timer::tick("PW_Basis", "gatherp_scatterp");
     return;
 }
 
