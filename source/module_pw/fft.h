@@ -10,13 +10,13 @@
 //#include "fftw3-mpi_mkl.h"
 #endif
 
-#ifdef __MIX_PRECISION
-#include "fftw3f.h"
-#if defined(__FFTW3_MPI) && defined(__MPI)
-#include "fftw3f-mpi.h"
-//#include "fftw3-mpi_mkl.h"
-#endif
-#endif
+// #ifdef __MIX_PRECISION
+// #include "fftw3f.h"
+// #if defined(__FFTW3_MPI) && defined(__MPI)
+// #include "fftw3f-mpi.h"
+// //#include "fftw3-mpi_mkl.h"
+// #endif
+// #endif
 
 namespace ModulePW
 {
@@ -40,10 +40,16 @@ public:
 	void fftxyc2r(std::complex<double>* & in, double* & out);
 
 #ifdef __MIX_PRECISION
-	void executefftwf(std::string instr);
+	void cleanfFFT();
+	void fftfzfor(std::complex<float>* & in, std::complex<float>* & out);
+	void fftfzbac(std::complex<float>* & in, std::complex<float>* & out);
+	void fftfxyfor(std::complex<float>* & in, std::complex<float>* & out);
+	void fftfxybac(std::complex<float>* & in, std::complex<float>* & out);
+	void fftfxyr2c(float * &in, std::complex<float>* & out);
+	void fftfxyc2r(std::complex<float>* & in, float* & out);
 #endif
 
-private:
+public:
 	void initplan();
 	void initplan_mpi();
 #ifdef __MIX_PRECISION
@@ -64,8 +70,7 @@ public:
 	std::complex<double> *aux1, *aux2; //fft space, [maxgrids]
 	double *r_rspace; //real number space for r, [nplane * nx *ny]
 #ifdef __MIX_PRECISION
-	std::complex<float> * cf_gspace; //complex number space for g, [ns * nz]
-	std::complex<float> * cf_rspace; //complex number space for r, [nplane * nx *ny]
+	std::complex<float> *auxf1, *auxf2; //fft space, [maxgrids]
 	float *rf_rspace; //real number space for r, [nplane * nx *ny]
 #endif
 
@@ -90,12 +95,14 @@ private:
 	fftw_plan planyc2r;
 #ifdef __MIX_PRECISION
 	bool destroypf;
-	fftwf_plan planf2r2c;
-	fftwf_plan planf2c2r;
-	fftwf_plan planf1for;
-	fftwf_plan planf1bac;
-	fftwf_plan planf2for;
-	fftwf_plan planf2bac;
+	fftwf_plan planfzfor;
+	fftwf_plan planfzbac;
+	fftwf_plan planfxfor;
+	fftwf_plan planfxbac;
+	fftwf_plan planfyfor;
+	fftwf_plan planfybac;
+	fftwf_plan planfyr2c;
+	fftwf_plan planfyc2r;
 #endif
 
 };

@@ -193,12 +193,20 @@ public:
     void recip2real(std::complex<double> * in, double *out); //in:(nz, ns)  ; out(nplane,nx*ny)
     void recip2real(std::complex<double> * in, std::complex<double> * out); //in:(nz, ns)  ; out(nplane,nx*ny)
 
-    void gatherp_scatters(std::complex<double> *in, std::complex<double> *out); //gather planes and scatter sticks of all processors
-    void gathers_scatterp(std::complex<double> *in, std::complex<double> *out); //gather sticks of and scatter planes of all processors
+#ifdef __MIX_PRECISION
+    void real2recip(float * in, std::complex<float> * out); //in:(nplane,nx*ny)  ; out(nz, ns)
+    void real2recip(std::complex<float> * in, std::complex<float> * out); //in:(nplane,nx*ny)  ; out(nz, ns)
+    void recip2real(std::complex<float> * in, float *out); //in:(nz, ns)  ; out(nplane,nx*ny)
+    void recip2real(std::complex<float> * in, std::complex<float> * out); //in:(nz, ns)  ; out(nplane,nx*ny)
+#endif
+    template<typename T>
+    void gatherp_scatters(std::complex<T> *in, std::complex<T> *out); //gather planes and scatter sticks of all processors
+    template<typename T>
+    void gathers_scatterp(std::complex<T> *in, std::complex<T> *out); //gather sticks of and scatter planes of all processors
     // void gathers_scatterp2(std::complex<double> *in, std::complex<double> *out); //gather sticks of and scatter planes of all processors
     // void gatherp_scatters2(std::complex<double> *in, std::complex<double> *out); //gather sticks of and scatter planes of all processors
-    void gatherp_scatters_gamma(std::complex<double> *in, std::complex<double> *out); //gather planes and scatter sticks of all processors, used when gamma_only
-    void gathers_scatterp_gamma(std::complex<double> *in, std::complex<double> *out); //gather sticks of and scatter planes of all processors, used when gamma only
+    // void gatherp_scatters_gamma(std::complex<double> *in, std::complex<double> *out); //gather planes and scatter sticks of all processors, used when gamma_only
+    // void gathers_scatterp_gamma(std::complex<double> *in, std::complex<double> *out); //gather sticks of and scatter planes of all processors, used when gamma only
 
     
     
