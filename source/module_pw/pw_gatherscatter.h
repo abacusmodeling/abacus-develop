@@ -1,6 +1,7 @@
 #include "pw_basis.h"
 #include "../module_base/global_function.h"
 #include "../module_base/timer.h"
+#include "typeinfo"
 #ifdef __MPI
 #include "mpi.h"
 #include "../src_parallel/parallel_global.h"
@@ -12,7 +13,8 @@ namespace ModulePW
 //in and out should be in different places 
 //in[] will be changed
 //
-void PW_Basis:: gatherp_scatters(complex<double> *in, complex<double> *out)
+template<typename T>
+void PW_Basis:: gatherp_scatters(complex<T> *in, complex<T> *out)
 {
     ModuleBase::timer::tick("PW_Basis", "gatherp_scatters");
     
@@ -44,8 +46,10 @@ void PW_Basis:: gatherp_scatters(complex<double> *in, complex<double> *out)
 
     //exchange data
     //(nplane,nstot) to (numz[ip],ns, poolnproc)
-	MPI_Alltoallv(out, numr, startr, mpicomplex, in, numg, startg, mpicomplex, POOL_WORLD);
-
+    if(typeid(T) == typeid(double))
+	    MPI_Alltoallv(out, numr, startr, mpicomplex, in, numg, startg, mpicomplex, POOL_WORLD);
+    else if(typeid(T) == typeid(float))
+        MPI_Alltoallv(out, numr, startr, MPI_COMPLEX, in, numg, startg, MPI_COMPLEX, POOL_WORLD);
     // change (nz,ns) to (numz[ip],ns, poolnproc)
     for (int ip = 0; ip < this->poolnproc ;++ip)
 	{
@@ -60,6 +64,7 @@ void PW_Basis:: gatherp_scatters(complex<double> *in, complex<double> *out)
 	}
    
 #endif
+    ModuleBase::timer::tick("PW_Basis", "gatherp_scatters");
     return;
 }
 
@@ -68,8 +73,10 @@ void PW_Basis:: gatherp_scatters(complex<double> *in, complex<double> *out)
 //in and out should be in different places 
 //in[] will be changed
 //
-void PW_Basis:: gathers_scatterp(complex<double> *in, complex<double> *out)
+template<typename T>
+void PW_Basis:: gathers_scatterp(complex<T> *in, complex<T> *out)
 {
+    ModuleBase::timer::tick("PW_Basis", "gatherp_scatterp");
     
     if(this->poolnproc == 1) //In this case nrxx=nx*ny*nz, nst = nstot, 
     {
@@ -102,8 +109,10 @@ void PW_Basis:: gathers_scatterp(complex<double> *in, complex<double> *out)
 
 	//exchange data
     //(numz[ip],ns, poolnproc) to (nplane,nstot)
-	MPI_Alltoallv(out, numg, startg, mpicomplex, in, numr, startr, mpicomplex, POOL_WORLD);
-
+    if(typeid(T) == typeid(double))
+	    MPI_Alltoallv(out, numg, startg, mpicomplex, in, numr, startr, mpicomplex, POOL_WORLD);
+    else if(typeid(T) == typeid(float))
+        MPI_Alltoallv(out, numg, startg, MPI_COMPLEX, in, numr, startr, MPI_COMPLEX, POOL_WORLD);
     ModuleBase::GlobalFunc::ZEROS(out, this->nrxx);
     //change (nplane,nstot) to (nplane nxy)
 	for (int istot = 0;istot < nstot; ++istot)
@@ -117,6 +126,7 @@ void PW_Basis:: gathers_scatterp(complex<double> *in, complex<double> *out)
 	}
 
 #endif
+    ModuleBase::timer::tick("PW_Basis", "gatherp_scatterp");
     return;
 }
 

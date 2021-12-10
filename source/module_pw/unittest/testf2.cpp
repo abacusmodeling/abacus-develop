@@ -35,6 +35,7 @@ int main(int argc,char **argv)
     divide_pools(nproc, myrank, nproc_in_pool, npool, mypool, rank_in_pool);
     //cout<<nproc<<" d "<<myrank<<" d "<<nproc_in_pool<<" "<<npool<<" "<<mypool<<" "<<rank_in_pool<<endl;
     ModuleBase::timer::start();
+    
     //init
     pwtest.initgrids(lat0,latvec,wfcecut);
     //pwtest.initgrids(lat0,latvec,5,7,7);
@@ -104,14 +105,14 @@ int main(int argc,char **argv)
         cout<<endl;
     }
     
-    complex<double> * rhog = new complex<double> [npw];
+    complex<float> * rhog = new complex<float> [npw];
     for(int ig = 0 ; ig < npw ; ++ig)
     {
-        rhog[ig] = 1.0/(pwtest.gg[ig]+1) + ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ig].x+1) + 1);
+        rhog[ig] = complex<float>(1.0/(pwtest.gg[ig]+1) + ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ig].x+1) + 1));
         //rhog[ig] = 1.0/(pwtest.gg[ig]+1);
         //rhog[ig] = 1.0;
     }    
-    complex<double> * rhor = new complex<double> [nrxx];
+    complex<float> * rhor = new complex<float> [nrxx];
     pwtest.recip2real(rhog,rhor);
     if(myrank == 0)     cout << "new pw module\n";
     MPI_Barrier(MPI_COMM_WORLD);
@@ -153,8 +154,8 @@ int main(int argc,char **argv)
         }
         cout<<endl;
     }
-
-    ModuleBase::timer::finish(GlobalV::ofs_running, true);
+    
+    if(rank_in_pool==0) ModuleBase::timer::finish(GlobalV::ofs_running, true);
 
     MPI_Barrier(MPI_COMM_WORLD);     
     delete [] rhog;

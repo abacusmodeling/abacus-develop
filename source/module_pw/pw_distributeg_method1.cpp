@@ -50,14 +50,14 @@ void PW_Basis::distribution_method1()
         std::cout << "The first step done\n";
         std::cout << "tot_npw   " << tot_npw << '\n';
         std::cout << "this->nstot   " << this->nstot << '\n';
-        for (int ix = 0; ix < nx; ++ix)
-        {
-            for (int iy = 0; iy < ny; ++iy)
-            {
-                std::cout << st_length2D[ix * ny + iy] << std::setw(4);
-            }
-            std::cout << '\n';
-        }
+        // for (int ix = 0; ix < nx; ++ix)
+        // {
+        //     for (int iy = 0; iy < ny; ++iy)
+        //     {
+        //         std::cout << st_length2D[ix * ny + iy] << std::setw(4);
+        //     }
+        //     std::cout << '\n';
+        // }
         // ------------------------------------------------------------
 #ifdef __MPI
         // Parallel line
@@ -92,9 +92,9 @@ void PW_Basis::distribution_method1()
 
          // for test -----------------------------------------------------------------------------
         std::cout << "The 3-1 step done\n";
-        std::cout << "st_i    ";
-        for (int is = 0; is < this->nstot; ++is) cout << st_i[is] << setw(4) ;
-        std::cout << std::endl;
+        // std::cout << "st_i    ";
+        // for (int is = 0; is < this->nstot; ++is) cout << st_i[is] << setw(4) ;
+        // std::cout << std::endl;
         // --------------------------------------------------------------------------------------
 
         this->get_istot2bigixy(st_i, st_j);
@@ -263,7 +263,6 @@ void PW_Basis::collect_st(
                     temp_st_j[is] = y;
                     temp_st_length[is] = static_cast<double>(st_length2D[index]);
                     ++is;
-                    std::cout << "is   " << is << '\n'; 
                 }   
             }
         }
@@ -283,9 +282,9 @@ void PW_Basis::collect_st(
         st_i[istot] = temp_st_i[st_sorted_index[istot]];
         st_j[istot] = temp_st_j[st_sorted_index[istot]];
     }
-    std::cout << "st_length    ";
-    for (int is = 0; is < this->nstot; ++is) std::cout << st_length[is] << std::setw(4);
-    std::cout << "\n";
+    // std::cout << "st_length    ";
+    // for (int is = 0; is < this->nstot; ++is) std::cout << st_length[is] << std::setw(4);
+    // std::cout << "\n";
 
     delete[] temp_st_i;
     delete[] temp_st_j;
@@ -350,10 +349,10 @@ void PW_Basis::divide_sticks(
         this->ixy2ip[st_i[is] * this->ny + st_j[is]] = ipmin;
     }
     // for test --------------------------------------------------------------------------
-    for(int i = 0; i < this->poolnproc; ++i) std::cout<<this->nstnz_per[i]<<std::setw(4);
-    std::cout<<"\n";
-    for(int i = 0; i < this->poolnproc; ++i) std::cout<<nst_per[i]<<std::setw(4);
-    std::cout<<"\n";
+    // for(int i = 0; i < this->poolnproc; ++i) std::cout<<this->nstnz_per[i]<<std::setw(4);
+    // std::cout<<"\n";
+    // for(int i = 0; i < this->poolnproc; ++i) std::cout<<nst_per[i]<<std::setw(4);
+    // std::cout<<"\n";
     // -----------------------------------------------------------------------------------
     for (int ip = 1; ip < poolnproc; ++ip)
     {
