@@ -1,3 +1,4 @@
+#ifdef __MPI
 #include "../../src_parallel/parallel_global.h"
 #include "mpi.h"
 #include <iostream>
@@ -75,3 +76,4 @@ void divide_pools(const int &nproc, const int &myrank, int &nproc_in_pool, int &
     delete[] startpro_pool;
     return;
 }
+#endif

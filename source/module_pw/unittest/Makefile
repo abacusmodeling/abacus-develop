@@ -2,8 +2,7 @@
 #==========================
 # Compiler information 
 #==========================
-CPLUSPLUS     = icpc
-CPLUSPLUS_MPI = mpiicpc
+CPLUSPULS = mpiicpc
 CUDA_COMPILE = nvcc
 OBJ_DIR = pw_obj
 BIN_DIR = testbin
@@ -43,14 +42,16 @@ test_t2.exe
 
 FLOATFILE=testf2.exe\
 testf3.exe
-
+TESTFILE0 = ${DOUBLEFILE}
 
 #==========================
 # Options
 #==========================
+#No MPI
+# HONG = -D__NORMAL
+
 #Only MPI
 HONG = -D__MPI -D__NORMAL
-TESTFILE0 = ${DOUBLEFILE} 
 
 #Mix Precision
 # HONG = -D__MPI -D__MIX_PRECISION -D__NORMAL
@@ -61,6 +62,7 @@ TESTFILE0 = ${DOUBLEFILE}
 
 #Cuda & Mix Precision
 #HONG = -D__MPI -D__CUDA -D__MIX_PRECISION -D__NORMAL
+# TESTFILE0 = ${DOUBLEFILE} ${FLOATFILE}
 
 
 PW_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${PW_OBJS_0})
@@ -107,9 +109,9 @@ init :
 	@ if [ ! -d $(OBJ_DIR)/README ]; then echo "This directory contains all of the .o files" > $(OBJ_DIR)/README; fi
 
 ${BIN_DIR}/%.exe: %.cpp
-	${CPLUSPLUS_MPI} ${OPTS} $< test_tool.cpp ${PW_OBJS}  ${LIBS} -o $@
+	${CPLUSPULS} ${OPTS} $< test_tool.cpp ${PW_OBJS}  ${LIBS} -o $@
 ${OBJ_DIR}/%.o:%.cpp
-	${CPLUSPLUS_MPI} ${OPTS} -c ${HONG} $< -o $@
+	${CPLUSPULS} ${OPTS} -c ${HONG} $< -o $@
 
 .PHONY:clean
 clean:

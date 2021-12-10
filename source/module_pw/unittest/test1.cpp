@@ -1,6 +1,9 @@
 #include "../pw_basis.h"
 #include "../../src_parallel/parallel_global.h"
+#ifdef __MPI
 #include "test_tool.h"
+#include "mpi.h"
+#endif
 #include "../../module_base/timer.h"
 #include "../../module_base/global_function.h"
 
@@ -13,8 +16,13 @@ int main(int argc,char **argv)
     int nproc, myrank;
     int nproc_in_pool, npool, mypool, rank_in_pool;
     npool = 1;
+#ifdef __MPI
     setupmpi(argc,argv,nproc, myrank);
     divide_pools(nproc, myrank, nproc_in_pool, npool, mypool, rank_in_pool);
+#else
+    nproc = nproc_in_pool = npool = 1;
+    myrank = mypool = rank_in_pool = 0;
+#endif
 
     ModuleBase::timer::start();
 
@@ -25,14 +33,19 @@ int main(int argc,char **argv)
     pwtest.initparameters(gamma_only, ecut, nproc, rank_in_pool, distribution_type);
     pwtest.distribute_r();
     pwtest.distribute_g();
-    MPI_Barrier(POOL_WORLD);
 
     int tot_npw = 0;
     int nxy = pwtest.nx * pwtest.ny;
+#ifdef __MPI
     MPI_Reduce(&pwtest.npw, &tot_npw, 1, MPI_INT, MPI_SUM, 0, POOL_WORLD);
+#else
+    tot_npw = pwtest.npw;
+#endif
     for (int ip = 0; ip < nproc; ip++)
     {
+#ifdef __MPI
         MPI_Barrier(POOL_WORLD);
+#endif
         if (rank_in_pool == ip)
         {
             std::cout<<"ip:  "<<ip<<'\n';
@@ -58,11 +71,15 @@ int main(int argc,char **argv)
             std::cout << "\n";
         }
     }
+#ifdef __MPI
     MPI_Barrier(POOL_WORLD);
+#endif
     pwtest.collect_local_pw();
     for (int ip = 0; ip < nproc; ip++)
     {
+#ifdef __MPI
         MPI_Barrier(POOL_WORLD);
+#endif
         if (rank_in_pool == ip)
         {
             std::cout<<"ip:  "<<ip<<'\n';
@@ -80,23 +97,5 @@ int main(int argc,char **argv)
     }
     if(rank_in_pool==0) ModuleBase::timer::finish(GlobalV::ofs_running, true);
 
-    // if (rank_in_pool == 0)
-    // {
-    //     std::cout << "tot_npw   " << tot_npw << "\n";
-    //     double* gg_global = new double[tot_npw];
-    //     ModuleBase::Vector3<double> *gdirect_global = new ModuleBase::Vector3<double>[tot_npw];
-    //     ModuleBase::Vector3<double> *gcar_global = new ModuleBase::Vector3<double>[tot_npw];
-    //     pwtest.collect_tot_pw(gg_global, gdirect_global, gcar_global);
-    //     std::cout<<"gg_global    gdirect_global    gcar_global\n";
-    //     for (int ig = 0; ig < tot_npw; ++ig)
-    //     {
-    //         std::cout << gg_global[ig] << std::setw(4) << gdirect_global[ig] << std::setw(4) << gcar_global[ig];
-    //         std::cout << "\n";
-    //     }
-    //     std::cout<<"done"<<"\n";
-    //     delete[] gg_global;
-    //     delete[] gdirect_global;
-    //     delete[] gcar_global;
-    // }
     return 0;
 }

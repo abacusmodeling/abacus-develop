@@ -2,12 +2,15 @@
 // TEST for FFT
 //---------------------------------------------
 #include "../pw_basis.h"
+#include "../../src_parallel/parallel_global.h"
+#ifdef __MPI
 #include "test_tool.h"
+#include "mpi.h"
+#endif
 #include "../../module_base/constants.h"
 #include "../../module_base/global_function.h"
 #include <iostream>
 #include <iomanip>
-#include "mpi.h"
 #include "time.h"
 #include <gperftools/profiler.h>
 #include "../../module_base/timer.h"
@@ -33,8 +36,13 @@ int main(int argc,char **argv)
     //--------------------------------------------------
     
     //setup mpi
+#ifdef __MPI
     setupmpi(argc,argv,nproc, myrank);
     divide_pools(nproc, myrank, nproc_in_pool, npool, mypool, rank_in_pool);
+#else
+    nproc = nproc_in_pool = npool = 1;
+    myrank = mypool = rank_in_pool = 0;
+#endif
     //cout<<nproc<<" d "<<myrank<<" d "<<nproc_in_pool<<" "<<npool<<" "<<mypool<<" "<<rank_in_pool<<endl;
     // MPI_Barrier(MPI_COMM_WORLD);
     // if(myrank==0) ProfilerStart("test0.prof");
@@ -71,7 +79,9 @@ int main(int argc,char **argv)
     complex<double> * rhor = new complex<double> [nrxx];
 
     clock_t fftstart, fftend;
-    MPI_Barrier(MPI_COMM_WORLD);
+#ifdef __MPI
+        MPI_Barrier(POOL_WORLD);
+#endif
     fftstart = clock();
     
     for (int i = 0; i < 1000; ++i)
@@ -79,7 +89,9 @@ int main(int argc,char **argv)
         pwtest.recip2real(rhog,rhor);
     }
 
-    MPI_Barrier(MPI_COMM_WORLD);
+#ifdef __MPI
+        MPI_Barrier(POOL_WORLD);
+#endif
     fftend = clock();
     double fftduration = (double)(fftend - fftstart)/CLOCKS_PER_SEC;
 

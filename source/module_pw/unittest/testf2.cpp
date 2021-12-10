@@ -2,12 +2,14 @@
 // TEST for FFT
 //---------------------------------------------
 #include "../pw_basis.h"
+#ifdef __MPI
 #include "test_tool.h"
+#include "mpi.h"
+#endif
 #include "../../module_base/constants.h"
 #include "../../module_base/global_function.h"
 #include <iostream>
 #include <iomanip>
-#include "mpi.h"
 #include "../../module_base/timer.h"
 
 using namespace std;
@@ -31,8 +33,13 @@ int main(int argc,char **argv)
     //--------------------------------------------------
     
     //setup mpi
+#ifdef __MPI
     setupmpi(argc,argv,nproc, myrank);
     divide_pools(nproc, myrank, nproc_in_pool, npool, mypool, rank_in_pool);
+#else
+    nproc = nproc_in_pool = npool = 1;
+    myrank = mypool = rank_in_pool = 0;
+#endif
     //cout<<nproc<<" d "<<myrank<<" d "<<nproc_in_pool<<" "<<npool<<" "<<mypool<<" "<<rank_in_pool<<endl;
     ModuleBase::timer::start();
     
@@ -115,7 +122,9 @@ int main(int argc,char **argv)
     complex<float> * rhor = new complex<float> [nrxx];
     pwtest.recip2real(rhog,rhor);
     if(myrank == 0)     cout << "new pw module\n";
+#ifdef __MPI
     MPI_Barrier(MPI_COMM_WORLD);
+#endif
     for(int ixy = 0 ; ixy < nx * ny ; ixy+=5)
     {
         for(int ip = 0 ; ip < nproc ; ++ip)
@@ -127,7 +136,9 @@ int main(int argc,char **argv)
                 cout<<setprecision(5)<<setiosflags(ios::left)<<setw(30)<<rhor[ixy*nplane+iz];
             }
         }
-        MPI_Barrier(MPI_COMM_WORLD);            
+#ifdef __MPI
+    MPI_Barrier(MPI_COMM_WORLD);
+#endif          
         } 
     }
     
@@ -157,7 +168,9 @@ int main(int argc,char **argv)
     
     if(rank_in_pool==0) ModuleBase::timer::finish(GlobalV::ofs_running, true);
 
-    MPI_Barrier(MPI_COMM_WORLD);     
+#ifdef __MPI
+    MPI_Barrier(MPI_COMM_WORLD);
+#endif     
     delete [] rhog;
     delete [] rhor;
     if(tmp!=NULL) delete []tmp; 
