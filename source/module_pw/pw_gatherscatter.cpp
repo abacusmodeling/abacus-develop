@@ -1,5 +1,6 @@
 #include "pw_basis.h"
 #include "../module_base/global_function.h"
+#include "../module_base/timer.h"
 #ifdef __MPI
 #include "mpi.h"
 #include "../src_parallel/parallel_global.h"
@@ -13,6 +14,8 @@ namespace ModulePW
 //
 void PW_Basis:: gatherp_scatters(complex<double> *in, complex<double> *out)
 {
+    ModuleBase::timer::tick("PW_Basis", "gatherp_scatters");
+    
     if(this->poolnproc == 1) //In this case nst=nstot, nz = nplane, 
     {
         for(int is = 0 ; is < this->nst ; ++is)

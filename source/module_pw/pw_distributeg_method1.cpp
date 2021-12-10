@@ -3,6 +3,7 @@
 #include "../src_parallel/parallel_global.h"
 #include "../module_base/global_function.h"
 #include "iostream"
+#include "../module_base/timer.h"
 
 
 namespace ModulePW
@@ -24,6 +25,7 @@ namespace ModulePW
 //
 void PW_Basis::distribution_method1()
 {
+    ModuleBase::timer::tick("PW_Basis", "distributeg_method1");
 
     // initial the variables needed by all proc.
     int tot_npw = 0;                     // total number of planewaves.
@@ -186,7 +188,7 @@ void PW_Basis::distribution_method1()
     // for test ----------------------------------------------
     if (poolrank==0) std::cout << "The fifth step done\n";
     // -------------------------------------------------------
-
+    ModuleBase::timer::tick("PW_Basis", "distributeg_method1");
     return;
 }
 

@@ -3,6 +3,7 @@
 #include "pw_basis.h"
 #include <cassert>
 #include "../module_base/global_function.h"
+#include "../module_base/timer.h"
 
 namespace ModulePW
 {
@@ -14,6 +15,8 @@ namespace ModulePW
 //
 void PW_Basis:: real2recip(std::complex<double> * in, std::complex<double> * out)
 {
+    ModuleBase::timer::tick("PW_Basis", "real2recip");
+
     assert(this->gamma_only == false);
     for(int ir = 0 ; ir < this->nrxx ; ++ir)
     {
@@ -30,6 +33,7 @@ void PW_Basis:: real2recip(std::complex<double> * in, std::complex<double> * out
         out[ig] = this->ft.aux1[this->ig2isz[ig]];
     }
     return;
+    ModuleBase::timer::tick("PW_Basis", "real2recip");
 }
 
 //
@@ -39,6 +43,7 @@ void PW_Basis:: real2recip(std::complex<double> * in, std::complex<double> * out
 //
 void PW_Basis:: real2recip(double * in, std::complex<double> * out)
 {
+    ModuleBase::timer::tick("PW_Basis", "real2recip_gamma_only");
     assert(this->gamma_only == true);
     // for(int ir = 0 ; ir < this->nrxx ; ++ir)
     // {
@@ -64,6 +69,7 @@ void PW_Basis:: real2recip(double * in, std::complex<double> * out)
     {
         out[ig] = this->ft.aux1[this->ig2isz[ig]];
     }
+    ModuleBase::timer::tick("PW_Basis", "real2recip_gamma_only");
     return;
 }
 
@@ -74,6 +80,7 @@ void PW_Basis:: real2recip(double * in, std::complex<double> * out)
 //
 void PW_Basis:: recip2real(std::complex<double> * in, std::complex<double> * out)
 {
+    ModuleBase::timer::tick("PW_Basis", "recip2real");
     assert(this->gamma_only == false);
     ModuleBase::GlobalFunc::ZEROS(ft.aux1, this->nst * this->nz);
 
@@ -91,6 +98,7 @@ void PW_Basis:: recip2real(std::complex<double> * in, std::complex<double> * out
     {
         out[ir] = this->ft.aux1[ir] / double(this->bignxyz);
     }
+    ModuleBase::timer::tick("PW_Basis", "recip2real");
 
     return;
 }
@@ -102,6 +110,7 @@ void PW_Basis:: recip2real(std::complex<double> * in, std::complex<double> * out
 //
 void PW_Basis:: recip2real(std::complex<double> * in, double * out)
 {
+    ModuleBase::timer::tick("PW_Basis", "recip2real_gamma_only");
     assert(this->gamma_only == true);
     ModuleBase::GlobalFunc::ZEROS(ft.aux1, this->nst * this->nz);
 
@@ -129,6 +138,7 @@ void PW_Basis:: recip2real(std::complex<double> * in, double * out)
             out[ix*npy + ipy] = this->ft.r_rspace[ix*npy*2 + ipy] / double(this->bignxyz);
         }
     }
+    ModuleBase::timer::tick("PW_Basis", "recip2real_gamma_only");
     return;
 }
 
