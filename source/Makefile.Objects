@@ -245,6 +245,8 @@ read_rho.o\
 read_atoms.o\
 read_cell_pseudopots.o\
 read_dm.o\
+read_txt_tools.o\
+read_txt_stru.o\
 write_pot.o\
 write_rho.o\
 write_rho_cube.o\
