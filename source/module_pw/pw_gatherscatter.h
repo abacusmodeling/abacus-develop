@@ -14,7 +14,7 @@ namespace ModulePW
 //in[] will be changed
 //
 template<typename T>
-void PW_Basis:: gatherp_scatters(complex<T> *in, complex<T> *out)
+void PW_Basis:: gatherp_scatters(std::complex<T> *in, std::complex<T> *out)
 {
     ModuleBase::timer::tick("PW_Basis", "gatherp_scatters");
     
@@ -74,7 +74,7 @@ void PW_Basis:: gatherp_scatters(complex<T> *in, complex<T> *out)
 //in[] will be changed
 //
 template<typename T>
-void PW_Basis:: gathers_scatterp(complex<T> *in, complex<T> *out)
+void PW_Basis:: gathers_scatterp(std::complex<T> *in, std::complex<T> *out)
 {
     ModuleBase::timer::tick("PW_Basis", "gatherp_scatterp");
     
