@@ -49,11 +49,17 @@ TESTFILE0 = ${DOUBLEFILE}
 #==========================
 #No MPI
 # HONG = -D__NORMAL
+# CPLUSPULS = icpc
+
+#Mix Precision
+# HONG = -D__MIX_PRECISION -D__NORMAL
+# TESTFILE0 = ${DOUBLEFILE} ${FLOATFILE}
+# CPLUSPULS = icpc
 
 #Only MPI
 HONG = -D__MPI -D__NORMAL
 
-#Mix Precision
+#MPI + Mix Precision
 # HONG = -D__MPI -D__MIX_PRECISION -D__NORMAL
 # TESTFILE0 = ${DOUBLEFILE} ${FLOATFILE}
 
