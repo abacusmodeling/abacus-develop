@@ -6,23 +6,8 @@ CPLUSPLUS     = g++
 CPLUSPLUS_MPI = mpicxx
 CUDA_COMPILE = nvcc
 OBJ_DIR = pw_obj
+BIN_DIR = testbin
 NP      = 12
-
-#==========================
-# Options
-#==========================
-#Only MPI
-HONG = -D__MPI -D__NORMAL
-
-#Mix Precision
-#HONG = -D__MIX_PRECISION -D__NORMAL
-
-#Cuda
-#HONG = -D__MPI -D__CUDA -D__NORMAL
-
-#Cuda & Mix Precision
-#HONG = -D__MPI -D__CUDA -D__MIX_PRECISION -D__NORMAL
-
 #==========================
 # Objects
 #==========================
@@ -47,16 +32,48 @@ pw_distributeg_method1.o\
 pw_distributeg_method2.o\
 fft.o
 
+DOUBLEFILE=test1.exe\
+test2.exe\
+test3.exe\
+test2-1.exe\
+test2-2.exe\
+test2-3.exe\
+test_t1.exe\
+test_t2.exe
+
+FLOATFILE=testf2.exe\
+testf3.exe
+
+#==========================
+# Options
+#==========================
+#Only MPI
+# HONG = -D__MPI -D__NORMAL
+# TESTFILE0 = ${DOUBLEFILE} 
+
+#Mix Precision
+HONG = -D__MPI -D__MIX_PRECISION -D__NORMAL
+TESTFILE0 = ${DOUBLEFILE} ${FLOATFILE}
+
+#Cuda
+#HONG = -D__MPI -D__CUDA -D__NORMAL
+
+#Cuda & Mix Precision
+#HONG = -D__MPI -D__CUDA -D__MIX_PRECISION -D__NORMAL
+
+
 PW_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${PW_OBJS_0})
+TESTFILE=$(patsubst %.exe, ${BIN_DIR}/%.exe, ${TESTFILE0})
 
 ##==========================
 ## FFTW package needed 
 ##==========================
 #Use fftw package
-FFTW_DIR = /home/qianrui/gnucompile/g_fftw-3.3.8
+FFTW_DIR = /home/qianrui/gnucompile/g_fftw-3.3.8-mpi
 FFTW_LIB_DIR     = ${FFTW_DIR}/lib
 FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
-FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
+FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -lfftw3f -Wl,-rpath=${FFTW_LIB_DIR}
+# FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
 
 
 
@@ -76,37 +93,20 @@ OPTS = -I${FFTW_INCLUDE_DIR} ${HONG} -Ofast -std=c++11 -Wall -g
 #==========================
 pw : 
 	@ make init
-	@ make -j $(NP) parallel
+	@ make -j $(NP) ${PW_OBJS}
+	@ make -j $(NP) ${TESTFILE}
 
 init :
 	@ if [ ! -d $(OBJ_DIR) ]; then mkdir $(OBJ_DIR); fi
+	@ if [ ! -d $(BIN_DIR) ]; then mkdir $(BIN_DIR); fi
 	@ if [ ! -d $(OBJ_DIR)/README ]; then echo "This directory contains all of the .o files" > $(OBJ_DIR)/README; fi
 
-parallel : ${PW_OBJS}
-	${CPLUSPLUS_MPI} ${OPTS} test1.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test1.exe 
-	${CPLUSPLUS_MPI} ${OPTS} test2.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test2.exe 
-	${CPLUSPLUS_MPI} ${OPTS} test3.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test3.exe 
-	${CPLUSPLUS_MPI} ${OPTS} test2-1.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test2-1.exe 
-	${CPLUSPLUS_MPI} ${OPTS} test2-2.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test2-2.exe 
-	${CPLUSPLUS_MPI} ${OPTS} test2-3.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test2-3.exe 
-	${CPLUSPLUS_MPI} ${OPTS} test_t1.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test_t1.exe 
-	${CPLUSPLUS_MPI} ${OPTS} test_t2.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test_t2.exe 
-	${CPLUSPLUS_MPI} ${OPTS} testf2.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o testf2.exe 
-	${CPLUSPLUS_MPI} ${OPTS} testf3.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o testf3.exe 
-
+${BIN_DIR}/%.exe: %.cpp
+	${CPLUSPLUS_MPI} ${OPTS} $< test_tool.cpp ${PW_OBJS}  ${LIBS} -o $@
 ${OBJ_DIR}/%.o:%.cpp
 	${CPLUSPLUS_MPI} ${OPTS} -c ${HONG} $< -o $@
 
 .PHONY:clean
 clean:
 	@ if [ -d $(OBJ_DIR) ]; then rm -rf $(OBJ_DIR); fi
-	@ if [ -e test1.exe ]; then rm -f test1.exe; fi
-	@ if [ -e test2.exe ]; then rm -f test2.exe; fi
-	@ if [ -e test3.exe ]; then rm -f test3.exe; fi
-	@ if [ -e test2-1.exe ]; then rm -f test2-1.exe; fi
-	@ if [ -e test2-2.exe ]; then rm -f test2-2.exe; fi
-	@ if [ -e test2-3.exe ]; then rm -f test2-3.exe; fi
-	@ if [ -e test_t1.exe ]; then rm -f test_t1.exe; fi
-	@ if [ -e test_t2.exe ]; then rm -f test_t2.exe; fi
-	@ if [ -e testf2.exe ]; then rm -f testf2.exe; fi
-	@ if [ -e testf3.exe ]; then rm -f testf3.exe; fi
+	@ if [ -d $(BIN_DIR) ]; then rm -rf $(BIN_DIR); fi
