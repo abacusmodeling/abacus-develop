@@ -1,6 +1,8 @@
 #include "../pw_basis.h"
 #include "../../src_parallel/parallel_global.h"
 #include "test_tool.h"
+#include "../../module_base/timer.h"
+#include "../../module_base/global_function.h"
 
 int main(int argc,char **argv)
 {
@@ -13,6 +15,8 @@ int main(int argc,char **argv)
     npool = 1;
     setupmpi(argc,argv,nproc, myrank);
     divide_pools(nproc, myrank, nproc_in_pool, npool, mypool, rank_in_pool);
+
+    ModuleBase::timer::start();
 
     int distribution_type = 2;
     ModulePW::PW_Basis pwtest;
@@ -74,6 +78,7 @@ int main(int argc,char **argv)
             std::cout << "\n";
         }
     }
+    if(rank_in_pool==0) ModuleBase::timer::finish(GlobalV::ofs_running, true);
 
     // if (rank_in_pool == 0)
     // {

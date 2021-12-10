@@ -1,5 +1,6 @@
 #include "./pw_basis.h"
 #include "../module_base/constants.h"
+#include "../module_base/timer.h"
 
 namespace ModulePW
 {
@@ -14,6 +15,7 @@ void PW_Basis:: initgrids(
         double gridecut
 )
 {
+    // ModuleBase::timer::start();
     //init latice
     this->lat0 = lat0_in;
     this->latvec = latvec_in;

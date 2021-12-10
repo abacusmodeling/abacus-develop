@@ -10,6 +10,7 @@
 #include "mpi.h"
 #include "time.h"
 #include <gperftools/profiler.h>
+#include "../../module_base/timer.h"
 
 using namespace std;
 int main(int argc,char **argv)
@@ -30,7 +31,7 @@ int main(int argc,char **argv)
     npool = 1;
     gamma_only = true;
     //--------------------------------------------------
-    
+
     //setup mpi
     setupmpi(argc,argv,nproc, myrank);
     divide_pools(nproc, myrank, nproc_in_pool, npool, mypool, rank_in_pool);
@@ -39,6 +40,7 @@ int main(int argc,char **argv)
     // if(myrank==0) ProfilerStart("test0.prof");
     // if(myrank==1) ProfilerStart("test1.prof");
     
+    ModuleBase::timer::start();
     //init
     pwtest.initgrids(lat0,latvec,wfcecut);
     //pwtest.initgrids(lat0,latvec,5,7,7);
@@ -83,6 +85,8 @@ int main(int argc,char **argv)
 
     cout<<"\n";
     cout<<"spend "<<fftduration<<"s\n";
+   
+    if(rank_in_pool==0) ModuleBase::timer::finish(GlobalV::ofs_running, true);
    
     if(tmp!=NULL) delete []tmp; 
     // MPI_Barrier(MPI_COMM_WORLD);

@@ -1,6 +1,10 @@
 #include "pw_basis.h"
 #include "../module_base/mymath.h"
 #include <iostream>
+#include "../module_base/memory.h"
+#include "../module_base/timer.h"
+#include "../module_base/global_function.h"
+
 
 namespace ModulePW
 {
