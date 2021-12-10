@@ -45,6 +45,7 @@ pw_init.o\
 pw_transform.o\
 pw_distributeg.o\
 pw_distributeg_method1.o\
+pw_distributeg_method2.o\
 fft.o
 
 PW_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${PW_OBJS_0})
@@ -69,6 +70,7 @@ FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
 # CUDA_LIB			= -L${CUDA_LIB_DIR} -lcufft -lcublas -lcudart
 
 LIBS = ${FFTW_LIB} ${CUDA_LIB}
+#LIBS = ${FFTW_LIB} ${CUDA_LIB} -ltcmalloc -lprofiler
 OPTS = -I${FFTW_INCLUDE_DIR} ${HONG} -Ofast -std=c++11 -Wall -g 
 #==========================
 # MAKING OPTIONS
@@ -85,6 +87,11 @@ parallel : ${PW_OBJS}
 	${CPLUSPLUS_MPI} ${OPTS} test1.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test1.exe 
 	${CPLUSPLUS_MPI} ${OPTS} test2.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test2.exe 
 	${CPLUSPLUS_MPI} ${OPTS} test3.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test3.exe 
+	${CPLUSPLUS_MPI} ${OPTS} test2-1.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test2-1.exe 
+	${CPLUSPLUS_MPI} ${OPTS} test2-2.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test2-2.exe 
+	${CPLUSPLUS_MPI} ${OPTS} test2-3.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test2-3.exe 
+	${CPLUSPLUS_MPI} ${OPTS} test_t1.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test_t1.exe 
+	${CPLUSPLUS_MPI} ${OPTS} test_t2.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test_t2.exe 
 
 ${OBJ_DIR}/%.o:%.cpp
 	${CPLUSPLUS_MPI} ${OPTS} -c ${HONG} $< -o $@
@@ -95,3 +102,8 @@ clean:
 	@ if [ -e test1.exe ]; then rm -f test1.exe; fi
 	@ if [ -e test2.exe ]; then rm -f test2.exe; fi
 	@ if [ -e test3.exe ]; then rm -f test3.exe; fi
+	@ if [ -e test2-1.exe ]; then rm -f test2-1.exe; fi
+	@ if [ -e test2-2.exe ]; then rm -f test2-2.exe; fi
+	@ if [ -e test2-3.exe ]; then rm -f test2-3.exe; fi
+	@ if [ -e test_t1.exe ]; then rm -f test_t1.exe; fi
+	@ if [ -e test_t2.exe ]; then rm -f test_t2.exe; fi

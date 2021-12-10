@@ -40,7 +40,7 @@ int main(int argc,char **argv)
                 std::cout << "\nstartnsz_per ";
                 for (int ip = 0; ip < nproc; ip++) std::cout << pwtest.startnsz_per[ip] << std::setw(4);
                 std::cout << "\nistot2ixy ";
-                for (int is = 0; is < pwtest.nstot; is++) std::cout << pwtest.istot2ixy[is] << std::setw(4);
+                for (int is = 0; is < pwtest.nstot; is++) std::cout << pwtest.istot2bigixy[is] << std::setw(4);
                 std::cout << "\nixy2istot ";
                 for (int ixy = 0; ixy < nxy; ixy++) std::cout << pwtest.ixy2istot[ixy] << std::setw(4);
                 std::cout << "\nixy2ip ";

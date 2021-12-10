@@ -27,11 +27,18 @@ public:
 
 	FFT();
 	~FFT();
-	void initfft(int nx_in, int bigny_in, int nz_in, int ns_in, int nplane_in, bool gamma_only_in, bool mpifft_in = false);
+	void initfft(int nx_in, int bigny_in, int nz_in, int liy_in, int riy_in, int ns_in, int nplane_in, 
+				 int nproc_in, bool gamma_only_in, bool mpifft_in = false);
 	void setupFFT();
 	void cleanFFT();
 
-	void executefftw(std::string instr);
+	void fftzfor(std::complex<double>* & in, std::complex<double>* & out);
+	void fftzbac(std::complex<double>* & in, std::complex<double>* & out);
+	void fftxyfor(std::complex<double>* & in, std::complex<double>* & out);
+	void fftxybac(std::complex<double>* & in, std::complex<double>* & out);
+	void fftxyr2c(double * &in, std::complex<double>* & out);
+	void fftxyc2r(std::complex<double>* & in, double* & out);
+
 #ifdef __MIX_PRECISION
 	void executefftwf(std::string instr);
 #endif
@@ -49,10 +56,12 @@ public:
 	int nxy;
 	int bigny;
 	int bignxy;
+	int liy,riy;// liy: the left edge of the pw ball in the y direction; riy: the right edge of the pw ball in the y direction
 	int ns; //number of sticks
 	int nplane; //number of x-y planes
-	std::complex<double> * c_gspace, *c_gspace2; //complex number space for g, [ns * nz]
-	std::complex<double> * c_rspace, *c_rspace2;//complex number space for r, [nplane * nx *ny]
+	int maxgrids; // max between nz * ns and bignxy * nplane
+	int nproc; // number of proc.
+	std::complex<double> *aux1, *aux2; //fft space, [maxgrids]
 	double *r_rspace; //real number space for r, [nplane * nx *ny]
 #ifdef __MIX_PRECISION
 	std::complex<float> * cf_gspace; //complex number space for g, [ns * nz]
@@ -65,12 +74,20 @@ private:
 	bool gamma_only;
 	bool destroyp;
 	bool mpifft; // if use mpi fft, only used when define __FFTW3_MPI
-	fftw_plan plan2r2c;
-	fftw_plan plan2c2r;
-	fftw_plan plan1for;
-	fftw_plan plan1bac;
-	fftw_plan plan2for;
-	fftw_plan plan2bac;
+	// fftw_plan plan2r2c;
+	// fftw_plan plan2c2r;
+	// fftw_plan plan1for;
+	// fftw_plan plan1bac;
+	// fftw_plan plan2for;
+	// fftw_plan plan2bac;
+	fftw_plan planzfor;
+	fftw_plan planzbac;
+	fftw_plan planxfor;
+	fftw_plan planxbac;
+	fftw_plan planyfor;
+	fftw_plan planybac;
+	fftw_plan planyr2c;
+	fftw_plan planyc2r;
 #ifdef __MIX_PRECISION
 	bool destroypf;
 	fftwf_plan planf2r2c;

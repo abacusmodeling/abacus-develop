@@ -72,6 +72,7 @@ FFTW_LIB = -Wl,--start-group -lmkl_intel_lp64  -lmkl_core -lmkl_intel_thread -Wl
 # CUDA_LIB_DIR		= ${CUDA_DIR}/lib64
 # CUDA_LIB			= -L${CUDA_LIB_DIR} -lcufft -lcublas -lcudart
 
+#LIBS = ${FFTW_LIB} ${CUDA_LIB} -ltcmalloc -lprofiler
 LIBS = ${FFTW_LIB} ${CUDA_LIB}
 OPTS = -I${FFTW_INCLUDE_DIR} ${HONG} -Ofast -std=c++11 -simd -m64 -qopenmp -Wall -pedantic -g
 
@@ -93,6 +94,8 @@ parallel : ${PW_OBJS}
 	${CPLUSPLUS_MPI} ${OPTS} test2-1.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test2-1.exe 
 	${CPLUSPLUS_MPI} ${OPTS} test2-2.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test2-2.exe 
 	${CPLUSPLUS_MPI} ${OPTS} test2-3.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test2-3.exe 
+	${CPLUSPLUS_MPI} ${OPTS} test_t1.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test_t1.exe 
+	${CPLUSPLUS_MPI} ${OPTS} test_t2.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o test_t2.exe 
 
 ${OBJ_DIR}/%.o:%.cpp
 	${CPLUSPLUS_MPI} ${OPTS} -c ${HONG} $< -o $@
@@ -106,3 +109,5 @@ clean:
 	@ if [ -e test2-1.exe ]; then rm -f test2-1.exe; fi
 	@ if [ -e test2-2.exe ]; then rm -f test2-2.exe; fi
 	@ if [ -e test2-3.exe ]; then rm -f test2-3.exe; fi
+	@ if [ -e test_t1.exe ]; then rm -f test_t1.exe; fi
+	@ if [ -e test_t2.exe ]; then rm -f test_t2.exe; fi

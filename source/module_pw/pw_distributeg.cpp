@@ -54,6 +54,7 @@ void PW_Basis::count_pw_st(
         iy_start = 0;
         iy_end = this->ny - 1;
     }
+    this->liy = this->riy = 0;
     for (int ix = -ibox[0]; ix <= ibox[0]; ++ix)
     {
         for (int iy = iy_start; iy <= iy_end; ++iy)
@@ -81,6 +82,8 @@ void PW_Basis::count_pw_st(
                     if (length == 0) st_bottom2D[index] = iz; // length == 0 means this point is the bottom of stick (x, y).
                     ++tot_npw;
                     ++length;
+                    if(iy < this->riy) this->riy = iy;
+                    if(iy > this->liy) this->liy = iy;
                 }
             }
             if (length > 0)
@@ -90,6 +93,8 @@ void PW_Basis::count_pw_st(
             }
         }
     }
+    riy += this->ny;
+    std::cout<<"liy "<<liy<<" ; riy "<<riy<<std::endl;
     return;
 }
 

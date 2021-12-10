@@ -17,17 +17,17 @@ void PW_Basis:: real2recip(std::complex<double> * in, std::complex<double> * out
     assert(this->gamma_only == false);
     for(int ir = 0 ; ir < this->nrxx ; ++ir)
     {
-        this->ft.c_rspace[ir] = in[ir];
+        this->ft.aux1[ir] = in[ir];
     }
-    this->ft.executefftw("2for");
+    this->ft.fftxyfor(ft.aux1,ft.aux1);
 
-    this->gatherp_scatters(this->ft.c_rspace2, this->ft.c_gspace);
+    this->gatherp_scatters(this->ft.aux1, this->ft.aux2);
     
-    this->ft.executefftw("1for");
+    this->ft.fftzfor(ft.aux2,ft.aux1);
 
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
-        out[ig] = this->ft.c_gspace2[this->ig2isz[ig]];
+        out[ig] = this->ft.aux1[this->ig2isz[ig]];
     }
     return;
 }
@@ -40,19 +40,29 @@ void PW_Basis:: real2recip(std::complex<double> * in, std::complex<double> * out
 void PW_Basis:: real2recip(double * in, std::complex<double> * out)
 {
     assert(this->gamma_only == true);
-    for(int ir = 0 ; ir < this->nrxx ; ++ir)
+    // for(int ir = 0 ; ir < this->nrxx ; ++ir)
+    // {
+    //     this->ft.r_rspace[ir] = in[ir];
+    // }
+    // r2c in place
+    int npy = this->bigny * this->nplane;
+    for(int ix = 0 ; ix < this->nx ; ++ix)
     {
-        this->ft.r_rspace[ir] = in[ir];
+        for(int ipy = 0 ; ipy < npy ; ++ipy)
+        {
+            this->ft.r_rspace[ix*npy*2 + ipy] = in[ix*npy + ipy];
+        }
     }
-    this->ft.executefftw("2r2c");
 
-    this->gatherp_scatters(this->ft.c_rspace, this->ft.c_gspace);
+    this->ft.fftxyr2c(ft.r_rspace,ft.aux1);
+
+    this->gatherp_scatters(this->ft.aux1, this->ft.aux2);
     
-    this->ft.executefftw("1for");
+    this->ft.fftzfor(ft.aux2,ft.aux1);
 
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
-        out[ig] = this->ft.c_gspace2[this->ig2isz[ig]];
+        out[ig] = this->ft.aux1[this->ig2isz[ig]];
     }
     return;
 }
@@ -65,22 +75,23 @@ void PW_Basis:: real2recip(double * in, std::complex<double> * out)
 void PW_Basis:: recip2real(std::complex<double> * in, std::complex<double> * out)
 {
     assert(this->gamma_only == false);
-    ModuleBase::GlobalFunc::ZEROS(ft.c_gspace, this->nst * this->nz);
+    ModuleBase::GlobalFunc::ZEROS(ft.aux1, this->nst * this->nz);
 
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
-        this->ft.c_gspace[this->ig2isz[ig]] = in[ig];
+        this->ft.aux1[this->ig2isz[ig]] = in[ig];
     }
-    this->ft.executefftw("1bac");
+    this->ft.fftzbac(ft.aux1, ft.aux2);
 
-    this->gathers_scatterp(this->ft.c_gspace2,this->ft.c_rspace);
+    this->gathers_scatterp(this->ft.aux2,this->ft.aux1);
 
-    this->ft.executefftw("2bac");
-
+    this->ft.fftxybac(ft.aux1,ft.aux1);
+    
     for(int ir = 0 ; ir < this->nrxx ; ++ir)
     {
-        out[ir] = this->ft.c_rspace2[ir] / double(this->bignxyz);
+        out[ir] = this->ft.aux1[ir] / double(this->bignxyz);
     }
+
     return;
 }
 
@@ -92,21 +103,31 @@ void PW_Basis:: recip2real(std::complex<double> * in, std::complex<double> * out
 void PW_Basis:: recip2real(std::complex<double> * in, double * out)
 {
     assert(this->gamma_only == true);
-    ModuleBase::GlobalFunc::ZEROS(ft.c_gspace, this->nst * this->nz);
+    ModuleBase::GlobalFunc::ZEROS(ft.aux1, this->nst * this->nz);
 
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
-        this->ft.c_gspace[this->ig2isz[ig]] = in[ig];
+        this->ft.aux1[this->ig2isz[ig]] = in[ig];
     }
-    this->ft.executefftw("1bac");
+   this->ft.fftzbac(ft.aux1, ft.aux2);
     
-    this->gathers_scatterp(this->ft.c_gspace2, this->ft.c_rspace);
+    this->gathers_scatterp(this->ft.aux2, this->ft.aux1);
 
-    this->ft.executefftw("2c2r");
+    this->ft.fftxyc2r(ft.aux1,ft.r_rspace);
 
-    for(int ir = 0 ; ir < this->nrxx ; ++ir)
+    // for(int ir = 0 ; ir < this->nrxx ; ++ir)
+    // {
+    //     out[ir] = this->ft.r_rspace[ir] / this->bignxyz;
+    // }
+
+    // r2c in place
+    int npy = this->bigny * this->nplane;
+    for(int ix = 0 ; ix < this->nx ; ++ix)
     {
-        out[ir] = this->ft.r_rspace[ir] / this->bignxyz;
+        for(int ipy = 0 ; ipy < npy ; ++ipy)
+        {
+            out[ix*npy + ipy] = this->ft.r_rspace[ix*npy*2 + ipy] / double(this->bignxyz);
+        }
     }
     return;
 }

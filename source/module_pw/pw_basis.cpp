@@ -8,17 +8,22 @@ namespace ModulePW
 PW_Basis::PW_Basis()
 {
     ig2isz = NULL;
-    istot2ixy = NULL;   
+    istot2bigixy = NULL;   
     ixy2istot = NULL;
     is2ixy = NULL;
     ixy2ip = NULL; 
     startnsz_per = NULL;
     nstnz_per = NULL;
+    nst_per = NULL;
     gdirect = NULL;		
     gcar = NULL; 
     gg = NULL;
     startz = NULL;
     numz = NULL;  
+    this->numg = NULL;
+	this->startg = NULL;
+	this->startr = NULL;
+	this->numr = NULL;
     poolnproc = 1;
     poolrank = 0;
 }
@@ -26,25 +31,66 @@ PW_Basis::PW_Basis()
 PW_Basis:: ~PW_Basis()
 {
     if(ig2isz != NULL) delete[] ig2isz;
-    if(istot2ixy != NULL) delete[] istot2ixy;
+    if(istot2bigixy != NULL) delete[] istot2bigixy;
     if(ixy2istot != NULL) delete[] ixy2istot;
     if(is2ixy != NULL) delete[] is2ixy;
     if(ixy2ip != NULL) delete[] ixy2ip;
     if(startnsz_per != NULL) delete[] startnsz_per;
     if(nstnz_per != NULL) delete[] nstnz_per;
+    if(nst_per != NULL) delete[] nst_per;
     if(gdirect != NULL) delete[] gdirect;
     if(gcar != NULL) delete[] gcar;
     if(gg != NULL) delete[] gg;
     if(startz != NULL) delete[] startz;
     if(numz != NULL) delete[] numz;
+    if(numg != NULL) delete[] numg;
+    if(numr != NULL) delete[] numr;
+    if(startg != NULL) delete[] startg;
+    if(startr != NULL) delete[] startr;
 }
 
 void PW_Basis::setuptransform()
 {
     this->distribute_r();
     this->distribute_g();
-    this->ft.initfft(this->nx,this->bigny,this->nz,this->nst,this->nplane,this->gamma_only);
+    this->getstartgr();
+    this->ft.initfft(this->nx,this->bigny,this->nz,this->liy,this->riy,this->nst,this->nplane,this->poolnproc,this->gamma_only);
     this->ft.setupFFT();
+}
+
+void PW_Basis::getstartgr()
+{
+    this->maxgrids = (this->nz * this->nst > this->bignxy * nplane) ? this->nz * this->nst : this->bignxy * nplane;
+    
+    //---------------------------------------------
+	// sum : starting plane of FFT box.
+	//---------------------------------------------
+    this->numg = new int[poolnproc];
+	this->startg = new int[poolnproc];
+	this->startr = new int[poolnproc];
+	this->numr = new int[poolnproc];
+
+	// Each processor has a set of full sticks,
+	// 'rank_use' processor send a piece(npps[ip]) of these sticks(nst_per[rank_use])
+	// to all the other processors in this pool
+	for (int ip = 0;ip < poolnproc; ++ip) this->numg[ip] = this->nst_per[poolrank] * this->numz[ip];
+
+
+	// Each processor in a pool send a piece of each stick(nst_per[ip]) to
+	// other processors in this pool
+	// rank_use processor receive datas in npps[rank_p] planes.
+	for (int ip = 0;ip < poolnproc; ++ip) this->numr[ip] = this->nst_per[ip] * this->numz[poolrank];
+
+
+	// startg record the starting 'numg' position in each processor.
+	this->startg[0] = 0;
+	for (int ip = 1;ip < poolnproc; ++ip) this->startg[ip] = this->startg[ip-1] + this->numg[ip-1];
+
+
+	// startr record the starting 'numr' position
+	this->startr[0] = 0;
+	for (int ip = 1;ip < poolnproc; ++ip) this->startr[ip] = this->startr[ip-1] + this->numr[ip-1];
+    return;
 }
 
 //
