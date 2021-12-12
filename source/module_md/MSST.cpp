@@ -35,7 +35,7 @@ void MSST::setup()
 
     int sd = mdp.direction;
 
-    MD_func::force_virial(mdp, ucell, potential, force, virial);
+    MD_func::force_virial(step_, mdp, ucell, potential, force, virial);
     MD_func::kinetic_stress(ucell, vel, allmass, kinetic, stress);
     stress += virial;
 
@@ -168,7 +168,7 @@ void MSST::write_restart()
 		ssc << GlobalV::global_out_dir << "Restart_md.dat";
 		std::ofstream file(ssc.str().c_str());
 
-        file << step_ << std::endl;
+        file << step_ + step_rst_ << std::endl;
 		file << omega[mdp.direction] << std::endl;
         file << e0 << std::endl;
         file << v0 << std::endl;
@@ -209,8 +209,6 @@ void MSST::restart()
     MPI_Bcast(&p0, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(&lag_pos, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 #endif
-
-    step_ = step_rst_;
 }
 
 double MSST::extra_term()

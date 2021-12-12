@@ -38,6 +38,7 @@ class MD_func
 		ModuleBase::Vector3<double>* vel);
 
 	static void force_virial(
+		const int &istep,
 		const MD_parameters &mdp,
 		const UnitCell_pseudo &unit_in,
 		double &potential,

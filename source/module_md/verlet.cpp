@@ -49,7 +49,7 @@ void Verlet::setup()
         restart();
     }
 
-    MD_func::force_virial(mdp, ucell, potential, force, virial);
+    MD_func::force_virial(step_, mdp, ucell, potential, force, virial);
     MD_func::kinetic_stress(ucell, vel, allmass, kinetic, stress);
     stress += virial;
 
@@ -94,7 +94,7 @@ void Verlet::outputMD()
     if(GlobalV::MY_RANK) return;
 
 	std::ofstream ofs;
-	if(step_ == step_rst_)
+	if(step_ + step_rst_ == 0)
 	{
 		ofs.open("run.log", ios::trunc);
 	}
@@ -112,7 +112,7 @@ void Verlet::outputMD()
         press += stress(i,i)/3;
     }
 
-    std::cout << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed);
+    // std::cout << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed);
     std::cout << " " << std::left << std::setw(20) << "Energy" 
             << std::left << std::setw(20) << "Potential" 
             << std::left << std::setw(20) << "Kinetic" 
@@ -126,7 +126,7 @@ void Verlet::outputMD()
 	std::cout << " ------------------------------------------------------------" << std::endl;
     MD_func::outStress(virial, stress);
 
-    if(step_ == step_rst_)
+    if(step_ == 0)
 	{
 		ofs << std::left << std::setw(20) << "Step" 
             << std::left << std::setw(20) << "Energy" 
@@ -135,7 +135,7 @@ void Verlet::outputMD()
             << std::left << std::setw(20) << "Temperature" 
             << std::left << std::setw(20) << "Pressure (KBAR)" <<std::endl;
 	}
-    ofs << std::left << std::setw(20) << step_
+    ofs << std::left << std::setw(20) << step_ + step_rst_
         << std::left << std::setw(20) << potential+kinetic
         << std::left << std::setw(20) << potential
         << std::left << std::setw(20) << kinetic
@@ -152,7 +152,7 @@ void Verlet::write_restart()
 		ssc << GlobalV::global_out_dir << "Restart_md.dat";
 		std::ofstream file(ssc.str().c_str());
 
-        file << step_ << std::endl;
+        file << step_ + step_rst_ << std::endl;
 		file.close();
 	}
 #ifdef __MPI
@@ -182,6 +182,4 @@ void Verlet::restart()
 #ifdef __MPI
 	MPI_Bcast(&step_rst_, 1, MPI_INT, 0, MPI_COMM_WORLD);
 #endif
-
-    step_ = step_rst_;
 }

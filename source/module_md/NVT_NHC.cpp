@@ -95,7 +95,7 @@ void NVT_NHC::write_restart()
 		ssc << GlobalV::global_out_dir << "Restart_md.dat";
 		std::ofstream file(ssc.str().c_str());
 
-        file << step_ << std::endl;
+        file << step_ + step_rst_ << std::endl;
         file << mdp.MNHC << std::endl;
         for(int i=0; i<mdp.MNHC; ++i)
         {
@@ -150,8 +150,6 @@ void NVT_NHC::restart()
     MPI_Bcast(eta, mdp.MNHC, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(veta, mdp.MNHC, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 #endif
-
-    step_ = step_rst_;
 }
 
 void NVT_NHC::integrate()
