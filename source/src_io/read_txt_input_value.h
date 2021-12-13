@@ -23,9 +23,9 @@ namespace Read_Txt_Input
 		void sets(const std::string &s_in);
 
 	private:
-		bool b;
-		int i;
-		double d;
+		bool b = false;
+		int i = 0;
+		double d = 0.0;
 		std::string s;
 
 #ifdef USE_CEREAL_SERIALIZATION

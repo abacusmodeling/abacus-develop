@@ -1,5 +1,6 @@
 #include "read_txt_input_value.h"
 
+#include "src_io/read_txt_tools.h"
 #include <stdexcept>
 
 namespace Read_Txt_Input
@@ -30,16 +31,28 @@ namespace Read_Txt_Input
 	
 	void Input_Value::sets(const std::string &s_in)
 	{
-		try
+		this->s = s_in;
+		if(Read_Txt_Tools::in_set(s_in, Read_Txt_Tools::Preset::True))
 		{
-			this->s = s_in;
-			this->d = std::stod(s_in);
-			this->i = std::stoi(s_in);
-			this->b = static_cast<bool>(std::stoi(s_in));
+			this->b = true;
+			this->i = 1;
+			this->d = 1.0;
 		}
-		catch(const std::invalid_argument &e)
+		else if(Read_Txt_Tools::in_set(s_in, Read_Txt_Tools::Preset::False))
 		{
-			this->s = s_in;
+			this->b = false;
+			this->i = 0;
+			this->d = 0.0;
+		}
+		else
+		{
+			try
+			{
+				this->d = std::stod(s_in);
+				this->i = std::stoi(s_in);
+				this->b = static_cast<bool>(std::stoi(s_in));
+			}
+			catch(const std::invalid_argument &e){}
 		}
 	}
 }

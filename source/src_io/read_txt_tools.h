@@ -69,7 +69,14 @@ namespace Read_Txt_Tools
 	bool in_set(const T &value, const std::set<T> &set_check)
 	{
 		return set_check.find(value)!=set_check.end();
-	}	
+	}
+
+	namespace Preset
+	{
+		const std::set<std::string> True = {"1","T","t","TRUE","True","true"};
+		const std::set<std::string> False = {"0","F","f","FALSE","False","false"};
+		const std::set<std::string> Bool = {"1","T","t","TRUE","True","true","0","F","f","FALSE","False","false"};
+	}
 }
 
 #endif

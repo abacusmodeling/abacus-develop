@@ -18,7 +18,7 @@ namespace Read_Txt_Input
 			item.check_transform = [](Input_Item &self)
 			{
 				Input_List::check_value_size(self, 1);
-				if(!Read_Txt_Tools::in_set(self.values[0].gets(), {"1","2","4"}))
+				if(!Read_Txt_Tools::in_set(self.values[0].geti(), {1,2,4}))
 					throw std::invalid_argument("nspin must be 1,2,4");
 			};
 			item.convert = [](const Input_Item &self)
@@ -41,6 +41,23 @@ namespace Read_Txt_Input
 			item.convert = [](const Input_Item &self)
 			{
 				GlobalC::ucell.ntype = self.values[0].geti();
+			};
+			this->add_item(item);
+		}
+
+		{
+			Input_Item item("symmetry");
+			item.default_1(false);
+			item.annotation = "turn symmetry on or off";
+			item.check_transform = [](Input_Item &self)
+			{
+				Input_List::check_value_size(self, 1);
+				if(!Read_Txt_Tools::in_set( self.values[0].gets(), Read_Txt_Tools::Preset::Bool))
+					throw std::invalid_argument("symmetry must be bool");
+			};
+			item.convert = [](const Input_Item &self)
+			{
+				ModuleSymmetry::Symmetry::symm_flag = self.values[0].getb();
 			};
 			this->add_item(item);
 		}
