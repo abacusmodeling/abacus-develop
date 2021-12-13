@@ -42,6 +42,7 @@ namespace Read_Txt_Input
 		std::string label;
 		int value_read_size = -1;
 		friend class Input_List;
+		friend class Input_Process;
 
 #ifdef USE_CEREAL_SERIALIZATION
 	public:

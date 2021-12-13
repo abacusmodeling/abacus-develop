@@ -249,6 +249,7 @@ read_txt_tools.o\
 read_txt_stru.o\
 read_txt_input.o\
 read_txt_input_list.o\
+read_txt_input_process.o\
 read_txt_input-general.o\
 read_txt_input-pw.o\
 write_pot.o\
