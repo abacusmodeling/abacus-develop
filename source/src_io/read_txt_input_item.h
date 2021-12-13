@@ -1,3 +1,8 @@
+//=======================
+// AUTHOR : Peize Lin
+// DATE :   2021-12-13
+//=======================
+
 #ifndef READ_TXT_INPUT_ITEM_H
 #define READ_TXT_INPUT_ITEM_H
 
@@ -37,7 +42,7 @@ namespace Read_Txt_Input
 
 	private:
 		std::string label;
-		int value_read_size = -1;
+		//int value_read_size = -1;
 
 		friend class Input_List;
 		friend class Input_Process;

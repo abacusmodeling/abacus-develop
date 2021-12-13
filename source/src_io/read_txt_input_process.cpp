@@ -1,3 +1,8 @@
+//=======================
+// AUTHOR : Peize Lin
+// DATE :   2021-12-13
+//=======================
+
 #include "read_txt_input_process.h"
 
 #include "src_io/read_txt_tools.h"
@@ -35,11 +40,16 @@ namespace Read_Txt_Input
 			const auto ptr = input.list.find(input_read.first);
 			if(ptr==input.list.end())
 				throw std::out_of_range("input_read.first");
-			if(input_read.second.size() > ptr->second.values.size())
-				throw std::out_of_range("size error");
+
+			//if(input_read.second.size() > ptr->second.values.size())
+			if(input_read.second.size() != ptr->second.values.size())
+				throw std::out_of_range(
+					"size of INPUT "+ptr->second.label+" needs "+std::to_string(ptr->second.values.size())
+					+" but reads "+std::to_string(input_read.second.size()));
+
 			for(size_t i=0; i<input_read.second.size(); ++i)
 				ptr->second.values[i].sets(input_read.second[i]);
-			ptr->second.value_read_size = input_read.second.size();
+			//ptr->second.value_read_size = input_read.second.size();
 		}
 	}
 

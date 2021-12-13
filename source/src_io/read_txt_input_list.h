@@ -1,3 +1,8 @@
+//=======================
+// AUTHOR : Peize Lin
+// DATE :   2021-12-13
+//=======================
+
 #ifndef READ_TXT_INIPUT_LIST_H
 #define READ_TXT_INIPUT_LIST_H
 
@@ -16,8 +21,8 @@ namespace Read_Txt_Input
 
 	private:	
 		void add_item(const Input_Item &input_item);
-		static void check_value_size(const Input_Item& input_item, const int size);
-		static void check_value_size(const Input_Item& input_item, const int size_low, const int size_up);
+		//static void check_value_size(const Input_Item& input_item, const int size);
+		//static void check_value_size(const Input_Item& input_item, const int size_low, const int size_up);
 
 		std::map<std::string, Input_Item> list;
 		std::vector<std::string> add_order;

@@ -1,3 +1,8 @@
+//=======================
+// AUTHOR : Peize Lin
+// DATE :   2021-12-13
+//=======================
+
 #include "read_txt_input_list.h"
 
 #include "module_base/constants.h"
@@ -16,7 +21,6 @@ namespace Read_Txt_Input
 			item.annotation = "energy cutoff for wave functions";
 			item.check_transform = [](Input_Item &self)
 			{
-				Input_List::check_value_size(self, 1, 2);
 				if(self.values[1].gets()=="eV"){}
 				else if(self.values[1].gets()=="Ry")
 					self.values[0].setd( self.values[0].getd() / ModuleBase::Ry_to_eV );

@@ -73,9 +73,9 @@ namespace Read_Txt_Tools
 
 	namespace Preset
 	{
-		const std::set<std::string> True = {"1","T","t","TRUE","True","true"};
-		const std::set<std::string> False = {"0","F","f","FALSE","False","false"};
-		const std::set<std::string> Bool = {"1","T","t","TRUE","True","true","0","F","f","FALSE","False","false"};
+		const std::set<std::string> True = {"1","T","TRUE","True","true"};
+		const std::set<std::string> False = {"0","F","FALSE","False","false"};
+		const std::set<std::string> Bool = {"1","T","TRUE","True","true","0","F","FALSE","False","false"};
 	}
 }
 

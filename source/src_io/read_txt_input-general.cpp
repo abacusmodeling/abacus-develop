@@ -1,3 +1,8 @@
+//=======================
+// AUTHOR : Peize Lin
+// DATE :   2021-12-13
+//=======================
+
 #include "read_txt_input_list.h"
 
 #include "src_io/read_txt_tools.h"
@@ -17,7 +22,6 @@ namespace Read_Txt_Input
 			item.annotation = "1: single spin; 2: up and down spin; 4: noncollinear spin";
 			item.check_transform = [](Input_Item &self)
 			{
-				Input_List::check_value_size(self, 1);
 				if(!Read_Txt_Tools::in_set(self.values[0].geti(), {1,2,4}))
 					throw std::invalid_argument("nspin must be 1,2,4");
 			};
@@ -34,7 +38,6 @@ namespace Read_Txt_Input
 			item.annotation = "atom species number";
 			item.check_transform = [](Input_Item &self)
 			{
-				Input_List::check_value_size(self, 1);
 				if(self.values[0].geti()<=0)
 					throw std::invalid_argument("ntype must > 0");
 			};
@@ -51,7 +54,6 @@ namespace Read_Txt_Input
 			item.annotation = "turn symmetry on or off";
 			item.check_transform = [](Input_Item &self)
 			{
-				Input_List::check_value_size(self, 1);
 				if(!Read_Txt_Tools::in_set( self.values[0].gets(), Read_Txt_Tools::Preset::Bool))
 					throw std::invalid_argument("symmetry must be bool");
 			};
