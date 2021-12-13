@@ -19,7 +19,10 @@ namespace Read_Txt_Input
 	public:
 		// call these functions
 		Input_Item(const std::string &label_in) :label(label_in) {}
-		void default1(const std::vector<std::string> &value_in);
+		template<typename T>
+		void default_1(const T &value);
+		template <typename T_head, typename... T_tail>
+		void default_1( const T_head &value_head, const T_tail... values_tail);
 
 		// set these variables and functions
 		std::string annotation;
@@ -30,13 +33,17 @@ namespace Read_Txt_Input
 		std::function<void(const Input_Item&)> convert
 			= [](const Input_Item&item){};
 
-		std::vector<Input_Value> value;
+		std::vector<Input_Value> values;
 
 	private:
 		std::string label;
 		int value_read_size = -1;
+
 		friend class Input_List;
 		friend class Input_Process;
+
+		template<typename T>
+		void set_value(const T &value);
 
 #ifdef USE_CEREAL_SERIALIZATION
 	public:
@@ -47,5 +54,7 @@ namespace Read_Txt_Input
 #endif
 	};	
 }
+
+#include "read_txt_input_item-template.h"
 
 #endif

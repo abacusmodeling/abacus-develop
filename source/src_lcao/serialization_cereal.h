@@ -50,7 +50,7 @@ template<class Archive> void Input_Value::serialize( Archive & ar )
 template<class Archive> void Input_Item::serialize( Archive & ar )
 {
 	ar( this->annotation );
-	ar( this->value );
+	ar( this->values );
 	ar( this->label );
 	ar( this->value_read_size );
 }
