@@ -43,6 +43,7 @@ namespace Read_Txt_Input
 	private:
 		std::string label;
 		//int value_read_size = -1;
+		std::vector<std::string> values_type;
 
 		friend class Input_List;
 		friend class Input_Process;

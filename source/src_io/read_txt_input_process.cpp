@@ -56,7 +56,18 @@ namespace Read_Txt_Input
 	void Input_Process::check_transform()
 	{
 		for(auto &item : input.list)
+		{
 			item.second.check_transform(item.second);
+
+			for(size_t i=0; i<item.second.values.size(); ++i)
+			{
+				if(item.second.values_type[i]=="b")
+				{
+					if(!Read_Txt_Tools::in_set( item.second.values[i].gets(), Read_Txt_Tools::Preset::Bool))
+						throw std::invalid_argument("INPUT "+item.second.label+" must be bool");
+				}
+			}
+		}
 	}
 
 	void Input_Process::default2()
@@ -71,9 +82,26 @@ namespace Read_Txt_Input
 		for(const std::string &label : input.add_order)
 		{
 			ofs<<label<<"\t";
-			for(const Input_Value &value : input.list.at(label).values)
-				ofs<<value.gets()<<" ";
-			ofs<<"\t# "<<input.list.at(label).annotation<<std::endl;
+			const Read_Txt_Input::Input_Item &item = input.list.at(label);
+			for(size_t i=0; i<item.values.size(); ++i)
+			{
+				if(item.values_type[i]=="s")
+					ofs<<item.values[i].gets()<<" ";
+				else if(item.values_type[i]=="d")
+					ofs<<std::to_string(item.values[i].getd())<<" ";
+				else if(item.values_type[i]=="i")
+					ofs<<std::to_string(item.values[i].geti())<<" ";
+				else if(item.values_type[i]=="b")
+				{
+					if(item.values[i].getb())
+						ofs<<"true"<<" ";
+					else
+						ofs<<"false"<<" ";
+				}
+				else
+					throw invalid_argument("Input_Process::out() value_type["+std::to_string(i)+"]="+item.values_type[i]);
+			}
+			ofs<<"\t# "<<item.annotation<<std::endl;
 		}
 	}
 

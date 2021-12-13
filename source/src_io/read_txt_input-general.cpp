@@ -52,11 +52,6 @@ namespace Read_Txt_Input
 			Input_Item item("symmetry");
 			item.default_1(false);
 			item.annotation = "turn symmetry on or off";
-			item.check_transform = [](Input_Item &self)
-			{
-				if(!Read_Txt_Tools::in_set( self.values[0].gets(), Read_Txt_Tools::Preset::Bool))
-					throw std::invalid_argument("symmetry must be bool");
-			};
 			item.convert = [](const Input_Item &self)
 			{
 				ModuleSymmetry::Symmetry::symm_flag = self.values[0].getb();

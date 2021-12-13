@@ -28,6 +28,7 @@ namespace Read_Txt_Input
 	{
 		this->values.push_back({});
 		this->values.back().setb(b);
+		this->values_type.push_back("b");
 	}
 
 	template<>
@@ -35,6 +36,7 @@ namespace Read_Txt_Input
 	{
 		this->values.push_back({});
 		this->values.back().seti(i);
+		this->values_type.push_back("i");
 	}
 
 	template<>
@@ -42,6 +44,7 @@ namespace Read_Txt_Input
 	{
 		this->values.push_back({});
 		this->values.back().setd(d);
+		this->values_type.push_back("d");
 	}
 
 	template<>
@@ -49,6 +52,7 @@ namespace Read_Txt_Input
 	{
 		this->values.push_back({});
 		this->values.back().sets(s);
+		this->values_type.push_back("s");
 	}
 
 	template<>
@@ -56,6 +60,7 @@ namespace Read_Txt_Input
 	{
 		this->values.push_back({});
 		this->values.back().sets(std::string(s));
+		this->values_type.push_back("s");
 	}
 }
 

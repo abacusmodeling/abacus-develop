@@ -17,7 +17,7 @@ namespace Read_Txt_Input
 	{
 		{
 			Input_Item item("ecutwfc");
-			item.default_1(100,"eV");
+			item.default_1(100.0,"eV");
 			item.annotation = "energy cutoff for wave functions";
 			item.check_transform = [](Input_Item &self)
 			{
