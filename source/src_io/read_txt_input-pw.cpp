@@ -17,17 +17,13 @@ namespace Read_Txt_Input
 			item.check_transform = [](Input_Item &self)
 			{
 				Input_List::check_value_size(self, 1, 2);
-				if(self.value[1].s=="eV")
-					self.value[0].d = std::stod(self.value[0].s);
-				else if(self.value[1].s=="Ry")
-				{
-					self.value[0].d = std::stod(self.value[0].s) / ModuleBase::Ry_to_eV;
-					self.value[0].s = std::to_string(self.value[0].d);
-				}
+				if(self.value[1].gets()=="eV"){}
+				else if(self.value[1].gets()=="Ry")
+					self.value[0].setd( self.value[0].getd() / ModuleBase::Ry_to_eV );
 				else
-					throw std::invalid_argument(self.value[1].s);
-				self.value[1].s = "eV";
-				if(self.value[0].d<=0)
+					throw std::invalid_argument(self.value[1].gets());
+				self.value[1].sets("eV");
+				if(self.value[0].getd()<=0)
 					throw std::invalid_argument("ecutwfc must > 0");
 			};
 			item.convert = [](const Input_Item &self)

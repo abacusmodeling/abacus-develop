@@ -1,4 +1,4 @@
-#include "read_txt_input.h"
+#include "read_txt_input_item.h"
 
 namespace Read_Txt_Input
 {
@@ -6,6 +6,6 @@ namespace Read_Txt_Input
 	{
 		this->value.resize(value_in.size());
 		for(size_t i=0; i<value_in.size(); ++i)
-			this->value[i].s = value_in[i];
+			this->value[i].sets(value_in[i]);
 	}
 }

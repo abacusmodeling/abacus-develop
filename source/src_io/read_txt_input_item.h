@@ -1,5 +1,7 @@
-#ifndef READ_TXT_INPUT_H
-#define READ_TXT_INPUT_H
+#ifndef READ_TXT_INPUT_ITEM_H
+#define READ_TXT_INPUT_ITEM_H
+
+#include "read_txt_input_value.h"
 
 #include <vector>
 #include <map>
@@ -12,14 +14,6 @@
 
 namespace Read_Txt_Input
 {
-	struct Input_Value
-	{
-		bool b;
-		int i;
-		double d;
-		std::string s;
-	};
-
 	class Input_Item
 	{
 	public:

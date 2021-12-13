@@ -12,7 +12,8 @@
 #include "../module_base/vector3.h"
 #include "../src_ri/abfs-vector3_order.h"
 #include "../module_base/matrix.h"
-#include "src_io/read_txt_input.h"
+#include "src_io/read_txt_input_value.h"
+#include "src_io/read_txt_input_item.h"
 
 
 
@@ -39,12 +40,12 @@ template<class Archive> void load( Archive & ar, matrix & m )
 
 namespace Read_Txt_Input
 {
-template<class Archive> void serialize( Archive & ar, Input_Value & value )
+template<class Archive> void Input_Value::serialize( Archive & ar )
 {
-	ar( value.b );
-	ar( value.i );
-	ar( value.d );
-	ar( value.s );
+	ar( this->b );
+	ar( this->i );
+	ar( this->d );
+	ar( this->s );
 }
 template<class Archive> void Input_Item::serialize( Archive & ar )
 {

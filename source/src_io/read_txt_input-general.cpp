@@ -18,13 +18,12 @@ namespace Read_Txt_Input
 			item.check_transform = [](Input_Item &self)
 			{
 				Input_List::check_value_size(self, 1);
-				if(!Read_Txt_Tools::in_set(self.value[0].s, {"1","2","4"}))
+				if(!Read_Txt_Tools::in_set(self.value[0].gets(), {"1","2","4"}))
 					throw std::invalid_argument("nspin must be 1,2,4");
-				self.value[0].i = std::stoi(self.value[0].s);
 			};
 			item.convert = [](const Input_Item &self)
 			{
-				GlobalV::NSPIN = self.value[0].i;
+				GlobalV::NSPIN = self.value[0].geti();
 			};
 			this->add_item(item);
 		}
@@ -36,13 +35,12 @@ namespace Read_Txt_Input
 			item.check_transform = [](Input_Item &self)
 			{
 				Input_List::check_value_size(self, 1);
-				self.value[0].i = std::stoi(self.value[0].s);
-				if(self.value[0].i<=0)
+				if(self.value[0].geti()<=0)
 					throw std::invalid_argument("ntype must > 0");
 			};
 			item.convert = [](const Input_Item &self)
 			{
-				GlobalC::ucell.ntype = self.value[0].i;
+				GlobalC::ucell.ntype = self.value[0].geti();
 			};
 			this->add_item(item);
 		}

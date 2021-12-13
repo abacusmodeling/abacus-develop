@@ -38,7 +38,7 @@ namespace Read_Txt_Input
 			if(input_read.second.size() > ptr->second.value.size())
 				throw std::out_of_range("size error");
 			for(size_t i=0; i<input_read.second.size(); ++i)
-				ptr->second.value[i].s = input_read.second[i];
+				ptr->second.value[i].sets(input_read.second[i]);
 			ptr->second.value_read_size = input_read.second.size();
 		}
 	}
@@ -62,7 +62,7 @@ namespace Read_Txt_Input
 		{
 			ofs<<label<<"\t";
 			for(const Input_Value &value : input.list.at(label).value)
-				ofs<<value.s<<" ";
+				ofs<<value.gets()<<" ";
 			ofs<<"\t# "<<input.list.at(label).annotation<<std::endl;
 		}
 	}
