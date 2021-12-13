@@ -103,19 +103,19 @@ if(USE_ROCM)
     /opt/rocm/hip/include
     /opt/rocm/hipfft/include
     /opt/rocm/hipblas/include
-    /opt/rocm/rocsolver/include
+    # /opt/rocm-4.5.0/rocsolver/include
   )
   # find_package(ROCM REQUIRED)
   find_package(hip REQUIRED)
   find_package(hipfft REQUIRED)
   find_package(hipblas REQUIRED)
-  find_package(rocsolver REQUIRED)
+#   find_package(rocsolver REQUIRED)
   target_link_libraries(${ABACUS_BIN_NAME}
     hip::device
     hip::host
     hip::hipfft
     roc::hipblas
-    roc::rocsolver
+    # roc::rocsolver
   )
   add_compile_definitions(__ROCM)
   # set (HIP_HIPCC_FLAGS -hc; -fno-gpu-rdc; --amdgpu-target=gfx906)

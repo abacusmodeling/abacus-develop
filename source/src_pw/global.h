@@ -183,10 +183,6 @@ static const char *_hipblasGetErrorEnum(hipblasStatus_t error)
             return "HIPBLAS_STATUS_NOT_SUPPORTED";
         case HIPBLAS_STATUS_HANDLE_IS_NULLPTR:
             return "HIPBLAS_STATUS_HANDLE_IS_NULLPTR";
-        case HIPBLAS_STATUS_INVALID_ENUM:
-            return "HIPBLAS_STATUS_INVALID_ENUM";
-        case HIPBLAS_STATUS_UNKNOWN:
-            return "HIPBLAS_STATUS_UNKNOWN";
     }
     return "<unknown>";
 }

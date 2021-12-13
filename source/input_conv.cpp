@@ -47,7 +47,17 @@ void Input_Conv::Convert(void)
 	GlobalC::wf.seed = INPUT.seed;
 	GlobalC::pw.seed = INPUT.seed;
     GlobalV::NBANDS_ISTATE = INPUT.nbands_istate;
+#if ((defined __CUDA) || (defined __ROCM))
+	int temp_nproc;
+	MPI_Comm_size(MPI_COMM_WORLD, &temp_nproc);
+	if(temp_nproc != INPUT.npool)
+	{
+		std::cout << "None npool set in INPUT file, auto set npool = " << temp_nproc << std::endl;
+	}
+	GlobalV::NPOOL = temp_nproc;
+#else
 	GlobalV::NPOOL = INPUT.npool;
+#endif
 	GlobalV::CALCULATION = INPUT.calculation;
 
 	GlobalV::PSEUDORCUT = INPUT.pseudo_rcut;

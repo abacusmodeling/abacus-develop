@@ -131,8 +131,8 @@ void Diago_CG_CUDA<T, T2, T3>::diag
 {
     // cout<<"begin diago fft dim"<<GlobalC::pw.nx<<" "<<GlobalC::pw.ny<<" "<<GlobalC::pw.nz<<endl;
     // cout << &GlobalC::pw << endl;
-    if (test_cg==1) ModuleBase::TITLE("Diago_CG_CUDA","diag");
-    ModuleBase::timer::tick("Diago_CG_CUDA","diag");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG_HIP","diag");
+    ModuleBase::timer::tick("Diago_CG_HIP","diag");
 
     avg_iter = 0.0;
     notconv = 0;
@@ -169,7 +169,7 @@ void Diago_CG_CUDA<T, T2, T3>::diag
     CHECK_CUDA(hipMalloc((void**)&lagrange, n_band * sizeof(T2)));
     CHECK_CUDA(hipMalloc((void**)&phi_m, dim * sizeof(T2)));
 
-    // timer::tick("Diago_CG_CUDA","diag");
+    // timer::tick("Diago_CG_HIP","diag");
 
 	// Init with ZERO ...
     // T em_host = 0;
@@ -285,7 +285,7 @@ void Diago_CG_CUDA<T, T2, T3>::diag
 
     avg_iter /= n_band;
 
-    // timer::tick("Diago_CG_CUDA","diag");
+    // timer::tick("Diago_CG_HIP","diag");
     CHECK_CUDA(hipFree(lagrange));
     CHECK_CUDA(hipFree(pphi));
     CHECK_CUDA(hipFree(g0));
@@ -296,7 +296,7 @@ void Diago_CG_CUDA<T, T2, T3>::diag
     CHECK_CUDA(hipFree(sphi));
     CHECK_CUDA(hipFree(phi_m));
 
-    ModuleBase::timer::tick("Diago_CG_CUDA","diag");
+    ModuleBase::timer::tick("Diago_CG_HIP","diag");
     return;
 } // end subroutine ccgdiagg
 
@@ -307,8 +307,8 @@ void Diago_CG_CUDA<T, T2, T3>::calculate_gradient(
     const T2 *hpsi, const T2 *spsi,
     T2 *g, T2 *ppsi)
 {
-    if (test_cg==1) ModuleBase::TITLE("Diago_CG_CUDA","calculate_gradient");
-    ModuleBase::timer::tick("Diago_CG_CUDA","calculate_grad");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG_HIP","calculate_gradient");
+    ModuleBase::timer::tick("Diago_CG_HIP","calculate_grad");
 
     int thread = 512;
     int block = (dim + thread - 1) / thread;
@@ -331,7 +331,7 @@ void Diago_CG_CUDA<T, T2, T3>::calculate_gradient(
     // Update g !
     hipLaunchKernelGGL(HIP_KERNEL_NAME(kernel_get_gredient<T, T2, T3>), dim3(block), dim3(thread), 0, 0, reinterpret_cast<T3*>(g), reinterpret_cast<T3*>(ppsi), dim, lambda);
     // hipLaunchKernelGGL(kernel_multi_add, dim3(block), dim3(thread), 0, 0, g, g, 1, ppsi, -lambda, dim);
-    ModuleBase::timer::tick("Diago_CG_CUDA","calculate_grad");
+    ModuleBase::timer::tick("Diago_CG_HIP","calculate_grad");
     return;
 }
 
@@ -341,8 +341,8 @@ void Diago_CG_CUDA<T, T2, T3>::orthogonal_gradient( const int &dim, const int &d
                                     hipblasComplex *g, hipblasComplex *sg, hipblasComplex *lagrange,
                                     const hipblasComplex *eigenfunction, const int m)
 {
-    if (test_cg==1) ModuleBase::TITLE("Diago_CG_CUDA","orthogonal_gradient");
-    ModuleBase::timer::tick("Diago_CG_CUDA","orth_grad");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG_HIP","orthogonal_gradient");
+    ModuleBase::timer::tick("Diago_CG_HIP","orth_grad");
 
     GlobalC::hm.hpw.s_1psi_cuda(dim, g, sg);
 
@@ -393,7 +393,7 @@ void Diago_CG_CUDA<T, T2, T3>::orthogonal_gradient( const int &dim, const int &d
         }
     }*/
 
-    ModuleBase::timer::tick("Diago_CG_CUDA","orth_grad");
+    ModuleBase::timer::tick("Diago_CG_HIP","orth_grad");
     // CHECK_CUBLAS(hipblasDestroy(handle));
     return;
 }
@@ -403,8 +403,8 @@ void Diago_CG_CUDA<T, T2, T3>::orthogonal_gradient( const int &dim, const int &d
                                     hipblasDoubleComplex *g, hipblasDoubleComplex *sg, hipblasDoubleComplex *lagrange,
                                     const hipblasDoubleComplex *eigenfunction, const int m)
 {
-    if (test_cg==1) ModuleBase::TITLE("Diago_CG_CUDA","orthogonal_gradient");
-    ModuleBase::timer::tick("Diago_CG_CUDA","orth_grad");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG_HIP","orthogonal_gradient");
+    ModuleBase::timer::tick("Diago_CG_HIP","orth_grad");
 
     GlobalC::hm.hpw.s_1psi_cuda(dim, g, sg);
 
@@ -451,7 +451,7 @@ void Diago_CG_CUDA<T, T2, T3>::orthogonal_gradient( const int &dim, const int &d
         }
     }*/
 
-    ModuleBase::timer::tick("Diago_CG_CUDA","orth_grad");
+    ModuleBase::timer::tick("Diago_CG_HIP","orth_grad");
     // CHECK_CUBLAS(hipblasDestroy(handle));
     return;
 }
@@ -470,8 +470,8 @@ void Diago_CG_CUDA<T, T2, T3>::calculate_gamma_cg(
     const T &theta,
     const T2 *psi_m)
 {
-    if (test_cg==1) ModuleBase::TITLE("Diago_CG_CUDA","calculate_gamma_cg");
-    ModuleBase::timer::tick("Diago_CG_CUDA","gamma_cg");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG_HIP","calculate_gamma_cg");
+    ModuleBase::timer::tick("Diago_CG_HIP","gamma_cg");
     T gg_inter;
     if (iter>0)
     {
@@ -537,7 +537,7 @@ void Diago_CG_CUDA<T, T2, T3>::calculate_gamma_cg(
 
         hipLaunchKernelGGL(HIP_KERNEL_NAME(kernel_get_normacg<T, T2, T3>), dim3(block), dim3(thread), 0, 0, dim, reinterpret_cast<T3*>(cg), reinterpret_cast<const T3*>(psi_m), norma);
     }
-    ModuleBase::timer::tick("Diago_CG_CUDA","gamma_cg");
+    ModuleBase::timer::tick("Diago_CG_HIP","gamma_cg");
     return;
 }
 
@@ -557,8 +557,8 @@ bool Diago_CG_CUDA<T, T2, T3>::update_psi(
     T2 *sphi,
     T2 *vkb_c)
 {
-    if (test_cg==1) ModuleBase::TITLE("Diago_CG_CUDA","update_psi");
-    ModuleBase::timer::tick("Diago_CG_CUDA","update_psi");
+    if (test_cg==1) ModuleBase::TITLE("Diago_CG_HIP","update_psi");
+    ModuleBase::timer::tick("Diago_CG_HIP","update_psi");
     int thread = 512;
     int block = (dim + thread - 1) / thread;
     // pw.h_1psi(dim, cg, hcg, scg); // TODO
@@ -609,7 +609,7 @@ bool Diago_CG_CUDA<T, T2, T3>::update_psi(
 
     if ( abs(eigenvalue-e0)< threshold)
     {
-        ModuleBase::timer::tick("Diago_CG_CUDA","update_psi");
+        ModuleBase::timer::tick("Diago_CG_HIP","update_psi");
         return 1;
     }
     else
@@ -623,7 +623,7 @@ bool Diago_CG_CUDA<T, T2, T3>::update_psi(
             reinterpret_cast<T3*>(sphi), reinterpret_cast<T3*>(sphi), cost, reinterpret_cast<const T3*>(scg), sint_norm, dim);
         hipLaunchKernelGGL(HIP_KERNEL_NAME(kernel_multi_add<T, T2, T3>), dim3(block), dim3(thread), 0, 0, 
             reinterpret_cast<T3*>(hpsi), reinterpret_cast<T3*>(hpsi), cost, reinterpret_cast<const T3*>(hcg), sint_norm, dim);
-        ModuleBase::timer::tick("Diago_CG_CUDA","update_psi");
+        ModuleBase::timer::tick("Diago_CG_HIP","update_psi");
         return 0;
     }
 }
@@ -639,7 +639,7 @@ void Diago_CG_CUDA<T, T2, T3>::schmit_orth
     hipblasComplex *psi_m
 )
 {
-    ModuleBase::timer::tick("Diago_CG_CUDA","schmit_orth");
+    ModuleBase::timer::tick("Diago_CG_HIP","schmit_orth");
     assert( m >= 0 );
     // cout<<"orth, dim="<<dim<<endl;
 
@@ -681,7 +681,7 @@ void Diago_CG_CUDA<T, T2, T3>::schmit_orth
     GlobalC::hm.hpw.s_1psi_cuda(dim, psi_m, sphi);
 
     // CHECK_CUBLAS(hipblasDestroy(handle));
-    ModuleBase::timer::tick("Diago_CG_CUDA","schmit_orth");
+    ModuleBase::timer::tick("Diago_CG_HIP","schmit_orth");
     CHECK_CUDA(hipFree(lagrange));
     return ;
 }
@@ -697,7 +697,7 @@ void Diago_CG_CUDA<T, T2, T3>::schmit_orth
     hipblasDoubleComplex *psi_m
 )
 {
-    ModuleBase::timer::tick("Diago_CG_CUDA","schmit_orth");
+    ModuleBase::timer::tick("Diago_CG_HIP","schmit_orth");
     assert( m >= 0 );
     // cout<<"orth, dim="<<dim<<endl;
 
@@ -735,7 +735,7 @@ void Diago_CG_CUDA<T, T2, T3>::schmit_orth
     GlobalC::hm.hpw.s_1psi_cuda(dim, psi_m, sphi);
 
     // CHECK_CUBLAS(hipblasDestroy(handle));
-    ModuleBase::timer::tick("Diago_CG_CUDA","schmit_orth");
+    ModuleBase::timer::tick("Diago_CG_HIP","schmit_orth");
     CHECK_CUDA(hipFree(lagrange));
     return ;
 }

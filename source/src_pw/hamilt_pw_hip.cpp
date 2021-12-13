@@ -145,7 +145,7 @@ void Hamilt_PW::allocate(
 	const int &nkb,
 	const int &nrxx)
 {
-    ModuleBase::TITLE("Hamilt_PW_CUDA","allocate");
+    ModuleBase::TITLE("Hamilt_PW_HIP","allocate");
 
 	assert(npwx > 0);
 	assert(npol > 0);
@@ -178,7 +178,7 @@ void Hamilt_PW::allocate(
 
 void Hamilt_PW::init_k(const int ik)
 {
-    ModuleBase::TITLE("Hamilt_PW_CUDA","init_k");
+    ModuleBase::TITLE("Hamilt_PW_HIP","init_k");
 	// mohan add 2010-09-30
 	// (1) Which spin to use.
 	if(GlobalV::NSPIN==2)
@@ -245,8 +245,8 @@ void Hamilt_PW::diagH_subspace(
     ModuleBase::ComplexMatrix &evc,
     double *en)
 {
-    ModuleBase::TITLE("Hamilt_PW_CUDA","diagH_subspace");
-    ModuleBase::timer::tick("Hamilt_PW_CUDA","diagH_subspace");
+    ModuleBase::TITLE("Hamilt_PW_HIP","diagH_subspace");
+    ModuleBase::timer::tick("Hamilt_PW_HIP","diagH_subspace");
 
 	assert(nstart!=0);
 	assert(n_band!=0);
@@ -450,7 +450,7 @@ void Hamilt_PW::diagH_subspace(
 
     //out.printcm_norm("hvec",hvec,1.0e-8);
 
-    ModuleBase::timer::tick("Hamilt_PW_CUDA","diagH_subspace");
+    ModuleBase::timer::tick("Hamilt_PW_HIP","diagH_subspace");
     return;
 }
 
@@ -464,8 +464,8 @@ void Hamilt_PW::diagH_subspace_cuda(
     double *en,
 	hipblasDoubleComplex *vkb_c)
 {
-    ModuleBase::TITLE("Hamilt_PW_CUDA","diagH_subspace_cuda");
-    ModuleBase::timer::tick("Hamilt_PW_CUDA","diagH_subspace_cuda");
+    ModuleBase::TITLE("Hamilt_PW_HIP","diagH_subspace_hip");
+    ModuleBase::timer::tick("Hamilt_PW_HIP","diagH_subspace_hip");
 
 	assert(nstart!=0);
 	assert(n_band!=0);
@@ -665,7 +665,7 @@ void Hamilt_PW::diagH_subspace_cuda(
 	CHECK_CUDA(hipFree(sc));
 	CHECK_CUDA(hipFree(hvec));
 
-    ModuleBase::timer::tick("Hamilt_PW_CUDA","diagH_subspace_cuda");
+    ModuleBase::timer::tick("Hamilt_PW_HIP","diagH_subspace_hip");
     return;
 }
 
@@ -734,7 +734,7 @@ void Hamilt_PW::s_1psi
 
 void Hamilt_PW::h_psi_cuda(const hipblasComplex *psi_in, hipblasComplex *hpsi, hipblasComplex *vkb_c, const int m)
 {
-    ModuleBase::timer::tick("Hamilt_PW_CUDA","h_psi");
+    ModuleBase::timer::tick("Hamilt_PW_HIP","h_psi");
     // int i = 0;
     // int j = 0;
     // int ig= 0;
@@ -750,7 +750,7 @@ void Hamilt_PW::h_psi_cuda(const hipblasComplex *psi_in, hipblasComplex *hpsi, h
 	//------------------------------------
 	hipblasComplex *tmhpsi;
 	const hipblasComplex *tmpsi_in;
-    ModuleBase::timer::tick("Hamilt_PW_CUDA","kinetic");
+    ModuleBase::timer::tick("Hamilt_PW_HIP","kinetic");
  	if(GlobalV::T_IN_H)
 	{
         tmhpsi = hpsi;
@@ -800,7 +800,7 @@ void Hamilt_PW::h_psi_cuda(const hipblasComplex *psi_in, hipblasComplex *hpsi, h
 		CHECK_CUDA(hipFree(f_g2kin));
 	}
 
-    ModuleBase::timer::tick("Hamilt_PW_CUDA","kinetic");
+    ModuleBase::timer::tick("Hamilt_PW_HIP","kinetic");
 
 	// cout<<"======after hpsi part I======="<<endl;
 	// print_test<hipblasComplex>(hpsi, 15);
@@ -808,7 +808,7 @@ void Hamilt_PW::h_psi_cuda(const hipblasComplex *psi_in, hipblasComplex *hpsi, h
 	//------------------------------------
 	//(2) the local potential.
 	//-----------------------------------
-	ModuleBase::timer::tick("Hamilt_PW_CUDA","vloc");
+	ModuleBase::timer::tick("Hamilt_PW_HIP","vloc");
     //  ...
 	if(GlobalV::VL_IN_H)
 	{
@@ -858,11 +858,11 @@ void Hamilt_PW::h_psi_cuda(const hipblasComplex *psi_in, hipblasComplex *hpsi, h
 		CHECK_CUDA(hipFree(f_vr_eff1));
         CHECK_CUDA(hipFree(f_porter));
 	}
-	ModuleBase::timer::tick("Hamilt_PW_CUDA","vloc");
+	ModuleBase::timer::tick("Hamilt_PW_HIP","vloc");
 	//------------------------------------
 	// (3) the nonlocal pseudopotential.
 	//------------------------------------
-	ModuleBase::timer::tick("Hamilt_PW_CUDA","vnl");
+	ModuleBase::timer::tick("Hamilt_PW_HIP","vnl");
 
 	// cout<<"======after hpsi part II======="<<endl;
 	// print_test<hipblasComplex>(hpsi, 15);
@@ -941,7 +941,7 @@ void Hamilt_PW::h_psi_cuda(const hipblasComplex *psi_in, hipblasComplex *hpsi, h
         }
     }
 
-    ModuleBase::timer::tick("Hamilt_PW_CUDA","vnl");
+    ModuleBase::timer::tick("Hamilt_PW_HIP","vnl");
 
 	// cout<<"======after hpsi part III======="<<endl;
 	// print_test<hipblasComplex>(hpsi, 15);
@@ -951,13 +951,13 @@ void Hamilt_PW::h_psi_cuda(const hipblasComplex *psi_in, hipblasComplex *hpsi, h
 	//------------------------------------
     // TODO: add metaGGA part
 
-    ModuleBase::timer::tick("Hamilt_PW_CUDA","h_psi");
+    ModuleBase::timer::tick("Hamilt_PW_HIP","h_psi");
     return;
 }
 
 void Hamilt_PW::h_psi_cuda(const hipblasDoubleComplex *psi_in, hipblasDoubleComplex *hpsi, hipblasDoubleComplex *vkb_c, const int m)
 {
-    ModuleBase::timer::tick("Hamilt_PW_CUDA","h_psi");
+    ModuleBase::timer::tick("Hamilt_PW_HIP","h_psi");
     // int i = 0;
     // int j = 0;
     // int ig= 0;
@@ -973,7 +973,7 @@ void Hamilt_PW::h_psi_cuda(const hipblasDoubleComplex *psi_in, hipblasDoubleComp
 	//------------------------------------
 	hipblasDoubleComplex *tmhpsi;
 	const hipblasDoubleComplex *tmpsi_in;
-    ModuleBase::timer::tick("Hamilt_PW_CUDA","kinetic");
+    ModuleBase::timer::tick("Hamilt_PW_HIP","kinetic");
  	if(GlobalV::T_IN_H)
 	{
         tmhpsi = hpsi;
@@ -1015,7 +1015,7 @@ void Hamilt_PW::h_psi_cuda(const hipblasDoubleComplex *psi_in, hipblasDoubleComp
         CHECK_CUDA(hipFree(d_g2kin));
 	}
 
-    ModuleBase::timer::tick("Hamilt_PW_CUDA","kinetic");
+    ModuleBase::timer::tick("Hamilt_PW_HIP","kinetic");
 
 	// cout<<"======after hpsi part I======="<<endl;
 	// print_test<hipblasDoubleComplex>(hpsi, 10);
@@ -1023,7 +1023,7 @@ void Hamilt_PW::h_psi_cuda(const hipblasDoubleComplex *psi_in, hipblasDoubleComp
 	//------------------------------------
 	//(2) the local potential.
 	//-----------------------------------
-	ModuleBase::timer::tick("Hamilt_PW_CUDA","vloc");
+	ModuleBase::timer::tick("Hamilt_PW_HIP","vloc");
     //  ...
 	if(GlobalV::VL_IN_H)
 	{
@@ -1074,14 +1074,14 @@ void Hamilt_PW::h_psi_cuda(const hipblasDoubleComplex *psi_in, hipblasDoubleComp
         CHECK_CUDA(hipFree(d_vr_eff1));
         CHECK_CUDA(hipFree(d_porter));
 	}
-	ModuleBase::timer::tick("Hamilt_PW_CUDA","vloc");
+	ModuleBase::timer::tick("Hamilt_PW_HIP","vloc");
 
 	// cout<<"======after hpsi part II======="<<endl;
 	// print_test<hipblasDoubleComplex>(hpsi, 10);
 	//------------------------------------
 	// (3) the nonlocal pseudopotential.
 	//------------------------------------
-	ModuleBase::timer::tick("Hamilt_PW_CUDA","vnl");
+	ModuleBase::timer::tick("Hamilt_PW_HIP","vnl");
 
     if(GlobalV::VNL_IN_H)
 	{
@@ -1156,7 +1156,7 @@ void Hamilt_PW::h_psi_cuda(const hipblasDoubleComplex *psi_in, hipblasDoubleComp
         }
     }
 
-    ModuleBase::timer::tick("Hamilt_PW_CUDA","vnl");
+    ModuleBase::timer::tick("Hamilt_PW_HIP","vnl");
 	// cout<<"======after hpsi part III======="<<endl;
 	// print_test<hipblasDoubleComplex>(hpsi, 10);
 
@@ -1165,7 +1165,7 @@ void Hamilt_PW::h_psi_cuda(const hipblasDoubleComplex *psi_in, hipblasDoubleComp
 	//------------------------------------
     // TODO: add metaGGA part
 
-    ModuleBase::timer::tick("Hamilt_PW_CUDA","h_psi");
+    ModuleBase::timer::tick("Hamilt_PW_HIP","h_psi");
     return;
 }
 
@@ -1393,7 +1393,7 @@ void Hamilt_PW::add_nonlocal_pp_cuda(
     const hipblasComplex *f_vkb_c,
 	const int m)
 {
-    ModuleBase::timer::tick("Hamilt_PW_CUDA","add_nonlocal_pp");
+    ModuleBase::timer::tick("Hamilt_PW_HIP","add_nonlocal_pp");
 
 	// number of projectors
 	int nkb = GlobalC::ppcell.nkb;
@@ -1502,7 +1502,7 @@ void Hamilt_PW::add_nonlocal_pp_cuda(
 	// delete[] ps;
     CHECK_CUDA(hipFree(ps));
 	// CHECK_CUBLAS(hipblasDestroy(handle));
-    ModuleBase::timer::tick("Hamilt_PW_CUDA","add_nonlocal_pp");
+    ModuleBase::timer::tick("Hamilt_PW_HIP","add_nonlocal_pp");
     return;
 }
 
@@ -1512,7 +1512,7 @@ void Hamilt_PW::add_nonlocal_pp_cuda(
     const hipblasDoubleComplex *d_vkb_c,
 	const int m)
 {
-    ModuleBase::timer::tick("Hamilt_PW_CUDA","add_nonlocal_pp");
+    ModuleBase::timer::tick("Hamilt_PW_HIP","add_nonlocal_pp");
 
 	// number of projectors
 	int nkb = GlobalC::ppcell.nkb;
@@ -1615,7 +1615,7 @@ void Hamilt_PW::add_nonlocal_pp_cuda(
 	// delete[] ps;
     CHECK_CUDA(hipFree(ps));
 	// CHECK_CUBLAS(hipblasDestroy(handle));
-    ModuleBase::timer::tick("Hamilt_PW_CUDA","add_nonlocal_pp");
+    ModuleBase::timer::tick("Hamilt_PW_HIP","add_nonlocal_pp");
     return;
 }
 
