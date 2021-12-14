@@ -110,6 +110,7 @@ void Charge::write_rho_cube(
     	{
         	start_z[ip] = start_z[ip-1]+num_z[ip-1];
     	}	
+		delete[] num_z;
 
 		// which_ip: found iz belongs to which ip.
 		int *which_ip = new int[GlobalC::pw.ncz];
