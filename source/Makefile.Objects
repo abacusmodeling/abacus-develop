@@ -255,6 +255,7 @@ write_rho_dipole.o\
 write_HS.o\
 write_HS_R.o\
 write_dm.o\
+write_wfc_realspace.o\
 potential_libxc.o \
 potential_libxc_meta.o \
 efield.o \
@@ -280,6 +281,7 @@ variable_cell.o\
 dftu.o\
 dftu_yukawa.o\
 dftu_relax.o\
+dmft.o \
 
 OBJS_COMMON=atom_spec.o \
 unitcell.o \

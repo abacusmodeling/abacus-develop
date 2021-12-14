@@ -63,8 +63,6 @@ class Input
 	std::string NNKP;            // add by jingan for wannier90
 	std::string wannier_spin;    // add by jingan for wannier90
 
-	bool mlwf_flag; 		// add by mohan
-
 //==========================================================
 // Stochastic DFT
 //==========================================================
@@ -89,7 +87,6 @@ class Input
 //==========================================================
 	bool opt_epsilon2;		// true : calculate the dielectric functions
 	int  opt_nbands;		// number of bands for optical transition matrix
-    bool lda_plus_u;		// true : lda plus u calculation
 
 //==========================================================
 // electrons / spin
@@ -222,6 +219,7 @@ class Input
 	int out_dm; // output density matrix.
 	int out_potential;		// yes or no
     int out_wf;			// 0: no; 1: txt; 2: dat
+    int out_wf_r;			// 0: no; 1: yes
 	int out_dos;			// dos calculation. mohan add 20090909
     int out_band;                   // band calculation pengfei 2014-10-13
 	int out_hs;			// output H matrix and S matrix in local basis.
@@ -229,6 +227,7 @@ class Input
 	int out_r_matrix;   // jingan add 2019-8-14, output r(R) matrix.
 	bool out_lowf;			// output the wave functions in local basis.
 	bool out_alllog; 		// output all logs.
+	bool out_element_info; // output infomation of all element
 
 	double dos_emin_ev;
 	double dos_emax_ev;
@@ -446,6 +445,11 @@ class Input
 
 	int dftu_type;                  //1:rotationally invarient formalism; 2:simplified form(default)
 	int double_counting;            // 1:FLL(fully localized limit)(default); 2:AMF(around mean field)
+
+//==========================================================
+//    DFT+DMFT       Xin Qu added on 2021-08
+//==========================================================
+  bool dft_plus_dmft;                //true:DFT+U correction; false：standard DFT calcullation(default)
 
 //==========================================================
 // DeepKS -- added by caoyu and mohan
