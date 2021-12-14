@@ -19,15 +19,15 @@
 
     - [Electronic structure](#electronic-structure)
     
-        [basis_type](#basis-type) | [ks_solver](#ks-solver) | [nbands](#nbands) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [occupations](#occupations) | [smearing](#smearing) | [sigma](#sigma) | [mixing_type](#mixing-type) | [mixing_beta](#mixing-beta) | [mixing_ndim](#mixing-ndim) | [mixing_gg0](#mixing-gg0) | [gamma_only](#gamma-only) | [printe](#printe) | [niter](#niter) | [dr2](#dr2) | [charge_extrap](#charge-extrap)
+        [basis_type](#basis-type) | [ks_solver](#ks-solver) | [nbands](#nbands) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [occupations](#occupations) | [smearing](#smearing) | [sigma](#sigma) | [mixing_type](#mixing-type) | [mixing_beta](#mixing-beta) | [mixing_ndim](#mixing-ndim) | [mixing_gg0](#mixing-gg0) | [gamma_only](#gamma-only) | [printe](#printe) | [niter](#niter) | [dr2](#dr2) | [charge_extrap](#charge-extrap) | [ocp](#ocp) | [ocp_set](#ocp_set)
 
     - [Geometry relaxation](#geometry-relaxation)
     
-        [nstep](#nstep) | [force](#force) | [force_thr](#force-thr) | [force_thr_ev](#force-thr-ev) | [force_set](#force-set) | [bfgs_w1](#bfgs-w1) | [bfgs_w2](#bfgs-w2) | [trust_radius_max](#trust-radius-max) | [trust_radius_min](#trust-radius-min) | [trust_radius_ini](#trust-radius-ini) | [stress](#stress) | [stress_thr](#stress-thr) | [press](#press) | [fixed_axes](#fixed-axes) | [move_method](#move-method) | [cg_threshold](#cg-threshold) | [cell_factor](#cell-factor)
+        [nstep](#nstep) | [force](#force) | [force_thr](#force-thr) | [force_thr_ev](#force-thr-ev) | [force_set](#force-set) | [bfgs_w1](#bfgs-w1) | [bfgs_w2](#bfgs-w2) | [trust_radius_max](#trust-radius-max) | [trust_radius_min](#trust-radius-min) | [trust_radius_ini](#trust-radius-ini) | [stress](#stress) | [stress_thr](#stress-thr) | [press1, press2, press3](#press) | [fixed_axes](#fixed-axes) | [move_method](#move-method) | [cg_threshold](#cg-threshold) | [cell_factor](#cell-factor)
 
     - [Variables related to program output](#variables-related-to-program-output)
 
-        [mulliken](#mulliken) | [out_charge](#out-charge) | [out_potential](#out-potential) | [out_dm](#out-dm) | [out_wf](#out-wf) | [out_lowf](#out-lowf) | [out_dos](#out-dos) | [out_band](#out-band) | [out_stru](#out-stru) | [out_level](#out_level) | [out_alllog](#out-alllog) | [out_hs](#out-hs) | [out_r](#out-r) | [out_hs2](#out-hs2)
+        [mulliken](#mulliken) | [out_charge](#out-charge) | [out_potential](#out-potential) | [out_dm](#out-dm) | [out_wf](#out-wf) | [out_lowf](#out-lowf) | [out_dos](#out-dos) | [out_band](#out-band) | [out_stru](#out-stru) | [out_level](#out_level) | [out_alllog](#out-alllog) | [out_hs](#out-hs) | [out_r](#out-r) | [out_hs2](#out-hs2) | [out_element_info](#out-element-info) | [restart_save](#restart_save) | [restart_load](#restart_load)
 
     - [Density of states](#density-of-states)
 
@@ -47,13 +47,19 @@
 
     - [DFT+U correction](#DFT_U-correction)
 
+        [dft_plus_u](#dft_plus_u) | [orbital_corr](#orbital_corr) | [hubbard_u](#hubbard_u) | [hund_j](#hund_j) | [yukawa_potential](#yukawa_potential) | [omc](#omc)
+
     - [VdW correction](#vdw-correction)
 
         [vdw_method](#vdw-method) | [vdw_s6](#vdw-s6) | [vdw_s8](#vdw-s8) | [vdw_a1](#vdw-a1) | [vdw_a2](#vdw-a2) | [vdw_d](#vdw-d) | [vdw_abc](#vdw-abc) | [vdw_C6_file](#vdw-C6-file) | [vdw_C6_unit](#vdw-C6-unit) | [vdw_R0_file](#vdw-R0-file) | [vdw_R0_unit](#vdw-R0-unit) | [vdw_model](#vdw-model) | [vdw_radius](#vdw-radius) | [vdw_radius_unit](#vdw-radius-unit) | [vdw_cn_radius](#vdw-cn-radius) | [vdw_cn_radius_unit](#vdw-cn-radius-unit) | [vdw_period](#vdw-period)
         
     - [Berry phase and wannier90 interface](#berry-phase-and-wannier90-interface)
     
-        [berry_phase](#berry-phase) | [gdir](#gdir) | [towannier90](#towannier90) | [nnkpfile](#nnkpfile) | [wannier_spin](#wannier-spin) | [tddft](#tddft)  [vext](#vext) | [vext_dire](#vext-dire) 
+        [berry_phase](#berry-phase) | [gdir](#gdir) | [towannier90](#towannier90) | [nnkpfile](#nnkpfile) | [wannier_spin](#wannier-spin)
+
+    - [TDDFT: time dependent density functional theory](#TDDFT-doc)
+    
+        [tddft](#tddft) | [td_dr2](#td_dr2) | [td_dt](#td_dt) | [td_force_dt](#td_force_dt) | [td_vext](#td_vext) | [td_vext_dire](#td_vext_dire) | [td_timescale](#td_timescale) | [td_vexttype](#td_vexttype) | [td_vextout](#td_vextout) | [td_dipoleout](#td_dipoleout)
 
     - [Variables useful for debugging](#variables-useful-for-debugging)
 
@@ -292,7 +298,7 @@ This part of variables are used to control general system parameters.
 
 - diago_proc<a id="diago_proc"></a>
     - *Type*: Integer
-    - *Descrption*: If set to a positive number, then it specifies the number of threads used for carrying out diagonalization. Must be less than or equal to total number of MPI threads. Also, when cg diagonalization is used, diago_proc must be same as total number of MPI threads. If set to 0, then it will be set to the number of MPI threads. Normally, it is fine just leaving it to default value.
+    - *Descrption*: If set to a positive number, then it specifies the number of threads used for carrying out diagonalization. Must be less than or equal to total number of MPI threads. Also, when cg diagonalization is used, diago_proc must be same as total number of MPI threads. If set to 0, then it will be set to the number of MPI threads. Normally, it is fine just leaving it to default value. Only used for pw base.
     - *Default*: 0
 
     [back to top](#input-file)
@@ -605,6 +611,22 @@ calculations.
 
     [back to top](#input-file)
 
+
+- ocp<a id="ocp"></a>
+    - *Type*: Boolean
+    - *Description*: option for choose whether calcualting constrained DFT or not.
+    Only used for TDDFT.
+    - *Default*:0
+
+    [back to top](#input-file)
+
+- ocp_set<a id="ocp_set"></a>
+    - *Type*: string
+    - *Description*: If ocp is true, the ocp_set is a string to set the number of occupancy, like 1 10 * 1 0 1 representing the 13 band occupancy, 12th band occupancy 0 and the rest 1, the code is parsing this string into an array through a regular expression.
+    - *Default*:none
+
+    [back to top](#input-file)
+
 ### Geometry relaxation
 This part of variables are used to control the geometry relaxation.
 
@@ -687,11 +709,11 @@ This part of variables are used to control the geometry relaxation.
 - stress_thr<a id="stress-thr"></a>
     - *Type*: Real
     - *Description*: The threshold of the stress convergence, it indicates the largest stress among all the directions, the unit is KBar,
-    - *Default*: 10
+    - *Default*: 0.01
 
     [back to top](#input-file)
 
-- press1, 2, 3<a id="press"></a>
+- press1, press2, press3<a id="press"></a>
     - *Type*: Real
     - *Description*: the external pressures along three axes,the compressive stress is taken to be positive, the unit is KBar.
     - *Default*: 0
@@ -831,6 +853,41 @@ This part of variables are used to control the output of properties.
 
     [back to top](#input-file)
 
+- out_element_info<a id="out-element-info"></a>
+    - *Type*: Boolean
+    - *Description*: When set to 1, ABACUS will generate a new directory under OUT.suffix path named as element name such as 'Si', which contained files "Si-d1-orbital-dru.dat  Si-p2-orbital-k.dat    Si-s2-orbital-dru.dat
+    Si-d1-orbital-k.dat    Si-p2-orbital-r.dat    Si-s2-orbital-k.dat
+    Si-d1-orbital-r.dat    Si-p2-orbital-ru.dat   Si-s2-orbital-r.dat
+    Si-d1-orbital-ru.dat   Si-p-proj-k.dat        Si-s2-orbital-ru.dat
+    Si.NONLOCAL            Si-p-proj-r.dat        Si-s-proj-k.dat
+    Si-p1-orbital-dru.dat  Si-p-proj-ru.dat       Si-s-proj-r.dat
+    Si-p1-orbital-k.dat    Si-s1-orbital-dru.dat  Si-s-proj-ru.dat
+    Si-p1-orbital-r.dat    Si-s1-orbital-k.dat    v_loc_g.dat
+    Si-p1-orbital-ru.dat   Si-s1-orbital-r.dat
+    Si-p2-orbital-dru.dat  Si-s1-orbital-ru.dat " for example.
+
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+- restart_save<a id="restart_save"></a>
+    - *Type*: Boolean
+    - *Description*: Only for LCAO, store charge density file and H matrix file every scf step for restart.
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+- restart_load<a id="restart_load"></a>
+    - *Type*: Boolean
+    - *Description*: Only for LCAO, used for restart, only if that:
+        * set restart_save as true and do scf calculation before.
+        * please ensure suffix is same with calculation before and density file and H matrix file is exist. 
+
+      restart from stored density file and H matrix file.
+    - *Default*: 0
+    
+    [back to top](#input-file)
+
 ### Density of states
 This part of variables are used to control the calculation of DOS.
 
@@ -859,7 +916,7 @@ This part of variables are used to control the calculation of DOS.
 This part of variables are used to control the addition of an external electric field. It is achieved by adding a saw-like potential to the local ionic potential.
 
 - efield<a id="efield"></a>
-    - *Type*: Bool
+    - *Type*: Boolean
     - *Description*: Controls whether to add the external electric field. When set to 1, the electric field is turned on. When set to 0, there is no electric field.
     - *Default*: 0.
 
@@ -895,9 +952,10 @@ This part of variables are used to control the addition of an external electric 
 
 ### DeePKS
 This part of variables are used to control the usage of DeePKS method (a comprehensive data-driven approach to improve accuracy of DFT).
+Warning: this function is not robust enough for version 2.2.0. Please try these variables in https://github.com/deepmodeling/abacus-develop/tree/deepks .
 
 - out_descriptor<a id="out-descriptor"></a>
-    - *Type*: Bool
+    - *Type*: Boolean
     - *Description*: when set to 1, ABACUS will calculate and output descriptor for DeePKS training. In `LCAO` calculation, a path of *.orb file is needed to be specified under `NUMERICAL_DESCRIPTOR`in `STRU`file. For example: 
     ```
     NUMERICAL_ORBITAL
@@ -917,7 +975,7 @@ This part of variables are used to control the usage of DeePKS method (a compreh
 
     [back to top](#input-file)
 - deepks_scf<a id="deepks-scf"></a>
-    - *Type*: Bool
+    - *Type*: Boolean
     - *Description*: only when deepks is enabled in `LCAO` calculation can this variable set to 1. Then, a trained, traced model file is needed for self-consistant field iteration in DeePKS method.
     - *Default*: 0
 
@@ -1071,7 +1129,7 @@ This part of variables are used to control the molecular dynamics calculations.
     [back to top](#input-file)
 
 - md_rstmd<a id="md-rstmd"></a>
-    - *Type*: Bool
+    - *Type*: Boolean
     - *Description*: to control whether restart md.
         - 0:When set to 0, ABACUS will calculate md normolly.
         - 1:When set to 1, ABACUS will calculate md from last step in your test before.
@@ -1122,7 +1180,7 @@ This part of variables are used to control the molecular dynamics calculations.
 - NVT_control<a id="nvt-control"></a> 
     - *Type*: Integer
     - *Description*: Specifies which type of thermostat is used.
-        - 1: Nose-Hoover
+        - 1: Nose-Hoover-chains
         - 2: Langevin
         - 3: Andersen
     - *Default*: 1
@@ -1209,43 +1267,43 @@ This part of variables are used to control the molecular dynamics calculations.
 
 ### DFT+U correction
 This part of variables are used to control DFT+U correlated parameters
-- dft_plus_u 
-    - *Type*: Bool
+- dft_plus_u<a id="dft_plus_u"></a>
+    - *Type*: Boolean
     - *Description*: If set to 1, ABCUS will calculate plus U correction, which is especially important for correlated electron.
     - *Default*: 0
 
     [back to top](#input-file)
 
-- orbital_corr
+- orbital_corr<a id="orbital_corr"></a>
     - *Type*: Int
     - *Description*: $l_1,l_2,l_3,\ldots$ for atom type 1,2,3 respectively.(usually 2 for d electrons and 3 for f electrons) .Specify which orbits need plus U correction for each atom. If set to -1, the correction would not be calculate for this atom.
     - *Default*: None
 
     [back to top](#input-file)
 
-- hubbard_u
+- hubbard_u<a id="hubbard_u"></a>
     - *Type*: Real
     - *Description*: Hubbard Coulomb interaction parameter U(ev) in plus U correction,which should be specified for each atom unless Yukawa potential is use. ABACUS use a simplified scheme which only need U and J for each atom.
     - *Default*: 0.0 
 
     [back to top](#input-file)
 
-- hund_j
+- hund_j<a id="hund_j"></a>
     - *Type*: Real
     - *Description*: Hund exchange parameter J(ev) in plus U correction ,which should be specified for each atom unless Yukawa potential is use. ABACUS use a simplified scheme which only need U and J for each atom.
     - *Default*: 0.0 
 
     [back to top](#input-file)
 
-- yukawa_potential
-    - *Type*: Bool
+- yukawa_potential<a id="yukawa_potential"></a>
+    - *Type*: Boolean
     - *Description*: whether use the local screen Coulomb potential method to calculate the value of U and J. If this is set to 1, hubbard_u and hund_j do not need to be specified.
     - *Default*: 0
 
     [back to top](#input-file)
 
-- omc 
-    - *Type*: Bool
+- omc<a id="omc"></a> 
+    - *Type*: Boolean
     - *Description*: whether turn on occupation matrix control method or not
     - *Default*: 0
 
@@ -1396,6 +1454,8 @@ This part of variables are used to control berry phase and wannier90 interfacae 
     - *Default*: up
 
     [back to top](#input-file)
+
+### TDDFT: time dependent density functional theory
 - tddft<a id="tddft"></a>
     - *Type*: Integer
     - *Description*:
@@ -1404,7 +1464,25 @@ This part of variables are used to control berry phase and wannier90 interfacae 
     - *Default*: 0
 
     [back to top](#input-file)
-- vext<a id="vext"></a>
+- td_dr2<a id="td_dr2"></a>
+    - *Type*: Double
+    - *Description*: Accuracy of electron convergence when doing time-dependent evolution.
+    - *Default*: 1e-9
+
+    [back to top](#input-file)
+- td_dt<a id="td_dt"></a>
+    - *Type*: Double
+    - *Description*: Time-dependent evolution time step. (fs)
+    - *Default*: 0.02
+
+    [back to top](#input-file)
+- td_force_dt<a id="td_force_dt"></a>
+    - *Type*: Double
+    - *Description*: Time-dependent evolution force changes time step. (fs)
+    - *Default*: 0.02
+
+    [back to top](#input-file)
+- td_vext<a id="td_vext"></a>
     - *Type*: Integer
     - *Description*:
         - 1: add a laser material interaction (extern laser field).
@@ -1412,13 +1490,44 @@ This part of variables are used to control berry phase and wannier90 interfacae 
     - *Default*: 0
 
     [back to top](#input-file)
-- vext_dire<a id="vext-dire"></a>
+- td_vext_dire<a id="td_vext_dire"></a>
     - *Type*: Integer
     - *Description*:
         - 1: the direction of external light field is along x axis.
         - 2: the direction of external light field is along y axis.
         - 3: the direction of external light field is along z axis.
     - *Default*: 1
+
+    [back to top](#input-file)
+- td_timescale<a id="td_timescale"></a>
+    - *Type*: Double
+    - *Description*: Time range of external electric field application. (fs)
+    - *Default*: 0.5
+
+    [back to top](#input-file)
+- td_vexttype<a id="td_vexttype"></a>
+    - *Type*: Integer
+    - *Description*:
+        - 1: Gaussian-type light field.
+        - 2: Delta function form light field.
+        - 3: Trigonometric function form light field.
+    - *Default*: 1
+
+    [back to top](#input-file)
+- td_vextout<a id="td_vextout"></a>
+    - *Type*: Integer
+    - *Description*:
+        - 1: Output external electric field.
+        - 0: do not Output external electric field.
+    - *Default*: 0
+
+    [back to top](#input-file)
+- td_dipoleout<a id="td_dipoleout"></a>
+    - *Type*: Integer
+    - *Description*:
+        - 1: Output dipole.
+        - 0: do not Output dipole.
+    - *Default*: 0
 
     [back to top](#input-file)
 

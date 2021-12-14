@@ -141,14 +141,14 @@ void Dos::calculate_Mulliken(const std::string &fa)
 bool Dos::calculate_dos
 (
 	const int &is,
-	const int *isk,
+	const std::vector<int> &isk,
 	const std::string &fa, //file address
 	const double &de_ev, // delta energy in ev
 	const double &emax_ev,
 	const double &emin_ev,// minimal energy in ev.
 	const int &nks,//number of k points
 	const int &nkstot,
-	const double *wk,//weight of k points
+	const std::vector<double> &wk,//weight of k points
 	const ModuleBase::matrix &wg,//weight of (kpoint,bands)
 	const int &nbands,// number of bands
 	double** ekb//store energy for each k point and each band

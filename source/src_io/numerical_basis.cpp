@@ -67,7 +67,7 @@ void Numerical_Basis::output_overlap( const ModuleBase::ComplexMatrix *psi)
         std::ofstream ofs;
         std::stringstream ss;
         // the parameter 'winput::spillage_outdir' is read from INPUTw.
-        ss << winput::spillage_outdir << "/" << GlobalC::ucell.latName << "." << derivative_order << ".dat";
+        ss << winput::spillage_outdir << "/" <<  "orb_matrix." << derivative_order << ".dat";
         if (GlobalV::MY_RANK==0)
         {
             ofs.open(ss.str().c_str());
