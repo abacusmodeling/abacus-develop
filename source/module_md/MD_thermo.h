@@ -13,7 +13,8 @@ class MD_thermo
         const int control,
         const double &temperature,
         ModuleBase::Vector3<double>* vel,
-        const double* allmass
+        const double* allmass,
+        const int& numIon
         );
     void init_NHC(
         const int &MNHC_in, 
@@ -41,12 +42,14 @@ class MD_thermo
     void ADSIntegrator(
         const double &temperature,
         ModuleBase::Vector3<double>* vel,
-        const double* allmass
+        const double* allmass,
+        const int& numIon
     );
 	void LGVIntegrator(
         const double &temperature,
         ModuleBase::Vector3<double>* vel,
-        const double* allmass
+        const double* allmass,
+        const int& numIon
     );
 	void NHCIntegrator(
         const double &temperature,

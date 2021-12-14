@@ -135,6 +135,7 @@ void MD_func::RandomVel(
 	const int& numIon, 
 	const double& temperature, 
 	const double* allmass,
+	const ModuleBase::Vector3<int> frozen,
 	const int& frozen_freedom,
 	const ModuleBase::Vector3<int>* ionmbl,
 	ModuleBase::Vector3<double>* vel)
@@ -184,9 +185,9 @@ void MD_func::RandomVel(
 
 		for(int i=0; i<numIon; i++)
     	{
-			if(ionmbl[i].x) vel[i].x -= average.x;
-			if(ionmbl[i].y) vel[i].y -= average.y;
-			if(ionmbl[i].z) vel[i].z -= average.z;
+			if(ionmbl[i].x && frozen.x==0) vel[i].x -= average.x;
+			if(ionmbl[i].y && frozen.y==0) vel[i].y -= average.y;
+			if(ionmbl[i].z && frozen.z==0) vel[i].z -= average.z;
 		}
 	
 		double factor = 0.5*(3*numIon-frozen_freedom)*temperature/GetAtomKE(numIon, vel, allmass);
@@ -210,7 +211,12 @@ void MD_func::InitVel(
 	ModuleBase::Vector3<int>* ionmbl,
 	ModuleBase::Vector3<double>* vel)
 {
-	//frozen_freedom = getMassMbl(unit_in, allmass, ionmbl);
+	ModuleBase::Vector3<int> frozen;
+	getMassMbl(unit_in, allmass, frozen, ionmbl);
+	frozen_freedom = frozen.x + frozen.y + frozen.z;
+	if(frozen.x == 0) ++frozen_freedom;
+	if(frozen.y == 0) ++frozen_freedom;
+	if(frozen.z == 0) ++frozen_freedom;
 
 	if(unit_in.set_vel)
     {
@@ -218,7 +224,7 @@ void MD_func::InitVel(
     }
     else
     {
-        RandomVel(unit_in.nat, temperature, allmass, frozen_freedom, ionmbl, vel);
+        RandomVel(unit_in.nat, temperature, allmass, frozen, frozen_freedom, ionmbl, vel);
     }
 }
 
@@ -357,34 +363,26 @@ std::string MD_func::intTurnTostring(long int iter, std::string path)
 	return path;
 }
 
-int MD_func::getMassMbl(const UnitCell_pseudo &unit_in, 
-			const MD_parameters &mdp,
+void MD_func::getMassMbl(const UnitCell_pseudo &unit_in, 
 			double* allmass, 
+			ModuleBase::Vector3<int> &frozen,
 			ModuleBase::Vector3<int>* ionmbl)
 {
 //some prepared information
 //mass and degree of freedom
 	int ion=0;
-	int frozen_freedom=0;
+	frozen.set(0,0,0);
 	for(int it=0;it<unit_in.ntype;it++){
 		for(int i=0;i<unit_in.atoms[it].na;i++){
 			allmass[ion]=unit_in.atoms[it].mass/ModuleBase::AU_to_MASS;
 			ionmbl[ion]=unit_in.atoms[it].mbl[i];
-			if (ionmbl[ion].x==0) frozen_freedom++;
-			if (ionmbl[ion].y==0) frozen_freedom++;
-			if (ionmbl[ion].z==0) frozen_freedom++;
+			if (ionmbl[ion].x==0) ++frozen.x;
+			if (ionmbl[ion].y==0) ++frozen.y;
+			if (ionmbl[ion].z==0) ++frozen.z;
 
 			ion++;
 		}
 	}
-
-	// the center of mass is fixed except for NVT Anderson
-	if(!(mdp.mdtype==1 && mdp.NVT_control==3))
-	{
-		frozen_freedom += 3;
-	}
-
-	return frozen_freedom;
 }
 
 void MD_func::printpos(const std::string& file, const int& iter, const int& recordFreq, const UnitCell_pseudo& unit_in)

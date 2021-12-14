@@ -17,6 +17,7 @@
 #include "../src_pw/vdwd3.h"
 #include "../src_pw/vdwd2_parameters.h"
 #include "../src_pw/vdwd3_parameters.h"
+#include "dmft.h"
 #ifdef __DEEPKS
 #include "LCAO_descriptor.h"    //caoyu add 2021-07-26
 #endif
@@ -170,10 +171,20 @@ void LOOP_ions::opt_ions(void)
             GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
         }
 
+    if(INPUT.dft_plus_dmft)
+    {
+      // Output sparse overlap matrix S(R)
+      this->output_SR("outputs_to_DMFT/overlap_matrix/SR.csr");
+      
+      // Output wave functions, bands, k-points information, and etc.
+      GlobalC::dmft.out_to_dmft();
+    }
+
         if(GlobalC::ParaO.out_hsR)
 		{
 			this->output_HS_R(); //LiuXh add 2019-07-15
 		}
+
         //caoyu add 2021-03-31
 #ifdef __DEEPKS
         if (GlobalV::out_descriptor)
@@ -299,6 +310,7 @@ bool LOOP_ions::force_stress(
 
             if(IMM.get_converged() || (istep==GlobalV::NSTEP))
             {
+                ModuleBase::timer::tick("LOOP_ions","force_stress");
                 return 1; // 1 means converged
             }
             else // ions are not converged
@@ -314,10 +326,12 @@ bool LOOP_ions::force_stress(
                     GlobalC::pot.init_pot( istep, GlobalC::pw.strucFac );
                 }
             }
+            ModuleBase::timer::tick("LOOP_ions","force_stress");
             return 0;
         }
         else
         {
+            ModuleBase::timer::tick("LOOP_ions","force_stress");
             return 1;
         }
 
@@ -367,6 +381,7 @@ xiaohui modify 2014-08-09*/
            	converged_stress = LCM.get_converged();
            	if(converged_stress)
            	{
+                ModuleBase::timer::tick("LOOP_ions","force_stress");
                	return 1;
            	}
            	else
@@ -375,11 +390,13 @@ xiaohui modify 2014-08-09*/
                	GlobalC::pot.init_pot(stress_step, GlobalC::pw.strucFac);
 
                	++stress_step;
+                ModuleBase::timer::tick("LOOP_ions","force_stress");
                	return 0;
            	}
 		}
         else
         {
+            ModuleBase::timer::tick("LOOP_ions","force_stress");
             return 1;
         }
 	}
@@ -409,6 +426,7 @@ xiaohui modify 2014-08-09*/
             	    converged_stress = LCM.get_converged();
             	    if(converged_stress)
             	    {
+                        ModuleBase::timer::tick("LOOP_ions","force_stress");
                 	    return 1;
             	    }
             	    else
@@ -417,11 +435,13 @@ xiaohui modify 2014-08-09*/
                 	    GlobalC::pot.init_pot(stress_step, GlobalC::pw.strucFac);
 
                 	    ++stress_step;
+                        ModuleBase::timer::tick("LOOP_ions","force_stress");
                 	    return 0;
                     }
                 }
                 else
                 {
+                    ModuleBase::timer::tick("LOOP_ions","force_stress");
                     return 1;
                 }
 
@@ -439,18 +459,18 @@ xiaohui modify 2014-08-09*/
                     GlobalC::pot.init_pot( istep, GlobalC::pw.strucFac );
                 }
                 ++force_step;
+                ModuleBase::timer::tick("LOOP_ions","force_stress");
                 return 0;
             }
         }
         else
         {
+            ModuleBase::timer::tick("LOOP_ions","force_stress");
             return 1;
         }
     }
-
-    return 0;
-
     ModuleBase::timer::tick("LOOP_ions","force_stress");
+    return 0;
 }
 
 void LOOP_ions::final_scf(void)
@@ -545,3 +565,4 @@ void LOOP_ions::final_scf(void)
 
     return;
 }
+

@@ -31,7 +31,7 @@ MD_basic::MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
 	allmass=new double[ucell.nat];
 	ionmbl=new ModuleBase::Vector3<int>[ucell.nat];
 
-    frozen_freedom_ = mdf.getMassMbl(ucell, mdp, allmass, ionmbl);
+    //frozen_freedom_ = mdf.getMassMbl(ucell, mdp, allmass, ionmbl);
     mdf.InitVel(ucell, temperature_, allmass, frozen_freedom_, ionmbl, vel);
     // if (ucell.set_vel)    //  Yuanbo Li 2021-08-01
     // {
@@ -236,7 +236,7 @@ void MD_basic::runNVT(int step1, double potential, ModuleBase::Vector3<double> *
 
     update_half_direct(1);
 	
-	mdt.Integrator(mdp.NVT_control, temperature_, vel, allmass);//thermostat interact with velocity
+	mdt.Integrator(mdp.NVT_control, temperature_, vel, allmass, ucell.nat);//thermostat interact with velocity
     twiceKE=mdf.GetAtomKE(ucell.nat, vel, allmass);
     twiceKE = 2 * twiceKE;
 	
