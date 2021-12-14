@@ -10,7 +10,7 @@ namespace Read_Txt_Input
 	void Input_List::add_item(const Input_Item &input_item)
 	{
 		list.insert(make_pair(input_item.label, input_item));
-		add_order.push_back(input_item.label);
+		output_labels.push_back(input_item.label);
 	}
 
 	/*

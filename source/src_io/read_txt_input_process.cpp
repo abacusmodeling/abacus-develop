@@ -79,29 +79,37 @@ namespace Read_Txt_Input
 	void Input_Process::out(const std::string &file_name) const
 	{
 		std::ofstream ofs(file_name);
-		for(const std::string &label : input.add_order)
+		for(const std::string &label : input.output_labels)
 		{
-			ofs<<label<<"\t";
-			const Read_Txt_Input::Input_Item &item = input.list.at(label);
-			for(size_t i=0; i<item.values.size(); ++i)
+			const auto ptr = input.list.find(label);
+			if(ptr==input.list.end())
 			{
-				if(item.values_type[i]=="s")
-					ofs<<item.values[i].gets()<<" ";
-				else if(item.values_type[i]=="d")
-					ofs<<std::to_string(item.values[i].getd())<<" ";
-				else if(item.values_type[i]=="i")
-					ofs<<std::to_string(item.values[i].geti())<<" ";
-				else if(item.values_type[i]=="b")
-				{
-					if(item.values[i].getb())
-						ofs<<"true"<<" ";
-					else
-						ofs<<"false"<<" ";
-				}
-				else
-					throw invalid_argument("Input_Process::out() value_type["+std::to_string(i)+"]="+item.values_type[i]);
+				ofs<<std::endl<<"# "<<label<<std::endl;
 			}
-			ofs<<"\t# "<<item.annotation<<std::endl;
+			else
+			{
+				ofs<<label<<"\t";
+				const Read_Txt_Input::Input_Item &item = ptr->second;
+				for(size_t i=0; i<item.values.size(); ++i)
+				{
+					if(item.values_type[i]=="s")
+						ofs<<item.values[i].gets()<<" ";
+					else if(item.values_type[i]=="d")
+						ofs<<std::to_string(item.values[i].getd())<<" ";
+					else if(item.values_type[i]=="i")
+						ofs<<std::to_string(item.values[i].geti())<<" ";
+					else if(item.values_type[i]=="b")
+					{
+						if(item.values[i].getb())
+							ofs<<"true"<<" ";
+						else
+							ofs<<"false"<<" ";
+					}
+					else
+						throw invalid_argument("Input_Process::out() value_type["+std::to_string(i)+"]="+item.values_type[i]);
+				}
+				ofs<<"\t# "<<item.annotation<<std::endl;
+			}
 		}
 	}
 

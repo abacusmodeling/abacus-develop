@@ -16,6 +16,8 @@ namespace Read_Txt_Input
 {
 	void Input_List::set_items_general()
 	{
+		this->output_labels.push_back("Parameters (1.General)");
+
 		{
 			Input_Item item("nspin");
 			item.default_1(1);

@@ -15,6 +15,8 @@ namespace Read_Txt_Input
 {
 	void Input_List::set_items_pw()
 	{
+		this->output_labels.push_back("Parameters (2.Pw)");
+
 		{
 			Input_Item item("ecutwfc");
 			item.default_1(100.0,"eV");
