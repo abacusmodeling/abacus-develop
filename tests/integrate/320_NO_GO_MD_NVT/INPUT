@@ -5,14 +5,15 @@ pseudo_dir		./
 ntype			1	
 nbands			8
 calculation     md
+read_file_dir   ./
 
 #Parameters (Accuracy)
 ecutwfc			20
 niter			20
 
-dr2         1E-7
+dr2 1E-7
 basis_type		lcao
-nstep           2
+nstep           1
 
 stress          1
 stress_thr      1e-6
@@ -23,9 +24,10 @@ ks_solver       genelpa
 mixing_type     pulay
 mixing_beta     0.7
 
-md_mdtype        0
-md_rstmd         1
-
-read_file_dir   ./
+md_mdtype        1
+md_tfirst        10
+md_dt            1
+md_rstmd         0
 
 gamma_only 1
+

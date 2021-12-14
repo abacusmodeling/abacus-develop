@@ -225,7 +225,6 @@ void MD_func::RandomVel(
 	const int& numIon, 
 	const double& temperature, 
 	const double* allmass,
-	const ModuleBase::Vector3<int> frozen,
 	const int& frozen_freedom,
 	const ModuleBase::Vector3<int> frozen,
 	const ModuleBase::Vector3<int>* ionmbl,
