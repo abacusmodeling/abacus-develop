@@ -2,10 +2,7 @@
 #ifndef RUN_MD_PW_H
 #define RUN_MD_PW_H
 
-#include "../src_pw/tools.h"
 #include "../src_pw/charge_extra.h"
-#include "../src_ions/lattice_change_methods.h"
-#include "../src_pw/global.h"
 
 class Run_MD_PW
 {
@@ -23,7 +20,7 @@ public:
 
 private:
     Charge_Extra CE;
-    Lattice_Change_Methods LCM;
+    bool cellchange;
 };
 
 #endif

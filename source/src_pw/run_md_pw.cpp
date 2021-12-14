@@ -17,7 +17,10 @@
 #include "../module_md/NVT_NHC.h"
 #include "../src_io/print_info.h"
 
-Run_MD_PW::Run_MD_PW(){}
+Run_MD_PW::Run_MD_PW()
+{
+    cellchange = false;
+}
 
 Run_MD_PW::~Run_MD_PW(){}
 
@@ -44,11 +47,6 @@ void Run_MD_PW::md_ions_pw(void)
     // allocation for ion movement.
     CE.allocate_ions();
 
-    if (GlobalV::STRESS) // pengfei Li 2018-05-14
-    {
-        LCM.allocate();
-    }
-
     // determine the mdtype
     Verlet *verlet;
     if(INPUT.mdp.mdtype == -1)
@@ -70,6 +68,7 @@ void Run_MD_PW::md_ions_pw(void)
     else if(INPUT.mdp.mdtype==4)
     {
         verlet = new MSST(INPUT.mdp, GlobalC::ucell); 
+        cellchange = true;
     }
 
     // md cycle
@@ -78,33 +77,44 @@ void Run_MD_PW::md_ions_pw(void)
         if(verlet->step_ == 0)
         {
             verlet->setup();
-            CE.update_all_pos(GlobalC::ucell);
         }
         else
         {
+            CE.update_all_pos(GlobalC::ucell);
+
             verlet->first_half();
 
-            CE.save_pos_next(GlobalC::ucell);
-            //xiaohui add CE.istep = istep 2014-07-07
-            CE.update_istep(verlet->step_);
-            // charge extrapolation if istep>0.
-            CE.extrapolate_charge();
+            if(cellchange)
+            {
+                CE.update_istep(1);
+            }
+            else
+            {
+                CE.update_istep(verlet->step_);
+            }
 
-            //reset local potential and initial wave function
+            CE.extrapolate_charge();
+            CE.save_pos_next(GlobalC::ucell);
+
+            if(cellchange)
+            {
+                Variable_Cell::init_after_vc();
+            }
+
+            // reset local potential and initial wave function
             GlobalC::pot.init_pot(verlet->step_, GlobalC::pw.strucFac);
-            //GlobalV::ofs_running << " Setup the new wave functions?\n" << std::endl;
+            
+            // new wave functions
             GlobalC::wf.wfcinit();
 
             // update force and virial due to the update of atom positions
             MD_func::force_virial(verlet->step_, verlet->mdp, verlet->ucell, verlet->potential, verlet->force, verlet->virial);
 
-            CE.update_all_pos(GlobalC::ucell);
-
             verlet->second_half();
 
             MD_func::kinetic_stress(verlet->ucell, verlet->vel, verlet->allmass, verlet->kinetic, verlet->stress);
 
-            verlet->stress +=  verlet->virial;
+            verlet->stress += verlet->virial;
         }
 
         if(verlet->step_ % verlet->mdp.recordFreq == 0)

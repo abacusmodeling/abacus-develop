@@ -7,10 +7,7 @@ HEADERS= *.h
 OBJS_MAIN=input.o\
 
 OBJS_MD=driver_classic.o\
-MD_basic.o\
-MD_fire.o\
 MD_func.o\
-MD_thermo.o\
 run_md_classic.o\
 LJ_potential.o\
 DP_potential.o\

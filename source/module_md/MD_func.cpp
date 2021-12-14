@@ -376,7 +376,8 @@ void MD_func::force_virial(const int &istep,
 #ifdef __LCAO
 		else if(GlobalV::BASIS_TYPE=="lcao")
 		{
-			//Run_lcao::lcao_line();
+			Run_MD_LCAO md_lcao;
+			md_lcao.md_force_virial(istep, unit_in.nat, potential, force, stress);
 		}
 #endif
 	}
