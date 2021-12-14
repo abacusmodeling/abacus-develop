@@ -1,8 +1,10 @@
 #include "run_md_classic.h"
-#include "MD_basic.h"
+#include "MD_func.h"
 #include "NVE.h"
 #include "MSST.h"
+#include "FIRE.h"
 #include "NVT_ADS.h"
+#include "NVT_NHC.h"
 #include "../input.h"
 #include "../src_io/print_info.h"
 
@@ -25,25 +27,31 @@ void Run_MD_CLASSIC::classic_md_line(void)
 
     // determine the mdtype
     Verlet *verlet;
-    if(INPUT.mdp.mdtype==0)
+    if(INPUT.mdp.mdtype == -1)
+    {
+        verlet = new FIRE(INPUT.mdp, ucell_c); 
+    }
+    else if(INPUT.mdp.mdtype == 0)
     {
         verlet = new NVE(INPUT.mdp, ucell_c); 
     }
-    else if(INPUT.mdp.mdtype==1)
+    else if(INPUT.mdp.mdtype == 1)
     {
         verlet = new NVT_ADS(INPUT.mdp, ucell_c);
     }
-    else if(INPUT.mdp.mdtype==4)
+    else if(INPUT.mdp.mdtype == 2)
+    {
+        verlet = new NVT_NHC(INPUT.mdp, ucell_c);
+    }
+    else if(INPUT.mdp.mdtype == 4)
     {
         verlet = new MSST(INPUT.mdp, ucell_c); 
     }
 
-    bool stop = false;
-
     // md cycle
-    while (verlet->step_ <= (GlobalV::NSTEP + verlet->step_rst_) && !stop)
+    while (verlet->step_ <= GlobalV::NSTEP && !verlet->stop)
     {
-        if(verlet->step_ == verlet->step_rst_)
+        if(verlet->step_ == 0)
         {
             verlet->setup();
         }
@@ -52,7 +60,7 @@ void Run_MD_CLASSIC::classic_md_line(void)
             verlet->first_half();
 
             // update force and virial due to the update of atom positions
-            MD_func::force_virial(verlet->mdp, verlet->ucell, verlet->potential, verlet->force, verlet->virial);
+            MD_func::force_virial(verlet->step_, verlet->mdp, verlet->ucell, verlet->potential, verlet->force, verlet->virial);
 
             verlet->second_half();
 
@@ -61,20 +69,20 @@ void Run_MD_CLASSIC::classic_md_line(void)
             verlet->stress +=  verlet->virial;
         }
 
-        Print_Info::print_screen(0, 0, verlet->step_);
-        verlet->outputMD();
-
-        if((verlet->step_ - verlet->step_rst_) % verlet->mdp.recordFreq == 0)
+        if(verlet->step_ % verlet->mdp.recordFreq == 0)
         {
+            Print_Info::print_screen(0, 0, verlet->step_ + verlet->step_rst_);
+            verlet->outputMD();
+            
             verlet->ucell.update_vel(verlet->vel);
             std::stringstream file;
-            file << GlobalV::global_out_dir << "STRU_MD_" << verlet->step_;
+            file << GlobalV::global_out_dir << "STRU_MD_" << verlet->step_ + verlet->step_rst_;
 #ifdef __LCAO
             verlet->ucell.print_stru_file(GlobalC::ORB, file.str(), 1, 1);
 #else
             verlet->ucell.print_stru_file(file.str(), 1, 1);
 #endif
-            MD_func::MDdump(verlet->step_, verlet->ucell.nat, verlet->virial, verlet->force);
+            MD_func::MDdump(verlet->step_ + verlet->step_rst_, verlet->ucell.nat, verlet->virial, verlet->force);
             verlet->write_restart();
         }
 
@@ -87,6 +95,6 @@ void Run_MD_CLASSIC::classic_md_line(void)
     GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
     delete verlet;
-    ModuleBase::timer::tick("Run_MD_CLASSIC", "md_cells_classic");
+    ModuleBase::timer::tick("Run_MD_CLASSIC", "classic_md_line");
     return;
 }

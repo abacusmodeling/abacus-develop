@@ -11,7 +11,7 @@ ecutwfc			20
 niter			20
 
 basis_type		pw
-nstep           2
+nstep           1
 
 stress          1
 stress_thr      1e-6
@@ -23,6 +23,6 @@ mixing_type     pulay
 mixing_beta     0.7
 
 md_mdtype        0
-md_rstmd         1
+md_rstmd         0
 
 read_file_dir   ./

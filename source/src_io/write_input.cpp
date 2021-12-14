@@ -178,6 +178,7 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"velocity",mdp.velocity,"the velocity of shock wave");
 	ModuleBase::GlobalFunc::OUTP(ofs,"viscosity",mdp.viscosity,"artificial viscosity");
 	ModuleBase::GlobalFunc::OUTP(ofs,"tscale",mdp.tscale,"reduction in initial temperature");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_tfreq",mdp.tfreq,"oscillation frequency, used to determine Qmass of NHC");
 
 
 	ofs << "\n#Parameters (11.Efield)" << std::endl;

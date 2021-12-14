@@ -11,6 +11,8 @@ class MD_func
     MD_func(){};
     ~MD_func(){};
 
+	static double gaussrand();
+
 	static bool RestartMD(const int& numIon, ModuleBase::Vector3<double>* vel, int& step_rst);
     static void mdRestartOut(const int& step, const int& recordFreq, const int& numIon, ModuleBase::Vector3<double>* vel);
 	
@@ -36,6 +38,7 @@ class MD_func
 		ModuleBase::Vector3<double>* vel);
 
 	static void force_virial(
+		const int &istep,
 		const MD_parameters &mdp,
 		const UnitCell_pseudo &unit_in,
 		double &potential,

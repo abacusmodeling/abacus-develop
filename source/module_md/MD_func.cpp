@@ -7,6 +7,45 @@
 #include "../module_neighbor/sltk_grid_driver.h"
 #include "../module_base/global_variable.h"
 
+#ifndef __CMD
+#include "../src_pw/run_md_pw.h"
+#endif
+
+#ifdef __LCAO
+#include "../src_lcao/run_md_lcao.h"
+#endif
+
+
+double MD_func::gaussrand()
+{
+    static double V1, V2, S;
+    static int phase = 0;
+    double X;
+     
+    if ( phase == 0 ) 
+    {
+        do 
+        {
+            double U1 = rand()/double(RAND_MAX);
+            double U2 = rand()/double(RAND_MAX);
+             
+            V1 = 2.0 * U1 - 1.0;
+            V2 = 2.0 * U2 - 1.0;
+            S = V1 * V1 + V2 * V2;
+        } while(S >= 1 || S == 0);
+         
+        X = V1 * sqrt(-2.0 * log(S) / S);
+    } 
+    else
+    {
+        X = V2 * sqrt(-2.0 * log(S) / S);
+    }
+
+    phase = 1 - phase;
+ 
+    return X;
+}
+
 bool MD_func::RestartMD(const int& numIon, ModuleBase::Vector3<double>* vel, int& step_rst)
 {
 	int error(0);
@@ -193,7 +232,6 @@ void MD_func::RandomVel(
 {
 	if(!GlobalV::MY_RANK)
 	{
-		srand(time(0));
 		ModuleBase::Vector3<double> average;
 		ModuleBase::Vector3<double> mass;
 		average.set(0,0,0);
@@ -280,7 +318,8 @@ void MD_func::InitPos(
 }
 
 //calculate potential, force and virial
-void MD_func::force_virial(const MD_parameters &mdp,
+void MD_func::force_virial(const int &istep,
+		const MD_parameters &mdp,
 		const UnitCell_pseudo &unit_in,
 		double &potential,
 		ModuleBase::Vector3<double> *force,
@@ -326,13 +365,26 @@ void MD_func::force_virial(const MD_parameters &mdp,
 	{
 		DP_potential::DP_pot(unit_in, potential, force, stress);
 	}
+#ifndef __CMD
 	else if(mdp.md_potential == "FP")
 	{
-		ModuleBase::WARNING_QUIT("md_force_stress", "FPMD is only available in integrated program or PW module ！");
+		if(GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")
+		{
+			Run_MD_PW md_pw;
+			md_pw.md_force_virial(istep, unit_in.nat, potential, force, stress);
+		}
+#ifdef __LCAO
+		else if(GlobalV::BASIS_TYPE=="lcao")
+		{
+			Run_MD_LCAO md_lcao;
+			md_lcao.md_force_virial(istep, unit_in.nat, potential, force, stress);
+		}
+#endif
 	}
+#endif
 	else
 	{
-		ModuleBase::WARNING_QUIT("md_force_stress", "Unsupported MD potential ！");
+		ModuleBase::WARNING_QUIT("md_force_stress", "Unsupported MD potential !");
 	}
 
 	ModuleBase::timer::tick("MD_func", "md_force_stress");
@@ -353,7 +405,7 @@ void MD_func::outStress(const ModuleBase::matrix &virial, const ModuleBase::matr
     GlobalV::ofs_running<<"Kenetic Term is "<<(stress_scalar-virial_scalar)*unit_transform<<" Kbar "<<std::endl;
 
 	GlobalV::ofs_running << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed) << std::endl;
-	ModuleBase::GlobalFunc::NEW_PART("TOTAL-STRESS (KBAR)");
+	ModuleBase::GlobalFunc::NEW_PART("MD STRESS (KBAR)");
 	for (int i=0; i<3; i++)
 	{
 		GlobalV::ofs_running << " " << std::setw(15) << stress(i,0)*unit_transform 
@@ -363,71 +415,6 @@ void MD_func::outStress(const ModuleBase::matrix &virial, const ModuleBase::matr
 	}
 	GlobalV::ofs_running << std::setiosflags(ios::left);
 }
-
-/*
-void MD_func::InitVelocity(
-	const int& numIon, 
-	const double& temperature, 
-	const double& fundamentalTime, 
-	const double* allmass,
-	ModuleBase::Vector3<double>* vel)
-{
-	if(!GlobalV::MY_RANK){ //xiaohui add 2015-09-25
-		srand(time(0));
-		int iy=rand()%21,im=rand()%11,id=rand()%21,ih=rand()%31,in=rand()%61,is=rand()%41;
-		int jy=rand()%21,jm=rand()%11,jd=rand()%21,jh=rand()%31,jn=rand()%61,js=rand()%41;
-		//    int iy=13,im=10,id=1,ih=21,in=54,is=23;
-		//  int jy=14,jm=6,jd=19,jh=4,jn=29,js=32;
-		long int i,j;
-		long int i0,i1,i2,j0,j1,j2;
-		long int a=16807,m=2147483647,q=127773,r=2836;
-		long int M;  
-		double x,y,u,v;
-		i=iy+70*(im+12*(id+31*(ih+23*(in+59*is))));				//initial the seeds
-		j=jy+70*(jm+12*(jd+31*(jh+23*(jn+59*js))));	
-		i0=a*(i%q)-r*((i-i%q)/q);
-		j0=a*(j%q)-r*((j-j%q)/q);
-		if(i0>=0)	i1=i0;  	else i1=i0+m;	
-		i0=a*(j%q)-r*((j-j%q)/q);
-		if(j0>=0)	j1=j0;  	else j1=j0+m;	
-		for(M=0;M<3*numIon;){	
-			i0=a*(i1%q)-r*((i1-i1%q)/q);                        
-			if(i0>=0)	i2=i0;  
-			else i2=i0+m;									
-			u=((double)i1)/((double)m);		       //first ramdon number        
-			i1=i2;
-			j0=a*(j1%q)-r*((j1-j1%q)/q);
-			if(j0>=0)	j2=j0;  
-			else j2=j0+m;										
-			v=((double)j1)/((double)m);		        //second ramdon number
-			j1=j2;
-			x=tan(ModuleBase::PI*(u-0.5));
-			y=1.6*v/(ModuleBase::PI*(x*x+1.0));
-			if(y<=(1.0/sqrt(2.0*ModuleBase::PI)*exp(-0.5*x*x))){
-				if(M<numIon) vel[M].x=x;
-				else if(M<2*numIon) vel[M-numIon].y=x;
-				else vel[M-2*numIon].z=x;
-					// std::cout<<"this vel is:"<<x<<std::endl;
-					M++;
-			}
-		}
-      
-		int ion = 0;
-		for(ion=0;ion<numIon;ion++){
-			vel[ion]/=sqrt(allmass[ion]*9.01938e-31);				 
-		}
-		for(ion=0;ion<numIon;ion++){
-			vel[ion]*=sqrt(temperature/ModuleBase::K_BOLTZMAN_AU * ModuleBase::K_BOLTZMAN_SI);
-			vel[ion]*= fundamentalTime/ModuleBase::BOHR_RADIUS_SI;
-		//rescale the velocities to a.u.
-		}
-	} //xiaohui add 2 lines 2015-09-25, bcast vel
-//2015-09-25, xiaohui
-#ifdef __MPI
-	MPI_Bcast(vel,numIon*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
-#endif
-	return;
-}*/
 
 /*void MD_func::ReadNewTemp(int step )
 {

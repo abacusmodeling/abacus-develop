@@ -43,7 +43,7 @@
 
     - [Molecular dynamics](#molecular-dynamics)
 
-        [md_type](#md-type) | [md_potential](#md-potential) | [md_rstmd](#md-rstmd) | [md_dt](#md_dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_dumpmdfred](#md-dumpmdfred) | [md_fixtemperature](#md-fixtemperature) | [NVT_control](#nvt-control) | [NVT_tau](#nvt-tau) | [MNHC](#mnhc) | [md_ediff](#md-ediff) | [md_ediffg](#md-ediffg) | [rcut_lj](#rcut_lj) | [epsilon_lj](#epsilon_lj) | [sigma_lj](#sigma_lj) | [direction](#direction) | [velocity](#velocity) | [viscosity](#viscosity) | [tscale](#tscale)
+        [md_type](#md-type) | [md_potential](#md-potential) | [md_rstmd](#md-rstmd) | [md_dt](#md_dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_dumpmdfred](#md-dumpmdfred) | [md_tfreq](#md-tfreq) | [md_fixtemperature](#md-fixtemperature) | [NVT_control](#nvt-control) | [NVT_tau](#nvt-tau) | [MNHC](#mnhc) | [md_ediff](#md-ediff) | [md_ediffg](#md-ediffg) | [rcut_lj](#rcut_lj) | [epsilon_lj](#epsilon_lj) | [sigma_lj](#sigma_lj) | [direction](#direction) | [velocity](#velocity) | [viscosity](#viscosity) | [tscale](#tscale)
 
     - [DFT+U correction](#DFT_U-correction)
 
@@ -1103,6 +1103,12 @@ This part of variables are used to control the molecular dynamics calculations.
 
     [back to top](#input-file)
 
+- md_tfreq<a id="md-tfreq"></a>
+    - *Type*: Real
+    - *Description*: Oscillation frequency, used to determine Qmass of NHC.
+    - *Default*: 1.0
+
+    [back to top](#input-file)
 
 - md_fixtemperature<a id="md-fixtemperature"></a>
     - *Type*: Integer

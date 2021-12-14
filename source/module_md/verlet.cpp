@@ -5,6 +5,8 @@ Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     mdp(MD_para_in),
     ucell(unit_in)
 {
+    stop = false;
+
     allmass = new double [ucell.nat];
     pos = new ModuleBase::Vector3<double> [ucell.nat];
     vel = new ModuleBase::Vector3<double> [ucell.nat];
@@ -14,8 +16,9 @@ Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     stress.create(3,3);
 
     // convert to a.u. unit
-    mdp.dt/=ModuleBase::AU_to_FS;
-	temperature_=mdp.tfirst/ModuleBase::Hartree_to_K;
+    mdp.dt /= ModuleBase::AU_to_FS;
+    mdp.tfirst /= ModuleBase::Hartree_to_K;
+    mdp.tlast /= ModuleBase::Hartree_to_K;
 
     // LJ parameters
     mdp.rcut_lj *= ModuleBase::ANGSTROM_AU;
@@ -26,9 +29,8 @@ Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     step_rst_ = 0;
     if(mdp.rstMD) unit_in.set_vel = 1;
 
-    //frozen_freedom_ = MD_func::getMassMbl(ucell, mdp, allmass, ionmbl);
     MD_func::InitPos(ucell, pos);
-    MD_func::InitVel(ucell, temperature_, allmass, frozen_freedom_, ionmbl, vel);
+    MD_func::InitVel(ucell, mdp.tfirst, allmass, frozen_freedom_, ionmbl, vel);
 }
 
 Verlet::~Verlet()
@@ -47,9 +49,11 @@ void Verlet::setup()
         restart();
     }
 
-    MD_func::force_virial(mdp, ucell, potential, force, virial);
+    MD_func::force_virial(step_, mdp, ucell, potential, force, virial);
     MD_func::kinetic_stress(ucell, vel, allmass, kinetic, stress);
     stress += virial;
+
+    temperature_ = 2*kinetic/(double(3*ucell.nat-frozen_freedom_))*ModuleBase::Hartree_to_K;
 }
 
 void Verlet::first_half()
@@ -60,14 +64,15 @@ void Verlet::first_half()
         {
             if(ionmbl[i][k])
             {
-                pos[i][k] += vel[i][k]*mdp.dt + 0.5*force[i][k]*mdp.dt*mdp.dt/allmass[i];
                 vel[i][k] += 0.5*force[i][k]*mdp.dt/allmass[i];
+                pos[i][k] += vel[i][k]*mdp.dt;
             }
         }
     }
 
     ucell.update_pos_tau(pos);
     ucell.periodic_boundary_adjustment();
+    MD_func::InitPos(ucell, pos);
 }
 
 void Verlet::second_half()
@@ -86,6 +91,18 @@ void Verlet::second_half()
 
 void Verlet::outputMD()
 {
+    if(GlobalV::MY_RANK) return;
+
+	std::ofstream ofs;
+	if(step_ + step_rst_ == 0)
+	{
+		ofs.open("run.log", ios::trunc);
+	}
+	else
+	{
+		ofs.open("run.log", ios::app);
+	}
+
     temperature_ = 2*kinetic/(double(3*ucell.nat-frozen_freedom_))*ModuleBase::Hartree_to_K;
 
     const double unit_transform = ModuleBase::HARTREE_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
@@ -95,7 +112,7 @@ void Verlet::outputMD()
         press += stress(i,i)/3;
     }
 
-    std::cout << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed);
+    // std::cout << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed);
     std::cout << " " << std::left << std::setw(20) << "Energy" 
             << std::left << std::setw(20) << "Potential" 
             << std::left << std::setw(20) << "Kinetic" 
@@ -107,8 +124,24 @@ void Verlet::outputMD()
             << std::left << std::setw(20) << temperature_
             << std::left << std::setw(20) << press*unit_transform <<std::endl;
 	std::cout << " ------------------------------------------------------------" << std::endl;
-
     MD_func::outStress(virial, stress);
+
+    if(step_ == 0)
+	{
+		ofs << std::left << std::setw(20) << "Step" 
+            << std::left << std::setw(20) << "Energy" 
+            << std::left << std::setw(20) << "Potential" 
+            << std::left << std::setw(20) << "Kinetic" 
+            << std::left << std::setw(20) << "Temperature" 
+            << std::left << std::setw(20) << "Pressure (KBAR)" <<std::endl;
+	}
+    ofs << std::left << std::setw(20) << step_ + step_rst_
+        << std::left << std::setw(20) << potential+kinetic
+        << std::left << std::setw(20) << potential
+        << std::left << std::setw(20) << kinetic
+        << std::left << std::setw(20) << temperature_
+        << std::left << std::setw(20) << press*unit_transform <<std::endl;
+    ofs.close();
 }
 
 void Verlet::write_restart()
@@ -119,7 +152,7 @@ void Verlet::write_restart()
 		ssc << GlobalV::global_out_dir << "Restart_md.dat";
 		std::ofstream file(ssc.str().c_str());
 
-        file << step_ << std::endl;
+        file << step_ + step_rst_ << std::endl;
 		file.close();
 	}
 #ifdef __MPI
@@ -138,7 +171,7 @@ void Verlet::restart()
         if(!file)
 		{
 			std::cout<< "please ensure whether 'Restart_md.dat' exists!" << std::endl;
-            ModuleBase::WARNING_QUIT("MSST", "no Restart_md.dat ！");
+            ModuleBase::WARNING_QUIT("verlet", "no Restart_md.dat ！");
 		}
 
 		file >> step_rst_;
@@ -149,6 +182,4 @@ void Verlet::restart()
 #ifdef __MPI
 	MPI_Bcast(&step_rst_, 1, MPI_INT, 0, MPI_COMM_WORLD);
 #endif
-
-    step_ = step_rst_;
 }
