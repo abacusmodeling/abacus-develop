@@ -39,6 +39,9 @@ public:
 		// NHC
 		tfreq = 1;
 		MNHC = 4;
+
+		// Langevin
+		damp = 1;
 	};
     ~MD_parameters(){};
 
@@ -73,6 +76,9 @@ public:
 	// NHC
 	double tfreq;               // Oscillation frequency, used to determine Qmass of NHC
 	int MNHC;                   // num of NHC
+
+	// Langevin
+	double damp;                // damping parameter (time units)
 };
 
 

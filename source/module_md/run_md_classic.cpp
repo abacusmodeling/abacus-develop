@@ -5,6 +5,7 @@
 #include "FIRE.h"
 #include "NVT_ADS.h"
 #include "NVT_NHC.h"
+#include "Langevin.h"
 #include "../input.h"
 #include "../src_io/print_info.h"
 
@@ -42,6 +43,10 @@ void Run_MD_CLASSIC::classic_md_line(void)
     else if(INPUT.mdp.mdtype == 2)
     {
         verlet = new NVT_NHC(INPUT.mdp, ucell_c);
+    }
+    else if(INPUT.mdp.mdtype == 3)
+    {
+        verlet = new Langevin(INPUT.mdp, ucell_c);
     }
     else if(INPUT.mdp.mdtype == 4)
     {

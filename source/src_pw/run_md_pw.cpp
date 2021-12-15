@@ -15,6 +15,7 @@
 #include "../module_md/MSST.h"
 #include "../module_md/NVT_ADS.h"
 #include "../module_md/NVT_NHC.h"
+#include "../module_md/Langevin.h"
 #include "../src_io/print_info.h"
 
 Run_MD_PW::Run_MD_PW()
@@ -64,6 +65,10 @@ void Run_MD_PW::md_ions_pw(void)
     else if(INPUT.mdp.mdtype==2)
     {
         verlet = new NVT_NHC(INPUT.mdp, GlobalC::ucell);
+    }
+    else if(INPUT.mdp.mdtype == 3)
+    {
+        verlet = new Langevin(INPUT.mdp, GlobalC::ucell);
     }
     else if(INPUT.mdp.mdtype==4)
     {

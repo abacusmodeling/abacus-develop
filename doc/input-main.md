@@ -43,7 +43,7 @@
 
     - [Molecular dynamics](#molecular-dynamics)
 
-        [md_type](#md-type) | [md_potential](#md-potential) | [md_rstmd](#md-rstmd) | [md_dt](#md_dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_dumpmdfred](#md-dumpmdfred) | [md_tfreq](#md-tfreq) | [md_fixtemperature](#md-fixtemperature) | [NVT_control](#nvt-control) | [NVT_tau](#nvt-tau) | [MNHC](#mnhc) | [md_ediff](#md-ediff) | [md_ediffg](#md-ediffg) | [rcut_lj](#rcut_lj) | [epsilon_lj](#epsilon_lj) | [sigma_lj](#sigma_lj) | [direction](#direction) | [velocity](#velocity) | [viscosity](#viscosity) | [tscale](#tscale)
+        [md_type](#md-type) | [md_potential](#md-potential) | [md_rstmd](#md-rstmd) | [md_dt](#md_dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_dumpmdfred](#md-dumpmdfred) | [md_tfreq](#md-tfreq) | [md_fixtemperature](#md-fixtemperature) | [NVT_control](#nvt-control) | [NVT_tau](#nvt-tau) | [MNHC](#mnhc) | [md_ediff](#md-ediff) | [md_ediffg](#md-ediffg) | [rcut_lj](#rcut_lj) | [epsilon_lj](#epsilon_lj) | [sigma_lj](#sigma_lj) | [direction](#direction) | [velocity](#velocity) | [viscosity](#viscosity) | [tscale](#tscale) | [damp](#damp)
 
     - [DFT+U correction](#DFT_U-correction)
 
@@ -1115,6 +1115,7 @@ This part of variables are used to control the molecular dynamics calculations.
         - 0: NVE ensemble;
         - 1: NVT ensemble with Anderson thermostat;
         - 2: NVT ensemble with Nose Hoover Chain;
+        - 3: NVT ensemble with Langevin method;
         - 4: MSST method; 
     - *Default*: 2
 
@@ -1268,6 +1269,12 @@ This part of variables are used to control the molecular dynamics calculations.
 
     [back to top](#input-file)
 
+- damp<a id="damp"></a>
+    - *Type*: Real
+    - *Description*: damping parameter (fs) used to add force in Langevin method.
+    - *Default*: 1
+
+    [back to top](#input-file)
 
 ### DFT+U correction
 This part of variables are used to control DFT+U correlated parameters
