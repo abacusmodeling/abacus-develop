@@ -22,3 +22,6 @@ mixing_type     pulay
 mixing_beta     0.7
 
 charge_extrap  first-order
+
+md_tfirst      10
+md_tfreq       0.1
