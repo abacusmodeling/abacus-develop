@@ -180,6 +180,7 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"viscosity",mdp.viscosity,"artificial viscosity");
 	ModuleBase::GlobalFunc::OUTP(ofs,"tscale",mdp.tscale,"reduction in initial temperature");
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_tfreq",mdp.tfreq,"oscillation frequency, used to determine Qmass of NHC");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_damp",mdp.damp,"damping parameter (time units) used to add force in Langevin method");
 
 
 	ofs << "\n#Parameters (11.Efield)" << std::endl;

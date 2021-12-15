@@ -6,6 +6,12 @@ NVT_NHC::NVT_NHC(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in) : Verlet(M
     // convert to a.u. unit
     mdp.tfreq *= ModuleBase::AU_to_FS;
 
+    if(mdp.tfirst == 0)
+    {
+        std::cout << " tfirst must be larger than 0 in NHC !!! " << std::endl;
+        ModuleBase::WARNING_QUIT("NVT_NHC", " tfirst must be larger than 0 in NHC !!! ");
+    }
+
     // init NHC
     Q = new double [mdp.MNHC];
 	G = new double [mdp.MNHC];
@@ -225,7 +231,7 @@ void NVT_NHC::integrate()
 
 void NVT_NHC::temp_target()
 {
-    double delta = (double)step_ / GlobalV::NSTEP;
+    double delta = (double)(step_ + step_rst_) / GlobalV::NSTEP;
     t_target = mdp.tfirst + delta * (mdp.tlast - mdp.tfirst);
 }
 
