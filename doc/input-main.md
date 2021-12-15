@@ -1111,10 +1111,12 @@ This part of variables are used to control the molecular dynamics calculations.
 - md_type<a id="md-type"></a>
     - *Type*: Integer
     - *Description*: control the ensemble to run md.
-        - 0: When set to 0, ABACUS will use NVE ensemble;
-        - 1: When set to 1, ABACUS will use NVT ensemble with Nose Hoover method;
-        - 2: When set to 2, ABACUS will use NVT ensemble with Velosity Scaling method;
-    - *Default*: 1
+        - -1: FIRE method to relax;
+        - 0: NVE ensemble;
+        - 1: NVT ensemble with Anderson thermostat;
+        - 2: NVT ensemble with Nose Hoover Chain;
+        - 4: MSST method; 
+    - *Default*: 2
 
     [back to top](#input-file)
 
@@ -1131,15 +1133,15 @@ This part of variables are used to control the molecular dynamics calculations.
 - md_rstmd<a id="md-rstmd"></a>
     - *Type*: Boolean
     - *Description*: to control whether restart md.
-        - 0:When set to 0, ABACUS will calculate md normolly.
-        - 1:When set to 1, ABACUS will calculate md from last step in your test before.
+        - 0: When set to 0, ABACUS will calculate md normolly.
+        - 1: When set to 1, ABACUS will calculate md from last step in your test before.
     - *Default*: 0
 
     [back to top](#input-file)
 - md_dt<a id="md_dt"></a>
     - *Type*: Double
     - *Description*: This is the time step(fs) used in md simulation .
-    - *Default*: No default
+    - *Default*: 1
 
     [back to top](#input-file)
 - md_tfirst & md_tlast<a id="md-t"></a>
@@ -1150,8 +1152,8 @@ This part of variables are used to control the molecular dynamics calculations.
     [back to top](#input-file)
 - md_qmass<a id="md-qmass"></a>
     - *Type*: Double
-    - *Description*: Inertia of extended system variable. Used only when md_type is 1 or 2, you should set a number which is larger than 0. If you want to autoset this by ABACUS,just set it to 0.
-    - *Default*: 0
+    - *Description*: Inertia of extended system variable. Used only when md_type is 4, you should set a number which is larger than 0. Note that Qmass of NHC is set by md_tfreq.
+    - *Default*: No default
 
     [back to top](#input-file)
 - md_dumpmdfred<a id="md-dumpmdfred"></a>
@@ -1163,7 +1165,9 @@ This part of variables are used to control the molecular dynamics calculations.
 
 - md_tfreq<a id="md-tfreq"></a>
     - *Type*: Real
-    - *Description*: Oscillation frequency, used to determine Qmass of NHC.
+    - *Description*: 
+        - Oscillation frequency, used to determine Qmass of NHC; 
+        - 1/(md_tfreq*md_dt) is collision probability in Anderson method.
     - *Default*: 1.0
 
     [back to top](#input-file)
@@ -1238,28 +1242,28 @@ This part of variables are used to control the molecular dynamics calculations.
 
 - direction<a id="direction"></a>
     - *Type*: Integer
-    - *Description*: the direction of shock wave
+    - *Description*: the direction of shock wave for MSST.
     - *Default*: 2 (z direction)
 
     [back to top](#input-file)
 
 - velocity<a id="velocity"></a>
     - *Type*: Real
-    - *Description*: the velocity of shock wave (\AA/fs)
+    - *Description*: the velocity of shock wave (\AA/fs) for MSST.
     - *Default*: 0
 
     [back to top](#input-file)
 
 - viscosity<a id="viscosity"></a>
     - *Type*: Real
-    - *Description*: artificial viscosity (mass/length/time)
+    - *Description*: artificial viscosity (mass/length/time) for MSST.
     - *Default*: 0
 
     [back to top](#input-file)
 
 - tscale<a id="tscale"></a>
     - *Type*: Real
-    - *Description*: reduction in initial temperature (0~1) used to compress volume 
+    - *Description*: reduction in initial temperature (0~1) used to compress volume in MSST.
     - *Default*: 0
 
     [back to top](#input-file)

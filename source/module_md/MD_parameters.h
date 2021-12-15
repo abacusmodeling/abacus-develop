@@ -8,19 +8,20 @@ class MD_parameters
 public:
     MD_parameters()
 	{
-		mdtype=1;
+		rstMD = 0;
+		mdtype = 2;
+		dt = 1;
+		tfirst = 0;
+		tlast = -1;
+		recordFreq = 1;
+
+		// useless
 		NVT_tau=0;
 		NVT_control=1;
-		dt=1;
-		tfirst=0;         //kelvin
-		tlast=-1;
-		recordFreq=1;
 		mdoutputpath="mdoutput";
-		rstMD=0;
 		fixTemperature=1;
 		ediff=1e-4;
 		ediffg=1e-3;
-		MNHC=4;
 
 		// Classic MD 
 		md_potential = "FP";
@@ -37,19 +38,20 @@ public:
 
 		// NHC
 		tfreq = 1;
+		MNHC = 4;
 	};
     ~MD_parameters(){};
 
-    int rstMD;          // 1 : restart MD, vel.restart and ion.restart files will be read
-                        // 0 : not restart from ion and vel files
-	int mdtype;         // 1: NVT:Nose Hoover, 2:NVT:velocity scaling 3: NPT, 0: NVE 
+    int rstMD;          // 1: restart MD, 0: no restart MD
+	int mdtype;         // -1: FIRE, 0: NVE, 1: NVT ADS, 2: NVT NHC, 3: NPT, 4: MSST 
     double dt ;         // Time increment (hbar/E_hartree)
-    double tfirst; //Temperature (in Hartree, 1 Hartree ~ 3E5 K)
-    double tlast;
+    double tfirst;      // Temperature (in Hartree, 1 Hartree ~ 3E5 K)
+    double tlast;       // Target temperature
     int recordFreq;     // The period to dump MD information for monitoring and restarting MD
+
+	// useless
     int NVT_control;
     double NVT_tau;
-    int MNHC;
     std::string mdoutputpath;// output directory of md files: .ion .vel
 	double ediff;       //parameter for constrain 
 	double ediffg;      //parameter for constrain
@@ -70,7 +72,7 @@ public:
 
 	// NHC
 	double tfreq;               // Oscillation frequency, used to determine Qmass of NHC
-
+	int MNHC;                   // num of NHC
 };
 
 

@@ -4,9 +4,9 @@
 NVT_ADS::NVT_ADS(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in) : Verlet(MD_para_in, unit_in)
 {
     // convert to a.u. unit
-    mdp.viscosity *= ModuleBase::AU_to_FS;
+    mdp.tfreq *= ModuleBase::AU_to_FS;
 
-    nraise = mdp.viscosity * mdp.dt;
+    nraise = mdp.tfreq * mdp.dt;
 }
 
 NVT_ADS::~NVT_ADS(){}
