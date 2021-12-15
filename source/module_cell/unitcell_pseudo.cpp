@@ -99,7 +99,7 @@ void UnitCell_pseudo::setup_cell(
 			ok2 = this->read_atom_positions(ifa, log, GlobalV::ofs_warning);
 #endif
 
-			if(ok2)
+			if(ok2&&GlobalV::out_element_info)
 			{
 				for(int i=0;i<this->ntype;i++)
 				{
@@ -197,7 +197,7 @@ void UnitCell_pseudo::setup_cell(
 
 	this->read_cell_pseudopots(s_pseudopot_dir, log);
 	
-	if(GlobalV::MY_RANK == 0) 
+	if(GlobalV::MY_RANK == 0 && GlobalV::out_element_info) 
 	{
 		for(int it=0; it<this->ntype; it++)
 		{
@@ -380,7 +380,7 @@ void UnitCell_pseudo::setup_cell_classic(
 #else
 			ok2 = this->read_atom_positions(ifa, ofs_running, ofs_warning);
 #endif
-			if(ok2)
+			if(ok2&&GlobalV::out_element_info)
 			{
 				for(int i=0;i<this->ntype;i++)
 				{
