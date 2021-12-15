@@ -55,9 +55,6 @@ chi0_hilbert.o\
 chi0_standard.o\
 epsilon0_pwscf.o\
 epsilon0_vasp.o\
-MD_basic.o\
-MD_thermo.o\
-MD_fire.o\
 MD_func.o\
 exx_lip.o\
 soc.o\
@@ -298,6 +295,13 @@ run_md_classic.o\
 LJ_potential.o\
 DP_potential.o\
 cmd_neighbor.o\
+verlet.o\
+NVE.o\
+MSST.o\
+NVT_ADS.o\
+NVT_NHC.o\
+FIRE.o\
+Langevin.o\
 dos.o \
 inverse_matrix.o \
 energy.o \

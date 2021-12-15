@@ -41,7 +41,7 @@ public:
     ModuleBase::Vector3<double> *m_loc_;
 
 
-    void print_Atom(std::ofstream &ofs, output &outp);
+    void print_Atom(std::ofstream &ofs);
 #ifdef __MPI
     void bcast_atom(void);
     void bcast_atom2(void);

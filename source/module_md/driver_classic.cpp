@@ -18,10 +18,10 @@ void Driver_classic::init()
 	ModuleBase::timer::start();
 
 	// (1) read the input parameters.
-	this->reading();
+	Driver_classic::reading();
 
 	// (2) welcome to the classic MD!
-	this->classic_world();
+	Driver_classic::classic_world();
 
 	// (3) output information
 	time_t	time_finish= std::time(NULL);
@@ -56,6 +56,7 @@ void Driver_classic::convert(UnitCell_pseudo &ucell_c)
 
     if(INPUT.atom_file!="") GlobalV::global_atom_card = INPUT.atom_file;
     GlobalV::CALCULATION = INPUT.calculation;
+	GlobalV::BASIS_TYPE = INPUT.basis_type;
     GlobalV::OUT_LEVEL = INPUT.out_level;
     GlobalV::SEARCH_RADIUS = max(INPUT.search_radius,(INPUT.mdp.rcut_lj+2)*ModuleBase::ANGSTROM_AU);
 	GlobalV::SEARCH_PBC = INPUT.search_pbc;
@@ -82,7 +83,7 @@ void Driver_classic::classic_world(void)
 
 	Run_MD_CLASSIC run_md_classic;
 
-	this->convert(run_md_classic.ucell_c);
+	Driver_classic::convert(run_md_classic.ucell_c);
 
 	if(GlobalV::CALCULATION != "md")
 	{
