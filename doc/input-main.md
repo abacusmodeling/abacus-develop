@@ -1115,6 +1115,7 @@ This part of variables are used to control the molecular dynamics calculations.
         - 0: NVE ensemble;
         - 1: NVT ensemble with Anderson thermostat;
         - 2: NVT ensemble with Nose Hoover Chain;
+        - 3: NVT ensemble with Langevin method;
         - 4: MSST method; 
     - *Default*: 2
 

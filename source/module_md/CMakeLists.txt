@@ -12,4 +12,5 @@ add_library(
     NVT_ADS.cpp
     NVT_NHC.cpp
     FIRE.cpp
+    Langevin.cpp
 )

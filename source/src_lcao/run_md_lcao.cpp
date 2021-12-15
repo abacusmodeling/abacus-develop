@@ -21,6 +21,7 @@
 #include "../module_md/MSST.h"
 #include "../module_md/NVT_ADS.h"
 #include "../module_md/NVT_NHC.h"
+#include "../module_md/Langevin.h"
 
 Run_MD_LCAO::Run_MD_LCAO()
 {
@@ -90,15 +91,19 @@ void Run_MD_LCAO::opt_ions(void)
     {
         verlet = new NVE(INPUT.mdp, GlobalC::ucell); 
     }
-    else if(INPUT.mdp.mdtype==1)
+    else if(INPUT.mdp.mdtype == 1)
     {
         verlet = new NVT_ADS(INPUT.mdp, GlobalC::ucell);
     }
-    else if(INPUT.mdp.mdtype==2)
+    else if(INPUT.mdp.mdtype == 2)
     {
         verlet = new NVT_NHC(INPUT.mdp, GlobalC::ucell);
     }
-    else if(INPUT.mdp.mdtype==4)
+    else if(INPUT.mdp.mdtype == 3)
+    {
+        verlet = new Langevin(INPUT.mdp, GlobalC::ucell);
+    }
+    else if(INPUT.mdp.mdtype == 4)
     {
         verlet = new MSST(INPUT.mdp, GlobalC::ucell); 
         cellchange = true;
