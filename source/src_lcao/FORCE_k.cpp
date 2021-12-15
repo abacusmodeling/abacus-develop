@@ -75,6 +75,10 @@ void Force_LCAO_k::ftable_k (
         GlobalC::ld.cal_f_delta_k(GlobalC::LOC.wfc_dm_2d.dm_k,isstress,svnl_dalpha);
 #ifdef __MPI
         Parallel_Reduce::reduce_double_all(GlobalC::ld.F_delta.c,GlobalC::ld.F_delta.nr*GlobalC::ld.F_delta.nc);
+		if(isstress)
+		{
+			Parallel_Reduce::reduce_double_pool( svnl_dalpha.c, svnl_dalpha.nr * svnl_dalpha.nc);
+		}
 #endif
         GlobalC::ld.print_F_delta("F_delta.dat");
     }

@@ -91,6 +91,10 @@ void Force_LCAO_gamma::ftable_gamma (
         GlobalC::ld.cal_f_delta_new(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],isstress, svnl_dalpha);
 #ifdef __MPI
         Parallel_Reduce::reduce_double_all(GlobalC::ld.F_delta.c,GlobalC::ld.F_delta.nr*GlobalC::ld.F_delta.nc);
+		if(isstress)
+		{
+			Parallel_Reduce::reduce_double_pool( svnl_dalpha.c, svnl_dalpha.nr * svnl_dalpha.nc);
+		}
 #endif
         GlobalC::ld.print_F_delta("F_delta.dat");
     }
