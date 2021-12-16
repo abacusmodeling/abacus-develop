@@ -30,6 +30,7 @@ add_library(
 	read_txt_input_process_global.cpp
 	read_txt_input-general.cpp
 	read_txt_input-pw.cpp
+	read_txt_input-spectrum.cpp
     read_txt_stru.cpp
     restart.cpp
     rwstream.cpp

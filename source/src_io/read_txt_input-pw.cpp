@@ -19,18 +19,20 @@ namespace Read_Txt_Input
 
 		{
 			Input_Item item("ecutwfc");
-			item.default_1(100.0,"eV");
+			item.default_1(100.0,"Ry");
+			item.check_values_size(1,2);
 			item.annotation = "energy cutoff for wave functions";
 			item.check_transform = [](Input_Item &self)
 			{
-				if(self.values[1].gets()=="eV"){}
-				else if(self.values[1].gets()=="Ry")
+				if(self.values[0].getd()<=0)
+					throw std::invalid_argument("ecutwfc must > 0");
+
+				if(self.values[1].gets()=="Ry"){}
+				else if(self.values[1].gets()=="eV")
 					self.values[0].setd( self.values[0].getd() / ModuleBase::Ry_to_eV );
 				else
 					throw std::invalid_argument(self.values[1].gets());
-				self.values[1].sets("eV");
-				if(self.values[0].getd()<=0)
-					throw std::invalid_argument("ecutwfc must > 0");
+				self.values[1].sets("Ry");
 			};
 			item.convert = [](const Input_Item &self)
 			{

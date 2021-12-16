@@ -51,8 +51,11 @@ template<class Archive> void Input_Item::serialize( Archive & ar )
 {
 	ar( this->annotation );
 	ar( this->values );
+	ar( this->values_type );
 	ar( this->label );
-	//ar( this->value_read_size );
+	ar( this->values_size_read );
+	ar( this->values_size_lower_limit );
+	ar( this->values_size_upper_limit );
 }
 }
 

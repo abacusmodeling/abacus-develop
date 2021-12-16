@@ -253,6 +253,7 @@ read_txt_input_process.o\
 read_txt_input_process_global.o\
 read_txt_input-general.o\
 read_txt_input-pw.o\
+read_txt_input-spectrum.o\
 write_pot.o\
 write_rho.o\
 write_rho_cube.o\

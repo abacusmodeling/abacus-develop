@@ -35,6 +35,7 @@ namespace Read_Txt_Input
 	{
 		set_items_general();
 		set_items_pw();
+		set_items_spectrum();
 	}
 
 }

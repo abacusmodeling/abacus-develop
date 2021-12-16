@@ -37,36 +37,48 @@ namespace Read_Txt_Input
 			= Read_Txt_Tools::read_file_to_map(file_name, {"#","\\"}, true);
 		for(const auto & input_read : inputs_read)
 		{
-			const auto ptr = this->input.list.find(input_read.first);
-			if(ptr==this->input.list.end())
+			const auto item_ptr = this->input.list.find(input_read.first);
+			if(item_ptr==this->input.list.end())
 				throw std::out_of_range("input_read.first");
+			Read_Txt_Input::Input_Item &item = item_ptr->second;
 
-			//if(input_read.second.size() > ptr->second.values.size())
-			if(input_read.second.size() != ptr->second.values.size())
-				throw std::out_of_range(
-					"size of INPUT "+ptr->second.label+" needs "+std::to_string(ptr->second.values.size())
-					+" but reads "+std::to_string(input_read.second.size()));
+			item.values_size_read = input_read.second.size();
+			if(item.values.size()<input_read.second.size())
+			{
+				item.values.resize(input_read.second.size());
+				item.values_type.resize(input_read.second.size(),"s");
+			}
 
 			for(size_t i=0; i<input_read.second.size(); ++i)
-				ptr->second.values[i].sets(input_read.second[i]);
-			//ptr->second.value_read_size = input_read.second.size();
+				item.values[i].sets(input_read.second[i]);
 		}
 	}
 
 	void Input_Process::check_transform()
 	{
-		for(auto &item : this->input.list)
+		for(auto &tmp : this->input.list)
 		{
-			item.second.check_transform(item.second);
+			Read_Txt_Input::Input_Item &item = tmp.second;
 
-			for(size_t i=0; i<item.second.values.size(); ++i)
+			if( item.values_size_read>=0 &&
+			   (item.values_size_read<item.values_size_lower_limit ||
+			    item.values_size_read>item.values_size_upper_limit   ))
 			{
-				if(item.second.values_type[i]=="b")
-				{
-					if(!Read_Txt_Tools::in_set( item.second.values[i].gets(), Read_Txt_Tools::Preset::Bool))
-						throw std::invalid_argument("INPUT "+item.second.label+" must be bool");
-				}
+				throw std::out_of_range(
+					"size of INPUT "+item.label+" needs in ["+std::to_string(item.values_size_lower_limit)+","+std::to_string(item.values_size_upper_limit)+"]"
+					+" but reads "+std::to_string(item.values_size_read));
 			}
+
+			item.check_transform(item);
+
+			for(size_t i=0; i<item.values.size(); ++i)
+			{
+				if(item.values_type[i]=="b")
+				{
+					if(!Read_Txt_Tools::in_set( item.values[i].gets(), Read_Txt_Tools::Preset::Bool))
+						throw std::invalid_argument("INPUT "+item.label+" must be bool");
+				}
+			}		
 		}
 		this->check_transform_global(this->input.list);
 	}
@@ -83,15 +95,15 @@ namespace Read_Txt_Input
 		std::ofstream ofs(file_name);
 		for(const std::string &label : this->input.output_labels)
 		{
-			const auto ptr = this->input.list.find(label);
-			if(ptr==this->input.list.end())
+			const auto item_ptr = this->input.list.find(label);
+			if(item_ptr==this->input.list.end())
 			{
 				ofs<<std::endl<<"# "<<label<<std::endl;
 			}
 			else
 			{
 				ofs<<label<<"\t";
-				const Read_Txt_Input::Input_Item &item = ptr->second;
+				const Read_Txt_Input::Input_Item &item = item_ptr->second;
 				for(size_t i=0; i<item.values.size(); ++i)
 				{
 					if(item.values_type[i]=="s")

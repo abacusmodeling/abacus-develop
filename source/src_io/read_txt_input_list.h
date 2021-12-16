@@ -29,6 +29,7 @@ namespace Read_Txt_Input
 
 		void set_items_general();
 		void set_items_pw();
+		void set_items_spectrum();
 
 		friend class Input_Process;
 	};

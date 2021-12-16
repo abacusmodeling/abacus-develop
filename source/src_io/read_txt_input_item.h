@@ -40,10 +40,16 @@ namespace Read_Txt_Input
 
 		std::vector<Input_Value> values;
 
+		void check_values_size(const int lower_limit, const int upper_limit)
+		{ values_size_lower_limit=lower_limit;	values_size_upper_limit=upper_limit; }
+
 	private:
 		std::string label;
-		//int value_read_size = -1;
 		std::vector<std::string> values_type;
+		
+		int values_size_read = -1;
+		int values_size_lower_limit = 0;
+		int values_size_upper_limit = 0;
 
 		friend class Input_List;
 		friend class Input_Process;

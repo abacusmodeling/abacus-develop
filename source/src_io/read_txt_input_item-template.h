@@ -14,6 +14,8 @@ namespace Read_Txt_Input
 	void Input_Item::default_1(const T &value)
 	{
 		set_value(value);
+		++this->values_size_lower_limit;
+		++this->values_size_upper_limit;
 	}
 
 	template <typename T_head, typename... T_tail>
@@ -21,6 +23,8 @@ namespace Read_Txt_Input
 	{
 		set_value(value_head);
 		default_1(values_tail...);
+		++this->values_size_lower_limit;
+		++this->values_size_upper_limit;
 	}
 
 	template<>
