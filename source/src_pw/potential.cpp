@@ -24,6 +24,9 @@ Potential::~Potential()
 {
     delete[] vltot;
     delete[] vr_eff1;
+#ifdef __CUDA
+	cudaFree(d_vr_eff1);
+#endif
 }
 
 void Potential::allocate(const int nrxx)
@@ -48,6 +51,9 @@ void Potential::allocate(const int nrxx)
 
     delete[] this->vr_eff1;
     this->vr_eff1 = new double[nrxx];
+#ifdef __CUDA
+	cudaMalloc((void**)&this->d_vr_eff1, nrxx * sizeof(double));
+#endif
     ModuleBase::Memory::record("Potential","vr_eff1",nrxx,"double");
 
     this->vnew.create(GlobalV::NSPIN,nrxx);

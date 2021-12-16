@@ -34,6 +34,9 @@ class Potential
 	ModuleBase::matrix vofk; //kinetic energy density, for meta-GGA; wenfei 2021-07-28
 
     double *vr_eff1; 
+#ifdef __CUDA
+	double *d_vr_eff1;
+#endif
     double *vltot;
 	int out_potential; // mohan add 2011-02-28
 

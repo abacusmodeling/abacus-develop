@@ -10,6 +10,9 @@ Use_FFT::Use_FFT()
 Use_FFT::~Use_FFT()
 {
 	delete[] porter;
+#ifdef __CUDA
+    cudaFree(d_porter);
+#endif
 }
 
 void Use_FFT::allocate(void)
@@ -18,8 +21,10 @@ void Use_FFT::allocate(void)
 
     delete[] porter;
     porter = new std::complex<double>[GlobalC::pw.nrxx];
+#ifdef __CUDA
+    cudaMalloc((void**)&d_porter, GlobalC::pw.nrxx * sizeof(double2));
+#endif
     ModuleBase::Memory::record("Use_FFT","porter",GlobalC::pw.nrxx,"complexmatrix");
-
     return;
 }
 

@@ -54,6 +54,7 @@ class Use_FFT
 		std::complex<double> *psic);
 
 #ifdef __CUDA
+	double2 *d_porter;
 	cufftHandle fft_handle;
 	void RoundTrip(const float2 *psi, const float *vr, const int *fft_index, float2 *psic)
 	{
