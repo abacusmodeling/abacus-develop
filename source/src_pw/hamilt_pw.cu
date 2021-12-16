@@ -945,16 +945,13 @@ void Hamilt_PW::h_psi_cuda(const double2 *psi_in, double2 *hpsi, double2 *vkb_c,
         tmhpsi = hpsi;
         tmpsi_in = psi_in;
 
-        double* d_g2kin;
-        CHECK_CUDA(cudaMalloc((void**)&d_g2kin, GlobalC::wf.npwx*sizeof(double)));
-        CHECK_CUDA(cudaMemcpy(d_g2kin, GlobalC::wf.g2kin, GlobalC::wf.npw*sizeof(double), cudaMemcpyHostToDevice));
         for(int ib = 0 ; ib < m; ++ib)
         {
             // cout<<"in hpsi-Kinetic, iband = "<<ib<<endl;
 
             int thread = 512;
             int block = (GlobalC::wf.npw + thread - 1) / thread;
-            kernel_get_tmhpsi<double, double2><<<block, thread>>>(GlobalC::wf.npw, tmhpsi, tmpsi_in, d_g2kin);
+            kernel_get_tmhpsi<double, double2><<<block, thread>>>(GlobalC::wf.npw, tmhpsi, tmpsi_in, GlobalC::wf.d_g2kin);
 
             // if(GlobalC::NSPIN==4){
             //     for(ig=GlobalC::wf.npw; ig < GlobalC::wf.npwx; ++ig)
@@ -977,7 +974,6 @@ void Hamilt_PW::h_psi_cuda(const double2 *psi_in, double2 *hpsi, double2 *vkb_c,
             tmhpsi += GlobalC::wf.npwx;
             tmpsi_in += GlobalC::wf.npwx;
         }
-        CHECK_CUDA(cudaFree(d_g2kin));
 	}
 
     ModuleBase::timer::tick("Hamilt_PW_CUDA","kinetic");

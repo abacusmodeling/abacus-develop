@@ -13,6 +13,9 @@ WF_igk::~WF_igk()
 		std::cout << " ~WF_igk()" << std::endl;
 	}
     delete[] g2kin;
+#ifdef __CUDA
+    cudaFree(this->d_g2kin);
+#endif
 }
 
 //=======================================================
@@ -135,6 +138,9 @@ void WF_igk::ekin(const int ik)
 //--------------------------------------------------------
         this->g2kin[ig] = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig)).norm2() * GlobalC::ucell.tpiba2;
     }
+#ifdef __CUDA
+    cudaMemcpy(this->d_g2kin, this->g2kin, GlobalC::kv.ngk[ik]*sizeof(double), cudaMemcpyHostToDevice);
+#endif
     ModuleBase::timer::tick("WF_igk","ekin");
     return ;
 }
