@@ -24,7 +24,7 @@ namespace Read_Txt_Input
 		{
 			this->read(file_name);
 			this->check_transform();
-			this->default2();
+			this->default_2();
 			this->out(GlobalV::global_out_dir + file_name);
 		}
 		this->bcast();
@@ -37,8 +37,8 @@ namespace Read_Txt_Input
 			= Read_Txt_Tools::read_file_to_map(file_name, {"#","\\"}, true);
 		for(const auto & input_read : inputs_read)
 		{
-			const auto ptr = input.list.find(input_read.first);
-			if(ptr==input.list.end())
+			const auto ptr = this->input.list.find(input_read.first);
+			if(ptr==this->input.list.end())
 				throw std::out_of_range("input_read.first");
 
 			//if(input_read.second.size() > ptr->second.values.size())
@@ -55,7 +55,7 @@ namespace Read_Txt_Input
 
 	void Input_Process::check_transform()
 	{
-		for(auto &item : input.list)
+		for(auto &item : this->input.list)
 		{
 			item.second.check_transform(item.second);
 
@@ -68,21 +68,23 @@ namespace Read_Txt_Input
 				}
 			}
 		}
+		this->check_transform_global(this->input.list);
 	}
 
-	void Input_Process::default2()
+	void Input_Process::default_2()
 	{
-		for(auto &item : input.list)
-			item.second.default2(input.list);
+		for(auto &item : this->input.list)
+			item.second.default_2(item.second, this->input.list);
+		this->default_2_global(this->input.list);
 	}
 
 	void Input_Process::out(const std::string &file_name) const
 	{
 		std::ofstream ofs(file_name);
-		for(const std::string &label : input.output_labels)
+		for(const std::string &label : this->input.output_labels)
 		{
-			const auto ptr = input.list.find(label);
-			if(ptr==input.list.end())
+			const auto ptr = this->input.list.find(label);
+			if(ptr==this->input.list.end())
 			{
 				ofs<<std::endl<<"# "<<label<<std::endl;
 			}
@@ -121,7 +123,7 @@ namespace Read_Txt_Input
 			std::stringstream ss;
 			{
 				cereal::BinaryOutputArchive ar(ss);
-				ar(input.list);
+				ar(this->input.list);
 			}
 			const int size = ss.str().size();
 			MPI_Bcast( const_cast<int*>(&size), 1, MPI_INT, 0, MPI_COMM_WORLD );
@@ -137,7 +139,7 @@ namespace Read_Txt_Input
 			ss.rdbuf()->pubsetbuf(c.data(),size);
 			{
 				cereal::BinaryInputArchive ar(ss);
-				ar(input.list);
+				ar(this->input.list);
 			}
 		}
 #else
@@ -147,7 +149,8 @@ namespace Read_Txt_Input
 
 	void Input_Process::convert()
 	{
-		for(auto &item : input.list)
+		for(auto &item : this->input.list)
 			item.second.convert(item.second);
+		this->convert_global(this->input.list);
 	}
 }

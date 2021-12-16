@@ -18,12 +18,17 @@ namespace Read_Txt_Input
 
 	private:
 		Input_List &input;
+
 		void read(const std::string &file_name);
 		void check_transform();
-		void default2();
+		void default_2();
 		void out(const std::string &file_name) const;
 		void bcast();
-		void convert();		
+		void convert();
+
+		void check_transform_global(std::map<std::string, Input_Item> &list);
+		void default_2_global(std::map<std::string, Input_Item> &list);
+		void convert_global(const std::map<std::string, Input_Item> &list);
 	};
 }
 

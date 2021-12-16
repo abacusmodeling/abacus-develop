@@ -27,14 +27,14 @@ namespace Read_Txt_Input
 		template<typename T>
 		void default_1(const T &value);
 		template <typename T_head, typename... T_tail>
-		void default_1( const T_head &value_head, const T_tail... values_tail);
+		void default_1(const T_head &value_head, const T_tail... values_tail);
 
 		// set these variables and functions
 		std::string annotation;
 		std::function<void(Input_Item&)> check_transform
 			= [](Input_Item&self){};
-		std::function<void(const std::map<std::string, Input_Item>&)> default2
-			= [](const std::map<std::string, Input_Item>&list){};
+		std::function<void(Input_Item&, const std::map<std::string, Input_Item>&)> default_2
+			= [](Input_Item&self, const std::map<std::string, Input_Item>&list){};
 		std::function<void(const Input_Item&)> convert
 			= [](const Input_Item&item){};
 
