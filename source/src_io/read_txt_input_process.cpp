@@ -34,7 +34,7 @@ namespace Read_Txt_Input
 	void Input_Process::read(const std::string &file_name)
 	{
 		const std::map<std::string, std::vector<std::string>> inputs_read
-			= Read_Txt_Tools::read_file_to_map(file_name, {"#","\\"});
+			= Read_Txt_Tools::read_file_to_map(file_name, {"#","\\"}, true);
 		for(const auto & input_read : inputs_read)
 		{
 			const auto ptr = input.list.find(input_read.first);

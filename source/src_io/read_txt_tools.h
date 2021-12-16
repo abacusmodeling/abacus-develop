@@ -19,7 +19,8 @@ namespace Read_Txt_Tools
 	// }
 	std::map<std::string, std::vector<std::string>> read_file_to_map(
 		const std::string &file_name,
-		const std::set<std::string> &comment_seps);
+		const std::set<std::string> &comment_seps,
+		const bool flag_check_duplicate);
 
 
 	// [
