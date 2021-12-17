@@ -12,9 +12,6 @@ class MD_func
     ~MD_func(){};
 
 	static double gaussrand();
-
-	static bool RestartMD(const int& numIon, ModuleBase::Vector3<double>* vel, int& step_rst);
-    static void mdRestartOut(const int& step, const int& recordFreq, const int& numIon, ModuleBase::Vector3<double>* vel);
 	
 	static void InitPos( const UnitCell_pseudo &unit_in, ModuleBase::Vector3<double>* pos);
 
@@ -65,19 +62,9 @@ class MD_func
 		const ModuleBase::matrix &virial, 
 		const ModuleBase::Vector3<double> *force);
 
-	static std::string intTurnTostring(long int iter,std::string path);
 	static void getMassMbl(const UnitCell_pseudo &unit_in, 
 		double* allmass, 
 		ModuleBase::Vector3<int> &frozen,
 		ModuleBase::Vector3<int>* ionmbl);
-    static void printpos(const std::string& file, const int& iter, const int& recordFreq, const UnitCell_pseudo& unit_in);
-    static void scalevel(
-		const int& numIon,
-		const int& nfrozen,
-		const double& temperature,
-		ModuleBase::Vector3<double>* vel,
-		const double* allmass);
-	static double MAXVALF(const int numIon, const ModuleBase::Vector3<double>* force);
-	static double Conserved(const double KE, const double PE, const int number);
 };
 #endif
