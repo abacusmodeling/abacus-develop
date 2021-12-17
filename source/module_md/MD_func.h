@@ -58,7 +58,7 @@ class MD_func
 
 	static void MDdump(
 		const int &step, 
-		const int &natom,
+		const UnitCell_pseudo &unit_in,
 		const ModuleBase::matrix &virial, 
 		const ModuleBase::Vector3<double> *force);
 

@@ -323,7 +323,7 @@ void MD_func::outStress(const ModuleBase::matrix &virial, const ModuleBase::matr
 }
 
 void MD_func::MDdump(const int &step, 
-		const int &natom,
+		const UnitCell_pseudo &unit_in,
 		const ModuleBase::matrix &virial, 
 		const ModuleBase::Vector3<double> *force)
 {
@@ -332,22 +332,22 @@ void MD_func::MDdump(const int &step,
 	std::stringstream file;
     file << GlobalV::global_out_dir << "MD_dump";
 	std::ofstream ofs;
-	if(step == 0)
-	{
-		ofs.open(file.str(), ios::trunc);
-	}
-	else
-	{
-		ofs.open(file.str(), ios::app);
-	}
+	ofs.open(file.str(), ios::app);
 
 	const double unit_virial = ModuleBase::HARTREE_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
-	const double unit_force = ModuleBase::Hartree_to_eV*ModuleBase::ANGSTROM_AU;
+	const double unit_force = ModuleBase::Hartree_to_eV * ModuleBase::ANGSTROM_AU;
 
-	ofs << "MDstep:  " << step << std::endl;
+	ofs << "MDSTEP:  " << step << std::endl;
+	ofs << std::setprecision(12) << std::setiosflags(ios::fixed);
+
+	ofs << "LATTICE_CONSTANT: " << unit_in.lat0 << std::endl;
+
+	ofs << "LATTICE_VECTORS" << std::endl;
+	ofs << std::setw(18) << unit_in.latvec.e11 << std::setw(18) << unit_in.latvec.e12 << std::setw(18) << unit_in.latvec.e13 << std::endl; 
+	ofs << std::setw(18) << unit_in.latvec.e21 << std::setw(18) << unit_in.latvec.e22 << std::setw(18) << unit_in.latvec.e23 << std::endl;
+	ofs << std::setw(18) << unit_in.latvec.e31 << std::setw(18) << unit_in.latvec.e32 << std::setw(18) << unit_in.latvec.e33 << std::endl;
 
 	ofs << "VIRIAL (KBAR)" << std::endl;
-	ofs << std::setprecision(12) << std::setiosflags(ios::fixed);
 	for(int i=0; i<3; ++i)
 	{
 		ofs << std::setw(18) << virial(i, 0) * unit_virial 
@@ -355,13 +355,23 @@ void MD_func::MDdump(const int &step,
 			<< std::setw(18) << virial(i, 2) * unit_virial << std::endl;
 	}
 
-	ofs << "\nFORCE (eV/Angstrom)" << std::endl;
-	for(int i=0; i<natom; ++i)
-	{
-		ofs << std::setw(18) << force[i].x * unit_force 
-			<< std::setw(18) << force[i].y * unit_force 
-			<< std::setw(18) << force[i].z * unit_force << std::endl;
-	}
+	ofs << "INDEX    LABEL    POSITIONS    FORCE (eV/Angstrom)" << std::endl;
+	int index = 0;
+	for(int it=0; it<unit_in.ntype; ++it)
+    {
+        for(int ia=0; ia<unit_in.atoms[it].na; ++ia)
+	    {	
+		    ofs << std::setw(4) << index
+			<< std::setw(4) << unit_in.atom_label[it]
+			<< std::setw(18) << unit_in.atoms[it].tau[ia].x
+			<< std::setw(18) << unit_in.atoms[it].tau[ia].y
+			<< std::setw(18) << unit_in.atoms[it].tau[ia].z
+			<< std::setw(18) << force[index].x * unit_force 
+			<< std::setw(18) << force[index].y * unit_force 
+			<< std::setw(18) << force[index].z * unit_force << std::endl;
+            index++;
+	    }
+    }
 
 	ofs << std::endl;
 	ofs << std::endl;
