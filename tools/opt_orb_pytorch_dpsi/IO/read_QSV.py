@@ -107,7 +107,7 @@ def read_QI(info_stru, info_element, data):
 							QI[it][il][ib,ia,im,ie] = complex(next(data), next(data))
 	for it in info_stru.Na.keys():
 		for il in range(info_element[it].Nl):
-			QI[it][il] = QI[it][il].view(-1,info_element[it].Ne).conj()
+			QI[it][il] = QI[it][il][:info_stru.Nb_true,:,:,:].view(-1,info_element[it].Ne).conj()
 	return QI
 
 
@@ -145,14 +145,16 @@ def read_VI(info_stru,V_info,ist,data):
 			VI = np.empty(info_stru.Nb,dtype=np.float64)
 			for ib in range(info_stru.Nb):
 				VI.data[ib] = next(data)
+			VI = VI[:info_stru.Nb_true]
 		else:
-			VI = np.ones(info_stru.Nb,dtype=np.float64)
+			VI = np.ones(info_stru.Nb_true, dtype=np.float64)
 	else:
 		""" VI[ib1,ib2]	<psi|psi> """
 		if V_info["init_from_file"]:
 			VI = np.empty((info_stru.Nb,info_stru.Nb),dtype=np.float64)
 			for ib1,ib2 in itertools.product( range(info_stru.Nb), range(info_stru.Nb) ):
 				VI[ib1,ib2] = next(data)
+			VI = VI[info_stru.Nb_true, info_stru.Nb_true]
 		else:
-			VI = np.eye(info_stru.Nb,info_stru.Nb,dtype=np.float64)
+			VI = np.eye(info_stru.Nb_true, info_stru.Nb_true, dtype=np.float64)
 	return torch.from_numpy(VI)
