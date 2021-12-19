@@ -123,6 +123,8 @@ public:
 
 #ifdef __CUDA
     int *GR_index_d;
+    double2 *d_becp;
+    double2 *d_ps;
     cublasHandle_t hpw_handle;
 #endif
 

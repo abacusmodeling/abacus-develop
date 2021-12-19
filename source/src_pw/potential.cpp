@@ -474,5 +474,9 @@ void Potential::newd(void)
 			}
 		}
 	}
+#ifdef __CUDA
+	cudaMemcpy(GlobalC::ppcell.d_deeq, GlobalC::ppcell.deeq.ptr, 
+	GlobalV::NSPIN*GlobalC::ucell.nat*GlobalC::ppcell.nhm*GlobalC::ppcell.nhm*sizeof(double), cudaMemcpyHostToDevice);
+#endif
 	return;
 } // end subroutine newd

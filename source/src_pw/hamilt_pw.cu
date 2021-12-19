@@ -130,6 +130,8 @@ Hamilt_PW::~Hamilt_PW()
 #ifdef __CUDA
 	CHECK_CUDA(cudaFree(GR_index_d));
 	CHECK_CUBLAS(cublasDestroy(hpw_handle));
+	CHECK_CUDA(cudaFree(d_becp));
+	CHECK_CUDA(cudaFree(d_ps));
     // CHECK_CUDA(cudaFree(GR_index_d));
 #endif
 }
@@ -157,8 +159,14 @@ void Hamilt_PW::allocate(
 	GR_index = new int[nrxx];
 
 #ifdef __CUDA
-    CHECK_CUDA(cudaFree(GR_index_d));
-    CHECK_CUDA(cudaMalloc((void**)&GR_index_d, nrxx*sizeof(int)));
+	CHECK_CUDA(cudaFree(GR_index_d));
+	CHECK_CUDA(cudaMalloc((void**)&GR_index_d, nrxx*sizeof(int)));
+
+	CHECK_CUDA(cudaFree(d_becp));
+	CHECK_CUDA(cudaMalloc((void**)&d_becp, GlobalV::NPOL*GlobalC::ppcell.nkb*sizeof(double2)));
+
+	CHECK_CUDA(cudaFree(d_ps));
+	CHECK_CUDA(cudaMalloc((void**)&d_ps, GlobalC::ppcell.nkb * GlobalV::NPOL * sizeof(double2)));
 #endif
     // ZEROS(this->hpsi, npwx * npol);
     // ZEROS(this->spsi, npwx * npol);
@@ -990,35 +998,11 @@ void Hamilt_PW::h_psi_cuda(const double2 *psi_in, double2 *hpsi, double2 *vkb_c,
 	{
         tmhpsi = hpsi;
         tmpsi_in = psi_in;
-        // int *d_GR_index;
-
-        // CHECK_CUDA(cudaMalloc((void**)&d_GR_index, GlobalC::wf.npwx * sizeof(int)));
-
-        // cout<<"NSPIN = "<<GlobalV::NSPIN<<endl;
         for(int ib = 0 ; ib < m; ++ib)
         {
-            // cout<<"in hpsi:loacl_pot, iband = "<<ib<<endl;
-            // if(NSPIN!=4){
-            // ZEROS( UFFT.porter, pw.nrxx);
             CHECK_CUDA(cudaMemset(GlobalC::UFFT.d_porter, 0, GlobalC::pw.nrxx * sizeof(double2)));
-			// cout<<"m:"<<m<<endl;
-			// cout<<"grindex:"<<endl;
-			// int *GR_index_h = new int[10];
-			// CHECK_CUDA(cudaMemcpy(GR_index_h, GR_index_d, 10*sizeof(int), cudaMemcpyDeviceToHost));
-			// for(int i=0;i<10;i++)
-			// {
-			// 	cout<<GR_index_h[i]<<endl;
-			// }
-			
             GlobalC::UFFT.RoundTrip( tmpsi_in, GlobalC::pot.d_vr_eff1, GR_index_d, GlobalC::UFFT.d_porter );
 
-			// cout<<"dporter"<<endl;
-			// print_test<double2>(GlobalC::UFFT.d_porter, 10);
-
-            // for (j = 0;j < wf.npw;j++)
-            // {
-            //     tmhpsi[j] += UFFT.porter[ GR_index[j] ];
-            // }
             int thread = 512;
             int block = (GlobalC::wf.npw + thread - 1) / thread;
             kernel_add_tmhpsi<double2><<<block, thread>>>(GlobalC::wf.npw, tmhpsi, GlobalC::UFFT.d_porter, GR_index_d);
@@ -1026,7 +1010,6 @@ void Hamilt_PW::h_psi_cuda(const double2 *psi_in, double2 *hpsi, double2 *vkb_c,
             tmhpsi += dmax;
             tmpsi_in += dmax;
         }
-        // CHECK_CUDA(cudaFree(d_GR_index));
 	}
 	ModuleBase::timer::tick("Hamilt_PW_CUDA","vloc");
 
@@ -1043,8 +1026,10 @@ void Hamilt_PW::h_psi_cuda(const double2 *psi_in, double2 *hpsi, double2 *vkb_c,
         {
             int nkb = GlobalC::ppcell.nkb;
             double2 *becp;
-            // double2 *d_vkb_c;
-            CHECK_CUDA(cudaMalloc((void**)&becp, GlobalV::NPOL*m*nkb*sizeof(double2)));
+			if(m != 1)
+			{
+				CHECK_CUDA(cudaMalloc((void**)&becp, GlobalV::NPOL*m*nkb*sizeof(double2)));
+			}
             // CHECK_CUDA(cudaMalloc((void**)&d_vkb_c, GlobalC::wf.npwx*nkb*sizeof(double2)));
 
             // CHECK_CUDA(cudaMemcpy(d_vkb_c, GlobalC::ppcell.vkb.c, GlobalC::wf.npwx*nkb*sizeof(double2), cudaMemcpyHostToDevice));
@@ -1065,14 +1050,12 @@ void Hamilt_PW::h_psi_cuda(const double2 *psi_in, double2 *hpsi, double2 *vkb_c,
             if(m==1 && GlobalV::NPOL==1)
             {
                 int inc = 1;
-                CHECK_CUBLAS(cublasZgemv(hpw_handle, transa, GlobalC::wf.npw, nkb, &ONE, vkb_c, GlobalC::wf.npwx, psi_in, inc, &ZERO, becp, inc));
-
+                CHECK_CUBLAS(cublasZgemv(hpw_handle, transa, GlobalC::wf.npw, nkb, &ONE, vkb_c, GlobalC::wf.npwx, psi_in, inc, &ZERO, d_becp, inc));
             }
             else
             {
                 int npm = GlobalV::NPOL * m;
                 CHECK_CUBLAS(cublasZgemm(hpw_handle, transa, transb, nkb, npm, GlobalC::wf.npw, &ONE, vkb_c, GlobalC::wf.npwx, psi_in, GlobalC::wf.npwx, &ZERO, becp, nkb));
-
             }
 
             // complex<double> *hpsi_cpu = new complex<double>[GlobalC::wf.npw*GlobalV::NPOL];
@@ -1092,10 +1075,15 @@ void Hamilt_PW::h_psi_cuda(const double2 *psi_in, double2 *hpsi, double2 *vkb_c,
 			// cout<<"===== becp before add nonloaclpp ===="<<endl;
 			// print_test<double2>(becp, 15);
 
-            this->add_nonlocal_pp_cuda(hpsi, becp, vkb_c, m);
-
-            // CHECK_CUBLAS(cublasDestroy(handle));
-            CHECK_CUDA(cudaFree(becp));
+            if(m == 1)
+			{
+				this->add_nonlocal_pp_cuda(hpsi, d_becp, vkb_c, m);
+			}
+			else
+			{
+				this->add_nonlocal_pp_cuda(hpsi, becp, vkb_c, m);
+			}
+			
             // CHECK_CUDA(cudaFree(d_vkb_c));
             // cout<<"nonlocal end"<<endl;
 
@@ -1464,8 +1452,15 @@ void Hamilt_PW::add_nonlocal_pp_cuda(
 	// complex<double> *ps  = new complex<double> [nkb * GlobalV::NPOL * m];
     // ZEROS(ps, GlobalV::NPOL * m * nkb);
     double2 *ps;
-    CHECK_CUDA(cudaMalloc((void**)&ps, nkb * GlobalV::NPOL * m * sizeof(double2)));
-    CHECK_CUDA(cudaMemset(ps, 0, GlobalV::NPOL * m * sizeof(double2)));
+	if(m == 1)
+	{
+		CHECK_CUDA(cudaMemset(d_ps, 0, GlobalV::NPOL * m * sizeof(double2)));
+	}
+	else
+	{
+		CHECK_CUDA(cudaMalloc((void**)&ps, nkb * GlobalV::NPOL * m * sizeof(double2)));
+		CHECK_CUDA(cudaMemset(d_ps, 0, GlobalV::NPOL * m * sizeof(double2)));
+	}
 
     int sum = 0;
     int iat = 0;
@@ -1476,13 +1471,9 @@ void Hamilt_PW::add_nonlocal_pp_cuda(
 
         const int nproj = GlobalC::ucell.atoms[it].nh;
         const int nprojx = GlobalC::ppcell.nhm;
-        double *cur_deeq;
-        CHECK_CUDA(cudaMalloc((void**)&cur_deeq, nprojx*nprojx*sizeof(double)));
+        
         for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
         {
-            CHECK_CUDA(cudaMemcpy(cur_deeq, &(GlobalC::ppcell.deeq(GlobalV::CURRENT_SPIN, iat, 0, 0)),
-                nprojx*nprojx*sizeof(double), cudaMemcpyHostToDevice));
-
             int thread_x = 16;
             dim3 thread(thread_x, thread_x);
             dim3 block((nproj+thread_x-1) / thread_x, (m+thread_x-1) / thread_x);
@@ -1502,8 +1493,14 @@ void Hamilt_PW::add_nonlocal_pp_cuda(
 			// }
 			// cout<<endl;
 			// delete [] test_deeq;
-
-            kernel_addpp<double, double2><<<block, thread>>>(ps, cur_deeq, becp, nproj, nprojx, sum, m, nkb);
+			if(m == 1)
+			{
+				kernel_addpp<double, double2><<<block, thread>>>(d_ps, &GlobalC::ppcell.d_deeq[GlobalV::CURRENT_SPIN*iat*nprojx*nprojx], becp, nproj, nprojx, sum, m, nkb);
+			}
+			else
+			{
+				kernel_addpp<double, double2><<<block, thread>>>(ps, &GlobalC::ppcell.d_deeq[GlobalV::CURRENT_SPIN*iat*nprojx*nprojx], becp, nproj, nprojx, sum, m, nkb);
+			}
 
             sum += nproj;
             ++iat;
@@ -1528,7 +1525,7 @@ void Hamilt_PW::add_nonlocal_pp_cuda(
             &ONE,
             d_vkb_c,
             GlobalC::wf.npwx,
-			ps,
+			d_ps,
 			inc,
 			&ONE,
 			hpsi_in,
@@ -1552,10 +1549,10 @@ void Hamilt_PW::add_nonlocal_pp_cuda(
             hpsi_in,
             GlobalC::wf.npwx));
 	}
-
-	// delete[] ps;
-    CHECK_CUDA(cudaFree(ps));
-	// CHECK_CUBLAS(cublasDestroy(handle));
+	if(m == 1)
+	{
+		CHECK_CUDA(cudaFree(ps));
+	}
     ModuleBase::timer::tick("Hamilt_PW_CUDA","add_nonlocal_pp");
     return;
 }

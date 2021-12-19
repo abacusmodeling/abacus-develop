@@ -15,6 +15,9 @@ pseudopot_cell_vnl::pseudopot_cell_vnl()
 
 pseudopot_cell_vnl::~pseudopot_cell_vnl()
 {
+#ifdef __CUDA
+	cudaFree(this->d_deeq);
+#endif
 }
 
 //-----------------------------------
@@ -73,6 +76,9 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 		this->nhtolm.create(ntype, this->nhm);
 		this->nhtoj.create(ntype, this->nhm);
 		this->deeq.create(GlobalV::NSPIN, GlobalC::ucell.nat, this->nhm, this->nhm);
+#ifdef __CUDA
+		cudaMalloc((void**)&d_deeq, GlobalV::NSPIN*GlobalC::ucell.nat*this->nhm*this->nhm*sizeof(double));
+#endif		
 		this->deeq_nc.create(GlobalV::NSPIN, GlobalC::ucell.nat, this->nhm, this->nhm);
 		this->dvan.create(ntype, this->nhm, this->nhm);
 		this->dvan_so.create(GlobalV::NSPIN, ntype, this->nhm, this->nhm);
