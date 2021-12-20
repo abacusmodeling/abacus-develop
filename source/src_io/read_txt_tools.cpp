@@ -8,6 +8,7 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include <stdexcept>
 
 namespace Read_Txt_Tools
 {
@@ -17,7 +18,8 @@ namespace Read_Txt_Tools
 	// }
 	std::map<std::string, std::vector<std::string>> read_file_to_map(
 		const std::string &file_name,
-		const std::set<std::string> &comment_seps)
+		const std::set<std::string> &comment_seps,
+		const bool flag_check_duplicate)
 	{
 		std::string str;
 		std::ifstream ifs(file_name);
@@ -27,7 +29,12 @@ namespace Read_Txt_Tools
 			std::getline(ifs,str);
 			const std::vector<std::string> vec = Read_Txt_Tools::split_whitespace(Read_Txt_Tools::ignore_comment(str, comment_seps));
 			if(vec.size()>0)
+			{
+				if(flag_check_duplicate)
+					if(m.find(vec[0])!=m.end())
+						throw std::invalid_argument(vec[0]+" is duplicated in INPUT");
 				m[vec[0]] = std::vector<std::string>(vec.begin()+1, vec.end());
+			}
 		}
 		return m;
 	}

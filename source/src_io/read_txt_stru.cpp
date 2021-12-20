@@ -7,6 +7,7 @@
 #include "read_txt_tools.h"
 
 #include <algorithm>
+#include <stdexcept>
 
 namespace Read_Txt_Stru
 {

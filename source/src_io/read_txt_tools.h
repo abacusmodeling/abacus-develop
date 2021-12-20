@@ -19,7 +19,8 @@ namespace Read_Txt_Tools
 	// }
 	std::map<std::string, std::vector<std::string>> read_file_to_map(
 		const std::string &file_name,
-		const std::set<std::string> &comment_seps);
+		const std::set<std::string> &comment_seps,
+		const bool flag_check_duplicate);
 
 
 	// [
@@ -62,7 +63,21 @@ namespace Read_Txt_Tools
 		for(const std::vector<T> & data_i : data_v)
 			data_chain.insert(data_chain.end(), data_i.begin(), data_i.end());
 		return data_chain;
-	}	
+	}
+
+	// check whether value in set_check
+	template<typename T>
+	bool in_set(const T &value, const std::set<T> &set_check)
+	{
+		return set_check.find(value)!=set_check.end();
+	}
+
+	namespace Preset
+	{
+		const std::set<std::string> True = {"1","T","TRUE","True","true"};
+		const std::set<std::string> False = {"0","F","FALSE","False","false"};
+		const std::set<std::string> Bool = {"1","T","TRUE","True","true","0","F","FALSE","False","false"};
+	}
 }
 
 #endif

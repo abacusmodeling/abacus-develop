@@ -68,7 +68,7 @@ def main():
 			print( '%5s'%"istep", "%20s"%"Spillage", flush=True )
 
 		loss_old = np.inf
-		for istep in range(200):
+		for istep in range(10000):
 
 			Spillage = 0
 			for ist in range(len(info_stru)):
@@ -87,7 +87,7 @@ def main():
 						V_linear[i] = opt_orb.cal_V_linear(coef,Q_linear,S_linear,V,V_info)
 
 				def cal_Spillage(V_delta):
-					Spillage = (V_delta * weight[ist]).sum()
+					Spillage = (V_delta * weight[ist][:info_stru[ist].Nb_true]).sum()
 					return Spillage
 
 				def cal_delta(VI, V):
