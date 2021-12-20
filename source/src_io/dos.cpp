@@ -354,14 +354,8 @@ void Dos::nscf_band(
 	{
 		if (ik>0)
 		{
-			double thiskx = GlobalC::kv.kvec_c[ik].x;
-			double thisky = GlobalC::kv.kvec_c[ik].y;
-			double thiskz = GlobalC::kv.kvec_c[ik].z;
-			double lastkx = GlobalC::kv.kvec_c[ik-1].x;
-			double lastky = GlobalC::kv.kvec_c[ik-1].y;
-			double lastkz = GlobalC::kv.kvec_c[ik-1].z;
-			klength[ik] = klength[ik-1] + sqrt(pow(thiskx-lastkx,2)
-						+pow(thisky-lastky,2)+pow(thiskz-lastkz,2));
+			auto delta=GlobalC::kv.kvec_c[ik]-GlobalC::kv.kvec_c[ik-1];
+			klength[ik] = klength[ik-1] + delta.norm();
 		}
 		if ( GlobalV::MY_POOL == GlobalC::Pkpoints.whichpool[ik] )
 		{
