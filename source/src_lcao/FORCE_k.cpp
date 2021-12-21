@@ -362,10 +362,6 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 			{
 				for(int iv=0; iv<irr; ++iv)
 				{
-					if(std::abs(vvv[is][iv].imag())>1.0e-8)
-					{
-						GlobalV::ofs_running << "vvv : " << iv << " " << is << " " << vvv[is][iv] << "\n";
-					}
 					dm2d[is][gstart+iv] = vvv[is][iv].real();
 				}
             //xiaohui add 2014-03-17, add "if(irr > 0)"

@@ -551,13 +551,13 @@ void LCAO_Descriptor::cal_projected_DM_k(const std::vector<ModuleBase::ComplexMa
 					for (int iw1=0; iw1<nw1_tot; ++iw1)
 					{
 						const int iw1_all = start1 + iw1;
-						const int iw1_local = GlobalC::ParaO.trace_loc_row[iw1_all];
+						const int iw1_local = GlobalC::ParaO.trace_loc_col[iw1_all];
 						if(iw1_local < 0)continue;
 						const int iw1_0 = iw1/GlobalV::NPOL;
 						for (int iw2=0; iw2<nw2_tot; ++iw2)
 						{
 							const int iw2_all = start2 + iw2;
-							const int iw2_local = GlobalC::ParaO.trace_loc_col[iw2_all];
+							const int iw2_local = GlobalC::ParaO.trace_loc_row[iw2_all];
 							if(iw2_local < 0)continue;
 							const int iw2_0 = iw2/GlobalV::NPOL;
  
@@ -567,7 +567,7 @@ void LCAO_Descriptor::cal_projected_DM_k(const std::vector<ModuleBase::ComplexMa
                             {
                                 const double arg = ( GlobalC::kv.kvec_d[ik] * (dR1-dR2) ) * ModuleBase::TWO_PI;
                                 const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );
-                                tmp += dm[ik](iw2_local,iw1_local)*kphase;
+                                tmp += dm[ik](iw1_local,iw2_local)*kphase;
                             }
                             if(tmp.imag()>1.0e-8)
                             {
@@ -1068,7 +1068,7 @@ void LCAO_Descriptor::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& d
                             std::complex<double> tmp = 0.0;
                             for(int ik=0;ik<GlobalC::kv.nks;ik++)
                             {
-                                const double arg = ( GlobalC::kv.kvec_d[ik] * (dR1-dR2) ) * ModuleBase::TWO_PI;
+                                const double arg = - ( GlobalC::kv.kvec_d[ik] * (dR1-dR2) ) * ModuleBase::TWO_PI;
                                 const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );
                                 tmp += dm[ik](iw2_local,iw1_local)*kphase;
                             }
