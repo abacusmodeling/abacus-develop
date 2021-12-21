@@ -65,6 +65,7 @@ void LCAO_Descriptor::cal_gvx(const ModuleBase::matrix &dm)
     this->init_gdmx();
     this->cal_gdmx(dm); //checked
 
+    //gdmr_vector : nat(derivative) * 3 * inl(projector) * nm * nm
     if(GlobalV::MY_RANK==0)
     {
         //make gdmx as tensor
@@ -106,13 +107,17 @@ void LCAO_Descriptor::cal_gvx(const ModuleBase::matrix &dm)
         assert(this->gdmr_vector.size()==nlmax);
 
         //einsum for each inl: 
+        //gdmr_vector : b:nat(derivative) * x:3 * a:inl(projector) * m:nm * n:nm
+        //gevdm_vector : a:inl * v:nm (descriptor) * m:nm (pdm, dim1) * n:nm (pdm, dim2)
+        //gvx_vector : b:nat(derivative) * x:3 * a:inl(projector) * m:nm(descriptor)
         std::vector<torch::Tensor> gvx_vector;
         for (int nl = 0;nl<nlmax;++nl)
         {
             gvx_vector.push_back(at::einsum("bxamn, avmn->bxav", {this->gdmr_vector[nl], this->gevdm_vector[nl]}));
-        }//
+        }
         
         // cat nv-> \sum_nl(nv) = \sum_nl(nm_nl)=des_per_atom
+        // concatenate index a(inl) and m(nm)
         this->gvx_tensor = torch::cat(gvx_vector, -1);
 
         assert(this->gvx_tensor.size(0) == GlobalC::ucell.nat);

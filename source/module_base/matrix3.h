@@ -15,7 +15,7 @@ class Matrix3
 {
 	/* data */
 public:
-	// element eij:i_column,j_row
+	// element eij: i_row, j_column
 	double e11, e12, e13, e21, e22, e23, e31, e32, e33;
 
 	/* Constructors and destructor */

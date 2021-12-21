@@ -472,12 +472,6 @@ void Force_Stress_LCAO::getForceStress(
 			}
 		}
 
-#ifdef __DEEPKS
-		for(int i=0;i<3;i++)
-		{
-			scs(i,i) -= GlobalC::ld.e_delta_band / GlobalC::ucell.omega;
-		}
-#endif
 
 
 		if(ModuleSymmetry::Symmetry::symm_flag)

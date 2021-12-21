@@ -664,22 +664,29 @@ void Pdiag_Double::diago_double_begin(
         MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, comm_2D);
 		wfc_2d.create(this->ncol,this->nrow);			// Fortran order
 
-        int is_already_decomposed, elpa_error;
         static elpa_t handle;
+        static bool has_set_elpa_handle = false;
+        if(! has_set_elpa_handle)
+        {
+            set_elpahandle(handle, desc, nrow, ncol);
+            has_set_elpa_handle = true;
+        }
 
+        int is_already_decomposed;
         if(ifElpaHandle(GlobalC::CHR.get_new_e_iteration(), (GlobalV::CALCULATION=="nscf")))
         {
-            ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_set");
+            ModuleBase::timer::tick("Diago_LCAO_Matrix","decompose_S");
             LapackConnector::copy(nloc, s_mat, inc, Stmp, inc);
-            set_elpahandle(handle, desc, nrow, ncol);
             is_already_decomposed=0;
-            ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_set");
+            ModuleBase::timer::tick("Diago_LCAO_Matrix","decompose_S");
         }
         else
         {
             is_already_decomposed=1;
         }
+
         ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_solve");
+        int elpa_error;
         elpa_generalized_eigenvectors_d(handle, h_mat, Stmp, eigen, wfc_2d.c, is_already_decomposed, &elpa_error);
         ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_solve");
 
@@ -1019,15 +1026,16 @@ void Pdiag_Double::diago_complex_begin(
         MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, comm_2D);
         wfc_2d.create(this->ncol,this->nrow);            // Fortran order
 
-        LapackConnector::copy(nloc, cs_mat, inc, Stmp, inc);
-        ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_set");
         static elpa_t handle;
-
-        if(ifElpaHandle(GlobalC::CHR.get_new_e_iteration(), (GlobalV::CALCULATION=="nscf")))
+        static bool has_set_elpa_handle = false;
+        if(! has_set_elpa_handle)
         {
             set_elpahandle(handle, desc, nrow, ncol);
+            has_set_elpa_handle = true;
         }
-        ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_set");
+
+        LapackConnector::copy(nloc, cs_mat, inc, Stmp, inc);
+
         ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_solve");
         int elpa_derror;
         elpa_generalized_eigenvectors_dc(handle, reinterpret_cast<double _Complex*>(ch_mat),

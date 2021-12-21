@@ -59,6 +59,7 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"out_charge",out_charge,">0 output charge density for selected electron steps");
 	ModuleBase::GlobalFunc::OUTP(ofs,"out_potential",out_potential,"output realspace potential");
 	ModuleBase::GlobalFunc::OUTP(ofs,"out_wf",out_wf,"output wave functions");
+	ModuleBase::GlobalFunc::OUTP(ofs,"out_wf_r",out_wf_r,"output wave functions in realspace");
 	ModuleBase::GlobalFunc::OUTP(ofs,"out_dos",out_dos,"output energy and dos");
 	ModuleBase::GlobalFunc::OUTP(ofs,"out_band",out_band,"output energy and band structure");
 	ModuleBase::GlobalFunc::OUTP(ofs,"restart_save",restart_save,"print to disk every step for restart");
@@ -174,6 +175,13 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"rcut_lj",mdp.rcut_lj,"cutoff radius of LJ potential");
 	ModuleBase::GlobalFunc::OUTP(ofs,"epsilon_lj",mdp.epsilon_lj,"the value of epsilon for LJ potential");
 	ModuleBase::GlobalFunc::OUTP(ofs,"sigma_lj",mdp.sigma_lj,"the value of sigma for LJ potential");
+	ModuleBase::GlobalFunc::OUTP(ofs,"direction",mdp.direction,"the direction of shock wave");
+	ModuleBase::GlobalFunc::OUTP(ofs,"velocity",mdp.velocity,"the velocity of shock wave");
+	ModuleBase::GlobalFunc::OUTP(ofs,"viscosity",mdp.viscosity,"artificial viscosity");
+	ModuleBase::GlobalFunc::OUTP(ofs,"tscale",mdp.tscale,"reduction in initial temperature");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_tfreq",mdp.tfreq,"oscillation frequency, used to determine Qmass of NHC");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_damp",mdp.damp,"damping parameter (time units) used to add force in Langevin method");
+
 
 	ofs << "\n#Parameters (11.Efield)" << std::endl;
 	ModuleBase::GlobalFunc::OUTP(ofs,"efield",efield,"add electric field");
@@ -197,7 +205,6 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"test_stress", test_stress, "test the force");
 	
 	ofs << "\n#Parameters (13.Other Methods)" << std::endl;
-	ModuleBase::GlobalFunc::OUTP(ofs,"mlwf_flag",mlwf_flag,"turn MLWF on or off");
 	ModuleBase::GlobalFunc::OUTP(ofs,"opt_epsilon2",opt_epsilon2,"calculate the dielectic function");
 	ModuleBase::GlobalFunc::OUTP(ofs,"opt_nbands",opt_nbands,"number of bands for optical calculation");
 	

@@ -81,16 +81,16 @@ void ELEC_scf::scf(const int &istep)
 	{
         Print_Info::print_scf(istep, iter);
 
-		//time_t time_start, time_finish;
-		clock_t clock_start;
-
 		std::string ufile = "CHANGE";
 		Update_input UI;
 		UI.init(ufile);
 
 		if(INPUT.dft_plus_u) GlobalC::dftu.iter_dftu = iter;
-		//time_start= std::time(NULL);
-		clock_start = std::clock();
+#ifdef __MPI
+		auto clock_start = MPI_Wtime();
+#else
+		auto clock_start = std::chrono::system_clock::now();
+#endif
 		conv_elec = false;//mohan add 2008-05-25
 
 		// mohan add 2010-07-16
@@ -454,7 +454,11 @@ void ELEC_scf::scf(const int &istep)
 		}
 
 		//time_finish=std::time(NULL);
-		double duration = (double)(clock() - clock_start) / CLOCKS_PER_SEC;
+#ifdef __MPI
+		double duration = (double)(MPI_Wtime() - clock_start);
+#else
+		double duration = (double)(std::chrono::system_clock::now() - clock_start) / CLOCKS_PER_SEC;
+#endif
 		//double duration_time = difftime(time_finish, time_start);
 		//std::cout<<"Time_clock\t"<<"Time_time"<<std::endl;
 		//std::cout<<duration<<"\t"<<duration_time<<std::endl;

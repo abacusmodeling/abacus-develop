@@ -203,5 +203,7 @@ extern bool deepks_scf; //caoyu add 2021-10-16 for DeePKS
 //method for dealing with non-local potential in Hamiltonian matrix, 0 for old, 1 for new
 extern int vnl_method;
 
+//whether or not output information for each element
+extern bool out_element_info;
 }
 #endif

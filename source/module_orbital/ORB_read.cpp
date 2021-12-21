@@ -556,7 +556,7 @@ void LCAO_Orbitals::read_orb_file(
 				this->kmesh,
 				this->dk,
 				this->dr_uniform,
-				true,
+				GlobalV::out_element_info,
 				true,
 				force_flag); // delta k mesh in reciprocal space
 
