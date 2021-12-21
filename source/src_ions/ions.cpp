@@ -10,6 +10,7 @@
 #include "../src_pw/pw_basis.h"
 #include "../src_io/print_info.h"
 #include "variable_cell.h" // mohan add 2021-02-01
+#include "src_io/write_wfc_realspace.h"
 
 void Ions::opt_ions_pw(void)
 {
@@ -183,12 +184,6 @@ void Ions::opt_ions_pw(void)
 			elec_sto.scf_stochastic(istep-1);
 			eiter = elec_sto.iter;
 		}
-	
-
-		if(GlobalV::CALCULATION=="relax"|| GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="cell-relax")
-		{
-			CE.update_all_pos(GlobalC::ucell);
-		}
 
 		if(GlobalC::pot.out_potential == 2)
 		{
@@ -246,6 +241,11 @@ void Ions::opt_ions_pw(void)
 	{
 		std::cout << " ION DYNAMICS FINISHED :)" << std::endl;
 	}
+
+	if(GlobalC::wf.out_wf_r == 1)				// Peize Lin add 2021.11.21
+	{
+		Write_Wfc_Realspace::write_wfc_realspace_1(GlobalC::wf.evc, "wfc_realspace");
+	}	
 
 	ModuleBase::timer::tick("Ions","opt_ions_pw");
     return;
@@ -367,6 +367,8 @@ bool Ions::if_do_cellrelax()
 bool Ions::do_relax(const int& istep, int& jstep, const ModuleBase::matrix& ionic_force, const double& total_energy)
 {
 	ModuleBase::TITLE("Ions","do_relax");
+	CE.update_istep(jstep);
+	CE.update_all_pos(GlobalC::ucell);
 	IMM.cal_movement(istep, jstep, ionic_force, total_energy);
 	++jstep;
 	return IMM.get_converged();
@@ -386,6 +388,7 @@ void Ions::reset_after_relax(const int& istep)
 	GlobalV::ofs_running << " Setup the extrapolated charge." << std::endl;
 	// charge extrapolation if istep>0.
 	CE.extrapolate_charge();
+	CE.save_pos_next(GlobalC::ucell);
 
 	GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << std::endl;
 	// calculate the new potential accordint to

@@ -43,11 +43,7 @@ void Run_MD_PW::md_ions_pw(void)
     }
 
     // allocation for ion movement.
-    if (GlobalV::FORCE)
-    {
-        IMM.allocate();
-        CE.allocate_ions();
-    }
+    CE.allocate_ions();
 
     if (GlobalV::STRESS) // pengfei Li 2018-05-14
     {
@@ -62,9 +58,7 @@ void Run_MD_PW::md_ions_pw(void)
 
     while (istep <= GlobalV::NSTEP && !stop)
     {
-        time_t estart = time(NULL);
-
-        if (GlobalV::OUT_LEVEL == "ie")
+        if (GlobalV::OUT_LEVEL == "ie" || GlobalV::OUT_LEVEL == "i")
         {
             std::cout << " -------------------------------------------" << std::endl;
             std::cout << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
@@ -160,9 +154,6 @@ void Run_MD_PW::md_ions_pw(void)
             GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
         }
 
-        time_t eend = time(NULL);
-        time_t fstart = time(NULL);
-
         this->callInteraction_PW(GlobalC::ucell.nat, force, stress);
         double potential = GlobalC::en.etot/2;
 
@@ -183,8 +174,6 @@ void Run_MD_PW::md_ions_pw(void)
             ModuleBase::WARNING_QUIT("opt_ions", "mdtype should be -1~2!");
         }
 
-        time_t fend = time(NULL);
-
         CE.save_pos_next(GlobalC::ucell);
 
         //xiaohui add CE.istep = istep 2014-07-07
@@ -197,25 +186,6 @@ void Run_MD_PW::md_ions_pw(void)
         GlobalC::pot.init_pot(istep, GlobalC::pw.strucFac);
         //GlobalV::ofs_running << " Setup the new wave functions?\n" << std::endl;
         GlobalC::wf.wfcinit();
-
-        if (GlobalV::OUT_LEVEL == "i")
-        {
-            double etime_min = difftime(eend, estart) / 60.0;
-            double ftime_min = difftime(fend, fstart) / 60.0;
-            std::stringstream ss;
-            ss << GlobalV::MOVE_IONS << istep;
-
-            std::cout << " " << std::setw(7) << ss.str()
-                 << std::setw(5) << eiter
-                 << std::setw(15) << std::setprecision(6) << GlobalC::en.etot * ModuleBase::Ry_to_eV
-                 << std::setw(15) << IMM.get_ediff() * ModuleBase::Ry_to_eV
-                 << std::setprecision(3)
-                 << std::setw(15) << IMM.get_largest_grad() * ModuleBase::Ry_to_eV / 0.529177
-                 << std::setw(15) << IMM.get_trust_radius()
-                 << std::setw(8) << IMM.get_update_iter()
-                 << std::setprecision(2) << std::setw(11) << etime_min
-                 << std::setw(11) << ftime_min << std::endl;
-        }
 
         ++istep;
     }

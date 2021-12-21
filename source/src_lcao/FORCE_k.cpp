@@ -75,6 +75,10 @@ void Force_LCAO_k::ftable_k (
         GlobalC::ld.cal_f_delta_k(GlobalC::LOC.wfc_dm_2d.dm_k,isstress,svnl_dalpha);
 #ifdef __MPI
         Parallel_Reduce::reduce_double_all(GlobalC::ld.F_delta.c,GlobalC::ld.F_delta.nr*GlobalC::ld.F_delta.nc);
+		if(isstress)
+		{
+			Parallel_Reduce::reduce_double_pool( svnl_dalpha.c, svnl_dalpha.nr * svnl_dalpha.nc);
+		}
 #endif
         GlobalC::ld.print_F_delta("F_delta.dat");
     }
@@ -1295,9 +1299,9 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 		// Grid integration here.
 		//--------------------------------
 		// fvl_dphi can not be set to zero here if Vna is used
-		if(isstress&&isforce) 
+		if(isstress||isforce) 
 		{
-			GlobalC::UHM.GK.svl_k_RealSpace(fvl_dphi,svl_dphi,GlobalC::pot.vr_eff1);
+			GlobalC::UHM.GK.svl_k_RealSpace(isforce, isstress, fvl_dphi,svl_dphi,GlobalC::pot.vr_eff1);
 		}
 		else if(isforce) 
 		{

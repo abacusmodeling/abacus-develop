@@ -57,6 +57,7 @@ list(APPEND objects
     wavefunc_in_pw.cpp
 	H_TDDFT_pw.cpp
     run_md_lcao.cpp
+    dmft.cpp
 )
 
 if(ENABLE_DEEPKS)

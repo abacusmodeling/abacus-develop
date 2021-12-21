@@ -199,12 +199,14 @@ void Gint_k::fvl_k_RealSpace(ModuleBase::matrix& fvl_dphi, const double *vl)
 }
 
 void Gint_k::svl_k_RealSpace(
+	const bool isforce,
+	const bool isstress,
 	ModuleBase::matrix& fvl_dphi, 
 	ModuleBase::matrix& svl_dphi, 
 	const double *vl)
 {
-	ModuleBase::TITLE("Gint_k","cal_stress");
-	ModuleBase::timer::tick("Gint_k","cal_stress");
+	ModuleBase::TITLE("Gint_k","svl_k_RealSpace");
+	ModuleBase::timer::tick("Gint_k","svl_k_RealSpace");
 
 	if(!this->reduced)
 	{
@@ -223,24 +225,40 @@ void Gint_k::svl_k_RealSpace(
 	}
 
 	// to store < phi | vlocal | dphi>
-	double* pvdpx = new double[nnrg];
-	double* pvdpy = new double[nnrg];
-	double* pvdpz = new double[nnrg];
-	double* pvdp11 = new double[nnrg];
-	double* pvdp22 = new double[nnrg];
-	double* pvdp33 = new double[nnrg];
-	double* pvdp12 = new double[nnrg];
-	double* pvdp13 = new double[nnrg];
-	double* pvdp23 = new double[nnrg];
-	ModuleBase::GlobalFunc::ZEROS(pvdpx, nnrg);
-	ModuleBase::GlobalFunc::ZEROS(pvdpy, nnrg);
-	ModuleBase::GlobalFunc::ZEROS(pvdpz, nnrg);
-	ModuleBase::GlobalFunc::ZEROS(pvdp11, nnrg);
-	ModuleBase::GlobalFunc::ZEROS(pvdp22, nnrg);
-	ModuleBase::GlobalFunc::ZEROS(pvdp33, nnrg);
-	ModuleBase::GlobalFunc::ZEROS(pvdp12, nnrg);
-	ModuleBase::GlobalFunc::ZEROS(pvdp13, nnrg);
-	ModuleBase::GlobalFunc::ZEROS(pvdp23, nnrg);
+	double* pvdpx;
+	double* pvdpy;
+	double* pvdpz;
+	double* pvdp11;
+	double* pvdp22;
+	double* pvdp33;
+	double* pvdp12;
+	double* pvdp13;
+	double* pvdp23;
+	if(isforce)
+	{
+		pvdpx = new double[nnrg];
+		pvdpy = new double[nnrg];
+		pvdpz = new double[nnrg];
+		ModuleBase::GlobalFunc::ZEROS(pvdpx, nnrg);
+		ModuleBase::GlobalFunc::ZEROS(pvdpy, nnrg);
+		ModuleBase::GlobalFunc::ZEROS(pvdpz, nnrg);
+	}
+	if(isstress)
+	{
+		pvdp11 = new double[nnrg];
+		pvdp22 = new double[nnrg];
+		pvdp33 = new double[nnrg];
+		pvdp12 = new double[nnrg];
+		pvdp13 = new double[nnrg];
+		pvdp23 = new double[nnrg];
+		ModuleBase::GlobalFunc::ZEROS(pvdp11, nnrg);
+		ModuleBase::GlobalFunc::ZEROS(pvdp22, nnrg);
+		ModuleBase::GlobalFunc::ZEROS(pvdp33, nnrg);
+		ModuleBase::GlobalFunc::ZEROS(pvdp12, nnrg);
+		ModuleBase::GlobalFunc::ZEROS(pvdp13, nnrg);
+		ModuleBase::GlobalFunc::ZEROS(pvdp23, nnrg);
+	}
+	
 
 
 	const double delta_r = GlobalC::ORB.dr_uniform;
@@ -352,34 +370,49 @@ void Gint_k::svl_k_RealSpace(
 				}
 				//std::cout<<"loop  "<<i<<" "<<j<<" "<<k<<std::endl;//test
 
-				this->evaluate_vl_stress(grid_index, size,i,j,k,
+				if(isforce)
+				{
+					this->evaluate_vl_force(grid_index, size,i,j,k,
 						psir_ylm, cal_flag, vldr3, distance,
 						dphi_x, dphi_y, dphi_z,
 						pvdpx, pvdpy, pvdpz,
+						GlobalC::GridT);
+				}
+				if(isstress)
+				{
+					this->evaluate_vl_stress(grid_index, size,i,j,k,
+						psir_ylm, cal_flag, vldr3, distance,
+						dphi_x, dphi_y, dphi_z,
 						pvdp11, pvdp22, pvdp33, pvdp12, pvdp13, pvdp23, dr,GlobalC::GridT);
+				}
 			}// int k
 		}// int j
 	} // int i
-
 
 	//---------------------------------------
 	// Folding R here
 	//---------------------------------------
 
 	//GlobalC::LM.DHloc_fixedR_x
-	this->folding_stress(fvl_dphi, svl_dphi, pvdpx, pvdpy, pvdpz,
+	this->folding_stress(isforce, isstress, fvl_dphi, svl_dphi, pvdpx, pvdpy, pvdpz,
 			pvdp11, pvdp22, pvdp33, pvdp12, pvdp13, pvdp23);
 
-	delete[] pvdpx;
-	delete[] pvdpy;
-	delete[] pvdpz;
-	delete[] pvdp11;
-	delete[] pvdp22;
-	delete[] pvdp33;
-	delete[] pvdp12;
-	delete[] pvdp13;
-	delete[] pvdp23;
-
+	if(isforce)
+	{
+		delete[] pvdpx;
+		delete[] pvdpy;
+		delete[] pvdpz;
+	}
+	if(isstress)
+	{
+		delete[] pvdp11;
+		delete[] pvdp22;
+		delete[] pvdp33;
+		delete[] pvdp12;
+		delete[] pvdp13;
+		delete[] pvdp23;
+	}
+	
 	delete[] vldr3;
 	if(max_size!=0)
 	{
@@ -411,7 +444,7 @@ void Gint_k::svl_k_RealSpace(
 
 		delete[] ylma;
 	}
-	ModuleBase::timer::tick("Gint_k","cal_stress");
+	ModuleBase::timer::tick("Gint_k","svl_k_RealSpace");
 	return;
 }
 
@@ -429,9 +462,6 @@ void Gint_k::evaluate_vl_stress(
 	double*** dphi_x, 
 	double*** dphi_y, 
 	double*** dphi_z,
-	double* pvdpx, 
-	double* pvdpy, 
-	double* pvdpz, 
 	double* pvdp11, 
 	double* pvdp22, 
 	double* pvdp33, 
@@ -441,18 +471,14 @@ void Gint_k::evaluate_vl_stress(
 	double*** dr,
 	const Grid_Technique &gt)
 {
-
+	ModuleBase::timer::tick("Gint_k","evaluate_vl_stress");
 	double *psi1, *psi2;
 	double *iw1p, *iw2p;
 	double *iw1px, *iw1py, *iw1pz;//extra pointer compared to non-force grid integration.
-	double *iw2px, *iw2py, *iw2pz;//extra pointer compared to non-force grid integration.
 	double *end1, *end2;
-	double *pvp1, *pvp2, *pvp3;//extra pointer
-        double *pvp11, *pvp22, *pvp33, *pvp12, *pvp13, *pvp23;
-	int iw1_lo, iw2_lo;
+    double *pvp11, *pvp22, *pvp33, *pvp12, *pvp13, *pvp23;
 	int iwi, iww;
-	double vpsir1, vpsir2, vpsir3;//extra pointer
-        double vpsir11, vpsir22, vpsir33, vpsir12, vpsir13, vpsir23;//extra pointer
+    double vpsir11, vpsir22, vpsir33, vpsir12, vpsir13, vpsir23;//extra pointer
 	double *psix, *psiy, *psiz;
 
 
@@ -482,8 +508,6 @@ void Gint_k::evaluate_vl_stress(
 		const int iat = gt.which_atom[mcell_index1];
         const int T1 = GlobalC::ucell.iat2it[iat];
         const int I1 = GlobalC::ucell.iat2ia[iat];
-        const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
-		const int iw1_start = gt.trace_lo[start1];
         Atom *atom1 = &GlobalC::ucell.atoms[T1];
 	
         //~~~~~~~~~~~~~~~~
@@ -525,9 +549,6 @@ void Gint_k::evaluate_vl_stress(
 //---------------------------------------------------------
             {
                 Atom *atom2 = &GlobalC::ucell.atoms[T2];
-                const int I2 = GlobalC::ucell.iat2ia[iat2];
-                const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-				const int iw2_start = gt.trace_lo[start2];
 
 	            //---------------
                 // get cell R2.
@@ -598,8 +619,7 @@ void Gint_k::evaluate_vl_stress(
 						
 						
 						end1 = psi1 + atom1->nw;
-						end2 = psi2 + atom2->nw;
-						iw1_lo = iw1_start;	
+						end2 = psi2 + atom2->nw;	
 						//------------------------------------
 						// circle for wave functions of atom 1.
 						//------------------------------------
@@ -611,10 +631,6 @@ void Gint_k::evaluate_vl_stress(
 
 						for (iw1p=psi1; iw1p < end1; ++ iw1p)
 						{
-							//vpsir1 = iw1p[0] * vldr3[ib];
-							vpsir1 = iw1px[0] * vldr3[ib];
-							vpsir2 = iw1py[0] * vldr3[ib];
-							vpsir3 = iw1pz[0] * vldr3[ib];
                             vpsir11 = iw1px[0] * vldr3[ib] * dr[ib][ia1][0];
                             vpsir22 = iw1py[0] * vldr3[ib] * dr[ib][ia1][1];
                             vpsir33 = iw1pz[0] * vldr3[ib] * dr[ib][ia1][2];
@@ -625,7 +641,6 @@ void Gint_k::evaluate_vl_stress(
 							++iw1py;
 							++iw1pz;
 
-							iw2_lo = iw2_start;
 							iww = iatw + iwi;// -1 because ++iww from below.
 
 							dmR2 = &dmR[iww]; //mohan add 2012-01-05
@@ -635,16 +650,10 @@ void Gint_k::evaluate_vl_stress(
 							//---------------------------------
 							// only correct for one processor
 							//---------------------------------
-//							pvp1 = &GlobalC::LM.DHloc_fixedR_x[iww];
-//							pvp2 = &GlobalC::LM.DHloc_fixedR_y[iww];
-//							pvp3 = &GlobalC::LM.DHloc_fixedR_z[iww];
 
 							//--------------------------------------
 							// store phi_i(r) vlocal(r) * dphi_j(r)
 							//--------------------------------------
-							pvp1 = &pvdpx[iww]; //mohan add 2012-1-6
-							pvp2 = &pvdpy[iww];
-							pvp3 = &pvdpz[iww];
 
                             pvp11 = &pvdp11[iww]; //zhengdy add 2017/3/28
                             pvp22 = &pvdp22[iww];
@@ -655,50 +664,18 @@ void Gint_k::evaluate_vl_stress(
 							//------------------------------------
 							// circle for wave functions of atom 2.
 							//------------------------------------
-							iw2px = psix;
-							iw2py = psiy;
-							iw2pz = psiz;
-
-							for(iw2p=psi2; iw2p < end2; ++iw2p,
-								++iw2px, ++iw2py, ++iw2pz)
+							for(iw2p=psi2; iw2p < end2; ++iw2p)
 							{
-								// the main difference to calculate
-								// the force is that the whole 
-								// matrix should be calculated!
-								//if( iw1_lo > iw2_lo)
-								//{
-								//	++iw2_lo;
-								//	++pvp1;
-								//	++pvp2;
-								//	++pvp3;
-								//	continue;
-								//}
-								// mohan tmp
 
 						// bug here!!!!!!!!!!!!!!!!!!!!!!!!!!!
 						// DM(R) * psi1(r) * v(r) * psi2_R(r)
-								pvp1[0] += dmR2[0] * vpsir1 * iw2p[0];
-								pvp2[0] += dmR2[0] * vpsir2 * iw2p[0];
-								pvp3[0] += dmR2[0] * vpsir3 * iw2p[0];
                                 pvp11[0] += dmR2[0] * vpsir11 * iw2p[0] ;
                                 pvp22[0] += dmR2[0] * vpsir22 * iw2p[0] ;
                                 pvp33[0] += dmR2[0] * vpsir33 * iw2p[0] ;
                                 pvp12[0] += dmR2[0] * vpsir12 * iw2p[0] ;
                                 pvp13[0] += dmR2[0] * vpsir13 * iw2p[0] ;
                                 pvp23[0] += dmR2[0] * vpsir23 * iw2p[0] ;
-//								pvp1[0] += vpsir1 * iw2p[0];
-//								pvp2[0] += vpsir2 * iw2p[0];
-//								pvp3[0] += vpsir3 * iw2p[0];
-						// bug here!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-								//pvp1[0] -= vpsir1 * iw2px[0];
-								//pvp2[0] -= vpsir1 * iw2py[0];
-								//pvp3[0] -= vpsir1 * iw2pz[0];
-
-								++iw2_lo;
-								++pvp1;
-								++pvp2;
-								++pvp3;
                                 ++pvp11;
                                 ++pvp22;
                                 ++pvp33;
@@ -708,7 +685,6 @@ void Gint_k::evaluate_vl_stress(
 						//density matrix
 								++dmR2;
 							}
-							++iw1_lo;
 						}// iw
 					}//end flag
 				}//end ib
@@ -717,6 +693,7 @@ void Gint_k::evaluate_vl_stress(
 	}//ia1
 
 	delete[] all_out_of_range;
+	ModuleBase::timer::tick("Gint_k","evaluate_vl_stress");
 	return;
 }
 
@@ -726,14 +703,12 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
         double* pvdpx, double* pvdpy, double* pvdpz,
         const Grid_Technique &gt)
 {                       
-                                
+        ModuleBase::timer::tick("Gint_k","evaluate_vl_force");
         double *psi1, *psi2;    
         double *iw1p, *iw2p;
         double *iw1px, *iw1py, *iw1pz;//extra pointer compared to non-force grid integration.
-        double *iw2px, *iw2py, *iw2pz;//extra pointer compared to non-force grid integration.
         double *end1, *end2;
         double *pvp1, *pvp2, *pvp3;//extra pointer
-        int iw1_lo, iw2_lo;
         int iwi, iww;
         double vpsir1, vpsir2, vpsir3;//extra pointer
         double *psix, *psiy, *psiz;
@@ -758,215 +733,177 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
         double* dmR2;
         for (int ia1=0; ia1<size; ++ia1)
         {
-                if(all_out_of_range[ia1]) continue;
+            if(all_out_of_range[ia1]) continue;
 
-        const int mcell_index1 = gt.bcell_start[grid_index] + ia1;
-                const int iat = gt.which_atom[mcell_index1];
-        const int T1 = GlobalC::ucell.iat2it[iat];
-        const int I1 = GlobalC::ucell.iat2ia[iat];
-        const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
-                const int iw1_start = gt.trace_lo[start1];
-        Atom *atom1 = &GlobalC::ucell.atoms[T1];
+			const int mcell_index1 = gt.bcell_start[grid_index] + ia1;
+			const int iat = gt.which_atom[mcell_index1];
+			const int T1 = GlobalC::ucell.iat2it[iat];
+			const int I1 = GlobalC::ucell.iat2ia[iat];
+			Atom *atom1 = &GlobalC::ucell.atoms[T1];
 
-        //~~~~~~~~~~~~~~~~
-        // get cell R1.
-        //~~~~~~~~~~~~~~~~
-        const int id1 = gt.which_unitcell[mcell_index1];
-        const int R1x = gt.ucell_index2x[id1];
-        const int R1y = gt.ucell_index2y[id1];
-        const int R1z = gt.ucell_index2z[id1];
-        const int DM_start = GlobalC::LNNR.nlocstartg[iat];
+			//~~~~~~~~~~~~~~~~
+			// get cell R1.
+			//~~~~~~~~~~~~~~~~
+			const int id1 = gt.which_unitcell[mcell_index1];
+			const int R1x = gt.ucell_index2x[id1];
+			const int R1y = gt.ucell_index2y[id1];
+			const int R1z = gt.ucell_index2z[id1];
+			const int DM_start = GlobalC::LNNR.nlocstartg[iat];
 
-        // get (j,beta,R2)
-        for (int ia2=0; ia2<size; ++ia2)
-        {
-                        if(all_out_of_range[ia2]) continue;
+			// get (j,beta,R2)
+			for (int ia2=0; ia2<size; ++ia2)
+			{
+                if(all_out_of_range[ia2]) continue;
 
-                        //---------------------------------------------
-                        // check if we need to calculate the big cell.
-                        //---------------------------------------------
-                        bool same_flag = false;
-                        for(int ib=0; ib<gt.bxyz; ++ib)
-                        {
-                                if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
-                                {
-                                //      std::cout << " same flag is = " << ib << std::endl;
-                                        same_flag = true;
-                                        break;
-                                }
-                        }
+				//---------------------------------------------
+				// check if we need to calculate the big cell.
+				//---------------------------------------------
+				bool same_flag = false;
+				for(int ib=0; ib<gt.bxyz; ++ib)
+				{
+					if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
+					{
+					//      std::cout << " same flag is = " << ib << std::endl;
+							same_flag = true;
+							break;
+					}
+                }
 
-                        if(!same_flag) continue;
+                if(!same_flag) continue;
 
-            const int bcell2 = gt.bcell_start[grid_index] + ia2;
-            const int T2 = GlobalC::ucell.iat2it[ gt.which_atom[bcell2]];
-                        const int iat2 = gt.which_atom[bcell2];
+				const int bcell2 = gt.bcell_start[grid_index] + ia2;
+				const int T2 = GlobalC::ucell.iat2it[ gt.which_atom[bcell2]];
+				const int iat2 = gt.which_atom[bcell2];
 
 //---------------------------------------------------------
 //            if (T2 >= T1 ) //mohan fix bug 2012-07-10
 //---------------------------------------------------------
-            {
-                Atom *atom2 = &GlobalC::ucell.atoms[T2];
-                const int I2 = GlobalC::ucell.iat2ia[iat2];
-                const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-                                const int iw2_start = gt.trace_lo[start2];
+            	{
+					Atom *atom2 = &GlobalC::ucell.atoms[T2];
 
                     //---------------
-                // get cell R2.
+                	// get cell R2.
                     //---------------
-                const int id2 = gt.which_unitcell[bcell2];
-                const int R2x = gt.ucell_index2x[id2];
-                const int R2y = gt.ucell_index2y[id2];
-                const int R2z = gt.ucell_index2z[id2];
+					const int id2 = gt.which_unitcell[bcell2];
+					const int R2x = gt.ucell_index2x[id2];
+					const int R2y = gt.ucell_index2y[id2];
+					const int R2z = gt.ucell_index2z[id2];
 
-                                //------------------------------------------------
-                                // calculate the 'offset': R2 position relative
-                                // to R1 atom.
-                                //------------------------------------------------
-                const int dRx = R1x - R2x;
-                const int dRy = R1y - R2y;
-                const int dRz = R1z - R2z;
+					//------------------------------------------------
+					// calculate the 'offset': R2 position relative
+					// to R1 atom.
+					//------------------------------------------------
+					const int dRx = R1x - R2x;
+					const int dRy = R1y - R2y;
+					const int dRz = R1z - R2z;
 
-                                const int index = GlobalC::LNNR.cal_RindexAtom(dRx, dRy, dRz, iat2);
-                int offset = -1;
+                    const int index = GlobalC::LNNR.cal_RindexAtom(dRx, dRy, dRz, iat2);
+                	int offset = -1;
 
-                                int* find_start = GlobalC::LNNR.find_R2[iat];
-                                int* findend = GlobalC::LNNR.find_R2[iat] + GlobalC::LNNR.nad[iat];
+					int* find_start = GlobalC::LNNR.find_R2[iat];
+					int* findend = GlobalC::LNNR.find_R2[iat] + GlobalC::LNNR.nad[iat];
 
-                                // the nad should be a large expense of time.
-                                for(int* find=find_start; find < findend; find++)
-                                {
-                                        if( find[0] == index )
-                                        {
-                                                offset = find - find_start;
-                                                break;
-                                        }
-                                }
+					// the nad should be a large expense of time.
+					for(int* find=find_start; find < findend; find++)
+					{
+						if( find[0] == index )
+						{
+								offset = find - find_start;
+								break;
+						}
+					}
 
-                                if(offset == -1 )
-                {
-                    ModuleBase::WARNING_QUIT("gint_k","evaluate_vl_force wrong");
-                }
-                assert(offset < GlobalC::LNNR.nad[iat]);
+                    if(offset == -1 )
+					{
+						ModuleBase::WARNING_QUIT("gint_k","evaluate_vl_force wrong");
+					}
+                	assert(offset < GlobalC::LNNR.nad[iat]);
 
-                                //--------------------------------------------------------------- 
-                                // what I do above is to get 'offset' for atom std::pair (iat1, iat2)
-                                // if I want to simplify this searching for offset,
-                                // I should take advantage of gt.which_unitcell.
-                                //--------------------------------------------------------------- 
+					//--------------------------------------------------------------- 
+					// what I do above is to get 'offset' for atom std::pair (iat1, iat2)
+					// if I want to simplify this searching for offset,
+					// I should take advantage of gt.which_unitcell.
+					//--------------------------------------------------------------- 
 
-                                const int iatw = DM_start + GlobalC::LNNR.find_R2st[iat][offset];
+                    const int iatw = DM_start + GlobalC::LNNR.find_R2st[iat][offset];
 
-                                for(int ib=0; ib<gt.bxyz; ++ib)
-                                {
-                                        if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
-                                        {
-                                                psi1 = psir_ylm[ib][ia1];
-                                                psi2 = psir_ylm[ib][ia2];
+					for(int ib=0; ib<gt.bxyz; ++ib)
+					{
+						if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
+						{
+							psi1 = psir_ylm[ib][ia1];
+							psi2 = psir_ylm[ib][ia2];
 
-                                                psix = dphi_x[ib][ia1];
-                                                psiy = dphi_y[ib][ia1];
-                                                psiz = dphi_z[ib][ia1];
-                                                //psix = psi1; // for overlap test
-                                                //psiy = psi1; // for overlap test
-                                                //psiz = psi1; // for overlap test
+							psix = dphi_x[ib][ia1];
+							psiy = dphi_y[ib][ia1];
+							psiz = dphi_z[ib][ia1];
+							//psix = psi1; // for overlap test
+							//psiy = psi1; // for overlap test
+							//psiz = psi1; // for overlap test
 
 
-                                                end1 = psi1 + atom1->nw;
-                                                end2 = psi2 + atom2->nw;
-                                                iw1_lo = iw1_start;
-                                                //------------------------------------
-                                                // circle for wave functions of atom 1.
-                                                //------------------------------------
-                                                iwi = 0;
+							end1 = psi1 + atom1->nw;
+							end2 = psi2 + atom2->nw;
+							//------------------------------------
+							// circle for wave functions of atom 1.
+							//------------------------------------
+							iwi = 0;
 
-                                                iw1px = psix;
-                                                iw1py = psiy;
-                                                iw1pz = psiz;
-                                                for (iw1p=psi1; iw1p < end1; ++ iw1p)
-                                                {
-                                                        //vpsir1 = iw1p[0] * vldr3[ib];
-                                                        vpsir1 = iw1px[0] * vldr3[ib];
-                                                        vpsir2 = iw1py[0] * vldr3[ib];
-                                                        vpsir3 = iw1pz[0] * vldr3[ib];
-                                                        ++iw1px;
-                                                        ++iw1py;
-                                                        ++iw1pz;
+							iw1px = psix;
+							iw1py = psiy;
+							iw1pz = psiz;
+							for (iw1p=psi1; iw1p < end1; ++ iw1p)
+							{
+								//vpsir1 = iw1p[0] * vldr3[ib];
+								vpsir1 = iw1px[0] * vldr3[ib];
+								vpsir2 = iw1py[0] * vldr3[ib];
+								vpsir3 = iw1pz[0] * vldr3[ib];
+								++iw1px;
+								++iw1py;
+								++iw1pz;
 
-                                                        iw2_lo = iw2_start;
-                                                        iww = iatw + iwi;// -1 because ++iww from below.
+								iww = iatw + iwi;// -1 because ++iww from below.
 
-                                                        dmR2 = &dmR[iww]; //mohan add 2012-01-05
+								dmR2 = &dmR[iww]; //mohan add 2012-01-05
 
-                                                        iwi += atom2->nw;
+								iwi += atom2->nw;
 
-                                                        //---------------------------------
-                                                        // only correct for one processor
-                                                        //---------------------------------
-//                                                      pvp1 = &GlobalC::LM.DHloc_fixedR_x[iww];
-//                                                      pvp2 = &GlobalC::LM.DHloc_fixedR_y[iww];
-//                                                      pvp3 = &GlobalC::LM.DHloc_fixedR_z[iww];
+								//--------------------------------------
+								// store phi_i(r) vlocal(r) * dphi_j(r)
+								//--------------------------------------
+								pvp1 = &pvdpx[iww]; //mohan add 2012-1-6
+								pvp2 = &pvdpy[iww];
+								pvp3 = &pvdpz[iww];
 
-                                                        //--------------------------------------
-                                                        // store phi_i(r) vlocal(r) * dphi_j(r)
-                                                        //--------------------------------------
-                                                        pvp1 = &pvdpx[iww]; //mohan add 2012-1-6
-                                                        pvp2 = &pvdpy[iww];
-                                                        pvp3 = &pvdpz[iww];
+								//------------------------------------
+								// circle for wave functions of atom 2.
+								//------------------------------------
+								for(iw2p=psi2; iw2p < end2; ++iw2p)
+								{
+									// the main difference to calculate
+									// the force is that the whole 
+									// matrix should be calculated!
 
-                                                        //------------------------------------
-                                                        // circle for wave functions of atom 2.
-                                                        //------------------------------------
-                                                        iw2px = psix;
-                                                        iw2py = psiy;
-                                                        iw2pz = psiz;
+                                    // DM(R) * psi1(r) * v(r) * psi2_R(r)
+									pvp1[0] += dmR2[0] * vpsir1 * iw2p[0];
+									pvp2[0] += dmR2[0] * vpsir2 * iw2p[0];
+									pvp3[0] += dmR2[0] * vpsir3 * iw2p[0];
 
-                                                        for(iw2p=psi2; iw2p < end2; ++iw2p,
-                                                                ++iw2px, ++iw2py, ++iw2pz)
-                                                        {
-                                                                // the main difference to calculate
-                                                                // the force is that the whole 
-                                                                // matrix should be calculated!
-                                                                //if( iw1_lo > iw2_lo)
-                                                                //{
-                                                                //      ++iw2_lo;
-                                                                //      ++pvp1;
-                                                                //      ++pvp2;
-                                                                //      ++pvp3;
-                                                                //      continue;
-                                                                //}
-                                                                // mohan tmp
-
-                                                // bug here!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                                                // DM(R) * psi1(r) * v(r) * psi2_R(r)
-                                                                        pvp1[0] += dmR2[0] * vpsir1 * iw2p[0];
-                                                                        pvp2[0] += dmR2[0] * vpsir2 * iw2p[0];
-                                                                        pvp3[0] += dmR2[0] * vpsir3 * iw2p[0];
-//                                                              pvp1[0] += vpsir1 * iw2p[0];
-//                                                              pvp2[0] += vpsir2 * iw2p[0];
-//                                                              pvp3[0] += vpsir3 * iw2p[0];
-                                                // bug here!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-                                                                //pvp1[0] -= vpsir1 * iw2px[0];
-                                                                //pvp2[0] -= vpsir1 * iw2py[0];
-                                                                //pvp3[0] -= vpsir1 * iw2pz[0];
-
-                                                                ++iw2_lo;
-                                                                ++pvp1;
-                                                                ++pvp2;
-                                                                ++pvp3;
-                                                //density matrix
-                                                                ++dmR2;
-                                                        }
-                                                        ++iw1_lo;
-                                                }// iw
-                                        }//end flag
-                                }//end ib
-            }// T
-        }// ia2
+									++pvp1;
+									++pvp2;
+									++pvp3;
+									//density matrix
+									++dmR2;
+								}
+                            }// iw
+                        }//end flag
+                	}//end ib
+            	}// T
+        	}// ia2
         }//ia1
 
         delete[] all_out_of_range;
+		ModuleBase::timer::tick("Gint_k","evaluate_vl_force");
         return;
 }
 

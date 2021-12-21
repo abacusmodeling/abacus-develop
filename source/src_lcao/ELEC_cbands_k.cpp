@@ -116,7 +116,7 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		{
 			GlobalC::restart.load_disk("H", ik);
 			GlobalC::restart.info_load.load_H_finish = true;
-		}			
+		}
 		if(GlobalC::restart.info_save.save_H)
 		{
 			GlobalC::restart.save_disk("H", ik);

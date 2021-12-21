@@ -323,7 +323,7 @@ int UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_ru
 			latvec.e22 = bba * sinab;
 			latvec.e23 = 0.0;
 			latvec.e31 = cba * cosac;
-			latvec.e32 = cba * (cosbc - cosac*cosab/sinab);
+			latvec.e32 = cba * (cosbc - cosac*cosab) / sinab;
 			term = 1.0 + 2.0 * cosab*cosac*cosbc - cosab*cosab - cosac*cosac - cosbc*cosbc;
 			term = sqrt(term)/sinab;
 			latvec.e33 = cba * term;
@@ -618,7 +618,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
                                         mv.z = true ;
                                         atoms[it].vel[ia].set(0,0,0);
 #ifndef __CMD
-										atoms[it].mag[ia]=magnet.start_magnetization[it];
+										//atoms[it].mag[ia]=magnet.start_magnetization[it];//if this line is used, default startmag_type would be 2
 #endif										
 										atoms[it].angle1[ia]=0;
 										atoms[it].angle2[ia]=0;
