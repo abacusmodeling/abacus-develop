@@ -1,5 +1,9 @@
 // For format details, see https://aka.ms/devcontainer.json.
 {
 	"image":"ghcr.io/deepmodeling/abacus-development-kit:gnu",
-	"extensions": ["ms-vscode.cpptools-extension-pack"]
+	"extensions": [
+		"ms-vscode.cpptools-extension-pack",
+		"xaver.clang-format",
+		"cschlosser.doxdocgen"
+	]
 }
