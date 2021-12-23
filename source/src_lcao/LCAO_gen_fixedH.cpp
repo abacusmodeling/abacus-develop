@@ -287,9 +287,9 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri, con
 	{
 		if(nnr != GlobalC::LNNR.nnr)
 		{
-			std::cout << " nnr=" << nnr << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << std::endl;
-			GlobalV::ofs_running << " nnr=" << nnr << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << std::endl;
-			ModuleBase::WARNING_QUIT("LCAO_gen_fixedH::build_ST_new","nnr != GlobalC::LNNR.nnr");
+			std::cout << " nnr=" << nnr << " LNNR.nnr=" << GlobalC::LNNR.nnr << std::endl;
+			GlobalV::ofs_running << " nnr=" << nnr << " LNNR.nnr=" << GlobalC::LNNR.nnr << std::endl;
+			ModuleBase::WARNING_QUIT("LCAO_gen_fixedH::build_ST_new","nnr != LNNR.nnr");
 		}
 	}
 
@@ -852,7 +852,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
 	//		GlobalV::ofs_running << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << std::endl;
 		if( nnr!=GlobalC::LNNR.nnr)
 		{
-			ModuleBase::WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_mu_new","nnr!=GlobalC::LNNR.nnr");
+			ModuleBase::WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_mu_new","nnr!=LNNR.nnr");
 		}
 	}
 
@@ -1119,7 +1119,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 //		GlobalV::ofs_running << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << std::endl;
 		if( nnr!=GlobalC::LNNR.nnr)
 		{
-			ModuleBase::WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_mu","nnr!=GlobalC::LNNR.nnr");
+			ModuleBase::WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_mu","nnr!=LNNR.nnr");
 		}
 	}
 

@@ -785,8 +785,8 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
                         {
                             if(i==0 && j==0)
                             {
-                                g1 << dRx << " " << dRy << " " << dRz  << "    //R std::vector(R2 - R1,unit: lattice std::vector)" <<std::endl;
-                                g2 << dRx << " " << dRy << " " << dRz  << "    //R std::vector(R2 - R1,unit: lattice std::vector)" <<std::endl;
+                                g1 << dRx << " " << dRy << " " << dRz  << "    //R std::vector(R2 - R1,unit: lattice vector)" <<std::endl;
+                                g2 << dRx << " " << dRy << " " << dRz  << "    //R std::vector(R2 - R1,unit: lattice vector)" <<std::endl;
                             }
                             //g1 << " " << lineH[j-i];
                             //g2 << " " << lineS[j-i];

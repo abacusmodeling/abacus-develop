@@ -237,7 +237,7 @@ void Diago_LCAO_Matrix::solve_double_matrix(
 	else
 	{
 		std::cout << " Diago_LCAO_Matrix, diago_type = " << GlobalV::KS_SOLVER << std::endl; 
-		ModuleBase::WARNING_QUIT("Diago_LCAO_Matrix::init","Check GlobalV::KS_SOLVER.");
+		ModuleBase::WARNING_QUIT("Diago_LCAO_Matrix::init","Check ks_solver.");
 	}
 
 	time_t time_end = time(NULL);

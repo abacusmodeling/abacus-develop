@@ -316,7 +316,7 @@ void Input::Print(const std::string &fn)const
 	
 	ofs << "\n#Parameters (18.berry_wannier)" << std::endl;
 	ModuleBase::GlobalFunc::OUTP(ofs,"berry_phase",berry_phase,"calculate berry phase or not");
-	ModuleBase::GlobalFunc::OUTP(ofs,"gdir",gdir,"calculate the polarization in the direction of the lattice std::vector");
+	ModuleBase::GlobalFunc::OUTP(ofs,"gdir",gdir,"calculate the polarization in the direction of the lattice vector");
 	ModuleBase::GlobalFunc::OUTP(ofs,"towannier90",towannier90,"use wannier90 code interface or not");
 	ModuleBase::GlobalFunc::OUTP(ofs,"nnkpfile",NNKP,"the wannier90 code nnkp file name");
 	ModuleBase::GlobalFunc::OUTP(ofs,"wannier_spin",wannier_spin,"calculate spin in wannier90 code interface");
