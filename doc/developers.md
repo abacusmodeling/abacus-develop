@@ -156,4 +156,4 @@ An practical example is class [LCAO_Descriptor](https://github.com/deepmodeling/
 ### Code formatting style
 
 We use `clang-format` as our code formatter. The `.clang-format` file in root directory describes the rules to conform.
-A Visual Studio Code extension [clang-format](https://marketplace.visualstudio.com/items?itemName=xaver.clang-format) can help you format your codes on save.
+For Visual Studio Code developers, the [official extension of C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools) provided by Microsoft can help you format your codes following the rules. Configure your VS Code settings as `"C_Cpp.clang_format_style": "file"` (you can look up this option by pasting it into the search box of VS Code settings page), and the clang-format will take into effect. You may also set `"editor.formatOnSave": true` to avoid formatting files everytime manually.
