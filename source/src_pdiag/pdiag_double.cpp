@@ -612,7 +612,7 @@ void Pdiag_Double::diago_double_begin(
 
 	double* Stmp = GlobalC::LM.Sdiag;
 
-    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"start solver, GlobalV::KS_SOLVER",GlobalV::KS_SOLVER);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"start solver, ks_solver",GlobalV::KS_SOLVER);
     if(GlobalV::KS_SOLVER=="hpseps")
     {
         double *eigen = new double[GlobalV::NLOCAL];

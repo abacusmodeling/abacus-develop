@@ -17,7 +17,7 @@ public:
 	// mohan add 2021-02-21
 	static bool symm_flag;
 
-	void analy_sys(const UnitCell_pseudo &ucell, const output &out, std::ofstream &ofs_running);
+	void analy_sys(const UnitCell_pseudo &ucell, std::ofstream &ofs_running);
 	bool available;
 
 	ModuleBase::Vector3<double> s1, s2, s3;

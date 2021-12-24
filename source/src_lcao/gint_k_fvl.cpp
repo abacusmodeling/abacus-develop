@@ -17,7 +17,7 @@ void Gint_k::fvl_k_RealSpace(ModuleBase::matrix& fvl_dphi, const double *vl)
 
 	int nnrg = GlobalC::LNNR.nnrg;
  	//xiaohui add "OUT_LEVEL", 2015-09-16
-	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " GlobalC::LNNR.nnrg in cal_force_k = " << GlobalC::LNNR.nnrg << std::endl;
+	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " LNNR.nnrg in cal_force_k = " << GlobalC::LNNR.nnrg << std::endl;
 	assert(nnrg>=0);
 
 	// just because to make thea arrys meaningful.
@@ -215,7 +215,7 @@ void Gint_k::svl_k_RealSpace(
 
 	int nnrg = GlobalC::LNNR.nnrg;
 
-	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " GlobalC::LNNR.nnrg in cal_force_k = " << GlobalC::LNNR.nnrg << std::endl;
+	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " LNNR.nnrg in cal_force_k = " << GlobalC::LNNR.nnrg << std::endl;
 	assert(nnrg>=0);
 
 	// just because to make thea arrys meaningful.

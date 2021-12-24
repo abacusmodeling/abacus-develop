@@ -540,8 +540,8 @@ void Force_LCAO_k::cal_foverlap_k(
 	if(irr!=GlobalC::LNNR.nnr)
 	{
 		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wrong irr",irr);
-		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wrong GlobalC::LNNR.nnr",GlobalC::LNNR.nnr);
-		ModuleBase::WARNING_QUIT("Force_LCAO_k::cal_foverlap_k","irr!=GlobalC::LNNR.nnr");
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wrong LNNR.nnr",GlobalC::LNNR.nnr);
+		ModuleBase::WARNING_QUIT("Force_LCAO_k::cal_foverlap_k","irr!=LNNR.nnr");
 	}
 	
 	for(int is=0; is<GlobalV::NSPIN; is++)

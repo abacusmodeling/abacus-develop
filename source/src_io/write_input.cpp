@@ -175,6 +175,13 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"rcut_lj",mdp.rcut_lj,"cutoff radius of LJ potential");
 	ModuleBase::GlobalFunc::OUTP(ofs,"epsilon_lj",mdp.epsilon_lj,"the value of epsilon for LJ potential");
 	ModuleBase::GlobalFunc::OUTP(ofs,"sigma_lj",mdp.sigma_lj,"the value of sigma for LJ potential");
+	ModuleBase::GlobalFunc::OUTP(ofs,"direction",mdp.direction,"the direction of shock wave");
+	ModuleBase::GlobalFunc::OUTP(ofs,"velocity",mdp.velocity,"the velocity of shock wave");
+	ModuleBase::GlobalFunc::OUTP(ofs,"viscosity",mdp.viscosity,"artificial viscosity");
+	ModuleBase::GlobalFunc::OUTP(ofs,"tscale",mdp.tscale,"reduction in initial temperature");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_tfreq",mdp.tfreq,"oscillation frequency, used to determine Qmass of NHC");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_damp",mdp.damp,"damping parameter (time units) used to add force in Langevin method");
+
 
 	ofs << "\n#Parameters (11.Efield)" << std::endl;
 	ModuleBase::GlobalFunc::OUTP(ofs,"efield",efield,"add electric field");
@@ -309,7 +316,7 @@ void Input::Print(const std::string &fn)const
 	
 	ofs << "\n#Parameters (18.berry_wannier)" << std::endl;
 	ModuleBase::GlobalFunc::OUTP(ofs,"berry_phase",berry_phase,"calculate berry phase or not");
-	ModuleBase::GlobalFunc::OUTP(ofs,"gdir",gdir,"calculate the polarization in the direction of the lattice std::vector");
+	ModuleBase::GlobalFunc::OUTP(ofs,"gdir",gdir,"calculate the polarization in the direction of the lattice vector");
 	ModuleBase::GlobalFunc::OUTP(ofs,"towannier90",towannier90,"use wannier90 code interface or not");
 	ModuleBase::GlobalFunc::OUTP(ofs,"nnkpfile",NNKP,"the wannier90 code nnkp file name");
 	ModuleBase::GlobalFunc::OUTP(ofs,"wannier_spin",wannier_spin,"calculate spin in wannier90 code interface");

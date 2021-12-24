@@ -127,15 +127,15 @@ void UnitCell_pseudo::read_cell_pseudopots(const std::string &pp_dir, std::ofstr
 }
 
 
-void UnitCell_pseudo::print_unitcell_pseudo(const std::string &fn, output &outp)
+void UnitCell_pseudo::print_unitcell_pseudo(const std::string &fn)
 {
 	if(GlobalV::test_pseudo_cell) ModuleBase::TITLE("UnitCell_pseudo","print_unitcell_pseudo");
 	std::ofstream ofs( fn.c_str() );
 
-	this->print_cell(ofs, outp);
+	this->print_cell(ofs);
 	for (int i = 0;i < ntype;i++)
 	{
-		atoms[i].print_Atom(ofs, outp);
+		atoms[i].print_Atom(ofs);
 	}
 
 	ofs.close();
