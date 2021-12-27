@@ -133,7 +133,7 @@ void Hamilt::diagH_pw(
                 }
                 else
                 {
-                    CHECK_CUFFT(cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z));
+                    // CHECK_CUFFT(cufftPlan3d(&GlobalC::UFFT.fft_handle, GlobalC::pw.nx, GlobalC::pw.ny, GlobalC::pw.nz, CUFFT_Z2Z));
                 }
 
                 CHECK_CUDA(cudaMalloc((void**)&d_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx * GlobalV::NPOL * sizeof(double2)));
@@ -232,7 +232,7 @@ void Hamilt::diagH_pw(
                             GlobalV::DIAGO_CG_MAXITER, reorder, notconv, avg);
                     }
                     // TODO destroy handle
-                    CHECK_CUFFT(cufftDestroy(GlobalC::UFFT.fft_handle));
+                    // CHECK_CUFFT(cufftDestroy(GlobalC::UFFT.fft_handle));
                     // to cpu
                     CHECK_CUDA(cudaMemcpy(GlobalC::wf.evc[ik0].c, d_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx * sizeof(double2), cudaMemcpyDeviceToHost));
                     CHECK_CUDA(cudaMemcpy(GlobalC::wf.ekb[ik], d_wf_ekb, GlobalV::NBANDS * sizeof(double), cudaMemcpyDeviceToHost));
