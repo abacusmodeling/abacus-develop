@@ -11,7 +11,7 @@ project(ABACUS
     LANGUAGES CXX
 )
 
-option(ENABLE_DEEPKS "Enable DeePKS functionality" ON)
+option(ENABLE_DEEPKS "Enable DeePKS functionality" OFF)
 option(ENABLE_LIBXC "Enable LibXC functionality" OFF)
 option(USE_CUDA "Enable support to CUDA." OFF)
 option(USE_OPENMP " Enable OpenMP in abacus." ON)
