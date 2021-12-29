@@ -64,7 +64,10 @@ void LCAO_Descriptor::cal_gvx(const ModuleBase::matrix &dm)
     this->build_S_descriptor(1);
     this->init_gdmx();
     this->cal_gdmx(dm); //checked
-
+    if(!gdmr_vector.empty())
+    {
+        gdmr_vector.erase(gdmr_vector.begin(),gdmr_vector.end());
+    }
     //gdmr_vector : nat(derivative) * 3 * inl(projector) * nm * nm
     if(GlobalV::MY_RANK==0)
     {
@@ -297,6 +300,10 @@ void LCAO_Descriptor::cal_gedm_k(const std::vector<ModuleBase::ComplexMatrix>& d
 void LCAO_Descriptor::cal_gvdm()
 {
     ModuleBase::TITLE("LCAO_Descriptor", "cal_gvdm");
+    if(!gevdm_vector.empty())
+    {
+        gevdm_vector.erase(gevdm_vector.begin(),gevdm_vector.end());
+    }
     //cal gevdm(d(EigenValue(D))/dD)
     int nlmax = inlmax/GlobalC::ucell.nat;
     for (int nl=0;nl<nlmax;++nl)
