@@ -7,8 +7,6 @@
     - [Link LIBXC](#link-libxc)
 - [Structure of the package](#structure-of-the-package)
   - [Structure of source code](#structure-of-source-code)
-
-  - [Building the program](#building-the-program)
 - [Installation with DeePKS](#installation-with-deepks)
   - [Extra prerequisites](#extra-prerequisites)
   - [Extra settings for building](#extra-settings-for-building)
@@ -77,6 +75,15 @@ Alternatively, you can choose [Intel® oneAPI toolkit](https://software.intel.co
 If you use Intel toolchain, don't forget to [set environment variables](https://software.intel.com/content/www/us/en/develop/documentation/get-started-with-intel-oneapi-render-linux/top/configure-your-system.html) before you start! `cmake` will use Intel MKL if the environment variable `MKLROOT` is set.
 
 [back to top](#download-and-install)
+
+### Container Deployment
+
+We offer a pre-built docker image containing all the requirements - you only need to clone and compile `abacus` in the container. Please refer to our [Package Page](https://github.com/deepmodeling/abacus-develop/pkgs/container/abacus-development-kit).
+
+The project is ready for VS Code development container. Please refer to [Developing inside a Container](https://code.visualstudio.com/docs/remote/containers#_quick-start-try-a-development-container). Choose `Open a Remote Window -> Clone a Repository in Container Volume` in VS Code command palette, and put the [git address](https://github.com/hongriTianqi/abacus-develop.git) of `ABACUS` when prompted.
+
+We also support [gitpod](https://www.gitpod.io/) to offer an ready-to-use online development environment.
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/hongriTianqi/abacus-develop)
 
 ### Build and install ABACUS with CMake
 
