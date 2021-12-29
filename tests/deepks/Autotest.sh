@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ABACUS executable path
-abacus=/home/wenfei/abacus-develop/build/abacus
+abacus=abacus
 # number of mpi processes
 np=4
 # threshold with unit: eV

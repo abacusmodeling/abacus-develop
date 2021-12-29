@@ -438,20 +438,6 @@ std::ostream & ComplexMatrix::print( std::ostream & os, const double threshold_a
 	return os;
 }
 
-ModuleBase::matrix ComplexMatrix::dble(void)
-{
-	ModuleBase::matrix a;
-	a.create(this->nr, this->nc);
-	for(int i=0;i<this->nr;i++)
-	{
-		for(int j=0;j<this->nc;j++)
-		{
-			a(i,j) = std::real((*this)(i,j));
-		}
-	}
-	return a;
-}
-
 bool ComplexMatrix::checkreal(void)
 {
 	const double tiny = 1e-12;

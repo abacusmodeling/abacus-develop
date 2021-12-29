@@ -58,7 +58,6 @@ public:
 
 	std::ostream & print( std::ostream & os, const double threshold_abs=0.0, const double threshold_imag=0.0 ) const;		// Peize Lin add 2021.09.08
 
-	ModuleBase::matrix dble(void);
 	bool checkreal(void);
 };
 

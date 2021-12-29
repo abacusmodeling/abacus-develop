@@ -5,7 +5,9 @@
 #include "../src_pw/symmetry_rho.h"
 #include "LCAO_evolve.h"
 #include "dftu.h"
+#ifdef __DEEPKS
 #include "LCAO_descriptor.h"
+#endif
 
 ELEC_cbands_k::ELEC_cbands_k(){};
 ELEC_cbands_k::~ELEC_cbands_k(){};
