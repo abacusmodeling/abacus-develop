@@ -189,15 +189,35 @@ void LOOP_ions::opt_ions(void)
 #ifdef __DEEPKS
         if (GlobalV::out_descriptor)
         {
-            //ld.init(ORB.get_lmax_d(), ORB.get_nchimax_d(), ucell.nat* ORB.Alpha[0].getTotal_nchi());
-            //ld.build_S_descriptor(0);  //cal overlap, no need dm
-            GlobalC::ld.cal_projected_DM(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);  //need dm
+            if(!GlobalV::deepks_scf)
+            {
+                GlobalC::ld.resize_nlm();
+                GlobalC::ld.build_v_delta_alpha_new(0);
+            }
+
+            if(GlobalV::GAMMA_ONLY_LOCAL)
+            {
+                GlobalC::ld.cal_projected_DM(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);  //need dm
+            }
+            else
+            {
+                GlobalC::ld.cal_projected_DM_k(GlobalC::LOC.wfc_dm_2d.dm_k);  //need dm
+            }
+
             GlobalC::ld.cal_descriptor();    //final descriptor
             GlobalC::ld.save_npy_d();            //libnpy needed
+            
             if (GlobalV::deepks_scf)
             {
                 //ld.print_H_V_delta();   //final H_delta
-                GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma);
+                if(GlobalV::GAMMA_ONLY_LOCAL)
+                {
+                    GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma);
+                }
+                else
+                {
+                    GlobalC::ld.cal_e_delta_band_k(GlobalC::LOC.wfc_dm_2d.dm_k);
+                }
                 std::cout << "E_delta_band = " << std::setprecision(8) << GlobalC::ld.e_delta_band << " Ry" << " = " << std::setprecision(8) << GlobalC::ld.e_delta_band * ModuleBase::Ry_to_eV << " eV" << std::endl;
                 std::cout << "E_delta_NN= "<<std::setprecision(8) << GlobalC::ld.E_delta << " Ry" << " = "<<std::setprecision(8)<<GlobalC::ld.E_delta*ModuleBase::Ry_to_eV<<" eV"<<std::endl;
             }

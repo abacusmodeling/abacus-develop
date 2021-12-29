@@ -1,4 +1,7 @@
 add_subdirectory(integrate)
+if(ENABLE_DEEPKS)
+	add_subdirectory(deepks)
+endif()
 
 set(CMAKE_LINK_WHAT_YOU_USE TRUE)
 find_package(Threads)
