@@ -161,7 +161,6 @@ LCAO_nnr.o \
 LCAO_diago.o\
 LCAO_evolve.o\
 LCAO_descriptor.o\
-LCAO_descriptor_old.o\
 LCAO_descriptor_io.o\
 LCAO_descriptor_dV.o\
 ylm.o\

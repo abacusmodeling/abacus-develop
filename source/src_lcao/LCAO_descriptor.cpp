@@ -188,6 +188,20 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
     ModuleBase::TITLE("LCAO_Descriptor", "build_S_descriptor");
     //array to store data
 
+    for (int inl = 0;inl < this->inlmax;inl++)
+    {
+        ModuleBase::GlobalFunc::ZEROS(S_mu_alpha[inl], GlobalV::NLOCAL * (2 * this->lmaxd+ 1));
+    }
+    if(calc_deri)
+    {
+        for (int inl = 0;inl < this->inlmax;inl++)
+        {
+            ModuleBase::GlobalFunc::ZEROS(DS_mu_alpha_x[inl], GlobalV::NLOCAL * (2 * this->lmaxd + 1));
+            ModuleBase::GlobalFunc::ZEROS(DS_mu_alpha_y[inl], GlobalV::NLOCAL * (2 * this->lmaxd + 1));
+            ModuleBase::GlobalFunc::ZEROS(DS_mu_alpha_z[inl], GlobalV::NLOCAL * (2 * this->lmaxd + 1));
+        }
+    }
+
     double olm[3] = {0.0, 0.0, 0.0};
     ModuleBase::Vector3<double> tau1, tau2, dtau;
     ModuleBase::Vector3<double> dtau1, dtau2, tau0;
@@ -319,6 +333,10 @@ void LCAO_Descriptor::cal_projected_DM(const ModuleBase::matrix &dm)
     ModuleBase::TITLE("LCAO_Descriptor", "cal_projected_DM");
     ModuleBase::timer::tick("LCAO_Descriptor","cal_projected_DM"); 
     const int pdm_size = (this->lmaxd * 2 + 1) * (this->lmaxd * 2 + 1);
+    for (int inl = 0;inl < this->inlmax;inl++)
+    {
+        ModuleBase::GlobalFunc::ZEROS(this->pdm[inl], pdm_size);
+    }
 
     if(GlobalV::NPROC>1)
     {
