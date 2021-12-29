@@ -1558,6 +1558,8 @@ void ORB_gen_tables::snap_psialpha_half(
 		}//end N0
 	}//end L0
 
+	delete[] calproj;
+	delete[] rmesh1;
 	ModuleBase::timer::tick("ORB_gen_tables", "snap_psialpha_half");
 	return;
 }

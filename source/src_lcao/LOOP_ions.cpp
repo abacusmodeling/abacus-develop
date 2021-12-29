@@ -61,8 +61,6 @@ void LOOP_ions::opt_ions(void)
         LCM.allocate();
     }
 
-
-
     this->istep = 1;
     int force_step = 1;
     int stress_step = 1;
@@ -171,14 +169,14 @@ void LOOP_ions::opt_ions(void)
             GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
         }
 
-    if(INPUT.dft_plus_dmft)
-    {
-      // Output sparse overlap matrix S(R)
-      this->output_SR("outputs_to_DMFT/overlap_matrix/SR.csr");
-      
-      // Output wave functions, bands, k-points information, and etc.
-      GlobalC::dmft.out_to_dmft();
-    }
+        if(INPUT.dft_plus_dmft)
+        {
+        // Output sparse overlap matrix S(R)
+        this->output_SR("outputs_to_DMFT/overlap_matrix/SR.csr");
+        
+        // Output wave functions, bands, k-points information, and etc.
+        GlobalC::dmft.out_to_dmft();
+        }
 
         if(GlobalC::ParaO.out_hsR)
 		{
@@ -189,12 +187,6 @@ void LOOP_ions::opt_ions(void)
 #ifdef __DEEPKS
         if (GlobalV::out_descriptor)
         {
-            if(!GlobalV::deepks_scf)
-            {
-                GlobalC::ld.resize_nlm();
-                GlobalC::ld.build_v_delta_alpha_new(0);
-            }
-
             if(GlobalV::GAMMA_ONLY_LOCAL)
             {
                 GlobalC::ld.cal_projected_DM(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);  //need dm

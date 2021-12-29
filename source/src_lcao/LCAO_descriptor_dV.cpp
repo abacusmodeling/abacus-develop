@@ -13,12 +13,9 @@
 //===============================
 
 
-void LCAO_Descriptor::deepks_pre_scf(const string& model_file)
+void LCAO_Descriptor::allocate_V_delta()
 {
-    ModuleBase::TITLE("LCAO_Descriptor", "deepks_pre_scf");
-
-	// load the DeePKS model from deep neural network
-    this->load_model(model_file);
+    ModuleBase::TITLE("LCAO_Descriptor", "allocate_V_delta");
 
     //initialize the H matrix H_V_delta
     if(GlobalV::GAMMA_ONLY_LOCAL)
@@ -64,18 +61,11 @@ void LCAO_Descriptor::deepks_pre_scf(const string& model_file)
             ModuleBase::GlobalFunc::ZEROS(DS_mu_alpha_z[inl], GlobalV::NLOCAL * (2 * this->lmaxd + 1));
         }
     }
-    if(GlobalV::GAMMA_ONLY_LOCAL)
-    {
-        this->nlm_save.resize(GlobalC::ucell.nat);
-    }
-    else
-    {
-        this->nlm_save_k.resize(GlobalC::ucell.nat);
-    }
+
     return;
 }
 
-void LCAO_Descriptor::resize_nlm()
+void LCAO_Descriptor::allocate_nlm(void)
 {
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {
@@ -85,7 +75,6 @@ void LCAO_Descriptor::resize_nlm()
     {
         this->nlm_save_k.resize(GlobalC::ucell.nat);
     }
-    return;
 }
 
 //this subroutine adds dV to the Kohn-Sham Hamiltonian

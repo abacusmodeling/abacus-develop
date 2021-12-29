@@ -62,6 +62,7 @@ public:
     void init(const int lm/**< [in] max angular momentum quantum number: 'L'*/,
         const int nm/**< [in] max orbital number with the same 'L', for each 'L'*/,
         const int tot_inl/**< [in] total number of radial orbitals (sum of atoms 'I', angular number 'L' and orbital number 'N') */);
+    void allocate_nlm();
 
 	/// calculate overlap between lcao basis Phi and descriptor basis Alpha
     /// <alpha | chi>
@@ -81,11 +82,13 @@ public:
 //deals with application of correction dV to Hamiltonian and force
 //realized in LCAO_descriptor_dV.cpp
 //===============================
-	/// 1. Load DeePKS model
-    /// 2. Initialize the deltaV Hamiltonian matrix 
-    /// 3. If FORCE, initialize the matrces for force
-    void deepks_pre_scf(const std::string& model_file/**< [in] path of a traced model file, provided by deepks-kit*/);
-    void resize_nlm();
+
+    //load the trained neural network model
+    void load_model(const std::string& model_file);
+
+    /// 1. Initialize the deltaV Hamiltonian matrix 
+    /// 2. If FORCE, initialize the matrces for force
+    void allocate_V_delta(void);
 
     ///add dV to the Hamiltonian matrix
     void add_v_delta(void);
@@ -151,26 +154,6 @@ public:
 	void save_npy_e(const double &e/**<[in] \f$E_{base}\f$ or \f$E_{tot}\f$, in Ry*/, const std::string &e_file);
 	void save_npy_f(const ModuleBase::matrix &fbase/**<[in] \f$F_{base}\f$ or \f$F_{tot}\f$, in Ry/Bohr*/, const std::string &f_file);
     void save_npy_gvx(void);
-
-//==============
-//obsolete subroutines, in LCAO_descriptor_old.cpp
-//==============
-
-    //calculates descriptors for atoms
-    void cal_dm_as_descriptor(const ModuleBase::matrix& dm/**< [in] density matrix*/); // mohan add 2021-08-04
-
-    ///calculate \f$\sum_{I}\sum_{nlmm'}\langle\phi_\mu|\alpha^I_{nlm}\rangle{\frac{dE}{dD^I_{nlmm'}}}\langle\alpha^I_{nlm'}|\phi_\nu\rangle\f$ (for gamma_only)
-    void build_v_delta_alpha(const bool& cal_deri/**< [in] 0 for 3-center intergration, 1 for its derivation*/);    
-    ///calculate \f$\sum_{I}\sum_{nlmm'}\langle\phi_\mu|\alpha^I_{nlm}\rangle{\frac{dE}{dD^I_{nlmm'}}}\langle\alpha^I_{nlm'}|\phi_\nu\rangle\f$ (for multi-k)
-    void build_v_delta_mu(const bool &cal_deri/**< [in] 0 for 3-center intergration, 1 for its derivation*/);
-    
-    ///compute \f$H_{\delta, \mu\nu} = \langle\phi_\mu|V_\delta|\phi_\nu\rangle\f$ 
-    void cal_v_delta(const ModuleBase::matrix& dm/**< [in] density matrix*/);
-
-    ///compute Hellmann-Feynman term of the force contribution of \f$E_\delta\f$
-    void cal_f_delta_hf(const ModuleBase::matrix& dm/**< [in] density matrix*/);
-    ///compute the force contribution of \f$E_\delta\f$
-    void cal_f_delta(const ModuleBase::matrix& dm/**< [in] density matrix*/);
 
 //-------------------
 // public variables
@@ -306,15 +289,6 @@ private:
     void cal_gdmx(const ModuleBase::matrix& dm);	//dD/dX, precondition of cal_gvx
     void cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm);	//dD/dX, precondition of cal_gvx
 	void del_gdmx(void);
-
-//===============================
-//DeePKS Part 2
-//deals with application of correction dV to Hamiltonian and force
-//realized in LCAO_descriptor_dV.cpp
-//===============================
-
-    //load the trained neural network model
-    void load_model(const std::string& model_file);
 
 //============================
 //DeePKS Part 3

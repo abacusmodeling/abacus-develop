@@ -9,6 +9,9 @@
 #include "src_io/print_info.h"
 #include "module_symmetry/symmetry.h"
 #include "src_lcao/run_md_lcao.h"
+#ifdef __DEEPKS
+#include "src_lcao/LCAO_descriptor.h"
+#endif
 
 Run_lcao::Run_lcao(){}
 Run_lcao::~Run_lcao(){}
@@ -161,6 +164,19 @@ void Run_lcao::lcao_line(void)
 				break;
 		}
 	}
+
+#ifdef __DEEPKS
+	//wenfei 2021-12-19
+	//if we are performing DeePKS calculations, we need to load a model
+	if (GlobalV::out_descriptor)
+	{
+		if (GlobalV::deepks_scf)
+		{
+			// load the DeePKS model from deep neural network
+    		GlobalC::ld.load_model(INPUT.model_file);
+		}
+	}
+#endif
 
 	if(GlobalV::CALCULATION=="md")
 	{

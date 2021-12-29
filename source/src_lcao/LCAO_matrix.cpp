@@ -65,13 +65,6 @@ void LCAO_Matrix::divide_HS_in_frag(const bool isGamma, Parallel_Orbitals &po)
 	// for 2d: calculate po.nloc first, then trace_loc_row and trace_loc_col
 	// for O(N): calculate the three together.
 	po.set_trace();
-#ifdef __DEEPKS
-	if(GlobalV::out_descriptor)
-	{
-		GlobalC::ParaD.set_nlocal(MPI_COMM_WORLD);
-		GlobalC::ParaD.set_loc_orb(MPI_COMM_WORLD);
-	}
-#endif
 
 	// (3) allocate for S, H_fixed, H, and S_diag
 	if(isGamma)
@@ -82,7 +75,26 @@ void LCAO_Matrix::divide_HS_in_frag(const bool isGamma, Parallel_Orbitals &po)
 	{
 		allocate_HS_k(po.nloc);
 	}
+#ifdef __DEEPKS
+	//wenfei 2021-12-19
+    //preparation for DeePKS
 
+	if (GlobalV::out_descriptor)
+	{
+        //initialize relevant parallelization plans
+		GlobalC::ParaD.set_nlocal(MPI_COMM_WORLD);
+		GlobalC::ParaD.set_loc_orb(MPI_COMM_WORLD);
+
+        //allocate relevant data structures for calculating descriptors
+		GlobalC::ld.init(GlobalC::ORB.get_lmax_d(), GlobalC::ORB.get_nchimax_d(), GlobalC::ucell.nat * GlobalC::ORB.Alpha[0].getTotal_nchi());
+        GlobalC::ld.allocate_nlm();
+		if (GlobalV::deepks_scf)
+		{
+            //allocate relevant data structures for constructing V_delta
+            GlobalC::ld.allocate_V_delta();
+		}
+	}
+#endif
 	return;
 }
 

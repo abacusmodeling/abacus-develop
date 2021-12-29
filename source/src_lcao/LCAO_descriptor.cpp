@@ -795,22 +795,6 @@ void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm)
     ModuleBase::TITLE("LCAO_Descriptor", "cal_gdmx");
     //get DS_alpha_mu and S_nu_beta
 
-// for checking purpose
-/*    
-    std::ifstream ifs("dm");
-    ModuleBase::matrix dm1(dm.nr,dm.nc);
-
-    for (int mu=0;mu<GlobalV::NLOCAL;mu++)
-    {
-        for (int nu=0;nu<GlobalV::NLOCAL;nu++)
-        {
-            double c;
-            ifs >> c;
-            dm1(mu,nu)=c;
-        }
-    }
-*/
-//
     double** ss = this->S_mu_alpha;
     double** dsx = this->DS_mu_alpha_x;
     double** dsy = this->DS_mu_alpha_y;

@@ -79,14 +79,7 @@ void Force_LCAO_gamma::ftable_gamma (
 #ifdef __DEEPKS
     if (GlobalV::deepks_scf)
     {
-        //=======method 1: dgemm==============
-        //GlobalC::ld.build_S_descriptor(1);   //for F_delta calculation
-        //GlobalC::ld.cal_f_delta(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
-        //GlobalC::ld.print_F_delta("F_delta_old.dat");
-
-        
-        //=======method 2: snap_psialpha========
-        
+                
         GlobalC::ld.cal_gedm(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
         GlobalC::ld.cal_f_delta_new(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],isstress, svnl_dalpha);
 #ifdef __MPI

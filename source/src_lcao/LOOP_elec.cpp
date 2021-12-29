@@ -146,22 +146,19 @@ void LOOP_elec::before_solver(const int &istep)
 
 	// (9) compute S, T, Vnl, Vna matrix.
     GlobalC::UHM.set_lcao_matrices();
-    
-#ifdef __DEEPKS
-	//init deepks
-	if (GlobalV::out_descriptor)
-	{
-		GlobalC::ld.init(GlobalC::ORB.get_lmax_d(), GlobalC::ORB.get_nchimax_d(), GlobalC::ucell.nat * GlobalC::ORB.Alpha[0].getTotal_nchi());
-		GlobalC::ld.build_S_descriptor(0);  //init overlap table
-		if (GlobalV::deepks_scf)
-		{
-			//load a model
-			GlobalC::ld.deepks_pre_scf(INPUT.model_file);	//caoyu add 2021-07-26
 
-			//build and save <psi(0)|alpha(R)> at beginning
-			GlobalC::ld.build_v_delta_alpha_new(GlobalV::FORCE);
-		}
-	}
+#ifdef __DEEPKS
+    //for each ionic step, the overlap <psi|alpha> must be rebuilt
+    //since it depends on ionic positions
+    if (GlobalV::out_descriptor)
+    {
+        GlobalC::ld.build_S_descriptor(0);  //init overlap table
+        if (GlobalV::deepks_scf)
+        {
+            //build and save <psi(0)|alpha(R)> at beginning
+            GlobalC::ld.build_v_delta_alpha_new(GlobalV::FORCE);
+        }
+    }
 #endif
 
     ModuleBase::timer::tick("LOOP_elec","before_solver"); 
