@@ -660,7 +660,7 @@ void LCAO_Descriptor::cal_f_delta_k(const std::vector<ModuleBase::ComplexMatrix>
                             std::complex<double> tmp = 0.0;
                             for(int ik=0;ik<GlobalC::kv.nks;ik++)
                             {
-                                const double arg = ( GlobalC::kv.kvec_d[ik] * (dR2-dR1) ) * ModuleBase::TWO_PI;
+                                const double arg = - ( GlobalC::kv.kvec_d[ik] * (dR2-dR1) ) * ModuleBase::TWO_PI;
                                 const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );
                                 tmp += dm[ik](iw1_local, iw2_local) * kphase;
                             }
