@@ -569,10 +569,6 @@ void LCAO_Descriptor::cal_projected_DM_k(const std::vector<ModuleBase::ComplexMa
                                 const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );
                                 tmp += dm[ik](iw1_local,iw2_local)*kphase;
                             }
-                            if(tmp.imag()>1.0e-8)
-                            {
-                                GlobalV::ofs_running << "dm_current not real : " << tmp << "\n";
-                            }
                             dm_current=tmp.real();
 
                             key_tuple key_1(ibt1,dR1.x,dR1.y,dR1.z);
@@ -1072,10 +1068,6 @@ void LCAO_Descriptor::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& d
                                 const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );
                                 tmp += dm[ik](iw2_local,iw1_local)*kphase;
                             }
-                            if(tmp.imag()>1.0e-8)
-                            {
-                                GlobalV::ofs_running << "dm_current not real : " << tmp << "\n";
-                            }
                             dm_current=tmp.real();
                             
                             key_tuple key_1(ibt1,dR1.x,dR1.y,dR1.z);
@@ -1104,15 +1096,15 @@ void LCAO_Descriptor::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& d
                                             double fact_z = (nlm2[3][ib+m2] * nlm1[ib+m1] + nlm2[3][ib+m2] * nlm1[ib+m1]) * dm_current;
 
                                             //(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'> + (<d/dX chi_nu|alpha_m'>)<chi_mu|alpha_m>
-                                            gdmx[ibt2][inl][m1*nm + m2] += fact_x;
-                                            gdmy[ibt2][inl][m1*nm + m2] += fact_y;                                               
-                                            gdmz[ibt2][inl][m1*nm + m2] += fact_z;
+                                            gdmx[iat][inl][m1*nm + m2] += fact_x;
+                                            gdmy[iat][inl][m1*nm + m2] += fact_y;                                               
+                                            gdmz[iat][inl][m1*nm + m2] += fact_z;
 
                                             //(<chi_mu|d/dX alpha_m>)<chi_nu|alpha_m'> + (<chi_nu|d/dX alpha_m'>)<chi_mu|alpha_m>
                                             // = -(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'> - (<d/dX chi_nu|alpha_m'>)<chi_mu|alpha_m>
-                                            gdmx[iat][inl][m1*nm + m2] -= fact_x;                                               
-                                            gdmy[iat][inl][m1*nm + m2] -= fact_y;                                               
-                                            gdmz[iat][inl][m1*nm + m2] -= fact_z;
+                                            gdmx[ibt2][inl][m1*nm + m2] -= fact_x;                                               
+                                            gdmy[ibt2][inl][m1*nm + m2] -= fact_y;                                               
+                                            gdmz[ibt2][inl][m1*nm + m2] -= fact_z;
 
                                         }
                                     }

@@ -664,10 +664,6 @@ void LCAO_Descriptor::cal_f_delta_k(const std::vector<ModuleBase::ComplexMatrix>
                                 const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );
                                 tmp += dm[ik](iw1_local, iw2_local) * kphase;
                             }
-                            if(tmp.imag()>1.0e-8)
-                            {
-                                GlobalV::ofs_running << "dm_current not real in force_hf" << tmp << "\n";
-                            }
                             dm_current=tmp.real();
 
 
