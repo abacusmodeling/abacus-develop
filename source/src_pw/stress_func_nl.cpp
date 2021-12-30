@@ -52,7 +52,10 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma)
         becp.zero_out();
 		for (int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
-			if(std::abs(GlobalC::wf.wg(ik, ib)) < 1.0e-5) continue;
+			///
+			///only occupied band should be calculated.
+			///
+			if(GlobalC::wf.wg(ik, ib) < 1.0e-8) continue;
 			for (int i = 0; i < nkb; i++) 
 			{
                 for (int ig = 0; ig < GlobalC::wf.npw; ig++) {
@@ -133,7 +136,10 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma)
 				ModuleBase::timer::tick("Stress", "get_dbecp");
 				for (int ib=0; ib<GlobalV::NBANDS; ib++)
 				{
-					if(std::abs(GlobalC::wf.wg(ik, ib)) < 1.0e-5) continue;
+					///
+					///only occupied band should be calculated.
+					///
+					if(GlobalC::wf.wg(ik, ib) < 1.0e-8) continue;
 					for (int i=0; i<nkb; i++)
 					{
 						for (int ig=0; ig<GlobalC::wf.npw; ig++) 
@@ -159,7 +165,10 @@ void Stress_Func::stress_nl(ModuleBase::matrix& sigma)
 				ModuleBase::timer::tick("Stress", "get_final_step");
 				for (int ib=0; ib<GlobalV::NBANDS; ib++)
 				{
-					if(std::abs(GlobalC::wf.wg(ik, ib)) < 1.0e-5) continue;
+					///
+					///only occupied band should be calculated.
+					///
+					if(GlobalC::wf.wg(ik, ib) < 1.0e-5) continue;
 					double fac = GlobalC::wf.wg(ik, ib) * 1.0;
 					int iat = 0;
 					int sum = 0;
