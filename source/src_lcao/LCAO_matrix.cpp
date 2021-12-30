@@ -87,12 +87,6 @@ void LCAO_Matrix::divide_HS_in_frag(const bool isGamma, Parallel_Orbitals &po)
 
         //allocate relevant data structures for calculating descriptors
 		GlobalC::ld.init(GlobalC::ORB.get_lmax_d(), GlobalC::ORB.get_nchimax_d(), GlobalC::ucell.nat * GlobalC::ORB.Alpha[0].getTotal_nchi());
-        GlobalC::ld.allocate_nlm();
-		if (GlobalV::deepks_scf)
-		{
-            //allocate relevant data structures for constructing V_delta
-            GlobalC::ld.allocate_V_delta();
-		}
 	}
 #endif
 	return;

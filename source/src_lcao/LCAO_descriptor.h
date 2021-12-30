@@ -62,7 +62,6 @@ public:
     void init(const int lm/**< [in] max angular momentum quantum number: 'L'*/,
         const int nm/**< [in] max orbital number with the same 'L', for each 'L'*/,
         const int tot_inl/**< [in] total number of radial orbitals (sum of atoms 'I', angular number 'L' and orbital number 'N') */);
-    void allocate_nlm();
 
 	/// calculate overlap between lcao basis Phi and descriptor basis Alpha
     /// <alpha | chi>
@@ -254,6 +253,10 @@ private:
 
 // arrange index of descriptor in all atoms
 	void init_index(void);
+// data structure that saves <psi|alpha>
+    void allocate_nlm();
+// array for storing gdmx, used for calculating gvx
+	void init_gdmx(void);
 
 //save the overlap <alpha|chi> into array
 	void set_S_mu_alpha(
@@ -285,7 +288,7 @@ private:
 
 //calculate the gradient of pdm with regard to atomic positions
 //d/dX D_{Inl,mm'}
-	void init_gdmx(void);
+
     void cal_gdmx(const ModuleBase::matrix& dm);	//dD/dX, precondition of cal_gvx
     void cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm);	//dD/dX, precondition of cal_gvx
 	void del_gdmx(void);

@@ -62,7 +62,6 @@ void LCAO_Descriptor::cal_gvx(const ModuleBase::matrix &dm)
     this->cal_gvdm();
 
     this->build_S_descriptor(1);
-    this->init_gdmx();
     this->cal_gdmx(dm); //checked
     if(!gdmr_vector.empty())
     {
@@ -138,7 +137,6 @@ void LCAO_Descriptor::cal_gvx_k(const std::vector<ModuleBase::ComplexMatrix>& dm
     //preconditions
     this->cal_gvdm();
 
-    this->init_gdmx();
     this->cal_gdmx_k(dm);
 
     if(GlobalV::MY_RANK==0)

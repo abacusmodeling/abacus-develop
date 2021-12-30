@@ -122,7 +122,16 @@ void LCAO_Descriptor::init(
     this->n_descriptor = GlobalC::ucell.nat * this->des_per_atom;
 
     this->init_index();
-    
+    this->allocate_nlm();
+
+    if(GlobalV::deepks_scf)
+    {
+        this->allocate_V_delta();
+        if(GlobalV::FORCE)
+        {
+            this->init_gdmx();
+        }
+    }
     return;
 }
 
@@ -813,6 +822,16 @@ void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm)
     ModuleBase::TITLE("LCAO_Descriptor", "cal_gdmx");
     //get DS_alpha_mu and S_nu_beta
 
+    for (int iat = 0;iat < GlobalC::ucell.nat;iat++)
+    {
+        for (int inl = 0;inl < inlmax;inl++)
+        {
+            ModuleBase::GlobalFunc::ZEROS(gdmx[iat][inl], (2 * lmaxd + 1) * (2 * lmaxd + 1));
+            ModuleBase::GlobalFunc::ZEROS(gdmy[iat][inl], (2 * lmaxd + 1) * (2 * lmaxd + 1));
+            ModuleBase::GlobalFunc::ZEROS(gdmz[iat][inl], (2 * lmaxd + 1) * (2 * lmaxd + 1));
+        }
+    }
+
     double** ss = this->S_mu_alpha;
     double** dsx = this->DS_mu_alpha_x;
     double** dsy = this->DS_mu_alpha_y;
@@ -923,67 +942,6 @@ void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm)
         GlobalC::ParaD.allsum_deepks(this->inlmax,gdm_size,this->gdmz[iat]);
     }
 #endif   
-// for checking purpose
-/*
-    GlobalV::ofs_running << "gdmx" << std::endl;
-    for(int iat=0;iat<GlobalC::ucell.nat;iat++)
-    {
-        GlobalV::ofs_running << iat << std::endl;
-        for(int inl = 0;inl < inlmax;inl++)
-        {
-            int nm = 2 * inl_l[inl] + 1;
-            if(nm>1) continue; //print s orbitals for checking
-            for (int m1 = 0;m1 < nm;++m1)
-            {
-                for (int m2 = 0;m2 < nm;++m2)
-                {
-                    int index = m1 * nm + m2;
-                    GlobalV::ofs_running << std::setprecision(10) << gdmx[iat][inl][index] << " ";
-                }
-            }
-            GlobalV::ofs_running << std::endl;
-        }
-    }
-    GlobalV::ofs_running << "gdmy" << std::endl;
-    for(int iat=0;iat<GlobalC::ucell.nat;iat++)
-    {
-        GlobalV::ofs_running << iat << std::endl;
-        for(int inl = 0;inl < inlmax;inl++)
-        {
-            int nm = 2 * inl_l[inl] + 1;
-            if(nm>1) continue; //print s orbitals for checking
-            for (int m1 = 0;m1 < nm;++m1)
-            {
-                for (int m2 = 0;m2 < nm;++m2)
-                {
-                    int index = m1 * nm + m2;
-                    GlobalV::ofs_running << std::setprecision(10) << gdmy[iat][inl][index] << " ";
-                }
-            }
-            GlobalV::ofs_running << std::endl;
-        }
-    }
-    GlobalV::ofs_running << "gdmz" << std::endl;
-    for(int iat=0;iat<GlobalC::ucell.nat;iat++)
-    {
-        GlobalV::ofs_running << iat << std::endl;
-        for(int inl = 0;inl < inlmax;inl++)
-        {
-            int nm = 2 * inl_l[inl] + 1;
-            if(nm>1) continue; //print s orbitals for checking
-            for (int m1 = 0;m1 < nm;++m1)
-            {
-                for (int m2 = 0;m2 < nm;++m2)
-                {
-                    int index = m1 * nm + m2;
-                    GlobalV::ofs_running << std::setprecision(10) << gdmz[iat][inl][index] << " ";
-                }
-            }
-            GlobalV::ofs_running << std::endl;
-        }
-    }
-*/
-//
     return;
 }
 
