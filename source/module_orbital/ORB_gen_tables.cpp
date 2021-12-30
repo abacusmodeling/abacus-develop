@@ -141,8 +141,10 @@ void ORB_gen_tables::snap_psibeta_half(
 	const int nproj = infoNL_.nproj[T0];
 	assert(nproj>0); // mohan add 2021-04-25
 
-	bool *calproj = new bool[nproj];
-	int *rmesh1 = new int[nproj];
+	std::vector<bool> calproj;
+	calproj.resize(nproj);
+	std::vector<int> rmesh1;
+	rmesh1.resize(nproj);
 
 	if(calc_deri)
 	{
@@ -200,8 +202,6 @@ void ORB_gen_tables::snap_psibeta_half(
 
 	if (all_out)
 	{
-		delete[] calproj;
-		delete[] rmesh1;
 		ModuleBase::timer::tick("ORB_gen_tables", "snap_psibeta_half");
 		return;
 	}
@@ -1300,8 +1300,10 @@ void ORB_gen_tables::snap_psialpha_half(
     const int ln_per_atom = GlobalC::ORB.Alpha[0].getTotal_nchi();
     assert(ln_per_atom > 0); 
 	
-	bool *calproj = new bool[ln_per_atom];
-	int *rmesh1 = new int[ln_per_atom];
+	std::vector<bool> calproj;
+	calproj.resize(ln_per_atom);
+	std::vector<int> rmesh1;
+	rmesh1.resize(ln_per_atom);
 
 	if(job==0)
 	{
@@ -1356,8 +1358,6 @@ void ORB_gen_tables::snap_psialpha_half(
 
 	if (all_out)
 	{
-		delete[] calproj;
-		delete[] rmesh1;
 		ModuleBase::timer::tick("ORB_gen_tables", "snap_psialpha_half");
 		return;
 	}
@@ -1557,6 +1557,7 @@ void ORB_gen_tables::snap_psialpha_half(
 			}//end m0
 		}//end N0
 	}//end L0
+	ModuleBase::timer::tick("ORB_gen_tables", "snap_psialpha_half");
 }
 //caoyu add 2021-08-30
 void ORB_gen_tables::snap_psialpha(
