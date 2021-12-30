@@ -149,14 +149,17 @@ void LOOP_elec::before_solver(const int &istep)
     
 #ifdef __DEEPKS
 	//init deepks
-	if (INPUT.out_descriptor)
+	if (GlobalV::out_descriptor)
 	{
 		GlobalC::ld.init(GlobalC::ORB.get_lmax_d(), GlobalC::ORB.get_nchimax_d(), GlobalC::ucell.nat * GlobalC::ORB.Alpha[0].getTotal_nchi());
 		GlobalC::ld.build_S_descriptor(0);  //init overlap table
-		if (INPUT.deepks_scf)
+		if (GlobalV::deepks_scf)
 		{
 			//load a model
 			GlobalC::ld.deepks_pre_scf(INPUT.model_file);	//caoyu add 2021-07-26
+
+			//build and save <psi(0)|alpha(R)> at beginning
+			GlobalC::ld.build_v_delta_alpha_new(GlobalV::FORCE);
 		}
 	}
 #endif

@@ -8,7 +8,7 @@
     - [Upating documentation](#updating-documentation)
     - [Macros](#macros)
     - [Comment style for documentation](#comment-style-for-documentation)
-
+	- [Code Formatting style](#code-formatting-style)
     [back to main page](../README.md)
 
 ## Raising issues on GitHub
@@ -32,11 +32,13 @@ The ABACUS code is reconstructed to form several self-contained modules. A descr
 ### Macros
 
 ### Comment Style for Documentation
-ABACUS uses Doxygen to generate docs directly from `.h ` and `.cpp` code files. 
+ABACUS uses Doxygen to generate docs directly from `.h ` and `.cpp` code files.
 
 For comments that need to be shown in documents, these formats should be used -- **Javadoc style** (as follow) is recommended, though Qt style is also ok. See it in [official manual](https://www.doxygen.nl/manual/docblocks.html).
 
 A helpful VS Code extension -- Doxygen Documentation Generator, can help you formating comments.
+
+An practical example is class [LCAO_Descriptor](https://github.com/deepmodeling/abacus-develop/blob/deepks/source/src_lcao/LCAO_descriptor.h), the effects can be seen on [readthedocs page](https://abacus-deepks.readthedocs.io/en/latest/DeePKS_API/classLCAO__Descriptor.html#exhale-class-classLCAO-Descriptor)
 
 - Detailed Comment Block
     ```
@@ -54,7 +56,7 @@ A helpful VS Code extension -- Doxygen Documentation Generator, can help you for
     /********************************************//**
     *  ... text
     ***********************************************/
-    
+
     /////////////////////////////////////////////////
     /// ... text ...
     /////////////////////////////////////////////////
@@ -81,7 +83,7 @@ A helpful VS Code extension -- Doxygen Documentation Generator, can help you for
 
 - Parameters
     usage: `[in],[out],[in,out] description`
-    eg. 
+    eg.
     ```
     void foo(int v/**< [in] docs for input parameter v.*/);
     ```
@@ -96,7 +98,7 @@ A helpful VS Code extension -- Doxygen Documentation Generator, can help you for
     *   - sub item 1
     *     - sub sub item 1
     *     - sub sub item 2
-    *     . 
+    *     .
     *     The dot above ends the sub sub item list.
     *
     *     More text for the first sub item
@@ -115,7 +117,7 @@ A helpful VS Code extension -- Doxygen Documentation Generator, can help you for
     ```
     eg.2
     ```
-    /*! 
+    /*!
     *  A list of events:
     *    - mouse events
     *         -# mouse move event
@@ -137,16 +139,21 @@ A helpful VS Code extension -- Doxygen Documentation Generator, can help you for
     - eg.
     ```
     \f{eqnarray*}{
-            g &=& \frac{Gm_2}{r^2} \\ 
+            g &=& \frac{Gm_2}{r^2} \\
             &=& \frac{(6.673 \times 10^{-11}\,\mbox{m}^3\,\mbox{kg}^{-1}\,
-                \mbox{s}^{-2})(5.9736 \times 10^{24}\,\mbox{kg})}{(6371.01\,\mbox{km})^2} \\ 
+                \mbox{s}^{-2})(5.9736 \times 10^{24}\,\mbox{kg})}{(6371.01\,\mbox{km})^2} \\
             &=& 9.82066032\,\mbox{m/s}^2
     \f}
     ```
 
 - Tips
-    - Only comments in .h file will be visible in generated  by Doxygen + Sphinx; 
-    - Private class members will not be documented; 
-    - Use [Markdown features](https://www.doxygen.nl/manual/markdown.html), such as using a empty new line for a new paragraph. 
+    - Only comments in .h file will be visible in generated  by Doxygen + Sphinx;
+    - Private class members will not be documented;
+    - Use [Markdown features](https://www.doxygen.nl/manual/markdown.html), such as using a empty new line for a new paragraph.
 ​
 [back to top](#for-developers)
+
+### Code formatting style
+
+We use `clang-format` as our code formatter. The `.clang-format` file in root directory describes the rules to conform.
+For Visual Studio Code developers, the [official extension of C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools) provided by Microsoft can help you format your codes following the rules. Configure your VS Code settings as `"C_Cpp.clang_format_style": "file"` (you can look up this option by pasting it into the search box of VS Code settings page), and the clang-format will take into effect. You may also set `"editor.formatOnSave": true` to avoid formatting files everytime manually.

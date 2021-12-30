@@ -4,7 +4,7 @@
 
 In ABACUS, the atomic orbital bases are generated using a scheme developed in the [paper](https://iopscience.iop.org/article/10.1088/0953-8984/22/44/445501). We provide a script named “generate_orbital.sh” under the directory tools/ to generate the atomic orbitals bases. In order to run this script, an ORBITAL_INPUT file is required.
 
-An example of this ORBITAL_INPUT file can be found in $ABACUS/tools/SIAB/2_Generate:
+An example of this ORBITAL_INPUT file can be found in $ABACUS/tools/SIAB/SimulatedAnnealing/example_N:
 ```
 #1.exe_dir
 #----------------------------------------------------------------------------
@@ -101,7 +101,7 @@ The ORBITAL_INPUT file contains 5 parts :
     This part gives the bond lengths of the reference systems (dimer or trimer). Generally, the bond lengths are chosen to distribute on both sides of the equilibrium value. For example, for N dimer we use (in Å):
      - Dis 1.0 1.1 1.5 2.0 3.0
 
-    It means we take 5 reference systems (dimer), and the bond lengths are 1.0 1.1 1.5 2.0 3.0 angstrom, respectively. Every element has reference systems with different bond lengths, which could be found in file $ABACUS/tools/SIAB/2_Generate/DIS.txt.
+    It means we take 5 reference systems (dimer), and the bond lengths are 1.0 1.1 1.5 2.0 3.0 angstrom, respectively. Every element has reference systems with different bond lengths, which could be found in file $ABACUS/tools/SIAB/DIS.txt.
 4. orbital generation
 
     The main parameters for orbital generation
@@ -142,7 +142,7 @@ The ORBITAL_INPUT file contains 5 parts :
 
         the accept rise of spillage when optimizing the kinetic energy
         
-After preparing the ORBITAL_INPUT file, one just needs to run the script and wait for the results. The results will be written into several output files under the directory $element.id_element/$Rcut/, for example 07_N/6/.
+After preparing the ORBITAL_INPUT file, one just needs to run the script "$PATH_TO/generate_orbital.sh ORBITAL_INPUT" and wait for the results. The results will be written into several output files under the directory $element.id_element/$Rcut/, for example 07_N/6/.
 
 Some output files listed here are useful.
 - ORBITAL_RESULTS.txt

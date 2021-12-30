@@ -34,7 +34,7 @@ public:
 		Parallel_Orbitals &po // parallel orbitals parameters
 	);
     
-    void folding_overlap_matrix(const int ik, std::complex<double>* Sk);
+    static void folding_overlap_matrix(const int ik, std::complex<double>* Sk);
     
     //calculate the local occupation number matrix
     void cal_occup_m_k(const int iter);

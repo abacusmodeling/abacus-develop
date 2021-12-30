@@ -3,6 +3,7 @@
 
 #include "../src_pw/tools.h"
 #include "pdiag_basic.h"
+#include "diag_scalapack_gvx.h"
 
 class Pdiag_Double : public Pdiag_Basic
 {
@@ -51,6 +52,7 @@ class Pdiag_Double : public Pdiag_Basic
 	int dim0;
 	int dim1;
 
+	Diag_Scalapack_gvx diag_scalapack_gvx;			// Peize Lin add 2021.11.02
 };
 
 #endif

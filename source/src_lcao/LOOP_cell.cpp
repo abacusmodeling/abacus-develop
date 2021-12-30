@@ -2,6 +2,7 @@
 #include "LOOP_ions.h"
 
 #include "dftu.h"   //Quxin add for DFT+U on 20201029
+#include "dmft.h"
 
 // delete in near future
 #include "../src_pw/global.h"
@@ -63,11 +64,13 @@ void LOOP_cell::opt_cell(void)
 		GlobalC::dftu.init(GlobalC::ucell, GlobalC::ParaO);
 	}
 
+  if(INPUT.dft_plus_dmft) GlobalC::dmft.init(INPUT, GlobalC::ucell);
+
 	LOOP_ions ions;
 	ions.opt_ions();
 
 	// mohan update 2021-02-10
-    GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, INPUT.out_descriptor, GlobalC::ucell.infoNL.nproj);
+    GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
 	
 	return;
 }
