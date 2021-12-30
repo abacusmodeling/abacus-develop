@@ -408,6 +408,8 @@ void ORB_gen_tables::snap_psibeta_half(
 	}// end nb
 
 	assert(index == natomwfc);
+	delete[] calproj;
+	delete[] rmesh1;
 	ModuleBase::timer::tick("ORB_gen_tables", "snap_psibeta_half");
 
 	return;
