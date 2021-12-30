@@ -438,4 +438,20 @@ std::ostream & ComplexMatrix::print( std::ostream & os, const double threshold_a
 	return os;
 }
 
+bool ComplexMatrix::checkreal(void)
+{
+	const double tiny = 1e-12;
+	for(int i=0;i<this->nr;i++)
+	{
+		for(int j=0;j<this->nc;j++)
+		{
+			if(std::imag((*this)(i,j)) > tiny)
+			{
+				return 0;
+			}
+		}
+	}
+	return 1;
+}
+
 }

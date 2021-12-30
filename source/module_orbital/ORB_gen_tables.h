@@ -103,8 +103,7 @@ class ORB_gen_tables
 			const int& N1,
 			const ModuleBase::Vector3<double>& R0, // The projector.
 			const int& T0,
-			const int& I0,
-			ModuleBase::IntArray* inl_index
+			const int& I0
         ) const;
 
 		void snap_psialpha(

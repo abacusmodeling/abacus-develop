@@ -114,10 +114,20 @@ if(MKLROOT)
   find_package(IntelMKL REQUIRED)
   add_definitions(-D__MKL -DMKL_ILP64)
   include_directories(${MKL_INCLUDE_DIRS} ${MKL_INCLUDE_DIRS}/fftw)
-  target_link_libraries(${ABACUS_BIN_NAME}
-    -lifcore
-    IntelMKL::MKL
-  )
+  
+  # Since libtorch will find its own MKL, the fftw part conflicts with the original one.
+  # When enable deepks, mkl will be linked within ${TORCH_LIBRARIES}.
+  if(ENABLE_DEEPKS)
+    target_link_libraries(${ABACUS_BIN_NAME}
+      -lifcore
+      # IntelMKL::MKL
+    )
+  else()
+    target_link_libraries(${ABACUS_BIN_NAME}
+      -lifcore
+      IntelMKL::MKL
+    )
+  endif()
 else()
   find_package(FFTW3 REQUIRED)
   find_package(LAPACK REQUIRED)
@@ -149,7 +159,7 @@ if(ENABLE_DEEPKS)
     )
     FetchContent_MakeAvailable(libnpy)
   endif()
-  include_directories(${libnpy_SOURCE_DIR})
+  include_directories(${libnpy_SOURCE_DIR}/include)
   add_compile_definitions(__DEEPKS)
 endif()
 

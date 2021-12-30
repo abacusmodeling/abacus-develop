@@ -3,6 +3,10 @@
 #include <unordered_map>
 #include <map>
 
+#ifdef __DEEPKS
+#include "LCAO_descriptor.h"
+#endif
+
 Force_LCAO_k::Force_LCAO_k ()
 {
 }
@@ -23,7 +27,12 @@ void Force_LCAO_k::ftable_k (
 		ModuleBase::matrix& soverlap,
 		ModuleBase::matrix& stvnl_dphi,
 		ModuleBase::matrix& svnl_dbeta,
+#ifdef __DEEPKS
+		ModuleBase::matrix& svl_dphi,
+		ModuleBase::matrix& svnl_dalpha
+#else
 		ModuleBase::matrix& svl_dphi
+#endif
 		)
 {
     ModuleBase::TITLE("Force_LCAO_k", "ftable_k");
@@ -57,6 +66,24 @@ void Force_LCAO_k::ftable_k (
 	this->cal_fvl_dphi_k(dm2d, isforce, isstress, fvl_dphi, svl_dphi);
 
 	this->calFvnlDbeta(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta, GlobalV::vnl_method);
+
+#ifdef __DEEPKS
+    if (GlobalV::deepks_scf)
+    {
+		GlobalC::ld.cal_gedm_k(GlobalC::LOC.wfc_dm_2d.dm_k);
+
+        GlobalC::ld.cal_f_delta_k(GlobalC::LOC.wfc_dm_2d.dm_k,isstress,svnl_dalpha);
+#ifdef __MPI
+        Parallel_Reduce::reduce_double_all(GlobalC::ld.F_delta.c,GlobalC::ld.F_delta.nr*GlobalC::ld.F_delta.nc);
+		if(isstress)
+		{
+			Parallel_Reduce::reduce_double_pool( svnl_dalpha.c, svnl_dalpha.nr * svnl_dalpha.nc);
+		}
+#endif
+        GlobalC::ld.print_F_delta("F_delta.dat");
+    }
+#endif
+
 
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
@@ -376,7 +403,7 @@ std::complex<double> Force_LCAO_k::set_EDM_k_element(
 	}
 	//--------------------------------------
 	// for density matrix
-	// \sum E(i)*psi(mu)*psi(nu)
+	// \sum exp(iRk)*psi(mu)*psi(nu)
 	//--------------------------------------
 	else
 	{
