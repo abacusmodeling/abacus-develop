@@ -26,7 +26,6 @@ void LCAO_Descriptor::allocate_V_delta()
     }
     else
     {
-        H_V_deltaR = new double[GlobalC::LNNR.nnr];
         H_V_delta_k = new std::complex<double>* [GlobalC::kv.nks];
         for(int ik=0;ik<GlobalC::kv.nks;ik++)
         {
@@ -47,22 +46,32 @@ void LCAO_Descriptor::allocate_V_delta()
     {
         //init F_delta
         F_delta.create(GlobalC::ucell.nat, 3);
-        //init DS_mu_alpha**
-        this->DS_mu_alpha_x = new double* [this->inlmax];
-        this->DS_mu_alpha_y = new double* [this->inlmax];
-        this->DS_mu_alpha_z = new double* [this->inlmax];
-        for (int inl = 0;inl < this->inlmax;inl++)
+        if(GlobalV::GAMMA_ONLY_LOCAL)
         {
-            this->DS_mu_alpha_x[inl] = new double[GlobalV::NLOCAL * (2 * this->lmaxd + 1)];
-            this->DS_mu_alpha_y[inl] = new double[GlobalV::NLOCAL * (2 * this->lmaxd + 1)];
-            this->DS_mu_alpha_z[inl] = new double[GlobalV::NLOCAL * (2 * this->lmaxd + 1)];
-            ModuleBase::GlobalFunc::ZEROS(DS_mu_alpha_x[inl], GlobalV::NLOCAL * (2 * this->lmaxd + 1));
-            ModuleBase::GlobalFunc::ZEROS(DS_mu_alpha_y[inl], GlobalV::NLOCAL * (2 * this->lmaxd + 1));
-            ModuleBase::GlobalFunc::ZEROS(DS_mu_alpha_z[inl], GlobalV::NLOCAL * (2 * this->lmaxd + 1));
+            //init DS_mu_alpha**
+            this->DS_mu_alpha_x = new double* [this->inlmax];
+            this->DS_mu_alpha_y = new double* [this->inlmax];
+            this->DS_mu_alpha_z = new double* [this->inlmax];
+            for (int inl = 0;inl < this->inlmax;inl++)
+            {
+                this->DS_mu_alpha_x[inl] = new double[GlobalV::NLOCAL * (2 * this->lmaxd + 1)];
+                this->DS_mu_alpha_y[inl] = new double[GlobalV::NLOCAL * (2 * this->lmaxd + 1)];
+                this->DS_mu_alpha_z[inl] = new double[GlobalV::NLOCAL * (2 * this->lmaxd + 1)];
+                ModuleBase::GlobalFunc::ZEROS(DS_mu_alpha_x[inl], GlobalV::NLOCAL * (2 * this->lmaxd + 1));
+                ModuleBase::GlobalFunc::ZEROS(DS_mu_alpha_y[inl], GlobalV::NLOCAL * (2 * this->lmaxd + 1));
+                ModuleBase::GlobalFunc::ZEROS(DS_mu_alpha_z[inl], GlobalV::NLOCAL * (2 * this->lmaxd + 1));
+            }
         }
     }
 
     return;
+}
+
+void LCAO_Descriptor::allocate_V_deltaR(const int nnr)
+{
+    delete[] H_V_deltaR;
+    H_V_deltaR = new double[nnr];
+    ModuleBase::GlobalFunc::ZEROS(H_V_deltaR, nnr);
 }
 
 void LCAO_Descriptor::allocate_nlm(void)
@@ -383,7 +392,7 @@ void LCAO_Descriptor::add_v_delta_k(void)
 
     if( nnr!=GlobalC::LNNR.nnr)
     {
-        ModuleBase::WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_mu_new","nnr!=GlobalC::LNNR.nnr");
+        ModuleBase::WARNING_QUIT("LCAO_DESCRIPTOR","nnr!=GlobalC::LNNR.nnr");
     }
 
     ModuleBase::timer::tick ("LCAO_DESCRIPTOR","add_v_delta_k");

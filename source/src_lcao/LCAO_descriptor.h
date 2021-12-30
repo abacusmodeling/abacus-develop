@@ -88,6 +88,7 @@ public:
     /// 1. Initialize the deltaV Hamiltonian matrix 
     /// 2. If FORCE, initialize the matrces for force
     void allocate_V_delta(void);
+    void allocate_V_deltaR(const int nnr);
 
     ///add dV to the Hamiltonian matrix
     void add_v_delta(void);

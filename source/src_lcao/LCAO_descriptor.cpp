@@ -54,7 +54,7 @@ LCAO_Descriptor::~LCAO_Descriptor()
             delete[] gedm[inl];
         }
         delete[] gedm;
-        if (GlobalV::FORCE)
+        if (GlobalV::FORCE && GlobalV::GAMMA_ONLY_LOCAL)
         {
             //delete DS_mu_alpha**
             for (int inl = 0;inl < this->inlmax;inl++)
@@ -866,65 +866,65 @@ void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm)
                             {
                                 //mu->iw1,nu->iw2
                                 //(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'>
-                                gdmx[iat][inl][m1*nm + m2] += 
+                                gdmx[ibt][inl][m1*nm + m2] += 
                                 dsx[inl][m1*GlobalV::NLOCAL + mu] * dm(iw1, iw2) * ss[inl][m2*GlobalV::NLOCAL + nu];
-                                gdmy[iat][inl][m1*nm + m2] += 
+                                gdmy[ibt][inl][m1*nm + m2] += 
                                 dsy[inl][m1*GlobalV::NLOCAL + mu] * dm(iw1, iw2) * ss[inl][m2*GlobalV::NLOCAL + nu];
-                                gdmz[iat][inl][m1*nm + m2] += 
+                                gdmz[ibt][inl][m1*nm + m2] += 
                                 dsz[inl][m1*GlobalV::NLOCAL + mu] * dm(iw1, iw2) * ss[inl][m2*GlobalV::NLOCAL + nu];
 
                                 //(<d/dX chi_nu|alpha_m'>)<chi_mu|alpha_m>
-                                gdmx[iat][inl][m2*nm + m1] += 
+                                gdmx[ibt][inl][m2*nm + m1] += 
                                 dsx[inl][m1*GlobalV::NLOCAL + mu] * dm(iw1, iw2) * ss[inl][m2*GlobalV::NLOCAL + nu];
-                                gdmy[iat][inl][m2*nm + m1] += 
+                                gdmy[ibt][inl][m2*nm + m1] += 
                                 dsy[inl][m1*GlobalV::NLOCAL + mu] * dm(iw1, iw2) * ss[inl][m2*GlobalV::NLOCAL + nu];
-                                gdmz[iat][inl][m2*nm + m1] += 
+                                gdmz[ibt][inl][m2*nm + m1] += 
                                 dsz[inl][m1*GlobalV::NLOCAL + mu] * dm(iw1, iw2) * ss[inl][m2*GlobalV::NLOCAL + nu];
 
                                 //(<chi_mu|d/dX alpha_m>)<chi_nu|alpha_m'> = -(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'>
-                                gdmx[ibt][inl][m1*nm + m2] -= 
+                                gdmx[iat][inl][m1*nm + m2] -= 
                                 dsx[inl][m1*GlobalV::NLOCAL + mu] * dm(iw1, iw2) * ss[inl][m2*GlobalV::NLOCAL + nu];
-                                gdmy[ibt][inl][m1*nm + m2] -= 
+                                gdmy[iat][inl][m1*nm + m2] -= 
                                 dsy[inl][m1*GlobalV::NLOCAL + mu] * dm(iw1, iw2) * ss[inl][m2*GlobalV::NLOCAL + nu];
-                                gdmz[ibt][inl][m1*nm + m2] -= 
+                                gdmz[iat][inl][m1*nm + m2] -= 
                                 dsz[inl][m1*GlobalV::NLOCAL + mu] * dm(iw1, iw2) * ss[inl][m2*GlobalV::NLOCAL + nu];
 
                                 //(<chi_nu|d/dX alpha_m'>)<chi_mu|alpha_m> = -(<d/dX chi_nu|alpha_m'>)<chi_mu|alpha_m>
-                                gdmx[ibt][inl][m2*nm + m1] -= 
+                                gdmx[iat][inl][m2*nm + m1] -= 
                                 dsx[inl][m1*GlobalV::NLOCAL + mu] * dm(iw1, iw2) * ss[inl][m2*GlobalV::NLOCAL + nu];
-                                gdmy[ibt][inl][m2*nm + m1] -= 
+                                gdmy[iat][inl][m2*nm + m1] -= 
                                 dsy[inl][m1*GlobalV::NLOCAL + mu] * dm(iw1, iw2) * ss[inl][m2*GlobalV::NLOCAL + nu];
-                                gdmz[ibt][inl][m2*nm + m1] -= 
+                                gdmz[iat][inl][m2*nm + m1] -= 
                                 dsz[inl][m1*GlobalV::NLOCAL + mu] * dm(iw1, iw2) * ss[inl][m2*GlobalV::NLOCAL + nu];                                
                             }
                             else
                             {
-                                gdmx[iat][inl][m1*nm + m2] += 
+                                gdmx[ibt][inl][m1*nm + m2] += 
                                 dsx[inl][mu*nm + m1] * dm(iw1, iw2) * ss[inl][nu*nm + m2];
-                                gdmy[iat][inl][m1*nm + m2] += 
+                                gdmy[ibt][inl][m1*nm + m2] += 
                                 dsy[inl][mu*nm + m1] * dm(iw1, iw2) * ss[inl][nu*nm + m2];
-                                gdmz[iat][inl][m1*nm + m2] += 
+                                gdmz[ibt][inl][m1*nm + m2] += 
                                 dsz[inl][mu*nm + m1] * dm(iw1, iw2) * ss[inl][nu*nm + m2];
                                 
-                                gdmx[iat][inl][m2*nm + m1] += 
+                                gdmx[ibt][inl][m2*nm + m1] += 
                                 dsx[inl][mu*nm + m1] * dm(iw1, iw2) * ss[inl][nu*nm + m2];
-                                gdmy[iat][inl][m2*nm + m1] += 
+                                gdmy[ibt][inl][m2*nm + m1] += 
                                 dsy[inl][mu*nm + m1] * dm(iw1, iw2) * ss[inl][nu*nm + m2];
-                                gdmz[iat][inl][m2*nm + m1] += 
+                                gdmz[ibt][inl][m2*nm + m1] += 
                                 dsz[inl][mu*nm + m1] * dm(iw1, iw2) * ss[inl][nu*nm + m2];
 
-                                gdmx[ibt][inl][m1*nm + m2] -= 
+                                gdmx[iat][inl][m1*nm + m2] -= 
                                 dsx[inl][mu*nm + m1] * dm(iw1, iw2) * ss[inl][nu*nm + m2];
-                                gdmy[ibt][inl][m1*nm + m2] -= 
+                                gdmy[iat][inl][m1*nm + m2] -= 
                                 dsy[inl][mu*nm + m1] * dm(iw1, iw2) * ss[inl][nu*nm + m2];
-                                gdmz[ibt][inl][m1*nm + m2] -= 
+                                gdmz[iat][inl][m1*nm + m2] -= 
                                 dsz[inl][mu*nm + m1] * dm(iw1, iw2) * ss[inl][nu*nm + m2];
                                 
-                                gdmx[ibt][inl][m2*nm + m1] -= 
+                                gdmx[iat][inl][m2*nm + m1] -= 
                                 dsx[inl][mu*nm + m1] * dm(iw1, iw2) * ss[inl][nu*nm + m2];
-                                gdmy[ibt][inl][m2*nm + m1] -= 
+                                gdmy[iat][inl][m2*nm + m1] -= 
                                 dsy[inl][mu*nm + m1] * dm(iw1, iw2) * ss[inl][nu*nm + m2];
-                                gdmz[ibt][inl][m2*nm + m1] -= 
+                                gdmz[iat][inl][m2*nm + m1] -= 
                                 dsz[inl][mu*nm + m1] * dm(iw1, iw2) * ss[inl][nu*nm + m2];
                             }
                         }
@@ -968,7 +968,7 @@ void LCAO_Descriptor::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& d
 		Atom* atom0 = &GlobalC::ucell.atoms[T0]; 
         for (int I0 =0; I0< atom0->na; I0++)
         {
-            const int iat = GlobalC::ucell.itia2iat(T0,I0);
+            const int iat = GlobalC::ucell.itia2iat(T0,I0);//on which alpha is located
             const ModuleBase::Vector3<double> tau0 = atom0->tau[I0];
             GlobalC::GridD.Find_atom(GlobalC::ucell, atom0->tau[I0] ,T0, I0);
 
@@ -976,7 +976,7 @@ void LCAO_Descriptor::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& d
             {
                 const int T1 = GlobalC::GridD.getType(ad1);
                 const int I1 = GlobalC::GridD.getNatom(ad1);
-                const int ibt1 = GlobalC::ucell.itia2iat(T1,I1);
+                const int ibt1 = GlobalC::ucell.itia2iat(T1,I1); //on which chi_mu is located
                 const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
                 
                 const ModuleBase::Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau(ad1);
