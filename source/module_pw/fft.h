@@ -99,8 +99,10 @@ private:
 	bool destroypf;
 	fftwf_plan planfzfor;
 	fftwf_plan planfzbac;
-	fftwf_plan planfxfor;
-	fftwf_plan planfxbac;
+	fftwf_plan planfxfor1;
+	fftwf_plan planfxbac1;
+	fftwf_plan planfxfor2;
+	fftwf_plan planfxbac2;
 	fftwf_plan planfyfor;
 	fftwf_plan planfybac;
 	fftwf_plan planfyr2c;
