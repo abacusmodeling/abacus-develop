@@ -16,7 +16,7 @@ void IState_Charge::begin(void)
 
 	if(!GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		ModuleBase::WARNING_QUIT("IState_Charge::begin","Only available for GlobalV::GAMMA_ONLY_LOCAL now.");
+		ModuleBase::WARNING_QUIT("IState_Charge::begin","Only available for GAMMA_ONLY_LOCAL now.");
 	}
 
 	int mode = 0;
@@ -39,7 +39,7 @@ void IState_Charge::begin(void)
 	// (1.1) allocate the space for GlobalC::LOWF.WFC_GAMMA
 
 	// (1.2) read in LOWF_GAMMA.dat
-	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"GlobalC::LOWF.allocate_flag",GlobalC::LOWF.get_allocate_flag());	
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"LOWF.allocate_flag",GlobalC::LOWF.get_allocate_flag());	
 	std::cout << " number of electrons = " << GlobalC::CHR.nelec << std::endl;
 
 	// mohan update 2011-03-21

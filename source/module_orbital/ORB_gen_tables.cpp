@@ -141,8 +141,10 @@ void ORB_gen_tables::snap_psibeta_half(
 	const int nproj = infoNL_.nproj[T0];
 	assert(nproj>0); // mohan add 2021-04-25
 
-	bool *calproj = new bool[nproj];
-	int *rmesh1 = new int[nproj];
+	std::vector<bool> calproj;
+	calproj.resize(nproj);
+	std::vector<int> rmesh1;
+	rmesh1.resize(nproj);
 
 	if(calc_deri)
 	{
@@ -200,8 +202,6 @@ void ORB_gen_tables::snap_psibeta_half(
 
 	if (all_out)
 	{
-		delete[] calproj;
-		delete[] rmesh1;
 		ModuleBase::timer::tick("ORB_gen_tables", "snap_psibeta_half");
 		return;
 	}
@@ -1291,8 +1291,7 @@ void ORB_gen_tables::snap_psialpha_half(
 		const int& N1,
 		const ModuleBase::Vector3<double>& R0, // The projector.
 		const int& T0,
-		const int& I0,
-		ModuleBase::IntArray* inl_index
+		const int& I0
 	) const
 {
 	ModuleBase::timer::tick("ORB_gen_tables", "snap_psialpha_half");
@@ -1300,8 +1299,10 @@ void ORB_gen_tables::snap_psialpha_half(
     const int ln_per_atom = GlobalC::ORB.Alpha[0].getTotal_nchi();
     assert(ln_per_atom > 0); 
 	
-	bool *calproj = new bool[ln_per_atom];
-	int *rmesh1 = new int[ln_per_atom];
+	std::vector<bool> calproj;
+	calproj.resize(ln_per_atom);
+	std::vector<int> rmesh1;
+	rmesh1.resize(ln_per_atom);
 
 	if(job==0)
 	{
@@ -1356,8 +1357,6 @@ void ORB_gen_tables::snap_psialpha_half(
 
 	if (all_out)
 	{
-		delete[] calproj;
-		delete[] rmesh1;
 		ModuleBase::timer::tick("ORB_gen_tables", "snap_psialpha_half");
 		return;
 	}
@@ -1427,14 +1426,14 @@ void ORB_gen_tables::snap_psialpha_half(
             if (!calproj[nb])
             {
 				ip += 2*L0 + 1;
+				++nb;
                 continue;
             }
-            ++nb;
             
             // <psi1 | Beta>
             const int Opair1 = talpha.DS_Opair(Tpair1, L1, L0, N1, N0);
-            const int inl = inl_index[T0](I0, L0, N0);
-            for (int m0 = 0;m0 < 2 * L0 + 1;m0++)
+ 
+            for (int m0 = 0;m0 < 2 * L0 + 1;++m0)
             {
 				int gindex0 = L0 * L0 + m0;
 				double term_a = 0.0;
@@ -1555,8 +1554,12 @@ void ORB_gen_tables::snap_psialpha_half(
 
 				ip+=1;
 			}//end m0
+			++nb;
 		}//end N0
 	}//end L0
+
+	ModuleBase::timer::tick("ORB_gen_tables", "snap_psialpha_half");
+	return;
 }
 //caoyu add 2021-08-30
 void ORB_gen_tables::snap_psialpha(

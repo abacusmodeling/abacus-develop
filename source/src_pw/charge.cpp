@@ -753,6 +753,10 @@ void Charge::sum_band_k(void)
 		{
 			for (int ibnd = 0;ibnd < GlobalV::NBANDS;ibnd++)
 			{
+				///
+				///only occupied band should be calculated.
+				///
+				if(GlobalC::wf.wg(ik, ibnd)<1e-8) continue;
 				GlobalC::en.eband += GlobalC::wf.ekb[ik][ibnd] * GlobalC::wf.wg(ik, ibnd);
 				ModuleBase::GlobalFunc::ZEROS( porter, GlobalC::pw.nrxx );
 				for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
@@ -807,6 +811,10 @@ void Charge::sum_band_k(void)
 		else
 		for (int ibnd = 0;ibnd < GlobalV::NBANDS;ibnd++)
 		{
+			///
+			///only occupied band should be calculated.
+			///
+			if(GlobalC::wf.wg(ik, ibnd)<1e-8) continue;
 			GlobalC::en.eband += GlobalC::wf.ekb[ik][ibnd] * GlobalC::wf.wg(ik, ibnd);
 			//std::cout << "\n ekb = " << GlobalC::wf.ekb[ik][ibnd] << " wg = " << GlobalC::wf.wg(ik, ibnd);
 

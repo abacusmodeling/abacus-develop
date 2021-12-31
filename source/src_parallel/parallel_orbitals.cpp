@@ -106,7 +106,7 @@ void Parallel_Orbitals::set_trace(void)
     else 
     {
         std::cout << " Parallel Orbial, GlobalV::DIAGO_TYPE = " << GlobalV::KS_SOLVER << std::endl;
-        ModuleBase::WARNING_QUIT("Parallel_Orbitals::set_trace","Check GlobalV::KS_SOLVER.");
+        ModuleBase::WARNING_QUIT("Parallel_Orbitals::set_trace","Check ks_solver.");
     }
 
     //---------------------------

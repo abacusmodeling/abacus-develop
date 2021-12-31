@@ -2,18 +2,24 @@ INPUT_PARAMETERS
 #Parameters (1.General)
 suffix			autotest
 calculation     	scf
+dft_functional		lda
 ntype			2
 nbands			6
 symmetry		0
 
 #Parameters (2.Iteration)
 ecutwfc			50
-dr2			1e-7
+dr2			1e-8
 niter			50
 
 #Parameters (3.Basis)
 basis_type		lcao
 gamma_only		1
+force 1
+
+out_descriptor	1
+lmax_descriptor		2
+newdm	1
 
 #Parameters (4.Smearing)
 smearing		gaussian
@@ -23,10 +29,5 @@ sigma			0.02
 mixing_type		pulay
 mixing_beta		0.4
 
-#Parameters (6.File)
-out_descriptor          1 
-lmax_descriptor		2
-newdm			1
-deepks_scf		1
-model_file		model_lda_pbe_18.ptg
-force			1
+deepks_scf	1
+model_file	model.ptg

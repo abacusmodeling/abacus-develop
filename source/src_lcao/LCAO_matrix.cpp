@@ -2,6 +2,7 @@
 #include "global_fp.h"
 #ifdef __DEEPKS
 #include "../src_parallel/parallel_deepks.h"
+#include "LCAO_descriptor.h"
 #endif
 
 LCAO_Matrix::LCAO_Matrix()
@@ -579,13 +580,20 @@ void LCAO_Matrix::update_Hloc(void)
     return;
 }
 
-void LCAO_Matrix::update_Hloc2(void)
+void LCAO_Matrix::update_Hloc2(const int &ik)
 {
-    for (long i=0; i<GlobalC::ParaO.nloc; i++)
-    {
-        Hloc2[i] += Hloc_fixed2[i];
-    }
-    return;
+	for (long i=0; i<GlobalC::ParaO.nloc; i++)
+	{
+		Hloc2[i] += Hloc_fixed2[i];
+#ifdef __DEEPKS
+		if(GlobalV::deepks_scf)
+		{
+			Hloc2[i] += GlobalC::ld.H_V_delta_k[ik][i];
+		}
+#endif
+	}
+
+	return;
 }
 
 

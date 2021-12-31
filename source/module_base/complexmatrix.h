@@ -57,6 +57,8 @@ public:
 	void set_as_identity_matrix(void);
 
 	std::ostream & print( std::ostream & os, const double threshold_abs=0.0, const double threshold_imag=0.0 ) const;		// Peize Lin add 2021.09.08
+
+	bool checkreal(void);
 };
 
 ComplexMatrix operator+(const ComplexMatrix &m1,  const ComplexMatrix &m2);

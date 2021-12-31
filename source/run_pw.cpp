@@ -88,7 +88,7 @@ void Run_pw::plane_wave_line(void)
     
 //----------------------------------------------------------
 // 1 read in initial data:
-//   a lattice structure:atom_species,atom_positions,lattice std::vector
+//   a lattice structure:atom_species,atom_positions,lattice vector
 //   b k_points
 //   c pseudopotential
 // 2 setup planeware basis, FFT,structure factor, ...
