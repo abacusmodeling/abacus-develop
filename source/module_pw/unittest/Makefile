@@ -114,7 +114,7 @@ init :
 	@ if [ ! -d $(BIN_DIR) ]; then mkdir $(BIN_DIR); fi
 	@ if [ ! -d $(OBJ_DIR)/README ]; then echo "This directory contains all of the .o files" > $(OBJ_DIR)/README; fi
 
-${BIN_DIR}/%.exe: %.cpp
+${BIN_DIR}/%.exe: %.cpp ${PW_OBJS}
 	${CPLUSPULS} ${OPTS} $< test_tool.cpp ${PW_OBJS}  ${LIBS} -o $@
 ${OBJ_DIR}/%.o:%.cpp
 	${CPLUSPULS} ${OPTS} -c ${HONG} $< -o $@
