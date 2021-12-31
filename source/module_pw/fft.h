@@ -87,8 +87,10 @@ private:
 	// fftw_plan plan2bac;
 	fftw_plan planzfor;
 	fftw_plan planzbac;
-	fftw_plan planxfor;
-	fftw_plan planxbac;
+	fftw_plan planxfor1;
+	fftw_plan planxbac1;
+	fftw_plan planxfor2;
+	fftw_plan planxbac2;
 	fftw_plan planyfor;
 	fftw_plan planybac;
 	fftw_plan planyr2c;
@@ -97,8 +99,10 @@ private:
 	bool destroypf;
 	fftwf_plan planfzfor;
 	fftwf_plan planfzbac;
-	fftwf_plan planfxfor;
-	fftwf_plan planfxbac;
+	fftwf_plan planfxfor1;
+	fftwf_plan planfxbac1;
+	fftwf_plan planfxfor2;
+	fftwf_plan planfxbac2;
 	fftwf_plan planfyfor;
 	fftwf_plan planfybac;
 	fftwf_plan planfyr2c;

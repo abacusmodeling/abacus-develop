@@ -165,7 +165,7 @@ int main(int argc,char **argv)
         cout<<endl;
     }
 
-    ModuleBase::timer::finish(GlobalV::ofs_running, true);
+    if(rank_in_pool==0) ModuleBase::timer::finish(GlobalV::ofs_running, true);
 
 #ifdef __MPI
     MPI_Barrier(MPI_COMM_WORLD);
