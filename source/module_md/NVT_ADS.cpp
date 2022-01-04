@@ -38,21 +38,28 @@ void NVT_ADS::second_half()
 
     Verlet::second_half();
 
-    double deviation;
-    for(int i=0; i<ucell.nat; ++i)
+    if(GlobalV::MY_RANK==0)
     {
-        if(rand()/double(RAND_MAX) <= 1.0/nraise)
+        double deviation;
+        for(int i=0; i<ucell.nat; ++i)
         {
-            deviation = sqrt(mdp.tlast / allmass[i]);
-            for(int k=0; k<3; ++k)
+            if(rand()/double(RAND_MAX) <= 1.0/nraise)
             {
-                if(ionmbl[i][k]) 
+                deviation = sqrt(mdp.tlast / allmass[i]);
+                for(int k=0; k<3; ++k)
                 {
-                    vel[i][k] = deviation * MD_func::gaussrand();
+                    if(ionmbl[i][k]) 
+                    {
+                        vel[i][k] = deviation * MD_func::gaussrand();
+                    }
                 }
             }
         }
     }
+
+#ifdef __MPI
+	MPI_Bcast(vel, ucell.nat*3, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+#endif
 
     ModuleBase::timer::tick("NVT_ADS", "second_half");
 }
