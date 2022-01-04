@@ -1,7 +1,6 @@
 #include "LCAO_matrix.h"
 #include "global_fp.h"
 #ifdef __DEEPKS
-#include "../src_parallel/parallel_deepks.h"
 #include "LCAO_descriptor.h"
 #endif
 
@@ -81,10 +80,6 @@ void LCAO_Matrix::divide_HS_in_frag(const bool isGamma, Parallel_Orbitals &po)
 
 	if (GlobalV::out_descriptor)
 	{
-        //initialize relevant parallelization plans
-		GlobalC::ParaD.set_nlocal(MPI_COMM_WORLD);
-		GlobalC::ParaD.set_loc_orb(MPI_COMM_WORLD);
-
         //allocate relevant data structures for calculating descriptors
 		GlobalC::ld.init(GlobalC::ORB.get_lmax_d(), GlobalC::ORB.get_nchimax_d(), GlobalC::ucell.nat * GlobalC::ORB.Alpha[0].getTotal_nchi());
 	}

@@ -19,9 +19,7 @@
 #include "global_fp.h"
 #include "../src_pw/global.h"
 #include "../src_io/winput.h"
-#ifdef __MPI
-#include "../src_parallel/parallel_deepks.h"
-#endif
+
 ///
 /// This class contains subroutines for realization of the DeePKS method
 /// In essential, it is a machine-learned correction term to the XC potential
@@ -149,6 +147,18 @@ public:
 	void save_npy_e(const double &e/**<[in] \f$E_{base}\f$ or \f$E_{tot}\f$, in Ry*/, const std::string &e_file);
 	void save_npy_f(const ModuleBase::matrix &fbase/**<[in] \f$F_{base}\f$ or \f$F_{tot}\f$, in Ry/Bohr*/, const std::string &f_file);
     void save_npy_gvx(void);
+
+//========
+// Extra : parallelization, also in LCAO_descriptor.cpp
+//========
+
+#ifdef __MPI
+    //reduces a dim 2 array
+    void allsum_deepks(
+        int inlmax, //first dimension
+        int ndim, //second dimension
+        double** mat); //the array being reduced 
+#endif
 
 //-------------------
 // public variables

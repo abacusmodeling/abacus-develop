@@ -49,6 +49,19 @@ LCAO_Descriptor::~LCAO_Descriptor()
     }
 }
 
+#ifdef __MPI
+void LCAO_Descriptor::allsum_deepks(
+    int inlmax, //first dimension
+    int ndim, //second dimension
+    double** mat) //the array being reduced 
+{
+    for(int inl=0;inl<inlmax;inl++)
+    {
+        Parallel_Reduce::reduce_double_all(mat[inl],ndim);
+    }
+}
+#endif
+
 void LCAO_Descriptor::init(
 	const int lm, // max L for descriptor 
 	const int nm, // max n for descriptor
@@ -61,7 +74,7 @@ void LCAO_Descriptor::init(
     assert(lm >= 0);
     assert(nm >= 0);
     assert(tot_inl >= 0);
-    
+
     this->lmaxd = lm;
     this->nmaxd = nm;
     this->inlmax = tot_inl;
@@ -257,7 +270,7 @@ void LCAO_Descriptor::cal_projected_DM(const ModuleBase::matrix &dm)
     }//T0
 
 #ifdef __MPI
-    GlobalC::ParaD.allsum_deepks(this->inlmax,pdm_size,this->pdm);
+    allsum_deepks(this->inlmax,pdm_size,this->pdm);
 #endif
     ModuleBase::timer::tick("LCAO_Descriptor","cal_projected_DM"); 
     return;
@@ -380,7 +393,7 @@ void LCAO_Descriptor::cal_projected_DM_k(const std::vector<ModuleBase::ComplexMa
     }//T0
 
 #ifdef __MPI
-    GlobalC::ParaD.allsum_deepks(this->inlmax,pdm_size,this->pdm);
+    allsum_deepks(this->inlmax,pdm_size,this->pdm);
 #endif
     ModuleBase::timer::tick("LCAO_Descriptor","cal_projected_DM_k");
     return;
@@ -648,9 +661,9 @@ void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm)
 #ifdef __MPI
     for(int iat=0;iat<GlobalC::ucell.nat;iat++)
     {
-        GlobalC::ParaD.allsum_deepks(this->inlmax,size,this->gdmx[iat]);
-        GlobalC::ParaD.allsum_deepks(this->inlmax,size,this->gdmy[iat]);
-        GlobalC::ParaD.allsum_deepks(this->inlmax,size,this->gdmz[iat]);
+        allsum_deepks(this->inlmax,size,this->gdmx[iat]);
+        allsum_deepks(this->inlmax,size,this->gdmy[iat]);
+        allsum_deepks(this->inlmax,size,this->gdmz[iat]);
     }
 #endif
     return;
@@ -793,9 +806,9 @@ void LCAO_Descriptor::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& d
 #ifdef __MPI
     for(int iat=0;iat<GlobalC::ucell.nat;iat++)
     {
-        GlobalC::ParaD.allsum_deepks(this->inlmax,size,this->gdmx[iat]);
-        GlobalC::ParaD.allsum_deepks(this->inlmax,size,this->gdmy[iat]);
-        GlobalC::ParaD.allsum_deepks(this->inlmax,size,this->gdmz[iat]);
+        allsum_deepks(this->inlmax,size,this->gdmx[iat]);
+        allsum_deepks(this->inlmax,size,this->gdmy[iat]);
+        allsum_deepks(this->inlmax,size,this->gdmz[iat]);
     }
 #endif
     return;
