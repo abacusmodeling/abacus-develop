@@ -14,8 +14,7 @@ VPATH=../../src_parallel\
 :../../module_base\
 :../
 
-PW_OBJS_0=intarray.o\
-matrix.o\
+PW_OBJS_0=matrix.o\
 matrix3.o\
 tool_quit.o\
 mymath3.o\
@@ -29,11 +28,15 @@ pw_transform.o\
 pw_distributeg.o\
 pw_distributeg_method1.o\
 pw_distributeg_method2.o\
-fft.o
+fft.o\
+pw_basis_k.o\
+pw_operation.o\
+pw_transform_k.o
 
 DOUBLEFILE=test1.exe\
 test2.exe\
 test3.exe\
+test4.exe\
 test2-1.exe\
 test2-2.exe\
 test2-3.exe\
@@ -41,7 +44,8 @@ test_t1.exe\
 test_t2.exe
 
 FLOATFILE=testf2.exe\
-testf3.exe
+testf3.exe\
+testf4.exe
 TESTFILE0 = ${DOUBLEFILE} 
 
 #==========================
@@ -110,7 +114,7 @@ init :
 	@ if [ ! -d $(BIN_DIR) ]; then mkdir $(BIN_DIR); fi
 	@ if [ ! -d $(OBJ_DIR)/README ]; then echo "This directory contains all of the .o files" > $(OBJ_DIR)/README; fi
 
-${BIN_DIR}/%.exe: %.cpp
+${BIN_DIR}/%.exe: %.cpp ${PW_OBJS}
 	${CPLUSPLUS} ${OPTS} $< test_tool.cpp ${PW_OBJS}  ${LIBS} -o $@
 ${OBJ_DIR}/%.o:%.cpp
 	${CPLUSPLUS} ${OPTS} -c ${HONG} $< -o $@

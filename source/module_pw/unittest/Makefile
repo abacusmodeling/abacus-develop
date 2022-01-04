@@ -14,8 +14,7 @@ VPATH=../../src_parallel\
 :../../module_base\
 :../
 
-PW_OBJS_0=intarray.o\
-matrix.o\
+PW_OBJS_0=matrix.o\
 matrix3.o\
 tool_quit.o\
 mymath3.o\
@@ -29,11 +28,15 @@ pw_transform.o\
 pw_distributeg.o\
 pw_distributeg_method1.o\
 pw_distributeg_method2.o\
-fft.o
+fft.o\
+pw_basis_k.o\
+pw_operation.o\
+pw_transform_k.o
 
 DOUBLEFILE=test1.exe\
 test2.exe\
 test3.exe\
+test4.exe\
 test2-1.exe\
 test2-2.exe\
 test2-3.exe\
@@ -41,7 +44,8 @@ test_t1.exe\
 test_t2.exe
 
 FLOATFILE=testf2.exe\
-testf3.exe
+testf3.exe\
+testf4.exe
 TESTFILE0 = ${DOUBLEFILE}
 
 #==========================
@@ -78,10 +82,10 @@ TESTFILE=$(patsubst %.exe, ${BIN_DIR}/%.exe, ${TESTFILE0})
 ## FFTW package needed 
 ##==========================
 #Use fftw package
-# FFTW_DIR = /home/qianrui/intelcompile/impi_fftw
-# FFTW_LIB_DIR     = ${FFTW_DIR}/lib
-# FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
-# FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
+#  FFTW_DIR = /home/qianrui/intelcompile/impi_fftw
+#  FFTW_LIB_DIR     = ${FFTW_DIR}/lib
+#  FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
+#  FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
 # FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -lfftw3f -Wl,-rpath=${FFTW_LIB_DIR}
 
 #Use mkl_fftw

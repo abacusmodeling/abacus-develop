@@ -96,6 +96,9 @@ int main(int argc,char **argv)
         }
     }
     if(rank_in_pool==0) ModuleBase::timer::finish(GlobalV::ofs_running, true);
+#ifdef __MPI
+    finishmpi();
+#endif
 
     return 0;
 }
