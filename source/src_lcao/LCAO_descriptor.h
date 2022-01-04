@@ -57,9 +57,10 @@ public:
 
     ///Allocate memory and calculate the index of descriptor in all atoms. 
     ///(only for descriptor part, not including scf)
-    void init(const int lm/**< [in] max angular momentum quantum number: 'L'*/,
-        const int nm/**< [in] max orbital number with the same 'L', for each 'L'*/,
-        const int tot_inl/**< [in] total number of radial orbitals (sum of atoms 'I', angular number 'L' and orbital number 'N') */);
+    void init(const LCAO_Orbitals &orb,
+        const int nat,
+        const int ntype,
+        std::vector<int> na);
 
     //S_alpha_mu * DM  * S_nu_beta
     ///calculate projected density matrix:
@@ -81,7 +82,7 @@ public:
 
     /// 1. Initialize the deltaV Hamiltonian matrix 
     /// 2. If FORCE, initialize the matrces for force
-    void allocate_V_delta(void);
+    void allocate_V_delta(const int nat);
     void allocate_V_deltaR(const int nnr);
 
     ///add dV to the Hamiltonian matrix
@@ -108,8 +109,8 @@ public:
 //============================
 
     ///calculate partial of energy correction to descriptors
-    void cal_gedm(const ModuleBase::matrix& dm/**< [in] density matrix*/);	//need to load model in this step
-    void cal_gedm_k(const std::vector<ModuleBase::ComplexMatrix>& dm);	//need to load model in this step
+    void cal_gedm(const ModuleBase::matrix& dm/**< [in] density matrix*/, const int nat);	//need to load model in this step
+    void cal_gedm_k(const std::vector<ModuleBase::ComplexMatrix>& dm, const int nat);	//need to load model in this step
 
     ///calculates gradient of descriptors w.r.t atomic positions
     ///----------------------------------------------------
@@ -120,8 +121,8 @@ public:
     /// - b: the atoms whose force being calculated)
     ///gvdm*gdmx->gvx
     ///----------------------------------------------------
-    void cal_gvx(const ModuleBase::matrix &dm);
-    void cal_gvx_k(const std::vector<ModuleBase::ComplexMatrix>& dm);
+    void cal_gvx(const ModuleBase::matrix &dm, const int nat);
+    void cal_gvx_k(const std::vector<ModuleBase::ComplexMatrix>& dm, const int nat);
 
     ///print descriptors based on LCAO basis
     void print_descriptor(void);
@@ -143,10 +144,11 @@ public:
     ///
     /// Unit of force: Ry/Bohr
     ///----------------------------------------------------------------------
-	void save_npy_d(void);
-	void save_npy_e(const double &e/**<[in] \f$E_{base}\f$ or \f$E_{tot}\f$, in Ry*/, const std::string &e_file);
-	void save_npy_f(const ModuleBase::matrix &fbase/**<[in] \f$F_{base}\f$ or \f$F_{tot}\f$, in Ry/Bohr*/, const std::string &f_file);
-    void save_npy_gvx(void);
+	void save_npy_d(const int nat);
+	void save_npy_e(const double &e/**<[in] \f$E_{base}\f$ or \f$E_{tot}\f$, in Ry*/,const std::string &e_file);
+	void save_npy_f(const ModuleBase::matrix &fbase/**<[in] \f$F_{base}\f$ or \f$F_{tot}\f$, in Ry/Bohr*/,
+        const std::string &f_file, const int nat);
+    void save_npy_gvx(const int nat);
 
 //========
 // Extra : parallelization, also in LCAO_descriptor.cpp
@@ -246,9 +248,13 @@ private:
 //===============================
 
 // arrange index of descriptor in all atoms
-	void init_index(void);
+	void init_index(const int ntype,
+        const int nat,
+        std::vector<int> na,
+        const int tot_inl,
+        const LCAO_Orbitals &orb);
 // data structure that saves <psi|alpha>
-    void allocate_nlm();
+    void allocate_nlm(const int nat);
 // array for storing gdmx, used for calculating gvx
 	void init_gdmx(void);
 
@@ -275,7 +281,7 @@ private:
 //============================    
     //partial of descriptors w.r.t projected dm
     //called when force=1, precondition of cal_gvx
-    void cal_gvdm();    
+    void cal_gvdm(const int nat);    
 
     //converts descriptor from projected density matrices
     //and converts to libtorch format

@@ -308,29 +308,29 @@ void Force_Stress_LCAO::getForceStress(
 		{
 			if(GlobalV::MY_RANK==0)
 			{
-            	GlobalC::ld.save_npy_f(fcs, "f_tot.npy"); //Ty/Bohr, F_tot
+            	GlobalC::ld.save_npy_f(fcs, "f_tot.npy", GlobalC::ucell.nat); //Ty/Bohr, F_tot
 			}
             if (GlobalV::deepks_scf)
             {
 				if(GlobalV::MY_RANK==0)
 				{
-                	GlobalC::ld.save_npy_f(fcs - GlobalC::ld.F_delta, "f_base.npy"); //Ry/Bohr, F_base
+                	GlobalC::ld.save_npy_f(fcs - GlobalC::ld.F_delta, "f_base.npy", GlobalC::ucell.nat); //Ry/Bohr, F_base
 				}
 
 				if(GlobalV::GAMMA_ONLY_LOCAL)
 				{
-					GlobalC::ld.cal_gvx(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
+					GlobalC::ld.cal_gvx(GlobalC::LOC.wfc_dm_2d.dm_gamma[0], GlobalC::ucell.nat);
 					if(GlobalV::MY_RANK==0)
 					{
-						GlobalC::ld.save_npy_gvx();//  /Bohr, grad_vx
+						GlobalC::ld.save_npy_gvx(GlobalC::ucell.nat);//  /Bohr, grad_vx
 					}
 				}
 				else
 				{				
-					GlobalC::ld.cal_gvx_k(GlobalC::LOC.wfc_dm_2d.dm_k);
+					GlobalC::ld.cal_gvx_k(GlobalC::LOC.wfc_dm_2d.dm_k, GlobalC::ucell.nat);
 					if(GlobalV::MY_RANK==0)
 					{
-						GlobalC::ld.save_npy_gvx();//  /Bohr, grad_vx
+						GlobalC::ld.save_npy_gvx(GlobalC::ucell.nat);//  /Bohr, grad_vx
 					}
 				}
             }
@@ -338,7 +338,7 @@ void Force_Stress_LCAO::getForceStress(
             {
 				if(GlobalV::MY_RANK==0)
 				{
-                	GlobalC::ld.save_npy_f(fcs, "f_base.npy"); //no scf, F_base=F_tot
+                	GlobalC::ld.save_npy_f(fcs, "f_base.npy", GlobalC::ucell.nat); //no scf, F_base=F_tot
 				}
             }
 

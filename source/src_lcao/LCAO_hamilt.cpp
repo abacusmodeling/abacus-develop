@@ -109,7 +109,7 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-
 
 	if (GlobalV::deepks_scf)
     {        
-		GlobalC::ld.cal_gedm(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
+		GlobalC::ld.cal_gedm(GlobalC::LOC.wfc_dm_2d.dm_gamma[0], GlobalC::ucell.nat);
 		GlobalC::ld.add_v_delta();  
 	}
 	

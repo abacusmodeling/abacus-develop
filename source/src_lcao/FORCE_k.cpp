@@ -70,7 +70,7 @@ void Force_LCAO_k::ftable_k (
 #ifdef __DEEPKS
     if (GlobalV::deepks_scf)
     {
-		GlobalC::ld.cal_gedm_k(GlobalC::LOC.wfc_dm_2d.dm_k);
+		GlobalC::ld.cal_gedm_k(GlobalC::LOC.wfc_dm_2d.dm_k, GlobalC::ucell.nat);
 
         GlobalC::ld.cal_f_delta_k(GlobalC::LOC.wfc_dm_2d.dm_k,isstress,svnl_dalpha);
 #ifdef __MPI

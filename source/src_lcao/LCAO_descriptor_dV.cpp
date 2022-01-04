@@ -13,7 +13,7 @@
 //===============================
 
 
-void LCAO_Descriptor::allocate_V_delta()
+void LCAO_Descriptor::allocate_V_delta(const int nat)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "allocate_V_delta");
 
@@ -45,7 +45,7 @@ void LCAO_Descriptor::allocate_V_delta()
     if (GlobalV::FORCE)
     {
         //init F_delta
-        F_delta.create(GlobalC::ucell.nat, 3);
+        F_delta.create(nat, 3);
     }
 
     return;
@@ -58,7 +58,7 @@ void LCAO_Descriptor::allocate_V_deltaR(const int nnr)
     ModuleBase::GlobalFunc::ZEROS(H_V_deltaR, nnr);
 }
 
-void LCAO_Descriptor::allocate_nlm(void)
+void LCAO_Descriptor::allocate_nlm(const int nat)
 {
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {

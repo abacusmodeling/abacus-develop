@@ -55,11 +55,11 @@ void LCAO_Descriptor::cal_descriptor_tensor(void)
 }
 
 //calculates gradient of descriptors from gradient of projected density matrices
-void LCAO_Descriptor::cal_gvx(const ModuleBase::matrix &dm)
+void LCAO_Descriptor::cal_gvx(const ModuleBase::matrix &dm, const int nat)
 {
     ModuleBase::TITLE("LCAO_Descriptor","cal_gvx");
     //preconditions
-    this->cal_gvdm();
+    this->cal_gvdm(nat);
 
     this->cal_gdmx(dm); //checked
     if(!gdmr_vector.empty())
@@ -70,17 +70,17 @@ void LCAO_Descriptor::cal_gvx(const ModuleBase::matrix &dm)
     if(GlobalV::MY_RANK==0)
     {
         //make gdmx as tensor
-        int nlmax = this->inlmax/GlobalC::ucell.nat;
+        int nlmax = this->inlmax/nat;
         for (int nl=0;nl<nlmax;++nl)
         {
             std::vector<torch::Tensor> bmmv;
-            for (int ibt=0;ibt<GlobalC::ucell.nat;++ibt)
+            for (int ibt=0;ibt<nat;++ibt)
             {
                 std::vector<torch::Tensor> xmmv;
                 for (int i=0;i<3;++i)
                 {
                     std::vector<torch::Tensor> ammv;
-                    for (int iat=0; iat<GlobalC::ucell.nat; ++iat)
+                    for (int iat=0; iat<nat; ++iat)
                     {
                         int inl = iat*nlmax + nl;
                         int nm = 2*this->inl_l[inl]+1;
@@ -121,37 +121,37 @@ void LCAO_Descriptor::cal_gvx(const ModuleBase::matrix &dm)
         // concatenate index a(inl) and m(nm)
         this->gvx_tensor = torch::cat(gvx_vector, -1);
 
-        assert(this->gvx_tensor.size(0) == GlobalC::ucell.nat);
+        assert(this->gvx_tensor.size(0) == nat);
         assert(this->gvx_tensor.size(1) == 3);
-        assert(this->gvx_tensor.size(2) == GlobalC::ucell.nat);
+        assert(this->gvx_tensor.size(2) == nat);
         assert(this->gvx_tensor.size(3) == this->des_per_atom);
     }
 
     return;
 }
 
-void LCAO_Descriptor::cal_gvx_k(const std::vector<ModuleBase::ComplexMatrix>& dm)
+void LCAO_Descriptor::cal_gvx_k(const std::vector<ModuleBase::ComplexMatrix>& dm, const int nat)
 {
     ModuleBase::TITLE("LCAO_Descriptor","cal_gvx");
     //preconditions
-    this->cal_gvdm();
+    this->cal_gvdm(nat);
 
     this->cal_gdmx_k(dm);
 
     if(GlobalV::MY_RANK==0)
     {
         //make gdmx as tensor
-        int nlmax = this->inlmax/GlobalC::ucell.nat;
+        int nlmax = this->inlmax/nat;
         for (int nl=0;nl<nlmax;++nl)
         {
             std::vector<torch::Tensor> bmmv;
-            for (int ibt=0;ibt<GlobalC::ucell.nat;++ibt)
+            for (int ibt=0;ibt<nat;++ibt)
             {
                 std::vector<torch::Tensor> xmmv;
                 for (int i=0;i<3;++i)
                 {
                     std::vector<torch::Tensor> ammv;
-                    for (int iat=0; iat<GlobalC::ucell.nat; ++iat)
+                    for (int iat=0; iat<nat; ++iat)
                     {
                         int inl = iat*nlmax + nl;
                         int nm = 2*this->inl_l[inl]+1;
@@ -188,9 +188,9 @@ void LCAO_Descriptor::cal_gvx_k(const std::vector<ModuleBase::ComplexMatrix>& dm
         // cat nv-> \sum_nl(nv) = \sum_nl(nm_nl)=des_per_atom
         this->gvx_tensor = torch::cat(gvx_vector, -1);
 
-        assert(this->gvx_tensor.size(0) == GlobalC::ucell.nat);
+        assert(this->gvx_tensor.size(0) == nat);
         assert(this->gvx_tensor.size(1) == 3);
-        assert(this->gvx_tensor.size(2) == GlobalC::ucell.nat);
+        assert(this->gvx_tensor.size(2) == nat);
         assert(this->gvx_tensor.size(3) == this->des_per_atom);
     }
 
@@ -215,7 +215,7 @@ void LCAO_Descriptor::load_model(const string& model_file)
 }
 
 //obtain from the machine learning model dE_delta/dDescriptor
-void LCAO_Descriptor::cal_gedm(const ModuleBase::matrix &dm)
+void LCAO_Descriptor::cal_gedm(const ModuleBase::matrix &dm, const int nat)
 {
     //using this->pdm_tensor
     ModuleBase::TITLE("LCAO_Descriptor", "cal_gedm");
@@ -227,7 +227,7 @@ void LCAO_Descriptor::cal_gedm(const ModuleBase::matrix &dm)
     //forward
     std::vector<torch::jit::IValue> inputs;
     //input_dim:(natom, des_per_atom)
-    inputs.push_back(torch::cat(this->d_tensor, /*dim=*/0).reshape({ GlobalC::ucell.nat, this->des_per_atom }));
+    inputs.push_back(torch::cat(this->d_tensor, /*dim=*/0).reshape({ nat, this->des_per_atom }));
     std::vector<torch::Tensor> ec;
     ec.push_back(module.forward(inputs).toTensor());    //Hartree
     this->E_delta = ec[0].item().toDouble() * 2;//Ry; *2 is for Hartree to Ry
@@ -254,7 +254,7 @@ void LCAO_Descriptor::cal_gedm(const ModuleBase::matrix &dm)
     return;
 }
 
-void LCAO_Descriptor::cal_gedm_k(const std::vector<ModuleBase::ComplexMatrix>& dm)
+void LCAO_Descriptor::cal_gedm_k(const std::vector<ModuleBase::ComplexMatrix>& dm, const int nat)
 {
     //using this->pdm_tensor
     ModuleBase::TITLE("LCAO_Descriptor", "cal_gedm");
@@ -266,7 +266,7 @@ void LCAO_Descriptor::cal_gedm_k(const std::vector<ModuleBase::ComplexMatrix>& d
     //forward
     std::vector<torch::jit::IValue> inputs;
     //input_dim:(natom, des_per_atom)
-    inputs.push_back(torch::cat(this->d_tensor, /*dim=*/0).reshape({ GlobalC::ucell.nat, this->des_per_atom }));
+    inputs.push_back(torch::cat(this->d_tensor, /*dim=*/0).reshape({ nat, this->des_per_atom }));
     std::vector<torch::Tensor> ec;
     ec.push_back(module.forward(inputs).toTensor());    //Hartree
     this->E_delta = ec[0].item().toDouble() * 2;//Ry; *2 is for Hartree to Ry
@@ -294,7 +294,7 @@ void LCAO_Descriptor::cal_gedm_k(const std::vector<ModuleBase::ComplexMatrix>& d
 }
 
 //dDescriptor / dprojected density matrix
-void LCAO_Descriptor::cal_gvdm()
+void LCAO_Descriptor::cal_gvdm(const int nat)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "cal_gvdm");
     if(!gevdm_vector.empty())
@@ -302,11 +302,11 @@ void LCAO_Descriptor::cal_gvdm()
         gevdm_vector.erase(gevdm_vector.begin(),gevdm_vector.end());
     }
     //cal gevdm(d(EigenValue(D))/dD)
-    int nlmax = inlmax/GlobalC::ucell.nat;
+    int nlmax = inlmax/nat;
     for (int nl=0;nl<nlmax;++nl)
     {
         std::vector<torch::Tensor> avmmv;
-        for (int iat = 0;iat<GlobalC::ucell.nat;++iat)
+        for (int iat = 0;iat<nat;++iat)
         {
             int inl = iat*nlmax+nl;
             int nm = 2*this->inl_l[inl]+1;
@@ -426,7 +426,7 @@ void LCAO_Descriptor::print_F_delta(const string& fname)
 }
 
 
-void LCAO_Descriptor::save_npy_d(void)
+void LCAO_Descriptor::save_npy_d(const int nat)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "save_npy_d");
     //save descriptor in .npy format
@@ -435,7 +435,7 @@ void LCAO_Descriptor::save_npy_d(void)
     {
         npy_des.push_back(this->d[i]);
     }
-    const long unsigned dshape[] = {(long unsigned) GlobalC::ucell.nat, (long unsigned) this->des_per_atom };
+    const long unsigned dshape[] = {(long unsigned) nat, (long unsigned) this->des_per_atom };
     if (GlobalV::MY_RANK == 0)
     {
         npy::SaveArrayAsNumpy("dm_eig.npy", false, 2, dshape, npy_des);
@@ -455,14 +455,14 @@ void LCAO_Descriptor::save_npy_e(const double &e, const std::string &e_file)
     return;
 }
 
-void LCAO_Descriptor::save_npy_f(const ModuleBase::matrix &f, const std::string &f_file)
+void LCAO_Descriptor::save_npy_f(const ModuleBase::matrix &f, const std::string &f_file, const int nat)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "save_npy_f");
     //save f_base
     //caution: unit: Rydberg/Bohr
-    const long unsigned fshape[] = {(long unsigned) GlobalC::ucell.nat, 3 };
+    const long unsigned fshape[] = {(long unsigned) nat, 3 };
     vector<double> npy_f;
-    for (int iat = 0;iat < GlobalC::ucell.nat;++iat)
+    for (int iat = 0;iat < nat;++iat)
     {
         for (int i = 0;i < 3;i++)
         {
@@ -473,18 +473,18 @@ void LCAO_Descriptor::save_npy_f(const ModuleBase::matrix &f, const std::string 
     return;
 }
 
-void LCAO_Descriptor::save_npy_gvx(void)
+void LCAO_Descriptor::save_npy_gvx(const int nat)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "save_npy_gvx");
     //save grad_vx.npy (when  force label is in use)
     //unit: /Bohr
-    const long unsigned gshape[] = {(long unsigned) GlobalC::ucell.nat, 3, GlobalC::ucell.nat, this->des_per_atom};
+    const long unsigned gshape[] = {(long unsigned) nat, 3, nat, this->des_per_atom};
     vector<double> npy_gvx;
-    for (int ibt = 0;ibt < GlobalC::ucell.nat;++ibt)
+    for (int ibt = 0;ibt < nat;++ibt)
     {
         for (int i = 0;i < 3;i++)
         {
-            for (int iat = 0;iat < GlobalC::ucell.nat;++iat)
+            for (int iat = 0;iat < nat;++iat)
             {
                 for(int p=0;p<this->des_per_atom;++p)
                 {

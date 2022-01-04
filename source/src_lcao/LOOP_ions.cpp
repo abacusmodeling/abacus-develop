@@ -197,7 +197,7 @@ void LOOP_ions::opt_ions(void)
             }
 
             GlobalC::ld.cal_descriptor();    //final descriptor
-            GlobalC::ld.save_npy_d();            //libnpy needed
+            GlobalC::ld.save_npy_d(GlobalC::ucell.nat);            //libnpy needed
             
             if (GlobalV::deepks_scf)
             {

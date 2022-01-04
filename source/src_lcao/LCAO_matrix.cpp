@@ -81,7 +81,16 @@ void LCAO_Matrix::divide_HS_in_frag(const bool isGamma, Parallel_Orbitals &po)
 	if (GlobalV::out_descriptor)
 	{
         //allocate relevant data structures for calculating descriptors
-		GlobalC::ld.init(GlobalC::ORB.get_lmax_d(), GlobalC::ORB.get_nchimax_d(), GlobalC::ucell.nat * GlobalC::ORB.Alpha[0].getTotal_nchi());
+        std::vector<int> na;
+        na.resize(GlobalC::ucell.ntype);
+        for(int it=0;it<GlobalC::ucell.ntype;it++)
+        {
+            na[it] = GlobalC::ucell.atoms[it].na;
+        }
+		GlobalC::ld.init(GlobalC::ORB,
+            GlobalC::ucell.nat,
+            GlobalC::ucell.ntype,
+            na);
 	}
 #endif
 	return;
