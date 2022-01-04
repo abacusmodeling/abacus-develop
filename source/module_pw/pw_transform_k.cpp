@@ -1,6 +1,6 @@
 #include "fft.h"
 #include <complex>
-#include "pw_basis.h"
+#include "pw_basis_k.h"
 #include <cassert>
 #include "../module_base/global_function.h"
 #include "../module_base/timer.h"
@@ -11,16 +11,12 @@ namespace ModulePW
 
 //
 //transform real space to reciprocal space
-//c(k,g)=\int dr*f(r)*exp(-ig*r)
-//c(k,g)=c_k(g)*exp(ik*r)
-//c_k(g)=\int dr*f(r)*exp(-i(g+k)*r)
-//Here we calculate c(k,g)
 //in: (nplane,nx,ny)
 //out: (nz, ns)
 //
-void PW_Basis:: real2recip(std::complex<double> * in, std::complex<double> * out)
+void PW_Basis_K:: real2recip(std::complex<double> * in, std::complex<double> * out, int ik)
 {
-    ModuleBase::timer::tick("PW_Basis", "real2recip");
+    ModuleBase::timer::tick("PW_Basis_K", "real2recip");
 
     assert(this->gamma_only == false);
     for(int ir = 0 ; ir < this->nrxx ; ++ir)
@@ -33,12 +29,12 @@ void PW_Basis:: real2recip(std::complex<double> * in, std::complex<double> * out
     
     this->ft.fftzfor(ft.aux2,ft.aux1);
 
-    for(int ig = 0 ; ig < this->npw ; ++ig)
+    for(int igl = 0 ; igl < this->npwk[ik] ; ++igl)
     {
-        out[ig] = this->ft.aux1[this->ig2isz[ig]];
+        out[igl] = this->ft.aux1[this->igl2isz_k[igl+ik*this->npwk_max]];
     }
     return;
-    ModuleBase::timer::tick("PW_Basis", "real2recip");
+    ModuleBase::timer::tick("PW_Basis_K", "real2recip");
 }
 
 //
@@ -46,9 +42,9 @@ void PW_Basis:: real2recip(std::complex<double> * in, std::complex<double> * out
 //in: (nplane,nx,ny)
 //out: (nz, ns)
 //
-void PW_Basis:: real2recip(double * in, std::complex<double> * out)
+void PW_Basis_K:: real2recip(double * in, std::complex<double> * out, int ik)
 {
-    ModuleBase::timer::tick("PW_Basis", "real2recip_gamma_only");
+    ModuleBase::timer::tick("PW_Basis_K", "real2recip_gamma_only");
     assert(this->gamma_only == true);
     // for(int ir = 0 ; ir < this->nrxx ; ++ir)
     // {
@@ -70,32 +66,28 @@ void PW_Basis:: real2recip(double * in, std::complex<double> * out)
     
     this->ft.fftzfor(ft.aux2,ft.aux1);
 
-    for(int ig = 0 ; ig < this->npw ; ++ig)
+    for(int igl = 0 ; igl < this->npwk[ik] ; ++igl)
     {
-        out[ig] = this->ft.aux1[this->ig2isz[ig]];
+        out[igl] = this->ft.aux1[this->igl2isz_k[igl+ik*this->npwk_max]];
     }
-    ModuleBase::timer::tick("PW_Basis", "real2recip_gamma_only");
+    ModuleBase::timer::tick("PW_Basis_K", "real2recip_gamma_only");
     return;
 }
 
 //
 //transform real space to reciprocal space
-//f(r)=1/V * \sum_{g} c(k,g)*exp(ig*r)
-//c(k,g)=c_k(g)*exp(ik*r)
-//f(r)=1/V * \sum_{g} c_k(g)*exp(i(g+k)*r)
-//Here we use c(k,g)
 //in: (nz,ns)
 //out: (nplane, nx, ny)
 //
-void PW_Basis:: recip2real(std::complex<double> * in, std::complex<double> * out)
+void PW_Basis_K:: recip2real(std::complex<double> * in, std::complex<double> * out, int ik)
 {
-    ModuleBase::timer::tick("PW_Basis", "recip2real");
+    ModuleBase::timer::tick("PW_Basis_K", "recip2real");
     assert(this->gamma_only == false);
     ModuleBase::GlobalFunc::ZEROS(ft.aux1, this->nst * this->nz);
 
-    for(int ig = 0 ; ig < this->npw ; ++ig)
+    for(int igl = 0 ; igl < this->npwk[ik] ; ++igl)
     {
-        this->ft.aux1[this->ig2isz[ig]] = in[ig];
+        this->ft.aux1[this->igl2isz_k[igl+ik*this->npwk_max]] = in[igl];
     }
     this->ft.fftzbac(ft.aux1, ft.aux2);
 
@@ -107,7 +99,7 @@ void PW_Basis:: recip2real(std::complex<double> * in, std::complex<double> * out
     {
         out[ir] = this->ft.aux1[ir] / double(this->bignxyz);
     }
-    ModuleBase::timer::tick("PW_Basis", "recip2real");
+    ModuleBase::timer::tick("PW_Basis_K", "recip2real");
 
     return;
 }
@@ -117,15 +109,15 @@ void PW_Basis:: recip2real(std::complex<double> * in, std::complex<double> * out
 //in: (nz,ns)
 //out: (nplane, nx, ny)
 //
-void PW_Basis:: recip2real(std::complex<double> * in, double * out)
+void PW_Basis_K:: recip2real(std::complex<double> * in, double * out, int ik)
 {
-    ModuleBase::timer::tick("PW_Basis", "recip2real_gamma_only");
+    ModuleBase::timer::tick("PW_Basis_K", "recip2real_gamma_only");
     assert(this->gamma_only == true);
     ModuleBase::GlobalFunc::ZEROS(ft.aux1, this->nst * this->nz);
 
-    for(int ig = 0 ; ig < this->npw ; ++ig)
+    for(int igl = 0 ; igl < this->npwk[ik] ; ++igl)
     {
-        this->ft.aux1[this->ig2isz[ig]] = in[ig];
+        this->ft.aux1[this->igl2isz_k[igl+ik*this->npwk_max]] = in[igl];
     }
    this->ft.fftzbac(ft.aux1, ft.aux2);
     
@@ -147,12 +139,12 @@ void PW_Basis:: recip2real(std::complex<double> * in, double * out)
             out[ix*npy + ipy] = this->ft.r_rspace[ix*npy*2 + ipy] / double(this->bignxyz);
         }
     }
-    ModuleBase::timer::tick("PW_Basis", "recip2real_gamma_only");
+    ModuleBase::timer::tick("PW_Basis_K", "recip2real_gamma_only");
     return;
 }
 
 #ifdef __MIX_PRECISION
-void PW_Basis:: real2recip(std::complex<float> * in, std::complex<float> * out)
+void PW_Basis_K:: real2recip(std::complex<float> * in, std::complex<float> * out, int ik)
 {
     assert(this->gamma_only == false);
     for(int ir = 0 ; ir < this->nrxx ; ++ir)
@@ -165,14 +157,14 @@ void PW_Basis:: real2recip(std::complex<float> * in, std::complex<float> * out)
     
     this->ft.fftfzfor(ft.auxf2,ft.auxf1);
 
-    for(int ig = 0 ; ig < this->npw ; ++ig)
+    for(int igl = 0 ; igl < this->npwk[ik] ; ++igl)
     {
-        out[ig] = this->ft.auxf1[this->ig2isz[ig]];
+        out[igl] = this->ft.auxf1[this->igl2isz_k[igl+ik*this->npwk_max]];
     }
     return;
 }
 
-void PW_Basis:: real2recip(float * in, std::complex<float> * out)
+void PW_Basis_K:: real2recip(float * in, std::complex<float> * out, int ik)
 {
     assert(this->gamma_only == true);
     int npy = this->bigny * this->nplane;
@@ -190,21 +182,21 @@ void PW_Basis:: real2recip(float * in, std::complex<float> * out)
     
     this->ft.fftfzfor(ft.auxf2,ft.auxf1);
 
-    for(int ig = 0 ; ig < this->npw ; ++ig)
+    for(int igl = 0 ; igl < this->npwk[ik] ; ++igl)
     {
-        out[ig] = this->ft.auxf1[this->ig2isz[ig]];
+        out[igl] = this->ft.auxf1[this->igl2isz_k[igl+ik*this->npwk_max]];
     }
     return;
 }
 
-void PW_Basis:: recip2real(std::complex<float> * in, std::complex<float> * out)
+void PW_Basis_K:: recip2real(std::complex<float> * in, std::complex<float> * out, int ik)
 {
     assert(this->gamma_only == false);
     ModuleBase::GlobalFunc::ZEROS(ft.auxf1, this->nst * this->nz);
 
-    for(int ig = 0 ; ig < this->npw ; ++ig)
+    for(int igl = 0 ; igl < this->npwk[ik] ; ++igl)
     {
-        this->ft.auxf1[this->ig2isz[ig]] = in[ig];
+        this->ft.auxf1[this->igl2isz_k[igl+ik*this->npwk_max]] = in[igl];
     }
     this->ft.fftfzbac(ft.auxf1, ft.auxf2);
 
@@ -220,14 +212,14 @@ void PW_Basis:: recip2real(std::complex<float> * in, std::complex<float> * out)
     return;
 }
 
-void PW_Basis:: recip2real(std::complex<float> * in, float * out)
+void PW_Basis_K:: recip2real(std::complex<float> * in, float * out, int ik)
 {
     assert(this->gamma_only == true);
     ModuleBase::GlobalFunc::ZEROS(ft.auxf1, this->nst * this->nz);
 
-    for(int ig = 0 ; ig < this->npw ; ++ig)
+    for(int igl = 0 ; igl < this->npwk[ik] ; ++igl)
     {
-        this->ft.auxf1[this->ig2isz[ig]] = in[ig];
+        this->ft.auxf1[this->igl2isz_k[igl+ik*this->npwk_max]] = in[igl];
     }
    this->ft.fftfzbac(ft.auxf1, ft.auxf2);
     

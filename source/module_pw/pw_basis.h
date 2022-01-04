@@ -100,14 +100,14 @@ public:
 
     void collect_local_pw();
 
-    void collect_tot_pw(
-        double* gg_global,
-        ModuleBase::Vector3<double> *gdirect_global,
-        ModuleBase::Vector3<double> *gcar_global
-    ); 
+    // void collect_tot_pw(
+    //     double* gg_global,
+    //     ModuleBase::Vector3<double> *gdirect_global,
+    //     ModuleBase::Vector3<double> *gcar_global
+    // ); 
    
 
-private:
+public:
     bool gamma_only;	// only half g are used.
     double ggecut;    //Energy cut off for g^2/2, unit in 1/lat0^2, ggecut=ecutwfc(Ry)*lat0^2/4pi^2
     double lat0;     //unit length for lattice, unit in bohr
@@ -207,11 +207,6 @@ public:
     // void gatherp_scatters2(std::complex<double> *in, std::complex<double> *out); //gather sticks of and scatter planes of all processors
     // void gatherp_scatters_gamma(std::complex<double> *in, std::complex<double> *out); //gather planes and scatter sticks of all processors, used when gamma_only
     // void gathers_scatterp_gamma(std::complex<double> *in, std::complex<double> *out); //gather sticks of and scatter planes of all processors, used when gamma only
-
-    
-    
-   
-
 
 };
 

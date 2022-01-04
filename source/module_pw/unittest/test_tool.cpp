@@ -76,4 +76,10 @@ void divide_pools(const int &nproc, const int &myrank, int &nproc_in_pool, int &
     delete[] startpro_pool;
     return;
 }
+void finishmpi()
+{
+    MPI_Comm_free(&POOL_WORLD);
+    MPI_Type_free(&mpicomplex);
+    MPI_Finalize();   
+}
 #endif
