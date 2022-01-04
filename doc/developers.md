@@ -51,31 +51,33 @@ The ABACUS code is reconstructed to form several self-contained modules. A descr
 
 After your pull request is merged, you can safely delete your branch and pull the changes from the main (upstream) repository:
 
-* Delete the remote branch on GitHub either through the GitHub web UI or your local shell as follows:
+- Delete the remote branch on GitHub either through the GitHub web UI or your local shell as follows:
 
     ```shell
     git push origin --delete my-fix-branch
     ```
 
-* Check out the master branch:
+- Check out the master branch:
 
     ```shell
     git checkout develop -f
     ```
 
-* Delete the local branch:
+- Delete the local branch:
 
     ```shell
     git branch -D my-fix-branch
     ```
 
-* Update your master with the latest upstream version:
+- Update your master with the latest upstream version:
 
     ```shell
     git pull --ff upstream develop
     ```
 
 ### Providing unit tests
+
+We use GoogleTest as our test framework. Write your test under the corresponding module folder at `abacus-develop/tests`, then append the test to `tests/CMakeLists.txt`. To build tests for abacus, set `BUILD_TESTING=1` when configuring with CMake. Executables of test programs will be under `build/tests`.
 
 ### Updating documentation
 
