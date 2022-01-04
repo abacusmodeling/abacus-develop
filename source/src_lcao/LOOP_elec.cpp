@@ -155,12 +155,8 @@ void LOOP_elec::before_solver(const int &istep)
     //since it depends on ionic positions
     if (GlobalV::out_descriptor)
     {
-        GlobalC::ld.build_S_descriptor(0);  //init overlap table
-		if(GlobalV::deepks_scf || !GlobalV::GAMMA_ONLY_LOCAL)
-		{
-			//build and save <psi(0)|alpha(R)> at beginning
-        	GlobalC::ld.build_v_delta_alpha_new(GlobalV::FORCE);
-		}
+		//build and save <psi(0)|alpha(R)> at beginning
+        GlobalC::ld.build_v_delta_alpha_new(GlobalV::FORCE);
     }
 #endif
 

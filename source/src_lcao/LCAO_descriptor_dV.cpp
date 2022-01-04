@@ -46,22 +46,6 @@ void LCAO_Descriptor::allocate_V_delta()
     {
         //init F_delta
         F_delta.create(GlobalC::ucell.nat, 3);
-        if(GlobalV::GAMMA_ONLY_LOCAL)
-        {
-            //init DS_mu_alpha**
-            this->DS_mu_alpha_x = new double* [this->inlmax];
-            this->DS_mu_alpha_y = new double* [this->inlmax];
-            this->DS_mu_alpha_z = new double* [this->inlmax];
-            for (int inl = 0;inl < this->inlmax;inl++)
-            {
-                this->DS_mu_alpha_x[inl] = new double[GlobalV::NLOCAL * (2 * this->lmaxd + 1)];
-                this->DS_mu_alpha_y[inl] = new double[GlobalV::NLOCAL * (2 * this->lmaxd + 1)];
-                this->DS_mu_alpha_z[inl] = new double[GlobalV::NLOCAL * (2 * this->lmaxd + 1)];
-                ModuleBase::GlobalFunc::ZEROS(DS_mu_alpha_x[inl], GlobalV::NLOCAL * (2 * this->lmaxd + 1));
-                ModuleBase::GlobalFunc::ZEROS(DS_mu_alpha_y[inl], GlobalV::NLOCAL * (2 * this->lmaxd + 1));
-                ModuleBase::GlobalFunc::ZEROS(DS_mu_alpha_z[inl], GlobalV::NLOCAL * (2 * this->lmaxd + 1));
-            }
-        }
     }
 
     return;

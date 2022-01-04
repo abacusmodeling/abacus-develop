@@ -63,10 +63,6 @@ public:
         const int nm/**< [in] max orbital number with the same 'L', for each 'L'*/,
         const int tot_inl/**< [in] total number of radial orbitals (sum of atoms 'I', angular number 'L' and orbital number 'N') */);
 
-	/// calculate overlap between lcao basis Phi and descriptor basis Alpha
-    /// <alpha | chi>
-    void build_S_descriptor(const bool &calc_deri/**< [in] 0 for \f$\langle\phi|\alpha\rangle\f$, 1 for \f$\langle\frac{d\phi}{dR}|\alpha\rangle\f$*/);
-
     //S_alpha_mu * DM  * S_nu_beta
     ///calculate projected density matrix:
     ///pdm = sum_i,occ <phi_i|alpha1><alpha2|phi_k>
@@ -129,7 +125,6 @@ public:
     void cal_gvx(const ModuleBase::matrix &dm);
     void cal_gvx_k(const std::vector<ModuleBase::ComplexMatrix>& dm);
 
-
     ///print descriptors based on LCAO basis
     void print_descriptor(void);
     
@@ -185,16 +180,6 @@ private:
 	// related derivatives.
 	torch::jit::script::Module module;
 
-	//density matrix: dm_gamma
-	double* dm_double;
-	// overlap between lcao and descriptor basis
-	double** S_mu_alpha;	//[tot_Inl][GlobalV::NLOCAL][2l+1]	caoyu modified 2021-05-07
-
-	//d(S) for f_delta:	<\psi_mu|d\alpha^I_nlm> , [tot_Inl][GlobalV::NLOCAL][2l+1]
-	double** DS_mu_alpha_x;
-	double** DS_mu_alpha_y;
-	double** DS_mu_alpha_z;
-
     // saves <psi(0)|alpha(R)>
     std::vector<std::vector<std::unordered_map<int,std::vector<std::vector<double>>>>> nlm_save;
     
@@ -229,13 +214,11 @@ private:
     //dD/dX, tensor form of gdmx
     std::vector<torch::Tensor> gdmr_vector;
 
-
     ///size of descriptor(projector) basis set
     int n_descriptor;
 
 	// \sum_L{Nchi(L)*(2L+1)}
 	int des_per_atom;
-
 
 	ModuleBase::IntArray* alpha_index;
 	ModuleBase::IntArray* inl_index;	//caoyu add 2021-05-07
@@ -259,13 +242,6 @@ private:
 // array for storing gdmx, used for calculating gvx
 	void init_gdmx(void);
 
-//save the overlap <alpha|chi> into array
-	void set_S_mu_alpha(
-		const int &iw1_all,
-		const int& inl,
-		const int& im,
-		const double& v);
-
 //for checking purpose, print the projected density matrices
     void print_projected_DM(
 		std::ofstream &ofs,
@@ -274,18 +250,6 @@ private:
 		const int &ia,
 		const int &l,
 		const int& n);
-
-//save the d/dX<alpha|chi> into array
-	void set_DS_mu_alpha(
-		const int& iw1_all,
-		const int& inl,
-		const int& im,
-		const double& vx,
-		const double& vy,
-		const double& vz);
-
-//converts density matrix to format used in deepks subroutines
-	void getdm_double(const ModuleBase::matrix& dm);
 
 //calculate the gradient of pdm with regard to atomic positions
 //d/dX D_{Inl,mm'}

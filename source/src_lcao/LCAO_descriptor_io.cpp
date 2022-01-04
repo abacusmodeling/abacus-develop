@@ -61,7 +61,6 @@ void LCAO_Descriptor::cal_gvx(const ModuleBase::matrix &dm)
     //preconditions
     this->cal_gvdm();
 
-    this->build_S_descriptor(1);
     this->cal_gdmx(dm); //checked
     if(!gdmr_vector.empty())
     {
