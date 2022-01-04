@@ -124,6 +124,12 @@ If Libxc is not installed in standard path (i.e. installed with a custom prefix 
 cmake -B build -DLibxc_DIR=~/libxc
 ```
 
+To build tests for abacus, define `BUILD_TESTING` flag.
+
+```bash
+cmake -B build -DBUILD_TESTING=1
+```
+
 #### Build and Install
 
 After configuring, start build and install by:
