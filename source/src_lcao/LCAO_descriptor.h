@@ -78,7 +78,7 @@ public:
         const K_Vectors &kv);
 
     ///EIGENVALUE of pdm in block of I_n_l
-    void cal_descriptor(const UnitCell_pseudo &ucell);
+    void cal_descriptor(const UnitCell_pseudo &ucell, const LCAO_Orbitals &orb);
 
 //===============================
 //DeePKS Part 2
@@ -130,8 +130,23 @@ public:
     /// - b: the atoms whose force being calculated)
     ///gvdm*gdmx->gvx
     ///----------------------------------------------------
-    void cal_gvx(const ModuleBase::matrix &dm, const int nat);
-    void cal_gvx_k(const std::vector<ModuleBase::ComplexMatrix>& dm, const int nat);
+    void cal_gvx(const int nat);
+    void cal_gvx_k(const int nat);
+
+//calculate the gradient of pdm with regard to atomic positions
+//d/dX D_{Inl,mm'}
+
+    void cal_gdmx(const ModuleBase::matrix& dm,
+        const UnitCell_pseudo &ucell,
+        const LCAO_Orbitals &orb,
+        Grid_Driver &GridD,
+        const Parallel_Orbitals &ParaO);	//dD/dX, precondition of cal_gvx
+    void cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm,
+        const UnitCell_pseudo &ucell,
+        const LCAO_Orbitals &orb,
+        Grid_Driver &GridD,
+        const Parallel_Orbitals &ParaO,
+        const K_Vectors &kv);	//dD/dX, precondition of cal_gvx
 
     ///print descriptors based on LCAO basis
     void print_descriptor(const UnitCell_pseudo &ucell);
@@ -276,11 +291,6 @@ private:
 		const int &l,
 		const int& n);
 
-//calculate the gradient of pdm with regard to atomic positions
-//d/dX D_{Inl,mm'}
-
-    void cal_gdmx(const ModuleBase::matrix& dm);	//dD/dX, precondition of cal_gvx
-    void cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm);	//dD/dX, precondition of cal_gvx
 	void del_gdmx(const int nat);
 
 //============================

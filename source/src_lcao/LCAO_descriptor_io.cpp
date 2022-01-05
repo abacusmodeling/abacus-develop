@@ -55,17 +55,16 @@ void LCAO_Descriptor::cal_descriptor_tensor(void)
 }
 
 //calculates gradient of descriptors from gradient of projected density matrices
-void LCAO_Descriptor::cal_gvx(const ModuleBase::matrix &dm, const int nat)
+void LCAO_Descriptor::cal_gvx(const int nat)
 {
     ModuleBase::TITLE("LCAO_Descriptor","cal_gvx");
     //preconditions
     this->cal_gvdm(nat);
-
-    this->cal_gdmx(dm); //checked
     if(!gdmr_vector.empty())
     {
         gdmr_vector.erase(gdmr_vector.begin(),gdmr_vector.end());
     }
+
     //gdmr_vector : nat(derivative) * 3 * inl(projector) * nm * nm
     if(GlobalV::MY_RANK==0)
     {
@@ -130,14 +129,17 @@ void LCAO_Descriptor::cal_gvx(const ModuleBase::matrix &dm, const int nat)
     return;
 }
 
-void LCAO_Descriptor::cal_gvx_k(const std::vector<ModuleBase::ComplexMatrix>& dm, const int nat)
+void LCAO_Descriptor::cal_gvx_k(const int nat)
 {
     ModuleBase::TITLE("LCAO_Descriptor","cal_gvx");
     //preconditions
     this->cal_gvdm(nat);
 
-    this->cal_gdmx_k(dm);
-
+    if(!gdmr_vector.empty())
+    {
+        gdmr_vector.erase(gdmr_vector.begin(),gdmr_vector.end());
+    }
+    
     if(GlobalV::MY_RANK==0)
     {
         //make gdmx as tensor

@@ -84,7 +84,7 @@ void Force_LCAO_gamma::ftable_gamma (
             GlobalC::ORB,
             GlobalC::GridD,
             GlobalC::ParaO);
-    	GlobalC::ld.cal_descriptor(GlobalC::ucell);
+    	GlobalC::ld.cal_descriptor(GlobalC::ucell,GlobalC::ORB);
         GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
         GlobalC::ld.cal_f_delta_new(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],isstress, svnl_dalpha);
 #ifdef __MPI

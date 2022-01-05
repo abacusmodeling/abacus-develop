@@ -62,11 +62,11 @@ void LCAO_Descriptor::allocate_nlm(const int nat)
 {
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {
-        this->nlm_save.resize(GlobalC::ucell.nat);
+        this->nlm_save.resize(nat);
     }
     else
     {
-        this->nlm_save_k.resize(GlobalC::ucell.nat);
+        this->nlm_save_k.resize(nat);
     }
 }
 

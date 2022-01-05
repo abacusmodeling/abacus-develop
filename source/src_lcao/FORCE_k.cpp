@@ -76,7 +76,7 @@ void Force_LCAO_k::ftable_k (
             GlobalC::GridD,
             GlobalC::ParaO,
 			GlobalC::kv);
-    	GlobalC::ld.cal_descriptor(GlobalC::ucell);
+    	GlobalC::ld.cal_descriptor(GlobalC::ucell,GlobalC::ORB);
 		GlobalC::ld.cal_gedm_k(GlobalC::ucell.nat);
 
         GlobalC::ld.cal_f_delta_k(GlobalC::LOC.wfc_dm_2d.dm_k,isstress,svnl_dalpha);

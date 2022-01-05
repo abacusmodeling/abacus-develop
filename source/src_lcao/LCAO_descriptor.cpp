@@ -417,13 +417,13 @@ void LCAO_Descriptor::cal_projected_DM_k(const std::vector<ModuleBase::ComplexMa
 }
 
 //the eigenvalues of pdm are descriptors
-void LCAO_Descriptor::cal_descriptor(const UnitCell_pseudo &ucell)
+void LCAO_Descriptor::cal_descriptor(const UnitCell_pseudo &ucell, const LCAO_Orbitals &orb)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "cal_descriptor");
     delete[] d;
 
     d = new double[this->n_descriptor];
-    const int lmax = GlobalC::ORB.get_lmax_d();
+    const int lmax = orb.get_lmax_d();
     int id = 0;
     for (int it = 0; it < ucell.ntype; it++)
     {
@@ -431,7 +431,7 @@ void LCAO_Descriptor::cal_descriptor(const UnitCell_pseudo &ucell)
         {
             for (int l = 0; l <= lmax; l++)
             {
-                int nmax = GlobalC::ORB.Alpha[0].getNchi(l);
+                int nmax = orb.Alpha[0].getNchi(l);
                 for (int n = 0; n < nmax; n++)
                 {
                     const int dim = 2 * l + 1;
@@ -540,13 +540,17 @@ void LCAO_Descriptor::print_descriptor(const UnitCell_pseudo &ucell)
 
 //this subroutine calculates the gradient of projected density matrices
 //gdmx_m,m = d/dX sum_{mu,nu} rho_{mu,nu} <chi_mu|alpha_m><alpha_m'|chi_nu>
-void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm)
+void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm,
+    const UnitCell_pseudo &ucell,
+    const LCAO_Orbitals &orb,
+    Grid_Driver &GridD,
+    const Parallel_Orbitals &ParaO)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "cal_gdmx");
     //get DS_alpha_mu and S_nu_beta
 
     int size = (2 * lmaxd + 1) * (2 * lmaxd + 1);
-    for (int iat = 0;iat < GlobalC::ucell.nat;iat++)
+    for (int iat = 0;iat < ucell.nat;iat++)
     {
         for (int inl = 0;inl < inlmax;inl++)
         {
@@ -556,45 +560,42 @@ void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm)
         }
     }
 
-    const double Rcut_Alpha = GlobalC::ORB.Alpha[0].getRcut();
+    const double Rcut_Alpha = orb.Alpha[0].getRcut();
 
-    for (int T0 = 0; T0 < GlobalC::ucell.ntype; T0++)
+    for (int T0 = 0; T0 < ucell.ntype; T0++)
     {
-		Atom* atom0 = &GlobalC::ucell.atoms[T0]; 
+		Atom* atom0 = &ucell.atoms[T0]; 
         for (int I0 =0; I0< atom0->na; I0++)
         {
-            const int iat = GlobalC::ucell.itia2iat(T0,I0);//on which alpha is located
+            const int iat = ucell.itia2iat(T0,I0);//on which alpha is located
             const ModuleBase::Vector3<double> tau0 = atom0->tau[I0];
-            GlobalC::GridD.Find_atom(GlobalC::ucell, atom0->tau[I0] ,T0, I0);
+            GridD.Find_atom(ucell, atom0->tau[I0] ,T0, I0);
 
-            for (int ad1=0; ad1<GlobalC::GridD.getAdjacentNum()+1 ; ++ad1)
+            for (int ad1=0; ad1<GridD.getAdjacentNum()+1 ; ++ad1)
             {
-                const int T1 = GlobalC::GridD.getType(ad1);
-                const int I1 = GlobalC::GridD.getNatom(ad1);
-                const int ibt1 = GlobalC::ucell.itia2iat(T1,I1); //on which chi_mu is located
-                const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
+                const int T1 = GridD.getType(ad1);
+                const int I1 = GridD.getNatom(ad1);
+                const int ibt1 = ucell.itia2iat(T1,I1); //on which chi_mu is located
+                const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
                 
-                const ModuleBase::Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau(ad1);
-				const Atom* atom1 = &GlobalC::ucell.atoms[T1];
+                const ModuleBase::Vector3<double> tau1 = GridD.getAdjacentTau(ad1);
+				const Atom* atom1 = &ucell.atoms[T1];
 				const int nw1_tot = atom1->nw*GlobalV::NPOL;
-				const double Rcut_AO1 = GlobalC::ORB.Phi[T1].getRcut();
+				const double Rcut_AO1 = orb.Phi[T1].getRcut(); 
 
-                ModuleBase::Vector3<double> dR1(GlobalC::GridD.getBox(ad1).x, GlobalC::GridD.getBox(ad1).y, GlobalC::GridD.getBox(ad1).z); 
-
-				for (int ad2=0; ad2 < GlobalC::GridD.getAdjacentNum()+1 ; ad2++)
+				for (int ad2=0; ad2 < GridD.getAdjacentNum()+1 ; ad2++)
 				{
-					const int T2 = GlobalC::GridD.getType(ad2);
-					const int I2 = GlobalC::GridD.getNatom(ad2);
-					const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-                    const int ibt2 = GlobalC::ucell.itia2iat(T2,I2);
-					const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad2);
-					const Atom* atom2 = &GlobalC::ucell.atoms[T2];
+					const int T2 = GridD.getType(ad2);
+					const int I2 = GridD.getNatom(ad2);
+					const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+                    const int ibt2 = ucell.itia2iat(T2,I2);
+					const ModuleBase::Vector3<double> tau2 = GridD.getAdjacentTau(ad2);
+					const Atom* atom2 = &ucell.atoms[T2];
 					const int nw2_tot = atom2->nw*GlobalV::NPOL;
-                    ModuleBase::Vector3<double> dR2(GlobalC::GridD.getBox(ad2).x, GlobalC::GridD.getBox(ad2).y, GlobalC::GridD.getBox(ad2).z);
 					
-					const double Rcut_AO2 = GlobalC::ORB.Phi[T2].getRcut();
-                	const double dist1 = (tau1-tau0).norm() * GlobalC::ucell.lat0;
-                	const double dist2 = (tau2-tau0).norm() * GlobalC::ucell.lat0;
+					const double Rcut_AO2 = orb.Phi[T2].getRcut();
+                	const double dist1 = (tau1-tau0).norm() * ucell.lat0;
+                	const double dist2 = (tau2-tau0).norm() * ucell.lat0;
 
 					if (dist1 > Rcut_Alpha + Rcut_AO1
 							|| dist2 > Rcut_Alpha + Rcut_AO2)
@@ -605,13 +606,13 @@ void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm)
 					for (int iw1=0; iw1<nw1_tot; ++iw1)
 					{
 						const int iw1_all = start1 + iw1;
-						const int iw1_local = GlobalC::ParaO.trace_loc_row[iw1_all];
+						const int iw1_local = ParaO.trace_loc_row[iw1_all];
 						if(iw1_local < 0)continue;
 						const int iw1_0 = iw1/GlobalV::NPOL;
 						for (int iw2=0; iw2<nw2_tot; ++iw2)
 						{
 							const int iw2_all = start2 + iw2;
-							const int iw2_local = GlobalC::ParaO.trace_loc_col[iw2_all];
+							const int iw2_local = ParaO.trace_loc_col[iw2_all];
 							if(iw2_local < 0)continue;
 							const int iw2_0 = iw2/GlobalV::NPOL;
                             
@@ -621,9 +622,9 @@ void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm)
                             assert(nlm1.size()==nlm2[0].size());
 
                             int ib=0;
-                            for (int L0 = 0; L0 <= GlobalC::ORB.Alpha[0].getLmax();++L0)
+                            for (int L0 = 0; L0 <= orb.Alpha[0].getLmax();++L0)
                             {
-                                for (int N0 = 0;N0 < GlobalC::ORB.Alpha[0].getNchi(L0);++N0)
+                                for (int N0 = 0;N0 < orb.Alpha[0].getNchi(L0);++N0)
                                 {
                                     const int inl = this->inl_index[T0](I0, L0, N0);
                                     const int nm = 2*L0+1;
@@ -663,7 +664,7 @@ void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm)
     }//T0
 
 #ifdef __MPI
-    for(int iat=0;iat<GlobalC::ucell.nat;iat++)
+    for(int iat=0;iat<ucell.nat;iat++)
     {
         allsum_deepks(this->inlmax,size,this->gdmx[iat]);
         allsum_deepks(this->inlmax,size,this->gdmy[iat]);
@@ -673,13 +674,18 @@ void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm)
     return;
 }
 
-void LCAO_Descriptor::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm)
+void LCAO_Descriptor::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm,
+    const UnitCell_pseudo &ucell,
+    const LCAO_Orbitals &orb,
+    Grid_Driver &GridD,
+    const Parallel_Orbitals &ParaO,
+    const K_Vectors &kv)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "cal_gdmx");
 
     int size = (2 * lmaxd + 1) * (2 * lmaxd + 1);
 
-    for (int iat = 0;iat < GlobalC::ucell.nat;iat++)
+    for (int iat = 0;iat < ucell.nat;iat++)
     {
         for (int inl = 0;inl < inlmax;inl++)
         {
@@ -689,45 +695,45 @@ void LCAO_Descriptor::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& d
         }
     }
 
-    const double Rcut_Alpha = GlobalC::ORB.Alpha[0].getRcut();
+    const double Rcut_Alpha = orb.Alpha[0].getRcut();
 
-    for (int T0 = 0; T0 < GlobalC::ucell.ntype; T0++)
+    for (int T0 = 0; T0 < :ucell.ntype; T0++)
     {
-		Atom* atom0 = &GlobalC::ucell.atoms[T0]; 
+		Atom* atom0 = &ucell.atoms[T0]; 
         for (int I0 =0; I0< atom0->na; I0++)
         {
-            const int iat = GlobalC::ucell.itia2iat(T0,I0);//on which alpha is located
+            const int iat = ucell.itia2iat(T0,I0);//on which alpha is located
             const ModuleBase::Vector3<double> tau0 = atom0->tau[I0];
-            GlobalC::GridD.Find_atom(GlobalC::ucell, atom0->tau[I0] ,T0, I0);
+            GridD.Find_atom(ucell, atom0->tau[I0] ,T0, I0);
 
-            for (int ad1=0; ad1<GlobalC::GridD.getAdjacentNum()+1 ; ++ad1)
+            for (int ad1=0; ad1<GridD.getAdjacentNum()+1 ; ++ad1)
             {
-                const int T1 = GlobalC::GridD.getType(ad1);
-                const int I1 = GlobalC::GridD.getNatom(ad1);
-                const int ibt1 = GlobalC::ucell.itia2iat(T1,I1); //on which chi_mu is located
-                const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
+                const int T1 = GridD.getType(ad1);
+                const int I1 = GridD.getNatom(ad1);
+                const int ibt1 = ucell.itia2iat(T1,I1); //on which chi_mu is located
+                const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
                 
-                const ModuleBase::Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau(ad1);
-				const Atom* atom1 = &GlobalC::ucell.atoms[T1];
+                const ModuleBase::Vector3<double> tau1 = GridD.getAdjacentTau(ad1);
+				const Atom* atom1 = &ucell.atoms[T1];
 				const int nw1_tot = atom1->nw*GlobalV::NPOL;
-				const double Rcut_AO1 = GlobalC::ORB.Phi[T1].getRcut();
+				const double Rcut_AO1 = orb.Phi[T1].getRcut();
 
-                ModuleBase::Vector3<double> dR1(GlobalC::GridD.getBox(ad1).x, GlobalC::GridD.getBox(ad1).y, GlobalC::GridD.getBox(ad1).z); 
+                ModuleBase::Vector3<double> dR1(GridD.getBox(ad1).x, GridD.getBox(ad1).y, GridD.getBox(ad1).z); 
 
-				for (int ad2=0; ad2 < GlobalC::GridD.getAdjacentNum()+1 ; ad2++)
+				for (int ad2=0; ad2 < GridD.getAdjacentNum()+1 ; ad2++)
 				{
-					const int T2 = GlobalC::GridD.getType(ad2);
-					const int I2 = GlobalC::GridD.getNatom(ad2);
-					const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-                    const int ibt2 = GlobalC::ucell.itia2iat(T2,I2);
-					const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad2);
-					const Atom* atom2 = &GlobalC::ucell.atoms[T2];
+					const int T2 = GridD.getType(ad2);
+					const int I2 = GridD.getNatom(ad2);
+					const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+                    const int ibt2 = ucell.itia2iat(T2,I2);
+					const ModuleBase::Vector3<double> tau2 = GridD.getAdjacentTau(ad2);
+					const Atom* atom2 = &ucell.atoms[T2];
 					const int nw2_tot = atom2->nw*GlobalV::NPOL;
-                    ModuleBase::Vector3<double> dR2(GlobalC::GridD.getBox(ad2).x, GlobalC::GridD.getBox(ad2).y, GlobalC::GridD.getBox(ad2).z);
+                    ModuleBase::Vector3<double> dR2(GridD.getBox(ad2).x, GridD.getBox(ad2).y, GridD.getBox(ad2).z);
 					
-					const double Rcut_AO2 = GlobalC::ORB.Phi[T2].getRcut();
-                	const double dist1 = (tau1-tau0).norm() * GlobalC::ucell.lat0;
-                	const double dist2 = (tau2-tau0).norm() * GlobalC::ucell.lat0;
+					const double Rcut_AO2 = orb.Phi[T2].getRcut();
+                	const double dist1 = (tau1-tau0).norm() * ucell.lat0;
+                	const double dist2 = (tau2-tau0).norm() * ucell.lat0;
 
 					if (dist1 > Rcut_Alpha + Rcut_AO1
 							|| dist2 > Rcut_Alpha + Rcut_AO2)
@@ -738,21 +744,21 @@ void LCAO_Descriptor::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& d
 					for (int iw1=0; iw1<nw1_tot; ++iw1)
 					{
 						const int iw1_all = start1 + iw1;
-						const int iw1_local = GlobalC::ParaO.trace_loc_row[iw1_all];
+						const int iw1_local = ParaO.trace_loc_row[iw1_all];
 						if(iw1_local < 0)continue;
 						const int iw1_0 = iw1/GlobalV::NPOL;
 						for (int iw2=0; iw2<nw2_tot; ++iw2)
 						{
 							const int iw2_all = start2 + iw2;
-							const int iw2_local = GlobalC::ParaO.trace_loc_col[iw2_all];
+							const int iw2_local = ParaO.trace_loc_col[iw2_all];
 							if(iw2_local < 0)continue;
 							const int iw2_0 = iw2/GlobalV::NPOL;
 
                             double dm_current;
                             std::complex<double> tmp = 0.0;
-                            for(int ik=0;ik<GlobalC::kv.nks;ik++)
+                            for(int ik=0;ik<kv.nks;ik++)
                             {
-                                const double arg = - ( GlobalC::kv.kvec_d[ik] * (dR1-dR2) ) * ModuleBase::TWO_PI;
+                                const double arg = - ( kv.kvec_d[ik] * (dR1-dR2) ) * ModuleBase::TWO_PI;
                                 const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );
                                 tmp += dm[ik](iw2_local,iw1_local)*kphase;
                             }
@@ -766,9 +772,9 @@ void LCAO_Descriptor::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& d
                             assert(nlm1.size()==nlm2[0].size());
 
                             int ib=0;
-                            for (int L0 = 0; L0 <= GlobalC::ORB.Alpha[0].getLmax();++L0)
+                            for (int L0 = 0; L0 <= orb.Alpha[0].getLmax();++L0)
                             {
-                                for (int N0 = 0;N0 < GlobalC::ORB.Alpha[0].getNchi(L0);++N0)
+                                for (int N0 = 0;N0 < orb.Alpha[0].getNchi(L0);++N0)
                                 {
                                     const int inl = this->inl_index[T0](I0, L0, N0);
                                     const int nm = 2*L0+1;
@@ -808,7 +814,7 @@ void LCAO_Descriptor::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& d
     }//T0
 
 #ifdef __MPI
-    for(int iat=0;iat<GlobalC::ucell.nat;iat++)
+    for(int iat=0;iat<ucell.nat;iat++)
     {
         allsum_deepks(this->inlmax,size,this->gdmx[iat]);
         allsum_deepks(this->inlmax,size,this->gdmy[iat]);

@@ -31,7 +31,7 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
             GlobalC::GridD,
             GlobalC::ParaO,
 			GlobalC::kv);
-    	GlobalC::ld.cal_descriptor(GlobalC::ucell);
+    	GlobalC::ld.cal_descriptor(GlobalC::ucell, GlobalC::ORB);
 		//calculate dE/dD
 		GlobalC::ld.cal_gedm_k(GlobalC::ucell.nat);
 

@@ -205,7 +205,7 @@ void LOOP_ions::opt_ions(void)
                     GlobalC::kv);
             }
 
-            GlobalC::ld.cal_descriptor(GlobalC::ucell);    //final descriptor
+            GlobalC::ld.cal_descriptor(GlobalC::ucell, GlobalC::ORB);    //final descriptor
             GlobalC::ld.print_descriptor(GlobalC::ucell);
             GlobalC::ld.save_npy_d(GlobalC::ucell.nat);            //libnpy needed
             

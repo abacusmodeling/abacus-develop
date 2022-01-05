@@ -114,7 +114,7 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-
             GlobalC::ORB,
             GlobalC::GridD,
             GlobalC::ParaO);
-    	GlobalC::ld.cal_descriptor(GlobalC::ucell);        
+    	GlobalC::ld.cal_descriptor(GlobalC::ucell, GlobalC::ORB);        
 		GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
 		GlobalC::ld.add_v_delta();  
 	}
