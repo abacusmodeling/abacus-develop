@@ -112,5 +112,8 @@ int main(int argc,char **argv)
     //     delete[] gdirect_global;
     //     delete[] gcar_global;
     // }
+#ifdef __MPI
+    finishmpi();
+#endif
     return 0;
 }

@@ -189,5 +189,12 @@ int main(int argc,char **argv)
     delete [] rhor;
     delete[] kvec_d;
     if(rank_in_pool==0) ModuleBase::timer::finish(GlobalV::ofs_running, true);
+    fftw_cleanup();
+#ifdef __MIX_PRECISION
+    fftwf_cleanup();
+#endif
+#ifdef __MPI
+    finishmpi();
+#endif
     return 0;
 }

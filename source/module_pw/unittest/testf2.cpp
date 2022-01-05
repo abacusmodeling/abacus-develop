@@ -174,5 +174,12 @@ int main(int argc,char **argv)
     delete [] rhog;
     delete [] rhor;
     if(tmp!=NULL) delete []tmp; 
+    fftw_cleanup();
+#ifdef __MIX_PRECISION
+    fftwf_cleanup();
+#endif
+#ifdef __MPI
+    finishmpi();
+#endif
     return 0;
 }
