@@ -33,10 +33,10 @@ class LCAO_Matrix
     // thse matrix are used to
     // diagonalize.
     //------------------------------
-    double* Hloc;
-    double* Sloc;
-    double* Hloc_fixed;
-    double* Sdiag; // used in pdiag_double.cpp
+    std::vector<double> Hloc;
+    std::vector<double> Sloc;
+    std::vector<double> Hloc_fixed;
+    std::vector<double> Sdiag; // used in pdiag_double.cpp
 
     //------------------------------
     // 1. Hamiltonian(vl),
@@ -46,10 +46,10 @@ class LCAO_Matrix
     // these matrix are used to
     // diagonalize.
     //------------------------------
-    std::complex<double> *Hloc2;
-    std::complex<double> *Sloc2;
-    std::complex<double> *Hloc_fixed2;
-    std::complex<double> *Sdiag2; // used in pdiag_double.cpp
+    std::vector<std::complex<double>> Hloc2;
+    std::vector<std::complex<double>> Sloc2;
+    std::vector<std::complex<double>> Hloc_fixed2;
+    std::vector<std::complex<double>> Sdiag2; // used in pdiag_double.cpp
     //with soc, zhengdy-soc
 /*	ModuleBase::ComplexMatrix Hloc2_soc;
     ModuleBase::ComplexMatrix Sloc2_soc;

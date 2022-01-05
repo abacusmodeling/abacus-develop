@@ -7,32 +7,10 @@
 
 LCAO_Matrix::LCAO_Matrix()
 {
-    // for gamma_only
-    Sloc = new double[1];
-    Hloc_fixed = new double[1];
-    Hloc = new double[1];
-    Sdiag = new double[1];
-
-    // for many k points
-    Sloc2 = new std::complex<double>[1];
-    Hloc_fixed2 = new std::complex<double>[1];
-    Hloc2 = new std::complex<double>[1];
-    Sdiag2 = new std::complex<double>[1];
 }
 
 LCAO_Matrix::~LCAO_Matrix()
 {
-     // delete matrix for gamma_only.
-    delete[] Sloc;
-    delete[] Hloc_fixed;
-    delete[] Hloc;
-    delete[] Sdiag;
-
-    // delete matrix for many k points
-    delete[] Sloc2;
-    delete[] Hloc_fixed2;
-    delete[] Hloc2;	
-    delete[] Sdiag2;
 }
 
 
@@ -97,20 +75,16 @@ void LCAO_Matrix::allocate_HS_gamma(const long &nloc)
     // because we initilize in the constructor function
     // with dimension '1', so here we reconstruct these
     // matrices
-    delete[] Sloc;
-    delete[] Hloc_fixed;
-    delete[] Hloc;
-    delete[] Sdiag;
 
-    this->Sloc = new double[nloc];
-    this->Hloc_fixed = new double[nloc];
-    this->Hloc = new double[nloc];
-    this->Sdiag = new double[nloc];
+    this->Sloc.resize(nloc);
+    this->Hloc_fixed.resize(nloc);
+    this->Hloc.resize(nloc);
+    this->Sdiag.resize(nloc);
 
-    ModuleBase::GlobalFunc::ZEROS(Sloc,nloc);
-    ModuleBase::GlobalFunc::ZEROS(Hloc_fixed,nloc);
-    ModuleBase::GlobalFunc::ZEROS(Hloc,nloc);
-    ModuleBase::GlobalFunc::ZEROS(Sdiag,nloc); // mohan add 2021-01-30
+    ModuleBase::GlobalFunc::ZEROS(Sloc.data(),nloc);
+    ModuleBase::GlobalFunc::ZEROS(Hloc_fixed.data(),nloc);
+    ModuleBase::GlobalFunc::ZEROS(Hloc.data(),nloc);
+    ModuleBase::GlobalFunc::ZEROS(Sdiag.data(),nloc); // mohan add 2021-01-30
 
     return;
 }
@@ -126,19 +100,14 @@ void LCAO_Matrix::allocate_HS_k(const long &nloc)
     // because we initilize in the constructor function
     // with dimension '1', so here we reconstruct these
     // matrices
-    delete[] Sloc2;
-    delete[] Hloc_fixed2;
-    delete[] Hloc2;
-    delete[] Sdiag2;
+    this->Sloc2.resize(nloc);
+    this->Hloc_fixed2.resize(nloc);
+    this->Hloc2.resize(nloc);
+    this->Sdiag2.resize(nloc);
 
-    this->Sloc2 = new std::complex<double>[nloc];
-    this->Hloc_fixed2 = new std::complex<double>[nloc];
-    this->Hloc2 = new std::complex<double>[nloc];
-    this->Sdiag2 = new std::complex<double>[nloc];
-
-    ModuleBase::GlobalFunc::ZEROS(Sloc2,nloc);
-    ModuleBase::GlobalFunc::ZEROS(Hloc_fixed2,nloc);
-    ModuleBase::GlobalFunc::ZEROS(Hloc2,nloc);
+    ModuleBase::GlobalFunc::ZEROS(Sloc2.data(),nloc);
+    ModuleBase::GlobalFunc::ZEROS(Hloc_fixed2.data(),nloc);
+    ModuleBase::GlobalFunc::ZEROS(Hloc2.data(),nloc);
     
     return;
 }
@@ -389,17 +358,17 @@ void LCAO_Matrix::set_stress
 
 void LCAO_Matrix::zeros_HSgamma(const char &mtype)
 {
-    if (mtype=='S') ModuleBase::GlobalFunc::ZEROS(Sloc,GlobalC::ParaO.nloc);
-    else if (mtype=='T') ModuleBase::GlobalFunc::ZEROS(Hloc_fixed,GlobalC::ParaO.nloc);
-    else if (mtype=='H') ModuleBase::GlobalFunc::ZEROS(Hloc,GlobalC::ParaO.nloc);
+    if (mtype=='S') ModuleBase::GlobalFunc::ZEROS(Sloc.data(),GlobalC::ParaO.nloc);
+    else if (mtype=='T') ModuleBase::GlobalFunc::ZEROS(Hloc_fixed.data(),GlobalC::ParaO.nloc);
+    else if (mtype=='H') ModuleBase::GlobalFunc::ZEROS(Hloc.data(),GlobalC::ParaO.nloc);
     return;
 }
 
 void LCAO_Matrix::zeros_HSk(const char &mtype)
 {
-    if (mtype=='S') ModuleBase::GlobalFunc::ZEROS(Sloc2,GlobalC::ParaO.nloc);
-    else if (mtype=='T') ModuleBase::GlobalFunc::ZEROS(Hloc_fixed2,GlobalC::ParaO.nloc);
-    else if (mtype=='H') ModuleBase::GlobalFunc::ZEROS(Hloc2,GlobalC::ParaO.nloc);
+    if (mtype=='S') ModuleBase::GlobalFunc::ZEROS(Sloc2.data(),GlobalC::ParaO.nloc);
+    else if (mtype=='T') ModuleBase::GlobalFunc::ZEROS(Hloc_fixed2.data(),GlobalC::ParaO.nloc);
+    else if (mtype=='H') ModuleBase::GlobalFunc::ZEROS(Hloc2.data(),GlobalC::ParaO.nloc);
     return;
 }
 
