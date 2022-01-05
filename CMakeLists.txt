@@ -107,6 +107,12 @@ else()
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-write-strings" )
 endif()
 
+if(CMAKE_COMPILER_IS_GNUCXX)
+target_link_libraries(${ABACUS_BIN_NAME}
+  -lgfortran
+)
+endif()
+
 if(DEFINED ENV{MKLROOT} AND NOT DEFINED MKLROOT)
     set(MKLROOT "$ENV{MKLROOT}")
 endif()
@@ -245,11 +251,6 @@ target_link_libraries(${ABACUS_BIN_NAME}
     driver
     -lm
 )
-if(CMAKE_COMPILER_IS_GNUCXX)
-target_link_libraries(${ABACUS_BIN_NAME}
-  -lgfortran
-)
-endif()
 
 install(PROGRAMS ${ABACUS_BIN_PATH}
     TYPE BIN
