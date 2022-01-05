@@ -189,14 +189,24 @@ void LOOP_ions::opt_ions(void)
         {
             if(GlobalV::GAMMA_ONLY_LOCAL)
             {
-                GlobalC::ld.cal_projected_DM(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);  //need dm
+                GlobalC::ld.cal_projected_DM(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],
+                    GlobalC::ucell,
+                    GlobalC::ORB,
+                    GlobalC::GridD,
+                    GlobalC::ParaO);
             }
             else
             {
-                GlobalC::ld.cal_projected_DM_k(GlobalC::LOC.wfc_dm_2d.dm_k);  //need dm
+                GlobalC::ld.cal_projected_DM_k(GlobalC::LOC.wfc_dm_2d.dm_k,
+                    GlobalC::ucell,
+                    GlobalC::ORB,
+                    GlobalC::GridD,
+                    GlobalC::ParaO,
+                    GlobalC::kv);
             }
 
-            GlobalC::ld.cal_descriptor();    //final descriptor
+            GlobalC::ld.cal_descriptor(GlobalC::ucell);    //final descriptor
+            GlobalC::ld.print_descriptor(GlobalC::ucell);
             GlobalC::ld.save_npy_d(GlobalC::ucell.nat);            //libnpy needed
             
             if (GlobalV::deepks_scf)

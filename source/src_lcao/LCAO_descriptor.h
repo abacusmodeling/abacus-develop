@@ -65,11 +65,20 @@ public:
     //S_alpha_mu * DM  * S_nu_beta
     ///calculate projected density matrix:
     ///pdm = sum_i,occ <phi_i|alpha1><alpha2|phi_k>
-    void cal_projected_DM(const ModuleBase::matrix& dm/**< [in] density matrix*/);
-    void cal_projected_DM_k(const std::vector<ModuleBase::ComplexMatrix>& dm);
+    void cal_projected_DM(const ModuleBase::matrix& dm/**< [in] density matrix*/,
+        const UnitCell_pseudo &ucell,
+        const LCAO_Orbitals &orb,
+        Grid_Driver &GridD,
+        const Parallel_Orbitals &ParaO);
+    void cal_projected_DM_k(const std::vector<ModuleBase::ComplexMatrix>& dm,
+        const UnitCell_pseudo &ucell,
+        const LCAO_Orbitals &orb,
+        Grid_Driver &GridD,
+        const Parallel_Orbitals &ParaO,
+        const K_Vectors &kv);
 
     ///EIGENVALUE of pdm in block of I_n_l
-    void cal_descriptor(void);
+    void cal_descriptor(const UnitCell_pseudo &ucell);
 
 //===============================
 //DeePKS Part 2
@@ -109,8 +118,8 @@ public:
 //============================
 
     ///calculate partial of energy correction to descriptors
-    void cal_gedm(const ModuleBase::matrix& dm/**< [in] density matrix*/, const int nat);	//need to load model in this step
-    void cal_gedm_k(const std::vector<ModuleBase::ComplexMatrix>& dm, const int nat);	//need to load model in this step
+    void cal_gedm(const int nat);
+    void cal_gedm_k(const int nat);
 
     ///calculates gradient of descriptors w.r.t atomic positions
     ///----------------------------------------------------
@@ -125,13 +134,13 @@ public:
     void cal_gvx_k(const std::vector<ModuleBase::ComplexMatrix>& dm, const int nat);
 
     ///print descriptors based on LCAO basis
-    void print_descriptor(void);
+    void print_descriptor(const UnitCell_pseudo &ucell);
     
     ///print the \f$H_\delta\f$ matrix in LCAO basis
     void print_H_V_delta(void);
     
     ///print the force related to\f$V_\delta\f$ for each atom
-    void print_F_delta(const std::string &fname/**< [in] the name of output file*/);
+    void print_F_delta(const std::string &fname/**< [in] the name of output file*/, const UnitCell_pseudo &ucell);
 
 	///----------------------------------------------------------------------
 	///The following 4 functions save the `[dm_eig], [e_base], [f_base], [grad_vx]`
@@ -256,7 +265,7 @@ private:
 // data structure that saves <psi|alpha>
     void allocate_nlm(const int nat);
 // array for storing gdmx, used for calculating gvx
-	void init_gdmx(void);
+	void init_gdmx(const int nat);
 
 //for checking purpose, print the projected density matrices
     void print_projected_DM(
@@ -272,7 +281,7 @@ private:
 
     void cal_gdmx(const ModuleBase::matrix& dm);	//dD/dX, precondition of cal_gvx
     void cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm);	//dD/dX, precondition of cal_gvx
-	void del_gdmx(void);
+	void del_gdmx(const int nat);
 
 //============================
 //DeePKS Part 3

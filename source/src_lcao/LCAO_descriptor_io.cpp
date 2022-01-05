@@ -215,13 +215,11 @@ void LCAO_Descriptor::load_model(const string& model_file)
 }
 
 //obtain from the machine learning model dE_delta/dDescriptor
-void LCAO_Descriptor::cal_gedm(const ModuleBase::matrix &dm, const int nat)
+void LCAO_Descriptor::cal_gedm(const int nat)
 {
     //using this->pdm_tensor
     ModuleBase::TITLE("LCAO_Descriptor", "cal_gedm");
     //-----prepare for autograd---------
-    this->cal_projected_DM(dm);
-    this->cal_descriptor();
     this->cal_descriptor_tensor();  //use torch::linalg::eigh
     //-----prepared-----------------------
     //forward
@@ -254,13 +252,11 @@ void LCAO_Descriptor::cal_gedm(const ModuleBase::matrix &dm, const int nat)
     return;
 }
 
-void LCAO_Descriptor::cal_gedm_k(const std::vector<ModuleBase::ComplexMatrix>& dm, const int nat)
+void LCAO_Descriptor::cal_gedm_k(const int nat)
 {
     //using this->pdm_tensor
     ModuleBase::TITLE("LCAO_Descriptor", "cal_gedm");
     //-----prepare for autograd---------
-    this->cal_projected_DM_k(dm);
-    this->cal_descriptor();
     this->cal_descriptor_tensor();  //use torch::linalg::eigh
     //-----prepared-----------------------
     //forward
@@ -376,7 +372,7 @@ void LCAO_Descriptor::print_H_V_delta(void)
 }
 
 
-void LCAO_Descriptor::print_F_delta(const string& fname)
+void LCAO_Descriptor::print_F_delta(const string& fname, const UnitCell_pseudo &ucell)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "print_F_delta");
 
@@ -393,12 +389,12 @@ void LCAO_Descriptor::print_F_delta(const string& fname)
     ofs << "F_delta(Hatree/Bohr) from deepks model: " << std::endl;
     ofs << std::setw(12) << "type" << std::setw(12) << "atom" << std::setw(15) << "dF_x" << std::setw(15) << "dF_y" << std::setw(15) << "dF_z" << std::endl;
 
-    for (int it = 0;it < GlobalC::ucell.ntype;++it)
+    for (int it = 0;it < ucell.ntype;++it)
     {
-        for (int ia = 0;ia < GlobalC::ucell.atoms[it].na;++ia)
+        for (int ia = 0;ia < ucell.atoms[it].na;++ia)
         {
-            int iat = GlobalC::ucell.itia2iat(it, ia);
-            ofs << std::setw(12) << GlobalC::ucell.atoms[it].label << std::setw(12) << ia
+            int iat = ucell.itia2iat(it, ia);
+            ofs << std::setw(12) << ucell.atoms[it].label << std::setw(12) << ia
                 << std::setw(15) << this->F_delta(iat, 0) / 2 << std::setw(15) << this->F_delta(iat, 1) / 2
                 << std::setw(15) << this->F_delta(iat, 2) / 2 << std::endl;
         }
@@ -407,12 +403,12 @@ void LCAO_Descriptor::print_F_delta(const string& fname)
     ofs << "F_delta(eV/Angstrom) from deepks model: " << std::endl;
     ofs << std::setw(12) << "type" << std::setw(12) << "atom" << std::setw(15) << "dF_x" << std::setw(15) << "dF_y" << std::setw(15) << "dF_z" << std::endl;
 
-    for (int it = 0;it < GlobalC::ucell.ntype;++it)
+    for (int it = 0;it < ucell.ntype;++it)
     {
-        for (int ia = 0;ia < GlobalC::ucell.atoms[it].na;++ia)
+        for (int ia = 0;ia < ucell.atoms[it].na;++ia)
         {
-            int iat = GlobalC::ucell.itia2iat(it, ia);
-            ofs << std::setw(12) << GlobalC::ucell.atoms[it].label << std::setw(12)
+            int iat = ucell.itia2iat(it, ia);
+            ofs << std::setw(12) << ucell.atoms[it].label << std::setw(12)
                 << ia << std::setw(15) << this->F_delta(iat, 0) * ModuleBase::Ry_to_eV/ModuleBase::BOHR_TO_A
                 << std::setw(15) << this->F_delta(iat, 1) * ModuleBase::Ry_to_eV/ModuleBase::BOHR_TO_A
                 << std::setw(15) << this->F_delta(iat, 2) * ModuleBase::Ry_to_eV/ModuleBase::BOHR_TO_A << std::endl;
