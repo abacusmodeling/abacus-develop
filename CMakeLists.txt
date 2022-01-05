@@ -114,7 +114,7 @@ if(MKLROOT)
   find_package(IntelMKL REQUIRED)
   add_definitions(-D__MKL -DMKL_ILP64)
   include_directories(${MKL_INCLUDE_DIRS} ${MKL_INCLUDE_DIRS}/fftw)
-  
+
   # Since libtorch will find its own MKL, the fftw part conflicts with the original one.
   # When enable deepks, mkl will be linked within ${TORCH_LIBRARIES}.
   if(ENABLE_DEEPKS)
@@ -191,6 +191,39 @@ add_compile_definitions(
   TEST_EXX_RADIAL=1
 )
 
+IF (BUILD_TESTING)
+  include(CTest)
+  enable_testing()
+  find_package(Threads)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+  include(FetchContent)
+  FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com.cnpmjs.org/google/googletest.git
+    GIT_TAG "origin/main"
+  )
+  FetchContent_MakeAvailable(googletest)
+  # TODO: Find GoogleTest Locally
+
+  add_subdirectory(tests) # Contains integration tests
+
+endif()
+function(AddTest)
+  cmake_parse_arguments(UT "DYN" "TARGET" "LIBS;DYN_LIBS;STATIC_LIBS;SOURCES;DEPENDS" ${ARGN})
+  add_executable(${UT_TARGET} ${UT_SOURCES})
+  #dependencies & link library
+  get_target_property(ABACUS_LINK_LIBRARIES ${ABACUS_BIN_NAME} LINK_LIBRARIES)
+  target_link_libraries(${UT_TARGET} ${UT_LIBS} ${ABACUS_LINK_LIBRARIES}
+    base cell symmetry md symmetry
+    neighbor orb io ions lcao parallel mrrr pdiag pw ri driver
+    pthread gtest_main)
+  install(TARGETS ${UT_TARGET} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/../../../tests )
+  add_test(NAME ${UT_TARGET}
+    COMMAND ${UT_TARGET}
+    WORKING_DIRECTORY $<TARGET_FILE_DIR:${UT_TARGET}>
+  )
+endfunction(AddTest)
+
 add_subdirectory(source)
 
 target_link_libraries(${ABACUS_BIN_NAME}
@@ -222,9 +255,3 @@ install(PROGRAMS ${ABACUS_BIN_PATH}
     TYPE BIN
     #DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
-
-include(CTest)
-enable_testing()
-IF (BUILD_TESTING)
-  add_subdirectory(tests)
-endif()
