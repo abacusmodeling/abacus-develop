@@ -1,7 +1,7 @@
 #include "LCAO_matrix.h"
 #include "global_fp.h"
 #ifdef __DEEPKS
-#include "LCAO_descriptor.h"
+#include "../module_deepks/LCAO_descriptor.h"
 #endif
 
 LCAO_Matrix::LCAO_Matrix()
@@ -91,6 +91,17 @@ void LCAO_Matrix::divide_HS_in_frag(const bool isGamma, Parallel_Orbitals &po)
             GlobalC::ucell.nat,
             GlobalC::ucell.ntype,
             na);
+        if(GlobalV::deepks_scf)
+        {
+            if(isGamma)
+            {
+                GlobalC::ld.allocate_V_delta(GlobalC::ucell.nat,GlobalC::ParaO.nloc);
+            }
+            else
+            {
+                GlobalC::ld.allocate_V_delta(GlobalC::ucell.nat,GlobalC::ParaO.nloc,GlobalC::kv.nks);
+            }
+        }
 	}
 #endif
 	return;

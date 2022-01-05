@@ -12,11 +12,11 @@
 #include "torch/csrc/autograd/autograd.h"
 #include "torch/csrc/api/include/torch/linalg.h"
 
-#include "LCAO_matrix.h"
+#include "../src_lcao/LCAO_matrix.h"
 #include "../module_base/lapack_connector.h"
 #include "../module_base/intarray.h"
 #include "../module_base/complexmatrix.h"
-#include "global_fp.h"
+#include "../src_lcao/global_fp.h"
 #include "../src_pw/global.h"
 #include "../src_io/winput.h"
 
@@ -91,25 +91,51 @@ public:
 
     /// 1. Initialize the deltaV Hamiltonian matrix 
     /// 2. If FORCE, initialize the matrces for force
-    void allocate_V_delta(const int nat);
+    void allocate_V_delta(const int nat,const int nloc, const int nks=1);
     void allocate_V_deltaR(const int nnr);
 
     ///add dV to the Hamiltonian matrix
-    void add_v_delta(void);
-    void add_v_delta_k(void);
+    void add_v_delta(const UnitCell_pseudo &ucell,
+        const LCAO_Orbitals &orb,
+        Grid_Driver &GridD,
+        const Parallel_Orbitals &ParaO);
+    void add_v_delta_k(const UnitCell_pseudo &ucell,
+        const LCAO_Orbitals &orb,
+        Grid_Driver &GridD,
+        const Parallel_Orbitals &ParaO,
+        const int nnr_in);
     
     //calculates sum_(L0,M0) alpha<psi_i|alpha><alpha|psi_j>
-    void build_v_delta_alpha_new(const bool& cal_deri/**< [in] 0 for 3-center intergration, 1 for its derivation*/);
+    void build_v_delta_alpha_new(const bool& cal_deri/**< [in] 0 for 3-center intergration, 1 for its derivation*/,
+        const UnitCell_pseudo &ucell,
+        const LCAO_Orbitals &orb,
+        Grid_Driver &GridD,
+        const Parallel_Orbitals &ParaO,
+        const ORB_gen_tables &UOT);
 
     //for gamma only, pulay and HF terms of force are calculated together
-    void cal_f_delta_new(const ModuleBase::matrix& dm/**< [in] density matrix*/, const bool isstress, ModuleBase::matrix& svnl_dalpha);
+    void cal_f_delta_new(const ModuleBase::matrix& dm/**< [in] density matrix*/,
+        const UnitCell_pseudo &ucell,
+        const LCAO_Orbitals &orb,
+        Grid_Driver &GridD,
+        const Parallel_Orbitals &ParaO,
+        const bool isstress, ModuleBase::matrix& svnl_dalpha);
 
     //for multi-k, pulay and HF terms of force are calculated together
-    void cal_f_delta_k(const std::vector<ModuleBase::ComplexMatrix>& dm/**<[in] density matrix*/, const bool isstress, ModuleBase::matrix& svnl_dalpha);
+    void cal_f_delta_k(const std::vector<ModuleBase::ComplexMatrix>& dm/**<[in] density matrix*/,
+        const UnitCell_pseudo &ucell,
+        const LCAO_Orbitals &orb,
+        Grid_Driver &GridD,
+        const Parallel_Orbitals &ParaO,
+        const K_Vectors &kv,
+        const bool isstress, ModuleBase::matrix& svnl_dalpha);
 
     ///calculate tr(\rho V_delta)
-    void cal_e_delta_band(const std::vector<ModuleBase::matrix>& dm/**<[in] density matrix*/);
-    void cal_e_delta_band_k(const std::vector<ModuleBase::ComplexMatrix>& dm/**<[in] density matrix*/);
+    void cal_e_delta_band(const std::vector<ModuleBase::matrix>& dm/**<[in] density matrix*/,
+        const Parallel_Orbitals &ParaO);
+    void cal_e_delta_band_k(const std::vector<ModuleBase::ComplexMatrix>& dm/**<[in] density matrix*/,
+        const Parallel_Orbitals &ParaO,
+        const int nks);
 
 //============================
 //DeePKS Part 3

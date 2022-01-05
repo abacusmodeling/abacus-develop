@@ -4,7 +4,7 @@
 #include <map>
 
 #ifdef __DEEPKS
-#include "LCAO_descriptor.h"
+#include "../module_deepks/LCAO_descriptor.h"
 #endif
 
 Force_LCAO_k::Force_LCAO_k ()
@@ -79,7 +79,13 @@ void Force_LCAO_k::ftable_k (
     	GlobalC::ld.cal_descriptor(GlobalC::ucell,GlobalC::ORB);
 		GlobalC::ld.cal_gedm_k(GlobalC::ucell.nat);
 
-        GlobalC::ld.cal_f_delta_k(GlobalC::LOC.wfc_dm_2d.dm_k,isstress,svnl_dalpha);
+        GlobalC::ld.cal_f_delta_k(GlobalC::LOC.wfc_dm_2d.dm_k,
+			GlobalC::ucell,
+            GlobalC::ORB,
+            GlobalC::GridD,
+            GlobalC::ParaO,
+			GlobalC::kv,
+			isstress,svnl_dalpha);
 #ifdef __MPI
         Parallel_Reduce::reduce_double_all(GlobalC::ld.F_delta.c,GlobalC::ld.F_delta.nr*GlobalC::ld.F_delta.nc);
 		if(isstress)

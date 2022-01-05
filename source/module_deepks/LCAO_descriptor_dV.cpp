@@ -1,7 +1,6 @@
 //wenfei add 2021 october
 #ifdef __DEEPKS
 
-#include "LCAO_nnr.h"
 #include "LCAO_descriptor.h"
 
 //===============================
@@ -13,7 +12,7 @@
 //===============================
 
 
-void LCAO_Descriptor::allocate_V_delta(const int nat)
+void LCAO_Descriptor::allocate_V_delta(const int nat, const int nloc, const int nks)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "allocate_V_delta");
 
@@ -21,16 +20,16 @@ void LCAO_Descriptor::allocate_V_delta(const int nat)
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {
         delete[] this->H_V_delta;
-        this->H_V_delta = new double[GlobalC::ParaO.nloc];
-        ModuleBase::GlobalFunc::ZEROS(this->H_V_delta, GlobalC::ParaO.nloc);
+        this->H_V_delta = new double[nloc];
+        ModuleBase::GlobalFunc::ZEROS(this->H_V_delta, nloc);
     }
     else
     {
-        H_V_delta_k = new std::complex<double>* [GlobalC::kv.nks];
-        for(int ik=0;ik<GlobalC::kv.nks;ik++)
+        H_V_delta_k = new std::complex<double>* [nks];
+        for(int ik=0;ik<nks;ik++)
         {
-            this->H_V_delta_k[ik] = new std::complex<double>[GlobalC::ParaO.nloc];
-            ModuleBase::GlobalFunc::ZEROS(this->H_V_delta_k[ik], GlobalC::ParaO.nloc);
+            this->H_V_delta_k[ik] = new std::complex<double>[nloc];
+            ModuleBase::GlobalFunc::ZEROS(this->H_V_delta_k[ik], nloc);
         }
     }
 
@@ -46,6 +45,7 @@ void LCAO_Descriptor::allocate_V_delta(const int nat)
     {
         //init F_delta
         F_delta.create(nat, 3);
+        this->init_gdmx(nat);
     }
 
     return;
@@ -72,45 +72,48 @@ void LCAO_Descriptor::allocate_nlm(const int nat)
 
 //this subroutine adds dV to the Kohn-Sham Hamiltonian
 //for gamma_only calculations
-void LCAO_Descriptor::add_v_delta(void)
+void LCAO_Descriptor::add_v_delta(const UnitCell_pseudo &ucell,
+    const LCAO_Orbitals &orb,
+    Grid_Driver &GridD,
+    const Parallel_Orbitals &ParaO)
 {
     ModuleBase::TITLE("LCAO_DESCRIPTOR", "add_v_delta");
     ModuleBase::timer::tick ("LCAO_gen_fixedH","add_v_delta");
-    ModuleBase::GlobalFunc::ZEROS(this->H_V_delta,GlobalC::ParaO.nloc); //init before calculate
+    ModuleBase::GlobalFunc::ZEROS(this->H_V_delta,ParaO.nloc); //init before calculate
 
-    const double Rcut_Alpha = GlobalC::ORB.Alpha[0].getRcut();
+    const double Rcut_Alpha = orb.Alpha[0].getRcut();
 
-    for (int T0 = 0; T0 < GlobalC::ucell.ntype; T0++)
+    for (int T0 = 0; T0 < ucell.ntype; T0++)
     {
-		Atom* atom0 = &GlobalC::ucell.atoms[T0]; 
+		Atom* atom0 = &ucell.atoms[T0]; 
         for (int I0 =0; I0< atom0->na; I0++)
         {
-            const int iat = GlobalC::ucell.itia2iat(T0,I0);
+            const int iat = ucell.itia2iat(T0,I0);
             const ModuleBase::Vector3<double> tau0 = atom0->tau[I0];
-            GlobalC::GridD.Find_atom(GlobalC::ucell, atom0->tau[I0] ,T0, I0);
+            GridD.Find_atom(ucell, atom0->tau[I0] ,T0, I0);
 
-            for (int ad1=0; ad1<GlobalC::GridD.getAdjacentNum()+1 ; ++ad1)
+            for (int ad1=0; ad1<GridD.getAdjacentNum()+1 ; ++ad1)
             {
-                const int T1 = GlobalC::GridD.getType(ad1);
-                const int I1 = GlobalC::GridD.getNatom(ad1);
-                const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
-                const ModuleBase::Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau(ad1);
-				const Atom* atom1 = &GlobalC::ucell.atoms[T1];
+                const int T1 = GridD.getType(ad1);
+                const int I1 = GridD.getNatom(ad1);
+                const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
+                const ModuleBase::Vector3<double> tau1 = GridD.getAdjacentTau(ad1);
+				const Atom* atom1 = &ucell.atoms[T1];
 				const int nw1_tot = atom1->nw*GlobalV::NPOL;
-				const double Rcut_AO1 = GlobalC::ORB.Phi[T1].getRcut(); 
+				const double Rcut_AO1 = orb.Phi[T1].getRcut(); 
 
-				for (int ad2=0; ad2 < GlobalC::GridD.getAdjacentNum()+1 ; ad2++)
+				for (int ad2=0; ad2 < GridD.getAdjacentNum()+1 ; ad2++)
 				{
-					const int T2 = GlobalC::GridD.getType(ad2);
-					const int I2 = GlobalC::GridD.getNatom(ad2);
-					const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-					const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad2);
-					const Atom* atom2 = &GlobalC::ucell.atoms[T2];
+					const int T2 = GridD.getType(ad2);
+					const int I2 = GridD.getNatom(ad2);
+					const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+					const ModuleBase::Vector3<double> tau2 = GridD.getAdjacentTau(ad2);
+					const Atom* atom2 = &ucell.atoms[T2];
 					const int nw2_tot = atom2->nw*GlobalV::NPOL;
 					
-					const double Rcut_AO2 = GlobalC::ORB.Phi[T2].getRcut();
-                	const double dist1 = (tau1-tau0).norm() * GlobalC::ucell.lat0;
-                	const double dist2 = (tau2-tau0).norm() * GlobalC::ucell.lat0;
+					const double Rcut_AO2 = orb.Phi[T2].getRcut();
+                	const double dist1 = (tau1-tau0).norm() * ucell.lat0;
+                	const double dist2 = (tau2-tau0).norm() * ucell.lat0;
 
 					if (dist1 > Rcut_Alpha + Rcut_AO1
 							|| dist2 > Rcut_Alpha + Rcut_AO2)
@@ -121,13 +124,13 @@ void LCAO_Descriptor::add_v_delta(void)
 					for (int iw1=0; iw1<nw1_tot; ++iw1)
 					{
 						const int iw1_all = start1 + iw1;
-						const int iw1_local = GlobalC::ParaO.trace_loc_row[iw1_all];
+						const int iw1_local = ParaO.trace_loc_row[iw1_all];
 						if(iw1_local < 0)continue;
 						const int iw1_0 = iw1/GlobalV::NPOL;
 						for (int iw2=0; iw2<nw2_tot; ++iw2)
 						{
 							const int iw2_all = start2 + iw2;
-							const int iw2_local = GlobalC::ParaO.trace_loc_col[iw2_all];
+							const int iw2_local = ParaO.trace_loc_col[iw2_all];
 							if(iw2_local < 0)continue;
 							const int iw2_0 = iw2/GlobalV::NPOL;
 
@@ -137,9 +140,9 @@ void LCAO_Descriptor::add_v_delta(void)
 
                             assert(nlm1.size()==nlm2.size());
                             int ib=0;
-                            for (int L0 = 0; L0 <= GlobalC::ORB.Alpha[0].getLmax();++L0)
+                            for (int L0 = 0; L0 <= orb.Alpha[0].getLmax();++L0)
                             {
-                                for (int N0 = 0;N0 < GlobalC::ORB.Alpha[0].getNchi(L0);++N0)
+                                for (int N0 = 0;N0 < orb.Alpha[0].getNchi(L0);++N0)
                                 {
                                     const int inl = this->inl_index[T0](I0, L0, N0);
                                     const int nm = 2*L0+1;
@@ -160,14 +163,13 @@ void LCAO_Descriptor::add_v_delta(void)
 
                             if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                             {
-                                iic=iw1_local+iw2_local*GlobalC::ParaO.nrow;
+                                iic=iw1_local+iw2_local*ParaO.nrow;
                             }
                             else
                             {
-                                iic=iw1_local*GlobalC::ParaO.ncol+iw2_local;
+                                iic=iw1_local*ParaO.ncol+iw2_local;
                             }
                             this->H_V_delta[iic] += nlm;
-                            GlobalC::LM.Hloc[iic] += nlm;
 						}//iw2
 					}//iw1
 				}//ad2
@@ -181,13 +183,17 @@ void LCAO_Descriptor::add_v_delta(void)
 
 //this subroutine calculates H_V_deltaR
 //used in multi-k calculations
-void LCAO_Descriptor::add_v_delta_k(void)
+void LCAO_Descriptor::add_v_delta_k(const UnitCell_pseudo &ucell,
+    const LCAO_Orbitals &orb,
+    Grid_Driver &GridD,
+    const Parallel_Orbitals &ParaO,
+    const int nnr_in)
 {
     ModuleBase::TITLE("LCAO_DESCRIPTOR", "add_v_delta_k");
     ModuleBase::timer::tick ("LCAO_DESCRIPTOR","add_v_delta_k");
-    ModuleBase::GlobalFunc::ZEROS(this->H_V_deltaR, GlobalC::LNNR.nnr);
+    ModuleBase::GlobalFunc::ZEROS(this->H_V_deltaR, nnr_in);
 
-    const double Rcut_Alpha = GlobalC::ORB.Alpha[0].getRcut();
+    const double Rcut_Alpha = orb.Alpha[0].getRcut();
 
 	int nnr = 0;
 	ModuleBase::Vector3<double> tau1, tau2, dtau;
@@ -201,61 +207,61 @@ void LCAO_Descriptor::add_v_delta_k(void)
 	//	RA.for_2d();
 
 	// psi1
-	for (int T1 = 0; T1 < GlobalC::ucell.ntype; ++T1)
+	for (int T1 = 0; T1 < ucell.ntype; ++T1)
 	{
-		const Atom* atom1 = &GlobalC::ucell.atoms[T1];
+		const Atom* atom1 = &ucell.atoms[T1];
 		for (int I1 =0; I1< atom1->na; ++I1)
 		{
 
-			GlobalC::GridD.Find_atom(GlobalC::ucell, atom1->tau[I1] ,T1, I1);
-			const int iat1 = GlobalC::ucell.itia2iat(T1, I1);
-			const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
+			GridD.Find_atom(ucell, atom1->tau[I1] ,T1, I1);
+			const int iat1 = ucell.itia2iat(T1, I1);
+			const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
 			tau1 = atom1->tau[I1];
 
 			// psi2
-			for (int ad2=0; ad2<GlobalC::GridD.getAdjacentNum()+1; ++ad2)
+			for (int ad2=0; ad2<GridD.getAdjacentNum()+1; ++ad2)
 			{
-				const int T2 = GlobalC::GridD.getType(ad2);
-				const Atom* atom2 = &GlobalC::ucell.atoms[T2];
+				const int T2 = GridD.getType(ad2);
+				const Atom* atom2 = &ucell.atoms[T2];
 				
-				const int I2 = GlobalC::GridD.getNatom(ad2);
-				const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
-				const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-				tau2 = GlobalC::GridD.getAdjacentTau(ad2);
+				const int I2 = GridD.getNatom(ad2);
+				const int iat2 = ucell.itia2iat(T2, I2);
+				const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+				tau2 = GridD.getAdjacentTau(ad2);
 
 				bool is_adj = false;
 
-				const int rx2=GlobalC::GridD.getBox(ad2).x;
-				const int ry2=GlobalC::GridD.getBox(ad2).y;
-				const int rz2=GlobalC::GridD.getBox(ad2).z;
+				const int rx2=GridD.getBox(ad2).x;
+				const int ry2=GridD.getBox(ad2).y;
+				const int rz2=GridD.getBox(ad2).z;
 
 					
 				dtau = tau2 - tau1;
-				distance = dtau.norm2() * pow(GlobalC::ucell.lat0,2);
+				distance = dtau.norm2() * pow(ucell.lat0,2);
 				// this rcut is in order to make nnr consistent 
 				// with other matrix.
-				rcut = pow(GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut(),2);
+				rcut = pow(orb.Phi[T1].getRcut() + orb.Phi[T2].getRcut(),2);
 				if(distance < rcut) is_adj = true;
 				else if(distance >= rcut)
 				{
-					for (int ad0 = 0; ad0 < GlobalC::GridD.getAdjacentNum()+1; ++ad0)
+					for (int ad0 = 0; ad0 < GridD.getAdjacentNum()+1; ++ad0)
 					{
-						const int T0 = GlobalC::GridD.getType(ad0);
-						//const int I0 = GlobalC::GridD.getNatom(ad0);
+						const int T0 = GridD.getType(ad0);
+						//const int I0 = GridD.getNatom(ad0);
 						//const int T0 = RA.info[iat1][ad0][3];
 						//const int I0 = RA.info[iat1][ad0][4];
-						//const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
-						//const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
+						//const int iat0 = ucell.itia2iat(T0, I0);
+						//const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
 
-						tau0 = GlobalC::GridD.getAdjacentTau(ad0);
+						tau0 = GridD.getAdjacentTau(ad0);
 						dtau1 = tau0 - tau1;
 						dtau2 = tau0 - tau2;
 
-						const double distance1 = dtau1.norm2() * pow(GlobalC::ucell.lat0,2);
-						const double distance2 = dtau2.norm2() * pow(GlobalC::ucell.lat0,2);
+						const double distance1 = dtau1.norm2() * pow(ucell.lat0,2);
+						const double distance2 = dtau2.norm2() * pow(ucell.lat0,2);
 
-						rcut1 = pow(GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max(),2);
-						rcut2 = pow(GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ucell.infoNL.Beta[T0].get_rcut_max(),2);
+						rcut1 = pow(orb.Phi[T1].getRcut() + ucell.infoNL.Beta[T0].get_rcut_max(),2);
+						rcut2 = pow(orb.Phi[T2].getRcut() + ucell.infoNL.Beta[T0].get_rcut_max(),2);
 
 						if( distance1 < rcut1 && distance2 < rcut2 )
 						{
@@ -270,36 +276,36 @@ void LCAO_Descriptor::add_v_delta_k(void)
 				{
 					// < psi1 | all projectors | psi2 >
 					// ----------------------------- enter the nnr increaing zone -------------------------
-					for (int ad0=0; ad0 < GlobalC::GridD.getAdjacentNum()+1 ; ++ad0)
+					for (int ad0=0; ad0 < GridD.getAdjacentNum()+1 ; ++ad0)
 					{
-						const int T0 = GlobalC::GridD.getType(ad0);
-						const int I0 = GlobalC::GridD.getNatom(ad0);
-						const int iat = GlobalC::ucell.itia2iat(T0,I0);
+						const int T0 = GridD.getType(ad0);
+						const int I0 = GridD.getNatom(ad0);
+						const int iat = ucell.itia2iat(T0,I0);
 
 						// mohan add 2010-12-19
-						if( GlobalC::ucell.infoNL.nproj[T0] == 0) continue;
+						if( ucell.infoNL.nproj[T0] == 0) continue;
 
-						//const int I0 = GlobalC::GridD.getNatom(ad0);
-						//const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
-						tau0 = GlobalC::GridD.getAdjacentTau(ad0);
+						//const int I0 = GridD.getNatom(ad0);
+						//const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+						tau0 = GridD.getAdjacentTau(ad0);
 
 						dtau1 = tau0 - tau1;
 						dtau2 = tau0 - tau2;
-						const double distance1 = dtau1.norm2() * pow(GlobalC::ucell.lat0,2);
-						const double distance2 = dtau2.norm2() * pow(GlobalC::ucell.lat0,2);
+						const double distance1 = dtau1.norm2() * pow(ucell.lat0,2);
+						const double distance2 = dtau2.norm2() * pow(ucell.lat0,2);
 
 						// seems a bug here!! mohan 2011-06-17
-						rcut1 = pow(GlobalC::ORB.Phi[T1].getRcut() + Rcut_Alpha,2);
-						rcut2 = pow(GlobalC::ORB.Phi[T2].getRcut() + Rcut_Alpha,2);
+						rcut1 = pow(orb.Phi[T1].getRcut() + Rcut_Alpha,2);
+						rcut2 = pow(orb.Phi[T2].getRcut() + Rcut_Alpha,2);
 
 						if(distance1 >= rcut1 || distance2 >= rcut2)
 						{
 							continue;
 						}
-						//const Atom* atom0 = &GlobalC::ucell.atoms[T0];
-						const int rx0=GlobalC::GridD.getBox(ad0).x;
-						const int ry0=GlobalC::GridD.getBox(ad0).y;
-						const int rz0=GlobalC::GridD.getBox(ad0).z;
+						//const Atom* atom0 = &ucell.atoms[T0];
+						const int rx0=GridD.getBox(ad0).x;
+						const int ry0=GridD.getBox(ad0).y;
+						const int rz0=GridD.getBox(ad0).z;
 						key_tuple key_1(iat1,-rx0,-ry0,-rz0);
 						key_tuple key_2(iat2,rx2-rx0,ry2-ry0,rz2-rz0);
 
@@ -308,7 +314,7 @@ void LCAO_Descriptor::add_v_delta_k(void)
 						for (int iw1=0; iw1<atom1->nw*GlobalV::NPOL; iw1++)
 						{
 							const int iw1_all = start1 + iw1;
-							const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
+							const int mu = ParaO.trace_loc_row[iw1_all];
 							if(mu < 0)continue; 
 
 							// fix a serious bug: atom2[T2] -> atom2
@@ -316,7 +322,7 @@ void LCAO_Descriptor::add_v_delta_k(void)
 							for (int iw2=0; iw2<atom2->nw*GlobalV::NPOL; iw2++)
 							{
 								const int iw2_all = start2 + iw2;
-								const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];						
+								const int nu = ParaO.trace_loc_col[iw2_all];						
 								if(nu < 0)continue;
   
                                 std::vector<double> nlm1 = this->nlm_save_k[iat][key_1][iw1_all][0];
@@ -325,9 +331,9 @@ void LCAO_Descriptor::add_v_delta_k(void)
 
                                 int ib=0;
                                 double nlm = 0.0;
-                                for (int L0 = 0; L0 <= GlobalC::ORB.Alpha[0].getLmax();++L0)
+                                for (int L0 = 0; L0 <= orb.Alpha[0].getLmax();++L0)
                                 {
-                                    for (int N0 = 0;N0 < GlobalC::ORB.Alpha[0].getNchi(L0);++N0)
+                                    for (int N0 = 0;N0 < orb.Alpha[0].getNchi(L0);++N0)
                                     {
                                         const int inl = this->inl_index[T0](I0, L0, N0);
                                         const int nm = 2*L0+1;
@@ -354,7 +360,7 @@ void LCAO_Descriptor::add_v_delta_k(void)
 					{
 						const int j0 = j/GlobalV::NPOL;//added by zhengdy-soc
 						const int iw1_all = start1 + j;
-						const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
+						const int mu = ParaO.trace_loc_row[iw1_all];
 						if(mu < 0)continue; 
 
 						// fix a serious bug: atom2[T2] -> atom2
@@ -363,7 +369,7 @@ void LCAO_Descriptor::add_v_delta_k(void)
 						{
 							const int k0 = k/GlobalV::NPOL;
 							const int iw2_all = start2 + k;
-							const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];						
+							const int nu = ParaO.trace_loc_col[iw2_all];						
 							if(nu < 0)continue;
 
 							nnr++;
@@ -374,9 +380,9 @@ void LCAO_Descriptor::add_v_delta_k(void)
         }//I1
     }//T1
 
-    if( nnr!=GlobalC::LNNR.nnr)
+    if( nnr!=nnr_in)
     {
-        ModuleBase::WARNING_QUIT("LCAO_DESCRIPTOR","nnr!=GlobalC::LNNR.nnr");
+        ModuleBase::WARNING_QUIT("LCAO_DESCRIPTOR","nnr!=LNNR.nnr");
     }
 
     ModuleBase::timer::tick ("LCAO_DESCRIPTOR","add_v_delta_k");
@@ -386,44 +392,49 @@ void LCAO_Descriptor::add_v_delta_k(void)
 
 //force for gamma only calculations
 //Pulay and HF terms are calculated together
-void LCAO_Descriptor::cal_f_delta_new(const ModuleBase::matrix& dm, const bool isstress, ModuleBase::matrix& svnl_dalpha)
+void LCAO_Descriptor::cal_f_delta_new(const ModuleBase::matrix& dm,
+    const UnitCell_pseudo &ucell,
+    const LCAO_Orbitals &orb,
+    Grid_Driver &GridD,
+    const Parallel_Orbitals &ParaO,
+    const bool isstress, ModuleBase::matrix& svnl_dalpha)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "cal_f_delta_new");
     this->F_delta.zero_out();
 
-    const double Rcut_Alpha = GlobalC::ORB.Alpha[0].getRcut();
-    for (int T0 = 0; T0 < GlobalC::ucell.ntype; T0++)
+    const double Rcut_Alpha = orb.Alpha[0].getRcut();
+    for (int T0 = 0; T0 < ucell.ntype; T0++)
     {
-		Atom* atom0 = &GlobalC::ucell.atoms[T0]; 
+		Atom* atom0 = &ucell.atoms[T0]; 
         for (int I0 =0; I0< atom0->na; I0++)
         {
-            int iat = GlobalC::ucell.itia2iat(T0,I0);
+            int iat = ucell.itia2iat(T0,I0);
             const ModuleBase::Vector3<double> tau0 = atom0->tau[I0];
-            GlobalC::GridD.Find_atom(GlobalC::ucell, atom0->tau[I0] ,T0, I0);
+            GridD.Find_atom(ucell, atom0->tau[I0] ,T0, I0);
 
-            for (int ad1=0; ad1<GlobalC::GridD.getAdjacentNum()+1 ; ++ad1)
+            for (int ad1=0; ad1<GridD.getAdjacentNum()+1 ; ++ad1)
             {
-                const int T1 = GlobalC::GridD.getType(ad1);
-                const int I1 = GlobalC::GridD.getNatom(ad1);
-                const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
-                const ModuleBase::Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau(ad1);
-                const Atom* atom1 = &GlobalC::ucell.atoms[T1];
+                const int T1 = GridD.getType(ad1);
+                const int I1 = GridD.getNatom(ad1);
+                const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
+                const ModuleBase::Vector3<double> tau1 = GridD.getAdjacentTau(ad1);
+                const Atom* atom1 = &ucell.atoms[T1];
                 const int nw1_tot = atom1->nw*GlobalV::NPOL;
-                const double Rcut_AO1 = GlobalC::ORB.Phi[T1].getRcut();
+                const double Rcut_AO1 = orb.Phi[T1].getRcut();
 
-                for (int ad2=0; ad2 < GlobalC::GridD.getAdjacentNum()+1 ; ad2++)
+                for (int ad2=0; ad2 < GridD.getAdjacentNum()+1 ; ad2++)
                 {
-                    const int T2 = GlobalC::GridD.getType(ad2);
-                    const int I2 = GlobalC::GridD.getNatom(ad2);
-                    const int ibt = GlobalC::ucell.itia2iat(T2,I2);
-                    const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-                    const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad2);
-                    const Atom* atom2 = &GlobalC::ucell.atoms[T2];
+                    const int T2 = GridD.getType(ad2);
+                    const int I2 = GridD.getNatom(ad2);
+                    const int ibt = ucell.itia2iat(T2,I2);
+                    const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+                    const ModuleBase::Vector3<double> tau2 = GridD.getAdjacentTau(ad2);
+                    const Atom* atom2 = &ucell.atoms[T2];
                     const int nw2_tot = atom2->nw*GlobalV::NPOL;
                     
-                    const double Rcut_AO2 = GlobalC::ORB.Phi[T2].getRcut();
-                    const double dist1 = (tau1-tau0).norm() * GlobalC::ucell.lat0;
-                    const double dist2 = (tau2-tau0).norm() * GlobalC::ucell.lat0;
+                    const double Rcut_AO2 = orb.Phi[T2].getRcut();
+                    const double dist1 = (tau1-tau0).norm() * ucell.lat0;
+                    const double dist2 = (tau2-tau0).norm() * ucell.lat0;
 
                     if (dist1 > Rcut_Alpha + Rcut_AO1
                             || dist2 > Rcut_Alpha + Rcut_AO2)
@@ -446,13 +457,13 @@ void LCAO_Descriptor::cal_f_delta_new(const ModuleBase::matrix& dm, const bool i
                     for (int iw1=0; iw1<nw1_tot; ++iw1)
                     {
                         const int iw1_all = start1 + iw1;
-                        const int iw1_local = GlobalC::ParaO.trace_loc_col[iw1_all];
+                        const int iw1_local = ParaO.trace_loc_col[iw1_all];
                         if(iw1_local < 0)continue;
 
                         for (int iw2=0; iw2<nw2_tot; ++iw2)
                         {
                             const int iw2_all = start2 + iw2;
-                            const int iw2_local = GlobalC::ParaO.trace_loc_row[iw2_all];
+                            const int iw2_local = ParaO.trace_loc_row[iw2_all];
                             if(iw2_local < 0)continue;
 
                             double nlm[3]={0,0,0};
@@ -469,9 +480,9 @@ void LCAO_Descriptor::cal_f_delta_new(const ModuleBase::matrix& dm, const bool i
                             assert(nlm1.size()==nlm2[0].size());
 
                             int ib=0;
-                            for (int L0 = 0; L0 <= GlobalC::ORB.Alpha[0].getLmax();++L0)
+                            for (int L0 = 0; L0 <= orb.Alpha[0].getLmax();++L0)
                             {
-                                for (int N0 = 0;N0 < GlobalC::ORB.Alpha[0].getNchi(L0);++N0)
+                                for (int N0 = 0;N0 < orb.Alpha[0].getNchi(L0);++N0)
                                 {
                                     const int inl = this->inl_index[T0](I0, L0, N0);
                                     const int nm = 2*L0+1;
@@ -511,9 +522,9 @@ void LCAO_Descriptor::cal_f_delta_new(const ModuleBase::matrix& dm, const bool i
                                 assert(nlm1.size()==nlm2[0].size());                                
 
                                 int ib=0;
-                                for (int L0 = 0; L0 <= GlobalC::ORB.Alpha[0].getLmax();++L0)
+                                for (int L0 = 0; L0 <= orb.Alpha[0].getLmax();++L0)
                                 {
-                                    for (int N0 = 0;N0 < GlobalC::ORB.Alpha[0].getNchi(L0);++N0)
+                                    for (int N0 = 0;N0 < orb.Alpha[0].getNchi(L0);++N0)
                                     {
                                         const int inl = this->inl_index[T0](I0, L0, N0);
                                         const int nm = 2*L0+1;
@@ -552,7 +563,7 @@ void LCAO_Descriptor::cal_f_delta_new(const ModuleBase::matrix& dm, const bool i
         {
             for(int j=0;j<3;j++)
             {
-                svnl_dalpha(i,j) *=  GlobalC::ucell.lat0 / GlobalC::ucell.omega;
+                svnl_dalpha(i,j) *=  ucell.lat0 / ucell.omega;
             }
         }
     }
@@ -563,51 +574,57 @@ void LCAO_Descriptor::cal_f_delta_new(const ModuleBase::matrix& dm, const bool i
 //force for multi-k calculations
 //Pulay and HF terms are calculated together
 
-void LCAO_Descriptor::cal_f_delta_k(const std::vector<ModuleBase::ComplexMatrix>& dm/**<[in] density matrix*/, const bool isstress, ModuleBase::matrix& svnl_dalpha)
+void LCAO_Descriptor::cal_f_delta_k(const std::vector<ModuleBase::ComplexMatrix>& dm/**<[in] density matrix*/,
+    const UnitCell_pseudo &ucell,
+    const LCAO_Orbitals &orb,
+    Grid_Driver &GridD,
+    const Parallel_Orbitals &ParaO,
+    const K_Vectors &kv,
+    const bool isstress, ModuleBase::matrix& svnl_dalpha)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "cal_f_delta_hf_k_new");
     ModuleBase::timer::tick("LCAO_Descriptor","cal_f_delta_hf_k_new");
     this->F_delta.zero_out();
 
-    const double Rcut_Alpha = GlobalC::ORB.Alpha[0].getRcut();
+    const double Rcut_Alpha = orb.Alpha[0].getRcut();
 
-    for (int T0 = 0; T0 < GlobalC::ucell.ntype; T0++)
+    for (int T0 = 0; T0 < ucell.ntype; T0++)
     {
-		Atom* atom0 = &GlobalC::ucell.atoms[T0]; 
+		Atom* atom0 = &ucell.atoms[T0]; 
         for (int I0 =0; I0< atom0->na; I0++)
         {
-            const int iat = GlobalC::ucell.itia2iat(T0,I0);
+            const int iat = ucell.itia2iat(T0,I0);
             const ModuleBase::Vector3<double> tau0 = atom0->tau[I0];
-            GlobalC::GridD.Find_atom(GlobalC::ucell, atom0->tau[I0] ,T0, I0);
+            GridD.Find_atom(ucell, atom0->tau[I0] ,T0, I0);
 	
 
-            for (int ad1=0; ad1<GlobalC::GridD.getAdjacentNum()+1 ; ++ad1)
+            for (int ad1=0; ad1<GridD.getAdjacentNum()+1 ; ++ad1)
             {
-                const int T1 = GlobalC::GridD.getType(ad1);
-                const int I1 = GlobalC::GridD.getNatom(ad1);
-                const int ibt1 = GlobalC::ucell.itia2iat(T1,I1);
-                const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
-                const ModuleBase::Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau(ad1);
-                const Atom* atom1 = &GlobalC::ucell.atoms[T1];
+                const int T1 = GridD.getType(ad1);
+                const int I1 = GridD.getNatom(ad1);
+                const int ibt1 = ucell.itia2iat(T1,I1);
+                const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
+                const ModuleBase::Vector3<double> tau1 = GridD.getAdjacentTau(ad1);
+                const Atom* atom1 = &ucell.atoms[T1];
                 const int nw1_tot = atom1->nw*GlobalV::NPOL;
-                const double Rcut_AO1 = GlobalC::ORB.Phi[T1].getRcut();
+                const double Rcut_AO1 = orb.Phi[T1].getRcut();
 
-                ModuleBase::Vector3<double> dR1(GlobalC::GridD.getBox(ad1).x, GlobalC::GridD.getBox(ad1).y, GlobalC::GridD.getBox(ad1).z);
+                ModuleBase::Vector3<double> dR1(GridD.getBox(ad1).x, GridD.getBox(ad1).y, GridD.getBox(ad1).z);
 
-                for (int ad2=0; ad2 < GlobalC::GridD.getAdjacentNum()+1 ; ad2++)
+                for (int ad2=0; ad2 < GridD.getAdjacentNum()+1 ; ad2++)
                 {
-                    const int T2 = GlobalC::GridD.getType(ad2);
-                    const int I2 = GlobalC::GridD.getNatom(ad2);
-                    const int ibt2 = GlobalC::ucell.itia2iat(T2,I2);
-                    const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-                    const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad2);
-                    const Atom* atom2 = &GlobalC::ucell.atoms[T2];
+                    const int T2 = GridD.getType(ad2);
+                    const int I2 = GridD.getNatom(ad2);
+                    const int ibt2 = ucell.itia2iat(T2,I2);
+                    const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+                    const ModuleBase::Vector3<double> tau2 = GridD.getAdjacentTau(ad2);
+                    const Atom* atom2 = &ucell.atoms[T2];
                     const int nw2_tot = atom2->nw*GlobalV::NPOL;
-                    ModuleBase::Vector3<double> dR2(GlobalC::GridD.getBox(ad2).x, GlobalC::GridD.getBox(ad2).y, GlobalC::GridD.getBox(ad2).z);
+                    ModuleBase::Vector3<double> dR2(GridD.getBox(ad2).x, GridD.getBox(ad2).y, GridD.getBox(ad2).z);
                     
-                    const double Rcut_AO2 = GlobalC::ORB.Phi[T2].getRcut();
-                    const double dist1 = (tau1-tau0).norm() * GlobalC::ucell.lat0;
-                    const double dist2 = (tau2-tau0).norm() * GlobalC::ucell.lat0;
+                    const double Rcut_AO2 = orb.Phi[T2].getRcut();
+                    const double dist1 = (tau1-tau0).norm() * ucell.lat0;
+                    const double dist2 = (tau2-tau0).norm() * ucell.lat0;
 
                     if (dist1 > Rcut_Alpha + Rcut_AO1
                             || dist2 > Rcut_Alpha + Rcut_AO2)
@@ -630,24 +647,23 @@ void LCAO_Descriptor::cal_f_delta_k(const std::vector<ModuleBase::ComplexMatrix>
                     for (int iw1=0; iw1<nw1_tot; ++iw1)
                     {
                         const int iw1_all = start1 + iw1;
-                        const int iw1_local = GlobalC::ParaO.trace_loc_col[iw1_all];
+                        const int iw1_local = ParaO.trace_loc_col[iw1_all];
                         if(iw1_local < 0)continue;
 
                         for (int iw2=0; iw2<nw2_tot; ++iw2)
                         {
                             const int iw2_all = start2 + iw2;
-                            const int iw2_local = GlobalC::ParaO.trace_loc_row[iw2_all];
+                            const int iw2_local = ParaO.trace_loc_row[iw2_all];
                             if(iw2_local < 0)continue;
                             double dm_current;
                             std::complex<double> tmp = 0.0;
-                            for(int ik=0;ik<GlobalC::kv.nks;ik++)
+                            for(int ik=0;ik<kv.nks;ik++)
                             {
-                                const double arg = - ( GlobalC::kv.kvec_d[ik] * (dR2-dR1) ) * ModuleBase::TWO_PI;
+                                const double arg = - ( kv.kvec_d[ik] * (dR2-dR1) ) * ModuleBase::TWO_PI;
                                 const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );
                                 tmp += dm[ik](iw1_local, iw2_local) * kphase;
                             }
                             dm_current=tmp.real();
-
 
                             double nlm[3]={0,0,0};
                             double nlm_t[3] = {0,0,0}; //for stress
@@ -664,9 +680,9 @@ void LCAO_Descriptor::cal_f_delta_k(const std::vector<ModuleBase::ComplexMatrix>
                             assert(nlm1.size()==nlm2[0].size());
 
                             int ib=0;
-                            for (int L0 = 0; L0 <= GlobalC::ORB.Alpha[0].getLmax();++L0)
+                            for (int L0 = 0; L0 <= orb.Alpha[0].getLmax();++L0)
                             {
-                                for (int N0 = 0;N0 < GlobalC::ORB.Alpha[0].getNchi(L0);++N0)
+                                for (int N0 = 0;N0 < orb.Alpha[0].getNchi(L0);++N0)
                                 {
                                     const int inl = this->inl_index[T0](I0, L0, N0);
                                     const int nm = 2*L0+1;
@@ -706,9 +722,9 @@ void LCAO_Descriptor::cal_f_delta_k(const std::vector<ModuleBase::ComplexMatrix>
                                 assert(nlm1.size()==nlm2[0].size());                                
 
                                 int ib=0;
-                                for (int L0 = 0; L0 <= GlobalC::ORB.Alpha[0].getLmax();++L0)
+                                for (int L0 = 0; L0 <= orb.Alpha[0].getLmax();++L0)
                                 {
-                                    for (int N0 = 0;N0 < GlobalC::ORB.Alpha[0].getNchi(L0);++N0)
+                                    for (int N0 = 0;N0 < orb.Alpha[0].getNchi(L0);++N0)
                                     {
                                         const int inl = this->inl_index[T0](I0, L0, N0);
                                         const int nm = 2*L0+1;
@@ -748,7 +764,7 @@ void LCAO_Descriptor::cal_f_delta_k(const std::vector<ModuleBase::ComplexMatrix>
         {
             for(int j=0;j<3;j++)
             {
-                svnl_dalpha(i,j) =  svnl_dalpha(i,j) * GlobalC::ucell.lat0 / GlobalC::ucell.omega;
+                svnl_dalpha(i,j) =  svnl_dalpha(i,j) * ucell.lat0 / ucell.omega;
             }
         }
     }
@@ -759,7 +775,7 @@ void LCAO_Descriptor::cal_f_delta_k(const std::vector<ModuleBase::ComplexMatrix>
 
 //calculating sum of correction band energies
 //for gamma_only calculations
-void LCAO_Descriptor::cal_e_delta_band(const std::vector<ModuleBase::matrix> &dm)
+void LCAO_Descriptor::cal_e_delta_band(const std::vector<ModuleBase::matrix> &dm, const Parallel_Orbitals &ParaO)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "cal_e_delta_band");
     this->e_delta_band = 0;
@@ -767,12 +783,12 @@ void LCAO_Descriptor::cal_e_delta_band(const std::vector<ModuleBase::matrix> &dm
     {
         for (int j = 0; j < GlobalV::NLOCAL; ++j)
         {
-            const int mu = GlobalC::ParaO.trace_loc_row[j];
-            const int nu = GlobalC::ParaO.trace_loc_col[i];
+            const int mu = ParaO.trace_loc_row[j];
+            const int nu = ParaO.trace_loc_col[i];
             
             if (mu >= 0 && nu >= 0)
             {                
-                const int index=nu*GlobalC::ParaO.nrow+mu;
+                const int index=nu*ParaO.nrow+mu;
                 for (int is = 0; is < GlobalV::NSPIN; ++is)
                 {
                     this->e_delta_band += dm[is](nu, mu) * this->H_V_delta[index];
@@ -780,13 +796,17 @@ void LCAO_Descriptor::cal_e_delta_band(const std::vector<ModuleBase::matrix> &dm
             }
         }
     }
+#ifdef __MPI
     Parallel_Reduce::reduce_double_all(this->e_delta_band);
+#endif
     return;
 }
 
 //calculating sum of correction band energies
 //for multi_k calculations
-void LCAO_Descriptor::cal_e_delta_band_k(const std::vector<ModuleBase::ComplexMatrix> &dm)
+void LCAO_Descriptor::cal_e_delta_band_k(const std::vector<ModuleBase::ComplexMatrix> &dm,
+    const Parallel_Orbitals &ParaO,
+    const int nks)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "cal_e_delta_band");
     std::complex<double> e_delta_band_k=std::complex<double>(0.0,0.0);
@@ -794,28 +814,30 @@ void LCAO_Descriptor::cal_e_delta_band_k(const std::vector<ModuleBase::ComplexMa
     {
         for (int j = 0; j < GlobalV::NLOCAL; ++j)
         {
-            const int mu = GlobalC::ParaO.trace_loc_row[j];
-            const int nu = GlobalC::ParaO.trace_loc_col[i];
+            const int mu = ParaO.trace_loc_row[j];
+            const int nu = ParaO.trace_loc_col[i];
             
             if (mu >= 0 && nu >= 0)
             {                
                 int iic;
                 if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                 {
-                    iic=mu+nu*GlobalC::ParaO.nrow;
+                    iic=mu+nu*ParaO.nrow;
                 }
                 else
                 {
-                    iic=mu*GlobalC::ParaO.ncol+nu;
+                    iic=mu*ParaO.ncol+nu;
                 }
-                for(int ik=0;ik<GlobalC::kv.nks;ik++)
+                for(int ik=0;ik<nks;ik++)
                 {
                     e_delta_band_k += dm[ik](nu, mu) * this->H_V_delta_k[ik][iic];
                 }
             }
         }
     }
+#ifdef __MPI
     Parallel_Reduce::reduce_complex_double_all(e_delta_band_k);
+#endif
     if(e_delta_band_k.imag()>1e-12)
     {
         GlobalV::ofs_running << "e_delta_band_k : " << e_delta_band_k << std::endl;
@@ -828,12 +850,17 @@ void LCAO_Descriptor::cal_e_delta_band_k(const std::vector<ModuleBase::ComplexMa
 //calculates sum_(L0,M0) alpha<psi_i|alpha><alpha|psi_j>
 //and accumulate the value to H_V_delta(i,j)
 //as well as the counterpart in forces, if calc_deri=1
-void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri)
+void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri,
+    const UnitCell_pseudo &ucell,
+    const LCAO_Orbitals &orb,
+    Grid_Driver &GridD,
+    const Parallel_Orbitals &ParaO,
+    const ORB_gen_tables &UOT)
 {
     ModuleBase::TITLE("LCAO_Descriptor", "build_v_delta_alpha_new");
     ModuleBase::timer::tick ("LCAO_Descriptor","build_v_delta_alpha_new");
 
-    const double Rcut_Alpha = GlobalC::ORB.Alpha[0].getRcut();
+    const double Rcut_Alpha = orb.Alpha[0].getRcut();
     //same for all types of atoms
     int job;
     if(!calc_deri)
@@ -845,12 +872,12 @@ void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri)
         job=1;
     }
 
-    for (int T0 = 0; T0 < GlobalC::ucell.ntype; T0++)
+    for (int T0 = 0; T0 < ucell.ntype; T0++)
     {
-		Atom* atom0 = &GlobalC::ucell.atoms[T0]; 
+		Atom* atom0 = &ucell.atoms[T0]; 
         for (int I0 =0; I0< atom0->na; I0++)
         {
-            const int iat = GlobalC::ucell.itia2iat(T0,I0);
+            const int iat = ucell.itia2iat(T0,I0);
 			//=======================================================
             //Step 1 : 
 			//saves <alpha|psi>, where alpha runs over all projectors
@@ -858,23 +885,23 @@ void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri)
 			//=======================================================
 
 			const ModuleBase::Vector3<double> tau0 = atom0->tau[I0];
-            GlobalC::GridD.Find_atom(GlobalC::ucell, atom0->tau[I0] ,T0, I0);
+            GridD.Find_atom(ucell, atom0->tau[I0] ,T0, I0);
 
 			//outermost loop : all adjacent atoms
             if(GlobalV::GAMMA_ONLY_LOCAL)
             {
-                this->nlm_save[iat].resize(GlobalC::GridD.getAdjacentNum()+1);
+                this->nlm_save[iat].resize(GridD.getAdjacentNum()+1);
             }
 
-            for (int ad=0; ad<GlobalC::GridD.getAdjacentNum()+1 ; ++ad)
+            for (int ad=0; ad<GridD.getAdjacentNum()+1 ; ++ad)
             {
-                const int T1 = GlobalC::GridD.getType(ad);
-                const int I1 = GlobalC::GridD.getNatom(ad);
-                const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
-				const double Rcut_AO1 = GlobalC::ORB.Phi[T1].getRcut();
+                const int T1 = GridD.getType(ad);
+                const int I1 = GridD.getNatom(ad);
+                const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
+				const double Rcut_AO1 = orb.Phi[T1].getRcut();
 
-                const ModuleBase::Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau(ad);
-				const Atom* atom1 = &GlobalC::ucell.atoms[T1];
+                const ModuleBase::Vector3<double> tau1 = GridD.getAdjacentTau(ad);
+				const Atom* atom1 = &ucell.atoms[T1];
 				const int nw1_tot = atom1->nw*GlobalV::NPOL;
 
                 std::unordered_map<int,std::vector<std::vector<double>>> nlm_cur;
@@ -887,7 +914,7 @@ void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri)
                     nlm_cur.clear();
                 }
 
-				const double dist1 = (tau1-tau0).norm() * GlobalC::ucell.lat0;
+				const double dist1 = (tau1-tau0).norm() * ucell.lat0;
 
 				if (dist1 > Rcut_Alpha + Rcut_AO1)
 				{
@@ -897,8 +924,8 @@ void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri)
 				for (int iw1=0; iw1<nw1_tot; ++iw1)
 				{
 					const int iw1_all = start1 + iw1;
-					const int iw1_local = GlobalC::ParaO.trace_loc_row[iw1_all];
-					const int iw2_local = GlobalC::ParaO.trace_loc_col[iw1_all];
+					const int iw1_local = ParaO.trace_loc_row[iw1_all];
+					const int iw2_local = ParaO.trace_loc_col[iw1_all];
 					if(iw1_local < 0 && iw2_local < 0)continue;
 					const int iw1_0 = iw1/GlobalV::NPOL;
 					std::vector<std::vector<double>> nlm;
@@ -906,12 +933,12 @@ void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri)
 					//for force, the right hand side is the gradient
 					//and the first dimension is then 3
 					//inner loop : all projectors (L0,M0)
-					GlobalC::UOT.snap_psialpha_half(
+					UOT.snap_psialpha_half(
 						nlm, job, tau1, T1,
 						atom1->iw2l[ iw1_0 ], // L1
 						atom1->iw2m[ iw1_0 ], // m1
 						atom1->iw2n[ iw1_0 ], // N1
-						GlobalC::ucell.atoms[T0].tau[I0], T0, I0); //R0,T0
+						ucell.atoms[T0].tau[I0], T0, I0); //R0,T0
 
                     if(GlobalV::GAMMA_ONLY_LOCAL)
                     {
@@ -925,10 +952,10 @@ void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri)
 
                 if(!GlobalV::GAMMA_ONLY_LOCAL)
                 {
-                    const int ibt=GlobalC::ucell.itia2iat(T1, I1);
-                    const int rx=GlobalC::GridD.getBox(ad).x;
-                    const int ry=GlobalC::GridD.getBox(ad).y;
-                    const int rz=GlobalC::GridD.getBox(ad).z;
+                    const int ibt=ucell.itia2iat(T1, I1);
+                    const int rx=GridD.getBox(ad).x;
+                    const int ry=GridD.getBox(ad).y;
+                    const int rz=GridD.getBox(ad).z;
                     key_tuple key_1(ibt,rx,ry,rz);
                     this->nlm_save_k[iat][key_1]=nlm_cur;
                 }

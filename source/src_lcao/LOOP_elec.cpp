@@ -22,7 +22,7 @@
 #include "../src_pw/vdwd2.h"
 #include "../src_pw/vdwd3.h"
 #ifdef __DEEPKS
-#include "LCAO_descriptor.h"
+#include "../module_deepks/LCAO_descriptor.h"
 #endif
 
 void LOOP_elec::solve_elec_stru(const int &istep)
@@ -156,7 +156,12 @@ void LOOP_elec::before_solver(const int &istep)
     if (GlobalV::out_descriptor)
     {
 		//build and save <psi(0)|alpha(R)> at beginning
-        GlobalC::ld.build_v_delta_alpha_new(GlobalV::FORCE);
+        GlobalC::ld.build_v_delta_alpha_new(GlobalV::FORCE,
+			GlobalC::ucell,
+			GlobalC::ORB,
+			GlobalC::GridD,
+			GlobalC::ParaO,
+			GlobalC::UOT);
     }
 #endif
 

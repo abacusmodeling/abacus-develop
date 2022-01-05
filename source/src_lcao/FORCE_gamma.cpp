@@ -1,7 +1,7 @@
 #include "FORCE_gamma.h"
 #include "../src_pw/global.h"
 #ifdef __DEEPKS
-#include "LCAO_descriptor.h"//caoyu add for deepks on 20210813
+#include "../module_deepks/LCAO_descriptor.h"//caoyu add for deepks on 20210813
 #endif
 
 Force_LCAO_gamma::Force_LCAO_gamma ()
@@ -86,7 +86,12 @@ void Force_LCAO_gamma::ftable_gamma (
             GlobalC::ParaO);
     	GlobalC::ld.cal_descriptor(GlobalC::ucell,GlobalC::ORB);
         GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
-        GlobalC::ld.cal_f_delta_new(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],isstress, svnl_dalpha);
+        GlobalC::ld.cal_f_delta_new(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],
+            GlobalC::ucell,
+            GlobalC::ORB,
+            GlobalC::GridD,
+            GlobalC::ParaO,
+            isstress, svnl_dalpha);
 #ifdef __MPI
         Parallel_Reduce::reduce_double_all(GlobalC::ld.F_delta.c,GlobalC::ld.F_delta.nr*GlobalC::ld.F_delta.nc);
 		if(isstress)

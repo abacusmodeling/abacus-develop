@@ -19,7 +19,7 @@
 #include "../src_pw/vdwd3_parameters.h"
 #include "dmft.h"
 #ifdef __DEEPKS
-#include "LCAO_descriptor.h"    //caoyu add 2021-07-26
+#include "../module_deepks/LCAO_descriptor.h"    //caoyu add 2021-07-26
 #endif
 
 LOOP_ions::LOOP_ions()
@@ -214,11 +214,11 @@ void LOOP_ions::opt_ions(void)
                 //ld.print_H_V_delta();   //final H_delta
                 if(GlobalV::GAMMA_ONLY_LOCAL)
                 {
-                    GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma);
+                    GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma, GlobalC::ParaO);
                 }
                 else
                 {
-                    GlobalC::ld.cal_e_delta_band_k(GlobalC::LOC.wfc_dm_2d.dm_k);
+                    GlobalC::ld.cal_e_delta_band_k(GlobalC::LOC.wfc_dm_2d.dm_k, GlobalC::ParaO, GlobalC::kv.nks);
                 }
                 std::cout << "E_delta_band = " << std::setprecision(8) << GlobalC::ld.e_delta_band << " Ry" << " = " << std::setprecision(8) << GlobalC::ld.e_delta_band * ModuleBase::Ry_to_eV << " eV" << std::endl;
                 std::cout << "E_delta_NN= "<<std::setprecision(8) << GlobalC::ld.E_delta << " Ry" << " = "<<std::setprecision(8)<<GlobalC::ld.E_delta*ModuleBase::Ry_to_eV<<" eV"<<std::endl;

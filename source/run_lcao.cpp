@@ -10,7 +10,7 @@
 #include "module_symmetry/symmetry.h"
 #include "src_lcao/run_md_lcao.h"
 #ifdef __DEEPKS
-#include "src_lcao/LCAO_descriptor.h"
+#include "module_deepks/LCAO_descriptor.h"
 #endif
 
 Run_lcao::Run_lcao(){}

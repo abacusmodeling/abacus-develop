@@ -110,14 +110,6 @@ void LCAO_Descriptor::init(
     this->init_index(ntype, nat, na, tot_inl, orb);
     this->allocate_nlm(nat);
 
-    if(GlobalV::deepks_scf)
-    {
-        this->allocate_V_delta(nat);
-        if(GlobalV::FORCE)
-        {
-            this->init_gdmx(nat);
-        }
-    }
     return;
 }
 
@@ -697,7 +689,7 @@ void LCAO_Descriptor::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& d
 
     const double Rcut_Alpha = orb.Alpha[0].getRcut();
 
-    for (int T0 = 0; T0 < :ucell.ntype; T0++)
+    for (int T0 = 0; T0 < ucell.ntype; T0++)
     {
 		Atom* atom0 = &ucell.atoms[T0]; 
         for (int I0 =0; I0< atom0->na; I0++)
