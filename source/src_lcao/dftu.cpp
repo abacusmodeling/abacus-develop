@@ -528,7 +528,7 @@ void DFTU::cal_occup_m_gamma(const int iter)
 		pdgemm_(&transN, &transT,
 				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 				&alpha, 
-				GlobalC::LM.Sloc, &one_int, &one_int, GlobalC::ParaO.desc, 
+				GlobalC::LM.Sloc.data(), &one_int, &one_int, GlobalC::ParaO.desc, 
 				GlobalC::LOC.wfc_dm_2d.dm_gamma.at(is).c, &one_int, &one_int, GlobalC::ParaO.desc,
 				&beta,
 				&srho[0], &one_int, &one_int, GlobalC::ParaO.desc);
@@ -1175,7 +1175,7 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, std::complex<d
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 		&half, 
 		ModuleBase::GlobalFunc::VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc,
-		GlobalC::LM.Sloc2, &one_int, &one_int, GlobalC::ParaO.desc,
+		GlobalC::LM.Sloc2.data(), &one_int, &one_int, GlobalC::ParaO.desc,
 		&zero,
 		eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
 
@@ -1262,7 +1262,7 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 		&half, 
 		ModuleBase::GlobalFunc::VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc, 
-		GlobalC::LM.Sloc, &one_int, &one_int, GlobalC::ParaO.desc,
+		GlobalC::LM.Sloc.data(), &one_int, &one_int, GlobalC::ParaO.desc,
 		&beta,
 		eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
 
