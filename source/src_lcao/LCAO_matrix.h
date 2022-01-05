@@ -66,14 +66,12 @@ class LCAO_Matrix
     // HlocR -> Hloc2,
     // SlocR -> Sloc2,
     //------------------------------
-    double* HlocR;
-    double* SlocR;
-    double* Hloc_fixedR;
+    std::vector<double> SlocR;
+    std::vector<double> Hloc_fixedR;
 
     //with soc, zhengdy-soc
-    complex<double>* HlocR_soc;
-    complex<double>* SlocR_soc;
-    complex<double>* Hloc_fixedR_soc;
+    std::vector<std::complex<double>> SlocR_soc;
+    std::vector<std::complex<double>> Hloc_fixedR_soc;
 
     //LiuXh add 2019-07-15
     double ****Hloc_fixedR_tr;
@@ -179,7 +177,7 @@ class LCAO_Matrix
 
     void zeros_HSgamma(const char &mtype);
     void zeros_HSk(const char &mtype);
-    void zeros_HSR(const char &mtype, const int &nnr);
+    void zeros_HSR(const char &mtype);
 
     void print_HSgamma(const char &mtype, std::ostream &os=std::cout);
     void print_HSk(const char &mtype, const char &vtype = 'C', const double &accuracy = 1.0e-5, std::ostream &os=std::cout);

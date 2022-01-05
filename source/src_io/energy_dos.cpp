@@ -379,7 +379,7 @@ void energy::perform_dos(void)
 					GlobalC::ucell.infoNL.Beta);
 
 				GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
-				GlobalC::LM.zeros_HSR('S', GlobalC::LNNR.nnr);
+				GlobalC::LM.zeros_HSR('S');
 				GlobalC::UHM.genH.calculate_S_no();
 				GlobalC::UHM.genH.build_ST_new('S', false, GlobalC::ucell);
 				std::vector<ModuleBase::ComplexMatrix> Mulk;
