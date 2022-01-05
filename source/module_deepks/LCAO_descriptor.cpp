@@ -1,7 +1,7 @@
 //caoyu add 2021-03-2
 #ifdef __DEEPKS
 
-#include "LCAO_descriptor.h"
+#include "LCAO_deepks.h"
 
 //===============================
 //DeePKS Part 1
@@ -10,10 +10,10 @@
 
 namespace GlobalC
 {
-    LCAO_Descriptor ld;
+    LCAO_Deepks ld;
 }
 
-LCAO_Descriptor::LCAO_Descriptor()
+LCAO_Deepks::LCAO_Deepks()
 {
     alpha_index = new ModuleBase::IntArray[1];
     inl_index = new ModuleBase::IntArray[1];
@@ -22,7 +22,7 @@ LCAO_Descriptor::LCAO_Descriptor()
     H_V_delta = new double[1];
 }
 
-LCAO_Descriptor::~LCAO_Descriptor()
+LCAO_Deepks::~LCAO_Deepks()
 {
     delete[] alpha_index;
     delete[] inl_index;
@@ -50,7 +50,7 @@ LCAO_Descriptor::~LCAO_Descriptor()
 }
 
 #ifdef __MPI
-void LCAO_Descriptor::allsum_deepks(
+void LCAO_Deepks::allsum_deepks(
     int inlmax, //first dimension
     int ndim, //second dimension
     double** mat) //the array being reduced 
@@ -62,13 +62,13 @@ void LCAO_Descriptor::allsum_deepks(
 }
 #endif
 
-void LCAO_Descriptor::init(
+void LCAO_Deepks::init(
     const LCAO_Orbitals &orb,
     const int nat,
     const int ntype,
     std::vector<int> na) 
 {
-    ModuleBase::TITLE("LCAO_Descriptor", "init");
+    ModuleBase::TITLE("LCAO_Deepks", "init");
 
     GlobalV::ofs_running << " Initialize the descriptor index for DeePKS (lcao line)" << std::endl;
 
@@ -113,7 +113,7 @@ void LCAO_Descriptor::init(
     return;
 }
 
-void LCAO_Descriptor::init_index(const int ntype, const int nat, std::vector<int> na, const int Total_nchi, const LCAO_Orbitals &orb)
+void LCAO_Deepks::init_index(const int ntype, const int nat, std::vector<int> na, const int Total_nchi, const LCAO_Orbitals &orb)
 {
     delete[] this->alpha_index;
     this->alpha_index = new ModuleBase::IntArray[ntype];
@@ -169,14 +169,14 @@ void LCAO_Descriptor::init_index(const int ntype, const int nat, std::vector<int
 
 //this subroutine performs the calculation of projected density matrices
 //pdm_m,m'=\sum_{mu,nu} rho_{mu,nu} <chi_mu|alpha_m><alpha_m'|chi_nu>
-void LCAO_Descriptor::cal_projected_DM(const ModuleBase::matrix &dm, 
+void LCAO_Deepks::cal_projected_DM(const ModuleBase::matrix &dm, 
     const UnitCell_pseudo &ucell,
     const LCAO_Orbitals &orb,
     Grid_Driver &GridD,
     const Parallel_Orbitals &ParaO)
 {
-    ModuleBase::TITLE("LCAO_Descriptor", "cal_projected_DM");
-    ModuleBase::timer::tick("LCAO_Descriptor","cal_projected_DM"); 
+    ModuleBase::TITLE("LCAO_Deepks", "cal_projected_DM");
+    ModuleBase::timer::tick("LCAO_Deepks","cal_projected_DM"); 
     if(dm.nr == 0 && dm.nc ==0)
     {
         return;
@@ -275,11 +275,11 @@ void LCAO_Descriptor::cal_projected_DM(const ModuleBase::matrix &dm,
 #ifdef __MPI
     allsum_deepks(this->inlmax,pdm_size,this->pdm);
 #endif
-    ModuleBase::timer::tick("LCAO_Descriptor","cal_projected_DM"); 
+    ModuleBase::timer::tick("LCAO_Deepks","cal_projected_DM"); 
     return;
 }
 
-void LCAO_Descriptor::cal_projected_DM_k(const std::vector<ModuleBase::ComplexMatrix>& dm,
+void LCAO_Deepks::cal_projected_DM_k(const std::vector<ModuleBase::ComplexMatrix>& dm,
     const UnitCell_pseudo &ucell,
     const LCAO_Orbitals &orb,
     Grid_Driver &GridD,
@@ -287,7 +287,7 @@ void LCAO_Descriptor::cal_projected_DM_k(const std::vector<ModuleBase::ComplexMa
     const K_Vectors &kv)
 {
 
-    ModuleBase::timer::tick("LCAO_Descriptor","cal_projected_DM_k");
+    ModuleBase::timer::tick("LCAO_Deepks","cal_projected_DM_k");
 
     if(dm[0].nr == 0 && dm[0].nc ==0)
     {
@@ -403,81 +403,13 @@ void LCAO_Descriptor::cal_projected_DM_k(const std::vector<ModuleBase::ComplexMa
 #ifdef __MPI
     allsum_deepks(this->inlmax,pdm_size,this->pdm);
 #endif
-    ModuleBase::timer::tick("LCAO_Descriptor","cal_projected_DM_k");
+    ModuleBase::timer::tick("LCAO_Deepks","cal_projected_DM_k");
     return;
     
 }
 
-//the eigenvalues of pdm are descriptors
-void LCAO_Descriptor::cal_descriptor(const UnitCell_pseudo &ucell, const LCAO_Orbitals &orb)
-{
-    ModuleBase::TITLE("LCAO_Descriptor", "cal_descriptor");
-    delete[] d;
-
-    d = new double[this->n_descriptor];
-    const int lmax = orb.get_lmax_d();
-    int id = 0;
-    for (int it = 0; it < ucell.ntype; it++)
-    {
-        for (int ia = 0; ia < ucell.atoms[it].na; ia++)
-        {
-            for (int l = 0; l <= lmax; l++)
-            {
-                int nmax = orb.Alpha[0].getNchi(l);
-                for (int n = 0; n < nmax; n++)
-                {
-                    const int dim = 2 * l + 1;
-                    const int inl = inl_index[it](ia, l, n);
-                    // descriptor for atom (it, ia)
-                    ModuleBase::ComplexMatrix des(dim, dim);
-                    for (int m = 0; m < dim; m++)
-                    {
-                        for (int m2 = 0; m2 < dim; m2++)
-                        {
-                            int index = m * dim + m2;
-                            complex<double> tmp(this->pdm[inl][index], 0);
-                            des(m, m2) += tmp;
-                        }
-                    }
-                    if (l == 0)
-                    {
-                        this->d[id] = des(0, 0).real();
-                        ++id;
-                    }
-                    else
-                    {
-                        // diagonalizae
-                        // assume des matrix is Hermitian
-                        char jobz = 'N'; // eigenvalues only
-                        char uplo = 'U'; // upper matrix is stored
-                        int ndim = des.nr;
-                        double *tmpd = new double[ndim]();
-                        const int lwork = 2 * ndim;
-                        complex<double> *work = new complex<double>[lwork]();
-                        double *rwork = new double[3 * ndim - 2]();
-                        int infor = 0;
-                        // diag by calling zheev
-                        LapackConnector::zheev(jobz, uplo, ndim, des, ndim, tmpd, work, lwork, rwork, &infor);
-                        // put the eigenvalues into d (descriptor)
-                        for (int idim = 0; idim < ndim; ++idim)
-                        {
-                            this->d[id] = tmpd[idim];
-                            ++id;
-                        }
-                        delete[] tmpd;
-                        delete[] rwork;
-                        delete[] work;
-                    }
-                } //n
-            }     //l
-        }         //ia
-    }             //it
-    return;
-}
-
-
 //for checking purpose
-void LCAO_Descriptor::print_projected_DM(
+void LCAO_Deepks::print_projected_DM(
 	ofstream& ofs, 
 	ModuleBase::ComplexMatrix& des, 
 	const int& it, // index for atom type
@@ -498,9 +430,9 @@ void LCAO_Descriptor::print_projected_DM(
 }
 
 
-void LCAO_Descriptor::print_descriptor(const UnitCell_pseudo &ucell)
+void LCAO_Deepks::print_descriptor(const int nat)
 {
-    ModuleBase::TITLE("LCAO_Descriptor", "print_descriptor");
+    ModuleBase::TITLE("LCAO_Deepks", "print_descriptor");
     ofstream ofs;
     stringstream ss;
     // the parameter 'winput::spillage_outdir' is read from INPUTw.
@@ -510,20 +442,19 @@ void LCAO_Descriptor::print_descriptor(const UnitCell_pseudo &ucell)
     {
         ofs.open(ss.str().c_str());
     }
-    for (int it = 0; it < ucell.ntype; it++)
+    for (int ia = 0; ia < nat; ia++)
     {
-        for (int ia = 0; ia < ucell.atoms[it].na; ia++)
+        ofs << " atom_index " << ia + 1 << " n_descriptor " << this->des_per_atom << std::endl;
+        for(int inl=0;inl<inlmax/nat;inl++)
         {
-            ofs << ucell.atoms[it].label << " atom_index " << ia + 1 << " n_descriptor " << this->des_per_atom << std::endl;
-            int id0 = this->alpha_index[it](ia, 0, 0, 0);
-            for (int id = id0; id < id0 + this->des_per_atom; ++id)
+            int nm = 2*inl_l[inl]+1;
+            for(int im=0;im<nm;im++)
             {
-                if ((id - id0) > 0 && (id - id0) % 8 == 0)
-                    ofs << std::endl;
-                ofs << std::setprecision(10) << d[id] << " ";
+                const int ind=ia*inlmax/nat+inl;
+                ofs << std::setprecision(10) << d_tensor[ind].index({im}).item().toDouble() << " ";
             }
-            ofs << std::endl << std::endl;
         }
+        ofs << std::endl << std::endl;
     }
     GlobalV::ofs_running << " Descriptors have been printed to " << ss.str() << std::endl;
 
@@ -532,13 +463,13 @@ void LCAO_Descriptor::print_descriptor(const UnitCell_pseudo &ucell)
 
 //this subroutine calculates the gradient of projected density matrices
 //gdmx_m,m = d/dX sum_{mu,nu} rho_{mu,nu} <chi_mu|alpha_m><alpha_m'|chi_nu>
-void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm,
+void LCAO_Deepks::cal_gdmx(const ModuleBase::matrix &dm,
     const UnitCell_pseudo &ucell,
     const LCAO_Orbitals &orb,
     Grid_Driver &GridD,
     const Parallel_Orbitals &ParaO)
 {
-    ModuleBase::TITLE("LCAO_Descriptor", "cal_gdmx");
+    ModuleBase::TITLE("LCAO_Deepks", "cal_gdmx");
     //get DS_alpha_mu and S_nu_beta
 
     int size = (2 * lmaxd + 1) * (2 * lmaxd + 1);
@@ -666,14 +597,14 @@ void LCAO_Descriptor::cal_gdmx(const ModuleBase::matrix &dm,
     return;
 }
 
-void LCAO_Descriptor::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm,
+void LCAO_Deepks::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm,
     const UnitCell_pseudo &ucell,
     const LCAO_Orbitals &orb,
     Grid_Driver &GridD,
     const Parallel_Orbitals &ParaO,
     const K_Vectors &kv)
 {
-    ModuleBase::TITLE("LCAO_Descriptor", "cal_gdmx");
+    ModuleBase::TITLE("LCAO_Deepks", "cal_gdmx");
 
     int size = (2 * lmaxd + 1) * (2 * lmaxd + 1);
 
@@ -816,7 +747,7 @@ void LCAO_Descriptor::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& d
     return;
 }
 
-void LCAO_Descriptor::init_gdmx(const int nat)
+void LCAO_Deepks::init_gdmx(const int nat)
 {
     this->gdmx = new double** [nat];
     this->gdmy = new double** [nat];
@@ -840,7 +771,7 @@ void LCAO_Descriptor::init_gdmx(const int nat)
 }
 
 
-void LCAO_Descriptor::del_gdmx(const int nat)
+void LCAO_Deepks::del_gdmx(const int nat)
 {
     for (int iat = 0;iat < nat;iat++)
     {

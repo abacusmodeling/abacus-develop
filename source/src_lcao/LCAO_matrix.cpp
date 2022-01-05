@@ -1,7 +1,7 @@
 #include "LCAO_matrix.h"
 #include "global_fp.h"
 #ifdef __DEEPKS
-#include "../module_deepks/LCAO_descriptor.h"
+#include "../module_deepks/LCAO_deepks.h"
 #endif
 
 LCAO_Matrix::LCAO_Matrix()

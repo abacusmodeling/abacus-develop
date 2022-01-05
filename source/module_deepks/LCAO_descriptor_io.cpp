@@ -1,7 +1,7 @@
 //wenfei 2021-11-17
 #ifdef __DEEPKS
 
-#include "LCAO_descriptor.h"
+#include "LCAO_deepks.h"
 #include "npy.hpp"
 //============================
 //DeePKS Part 3
@@ -9,9 +9,10 @@
 //============================
 
 //calculates descriptors from projected density matrices
-void LCAO_Descriptor::cal_descriptor_tensor(void)
+void LCAO_Deepks::cal_descriptor(void)
 {
-    ModuleBase::TITLE("LCAO_Descriptor", "cal_descriptor_tensor");
+    ModuleBase::TITLE("LCAO_Deepks", "cal_descriptor");
+
     //init pdm_tensor and d_tensor
     torch::Tensor tmp;
 
@@ -55,9 +56,9 @@ void LCAO_Descriptor::cal_descriptor_tensor(void)
 }
 
 //calculates gradient of descriptors from gradient of projected density matrices
-void LCAO_Descriptor::cal_gvx(const int nat)
+void LCAO_Deepks::cal_gvx(const int nat)
 {
-    ModuleBase::TITLE("LCAO_Descriptor","cal_gvx");
+    ModuleBase::TITLE("LCAO_Deepks","cal_gvx");
     //preconditions
     this->cal_gvdm(nat);
     if(!gdmr_vector.empty())
@@ -129,9 +130,9 @@ void LCAO_Descriptor::cal_gvx(const int nat)
     return;
 }
 
-void LCAO_Descriptor::cal_gvx_k(const int nat)
+void LCAO_Deepks::cal_gvx_k(const int nat)
 {
-    ModuleBase::TITLE("LCAO_Descriptor","cal_gvx");
+    ModuleBase::TITLE("LCAO_Deepks","cal_gvx");
     //preconditions
     this->cal_gvdm(nat);
 
@@ -199,9 +200,9 @@ void LCAO_Descriptor::cal_gvx_k(const int nat)
     return;
 }
 
-void LCAO_Descriptor::load_model(const string& model_file)
+void LCAO_Deepks::load_model(const string& model_file)
 {
-    ModuleBase::TITLE("LCAO_Descriptor", "load_model");
+    ModuleBase::TITLE("LCAO_Deepks", "load_model");
 
     try
 	{
@@ -217,13 +218,11 @@ void LCAO_Descriptor::load_model(const string& model_file)
 }
 
 //obtain from the machine learning model dE_delta/dDescriptor
-void LCAO_Descriptor::cal_gedm(const int nat)
+void LCAO_Deepks::cal_gedm(const int nat)
 {
     //using this->pdm_tensor
-    ModuleBase::TITLE("LCAO_Descriptor", "cal_gedm");
-    //-----prepare for autograd---------
-    this->cal_descriptor_tensor();  //use torch::linalg::eigh
-    //-----prepared-----------------------
+    ModuleBase::TITLE("LCAO_Deepks", "cal_gedm");
+
     //forward
     std::vector<torch::jit::IValue> inputs;
     //input_dim:(natom, des_per_atom)
@@ -254,13 +253,11 @@ void LCAO_Descriptor::cal_gedm(const int nat)
     return;
 }
 
-void LCAO_Descriptor::cal_gedm_k(const int nat)
+void LCAO_Deepks::cal_gedm_k(const int nat)
 {
     //using this->pdm_tensor
-    ModuleBase::TITLE("LCAO_Descriptor", "cal_gedm");
-    //-----prepare for autograd---------
-    this->cal_descriptor_tensor();  //use torch::linalg::eigh
-    //-----prepared-----------------------
+    ModuleBase::TITLE("LCAO_Deepks", "cal_gedm");
+
     //forward
     std::vector<torch::jit::IValue> inputs;
     //input_dim:(natom, des_per_atom)
@@ -292,9 +289,9 @@ void LCAO_Descriptor::cal_gedm_k(const int nat)
 }
 
 //dDescriptor / dprojected density matrix
-void LCAO_Descriptor::cal_gvdm(const int nat)
+void LCAO_Deepks::cal_gvdm(const int nat)
 {
-    ModuleBase::TITLE("LCAO_Descriptor", "cal_gvdm");
+    ModuleBase::TITLE("LCAO_Deepks", "cal_gvdm");
     if(!gevdm_vector.empty())
     {
         gevdm_vector.erase(gevdm_vector.begin(),gevdm_vector.end());
@@ -330,9 +327,9 @@ void LCAO_Descriptor::cal_gvdm(const int nat)
     return;
 }
 
-void LCAO_Descriptor::print_H_V_delta(void)
+void LCAO_Deepks::print_H_V_delta(void)
 {
-    ModuleBase::TITLE("LCAO_Descriptor", "print_H_V_delta");
+    ModuleBase::TITLE("LCAO_Deepks", "print_H_V_delta");
 
     ofstream ofs;
     stringstream ss;
@@ -374,9 +371,9 @@ void LCAO_Descriptor::print_H_V_delta(void)
 }
 
 
-void LCAO_Descriptor::print_F_delta(const string& fname, const UnitCell_pseudo &ucell)
+void LCAO_Deepks::print_F_delta(const string& fname, const UnitCell_pseudo &ucell)
 {
-    ModuleBase::TITLE("LCAO_Descriptor", "print_F_delta");
+    ModuleBase::TITLE("LCAO_Deepks", "print_F_delta");
 
     ofstream ofs;
     stringstream ss;
@@ -424,14 +421,18 @@ void LCAO_Descriptor::print_F_delta(const string& fname, const UnitCell_pseudo &
 }
 
 
-void LCAO_Descriptor::save_npy_d(const int nat)
+void LCAO_Deepks::save_npy_d(const int nat)
 {
-    ModuleBase::TITLE("LCAO_Descriptor", "save_npy_d");
+    ModuleBase::TITLE("LCAO_Deepks", "save_npy_d");
     //save descriptor in .npy format
     vector<double> npy_des;
-    for (int i = 0;i < this->n_descriptor;++i)
+    for (int inl = 0;inl < inlmax;++inl)
     {
-        npy_des.push_back(this->d[i]);
+        int nm = 2*inl_l[inl] + 1;
+        for(int im=0;im<nm;im++)
+        {
+            npy_des.push_back(this->d_tensor[inl].index({im}).item().toDouble());
+        }
     }
     const long unsigned dshape[] = {(long unsigned) nat, (long unsigned) this->des_per_atom };
     if (GlobalV::MY_RANK == 0)
@@ -442,9 +443,9 @@ void LCAO_Descriptor::save_npy_d(const int nat)
 }
 
 
-void LCAO_Descriptor::save_npy_e(const double &e, const std::string &e_file)
+void LCAO_Deepks::save_npy_e(const double &e, const std::string &e_file)
 {
-    ModuleBase::TITLE("LCAO_Descriptor", "save_npy_e");
+    ModuleBase::TITLE("LCAO_Deepks", "save_npy_e");
     //save e_base
     const long unsigned eshape[] = { 1 };
     vector<double> npy_e;
@@ -453,9 +454,9 @@ void LCAO_Descriptor::save_npy_e(const double &e, const std::string &e_file)
     return;
 }
 
-void LCAO_Descriptor::save_npy_f(const ModuleBase::matrix &f, const std::string &f_file, const int nat)
+void LCAO_Deepks::save_npy_f(const ModuleBase::matrix &f, const std::string &f_file, const int nat)
 {
-    ModuleBase::TITLE("LCAO_Descriptor", "save_npy_f");
+    ModuleBase::TITLE("LCAO_Deepks", "save_npy_f");
     //save f_base
     //caution: unit: Rydberg/Bohr
     const long unsigned fshape[] = {(long unsigned) nat, 3 };
@@ -471,9 +472,9 @@ void LCAO_Descriptor::save_npy_f(const ModuleBase::matrix &f, const std::string 
     return;
 }
 
-void LCAO_Descriptor::save_npy_gvx(const int nat)
+void LCAO_Deepks::save_npy_gvx(const int nat)
 {
-    ModuleBase::TITLE("LCAO_Descriptor", "save_npy_gvx");
+    ModuleBase::TITLE("LCAO_Deepks", "save_npy_gvx");
     //save grad_vx.npy (when  force label is in use)
     //unit: /Bohr
     const long unsigned gshape[] = {(long unsigned) nat, 3, nat, this->des_per_atom};

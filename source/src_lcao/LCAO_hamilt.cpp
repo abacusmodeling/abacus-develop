@@ -5,7 +5,7 @@
 #include "global_fp.h" // mohan add 2021-01-30
 #include "dftu.h"
 #ifdef __DEEPKS
-#include "../module_deepks/LCAO_descriptor.h"	//caoyu add 2021-07-26
+#include "../module_deepks/LCAO_deepks.h"	//caoyu add 2021-07-26
 #endif
 
 LCAO_Hamilt::LCAO_Hamilt()
@@ -114,7 +114,7 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-
             GlobalC::ORB,
             GlobalC::GridD,
             GlobalC::ParaO);
-    	GlobalC::ld.cal_descriptor(GlobalC::ucell, GlobalC::ORB);        
+    	GlobalC::ld.cal_descriptor();        
 		GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
 		GlobalC::ld.add_v_delta(GlobalC::ucell,
             GlobalC::ORB,

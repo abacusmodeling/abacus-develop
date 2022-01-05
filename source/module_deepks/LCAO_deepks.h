@@ -21,7 +21,7 @@
 #include "../src_io/winput.h"
 
 ///
-/// This class contains subroutines for realization of the DeePKS method
+/// The LCAO_Deepks contains subroutines for implementation of the DeePKS method in atomic basis.
 /// In essential, it is a machine-learned correction term to the XC potential
 /// in the form of delta_V=|alpha> V(D) <alpha|, where D is a list of descriptors
 /// The subroutines may be roughly grouped into 3 groups
@@ -33,11 +33,11 @@
 /// 
 /// For details of DeePKS method, you can refer to [DeePKS paper](https://pubs.acs.org/doi/10.1021/acs.jctc.0c00872).
 ///
-//
+///
 // caoyu add 2021-03-29
-// wenfei modified 2021-11-17
+// wenfei modified 2022-1-5
 //
-class LCAO_Descriptor
+class LCAO_Deepks
 {
 
 //===============================
@@ -52,8 +52,8 @@ public:
 //realized in LCAO_descriptor.cpp
 //===============================
 
-    explicit LCAO_Descriptor();
-    ~LCAO_Descriptor();
+    explicit LCAO_Deepks();
+    ~LCAO_Deepks();
 
     ///Allocate memory and calculate the index of descriptor in all atoms. 
     ///(only for descriptor part, not including scf)
@@ -77,8 +77,9 @@ public:
         const Parallel_Orbitals &ParaO,
         const K_Vectors &kv);
 
-    ///EIGENVALUE of pdm in block of I_n_l
-    void cal_descriptor(const UnitCell_pseudo &ucell, const LCAO_Orbitals &orb);
+    ///Calculates descriptors
+    ///which are eigenvalues of pdm in blocks of I_n_l
+	void cal_descriptor(void);
 
 //===============================
 //DeePKS Part 2
@@ -175,7 +176,7 @@ public:
         const K_Vectors &kv);	//dD/dX, precondition of cal_gvx
 
     ///print descriptors based on LCAO basis
-    void print_descriptor(const UnitCell_pseudo &ucell);
+    void print_descriptor(const int nat);
     
     ///print the \f$H_\delta\f$ matrix in LCAO basis
     void print_H_V_delta(void);
@@ -328,15 +329,11 @@ private:
     //called when force=1, precondition of cal_gvx
     void cal_gvdm(const int nat);    
 
-    //converts descriptor from projected density matrices
-    //and converts to libtorch format
-	void cal_descriptor_tensor(void);
-
 };
 
 namespace GlobalC
 {
-extern LCAO_Descriptor ld;
+extern LCAO_Deepks ld;
 }
 
 #endif

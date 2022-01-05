@@ -6,7 +6,7 @@
 #include "LCAO_evolve.h"
 #include "dftu.h"
 #ifdef __DEEPKS
-#include "../module_deepks/LCAO_descriptor.h"
+#include "../module_deepks/LCAO_deepks.h"
 #include "LCAO_nnr.h"
 #endif
 
@@ -32,7 +32,7 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
             GlobalC::GridD,
             GlobalC::ParaO,
 			GlobalC::kv);
-    	GlobalC::ld.cal_descriptor(GlobalC::ucell, GlobalC::ORB);
+    	GlobalC::ld.cal_descriptor();
 		//calculate dE/dD
 		GlobalC::ld.cal_gedm_k(GlobalC::ucell.nat);
 

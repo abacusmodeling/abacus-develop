@@ -19,7 +19,7 @@
 #include "../src_pw/vdwd3_parameters.h"
 #include "dmft.h"
 #ifdef __DEEPKS
-#include "../module_deepks/LCAO_descriptor.h"    //caoyu add 2021-07-26
+#include "../module_deepks/LCAO_deepks.h"    //caoyu add 2021-07-26
 #endif
 
 LOOP_ions::LOOP_ions()
@@ -205,8 +205,8 @@ void LOOP_ions::opt_ions(void)
                     GlobalC::kv);
             }
 
-            GlobalC::ld.cal_descriptor(GlobalC::ucell, GlobalC::ORB);    //final descriptor
-            GlobalC::ld.print_descriptor(GlobalC::ucell);
+            GlobalC::ld.cal_descriptor();    //final descriptor
+            GlobalC::ld.print_descriptor(GlobalC::ucell.nat);
             GlobalC::ld.save_npy_d(GlobalC::ucell.nat);            //libnpy needed
             
             if (GlobalV::deepks_scf)

@@ -4,7 +4,7 @@
 #include <map>
 
 #ifdef __DEEPKS
-#include "../module_deepks/LCAO_descriptor.h"
+#include "../module_deepks/LCAO_deepks.h"
 #endif
 
 Force_LCAO_k::Force_LCAO_k ()
@@ -76,7 +76,7 @@ void Force_LCAO_k::ftable_k (
             GlobalC::GridD,
             GlobalC::ParaO,
 			GlobalC::kv);
-    	GlobalC::ld.cal_descriptor(GlobalC::ucell,GlobalC::ORB);
+    	GlobalC::ld.cal_descriptor();
 		GlobalC::ld.cal_gedm_k(GlobalC::ucell.nat);
 
         GlobalC::ld.cal_f_delta_k(GlobalC::LOC.wfc_dm_2d.dm_k,

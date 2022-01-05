@@ -1,7 +1,7 @@
 //wenfei add 2021 october
 #ifdef __DEEPKS
 
-#include "LCAO_descriptor.h"
+#include "LCAO_deepks.h"
 
 //===============================
 //DeePKS Part 2
@@ -12,9 +12,9 @@
 //===============================
 
 
-void LCAO_Descriptor::allocate_V_delta(const int nat, const int nloc, const int nks)
+void LCAO_Deepks::allocate_V_delta(const int nat, const int nloc, const int nks)
 {
-    ModuleBase::TITLE("LCAO_Descriptor", "allocate_V_delta");
+    ModuleBase::TITLE("LCAO_Deepks", "allocate_V_delta");
 
     //initialize the H matrix H_V_delta
     if(GlobalV::GAMMA_ONLY_LOCAL)
@@ -51,14 +51,14 @@ void LCAO_Descriptor::allocate_V_delta(const int nat, const int nloc, const int 
     return;
 }
 
-void LCAO_Descriptor::allocate_V_deltaR(const int nnr)
+void LCAO_Deepks::allocate_V_deltaR(const int nnr)
 {
     delete[] H_V_deltaR;
     H_V_deltaR = new double[nnr];
     ModuleBase::GlobalFunc::ZEROS(H_V_deltaR, nnr);
 }
 
-void LCAO_Descriptor::allocate_nlm(const int nat)
+void LCAO_Deepks::allocate_nlm(const int nat)
 {
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {
@@ -72,7 +72,7 @@ void LCAO_Descriptor::allocate_nlm(const int nat)
 
 //this subroutine adds dV to the Kohn-Sham Hamiltonian
 //for gamma_only calculations
-void LCAO_Descriptor::add_v_delta(const UnitCell_pseudo &ucell,
+void LCAO_Deepks::add_v_delta(const UnitCell_pseudo &ucell,
     const LCAO_Orbitals &orb,
     Grid_Driver &GridD,
     const Parallel_Orbitals &ParaO)
@@ -183,7 +183,7 @@ void LCAO_Descriptor::add_v_delta(const UnitCell_pseudo &ucell,
 
 //this subroutine calculates H_V_deltaR
 //used in multi-k calculations
-void LCAO_Descriptor::add_v_delta_k(const UnitCell_pseudo &ucell,
+void LCAO_Deepks::add_v_delta_k(const UnitCell_pseudo &ucell,
     const LCAO_Orbitals &orb,
     Grid_Driver &GridD,
     const Parallel_Orbitals &ParaO,
@@ -392,14 +392,14 @@ void LCAO_Descriptor::add_v_delta_k(const UnitCell_pseudo &ucell,
 
 //force for gamma only calculations
 //Pulay and HF terms are calculated together
-void LCAO_Descriptor::cal_f_delta_new(const ModuleBase::matrix& dm,
+void LCAO_Deepks::cal_f_delta_new(const ModuleBase::matrix& dm,
     const UnitCell_pseudo &ucell,
     const LCAO_Orbitals &orb,
     Grid_Driver &GridD,
     const Parallel_Orbitals &ParaO,
     const bool isstress, ModuleBase::matrix& svnl_dalpha)
 {
-    ModuleBase::TITLE("LCAO_Descriptor", "cal_f_delta_new");
+    ModuleBase::TITLE("LCAO_Deepks", "cal_f_delta_new");
     this->F_delta.zero_out();
 
     const double Rcut_Alpha = orb.Alpha[0].getRcut();
@@ -574,7 +574,7 @@ void LCAO_Descriptor::cal_f_delta_new(const ModuleBase::matrix& dm,
 //force for multi-k calculations
 //Pulay and HF terms are calculated together
 
-void LCAO_Descriptor::cal_f_delta_k(const std::vector<ModuleBase::ComplexMatrix>& dm/**<[in] density matrix*/,
+void LCAO_Deepks::cal_f_delta_k(const std::vector<ModuleBase::ComplexMatrix>& dm/**<[in] density matrix*/,
     const UnitCell_pseudo &ucell,
     const LCAO_Orbitals &orb,
     Grid_Driver &GridD,
@@ -582,8 +582,8 @@ void LCAO_Descriptor::cal_f_delta_k(const std::vector<ModuleBase::ComplexMatrix>
     const K_Vectors &kv,
     const bool isstress, ModuleBase::matrix& svnl_dalpha)
 {
-    ModuleBase::TITLE("LCAO_Descriptor", "cal_f_delta_hf_k_new");
-    ModuleBase::timer::tick("LCAO_Descriptor","cal_f_delta_hf_k_new");
+    ModuleBase::TITLE("LCAO_Deepks", "cal_f_delta_hf_k_new");
+    ModuleBase::timer::tick("LCAO_Deepks","cal_f_delta_hf_k_new");
     this->F_delta.zero_out();
 
     const double Rcut_Alpha = orb.Alpha[0].getRcut();
@@ -769,15 +769,15 @@ void LCAO_Descriptor::cal_f_delta_k(const std::vector<ModuleBase::ComplexMatrix>
         }
     }
 
-    ModuleBase::timer::tick("LCAO_Descriptor","cal_f_delta_hf_k_new");
+    ModuleBase::timer::tick("LCAO_Deepks","cal_f_delta_hf_k_new");
     return;
 }
 
 //calculating sum of correction band energies
 //for gamma_only calculations
-void LCAO_Descriptor::cal_e_delta_band(const std::vector<ModuleBase::matrix> &dm, const Parallel_Orbitals &ParaO)
+void LCAO_Deepks::cal_e_delta_band(const std::vector<ModuleBase::matrix> &dm, const Parallel_Orbitals &ParaO)
 {
-    ModuleBase::TITLE("LCAO_Descriptor", "cal_e_delta_band");
+    ModuleBase::TITLE("LCAO_Deepks", "cal_e_delta_band");
     this->e_delta_band = 0;
     for (int i = 0; i < GlobalV::NLOCAL; ++i)
     {
@@ -804,11 +804,11 @@ void LCAO_Descriptor::cal_e_delta_band(const std::vector<ModuleBase::matrix> &dm
 
 //calculating sum of correction band energies
 //for multi_k calculations
-void LCAO_Descriptor::cal_e_delta_band_k(const std::vector<ModuleBase::ComplexMatrix> &dm,
+void LCAO_Deepks::cal_e_delta_band_k(const std::vector<ModuleBase::ComplexMatrix> &dm,
     const Parallel_Orbitals &ParaO,
     const int nks)
 {
-    ModuleBase::TITLE("LCAO_Descriptor", "cal_e_delta_band");
+    ModuleBase::TITLE("LCAO_Deepks", "cal_e_delta_band");
     std::complex<double> e_delta_band_k=std::complex<double>(0.0,0.0);
     for (int i = 0; i < GlobalV::NLOCAL; ++i)
     {
@@ -850,15 +850,15 @@ void LCAO_Descriptor::cal_e_delta_band_k(const std::vector<ModuleBase::ComplexMa
 //calculates sum_(L0,M0) alpha<psi_i|alpha><alpha|psi_j>
 //and accumulate the value to H_V_delta(i,j)
 //as well as the counterpart in forces, if calc_deri=1
-void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri,
+void LCAO_Deepks::build_v_delta_alpha_new(const bool& calc_deri,
     const UnitCell_pseudo &ucell,
     const LCAO_Orbitals &orb,
     Grid_Driver &GridD,
     const Parallel_Orbitals &ParaO,
     const ORB_gen_tables &UOT)
 {
-    ModuleBase::TITLE("LCAO_Descriptor", "build_v_delta_alpha_new");
-    ModuleBase::timer::tick ("LCAO_Descriptor","build_v_delta_alpha_new");
+    ModuleBase::TITLE("LCAO_Deepks", "build_v_delta_alpha_new");
+    ModuleBase::timer::tick ("LCAO_Deepks","build_v_delta_alpha_new");
 
     const double Rcut_Alpha = orb.Alpha[0].getRcut();
     //same for all types of atoms
@@ -963,7 +963,7 @@ void LCAO_Descriptor::build_v_delta_alpha_new(const bool& calc_deri,
 		}//end I0
 	}//end T0
 
-    ModuleBase::timer::tick ("LCAO_Descriptor","build_v_delta_alpha_new");
+    ModuleBase::timer::tick ("LCAO_Deepks","build_v_delta_alpha_new");
 	return;
 
 }
