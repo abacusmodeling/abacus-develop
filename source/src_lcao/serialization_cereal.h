@@ -6,10 +6,14 @@
 #include <cereal/types/vector.hpp>
 #include <cereal/types/map.hpp>
 #include <cereal/types/set.hpp>
+#include <cereal/types/string.hpp>
+#include <cereal/types/functional.hpp>
 
 #include "../module_base/vector3.h"
 #include "../src_ri/abfs-vector3_order.h"
 #include "../module_base/matrix.h"
+#include "src_io/read_txt_input_value.h"
+#include "src_io/read_txt_input_item.h"
 
 
 
@@ -31,6 +35,27 @@ template<class Archive> void load( Archive & ar, matrix & m )
 	ar(nr);	ar(nc);
 	m.create(nr,nc);
 	ar(cereal::binary_data(m.c, m.nr*m.nc*sizeof(double)));
+}
+}
+
+namespace Read_Txt_Input
+{
+template<class Archive> void Input_Value::serialize( Archive & ar )
+{
+	ar( this->b );
+	ar( this->i );
+	ar( this->d );
+	ar( this->s );
+}
+template<class Archive> void Input_Item::serialize( Archive & ar )
+{
+	ar( this->annotation );
+	ar( this->values );
+	ar( this->values_type );
+	ar( this->label );
+	ar( this->values_size_read );
+	ar( this->values_size_lower_limit );
+	ar( this->values_size_upper_limit );
 }
 }
 
