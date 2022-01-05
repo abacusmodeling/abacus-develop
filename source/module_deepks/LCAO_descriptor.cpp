@@ -18,7 +18,6 @@ LCAO_Deepks::LCAO_Deepks()
     alpha_index = new ModuleBase::IntArray[1];
     inl_index = new ModuleBase::IntArray[1];
     inl_l = new int[1];
-    d = new double[1];
     H_V_delta = new double[1];
 }
 
@@ -27,7 +26,6 @@ LCAO_Deepks::~LCAO_Deepks()
     delete[] alpha_index;
     delete[] inl_index;
     delete[] inl_l;
-    delete[] d;
     delete[] H_V_delta;
 
     //=======1. "out_descriptor" part==========
@@ -407,28 +405,6 @@ void LCAO_Deepks::cal_projected_DM_k(const std::vector<ModuleBase::ComplexMatrix
     return;
     
 }
-
-//for checking purpose
-void LCAO_Deepks::print_projected_DM(
-	ofstream& ofs, 
-	ModuleBase::ComplexMatrix& des, 
-	const int& it, // index for atom type
-	const int& ia, // index for atoms
-	const int& l, // index for angular momentum quantum number L
-	const int& n) // index for principal quantum number n
-{
-    ofs << "L=" << l << "   N=" << n << std::endl;
-    for (int i = 0; i < 2 * l + 1; i++)
-    {
-        for (int j = 0; j < 2 * l + 1; j++)
-        {
-            ofs << des(i, j).real() << " ";
-        }
-        ofs << std::endl;
-    }
-    return;
-}
-
 
 void LCAO_Deepks::print_descriptor(const int nat)
 {

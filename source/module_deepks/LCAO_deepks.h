@@ -13,7 +13,6 @@
 #include "torch/csrc/api/include/torch/linalg.h"
 
 #include "../src_lcao/LCAO_matrix.h"
-#include "../module_base/lapack_connector.h"
 #include "../module_base/intarray.h"
 #include "../module_base/complexmatrix.h"
 #include "../src_lcao/global_fp.h"
@@ -107,7 +106,7 @@ public:
         const int nnr_in);
     
     //calculates sum_(L0,M0) alpha<psi_i|alpha><alpha|psi_j>
-    void build_v_delta_alpha_new(const bool& cal_deri/**< [in] 0 for 3-center intergration, 1 for its derivation*/,
+    void build_v_delta_alpha(const bool& cal_deri/**< [in] 0 for 3-center intergration, 1 for its derivation*/,
         const UnitCell_pseudo &ucell,
         const LCAO_Orbitals &orb,
         Grid_Driver &GridD,
@@ -115,7 +114,7 @@ public:
         const ORB_gen_tables &UOT);
 
     //for gamma only, pulay and HF terms of force are calculated together
-    void cal_f_delta_new(const ModuleBase::matrix& dm/**< [in] density matrix*/,
+    void cal_f_delta_gamma(const ModuleBase::matrix& dm/**< [in] density matrix*/,
         const UnitCell_pseudo &ucell,
         const LCAO_Orbitals &orb,
         Grid_Driver &GridD,
@@ -146,7 +145,6 @@ public:
 
     ///calculate partial of energy correction to descriptors
     void cal_gedm(const int nat);
-    void cal_gedm_k(const int nat);
 
     ///calculates gradient of descriptors w.r.t atomic positions
     ///----------------------------------------------------
@@ -158,7 +156,6 @@ public:
     ///gvdm*gdmx->gvx
     ///----------------------------------------------------
     void cal_gvx(const int nat);
-    void cal_gvx_k(const int nat);
 
 //calculate the gradient of pdm with regard to atomic positions
 //d/dX D_{Inl,mm'}
@@ -177,9 +174,6 @@ public:
 
     ///print descriptors based on LCAO basis
     void print_descriptor(const int nat);
-    
-    ///print the \f$H_\delta\f$ matrix in LCAO basis
-    void print_H_V_delta(void);
     
     ///print the force related to\f$V_\delta\f$ for each atom
     void print_F_delta(const std::string &fname/**< [in] the name of output file*/, const UnitCell_pseudo &ucell);
@@ -254,7 +248,6 @@ private:
 	std::vector<torch::Tensor> pdm_tensor;
 
 	// descriptors
-    double *d;
 	std::vector<torch::Tensor> d_tensor;
 
 	//gedm:dE/dD, [tot_Inl][2l+1][2l+1]	(E: Hartree)
@@ -309,15 +302,6 @@ private:
 // array for storing gdmx, used for calculating gvx
 	void init_gdmx(const int nat);
 
-//for checking purpose, print the projected density matrices
-    void print_projected_DM(
-		std::ofstream &ofs,
-		ModuleBase::ComplexMatrix &des,
-		const int &it,
-		const int &ia,
-		const int &l,
-		const int& n);
-
 	void del_gdmx(const int nat);
 
 //============================
@@ -333,7 +317,7 @@ private:
 
 namespace GlobalC
 {
-extern LCAO_Deepks ld;
+    extern LCAO_Deepks ld;
 }
 
 #endif

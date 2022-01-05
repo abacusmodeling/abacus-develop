@@ -34,7 +34,7 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 			GlobalC::kv);
     	GlobalC::ld.cal_descriptor();
 		//calculate dE/dD
-		GlobalC::ld.cal_gedm_k(GlobalC::ucell.nat);
+		GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
 
 		//calculate H_V_deltaR from saved <alpha(0)|psi(R)>
 		GlobalC::ld.add_v_delta_k(GlobalC::ucell,

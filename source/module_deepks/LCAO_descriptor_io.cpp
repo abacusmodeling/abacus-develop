@@ -130,76 +130,6 @@ void LCAO_Deepks::cal_gvx(const int nat)
     return;
 }
 
-void LCAO_Deepks::cal_gvx_k(const int nat)
-{
-    ModuleBase::TITLE("LCAO_Deepks","cal_gvx");
-    //preconditions
-    this->cal_gvdm(nat);
-
-    if(!gdmr_vector.empty())
-    {
-        gdmr_vector.erase(gdmr_vector.begin(),gdmr_vector.end());
-    }
-    
-    if(GlobalV::MY_RANK==0)
-    {
-        //make gdmx as tensor
-        int nlmax = this->inlmax/nat;
-        for (int nl=0;nl<nlmax;++nl)
-        {
-            std::vector<torch::Tensor> bmmv;
-            for (int ibt=0;ibt<nat;++ibt)
-            {
-                std::vector<torch::Tensor> xmmv;
-                for (int i=0;i<3;++i)
-                {
-                    std::vector<torch::Tensor> ammv;
-                    for (int iat=0; iat<nat; ++iat)
-                    {
-                        int inl = iat*nlmax + nl;
-                        int nm = 2*this->inl_l[inl]+1;
-                        std::vector<double> mmv;
-                        for (int m1=0;m1<nm;++m1)
-                        {
-                            for(int m2=0;m2<nm;++m2)
-                            {
-                                if(i==0) mmv.push_back(this->gdmx[ibt][inl][m1*nm+m2]);
-                                if(i==1) mmv.push_back(this->gdmy[ibt][inl][m1*nm+m2]);
-                                if(i==2) mmv.push_back(this->gdmz[ibt][inl][m1*nm+m2]);
-                            }
-                        }//nm^2
-                        torch::Tensor mm = torch::tensor(mmv, torch::TensorOptions().dtype(torch::kFloat64) ).reshape({nm, nm});    //nm*nm
-                        ammv.push_back(mm);
-                    }
-                    torch::Tensor amm = torch::stack(ammv, 0);  //nat*nm*nm
-                    xmmv.push_back(amm);
-                }
-                torch::Tensor bmm = torch::stack(xmmv, 0);  //3*nat*nm*nm
-                bmmv.push_back(bmm); 
-            }
-            this->gdmr_vector.push_back(torch::stack(bmmv, 0)); //nbt*3*nat*nm*nm
-        }
-        assert(this->gdmr_vector.size()==nlmax);
-
-        //einsum for each inl: 
-        std::vector<torch::Tensor> gvx_vector;
-        for (int nl = 0;nl<nlmax;++nl)
-        {
-            gvx_vector.push_back(at::einsum("bxamn, avmn->bxav", {this->gdmr_vector[nl], this->gevdm_vector[nl]}));
-        }//
-        
-        // cat nv-> \sum_nl(nv) = \sum_nl(nm_nl)=des_per_atom
-        this->gvx_tensor = torch::cat(gvx_vector, -1);
-
-        assert(this->gvx_tensor.size(0) == nat);
-        assert(this->gvx_tensor.size(1) == 3);
-        assert(this->gvx_tensor.size(2) == nat);
-        assert(this->gvx_tensor.size(3) == this->des_per_atom);
-    }
-
-    return;
-}
-
 void LCAO_Deepks::load_model(const string& model_file)
 {
     ModuleBase::TITLE("LCAO_Deepks", "load_model");
@@ -219,41 +149,6 @@ void LCAO_Deepks::load_model(const string& model_file)
 
 //obtain from the machine learning model dE_delta/dDescriptor
 void LCAO_Deepks::cal_gedm(const int nat)
-{
-    //using this->pdm_tensor
-    ModuleBase::TITLE("LCAO_Deepks", "cal_gedm");
-
-    //forward
-    std::vector<torch::jit::IValue> inputs;
-    //input_dim:(natom, des_per_atom)
-    inputs.push_back(torch::cat(this->d_tensor, /*dim=*/0).reshape({ nat, this->des_per_atom }));
-    std::vector<torch::Tensor> ec;
-    ec.push_back(module.forward(inputs).toTensor());    //Hartree
-    this->E_delta = ec[0].item().toDouble() * 2;//Ry; *2 is for Hartree to Ry
-    
-    //cal gedm
-    std::vector<torch::Tensor> gedm_shell;
-    gedm_shell.push_back(torch::ones_like(ec[0]));
-    this->gedm_tensor = torch::autograd::grad(ec, this->pdm_tensor, gedm_shell, /*retain_grad=*/true, /*create_graph=*/false, /*allow_unused=*/true);
-
-    //gedm_tensor(Hartree) to gedm(Ry)
-    for (int inl = 0;inl < inlmax;++inl)
-    {
-        int nm = 2 * inl_l[inl] + 1;
-        for (int m1 = 0;m1 < nm;++m1)
-        {
-            for (int m2 = 0;m2 < nm;++m2)
-            {
-                int index = m1 * nm + m2;
-                //*2 is for Hartree to Ry
-                this->gedm[inl][index] = this->gedm_tensor[inl].index({ m1,m2 }).item().toDouble() * 2;
-            }
-        }
-    }
-    return;
-}
-
-void LCAO_Deepks::cal_gedm_k(const int nat)
 {
     //using this->pdm_tensor
     ModuleBase::TITLE("LCAO_Deepks", "cal_gedm");
@@ -326,50 +221,6 @@ void LCAO_Deepks::cal_gvdm(const int nat)
     assert(this->gevdm_vector.size() == nlmax);
     return;
 }
-
-void LCAO_Deepks::print_H_V_delta(void)
-{
-    ModuleBase::TITLE("LCAO_Deepks", "print_H_V_delta");
-
-    ofstream ofs;
-    stringstream ss;
-
-    // the parameter 'winput::spillage_outdir' is read from INPUTw.
-    ss << winput::spillage_outdir << "/"
-       << "H_V_delta.dat";
-
-    if (GlobalV::MY_RANK == 0)
-    {
-        ofs.open(ss.str().c_str());
-    }
-
-    ofs << "E_delta(Ry) from deepks model: " << this->E_delta << std::endl;
-    ofs << "E_delta(eV) from deepks model: " << this->E_delta * ModuleBase::Ry_to_eV << std::endl;
-    ofs << "H_delta(Ry)(gamma only)) from deepks model: " << std::endl;
-
-    for (int i = 0;i < GlobalV::NLOCAL;++i)
-    {
-        for (int j = 0;j < GlobalV::NLOCAL;++j)
-        {
-            ofs<< std::setw(12)<< this->H_V_delta[i * GlobalV::NLOCAL + j] << " ";
-        }
-        ofs << std::endl;
-    }
-    ofs << "H_delta(eV)(gamma only)) from deepks model: " << std::endl;
-
-    for (int i = 0;i < GlobalV::NLOCAL;++i)
-    {
-        for (int j = 0;j < GlobalV::NLOCAL;++j)
-        {
-            ofs<< std::setw(12)<< this->H_V_delta[i * GlobalV::NLOCAL + j] *ModuleBase::Ry_to_eV<< " ";
-        }
-        ofs << std::endl;
-    }
-
-    GlobalV::ofs_running << " H_delta has been printed to " << ss.str() << std::endl;
-    return;
-}
-
 
 void LCAO_Deepks::print_F_delta(const string& fname, const UnitCell_pseudo &ucell)
 {

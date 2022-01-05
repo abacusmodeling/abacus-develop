@@ -211,7 +211,6 @@ void LOOP_ions::opt_ions(void)
             
             if (GlobalV::deepks_scf)
             {
-                //ld.print_H_V_delta();   //final H_delta
                 if(GlobalV::GAMMA_ONLY_LOCAL)
                 {
                     GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma, GlobalC::ParaO);

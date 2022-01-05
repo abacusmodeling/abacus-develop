@@ -156,7 +156,7 @@ void LOOP_elec::before_solver(const int &istep)
     if (GlobalV::out_descriptor)
     {
 		//build and save <psi(0)|alpha(R)> at beginning
-        GlobalC::ld.build_v_delta_alpha_new(GlobalV::FORCE,
+        GlobalC::ld.build_v_delta_alpha(GlobalV::FORCE,
 			GlobalC::ucell,
 			GlobalC::ORB,
 			GlobalC::GridD,

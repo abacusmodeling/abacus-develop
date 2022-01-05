@@ -392,14 +392,14 @@ void LCAO_Deepks::add_v_delta_k(const UnitCell_pseudo &ucell,
 
 //force for gamma only calculations
 //Pulay and HF terms are calculated together
-void LCAO_Deepks::cal_f_delta_new(const ModuleBase::matrix& dm,
+void LCAO_Deepks::cal_f_delta_gamma(const ModuleBase::matrix& dm,
     const UnitCell_pseudo &ucell,
     const LCAO_Orbitals &orb,
     Grid_Driver &GridD,
     const Parallel_Orbitals &ParaO,
     const bool isstress, ModuleBase::matrix& svnl_dalpha)
 {
-    ModuleBase::TITLE("LCAO_Deepks", "cal_f_delta_new");
+    ModuleBase::TITLE("LCAO_Deepks", "cal_f_delta_gamma");
     this->F_delta.zero_out();
 
     const double Rcut_Alpha = orb.Alpha[0].getRcut();
@@ -850,15 +850,15 @@ void LCAO_Deepks::cal_e_delta_band_k(const std::vector<ModuleBase::ComplexMatrix
 //calculates sum_(L0,M0) alpha<psi_i|alpha><alpha|psi_j>
 //and accumulate the value to H_V_delta(i,j)
 //as well as the counterpart in forces, if calc_deri=1
-void LCAO_Deepks::build_v_delta_alpha_new(const bool& calc_deri,
+void LCAO_Deepks::build_v_delta_alpha(const bool& calc_deri,
     const UnitCell_pseudo &ucell,
     const LCAO_Orbitals &orb,
     Grid_Driver &GridD,
     const Parallel_Orbitals &ParaO,
     const ORB_gen_tables &UOT)
 {
-    ModuleBase::TITLE("LCAO_Deepks", "build_v_delta_alpha_new");
-    ModuleBase::timer::tick ("LCAO_Deepks","build_v_delta_alpha_new");
+    ModuleBase::TITLE("LCAO_Deepks", "build_v_delta_alpha");
+    ModuleBase::timer::tick ("LCAO_Deepks","build_v_delta_alpha");
 
     const double Rcut_Alpha = orb.Alpha[0].getRcut();
     //same for all types of atoms
@@ -963,7 +963,7 @@ void LCAO_Deepks::build_v_delta_alpha_new(const bool& calc_deri,
 		}//end I0
 	}//end T0
 
-    ModuleBase::timer::tick ("LCAO_Deepks","build_v_delta_alpha_new");
+    ModuleBase::timer::tick ("LCAO_Deepks","build_v_delta_alpha");
 	return;
 
 }

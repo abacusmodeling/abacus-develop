@@ -86,7 +86,7 @@ void Force_LCAO_gamma::ftable_gamma (
             GlobalC::ParaO);
     	GlobalC::ld.cal_descriptor();
         GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
-        GlobalC::ld.cal_f_delta_new(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],
+        GlobalC::ld.cal_f_delta_gamma(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],
             GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
