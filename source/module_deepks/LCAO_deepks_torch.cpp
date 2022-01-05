@@ -1,12 +1,22 @@
-//wenfei 2021-11-17
+//This file contains interfaces with libtorch,
+//including loading of model and calculating gradients
+
+//The file contains 5 subroutines:
+//1. cal_descriptor : obtains descriptors which are eigenvalues of pdm
+//      by calling torch::linalg::eigh
+//2. cal_gvx : gvx is used for training with force label, which is gradient of descriptors, 
+//      calculated by d(des)/dX = d(pdm)/dX * d(des)/d(pdm) = gdmx * gvdm
+//      using einsum
+//3. cal_gvdm : d(des)/d(pdm)
+//      calculated using torch::autograd::grad
+//4. load_model : loads model for applying V_delta
+//5. cal_gedm : calculates d(E_delta)/d(pdm)
+//      this is the term V(D) that enters the expression H_V_delta = |alpha>V(D)<alpha|
+//      caculated using torch::autograd::grad
+
 #ifdef __DEEPKS
 
 #include "LCAO_deepks.h"
-#include "npy.hpp"
-//============================
-//DeePKS Part 3
-//subroutines that deals with io as well as interface with libtorch, libnpy
-//============================
 
 //calculates descriptors from projected density matrices
 void LCAO_Deepks::cal_descriptor(void)
@@ -130,6 +140,45 @@ void LCAO_Deepks::cal_gvx(const int nat)
     return;
 }
 
+//dDescriptor / dprojected density matrix
+void LCAO_Deepks::cal_gvdm(const int nat)
+{
+    ModuleBase::TITLE("LCAO_Deepks", "cal_gvdm");
+    if(!gevdm_vector.empty())
+    {
+        gevdm_vector.erase(gevdm_vector.begin(),gevdm_vector.end());
+    }
+    //cal gevdm(d(EigenValue(D))/dD)
+    int nlmax = inlmax/nat;
+    for (int nl=0;nl<nlmax;++nl)
+    {
+        std::vector<torch::Tensor> avmmv;
+        for (int iat = 0;iat<nat;++iat)
+        {
+            int inl = iat*nlmax+nl;
+            int nm = 2*this->inl_l[inl]+1;
+            //repeat each block for nm times in an additional dimension
+            torch::Tensor tmp_x = this->pdm_tensor[inl].reshape({nm, nm}).unsqueeze(0).repeat({nm, 1, 1});
+            //torch::Tensor tmp_y = std::get<0>(torch::symeig(tmp_x, true));
+            torch::Tensor tmp_y = std::get<0>(torch::linalg::eigh(tmp_x, "U"));
+            torch::Tensor tmp_yshell = torch::eye(nm, torch::TensorOptions().dtype(torch::kFloat64));
+            std::vector<torch::Tensor> tmp_rpt;     //repeated-pdm-tensor (x)
+            std::vector<torch::Tensor> tmp_rdt; //repeated-d-tensor (y)
+            std::vector<torch::Tensor> tmp_gst; //gvx-shell
+            tmp_rpt.push_back(tmp_x);
+            tmp_rdt.push_back(tmp_y);
+            tmp_gst.push_back(tmp_yshell);
+            std::vector<torch::Tensor> tmp_res;
+            tmp_res = torch::autograd::grad(tmp_rdt, tmp_rpt, tmp_gst, false, false, /*allow_unused*/true); //nm(v)**nm*nm
+            avmmv.push_back(tmp_res[0]);
+        }
+        torch::Tensor avmm = torch::stack(avmmv, 0); //nat*nv**nm*nm
+        this->gevdm_vector.push_back(avmm);
+    }
+    assert(this->gevdm_vector.size() == nlmax);
+    return;
+}
+
 void LCAO_Deepks::load_model(const string& model_file)
 {
     ModuleBase::TITLE("LCAO_Deepks", "load_model");
@@ -180,170 +229,6 @@ void LCAO_Deepks::cal_gedm(const int nat)
             }
         }
     }
-    return;
-}
-
-//dDescriptor / dprojected density matrix
-void LCAO_Deepks::cal_gvdm(const int nat)
-{
-    ModuleBase::TITLE("LCAO_Deepks", "cal_gvdm");
-    if(!gevdm_vector.empty())
-    {
-        gevdm_vector.erase(gevdm_vector.begin(),gevdm_vector.end());
-    }
-    //cal gevdm(d(EigenValue(D))/dD)
-    int nlmax = inlmax/nat;
-    for (int nl=0;nl<nlmax;++nl)
-    {
-        std::vector<torch::Tensor> avmmv;
-        for (int iat = 0;iat<nat;++iat)
-        {
-            int inl = iat*nlmax+nl;
-            int nm = 2*this->inl_l[inl]+1;
-            //repeat each block for nm times in an additional dimension
-            torch::Tensor tmp_x = this->pdm_tensor[inl].reshape({nm, nm}).unsqueeze(0).repeat({nm, 1, 1});
-            //torch::Tensor tmp_y = std::get<0>(torch::symeig(tmp_x, true));
-            torch::Tensor tmp_y = std::get<0>(torch::linalg::eigh(tmp_x, "U"));
-            torch::Tensor tmp_yshell = torch::eye(nm, torch::TensorOptions().dtype(torch::kFloat64));
-            std::vector<torch::Tensor> tmp_rpt;     //repeated-pdm-tensor (x)
-            std::vector<torch::Tensor> tmp_rdt; //repeated-d-tensor (y)
-            std::vector<torch::Tensor> tmp_gst; //gvx-shell
-            tmp_rpt.push_back(tmp_x);
-            tmp_rdt.push_back(tmp_y);
-            tmp_gst.push_back(tmp_yshell);
-            std::vector<torch::Tensor> tmp_res;
-            tmp_res = torch::autograd::grad(tmp_rdt, tmp_rpt, tmp_gst, false, false, /*allow_unused*/true); //nm(v)**nm*nm
-            avmmv.push_back(tmp_res[0]);
-        }
-        torch::Tensor avmm = torch::stack(avmmv, 0); //nat*nv**nm*nm
-        this->gevdm_vector.push_back(avmm);
-    }
-    assert(this->gevdm_vector.size() == nlmax);
-    return;
-}
-
-void LCAO_Deepks::print_F_delta(const string& fname, const UnitCell_pseudo &ucell)
-{
-    ModuleBase::TITLE("LCAO_Deepks", "print_F_delta");
-
-    ofstream ofs;
-    stringstream ss;
-    // the parameter 'winput::spillage_outdir' is read from INPUTw.
-    ss << winput::spillage_outdir << "/"<< fname ;
-
-    if (GlobalV::MY_RANK == 0)
-    {
-        ofs.open(ss.str().c_str());
-    }
-
-    ofs << "F_delta(Hatree/Bohr) from deepks model: " << std::endl;
-    ofs << std::setw(12) << "type" << std::setw(12) << "atom" << std::setw(15) << "dF_x" << std::setw(15) << "dF_y" << std::setw(15) << "dF_z" << std::endl;
-
-    for (int it = 0;it < ucell.ntype;++it)
-    {
-        for (int ia = 0;ia < ucell.atoms[it].na;++ia)
-        {
-            int iat = ucell.itia2iat(it, ia);
-            ofs << std::setw(12) << ucell.atoms[it].label << std::setw(12) << ia
-                << std::setw(15) << this->F_delta(iat, 0) / 2 << std::setw(15) << this->F_delta(iat, 1) / 2
-                << std::setw(15) << this->F_delta(iat, 2) / 2 << std::endl;
-        }
-    }
-
-    ofs << "F_delta(eV/Angstrom) from deepks model: " << std::endl;
-    ofs << std::setw(12) << "type" << std::setw(12) << "atom" << std::setw(15) << "dF_x" << std::setw(15) << "dF_y" << std::setw(15) << "dF_z" << std::endl;
-
-    for (int it = 0;it < ucell.ntype;++it)
-    {
-        for (int ia = 0;ia < ucell.atoms[it].na;++ia)
-        {
-            int iat = ucell.itia2iat(it, ia);
-            ofs << std::setw(12) << ucell.atoms[it].label << std::setw(12)
-                << ia << std::setw(15) << this->F_delta(iat, 0) * ModuleBase::Ry_to_eV/ModuleBase::BOHR_TO_A
-                << std::setw(15) << this->F_delta(iat, 1) * ModuleBase::Ry_to_eV/ModuleBase::BOHR_TO_A
-                << std::setw(15) << this->F_delta(iat, 2) * ModuleBase::Ry_to_eV/ModuleBase::BOHR_TO_A << std::endl;
-        }
-    }
-
-    GlobalV::ofs_running << " F_delta has been printed to " << ss.str() << std::endl;
-    ofs.close();
-
-    return;
-}
-
-
-void LCAO_Deepks::save_npy_d(const int nat)
-{
-    ModuleBase::TITLE("LCAO_Deepks", "save_npy_d");
-    //save descriptor in .npy format
-    vector<double> npy_des;
-    for (int inl = 0;inl < inlmax;++inl)
-    {
-        int nm = 2*inl_l[inl] + 1;
-        for(int im=0;im<nm;im++)
-        {
-            npy_des.push_back(this->d_tensor[inl].index({im}).item().toDouble());
-        }
-    }
-    const long unsigned dshape[] = {(long unsigned) nat, (long unsigned) this->des_per_atom };
-    if (GlobalV::MY_RANK == 0)
-    {
-        npy::SaveArrayAsNumpy("dm_eig.npy", false, 2, dshape, npy_des);
-    }
-    return;
-}
-
-
-void LCAO_Deepks::save_npy_e(const double &e, const std::string &e_file)
-{
-    ModuleBase::TITLE("LCAO_Deepks", "save_npy_e");
-    //save e_base
-    const long unsigned eshape[] = { 1 };
-    vector<double> npy_e;
-    npy_e.push_back(e);
-    npy::SaveArrayAsNumpy(e_file, false, 1, eshape, npy_e);
-    return;
-}
-
-void LCAO_Deepks::save_npy_f(const ModuleBase::matrix &f, const std::string &f_file, const int nat)
-{
-    ModuleBase::TITLE("LCAO_Deepks", "save_npy_f");
-    //save f_base
-    //caution: unit: Rydberg/Bohr
-    const long unsigned fshape[] = {(long unsigned) nat, 3 };
-    vector<double> npy_f;
-    for (int iat = 0;iat < nat;++iat)
-    {
-        for (int i = 0;i < 3;i++)
-        {
-            npy_f.push_back(f(iat, i));
-        }
-    }
-    npy::SaveArrayAsNumpy(f_file, false, 2, fshape, npy_f);
-    return;
-}
-
-void LCAO_Deepks::save_npy_gvx(const int nat)
-{
-    ModuleBase::TITLE("LCAO_Deepks", "save_npy_gvx");
-    //save grad_vx.npy (when  force label is in use)
-    //unit: /Bohr
-    const long unsigned gshape[] = {(long unsigned) nat, 3, nat, this->des_per_atom};
-    vector<double> npy_gvx;
-    for (int ibt = 0;ibt < nat;++ibt)
-    {
-        for (int i = 0;i < 3;i++)
-        {
-            for (int iat = 0;iat < nat;++iat)
-            {
-                for(int p=0;p<this->des_per_atom;++p)
-                {
-                    npy_gvx.push_back(this->gvx_tensor.index({ ibt, i, iat, p }).item().toDouble());
-                }
-            }
-        }
-    }
-    npy::SaveArrayAsNumpy("grad_vx.npy", false, 4, gshape, npy_gvx);
     return;
 }
 

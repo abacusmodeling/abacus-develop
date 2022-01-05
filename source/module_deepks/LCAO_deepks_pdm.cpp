@@ -1,169 +1,18 @@
-//caoyu add 2021-03-2
+//wenfei 2022-1-5
+//This file contains subroutines for calculating pdm,
+//which is defind as sum_mu,nu rho_mu,nu (<chi_mu|alpha><alpha|chi_nu>);
+//as well as gdmx, which is the gradient of pdm, defined as
+//sum_mu,nu rho_mu,nu d/dX(<chi_mu|alpha><alpha|chi_nu>)
+
+//There are four subroutines in this file:
+//1. cal_projected_DM, which is used for calculating pdm for gamma point calculation
+//2. cal_projected_DM_k, counterpart of 1, for multi-k
+//3. cal_gdmx, calculating gdmx for gamma point
+//4. cal_gdmx_k, counterpart of 3, for multi-k
+
 #ifdef __DEEPKS
 
 #include "LCAO_deepks.h"
-
-//===============================
-//DeePKS Part 1
-//deals with generation of descriptors as well as labels
-//===============================
-
-namespace GlobalC
-{
-    LCAO_Deepks ld;
-}
-
-LCAO_Deepks::LCAO_Deepks()
-{
-    alpha_index = new ModuleBase::IntArray[1];
-    inl_index = new ModuleBase::IntArray[1];
-    inl_l = new int[1];
-    H_V_delta = new double[1];
-}
-
-LCAO_Deepks::~LCAO_Deepks()
-{
-    delete[] alpha_index;
-    delete[] inl_index;
-    delete[] inl_l;
-    delete[] H_V_delta;
-
-    //=======1. "out_descriptor" part==========
-    //delete pdm**
-    for (int inl = 0;inl < this->inlmax;inl++)
-    {
-        delete[] pdm[inl];
-    }
-    delete[] pdm;
-    //=======2. "deepks_scf" part==========
-    if (GlobalV::deepks_scf)
-    {
-        //delete gedm**
-        for (int inl = 0;inl < this->inlmax;inl++)
-        {
-            delete[] gedm[inl];
-        }
-        delete[] gedm;
-    }
-}
-
-#ifdef __MPI
-void LCAO_Deepks::allsum_deepks(
-    int inlmax, //first dimension
-    int ndim, //second dimension
-    double** mat) //the array being reduced 
-{
-    for(int inl=0;inl<inlmax;inl++)
-    {
-        Parallel_Reduce::reduce_double_all(mat[inl],ndim);
-    }
-}
-#endif
-
-void LCAO_Deepks::init(
-    const LCAO_Orbitals &orb,
-    const int nat,
-    const int ntype,
-    std::vector<int> na) 
-{
-    ModuleBase::TITLE("LCAO_Deepks", "init");
-
-    GlobalV::ofs_running << " Initialize the descriptor index for DeePKS (lcao line)" << std::endl;
-
-    const int lm = orb.get_lmax_d();
-    const int nm = orb.get_nchimax_d();
-    const int tot_inl_per_atom = orb.Alpha[0].getTotal_nchi();
-
-    assert(lm >= 0);
-    assert(nm >= 0);
-    assert(tot_inl_per_atom >= 0);
-    
-    const int tot_inl = tot_inl_per_atom * nat;
-
-    this->lmaxd = lm;
-    this->nmaxd = nm;
-    this->inlmax = tot_inl;
-    GlobalV::ofs_running << " lmax of descriptor = " << this->lmaxd << std::endl;
-    GlobalV::ofs_running << " nmax of descriptor= " << nmaxd << std::endl;
-	GlobalV::ofs_running << " total basis (all atoms) for descriptor= " << std::endl;
-    
-    //init pdm**
-    const int pdm_size = (this->lmaxd * 2 + 1) * (this->lmaxd * 2 + 1);
-    this->pdm = new double* [this->inlmax];
-    for (int inl = 0;inl < this->inlmax;inl++)
-    {
-        this->pdm[inl] = new double[pdm_size];
-        ModuleBase::GlobalFunc::ZEROS(this->pdm[inl], pdm_size);
-    }
-
-    // cal n(descriptor) per atom , related to Lmax, nchi(L) and m. (not total_nchi!)
-	this->des_per_atom=0; // mohan add 2021-04-21
-    for (int l = 0; l <= this->lmaxd; l++)
-    {
-        this->des_per_atom += orb.Alpha[0].getNchi(l) * (2 * l + 1);
-    }
-
-    this->n_descriptor = nat * this->des_per_atom;
-
-    this->init_index(ntype, nat, na, tot_inl, orb);
-    this->allocate_nlm(nat);
-
-    return;
-}
-
-void LCAO_Deepks::init_index(const int ntype, const int nat, std::vector<int> na, const int Total_nchi, const LCAO_Orbitals &orb)
-{
-    delete[] this->alpha_index;
-    this->alpha_index = new ModuleBase::IntArray[ntype];
-    delete[] this->inl_index;
-    this->inl_index = new ModuleBase::IntArray[ntype];
-    delete[] this->inl_l;
-    this->inl_l = new int[this->inlmax];
-    ModuleBase::GlobalFunc::ZEROS(this->inl_l, this->inlmax);
-
-    int inl = 0;
-    int alpha = 0;
-    for (int it = 0; it < ntype; it++)
-    {
-        this->alpha_index[it].create(
-            na[it],
-            this->lmaxd + 1, // l starts from 0
-            this->nmaxd,
-            2 * this->lmaxd + 1); // m ==> 2*l+1
-
-        this->inl_index[it].create(
-            na[it],
-            this->lmaxd + 1,
-            this->nmaxd); 
-
-        GlobalV::ofs_running << " Type " << it + 1
-                    << " number_of_atoms " << na[it] << std::endl;
-
-        for (int ia = 0; ia < na[it]; ia++)
-        {
-            //alpha
-            for (int l = 0; l < this->lmaxd + 1; l++)
-            {
-                for (int n = 0; n < orb.Alpha[0].getNchi(l); n++)
-                {
-                    for (int m = 0; m < 2 * l + 1; m++)
-                    {
-                        this->alpha_index[it](ia, l, n, m) = alpha;
-                        alpha++;
-                    }
-                    this->inl_index[it](ia, l, n) = inl;
-                    this->inl_l[inl] = l;
-                    inl++;
-                }
-            }
-        }//end ia
-    }//end it
-    assert(this->n_descriptor == alpha);
-    assert(Total_nchi == inl);
-    GlobalV::ofs_running << " descriptors_per_atom " << this->des_per_atom << std::endl;
-    GlobalV::ofs_running << " total_descriptors " << this->n_descriptor << std::endl;
-	return;
-}
 
 //this subroutine performs the calculation of projected density matrices
 //pdm_m,m'=\sum_{mu,nu} rho_{mu,nu} <chi_mu|alpha_m><alpha_m'|chi_nu>
@@ -406,37 +255,6 @@ void LCAO_Deepks::cal_projected_DM_k(const std::vector<ModuleBase::ComplexMatrix
     
 }
 
-void LCAO_Deepks::print_descriptor(const int nat)
-{
-    ModuleBase::TITLE("LCAO_Deepks", "print_descriptor");
-    ofstream ofs;
-    stringstream ss;
-    // the parameter 'winput::spillage_outdir' is read from INPUTw.
-    ss << winput::spillage_outdir << "/"
-       << "descriptor.dat";
-    if (GlobalV::MY_RANK == 0)
-    {
-        ofs.open(ss.str().c_str());
-    }
-    for (int ia = 0; ia < nat; ia++)
-    {
-        ofs << " atom_index " << ia + 1 << " n_descriptor " << this->des_per_atom << std::endl;
-        for(int inl=0;inl<inlmax/nat;inl++)
-        {
-            int nm = 2*inl_l[inl]+1;
-            for(int im=0;im<nm;im++)
-            {
-                const int ind=ia*inlmax/nat+inl;
-                ofs << std::setprecision(10) << d_tensor[ind].index({im}).item().toDouble() << " ";
-            }
-        }
-        ofs << std::endl << std::endl;
-    }
-    GlobalV::ofs_running << " Descriptors have been printed to " << ss.str() << std::endl;
-
-    return;
-}
-
 //this subroutine calculates the gradient of projected density matrices
 //gdmx_m,m = d/dX sum_{mu,nu} rho_{mu,nu} <chi_mu|alpha_m><alpha_m'|chi_nu>
 void LCAO_Deepks::cal_gdmx(const ModuleBase::matrix &dm,
@@ -446,6 +264,7 @@ void LCAO_Deepks::cal_gdmx(const ModuleBase::matrix &dm,
     const Parallel_Orbitals &ParaO)
 {
     ModuleBase::TITLE("LCAO_Deepks", "cal_gdmx");
+    ModuleBase::timer::tick("LCAO_Deepks","cal_gdmx");
     //get DS_alpha_mu and S_nu_beta
 
     int size = (2 * lmaxd + 1) * (2 * lmaxd + 1);
@@ -570,6 +389,7 @@ void LCAO_Deepks::cal_gdmx(const ModuleBase::matrix &dm,
         allsum_deepks(this->inlmax,size,this->gdmz[iat]);
     }
 #endif
+    ModuleBase::timer::tick("LCAO_Deepks","cal_gdmx");
     return;
 }
 
@@ -580,7 +400,8 @@ void LCAO_Deepks::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm,
     const Parallel_Orbitals &ParaO,
     const K_Vectors &kv)
 {
-    ModuleBase::TITLE("LCAO_Deepks", "cal_gdmx");
+    ModuleBase::TITLE("LCAO_Deepks", "cal_gdmx_k");
+    ModuleBase::timer::tick("LCAO_Deepks","cal_gdmx_k");
 
     int size = (2 * lmaxd + 1) * (2 * lmaxd + 1);
 
@@ -720,50 +541,7 @@ void LCAO_Deepks::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm,
         allsum_deepks(this->inlmax,size,this->gdmz[iat]);
     }
 #endif
-    return;
-}
-
-void LCAO_Deepks::init_gdmx(const int nat)
-{
-    this->gdmx = new double** [nat];
-    this->gdmy = new double** [nat];
-    this->gdmz = new double** [nat];
-    for (int iat = 0;iat < nat;iat++)
-    {
-        this->gdmx[iat] = new double* [inlmax];
-        this->gdmy[iat] = new double* [inlmax];
-        this->gdmz[iat] = new double* [inlmax];
-        for (int inl = 0;inl < inlmax;inl++)
-        {
-            this->gdmx[iat][inl] = new double [(2 * lmaxd + 1) * (2 * lmaxd + 1)];
-            this->gdmy[iat][inl] = new double [(2 * lmaxd + 1) * (2 * lmaxd + 1)];
-            this->gdmz[iat][inl] = new double[(2 * lmaxd + 1) * (2 * lmaxd + 1)];
-            ModuleBase::GlobalFunc::ZEROS(gdmx[iat][inl], (2 * lmaxd + 1) * (2 * lmaxd + 1));
-            ModuleBase::GlobalFunc::ZEROS(gdmy[iat][inl], (2 * lmaxd + 1) * (2 * lmaxd + 1));
-            ModuleBase::GlobalFunc::ZEROS(gdmz[iat][inl], (2 * lmaxd + 1) * (2 * lmaxd + 1));
-        }
-    }
-    return;
-}
-
-
-void LCAO_Deepks::del_gdmx(const int nat)
-{
-    for (int iat = 0;iat < nat;iat++)
-    {
-        for (int inl = 0;inl < inlmax;inl++)
-        {
-            delete[] this->gdmx[iat][inl];
-            delete[] this->gdmy[iat][inl];
-            delete[] this->gdmz[iat][inl];
-        }
-        delete[] this->gdmx[iat];
-        delete[] this->gdmy[iat];
-        delete[] this->gdmz[iat];
-    }
-    delete[] this->gdmx;
-    delete[] this->gdmy;
-    delete[] this->gdmz;
+    ModuleBase::timer::tick("LCAO_Deepks","cal_gdmx_k");
     return;
 }
 

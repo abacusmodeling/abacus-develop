@@ -160,9 +160,14 @@ LCAO_matrix.o\
 LCAO_nnr.o \
 LCAO_diago.o\
 LCAO_evolve.o\
-LCAO_descriptor.o\
-LCAO_descriptor_io.o\
-LCAO_descriptor_dV.o\
+LCAO_deepks.o\
+LCAO_deepks_fdelta.o\
+LCAO_deepks_io.o\
+LCAO_deepks_mpi.o\
+LCAO_deepks_pdm.o\
+LCAO_deepks_psialpha.o\
+LCAO_deepks_torch.o\
+LCAO_deepks_vdelta.o\
 ylm.o\
 FORCE_STRESS.o\
 FORCE_gamma.o\
