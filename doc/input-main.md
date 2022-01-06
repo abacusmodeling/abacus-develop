@@ -43,7 +43,7 @@
 
     - [Molecular dynamics](#molecular-dynamics)
 
-        [md_type](#md-type) | [md_potential](#md-potential) | [md_rstmd](#md-rstmd) | [md_dt](#md_dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_dumpmdfred](#md-dumpmdfred) | [md_tfreq](#md-tfreq) | [md_fixtemperature](#md-fixtemperature) | [NVT_control](#nvt-control) | [NVT_tau](#nvt-tau) | [MNHC](#mnhc) | [md_ediff](#md-ediff) | [md_ediffg](#md-ediffg) | [rcut_lj](#rcut_lj) | [epsilon_lj](#epsilon_lj) | [sigma_lj](#sigma_lj) | [direction](#direction) | [velocity](#velocity) | [viscosity](#viscosity) | [tscale](#tscale) | [damp](#damp)
+        [md_type](#md-type) | [md_potential](#md-potential) | [md_rstmd](#md-rstmd) | [md_dt](#md_dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_dumpfred](#md-dumpfred) | [md_rstfred](#md-rstfred) | [md_tfreq](#md-tfreq) | [MNHC](#mnhc) | [rcut_lj](#rcut_lj) | [epsilon_lj](#epsilon_lj) | [sigma_lj](#sigma_lj) | [direction](#direction) | [velocity](#velocity) | [viscosity](#viscosity) | [tscale](#tscale) | [damp](#damp)
 
     - [DFT+U correction](#DFT_U-correction)
 
@@ -1157,9 +1157,16 @@ This part of variables are used to control the molecular dynamics calculations.
     - *Default*: No default
 
     [back to top](#input-file)
-- md_dumpmdfred<a id="md-dumpmdfred"></a>
+- md_dumpfred<a id="md-dumpfred"></a>
     - *Type*: Integer
-    - *Description*:This is the steps to control the frequence to output md information
+    - *Description*:This is the frequence to dump md information.
+    - *Default*: 1
+
+    [back to top](#input-file)
+
+- md_rstfred<a id="md-rstfred"></a>
+    - *Type*: Integer
+    - *Description*:This is the frequence to output restart information.
     - *Default*: 1
 
     [back to top](#input-file)
@@ -1173,50 +1180,10 @@ This part of variables are used to control the molecular dynamics calculations.
 
     [back to top](#input-file)
 
-- md_fixtemperature<a id="md-fixtemperature"></a>
-    - *Type*: Integer
-    - *Description*:
-        - n:when set to n (n > 1), ABACUS will read the file "ChangeTemp.dat" and change system’s temperature every n steps
-        - 0,1:When set to 0 or 1, ABACUS won’t change the temperature during running MD.
-    - *Default*: 1
-
-    [back to top](#input-file)
-
-- NVT_control<a id="nvt-control"></a> 
-    - *Type*: Integer
-    - *Description*: Specifies which type of thermostat is used.
-        - 1: Nose-Hoover-chains
-        - 2: Langevin
-        - 3: Andersen
-    - *Default*: 1
-
-    [back to top](#input-file)
-
-- NVT_tau<a id="nvt-tau"></a>
-    - *Type*: Real
-    - *Description*: Parameter for adjust effect of thermostat corresponding to the time scale of collision, in fs. If te input value is less than 1d-10, then it is automatically set in ABACUS.
-    - *Default*: 0 
-
-    [back to top](#input-file)
-
 - MNHC<a id="mnhc"></a>
     - *Type*: Integer
     - *Description*: Number of Nose-Hoover chains.
     - *Default*: 4
-
-    [back to top](#input-file)
-
-- md_ediff<a id="md-ediff"></a>
-    - *Type*: Real
-    - *Description*: Parameter for constraining total energy change.
-    - *Default*: 0.0001
-
-    [back to top](#input-file)
-
-- md_ediffg<a id="md-ediffg"></a>
-    - *Type*: Real
-    - *Description*: Parameter for constraining max force change
-    - *Default*: 0.001
 
     [back to top](#input-file)
 
