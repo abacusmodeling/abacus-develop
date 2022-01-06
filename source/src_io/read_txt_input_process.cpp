@@ -126,7 +126,8 @@ namespace Read_Txt_Input
 	void Input_Process::bcast()
 	{
 #ifdef USE_CEREAL_SERIALIZATION
-		ModuleBase::bcast_data_cereal(this->input.list, MPI_COMM_WORLD, 0);
+		for(auto &item : this->input.list)
+			ModuleBase::bcast_data_cereal(item.second, MPI_COMM_WORLD, 0);
 #else
 #error Input_Process::bcast() needs cereal
 #endif
