@@ -1454,7 +1454,7 @@ void Hamilt_PW::add_nonlocal_pp_cuda(
     double2 *ps;
 	if(m == 1)
 	{
-		CHECK_CUDA(cudaMemset(d_ps, 0, GlobalV::NPOL * m * sizeof(double2)));
+		CHECK_CUDA(cudaMemset(d_ps, 0, nkb * GlobalV::NPOL * m * sizeof(double2)));
 	}
 	else
 	{
