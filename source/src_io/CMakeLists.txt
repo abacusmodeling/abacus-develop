@@ -25,6 +25,7 @@ add_library(
     read_rho.cpp
     read_txt_tools.cpp
     read_txt_input_value.cpp
+    read_txt_input_item.cpp
 	read_txt_input_list.cpp
 	read_txt_input_process.cpp
 	read_txt_input_process_global.cpp
