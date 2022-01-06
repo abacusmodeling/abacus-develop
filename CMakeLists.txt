@@ -82,6 +82,7 @@ if(USE_CUDA)
     -lcublas
     -lcudart
     -lcusolver
+    -lnvToolsExt
   )
   set_property(TARGET ${ABACUS_BIN_NAME}
   PROPERTY CUDA_ARCHITECTURES

@@ -27,6 +27,18 @@ public:
         const double2* psi_L,
         const double2* psi_R,
         const bool reduce = true) ;
+    
+    void ddot_real_on_device(
+        const int &dim,
+        const float2* psi_L,
+        const float2* psi_R,
+        float *res);
+    
+    void ddot_real_on_device(
+        const int &dim,
+        const double2* psi_L,
+        const double2* psi_R,
+        double *res);
 
     float2 ddot(
         const int & dim,
@@ -101,6 +113,8 @@ private:
     int test_cg;
 #ifdef __CUDA
     cublasHandle_t diag_handle;
+    // cublasHandle_t diag_handle_device; // pointer_mode = device
+    T* tmp_3value;
 #endif
 
 #ifdef __ROCM

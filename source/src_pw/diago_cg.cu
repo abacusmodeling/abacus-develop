@@ -1,6 +1,7 @@
 #include "diago_cg.cuh"
 #include "cuda_runtime.h"
 #include "global.h"
+#include "nvToolsExt.h"
 
 template<class T, class T2>
 int Diago_CG_CUDA<T, T2>::moved = 0;
@@ -39,13 +40,13 @@ __global__ void kernel_precondition_inverse(T2 *res, const T2 *data, const int s
 }
 
 template<class T, class T2>
-__global__ void kernel_get_gredient(T2 *g, T2 *ppsi, int size, T lambda)
+__global__ void kernel_get_gredient(T2 *g, T2 *ppsi, int size, T* tmp_3value)
 {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if(idx < size)
     {
-        g[idx].x -= lambda * ppsi[idx].x;
-        g[idx].y -= lambda * ppsi[idx].y;
+        g[idx].x -= tmp_3value[2] * ppsi[idx].x;
+        g[idx].y -= tmp_3value[2] * ppsi[idx].y;
     }
 }
 
@@ -83,17 +84,27 @@ __global__ void kernel_multi_add(T2 *dst, T2 *src1, T a1, const T2 *src2, T a2, 
 }
 
 template<class T, class T2>
+__global__ void divide_lambda(T* res)
+{
+    res[2] = res[0] / res[1];
+}
+
+template<class T, class T2>
 Diago_CG_CUDA<T, T2>::Diago_CG_CUDA()
 {
     test_cg=0;
+    CHECK_CUDA(cudaMalloc((void**)&tmp_3value, sizeof(T)*3));
     CHECK_CUBLAS(cublasCreate(&diag_handle));
-    // CHECK_CUBLAS(cublasCreate(&ddot_handle));
+    // CHECK_CUBLAS(cublasCreate(&diag_handle_device));
+    // CHECK_CUBLAS(cublasSetPointerMode(diag_handle_device, CUBLAS_POINTER_MODE_HOST));
 }
 
 template<class T, class T2>
 Diago_CG_CUDA<T, T2>::~Diago_CG_CUDA() 
 {
+    CHECK_CUDA(cudaFree(tmp_3value));
     CHECK_CUBLAS(cublasDestroy(diag_handle));
+    // CHECK_CUBLAS(cublasCreate(&diag_handle));
     // CHECK_CUBLAS(cublasDestroy(ddot_handle));
 }
 
@@ -311,6 +322,8 @@ void Diago_CG_CUDA<T, T2>::calculate_gradient(
     if (test_cg==1) ModuleBase::TITLE("Diago_CG_CUDA","calculate_gradient");
     ModuleBase::timer::tick("Diago_CG_CUDA","calculate_grad");
 
+    nvtxRangePushA("cal_grad");
+
     int thread = 512;
     int block = (dim + thread - 1) / thread;
 
@@ -320,16 +333,24 @@ void Diago_CG_CUDA<T, T2>::calculate_gradient(
     // (3) PS|psi> : ppsi[i] = spsi[i]/precondition[i]
     kernel_precondition<T, T2><<<block, thread>>>(ppsi, spsi, dim, precondition);
 
-    // Update lambda !
-    // (4) <psi|SPH|psi >
-    const T eh = this->ddot_real(dim, spsi, g);
-    // (5) <psi|SPS|psi >
-    const T es = this->ddot_real(dim, spsi, ppsi);
-    const T lambda = eh / es;
+    // // Update lambda !
+    // // (4) <psi|SPH|psi >
+    // const T eh = this->ddot_real(dim, spsi, g);
+    // // (5) <psi|SPS|psi >
+    // const T es = this->ddot_real(dim, spsi, ppsi);
+    // const T lambda = eh / es;
+
+    // T* tmp_3value; // value of eh, es lambda
+    // CHECK_CUDA(cudaMalloc((void**)&tmp_3value, sizeof(T)*3))
+    ddot_real_on_device(dim, spsi, g, &tmp_3value[0]);
+    ddot_real_on_device(dim, spsi, ppsi, &tmp_3value[1]);
+    divide_lambda<T, T2><<<1, 1>>>(tmp_3value);
 
     // Update g !
-    kernel_get_gredient<T, T2><<<block, thread>>>(g, ppsi, dim, lambda);
+    kernel_get_gredient<T, T2><<<block, thread>>>(g, ppsi, dim, tmp_3value);
     // kernel_multi_add<<<block, thread>>>(g, g, 1, ppsi, -lambda, dim);
+    
+    nvtxRangePop();
     ModuleBase::timer::tick("Diago_CG_CUDA","calculate_grad");
     return;
 }
@@ -740,6 +761,34 @@ double Diago_CG_CUDA<T, T2>::ddot_real
     return result;
 }
 
+template<class T, class T2>
+void Diago_CG_CUDA<T, T2>::ddot_real_on_device
+(
+    const int &dim,
+    const float2* psi_L,
+    const float2* psi_R,
+    float *res
+)
+{
+    CHECK_CUBLAS(cublasSetPointerMode(diag_handle, CUBLAS_POINTER_MODE_DEVICE));
+    CHECK_CUBLAS(cublasSdot(diag_handle, dim*2, (float*)psi_L, 1, (float*)psi_R, 1, res));
+    CHECK_CUBLAS(cublasSetPointerMode(diag_handle, CUBLAS_POINTER_MODE_HOST));
+}
+
+
+template<class T, class T2>
+void Diago_CG_CUDA<T, T2>::ddot_real_on_device
+(
+    const int &dim,
+    const double2* psi_L,
+    const double2* psi_R,
+    double *res
+)
+{
+    CHECK_CUBLAS(cublasSetPointerMode(diag_handle, CUBLAS_POINTER_MODE_DEVICE));
+    CHECK_CUBLAS(cublasDdot(diag_handle, dim*2, (double*)psi_L, 1, (double*)psi_R, 1, res));
+    CHECK_CUBLAS(cublasSetPointerMode(diag_handle, CUBLAS_POINTER_MODE_HOST));
+}
 
 template<class T, class T2>
 float2 Diago_CG_CUDA<T, T2>::ddot
