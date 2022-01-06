@@ -160,7 +160,7 @@ if(ENABLE_DEEPKS)
   include(FetchContent)
     FetchContent_Declare(
       libnpy
-      GIT_REPOSITORY https://github.com.cnpmjs.org/llohse/libnpy.git
+      GIT_REPOSITORY https://github.com/llohse/libnpy.git
     )
     FetchContent_MakeAvailable(libnpy)
   endif()
@@ -204,7 +204,7 @@ IF (BUILD_TESTING)
   include(FetchContent)
   FetchContent_Declare(
     googletest
-    GIT_REPOSITORY https://github.com.cnpmjs.org/google/googletest.git
+    GIT_REPOSITORY https://github.com/google/googletest.git
     GIT_TAG "origin/main"
   )
   FetchContent_MakeAvailable(googletest)
