@@ -248,6 +248,7 @@ read_dm.o\
 read_txt_tools.o\
 read_txt_stru.o\
 read_txt_input_value.o\
+read_txt_input_item.o\
 read_txt_input_list.o\
 read_txt_input_process.o\
 read_txt_input_process_global.o\
