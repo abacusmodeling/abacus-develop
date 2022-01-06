@@ -21,7 +21,9 @@
 typedef fftw_complex FFTW_COMPLEX;
 
 //#include <unistd.h>
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 
 namespace ModuleBase
 {
@@ -980,7 +982,9 @@ void Mathzone_Add1::Cubic_Spline_Interpolation
 {	
 	ModuleBase::timer::tick("Mathzone_Add1","Cubic_Spline_Interpolation");
 
+#ifdef _OPENMP
 	#pragma omp parallel for schedule(static)
+#endif
 	for(int m = 0; m < rsize ; m++)
 	{
 		int klo = 0;

@@ -16,6 +16,7 @@ class wavefunc : public WF_atomic
     void allocate_ekb_wg(const int nks);
 
     int out_wf; //qianrui modify 2020-10-19
+    int out_wf_r=0; // Peize Lin add 2021.11.21
 
     // et    : (nks,nbnd),eigenvalues of the hamiltonian
     // wg	 : the weight of each k point and band

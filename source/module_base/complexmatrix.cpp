@@ -414,23 +414,44 @@ ComplexMatrix conj(const ComplexMatrix &m)
 }
 
 // Peize Lin add 2021.09.08
-std::ostream & ComplexMatrix::print( std::ostream & os, const double threshold_norm, const double threshold_imag ) const
+std::ostream & ComplexMatrix::print( std::ostream & os, const double threshold_abs, const double threshold_imag ) const
 {
 	for( int ir=0; ir!=this->nr; ++ir )
 	{
 		for( int ic=0; ic!=this->nc; ++ic )
-			if(std::norm((*this)(ir,ic))>threshold_norm)
+		{
+			const std::complex<double> & data = (*this)(ir,ic);
+			if(std::abs(data)>threshold_abs)
 			{
-				if(std::imag((*this)(ir,ic))>threshold_imag)
-					os<<(*this)(ir,ic)<<"\t";
+				if(std::abs(std::imag(data))>threshold_imag)
+					os<<data<<"\t";
 				else
-					os<<std::real((*this)(ir,ic))<<"\t";
+					os<<std::real(data)<<"\t";
 			}
 			else
+			{
 				os<<0<<"\t";
+			}
+		}
 		os<<std::endl;
 	}	
 	return os;
+}
+
+bool ComplexMatrix::checkreal(void)
+{
+	const double tiny = 1e-12;
+	for(int i=0;i<this->nr;i++)
+	{
+		for(int j=0;j<this->nc;j++)
+		{
+			if(std::imag((*this)(i,j)) > tiny)
+			{
+				return 0;
+			}
+		}
+	}
+	return 1;
 }
 
 }

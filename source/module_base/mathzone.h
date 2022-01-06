@@ -49,7 +49,7 @@ public:
 //==========================================================
 // MEMBER FUNCTION :
 // NAME : Direct_to_Cartesian
-// use lattice std::vector matrix R
+// use lattice vector matrix R
 // change the direct std::vector (dx,dy,dz) to cartesuab vectir
 // (cx,cy,cz)
 // (dx,dy,dz) = (cx,cy,cz) * R

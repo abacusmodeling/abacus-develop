@@ -93,7 +93,20 @@ class ORB_gen_tables
 		const bool &calc_deri)const; // mohan add 2021-04-25);
 	/// set as public because in hamilt_linear,
 #ifdef __DEEPKS
-    void snap_psialpha(
+    void snap_psialpha_half(
+			std::vector<std::vector<double>> &nlm,
+			const int& job,
+			const ModuleBase::Vector3<double>& R1,
+			const int& T1,
+			const int& L1,
+			const int& m1,
+			const int& N1,
+			const ModuleBase::Vector3<double>& R0, // The projector.
+			const int& T0,
+			const int& I0
+        ) const;
+
+		void snap_psialpha(
         double nlm[],
         const int& job,
         const ModuleBase::Vector3<double>& R1,

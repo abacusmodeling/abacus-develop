@@ -137,7 +137,6 @@ void Input::Default(void)
 
 	opt_epsilon2 = false;//mohan add 2010-03-24
 	opt_nbands = 0;
-    lda_plus_u = false;
 //----------------------------------------------------------
 // electrons / spin
 //----------------------------------------------------------
@@ -158,7 +157,6 @@ void Input::Default(void)
     symmetry=false;
 	set_vel=false;
     symmetry_prec = 1.0e-5; //LiuXh add 2021-08-12, accuracy for symmetry
-	mlwf_flag=false;
     force=0;
     force_set=false;
     force_thr=1.0e-3;
@@ -221,7 +219,7 @@ void Input::Default(void)
 //----------------------------------------------------------
     dr2 = 1.0e-9;
     niter = 40;
-    nstep = 1;
+    this->nstep = 0;
 	out_stru = 0;
 //----------------------------------------------------------
 // occupation
@@ -253,6 +251,7 @@ void Input::Default(void)
 
     out_potential = 0;
     out_wf = 0;
+    out_wf_r = 0;
 	out_dos = 0;
     out_band = 0;
 	out_hs = 0;
@@ -265,6 +264,7 @@ void Input::Default(void)
 	dos_edelta_ev = 0.01;//(ev)
 	dos_scale = 0.01;
     b_coef = 0.07;
+	out_element_info = false;
 //----------------------------------------------------------
 // LCAO
 //----------------------------------------------------------
@@ -282,33 +282,6 @@ void Input::Default(void)
 	selinv_mu = -1.0;
 	selinv_threshold = 1.0e-3;
 	selinv_niter = 50;
-//----------------------------------------------------------
-// Molecular Dynamics
-//----------------------------------------------------------
-/*
-	md_dt=20.0; //unit is 1 a.u., which is 4.8378*10e-17 s
-	md_restart=0;
-	md_tolv=100.0;
-	md_thermostat="not_controlled"; //"rescaling","rescale-v","rescale-t","reduce-t"...
-	md_temp0=300; //kelvin
-	md_tstep=1; //reduec md_delt every md_tstep step.
-	md_delt=1.0;
-*/
-
-/* //----------------------------------------------------------
-// vdwD2									//Peize Lin add 2014-03-31, update 2015-09-30
-//----------------------------------------------------------
-	vdwD2=false;
-	vdwD2_scaling=0.75;
-	vdwD2_d=20;
-	vdwD2_C6_file="default";
-	vdwD2_C6_unit="Jnm6/mol";
-	vdwD2_R0_file="default";
-	vdwD2_R0_unit="A";
-	vdwD2_model="radius";
-	vdwD2_period = {3,3,3};
-	vdwD2_radius=30.0/ModuleBase::BOHR_TO_A;
-	vdwD2_radius_unit="Bohr"; */
 
 //----------------------------------------------------------
 // vdw									//jiyy add 2019-08-04
@@ -465,6 +438,11 @@ void Input::Default(void)
 	double_counting = 1;
 	omc = false;
 	dftu_type = 2;
+
+//==========================================================
+//    DFT+DMFT     Xin Qu added on 2020-08
+//==========================================================
+    dft_plus_dmft = false;  
 
     return;
 }
@@ -663,10 +641,6 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, opt_nbands);
         }
-        else if (strcmp("lda_plus_u", word) == 0)// lda + u
-        {
-            read_value(ifs, lda_plus_u);
-        }
 //----------------------------------------------------------
 // electrons / spin
 //----------------------------------------------------------
@@ -729,10 +703,6 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("symmetry_prec", word) == 0) //LiuXh add 2021-08-12, accuracy for symmetry
         {
             read_value(ifs, symmetry_prec);
-        }
-        else if (strcmp("mlwf_flag", word) == 0)
-        {
-            read_value(ifs, mlwf_flag);
         }
         else if (strcmp("force", word) == 0)
         {
@@ -947,7 +917,7 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("nstep", word) == 0)
         {
-            read_value(ifs, nstep);
+            read_value(ifs, this->nstep);
         }
         else if (strcmp("out_stru", word) == 0)
         {
@@ -1061,6 +1031,10 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, out_wf);
         }
+        else if (strcmp("out_wf_r", word) == 0)
+        {
+            read_value(ifs, out_wf_r);
+        }
 		//mohan add 20090909
         else if (strcmp("out_dos", word) == 0)
         {
@@ -1091,6 +1065,10 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("out_alllog", word) == 0)
         {
             read_value(ifs, out_alllog);
+        }
+		else if (strcmp("out_element_info", word) == 0)
+        {
+            read_value(ifs, out_element_info);
         }
         else if (strcmp("dos_emin_ev", word) == 0)
         {
@@ -1162,37 +1140,7 @@ bool Input::Read(const std::string &fn)
             read_value(ifs, selinv_niter);
         }
 		// about molecular dynamics
-/*
-        else if (strcmp("md_dt", word) == 0)
-        {
-            read_value(ifs, md_dt);
-        }
-        else if (strcmp("md_restart", word) == 0)
-        {
-            read_value(ifs, md_restart);
-        }
-        else if (strcmp("md_tolv", word) == 0)
-        {
-            read_value(ifs, md_tolv);
-        }
-        else if (strcmp("md_thermostat", word) == 0)
-        {
-            read_value(ifs, md_thermostat);
-        }
-        else if (strcmp("md_temp0", word) == 0)
-        {
-            read_value(ifs, md_temp0);
-        }
-        else if (strcmp("md_tstep", word) == 0)
-        {
-            read_value(ifs, md_tstep);
-        }
-        else if (strcmp("md_delt", word) == 0)
-        {
-            read_value(ifs, md_delt);
-        }
-*/
-//added begin by zheng daye
+		//added begin by zheng daye
 		else if (strcmp("md_mdtype",word) == 0)
 		{
 			read_value(ifs, mdp.mdtype);
@@ -1249,7 +1197,7 @@ bool Input::Read(const std::string &fn)
 		{
 			read_value(ifs,mdp.ediffg );
 		}
-//added by zheng daye
+		//added by zheng daye
 //----------------------------------------------------------
 // Classic MD
 // Yu Liu add 2021-07-30
@@ -1269,6 +1217,30 @@ bool Input::Read(const std::string &fn)
 		else if (strcmp("md_potential",word) == 0)
 		{
 			read_value(ifs, mdp.md_potential);
+		}
+		else if (strcmp("direction",word) == 0)
+		{
+			read_value(ifs, mdp.direction);
+		}
+		else if (strcmp("velocity",word) == 0)
+		{
+			read_value(ifs, mdp.velocity);
+		}
+		else if (strcmp("viscosity",word) == 0)
+		{
+			read_value(ifs, mdp.viscosity);
+		}
+		else if (strcmp("tscale",word) == 0)
+		{
+			read_value(ifs, mdp.tscale);
+		}
+		else if (strcmp("md_tfreq",word) == 0)
+		{
+			read_value(ifs, mdp.tfreq);
+		}
+		else if (strcmp("md_damp",word) == 0)
+		{
+			read_value(ifs, mdp.damp);
 		}
 //----------------------------------------------------------
 // tddft
@@ -1326,57 +1298,6 @@ bool Input::Read(const std::string &fn)
 		{
 			read_value(ifs,td_dipoleout );
 		}
-
-
-/* //----------------------------------------------------------
-// vdwD2
-// Peize Lin add 2014-03-31
-//----------------------------------------------------------
-        else if (strcmp("vdwd2", word) == 0)
-	    {
-	        read_value(ifs, vdwD2);
-	    }
-	    else if (strcmp("vdwd2_scaling", word) == 0)
-	    {
-	        read_value(ifs, vdwD2_scaling);
-	    }
-	    else if (strcmp("vdwd2_d", word) == 0)
-	    {
-	        read_value(ifs, vdwD2_d);
-	    }
-	    else if (strcmp("vdwd2_c6_file", word) == 0)
-	    {
-	        read_value(ifs, vdwD2_C6_file);
-	    }
-	    else if (strcmp("vdwd2_c6_unit", word) == 0)
-	    {
-	        read_value(ifs, vdwD2_C6_unit);
-	    }
-	    else if (strcmp("vdwd2_r0_file", word) == 0)
-	    {
-	        read_value(ifs, vdwD2_R0_file);
-	    }
-	    else if (strcmp("vdwd2_r0_unit", word) == 0)
-	    {
-	        read_value(ifs, vdwD2_R0_unit);
-	    }
-	    else if (strcmp("vdwd2_model", word) == 0)
-	    {
-	        read_value(ifs, vdwD2_model);
-	    }
-	    else if (strcmp("vdwd2_period", word) == 0)
-	    {
-			ifs >> vdwD2_period.x >> vdwD2_period.y;
-	        read_value(ifs, vdwD2_period.z);
-	    }
-	    else if (strcmp("vdwd2_radius", word) == 0)
-	    {
-	        read_value(ifs, vdwD2_radius);
-	    }
-	    else if (strcmp("vdwd2_radius_unit", word) == 0)
-	    {
-	        read_value(ifs, vdwD2_radius_unit);
-        } */
 //----------------------------------------------------------
 // vdw
 // jiyy add 2019-08-04
@@ -1464,14 +1385,6 @@ bool Input::Read(const std::string &fn)
 //--------------------------------------------------------
 // epsilon           pengfei Li 2016-11-23
 //--------------------------------------------------------
-	    //else if (strcmp("epsilon", word) == 0)
-	    //{
-	    //    read_value(ifs, epsilon);
-	    //}
-	    //else if (strcmp("epsilon_choice", word) == 0)
-	    //{
-	    //    read_value(ifs, epsilon_choice);
-	    //}
 		else if (strcmp("spectral_type", word) == 0)
 	    {
 	        read_value(ifs, spectral_type);
@@ -1512,10 +1425,6 @@ bool Input::Read(const std::string &fn)
 	    {
 	        read_value(ifs, ecut_chi);
 	    }
-	    //else if (strcmp("oband", word) == 0)
-	    //{
-	    //   read_value(ifs, oband);
-	    //}
 	    else if (strcmp("q_start", word) == 0)
 	    {
 			ifs >> q_start[0]; ifs >> q_start[1]; read_value(ifs, q_start[2]);
@@ -1524,14 +1433,6 @@ bool Input::Read(const std::string &fn)
 	    {
 			ifs >> q_direct[0]; ifs >> q_direct[1]; read_value(ifs, q_direct[2]);
 	    }
-	    //else if (strcmp("start_q", word) == 0)
-	    //{
-	    //    read_value(ifs, start_q);
-	    //}
-	    //else if (strcmp("interval_q", word) == 0)
-	    //{
-	    //    read_value(ifs, interval_q);
-	    //}
 	    else if (strcmp("nq", word) == 0)
 	    {
 	        read_value(ifs, nq);
@@ -1576,18 +1477,6 @@ bool Input::Read(const std::string &fn)
 			getline(ifs, GlobalV::ocp_set);
 //			ifs.ignore(150, '\n');
 		}
-        // else if (strcmp("ocp_n", word) == 0)
-        // {
-            // read_value(ifs, ocp_n);
-        // }
-        // else if (strcmp("ocp_kb", word) == 0)
-        // {
-             // for(int i=0; i<(ocp_n-1); i++)
-             // {
-                 // ifs >> GlobalV::ocp_kb[i];
-             // }
-			// read_value(ifs, GlobalV::ocp_kb[ocp_n-1]);
-        // }
 		else if (strcmp("mulliken", word) == 0)
 		{
 			read_value(ifs, GlobalV::mulliken);
@@ -1597,14 +1486,6 @@ bool Input::Read(const std::string &fn)
 	        ifs >> lcao_box[0]; ifs >> lcao_box[1];
 	        read_value(ifs, lcao_box[2]);
 	    }
-	    //else if (strcmp("epsilon0", word) == 0)
-	    //{
-	    //    read_value(ifs, epsilon0);
-	    //}
-	    //else if (strcmp("intersmear", word) == 0)
-	    //{
-	    //    read_value(ifs, intersmear);
-	    //}
 	    else if (strcmp("intrasmear", word) == 0)
 	    {
 	        read_value(ifs, intrasmear);
@@ -1621,10 +1502,6 @@ bool Input::Read(const std::string &fn)
 	    {
 	        read_value(ifs, eps_degauss);
 	    }
-	    //else if (strcmp("epsilon0_choice", word) == 0)
-	    //{
-	    //    read_value(ifs, epsilon0_choice);
-	    //}
 //----------------------------------------------------------
 // exx
 // Peize Lin add 2018-06-20
@@ -1713,22 +1590,6 @@ bool Input::Read(const std::string &fn)
 		{
 			read_value(ifs, soc_lambda);
 		}
-/*		else if (strcmp("angle1", word) == 0)
-		{
-			angle1.resize(ntype);
-			for(auto &i:angle1)
-				read_value(ifs, i);
-		}
-		else if (strcmp("angle2", word) == 0)
-		{
-			angle2.resize(ntype);
-			for (auto &i : angle2)
-				read_value(ifs, i);
-		}*/
-        //else if (strcmp("epsilon0_choice", word) == 0)
-        //{
-        //    read_value(ifs, epsilon0_choice);
-        //}
 		else if (strcmp("cell_factor", word) == 0)
 		{
 			read_value(ifs, cell_factor);
@@ -1741,81 +1602,6 @@ bool Input::Read(const std::string &fn)
 		{
 			read_value(ifs, test_just_neighbor);
 		}
-//---------------
-//start magnetic
-/*
-#ifndef __CMD
-		else if (strcmp("magmom", word) == 0)
-		{
-			n_mag_at=0;
-			stringstream sstr;
-			string s;
-			getline(ifs,s);
-			sstr.str(s);
-			int tmplength=s.length();
-    		int at_per_mag[tmplength];
-    		double mags[tmplength];
-    		int n_magmom=0;
-			s="";
-			//1 3*2 6*1 
-			while(sstr.good())
-			{
-				sstr>>s;
-				string s1;
-				string s2;
-				bool mul=0;// if this parameter is the form n*m
-				for(int i=0;i<s.size();i++)
-				{
-					if ((s[i]>='0'&& s[i]<='9') or s[i]=='.' or s[i]=='+' or s[i]=='-')
-					{
-						s1.push_back(s[i]);
-					} 
-					else if (s[i]=='*')
-					{
-						s2=s1;
-						s1="";
-						mul=true;
-					}
-					else
-					{
-						std::cout<<"Unrecognized character"<<s[i]<<"when reading start magnetism";
-						exit(0);
-					}
-				}
-				cout<<"s1 "<<s1<<" s2 "<<s2<<'h'<<n_mag_at<<"\n";
-				double mag=stoi(s1);
-				if(mul)
-				{
-					int num=stoi(s2);
-					mags[n_magmom]=mag;
-	    			at_per_mag[n_magmom]=num;
-					n_mag_at+=num;
-				}
-				else
-				{
-					mags[n_magmom]=mag;
-	    			at_per_mag[n_magmom]=1;
-					n_mag_at+=1;
-				}
-				n_magmom+=1;
-			}
-			atom_mag = new double[n_mag_at];
-			int n_m=0;// the n_m value of magmom
-			int n_n=0;//how many magmom has been defined
-			for(int i=0;i<n_mag_at;i++)
-			{
-				if (i-n_n>=at_per_mag[n_m])
-				{
-					n_n+=at_per_mag[n_m];
-					n_m+=1;
-				}
-				atom_mag[i]=mags[n_m];
-				cout<<"atom_mag"<<atom_mag[i];
-			}	
-	}
-
-#endif
-*/		
 //--------------
 //----------------------------------------------------------------------------------
 //         Xin Qu added on 2020-10-29 for DFT+U
@@ -1832,7 +1618,14 @@ bool Input::Read(const std::string &fn)
         else if(strcmp("orbital_corr",word)==0) ifs.ignore(150,'\n');
 		else if(strcmp("omc",word)==0) ifs.ignore(150,'\n');
 		else if(strcmp("yukawa_lambda",word)==0) ifs.ignore(150,'\n');
-//---------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------
+//         Xin Qu added on 2020-08 for DFT+DMFT
+//----------------------------------------------------------------------------------
+		else if(strcmp("dft_plus_dmft",word)==0)
+		{
+			ifs >> dft_plus_dmft;
+		}
+//----------------------------------------------------------------------------------
         else
         {
 			//xiaohui add 2015-09-15
@@ -1978,7 +1771,7 @@ bool Input::Read(const std::string &fn)
 				exit(0);
 			}
 
-			if( (orbital_corr[i]==-1) && (orbital_corr[i]==0) && (orbital_corr[i]!=1) && (orbital_corr[i]!=2) && (orbital_corr[i]!=3) )
+			if( (orbital_corr[i]!=-1) && (orbital_corr[i]!=0) && (orbital_corr[i]!=1) && (orbital_corr[i]!=2) && (orbital_corr[i]!=3) )
 			{
 				std::cout << " WRONG ARGUMENTS OF orbital_corr " << std::endl;
 				exit(0);
@@ -1997,9 +1790,102 @@ bool Input::Read(const std::string &fn)
 			exit(0);
 		}
 
+		if(strcmp("genelpa", ks_solver.c_str())!=0 && strcmp(ks_solver.c_str(),"scalapack_gvx")!=0 )
+		{
+			std::cout << " WRONG ARGUMENTS OF ks_solver in DFT+U routine, only genelpa and scalapack_gvx are supportted " << std::endl;
+			exit(0);
+		}
+
+	}
+
+//----------------------------------------------------------
+//       DFT+DMFT    Xin Qu  added on 2020-08
+//----------------------------------------------------------
+	if(dft_plus_dmft)
+	{
+		ifs.clear();
+    ifs.seekg(0);  //move to the beginning of the file
+    ifs.rdstate();
+    while (ifs.good())
+    {
+  		ifs >> word1;
+  		strtolower(word1, word);     //convert uppercase std::string to lower case; word1 --> word
+
+			if(strcmp("hubbard_u", word)==0)
+			{
+				for(int i=0; i<ntype; i++)
+				{
+					ifs >> hubbard_u[i];
+					hubbard_u[i] /= ModuleBase::Ry_to_eV;
+				}
+			}
+			else if (strcmp("hund_j", word)==0)
+			{
+				for(int i=0;i<ntype;i++)
+				{
+					ifs >> hund_j[i];
+					hund_j[i] /= ModuleBase::Ry_to_eV;
+				}
+			}
+			else if(strcmp("orbital_corr", word)==0)
+			{
+				for(int i=0;i<ntype;i++)
+				{
+					ifs >> orbital_corr[i];
+				}
+			}
+			else ifs.ignore(150, '\n');
+
+			if (ifs.eof() != 0) break;
+		}
+
+		for(int i=0; i<ntype; i++)
+		{
+
+			if(hubbard_u[i]<-1.0e-3)
+			{
+				std::cout << " WRONG ARGUMENTS OF hubbard_u " << std::endl;
+				exit(0);
+			}
+
+			if(hund_j[i]<-1.0e-3)
+			{
+				std::cout << " WRONG ARGUMENTS OF hund_j " << std::endl;
+				exit(0);
+			}
+
+			if( (orbital_corr[i]!=-1) && (orbital_corr[i]!=0) && (orbital_corr[i]!=1) && (orbital_corr[i]!=2) && (orbital_corr[i]!=3) )
+			{
+				std::cout << " WRONG ARGUMENTS OF orbital_corr " << std::endl;
+				exit(0);
+			}
+		}
+
+		bool dmft_flag = false;
+		for(int i=0; i<ntype; i++)
+		{
+			if(orbital_corr[i] != -1)
+      {
+        dmft_flag = true;
+        break;
+      }
+		}
+
+    if(!dmft_flag)
+    {
+      std::cout << "No atoms are correlated!!!" << std::endl;
+		  exit(0);
+    }
+
+		if(strcmp("lcao", basis_type.c_str())!=0)
+		{
+			std::cout << " WRONG ARGUMENTS OF basis_type, only lcao is support " << std::endl;
+			exit(0);
+		}
+
 		if(strcmp("genelpa", ks_solver.c_str())!=0)
 		{
-			std::cout << " WRONG ARGUMENTS OF ks_solver in DFT+U routine, only genelpa is support " << std::endl;
+			std::cout << " WRONG ARGUMENTS OF ks_solver in DFT+DMFT routine, only genelpa is support " << std::endl;
 			exit(0);
 		}
 
@@ -2126,7 +2012,6 @@ void Input::Bcast()
 
     Parallel_Common::bcast_bool( opt_epsilon2 );
     Parallel_Common::bcast_int( opt_nbands );
-    Parallel_Common::bcast_bool( lda_plus_u );
 
 	Parallel_Common::bcast_string( dft_functional );
     Parallel_Common::bcast_int( nspin );
@@ -2143,7 +2028,6 @@ void Input::Bcast()
     Parallel_Common::bcast_bool( symmetry );
 	Parallel_Common::bcast_bool( set_vel );  //liuyu 2021-07-14
     Parallel_Common::bcast_double( symmetry_prec ); //LiuXh add 2021-08-12, accuracy for symmetry
-    Parallel_Common::bcast_bool( mlwf_flag );
     Parallel_Common::bcast_int( force );
     Parallel_Common::bcast_bool( force_set );
     Parallel_Common::bcast_double( force_thr);
@@ -2199,7 +2083,7 @@ void Input::Bcast()
 
     Parallel_Common::bcast_double( dr2 );
     Parallel_Common::bcast_int( niter );
-    Parallel_Common::bcast_int( nstep );
+    Parallel_Common::bcast_int( this->nstep );
 	Parallel_Common::bcast_int( out_stru ); //mohan add 2012-03-23
 
     //Parallel_Common::bcast_string( occupations );
@@ -2227,6 +2111,7 @@ void Input::Bcast()
 
 	Parallel_Common::bcast_int(out_potential);
     Parallel_Common::bcast_int( out_wf );
+    Parallel_Common::bcast_int( out_wf_r );
 	Parallel_Common::bcast_int( out_dos );
         Parallel_Common::bcast_int( out_band );
 	Parallel_Common::bcast_int( out_hs );
@@ -2234,6 +2119,7 @@ void Input::Bcast()
 	Parallel_Common::bcast_int( out_r_matrix ); // jingan add 2019-8-14
 	Parallel_Common::bcast_bool( out_lowf );
 	Parallel_Common::bcast_bool( out_alllog );
+	Parallel_Common::bcast_bool( out_element_info );
 
 	Parallel_Common::bcast_double( dos_emin_ev );
 	Parallel_Common::bcast_double( dos_emax_ev );
@@ -2284,6 +2170,12 @@ void Input::Bcast()
 		Parallel_Common::bcast_double(mdp.epsilon_lj);
 		Parallel_Common::bcast_double(mdp.sigma_lj);
 		Parallel_Common::bcast_string(mdp.md_potential);
+		Parallel_Common::bcast_int(mdp.direction);
+		Parallel_Common::bcast_double(mdp.velocity);
+		Parallel_Common::bcast_double(mdp.viscosity);
+		Parallel_Common::bcast_double(mdp.tscale);
+		Parallel_Common::bcast_double(mdp.tfreq);
+		Parallel_Common::bcast_double(mdp.damp);
 /* 	// Peize Lin add 2014-04-07
 	Parallel_Common::bcast_bool( vdwD2 );
 	Parallel_Common::bcast_double( vdwD2_scaling );
@@ -2439,7 +2331,7 @@ void Input::Bcast()
 //-----------------------------------------------------------------------------------
 //DFT+U (added by Quxin 2020-10-29)
 //-----------------------------------------------------------------------------------
-    Parallel_Common::bcast_bool( dft_plus_u );
+  Parallel_Common::bcast_bool( dft_plus_u );
 	Parallel_Common::bcast_bool( yukawa_potential );
 	Parallel_Common::bcast_bool( omc );
 	Parallel_Common::bcast_int(dftu_type);
@@ -2459,6 +2351,11 @@ void Input::Bcast()
 		Parallel_Common::bcast_int(orbital_corr[i]);
 	}
 
+//-----------------------------------------------------------------------------------
+//DFT+DMFT (added by Quxin 2020-08)
+//-----------------------------------------------------------------------------------
+  Parallel_Common::bcast_bool( dft_plus_dmft );
+
     return;
 }
 #endif
@@ -2475,6 +2372,10 @@ void Input::Check(void)
 
 	//std::cout << "diago_proc=" << diago_proc << std::endl;
 	//std::cout << " NPROC=" << GlobalV::NPROC << std::endl;
+	if(diago_proc>1 && basis_type=="lcao")
+	{
+		ModuleBase::WARNING_QUIT("Input", "please don't set diago_proc with lcao base");
+	}
 	if(diago_proc<=0)
 	{
 		diago_proc = GlobalV::NPROC;
@@ -2483,19 +2384,6 @@ void Input::Check(void)
 	{
 		diago_proc = GlobalV::NPROC;
 	}
-
-	// mohan add 2010/03/29
-	//if(!local_basis && diago_type=="lapack") xiaohui modify 2013-09-01
-	//if(basis_type=="pw" && ks_solver=="lapack") xiaohui modify 2013-09-04 //xiaohui add 2013-09-01
-	//{
-	//	ModuleBase::WARNING_QUIT("Input","lapack can not be used in plane wave basis.");
-	//} xiaohui modify 2013-09-04
-
-	//xiaohui move 4 lines, 2015-09-30
-	//if(symmetry)
-	//{
-	//	ModuleBase::WARNING("Input","symmetry is only correct for total energy calculations now,not for nonlocal force." );
-	//}
 
     if (efield && symmetry)
     {
@@ -2556,7 +2444,7 @@ void Input::Check(void)
 			std::cout<<"sorry, can't calculate force with soc now, would be implement in next version!"<<std::endl;
 		}
 */
-                nstep = 1;
+                this->nstep = 1;
 
     }
 	else if (calculation == "scf-sto")  // qianrui 2021-2-20
@@ -2566,6 +2454,7 @@ void Input::Check(void)
                         mem_saver = 0;
                         ModuleBase::GlobalFunc::AUTO_SET("mem_savre","0");
                 }
+				this->nstep = 1;
     }
     else if (calculation == "relax")  // pengfei 2014-10-13
     {
@@ -2575,12 +2464,13 @@ void Input::Check(void)
                         ModuleBase::GlobalFunc::AUTO_SET("mem_savre","0");
                 }
                 force = 1;
+				if(! this->nstep) this->nstep = 50;
     }
 
     else if (calculation == "nscf")
     {
 		GlobalV::CALCULATION = "nscf";
-        nstep = 1;
+        this->nstep = 1;
 		out_stru = 0;
 
 		//if (local_basis == 0 && linear_scaling == 0) xiaohui modify 2013-09-01
@@ -2604,7 +2494,7 @@ void Input::Check(void)
 	else if(calculation == "istate")
 	{
 		GlobalV::CALCULATION = "istate";
-		nstep = 1;
+		this->nstep = 1;
 		out_stru = 0;
 		out_dos = 0;
                 out_band = 0;
@@ -2625,7 +2515,7 @@ void Input::Check(void)
 	else if(calculation == "ienvelope")
 	{
 		GlobalV::CALCULATION = "ienvelope"; // mohan fix 2011-11-04
-		nstep = 1;
+		this->nstep = 1;
 		out_stru = 0;
 		out_dos = 0;
                 out_band = 0;
@@ -2647,6 +2537,10 @@ void Input::Check(void)
 		GlobalV::CALCULATION = "md";
 		symmetry = false;
 		force = 1;
+		if(this->nstep==0){
+			GlobalV::ofs_running<<"nstep should be set. Autoset nstep to 50!"<<endl;
+			this->nstep = 50;
+		}
         if(!out_md_control) out_level = "m";//zhengdy add 2019-04-07
 
         //deal with input parameters , 2019-04-30
@@ -2677,9 +2571,11 @@ void Input::Check(void)
 	{
 		force = 1;
 		stress = 1;
+		if(! this->nstep) this->nstep = 50;
 	}
 	else if(calculation == "test")
 	{
+		this->nstep = 1;
 	}
     else
     {
@@ -3005,14 +2901,6 @@ void Input::Check(void)
 		{
 			ModuleBase::WARNING_QUIT("INPUT","You must choose a direction!");
 		}
-		//if( oband > nbands)
-		//{
-		//	ModuleBase::WARNING_QUIT("INPUT","oband must <= nbands");
-		//}
-        //        if( oband == 1)
-        //        {
-        //            oband = nbands;
-        //        }
 	}
 
 	if(exx_hybrid_type!="no" &&

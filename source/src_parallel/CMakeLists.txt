@@ -1,6 +1,4 @@
-add_library(
-    parallel
-    OBJECT
+list(APPEND objects
     ft.cpp
     parallel_common.cpp
     parallel_global.cpp
@@ -10,4 +8,14 @@ add_library(
     parallel_pw.cpp
     parallel_reduce.cpp
     subgrid_oper.cpp
+)
+
+if(ENABLE_DEEPKS)
+list(APPEND objects parallel_deepks.cpp)
+endif()
+
+add_library(
+    parallel
+    OBJECT
+    ${objects}
 )
