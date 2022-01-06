@@ -14,6 +14,7 @@ VPATH=./src_global\
 :./module_cell\
 :./module_base\
 :./module_md\
+:./module_deepks\
 :./src_pw\
 :./src_lcao\
 :./src_ions\

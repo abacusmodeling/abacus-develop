@@ -46,100 +46,6 @@ double MD_func::gaussrand()
     return X;
 }
 
-bool MD_func::RestartMD(const int& numIon, ModuleBase::Vector3<double>* vel, int& step_rst)
-{
-	int error(0);
-	double *vell=new double[numIon*3];
-	if (!GlobalV::MY_RANK)
-	{
-		std::stringstream ssc;
-		ssc << GlobalV::global_readin_dir << "Restart_md.dat";
-		std::ifstream file(ssc.str().c_str());
-
-		if(!file)
-		{
-			std::cout<<"please ensure whether 'Restart_md.dat' exists!"<<std::endl;
-			error = 1;
-		}
-		if (!error)
-		{
-			file.ignore(11, '\n');
-
-        //----------------------------------------------------------
-        // main parameters
-        //----------------------------------------------------------
-			file.ignore(13, '\n');//read and assert number of atoms
-			int num;
-			file>>num;
-			if(num != numIon)
-			{
-				std::cout<<"please ensure whether 'Restart_md.dat' right!"<<std::endl;
-				error = 1;
-			}
-		}
-		if (!error)
-		{
-			file.get();
-			file.ignore(23, '\n');//read velocities
-			for(int i = 0;i<numIon*3;i++)
-			{
-				file>>vell[i];
-			}
-			file.get();
-			file.ignore(6, '\n');//read start step of MD
-			file>>step_rst;
-			file.close();
-		}
-	}
-#ifdef __MPI
-	MPI_Bcast(&error,1,MPI_INT,0,MPI_COMM_WORLD);
-#endif
-	if(error)
-	{
-		delete[] vell;
-		exit(0);
-	}
-#ifdef __MPI
-	MPI_Bcast(&step_rst,1,MPI_INT,0,MPI_COMM_WORLD);
-	MPI_Bcast(vell,numIon*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
-#endif
-	for(int i=0;i<numIon;i++)
-	{
-		vel[i].x=vell[i*3];
-		vel[i].y=vell[i*3+1];
-		vel[i].z=vell[i*3+2];
-	}
-
-	delete []vell;
-	return true;
-}
-
-void MD_func::mdRestartOut(const int& step, const int& recordFreq, const int& numIon, ModuleBase::Vector3<double>* vel)
-{
-//this function used for outputting the information of restart file
-	bool pass;
-	pass = 0;
-
-	if (recordFreq==1||step==1||( recordFreq > 1&& step%recordFreq==0 ) )
-		pass =1;
-	if (!pass) return;
-
-	if(!GlobalV::MY_RANK){
-		std::stringstream ssc;
-		ssc << GlobalV::global_out_dir << "Restart_md.dat";
-		std::ofstream file(ssc.str().c_str());
-		file<<"MD_RESTART"<<std::endl;
-		file<<"ATOM_NUMBERS: "<<numIon<<std::endl;
-		file<<"ION_VELOCITIES_(a.u.): "<<std::endl;
-		for(int i=0;i<numIon;i++){
-			file<<std::setprecision (12)<<vel[i].x<<" "<<std::setprecision (12)<<vel[i].y<<" "<<std::setprecision (12)<<vel[i].z<<std::endl;
-		}
-		file<<"step: "<<step<<std::endl;                
-		file.close();
-	}
-	return;
-}
-
 double MD_func::GetAtomKE(
 		const int &numIon,
 		const ModuleBase::Vector3<double> *vel, 
@@ -416,58 +322,8 @@ void MD_func::outStress(const ModuleBase::matrix &virial, const ModuleBase::matr
 	GlobalV::ofs_running << std::setiosflags(ios::left);
 }
 
-/*void MD_func::ReadNewTemp(int step )
-{
-//-----------------------------------------------------------------
-//  If fixTemperature == 0, then this subroutine will be skipped
-//  otherwise, we are going to read a new temperature from the disk.
-//  You only need to create a file named ChangeTemp.dat, and then 
-//  change the temperature in it. 
-//-----------------------------------------------------------------
-
-	double intemp;
-	int sstep=0;
-
-	if ( fixTemperature > 0 )
-	{
-
-	// Change the temperature every 'fixTemperature' steps.
-		if( (step!=1)&&(step%fixTemperature == 1) )
-		{
-			
-			// Read in new temperature from file.
-			std::ifstream file;
-			file.open("ChangeTemp.dat");
-			if (!file){
-				std::cout<<"ERROR IN OPENING ChangeTemp.dat, CODE STOP!"<<std::endl;
-				exit(0);
-			}
-			while((sstep+fixTemperature)<step){
-				file>> intemp;
-				sstep+=fixTemperature;
-			}
-			file.close();
-
-			// Renew information.
-			intemp =  intemp * ModuleBase::K_BOLTZMAN_AU;
-			if ( fabs(intemp-temperature) >1e-6 ) {
-				std::cout <<"(ReadNewTemp): Read in new temp:"<< intemp/ModuleBase::K_BOLTZMAN_AU 
-					<<" previous temp:"<< temperature/ModuleBase::K_BOLTZMAN_AU<<std::endl;
-				temperature = intemp;
-			}
-			else{
-				std::cout<<"(ReadNewTemp): new temp:"<< intemp/ModuleBase::K_BOLTZMAN_AU
-					<<" previous temp:"<<temperature/ModuleBase::K_BOLTZMAN_AU
-					<< ". No change of temp."<<std::endl;
-			}
-		}
-	}
-
-	return;
-}*/
-
 void MD_func::MDdump(const int &step, 
-		const int &natom,
+		const UnitCell_pseudo &unit_in,
 		const ModuleBase::matrix &virial, 
 		const ModuleBase::Vector3<double> *force)
 {
@@ -476,22 +332,22 @@ void MD_func::MDdump(const int &step,
 	std::stringstream file;
     file << GlobalV::global_out_dir << "MD_dump";
 	std::ofstream ofs;
-	if(step == 0)
-	{
-		ofs.open(file.str(), ios::trunc);
-	}
-	else
-	{
-		ofs.open(file.str(), ios::app);
-	}
+	ofs.open(file.str(), ios::app);
 
 	const double unit_virial = ModuleBase::HARTREE_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;
-	const double unit_force = ModuleBase::Hartree_to_eV*ModuleBase::ANGSTROM_AU;
+	const double unit_force = ModuleBase::Hartree_to_eV * ModuleBase::ANGSTROM_AU;
 
-	ofs << "MDstep:  " << step << std::endl;
+	ofs << "MDSTEP:  " << step << std::endl;
+	ofs << std::setprecision(12) << std::setiosflags(ios::fixed);
+
+	ofs << "LATTICE_CONSTANT: " << unit_in.lat0 << std::endl;
+
+	ofs << "LATTICE_VECTORS" << std::endl;
+	ofs << std::setw(18) << unit_in.latvec.e11 << std::setw(18) << unit_in.latvec.e12 << std::setw(18) << unit_in.latvec.e13 << std::endl; 
+	ofs << std::setw(18) << unit_in.latvec.e21 << std::setw(18) << unit_in.latvec.e22 << std::setw(18) << unit_in.latvec.e23 << std::endl;
+	ofs << std::setw(18) << unit_in.latvec.e31 << std::setw(18) << unit_in.latvec.e32 << std::setw(18) << unit_in.latvec.e33 << std::endl;
 
 	ofs << "VIRIAL (KBAR)" << std::endl;
-	ofs << std::setprecision(12) << std::setiosflags(ios::fixed);
 	for(int i=0; i<3; ++i)
 	{
 		ofs << std::setw(18) << virial(i, 0) * unit_virial 
@@ -499,38 +355,27 @@ void MD_func::MDdump(const int &step,
 			<< std::setw(18) << virial(i, 2) * unit_virial << std::endl;
 	}
 
-	ofs << "\nFORCE (eV/Angstrom)" << std::endl;
-	for(int i=0; i<natom; ++i)
-	{
-		ofs << std::setw(18) << force[i].x * unit_force 
-			<< std::setw(18) << force[i].y * unit_force 
-			<< std::setw(18) << force[i].z * unit_force << std::endl;
-	}
+	ofs << "INDEX    LABEL    POSITIONS    FORCE (eV/Angstrom)" << std::endl;
+	int index = 0;
+	for(int it=0; it<unit_in.ntype; ++it)
+    {
+        for(int ia=0; ia<unit_in.atoms[it].na; ++ia)
+	    {	
+		    ofs << std::setw(4) << index
+			<< std::setw(4) << unit_in.atom_label[it]
+			<< std::setw(18) << unit_in.atoms[it].tau[ia].x
+			<< std::setw(18) << unit_in.atoms[it].tau[ia].y
+			<< std::setw(18) << unit_in.atoms[it].tau[ia].z
+			<< std::setw(18) << force[index].x * unit_force 
+			<< std::setw(18) << force[index].y * unit_force 
+			<< std::setw(18) << force[index].z * unit_force << std::endl;
+            index++;
+	    }
+    }
 
 	ofs << std::endl;
 	ofs << std::endl;
 	ofs.close();
-}
-
-//int to std::string and add to output path
-std::string MD_func::intTurnTostring(long int iter, std::string path)
-{
-	long int i[10],k=0;
-	if(iter>9999999999) return "error!";
-	for(int j=9; j>-1; j--)
-	{
-		if(iter==0) continue;
-		if(iter>pow(10,j)-1)
-		{
-			i[k] = iter%10;
-			iter /= 10;
-			k++;
-		}
-	}
-	for(int j=k-1;j>-1;j--){
-		path+=(i[j]+48);
-	}
-	return path;
 }
 
 void MD_func::getMassMbl(const UnitCell_pseudo &unit_in, 
@@ -554,91 +399,4 @@ void MD_func::getMassMbl(const UnitCell_pseudo &unit_in,
 			ion++;
 		}
 	}
-}
-
-void MD_func::printpos(const std::string& file, const int& iter, const int& recordFreq, const UnitCell_pseudo& unit_in)
-{
-//intend to output the positions of atoms to ordered file
-	bool pass;
-	pass = 0;
-
-	if (recordFreq==1||iter==1||( recordFreq > 1&& iter%recordFreq==0 ) )
-		pass =1;
-	if (!pass) return;
-
-	std::string file1=file+".xyz";
-	std::string file2=file+".cif";
-
-	//xiaohui add 'GlobalV::OUT_LEVEL', 2015-09-16
-	if(GlobalV::OUT_LEVEL == "i"||GlobalV::OUT_LEVEL == "ie") unit_in.print_tau();
-	if(GlobalV::OUT_LEVEL == "i"||GlobalV::OUT_LEVEL == "ie") unit_in.print_cell_xyz(file1);
-	unit_in.print_cell_cif(file2);
-	std::stringstream ss;
-
-	ss << GlobalV::global_out_dir << "STRU_MD";
-
-	//zhengdy modify 2015-05-06, outputfile "STRU_Restart"
-#ifdef __LCAO
-	unit_in.print_stru_file(GlobalC::ORB, ss.str(), 2, 1);
-#else
-	unit_in.print_stru_file(ss.str(), 2, 1);
-#endif
-
-	return;
-}
-
-//rescale velocities to target temperature.
-void MD_func::scalevel(
-	const int& numIon,
-	const int& nfrozen,
-	const double& temperature,
-	ModuleBase::Vector3<double>* vel,
-	const double* allmass
-)
-{
-	double ke=GetAtomKE(numIon, vel, allmass);
-	if(ke>1e-9)
-	{
-		for(int i=0;i<numIon;i++)
-		{
-			vel[i]*=sqrt((3*numIon-nfrozen)*temperature/ke/2);
-		}
-	}
-	return;
-}
-
-double MD_func::Conserved(const double KE, const double PE, const int nfreedom){
-//---------------------------------------------------------------------------
-//   This function calculates the conserved quantity for the NVE system. 
-//----------------------------------------------------------------------------
-
-   	// KE   // Kinetic energy of particles (due to their velocity)
-   	// PE   // Potential energy (DFT total energy)
-	// number //number of atoms which have full freedoms
-
-  	double Conserved; // The conserved quantity
-
-   	Conserved = KE + PE ;
-   
-	if (!GlobalV::MY_RANK)
-	{               
-		GlobalV::ofs_running<< "--------------------------------------------------"<<std::endl;
-        GlobalV::ofs_running<< "            SUMMARY OF NVE CALCULATION            "<<std::endl;
-        GlobalV::ofs_running<<" --------------------------------------------------"<<std::endl;  
-		GlobalV::ofs_running<< "NVE Conservation     : "<< Conserved<<" (Hartree)"<<std::endl;
-		GlobalV::ofs_running<< "NVE Temperature      : "<< 2*KE/(nfreedom)*ModuleBase::Hartree_to_K<<" (K)"<<std::endl;
-		GlobalV::ofs_running<< "NVE Kinetic energy   : "<< KE<<" (Hartree)"<<std::endl;
-		GlobalV::ofs_running<< "NVE Potential energy : "<< PE<<" (Hartree)"<<std::endl;
-	}
-   	return Conserved;
-}
-
-double MD_func::MAXVALF(const int numIon, const ModuleBase::Vector3<double>* force){
-	//std::cout<<"enter in MAXVALF"<<std::endl;
-	double max=0;
-	for(int i=0;i<numIon;i++){
-		double force0 = pow(force[i].x,2)+pow(force[i].y,2)+pow(force[i].z,2);
-		if(max<force0) max = force0;
-	}
-	return max;
 }

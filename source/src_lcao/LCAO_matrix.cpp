@@ -1,38 +1,15 @@
 #include "LCAO_matrix.h"
 #include "global_fp.h"
 #ifdef __DEEPKS
-#include "../src_parallel/parallel_deepks.h"
-#include "LCAO_descriptor.h"
+#include "../module_deepks/LCAO_deepks.h"
 #endif
 
 LCAO_Matrix::LCAO_Matrix()
 {
-    // for gamma_only
-    Sloc = new double[1];
-    Hloc_fixed = new double[1];
-    Hloc = new double[1];
-    Sdiag = new double[1];
-
-    // for many k points
-    Sloc2 = new std::complex<double>[1];
-    Hloc_fixed2 = new std::complex<double>[1];
-    Hloc2 = new std::complex<double>[1];
-    Sdiag2 = new std::complex<double>[1];
 }
 
 LCAO_Matrix::~LCAO_Matrix()
 {
-     // delete matrix for gamma_only.
-    delete[] Sloc;
-    delete[] Hloc_fixed;
-    delete[] Hloc;
-    delete[] Sdiag;
-
-    // delete matrix for many k points
-    delete[] Sloc2;
-    delete[] Hloc_fixed2;
-    delete[] Hloc2;	
-    delete[] Sdiag2;
 }
 
 
@@ -65,13 +42,6 @@ void LCAO_Matrix::divide_HS_in_frag(const bool isGamma, Parallel_Orbitals &po)
 	// for 2d: calculate po.nloc first, then trace_loc_row and trace_loc_col
 	// for O(N): calculate the three together.
 	po.set_trace();
-#ifdef __DEEPKS
-	if(GlobalV::out_descriptor)
-	{
-		GlobalC::ParaD.set_nlocal(MPI_COMM_WORLD);
-		GlobalC::ParaD.set_loc_orb(MPI_COMM_WORLD);
-	}
-#endif
 
 	// (3) allocate for S, H_fixed, H, and S_diag
 	if(isGamma)
@@ -82,7 +52,36 @@ void LCAO_Matrix::divide_HS_in_frag(const bool isGamma, Parallel_Orbitals &po)
 	{
 		allocate_HS_k(po.nloc);
 	}
+#ifdef __DEEPKS
+	//wenfei 2021-12-19
+    //preparation for DeePKS
 
+	if (GlobalV::out_descriptor)
+	{
+        //allocate relevant data structures for calculating descriptors
+        std::vector<int> na;
+        na.resize(GlobalC::ucell.ntype);
+        for(int it=0;it<GlobalC::ucell.ntype;it++)
+        {
+            na[it] = GlobalC::ucell.atoms[it].na;
+        }
+		GlobalC::ld.init(GlobalC::ORB,
+            GlobalC::ucell.nat,
+            GlobalC::ucell.ntype,
+            na);
+        if(GlobalV::deepks_scf)
+        {
+            if(isGamma)
+            {
+                GlobalC::ld.allocate_V_delta(GlobalC::ucell.nat,GlobalC::ParaO.nloc);
+            }
+            else
+            {
+                GlobalC::ld.allocate_V_delta(GlobalC::ucell.nat,GlobalC::ParaO.nloc,GlobalC::kv.nks);
+            }
+        }
+	}
+#endif
 	return;
 }
 
@@ -97,20 +96,16 @@ void LCAO_Matrix::allocate_HS_gamma(const long &nloc)
     // because we initilize in the constructor function
     // with dimension '1', so here we reconstruct these
     // matrices
-    delete[] Sloc;
-    delete[] Hloc_fixed;
-    delete[] Hloc;
-    delete[] Sdiag;
 
-    this->Sloc = new double[nloc];
-    this->Hloc_fixed = new double[nloc];
-    this->Hloc = new double[nloc];
-    this->Sdiag = new double[nloc];
+    this->Sloc.resize(nloc);
+    this->Hloc_fixed.resize(nloc);
+    this->Hloc.resize(nloc);
+    this->Sdiag.resize(nloc);
 
-    ModuleBase::GlobalFunc::ZEROS(Sloc,nloc);
-    ModuleBase::GlobalFunc::ZEROS(Hloc_fixed,nloc);
-    ModuleBase::GlobalFunc::ZEROS(Hloc,nloc);
-    ModuleBase::GlobalFunc::ZEROS(Sdiag,nloc); // mohan add 2021-01-30
+    ModuleBase::GlobalFunc::ZEROS(Sloc.data(),nloc);
+    ModuleBase::GlobalFunc::ZEROS(Hloc_fixed.data(),nloc);
+    ModuleBase::GlobalFunc::ZEROS(Hloc.data(),nloc);
+    ModuleBase::GlobalFunc::ZEROS(Sdiag.data(),nloc); // mohan add 2021-01-30
 
     return;
 }
@@ -126,19 +121,14 @@ void LCAO_Matrix::allocate_HS_k(const long &nloc)
     // because we initilize in the constructor function
     // with dimension '1', so here we reconstruct these
     // matrices
-    delete[] Sloc2;
-    delete[] Hloc_fixed2;
-    delete[] Hloc2;
-    delete[] Sdiag2;
+    this->Sloc2.resize(nloc);
+    this->Hloc_fixed2.resize(nloc);
+    this->Hloc2.resize(nloc);
+    this->Sdiag2.resize(nloc);
 
-    this->Sloc2 = new std::complex<double>[nloc];
-    this->Hloc_fixed2 = new std::complex<double>[nloc];
-    this->Hloc2 = new std::complex<double>[nloc];
-    this->Sdiag2 = new std::complex<double>[nloc];
-
-    ModuleBase::GlobalFunc::ZEROS(Sloc2,nloc);
-    ModuleBase::GlobalFunc::ZEROS(Hloc_fixed2,nloc);
-    ModuleBase::GlobalFunc::ZEROS(Hloc2,nloc);
+    ModuleBase::GlobalFunc::ZEROS(Sloc2.data(),nloc);
+    ModuleBase::GlobalFunc::ZEROS(Hloc_fixed2.data(),nloc);
+    ModuleBase::GlobalFunc::ZEROS(Hloc2.data(),nloc);
     
     return;
 }
@@ -146,32 +136,20 @@ void LCAO_Matrix::allocate_HS_k(const long &nloc)
 void LCAO_Matrix::allocate_HS_R(const int &nnR)
 {
     if(GlobalV::NSPIN!=4)
-    {
-        delete[] HlocR;
-        delete[] SlocR;
-        delete[] Hloc_fixedR;	
-    
-        this->HlocR = new double[nnR];
-        this->SlocR = new double[nnR];
-        this->Hloc_fixedR = new double[nnR];
+    {	
+        this->SlocR.resize(nnR);
+        this->Hloc_fixedR.resize(nnR);
 
-        ModuleBase::GlobalFunc::ZEROS(HlocR, nnR);
-        ModuleBase::GlobalFunc::ZEROS(SlocR, nnR);
-        ModuleBase::GlobalFunc::ZEROS(Hloc_fixedR, nnR);
+        ModuleBase::GlobalFunc::ZEROS(SlocR.data(), nnR);
+        ModuleBase::GlobalFunc::ZEROS(Hloc_fixedR.data(), nnR);
     }
     else
     {
-        delete[] HlocR_soc;
-        delete[] SlocR_soc;
-        delete[] Hloc_fixedR_soc;
-
-        this->HlocR_soc = new std::complex<double>[nnR];
-        this->SlocR_soc = new std::complex<double>[nnR];
-        this->Hloc_fixedR_soc = new std::complex<double>[nnR];
+        this->SlocR_soc.resize(nnR);
+        this->Hloc_fixedR_soc.resize(nnR);
         
-        ModuleBase::GlobalFunc::ZEROS(HlocR_soc, nnR);
-        ModuleBase::GlobalFunc::ZEROS(SlocR_soc, nnR);
-        ModuleBase::GlobalFunc::ZEROS(Hloc_fixedR_soc, nnR);
+        ModuleBase::GlobalFunc::ZEROS(SlocR_soc.data(), nnR);
+        ModuleBase::GlobalFunc::ZEROS(Hloc_fixedR_soc.data(), nnR);
         
     }
 
@@ -389,33 +367,31 @@ void LCAO_Matrix::set_stress
 
 void LCAO_Matrix::zeros_HSgamma(const char &mtype)
 {
-    if (mtype=='S') ModuleBase::GlobalFunc::ZEROS(Sloc,GlobalC::ParaO.nloc);
-    else if (mtype=='T') ModuleBase::GlobalFunc::ZEROS(Hloc_fixed,GlobalC::ParaO.nloc);
-    else if (mtype=='H') ModuleBase::GlobalFunc::ZEROS(Hloc,GlobalC::ParaO.nloc);
+    if (mtype=='S') ModuleBase::GlobalFunc::ZEROS(this->Sloc.data(), this->Sloc.size());
+    else if (mtype=='T') ModuleBase::GlobalFunc::ZEROS(this->Hloc_fixed.data(), this->Hloc_fixed.size());
+    else if (mtype=='H') ModuleBase::GlobalFunc::ZEROS(this->Hloc.data(), this->Hloc.size());
     return;
 }
 
 void LCAO_Matrix::zeros_HSk(const char &mtype)
 {
-    if (mtype=='S') ModuleBase::GlobalFunc::ZEROS(Sloc2,GlobalC::ParaO.nloc);
-    else if (mtype=='T') ModuleBase::GlobalFunc::ZEROS(Hloc_fixed2,GlobalC::ParaO.nloc);
-    else if (mtype=='H') ModuleBase::GlobalFunc::ZEROS(Hloc2,GlobalC::ParaO.nloc);
+    if (mtype=='S') ModuleBase::GlobalFunc::ZEROS(this->Sloc2.data(), this->Sloc2.size());
+    else if (mtype=='T') ModuleBase::GlobalFunc::ZEROS(this->Hloc_fixed2.data(), this->Hloc_fixed2.size());
+    else if (mtype=='H') ModuleBase::GlobalFunc::ZEROS(this->Hloc2.data(), this->Hloc2.size());
     return;
 }
 
-void LCAO_Matrix::zeros_HSR(const char &mtype, const int &nnr)
+void LCAO_Matrix::zeros_HSR(const char &mtype)
 {
     if(GlobalV::NSPIN!=4)
     {
-        if (mtype=='S') ModuleBase::GlobalFunc::ZEROS(SlocR, nnr);
-        else if (mtype=='T') ModuleBase::GlobalFunc::ZEROS(Hloc_fixedR, nnr);
-        else if (mtype=='H') ModuleBase::GlobalFunc::ZEROS(HlocR, nnr);
+        if (mtype=='S') ModuleBase::GlobalFunc::ZEROS(this->SlocR.data(), this->SlocR.size());
+        else if (mtype=='T') ModuleBase::GlobalFunc::ZEROS(this->Hloc_fixedR.data(), this->Hloc_fixedR.size());
     }
     else
     {
-        if (mtype=='H') ModuleBase::GlobalFunc::ZEROS(this->HlocR_soc, nnr);
-        else if (mtype=='S') ModuleBase::GlobalFunc::ZEROS(this->SlocR_soc, nnr);
-        else if (mtype=='T') ModuleBase::GlobalFunc::ZEROS(this->Hloc_fixedR_soc, nnr);
+        if (mtype=='S') ModuleBase::GlobalFunc::ZEROS(this->SlocR_soc.data(), this->SlocR_soc.size());
+        else if (mtype=='T') ModuleBase::GlobalFunc::ZEROS(this->Hloc_fixedR_soc.data(), this->Hloc_fixedR_soc.size());
     }
     return;
 }

@@ -724,7 +724,10 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
 			}
             for (int ib=0; ib<GlobalV::NBANDS; ib++)
             {
-                if(std::abs(GlobalC::wf.wg(ik, ib)) < 1.0e-5) continue;
+                ///
+                ///only occupied band should be calculated.
+                ///
+                if(GlobalC::wf.wg(ik, ib) < 1.0e-8) continue;
                 for (int i=0; i<nkb; i++)
                 {
                     for (int ig=0; ig<GlobalC::wf.npw; ig++)
@@ -743,7 +746,10 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
 //		ModuleBase::GlobalFunc::ZEROS(cf, GlobalC::ucell.nat);
 		for (int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
-            if(std::abs(GlobalC::wf.wg(ik, ib)) < 1.0e-5) continue;
+            ///
+			///only occupied band should be calculated.
+			///
+            if(GlobalC::wf.wg(ik, ib) < 1.0e-8) continue;
 			double fac = GlobalC::wf.wg(ik, ib) * 2.0 * GlobalC::ucell.tpiba;
         	int iat = 0;
         	int sum = 0;

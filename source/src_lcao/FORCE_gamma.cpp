@@ -1,7 +1,7 @@
 #include "FORCE_gamma.h"
 #include "../src_pw/global.h"
 #ifdef __DEEPKS
-#include "LCAO_descriptor.h"//caoyu add for deepks on 20210813
+#include "../module_deepks/LCAO_deepks.h"//caoyu add for deepks on 20210813
 #endif
 
 Force_LCAO_gamma::Force_LCAO_gamma ()
@@ -79,16 +79,19 @@ void Force_LCAO_gamma::ftable_gamma (
 #ifdef __DEEPKS
     if (GlobalV::deepks_scf)
     {
-        //=======method 1: dgemm==============
-        //GlobalC::ld.build_S_descriptor(1);   //for F_delta calculation
-        //GlobalC::ld.cal_f_delta(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
-        //GlobalC::ld.print_F_delta("F_delta_old.dat");
-
-        
-        //=======method 2: snap_psialpha========
-        
-        GlobalC::ld.cal_gedm(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
-        GlobalC::ld.cal_f_delta_new(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],isstress, svnl_dalpha);
+		GlobalC::ld.cal_projected_DM(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],
+            GlobalC::ucell,
+            GlobalC::ORB,
+            GlobalC::GridD,
+            GlobalC::ParaO);
+    	GlobalC::ld.cal_descriptor();
+        GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
+        GlobalC::ld.cal_f_delta_gamma(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],
+            GlobalC::ucell,
+            GlobalC::ORB,
+            GlobalC::GridD,
+            GlobalC::ParaO,
+            isstress, svnl_dalpha);
 #ifdef __MPI
         Parallel_Reduce::reduce_double_all(GlobalC::ld.F_delta.c,GlobalC::ld.F_delta.nr*GlobalC::ld.F_delta.nc);
 		if(isstress)
@@ -96,7 +99,7 @@ void Force_LCAO_gamma::ftable_gamma (
 			Parallel_Reduce::reduce_double_pool( svnl_dalpha.c, svnl_dalpha.nr * svnl_dalpha.nc);
 		}
 #endif
-        GlobalC::ld.print_F_delta("F_delta.dat");
+        GlobalC::ld.print_F_delta("F_delta.dat", GlobalC::ucell);
     }
 #endif
     

@@ -7,7 +7,7 @@
 #include "../src_pw/vdwd2.h"
 #include "../src_pw/vdwd3.h"
 #ifdef __DEEPKS
-#include "LCAO_descriptor.h"	//caoyu add for deepks 2021-06-03
+#include "../module_deepks/LCAO_deepks.h"	//caoyu add for deepks 2021-06-03
 #endif
 
 double Force_Stress_LCAO::force_invalid_threshold_ev = 0.00;
@@ -308,37 +308,43 @@ void Force_Stress_LCAO::getForceStress(
 		{
 			if(GlobalV::MY_RANK==0)
 			{
-            	GlobalC::ld.save_npy_f(fcs, "f_tot.npy"); //Ty/Bohr, F_tot
+            	GlobalC::ld.save_npy_f(fcs, "f_tot.npy", GlobalC::ucell.nat); //Ty/Bohr, F_tot
 			}
             if (GlobalV::deepks_scf)
             {
 				if(GlobalV::MY_RANK==0)
 				{
-                	GlobalC::ld.save_npy_f(fcs - GlobalC::ld.F_delta, "f_base.npy"); //Ry/Bohr, F_base
+                	GlobalC::ld.save_npy_f(fcs - GlobalC::ld.F_delta, "f_base.npy", GlobalC::ucell.nat); //Ry/Bohr, F_base
 				}
 
 				if(GlobalV::GAMMA_ONLY_LOCAL)
 				{
-					GlobalC::ld.cal_gvx(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
-					if(GlobalV::MY_RANK==0)
-					{
-						GlobalC::ld.save_npy_gvx();//  /Bohr, grad_vx
-					}
+    				GlobalC::ld.cal_gdmx(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],
+						GlobalC::ucell,
+						GlobalC::ORB,
+						GlobalC::GridD,
+						GlobalC::ParaO);
 				}
 				else
-				{				
-					GlobalC::ld.cal_gvx_k(GlobalC::LOC.wfc_dm_2d.dm_k);
-					if(GlobalV::MY_RANK==0)
-					{
-						GlobalC::ld.save_npy_gvx();//  /Bohr, grad_vx
-					}
+				{			
+					GlobalC::ld.cal_gdmx_k(GlobalC::LOC.wfc_dm_2d.dm_k,
+						GlobalC::ucell,
+						GlobalC::ORB,
+						GlobalC::GridD,
+						GlobalC::ParaO,
+						GlobalC::kv);	
+				}
+				GlobalC::ld.cal_gvx(GlobalC::ucell.nat);
+				if(GlobalV::MY_RANK==0)
+				{
+					GlobalC::ld.save_npy_gvx(GlobalC::ucell.nat);//  /Bohr, grad_vx
 				}
             }
             else
             {
 				if(GlobalV::MY_RANK==0)
 				{
-                	GlobalC::ld.save_npy_f(fcs, "f_base.npy"); //no scf, F_base=F_tot
+                	GlobalC::ld.save_npy_f(fcs, "f_base.npy", GlobalC::ucell.nat); //no scf, F_base=F_tot
 				}
             }
 

@@ -7,19 +7,19 @@
 #include "../module_base/constants.h"
 
 Vdwd3_Parameters::Vdwd3_Parameters()
-    : mxc((unsigned long)max_elem, 1)
 {
 }
 
 void Vdwd3_Parameters::initial_parameters(const Input &input)
 {
-    this->r0ab.resize((unsigned long)max_elem,
-      std::vector<double>((unsigned long)max_elem, 0.0));
+    this->mxc.resize(max_elem, 1);
+    this->r0ab.resize(max_elem,
+      std::vector<double>(max_elem, 0.0));
     this->c6ab.resize(3,std::vector<std::vector<std::vector<std::vector<double>>>>(
       5, std::vector<std::vector<std::vector<double>>>(
       5, std::vector<std::vector<double>>(
-      (unsigned long)max_elem,
-      std::vector<double>((unsigned long)max_elem, 0.0)))));
+      max_elem,
+      std::vector<double>(max_elem, 0.0)))));
     init_C6();
     init_r2r4();
     init_rcov();
