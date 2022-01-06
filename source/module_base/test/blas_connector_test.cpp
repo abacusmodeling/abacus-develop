@@ -1,4 +1,4 @@
-#include "blas_connector.h"
+#include "../blas_connector.h"
 #include "gtest/gtest.h"
 
 #include <algorithm>

@@ -13,15 +13,8 @@ public:
 		dt = 1;
 		tfirst = 0;
 		tlast = -1;
-		recordFreq = 1;
-
-		// useless
-		NVT_tau=0;
-		NVT_control=1;
-		mdoutputpath="mdoutput";
-		fixTemperature=1;
-		ediff=1e-4;
-		ediffg=1e-3;
+		dumpfreq = 1;
+		rstfreq = 1;
 
 		// Classic MD 
 		md_potential = "FP";
@@ -50,15 +43,8 @@ public:
     double dt ;         // Time increment (hbar/E_hartree)
     double tfirst;      // Temperature (in Hartree, 1 Hartree ~ 3E5 K)
     double tlast;       // Target temperature
-    int recordFreq;     // The period to dump MD information for monitoring and restarting MD
-
-	// useless
-    int NVT_control;
-    double NVT_tau;
-    std::string mdoutputpath;// output directory of md files: .ion .vel
-	double ediff;       //parameter for constrain 
-	double ediffg;      //parameter for constrain
-    int fixTemperature;
+    int dumpfreq;       // The period to dump MD information
+	int rstfreq;        // The period to output MD restart information
 
 	// Classic MD               // liuyu 2021-07-30
 	std::string md_potential;   // choose potential: LJ, DP, FP
