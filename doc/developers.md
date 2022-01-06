@@ -3,20 +3,22 @@
 - [Raising issues on GitHub](#raising-issues-on-github)
 - [Modularization and module tests](#modularization-and-module-tests)
 - [Contributing to ABACUS](#contributing-to-abacus)
-    - [Making pull requests](#making-pull-requests)
-    - [Providing uniy tests](#providing-unit-tests)
-    - [Upating documentation](#updating-documentation)
-    - [Macros](#macros)
-    - [Comment style for documentation](#comment-style-for-documentation)
-	- [Code Formatting style](#code-formatting-style)
+  - [Making pull requests](#making-pull-requests)
+  - [Providing uniy tests](#providing-unit-tests)
+  - [Upating documentation](#updating-documentation)
+  - [Macros](#macros)
+  - [Comment style for documentation](#comment-style-for-documentation)
+  - [Code Formatting style](#code-formatting-style)
     [back to main page](../README.md)
 
 ## Raising issues on GitHub
+
 Raising issues on GitHub is a convernient way to notify the develper team about bugs and feature requests of the ABACUS code. We provide a few templates for issues.
 
 [back to top](#for-developers)
 
 ## Modularization and module tests
+
 The ABACUS code is reconstructed to form several self-contained modules. A description of modules can be found in the [installation guide](install.md#structure-of-source-code). We also provide module tests for the modules.
 
 [back to top](#for-developers)
@@ -25,14 +27,65 @@ The ABACUS code is reconstructed to form several self-contained modules. A descr
 
 ### Making pull requests
 
+1. [Fork](https://docs.github.com/en/github/getting-started-with-github/fork-a-repo) the abacus repo.
+
+2. In your forked repository, make your changes in a new git branch:
+
+     ```shell
+     git checkout -b my-fix-branch
+     ```
+
+3. Create your patch, including appropriate test cases.
+
+4. Commit Your changes.
+
+5. Push your branch to GitHub:
+
+    ```shell
+    git push origin my-fix-branch
+    ```
+
+6. In GitHub, send a pull request to `abacus-develop:develop`.
+
+7. After your pull request is merged
+
+After your pull request is merged, you can safely delete your branch and pull the changes from the main (upstream) repository:
+
+- Delete the remote branch on GitHub either through the GitHub web UI or your local shell as follows:
+
+    ```shell
+    git push origin --delete my-fix-branch
+    ```
+
+- Check out the master branch:
+
+    ```shell
+    git checkout develop -f
+    ```
+
+- Delete the local branch:
+
+    ```shell
+    git branch -D my-fix-branch
+    ```
+
+- Update your master with the latest upstream version:
+
+    ```shell
+    git pull --ff upstream develop
+    ```
+
 ### Providing unit tests
+
+We use GoogleTest as our test framework. Write your test under the corresponding module folder at `abacus-develop/tests`, then append the test to `tests/CMakeLists.txt`. To build tests for abacus, set `BUILD_TESTING=1` when configuring with CMake. Executables of test programs will be under `build/tests`.
 
 ### Updating documentation
 
 ### Macros
 
 ### Comment Style for Documentation
-ABACUS uses Doxygen to generate docs directly from `.h ` and `.cpp` code files.
+
+ABACUS uses Doxygen to generate docs directly from `.h` and `.cpp` code files.
 
 For comments that need to be shown in documents, these formats should be used -- **Javadoc style** (as follow) is recommended, though Qt style is also ok. See it in [official manual](https://www.doxygen.nl/manual/docblocks.html).
 
@@ -41,18 +94,22 @@ A helpful VS Code extension -- Doxygen Documentation Generator, can help you for
 An practical example is class [LCAO_Descriptor](https://github.com/deepmodeling/abacus-develop/blob/deepks/source/src_lcao/LCAO_descriptor.h), the effects can be seen on [readthedocs page](https://abacus-deepks.readthedocs.io/en/latest/DeePKS_API/classLCAO__Descriptor.html#exhale-class-classLCAO-Descriptor)
 
 - Detailed Comment Block
-    ```
+
+    ```cpp
     /**
     * ... text ...
     */
     ```
-    ```
+
+    ```cpp
     ///
     /// ... text ...
     ///
     ```
+
     or ( set JAVADOC_BANNER = YES )
-    ```
+
+    ```cpp
     /********************************************//**
     *  ... text
     ***********************************************/
@@ -65,18 +122,22 @@ An practical example is class [LCAO_Descriptor](https://github.com/deepmodeling/
     *  ... text
     ***********************************************/
     ```
+
 - Brief + Detailed Comment Block
-    ```
+
+    ```cpp
     /// Brief description which ends at this dot. Details follow
     /// here.
 
     /// Brief description.
     /** Detailed description. */
     ```
+
 ​
 
 - Comments After the Item: Add a "<"
-    ```
+
+    ```cpp
     int var; /**<Detailed description after the member */
     int var; ///<Brief description after the member
     ```
@@ -84,14 +145,17 @@ An practical example is class [LCAO_Descriptor](https://github.com/deepmodeling/
 - Parameters
     usage: `[in],[out],[in,out] description`
     eg.
-    ```
+
+    ```cpp
     void foo(int v/**< [in] docs for input parameter v.*/);
     ```
+
     or use `@param` commond
 ​
 - List
     eg.1
-    ```
+
+    ```cpp
     /**
     * Text before the list
     * - list item 1
@@ -115,8 +179,10 @@ An practical example is class [LCAO_Descriptor](https://github.com/deepmodeling/
     * More text in a new paragraph.
     */
     ```
+
     eg.2
-    ```
+
+    ```cpp
     /*!
     *  A list of events:
     *    - mouse events
@@ -131,13 +197,15 @@ An practical example is class [LCAO_Descriptor](https://github.com/deepmodeling/
     *  More text here.
     */
     ```
+
 - Formula
 
-    - inline: 	`\f$myformula\f$`
-    - separate line: 	 `\f[myformula\f]`
-    - environment:	`\f{environment}{myformula}`
-    - eg.
-    ```
+  - inline:  `\f$myformula\f$`
+  - separate line:   `\f[myformula\f]`
+  - environment: `\f{environment}{myformula}`
+  - eg.
+
+    ```latex
     \f{eqnarray*}{
             g &=& \frac{Gm_2}{r^2} \\
             &=& \frac{(6.673 \times 10^{-11}\,\mbox{m}^3\,\mbox{kg}^{-1}\,
@@ -147,9 +215,9 @@ An practical example is class [LCAO_Descriptor](https://github.com/deepmodeling/
     ```
 
 - Tips
-    - Only comments in .h file will be visible in generated  by Doxygen + Sphinx;
-    - Private class members will not be documented;
-    - Use [Markdown features](https://www.doxygen.nl/manual/markdown.html), such as using a empty new line for a new paragraph.
+  - Only comments in .h file will be visible in generated  by Doxygen + Sphinx;
+  - Private class members will not be documented;
+  - Use [Markdown features](https://www.doxygen.nl/manual/markdown.html), such as using a empty new line for a new paragraph.
 ​
 [back to top](#for-developers)
 

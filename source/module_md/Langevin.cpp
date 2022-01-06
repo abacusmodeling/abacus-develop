@@ -62,14 +62,21 @@ void Langevin::post_force()
 {
     temp_target();
 
-    for(int i=0; i<ucell.nat; ++i)
+    if(GlobalV::MY_RANK==0)
     {
-        force[i] -= allmass[i] * vel[i] / mdp.damp;
-        for(int j=0; j<3; ++j)
+        for(int i=0; i<ucell.nat; ++i)
         {
-            force[i][j] += sqrt(24.0 * t_target * allmass[i] / mdp.damp / mdp.dt) * (rand()/double(RAND_MAX) - 0.5);
+            force[i] -= allmass[i] * vel[i] / mdp.damp;
+            for(int j=0; j<3; ++j)
+            {
+                force[i][j] += sqrt(24.0 * t_target * allmass[i] / mdp.damp / mdp.dt) * (rand()/double(RAND_MAX) - 0.5);
+            }
         }
     }
+
+#ifdef __MPI
+	MPI_Bcast(force, ucell.nat*3, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+#endif
 }
 
 void Langevin::temp_target()

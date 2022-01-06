@@ -218,7 +218,6 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
         // set the local potential
         // in LCAO basis.
         //--------------------------
-        GlobalC::LM.zeros_HSR('H', GlobalC::LNNR.nnr);
 
         if(GlobalV::NSPIN!=4) 
         {
@@ -285,7 +284,7 @@ void LCAO_Hamilt::calculate_STNR_k(void)
     // is GlobalC::LNNR.nnr.
     // and store in GlobalC::LM.SlocR.
     //--------------------------------------------
-    GlobalC::LM.zeros_HSR('S', GlobalC::LNNR.nnr);
+    GlobalC::LM.zeros_HSR('S');
     this->genH.calculate_S_no();	
 
     //------------------------------
@@ -293,7 +292,7 @@ void LCAO_Hamilt::calculate_STNR_k(void)
     // and then calculate it
     // and store in GlobalC::LM.Hloc_fixedR.
     //------------------------------
-    GlobalC::LM.zeros_HSR('T', GlobalC::LNNR.nnr);
+    GlobalC::LM.zeros_HSR('T');
     
 
 
