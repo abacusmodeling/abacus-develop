@@ -4,7 +4,7 @@
 #include <map>
 
 #ifdef __DEEPKS
-#include "LCAO_descriptor.h"
+#include "../module_deepks/LCAO_deepks.h"
 #endif
 
 Force_LCAO_k::Force_LCAO_k ()
@@ -70,9 +70,22 @@ void Force_LCAO_k::ftable_k (
 #ifdef __DEEPKS
     if (GlobalV::deepks_scf)
     {
-		GlobalC::ld.cal_gedm_k(GlobalC::LOC.wfc_dm_2d.dm_k);
+		GlobalC::ld.cal_projected_DM_k(GlobalC::LOC.wfc_dm_2d.dm_k,
+			GlobalC::ucell,
+            GlobalC::ORB,
+            GlobalC::GridD,
+            GlobalC::ParaO,
+			GlobalC::kv);
+    	GlobalC::ld.cal_descriptor();
+		GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
 
-        GlobalC::ld.cal_f_delta_k(GlobalC::LOC.wfc_dm_2d.dm_k,isstress,svnl_dalpha);
+        GlobalC::ld.cal_f_delta_k(GlobalC::LOC.wfc_dm_2d.dm_k,
+			GlobalC::ucell,
+            GlobalC::ORB,
+            GlobalC::GridD,
+            GlobalC::ParaO,
+			GlobalC::kv,
+			isstress,svnl_dalpha);
 #ifdef __MPI
         Parallel_Reduce::reduce_double_all(GlobalC::ld.F_delta.c,GlobalC::ld.F_delta.nr*GlobalC::ld.F_delta.nc);
 		if(isstress)
@@ -80,7 +93,7 @@ void Force_LCAO_k::ftable_k (
 			Parallel_Reduce::reduce_double_pool( svnl_dalpha.c, svnl_dalpha.nr * svnl_dalpha.nc);
 		}
 #endif
-        GlobalC::ld.print_F_delta("F_delta.dat");
+        GlobalC::ld.print_F_delta("F_delta.dat", GlobalC::ucell);
     }
 #endif
 

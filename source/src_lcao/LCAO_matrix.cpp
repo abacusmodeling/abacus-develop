@@ -1,8 +1,7 @@
 #include "LCAO_matrix.h"
 #include "global_fp.h"
 #ifdef __DEEPKS
-#include "../src_parallel/parallel_deepks.h"
-#include "LCAO_descriptor.h"
+#include "../module_deepks/LCAO_deepks.h"
 #endif
 
 LCAO_Matrix::LCAO_Matrix()
@@ -43,13 +42,6 @@ void LCAO_Matrix::divide_HS_in_frag(const bool isGamma, Parallel_Orbitals &po)
 	// for 2d: calculate po.nloc first, then trace_loc_row and trace_loc_col
 	// for O(N): calculate the three together.
 	po.set_trace();
-#ifdef __DEEPKS
-	if(GlobalV::out_descriptor)
-	{
-		GlobalC::ParaD.set_nlocal(MPI_COMM_WORLD);
-		GlobalC::ParaD.set_loc_orb(MPI_COMM_WORLD);
-	}
-#endif
 
 	// (3) allocate for S, H_fixed, H, and S_diag
 	if(isGamma)
@@ -60,7 +52,36 @@ void LCAO_Matrix::divide_HS_in_frag(const bool isGamma, Parallel_Orbitals &po)
 	{
 		allocate_HS_k(po.nloc);
 	}
+#ifdef __DEEPKS
+	//wenfei 2021-12-19
+    //preparation for DeePKS
 
+	if (GlobalV::out_descriptor)
+	{
+        //allocate relevant data structures for calculating descriptors
+        std::vector<int> na;
+        na.resize(GlobalC::ucell.ntype);
+        for(int it=0;it<GlobalC::ucell.ntype;it++)
+        {
+            na[it] = GlobalC::ucell.atoms[it].na;
+        }
+		GlobalC::ld.init(GlobalC::ORB,
+            GlobalC::ucell.nat,
+            GlobalC::ucell.ntype,
+            na);
+        if(GlobalV::deepks_scf)
+        {
+            if(isGamma)
+            {
+                GlobalC::ld.allocate_V_delta(GlobalC::ucell.nat,GlobalC::ParaO.nloc);
+            }
+            else
+            {
+                GlobalC::ld.allocate_V_delta(GlobalC::ucell.nat,GlobalC::ParaO.nloc,GlobalC::kv.nks);
+            }
+        }
+	}
+#endif
 	return;
 }
 

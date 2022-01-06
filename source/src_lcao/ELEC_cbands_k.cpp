@@ -6,7 +6,8 @@
 #include "LCAO_evolve.h"
 #include "dftu.h"
 #ifdef __DEEPKS
-#include "LCAO_descriptor.h"
+#include "../module_deepks/LCAO_deepks.h"
+#include "LCAO_nnr.h"
 #endif
 
 ELEC_cbands_k::ELEC_cbands_k(){};
@@ -25,11 +26,22 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 #ifdef __DEEPKS
 	if (GlobalV::deepks_scf)
     {
+		GlobalC::ld.cal_projected_DM_k(GlobalC::LOC.wfc_dm_2d.dm_k,
+			GlobalC::ucell,
+            GlobalC::ORB,
+            GlobalC::GridD,
+            GlobalC::ParaO,
+			GlobalC::kv);
+    	GlobalC::ld.cal_descriptor();
 		//calculate dE/dD
-		GlobalC::ld.cal_gedm_k(GlobalC::LOC.wfc_dm_2d.dm_k);
+		GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
 
 		//calculate H_V_deltaR from saved <alpha(0)|psi(R)>
-		GlobalC::ld.add_v_delta_k();
+		GlobalC::ld.add_v_delta_k(GlobalC::ucell,
+            GlobalC::ORB,
+            GlobalC::GridD,
+            GlobalC::ParaO,
+			GlobalC::LNNR.nnr);
 	}
 #endif
 
