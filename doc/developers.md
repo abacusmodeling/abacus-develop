@@ -19,7 +19,38 @@ Raising issues on GitHub is a convernient way to notify the develper team about 
 
 ## Modularization and module tests
 
-The ABACUS code is reconstructed to form several self-contained modules. A description of modules can be found in the [installation guide](install.md#structure-of-source-code). We also provide module tests for the modules.
+The ABACUS code is refactored to several self-contained modules. A description of modules can be found in the [installation guide](install.md#structure-of-source-code). We also provide module unit tests.
+
+### Add a unit test
+
+If there are currently no unit tests provided for the module, do as follows. `module_base` provides a simple demonstration.
+
+- Add a folder named `test` under the module.
+- Append the content below to `CMakeLists.txt` of the module:
+
+```cmake
+IF (BUILD_TESTING)
+  add_subdirectory(test)
+endif()
+```
+
+- Add a blank `CMakeLists.txt` under `module*/test`.
+
+To add a unit test:
+
+- Write your test under `GoogleTest` framework.
+- Add your testing source code with suffix `*_test.cpp` in `test` directory.
+- Append the content below to `CMakeLists.txt` of the module:
+
+```cmake
+AddTest(
+  TARGET <module_name>_<test_name> # this is the executable file name of the test
+  SOURCES <test_name>.cpp
+)
+```
+
+- Build with `-D BUILD_TESTING=1` flag. You can find built testing programs under `build/source/<module_name>/test`.
+- Follow the installing procedure of CMake. The tests will move to `build/test`.
 
 [back to top](#for-developers)
 
