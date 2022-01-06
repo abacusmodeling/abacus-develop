@@ -1,15 +1,19 @@
 if(ENABLE_DEEPKS)
     list(APPEND objects
-        LCAO_descriptor.cpp
-        LCAO_descriptor_old.cpp
-        LCAO_descriptor_dV.cpp
-        LCAO_descriptor_io.cpp
+        LCAO_deepks.cpp
+        LCAO_deepks_fdelta.cpp
+        LCAO_deepks_io.cpp
+        LCAO_deepks_mpi.cpp
+        LCAO_deepks_pdm.cpp
+        LCAO_deepks_psialpha.cpp
+        LCAO_deepks_torch.cpp
+        LCAO_deepks_vdelta.cpp
         )
-endif()
 
-add_library(
-    lcao
-    OBJECT
-    ${objects}
-)
+    add_library(
+        deepks
+        OBJECT
+        ${objects}
+    )
+endif()
 
