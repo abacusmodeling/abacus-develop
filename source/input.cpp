@@ -219,7 +219,6 @@ void Input::Default(void)
 //----------------------------------------------------------
 // iteration
 //----------------------------------------------------------
-    dr2 = 1.0e-9;
     niter = 40;
     this->nstep = 0;
 	out_stru = 0;
@@ -944,10 +943,6 @@ bool Input::Read(const std::string &fn)
 //----------------------------------------------------------
 // iteration
 //----------------------------------------------------------
-        else if (strcmp("dr2", word) == 0)
-        {
-            read_value(ifs, dr2);
-        }
         else if (strcmp("niter", word) == 0)
         {
             read_value(ifs, niter);
@@ -1860,7 +1855,8 @@ bool Input::Read(const std::string &fn)
 			//xiaohui add 2015-09-15
 			if(word[0] != '#' && word[0] != '/')
 			{
-				input_error = 1;
+				// Peize Lin delete 2022.01.06 temporarily
+				//input_error = 1;
 				std::cout<<" THE PARAMETER NAME '" << word << "' IS NOT USED!" << std::endl;
 			}
 // mohan screen this 2012-06-30
@@ -2312,7 +2308,6 @@ void Input::Bcast()
 	Parallel_Common::bcast_int( test_force );
 	Parallel_Common::bcast_int( test_stress );
 
-    Parallel_Common::bcast_double( dr2 );
     Parallel_Common::bcast_int( niter );
     Parallel_Common::bcast_int( this->nstep );
 	Parallel_Common::bcast_int( out_stru ); //mohan add 2012-03-23
