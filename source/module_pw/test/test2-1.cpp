@@ -1,32 +1,22 @@
 #include "../pw_basis.h"
-#include "../../src_parallel/parallel_global.h"
 #ifdef __MPI
 #include "test_tool.h"
+#include "../../src_parallel/parallel_global.h"
 #include "mpi.h"
 #endif
-#include "../../module_base/timer.h"
 #include "../../module_base/global_function.h"
+#include "utest.h"
 
-int main(int argc,char **argv)
+TEST_F(PWTEST,test1_2)
 {
+    //--------------------------------------------------
     ModuleBase::Matrix3 latvec(1,0,0,0,1,0,0,0,1);
     bool gamma_only = true;
     double ecut = 100;
     double lat0 = 1;
-    int nproc, myrank;
-    int nproc_in_pool, npool, mypool, rank_in_pool;
-    npool = 1;
-#ifdef __MPI
-    setupmpi(argc,argv,nproc, myrank);
-    divide_pools(nproc, myrank, nproc_in_pool, npool, mypool, rank_in_pool);
-#else
-    nproc = nproc_in_pool = npool = 1;
-    myrank = mypool = rank_in_pool = 0;
-#endif
-
-    ModuleBase::timer::start();
-
     int distribution_type = 2;
+    //--------------------------------------------------
+
     ModulePW::PW_Basis pwtest;
 
     pwtest.initgrids(lat0, latvec, ecut);
@@ -112,8 +102,4 @@ int main(int argc,char **argv)
     //     delete[] gdirect_global;
     //     delete[] gcar_global;
     // }
-#ifdef __MPI
-    finishmpi();
-#endif
-    return 0;
 }

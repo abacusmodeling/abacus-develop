@@ -5,11 +5,11 @@
 namespace ModulePW
 {
 
-//
-//Special pw_basis class.
-//It includes different k-points
-//plane waves: <r|g,k>=1/sqrt(V) * exp(i(k+g)r)
-//
+///
+/// Special pw_basis class.
+/// It includes different k-points
+/// plane waves: <r|g,k>=1/sqrt(V) * exp(i(k+g)r)
+///
 class PW_Basis_K : public PW_Basis
 {
 

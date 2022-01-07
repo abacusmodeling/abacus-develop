@@ -9,13 +9,12 @@
 #endif
 #include "../../module_base/constants.h"
 #include "../../module_base/global_function.h"
-#include <iomanip>
-#include "gtest/gtest.h"
-extern int nproc_in_pool,rank_in_pool;
+#include "utest.h"
 
 using namespace std;
-TEST(PWTEST,test1_2f)
+TEST_F(PWTEST,test2_2)
 {
+    cout<<"dividemthd 2, gamma_only: off, double precision"<<endl;
     ModulePW::PW_Basis pwtest;
     ModuleBase::Matrix3 latvec;
     int nx,ny,nz;  //f*G
@@ -24,16 +23,17 @@ TEST(PWTEST,test1_2f)
     bool gamma_only;
     //--------------------------------------------------
     lat0 = 2;
-    ModuleBase::Matrix3 la(1, 1, 0, 0, 2, 0, 0, 0, 2);
+    ModuleBase::Matrix3 la(1, 0, 1, 0, 2, 0, 0, 0, 2);
     latvec = la;
-    wfcecut = 10;
+    wfcecut = 20;
     gamma_only = false;
+    int distribution_type = 2;
     //--------------------------------------------------
     
     //init
-    pwtest.initgrids(lat0,latvec,wfcecut);
+    pwtest.initgrids(lat0,latvec,1.5*wfcecut);
     //pwtest.initgrids(lat0,latvec,5,7,7);
-    pwtest.initparameters(gamma_only,wfcecut,nproc_in_pool,rank_in_pool,1);
+    pwtest.initparameters(gamma_only,wfcecut,nproc_in_pool,rank_in_pool,distribution_type);
     pwtest.setuptransform();
     pwtest.collect_local_pw();
 
@@ -77,6 +77,7 @@ TEST(PWTEST,test1_2f)
         fftw_execute(pp);    
         fftw_destroy_plan(pp); 
         
+        //output
         ModuleBase::Vector3<double> delta_g(double(int(nx/2))/nx, double(int(ny/2))/ny, double(int(ny/2))/nz); 
         for(int ixy = 0 ; ixy < nx * ny ; ++ixy)
         {
@@ -96,13 +97,13 @@ TEST(PWTEST,test1_2f)
     MPI_Bcast(tmp,2*nx*ny*nz,MPI_DOUBLE,0,POOL_WORLD);
 #endif
     
-    complex<float> * rhog = new complex<float> [npw];
-    complex<float> * rhogout = new complex<float> [npw];
+    complex<double> * rhog = new complex<double> [npw];
+    complex<double> * rhogout = new complex<double> [npw];
     for(int ig = 0 ; ig < npw ; ++ig)
     {
         rhog[ig] = 1.0/(pwtest.gg[ig]+1) + ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ig].x+1) + 1);
     }    
-    complex<float> * rhor = new complex<float> [nrxx];
+    complex<double> * rhor = new complex<double> [nrxx];
     pwtest.recip2real(rhog,rhor);
     int startiz = pwtest.startz[rank_in_pool];
     for(int ixy = 0 ; ixy < nx * ny ; ++ixy)
@@ -114,20 +115,18 @@ TEST(PWTEST,test1_2f)
         }
     }
 
-    
-    
     pwtest.real2recip(rhor,rhogout);
     for(int ig = 0 ; ig < npw ; ++ig)
     {
         EXPECT_NEAR(rhog[ig].real(),rhogout[ig].real(),1e-6);
         EXPECT_NEAR(rhog[ig].imag(),rhogout[ig].imag(),1e-6);
     }
-  
+    
+
     delete [] rhog;
     delete [] rhogout;
     delete [] rhor;
     delete []tmp; 
-
     fftw_cleanup();
 #ifdef __MIX_PRECISION
     fftwf_cleanup();

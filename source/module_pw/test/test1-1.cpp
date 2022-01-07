@@ -1,36 +1,27 @@
 #include "../pw_basis.h"
-#include "../../src_parallel/parallel_global.h"
 #ifdef __MPI
 #include "test_tool.h"
+#include "../../src_parallel/parallel_global.h"
 #include "mpi.h"
 #endif
-#include "../../module_base/timer.h"
 #include "../../module_base/global_function.h"
+#include "gtest/gtest.h"
+extern int nproc_in_pool,rank_in_pool;
 
-int main(int argc,char **argv)
+TEST(PWTEST,test1_1)
 {
+    //--------------------------------------------------
     ModuleBase::Matrix3 latvec(1,0,0,0,1,0,0,0,1);
     bool gamma_only = true;
     double ecut = 100;
     double lat0 = 1;
-    int nproc, myrank;
-    int nproc_in_pool, npool, mypool, rank_in_pool;
-    npool = 1;
-#ifdef __MPI
-    setupmpi(argc,argv,nproc, myrank);
-    divide_pools(nproc, myrank, nproc_in_pool, npool, mypool, rank_in_pool);
-#else
-    nproc = nproc_in_pool = npool = 1;
-    myrank = mypool = rank_in_pool = 0;
-#endif
-
-    ModuleBase::timer::start();
-
     int distribution_type = 1;
+    //--------------------------------------------------
+
     ModulePW::PW_Basis pwtest;
 
     pwtest.initgrids(lat0, latvec, ecut);
-    pwtest.initparameters(gamma_only, ecut, nproc, rank_in_pool, distribution_type);
+    pwtest.initparameters(gamma_only, ecut, nproc_in_pool, rank_in_pool, distribution_type);
     pwtest.distribute_r();
     pwtest.distribute_g();
 
@@ -41,6 +32,7 @@ int main(int argc,char **argv)
 #else
     tot_npw = pwtest.npw;
 #endif
+
     for (int ip = 0; ip < nproc; ip++)
     {
 #ifdef __MPI
@@ -95,10 +87,4 @@ int main(int argc,char **argv)
             std::cout << "\n";
         }
     }
-    if(rank_in_pool==0) ModuleBase::timer::finish(GlobalV::ofs_running, true);
-#ifdef __MPI
-    finishmpi();
-#endif
-
-    return 0;
 }

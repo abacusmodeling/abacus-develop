@@ -9,13 +9,12 @@
 #endif
 #include "../../module_base/constants.h"
 #include "../../module_base/global_function.h"
-#include <iomanip>
-#include "gtest/gtest.h"
-extern int nproc_in_pool,rank_in_pool;
+#include "utest.h"
 
 using namespace std;
-TEST(PWTEST,test2_3)
+TEST_F(PWTEST,test1_3)
 {
+    cout<<"dividemthd 1, gamma_only: on, double precision"<<endl;
     ModulePW::PW_Basis pwtest;
     ModuleBase::Matrix3 latvec;
     int nx,ny,nz;  //f*G
@@ -26,14 +25,15 @@ TEST(PWTEST,test2_3)
     lat0 = 4;
     ModuleBase::Matrix3 la(1, 1, 0, 1, 0, 1, 0, 1, 1);
     latvec = la;
-    wfcecut = 15;
+    wfcecut = 20;
     gamma_only = true;
+    int distribution_type = 1;
     //--------------------------------------------------
     
     //init
-    pwtest.initgrids(lat0,latvec,4*wfcecut);
+    pwtest.initgrids(lat0,latvec,1.5*wfcecut);
     //pwtest.initgrids(lat0,latvec,5,7,7);
-    pwtest.initparameters(gamma_only,wfcecut,nproc_in_pool,rank_in_pool,2);
+    pwtest.initparameters(gamma_only,wfcecut,nproc_in_pool,rank_in_pool,distribution_type);
     pwtest.setuptransform();
     pwtest.collect_local_pw();
 

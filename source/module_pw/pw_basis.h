@@ -10,14 +10,14 @@
 namespace ModulePW
 {
 
-//
-//A class which can convert a function of "r" to the corresponding linear 
-// superposition of plane waves (real space to reciprocal space)
-// or convert a linear superposition of plane waves to the function 
-// of "r" (reciprocal to real).
-//plane waves: <r|g>=1/sqrt(V) * exp(igr)
-// f(r) = 1/sqrt(V) * \sum_g{c(g)*exp(igr)}
-//
+///
+/// A class which can convert a function of "r" to the corresponding linear 
+/// superposition of plane waves (real space to reciprocal space)
+/// or convert a linear superposition of plane waves to the function 
+/// of "r" (reciprocal to real).
+/// plane waves: <r|g>=1/sqrt(V) * exp(igr)
+/// f(r) = 1/sqrt(V) * \sum_g{c(g)*exp(igr)}
+///
 class PW_Basis
 {
 

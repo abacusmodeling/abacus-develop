@@ -9,13 +9,12 @@
 #endif
 #include "../../module_base/constants.h"
 #include "../../module_base/global_function.h"
-#include <iomanip>
-#include "gtest/gtest.h"
-extern int nproc_in_pool,rank_in_pool;
+#include "utest.h"
 
 using namespace std;
-TEST(PWTEST,test1_4f)
+TEST_F(PWTEST,test1_4)
 {
+    cout<<"dividemthd 1, gamma_only: off, double precision, 2 kpoints"<<endl;
     ModulePW::PW_Basis_K pwtest;
     ModuleBase::Matrix3 latvec;
     int nx,ny,nz;  //f*G
@@ -34,11 +33,12 @@ TEST(PWTEST,test1_4f)
     latvec = la;
     wfcecut = 10;
     gamma_only = false;
+    int distribution_type = 1;
     //--------------------------------------------------
     //init
     pwtest.initgrids(lat0,latvec,wfcecut);
     //pwtest.initgrids(lat0,latvec,5,7,7);
-    pwtest.initparameters(gamma_only,wfcecut,nks,kvec_d,nproc_in_pool,rank_in_pool,1);
+    pwtest.initparameters(gamma_only,wfcecut,nks,kvec_d,nproc_in_pool,rank_in_pool,distribution_type);
     pwtest.setuptransform();
     pwtest.collect_local_pw();
 
@@ -56,7 +56,7 @@ TEST(PWTEST,test1_4f)
 	G  = GT.Transpose();
 	GGT = G * GT;
     complex<double> *tmp = new complex<double> [nx*ny*nz];
-    complex<float> * rhor = new complex<float> [nrxx];
+    complex<double> * rhor = new complex<double> [nrxx];
     for(int ik  = 0; ik < nks; ++ik)
     {
         int npw = pwtest.npwk[ik];
@@ -106,8 +106,8 @@ TEST(PWTEST,test1_4f)
 #ifdef __MPI
         MPI_Bcast(tmp,2*nx*ny*nz,MPI_DOUBLE,0,POOL_WORLD);
 #endif
-        complex<float> * rhog = new complex<float> [npw];
-        complex<float> * rhogout = new complex<float> [npw];
+        complex<double> * rhog = new complex<double> [npw];
+        complex<double> * rhogout = new complex<double> [npw];
         for(int ig = 0 ; ig < npw ; ++ig)
         {
             rhog[ig] = 1.0/(pwtest.gg[ik*npwk_max + ig]+1) + ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ik*npwk_max + ig].x+1) + 1);
