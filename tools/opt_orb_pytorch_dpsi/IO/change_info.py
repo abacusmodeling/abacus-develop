@@ -11,6 +11,10 @@ def change_info(info_old, weight_old):
 	for ist,weight in enumerate(weight_old):
 		info_stru[ist].weight = weight
 		info_stru[ist].Nb = weight.shape[0]
+		for ib in range(weight.shape[0], 0, -1):
+			if weight[ib-1]>0:
+				info_stru[ist].Nb_true = ib
+				break
 
 	info_element = addict.Dict()
 	for it_index,it in enumerate(info_old.Nt_all):
@@ -36,20 +40,36 @@ def change_info(info_old, weight_old):
 
 	"""
 	info_stru =
-	[{'Na': {'C': 2},
+	[{'Na': {'C': 1},
 	  'Nb': 6,
-	  'weight': tensor([0.1250, 0.1250, 0.1150, 0.1150, 0.0200, 0.0000])},
-	 {'Na': {'C': 2},
+	  'Nb_true': 4,
+	  'weight': tensor([0.0333, 0.0111, 0.0111, 0.0111, 0.0000, 0.0000])},
+	 {'Na': {'C': 1},
 	  'Nb': 6,
-	  'weight': tensor([0.1250, 0.1250, 0.0896, 0.0896, 0.0707, 0.0000])}]
+	  'Nb_true': 2,
+	  'weight': tensor([0.0667, 0.0667, 0.0000, 0.0000, 0.0000, 0.0000])},
+	 {'Na': {'C': 1, 'O': 2},
+	  'Nb': 10,
+	  'Nb_true': 8,
+	  'weight': tensor([0.1000, 0.1000, 0.1000, 0.1000, 0.1000, 0.1000, 0.1000, 0.1000, 0.0000, 0.0000])}]
 
 	info_element =
-	{'C': {'Ecut': 200,
-       'Ne': 19,
-       'Nl': 3,
-       'Nu': [2, 2, 1],
-       'Rcut': 6,
-       'dr': 0.01}}
+	{'C': {
+		'Ecut': 200,
+    	'Ne': 19,
+    	'Nl': 3,
+    	'Nu': [2, 2, 1],
+    	'Rcut': 6,
+    	'dr': 0.01,
+    	'index': 0},
+	 'O': {
+		'Ecut': 200,
+		'Ne': 19,
+		'Nl': 3,
+		'Nu': [3, 2, 1],
+		'Rcut': 6,
+		'dr': 0.01,
+		'index': 1}}
 
 	info_opt =
 	{'cal_T': False,
