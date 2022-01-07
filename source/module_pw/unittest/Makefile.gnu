@@ -5,7 +5,6 @@
 CPLUSPLUS = mpicxx
 CUDA_COMPILE = nvcc
 OBJ_DIR = pw_obj
-BIN_DIR = testbin
 NP      = 12
 #==========================
 # Objects
@@ -33,19 +32,16 @@ pw_basis_k.o\
 pw_operation.o\
 pw_transform_k.o
 
-DOUBLEFILE=test1.exe\
-test2.exe\
-test3.exe\
-test4.exe\
-test2-1.exe\
-test2-2.exe\
-test2-3.exe\
-test_t1.exe\
-test_t2.exe
+DOUBLEFILE=test1-2.o\
+test1-3.o\
+test1-4.o\
+test2-2.o\
+test2-3.o
 
-FLOATFILE=testf2.exe\
-testf3.exe\
-testf4.exe
+FLOATFILE=test1-2f.o\
+test1-3f.o\
+test1-4f.o
+
 TESTFILE0 = ${DOUBLEFILE} 
 
 #==========================
@@ -58,7 +54,7 @@ TESTFILE0 = ${DOUBLEFILE}
 #Mix Precision
 # HONG = -D__MIX_PRECISION -D__NORMAL
 # TESTFILE0 = ${DOUBLEFILE} ${FLOATFILE}
-# CPLUSPULS = g++
+# CPLUSPLUS = g++
 
 #Only MPI
 HONG = -D__MPI -D__NORMAL
@@ -76,7 +72,7 @@ HONG = -D__MPI -D__NORMAL
 
 
 PW_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${PW_OBJS_0})
-TESTFILE=$(patsubst %.exe, ${BIN_DIR}/%.exe, ${TESTFILE0})
+TESTFILE=$(patsubst %.o, ${OBJ_DIR}/%.o, ${TESTFILE0})
 
 ##==========================
 ## FFTW package needed 
@@ -85,8 +81,8 @@ TESTFILE=$(patsubst %.exe, ${BIN_DIR}/%.exe, ${TESTFILE0})
 FFTW_DIR = /home/qianrui/gnucompile/g_fftw-3.3.8-mpi
 FFTW_LIB_DIR     = ${FFTW_DIR}/lib
 FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
-FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -lfftw3f -Wl,-rpath=${FFTW_LIB_DIR}
-# FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
+# FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -lfftw3f -Wl,-rpath=${FFTW_LIB_DIR}
+FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
 
 
 
@@ -98,28 +94,32 @@ FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -lfftw3f -Wl,-rpath=${FFTW_LIB_DIR}
 # CUDA_LIB_DIR		= ${CUDA_DIR}/lib64
 # CUDA_LIB			= -L${CUDA_LIB_DIR} -lcufft -lcublas -lcudart
 
-LIBS = ${FFTW_LIB} ${CUDA_LIB}
+##==========================
+## GTEST needed 
+##==========================
+GTEST_DIR = /home/qianrui/gnucompile/g_gtest
+GTESTOPTS = -I${GTEST_DIR}/include -L${GTEST_DIR}/lib -lgtest -lpthread
+
+
 #LIBS = ${FFTW_LIB} ${CUDA_LIB} -ltcmalloc -lprofiler
+LIBS = ${FFTW_LIB} ${CUDA_LIB}
 OPTS = -I${FFTW_INCLUDE_DIR} ${HONG} -Ofast -std=c++11 -Wall -g 
 #==========================
 # MAKING OPTIONS
 #==========================
 pw : 
 	@ make init
-	@ make -j $(NP) ${PW_OBJS}
-	@ make -j $(NP) ${TESTFILE}
+	@ make -j $(NP) utest.exe
 
 init :
 	@ if [ ! -d $(OBJ_DIR) ]; then mkdir $(OBJ_DIR); fi
-	@ if [ ! -d $(BIN_DIR) ]; then mkdir $(BIN_DIR); fi
-	@ if [ ! -d $(OBJ_DIR)/README ]; then echo "This directory contains all of the .o files" > $(OBJ_DIR)/README; fi
 
-${BIN_DIR}/%.exe: %.cpp ${PW_OBJS}
-	${CPLUSPLUS} ${OPTS} $< test_tool.cpp ${PW_OBJS}  ${LIBS} -o $@
+utest.exe: ${PW_OBJS} ${TESTFILE}
+	${CPLUSPLUS} ${OPTS} ${TESTFILE} utest.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o utest.exe ${GTESTOPTS}
 ${OBJ_DIR}/%.o:%.cpp
-	${CPLUSPLUS} ${OPTS} -c ${HONG} $< -o $@
+	${CPLUSPLUS} ${OPTS} -c ${HONG} $< -o $@ ${GTESTOPTS}
 
 .PHONY:clean
 clean:
 	@ if [ -d $(OBJ_DIR) ]; then rm -rf $(OBJ_DIR); fi
-	@ if [ -d $(BIN_DIR) ]; then rm -rf $(BIN_DIR); fi
+	@ if [ -e utest.exe ]; then rm -f utest.exe; fi

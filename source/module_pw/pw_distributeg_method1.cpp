@@ -2,7 +2,7 @@
 #include "../module_base/mymath.h"
 #include "../src_parallel/parallel_global.h"
 #include "../module_base/global_function.h"
-#include "iostream"
+// #include "iostream"
 #include "../module_base/timer.h"
 
 
@@ -47,9 +47,9 @@ void PW_Basis::distribution_method1()
 
         this->count_pw_st(tot_npw, st_length2D, st_bottom2D);
         // for test --------------------------------------------------
-        std::cout << "The first step done\n";
-        std::cout << "tot_npw   " << tot_npw << '\n';
-        std::cout << "this->nstot   " << this->nstot << '\n';
+        // std::cout << "The first step done\n";
+        // std::cout << "tot_npw   " << tot_npw << '\n';
+        // std::cout << "this->nstot   " << this->nstot << '\n';
         // for (int ix = 0; ix < nx; ++ix)
         // {
         //     for (int iy = 0; iy < ny; ++iy)
@@ -70,7 +70,7 @@ void PW_Basis::distribution_method1()
         this->collect_st(st_length2D, st_bottom2D, st_i, st_j, st_length);
 
         // ------------------------------------------------------------
-        std::cout << "\nThe second step done\n";
+        // std::cout << "\nThe second step done\n";
         // ------------------------------------------------------------
 
         // (3) Distribute sticks to cores.
@@ -91,7 +91,7 @@ void PW_Basis::distribution_method1()
         delete[] st_length;
 
          // for test -----------------------------------------------------------------------------
-        std::cout << "The 3-1 step done\n";
+        // std::cout << "The 3-1 step done\n";
         // std::cout << "st_i    ";
         // for (int is = 0; is < this->nstot; ++is) cout << st_i[is] << setw(4) ;
         // std::cout << std::endl;
@@ -101,7 +101,7 @@ void PW_Basis::distribution_method1()
         delete[] st_i;
         delete[] st_j;
         // for test -----------------------------------------------------------------------------
-        std::cout << "The 3-2 step done\n";
+        // std::cout << "The 3-2 step done\n";
         // --------------------------------------------------------------------------------------
 
         // (4) Send npw_per, nst[poolrank], st_* to all cores.
@@ -152,7 +152,7 @@ void PW_Basis::distribution_method1()
         MPI_Status ierror;
         MPI_Recv(&npw, 1, MPI_INT, 0, 0, POOL_WORLD, &ierror);  // number of planewaves in current proc.
         MPI_Recv(&nst, 1, MPI_INT, 0, 0, POOL_WORLD, &ierror);
-        std::cout << this->poolrank << " recive done.\n";
+        // std::cout << this->poolrank << " recive done.\n";
 #endif
     }
 #ifdef __MPI
@@ -176,7 +176,7 @@ void PW_Basis::distribution_method1()
     MPI_Bcast(this->ixy2istot, this->nxy, MPI_INT, 0, POOL_WORLD);
     MPI_Bcast(this->nst_per, this->poolnproc, MPI_INT, 0 , POOL_WORLD);
 
-    std::cout << "Bcast done\n";
+    // std::cout << "Bcast done\n";
 #endif
     this->nstnz = this->nst * this->nz;
 
@@ -186,7 +186,7 @@ void PW_Basis::distribution_method1()
     if (st_bottom2D != NULL) delete[] st_bottom2D;
     if (st_length2D != NULL) delete[] st_length2D;
     // for test ----------------------------------------------
-    if (poolrank==0) std::cout << "The fifth step done\n";
+    // if (poolrank==0) std::cout << "The fifth step done\n";
     // -------------------------------------------------------
     ModuleBase::timer::tick("PW_Basis", "distributeg_method1");
     return;
@@ -268,7 +268,7 @@ void PW_Basis::collect_st(
         }
     }
     assert(is == this->nstot);
-    std::cout<<"collect sticks done\n";
+    // std::cout<<"collect sticks done\n";
 
     // As we will distribute the longest sticks preferentially in Step(3), we rearrange st_* in the order of length decreasing.
 

@@ -14,7 +14,7 @@
 extern int nproc_in_pool,rank_in_pool;
 
 using namespace std;
-TEST(PWTEST,test2_2)
+TEST(PWTEST,test1_2f)
 {
     ModulePW::PW_Basis pwtest;
     ModuleBase::Matrix3 latvec;
@@ -24,16 +24,16 @@ TEST(PWTEST,test2_2)
     bool gamma_only;
     //--------------------------------------------------
     lat0 = 2;
-    ModuleBase::Matrix3 la(1, 0, 1, 0, 2, 0, 0, 0, 2);
+    ModuleBase::Matrix3 la(1, 1, 0, 0, 2, 0, 0, 0, 2);
     latvec = la;
-    wfcecut = 20;
+    wfcecut = 10;
     gamma_only = false;
     //--------------------------------------------------
     
     //init
-    pwtest.initgrids(lat0,latvec,1.5*wfcecut);
+    pwtest.initgrids(lat0,latvec,wfcecut);
     //pwtest.initgrids(lat0,latvec,5,7,7);
-    pwtest.initparameters(gamma_only,wfcecut,nproc_in_pool,rank_in_pool,2);
+    pwtest.initparameters(gamma_only,wfcecut,nproc_in_pool,rank_in_pool,1);
     pwtest.setuptransform();
     pwtest.collect_local_pw();
 
@@ -77,7 +77,6 @@ TEST(PWTEST,test2_2)
         fftw_execute(pp);    
         fftw_destroy_plan(pp); 
         
-        //output
         ModuleBase::Vector3<double> delta_g(double(int(nx/2))/nx, double(int(ny/2))/ny, double(int(ny/2))/nz); 
         for(int ixy = 0 ; ixy < nx * ny ; ++ixy)
         {
@@ -97,13 +96,13 @@ TEST(PWTEST,test2_2)
     MPI_Bcast(tmp,2*nx*ny*nz,MPI_DOUBLE,0,POOL_WORLD);
 #endif
     
-    complex<double> * rhog = new complex<double> [npw];
-    complex<double> * rhogout = new complex<double> [npw];
+    complex<float> * rhog = new complex<float> [npw];
+    complex<float> * rhogout = new complex<float> [npw];
     for(int ig = 0 ; ig < npw ; ++ig)
     {
         rhog[ig] = 1.0/(pwtest.gg[ig]+1) + ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ig].x+1) + 1);
     }    
-    complex<double> * rhor = new complex<double> [nrxx];
+    complex<float> * rhor = new complex<float> [nrxx];
     pwtest.recip2real(rhog,rhor);
     int startiz = pwtest.startz[rank_in_pool];
     for(int ixy = 0 ; ixy < nx * ny ; ++ixy)
@@ -115,18 +114,20 @@ TEST(PWTEST,test2_2)
         }
     }
 
+    
+    
     pwtest.real2recip(rhor,rhogout);
     for(int ig = 0 ; ig < npw ; ++ig)
     {
         EXPECT_NEAR(rhog[ig].real(),rhogout[ig].real(),1e-6);
         EXPECT_NEAR(rhog[ig].imag(),rhogout[ig].imag(),1e-6);
     }
-    
-
+  
     delete [] rhog;
     delete [] rhogout;
     delete [] rhor;
     delete []tmp; 
+
     fftw_cleanup();
 #ifdef __MIX_PRECISION
     fftwf_cleanup();
