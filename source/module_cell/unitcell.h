@@ -88,7 +88,7 @@ public:
 
     bool judge_big_cell(void)const;
 
-protected:
+
 
     double *atom_mass;
     std::string *atom_label;

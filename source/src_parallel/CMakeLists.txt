@@ -10,10 +10,6 @@ list(APPEND objects
     subgrid_oper.cpp
 )
 
-if(ENABLE_DEEPKS)
-list(APPEND objects parallel_deepks.cpp)
-endif()
-
 add_library(
     parallel
     OBJECT

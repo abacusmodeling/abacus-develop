@@ -19,7 +19,38 @@ Raising issues on GitHub is a convernient way to notify the develper team about 
 
 ## Modularization and module tests
 
-The ABACUS code is reconstructed to form several self-contained modules. A description of modules can be found in the [installation guide](install.md#structure-of-source-code). We also provide module tests for the modules.
+The ABACUS code is refactored to several self-contained modules. A description of modules can be found in the [installation guide](install.md#structure-of-source-code). We also provide module unit tests.
+
+### Add a unit test
+
+If there are currently no unit tests provided for the module, do as follows. `module_base` provides a simple demonstration.
+
+- Add a folder named `test` under the module.
+- Append the content below to `CMakeLists.txt` of the module:
+
+```cmake
+IF (BUILD_TESTING)
+  add_subdirectory(test)
+endif()
+```
+
+- Add a blank `CMakeLists.txt` under `module*/test`.
+
+To add a unit test:
+
+- Write your test under `GoogleTest` framework.
+- Add your testing source code with suffix `*_test.cpp` in `test` directory.
+- Append the content below to `CMakeLists.txt` of the module:
+
+```cmake
+AddTest(
+  TARGET <module_name>_<test_name> # this is the executable file name of the test
+  SOURCES <test_name>.cpp
+)
+```
+
+- Build with `-D BUILD_TESTING=1` flag. You can find built testing programs under `build/source/<module_name>/test`.
+- Follow the installing procedure of CMake. The tests will move to `build/test`.
 
 [back to top](#for-developers)
 
@@ -91,7 +122,7 @@ For comments that need to be shown in documents, these formats should be used --
 
 A helpful VS Code extension -- Doxygen Documentation Generator, can help you formating comments.
 
-An practical example is class [LCAO_Descriptor](https://github.com/deepmodeling/abacus-develop/blob/deepks/source/src_lcao/LCAO_descriptor.h), the effects can be seen on [readthedocs page](https://abacus-deepks.readthedocs.io/en/latest/DeePKS_API/classLCAO__Descriptor.html#exhale-class-classLCAO-Descriptor)
+An practical example is class [LCAO_Deepks](https://github.com/deepmodeling/abacus-develop/blob/deepks/source/module_deepks/LCAO_deepks.h), the effects can be seen on [readthedocs page](https://abacus-deepks.readthedocs.io/en/latest/DeePKS_API/classLCAO__Descriptor.html#exhale-class-classLCAO-Descriptor)
 
 - Detailed Comment Block
 

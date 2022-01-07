@@ -6,6 +6,7 @@
 #include "write_wfc_realspace.h"
 #include "src_pw/global.h"
 #include "module_base/tool_title.h"
+#include "module_base/timer.h"
 #include <fstream>
 #include <stdexcept>
 #include <cstdlib>
@@ -18,6 +19,7 @@ namespace Write_Wfc_Realspace
 	void write_wfc_realspace_1(const ModuleBase::ComplexMatrix*const wfc_g, const std::string &folder_name)
 	{
 		ModuleBase::TITLE("Write_Wfc_Realspace", "write_wfc_realspace_1");
+		ModuleBase::timer::tick("Write_Wfc_Realspace", "write_wfc_realspace_1");
 
 		const string outdir = GlobalV::global_out_dir + folder_name + "/";
 		const std::string command0 =  "test -d " + outdir + " || mkdir " + outdir;
@@ -54,6 +56,7 @@ namespace Write_Wfc_Realspace
 #ifdef __MPI
 		MPI_Waitall( mpi_requests.size(), mpi_requests.data(), MPI_STATUSES_IGNORE );
 #endif
+		ModuleBase::timer::tick("Write_Wfc_Realspace", "write_wfc_realspace_1");
 	}
 	// processes output pipeline:
 	//
@@ -71,6 +74,7 @@ namespace Write_Wfc_Realspace
 	// Output: wfc_r[ir]
 	std::vector<std::complex<double>> cal_wfc_r(const ModuleBase::ComplexMatrix &wfc_g, const int ik, const int ib)
 	{
+		ModuleBase::timer::tick("Write_Wfc_Realspace", "cal_wfc_r");
 		ModuleBase::GlobalFunc::ZEROS(GlobalC::UFFT.porter, GlobalC::pw.nrxx);
 		std::vector<std::complex<double>> wfc_r(GlobalC::pw.nrxx);
 		for(int ig=0; ig<GlobalC::kv.ngk[ik]; ++ig)
@@ -78,6 +82,7 @@ namespace Write_Wfc_Realspace
 		GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter,1);
 		for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
 			wfc_r[ir] = GlobalC::UFFT.porter[ir];
+		ModuleBase::timer::tick("Write_Wfc_Realspace", "cal_wfc_r");
 		return wfc_r;
 	}
 
@@ -90,6 +95,7 @@ namespace Write_Wfc_Realspace
 	void write_charge_realspace_1(const std::vector<double> &chg_r, const std::string &file_name)
 #endif
 	{
+		ModuleBase::timer::tick("Write_Wfc_Realspace", "write_charge_realspace_1");
 		std::ofstream ofs;
 
 #ifdef  __MPI
@@ -140,7 +146,7 @@ namespace Write_Wfc_Realspace
 					const int ir = (ix*GlobalC::pw.ncy+iy)*GlobalC::pw.nczp+iz;
 					ofs<<chg_r[ir]<<" ";
 				}
-				ofs<<std::endl;
+				ofs<<"\n";
 			}
 		}
 		ofs.close();
@@ -156,5 +162,6 @@ namespace Write_Wfc_Realspace
 			mpi_request = MPI_REQUEST_NULL;
 		}
 #endif
+		ModuleBase::timer::tick("Write_Wfc_Realspace", "write_charge_realspace_1");
 	}
 };

@@ -19,7 +19,7 @@
 #include "../src_pw/vdwd3_parameters.h"
 #include "dmft.h"
 #ifdef __DEEPKS
-#include "LCAO_descriptor.h"    //caoyu add 2021-07-26
+#include "../module_deepks/LCAO_deepks.h"    //caoyu add 2021-07-26
 #endif
 
 LOOP_ions::LOOP_ions()
@@ -60,8 +60,6 @@ void LOOP_ions::opt_ions(void)
         // allocate arrays related to changes of lattice vectors
         LCM.allocate();
     }
-
-
 
     this->istep = 1;
     int force_step = 1;
@@ -171,14 +169,14 @@ void LOOP_ions::opt_ions(void)
             GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
         }
 
-    if(INPUT.dft_plus_dmft)
-    {
-      // Output sparse overlap matrix S(R)
-      this->output_SR("outputs_to_DMFT/overlap_matrix/SR.csr");
-      
-      // Output wave functions, bands, k-points information, and etc.
-      GlobalC::dmft.out_to_dmft();
-    }
+        if(INPUT.dft_plus_dmft)
+        {
+        // Output sparse overlap matrix S(R)
+        this->output_SR("outputs_to_DMFT/overlap_matrix/SR.csr");
+        
+        // Output wave functions, bands, k-points information, and etc.
+        GlobalC::dmft.out_to_dmft();
+        }
 
         if(GlobalC::ParaO.out_hsR)
 		{
@@ -189,34 +187,37 @@ void LOOP_ions::opt_ions(void)
 #ifdef __DEEPKS
         if (GlobalV::out_descriptor)
         {
-            if(!GlobalV::deepks_scf)
-            {
-                GlobalC::ld.resize_nlm();
-                GlobalC::ld.build_v_delta_alpha_new(0);
-            }
-
             if(GlobalV::GAMMA_ONLY_LOCAL)
             {
-                GlobalC::ld.cal_projected_DM(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);  //need dm
+                GlobalC::ld.cal_projected_DM(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],
+                    GlobalC::ucell,
+                    GlobalC::ORB,
+                    GlobalC::GridD,
+                    GlobalC::ParaO);
             }
             else
             {
-                GlobalC::ld.cal_projected_DM_k(GlobalC::LOC.wfc_dm_2d.dm_k);  //need dm
+                GlobalC::ld.cal_projected_DM_k(GlobalC::LOC.wfc_dm_2d.dm_k,
+                    GlobalC::ucell,
+                    GlobalC::ORB,
+                    GlobalC::GridD,
+                    GlobalC::ParaO,
+                    GlobalC::kv);
             }
 
             GlobalC::ld.cal_descriptor();    //final descriptor
-            GlobalC::ld.save_npy_d();            //libnpy needed
+            GlobalC::ld.print_descriptor(GlobalC::ucell.nat);
+            GlobalC::ld.save_npy_d(GlobalC::ucell.nat);            //libnpy needed
             
             if (GlobalV::deepks_scf)
             {
-                //ld.print_H_V_delta();   //final H_delta
                 if(GlobalV::GAMMA_ONLY_LOCAL)
                 {
-                    GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma);
+                    GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma, GlobalC::ParaO);
                 }
                 else
                 {
-                    GlobalC::ld.cal_e_delta_band_k(GlobalC::LOC.wfc_dm_2d.dm_k);
+                    GlobalC::ld.cal_e_delta_band_k(GlobalC::LOC.wfc_dm_2d.dm_k, GlobalC::ParaO, GlobalC::kv.nks);
                 }
                 std::cout << "E_delta_band = " << std::setprecision(8) << GlobalC::ld.e_delta_band << " Ry" << " = " << std::setprecision(8) << GlobalC::ld.e_delta_band * ModuleBase::Ry_to_eV << " eV" << std::endl;
                 std::cout << "E_delta_NN= "<<std::setprecision(8) << GlobalC::ld.E_delta << " Ry" << " = "<<std::setprecision(8)<<GlobalC::ld.E_delta*ModuleBase::Ry_to_eV<<" eV"<<std::endl;
@@ -531,6 +532,9 @@ void LOOP_ions::final_scf(void)
         // and allocate the space for H(R) and S(R).
         GlobalC::LNNR.cal_nnr();
         GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
+#ifdef __DEEPKS
+		GlobalC::ld.allocate_V_deltaR(GlobalC::LNNR.nnr);
+#endif
 
 		// need to first calculae lgd.
         // using GlobalC::GridT.init.

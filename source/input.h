@@ -273,15 +273,13 @@ class Input
 	double md_qmass;                   //mass of thermostat
 	double md_tfirst;                    //temperature begin
 	double md_tlast;                    //temperature end
-	int md_dumpmdfred;                  //The period to dump MD information for monitoring and restarting MD
+	int md_dumpfred;                  //The period to dump MD information for monitoring and restarting MD
 	std::string md_mdoutpath;                //output path for md
 	bool md_domsd;                   //whether compute <r(t)-r(0)>
 	bool md_domsdatom;                //whether compute msd for each atom
 	int md_rstmd;                    //whether restart;
 	int md_outputstressperiod;      //period to output stress
 	int md_fixtemperature;          //period to change temperature
-	double md_ediff;             //parameter for constraining total energy change
-	double md_ediffg;             //parameter for constraining max force change
 	int md_msdstartTime;            //choose which step that msd be calculated */
 	MD_parameters mdp;
 

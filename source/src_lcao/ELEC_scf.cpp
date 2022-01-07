@@ -13,7 +13,7 @@
 //new
 #include "../src_pw/H_Ewald_pw.h"
 #ifdef __DEEPKS
-    #include "LCAO_descriptor.h"	//caoyu add 2021-06-04
+    #include "../module_deepks/LCAO_deepks.h"	//caoyu add 2021-06-04
 #endif
 
 ELEC_scf::ELEC_scf(){}
