@@ -194,11 +194,6 @@ void Input_Conv::Convert(void)
 	GlobalV::TEST_STRESS = INPUT.test_stress;
 
 //----------------------------------------------------------
-// iteration (1/3)
-//----------------------------------------------------------
-    GlobalV::DRHO2 = INPUT.dr2;
-
-//----------------------------------------------------------
 // wavefunction / charge / potential / (2/4)
 //----------------------------------------------------------
     GlobalV::RESTART_MODE = INPUT.restart_mode;

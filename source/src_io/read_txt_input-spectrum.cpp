@@ -13,7 +13,7 @@ namespace Read_Txt_Input
 	{
 		this->output_labels.push_back("Parameters (15.Spectrum)");
 
-		{
+		/*{
 			Input_Item item("ocp_set");
 			item.annotation = "set occupation number";
 			item.check_values_size(0, std::numeric_limits<int>::max());
@@ -22,6 +22,6 @@ namespace Read_Txt_Input
 				// ...
 			};
 			this->add_item(item);
-		}
+		}*/
 	}
 }

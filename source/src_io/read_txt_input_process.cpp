@@ -7,6 +7,7 @@
 
 #include "src_io/read_txt_tools.h"
 #include "module_base/global_variable.h"
+#include "module_base/tool_title.h"
 
 #ifdef USE_CEREAL_SERIALIZATION
 #include "src_lcao/serialization_cereal.h"
@@ -16,26 +17,36 @@ namespace Read_Txt_Input
 {
 	void Input_Process::read_and_convert(const std::string &file_name)
 	{
+		ModuleBase::TITLE("Input_Process","read_and_convert");
 		if(GlobalV::MY_RANK==0)
 		{
 			this->read(file_name);
 			this->check_transform();
 			this->default_2();
-			this->out(GlobalV::global_out_dir + file_name);
+			// Peize Lin delete 2022.01.06 temporarily
+			//this->out(GlobalV::global_out_dir + file_name);
 		}
 		this->bcast();
+			// Peize Lin add 2022.01.06 temporarily
+			this->out(GlobalV::global_out_dir + file_name + "-new-"+std::to_string(GlobalV::MY_RANK));
 		this->convert();
 	}
 
 	void Input_Process::read(const std::string &file_name)
 	{
+		ModuleBase::TITLE("Input_Process","read");
 		const std::map<std::string, std::vector<std::string>> inputs_read
 			= Read_Txt_Tools::read_file_to_map(file_name, {"#","\\"}, true);
 		for(const auto & input_read : inputs_read)
 		{
 			const auto item_ptr = this->input.list.find(input_read.first);
 			if(item_ptr==this->input.list.end())
-				throw std::out_of_range("input_read.first");
+			{
+				// Peize Lin delete interrupt 2022.01.06 temporarily
+				//throw std::out_of_range("input_read.first");
+				GlobalV::ofs_warning<<" INPUT-new '" << input_read.first << "' IS NOT USED!" << std::endl;
+				continue;
+			}
 			Read_Txt_Input::Input_Item &item = item_ptr->second;
 
 			item.values_size_read = input_read.second.size();
@@ -52,6 +63,7 @@ namespace Read_Txt_Input
 
 	void Input_Process::check_transform()
 	{
+		ModuleBase::TITLE("Input_Process","check_transform");
 		for(auto &tmp : this->input.list)
 		{
 			Read_Txt_Input::Input_Item &item = tmp.second;
@@ -81,6 +93,7 @@ namespace Read_Txt_Input
 
 	void Input_Process::default_2()
 	{
+		ModuleBase::TITLE("Input_Process","default_2");
 		for(auto &item : this->input.list)
 			item.second.default_2(item.second, this->input.list);
 		this->default_2_global(this->input.list);
@@ -88,6 +101,7 @@ namespace Read_Txt_Input
 
 	void Input_Process::out(const std::string &file_name) const
 	{
+		ModuleBase::TITLE("Input_Process","out");
 		std::ofstream ofs(file_name);
 		for(const std::string &label : this->input.output_labels)
 		{
@@ -105,9 +119,9 @@ namespace Read_Txt_Input
 					if(item.values_type[i]=="s")
 						ofs<<item.values[i].gets()<<" ";
 					else if(item.values_type[i]=="d")
-						ofs<<std::to_string(item.values[i].getd())<<" ";
+						ofs<<item.values[i].getd()<<" ";
 					else if(item.values_type[i]=="i")
-						ofs<<std::to_string(item.values[i].geti())<<" ";
+						ofs<<item.values[i].geti()<<" ";
 					else if(item.values_type[i]=="b")
 					{
 						if(item.values[i].getb())
@@ -125,8 +139,10 @@ namespace Read_Txt_Input
 
 	void Input_Process::bcast()
 	{
+		ModuleBase::TITLE("Input_Process","bcast");
 #ifdef USE_CEREAL_SERIALIZATION
-		ModuleBase::bcast_data_cereal(this->input.list, MPI_COMM_WORLD, 0);
+		for(auto &item : this->input.list)
+			ModuleBase::bcast_data_cereal(item.second, MPI_COMM_WORLD, 0);
 #else
 #error Input_Process::bcast() needs cereal
 #endif
@@ -134,6 +150,7 @@ namespace Read_Txt_Input
 
 	void Input_Process::convert()
 	{
+		ModuleBase::TITLE("Input_Process","convert");
 		for(auto &item : this->input.list)
 			item.second.convert(item.second);
 		this->convert_global(this->input.list);

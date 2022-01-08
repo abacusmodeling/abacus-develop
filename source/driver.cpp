@@ -12,6 +12,9 @@
 #include "src_io/print_info.h"
 #include "module_base/timer.h"
 
+#include "src_io/read_txt_input_list.h"
+#include "src_io/read_txt_input_process.h"
+
 Driver::Driver(){}
 
 
@@ -76,6 +79,11 @@ void Driver::reading(void)
     ss1 << GlobalV::global_out_dir << GlobalV::global_in_card;
     INPUT.Print( ss1.str() );
     //ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"READING CARDS");
+
+	Read_Txt_Input::Input_List input_list;
+	input_list.set_items();
+	Read_Txt_Input::Input_Process input_process(input_list);
+	input_process.read_and_convert(GlobalV::global_in_card);
 
 	ModuleBase::timer::tick("Driver","reading");
 	return;
