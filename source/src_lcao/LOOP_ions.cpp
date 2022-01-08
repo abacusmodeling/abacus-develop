@@ -189,11 +189,13 @@ void LOOP_ions::opt_ions(void)
         {
             if(GlobalV::GAMMA_ONLY_LOCAL)
             {
+                GlobalC::ld.print_dm(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
                 GlobalC::ld.cal_projected_DM(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],
                     GlobalC::ucell,
                     GlobalC::ORB,
                     GlobalC::GridD,
-                    GlobalC::ParaO);
+                    GlobalC::ParaO.trace_loc_row,
+                    GlobalC::ParaO.trace_loc_col);
             }
             else
             {
@@ -204,6 +206,7 @@ void LOOP_ions::opt_ions(void)
                     GlobalC::ParaO,
                     GlobalC::kv);
             }
+            GlobalC::ld.check_projected_dm();
 
             GlobalC::ld.cal_descriptor();    //final descriptor
             GlobalC::ld.print_descriptor(GlobalC::ucell.nat);

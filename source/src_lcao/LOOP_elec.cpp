@@ -160,8 +160,16 @@ void LOOP_elec::before_solver(const int &istep)
 			GlobalC::ucell,
 			GlobalC::ORB,
 			GlobalC::GridD,
-			GlobalC::ParaO,
+			GlobalC::ParaO.trace_loc_row,
+			GlobalC::ParaO.trace_loc_col,
 			GlobalC::UOT);
+        /*GlobalC::ld.check_psialpha(GlobalV::FORCE,
+			GlobalC::ucell,
+			GlobalC::ORB,
+			GlobalC::GridD,
+			GlobalC::ParaO.trace_loc_row,
+			GlobalC::ParaO.trace_loc_col,
+			GlobalC::UOT);*/
     }
 #endif
 

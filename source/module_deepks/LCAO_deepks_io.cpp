@@ -24,8 +24,7 @@ void LCAO_Deepks::print_descriptor(const int nat)
     ofstream ofs;
     stringstream ss;
     // the parameter 'winput::spillage_outdir' is read from INPUTw.
-    ss << winput::spillage_outdir << "/"
-       << "descriptor.dat";
+    ss << "./descriptor.dat";
     if (GlobalV::MY_RANK == 0)
     {
         ofs.open(ss.str().c_str());
@@ -57,7 +56,7 @@ void LCAO_Deepks::print_F_delta(const string& fname, const UnitCell_pseudo &ucel
     ofstream ofs;
     stringstream ss;
     // the parameter 'winput::spillage_outdir' is read from INPUTw.
-    ss << winput::spillage_outdir << "/"<< fname ;
+    ss << "./"<< fname ;
 
     if (GlobalV::MY_RANK == 0)
     {
@@ -97,6 +96,20 @@ void LCAO_Deepks::print_F_delta(const string& fname, const UnitCell_pseudo &ucel
     ofs.close();
 
     return;
+}
+
+void LCAO_Deepks::print_dm(const ModuleBase::matrix &dm)
+{
+    ofstream ofs("dm");
+    ofs << std::setprecision(12);
+    for (int mu=0;mu<GlobalV::NLOCAL;mu++)
+    {
+        for (int nu=0;nu<GlobalV::NLOCAL;nu++)
+        {
+            ofs << dm(mu,nu) << " ";
+        }
+        ofs << std::endl;
+    }
 }
 
 //saves descriptor into dm_eig.npy

@@ -414,12 +414,12 @@ void ORB_table_alpha::init_DS_Opair(LCAO_Orbitals &orb)
 	return;
 }
 
-/*
+
 //caoyu add 2021-03-20
 void ORB_table_alpha::print_Table_DSR(LCAO_Orbitals &orb)
 {
 	ModuleBase::TITLE("ORB_table_alpha", "print_Table_DSR");
-	NEW_PART("Overlap table S between lcao orbital and descriptor basis : S_{I_mu_alpha}");
+	//NEW_PART("Overlap table S between lcao orbital and descriptor basis : S_{I_mu_alpha}");
 
 	ofstream ofs;
 	stringstream ss;
@@ -473,4 +473,4 @@ void ORB_table_alpha::print_Table_DSR(LCAO_Orbitals &orb)
 	}// T1
 	return;
 }
-*/
+

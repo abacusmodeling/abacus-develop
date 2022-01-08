@@ -83,7 +83,8 @@ void Force_LCAO_gamma::ftable_gamma (
             GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            GlobalC::ParaO);
+            GlobalC::ParaO.trace_loc_row,
+            GlobalC::ParaO.trace_loc_col);
     	GlobalC::ld.cal_descriptor();
         GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
         GlobalC::ld.cal_f_delta_gamma(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],

@@ -323,7 +323,9 @@ void Force_Stress_LCAO::getForceStress(
 						GlobalC::ucell,
 						GlobalC::ORB,
 						GlobalC::GridD,
-						GlobalC::ParaO);
+						GlobalC::ParaO.trace_loc_row,
+    					GlobalC::ParaO.trace_loc_col);
+					//GlobalC::ld.check_gdmx(GlobalC::ucell.nat);
 				}
 				else
 				{			

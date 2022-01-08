@@ -5,19 +5,15 @@
 
 #include "../module_base/intarray.h"
 #include "../module_base/complexmatrix.h"
-#include "../src_pw/global.h"
+#include "../module_orbital/ORB_gen_tables.h"
 #include <unordered_map>
 
 #include "torch/script.h"
 #include "torch/csrc/autograd/autograd.h"
 #include "torch/csrc/api/include/torch/linalg.h"
 
-#include "../src_lcao/LCAO_matrix.h"
-#include "../module_base/intarray.h"
-#include "../module_base/complexmatrix.h"
-#include "../src_lcao/global_fp.h"
-#include "../src_pw/global.h"
-#include "../src_io/winput.h"
+#include "../module_neighbor/sltk_grid_driver.h"
+#include "../src_parallel/parallel_orbitals.h"
 
 ///
 /// The LCAO_Deepks contains subroutines for implementation of the DeePKS method in atomic basis.
@@ -156,6 +152,9 @@ public:
 
     void allocate_V_delta(const int nat,const int nloc, const int nks=1);
     void allocate_V_deltaR(const int nnr);
+    // array for storing gdmx, used for calculating gvx
+	void init_gdmx(const int nat);
+	void del_gdmx(const int nat);
 
 private:
 
@@ -168,27 +167,33 @@ private:
     // data structure that saves <psi|alpha>
     void allocate_nlm(const int nat);
 
-    // array for storing gdmx, used for calculating gvx
-	void init_gdmx(const int nat);
-	void del_gdmx(const int nat);
-
 //-------------------
 // LCAO_deepks_psialpha.cpp
 //-------------------
 
 //wenfei 2022-1-5
-//This file contains one subroutine for calculating the overlap
-//between atomic basis and projector alpha : chi_mu|alpha>;
-//it will be used in calculating pdm, gdmx, H_V_delta, F_delta
+//This file contains 2 subroutines, one for calculating the overlap
+//between atomic basis and projector alpha : <chi_mu|alpha>
+//which will be used in calculating pdm, gdmx, H_V_delta, F_delta;
+//The other is for checking the results
 
 public:
 
     //calculates <chi|alpha>
-    void build_psialpha(const bool& cal_deri/**< [in] 0 for 3-center intergration, 1 for its derivation*/,
+    void build_psialpha(const bool& cal_deri/**< [in] 0 for 2-center intergration, 1 for its derivation*/,
         const UnitCell_pseudo &ucell,
         const LCAO_Orbitals &orb,
         Grid_Driver &GridD,
-        const Parallel_Orbitals &ParaO,
+        const int* trace_loc_row,
+        const int* trace_loc_col,
+        const ORB_gen_tables &UOT);
+
+    void check_psialpha(const bool& cal_deri/**< [in] 0 for 2-center intergration, 1 for its derivation*/,
+        const UnitCell_pseudo &ucell,
+        const LCAO_Orbitals &orb,
+        Grid_Driver &GridD,
+        const int* trace_loc_row,
+        const int* trace_loc_col,
         const ORB_gen_tables &UOT);
 
 //-------------------
@@ -215,13 +220,15 @@ public:
         const UnitCell_pseudo &ucell,
         const LCAO_Orbitals &orb,
         Grid_Driver &GridD,
-        const Parallel_Orbitals &ParaO);
+        const int* trace_loc_row,
+        const int* trace_loc_col);
     void cal_projected_DM_k(const std::vector<ModuleBase::ComplexMatrix>& dm,
         const UnitCell_pseudo &ucell,
         const LCAO_Orbitals &orb,
         Grid_Driver &GridD,
         const Parallel_Orbitals &ParaO,
         const K_Vectors &kv);
+    void check_projected_dm(void);
 
     //calculate the gradient of pdm with regard to atomic positions
     //d/dX D_{Inl,mm'}
@@ -230,13 +237,15 @@ public:
         const UnitCell_pseudo &ucell,
         const LCAO_Orbitals &orb,
         Grid_Driver &GridD,
-        const Parallel_Orbitals &ParaO);	//dD/dX, precondition of cal_gvx
+        const int* trace_loc_row,
+        const int* trace_loc_col);	//dD/dX, precondition of cal_gvx
     void cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm,
         const UnitCell_pseudo &ucell,
         const LCAO_Orbitals &orb,
         Grid_Driver &GridD,
         const Parallel_Orbitals &ParaO,
         const K_Vectors &kv);	//dD/dX, precondition of cal_gvx
+    void check_gdmx(const int nat);
 
 //-------------------
 // LCAO_deepks_vdelta.cpp
@@ -374,6 +383,7 @@ public:
     
     ///print the force related to\f$V_\delta\f$ for each atom
     void print_F_delta(const std::string &fname/**< [in] the name of output file*/, const UnitCell_pseudo &ucell);
+    void print_dm(const ModuleBase::matrix &dm);
 
 	///----------------------------------------------------------------------
 	///The following 4 functions save the `[dm_eig], [e_base], [f_base], [grad_vx]`

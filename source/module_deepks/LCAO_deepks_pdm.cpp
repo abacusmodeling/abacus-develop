@@ -20,10 +20,12 @@ void LCAO_Deepks::cal_projected_DM(const ModuleBase::matrix &dm,
     const UnitCell_pseudo &ucell,
     const LCAO_Orbitals &orb,
     Grid_Driver &GridD,
-    const Parallel_Orbitals &ParaO)
+    const int* trace_loc_row,
+    const int* trace_loc_col)
 {
     ModuleBase::TITLE("LCAO_Deepks", "cal_projected_DM");
-    ModuleBase::timer::tick("LCAO_Deepks","cal_projected_DM"); 
+    ModuleBase::timer::tick("LCAO_Deepks","cal_projected_DM");
+
     if(dm.nr == 0 && dm.nc ==0)
     {
         return;
@@ -78,14 +80,14 @@ void LCAO_Deepks::cal_projected_DM(const ModuleBase::matrix &dm,
 					for (int iw1=0; iw1<nw1_tot; ++iw1)
 					{
 						const int iw1_all = start1 + iw1;
-						const int iw1_local = ParaO.trace_loc_col[iw1_all];
+						const int iw1_local = trace_loc_col[iw1_all];
 						if(iw1_local < 0)continue;
 						const int iw1_0 = iw1/GlobalV::NPOL;
 
 						for (int iw2=0; iw2<nw2_tot; ++iw2)
 						{
 							const int iw2_all = start2 + iw2;
-							const int iw2_local = ParaO.trace_loc_row[iw2_all];
+							const int iw2_local = trace_loc_row[iw2_all];
 							if(iw2_local < 0)continue;
 							const int iw2_0 = iw2/GlobalV::NPOL;
 
@@ -255,13 +257,28 @@ void LCAO_Deepks::cal_projected_DM_k(const std::vector<ModuleBase::ComplexMatrix
     
 }
 
+void LCAO_Deepks::check_projected_dm(void)
+{
+    ofstream ofs("pdm");
+    const int pdm_size = (this->lmaxd * 2 + 1) * (this->lmaxd * 2 + 1);
+    for(int inl=0;inl<inlmax;inl++)
+    {
+        for(int ind=0;ind<pdm_size;ind++)
+        {
+            ofs << pdm[inl][ind] << " ";
+        }
+        ofs << std::endl;
+    }
+}
+
 //this subroutine calculates the gradient of projected density matrices
 //gdmx_m,m = d/dX sum_{mu,nu} rho_{mu,nu} <chi_mu|alpha_m><alpha_m'|chi_nu>
 void LCAO_Deepks::cal_gdmx(const ModuleBase::matrix &dm,
     const UnitCell_pseudo &ucell,
     const LCAO_Orbitals &orb,
     Grid_Driver &GridD,
-    const Parallel_Orbitals &ParaO)
+    const int* trace_loc_row,
+    const int* trace_loc_col)
 {
     ModuleBase::TITLE("LCAO_Deepks", "cal_gdmx");
     ModuleBase::timer::tick("LCAO_Deepks","cal_gdmx");
@@ -324,13 +341,13 @@ void LCAO_Deepks::cal_gdmx(const ModuleBase::matrix &dm,
 					for (int iw1=0; iw1<nw1_tot; ++iw1)
 					{
 						const int iw1_all = start1 + iw1;
-						const int iw1_local = ParaO.trace_loc_row[iw1_all];
+						const int iw1_local = trace_loc_row[iw1_all];
 						if(iw1_local < 0)continue;
 						const int iw1_0 = iw1/GlobalV::NPOL;
 						for (int iw2=0; iw2<nw2_tot; ++iw2)
 						{
 							const int iw2_all = start2 + iw2;
-							const int iw2_local = ParaO.trace_loc_col[iw2_all];
+							const int iw2_local = trace_loc_col[iw2_all];
 							if(iw2_local < 0)continue;
 							const int iw2_0 = iw2/GlobalV::NPOL;
                             
@@ -543,6 +560,44 @@ void LCAO_Deepks::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm,
 #endif
     ModuleBase::timer::tick("LCAO_Deepks","cal_gdmx_k");
     return;
+}
+
+void LCAO_Deepks::check_gdmx(const int nat)
+{
+    std::stringstream ss;
+    ofstream ofs_x;
+    ofstream ofs_y;
+    ofstream ofs_z;
+
+    const int pdm_size = (this->lmaxd * 2 + 1) * (this->lmaxd * 2 + 1);
+    for(int ia=0;ia<nat;ia++)
+    {
+        ss.str("");
+        ss<<"gdmx_"<<ia<<".dat";
+        ofs_x.open(ss.str().c_str());
+        ss.str("");
+        ss<<"gdmy_"<<ia<<".dat";
+        ofs_y.open(ss.str().c_str());
+        ss.str("");
+        ss<<"gdmz_"<<ia<<".dat";
+        ofs_z.open(ss.str().c_str());
+
+        for(int inl=0;inl<inlmax;inl++)
+        {
+            for(int ind=0;ind<pdm_size;ind++)
+            {
+                ofs_x << gdmx[ia][inl][ind] << " ";
+                ofs_y << gdmy[ia][inl][ind] << " ";
+                ofs_z << gdmz[ia][inl][ind] << " ";
+            }
+            ofs_x << std::endl;
+            ofs_y << std::endl;
+            ofs_z << std::endl;
+        }
+        ofs_x.close();
+        ofs_y.close();
+        ofs_z.close();
+    }
 }
 
 #endif

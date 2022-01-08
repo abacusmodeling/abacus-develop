@@ -94,6 +94,7 @@ class ORB_gen_tables
 	/// set as public because in hamilt_linear,
 #ifdef __DEEPKS
     void snap_psialpha_half(
+			const LCAO_Orbitals& orb,
 			std::vector<std::vector<double>> &nlm,
 			const int& job,
 			const ModuleBase::Vector3<double>& R1,
