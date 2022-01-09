@@ -29,21 +29,23 @@ public:
     void initgrids(
         double lat0_in, //unit length (unit in bohr)
         ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors (unit in lat0) 
-        double gridecut //unit in Ry, ecut to set up grids
+        double gridecut, //unit in Ry, ecut to set up grids
+        int poolnproc_in, // Number of processors in this pool
+        int poolrank_in // Rank in this pool
     );
     //Init the grids for FFT
     void initgrids(
         double lat0_in,
         ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
-        int nx_in, int bigny_in, int nz_in
+        int nx_in, int bigny_in, int nz_in,
+        int poolnproc_in, // Number of processors in this pool
+        int poolrank_in // Rank in this pool
     );
 
     //Init some parameters
     void initparameters(
         bool gamma_only_in,
         double pwecut_in, //unit in Ry, ecut to decides plane waves
-        int poolnproc_in, // Number of processors in this pool
-        int poolrank_in, // Rank in this pool
         int distribution_type_in
     );
 

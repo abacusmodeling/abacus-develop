@@ -31,9 +31,9 @@ TEST_F(PWTEST,test1_3f)
     //--------------------------------------------------
     
     //init
-    pwtest.initgrids(lat0,latvec,1.5*wfcecut);
+    pwtest.initgrids(lat0,latvec,1.5*wfcecut, nproc_in_pool, rank_in_pool);
     //pwtest.initgrids(lat0,latvec,5,7,7);
-    pwtest.initparameters(gamma_only,wfcecut,nproc_in_pool,rank_in_pool,distribution_type);
+    pwtest.initparameters(gamma_only,wfcecut,distribution_type);
     pwtest.setuptransform();
     pwtest.collect_local_pw();
 

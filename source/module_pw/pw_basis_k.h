@@ -22,8 +22,6 @@ public:
         double ecut_in,
         int nk_in, //number of k points in this pool
         ModuleBase::Vector3<double> *kvec_d, // Direct coordinates of k points
-        int poolnproc_in, // Number of processors in this pool
-        int poolrank_in, // Rank in this pool
         int distribution_type_in
     );
 

@@ -19,8 +19,8 @@ TEST_F(PWTEST,test1_2)
 
     ModulePW::PW_Basis pwtest;
 
-    pwtest.initgrids(lat0, latvec, ecut);
-    pwtest.initparameters(gamma_only, ecut, nproc, rank_in_pool, distribution_type);
+    pwtest.initgrids(lat0, latvec, ecut, nproc_in_pool, rank_in_pool);
+    pwtest.initparameters(gamma_only, ecut, distribution_type);
     pwtest.distribute_r();
     pwtest.distribute_g();
     int tot_npw = 0;
