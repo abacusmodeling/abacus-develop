@@ -456,6 +456,7 @@ class Input
 	int lmax_descriptor; //lmax used in descriptor, mohan added 2021-01-03
 	int deepks_scf;	//(need libnpy and libtorch) if set 1, a trained model would be needed to cal V_delta and F_delta
 	string model_file;		//needed when deepks_scf=1
+	int deepks_bandgap; //for bandgap label. QO added 2021-12-15	
 
 //==========================================================
 // variables for test only

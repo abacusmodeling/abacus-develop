@@ -199,6 +199,7 @@ extern bool FINAL_SCF; //LiuXh add 20180619
 
 extern bool out_descriptor; //caoyu add 2021-10-16 for DeePKS
 extern bool deepks_scf; //caoyu add 2021-10-16 for DeePKS
+extern bool deepks_bandgap; //QO added 2021-12-15 for DeePKS bandgap label
 
 //method for dealing with non-local potential in Hamiltonian matrix, 0 for old, 1 for new
 extern int vnl_method;

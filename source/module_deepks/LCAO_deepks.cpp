@@ -266,4 +266,40 @@ void LCAO_Deepks::allocate_V_deltaR(const int nnr)
     ModuleBase::GlobalFunc::ZEROS(H_V_deltaR, nnr);
 }
 
+void LCAO_Deepks::init_orbital_pdm_shell(void)
+{
+    
+    this->orbital_pdm_shell = new double** [1];
+
+    for (int hl=0; hl<1; hl++)
+    {
+        this->orbital_pdm_shell[hl] = new double* [this->inlmax];
+
+        for(int inl = 0; inl < this->inlmax; inl++)
+        {
+            this->orbital_pdm_shell[hl][inl] = new double [(2 * this->lmaxd + 1) * (2 * this->lmaxd + 1)];
+            ModuleBase::GlobalFunc::ZEROS(orbital_pdm_shell[hl][inl], (2 * this->lmaxd + 1) * (2 * this->lmaxd + 1));
+        }
+
+    }
+
+    return;
+}
+
+
+void LCAO_Deepks::del_orbital_pdm_shell(void)
+{
+    for (int hl=0; hl<1; hl++)
+    {
+        for (int inl = 0;inl < this->inlmax; inl++)
+        {
+            delete[] this->orbital_pdm_shell[hl][inl];
+        }
+        delete[] this->orbital_pdm_shell[hl];
+    }
+    delete[] this->orbital_pdm_shell;
+
+    return;
+}
+
 #endif

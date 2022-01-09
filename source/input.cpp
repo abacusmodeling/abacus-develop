@@ -1023,6 +1023,10 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, model_file);
         }
+		else if (strcmp("deepks_bandgap", word) == 0) // QO added 2021-12-15
+        {
+            read_value(ifs, deepks_bandgap);
+		}
 		else if (strcmp("out_potential", word) == 0)
         {
             read_value(ifs, out_potential);
@@ -2088,6 +2092,7 @@ void Input::Bcast()
     Parallel_Common::bcast_int( lmax_descriptor ); // mohan modified 2021-01-03
     Parallel_Common::bcast_int( deepks_scf ); // caoyu add 2021-06-02
 	Parallel_Common::bcast_string( model_file ); //  caoyu add 2021-06-03
+	Parallel_Common::bcast_int( deepks_bandgap ); // QO add 2021-12-15
 
 	Parallel_Common::bcast_int(out_potential);
     Parallel_Common::bcast_int( out_wf );

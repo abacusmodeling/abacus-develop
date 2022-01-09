@@ -160,7 +160,7 @@ if(ENABLE_DEEPKS)
   include(FetchContent)
     FetchContent_Declare(
       libnpy
-      GIT_REPOSITORY https://github.com/llohse/libnpy.git
+      GIT_REPOSITORY https://github.com.cnpmjs.org/llohse/libnpy.git
     )
     FetchContent_MakeAvailable(libnpy)
   endif()
@@ -234,6 +234,7 @@ add_subdirectory(source)
 target_link_libraries(${ABACUS_BIN_NAME}
     base
     cell
+    deepks
     symmetry
     md
     symmetry

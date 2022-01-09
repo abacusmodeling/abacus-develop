@@ -2,6 +2,7 @@ if(ENABLE_DEEPKS)
     list(APPEND objects
         LCAO_deepks.cpp
         LCAO_deepks_fdelta.cpp
+        LCAO_deepks_odelta.cpp
         LCAO_deepks_io.cpp
         LCAO_deepks_mpi.cpp
         LCAO_deepks_pdm.cpp

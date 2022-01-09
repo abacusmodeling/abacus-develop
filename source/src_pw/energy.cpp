@@ -17,7 +17,7 @@
 #include "H_Hartree_pw.h"
 #include "H_XC_pw.h"
 #ifdef __DEEPKS
-#include "../src_lcao/../module_deepks/LCAO_deepks.h"
+#include "../module_deepks/LCAO_deepks.h"
 #endif
 
 
