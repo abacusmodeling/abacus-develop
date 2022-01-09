@@ -35,7 +35,7 @@ void PW_Basis:: real2recip(std::complex<double> * in, std::complex<double> * out
 
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
-        out[ig] = this->ft.aux1[this->ig2isz[ig]];
+        out[ig] = this->ft.aux1[this->ig2isz[ig]] / double(this->bignxyz);
     }
     return;
     ModuleBase::timer::tick("PW_Basis", "real2recip");
@@ -72,7 +72,7 @@ void PW_Basis:: real2recip(double * in, std::complex<double> * out)
 
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
-        out[ig] = this->ft.aux1[this->ig2isz[ig]];
+        out[ig] = this->ft.aux1[this->ig2isz[ig]] / double(this->bignxyz);
     }
     ModuleBase::timer::tick("PW_Basis", "real2recip_gamma_only");
     return;
@@ -105,7 +105,7 @@ void PW_Basis:: recip2real(std::complex<double> * in, std::complex<double> * out
     
     for(int ir = 0 ; ir < this->nrxx ; ++ir)
     {
-        out[ir] = this->ft.aux1[ir] / double(this->bignxyz);
+        out[ir] = this->ft.aux1[ir];
     }
     ModuleBase::timer::tick("PW_Basis", "recip2real");
 
@@ -144,7 +144,7 @@ void PW_Basis:: recip2real(std::complex<double> * in, double * out)
     {
         for(int ipy = 0 ; ipy < npy ; ++ipy)
         {
-            out[ix*npy + ipy] = this->ft.r_rspace[ix*npy*2 + ipy] / double(this->bignxyz);
+            out[ix*npy + ipy] = this->ft.r_rspace[ix*npy*2 + ipy];
         }
     }
     ModuleBase::timer::tick("PW_Basis", "recip2real_gamma_only");
@@ -167,7 +167,7 @@ void PW_Basis:: real2recip(std::complex<float> * in, std::complex<float> * out)
 
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
-        out[ig] = this->ft.auxf1[this->ig2isz[ig]];
+        out[ig] = this->ft.auxf1[this->ig2isz[ig]] / float(this->bignxyz);
     }
     return;
 }
@@ -192,7 +192,7 @@ void PW_Basis:: real2recip(float * in, std::complex<float> * out)
 
     for(int ig = 0 ; ig < this->npw ; ++ig)
     {
-        out[ig] = this->ft.auxf1[this->ig2isz[ig]];
+        out[ig] = this->ft.auxf1[this->ig2isz[ig]] / float(this->bignxyz);
     }
     return;
 }
@@ -214,7 +214,7 @@ void PW_Basis:: recip2real(std::complex<float> * in, std::complex<float> * out)
     
     for(int ir = 0 ; ir < this->nrxx ; ++ir)
     {
-        out[ir] = this->ft.auxf1[ir] / float(this->bignxyz);
+        out[ir] = this->ft.auxf1[ir];
     }
 
     return;
@@ -240,7 +240,7 @@ void PW_Basis:: recip2real(std::complex<float> * in, float * out)
     {
         for(int ipy = 0 ; ipy < npy ; ++ipy)
         {
-            out[ix*npy + ipy] = this->ft.rf_rspace[ix*npy*2 + ipy] / float(this->bignxyz);
+            out[ix*npy + ipy] = this->ft.rf_rspace[ix*npy*2 + ipy];
         }
     }
     return;

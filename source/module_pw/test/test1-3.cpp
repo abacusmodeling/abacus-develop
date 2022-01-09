@@ -89,7 +89,6 @@ TEST_F(PWTEST,test1_3)
                 ModuleBase::Vector3<double> real_r(ix, iy, iz);
                 double phase_im = -delta_g * real_r;
                 complex<double> phase(0,ModuleBase::TWO_PI * phase_im);
-                tmp[ixy * nz + iz] /= nxyz;
                 tmp[ixy * nz + iz] *= exp(phase);
             }
         }

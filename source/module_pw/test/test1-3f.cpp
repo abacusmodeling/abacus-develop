@@ -89,7 +89,6 @@ TEST_F(PWTEST,test1_3f)
                 ModuleBase::Vector3<double> real_r(ix, iy, iz);
                 double phase_im = -delta_g * real_r;
                 complex<double> phase(0,ModuleBase::TWO_PI * phase_im);
-                tmp[ixy * nz + iz] /= nxyz;
                 tmp[ixy * nz + iz] *= exp(phase);
             }
         }
@@ -112,7 +111,7 @@ TEST_F(PWTEST,test1_3f)
     {
         for(int iz = 0 ; iz < nplane ; ++iz)
         {
-            EXPECT_NEAR(tmp[ixy * nz + startiz + iz].real(),rhor[ixy*nplane+iz],1e-6);
+            EXPECT_NEAR(tmp[ixy * nz + startiz + iz].real(),rhor[ixy*nplane+iz],1e-4);
         }
     }
     
