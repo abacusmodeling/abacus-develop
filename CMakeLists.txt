@@ -1,14 +1,14 @@
 ########################################
 # CMake build system
 # This file is part of ABACUS
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.18)
 ########################################
 
 project(ABACUS
     VERSION 2.2.0
     DESCRIPTION "ABACUS is an electronic structure package based on DFT."
     HOMEPAGE_URL "https://github.com/deepmodeling/abacus-develop"
-    # LANGUAGES CXX
+    LANGUAGES CXX
 )
 
 option(ENABLE_DEEPKS "Enable DeePKS functionality" OFF)
