@@ -1,8 +1,0 @@
-1. change CHECK_CUDA -> CHECK_HIP
-2. Use HipLaunchKernel()
-3. HIPBLAS_OP_C/N/T
-4. Name of class and functions
-5. For template kernels, use HIP_KERNEL_NAME macro.
-
-6. cusolver not have API in Hip ?
-7. 
