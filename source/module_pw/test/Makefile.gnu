@@ -4,7 +4,7 @@
 #==========================
 CPLUSPLUS = mpicxx
 CUDA_COMPILE = nvcc
-OBJ_DIR = pw_obj
+OBJ_DIR = obj
 NP      = 12
 #==========================
 # Objects
@@ -32,9 +32,13 @@ pw_basis_k.o\
 pw_operation.o\
 pw_transform_k.o
 
-DOUBLEFILE=test1-2.o\
+DOUBLEFILE=test1-1-1.o\
+test1-1-2.o\
+test1-2.o\
 test1-3.o\
 test1-4.o\
+test2-1-1.o\
+test2-1-2.o\
 test2-2.o\
 test2-3.o
 
@@ -57,11 +61,11 @@ TESTFILE0 = ${DOUBLEFILE}
 # CPLUSPLUS = g++
 
 #Only MPI
-HONG = -D__MPI -D__NORMAL
+# HONG = -D__MPI -D__NORMAL
 
 #MPI + Mix Precision
-# HONG = -D__MPI -D__MIX_PRECISION -D__NORMAL
-# TESTFILE0 = ${DOUBLEFILE} ${FLOATFILE}
+HONG = -D__MPI -D__MIX_PRECISION -D__NORMAL
+TESTFILE0 = ${DOUBLEFILE} ${FLOATFILE}
 
 #Cuda
 #HONG = -D__MPI -D__CUDA -D__NORMAL
@@ -81,8 +85,8 @@ TESTFILE=$(patsubst %.o, ${OBJ_DIR}/%.o, ${TESTFILE0})
 FFTW_DIR = /home/qianrui/gnucompile/g_fftw-3.3.8-mpi
 FFTW_LIB_DIR     = ${FFTW_DIR}/lib
 FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
-# FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -lfftw3f -Wl,-rpath=${FFTW_LIB_DIR}
-FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
+FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -lfftw3f -Wl,-rpath=${FFTW_LIB_DIR}
+# FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
 
 
 
@@ -109,17 +113,17 @@ OPTS = -I${FFTW_INCLUDE_DIR} ${HONG} -Ofast -std=c++11 -Wall -g
 #==========================
 pw : 
 	@ make init
-	@ make -j $(NP) utest.exe
+	@ make -j $(NP) pw_test.exe
 
 init :
 	@ if [ ! -d $(OBJ_DIR) ]; then mkdir $(OBJ_DIR); fi
 
-utest.exe: ${PW_OBJS} ${TESTFILE}
-	${CPLUSPLUS} ${OPTS} ${TESTFILE} utest.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o utest.exe ${GTESTOPTS}
+pw_test.exe: ${PW_OBJS} ${TESTFILE}
+	${CPLUSPLUS} ${OPTS} ${TESTFILE} pw_test.cpp test_tool.cpp ${PW_OBJS}  ${LIBS} -o pw_test.exe ${GTESTOPTS}
 ${OBJ_DIR}/%.o:%.cpp
 	${CPLUSPLUS} ${OPTS} -c ${HONG} $< -o $@ ${GTESTOPTS}
 
 .PHONY:clean
 clean:
 	@ if [ -d $(OBJ_DIR) ]; then rm -rf $(OBJ_DIR); fi
-	@ if [ -e utest.exe ]; then rm -f utest.exe; fi
+	@ if [ -e pw_test.exe ]; then rm -f pw_test.exe; fi

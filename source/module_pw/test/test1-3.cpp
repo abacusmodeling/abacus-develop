@@ -9,12 +9,12 @@
 #endif
 #include "../../module_base/constants.h"
 #include "../../module_base/global_function.h"
-#include "utest.h"
+#include "pw_test.h"
 
 using namespace std;
 TEST_F(PWTEST,test1_3)
 {
-    cout<<"dividemthd 1, gamma_only: on, double precision"<<endl;
+    cout<<"dividemthd 1, gamma_only: on, double precision, check fft"<<endl;
     ModulePW::PW_Basis pwtest;
     ModuleBase::Matrix3 latvec;
     int nx,ny,nz;  //f*G
@@ -43,7 +43,6 @@ TEST_F(PWTEST,test1_3)
     ny = pwtest.bigny;
     nz = pwtest.nz;
     int nplane = pwtest.nplane;
-    int nxyz = nx * ny * nz;
 
     double tpiba2 = ModuleBase::TWO_PI * ModuleBase::TWO_PI / lat0 / lat0;
     double ggecut = wfcecut / tpiba2;

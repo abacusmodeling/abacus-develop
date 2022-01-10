@@ -55,15 +55,15 @@ public:
 public:
     //reciprocal-space
     // only on first proc.
-    int *startnsz_per; // startnsz_per[ip]: starting is * nz stick in the ip^th proc.
-    int *nstnz_per; // nz * nst(number of sticks) on each core.
+    int *startnsz_per;//useless // startnsz_per[ip]: starting is * nz stick in the ip^th proc.
+    int *nstnz_per;//useless // nz * nst(number of sticks) on each core.
     int *nst_per;// nst on each core
     // on all proc.
     int *ig2isz; // map ig to (is, iz).
     int *istot2bigixy; // istot2bigixy[is]: iy + ix * bigny of is^th stick among all sticks.
-    int *ixy2istot; // ixy2istot[ix + iy * nx]: is of stick on (ix, iy) among all sticks.
+    int *ixy2istot; //useless // ixy2istot[ix + iy * nx]: is of stick on (ix, iy) among all sticks.
     int *is2ixy; // is2ixy[is]: ix + iy * bignx of is^th stick among sticks on current proc.
-    int *ixy2ip; // ixy2ip[ix + iy * nx]: ip of proc which contains stick on (ix, iy).
+    int *ixy2ip; // useless// ixy2ip[ix + iy * nx]: ip of proc which contains stick on (ix, iy).
     int nst; //num. of sticks in current proc.
     int nstnz; // nst * nz
     int nstot; //num. of sticks in total.

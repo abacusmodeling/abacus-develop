@@ -3,7 +3,7 @@
 #include "mpi.h"
 #endif
 #include "fftw3.h"
-#include "utest.h"
+#include "pw_test.h"
 using namespace std;
 
 int nproc_in_pool, rank_in_pool;
@@ -32,15 +32,16 @@ public:
 
 int main(int argc, char **argv) 
 {
-    int nproc, myrank;
-    int npool, mypool;
+    
+    int npool;
     npool = 1;
 #ifdef __MPI
+    int nproc, myrank,mypool;
     setupmpi(argc,argv,nproc, myrank);
     divide_pools(nproc, myrank, nproc_in_pool, npool, mypool, rank_in_pool);
 #else
-    nproc = nproc_in_pool = npool = 1;
-    myrank = mypool = rank_in_pool = 0;
+    nproc_in_pool = npool = 1;
+    rank_in_pool = 0;
 #endif
     int result = 0;
     testing::AddGlobalTestEnvironment(new TestEnv);
