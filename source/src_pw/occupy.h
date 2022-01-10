@@ -48,14 +48,14 @@ public:
     // fixed occupations
     static bool fixed_occupations;
 
-    static void iweights(const int nks,const double *wk,const int nband,
+    static void iweights(const int nks,const std::vector<double> &wk,const int nband,
                          const double &nelec, double **ekb, double &ef, 
-						ModuleBase::matrix &wg, const int &is, const int *isk);
+						ModuleBase::matrix &wg, const int &is, const std::vector<int> &isk);
 
-    static void gweights(const int nks,const double *wk,const int nband,
+    static void gweights(const int nks,const std::vector<double> &wk,const int nband,
 						const double &nelec,const double &degauss,
                          const int ngauss,double **ekb, double &ef, 
-						double &demet, ModuleBase::matrix &wg, const int &is, const int *isk);
+						double &demet, ModuleBase::matrix &wg, const int &is, const std::vector<int> &isk);
 
     static void tweights(const int nks,const int nspin,const int nband,
 						const double &nelec,const int ntetra,
@@ -66,13 +66,13 @@ public:
 private:
 
     static void efermig(double **ekb,const int nbnd,const int nks,
-						const double &nelec,const double *wk,
+						const double &nelec,const std::vector<double> &wk,
                         const double &degauss,const int ngauss,
-						double &ef, const int &is, const int *isk);
+						double &ef, const int &is, const std::vector<int> &isk);
 
     static double sumkg(double **ekb,const int nband,const int nks,
-						const double *wk,const double &degauss, const int ngauss,
-						const double &e, const int &is, const int *isk);
+						const std::vector<double> &wk,const double &degauss, const int ngauss,
+						const double &e, const int &is, const std::vector<int> &isk);
 
     static double wgauss(const double &x,const int n);
 

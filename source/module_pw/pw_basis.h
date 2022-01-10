@@ -10,14 +10,14 @@
 namespace ModulePW
 {
 
-//
-//A class which can convert a function of "r" to the corresponding linear 
-// superposition of plane waves (real space to reciprocal space)
-// or convert a linear superposition of plane waves to the function 
-// of "r" (reciprocal to real).
-//plane waves: <r|g>=1/sqrt(V) * exp(igr)
-// f(r) = 1/sqrt(V) * \sum_g{c(g)*exp(igr)}
-//
+///
+/// A class which can convert a function of "r" to the corresponding linear 
+/// superposition of plane waves (real space to reciprocal space)
+/// or convert a linear superposition of plane waves to the function 
+/// of "r" (reciprocal to real).
+/// plane waves: <r|g>=1/sqrt(V) * exp(igr)
+/// f(r) = 1/sqrt(V) * \sum_g{c(g)*exp(igr)}
+///
 class PW_Basis
 {
 
@@ -29,21 +29,23 @@ public:
     void initgrids(
         double lat0_in, //unit length (unit in bohr)
         ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors (unit in lat0) 
-        double gridecut //unit in Ry, ecut to set up grids
+        double gridecut, //unit in Ry, ecut to set up grids
+        int poolnproc_in, // Number of processors in this pool
+        int poolrank_in // Rank in this pool
     );
     //Init the grids for FFT
     void initgrids(
         double lat0_in,
         ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
-        int nx_in, int bigny_in, int nz_in
+        int nx_in, int bigny_in, int nz_in,
+        int poolnproc_in, // Number of processors in this pool
+        int poolrank_in // Rank in this pool
     );
 
     //Init some parameters
     void initparameters(
         bool gamma_only_in,
         double pwecut_in, //unit in Ry, ecut to decides plane waves
-        int poolnproc_in, // Number of processors in this pool
-        int poolrank_in, // Rank in this pool
         int distribution_type_in
     );
 
@@ -53,15 +55,15 @@ public:
 public:
     //reciprocal-space
     // only on first proc.
-    int *startnsz_per; // startnsz_per[ip]: starting is * nz stick in the ip^th proc.
-    int *nstnz_per; // nz * nst(number of sticks) on each core.
+    int *startnsz_per;//useless // startnsz_per[ip]: starting is * nz stick in the ip^th proc.
+    int *nstnz_per;//useless // nz * nst(number of sticks) on each core.
     int *nst_per;// nst on each core
     // on all proc.
     int *ig2isz; // map ig to (is, iz).
     int *istot2bigixy; // istot2bigixy[is]: iy + ix * bigny of is^th stick among all sticks.
-    int *ixy2istot; // ixy2istot[ix + iy * nx]: is of stick on (ix, iy) among all sticks.
+    int *ixy2istot; //useless // ixy2istot[ix + iy * nx]: is of stick on (ix, iy) among all sticks.
     int *is2ixy; // is2ixy[is]: ix + iy * bignx of is^th stick among sticks on current proc.
-    int *ixy2ip; // ixy2ip[ix + iy * nx]: ip of proc which contains stick on (ix, iy).
+    int *ixy2ip; // useless// ixy2ip[ix + iy * nx]: ip of proc which contains stick on (ix, iy).
     int nst; //num. of sticks in current proc.
     int nstnz; // nst * nz
     int nstot; //num. of sticks in total.

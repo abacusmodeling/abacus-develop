@@ -3,6 +3,10 @@
 #include <unordered_map>
 #include <map>
 
+#ifdef __DEEPKS
+#include "../module_deepks/LCAO_deepks.h"
+#endif
+
 Force_LCAO_k::Force_LCAO_k ()
 {
 }
@@ -23,7 +27,12 @@ void Force_LCAO_k::ftable_k (
 		ModuleBase::matrix& soverlap,
 		ModuleBase::matrix& stvnl_dphi,
 		ModuleBase::matrix& svnl_dbeta,
+#ifdef __DEEPKS
+		ModuleBase::matrix& svl_dphi,
+		ModuleBase::matrix& svnl_dalpha
+#else
 		ModuleBase::matrix& svl_dphi
+#endif
 		)
 {
     ModuleBase::TITLE("Force_LCAO_k", "ftable_k");
@@ -57,6 +66,37 @@ void Force_LCAO_k::ftable_k (
 	this->cal_fvl_dphi_k(dm2d, isforce, isstress, fvl_dphi, svl_dphi);
 
 	this->calFvnlDbeta(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta, GlobalV::vnl_method);
+
+#ifdef __DEEPKS
+    if (GlobalV::deepks_scf)
+    {
+		GlobalC::ld.cal_projected_DM_k(GlobalC::LOC.wfc_dm_2d.dm_k,
+			GlobalC::ucell,
+            GlobalC::ORB,
+            GlobalC::GridD,
+            GlobalC::ParaO,
+			GlobalC::kv);
+    	GlobalC::ld.cal_descriptor();
+		GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
+
+        GlobalC::ld.cal_f_delta_k(GlobalC::LOC.wfc_dm_2d.dm_k,
+			GlobalC::ucell,
+            GlobalC::ORB,
+            GlobalC::GridD,
+            GlobalC::ParaO,
+			GlobalC::kv,
+			isstress,svnl_dalpha);
+#ifdef __MPI
+        Parallel_Reduce::reduce_double_all(GlobalC::ld.F_delta.c,GlobalC::ld.F_delta.nr*GlobalC::ld.F_delta.nc);
+		if(isstress)
+		{
+			Parallel_Reduce::reduce_double_pool( svnl_dalpha.c, svnl_dalpha.nr * svnl_dalpha.nc);
+		}
+#endif
+        GlobalC::ld.print_F_delta("F_delta.dat", GlobalC::ucell);
+    }
+#endif
+
 
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
@@ -376,7 +416,7 @@ std::complex<double> Force_LCAO_k::set_EDM_k_element(
 	}
 	//--------------------------------------
 	// for density matrix
-	// \sum E(i)*psi(mu)*psi(nu)
+	// \sum exp(iRk)*psi(mu)*psi(nu)
 	//--------------------------------------
 	else
 	{
@@ -509,8 +549,8 @@ void Force_LCAO_k::cal_foverlap_k(
 	if(irr!=GlobalC::LNNR.nnr)
 	{
 		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wrong irr",irr);
-		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wrong GlobalC::LNNR.nnr",GlobalC::LNNR.nnr);
-		ModuleBase::WARNING_QUIT("Force_LCAO_k::cal_foverlap_k","irr!=GlobalC::LNNR.nnr");
+		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"wrong LNNR.nnr",GlobalC::LNNR.nnr);
+		ModuleBase::WARNING_QUIT("Force_LCAO_k::cal_foverlap_k","irr!=LNNR.nnr");
 	}
 	
 	for(int is=0; is<GlobalV::NSPIN; is++)
@@ -1272,9 +1312,9 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 		// Grid integration here.
 		//--------------------------------
 		// fvl_dphi can not be set to zero here if Vna is used
-		if(isstress&&isforce) 
+		if(isstress||isforce) 
 		{
-			GlobalC::UHM.GK.svl_k_RealSpace(fvl_dphi,svl_dphi,GlobalC::pot.vr_eff1);
+			GlobalC::UHM.GK.svl_k_RealSpace(isforce, isstress, fvl_dphi,svl_dphi,GlobalC::pot.vr_eff1);
 		}
 		else if(isforce) 
 		{

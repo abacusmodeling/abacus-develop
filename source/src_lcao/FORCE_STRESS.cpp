@@ -7,7 +7,7 @@
 #include "../src_pw/vdwd2.h"
 #include "../src_pw/vdwd3.h"
 #ifdef __DEEPKS
-#include "LCAO_descriptor.h"	//caoyu add for deepks 2021-06-03
+#include "../module_deepks/LCAO_deepks.h"	//caoyu add for deepks 2021-06-03
 #endif
 
 double Force_Stress_LCAO::force_invalid_threshold_ev = 0.00;
@@ -97,7 +97,10 @@ void Force_Stress_LCAO::getForceStress(
 	ModuleBase::matrix soverlap;
 	ModuleBase::matrix stvnl_dphi;
 	ModuleBase::matrix svnl_dbeta;
-	ModuleBase::matrix svl_dphi;
+	ModuleBase::matrix svl_dphi;	
+#ifdef __DEEPKS
+	ModuleBase::matrix svnl_dalpha; //deepks
+#endif
 
 	if(isstress)
 	{
@@ -112,6 +115,9 @@ void Force_Stress_LCAO::getForceStress(
 		stvnl_dphi.create(3,3);
 		svnl_dbeta.create(3,3);
 		svl_dphi.create(3,3);
+#ifdef __DEEPKS
+		svnl_dalpha.create(3,3);
+#endif
 		//calculate basic terms in Stress, similar method with PW base
 		this->calStressPwPart(
 				sigmadvl,
@@ -135,8 +141,12 @@ void Force_Stress_LCAO::getForceStress(
 				soverlap,
 				stvnl_dphi,
 				svnl_dbeta,
+#ifdef __DEEPKS
+				svl_dphi,
+				svnl_dalpha);
+#else
 				svl_dphi);
-
+#endif
 	//implement vdw force or stress here
 	// Peize Lin add 2014-04-04, update 2021-03-09
 	ModuleBase::matrix force_vdw;
@@ -264,7 +274,7 @@ void Force_Stress_LCAO::getForceStress(
 				}
 #ifdef __DEEPKS
 				// mohan add 2021-08-04
-				if (INPUT.deepks_scf)
+				if (GlobalV::deepks_scf)
 				{
 					fcs(iat, i) += GlobalC::ld.F_delta(iat, i);
 				}
@@ -294,10 +304,51 @@ void Force_Stress_LCAO::getForceStress(
 
 #ifdef __DEEPKS
 		//DeePKS force, caoyu add 2021-06-03
-		if (INPUT.deepks_scf)
+		if (GlobalV::out_descriptor) //not parallelized yet
 		{
-			GlobalC::ld.save_npy_f(fcs);	//save fbase
-		}
+			if(GlobalV::MY_RANK==0)
+			{
+            	GlobalC::ld.save_npy_f(fcs, "f_tot.npy", GlobalC::ucell.nat); //Ty/Bohr, F_tot
+			}
+            if (GlobalV::deepks_scf)
+            {
+				if(GlobalV::MY_RANK==0)
+				{
+                	GlobalC::ld.save_npy_f(fcs - GlobalC::ld.F_delta, "f_base.npy", GlobalC::ucell.nat); //Ry/Bohr, F_base
+				}
+
+				if(GlobalV::GAMMA_ONLY_LOCAL)
+				{
+    				GlobalC::ld.cal_gdmx(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],
+						GlobalC::ucell,
+						GlobalC::ORB,
+						GlobalC::GridD,
+						GlobalC::ParaO);
+				}
+				else
+				{			
+					GlobalC::ld.cal_gdmx_k(GlobalC::LOC.wfc_dm_2d.dm_k,
+						GlobalC::ucell,
+						GlobalC::ORB,
+						GlobalC::GridD,
+						GlobalC::ParaO,
+						GlobalC::kv);	
+				}
+				GlobalC::ld.cal_gvx(GlobalC::ucell.nat);
+				if(GlobalV::MY_RANK==0)
+				{
+					GlobalC::ld.save_npy_gvx(GlobalC::ucell.nat);//  /Bohr, grad_vx
+				}
+            }
+            else
+            {
+				if(GlobalV::MY_RANK==0)
+				{
+                	GlobalC::ld.save_npy_f(fcs, "f_base.npy", GlobalC::ucell.nat); //no scf, F_base=F_tot
+				}
+            }
+
+        }
 #endif
 		// print Rydberg force or not
 		bool ry = false;
@@ -355,7 +406,7 @@ void Force_Stress_LCAO::getForceStress(
 			}
 #ifdef __DEEPKS
 			//caoyu add 2021-06-03
-			if (INPUT.deepks_scf)
+			if (GlobalV::deepks_scf)
 			{
 				this->print_force("DeePKS 	FORCE", GlobalC::ld.F_delta, 1, ry);
 			}
@@ -407,7 +458,13 @@ void Force_Stress_LCAO::getForceStress(
 					+ sigmacc(i,j) //nonlinear core correction stress (pw)
 					+ sigmaxc(i,j)//exchange corretion stress
 					+ sigmahar(i,j);// hartree stress
-
+#ifdef __DEEPKS
+				// wenfei add 2021/11/2
+				if (GlobalV::deepks_scf)
+				{
+					scs(i,j) += svnl_dalpha(i,j);
+				}
+#endif
 					//VDW stress from linpz and jiyy
 				if(GlobalC::vdwd2_para.flag_vdwd2||GlobalC::vdwd3_para.flag_vdwd3)
 				{
@@ -420,6 +477,7 @@ void Force_Stress_LCAO::getForceStress(
 				}
 			}
 		}
+
 
 
 		if(ModuleSymmetry::Symmetry::symm_flag)
@@ -671,7 +729,12 @@ void Force_Stress_LCAO::calForceStressIntegralPart(
 	ModuleBase::matrix& soverlap,
 	ModuleBase::matrix& stvnl_dphi,
 	ModuleBase::matrix& svnl_dbeta,
+#if __DEEPKS
+	ModuleBase::matrix& svl_dphi,
+	ModuleBase::matrix& svnl_dalpha)
+#else
 	ModuleBase::matrix& svl_dphi)
+#endif
 {
 	if(isGammaOnly)
 	{
@@ -685,7 +748,12 @@ void Force_Stress_LCAO::calForceStressIntegralPart(
 				soverlap,
 				stvnl_dphi,
 				svnl_dbeta,
+#if __DEEPKS
+				svl_dphi,
+				svnl_dalpha);
+#else
 				svl_dphi);
+#endif
 	}
 	else
 	{
@@ -699,7 +767,12 @@ void Force_Stress_LCAO::calForceStressIntegralPart(
 				soverlap,
 				stvnl_dphi,
 				svnl_dbeta,
+#if __DEEPKS
+				svl_dphi,
+				svnl_dalpha);
+#else
 				svl_dphi);
+#endif
 	}
 	return;
 }

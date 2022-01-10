@@ -6,7 +6,10 @@
 #include "tools.h"
 #include "pw_basis.h"
 #include "pw_complement.h"
+
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 
 PW_Basis::PW_Basis()
 {
@@ -770,7 +773,9 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
         {
 	    	const int na = Ucell->atoms[it].na;
 	    	const ModuleBase::Vector3<double> * const tau = Ucell->atoms[it].tau;
+#ifdef _OPENMP
 		    #pragma omp parallel for schedule(static)
+#endif
             for (int ig=0; ig<this->ngmc; ig++)
             {
 		    	const ModuleBase::Vector3<double> gcar_ig = gcar[ig];
@@ -882,7 +887,7 @@ void PW_Basis::columns_and_pw_distribution_2(void)
                         //------------------------------------------------------
                         if (npw2 < npw1)
                         {
-							if (non_zero_grid + nz < ngrid) //qianrui fix a bug 2021-5-20 to make sure non_zero_grid < ngrid after distributing pw
+							if (non_zero_grid + nz <= ngrid) //qianrui fix a bug 2021-5-20 to make sure non_zero_grid < ngrid after distributing pw
 							{
 								// ip1 save the process number which has smallest number of plane wave
 								// in this pool.
@@ -899,7 +904,7 @@ void PW_Basis::columns_and_pw_distribution_2(void)
                         {
                             if (nst2 < nst1)
                             {
-                                if (non_zero_grid + nz < ngrid) //qianrui add nz
+                                if (non_zero_grid + nz <= ngrid) //qianrui add nz
                                 {
                                     ip1=ip2;
                                 }
@@ -930,7 +935,7 @@ void PW_Basis::columns_and_pw_distribution_2(void)
                 if (npw2 < pw_tmp)
                 {
                     pw_tmp = npw2;
-                    if (non_zero_grid + nz < ngrid) //qianrui add nz
+                    if (non_zero_grid + nz <= ngrid) //qianrui add nz
                     {
                         // ip1 is the index of processor which
                         // has smallest number of plane wave.

@@ -524,10 +524,10 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex_3(const int &ik, complex<double>
         //complex<double>* Z = new complex<double>[this->loc_size * NLOCAL];
         //ModuleBase::GlobalFunc::ZEROS(Z, this->loc_size * NLOCAL);
 
-	zcopy_(&GlobalC::ParaO.nloc, GlobalC::LM.Sloc2, &inc, Stmp, &inc);
-	zcopy_(&GlobalC::ParaO.nloc, GlobalC::LM.Hloc2, &inc, Htmp1, &inc);
-	zcopy_(&GlobalC::ParaO.nloc, GlobalC::LM.Hloc2, &inc, Htmp2, &inc);
-	zcopy_(&GlobalC::ParaO.nloc, GlobalC::LM.Hloc2, &inc, Htmp3, &inc);
+	zcopy_(&GlobalC::ParaO.nloc, GlobalC::LM.Sloc2.data(), &inc, Stmp, &inc);
+	zcopy_(&GlobalC::ParaO.nloc, GlobalC::LM.Hloc2.data(), &inc, Htmp1, &inc);
+	zcopy_(&GlobalC::ParaO.nloc, GlobalC::LM.Hloc2.data(), &inc, Htmp2, &inc);
+	zcopy_(&GlobalC::ParaO.nloc, GlobalC::LM.Hloc2.data(), &inc, Htmp3, &inc);
 
 	//cout << "*Htmp2: " << *Htmp2 << endl;
 

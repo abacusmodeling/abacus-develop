@@ -55,9 +55,6 @@ chi0_hilbert.o\
 chi0_standard.o\
 epsilon0_pwscf.o\
 epsilon0_vasp.o\
-MD_basic.o\
-MD_thermo.o\
-MD_fire.o\
 MD_func.o\
 exx_lip.o\
 soc.o\
@@ -163,7 +160,14 @@ LCAO_matrix.o\
 LCAO_nnr.o \
 LCAO_diago.o\
 LCAO_evolve.o\
-LCAO_descriptor.o\
+LCAO_deepks.o\
+LCAO_deepks_fdelta.o\
+LCAO_deepks_io.o\
+LCAO_deepks_mpi.o\
+LCAO_deepks_pdm.o\
+LCAO_deepks_psialpha.o\
+LCAO_deepks_torch.o\
+LCAO_deepks_vdelta.o\
 ylm.o\
 FORCE_STRESS.o\
 FORCE_gamma.o\
@@ -176,6 +180,7 @@ global_fp.o \
 pdiag_double.o \
 pdiag_basic.o \
 pdiag_common.o \
+diag_scalapack_gvx.o \
 subgrid_oper.o \
 conv_coulomb_pot.o \
 conv_coulomb_pot_k.o \
@@ -244,6 +249,16 @@ read_rho.o\
 read_atoms.o\
 read_cell_pseudopots.o\
 read_dm.o\
+read_txt_tools.o\
+read_txt_stru.o\
+read_txt_input_value.o\
+read_txt_input_item.o\
+read_txt_input_list.o\
+read_txt_input_process.o\
+read_txt_input_process_global.o\
+read_txt_input-general.o\
+read_txt_input-pw.o\
+read_txt_input-spectrum.o\
 write_pot.o\
 write_rho.o\
 write_rho_cube.o\
@@ -251,6 +266,7 @@ write_rho_dipole.o\
 write_HS.o\
 write_HS_R.o\
 write_dm.o\
+write_wfc_realspace.o\
 potential_libxc.o \
 potential_libxc_meta.o \
 efield.o \
@@ -276,6 +292,7 @@ variable_cell.o\
 dftu.o\
 dftu_yukawa.o\
 dftu_relax.o\
+dmft.o \
 
 OBJS_COMMON=atom_spec.o \
 unitcell.o \
@@ -292,6 +309,13 @@ run_md_classic.o\
 LJ_potential.o\
 DP_potential.o\
 cmd_neighbor.o\
+verlet.o\
+NVE.o\
+MSST.o\
+NVT_ADS.o\
+NVT_NHC.o\
+FIRE.o\
+Langevin.o\
 dos.o \
 inverse_matrix.o \
 energy.o \

@@ -2,7 +2,7 @@
 #include "../module_base/mymath.h"
 #include "../src_parallel/parallel_global.h"
 #include "../module_base/global_function.h"
-#include "iostream"
+// #include "iostream"
 #include "../module_base/timer.h"
 
 
@@ -48,17 +48,17 @@ void PW_Basis::distribution_method2()
 
         this->count_pw_st(tot_npw, st_length2D, st_bottom2D);
         // for test --------------------------------------------------
-        std::cout << "The first step done\n";
-        std::cout << "tot_npw   " << tot_npw << '\n';
-        std::cout << "this->nstot   " << this->nstot << '\n';
-        for (int ix = 0; ix < nx; ++ix)
-        {
-            for (int iy = 0; iy < ny; ++iy)
-            {
-                std::cout << st_length2D[ix * ny + iy] << std::setw(4);
-            }
-            std::cout << '\n';
-        }
+        // std::cout << "The first step done\n";
+        // std::cout << "tot_npw   " << tot_npw << '\n';
+        // std::cout << "this->nstot   " << this->nstot << '\n';
+        // for (int ix = 0; ix < nx; ++ix)
+        // {
+        //     for (int iy = 0; iy < ny; ++iy)
+        //     {
+        //         std::cout << st_length2D[ix * ny + iy] << std::setw(4);
+        //     }
+        //     std::cout << '\n';
+        // }
         // ------------------------------------------------------------
 
         // (2) Devide the sticks to each core, sticks are in the order of ixy increasing.
@@ -66,9 +66,9 @@ void PW_Basis::distribution_method2()
         ModuleBase::GlobalFunc::ZEROS(nst_per, this->poolnproc);
         this->divide_sticks2();
         // for test ----------------------------------------------------------------------------
-        std::cout << "nst_per  ";
-        for (int ip = 0; ip < this->poolnproc; ++ip) std::cout << nst_per[ip] << std::setw(4);
-        std::cout << "\n";
+        // std::cout << "nst_per  ";
+        // for (int ip = 0; ip < this->poolnproc; ++ip) std::cout << nst_per[ip] << std::setw(4);
+        // std::cout << "\n";
         //-------------------------------------------------------------------------------------- 
 
         // (3) Create the maps from ixy to ip, istot, and from istot to ixy
@@ -77,9 +77,9 @@ void PW_Basis::distribution_method2()
         ModuleBase::GlobalFunc::ZEROS(npw_per, this->poolnproc);
         this->create_maps(st_length2D, npw_per);
         // for test ----------------------------------------------------------------------------
-        std::cout << "npw_per  ";
-        for (int ip = 0; ip < this->poolnproc; ++ip) std::cout << npw_per[ip] << std::setw(4);
-        std::cout << "\n";
+        // std::cout << "npw_per  ";
+        // for (int ip = 0; ip < this->poolnproc; ++ip) std::cout << npw_per[ip] << std::setw(4);
+        // std::cout << "\n";
         //-------------------------------------------------------------------------------------- 
 
         // (4) Send npw_per, nst[poolrank], st_* to all cores.
@@ -101,7 +101,7 @@ void PW_Basis::distribution_method2()
         MPI_Status ierror;
         MPI_Recv(&npw, 1, MPI_INT, 0, 0, POOL_WORLD, &ierror);  // number of planewaves in current proc.
         MPI_Recv(&nst, 1, MPI_INT, 0, 0, POOL_WORLD, &ierror);
-        std::cout << this->poolrank << " recive done.\n";
+        // std::cout << this->poolrank << " recive done.\n";
 #endif
     }
 #ifdef __MPI
@@ -125,7 +125,7 @@ void PW_Basis::distribution_method2()
     MPI_Bcast(this->istot2bigixy, this->nstot, MPI_INT, 0, POOL_WORLD);
     MPI_Bcast(this->ixy2istot, this->nxy, MPI_INT, 0, POOL_WORLD);
 
-    std::cout << "Bcast done\n";
+    // std::cout << "Bcast done\n";
 #endif
     this->nstnz = this->nst * this->nz;
 
@@ -135,7 +135,7 @@ void PW_Basis::distribution_method2()
     if (st_bottom2D != NULL) delete[] st_bottom2D;
     if (st_length2D != NULL) delete[] st_length2D;
     // for test ----------------------------------------------
-    if (poolrank==0) std::cout << "The fifth step done\n";
+    // if (poolrank==0) std::cout << "The fifth step done\n";
     // -------------------------------------------------------
     ModuleBase::timer::tick("PW_Basis", "distributeg_method1");
     return;

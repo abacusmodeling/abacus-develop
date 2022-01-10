@@ -9,6 +9,9 @@
 #include "src_io/print_info.h"
 #include "module_symmetry/symmetry.h"
 #include "src_lcao/run_md_lcao.h"
+#ifdef __DEEPKS
+#include "module_deepks/LCAO_deepks.h"
+#endif
 
 Run_lcao::Run_lcao(){}
 Run_lcao::~Run_lcao(){}
@@ -23,9 +26,9 @@ void Run_lcao::lcao_line(void)
     // improvement: a) separating the first reading of the atom_card and subsequent
     // cell relaxation. b) put GlobalV::NLOCAL and GlobalV::NBANDS as input parameters
 #ifdef __LCAO
-    GlobalC::ucell.setup_cell( GlobalC::ORB, GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
+    GlobalC::ucell.setup_cell( GlobalC::ORB, GlobalV::global_pseudo_dir, GlobalV::global_atom_card, GlobalV::ofs_running);
 #else
-    GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
+    GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir, GlobalV::global_atom_card, GlobalV::ofs_running);
 #endif
 	if(INPUT.test_just_neighbor)
 	{
@@ -66,7 +69,7 @@ void Run_lcao::lcao_line(void)
     // symmetry analysis should be performed every time the cell is changed
     if (ModuleSymmetry::Symmetry::symm_flag)
     {
-        GlobalC::symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
+        GlobalC::symm.analy_sys(GlobalC::ucell, GlobalV::ofs_running);
         ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
@@ -89,7 +92,7 @@ void Run_lcao::lcao_line(void)
 		INPUT.lcao_dk,
 		INPUT.lcao_dr,
 		INPUT.lcao_rmax,
-		INPUT.out_descriptor,
+		GlobalV::out_descriptor,
 		INPUT.out_r_matrix,
 		GlobalV::FORCE,
 		GlobalV::MY_RANK);
@@ -106,7 +109,7 @@ void Run_lcao::lcao_line(void)
 		GlobalC::UOT,
 		GlobalC::ORB,
 		GlobalC::ucell.lat0,
-		INPUT.out_descriptor,
+		GlobalV::out_descriptor,
 		Exx_Abfs::Lmax,
 		GlobalC::ucell.infoNL.nprojmax,
 		GlobalC::ucell.infoNL.nproj,
@@ -161,6 +164,19 @@ void Run_lcao::lcao_line(void)
 				break;
 		}
 	}
+
+#ifdef __DEEPKS
+	//wenfei 2021-12-19
+	//if we are performing DeePKS calculations, we need to load a model
+	if (GlobalV::out_descriptor)
+	{
+		if (GlobalV::deepks_scf)
+		{
+			// load the DeePKS model from deep neural network
+    		GlobalC::ld.load_model(INPUT.model_file);
+		}
+	}
+#endif
 
 	if(GlobalV::CALCULATION=="md")
 	{

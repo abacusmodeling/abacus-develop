@@ -222,7 +222,7 @@ void DFTU::init(
 		this->J_Yukawa.resize(cell.ntype);	
 
 		for(int it=0; it<cell.ntype; it++)
-		{			
+		{
 			const int NL = cell.atoms[it].nwl + 1;
 
 			this->Fk.at(it).resize(NL);		
@@ -246,7 +246,7 @@ void DFTU::init(
 				// {
 					// this->cal_slater_Fk(l, it);
 					// this->cal_slater_UJ(it, l);
-				// }				
+				// }
 			}			 	
 		}
  	}
@@ -528,7 +528,7 @@ void DFTU::cal_occup_m_gamma(const int iter)
 		pdgemm_(&transN, &transT,
 				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 				&alpha, 
-				GlobalC::LM.Sloc, &one_int, &one_int, GlobalC::ParaO.desc, 
+				GlobalC::LM.Sloc.data(), &one_int, &one_int, GlobalC::ParaO.desc, 
 				GlobalC::LOC.wfc_dm_2d.dm_gamma.at(is).c, &one_int, &one_int, GlobalC::ParaO.desc,
 				&beta,
 				&srho[0], &one_int, &one_int, GlobalC::ParaO.desc);
@@ -1175,7 +1175,7 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, std::complex<d
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 		&half, 
 		ModuleBase::GlobalFunc::VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc,
-		GlobalC::LM.Sloc2, &one_int, &one_int, GlobalC::ParaO.desc,
+		GlobalC::LM.Sloc2.data(), &one_int, &one_int, GlobalC::ParaO.desc,
 		&zero,
 		eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
 
@@ -1262,7 +1262,7 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 		&half, 
 		ModuleBase::GlobalFunc::VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc, 
-		GlobalC::LM.Sloc, &one_int, &one_int, GlobalC::ParaO.desc,
+		GlobalC::LM.Sloc.data(), &one_int, &one_int, GlobalC::ParaO.desc,
 		&beta,
 		eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
 
@@ -1437,31 +1437,28 @@ void DFTU::output()
 
 void DFTU::cal_eff_pot_mat_R_double(const int ispin, double* SR, double* HR)
 {
-  	const char transN = 'N', transT = 'T';
-	const int  one_int = 1;
-	const double alpha = 1.0, beta = 0.0, one=1.0, half=0.5;
-
-  	for(int i=0; i<GlobalC::ParaO.nloc; i++) HR[i] = 0.0;
+  const char transN = 'N', transT = 'T';
+  const int  one_int = 1;
+  const double alpha = 1.0, beta = 0.0, one=1.0, half=0.5;
 
 	std::vector<double> VU(GlobalC::ParaO.nloc);
 	this->cal_VU_pot_mat_real(ispin, 1, &VU[0]);
 
-	pdgemm_(&transN, &transN,
-		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
-		&half, 
-		ModuleBase::GlobalFunc::VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc, 
-		SR, &one_int, &one_int, GlobalC::ParaO.desc,
-		&beta,
-		HR, &one_int, &one_int, GlobalC::ParaO.desc);
+  pdgemm_(&transN, &transN,
+    &GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
+    &half, 
+    ModuleBase::GlobalFunc::VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc, 
+    SR, &one_int, &one_int, GlobalC::ParaO.desc,
+    &beta,
+    HR, &one_int, &one_int, GlobalC::ParaO.desc);
 
-	for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
-		VU[irc] = HR[irc];
-
-  	pdtran_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
-	  &one, 
-	  &VU[0], &one_int, &one_int, GlobalC::ParaO.desc, 
-	  &one, 
-	  HR, &one_int, &one_int, GlobalC::ParaO.desc);
+  pdgemm_(&transN, &transN,
+    &GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
+    &half, 
+    SR, &one_int, &one_int, GlobalC::ParaO.desc, 
+    ModuleBase::GlobalFunc::VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc,
+    &one,
+    HR, &one_int, &one_int, GlobalC::ParaO.desc);
 
   return;
 }
@@ -1469,34 +1466,31 @@ void DFTU::cal_eff_pot_mat_R_double(const int ispin, double* SR, double* HR)
 void DFTU::cal_eff_pot_mat_R_complex_double(
   const int ispin, std::complex<double>* SR, std::complex<double>* HR)
 {
-  	const char transN = 'N', transT = 'T';
-	const int  one_int = 1;
-	const std::complex<double> alpha(1.0,0.0), beta(0.0,0.0);
-  	const std::complex<double> zero(0.0,0.0), half(0.5,0.0), one(1.0,0.0);
+  const char transN = 'N', transT = 'T';
+  const int  one_int = 1;
+  const std::complex<double> alpha(1.0,0.0), beta(0.0,0.0);
+  const std::complex<double> zero(0.0,0.0), half(0.5,0.0), one(1.0,0.0);
 
-  	for(int i=0; i<GlobalC::ParaO.nloc; i++) HR[i] = zero;
+  std::vector<std::complex<double>> VU(GlobalC::ParaO.nloc);
+  this->cal_VU_pot_mat_complex(ispin, 1, &VU[0]);
 
-  	std::vector<std::complex<double>> VU(GlobalC::ParaO.nloc);
-  	this->cal_VU_pot_mat_complex(ispin, 1, &VU[0]);
+  pzgemm_(&transN, &transN,
+    &GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
+    &half, 
+    ModuleBase::GlobalFunc::VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc,
+    SR, &one_int, &one_int, GlobalC::ParaO.desc,
+    &beta,
+    HR, &one_int, &one_int, GlobalC::ParaO.desc);
 
-	pzgemm_(&transN, &transN,
-		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
-		&half, 
-		ModuleBase::GlobalFunc::VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc,
-		SR, &one_int, &one_int, GlobalC::ParaO.desc,
-		&beta,
-		HR, &one_int, &one_int, GlobalC::ParaO.desc);
+  pzgemm_(&transN, &transN,
+    &GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
+    &half, 
+    SR, &one_int, &one_int, GlobalC::ParaO.desc, 
+    ModuleBase::GlobalFunc::VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc,
+    &one,
+    HR, &one_int, &one_int, GlobalC::ParaO.desc);
 
-	for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
-	  	VU[irc] = HR[irc];
-
-  	pztranc_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
-		&one, 
-		&VU[0], &one_int, &one_int, GlobalC::ParaO.desc, 
-		&one, 
-		HR, &one_int, &one_int, GlobalC::ParaO.desc);
-
-  	return;
+    return;
 }
 
 void DFTU::folding_overlap_matrix(const int ik, std::complex<double>* Sk)
