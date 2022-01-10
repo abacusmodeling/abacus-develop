@@ -10,7 +10,7 @@ if(ENABLE_DEEPKS)
         LCAO_deepks_torch.cpp
         LCAO_deepks_vdelta.cpp
         )
-
+        
     add_library(
         deepks
         OBJECT

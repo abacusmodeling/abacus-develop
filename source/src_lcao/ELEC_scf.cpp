@@ -555,6 +555,16 @@ void ELEC_scf::scf(const int &istep)
 				{
 					GlobalV::ofs_running << " " << GlobalV::global_out_dir << " final etot is " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
 				}
+			}
+			else
+			{
+				GlobalV::ofs_running << " !! convergence has not been achieved @_@" << std::endl;
+				if(GlobalV::OUT_LEVEL=="ie" || GlobalV::OUT_LEVEL=="m") //xiaohui add "m" option, 2015-09-16
+				std::cout << " !! CONVERGENCE HAS NOT BEEN ACHIEVED !!" << std::endl;
+			}
+
+			if(conv_elec || iter==GlobalV::NITER)
+			{
 #ifdef __DEEPKS
 				if (GlobalV::out_descriptor)	//caoyu add 2021-06-04
 				{
@@ -586,14 +596,19 @@ void ELEC_scf::scf(const int &istep)
         	    			dm_bandgap.cal_dm(wg_hl); 
 						
 			    			if(GlobalV::GAMMA_ONLY_LOCAL){
-            	    			GlobalC::ld.cal_o_delta(dm_bandgap.dm_gamma);
+            	    			GlobalC::ld.cal_o_delta(dm_bandgap.dm_gamma,GlobalC::ParaO);
                 			}
 					
                 			else{
-            	    			GlobalC::ld.cal_o_delta_k(dm_bandgap.dm_k);
+            	    			GlobalC::ld.cal_o_delta_k(dm_bandgap.dm_k,GlobalC::ParaO, GlobalC::kv.nks);
                 			}	
 							GlobalC::ld.save_npy_o(GlobalC::wf.ekb[0][nocc] - GlobalC::wf.ekb[0][nocc-1] - GlobalC::ld.o_delta, "o_base.npy");
-			    			GlobalC::ld.cal_orbital_precalc(dm_bandgap.dm_gamma);
+			    			GlobalC::ld.cal_orbital_precalc(dm_bandgap.dm_gamma,
+								GlobalC::ucell.nat,
+								GlobalC::ucell,
+            					GlobalC::ORB,
+            					GlobalC::GridD,
+            					GlobalC::ParaO);
 							if(GlobalV::MY_RANK==0)
 								GlobalC::ld.save_npy_orbital_precalc();
         				}
@@ -608,12 +623,7 @@ void ELEC_scf::scf(const int &istep)
 				}
 #endif
 			}
-			else
-			{
-				GlobalV::ofs_running << " !! convergence has not been achieved @_@" << std::endl;
-				if(GlobalV::OUT_LEVEL=="ie" || GlobalV::OUT_LEVEL=="m") //xiaohui add "m" option, 2015-09-16
-				std::cout << " !! CONVERGENCE HAS NOT BEEN ACHIEVED !!" << std::endl;
-			}
+
 
 //			ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"ELECTRONS CONVERGED!");
 			ModuleBase::timer::tick("ELEC_scf","scf");

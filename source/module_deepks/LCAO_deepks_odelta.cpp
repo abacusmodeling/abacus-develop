@@ -11,7 +11,7 @@
 
 #include "LCAO_deepks.h"
 
-void LCAO_Deepks::cal_o_delta(const std::vector<ModuleBase::matrix> &dm_hl)
+void LCAO_Deepks::cal_o_delta(const std::vector<ModuleBase::matrix> &dm_hl, const Parallel_Orbitals &ParaO)
 {
     ModuleBase::TITLE("LCAO_Deepks", "cal_o_delta");
     this->o_delta = 0;
@@ -19,12 +19,12 @@ void LCAO_Deepks::cal_o_delta(const std::vector<ModuleBase::matrix> &dm_hl)
     {
         for (int j = 0; j < GlobalV::NLOCAL; ++j)
         {
-            const int mu = GlobalC::ParaO.trace_loc_row[j];
-            const int nu = GlobalC::ParaO.trace_loc_col[i];
+            const int mu = ParaO.trace_loc_row[j];
+            const int nu = ParaO.trace_loc_col[i];
             
             if (mu >= 0 && nu >= 0)
             {                
-                const int index=nu*GlobalC::ParaO.nrow+mu;
+                const int index = nu*ParaO.nrow + mu;
                 for (int is = 0; is < GlobalV::NSPIN; ++is)
                 {
                     this->o_delta += dm_hl[is](nu, mu) * this->H_V_delta[index];
@@ -39,7 +39,9 @@ void LCAO_Deepks::cal_o_delta(const std::vector<ModuleBase::matrix> &dm_hl)
 
 //calculating the correction of (LUMO-HOMO) energies, i.e., band gap corrections
 //for multi_k calculations
-void LCAO_Deepks::cal_o_delta_k(const std::vector<ModuleBase::ComplexMatrix> &dm_hl)
+void LCAO_Deepks::cal_o_delta_k(const std::vector<ModuleBase::ComplexMatrix> &dm_hl,
+    const Parallel_Orbitals &ParaO,
+    const int nks)
 {
     ModuleBase::TITLE("LCAO_Deepks", "cal_o_delta_k");
     std::complex<double> o_delta_k=std::complex<double>(0.0,0.0);
@@ -47,21 +49,21 @@ void LCAO_Deepks::cal_o_delta_k(const std::vector<ModuleBase::ComplexMatrix> &dm
     {
         for (int j = 0; j < GlobalV::NLOCAL; ++j)
         {
-            const int mu = GlobalC::ParaO.trace_loc_row[j];
-            const int nu = GlobalC::ParaO.trace_loc_col[i];
+            const int mu = ParaO.trace_loc_row[j];
+            const int nu = ParaO.trace_loc_col[i];
             
             if (mu >= 0 && nu >= 0)
             {                
                 int iic;
                 if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                 {
-                    iic=mu+nu*GlobalC::ParaO.nrow;
+                    iic = mu + nu*ParaO.nrow;
                 }
                 else
                 {
-                    iic=mu*GlobalC::ParaO.ncol+nu;
+                    iic = mu*ParaO.ncol + nu;
                 }
-                for(int ik=0;ik<GlobalC::kv.nks;ik++)
+                for(int ik=0; ik<nks; ik++)
                 {
                     o_delta_k += dm_hl[ik](nu, mu) * this->H_V_delta_k[ik][iic];
                 }

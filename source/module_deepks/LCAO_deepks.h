@@ -112,9 +112,9 @@ private:
     //dD/dX, tensor form of gdmx
     std::vector<torch::Tensor> gdmr_vector;
 
-    //orbital_pdm_shell \langle \phi_\mu|\alpha\rangle\langle\alpha|\phi_\nu\rnalge
+    //orbital_pdm_shell:[1,Inl,nm*nm]; \langle \phi_\mu|\alpha\rangle\langle\alpha|\phi_\nu\rnalge
     double*** orbital_pdm_shell;
-    //orbital_precalc
+    //orbital_precalc:[1,NAt,NDscrpt]; gvdm*orbital_pdm_shell
     torch::Tensor orbital_precalc_tensor;
 
     ///size of descriptor(projector) basis set
@@ -329,8 +329,11 @@ public:
 
 public:
     
-    void cal_o_delta(const std::vector<ModuleBase::matrix>& dm_hl/**<[in] density matrix*/);
-    void cal_o_delta_k(const std::vector<ModuleBase::ComplexMatrix>& dm_hl/**<[in] density matrix*/);
+    void cal_o_delta(const std::vector<ModuleBase::matrix>& dm_hl/**<[in] modified density matrix that contains HOMO and LUMO only*/,
+        const Parallel_Orbitals &ParaO);
+    void cal_o_delta_k(const std::vector<ModuleBase::ComplexMatrix>& dm_hl/**<[in] modified density matrix that contains HOMO and LUMO only*/,
+        const Parallel_Orbitals &ParaO,
+        const int nks);
 
 //-------------------
 // LCAO_deepks_torch.cpp
@@ -352,7 +355,8 @@ public:
 //      this is the term V(D) that enters the expression H_V_delta = |alpha>V(D)<alpha|
 //      caculated using torch::autograd::grad
 //6. cal_orbital_precalc : orbital_precalc is usted for training with orbital label, 
-//                         which equals gvdm * orbital_shell_pairs 
+//                         which equals gvdm * orbital_pdm_shell, 
+//                         orbital_pdm_shells[1,Inl,nm*nm] = dm_hl * overlap * overlap
 
 public:
 
@@ -378,7 +382,12 @@ public:
     void cal_gedm(const int nat);
 
     //calculates orbital_precalc
-    void cal_orbital_precalc(const std::vector<ModuleBase::matrix>& dm_hl/**<[in] density matrix*/);
+    void cal_orbital_precalc(const std::vector<ModuleBase::matrix>& dm_hl/**<[in] density matrix*/,
+        const int nat,
+        const UnitCell_pseudo &ucell,
+        const LCAO_Orbitals &orb,
+        Grid_Driver &GridD,
+        const Parallel_Orbitals &ParaO);
 
 private:
     void cal_gvdm(const int nat);
