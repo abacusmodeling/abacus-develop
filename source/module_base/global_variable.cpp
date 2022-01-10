@@ -185,4 +185,6 @@ bool out_descriptor = false; //caoyu add 2021-10-16 for DeePKS
 bool deepks_scf = false; //caoyu add 2021-10-16 for DeePKS
 
 int vnl_method = 1; //set defauld vnl method as old, added by zhengdy 2021-10-11
+
+bool out_element_info = false; //added by zhengdy 2021-11-26
 }

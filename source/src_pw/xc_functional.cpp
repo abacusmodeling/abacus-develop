@@ -218,7 +218,7 @@ void XC_Functional::xc_spin(const double &rho, const double &zeta,
 		case 4: //mohan fix bug 2012-05-28, case 2 to 4.
 		XC_Functional::pw_spin(rs, zeta, ec, vcup, vcdw); break;
 		default:
-		ModuleBase::WARNING_QUIT("XC_Functional::xc_spin", "GlobalC::xcf.icorr_now wrong!");
+		ModuleBase::WARNING_QUIT("XC_Functional::xc_spin", "xcf.icorr_now wrong!");
 	}
 
 	return;

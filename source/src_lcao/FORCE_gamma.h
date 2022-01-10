@@ -26,7 +26,12 @@ class Force_LCAO_gamma
 		ModuleBase::matrix& soverlap,
 		ModuleBase::matrix& stvnl_dphi,
 		ModuleBase::matrix& svnl_dbeta,
+#ifdef __DEEPKS
+		ModuleBase::matrix& svl_dphi,
+		ModuleBase::matrix& svnl_dalpha
+#else
 		ModuleBase::matrix& svl_dphi
+#endif
 		);
 
 	// get the ds, dt, dvnl.

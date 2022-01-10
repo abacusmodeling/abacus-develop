@@ -65,7 +65,6 @@ void Electrons::non_self_consistent(const int &istep)
         GlobalV::ofs_running << std::endl;
     }
 
-
     // add by jingan in 2018.11.7
     if(GlobalV::CALCULATION == "nscf" && INPUT.towannier90)
     {
@@ -293,9 +292,9 @@ void Electrons::self_consistent(const int &istep)
                     GlobalV::ofs_running << " dr2=" << dr2 << " < diago_error=" << diago_error << std::endl;
 
                     // update GlobalV::ETHR.
-                    GlobalV::ofs_running << " Origin GlobalV::ETHR = " << GlobalV::ETHR << std::endl;
+                    GlobalV::ofs_running << " Origin ETHR = " << GlobalV::ETHR << std::endl;
                     GlobalV::ETHR = 0.1 * dr2 / GlobalC::CHR.nelec;
-                    GlobalV::ofs_running << " New    GlobalV::ETHR = " << GlobalV::ETHR << std::endl;
+                    GlobalV::ofs_running << " New    ETHR = " << GlobalV::ETHR << std::endl;
                     //goto first_iter_again;
                     goto scf_step;
                 }
@@ -361,7 +360,7 @@ void Electrons::self_consistent(const int &istep)
             //ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"write wave functions into file WAVEFUNC.dat");
         }
 
-			GlobalC::pot.set_vr_eff();
+		GlobalC::pot.set_vr_eff();
 
         //print_eigenvalue(GlobalV::ofs_running);
         GlobalC::en.calculate_etot();

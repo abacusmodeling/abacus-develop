@@ -264,6 +264,7 @@ void Forces::print(const std::string &name, const ModuleBase::matrix &f, bool ry
 
 	GlobalV::ofs_running << " " << std::setw(8) << "atom" << std::setw(15) << "x" << std::setw(15) << "y" << std::setw(15) << "z" << std::endl;
 	GlobalV::ofs_running << std::setiosflags(ios::showpos);
+    GlobalV::ofs_running << std::setprecision(8);
 
 	const double fac = ModuleBase::Ry_to_eV / 0.529177;
 	
@@ -723,6 +724,10 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
 			}
             for (int ib=0; ib<GlobalV::NBANDS; ib++)
             {
+                ///
+                ///only occupied band should be calculated.
+                ///
+                if(GlobalC::wf.wg(ik, ib) < 1.0e-8) continue;
                 for (int i=0; i<nkb; i++)
                 {
                     for (int ig=0; ig<GlobalC::wf.npw; ig++)
@@ -741,6 +746,10 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
 //		ModuleBase::GlobalFunc::ZEROS(cf, GlobalC::ucell.nat);
 		for (int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
+            ///
+			///only occupied band should be calculated.
+			///
+            if(GlobalC::wf.wg(ik, ib) < 1.0e-8) continue;
 			double fac = GlobalC::wf.wg(ik, ib) * 2.0 * GlobalC::ucell.tpiba;
         	int iat = 0;
         	int sum = 0;

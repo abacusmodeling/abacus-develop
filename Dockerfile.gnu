@@ -39,8 +39,8 @@ RUN cd /tmp \
     && cd /tmp && rm -rf fftw-3.3.9 && rm fftw-3.3.9.tar.gz
 
 RUN cd /tmp \
-    && wget https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-1.9.0%2Bcpu.zip --no-check-certificate --quiet \
-    && unzip libtorch-shared-with-deps-1.9.0+cpu.zip \
+    && wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.9.1%2Bcpu.zip --no-check-certificate --quiet \
+    && unzip libtorch-cxx11-abi-shared-with-deps-1.9.1+cpu.zip \
     && cp -r libtorch/include /usr/local \
     && cp -r libtorch/lib /usr/local \
     && cp -r libtorch/share /usr/local \

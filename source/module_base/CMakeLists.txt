@@ -34,3 +34,7 @@ add_library(
     tool_title.cpp
     ylm.cpp
 )
+
+IF (BUILD_TESTING)
+  add_subdirectory(test)
+endif()

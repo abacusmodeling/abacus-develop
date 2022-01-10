@@ -35,7 +35,7 @@ md_nresn 3
 md_nyosh 3
 md_qmass 0
 md_tlast 30
-md_dumpmdfred 1
+md_dumpfred 1
 md_domsd 0
 md_domsdatom 0
 md_outputstressperiod 0

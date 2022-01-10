@@ -8,6 +8,14 @@
 #include "../module_base/blas_connector.h"
 #include "global_fp.h" // mohan add 2021-01-30
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
+#ifdef __MKL
+#include <mkl_service.h>
+#endif
+
 inline void setVindex(const int ncyz, const int ibx, const int jby, const int kbz, int* vindex)
 {				
 	int bindex = 0;
@@ -395,6 +403,15 @@ void Gint_k::cal_rho_k(void)
 	ModuleBase::TITLE("Gint_k","cal_rho_k");
 	ModuleBase::timer::tick("Gint_k","cal_rho_k");
 
+#ifdef __MKL
+    const int mkl_threads = mkl_get_max_threads();
+    mkl_set_num_threads(1);
+#endif
+
+#ifdef _OPENMP
+    #pragma omp parallel
+    {
+#endif
 	const double delta_r = GlobalC::ORB.dr_uniform;
 	// it is an uniform grid to save orbital values, so the delta_r is a constant.
 	const int max_size = GlobalC::GridT.max_atom;
@@ -453,6 +470,10 @@ void Gint_k::cal_rho_k(void)
 	
 	const int ncyz = GlobalC::pw.ncy*GlobalC::pw.nczp;
 	const int nbyz = nby*nbz;	
+
+#ifdef _OPENMP
+    #pragma omp for
+#endif
 	for(int i=0; i<nbx; i++)
 	{
 		const int ibx = i*GlobalC::pw.bx; // mohan add 2012-03-25
@@ -511,6 +532,13 @@ void Gint_k::cal_rho_k(void)
     }	
 
 //	std::cout << " calculate the charge density from density matrix " << std::endl;
+#ifdef _OPENMP
+    } //end omp
+#endif
+
+#ifdef __MKL
+    mkl_set_num_threads(mkl_threads);
+#endif
 
 	ModuleBase::timer::tick("Gint_k","cal_rho_k");
 	return;

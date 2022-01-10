@@ -299,7 +299,7 @@ void Hamilt::diagH_pw(
         	}
         	else
         	{
-				ModuleBase::WARNING_QUIT("calculate_bands","Check GlobalV::KS_SOLVER !");
+				ModuleBase::WARNING_QUIT("calculate_bands","Check ks_solver !");
         	}
             avg_iter += avg;
             ++ntry;

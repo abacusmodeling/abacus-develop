@@ -323,7 +323,7 @@ int UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_ru
 			latvec.e22 = bba * sinab;
 			latvec.e23 = 0.0;
 			latvec.e31 = cba * cosac;
-			latvec.e32 = cba * (cosbc - cosac*cosab/sinab);
+			latvec.e32 = cba * (cosbc - cosac*cosab) / sinab;
 			term = 1.0 + 2.0 * cosab*cosac*cosbc - cosab*cosab - cosac*cosac - cosbc*cosbc;
 			term = sqrt(term)/sinab;
 			latvec.e33 = cba * term;
@@ -618,7 +618,7 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
                                         mv.z = true ;
                                         atoms[it].vel[ia].set(0,0,0);
 #ifndef __CMD
-										atoms[it].mag[ia]=magnet.start_magnetization[it];
+										//atoms[it].mag[ia]=magnet.start_magnetization[it];//if this line is used, default startmag_type would be 2
 #endif										
 										atoms[it].angle1[ia]=0;
 										atoms[it].angle2[ia]=0;
@@ -925,9 +925,9 @@ bool UnitCell_pseudo::check_tau(void)const
 }
 
 #ifdef __LCAO
-void UnitCell_pseudo::print_stru_file(const LCAO_Orbitals &orb, const std::string &fn, const int &type)const
+void UnitCell_pseudo::print_stru_file(const LCAO_Orbitals &orb, const std::string &fn, const int &type, const int &level)const
 #else
-void UnitCell_pseudo::print_stru_file(const std::string &fn, const int &type)const
+void UnitCell_pseudo::print_stru_file(const std::string &fn, const int &type, const int &level)const
 #endif
 {
 	ModuleBase::TITLE("UnitCell_pseudo","print_stru_file");
@@ -987,19 +987,29 @@ void UnitCell_pseudo::print_stru_file(const std::string &fn, const int &type)con
 			ofs << "0" << " #magnetism" << std::endl;
 #endif
 
-			//2015-05-07, modify
-			//ofs << atoms[it].nwl << " #max angular momentum" << std::endl;
-			//xiaohui modify 2015-03-15
-			//for(int l=0; l<=atoms[it].nwl; l++)
-			//{
-			//	ofs << atoms[it].l_nchi[l] << " #number of zeta for l=" << l << std::endl;
-			//}
 			ofs << atoms[it].na << " #number of atoms" << std::endl;
 			for(int ia=0; ia<atoms[it].na; ia++)
 			{
-				ofs << atoms[it].tau[ia].x << " " << atoms[it].tau[ia].y << " " << atoms[it].tau[ia].z << " " 
-					<< atoms[it].mbl[ia].x << " " << atoms[it].mbl[ia].y << " " << atoms[it].mbl[ia].z << " "
-					<< atoms[it].vel[ia].x << " " << atoms[it].vel[ia].y << " " << atoms[it].vel[ia].z << std::endl;
+				ofs << atoms[it].tau[ia].x << "  " << atoms[it].tau[ia].y << "  " << atoms[it].tau[ia].z
+					<< "  m  " << atoms[it].mbl[ia].x << "  " << atoms[it].mbl[ia].y << "  " << atoms[it].mbl[ia].z;
+
+				if(level == 1)
+				{
+					// output velocity
+					ofs << "  v  " << atoms[it].vel[ia].x << "  " << atoms[it].vel[ia].y << "  " << atoms[it].vel[ia].z << std::endl;
+				}
+				else if(level == 2)
+				{
+					// output magnetic information
+				}
+				else if(level == 3)
+				{
+					// output velocity and magnetic information
+				}
+				else
+				{
+					ofs << std::endl;
+				}
 			}
 		}
 	}
@@ -1015,18 +1025,30 @@ void UnitCell_pseudo::print_stru_file(const std::string &fn, const int &type)con
 #else
 			ofs << "0" << " #magnetism" << std::endl;
 #endif
-			//ofs << atoms[it].nwl << " #max angular momentum" << std::endl;
-			//xiaohui modify 2015-03-15
-			//for(int l=0; l<=atoms[it].nwl; l++)
-			//{
-			//	ofs << atoms[it].l_nchi[l] << " #number of zeta for l=" << l << std::endl;
-			//}
+			
 			ofs << atoms[it].na << " #number of atoms" << std::endl;
 			for(int ia=0; ia<atoms[it].na; ia++)
 			{
-				ofs << atoms[it].taud[ia].x << " " << atoms[it].taud[ia].y << " " << atoms[it].taud[ia].z << " " 
-					<< atoms[it].mbl[ia].x << " " << atoms[it].mbl[ia].y << " " << atoms[it].mbl[ia].z << " "
-					<< atoms[it].vel[ia].x << " " << atoms[it].vel[ia].y << " " << atoms[it].vel[ia].z << std::endl;
+				ofs << atoms[it].taud[ia].x << "  " << atoms[it].taud[ia].y << "  " << atoms[it].taud[ia].z
+					<< "  m  " << atoms[it].mbl[ia].x << "  " << atoms[it].mbl[ia].y << "  " << atoms[it].mbl[ia].z;
+
+				if(level == 1)
+				{
+					// output velocity
+					ofs << "  v  " << atoms[it].vel[ia].x << "  " << atoms[it].vel[ia].y << "  " << atoms[it].vel[ia].z << std::endl;
+				}
+				else if(level == 2)
+				{
+					// output magnetic information
+				}
+				else if(level == 3)
+				{
+					// output velocity and magnetic information
+				}
+				else
+				{
+					ofs << std::endl;
+				}
 			}
 		}
 	}

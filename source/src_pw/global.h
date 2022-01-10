@@ -15,7 +15,6 @@
 #include "wavefunc.h"
 #include "use_fft.h"
 #include "klist.h"
-#include "../src_io/output.h"
 #include "magnetism.h"
 #include "vdwd2.h"
 #include "vdwd2_parameters.h"
@@ -286,7 +285,6 @@ namespace GlobalC
 {
 extern K_Vectors kv;
 extern Use_FFT UFFT;
-extern output out;
 extern PW_Basis pw;
 extern Stochastic_WF sto_wf; //qianrui add 2021-2-5
 extern energy en;
