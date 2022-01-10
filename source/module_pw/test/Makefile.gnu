@@ -48,6 +48,24 @@ test1-4f.o
 
 TESTFILE0 = ${DOUBLEFILE} 
 
+
+##==========================
+## FFTW package needed 
+##==========================
+#Use fftw package
+FFTW_DIR = /home/qianrui/gnucompile/g_fftw-3.3.8-mpi
+FFTW_LIB_DIR     = ${FFTW_DIR}/lib
+FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
+FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -lfftw3f -Wl,-rpath=${FFTW_LIB_DIR}
+# FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
+
+##==========================
+## GTEST needed 
+##==========================
+GTEST_DIR = /home/qianrui/gnucompile/g_gtest
+GTESTOPTS = -I${GTEST_DIR}/include -L${GTEST_DIR}/lib -lgtest -lpthread
+
+
 #==========================
 # Options
 #==========================
@@ -78,17 +96,6 @@ TESTFILE0 = ${DOUBLEFILE} ${FLOATFILE}
 PW_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${PW_OBJS_0})
 TESTFILE=$(patsubst %.o, ${OBJ_DIR}/%.o, ${TESTFILE0})
 
-##==========================
-## FFTW package needed 
-##==========================
-#Use fftw package
-FFTW_DIR = /home/qianrui/gnucompile/g_fftw-3.3.8-mpi
-FFTW_LIB_DIR     = ${FFTW_DIR}/lib
-FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
-FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -lfftw3f -Wl,-rpath=${FFTW_LIB_DIR}
-# FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
-
-
 
 ##==========================
 ## CUDA needed 
@@ -97,12 +104,6 @@ FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -lfftw3f -Wl,-rpath=${FFTW_LIB_DIR}
 # CUDA_INCLUDE_DIR	= ${CUDA_DIR}/include 
 # CUDA_LIB_DIR		= ${CUDA_DIR}/lib64
 # CUDA_LIB			= -L${CUDA_LIB_DIR} -lcufft -lcublas -lcudart
-
-##==========================
-## GTEST needed 
-##==========================
-GTEST_DIR = /home/qianrui/gnucompile/g_gtest
-GTESTOPTS = -I${GTEST_DIR}/include -L${GTEST_DIR}/lib -lgtest -lpthread
 
 
 #LIBS = ${FFTW_LIB} ${CUDA_LIB} -ltcmalloc -lprofiler

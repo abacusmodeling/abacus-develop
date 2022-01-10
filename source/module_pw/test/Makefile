@@ -48,6 +48,12 @@ test1-4f.o
 
 TESTFILE0 = ${DOUBLEFILE}
 
+##==========================
+## GTEST needed 
+##==========================
+GTEST_DIR = /home/qianrui/intelcompile/impi_gtest
+GTESTOPTS = -I${GTEST_DIR}/include -L${GTEST_DIR}/lib -lgtest -lpthread
+
 #==========================
 # Options
 #==========================
@@ -100,12 +106,6 @@ FFTW_LIB = -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core
 # CUDA_INCLUDE_DIR	= ${CUDA_DIR}/include 
 # CUDA_LIB_DIR		= ${CUDA_DIR}/lib64
 # CUDA_LIB			= -L${CUDA_LIB_DIR} -lcufft -lcublas -lcudart
-
-##==========================
-## GTEST needed 
-##==========================
-GTEST_DIR = /home/qianrui/intelcompile/impi_gtest
-GTESTOPTS = -I${GTEST_DIR}/include -L${GTEST_DIR}/lib -lgtest -lpthread
 
 
 #LIBS = ${FFTW_LIB} ${CUDA_LIB} -ltcmalloc -lprofiler
