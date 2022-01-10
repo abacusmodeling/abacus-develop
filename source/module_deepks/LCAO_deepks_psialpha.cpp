@@ -136,8 +136,8 @@ void LCAO_Deepks::check_psialpha(const bool& calc_deri,
     const int* trace_loc_col,
     const ORB_gen_tables &UOT)
 {
-    ModuleBase::TITLE("LCAO_Deepks", "build_psialpha");
-    ModuleBase::timer::tick ("LCAO_Deepks","build_psialpha");
+    ModuleBase::TITLE("LCAO_Deepks", "check_psialpha");
+    ModuleBase::timer::tick ("LCAO_Deepks","check_psialpha");
 
     const double Rcut_Alpha = orb.Alpha[0].getRcut();
     //same for all types of atoms
@@ -152,6 +152,14 @@ void LCAO_Deepks::check_psialpha(const bool& calc_deri,
     }
 
     std::ofstream ofs("psialpha.dat");
+    std::ofstream ofs_x("dpsialpha_x.dat");
+    std::ofstream ofs_y("dpsialpha_y.dat");
+    std::ofstream ofs_z("dpsialpha_z.dat");
+
+    ofs<<std::setprecision(12);
+    ofs_x<<std::setprecision(12);
+    ofs_x<<std::setprecision(12);
+    ofs_x<<std::setprecision(12);
 
     for (int T0 = 0; T0 < ucell.ntype; T0++)
     {
@@ -169,6 +177,9 @@ void LCAO_Deepks::check_psialpha(const bool& calc_deri,
             GridD.Find_atom(ucell, atom0->tau[I0] ,T0, I0);
 
             ofs << "iat : " << iat << std::endl;
+            ofs_x << "iat : " << iat << std::endl;
+            ofs_y << "iat : " << iat << std::endl;
+            ofs_z << "iat : " << iat << std::endl;
 
             for (int ad=0; ad<GridD.getAdjacentNum()+1 ; ++ad)
             {
@@ -191,7 +202,10 @@ void LCAO_Deepks::check_psialpha(const bool& calc_deri,
                 int ibt, rx, ry, rz;
                 if(GlobalV::GAMMA_ONLY_LOCAL)
                 {
-                    ofs << "ad : " << ad << std::endl;
+                    ofs << "ad : " << ad << " " << dist1 << std::endl;
+                    ofs_x << "ad : " << ad << " " << dist1 << std::endl;
+                    ofs_y << "ad : " << ad << " " << dist1 << std::endl;
+                    ofs_z << "ad : " << ad << " " << dist1 << std::endl;
                 }
                 else
                 {
@@ -199,14 +213,19 @@ void LCAO_Deepks::check_psialpha(const bool& calc_deri,
                     rx=GridD.getBox(ad).x;
                     ry=GridD.getBox(ad).y;
                     rz=GridD.getBox(ad).z;
-                    ofs << "key : " << ibt << " " << rx << " " << ry << " " << rz << std::endl; 
+                    ofs << "key : " << ibt << " " << rx << " " << ry << " " << rz << std::endl;
+                    ofs_x << "key : " << ibt << " " << rx << " " << ry << " " << rz << std::endl; 
+                    ofs_y << "key : " << ibt << " " << rx << " " << ry << " " << rz << std::endl; 
+                    ofs_z << "key : " << ibt << " " << rx << " " << ry << " " << rz << std::endl; 
                 }
 
 				for (int iw1=0; iw1<nw1_tot; ++iw1)
 				{
-                    ofs << "iw : " << iw1 << std::endl;
-
 					const int iw1_all = start1 + iw1;
+                    ofs << "iw : " << iw1_all << std::endl;
+                    ofs_x << "iw : " << iw1_all << std::endl;
+                    ofs_y << "iw : " << iw1_all << std::endl;
+                    ofs_z << "iw : " << iw1_all << std::endl;
 					const int iw1_local = trace_loc_row[iw1_all];
 					const int iw2_local = trace_loc_col[iw1_all];
 					if(iw1_local < 0 && iw2_local < 0)continue;
@@ -226,16 +245,31 @@ void LCAO_Deepks::check_psialpha(const bool& calc_deri,
                     
                     for(int ind=0;ind<nlm[0].size();ind++)
                     {
-                        ofs << nlm[1][ind] << " ";
+                        ofs << nlm[0][ind] << " ";
                         if(ind%6 == 5) ofs << "\n";
+                        if(calc_deri)
+                        {
+                            ofs_x << nlm[1][ind] << " ";
+                            if(ind%6 == 5) ofs_x << "\n";
+                            ofs_y << nlm[2][ind] << " ";
+                            if(ind%6 == 5) ofs_y << "\n";
+                            ofs_z << nlm[3][ind] << " ";
+                            if(ind%6 == 5) ofs_z << "\n";
+                        }
                     }
                     ofs << std::endl;
+                    if(calc_deri)
+                    {
+                        ofs_x << std::endl;
+                        ofs_y << std::endl;
+                        ofs_z << std::endl;
+                    }
 				}//end iw
 			}//end ad
 		}//end I0
 	}//end T0
 
-    ModuleBase::timer::tick ("LCAO_Deepks","build_psialpha");
+    ModuleBase::timer::tick ("LCAO_Deepks","check_psialpha");
 	return;
 
 }

@@ -261,6 +261,7 @@ void LCAO_Deepks::check_projected_dm(void)
 {
     ofstream ofs("pdm");
     const int pdm_size = (this->lmaxd * 2 + 1) * (this->lmaxd * 2 + 1);
+    ofs<<std::setprecision(12);
     for(int inl=0;inl<inlmax;inl++)
     {
         for(int ind=0;ind<pdm_size;ind++)
@@ -341,13 +342,13 @@ void LCAO_Deepks::cal_gdmx(const ModuleBase::matrix &dm,
 					for (int iw1=0; iw1<nw1_tot; ++iw1)
 					{
 						const int iw1_all = start1 + iw1;
-						const int iw1_local = trace_loc_row[iw1_all];
+						const int iw1_local = trace_loc_col[iw1_all];
 						if(iw1_local < 0)continue;
 						const int iw1_0 = iw1/GlobalV::NPOL;
 						for (int iw2=0; iw2<nw2_tot; ++iw2)
 						{
 							const int iw2_all = start2 + iw2;
-							const int iw2_local = trace_loc_col[iw2_all];
+							const int iw2_local = trace_loc_row[iw2_all];
 							if(iw2_local < 0)continue;
 							const int iw2_0 = iw2/GlobalV::NPOL;
                             
@@ -363,27 +364,29 @@ void LCAO_Deepks::cal_gdmx(const ModuleBase::matrix &dm,
                                 {
                                     const int inl = this->inl_index[T0](I0, L0, N0);
                                     const int nm = 2*L0+1;
-                                    for (int m1 = 0;m1 < 2 * L0 + 1;++m1)
+                                    for (int m1 = 0;m1 < nm;++m1)
                                     {
-                                        for (int m2 = 0; m2 < 2 * L0 + 1; ++m2)
+                                        for (int m2 = 0; m2 <nm; ++m2)
                                         {
-                                            //ibt : on which iw2 is located
-                                            //iat : on which alpha is located
+                                            //(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'>
+                                            gdmx[iat][inl][m1*nm+m2] += nlm2[1][ib+m2] * nlm1[ib+m1] * dm(iw1_local,iw2_local);
+                                            gdmy[iat][inl][m1*nm+m2] += nlm2[2][ib+m2] * nlm1[ib+m1] * dm(iw1_local,iw2_local);
+                                            gdmz[iat][inl][m1*nm+m2] += nlm2[3][ib+m2] * nlm1[ib+m1] * dm(iw1_local,iw2_local);
 
-                                            double fact_x = (nlm2[1][ib+m2] * nlm1[ib+m1] + nlm2[1][ib+m2] * nlm1[ib+m1]) * dm(iw2_local,iw1_local);
-                                            double fact_y = (nlm2[2][ib+m2] * nlm1[ib+m1] + nlm2[2][ib+m2] * nlm1[ib+m1]) * dm(iw2_local,iw1_local);
-                                            double fact_z = (nlm2[3][ib+m2] * nlm1[ib+m1] + nlm2[3][ib+m2] * nlm1[ib+m1]) * dm(iw2_local,iw1_local);
+                                            //(<d/dX chi_nu|alpha_m'>)<chi_mu|alpha_m>
+                                            gdmx[iat][inl][m2*nm+m1] += nlm2[1][ib+m2] * nlm1[ib+m1] * dm(iw1_local,iw2_local);
+                                            gdmy[iat][inl][m2*nm+m1] += nlm2[2][ib+m2] * nlm1[ib+m1] * dm(iw1_local,iw2_local);
+                                            gdmz[iat][inl][m2*nm+m1] += nlm2[3][ib+m2] * nlm1[ib+m1] * dm(iw1_local,iw2_local);                                            
 
-                                            //(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'> + (<d/dX chi_nu|alpha_m'>)<chi_mu|alpha_m>
-                                            gdmx[iat][inl][m1*nm + m2] += fact_x;
-                                            gdmy[iat][inl][m1*nm + m2] += fact_y;                                               
-                                            gdmz[iat][inl][m1*nm + m2] += fact_z;
+                                            //(<chi_mu|d/dX alpha_m>)<chi_nu|alpha_m'> = -(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'>
+                                            gdmx[ibt2][inl][m1*nm+m2] -= nlm2[1][ib+m2] * nlm1[ib+m1] * dm(iw1_local,iw2_local);                                               
+                                            gdmy[ibt2][inl][m1*nm+m2] -= nlm2[2][ib+m2] * nlm1[ib+m1] * dm(iw1_local,iw2_local);                                               
+                                            gdmz[ibt2][inl][m1*nm+m2] -= nlm2[3][ib+m2] * nlm1[ib+m1] * dm(iw1_local,iw2_local);
 
-                                            //(<chi_mu|d/dX alpha_m>)<chi_nu|alpha_m'> + (<chi_nu|d/dX alpha_m'>)<chi_mu|alpha_m>
-                                            // = -(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'> - (<d/dX chi_nu|alpha_m'>)<chi_mu|alpha_m>
-                                            gdmx[ibt2][inl][m1*nm + m2] -= fact_x;                                               
-                                            gdmy[ibt2][inl][m1*nm + m2] -= fact_y;                                               
-                                            gdmz[ibt2][inl][m1*nm + m2] -= fact_z;
+                                            //(<chi_nu|d/dX alpha_m'>)<chi_mu|alpha_m> = -(<d/dX chi_nu|alpha_m'>)<chi_mu|alpha_m>
+                                            gdmx[ibt2][inl][m2*nm+m1] -= nlm2[1][ib+m2] * nlm1[ib+m1] * dm(iw1_local,iw2_local);                                               
+                                            gdmy[ibt2][inl][m2*nm+m1] -= nlm2[2][ib+m2] * nlm1[ib+m1] * dm(iw1_local,iw2_local);                                               
+                                            gdmz[ibt2][inl][m2*nm+m1] -= nlm2[3][ib+m2] * nlm1[ib+m1] * dm(iw1_local,iw2_local);                                            
 
                                         }
                                     }
@@ -568,6 +571,10 @@ void LCAO_Deepks::check_gdmx(const int nat)
     ofstream ofs_x;
     ofstream ofs_y;
     ofstream ofs_z;
+
+    ofs_x<<std::setprecision(12);
+    ofs_y<<std::setprecision(12);
+    ofs_z<<std::setprecision(12);
 
     const int pdm_size = (this->lmaxd * 2 + 1) * (this->lmaxd * 2 + 1);
     for(int ia=0;ia<nat;ia++)
