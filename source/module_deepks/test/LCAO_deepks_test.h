@@ -35,11 +35,11 @@ public:
 	ORB_control ooo;
 
 	UnitCell_pseudo ucell;
-	output out;
 
 	Test_Deepks::Parallel_Orbitals ParaO;
+	Test_Deepks::K_Vectors kv;
 	LCAO_Deepks ld;
-	bool force_flag = 1;
+
 	int my_rank = 0;
 
 	double lcao_ecut = 0; // (Ry)
@@ -47,15 +47,11 @@ public:
 	double lcao_dr = 0.01;
 	double lcao_rmax = 30; // (a.u.)
 
-	int out_descriptor = 1;
 	int out_r_matrix = 0;
 
 	int lmax=2;
 	int ntype=0;
-
 	int nnr;
-
-	Test_Deepks::K_Vectors kv;
 
 	ModuleBase::matrix dm;
 	std::vector<ModuleBase::ComplexMatrix> dm_k;

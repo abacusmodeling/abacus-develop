@@ -154,9 +154,9 @@ void test_deepks::set_orbs(const double &lat0_in)
 			lcao_dk,
 			lcao_dr,
 			lcao_rmax,
-			out_descriptor,
+			GlobalV::out_descriptor,
 			out_r_matrix,
-			force_flag,
+			GlobalV::FORCE,
 			my_rank);
 		
 		ucell.infoNL.setupNonlocal(
@@ -170,7 +170,7 @@ void test_deepks::set_orbs(const double &lat0_in)
 			OGT,
 			ORB,
 			ucell.lat0,
-			out_descriptor,
+			GlobalV::out_descriptor,
 			lmax,
 			ucell.infoNL.nprojmax,
 			ucell.infoNL.nproj,
