@@ -49,6 +49,7 @@ public:
 	friend class Hamilt;
     friend class Stochastic_Iter;
 
+    // Use hpsi(cpu) in diagH_subspace.
 	void diagH_subspace(const int ik,
                   const int nstart,
                   const int nbnd,
@@ -56,6 +57,7 @@ public:
                   ModuleBase::ComplexMatrix &evc,
                   double *en);
     
+    // Use hpsi_cuda(gpu) in diagH_subspace instead of hpsi(cpu).
     void diagH_subspace_cuda(
         const int ik,
         const int nstart,
@@ -65,6 +67,7 @@ public:
         double *en,
         double2 *vkb_c);
 
+    // Calculate hpsi and spsi (FP32)
     void h_1psi_cuda(
         const int npw,
         const float2 *psi1d,
@@ -72,41 +75,48 @@ public:
         float2 *spsi,
         float2 *vkb_c);
     
+    // Calculate hpsi and spsi (FP64)
     void h_1psi_cuda(
         const int npw,
         const double2 *psi1d,
         double2 *hpsi,
         double2 *spsi,
         double2 *vkb_c);
-
+    
+    // hpsi (cpu)
     void h_1psi(
         const int npw,
         const std::complex<double> *psi1d,
         std::complex<double> *hpsi,
         std::complex<double> *spsi);
 
+    // Hpsi operation (FP32)
     void h_psi_cuda(
 		const float2 *psi,
 		float2 *hpsi,
         float2 *vkb_c,
 		const int m = 1); 
     
+    // Hpsi operation (FP64)
     void h_psi_cuda(
 		const double2 *psi,
 		double2 *hpsi,
         double2 *vkb_c,
 		const int m = 1); 
 
+    // In this version, spsi operation just copy psi into spsi.
     void s_1psi_cuda(
         const int npw,
         const float2 *psi,
         float2 *spsi);
     
+    // In this version, spsi operation just copy psi into spsi.
     void s_1psi_cuda(
         const int npw,
         const double2 *psi,
         double2 *spsi);
-
+    
+    // In this version, spsi operation just copy psi into spsi.
     void s_1psi(
         const int npw,
         const std::complex < double> *psi,
@@ -122,26 +132,31 @@ public:
     int *GR_index;
 
 #ifdef __CUDA
+    // vectors on device
     int *GR_index_d;
     double2 *d_becp;
     double2 *d_ps;
-    cublasHandle_t hpw_handle;
+    
+    cublasHandle_t hpw_handle; // cublas handle
 #endif
 
 	// add contributions of h*psi from
 	// non-local pseduopotentials
+    // add vnl_pp GPU version (FP32)
 	void add_nonlocal_pp_cuda(
 		float2 *hpsi_in,
 		const float2 *becp,
 		const float2 *d_vkb_c,
 		const int m);
     
+    // add vnl_pp GPU version (FP64)
     void add_nonlocal_pp_cuda(
 		double2 *hpsi_in,
 		const double2 *becp,
 		const double2 *d_vkb_c,
 		const int m);
 
+    // CPU version
     void add_nonlocal_pp(
 		std::complex<double> *hpsi,
 		const std::complex<double> *becp,
@@ -149,6 +164,7 @@ public:
 
 	private:
 
+    // Ddot operations.
 	double ddot_real(
 		const int& npw,
 		const std::complex<double>* psi_L,
@@ -168,7 +184,7 @@ public:
                           const std::complex<double> *psik )const ;
 
 	private:
-
+    // Use Lapack to solve eigenvalue problem.
     void diag_zheev
     (
         const int& npw,
