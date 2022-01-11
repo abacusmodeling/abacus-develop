@@ -1,12 +1,3 @@
-//==========================================================
-// AUTHOR : wangjp
-// Data :2009-04
-// Last Update:
-//
-// 09-05-10 modify SchmitOrth() diag_zhegvx() as static
-// member function
-//==========================================================
-
 #ifndef Diago_David_CUH
 #define Diago_David_CUH
 
@@ -18,7 +9,8 @@ public:
 
     Diago_David_CUDA();
     ~Diago_David_CUDA();
-
+    
+    // SchmitOrth in Davison Method.
     static void SchmitOrth(
         const int& npw,
         const int n_band,
@@ -26,7 +18,8 @@ public:
         const ModuleBase::ComplexMatrix &psi,
         double2* psi_m,
         double2* spsi);
-
+    
+    // Use LapackConnector::zhegvx operations.
     static void diag_zhegvx(
         const int& n,
         const int& m,
@@ -36,6 +29,7 @@ public:
         double* e,
         ModuleBase::ComplexMatrix &vc);
 
+    // Solving for eigenvalues using davison's method 
     void diag(
         ModuleBase::ComplexMatrix &psi,
         double *en,
@@ -52,6 +46,7 @@ private:
 
     int test_david;
 
+    // calculate gradient
     void cal_grad(
         const int& npw,
         const int& nbase,
@@ -79,7 +74,7 @@ private:
         ModuleBase::ComplexMatrix &hc,
         ModuleBase::ComplexMatrix &sc);
 
-
+    // Update hp, sp, basis and reduce Hamiltonian.
     void refresh(
         const int& npw,
         const int& nband,
@@ -93,6 +88,7 @@ private:
         ModuleBase::ComplexMatrix &sc,
         ModuleBase::ComplexMatrix &vc);
 
+    // Calculate residuals.
     void cal_err(
         const int& npw,
         const int& nband,
