@@ -47,6 +47,8 @@ public:
 	void operator*=(const std::complex < double> c);
 
 	void operator*=(const ComplexArray &in);
+	bool operator== (const ComplexArray &cd2)const;
+	bool operator!= (const ComplexArray &cd2)const;
 
 	// subscript operator
 	std::complex < double> &operator()

@@ -6,22 +6,10 @@
 ***********************************************/
 
 /**
-* function "inline void ComplexArray::operator=(const std::complex < double> c)" 
-* has some error. 
-*
-* The declare of this function is in .h file, but the definition is in .cpp file,
-* and this would cause error when only include the .h file in this .cpp file.
-*
-* the definition of this function should be in .h file, 
-* or do not define as an "inline" function, but a normal function.
-*/
-
-
-/**
 * - Tested Function:
 *   - operator "=":
 *       - assign a complex to all elements of a ComplexArray
-*       - assign a ComplexArray to another a ComplexArray
+*       - assign a ComplexArray to another ComplexArray
 *
 *   - operator "+":
 *       - one ComplexArray plus another ComplexArray that has
@@ -58,7 +46,7 @@
 *       similar as "*"
 *
 *   - oprator "()":
-*       - assess the element
+*       - access the element
 */
 
 
@@ -96,47 +84,20 @@ class ComplexArray_test : public testing::Test
 
 };
 
-bool Compare(ModuleBase::ComplexArray &ca1, ModuleBase::ComplexArray &ca2)
-{
-    if (ca1.getSize() != ca2.getSize()) {return false;}
-    if (ca1.getBound1() != ca2.getBound1()) {return false;}
-    if (ca1.getBound2() != ca2.getBound2()) {return false;}
-    if (ca1.getBound3() != ca2.getBound3()) {return false;}
-    if (ca1.getBound4() != ca2.getBound4()) {return false;}
-    for ( int i = 0;i < ca1.getBound1();i++)
-    {
-        for ( int j = 0;j < ca1.getBound2();j++)
-        {
-            for ( int k = 0;k < ca1.getBound3();k++)
-            {
-                for ( int l = 0;l < ca1.getBound4();l++)
-                {
-                    if (ca1(i,j,k,l) != ca2(i,j,k,l)) {return false;}
-                }
-            }
-        }
-    }
-    return true;
-}
-
-
 TEST_F(ComplexArray_test,operator_equal)
 {   
-    c2 = a2;
-    b2 = a2;
-    EXPECT_TRUE(Compare(c2,a2));
-    EXPECT_TRUE(Compare(b2,a2));
-    //EXPECT_NE(c2,a4);
+    c2 = a2; //c2 is not assigned
+    b2 = a2; //b2 is arrigned by a complex
+    EXPECT_EQ(c2,a2);
+    EXPECT_EQ(b2,a2);
+    EXPECT_NE(c2,a4);
     EXPECT_DEATH(c2=a4,"");
-    //EXPECT_DEATH(d2=a2,"");
 }
 
 TEST_F(ComplexArray_test,operator_plus)
 {
     c2 = a2 + b2;
-    EXPECT_TRUE(Compare(c2,a2_plus_b2));
-    //std::cout << "a2+d2" << std::endl;
-    //a2 + d2;
+    EXPECT_EQ(c2,a2_plus_b2);
     EXPECT_DEATH(a2+a4,"");
     //EXPECT_DEATH(a2+d2,"");
 }
@@ -144,7 +105,7 @@ TEST_F(ComplexArray_test,operator_plus)
 TEST_F(ComplexArray_test,operator_plus_equal)
 {
     a2 += b2;
-    EXPECT_TRUE(Compare(a2,a2_plus_b2));
+    EXPECT_EQ(a2,a2_plus_b2);
     EXPECT_DEATH(a2+=a4,"");
     //EXPECT_DEATH(a2+=d2,"");
 }
@@ -152,7 +113,7 @@ TEST_F(ComplexArray_test,operator_plus_equal)
 TEST_F(ComplexArray_test,operator_minus)
 {
     c2 = a2 - b2;
-    EXPECT_TRUE(Compare(c2,a2_minus_b2));
+    EXPECT_EQ(c2,a2_minus_b2);
     EXPECT_DEATH(a2-a4,"");
     //EXPECT_DEATH(a2-d2,"");
 }
@@ -160,7 +121,7 @@ TEST_F(ComplexArray_test,operator_minus)
 TEST_F(ComplexArray_test,operator_minus_equal)
 {      
     a2 -= b2;
-    EXPECT_TRUE(Compare(a2,a2_minus_b2));
+    EXPECT_EQ(a2,a2_minus_b2);
     EXPECT_DEATH(a2-=a4,"");
     //EXPECT_DEATH(a2-=d2,"");
 }
@@ -169,9 +130,10 @@ TEST_F(ComplexArray_test,operator_minus_equal)
 TEST_F(ComplexArray_test,operator_multiply)
 {
     c2 = a2 * com2;
-    EXPECT_TRUE(Compare(c2,a2_mult_b2));
+    EXPECT_EQ(c2,a2_mult_b2);
+
     c2 = a2*3.0;
-    EXPECT_TRUE(Compare(c2,a2_mult_3));
+    EXPECT_EQ(c2,a2_mult_3);
    // EXPECT_ANY_THROW(a2*a4);
    // EXPECT_ANY_THROW(a2*d2);
 }
@@ -180,15 +142,15 @@ TEST_F(ComplexArray_test,operator_multiply_equal)
 {
     c2 = a2;
     c2 *= b2;
-    EXPECT_TRUE(Compare(c2,a2_mult_b2));
+    EXPECT_EQ(c2,a2_mult_b2);
 
     c2 = a2;
     c2 *= 3.0;
-    EXPECT_TRUE(Compare(c2,a2_mult_3));
+    EXPECT_EQ(c2,a2_mult_3);
 
     c2 = a2;
     c2 *= com2;
-    EXPECT_TRUE(Compare(c2,a2_mult_b2));
+    EXPECT_EQ(c2,a2_mult_b2);
 
     EXPECT_DEATH(a2*=a4,"");
  //   EXPECT_DEATH(a2*=d2,"");
@@ -197,10 +159,10 @@ TEST_F(ComplexArray_test,operator_multiply_equal)
 TEST_F(ComplexArray_test,operator_parentheses)
 {
     c2 = a2;
-    EXPECT_TRUE(c2(0,0,0,0) == com1);
+    EXPECT_EQ(c2(0,0,0,0), com1);
 
     c2(1,0,0,0) = com2;
-    EXPECT_FALSE(Compare(c2,a2));
+    EXPECT_NE(c2,a2);
 
     EXPECT_DEATH(a2(1,1,1,0),"");
 }
