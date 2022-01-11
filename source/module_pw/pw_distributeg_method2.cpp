@@ -9,14 +9,14 @@
 namespace ModulePW
 {
 //
-// Distribute planewaves in reciprocal space to coreors.
+// Distribute planewaves in reciprocal space to cores.
 // Firstly, divide the sphere in reciprocal space into sticks, which are vertical to x-y plane.
 // Secondly, distribute these sticks to coreors.
 // 
 // Example
 //                                ---- ixy increasing --->
-// index of sticks 0, 1, 2, ..., nst_per[0]-1, nst_per[0], ..., nst_per[1], ...
-//                |___________________________|____________________________|___
+// index of sticks 0, 1, 2, ..., nst_per[0]-1, nst_per[0], ..., nst_per[1]-1, ...
+//                |___________________________|______________________________|___
 // ip                           0                            1              ...
 // 
 //Known: G, GT, GGT, ny, nx, nz, poolnproc, poolrank, ggecut
@@ -29,7 +29,6 @@ void PW_Basis::distribution_method2()
     // initial the variables needed by all proc.
     int tot_npw = 0;                     // total number of planewaves.
     this->nstot = 0;                     // total number of sticks.
-   // int st_start = 0;                    // index of the first stick on current proc.
     int *st_bottom2D = NULL;             // st_bottom2D[ixy], minimum z of stick on (x, y).
     int *st_length2D = NULL;             // st_length2D[ixy], number of planewaves in stick on (x, y).
 

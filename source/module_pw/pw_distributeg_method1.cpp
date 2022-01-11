@@ -9,17 +9,17 @@
 namespace ModulePW
 {
 //
-// Distribute planewaves in reciprocal space to coreors.
+// Distribute planewaves in reciprocal space to cores.
 // Firstly, divide the sphere in reciprocal space into sticks, which are vertical to x-y plane.
+// Secondly, distribute these sticks to coreors.
 // 
 // Example
-//                |  ---- ixy increasing ---> |  ---- ixy increasing --->  |...
-// index of sticks 0, 1, 2, ..., nst_per[0]-1, nst_per[0], ..., nst_per[1], ...
-//                |___________________________|____________________________|___
+//                |  ---- ixy increasing ---> |   ---- ixy increasing --->   |...
+// index of sticks 0, 1, 2, ..., nst_per[0]-1, nst_per[0], ..., nst_per[1]-1, ...
+//                |___________________________|______________________________|___
 // ip                           0                            1              ...
 //                             npw    approximate equal to  npw   approximate equal to...
 // 
-// Secondly, distribute these sticks to coreors.
 //Known: G, GT, GGT, ny, nx, nz, poolnproc, poolrank, ggecut
 //output: ig2isz[ig], istot2bigixy[is], ixy2istot[nxy], is2ixy[is], ixy2ip[ixy], startnsz_per[ip], nst_per[ip], nst
 //
@@ -27,7 +27,7 @@ void PW_Basis::distribution_method1()
 {
     ModuleBase::timer::tick("PW_Basis", "distributeg_method1");
 
-    // initial the variables needed by all proc.
+    // initial the variables needed by all process
     int tot_npw = 0;                     // total number of planewaves.
     this->nstot = 0;                     // total number of sticks.
     int *st_bottom2D = NULL;             // st_bottom2D[ixy], minimum z of stick on (x, y).
@@ -38,10 +38,10 @@ void PW_Basis::distribution_method1()
         // (1) Count the total number of planewaves (tot_npw) and sticks (this->nstot).                  
         
         // Actually we will scan [(2 * ibox[0] + 1) * (2 * ibox[1] + 1)] points on x-y plane,
-        // but we define st_length2D with (ny * nx) points here, because we assume that the diameter
-        // of the sphere is shorter than the sides of the cube.
-        st_length2D = new int[nxy];                    // the number of planewaves that belong to the stick located on (x, y).
-        st_bottom2D = new int[nxy];                    // the z-coordinate of the bottom of stick on (x, y).
+        // but we define st_length2D with (ny * nx) points here, because the diameter
+        // of the sphere should be shorter than the sides of the cube.
+        st_length2D = new int[nxy];
+        st_bottom2D = new int[nxy];
         ModuleBase::GlobalFunc::ZEROS(st_length2D, this->nxy);
         ModuleBase::GlobalFunc::ZEROS(st_bottom2D, this->nxy);
 
@@ -62,7 +62,7 @@ void PW_Basis::distribution_method1()
 #ifdef __MPI
         // Parallel line
 
-        // (2) Collect the x, y indexs, length, bottom of the sticks.
+        // (2) Collect the x, y indexs, and length of the sticks.
         int* st_i = new int[this->nstot];                           // x or x + nx (if x < 0) of stick.
         int* st_j = new int[this->nstot];                           // y or y + ny (if y < 0) of stick.
         int* st_length = new int[this->nstot];                      // number of planewaves in stick.
@@ -73,7 +73,7 @@ void PW_Basis::distribution_method1()
         // std::cout << "\nThe second step done\n";
         // ------------------------------------------------------------
 
-        // (3) Distribute sticks to cores.
+        // (3) Distribute the sticks to cores.
         int *npw_per = new int[this->poolnproc];  // number of planewaves on each core.
         this->nstnz_per = new int[this->poolnproc]; // nz * nst(number of sticks) on each core.
         this->startnsz_per = new int[this->poolnproc];
@@ -82,7 +82,7 @@ void PW_Basis::distribution_method1()
         ModuleBase::GlobalFunc::ZEROS(this->nstnz_per, poolnproc);
         ModuleBase::GlobalFunc::ZEROS(startnsz_per, poolnproc);
         
-        this->ixy2ip = new int[this->nxy];              // ip of core which contains stick on (x, y).
+        this->ixy2ip = new int[this->nxy];              // ip of core which contains the stick on (x, y).
         for (int ixy = 0; ixy < this->nxy; ++ixy)
         {
             this->ixy2ip[ixy] = -1;                 // meaning this stick has not been distributed or there is no stick on (x, y).
@@ -104,7 +104,7 @@ void PW_Basis::distribution_method1()
         // std::cout << "The 3-2 step done\n";
         // --------------------------------------------------------------------------------------
 
-        // (4) Send npw_per, nst[poolrank], st_* to all cores.
+        // (4) Send npw_per[ip], nst_per[ip] to all cores.
         this->npw = npw_per[0];
         this->nst = nst_per[0];
 
@@ -127,7 +127,7 @@ void PW_Basis::distribution_method1()
 
         this->ixy2istot = new int[nxy];
         this->istot2bigixy = new int[this->nstot];
-        this->ixy2ip = new int[nxy];              // ip of core which contains stick on (x, y).
+        this->ixy2ip = new int[nxy];
         int st_move = 0;
         for (int ixy = 0; ixy < nxy; ++ixy)
         {
@@ -140,8 +140,8 @@ void PW_Basis::distribution_method1()
             }
             else
             {
-            ixy2istot[ixy] = -1;
-            ixy2ip[ixy] = -1;
+                ixy2istot[ixy] = -1;
+                ixy2ip[ixy] = -1;
             }
         }
 #endif
@@ -205,7 +205,7 @@ void PW_Basis::collect_st(
     int* st_bottom2D,                               // the z-coordinate of the bottom of stick on (x, y), stored in 2d x-y plane.
     int* st_i,                                      // x or x + nx (if x < 0) of stick.
     int* st_j,                                      // y or y + ny (if y < 0) of stick.
-    int* st_length                                 // number of planewaves in stick, stored in 1d array with this->nstot elements.
+    int* st_length                                  // number of planewaves in stick, stored in 1d array with this->nstot elements.
 )
 {
     int *temp_st_i = new int[this->nstot];                      // x or x + nx (if x < 0) of stick.
@@ -215,7 +215,7 @@ void PW_Basis::collect_st(
 
     int ibox[3] = {0, 0, 0};                            // an auxiliary vector, determine the boundary of the scanning area.
     ibox[0] = int(this->nx / 2) + 1;                    // scan x from -ibox[0] to ibox[0].
-    ibox[1] = int(this->ny / 2) + 1;                    // scan y from -ibox[1] to ibox[1].
+    ibox[1] = int(this->ny / 2) + 1;                    // scan y from -ibox[1] to ibox[1], if not gamma-only.
     ibox[2] = int(this->nz / 2) + 1;                    // scan z from -ibox[2] to ibox[2].
 
     ModuleBase::Vector3<double> f;
@@ -274,13 +274,15 @@ void PW_Basis::collect_st(
 
     int *st_sorted_index = new int[this->nstot]; // indexs in the order of length increasing.
     st_sorted_index[0] = 0;
-    ModuleBase::heapsort(this->nstot, temp_st_length, st_sorted_index); // sort st_* in the order of length decreasing.
+    ModuleBase::heapsort(this->nstot, temp_st_length, st_sorted_index); // sort st_* in the order of length increasing.
 
+    int index = 0;  // indexs in the order of length decreasing.
     for (int istot = 0; istot < this->nstot; ++istot)
     {
-        st_length[istot] = static_cast<int>(temp_st_length[istot]);
-        st_i[istot] = temp_st_i[st_sorted_index[istot]];
-        st_j[istot] = temp_st_j[st_sorted_index[istot]];
+        index = (this->nstot - 1) - istot;
+        st_length[index] = static_cast<int>(temp_st_length[istot]);
+        st_i[index] = temp_st_i[st_sorted_index[istot]];
+        st_j[index] = temp_st_j[st_sorted_index[istot]];
     }
     // std::cout << "st_length    ";
     // for (int is = 0; is < this->nstot; ++is) std::cout << st_length[is] << std::setw(4);
@@ -343,7 +345,7 @@ void PW_Basis::divide_sticks(
                 // }
             }
         }
-        nst_per[ipmin]++;
+        this->nst_per[ipmin]++;
         this->nstnz_per[ipmin] += this->nz;
         npw_per[ipmin] += st_length[is];
         this->ixy2ip[st_i[is] * this->ny + st_j[is]] = ipmin;

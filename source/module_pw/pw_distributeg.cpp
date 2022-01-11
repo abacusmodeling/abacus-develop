@@ -41,12 +41,12 @@ void PW_Basis::count_pw_st(
 {
     int ibox[3] = {0, 0, 0};                            // an auxiliary vector, determine the boundary of the scanning area.
     ibox[0] = int(this->nx / 2) + 1;                    // scan x from -ibox[0] to ibox[0].
-    ibox[1] = int(this->ny / 2) + 1;                    // scan y from -ibox[1] to ibox[1].
+    ibox[1] = int(this->ny / 2) + 1;                    // scan y from -ibox[1] to ibox[1], if not gamma-only.
     ibox[2] = int(this->nz / 2) + 1;                    // scan z from -ibox[2] to ibox[2].
 
     ModuleBase::Vector3<double> f;
 
-    int iy_start = -ibox[1]; // determine the scaning area along x-direct, if gamma-only, only positive axis is used.
+    int iy_start = -ibox[1]; // determine the scaning area along y-direct, if gamma-only, only positive axis is used.
     int iy_end = ibox[1];
     if (this->gamma_only)
     {
@@ -69,7 +69,7 @@ void PW_Basis::count_pw_st(
             if (y < 0) y += this->ny;
             int index = x * this->ny + y;
 
-            int length = 0; // number of planewave in stick (x, y).
+            int length = 0; // number of planewave on stick (x, y).
             for (int iz = -ibox[2]; iz <= ibox[2]; ++iz)
             {
                 f.x = ix;
@@ -113,14 +113,14 @@ void PW_Basis::get_ig2isz_is2ixy(
     {
         this->ig2isz = new int[1]; // map ig to the z coordinate of this planewave.
         this->ig2isz[0] = 0;
-        this->is2ixy = new int[1]; // map is (index of sticks) to ixy (ix + iy * nx).
+        this->is2ixy = new int[1]; // map is (index of sticks) to ixy (iy + ix * ny).
         this->is2ixy[0] = -1;
         return;
     }
 
     this->ig2isz = new int[this->npw]; // map ig to the z coordinate of this planewave.
     ModuleBase::GlobalFunc::ZEROS(this->ig2isz, this->npw);
-    this->is2ixy = new int[this->nst]; // map is (index of sticks) to ixy (ix + iy * nx).
+    this->is2ixy = new int[this->nst]; // map is (index of sticks) to ixy (iy + ix * ny).
     for (int is = 0; is < this->nst; ++is) 
     {
         this->is2ixy[is] = -1;
