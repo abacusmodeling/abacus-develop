@@ -56,7 +56,9 @@ class Hamilt
 		ModuleBase::ComplexMatrix &hvec); // output: eigenvectors
 
 #ifdef __CUDA
-	cusolverDnHandle_t cusolver_handle;
+	cusolverDnHandle_t cusolver_handle; // cusolver handle
+
+	// Use hpsi_cuda to do operations in diagH_subspace instead of hpsi.
 	void diagH_subspace_cuda(
 		const int ik,
 		const int nstart,
@@ -66,6 +68,7 @@ class Hamilt
 		double *en,
 		double2 *d_ekb_c);
 
+	// Use cusolver API to solve eigenvalue problems instead Lapack.
 	void diagH_CUSOLVER(
 		const int nstart,
 		const int nbands,
@@ -78,6 +81,8 @@ class Hamilt
 
 #ifdef __ROCM
 	// rocsolver_handle rocsolver_handle;
+
+	// Use hpsi_cuda to do operations in diagH_subspace instead of hpsi.
 	void diagH_subspace_cuda(
 		const int ik,
 		const int nstart,
@@ -86,15 +91,6 @@ class Hamilt
 		hipblasDoubleComplex* evc,
 		double *en,
 		hipblasDoubleComplex *d_ekb_c);
-
-	void diagH_CUSOLVER(
-		const int nstart,
-		const int nbands,
-		hipblasDoubleComplex* hc,  // nstart * nstart
-		hipblasDoubleComplex* sc,  // nstart * nstart
-		const int ldh, // nstart
-		double *e,
-		hipblasDoubleComplex* hvec);
 #endif
 
     Hamilt_PW hpw;
