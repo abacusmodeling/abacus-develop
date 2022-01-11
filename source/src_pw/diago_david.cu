@@ -68,7 +68,6 @@ void Diago_David_CUDA::diag
 
     assert( order > 1 );
     assert( order*nband < npw * GlobalV::NPROC_IN_POOL ); 
-    //qianrui change it 2021-7-25. 
     //In strictly speaking, it shoule be order*nband < npw sum of all pools. We roughly estimate it here.
     //However, in most cases, total number of plane waves should be much larger than nband*order
 
@@ -85,13 +84,6 @@ void Diago_David_CUDA::diag
     CHECK_CUDA(cudaMalloc((void**)&hp, nbase_x*npw*sizeof(double2)));
     CHECK_CUDA(cudaMalloc((void**)&sp, nbase_x*npw*sizeof(double2)));
 
-
-    // ModuleBase::ComplexMatrix hc( nbase_x, nbase_x );		// Hamiltonian on the reduced basis
-    // ModuleBase::ComplexMatrix sc( nbase_x, nbase_x );		// Overlap on the reduced basis
-    // ModuleBase::ComplexMatrix vc( nbase_x, nbase_x );		// Eigenvectors of hc
-    // double* e = new double[nbase_x];			// the lowest N eigenvalues of hc
-    // assert(e != 0) ;
-
     double2* hc;
     double2* sc;
     double2* vc;
@@ -101,17 +93,6 @@ void Diago_David_CUDA::diag
     CHECK_CUDA(cudaMalloc((void**)&vc, nbase_x*nbase_x*sizeof(double2)));
     // CHECK_CUDA(cudaMalloc((void**)&e, nbase_x*sizeof(double)));
     assert(e != 0);
-
-    // double2* psi_m = new double2[npw] ;
-    // assert(psi_m != 0) ;
-    // double2* hpsi = new double2[npw] ;
-    // assert(hpsi != 0) ;
-    // double2* spsi = new double2[npw] ;
-    // assert(spsi != 0) ;
-    // double2* ppsi = new double2[npw] ;
-    // assert(ppsi != 0) ;
-    // double2* respsi = new double2[npw] ;
-    // assert(respsi != 0) ;
 
     double2* psi_m;
     double2* hpsi;
@@ -123,7 +104,6 @@ void Diago_David_CUDA::diag
     CHECK_CUDA(cudaMalloc((void**)&spsi, npw*sizeof(double2)));
     CHECK_CUDA(cudaMalloc((void**)&ppsi, npw*sizeof(double2)));
     CHECK_CUDA(cudaMalloc((void**)&respsi, npw*sizeof(double2)));
-    // TODO: add assert ...
 
     // bool* convflag = new bool[nband] ;	// convflag[m] = true if the m th band is convergent
     // assert(convflag != 0) ;
@@ -132,8 +112,6 @@ void Diago_David_CUDA::diag
 
     bool* convflag = new bool[nband];
     int* unconv = new int[nband];
-    // TODO: add assert
-
     int nbase = 0;						// the dimension of the reduced basis set
     notconv = nband;					// the number of the unconvergent bands
     // ModuleBase::GlobalFunc::ZEROS( convflag, nband );
@@ -203,14 +181,7 @@ void Diago_David_CUDA::diag
         }
 
         ModuleBase::timer::tick("Diago_David_CUDA","check_update");
-        /*
-        		// test_david==2 std::cout info of each iteration
-        		if( test_david==2 )
-        		{
-        			std::cout << "iter = " << dav_iter << " notconv = " << notconv << std::endl;
-        			out.printr1_d( "energy", en, nband );
-        		}
-        */
+
         if ( !notconv || ( nbase + notconv > nbase_x) || (dav_iter == maxiter) )
         {
             ModuleBase::timer::tick("Diago_David_CUDA","last");
@@ -302,8 +273,6 @@ void Diago_David_CUDA::cal_grad
     for ( int m = 0; m < notconv; m++ )
     {
         // ModuleBase::GlobalFunc::ZEROS( respsi, npw );
-        // TODO: zeros(respsi);
-
         // for ( int i = 0; i < nbase; i++ )
         // {
         //     for ( int ig = 0; ig < npw; ig++ )
@@ -393,19 +362,6 @@ void Diago_David_CUDA::cal_elem
     return;
 }
 
-//==============================================================================
-// optimize diag_zhegvx().
-
-// 09-05-09 wangjp
-// fixed a bug in diag_zhegvx().
-// modify the dimension of h and s as (n,n) and copy the leading N*N
-// part of hc & sc into h & s
-
-// 09-05-10 wangjp
-// As the complexmatrixs will be copied again in the subroutine ZHEGVX(...  ),
-// i.e ZHEGVX(...) will not destroy the input complexmatrixs,
-// we needn't creat another two complexmatrixs in diag_zhegvx().
-//==============================================================================
 void Diago_David_CUDA::diag_zhegvx
 (
     const int& n,
