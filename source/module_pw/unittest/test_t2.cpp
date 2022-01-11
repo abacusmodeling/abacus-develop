@@ -52,7 +52,8 @@ int main(int argc,char **argv)
     //init
     pwtest.initgrids(lat0,latvec,wfcecut);
     //pwtest.initgrids(lat0,latvec,5,7,7);
-    pwtest.initparameters(gamma_only,wfcecut,nproc_in_pool,rank_in_pool,1);
+    // pwtest.initparameters(gamma_only,wfcecut,nproc_in_pool,rank_in_pool,1);
+    pwtest.initparameters(gamma_only,wfcecut,nproc_in_pool,rank_in_pool,2);
     pwtest.setuptransform();
     pwtest.collect_local_pw();
 
@@ -71,8 +72,8 @@ int main(int argc,char **argv)
     complex<double> * rhog = new complex<double> [npw];
     for(int ig = 0 ; ig < npw ; ++ig)
     {
-        // rhog[ig] = 1.0/(pwtest.gg[ig]+1) + ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ig].x+1) + 1);
-        rhog[ig] = 1.0/(pwtest.gg[ig]+1);
+        rhog[ig] = 1.0/(pwtest.gg[ig]+1) + ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ig].x+1) + 1);
+        // rhog[ig] = 1.0/(pwtest.gg[ig]+1);
         //rhog[ig] = 1.0;
     }    
 
@@ -95,10 +96,12 @@ int main(int argc,char **argv)
     fftend = clock();
     double fftduration = (double)(fftend - fftstart)/CLOCKS_PER_SEC;
 
-    cout<<"\n";
-    cout<<"spend "<<fftduration<<"s\n";
-   
-    if(rank_in_pool==0) ModuleBase::timer::finish(GlobalV::ofs_running, true);
+    if(rank_in_pool==0)
+    {
+        ModuleBase::timer::finish(GlobalV::ofs_running, true);
+        cout<<"\n";
+        cout<<"spend "<<fftduration<<"s\n";
+    }
    
     if(tmp!=NULL) delete []tmp; 
     // MPI_Barrier(MPI_COMM_WORLD);

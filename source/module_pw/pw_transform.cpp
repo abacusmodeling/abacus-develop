@@ -37,8 +37,8 @@ void PW_Basis:: real2recip(std::complex<double> * in, std::complex<double> * out
     {
         out[ig] = this->ft.aux1[this->ig2isz[ig]];
     }
-    return;
     ModuleBase::timer::tick("PW_Basis", "real2recip");
+    return;
 }
 
 //

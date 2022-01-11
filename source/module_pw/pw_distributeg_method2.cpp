@@ -51,14 +51,14 @@ void PW_Basis::distribution_method2()
         std::cout << "The first step done\n";
         std::cout << "tot_npw   " << tot_npw << '\n';
         std::cout << "this->nstot   " << this->nstot << '\n';
-        for (int ix = 0; ix < nx; ++ix)
-        {
-            for (int iy = 0; iy < ny; ++iy)
-            {
-                std::cout << st_length2D[ix * ny + iy] << std::setw(4);
-            }
-            std::cout << '\n';
-        }
+        // for (int ix = 0; ix < nx; ++ix)
+        // {
+        //     for (int iy = 0; iy < ny; ++iy)
+        //     {
+        //         std::cout << st_length2D[ix * ny + iy] << std::setw(4);
+        //     }
+        //     std::cout << '\n';
+        // }
         // ------------------------------------------------------------
 
         // (2) Devide the sticks to each core, sticks are in the order of ixy increasing.
@@ -67,7 +67,7 @@ void PW_Basis::distribution_method2()
         this->divide_sticks2();
         // for test ----------------------------------------------------------------------------
         std::cout << "nst_per  ";
-        for (int ip = 0; ip < this->poolnproc; ++ip) std::cout << nst_per[ip] << std::setw(4);
+        for (int ip = 0; ip < this->poolnproc; ++ip) std::cout << nst_per[ip] << std::setw(10);
         std::cout << "\n";
         //-------------------------------------------------------------------------------------- 
 
@@ -78,7 +78,7 @@ void PW_Basis::distribution_method2()
         this->create_maps(st_length2D, npw_per);
         // for test ----------------------------------------------------------------------------
         std::cout << "npw_per  ";
-        for (int ip = 0; ip < this->poolnproc; ++ip) std::cout << npw_per[ip] << std::setw(4);
+        for (int ip = 0; ip < this->poolnproc; ++ip) std::cout << npw_per[ip] << std::setw(10);
         std::cout << "\n";
         //-------------------------------------------------------------------------------------- 
 
@@ -137,7 +137,7 @@ void PW_Basis::distribution_method2()
     // for test ----------------------------------------------
     if (poolrank==0) std::cout << "The fifth step done\n";
     // -------------------------------------------------------
-    ModuleBase::timer::tick("PW_Basis", "distributeg_method1");
+    ModuleBase::timer::tick("PW_Basis", "distributeg_method2");
     return;
 }
 
