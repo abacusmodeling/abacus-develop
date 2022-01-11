@@ -40,7 +40,7 @@ void Run_MD_LCAO::opt_cell(void)
     // npwx may change according to cell change
     // this function belongs to cell LOOP
     GlobalC::wf.allocate_ekb_wg(GlobalC::kv.nks);
-    
+
     // Initialize the FFT.
     // this function belongs to cell LOOP
     GlobalC::UFFT.allocate();
