@@ -1,5 +1,4 @@
 #include "../MD_func.h"
-#include "../LJ_potential.h"
 #include "setcell.cpp"
 #include "gtest/gtest.h"
 

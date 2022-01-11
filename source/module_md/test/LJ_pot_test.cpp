@@ -19,6 +19,7 @@ protected:
 		force = new ModuleBase::Vector3<double> [natom];
 		stress.create(3,3);
 
+		parameters();
 		Grid_Driver grid_neigh(0,0,0);
 		neighbor(grid_neigh, ucell);
 

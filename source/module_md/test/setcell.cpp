@@ -92,6 +92,30 @@ void neighbor(Grid_Driver &grid_neigh, UnitCell_pseudo &ucell)
     INPUT.mdp.rcut_lj *= ModuleBase::ANGSTROM_AU;
 	INPUT.mdp.epsilon_lj /= ModuleBase::Hartree_to_eV;
 	INPUT.mdp.sigma_lj *= ModuleBase::ANGSTROM_AU;
-
     atom_arrange::search(1, ofs, grid_neigh, ucell, GlobalV::SEARCH_RADIUS, 0, 0);
+}
+
+void parameters()
+{
+    GlobalV::SEARCH_RADIUS = 8.5 * ModuleBase::ANGSTROM_AU;
+
+    INPUT.mdp.rstMD = 0;
+    INPUT.mdp.dt = 1;
+    INPUT.mdp.tfirst = INPUT.mdp.tlast = 300;
+
+    INPUT.mdp.md_potential = "LJ";
+    INPUT.mdp.rcut_lj = 8.5;
+    INPUT.mdp.epsilon_lj = 0.01032; 
+	INPUT.mdp.sigma_lj = 3.405;
+
+    INPUT.mdp.direction = 2;
+	INPUT.mdp.Qmass = 1;
+	INPUT.mdp.velocity = 0;
+	INPUT.mdp.viscosity = 0;
+	INPUT.mdp.tscale = 0.01;
+
+    INPUT.mdp.tfreq = 1;
+    INPUT.mdp.MNHC = 4;
+
+    INPUT.mdp.damp = 1;
 }
