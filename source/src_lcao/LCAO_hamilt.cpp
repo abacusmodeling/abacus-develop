@@ -797,6 +797,13 @@ void LCAO_Hamilt::calculate_HSR_sparse(const int &current_spin, const double &sp
         }
     }
 
+    if (GlobalC::exx_global.info.hybrid_type==Exx_Global::Hybrid_Type::HF
+        || GlobalC::exx_global.info.hybrid_type==Exx_Global::Hybrid_Type::PBE0
+        || GlobalC::exx_global.info.hybrid_type==Exx_Global::Hybrid_Type::HSE)
+    {
+        calculate_HR_exx_sparse(current_spin, sparse_threshold);
+    }
+
     clear_zero_elements(current_spin, sparse_threshold);
 
 }
@@ -1031,6 +1038,80 @@ void LCAO_Hamilt::calculat_HR_dftu_soc_sparse(const int &current_spin, const dou
 
     ModuleBase::timer::tick("LCAO_Hamilt","calculat_HR_dftu_soc_sparse");
 
+}
+
+// Peize Lin add 2021.11.16
+void LCAO_Hamilt::calculate_HR_exx_sparse(const int &current_spin, const double &sparse_threshold)
+{
+	ModuleBase::TITLE("LCAO_Hamilt","calculate_HR_exx_sparse");
+	ModuleBase::timer::tick("LCAO_Hamilt","calculate_HR_exx_sparse");	
+
+	const Abfs::Vector3_Order<int> Rs_period(GlobalC::kv.nmp[0], GlobalC::kv.nmp[1], GlobalC::kv.nmp[2]);
+	if(Rs_period.x<=0 || Rs_period.y<=0 || Rs_period.z<=0)
+		throw std::invalid_argument("Rs_period = ("+ModuleBase::GlobalFunc::TO_STRING(Rs_period.x)+","+ModuleBase::GlobalFunc::TO_STRING(Rs_period.y)+","+ModuleBase::GlobalFunc::TO_STRING(Rs_period.z)+").\n"
+			+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+	const std::vector<Abfs::Vector3_Order<int>> Rs = Abfs::get_Born_von_Karmen_boxes( Rs_period );
+
+
+	const int ik_begin = (GlobalV::NSPIN==2) ? (current_spin*GlobalC::kv.nks/2) : 0;
+	const int ik_end = (GlobalV::NSPIN==2) ? ((current_spin+1)*GlobalC::kv.nks/2) : GlobalC::kv.nks;
+	for(const Abfs::Vector3_Order<int> &R : Rs)
+	{
+		ModuleBase::matrix HexxR;
+		for(int ik=ik_begin; ik<ik_end; ++ik)
+		{
+			ModuleBase::matrix HexxR_tmp;
+			if(GlobalV::GAMMA_ONLY_LOCAL)
+				HexxR_tmp = GlobalC::exx_global.info.hybrid_alpha
+					* GlobalC::exx_lcao.Hexx_para.HK_Gamma_m2D[ik];
+			else
+				HexxR_tmp = GlobalC::exx_global.info.hybrid_alpha
+					* (GlobalC::exx_lcao.Hexx_para.HK_K_m2D[ik]
+					* std::exp( ModuleBase::TWO_PI*ModuleBase::IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (R*GlobalC::ucell.latvec)) )).real();
+
+			if(HexxR.c)
+				HexxR += HexxR_tmp;
+			else
+				HexxR = std::move(HexxR_tmp);
+		}
+
+		for(int iwt1_local=0; iwt1_local<HexxR.nr; ++iwt1_local)
+		{
+			const int iwt1_global = (GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")
+				? GlobalC::ParaO.MatrixInfo.col_set[iwt1_local]
+				: GlobalC::ParaO.MatrixInfo.row_set[iwt1_local];
+			for(int iwt2_local=0; iwt2_local<HexxR.nc; ++iwt2_local)
+			{
+				const int iwt2_global = (GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")
+					? GlobalC::ParaO.MatrixInfo.row_set[iwt2_local]
+					: GlobalC::ParaO.MatrixInfo.col_set[iwt2_local];
+				if(std::abs(HexxR(iwt1_local,iwt2_local)) > sparse_threshold)
+				{
+					if(GlobalV::NSPIN==1 || GlobalV::NSPIN==2)
+					{
+						auto &HR_sparse_ptr = GlobalC::LM.HR_sparse[current_spin][R][iwt1_global];
+						auto &HR_sparse = HR_sparse_ptr[iwt2_global];
+						HR_sparse += HexxR(iwt1_local,iwt2_local);
+						if(std::abs(HR_sparse) < sparse_threshold)
+							HR_sparse_ptr.erase(iwt2_global);
+					}
+					else
+					{
+						auto &HR_sparse_ptr = GlobalC::LM.HR_soc_sparse[R][iwt1_global];
+						auto &HR_sparse = HR_sparse_ptr[iwt2_global];
+						HR_sparse += HexxR(iwt1_local,iwt2_local);
+						if(std::abs(HR_sparse) < sparse_threshold)
+							HR_sparse_ptr.erase(iwt2_global);
+					}
+				}
+			}
+		}
+	}
+
+    // In the future it should be changed to mpi communication, since some Hexx(R) of R in Rs may be zeros
+    GlobalC::LM.all_R_coor.insert(Rs.begin(),Rs.end());
+    
+	ModuleBase::timer::tick("LCAO_Hamilt","calculate_HR_exx_sparse");	
 }
 
 // in case there are elements smaller than the threshold

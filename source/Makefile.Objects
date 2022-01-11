@@ -249,6 +249,16 @@ read_rho.o\
 read_atoms.o\
 read_cell_pseudopots.o\
 read_dm.o\
+read_txt_tools.o\
+read_txt_stru.o\
+read_txt_input_value.o\
+read_txt_input_item.o\
+read_txt_input_list.o\
+read_txt_input_process.o\
+read_txt_input_process_global.o\
+read_txt_input-general.o\
+read_txt_input-pw.o\
+read_txt_input-spectrum.o\
 write_pot.o\
 write_rho.o\
 write_rho_cube.o\
