@@ -1,6 +1,4 @@
-add_library(
-    lcao
-    OBJECT
+list(APPEND objects
     DM_gamma.cpp
     DM_k.cpp
     ELEC_cbands_gamma.cpp
@@ -59,8 +57,11 @@ add_library(
     wavefunc_in_pw.cpp
 	H_TDDFT_pw.cpp
     run_md_lcao.cpp
+    dmft.cpp
 )
 
-if(ENABLE_DEEPKS)
-    target_sources(lcao PRIVATE LCAO_descriptor.cpp)
-endif()
+add_library(
+    lcao
+    OBJECT
+    ${objects}
+)

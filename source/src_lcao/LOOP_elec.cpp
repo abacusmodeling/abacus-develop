@@ -22,7 +22,7 @@
 #include "../src_pw/vdwd2.h"
 #include "../src_pw/vdwd3.h"
 #ifdef __DEEPKS
-#include "LCAO_descriptor.h"
+#include "../module_deepks/LCAO_deepks.h"
 #endif
 
 void LOOP_elec::solve_elec_stru(const int &istep)
@@ -79,6 +79,9 @@ void LOOP_elec::set_matrix_grid(void)
 		// and allocate the space for H(R) and S(R).
 		GlobalC::LNNR.cal_nnr();
 		GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
+#ifdef __DEEPKS
+		GlobalC::ld.allocate_V_deltaR(GlobalC::LNNR.nnr);
+#endif
 
 		// need to first calculae lgd.
 		// using GlobalC::GridT.init.
@@ -146,19 +149,20 @@ void LOOP_elec::before_solver(const int &istep)
 
 	// (9) compute S, T, Vnl, Vna matrix.
     GlobalC::UHM.set_lcao_matrices();
-    
+
 #ifdef __DEEPKS
-	//init deepks
-	if (INPUT.out_descriptor)
-	{
-		GlobalC::ld.init(GlobalC::ORB.get_lmax_d(), GlobalC::ORB.get_nchimax_d(), GlobalC::ucell.nat * GlobalC::ORB.Alpha[0].getTotal_nchi());
-		GlobalC::ld.build_S_descriptor(0);  //init overlap table
-		if (INPUT.deepks_scf)
-		{
-			//load a model
-			GlobalC::ld.deepks_pre_scf(INPUT.model_file);	//caoyu add 2021-07-26
-		}
-	}
+    //for each ionic step, the overlap <psi|alpha> must be rebuilt
+    //since it depends on ionic positions
+    if (GlobalV::out_descriptor)
+    {
+		//build and save <psi(0)|alpha(R)> at beginning
+        GlobalC::ld.build_psialpha(GlobalV::FORCE,
+			GlobalC::ucell,
+			GlobalC::ORB,
+			GlobalC::GridD,
+			GlobalC::ParaO,
+			GlobalC::UOT);
+    }
 #endif
 
     ModuleBase::timer::tick("LOOP_elec","before_solver"); 

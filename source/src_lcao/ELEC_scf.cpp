@@ -13,7 +13,7 @@
 //new
 #include "../src_pw/H_Ewald_pw.h"
 #ifdef __DEEPKS
-    #include "LCAO_descriptor.h"	//caoyu add 2021-06-04
+    #include "../module_deepks/LCAO_deepks.h"	//caoyu add 2021-06-04
 #endif
 
 ELEC_scf::ELEC_scf(){}
@@ -81,16 +81,16 @@ void ELEC_scf::scf(const int &istep)
 	{
         Print_Info::print_scf(istep, iter);
 
-		//time_t time_start, time_finish;
-		clock_t clock_start;
-
 		std::string ufile = "CHANGE";
 		Update_input UI;
 		UI.init(ufile);
 
 		if(INPUT.dft_plus_u) GlobalC::dftu.iter_dftu = iter;
-		//time_start= std::time(NULL);
-		clock_start = std::clock();
+#ifdef __MPI
+		auto clock_start = MPI_Wtime();
+#else
+		auto clock_start = std::chrono::system_clock::now();
+#endif
 		conv_elec = false;//mohan add 2008-05-25
 
 		// mohan add 2010-07-16
@@ -454,7 +454,11 @@ void ELEC_scf::scf(const int &istep)
 		}
 
 		//time_finish=std::time(NULL);
-		double duration = (double)(clock() - clock_start) / CLOCKS_PER_SEC;
+#ifdef __MPI
+		double duration = (double)(MPI_Wtime() - clock_start);
+#else
+		double duration = (double)(std::chrono::system_clock::now() - clock_start) / CLOCKS_PER_SEC;
+#endif
 		//double duration_time = difftime(time_finish, time_start);
 		//std::cout<<"Time_clock\t"<<"Time_time"<<std::endl;
 		//std::cout<<duration<<"\t"<<duration_time<<std::endl;
@@ -552,9 +556,17 @@ void ELEC_scf::scf(const int &istep)
 					GlobalV::ofs_running << " " << GlobalV::global_out_dir << " final etot is " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
 				}
 #ifdef __DEEPKS
-				if (INPUT.deepks_scf)	//caoyu add 2021-06-04
+				if (GlobalV::out_descriptor)	//caoyu add 2021-06-04
 				{
-					GlobalC::ld.save_npy_e(GlobalC::en.etot);//ebase = etot, no deepks E_delta including
+                    GlobalC::ld.save_npy_e(GlobalC::en.etot, "e_tot.npy");
+                    if (GlobalV::deepks_scf) {
+                        GlobalC::ld.save_npy_e(GlobalC::en.etot - GlobalC::ld.E_delta, "e_base.npy");//ebase :no deepks E_delta including
+                    }
+                    else
+                    {
+                        GlobalC::ld.save_npy_e(GlobalC::en.etot, "e_base.npy");  // no scf, e_tot=e_base
+                    }
+
 				}
 #endif
 			}

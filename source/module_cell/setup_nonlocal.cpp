@@ -79,7 +79,7 @@ void InfoNonlocal::Set_NonLocal(
 					dk,
 					dr_uniform); // delta k mesh in reciprocal space
 
-			tmpBeta_lm[p1].plot(GlobalV::MY_RANK);
+			if(GlobalV::out_element_info)tmpBeta_lm[p1].plot(GlobalV::MY_RANK);
 
 			delete[] beta_r;
 				
@@ -189,7 +189,7 @@ void InfoNonlocal::Set_NonLocal(
 					dk,
 					dr_uniform); // delta k mesh in reciprocal space
 
-			tmpBeta_lm[p1].plot(GlobalV::MY_RANK);
+			if(GlobalV::out_element_info)tmpBeta_lm[p1].plot(GlobalV::MY_RANK);
 
 			delete[] beta_r;
 		}
@@ -443,7 +443,7 @@ void InfoNonlocal::Read_NonLocal(
                 dk,
 				dr_uniform); // delta k mesh in reciprocal space
 
-		tmpBeta_lm[p1].plot(my_rank);
+		if(GlobalV::out_element_info)tmpBeta_lm[p1].plot(my_rank);
 
 		delete[] radial_ps;
 		delete[] rab_ps;

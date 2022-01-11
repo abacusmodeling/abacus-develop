@@ -1,7 +1,6 @@
 INPUT_PARAMETERS
 #Parameters	(General)
 suffix      	autotest
-pseudo_dir		./
 ntype			1	
 nbands			8
 calculation 	relax

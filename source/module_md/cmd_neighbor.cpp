@@ -39,7 +39,7 @@ ModuleBase::Vector3<double> CMD_neighbor::cell_periodic(const ModuleBase::Vector
 }
 
 //build the neighbor list
-void CMD_neighbor::neighbor(UnitCell_pseudo &ucell_c)
+void CMD_neighbor::neighbor(const UnitCell_pseudo &ucell_c)
 {
     ModuleBase::TITLE("CMD_neighbor", "Neighbor");
     ModuleBase::timer::tick("CMD_neighbor", "Neighbor");

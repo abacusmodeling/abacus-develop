@@ -209,7 +209,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 		const int startmag_type = [&]()->int
 		{
 			if(GlobalV::NSPIN==4)		//zhengdy-soc, type 2 is still wrong.
-				return 2;
+				return 1;
 			for(int it=0; it<GlobalC::ucell.ntype; it++)
 				for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 					if(GlobalC::ucell.atoms[it].mag[ia]!=0.0)
@@ -331,7 +331,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 				else if(spin_number_need==2)
 				{
 					if(startmag_type==1)
-					{ cout<<"this should not be called";
+					{
 						for (int ig = 0; ig < GlobalC::pw.ngmc ; ig++)
 						{
 							const std::complex<double> swap = GlobalC::pw.strucFac(it, ig)* rho_lgl[GlobalC::pw.ig2ngg[ig]];
@@ -375,7 +375,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 				{
 					//noncolinear case
 					if(startmag_type == 1)
-					{cout<<"this would not be call";
+					{
 						for (int ig = 0; ig < GlobalC::pw.ngmc ; ig++)
 						{
 							const std::complex<double> swap = GlobalC::pw.strucFac(it, ig)* rho_lgl[GlobalC::pw.ig2ngg[ig]];
@@ -753,6 +753,10 @@ void Charge::sum_band_k(void)
 		{
 			for (int ibnd = 0;ibnd < GlobalV::NBANDS;ibnd++)
 			{
+				///
+				///only occupied band should be calculated.
+				///
+				if(GlobalC::wf.wg(ik, ibnd)<1e-8) continue;
 				GlobalC::en.eband += GlobalC::wf.ekb[ik][ibnd] * GlobalC::wf.wg(ik, ibnd);
 				ModuleBase::GlobalFunc::ZEROS( porter, GlobalC::pw.nrxx );
 				for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
@@ -807,6 +811,10 @@ void Charge::sum_band_k(void)
 		else
 		for (int ibnd = 0;ibnd < GlobalV::NBANDS;ibnd++)
 		{
+			///
+			///only occupied band should be calculated.
+			///
+			if(GlobalC::wf.wg(ik, ibnd)<1e-8) continue;
 			GlobalC::en.eband += GlobalC::wf.ekb[ik][ibnd] * GlobalC::wf.wg(ik, ibnd);
 			//std::cout << "\n ekb = " << GlobalC::wf.ekb[ik][ibnd] << " wg = " << GlobalC::wf.wg(ik, ibnd);
 

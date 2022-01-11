@@ -1,7 +1,7 @@
 #include "FORCE_gamma.h"
 #include "../src_pw/global.h"
 #ifdef __DEEPKS
-#include "LCAO_descriptor.h"//caoyu add for deepks on 20210813
+#include "../module_deepks/LCAO_deepks.h"//caoyu add for deepks on 20210813
 #endif
 
 Force_LCAO_gamma::Force_LCAO_gamma ()
@@ -21,7 +21,12 @@ void Force_LCAO_gamma::ftable_gamma (
 	ModuleBase::matrix& soverlap,
 	ModuleBase::matrix& stvnl_dphi,
 	ModuleBase::matrix& svnl_dbeta,
+#ifdef __DEEPKS
+	ModuleBase::matrix& svl_dphi,
+	ModuleBase::matrix& svnl_dalpha)
+#else
 	ModuleBase::matrix& svl_dphi)
+#endif
 {
     ModuleBase::TITLE("Force_LCAO_gamma", "ftable");
     ModuleBase::timer::tick("Force_LCAO_gamma","ftable_gamma");
@@ -72,22 +77,29 @@ void Force_LCAO_gamma::ftable_gamma (
     
     //caoyu add for DeePKS
 #ifdef __DEEPKS
-    if (INPUT.deepks_scf)
+    if (GlobalV::deepks_scf)
     {
-        //=======method 1: dgemm==============
-        //ld.build_S_descriptor(1);   //for F_delta calculation
-        //ld.cal_f_delta(LOC.wfc_dm_2d.dm_gamma[0]);
-        //ld.print_F_delta("F_delta_old.dat");
-
-        
-        //=======method 2: snap_psialpha========
-        
-        GlobalC::ld.cal_gedm(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
-        GlobalC::ld.cal_f_delta_hf(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
-        //ld.print_F_delta("F_delta_hf.dat");
-        GlobalC::ld.cal_f_delta_pulay(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
-        //ld.print_F_delta("F_delta_pulay.dat");
-        GlobalC::ld.print_F_delta("F_delta.dat");
+		GlobalC::ld.cal_projected_DM(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],
+            GlobalC::ucell,
+            GlobalC::ORB,
+            GlobalC::GridD,
+            GlobalC::ParaO);
+    	GlobalC::ld.cal_descriptor();
+        GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
+        GlobalC::ld.cal_f_delta_gamma(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],
+            GlobalC::ucell,
+            GlobalC::ORB,
+            GlobalC::GridD,
+            GlobalC::ParaO,
+            isstress, svnl_dalpha);
+#ifdef __MPI
+        Parallel_Reduce::reduce_double_all(GlobalC::ld.F_delta.c,GlobalC::ld.F_delta.nr*GlobalC::ld.F_delta.nc);
+		if(isstress)
+		{
+			Parallel_Reduce::reduce_double_pool( svnl_dalpha.c, svnl_dalpha.nr * svnl_dalpha.nc);
+		}
+#endif
+        GlobalC::ld.print_F_delta("F_delta.dat", GlobalC::ucell);
     }
 #endif
     

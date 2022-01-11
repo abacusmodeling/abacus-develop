@@ -141,14 +141,14 @@ void Dos::calculate_Mulliken(const std::string &fa)
 bool Dos::calculate_dos
 (
 	const int &is,
-	const int *isk,
+	const std::vector<int> &isk,
 	const std::string &fa, //file address
 	const double &de_ev, // delta energy in ev
 	const double &emax_ev,
 	const double &emin_ev,// minimal energy in ev.
 	const int &nks,//number of k points
 	const int &nkstot,
-	const double *wk,//weight of k points
+	const std::vector<double> &wk,//weight of k points
 	const ModuleBase::matrix &wg,//weight of (kpoint,bands)
 	const int &nbands,// number of bands
 	double** ekb//store energy for each k point and each band
@@ -347,8 +347,16 @@ void Dos::nscf_band(
 	}
 	MPI_Barrier(MPI_COMM_WORLD);
 
+	std::vector<double> klength;
+	klength.resize(nks);
+	klength[0] = 0.0;
 	for(int ik=0; ik<nks; ik++)
 	{
+		if (ik>0)
+		{
+			auto delta=GlobalC::kv.kvec_c[ik]-GlobalC::kv.kvec_c[ik-1];
+			klength[ik] = klength[ik-1] + delta.norm();
+		}
 		if ( GlobalV::MY_POOL == GlobalC::Pkpoints.whichpool[ik] )
 		{
 			const int ik_now = ik - GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL];
@@ -360,6 +368,7 @@ void Dos::nscf_band(
 					ofs << std::setprecision(8);
 					//start from 1
 					ofs << ik+1;
+					ofs << " " << klength[ik] << " ";
 					for(int ib = 0; ib < nband; ib++)
 					{
 						ofs << " " << (ekb[ik_now+is*nks][ib]-fermie) * ModuleBase::Ry_to_eV;

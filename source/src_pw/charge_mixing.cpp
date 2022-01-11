@@ -276,7 +276,6 @@ double Charge_Mixing::rhog_dot_product(
 	sum *= GlobalC::ucell.omega * 0.5;
 
 	//bool dft_is_meta = false;
-	//bool lda_plus_u = false;
 	//bool okpaw = false;
 	//bool dipfield = false;
 

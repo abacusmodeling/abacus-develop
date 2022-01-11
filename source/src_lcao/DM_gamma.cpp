@@ -267,10 +267,7 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
     setAlltoallvParameter(GlobalC::ParaO.comm_2D, GlobalC::ParaO.blacs_ctxt, GlobalC::ParaO.nb);
 
 	// Peize Lin test 2019-01-16
-    if (GlobalV::KS_SOLVER=="genelpa") //LiuXh add 2021-09-06, clear memory, _2d only used in genelpa solver
-    {
-        wfc_dm_2d.init();
-    }
+    wfc_dm_2d.init();
 
 	if(GlobalC::wf.start_wfc=="file")
 	{
@@ -303,7 +300,7 @@ void Local_Orbital_Charge::gamma_file(const Grid_Technique &gt)
 		GlobalV::ofs_running << " Error=" << error << std::endl;
 		if(error==1)
 		{
-			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: GlobalC::LOWF.dat");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: LOWF.dat");
 		}
 		else if(error==2)
 		{
@@ -332,7 +329,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D_pub(void)
 void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
 {
     ModuleBase::timer::tick("LCAO_Charge","dm_2dTOgrid");
-    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"cal_dk_gamma_from_2D, GlobalV::NSPIN", GlobalV::NSPIN);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"cal_dk_gamma_from_2D, NSPIN", GlobalV::NSPIN);
 
     for(int is=0; is<GlobalV::NSPIN; ++is)
     {

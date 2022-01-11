@@ -114,6 +114,7 @@ public:
 	Exx_Info info;
 	
 	friend class Local_Orbital_Charge;
+	friend class LCAO_Hamilt;
 };
 
 #endif	// EXX_LCAO_H

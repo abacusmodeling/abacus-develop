@@ -74,19 +74,21 @@ public:
 public:
     UnitCell();
     ~UnitCell();
-    void print_cell(std::ofstream &ofs, output &outp)const;
+    void print_cell(std::ofstream &ofs)const;
     void print_cell_xyz(const std::string &fn)const;
     void print_cell_cif(const std::string &fn)const;
 
     void update_pos_tau(const double* pos);
+    void update_pos_tau(const ModuleBase::Vector3<double>* posd_in);
     void update_pos_taud(const ModuleBase::Vector3<double>* posd_in);
+    void update_vel(const ModuleBase::Vector3<double>* vel_in);
     void periodic_boundary_adjustment();
     void bcast_atoms_tau();
     void save_cartesian_position(double* pos)const;
 
-    bool judge_big_cell(void);
+    bool judge_big_cell(void)const;
 
-protected:
+
 
     double *atom_mass;
     std::string *atom_label;

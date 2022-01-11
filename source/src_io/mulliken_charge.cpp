@@ -140,7 +140,7 @@ void Mulliken_Charge::cal_mulliken(void)
 						&T_char,
 						&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 						&one_float,
-						GlobalC::LM.Sloc, &one_int, &one_int, GlobalC::ParaO.desc,
+						GlobalC::LM.Sloc.data(), &one_int, &one_int, GlobalC::ParaO.desc,
 						Dwf.c, &one_int, &NB, GlobalC::ParaO.desc, &one_int,
 						&zero_float,
 						mud[0].c, &one_int, &NB, GlobalC::ParaO.desc,
@@ -195,7 +195,7 @@ void Mulliken_Charge::cal_mulliken(void)
 					INPUT.lcao_dk,
 					INPUT.lcao_dr,
 					INPUT.lcao_rmax,
-					INPUT.out_descriptor,
+					GlobalV::out_descriptor,
 					INPUT.out_r_matrix,
 					GlobalV::FORCE,
 					GlobalV::MY_RANK);
@@ -212,7 +212,7 @@ void Mulliken_Charge::cal_mulliken(void)
 					GlobalC::UOT,
 					GlobalC::ORB,
 					GlobalC::ucell.lat0,
-					INPUT.out_descriptor,
+					GlobalV::out_descriptor,
 					Exx_Abfs::Lmax,
 					GlobalC::ucell.infoNL.nprojmax,
 					GlobalC::ucell.infoNL.nproj,
@@ -221,7 +221,7 @@ void Mulliken_Charge::cal_mulliken(void)
 
 
 			GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
-			GlobalC::LM.zeros_HSR('S', GlobalC::LNNR.nnr);
+			GlobalC::LM.zeros_HSR('S');
 			GlobalC::UHM.genH.calculate_S_no();
 			GlobalC::UHM.genH.build_ST_new('S', false, GlobalC::ucell);
 
@@ -250,7 +250,7 @@ void Mulliken_Charge::cal_mulliken(void)
 								&T_char,
 								&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 								&one_float,
-								GlobalC::LM.Sloc2, &one_int, &one_int, GlobalC::ParaO.desc,
+								GlobalC::LM.Sloc2.data(), &one_int, &one_int, GlobalC::ParaO.desc,
 								Dwf.c, &one_int, &NB, GlobalC::ParaO.desc, &one_int,
 								&zero_float,
 								mud[0].c, &one_int, &NB, GlobalC::ParaO.desc,
@@ -283,7 +283,7 @@ void Mulliken_Charge::cal_mulliken(void)
 				GlobalV::SEARCH_RADIUS, 
 				GlobalV::test_atom_input);
 #endif
-			GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, INPUT.out_descriptor, GlobalC::ucell.infoNL.nproj);
+			GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
 
 		}//else                     
 		MPI_Reduce(MecMulP[is], DecMulP[is] , GlobalV::NLOCAL , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);

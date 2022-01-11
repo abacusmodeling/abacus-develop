@@ -1,7 +1,6 @@
 #include "pw_basis.h"
 #include "../module_base/tool_quit.h"
 #include "../module_base/global_function.h"
-#include <iostream>
 
 namespace ModulePW
 {
@@ -94,7 +93,6 @@ void PW_Basis::count_pw_st(
         }
     }
     riy += this->ny;
-    std::cout<<"liy "<<liy<<" ; riy "<<riy<<std::endl;
     return;
 }
 
