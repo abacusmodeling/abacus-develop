@@ -12,7 +12,6 @@ list(APPEND objects
     diago_cg.cpp
     diago_david.cpp
     efield.cpp
-    # electrons.cpp
     energy.cpp
     forces.cpp
     global.cpp
@@ -78,7 +77,6 @@ else()
     list(APPEND objects
         hamilt.cpp
         hamilt_pw.cpp
-        diago_cg.cpp
         electrons.cpp
     )
 endif()
