@@ -34,6 +34,7 @@ class Hamilt_PW
 	friend class Hamilt;
 	friend class Stochastic_Iter;
 
+	// Use hpsi(cpu) in diagH_subspace.
 	void diagH_subspace(const int ik,
 						const int nstart,
 						const int nbnd,
@@ -41,6 +42,7 @@ class Hamilt_PW
 						ModuleBase::ComplexMatrix &evc,
 						double *en);
 
+	// Use hpsi_cuda(dcu) in diagH_subspace instead of hpsi(cpu).
 	void diagH_subspace_cuda(const int ik,
 							 const int nstart,
 							 const int n_band,
@@ -49,61 +51,74 @@ class Hamilt_PW
 							 double *en,
 							 hipblasDoubleComplex *vkb_c);
 
+	// Calculate hpsi and spsi (FP32)
 	void h_1psi_cuda(const int npw,
 					 const hipblasComplex *psi1d,
 					 hipblasComplex *hpsi,
 					 hipblasComplex *spsi,
 					 hipblasComplex *vkb_c);
 
+	// Calculate hpsi and spsi (FP64)
 	void h_1psi_cuda(const int npw,
 					 const hipblasDoubleComplex *psi1d,
 					 hipblasDoubleComplex *hpsi,
 					 hipblasDoubleComplex *spsi,
 					 hipblasDoubleComplex *vkb_c);
 
+	// hpsi (cpu)
 	void h_1psi(const int npw,
 				const std::complex<double> *psi1d,
 				std::complex<double> *hpsi,
 				std::complex<double> *spsi);
 
+	// hpsi (dcu, FP32)
 	void h_psi_cuda(const hipblasComplex *psi, hipblasComplex *hpsi, hipblasComplex *vkb_c, const int m = 1);
 
+	// hpsi (dcu, FP64)
 	void h_psi_cuda(const hipblasDoubleComplex *psi,
 					hipblasDoubleComplex *hpsi,
 					hipblasDoubleComplex *vkb_c,
 					const int m = 1);
 
+	// In this version, spsi operation just copy psi into spsi.
 	void s_1psi_cuda(const int npw, const hipblasComplex *psi, hipblasComplex *spsi);
 
+	// In this version, spsi operation just copy psi into spsi.
 	void s_1psi_cuda(const int npw, const hipblasDoubleComplex *psi, hipblasDoubleComplex *spsi);
 
+	// In this version, spsi operation just copy psi into spsi.
 	void s_1psi(const int npw, const std::complex<double> *psi, std::complex<double> *spsi);
 
+	// hpsi operation on cpu.
 	void h_psi(const std::complex<double> *psi, std::complex<double> *hpsi, const int m = 1);
 
   private:
 	int *GR_index;
 
 #ifdef __ROCM
-	int *GR_index_d;
-	hipblasHandle_t hpw_handle;
+	int *GR_index_d; // fft index on device
+	hipblasHandle_t hpw_handle; // hipblas handle
 #endif
 
 	// add contributions of h*psi from
 	// non-local pseduopotentials
+	// add vnl_pp DCU version (FP32)
 	void add_nonlocal_pp_cuda(hipblasComplex *hpsi_in,
 							  const hipblasComplex *becp,
 							  const hipblasComplex *d_vkb_c,
 							  const int m);
 
+	// add vnl_pp DCU version (FP64)
 	void add_nonlocal_pp_cuda(hipblasDoubleComplex *hpsi_in,
 							  const hipblasDoubleComplex *becp,
 							  const hipblasDoubleComplex *d_vkb_c,
 							  const int m);
 
+	// CPU version
 	void add_nonlocal_pp(std::complex<double> *hpsi, const std::complex<double> *becp, const int m);
 
   private:
+	// ddot operations
 	double ddot_real(const int &npw, const std::complex<double> *psi_L, const std::complex<double> *psi_R) const;
 
 	std::complex<double> ddot(const int &npw,
