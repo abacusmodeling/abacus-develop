@@ -1,27 +1,27 @@
-#include "../LJ_potential.h"
-#include "setcell.cpp"
 #include "gtest/gtest.h"
+#include "setcell.h"
+#include "module_md/LJ_potential.h"
 
 class LJ_pot_test : public testing::Test
 {
 protected:
-	static ModuleBase::Vector3<double> *force;
-    static ModuleBase::matrix stress;
-	static double potential;
-	static int natom;
+	ModuleBase::Vector3<double> *force;
+    ModuleBase::matrix stress;
+	double potential;
+	int natom;
 
-	static void SetUpTestCase()
+	void SetUp()
 	{
 		UnitCell_pseudo ucell;
-		setupcell(ucell);
+		Setcell::setupcell(ucell);
 
 		natom = ucell.nat;
 		force = new ModuleBase::Vector3<double> [natom];
 		stress.create(3,3);
 
-		parameters();
+		Setcell::parameters();
 		Grid_Driver grid_neigh(0,0,0);
-		neighbor(grid_neigh, ucell);
+		Setcell::neighbor(grid_neigh, ucell);
 
 		potential = LJ_potential::Lennard_Jones(
 								ucell,
@@ -30,7 +30,7 @@ protected:
 								stress);
 	}
 
-	static void TearDownTestCase()
+	void TearDown()
 	{
 		delete []force;
 	}
@@ -69,11 +69,6 @@ TEST_F(LJ_pot_test, stress)
 	EXPECT_DOUBLE_EQ(stress(2,1), -1.1858461261560206e-22);
 	EXPECT_DOUBLE_EQ(stress(2,2), 6.4275429572682057e-07);
 }
-
-ModuleBase::Vector3<double> *LJ_pot_test::force;
-ModuleBase::matrix LJ_pot_test::stress;
-double LJ_pot_test::potential;
-int LJ_pot_test::natom;
 
 int main(int argc, char **argv) 
 {

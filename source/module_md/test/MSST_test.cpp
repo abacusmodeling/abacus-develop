@@ -1,25 +1,28 @@
-#include "setcell.cpp"
 #include "gtest/gtest.h"
-#include "../MSST.h"
+#include "setcell.h"
+#include "module_md/MSST.h"
 
-UnitCell_pseudo ucell;
 class MSST_test : public testing::Test
 {
 protected:
 	Verlet *verlet;
+    UnitCell_pseudo ucell;
 
-	static void SetUpTestCase()
-	{
-		setupcell(ucell);
-        parameters();
-	}
+	void SetUp()
+    {
+        Setcell::setupcell(ucell);
+        Setcell::parameters();
+        verlet = new MSST(INPUT.mdp, ucell);
+    }
 
-	static void TearDownTestCase(){}
+    void TearDown()
+    {
+        delete verlet;
+    }
 };
 
 TEST_F(MSST_test, setup)
 {
-    verlet = new MSST(INPUT.mdp, ucell);
 	verlet->setup();
 
     EXPECT_DOUBLE_EQ(verlet->vel[0].x, -0.0001314186733659715);
@@ -48,6 +51,7 @@ TEST_F(MSST_test, setup)
 
 TEST_F(MSST_test, first_half)
 {
+    verlet->setup();
     verlet->first_half();
 
     EXPECT_DOUBLE_EQ(ucell.lat0, 1.0);
@@ -92,6 +96,8 @@ TEST_F(MSST_test, first_half)
 
 TEST_F(MSST_test, second_half)
 {
+    verlet->setup();
+    verlet->first_half();
     verlet->second_half();
 
     EXPECT_DOUBLE_EQ(ucell.lat0, 1.0);
@@ -132,8 +138,6 @@ TEST_F(MSST_test, second_half)
     EXPECT_DOUBLE_EQ(verlet->vel[3].x, 0.00011255062494439833);
 	EXPECT_DOUBLE_EQ(verlet->vel[3].y, 7.7296995498991997e-05);
     EXPECT_DOUBLE_EQ(verlet->vel[3].z, -2.8200698165338931e-05);
-
-    delete verlet;
 }
 
 int main(int argc, char **argv) 

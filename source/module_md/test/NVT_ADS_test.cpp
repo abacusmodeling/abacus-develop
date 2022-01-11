@@ -1,25 +1,28 @@
-#include "setcell.cpp"
 #include "gtest/gtest.h"
-#include "../NVT_ADS.h"
+#include "setcell.h"
+#include "module_md/NVT_ADS.h"
 
-UnitCell_pseudo ucell;
 class NVT_ADS_test : public testing::Test
 {
 protected:
 	Verlet *verlet;
+    UnitCell_pseudo ucell;
 
-	static void SetUpTestCase()
-	{
-		setupcell(ucell);
-        parameters();
-	}
+	void SetUp()
+    {
+        Setcell::setupcell(ucell);
+        Setcell::parameters();
+        verlet = new NVT_ADS(INPUT.mdp, ucell);
+    }
 
-	static void TearDownTestCase(){}
+    void TearDown()
+    {
+        delete verlet;
+    }
 };
 
 TEST_F(NVT_ADS_test, setup)
 {
-    verlet = new NVT_ADS(INPUT.mdp, ucell);
 	verlet->setup();
     
     EXPECT_DOUBLE_EQ(verlet->temperature_, 299.99999999999665);
@@ -36,6 +39,7 @@ TEST_F(NVT_ADS_test, setup)
 
 TEST_F(NVT_ADS_test, first_half)
 {
+    verlet->setup();
     verlet->first_half();
     
     EXPECT_DOUBLE_EQ(verlet->pos[0].x, 9.9945454470992772);
@@ -67,6 +71,8 @@ TEST_F(NVT_ADS_test, first_half)
 
 TEST_F(NVT_ADS_test, second_half)
 {
+    verlet->setup();
+    verlet->first_half();
     verlet->second_half();
     
     EXPECT_DOUBLE_EQ(verlet->pos[0].x, 9.9945454470992772);
@@ -94,8 +100,6 @@ TEST_F(NVT_ADS_test, second_half)
     EXPECT_DOUBLE_EQ(verlet->vel[3].x, -5.5210933928648482e-05);
 	EXPECT_DOUBLE_EQ(verlet->vel[3].y, 9.4285703375506354e-05);
     EXPECT_DOUBLE_EQ(verlet->vel[3].z, 0.00011813306369670275);
-
-    delete verlet;
 }
 
 int main(int argc, char **argv) 

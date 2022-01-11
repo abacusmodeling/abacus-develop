@@ -1,25 +1,29 @@
-#include "setcell.cpp"
 #include "gtest/gtest.h"
-#include "../NVE.h"
+#include "setcell.h"
+#include "module_md/NVE.h"
 
-UnitCell_pseudo ucell;
 class NVE_test : public testing::Test
 {
 protected:
 	Verlet *verlet;
+    UnitCell_pseudo ucell;
 
-	static void SetUpTestCase()
-	{
-		setupcell(ucell);
-        parameters();
-	}
 
-	static void TearDownTestCase(){}
+    void SetUp()
+    {
+        Setcell::setupcell(ucell);
+        Setcell::parameters();
+        verlet = new NVE(INPUT.mdp, ucell);
+    }
+
+    void TearDown()
+    {
+        delete verlet;
+    }
 };
 
 TEST_F(NVE_test, setup)
 {
-    verlet = new NVE(INPUT.mdp, ucell);
 	verlet->setup();
     
     EXPECT_DOUBLE_EQ(verlet->temperature_, 299.99999999999665);
@@ -36,6 +40,7 @@ TEST_F(NVE_test, setup)
 
 TEST_F(NVE_test, first_half)
 {
+    verlet->setup();
     verlet->first_half();
     
     EXPECT_DOUBLE_EQ(verlet->pos[0].x, 9.9945454470992772);
@@ -67,6 +72,8 @@ TEST_F(NVE_test, first_half)
 
 TEST_F(NVE_test, second_half)
 {
+    verlet->setup();
+    verlet->first_half();
     verlet->second_half();
     
     EXPECT_DOUBLE_EQ(verlet->pos[0].x, 9.9945454470992772);
@@ -94,8 +101,6 @@ TEST_F(NVE_test, second_half)
     EXPECT_DOUBLE_EQ(verlet->vel[3].x, 0.0001131161941102004);
 	EXPECT_DOUBLE_EQ(verlet->vel[3].y, 7.7689155499504408e-05);
     EXPECT_DOUBLE_EQ(verlet->vel[3].z, -2.83313122596e-05);
-
-    delete verlet;
 }
 
 int main(int argc, char **argv) 

@@ -1,25 +1,28 @@
-#include "setcell.cpp"
 #include "gtest/gtest.h"
-#include "../FIRE.h"
+#include "setcell.h"
+#include "module_md/FIRE.h"
 
-UnitCell_pseudo ucell;
 class FIRE_test : public testing::Test
 {
 protected:
 	Verlet *verlet;
+    UnitCell_pseudo ucell;
 
-	static void SetUpTestCase()
-	{
-		setupcell(ucell);
-        parameters();
-	}
+	void SetUp()
+    {
+        Setcell::setupcell(ucell);
+        Setcell::parameters();
+        verlet = new FIRE(INPUT.mdp, ucell);
+    }
 
-	static void TearDownTestCase(){}
+    void TearDown()
+    {
+        delete verlet;
+    }
 };
 
 TEST_F(FIRE_test, setup)
 {
-    verlet = new FIRE(INPUT.mdp, ucell);
 	verlet->setup();
     
     EXPECT_DOUBLE_EQ(verlet->temperature_, 299.99999999999665);
@@ -36,6 +39,7 @@ TEST_F(FIRE_test, setup)
 
 TEST_F(FIRE_test, first_half)
 {
+    verlet->setup();
     verlet->first_half();
     
     EXPECT_DOUBLE_EQ(verlet->pos[0].x, 9.995455294044568);
@@ -67,6 +71,8 @@ TEST_F(FIRE_test, first_half)
 
 TEST_F(FIRE_test, second_half)
 {
+    verlet->setup();
+    verlet->first_half();
     verlet->second_half();
     
     EXPECT_DOUBLE_EQ(verlet->pos[0].x, 9.995455294044568);
@@ -94,8 +100,6 @@ TEST_F(FIRE_test, second_half)
     EXPECT_DOUBLE_EQ(verlet->vel[3].x, 0.00011072762648726122);
 	EXPECT_DOUBLE_EQ(verlet->vel[3].y, 5.2868256066506055e-05);
     EXPECT_DOUBLE_EQ(verlet->vel[3].z, -2.5498181033639999e-05);
-
-    delete verlet;
 }
 
 int main(int argc, char **argv) 

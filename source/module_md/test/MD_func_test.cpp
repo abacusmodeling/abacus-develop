@@ -1,11 +1,11 @@
-#include "../MD_func.h"
-#include "setcell.cpp"
 #include "gtest/gtest.h"
+#include "setcell.h"
+#include "module_md/MD_func.h"
 
-UnitCell_pseudo ucell;
 class MD_func_test : public testing::Test
 {
 protected:
+	UnitCell_pseudo ucell;
 	double *allmass;                     // atom mass 
     ModuleBase::Vector3<double> *pos;    // atom position
     ModuleBase::Vector3<double> *vel;    // atom velocity
@@ -17,12 +17,25 @@ protected:
 	double temperature;                  // temperature
 	int frozen_freedom;                  // frozen_freedom
 
-	static void SetUpTestCase()
+	void SetUp()
 	{
-		setupcell(ucell);
+		Setcell::setupcell(ucell);
+		natom = ucell.nat;
+		allmass = new double [natom];
+		pos = new ModuleBase::Vector3<double> [natom];
+		ionmbl = new ModuleBase::Vector3<int> [natom];
+		vel = new ModuleBase::Vector3<double> [natom];
+		stress.create(3,3);
+		virial.create(3,3);
 	}
 
-	static void TearDownTestCase(){}
+	void TearDown()
+	{
+		delete[] allmass;
+		delete[] pos;
+		delete[] vel;
+		delete[] ionmbl;
+	}
 };
 
 TEST_F(MD_func_test, gaussrand)
@@ -34,8 +47,6 @@ TEST_F(MD_func_test, gaussrand)
 
 TEST_F(MD_func_test, initpos)
 {
-	natom = ucell.nat;
-	pos = new ModuleBase::Vector3<double> [natom];
 	MD_func::InitPos(ucell, pos);
 
 	EXPECT_DOUBLE_EQ(pos[0].x, 0.0);
@@ -56,9 +67,6 @@ TEST_F(MD_func_test, randomvel)
 {
 	ucell.set_vel = 0;
 	temperature = 300 / ModuleBase::Hartree_to_K;
-	allmass = new double [natom];
-	ionmbl = new ModuleBase::Vector3<int> [natom];
-	vel = new ModuleBase::Vector3<double> [natom];
 	MD_func::InitVel(ucell, temperature, allmass, frozen_freedom, ionmbl, vel);
 
 	EXPECT_DOUBLE_EQ(vel[0].x, 6.0690078968654719e-05);
@@ -77,6 +85,10 @@ TEST_F(MD_func_test, randomvel)
 
 TEST_F(MD_func_test, getmassmbl)
 {
+	ucell.set_vel = 0;
+	temperature = 300 / ModuleBase::Hartree_to_K;
+	MD_func::InitVel(ucell, temperature, allmass, frozen_freedom, ionmbl, vel);
+
 	for(int i=0; i<natom; ++i)
 	{
 		EXPECT_DOUBLE_EQ(allmass[i], 39.948 / ModuleBase::AU_to_MASS);
@@ -109,7 +121,7 @@ TEST_F(MD_func_test, readvel)
 TEST_F(MD_func_test, kinetic_stress)
 {
 	double kinetic;
-	stress.create(3,3);
+	MD_func::InitVel(ucell, temperature, allmass, frozen_freedom, ionmbl, vel);
 	MD_func::kinetic_stress(ucell, vel, allmass, kinetic, stress);
 	EXPECT_DOUBLE_EQ(kinetic, 0.004275200820433157);
 	EXPECT_DOUBLE_EQ(stress(0,0), 5.2064533063673623e-06);
@@ -121,11 +133,6 @@ TEST_F(MD_func_test, kinetic_stress)
 	EXPECT_DOUBLE_EQ(stress(2,0), 1.5039983732220751e-06);
 	EXPECT_DOUBLE_EQ(stress(2,1), -1.251414906590483e-06);
 	EXPECT_DOUBLE_EQ(stress(2,2), 9.6330189688582584e-07);
-
-	delete[] allmass;
-	delete[] pos;
-	delete[] vel;
-	delete[] ionmbl;
 }
 
 int main(int argc, char **argv) 
