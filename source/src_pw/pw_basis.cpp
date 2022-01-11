@@ -760,11 +760,12 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
 //	outstr = GlobalV::global_out_dir + "strucFac.dat"; 
 //	std::ofstream ofs( outstr.c_str() ) ;
     bool usebspline;
-    if(nbspline >= 0)   usebspline = true;
+    if(nbspline > 0)   usebspline = true;
     else    usebspline = false;
     
     if(usebspline)
     {
+        nbspline = int((nbspline+1)/2)*2; // nbspline must be a positive even number.
         this->bspline_sf(nbspline);
     }
     else
