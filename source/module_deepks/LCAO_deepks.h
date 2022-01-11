@@ -46,9 +46,12 @@ public:
     ///(Unit: Ry)  \f$tr(\rho H_\delta), \rho = \sum_i{c_{i, \mu}c_{i,\nu}} \f$ (for gamma_only)
     double e_delta_band = 0.0;
     
+    ///(Unit: Ry)  \f$tr(\rho_{HL} H_\delta), 
+    ///\rho_{HL} = c_{L, \mu}c_{L,\nu} - c_{H, \mu}c_{H,\nu} \f$ (for gamma_only)
+    double o_delta = 0.0;
+
     ///Correction term to the Hamiltonian matrix: \f$\langle\psi|V_\delta|\psi\rangle\f$ (for gamma only)
     double* H_V_delta;
-
     ///Correction term to Hamiltonian, for multi-k
     ///In R space:
     double* H_V_deltaR;
@@ -104,6 +107,11 @@ private:
 
     //dD/dX, tensor form of gdmx
     std::vector<torch::Tensor> gdmr_vector;
+
+    //orbital_pdm_shell:[1,Inl,nm*nm]; \langle \phi_\mu|\alpha\rangle\langle\alpha|\phi_\nu\rnalge
+    double*** orbital_pdm_shell;
+    //orbital_precalc:[1,NAt,NDscrpt]; gvdm*orbital_pdm_shell
+    torch::Tensor orbital_precalc_tensor;
 
     ///size of descriptor(projector) basis set
     int n_descriptor;
@@ -169,6 +177,14 @@ private:
         const LCAO_Orbitals &orb);
     // data structure that saves <psi|alpha>
     void allocate_nlm(const int nat);
+
+    // array for storing gdmx, used for calculating gvx
+	void init_gdmx(const int nat);
+	void del_gdmx(const int nat);
+
+    //for bandgap label calculation; QO added on 2022-1-7
+    void init_orbital_pdm_shell(void);
+    void del_orbital_pdm_shell(void);
 
 //-------------------
 // LCAO_deepks_psialpha.cpp
@@ -347,6 +363,25 @@ public:
     void check_f_delta(const int nat, ModuleBase::matrix& svnl_dalpha);
 
 //-------------------
+// LCAO_deepks_odelta.cpp
+//-------------------
+
+//This file contains subroutines for calculating O_delta,
+//which corresponds to the correction of the band gap. 
+
+//There are two subroutines in this file:
+//1. cal_o_delta, which is used for gamma point calculation
+//2. cal_o_delta_k, which is used for multi-k calculation
+
+public:
+    
+    void cal_o_delta(const std::vector<ModuleBase::matrix>& dm_hl/**<[in] modified density matrix that contains HOMO and LUMO only*/,
+        const Parallel_Orbitals &ParaO);
+    void cal_o_delta_k(const std::vector<ModuleBase::ComplexMatrix>& dm_hl/**<[in] modified density matrix that contains HOMO and LUMO only*/,
+        const Parallel_Orbitals &ParaO,
+        const int nks);
+
+//-------------------
 // LCAO_deepks_torch.cpp
 //-------------------
 
@@ -369,6 +404,9 @@ public:
 //      this is the term V(D) that enters the expression H_V_delta = |alpha>V(D)<alpha|
 //      caculated using torch::autograd::grad
 //8. check_gedm : prints gedm for checking
+//9. cal_orbital_precalc : orbital_precalc is usted for training with orbital label, 
+//                         which equals gvdm * orbital_pdm_shell, 
+//                         orbital_pdm_shells[1,Inl,nm*nm] = dm_hl * overlap * overlap
 
 public:
 
@@ -397,6 +435,14 @@ public:
     void cal_gedm(const int nat);
     void check_gedm(void);
 
+    //calculates orbital_precalc
+    void cal_orbital_precalc(const std::vector<ModuleBase::matrix>& dm_hl/**<[in] density matrix*/,
+        const int nat,
+        const UnitCell_pseudo &ucell,
+        const LCAO_Orbitals &orb,
+        Grid_Driver &GridD,
+        const Parallel_Orbitals &ParaO);
+
 private:
     void cal_gvdm(const int nat);
 
@@ -413,11 +459,13 @@ private:
 //1. print_dm : for gamma only
 //2. print_dm_k : for multi-k
 
-//There are 4 subroutines in this file that prints to npy file:
-//1. save_npy_d : descriptor ->dm_eig.npy
-//2. save_npy_gvx : gvx ->grad_vx.npy
-//3. save_npy_e : energy
-//4. save_npy_f : force
+//And 6 which prints quantities in .npy format 
+//3. save_npy_d : descriptor ->dm_eig.npy
+//4. save_npy_gvx : gvx ->grad_vx.npy
+//5. save_npy_e : energy
+//6. save_npy_f : force
+//7. save_npy_o: orbital
+//8. save_npy_orbital_precalc: orbital_precalc -> orbital_precalc.npy
 
 public:
   
@@ -441,6 +489,10 @@ public:
 	void save_npy_f(const ModuleBase::matrix &fbase/**<[in] \f$F_{base}\f$ or \f$F_{tot}\f$, in Ry/Bohr*/,
         const std::string &f_file, const int nat);
     void save_npy_gvx(const int nat);
+
+    //QO added on 2021-12-15
+    void save_npy_o(const double &bandgap/**<[in] \f$E_{base}\f$ or \f$E_{tot}\f$, in Ry*/, const std::string &o_file);
+    void save_npy_orbital_precalc(void);
 
 //-------------------
 // LCAO_deepks_mpi.cpp
