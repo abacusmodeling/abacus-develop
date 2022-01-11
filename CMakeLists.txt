@@ -100,27 +100,23 @@ if(USE_ROCM)
   # set(CMAKE_CXX_STANDARD_REQUIRED True) 
   list(APPEND CMAKE_PREFIX_PATH /opt/rocm/hip /opt/rocm)
   list(APPEND CMAKE_SYSTEM_PREFIX_PATH "/opt/rocm/hip")
-  include_directories(
-    /opt/rocm/hip/include
-    /opt/rocm/hipfft/include
-    /opt/rocm/hipblas/include
-    # /opt/rocm-4.5.0/rocsolver/include
-  )
+  
   # find_package(ROCM REQUIRED)
   find_package(hip REQUIRED)
   find_package(hipfft REQUIRED)
   find_package(hipblas REQUIRED)
-#   find_package(rocsolver REQUIRED)
+  include_directories(
+    /opt/rocm/hip/include
+    /opt/rocm/hipfft/include
+    /opt/rocm/hipblas/include
+  )
   target_link_libraries(${ABACUS_BIN_NAME}
     hip::device
     hip::host
     hip::hipfft
     roc::hipblas
-    # roc::rocsolver
   )
   add_compile_definitions(__ROCM)
-  # set (HIP_HIPCC_FLAGS -hc; -fno-gpu-rdc; --amdgpu-target=gfx906)
-  # add_compile_definitions(__HIP_PLATFORM_HCC__)
 endif()
 
 if(ENABLE_ASAN)
