@@ -94,6 +94,7 @@ if(USE_CUDA)
   add_compile_definitions(__CUDA)
 endif()
 
+# Warning: CMake add support to HIP in version 3.21. This is rather a new version.
 if(USE_ROCM)
   set(CMAKE_CXX_STANDARD 11) 
   SET(CMAKE_HIP_STANDARD 11)
