@@ -11,55 +11,46 @@
 
 class Hamilt
 {
-	public:
+  public:
+	Hamilt();
+	~Hamilt();
 
-    Hamilt();
-    ~Hamilt();
+	void init_before_ions(void);
 
-    void init_before_ions(void);
+	void init_before_electrons(void);
 
-    void init_before_electrons(void);
-
-    void clear_after_ions(void);
+	void clear_after_ions(void);
 
 	// diagH_subspace then full space in pw
-    void diagH_pw(
-		const int &istep,
-		const int &iter,
-		const int &ik,
-		const double *precondition,
-		double &avg_iter);
+	void diagH_pw(const int &istep, const int &iter, const int &ik, const double *precondition, double &avg_iter);
 
 	// generate H and S then call diagH_subspace
-    void diagH_subspace(
-		const int ik,
-		const int nstart,
-		const int nbnd,
-		const ModuleBase::ComplexMatrix &psi,
-		ModuleBase::ComplexMatrix &evc,
-		double *en);
+	void diagH_subspace(const int ik,
+						const int nstart,
+						const int nbnd,
+						const ModuleBase::ComplexMatrix &psi,
+						ModuleBase::ComplexMatrix &evc,
+						double *en);
 
 	// be called by diagH_subspace
-    void diagH_LAPACK(
-		const int n,
-		const int m,
-		const ModuleBase::ComplexMatrix &hc, // Hamiltonian matrix
-		const ModuleBase::ComplexMatrix &sc, // overlap matrix
-		const int ldh,
-		double *e, // output: eigenvalues
-		ModuleBase::ComplexMatrix &hvec); // output: eigenvectors
+	void diagH_LAPACK(const int n,
+					  const int m,
+					  const ModuleBase::ComplexMatrix &hc, // Hamiltonian matrix
+					  const ModuleBase::ComplexMatrix &sc, // overlap matrix
+					  const int ldh,
+					  double *e, // output: eigenvalues
+					  ModuleBase::ComplexMatrix &hvec); // output: eigenvectors
 
 #ifdef __ROCM
 
 	// rocsolver_handle cusolver_handle;
-	void diagH_subspace_cuda(
-		const int ik,
-		const int nstart,
-		const int n_band,
-		const hipblasDoubleComplex* psi,
-		hipblasDoubleComplex* evc,
-		double *en,
-		hipblasDoubleComplex *d_ekb_c);
+	void diagH_subspace_cuda(const int ik,
+							 const int nstart,
+							 const int n_band,
+							 const hipblasDoubleComplex *psi,
+							 hipblasDoubleComplex *evc,
+							 double *en,
+							 hipblasDoubleComplex *d_ekb_c);
 /*
 	void diagH_CUSOLVER(
 		const int nstart,
@@ -72,11 +63,9 @@ class Hamilt
 */
 #endif
 
-    Hamilt_PW hpw;
+	Hamilt_PW hpw;
 
-private:
-
-    bool test_exit_cond( const int &ntry, const int &notconv);
-
+  private:
+	bool test_exit_cond(const int &ntry, const int &notconv);
 };
 #endif
