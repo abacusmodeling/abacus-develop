@@ -149,7 +149,9 @@ if(ENABLE_DEEPKS)
   set(CMAKE_CXX_STANDARD 14)
   find_package(Torch REQUIRED)
   include_directories(${TORCH_INCLUDE_DIRS})
-  target_link_libraries(${ABACUS_BIN_NAME} ${TORCH_LIBRARIES})
+  target_link_libraries(${ABACUS_BIN_NAME} 
+    ${TORCH_LIBRARIES}
+    deepks)
   add_compile_options(${TORCH_CXX_FLAGS})
 
   find_path(libnpy_SOURCE_DIR
@@ -160,7 +162,7 @@ if(ENABLE_DEEPKS)
   include(FetchContent)
     FetchContent_Declare(
       libnpy
-      GIT_REPOSITORY https://github.com/llohse/libnpy.git
+      GIT_REPOSITORY https://github.com.cnpmjs.org/llohse/libnpy.git
     )
     FetchContent_MakeAvailable(libnpy)
   endif()

@@ -639,6 +639,7 @@ void Input_Conv::Convert(void)
 	#ifdef __DEEPKS
 	GlobalV::out_descriptor = INPUT.out_descriptor; 
 	GlobalV::deepks_scf = INPUT.deepks_scf;
+	GlobalV::deepks_bandgap = INPUT.deepks_bandgap; //QO added for bandgap label 2021-12-15
 	#endif
 	
     return;

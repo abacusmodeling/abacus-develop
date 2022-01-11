@@ -555,20 +555,6 @@ void ELEC_scf::scf(const int &istep)
 				{
 					GlobalV::ofs_running << " " << GlobalV::global_out_dir << " final etot is " << GlobalC::en.etot * ModuleBase::Ry_to_eV << " eV" << std::endl;
 				}
-#ifdef __DEEPKS
-				if (GlobalV::out_descriptor)	//caoyu add 2021-06-04
-				{
-                    GlobalC::ld.save_npy_e(GlobalC::en.etot, "e_tot.npy");
-                    if (GlobalV::deepks_scf) {
-                        GlobalC::ld.save_npy_e(GlobalC::en.etot - GlobalC::ld.E_delta, "e_base.npy");//ebase :no deepks E_delta including
-                    }
-                    else
-                    {
-                        GlobalC::ld.save_npy_e(GlobalC::en.etot, "e_base.npy");  // no scf, e_tot=e_base
-                    }
-
-				}
-#endif
 			}
 			else
 			{
@@ -576,6 +562,68 @@ void ELEC_scf::scf(const int &istep)
 				if(GlobalV::OUT_LEVEL=="ie" || GlobalV::OUT_LEVEL=="m") //xiaohui add "m" option, 2015-09-16
 				std::cout << " !! CONVERGENCE HAS NOT BEEN ACHIEVED !!" << std::endl;
 			}
+
+			if(conv_elec || iter==GlobalV::NITER)
+			{
+#ifdef __DEEPKS
+				if (GlobalV::out_descriptor)	//caoyu add 2021-06-04
+				{
+                    GlobalC::ld.save_npy_e(GlobalC::en.etot, "e_tot.npy");
+					int nocc = GlobalC::CHR.nelec/2;
+					if (GlobalV::deepks_bandgap)
+						GlobalC::ld.save_npy_o(GlobalC::wf.ekb[0][nocc] - GlobalC::wf.ekb[0][nocc-1], "o_tot.npy"); 
+                    if (GlobalV::deepks_scf) {
+                        GlobalC::ld.save_npy_e(GlobalC::en.etot - GlobalC::ld.E_delta, "e_base.npy");//ebase :no deepks E_delta including
+						if (GlobalV::deepks_bandgap)
+            			{
+			    			ModuleBase::matrix wg_hl;
+                			wg_hl.create(GlobalV::NSPIN, GlobalV::NBANDS);
+				
+			    			for(int is=0; is<GlobalV::NSPIN; is++){
+        		    			for(int ib=0; ib<GlobalV::NBANDS; ib++){
+        			    			wg_hl(is,ib) = 0.0;
+								
+					    			if(ib == nocc-1)
+						  				wg_hl(is,ib) = -1.0;
+					    			else if(ib == nocc)
+						    			wg_hl(is,ib) = 1.0;
+        		    			}
+        	    			}
+
+			    			Wfc_Dm_2d dm_bandgap;	
+        	    			dm_bandgap.init();
+        	    			dm_bandgap.wfc_gamma=GlobalC::LOC.wfc_dm_2d.wfc_gamma;
+        	    			dm_bandgap.cal_dm(wg_hl); 
+						
+			    			if(GlobalV::GAMMA_ONLY_LOCAL){
+            	    			GlobalC::ld.cal_o_delta(dm_bandgap.dm_gamma,GlobalC::ParaO);
+                			}
+					
+                			else{
+            	    			GlobalC::ld.cal_o_delta_k(dm_bandgap.dm_k,GlobalC::ParaO, GlobalC::kv.nks);
+                			}	
+							GlobalC::ld.save_npy_o(GlobalC::wf.ekb[0][nocc] - GlobalC::wf.ekb[0][nocc-1] - GlobalC::ld.o_delta, "o_base.npy");
+			    			GlobalC::ld.cal_orbital_precalc(dm_bandgap.dm_gamma,
+								GlobalC::ucell.nat,
+								GlobalC::ucell,
+            					GlobalC::ORB,
+            					GlobalC::GridD,
+            					GlobalC::ParaO);
+							if(GlobalV::MY_RANK==0)
+								GlobalC::ld.save_npy_orbital_precalc();
+        				}
+					}
+                    else
+                    {
+                        GlobalC::ld.save_npy_e(GlobalC::en.etot, "e_base.npy");  // no scf, e_tot=e_base
+						GlobalC::ld.save_npy_o(GlobalC::wf.ekb[0][nocc] - GlobalC::wf.ekb[0][nocc-1], "o_base.npy");  // no scf, o_tot=o_base	
+						
+                    }
+
+				}
+#endif
+			}
+
 
 //			ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"ELECTRONS CONVERGED!");
 			ModuleBase::timer::tick("ELEC_scf","scf");
