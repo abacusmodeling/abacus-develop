@@ -2,6 +2,7 @@
 
 #include "global.h"
 #include "hip/hip_runtime.h"
+using namespace HipCheck;
 
 template <class T, class T2, class T3> int Diago_CG_CUDA<T, T2, T3>::moved = 0;
 

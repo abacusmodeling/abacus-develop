@@ -5,6 +5,7 @@
 #include "diago_cg_hip.h"
 #include "diago_david.h"
 #include "hipfft.h"
+using namespace HipCheck;
 
 Hamilt::Hamilt()
 {

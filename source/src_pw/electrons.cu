@@ -12,6 +12,7 @@
 #include "../src_io/berryphase.h"
 // new
 #include "H_Ewald_pw.h"
+using namespace CudaCheck;
 
 __global__ void kernel_pred1(double *data, int size)
 {

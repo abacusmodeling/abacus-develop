@@ -1,7 +1,7 @@
 #include "diago_david.cuh"
 #include "diago_cg.cuh"
 #include "global.h"
-
+using namespace CudaCheck;
 
 template<class T, class T2>
 __global__ void kernel_precondition_david(T2 *res, const T2 *data, const int size, const T *P)

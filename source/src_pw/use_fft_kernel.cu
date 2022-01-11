@@ -1,6 +1,7 @@
 #include "use_fft.h"
 #include "global.h"
 #include "cufft.h"
+using namespace CudaCheck;
 
 template<class T2>
 __global__ void kernel_set(int size, T2 *dst, const T2 *src, const int *index_list)

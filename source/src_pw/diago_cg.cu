@@ -2,6 +2,7 @@
 #include "cuda_runtime.h"
 #include "global.h"
 #include "nvToolsExt.h"
+using namespace CudaCheck;
 
 template<class T, class T2>
 int Diago_CG_CUDA<T, T2>::moved = 0;

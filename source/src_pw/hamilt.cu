@@ -4,6 +4,7 @@
 #include "diago_david.h"
 #include "diago_cg.cuh"
 #include "cufft.h"
+using namespace CudaCheck;
 
 Hamilt::Hamilt() 
 {

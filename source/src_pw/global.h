@@ -26,6 +26,8 @@
 #include "xc_type.h"
 
 #ifdef __CUDA
+namespace CudaCheck
+{
 static const char *_cublasGetErrorString(cublasStatus_t error)
 {
 	switch (error)
@@ -167,9 +169,12 @@ static const char *_cufftGetErrorString(cufftResult_t error)
 				   status);                                                          \
 		}                                                                            \
 	}
+} // namespace CudaCheck
 #endif
 
 #ifdef __ROCM
+namespace HipCheck
+{
 static const char *_hipblasGetErrorString(hipblasStatus_t error)
 {
 	switch (error)
@@ -296,6 +301,7 @@ static const char *_hipfftGetErrorString(hipfftResult_t error)
 				   status);                                                           \
 		}                                                                             \
 	}
+} // namespace HipCheck
 #endif
 
 //==========================================================
