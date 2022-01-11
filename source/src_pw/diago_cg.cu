@@ -165,9 +165,6 @@ void Diago_CG_CUDA<T, T2>::diag
     T2 *lagrange;
     T2 *phi_m;
 
-    // cout << "Hello, CG!" << endl;
-    // cout << "CG Dim = " << dim << " & " << dmx << endl;
-
     CHECK_CUDA(cudaMalloc((void**)&sphi, dim * sizeof(T2)));
     CHECK_CUDA(cudaMalloc((void**)&scg, dim * sizeof(T2)));
     CHECK_CUDA(cudaMalloc((void**)&hphi, dim * sizeof(T2)));
@@ -178,31 +175,18 @@ void Diago_CG_CUDA<T, T2>::diag
     CHECK_CUDA(cudaMalloc((void**)&lagrange, n_band * sizeof(T2)));
     CHECK_CUDA(cudaMalloc((void**)&phi_m, dim * sizeof(T2)));
 
-    // timer::tick("Diago_CG_CUDA","diag");
-
-	// Init with ZERO ...
-    // T em_host = 0;
-
     for (int m=0; m<n_band; m++)
     {
         if (test_cg>2) GlobalV::ofs_running << "Diagonal Band : " << m << endl;
-        // cout<<"====band====="<<m<<endl;
         cudaDeviceSynchronize();
 
         CHECK_CUDA(cudaMemcpy(phi_m, &phi[m*dmx], dim*sizeof(T2), cudaMemcpyDeviceToDevice));
 
-        // CHECK_CUDA(cudaMemcpy(sphi, phi_m, dim * sizeof(T2), cudaMemcpyDeviceToDevice));
         GlobalC::hm.hpw.s_1psi_cuda(dim, phi_m, sphi);
 
         this->schmit_orth(dim, dmx, m, phi, sphi, phi_m);
 
-        // cout<<"====phi_m after schmit===="<<endl;
-        // test_print<T2>(phi_m, 15);
-
         GlobalC::hm.hpw.h_1psi_cuda(dim, phi_m, hphi, sphi, vkb_c);
-
-        // cout<<"====hphi after hpsi===="<<endl;
-        // test_print<T2>(hphi, 15);
 
         T em_host = 0;
         em_host = ddot_real(dim, phi_m, hphi);
@@ -218,25 +202,12 @@ void Diago_CG_CUDA<T, T2>::diag
 
         for (iter = 0;iter < maxter; iter++)
         {
-            // cout<<"******iter:"<<iter<<"******"<<endl;
             this->calculate_gradient( precondition, dim, hphi, sphi, g, pphi );
-
-            // cout<<"====g after cal_grad===="<<endl;
-            // test_print<T2>(g, 15);
-
             this->orthogonal_gradient( dim, dmx, g, scg, lagrange, phi, m );
-
-            // cout<<"====lag after orth===="<<endl;
-            // test_print<T2>(lagrange, 5);
-
             this->calculate_gamma_cg( iter, dim, precondition, g, scg,
 			    g0, cg, gg_last, cg_norm, theta, phi_m);// scg used as sg
             converged = this->update_psi( dim, cg_norm, theta, pphi, cg, scg, phi_m ,
 			    em_host, eps, hphi, sphi, vkb_c); // pphi is used as hcg
-            
-            // cout<<"====hphi after update===="<<endl;
-            // test_print<T2>(hphi, 15);
-
             CHECK_CUDA(cudaMemcpy(&e[m], &em_host, sizeof(T), cudaMemcpyHostToDevice));
             if ( converged ) break;
         }//end iter
@@ -248,7 +219,6 @@ void Diago_CG_CUDA<T, T2>::diag
             ++notconv;
         }
 
-        // cout<<"now_iter:"<<iter<<endl;
         avg_iter += static_cast<double>(iter) + 1.00;
 
         if (m > 0 && reorder)
@@ -371,38 +341,17 @@ void Diago_CG_CUDA<T, T2>::orthogonal_gradient( const int &dim, const int &dmx,
     // cublasHandle_t handle;
     // cublasCreate(&handle);
     cublasOperation_t trans1 = CUBLAS_OP_C;
-    // ONE ZERO cufftcomplex?
-    // CHECK_CUBLAS(cublasZgemv(handle, trans1, dim, m, ONE, eigenfunction, dmx, sg, inc, ZERO, lagrange, inc));
     float2 ONE, ZERO, NEG_ONE;
     ONE.y = ZERO.x = ZERO.y = 0.0;
     ONE.x = 1.0;
     NEG_ONE.x = -1.0;
     CHECK_CUBLAS(cublasCgemv(diag_handle, trans1, dim, m, &ONE, eigenfunction, dmx, sg, inc, &ZERO, lagrange, inc));
-    /*for (int i=0; i<m; i++)
-    {
-        lagrange[i] = ZERO;
-        for (int j=0; j<dim; j++)
-        {
-            lagrange[i] += conj( eigenfunction(i,j) ) * sg[j];
-        }
-    }*/
-
     // Parallel_Reduce::reduce_complex_double_pool(lagrange, m); // todo
     // (3) orthogonal |g> and |Sg> to all states (0~m-1)
     cublasOperation_t trans2 = CUBLAS_OP_N;
 
     CHECK_CUBLAS(cublasCgemv(diag_handle, trans2, dim, m, &NEG_ONE, eigenfunction, dmx, lagrange, inc, &ONE, g, inc));
     CHECK_CUBLAS(cublasCgemv(diag_handle, trans2, dim, m, &NEG_ONE, eigenfunction, dmx, lagrange, inc, &ONE, sg, inc));
-
-    /*for (int i=0; i<m; i++)
-    {
-        for (int j=0; j<dim; j++)
-        {
-            const complex<T> oo = lagrange[i] * eigenfunction(i, j);
-            g[j] -= oo;
-            sg[j] -= oo;
-        }
-    }*/
 
     ModuleBase::timer::tick("Diago_CG_CUDA","orth_grad");
     // CHECK_CUBLAS(cublasDestroy(handle));
@@ -431,14 +380,6 @@ void Diago_CG_CUDA<T, T2>::orthogonal_gradient( const int &dim, const int &dmx,
     ONE.x = 1.0;
     NEG_ONE.x = -1.0;
     CHECK_CUBLAS(cublasZgemv(diag_handle, trans1, dim, m, &ONE, eigenfunction, dmx, sg, inc, &ZERO, lagrange, inc));
-    /*for (int i=0; i<m; i++)
-    {
-        lagrange[i] = ZERO;
-        for (int j=0; j<dim; j++)
-        {
-            lagrange[i] += conj( eigenfunction(i,j) ) * sg[j];
-        }
-    }*/
 
     // Parallel_Reduce::reduce_complex_double_pool(lagrange, m); // todo
     // (3) orthogonal |g> and |Sg> to all states (0~m-1)
@@ -446,16 +387,6 @@ void Diago_CG_CUDA<T, T2>::orthogonal_gradient( const int &dim, const int &dmx,
 
     CHECK_CUBLAS(cublasZgemv(diag_handle, trans2, dim, m, &NEG_ONE, eigenfunction, dmx, lagrange, inc, &ONE, g, inc));
     CHECK_CUBLAS(cublasZgemv(diag_handle, trans2, dim, m, &NEG_ONE, eigenfunction, dmx, lagrange, inc, &ONE, sg, inc));
-
-    /*for (int i=0; i<m; i++)
-    {
-        for (int j=0; j<dim; j++)
-        {
-            const complex<T> oo = lagrange[i] * eigenfunction(i, j);
-            g[j] -= oo;
-            sg[j] -= oo;
-        }
-    }*/
 
     ModuleBase::timer::tick("Diago_CG_CUDA","orth_grad");
     // CHECK_CUBLAS(cublasDestroy(handle));
@@ -492,11 +423,6 @@ void Diago_CG_CUDA<T, T2>::calculate_gamma_cg(
     // firstly, for now, calculate: gg_now
     // secondly, prepare for the next iteration: gg_inter
     // |psg> = P | Sg >
-    // for (int i=0; i<dim; i++)
-    // {
-    //     psg[i] = precondition[i] * sg[i];
-    // }
-
     int thread = 512;
     int block = (dim + thread - 1) / thread;
     kernel_precondition_inverse<T, T2><<<block, thread>>>(psg, sg, dim, precondition);
@@ -511,11 +437,6 @@ void Diago_CG_CUDA<T, T2>::calculate_gamma_cg(
         gg_last = gg_now;
         // (50) cg direction first value : |g>
         // |cg> = |g>
-
-        // for (int i=0; i<dim; i++)
-        // {
-        //     cg[i] = g[i];
-        // }
         CHECK_CUDA(cudaMemcpy(cg, g, dim*sizeof(T2), cudaMemcpyDeviceToDevice));
     }
     else
@@ -528,19 +449,8 @@ void Diago_CG_CUDA<T, T2>::calculate_gamma_cg(
         gg_last = gg_now;
 
         // (6) Update cg direction !(need gamma and |go> ):
-        // for (int i=0; i<dim; i++)
-        // {
-        //     cg[i] = gamma * cg[i] + g[i];
-        // }
-
         kernel_get_gammacg<T, T2><<<block, thread>>>(dim, cg, g, gamma);
-
         const T norma = gamma * cg_norm * sin(theta);
-        // for (int i = 0;i < dim;i++)
-        // {
-        //     cg[i] -= norma * psi_m[i];
-        // }
-
         kernel_get_normacg<T, T2><<<block, thread>>>(dim, cg, psi_m, norma);
     }
     ModuleBase::timer::tick("Diago_CG_CUDA","gamma_cg");
@@ -596,21 +506,7 @@ bool Diago_CG_CUDA<T, T2>::update_psi(
 
     const T cost = cos(theta);
     const T sint_norm = sin(theta)/cg_norm;
-
-//	cout << "\n cg_norm = " << this->ddot(dim, cg, cg);
-//	cout << "\n cg_norm_fac = "<< cg_norm * cg_norm;
-//	cout << "\n overlap = "  << this->ddot(dim, psi_m, psi_m);
-
-    // for (int i=0; i<dim; i++)
-    // {
-    //     psi_m[i] = psi_m[i] * cost + sint_norm * cg[i];
-    // }
-
     kernel_multi_add<T, T2><<<block, thread>>>(psi_m, psi_m, cost, cg, sint_norm, dim);
-
-//	cout << "\n overlap2 = "  << this->ddot(dim, psi_m, psi_m);
-    // cout<<"======"<<endl;
-    // cout<<abs(eigenvalue-e0)<<" "<<threshold<<endl;
 
     if ( abs(eigenvalue-e0)< threshold)
     {
@@ -619,11 +515,6 @@ bool Diago_CG_CUDA<T, T2>::update_psi(
     }
     else
     {
-        // for (int i=0; i<dim; i++)
-        // {
-        //     sphi[i] = sphi[i] * cost + sint_norm * scg[i];
-        //     hpsi[i] = hpsi[i] * cost + sint_norm * hcg[i];
-        // }
         kernel_multi_add<T, T2><<<block, thread>>>(sphi, sphi, cost, scg, sint_norm, dim);
         kernel_multi_add<T, T2><<<block, thread>>>(hpsi, hpsi, cost, hcg, sint_norm, dim);
         ModuleBase::timer::tick("Diago_CG_CUDA","update_psi");
@@ -644,15 +535,12 @@ void Diago_CG_CUDA<T, T2>::schmit_orth
 {
     ModuleBase::timer::tick("Diago_CG_CUDA","schmit_orth");
     assert( m >= 0 );
-    // cout<<"orth, dim="<<dim<<endl;
 
     float2 *lagrange;
     CHECK_CUDA(cudaMalloc((void**)&lagrange, (m+1)*sizeof(float2)));
     int inc=1;
     int mp1 = m+1;
 
-    // cublasHandle_t handle;
-    // CHECK_CUBLAS(cublasCreate(&handle));
     cublasOperation_t trans1 = CUBLAS_OP_C;
 
     float2 ONE, ZERO, NEG_ONE;
@@ -675,7 +563,6 @@ void Diago_CG_CUDA<T, T2>::schmit_orth
 
     GlobalC::hm.hpw.s_1psi_cuda(dim, psi_m, sphi);
 
-    // CHECK_CUBLAS(cublasDestroy(handle));
     ModuleBase::timer::tick("Diago_CG_CUDA","schmit_orth");
     CHECK_CUDA(cudaFree(lagrange));
     return ;
@@ -694,15 +581,11 @@ void Diago_CG_CUDA<T, T2>::schmit_orth
 {
     ModuleBase::timer::tick("Diago_CG_CUDA","schmit_orth");
     assert( m >= 0 );
-    // cout<<"orth, dim="<<dim<<endl;
 
     double2 *lagrange;
     CHECK_CUDA(cudaMalloc((void**)&lagrange, (m+1)*sizeof(double2)));
     int inc=1;
     int mp1 = m+1;
-
-    // cublasHandle_t handle;
-    // CHECK_CUBLAS(cublasCreate(&handle));
     cublasOperation_t trans1 = CUBLAS_OP_C;
 
     double2 ONE, ZERO, NEG_ONE;
@@ -725,7 +608,6 @@ void Diago_CG_CUDA<T, T2>::schmit_orth
 
     GlobalC::hm.hpw.s_1psi_cuda(dim, psi_m, sphi);
 
-    // CHECK_CUBLAS(cublasDestroy(handle));
     ModuleBase::timer::tick("Diago_CG_CUDA","schmit_orth");
     CHECK_CUDA(cudaFree(lagrange));
     return ;
@@ -826,11 +708,6 @@ float2 Diago_CG_CUDA<T, T2>::ddot
     float2 *psik
 )
 {
-    // assert(dim > 0) ;
-    // for (int i = 0; i < dim ; i++)
-    // {
-    //     result += conj(psi(m, i)) *  psik[i] ;
-    // }
     float2 result;
     CHECK_CUBLAS(cublasCdotc(diag_handle, dim, &psi[m*dim], 1, psik, 1, &result));
     return result;
@@ -845,11 +722,6 @@ double2 Diago_CG_CUDA<T, T2>::ddot
     double2 *psik
 )
 {
-    // assert(dim > 0) ;
-    // for (int i = 0; i < dim ; i++)
-    // {
-    //     result += conj(psi(m, i)) *  psik[i] ;
-    // }
     double2 result;
     CHECK_CUBLAS(cublasZdotc(diag_handle, dim, &psi[m*dim], 1, psik, 1, &result));
     return result;
@@ -867,12 +739,6 @@ float2 Diago_CG_CUDA<T, T2>::ddot
     const int & n
 )
 {
-    // assert( (dim>0) && (dim<=psi_L.nc) && (dim<=psi_R.nc) );
-
-    // for ( int i = 0; i < dim ; i++)
-    // {
-    //     result += conj( psi_L(m,i) ) * psi_R(n,i) ;
-    // }
     float2 result;
     CHECK_CUBLAS(cublasCdotc(diag_handle, dim, &psi_L[m*dim], 1, &psi_R[n*dim], 1, &result));
     return result;
@@ -888,12 +754,6 @@ double2 Diago_CG_CUDA<T, T2>::ddot
     const int & n
 )
 {
-    // assert( (dim>0) && (dim<=psi_L.nc) && (dim<=psi_R.nc) );
-
-    // for ( int i = 0; i < dim ; i++)
-    // {
-    //     result += conj( psi_L(m,i) ) * psi_R(n,i) ;
-    // }
     double2 result;
     CHECK_CUBLAS(cublasZdotc(diag_handle, dim, &psi_L[m*dim], 1, &psi_R[n*dim], 1, &result));
     return result;
