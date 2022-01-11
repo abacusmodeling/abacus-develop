@@ -178,10 +178,6 @@ private:
     // data structure that saves <psi|alpha>
     void allocate_nlm(const int nat);
 
-    // array for storing gdmx, used for calculating gvx
-	void init_gdmx(const int nat);
-	void del_gdmx(const int nat);
-
     //for bandgap label calculation; QO added on 2022-1-7
     void init_orbital_pdm_shell(void);
     void del_orbital_pdm_shell(void);
@@ -414,7 +410,7 @@ public:
     ///which are eigenvalues of pdm in blocks of I_n_l
 	void cal_descriptor(void);
     ///print descriptors based on LCAO basis
-    void check_descriptor(const int nat);
+    void check_descriptor(const UnitCell_pseudo &ucell);
 
     ///calculates gradient of descriptors w.r.t atomic positions
     ///----------------------------------------------------
@@ -492,7 +488,7 @@ public:
 
     //QO added on 2021-12-15
     void save_npy_o(const double &bandgap/**<[in] \f$E_{base}\f$ or \f$E_{tot}\f$, in Ry*/, const std::string &o_file);
-    void save_npy_orbital_precalc(void);
+    void save_npy_orbital_precalc(const int nat);
 
 //-------------------
 // LCAO_deepks_mpi.cpp

@@ -211,6 +211,7 @@ void LOOP_ions::opt_ions(void)
             }
             //GlobalC::ld.check_projected_dm();
             GlobalC::ld.cal_descriptor();    //final descriptor
+            GlobalC::ld.check_descriptor(GlobalC::ucell);
             
             if(GlobalV::MY_RANK==0)
             {

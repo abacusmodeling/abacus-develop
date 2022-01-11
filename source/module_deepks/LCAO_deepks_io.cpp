@@ -142,17 +142,17 @@ void LCAO_Deepks::save_npy_o(const double &bandgap, const std::string &o_file)
     return;
 }
 
-void LCAO_Deepks::save_npy_orbital_precalc(void)
+void LCAO_Deepks::save_npy_orbital_precalc(const int nat)
 {
     ModuleBase::TITLE("LCAO_Deepks", "save_npy_orbital_precalc");
     //save orbital_precalc.npy (when bandgap label is in use)
     //unit: a.u.
-    const long unsigned gshape[] = {(long unsigned) 1, GlobalC::ucell.nat, this->des_per_atom};
+    const long unsigned gshape[] = {(long unsigned) 1, nat, this->des_per_atom};
     vector<double> npy_orbital_precalc;
     for (int hl = 0;hl < 1; ++hl)
     {
         
-        for (int iat = 0;iat < GlobalC::ucell.nat;++iat)
+        for (int iat = 0;iat < nat;++iat)
         {
             for(int p=0; p<this->des_per_atom; ++p)
             {

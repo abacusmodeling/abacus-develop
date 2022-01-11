@@ -610,7 +610,7 @@ void ELEC_scf::scf(const int &istep)
             					GlobalC::GridD,
             					GlobalC::ParaO);
 							if(GlobalV::MY_RANK==0)
-								GlobalC::ld.save_npy_orbital_precalc();
+								GlobalC::ld.save_npy_orbital_precalc(GlobalC::ucell.nat);
         				}
 					}
                     else

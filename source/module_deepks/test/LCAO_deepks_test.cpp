@@ -142,7 +142,7 @@ void test_deepks::check_gdmx(void)
 void test_deepks::check_descriptor(void)
 {
 	this->ld.cal_descriptor();
-	this->ld.check_descriptor(ucell.nat);
+	this->ld.check_descriptor(ucell);
 }
 
 void test_deepks::check_gvx(void)

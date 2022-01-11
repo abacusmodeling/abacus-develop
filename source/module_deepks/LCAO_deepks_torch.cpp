@@ -72,23 +72,30 @@ void LCAO_Deepks::cal_descriptor(void)
     return;
 }
 
-void LCAO_Deepks::check_descriptor(const int nat)
+void LCAO_Deepks::check_descriptor(const UnitCell_pseudo &ucell)
 {
     ModuleBase::TITLE("LCAO_Deepks", "check_descriptor");
     ofstream ofs("descriptor.dat");
     ofs<<std::setprecision(12);
-    for(int ia=0;ia<nat;ia++)
+    for (int it = 0; it < ucell.ntype; it++)
     {
-        for(int inl=0;inl<inlmax/nat;inl++)
+        for (int ia = 0; ia < ucell.atoms[it].na; ia++)
         {
-            int nm = 2*inl_l[inl]+1;
-            for(int im=0;im<nm;im++)
+            ofs << ucell.atoms[it].label << " atom_index " << ia + 1 << " n_descriptor " << this->des_per_atom << std::endl;
+            int id = 0;
+            for(int inl=0;inl<inlmax/ucell.nat;inl++)
             {
-                const int ind=ia*inlmax/nat+inl;
-                ofs << std::setprecision(10) << d_tensor[ind].index({im}).item().toDouble() << " ";
-            }
-            ofs << std::endl;
-        }   
+                int nm = 2*inl_l[inl]+1;
+                for(int im=0;im<nm;im++)
+                {
+                    if (id % 8 == 7) ofs << std::endl;
+                    id++;
+                    const int ind=ia*inlmax/ucell.nat+inl;
+                    ofs << std::setprecision(10) << d_tensor[ind].index({im}).item().toDouble() << " ";
+                }
+            }   
+            ofs << std::endl << std::endl;
+        }
     }
     return;
 }
@@ -347,7 +354,7 @@ void LCAO_Deepks::cal_orbital_precalc(const std::vector<ModuleBase::matrix> &dm_
         {
             const int iat = ucell.itia2iat(T0,I0);
             const ModuleBase::Vector3<double> tau0 = atom0->tau[I0];
-            GridD.Find_atom(GlobalC::ucell, atom0->tau[I0] ,T0, I0);
+            GridD.Find_atom(ucell, atom0->tau[I0] ,T0, I0);
 
             for (int ad1=0; ad1<GridD.getAdjacentNum()+1 ; ++ad1)
             {
@@ -364,7 +371,7 @@ void LCAO_Deepks::cal_orbital_precalc(const std::vector<ModuleBase::matrix> &dm_
 					const int T2 = GridD.getType(ad2);
 					const int I2 = GridD.getNatom(ad2);
 					const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
-					const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad2);
+					const ModuleBase::Vector3<double> tau2 = GridD.getAdjacentTau(ad2);
 					const Atom* atom2 = &ucell.atoms[T2];
 					const int nw2_tot = atom2->nw*GlobalV::NPOL;
 					
