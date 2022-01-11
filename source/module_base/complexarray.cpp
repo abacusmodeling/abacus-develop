@@ -126,7 +126,7 @@ ComplexArray &ComplexArray::operator=(const ComplexArray & cd)
 }
 
 // Assignment of scalar:  all entries set to c
-inline void ComplexArray::operator=(const std::complex < double> c)
+void ComplexArray::operator=(const std::complex < double> c)
 {
 	const int size = this->getSize();
 	for (int i = 0; i < size; i++)
