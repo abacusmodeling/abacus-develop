@@ -31,6 +31,7 @@ LCAO_Deepks::LCAO_Deepks()
     inl_index = new ModuleBase::IntArray[1];
     inl_l = new int[1];
     H_V_delta = new double[1];
+    H_V_deltaR = new double[1];
 }
 
 //Desctructor of the class
@@ -261,6 +262,8 @@ void LCAO_Deepks::allocate_V_delta(const int nat, const int nloc, const int nks)
 
 void LCAO_Deepks::allocate_V_deltaR(const int nnr)
 {
+    ModuleBase::TITLE("LCAO_Deepks", "allocate_V_deltaR");
+    GlobalV::ofs_running << nnr << std::endl;
     delete[] H_V_deltaR;
     H_V_deltaR = new double[nnr];
     ModuleBase::GlobalFunc::ZEROS(H_V_deltaR, nnr);

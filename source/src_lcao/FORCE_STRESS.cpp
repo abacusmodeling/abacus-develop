@@ -325,7 +325,6 @@ void Force_Stress_LCAO::getForceStress(
 						GlobalC::GridD,
 						GlobalC::ParaO.trace_loc_row,
     					GlobalC::ParaO.trace_loc_col);
-					//GlobalC::ld.check_gdmx(GlobalC::ucell.nat);
 				}
 				else
 				{			
@@ -333,10 +332,14 @@ void Force_Stress_LCAO::getForceStress(
 						GlobalC::ucell,
 						GlobalC::ORB,
 						GlobalC::GridD,
-						GlobalC::ParaO,
-						GlobalC::kv);	
+						GlobalC::ParaO.trace_loc_row,
+    					GlobalC::ParaO.trace_loc_col,
+						GlobalC::kv.nks,
+						GlobalC::kv.kvec_d);	
 				}
+				//GlobalC::ld.check_gdmx(GlobalC::ucell.nat);
 				GlobalC::ld.cal_gvx(GlobalC::ucell.nat);
+				//GlobalC::ld.check_gvx(GlobalC::ucell.nat);
 				if(GlobalV::MY_RANK==0)
 				{
 					GlobalC::ld.save_npy_gvx(GlobalC::ucell.nat);//  /Bohr, grad_vx

@@ -74,8 +74,10 @@ void Force_LCAO_k::ftable_k (
 			GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            GlobalC::ParaO,
-			GlobalC::kv);
+            GlobalC::ParaO.trace_loc_row,
+			GlobalC::ParaO.trace_loc_col,
+			GlobalC::kv.nks,
+			GlobalC::kv.kvec_d);
     	GlobalC::ld.cal_descriptor();
 		GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
 
@@ -83,8 +85,10 @@ void Force_LCAO_k::ftable_k (
 			GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            GlobalC::ParaO,
-			GlobalC::kv,
+            GlobalC::ParaO.trace_loc_row,
+			GlobalC::ParaO.trace_loc_col,
+			GlobalC::kv.nks,
+			GlobalC::kv.kvec_d,
 			isstress,svnl_dalpha);
 #ifdef __MPI
         Parallel_Reduce::reduce_double_all(GlobalC::ld.F_delta.c,GlobalC::ld.F_delta.nr*GlobalC::ld.F_delta.nc);
@@ -93,7 +97,6 @@ void Force_LCAO_k::ftable_k (
 			Parallel_Reduce::reduce_double_pool( svnl_dalpha.c, svnl_dalpha.nr * svnl_dalpha.nc);
 		}
 #endif
-        GlobalC::ld.print_F_delta("F_delta.dat", GlobalC::ucell);
     }
 #endif
 

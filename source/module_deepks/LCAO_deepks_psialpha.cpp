@@ -1,8 +1,10 @@
-//wenfei 2022-1-5
-//This file contains 2 subroutines, one for calculating the overlap
-//between atomic basis and projector alpha : <chi_mu|alpha>
+//wenfei 2022-1-11
+//This file contains 2 subroutines:
+//1. build_psialpha, which calculates the overlap
+//between atomic basis and projector alpha : <psi_mu|alpha>
 //which will be used in calculating pdm, gdmx, H_V_delta, F_delta;
-//The other is for checking the results
+//2. check_psialpha, which prints the results into .dat files
+//for checking
 
 #ifdef __DEEPKS
 
@@ -19,8 +21,9 @@ void LCAO_Deepks::build_psialpha(const bool& calc_deri,
     ModuleBase::TITLE("LCAO_Deepks", "build_psialpha");
     ModuleBase::timer::tick ("LCAO_Deepks","build_psialpha");
 
+    //cutoff for alpha is same for all types of atoms
     const double Rcut_Alpha = orb.Alpha[0].getRcut();
-    //same for all types of atoms
+    
     int job;
     if(!calc_deri)
     {
@@ -36,22 +39,16 @@ void LCAO_Deepks::build_psialpha(const bool& calc_deri,
 		Atom* atom0 = &ucell.atoms[T0]; 
         for (int I0 =0; I0< atom0->na; I0++)
         {
+            //iat: atom index on which |alpha> is located
             const int iat = ucell.itia2iat(T0,I0);
-			//=======================================================
-            //Step 1 : 
-			//saves <alpha|psi>, where alpha runs over all projectors
-			//and psi runs over atomic basis sets on the current core
-			//=======================================================
-
 			const ModuleBase::Vector3<double> tau0 = atom0->tau[I0];
             GridD.Find_atom(ucell, atom0->tau[I0] ,T0, I0);
 
-			//outermost loop : all adjacent atoms
             if(GlobalV::GAMMA_ONLY_LOCAL)
             {
                 this->nlm_save[iat].resize(GridD.getAdjacentNum()+1);
             }
-
+            //outermost loop : find all adjacent atoms
             for (int ad=0; ad<GridD.getAdjacentNum()+1 ; ++ad)
             {
                 const int T1 = GridD.getType(ad);
@@ -80,6 +77,7 @@ void LCAO_Deepks::build_psialpha(const bool& calc_deri,
 					continue;
 				}
 
+                //middle loop : all atomic basis on the adjacent atom ad
 				for (int iw1=0; iw1<nw1_tot; ++iw1)
 				{
 					const int iw1_all = start1 + iw1;
@@ -88,10 +86,10 @@ void LCAO_Deepks::build_psialpha(const bool& calc_deri,
 					if(iw1_local < 0 && iw2_local < 0)continue;
 					const int iw1_0 = iw1/GlobalV::NPOL;
 					std::vector<std::vector<double>> nlm;
-					//2D, but first dimension is only 1 here
-					//for force, the right hand side is the gradient
-					//and the first dimension is then 3
-					//inner loop : all projectors (L0,M0)
+					//2D, dim 0 contains the overlap <psi|alpha>
+                    //dim 1-3 contains the gradient of overlap
+
+					//inner loop : all projectors (N,L,M)
 					UOT.snap_psialpha_half(
                         orb,
 						nlm, job, tau1, T1,

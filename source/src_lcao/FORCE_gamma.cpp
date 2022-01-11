@@ -91,7 +91,8 @@ void Force_LCAO_gamma::ftable_gamma (
             GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            GlobalC::ParaO,
+            GlobalC::ParaO.trace_loc_row,
+            GlobalC::ParaO.trace_loc_col,
             isstress, svnl_dalpha);
 #ifdef __MPI
         Parallel_Reduce::reduce_double_all(GlobalC::ld.F_delta.c,GlobalC::ld.F_delta.nr*GlobalC::ld.F_delta.nc);
@@ -100,7 +101,6 @@ void Force_LCAO_gamma::ftable_gamma (
 			Parallel_Reduce::reduce_double_pool( svnl_dalpha.c, svnl_dalpha.nr * svnl_dalpha.nc);
 		}
 #endif
-        GlobalC::ld.print_F_delta("F_delta.dat", GlobalC::ucell);
     }
 #endif
     

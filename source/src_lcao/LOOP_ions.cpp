@@ -189,7 +189,7 @@ void LOOP_ions::opt_ions(void)
         {
             if(GlobalV::GAMMA_ONLY_LOCAL)
             {
-                GlobalC::ld.print_dm(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
+                //GlobalC::ld.print_dm(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
                 GlobalC::ld.cal_projected_DM(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],
                     GlobalC::ucell,
                     GlobalC::ORB,
@@ -199,28 +199,41 @@ void LOOP_ions::opt_ions(void)
             }
             else
             {
+                //GlobalC::ld.print_dm_k(GlobalC::kv.nks,GlobalC::LOC.wfc_dm_2d.dm_k);
                 GlobalC::ld.cal_projected_DM_k(GlobalC::LOC.wfc_dm_2d.dm_k,
                     GlobalC::ucell,
                     GlobalC::ORB,
                     GlobalC::GridD,
-                    GlobalC::ParaO,
-                    GlobalC::kv);
+                    GlobalC::ParaO.trace_loc_row,
+                    GlobalC::ParaO.trace_loc_col,
+                    GlobalC::kv.nks,
+                    GlobalC::kv.kvec_d);
             }
-            GlobalC::ld.check_projected_dm();
-
+            //GlobalC::ld.check_projected_dm();
             GlobalC::ld.cal_descriptor();    //final descriptor
-            GlobalC::ld.print_descriptor(GlobalC::ucell.nat);
-            GlobalC::ld.save_npy_d(GlobalC::ucell.nat);            //libnpy needed
             
+            if(GlobalV::MY_RANK==0)
+            {
+                GlobalC::ld.save_npy_d(GlobalC::ucell.nat);            //libnpy needed
+            }
+
             if (GlobalV::deepks_scf)
             {
                 if(GlobalV::GAMMA_ONLY_LOCAL)
                 {
-                    GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma, GlobalC::ParaO);
+                    GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],
+                        GlobalC::ParaO.trace_loc_row,
+                        GlobalC::ParaO.trace_loc_col,
+                        GlobalC::ParaO.nrow);
                 }
                 else
                 {
-                    GlobalC::ld.cal_e_delta_band_k(GlobalC::LOC.wfc_dm_2d.dm_k, GlobalC::ParaO, GlobalC::kv.nks);
+                    GlobalC::ld.cal_e_delta_band_k(GlobalC::LOC.wfc_dm_2d.dm_k,
+                    GlobalC::ParaO.trace_loc_row,
+                    GlobalC::ParaO.trace_loc_col,
+                    GlobalC::kv.nks,
+                    GlobalC::ParaO.nrow,
+                    GlobalC::ParaO.ncol);
                 }
                 std::cout << "E_delta_band = " << std::setprecision(8) << GlobalC::ld.e_delta_band << " Ry" << " = " << std::setprecision(8) << GlobalC::ld.e_delta_band * ModuleBase::Ry_to_eV << " eV" << std::endl;
                 std::cout << "E_delta_NN= "<<std::setprecision(8) << GlobalC::ld.E_delta << " Ry" << " = "<<std::setprecision(8)<<GlobalC::ld.E_delta*ModuleBase::Ry_to_eV<<" eV"<<std::endl;

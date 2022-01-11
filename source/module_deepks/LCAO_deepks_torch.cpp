@@ -1,18 +1,22 @@
 //This file contains interfaces with libtorch,
 //including loading of model and calculating gradients
+//as well as subroutines that prints the results for checking
 
-//The file contains 5 subroutines:
+//The file contains 8 subroutines:
 //1. cal_descriptor : obtains descriptors which are eigenvalues of pdm
 //      by calling torch::linalg::eigh
-//2. cal_gvx : gvx is used for training with force label, which is gradient of descriptors, 
+//2. check_descriptor : prints descriptor for checking
+//3. cal_gvx : gvx is used for training with force label, which is gradient of descriptors, 
 //      calculated by d(des)/dX = d(pdm)/dX * d(des)/d(pdm) = gdmx * gvdm
 //      using einsum
-//3. cal_gvdm : d(des)/d(pdm)
+//4. check_gvx : prints gvx into gvx.dat for checking
+//5. cal_gvdm : d(des)/d(pdm)
 //      calculated using torch::autograd::grad
-//4. load_model : loads model for applying V_delta
-//5. cal_gedm : calculates d(E_delta)/d(pdm)
+//6. load_model : loads model for applying V_delta
+//7. cal_gedm : calculates d(E_delta)/d(pdm)
 //      this is the term V(D) that enters the expression H_V_delta = |alpha>V(D)<alpha|
 //      caculated using torch::autograd::grad
+//8. check_gedm : prints gedm for checking
 
 #ifdef __DEEPKS
 
@@ -61,6 +65,27 @@ void LCAO_Deepks::cal_descriptor(void)
         //d_v = torch::symeig(pdm_tensor[inl], /*eigenvalues=*/true, /*upper=*/true);
         d_v = torch::linalg::eigh(pdm_tensor[inl], /*uplo*/"U");
         d_tensor[inl] = std::get<0>(d_v);
+    }
+    return;
+}
+
+void LCAO_Deepks::check_descriptor(const int nat)
+{
+    ModuleBase::TITLE("LCAO_Deepks", "check_descriptor");
+    ofstream ofs("descriptor.dat");
+    ofs<<std::setprecision(12);
+    for(int ia=0;ia<nat;ia++)
+    {
+        for(int inl=0;inl<inlmax/nat;inl++)
+        {
+            int nm = 2*inl_l[inl]+1;
+            for(int im=0;im<nm;im++)
+            {
+                const int ind=ia*inlmax/nat+inl;
+                ofs << std::setprecision(10) << d_tensor[ind].index({im}).item().toDouble() << " ";
+            }
+            ofs << std::endl;
+        }   
     }
     return;
 }
@@ -140,6 +165,50 @@ void LCAO_Deepks::cal_gvx(const int nat)
     return;
 }
 
+void LCAO_Deepks::check_gvx(const int nat)
+{
+    std::stringstream ss;
+    ofstream ofs_x;
+    ofstream ofs_y;
+    ofstream ofs_z;
+
+    ofs_x<<std::setprecision(12);
+    ofs_y<<std::setprecision(12);
+    ofs_z<<std::setprecision(12);
+
+    for(int ia=0;ia<nat;ia++)
+    {
+        ss.str("");
+        ss<<"gvx_"<<ia<<".dat";
+        ofs_x.open(ss.str().c_str());
+        ss.str("");
+        ss<<"gvy_"<<ia<<".dat";
+        ofs_y.open(ss.str().c_str());
+        ss.str("");
+        ss<<"gvz_"<<ia<<".dat";
+        ofs_z.open(ss.str().c_str());
+        for(int ib=0;ib<nat;ib++)
+        {
+            for(int inl=0;inl<inlmax/nat;inl++)
+            {
+                int nm = 2*inl_l[inl]+1;
+                {
+                    const int ind=ib*inlmax/nat+inl;
+                    ofs_x << std::setprecision(10) << gvx_tensor.index({ia,0,ib,inl}).item().toDouble() << " ";
+                    ofs_y << std::setprecision(10) << gvx_tensor.index({ia,1,ib,inl}).item().toDouble() << " ";
+                    ofs_z << std::setprecision(10) << gvx_tensor.index({ia,2,ib,inl}).item().toDouble() << " ";
+                }
+            }
+            ofs_x << std::endl;
+            ofs_y << std::endl;
+            ofs_z << std::endl;
+        }
+        ofs_x.close();
+        ofs_y.close();
+        ofs_z.close();        
+    }
+}
+
 //dDescriptor / dprojected density matrix
 void LCAO_Deepks::cal_gvdm(const int nat)
 {
@@ -204,12 +273,13 @@ void LCAO_Deepks::cal_gedm(const int nat)
 
     //forward
     std::vector<torch::jit::IValue> inputs;
+    
     //input_dim:(natom, des_per_atom)
-    inputs.push_back(torch::cat(this->d_tensor, /*dim=*/0).reshape({ nat, this->des_per_atom }));
+    inputs.push_back(torch::cat(this->d_tensor, 0).reshape({ nat, this->des_per_atom }));
     std::vector<torch::Tensor> ec;
     ec.push_back(module.forward(inputs).toTensor());    //Hartree
     this->E_delta = ec[0].item().toDouble() * 2;//Ry; *2 is for Hartree to Ry
-    
+
     //cal gedm
     std::vector<torch::Tensor> gedm_shell;
     gedm_shell.push_back(torch::ones_like(ec[0]));
@@ -230,6 +300,25 @@ void LCAO_Deepks::cal_gedm(const int nat)
         }
     }
     return;
+}
+
+void LCAO_Deepks::check_gedm()
+{
+    ofstream ofs("gedm.dat");
+    for(int inl=0;inl<inlmax;inl++)
+    {
+        int nm = 2 * inl_l[inl] + 1;
+        for (int m1 = 0;m1 < nm;++m1)
+        {
+            for (int m2 = 0;m2 < nm;++m2)
+            {
+                int index = m1 * nm + m2;
+                //*2 is for Hartree to Ry
+                ofs << this->gedm[inl][index] << " ";
+            }
+        }   
+        ofs << std::endl;     
+    }
 }
 
 #endif

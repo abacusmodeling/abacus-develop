@@ -1,14 +1,20 @@
-//wenfei 2022-1-5
+//wenfei 2022-1-11
 //This file contains subroutines for calculating pdm,
 //which is defind as sum_mu,nu rho_mu,nu (<chi_mu|alpha><alpha|chi_nu>);
 //as well as gdmx, which is the gradient of pdm, defined as
 //sum_mu,nu rho_mu,nu d/dX(<chi_mu|alpha><alpha|chi_nu>)
 
-//There are four subroutines in this file:
+//It also contains subroutines for printing pdm and gdmx
+//for checking purpose
+
+//There are 6 subroutines in this file:
 //1. cal_projected_DM, which is used for calculating pdm for gamma point calculation
 //2. cal_projected_DM_k, counterpart of 1, for multi-k
-//3. cal_gdmx, calculating gdmx for gamma point
-//4. cal_gdmx_k, counterpart of 3, for multi-k
+//3. check_projected_dm, which prints pdm to descriptor.dat
+
+//4. cal_gdmx, calculating gdmx for gamma point
+//5. cal_gdmx_k, counterpart of 3, for multi-k
+//6. check_gdmx, which prints gdmx to a series of .dat files
 
 #ifdef __DEEPKS
 
@@ -132,8 +138,10 @@ void LCAO_Deepks::cal_projected_DM_k(const std::vector<ModuleBase::ComplexMatrix
     const UnitCell_pseudo &ucell,
     const LCAO_Orbitals &orb,
     Grid_Driver &GridD,
-    const Parallel_Orbitals &ParaO,
-    const K_Vectors &kv)
+    const int* trace_loc_row,
+    const int* trace_loc_col,
+    const int nks,
+    const std::vector<ModuleBase::Vector3<double>> &kvec_d)
 {
 
     ModuleBase::timer::tick("LCAO_Deepks","cal_projected_DM_k");
@@ -197,21 +205,21 @@ void LCAO_Deepks::cal_projected_DM_k(const std::vector<ModuleBase::ComplexMatrix
 					for (int iw1=0; iw1<nw1_tot; ++iw1)
 					{
 						const int iw1_all = start1 + iw1;
-						const int iw1_local = ParaO.trace_loc_col[iw1_all];
+						const int iw1_local = trace_loc_col[iw1_all];
 						if(iw1_local < 0)continue;
 						const int iw1_0 = iw1/GlobalV::NPOL;
 						for (int iw2=0; iw2<nw2_tot; ++iw2)
 						{
 							const int iw2_all = start2 + iw2;
-							const int iw2_local = ParaO.trace_loc_row[iw2_all];
+							const int iw2_local = trace_loc_row[iw2_all];
 							if(iw2_local < 0)continue;
 							const int iw2_0 = iw2/GlobalV::NPOL;
  
                             double dm_current;
                             std::complex<double> tmp = 0.0;
-                            for(int ik=0;ik<kv.nks;ik++)
+                            for(int ik=0;ik<nks;ik++)
                             {
-                                const double arg = ( kv.kvec_d[ik] * (dR1-dR2) ) * ModuleBase::TWO_PI;
+                                const double arg = ( kvec_d[ik] * (dR1-dR2) ) * ModuleBase::TWO_PI;
                                 const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );
                                 tmp += dm[ik](iw1_local,iw2_local)*kphase;
                             }
@@ -417,8 +425,10 @@ void LCAO_Deepks::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm,
     const UnitCell_pseudo &ucell,
     const LCAO_Orbitals &orb,
     Grid_Driver &GridD,
-    const Parallel_Orbitals &ParaO,
-    const K_Vectors &kv)
+    const int* trace_loc_row,
+    const int* trace_loc_col,
+    const int nks,
+    const std::vector<ModuleBase::Vector3<double>> &kvec_d)
 {
     ModuleBase::TITLE("LCAO_Deepks", "cal_gdmx_k");
     ModuleBase::timer::tick("LCAO_Deepks","cal_gdmx_k");
@@ -484,23 +494,23 @@ void LCAO_Deepks::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm,
 					for (int iw1=0; iw1<nw1_tot; ++iw1)
 					{
 						const int iw1_all = start1 + iw1;
-						const int iw1_local = ParaO.trace_loc_row[iw1_all];
+						const int iw1_local = trace_loc_col[iw1_all];
 						if(iw1_local < 0)continue;
 						const int iw1_0 = iw1/GlobalV::NPOL;
 						for (int iw2=0; iw2<nw2_tot; ++iw2)
 						{
 							const int iw2_all = start2 + iw2;
-							const int iw2_local = ParaO.trace_loc_col[iw2_all];
+							const int iw2_local = trace_loc_row[iw2_all];
 							if(iw2_local < 0)continue;
 							const int iw2_0 = iw2/GlobalV::NPOL;
 
                             double dm_current;
                             std::complex<double> tmp = 0.0;
-                            for(int ik=0;ik<kv.nks;ik++)
+                            for(int ik=0;ik<nks;ik++)
                             {
-                                const double arg = - ( kv.kvec_d[ik] * (dR1-dR2) ) * ModuleBase::TWO_PI;
+                                const double arg = - ( kvec_d[ik] * (dR2-dR1) ) * ModuleBase::TWO_PI;
                                 const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );
-                                tmp += dm[ik](iw2_local,iw1_local)*kphase;
+                                tmp += dm[ik](iw1_local,iw2_local)*kphase;
                             }
                             dm_current=tmp.real();
                             
@@ -522,23 +532,25 @@ void LCAO_Deepks::cal_gdmx_k(const std::vector<ModuleBase::ComplexMatrix>& dm,
                                     {
                                         for (int m2 = 0; m2 < 2 * L0 + 1; ++m2)
                                         {
-                                            //ibt : on which iw2 is located
-                                            //iat : on which alpha is located
+                                            //(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'>
+                                            gdmx[iat][inl][m1*nm+m2] += nlm2[1][ib+m2] * nlm1[ib+m1] * dm_current;
+                                            gdmy[iat][inl][m1*nm+m2] += nlm2[2][ib+m2] * nlm1[ib+m1] * dm_current;
+                                            gdmz[iat][inl][m1*nm+m2] += nlm2[3][ib+m2] * nlm1[ib+m1] * dm_current;
 
-                                            double fact_x = (nlm2[1][ib+m2] * nlm1[ib+m1] + nlm2[1][ib+m2] * nlm1[ib+m1]) * dm_current;
-                                            double fact_y = (nlm2[2][ib+m2] * nlm1[ib+m1] + nlm2[2][ib+m2] * nlm1[ib+m1]) * dm_current;
-                                            double fact_z = (nlm2[3][ib+m2] * nlm1[ib+m1] + nlm2[3][ib+m2] * nlm1[ib+m1]) * dm_current;
+                                            //(<d/dX chi_nu|alpha_m'>)<chi_mu|alpha_m>
+                                            gdmx[iat][inl][m2*nm+m1] += nlm2[1][ib+m2] * nlm1[ib+m1] * dm_current;
+                                            gdmy[iat][inl][m2*nm+m1] += nlm2[2][ib+m2] * nlm1[ib+m1] * dm_current;
+                                            gdmz[iat][inl][m2*nm+m1] += nlm2[3][ib+m2] * nlm1[ib+m1] * dm_current;                                            
 
-                                            //(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'> + (<d/dX chi_nu|alpha_m'>)<chi_mu|alpha_m>
-                                            gdmx[iat][inl][m1*nm + m2] += fact_x;
-                                            gdmy[iat][inl][m1*nm + m2] += fact_y;                                               
-                                            gdmz[iat][inl][m1*nm + m2] += fact_z;
+                                            //(<chi_mu|d/dX alpha_m>)<chi_nu|alpha_m'> = -(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'>
+                                            gdmx[ibt2][inl][m1*nm+m2] -= nlm2[1][ib+m2] * nlm1[ib+m1] * dm_current;                                               
+                                            gdmy[ibt2][inl][m1*nm+m2] -= nlm2[2][ib+m2] * nlm1[ib+m1] * dm_current;                                               
+                                            gdmz[ibt2][inl][m1*nm+m2] -= nlm2[3][ib+m2] * nlm1[ib+m1] * dm_current;
 
-                                            //(<chi_mu|d/dX alpha_m>)<chi_nu|alpha_m'> + (<chi_nu|d/dX alpha_m'>)<chi_mu|alpha_m>
-                                            // = -(<d/dX chi_mu|alpha_m>)<chi_nu|alpha_m'> - (<d/dX chi_nu|alpha_m'>)<chi_mu|alpha_m>
-                                            gdmx[ibt2][inl][m1*nm + m2] -= fact_x;                                               
-                                            gdmy[ibt2][inl][m1*nm + m2] -= fact_y;                                               
-                                            gdmz[ibt2][inl][m1*nm + m2] -= fact_z;
+                                            //(<chi_nu|d/dX alpha_m'>)<chi_mu|alpha_m> = -(<d/dX chi_nu|alpha_m'>)<chi_mu|alpha_m>
+                                            gdmx[ibt2][inl][m2*nm+m1] -= nlm2[1][ib+m2] * nlm1[ib+m1] * dm_current;                                               
+                                            gdmy[ibt2][inl][m2*nm+m1] -= nlm2[2][ib+m2] * nlm1[ib+m1] * dm_current;                                               
+                                            gdmz[ibt2][inl][m2*nm+m1] -= nlm2[3][ib+m2] * nlm1[ib+m1] * dm_current;     
 
                                         }
                                     }
