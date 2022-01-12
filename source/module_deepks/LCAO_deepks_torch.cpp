@@ -81,6 +81,7 @@ void LCAO_Deepks::check_descriptor(const UnitCell_pseudo &ucell)
     {
         for (int ia = 0; ia < ucell.atoms[it].na; ia++)
         {
+            int iat=ucell.itia2iat(it,ia);
             ofs << ucell.atoms[it].label << " atom_index " << ia + 1 << " n_descriptor " << this->des_per_atom << std::endl;
             int id = 0;
             for(int inl=0;inl<inlmax/ucell.nat;inl++)
@@ -88,10 +89,10 @@ void LCAO_Deepks::check_descriptor(const UnitCell_pseudo &ucell)
                 int nm = 2*inl_l[inl]+1;
                 for(int im=0;im<nm;im++)
                 {
+                    const int ind=iat*inlmax/ucell.nat+inl;
+                    ofs << std::setprecision(10) << d_tensor[ind].index({im}).item().toDouble() << " ";
                     if (id % 8 == 7) ofs << std::endl;
                     id++;
-                    const int ind=ia*inlmax/ucell.nat+inl;
-                    ofs << std::setprecision(10) << d_tensor[ind].index({im}).item().toDouble() << " ";
                 }
             }   
             ofs << std::endl << std::endl;
