@@ -51,7 +51,7 @@ elif ((i==1)) ;then
     ./pw_test.exe
     echo "valgrind test:(1 processors)"
     valgrind ./pw_test.exe >_tmp.txt 2>&1
-    cat _tmp.txt|grep "ERROR SUMMARY"
+    cat _tmp.txt|egrep "(ERROR SUMMARY)|(lost)";
 else
     echo "1 processor:"
     ./pw_test.exe
@@ -70,13 +70,13 @@ fi
 if ((i==3)) ;then
     echo "valgrind test:(1 processors)"
     valgrind ./pw_test.exe >_tmp.txt 2>&1
-    cat _tmp.txt|grep "ERROR SUMMARY";
+    cat _tmp.txt|egrep "(ERROR SUMMARY)|(lost)";
     echo "valgrind test:(2 processors)"
     mpirun -np 2 valgrind ./pw_test.exe >_tmp.txt 2>&1
-    cat _tmp.txt|grep "ERROR SUMMARY";
+    cat _tmp.txt|egrep "(ERROR SUMMARY)|(lost)";
     echo "valgrind test:(8 processors)"
     mpirun -np 8 valgrind ./pw_test.exe >_tmp.txt 2>&1
-    cat _tmp.txt|grep "ERROR SUMMARY";
+    cat _tmp.txt|egrep "(ERROR SUMMARY)|(lost)";
 fi
 make clean > /dev/null 2>&1
 done
