@@ -11,6 +11,24 @@
 
 #include "LCAO_deepks.h"
 
+void stress_fill( 
+    const double& lat0_, 
+    const double& omega_,
+    ModuleBase::matrix& stress_matrix)
+{
+    assert(omega_>0.0);
+    double weight = lat0_ / omega_ ;
+    for(int i=0;i<3;++i)
+    {
+        for(int j=0;j<3;++j)
+        {
+            if(j>i) stress_matrix(j,i) = stress_matrix(i,j);
+            stress_matrix(i,j) *= weight ;
+        }
+    }
+}
+
+
 //force for gamma only calculations
 //Pulay and HF terms are calculated together
 void LCAO_Deepks::cal_f_delta_gamma(const ModuleBase::matrix& dm,
@@ -182,13 +200,7 @@ void LCAO_Deepks::cal_f_delta_gamma(const ModuleBase::matrix& dm,
 
     if(isstress)
     {
-        for(int i=0;i<3;i++)
-        {
-            for(int j=0;j<3;j++)
-            {
-                svnl_dalpha(i,j) *=  ucell.lat0 / ucell.omega;
-            }
-        }
+        stress_fill(ucell.lat0, ucell.omega, svnl_dalpha);
     }
 
     return;
@@ -385,13 +397,7 @@ void LCAO_Deepks::cal_f_delta_k(const std::vector<ModuleBase::ComplexMatrix>& dm
 
     if(isstress)
     {
-        for(int i=0;i<3;i++)
-        {
-            for(int j=0;j<3;j++)
-            {
-                svnl_dalpha(i,j) =  svnl_dalpha(i,j) * ucell.lat0 / ucell.omega;
-            }
-        }
+        stress_fill(ucell.lat0, ucell.omega, svnl_dalpha);
     }
     ModuleBase::timer::tick("LCAO_Deepks","cal_f_delta_hf_k_new");
     return;
