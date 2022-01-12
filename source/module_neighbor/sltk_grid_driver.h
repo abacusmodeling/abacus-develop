@@ -8,6 +8,7 @@
 #include "sltk_grid.h"
 #include "../src_pw/tools.h"
 #include "../src_pw/pw_basis.h"
+#include <tuple>
 
 class Grid_Driver : public Grid
 {
@@ -47,6 +48,9 @@ public:
 	const int& getNatom(const int i) const { return natom[i]; }
 	const ModuleBase::Vector3<double>& getAdjacentTau(const int i) const { return adjacent_tau[i]; } 
 	const ModuleBase::Vector3<int>& getBox(const int i) const {return box[i];}
+
+    std::vector<std::tuple<int, int, ModuleBase::Vector3<int>, ModuleBase::Vector3<double>>> get_adjs(const size_t &iat);
+    std::vector<std::vector<std::tuple<int, int, ModuleBase::Vector3<int>, ModuleBase::Vector3<double>>>> get_adjs();
 
 private:
 
