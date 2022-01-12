@@ -9,11 +9,11 @@
 namespace ModulePW
 {
 
-//
-//transform real space to reciprocal space
-//in: (nplane,nx,ny)
-//out: (nz, ns)
-//
+///
+/// transform real space to reciprocal space
+/// in: (nplane,ny,nx), complex<double> data
+/// out: (nz, ns),  complex<double> data
+///
 void PW_Basis_K:: real2recip(std::complex<double> * in, std::complex<double> * out, int ik)
 {
     ModuleBase::timer::tick("PW_Basis_K", "real2recip");
@@ -37,11 +37,11 @@ void PW_Basis_K:: real2recip(std::complex<double> * in, std::complex<double> * o
     ModuleBase::timer::tick("PW_Basis_K", "real2recip");
 }
 
-//
-//transform real space to reciprocal space
-//in: (nplane,nx,ny)
-//out: (nz, ns)
-//
+///
+/// transform real space to reciprocal space
+/// in: (nplane,ny,nx), double data
+/// out: (nz, ns), complex<double> data
+///
 void PW_Basis_K:: real2recip(double * in, std::complex<double> * out, int ik)
 {
     ModuleBase::timer::tick("PW_Basis_K", "real2recip_gamma_only");
@@ -74,11 +74,11 @@ void PW_Basis_K:: real2recip(double * in, std::complex<double> * out, int ik)
     return;
 }
 
-//
-//transform real space to reciprocal space
-//in: (nz,ns)
-//out: (nplane, nx, ny)
-//
+///
+/// transform reciprocal space to real space
+/// in: (nz,ns), complex<double>
+/// out: (nplane, ny, nx), complex<double>
+///
 void PW_Basis_K:: recip2real(std::complex<double> * in, std::complex<double> * out, int ik)
 {
     ModuleBase::timer::tick("PW_Basis_K", "recip2real");
@@ -104,11 +104,11 @@ void PW_Basis_K:: recip2real(std::complex<double> * in, std::complex<double> * o
     return;
 }
 
-//
-//transform real space to reciprocal space
-//in: (nz,ns)
-//out: (nplane, nx, ny)
-//
+///
+/// transform reciprocal space to real space
+/// in: (nz,ns), complex<double>
+/// out: (nplane, ny, nx), double
+///
 void PW_Basis_K:: recip2real(std::complex<double> * in, double * out, int ik)
 {
     ModuleBase::timer::tick("PW_Basis_K", "recip2real_gamma_only");
@@ -144,6 +144,11 @@ void PW_Basis_K:: recip2real(std::complex<double> * in, double * out, int ik)
 }
 
 #ifdef __MIX_PRECISION
+///
+/// transform real space to reciprocal space
+/// in: (nplane,ny,nx), complex<float> data
+/// out: (nz, ns),  complex<float> data
+///
 void PW_Basis_K:: real2recip(std::complex<float> * in, std::complex<float> * out, int ik)
 {
     assert(this->gamma_only == false);
@@ -164,6 +169,11 @@ void PW_Basis_K:: real2recip(std::complex<float> * in, std::complex<float> * out
     return;
 }
 
+///
+/// transform real space to reciprocal space
+/// in: (nplane,ny,nx), float data
+/// out: (nz, ns), complex<float> data
+///
 void PW_Basis_K:: real2recip(float * in, std::complex<float> * out, int ik)
 {
     assert(this->gamma_only == true);
@@ -189,6 +199,11 @@ void PW_Basis_K:: real2recip(float * in, std::complex<float> * out, int ik)
     return;
 }
 
+///
+/// transform reciprocal space to real space
+/// in: (nz,ns), complex<float>
+/// out: (nplane, ny, nx), complex<float>
+///
 void PW_Basis_K:: recip2real(std::complex<float> * in, std::complex<float> * out, int ik)
 {
     assert(this->gamma_only == false);
@@ -212,6 +227,11 @@ void PW_Basis_K:: recip2real(std::complex<float> * in, std::complex<float> * out
     return;
 }
 
+///
+/// transform reciprocal space to real space
+/// in: (nz,ns), complex<float>
+/// out: (nplane, ny, nx), float
+///
 void PW_Basis_K:: recip2real(std::complex<float> * in, float * out, int ik)
 {
     assert(this->gamma_only == true);

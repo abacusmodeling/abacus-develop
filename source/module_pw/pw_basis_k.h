@@ -8,7 +8,8 @@ namespace ModulePW
 ///
 /// Special pw_basis class.
 /// It includes different k-points
-/// plane waves: <r|g,k>=1/sqrt(V) * exp(i(k+g)r)
+/// plane waves: <r|g,k> = 1/sqrt(V) * exp(i(k+g)r)
+/// f(r) = 1/sqrt(V) * \sum_g{c(g)*exp(i(k+g)r)}
 ///
 class PW_Basis_K : public PW_Basis
 {
@@ -17,6 +18,7 @@ public:
     PW_Basis_K();
     ~PW_Basis_K();
 
+    //init parameters of pw_basis_k class
     void initparameters(
         bool gamma_only_in,
         double ecut_in,
@@ -35,9 +37,15 @@ public:
     double gk_ecut; //Energy cut off for (g+k)^2/2
 
 public:
+    //prepare for transforms between real and reciprocal spaces
     void setuptransform();
+    
+    //create igl2isz_k map array for fft
     void setupIndGk();
+
     int *igl2isz_k; //[npwk_max*nks] map (ig,ik) to (is,iz) 
+
+    //create Direct coordinate, Cartesian coordinate, norm2 of plane waves in each processor
     void collect_local_pw();
 
 public:
@@ -54,9 +62,13 @@ public:
 #endif
 
 public:
-    //operator
+    //operator:
+
+    //calculate g+k
     ModuleBase::Vector3<double> get_GPlusK_cartesian(const int ik, const int ig) const;
+    //calculate g+k.x/y/z
     double get_GPlusK_cartesian_projection(const int ik, const int ig, const int axis) const;
+    //calculate (g+k)^2
     double get_SquareGPlusK_cartesian(const int ik, const int ig) const;
 };
 

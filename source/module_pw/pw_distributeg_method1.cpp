@@ -8,21 +8,21 @@
 
 namespace ModulePW
 {
-//
-// Distribute planewaves in reciprocal space to cores.
-// Firstly, divide the sphere in reciprocal space into sticks, which are vertical to x-y plane.
-// Secondly, distribute these sticks to coreors.
-// 
-// Example
-//                |  ---- ixy increasing ---> |   ---- ixy increasing --->   |...
-// index of sticks 0, 1, 2, ..., nst_per[0]-1, nst_per[0], ..., nst_per[1]-1, ...
-//                |___________________________|______________________________|___
-// ip                           0                            1              ...
-//                             npw    approximate equal to  npw   approximate equal to...
-// 
-//Known: G, GT, GGT, ny, nx, nz, poolnproc, poolrank, ggecut
-//output: ig2isz[ig], istot2bigixy[is], ixy2istot[nxy], is2ixy[is], ixy2ip[ixy], startnsz_per[ip], nst_per[ip], nst
-//
+///
+/// Distribute planewaves in reciprocal space to cores.
+/// Firstly, divide the sphere in reciprocal space into sticks, which are vertical to x-y plane.
+/// Secondly, distribute these sticks to coreors.
+/// 
+/// Example
+///                |  ---- ixy increasing ---> |   ---- ixy increasing --->   |...
+/// index of sticks 0, 1, 2, ..., nst_per[0]-1, nst_per[0], ..., nst_per[1]-1, ...
+///                |___________________________|______________________________|___
+/// ip                           0                            1              ...
+///                             npw    approximate equal to  npw   approximate equal to...
+/// 
+/// Known: G, GT, GGT, ny, nx, nz, poolnproc, poolrank, ggecut
+/// output: ig2isz[ig], istot2bigixy[is], ixy2istot[nxy], is2ixy[is], ixy2ip[ixy], startnsz_per[ip], nst_per[ip], nst
+///
 void PW_Basis::distribution_method1()
 {
     ModuleBase::timer::tick("PW_Basis", "distributeg_method1");
@@ -87,7 +87,7 @@ void PW_Basis::distribution_method1()
         {
             this->ixy2ip[ixy] = -1;                 // meaning this stick has not been distributed or there is no stick on (x, y).
         }
-        this->divide_sticks(st_i, st_j, st_length, npw_per);
+        this->divide_sticks_1(st_i, st_j, st_length, npw_per);
         delete[] st_length;
 
          // for test -----------------------------------------------------------------------------
@@ -192,14 +192,14 @@ void PW_Basis::distribution_method1()
     return;
 }
 
-//        
-// (2) Collect the x, y indexs, length of the sticks.
-// Firstly, we scan the area and construct temp_st_*.
-// Then, as we will distribute the longest sticks preferentially in Step(3),
-// we will sort temp_st_length from largest to smallest, and reaarange st_* to the same order.
-// known: tot_npw, this->nstot, st_length2D, st_bottom2D
-// output: st_i, st_j, st_length
-//
+///        
+/// (2) Collect the x, y indexs, length of the sticks.
+/// Firstly, we scan the area and construct temp_st_*.
+/// Then, as we will distribute the longest sticks preferentially in Step(3),
+/// we will sort temp_st_length from largest to smallest, and reaarange st_* to the same order.
+/// known: tot_npw, this->nstot, st_length2D, st_bottom2D
+/// output: st_i, st_j, st_length
+///
 void PW_Basis::collect_st(
     int* st_length2D,                               // the number of planewaves that belong to the stick located on (x, y), stored in 2d x-y plane.
     int* st_bottom2D,                               // the z-coordinate of the bottom of stick on (x, y), stored in 2d x-y plane.
@@ -295,15 +295,15 @@ void PW_Basis::collect_st(
     return;
 }
 
-//
-// (3-1) Distribute sticks to cores.
-// We have rearranged sticks in the order of length decreasing, so that we will distribute the longest stick preferentially here.
-// For each stick, we find the core that contains the least planewaves firstly, and distribute the stick to it,
-// then update npw_per, this->nstnz_per, this->ixy2ip, and this->startnsz_per.
-// known: tot_npw, this->nstot, st_i, st_j, st_length
-// output: npw_per, nst_per, this->nstnz_per, this->ixy2ip, this->startnsz_per
-//
-void PW_Basis::divide_sticks(
+///
+/// (3-1) Distribute sticks to cores according to the number of plane waves.
+/// We have rearranged sticks in the order of length decreasing, so that we will distribute the longest stick preferentially here.
+/// For each stick, we find the core that contains the least planewaves firstly, and distribute the stick to it,
+/// then update npw_per, this->nstnz_per, this->ixy2ip, and this->startnsz_per.
+/// known: tot_npw, this->nstot, st_i, st_j, st_length
+/// output: npw_per, nst_per, this->nstnz_per, this->ixy2ip, this->startnsz_per
+///
+void PW_Basis::divide_sticks_1(
     int* st_i,          // x or x + nx (if x < 0) of stick.
     int* st_j,          // y or y + ny (if y < 0) of stick.
     int* st_length,     // the stick on (x, y) consists of st_length[x*ny+y] planewaves.
@@ -363,14 +363,14 @@ void PW_Basis::divide_sticks(
     return;
 }
 
-//
-// (3-2) Rearrange sticks in the order of the ip of core increasing, in each core, sticks are sorted in the order of ixy increasing.
-// (st_start + st_move) is the new index of sticks.
-// Then get istot2bigixy (istot2bigixy[is]: iy + ix * ny of is^th stick among all sticks) on the first core
-// and ixy2istot (ixy2istot[iy + ix * ny]: is of stick on (iy, ix) among all sticks).
-// known: this->nstot, st_i, st_j, this->startnsz_per
-// output: istot2bigixy, ixy2istot
-//
+///
+/// (3-2) Rearrange sticks in the order of the ip of core increasing, in each core, sticks are sorted in the order of ixy increasing.
+/// (st_start + st_move) is the new index of sticks.
+/// Then get istot2bigixy (istot2bigixy[is]: iy + ix * ny of is^th stick among all sticks) on the first core
+/// and ixy2istot (ixy2istot[iy + ix * ny]: is of stick on (iy, ix) among all sticks).
+/// known: this->nstot, st_i, st_j, this->startnsz_per
+/// output: istot2bigixy, ixy2istot
+///
 void PW_Basis::get_istot2bigixy(
     int* st_i,          // x or x + nx (if x < 0) of stick.
     int* st_j          // y or y + ny (if y < 0) of stick.

@@ -99,6 +99,12 @@ void PW_Basis_K::setupIndGk()
 
     return;
 }
+
+/// 
+/// distribute plane wave basis and real-space grids to different processors
+/// set up maps for fft and create arrays for MPI_Alltoall
+/// set up ffts
+///
 void PW_Basis_K::setuptransform()
 {
     this->distribute_r();

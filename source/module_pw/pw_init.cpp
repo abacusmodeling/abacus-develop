@@ -7,11 +7,11 @@
 
 namespace ModulePW
 {
-//
-//Init the grids for FFT
-//Input: lattice vectors of the cell, Energy cut off for G^2/2
-//Output: nx, ny, nz, nxyz, latvec, G, GT, GGT
-//
+/// 
+/// Init the grids for FFT
+/// Input: lattice vectors of the cell, Energy cut off for G^2/2
+/// Output: nx, ny, nz, nxyz, latvec, G, GT, GGT
+/// 
 void PW_Basis:: initgrids(
         double lat0_in, //unit length (unit in bohr)
         ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors
@@ -140,11 +140,11 @@ void PW_Basis:: initgrids(
     return;
 }
 
-//
-//Init the grids for FFT
-//Input: lattice vectors of the cell, nx, ny, nz
-//Output: nx, ny, nz, nxyz, latvec, G, GT, GGT
-//
+/// 
+/// Init the grids for FFT
+/// Input: lattice vectors of the cell, nx, ny, nz
+/// Output: nx, ny, nz, nxyz, latvec, G, GT, GGT
+/// 
 void PW_Basis:: initgrids(
     double lat0_in,
     ModuleBase::Matrix3 latvec_in, // Unitcell lattice vectors

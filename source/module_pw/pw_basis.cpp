@@ -52,6 +52,11 @@ PW_Basis:: ~PW_Basis()
     if(startr != NULL) delete[] startr;
 }
 
+/// 
+/// distribute plane wave basis and real-space grids to different processors
+/// set up maps for fft and create arrays for MPI_Alltoall
+/// set up ffts
+///
 void PW_Basis::setuptransform()
 {
     this->distribute_r();
@@ -96,11 +101,11 @@ void PW_Basis::getstartgr()
     return;
 }
 
-//
-// Collect planewaves on current core, and construct gg, gdirect, gcar according to ig2isz and is2ixy.
-// known: ig2isz, is2ixy
-// output: gg, gdirect, gcar
-// 
+///
+/// Collect planewaves on current core, and construct gg, gdirect, gcar according to ig2isz and is2ixy.
+/// known: ig2isz, is2ixy
+/// output: gg, gdirect, gcar
+/// 
 void PW_Basis::collect_local_pw()
 {
     if(gg != NULL) delete[] gg;
