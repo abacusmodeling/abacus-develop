@@ -59,6 +59,7 @@ void PW_Basis::distribution_method1()
         //     std::cout << '\n';
         // }
         // ------------------------------------------------------------
+        ModuleBase::GlobalFunc::ZEROS(this->nst_per, poolnproc);
 #ifdef __MPI
         // Parallel line
 
@@ -78,7 +79,6 @@ void PW_Basis::distribution_method1()
         this->nstnz_per = new int[this->poolnproc]; // nz * nst(number of sticks) on each core.
         this->startnsz_per = new int[this->poolnproc];
         ModuleBase::GlobalFunc::ZEROS(npw_per, poolnproc);
-        ModuleBase::GlobalFunc::ZEROS(this->nst_per, poolnproc);
         ModuleBase::GlobalFunc::ZEROS(this->nstnz_per, poolnproc);
         ModuleBase::GlobalFunc::ZEROS(startnsz_per, poolnproc);
         
@@ -124,6 +124,7 @@ void PW_Basis::distribution_method1()
         this->nstnz_per[0] = this->nst * this->nz;
         this->startnsz_per = new int[1];
         this->startnsz_per[0] = 0;
+        this->nst_per[0] = this->nst;
 
         this->ixy2istot = new int[nxy];
         this->istot2bigixy = new int[this->nstot];

@@ -41,7 +41,62 @@ TEST_F(PWTEST,test1_1_1)
     const int nx_ref = 54;
     const int ny_ref = 3;
     const int nz_ref = 15;
-    
+
+    //some results for different number of processors
+    int npw_per_ref[12][12]={
+        {1051},
+        {525,526},
+        {351,351,349},
+        {263,263,263,262},
+        {210,211,211,211,208},
+        {177,177,174,174,175,174},
+        {152,152,149,149,149,150,150},
+        {131,131,131,131,131,132,132,132},
+        {118,118,118,118,118,115,115,115,116},
+        {106,107,107,104,104,104,104,107,104,104},
+        {98,95,95,95,95,95,95,98,95,95,95},
+        {88,88,88,88,89,89,86,86,86,86,88,89}
+    };
+    int nst_per_ref[12][12]={
+        {123},
+        {61,62},
+        {41,41,41},
+        {31,31,31,30},
+        {24,25,25,25,24},
+        {21,21,20,20,21,20},
+        {18,18,17,17,17,18,18},
+        {15,15,15,15,15,16,16,16},
+        {14,14,14,14,14,13,13,13,14},
+        {12,13,13,12,12,12,12,13,12,12},
+        {12,11,11,11,11,11,11,12,11,11,11},
+        {10,10,10,10,11,11,10,10,10,10,10,11}
+    };
+    int *npw_per;
+    if(rank_in_pool == 0)
+    {
+        npw_per = new int [nproc_in_pool];
+    }
+#ifdef __MPI
+    MPI_Gather(&pwtest.npw,1,MPI_INT,npw_per,1,MPI_INT,0,POOL_WORLD);
+#else
+    if(rank_in_pool == 0) npw_per[0] = pwtest.npw;
+#endif
+    if(rank_in_pool == 0)
+    {
+        if(nproc_in_pool <= 12)
+        {
+            for(int ip = 0 ; ip < nproc_in_pool ; ++ip)
+            {
+                ASSERT_EQ(npw_per_ref[nproc_in_pool-1][ip], npw_per[ip]);
+                ASSERT_EQ(nst_per_ref[nproc_in_pool-1][ip], pwtest.nst_per[ip]);
+            }
+        }
+        else
+        {
+            cout<<"Please use mpi processors no more than 12."<<endl;
+        }
+        delete []npw_per;
+    }
 
     //results
     int tot_npw = 0;

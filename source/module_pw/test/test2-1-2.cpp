@@ -42,6 +42,61 @@ TEST_F(PWTEST,test2_1_2)
     const int bigny_ref = 36;
     const int ny_ref = 19;
     const int nz_ref = 50;
+    //some results for different number of processors
+    int npw_per_ref[12][12]={
+        {2931},
+        {1548,1383},
+        {1133,744,1054},
+        {870,678,586,797},
+        {699,617,397,559,659},
+        {598,535,415,329,521,533},
+        {501,457,421,267,371,431,483},
+        {458,412,384,294,230,356,406,391},
+        {418,364,364,304,181,267,319,367,347},
+        {374,340,328,286,234,165,277,291,329,307},
+        {328,314,298,276,234,160,200,240,310,296,275},
+        {303,295,291,257,233,183,151,204,236,262,254,262}
+    };
+    int nst_per_ref[12][12]={
+        {175},
+        {88,87},
+        {59,58,58},
+        {44,44,44,43},
+        {35,35,35,35,35},
+        {30,29,29,29,29,29},
+        {25,25,25,25,25,25,25},
+        {22,22,22,22,22,22,22,21},
+        {20,20,20,20,19,19,19,19,19},
+        {18,18,18,18,18,17,17,17,17,17},
+        {16,16,16,16,16,16,16,16,16,16,15},
+        {15,15,15,15,15,15,15,14,14,14,14,14}
+    };
+    int *npw_per;
+    if(rank_in_pool == 0)
+    {
+        npw_per = new int [nproc_in_pool];
+    }
+#ifdef __MPI
+    MPI_Gather(&pwtest.npw,1,MPI_INT,npw_per,1,MPI_INT,0,POOL_WORLD);
+#else
+    if(rank_in_pool == 0) npw_per[0] = pwtest.npw;
+#endif
+    if(rank_in_pool == 0)
+    {
+        if(nproc_in_pool <= 12)
+        {
+            for(int ip = 0 ; ip < nproc_in_pool ; ++ip)
+            {
+                ASSERT_EQ(npw_per_ref[nproc_in_pool-1][ip], npw_per[ip]);
+                ASSERT_EQ(nst_per_ref[nproc_in_pool-1][ip], pwtest.nst_per[ip]);
+            }
+        }
+        else
+        {
+            cout<<"Please use mpi processors no more than 12."<<endl;
+        }
+        delete []npw_per;
+    }
     
 
     //results

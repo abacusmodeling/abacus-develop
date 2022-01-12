@@ -67,14 +67,14 @@ GTESTOPTS = -I${GTEST_DIR}/include -L${GTEST_DIR}/lib -lgtest -lpthread
 # CPLUSPLUS = icpc
 
 #Only MPI
-# HONG = -D__MPI -D__NORMAL
+HONG = -D__MPI -D__NORMAL
 
 #MPI + Mix Precision
 # HONG = -D__MPI -D__MIX_PRECISION -D__NORMAL
 # TESTFILE0 = ${DOUBLEFILE} ${FLOATFILE}
 
 #Cuda
-HONG = -D__MPI -D__CUDA -D__NORMAL
+# HONG = -D__MPI -D__CUDA -D__NORMAL
 
 #Cuda & Mix Precision
 #HONG = -D__MPI -D__CUDA -D__MIX_PRECISION -D__NORMAL
