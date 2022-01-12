@@ -42,7 +42,7 @@ LCAO_Deepks::~LCAO_Deepks()
     delete[] inl_l;
     delete[] H_V_delta;
 
-    //=======1. "out_descriptor" part==========
+    //=======1. to use deepks, pdm is required==========
     //delete pdm**
     for (int inl = 0;inl < this->inlmax;inl++)
     {
@@ -254,7 +254,8 @@ void LCAO_Deepks::allocate_V_delta(const int nat, const int nloc, const int nks)
     {
         //init F_delta
         F_delta.create(nat, 3);
-        this->init_gdmx(nat);
+        if(GlobalV::deepks_out_labels) this->init_gdmx(nat);
+        //gdmx is used only in calculating gvx
     }
 
     return;

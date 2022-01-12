@@ -24,7 +24,7 @@ void test_deepks::set_parameters()
 	GlobalV::global_out_dir="./";
 	GlobalV::ofs_warning.open("warning.log");
 	GlobalV::ofs_running.open("running.log");
-	GlobalV::out_descriptor=1;
+	GlobalV::deepks_setorb=1;
 	GlobalV::GAMMA_ONLY_LOCAL=0;
 	GlobalV::FORCE=1;
 
@@ -154,7 +154,7 @@ void test_deepks::set_orbs(const double &lat0_in)
 			lcao_dk,
 			lcao_dr,
 			lcao_rmax,
-			GlobalV::out_descriptor,
+			GlobalV::deepks_setorb,
 			out_r_matrix,
 			GlobalV::FORCE,
 			my_rank);
@@ -170,7 +170,7 @@ void test_deepks::set_orbs(const double &lat0_in)
 			OGT,
 			ORB,
 			ucell.lat0,
-			GlobalV::out_descriptor,
+			GlobalV::deepks_setorb,
 			lmax,
 			ucell.infoNL.nprojmax,
 			ucell.infoNL.nproj,

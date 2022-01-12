@@ -267,9 +267,9 @@ void LCAO_Deepks::cal_projected_DM_k(const std::vector<ModuleBase::ComplexMatrix
 
 void LCAO_Deepks::check_projected_dm(void)
 {
-    ofstream ofs("pdm");
+    ofstream ofs("pdm.dat");
     const int pdm_size = (this->lmaxd * 2 + 1) * (this->lmaxd * 2 + 1);
-    ofs<<std::setprecision(12);
+    ofs<<std::setprecision(10);
     for(int inl=0;inl<inlmax;inl++)
     {
         for(int ind=0;ind<pdm_size;ind++)
@@ -584,9 +584,9 @@ void LCAO_Deepks::check_gdmx(const int nat)
     ofstream ofs_y;
     ofstream ofs_z;
 
-    ofs_x<<std::setprecision(12);
-    ofs_y<<std::setprecision(12);
-    ofs_z<<std::setprecision(12);
+    ofs_x<<std::setprecision(10);
+    ofs_y<<std::setprecision(10);
+    ofs_z<<std::setprecision(10);
 
     const int pdm_size = (this->lmaxd * 2 + 1) * (this->lmaxd * 2 + 1);
     for(int ia=0;ia<nat;ia++)

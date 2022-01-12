@@ -94,7 +94,7 @@ int UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_ru
 			}
 		}	
 		// caoyu add 2021-03-16
-		if(GlobalV::out_descriptor)
+		if(GlobalV::deepks_setorb)
 		{
 			if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "NUMERICAL_DESCRIPTOR")) {
 				ifa >> orb.descriptor_file;

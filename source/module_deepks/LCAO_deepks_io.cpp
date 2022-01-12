@@ -57,6 +57,7 @@ void LCAO_Deepks::print_dm_k(const int nks, const std::vector<ModuleBase::Comple
 void LCAO_Deepks::save_npy_d(const int nat)
 {
     ModuleBase::TITLE("LCAO_Deepks", "save_npy_d");
+    if(GlobalV::MY_RANK!=0) return;
     //save descriptor in .npy format
     vector<double> npy_des;
     for (int inl = 0;inl < inlmax;++inl)
@@ -79,6 +80,7 @@ void LCAO_Deepks::save_npy_d(const int nat)
 void LCAO_Deepks::save_npy_gvx(const int nat)
 {
     ModuleBase::TITLE("LCAO_Deepks", "save_npy_gvx");
+    if(GlobalV::MY_RANK!=0) return;
     //save grad_vx.npy (when  force label is in use)
     //unit: /Bohr
     const long unsigned gshape[] = {(long unsigned) nat, 3, nat, this->des_per_atom};
@@ -104,6 +106,7 @@ void LCAO_Deepks::save_npy_gvx(const int nat)
 void LCAO_Deepks::save_npy_e(const double &e, const std::string &e_file)
 {
     ModuleBase::TITLE("LCAO_Deepks", "save_npy_e");
+    if(GlobalV::MY_RANK!=0) return;
     //save e_base
     const long unsigned eshape[] = { 1 };
     vector<double> npy_e;
@@ -116,6 +119,7 @@ void LCAO_Deepks::save_npy_e(const double &e, const std::string &e_file)
 void LCAO_Deepks::save_npy_f(const ModuleBase::matrix &f, const std::string &f_file, const int nat)
 {
     ModuleBase::TITLE("LCAO_Deepks", "save_npy_f");
+    if(GlobalV::MY_RANK!=0) return;
     //save f_base
     //caution: unit: Rydberg/Bohr
     const long unsigned fshape[] = {(long unsigned) nat, 3 };
@@ -134,6 +138,7 @@ void LCAO_Deepks::save_npy_f(const ModuleBase::matrix &f, const std::string &f_f
 void LCAO_Deepks::save_npy_o(const double &bandgap, const std::string &o_file)
 {
     ModuleBase::TITLE("LCAO_Deepks", "save_npy_o");
+    if(GlobalV::MY_RANK!=0) return;
     //save o_base
     const long unsigned oshape[] = { 1 };
     vector<double> npy_o;
@@ -145,6 +150,7 @@ void LCAO_Deepks::save_npy_o(const double &bandgap, const std::string &o_file)
 void LCAO_Deepks::save_npy_orbital_precalc(const int nat)
 {
     ModuleBase::TITLE("LCAO_Deepks", "save_npy_orbital_precalc");
+    if(GlobalV::MY_RANK!=0) return;
     //save orbital_precalc.npy (when bandgap label is in use)
     //unit: a.u.
     const long unsigned gshape[] = {(long unsigned) 1, nat, this->des_per_atom};

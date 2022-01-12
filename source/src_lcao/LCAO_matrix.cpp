@@ -57,7 +57,7 @@ void LCAO_Matrix::divide_HS_in_frag(const bool isGamma, Parallel_Orbitals &po)
 	//wenfei 2021-12-19
     //preparation for DeePKS
 
-	if (GlobalV::out_descriptor)
+	if (GlobalV::deepks_out_labels || GlobalV::deepks_scf)
 	{
         //allocate relevant data structures for calculating descriptors
         std::vector<int> na;

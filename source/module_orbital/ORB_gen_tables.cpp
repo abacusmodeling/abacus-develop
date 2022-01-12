@@ -18,7 +18,7 @@ void ORB_gen_tables::gen_tables(
 	const int &job0,
 	LCAO_Orbitals &orb,
 	const int &Lmax_exx,
-	const int &out_descriptor,
+	const bool &deepks_setorb,
 	const int &nprojmax, 
 	const int* nproj,
 	const Numerical_Nonlocal* beta_)
@@ -49,7 +49,7 @@ void ORB_gen_tables::gen_tables(
 
 	//caoyu add 2021-03-18
 	//mohan update 2021-04-22
-	if (out_descriptor>0)
+	if (deepks_setorb)
 	{
 		talpha.allocate(
 			orb.get_ntype(), 
@@ -70,7 +70,7 @@ void ORB_gen_tables::gen_tables(
 
 	//caoyu add 2021-03-18
 	// DS: Descriptor
-	if (out_descriptor>0)
+	if (deepks_setorb)
 	{
 		talpha.init_DS_Opair(orb);
 		talpha.init_DS_2Lplus1(orb);
@@ -102,10 +102,10 @@ void ORB_gen_tables::gen_tables(
 	tbeta.init_Table_Beta(MOT.pSB, orb.Phi, beta_, nproj); // add 2009-5-8
 
 	//caoyu add 2021-03-18
-	if (out_descriptor>0)
+	if (deepks_setorb)
 	{
 		talpha.init_Table_Alpha(MOT.pSB, orb);
-		//talpha.print_Table_DSR();
+		if(GlobalV::deepks_out_unittest) talpha.print_Table_DSR(orb);
 	}
 
 	/////////////////////////////

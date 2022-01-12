@@ -101,6 +101,31 @@ void Force_LCAO_gamma::ftable_gamma (
 			Parallel_Reduce::reduce_double_pool( svnl_dalpha.c, svnl_dalpha.nr * svnl_dalpha.nc);
 		}
 #endif
+        if(GlobalV::deepks_out_unittest)
+        {
+            GlobalC::ld.print_dm(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
+            GlobalC::ld.check_projected_dm();
+            GlobalC::ld.check_descriptor(GlobalC::ucell);
+            GlobalC::ld.check_gedm();
+            GlobalC::ld.add_v_delta(GlobalC::ucell,
+                        GlobalC::ORB,
+                        GlobalC::GridD,
+                        GlobalC::ParaO.trace_loc_row,
+                        GlobalC::ParaO.trace_loc_col,
+                        GlobalC::ParaO.nrow,
+                        GlobalC::ParaO.ncol);
+            GlobalC::ld.check_v_delta(GlobalC::ParaO.nrow,GlobalC::ParaO.ncol);
+
+            GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],
+                GlobalC::ParaO.trace_loc_row,
+                GlobalC::ParaO.trace_loc_col,
+                GlobalC::ParaO.nrow);
+			ofstream ofs("E_delta_bands.dat");
+			ofs <<std::setprecision(10)<< GlobalC::ld.e_delta_band;
+			ofstream ofs1("E_delta.dat");
+			ofs1 <<std::setprecision(10)<< GlobalC::ld.E_delta;
+            GlobalC::ld.check_f_delta(GlobalC::ucell.nat, svnl_dalpha);
+        }
     }
 #endif
     

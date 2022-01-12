@@ -429,6 +429,7 @@ void ORB_table_alpha::print_Table_DSR(LCAO_Orbitals &orb)
 	{
 		ofs.open(ss.str().c_str());
 	}
+	ofs << std::setprecision(10);
 
 	for (int T1 = 0; T1 < this->ntype; T1++)	//T1
 	{

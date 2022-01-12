@@ -90,4 +90,9 @@ public:
 
 	void check_e_deltabands(void);
 	void check_f_delta(void);
+
+	//compares numbers stored in two files
+	bool compare_with_ref(
+		const std::string f1,
+		const std::string f2);
 };

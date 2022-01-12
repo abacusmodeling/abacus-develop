@@ -75,8 +75,9 @@ void LCAO_Deepks::cal_descriptor(void)
 void LCAO_Deepks::check_descriptor(const UnitCell_pseudo &ucell)
 {
     ModuleBase::TITLE("LCAO_Deepks", "check_descriptor");
+    if(GlobalV::MY_RANK!=0) return;
     ofstream ofs("descriptor.dat");
-    ofs<<std::setprecision(12);
+    ofs<<std::setprecision(10);
     for (int it = 0; it < ucell.ntype; it++)
     {
         for (int ia = 0; ia < ucell.atoms[it].na; ia++)
@@ -90,7 +91,7 @@ void LCAO_Deepks::check_descriptor(const UnitCell_pseudo &ucell)
                 for(int im=0;im<nm;im++)
                 {
                     const int ind=iat*inlmax/ucell.nat+inl;
-                    ofs << std::setprecision(10) << d_tensor[ind].index({im}).item().toDouble() << " ";
+                    ofs << d_tensor[ind].index({im}).item().toDouble() << " ";
                     if (id % 8 == 7) ofs << std::endl;
                     id++;
                 }
@@ -198,6 +199,11 @@ void LCAO_Deepks::check_gvx(const int nat)
         ss.str("");
         ss<<"gvz_"<<ia<<".dat";
         ofs_z.open(ss.str().c_str());
+
+        ofs_x << std::setprecision(10);
+        ofs_y << std::setprecision(10);
+        ofs_z << std::setprecision(10);
+        
         for(int ib=0;ib<nat;ib++)
         {
             for(int inl=0;inl<inlmax/nat;inl++)
@@ -205,9 +211,9 @@ void LCAO_Deepks::check_gvx(const int nat)
                 int nm = 2*inl_l[inl]+1;
                 {
                     const int ind=ib*inlmax/nat+inl;
-                    ofs_x << std::setprecision(10) << gvx_tensor.index({ia,0,ib,inl}).item().toDouble() << " ";
-                    ofs_y << std::setprecision(10) << gvx_tensor.index({ia,1,ib,inl}).item().toDouble() << " ";
-                    ofs_z << std::setprecision(10) << gvx_tensor.index({ia,2,ib,inl}).item().toDouble() << " ";
+                    ofs_x << gvx_tensor.index({ia,0,ib,inl}).item().toDouble() << " ";
+                    ofs_y << gvx_tensor.index({ia,1,ib,inl}).item().toDouble() << " ";
+                    ofs_z << gvx_tensor.index({ia,2,ib,inl}).item().toDouble() << " ";
                 }
             }
             ofs_x << std::endl;
@@ -259,13 +265,13 @@ void LCAO_Deepks::cal_gvdm(const int nat)
     return;
 }
 
-void LCAO_Deepks::load_model(const string& model_file)
+void LCAO_Deepks::load_model(const string& deepks_model)
 {
     ModuleBase::TITLE("LCAO_Deepks", "load_model");
 
     try
 	{
-        this->module = torch::jit::load(model_file);
+        this->module = torch::jit::load(deepks_model);
     }
     catch (const c10::Error& e)
 
