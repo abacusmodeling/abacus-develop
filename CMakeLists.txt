@@ -95,6 +95,7 @@ if(USE_CUDA)
 endif()
 
 # Warning: CMake add support to HIP in version 3.21. This is rather a new version.
+# Use cmake with AMD-ROCm: https://rocmdocs.amd.com/en/latest/Installation_Guide/Using-CMake-with-AMD-ROCm.html
 if(USE_ROCM)
   set(CMAKE_CXX_STANDARD 11) 
   SET(CMAKE_HIP_STANDARD 11)
