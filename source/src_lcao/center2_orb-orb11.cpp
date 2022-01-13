@@ -198,14 +198,12 @@ ModuleBase::Vector3<double> Center2_Orb::Orb11::cal_grad_overlap(    //caoyu add
 			if( 0==Gaunt_real_A_B_AB )	continue;
 
 			const double ylm_solid = rly[ MGT.get_lm_index(LAB, mAB) ];	
-			if( 0==ylm_solid ) continue;
 			const double ylm_real = 
 				(distance > tiny2) ?
 				ylm_solid / pow(distance,LAB) :
                 ylm_solid;
             
             const ModuleBase::Vector3<double> gylm_solid = grly[MGT.get_lm_index(LAB, mAB)];
-			if( 0==gylm_solid.norm2() ) continue; //????
 			const ModuleBase::Vector3<double> gylm_real =
 				(distance > tiny2) ?
 				gylm_solid / pow(distance,LAB) :
