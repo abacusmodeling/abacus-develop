@@ -13,6 +13,8 @@ protected:
         Setcell::setupcell(ucell);
         Setcell::parameters();
         verlet = new NVT_ADS(INPUT.mdp, ucell);
+
+        verlet->setup();
     }
 
     void TearDown()
@@ -22,9 +24,7 @@ protected:
 };
 
 TEST_F(NVT_ADS_test, setup)
-{
-    verlet->setup();
-    
+{   
     EXPECT_DOUBLE_EQ(verlet->temperature_, 299.99999999999665);
     EXPECT_DOUBLE_EQ(verlet->stress(0,0), 6.0100555286436806e-06);
     EXPECT_DOUBLE_EQ(verlet->stress(0,1), -1.4746713013791574e-06);
@@ -39,7 +39,6 @@ TEST_F(NVT_ADS_test, setup)
 
 TEST_F(NVT_ADS_test, first_half)
 {
-    verlet->setup();
     verlet->first_half();
     
     EXPECT_DOUBLE_EQ(verlet->pos[0].x, 9.9945454470992772);
@@ -71,7 +70,6 @@ TEST_F(NVT_ADS_test, first_half)
 
 TEST_F(NVT_ADS_test, second_half)
 {
-    verlet->setup();
     verlet->first_half();
     verlet->second_half();
     

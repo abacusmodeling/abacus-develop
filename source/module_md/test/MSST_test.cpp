@@ -13,6 +13,8 @@ protected:
         Setcell::setupcell(ucell);
         Setcell::parameters();
         verlet = new MSST(INPUT.mdp, ucell);
+
+        verlet->setup();
     }
 
     void TearDown()
@@ -23,8 +25,6 @@ protected:
 
 TEST_F(MSST_test, setup)
 {
-    verlet->setup();
-
     EXPECT_DOUBLE_EQ(verlet->vel[0].x, -0.0001314186733659715);
     EXPECT_DOUBLE_EQ(verlet->vel[0].y, 7.0985331994796372e-05);
     EXPECT_DOUBLE_EQ(verlet->vel[0].z, -1.3947731701005279e-05);
@@ -51,7 +51,6 @@ TEST_F(MSST_test, setup)
 
 TEST_F(MSST_test, first_half)
 {
-    verlet->setup();
     verlet->first_half();
 
     EXPECT_DOUBLE_EQ(ucell.lat0, 1.0);
@@ -96,7 +95,6 @@ TEST_F(MSST_test, first_half)
 
 TEST_F(MSST_test, second_half)
 {
-    verlet->setup();
     verlet->first_half();
     verlet->second_half();
 
