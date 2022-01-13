@@ -86,8 +86,8 @@ class ComplexArray_test : public testing::Test
 
 TEST_F(ComplexArray_test,operator_equal)
 {   
-    c2 = a2; //c2 is not assigned
-    b2 = a2; //b2 is arrigned by a complex
+    c2 = a2; //c2 is just constructed as a CompleArray, but not assigned by any value
+    b2 = a2; //b2 is constructed as a ComplexArray, and is also assigned by a complex
     EXPECT_EQ(c2,a2);
     EXPECT_EQ(b2,a2);
     EXPECT_NE(c2,a4);
