@@ -185,8 +185,8 @@ void LOOP_ions::opt_ions(void)
 
         //caoyu add 2021-03-31
 #ifdef __DEEPKS
-        //if (GlobalV::deepks_out_labels)
-        //{
+        if (GlobalV::deepks_out_labels || GlobalV::deepks_scf)
+        {
             //this part is for integrated test of deepks
             //so it is printed no matter even if deepks_out_labels is not used
             if(GlobalV::GAMMA_ONLY_LOCAL)
@@ -213,7 +213,7 @@ void LOOP_ions::opt_ions(void)
             GlobalC::ld.check_descriptor(GlobalC::ucell);
             
             if (GlobalV::deepks_out_labels) GlobalC::ld.save_npy_d(GlobalC::ucell.nat);            //libnpy needed
-        //}
+        }
 
         if (GlobalV::deepks_scf)
         {
