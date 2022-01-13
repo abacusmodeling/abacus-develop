@@ -1,1 +1,1 @@
-test first-order charge extrapolation in MD, 3 MD STEP
+Func:PW/MD,charge_extrap=second-order; Sys:Si2; Ref:energy,force,stress 
