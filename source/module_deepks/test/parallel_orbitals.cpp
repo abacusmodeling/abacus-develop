@@ -38,7 +38,6 @@ namespace Test_Deepks
         ModuleBase::Memory::record("Parallel_Orbitals","trace_loc_row",GlobalV::NLOCAL,"int");
         ModuleBase::Memory::record("Parallel_Orbitals","trace_loc_col",GlobalV::NLOCAL,"int");
 
-        std::cout << " common settings for trace_loc_row and trace_loc_col " << std::endl;
         for (int i=0; i<GlobalV::NLOCAL; i++)
         {
             trace_loc_row[i] = i;

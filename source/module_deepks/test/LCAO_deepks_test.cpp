@@ -157,21 +157,22 @@ void test_deepks::check_gdmx(void)
 		ss.str("");
         ss<<"gdmx_"<<ia<<".dat";
 		ss1.str("");
-        ss<<"gdmx_"<<ia<<"_ref.dat";
+        ss1<<"gdmx_"<<ia<<"_ref.dat";
+		
 		same=this->compare_with_ref(ss.str(),ss1.str());
 		if(!same) std::cout << "gdmx_" << ia << ".dat inconsistent" << std::endl;
 
         ss.str("");
         ss<<"gdmy_"<<ia<<".dat";
 		ss1.str("");
-        ss<<"gdmy_"<<ia<<"_ref.dat";
+        ss1<<"gdmy_"<<ia<<"_ref.dat";
 		same=this->compare_with_ref(ss.str(),ss1.str());
 		if(!same) std::cout << "gdmy_" << ia << ".dat inconsistent" << std::endl;
 
         ss.str("");
         ss<<"gdmz_"<<ia<<".dat";
         ss1.str("");
-        ss<<"gdmz_"<<ia<<"_ref.dat";
+        ss1<<"gdmz_"<<ia<<"_ref.dat";
 		same=this->compare_with_ref(ss.str(),ss1.str());
 		if(!same) std::cout << "gdmz_" << ia << ".dat inconsistent" << std::endl;
 	}	
@@ -197,21 +198,21 @@ void test_deepks::check_gvx(void)
 		ss.str("");
         ss<<"gvx_"<<ia<<".dat";
 		ss1.str("");
-        ss<<"gvx_"<<ia<<"_ref.dat";
+        ss1<<"gvx_"<<ia<<"_ref.dat";
 		same=this->compare_with_ref(ss.str(),ss1.str());
 		if(!same) std::cout << "gvx_" << ia << ".dat inconsistent" << std::endl;
 
         ss.str("");
         ss<<"gvy_"<<ia<<".dat";
 		ss1.str("");
-        ss<<"gvy_"<<ia<<"_ref.dat";
+        ss1<<"gvy_"<<ia<<"_ref.dat";
 		same=this->compare_with_ref(ss.str(),ss1.str());
 		if(!same) std::cout << "gvy_" << ia << ".dat inconsistent" << std::endl;
 
         ss.str("");
         ss<<"gvz_"<<ia<<".dat";
         ss1.str("");
-        ss<<"gvz_"<<ia<<"_ref.dat";
+        ss1<<"gvz_"<<ia<<"_ref.dat";
 		same=this->compare_with_ref(ss.str(),ss1.str());
 		if(!same) std::cout << "gvz_" << ia << ".dat inconsistent" << std::endl;
 	}
@@ -231,9 +232,10 @@ void test_deepks::check_edelta(void)
 	this->ld.cal_gedm(ucell.nat);
 
 	ofstream ofs("E_delta.dat");
-	ofs << std::setprecision(10) << this->ld.E_delta;
+	ofs << std::setprecision(10) << this->ld.E_delta << std::endl;
+	ofs.close();
 	bool same=this->compare_with_ref("E_delta.dat","E_delta_ref.dat");
-	if(!same) std::cout << "E_delta.dat inconsistent" << std::endl;	
+	if(!same) std::cout << "E_delta.dat inconsistent" << std::endl;
 	
 	this->ld.check_gedm();
 	same=this->compare_with_ref("gedm.dat","gedm_ref.dat");
@@ -261,7 +263,8 @@ void test_deepks::check_e_deltabands(void)
 	}
 
 	ofstream ofs("E_delta_bands.dat");
-	ofs << std::setprecision(10) << this->ld.e_delta_band;
+	ofs << std::setprecision(10) << this->ld.e_delta_band << std::endl;
+	ofs.close();
 	bool same=this->compare_with_ref("E_delta_bands.dat","E_delta_bands_ref.dat");
 	if(!same) std::cout << "E_delta_bands.dat inconsistent" << std::endl;
 }
@@ -333,26 +336,26 @@ bool test_deepks::compare_with_ref(
 	const std::string f1,
 	const std::string f2)
 {
+
 	ifstream file1(f1.c_str());
 	ifstream file2(f2.c_str());
-
-	bool same=true;
+	double test_thr=1e-8;
 
 	std::string word1;
 	std::string word2;
 	while(file1 >> word1)
 	{
-		file2>>word2;
-		if(word1[0]-'0'>=0||word1[0]-'0'<10||word1[0]=='-')
-		{
-			if(word1!=word2) same=false;
-		}
-		else
+		file2 >> word2;
+		if((word1[0]-'0'>=0 && word1[0]-'0'<10)||word1[0]=='-')
 		{
 			double num1 = std::stof(word1);
 			double num2 = std::stof(word2);
-			if(abs(num1-num2)>1e-8) same=false;
+			if(abs(num1-num2)>test_thr) return false;			
+		}
+		else
+		{
+			if(word1!=word2) return false;
 		}
 	}
-	return same;
+	return true;
 }

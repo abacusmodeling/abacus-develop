@@ -24,7 +24,8 @@ void InfoNonlocal::Set_NonLocal(
     int &n_projectors,
     const int& kmesh,
     const double& dk,
-    const double& dr_uniform)
+    const double& dr_uniform,
+	std::ofstream &log)
 {
 	ModuleBase::TITLE("InfoNonlocal","Set_NonLocal");
 
@@ -211,7 +212,7 @@ void InfoNonlocal::Set_NonLocal(
 
 	delete[] tmpBeta_lm;
 
-	std::cout << " SET NONLOCAL PSEUDOPOTENTIAL PROJECTORS" << std::endl;
+	log << " SET NONLOCAL PSEUDOPOTENTIAL PROJECTORS" << std::endl;
 	return;
 }
 
@@ -525,7 +526,8 @@ void InfoNonlocal::setupNonlocal(
 					this->nproj[it],
 					orb.get_kmesh(),
 					orb.get_dk(),
-					orb.get_dr_uniform() );
+					orb.get_dr_uniform(),
+					log);
 			}
 			this->nprojmax = std::max(this->nprojmax, this->nproj[it]);
 			//caoyu add 2021-05-24 to reconstruct atom_arrange::set_sr_NL

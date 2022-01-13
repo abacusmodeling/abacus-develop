@@ -5,7 +5,7 @@ void calculate();
 int main(int argc, char **argv)
 {
 
-	std::cout << "Hello, this is the DEEPKS module of ABACUS." << std::endl;
+	std::cout << "Test of module_deepks" << std::endl;
 
     calculate();
 
@@ -31,10 +31,6 @@ void calculate()
 	test.check_v_delta();
 	test.check_e_deltabands();
 	test.check_f_delta();
-
-	std::cout << "--------------------" << std::endl;
-	std::cout << " Have a great day! " << std::endl;
-	std::cout << "--------------------" << std::endl;
 
     return;
 }
