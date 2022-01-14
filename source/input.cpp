@@ -2276,26 +2276,6 @@ void Input::Bcast()
 	Parallel_Common::bcast_bool( noncolin );
 	Parallel_Common::bcast_bool( lspinorb );
 	Parallel_Common::bcast_double( soc_lambda );
-	if(noncolin)
-	{
-		if(GlobalV::MY_RANK==0)
-		{
-			if (angle1.size() != this->ntype)
-				angle1.resize(this->ntype);
-			if (angle2.size() != this->ntype)
-				angle2.resize(this->ntype);
-		}
-		if(GlobalV::MY_RANK!=0)
-		{
-			angle1.resize(this->ntype);
-			angle2.resize(this->ntype);
-		}
-		for(int i = 0;i<this->ntype;i++)
-		{
-			Parallel_Common::bcast_double(angle1[i]);
-			Parallel_Common::bcast_double(angle2[i]);
-		}
-	}
 
 		//Parallel_Common::bcast_int( epsilon0_choice );
     Parallel_Common::bcast_double( cell_factor); //LiuXh add 20180619

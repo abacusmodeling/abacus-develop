@@ -42,10 +42,11 @@ void Input_Conv::Convert(void)
 	if (INPUT.orbital_dir != "")
 		GlobalV::global_orbital_dir = INPUT.orbital_dir + "/";
 	GlobalV::global_pseudo_type = INPUT.pseudo_type;
-	GlobalC::ucell.latName = INPUT.latname;
-	GlobalC::ucell.ntype = INPUT.ntype;
-	GlobalC::ucell.lmaxmax = INPUT.lmaxmax;
-	GlobalC::ucell.set_vel = INPUT.set_vel;
+	GlobalC::ucell.setup(INPUT.latname,
+				INPUT.ntype,
+				INPUT.lmaxmax,
+				INPUT.set_vel,
+				INPUT.fixed_axes);
 
 	GlobalV::NBANDS = INPUT.nbands;
 	GlobalC::wf.seed = INPUT.seed;
@@ -111,65 +112,6 @@ void Input_Conv::Convert(void)
 
 	GlobalV::STRESS = INPUT.stress;
 
-	// pengfei Li add 2018-11-11
-	if (INPUT.fixed_axes == "None")
-	{
-		GlobalC::ucell.lc[0] = 1;
-		GlobalC::ucell.lc[1] = 1;
-		GlobalC::ucell.lc[2] = 1;
-	}
-	else if (INPUT.fixed_axes == "volume")
-	{
-		GlobalC::ucell.lc[0] = 1;
-		GlobalC::ucell.lc[1] = 1;
-		GlobalC::ucell.lc[2] = 1;
-	}
-	else if (INPUT.fixed_axes == "a")
-	{
-		GlobalC::ucell.lc[0] = 0;
-		GlobalC::ucell.lc[1] = 1;
-		GlobalC::ucell.lc[2] = 1;
-	}
-	else if (INPUT.fixed_axes == "b")
-	{
-		GlobalC::ucell.lc[0] = 1;
-		GlobalC::ucell.lc[1] = 0;
-		GlobalC::ucell.lc[2] = 1;
-	}
-	else if (INPUT.fixed_axes == "c")
-	{
-		GlobalC::ucell.lc[0] = 1;
-		GlobalC::ucell.lc[1] = 1;
-		GlobalC::ucell.lc[2] = 0;
-	}
-	else if (INPUT.fixed_axes == "ab")
-	{
-		GlobalC::ucell.lc[0] = 0;
-		GlobalC::ucell.lc[1] = 0;
-		GlobalC::ucell.lc[2] = 1;
-	}
-	else if (INPUT.fixed_axes == "ac")
-	{
-		GlobalC::ucell.lc[0] = 0;
-		GlobalC::ucell.lc[1] = 1;
-		GlobalC::ucell.lc[2] = 0;
-	}
-	else if (INPUT.fixed_axes == "bc")
-	{
-		GlobalC::ucell.lc[0] = 1;
-		GlobalC::ucell.lc[1] = 0;
-		GlobalC::ucell.lc[2] = 0;
-	}
-	else if (INPUT.fixed_axes == "abc")
-	{
-		GlobalC::ucell.lc[0] = 0;
-		GlobalC::ucell.lc[1] = 0;
-		GlobalC::ucell.lc[2] = 0;
-	}
-	else
-	{
-		ModuleBase::WARNING_QUIT("Input", "fixed_axes should be None,a,b,c,ab,ac,bc or abc!");
-	}
 
 	GlobalV::MOVE_IONS = INPUT.ion_dynamics;
 	GlobalV::OUT_LEVEL = INPUT.out_level;
@@ -359,6 +301,7 @@ void Input_Conv::Convert(void)
 	{
 		GlobalV::NSPIN = 4;
 	}
+
 	if (GlobalV::NSPIN == 4)
 	{
 		GlobalV::NONCOLIN = INPUT.noncolin;
@@ -376,28 +319,10 @@ void Input_Conv::Convert(void)
 			GlobalV::DOMAG_Z = true;
 		}
 		GlobalV::LSPINORB = INPUT.lspinorb;
-		GlobalV::soc_lambda = INPUT.soc_lambda;
-
-		delete[] GlobalC::ucell.magnet.m_loc_;
-		delete[] GlobalC::ucell.magnet.angle1_;
-		delete[] GlobalC::ucell.magnet.angle2_;
-		GlobalC::ucell.magnet.m_loc_ = new ModuleBase::Vector3<double>[INPUT.ntype];
-		GlobalC::ucell.magnet.angle1_ = new double[INPUT.ntype];
-		GlobalC::ucell.magnet.angle2_ = new double[INPUT.ntype];
-		for (int i = 0; i < INPUT.ntype; i++)
-		{
-			GlobalC::ucell.magnet.angle1_[i] = INPUT.angle1[i] / 180 * ModuleBase::PI;
-			GlobalC::ucell.magnet.angle2_[i] = INPUT.angle2[i] / 180 * ModuleBase::PI;
-		}
-#ifdef __MPI
-//			Parallel_Common::bcast_double(GlobalC::ucell.magnet.angle1_[i]);
-//			Parallel_Common::bcast_double(GlobalC::ucell.magnet.angle2_[i]);
-#endif
+		GlobalV::soc_lambda = INPUT.soc_lambda;	
 	}
 	else
 	{
-		delete[] GlobalC::ucell.magnet.m_loc_;
-		GlobalC::ucell.magnet.m_loc_ = new ModuleBase::Vector3<double>[INPUT.ntype];
 		GlobalV::LSPINORB = false;
 		GlobalV::NONCOLIN = false;
 		GlobalV::DOMAG = false;
