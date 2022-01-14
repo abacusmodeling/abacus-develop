@@ -21,6 +21,9 @@ class WF_igk
     int npw;
     ModuleBase::IntArray igk;
     double *g2kin;
+#ifdef __CUDA
+    double *d_g2kin;
+#endif
 
 	public:
 
