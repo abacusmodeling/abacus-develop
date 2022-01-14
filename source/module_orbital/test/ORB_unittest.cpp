@@ -49,7 +49,7 @@ void test_orb::set_ekcut()
 		{
 			std::cout << "error : cannot find LCAO file : " << ORB.orbital_file[it] << std::endl;
 		}
-
+		ORB.orbital_file[it] = this->case_dir + ORB.orbital_file[it].c_str();
 		string word;
 		while (in_ao.good())
 		{
