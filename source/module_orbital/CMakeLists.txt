@@ -13,3 +13,8 @@ add_library(
     ORB_table_beta.cpp
     ORB_table_phi.cpp
 )
+
+IF (BUILD_TESTING)
+  set(CMAKE_CXX_STANDARD 14)
+  add_subdirectory(test)
+endif()

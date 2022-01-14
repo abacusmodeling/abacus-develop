@@ -8,8 +8,8 @@ void test_orb::SetUp()
 		ORB.Phi[0].PhiLN(0, 0),
 		OGT.MOT, Center2_MGT);*/
 	// 1. setup orbitals
-    this->ofs_running.open("log.txt");
-    this->count_ntype();
+	this->ofs_running.open("log.txt");
+	this->count_ntype();
     this->set_files();
     this->set_ekcut();
 
@@ -44,7 +44,7 @@ void test_orb::set_ekcut()
 	{
 		double ek_current;
 
-		in_ao.open(ORB.orbital_file[it].c_str());
+		in_ao.open((this->case_dir+ORB.orbital_file[it].c_str()));
 		if(!in_ao)
 		{
 			std::cout << "error : cannot find LCAO file : " << ORB.orbital_file[it] << std::endl;
@@ -107,7 +107,7 @@ void test_orb::set_orbs()
 void test_orb::set_files()
 {
 	std::cout << "read names of atomic basis set files" << std::endl;
-	std::ifstream ifs("STRU",std::ios::in);
+	std::ifstream ifs((this->case_dir + "STRU"),std::ios::in);
 
 	ModuleBase::GlobalFunc::SCAN_BEGIN(ifs,"NUMERICAL_ORBITAL");
 	ORB.read_in_flag = true;
@@ -127,7 +127,8 @@ void test_orb::set_files()
 void test_orb::count_ntype()
 {
 	std::cout << "count number of atom types" << std::endl;
-	std::ifstream ifs("STRU",std::ios::in);
+		std::cout << this->case_dir +"STRU" << std::endl;
+	std::ifstream ifs( (this->case_dir+ "STRU"), std::ios::in);
 
 	if (!ifs)
 	{
@@ -156,7 +157,7 @@ void test_orb::count_ntype()
 		std::string tmpid=x.substr(0,1);
 		if(!x.empty() && tmpid!="#") ntype_read++;
 	}
-
+	std::cout <<"ntype="<< ntype_read << std::endl;
 	ifs.close();
 
 	return;
