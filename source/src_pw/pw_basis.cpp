@@ -88,7 +88,9 @@ void PW_Basis::set
     const int &ncz_in,
 	const int &bx_in,
 	const int &by_in,
-	const int &bz_in
+	const int &bz_in,
+    const int &seed_in,
+    const int &nbspline_in
 )
 {
     ModuleBase::TITLE("PW_Basis","set");
@@ -104,6 +106,8 @@ void PW_Basis::set
 	this->bx = bx_in;
 	this->by = by_in;
 	this->bz = bz_in;
+    this->seed = seed_in;
+    this->nbspline = nbspline_in;
 
     if (ecutwfc <= 0.00)
     {

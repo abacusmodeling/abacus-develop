@@ -49,7 +49,6 @@ void Input_Conv::Convert(void)
 
 	GlobalV::NBANDS = INPUT.nbands;
 	GlobalC::wf.seed = INPUT.seed;
-	GlobalC::pw.seed = INPUT.seed;
 	GlobalV::NBANDS_ISTATE = INPUT.nbands_istate;
 #if ((defined __CUDA) || (defined __ROCM))
 	int temp_nproc;
@@ -197,7 +196,9 @@ void Input_Conv::Convert(void)
 					INPUT.ncz,
 					INPUT.bx,
 					INPUT.by,
-					INPUT.bz);
+					INPUT.bz,
+					INPUT.seed,
+					INPUT.nbspline);
 	GlobalV::GAMMA_ONLY_LOCAL = INPUT.gamma_only_local;
 
 	//----------------------------------------------------------
@@ -211,7 +212,6 @@ void Input_Conv::Convert(void)
 	GlobalV::NB2D = INPUT.nb2d;
 	GlobalV::NURSE = INPUT.nurse;
 	GlobalV::COLOUR = INPUT.colour;
-	GlobalC::pw.nbspline = INPUT.nbspline;
 	GlobalV::T_IN_H = INPUT.t_in_h;
 	GlobalV::VL_IN_H = INPUT.vl_in_h;
 	GlobalV::VNL_IN_H = INPUT.vnl_in_h;
