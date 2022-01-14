@@ -14,6 +14,7 @@ project(ABACUS
 option(ENABLE_DEEPKS "Enable DeePKS functionality" OFF)
 option(ENABLE_LIBXC "Enable LibXC functionality" OFF)
 option(USE_CUDA "Enable support to CUDA." OFF)
+option(USE_ROCM "Enable support to ROCm." OFF)
 option(USE_OPENMP " Enable OpenMP in abacus." ON)
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 option(BUILD_TESTING "Build ABACUS unit tests" OFF)
@@ -80,6 +81,8 @@ if(USE_CUDA)
     -lcufft
     -lcublas
     -lcudart
+    -lcusolver
+    -lnvToolsExt
   )
   set_property(TARGET ${ABACUS_BIN_NAME}
   PROPERTY CUDA_ARCHITECTURES
@@ -89,6 +92,33 @@ if(USE_CUDA)
   )
   include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
   add_compile_definitions(__CUDA)
+endif()
+
+# Warning: CMake add support to HIP in version 3.21. This is rather a new version.
+# Use cmake with AMD-ROCm: https://rocmdocs.amd.com/en/latest/Installation_Guide/Using-CMake-with-AMD-ROCm.html
+if(USE_ROCM)
+  set(CMAKE_CXX_STANDARD 11) 
+  SET(CMAKE_HIP_STANDARD 11)
+  # set(CMAKE_CXX_STANDARD_REQUIRED True) 
+  list(APPEND CMAKE_PREFIX_PATH /opt/rocm/hip /opt/rocm)
+  list(APPEND CMAKE_SYSTEM_PREFIX_PATH "/opt/rocm/hip")
+  
+  # find_package(ROCM REQUIRED)
+  find_package(hip REQUIRED)
+  find_package(hipfft REQUIRED)
+  find_package(hipblas REQUIRED)
+  include_directories(
+    /opt/rocm/hip/include
+    /opt/rocm/hipfft/include
+    /opt/rocm/hipblas/include
+  )
+  target_link_libraries(${ABACUS_BIN_NAME}
+    hip::device
+    hip::host
+    hip::hipfft
+    roc::hipblas
+  )
+  add_compile_definitions(__ROCM)
 endif()
 
 if(ENABLE_ASAN)
