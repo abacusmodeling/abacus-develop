@@ -102,7 +102,6 @@ TEST_F(FIRE_test, second_half)
 
 int main(int argc, char **argv) 
 {
-    srand(2000);
 #ifdef __MPI
     MPI_Init(&argc,&argv);
 #endif

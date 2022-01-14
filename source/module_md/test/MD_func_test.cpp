@@ -40,9 +40,9 @@ protected:
 
 TEST_F(MD_func_test, gaussrand)
 {
-    EXPECT_DOUBLE_EQ(MD_func::gaussrand(), -0.36873170048963488);
-    EXPECT_DOUBLE_EQ(MD_func::gaussrand(), -0.52126317699631741);
-    EXPECT_DOUBLE_EQ(MD_func::gaussrand(), 0.58546002948078557);
+    EXPECT_DOUBLE_EQ(MD_func::gaussrand(), 1.1122716058967226);
+    EXPECT_DOUBLE_EQ(MD_func::gaussrand(), -0.34532367182326629);
+    EXPECT_DOUBLE_EQ(MD_func::gaussrand(), 0.60805637857480721);
 }
 
 TEST_F(MD_func_test, initpos)
@@ -69,18 +69,18 @@ TEST_F(MD_func_test, randomvel)
     temperature = 300 / ModuleBase::Hartree_to_K;
     MD_func::InitVel(ucell, temperature, allmass, frozen_freedom, ionmbl, vel);
     
-    EXPECT_DOUBLE_EQ(vel[0].x, 6.0690078968654719e-05);
-    EXPECT_DOUBLE_EQ(vel[0].y, -0.00014603859011949659);
-    EXPECT_DOUBLE_EQ(vel[0].z, 3.5215704435916494e-05);
-    EXPECT_DOUBLE_EQ(vel[1].x, 5.5672261036849076e-05);
-    EXPECT_DOUBLE_EQ(vel[1].y, 0.00016510552718707551);
-    EXPECT_DOUBLE_EQ(vel[1].z, -3.853681367488217e-05);
-    EXPECT_DOUBLE_EQ(vel[2].x, 1.2878622979722992e-05);
-    EXPECT_DOUBLE_EQ(vel[2].y, -8.79320431251751e-05);
-    EXPECT_DOUBLE_EQ(vel[2].z, -0.00012075887140803323);
-    EXPECT_DOUBLE_EQ(vel[3].x, -0.00012924096298522683);
-    EXPECT_DOUBLE_EQ(vel[3].y, 6.8865106057596176e-05);
-    EXPECT_DOUBLE_EQ(vel[3].z, 0.00012407998064699891);
+    EXPECT_DOUBLE_EQ(vel[0].x, 9.955820662799565e-05);
+    EXPECT_DOUBLE_EQ(vel[0].y, -0.00012917393372131422);
+    EXPECT_DOUBLE_EQ(vel[0].z, -8.4599368654491246e-05);
+    EXPECT_DOUBLE_EQ(vel[1].x, 4.1034985393118706e-05);
+    EXPECT_DOUBLE_EQ(vel[1].y, -9.6437902555556509e-05);
+    EXPECT_DOUBLE_EQ(vel[1].z, 4.6628712932642165e-06);
+    EXPECT_DOUBLE_EQ(vel[2].x, -7.7642484416037542e-05);
+    EXPECT_DOUBLE_EQ(vel[2].y, 4.6830831780673456e-05);
+    EXPECT_DOUBLE_EQ(vel[2].z, -7.2536379587572053e-05);
+    EXPECT_DOUBLE_EQ(vel[3].x, -6.295070760507684e-05);
+    EXPECT_DOUBLE_EQ(vel[3].y, 0.00017878100449619723);
+    EXPECT_DOUBLE_EQ(vel[3].z, 0.0001524728769487991);
 }
 
 TEST_F(MD_func_test, getmassmbl)
@@ -137,7 +137,6 @@ TEST_F(MD_func_test, kinetic_stress)
 
 int main(int argc, char **argv) 
 {
-    srand(2000);
 #ifdef __MPI
     MPI_Init(&argc,&argv);
 #endif

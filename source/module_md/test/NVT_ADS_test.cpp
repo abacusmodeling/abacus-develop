@@ -86,23 +86,22 @@ TEST_F(NVT_ADS_test, second_half)
     EXPECT_DOUBLE_EQ(verlet->pos[3].y, 5.303223068197739);
     EXPECT_DOUBLE_EQ(verlet->pos[3].z, 4.9988287446427613);
 
-    EXPECT_DOUBLE_EQ(verlet->vel[0].x, -5.3852837160556926e-05);
-    EXPECT_DOUBLE_EQ(verlet->vel[0].y, 3.9891750814864032e-05);
-    EXPECT_DOUBLE_EQ(verlet->vel[0].z, -0.0001571376589912);
-    EXPECT_DOUBLE_EQ(verlet->vel[1].x, 1.718541631150379e-05);
-    EXPECT_DOUBLE_EQ(verlet->vel[1].y, 0.00021372449527040215);
-    EXPECT_DOUBLE_EQ(verlet->vel[1].z, 0.00033621285692567155);
-    EXPECT_DOUBLE_EQ(verlet->vel[2].x, -0.00019000999252003062);
-    EXPECT_DOUBLE_EQ(verlet->vel[2].y, -9.7247429909167319e-05);
-    EXPECT_DOUBLE_EQ(verlet->vel[2].z, -2.9966514945579874e-05);
-    EXPECT_DOUBLE_EQ(verlet->vel[3].x, -5.5210933928648482e-05);
-    EXPECT_DOUBLE_EQ(verlet->vel[3].y, 9.4285703375506354e-05);
-    EXPECT_DOUBLE_EQ(verlet->vel[3].z, 0.00011813306369670275);
+    EXPECT_DOUBLE_EQ(verlet->vel[0].x, -5.6668160441304611e-05);
+    EXPECT_DOUBLE_EQ(verlet->vel[0].y, 0.00015189506534878691);
+    EXPECT_DOUBLE_EQ(verlet->vel[0].z, -0.00012247221187246948);
+    EXPECT_DOUBLE_EQ(verlet->vel[1].x, -6.6724169081868237e-05);
+    EXPECT_DOUBLE_EQ(verlet->vel[1].y, -0.0001963389480223568);
+    EXPECT_DOUBLE_EQ(verlet->vel[1].z, 4.768316146189508e-05);
+    EXPECT_DOUBLE_EQ(verlet->vel[2].x, 0.0001563891187049906);
+    EXPECT_DOUBLE_EQ(verlet->vel[2].y, -0.00016408850308461561);
+    EXPECT_DOUBLE_EQ(verlet->vel[2].z, 2.1395048951018702e-06);
+    EXPECT_DOUBLE_EQ(verlet->vel[3].x, 7.2200148840519235e-05);
+    EXPECT_DOUBLE_EQ(verlet->vel[3].y, 9.8952839341203403e-05);
+    EXPECT_DOUBLE_EQ(verlet->vel[3].z, 0.00015843986714134529);
 }
 
 int main(int argc, char **argv) 
 {
-    srand(2000);
 #ifdef __MPI
     MPI_Init(&argc,&argv);
 #endif

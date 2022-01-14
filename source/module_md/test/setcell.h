@@ -61,6 +61,10 @@ public:
         ucell.atoms[0].mbl = new ModuleBase::Vector3<int>[4];
         ucell.atoms[0].mass = ucell.atom_mass[0];
 
+        ucell.atoms[0].angle1 = new double[4];
+        ucell.atoms[0].angle2 = new double[4];
+        ucell.atoms[0].m_loc_ = new ModuleBase::Vector3<double>[4];
+
         ucell.atoms[0].taud[0].set(0.0, 0.0, 0.0);
         ucell.atoms[0].taud[1].set(0.52, 0.52, 0.0);
         ucell.atoms[0].taud[2].set(0.51, 0.0, 0.5);
@@ -92,17 +96,17 @@ public:
 
     static void neighbor(Grid_Driver &grid_neigh, UnitCell_pseudo &ucell)
     {
-        ofstream ofs("run.log");
         GlobalV::SEARCH_RADIUS = 8.5 * ModuleBase::ANGSTROM_AU;
         INPUT.mdp.rcut_lj = 8.5 * ModuleBase::ANGSTROM_AU;
         INPUT.mdp.epsilon_lj = 0.01032 / ModuleBase::Hartree_to_eV;
         INPUT.mdp.sigma_lj = 3.405 * ModuleBase::ANGSTROM_AU;
-        atom_arrange::search(1, ofs, grid_neigh, ucell, GlobalV::SEARCH_RADIUS, 0, 0);
+        atom_arrange::search(1, GlobalV::ofs_running, grid_neigh, ucell, GlobalV::SEARCH_RADIUS, 0, 0);
     };
 
     static void parameters()
     {
         GlobalV::SEARCH_RADIUS = 8.5 * ModuleBase::ANGSTROM_AU;
+        ModuleBase::Global_File::open_log(GlobalV::ofs_running, "run.log");
 
         INPUT.mdp.rstMD = 0;
         INPUT.mdp.dt = 1;
