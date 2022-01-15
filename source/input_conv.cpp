@@ -67,13 +67,6 @@ void Input_Conv::Convert(void)
 	GlobalV::PSEUDORCUT = INPUT.pseudo_rcut;
 	GlobalV::RENORMWITHMESH = INPUT.renormwithmesh;
 
-	// qianrui add 2021-2-5
-	GlobalC::sto_wf.nchi = INPUT.nbands_sto;
-	GlobalC::sto_wf.nche_sto = INPUT.nche_sto;
-	GlobalC::sto_wf.seed_sto = INPUT.seed_sto;
-	GlobalC::sto_wf.emax_sto = INPUT.emax_sto;
-	GlobalC::sto_wf.emin_sto = INPUT.emin_sto;
-	GlobalC::sto_wf.stotype = INPUT.stotype;
 
 	// Electrical Field
 	GlobalV::EFIELD = INPUT.efield;

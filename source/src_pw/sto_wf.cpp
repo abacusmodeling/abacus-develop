@@ -16,8 +16,21 @@ Stochastic_WF::~Stochastic_WF()
     delete[] chi0;
 }
 
-void Stochastic_WF::init(void)
+void Stochastic_WF::init(const int & nchi_in,
+    const int & nche_sto_in,
+    const int & seed_sto_in,
+    const double & emax_sto_in,
+    const double & emin_sto_in,
+    const std::string & stotype_in)
 {
+    ///initialize parameters
+
+    this->nchi = nchi_in;
+    this->nche_sto = nche_sto_in;
+    this->seed_sto = seed_sto_in;
+    this->emax_sto = emax_sto_in;
+    this->emin_sto = emin_sto_in;
+    this->stotype = stotype_in;
     //wait for init
 
     int ndim=0;
