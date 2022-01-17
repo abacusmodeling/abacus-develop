@@ -2,6 +2,7 @@
 #define HAMILT_PW_CUH
 
 #include "tools.h"
+#include "../module_base/complexmatrix.h"
 
 #ifdef __CUDA
 #include "cublas_v2.h"

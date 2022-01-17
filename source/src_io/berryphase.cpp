@@ -217,6 +217,7 @@ void berryphase::set_kpoints(const int direction)
 
 }
 
+#include "../module_base/complexmatrix.h"
 double berryphase::stringPhase(int index_str, int nbands)
 {
 	std::complex<double> zeta(1.0, 0.0);

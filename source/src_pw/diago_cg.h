@@ -2,6 +2,7 @@
 #define DIAGO_CG_H
 
 #include "tools.h"
+#include "../module_base/complexmatrix.h"
 
 class Diago_CG
 {

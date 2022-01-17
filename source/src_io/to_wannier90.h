@@ -8,6 +8,7 @@ using namespace std;
 #include <cmath>
 #include <cstdlib>
 #include "../src_pw/tools.h"
+#include "../module_base/complexmatrix.h"
 #include "../module_base/lapack_connector.h"
 #include "../src_pw/global.h"
 #include "../src_lcao/wavefunc_in_pw.h"

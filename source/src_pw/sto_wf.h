@@ -2,6 +2,7 @@
 #define STOCHASTIC_WF_H
 
 #include "tools.h"
+#include "../module_base/complexmatrix.h"
 #include "sto_che.h"
 //qianrui 2021-2-4
 

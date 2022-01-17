@@ -2,6 +2,7 @@
 #define EVOLVE_LCAO_MATRIX_H
 
 #include "../src_pw/tools.h"
+#include "../module_base/complexmatrix.h"
 
 class Evolve_LCAO_Matrix
 {

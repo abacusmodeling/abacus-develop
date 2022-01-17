@@ -3,6 +3,7 @@
 
 #include "../src_pw/global.h"
 #include "../src_pw/tools.h"
+#include "../module_base/complexmatrix.h"
 
 //---------------------------------------------------
 // FUNCTION: expand the local basis sets into plane

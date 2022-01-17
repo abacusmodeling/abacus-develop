@@ -2,6 +2,7 @@
 #define HAMILT_PW_H
 
 #include "tools.h"
+#include "../module_base/complexmatrix.h"
 
 class Hamilt_PW
 {

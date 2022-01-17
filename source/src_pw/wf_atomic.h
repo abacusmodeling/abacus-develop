@@ -2,6 +2,7 @@
 #define WF_ATOMIC_H
 
 #include "tools.h"
+#include "../module_base/complexmatrix.h"
 #include "wf_igk.h"
 
 class WF_atomic : public WF_igk

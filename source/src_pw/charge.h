@@ -2,6 +2,7 @@
 #define CHARGE_H
 
 #include "tools.h"
+#include "../module_base/complexmatrix.h"
 #include "../src_parallel/parallel_global.h"
 
 //==========================================================

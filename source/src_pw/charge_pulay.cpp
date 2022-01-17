@@ -365,7 +365,7 @@ void Charge_Pulay::generate_Abar(const int &scheme, ModuleBase::matrix &A)const
 	return;
 }
 
-
+#include "../module_base/complexmatrix.h"
 void Charge_Pulay::inverse_preA(const int &dim, ModuleBase::matrix &preA)const
 {
 	ModuleBase::ComplexMatrix B(dim, dim);

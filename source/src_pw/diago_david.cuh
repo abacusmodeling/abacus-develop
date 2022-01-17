@@ -2,6 +2,7 @@
 #define Diago_David_CUH
 
 #include "tools.h"
+#include "../module_base/complexmatrix.h"
 
 class Diago_David_CUDA
 {

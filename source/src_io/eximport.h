@@ -5,6 +5,7 @@
 #ifndef EXIMPORT_H
 #define EXIMPORT_H
 #include <fstream>
+#include "../module_base/complexmatrix.h"
 
 using namespace std;
 

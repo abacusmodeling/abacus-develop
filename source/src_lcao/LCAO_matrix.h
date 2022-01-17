@@ -2,6 +2,7 @@
 #define LCAO_MATRIX_H
 
 #include "../src_pw/tools.h"
+#include "../module_base/complexmatrix.h"
 #include "../src_parallel/parallel_orbitals.h"
 
 // add by jingan for map<> in 2021-12-2, will be deleted in the future

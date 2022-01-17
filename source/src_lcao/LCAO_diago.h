@@ -2,6 +2,7 @@
 #define DIAGO_LCAO_MATRIX_H
 
 #include "../src_pw/tools.h"
+#include "../module_base/complexmatrix.h"
 
 class Diago_LCAO_Matrix
 {

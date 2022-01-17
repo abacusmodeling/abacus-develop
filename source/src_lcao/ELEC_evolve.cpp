@@ -182,6 +182,7 @@ void ELEC_evolve::evolve_complex_matrix(
 	return;
 }
 
+#include "../module_base/complexmatrix.h"
 void ELEC_evolve::using_LAPACK_complex(const int &ik, std::complex<double>** c, std::complex<double>** c_init)const
 {
 	ModuleBase::TITLE("ELEC_evolve","using_LAPACK_complex");
