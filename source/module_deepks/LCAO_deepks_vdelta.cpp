@@ -12,6 +12,7 @@
 #ifdef __DEEPKS
 
 #include "LCAO_deepks.h"
+#include "../module_base/vector3.h"
 
 //this subroutine adds dV to the Kohn-Sham Hamiltonian
 //for gamma_only calculations

@@ -7,6 +7,7 @@
 #include "sltk_atom_input.h"
 #include "sltk_grid.h"
 #include "../src_pw/tools.h"
+#include "../module_base/vector3.h"
 #include "../src_pw/pw_basis.h"
 
 class Grid_Driver : public Grid

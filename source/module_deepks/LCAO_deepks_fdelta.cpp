@@ -9,6 +9,7 @@
 #ifdef __DEEPKS
 
 #include "LCAO_deepks.h"
+#include "../module_base/vector3.h"
 
 //force for gamma only calculations
 //Pulay and HF terms are calculated together
