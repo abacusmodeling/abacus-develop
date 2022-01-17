@@ -21,7 +21,6 @@ using namespace std;
 #include "../module_base/vector3.h"
 #include "../module_base/matrix.h"
 #include "../module_base/matrix3.h"
-#include "../module_base/complexarray.h"
 #include "../module_base/complexmatrix.h"
 
 #include "../module_base/memory.h"

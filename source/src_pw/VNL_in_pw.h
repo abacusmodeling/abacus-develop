@@ -2,6 +2,7 @@
 #define VNL_IN_PW_H
 
 #include "tools.h"
+#include "../module_base/complexarray.h"
 #include "VL_in_pw.h"
 #ifdef __LCAO
 #include "../module_orbital/ORB_gen_tables.h"

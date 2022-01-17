@@ -655,6 +655,8 @@ void Forces::cal_force_cc(ModuleBase::matrix& forcecc)
 	return;
 }
 
+#include "../module_base/complexarray.h"
+#include "../module_base/complexmatrix.h"
 void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
 {
 	ModuleBase::TITLE("Forces","cal_force_nl");
