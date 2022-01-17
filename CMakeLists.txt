@@ -135,7 +135,6 @@ if(ENABLE_ASAN)
   target_link_libraries(${ABACUS_BIN_NAME}
 	-fsanitize=address
   )
-  )
 endif()
 
 if(DEFINED ENV{MKLROOT} AND NOT DEFINED MKLROOT)
