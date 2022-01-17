@@ -26,7 +26,7 @@ using namespace std;
 #include "../module_base/timer.h"
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
-#include "../module_base/global_file.h"
+
 
 #ifdef _MCD_CHECK
 #include "../src_parallel/mcd.h"

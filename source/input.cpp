@@ -13,6 +13,7 @@
 #include <string.h>
 #include <vector>
 #include <sstream>
+#include "module_base/global_file.h"
 Input INPUT;
 
 void Input::Init(const std::string &fn)
