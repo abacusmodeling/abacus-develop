@@ -425,41 +425,6 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 			ModuleBase::GlobalFunc::READ_VALUE(ifpos, magnet.start_magnetization[it] );
 
 #ifndef __SYMMETRY
-/*
-			if(GlobalV::NSPIN==4)//added by zhengdy-soc
-			{
-				if(GlobalV::NONCOLIN)
-				{
-					magnet.m_loc_[it].x = magnet.start_magnetization[it] *
-							sin(magnet.angle1_[it]) * cos(magnet.angle2_[it]);
-					magnet.m_loc_[it].y = magnet.start_magnetization[it] *
-							sin(magnet.angle1_[it]) * sin(magnet.angle2_[it]);
-					magnet.m_loc_[it].z = magnet.start_magnetization[it] *
-							cos(magnet.angle1_[it]);
-				}
-				else
-				{
-					magnet.m_loc_[it].x = 0;
-					magnet.m_loc_[it].y = 0;
-					magnet.m_loc_[it].z = magnet.start_magnetization[it];
-				}
-
-				ModuleBase::GlobalFunc::OUT(ofs_running, "noncollinear magnetization_x",magnet.m_loc_[it].x);
-				ModuleBase::GlobalFunc::OUT(ofs_running, "noncollinear magnetization_y",magnet.m_loc_[it].y);
-				ModuleBase::GlobalFunc::OUT(ofs_running, "noncollinear magnetization_z",magnet.m_loc_[it].z);
-
-				ModuleBase::GlobalFunc::ZEROS(magnet.ux_ ,3);
-			}
-			else if(GlobalV::NSPIN==2)
-			{
-				magnet.m_loc_[it].x = magnet.start_magnetization[it];
-				ModuleBase::GlobalFunc::OUT(ofs_running, "start magnetization",magnet.start_magnetization[it]);
-			}
-			else if(GlobalV::NSPIN==1)
-			{
-				ModuleBase::GlobalFunc::OUT(ofs_running, "start magnetization","FALSE");
-			}
-*/
 			//===========================================
 			// (2) read in numerical orbital information
 			// int atoms[it].nwl

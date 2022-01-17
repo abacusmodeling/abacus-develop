@@ -59,7 +59,12 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 
 	clock_t start,finish;
 	double duration = 0.0;
-	GlobalC::sto_wf.init();
+	GlobalC::sto_wf.init(INPUT.nbands_sto, 
+		INPUT.nche_sto, 
+		INPUT.seed_sto, 
+		INPUT.emax_sto, 
+		INPUT.emin_sto, 
+		INPUT.stotype);
 	int chetype = 1;
 
 	for (this->iter = 1;iter <= GlobalV::NITER;iter++)

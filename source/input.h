@@ -354,8 +354,6 @@ class Input
 	bool lspinorb;
 	double soc_lambda;
 
-	//	bool starting_spin_angle;
-	vector<double> angle1={0}, angle2={0};
 
 
 //==========================================================
