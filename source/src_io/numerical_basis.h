@@ -6,6 +6,7 @@
 #ifndef NUMERICAL_BASIS_H
 #define NUMERICAL_BASIS_H
 #include "../src_pw/tools.h"
+#include "../module_base/intarray.h"
 #include "bessel_basis.h"
 #include <vector>
 //==========================================================

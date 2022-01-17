@@ -2,6 +2,7 @@
 #define WF_IGK_H
 
 #include "tools.h"
+#include "../module_base/intarray.h"
 #include "pw_basis.h"
 
 class WF_igk 
