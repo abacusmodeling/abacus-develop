@@ -119,7 +119,7 @@ int ORB_table_beta::get_rmesh(const double &R1, const double &R2)
 	return rmesh;
 }
 
-
+#include "../module_base/mathzone_add1.h"
 
 void ORB_table_beta::cal_VNL_PhiBeta_R(
 		ModuleBase::Sph_Bessel_Recursive::D2 *pSB, // mohan add 2021-03-06

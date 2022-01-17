@@ -211,6 +211,7 @@ void Numerical_Orbital_Lm::copy_parameter(
 	this->kcut = (nk-1) * this->dk;
 }
 
+#include "../module_base/mathzone_add1.h"
 void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool &force_flag)
 {
 	ModuleBase::timer::tick("NOrbital_Lm", "extra_uniform");

@@ -110,6 +110,7 @@ int ORB_table_phi::get_rmesh(const double &R1, const double &R2)
 	return rmesh;
 }
 
+#include "../module_base/mathzone_add1.h"
 // Peize Lin accelerate 2017-10-02
 void ORB_table_phi::cal_ST_Phi12_R
 (
