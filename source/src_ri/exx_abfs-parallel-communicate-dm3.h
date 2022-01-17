@@ -3,6 +3,7 @@
 
 #include "exx_abfs-parallel.h"
 #include "abfs-vector3_order.h"
+#include "../module_base/complexmatrix.h"
 
 #include <vector>
 #include <map>

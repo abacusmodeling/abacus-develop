@@ -24,7 +24,6 @@ using namespace std;
 
 #include "../module_base/memory.h"
 #include "../module_base/timer.h"
-#include "../module_base/lapack_connector.h"
 #include "../module_base/export.h"
 
 #include "../module_base/mathzone.h"
