@@ -16,7 +16,7 @@ option(ENABLE_LIBXC "Enable LibXC functionality" OFF)
 option(USE_CUDA "Enable support to CUDA." OFF)
 option(USE_ROCM "Enable support to ROCm." OFF)
 option(USE_OPENMP " Enable OpenMP in abacus." ON)
-option(ENABLE_ASAN "Enable AddressSanitizer" ON)
+option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 option(BUILD_TESTING "Build ABACUS unit tests" OFF)
 option(GENERATE_TEST_REPORTS "Enable test report generation" OFF)
 
