@@ -27,6 +27,8 @@ set(ABACUS_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 set(ABACUS_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/${ABACUS_BIN_NAME})
 include_directories(${ABACUS_SOURCE_DIR})
 add_executable(${ABACUS_BIN_NAME} source/main.cpp)
+add_compile_options(-O2 -g)
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-write-strings" )
 
 find_package(Cereal REQUIRED)
 include_directories(${Cereal_INCLUDE_DIR})
@@ -97,12 +99,12 @@ endif()
 # Warning: CMake add support to HIP in version 3.21. This is rather a new version.
 # Use cmake with AMD-ROCm: https://rocmdocs.amd.com/en/latest/Installation_Guide/Using-CMake-with-AMD-ROCm.html
 if(USE_ROCM)
-  set(CMAKE_CXX_STANDARD 11) 
+  set(CMAKE_CXX_STANDARD 11)
   SET(CMAKE_HIP_STANDARD 11)
-  # set(CMAKE_CXX_STANDARD_REQUIRED True) 
+  # set(CMAKE_CXX_STANDARD_REQUIRED True)
   list(APPEND CMAKE_PREFIX_PATH /opt/rocm/hip /opt/rocm)
   list(APPEND CMAKE_SYSTEM_PREFIX_PATH "/opt/rocm/hip")
-  
+
   # find_package(ROCM REQUIRED)
   find_package(hip REQUIRED)
   find_package(hipfft REQUIRED)
@@ -123,18 +125,16 @@ endif()
 
 if(ENABLE_ASAN)
   add_compile_options(
-    -O1
-    -g
     -fsanitize=address
     -fno-omit-frame-pointer
   )
   add_link_options(
-    -g
     -fsanitize=address
   )
-else()
-  add_compile_options(-O2 -g)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-write-strings" )
+  # `add_link_options` only affects executables added after.
+  target_link_libraries(${ABACUS_BIN_NAME}
+	-fsanitize=address
+  )
 endif()
 
 if(DEFINED ENV{MKLROOT} AND NOT DEFINED MKLROOT)
