@@ -46,18 +46,30 @@ tail -n $tailn Makefile.gnu >>Makefile
 make > /dev/null 2>&1
 
 if ((i==0)) ;then
+    echo "Test for Serial Version:"
     ./pw_test.exe
 elif ((i==1)) ;then
+    echo "Test for Serial Version with single precision:"
     ./pw_test.exe
     echo "valgrind test:(1 processors)"
     valgrind ./pw_test.exe >_tmp.txt 2>&1
     cat _tmp.txt|egrep "(ERROR SUMMARY)|(lost)";
 else
+    if((i==2)) ;then
+        echo "Test for MPI Version:"
+    elif((i==3)) ;then
+        echo "Test for MPI Version with single precision:"
+    fi
     echo "1 processor:"
     ./pw_test.exe
     sleep 1
-    echo "2 processors:"
-    mpirun -np 2 ./pw_test.exe >_tmp.txt 2>&1
+    echo "3 processors:"
+    mpirun -np 3 ./pw_test.exe >_tmp.txt 2>&1
+    cat _tmp.txt|grep PASSED
+    cat _tmp.txt|grep FAILED
+    sleep 1
+    echo "5 processors:"
+    mpirun -np 5 ./pw_test.exe >_tmp.txt 2>&1
     cat _tmp.txt|grep PASSED
     cat _tmp.txt|grep FAILED
     sleep 1
@@ -71,8 +83,11 @@ if ((i==3)) ;then
     echo "valgrind test:(1 processors)"
     valgrind ./pw_test.exe >_tmp.txt 2>&1
     cat _tmp.txt|egrep "(ERROR SUMMARY)|(lost)";
-    echo "valgrind test:(2 processors)"
-    mpirun -np 2 valgrind ./pw_test.exe >_tmp.txt 2>&1
+    echo "valgrind test:(3 processors)"
+    mpirun -np 3 valgrind ./pw_test.exe >_tmp.txt 2>&1
+    cat _tmp.txt|egrep "(ERROR SUMMARY)|(lost)";
+    echo "valgrind test:(5 processors)"
+    mpirun -np 5 valgrind ./pw_test.exe >_tmp.txt 2>&1
     cat _tmp.txt|egrep "(ERROR SUMMARY)|(lost)";
     echo "valgrind test:(8 processors)"
     mpirun -np 8 valgrind ./pw_test.exe >_tmp.txt 2>&1
