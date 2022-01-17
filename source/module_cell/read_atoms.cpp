@@ -349,6 +349,7 @@ int UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_ru
 	return 0;
 }
 
+#include "../module_base/mathzone.h"
 // Read atomic positions
 // return 1: no problem.
 // return 0: some problems.

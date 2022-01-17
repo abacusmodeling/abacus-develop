@@ -41,6 +41,7 @@ Grid_Base::~Grid_Base()
 	delete[] yy2;
 }
 
+#include "../module_base/mathzone.h"
 void Grid_Base::init(
     const ModuleBase::Matrix3 &latvec_in,
     const double &lat0_in,

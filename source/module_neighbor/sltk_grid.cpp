@@ -397,6 +397,7 @@ void Grid::Build_Cell(void)
 	return;
 }
 
+#include "../module_base/mathzone.h"
 void Grid::In_Which_Cell(const UnitCell &ucell, int &a, int &b, int &c, const FAtom &atom)const
 {
 	if (expand_flag)

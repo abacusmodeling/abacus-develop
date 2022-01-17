@@ -38,6 +38,7 @@ ModuleBase::Vector3<double> CMD_neighbor::cell_periodic(const ModuleBase::Vector
 	return temp;
 }
 
+#include "../module_base/mathzone.h"
 //build the neighbor list
 void CMD_neighbor::neighbor(const UnitCell_pseudo &ucell_c)
 {

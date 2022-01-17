@@ -6,6 +6,7 @@
 #ifndef BESSEL_BASIS_H
 #define BESSEL_BASIS_H
 #include "../src_pw/tools.h"
+#include "../module_base/realarray.h"
 
 //==========================================================
 // CLASS :

@@ -820,6 +820,7 @@ void Force_Stress_LCAO::calStressPwPart(
 	return;
 }
 
+#include "../module_base/mathzone.h"
 //do symmetry for total force
 void Force_Stress_LCAO::forceSymmetry(ModuleBase::matrix& fcs)
 {

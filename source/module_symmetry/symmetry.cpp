@@ -3,6 +3,8 @@
 //#include "../src_pw/global.h"
 //#include "symm_other.h"
 
+#include "../module_base/mathzone.h"
+
 namespace ModuleSymmetry
 {
 Symmetry::Symmetry()

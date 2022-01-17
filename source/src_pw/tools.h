@@ -25,8 +25,6 @@ using namespace std;
 #include "../module_base/memory.h"
 #include "../module_base/timer.h"
 #include "../module_base/export.h"
-
-#include "../module_base/mathzone.h"
 #include "../module_base/mathzone_add1.h"
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"

@@ -56,6 +56,7 @@ double LJ_potential::Lennard_Jones(const UnitCell_pseudo &ucell_c,
 	return potential/2.0;
 }
 
+#include "../module_base/mathzone.h"
 double LJ_potential::Lennard_Jones(const UnitCell_pseudo &ucell_c, 
                     CMD_neighbor &cmd_neigh,
                     ModuleBase::Vector3<double> *force,

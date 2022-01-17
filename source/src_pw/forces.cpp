@@ -16,6 +16,7 @@ Forces::Forces()
 
 Forces::~Forces() {}
 
+#include "../module_base/mathzone.h"
 #include "efield.h"
 void Forces::init(ModuleBase::matrix& force)
 {

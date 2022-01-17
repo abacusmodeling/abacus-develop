@@ -3,6 +3,7 @@
 
 #include "../src_pw/tools.h"
 #include "../module_base/complexarray.h"
+#include "../module_base/realarray.h"
 
 class Parallel_Kpoints
 {
