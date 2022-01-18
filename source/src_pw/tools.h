@@ -1,11 +1,6 @@
 #ifndef TOOL_H
 #define TOOL_H
 
-using namespace std;
-
-
-
-
 #include "../module_base/constants.h"
 
 #include "../module_base/memory.h"
