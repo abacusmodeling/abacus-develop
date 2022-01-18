@@ -4,7 +4,8 @@
 #ifdef __MPI
 #include <mpi.h>
 #endif
-#include "../src_pw/tools.h"
+#include <complex>
+#include <string>
 
 namespace Parallel_Common
 {
