@@ -81,9 +81,9 @@ class LCAO_Matrix
     double ****HR_tr;
 
 
-    complex<double> ****Hloc_fixedR_tr_soc;
-    complex<double> ****SlocR_tr_soc;
-    complex<double> ****HR_tr_soc;
+    std::complex<double> ****Hloc_fixedR_tr_soc;
+    std::complex<double> ****SlocR_tr_soc;
+    std::complex<double> ****HR_tr_soc;
 
     // jingan add 2021-6-4, modify 2021-12-2
     // Sparse form of HR and SR, the format is [R_direct_coor][orbit_row][orbit_col]

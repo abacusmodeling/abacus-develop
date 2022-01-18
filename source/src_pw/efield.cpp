@@ -1,6 +1,7 @@
 #include "efield.h"
 #include "tools.h"
 #include "global.h"
+#include "../src_parallel/parallel_reduce.h"
 
 Efield::Efield(){}
 Efield::~Efield(){}

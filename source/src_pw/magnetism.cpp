@@ -2,6 +2,7 @@
 #ifndef __CELL
 #include "global.h"
 #endif
+#include "../src_parallel/parallel_reduce.h"
 
 Magnetism::Magnetism()
 {

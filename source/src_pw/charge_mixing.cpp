@@ -1,6 +1,7 @@
 #include "charge_mixing.h"
 #include "global.h"
 #include "../module_base/inverse_matrix.h"
+#include "../src_parallel/parallel_reduce.h"
 
 Charge_Mixing::Charge_Mixing(){}
 Charge_Mixing::~Charge_Mixing(){}

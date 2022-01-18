@@ -7,6 +7,7 @@
 #include "../module_orbital/ORB_read.h"
 #include "../src_pw/global.h"
 #include "../module_base/blas_connector.h"
+#include "../src_parallel/parallel_reduce.h"
 
 #include "global_fp.h" // mohan add 2021-01-30
 #include "../module_base/ylm.h"

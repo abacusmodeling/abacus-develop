@@ -1,6 +1,7 @@
 #include "charge_pulay.h"
 #include "global.h"
 #include "../module_base/inverse_matrix.h"
+#include "../src_parallel/parallel_reduce.h"
 
 Charge_Pulay::Charge_Pulay()
 {

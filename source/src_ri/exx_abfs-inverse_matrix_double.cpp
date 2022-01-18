@@ -72,7 +72,7 @@ void Exx_Abfs::Inverse_Matrix_Double::using_dsyev( const double &threshold_condi
 	
 	double eigen_value_max = 0;
 	for( const double &ie : eigen_value )
-		eigen_value_max = max( ie, eigen_value_max );
+		eigen_value_max = std::max( ie, eigen_value_max );
 	const double threshold = eigen_value_max * threshold_condition_number;
 
 	#if TEST_EXX_LCAO==1

@@ -1,5 +1,6 @@
 #include "FORCE_k.h"
 #include "../src_pw/global.h"
+#include "../src_parallel/parallel_reduce.h"
 #include <unordered_map>
 #include <map>
 

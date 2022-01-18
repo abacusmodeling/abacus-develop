@@ -17,6 +17,7 @@
 // even in a LSDA calculation.
 //----------------------------------------------------------
 #include "tools.h"
+#include "../src_parallel/parallel_reduce.h"
 #include "global.h"
 #include "charge.h"
 #include "magnetism.h"

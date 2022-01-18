@@ -1,6 +1,7 @@
 #include "tools.h"
 #include "global.h"
 #include "sto_hchi.h" 
+#include "../src_parallel/parallel_reduce.h"
 
 int Stochastic_hchi::nrxx;
 int Stochastic_hchi::nx;

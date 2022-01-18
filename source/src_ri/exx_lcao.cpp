@@ -2,6 +2,7 @@
 
 #include "../src_pw/global.h"
 #include "../module_base/global_function.h"
+#include "../src_parallel/parallel_reduce.h"
 
 #include "conv_coulomb_pot.h"
 #include "conv_coulomb_pot-inl.h"

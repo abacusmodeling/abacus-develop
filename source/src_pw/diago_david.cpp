@@ -1,6 +1,7 @@
 #include "diago_david.h"
 #include "diago_cg.h"
 #include "global.h"
+#include "../src_parallel/parallel_reduce.h"
 
 Diago_David::Diago_David()
 {

@@ -2,6 +2,7 @@
 #define STRESS_FUNC_H
 
 #include "tools.h"
+#include "../src_parallel/parallel_reduce.h"
 #include "../module_base/matrix.h"
 #include "../module_base/complexmatrix.h"
 #include "./global.h"

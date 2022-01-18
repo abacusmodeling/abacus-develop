@@ -1,5 +1,6 @@
 #include "../src_lcao/local_orbital_charge.h"
 #include "../src_pw/global.h"
+#include "../src_parallel/parallel_reduce.h"
 #include "../module_base/blas_connector.h"
 #include "../src_lcao/LCAO_nnr.h" // mohan add 2021-03-07
 

@@ -1,5 +1,6 @@
 #include "diago_cg.h"
 #include "global.h"
+#include "../src_parallel/parallel_reduce.h"
 
 int Diago_CG::moved = 0;
 

@@ -1,6 +1,7 @@
 #include "optical.h"
 #include "../src_pw/tools.h"
 #include "../src_pw/global.h"
+#include "../src_parallel/parallel_reduce.h"
 
 bool Optical::opt_epsilon2 = false;
 int  Optical::opt_nbands = 0;

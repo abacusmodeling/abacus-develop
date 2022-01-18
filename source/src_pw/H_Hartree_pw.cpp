@@ -1,4 +1,5 @@
 #include "H_Hartree_pw.h"
+#include "../src_parallel/parallel_reduce.h"
 
 double H_Hartree_pw::hartree_energy=0.0;
 

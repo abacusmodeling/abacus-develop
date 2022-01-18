@@ -2,6 +2,7 @@
 #include "../src_pw/global.h"
 #include "../module_base/blas_connector.h"
 #include "../src_io/wf_local.h"
+#include "../src_parallel/parallel_reduce.h"
 
 extern "C"
 {

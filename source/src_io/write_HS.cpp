@@ -1,6 +1,6 @@
 #include "write_HS.h"
 #include "../src_pw/global.h"
-
+#include "../src_parallel/parallel_reduce.h"
 
 void HS_Matrix::saving_HS(const double *Hloc, const double* Sloc, bool bit, const int &out_hs)
 {   

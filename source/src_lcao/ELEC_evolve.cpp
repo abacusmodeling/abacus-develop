@@ -5,6 +5,7 @@
 #include "../src_pw/symmetry_rho.h"
 #include "LCAO_evolve.h"
 #include "dftu.h"
+#include "../src_parallel/parallel_reduce.h"
 
 ELEC_evolve::ELEC_evolve(){};
 ELEC_evolve::~ELEC_evolve(){};
