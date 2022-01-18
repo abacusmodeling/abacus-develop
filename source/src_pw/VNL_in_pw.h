@@ -2,6 +2,7 @@
 #define VNL_IN_PW_H
 
 #include "tools.h"
+#include "../module_base/matrix.h"
 #include "../module_base/complexarray.h"
 #include "../module_base/complexmatrix.h"
 #include "VL_in_pw.h"

@@ -3,6 +3,7 @@
 using namespace std;
 
 #include "tools.h"
+#include "../module_base/matrix.h"
 #include "../module_base/vector3.h"
 #include "../module_base/complexmatrix.h"
 //#include "../src_algorithms/mymath.h"     //  only wgauss(),wlgauss()

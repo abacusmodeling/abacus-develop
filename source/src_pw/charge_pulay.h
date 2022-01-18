@@ -8,6 +8,7 @@
 // (4) Modified Broden Mixing
 //===================================
 #include "tools.h"
+#include "../module_base/matrix.h"
 #include "charge_mixing.h"
 
 #ifdef __EXX // mohan add 2021-05-23

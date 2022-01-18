@@ -8,6 +8,7 @@ using namespace std;
 #include <cmath>
 #include <cstdlib>
 #include "../src_pw/tools.h"
+#include "../module_base/matrix.h"
 #include "../module_base/matrix3.h"
 #include "../module_base/complexmatrix.h"
 #include "../module_base/lapack_connector.h"

@@ -2,6 +2,7 @@
 #define POTENTIAL_H
 
 #include "tools.h"
+#include "../module_base/matrix.h"
 #include "../module_base/complexmatrix.h"
 
 class Potential

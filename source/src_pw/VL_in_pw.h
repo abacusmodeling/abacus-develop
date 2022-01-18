@@ -2,6 +2,7 @@
 #define VL_IN_PW_H 
 
 #include "tools.h"
+#include "../module_base/matrix.h"
 
 class pseudopot_cell_vl
 {

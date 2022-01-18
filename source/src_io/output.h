@@ -9,6 +9,7 @@
 #include "../module_base/realarray.h"
 #include "../module_base/matrix3.h"
 #include "../module_base/complexmatrix.h"
+#include "../module_base/matrix.h"
 class output
 {
 public:

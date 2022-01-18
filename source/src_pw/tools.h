@@ -18,7 +18,6 @@ using namespace std;
 #include <vector>
 
 #include "../module_base/constants.h"
-#include "../module_base/matrix.h"
 
 #include "../module_base/memory.h"
 #include "../module_base/timer.h"

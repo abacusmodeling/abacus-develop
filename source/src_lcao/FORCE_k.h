@@ -2,6 +2,7 @@
 #define FORCE_LCAO_K_H
 
 #include "../src_pw/tools.h"
+#include "../module_base/matrix.h"
 #include "LCAO_matrix.h" 
 #include "FORCE_gamma.h"
 

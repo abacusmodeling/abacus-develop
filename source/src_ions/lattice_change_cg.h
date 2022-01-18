@@ -2,6 +2,7 @@
 #define LATTICE_CHANGE_CG_H
 
 #include "../src_pw/tools.h"
+#include "../module_base/matrix.h"
 class Lattice_Change_CG
 {
 

@@ -2,6 +2,7 @@
 #define GGA_PW_H
 
 #include "tools.h"
+#include "../module_base/matrix.h"
 #include "../module_base/vector3.h"
 #include "../src_parallel/parallel_global.h"
 

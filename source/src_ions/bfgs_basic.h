@@ -2,6 +2,7 @@
 #define BFGS_BASIC
 
 #include "../src_pw/tools.h"
+#include "../module_base/matrix.h"
 
 // references
 // 1) Roger Fletcher, Practical Methods of Optimization, John Wiley and

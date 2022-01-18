@@ -2,6 +2,7 @@
 #define FORCES_H
 
 #include "tools.h"
+#include "../module_base/matrix.h"
 
 class Forces
 {

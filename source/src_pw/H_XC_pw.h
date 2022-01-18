@@ -2,6 +2,7 @@
 #define H_XC_PW_H
 
 #include "tools.h"
+#include "../module_base/matrix.h"
 
 class H_XC_pw 
 {

@@ -3,6 +3,7 @@
 
 #include "../src_pw/electrons.h"
 #include "../src_pw/tools.h"
+#include "../module_base/matrix.h"
 #include "../src_pw/charge_extra.h"
 #include "../src_pw/sto_elec.h" //mohan added 2021-01-28
 #include "ions_move_methods.h"
