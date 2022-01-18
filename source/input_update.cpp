@@ -264,6 +264,7 @@ bool Update_input::Read(const std::string &fn)
     return true;
 }//end read_parameters
 
+#include "src_parallel/parallel_common.h"
 #ifdef __MPI
 void Update_input::Bcast()
 {

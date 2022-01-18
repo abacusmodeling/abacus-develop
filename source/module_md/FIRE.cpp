@@ -1,5 +1,8 @@
 #include "FIRE.h"
 #include "MD_func.h"
+#ifdef __MPI
+#include <mpi.h>
+#endif
 
 FIRE::FIRE(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in) : Verlet(MD_para_in, unit_in)
 {

@@ -58,7 +58,7 @@ UnitCell::~UnitCell()
 	delete[] lc;
 }
 
-
+#include "../src_parallel/parallel_common.h"
 #ifdef __MPI
 void UnitCell::bcast_unitcell(void)
 {

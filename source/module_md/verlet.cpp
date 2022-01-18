@@ -1,5 +1,8 @@
 #include "verlet.h"
 #include "MD_func.h"
+#ifdef __MPI
+#include <mpi.h>
+#endif
 
 Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     mdp(MD_para_in),

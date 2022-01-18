@@ -9,6 +9,4 @@
 #include "../module_base/global_variable.h"
 
 
-#include "../src_parallel/parallel_common.h"
-
 #endif

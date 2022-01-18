@@ -1,4 +1,5 @@
 #include "setup_nonlocal.h"
+#include "../src_parallel/parallel_common.h"
 
 #ifdef __LCAO
 //#include "../src_pw/global.h"

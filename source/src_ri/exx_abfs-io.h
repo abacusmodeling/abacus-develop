@@ -8,6 +8,9 @@
 #include "../module_orbital/ORB_atomic_lm.h"
 #include "../module_base/matrix.h"
 #include "../module_base/element_basis_index.h"
+#ifdef __MPI
+#include <mpi.h>
+#endif
 
 class LCAO_Orbitals;
 

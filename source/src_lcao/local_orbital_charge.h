@@ -2,6 +2,7 @@
 #define LOCAL_ORBITAL_CHARGE
 
 #include "../src_pw/tools.h"
+#include "../src_parallel/parallel_common.h"
 #include "grid_technique.h"
 #include "wfc_dm_2d.h"
 

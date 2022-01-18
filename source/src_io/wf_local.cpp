@@ -1,5 +1,6 @@
 #include "wf_local.h"
 #include "../src_pw/global.h"
+#include "../src_parallel/parallel_common.h"
 
 inline int globalIndex(int localIndex, int nblk, int nprocs, int myproc)
 {

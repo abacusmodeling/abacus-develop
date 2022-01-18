@@ -1,4 +1,5 @@
 #include "unitcell_pseudo.h"
+#include "../src_parallel/parallel_common.h"
 #include "../input.h"
 #ifdef __LCAO
 //#include "../module_orbital/ORB_read.h" // to use 'ORB' -- mohan 2021-01-30

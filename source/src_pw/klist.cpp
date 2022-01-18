@@ -3,6 +3,7 @@
 #include "../src_parallel/parallel_global.h"
 #include "../module_symmetry/symmetry.h"
 #include "../src_parallel/parallel_reduce.h"
+#include "../src_parallel/parallel_common.h"
 
 K_Vectors::K_Vectors()
 {	

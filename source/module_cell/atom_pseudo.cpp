@@ -149,6 +149,7 @@ void Atom_pseudo::print_atom(std::ofstream &ofs)
 	return;
 }
 
+#include "../src_parallel/parallel_common.h"
 #ifdef __MPI
 void Atom_pseudo::bcast_atom_pseudo(const int &na)
 {
