@@ -156,8 +156,8 @@ void LCAO_Deepks::check_psialpha(const bool& calc_deri,
 
     ofs<<std::setprecision(10);
     ofs_x<<std::setprecision(10);
-    ofs_x<<std::setprecision(10);
-    ofs_x<<std::setprecision(10);
+    ofs_y<<std::setprecision(10);
+    ofs_z<<std::setprecision(10);
 
     for (int T0 = 0; T0 < ucell.ntype; T0++)
     {
