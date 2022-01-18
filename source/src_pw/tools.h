@@ -10,7 +10,6 @@ using namespace std;
 #include <cmath>
 
 #include <string>
-#include <iostream>
 #include <fstream>
 #include <iomanip>
 
