@@ -10,7 +10,6 @@ using namespace std;
 #include <cmath>
 
 #include <string>
-#include <fstream>
 
 #include <vector>
 
