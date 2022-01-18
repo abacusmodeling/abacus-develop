@@ -60,7 +60,7 @@ void test_orb::set_orbs(const double &lat0_in)
 			lcao_dr,
 			lcao_rmax,
 			lat0_in,
-			out_descriptor,
+			deepks_out_labels,
 			out_r_matrix,
 			lmax,
 			force_flag,

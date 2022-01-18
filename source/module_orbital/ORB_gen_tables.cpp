@@ -18,7 +18,7 @@ void ORB_gen_tables::gen_tables(
 	const int &job0,
 	LCAO_Orbitals &orb,
 	const int &Lmax_exx,
-	const int &out_descriptor,
+	const bool &deepks_setorb,
 	const int &nprojmax, 
 	const int* nproj,
 	const Numerical_Nonlocal* beta_)
@@ -49,7 +49,7 @@ void ORB_gen_tables::gen_tables(
 
 	//caoyu add 2021-03-18
 	//mohan update 2021-04-22
-	if (out_descriptor>0)
+	if (deepks_setorb)
 	{
 		talpha.allocate(
 			orb.get_ntype(), 
@@ -70,7 +70,7 @@ void ORB_gen_tables::gen_tables(
 
 	//caoyu add 2021-03-18
 	// DS: Descriptor
-	if (out_descriptor>0)
+	if (deepks_setorb)
 	{
 		talpha.init_DS_Opair(orb);
 		talpha.init_DS_2Lplus1(orb);
@@ -102,10 +102,10 @@ void ORB_gen_tables::gen_tables(
 	tbeta.init_Table_Beta(MOT.pSB, orb.Phi, beta_, nproj); // add 2009-5-8
 
 	//caoyu add 2021-03-18
-	if (out_descriptor>0)
+	if (deepks_setorb)
 	{
 		talpha.init_Table_Alpha(MOT.pSB, orb);
-		//talpha.print_Table_DSR();
+		if(GlobalV::deepks_out_unittest) talpha.print_Table_DSR(orb);
 	}
 
 	/////////////////////////////
@@ -1282,6 +1282,7 @@ double ORB_gen_tables::get_distance(const ModuleBase::Vector3<double> &R1, const
 #ifdef __DEEPKS
 
 void ORB_gen_tables::snap_psialpha_half(
+		const LCAO_Orbitals& orb,
 		std::vector<std::vector<double>> &nlm,
 		const int& job,
 		const ModuleBase::Vector3<double>& R1,
@@ -1296,7 +1297,7 @@ void ORB_gen_tables::snap_psialpha_half(
 {
 	ModuleBase::timer::tick("ORB_gen_tables", "snap_psialpha_half");
 
-    const int ln_per_atom = GlobalC::ORB.Alpha[0].getTotal_nchi();
+    const int ln_per_atom = orb.Alpha[0].getTotal_nchi();
     assert(ln_per_atom > 0); 
 	
 	std::vector<bool> calproj;
@@ -1314,9 +1315,9 @@ void ORB_gen_tables::snap_psialpha_half(
 	}
 
 	int nproj = 0;
-    for (int L0 = 0; L0 <= GlobalC::ORB.Alpha[0].getLmax();++L0)
+    for (int L0 = 0; L0 <= orb.Alpha[0].getLmax();++L0)
     {
-        for (int N0 = 0;N0 < GlobalC::ORB.Alpha[0].getNchi(L0);++N0)
+        for (int N0 = 0;N0 < orb.Alpha[0].getNchi(L0);++N0)
         {
 			nproj += (2 * L0 + 1);
 		}
@@ -1332,7 +1333,7 @@ void ORB_gen_tables::snap_psialpha_half(
 	}
 
 	//rcut of orbtials and projectors
-	const double Rcut1 = GlobalC::ORB.Phi[T1].getRcut();
+	const double Rcut1 = orb.Phi[T1].getRcut();
 
 	//in our calculation, we always put orbital phi at the left side of <phi|alpha>
 	const ModuleBase::Vector3<double> dRa = (R0 - R1) * this->lat0;
@@ -1341,7 +1342,7 @@ void ORB_gen_tables::snap_psialpha_half(
 	bool all_out = true;
 	for (int ip = 0; ip < ln_per_atom; ip++)
 	{
-		const double Rcut0 = GlobalC::ORB.Alpha[0].getRcut();
+		const double Rcut0 = orb.Alpha[0].getRcut();
 		if (distance10 > (Rcut1 + Rcut0))
 		{
 			calproj[ip] = false;
@@ -1419,9 +1420,9 @@ void ORB_gen_tables::snap_psialpha_half(
 	int ip = 0; //for L0,N0,m0
     int nb = 0; //for L0, N0
 
-    for (int L0 = 0; L0 <= GlobalC::ORB.Alpha[0].getLmax();++L0)
+    for (int L0 = 0; L0 <= orb.Alpha[0].getLmax();++L0)
     {
-        for (int N0 = 0;N0 < GlobalC::ORB.Alpha[0].getNchi(L0);++N0)
+        for (int N0 = 0;N0 < orb.Alpha[0].getNchi(L0);++N0)
         {
             if (!calproj[nb])
             {

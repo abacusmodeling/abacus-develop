@@ -1,18 +1,25 @@
 //This file contains interfaces with libtorch,
 //including loading of model and calculating gradients
+//as well as subroutines that prints the results for checking
 
-//The file contains 5 subroutines:
+//The file contains 8 subroutines:
 //1. cal_descriptor : obtains descriptors which are eigenvalues of pdm
 //      by calling torch::linalg::eigh
-//2. cal_gvx : gvx is used for training with force label, which is gradient of descriptors, 
+//2. check_descriptor : prints descriptor for checking
+//3. cal_gvx : gvx is used for training with force label, which is gradient of descriptors, 
 //      calculated by d(des)/dX = d(pdm)/dX * d(des)/d(pdm) = gdmx * gvdm
 //      using einsum
-//3. cal_gvdm : d(des)/d(pdm)
+//4. check_gvx : prints gvx into gvx.dat for checking
+//5. cal_gvdm : d(des)/d(pdm)
 //      calculated using torch::autograd::grad
-//4. load_model : loads model for applying V_delta
-//5. cal_gedm : calculates d(E_delta)/d(pdm)
+//6. load_model : loads model for applying V_delta
+//7. cal_gedm : calculates d(E_delta)/d(pdm)
 //      this is the term V(D) that enters the expression H_V_delta = |alpha>V(D)<alpha|
 //      caculated using torch::autograd::grad
+//8. check_gedm : prints gedm for checking
+//9. cal_orbital_precalc : orbital_precalc is usted for training with orbital label, 
+//                         which equals gvdm * orbital_pdm_shell, 
+//                         orbital_pdm_shells[1,Inl,nm*nm] = dm_hl * overlap * overlap
 
 #ifdef __DEEPKS
 
@@ -61,6 +68,36 @@ void LCAO_Deepks::cal_descriptor(void)
         //d_v = torch::symeig(pdm_tensor[inl], /*eigenvalues=*/true, /*upper=*/true);
         d_v = torch::linalg::eigh(pdm_tensor[inl], /*uplo*/"U");
         d_tensor[inl] = std::get<0>(d_v);
+    }
+    return;
+}
+
+void LCAO_Deepks::check_descriptor(const UnitCell_pseudo &ucell)
+{
+    ModuleBase::TITLE("LCAO_Deepks", "check_descriptor");
+    if(GlobalV::MY_RANK!=0) return;
+    ofstream ofs("descriptor.dat");
+    ofs<<std::setprecision(10);
+    for (int it = 0; it < ucell.ntype; it++)
+    {
+        for (int ia = 0; ia < ucell.atoms[it].na; ia++)
+        {
+            int iat=ucell.itia2iat(it,ia);
+            ofs << ucell.atoms[it].label << " atom_index " << ia + 1 << " n_descriptor " << this->des_per_atom << std::endl;
+            int id = 0;
+            for(int inl=0;inl<inlmax/ucell.nat;inl++)
+            {
+                int nm = 2*inl_l[inl]+1;
+                for(int im=0;im<nm;im++)
+                {
+                    const int ind=iat*inlmax/ucell.nat+inl;
+                    ofs << d_tensor[ind].index({im}).item().toDouble() << " ";
+                    if (id % 8 == 7) ofs << std::endl;
+                    id++;
+                }
+            }   
+            ofs << std::endl << std::endl;
+        }
     }
     return;
 }
@@ -140,6 +177,55 @@ void LCAO_Deepks::cal_gvx(const int nat)
     return;
 }
 
+void LCAO_Deepks::check_gvx(const int nat)
+{
+    std::stringstream ss;
+    ofstream ofs_x;
+    ofstream ofs_y;
+    ofstream ofs_z;
+
+    ofs_x<<std::setprecision(12);
+    ofs_y<<std::setprecision(12);
+    ofs_z<<std::setprecision(12);
+
+    for(int ia=0;ia<nat;ia++)
+    {
+        ss.str("");
+        ss<<"gvx_"<<ia<<".dat";
+        ofs_x.open(ss.str().c_str());
+        ss.str("");
+        ss<<"gvy_"<<ia<<".dat";
+        ofs_y.open(ss.str().c_str());
+        ss.str("");
+        ss<<"gvz_"<<ia<<".dat";
+        ofs_z.open(ss.str().c_str());
+
+        ofs_x << std::setprecision(10);
+        ofs_y << std::setprecision(10);
+        ofs_z << std::setprecision(10);
+        
+        for(int ib=0;ib<nat;ib++)
+        {
+            for(int inl=0;inl<inlmax/nat;inl++)
+            {
+                int nm = 2*inl_l[inl]+1;
+                {
+                    const int ind=ib*inlmax/nat+inl;
+                    ofs_x << gvx_tensor.index({ia,0,ib,inl}).item().toDouble() << " ";
+                    ofs_y << gvx_tensor.index({ia,1,ib,inl}).item().toDouble() << " ";
+                    ofs_z << gvx_tensor.index({ia,2,ib,inl}).item().toDouble() << " ";
+                }
+            }
+            ofs_x << std::endl;
+            ofs_y << std::endl;
+            ofs_z << std::endl;
+        }
+        ofs_x.close();
+        ofs_y.close();
+        ofs_z.close();        
+    }
+}
+
 //dDescriptor / dprojected density matrix
 void LCAO_Deepks::cal_gvdm(const int nat)
 {
@@ -179,13 +265,13 @@ void LCAO_Deepks::cal_gvdm(const int nat)
     return;
 }
 
-void LCAO_Deepks::load_model(const string& model_file)
+void LCAO_Deepks::load_model(const string& deepks_model)
 {
     ModuleBase::TITLE("LCAO_Deepks", "load_model");
 
     try
 	{
-        this->module = torch::jit::load(model_file);
+        this->module = torch::jit::load(deepks_model);
     }
     catch (const c10::Error& e)
 
@@ -204,12 +290,13 @@ void LCAO_Deepks::cal_gedm(const int nat)
 
     //forward
     std::vector<torch::jit::IValue> inputs;
+    
     //input_dim:(natom, des_per_atom)
-    inputs.push_back(torch::cat(this->d_tensor, /*dim=*/0).reshape({ nat, this->des_per_atom }));
+    inputs.push_back(torch::cat(this->d_tensor, 0).reshape({ nat, this->des_per_atom }));
     std::vector<torch::Tensor> ec;
     ec.push_back(module.forward(inputs).toTensor());    //Hartree
     this->E_delta = ec[0].item().toDouble() * 2;//Ry; *2 is for Hartree to Ry
-    
+
     //cal gedm
     std::vector<torch::Tensor> gedm_shell;
     gedm_shell.push_back(torch::ones_like(ec[0]));
@@ -230,6 +317,25 @@ void LCAO_Deepks::cal_gedm(const int nat)
         }
     }
     return;
+}
+
+void LCAO_Deepks::check_gedm()
+{
+    ofstream ofs("gedm.dat");
+    for(int inl=0;inl<inlmax;inl++)
+    {
+        int nm = 2 * inl_l[inl] + 1;
+        for (int m1 = 0;m1 < nm;++m1)
+        {
+            for (int m2 = 0;m2 < nm;++m2)
+            {
+                int index = m1 * nm + m2;
+                //*2 is for Hartree to Ry
+                ofs << this->gedm[inl][index] << " ";
+            }
+        }   
+        ofs << std::endl;     
+    }
 }
 
 // calculates orbital_precalc[1,NAt,NDscrpt] = gvdm * orbital_pdm_shells;
@@ -255,7 +361,7 @@ void LCAO_Deepks::cal_orbital_precalc(const std::vector<ModuleBase::matrix> &dm_
         {
             const int iat = ucell.itia2iat(T0,I0);
             const ModuleBase::Vector3<double> tau0 = atom0->tau[I0];
-            GridD.Find_atom(GlobalC::ucell, atom0->tau[I0] ,T0, I0);
+            GridD.Find_atom(ucell, atom0->tau[I0] ,T0, I0);
 
             for (int ad1=0; ad1<GridD.getAdjacentNum()+1 ; ++ad1)
             {
@@ -272,7 +378,7 @@ void LCAO_Deepks::cal_orbital_precalc(const std::vector<ModuleBase::matrix> &dm_
 					const int T2 = GridD.getType(ad2);
 					const int I2 = GridD.getNatom(ad2);
 					const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
-					const ModuleBase::Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau(ad2);
+					const ModuleBase::Vector3<double> tau2 = GridD.getAdjacentTau(ad2);
 					const Atom* atom2 = &ucell.atoms[T2];
 					const int nw2_tot = atom2->nw*GlobalV::NPOL;
 					

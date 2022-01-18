@@ -25,7 +25,8 @@ class InfoNonlocal
 			int &n_projectors,
 			const int& kmesh,
 			const double& dk,
-			const double& dr_uniform);
+			const double& dr_uniform,
+			std::ofstream &log);
 		/// read in the NONLOCAL projector from file.
 		void Read_NonLocal(
 			const int &it, 

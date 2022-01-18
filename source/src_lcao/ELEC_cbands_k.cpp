@@ -30,8 +30,10 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 			GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            GlobalC::ParaO,
-			GlobalC::kv);
+            GlobalC::ParaO.trace_loc_row,
+			GlobalC::ParaO.trace_loc_col,
+			GlobalC::kv.nks,
+			GlobalC::kv.kvec_d);
     	GlobalC::ld.cal_descriptor();
 		//calculate dE/dD
 		GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
@@ -40,7 +42,8 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		GlobalC::ld.add_v_delta_k(GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            GlobalC::ParaO,
+            GlobalC::ParaO.trace_loc_row,
+			GlobalC::ParaO.trace_loc_col,
 			GlobalC::LNNR.nnr);
 	}
 #endif

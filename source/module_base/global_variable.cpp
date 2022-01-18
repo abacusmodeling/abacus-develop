@@ -181,9 +181,12 @@ double soc_lambda = 1.0;
 
 bool FINAL_SCF = false; //LiuXh add 20180619
 
-bool out_descriptor = false; //caoyu add 2021-10-16 for DeePKS
-bool deepks_scf = false; //caoyu add 2021-10-16 for DeePKS
+bool deepks_out_labels = false; //caoyu add 2021-10-16 for DeePKS, wenfei 2022-1-16
+bool deepks_scf = false; //caoyu add 2021-10-16 for DeePKS, wenfei 2022-1-16
 bool deepks_bandgap = false; //for bandgap label. QO added 2021-12-15
+bool deepks_out_unittest = false;
+
+bool deepks_setorb = false;
 
 int vnl_method = 1; //set defauld vnl method as old, added by zhengdy 2021-10-11
 

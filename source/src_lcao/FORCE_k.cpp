@@ -74,8 +74,10 @@ void Force_LCAO_k::ftable_k (
 			GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            GlobalC::ParaO,
-			GlobalC::kv);
+            GlobalC::ParaO.trace_loc_row,
+			GlobalC::ParaO.trace_loc_col,
+			GlobalC::kv.nks,
+			GlobalC::kv.kvec_d);
     	GlobalC::ld.cal_descriptor();
 		GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
 
@@ -83,8 +85,10 @@ void Force_LCAO_k::ftable_k (
 			GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            GlobalC::ParaO,
-			GlobalC::kv,
+            GlobalC::ParaO.trace_loc_row,
+			GlobalC::ParaO.trace_loc_col,
+			GlobalC::kv.nks,
+			GlobalC::kv.kvec_d,
 			isstress,svnl_dalpha);
 #ifdef __MPI
         Parallel_Reduce::reduce_double_all(GlobalC::ld.F_delta.c,GlobalC::ld.F_delta.nr*GlobalC::ld.F_delta.nc);
@@ -93,7 +97,35 @@ void Force_LCAO_k::ftable_k (
 			Parallel_Reduce::reduce_double_pool( svnl_dalpha.c, svnl_dalpha.nr * svnl_dalpha.nc);
 		}
 #endif
-        GlobalC::ld.print_F_delta("F_delta.dat", GlobalC::ucell);
+        if(GlobalV::deepks_out_unittest)
+        {
+			GlobalC::ld.print_dm_k(GlobalC::kv.nks,GlobalC::LOC.wfc_dm_2d.dm_k);
+			GlobalC::ld.check_projected_dm();
+			GlobalC::ld.check_descriptor(GlobalC::ucell);
+			GlobalC::ld.check_gedm();
+			GlobalC::ld.add_v_delta_k(GlobalC::ucell,
+				GlobalC::ORB,
+				GlobalC::GridD,
+				GlobalC::ParaO.trace_loc_row,
+				GlobalC::ParaO.trace_loc_col,
+				GlobalC::LNNR.nnr);
+			GlobalC::ld.check_v_delta_k(GlobalC::LNNR.nnr);
+			for(int ik=0;ik<GlobalC::kv.nks;ik++)
+			{
+				GlobalC::LNNR.folding_fixedH(ik);
+			}
+			GlobalC::ld.cal_e_delta_band_k(GlobalC::LOC.wfc_dm_2d.dm_k,
+				GlobalC::ParaO.trace_loc_row,
+				GlobalC::ParaO.trace_loc_col,
+				GlobalC::kv.nks,
+				GlobalC::ParaO.nrow,
+				GlobalC::ParaO.ncol);
+			ofstream ofs("E_delta_bands.dat");
+			ofs <<std::setprecision(10)<< GlobalC::ld.e_delta_band;
+			ofstream ofs1("E_delta.dat");
+			ofs1 <<std::setprecision(10)<< GlobalC::ld.E_delta;
+			GlobalC::ld.check_f_delta(GlobalC::ucell.nat, svnl_dalpha);
+        }
     }
 #endif
 
@@ -511,7 +543,9 @@ void Force_LCAO_k::cal_foverlap_k(
 								for(int ipol = 0;ipol<3;ipol++)
 								{
 									soverlap(0,ipol) += edm2d[is][irr] * GlobalC::LM.DSloc_Rx[irr] * GlobalC::LM.DH_r[irr * 3 + ipol];
+									if(ipol<1) continue;
 									soverlap(1,ipol) += edm2d[is][irr] * GlobalC::LM.DSloc_Ry[irr] * GlobalC::LM.DH_r[irr * 3 + ipol];
+									if(ipol<2) continue;
 									soverlap(2,ipol) += edm2d[is][irr] * GlobalC::LM.DSloc_Rz[irr] * GlobalC::LM.DH_r[irr * 3 + ipol];
 								}
 							}
@@ -524,26 +558,9 @@ void Force_LCAO_k::cal_foverlap_k(
 		}
 	}
 
-	//-----------------
-	// test the force
-	//-----------------
-	/*
-	std::cout << " overlap force" << std::endl;
-	for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
+	if(isstress)
 	{
-		const double fac = ModuleBase::Ry_to_eV / 0.529177;
-		std::cout << std::setw(5) << iat+1 << std::setw(15) << foverlap[iat][0] *fac<< std::setw(15) << foverlap[iat][1]*fac << 
-		std::setw(15) << foverlap[iat][2]*fac << std::endl;
-	}
-	*/
-	if(isstress){
-		for(int i=0;i<3;i++)
-		{
-			for(int j=0;j<3;j++)
-			{
-				soverlap(i,j) *=  GlobalC::ucell.lat0 / GlobalC::ucell.omega;
-			}
-		}
+		StressTools::stress_fill(GlobalC::ucell.lat0, GlobalC::ucell.omega, soverlap);
 	}
 
 	if(irr!=GlobalC::LNNR.nnr)
@@ -642,14 +659,7 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(
 //	test(dm2d[0],"dm2d");
 
 	if(isstress){
-		for(int i=0;i<3;i++)
-		{
-			for(int j=0;j<3;j++)
-			{
-				if(i<j) stvnl_dphi(j,i) = stvnl_dphi(i,j);
-				stvnl_dphi(i,j) *=  GlobalC::ucell.lat0 / GlobalC::ucell.omega;
-			}
-		}
+		StressTools::stress_fill(GlobalC::ucell.lat0, GlobalC::ucell.omega, stvnl_dphi);
 	}
 
 	RA.delete_grid();//xiaohui add 2015-02-04
@@ -911,7 +921,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 											}
 											if(isstress) 
 											{
-												for(int ipol=0;ipol<3;ipol++)
+												for(int ipol=jpol;ipol<3;ipol++)
 												{
 													svnl_dbeta(jpol, ipol) += dm2d[is][iir] * 
 													(nlm[jpol] * r1[ipol] + nlm1[jpol] * r0[ipol]);
@@ -935,13 +945,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 
 	if(isstress)
 	{
-		for(int i=0;i<3;i++)
-		{
-			for(int j=0;j<3;j++)
-			{
-				svnl_dbeta(i,j) *=  GlobalC::ucell.lat0 / GlobalC::ucell.omega;
-			}
-		}
+		StressTools::stress_fill(GlobalC::ucell.lat0, GlobalC::ucell.omega, svnl_dbeta);
 	}
 
 	ModuleBase::timer::tick("Force_LCAO_k","cal_fvnl_dbeta_k");
@@ -1231,7 +1235,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k_new(
 												}
 												if(isstress) 
 												{
-													for(int ipol=0;ipol<3;ipol++)
+													for(int ipol=jpol;ipol<3;ipol++)
 													{
 														svnl_dbeta(jpol, ipol) += dm2d[is][iir] * 
 														(nlm[jpol] * r1[ipol] + nlm1[jpol] * r0[ipol]);
@@ -1256,13 +1260,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k_new(
 
 	if(isstress)
 	{
-		for(int i=0;i<3;i++)
-		{
-			for(int j=0;j<3;j++)
-			{
-				svnl_dbeta(i,j) *=  GlobalC::ucell.lat0 / GlobalC::ucell.omega;
-			}
-		}
+		StressTools::stress_fill(GlobalC::ucell.lat0, GlobalC::ucell.omega, svnl_dbeta);
 	}
 
 	ModuleBase::timer::tick("Force_LCAO_k","cal_fvnl_dbeta_k_new");
@@ -1324,12 +1322,7 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 
 	
 	if(isstress){
-		for(int ipol=0;ipol<3;ipol++){
-			for(int jpol=0;jpol<3;jpol++){
-				if(ipol < jpol) svl_dphi(jpol, ipol) = svl_dphi(ipol, jpol);
-				svl_dphi(ipol, jpol) /= GlobalC::ucell.omega;
-			}
-		}
+		StressTools::stress_fill(1.0, GlobalC::ucell.omega, svl_dphi);
 	}
 
 	ModuleBase::timer::tick("Force_LCAO_k","cal_fvl_dphi_k");

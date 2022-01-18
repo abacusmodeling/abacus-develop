@@ -33,7 +33,7 @@ has_band=`grep -En '(^|[[:space:]])out_band($|[[:space:]])' INPUT | awk '{print 
 has_dos=`grep -En '(^|[[:space:]])out_dos($|[[:space:]])' INPUT | awk '{print $2}'`
 has_hs=`grep -En '(^|[[:space:]])out_hs($|[[:space:]])' INPUT | awk '{print $2}'`
 has_r=`grep -En '(^|[[:space:]])out_r($|[[:space:]])' INPUT | awk '{print $2}'`
-out_descriptor=`grep out_descriptor INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
+deepks_out_labels=`grep deepks_out_labels INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 #echo $running_path
 base=`grep -En '(^|[[:space:]])basis_type($|[[:space:]])' INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 if [ $base == "pw" ]; then word="plane_wave_line" 
@@ -111,7 +111,7 @@ fi
 ttot=`grep $word $running_path | awk '{print $3}'`
 echo "totaltimeref $ttot" >>$1
 
-if ! test -z "$out_descriptor" && [ $out_descriptor -eq 1 ]; then
+if ! test -z "$deepks_out_labels" && [ $deepks_out_labels -eq 1 ]; then
 	sed '/n_des/d' descriptor.dat > des_tmp.txt
 	total_des=`sum_file des_tmp.txt 5`
 	rm des_tmp.txt

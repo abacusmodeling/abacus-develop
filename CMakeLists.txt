@@ -11,7 +11,7 @@ project(ABACUS
     LANGUAGES CXX
 )
 
-option(ENABLE_DEEPKS "Enable DeePKS functionality" OFF)
+option(ENABLE_DEEPKS "Enable DeePKS functionality" ON)
 option(ENABLE_LIBXC "Enable LibXC functionality" OFF)
 option(USE_CUDA "Enable support to CUDA." OFF)
 option(USE_OPENMP " Enable OpenMP in abacus." ON)
@@ -203,15 +203,18 @@ IF (BUILD_TESTING)
   enable_testing()
   find_package(Threads)
   set(CMAKE_CXX_STANDARD_REQUIRED ON)
-  include(FetchContent)
-  FetchContent_Declare(
-    googletest
-    GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG "origin/main"
-  )
-  FetchContent_MakeAvailable(googletest)
-  # TODO: Find GoogleTest Locally
-
+  find_package(GTest)
+  if(NOT ${GTEST_FOUND})
+    include(FetchContent)
+    FetchContent_Declare(
+      googletest
+      GIT_REPOSITORY https://github.com/google/googletest.git
+      GIT_TAG "origin/main"
+    )
+    FetchContent_MakeAvailable(googletest)
+  endif()
+  # TODO: Try the GoogleTest module.
+  # https://cmake.org/cmake/help/latest/module/GoogleTest.html
   add_subdirectory(tests) # Contains integration tests
 
 endif()
@@ -223,7 +226,7 @@ function(AddTest)
   target_link_libraries(${UT_TARGET} ${UT_LIBS} ${ABACUS_LINK_LIBRARIES}
     base cell symmetry md symmetry
     neighbor orb io ions lcao parallel mrrr pdiag pw ri driver
-    pthread gtest_main)
+    pthread GTest::gtest_main)
   install(TARGETS ${UT_TARGET} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/../../../tests )
   add_test(NAME ${UT_TARGET}
     COMMAND ${UT_TARGET}

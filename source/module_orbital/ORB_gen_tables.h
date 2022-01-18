@@ -26,7 +26,7 @@ class ORB_gen_tables
 		const int &job0,
 		LCAO_Orbitals &orb,
 		const int &Lmax_exx,
-		const int& out_descriptor,///<[in] whether to generate descriptors
+		const bool& deepks_setorb,///<[in] whether to generate descriptors
 		const int &nprojmax,
 		const int* nproj,
 		const Numerical_Nonlocal* beta_
@@ -94,6 +94,7 @@ class ORB_gen_tables
 	/// set as public because in hamilt_linear,
 #ifdef __DEEPKS
     void snap_psialpha_half(
+			const LCAO_Orbitals& orb,
 			std::vector<std::vector<double>> &nlm,
 			const int& job,
 			const ModuleBase::Vector3<double>& R1,
