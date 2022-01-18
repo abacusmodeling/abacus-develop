@@ -11,7 +11,6 @@ using namespace std;
 
 #include <string>
 #include <fstream>
-#include <iomanip>
 
 #include <vector>
 
