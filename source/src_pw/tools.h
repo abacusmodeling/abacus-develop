@@ -10,7 +10,6 @@ using namespace std;
 #include <cmath>
 
 
-#include <vector>
 
 #include "../module_base/constants.h"
 
