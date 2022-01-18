@@ -3,6 +3,7 @@
 #include "../module_orbital/ORB_read.h"
 #include "grid_base.h"
 #include "global_fp.h" // mohan add 2021-01-30
+#include "../module_base/memory.h"
 
 Grid_Base::Grid_Base()
 { 

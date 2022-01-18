@@ -11,6 +11,7 @@
 #include <cmath>
 #include <sstream>
 #include <complex>
+#include "../module_base/memory.h"
 
 #include "dftu.h"
 #include "../module_base/constants.h"

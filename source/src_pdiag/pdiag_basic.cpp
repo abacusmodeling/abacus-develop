@@ -3,6 +3,7 @@
 #include "../src_pw/global.h"
 #include "../src_io/wf_local.h"
 #include "../module_base/lapack_connector.h"
+#include "../module_base/memory.h"
 
 Pdiag_Basic::Pdiag_Basic()
 {

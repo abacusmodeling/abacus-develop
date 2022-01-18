@@ -3,6 +3,7 @@
 #include "../src_io/wf_local.h"
 #include "../module_base/blas_connector.h"
 #include "../src_parallel/parallel_common.h"
+#include "../module_base/memory.h"
 
 #include "LCAO_nnr.h"
 void Local_Orbital_Charge::allocate_DM_k(void)

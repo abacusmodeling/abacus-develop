@@ -4,6 +4,7 @@
 // 3. delete condition justification in pw_and_columns distributins 2
 
 #include "tools.h"
+#include "../module_base/memory.h"
 #include "../src_parallel/parallel_reduce.h"
 #include "pw_basis.h"
 #include "pw_complement.h"

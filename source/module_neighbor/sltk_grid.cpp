@@ -1,6 +1,7 @@
 #include "sltk_grid.h"
 #include "sltk_atom_input.h"
 #include "../src_pw/tools.h"
+#include "../module_base/memory.h"
 //#include "../src_pw/global.h"
 //=================
 // Class AtomLink

@@ -1,5 +1,6 @@
 #include "pw_complement.h"
 #include "../module_base/mymath.h"
+#include "../module_base/memory.h"
 
 int PW_complement::get_total_pw_number(
     const double& ggcut_start,

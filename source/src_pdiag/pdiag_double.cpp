@@ -5,6 +5,7 @@
 #include "../src_pw/global.h"
 #include "../src_lcao/local_orbital_charge.h"
 #include "../src_io/wf_local.h"
+#include "../module_base/memory.h"
 
 
 #ifdef __MPI

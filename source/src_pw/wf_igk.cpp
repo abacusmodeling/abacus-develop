@@ -1,6 +1,7 @@
 #include "wf_igk.h"
 
 #include "global.h"
+#include "../module_base/memory.h"
 
 WF_igk::WF_igk()
 {

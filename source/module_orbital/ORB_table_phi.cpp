@@ -1,6 +1,7 @@
 #include <stdexcept>
 #include "ORB_table_phi.h"
 #include "../module_base/math_integral.h"
+#include "../module_base/memory.h"
 
 double ORB_table_phi::dr = -1.0;
 

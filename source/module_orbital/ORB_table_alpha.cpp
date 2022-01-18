@@ -3,6 +3,7 @@
 #include "ORB_read.h"
 #include "../module_base/math_integral.h"
 #include <stdexcept>
+#include "../module_base/memory.h"
 
 double ORB_table_alpha::dr = -1.0;
 

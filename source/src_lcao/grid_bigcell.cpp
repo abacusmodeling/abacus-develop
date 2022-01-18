@@ -2,6 +2,7 @@
 #include "../src_pw/global.h"
 
 #include "global_fp.h" // mohan add 2021-01-30
+#include "../module_base/memory.h"
 
 Grid_BigCell::Grid_BigCell()
 {

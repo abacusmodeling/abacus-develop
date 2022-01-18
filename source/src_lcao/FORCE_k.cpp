@@ -3,6 +3,7 @@
 #include "../src_parallel/parallel_reduce.h"
 #include <unordered_map>
 #include <map>
+#include "../module_base/memory.h"
 
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"

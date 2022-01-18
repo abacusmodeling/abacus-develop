@@ -1,5 +1,6 @@
 #include "use_fft.h"
 #include "global.h"
+#include "../module_base/memory.h"
 
 
 Use_FFT::Use_FFT()

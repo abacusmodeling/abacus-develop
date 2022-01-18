@@ -1,4 +1,5 @@
 #include "tools.h"
+#include "../module_base/memory.h"
 #include "global.h"
 #include "potential.h"
 #include "xc_functional.h"
