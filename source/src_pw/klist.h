@@ -2,6 +2,7 @@
 #define K_VECTORS_H
 
 #include "tools.h"
+#include "../module_base/matrix3.h"
 #include "../module_symmetry/symmetry.h"
 #include <vector>
 

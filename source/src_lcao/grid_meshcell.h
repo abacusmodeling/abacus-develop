@@ -1,6 +1,7 @@
 #ifndef GRID_MESHCELL_H
 #define GRID_MESHCELL_H
 #include "../src_pw/tools.h"
+#include "../module_base/matrix3.h"
 #include "grid_meshk.h"
 
 class Grid_MeshCell: public Grid_MeshK

@@ -2,6 +2,7 @@
 #define MAGNETISM_H
 
 #include "tools.h"
+#include "../module_base/vector3.h"
 
 class Magnetism
 {
