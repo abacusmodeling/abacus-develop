@@ -25,8 +25,13 @@ void test_deepks::set_parameters()
 	GlobalV::ofs_warning.open("warning.log");
 	GlobalV::ofs_running.open("running.log");
 	GlobalV::deepks_setorb=1;
-	GlobalV::GAMMA_ONLY_LOCAL=0;
 	GlobalV::FORCE=1;
+	
+	std::ifstream ifs("INPUT");
+	char word[80];
+	ifs >> word;
+	ifs >> GlobalV::GAMMA_ONLY_LOCAL;
+	ifs.close();
 
 	ucell.latName = "test";
 	ucell.ntype = ntype;

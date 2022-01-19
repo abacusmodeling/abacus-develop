@@ -16,5 +16,6 @@ if(ENABLE_DEEPKS)
         OBJECT
         ${objects}
     )
+
 endif()
 

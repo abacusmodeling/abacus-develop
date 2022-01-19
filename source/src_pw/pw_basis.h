@@ -31,7 +31,9 @@ public:
         const int &ncz_in,
 		const int &bx_in,
 		const int &by_in,
-		const int &bz_in
+		const int &bz_in,
+        const int &seed_in,
+        const int &nbspline_in
     );
 
 	const UnitCell *Ucell; // pointer for UnitCell
