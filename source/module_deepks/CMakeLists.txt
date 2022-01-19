@@ -17,9 +17,5 @@ if(ENABLE_DEEPKS)
         ${objects}
     )
 
-    IF (BUILD_TESTING)
-        add_subdirectory(test)
-    endif()
-
 endif()
 
