@@ -5,7 +5,7 @@
 #include "../src_pw/global.h"
 #include "../src_io/write_HS.h"
 
-#include <mpi.h>
+#include "mpi.h"
 #include <cstdlib>
 #include <cstring>
 #include <fstream>

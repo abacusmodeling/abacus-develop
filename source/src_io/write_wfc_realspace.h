@@ -13,7 +13,7 @@
 #include <string>
 
 #ifdef __MPI
-#include <mpi.h>
+#include "mpi.h"
 #endif
 
 namespace Write_Wfc_Realspace

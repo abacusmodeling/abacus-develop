@@ -5,7 +5,7 @@
 #include <vector>
 #include <utility>
 #ifdef __MPI
-#include <mpi.h>
+#include "mpi.h"
 #endif
 using namespace std;
 

@@ -6,7 +6,7 @@
 #include "../module_base/mymath.h"
 #include <vector>
 #ifdef __MPI
-#include <mpi.h>
+#include "mpi.h"
 #endif
 #include <sys/time.h>
 #ifdef __LCAO

@@ -1,7 +1,7 @@
 #include "NVT_NHC.h"
 #include "MD_func.h"
 #ifdef __MPI
-#include <mpi.h>
+#include "mpi.h"
 #endif
 #include "../module_base/timer.h"
 

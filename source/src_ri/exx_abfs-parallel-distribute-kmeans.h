@@ -5,7 +5,7 @@
 #include "../module_base/vector3.h"
 #include <vector>
 #include <utility>
-#include <mpi.h>
+#include "mpi.h"
 
 class Exx_Abfs::Parallel::Distribute::Kmeans
 {

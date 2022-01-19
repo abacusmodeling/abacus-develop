@@ -3,7 +3,7 @@
 
 #include "exx_abfs.h"
 #ifdef __MPI
-#include <mpi.h>
+#include "mpi.h"
 #endif
 
 #include <vector>

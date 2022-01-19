@@ -4,7 +4,7 @@
 #include "../src_pw/global.h"
 #include "../src_lcao/global_fp.h"
 
-#include <mpi.h>
+#include "mpi.h"
 #include <thread>
 
 

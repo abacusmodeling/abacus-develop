@@ -9,7 +9,7 @@
 #include "../module_base/matrix.h"
 #include "../module_base/element_basis_index.h"
 #ifdef __MPI
-#include <mpi.h>
+#include "mpi.h"
 #endif
 
 class LCAO_Orbitals;
