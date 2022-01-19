@@ -4,6 +4,7 @@
 //#include "symm_other.h"
 
 #include "../module_base/mathzone.h"
+#include "../module_base/constants.h"
 
 namespace ModuleSymmetry
 {

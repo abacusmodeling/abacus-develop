@@ -4,6 +4,7 @@
 #include "../module_base/timer.h"
 #include "../module_base/math_integral.h"
 #include "../module_base/math_sphbes.h"
+#include "../module_base/constants.h"
 
 #ifdef _OPENMP
 #include <omp.h>

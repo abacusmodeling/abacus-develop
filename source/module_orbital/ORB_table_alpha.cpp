@@ -125,6 +125,7 @@ int ORB_table_alpha::get_rmesh(const double &R1, const double &R2)
 }
 
 #include "../module_base/mathzone_add1.h"
+#include "../module_base/constants.h"
 
 void ORB_table_alpha::cal_S_PhiAlpha_R(
 	ModuleBase::Sph_Bessel_Recursive::D2 *pSB, // mohan add 2021-03-06

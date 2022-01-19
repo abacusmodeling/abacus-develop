@@ -2,6 +2,7 @@
 #include "ORB_table_phi.h"
 #include "../module_base/math_integral.h"
 #include "../module_base/memory.h"
+#include "../module_base/constants.h"
 
 double ORB_table_phi::dr = -1.0;
 
@@ -243,6 +244,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 	return;
 }
 
+#include "../module_base/constants.h"
 
 // Peize Lin add 2017-10-27
 void ORB_table_phi::cal_ST_Phi12_R

@@ -751,7 +751,7 @@ void PW_Basis::get_nggm(const int ngmc_local)
     return;
 }
 
-
+#include "../module_base/constants.h"
 //  Calculate structure factor
 void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add OpenMP 2021.04.01
 {
