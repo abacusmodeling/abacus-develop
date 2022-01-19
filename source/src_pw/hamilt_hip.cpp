@@ -15,7 +15,6 @@ Hamilt::~Hamilt()
 {
 }
 
-// in tools.h
 
 __global__ void hamilt_cast_d2f(float *dst, double *src, int size)
 {

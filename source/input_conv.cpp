@@ -13,7 +13,8 @@
 #include "src_pw/efield.h"
 #include "src_pw/global.h"
 #include "src_pw/occupy.h"
-#include "src_pw/tools.h"
+#include "module_base/global_function.h"
+#include "module_base/global_variable.h"
 #include "src_ri/exx_abfs-jle.h"
 #ifdef __LCAO
 #include "module_orbital/ORB_read.h"

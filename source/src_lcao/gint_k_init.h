@@ -4,7 +4,8 @@
 //=========================================================
 #ifndef GINT_K_INIT_H
 #define GINT_K_INIT_H
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 class Gint_k_init
 {
 	friend class Gint_k;

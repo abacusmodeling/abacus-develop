@@ -2,7 +2,8 @@
 #define IONS_H
 
 #include "../src_pw/electrons.h"
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "../module_base/matrix.h"
 #include "../src_pw/charge_extra.h"
 #include "../src_pw/sto_elec.h" //mohan added 2021-01-28

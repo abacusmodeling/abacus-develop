@@ -7,7 +7,8 @@ using namespace std;
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "../module_base/matrix.h"
 #include "../module_base/matrix3.h"
 #include "../module_base/complexmatrix.h"

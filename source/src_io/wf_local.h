@@ -1,7 +1,8 @@
 #ifndef WF_LOCAL_H
 #define WF_LOCAL_H
 
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 
 // mohan add 2010-09-09
 namespace WF_Local

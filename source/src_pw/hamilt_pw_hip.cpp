@@ -1,6 +1,7 @@
 #include "global.h"
 #include "hip/hip_runtime.h"
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 // #include "hamilt_pw.cuh"
 #include "../module_base/blas_connector.h"
 #include "../src_io/optical.h" // only get judgement to calculate optical matrix or not.

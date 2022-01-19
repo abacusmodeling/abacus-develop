@@ -3,7 +3,8 @@
 // DATE : 2008-11-6
 //==========================================================
 //#include "global.h"
-#include "src_pw/tools.h"
+#include "module_base/global_function.h"
+#include "module_base/global_variable.h"
 #include "src_parallel/parallel_common.h"
 #include "input.h"
 

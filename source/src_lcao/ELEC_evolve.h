@@ -1,7 +1,8 @@
 #ifndef ELEC_EVOLVE_H
 #define ELEC_EVOLVE_H
 
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "LCAO_hamilt.h"
 
 //-----------------------------------------------------------

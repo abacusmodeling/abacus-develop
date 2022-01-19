@@ -3,7 +3,8 @@
 // 2. change ./src_parallel/ft.cpp 's some group size
 // 3. delete condition justification in pw_and_columns distributins 2
 
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "../module_base/memory.h"
 #include "../src_parallel/parallel_reduce.h"
 #include "pw_basis.h"

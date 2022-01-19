@@ -7,7 +7,8 @@
 #define GINT_GAMMA_H
 
 #include "gint_tools.h"
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "grid_base_beta.h"
 #include "grid_technique.h"
 #include "LCAO_matrix.h"

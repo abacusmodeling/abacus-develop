@@ -7,7 +7,8 @@
 // (3) Pulay Mixing
 // (4) Modified Broden Mixing
 //===================================
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "../module_base/matrix.h"
 #include "charge_mixing.h"
 

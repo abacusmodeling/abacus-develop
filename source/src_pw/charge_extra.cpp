@@ -1,5 +1,6 @@
 #include "charge_extra.h"
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "../module_base/memory.h"
 #include "global.h"
 #ifdef __LCAO

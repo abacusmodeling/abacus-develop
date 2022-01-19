@@ -1,5 +1,6 @@
 #include "global.h"
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "myfunc.h"
 #include "VL_in_pw.h"
 #include "../module_base/math_integral.h"

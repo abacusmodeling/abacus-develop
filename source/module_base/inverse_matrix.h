@@ -1,8 +1,9 @@
 #ifndef INVERSE_MATRIX_H
 #define INVERSE_MATRIX_H
 
-#include "../src_pw/tools.h"
-#include "../module_base/complexmatrix.h"
+#include "global_function.h"
+#include "global_variable.h"
+#include "complexmatrix.h"
 namespace ModuleBase
 {
 

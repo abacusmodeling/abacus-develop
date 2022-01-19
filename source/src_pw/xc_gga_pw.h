@@ -1,7 +1,8 @@
 #ifndef GGA_PW_H 
 #define GGA_PW_H
 
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "../module_base/matrix.h"
 #include "../module_base/vector3.h"
 #include "../src_parallel/parallel_global.h"

@@ -1,7 +1,8 @@
 #ifndef FUNCTIONAL_H
 #define FUNCTIONAL_H
 
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 class xcfunc
 {
 

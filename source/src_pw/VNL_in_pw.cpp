@@ -1,6 +1,7 @@
 #include "global.h"
 #include "VNL_in_pw.h"
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "wavefunc.h"
 #include "../module_orbital/ORB_gen_tables.h"
 #include "../module_base/math_integral.h"

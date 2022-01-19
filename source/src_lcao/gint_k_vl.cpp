@@ -1,4 +1,5 @@
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "gint_k.h"
 #include "LCAO_nnr.h"
 #include "../module_orbital/ORB_read.h"

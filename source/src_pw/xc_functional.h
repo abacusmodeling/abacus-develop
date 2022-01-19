@@ -9,7 +9,8 @@
 #include <xc.h>
 #endif	// ifdef USE_LIBXC
 
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 class XC_Functional
 {
 	public:

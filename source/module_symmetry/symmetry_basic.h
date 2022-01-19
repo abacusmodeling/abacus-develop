@@ -4,8 +4,6 @@
 //==========================================================
 #ifndef SYMMETRY_BASIC_H
 #define SYMMETRY_BASIC_H
-//#include "../src_pw/tools.h"
-//#include "symmetry_basic.h"
 #include "symm_other.h"
 #include "../module_base/mymath.h"
 #include "../module_base/ylm.h"

@@ -1,4 +1,5 @@
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "global.h"
 #include "electrons.h"
 #include "../src_pw/symmetry_rho.h"

@@ -1,6 +1,7 @@
 #include "istate_charge.h"
 #include "../src_pw/global.h"
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "../src_parallel/parallel_common.h"
 #include "../module_base/scalapack_connector.h"
 
