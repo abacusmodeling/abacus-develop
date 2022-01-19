@@ -4,6 +4,7 @@
 #include "../module_base/inverse_matrix.h"
 #include "../src_parallel/parallel_reduce.h"
 #include "../module_base/memory.h"
+#include "../module_base/timer.h"
 
 Charge_Broyden::Charge_Broyden() 
 {

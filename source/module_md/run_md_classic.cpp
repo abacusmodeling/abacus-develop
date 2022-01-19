@@ -8,6 +8,7 @@
 #include "Langevin.h"
 #include "../input.h"
 #include "../src_io/print_info.h"
+#include "../module_base/timer.h"
 
 Run_MD_CLASSIC::Run_MD_CLASSIC(){}
 

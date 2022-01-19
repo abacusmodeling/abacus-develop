@@ -3,6 +3,7 @@
 #ifdef __MPI
 #include <mpi.h>
 #endif
+#include "../module_base/timer.h"
 
 MSST::MSST(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in) : Verlet(MD_para_in, unit_in)
 {

@@ -26,6 +26,7 @@
 #include "../module_base/math_integral.h"
 #include "../module_base/math_sphbes.h"
 #include <vector>
+#include "../module_base/timer.h"
 
 Charge::Charge()
 {

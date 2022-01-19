@@ -7,6 +7,7 @@
 #include <cstring>
 #include <functional>
 #include <algorithm>
+#include "../module_base/timer.h"
 
 Numerical_Basis::Numerical_Basis() {}
 Numerical_Basis::~Numerical_Basis() {}

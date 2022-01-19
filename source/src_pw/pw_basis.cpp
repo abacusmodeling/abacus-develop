@@ -8,6 +8,7 @@
 #include "../src_parallel/parallel_reduce.h"
 #include "pw_basis.h"
 #include "pw_complement.h"
+#include "../module_base/timer.h"
 
 #ifdef _OPENMP
 #include <omp.h>

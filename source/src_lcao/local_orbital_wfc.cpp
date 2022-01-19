@@ -3,6 +3,7 @@
 #include "../src_io/wf_local.h"
 #include "../src_parallel/parallel_common.h"
 #include "../module_base/memory.h"
+#include "../module_base/timer.h"
 
 #include "global_fp.h" // mohan add 2021-01-30
 

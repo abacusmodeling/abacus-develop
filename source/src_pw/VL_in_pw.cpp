@@ -3,6 +3,7 @@
 #include "myfunc.h"
 #include "VL_in_pw.h"
 #include "../module_base/math_integral.h"
+#include "../module_base/timer.h"
 
 pseudopot_cell_vl::pseudopot_cell_vl()
 {

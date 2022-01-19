@@ -2,6 +2,7 @@
 
 #include "global.h"
 #include "../module_base/memory.h"
+#include "../module_base/timer.h"
 
 WF_igk::WF_igk()
 {

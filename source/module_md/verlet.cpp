@@ -3,6 +3,7 @@
 #ifdef __MPI
 #include <mpi.h>
 #endif
+#include "../module_base/timer.h"
 
 Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     mdp(MD_para_in),

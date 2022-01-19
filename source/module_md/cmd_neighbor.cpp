@@ -1,5 +1,6 @@
 #include "cmd_neighbor.h"
 #include "../src_parallel/parallel_common.h"
+#include "../module_base/timer.h"
 
 CMD_neighbor::CMD_neighbor()
 {

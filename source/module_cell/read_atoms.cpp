@@ -2,6 +2,7 @@
 #ifdef __LCAO
 #include "../module_orbital/ORB_read.h" // to use 'ORB' -- mohan 2021-01-30
 #endif
+#include "../module_base/timer.h"
 
 #ifndef __CELL
 #include "../src_pw/global.h"

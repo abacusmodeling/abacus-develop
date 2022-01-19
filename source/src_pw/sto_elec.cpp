@@ -5,6 +5,7 @@
 #include "../src_pw/symmetry_rho.h"
 #include "../src_io/wf_io.h"
 #include "H_Ewald_pw.h"
+#include "../module_base/timer.h"
 
 double Stochastic_Elec::avg_iter = 0;
 

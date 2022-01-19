@@ -13,6 +13,7 @@
 #ifdef __LCAO
 #include "../src_lcao/ELEC_evolve.h"
 #endif
+#include "../module_base/timer.h"
 
 Potential::Potential()
 {

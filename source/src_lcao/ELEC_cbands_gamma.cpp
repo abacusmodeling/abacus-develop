@@ -5,6 +5,7 @@
 #include "../src_pw/symmetry_rho.h"
 #include "LCAO_evolve.h"
 #include "dftu.h"
+#include "../module_base/timer.h"
 
 
 ELEC_cbands_gamma::ELEC_cbands_gamma(){};

@@ -8,6 +8,7 @@
 #include "../src_pw/global.h"
 #include "global_fp.h" // mohan add 2021-01-30
 #include "../module_base/memory.h"
+#include "../module_base/timer.h"
 
 Gint_k::Gint_k()
 {

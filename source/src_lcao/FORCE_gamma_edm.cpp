@@ -1,6 +1,7 @@
 #include "FORCE_gamma.h"
 #include "../src_pw/global.h"
 #include "../src_parallel/parallel_reduce.h"
+#include "../module_base/timer.h"
 
 double Force_LCAO_gamma::set_EDM_element(
     const int &ii, const int &jj, 

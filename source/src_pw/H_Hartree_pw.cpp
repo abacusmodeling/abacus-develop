@@ -1,6 +1,7 @@
 #include "H_Hartree_pw.h"
 #include "../src_parallel/parallel_reduce.h"
 #include "../module_base/constants.h"
+#include "../module_base/timer.h"
 
 double H_Hartree_pw::hartree_energy=0.0;
 

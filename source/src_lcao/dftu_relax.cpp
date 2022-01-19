@@ -22,6 +22,7 @@
 #include "../src_pw/magnetism.h"
 #include "../module_orbital/ORB_gen_tables.h"
 #include "../src_pw/charge.h"
+#include "../module_base/timer.h"
 
 extern "C"
 {

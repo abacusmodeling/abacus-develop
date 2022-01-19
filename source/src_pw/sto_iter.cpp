@@ -2,7 +2,8 @@
 #include "global.h"
 #include "sto_iter.h"
 #include "occupy.h"
-#include "diago_cg.h" 
+#include "diago_cg.h"
+#include "../module_base/timer.h" 
 
 double Stochastic_Iter:: mu;
 double Stochastic_Iter:: mu0;

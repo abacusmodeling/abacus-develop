@@ -1,5 +1,6 @@
 #include "LJ_potential.h"
 #include "../input.h"
+#include "../module_base/timer.h"
 
 LJ_potential::LJ_potential(){}
 

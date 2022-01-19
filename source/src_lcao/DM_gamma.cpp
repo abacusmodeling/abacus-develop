@@ -5,6 +5,7 @@
 #include "../src_parallel/parallel_reduce.h"
 #include "../src_parallel/parallel_common.h"
 #include "../module_base/memory.h"
+#include "../module_base/timer.h"
 
 extern "C"
 {

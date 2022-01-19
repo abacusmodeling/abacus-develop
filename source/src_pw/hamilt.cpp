@@ -2,6 +2,7 @@
 #include "hamilt.h"
 #include "diago_cg.h"
 #include "diago_david.h"
+#include "../module_base/timer.h"
 
 Hamilt::Hamilt() {}
 Hamilt::~Hamilt() {}

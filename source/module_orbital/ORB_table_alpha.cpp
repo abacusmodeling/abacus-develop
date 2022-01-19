@@ -4,6 +4,7 @@
 #include "../module_base/math_integral.h"
 #include <stdexcept>
 #include "../module_base/memory.h"
+#include "../module_base/timer.h"
 
 double ORB_table_alpha::dr = -1.0;
 

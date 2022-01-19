@@ -1,4 +1,8 @@
 #include "inverse_matrix.h"
+#include "tool_quit.h"
+#include "lapack_connector.h"
+#include "timer.h"
+#include "complexmatrix.h"
 
 namespace ModuleBase
 {
@@ -49,7 +53,7 @@ void Inverse_Matrix_Complex::init(const int &dim_in)
 	return;
 }
 
-#include "lapack_connector.h"
+
 void Inverse_Matrix_Complex::using_zheev( const ModuleBase::ComplexMatrix &Sin, ModuleBase::ComplexMatrix &Sout)
 {
 	ModuleBase::timer::tick("Inverse","using_zheev");

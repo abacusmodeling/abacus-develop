@@ -6,6 +6,7 @@
 #include "../module_base/math_ylmreal.h"
 #include "soc.h"
 #include <complex>
+#include "../module_base/timer.h"
 
 WF_atomic::WF_atomic()
 {

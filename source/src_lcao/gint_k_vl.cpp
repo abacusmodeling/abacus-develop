@@ -6,6 +6,7 @@
 #include "../module_base/ylm.h"
 #include "../src_pw/global.h"
 #include "../module_base/blas_connector.h"
+#include "../module_base/timer.h"
 //#include <mkl_cblas.h>
 
 #ifdef _OPENMP

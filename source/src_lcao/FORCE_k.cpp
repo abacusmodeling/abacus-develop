@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <map>
 #include "../module_base/memory.h"
+#include "../module_base/timer.h"
 
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"

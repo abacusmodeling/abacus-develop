@@ -23,6 +23,7 @@
 #include "src_lcao/global_fp.h"
 #include "src_lcao/local_orbital_charge.h"
 #endif
+#include "module_base/timer.h"
 
 void Input_Conv::Convert(void)
 {

@@ -3,6 +3,7 @@
 #ifdef __MPI
 #include <mpi.h>
 #endif
+#include "../module_base/timer.h"
 
 NVT_ADS::NVT_ADS(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in) : Verlet(MD_para_in, unit_in)
 {
