@@ -1,4 +1,7 @@
 #include "LCAO_deepks_test.h"
+#ifdef __MPI
+#include <mpi.h>
+#endif
 
 void calculate();
 
@@ -7,7 +10,13 @@ int main(int argc, char **argv)
 
 	std::cout << "Test of module_deepks" << std::endl;
 
+#ifdef __MPI
+	MPI_Init(&argc,&argv);
+#endif
     calculate();
+#ifdef __MPI
+	MPI_Finalize();
+#endif
 
     return 0;
 }

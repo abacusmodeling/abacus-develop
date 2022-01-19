@@ -438,15 +438,11 @@ void LCAO_Deepks::cal_e_delta_band_k(const std::vector<ModuleBase::ComplexMatrix
             }
         }
     }
-#ifdef __MPI
-    Parallel_Reduce::reduce_complex_double_all(e_delta_band_k);
-#endif
-    if(e_delta_band_k.imag()>1e-12)
-    {
-        GlobalV::ofs_running << "e_delta_band_k : " << e_delta_band_k << std::endl;
-        //ModuleBase::WARNING_QUIT("e_delta_band_k","energy should be real!");
-    }
+
     this->e_delta_band = e_delta_band_k.real();
+#ifdef __MPI
+    Parallel_Reduce::reduce_double_all(this->e_delta_band);
+#endif
     return;
 }
 

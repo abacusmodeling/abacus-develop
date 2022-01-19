@@ -16,5 +16,10 @@ if(ENABLE_DEEPKS)
         OBJECT
         ${objects}
     )
+
+    IF (BUILD_TESTING)
+        add_subdirectory(test)
+    endif()
+
 endif()
 
