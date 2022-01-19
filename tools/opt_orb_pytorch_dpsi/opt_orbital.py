@@ -18,7 +18,7 @@ class Opt_Orbital:
 
 		for it in info_stru.Na.keys():
 			for il in range(info_element[it].Nl):
-				Q[it][il] = torch.mm( QI[it][il], C[it][il].to(torch.complex128) ).view(info_stru.Nb,-1)
+				Q[it][il] = torch.mm( QI[it][il], C[it][il].to(torch.complex128) ).view(info_stru.Nb_true,-1)
 		return Q
 
 		
@@ -83,8 +83,8 @@ class Opt_Orbital:
 		  Q_cat[ib,it*il*ia*im*iu]
 		"""
 		# Q_b[ib][0,it*il*ia*im*iu]
-		Q_b = ND_list(info_stru.Nb)
-		for ib in range(info_stru.Nb):
+		Q_b = ND_list(info_stru.Nb_true)
+		for ib in range(info_stru.Nb_true):
 			# Q_[it][il*ia*im*iu]
 			Q_ = dict()
 			for it in info_stru.Na.keys():

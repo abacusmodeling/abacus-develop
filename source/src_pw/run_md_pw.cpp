@@ -77,7 +77,7 @@ void Run_MD_PW::md_ions_pw(void)
     }
 
     // md cycle
-    while (verlet->step_ <= GlobalV::NSTEP && !verlet->stop)
+    while ( (verlet->step_ + verlet->step_rst_) <= GlobalV::NSTEP && !verlet->stop)
     {
         if(verlet->step_ == 0)
         {
@@ -122,11 +122,16 @@ void Run_MD_PW::md_ions_pw(void)
             verlet->stress += verlet->virial;
         }
 
-        if(verlet->step_ % verlet->mdp.recordFreq == 0)
+        if((verlet->step_ + verlet->step_rst_) % verlet->mdp.dumpfreq == 0)
         {
             Print_Info::print_screen(0, 0, verlet->step_ + verlet->step_rst_);
             verlet->outputMD();
-            
+
+            MD_func::MDdump(verlet->step_ + verlet->step_rst_, verlet->ucell, verlet->virial, verlet->force);
+        }
+
+        if((verlet->step_ + verlet->step_rst_) % verlet->mdp.rstfreq == 0)
+        {
             verlet->ucell.update_vel(verlet->vel);
             std::stringstream file;
             file << GlobalV::global_out_dir << "STRU_MD_" << verlet->step_ + verlet->step_rst_;
@@ -135,20 +140,19 @@ void Run_MD_PW::md_ions_pw(void)
 #else
             verlet->ucell.print_stru_file(file.str(), 1, 1);
 #endif
-            MD_func::MDdump(verlet->step_ + verlet->step_rst_, verlet->ucell.nat, verlet->virial, verlet->force);
             verlet->write_restart();
-
-            if (GlobalC::pot.out_potential == 2)
-            {
-                std::stringstream ssp;
-                std::stringstream ssp_ave;
-                ssp << GlobalV::global_out_dir << "ElecStaticPot";
-                ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
-                GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
-            }
         }
 
         verlet->step_++;
+    }
+
+    if (GlobalC::pot.out_potential == 2)
+    {
+        std::stringstream ssp;
+        std::stringstream ssp_ave;
+        ssp << GlobalV::global_out_dir << "ElecStaticPot";
+        ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
+        GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
     }
 
     ModuleBase::timer::tick("Run_MD_PW", "md_ions_pw");

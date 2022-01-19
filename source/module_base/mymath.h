@@ -5,9 +5,6 @@
 #include "fftw.h"
 #elif defined __FFTW3
 #include "fftw3.h"
-#else
-#include <fftw3-mpi.h>
-//#include "fftw3-mpi_mkl.h"
 #endif
 namespace ModuleBase
 {

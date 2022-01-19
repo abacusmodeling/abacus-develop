@@ -12,7 +12,6 @@ list(APPEND objects
     diago_cg.cpp
     diago_david.cpp
     efield.cpp
-    electrons.cpp
     energy.cpp
     forces.cpp
     global.cpp
@@ -60,15 +59,25 @@ list(APPEND objects
     run_md_pw.cpp)
 if(USE_CUDA)
     list(APPEND objects
-        diago_cg_gpu.cu
+        diago_cg.cu
+        electrons.cu
         hamilt.cu
-        hamilt_pw_gpu.cu
+        hamilt_pw.cu
         use_fft_kernel.cu
+    )
+elseif(USE_ROCM)
+    list(APPEND objects
+        diago_cg_hip.cpp
+        electrons_hip.cpp
+        hamilt_hip.cpp
+        hamilt_pw_hip.cpp
+        use_fft_kernel_hip.cpp
     )
 else()
     list(APPEND objects
         hamilt.cpp
         hamilt_pw.cpp
+        electrons.cpp
     )
 endif()
 

@@ -2,7 +2,7 @@
 #include "../src_pw/global.h"
 #include "record_adj.h" //mohan add 2012-07-06
 #ifdef __DEEPKS
-#include "LCAO_descriptor.h"
+#include "../module_deepks/LCAO_deepks.h"
 #endif
 //----------------------------
 // define a global class obj.

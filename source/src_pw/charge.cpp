@@ -383,11 +383,11 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 							if(GlobalV::DOMAG)
 							{
 								rho_g3d(1, ig) += swap * (GlobalC::ucell.magnet.start_magnetization[it] / atom->zv) 
-								* sin(GlobalC::ucell.magnet.angle1_[it]) * cos(GlobalC::ucell.magnet.angle2_[it]);
+								* sin(atom->angle1[0]) * cos(atom->angle2[0]);
 								rho_g3d(2, ig) += swap * (GlobalC::ucell.magnet.start_magnetization[it] / atom->zv) 
-								* sin(GlobalC::ucell.magnet.angle1_[it]) * sin(GlobalC::ucell.magnet.angle2_[it]);
+								* sin(atom->angle1[0]) * sin(atom->angle2[0]);
 								rho_g3d(3, ig) += swap * (GlobalC::ucell.magnet.start_magnetization[it] / atom->zv) 
-								* cos(GlobalC::ucell.magnet.angle1_[it]);
+								* cos(atom->angle1[0]);
 							}
 							else if(GlobalV::DOMAG_Z)
 							{

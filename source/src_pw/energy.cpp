@@ -17,7 +17,7 @@
 #include "H_Hartree_pw.h"
 #include "H_XC_pw.h"
 #ifdef __DEEPKS
-#include "../src_lcao/LCAO_descriptor.h"
+#include "../src_lcao/../module_deepks/LCAO_deepks.h"
 #endif
 
 
@@ -73,11 +73,11 @@ void energy::calculate_harris(const int &flag)
 			this->etot_harris += GlobalC::ld.E_delta;  //caoyu add 2021-08-10
 			if(GlobalV::GAMMA_ONLY_LOCAL)
 			{
-				GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma);
+				GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma,GlobalC::ParaO);
 			}
 			else
 			{
-				GlobalC::ld.cal_e_delta_band_k(GlobalC::LOC.wfc_dm_2d.dm_k);
+				GlobalC::ld.cal_e_delta_band_k(GlobalC::LOC.wfc_dm_2d.dm_k,GlobalC::ParaO,GlobalC::kv.nks);
 			}
 			this->etot_harris -= GlobalC::ld.e_delta_band;
 		}
@@ -128,11 +128,11 @@ void energy::calculate_etot(void)
 		this->etot += GlobalC::ld.E_delta;
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma);
+			GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma, GlobalC::ParaO);
 		}
 		else
 		{
-			GlobalC::ld.cal_e_delta_band_k(GlobalC::LOC.wfc_dm_2d.dm_k);
+			GlobalC::ld.cal_e_delta_band_k(GlobalC::LOC.wfc_dm_2d.dm_k,GlobalC::ParaO,GlobalC::kv.nks);
 		}
         this->etot -= GlobalC::ld.e_delta_band;
 	}

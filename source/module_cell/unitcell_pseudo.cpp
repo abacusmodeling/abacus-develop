@@ -757,3 +757,75 @@ bool UnitCell_pseudo::if_cell_can_change()const
 	}
 	return 0;
 }
+
+void UnitCell_pseudo::setup(const std::string &latname_in,
+	const int &ntype_in, 
+	const int &lmaxmax_in,
+	const bool &set_vel_in,
+	const std::string &fixed_axes_in)
+{
+	this->latName = latname_in;
+	this->ntype = ntype_in;
+	this->lmaxmax = lmaxmax_in;
+	this->set_vel = set_vel_in;
+	// pengfei Li add 2018-11-11
+	if (fixed_axes_in == "None")
+	{
+		this->lc[0] = 1;
+		this->lc[1] = 1;
+		this->lc[2] = 1;
+	}
+	else if (fixed_axes_in == "volume")
+	{
+		this->lc[0] = 1;
+		this->lc[1] = 1;
+		this->lc[2] = 1;
+	}
+	else if (fixed_axes_in == "a")
+	{
+		this->lc[0] = 0;
+		this->lc[1] = 1;
+		this->lc[2] = 1;
+	}
+	else if (fixed_axes_in == "b")
+	{
+		this->lc[0] = 1;
+		this->lc[1] = 0;
+		this->lc[2] = 1;
+	}
+	else if (fixed_axes_in == "c")
+	{
+		this->lc[0] = 1;
+		this->lc[1] = 1;
+		this->lc[2] = 0;
+	}
+	else if (fixed_axes_in == "ab")
+	{
+		this->lc[0] = 0;
+		this->lc[1] = 0;
+		this->lc[2] = 1;
+	}
+	else if (fixed_axes_in == "ac")
+	{
+		this->lc[0] = 0;
+		this->lc[1] = 1;
+		this->lc[2] = 0;
+	}
+	else if (fixed_axes_in == "bc")
+	{
+		this->lc[0] = 1;
+		this->lc[1] = 0;
+		this->lc[2] = 0;
+	}
+	else if (fixed_axes_in == "abc")
+	{
+		this->lc[0] = 0;
+		this->lc[1] = 0;
+		this->lc[2] = 0;
+	}
+	else
+	{
+		ModuleBase::WARNING_QUIT("Input", "fixed_axes should be None,a,b,c,ab,ac,bc or abc!");
+	}
+	return;
+}

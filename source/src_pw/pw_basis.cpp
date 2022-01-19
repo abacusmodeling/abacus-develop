@@ -59,7 +59,7 @@ PW_Basis::~PW_Basis()
 	delete [] cutgg_num_table;
 
 #ifdef __MPI
-#ifndef __CUDA
+#if ((!defined __CUDA) && (!defined __ROCM))
     delete [] gcar;
     delete [] gdirect;
     delete [] gg;
@@ -88,7 +88,9 @@ void PW_Basis::set
     const int &ncz_in,
 	const int &bx_in,
 	const int &by_in,
-	const int &bz_in
+	const int &bz_in,
+    const int &seed_in,
+    const int &nbspline_in
 )
 {
     ModuleBase::TITLE("PW_Basis","set");
@@ -104,6 +106,8 @@ void PW_Basis::set
 	this->bx = bx_in;
 	this->by = by_in;
 	this->bz = bz_in;
+    this->seed = seed_in;
+    this->nbspline = nbspline_in;
 
     if (ecutwfc <= 0.00)
     {
@@ -173,7 +177,7 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
 	}
 
 #ifdef __MPI
-#ifdef __CUDA
+#if ((defined __CUDA) || (defined __ROCM))
     bool cutgg_flag = false;
 #else
     this->divide_fft_grid();
@@ -345,7 +349,7 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
         PW_complement::setup_GVectors(Ucell->G, ngmc_g, gg_global, gdirect_global, gcar_global);
 
 #ifdef __MPI
-#ifdef __CUDA
+#if ((defined __CUDA) || (defined __ROCM))
         this->get_GVectors();
         FFT_wfc.setupFFT3D(this->nx, this->ny,this->nz);
         FFT_chg.setupFFT3D(this->ncx, this->ncy,this->ncz);
@@ -760,11 +764,12 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
 //	outstr = GlobalV::global_out_dir + "strucFac.dat"; 
 //	std::ofstream ofs( outstr.c_str() ) ;
     bool usebspline;
-    if(nbspline >= 0)   usebspline = true;
+    if(nbspline > 0)   usebspline = true;
     else    usebspline = false;
     
     if(usebspline)
     {
+        nbspline = int((nbspline+1)/2)*2; // nbspline must be a positive even number.
         this->bspline_sf(nbspline);
     }
     else

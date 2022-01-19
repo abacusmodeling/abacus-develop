@@ -164,14 +164,9 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_qmass",mdp.Qmass,"mass of thermostat");
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_tfirst",mdp.tfirst,"temperature first");
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_tlast",mdp.tlast,"temperature last");
-	ModuleBase::GlobalFunc::OUTP(ofs,"md_dumpmdfred",mdp.recordFreq,"The period to dump MD information for monitoring and restarting MD");
-	ModuleBase::GlobalFunc::OUTP(ofs,"md_mdoutpath",mdp.mdoutputpath,"output path of md");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_dumpfred",mdp.dumpfreq,"The period to dump MD information");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_dumpfred",mdp.rstfreq,"The period to output MD restart information");
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_rstmd",mdp.rstMD,"whether restart");
-	ModuleBase::GlobalFunc::OUTP(ofs,"md_fixtemperature",mdp.fixTemperature,"period to change temperature");
-	ModuleBase::GlobalFunc::OUTP(ofs,"md_ediff",mdp.ediff,"parameter for constraining total energy change");
-	ModuleBase::GlobalFunc::OUTP(ofs,"md_ediffg",mdp.ediffg,"parameter for constraining max force change");
-	ModuleBase::GlobalFunc::OUTP(ofs,"NVT_tau",mdp.NVT_tau,"parameter for adjust effect of thermostat");
-	ModuleBase::GlobalFunc::OUTP(ofs,"NVT_control",mdp.NVT_control,"choose which thermostat used in NVT ensemble");
 	ModuleBase::GlobalFunc::OUTP(ofs,"rcut_lj",mdp.rcut_lj,"cutoff radius of LJ potential");
 	ModuleBase::GlobalFunc::OUTP(ofs,"epsilon_lj",mdp.epsilon_lj,"the value of epsilon for LJ potential");
 	ModuleBase::GlobalFunc::OUTP(ofs,"sigma_lj",mdp.sigma_lj,"the value of sigma for LJ potential");

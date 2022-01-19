@@ -32,7 +32,7 @@ public:
 //  void release_temp();
 
 	ComplexArray &operator=(const ComplexArray &cd);
-	inline void operator=(std::complex <double> c);
+	void operator=(std::complex <double> c);
 //  inline std::complex < double>  &operator()(int i, int j, int k)const
 //{return d[(i * bound2 + j) * bound3 +k];}
 //  inline void operator=(std::complex < double> c);
@@ -47,6 +47,8 @@ public:
 	void operator*=(const std::complex < double> c);
 
 	void operator*=(const ComplexArray &in);
+	bool operator== (const ComplexArray &cd2)const;
+	bool operator!= (const ComplexArray &cd2)const;
 
 	// subscript operator
 	std::complex < double> &operator()

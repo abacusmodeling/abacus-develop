@@ -1145,14 +1145,6 @@ bool Input::Read(const std::string &fn)
 		{
 			read_value(ifs, mdp.mdtype);
 		}
-		else if (strcmp("nvt_tau",word) == 0)
-		{
-			read_value(ifs, mdp.NVT_tau);
-		}
-		else if (strcmp("nvt_control",word) == 0)
-		{
-			read_value(ifs,mdp.NVT_control );
-		}
 		else if (strcmp("md_dt",word) == 0)
 		{
 			read_value(ifs, mdp.dt);
@@ -1173,29 +1165,17 @@ bool Input::Read(const std::string &fn)
 		{
 			read_value(ifs,mdp.tlast );
 		}
-		else if (strcmp("md_dumpmdfred",word) == 0)
+		else if (strcmp("md_dumpfred",word) == 0)
 		{
-			read_value(ifs, mdp.recordFreq);
+			read_value(ifs, mdp.dumpfreq);
 		}
-		else if (strcmp("md_mdoutpath",word) == 0)
+		else if (strcmp("md_rstfred",word) == 0)
 		{
-			read_value(ifs,mdp.mdoutputpath );
+			read_value(ifs, mdp.rstfreq);
 		}
 		else if (strcmp("md_rstmd",word) == 0)
 		{
 			read_value(ifs,mdp.rstMD );
-		}
-		else if (strcmp("md_fixtemperature",word) == 0)
-		{
-			read_value(ifs,mdp.fixTemperature );
-		}
-		else if (strcmp("md_ediff",word) == 0)
-		{
-			read_value(ifs,mdp.ediff );
-		}
-		else if (strcmp("md_ediffg",word) == 0)
-		{
-			read_value(ifs,mdp.ediffg );
 		}
 		//added by zheng daye
 //----------------------------------------------------------
@@ -2153,19 +2133,14 @@ void Input::Bcast()
 */
 	//zheng daye add 2014/5/5
         Parallel_Common::bcast_int(mdp.mdtype);
-        Parallel_Common::bcast_double(mdp.NVT_tau);
-        Parallel_Common::bcast_int(mdp.NVT_control);
         Parallel_Common::bcast_double(mdp.dt);
         Parallel_Common::bcast_int(mdp.MNHC);
         Parallel_Common::bcast_double(mdp.Qmass);
         Parallel_Common::bcast_double(mdp.tfirst);
         Parallel_Common::bcast_double(mdp.tlast);
-        Parallel_Common::bcast_int(mdp.recordFreq);
-        Parallel_Common::bcast_string(mdp.mdoutputpath);
+        Parallel_Common::bcast_int(mdp.dumpfreq);
+		Parallel_Common::bcast_int(mdp.rstfreq);
         Parallel_Common::bcast_int(mdp.rstMD);
-        Parallel_Common::bcast_int(mdp.fixTemperature);
-        Parallel_Common::bcast_double(mdp.ediff);
-        Parallel_Common::bcast_double(mdp.ediffg);
 		Parallel_Common::bcast_double(mdp.rcut_lj);
 		Parallel_Common::bcast_double(mdp.epsilon_lj);
 		Parallel_Common::bcast_double(mdp.sigma_lj);
@@ -2301,26 +2276,6 @@ void Input::Bcast()
 	Parallel_Common::bcast_bool( noncolin );
 	Parallel_Common::bcast_bool( lspinorb );
 	Parallel_Common::bcast_double( soc_lambda );
-	if(noncolin)
-	{
-		if(GlobalV::MY_RANK==0)
-		{
-			if (angle1.size() != this->ntype)
-				angle1.resize(this->ntype);
-			if (angle2.size() != this->ntype)
-				angle2.resize(this->ntype);
-		}
-		if(GlobalV::MY_RANK!=0)
-		{
-			angle1.resize(this->ntype);
-			angle2.resize(this->ntype);
-		}
-		for(int i = 0;i<this->ntype;i++)
-		{
-			Parallel_Common::bcast_double(angle1[i]);
-			Parallel_Common::bcast_double(angle2[i]);
-		}
-	}
 
 		//Parallel_Common::bcast_int( epsilon0_choice );
     Parallel_Common::bcast_double( cell_factor); //LiuXh add 20180619
