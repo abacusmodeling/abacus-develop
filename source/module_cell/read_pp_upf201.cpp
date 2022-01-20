@@ -132,28 +132,52 @@ int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 
 	
 
-	ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_R");
-	ModuleBase::GlobalFunc::READ_VALUE(ifs, word); // type size columns
-	delete[] r;
-	delete[] rab;
-	assert(mesh>0);
-	this->r = new double[mesh];
-	this->rab = new double[mesh];
-	ModuleBase::GlobalFunc::ZEROS(r,mesh);
-	ModuleBase::GlobalFunc::ZEROS(rab,mesh);
-	for (int ir = 0;ir < mesh;ir++)
+	if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_R"))
 	{
-		ifs >> this->r[ir];
+		ModuleBase::GlobalFunc::READ_VALUE(ifs, word); // type size columns
+		delete[] r;
+		delete[] rab;
+		assert(mesh>0);
+		this->r = new double[mesh];
+		this->rab = new double[mesh];
+		ModuleBase::GlobalFunc::ZEROS(r,mesh);
+		ModuleBase::GlobalFunc::ZEROS(rab,mesh);
+		for (int ir = 0;ir < mesh;ir++)
+		{
+			ifs >> this->r[ir];
+		}
+	}
+	else if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_R>"))
+	{
+		delete[] r;
+		delete[] rab;
+		assert(mesh>0);
+		this->r = new double[mesh];
+		this->rab = new double[mesh];
+		ModuleBase::GlobalFunc::ZEROS(r,mesh);
+		ModuleBase::GlobalFunc::ZEROS(rab,mesh);
+		for (int ir = 0;ir < mesh;ir++)
+		{
+			ifs >> this->r[ir];
+		}
 	}
 	ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_R>");
 
-	ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_RAB");
-	ModuleBase::GlobalFunc::READ_VALUE(ifs, word); // type size columns
-	for (int ir = 0;ir < mesh;ir++)
+    if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_RAB"))
 	{
-		ifs >> this->rab[ir];
+		ModuleBase::GlobalFunc::READ_VALUE(ifs, word); // type size columns
+		for (int ir = 0;ir < mesh;ir++)
+		{
+			ifs >> this->rab[ir];
+		}
 	}
-
+	else if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_RAB>"))
+	{
+		for (int ir = 0;ir < mesh;ir++)
+		{
+			ifs >> this->rab[ir];
+		}
+	}
 	ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_RAB>");
 	ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_MESH>");
 
@@ -230,19 +254,37 @@ int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 		ifs >> word; //number of beta
 	}
 
-	ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_DIJ");
-	ModuleBase::GlobalFunc::READ_VALUE(ifs, word);  // type size columns
-
-	this->nd = nbeta * nbeta;
-	for(int i=0;i<nbeta;i++)
+	if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_DIJ"))
 	{
-		for(int j=0;j<nbeta;j++)
+		ModuleBase::GlobalFunc::READ_VALUE(ifs, word);  // type size columns
+
+		this->nd = nbeta * nbeta;
+		for(int i=0;i<nbeta;i++)
 		{
-			ifs >> dion(i,j);
-			if ( i != j  && dion(i,j) != 0.0 )
+			for(int j=0;j<nbeta;j++)
 			{
-				std::cout << " error: for i != j, Dij of Pseudopotential must be 0.0 " << std::endl;
-				exit(1);
+				ifs >> dion(i,j);
+				if ( i != j  && dion(i,j) != 0.0 )
+				{
+					std::cout << " error: for i != j, Dij of Pseudopotential must be 0.0 " << std::endl;
+					exit(1);
+				}
+			}
+		}
+	}
+	else if ( ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_DIJ>"))
+	{
+		this->nd = nbeta * nbeta;
+		for(int i=0;i<nbeta;i++)
+		{
+			for(int j=0;j<nbeta;j++)
+			{
+				ifs >> dion(i,j);
+				if ( i != j  && dion(i,j) != 0.0 )
+				{
+					std::cout << " error: for i != j, Dij of Pseudopotential must be 0.0 " << std::endl;
+					exit(1);
+				}
 			}
 		}
 	}
@@ -302,14 +344,26 @@ int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 	//--------------------------------------
 	//-          PP_RHOATOM                - 
 	//--------------------------------------
-	ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_RHOATOM");
-	ModuleBase::GlobalFunc::READ_VALUE(ifs, word); // type size columns
-	delete[] rho_at;
-	this->rho_at = new double[mesh];
-	ModuleBase::GlobalFunc::ZEROS(rho_at, mesh);
-	for (int ir = 0;ir < mesh;ir++)
+	if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_RHOATOM"))
 	{
-		ifs >> this->rho_at[ir];
+		ModuleBase::GlobalFunc::READ_VALUE(ifs, word); // type size columns
+		delete[] rho_at;
+		this->rho_at = new double[mesh];
+		ModuleBase::GlobalFunc::ZEROS(rho_at, mesh);
+		for (int ir = 0;ir < mesh;ir++)
+		{
+			ifs >> this->rho_at[ir];
+		}
+	}
+	else if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_RHOATOM>"))
+	{
+		delete[] rho_at;
+		this->rho_at = new double[mesh];
+		ModuleBase::GlobalFunc::ZEROS(rho_at, mesh);
+		for (int ir = 0;ir < mesh;ir++)
+		{
+			ifs >> this->rho_at[ir];
+		}
 	}
 	ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_RHOATOM>");
 
