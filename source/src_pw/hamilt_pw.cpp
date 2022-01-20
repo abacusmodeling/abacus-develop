@@ -978,7 +978,7 @@ double Hamilt_PW::ddot_real
     double *pL,*pR;
     pL=(double *)psi_L;
     pR=(double *)psi_R;
-    double result=LapackConnector::dot(dim2,pL,1,pR,1);
+    double result=BlasConnector::dot(dim2,pL,1,pR,1);
     Parallel_Reduce::reduce_double_pool( result );
     return result;
     //======================================================================

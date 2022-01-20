@@ -574,7 +574,7 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 				//      for(int ib=0; ib<band_local; ib++)
 				//          rho_row_col(i_row,i_col) += Z_row(i_row,ib) * Z_col(i_col,ib);
 
-				LapackConnector::gemm(
+				BlasConnector::gemm(
 						'N', 'T', 
 						row_remain, col_remain, band_local,
 						1, Z_row.c, band_local, Z_col.c, band_local,

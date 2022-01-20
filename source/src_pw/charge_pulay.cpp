@@ -413,17 +413,6 @@ void Charge_Pulay::inverse_real_symmetry_matrix(const int &scheme, ModuleBase::m
 			B(i,j) = std::complex<double> (A(i,j),0.0);
 		}
 	}
-
-	// Abar is not 'positive' symmetry matrix!	
-	//ModuleBase::Inverse_Matrix_Real IMR;
-	//const int info = IMR.using_spotri(Abar,step);	
-	//for(int i=0; i<step; i++)
-	//{
-	//	for(int j=0; j<i; j++)
-	//	{
-	//		Abar(j,i)=Abar(i,j);
-	//	}
-	//}
 		
 	ModuleBase::Inverse_Matrix_Complex IMC;
 	IMC.init(step);

@@ -9,7 +9,7 @@
 #include "gram_schmidt_orth.h"
 
 #include "mathzone.h"
-#include "lapack_connector.h"
+#include "blas_connector.h"
 #include "math_integral.h" // mohan add 2021-04-03
 namespace ModuleBase
 {
@@ -51,7 +51,7 @@ std::vector<std::vector<Func_Type>> Gram_Schmidt_Orth<Func_Type,R_Type>::cal_ort
 			const Func_Type in_product = cal_norm(mul_func);
 
 			// hn - (hn,ei)ei
-			LapackConnector::axpy( mul_func.size(), -in_product, ModuleBase::GlobalFunc::VECTOR_TO_PTR(func_new[if_minus]), 1, ModuleBase::GlobalFunc::VECTOR_TO_PTR(func_try), 1);
+			BlasConnector::axpy( mul_func.size(), -in_product, ModuleBase::GlobalFunc::VECTOR_TO_PTR(func_new[if_minus]), 1, ModuleBase::GlobalFunc::VECTOR_TO_PTR(func_try), 1);
 		}
 		
 		// ||gn||
@@ -62,7 +62,7 @@ std::vector<std::vector<Func_Type>> Gram_Schmidt_Orth<Func_Type,R_Type>::cal_ort
 		// if ||gn|| too small, filter out
 		if( norm >= norm_threshold )
 		{
-			LapackConnector::scal( func_try.size(), 1.0/norm, ModuleBase::GlobalFunc::VECTOR_TO_PTR(func_try), 1 );
+			BlasConnector::scal( func_try.size(), 1.0/norm, ModuleBase::GlobalFunc::VECTOR_TO_PTR(func_try), 1 );
 			func_new.push_back( func_try );
 		}
 	}
