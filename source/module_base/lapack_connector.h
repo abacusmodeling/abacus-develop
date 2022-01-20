@@ -50,6 +50,34 @@ extern "C"
 	void zherk_(const char *uplo, const char *trans, const int *n, const int *k, 
 		const double *alpha, const std::complex<double> *A, const int *lda, 
 		const double *beta, std::complex<double> *C, const int *ldc);
+
+	// computes all eigenvalues of a symmetric tridiagonal matrix
+	// using the Pal-Walker-Kahan variant of the QL or QR algorithm.
+	void dsterf_(int *n, double *d, double *e, int *info);
+
+	void dstein_(int *n, double* d, double *e, int *m, double *w,
+		int* block, int* isplit, double* z, int *lda, double *work,
+		int* iwork, int* ifail, int *info);
+ 	void zstein_(int *n, double* d, double *e, int *m, double *w,
+        int* block, int* isplit, std::complex<double>* z, int *lda, double *work,
+        int* iwork, int* ifail, int *info);
+
+	// computes the Cholesky factorization of a real symmetric
+	// positive definite matrix A.
+	void dpotf2_(char *uplo, int *n, double *a, int *lda, int *info);
+	void zpotf2_(char *uplo,int *n,std::complex<double> *a, int *lda, int *info);
+
+	void dsygs2_(int *itype, char *uplo, int *n, double *a, int *lda, double *b, int *ldb, int *info);
+	void zhegs2_(int *itype, char *uplo, int *n, std::complex<double> *a, int *lda, std::complex<double> *b, int *ldb, int *info);
+
+	void dlacpy_(char *uplo, int *m, int *n, double* a, int *lda, double *b, int *ldb);
+	void zlacpy_(char *uplo, int *m, int *n, std::complex<double>* a, int *lda, std::complex<double> *b, int *ldb);
+
+	void dlarfg_(int *n, double *alpha, double *x, int *incx, double *tau);
+	void zlarfg_(int *n, std::complex<double> *alpha, std::complex<double> *x, int *incx, std::complex<double> *tau);
+
+	void dger_(int *m, int *n, double *alpha, double *x, int *incx, double *y, int *incy, double *a, int *lda);
+	void zgerc_(int *m, int *n, std::complex<double> *alpha,std::complex<double> *x, int *incx, std::complex<double> *y, int *incy,std::complex<double> *a, int *lda);
 }
 
 // Class LapackConnector provide the connector to fortran lapack routine.
