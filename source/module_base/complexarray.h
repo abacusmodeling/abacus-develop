@@ -42,30 +42,30 @@ public:
 	ComplexArray operator-(const ComplexArray &cd);
 	void operator-=(const ComplexArray &cd);
 	ComplexArray operator*(const double r);
-	ComplexArray operator*(const std::complex < double> c);
+	ComplexArray operator*(const std::complex <double> c);
 	void operator*=(const double r);
-	void operator*=(const std::complex < double> c);
+	void operator*=(const std::complex <double> c);
 
 	void operator*=(const ComplexArray &in);
 	bool operator== (const ComplexArray &cd2)const;
 	bool operator!= (const ComplexArray &cd2)const;
 
 	// subscript operator
-	std::complex < double> &operator()
+	std::complex <double> &operator()
 		(const int ind1=0, const int ind2=0, const int ind3=0, const int ind4=0);
 //  std::complex < double> &operator()(int, int, int, int, int);
 
-	const std::complex < double> &operator()
+	const std::complex <double> &operator()
 		(const int ind1=0, const int ind2=0, const int ind3=0, const int ind4=0)const;
 //  const std::complex < double> &operator()(int, int, int, int, int)const;
 
-	//set all element to be {0.0,0.0}
+	//set all elements to be {0.0,0.0}
 	void zero_out(void);
 
-	//set all element multiply -1
+	//Multiply all elements by -1
 	void negate(void);
 
-	//set all element to a random number whose real/image 
+	//set all elements to a random number whose real/image 
 	//is between [-0.5,0.5).
 	void randomize(void);//uniform distribution
 
@@ -87,24 +87,24 @@ private:
 };
 
 ComplexArray operator*(double r, const ComplexArray &cd);
-ComplexArray operator*(std::complex < double> c, const ComplexArray &cd);
+ComplexArray operator*(std::complex <double> c, const ComplexArray &cd);
 
 //Sum of absolute squares of all elements in cd
 double abs2(const ComplexArray &cd);
 
 
 void
-add_scale_abs2(const std::complex < double> &c, const ComplexArray & in,
+add_scale_abs2(const std::complex <double> &c, const ComplexArray & in,
                ComplexArray &out);
 
 // Take "dot-product" of two ComplexArray:  sum of cd1(conjugate)[i] * cd2[i]
-std::complex < double> dot(const ComplexArray &cd1, const ComplexArray &cd2);
+std::complex <double> dot(const ComplexArray &cd1, const ComplexArray &cd2);
 
 /* Does cd2 += r * cd1 */
 void scale_accumulate(double r, const ComplexArray &cd1, ComplexArray &cd2);
 
 /* Does cd2 += c * cd1 */
-void scale_accumulate(std::complex < double> c, const ComplexArray &cd1, ComplexArray &cd2);
+void scale_accumulate(std::complex <double> c, const ComplexArray &cd1, ComplexArray &cd2);
 
 /* Does cd3 = r1*cd1 + r2*cd2 */
 void scaled_sum(double r1, const ComplexArray &cd1,
@@ -112,12 +112,9 @@ void scaled_sum(double r1, const ComplexArray &cd1,
                 ComplexArray &cd3);
 
 /* Does cd3 = c1*cd1 + c2*cd2 */
-void scaled_sum(std::complex < double> c1, const ComplexArray &cd1,
-           std::complex < double> c2, const ComplexArray &cd2,
+void scaled_sum(std::complex <double> c1, const ComplexArray &cd1,
+           std::complex <double> c2, const ComplexArray &cd2,
            ComplexArray &cd3);
-//void scaled_sum(double r1, ComplexArray &cd1,
-//                double r2, ComplexArray &cd2,
-//                ComplexArray &cd3);
 
 //out[i] = a1[i] * in2[i]
 void point_mult(ComplexArray &a1, ComplexArray &in2, ComplexArray &out);

@@ -6,8 +6,8 @@
 ***********************************************/
 
 /**
-* - Tested Function of class ComplexArray:
-*   - construction:
+* - Tested functions of class ComplexArray:
+*   - constructor:
 *       - ComplexArray(const int bnd1=0, const int bnd2=1, const int bnd3=1, const int bnd4=1)
 *       - ComplexArray(const ComplexArray &cd)
 *       - ComplexArray(ComplexArray &&cd)
@@ -75,7 +75,6 @@ class ComplexArray_test : public testing::Test
 {
     protected:
         ModuleBase::ComplexArray a2,a4,b2,b4,c2,c4,d2;
-        ModuleBase::ComplexArray a2_plus_b2,a2_minus_b2,a2_mult_b2,a2_mult_3;
         std::complex<double> com1 {1.0,2.0};
         std::complex<double> com2 {3.0,4.0};
         std::complex<double> com3 {-2.0,-3.0};
@@ -87,28 +86,15 @@ class ComplexArray_test : public testing::Test
             b2 = ModuleBase::ComplexArray(2,1,1,1);  // of 4 dimesions,
             c2 = ModuleBase::ComplexArray(2,1,1,1);  // is a2 +/-/* d2 allowed or not???
             d2 = ModuleBase::ComplexArray(1,2,1,1);  // it does not matter, this situation will not appear in ABACUS
-            a2_plus_b2 = ModuleBase::ComplexArray(2,1,1,1);
-            a2_minus_b2 = ModuleBase::ComplexArray(2,1,1,1);
-            a2_mult_b2 = ModuleBase::ComplexArray(2,1,1,1);
-            a2_mult_3 = ModuleBase::ComplexArray(2,1,1,1);
             a4 = ModuleBase::ComplexArray(2,2,1,1);
             b4 = ModuleBase::ComplexArray(2,2,1,1);
             c4 = ModuleBase::ComplexArray(2,2,1,1);
-            a2 = com1;
-            b2 = com2;
-            a4 = com1;
-            b4 = com2;
-            d2 = com1;
-            a2_plus_b2 = com1 + com2;
-            a2_minus_b2 = com1 - com2;
-            a2_mult_b2 = com1 * com2;
-            a2_mult_3 = com1 * 3.0;
         }
 
 };
 
 
-TEST(ComplexArray, construction1_test)
+TEST(ComplexArray, constructor_bnd1234_test)
 {
     ModuleBase::ComplexArray a(1,2,3,4);
     ASSERT_EQ(a.getSize(),24);
@@ -124,7 +110,7 @@ TEST(ComplexArray, construction1_test)
     */
 }
 
-TEST(ComplexArray, construction2_test)
+TEST(ComplexArray, constructor_copy_test)
 {
     ModuleBase::ComplexArray a(1,2,3,4);
     ModuleBase::ComplexArray b(a);
@@ -142,7 +128,7 @@ TEST(ComplexArray, construction2_test)
 
 }
 
-TEST(ComplexArray, construction3_test)
+TEST(ComplexArray, construction_rvalue_test)
 {
     ModuleBase::ComplexArray b(ModuleBase::ComplexArray(1,2,3,4));
     ASSERT_EQ(b.getSize(),24);
@@ -155,60 +141,84 @@ TEST(ComplexArray, construction3_test)
 
 TEST_F(ComplexArray_test,operator_equal_complex)
 {   
+    a2 = com1;
     for(int i = 0;i<a2.getSize();++i)
-    {EXPECT_EQ(a2.ptr[i],com1);}
+    {
+        EXPECT_EQ(a2.ptr[i],com1);
+    }
 }
 
 
 TEST_F(ComplexArray_test,operator_equal_ComplexArray)
 {   
+    a2 = com1;
     ModuleBase::ComplexArray b = a2;
     for ( int i = 0;i<a2.getSize();++i)
     {
         EXPECT_EQ(b.ptr[i],a2.ptr[i]);
-        EXPECT_EQ(b.ptr[i],com1);
     }
 }
 
 TEST_F(ComplexArray_test,operator_equal_ComplexArray_rvalue)
 {   
-    ModuleBase::ComplexArray b = a2*2.0;
+    a2 = com1;
+    ModuleBase::ComplexArray b = a2 * 1.0;
 
-     for ( int i = 0;i<a2.getSize();++i)
+     for (int i = 0;i<a2.getSize();++i)
     {
-        EXPECT_EQ(b.ptr[i],com1*2.0);
+        EXPECT_EQ(b.ptr[i],com1);
     }   
 
 }
 
 TEST_F(ComplexArray_test,operator_plus)
 {
+    a2 = com1;
+    b2 = com2;
     c2 = a2 + b2;
-    EXPECT_EQ(c2,a2_plus_b2);
+    for(int i = 0;i<a2.getSize();++i) 
+    {
+        EXPECT_EQ(c2.ptr[i],(com1+com2));
+    }
     EXPECT_DEATH(a2+a4,"");
     //EXPECT_DEATH(a2+d2,"");
 }
 
 TEST_F(ComplexArray_test,operator_plus_equal)
 {
+    a2 = com1;
+    b2 = com2;
     a2 += b2;
-    EXPECT_EQ(a2,a2_plus_b2);
+    for(int i = 0;i<a2.getSize();++i) 
+    {
+        EXPECT_EQ(a2.ptr[i],(com1+com2));
+    }
     EXPECT_DEATH(a2+=a4,"");
     //EXPECT_DEATH(a2+=d2,"");
 }
 
 TEST_F(ComplexArray_test,operator_minus)
 {
+    a2 = com1;
+    b2 = com2;
     c2 = a2 - b2;
-    EXPECT_EQ(c2,a2_minus_b2);
+    for(int i = 0;i<a2.getSize();++i) 
+    {
+        EXPECT_EQ(c2.ptr[i],(com1-com2));
+    }
     EXPECT_DEATH(a2-a4,"");
     //EXPECT_DEATH(a2-d2,"");
 }
 
 TEST_F(ComplexArray_test,operator_minus_equal)
 {      
+    a2 = com1;
+    b2 = com2;
     a2 -= b2;
-    EXPECT_EQ(a2,a2_minus_b2);
+    for(int i = 0;i<a2.getSize();++i) 
+    {
+        EXPECT_EQ(a2.ptr[i],(com1-com2));
+    }
     EXPECT_DEATH(a2-=a4,"");
     //EXPECT_DEATH(a2-=d2,"");
 }
@@ -216,6 +226,7 @@ TEST_F(ComplexArray_test,operator_minus_equal)
 
 TEST_F(ComplexArray_test,operator_multiply_double)
 {
+    a2 = com1;
     c2 = a2 * 2.0;
     for ( int i = 0;i<a2.getSize();++i)
     {
@@ -225,6 +236,7 @@ TEST_F(ComplexArray_test,operator_multiply_double)
 
 TEST_F(ComplexArray_test,operator_multiply_complex)
 {
+    a2 = com1;
     c2 = a2 * com2;
     for ( int i = 0;i<a2.getSize();++i)
     {
@@ -234,6 +246,7 @@ TEST_F(ComplexArray_test,operator_multiply_complex)
 
 TEST_F(ComplexArray_test,operator_multiply_equal_double)
 {
+    a2 = com1;
     a2 *= 3.0;
     for ( int i = 0;i<a2.getSize();++i)
     {
@@ -243,6 +256,7 @@ TEST_F(ComplexArray_test,operator_multiply_equal_double)
 
 TEST_F(ComplexArray_test,operator_multiply_equal_complex)
 {
+    a2 = com1;
     a2 *= com2;
     for ( int i = 0;i<a2.getSize();++i)
     {
@@ -252,6 +266,8 @@ TEST_F(ComplexArray_test,operator_multiply_equal_complex)
 
 TEST_F(ComplexArray_test,operator_multiply_equal_ComplexArray)
 {
+    a2 = com1;
+    b2 = com2;
     a2 *= b2;
     for ( int i = 0;i<a2.getSize();++i)
     {
@@ -281,6 +297,7 @@ TEST_F(ComplexArray_test,operator_notequal)
 
 TEST_F(ComplexArray_test,operator_parentheses)
 {
+    a2 = com1;
     c2 = a2;
     EXPECT_EQ(c2(0,0,0,0), com1);
 
@@ -292,6 +309,7 @@ TEST_F(ComplexArray_test,operator_parentheses)
 
 TEST_F(ComplexArray_test,fuction_zero_out)
 {
+    a2 = com1;
     a2.zero_out();
     for (int i=0;i<a2.getSize();++i)
     {
@@ -301,6 +319,7 @@ TEST_F(ComplexArray_test,fuction_zero_out)
 
 TEST_F(ComplexArray_test,fuction_negate)
 {
+    a2 = com1;
     a2.negate();
     for (int i=0;i<a2.getSize();++i)
     {
@@ -347,6 +366,7 @@ TEST_F(ComplexArray_test,fuction_create)
 
 TEST_F(ComplexArray_test,operator_double_multiply)
 {
+    a2 = com1;
     c2 = 2.0 * a2 ;
     for ( int i = 0;i<a2.getSize();++i)
     {
@@ -356,6 +376,7 @@ TEST_F(ComplexArray_test,operator_double_multiply)
 
 TEST_F(ComplexArray_test,operator_complex_multiply)
 {
+    a2 = com1;
     c2 = com2 * a2 ;
     for ( int i = 0;i<a2.getSize();++i)
     {
