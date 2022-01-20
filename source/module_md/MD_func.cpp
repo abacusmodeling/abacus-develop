@@ -6,6 +6,7 @@
 #include "../module_neighbor/sltk_atom_arrange.h"
 #include "../module_neighbor/sltk_grid_driver.h"
 #include "../module_base/global_variable.h"
+#include "../module_base/timer.h"
 
 #ifndef __CMD
 #include "../src_pw/run_md_pw.h"

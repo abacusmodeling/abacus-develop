@@ -1,7 +1,8 @@
 #ifndef THRESHOLD_ELEC_H
 #define THRESHOLD_ELEC_H
 
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 
 class Threshold_Elec
 {

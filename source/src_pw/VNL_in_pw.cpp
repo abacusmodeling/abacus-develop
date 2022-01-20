@@ -1,6 +1,7 @@
 #include "global.h"
 #include "VNL_in_pw.h"
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "wavefunc.h"
 #include "../module_orbital/ORB_gen_tables.h"
 #include "../module_base/math_integral.h"
@@ -8,6 +9,7 @@
 #include "../module_base/math_polyint.h"
 #include "../module_base/math_ylmreal.h"
 #include "soc.h"
+#include "../module_base/timer.h"
 
 pseudopot_cell_vnl::pseudopot_cell_vnl()
 {

@@ -1,6 +1,9 @@
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "global.h"
 #include "sto_hchi.h" 
+#include "../src_parallel/parallel_reduce.h"
+#include "../module_base/timer.h"
 
 int Stochastic_hchi::nrxx;
 int Stochastic_hchi::nx;

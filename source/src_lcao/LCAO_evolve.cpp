@@ -288,7 +288,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, std::complex<double
 
 /*
 #include <cmath>
-#include <mpi.h>
+#include "mpi.h"
 extern "C"
 {
     #include "/export/soft/intel2015/composer_xe_2015.1.133/mkl/include/mkl_pblas.h"

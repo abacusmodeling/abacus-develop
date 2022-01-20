@@ -1,4 +1,5 @@
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "global.h"
 #include "hamilt_pw.cuh"
 #include "../module_base/blas_connector.h"

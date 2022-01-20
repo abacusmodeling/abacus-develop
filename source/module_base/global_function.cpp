@@ -197,7 +197,7 @@ void BLOCK_HERE( const std::string &description)
     bool go_on = false;
 	if(GlobalV::MY_RANK==0)
 	{
-    	cin >> go_on;
+    	std::cin >> go_on;
 	}
 
 #ifdef __MPI

@@ -9,6 +9,8 @@
 #include "../module_base/vector3.h"
 #include "../module_base/matrix.h"
 #include "../module_cell/setup_nonlocal.h"
+#include "../module_base/intarray.h"
+#include "../module_base/complexarray.h"
 
 /// used to be 'Use_Overlap_Table',
 /// now the name is 'ORB_gen_tables'

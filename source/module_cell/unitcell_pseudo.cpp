@@ -5,6 +5,9 @@
 #endif
 //#include "../src_pw/global.h"
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
+#include "../module_base/global_file.h"
+#include "../src_parallel/parallel_common.h"
+#include "../module_base/constants.h"
 
 UnitCell_pseudo::UnitCell_pseudo()
 {

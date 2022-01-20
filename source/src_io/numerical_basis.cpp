@@ -3,9 +3,11 @@
 #include "../module_symmetry/symmetry.h"
 #include "winput.h"
 #include "../module_base/math_ylmreal.h"
+#include "../src_parallel/parallel_reduce.h"
 #include <cstring>
 #include <functional>
 #include <algorithm>
+#include "../module_base/timer.h"
 
 Numerical_Basis::Numerical_Basis() {}
 Numerical_Basis::~Numerical_Basis() {}

@@ -1,7 +1,9 @@
 #ifndef H_XC_PW_H
 #define H_XC_PW_H
 
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../module_base/matrix.h"
 
 class H_XC_pw 
 {

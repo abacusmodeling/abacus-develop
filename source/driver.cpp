@@ -11,6 +11,7 @@
 #include "src_io/winput.h"
 #include "src_io/print_info.h"
 #include "module_base/timer.h"
+#include "module_base/memory.h"
 
 Driver::Driver(){}
 

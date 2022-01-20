@@ -2,6 +2,7 @@
 #include "./xc_functional.h"
 #include "./myfunc.h"
 #include "./xc_gga_pw.h"
+#include "../module_base/timer.h"
 
 //calculate the mGGA stress correction in PW and LCAO
 void Stress_Func::stress_mgga(ModuleBase::matrix& sigma) 

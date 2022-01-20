@@ -65,7 +65,7 @@
 #include <cmath>
 #include <cfloat>
 #ifdef __MPI
-#include <mpi.h>
+#include "mpi.h"
 #endif
 extern "C"
 {

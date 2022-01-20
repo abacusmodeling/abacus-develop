@@ -2,7 +2,8 @@
 #define UNITCELL_PSEUDO_H
 
 #include "atom_spec.h"
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "../src_io/output.h"
 #include "unitcell.h"
 #ifdef __LCAO

@@ -21,6 +21,7 @@
 #include "../src_ri/exx_opt_orb.h"
 #include "../src_pw/vdwd2.h"
 #include "../src_pw/vdwd3.h"
+#include "../module_base/timer.h"
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"
 #endif

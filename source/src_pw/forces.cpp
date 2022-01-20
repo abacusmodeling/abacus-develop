@@ -7,6 +7,8 @@
 #include "H_XC_pw.h"
 #include "../module_base/math_integral.h"
 #include "potential_libxc.h"
+#include "../src_parallel/parallel_reduce.h"
+#include "../module_base/timer.h"
 
 double Forces::output_acc = 1.0e-8; // (Ryd/angstrom).	
 
@@ -16,6 +18,7 @@ Forces::Forces()
 
 Forces::~Forces() {}
 
+#include "../module_base/mathzone.h"
 #include "efield.h"
 void Forces::init(ModuleBase::matrix& force)
 {
@@ -655,6 +658,8 @@ void Forces::cal_force_cc(ModuleBase::matrix& forcecc)
 	return;
 }
 
+#include "../module_base/complexarray.h"
+#include "../module_base/complexmatrix.h"
 void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
 {
 	ModuleBase::TITLE("Forces","cal_force_nl");

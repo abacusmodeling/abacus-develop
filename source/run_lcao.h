@@ -5,7 +5,8 @@
 #ifndef RUN_LCAO_H
 #define RUN_LCAO_H
 
-#include "src_pw/tools.h"
+#include "module_base/global_function.h"
+#include "module_base/global_variable.h"
 #include "input.h"
 
 class Run_lcao

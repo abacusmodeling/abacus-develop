@@ -6,6 +6,7 @@
 #ifdef __DEEPKS
 
 #include "LCAO_deepks.h"
+#include "../module_base/vector3.h"
 
 void LCAO_Deepks::build_psialpha(const bool& calc_deri,
     const UnitCell_pseudo &ucell,

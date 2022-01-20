@@ -16,7 +16,10 @@
 // (as in update) the total charge only could be needed,
 // even in a LSDA calculation.
 //----------------------------------------------------------
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../module_base/memory.h"
+#include "../src_parallel/parallel_reduce.h"
 #include "global.h"
 #include "charge.h"
 #include "magnetism.h"
@@ -24,6 +27,7 @@
 #include "../module_base/math_integral.h"
 #include "../module_base/math_sphbes.h"
 #include <vector>
+#include "../module_base/timer.h"
 
 Charge::Charge()
 {

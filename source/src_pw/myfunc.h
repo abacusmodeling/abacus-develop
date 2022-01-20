@@ -2,7 +2,11 @@
 #define MYFUNC_H
 using namespace std;
 
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../module_base/matrix.h"
+#include "../module_base/vector3.h"
+#include "../module_base/complexmatrix.h"
 //#include "../src_algorithms/mymath.h"     //  only wgauss(),wlgauss()
 #include <complex>
 

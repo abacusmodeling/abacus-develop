@@ -2,6 +2,7 @@
 #include "../src_pw/energy.h"
 #include "../src_pw/global.h"
 #include "../src_lcao/ELEC_evolve.h"
+#include "../src_parallel/parallel_reduce.h"
 
 //fuxiang add 2017-03-15
 void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &iter, const std::string &fn, const int &precision, const bool for_plot)

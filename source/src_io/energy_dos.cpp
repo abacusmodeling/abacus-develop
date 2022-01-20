@@ -1,5 +1,6 @@
 #include "dos.h"
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "../src_pw/global.h"
 #include "../src_pw/energy.h"
 #include "../src_pw/wavefunc.h"
@@ -17,6 +18,7 @@
 #include "../module_base/scalapack_connector.h"
 #include "../module_base/matrix.h"
 #include "../module_base/complexmatrix.h"
+#include "../src_parallel/parallel_reduce.h"
 #include <vector>
 #ifdef __MPI
 #include<mpi.h>

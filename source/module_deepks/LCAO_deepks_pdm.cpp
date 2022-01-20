@@ -13,6 +13,7 @@
 #ifdef __DEEPKS
 
 #include "LCAO_deepks.h"
+#include "../module_base/vector3.h"
 
 //this subroutine performs the calculation of projected density matrices
 //pdm_m,m'=\sum_{mu,nu} rho_{mu,nu} <chi_mu|alpha_m><alpha_m'|chi_nu>

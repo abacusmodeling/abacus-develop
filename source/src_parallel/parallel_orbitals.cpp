@@ -1,4 +1,5 @@
 #include "parallel_orbitals.h"
+#include "../module_base/memory.h"
 
 Parallel_Orbitals::Parallel_Orbitals()
 {

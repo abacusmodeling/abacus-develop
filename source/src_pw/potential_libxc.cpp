@@ -8,7 +8,8 @@
 
 #include "potential_libxc.h"
 #include "global.h"
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "xc_gga_pw.h"
 #include "../module_base/global_function.h"
 #ifdef __LCAO

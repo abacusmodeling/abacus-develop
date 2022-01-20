@@ -1,6 +1,8 @@
 #include "charge_pulay.h"
 #include "global.h"
 #include "../module_base/inverse_matrix.h"
+#include "../src_parallel/parallel_reduce.h"
+#include "../module_base/memory.h"
 
 Charge_Pulay::Charge_Pulay()
 {
@@ -365,7 +367,7 @@ void Charge_Pulay::generate_Abar(const int &scheme, ModuleBase::matrix &A)const
 	return;
 }
 
-
+#include "../module_base/complexmatrix.h"
 void Charge_Pulay::inverse_preA(const int &dim, ModuleBase::matrix &preA)const
 {
 	ModuleBase::ComplexMatrix B(dim, dim);

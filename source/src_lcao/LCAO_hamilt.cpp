@@ -4,9 +4,11 @@
 #include "../module_neighbor/sltk_atom_arrange.h"
 #include "global_fp.h" // mohan add 2021-01-30
 #include "dftu.h"
+#include "../src_parallel/parallel_reduce.h"
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"	//caoyu add 2021-07-26
 #endif
+#include "../module_base/timer.h"
 
 LCAO_Hamilt::LCAO_Hamilt()
 { 

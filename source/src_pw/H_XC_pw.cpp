@@ -1,6 +1,8 @@
 #include "H_XC_pw.h"
 #include "xc_functional.h"
 #include "xc_gga_pw.h"
+#include "../src_parallel/parallel_reduce.h"
+#include "../module_base/timer.h"
 
 double H_XC_pw::etxc;
 double H_XC_pw::vtxc;
