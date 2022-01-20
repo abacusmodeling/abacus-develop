@@ -336,7 +336,7 @@ bool test_deepks::compare_with_ref(
 	const std::string f1,
 	const std::string f2)
 {
-
+	this->total_check+=1;
 	ifstream file1(f1.c_str());
 	ifstream file2(f2.c_str());
 	double test_thr=1e-8;
@@ -350,11 +350,19 @@ bool test_deepks::compare_with_ref(
 		{
 			double num1 = std::stof(word1);
 			double num2 = std::stof(word2);
-			if(abs(num1-num2)>test_thr) return false;			
+			if(abs(num1-num2)>test_thr)
+			{
+				this->failed_check+=1;
+				return false;
+			}			
 		}
 		else
 		{
-			if(word1!=word2) return false;
+			if(word1!=word2)
+			{
+				this->failed_check+=1;
+				return false;
+			}
 		}
 	}
 	return true;

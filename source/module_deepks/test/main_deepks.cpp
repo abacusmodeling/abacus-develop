@@ -41,5 +41,8 @@ void calculate()
 	test.check_e_deltabands();
 	test.check_f_delta();
 
+	std::cout << "Total checks : " << test.total_check <<std::endl;
+	std::cout << "Failed checks : " << test.failed_check <<std::endl;
+
     return;
 }

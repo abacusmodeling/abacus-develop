@@ -40,6 +40,9 @@ public:
 	Test_Deepks::K_Vectors kv;
 	LCAO_Deepks ld;
 
+	int failed_check = 0;
+	int total_check = 0;
+
 	int my_rank = 0;
 
 	double lcao_ecut = 0; // (Ry)
