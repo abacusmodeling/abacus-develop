@@ -323,7 +323,7 @@ TEST_F(ComplexArray_test,fuction_negate)
     a2.negate();
     for (int i=0;i<a2.getSize();++i)
     {
-        EXPECT_EQ(a2.ptr[i],com1*-1);
+        EXPECT_EQ(a2.ptr[i],com1*-1.0);
     }
 }
 
