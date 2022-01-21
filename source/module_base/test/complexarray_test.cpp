@@ -2,7 +2,7 @@
 #include"gtest/gtest.h"
 
 /************************************************
-*  unit test of class ComplexArray and related fucntions
+*  unit test of class ComplexArray and related functions
 ***********************************************/
 
 /**
