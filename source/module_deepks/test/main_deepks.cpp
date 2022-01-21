@@ -3,25 +3,29 @@
 #include <mpi.h>
 #endif
 
-void calculate();
+int calculate();
 
 int main(int argc, char **argv)
 {
-
-	std::cout << "Test of module_deepks" << std::endl;
-
 #ifdef __MPI
 	MPI_Init(&argc,&argv);
 #endif
-    calculate();
+    int status = calculate();
 #ifdef __MPI
 	MPI_Finalize();
 #endif
 
-    return 0;
+	if(status>0)
+	{
+		return 1;
+	}
+	else
+	{
+    	return 0;
+	}
 }
 
-void calculate()
+int calculate()
 {
 	test_deepks test;
 
@@ -41,5 +45,15 @@ void calculate()
 	test.check_e_deltabands();
 	test.check_f_delta();
 
-    return;
+	std::cout << " [  ------  ] Total checks : " << test.total_check <<std::endl;
+	if(test.failed_check>0)
+	{
+		std::cout << "\e[1;31m [  FAILED  ]\e[0m Failed checks : " << test.failed_check <<std::endl;
+	}
+	else
+	{
+		std::cout << "\e[1;32m [  PASS    ]\e[0m All checks passed!" << std::endl;
+	}
+
+    return test.failed_check;
 }
