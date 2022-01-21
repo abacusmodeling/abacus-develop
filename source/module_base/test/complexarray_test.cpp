@@ -71,6 +71,14 @@
 */
 
 
+double prec_test = 1e-14;
+//compare two complex by using EXPECT_NEAR()
+void EXPECT_COMPLEXD(const std::complex<double>& a,const std::complex<double>& b)
+{
+    EXPECT_NEAR(a.real(),b.real(),prec_test);
+    EXPECT_NEAR(a.imag(),b.imag(),prec_test);
+}
+
 class ComplexArray_test : public testing::Test
 {
     protected:
@@ -144,7 +152,7 @@ TEST_F(ComplexArray_test,operator_equal_complex)
     a2 = com1;
     for(int i = 0;i<a2.getSize();++i)
     {
-        EXPECT_EQ(a2.ptr[i],com1);
+        EXPECT_COMPLEXD(a2.ptr[i],com1);
     }
 }
 
@@ -155,7 +163,7 @@ TEST_F(ComplexArray_test,operator_equal_ComplexArray)
     ModuleBase::ComplexArray b = a2;
     for ( int i = 0;i<a2.getSize();++i)
     {
-        EXPECT_EQ(b.ptr[i],a2.ptr[i]);
+        EXPECT_COMPLEXD(b.ptr[i],a2.ptr[i]);
     }
 }
 
@@ -166,7 +174,7 @@ TEST_F(ComplexArray_test,operator_equal_ComplexArray_rvalue)
 
      for (int i = 0;i<a2.getSize();++i)
     {
-        EXPECT_EQ(b.ptr[i],com1);
+        EXPECT_COMPLEXD(b.ptr[i],com1);
     }   
 
 }
@@ -178,7 +186,7 @@ TEST_F(ComplexArray_test,operator_plus)
     c2 = a2 + b2;
     for(int i = 0;i<a2.getSize();++i) 
     {
-        EXPECT_EQ(c2.ptr[i],(com1+com2));
+        EXPECT_COMPLEXD(c2.ptr[i],(com1+com2));
     }
     EXPECT_DEATH(a2+a4,"");
     //EXPECT_DEATH(a2+d2,"");
@@ -191,7 +199,7 @@ TEST_F(ComplexArray_test,operator_plus_equal)
     a2 += b2;
     for(int i = 0;i<a2.getSize();++i) 
     {
-        EXPECT_EQ(a2.ptr[i],(com1+com2));
+        EXPECT_COMPLEXD(a2.ptr[i],(com1+com2));
     }
     EXPECT_DEATH(a2+=a4,"");
     //EXPECT_DEATH(a2+=d2,"");
@@ -204,7 +212,7 @@ TEST_F(ComplexArray_test,operator_minus)
     c2 = a2 - b2;
     for(int i = 0;i<a2.getSize();++i) 
     {
-        EXPECT_EQ(c2.ptr[i],(com1-com2));
+        EXPECT_COMPLEXD(c2.ptr[i],(com1-com2));
     }
     EXPECT_DEATH(a2-a4,"");
     //EXPECT_DEATH(a2-d2,"");
@@ -217,7 +225,7 @@ TEST_F(ComplexArray_test,operator_minus_equal)
     a2 -= b2;
     for(int i = 0;i<a2.getSize();++i) 
     {
-        EXPECT_EQ(a2.ptr[i],(com1-com2));
+        EXPECT_COMPLEXD(a2.ptr[i],(com1-com2));
     }
     EXPECT_DEATH(a2-=a4,"");
     //EXPECT_DEATH(a2-=d2,"");
@@ -230,7 +238,7 @@ TEST_F(ComplexArray_test,operator_multiply_double)
     c2 = a2 * 2.0;
     for ( int i = 0;i<a2.getSize();++i)
     {
-        EXPECT_EQ(c2.ptr[i],com1*2.0);
+        EXPECT_COMPLEXD(c2.ptr[i],com1*2.0);
     }  
 }
 
@@ -240,7 +248,7 @@ TEST_F(ComplexArray_test,operator_multiply_complex)
     c2 = a2 * com2;
     for ( int i = 0;i<a2.getSize();++i)
     {
-        EXPECT_EQ(c2.ptr[i],com1*com2);
+        EXPECT_COMPLEXD(c2.ptr[i],com1*com2);
     }
 }
 
@@ -250,7 +258,7 @@ TEST_F(ComplexArray_test,operator_multiply_equal_double)
     a2 *= 3.0;
     for ( int i = 0;i<a2.getSize();++i)
     {
-        EXPECT_EQ(a2.ptr[i],com1*3.0);
+        EXPECT_COMPLEXD(a2.ptr[i],com1*3.0);
     }
 }
 
@@ -260,7 +268,7 @@ TEST_F(ComplexArray_test,operator_multiply_equal_complex)
     a2 *= com2;
     for ( int i = 0;i<a2.getSize();++i)
     {
-        EXPECT_EQ(a2.ptr[i],com1*com2);
+        EXPECT_COMPLEXD(a2.ptr[i],com1*com2);
     }
 }
 
@@ -271,7 +279,7 @@ TEST_F(ComplexArray_test,operator_multiply_equal_ComplexArray)
     a2 *= b2;
     for ( int i = 0;i<a2.getSize();++i)
     {
-        EXPECT_EQ(a2.ptr[i],com1*com2);
+        EXPECT_COMPLEXD(a2.ptr[i],com1*com2);
     }
 
     EXPECT_DEATH(a2*=a4,"");
@@ -299,7 +307,7 @@ TEST_F(ComplexArray_test,operator_parentheses)
 {
     a2 = com1;
     c2 = a2;
-    EXPECT_EQ(c2(0,0,0,0), com1);
+    EXPECT_COMPLEXD(c2(0,0,0,0), com1);
 
     c2(1,0,0,0) = com2;
     EXPECT_NE(c2,a2);
@@ -313,7 +321,7 @@ TEST_F(ComplexArray_test,fuction_zero_out)
     a2.zero_out();
     for (int i=0;i<a2.getSize();++i)
     {
-        EXPECT_EQ(a2.ptr[i],comzero);
+        EXPECT_COMPLEXD(a2.ptr[i],comzero);
     }
 }
 
@@ -323,7 +331,7 @@ TEST_F(ComplexArray_test,fuction_negate)
     a2.negate();
     for (int i=0;i<a2.getSize();++i)
     {
-        EXPECT_EQ(a2.ptr[i],com1*-1.0);
+        EXPECT_COMPLEXD(a2.ptr[i],com1*-1.0);
     }
 }
 
@@ -370,7 +378,7 @@ TEST_F(ComplexArray_test,operator_double_multiply)
     c2 = 2.0 * a2 ;
     for ( int i = 0;i<a2.getSize();++i)
     {
-        EXPECT_EQ(c2.ptr[i],2.0 * com1);
+        EXPECT_COMPLEXD(c2.ptr[i],2.0 * com1);
     }  
 }
 
@@ -380,7 +388,7 @@ TEST_F(ComplexArray_test,operator_complex_multiply)
     c2 = com2 * a2 ;
     for ( int i = 0;i<a2.getSize();++i)
     {
-        EXPECT_EQ(c2.ptr[i],com2 * com1);
+        EXPECT_COMPLEXD(c2.ptr[i],com2 * com1);
     }  
 }
 
@@ -391,7 +399,7 @@ TEST(ComplexArray,function_abs2)
     a(1,0,0,0) = std::complex<double>{1.0,1.0};
     a(0,1,0,0) = std::complex<double>{2.0,2.0};
     a(1,1,0,0) = std::complex<double>{3.0,3.0};
-    EXPECT_EQ(abs2(a),28.0);
+    EXPECT_DOUBLE_EQ(abs2(a),28.0);
 }
 
 TEST(ComplexArray,function_dot)
@@ -409,8 +417,8 @@ TEST(ComplexArray,function_dot)
     b(1,1,0,0) = std::complex<double>{4.0,-3.0};
     std::complex<double> expectab {8.0,-32.0};
     std::complex<double> expectba {8.0,32.0};
-    EXPECT_EQ(dot(a,b),expectab);
-    EXPECT_EQ(dot(b,a),expectba);
+    EXPECT_COMPLEXD(dot(a,b),expectab);
+    EXPECT_COMPLEXD(dot(b,a),expectba);
 }
 
 TEST_F(ComplexArray_test,function_scale_accumulate_double)
@@ -420,7 +428,7 @@ TEST_F(ComplexArray_test,function_scale_accumulate_double)
     scale_accumulate(0.3,a2,b2);
     for ( int i = 0;i<b2.getSize();++i)
     {
-        EXPECT_EQ(b2.ptr[i],0.3*com1+com2);
+        EXPECT_COMPLEXD(b2.ptr[i],0.3*com1+com2);
     }  
 }
 
@@ -431,7 +439,7 @@ TEST_F(ComplexArray_test,function_scale_accumulate_complex)
     scale_accumulate(com3,a2,b2);
     for ( int i = 0;i<b2.getSize();++i)
     {
-        EXPECT_EQ(b2.ptr[i],com3*com1+com2);
+        EXPECT_COMPLEXD(b2.ptr[i],com3*com1+com2);
     }  
 }
 
@@ -442,7 +450,7 @@ TEST_F(ComplexArray_test,function_scaled_sum)
     scaled_sum(0.3,a2,0.4,b2,c2);
     for ( int i = 0;i<c2.getSize();++i)
     {
-        EXPECT_EQ(c2.ptr[i],0.3*com1 + 0.4*com2);
+        EXPECT_COMPLEXD(c2.ptr[i],0.3*com1 + 0.4*com2);
     }  
 }
 
@@ -453,6 +461,6 @@ TEST_F(ComplexArray_test,function_point_mult)
     point_mult(a2,b2,c2);
     for ( int i = 0;i<c2.getSize();++i)
     {
-        EXPECT_EQ(c2.ptr[i],com1*com2);
+        EXPECT_COMPLEXD(c2.ptr[i],com1*com2);
     }  
 }
