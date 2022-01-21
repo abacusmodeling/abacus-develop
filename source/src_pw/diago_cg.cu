@@ -2,6 +2,7 @@
 #include "cuda_runtime.h"
 #include "global.h"
 #include "nvToolsExt.h"
+#include "../module_base/timer.h"
 using namespace CudaCheck;
 
 template<class T, class T2>
