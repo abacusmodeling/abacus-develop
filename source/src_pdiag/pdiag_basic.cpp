@@ -439,7 +439,7 @@ void Pdiag_Basic::data_distribution(
             const int incx = 1;
             if (iarow==0&&iacol==0)
             {
-                LapackConnector::copy(LM.col_num,val,incx,&A[ai*LM.col_num],incx);
+                BlasConnector::copy(LM.col_num,val,incx,&A[ai*LM.col_num],incx);
                 for (int i=1; i<dim[1]; i++)
                 {
 //					GlobalV::ofs_running << " send to processor " << iarow*dim[1]+i << std::endl;
