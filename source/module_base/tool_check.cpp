@@ -77,7 +77,7 @@ void CHECK_STRING(std::ifstream &ifs,const std::string &v,bool quit)
 		{
 			std::cout << " read in value = " << v_in << std::endl;
 			std::cout << " the value should be = " << v << std::endl;
-			WARNING_QUIT("CHECK_DOUBLE","the name of parameter wrong!");
+			WARNING_QUIT("CHECK_STRING","the name of parameter wrong!");
 		}
 		else
 		{
