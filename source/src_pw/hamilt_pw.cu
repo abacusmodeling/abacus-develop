@@ -5,6 +5,8 @@
 #include "../module_base/blas_connector.h"
 #include "../src_io/optical.h" // only get judgement to calculate optical matrix or not.
 #include "myfunc.h"
+#include "../module_base/timer.h"
+#include "../src_parallel/parallel_reduce.h"
 using namespace CudaCheck;
 
 __global__ void cast_d2f(float *dst, double *src, int size)

@@ -10,10 +10,10 @@
 #include "global.h"
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
+#include "module_base/timer.h"
+#include "src_parallel/parallel_reduce.h"
 #include "xc_gga_pw.h"
 #include "./xc_functional.h"
-
-#include "../module_base/global_function.h"
 #ifdef __LCAO
 #include "../src_lcao/global_fp.h"
 #endif
