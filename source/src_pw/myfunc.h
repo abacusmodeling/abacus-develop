@@ -140,14 +140,6 @@ void zgemm(char tra,
            std::complex <double> *c,
            int ldc);
 
-void zgemv(char , int , int , std::complex < double> alpha ,
-           ModuleBase::ComplexMatrix overlap, int , std::complex < double> swfcatom , int npwx,
-           std::complex < double>  , ModuleBase::ComplexMatrix work, int);//called in orthoatwfc()
-
-int ILAENV(int , char *name, char *opts,const int n1,const int n2,const int n3,const int n4);
-
-void ZHPEV(int , std::complex < double> *hp, double *e, ModuleBase::ComplexMatrix &v,
-           int ldh, int n, std::complex < double> *aux, int naux);
 
 // compute the Euclidean length (12 norm) of std::vector x, with scaling of
 // input to avoid destructive underflow and overflow
