@@ -200,33 +200,6 @@ void reduce(int, double *dr2);
 void ireduce(int , int ngkp);
 void davcio(ModuleBase::ComplexMatrix evc, int nwordwfc, int iunwfc, int ik, int);
 
-void ZHEGVX(
-    int itype,
-    char jobz,
-    char range ,
-    char uplo ,
-    const int n,
-    const ModuleBase::ComplexMatrix &a,
-    const int lda,
-    const ModuleBase::ComplexMatrix &b,
-    const int ldb,
-    double vl,
-    double vu,
-    int il ,
-    int iu,
-    double abstol,
-    int &m,
-    double *w,
-    ModuleBase::ComplexMatrix &z,
-    const int ldz,
-    double *work,
-    int lwork,
-    double *rwork,
-    int *iwork,
-    int *ifail,
-    int &info );
-
-
 #endif // NYFUNC
 void DGER(int na, int nb, double , ModuleBase::ComplexMatrix a, int lda,
           ModuleBase::ComplexMatrix b, int ldb, ModuleBase::ComplexMatrix c, int ldc);
