@@ -14,7 +14,3 @@ AddTest(
   TARGET tool_check
   SOURCES tool_check_test.cpp
 )
-AddTest(
-  TARGET tool_quit
-  SOURCES tool_quit_test.cpp
-)
