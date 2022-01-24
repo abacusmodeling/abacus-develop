@@ -252,9 +252,9 @@ function(AddTest)
   #dependencies & link library
   get_target_property(ABACUS_LINK_LIBRARIES ${ABACUS_BIN_NAME} LINK_LIBRARIES)
   target_link_libraries(${UT_TARGET} ${UT_LIBS} ${ABACUS_LINK_LIBRARIES}
-    base cell symmetry md symmetry
+    base cell symmetry md
     neighbor orb io ions lcao parallel mrrr pdiag pw ri driver
-    pthread GTest::gtest_main)
+    pthread GTest::gtest_main GTest::gmock_main)
   install(TARGETS ${UT_TARGET} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/../../../tests )
   add_test(NAME ${UT_TARGET}
     COMMAND ${UT_TARGET}
