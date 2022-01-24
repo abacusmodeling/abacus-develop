@@ -201,8 +201,6 @@ void ireduce(int , int ngkp);
 void davcio(ModuleBase::ComplexMatrix evc, int nwordwfc, int iunwfc, int ik, int);
 
 #endif // NYFUNC
-void DGER(int na, int nb, double , ModuleBase::ComplexMatrix a, int lda,
-          ModuleBase::ComplexMatrix b, int ldb, ModuleBase::ComplexMatrix c, int ldc);
 
 void add_efield(ModuleBase::matrix rho, double *v, double etotefield);	// no used
 
