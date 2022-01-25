@@ -59,7 +59,7 @@ TEST_F(ToolCheckTest, Name)
 	ModuleBase::CHECK_NAME(ifs, "abacus", quit);
 	output = testing::internal::GetCapturedStdout();
 	EXPECT_THAT(output,testing::HasSubstr("not match"));
-	// quit check
+	// quit check: quit = false
 	testing::internal::CaptureStdout();
 	EXPECT_DEATH(ModuleBase::CHECK_NAME(ifs, "abacus"), "");
 	output = testing::internal::GetCapturedStdout();
@@ -80,7 +80,7 @@ TEST_F(ToolCheckTest, Int)
 	ModuleBase::CHECK_INT(ifs, 80, quit);
 	output = testing::internal::GetCapturedStdout();
 	EXPECT_THAT(output,testing::HasSubstr("not match"));
-	// quit check
+	// quit check: quit = false
 	testing::internal::CaptureStdout();
 	EXPECT_DEATH(ModuleBase::CHECK_INT(ifs, 80), "");
 	output = testing::internal::GetCapturedStdout();
@@ -96,7 +96,7 @@ TEST_F(ToolCheckTest, Double)
 	ofs << occupation << std::endl;
 	ofs.close();
 	ifs.open("tmp");
-	// non-quit check
+	// non-quit check: quit = false
 	testing::internal::CaptureStdout();
 	ModuleBase::CHECK_DOUBLE(ifs, 0.23002, quit);
 	output = testing::internal::GetCapturedStdout();
@@ -117,7 +117,7 @@ TEST_F(ToolCheckTest, String)
 	ofs << caltype << std::endl;
 	ofs.close();
 	ifs.open("tmp");
-	// non-quit check
+	// non-quit check: quit=false
 	testing::internal::CaptureStdout();
 	ModuleBase::CHECK_STRING(ifs, "scf", quit);
 	output = testing::internal::GetCapturedStdout();
