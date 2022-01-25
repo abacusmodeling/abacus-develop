@@ -5,7 +5,7 @@
 #include <fstream>
 
 /************************************************
- *  unit test of class ToolCheckTest
+ *  unit test of functions in tool_check.h
  ***********************************************/
 
 /**
@@ -22,6 +22,7 @@
  *   - ModuleBase::CHECK_STRING
  *    - check the next input from ifs is string
  *
+ * - Author: Tianqi Zhao
  */
 
 class ToolCheckTest : public testing::Test
