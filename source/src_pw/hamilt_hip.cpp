@@ -4,6 +4,7 @@
 // #include "diago_cg.h"
 #include "diago_cg_hip.h"
 #include "diago_david.h"
+#include "../module_base/timer.h"
 #include "hipfft.h"
 using namespace HipCheck;
 
@@ -14,7 +15,6 @@ Hamilt::~Hamilt()
 {
 }
 
-// in tools.h
 
 __global__ void hamilt_cast_d2f(float *dst, double *src, int size)
 {

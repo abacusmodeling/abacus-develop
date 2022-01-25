@@ -1,7 +1,6 @@
 #ifndef SYMMETRY_H
 #define SYMMETRY_H
 
-//#include "../src_pw/tools.h"
 #include "../module_cell/unitcell_pseudo.h"
 #include "symmetry_basic.h"
 

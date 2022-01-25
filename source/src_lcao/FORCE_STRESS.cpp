@@ -6,6 +6,7 @@
 #include "../src_pw/H_XC_pw.h"
 #include "../src_pw/vdwd2.h"
 #include "../src_pw/vdwd3.h"
+#include "../module_base/timer.h"
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"	//caoyu add for deepks 2021-06-03
 #endif
@@ -820,6 +821,7 @@ void Force_Stress_LCAO::calStressPwPart(
 	return;
 }
 
+#include "../module_base/mathzone.h"
 //do symmetry for total force
 void Force_Stress_LCAO::forceSymmetry(ModuleBase::matrix& fcs)
 {

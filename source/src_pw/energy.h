@@ -1,6 +1,7 @@
 #ifndef ENERGY_H
 #define ENERGY_H
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 
 class energy
 {

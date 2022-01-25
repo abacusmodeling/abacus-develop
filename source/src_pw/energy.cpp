@@ -1,13 +1,14 @@
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../src_parallel/parallel_reduce.h"
 #include "global.h"
 #include "energy.h"
 #include "../module_base/mymath.h"
 #include <vector>
 #ifdef __MPI
-#include <mpi.h>
+#include "mpi.h"
 #endif
 #include <sys/time.h>
-#include "tools.h"
 #ifdef __LCAO
 #include "../src_lcao/dftu.h"  //Quxin adds for DFT+U on 20201029
 #endif

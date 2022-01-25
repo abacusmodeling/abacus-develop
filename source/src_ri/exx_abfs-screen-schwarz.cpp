@@ -73,7 +73,7 @@ void Exx_Abfs::Screen::Schwarz::cal_max_pair_fock(
 	{
 		assert( m1.nc == m2.nc );
 		ModuleBase::matrix mm( m1.nr, m2.nr, false );
-		LapackConnector::gemm( 'N','T', m1.nr,m2.nr,m1.nc, 1, m1.c,m1.nc, m2.c,m2.nc, 0, mm.c,mm.nc );
+		BlasConnector::gemm( 'N','T', m1.nr,m2.nr,m1.nc, 1, m1.c,m1.nc, m2.c,m2.nc, 0, mm.c,mm.nc );
 		return mm;
 	};
 

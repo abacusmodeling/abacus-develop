@@ -2,7 +2,8 @@
 #define UNITCELL_PSEUDO_H
 
 #include "atom_spec.h"
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "../src_io/output.h"
 #include "unitcell.h"
 #ifdef __LCAO
@@ -87,6 +88,11 @@ public: // member functions
 	bool check_tau(void)const; //mohan add 2011-03-03
 	bool if_atoms_can_move()const;
 	bool if_cell_can_change()const;
+	void setup(const std::string &latname_in,
+			const int &ntype_in, 
+			const int &lmaxmax_in,
+			const bool &set_vel_in,
+			const std::string &fixed_axes_in);
 
 #ifdef __MPI
 	void bcast_unitcell_pseudo(void);

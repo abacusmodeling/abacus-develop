@@ -1,6 +1,7 @@
 #include "ft.h"
 #include "parallel_pw.h"
 #include "parallel_global.h"
+#include "../module_base/timer.h"
 //#include "../src_algorithms/mymath.h"
 //#include "fftw.h"
 

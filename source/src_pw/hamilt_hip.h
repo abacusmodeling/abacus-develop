@@ -1,7 +1,9 @@
 #ifndef HAMILT_HIP_H
 #define HAMILT_HIP_H
 
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../module_base/complexmatrix.h"
 
 #ifdef __ROCM
 #include "hamilt_pw_hip.h"

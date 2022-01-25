@@ -1,10 +1,12 @@
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "global.h"
 #include "sto_elec.h"
 #include "occupy.h"
 #include "../src_pw/symmetry_rho.h"
 #include "../src_io/wf_io.h"
 #include "H_Ewald_pw.h"
+#include "../module_base/timer.h"
 
 double Stochastic_Elec::avg_iter = 0;
 
@@ -59,7 +61,12 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 
 	clock_t start,finish;
 	double duration = 0.0;
-	GlobalC::sto_wf.init();
+	GlobalC::sto_wf.init(INPUT.nbands_sto, 
+		INPUT.nche_sto, 
+		INPUT.seed_sto, 
+		INPUT.emax_sto, 
+		INPUT.emin_sto, 
+		INPUT.stotype);
 	int chetype = 1;
 
 	for (this->iter = 1;iter <= GlobalV::NITER;iter++)

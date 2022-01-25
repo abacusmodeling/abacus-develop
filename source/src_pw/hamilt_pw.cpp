@@ -1,9 +1,12 @@
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../src_parallel/parallel_reduce.h"
 #include "global.h"
 #include "hamilt_pw.h"
 #include "../module_base/blas_connector.h"
 #include "../src_io/optical.h" // only get judgement to calculate optical matrix or not.
 #include "myfunc.h"
+#include "../module_base/timer.h"
 
 int Hamilt_PW::moved = 0;
 
@@ -975,7 +978,7 @@ double Hamilt_PW::ddot_real
     double *pL,*pR;
     pL=(double *)psi_L;
     pR=(double *)psi_R;
-    double result=LapackConnector::dot(dim2,pL,1,pR,1);
+    double result=BlasConnector::dot(dim2,pL,1,pR,1);
     Parallel_Reduce::reduce_double_pool( result );
     return result;
     //======================================================================

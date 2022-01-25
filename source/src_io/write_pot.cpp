@@ -1,5 +1,6 @@
 #include "../src_pw/potential.h"
 #include "../src_pw/global.h"
+#include "../module_base/timer.h"
 
 // translate from write_rho in charge.cpp.
 void Potential::write_potential(

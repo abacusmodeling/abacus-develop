@@ -2,7 +2,11 @@
 #define MYFUNC_H
 using namespace std;
 
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../module_base/matrix.h"
+#include "../module_base/vector3.h"
+#include "../module_base/complexmatrix.h"
 //#include "../src_algorithms/mymath.h"     //  only wgauss(),wlgauss()
 #include <complex>
 
@@ -195,33 +199,6 @@ void divide(int nqxq, int startq, int lastq);
 void reduce(int, double *dr2);
 void ireduce(int , int ngkp);
 void davcio(ModuleBase::ComplexMatrix evc, int nwordwfc, int iunwfc, int ik, int);
-
-void ZHEGVX(
-    int itype,
-    char jobz,
-    char range ,
-    char uplo ,
-    const int n,
-    const ModuleBase::ComplexMatrix &a,
-    const int lda,
-    const ModuleBase::ComplexMatrix &b,
-    const int ldb,
-    double vl,
-    double vu,
-    int il ,
-    int iu,
-    double abstol,
-    int &m,
-    double *w,
-    ModuleBase::ComplexMatrix &z,
-    const int ldz,
-    double *work,
-    int lwork,
-    double *rwork,
-    int *iwork,
-    int *ifail,
-    int &info );
-
 
 #endif // NYFUNC
 void DGER(int na, int nb, double , ModuleBase::ComplexMatrix a, int lda,

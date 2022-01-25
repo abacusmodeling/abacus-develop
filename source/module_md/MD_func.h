@@ -3,6 +3,7 @@
 
 #include "MD_parameters.h"
 #include "../module_cell/unitcell_pseudo.h"
+#include "../module_base/matrix.h"
 
 class MD_func
 {

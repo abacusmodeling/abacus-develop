@@ -4,6 +4,8 @@
 #include "diago_david.h"
 #include "diago_cg.cuh"
 #include "cufft.h"
+#include "../module_base/timer.h"
+
 using namespace CudaCheck;
 
 Hamilt::Hamilt() 
@@ -19,7 +21,6 @@ Hamilt::~Hamilt()
 #endif
 }
 
-// in tools.h
 
 __global__ void hamilt_cast_d2f(float *dst, double *src, int size)
 {

@@ -1,5 +1,7 @@
 #include "diago_cg.h"
 #include "global.h"
+#include "../src_parallel/parallel_reduce.h"
+#include "../module_base/timer.h"
 
 int Diago_CG::moved = 0;
 
@@ -497,7 +499,7 @@ double Diago_CG::ddot_real
     double *pL,*pR;
     pL=(double *)psi_L;
     pR=(double *)psi_R;
-    double result=LapackConnector::dot(dim2,pL,1,pR,1);
+    double result=BlasConnector::dot(dim2,pL,1,pR,1);
     if(reduce)  Parallel_Reduce::reduce_double_pool( result );
     return result;
     //======================================================================

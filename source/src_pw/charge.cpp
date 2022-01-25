@@ -16,7 +16,10 @@
 // (as in update) the total charge only could be needed,
 // even in a LSDA calculation.
 //----------------------------------------------------------
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../module_base/memory.h"
+#include "../src_parallel/parallel_reduce.h"
 #include "global.h"
 #include "charge.h"
 #include "magnetism.h"
@@ -24,6 +27,7 @@
 #include "../module_base/math_integral.h"
 #include "../module_base/math_sphbes.h"
 #include <vector>
+#include "../module_base/timer.h"
 
 Charge::Charge()
 {
@@ -383,11 +387,11 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 							if(GlobalV::DOMAG)
 							{
 								rho_g3d(1, ig) += swap * (GlobalC::ucell.magnet.start_magnetization[it] / atom->zv) 
-								* sin(GlobalC::ucell.magnet.angle1_[it]) * cos(GlobalC::ucell.magnet.angle2_[it]);
+								* sin(atom->angle1[0]) * cos(atom->angle2[0]);
 								rho_g3d(2, ig) += swap * (GlobalC::ucell.magnet.start_magnetization[it] / atom->zv) 
-								* sin(GlobalC::ucell.magnet.angle1_[it]) * sin(GlobalC::ucell.magnet.angle2_[it]);
+								* sin(atom->angle1[0]) * sin(atom->angle2[0]);
 								rho_g3d(3, ig) += swap * (GlobalC::ucell.magnet.start_magnetization[it] / atom->zv) 
-								* cos(GlobalC::ucell.magnet.angle1_[it]);
+								* cos(atom->angle1[0]);
 							}
 							else if(GlobalV::DOMAG_Z)
 							{

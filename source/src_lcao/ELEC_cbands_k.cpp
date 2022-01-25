@@ -9,6 +9,7 @@
 #include "../module_deepks/LCAO_deepks.h"
 #include "LCAO_nnr.h"
 #endif
+#include "../module_base/timer.h"
 
 ELEC_cbands_k::ELEC_cbands_k(){};
 ELEC_cbands_k::~ELEC_cbands_k(){};

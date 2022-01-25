@@ -1,5 +1,6 @@
 #include "dos.h"
 #include "../src_pw/global.h"
+#include "../src_parallel/parallel_reduce.h"
 #ifdef __LCAO
 void Dos::calculate_Mulliken(const std::string &fa)
 {

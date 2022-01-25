@@ -1,7 +1,8 @@
 #ifndef MULLIKEN_CHARGE_H
 #define MULLIKEN_CHARGE_H
 
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #ifdef __LCAO
 #include "../module_orbital/ORB_gen_tables.h"
 #include "../module_neighbor/sltk_grid_driver.h"

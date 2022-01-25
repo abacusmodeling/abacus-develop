@@ -10,7 +10,8 @@
 #include "electrons.h"
 #include "global.h"
 #include "hip/hip_runtime.h"
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 // new
 #include "H_Ewald_pw.h"
 using namespace HipCheck;

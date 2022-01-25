@@ -3,7 +3,9 @@
 // DATE : 2008-11-6
 //==========================================================
 //#include "global.h"
-#include "src_pw/tools.h"
+#include "module_base/global_function.h"
+#include "module_base/global_variable.h"
+#include "src_parallel/parallel_common.h"
 #include "input.h"
 
 #include <iostream>
@@ -13,6 +15,8 @@
 #include <string.h>
 #include <vector>
 #include <sstream>
+#include "module_base/global_file.h"
+#include "module_base/timer.h"
 Input INPUT;
 
 void Input::Init(const std::string &fn)
@@ -2276,26 +2280,6 @@ void Input::Bcast()
 	Parallel_Common::bcast_bool( noncolin );
 	Parallel_Common::bcast_bool( lspinorb );
 	Parallel_Common::bcast_double( soc_lambda );
-	if(noncolin)
-	{
-		if(GlobalV::MY_RANK==0)
-		{
-			if (angle1.size() != this->ntype)
-				angle1.resize(this->ntype);
-			if (angle2.size() != this->ntype)
-				angle2.resize(this->ntype);
-		}
-		if(GlobalV::MY_RANK!=0)
-		{
-			angle1.resize(this->ntype);
-			angle2.resize(this->ntype);
-		}
-		for(int i = 0;i<this->ntype;i++)
-		{
-			Parallel_Common::bcast_double(angle1[i]);
-			Parallel_Common::bcast_double(angle2[i]);
-		}
-	}
 
 		//Parallel_Common::bcast_int( epsilon0_choice );
     Parallel_Common::bcast_double( cell_factor); //LiuXh add 20180619

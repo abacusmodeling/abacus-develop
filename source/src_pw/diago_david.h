@@ -10,7 +10,9 @@
 #ifndef Diago_David_H
 #define Diago_David_H
 
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../module_base/complexmatrix.h"
 
 class Diago_David
 {

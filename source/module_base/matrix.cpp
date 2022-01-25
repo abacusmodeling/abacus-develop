@@ -13,7 +13,8 @@
 
 #ifdef __NORMAL
 #else
-#include "lapack_connector.h"
+#include "global_function.h"
+#include "blas_connector.h"
 #endif
 
 //*********************************************************
@@ -215,7 +216,7 @@ matrix operator*(const matrix &m1, const matrix &m2)
 	}
 #else
 	// Peize Lin accelerate 2017-10-27
-	LapackConnector::gemm(
+	BlasConnector::gemm(
 		'N', 'N', 
 		m1.nr, m2.nc, m1.nc,
 		1, m1.c, m1.nc, m2.c, m2.nc, 
@@ -445,7 +446,7 @@ double matrix::norm() const
 	}	
 	return sqrt(nn);
 #else
-	return LapackConnector::nrm2(nr*nc,c,1);
+	return BlasConnector::nrm2(nr*nc,c,1);
 #endif
 }
 

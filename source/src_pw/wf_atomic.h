@@ -1,7 +1,9 @@
 #ifndef WF_ATOMIC_H
 #define WF_ATOMIC_H
 
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../module_base/complexmatrix.h"
 #include "wf_igk.h"
 
 class WF_atomic : public WF_igk

@@ -1,7 +1,9 @@
 #ifndef WF_IGK_H
 #define WF_IGK_H
 
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../module_base/intarray.h"
 #include "pw_basis.h"
 
 class WF_igk 

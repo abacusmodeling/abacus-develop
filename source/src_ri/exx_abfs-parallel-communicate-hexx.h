@@ -10,7 +10,7 @@
 #include <valarray>
 #include <map>
 #include <deque>
-#include <mpi.h>
+#include "mpi.h"
 #include <atomic>
 
 // mohan comment out 2021-02-06

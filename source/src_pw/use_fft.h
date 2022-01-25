@@ -1,7 +1,10 @@
 #ifndef USE_FFT_H
 #define USE_FFT_H
 
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../module_base/matrix.h"
+#include "../module_base/complexmatrix.h"
 
 #ifdef __CUDA
 #include "cufft.h"

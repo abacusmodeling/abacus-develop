@@ -8,7 +8,7 @@
 	#include "../src_lcao/serialization_cereal.h"
 #endif
 
-#include <mpi.h>
+#include "mpi.h"
 #include <thread>
 #include <algorithm>
 
