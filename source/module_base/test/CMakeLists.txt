@@ -10,3 +10,7 @@ AddTest(
   TARGET base_complexarray
   SOURCES complexarray_test.cpp
 )
+AddTest(
+  TARGET tool_check
+  SOURCES tool_check_test.cpp
+)
