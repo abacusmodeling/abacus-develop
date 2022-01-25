@@ -103,7 +103,7 @@ TEST_F(ToolCheckTest, Double)
 	EXPECT_THAT(output,testing::HasSubstr("not match"));
 	// quit check
 	testing::internal::CaptureStdout();
-	EXPECT_DEATH(ModuleBase::CHECK_DOUBLE(ifs, 0.23002), "");
+	EXPECT_DEATH(ModuleBase::CHECK_DOUBLE(ifs, 0.22998), "");
 	output = testing::internal::GetCapturedStdout();
 	EXPECT_THAT(output,testing::HasSubstr("NOTICE"));
 	ifs.close();

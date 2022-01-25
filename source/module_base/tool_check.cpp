@@ -51,7 +51,7 @@ void CHECK_DOUBLE(std::ifstream &ifs,const double &v,bool quit)
 	const double tiny = 1.0e-5;
 	double v_in;
 	ifs >> v_in;
-	if( (v - v_in) > tiny )
+	if( fabs(v - v_in) > tiny )
 	{
 		if(quit)
 		{
