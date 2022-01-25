@@ -130,53 +130,25 @@ int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 		ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_MESH>");
 	}
 
-	
-
 	if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_R"))
 	{
 		ModuleBase::GlobalFunc::READ_VALUE(ifs, word); // type size columns
-		delete[] r;
-		delete[] rab;
-		assert(mesh>0);
-		this->r = new double[mesh];
-		this->rab = new double[mesh];
-		ModuleBase::GlobalFunc::ZEROS(r,mesh);
-		ModuleBase::GlobalFunc::ZEROS(rab,mesh);
-		for (int ir = 0;ir < mesh;ir++)
-		{
-			ifs >> this->r[ir];
-		}
+		this->read_pseudo_upf201_r(ifs);
 	}
 	else if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_R>"))
 	{
-		delete[] r;
-		delete[] rab;
-		assert(mesh>0);
-		this->r = new double[mesh];
-		this->rab = new double[mesh];
-		ModuleBase::GlobalFunc::ZEROS(r,mesh);
-		ModuleBase::GlobalFunc::ZEROS(rab,mesh);
-		for (int ir = 0;ir < mesh;ir++)
-		{
-			ifs >> this->r[ir];
-		}
+		this->read_pseudo_upf201_r(ifs);
 	}
 	ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_R>");
 
     if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_RAB"))
 	{
 		ModuleBase::GlobalFunc::READ_VALUE(ifs, word); // type size columns
-		for (int ir = 0;ir < mesh;ir++)
-		{
-			ifs >> this->rab[ir];
-		}
+		this->read_pseudo_upf201_rab(ifs);
 	}
 	else if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_RAB>"))
 	{
-		for (int ir = 0;ir < mesh;ir++)
-		{
-			ifs >> this->rab[ir];
-		}
+		this->read_pseudo_upf201_rab(ifs);
 	}
 	ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_RAB>");
 	ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_MESH>");
@@ -257,36 +229,11 @@ int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 	if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_DIJ"))
 	{
 		ModuleBase::GlobalFunc::READ_VALUE(ifs, word);  // type size columns
-
-		this->nd = nbeta * nbeta;
-		for(int i=0;i<nbeta;i++)
-		{
-			for(int j=0;j<nbeta;j++)
-			{
-				ifs >> dion(i,j);
-				if ( i != j  && dion(i,j) != 0.0 )
-				{
-					std::cout << " error: for i != j, Dij of Pseudopotential must be 0.0 " << std::endl;
-					exit(1);
-				}
-			}
-		}
+		this->read_pseudo_upf201_dij(ifs);
 	}
 	else if ( ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_DIJ>"))
 	{
-		this->nd = nbeta * nbeta;
-		for(int i=0;i<nbeta;i++)
-		{
-			for(int j=0;j<nbeta;j++)
-			{
-				ifs >> dion(i,j);
-				if ( i != j  && dion(i,j) != 0.0 )
-				{
-					std::cout << " error: for i != j, Dij of Pseudopotential must be 0.0 " << std::endl;
-					exit(1);
-				}
-			}
-		}
+		this->read_pseudo_upf201_dij(ifs);
 	}
 	ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_DIJ>");
 	ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_NONLOCAL>");
@@ -347,23 +294,11 @@ int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 	if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_RHOATOM"))
 	{
 		ModuleBase::GlobalFunc::READ_VALUE(ifs, word); // type size columns
-		delete[] rho_at;
-		this->rho_at = new double[mesh];
-		ModuleBase::GlobalFunc::ZEROS(rho_at, mesh);
-		for (int ir = 0;ir < mesh;ir++)
-		{
-			ifs >> this->rho_at[ir];
-		}
+		this->read_pseudo_upf201_rhoatom(ifs);
 	}
 	else if (ModuleBase::GlobalFunc::SCAN_BEGIN(ifs, "<PP_RHOATOM>"))
 	{
-		delete[] rho_at;
-		this->rho_at = new double[mesh];
-		ModuleBase::GlobalFunc::ZEROS(rho_at, mesh);
-		for (int ir = 0;ir < mesh;ir++)
-		{
-			ifs >> this->rho_at[ir];
-		}
+		this->read_pseudo_upf201_rhoatom(ifs);
 	}
 	ModuleBase::GlobalFunc::SCAN_END(ifs, "</PP_RHOATOM>");
 
@@ -1323,3 +1258,49 @@ void Pseudopot_upf:: getnameval(std::ifstream& ifs,int &n, std::string * name, s
 
     return;
 }*/
+void Pseudopot_upf::read_pseudo_upf201_r(std::ifstream &ifs)
+{
+	delete[] r;
+	delete[] rab;
+	assert(mesh>0);
+	this->r = new double[mesh];
+	this->rab = new double[mesh];
+	ModuleBase::GlobalFunc::ZEROS(r,mesh);
+	ModuleBase::GlobalFunc::ZEROS(rab,mesh);
+	for (int ir = 0;ir < mesh;ir++)
+	{
+		ifs >> this->r[ir];
+	}
+}
+void Pseudopot_upf::read_pseudo_upf201_rab(std::ifstream &ifs)
+{
+	for (int ir = 0;ir < mesh;ir++)
+	{
+		ifs >> this->rab[ir];
+	}
+}
+void Pseudopot_upf::read_pseudo_upf201_dij(std::ifstream &ifs)
+{
+	this->nd = nbeta * nbeta;
+	for(int i=0;i<nbeta;i++)
+	{
+		for(int j=0;j<nbeta;j++)
+		{
+			ifs >> dion(i,j);
+			if ( i != j  && dion(i,j) != 0.0 )
+			{
+				ModuleBase::WARNING_QUIT("read_pseudo_upf201","Error: for i != j, Dij of Pseudopotential must be 0.0");
+			}
+		}
+	}
+}
+void Pseudopot_upf::read_pseudo_upf201_rhoatom(std::ifstream &ifs)
+{
+	delete[] rho_at;
+	this->rho_at = new double[mesh];
+	ModuleBase::GlobalFunc::ZEROS(rho_at, mesh);
+	for (int ir = 0;ir < mesh;ir++)
+	{
+		ifs >> this->rho_at[ir];
+	}
+}
