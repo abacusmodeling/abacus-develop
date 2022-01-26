@@ -18,3 +18,7 @@ AddTest(
   TARGET tool_quit
   SOURCES tool_quit_test.cpp
 )
+AddTest(
+  TARGET base_integral
+  SOURCES math_integral_test.cpp
+)
