@@ -3,8 +3,9 @@
 
 #include<math.h>
 
-#define PI 3.14159265358979
 #define doublethreshold 1e-12
+
+
 
 /************************************************
 *  unit test of class Integral
@@ -19,7 +20,7 @@
  * 
  */
 
-class Simpson_Integral_sinx : public testing::Test
+class SimpsonIntegralSinx : public testing::Test
 {
     /**
      * test the integral of sinx between [0,PI],
@@ -31,7 +32,7 @@ class Simpson_Integral_sinx : public testing::Test
     double*     func;
     double*     rab;
     int         mesh = 10001;
-    double      dr   = PI/(mesh-1);
+    double      dr   = M_PI/(mesh-1);
     double      asum;
     double*     asumlist;
     double      expectvalue = 2.0;
@@ -44,7 +45,7 @@ class Simpson_Integral_sinx : public testing::Test
 
         for (int i=0;i<mesh;i++)
         {
-            func[i] = sin(PI*i/(mesh-1));
+            func[i] = sin(M_PI*i/(mesh-1));
             rab[i] = dr;
         }
     }
@@ -57,21 +58,23 @@ class Simpson_Integral_sinx : public testing::Test
     }
 };
 
-TEST_F(Simpson_Integral_sinx,Simpson_Integral_rab)
+
+
+TEST_F(SimpsonIntegralSinx,SimpsonIntegralRab)
 {
     ModuleBase::Integral::Simpson_Integral(mesh,func,rab,asum);
     EXPECT_NEAR(asum,expectvalue,doublethreshold);
     EXPECT_DEATH(ModuleBase::Integral::Simpson_Integral(mesh-1,func,rab,asum),"");
 }
 
-TEST_F(Simpson_Integral_sinx,Simpson_Integral_dr)
+TEST_F(SimpsonIntegralSinx,SimpsonIntegralDr)
 {
     ModuleBase::Integral::Simpson_Integral(mesh,func,dr,asum);
     EXPECT_NEAR(asum,expectvalue,doublethreshold);
     EXPECT_DEATH(ModuleBase::Integral::Simpson_Integral(mesh-1,func,dr,asum),"");
 }
 
-TEST_F(Simpson_Integral_sinx,Simpson_Integral_0toall)
+TEST_F(SimpsonIntegralSinx,SimpsonIntegral0toall)
 {
     int halfmesh = round(mesh/2);
     ModuleBase::Integral::Simpson_Integral_0toall(mesh,func,rab,asumlist);
@@ -82,7 +85,7 @@ TEST_F(Simpson_Integral_sinx,Simpson_Integral_0toall)
 }
 
 
-TEST_F(Simpson_Integral_sinx,Simpson_Integral_alltoinf)
+TEST_F(SimpsonIntegralSinx,SimpsonIntegralAlltoinf)
 {
     int halfmesh = round(mesh/2);
     ModuleBase::Integral::Simpson_Integral_alltoinf(mesh,func,rab,asumlist);
