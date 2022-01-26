@@ -22,6 +22,8 @@ extern "C"
 	void dcopy_(long const *n, const double *a, int const *incx, double *b, int const *incy);
 	void zcopy_(long const *n, const std::complex<double> *a, int const *incx, std::complex<double> *b, int const *incy); 
 
+	//reason for passing results as argument instead of returning it:
+	//see https://www.numbercrunch.de/blog/2014/07/lost-in-translation/
 	void zdotc_(std::complex<double> *result, const int *n, const std::complex<double> *zx, 
 		const int *incx, const std::complex<double> *zy, const int *incy);
 

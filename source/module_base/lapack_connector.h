@@ -276,6 +276,7 @@ public:
 		std::vector<double> work(std::max(1,lwork));
 		dsyev_(&jobz, &uplo_changed, &a.nr, a.c, &a.nr, w, ModuleBase::GlobalFunc::VECTOR_TO_PTR(work), &lwork, &info);		
 	}
+    
     // wrap function of fortran lapack routine zheev.
     static inline
     void zheev( const char jobz,
