@@ -5,7 +5,7 @@
 
 extern "C"
 {
-	// level 1: std::vector-std::vector operations	
+	// level 1: std::vector-std::vector operations, O(n) data and O(n) work.
 
 	// Peize Lin add ?scal 2016-08-04, to compute x=a*x
 	void sscal_(const int *N, const float *alpha, float *X, const int *incX);
@@ -26,12 +26,16 @@ extern "C"
 	//see https://www.numbercrunch.de/blog/2014/07/lost-in-translation/
 	void zdotc_(std::complex<double> *result, const int *n, const std::complex<double> *zx, 
 		const int *incx, const std::complex<double> *zy, const int *incy);
-
 	// Peize Lin add ?dot 2017-10-27, to compute d=x*y
 	float sdot_(const int *N, const float *X, const int *incX, const float *Y, const int *incY);
 	double ddot_(const int *N, const double *X, const int *incX, const double *Y, const int *incY);
 
-	// level 2: matrix-std::vector operations
+	// Peize Lin add ?nrm2 2018-06-12, to compute out = ||x||_2 = \sqrt{ \sum_i x_i**2 }
+	float snrm2_( const int *n, const float *X, const int *incX );
+	double dnrm2_( const int *n, const double *X, const int *incX );
+	double dznrm2_( const int *n, const std::complex<double> *X, const int *incX );
+
+	// level 2: matrix-std::vector operations, O(n^2) data and O(n^2) work.
 	void dgemv_(const char *transa, const int *m, const int *n, const double *alpha,  const double *a,  
 		const int *lda, const double *x, const int *incx, const double *beta, double *y, const int *incy);
 		
@@ -43,10 +47,15 @@ extern "C"
 		const double *alpha, const double *a, const int *lda, 
 		const double *x, const int *incx, 
 		const double *beta, double *y, const int *incy);			
-			
-	// level 3: matrix-matrix operations
+
+    // A := alpha x * y.T + A
+	void dger_(int *m, int *n, double *alpha, double *x, int *incx, double *y, int *incy, double *a, int *lda);
+	void zgerc_(int *m, int *n, std::complex<double> *alpha,std::complex<double> *x, int *incx, std::complex<double> *y, int *incy,std::complex<double> *a, int *lda);
+
+	// level 3: matrix-matrix operations, O(n^2) data and O(n^3) work.
 	
-	// Peize Lin add ?gemm 2017-10-27, to compute C = a * A.? * B.? + b * C 
+	// Peize Lin add ?gemm 2017-10-27, to compute C = a * A.? * B.? + b * C
+	// A is general
 	void sgemm_(const char *transa, const char *transb, const int *m, const int *n, const int *k,
 		const float *alpha, const float *a, const int *lda, const float *b, const int *ldb, 
 		const float *beta, float *c, const int *ldc);
@@ -56,27 +65,21 @@ extern "C"
 	void zgemm_(const char *transa, const char *transb, const int *m, const int *n, const int *k,
 		const std::complex<double> *alpha, const std::complex<double> *a, const int *lda, const std::complex<double> *b, const int *ldb, 
 		const std::complex<double> *beta, std::complex<double> *c, const int *ldc);
-
+	
+	//a is symmetric
 	void dsymm_(const char *side, const char *uplo, const int *m, const int *n,
 		const double *alpha, const double *a, const int *lda, const double *b, const int *ldb,
 		const double *beta, double *c, const int *ldc);
-
+	//a is hermitian
 	void zhemm_(char *side, char *uplo, int *m, int *n,std::complex<double> *alpha,
 		std::complex<double> *a,  int *lda,  std::complex<double> *b, int *ldb, std::complex<double> *beta, std::complex<double> *c, int *ldc);
 
+	//solving triangular matrix with multiple right hand sides
 	void dtrsm_(char *side, char* uplo, char *transa, char *diag, int *m, int *n,
 		double* alpha, double* a, int *lda, double*b, int *ldb);
-
 	void ztrsm_(char *side, char* uplo, char *transa, char *diag, int *m, int *n,
 	std::complex<double>* alpha, std::complex<double>* a, int *lda, std::complex<double>*b, int *ldb);
 
-	// Peize Lin add ?nrm2 2018-06-12, to compute out = ||x||_2 = \sqrt{ \sum_i x_i**2 }
-	float snrm2_( const int *n, const float *X, const int *incX );
-	double dnrm2_( const int *n, const double *X, const int *incX );
-	double dznrm2_( const int *n, const std::complex<double> *X, const int *incX );
-	// Peize Lin add zherk 2019-04-14
-	// if trans=='N':	C = a * A * A.H + b * C
-	// if trans=='C':	C = a * A.H * A + b * C	
 };
 
 // Class BlasConnector provide the connector to fortran lapack routine.
@@ -139,7 +142,6 @@ public:
 	{
 		return sdot_(&n, X, &incX, Y, &incY);
 	}
-
 	static inline
 	double dot( const int n, const double *X, const int incX, const double *Y, const int incY)
 	{
@@ -193,7 +195,8 @@ public:
 	{
 		return dznrm2_( &n, X, &incX );
 	}
-	
+
+	// copies a into b	
 	static inline
 	void copy(const long n, const double *a, const int incx, double *b, const int incy)
 	{

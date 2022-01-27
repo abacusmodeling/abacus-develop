@@ -108,9 +108,6 @@ extern "C"
 	void dlarfg_(int *n, double *alpha, double *x, int *incx, double *tau);
 	void zlarfg_(int *n, std::complex<double> *alpha, std::complex<double> *x, int *incx, std::complex<double> *tau);
 
-    // A := alpha x * y.T + A
-	void dger_(int *m, int *n, double *alpha, double *x, int *incx, double *y, int *incy, double *a, int *lda);
-	void zgerc_(int *m, int *n, std::complex<double> *alpha,std::complex<double> *x, int *incx, std::complex<double> *y, int *incy,std::complex<double> *a, int *lda);
 }
 
 // Class LapackConnector provide the connector to fortran lapack routine.
