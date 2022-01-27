@@ -14,22 +14,41 @@ class Sphbes
     Sphbes();
     ~Sphbes();
 
+    /**
+     * @brief spherical bessel
+     * 
+     * @param msh [in] number of grid points
+     * @param r [in] radial grid (1:msh)
+     * @param q [in] k_radial
+     * @param l [in] angular momentum
+     * @param jl [out] jl(1:msh) spherical bessel function
+     */
     static void Spherical_Bessel
     (
-        const int &msh,	//number of grid points
-        const double *r,//radial grid
-        const double &q,	//
-        const int &l,	//angular momentum
-        double *jl	//jl(1:msh) = j_l(q*r(i)),spherical bessel function
+        const int &msh,
+        const double *r,
+        const double &q,
+        const int &l,
+        double *jl
     );
 
+    /**
+     * @brief spherical bessel
+     * 
+     * @param msh [in] number of grid points
+     * @param r [in] radial grid (1:msh)
+     * @param q [in] k_radial
+     * @param l [in] angular momentum
+     * @param jl [out] jl(1:msh) spherical bessel function
+     * @param sjp [out] sjp[i] is assigned to be 1.0. i < msh.
+     */
 	static void Spherical_Bessel
 	(           
-	    const int &msh, //number of grid points
-		const double *r,//radial grid
-		const double &q,    //
-		const int &l,   //angular momentum
-		double *sj,     //jl(1:msh) = j_l(q*r(i)),spherical bessel function
+	    const int &msh, 
+		const double *r,
+		const double &q, 
+		const int &l,  
+		double *sj,    
 		double *sjp
 	);
 
