@@ -29,7 +29,14 @@ class XC_Functional
 
 	// GGA
 	static void gcxc(const double &rho, const double &grho, double &sx, double &sc,
-          double &v1x, double &v2x, double &v1c, double &v2c);
+        	double &v1x, double &v2x, double &v1c, double &v2c);
+
+	// spin polarized GGA
+	static void gcx_spin(double rhoup, double rhodw, double grhoup2, double grhodw2,
+            double &sx, double &v1xup, double &v1xdw, double &v2xup,
+            double &v2xdw);
+	static void gcc_spin(double rho, double &zeta, double grho, double &sc,
+            double &v1cup, double &v1cdw, double &v2c);
 
 #ifdef USE_LIBXC
 	struct Mgga_spin_in
@@ -91,16 +98,22 @@ class XC_Functional
 	static void gl(const double &rs, double &ec, double &vc);
 
 	// For LSDA correlation energy
+	// pz and pz_polarized should be put together
 	static void pz_spin( const double &rs, const double &zeta,
     	double &ec, double &vcup, double &vcdw);
 	static void pz_polarized( const double &rs, double &ec, double &vc);
-
-	public: //for tmp
 	static void pw_spin( const double &rs, const double &zeta,
         double &ec, double &vcup, double &vcdw);
 
-	private:
-	// For GW91
+	// some GGA functionals
+	static void hcth(const double rho, const double grho, double &sx, double &v1x, double &v2x);
+	static void pwcorr(const double r, const double c[], double &g, double &dg);
+	static void optx(const double rho, const double grho, double &sx, double &v1x, double &v2x);
+	
+	// For PW86 correlation functional
+	static void perdew86(const double rho, const double grho, double &sc, double &v1c, double &v2c);
+
+	// For PW91
 	static void ggax(const double &rho, const double &grho, double &sx, double &v1x, double &v2x);
 	static void ggac(const double &rho,const double &grho, double &sc, double &v1c, double &v2c);
 
@@ -111,7 +124,15 @@ class XC_Functional
 	static void becke88(const double &rho, const double &grho, double &sx, double &v1x, double &v2x);
 	static void glyp(const double &rho, const double &grho, double &sc, double &v1c, double &v2c);
 
-
+	// spin-polarized GGA
+	static void becke88_spin(double rho, double grho, double &sx, double &v1x,
+			double &v2x);
+	static void perdew86_spin(double rho, double zeta, double grho, double &sc,
+			double &v1cup, double &v1cdw, double &v2c);
+	static void ggac_spin(double rho, double zeta, double grho, double &sc,
+			double &v1cup, double &v1cdw, double &v2c);
+	static void pbec_spin(double rho, double zeta, double grho, const int &flag, double &sc,
+			double &v1cup, double &v1cdw, double &v2c);
 };
 
 #endif //XC_FUNCTION_H

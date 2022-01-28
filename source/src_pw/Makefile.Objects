@@ -125,8 +125,6 @@ VNL_in_pw.o\
 wavefunc.o\
 wf_atomic.o \
 wf_igk.o \
-xc_1.o\
-xc_2.o\
 xc_3.o \
 xc_gga_pw.o \
 xc_type.o \

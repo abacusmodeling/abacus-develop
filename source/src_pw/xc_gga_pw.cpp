@@ -1,7 +1,6 @@
 #include "xc_gga_pw.h"
 #include "global.h"
 #include "xc_functional.h"
-#include "myfunc.h"
 
 // from gradcorr.f90
 void GGA_PW::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
@@ -219,8 +218,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 			double rh = rhotmp1[ir] + rhotmp2[ir]; 
 			grho2a = gdr1[ir].norm2();
 			grho2b = gdr2[ir].norm2();
-			//XC_Functional::gcx_spin();
-			gcx_spin(rhotmp1[ir], rhotmp2[ir], grho2a, grho2b,
+			XC_Functional::gcx_spin(rhotmp1[ir], rhotmp2[ir], grho2a, grho2b,
 				sx, v1xup, v1xdw, v2xup, v2xdw);
 			
 			if(rh > epsr)
@@ -234,8 +232,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 					double zeta = ( rhotmp1[ir] - rhotmp2[ir] ) / rh;
 					if(GlobalV::NSPIN==4&&(GlobalV::DOMAG||GlobalV::DOMAG_Z)) zeta = fabs(zeta) * neg[ir];
 					const double grh2 = (gdr1[ir]+gdr2[ir]).norm2();
-					//XC_Functional::gcc_spin(rh, zeta, grh2, sc, v1cup, v1cdw, v2c);
-					gcc_spin(rh, zeta, grh2, sc, v1cup, v1cdw, v2c);
+					XC_Functional::gcc_spin(rh, zeta, grh2, sc, v1cup, v1cdw, v2c);
 					v2cup = v2c;
 					v2cdw = v2c;
 					v2cud = v2c;
