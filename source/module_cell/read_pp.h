@@ -105,6 +105,11 @@ private:
 	void read_pseudo_rhoatom(std::ifstream &ifs);
 	void read_pseudo_addinfo(std::ifstream &ifs);
 	void read_pseudo_so(std::ifstream &ifs);
+
+	void read_pseudo_upf201_r(std::ifstream &ifs);
+	void read_pseudo_upf201_rab(std::ifstream &ifs);
+	void read_pseudo_upf201_dij(std::ifstream &ifs);
+	void read_pseudo_upf201_rhoatom(std::ifstream &ifs);
 	//std::string get_string( char ss[]);
 	//int get_int( char ss[]);
 	//double get_double( char ss[]);
