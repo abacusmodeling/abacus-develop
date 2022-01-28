@@ -11,7 +11,7 @@ AddTest(
 )
 AddTest(
   TARGET base_complexarray
-  SOURCES complexarray_test.cpp ../complexarray.cpp ../global_variable.cpp
+  SOURCES complexarray_test.cpp ../complexarray.cpp
 )
 AddTest(
   TARGET tool_check
