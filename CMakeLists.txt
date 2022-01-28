@@ -167,7 +167,7 @@ else()
     message(WARNING "Cannot find the correct library for Fortran.")
   endif()
 endif()
-target_link_libraries(${ABACUS_BIN_NAME} math_libs)
+target_link_libraries(${ABACUS_BIN_NAME} ${math_libs})
 
 if(ENABLE_DEEPKS)
   set(CMAKE_CXX_STANDARD 14)
