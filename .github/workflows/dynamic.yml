@@ -44,7 +44,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Build and Test
         run: |
-          cmake -B build -DENABLE_ASAN=1 -DBUILD_TESTING=ON
+          cmake -B build -DENABLE_ASAN=1 -DBUILD_TESTING=ON -DENABLE_DEEPKS=1
           cmake --build build -j16
           cmake --install build
           cmake --build build --target test ARGS="-V"
