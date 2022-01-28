@@ -17,7 +17,7 @@ option(USE_CUDA "Enable support to CUDA." OFF)
 option(USE_ROCM "Enable support to ROCm." OFF)
 option(USE_OPENMP " Enable OpenMP in abacus." ON)
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
-option(BUILD_TESTING "Build ABACUS unit tests" OFF)
+option(BUILD_TESTING "Build ABACUS unit tests" ON)
 option(GENERATE_TEST_REPORTS "Enable test report generation" OFF)
 
 set(ABACUS_BIN_NAME abacus)
@@ -245,22 +245,23 @@ IF (BUILD_TESTING)
   # https://cmake.org/cmake/help/latest/module/GoogleTest.html
   add_subdirectory(tests) # Contains integration tests
 
-endif()
-function(AddTest)
-  cmake_parse_arguments(UT "DYN" "TARGET" "LIBS;DYN_LIBS;STATIC_LIBS;SOURCES;DEPENDS" ${ARGN})
-  add_executable(${UT_TARGET} ${UT_SOURCES})
-  #dependencies & link library
+  # ${ABACUS_LINK_LIBRARIES} contains blas, lapack, MPI, OpenMP, etc.
   get_target_property(ABACUS_LINK_LIBRARIES ${ABACUS_BIN_NAME} LINK_LIBRARIES)
-  target_link_libraries(${UT_TARGET} ${UT_LIBS} ${ABACUS_LINK_LIBRARIES}
-    base cell symmetry md
-    neighbor orb io ions lcao parallel mrrr pdiag pw ri driver
-    pthread GTest::gtest_main GTest::gmock_main)
-  install(TARGETS ${UT_TARGET} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/../../../tests )
-  add_test(NAME ${UT_TARGET}
-    COMMAND ${UT_TARGET}
-    WORKING_DIRECTORY $<TARGET_FILE_DIR:${UT_TARGET}>
-  )
-endfunction(AddTest)
+  function(AddTest) # function for UT
+    cmake_parse_arguments(UT "DYN" "TARGET" "LIBS;DYN_LIBS;STATIC_LIBS;SOURCES;DEPENDS" ${ARGN})
+    # Remove redundant symbols to avoid linking every library used.
+    # See https://gcc.gnu.org/onlinedocs/gnat_ugn/Compilation-options.html .
+    add_executable(${UT_TARGET} ${UT_SOURCES})
+    #dependencies & link library
+    target_link_libraries(${UT_TARGET} ${UT_LIBS}
+      OpenMP::OpenMP_CXX pthread GTest::gtest_main GTest::gmock_main)
+    install(TARGETS ${UT_TARGET} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/../../../tests )
+    add_test(NAME ${UT_TARGET}
+      COMMAND ${UT_TARGET}
+      WORKING_DIRECTORY $<TARGET_FILE_DIR:${UT_TARGET}>
+    )
+  endfunction(AddTest)
+endif()
 
 add_subdirectory(source)
 
