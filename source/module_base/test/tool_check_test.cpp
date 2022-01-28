@@ -61,8 +61,8 @@ TEST_F(ToolCheckTest, Name)
 	EXPECT_THAT(output,testing::HasSubstr("not match"));
 	// quit check: quit = false
 	testing::internal::CaptureStdout();
-	EXPECT_DEATH(ModuleBase::CHECK_NAME(ifs, "abacus"), "");
-	output = testing::internal::GetCapturedStdout();
+    EXPECT_EXIT(ModuleBase::CHECK_NAME(ifs, "abacus"), ::testing::ExitedWithCode(0), "");
+    output = testing::internal::GetCapturedStdout();
 	EXPECT_THAT(output,testing::HasSubstr("NOTICE"));
 	ifs.close();
 }
@@ -82,7 +82,7 @@ TEST_F(ToolCheckTest, Int)
 	EXPECT_THAT(output,testing::HasSubstr("not match"));
 	// quit check: quit = false
 	testing::internal::CaptureStdout();
-	EXPECT_DEATH(ModuleBase::CHECK_INT(ifs, 80), "");
+    EXPECT_EXIT(ModuleBase::CHECK_INT(ifs, 80), ::testing::ExitedWithCode(0), "");
 	output = testing::internal::GetCapturedStdout();
 	EXPECT_THAT(output,testing::HasSubstr("NOTICE"));
 	ifs.close();
@@ -103,7 +103,7 @@ TEST_F(ToolCheckTest, Double)
 	EXPECT_THAT(output,testing::HasSubstr("not match"));
 	// quit check
 	testing::internal::CaptureStdout();
-	EXPECT_DEATH(ModuleBase::CHECK_DOUBLE(ifs, 0.22998), "");
+    EXPECT_EXIT(ModuleBase::CHECK_DOUBLE(ifs, 0.22998), ::testing::ExitedWithCode(0), "");
 	output = testing::internal::GetCapturedStdout();
 	EXPECT_THAT(output,testing::HasSubstr("NOTICE"));
 	ifs.close();
@@ -124,7 +124,7 @@ TEST_F(ToolCheckTest, String)
 	EXPECT_THAT(output,testing::HasSubstr("not match"));
 	// quit check
 	testing::internal::CaptureStdout();
-	EXPECT_DEATH(ModuleBase::CHECK_STRING(ifs, "scf"), "");
+    EXPECT_EXIT(ModuleBase::CHECK_STRING(ifs, "scf"), ::testing::ExitedWithCode(0), "");
 	output = testing::internal::GetCapturedStdout();
 	EXPECT_THAT(output,testing::HasSubstr("NOTICE"));
 	ifs.close();
