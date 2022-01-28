@@ -277,15 +277,6 @@ double Charge_Mixing::rhog_dot_product(
 
 	sum *= GlobalC::ucell.omega * 0.5;
 
-	//bool dft_is_meta = false;
-	//bool okpaw = false;
-	//bool dipfield = false;
-
-//	if(dft_is_meta) sum += tauk_ddot();
-//	if(lda_pluse_u) sum += ns_ddot();
-//	if(okpaw) sum += paw_ddot();
-//	if(dipfield) sum += ...;
-
     return sum;
 }
 

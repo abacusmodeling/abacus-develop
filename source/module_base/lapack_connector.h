@@ -9,44 +9,67 @@
 #include "complexmatrix.h"
 #include "global_function.h"
 
+//Naming convention of lapack subroutines : ammxxx, where
+//"a" specifies the data type:
+//  - d stands for double
+//  - z stands for complex double
+//"mm" specifies the type of matrix, for example:
+//  - he stands for hermitian
+//  - sy stands for symmetric
+//"xxx" specifies the type of problem, for example:
+//  - gv stands for generalized eigenvalue
+
 extern "C"
 {
     int ilaenv_(int* ispec,const char* name,const char* opts,
     const int* n1,const int* n2,const int* n3,const int* n4);
+    // solve the generalized eigenproblem Ax=eBx, where A is Hermitian and complex couble
+    // zhegv_ returns all eigenvalues while zhegvx_ returns selected ones
     void zhegv_(const int* itype,const char* jobz,const char* uplo,const int* n,
                 std::complex<double>* a,const int* lda,std::complex<double>* b,const int* ldb,
                 double* w,std::complex<double>* work,int* lwork,double* rwork,int* info);
-	// mohan add dsygv 2010-03-20, to compute the eigenfunctions and eigenvalues of a real symmetry matrix.
-	void dsygv_(const int* itype, const char* jobz,const char* uplo, const int* n,
-				double* a,const int* lda,double* b,const int* ldb,
-	 			double* w,double* work,int* lwork,int* info);
-    // Peize Lin add dsygvx 2020.11.11, to compute the selected eigenvalues of a generalized symmetric/Hermitian matrix.
-	void dsygvx_(const int* itype, const char* jobz, const char* range, const char* uplo,
-                const int* n, double* A, const int* lda, double* B, const int* ldb,
-                const double* vl, const double* vu, const int* il, const int* iu,
-                const double* abstol, int* m, double* w, double* Z, const int* ldz, 
-                double* work, int* lwork, int*iwork, int* ifail, int* info);
-	void dsyev_(const char* jobz,const char* uplo,const int* n,double *a,
-                const int* lda,double* w,double* work,const int* lwork, int* info);
-    void zheev_(const char* jobz,const char* uplo,const int* n,std::complex<double> *a,
-                const int* lda,double* w,std::complex<double >* work,const int* lwork,
-                double* rwork,int* info);
-    void dsytrf_(const char* uplo, const int* n, double * a, const int* lda,
-                 int *ipiv,double *work, int* lwork ,int *info);
-    void dsytri_(const char* uplo,const int* n,double *a, const int *lda,
-                 int *ipiv, double * work,int *info);
     void zhegvx_(const int* itype,const char* jobz,const char* range,const char* uplo,
                  const int* n,std::complex<double> *a,const int* lda,std::complex<double> *b,
                  const int* ldb,const double* vl,const double* vu,const int* il,
                  const int* iu,const double* abstol,const int* m,double* w,
                  std::complex<double> *z,const int *ldz,std::complex<double> *work,const int* lwork,
                  double* rwork,int* iwork,int* ifail,int* info);
+	// solve the generalized eigenproblem Ax=eBx, where A is Symmetric and real couble
+    // dsygv_ returns all eigenvalues while dsygvx_ returns selected ones
+	void dsygv_(const int* itype, const char* jobz,const char* uplo, const int* n,
+				double* a,const int* lda,double* b,const int* ldb,
+	 			double* w,double* work,int* lwork,int* info);
+	void dsygvx_(const int* itype, const char* jobz, const char* range, const char* uplo,
+                const int* n, double* A, const int* lda, double* B, const int* ldb,
+                const double* vl, const double* vu, const int* il, const int* iu,
+                const double* abstol, int* m, double* w, double* Z, const int* ldz, 
+                double* work, int* lwork, int*iwork, int* ifail, int* info);
+    // solve the eigenproblem Ax=ex, where A is Symmetric and real double
+	void dsyev_(const char* jobz,const char* uplo,const int* n,double *a,
+                const int* lda,double* w,double* work,const int* lwork, int* info);
+    // solve the eigenproblem Ax=ex, where A is Hermitian and complex couble
+    void zheev_(const char* jobz,const char* uplo,const int* n,std::complex<double> *a,
+                const int* lda,double* w,std::complex<double >* work,const int* lwork,
+                double* rwork,int* info);
+    // dsytrf_ computes the Bunch-Kaufman factorization of a double precision
+    // symmetric matrix, while dsytri takes its output to perform martrix inversion
+    void dsytrf_(const char* uplo, const int* n, double * a, const int* lda,
+                 int *ipiv,double *work, int* lwork ,int *info);
+    void dsytri_(const char* uplo,const int* n,double *a, const int *lda,
+                 int *ipiv, double * work,int *info);
     // Peize Lin add dsptrf and dsptri 2016-06-21, to compute inverse real symmetry indefinit matrix.
+    // dpotrf computes the Cholesky factorization of a real symmetric positive definite matrix
+    // while dpotri taks its output to perform matrix inversion
     void dpotrf_(const char* uplo,const int* n, double* A, const int* lda, int *info);
     void dpotri_(const char* uplo,const int* n, double* A, const int* lda, int *info);
 
+    // zgetrf computes the LU factorization of a general matrix
+    // while zgetri takes its output to perform matrix inversion
     void zgetrf_(const int* m, const int *n, const std::complex<double> *A, const int *lda, int *ipiv, const int* info);
     void zgetri_(const int* n, std::complex<double> *A, const int *lda, int *ipiv, std::complex<double> *work, int *lwork, const int *info);
+
+    // if trans=='N':	C = alpha * A * A.H + beta * C
+	// if trans=='C':	C = alpha * A.H * A + beta * C
 	void zherk_(const char *uplo, const char *trans, const int *n, const int *k, 
 		const double *alpha, const std::complex<double> *A, const int *lda, 
 		const double *beta, std::complex<double> *C, const int *ldc);
@@ -54,30 +77,37 @@ extern "C"
 	// computes all eigenvalues of a symmetric tridiagonal matrix
 	// using the Pal-Walker-Kahan variant of the QL or QR algorithm.
 	void dsterf_(int *n, double *d, double *e, int *info);
-
+    // computes the eigenvectors of a real symmetric tridiagonal
+    // matrix T corresponding to specified eigenvalues
 	void dstein_(int *n, double* d, double *e, int *m, double *w,
 		int* block, int* isplit, double* z, int *lda, double *work,
 		int* iwork, int* ifail, int *info);
+    // computes the eigenvectors of a complex symmetric tridiagonal
+    // matrix T corresponding to specified eigenvalues
  	void zstein_(int *n, double* d, double *e, int *m, double *w,
         int* block, int* isplit, std::complex<double>* z, int *lda, double *work,
         int* iwork, int* ifail, int *info);
 
-	// computes the Cholesky factorization of a real symmetric
+	// computes the Cholesky factorization of a symmetric
 	// positive definite matrix A.
 	void dpotf2_(char *uplo, int *n, double *a, int *lda, int *info);
 	void zpotf2_(char *uplo,int *n,std::complex<double> *a, int *lda, int *info);
 
+    // reduces a symmetric definite generalized eigenproblem to standard form
+    // using the factorization results obtained from spotrf
 	void dsygs2_(int *itype, char *uplo, int *n, double *a, int *lda, double *b, int *ldb, int *info);
 	void zhegs2_(int *itype, char *uplo, int *n, std::complex<double> *a, int *lda, std::complex<double> *b, int *ldb, int *info);
 
+    // copies a into b
 	void dlacpy_(char *uplo, int *m, int *n, double* a, int *lda, double *b, int *ldb);
 	void zlacpy_(char *uplo, int *m, int *n, std::complex<double>* a, int *lda, std::complex<double> *b, int *ldb);
 
+    // generates a real elementary reflector H of order n, such that
+    //   H * ( alpha ) = ( beta ),   H is unitary.
+    //       (   x   )   (   0  )
 	void dlarfg_(int *n, double *alpha, double *x, int *incx, double *tau);
 	void zlarfg_(int *n, std::complex<double> *alpha, std::complex<double> *x, int *incx, std::complex<double> *tau);
 
-	void dger_(int *m, int *n, double *alpha, double *x, int *incx, double *y, int *incy, double *a, int *lda);
-	void zgerc_(int *m, int *n, std::complex<double> *alpha,std::complex<double> *x, int *incx, std::complex<double> *y, int *incy,std::complex<double> *a, int *lda);
 }
 
 // Class LapackConnector provide the connector to fortran lapack routine.
@@ -167,6 +197,35 @@ public:
         delete[] bux;
     }
 
+    // wrap function of fortran lapack routine zheev.
+    static inline
+    void zhegvx( const int itype, const char jobz, const char range, const char uplo,
+                 const int n, const ModuleBase::ComplexMatrix& a, const int lda, const ModuleBase::ComplexMatrix& b,
+                 const int ldb, const double vl, const double vu, const int il, const int iu,
+                 const double abstol, const int m, double* w, ModuleBase::ComplexMatrix& z, const int ldz,
+                 std::complex<double>* work, const int lwork, double* rwork, int* iwork,
+                 int* ifail, int info)
+    {
+        // Transpose the std::complex matrix to the fortran-form real-std::complex array.
+        std::complex<double>* aux = LapackConnector::transpose(a, n, lda);
+        std::complex<double>* bux = LapackConnector::transpose(b, n, ldb);
+        std::complex<double>* zux = new std::complex<double>[n*iu];// mohan modify 2009-08-02
+        //for(int i=0; i<n*iu; i++) zux[i] = std::complex<double>(0.0,0.0);
+
+        // call the fortran routine
+        zhegvx_(&itype, &jobz, &range, &uplo, &n, aux, &lda, bux, &ldb, &vl,
+                &vu, &il,&iu, &abstol, &m, w, zux, &ldz, work, &lwork, rwork, iwork, ifail, &info);
+
+        // Transpose the fortran-form real-std::complex array to the std::complex matrix
+        LapackConnector::transpose(zux, z, iu, n);	 // mohan modify 2009-08-02
+
+        // free the memory.
+        delete[] aux;
+        delete[] bux;
+        delete[] zux;
+
+    }	
+
 	// calculate the eigenvalues and eigenfunctions of a real symmetric matrix.
     static inline
     void dsygv(	const int itype,const char jobz,const char uplo,const int n,ModuleBase::matrix& a,
@@ -201,13 +260,6 @@ public:
 
 	// wrap function of fortran lapack routine dsyev.
     static inline
-	void dsyev(const char jobz,const char uplo,const int n,double *a,
-			const int lda,double *w,double *work,const int lwork, int info)
-	{
-		const char uplo_changed = change_uplo(uplo);
-		dsyev_(&jobz, &uplo_changed, &n, a, &lda, w, work, &lwork, &info);
-	}
-    static inline
 	void dsyev( const char jobz, const char uplo, ModuleBase::matrix &a, double* w, int info )		// Peize Lin update 2017-10-17
 	{
 		assert(a.nr==a.nc);
@@ -221,6 +273,7 @@ public:
 		std::vector<double> work(std::max(1,lwork));
 		dsyev_(&jobz, &uplo_changed, &a.nr, a.c, &a.nr, w, ModuleBase::GlobalFunc::VECTOR_TO_PTR(work), &lwork, &info);		
 	}
+    
     // wrap function of fortran lapack routine zheev.
     static inline
     void zheev( const char jobz,
@@ -242,35 +295,6 @@ public:
         // free the memory.
         delete[] aux;
     }
-
-    // wrap function of fortran lapack routine zheev.
-    static inline
-    void zhegvx( const int itype, const char jobz, const char range, const char uplo,
-                 const int n, const ModuleBase::ComplexMatrix& a, const int lda, const ModuleBase::ComplexMatrix& b,
-                 const int ldb, const double vl, const double vu, const int il, const int iu,
-                 const double abstol, const int m, double* w, ModuleBase::ComplexMatrix& z, const int ldz,
-                 std::complex<double>* work, const int lwork, double* rwork, int* iwork,
-                 int* ifail, int info)
-    {
-        // Transpose the std::complex matrix to the fortran-form real-std::complex array.
-        std::complex<double>* aux = LapackConnector::transpose(a, n, lda);
-        std::complex<double>* bux = LapackConnector::transpose(b, n, ldb);
-        std::complex<double>* zux = new std::complex<double>[n*iu];// mohan modify 2009-08-02
-        //for(int i=0; i<n*iu; i++) zux[i] = std::complex<double>(0.0,0.0);
-
-        // call the fortran routine
-        zhegvx_(&itype, &jobz, &range, &uplo, &n, aux, &lda, bux, &ldb, &vl,
-                &vu, &il,&iu, &abstol, &m, w, zux, &ldz, work, &lwork, rwork, iwork, ifail, &info);
-
-        // Transpose the fortran-form real-std::complex array to the std::complex matrix
-        LapackConnector::transpose(zux, z, iu, n);	 // mohan modify 2009-08-02
-
-        // free the memory.
-        delete[] aux;
-        delete[] bux;
-        delete[] zux;
-
-    }	
 
     static inline
     void zgetrf(int m, int n, ModuleBase::ComplexMatrix &a, const int lda, int *ipiv, int *info)
