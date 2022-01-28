@@ -159,9 +159,9 @@ else()
     LAPACK::LAPACK
     ScaLAPACK::ScaLAPACK
   )
-  if(CMAKE_CXX_COMPILER_ID EQUAL GNU)
+  if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
     list(APPEND math_libs -lgfortran)
-  elseif(CMAKE_CXX_COMPILER_ID EQUAL Intel)
+  elseif(CMAKE_CXX_COMPILER_ID MATCHES Intel)
     list(APPEND math_libs -lifcore)
   else()
     message(WARNING "Cannot find the correct library for Fortran.")
