@@ -1,12 +1,12 @@
 remove_definitions(-D__MPI)
 AddTest(
   TARGET base_matrix3
-  LIBS ${ABACUS_LINK_LIBRARIES}
-  SOURCES matrix3_test.cpp ../matrix3.cpp ../matrix.cpp ../tool_quit.cpp ../global_variable.cpp ../global_file.cpp ../memory.cpp ../timer.cpp ../../src_parallel/parallel_global.cpp ../../src_parallel/parallel_reduce.cpp
+  LIBS ${math_libs}
+  SOURCES matrix3_test.cpp ../matrix3.cpp ../matrix.cpp ../tool_quit.cpp ../global_variable.cpp ../global_file.cpp ../memory.cpp ../timer.cpp
 )
 AddTest(
   TARGET base_blas_connector
-  LIBS ${ABACUS_LINK_LIBRARIES}
+  LIBS ${math_libs}
   SOURCES blas_connector_test.cpp
 )
 AddTest(

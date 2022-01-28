@@ -42,6 +42,7 @@ find_package(MPI REQUIRED)
 include_directories(${MPI_CXX_INCLUDE_PATH})
 target_link_libraries(${ABACUS_BIN_NAME} MPI::MPI_CXX)
 add_compile_definitions(__MPI)
+list(APPEND math_libs MPI::MPI_CXX)
 
 find_package(Threads REQUIRED)
 target_link_libraries(${ABACUS_BIN_NAME} Threads::Threads)
@@ -132,9 +133,7 @@ if(ENABLE_ASAN)
     -fsanitize=address
   )
   # `add_link_options` only affects executables added after.
-  target_link_libraries(${ABACUS_BIN_NAME}
-	-fsanitize=address
-  )
+  target_link_libraries(${ABACUS_BIN_NAME} -fsanitize=address)
 endif()
 
 if(DEFINED ENV{MKLROOT} AND NOT DEFINED MKLROOT)
@@ -142,38 +141,33 @@ if(DEFINED ENV{MKLROOT} AND NOT DEFINED MKLROOT)
 endif()
 if(MKLROOT)
   find_package(IntelMKL REQUIRED)
-  add_definitions(-D__MKL -DMKL_ILP64)
+  add_definitions(-D__MKL)
   include_directories(${MKL_INCLUDE_DIRS} ${MKL_INCLUDE_DIRS}/fftw)
 
   # Since libtorch will find its own MKL, the fftw part conflicts with the original one.
   # When enable deepks, mkl will be linked within ${TORCH_LIBRARIES}.
-  if(ENABLE_DEEPKS)
-    target_link_libraries(${ABACUS_BIN_NAME}
-      -lifcore
-      # IntelMKL::MKL
-    )
-  else()
-    target_link_libraries(${ABACUS_BIN_NAME}
-      -lifcore
-      IntelMKL::MKL
-    )
+  if(NOT ENABLE_DEEPKS)
+    list(APPEND math_libs IntelMKL::MKL)
   endif()
 else()
   find_package(FFTW3 REQUIRED)
   find_package(LAPACK REQUIRED)
   find_package(ScaLAPACK REQUIRED)
   include_directories(${FFTW3_INCLUDE_DIRS})
-  target_link_libraries(${ABACUS_BIN_NAME}
+  list(APPEND math_libs
     FFTW3::FFTW3
     LAPACK::LAPACK
     ScaLAPACK::ScaLAPACK
   )
-  if(CMAKE_COMPILER_IS_GNUCXX)
-  target_link_libraries(${ABACUS_BIN_NAME}
-    -lgfortran
-  )
+  if(CMAKE_CXX_COMPILER_ID EQUAL GNU)
+    target_link_libraries(${ABACUS_BIN_NAME} -lgfortran)
+  elseif(CMAKE_CXX_COMPILER_ID EQUAL Intel)
+    target_link_libraries(${ABACUS_BIN_NAME} -lifcore)
+  else()
+    message(WARNING "Cannot find the correct library for Fortran.")
   endif()
 endif()
+target_link_libraries(${ABACUS_BIN_NAME} math_libs)
 
 if(ENABLE_DEEPKS)
   set(CMAKE_CXX_STANDARD 14)
@@ -245,12 +239,8 @@ IF (BUILD_TESTING)
   # https://cmake.org/cmake/help/latest/module/GoogleTest.html
   add_subdirectory(tests) # Contains integration tests
 
-  # ${ABACUS_LINK_LIBRARIES} contains blas, lapack, MPI, OpenMP, etc.
-  get_target_property(ABACUS_LINK_LIBRARIES ${ABACUS_BIN_NAME} LINK_LIBRARIES)
   function(AddTest) # function for UT
     cmake_parse_arguments(UT "DYN" "TARGET" "LIBS;DYN_LIBS;STATIC_LIBS;SOURCES;DEPENDS" ${ARGN})
-    # Remove redundant symbols to avoid linking every library used.
-    # See https://gcc.gnu.org/onlinedocs/gnat_ugn/Compilation-options.html .
     add_executable(${UT_TARGET} ${UT_SOURCES})
     #dependencies & link library
     target_link_libraries(${UT_TARGET} ${UT_LIBS}
