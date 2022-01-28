@@ -154,17 +154,18 @@ double Center2_Orb::Orb11::cal_overlap(
 
 ModuleBase::Vector3<double> Center2_Orb::Orb11::cal_grad_overlap(    //caoyu add 2021-11-19
 	const ModuleBase::Vector3<double> &RA, const ModuleBase::Vector3<double> &RB,
-    const int& mA, const int& mB) const
+	const int& mA, const int& mB) const
 {
-    const double tiny1 = 1e-12;		// why 1e-12?
-	const double tiny2 = 1e-10;		// why 1e-10?
+	const double tiny1 = 1e-12;		// same as `cal_overlap`
+	const double tiny2 = 1e-10;		//same as `cal_overlap`
 
 	const ModuleBase::Vector3<double> delta_R = RB-RA;
 	const double distance_true = delta_R.norm();
 	const double distance = (distance_true>=tiny1) ? distance_true : distance_true+tiny1;
 	const double RcutA = nA.getRcut();
 	const double RcutB = nB.getRcut();
-	if( distance > (RcutA + RcutB) ) return 0.0;
+	if( distance > (RcutA + RcutB) ) 
+		return ModuleBase::Vector3<double>(0.0, 0.0, 0.0);
 
 	const int LA = nA.getL();
 	const int LB = nB.getL();

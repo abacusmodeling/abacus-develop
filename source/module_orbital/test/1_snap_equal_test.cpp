@@ -83,4 +83,5 @@ int main(int argc, char** argv)
 #ifdef __MPI
     MPI_Finalize();
 #endif
+	return result;
 }
