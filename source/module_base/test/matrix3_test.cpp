@@ -10,20 +10,20 @@
 
 /**
  * - Tested Functions:
- *   - construct
+ *   - Construct
  *     - two ways of constructing a 3x3 matrix
- *   - identity
+ *   - Identity
  *     - set a 3x3 matrix to identity matrix
- *   - zero
+ *   - Zero
  *     - set all elements of a 3x3 matrix to zero
- *   - det
+ *   - Det
  *     - calculate the determinant of 3x3 matrix
- *   - transpose
+ *   - Transpose
  *     - do the transpose of 3x3 matrix
- *   - inverse
+ *   - Inverse
  *     - do the inverse of 3x3 matrix
- *   - equal
- *     - reloaded operator "=" for 3x3 matrix
+ *   - Assignment
+ *     - reloaded Assignment operator "=" for 3x3 matrix
  *   - AddEqual
  *     - reloaded operator "+=" for 3x3 matrix
  *   - MinusEqual
@@ -32,7 +32,7 @@
  *     - reloaded operator "*=" for (3x3 matrix) * number
  *   - OverEqual
  *     - reloaded operator "/=" for (3x3 matrix) / number
- *   - print
+ *   - Print
  *     - print a 3x3 matrix
  *   - MaddM
  *     - reloaded operator "+"  for two 3x3 matrix
@@ -77,7 +77,7 @@ protected:
 	std::string output;
 };
 
-TEST_F(Matrix3Test, construct)
+TEST_F(Matrix3Test, Construct)
 {
 	// method 1
 	ModuleBase::Matrix3 ma;
@@ -91,7 +91,7 @@ TEST_F(Matrix3Test, construct)
 	EXPECT_EQ(mb.e31,7); EXPECT_EQ(mb.e32,8); EXPECT_EQ(mb.e33,9);
 }
 
-TEST_F(Matrix3Test, idenity)
+TEST_F(Matrix3Test, Idenity)
 {
 	ModuleBase::Matrix3 mb(1,2,3,4,5,6,7,8,9);
 	mb.Identity();
@@ -100,7 +100,7 @@ TEST_F(Matrix3Test, idenity)
 	EXPECT_EQ(mb.e31,0); EXPECT_EQ(mb.e32,0); EXPECT_EQ(mb.e33,1);
 }
 
-TEST_F(Matrix3Test, zero)
+TEST_F(Matrix3Test, Zero)
 {
 	ModuleBase::Matrix3 ma;
 	ma.Zero();
@@ -109,7 +109,7 @@ TEST_F(Matrix3Test, zero)
 	EXPECT_EQ(ma.e31,0); EXPECT_EQ(ma.e32,0); EXPECT_EQ(ma.e33,0);
 }
 
-TEST_F(Matrix3Test, det)
+TEST_F(Matrix3Test, Det)
 {
 	ModuleBase::Matrix3 ma;
 	ma = get_random_matrix3();
@@ -122,7 +122,7 @@ TEST_F(Matrix3Test, det)
 	EXPECT_DOUBLE_EQ(ma.Det(),determinant);
 }
 
-TEST_F(Matrix3Test, transpose)
+TEST_F(Matrix3Test, Transpose)
 {
 	ModuleBase::Matrix3 ma, mb;
 	ma = get_random_matrix3();
@@ -132,7 +132,7 @@ TEST_F(Matrix3Test, transpose)
 	EXPECT_EQ(ma.e31,mb.e13); EXPECT_EQ(ma.e32,mb.e23); EXPECT_EQ(ma.e33,mb.e33);
 }
 
-TEST_F(Matrix3Test, inverse)
+TEST_F(Matrix3Test, Inverse)
 {
 	ModuleBase::Matrix3 ma, mb;
 	ma = get_random_matrix3();
@@ -148,7 +148,7 @@ TEST_F(Matrix3Test, inverse)
 	EXPECT_NEAR( (ma.e31*mb.e13 + ma.e32*mb.e23 + ma.e33*mb.e33), 1.0, 1e-15);
 }
 
-TEST_F(Matrix3Test, equal)
+TEST_F(Matrix3Test, Assignment)
 {
 	ModuleBase::Matrix3 ma, mb;
 	ma = get_random_matrix3();
@@ -200,7 +200,7 @@ TEST_F(Matrix3Test, OverEqual)
 	EXPECT_EQ(ma.e31/3.0,mb.e31); EXPECT_EQ(ma.e32/3.0,mb.e32); EXPECT_EQ(ma.e33/3.0,mb.e33);
 }
 
-TEST_F(Matrix3Test, print)
+TEST_F(Matrix3Test, Print)
 {
 	ModuleBase::Matrix3 ma;
 	ma = get_random_matrix3();
@@ -294,9 +294,9 @@ TEST_F(Matrix3Test, MmultiplyV)
 	ModuleBase::Vector3<double> v;
 	ma = get_random_matrix3();
 	v = ma * u;
-	EXPECT_THAT(v.x, u.x*ma.e11+u.y*ma.e12+u.z*ma.e13);
-	EXPECT_THAT(v.y, u.x*ma.e21+u.y*ma.e22+u.z*ma.e23);
-	EXPECT_THAT(v.z, u.x*ma.e31+u.y*ma.e32+u.z*ma.e33);
+	EXPECT_EQ(v.x, u.x*ma.e11+u.y*ma.e12+u.z*ma.e13);
+	EXPECT_EQ(v.y, u.x*ma.e21+u.y*ma.e22+u.z*ma.e23);
+	EXPECT_EQ(v.z, u.x*ma.e31+u.y*ma.e32+u.z*ma.e33);
 }
 
 TEST_F(Matrix3Test, VmultiplyM)
@@ -306,9 +306,9 @@ TEST_F(Matrix3Test, VmultiplyM)
 	ModuleBase::Vector3<double> v;
 	ma = get_random_matrix3();
 	v = u*ma;
-	EXPECT_THAT(v.x, u.x*ma.e11+u.y*ma.e21+u.z*ma.e31);
-	EXPECT_THAT(v.y, u.x*ma.e12+u.y*ma.e22+u.z*ma.e32);
-	EXPECT_THAT(v.z, u.x*ma.e13+u.y*ma.e23+u.z*ma.e33);
+	EXPECT_EQ(v.x, u.x*ma.e11+u.y*ma.e21+u.z*ma.e31);
+	EXPECT_EQ(v.y, u.x*ma.e12+u.y*ma.e22+u.z*ma.e32);
+	EXPECT_EQ(v.z, u.x*ma.e13+u.y*ma.e23+u.z*ma.e33);
 }
 
 TEST_F(Matrix3Test, MeqM)
