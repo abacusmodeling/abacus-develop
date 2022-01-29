@@ -21,3 +21,7 @@ AddTest(
   TARGET tool_quit
   SOURCES tool_quit_test.cpp ../tool_quit.cpp ../global_variable.cpp ../global_file.cpp ../memory.cpp ../timer.cpp
 )
+AddTest(
+  TARGET memory
+  SOURCES memory_test.cpp ../memory.cpp
+)
