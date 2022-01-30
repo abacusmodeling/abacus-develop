@@ -23,38 +23,38 @@
  *   - Inverse
  *     - do the inverse of 3x3 matrix
  *   - Assignment
- *     - reloaded Assignment operator "=" for 3x3 matrix
+ *     - overload assignment operator "=" for 3x3 matrix
  *   - AddEqual
- *     - reloaded operator "+=" for 3x3 matrix
+ *     - overload operator "+=" for 3x3 matrix
  *   - MinusEqual
- *     - reloaded operator "-=" for 3x3 matrix
+ *     - overload operator "-=" for 3x3 matrix
  *   - MultiplyEqual
- *     - reloaded operator "*=" for (3x3 matrix) * number
+ *     - overload operator "*=" for (3x3 matrix) * scalar
  *   - OverEqual
- *     - reloaded operator "/=" for (3x3 matrix) / number
+ *     - overload operator "/=" for (3x3 matrix) / scaler
  *   - Print
  *     - print a 3x3 matrix
  *   - MaddM
- *     - reloaded operator "+"  for two 3x3 matrix
+ *     - overload operator "+"  for two 3x3 matrices
  *   - MminusM
- *     - reloaded operator "-"  for two 3x3 matrix
+ *     - overload operator "-"  for two 3x3 matrices
  *   - MoverNum
- *     - reloaded operator "/"  for a (3x3 matrix)/(scalar)
+ *     - overload operator "/"  for a (3x3 matrix)/(scalar)
  *   - MmultiplyM
- *     - reloaded operator "*"  for (3x3 matrix)*(3x3 matrix)
+ *     - overload operator "*"  for (3x3 matrix)*(3x3 matrix)
  *   - MmultiplyNum
- *     - reloaded operator "*"  for (3x3 matrix)*(scalar)
- *     - as well as (scalar)*(3x3 matrix)
+ *     - overload operator "*"  for (3x3 matrix)*(scalar)
+ *     - and (scalar)*(3x3 matrix)
  *   - MmultiplyV
- *     - reloaded operator "*"  for (3x3 matrix)*(Vector3)
+ *     - overload operator "*"  for (3x3 matrix)*(Vector3)
  *   - VmultiplyM
- *     - reloaded operator "*"  for (Vector3)*(3x3 matrix)
+ *     - overload operator "*"  for (Vector3)*(3x3 matrix)
  *   - MeqM
- *     - reload operator "==" to assert
- *     - the equality between two 3x3 matrix
+ *     - overload operator "==" to assert
+ *     - the equality between two 3x3 matrices
  *   - MneM
- *     - reload operator "!=" to assert
- *     - the non-equality between two 3x3 matrix
+ *     - overload operator "!=" to assert
+ *     - the non-equality between two 3x3 matrices
  */
 
 using ::testing::DoubleLE;
@@ -316,8 +316,8 @@ TEST_F(Matrix3Test, MeqM)
 	matrix_a = get_random_matrix3();
 	matrix_a1 = matrix_a;
 	matrix_b = get_random_matrix3();
-	ASSERT_TRUE(matrix_a == matrix_a1);
-	ASSERT_FALSE(matrix_a == matrix_b);
+	EXPECT_TRUE(matrix_a == matrix_a1);
+	EXPECT_FALSE(matrix_a == matrix_b);
 }
 
 TEST_F(Matrix3Test, MneM)
@@ -325,6 +325,6 @@ TEST_F(Matrix3Test, MneM)
 	matrix_a = get_random_matrix3();
 	matrix_a1 = matrix_a;
 	matrix_b = get_random_matrix3();
-	ASSERT_FALSE(matrix_a != matrix_a1);
-	ASSERT_TRUE(matrix_a != matrix_b);
+	EXPECT_FALSE(matrix_a != matrix_a1);
+	EXPECT_TRUE(matrix_a != matrix_b);
 }
