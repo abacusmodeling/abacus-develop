@@ -57,8 +57,6 @@
  *     - the non-equality between two 3x3 matrices
  */
 
-using ::testing::DoubleLE;
-
 class Matrix3Test : public testing::Test
 {
 protected:
