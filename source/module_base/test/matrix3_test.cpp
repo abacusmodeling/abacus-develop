@@ -55,6 +55,9 @@
  *   - MneM
  *     - overload operator "!=" to assert
  *     - the non-equality between two 3x3 matrices
+ *   - ToMatrix
+ *     - change the form of a 3x3 matrix from that of class Matrix3
+ *     - to that of class matrix
  */
 
 class Matrix3Test : public testing::Test
@@ -325,4 +328,15 @@ TEST_F(Matrix3Test, MneM)
 	matrix_b = get_random_matrix3();
 	EXPECT_FALSE(matrix_a != matrix_a1);
 	EXPECT_TRUE(matrix_a != matrix_b);
+}
+
+TEST_F(Matrix3Test, ToMatrix)
+{
+	ModuleBase::Matrix3 ma;
+	ModuleBase::matrix mb;
+	ma = get_random_matrix3();
+	mb = ma.to_matrix();
+	EXPECT_EQ(ma.e11,mb(0,0)); EXPECT_EQ(ma.e12,mb(0,1)); EXPECT_EQ(ma.e13,mb(0,2));
+	EXPECT_EQ(ma.e21,mb(1,0)); EXPECT_EQ(ma.e22,mb(1,1)); EXPECT_EQ(ma.e23,mb(1,2));
+	EXPECT_EQ(ma.e31,mb(2,0)); EXPECT_EQ(ma.e32,mb(2,1)); EXPECT_EQ(ma.e33,mb(2,2));
 }
