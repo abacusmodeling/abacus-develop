@@ -12,11 +12,10 @@
 /**
  * - Tested Functions:
  *   - Tick
- *     - tick 1st time, set start_flag to falsue
+ *     - tick 1st time, set start_flag to false
  *     - tick 2nd time, calculate time duration
  *   - Start
  *     - start total time calculation
- *     -
  *   - PrintAll
  *     - print computational processes with time > 0.1 s 
  *   - Finish
@@ -51,7 +50,7 @@ TEST_F(TimerTest, Tick)
 	EXPECT_FALSE(ModuleBase::timer::timer_pool["wavefunc"]["evc"].start_flag);
 	// then we can have time elapsed in cpu_second
 	ModuleBase::timer::tick("wavefunc","evc");
-	EXPECT_TRUE(ModuleBase::timer::timer_pool["wavefunc"]["evc"].cpu_second>0.0);
+	EXPECT_GT(ModuleBase::timer::timer_pool["wavefunc"]["evc"].cpu_second,0.0);
 }
 
 TEST_F(TimerTest, Start)
@@ -66,7 +65,7 @@ TEST_F(TimerTest, PrintAll)
 	ModuleBase::timer::tick("wavefunc","evc");
 	EXPECT_FALSE(ModuleBase::timer::timer_pool["wavefunc"]["evc"].start_flag);
 	ModuleBase::timer::tick("wavefunc","evc");
-	EXPECT_TRUE(ModuleBase::timer::timer_pool["wavefunc"]["evc"].cpu_second>0.0);
+	EXPECT_GT(ModuleBase::timer::timer_pool["wavefunc"]["evc"].cpu_second,0.0);
 	// call print_all
 	ofs.open("tmp");
 	testing::internal::CaptureStdout();
