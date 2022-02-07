@@ -166,7 +166,7 @@ void matrix::create( const int nrow, const int ncol, const bool flag_zero )
 matrix operator+(const matrix &m1, const matrix &m2)
 {
 	assert(m1.nr == m2.nr);
-	assert(m2.nc == m2.nc);
+	assert(m1.nc == m2.nc);
 
 	matrix tm(m1);
 	const int size = m1.nr*m1.nc;
@@ -179,7 +179,7 @@ matrix operator+(const matrix &m1, const matrix &m2)
 matrix operator-(const matrix &m1, const matrix &m2)
 {
 	assert(m1.nr == m2.nr);
-	assert(m2.nc == m2.nc);
+	assert(m1.nc == m2.nc);
 
 	matrix tm(m1);
 	const int size = m1.nr*m1.nc;
@@ -346,6 +346,9 @@ void matrix::reshape( const double nr_new, const double nc_new )
 
 double trace_on(const matrix &A, const matrix &B)
 {
+	assert(A.nr == B.nc);
+	assert(A.nc == B.nr);
+
     double tr = 0.0;
     for (int i = 0; i < A.nr; ++i)
         for (int k = 0; k < A.nc; ++k)

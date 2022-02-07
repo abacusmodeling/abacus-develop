@@ -600,25 +600,3 @@ void pbec_spin(double rho, double zeta, double grho, const int &iflag, double &s
     v2c = ddh0;
     return;
 } // end subroutine pbec_spin
-
-double min3(double x1, double x2, double x3)
-{
-    double x;
-
-    if (x1 < x2)
-    {
-        if (x1 < x3)
-            x = x1;
-        else
-            x = x3;
-    }
-    else
-    {
-        if (x2 < x3)
-            x = x2;
-        else
-            x = x3;
-    }
-
-    return x;
-}

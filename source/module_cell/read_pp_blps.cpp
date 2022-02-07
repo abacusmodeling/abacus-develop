@@ -64,7 +64,7 @@ int Pseudopot_upf::read_pseudo_blps(std::ifstream &ifs)
     delete[] vloc;
     this->r = new double[mesh]; // Bohr
     this->rab = new double[mesh];
-    this->vloc = new double[mesh]; // Hatree
+    this->vloc = new double[mesh]; // Hartree
     ModuleBase::GlobalFunc::ZEROS(r,mesh);
     ModuleBase::GlobalFunc::ZEROS(rab,mesh);
     ModuleBase::GlobalFunc::ZEROS(vloc,mesh);
@@ -72,7 +72,7 @@ int Pseudopot_upf::read_pseudo_blps(std::ifstream &ifs)
     for(int i = 0;i < mesh; ++i)
     {
         ifs >> num >> this->r[i] >> this->vloc[i];
-        this->vloc[i] = this->vloc[i]*2;
+        this->vloc[i] = this->vloc[i]*2; // Hartree to Ry
     }
     rab[0] = r[1] - r[0];
     for(int i = 1; i < mesh - 1; ++i)

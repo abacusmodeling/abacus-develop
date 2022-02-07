@@ -20,25 +20,6 @@ class Diago_CG
         const std::complex<double>* psi_R,
         const bool reduce = true) ;
 
-    static std::complex<double> ddot(
-        const int & dim,
-        const std::complex<double>* psi_L,
-        const std::complex<double>* psi_R ) ;
-
-
-    static std::complex<double> ddot(
-        const int & dim,
-        const ModuleBase::ComplexMatrix &psi,
-        const int & m,
-        std::complex<double> *psik ) ;
-
-    static std::complex<double> ddot(
-        const int & dim,
-        const ModuleBase::ComplexMatrix &psi_L,
-        const int & m,
-        const ModuleBase::ComplexMatrix &psi_R,
-        const int & n) ;
-
     void diag(
         ModuleBase::ComplexMatrix &phi,
         double *e,
