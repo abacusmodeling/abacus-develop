@@ -12,7 +12,7 @@
 namespace ModuleBase
 {
 
-// 1024 bit  = 1 Byte
+//    8 bit  = 1 Byte
 // 1024 Byte = 1 KB
 // 1024 KB   = 1 MB
 // 1024 MB   = 1 GB
@@ -49,12 +49,12 @@ private:
 	static int n_now;
 	static bool init_flag;
 
-	static double complex_matrix_memory;//(16 Byte)
-	static double double_memory;//(8 Byte)
-	static double int_memory;//(4 Byte)
-	static double bool_memory;
-	static double short_memory;//(2 Byte)
-	static double float_memory;//(4 Byte)
+	static int complex_matrix_memory;//(16 Byte)
+	static int double_memory;//(8 Byte)
+	static int int_memory;//(4 Byte)
+	static int bool_memory;
+	static int short_memory;//(2 Byte)
+	static int float_memory;//(4 Byte)
 };
 
 }
