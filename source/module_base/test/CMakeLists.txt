@@ -27,5 +27,5 @@ AddTest(
 )
 AddTest(
   TARGET base_integral
-  SOURCES math_integral_test.cpp
+  SOURCES math_integral_test.cpp ../math_integral.cpp
 )
