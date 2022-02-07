@@ -48,6 +48,7 @@ TEST_F(TimerTest, Tick)
 	ModuleBase::timer::tick("wavefunc","evc");
 	// after 1st call of tick, start_flag becomes false
 	EXPECT_FALSE(ModuleBase::timer::timer_pool["wavefunc"]["evc"].start_flag);
+	for (int i=0;i<100;i++) EXPECT_EQ(i,i);
 	// then we can have time elapsed in cpu_second
 	ModuleBase::timer::tick("wavefunc","evc");
 	EXPECT_GT(ModuleBase::timer::timer_pool["wavefunc"]["evc"].cpu_second,0.0);
@@ -64,6 +65,7 @@ TEST_F(TimerTest, PrintAll)
 {
 	ModuleBase::timer::tick("wavefunc","evc");
 	EXPECT_FALSE(ModuleBase::timer::timer_pool["wavefunc"]["evc"].start_flag);
+	for (int i=0;i<100;i++)	EXPECT_EQ(i,i);
 	ModuleBase::timer::tick("wavefunc","evc");
 	EXPECT_GT(ModuleBase::timer::timer_pool["wavefunc"]["evc"].cpu_second,0.0);
 	// call print_all
