@@ -100,19 +100,3 @@ TEST_F(NVE_test, second_half)
     EXPECT_DOUBLE_EQ(verlet->vel[3].y, 7.7689155499504408e-05);
     EXPECT_DOUBLE_EQ(verlet->vel[3].z, -2.83313122596e-05);
 }
-
-int main(int argc, char **argv) 
-{
-#ifdef __MPI
-    MPI_Init(&argc,&argv);
-#endif
-
-    testing::InitGoogleTest(&argc, argv);
-    int result = RUN_ALL_TESTS();
-
-#ifdef __MPI
-    MPI_Finalize();
-#endif
-
-    return result;
-}

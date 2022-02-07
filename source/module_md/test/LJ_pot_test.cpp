@@ -69,19 +69,3 @@ TEST_F(LJ_pot_test, stress)
     EXPECT_DOUBLE_EQ(stress(2,1), -1.1858461261560206e-22);
     EXPECT_DOUBLE_EQ(stress(2,2), 6.4275429572682057e-07);
 }
-
-int main(int argc, char **argv) 
-{
-#ifdef __MPI
-    MPI_Init(&argc,&argv);
-#endif
-
-    testing::InitGoogleTest(&argc, argv);
-    int result = RUN_ALL_TESTS();
-
-#ifdef __MPI
-    MPI_Finalize();
-#endif
-
-    return result;
-}

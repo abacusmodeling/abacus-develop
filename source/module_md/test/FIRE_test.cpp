@@ -99,19 +99,3 @@ TEST_F(FIRE_test, second_half)
     EXPECT_DOUBLE_EQ(verlet->vel[3].y, 5.2868256066506055e-05);
     EXPECT_DOUBLE_EQ(verlet->vel[3].z, -2.5498181033639999e-05);
 }
-
-int main(int argc, char **argv) 
-{
-#ifdef __MPI
-    MPI_Init(&argc,&argv);
-#endif
-
-    testing::InitGoogleTest(&argc, argv);
-    int result = RUN_ALL_TESTS();
-
-#ifdef __MPI
-    MPI_Finalize();
-#endif
-
-    return result;
-}

@@ -134,19 +134,3 @@ TEST_F(MD_func_test, kinetic_stress)
     EXPECT_DOUBLE_EQ(stress(2,1), -1.251414906590483e-06);
     EXPECT_DOUBLE_EQ(stress(2,2), 9.6330189688582584e-07);
 }
-
-int main(int argc, char **argv) 
-{
-#ifdef __MPI
-    MPI_Init(&argc,&argv);
-#endif
-
-    testing::InitGoogleTest(&argc, argv);
-    int result = RUN_ALL_TESTS();
-
-#ifdef __MPI
-    MPI_Finalize();
-#endif
-
-    return result;
-}

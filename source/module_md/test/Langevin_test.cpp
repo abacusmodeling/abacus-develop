@@ -112,19 +112,3 @@ TEST_F(Langevin_test, second_half)
     EXPECT_DOUBLE_EQ(verlet->vel[3].y, 0.00012385428611483992);
     EXPECT_DOUBLE_EQ(verlet->vel[3].z, 0.00013451165281051973);
 }
-
-int main(int argc, char **argv) 
-{
-#ifdef __MPI
-    MPI_Init(&argc,&argv);
-#endif
-
-    testing::InitGoogleTest(&argc, argv);
-    int result = RUN_ALL_TESTS();
-
-#ifdef __MPI
-    MPI_Finalize();
-#endif
-
-    return result;
-}

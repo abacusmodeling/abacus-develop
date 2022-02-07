@@ -106,7 +106,7 @@ public:
     static void parameters()
     {
         GlobalV::SEARCH_RADIUS = 8.5 * ModuleBase::ANGSTROM_AU;
-        ModuleBase::Global_File::open_log(GlobalV::ofs_running, "run.log");
+        //ModuleBase::Global_File::open_log(GlobalV::ofs_running, "run.log");
 
         INPUT.mdp.rstMD = 0;
         INPUT.mdp.dt = 1;
