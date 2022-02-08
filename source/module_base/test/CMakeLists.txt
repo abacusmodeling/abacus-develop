@@ -25,3 +25,7 @@ AddTest(
   TARGET base_complexarray
   SOURCES complexarray_test.cpp ../complexarray.cpp
 )
+AddTest(
+  TARGET base_integral
+  SOURCES math_integral_test.cpp ../math_integral.cpp
+)
