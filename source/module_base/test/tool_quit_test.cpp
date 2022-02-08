@@ -2,7 +2,9 @@
 #include "../global_variable.h"
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
+#ifdef __MPI
 #include "mpi.h"
+#endif
 
 /************************************************
  *  unit test of functions in tool_quit.h
