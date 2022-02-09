@@ -8,7 +8,7 @@
 #include "../module_base/timer.h"
 #include "../module_cell/unitcell_pseudo.h"
 #include "../src_pw/klist.h"
-#include "../src_pw/xc_type.h"
+#include "../module_xc/xc_type.h"
 
 class Print_Info
 {

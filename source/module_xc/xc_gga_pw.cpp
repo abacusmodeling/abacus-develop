@@ -1,5 +1,5 @@
 #include "xc_gga_pw.h"
-#include "global.h"
+#include "../src_pw/global.h"
 #include "xc_functional.h"
 
 // from gradcorr.f90

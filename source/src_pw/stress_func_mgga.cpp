@@ -1,7 +1,6 @@
 #include "./stress_func.h"
-#include "./xc_functional.h"
-#include "./myfunc.h"
-#include "./xc_gga_pw.h"
+#include "../module_xc/xc_functional.h"
+#include "../module_xc/xc_gga_pw.h"
 #include "../module_base/timer.h"
 
 //calculate the mGGA stress correction in PW and LCAO

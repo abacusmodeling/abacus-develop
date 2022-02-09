@@ -1,9 +1,9 @@
 #include "FORCE_STRESS.h"
 #include "../src_pw/global.h"
-#include "../src_pw/potential_libxc.h"
+#include "../module_xc/potential_libxc.h"
 #include "./dftu.h"  //Quxin add for DFT+U on 20201029
 // new
-#include "../src_pw/H_XC_pw.h"
+#include "../module_xc/H_XC_pw.h"
 #include "../src_pw/vdwd2.h"
 #include "../src_pw/vdwd3.h"
 #include "../module_base/timer.h"

@@ -4,9 +4,9 @@
 #include "vdwd3.h"				  
 #include "../module_symmetry/symmetry.h"
 // new
-#include "H_XC_pw.h"
+#include "../module_xc/H_XC_pw.h"
 #include "../module_base/math_integral.h"
-#include "potential_libxc.h"
+#include "../module_xc/potential_libxc.h"
 #include "../src_parallel/parallel_reduce.h"
 #include "../module_base/timer.h"
 

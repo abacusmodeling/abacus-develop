@@ -11,7 +11,7 @@
 #include "VNL_in_pw.h"
 #include "charge_broyden.h"
 #include "energy.h"
-#include "exx_global.h"
+#include "../module_xc/exx_global.h"
 #include "hamilt.h"
 #include "klist.h"
 #include "magnetism.h"
@@ -23,7 +23,7 @@
 #include "vdwd3.h"
 #include "vdwd3_parameters.h"
 #include "wavefunc.h"
-#include "xc_type.h"
+#include "../module_xc/xc_type.h"
 
 #ifdef __CUDA
 namespace CudaCheck

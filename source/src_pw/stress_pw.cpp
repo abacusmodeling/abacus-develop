@@ -1,5 +1,5 @@
 #include "./stress_pw.h"
-#include "./H_XC_pw.h"
+#include "../module_xc/H_XC_pw.h"
 #include "vdwd2.h"
 #include "vdwd3.h"
 #include "../module_base/timer.h"

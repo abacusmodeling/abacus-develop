@@ -1,5 +1,5 @@
 #include "./stress_func.h"
-#include "./H_XC_pw.h"
+#include "../module_xc/H_XC_pw.h"
 #include "../module_base/math_integral.h"
 #include "../module_base/timer.h"
 

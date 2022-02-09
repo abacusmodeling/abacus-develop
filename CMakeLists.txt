@@ -260,7 +260,6 @@ target_link_libraries(${ABACUS_BIN_NAME}
     cell
     symmetry
     md
-    symmetry
     neighbor
     orb
     io
@@ -272,6 +271,7 @@ target_link_libraries(${ABACUS_BIN_NAME}
     pw
     ri
     driver
+    xc
     -lm
 )
 

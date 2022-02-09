@@ -7,7 +7,7 @@
 #ifdef USE_LIBXC
 
 #include "potential_libxc.h"
-#include "global.h"
+#include "../src_pw/global.h"
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
 #include "module_base/timer.h"

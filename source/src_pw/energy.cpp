@@ -16,7 +16,7 @@
 //new
 #include "H_Ewald_pw.h"
 #include "H_Hartree_pw.h"
-#include "H_XC_pw.h"
+#include "../module_xc/H_XC_pw.h"
 #ifdef __DEEPKS
 #include "../src_lcao/../module_deepks/LCAO_deepks.h"
 #endif

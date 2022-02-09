@@ -3,14 +3,14 @@
 #include "../module_base/memory.h"
 #include "global.h"
 #include "potential.h"
-#include "xc_functional.h"
-#include "xc_gga_pw.h"
+#include "../module_xc/xc_functional.h"
+#include "../module_xc/xc_gga_pw.h"
 #include "efield.h"
 #include "math.h"
-#include "potential_libxc.h"
+#include "../module_xc/potential_libxc.h"
 // new
 #include "H_Hartree_pw.h"
-#include "H_XC_pw.h"
+#include "../module_xc/H_XC_pw.h"
 #ifdef __LCAO
 #include "../src_lcao/ELEC_evolve.h"
 #endif

@@ -701,7 +701,7 @@ void eximport::in_evc(std::ifstream &in)
 //===========
 #include "../src_pw/H_Ewald_pw.h"
 #include "../src_pw/H_Hartree_pw.h"
-#include "../src_pw/H_XC_pw.h"
+#include "../module_xc/H_XC_pw.h"
 void eximport::out_energy(std::ofstream &out_data)
 {
 	//std::cout << "\n ==> out_energy" << std::endl;
