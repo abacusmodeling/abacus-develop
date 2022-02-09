@@ -42,3 +42,5 @@ AddTest(
   SOURCES 1_snap_equal_test.cpp ORB_unittest.cpp
   ${depend_files}
 )
+install(DIRECTORY GaAs DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/../../../tests)
+install(DIRECTORY GaAs DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

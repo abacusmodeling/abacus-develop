@@ -70,6 +70,6 @@ public:
 
 	int lmax=1;
 	double lat0 = 1.0;
-	string case_dir = "../../../../source/module_orbital/test/GaAs/";
+	string case_dir = "./GaAs/";
 };
 #endif
