@@ -1,5 +1,9 @@
 remove_definitions(-D__MPI)
 AddTest(
+  TARGET base_timer
+  SOURCES timer_test.cpp ../timer.cpp
+)
+AddTest(
   TARGET base_tool_quit
   SOURCES tool_quit_test.cpp ../tool_quit.cpp ../global_variable.cpp ../global_file.cpp ../memory.cpp ../timer.cpp
 )
