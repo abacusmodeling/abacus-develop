@@ -571,7 +571,7 @@ void Forces::cal_force_cc(ModuleBase::matrix& forcecc)
 	}
 	else
 	{	
-    	const auto etxc_vtxc_v = Potential_Libxc::v_xc(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
+    	const auto etxc_vtxc_v = Potential_Libxc::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 		H_XC_pw::etxc = std::get<0>(etxc_vtxc_v);
 		H_XC_pw::vtxc = std::get<1>(etxc_vtxc_v);
 	    v = std::get<2>(etxc_vtxc_v);

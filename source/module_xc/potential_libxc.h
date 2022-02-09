@@ -27,6 +27,9 @@ class Potential_Libxc
 	//------------------------------------------------
 	// [etxc, vtxc, v] = v_xc(...)
 	static std::tuple<double,double,ModuleBase::matrix> v_xc(
+		const int &nrxx, // number of real-space grid
+		const int &ncxyz, // total number of charge grid
+		const double &omega, // volume of cell
 		const double * const * const rho_in,
 		const double * const rho_core_in);
 	
