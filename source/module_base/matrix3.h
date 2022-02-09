@@ -11,6 +11,10 @@
 namespace ModuleBase
 {
 
+/**
+ * @brief 3x3 matrix and related operations
+ *
+ */
 class Matrix3
 {
 
