@@ -60,7 +60,7 @@ void Run_lcao::lcao_line(void)
 	// I warn the user again for each type.
 	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		GlobalC::xcf.which_dft(GlobalC::ucell.atoms[it].dft);
+		GlobalC::xcf.which_dft(GlobalC::ucell.atoms[it].xc_func);
 	}
 
     //GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir , GlobalV::global_atom_card , GlobalV::ofs_running, GlobalV::NLOCAL, GlobalV::NBANDS);

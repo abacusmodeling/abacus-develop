@@ -20,87 +20,37 @@ const std::string gradc[10] = { "NOGC", "P86", "GGC", "BLYP", "PBC", "HCTH", "ME
 
 // from function.f90
 //-----------------------------------------------------------------------
-void xcfunc::which_dft(const std::string *dft)
+void xcfunc::which_dft(const std::string xc_func)
 {
 	//-----------------------------------------------------------------------
 	// translates a std::string containing the exchange-correlation name
 	// into internal indices iexch, icorr, igcx, igcc
 
-	const int nxc = 10; // number of exchange functional
-	const int ncc = 12; // number of correlation functional
-	const int ngcx = 14; // number of gradient correction for exchange functional
-	const int ngcc = 10; // number of gradient correction for correlation functional
-
-	//int l=0;
-	int i=0;
 	int notset = -1;
 
-	// (1) exchange
 	this->iexch = notset;
-
-	for (i = 0;i < nxc;i++) 
-	{
-		if (exc[i] == dft[0])
-		{
-			set_dft_value(iexch, i);
-		}
-	} 
-
-	// (2) correlation
 	this->icorr = notset;
-
-	for (i = 0;i < ncc;i++)
-	{
-		if (corr[i] == dft[1])
-		{	
-			set_dft_value(icorr, i);
-		}
-	} 
-
-	// (3) gradient correction, exchange
 	this->igcx = notset;
-	for (i = 0;i < ngcx;i++)
-	{
-		if (gradx[i] == dft[2])
-		{
-			set_dft_value(igcx, i);
-		}
-	}
-
-	// (4) gradient correction, correlation
 	this->igcc = notset;
-	for (i = 0;i < ngcc;i++)
-	{
-		if (gradc[i] == dft[3])
-		{
-			set_dft_value(igcc, i);
-		}
-	}
-	
+
 	//======================= Second Part ===============================
 	// special case : BLYP => B88 for gradient correction on exchange
 
-	static int itype = 0;
-	++itype;
-	std::stringstream ss;
-	ss << " ELEMENT " << itype << " FUNCTIONAL : "; 
-//	std::cout << ss.str() << dft[0] << " " << dft[1] << " " << dft[2] << " " << dft[3] << std::endl;
-	
-	if( match_one( dft, "PBE0"))
+	if( xc_func == "PBE0")
 	{
 		set_dft_value(iexch,6);
 		set_dft_value(icorr,4);
 		set_dft_value(igcx,8);
 		set_dft_value(igcc,4);
 	}	
-	if( match_one( dft, "LDA"))
+	if( xc_func == "LDA" || xc_func == "PZ")
 	{
 		set_dft_value(iexch,1);
 		set_dft_value(icorr,1);
 		set_dft_value(igcx,0);
 		set_dft_value(igcc,0);
 	}	
-	else if ( match_one(dft, "PBE") )
+	else if ( xc_func == "PBE" )
 	{
 		// special case : PBE
 		set_dft_value(iexch, 1);
@@ -108,7 +58,7 @@ void xcfunc::which_dft(const std::string *dft)
 		set_dft_value(igcx, 3);
 		set_dft_value(igcc, 4);
 	} 
-	else if( match_one( dft, "revPBE" ) )
+	else if( xc_func == "revPBE" )
 	{
 		// special case : revPBE
 		set_dft_value(iexch,1);
@@ -116,34 +66,36 @@ void xcfunc::which_dft(const std::string *dft)
 		set_dft_value(igcx, 4);
 		set_dft_value(igcc, 4);
 	}
-	else if ( match_one(dft, "PBEsol") )
+	else if ( xc_func == "PBEsol")
 	{
 		set_dft_value(iexch, 1);
 		set_dft_value(icorr, 4);
 		set_dft_value(igcx, 10);
 		set_dft_value(igcc, 8);
 	}
-	else if ( match_one(dft, "WC") )
+	else if ( xc_func == "WC")
 	{
 		set_dft_value(iexch, 1);
 		set_dft_value(icorr, 4);
 		set_dft_value(igcx, 11);
 		set_dft_value(igcc, 4);
 	}	
-	else if ( match_one( dft, "BLYP") )
+	else if ( xc_func == "BLYP")
 	{
 		set_dft_value(iexch, 1);
 		set_dft_value(icorr, 3);
 		set_dft_value(igcx, 1);
 		set_dft_value(igcc, 3);
 	}
-	else if ( match_one(dft, "BP") )
+	else if ( xc_func == "BP")
 	{
 		// special case : BP = B88 + P86
+		set_dft_value(iexch, 0);
+		set_dft_value(icorr, 0);
 		set_dft_value(igcx, 1);
 		set_dft_value(igcc, 1);
 	} 
-	else if ( match_one(dft, "PW91") )
+	else if ( xc_func == "PW91")
 	{
 		// special case : PW91 = GGX + GGC
 		set_dft_value(iexch, 1);
@@ -151,18 +103,15 @@ void xcfunc::which_dft(const std::string *dft)
 		set_dft_value(igcx, 2);
 		set_dft_value(igcc, 2);
 	} 
-	else if ( match_one(dft, "HCTH") )
+	else if ( xc_func == "HCTH")
 	{
 		// special case : HCTH already contains LDA exchange and correlation
 		set_dft_value(iexch, 0);
 		set_dft_value(icorr, 0);
+		set_dft_value(igcx, 5);
+		set_dft_value(igcc, 5);
 	}
-	else if ( match_one(dft, "OPTX") )
-	{
-		// special case : OPTX already contains LDA exchange
-		set_dft_value(iexch, 0);
-	}
-	else if (match_one(dft, "OLYP") )
+	else if ( xc_func == "OLYP")
 	{
 		// special case : OLYP = OPTX + LYP
 		set_dft_value(iexch, 0);
@@ -170,7 +119,7 @@ void xcfunc::which_dft(const std::string *dft)
 		set_dft_value(igcx, 6);
 		set_dft_value(igcc, 3);
 	}
-	else if ( match_one(dft, "SCAN") )
+	else if ( xc_func == "SCAN")
 	{
 		// special case : SCAN already contains LDA exchange and correlation
 		set_dft_value(iexch, 0);
@@ -206,18 +155,6 @@ void xcfunc::which_dft(const std::string *dft)
 		set_dft_value(igcc, 0);
 	}
 
-//	std::cout << "\n iexch = " << iexch; 
-//	std::cout << "\n icorr = " << icorr; 
-//	std::cout << "\n igcx = " << igcx; 
-//	std::cout << "\n igcc = " << igcc << std::endl; 
-
-	//std::cout << "\n corr = " << exc[icorr];
-	//std::cout << "  corr = " << corr[icorr];
-	//std::cout << "  gradx = " << gradx[igcx];
-	//std::cout << "  gradc = " << gradc[igcc] << std::endl;
-	//'-'//corr (icorr) //'-'//gradx (igcx) //'-'//gradc (igcc)
-	//      WRITE( stdout,'(a)') dftout
-	
 	copy_to_now();
 
 	hybrid_first();
@@ -232,7 +169,7 @@ void xcfunc::set_dft_value(int &m,const int i)
 
 	if (m != notset && m != i)
 	{
-		std::cerr << "\n set_dft_value, two conflicting matching values,";	// 1);
+		std::cerr << "\n set_dft_value, two conflicting matching values,";
 	}
 	m = i;
 	return;
@@ -249,7 +186,6 @@ void xcfunc::printdft(std::ofstream &ofs)
 	ofs	<< "\n  igcc = " << igcc
 	<< "  -> " << gradc[igcc];
 }
-
 
 void xcfunc::ostreamdft(std::ostream &ofs) // zws add 20150108
 {
@@ -268,16 +204,6 @@ void xcfunc::ostreamdft(std::ostream &ofs) // zws add 20150108
 		ofs	<<  " " << gradx[igcx] ;
 		ofs	<<  " " << gradc[igcc] ;
 	}	
-}
-
-
-bool xcfunc::match_one(const std::string* dft, const std::string &name)const
-{
-	for(int i=0; i<4; i++)
-	{
-		if(dft[i]==name) return 1; // match one of the four std::string.
-	}
-	return 0; // no one match
 }
 
 // Peize Lin add 2016-12-03

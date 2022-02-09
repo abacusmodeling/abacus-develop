@@ -120,7 +120,7 @@ class xcfunc
 	~xcfunc();
 
 	// there are four values of dft.
-	void which_dft(const std::string *dft);
+	void which_dft(const std::string xc_func);
 	void printdft(std::ofstream &ofs);
 	void ostreamdft(std::ostream &ofs);  // zws add 20150108
 private:

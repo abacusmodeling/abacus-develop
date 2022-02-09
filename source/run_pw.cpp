@@ -41,7 +41,7 @@ void Run_pw::plane_wave_line(void)
 	// I warn the user again for each type.
 	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		GlobalC::xcf.which_dft(GlobalC::ucell.atoms[it].dft);
+		GlobalC::xcf.which_dft(GlobalC::ucell.atoms[it].xc_func);
     }
 
     ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");

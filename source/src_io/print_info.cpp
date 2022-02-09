@@ -211,16 +211,6 @@ void Print_Info::setup_parameters(UnitCell_pseudo &ucell, K_Vectors &kv, xcfunc 
 
 			std::cout << std::setw(12) << ucell.atoms[it].na;
 
-//				if(ucell.atoms[it].dft[1]=="PZ")    // pengfei Li added 2015-1-31 cancelled by zws
-//				{
-//					//std::cout << std::setw(12) << "PZ-LDA";
-//
-//				}
-//				else
-//				{
-//					//std::cout << std::setw(12) << ucell.atoms[it].dft[0];
-//                                        std::cout << std::setw(12) << "PBE";
-//				}
 #ifndef __CMD
 			xcf.ostreamdft(std::cout); // zws add 20150108
 #endif
