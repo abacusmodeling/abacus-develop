@@ -12,12 +12,22 @@
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
 #include "../module_base/vector3.h"
+#include "../module_base/matrix.h"
 class XC_Functional
 {
 	public:
 
 	XC_Functional();
 	~XC_Functional();
+
+	// compute the exchange-correlation energy 
+	// [etxc, vtxc, v] = v_xc(...)
+    static std::tuple<double,double,ModuleBase::matrix> v_xc(
+		const int &nrxx, // number of real-space grid
+		const int &ncxyz, // total number of charge grid
+		const double &omega, // volume of cell
+		const double*const*const rho_in, 
+		const double*const rho_core); // core charge density
 
 	// LDA
 	static void xc(const double &rho, double &ex, double &ec, double &vx, double &vc);

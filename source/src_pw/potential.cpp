@@ -10,7 +10,6 @@
 #include "../module_xc/potential_libxc.h"
 // new
 #include "H_Hartree_pw.h"
-#include "../module_xc/H_XC_pw.h"
 #ifdef __LCAO
 #include "../src_lcao/ELEC_evolve.h"
 #endif
@@ -331,23 +330,23 @@ ModuleBase::matrix Potential::v_of_rho(
 	if(GlobalV::DFT_META)
 	{
     	const std::tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> etxc_vtxc_v = Potential_Libxc::v_xc_meta(rho_in, GlobalC::CHR.rho_core, GlobalC::CHR.kin_r);
-		H_XC_pw::etxc = std::get<0>(etxc_vtxc_v);
-		H_XC_pw::vtxc = std::get<1>(etxc_vtxc_v);
+		GlobalC::en.etxc = std::get<0>(etxc_vtxc_v);
+		GlobalC::en.vtxc = std::get<1>(etxc_vtxc_v);
 		v            += std::get<2>(etxc_vtxc_v);
 		vofk		  = std::get<3>(etxc_vtxc_v);	
 	}
 	else
 	{	
     	const std::tuple<double,double,ModuleBase::matrix> etxc_vtxc_v = Potential_Libxc::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, rho_in, GlobalC::CHR.rho_core);
-		H_XC_pw::etxc = std::get<0>(etxc_vtxc_v);
-		H_XC_pw::vtxc = std::get<1>(etxc_vtxc_v);
+		GlobalC::en.etxc = std::get<0>(etxc_vtxc_v);
+		GlobalC::en.vtxc = std::get<1>(etxc_vtxc_v);
 		v            += std::get<2>(etxc_vtxc_v);
 	}
 	#else
-	const std::tuple<double,double,ModuleBase::matrix> etxc_vtxc_v = H_XC_pw::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, rho_in, GlobalC::CHR.rho_core);
+	const std::tuple<double,double,ModuleBase::matrix> etxc_vtxc_v = XC_Functional::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, rho_in, GlobalC::CHR.rho_core);
 	
-	H_XC_pw::etxc = std::get<0>(etxc_vtxc_v);
-	H_XC_pw::vtxc = std::get<1>(etxc_vtxc_v);
+	GlobalC::en.etxc = std::get<0>(etxc_vtxc_v);
+	GlobalC::en.vtxc = std::get<1>(etxc_vtxc_v);
 	v            += std::get<2>(etxc_vtxc_v);
 	#endif
 

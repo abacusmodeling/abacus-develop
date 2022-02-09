@@ -16,7 +16,6 @@
 //new
 #include "H_Ewald_pw.h"
 #include "H_Hartree_pw.h"
-#include "../module_xc/H_XC_pw.h"
 #ifdef __DEEPKS
 #include "../src_lcao/../module_deepks/LCAO_deepks.h"
 #endif
@@ -55,7 +54,7 @@ void energy::calculate_harris(const int &flag)
 	else if(flag==2)
 	{
 		this->etot_harris = eband + deband_harris 
-		+ (H_XC_pw::etxc - etxcc) 
+		+ (etxc - etxcc) 
 		+ H_Ewald_pw::ewald_energy 
 		+ H_Hartree_pw::hartree_energy 
 		+ demet
@@ -93,7 +92,7 @@ void energy::calculate_etot(void)
 	ModuleBase::TITLE("energy","calculate_etot");
 	//std::cout << "\n demet in etot = " << demet << std::endl;
 	this->etot = eband + deband 
-	+ (H_XC_pw::etxc - etxcc) 
+	+ (etxc - etxcc) 
 	+ H_Ewald_pw::ewald_energy 
 	+ H_Hartree_pw::hartree_energy 
 	+ demet
@@ -171,7 +170,7 @@ void energy::print_etot(
 			this->print_format("E_band", eband);
 			this->print_format("E_one_elec", eband + deband);
 			this->print_format("E_Hartree", H_Hartree_pw::hartree_energy);
-			this->print_format("E_xc", H_XC_pw::etxc - etxcc);
+			this->print_format("E_xc", etxc - etxcc);
 			this->print_format("E_Ewald", H_Ewald_pw::ewald_energy);
 			this->print_format("E_demet", demet); //mohan add 2011-12-02
 			this->print_format("E_descf", descf);
