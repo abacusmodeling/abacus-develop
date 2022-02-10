@@ -174,7 +174,7 @@ Matrix3 operator+(const Matrix3 &m1, const Matrix3 &m2);
 Matrix3 operator-(const Matrix3 &m1, const Matrix3 &m2);
 
 /**
- * @brief Overload operator "/" for a (3x3 matrix)/(scalar)
+ * @brief Overload operator "/" for a (Matrix3)/(scalar)
  * i.e. m/s
  *
  * @param m The 3x3 matrix
@@ -194,7 +194,7 @@ Matrix3 operator/(const Matrix3 &m, const double &s);
 Matrix3 operator*(const Matrix3 &m1, const Matrix3 &m2);
 
 /**
- * @brief Overload operator "*" for (3x3 matrix)*(scalar)
+ * @brief Overload operator "*" for (Matrix3)*(scalar)
  * i.e. m*s
  *
  * @param m The 3x3 matrix
@@ -204,7 +204,7 @@ Matrix3 operator*(const Matrix3 &m1, const Matrix3 &m2);
 Matrix3 operator*(const Matrix3 &m, const double &s);
 
 /**
- * @brief Overload operator "*" for (scalar)*(3x3 matrix)
+ * @brief Overload operator "*" for (scalar)*(Matrix3)
  * i.e. s*m
  *
  * @param s The scalar
@@ -214,7 +214,7 @@ Matrix3 operator*(const Matrix3 &m, const double &s);
 Matrix3 operator*(const double &s, const Matrix3 &m);
 
 /**
- * @brief Over load operator "*" for (3x3 matrix)*(Vector3)
+ * @brief Overload operator "*" for (Matrix3)*(Vector3)
  *
  * @tparam T
  * @param m The 3x3 matrix
@@ -225,7 +225,7 @@ Matrix3 operator*(const double &s, const Matrix3 &m);
 template <typename T> ModuleBase::Vector3<double> operator*(const Matrix3 &m, const ModuleBase::Vector3<T> &u);
 
 /**
- * @brief Over load operator "*" for (Vector3)*(3x3 matrix)
+ * @brief Overload operator "*" for (Vector3)*(Matrix3)
  *
  * @tparam T
  * @param u The vector with 3 elements
