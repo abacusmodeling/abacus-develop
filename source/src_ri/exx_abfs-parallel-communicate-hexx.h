@@ -152,8 +152,10 @@ public:
 	enum class Mixing_Mode{ No, Plain, Pulay };
 	Mixing_Mode mixing_mode;
 	double mixing_beta;
-	
+
+#ifdef __MPI	
 	Allreduce2 allreduce2;
+#endif
 };
 
 #endif

@@ -32,7 +32,7 @@ inline int localIndex(int globalIndex, int nblk, int nprocs, int& myproc)
     return int(globalIndex/(nblk*nprocs))*nblk+globalIndex%nblk;
 }
 
-
+#ifdef __MPI
 int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt, int nblk)
 {
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"enter setAlltoallvParameter, nblk", nblk);
@@ -207,7 +207,7 @@ int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt
     ModuleBase::timer::tick("LCAO_Charge","newDM_index");
     return 0;
 }
-
+#endif
 
 // allocate density kernel may change once the ion
 // positions change
@@ -268,7 +268,9 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
         ModuleBase::WARNING_QUIT("Local_Orbital_Charge::allocate","lgd<0!Something Wrong!");
     }
     
+#ifdef __MPI
     setAlltoallvParameter(GlobalC::ParaO.comm_2D, GlobalC::ParaO.blacs_ctxt, GlobalC::ParaO.nb);
+#endif
 
 	// Peize Lin test 2019-01-16
     wfc_dm_2d.init();
@@ -382,8 +384,10 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
             ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"last sender_buffer",sender_buffer[sender_size-1]);
         }
         // transform data via MPI_Alltoallv
+        #ifdef __MPI
         MPI_Alltoallv(sender_buffer, sender_size_process, sender_displacement_process, MPI_DOUBLE,
                       receiver_buffer, receiver_size_process, receiver_displacement_process, MPI_DOUBLE, GlobalC::ParaO.comm_2D);
+        #endif
         // put data from receiver buffer to this->DM[is]
         nNONZERO=0;
         // init DM[is]

@@ -169,8 +169,9 @@ void Exx_Lip::init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in, PW_Basis *pw_ptr_i
 		{
 			gzero_judge = GlobalV::RANK_IN_POOL;
 		}
+	#ifdef __MPI
 		MPI_Allreduce(&gzero_judge, &gzero_rank_in_pool, 1, MPI_INT, MPI_MAX, POOL_WORLD);
-
+	#endif
 		k_pack->wf_wg.create(k_pack->kv_ptr->nks,GlobalV::NBANDS);
 
 		k_pack->hvec_array = new ModuleBase::ComplexMatrix [k_pack->kv_ptr->nks];
@@ -526,8 +527,9 @@ void Exx_Lip::sum_all(int ik)
 {
 	double sum2_factor_g(0.0);
 	if( Exx_Global::Hybrid_Type::HF==info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==info.hybrid_type )
+		#ifdef __MPI
 		MPI_Reduce( &sum2_factor, &sum2_factor_g, 1, MPI_DOUBLE, MPI_SUM, gzero_rank_in_pool, POOL_WORLD);
-
+		#endif
 	for( size_t iw_l=1; iw_l<GlobalV::NLOCAL; ++iw_l)
 		for( size_t iw_r=0; iw_r<iw_l; ++iw_r)
 			sum1[iw_l*GlobalV::NLOCAL+iw_r] = conj(sum1[iw_r*GlobalV::NLOCAL+iw_l]);		// Peize Lin add conj 2019-04-14
@@ -566,6 +568,7 @@ void Exx_Lip::exx_energy_cal()
 			}
 		}
 	}
+
 	MPI_Allreduce( &exx_energy_tmp, &exx_energy, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);				// !!! k_point parallel incompleted. different pools have different GlobalC::kv.nks => deadlock
 	exx_energy *= (GlobalV::NSPIN==1) ? 2 : 1;
 	exx_energy /= 2;										// ETOT = E_band - 1/2 E_exx
@@ -706,7 +709,9 @@ void Exx_Lip::read_q_pack()
 		}
 		ifs_wf_wg.close();
 	}
+	#ifdef __MPI
 	MPI_Bcast( q_pack->wf_wg.c, q_pack->kv_ptr->nks*GlobalV::NBANDS, MPI_DOUBLE, 0, POOL_WORLD);
+	#endif
 
 	q_pack->hvec_array = new ModuleBase::ComplexMatrix [q_pack->kv_ptr->nks];
 	for( int iq=0; iq<q_pack->kv_ptr->nks; ++iq)
@@ -732,10 +737,12 @@ void Exx_Lip::read_q_pack()
 		}
 		ifs_hvec.close();
 	}
+	#ifdef __MPI
 	for( int iq=0; iq<q_pack->kv_ptr->nks; ++iq)
 	{
 		MPI_Bcast( q_pack->hvec_array[iq].c, GlobalV::NLOCAL*GlobalV::NBANDS, mpicomplex, 0, POOL_WORLD);
 	}
+	#endif
 
 	return;
 }

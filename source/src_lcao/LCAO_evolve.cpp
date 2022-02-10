@@ -18,14 +18,14 @@ void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, std::complex<doubl
 
 	if (INPUT.tddft==1)
 	{
-/*
+///*
 #ifdef __MPI
-		this->using_ScaLAPACK_complex(ik, cc, cc_init);
-#else
-		this->using_LAPACK_complex(ik, cc, cc_init);
-#endif
-*/
 		this->using_ScaLAPACK_complex(ik, WFC_K, wfc_2d);
+#else
+		//this->using_LAPACK_complex(ik, WFC_K, wfc_2d);
+#endif
+//*/
+		//this->using_ScaLAPACK_complex(ik, WFC_K, wfc_2d);
 	}
 	else
 	{
@@ -275,6 +275,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, std::complex<double
 	return;
 }
 
+#ifdef __MPI
 int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, complex<double>** WFC_K, ModuleBase::ComplexMatrix &wfc_2d)const
 {
 	ModuleBase::TITLE("Evolve_LCAO_Matrix","using_ScaLAPACK_complex");
@@ -455,3 +456,4 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, complex<double>**
 	return 0;
 
 }
+#endif
