@@ -40,7 +40,7 @@ protected:
 	// for output in file
 	std::ofstream ofs;
 	std::ifstream ifs;
-	int telapse = 100; // microseconds = 0.1 milliseconds
+	int T_Elapse = 100; // microseconds = 0.1 milliseconds
 	void TearDown()
 	{
 		remove("tmp");
@@ -53,7 +53,7 @@ TEST_F(TimerTest, Tick)
 	ModuleBase::timer::tick("wavefunc","evc");
 	// after 1st call of tick, start_flag becomes false
 	EXPECT_FALSE(ModuleBase::timer::timer_pool["wavefunc"]["evc"].start_flag);
-	std::this_thread::sleep_for(std::chrono::microseconds(telapse)); // 0.1 ms
+	std::this_thread::sleep_for(std::chrono::microseconds(T_Elapse)); // 0.1 ms
 	// then we can have time elapsed in cpu_second
 	ModuleBase::timer::tick("wavefunc","evc");
 	EXPECT_GT(ModuleBase::timer::timer_pool["wavefunc"]["evc"].cpu_second,0.0001);
@@ -69,7 +69,7 @@ TEST_F(TimerTest, Start)
 TEST_F(TimerTest, PrintAll)
 {
 	ModuleBase::timer::tick("wavefunc","evc");
-	std::this_thread::sleep_for(std::chrono::microseconds(telapse)); // 0.1 ms
+	std::this_thread::sleep_for(std::chrono::microseconds(T_Elapse)); // 0.1 ms
 	ModuleBase::timer::tick("wavefunc","evc");
 	// call print_all
 	ofs.open("tmp");
@@ -99,7 +99,7 @@ TEST_F(TimerTest, PrintUntilNow)
 TEST_F(TimerTest, Finish)
 {
 	ModuleBase::timer::tick("wavefunc","evc");
-	std::this_thread::sleep_for(std::chrono::microseconds(telapse)); // 0.1 ms
+	std::this_thread::sleep_for(std::chrono::microseconds(T_Elapse)); // 0.1 ms
 	ModuleBase::timer::tick("wavefunc","evc");
 	// call print_all
 	ofs.open("tmp");

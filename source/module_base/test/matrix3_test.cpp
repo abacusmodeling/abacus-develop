@@ -54,7 +54,7 @@
  *     - the equality between two 3x3 matrices
  *   - MneM
  *     - overload operator "!=" to assert
- *     - the non-equality between two 3x3 matrices
+ *     - the inequality between two 3x3 matrices
  *   - ToMatrix
  *     - change the form of a 3x3 matrix from that of class Matrix3
  *     - to that of class matrix
