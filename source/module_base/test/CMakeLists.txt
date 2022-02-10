@@ -33,3 +33,8 @@ AddTest(
   TARGET base_integral
   SOURCES math_integral_test.cpp ../math_integral.cpp
 )
+AddTest(
+  TARGET base_complexmatrix
+  LIBS ${math_libs}
+  SOURCES complexmatrix_test.cpp ../complexmatrix.cpp ../matrix.cpp 
+)
