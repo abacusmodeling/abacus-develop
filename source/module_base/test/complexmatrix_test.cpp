@@ -37,6 +37,12 @@
  * 
  */
 
+//To avoid the uncorrected call by matrix.cpp at line 37.
+namespace ModuleBase
+{
+    void WARNING_QUIT(const std::string &file,const std::string &description) {return ;}
+}
+
 inline void EXPECT_COMPLEX_EQ(const std::complex<double>& a,const std::complex<double>& b)
 {
     EXPECT_DOUBLE_EQ(a.real(),b.real());
