@@ -1,5 +1,4 @@
 #include "xc_functional.h"
-#include "xc_gga_pw.h"
 #include "../src_parallel/parallel_reduce.h"
 #include "../module_base/timer.h"
 
@@ -38,10 +37,8 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc
     double rhox = 0.0;
     double arhox = 0.0;
     double zeta = 0.0;
-    double ex = 0.0;
-    double ec = 0.0;
-    double vx[2];
-    double vc[2];
+    double exc = 0.0;
+    double vxc[2];
 
     int ir, is;
     int neg [3];
@@ -58,10 +55,10 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc
             arhox = abs(rhox);
             if (arhox > vanishing_charge)
             {
-                XC_Functional::xc(arhox, ex, ec, vx[0], vc[0]);
-                v(0,ir) = e2 * (vx[0] + vc[0]);
+                XC_Functional::xc(arhox, exc, vxc[0]);
+                v(0,ir) = e2 * vxc[0];
 				// consider the total charge density
-                etxc += e2 * (ex + ec) * rhox;
+                etxc += e2 * exc * rhox;
 				// only consider rho_in
                 vtxc += v(0, ir) * rho_in[0][ir];
             } // endif
@@ -100,14 +97,14 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc
                 }
 
                 // call
-                XC_Functional::xc_spin(arhox, zeta, ex, ec, vx[0], vx[1], vc[0], vc[1]);
+                XC_Functional::xc_spin(arhox, zeta, exc, vxc[0], vxc[1]);
 
                 for (is = 0;is < GlobalV::NSPIN;is++)
                 {
-                    v(is, ir) = e2 * (vx[is] + vc[is]);
+                    v(is, ir) = e2 * vxc[is];
                 }
 
-                etxc += e2 * (ex + ec) * rhox;
+                etxc += e2 * exc * rhox;
 
                 vtxc += v(0, ir) * rho_in[0][ir] + v(1, ir) * rho_in[1][ir];
             }
@@ -137,14 +134,14 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc
                     zeta = (zeta > 0.0) ? 1.0 : (-1.0);
                 }//end if
 
-                XC_Functional::xc_spin( arhox, zeta, ex, ec, vx[0], vx[1], vc[0], vc[1] );
+                XC_Functional::xc_spin( arhox, zeta, exc, vxc[0], vxc[1]);
 				
-                etxc += e2 * ( ex + ec ) * rhox;
+                etxc += e2 * exc * rhox;
 
-                v(0, ir) = e2*( 0.5 * ( vx[0] + vc[0] + vx[1] + vc[1] ) );
+                v(0, ir) = e2*( 0.5 * ( vxc[0] + vxc[1]) );
                 vtxc += v(0,ir) * rho_in[0][ir];
 
-                double vs = 0.5 * ( vx[0] + vc[0] - vx[1] - vc[1] );
+                double vs = 0.5 * ( vxc[0] - vxc[1] );
                 if ( amag > vanishing_charge )
                 {
                     for(int ipol = 1;ipol< 4;ipol++)
@@ -160,7 +157,7 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc
 
     // add gradient corrections (if any)
     // mohan modify 2009-12-15
-    GGA_PW::gradcorr(etxc, vtxc, v);
+    gradcorr(etxc, vtxc, v);
 
     // parallel code : collect vtxc,etxc
     // mohan add 2008-06-01

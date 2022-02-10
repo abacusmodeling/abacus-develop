@@ -105,7 +105,7 @@ void UnitCell_pseudo::read_cell_pseudopots(const std::string &pp_dir, std::ofstr
 			{
 				log << "\n In Pseudopot_upf::read_pseudo_header : dft_functional from INPUT does not match that in pseudopot file" << std::endl;
 				log << " Please make sure this is what you need" << std::endl;
-				log << " XC functional updated to : " << std::endl;
+				log << " XC functional updated to : " << GlobalV::DFT_FUNCTIONAL << std::endl;
 				ModuleBase::GlobalFunc::OUT(log,"exchange-correlation functional", atoms[i].xc_func);
 			}
 		}

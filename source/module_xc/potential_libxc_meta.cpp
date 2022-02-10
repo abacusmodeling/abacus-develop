@@ -12,7 +12,6 @@
 #include "../module_base/global_variable.h"
 #include "module_base/timer.h"
 #include "src_parallel/parallel_reduce.h"
-#include "xc_gga_pw.h"
 #include "./xc_functional.h"
 #ifdef __LCAO
 #include "../src_lcao/global_fp.h"
@@ -32,7 +31,7 @@ using namespace std;
 //XC_POLARIZED, XC_UNPOLARIZED: internal flags used in LIBXC, denote the polarized(nspin=1) or unpolarized(nspin=2) calculations, definition can be found in xc.h from LIBXC
 
 // [etxc, vtxc, v, vofk] = Potential_Libxc::v_xc(...)
-tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> Potential_Libxc::v_xc_meta(
+tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> XC_Functional::v_xc_meta(
 	const double * const * const rho_in,
 	const double * const rho_core_in,
 	const double * const * const kin_r_in)
@@ -64,26 +63,23 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> Potential_Libxc::v_xc
 	const int xc_polarized = (GlobalV::NSPIN ? XC_UNPOLARIZED : XC_POLARIZED);
 
 	//exchange
-	if(GlobalC::xcf.igcx_now == 13)
+	if( func_id[0] == 263)
 	{
 		xc_func_init(&x_func, 263 ,xc_polarized);
 	}
 	else
 	{
-		throw domain_error("iexch="+ModuleBase::GlobalFunc::TO_STRING(GlobalC::xcf.iexch_now)+", igcx="+ModuleBase::GlobalFunc::TO_STRING(GlobalC::xcf.igcx_now)
-			+" unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+		throw domain_error("functional unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
 
 	//correlation
-	if(GlobalC::xcf.igcc_now == 9)
+	if( func_id[1] == 267)
 	{
 		xc_func_init(&c_func, 267 ,xc_polarized);
 	}
     else
 	{
-		throw domain_error("icorr="+ModuleBase::GlobalFunc::TO_STRING(GlobalC::xcf.icorr_now)+", igcc="+ModuleBase::GlobalFunc::TO_STRING(GlobalC::xcf.igcc_now)
-			+" unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-
+		throw domain_error("functional unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 	}
 	
 	//rho,grho,tau
@@ -119,7 +115,7 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> Potential_Libxc::v_xc
 		
 		vector<complex<double>> rhog(GlobalC::pw.ngmc);
 		GlobalC::CHR.set_rhog(rho[is].data(), rhog.data());
-		GGA_PW::grad_rho(rhog.data(), grho[is].data());
+		XC_Functional::grad_rho(rhog.data(), grho[is].data());
 	}
 		
 	//kin_r : from double** to vector<double>
@@ -277,7 +273,7 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> Potential_Libxc::v_xc
 
 	for(int is=0;is<GlobalV::NSPIN;is++)
 	{
-		GGA_PW::grad_dot(ModuleBase::GlobalFunc::VECTOR_TO_PTR(h[is]),ModuleBase::GlobalFunc::VECTOR_TO_PTR(dh));	
+		XC_Functional::grad_dot(ModuleBase::GlobalFunc::VECTOR_TO_PTR(h[is]),ModuleBase::GlobalFunc::VECTOR_TO_PTR(dh));	
 		for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 		{
 			vrho[is][ir]-=dh[ir];

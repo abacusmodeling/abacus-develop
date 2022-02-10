@@ -355,7 +355,7 @@ void Input::Default(void)
 //----------------------------------------------------------
 // exx										//Peize Lin add 2018-06-20
 //----------------------------------------------------------
-	exx_hybrid_type = "no";
+	dft_functional = "default";
 
 	exx_hybrid_alpha = 0.25;
 	exx_hse_omega = 0.11;
@@ -1490,9 +1490,9 @@ bool Input::Read(const std::string &fn)
 // exx
 // Peize Lin add 2018-06-20
 //----------------------------------------------------------
-        else if (strcmp("exx_hybrid_type", word) == 0)
+        else if (strcmp("dft_functional", word) == 0)
         {
-            read_value(ifs, exx_hybrid_type);
+            read_value(ifs, dft_functional);
         }
         else if (strcmp("exx_hybrid_alpha", word) == 0)
         {
@@ -2258,7 +2258,7 @@ void Input::Bcast()
 	Parallel_Common::bcast_double( eps_degauss );
 
 	// Peize Lin add 2018-06-20
-	Parallel_Common::bcast_string( exx_hybrid_type );
+	Parallel_Common::bcast_string( dft_functional );
 	Parallel_Common::bcast_double( exx_hybrid_alpha );
 	Parallel_Common::bcast_double( exx_hse_omega );
 	Parallel_Common::bcast_bool( exx_separate_loop );
@@ -2862,16 +2862,7 @@ void Input::Check(void)
 		}
 	}
 
-	if(exx_hybrid_type!="no" &&
-		exx_hybrid_type!="hf" &&
-		exx_hybrid_type!="pbe0" &&
-		exx_hybrid_type!="hse" &&
-		exx_hybrid_type!="opt_orb")
-	{
-		ModuleBase::WARNING_QUIT("INPUT","exx_hybrid_type must be no or hf or pbe0 or hse or opt_orb");
-	}
-
-	if(exx_hybrid_type=="hf" || exx_hybrid_type=="pbe0" || exx_hybrid_type=="hse")
+	if(dft_functional=="hf" || dft_functional=="pbe0" || dft_functional=="hse")
 	{
 		if(exx_hybrid_alpha<0 || exx_hybrid_alpha>1)
 		{
@@ -2893,7 +2884,7 @@ void Input::Check(void)
 			ModuleBase::WARNING_QUIT("INPUT","exx_distribute_type must be htime or kmeans2 or kmeans1");
 		}
 	}
-	if(exx_hybrid_type=="opt_orb")
+	if(dft_functional=="opt_orb")
 	{
 		if(exx_opt_orb_lmax<0)
 		{

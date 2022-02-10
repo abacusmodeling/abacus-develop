@@ -34,15 +34,7 @@ void Run_pw::plane_wave_line(void)
 	// Yu Liu add 2021-07-03
 	GlobalC::CHR.cal_nelec();
 
-    // mohan add 2010-09-06
-	// Yu Liu move here 2021-06-27
-	// because the number of element type
-	// will easily be ignored, so here
-	// I warn the user again for each type.
-	for(int it=0; it<GlobalC::ucell.ntype; it++)
-	{
-		GlobalC::xcf.which_dft(GlobalC::ucell.atoms[it].xc_func);
-    }
+	XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
 
     ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 

@@ -1,31 +1,20 @@
-#include "xc_gga_pw.h"
 #include "../src_pw/global.h"
 #include "xc_functional.h"
 
 // from gradcorr.f90
-void GGA_PW::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
+void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 {
-	ModuleBase::TITLE("GGA_PW","gradcorr");
+	ModuleBase::TITLE("XC_Functional","gradcorr");
 	
-	if (GlobalC::xcf.igcx_now == 0  &&  GlobalC::xcf.igcc_now == 0)
-	{
-		return;
-	}
+	if(func_type == 0 || func_type == 1) return; // none or LDA functional
 
 	bool igcc_is_lyp = false;
-	if( GlobalC::xcf.igcc_now == 3 || GlobalC::xcf.igcc_now == 7)
-	{
-		igcc_is_lyp = true;
-	}
+	if( func_id[1] == 131) igcc_is_lyp = true;
 
 	int nspin0 = GlobalV::NSPIN;
 	if(GlobalV::NSPIN==4) nspin0 =1;
 	if(GlobalV::NSPIN==4&&(GlobalV::DOMAG||GlobalV::DOMAG_Z)) nspin0 = 2;
-	if(GlobalV::NSPIN==4)
-	{
-		//if(GlobalC::xcf.igcx != 0  ||  GlobalC::xcf.igcc != 0) GlobalC::ucell.magnet.cal_ux(GlobalC::ucell.ntype);
-		if(GlobalC::xcf.igcx != 0  ||  GlobalC::xcf.igcc != 0) GlobalC::ucell.cal_ux();
-	}
+	if(GlobalV::NSPIN==4) GlobalC::ucell.cal_ux();
 
 	assert(nspin0>0);
 	const double fac = 1.0/ nspin0;
@@ -64,7 +53,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 	gdr1 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
 	h1 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
 	
-	GGA_PW::grad_rho( rhogsum1 , gdr1 );
+	XC_Functional::grad_rho( rhogsum1 , gdr1 );
 
 	// for spin polarized case;
 	// calculate the gradient of (rho_core+rho) in reciprocal space.
@@ -80,7 +69,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 		gdr2 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
 		h2 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
 		
-		GGA_PW::grad_rho( rhogsum2 , gdr2 );
+		XC_Functional::grad_rho( rhogsum2 , gdr2 );
 	}
 
 	if(GlobalV::NSPIN == 4&&(GlobalV::DOMAG||GlobalV::DOMAG_Z))
@@ -122,51 +111,19 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 		gdr2 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
 		h2 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
 
-		GGA_PW::grad_rho( rhogsum1 , gdr1 );
-		GGA_PW::grad_rho( rhogsum2 , gdr2 );
+		XC_Functional::grad_rho( rhogsum1 , gdr1 );
+		XC_Functional::grad_rho( rhogsum2 , gdr2 );
 
 	}
-
-	// for test
-	/*
-	double sum[6]={0,0,0,0,0,0};
-	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
-	{
-		sum[0] += abs(gdr1[0][ir]);
-		sum[1] += abs(gdr1[1][ir]);
-		sum[2] += abs(gdr1[2][ir]);	
-		sum[3] += abs(rhotmp1[ir]);	
-		sum[4] += rhotmp1[ir]*rhotmp1[ir];	
-	}
-	*/
-	
-	/*
-	std::cout << "\n sum grad 1= " << sum[0] << " "  << sum[1] << " " << sum[2] << std::endl;
-	std::cout << " sum rho = " << sum[3] << " "  << sum[4] << std::endl;
-	ModuleBase::GlobalFunc::ZEROS(sum,6);
-	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
-	{
-		sum[0] += abs(gdr2[0][ir]);
-		sum[1] += abs(gdr2[1][ir]);
-		sum[2] += abs(gdr2[2][ir]);	
-		sum[3] += abs(rhotmp2[ir]);	
-		sum[4] += rhotmp2[ir]*rhotmp2[ir];	
-	}
-	std::cout << "\n sum grad 2= " << sum[0] << " "  << sum[1] << " " << sum[2] << std::endl;
-	std::cout << " sum rho = " << sum[3] << " "  << sum[4] << std::endl;
-	*/
 	
 	const double epsr = 1.0e-6;
 	const double epsg = 1.0e-10;
 
 	double grho2a = 0.0;
 	double grho2b = 0.0;
-	double sx = 0.0;
-	double sc = 0.0;
-	double v1x = 0.0;
-	double v2x = 0.0;
-	double v1c = 0.0;
-	double v2c = 0.0;
+	double sxc = 0.0;
+	double v1xc = 0.0;
+	double v2xc = 0.0;
 	double vtxcgc = 0.0;
 	double etxcgc = 0.0;
 
@@ -185,18 +142,17 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 					if( rhotmp1[ir] >= 0.0 ) segno = 1.0;
 					if( rhotmp1[ir] < 0.0 ) segno = -1.0;
 					
-					XC_Functional::gcxc( arho, grho2a, sx, sc, v1x, v2x, v1c, v2c);
-
+					XC_Functional::gcxc( arho, grho2a, sxc, v1xc, v2xc);
 					// first term of the gradient correction:
 					// D(rho*Exc)/D(rho)
-					v(0, ir) += ModuleBase::e2 * ( v1x + v1c );
+					v(0, ir) += ModuleBase::e2 * v1xc;
 					
 					// h contains
 					// D(rho*Exc) / D(|grad rho|) * (grad rho) / |grad rho|
-					h1[ir] = ModuleBase::e2 * ( v2x + v2c ) * gdr1[ir];
+					h1[ir] = ModuleBase::e2 * v2xc * gdr1[ir];
 					
-					vtxcgc += ModuleBase::e2*( v1x + v1c ) * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] );
-					etxcgc += ModuleBase::e2*( sx + sc ) * segno;
+					vtxcgc += ModuleBase::e2* v1xc * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] );
+					etxcgc += ModuleBase::e2* sxc  * segno;
 				}
 			} // end arho > epsr
 		}
@@ -213,6 +169,8 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 		double v2xdw = 0.0;
 		double v2cud = 0.0;
 		double v2c = 0.0;
+		double sx = 0.0;
+		double sc = 0.0;
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
 			double rh = rhotmp1[ir] + rhotmp2[ir]; 
@@ -225,7 +183,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 			{
 				if(igcc_is_lyp)
 				{
-					ModuleBase::WARNING_QUIT("gga_pw","igcc_is_lyp is not available now.");
+					ModuleBase::WARNING_QUIT("XC_Functional","igcc_is_lyp is not available now.");
 				}
 				else
 				{
@@ -283,8 +241,8 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 	for(int is=0; is<nspin0; is++)
 	{
 		ModuleBase::GlobalFunc::ZEROS(dh, GlobalC::pw.nrxx);
-		if(is==0)GGA_PW::grad_dot(h1,dh);
-		if(is==1)GGA_PW::grad_dot(h2,dh);
+		if(is==0)XC_Functional::grad_dot(h1,dh);
+		if(is==1)XC_Functional::grad_dot(h2,dh);
 
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 			v(is, ir) -= dh[ir];
@@ -356,7 +314,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 	return;
 }
 
-void GGA_PW::grad_wfc( const std::complex<double> *rhog, const int ik, std::complex<double> **grad, const int npw )
+void XC_Functional::grad_wfc( const std::complex<double> *rhog, const int ik, std::complex<double> **grad, const int npw )
 {
 	double *kplusg;
 	kplusg = new double[npw];
@@ -386,7 +344,7 @@ void GGA_PW::grad_wfc( const std::complex<double> *rhog, const int ik, std::comp
 	return;
 }
 
-void GGA_PW::grad_rho( const std::complex<double> *rhog, ModuleBase::Vector3<double> *gdr )
+void XC_Functional::grad_rho( const std::complex<double> *rhog, ModuleBase::Vector3<double> *gdr )
 {
 	std::complex<double> *gdrtmpg = new std::complex<double>[GlobalC::pw.ngmc];
 	ModuleBase::GlobalFunc::ZEROS(gdrtmpg, GlobalC::pw.ngmc);
@@ -432,7 +390,7 @@ void GGA_PW::grad_rho( const std::complex<double> *rhog, ModuleBase::Vector3<dou
 }
 
 
-void GGA_PW::grad_dot(const ModuleBase::Vector3<double> *h, double *dh)
+void XC_Functional::grad_dot(const ModuleBase::Vector3<double> *h, double *dh)
 {
 	std::complex<double> *aux = new std::complex<double>[GlobalC::pw.nrxx];
 	std::complex<double> *gaux = new std::complex<double>[GlobalC::pw.ngmc];
@@ -475,7 +433,7 @@ void GGA_PW::grad_dot(const ModuleBase::Vector3<double> *h, double *dh)
 	return;
 }
 
-void GGA_PW::noncolin_rho(double *rhoout1,double *rhoout2, double *neg)
+void XC_Functional::noncolin_rho(double *rhoout1,double *rhoout2, double *neg)
 {
 	//this function diagonalizes the spin density matrix and gives as output the
 	//spin up and spin down components of the charge.

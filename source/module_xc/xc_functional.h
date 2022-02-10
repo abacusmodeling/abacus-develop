@@ -17,6 +17,9 @@ class XC_Functional
 {
 	public:
 
+	friend class Run_lcao;
+	friend class Run_pw;
+
 	XC_Functional();
 	~XC_Functional();
 
@@ -29,26 +32,23 @@ class XC_Functional
 		const double*const*const rho_in, 
 		const double*const rho_core); // core charge density
 
-	// LDA
-	static void xc(const double &rho, double &ex, double &ec, double &vx, double &vc);
-
-	// LSDA
-	static void xc_spin(const double &rho, const double &zeta,
-			double &ex, double &ec,
-			double &vxup, double &vxdw,
-			double &vcup, double &vcdw);
-
-	// GGA
-	static void gcxc(const double &rho, const double &grho, double &sx, double &sc,
-        	double &v1x, double &v2x, double &v1c, double &v2c);
-
-	// spin polarized GGA
-	static void gcx_spin(double rhoup, double rhodw, double grhoup2, double grhodw2,
-            double &sx, double &v1xup, double &v1xdw, double &v2xup,
-            double &v2xdw);
-	static void gcc_spin(double rho, double &zeta, double grho, double &sc,
-            double &v1cup, double &v1cdw, double &v2c);
-
+	//------------------------------------------------
+	// evaluate the exchange-correlation (XC) energy
+	// by using the input charge density rho_in and rho_core_in
+	//------------------------------------------------
+	// [etxc, vtxc, v] = v_xc(...)
+	static std::tuple<double,double,ModuleBase::matrix> v_xc_libxc(
+		const int &nrxx, // number of real-space grid
+		const int &ncxyz, // total number of charge grid
+		const double &omega, // volume of cell
+		const double * const * const rho_in,
+		const double * const rho_core_in);
+	
+	static std::tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> v_xc_meta(
+		const double * const * const rho_in,
+		const double * const rho_core_in,
+		const double * const * const kin_r_in);
+		
 #ifdef USE_LIBXC
 	struct Mgga_spin_in
 	{
@@ -69,22 +69,46 @@ class XC_Functional
 		double v3cup, v3cdw;//vc: mgga part
 	};	
 	
+	// GGA
+	static void gcxc(const double &rho, const double &grho,
+			double &sxc, double &v1xc, double &v2xc);
+
+	// spin polarized GGA
+	static void gcx_spin(double rhoup, double rhodw, double grhoup2, double grhodw2,
+            double &sx, double &v1xup, double &v1xdw, double &v2xup,
+            double &v2xdw);
+	static void gcc_spin(double rho, double &zeta, double grho, double &sc,
+            double &v1cup, double &v1cdw, double &v2c);
+
+	static void gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v);
+	static void grad_rho( const std::complex<double> *rhog, ModuleBase::Vector3<double> *gdr );
+	static void grad_wfc( const std::complex<double> *rhog, const int ik, std::complex<double> **grad, const int npw );
+	static void grad_dot( const ModuleBase::Vector3<double> *h, double *dh);
+	static void noncolin_rho(double *rhoout1,double *rhoout2,double *seg);
+
 	// mGGA
 	static void tau_xc(const double &rho, const double &grho, const double &atau, double &sx, double &sc,
           double &v1x, double &v2x, double &v3x, double &v1c, double &v2c, double &v3c);
 	static void tau_xc_spin(const Mgga_spin_in &mgga_spin_in, Mgga_spin_out &mgga_spin_out);
+
 #endif
 
-	// PBEx, PBEc
-	static void pbex(const double &rho, const double &grho, const int &iflag,
-		double &sx, double &v1x, double &v2x);
-
-	static void pbec(const double &rho, const double &grho, const int &flag,
-		double &sc, double &v1c, double &v2c);
-
-
+	static int get_func_type();
 
 	private:
+
+	static std::vector<int> func_id; // id of exchange functional
+	static int func_type; //0:none, 1:lda, 2:gga, 3:mgga, 4:hybrid
+
+	static void set_xc_type(const std::string xc_func_in);
+	static std::vector<xc_func_type> init_func();
+
+	// LDA
+	static void xc(const double &rho, double &exc, double &vxc);
+
+	// LSDA
+	static void xc_spin(const double &rho, const double &zeta,
+			double &exc, double &vxcup, double &vxcdw);
 
 	// For LDA exchange energy
 	static void slater(const double &rs, double &ex, double &vx);
@@ -116,6 +140,13 @@ class XC_Functional
 	static void pw_spin( const double &rs, const double &zeta,
         double &ec, double &vcup, double &vcdw);
 
+	// PBEx, PBEc
+	static void pbex(const double &rho, const double &grho, const int &iflag,
+		double &sx, double &v1x, double &v2x);
+
+	static void pbec(const double &rho, const double &grho, const int &flag,
+		double &sc, double &v1c, double &v2c);
+
 	// some GGA functionals
 	static void hcth(const double rho, const double grho, double &sx, double &v1x, double &v2x);
 	static void pwcorr(const double r, const double c[], double &g, double &dg);
@@ -144,6 +175,16 @@ class XC_Functional
 			double &v1cup, double &v1cdw, double &v2c);
 	static void pbec_spin(double rho, double zeta, double grho, const int &flag, double &sc,
 			double &v1cup, double &v1cdw, double &v2c);
+
+	//----------------------------
+	// decide the value of spin
+	//----------------------------
+	static int nspin0() // may need updates from SOC
+	{
+		if     (GlobalV::NSPIN==1 || (GlobalV::NSPIN==4 && (!GlobalV::DOMAG && !GlobalV::DOMAG_Z)))		return 1;
+		else if(GlobalV::NSPIN==2 || (GlobalV::NSPIN==4 && ( GlobalV::DOMAG ||  GlobalV::DOMAG_Z)))		return 2;
+		else throw std::runtime_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+	}
 };
 
 #endif //XC_FUNCTION_H

@@ -174,28 +174,9 @@ void Pseudopot_upf::read_pseudo_header(std::ifstream &ifs)
 	
 	// dft functional enforced to modify
 	// mohan add 2010-07-15
-	if(GlobalV::DFT_FUNCTIONAL!="none")
+	if(GlobalV::DFT_FUNCTIONAL!="default" && xc_func != GlobalV::DFT_FUNCTIONAL)
 	{
-		//xiaohui add 2015-03-23
-		
-		std::string dft_functional;
-		if(xc_func == "PZ")
-		{
-			dft_functional = "lda";
-		}
-		else if(xc_func == "PBE")
-		{
-			dft_functional = "pbe";
-		}
-		else if(xc_func == "SCAN")
-		{
-			dft_functional = "scan";
-		}
-		
-		if(xc_func != GlobalV::DFT_FUNCTIONAL)
-		{
-			functional_error = 1;
-		}
+		functional_error = 1;
 	}
 	
 	ModuleBase::GlobalFunc::READ_VALUE(ifs, this->zp);

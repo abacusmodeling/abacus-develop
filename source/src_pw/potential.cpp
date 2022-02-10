@@ -4,7 +4,6 @@
 #include "global.h"
 #include "potential.h"
 #include "../module_xc/xc_functional.h"
-#include "../module_xc/xc_gga_pw.h"
 #include "efield.h"
 #include "math.h"
 #include "../module_xc/potential_libxc.h"
@@ -329,7 +328,7 @@ ModuleBase::matrix Potential::v_of_rho(
 	#ifdef USE_LIBXC
 	if(GlobalV::DFT_META)
 	{
-    	const std::tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> etxc_vtxc_v = Potential_Libxc::v_xc_meta(rho_in, GlobalC::CHR.rho_core, GlobalC::CHR.kin_r);
+    	const std::tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> etxc_vtxc_v = XC_Functional::v_xc_meta(rho_in, GlobalC::CHR.rho_core, GlobalC::CHR.kin_r);
 		GlobalC::en.etxc = std::get<0>(etxc_vtxc_v);
 		GlobalC::en.vtxc = std::get<1>(etxc_vtxc_v);
 		v            += std::get<2>(etxc_vtxc_v);
@@ -337,7 +336,7 @@ ModuleBase::matrix Potential::v_of_rho(
 	}
 	else
 	{	
-    	const std::tuple<double,double,ModuleBase::matrix> etxc_vtxc_v = Potential_Libxc::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, rho_in, GlobalC::CHR.rho_core);
+    	const std::tuple<double,double,ModuleBase::matrix> etxc_vtxc_v = XC_Functional::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, rho_in, GlobalC::CHR.rho_core);
 		GlobalC::en.etxc = std::get<0>(etxc_vtxc_v);
 		GlobalC::en.vtxc = std::get<1>(etxc_vtxc_v);
 		v            += std::get<2>(etxc_vtxc_v);

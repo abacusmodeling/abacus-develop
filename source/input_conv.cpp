@@ -419,7 +419,7 @@ void Input_Conv::Convert(void)
 		const std::string command0 = "test -d " + GlobalC::restart.folder + " || mkdir " + GlobalC::restart.folder;
 		if (GlobalV::MY_RANK == 0)
 			system(command0.c_str());
-		if (INPUT.exx_hybrid_type == "no")
+		if (INPUT.dft_functional == "no")
 		{
 			GlobalC::restart.info_save.save_charge = true;
 		}
@@ -432,7 +432,7 @@ void Input_Conv::Convert(void)
 	if (INPUT.restart_load)
 	{
 		GlobalC::restart.folder = GlobalV::global_out_dir + "restart/";
-		if (INPUT.exx_hybrid_type == "no")
+		if (INPUT.dft_functional == "hf" || INPUT.dft_functional == "pbe0" || INPUT.dft_functional == "hse" || INPUT.dft_functional == "opt_orb")
 		{
 			GlobalC::restart.info_load.load_charge = true;
 		}
@@ -447,28 +447,30 @@ void Input_Conv::Convert(void)
 // about exx, Peize Lin add 2018-06-20
 //----------------------------------------------------------
 #ifdef __LCAO
-	if (INPUT.exx_hybrid_type == "no")
+
+	if (INPUT.dft_functional == "hf")
 	{
-		GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::No;
+		GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HF;
+	}
+	else if (INPUT.dft_functional == "pbe0")
+	{
+		GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::PBE0;
+	}
+	else if (INPUT.dft_functional == "hse")
+	{
+		GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HSE;
+	}
+	else if (INPUT.dft_functional == "opt_orb")
+	{
+		GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::Generate_Matrix;
 	}
 	else
 	{
-		if (INPUT.exx_hybrid_type == "hf")
-		{
-			GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HF;
-		}
-		else if (INPUT.exx_hybrid_type == "pbe0")
-		{
-			GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::PBE0;
-		}
-		else if (INPUT.exx_hybrid_type == "hse")
-		{
-			GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HSE;
-		}
-		else if (INPUT.exx_hybrid_type == "opt_orb")
-		{
-			GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::Generate_Matrix;
-		}
+		GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::No;
+	}
+	
+	if(GlobalC::exx_global.info.hybrid_type != Exx_Global::Hybrid_Type::No)
+	{
 		GlobalC::exx_global.info.hybrid_alpha = INPUT.exx_hybrid_alpha;
 		GlobalC::exx_global.info.hse_omega = INPUT.exx_hse_omega;
 		GlobalC::exx_global.info.separate_loop = INPUT.exx_separate_loop;

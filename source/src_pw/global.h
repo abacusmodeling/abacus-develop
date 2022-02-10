@@ -23,7 +23,7 @@
 #include "vdwd3.h"
 #include "vdwd3_parameters.h"
 #include "wavefunc.h"
-#include "../module_xc/xc_type.h"
+#include "../module_xc/xc_functional.h"
 
 #ifdef __CUDA
 namespace CudaCheck

@@ -388,7 +388,7 @@ int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 	delete []name;
 	delete []val;
 	
-	if(GlobalV::DFT_FUNCTIONAL!="none")
+	if(GlobalV::DFT_FUNCTIONAL!="default")
 	{
 		if(xc_func != GlobalV::DFT_FUNCTIONAL)
 		{

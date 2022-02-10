@@ -53,15 +53,10 @@ void Run_lcao::lcao_line(void)
 	// Yu Liu add 2021-07-03
 	GlobalC::CHR.cal_nelec();
 
-	// mohan add 2010-09-06
-	// Yu Liu move here 2021-06-27
-	// because the number of element type
-	// will easily be ignored, so here
-	// I warn the user again for each type.
-	for(int it=0; it<GlobalC::ucell.ntype; it++)
-	{
-		GlobalC::xcf.which_dft(GlobalC::ucell.atoms[it].xc_func);
-	}
+	// it has been established that that
+	// xc_func is same for all elements, therefore
+	// only the first one if used
+	XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
 
     //GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir , GlobalV::global_atom_card , GlobalV::ofs_running, GlobalV::NLOCAL, GlobalV::NBANDS);
     ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
@@ -150,20 +145,6 @@ void Run_lcao::lcao_line(void)
 	// Initializee the potential.
     GlobalC::pot.allocate(GlobalC::pw.nrxx);
     ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT POTENTIAL");
-
-
-	// Peize Lin add 2018-11-30
-	if(GlobalV::CALCULATION=="nscf")
-	{
-		switch(GlobalC::exx_global.info.hybrid_type)
-		{
-			case Exx_Global::Hybrid_Type::HF:
-			case Exx_Global::Hybrid_Type::PBE0:
-			case Exx_Global::Hybrid_Type::HSE:
-				GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
-				break;
-		}
-	}
 
 #ifdef __DEEPKS
 	//wenfei 2021-12-19

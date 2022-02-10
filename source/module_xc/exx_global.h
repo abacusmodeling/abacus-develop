@@ -15,25 +15,6 @@ struct Exx_Global
 		
 		bool separate_loop = true;
 		size_t hybrid_step = 1;
-		
-		void set_xcfunc( xcfunc &xcf ) const
-		{
-			switch( hybrid_type )
-			{
-				case Exx_Global::Hybrid_Type::HF:
-					xcf.iexch_now=5;	xcf.igcx_now=0;
-					xcf.icorr_now=0;	xcf.igcc_now=0;
-					break;
-				case Exx_Global::Hybrid_Type::PBE0:
-					xcf.iexch_now=6;	xcf.igcx_now=8;
-					break;
-				case Exx_Global::Hybrid_Type::HSE:
-					xcf.iexch_now=9;	xcf.igcx_now=12;
-					break;
-				default:
-					throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-			}			
-		}			
 	};
 	Exx_Info info;
 };

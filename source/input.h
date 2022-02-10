@@ -360,8 +360,6 @@ class Input
 // exx
 // Peize Lin add 2018-06-20
 //==========================================================
-	std::string exx_hybrid_type;		// "no", "hf", "pbe0", "hse"
-
 	double exx_hybrid_alpha;
 	double exx_hse_omega;
 

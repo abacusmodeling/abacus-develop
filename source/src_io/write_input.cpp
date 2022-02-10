@@ -275,7 +275,7 @@ void Input::Print(const std::string &fn)const
 	//ModuleBase::GlobalFunc::OUTP(ofs,"epsilon0_choice",epsilon0_choice,"0: vasp's method  1: pwscf's method");
 	
 	ofs << "\n#Parameters (17.exx)" << std::endl;
-	ModuleBase::GlobalFunc::OUTP(ofs,"exx_hybrid_type",exx_hybrid_type,"no, hf, pbe0, hse or opt_orb");
+	ModuleBase::GlobalFunc::OUTP(ofs,"dft_functional",dft_functional,"no, hf, pbe0, hse or opt_orb");
 	ModuleBase::GlobalFunc::OUTP(ofs,"exx_hybrid_alpha",exx_hybrid_alpha,"");
 	ModuleBase::GlobalFunc::OUTP(ofs,"exx_hse_omega",exx_hse_omega,"");
 	ModuleBase::GlobalFunc::OUTP(ofs,"exx_separate_loop",exx_separate_loop,"0 or 1");

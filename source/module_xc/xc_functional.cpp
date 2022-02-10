@@ -1,5 +1,4 @@
 #include "xc_functional.h"
-#include "xc_type.h"
 #include "../src_pw/global.h"
 #include "../module_base/global_function.h"
 #include <stdexcept>
@@ -8,16 +7,130 @@ XC_Functional::XC_Functional(){}
 
 XC_Functional::~XC_Functional(){}
 
-void XC_Functional::xc(const double &rho, double &ex, double &ec, double &vx, double &vc)
+std::vector<int> XC_Functional::func_id(1);
+int XC_Functional::func_type = 0;
+
+int XC_Functional::get_func_type()
+{
+    return func_type;
+}
+
+// The setting values of functional id
+// according to the index in LIBXC
+// for detail, refer to https://www.tddft.org/programs/libxc/functionals/
+void XC_Functional::set_xc_type(const std::string xc_func_in)
+{
+    std::cout << "xc_func_in : "<< xc_func_in << std::endl;
+    func_id.clear();
+    std::string xc_func = xc_func_in;
+    std::transform(xc_func.begin(), xc_func.end(), xc_func.begin(), (::toupper));
+	if( xc_func == "LDA" || xc_func == "PZ" || xc_func == "SLAPZNOGXNOGC") //SLA+PZ
+	{
+        // I should use XC_LDA_X and XC_LDA_C_PZ here,
+        // but since we are not compiling with libxc as default,
+        // I chose to set it manually instead.
+        // Same for the rest.
+        func_id.push_back(1);
+        func_id.push_back(9);
+        func_type = 1;
+	}	
+	else if ( xc_func == "PBE" || xc_func == "SLAPWPBXPBC") //PBX+PBC
+	{
+        func_id.push_back(101);
+        func_id.push_back(130);
+        func_type = 2;
+	} 
+	else if( xc_func == "revPBE" ) //rPBX+PBC
+	{
+		func_id.push_back(117);
+        func_id.push_back(130);
+        func_type = 2;
+	}
+	else if ( xc_func == "PBEsol") //PBXsol+PBCsol
+	{
+        func_id.push_back(116);
+        func_id.push_back(133);
+        func_type = 2;
+	}
+	else if ( xc_func == "WC") //WC+PBC
+	{
+        func_id.push_back(118);
+        func_id.push_back(130);
+        func_type = 2;
+	}	
+	else if ( xc_func == "BLYP") //B88+BLYP
+	{
+        func_id.push_back(106);
+        func_id.push_back(131);
+	}
+	else if ( xc_func == "BP") //B88+P86
+	{
+        func_id.push_back(106);
+        func_id.push_back(132);
+        func_type = 2;
+	} 
+	else if ( xc_func == "PW91") //PW91_X+PW91_C
+	{
+        func_id.push_back(109);
+        func_id.push_back(134);
+        func_type = 2;
+	} 
+	else if ( xc_func == "HCTH") //HCTH_X+HCTH_C
+	{
+        func_id.push_back(34);
+        func_id.push_back(97);
+        func_type = 2;
+	}
+	else if ( xc_func == "OLYP") //OPTX+BLYP
+	{
+        func_id.push_back(110);
+        func_id.push_back(131);
+        func_type = 2;
+	}
+	else if ( xc_func == "SCAN")
+	{
+        func_id.push_back(263);
+        func_id.push_back(267);
+		GlobalV::DFT_META = 1;
+	}
+   	else if( xc_func == "PBE0")
+	{
+        func_id.push_back(406);
+        func_type = 4;
+	}
+    else if( xc_func == "HF" || xc_func == "OPT_ORB" ||  xc_func == "NONE")
+    {
+        // not doing anything
+    }
+    else if( xc_func == "HSE")
+    {
+        func_id.push_back(428);
+        func_type = 4;
+    }
+    else
+    {
+        std::cout << "functional name not recognized!" << std::endl;
+    }
+
+	if (func_id[0] == 110)
+	{
+		std::cerr << "\n OPTX untested please test,";
+	}
+}
+
+void XC_Functional::xc(const double &rho, double &exc, double &vxc)
 {
 	double small = 1.e-10;
 	double third = 1.0 / 3.0;
 	double pi34 = 0.6203504908994e0 ; // pi34=(3/4pi)^(1/3)
 	double rs;
-
-	if(rho <= small)
+    double e,v;
+    
+    exc = vxc = 0.00;
+	
+    if(rho <= small)
 	{
-		ex = ec = vx = vc = 0.00; 
+		
 		return;
 	}
 	else
@@ -25,201 +138,107 @@ void XC_Functional::xc(const double &rho, double &ex, double &ec, double &vx, do
 		rs = pi34 / std::pow(rho, third);
 	}
 
-	// Exchange:
-	// "nox"    none                           iexch=0
-	// "sla"    Slater (alpha=2/3)             iexch=1 (default)
-	// "sl1"    Slater (alpha=1.0)             iexch=2
-	// "rxc"    Relativistic Slater            iexch=3
-	// "oep"    Optimized Effective Potential  iexch=4
-	// "hf"     Hartree-Fock                   iexch=5
-	// "pb0x"   PBE0 (Slater*0.75+HF*0.25)     iexch=6
-	// "b3lp"   B3LYP(Slater*0.80+HF*0.20)     iexch=7
-	// "kzk"    Finite-size corrections        iexch=8
-	// "hsex"   HSE06                          iexch=9
+    for(int id : func_id)
+    {
+        switch( id )
+        {
+            // Exchange functionals containing slater exchange
+            case 1: case 101: case 117: case 116: case 118: case 106: case 109:
+            // SLA       PBX      rPBX    PBXsol        WC       B88     PW91_X
+                XC_Functional::slater(rs, e, v);break;
 
-	// Correlation:
-	// "noc"    none                           icorr=0
-	// "pz"     Perdew-Zunger                  icorr=1 (default)
-	// "vwn"    Vosko-Wilk-Nusair              icorr=2
-	// "lyp"    Lee-Yang-Parr                  icorr=3
-	// "pw"     Perdew-Wang                    icorr=4
-	// "wig"    Wigner                         icorr=5
-	// "hl"     Hedin-Lunqvist                 icorr=6
-	// "obz"    Ortiz-Ballone form for PZ      icorr=7
-	// "obw"    Ortiz-Ballone form for PW      icorr=8
-	// "gl"     Gunnarson-Lunqvist             icorr=9
-	// "b3lp"   B3LYP (same as "vwn")          icorr=10
-	// "kzk"    Finite-size corrections        icorr=11
+            // Exchange functionals containing attenuated slater exchange
+            case 406:
+            //  PBE0
+                XC_Functional::slater(rs, e, v);
+                e *= 0.75; v*= 0.75;
+                break;
 
-	// Gradient Correction on Exchange:
-	// "nogx"   none                           igcx =0 (default)
-	// "b88"    Becke88 (beta=0.0042)          igcx =1
-	// "ggx"    Perdew-Wang 91                 igcx =2
-	// "pbx"    Perdew-Burke-Ernzenhof exch    igcx =3
-	// "rpb"    revised PBE by Zhang-Yang      igcx =4
-	// "hcth"   Cambridge exch, Handy et al    igcx =5
-	// "optx"   Handy's exchange functional    igcx =6
-	// "meta"   TPSS meta-gga                  igcx =7
-	// "pb0x"   PBE0 (PBE exchange*0.75)       igcx =8
-	// "b3lp"   B3LYP (Becke88*0.72)           igcx =9
-	// "psx"    PBEsol exchange                igcx =10
-	// "wcx"    Wu-Cohen                       igcx =11
-	// "hsex"   HSE06                          igcx =12
-	// "scan"	SCAN						   igcx =13
-	
-	// Gradient Correction on Correlation:
-	// "nogc"   none                           igcc =0 (default)
-	// "p86"    Perdew86                       igcc =1
-	// "ggc"    Perdew-Wang 91 corr.           igcc =2
-	// "blyp"   Lee-Yang-Parr                  igcc =3
-	// "pbc"    Perdew-Burke-Ernzenhof corr    igcc =4
-	// "hcth"   Cambridge corr, Handy et al    igcc =5
-	// "meta"   TPSS meta-gga                  igcc =6
-	// "b3lp"   B3LYP (Lee-Yang-Parr*0.81)     igcc =7
-	// "psc"    PBEsol corr                    igcc =8
-	// "scan"   SCAN						   igcx =9
+            // Correlation functionals containing PW correlation
+            case 130: case 133:
+            //   PBC    PBCsol
+                XC_Functional::pw(rs, 0, e, v);break;
 
-	// Special cases (dft_shortname):
-	// "bp"    = "b88+p86"           = Becke-Perdew grad.corr.
-	// "pw91"  = "pw +ggx+ggc"       = PW91 (aka GGA)
-	// "blyp"  = "sla+b88+lyp+blyp"  = BLYP
-	// "pbe"   = "sla+pw+pbx+pbc"    = PBE
-	// "revpbe"= "sla+pw+rpb+pbc"    = revPBE (Zhang-Yang)
-	// "pbesol"= "sla+pw+psx+psc"    = PBEsol
-	// "hcth"  = "nox+noc+hcth+hcth" = HCTH/120
-	// "olyp"  = "nox+lyp+optx+blyp"!!! UNTESTED !!!
-	// "tpss"  = "sla+pw+meta+meta"  = TPSS Meta-GGA
-	// "wc"    = "sla+pw+wcx+pbc"    = Wu-Cohen
-	// "pbe0"  = "pb0x+pw+pb0x+pbc"  = PBE0
-	// "b3lyp" = "b3lp+vwn+b3lp+b3lp"= B3LYP
-	// "hse"   = "hsex+pw+hsex+pbc"  = HSE
+            // Correlation functionals containing PZ correlation
+            case 9: case 132:
+            //  PZ       P86
+                XC_Functional::pz(rs, 0, e, v);break;
 
-	// References:
-	//              pz      J.P.Perdew and A.Zunger, PRB 23, 5048 (1981)
-	//              vwn     S.H.Vosko, L.Wilk, M.Nusair, Can.J.Phys. 58,1200(1980)
-	//				wig		E.P.Wigner, Trans. Faraday Soc. 34, 67 (1938)
-	//				hl		L.Hedin and B.I.Lundqvist, J. Phys. C4, 2064 (1971)
-	//				gl		O.Gunnarsson and B.I.Lundqvist, PRB 13, 4274 (1976)
-	//              pw      J.P.Perdew and Y.Wang, PRB 45, 13244 (1992)
-	//              obpz    G.Ortiz and P.Ballone, PRB 50, 1391 (1994)
-	//              obpw    as above
-	//              b88     A.D.Becke, PRA 38, 3098 (1988)
-	//              p86     J.P.Perdew, PRB 33, 8822 (1986)
-	//              pbe     J.P.Perdew, K.Burke, M.Ernzerhof, PRL 77, 3865 (1996)
-	//              pw91    J.P.Perdew and Y. Wang, PRB 46, 6671 (1992)
-	//              blyp    C.Lee, W.Yang, R.G.Parr, PRB 37, 785 (1988)
-	//              hcth    Handy et al, JCP 109, 6264 (1998)
-	//              olyp    Handy et al, JCP 116, 5411 (2002)
-	//              revPBE  Zhang and Yang, PRL 80, 890 (1998)
-	//				meta    J.Tao, J.P.Perdew, V.N.Staroverov, G.E. Scuseria,PRL 91, 146401 (2003)
-	//				kzk     H.Kwee, S. Zhang, H. Krakauer, PRL 100, 126404 (2008)
-	//				pbe0    J.P.Perdew, M. Ernzerhof, K.Burke, JCP 105, 9982 (1996)
-	//				b3lyp   P.J. Stephens,F.J. Devlin,C.F. Chabalowski,M.J. Frisch J.Phys.Chem 98, 11623 (1994)
-	//				pbesol	J.P. Perdew et al., PRL 100, 136406 (2008)
-	//				wc		Z. Wu and R. E. Cohen, PRB 73, 235116 (2006)
-	//              hse     Paier J, Marsman M, Hummer K, et al, JPC 124(15): 154709 (2006)
-	//std::cout << " " << GlobalC::xcf.iexch_now << " " << GlobalC::xcf.icorr_now << " " << GlobalC::xcf.igcx_now << " " << GlobalC::xcf.igcc_now << std::endl;
+            // Correlation functionals containing LYP correlation
+            case 131:
+            //  BLYP
+                XC_Functional::lyp(rs, e, v);break;
 
-	switch(GlobalC::xcf.iexch_now)
-	{
-		case 1:
-			XC_Functional::slater(rs, ex, vx);break;
-		case 2:
-			XC_Functional::slater1(rs, ex, vx);break;
-		case 3:
-			XC_Functional::slater_rxc(rs, ex, vx);break;
-		case 6:
-			XC_Functional::slater(rs, ex, vx);
-			ex = 0.75 * ex;
-			vx = 0.75 * vx;
-			break;
-		case 9:
-			throw std::domain_error("HSE unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-			break;
-		default:
-			ex = vx = 0.0;
-	}
-	
-	switch(GlobalC::xcf.icorr_now)
-	{
-		case 1:
-			XC_Functional::pz(rs, 0, ec, vc);break;
-		case 2:
-			XC_Functional::vwn(rs, ec, vc);break;
-		case 3:
-			XC_Functional::lyp(rs, ec, vc);break;
-		case 4:
-			// mohan note: 0 is correct!
-			XC_Functional::pw(rs, 0, ec, vc);break;
-		case 5:
-			XC_Functional::wigner(rs, ec, vc);break;
-		case 6:
-			XC_Functional::hl(rs, ec, vc);break;
-		case 7:
-			XC_Functional::pz(rs, 1, ec, vc);break;
-		case 8:
-			XC_Functional::pw(rs, 1, ec, vc);break;
-		case 9:
-			XC_Functional::gl(rs, ec, vc);break;
-		default:
-			ex = vc = 0.0;
-	}
-
+            // Functionals that are realized only using LIBXC
+            case 428: case 263: case 267:
+            //    HSE    SCAN_X   SCAN_C
+                throw std::domain_error("functional unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+            
+            default:
+                e = v = 0.0;
+        }
+        exc += e;
+        vxc += v;
+    }
 	return;
 }
 
 void XC_Functional::xc_spin(const double &rho, const double &zeta,
-		double &ex, double &ec,
-		double &vxup, double &vxdw,
-		double &vcup, double &vcdw)
+		double &exc, double &vxcup, double &vxcdw)
 {
 	static const double small = 1.e-10;
+    double e, vup, vdw;
+    exc = vxcup = vxcdw = 0.0;
+
 	if (rho <= small)
 	{
-		ex = ec = vxup = vxdw = vcup = vcdw = 0.0;
 		return;
 	}
 
 	static const double third = 1.0 / 3.0;
 	static const double pi34 = 0.62035049089940; 
-
 	const double rs = pi34 / pow(rho, third);//wigner_sitz_radius;
 
-//	std::cout << " GlobalC::xcf.iexch_now=" << GlobalC::xcf.iexch_now << std::endl;
-//	std::cout << " GlobalC::xcf.icorr_now=" << GlobalC::xcf.icorr_now << std::endl;
+    for(int id : func_id)
+    {
+        switch( id )
+        {
+            // Exchange functionals containing slater exchange
+            case 1: case 101: case 117: case 116: case 118: case 106: case 109:
+            // SLA       PBX      rPBX    PBXsol        WC       B88     PW91_X
+                XC_Functional::slater_spin(rho, zeta, e, vup, vdw);	break;
+            
+            // Exchange functionals containing attenuated slater exchange
+            case 406:
+            //  PBE0
+                XC_Functional::slater_spin(rho, zeta, e, vup, vdw);
+                e *= 0.75; vup *= 0.75; vdw *=0.75;
+                break;
 
-	switch(GlobalC::xcf.iexch_now)
-	{
-		case 1:
-			XC_Functional::slater_spin(rho, zeta, ex, vxup, vxdw);	break;
-		case 2:
-			XC_Functional::slater1_spin(rho, zeta, ex, vxup, vxdw);	break;
-		case 3:
-			XC_Functional::slater_rxc_spin(rho, zeta, ex, vxup, vxdw);	break;
-		case 6:
-			XC_Functional::slater_spin(rho, zeta, ex, vxup, vxdw);
-			ex = 0.75 * ex;
-			vxup = 0.75 * vxup;
-			vxdw = 0.75 * vxdw;
-			break;
-		case 9:
-			throw std::domain_error("HSE unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));	break;
-		default:
-			ex = vxup = vxdw =0.0;
+            // Correlation functionals containing PZ correlation
+            case 9: case 132:
+                XC_Functional::pz_spin(rs, zeta, e, vup, vdw); break;
+
+            // Correlation functionals containing PW correlationtests/integrate/101_PW_OU_pseudopot
+            case 130: case 133:
+            //   PBC    PBCsol
+                XC_Functional::pw_spin(rs, zeta, e, vup, vdw); break;
+
+            // Correlation functionals that already contains LDA components
+            // so sets to 0 here
+            case 34: case 97: case 110:
+            //HCTH_X  HTCH_C      OPTX
+                e = vup = vdw =0.0;
+
+            // Cases that are only realized in LIBXC
+            default:
+                throw std::domain_error("functional unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));	break;
+
+        }
+        exc += e;
+        vxcup += vup;
+        vxcdw += vdw;
 	}
-
-	switch(GlobalC::xcf.icorr_now)
-	{
-		case 0:
-		ec = vcup = vcdw = 0.0; break;
-		case 1:
-		XC_Functional::pz_spin(rs, zeta, ec, vcup, vcdw); break;
-		case 4: //mohan fix bug 2012-05-28, case 2 to 4.
-		XC_Functional::pw_spin(rs, zeta, ec, vcup, vcdw); break;
-		default:
-		ModuleBase::WARNING_QUIT("XC_Functional::xc_spin", "xcf.icorr_now wrong!");
-	}
-
 	return;
 }
 
@@ -967,32 +986,29 @@ void XC_Functional::tau_xc(const double &rho, const double &grho, const double &
 	const int xc_polarized = XC_UNPOLARIZED;
 
 //exchange
-    if (GlobalC::xcf.igcx_now == 13)
-	{
-		xc_func_init(&x_func, 263 ,xc_polarized);
-		xc_mgga_exc_vxc(&x_func,1,&rho,&grho,&lapl_rho,&atau,&sx,&v1x,&v2x,&vlapl_rho,&v3x);
-		xc_func_end(&x_func);
-		sx = sx * rho;
-		v2x = v2x * 2.0;
-	}
-	else
-	{
-		ModuleBase::WARNING_QUIT("tau_xc","functional not implemented yet");
-	}
+    for(int id : XC_Functional::func_id)
+    {
+        switch( id )
+        {  
+            case 263:
+                xc_func_init(&x_func, 263 ,xc_polarized);
+                xc_mgga_exc_vxc(&x_func,1,&rho,&grho,&lapl_rho,&atau,&sx,&v1x,&v2x,&vlapl_rho,&v3x);
+                xc_func_end(&x_func);
+                sx = sx * rho;
+                v2x = v2x * 2.0;
+                break;
+            case 267:
+                xc_func_init(&c_func, 267 ,xc_polarized);
+                xc_mgga_exc_vxc(&c_func,1,&rho,&grho,&lapl_rho,&atau,&sc,&v1c,&v2c,&vlapl_rho,&v3c);
+                xc_func_end(&c_func);
+                sc = sc * rho;
+                v2c = v2c * 2.0;
+                break;
+            default:
+                throw std::domain_error( "functional unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+	    }
+    }
 
-//correlation
-	if(GlobalC::xcf.igcc_now == 9)
-	{
-		xc_func_init(&c_func, 267 ,xc_polarized);
-		xc_mgga_exc_vxc(&c_func,1,&rho,&grho,&lapl_rho,&atau,&sc,&v1c,&v2c,&vlapl_rho,&v3c);
-		xc_func_end(&c_func);
-		sc = sc * rho;
-		v2c = v2c * 2.0;
-	}
-	else
-	{
-		ModuleBase::WARNING_QUIT("tau_xc","functional not implemented yet");
-	}
 	return;
 }
 
@@ -1021,7 +1037,7 @@ void XC_Functional::tau_xc_spin(const Mgga_spin_in &mgga_spin_in, Mgga_spin_out 
 	tau[0]=mgga_spin_in.tauup; tau[1]=mgga_spin_in.taudw;
 
 //exchange
-    if (GlobalC::xcf.igcx_now == 13)
+    if (func_id[0]==263)
 	{
 		xc_func_init(&x_func, 263 ,xc_polarized);
 		xc_mgga_exc_vxc(&x_func,1,rho.data(),grho2.data(),lapl_rho.data(),tau.data(),&sx,v1x.data(),v2x.data(),vlapl_rho.data(),v3x.data());
@@ -1033,7 +1049,7 @@ void XC_Functional::tau_xc_spin(const Mgga_spin_in &mgga_spin_in, Mgga_spin_out 
 	}
 
 //correlation
-	if(GlobalC::xcf.igcc_now == 9)
+	if(func_id[1]==267)
 	{
 		xc_func_init(&c_func, 267 ,xc_polarized);
 		xc_mgga_exc_vxc(&c_func,1,rho.data(),grho2.data(),lapl_rho.data(),tau.data(),&sc,v1c.data(),mgga_spin_out.v2c.data(),vlapl_rho.data(),v3c.data());
@@ -1066,8 +1082,8 @@ void XC_Functional::tau_xc_spin(const Mgga_spin_in &mgga_spin_in, Mgga_spin_out 
 }
 #endif
 
-void XC_Functional::gcxc(const double &rho, const double &grho, double &sx, double &sc,
-          double &v1x, double &v2x, double &v1c, double &v2c)
+void XC_Functional::gcxc(const double &rho, const double &grho, double &sxc,
+          double &v1xc, double &v2xc)
 {
     //-----------------------------------------------------------------------
     //     gradient corrections for exchange and correlation - Hartree a.u.
@@ -1091,121 +1107,57 @@ void XC_Functional::gcxc(const double &rho, const double &grho, double &sx, doub
     // USE kinds
     // implicit none
     // real rho, grho, sx, sc, v1x, v2x, v1c, v2c;
-    double small = 1.e-10;	//parameter:
+    double small = 1.e-10;
+    double s,v1,v2;
+    sxc = v1xc = v2xc = 0.0;
 
-	// exchange
     if (rho <= small)
     {
-        sx = 0.00;
-        v1x = 0.00;
-        v2x = 0.00;
+        return;
     }
-    else if (GlobalC::xcf.igcx_now == 1)
-    {
-        XC_Functional::becke88(rho, grho, sx, v1x, v2x);
-    }
-    else if (GlobalC::xcf.igcx_now == 2)
-    {
-        XC_Functional::ggax(rho, grho, sx, v1x, v2x);
-    }
-    else if (GlobalC::xcf.igcx_now == 3)
-    {
-		//mohan modify 2009-12-15
-		// 0 stands for PBE, 1 stands for revised PBE
-        XC_Functional::pbex(rho, grho, 0, sx, v1x, v2x);
-    }
-    else if (GlobalC::xcf.igcx_now == 4)
-    {
-		// revised PBE.
-        XC_Functional::pbex(rho, grho, 1, sx, v1x, v2x);
-    }
-    else if (GlobalC::xcf.igcx_now == 5 && GlobalC::xcf.igcc_now == 5)
-    {
-        XC_Functional::hcth(rho, grho, sx, v1x, v2x);
-    }
-    else if (GlobalC::xcf.igcx_now == 6)
-    {
-        XC_Functional::optx(rho, grho, sx, v1x, v2x);
-    }
-	else if (GlobalC::xcf.igcx_now == 8)
-	{
-		XC_Functional::pbex (rho, grho, 0, sx, v1x, v2x);
-		sx *= 0.75;
-		v1x *= 0.75;
-		v2x *= 0.75;
-	}
-	else if (GlobalC::xcf.igcx_now == 10)
-	{
-		// PBESOL
-		XC_Functional::pbex(rho, grho, 2, sx, v1x, v2x);
-	}
-	else if (GlobalC::xcf.igcx_now == 11)
-	{
-		// wu cohen
-		XC_Functional::wcx (rho, grho, sx, v1x, v2x);
-	}
-	else if (GlobalC::xcf.igcx_now == 12)
-	{
-		// HSE
-		throw std::domain_error("HSE unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-	}
-	else if (GlobalC::xcf.igcx_now == 13)
-	{
-		//SCAN
-		cout << "to use SCAN, please link LIBXC" << endl;
-		throw domain_error("Check "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-	}
-    else
-    {
-        sx = 0.00;
-        v1x = 0.00;
-        v2x = 0.00;
-    } // endif
 
-	//std::cout << "\n igcx = " << GlobalC::xcf.igcx_now;
-	//std::cout << "\n igcc = " << GlobalC::xcf.igcc_now << std::endl;
-
-     // correlation
-    if (rho <= small)
+    for(int id : func_id)
     {
-        sc = 0.00;
-        v1c = 0.00;
-        v2c = 0.00;
+        switch( id )
+        {
+            case 106: //B88
+                XC_Functional::becke88(rho, grho, s, v1, v2);break;
+            case 109: //PW91_X
+                XC_Functional::ggax(rho, grho, s, v1, v2);break;
+            case 101: //PBX
+                XC_Functional::pbex(rho, grho, 0, s, v1, v2);break;
+            case 117: //revised PBX
+                XC_Functional::pbex(rho, grho, 1, s, v1, v2);break;
+            case 34: //HCTH_X
+                XC_Functional::hcth(rho, grho, s, v1, v2);break; //XC together
+            case 97: //HCTH_C
+                s = 0.0; v1 = 0.0; v2 = 0.0;break;
+            case 110: //OPTX
+                XC_Functional::optx(rho, grho, s, v1, v2);break;
+            case 406: //PBE0
+                XC_Functional::pbex(rho, grho, 0, s, v1, v2);
+                s *= 0.75; v1 *= 0.75; v2 *= 0.75;break;
+            case 116: //PBXsol
+                XC_Functional::pbex(rho, grho, 2, s, v1, v2);break;
+            case 118: //Wu-Cohen
+                XC_Functional::wcx (rho, grho, s, v1, v2);break;
+            case 132: //P86
+                XC_Functional::perdew86(rho, grho, s, v1, v2);break;
+            case 134: //PW91_C
+                XC_Functional::ggac(rho, grho, s, v1, v2);break;
+            case 130: //PBC
+                XC_Functional::pbec(rho, grho, 0, s, v1, v2);break;
+            case 133: //PBCsol
+                XC_Functional::pbec(rho, grho, 1, s, v1, v2);break;
+            case 131: //BLYP
+                XC_Functional::glyp(rho, grho, s, v1, v2); break;
+            default: //SCAN_X,SCAN_C,HSE, and so on
+                throw std::domain_error("functional unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
+        }
+        sxc += s;
+        v1xc += v1;
+        v2xc += v2;
     }
-    else if (GlobalC::xcf.igcc_now == 1)
-    {
-        XC_Functional::perdew86(rho, grho, sc, v1c, v2c);
-    }
-    else if (GlobalC::xcf.igcc_now == 2)
-    {
-        XC_Functional::ggac(rho, grho, sc, v1c, v2c);
-    }
-    else if (GlobalC::xcf.igcc_now == 3)
-    {
-        XC_Functional::glyp(rho, grho, sc, v1c, v2c);
-    }
-    else if (GlobalC::xcf.igcc_now == 4)
-    {
-        XC_Functional::pbec(rho, grho, 0, sc, v1c, v2c);
-    }
-	else if (GlobalC::xcf.igcc_now == 8)
-	{
-		// PBESOL
-		XC_Functional::pbec(rho, grho, 1, sc, v1c, v2c);
-	}
-	else if (GlobalC::xcf.igcc_now == 9)
-	{
-		//SCAN
-		cout << "to use SCAN, please link LIBXC" << endl;
-		throw domain_error("Check "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-	}
-    else
-    {
-        // note that if igcc == 5 the hcth functional is called above
-        sc = 0.00;
-        v1c = 0.00;
-        v2c = 0.00;
-    } //  endif
 
     return;
 }
@@ -1576,140 +1528,84 @@ void XC_Functional::gcx_spin(double rhoup, double rhodw, double grhoup2, double 
     // exchange
     double rho = rhoup + rhodw;
 
-	//std::cout << " GlobalC::xcf.igcx_now=" << GlobalC::xcf.igcx_now << std::endl;
+    sx = 0.00;
+    v1xup = 0.00; v2xup = 0.00;
+    v1xdw = 0.00; v2xdw = 0.00;
 
-    if (rho <= small || GlobalC::xcf.igcx_now == 0)
+    if (rho <= small)
     {
-        sx = 0.00;
-        v1xup = 0.00;
-        v2xup = 0.00;
-        v1xdw = 0.00;
-        v2xdw = 0.00;
+        return;
     }
-    else if (GlobalC::xcf.igcx_now == 1)
-    {
-        if (rhoup > small && sqrt(fabs(grhoup2)) > small)
-        {
-            XC_Functional::becke88_spin(rhoup, grhoup2, sxup, v1xup, v2xup);
-        }
-        else
-        {
-            sxup = 0.0;
-            v1xup = 0.0;
-            v2xup = 0.0;
-        } //  endif
 
-        if (rhodw > small && sqrt(fabs(grhodw2)) > small)
+    // not the correct way to do things, will change later
+    // should put exchange and correlation together
+    // like the others
+    //for(int id : func_id)
+    //{
+        int id = func_id[0];
+        switch( id )
         {
-            XC_Functional::becke88_spin(rhodw, grhodw2, sxdw, v1xdw, v2xdw);
+            case 106: //B88
+                if (rhoup > small && sqrt(fabs(grhoup2)) > small)
+                {
+                    XC_Functional::becke88_spin(rhoup, grhoup2, sxup, v1xup, v2xup);
+                }
+                if (rhodw > small && sqrt(fabs(grhodw2)) > small)
+                {
+                    XC_Functional::becke88_spin(rhodw, grhodw2, sxdw, v1xdw, v2xdw);
+                }
+                break;
+            case 101: //PBX
+                if (rhoup > small && sqrt(fabs(grhoup2)) > small)
+                {
+                    XC_Functional::pbex(2.0 * rhoup, 4.0 * grhoup2, 0, sxup, v1xup, v2xup);
+                }
+                if (rhodw > small && sqrt(fabs(grhodw2)) > small)
+                {
+                    XC_Functional::pbex(2.0 * rhodw, 4.0 * grhodw2, 0, sxdw, v1xdw, v2xdw);
+                }
+                break;
+            case 117: //revised PBX
+                if (rhoup > small && sqrt(fabs(grhoup2)) > small)
+                {
+                    XC_Functional::pbex(2.0 * rhoup, 4.0 * grhoup2, 1, sxup, v1xup, v2xup);
+                }
+                if (rhodw > small && sqrt(fabs(grhodw2)) > small)
+                {
+                    XC_Functional::pbex(2.0 * rhodw, 4.0 * grhodw2, 1, sxdw, v1xdw, v2xdw);
+                }
+                break;
+            case 406: //PBE0
+                if (rhoup > small && sqrt(fabs(grhoup2)) > small)
+                {
+                    XC_Functional::pbex(2.0 * rhoup, 4.0 * grhoup2, 0, sxup, v1xup, v2xup);
+                    sxup *= 0.75; v1xup *= 0.75; v2xup *= 0.75;
+                }
+                if (rhodw > small && sqrt(fabs(grhodw2)) > small)
+                {
+                    XC_Functional::pbex(2.0 * rhodw, 4.0 * grhodw2, 0, sxdw, v1xdw, v2xdw);
+        	    	sxdw *= 0.75; v1xdw *= 0.75; v2xdw *= 0.75;            
+                }
+                break;
+            case 116: //PBXsol
+                if (rhoup > small && sqrt(fabs(grhoup2)) > small)
+                {
+                    XC_Functional::pbex(2.0 * rhoup, 4.0 * grhoup2, 2, sxup, v1xup, v2xup);
+                }
+                if (rhodw > small && sqrt(fabs(grhodw2)) > small)
+                {
+                    XC_Functional::pbex(2.0 * rhodw, 4.0 * grhodw2, 2, sxdw, v1xdw, v2xdw);
+                }
+                break;
+            default:
+                sxup = 0.0; sxdw = 0.0;
+                v1xup = 0.0; v2xup = 0.0;
+                v1xdw = 0.0; v2xdw = 0.0;
         }
-        else
-        {
-            sxdw = 0.0;
-            v1xdw = 0.0;
-            v2xdw = 0.0;
-        } //endif
-
-        sx = sxup + sxdw;
-    }
-    else if (GlobalC::xcf.igcx_now == 2)
-    {
-        if (rhoup > small && sqrt(abs(grhoup2)) > small)
-        {
-			throw std::runtime_error("sxup, v1xup, v2xup uninitialized in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-        }
-        else
-        {
-            sxup = 0.0;
-            v1xup = 0.0;
-            v2xup = 0.0;
-        } //endif
-
-        if (rhodw > small && sqrt(abs(grhodw2)) > small)
-        {
-			throw std::runtime_error("sxdw, v1xdw, v2xdw uninitialized in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-        }
-        else
-        {
-            sxdw = 0.0;
-            v1xdw = 0.0;
-            v2xdw = 0.0;
-        } //endif
-
         sx = 0.50 * (sxup + sxdw);
-
         v2xup = 2.0 * v2xup;
-
-        v2xdw = 2.0 * v2xdw;
-    }
-	// igcx=3: PBE
-	// igcx=4: revised PBE
-	// igcx=8: PBE0
-	// igcx=10: PBEsol
-    else if (GlobalC::xcf.igcx_now == 3 || GlobalC::xcf.igcx_now == 4 || GlobalC::xcf.igcx_now==8 || GlobalC::xcf.igcx_now == 10)
-    {
-        if (GlobalC::xcf.igcx_now == 4)//mohan fix bug 2012-05-28
-        {
-            iflag = 1; //minus 1 in C++
-        }
-		else if(GlobalC::xcf.igcx_now == 10)
-		{
-			iflag = 2;
-		}
-        else
-        {
-            iflag = 0;
-        } 
-
-        if (rhoup > small && sqrt(fabs(grhoup2)) > small)
-        {
-            XC_Functional::pbex(2.0 * rhoup, 4.0 * grhoup2, iflag, sxup, v1xup, v2xup);
-        }
-        else
-        {
-            sxup = 0.0;
-            v1xup = 0.0;
-            v2xup = 0.0;
-        } 
-		
-		if (GlobalC::xcf.igcx_now == 8)						// Peize Lin add 2017-10-23
-		{
-			sxup *= 0.75;
-			v1xup *= 0.75;
-			v2xup *= 0.75;
-		}
-
-        if (rhodw > small && sqrt(fabs(grhodw2)) > small)
-        {
-            XC_Functional::pbex(2.0 * rhodw, 4.0 * grhodw2, iflag, sxdw, v1xdw, v2xdw);
-        }
-        else
-        {
-            sxdw = 0.0;
-            v1xdw = 0.0;
-            v2xdw = 0.0;
-        } 
-		
-		if (GlobalC::xcf.igcx_now == 8)						// Peize Lin add 2017-10-23
-		{
-			sxdw *= 0.75;
-			v1xdw *= 0.75;
-			v2xdw *= 0.75;
-		}		
-
-        sx = 0.5 * (sxup + sxdw);
-        v2xup = 2.0 * v2xup;
-        v2xdw = 2.0 * v2xdw;
-    }
-	// igcx=12: HSE
-	else if (GlobalC::xcf.igcx_now == 12)
-	{
-		throw std::domain_error( "HSE unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-	}
-    else
-    {
-        std::cout << "\n gcx_spin, not implemented, igcx_now";
-    } //endif
+        v2xdw = 2.0 * v2xdw;       
+    //}
 
     return;
 } //end subroutine gcx_spin
@@ -1743,12 +1639,11 @@ void XC_Functional::gcc_spin(double rho, double &zeta, double grho, double &sc,
 
     double x;
 
-    if (abs(zeta) - 1.0 > small)
+    sc = 0.00;
+    v1cup = 0.00; v1cdw = 0.00;
+    v2c = 0.00;
+    if (abs(zeta) - 1.0 > small || rho <= small || sqrt(abs(grho)) <= small)
     {
-        sc = 0.00;
-        v1cup = 0.00;
-        v1cdw = 0.00;
-        v2c = 0.00;
         return;
     }
     else
@@ -1766,45 +1661,21 @@ void XC_Functional::gcc_spin(double rho, double &zeta, double grho, double &sc,
 		}
     } //endif
 
-
-//	std::cout << "GlobalC::xcf.igcc_now=" << GlobalC::xcf.igcc_now << std::endl;
-
-    if (GlobalC::xcf.igcc_now == 0 || rho <= small || sqrt(abs(grho)) <= small)
-    {
-        sc = 0.00;
-        v1cup = 0.00;
-        v1cdw = 0.00;
-        v2c = 0.00;
-    }
-    else if (GlobalC::xcf.igcc_now == 1)
-    {
-        XC_Functional::perdew86_spin(rho, zeta, grho, sc, v1cup, v1cdw, v2c);
-    }
-    else if (GlobalC::xcf.igcc_now == 2)
-    {
-        XC_Functional::ggac_spin(rho, zeta, grho, sc, v1cup, v1cdw, v2c);
-    }
-    else if (GlobalC::xcf.igcc_now == 3 || GlobalC::xcf.igcc_now > 4)
-    {
-        std::cout << "\n lsda_functionals, not implemented, igcc_now = "
-             << GlobalC::xcf.igcc_now;
-    }
-    else if (GlobalC::xcf.igcc_now == 4)
-    {
-        XC_Functional::pbec_spin(rho, zeta, grho, 1, sc, v1cup, v1cdw, v2c);
-    }
-	else if (GlobalC::xcf.igcc_now == 8)//mohan add 2012-05-28
-	{
-        XC_Functional::pbec_spin(rho, zeta, grho, 2, sc, v1cup, v1cdw, v2c);
-	}
-    else
-    {
-        sc = 0.00;
-        v1cup = 0.00;
-        v1cdw = 0.00;
-        v2c = 0.00;
-    } //endif
-
+    //for(int id : func_id)
+    //{
+        int id = func_id[1];
+        switch( id )
+        {          
+            case 132: //P86
+                XC_Functional::perdew86_spin(rho, zeta, grho, sc, v1cup, v1cdw, v2c);break;
+            case 134: //PW91_C
+                XC_Functional::ggac_spin(rho, zeta, grho, sc, v1cup, v1cdw, v2c);break;
+            case 130: //PBC
+                XC_Functional::pbec_spin(rho, zeta, grho, 1, sc, v1cup, v1cdw, v2c);break;
+            case 133: //PBCsol
+                XC_Functional::pbec_spin(rho, zeta, grho, 2, sc, v1cup, v1cdw, v2c);break;
+        }
+    //}
     return;
 } //end subroutine gcc_spin
 

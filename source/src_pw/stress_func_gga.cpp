@@ -1,6 +1,5 @@
 #include "./stress_func.h"
 #include "../module_xc/xc_functional.h"
-#include "../module_xc/xc_gga_pw.h"
 #include "../module_base/timer.h"
 
 //calculate the GGA stress correction in PW and LCAO
@@ -8,21 +7,18 @@ void Stress_Func::stress_gga(ModuleBase::matrix& sigma)
 {
 	ModuleBase::timer::tick("Stress_Func","stress_gga");
      
-	if (GlobalC::xcf.igcx == 0  &&  GlobalC::xcf.igcc == 0)
+	int func_type = XC_Functional::get_func_type();
+	if (func_type == 0 || func_type == 1)
 	{
 		ModuleBase::timer::tick("Stress_Func","stress_gga");
 		return;
-	} 
+	}
+
 	double sigma_gradcorr[3][3];
 	double* p= &sigma_gradcorr[0][0];
 	for(int i=0;i<9;i++)
 		*p++ = 0;
 
-	bool igcc_is_lyp = false;
-	if( GlobalC::xcf.igcc == 3 || GlobalC::xcf.igcc == 7)
-	{
-		igcc_is_lyp = true;
-	}
 	const int nspin_in = GlobalV::NSPIN;
 	assert(nspin_in>0);
 	const double fac = 1.0/ nspin_in;
@@ -51,7 +47,7 @@ void Stress_Func::stress_gga(ModuleBase::matrix& sigma)
 	gdr1 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
 	ModuleBase::GlobalFunc::ZEROS(gdr1, GlobalC::pw.nrxx);
 
-	GGA_PW::grad_rho( rhogsum1 , gdr1 );
+	XC_Functional::grad_rho( rhogsum1 , gdr1 );
 
 	if(nspin_in==2)
 	{
@@ -71,7 +67,7 @@ void Stress_Func::stress_gga(ModuleBase::matrix& sigma)
 		gdr2 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
 		ModuleBase::GlobalFunc::ZEROS(gdr2, GlobalC::pw.nrxx);
 
-		GGA_PW::grad_rho( rhogsum2 , gdr2 );
+		XC_Functional::grad_rho( rhogsum2 , gdr2 );
 	}
         
 	const double epsr = 1.0e-6;
@@ -88,6 +84,9 @@ void Stress_Func::stress_gga(ModuleBase::matrix& sigma)
 	double v1c = 0.0;
 	double v2c = 0.0;
 	double v3c = 0.0;
+	double sxc = 0.0;
+	double v1xc = 0.0;
+	double v2xc = 0.0;
 
 	if(nspin_in==1||nspin_in==4)
 	{
@@ -111,7 +110,7 @@ void Stress_Func::stress_gga(ModuleBase::matrix& sigma)
 					}
 					else
 					{
-						XC_Functional::gcxc( arho, grho2a, sx, sc, v1x, v2x, v1c, v2c);
+						XC_Functional::gcxc( arho, grho2a, sxc, v1xc, v2xc);
 					}
 					double tt[3];
 					tt[0] = gdr1[ir].x;
@@ -121,7 +120,7 @@ void Stress_Func::stress_gga(ModuleBase::matrix& sigma)
 					{
 						for(int m = 0;m< l+1;m++)
 						{
-							sigma_gradcorr[l][m] += tt[l] * tt[m] * ModuleBase::e2 * (v2x + v2c);
+							sigma_gradcorr[l][m] += tt[l] * tt[m] * ModuleBase::e2 * v2xc;
 						}
 					}
 				}
@@ -154,19 +153,12 @@ void Stress_Func::stress_gga(ModuleBase::matrix& sigma)
 
 			if(rh > epsr)
 			{
-				if(igcc_is_lyp)
-				{
-					ModuleBase::WARNING_QUIT("stress","igcc_is_lyp is not available now.");
-				}
-				else
-				{
-					double zeta = ( rhotmp1[ir] - rhotmp2[ir] ) / rh;
-					double grh2 = (gdr1[ir]+gdr2[ir]).norm2();
-					XC_Functional::gcc_spin(rh, zeta, grh2, sc, v1cup, v1cdw, v2c);
-					v2cup = v2c;
-					v2cdw = v2c;
-					v2cud = v2c;
-				}
+				double zeta = ( rhotmp1[ir] - rhotmp2[ir] ) / rh;
+				double grh2 = (gdr1[ir]+gdr2[ir]).norm2();
+				XC_Functional::gcc_spin(rh, zeta, grh2, sc, v1cup, v1cdw, v2c);
+				v2cup = v2c;
+				v2cdw = v2c;
+				v2cud = v2c;
 			}
 			else
 			{
