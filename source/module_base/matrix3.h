@@ -240,8 +240,8 @@ template <typename T> ModuleBase::Vector3<double> operator*(const ModuleBase::Ve
  *
  * @param m1
  * @param m2
- * @return true
- * @return false
+ * @return true: if two matrices equal each other
+ * @return false: if they do not equal
  */
 bool operator==(const Matrix3 &m1, const Matrix3 &m2);
 
@@ -251,8 +251,8 @@ bool operator==(const Matrix3 &m1, const Matrix3 &m2);
  *
  * @param m1
  * @param m2
- * @return true
- * @return false
+ * @return true: if two matrices are inequal
+ * @return false: if they equal
  */
 bool operator!=(const Matrix3 &m1, const Matrix3 &m2); // whethor m1 != m2
 
