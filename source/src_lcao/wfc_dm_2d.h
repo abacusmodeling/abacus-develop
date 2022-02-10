@@ -10,6 +10,8 @@
 #include "../module_base/complexmatrix.h"
 #include <vector>
 
+#include "./record_adj.h"   //caoyu add 2022-2-9
+
 class Wfc_Dm_2d
 {
 
@@ -25,8 +27,11 @@ class Wfc_Dm_2d
 	
 	void init(void);
 
-	// dm = wfc.T * wg * wfc.conj()
-	void cal_dm(const ModuleBase::matrix &wg);					// wg(ik,ib), cal all dm
+    // dm = wfc.T * wg * wfc.conj()
+    // in multi-k it is dm(k)
+	void cal_dm(const ModuleBase::matrix &wg);					// wg(ik,ib), cal all dm 
+    // dm(R) = wfc.T * wg * wfc.conj()*kphase, only used in multi-k 
+    void cal_dm_R(double** dm2d, Record_adj ra);					// wg(ik,ib), cal dm(R)
 };
 
 #endif
