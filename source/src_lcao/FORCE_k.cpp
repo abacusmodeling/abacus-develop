@@ -455,13 +455,40 @@ void Force_LCAO_k::cal_foverlap_k(
 	{
 		edm2d[is] = new double[GlobalC::LNNR.nnr];
 		ModuleBase::GlobalFunc::ZEROS(edm2d[is], GlobalC::LNNR.nnr);
-	}
-	bool with_energy = true;
+    }
+    
+    Record_adj RA;
+	RA.for_2d();
 
 	//--------------------------------------------	
 	// calculate the energy density matrix here.
-	//--------------------------------------------	
-	this->set_EDM_k(edm2d, with_energy);
+    //--------------------------------------------	
+    if (INPUT.new_dm > 0)
+    {
+        ModuleBase::timer::tick("Force_LCAO_k","cal_edm_2d");
+
+        ModuleBase::matrix wgEkb;
+        wgEkb.create(GlobalC::kv.nks, GlobalV::NBANDS);
+
+        for (int ik = 0; ik < GlobalC::kv.nks; ik++)
+        {
+            for(int ib=0; ib<GlobalV::NBANDS; ib++)
+            {
+                wgEkb(ik, ib) = GlobalC::wf.wg(ik, ib) * GlobalC::wf.ekb[ik][ib];
+            }
+        }
+        Wfc_Dm_2d wfc_edm_2d;
+        wfc_edm_2d.init();
+        wfc_edm_2d.wfc_k = GlobalC::LOC.wfc_dm_2d.wfc_k;
+        wfc_edm_2d.cal_dm(wgEkb);
+        wfc_edm_2d.cal_dm_R(edm2d, RA);
+        ModuleBase::timer::tick("Force_LCAO_k","cal_edm_2d");
+    }
+    else
+    {
+        bool with_energy = true;
+        this->set_EDM_k(edm2d, with_energy);
+    }
 
 	//--------------------------------------------
     //summation \sum_{i,j} E(i,j)*dS(i,j)
@@ -469,8 +496,7 @@ void Force_LCAO_k::cal_foverlap_k(
 	//--------------------------------------------
 	ModuleBase::Vector3<double> tau1, dtau, tau2;
 
-	Record_adj RA;
-	RA.for_2d();
+
 
 	int irr = 0;
 	int iat = 0;
