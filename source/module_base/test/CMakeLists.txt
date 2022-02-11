@@ -38,3 +38,20 @@ AddTest(
   LIBS ${math_libs}
   SOURCES complexmatrix_test.cpp ../complexmatrix.cpp ../matrix.cpp 
 )
+AddTest(
+  TARGET base_realarray
+  SOURCES realarray_test.cpp ../realarray.cpp
+)
+AddTest(
+  TARGET base_intarray
+  SOURCES intarray_test.cpp ../intarray.cpp
+)
+AddTest(
+  TARGET base_vector3
+  SOURCES vector3_test.cpp 
+)
+AddTest(
+  TARGET base_mathzone
+  LIBS ${math_libs}
+  SOURCES mathzone_test.cpp ../mathzone.cpp ../matrix3.cpp ../matrix.cpp ../tool_quit.cpp ../global_variable.cpp ../global_file.cpp ../memory.cpp ../timer.cpp
+)
