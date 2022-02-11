@@ -31,7 +31,7 @@ class Wfc_Dm_2d
     // in multi-k it is dm(k)
 	void cal_dm(const ModuleBase::matrix &wg);					// wg(ik,ib), cal all dm 
     // dm(R) = wfc.T * wg * wfc.conj()*kphase, only used in multi-k 
-    void cal_dm_R(double** dm2d, Record_adj ra);					// wg(ik,ib), cal dm(R)
+    void cal_dm_R(Record_adj &ra, double** dm2d);					// wg(ik,ib), cal dm(R)
 };
 
 #endif

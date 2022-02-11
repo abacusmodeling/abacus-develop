@@ -61,7 +61,7 @@ void Force_LCAO_k::ftable_k (
     {
         Record_adj RA;
         RA.for_2d();
-        GlobalC::LOC.wfc_dm_2d.cal_dm_R(dm2d, RA);
+        GlobalC::LOC.wfc_dm_2d.cal_dm_R(RA, dm2d);
     }
     else
     {
@@ -481,7 +481,7 @@ void Force_LCAO_k::cal_foverlap_k(
         wfc_edm_2d.init();
         wfc_edm_2d.wfc_k = GlobalC::LOC.wfc_dm_2d.wfc_k;
         wfc_edm_2d.cal_dm(wgEkb);
-        wfc_edm_2d.cal_dm_R(edm2d, RA);
+        wfc_edm_2d.cal_dm_R(RA, edm2d);
         ModuleBase::timer::tick("Force_LCAO_k","cal_edm_2d");
     }
     else

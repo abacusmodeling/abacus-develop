@@ -146,7 +146,7 @@ void Wfc_Dm_2d::cal_dm(const ModuleBase::matrix &wg)
 }
 //ra.for_2d();
 //must cal cal_dm first
-void Wfc_Dm_2d::cal_dm_R(double** dm2d, Record_adj ra)
+void Wfc_Dm_2d::cal_dm_R(Record_adj &ra, double** dm2d)
 {
     ModuleBase::TITLE("Wfc_Dm_2d", "cal_dm_R");
     assert(this->dm_k[0].nr > 0 && dm_k[0].nc > 0); //must call cal_dm first
