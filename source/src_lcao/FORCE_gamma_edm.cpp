@@ -671,10 +671,10 @@ void Force_LCAO_gamma::cal_foverlap(
             }
         }
 
-        Wfc_Dm_2d wfc_edm_2d;
-        wfc_edm_2d.init();
-        wfc_edm_2d.wfc_gamma=GlobalC::LOC.wfc_dm_2d.wfc_gamma;
-        wfc_edm_2d.cal_dm(wgEkb);
+        std::vector<ModuleBase::matrix> edm_gamma(GlobalV::NSPIN);
+        GlobalC::LOC.wfc_dm_2d.cal_dm(wgEkb,
+            GlobalC::LOC.wfc_dm_2d.wfc_gamma,
+            edm_gamma);
 
         ModuleBase::timer::tick("Force_LCAO_gamma","cal_edm_2d");
 
@@ -691,7 +691,7 @@ void Force_LCAO_gamma::cal_foverlap(
                     double sum = 0.0;
                     for(int is=0; is<GlobalV::NSPIN; ++is)
                     {
-                        sum += wfc_edm_2d.dm_gamma[is](nu, mu);
+                        sum += edm_gamma[is](nu, mu);
                     }
                     sum *= 2.0;
 

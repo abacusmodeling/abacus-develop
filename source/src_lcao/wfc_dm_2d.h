@@ -15,23 +15,33 @@
 class Wfc_Dm_2d
 {
 
-	public:
+public:
 
-	// wfc stands for wave functions
-	std::vector<ModuleBase::matrix> wfc_gamma;			// wfc_gamma[is](ib,iw);
-	std::vector<ModuleBase::ComplexMatrix> wfc_k;		// wfc_k[ik](ib,iw);
+    // wfc stands for wave functions
+    std::vector<ModuleBase::matrix> wfc_gamma;			// wfc_gamma[is](ib,iw);
+    std::vector<ModuleBase::ComplexMatrix> wfc_k;		// wfc_k[ik](ib,iw);
 
-	// dm stands for density matrix
-	std::vector<ModuleBase::matrix> dm_gamma;			// dm_gamma[is](iw1,iw2);
-	std::vector<ModuleBase::ComplexMatrix> dm_k;		// dm_k[ik](iw1,iw2);
-	
-	void init(void);
+    // dm stands for density matrix
+    std::vector<ModuleBase::matrix> dm_gamma;			// dm_gamma[is](iw1,iw2);
+    std::vector<ModuleBase::ComplexMatrix> dm_k;		// dm_k[ik](iw1,iw2);
 
-    // dm = wfc.T * wg * wfc.conj()
-    // in multi-k it is dm(k)
-	void cal_dm(const ModuleBase::matrix &wg);					// wg(ik,ib), cal all dm 
+    void init(void);
+
+    // dm = wfc.T * wg * wfc.conj(); used in gamma_only
+    void cal_dm(const ModuleBase::matrix& wg,   // wg(ik,ib), cal all dm 
+        std::vector<ModuleBase::matrix>& wfc_gamma,
+        std::vector<ModuleBase::matrix>& dm_gamma);
+
+    // in multi-k,  it is dm(k)
+    void cal_dm(const ModuleBase::matrix& wg,    // wg(ik,ib), cal all dm 
+        std::vector<ModuleBase::ComplexMatrix>& wfc_k,
+        std::vector<ModuleBase::ComplexMatrix>& dm_k);
+
     // dm(R) = wfc.T * wg * wfc.conj()*kphase, only used in multi-k 
-    void cal_dm_R(Record_adj &ra, double** dm2d);					// wg(ik,ib), cal dm(R)
+    void cal_dm_R(
+        std::vector<ModuleBase::ComplexMatrix>& dm_k,
+        Record_adj& ra,
+        double** dm2d);     //output, dm2d[NSPIN][LNNR]
 };
 
 #endif
