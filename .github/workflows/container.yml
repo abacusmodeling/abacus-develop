@@ -9,7 +9,7 @@ on:
 
 jobs:
   build_container_and_push:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         dockerfile: ["gnu","intel","cuda"]
