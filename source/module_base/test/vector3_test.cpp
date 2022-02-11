@@ -57,13 +57,13 @@
  *     - overload operator "^" to calculate
  *     - the cross product of two 3d vectors
  *   - VeqV
- *     - reload operator "==" to assert
+ *     - overload operator "==" to assert
  *     - the equality between two 3d vectors
  *   - VneV
- *     - reload operator "!=" to assert
- *     - the non-equality between two 3d vectors
+ *     - overload operator "!=" to assert
+ *     - the inequality between two 3d vectors
  *   - StdOutV
- *     - reload operator "<<" to print out
+ *     - overload operator "<<" to print out
  *     - a 3d vectors on standard output
  *   - PrintV
  *     - print a 3d vectors on standard output

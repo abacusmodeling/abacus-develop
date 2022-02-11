@@ -345,6 +345,10 @@ template <class T> inline bool operator==(const Vector3<T> &u, const Vector3<T> 
     return false;
 }
 
+/**
+ * @brief Print a Vector3 on standard output with formats
+ *
+ */
 template <class T> void Vector3<T>::print(void) const
 {
     std::cout.precision(5);
@@ -352,6 +356,16 @@ template <class T> void Vector3<T>::print(void) const
               << std::endl;
     return;
 }
+
+/**
+ * @brief Overload "<<" tor print out a
+ * Vector3 on standard output
+ *
+ * @tparam T
+ * @param[in] os
+ * @param[in] u
+ * @return std::ostream&
+ */
 template <class T> static std::ostream &operator<<(std::ostream &os, const Vector3<T> &u)
 {
     os << "(" << std::setw(10) << u.x << "," << std::setw(10) << u.y << "," << std::setw(10) << u.z << ")";
