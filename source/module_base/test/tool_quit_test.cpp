@@ -2,7 +2,9 @@
 #include "../global_variable.h"
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
+#ifdef __MPI
 #include "mpi.h"
+#endif
 
 /************************************************
  *  unit test of functions in tool_quit.h
@@ -18,8 +20,6 @@
  *
  *   - ModuleBase::WARNING_QUIT
  *     - combine the above 2 functions
- *
- * - Author: Tianqi Zhao
  */
 
 class ToolQuitTest : public testing::Test
@@ -86,20 +86,18 @@ TEST_F(ToolQuitTest,warningquit)
 }
 
 // use __MPI to activate parallel environment
+#ifdef __MPI
 int main(int argc, char **argv)
 {
 
-#ifdef __MPI
 	MPI_Init(&argc,&argv);
-#endif
 
 	testing::InitGoogleTest(&argc,argv);
 	int result = RUN_ALL_TESTS();
 
-#ifdef __MPI
 	MPI_Finalize();
-#endif
 
 	return result;
 }
+#endif
 

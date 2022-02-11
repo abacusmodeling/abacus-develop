@@ -21,8 +21,6 @@ run_lcao.o\
 
 OBJS_PW=xc_type.o \
 xc_functional.o\
-xc_1.o\
-xc_2.o\
 xc_3.o \
 vdwd2.o\
 vdwd2_parameters.o\
