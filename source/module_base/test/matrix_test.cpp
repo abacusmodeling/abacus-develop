@@ -59,19 +59,15 @@ class matrixTest : public testing::Test
 
 };
 
-TEST(matrix,Constructornrnc)
+TEST(matrix,ConstructorNrNc)
 {
     ModuleBase::matrix m(3,4,true);
     EXPECT_EQ(m.nr,3);
     EXPECT_EQ(m.nc,4);
-    EXPECT_DOUBLE_EQ(m(0,0),0.0);
-    //EXPECT_DEATH(ModuleBase::matrix m(0,1),"");
-    //EXPECT_DEATH(ModuleBase::matrix m(1,0),"");
-    //EXPECT_DEATH(ModuleBase::matrix m(-1,1),"");
-    //EXPECT_DEATH(ModuleBase::matrix m(1,-1),"");    
+    EXPECT_DOUBLE_EQ(m(0,0),0.0);   
 }
 
-TEST_F(matrixTest,constructorMatrix)
+TEST_F(matrixTest,ConstructorMatrix)
 {
     ModuleBase::matrix m(m33a);
     int mnr = m.nr;
@@ -83,7 +79,7 @@ TEST_F(matrixTest,constructorMatrix)
     }    
 }
 
-TEST_F(matrixTest,constructorMtrixRvalue)
+TEST_F(matrixTest,ConstructorMtrixRValue)
 {
 
     ModuleBase::matrix m(3.0*m33a);
@@ -95,7 +91,7 @@ TEST_F(matrixTest,constructorMtrixRvalue)
     }    
 }
 
-TEST_F(matrixTest,create)
+TEST_F(matrixTest,Create)
 {
     m33a.create(13,14,true);
     EXPECT_EQ(m33a.nr,13);
@@ -106,7 +102,7 @@ TEST_F(matrixTest,create)
     }
 }
 
-TEST_F(matrixTest,operatorEqualMatrix)
+TEST_F(matrixTest,OperatorEqualMatrix)
 {
     ModuleBase::matrix m;
     m = m33a;
@@ -122,7 +118,7 @@ TEST_F(matrixTest,operatorEqualMatrix)
     EXPECT_EQ(m23a.nc,m33a.nc); 
 }
 
-TEST_F(matrixTest,operatorEqualMatrixRvalue)
+TEST_F(matrixTest,OperatorEqualMatrixRvalue)
 {
     ModuleBase::matrix m;
     m = 3.0 * m33a;
@@ -134,7 +130,7 @@ TEST_F(matrixTest,operatorEqualMatrixRvalue)
     }    
 }
 
-TEST_F(matrixTest,operatorParentheses)
+TEST_F(matrixTest,OperatorParentheses)
 {
     //EXPECT_DEATH(m33a(3,3),"");
     //EXPECT_DEATH(m33a(-1,0),"");
@@ -142,7 +138,7 @@ TEST_F(matrixTest,operatorParentheses)
     EXPECT_DOUBLE_EQ(m33a(0,0),1.1);
 }
 
-TEST_F(matrixTest,operatorMultiplyEqual)
+TEST_F(matrixTest,OperatorMultiplyEqual)
 {
     m33b = m33a;
     m33a *= 11.1;
@@ -155,7 +151,7 @@ TEST_F(matrixTest,operatorMultiplyEqual)
     }
 }
 
-TEST_F(matrixTest,operatorPlusEqual)
+TEST_F(matrixTest,OperatorPlusEqual)
 {
     EXPECT_DEATH(m33a += m34a,"");
 
@@ -170,7 +166,7 @@ TEST_F(matrixTest,operatorPlusEqual)
     }
 }
 
-TEST_F(matrixTest,operatorMinusEqual)
+TEST_F(matrixTest,OperatorMinusEqual)
 {
     EXPECT_DEATH(m33a -= m34a,"");
     
@@ -185,7 +181,7 @@ TEST_F(matrixTest,operatorMinusEqual)
     }
 }
 
-TEST_F(matrixTest,classMatrixTraceOn)
+TEST_F(matrixTest,ClassMatrixTraceOn)
 {
     m33a(0,0) = 1.1;
     m33a(1,1) = 2.2;
@@ -193,7 +189,7 @@ TEST_F(matrixTest,classMatrixTraceOn)
     EXPECT_DOUBLE_EQ(m33a.trace_on(),8.8);
 }
 
-TEST_F(matrixTest,classMatrixZeroOut)
+TEST_F(matrixTest,ClassMatrixZeroOut)
 {
     m33a.zero_out();
     for (int i=0;i<m33a.nr;++i)
@@ -205,7 +201,7 @@ TEST_F(matrixTest,classMatrixZeroOut)
     }
 }
 
-TEST_F(matrixTest,classMatrixMaxMinAbsmax)
+TEST_F(matrixTest,ClassMatrixMaxMinAbsmax)
 {
     m33a(1,0) = 9999.9;
     m33a(0,0) = -999999.9;
@@ -214,13 +210,13 @@ TEST_F(matrixTest,classMatrixMaxMinAbsmax)
     EXPECT_DOUBLE_EQ(m33a.absmax(),999999.9);
 }
 
-TEST_F(matrixTest,classMatrixNorm)
+TEST_F(matrixTest,ClassMatrixNorm)
 {
     EXPECT_NEAR(m33a.norm(),16.881943016134133728,1E-12);
     EXPECT_NEAR(m33b.norm(),187.38956747908889611,1E-12);
 }
 
-TEST_F(matrixTest,operatorPlus)
+TEST_F(matrixTest,OperatorPlus)
 {
     m33c = m33a + m33b;
     for (int i=0;i<m33a.nr;++i)
@@ -235,7 +231,7 @@ TEST_F(matrixTest,operatorPlus)
 }
 
 
-TEST_F(matrixTest,operatorMinus)
+TEST_F(matrixTest,OperatorMinus)
 {
     m33c = m33a - m33b;
     for (int i=0;i<m33a.nr;++i)
@@ -248,7 +244,7 @@ TEST_F(matrixTest,operatorMinus)
     EXPECT_DEATH(m33a-m34a,"");
 }
 
-TEST_F(matrixTest,operatorMultiplyTwoMatrix)
+TEST_F(matrixTest,OperatorMultiplyTwoMatrix)
 {
     EXPECT_DEATH(m34a*m33a,"");
 
@@ -283,7 +279,7 @@ TEST_F(matrixTest,operatorMultiplyTwoMatrix)
     EXPECT_DOUBLE_EQ(m33c(2,2),-138.0);
 }
 
-TEST_F(matrixTest,operatorMultiplyDouble)
+TEST_F(matrixTest,OperatorMultiplyDouble)
 {
     m33b = 3.0 * m33a;
     m33c = m33a * 3.0;
@@ -294,7 +290,7 @@ TEST_F(matrixTest,operatorMultiplyDouble)
     }
 }
 
-TEST_F(matrixTest,transpose)
+TEST_F(matrixTest,Transpose)
 {
     m23a(0,0) = 1.0; m23a(0,1) = 2.0; m23a(0,2) = 3.0;
     m23a(1,0) = 4.0; m23a(1,1) = 5.0; m23a(1,2) = 6.0;
@@ -325,7 +321,7 @@ TEST_F(matrixTest,TraceOn)
     EXPECT_DOUBLE_EQ(trace_on(m32,m23),967.0);
 }
 
-TEST_F(matrixTest,mdot)
+TEST_F(matrixTest,MDot)
 {
     EXPECT_DEATH(mdot(m23a,m33a),"");
     EXPECT_DEATH(mdot(m34a,m33a),"");
