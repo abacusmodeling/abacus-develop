@@ -79,6 +79,10 @@ class realArray
     const double &operator()(const int d1, const int d2, const int d3) const;
     const double &operator()(const int d1, const int d2, const int d3, const int d4) const;
 
+    /**
+     * @brief Set all elements of an IntArray to zero
+     *
+     */
     void zero_out(void);
 
     /**
