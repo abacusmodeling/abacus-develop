@@ -57,7 +57,7 @@ void Force_LCAO_k::ftable_k (
 	}
     ModuleBase::Memory::record ("Force_LCAO_k", "dm2d", GlobalV::NSPIN*GlobalC::LNNR.nnr, "double");	
 
-    if (INPUT.new_dm > 0)
+    if (INPUT.new_dm > 0 && INPUT.tddft == 0)
     {
         Record_adj RA;
         RA.for_2d();
@@ -463,7 +463,7 @@ void Force_LCAO_k::cal_foverlap_k(
 	//--------------------------------------------	
 	// calculate the energy density matrix here.
     //--------------------------------------------	
-    if (INPUT.new_dm > 0)
+    if (INPUT.new_dm > 0 && INPUT.tddft==0)
     {
         ModuleBase::timer::tick("Force_LCAO_k","cal_edm_2d");
 
