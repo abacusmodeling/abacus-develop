@@ -87,7 +87,7 @@ void test_orb::set_orbs()
 	int* nproj = new int[ORB.get_ntype()];
 	for (int i = 0;i < ORB.get_ntype();++i)
 		nproj[i] = 0;
-	const Numerical_Nonlocal beta_[1];
+	const Numerical_Nonlocal beta_[ORB.get_ntype()];
 
 	ooo.set_orb_tables(
 		ofs_running,
