@@ -581,19 +581,9 @@ void Pdiag_Double::diago_double_begin(
 
 				if(out_lowf)
 				{
-					if(INPUT.new_dm==0)
-					{
-						// mohan delete Bfield option 2021-02-12
-						//info=q2ZLOC_WFC_WFCAUG_CTOT(myid, pos, naroc, nb,
-						//	dim0, dim1, iprow, ipcol, this->loc_size,
-						//	work, Z_LOC[ik], wfc, GlobalC::LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN], ctot);
-					}
-					else
-					{
                     info=q2CTOT(myid, naroc, nb,
                         dim0, dim1, iprow, ipcol, this->loc_size,
                         work, ctot);
-					}
 				}//out_lowf
 				else
 				{
@@ -654,10 +644,6 @@ void Pdiag_Double::diago_double_begin(
 		}
 		memcpy( ekb, ekb_tmp.data(), sizeof(double)*GlobalV::NBANDS );
 
-		if(INPUT.new_dm==0)
-		{
-			throw std::domain_error("INPUT.new_dm must be 1. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		}
 	}
 	else if(GlobalV::KS_SOLVER=="lapack_gvx")
 	{
@@ -699,19 +685,10 @@ void Pdiag_Double::diago_double_begin(
 			throw std::runtime_error("M="+ModuleBase::GlobalFunc::TO_STRING(M)+". GlobalV::NBANDS="+ModuleBase::GlobalFunc::TO_STRING(GlobalV::NBANDS)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 
-		if(INPUT.new_dm==0)
-		{
-			throw std::domain_error("INPUT.new_dm must be 1. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		}
 	}
 	else if(GlobalV::KS_SOLVER=="scalapack_gvx")
 	{
 		diag_scalapack_gvx.pdsygvx_diag(this->desc, this->ncol, this->nrow, h_mat, s_mat, ekb, wfc_2d);		// Peize Lin add 2021.11.02
-
-		if(INPUT.new_dm==0)
-		{
-			throw std::domain_error("INPUT.new_dm must be 1. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		}
 	}
     //delete[] Stmp; //LiuXh 20171109
 #endif
@@ -957,8 +934,6 @@ void Pdiag_Double::diago_complex_begin(
 	{
 		diag_scalapack_gvx.pzhegvx_diag(this->desc, this->ncol, this->nrow, ch_mat, cs_mat, ekb, wfc_2d);		// Peize Lin add 2021.11.02
 
-//		if(INPUT.new_dm==0)
-//			throw std::domain_error("INPUT.new_dm must be 1. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		// the follow will be deleted after finish newdm
 		{
 			//change eigenvector matrix from block-cycle distribute matrix to column-divided distribute matrix

@@ -330,14 +330,7 @@ int WF_Local::read_lowf(double **c, const int &is)
     // if GlobalV::DRANK!=0, ctot is not used,
     // so it's save.
 
-	if(INPUT.new_dm==0)
-	{	
-		WF_Local::distri_lowf(ctot, GlobalC::SGO.totwfc[0]);
-	}
-	else
-	{
-		WF_Local::distri_lowf_new(ctot, is);
-	}
+	WF_Local::distri_lowf_new(ctot, is);
 	
 	// mohan add 2012-02-15,
 	// still have bugs, but can solve it later.
