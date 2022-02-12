@@ -129,82 +129,6 @@ inline int q2CTOT(
     return 0;
 }
 
-inline int q2ZLOC_WFC(
-	int pos,
-	int naroc[2],
-	int nb,
-	int dim0,
-	int dim1,
-	int iprow,
-	int ipcol,
-	int loc_size,
-	double* work,
-	double* ZLOC,
-	double** WFC)
-{
-    //ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"start q2ZLOC_WFC");
-    for(int j=0; j<naroc[1]; ++j)
-    {
-        int igcol=globalIndex(j, nb, dim1, ipcol);
-        if(igcol>=GlobalV::NBANDS) continue;
-        int zcol=igcol-pos;
-        for(int i=0; i<naroc[0]; ++i)
-        {
-            int igrow=globalIndex(i, nb, dim0, iprow);
-            if(0<=zcol && zcol<loc_size)
-            {
-                ZLOC[igrow*loc_size+zcol]=work[j*naroc[0]+i];
-            }
-	        int mu_local=GlobalC::SGO.trace_lo_tot[igrow];
-            if(mu_local>=0 && igrow<GlobalV::NBANDS)
-            {
-                WFC[igcol][mu_local]=work[j*naroc[0]+i];
-            }
-        }
-    }
-    //ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"WFC was done in q2ZLOC_WFC");
-    return 0;
-}
-
-
-inline int q2ZLOC_WFC_CTOT(
-	int myid,
-	int pos,
-	int naroc[2],
-	int nb,
-	int dim0,
-	int dim1,
-	int iprow,
-	int ipcol,
-	int loc_size,
-	double* work,
-	double* ZLOC,
-	double** WFC,
-	double** CTOT)
-{
-    for(int j=0; j<naroc[1]; ++j)
-    {
-        int igcol=globalIndex(j, nb, dim1, ipcol);
-        if(igcol>=GlobalV::NBANDS) continue;
-        int zcol=igcol-pos;
-        for(int i=0; i<naroc[0]; ++i)
-        {
-            int igrow=globalIndex(i, nb, dim0, iprow);
-            if(0<=zcol && zcol<loc_size)
-            {
-                ZLOC[igrow*loc_size+zcol]=work[j*naroc[0]+i];
-            }
-	        int mu_local=GlobalC::SGO.trace_lo_tot[igrow];
-            if(mu_local>=0)
-            {
-                WFC[igcol][mu_local]=work[j*naroc[0]+i];
-            }
-            if(myid==0) CTOT[igcol][igrow]=work[j*naroc[0]+i];
-        }
-    }
-    return 0;
-}
-
 
 inline int q2WFC_complex(
 	int naroc[2],
@@ -585,13 +509,6 @@ void Pdiag_Double::diago_double_begin(
                         dim0, dim1, iprow, ipcol, this->loc_size,
                         work, ctot);
 				}//out_lowf
-				else
-				{
-					// mohan update 2021-02-12, delete Bfield option
-					//info=q2ZLOC_WFC_WFCAUG(pos, naroc, nb,
-					//	dim0, dim1, iprow, ipcol, this->loc_size,
-					//	work, Z_LOC[ik], wfc, GlobalC::LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN]);
-				}
 			}//loop ipcol
 		}//loop iprow
 
