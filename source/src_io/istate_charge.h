@@ -14,7 +14,9 @@ class IState_Charge
 
 	int *bands_picked;
 
+#ifdef __MPI
 	void idmatrix(const int &ib);
+#endif
 
 };
 #endif
