@@ -31,7 +31,6 @@ global_function.o\
 global_variable.o\
 tool_title.o\
 tool_quit.o\
-mymath3.o\
 memory.o\
 
 OBJS_CELL=pseudo_nc.o\
