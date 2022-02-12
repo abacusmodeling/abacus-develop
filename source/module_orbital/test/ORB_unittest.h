@@ -1,10 +1,10 @@
-#ifndef _ORBTEST_
-#define _ORBTEST_
+#ifndef _ORBUNITTEST_
+#define _ORBUNITTEST_
 
 #include "gtest/gtest.h"
-#include "../../../source/module_orbital/ORB_control.h"
-#include "../../../source/module_base/global_function.h"	
-#include "../../../source/src_lcao/center2_orb-orb11.h"
+#include "module_orbital/ORB_control.h"
+#include "module_base/global_function.h"	
+#include "src_lcao/center2_orb-orb11.h"
 //#include "mock_center2.h"
 #include <fstream>
 #include <iomanip>
