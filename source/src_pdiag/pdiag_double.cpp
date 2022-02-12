@@ -74,6 +74,7 @@ inline int cart2blacs(
 #endif
 }
 
+#ifdef __MPI
 inline int set_elpahandle(elpa_t &handle, int *desc, int local_nrows, int local_ncols)
 {
   int error;
@@ -103,6 +104,7 @@ inline int set_elpahandle(elpa_t &handle, int *desc, int local_nrows, int local_
   elpa_setup(handle);   /* Set tunables */
   return 0;
 }
+#endif
 
 inline int q2CTOT(
 	int myid,
