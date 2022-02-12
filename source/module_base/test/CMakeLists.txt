@@ -1,5 +1,9 @@
 remove_definitions(-D__MPI)
 AddTest(
+  TARGET base_timer
+  SOURCES timer_test.cpp ../timer.cpp
+)
+AddTest(
   TARGET base_tool_quit
   SOURCES tool_quit_test.cpp ../tool_quit.cpp ../global_variable.cpp ../global_file.cpp ../memory.cpp ../timer.cpp
 )
@@ -28,4 +32,9 @@ AddTest(
 AddTest(
   TARGET base_integral
   SOURCES math_integral_test.cpp ../math_integral.cpp
+)
+AddTest(
+  TARGET base_complexmatrix
+  LIBS ${math_libs}
+  SOURCES complexmatrix_test.cpp ../complexmatrix.cpp ../matrix.cpp 
 )

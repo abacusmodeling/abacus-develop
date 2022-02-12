@@ -41,42 +41,9 @@ void Force_LCAO_gamma::ftable_gamma (
     // calculate the 'energy density matrix' here.
     this->cal_foverlap(isforce, isstress, foverlap, soverlap);
 
-    if(INPUT.new_dm>0)
-    {
-        this->cal_ftvnl_dphi(GlobalC::LOC.wfc_dm_2d.dm_gamma, isforce, isstress, ftvnl_dphi, stvnl_dphi);
-        this->calFvnlDbeta(GlobalC::LOC.wfc_dm_2d.dm_gamma, isforce, isstress, fvnl_dbeta, svnl_dbeta, GlobalV::vnl_method);
-        this->cal_fvl_dphi(GlobalC::LOC.wfc_dm_2d.dm_gamma, isforce, isstress, fvl_dphi, svl_dphi);
-
-    }
-    else
-    {
-        ModuleBase::timer::tick("Force_LCAO_gamma","cal_dm_grid");
-        // calculate the 'density matrix' here.
-        ModuleBase::matrix dm2d;
-		dm2d.create(GlobalV::NSPIN, GlobalC::ParaO.nloc);
-        ModuleBase::Memory::record ("Force_LCAO_gamma", "dm2d", GlobalC::ParaO.nloc*GlobalV::NSPIN, "double");    
-
-        bool with_energy = false;
-
-		this->set_EDM_gamma(dm2d, with_energy);
-
-        ModuleBase::timer::tick("Force_LCAO_gamma","cal_dm_grid");
-
-        this->cal_ftvnl_dphi(dm2d, isforce, isstress, ftvnl_dphi, stvnl_dphi);
-        if(GlobalV::NSPIN==4)
-        {
-            this->cal_fvnl_dbeta(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
-        }
-        else
-        {
-            this->cal_fvnl_dbeta_new(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
-        }
-
-
-        // calculate < dphi | V | phi > on real space grid.
-        this->cal_fvl_dphi(dm2d, isforce, isstress, fvl_dphi, svl_dphi);
-
-    }
+    this->cal_ftvnl_dphi(GlobalC::LOC.wfc_dm_2d.dm_gamma, isforce, isstress, ftvnl_dphi, stvnl_dphi);
+    this->calFvnlDbeta(GlobalC::LOC.wfc_dm_2d.dm_gamma, isforce, isstress, fvnl_dbeta, svnl_dbeta, GlobalV::vnl_method);
+    this->cal_fvl_dphi(GlobalC::LOC.wfc_dm_2d.dm_gamma, isforce, isstress, fvl_dphi, svl_dphi);
     
     //caoyu add for DeePKS
 #ifdef __DEEPKS

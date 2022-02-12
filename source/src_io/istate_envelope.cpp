@@ -26,8 +26,6 @@ void IState_Envelope::begin(void)
 
 	// (1.2) read in LOWF_GAMMA.dat
 
-	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"LOWF.allocate_flag",GlobalC::LOWF.get_allocate_flag());	
-
 	// mohan update 2011-03-21
 	// if ucell is odd, it's correct,
 	// if ucell is even, it's also correct.

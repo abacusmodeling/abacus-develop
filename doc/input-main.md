@@ -63,7 +63,7 @@
 
     - [Variables useful for debugging](#variables-useful-for-debugging)
 
-        [nurse](#nurse) | [t_in_h](#t-in-h) | [vl_in_h](#vl-in-h) | [vnl_in_h](#vnl-in-h) | [test_force](#test-force) | [test_stress](#test-stress) | [colour](#colour) | [new_dm](#new-dm) | [test_just_neighbor](#test-just-neighbor)
+        [nurse](#nurse) | [t_in_h](#t-in-h) | [vl_in_h](#vl-in-h) | [vnl_in_h](#vnl-in-h) | [test_force](#test-force) | [test_stress](#test-stress) | [colour](#colour) | [test_just_neighbor](#test-just-neighbor)
     - [DeePKS](#deepks)
     
         [out_descriptor](#out-descriptor) | [lmax_descriptor](#lmax-descriptor) | [deepks_scf](#deepks-scf) | [model_file](#model-file)
@@ -1564,17 +1564,6 @@ This part of variables are used to control berry phase and wannier90 interfacae 
     - *Type*: Boolean
     - *Description*: If set to 1, output to terminal will have some color.
     - *Default*: 0
-
-    [back to top](#input-file)
-
-- new_dm<a id="new-dm"></a>
-
-    - *Type*: Integer
-    - *Description*: Controls output of some debug information related to our density matrix data-structures.
-        - 1: show no debug information
-        - 2: only show key debug information
-        - 3: show all detail debug information
-    - *Default*: 1
 
     [back to top](#input-file)
 

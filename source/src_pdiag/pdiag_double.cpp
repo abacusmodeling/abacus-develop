@@ -129,175 +129,6 @@ inline int q2CTOT(
     return 0;
 }
 
-inline int q2ZLOC_WFC(
-	int pos,
-	int naroc[2],
-	int nb,
-	int dim0,
-	int dim1,
-	int iprow,
-	int ipcol,
-	int loc_size,
-	double* work,
-	double* ZLOC,
-	double** WFC)
-{
-    //ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"start q2ZLOC_WFC");
-    for(int j=0; j<naroc[1]; ++j)
-    {
-        int igcol=globalIndex(j, nb, dim1, ipcol);
-        if(igcol>=GlobalV::NBANDS) continue;
-        int zcol=igcol-pos;
-        for(int i=0; i<naroc[0]; ++i)
-        {
-            int igrow=globalIndex(i, nb, dim0, iprow);
-            if(0<=zcol && zcol<loc_size)
-            {
-                ZLOC[igrow*loc_size+zcol]=work[j*naroc[0]+i];
-            }
-	        int mu_local=GlobalC::SGO.trace_lo_tot[igrow];
-            if(mu_local>=0 && igrow<GlobalV::NBANDS)
-            {
-                WFC[igcol][mu_local]=work[j*naroc[0]+i];
-            }
-        }
-    }
-    //ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"WFC was done in q2ZLOC_WFC");
-    return 0;
-}
-
-inline int q2ZLOC_WFC_WFCAUG(
-	int pos,
-	int naroc[2],
-	int nb,
-	int dim0,
-	int dim1,
-	int iprow,
-	int ipcol,
-	int loc_size,
-	double* work,
-	double* ZLOC,
-	double** WFC,
-	double** WFCAUG)
-{
-
-    std::stringstream ss;
-    for(int j=0; j<naroc[1]; ++j)
-    {
-        int igcol=globalIndex(j, nb, dim1, ipcol);
-/*        ss<<"local column "<<j<<" nb "<<nb<<" dim1 "<<dim1<<" mypcol "<<ipcol<<" global column (GlobalV::NBANDS) "<<igcol;
-		ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,ss.str());
-		ss.str("");*/
-        if(igcol>=GlobalV::NBANDS) continue;
-        int zcol=igcol-pos;
-        for(int i=0; i<naroc[0]; ++i)
-        {
-            int igrow=globalIndex(i, nb, dim0, iprow);
-/*	        ss<<"    local row "<<i<<" nb "<<nb<<" dim0 "<<dim0<<" myprow "<<iprow<<" global row (GlobalV::NLOCAL)"<<igrow;
-			ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,ss.str());
-			ss.str("");*/
-            if(0<=zcol && zcol<loc_size)
-            {
-                ZLOC[igrow*loc_size+zcol]=work[j*naroc[0]+i];
-            }
-	        int mu_local=GlobalC::SGO.trace_lo_tot[igrow];
-            if(mu_local>=0)
-            {
-                WFC[igcol][mu_local]=work[j*naroc[0]+i];
-            }
-	        int mu_aug=GlobalC::LOWF.trace_aug[igrow];
-            if(mu_aug>=0)
-            {
-                WFCAUG[igcol][mu_aug]=work[j*naroc[0]+i];
-            }
-        }
-    }
-
-    //ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"WFCAUG was done in q2ZLOC_WFC_WFCAUG");
-    return 0;
-}
-
-inline int q2ZLOC_WFC_CTOT(
-	int myid,
-	int pos,
-	int naroc[2],
-	int nb,
-	int dim0,
-	int dim1,
-	int iprow,
-	int ipcol,
-	int loc_size,
-	double* work,
-	double* ZLOC,
-	double** WFC,
-	double** CTOT)
-{
-    for(int j=0; j<naroc[1]; ++j)
-    {
-        int igcol=globalIndex(j, nb, dim1, ipcol);
-        if(igcol>=GlobalV::NBANDS) continue;
-        int zcol=igcol-pos;
-        for(int i=0; i<naroc[0]; ++i)
-        {
-            int igrow=globalIndex(i, nb, dim0, iprow);
-            if(0<=zcol && zcol<loc_size)
-            {
-                ZLOC[igrow*loc_size+zcol]=work[j*naroc[0]+i];
-            }
-	        int mu_local=GlobalC::SGO.trace_lo_tot[igrow];
-            if(mu_local>=0)
-            {
-                WFC[igcol][mu_local]=work[j*naroc[0]+i];
-            }
-            if(myid==0) CTOT[igcol][igrow]=work[j*naroc[0]+i];
-        }
-    }
-    return 0;
-}
-
-inline int q2ZLOC_WFC_WFCAUG_CTOT(
-	int myid,
-	int pos,
-	int naroc[2],
-	int nb,
-	int dim0,
-	int dim1,
-	int iprow,
-	int ipcol,
-	int loc_size,
-	double* work,
-	double* ZLOC,
-	double** WFC,
-	double** WFCAUG,
-	double** CTOT)
-{
-    for(int j=0; j<naroc[1]; ++j)
-    {
-        int igcol=globalIndex(j, nb, dim1, ipcol);
-        if(igcol>=GlobalV::NBANDS) continue;
-        int zcol=igcol-pos;
-        for(int i=0; i<naroc[0]; ++i)
-        {
-            int igrow=globalIndex(i, nb, dim0, iprow);
-            if(0<=zcol && zcol<loc_size)
-            {
-                ZLOC[igrow*loc_size+zcol]=work[j*naroc[0]+i];
-            }
-	        int mu_local=GlobalC::SGO.trace_lo_tot[igrow];
-            if(mu_local>=0)
-            {
-                WFC[igcol][mu_local]=work[j*naroc[0]+i];
-            }
-	        int mu_aug=GlobalC::LOWF.trace_aug[igrow];
-            if(mu_aug>=0)
-            {
-                WFCAUG[igcol][mu_aug]=work[j*naroc[0]+i];
-            }
-            if(myid==0) CTOT[igcol][igrow]=work[j*naroc[0]+i];
-        }
-    }
-    return 0;
-}
 
 inline int q2WFC_complex(
 	int naroc[2],
@@ -326,38 +157,6 @@ inline int q2WFC_complex(
     return 0;
 }
 
-inline int q2WFC_WFCAUG_complex(
-	int naroc[2],
-	int nb,
-	int dim0,
-	int dim1,
-	int iprow,
-	int ipcol,
-	std::complex<double>* work,
-	std::complex<double>** WFC,
-	std::complex<double>** WFCAUG)
-{
-    for(int j=0; j<naroc[1]; ++j)
-    {
-        int igcol=globalIndex(j, nb, dim1, ipcol);
-        if(igcol>=GlobalV::NBANDS) continue;
-        for(int i=0; i<naroc[0]; ++i)
-        {
-            int igrow=globalIndex(i, nb, dim0, iprow);
-	        int mu_local=GlobalC::GridT.trace_lo[igrow];
-            if(mu_local>=0)
-            {
-                WFC[igcol][mu_local]=work[j*naroc[0]+i];
-            }
-	        int mu_aug=GlobalC::LOWF.trace_aug[igrow];
-            if(mu_aug>=0)
-            {
-                WFCAUG[igcol][mu_aug]=work[j*naroc[0]+i];
-            }
-        }
-    }
-    return 0;
-}
 
 inline int q2WFC_CTOT_complex(
 	int myid,
@@ -389,41 +188,6 @@ inline int q2WFC_CTOT_complex(
     return 0;
 }
 
-inline int q2WFC_WFCAUG_CTOT_complex(
-	int myid,
-	int naroc[2],
-	int nb,
-	int dim0,
-	int dim1,
-	int iprow,
-	int ipcol,
-	std::complex<double>* work,
-	std::complex<double>** WFC,
-	std::complex<double>** WFCAUG,
-	std::complex<double>** CTOT)
-{
-    for(int j=0; j<naroc[1]; ++j)
-    {
-        int igcol=globalIndex(j, nb, dim1, ipcol);
-        if(igcol>=GlobalV::NBANDS) continue;
-        for(int i=0; i<naroc[0]; ++i)
-        {
-            int igrow=globalIndex(i, nb, dim0, iprow);
-	        int mu_local=GlobalC::GridT.trace_lo[igrow];
-            if(mu_local>=0)
-            {
-                WFC[igcol][mu_local]=work[j*naroc[0]+i];
-            }
-	        int mu_aug=GlobalC::LOWF.trace_aug[igrow];
-            if(mu_aug>=0)
-            {
-                WFCAUG[igcol][mu_aug]=work[j*naroc[0]+i];
-            }
-            if(myid==0) CTOT[igcol][igrow]=work[j*naroc[0]+i];
-        }
-    }
-    return 0;
-}
 
 inline bool ifElpaHandle(const bool& newIteration, const bool& ifNSCF)
 {
@@ -741,27 +505,10 @@ void Pdiag_Double::diago_double_begin(
 
 				if(out_lowf)
 				{
-					if(INPUT.new_dm==0)
-					{
-						// mohan delete Bfield option 2021-02-12
-						//info=q2ZLOC_WFC_WFCAUG_CTOT(myid, pos, naroc, nb,
-						//	dim0, dim1, iprow, ipcol, this->loc_size,
-						//	work, Z_LOC[ik], wfc, GlobalC::LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN], ctot);
-					}
-					else
-					{
-						info=q2CTOT(myid, naroc, nb,
-							dim0, dim1, iprow, ipcol, this->loc_size,
-							work, ctot);
-					}
+                    info=q2CTOT(myid, naroc, nb,
+                        dim0, dim1, iprow, ipcol, this->loc_size,
+                        work, ctot);
 				}//out_lowf
-				else
-				{
-					// mohan update 2021-02-12, delete Bfield option
-					//info=q2ZLOC_WFC_WFCAUG(pos, naroc, nb,
-					//	dim0, dim1, iprow, ipcol, this->loc_size,
-					//	work, Z_LOC[ik], wfc, GlobalC::LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN]);
-				}
 			}//loop ipcol
 		}//loop iprow
 
@@ -814,10 +561,6 @@ void Pdiag_Double::diago_double_begin(
 		}
 		memcpy( ekb, ekb_tmp.data(), sizeof(double)*GlobalV::NBANDS );
 
-		if(INPUT.new_dm==0)
-		{
-			throw std::domain_error("INPUT.new_dm must be 1. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		}
 	}
 	else if(GlobalV::KS_SOLVER=="lapack_gvx")
 	{
@@ -859,19 +602,10 @@ void Pdiag_Double::diago_double_begin(
 			throw std::runtime_error("M="+ModuleBase::GlobalFunc::TO_STRING(M)+". GlobalV::NBANDS="+ModuleBase::GlobalFunc::TO_STRING(GlobalV::NBANDS)+". "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 
-		if(INPUT.new_dm==0)
-		{
-			throw std::domain_error("INPUT.new_dm must be 1. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		}
 	}
 	else if(GlobalV::KS_SOLVER=="scalapack_gvx")
 	{
 		diag_scalapack_gvx.pdsygvx_diag(this->desc, this->ncol, this->nrow, h_mat, s_mat, ekb, wfc_2d);		// Peize Lin add 2021.11.02
-
-		if(INPUT.new_dm==0)
-		{
-			throw std::domain_error("INPUT.new_dm must be 1. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-		}
 	}
     //delete[] Stmp; //LiuXh 20171109
 #endif
@@ -1084,9 +818,9 @@ void Pdiag_Double::diago_complex_begin(
                         ModuleBase::Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
                     }
 					// mohan update 2021-02-12, delete BFIELD option
-					info=q2WFC_WFCAUG_CTOT_complex(myid, naroc, nb,
+					info=q2WFC_CTOT_complex(myid, naroc, nb,
 							dim0, dim1, iprow, ipcol,
-							work, wfc, GlobalC::LOWF.WFC_K_aug[ik], ctot);
+							work, wfc, ctot);
                     std::stringstream ss;
 	                ss << GlobalV::global_out_dir << "LOWF_K_" << ik+1 << ".dat";
                     // mohan add 2012-04-03, because we need the occupations for the
@@ -1104,9 +838,9 @@ void Pdiag_Double::diago_complex_begin(
                 else
                 {
 					// mohan update 2021-02-12, delte BFIELD option
-					info=q2WFC_WFCAUG_complex(naroc, nb,
+					info=q2WFC_complex(naroc, nb,
 							dim0, dim1, iprow, ipcol,
-							work, wfc, GlobalC::LOWF.WFC_K_aug[ik]);
+							work, wfc);
 				}
             }
         }
@@ -1117,8 +851,6 @@ void Pdiag_Double::diago_complex_begin(
 	{
 		diag_scalapack_gvx.pzhegvx_diag(this->desc, this->ncol, this->nrow, ch_mat, cs_mat, ekb, wfc_2d);		// Peize Lin add 2021.11.02
 
-//		if(INPUT.new_dm==0)
-//			throw std::domain_error("INPUT.new_dm must be 1. "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		// the follow will be deleted after finish newdm
 		{
 			//change eigenvector matrix from block-cycle distribute matrix to column-divided distribute matrix
@@ -1161,9 +893,9 @@ void Pdiag_Double::diago_complex_begin(
 							ModuleBase::Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
 						}
 						// mohan update 2021-02-12, delete BFIELD option
-						info=q2WFC_WFCAUG_CTOT_complex(myid, naroc, nb,
+						info=q2WFC_CTOT_complex(myid, naroc, nb,
 								dim0, dim1, iprow, ipcol,
-								work, wfc, GlobalC::LOWF.WFC_K_aug[ik], ctot);
+								work, wfc, ctot);
 						std::stringstream ss;
 						ss << GlobalV::global_out_dir << "LOWF_K_" << ik+1 << ".dat";
 						// mohan add 2012-04-03, because we need the occupations for the
@@ -1181,9 +913,9 @@ void Pdiag_Double::diago_complex_begin(
 					else
 					{
 						// mohan update 2021-02-12, delte BFIELD option
-						info=q2WFC_WFCAUG_complex(naroc, nb,
+						info=q2WFC_complex(naroc, nb,
 								dim0, dim1, iprow, ipcol,
-								work, wfc, GlobalC::LOWF.WFC_K_aug[ik]);
+								work, wfc);
 					}
 				}
 			}

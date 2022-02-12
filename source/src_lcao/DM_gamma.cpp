@@ -113,14 +113,13 @@ int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt
         int prow, pcol;
         Cblacs_pcoord(blacs_ctxt, pnum, &prow, &pcol);
         receiver_size_process[pnum]=nRow_in_proc[prow]*nCol_in_proc[pcol];
-        if(INPUT.new_dm>1)
-        {
-            ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"pnum",pnum);
-            ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"prow",prow);
-            ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"pcol",pcol);
-            ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nRow_in_proc",nRow_in_proc[prow]);
-            ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nCol_in_proc",nCol_in_proc[pcol]);
-        }
+
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"pnum",pnum);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"prow",prow);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"pcol",pcol);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nRow_in_proc",nRow_in_proc[prow]);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nCol_in_proc",nCol_in_proc[pcol]);
+
         if(pnum>0)
         {
             receiver_displacement_process[pnum]=receiver_displacement_process[pnum-1]+receiver_size_process[pnum-1];
@@ -187,22 +186,20 @@ int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt
                   sender_2D_index, sender_size_process, sender_displacement_process, MPI_INT, comm_2D);
 
 
-    if(INPUT.new_dm>1)
+    GlobalV::ofs_running << "receiver_size is " << receiver_size << " ; receiver_size of each process is:\n";
+    for(int i=0; i<nprocs; ++i)
     {
-        GlobalV::ofs_running<<"receiver_size is "<<receiver_size<<" ; receiver_size of each process is:\n";
-        for(int i=0; i<nprocs; ++i)
-        {
-            GlobalV::ofs_running<<receiver_size_process[i]<<" ";
-        }
-        GlobalV::ofs_running<<std::endl;
-        GlobalV::ofs_running<<"sender_size is "<<sender_size<<" ; sender_size of each process is:\n";
-        for(int i=0; i<nprocs; ++i)
-        {
-            GlobalV::ofs_running<<sender_size_process[i]<<" ";
-        }
-        GlobalV::ofs_running<<std::endl;
+        GlobalV::ofs_running<<receiver_size_process[i]<<" ";
     }
-    // ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"last sender_2D_index",sender_2D_index[lgd_now*lgd_now-1]);
+    GlobalV::ofs_running<<std::endl;
+    GlobalV::ofs_running<<"sender_size is "<<sender_size<<" ; sender_size of each process is:\n";
+    for(int i=0; i<nprocs; ++i)
+    {
+        GlobalV::ofs_running<<sender_size_process[i]<<" ";
+    }
+    GlobalV::ofs_running << std::endl;
+        
+        // ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"last sender_2D_index",sender_2D_index[lgd_now*lgd_now-1]);
     delete[] receiver_2D_index;
     ModuleBase::timer::tick("LCAO_Charge","newDM_index");
     return 0;
@@ -339,31 +336,27 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
 
     for(int is=0; is<GlobalV::NSPIN; ++is)
     {
-        if(INPUT.new_dm>1)
-        // outputDM( GlobalC::ParaO.blacs_ctxt, GlobalC::ParaO.nb);
+        // int myid;
+        // MPI_Comm_rank(MPI_COMM_WORLD, &myid);
+        // if(myid==0)
+        // {
+        //     GlobalV::ofs_running<<"DM[0][0:1][0:1] before send:"<<std::endl;
+        //     GlobalV::ofs_running<<"DM(0,0)"<<wfc_dm_2d.dm_gamma[is](0,0)<<" ";
+        //     GlobalV::ofs_running<<"DM(0,1)"<<wfc_dm_2d.dm_gamma[is](1,0)<<std::endl;
+        //     GlobalV::ofs_running<<"DM(1,0)"<<wfc_dm_2d.dm_gamma[is](0,1)<<" ";
+        //     GlobalV::ofs_running<<"DM(1,1)"<<wfc_dm_2d.dm_gamma[is](1,1)<<std::endl;
+        // }
+        GlobalV::ofs_running<<"2D block parameters:\n"<<"nblk: "<<GlobalC::ParaO.nb<<std::endl;
+        GlobalV::ofs_running<<"DM in 2D format:\n_________________________________________\n";
+        for(int i=0; i<wfc_dm_2d.dm_gamma[is].nr; ++i)
         {
-            // int myid;
-            // MPI_Comm_rank(MPI_COMM_WORLD, &myid);
-            // if(myid==0)
-            // {
-            //     GlobalV::ofs_running<<"DM[0][0:1][0:1] before send:"<<std::endl;
-            //     GlobalV::ofs_running<<"DM(0,0)"<<wfc_dm_2d.dm_gamma[is](0,0)<<" ";
-            //     GlobalV::ofs_running<<"DM(0,1)"<<wfc_dm_2d.dm_gamma[is](1,0)<<std::endl;
-            //     GlobalV::ofs_running<<"DM(1,0)"<<wfc_dm_2d.dm_gamma[is](0,1)<<" ";
-            //     GlobalV::ofs_running<<"DM(1,1)"<<wfc_dm_2d.dm_gamma[is](1,1)<<std::endl;
-            // }
-            GlobalV::ofs_running<<"2D block parameters:\n"<<"nblk: "<<GlobalC::ParaO.nb<<std::endl;
-            GlobalV::ofs_running<<"DM in 2D format:\n_________________________________________\n";
-            for(int i=0; i<wfc_dm_2d.dm_gamma[is].nr; ++i)
+            for(int j=0; j<wfc_dm_2d.dm_gamma[is].nc; ++j)
             {
-                for(int j=0; j<wfc_dm_2d.dm_gamma[is].nc; ++j)
-                {
-                    GlobalV::ofs_running<<wfc_dm_2d.dm_gamma[is](i,j)<<" ";
-                }
-                GlobalV::ofs_running<<std::endl;
+                GlobalV::ofs_running<<wfc_dm_2d.dm_gamma[is](i,j)<<" ";
             }
-            GlobalV::ofs_running<<"=========================================\n";
+            GlobalV::ofs_running<<std::endl;
         }
+        GlobalV::ofs_running<<"=========================================\n";
 
         // put data from dm_gamma[is] to sender index
         int nNONZERO=0;
@@ -377,12 +370,11 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
                                                                 // so the row and column index should be switched
             if(sender_buffer[i]!=0) ++nNONZERO;
         }
-        if(INPUT.new_dm>1) 
-        {
-            ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of non-zero elements in sender_buffer",nNONZERO);
-            ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"sender_size",sender_size);
-            ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"last sender_buffer",sender_buffer[sender_size-1]);
-        }
+
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of non-zero elements in sender_buffer",nNONZERO);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"sender_size",sender_size);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"last sender_buffer",sender_buffer[sender_size-1]);
+
         // transform data via MPI_Alltoallv
         #ifdef __MPI
         MPI_Alltoallv(sender_buffer, sender_size_process, sender_displacement_process, MPI_DOUBLE,
@@ -408,44 +400,43 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
             if(receiver_buffer[i]!=0) ++nNONZERO;
         }
 
-        if(INPUT.new_dm>1)
+
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of non-zero elements in receiver_buffer",nNONZERO);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"receiver_size",receiver_size);
+        ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"last receiver_buffer",receiver_buffer[receiver_size-1]);
+        // GlobalV::ofs_running<<"DM[0][0:1][0:1] after receiver:"<<std::endl;
+        // int idx0=GlobalC::GridT.trace_lo[0];
+        // int idx1=GlobalC::GridT.trace_lo[1];
+        // if(idx0>=0)
+        // {
+        //     GlobalV::ofs_running<<"DM(0,0)"<<DM[0][idx0][idx0]<<" ";
+        // }
+        // if(idx0>=0 && idx1>=0)
+        // {
+        //     GlobalV::ofs_running<<"DM(0,1)"<<DM[0][idx0][idx1]<<std::endl;
+        //     GlobalV::ofs_running<<"DM(1,0)"<<DM[0][idx1][idx0]<<" ";
+        // }
+        // if(idx1>=0)
+        // {
+        //     GlobalV::ofs_running<<"DM(1,1)"<<DM[0][idx1][idx1]<<std::endl;
+        // }
+        //GlobalV::ofs_running<<DM[0][0][0]<<" "<<DM[0][0][1]<<std::endl;
+        //GlobalV::ofs_running<<DM[0][1][0]<<" "<<DM[0][1][1]<<std::endl;
+        GlobalV::ofs_running<<"DM in local grid:\n_________________________________________\n";
+        for(int i=0; i<GlobalV::NLOCAL; ++i)
         {
-            ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"number of non-zero elements in receiver_buffer",nNONZERO);
-            ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"receiver_size",receiver_size);
-            ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"last receiver_buffer",receiver_buffer[receiver_size-1]);
-            // GlobalV::ofs_running<<"DM[0][0:1][0:1] after receiver:"<<std::endl;
-            // int idx0=GlobalC::GridT.trace_lo[0];
-            // int idx1=GlobalC::GridT.trace_lo[1];
-            // if(idx0>=0)
-            // {
-            //     GlobalV::ofs_running<<"DM(0,0)"<<DM[0][idx0][idx0]<<" ";
-            // }
-            // if(idx0>=0 && idx1>=0)
-            // {
-            //     GlobalV::ofs_running<<"DM(0,1)"<<DM[0][idx0][idx1]<<std::endl;
-            //     GlobalV::ofs_running<<"DM(1,0)"<<DM[0][idx1][idx0]<<" ";
-            // }
-            // if(idx1>=0)
-            // {
-            //     GlobalV::ofs_running<<"DM(1,1)"<<DM[0][idx1][idx1]<<std::endl;
-            // }
-            //GlobalV::ofs_running<<DM[0][0][0]<<" "<<DM[0][0][1]<<std::endl;
-            //GlobalV::ofs_running<<DM[0][1][0]<<" "<<DM[0][1][1]<<std::endl;
-            GlobalV::ofs_running<<"DM in local grid:\n_________________________________________\n";
-            for(int i=0; i<GlobalV::NLOCAL; ++i)
+            int ii=GlobalC::GridT.trace_lo[i];
+            if(ii < 0) continue;
+            for(int j=0; j<GlobalV::NLOCAL; ++j)
             {
-                int ii=GlobalC::GridT.trace_lo[i];
-                if(ii < 0) continue;
-                for(int j=0; j<GlobalV::NLOCAL; ++j)
-                {
-                    int jj=GlobalC::GridT.trace_lo[j];
-                    if(jj<0) continue;
-                    GlobalV::ofs_running<<DM[is][ii][jj]<<" ";
-                }
-                GlobalV::ofs_running<<std::endl;
+                int jj=GlobalC::GridT.trace_lo[j];
+                if(jj<0) continue;
+                GlobalV::ofs_running<<DM[is][ii][jj]<<" ";
             }
-            GlobalV::ofs_running<<"=========================================\n";
+            GlobalV::ofs_running<<std::endl;
         }
+        GlobalV::ofs_running<<"=========================================\n";
+
     }
     ModuleBase::timer::tick("LCAO_Charge","dm_2dTOgrid");
 	return;
