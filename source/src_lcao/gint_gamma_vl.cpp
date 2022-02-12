@@ -459,6 +459,7 @@ void vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal)
     if(GlobalC::CHR.get_new_e_iteration())
     {
         ModuleBase::timer::tick("Gint_Gamma","distri_vl_index");
+        #ifdef __MPI
         setBufferParameter(GlobalC::ParaO.comm_2D, GlobalC::ParaO.blacs_ctxt, GlobalC::ParaO.nb,
                            GlobalC::ParaO.sender_index_size, GlobalC::ParaO.sender_local_index,
                            GlobalC::ParaO.sender_size_process, GlobalC::ParaO.sender_displacement_process,
@@ -466,6 +467,7 @@ void vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal)
                            GlobalC::ParaO.receiver_index_size, GlobalC::ParaO.receiver_global_index,
                            GlobalC::ParaO.receiver_size_process, GlobalC::ParaO.receiver_displacement_process,
                            GlobalC::ParaO.receiver_size, GlobalC::ParaO.receiver_buffer);
+        #endif
         ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "vlocal exchange index is built");
         ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "buffer size(M):", (GlobalC::ParaO.sender_size+GlobalC::ParaO.receiver_size)*sizeof(double)/1024/1024);
         ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "buffer index size(M):", (GlobalC::ParaO.sender_index_size+GlobalC::ParaO.receiver_index_size)*sizeof(int)/1024/1024);
@@ -491,10 +493,11 @@ void vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal)
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "vlocal data are put in sender_buffer, size(M):", GlobalC::ParaO.sender_size*8/1024/1024);
 
     // use mpi_alltoall to get local data
+    #ifdef __MPI
     MPI_Alltoallv(GlobalC::ParaO.sender_buffer, GlobalC::ParaO.sender_size_process, GlobalC::ParaO.sender_displacement_process, MPI_DOUBLE,
                   GlobalC::ParaO.receiver_buffer, GlobalC::ParaO.receiver_size_process,
 					GlobalC::ParaO.receiver_displacement_process, MPI_DOUBLE, GlobalC::ParaO.comm_2D);
-
+    #endif
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "vlocal data are exchanged, received size(M):", GlobalC::ParaO.receiver_size*8/1024/1024);
 
     // put local data to H matrix

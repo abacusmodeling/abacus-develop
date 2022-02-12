@@ -87,8 +87,9 @@ private:
     int *receiver_displacement_process;
     double* receiver_buffer;
 
+#ifdef __MPI
     int setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt, int nblk);
-
+#endif
     void cal_dk_gamma_from_2D(void);
 };
 

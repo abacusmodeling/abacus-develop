@@ -10,6 +10,8 @@
 #include "ELEC_evolve.h"
 #include "input_update.h"
 #include "../src_pw/occupy.h"
+#include "../module_base/timer.h"
+#include "chrono"
 //new
 #include "../src_pw/H_Ewald_pw.h"
 #ifdef __DEEPKS
