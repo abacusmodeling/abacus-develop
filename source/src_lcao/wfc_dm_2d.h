@@ -10,7 +10,7 @@
 #include "../module_base/complexmatrix.h"
 #include <vector>
 
-#include "./record_adj.h"   //caoyu add 2022-2-9
+#include "./record_adj.h"
 
 class Wfc_Dm_2d
 {

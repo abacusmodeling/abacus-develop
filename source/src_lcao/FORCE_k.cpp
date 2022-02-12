@@ -5,7 +5,7 @@
 #include <map>
 #include "../module_base/memory.h"
 #include "../module_base/timer.h"
-#include "wfc_dm_2d.h"  //caoyu add 2022-2-9
+#include "wfc_dm_2d.h"
 
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"
