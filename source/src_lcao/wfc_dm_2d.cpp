@@ -7,12 +7,14 @@
 #include "wfc_dm_2d.h"
 #include "../module_base/blas_connector.h"
 #include "../module_base/scalapack_connector.h"
+#include "../module_base/timer.h"
 #include "global_fp.h"
 #include "../src_pw/global.h"
 
 #include "../src_external/src_test/test_function.h"
 #include "../src_external/src_test/src_global/complexmatrix-test.h"
 
+#include "./LCAO_nnr.h"
 void Wfc_Dm_2d::init()
 {
 	ModuleBase::TITLE("Wfc_Dm_2d", "init");
@@ -28,117 +30,190 @@ void Wfc_Dm_2d::init()
 	}
 }
 
-void Wfc_Dm_2d::cal_dm(const ModuleBase::matrix &wg)
+
+//for gamma_only
+void Wfc_Dm_2d::cal_dm(const ModuleBase::matrix& wg,
+    std::vector<ModuleBase::matrix>& wfc_gamma,
+    std::vector<ModuleBase::matrix>& dm_gamma)
 {
 	ModuleBase::TITLE("Wfc_Dm_2d", "cal_dm");
 	
 	#ifdef TEST_DIAG
-	{
-		static int istep=0;
-		std::ofstream ofs("wfc_"+ModuleBase::GlobalFunc::TO_STRING(istep++)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
-		if(GlobalV::GAMMA_ONLY_LOCAL)
-		{
-			ofs<<wfc_gamma<<std::endl;
-		}
-		else
-		{
-			ofs<<wfc_k<<std::endl;
-		}
-	}
+    static int istep=0;
+    std::ofstream ofs("wfc_"+ModuleBase::GlobalFunc::TO_STRING(istep++)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
+    ofs<<wfc_gamma<<std::endl;
+	#endif
+	
+	// dm = wfc.T * wg * wfc.conj()
+	// dm[is](iw1,iw2) = \sum_{ib} wfc[is](ib,iw1).T * wg(is,ib) * wfc[is](ib,iw2).conj()
+	assert(wg.nc<=GlobalV::NLOCAL);
+    assert(wg.nr==GlobalV::NSPIN);
+    for(int is=0; is!=GlobalV::NSPIN; ++is)
+    {
+        std::vector<double> wg_local(GlobalC::ParaO.ncol,0.0);
+        for(int ib_global=0; ib_global!=wg.nc; ++ib_global)
+        {
+            const int ib_local = GlobalC::ParaO.trace_loc_col[ib_global];
+            if(ib_local>=0)
+            {
+                wg_local[ib_local] = wg(is,ib_global);
+            }
+        }
+        
+        // wg_wfc(ib,iw) = wg[ib] * wfc(ib,iw);
+        ModuleBase::matrix wg_wfc(wfc_gamma[is]);
+        for(int ir=0; ir!=wg_wfc.nr; ++ir)
+        {
+            BlasConnector::scal( wg_wfc.nc, wg_local[ir], wg_wfc.c+ir*wg_wfc.nc, 1 );
+        }
+
+        // C++: dm(iw1,iw2) = wfc(ib,iw1).T * wg_wfc(ib,iw2)
+        const double one_float=1.0, zero_float=0.0;
+        const int one_int=1;
+        const char N_char='N', T_char='T';
+        dm_gamma[is].create( wfc_gamma[is].nr, wfc_gamma[is].nc );
+        pdgemm_(
+            &N_char, &T_char,
+            &GlobalV::NLOCAL, &GlobalV::NLOCAL, &wg.nc,
+            &one_float,
+            wg_wfc.c, &one_int, &one_int, GlobalC::ParaO.desc,
+            wfc_gamma[is].c, &one_int, &one_int, GlobalC::ParaO.desc,
+            &zero_float,
+            dm_gamma[is].c, &one_int, &one_int, GlobalC::ParaO.desc);
+    }
+    #ifdef TEST_DIAG
+    static int istep=0;
+    std::ofstream ofs("dm_" + ModuleBase::GlobalFunc::TO_STRING(istep) + "_" + ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
+    ofs << dm_gamma << std::endl;
+	#endif
+
+	return;
+}
+
+//for multi-k
+void Wfc_Dm_2d::cal_dm(const ModuleBase::matrix& wg,    // wg(ik,ib), cal all dm 
+        std::vector<ModuleBase::ComplexMatrix>& wfc_k,
+        std::vector<ModuleBase::ComplexMatrix> &dm_k)
+{
+	ModuleBase::TITLE("Wfc_Dm_2d", "cal_dm");
+	
+	#ifdef TEST_DIAG
+    static int istep=0;
+    std::ofstream ofs("wfc_"+ModuleBase::GlobalFunc::TO_STRING(istep++)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
+    ofs<<wfc_k<<std::endl;
 	#endif
 	
 	// dm = wfc.T * wg * wfc.conj()
 	// dm[ik](iw1,iw2) = \sum_{ib} wfc[ik](ib,iw1).T * wg(ik,ib) * wfc[ik](ib,iw2).conj()
 	assert(wg.nc<=GlobalV::NLOCAL);
-	if(GlobalV::GAMMA_ONLY_LOCAL)
-	{
-		assert(wg.nr==GlobalV::NSPIN);
-		for(int is=0; is!=GlobalV::NSPIN; ++is)
-		{
-			std::vector<double> wg_local(GlobalC::ParaO.ncol,0.0);
-			for(int ib_global=0; ib_global!=wg.nc; ++ib_global)
-			{
-				const int ib_local = GlobalC::ParaO.trace_loc_col[ib_global];
-				if(ib_local>=0)
-				{
-					wg_local[ib_local] = wg(is,ib_global);
-				}
-			}
-			
-			// wg_wfc(ib,iw) = wg[ib] * wfc(ib,iw);
-			ModuleBase::matrix wg_wfc(wfc_gamma[is]);
-			for(int ir=0; ir!=wg_wfc.nr; ++ir)
-			{
-				BlasConnector::scal( wg_wfc.nc, wg_local[ir], wg_wfc.c+ir*wg_wfc.nc, 1 );
-			}
+    assert(wg.nr==GlobalC::kv.nks);
+    for(int ik=0; ik!=GlobalC::kv.nks; ++ik)
+    {
+        std::vector<double> wg_local(GlobalC::ParaO.ncol,0.0);
+        for(int ib_global=0; ib_global!=wg.nc; ++ib_global)
+        {
+            const int ib_local = GlobalC::ParaO.trace_loc_col[ib_global];
+            if(ib_local>=0)
+            {
+                wg_local[ib_local] = wg(ik,ib_global);
+            }
+        }
 
-			// C++: dm(iw1,iw2) = wfc(ib,iw1).T * wg_wfc(ib,iw2)
-			const double one_float=1.0, zero_float=0.0;
-			const int one_int=1;
-			const char N_char='N', T_char='T';
-			dm_gamma[is].create( wfc_gamma[is].nr, wfc_gamma[is].nc );
-			pdgemm_(
-				&N_char, &T_char,
-				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &wg.nc,
-				&one_float,
-				wg_wfc.c, &one_int, &one_int, GlobalC::ParaO.desc,
-				wfc_gamma[is].c, &one_int, &one_int, GlobalC::ParaO.desc,
-				&zero_float,
-				dm_gamma[is].c, &one_int, &one_int, GlobalC::ParaO.desc);
-		}
-	}
-	else
-	{
-		assert(wg.nr==GlobalC::kv.nks);
-		for(int ik=0; ik!=GlobalC::kv.nks; ++ik)
-		{
-			std::vector<double> wg_local(GlobalC::ParaO.ncol,0.0);
-			for(int ib_global=0; ib_global!=wg.nc; ++ib_global)
-			{
-				const int ib_local = GlobalC::ParaO.trace_loc_col[ib_global];
-				if(ib_local>=0)
-				{
-					wg_local[ib_local] = wg(ik,ib_global);
-				}
-			}
+        // wg_wfc(ib,iw) = wg[ib] * wfc(ib,iw).conj();
+        ModuleBase::ComplexMatrix wg_wfc = conj(wfc_k[ik]);
+        for(int ir=0; ir!=wg_wfc.nr; ++ir)
+        {
+            BlasConnector::scal( wg_wfc.nc, wg_local[ir], wg_wfc.c+ir*wg_wfc.nc, 1 );
+        }
 
-			// wg_wfc(ib,iw) = wg[ib] * wfc(ib,iw).conj();
-			ModuleBase::ComplexMatrix wg_wfc = conj(wfc_k[ik]);
-			for(int ir=0; ir!=wg_wfc.nr; ++ir)
-			{
-				BlasConnector::scal( wg_wfc.nc, wg_local[ir], wg_wfc.c+ir*wg_wfc.nc, 1 );
-			}
-
-			// C++: dm(iw1,iw2) = wfc(ib,iw1).T * wg_wfc(ib,iw2)
-			const double one_float=1.0, zero_float=0.0;
-			const int one_int=1;
-			const char N_char='N', T_char='T';
-			dm_k[ik].create( wfc_k[ik].nr, wfc_k[ik].nc );
-			pzgemm_(
-				&N_char, &T_char,
-				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &wg.nc,
-				&one_float,
-				wg_wfc.c, &one_int, &one_int, GlobalC::ParaO.desc,
-				wfc_k[ik].c, &one_int, &one_int, GlobalC::ParaO.desc,
-				&zero_float,
-				dm_k[ik].c, &one_int, &one_int, GlobalC::ParaO.desc);
-		}
-	}
+        // C++: dm(iw1,iw2) = wfc(ib,iw1).T * wg_wfc(ib,iw2)
+        const double one_float=1.0, zero_float=0.0;
+        const int one_int=1;
+        const char N_char='N', T_char='T';
+        dm_k[ik].create( wfc_k[ik].nr, wfc_k[ik].nc );
+        pzgemm_(
+            &N_char, &T_char,
+            &GlobalV::NLOCAL, &GlobalV::NLOCAL, &wg.nc,
+            &one_float,
+            wg_wfc.c, &one_int, &one_int, GlobalC::ParaO.desc,
+            wfc_k[ik].c, &one_int, &one_int, GlobalC::ParaO.desc,
+            &zero_float,
+            dm_k[ik].c, &one_int, &one_int, GlobalC::ParaO.desc);
+    }
 	
 	#ifdef TEST_DIAG
-	{
-		static int istep=0;
-		std::ofstream ofs("dm_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
-		if(GlobalV::GAMMA_ONLY_LOCAL)
-		{
-			ofs<<dm_gamma<<std::endl;
-		}
-		else
-		{
-			ofs<<dm_k<<std::endl;
-		}
-	}
+    static int istep=0;
+    std::ofstream ofs("dm_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
+    ofs<<dm_k<<std::endl;
 	#endif
 
 	return;
+}
+
+    
+
+
+//must cal cal_dm first
+void Wfc_Dm_2d::cal_dm_R(
+    std::vector<ModuleBase::ComplexMatrix> &dm_k,
+    Record_adj& ra,    //ra.for_2d();
+    double** dm2d)
+{
+    ModuleBase::TITLE("Wfc_Dm_2d", "cal_dm_R");
+    assert(dm_k[0].nr > 0 && dm_k[0].nc > 0); //must call cal_dm first
+
+    for (int ik = 0;ik < GlobalC::kv.nks;++ik)
+    {
+        // allocate memory and pointer for each ispin
+        int ispin = 0;
+        if (GlobalV::NSPIN == 2)
+        {
+            ispin = GlobalC::kv.isk[ik];
+        }
+        for (int T1 = 0;T1 < GlobalC::ucell.ntype;++T1)
+        {
+            for (int I1 = 0;I1 < GlobalC::ucell.atoms[T1].na;++I1)
+            {
+                const int iat = GlobalC::ucell.itia2iat(T1, I1);
+                const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
+                //irr: number of adjacent orbital pairs int this proc
+                const int irrstart = GlobalC::LNNR.nlocstart[iat];
+
+                int count = 0;
+                for (int cb = 0;cb < ra.na_each[iat];++cb)
+                {
+                    const int T2 = ra.info[iat][cb][3];
+                    const int I2 = ra.info[iat][cb][4];
+                    const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
+                    //-----------------
+                    // exp[i * R * k]
+                    //-----------------
+                    const std::complex<double> phase =
+                        exp(ModuleBase::TWO_PI * ModuleBase::IMAG_UNIT * (
+                            GlobalC::kv.kvec_d[ik].x * ra.info[iat][cb][0] +
+                            GlobalC::kv.kvec_d[ik].y * ra.info[iat][cb][1] +
+                            GlobalC::kv.kvec_d[ik].z * ra.info[iat][cb][2]
+                            ));
+                    for (int iw1 = 0;iw1 < GlobalC::ucell.atoms[T1].nw;++iw1)
+                    {
+                        int iw1_all = start1 + iw1;
+                        int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
+                        if (mu < 0)continue;
+                        for (int iw2 = 0;iw2 < GlobalC::ucell.atoms[T2].nw;++iw2)
+                        {
+                            int iw2_all = start2 + iw2;
+                            int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
+                            if (nu < 0)continue;
+                            //Caution: output of pzgemm_ : col first in **each** proc itself !!
+                            dm2d[ispin][irrstart + count] += (dm_k[ik](nu, mu) * phase).real();
+                            ++count;
+                        }//iw2
+                    }//iw1
+                }//TI2(cb)
+                assert(count == GlobalC::LNNR.nlocdim[iat]);
+            }//I1
+        }//T1
+    }//ik
+    ModuleBase::timer::tick("Wfc_Dm_2d", "cal_dm_R");
+    return;
 }

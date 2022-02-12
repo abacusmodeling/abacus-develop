@@ -5,6 +5,7 @@
 #include <map>
 #include "../module_base/memory.h"
 #include "../module_base/timer.h"
+#include "wfc_dm_2d.h"
 
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"
@@ -54,21 +55,31 @@ void Force_LCAO_k::ftable_k (
 		dm2d[is] = new double[GlobalC::LNNR.nnr];
 		ModuleBase::GlobalFunc::ZEROS(dm2d[is], GlobalC::LNNR.nnr);
 	}
-	ModuleBase::Memory::record ("Force_LCAO_k", "dm2d", GlobalV::NSPIN*GlobalC::LNNR.nnr, "double");	
-	bool with_energy = false;
+    ModuleBase::Memory::record ("Force_LCAO_k", "dm2d", GlobalV::NSPIN*GlobalC::LNNR.nnr, "double");	
 
-	
-	this->set_EDM_k(dm2d, with_energy);
-	
-	this->cal_ftvnl_dphi_k(dm2d, isforce, isstress, ftvnl_dphi, stvnl_dphi);
+    if (INPUT.new_dm > 0 && INPUT.tddft == 0)
+    {
+        Record_adj RA;
+        RA.for_2d();
+        GlobalC::LOC.wfc_dm_2d.cal_dm_R(
+            GlobalC::LOC.wfc_dm_2d.dm_k,
+            RA, dm2d);
+    }
+    else
+    {
+        bool with_energy = false;
+        this->set_EDM_k(dm2d, with_energy);
+    }
+    
+    this->cal_ftvnl_dphi_k(dm2d, isforce, isstress, ftvnl_dphi, stvnl_dphi);
 
 
-	// ---------------------------------------
-	// doing on the real space grid.
-	// ---------------------------------------
-	this->cal_fvl_dphi_k(dm2d, isforce, isstress, fvl_dphi, svl_dphi);
+    // ---------------------------------------
+    // doing on the real space grid.
+    // ---------------------------------------
+    this->cal_fvl_dphi_k(dm2d, isforce, isstress, fvl_dphi, svl_dphi);
 
-	this->calFvnlDbeta(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta, GlobalV::vnl_method);
+    this->calFvnlDbeta(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta, GlobalV::vnl_method);
 
 #ifdef __DEEPKS
     if (GlobalV::deepks_scf)
@@ -446,13 +457,41 @@ void Force_LCAO_k::cal_foverlap_k(
 	{
 		edm2d[is] = new double[GlobalC::LNNR.nnr];
 		ModuleBase::GlobalFunc::ZEROS(edm2d[is], GlobalC::LNNR.nnr);
-	}
-	bool with_energy = true;
+    }
+    
+    Record_adj RA;
+	RA.for_2d();
 
 	//--------------------------------------------	
 	// calculate the energy density matrix here.
-	//--------------------------------------------	
-	this->set_EDM_k(edm2d, with_energy);
+    //--------------------------------------------	
+    if (INPUT.new_dm > 0 && INPUT.tddft==0)
+    {
+        ModuleBase::timer::tick("Force_LCAO_k","cal_edm_2d");
+
+        ModuleBase::matrix wgEkb;
+        wgEkb.create(GlobalC::kv.nks, GlobalV::NBANDS);
+
+        for (int ik = 0; ik < GlobalC::kv.nks; ik++)
+        {
+            for(int ib=0; ib<GlobalV::NBANDS; ib++)
+            {
+                wgEkb(ik, ib) = GlobalC::wf.wg(ik, ib) * GlobalC::wf.ekb[ik][ib];
+            }
+        }
+        std::vector<ModuleBase::ComplexMatrix> edm_k(GlobalC::kv.nks);
+        GlobalC::LOC.wfc_dm_2d.cal_dm(wgEkb,
+            GlobalC::LOC.wfc_dm_2d.wfc_k,
+            edm_k);
+        GlobalC::LOC.wfc_dm_2d.cal_dm_R(edm_k,
+            RA, edm2d);
+        ModuleBase::timer::tick("Force_LCAO_k", "cal_edm_2d");
+    }
+    else
+    {
+        bool with_energy = true;
+        this->set_EDM_k(edm2d, with_energy);
+    }
 
 	//--------------------------------------------
     //summation \sum_{i,j} E(i,j)*dS(i,j)
@@ -460,8 +499,7 @@ void Force_LCAO_k::cal_foverlap_k(
 	//--------------------------------------------
 	ModuleBase::Vector3<double> tau1, dtau, tau2;
 
-	Record_adj RA;
-	RA.for_2d();
+
 
 	int irr = 0;
 	int iat = 0;
