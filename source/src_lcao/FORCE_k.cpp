@@ -57,19 +57,11 @@ void Force_LCAO_k::ftable_k (
 	}
     ModuleBase::Memory::record ("Force_LCAO_k", "dm2d", GlobalV::NSPIN*GlobalC::LNNR.nnr, "double");	
 
-    if (INPUT.new_dm > 0 && INPUT.tddft == 0)
-    {
-        Record_adj RA;
-        RA.for_2d();
-        GlobalC::LOC.wfc_dm_2d.cal_dm_R(
-            GlobalC::LOC.wfc_dm_2d.dm_k,
-            RA, dm2d);
-    }
-    else
-    {
-        bool with_energy = false;
-        this->set_EDM_k(dm2d, with_energy);
-    }
+    Record_adj RA;
+    RA.for_2d();
+    GlobalC::LOC.wfc_dm_2d.cal_dm_R(
+        GlobalC::LOC.wfc_dm_2d.dm_k,
+        RA, dm2d);
     
     this->cal_ftvnl_dphi_k(dm2d, isforce, isstress, ftvnl_dphi, stvnl_dphi);
 
@@ -242,203 +234,6 @@ void Force_LCAO_k::finish_k(void)
 
 #include "record_adj.h"
 #include "LCAO_nnr.h"
-void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
-{
-	ModuleBase::TITLE("Force_LCAO_k","set_EDM_k");
-	ModuleBase::timer::tick("Force_LCAO_k","set_EDM_k");
-
-	ModuleBase::Vector3<double> tau1, dtau;
-
-	//----------------------------------------------------------
-	// RA will set the adjacent information for each atom
-	// 2d means this adjacent information is for HPSEPS's kind
-	// of division of H matrix.
-	//----------------------------------------------------------
- 	//xiaohui add "OUT_LEVEL", 2015-09-16
-	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " Calculate the energy density matrix with k " << std::endl;
-	Record_adj RA;
-	RA.for_2d();
-
-	//------------------------
-	// circle for each atom
-	//------------------------
-	for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
-    {
-        Atom* atom1 = &GlobalC::ucell.atoms[T1];
-		for(int I1=0; I1<atom1->na; ++I1)
-		{
-			const int iat = GlobalC::ucell.itia2iat(T1,I1);
-			const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);
-			const int gstart = GlobalC::LNNR.nlocstart[iat];
-			const int irr = GlobalC::LNNR.nlocdim[iat];//number of adjacet orbitals
-
-			std::complex<double> **vvv = new std::complex<double>*[GlobalV::NSPIN];
-         //xiaohui add 2014-03-17, add "if(irr > 0)", 
-         //meaing only allocate memory when number of iat-th atom adjacet orbitals are not zero in this processor
-         if(irr > 0)
-         {
-   			for(int is=0; is<GlobalV::NSPIN; is++)
-			   {
-				   vvv[is] = new std::complex<double>[ irr ];
-				   ModuleBase::GlobalFunc::ZEROS(vvv[is], irr );
-			   }
-         }
-
-			int ispin=0;
-			std::complex<double> *dm;
-			//----------------
-			// circle for k
-			//----------------
-			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
-			{
-				// set the spin direction
-				if(GlobalV::NSPIN==2)
-				{
-					ispin = GlobalC::kv.isk[ik];
-				}
-				dm = vvv[ispin];
-				//------------------
-				// circle for bands
-				//------------------
-				for(int ib=0; ib<GlobalV::NBANDS; ++ib)
-				{
-					const double w1=GlobalC::wf.wg(ik,ib);
-					if(w1>0)
-					{
-						//-----------------------------
-						// start the adjacent cycle.
-						//-----------------------------
-						std::complex<double> *wfc = GlobalC::LOWF.WFC_K[ik][ib];
-						int count = 0;
-						for (int cb = 0; cb < RA.na_each[iat]; ++cb)
-						{
-							const int T2 = RA.info[iat][cb][3];
-							const int I2 = RA.info[iat][cb][4];
-							Atom* atom2 = &GlobalC::ucell.atoms[T2];
-
-							//-----------------
-							// exp[i * R * k]
-							//-----------------
-							const std::complex<double> phase = w1 * exp(ModuleBase::TWO_PI * ModuleBase::IMAG_UNIT * (
-										GlobalC::kv.kvec_d[ik].x * RA.info[iat][cb][0] +
-										GlobalC::kv.kvec_d[ik].y * RA.info[iat][cb][1] +
-										GlobalC::kv.kvec_d[ik].z * RA.info[iat][cb][2]
-										) );
-
-							const int start2 = GlobalC::ucell.itiaiw2iwt(T2,I2,0);
-
-							for(int jj=0; jj<atom1->nw; ++jj)
-							{
-								const int iw1_all = start1 + jj;
-								
-								// 2D division (HPSEPS)
-								const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
-								if(mu<0) continue;
-								const int mug = GlobalC::GridT.trace_lo[iw1_all];
-
-								for(int kk=0; kk<atom2->nw; ++kk)
-								{
-									const int iw2_all = start2 + kk;
-									
-									// 2D division (HPSEPS)
-									const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
-									if(nu<0) continue;
-									const int nug = GlobalC::GridT.trace_lo[iw2_all];
-	
-									if(mug >= 0 && nug >= 0)
-									{
-										dm[count] += set_EDM_k_element(phase, with_energy, 
-										wfc[mug], wfc[nug], GlobalC::wf.ekb[ik][ib]); 
-									}
-									else if( mug >= 0 && nug <= 0)
-									{
-										const int a4 = GlobalC::LOWF.trace_aug[iw2_all];
-									
-										//assert(a4>=0);
-
-										dm[count] += set_EDM_k_element(phase, with_energy, wfc[mug], 
-										GlobalC::LOWF.WFC_K_aug[ik][ib][a4], GlobalC::wf.ekb[ik][ib]); 
-									}
-									else if( mug <= 0 && nug >= 0)
-									{
-										const int a3 = GlobalC::LOWF.trace_aug[iw1_all]; 
-
-										dm[count] += set_EDM_k_element(phase, with_energy, 
-										GlobalC::LOWF.WFC_K_aug[ik][ib][a3], wfc[nug], GlobalC::wf.ekb[ik][ib]); 
-									}
-									else if( mug <=0 && nug <=0 )
-									{
-										const int a1 = GlobalC::LOWF.trace_aug[iw1_all];
-										const int a2 = GlobalC::LOWF.trace_aug[iw2_all];
-
-										dm[count] += set_EDM_k_element(phase, with_energy, 
-										GlobalC::LOWF.WFC_K_aug[ik][ib][a1], GlobalC::LOWF.WFC_K_aug[ik][ib][a2], GlobalC::wf.ekb[ik][ib]); 
-									}
-									assert(count<irr);
-									++ count;
-								}//kk
-							}//jj
-						}// cb
-//						GlobalV::ofs_running << " count = " << count << std::endl;
-						assert(count == GlobalC::LNNR.nlocdim[iat]);
-					}// w1
-				}//ib
-			}//ik
-
-			//--------------------------------------
-			// get the real value density matrix or
-			// energy density matrix 
-			//--------------------------------------
-			for(int is=0; is<GlobalV::NSPIN; ++is)
-			{
-				for(int iv=0; iv<irr; ++iv)
-				{
-					dm2d[is][gstart+iv] = vvv[is][iv].real();
-				}
-            //xiaohui add 2014-03-17, add "if(irr > 0)"
-            //meaning delete memory when number of iat-th atom adjacet orbitals are not zero in this processor 
-            if(irr > 0)
-            {
-				   delete[] vvv[is];
-            }
-			}
-			delete[] vvv;
-
-		}// I1
-	}// T1
-
-RA.delete_grid();//xiaohui add 2015-02-04
-	ModuleBase::timer::tick("Force_LCAO_k","set_EDM_k");
-	return;
-}
-
-
-std::complex<double> Force_LCAO_k::set_EDM_k_element(
-	const std::complex<double> &phase,
-	const bool with_energy,
-	std::complex<double> &coef1, std::complex<double> &coef2,
-	const double &ekb)
-{
-	std::complex<double> dm = std::complex<double>(0,0);
-	//--------------------------------------
-	// for energy density matrix
-	// \sum E(i)*exp(iRk)*psi(mu)*psi(nu)
-	//--------------------------------------
-	if(with_energy)
-	{
-		dm += phase * ekb * conj(coef1) * coef2;
-	}
-	//--------------------------------------
-	// for density matrix
-	// \sum exp(iRk)*psi(mu)*psi(nu)
-	//--------------------------------------
-	else
-	{
-		dm += phase * conj(coef1) * coef2 ;
-	}
-	return dm;
-}
-
 
 void Force_LCAO_k::cal_foverlap_k(
 	const bool isforce, 
@@ -465,33 +260,25 @@ void Force_LCAO_k::cal_foverlap_k(
 	//--------------------------------------------	
 	// calculate the energy density matrix here.
     //--------------------------------------------	
-    if (INPUT.new_dm > 0 && INPUT.tddft==0)
+    ModuleBase::timer::tick("Force_LCAO_k","cal_edm_2d");
+
+    ModuleBase::matrix wgEkb;
+    wgEkb.create(GlobalC::kv.nks, GlobalV::NBANDS);
+
+    for (int ik = 0; ik < GlobalC::kv.nks; ik++)
     {
-        ModuleBase::timer::tick("Force_LCAO_k","cal_edm_2d");
-
-        ModuleBase::matrix wgEkb;
-        wgEkb.create(GlobalC::kv.nks, GlobalV::NBANDS);
-
-        for (int ik = 0; ik < GlobalC::kv.nks; ik++)
+        for(int ib=0; ib<GlobalV::NBANDS; ib++)
         {
-            for(int ib=0; ib<GlobalV::NBANDS; ib++)
-            {
-                wgEkb(ik, ib) = GlobalC::wf.wg(ik, ib) * GlobalC::wf.ekb[ik][ib];
-            }
+            wgEkb(ik, ib) = GlobalC::wf.wg(ik, ib) * GlobalC::wf.ekb[ik][ib];
         }
-        std::vector<ModuleBase::ComplexMatrix> edm_k(GlobalC::kv.nks);
-        GlobalC::LOC.wfc_dm_2d.cal_dm(wgEkb,
-            GlobalC::LOC.wfc_dm_2d.wfc_k,
-            edm_k);
-        GlobalC::LOC.wfc_dm_2d.cal_dm_R(edm_k,
-            RA, edm2d);
-        ModuleBase::timer::tick("Force_LCAO_k", "cal_edm_2d");
     }
-    else
-    {
-        bool with_energy = true;
-        this->set_EDM_k(edm2d, with_energy);
-    }
+    std::vector<ModuleBase::ComplexMatrix> edm_k(GlobalC::kv.nks);
+    GlobalC::LOC.wfc_dm_2d.cal_dm(wgEkb,
+        GlobalC::LOC.wfc_dm_2d.wfc_k,
+        edm_k);
+    GlobalC::LOC.wfc_dm_2d.cal_dm_R(edm_k,
+        RA, edm2d);
+    ModuleBase::timer::tick("Force_LCAO_k", "cal_edm_2d");
 
 	//--------------------------------------------
     //summation \sum_{i,j} E(i,j)*dS(i,j)

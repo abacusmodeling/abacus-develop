@@ -16,9 +16,6 @@ namespace WF_Local
 	void distri_lowf_new(double** ctot, const int &is);
 	void distri_lowf_complex_new(std::complex<double>** ctot, const int &ik);
 
-	void distri_lowf_aug(double** ctot, double **c_aug);
-	void distri_lowf_aug_complex(std::complex<double>** ctot, std::complex<double> **c_aug);
-
 	int read_lowf(double **c, const int &is);
 
 	int read_lowf_complex(std::complex<double> **c, const int &ik, const bool &newdm);

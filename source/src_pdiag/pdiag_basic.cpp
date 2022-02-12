@@ -660,21 +660,6 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **cc
 	// distribution of local wave functions 
 	// to each processor.
 	WF_Local::distri_lowf_complex( ctot, cc);
-
-	// mohan 2010-09-26
-	// distribution of augmented wave functions.
-	// mohan fix bug 2011-01-03
-	// the third dimension of WFC_GAMMA_aug may be zero.
-	// mohan fix bug 2011-03-03
-	// when the third dimension is zero, we don't need to call
-	// this function, however, as proc 0, it needs all the procssors
-	// to give reports to it.
-	// mohan add 2012-01-09
-	// 
-	// for std::complex
-	// mohan update 2021-02-12, delete BFIELD option
-	WF_Local::distri_lowf_aug_complex( ctot, GlobalC::LOWF.WFC_K_aug[ik]); //mohan add 2012-01-09 
-	
 	
 	// clean staff.
 	if(GlobalV::DRANK==0)
@@ -1104,17 +1089,6 @@ MPI_Barrier(comm);
 	// only used for GlobalV::GAMMA_ONLY_LOCAL
 	//WF_Local::distri_lowf( ctot, wfc);
 
-	// mohan 2010-09-26
-	// distribution of augmented wave functions.
-	// mohan fix bug 2011-01-03
-	// the third dimension of WFC_GAMMA_aug may be zero.
-	// mohan fix bug 2011-03-03
-	// when the third dimension is zero, we don't need to call
-	// this function, however, as proc 0, it needs all the procssors
-	// to give reports to it.
-	//	std::cout << " block distri_lowf_aug" << std::endl;
-	// mohan update 2021-02-12, delte BFIELD option
-	//WF_Local::distri_lowf_aug( ctot, GlobalC::LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN]); 
 
 	// clean staff.
 	if(myid==0)

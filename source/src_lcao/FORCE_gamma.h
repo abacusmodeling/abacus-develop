@@ -50,10 +50,6 @@ class Force_LCAO_gamma
 	// forces reated to overlap matrix
 	// forces related to energy density matrix 
 	//-------------------------------------------------------------
-	void set_EDM_gamma(ModuleBase::matrix& dm, bool with_energy);
-
-	double set_EDM_element(const int &ii, const int &jj, const bool with_energy, 
-	 double*** coef1, double*** coef2, const int &is);
 
 	void cal_foverlap(
 		const bool isforce, 
