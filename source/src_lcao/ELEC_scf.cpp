@@ -413,7 +413,7 @@ void ELEC_scf::scf(const int &istep)
 #ifdef __MPI
 		double duration = (double)(MPI_Wtime() - clock_start);
 #else
-		double duration = (double)(std::chrono::system_clock::now() - clock_start) / CLOCKS_PER_SEC;
+		double duration = (std::chrono::system_clock::now() - clock_start).count() / CLOCKS_PER_SEC;
 #endif
 		//double duration_time = difftime(time_finish, time_start);
 		//std::cout<<"Time_clock\t"<<"Time_time"<<std::endl;
