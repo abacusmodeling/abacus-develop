@@ -1,3 +1,4 @@
+#ifdef __MPI
 #ifndef EXX_ABFS_PARALLEL_COMMUNICATE_HEXX_H
 #define EXX_ABFS_PARALLEL_COMMUNICATE_HEXX_H
 
@@ -158,4 +159,5 @@ public:
 #endif
 };
 
+#endif
 #endif

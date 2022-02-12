@@ -63,7 +63,10 @@ private:
 #elif EXX_DM==3
 	Exx_Abfs::Parallel::Communicate::DM3 DM_para;
 #endif
+
+#ifdef __MPI
 	Exx_Abfs::Parallel::Communicate::Hexx Hexx_para;
+#endif
 	double energy = 0.0;
 	
 	std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> lcaos;
