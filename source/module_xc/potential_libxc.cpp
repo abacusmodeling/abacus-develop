@@ -137,22 +137,30 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc_libxc(
 		}
 	}
 
-	// jiyy add for threshold
-	constexpr double rho_threshold = 1E-10;
-	// sgn for threshold mask
-	std::vector<double> sgn( nrxx * nspin0(), 1.0);
-
-	for( int ir=0; ir!= nrxx * nspin0(); ++ir )
-	{
-		if ( rho[ir]<rho_threshold)  sgn[ir] = 0.0;
-	}
-
 	std::vector<double> exc   ( nrxx                       );
 	std::vector<double> vrho  ( nrxx * nspin0()            );
 	std::vector<double> vsigma( nrxx * ((1==nspin0())?1:3) );
 
 	for( xc_func_type &func : funcs )
 	{
+
+		// jiyy add for threshold
+		const double rho_threshold = 1E-6;
+		const double grho_threshold = 1E-10;
+		// sgn for threshold mask
+		std::vector<double> sgn( nrxx * nspin0(), 1.0);
+
+		if(nspin0()==2 && func.info->family != XC_FAMILY_LDA && func.info->kind==XC_CORRELATION)
+		{
+				for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
+				{
+						if ( rho[ir*2]<rho_threshold || sqrt(abs(sigma[ir*3]))<grho_threshold )
+								sgn[ir*2] = 0.0;
+						if ( rho[ir*2+1]<rho_threshold || sqrt(abs(sigma[ir*3+2]))<grho_threshold )
+								sgn[ir*2+1] = 0.0;
+				}
+		}
+		
 		xc_func_set_dens_threshold(&func, rho_threshold);
 		switch( func.info->family )
 		{

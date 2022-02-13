@@ -20,7 +20,6 @@ int XC_Functional::get_func_type()
 // for detail, refer to https://www.tddft.org/programs/libxc/functionals/
 void XC_Functional::set_xc_type(const std::string xc_func_in)
 {
-    std::cout << "xc_func_in : "<< xc_func_in << std::endl;
     func_id.clear();
     std::string xc_func = xc_func_in;
     std::transform(xc_func.begin(), xc_func.end(), xc_func.begin(), (::toupper));
@@ -101,6 +100,7 @@ void XC_Functional::set_xc_type(const std::string xc_func_in)
     else if( xc_func == "HF" || xc_func == "OPT_ORB" ||  xc_func == "NONE")
     {
         // not doing anything
+        if(xc_func == "HF") func_type = 4;
     }
     else if( xc_func == "HSE")
     {

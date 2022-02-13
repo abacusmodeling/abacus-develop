@@ -19,8 +19,7 @@ input_conv.o\
 run_pw.o\
 run_lcao.o\
 
-OBJS_PW=xc_type.o \
-xc_functional.o\
+OBJS_PW=xc_functional.o\
 xc_3.o \
 vdwd2.o\
 vdwd2_parameters.o\

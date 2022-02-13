@@ -303,6 +303,7 @@ void Run_MD_PW::md_force_virial(
                     eiter += elec.iter;
                     if (elec.iter == 1 || hybrid_step == GlobalC::exx_global.info.hybrid_step - 1) // exx converge
                         break;
+                    XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
                     GlobalC::exx_lip.cal_exx();
                 }
             }
@@ -310,6 +311,7 @@ void Run_MD_PW::md_force_virial(
             {
                 elec.self_consistent(istep);
                 eiter += elec.iter;
+                XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
                 elec.self_consistent(istep);
                 eiter += elec.iter;
             }

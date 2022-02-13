@@ -13,12 +13,17 @@
 #include "../module_base/global_variable.h"
 #include "../module_base/vector3.h"
 #include "../module_base/matrix.h"
+#include "exx_global.h"
 class XC_Functional
 {
 	public:
 
 	friend class Run_lcao;
 	friend class Run_pw;
+	friend class Ions;
+	friend class ELEC_scf;
+	friend class LOOP_elec;
+	friend class Run_MD_PW;
 
 	XC_Functional();
 	~XC_Functional();

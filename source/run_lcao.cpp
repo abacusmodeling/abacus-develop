@@ -56,7 +56,14 @@ void Run_lcao::lcao_line(void)
 	// it has been established that that
 	// xc_func is same for all elements, therefore
 	// only the first one if used
-	XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
+	if(GlobalC::ucell.atoms[0].xc_func=="HSE" || GlobalC::ucell.atoms[0].xc_func=="PBE0")
+	{
+		XC_Functional::set_xc_type("pbe");
+	}
+	else
+	{
+		XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
+	}
 
     //GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir , GlobalV::global_atom_card , GlobalV::ofs_running, GlobalV::NLOCAL, GlobalV::NBANDS);
     ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
@@ -74,7 +81,7 @@ void Run_lcao::lcao_line(void)
 
     // print information
     // mohan add 2021-01-30
-    Print_Info::setup_parameters(GlobalC::ucell, GlobalC::kv, GlobalC::xcf);
+    Print_Info::setup_parameters(GlobalC::ucell, GlobalC::kv);
 
     // * reading the localized orbitals/projectors
 	// * construct the interpolation tables.
@@ -145,6 +152,18 @@ void Run_lcao::lcao_line(void)
 	// Initializee the potential.
     GlobalC::pot.allocate(GlobalC::pw.nrxx);
     ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running,"INIT POTENTIAL");
+
+	if(GlobalV::CALCULATION=="nscf")
+	{
+		switch(GlobalC::exx_global.info.hybrid_type)
+		{
+			case Exx_Global::Hybrid_Type::HF:
+			case Exx_Global::Hybrid_Type::PBE0:
+			case Exx_Global::Hybrid_Type::HSE:
+				XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
+				break;
+		}
+	}
 
 #ifdef __DEEPKS
 	//wenfei 2021-12-19

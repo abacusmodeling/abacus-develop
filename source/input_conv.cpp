@@ -419,14 +419,14 @@ void Input_Conv::Convert(void)
 		const std::string command0 = "test -d " + GlobalC::restart.folder + " || mkdir " + GlobalC::restart.folder;
 		if (GlobalV::MY_RANK == 0)
 			system(command0.c_str());
-		if (INPUT.dft_functional == "no")
+		if (INPUT.dft_functional == "hf" || INPUT.dft_functional == "pbe0" || INPUT.dft_functional == "hse" || INPUT.dft_functional == "opt_orb")
 		{
 			GlobalC::restart.info_save.save_charge = true;
+			GlobalC::restart.info_save.save_H = true;
 		}
 		else
 		{
 			GlobalC::restart.info_save.save_charge = true;
-			GlobalC::restart.info_save.save_H = true;
 		}
 	}
 	if (INPUT.restart_load)
@@ -468,7 +468,7 @@ void Input_Conv::Convert(void)
 	{
 		GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::No;
 	}
-	
+
 	if(GlobalC::exx_global.info.hybrid_type != Exx_Global::Hybrid_Type::No)
 	{
 		GlobalC::exx_global.info.hybrid_alpha = INPUT.exx_hybrid_alpha;

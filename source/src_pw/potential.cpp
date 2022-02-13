@@ -336,7 +336,7 @@ ModuleBase::matrix Potential::v_of_rho(
 	}
 	else
 	{	
-    	const std::tuple<double,double,ModuleBase::matrix> etxc_vtxc_v = XC_Functional::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, rho_in, GlobalC::CHR.rho_core);
+    	const std::tuple<double,double,ModuleBase::matrix> etxc_vtxc_v = XC_Functional::v_xc_libxc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, rho_in, GlobalC::CHR.rho_core);
 		GlobalC::en.etxc = std::get<0>(etxc_vtxc_v);
 		GlobalC::en.vtxc = std::get<1>(etxc_vtxc_v);
 		v            += std::get<2>(etxc_vtxc_v);

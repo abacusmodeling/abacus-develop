@@ -220,14 +220,12 @@ void ELEC_scf::scf(const int &istep)
 		}
 
 		// calculate exact-exchange
-		if(XC_Functional::get_func_type()==4)						// Peize Lin add 2018-10-30
+		if(XC_Functional::get_func_type()==4)
 		{
-			case 5:    case 6:   case 9:
-				if( !GlobalC::exx_global.info.separate_loop )
-				{
-					GlobalC::exx_lcao.cal_exx_elec();
-				}
-				break;
+			if( !GlobalC::exx_global.info.separate_loop )
+			{
+				GlobalC::exx_lcao.cal_exx_elec();
+			}
 		}
 
 		if(INPUT.dft_plus_u)
@@ -315,12 +313,11 @@ void ELEC_scf::scf(const int &istep)
 		GlobalC::en.set_exx();
 
 		// Peize Lin add 2020.04.04
-		if(Exx_Global::Hybrid_Type::HF==GlobalC::exx_lcao.info.hybrid_type
-			|| Exx_Global::Hybrid_Type::PBE0==GlobalC::exx_lcao.info.hybrid_type
-			|| Exx_Global::Hybrid_Type::HSE==GlobalC::exx_lcao.info.hybrid_type)
+		if(XC_Functional::get_func_type()==4)
 		{
 			if(GlobalC::restart.info_load.load_H && GlobalC::restart.info_load.load_H_finish && !GlobalC::restart.info_load.restart_exx)
 			{
+				XC_Functional::set_xc_type(GlobalC::ucell.atoms[0].xc_func);
 				GlobalC::exx_lcao.cal_exx_elec();
 				GlobalC::restart.info_load.restart_exx = true;
 			}

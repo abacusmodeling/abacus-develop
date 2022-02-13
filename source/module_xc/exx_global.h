@@ -1,7 +1,7 @@
 #ifndef EXX_GLOBAL_H
 #define EXX_GLOBAL_H
 
-#include "../module_xc/xc_type.h"
+#include "xc_functional.h"
 
 struct Exx_Global
 {
@@ -15,7 +15,7 @@ struct Exx_Global
 		
 		bool separate_loop = true;
 		size_t hybrid_step = 1;
-	};
+	};	
 	Exx_Info info;
 };
 
