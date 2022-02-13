@@ -119,8 +119,10 @@ void IState_Charge::begin(void)
 			
 			// (2) calculate the density matrix for a partuclar 
 			// band, whenever it is occupied or not.
+			
+		#ifdef __MPI
 			this->idmatrix(ib);
-
+		#endif
 			// (3) zero out of charge density array. 
 			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
@@ -149,7 +151,7 @@ void IState_Charge::begin(void)
 	return;
 }
 
-
+#ifdef __MPI
 void IState_Charge::idmatrix(const int &ib)
 {
 	ModuleBase::TITLE("IState_Charge","idmatrix");
@@ -236,4 +238,4 @@ void IState_Charge::idmatrix(const int &ib)
 		std::cout << " finished convert : " << std::endl;
 
 }
-
+#endif

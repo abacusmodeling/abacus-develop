@@ -2,6 +2,7 @@
 #include "../src_pw/global.h"
 #include "../src_lcao/global_fp.h"
 
+#ifdef __MPI
 std::vector<std::pair<std::vector<bool>,std::vector<bool>>>
 Exx_Abfs::Parallel::Communicate::Function::get_atom_in_2D_list(const MPI_Comm &mpi_comm)
 {
@@ -32,3 +33,4 @@ Exx_Abfs::Parallel::Communicate::Function::get_atom_in_2D_list(const MPI_Comm &m
 		}	
 	return atom_in_2D_list;
 }
+#endif
