@@ -39,4 +39,10 @@ ORB_table_beta.o\
 ORB_table_phi.o\
 ORB_table_alpha.o\
 ORB_gen_tables.o\
-ORB_unittest.o\
+
+OBJS_CTO=center2_orb-orb11.o\
+
+OBJS_TEST=ORB_unittest.o\
+1_snap_equal_test.o\
+#2_snap_finite_diff_test.o\
+#3_center2_finite_diff_test.o\

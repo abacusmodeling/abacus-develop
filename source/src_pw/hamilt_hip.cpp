@@ -514,10 +514,6 @@ void Hamilt::diagH_LAPACK(const int nstart,
 	// cout<<"hvec: "<<hvec.nr<<" "<<hvec.nc<<endl;
 
 	int lwork = 0;
-	//========================================
-	// int ILAENV();
-	// ILAENV returns optimal block size "nb"
-	//========================================
 
 	ModuleBase::ComplexMatrix sdum(nstart, ldh);
 	ModuleBase::ComplexMatrix hdum;
@@ -527,8 +523,6 @@ void Hamilt::diagH_LAPACK(const int nstart,
 	const bool all_eigenvalues = (nstart == nbands);
 
 	int nb = LapackConnector::ilaenv(1, "ZHETRD", "U", nstart, -1, -1, -1);
-	//  int nb = ILAENV(1,  "ZHETRD", "U", n, -1, -1, -1);
-	//  int nb = 32;
 
 	if (nb < 1)
 	{

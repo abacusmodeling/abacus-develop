@@ -50,8 +50,6 @@ list(APPEND objects
     wavefunc.cpp
     wf_atomic.cpp
     wf_igk.cpp
-    xc_1.cpp
-    xc_2.cpp
     xc_3.cpp
     xc_functional.cpp
     xc_gga_pw.cpp

@@ -77,24 +77,6 @@ public:
 		const std::complex<double> *becp,
 		const int m);
 
-    double ddot_real(
-		const int& npw,
-		const std::complex<double>* psi_L,
-		const std::complex<double>* psi_R)const;
-
-    std::complex<double> ddot( const int& npw,
-                          const std::complex<double> * psi_L,
-                          const std::complex<double> * psi_R )const ;
-
-    std::complex<double> just_ddot( const int& npw,
-                          const std::complex<double> * psi_L,
-                          const std::complex<double> * psi_R )const ;
-
-    std::complex<double> ddot( const int & npw,
-                          const ModuleBase::ComplexMatrix &psi,
-                          const int & m,
-                          const std::complex<double> *psik )const ;
-
     void diag_zheev
     (
         const int& npw,

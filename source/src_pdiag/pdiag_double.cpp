@@ -12,7 +12,7 @@
 #ifdef __MPI
 extern "C"
 {
-    #include "Cblacs.h"
+    #include "../module_base/blacs_connector.h"
     #include "my_elpa.h"
 	#include "../module_base/scalapack_connector.h"
 }
