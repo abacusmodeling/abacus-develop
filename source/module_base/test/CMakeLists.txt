@@ -43,3 +43,7 @@ AddTest(
   LIBS ${math_libs}
   SOURCES matrix_test.cpp ../matrix.cpp
 )
+AddTest(
+  TARGET base_sph_bessel_recursive
+  SOURCES sph_bessel_recursive_test.cpp ../sph_bessel_recursive-d1.cpp ../sph_bessel_recursive-d2.cpp
+)
