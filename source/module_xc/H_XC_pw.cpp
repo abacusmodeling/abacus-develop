@@ -25,11 +25,6 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc
     double vtxc = 0.0;
 	ModuleBase::matrix v(GlobalV::NSPIN, nrxx);
 
-	if(GlobalV::VXC_IN_H == 0)
-	{
-    	ModuleBase::timer::tick("H_XC_pw","v_xc");
-    	return std::make_tuple(etxc, vtxc, std::move(v));
-	}
     // the square of the e charge
     // in Rydeberg unit, so * 2.0.
     double e2 = 2.0;
@@ -41,7 +36,6 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc
     double vxc[2];
 
     int ir, is;
-    int neg [3];
 
     double vanishing_charge = 1.0e-10;
 
@@ -55,7 +49,16 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc
             arhox = abs(rhox);
             if (arhox > vanishing_charge)
             {
-                XC_Functional::xc(arhox, exc, vxc[0]);
+                if(use_libxc)
+                {
+                    std::cout << "xc_libxc" << std::endl;
+                    XC_Functional::xc_libxc(arhox, exc, vxc[0]);
+                }
+                else
+                {
+                    std::cout << "xc" << std::endl;
+                    XC_Functional::xc(arhox, exc, vxc[0]);
+                }
                 v(0,ir) = e2 * vxc[0];
 				// consider the total charge density
                 etxc += e2 * exc * rhox;
@@ -67,10 +70,6 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc
     else if(GlobalV::NSPIN ==2)
     {
         // spin-polarized case
-        neg [0] = 0;
-        neg [1] = 0;
-        neg [2] = 0;
-
         for (ir = 0;ir < nrxx;ir++)
         {
             rhox = rho_in[0][ir] + rho_in[1][ir] + rho_core[ir]; //HLX(05-29-06): bug fixed
@@ -82,22 +81,24 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc
 
                 if (abs(zeta)  > 1.0)
                 {
-                    ++neg[2];
                     zeta = (zeta > 0.0) ? 1.0 : (-1.0);
                 }
 
-                if (rho_in[0][ir] < 0.0)
-                {
-                    ++neg[0];
-                }
-
-                if (rho_in[1][ir] < 0.0)
-                {
-                    ++neg[1];
-                }
-
                 // call
-                XC_Functional::xc_spin(arhox, zeta, exc, vxc[0], vxc[1]);
+                if(use_libxc)
+                {
+                    std::cout << "xc_libxc" << std::endl;
+                    double rhoup = arhox * (1.0+zeta) / 2.0;
+                    double rhodw = arhox * (1.0-zeta) / 2.0;
+                    XC_Functional::xc_spin(rhoup, rhodw, exc, vxc[0], vxc[1]);
+                }
+                else
+                {
+                    std::cout << "xc" << std::endl;
+                    double rhoup = arhox * (1.0+zeta) / 2.0;
+                    double rhodw = arhox * (1.0-zeta) / 2.0;
+                    XC_Functional::xc_spin(arhox, zeta, exc, vxc[0], vxc[1]);
+                }
 
                 for (is = 0;is < GlobalV::NSPIN;is++)
                 {
@@ -105,7 +106,6 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc
                 }
 
                 etxc += e2 * exc * rhox;
-
                 vtxc += v(0, ir) * rho_in[0][ir] + v(1, ir) * rho_in[1][ir];
             }
         }
@@ -119,8 +119,6 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc
 
             rhox = rho_in[0][ir] + rho_core[ir];
 
-            if ( rho_in[0][ir] < 0.0 )  neg[0] -= rho_in[0][ir];
-
             arhox = abs( rhox );
 
             if ( arhox > vanishing_charge )
@@ -129,11 +127,8 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc
 
                 if ( abs( zeta ) > 1.0 )
                 {
-                    neg[1] += 1.0 / omega;
-
                     zeta = (zeta > 0.0) ? 1.0 : (-1.0);
                 }//end if
-
                 XC_Functional::xc_spin( arhox, zeta, exc, vxc[0], vxc[1]);
 				
                 etxc += e2 * exc * rhox;

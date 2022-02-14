@@ -48,7 +48,8 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc_libxc(
 	// use can check on website, for example:
 	// https://www.tddft.org/programs/libxc/manual/libxc-5.1.x/
 	//----------------------------------------------------------
-	std::vector<xc_func_type> funcs = init_func();
+	const int xc_polarized = (1==nspin0()) ? XC_UNPOLARIZED : XC_POLARIZED;
+	std::vector<xc_func_type> funcs = init_func(xc_polarized);
 
 	bool is_gga = false;
 	for( xc_func_type &func : funcs )
@@ -152,13 +153,13 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc_libxc(
 
 		if(nspin0()==2 && func.info->family != XC_FAMILY_LDA && func.info->kind==XC_CORRELATION)
 		{
-				for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
-				{
-						if ( rho[ir*2]<rho_threshold || sqrt(abs(sigma[ir*3]))<grho_threshold )
-								sgn[ir*2] = 0.0;
-						if ( rho[ir*2+1]<rho_threshold || sqrt(abs(sigma[ir*3+2]))<grho_threshold )
-								sgn[ir*2+1] = 0.0;
-				}
+			for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
+			{
+					if ( rho[ir*2]<rho_threshold || sqrt(abs(sigma[ir*3]))<grho_threshold )
+							sgn[ir*2] = 0.0;
+					if ( rho[ir*2+1]<rho_threshold || sqrt(abs(sigma[ir*3+2]))<grho_threshold )
+							sgn[ir*2+1] = 0.0;
+			}
 		}
 		
 		xc_func_set_dens_threshold(&func, rho_threshold);
@@ -297,11 +298,10 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc_libxc(
 	return std::make_tuple( etxc, vtxc, std::move(v) );
 }
 
-std::vector<xc_func_type> XC_Functional::init_func()
+std::vector<xc_func_type> XC_Functional::init_func(const int xc_polarized)
 {
 	// 'funcs' is the return value
 	std::vector<xc_func_type> funcs;
-	const int xc_polarized = (1==nspin0()) ? XC_UNPOLARIZED : XC_POLARIZED;
 
 	//-------------------------------------------
 	// define a function named 'add_func', which 

@@ -2,6 +2,7 @@
 #include "../src_pw/global.h"
 #include "../module_base/global_function.h"
 #include <stdexcept>
+#include <xc.h>
 
 XC_Functional::XC_Functional(){}
 
@@ -9,14 +10,14 @@ XC_Functional::~XC_Functional(){}
 
 std::vector<int> XC_Functional::func_id(1);
 int XC_Functional::func_type = 0;
+bool XC_Functional::use_libxc = true;
 
 int XC_Functional::get_func_type()
 {
     return func_type;
 }
 
-// The setting values of functional id
-// according to the index in LIBXC
+// The setting values of functional id according to the index in LIBXC
 // for detail, refer to https://www.tddft.org/programs/libxc/functionals/
 void XC_Functional::set_xc_type(const std::string xc_func_in)
 {
@@ -29,72 +30,84 @@ void XC_Functional::set_xc_type(const std::string xc_func_in)
         // but since we are not compiling with libxc as default,
         // I chose to set it manually instead.
         // Same for the rest.
-        func_id.push_back(1);
-        func_id.push_back(9);
+        func_id.push_back(XC_LDA_X);
+        func_id.push_back(XC_LDA_C_PZ);
         func_type = 1;
+        use_libxc = false;
 	}	
 	else if ( xc_func == "PBE" || xc_func == "SLAPWPBXPBC") //PBX+PBC
 	{
-        func_id.push_back(101);
-        func_id.push_back(130);
+        func_id.push_back(XC_GGA_X_PBE);
+        func_id.push_back(XC_GGA_C_PBE);
         func_type = 2;
+        use_libxc = false;
 	} 
 	else if( xc_func == "revPBE" ) //rPBX+PBC
 	{
-		func_id.push_back(117);
-        func_id.push_back(130);
+		func_id.push_back(XC_GGA_X_RPBE);
+        func_id.push_back(XC_GGA_C_PBE);
         func_type = 2;
+        use_libxc = false;
 	}
 	else if ( xc_func == "PBEsol") //PBXsol+PBCsol
 	{
-        func_id.push_back(116);
-        func_id.push_back(133);
+        func_id.push_back(XC_GGA_X_PBE_SOL);
+        func_id.push_back(XC_GGA_C_PBE_SOL);
         func_type = 2;
+        use_libxc = false;
 	}
 	else if ( xc_func == "WC") //WC+PBC
 	{
-        func_id.push_back(118);
-        func_id.push_back(130);
+        func_id.push_back(XC_GGA_X_WC);
+        func_id.push_back(XC_GGA_C_PBE);
         func_type = 2;
+        use_libxc = false;
 	}	
-	else if ( xc_func == "BLYP") //B88+BLYP
+	else if ( xc_func == "BLYP") //B88+LYP
 	{
-        func_id.push_back(106);
-        func_id.push_back(131);
+        func_id.push_back(XC_GGA_X_B88);
+        func_id.push_back(XC_GGA_C_LYP);
+        func_type = 2;
+        use_libxc = false;
 	}
 	else if ( xc_func == "BP") //B88+P86
 	{
-        func_id.push_back(106);
-        func_id.push_back(132);
+        func_id.push_back(XC_GGA_X_B88);
+        func_id.push_back(XC_GGA_C_P86);
         func_type = 2;
+        use_libxc = false;
 	} 
 	else if ( xc_func == "PW91") //PW91_X+PW91_C
 	{
-        func_id.push_back(109);
-        func_id.push_back(134);
+        func_id.push_back(XC_GGA_X_PW91);
+        func_id.push_back(XC_GGA_C_PW91);
         func_type = 2;
+        use_libxc = false;
 	} 
 	else if ( xc_func == "HCTH") //HCTH_X+HCTH_C
 	{
-        func_id.push_back(34);
-        func_id.push_back(97);
+        func_id.push_back(XC_GGA_X_HCTH_A);
+        func_id.push_back(XC_GGA_C_HCTH_A);
         func_type = 2;
+        use_libxc = false;
 	}
-	else if ( xc_func == "OLYP") //OPTX+BLYP
+	else if ( xc_func == "OLYP") //OPTX+LYP
 	{
-        func_id.push_back(110);
-        func_id.push_back(131);
+        func_id.push_back(XC_GGA_X_OPTX);
+        func_id.push_back(XC_GGA_C_LYP);
         func_type = 2;
+        use_libxc = false;
 	}
 	else if ( xc_func == "SCAN")
 	{
-        func_id.push_back(263);
-        func_id.push_back(267);
+        func_id.push_back(XC_MGGA_X_SCAN);
+        func_id.push_back(XC_MGGA_C_SCAN);
+        func_type = 3;
 		GlobalV::DFT_META = 1;
 	}
    	else if( xc_func == "PBE0")
 	{
-        func_id.push_back(406);
+        func_id.push_back(XC_HYB_GGA_XC_PBEH);
         func_type = 4;
 	}
     else if( xc_func == "HF" || xc_func == "OPT_ORB" ||  xc_func == "NONE")
@@ -104,7 +117,7 @@ void XC_Functional::set_xc_type(const std::string xc_func_in)
     }
     else if( xc_func == "HSE")
     {
-        func_id.push_back(428);
+        func_id.push_back(XC_HYB_GGA_XC_HSE06);
         func_type = 4;
     }
     else
@@ -118,9 +131,30 @@ void XC_Functional::set_xc_type(const std::string xc_func_in)
 	}
 }
 
+void XC_Functional::xc_libxc(const double &rho, double &exc, double &vxc)
+{
+
+    double e,v;
+    exc = vxc = 0.00;
+
+	std::vector<xc_func_type> funcs = init_func(XC_UNPOLARIZED);
+
+    for(xc_func_type &func : funcs)
+    {
+        if( func.info->family == XC_FAMILY_LDA)
+        {
+            // call Libxc function: xc_lda_exc_vxc
+            xc_lda_exc_vxc( &func, 1, &rho, &e, &v);
+        }
+        exc += e;
+        vxc += v;
+    }
+	return;
+}
+
 void XC_Functional::xc(const double &rho, double &exc, double &vxc)
 {
-	double small = 1.e-10;
+
 	double third = 1.0 / 3.0;
 	double pi34 = 0.6203504908994e0 ; // pi34=(3/4pi)^(1/3)
 	double rs;
@@ -128,50 +162,43 @@ void XC_Functional::xc(const double &rho, double &exc, double &vxc)
     
     exc = vxc = 0.00;
 	
-    if(rho <= small)
-	{
-		
-		return;
-	}
-	else
-	{
-		rs = pi34 / std::pow(rho, third);
-	}
+	rs = pi34 / std::pow(rho, third);
 
     for(int id : func_id)
     {
         switch( id )
         {
             // Exchange functionals containing slater exchange
-            case 1: case 101: case 117: case 116: case 118: case 106: case 109:
-            // SLA       PBX      rPBX    PBXsol        WC       B88     PW91_X
+            case XC_LDA_X: case XC_GGA_X_PBE: case XC_GGA_X_RPBE: case XC_GGA_X_PBE_SOL: 
+            case XC_GGA_X_WC: case XC_GGA_X_B88: case XC_GGA_X_PW91:
+            //  SLA,PBX,rPBX,PBXsol,WC,B88,PW91_X
                 XC_Functional::slater(rs, e, v);break;
 
             // Exchange functionals containing attenuated slater exchange
-            case 406:
+            case XC_HYB_GGA_XC_PBEH:
             //  PBE0
                 XC_Functional::slater(rs, e, v);
                 e *= 0.75; v*= 0.75;
                 break;
 
             // Correlation functionals containing PW correlation
-            case 130: case 133:
-            //   PBC    PBCsol
+            case XC_GGA_C_PBE: case XC_GGA_C_PBE_SOL:
+            //   PBC,PBCsol
                 XC_Functional::pw(rs, 0, e, v);break;
 
             // Correlation functionals containing PZ correlation
-            case 9: case 132:
-            //  PZ       P86
+            case XC_LDA_C_PZ: case XC_GGA_C_P86:
+            //  PZ,P86
                 XC_Functional::pz(rs, 0, e, v);break;
 
             // Correlation functionals containing LYP correlation
-            case 131:
+            case XC_GGA_C_LYP:
             //  BLYP
                 XC_Functional::lyp(rs, e, v);break;
 
             // Functionals that are realized only using LIBXC
-            case 428: case 263: case 267:
-            //    HSE    SCAN_X   SCAN_C
+            case XC_HYB_GGA_XC_HSE06: case XC_MGGA_X_SCAN: case XC_MGGA_C_SCAN:
+            //  HSE,SCAN_X,SCAN_C
                 throw std::domain_error("functional unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
             
             default:
@@ -183,17 +210,44 @@ void XC_Functional::xc(const double &rho, double &exc, double &vxc)
 	return;
 }
 
+void XC_Functional::xc_spin_libxc(const double &rhoup, const double &rhodw,
+		double &exc, double &vxcup, double &vxcdw)
+{
+
+    double e, vup, vdw;
+    double *rho_ud, *vxc_ud;
+    exc = vxcup = vxcdw = 0.0;
+
+    rho_ud = new double[2];
+    vxc_ud = new double[2];
+    rho_ud[0] = rhoup;
+    rho_ud[1] = rhodw;
+
+    std::vector<xc_func_type> funcs = init_func(XC_POLARIZED);
+
+    for(xc_func_type &func : funcs)
+    {
+        if( func.info->family == XC_FAMILY_LDA)
+        {
+            // call Libxc function: xc_lda_exc_vxc
+            xc_lda_exc_vxc( &func, 1, rho_ud, &e, vxc_ud);
+        }
+        exc += e;
+        vxcup += vxc_ud[0];
+        vxcdw += vxc_ud[1];
+    }    
+
+
+    delete[] rho_ud;
+    delete[] vxc_ud;
+}
+
 void XC_Functional::xc_spin(const double &rho, const double &zeta,
 		double &exc, double &vxcup, double &vxcdw)
 {
 	static const double small = 1.e-10;
     double e, vup, vdw;
     exc = vxcup = vxcdw = 0.0;
-
-	if (rho <= small)
-	{
-		return;
-	}
 
 	static const double third = 1.0 / 3.0;
 	static const double pi34 = 0.62035049089940; 
@@ -204,29 +258,31 @@ void XC_Functional::xc_spin(const double &rho, const double &zeta,
         switch( id )
         {
             // Exchange functionals containing slater exchange
-            case 1: case 101: case 117: case 116: case 118: case 106: case 109:
-            // SLA       PBX      rPBX    PBXsol        WC       B88     PW91_X
+            case XC_LDA_X: case XC_GGA_X_PBE: case XC_GGA_X_RPBE: case XC_GGA_X_PBE_SOL: 
+            case XC_GGA_X_WC: case XC_GGA_X_B88: case XC_GGA_X_PW91:
+            //  SLA,PBX,rPBX,PBXsol,WC,B88,PW91_X
                 XC_Functional::slater_spin(rho, zeta, e, vup, vdw);	break;
             
             // Exchange functionals containing attenuated slater exchange
-            case 406:
+            case XC_HYB_GGA_XC_PBEH:
             //  PBE0
                 XC_Functional::slater_spin(rho, zeta, e, vup, vdw);
                 e *= 0.75; vup *= 0.75; vdw *=0.75;
                 break;
 
             // Correlation functionals containing PZ correlation
-            case 9: case 132:
+            case XC_LDA_C_PZ: case XC_GGA_C_P86:
+            //  PZ,P86
                 XC_Functional::pz_spin(rs, zeta, e, vup, vdw); break;
 
             // Correlation functionals containing PW correlationtests/integrate/101_PW_OU_pseudopot
-            case 130: case 133:
-            //   PBC    PBCsol
+            case XC_GGA_C_PBE: case XC_GGA_C_PBE_SOL:
+            //   PBC,PBCsol
                 XC_Functional::pw_spin(rs, zeta, e, vup, vdw); break;
 
             // Correlation functionals that already contains LDA components
             // so sets to 0 here
-            case 34: case 97: case 110:
+            case XC_GGA_X_HCTH_A: case XC_GGA_C_HCTH_A: case XC_GGA_X_OPTX:
             //HCTH_X  HTCH_C      OPTX
                 e = vup = vdw =0.0;
 

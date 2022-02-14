@@ -104,15 +104,20 @@ class XC_Functional
 
 	static std::vector<int> func_id; // id of exchange functional
 	static int func_type; //0:none, 1:lda, 2:gga, 3:mgga, 4:hybrid
+	static bool use_libxc;
 
 	static void set_xc_type(const std::string xc_func_in);
-	static std::vector<xc_func_type> init_func();
+	static std::vector<xc_func_type> init_func(const int xc_polarized);
 
 	// LDA
 	static void xc(const double &rho, double &exc, double &vxc);
+	static void xc_libxc(const double &rho, double &exc, double &vxc);
+
 
 	// LSDA
 	static void xc_spin(const double &rho, const double &zeta,
+			double &exc, double &vxcup, double &vxcdw);
+	static void xc_spin_libxc(const double &rhoup, const double &rhodw,
 			double &exc, double &vxcup, double &vxcdw);
 
 	// For LDA exchange energy
