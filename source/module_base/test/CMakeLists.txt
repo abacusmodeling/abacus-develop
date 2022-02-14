@@ -39,6 +39,11 @@ AddTest(
   SOURCES complexmatrix_test.cpp ../complexmatrix.cpp ../matrix.cpp 
 )
 AddTest(
+ TARGET base_matrix
+  LIBS ${math_libs}
+  SOURCES matrix_test.cpp ../matrix.cpp
+)
+AddTest(
   TARGET base_realarray
   SOURCES realarray_test.cpp ../realarray.cpp
 )
