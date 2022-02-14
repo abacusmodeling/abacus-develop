@@ -38,6 +38,7 @@ inline int localIndex(int globalIndex, int nblk, int nprocs, int& myproc)
     return int(globalIndex/(nblk*nprocs))*nblk+globalIndex%nblk;
 }
 
+#ifdef __MPI
 inline int cart2blacs(
 	MPI_Comm comm_2D,
 	int nprows,
@@ -47,7 +48,6 @@ inline int cart2blacs(
 	int lld,
 	int *desc)
 {
-#ifdef __MPI
     int my_blacs_ctxt;
     int myprow, mypcol;
     int *usermap=new int[nprows*npcols];
@@ -69,10 +69,8 @@ inline int cart2blacs(
     descinit_(desc, &N, &N, &nblk, &nblk, &ISRC, &ISRC, &my_blacs_ctxt, &lld, &info);
 
     return my_blacs_ctxt;
-#else
-    return 0;
-#endif
 }
+#endif
 
 #ifdef __MPI
 inline int set_elpahandle(elpa_t &handle, int *desc, int local_nrows, int local_ncols)
