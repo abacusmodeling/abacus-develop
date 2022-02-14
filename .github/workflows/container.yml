@@ -6,7 +6,7 @@ on:
       - develop
       - reconstruction
       - newelpa
-      
+
 jobs:
   build_container_and_push:
     runs-on: ubuntu-latest

@@ -27,5 +27,4 @@ jobs:
       - name: Build
         run: |
           cmake -B build -DBUILD_TESTING=ON ${{ matrix.build_args }}
-          cmake --build build -j4
-          cmake --install build
+          cmake --build build -j2
