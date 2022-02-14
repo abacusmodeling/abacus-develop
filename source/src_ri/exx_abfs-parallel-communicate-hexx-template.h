@@ -5,7 +5,7 @@
 #include "../src_pw/global.h"
 #include "../src_lcao/global_fp.h"
 #include <cassert>
-
+#ifdef __MPI
 /*
 template< typename T >
 T Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D( const std::map<size_t,std::map<size_t,T>> & H_a2D ) const
@@ -210,5 +210,5 @@ Tmatrix Exx_Abfs::Parallel::Communicate::Hexx::pulay_mixing(
 	}
 	return H_pulay;
 }
-
+#endif
 #endif

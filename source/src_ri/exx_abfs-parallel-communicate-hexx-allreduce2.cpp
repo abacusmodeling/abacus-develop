@@ -1,3 +1,4 @@
+#ifdef __MPI
 #include "exx_abfs-parallel-communicate-hexx.h"
 #include "exx_abfs-parallel-communicate-function.h"
 
@@ -360,3 +361,4 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::insert_data(
 		}
 	}
 }
+#endif
