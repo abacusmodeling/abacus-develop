@@ -992,7 +992,7 @@ This part of variables are relevant when using hybrid functionals
 
 - exx_hybrid_type<a id="exx-hybrid-type"></a>
     - *Type*: String
-    - *Description*: Type of hybrid functional used. Options are "hf" (pure Hartree-Fock), "pbe0"(PBE0), "hse" (Note: in order to use HSE functional, LIBXC is required). Note also that HSE has been tested while PBE0 has NOT been fully tested yet.
+    - *Description*: Type of hybrid functional used. Options are "hf" (pure Hartree-Fock), "pbe0"(PBE0), "hse" (Note: in order to use HSE functional, LIBXC is required). Note also that HSE has been tested while PBE0 has NOT been fully tested yet, and the maxmum parallel cpus for running exx is Nx(N+1)/2, with N being the number of atoms.
 
     
         If set to "no", then no hybrid functional is used (i.e.,Fock exchange is not included.)
