@@ -40,7 +40,8 @@ Local_Orbital_wfc::~Local_Orbital_wfc()
 
 }
 
-void Local_Orbital_wfc::allocate_k(const Grid_Technique &gt)
+void Local_Orbital_wfc::allocate_k(const Grid_Technique& gt,
+    std::vector<ModuleBase::ComplexMatrix>& wfc_k)
 {
 	ModuleBase::TITLE("Local_Orbital_wfc","allocate_k");
 	if(GlobalV::NLOCAL < GlobalV::NBANDS)
@@ -100,7 +101,7 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique &gt)
 		for(int ik=0; ik<GlobalC::kv.nkstot; ++ik)
 		{
 			GlobalV::ofs_running << " Read in wave functions " << ik + 1 << std::endl;
-			error = WF_Local::read_lowf_complex( this->WFC_K[ik], ik , 0);
+			error = WF_Local::read_lowf_complex( this->WFC_K[ik], ik, &wfc_k);
 		}
 #ifdef __MPI
 		Parallel_Common::bcast_int(error);

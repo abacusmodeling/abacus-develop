@@ -297,7 +297,7 @@ void Local_Orbital_Charge::gamma_file(const Grid_Technique& gt,
 		wfc_gamma[is].zero_out();
 
 		GlobalV::ofs_running << " Read in wave functions " << is << std::endl;
-		error = WF_Local::read_lowf( ctot , is);
+		error = WF_Local::read_lowf( ctot , is, &wfc_gamma);
 #ifdef __MPI
 		Parallel_Common::bcast_int(error);
 #endif

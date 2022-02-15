@@ -75,7 +75,7 @@ void Local_Orbital_Charge::kpt_file(const Grid_Technique& gt,
 		wfc_k[ik].zero_out();
 
 		GlobalV::ofs_running << " Read in wave functions " << ik + 1 << std::endl;
-		error = WF_Local::read_lowf_complex( ctot , ik , 1);
+		error = WF_Local::read_lowf_complex( ctot , ik, &wfc_k);
 
 #ifdef __MPI
 		Parallel_Common::bcast_int(error);
