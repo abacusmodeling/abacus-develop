@@ -719,7 +719,9 @@ void unkOverlap_lcao::prepare_midmatrix_pblas(const int ik_L, const int ik_R, co
 	
 }
 
-std::complex<double> unkOverlap_lcao::det_berryphase(const int ik_L, const int ik_R, const ModuleBase::Vector3<double> dk, const int occ_bands)
+std::complex<double> unkOverlap_lcao::det_berryphase(const int ik_L, const int ik_R,
+    const ModuleBase::Vector3<double> dk, const int occ_bands,
+    std::vector<ModuleBase::ComplexMatrix>* wfc_k)
 {
 	const std::complex<double> minus = std::complex<double>(-1.0,0.0);
 	std::complex<double> det = std::complex<double>(1.0,0.0);
@@ -731,7 +733,6 @@ std::complex<double> unkOverlap_lcao::det_berryphase(const int ik_L, const int i
 	
 	this->prepare_midmatrix_pblas(ik_L,ik_R,dk,midmatrix);
 	
-	//GlobalC::LOC.wfc_dm_2d->wfc_k
 	char transa = 'C';
 	char transb = 'N';
 	int occBands = occ_bands;
@@ -740,14 +741,14 @@ std::complex<double> unkOverlap_lcao::det_berryphase(const int ik_L, const int i
 	int one = 1;
 #ifdef __MPI
 	pzgemm_(&transa,&transb,&occBands,&nlocal,&nlocal,&alpha,
-			GlobalC::LOC.wfc_dm_2d->wfc_k[ik_L].c,&one,&one,GlobalC::ParaO.desc,
+			wfc_k->at(ik_L).c,&one,&one,GlobalC::ParaO.desc,
 							  midmatrix,&one,&one,GlobalC::ParaO.desc,
 													   &beta,
 							   C_matrix,&one,&one,GlobalC::ParaO.desc);
 							   
 	pzgemm_(&transb,&transb,&occBands,&occBands,&nlocal,&alpha,
 								 C_matrix,&one,&one,GlobalC::ParaO.desc,
-			  GlobalC::LOC.wfc_dm_2d->wfc_k[ik_R].c,&one,&one,GlobalC::ParaO.desc,
+			wfc_k->at(ik_R).c,&one,&one,GlobalC::ParaO.desc,
 														 &beta,
 							   out_matrix,&one,&one,GlobalC::ParaO.desc);	
 

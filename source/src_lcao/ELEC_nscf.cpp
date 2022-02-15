@@ -91,7 +91,7 @@ void ELEC_nscf::nscf(LCAO_Hamilt& uhm,
 	// add by jingan
 	if (berryphase::berry_phase_flag && ModuleSymmetry::Symmetry::symm_flag == 0)
     {
-    	berryphase bp;
+    	berryphase bp(&wfc_k);
 		bp.Macroscopic_polarization();
     }
 
