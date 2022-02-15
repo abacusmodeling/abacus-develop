@@ -11,7 +11,11 @@
 ELEC_nscf::ELEC_nscf(){}
 ELEC_nscf::~ELEC_nscf(){}
 
-void ELEC_nscf::nscf(LCAO_Hamilt &uhm)
+void ELEC_nscf::nscf(LCAO_Hamilt& uhm,
+    std::vector<ModuleBase::matrix>& wfc_gamma,
+    std::vector<ModuleBase::matrix>& dm_gamma,
+    std::vector<ModuleBase::ComplexMatrix>& wfc_k,
+    std::vector<ModuleBase::ComplexMatrix>& dm_k)
 {
 	ModuleBase::TITLE("ELEC_nscf","nscf");
 
@@ -36,11 +40,11 @@ void ELEC_nscf::nscf(LCAO_Hamilt &uhm)
 	int istep=0; 
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		ELEC_cbands_gamma::cal_bands(istep, uhm);
+		ELEC_cbands_gamma::cal_bands(istep, uhm, wfc_gamma, dm_gamma);
 	}
 	else
 	{
-		ELEC_cbands_k::cal_bands(istep, uhm);
+		ELEC_cbands_k::cal_bands(istep, uhm, wfc_k, dm_k);
 	}
 
 	time_t time_finish=std::time(NULL);

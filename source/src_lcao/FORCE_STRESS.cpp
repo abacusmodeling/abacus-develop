@@ -46,8 +46,9 @@ void Force_Stress_LCAO::getForceStress(
 	const bool isforce,
 	const bool isstress,
 	const bool istestf,
-	const bool istests,
-	ModuleBase::matrix &fcs,
+    const bool istests,
+    Wfc_Dm_2d &wfc_dm_2d,
+    ModuleBase::matrix& fcs,
 	ModuleBase::matrix &scs)
 {
     ModuleBase::TITLE("Force_Stress_LCAO","getForceStress");
@@ -135,6 +136,7 @@ void Force_Stress_LCAO::getForceStress(
 				GlobalV::GAMMA_ONLY_LOCAL,
 				isforce,
 				isstress,
+                wfc_dm_2d,
 				foverlap,
 				ftvnl_dphi,
 				fvnl_dbeta,
@@ -208,7 +210,7 @@ void Force_Stress_LCAO::getForceStress(
 	if (INPUT.dft_plus_u)
 	{
 		// Quxin add for DFT+U on 20201029
-		GlobalC::dftu.force_stress();
+		GlobalC::dftu.force_stress(wfc_dm_2d);
 		
         if (isforce) {
             force_dftu.create(nat, 3);
@@ -320,7 +322,7 @@ void Force_Stress_LCAO::getForceStress(
 
 				if(GlobalV::GAMMA_ONLY_LOCAL)
 				{
-    				GlobalC::ld.cal_gdmx(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],
+    				GlobalC::ld.cal_gdmx(wfc_dm_2d.dm_gamma[0],
 						GlobalC::ucell,
 						GlobalC::ORB,
 						GlobalC::GridD,
@@ -328,7 +330,7 @@ void Force_Stress_LCAO::getForceStress(
 				}
 				else
 				{			
-					GlobalC::ld.cal_gdmx_k(GlobalC::LOC.wfc_dm_2d.dm_k,
+					GlobalC::ld.cal_gdmx_k(wfc_dm_2d.dm_k,
 						GlobalC::ucell,
 						GlobalC::ORB,
 						GlobalC::GridD,
@@ -722,8 +724,9 @@ void Force_Stress_LCAO::calForcePwPart(
 void Force_Stress_LCAO::calForceStressIntegralPart(
 	const bool isGammaOnly,
 	const bool isforce,
-	const bool isstress,
-	ModuleBase::matrix& foverlap,
+    const bool isstress,
+    Wfc_Dm_2d& wfc_dm_2d,
+    ModuleBase::matrix& foverlap,
 	ModuleBase::matrix& ftvnl_dphi,
 	ModuleBase::matrix& fvnl_dbeta,
 	ModuleBase::matrix& fvl_dphi,
@@ -742,6 +745,7 @@ void Force_Stress_LCAO::calForceStressIntegralPart(
     	flk.ftable_gamma(
 				isforce,
 				isstress,
+                wfc_dm_2d,
 				foverlap,
 				ftvnl_dphi,
 				fvnl_dbeta,
@@ -761,6 +765,7 @@ void Force_Stress_LCAO::calForceStressIntegralPart(
 		flk.ftable_k(
 				isforce,
 				isstress,
+                wfc_dm_2d,
 				foverlap,
 				ftvnl_dphi,
 				fvnl_dbeta,

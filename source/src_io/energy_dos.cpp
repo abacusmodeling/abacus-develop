@@ -25,7 +25,8 @@
 #endif
 #include <sys/time.h>
 
-void energy::perform_dos(void)
+void energy::perform_dos( std::vector<ModuleBase::matrix> &wfc_gamma,
+    std::vector<ModuleBase::ComplexMatrix> &wfc_k)
 {
 	ModuleBase::TITLE("energy","perform_dos");
 
@@ -226,13 +227,14 @@ void energy::perform_dos(void)
 
 		int NUM=GlobalV::NLOCAL*npoints;
 		Wfc_Dm_2d D;
-		D.init();
-		if(GlobalV::GAMMA_ONLY_LOCAL)
+        D.init();
+        
+        if (GlobalV::GAMMA_ONLY_LOCAL)
 		{
 			for(int in=0;in<GlobalV::NSPIN;in++)
 			{
 
-				D.wfc_gamma[in]=GlobalC::LOC.wfc_dm_2d.wfc_gamma[in];
+				D.wfc_gamma[in]=wfc_gamma[in];
 			}
 
 		}
@@ -242,7 +244,7 @@ void energy::perform_dos(void)
 			for(int in=0;in<GlobalC::kv.nks;in++)
 			{
 
-				D.wfc_k[in] = GlobalC::LOC.wfc_dm_2d.wfc_k[in];
+				D.wfc_k[in] = wfc_k[in];
 			}
 		}
 

@@ -61,7 +61,7 @@ void LCAO_Hamilt::set_lcao_matrices(void)
     return;
 }
 
-void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-12-03
+void LCAO_Hamilt::calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> dm_gamma)				// Peize Lin add ik 2016-12-03
 {
     ModuleBase::TITLE("LCAO_Hamilt","calculate_Hgamma");
     ModuleBase::timer::tick("LCAO_Hamilt","cal_Hgamma");
@@ -111,7 +111,7 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-
 
 	if (GlobalV::deepks_scf)
     {
-		GlobalC::ld.cal_projected_DM(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],
+		GlobalC::ld.cal_projected_DM(dm_gamma[0],
             GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,

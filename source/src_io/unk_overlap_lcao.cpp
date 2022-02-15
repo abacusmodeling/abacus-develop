@@ -731,7 +731,7 @@ std::complex<double> unkOverlap_lcao::det_berryphase(const int ik_L, const int i
 	
 	this->prepare_midmatrix_pblas(ik_L,ik_R,dk,midmatrix);
 	
-	//GlobalC::LOC.wfc_dm_2d.wfc_k
+	//GlobalC::LOC.wfc_dm_2d->wfc_k
 	char transa = 'C';
 	char transb = 'N';
 	int occBands = occ_bands;
@@ -740,14 +740,14 @@ std::complex<double> unkOverlap_lcao::det_berryphase(const int ik_L, const int i
 	int one = 1;
 #ifdef __MPI
 	pzgemm_(&transa,&transb,&occBands,&nlocal,&nlocal,&alpha,
-			GlobalC::LOC.wfc_dm_2d.wfc_k[ik_L].c,&one,&one,GlobalC::ParaO.desc,
+			GlobalC::LOC.wfc_dm_2d->wfc_k[ik_L].c,&one,&one,GlobalC::ParaO.desc,
 							  midmatrix,&one,&one,GlobalC::ParaO.desc,
 													   &beta,
 							   C_matrix,&one,&one,GlobalC::ParaO.desc);
 							   
 	pzgemm_(&transb,&transb,&occBands,&occBands,&nlocal,&alpha,
 								 C_matrix,&one,&one,GlobalC::ParaO.desc,
-			  GlobalC::LOC.wfc_dm_2d.wfc_k[ik_R].c,&one,&one,GlobalC::ParaO.desc,
+			  GlobalC::LOC.wfc_dm_2d->wfc_k[ik_R].c,&one,&one,GlobalC::ParaO.desc,
 														 &beta,
 							   out_matrix,&one,&one,GlobalC::ParaO.desc);	
 

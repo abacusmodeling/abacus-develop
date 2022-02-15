@@ -208,7 +208,7 @@ void IState_Charge::idmatrix(const int &ib)
 			}
 		
 			// wg_wfc(ib,iw) = wg[ib] * wfc(ib,iw);
-			ModuleBase::matrix wg_wfc(GlobalC::LOC.wfc_dm_2d.wfc_gamma[is]);
+			ModuleBase::matrix wg_wfc(GlobalC::LOC.wfc_dm_2d->wfc_gamma[is]);
 	
 			for(int ir=0; ir!=wg_wfc.nr; ++ir)
 			{
@@ -219,16 +219,16 @@ void IState_Charge::idmatrix(const int &ib)
 			const double one_float=1.0, zero_float=0.0;
 			const int one_int=1;
 			const char N_char='N', T_char='T';
-			GlobalC::LOC.wfc_dm_2d.dm_gamma[is].create( wg_wfc.nr, wg_wfc.nc );
+			GlobalC::LOC.wfc_dm_2d->dm_gamma[is].create( wg_wfc.nr, wg_wfc.nc );
 
 			pdgemm_(
 				&N_char, &T_char,
 				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalC::wf.wg.nc,
 				&one_float,
 				wg_wfc.c, &one_int, &one_int, GlobalC::ParaO.desc,
-				GlobalC::LOC.wfc_dm_2d.wfc_gamma[is].c, &one_int, &one_int, GlobalC::ParaO.desc,
+				GlobalC::LOC.wfc_dm_2d->wfc_gamma[is].c, &one_int, &one_int, GlobalC::ParaO.desc,
 				&zero_float,
-				GlobalC::LOC.wfc_dm_2d.dm_gamma[is].c, &one_int, &one_int, GlobalC::ParaO.desc);
+				GlobalC::LOC.wfc_dm_2d->dm_gamma[is].c, &one_int, &one_int, GlobalC::ParaO.desc);
 		}
 
 		std::cout << " finished calc dm_2d : " << std::endl;

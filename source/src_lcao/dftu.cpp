@@ -277,7 +277,7 @@ void DFTU::init(
     return;
 }
 
-void DFTU::cal_occup_m_k(const int iter)
+void DFTU::cal_occup_m_k(const int iter,  std::vector<ModuleBase::ComplexMatrix> &dm_k)
 {
 	ModuleBase::TITLE("DFTU", "cal_occup_m_k");
 	ModuleBase::timer::tick("DFTU", "cal_occup_m_k");
@@ -333,7 +333,7 @@ void DFTU::cal_occup_m_k(const int iter)
 				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 				&alpha, 
 				&Sk[0], &one_int, &one_int, GlobalC::ParaO.desc, 
-				GlobalC::LOC.wfc_dm_2d.dm_k.at(ik).c, &one_int, &one_int, GlobalC::ParaO.desc,
+				dm_k.at(ik).c, &one_int, &one_int, GlobalC::ParaO.desc,
 				&beta, 
 				&srho[0], &one_int, &one_int, GlobalC::ParaO.desc);
 
@@ -489,7 +489,7 @@ void DFTU::cal_occup_m_k(const int iter)
 	return;
 }
 
-void DFTU::cal_occup_m_gamma(const int iter)
+void DFTU::cal_occup_m_gamma(const int iter,  std::vector<ModuleBase::matrix> &dm_gamma)
 {
 	ModuleBase::TITLE("DFTU", "cal_occup_m_gamma");	
 	ModuleBase::timer::tick("DFTU", "cal_occup_m_gamma");
@@ -531,7 +531,7 @@ void DFTU::cal_occup_m_gamma(const int iter)
 				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 				&alpha, 
 				GlobalC::LM.Sloc.data(), &one_int, &one_int, GlobalC::ParaO.desc, 
-				GlobalC::LOC.wfc_dm_2d.dm_gamma.at(is).c, &one_int, &one_int, GlobalC::ParaO.desc,
+				dm_gamma.at(is).c, &one_int, &one_int, GlobalC::ParaO.desc,
 				&beta,
 				&srho[0], &one_int, &one_int, GlobalC::ParaO.desc);
 

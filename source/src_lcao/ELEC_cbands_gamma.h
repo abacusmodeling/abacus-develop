@@ -27,7 +27,9 @@ class ELEC_cbands_gamma
 
 	private:
 
-	static void cal_bands(const int &istep, LCAO_Hamilt &uhm);
+    static void cal_bands(const int& istep, LCAO_Hamilt& uhm,
+        std::vector<ModuleBase::matrix>& wfc_gamma,
+        std::vector<ModuleBase::matrix>& dm_gamma);
 
 
 };

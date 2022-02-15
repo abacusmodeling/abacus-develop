@@ -27,7 +27,9 @@ class ELEC_cbands_k
 
 	private:
 
-	static void cal_bands(const int &istep, LCAO_Hamilt &uhm);
+    static void cal_bands(const int& istep, LCAO_Hamilt& uhm,
+        std::vector<ModuleBase::ComplexMatrix>& wfc_k,
+        std::vector<ModuleBase::ComplexMatrix>& dm_k);
 
 
 };

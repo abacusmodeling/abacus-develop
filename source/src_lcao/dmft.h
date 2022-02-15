@@ -22,7 +22,7 @@ namespace ModuleDMFT
 
     public:
     void init(Input& in, UnitCell_pseudo &cell);
-    void out_to_dmft();
+    void out_to_dmft( std::vector<ModuleBase::ComplexMatrix> wfc_k);
     void out_kvector();
     void out_correlated_atom_info();
     void out_eigen_vector(const std::vector<ModuleBase::ComplexMatrix>& wfc);

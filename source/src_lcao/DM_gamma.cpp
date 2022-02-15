@@ -270,17 +270,18 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
 #endif
 
 	// Peize Lin test 2019-01-16
-    wfc_dm_2d.init();
+    wfc_dm_2d->init();
 
 	if(GlobalC::wf.start_wfc=="file")
 	{
-		this->gamma_file(gt);
+		this->gamma_file(gt, wfc_dm_2d->wfc_gamma);
 	}
 
     return;
 }
 
-void Local_Orbital_Charge::gamma_file(const Grid_Technique &gt)
+void Local_Orbital_Charge::gamma_file(const Grid_Technique& gt,
+    std::vector<ModuleBase::matrix> &wfc_gamma)
 {
 	ModuleBase::TITLE("Local_Orbital_Charge","gamma_file");
 
@@ -292,8 +293,8 @@ void Local_Orbital_Charge::gamma_file(const Grid_Technique &gt)
 	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
 
-		GlobalC::LOC.wfc_dm_2d.wfc_gamma[is].create(GlobalC::ParaO.ncol, GlobalC::ParaO.nrow);
-		GlobalC::LOC.wfc_dm_2d.wfc_gamma[is].zero_out();
+		wfc_gamma[is].create(GlobalC::ParaO.ncol, GlobalC::ParaO.nrow);
+		wfc_gamma[is].zero_out();
 
 		GlobalV::ofs_running << " Read in wave functions " << is << std::endl;
 		error = WF_Local::read_lowf( ctot , is);
@@ -348,11 +349,11 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
         // }
         GlobalV::ofs_running<<"2D block parameters:\n"<<"nblk: "<<GlobalC::ParaO.nb<<std::endl;
         GlobalV::ofs_running<<"DM in 2D format:\n_________________________________________\n";
-        for(int i=0; i<wfc_dm_2d.dm_gamma[is].nr; ++i)
+        for(int i=0; i<wfc_dm_2d->dm_gamma[is].nr; ++i)
         {
-            for(int j=0; j<wfc_dm_2d.dm_gamma[is].nc; ++j)
+            for(int j=0; j<wfc_dm_2d->dm_gamma[is].nc; ++j)
             {
-                GlobalV::ofs_running<<wfc_dm_2d.dm_gamma[is](i,j)<<" ";
+                GlobalV::ofs_running<<wfc_dm_2d->dm_gamma[is](i,j)<<" ";
             }
             GlobalV::ofs_running<<std::endl;
         }
@@ -366,7 +367,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
             const int icol=idx%GlobalV::NLOCAL;
             const int irow=(idx-icol)/GlobalV::NLOCAL;
             // sender_buffer[i]=wfc_dm_2d.dm_gamma[is](irow,icol);
-            sender_buffer[i]=wfc_dm_2d.dm_gamma[is](icol,irow); // sender_buffer is clomun major, 
+            sender_buffer[i]=wfc_dm_2d->dm_gamma[is](icol,irow); // sender_buffer is clomun major, 
                                                                 // so the row and column index should be switched
             if(sender_buffer[i]!=0) ++nNONZERO;
         }

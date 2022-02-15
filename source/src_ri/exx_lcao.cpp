@@ -1124,7 +1124,7 @@ ofs_mpi.close();
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{		
 				std::ofstream ofs("wfc_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(is)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
-				GlobalC::LOC.wfc_dm_2d.wfc_gamma[is].print(ofs, 1E-10)<<std::endl;
+				GlobalC::LOC.wfc_dm_2d->wfc_gamma[is].print(ofs, 1E-10)<<std::endl;
 			}
 		}
 		else
@@ -1132,7 +1132,7 @@ ofs_mpi.close();
 			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 			{
 				std::ofstream ofs("wfc_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(ik)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
-				GlobalC::LOC.wfc_dm_2d.wfc_gamma[ik].print(ofs, 1E-10)<<std::endl;
+				GlobalC::LOC.wfc_dm_2d->wfc_gamma[ik].print(ofs, 1E-10)<<std::endl;
 			}
 		}
 	};

@@ -18,7 +18,8 @@ class LOOP_ions
 
 	LOOP_elec LOE;
 
-	void opt_ions(void);
+	void opt_ions(std::vector<ModuleBase::matrix> &wfc_gamma,
+        std::vector<ModuleBase::ComplexMatrix> &wfc_k); //output for dos
 	void output_HS_R(
         const std::string &SR_filename="data-SR-sparse_SPIN0.csr",
         const std::string &HR_filename_up="data-HR-sparse_SPIN0.csr",
@@ -32,7 +33,9 @@ class LOOP_ions
 
 	Ions_Move_Methods IMM;
 
-	Lattice_Change_Methods LCM;
+    Lattice_Change_Methods LCM;
+
+    Wfc_Dm_2d wfc_dm_2d;
 
 	
 	// PLEASE move 'force_stress()'  function to other places, such as FORCE_STRESS.cpp or

@@ -3,6 +3,8 @@
 
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
+#include "../module_base/matrix.h"
+#include "../module_base/complexmatrix.h"
 #include "../src_pw/threshold_elec.h"
 
 //-----------------------------------------------------------
@@ -26,7 +28,11 @@ class ELEC_scf: private Threshold_Elec
 
 	private:
 
-	void scf(const int &istep);
+    void scf(const int& istep,
+        std::vector<ModuleBase::matrix>& wfc_gamma,
+        std::vector<ModuleBase::matrix>& dm_gamma,
+        std::vector<ModuleBase::ComplexMatrix>& wfc_k,
+        std::vector<ModuleBase::ComplexMatrix>& dm_k);
 
 	static int iter;
 

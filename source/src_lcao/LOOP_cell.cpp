@@ -10,7 +10,8 @@
 LOOP_cell::LOOP_cell(){}
 LOOP_cell::~LOOP_cell(){}
 
-void LOOP_cell::opt_cell(void)
+void LOOP_cell::opt_cell(std::vector<ModuleBase::matrix> &wfc_gamma,
+    std::vector<ModuleBase::ComplexMatrix> &wfc_k)
 {
 	ModuleBase::TITLE("LOOP_cell","opt_cell");
 
@@ -67,7 +68,9 @@ void LOOP_cell::opt_cell(void)
   if(INPUT.dft_plus_dmft) GlobalC::dmft.init(INPUT, GlobalC::ucell);
 
 	LOOP_ions ions;
-	ions.opt_ions();
+    ions.opt_ions(wfc_gamma, wfc_k);
+
+    
 
 	// mohan update 2021-02-10
     GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);

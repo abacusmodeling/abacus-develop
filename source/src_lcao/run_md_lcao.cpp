@@ -232,16 +232,18 @@ void Run_MD_LCAO::md_force_virial(
         GlobalC::en.evdw = vdwd3.get_energy();
     }
 
+    Wfc_Dm_2d wfc_dm_2d_md;
+    wfc_dm_2d_md.init();
     // solve electronic structures in terms of LCAO
-	// mohan add 2021-02-09
+    // mohan add 2021-02-09
     LOOP_elec LOE;
-	LOE.solve_elec_stru(istep+1);
+	LOE.solve_elec_stru(istep+1, wfc_dm_2d_md);
 
     //to call the force of each atom
 	ModuleBase::matrix fcs;//temp force matrix
 	Force_Stress_LCAO FSL;
 	FSL.allocate (); 
-	FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS, GlobalV::TEST_FORCE, GlobalV::TEST_STRESS, fcs, virial);
+	FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS, GlobalV::TEST_FORCE, GlobalV::TEST_STRESS, wfc_dm_2d_md, fcs, virial);
 
 	for(int ion=0; ion<numIon; ++ion)
     {

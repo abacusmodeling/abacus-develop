@@ -7,8 +7,9 @@
 // need energy density matrix here.
 void Force_LCAO_gamma::cal_foverlap(
 	const bool isforce, 
-	const bool isstress, 
-	ModuleBase::matrix& foverlap, 
+    const bool isstress,
+    Wfc_Dm_2d &wfc_dm_2d,
+    ModuleBase::matrix& foverlap,
 	ModuleBase::matrix& soverlap)
 {
     ModuleBase::TITLE("Force_LCAO_gamma","cal_foverlap");
@@ -28,8 +29,8 @@ void Force_LCAO_gamma::cal_foverlap(
     }
 
     std::vector<ModuleBase::matrix> edm_gamma(GlobalV::NSPIN);
-    GlobalC::LOC.wfc_dm_2d.cal_dm(wgEkb,
-        GlobalC::LOC.wfc_dm_2d.wfc_gamma,
+    wfc_dm_2d.cal_dm(wgEkb,
+        wfc_dm_2d.wfc_gamma,
         edm_gamma);
 
     ModuleBase::timer::tick("Force_LCAO_gamma","cal_edm_2d");

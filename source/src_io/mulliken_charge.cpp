@@ -40,7 +40,7 @@ Mulliken_Charge::Mulliken_Charge()
 		for(int in=0;in<GlobalV::NSPIN;in++)
 		{
 
-			M.wfc_gamma[in]=GlobalC::LOC.wfc_dm_2d.wfc_gamma[in];
+			M.wfc_gamma[in]=GlobalC::LOC.wfc_dm_2d->wfc_gamma[in];
 		}
 
 	}
@@ -50,7 +50,7 @@ Mulliken_Charge::Mulliken_Charge()
 		for(int in=0;in<GlobalC::kv.nks;in++)
 		{
 
-			M.wfc_k[in] = GlobalC::LOC.wfc_dm_2d.wfc_k[in];
+			M.wfc_k[in] = GlobalC::LOC.wfc_dm_2d->wfc_k[in];
 		}
 	}
 

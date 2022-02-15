@@ -23,7 +23,11 @@ ELEC_scf::~ELEC_scf(){}
 
 int ELEC_scf::iter=0;
 
-void ELEC_scf::scf(const int &istep)
+void ELEC_scf::scf(const int& istep,
+    std::vector<ModuleBase::matrix>& wfc_gamma,
+    std::vector<ModuleBase::matrix>& dm_gamma,
+    std::vector<ModuleBase::ComplexMatrix>& wfc_k,
+    std::vector<ModuleBase::ComplexMatrix>& dm_k)
 {
 	ModuleBase::TITLE("ELEC_scf","scf");
 	ModuleBase::timer::tick("ELEC_scf","scf");
@@ -195,17 +199,17 @@ void ELEC_scf::scf(const int &istep)
 		// mohan add 2021-02-09
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			ELEC_cbands_gamma::cal_bands(istep, GlobalC::UHM);
+			ELEC_cbands_gamma::cal_bands(istep, GlobalC::UHM, wfc_gamma, dm_gamma);
 		}
 		else
 		{
 			if(ELEC_evolve::tddft && istep >= 1 && iter > 1)
 			{
-				ELEC_evolve::evolve_psi(istep, GlobalC::UHM);
+				ELEC_evolve::evolve_psi(istep, GlobalC::UHM, wfc_k);
 			}
 			else
 			{
-				ELEC_cbands_k::cal_bands(istep, GlobalC::UHM);
+				ELEC_cbands_k::cal_bands(istep, GlobalC::UHM, wfc_k, dm_k);
 			}
 		}
 
@@ -288,8 +292,8 @@ void ELEC_scf::scf(const int &istep)
 		// the local occupation number matrix and energy correction
 		if(INPUT.dft_plus_u)
 		{
-			if(GlobalV::GAMMA_ONLY_LOCAL) GlobalC::dftu.cal_occup_m_gamma(iter);
-			else GlobalC::dftu.cal_occup_m_k(iter);
+			if(GlobalV::GAMMA_ONLY_LOCAL) GlobalC::dftu.cal_occup_m_gamma(iter, dm_gamma);
+			else GlobalC::dftu.cal_occup_m_k(iter, dm_k);
 
 		 	GlobalC::dftu.cal_energy_correction(istep);
 			GlobalC::dftu.output();
