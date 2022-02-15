@@ -32,26 +32,16 @@
 
 
 
-Mulliken_Charge::Mulliken_Charge()
+Mulliken_Charge::Mulliken_Charge(std::vector<ModuleBase::matrix> *wfc_gamma_in,
+    std::vector<ModuleBase::ComplexMatrix> *wfc_k_in)
 {
-	M.init();
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		for(int in=0;in<GlobalV::NSPIN;in++)
-		{
-
-			M.wfc_gamma[in]=GlobalC::LOC.wfc_dm_2d->wfc_gamma[in];
-		}
-
+        this->wfc_gamma = wfc_gamma_in;
 	}
 	else 
 	{
-
-		for(int in=0;in<GlobalC::kv.nks;in++)
-		{
-
-			M.wfc_k[in] = GlobalC::LOC.wfc_dm_2d->wfc_k[in];
-		}
+        this->wfc_k = wfc_k_in;
 	}
 
 	mug = new  std::complex<double>   [GlobalV::NLOCAL];
@@ -125,7 +115,7 @@ void Mulliken_Charge::cal_mulliken(void)
 			mud.resize(1);
 			mud[0].create(GlobalC::ParaO.ncol,GlobalC::ParaO.nrow);
 
-			ModuleBase::matrix Dwf = M.wfc_gamma[is];
+			ModuleBase::matrix Dwf = this->wfc_gamma->at(is);
 			for (int i=0; i<GlobalV::NBANDS; ++i)		  
 			{     
 				ModuleBase::GlobalFunc::ZEROS(mug, GlobalV::NLOCAL);
@@ -155,7 +145,7 @@ void Mulliken_Charge::cal_mulliken(void)
 						const int ir = GlobalC::ParaO.trace_loc_row[j];
 						const int ic = GlobalC::ParaO.trace_loc_col[i];
 
-						mug[j] = mud[0](ic,ir)*M.wfc_gamma[is](ic,ir);
+						mug[j] = mud[0](ic,ir)*this->wfc_gamma->at(is)(ic,ir);
 
 						const double x = mug[j].real();
 
@@ -232,7 +222,7 @@ void Mulliken_Charge::cal_mulliken(void)
 					GlobalC::LM.allocate_HS_k(GlobalC::ParaO.nloc);
 					GlobalC::LM.zeros_HSk('S');
 					GlobalC::LNNR.folding_fixedH(ik);
-					ModuleBase::ComplexMatrix Dwf = conj(M.wfc_k[ik]);
+					ModuleBase::ComplexMatrix Dwf = conj(this->wfc_k->at(ik));
 
 					for (int i=0; i<GlobalV::NBANDS; ++i)		  
 					{     
@@ -265,7 +255,7 @@ void Mulliken_Charge::cal_mulliken(void)
 								const int ir = GlobalC::ParaO.trace_loc_row[j];
 								const int ic = GlobalC::ParaO.trace_loc_col[i];
 
-								mug[j] = mud[0](ic,ir)*M.wfc_k[ik](ic,ir);
+								mug[j] = mud[0](ic,ir)*this->wfc_k->at(ik)(ic,ir);
 								const double x = mug[j].real();
 								MecMulP[is][j] +=x*GlobalC::wf.wg(ik,i);
 								// std::cout <<   wavog[j] << std::endl; 

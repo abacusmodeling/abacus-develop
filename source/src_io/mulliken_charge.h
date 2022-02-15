@@ -23,13 +23,15 @@ class Mulliken_Charge
 {
 	public:
 
-	Mulliken_Charge();
+	Mulliken_Charge(std::vector<ModuleBase::matrix> *wfc_gamma_in, 
+        std::vector<ModuleBase::ComplexMatrix> *wfc_k_in);
 	~Mulliken_Charge();
 
 	double**  DecMulP ;
 	double**  MecMulP ;
 	double***  ADecMulP ;
-	Wfc_Dm_2d M;
+    std::vector<ModuleBase::matrix> *wfc_gamma;
+    std::vector<ModuleBase::ComplexMatrix> *wfc_k;
 
 	std::complex<double> *mug;
 

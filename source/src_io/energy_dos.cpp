@@ -179,7 +179,7 @@ void energy::perform_dos( std::vector<ModuleBase::matrix> &wfc_gamma,
 #ifdef __LCAO
 	if(GlobalV::mulliken == 1)
 	{
-		Mulliken_Charge   MC;
+		Mulliken_Charge   MC(&wfc_gamma, &wfc_k);
 		MC.stdout_mulliken();			
 	}//qifeng add 2019/9/10
 #endif
