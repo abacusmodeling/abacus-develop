@@ -243,7 +243,7 @@ void LOOP_elec::solver(const int& istep,
 	}
 	else if (GlobalV::CALCULATION=="istate")
 	{
-		IState_Charge ISC;
+		IState_Charge ISC(&wfc_dm_2d.wfc_gamma, &wfc_dm_2d.dm_gamma);
 		ISC.begin();
 	}
 	else if (GlobalV::CALCULATION=="ienvelope")
