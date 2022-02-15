@@ -124,6 +124,7 @@ void unkOverlap_lcao::init()
 		get_lcao_wfc_global_ik(lcao_wfc_global[ik],GlobalC::LOWF.WFC_K[ik]);
 	}
 	
+#ifdef __MPI
 	// 并行方案
 	int nproc,myrank;
 	MPI_Comm_size(MPI_COMM_WORLD,&nproc);
@@ -150,6 +151,10 @@ void unkOverlap_lcao::init()
 			}
 		}
 	}
+#else 
+	int start=0;
+	int local_term=GlobalV::NLOCAL * GlobalV::NLOCAL;
+#endif
 	int count = -1;
 	for(int iw1 = 0; iw1 < GlobalV::NLOCAL; iw1++)
 	{
@@ -558,7 +563,9 @@ void unkOverlap_lcao::get_lcao_wfc_global_ik(std::complex<double> **ctot, std::c
 {
 	std::complex<double>* ctot_send = new std::complex<double>[GlobalV::NBANDS*GlobalV::NLOCAL];
 
+#ifdef __MPI
 	MPI_Status status;
+#endif
 
 	for (int i=0; i<GlobalV::DSIZE; i++)
 	{
@@ -583,6 +590,7 @@ void unkOverlap_lcao::get_lcao_wfc_global_ik(std::complex<double> **ctot, std::c
 			}
 			else
 			{
+			#ifdef __MPI
 				int tag;
 				// receive lgd2
 				int lgd2 = 0;
@@ -598,7 +606,6 @@ void unkOverlap_lcao::get_lcao_wfc_global_ik(std::complex<double> **ctot, std::c
 					tag = i * 3 + 1;
 					int* trace_lo2 = new int[GlobalV::NLOCAL];
 					MPI_Recv(trace_lo2, GlobalV::NLOCAL, MPI_INT, i, tag, DIAG_WORLD, &status);
-
 					// receive crecv
 					std::complex<double>* crecv = new std::complex<double>[GlobalV::NBANDS*lgd2];
 					ModuleBase::GlobalFunc::ZEROS(crecv, GlobalV::NBANDS*lgd2);
@@ -621,10 +628,12 @@ void unkOverlap_lcao::get_lcao_wfc_global_ik(std::complex<double> **ctot, std::c
 					delete[] crecv;
 					delete[] trace_lo2;
 				}
+			#endif
 			}
 		}// end GlobalV::DRANK=0
 		else if ( i == GlobalV::DRANK)
 		{
+		#ifdef __MPI
 			int tag;
 
 			// send GlobalC::GridT.lgd
@@ -657,11 +666,16 @@ void unkOverlap_lcao::get_lcao_wfc_global_ik(std::complex<double> **ctot, std::c
 				delete[] csend;
 
 			}
+		#endif
 		}// end i==GlobalV::DRANK
+		#ifdef __MPI
 		MPI_Barrier(DIAG_WORLD);
+		#endif
 	}
 
+	#ifdef __MPI
 	MPI_Bcast(ctot_send,GlobalV::NBANDS*GlobalV::NLOCAL,mpicomplex,0,DIAG_WORLD);
+	#endif
 
 	for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 	{
@@ -724,6 +738,7 @@ std::complex<double> unkOverlap_lcao::det_berryphase(const int ik_L, const int i
 	int nlocal = GlobalV::NLOCAL;
 	double alpha=1.0, beta=0.0;
 	int one = 1;
+#ifdef __MPI
 	pzgemm_(&transa,&transb,&occBands,&nlocal,&nlocal,&alpha,
 			GlobalC::LOC.wfc_dm_2d.wfc_k[ik_L].c,&one,&one,GlobalC::ParaO.desc,
 							  midmatrix,&one,&one,GlobalC::ParaO.desc,
@@ -734,14 +749,13 @@ std::complex<double> unkOverlap_lcao::det_berryphase(const int ik_L, const int i
 								 C_matrix,&one,&one,GlobalC::ParaO.desc,
 			  GlobalC::LOC.wfc_dm_2d.wfc_k[ik_R].c,&one,&one,GlobalC::ParaO.desc,
 														 &beta,
-							   out_matrix,&one,&one,GlobalC::ParaO.desc);
-	
+							   out_matrix,&one,&one,GlobalC::ParaO.desc);	
 
 	//int *ipiv = new int[ GlobalC::ParaO.nrow+GlobalC::ParaO.desc[4] ];
 	int *ipiv = new int[ GlobalC::ParaO.nrow ];
 	int info;
 	pzgetrf_(&occBands,&occBands,out_matrix,&one,&one,GlobalC::ParaO.desc,ipiv,&info);
-	
+
 	for(int i = 0; i < occBands; i++) // global
 	{	
 		int ir = GlobalC::ParaO.trace_loc_row[ i ]; // local
@@ -760,11 +774,12 @@ std::complex<double> unkOverlap_lcao::det_berryphase(const int ik_L, const int i
 		}
 		
 	}
-	
+	delete[] ipiv;
+#endif
 	delete[] midmatrix;
 	delete[] C_matrix;
 	delete[] out_matrix;
-	delete[] ipiv;
+	
 	
 #ifdef __MPI
     // note: the mpi uses MPI_COMMON_WORLD,so you must make the GlobalV::NPOOL = 1.
