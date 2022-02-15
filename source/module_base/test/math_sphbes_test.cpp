@@ -57,8 +57,8 @@ class Sphbes : public testing::Test
 
     void TearDown()
     {
-        delete r;
-        delete jl;
+        delete [] r;
+        delete [] jl;
     }       
 };
 
