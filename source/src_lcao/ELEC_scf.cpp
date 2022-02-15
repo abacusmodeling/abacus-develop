@@ -297,8 +297,21 @@ void ELEC_scf::scf(const int& istep,
 
 		 	GlobalC::dftu.cal_energy_correction(istep);
 			GlobalC::dftu.output();
+        }
+        
+#ifdef __DEEPKS
+        if(GlobalV::deepks_scf) 
+		{
+			if(GlobalV::GAMMA_ONLY_LOCAL)
+			{
+				GlobalC::ld.cal_e_delta_band(dm_gamma,GlobalC::ParaO);
+			}
+			else
+			{
+				GlobalC::ld.cal_e_delta_band_k(dm_k,GlobalC::ParaO,GlobalC::kv.nks);
+			}
 		}
-
+#endif
 		// (4) mohan add 2010-06-24
 		// using new charge density.
 		GlobalC::en.calculate_harris(2);
