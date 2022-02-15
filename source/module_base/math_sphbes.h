@@ -52,7 +52,15 @@ class Sphbes
 		double *sjp
 	);
 
-	
+	/**
+	 * @brief return num eigenvalues of spherical bessel function
+	 * 
+	 * @param num [in] the number of eigenvalues
+	 * @param l [in] angular number
+	 * @param epsilon [in] the accuracy 
+	 * @param eigenvalue [out] the calculated eigenvalues
+	 * @param rcut [in] the cutoff the radial function
+	 */
     static void Spherical_Bessel_Roots
     (
         const int &num,

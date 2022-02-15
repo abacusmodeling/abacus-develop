@@ -20,7 +20,9 @@
  * and the reference results are produced by ABACUS 
  * at 2022-1-27.
  * 
- * Tested function: Spherical_Bessel.
+ * Tested function: 
+ *      - Spherical_Bessel.
+ *      - Spherical_Bessel_Roots
  * 
  */
 
@@ -123,6 +125,46 @@ TEST_F(Sphbes,SphericalBessel)
     //reference result is calculated by Sphbes::Spherical_Bessel(msh,r,q,l,jl)
     EXPECT_NEAR(mean(jl,msh)/0.015215556095798710851,   1.0,doublethreshold);
 }
+
+TEST_F(Sphbes,SphericalBesselRoots)
+{
+    int neign = 100;
+    double **eign = new double*[8];
+    for(int i=0;i<8;++i)
+    {
+        eign[i] = new double[neign];
+        ModuleBase::Sphbes::Spherical_Bessel_Roots(neign,i,1.0e-12,eign[i],10.0);
+    }
+
+    EXPECT_NEAR(eign[0][0]/0.31415926535899563188,       1.0,doublethreshold);
+    EXPECT_NEAR(eign[0][99]/31.415926535896932847,       1.0,doublethreshold);
+    EXPECT_NEAR(mean(eign[0],100)/15.865042900628463229, 1.0,doublethreshold);
+    EXPECT_NEAR(eign[1][0]/0.44934094579091843347,       1.0,doublethreshold);
+    EXPECT_NEAR(eign[1][99]/31.572689440204385392,       1.0,doublethreshold);
+    EXPECT_NEAR(mean(eign[1],100)/16.020655759558295017, 1.0,doublethreshold);
+    EXPECT_NEAR(eign[2][0]/0.57634591968946913276,       1.0,doublethreshold);
+    EXPECT_NEAR(eign[2][99]/31.729140298172534784,       1.0,doublethreshold);
+    EXPECT_NEAR(mean(eign[2],100)/16.175128483074864505, 1.0,doublethreshold);
+    EXPECT_NEAR(eign[3][0]/0.69879320005004752492,       1.0,doublethreshold);
+    EXPECT_NEAR(eign[3][99]/31.885283678838447941,       1.0,doublethreshold);
+    EXPECT_NEAR(mean(eign[3],100)/16.328616567969248763, 1.0,doublethreshold);
+    EXPECT_NEAR(eign[4][0]/0.81825614525711076741,       1.0,doublethreshold);
+    EXPECT_NEAR(eign[4][99]/32.041124042016576823,       1.0,doublethreshold);
+    EXPECT_NEAR(mean(eign[4],100)/16.481221742387987206, 1.0,doublethreshold);
+    EXPECT_NEAR(eign[5][0]/0.93558121110426506473,       1.0,doublethreshold);
+    EXPECT_NEAR(eign[5][99]/32.196665741899131774,       1.0,doublethreshold);
+    EXPECT_NEAR(mean(eign[5],100)/16.633019118735202113, 1.0,doublethreshold);
+    EXPECT_NEAR(eign[6][0]/1.051283540809391015,         1.0,doublethreshold);
+    EXPECT_NEAR(eign[6][99]/32.351913030537232885,       1.0,doublethreshold);
+    EXPECT_NEAR(mean(eign[6],100)/16.784067905062840964, 1.0,doublethreshold);
+    EXPECT_NEAR(eign[7][0]/1.1657032192516516567,        1.0,doublethreshold);
+    EXPECT_NEAR(eign[7][99]/32.506870061157627561,       1.0,doublethreshold);
+    EXPECT_NEAR(mean(eign[7],100)/16.934416735327332049, 1.0,doublethreshold);
+    
+    for(int i=0;i<8;++i) delete [] eign[i];
+    delete [] eign;
+}
+
 
 int main(int argc, char **argv)
 {

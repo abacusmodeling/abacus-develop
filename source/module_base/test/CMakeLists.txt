@@ -48,6 +48,10 @@ AddTest(
   SOURCES sph_bessel_recursive_test.cpp ../sph_bessel_recursive-d1.cpp ../sph_bessel_recursive-d2.cpp
 )
 AddTest(
+  TARGET base_math_sphbes
+  SOURCES math_sphbes_test.cpp ../math_sphbes.cpp ../timer.cpp
+)
+AddTest(
   TARGET base_realarray
   SOURCES realarray_test.cpp ../realarray.cpp
 )
