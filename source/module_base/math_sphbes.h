@@ -18,10 +18,10 @@ class Sphbes
      * @brief spherical bessel
      * 
      * @param msh [in] number of grid points
-     * @param r [in] radial grid (1:msh)
+     * @param r [in] radial grid
      * @param q [in] k_radial
      * @param l [in] angular momentum
-     * @param jl [out] jl(1:msh) spherical bessel function
+     * @param jl [out] jl spherical bessel function
      */
     static void Spherical_Bessel
     (
@@ -36,10 +36,10 @@ class Sphbes
      * @brief spherical bessel
      * 
      * @param msh [in] number of grid points
-     * @param r [in] radial grid (1:msh)
+     * @param r [in] radial grid
      * @param q [in] k_radial
      * @param l [in] angular momentum
-     * @param jl [out] jl(1:msh) spherical bessel function
+     * @param jl [out] jl spherical bessel function
      * @param sjp [out] sjp[i] is assigned to be 1.0. i < msh.
      */
 	static void Spherical_Bessel

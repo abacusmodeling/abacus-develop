@@ -7,7 +7,7 @@
 
 #include"gtest/gtest.h"
 
-#define doublethreshold 1e-12
+#define doublethreshold 1e-7
 
 
 /************************************************
