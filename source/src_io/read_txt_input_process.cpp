@@ -123,6 +123,7 @@ namespace Read_Txt_Input
 		}
 	}
 
+#ifdef __MPI
 	void Input_Process::bcast()
 	{
 #ifdef USE_CEREAL_SERIALIZATION
@@ -131,6 +132,7 @@ namespace Read_Txt_Input
 #error Input_Process::bcast() needs cereal
 #endif
 	}
+#endif
 
 	void Input_Process::convert()
 	{

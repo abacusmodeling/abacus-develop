@@ -105,6 +105,7 @@ void Local_Orbital_Charge::read_dm(const int &is, const std::string &fn)
     }
     else
     {
+    #ifdef __MPI
         ModuleBase::WARNING_QUIT("Local_Orbital_Charge::read_dm","The nnrg should not be update");
         ModuleBase::CHECK_INT(ifs,GlobalC::LNNR.nnrg);
 
@@ -112,6 +113,7 @@ void Local_Orbital_Charge::read_dm(const int &is, const std::string &fn)
         {
             ifs >> DM_R[is][i];
         }
+    #endif
     }
 #else
 
