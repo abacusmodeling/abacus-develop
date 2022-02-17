@@ -33,12 +33,21 @@ protected:
 	const int MaxInt = 100;
 	int nr_in        = 17;
 	int nr_out       = 161;
-	double *r_in     = new double[nr_in];
-	double *r_out    = new double[nr_out];
-	double *y2       = new double[nr_in];
-	double *psi_in   = new double[nr_in];
-	double *psi_out  = new double[nr_out];
-	double *dpsi     = new double[nr_out];
+	double *r_in;
+	double *r_out;
+	double *y2;
+	double *psi_in;
+	double *psi_out;
+	double *dpsi;
+	void SetUp()
+	{
+		r_in     = new double[nr_in];
+		r_out    = new double[nr_out];
+		y2       = new double[nr_in];
+		psi_in   = new double[nr_in];
+		psi_out  = new double[nr_out];
+		dpsi     = new double[nr_out];
+	}
 	void TearDown()
 	{
 		delete[] r_in;
