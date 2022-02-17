@@ -37,8 +37,8 @@ public:
     static void folding_overlap_matrix(const int ik, std::complex<double>* Sk);
     
     //calculate the local occupation number matrix
-    void cal_occup_m_k(const int iter);
-    void cal_occup_m_gamma(const int iter);
+    void cal_occup_m_k(const int iter,  std::vector<ModuleBase::ComplexMatrix> &dm_k);
+    void cal_occup_m_gamma(const int iter,  std::vector<ModuleBase::matrix> &dm_gamma);
 
     void write_occup_m(const std::string &fn);
     void read_occup_m(const std::string &fn);

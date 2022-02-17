@@ -92,7 +92,7 @@ namespace ModuleDMFT
     return;
   }
 
-  void DFT_DMFT_interface::out_to_dmft()
+  void DFT_DMFT_interface::out_to_dmft( std::vector<ModuleBase::ComplexMatrix> wfc_k)
   {
     ModuleBase::TITLE("DFT_DMFT_interface", "out_to_dmft");
     
@@ -102,7 +102,7 @@ namespace ModuleDMFT
 
     this->out_correlated_atom_info();
 
-    this->out_eigen_vector(GlobalC::LOC.wfc_dm_2d.wfc_k);
+    this->out_eigen_vector(wfc_k);
     
     this->out_bands(GlobalC::wf.ekb, GlobalC::en.ef, GlobalC::CHR.nelec);
 

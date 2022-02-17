@@ -26,7 +26,8 @@
 #include "../module_deepks/LCAO_deepks.h"
 #endif
 
-void LOOP_elec::solve_elec_stru(const int &istep)
+void LOOP_elec::solve_elec_stru(const int& istep,
+    Wfc_Dm_2d &wfc_dm_2d)
 {
     ModuleBase::TITLE("LOOP_elec","solve_elec_stru"); 
     ModuleBase::timer::tick("LOOP_elec","solve_elec_stru"); 
@@ -34,9 +35,9 @@ void LOOP_elec::solve_elec_stru(const int &istep)
 	// prepare HS matrices, prepare grid integral
 	this->set_matrix_grid();
 	// density matrix extrapolation and prepare S,T,VNL matrices 
-	this->before_solver(istep);
+	this->before_solver(istep, wfc_dm_2d);
 	// do self-interaction calculations / nscf/ tddft, etc. 
-	this->solver(istep);
+	this->solver(istep, wfc_dm_2d);
 
     ModuleBase::timer::tick("LOOP_elec","solve_elec_stru"); 
 	return;
@@ -94,7 +95,7 @@ void LOOP_elec::set_matrix_grid(void)
 }
 
 
-void LOOP_elec::before_solver(const int &istep)
+void LOOP_elec::before_solver(const int &istep, Wfc_Dm_2d &wfc_dm_2d)
 {
     ModuleBase::TITLE("LOOP_elec","before_solver"); 
     ModuleBase::timer::tick("LOOP_elec","before_solver"); 
@@ -105,7 +106,7 @@ void LOOP_elec::before_solver(const int &istep)
 	// the force.
 
 	// init density kernel and wave functions.
-	GlobalC::LOC.allocate_dm_wfc(GlobalC::GridT);
+	GlobalC::LOC.allocate_dm_wfc(GlobalC::GridT, wfc_dm_2d);
 
 	//======================================
 	// do the charge extrapolation before the density matrix is regenerated.
@@ -169,7 +170,8 @@ void LOOP_elec::before_solver(const int &istep)
 	return;
 }
 
-void LOOP_elec::solver(const int &istep)
+void LOOP_elec::solver(const int& istep,
+    Wfc_Dm_2d &wfc_dm_2d)
 {
     ModuleBase::TITLE("LOOP_elec","solver"); 
     ModuleBase::timer::tick("LOOP_elec","solver"); 
@@ -197,8 +199,9 @@ void LOOP_elec::solver(const int &istep)
 		if( Exx_Global::Hybrid_Type::No==GlobalC::exx_global.info.hybrid_type  )
 		{
 			ELEC_scf es;
-			es.scf(istep-1);
-		}
+            es.scf(istep - 1, wfc_dm_2d.wfc_gamma, wfc_dm_2d.dm_gamma,
+                wfc_dm_2d.wfc_k, wfc_dm_2d.dm_k);
+        }
 		else if( Exx_Global::Hybrid_Type::Generate_Matrix == GlobalC::exx_global.info.hybrid_type )
 		{
 			Exx_Opt_Orb exx_opt_orb;
@@ -207,16 +210,16 @@ void LOOP_elec::solver(const int &istep)
 		else    // Peize Lin add 2016-12-03
 		{
 			ELEC_scf es;
-			es.scf(istep-1);
+			es.scf(istep-1, wfc_dm_2d.wfc_gamma, wfc_dm_2d.dm_gamma, wfc_dm_2d.wfc_k, wfc_dm_2d.dm_k);
 			if( GlobalC::exx_global.info.separate_loop )
 			{
 				for( size_t hybrid_step=0; hybrid_step!=GlobalC::exx_global.info.hybrid_step; ++hybrid_step )
 				{
 					GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
-					GlobalC::exx_lcao.cal_exx_elec();
+					GlobalC::exx_lcao.cal_exx_elec(wfc_dm_2d.dm_gamma, wfc_dm_2d.dm_k);
 					
 					ELEC_scf es;
-					es.scf(istep-1);
+					es.scf(istep-1, wfc_dm_2d.wfc_gamma, wfc_dm_2d.dm_gamma, wfc_dm_2d.wfc_k, wfc_dm_2d.dm_k);
 					if(ELEC_scf::iter==1)     // exx converge
 					{
 						break;
@@ -228,18 +231,19 @@ void LOOP_elec::solver(const int &istep)
 				GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
 
 				ELEC_scf es;
-				es.scf(istep-1);
+				es.scf(istep-1, wfc_dm_2d.wfc_gamma, wfc_dm_2d.dm_gamma,
+                wfc_dm_2d.wfc_k, wfc_dm_2d.dm_k);
 				
 			}
 		}
 	}
 	else if (GlobalV::CALCULATION=="nscf")
 	{
-		ELEC_nscf::nscf(GlobalC::UHM);
+		ELEC_nscf::nscf(GlobalC::UHM, wfc_dm_2d.wfc_gamma, wfc_dm_2d.dm_gamma, wfc_dm_2d.wfc_k, wfc_dm_2d.dm_k);
 	}
 	else if (GlobalV::CALCULATION=="istate")
 	{
-		IState_Charge ISC;
+		IState_Charge ISC(&wfc_dm_2d.wfc_gamma, &wfc_dm_2d.dm_gamma);
 		ISC.begin();
 	}
 	else if (GlobalV::CALCULATION=="ienvelope")

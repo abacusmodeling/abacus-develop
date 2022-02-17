@@ -42,8 +42,9 @@ class Force_Stress_LCAO
 		const bool isforce, 
 		const bool isstress, 
 		const bool istestf, 
-		const bool istests, 
-		ModuleBase::matrix &fcs, 
+        const bool istests,
+        Wfc_Dm_2d &wfc_dm_2d,
+        ModuleBase::matrix& fcs,
 		ModuleBase::matrix &scs);
 
 	void forceSymmetry(ModuleBase::matrix &fcs);
@@ -57,8 +58,9 @@ class Force_Stress_LCAO
 	void calForceStressIntegralPart(
 		const bool isGammaOnly,
 		const bool isforce,
-		const bool isstress,
-		ModuleBase::matrix &foverlap,
+        const bool isstress,
+        Wfc_Dm_2d &wfc_dm_2d,
+        ModuleBase::matrix& foverlap,
 		ModuleBase::matrix &ftvnl_dphi,
 		ModuleBase::matrix &fvnl_dbeta,	
 		ModuleBase::matrix &fvl_dphi,

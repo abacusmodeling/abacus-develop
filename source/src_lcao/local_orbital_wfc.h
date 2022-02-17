@@ -21,8 +21,9 @@ class Local_Orbital_wfc
 	std::complex<double>* WFC_K_POOL; // [NK*GlobalV::NBANDS*GlobalV::NLOCAL]
 
 
-    void allocate_k(const Grid_Technique& gt);
-    
+    void allocate_k(const Grid_Technique& gt,
+        std::vector<ModuleBase::ComplexMatrix> &wfc_k);
+
     //=========================================
     // Init Cij, make it satisfy 2 conditions:
     // (1) Unit

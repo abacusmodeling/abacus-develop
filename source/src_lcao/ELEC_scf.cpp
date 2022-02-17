@@ -23,7 +23,11 @@ ELEC_scf::~ELEC_scf(){}
 
 int ELEC_scf::iter=0;
 
-void ELEC_scf::scf(const int &istep)
+void ELEC_scf::scf(const int& istep,
+    std::vector<ModuleBase::matrix>& wfc_gamma,
+    std::vector<ModuleBase::matrix>& dm_gamma,
+    std::vector<ModuleBase::ComplexMatrix>& wfc_k,
+    std::vector<ModuleBase::ComplexMatrix>& dm_k)
 {
 	ModuleBase::TITLE("ELEC_scf","scf");
 	ModuleBase::timer::tick("ELEC_scf","scf");
@@ -181,7 +185,7 @@ void ELEC_scf::scf(const int &istep)
 			case 5:    case 6:   case 9:
 				if( !GlobalC::exx_global.info.separate_loop )
 				{
-					GlobalC::exx_lcao.cal_exx_elec();
+					GlobalC::exx_lcao.cal_exx_elec(dm_gamma, dm_k);
 				}
 				break;
 		}
@@ -195,17 +199,17 @@ void ELEC_scf::scf(const int &istep)
 		// mohan add 2021-02-09
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			ELEC_cbands_gamma::cal_bands(istep, GlobalC::UHM);
+			ELEC_cbands_gamma::cal_bands(istep, GlobalC::UHM, wfc_gamma, dm_gamma);
 		}
 		else
 		{
 			if(ELEC_evolve::tddft && istep >= 1 && iter > 1)
 			{
-				ELEC_evolve::evolve_psi(istep, GlobalC::UHM);
+				ELEC_evolve::evolve_psi(istep, GlobalC::UHM, wfc_k);
 			}
 			else
 			{
-				ELEC_cbands_k::cal_bands(istep, GlobalC::UHM);
+				ELEC_cbands_k::cal_bands(istep, GlobalC::UHM, wfc_k, dm_k);
 			}
 		}
 
@@ -278,7 +282,7 @@ void ELEC_scf::scf(const int &istep)
 			if(GlobalC::restart.info_load.load_H && GlobalC::restart.info_load.load_H_finish && !GlobalC::restart.info_load.restart_exx)
 			{
 				GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
-				GlobalC::exx_lcao.cal_exx_elec();
+				GlobalC::exx_lcao.cal_exx_elec(dm_gamma, dm_k);
 				GlobalC::restart.info_load.restart_exx = true;
 			}
 		}
@@ -288,13 +292,26 @@ void ELEC_scf::scf(const int &istep)
 		// the local occupation number matrix and energy correction
 		if(INPUT.dft_plus_u)
 		{
-			if(GlobalV::GAMMA_ONLY_LOCAL) GlobalC::dftu.cal_occup_m_gamma(iter);
-			else GlobalC::dftu.cal_occup_m_k(iter);
+			if(GlobalV::GAMMA_ONLY_LOCAL) GlobalC::dftu.cal_occup_m_gamma(iter, dm_gamma);
+			else GlobalC::dftu.cal_occup_m_k(iter, dm_k);
 
 		 	GlobalC::dftu.cal_energy_correction(istep);
 			GlobalC::dftu.output();
+        }
+        
+#ifdef __DEEPKS
+        if(GlobalV::deepks_scf) 
+		{
+			if(GlobalV::GAMMA_ONLY_LOCAL)
+			{
+				GlobalC::ld.cal_e_delta_band(dm_gamma,GlobalC::ParaO);
+			}
+			else
+			{
+				GlobalC::ld.cal_e_delta_band_k(dm_k,GlobalC::ParaO,GlobalC::kv.nks);
+			}
 		}
-
+#endif
 		// (4) mohan add 2010-06-24
 		// using new charge density.
 		GlobalC::en.calculate_harris(2);

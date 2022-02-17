@@ -5,6 +5,7 @@
 #include "../module_base/global_variable.h"
 #include "../module_base/matrix.h"
 #include "LCAO_matrix.h" 
+#include "wfc_dm_2d.h"
 
 class Force_LCAO_gamma
 {
@@ -20,8 +21,9 @@ class Force_LCAO_gamma
 	//orthonormal force + contribution from T and VNL
 	void ftable_gamma (
 		const bool isforce,
-		const bool isstress,
-		ModuleBase::matrix& foverlap,
+        const bool isstress,
+        Wfc_Dm_2d &wfc_dm_2d,
+        ModuleBase::matrix& foverlap,
 		ModuleBase::matrix& ftvnl_dphi,
 		ModuleBase::matrix& fvnl_dbeta,	
 		ModuleBase::matrix& fvl_dphi,
@@ -53,8 +55,9 @@ class Force_LCAO_gamma
 
 	void cal_foverlap(
 		const bool isforce, 
-		const bool isstress, 
-		ModuleBase::matrix& foverlap, 
+        const bool isstress,
+        Wfc_Dm_2d &wfc_dm_2d,
+        ModuleBase::matrix& foverlap,
 		ModuleBase::matrix& soverlap);	
 
 	//-------------------------------------------------------------

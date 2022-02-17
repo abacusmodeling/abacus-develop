@@ -15,7 +15,9 @@ ELEC_cbands_k::ELEC_cbands_k(){};
 ELEC_cbands_k::~ELEC_cbands_k(){};
 
 
-void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
+void ELEC_cbands_k::cal_bands(const int& istep, LCAO_Hamilt& uhm,
+    std::vector<ModuleBase::ComplexMatrix>& wfc_k,
+    std::vector<ModuleBase::ComplexMatrix>& dm_k)
 {
 	ModuleBase::TITLE("ELEC_cbands_k","cal_bands");
 	ModuleBase::timer::tick("ELEC_cbands_k","cal_bands");
@@ -27,7 +29,7 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 #ifdef __DEEPKS
 	if (GlobalV::deepks_scf)
     {
-		GlobalC::ld.cal_projected_DM_k(GlobalC::LOC.wfc_dm_2d.dm_k,
+		GlobalC::ld.cal_projected_DM_k(dm_k,
 			GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
@@ -140,7 +142,7 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		// write the wave functions into GlobalC::LOWF.WFC_K[ik].
 		ModuleBase::timer::tick("Efficience","diago_k");
 		Diago_LCAO_Matrix DLM;
-		DLM.solve_complex_matrix(ik, GlobalC::LOWF.WFC_K[ik], GlobalC::LOC.wfc_dm_2d.wfc_k[ik]);
+		DLM.solve_complex_matrix(ik, GlobalC::LOWF.WFC_K[ik], wfc_k[ik]);
 		ModuleBase::timer::tick("Efficience","diago_k");
 
 		ModuleBase::timer::tick("Efficience","each_k");

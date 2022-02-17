@@ -7,6 +7,12 @@ berryphase::berryphase()
 	GDIR = INPUT.gdir;
 }
 
+berryphase::berryphase(std::vector<ModuleBase::ComplexMatrix>* wfc_k_in) :
+    wfc_k(wfc_k_in)
+{
+	GDIR = INPUT.gdir;
+}
+
 berryphase::~berryphase()
 {
 	//GlobalV::ofs_running << "this is ~berryphase()" << std::endl;
@@ -318,7 +324,7 @@ double berryphase::stringPhase(int index_str, int nbands)
 			if(GlobalV::NSPIN!=4)
 			{
 				//std::complex<double> my_det = lcao_method.det_berryphase(ik_1,ik_2,dk,nbands);
-				zeta = zeta * lcao_method.det_berryphase(ik_1,ik_2,dk,nbands);
+				zeta = zeta * lcao_method.det_berryphase(ik_1,ik_2,dk,nbands, this->wfc_k);
 				// test by jingan
 				//GlobalV::ofs_running << "methon 1: det = " << my_det << std::endl;
 				// test by jingan

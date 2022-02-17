@@ -65,8 +65,10 @@ public:
 	void cal_orb_overlap();
 	void get_lcao_wfc_global_ik(std::complex<double> **ctot, std::complex<double> **cc);
 	void prepare_midmatrix_pblas(const int ik_L, const int ik_R, const ModuleBase::Vector3<double> dk, std::complex<double> *&midmatrix);
-	std::complex<double> det_berryphase(const int ik_L, const int ik_R, const ModuleBase::Vector3<double> dk, const int occ_bands);
-	
+    std::complex<double> det_berryphase(const int ik_L, const int ik_R,
+        const ModuleBase::Vector3<double> dk, const int occ_bands,
+        std::vector<ModuleBase::ComplexMatrix>* wfc_k);
+
 	void test();
 	
 	

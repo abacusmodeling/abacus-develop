@@ -12,7 +12,9 @@ ELEC_cbands_gamma::ELEC_cbands_gamma(){};
 ELEC_cbands_gamma::~ELEC_cbands_gamma(){};
 
 
-void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
+void ELEC_cbands_gamma::cal_bands(const int& istep, LCAO_Hamilt& uhm,
+    std::vector<ModuleBase::matrix>& wfc_gamma,
+    std::vector<ModuleBase::matrix>& dm_gamma)
 {
 	ModuleBase::TITLE("ELEC_cbands_gamma","cal_bands");
 	ModuleBase::timer::tick("ELEC_cband_gamma","cal_bands");
@@ -48,7 +50,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		//--------------------------------------------
 
 		// Peize Lin add ik 2016-12-03
-		uhm.calculate_Hgamma(ik);
+		uhm.calculate_Hgamma(ik, dm_gamma);
 
     // Effective potential of DFT+U is added to total Hamiltonian here; Quxin adds on 20201029
 		if(INPUT.dft_plus_u) 
@@ -83,8 +85,8 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		{
 			Diago_LCAO_Matrix DLM;
 			// the temperary array totwfc only have one spin direction.
-			//DLM.solve_double_matrix(ik, GlobalC::SGO.totwfc[0], GlobalC::LOC.wfc_dm_2d.wfc_gamma[ik]);
-			DLM.solve_double_matrix(ik, GlobalC::LOC.wfc_dm_2d.wfc_gamma[ik]); //LiuXh modify 2021-09-06, clear memory, totwfc not used now
+			//DLM.solve_double_matrix(ik, GlobalC::SGO.totwfc[0], wfc_gamma[ik]);
+			DLM.solve_double_matrix(ik, wfc_gamma[ik]); //LiuXh modify 2021-09-06, clear memory, totwfc not used now
 		}
 		else
 		{

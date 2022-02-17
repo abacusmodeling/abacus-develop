@@ -10,7 +10,8 @@ class berryphase
 
 public:
 
-	berryphase();
+    berryphase();   //for pw-line
+    berryphase(std::vector<ModuleBase::ComplexMatrix>* wfc_k_in);   //for lcao-line
 	~berryphase();
 
 	// mohan add 2021-02-16
@@ -25,8 +26,10 @@ public:
 	int nppstr;
 	int direction;
 	int occ_nbands;
-	int GDIR;
-	
+    int GDIR;
+
+    std::vector<ModuleBase::ComplexMatrix>* wfc_k;
+
 	void get_occupation_bands();
 
 	void lcao_init();

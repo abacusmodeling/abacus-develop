@@ -63,7 +63,8 @@ inline int CTOT2q_c(
 }
 
 // be called in local_orbital_wfc::allocate_k
-int WF_Local::read_lowf_complex(std::complex<double> **c, const int &ik, const bool &newdm)
+int WF_Local::read_lowf_complex(std::complex<double>** c, const int& ik, 
+    std::vector<ModuleBase::ComplexMatrix> *wfc_k)
 {
     ModuleBase::TITLE("WF_Local","read_lowf_complex");
     ModuleBase::timer::tick("WF_Local","read_lowf_complex");
@@ -183,14 +184,7 @@ int WF_Local::read_lowf_complex(std::complex<double> **c, const int &ik, const b
     // so it's save.
 	
     //WF_Local::distri_lowf(ctot, GlobalC::SGO.totwfc[0]);
-    if(newdm==0)
-	{
-		WF_Local::distri_lowf_complex(ctot, c); 
-	}
-	else
-	{	
-		WF_Local::distri_lowf_complex_new(ctot, ik);
-	}
+	WF_Local::distri_lowf_complex_new(ctot, ik, wfc_k);
 	
 	// mohan add 2012-02-15,
 	// still have bugs, but can solve it later.
@@ -227,7 +221,8 @@ int WF_Local::read_lowf_complex(std::complex<double> **c, const int &ik, const b
 	return 0;
 }
 
-int WF_Local::read_lowf(double **c, const int &is)
+int WF_Local::read_lowf(double** c, const int& is,
+    std::vector<ModuleBase::matrix>* wfc_gamma)
 {
     ModuleBase::TITLE("WF_Local","read_lowf");
     ModuleBase::timer::tick("WF_Local","read_lowf");
@@ -330,7 +325,7 @@ int WF_Local::read_lowf(double **c, const int &is)
     // if GlobalV::DRANK!=0, ctot is not used,
     // so it's save.
 
-	WF_Local::distri_lowf_new(ctot, is);
+	WF_Local::distri_lowf_new(ctot, is, wfc_gamma);
 	
 	// mohan add 2012-02-15,
 	// still have bugs, but can solve it later.
@@ -430,7 +425,8 @@ void WF_Local::write_lowf_complex(const std::string &name, std::complex<double> 
     return;
 }
 
-void WF_Local::distri_lowf_new(double **ctot, const int &is)
+void WF_Local::distri_lowf_new(double** ctot, const int& is,
+    std::vector<ModuleBase::matrix> *wfc_gamma)
 {
     ModuleBase::TITLE("WF_Local","distri_lowf_new");
 #ifdef __MPI
@@ -490,7 +486,7 @@ void WF_Local::distri_lowf_new(double **ctot, const int &is)
 			const int inc=1;
 			if(myid==src_rank)
 			{
-				BlasConnector::copy(GlobalC::ParaO.nloc, work, inc, GlobalC::LOC.wfc_dm_2d.wfc_gamma[is].c, inc);
+				BlasConnector::copy(GlobalC::ParaO.nloc, work, inc, wfc_gamma->at(is).c, inc);
 			}
 		}//loop ipcol
 	}//loop	iprow
@@ -502,7 +498,8 @@ void WF_Local::distri_lowf_new(double **ctot, const int &is)
     return;
 }
 
-void WF_Local::distri_lowf_complex_new(std::complex<double> **ctot, const int &ik)
+void WF_Local::distri_lowf_complex_new(std::complex<double>** ctot, const int& ik,
+    std::vector<ModuleBase::ComplexMatrix> *wfc_k)
 {
     ModuleBase::TITLE("WF_Local","distri_lowf_complex_new");
 #ifdef __MPI
@@ -562,7 +559,7 @@ void WF_Local::distri_lowf_complex_new(std::complex<double> **ctot, const int &i
 			const int inc=1;
 			if(myid==src_rank)
 			{
-				BlasConnector::copy(GlobalC::ParaO.nloc, work, inc, GlobalC::LOC.wfc_dm_2d.wfc_k[ik].c, inc);
+				BlasConnector::copy(GlobalC::ParaO.nloc, work, inc, wfc_k->at(ik).c, inc);
 			}
 		}//loop ipcol
 	}//loop	iprow

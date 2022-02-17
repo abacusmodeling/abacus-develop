@@ -16,7 +16,7 @@ class Local_Orbital_Charge
 	~Local_Orbital_Charge();
 
 	// mohan added 2021-02-08
-	void allocate_dm_wfc(const Grid_Technique &gt);
+	void allocate_dm_wfc(const Grid_Technique &gt, Wfc_Dm_2d &wfc_dm_2d);
 	// sum bands to compute the electron charge density
 	void sum_bands(void);
 
@@ -25,8 +25,9 @@ class Local_Orbital_Charge
 	//-----------------
 	void allocate_gamma(const Grid_Technique &gt);
 
-	void gamma_file(const Grid_Technique &gt);
-	void cal_dk_gamma_from_2D_pub(void);
+    void gamma_file(const Grid_Technique& gt,
+        std::vector<ModuleBase::matrix> &wfc_gamma);
+    void cal_dk_gamma_from_2D_pub(void);
 
 
 	//-----------------
@@ -34,7 +35,8 @@ class Local_Orbital_Charge
 	//-----------------
 	void allocate_DM_k(void);
 	
-	void kpt_file(const Grid_Technique &gt);
+    void kpt_file(const Grid_Technique& gt,
+        std::vector<ModuleBase::ComplexMatrix> &wfc_k);
 
 	// liaochen modify on 2010-3-23 
 	// change its state from private to public
@@ -48,7 +50,8 @@ class Local_Orbital_Charge
 
 	void read_dm(const int &is, const std::string &fn);
 	
-	Wfc_Dm_2d wfc_dm_2d;		// Peize Lin test 2019-01-16
+    Wfc_Dm_2d* wfc_dm_2d;		// Peize Lin test 2019-01-16 
+    //trying to change it to pointer
 
 private:
 

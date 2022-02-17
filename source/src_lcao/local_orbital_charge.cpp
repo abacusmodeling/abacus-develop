@@ -76,9 +76,10 @@ Local_Orbital_Charge::~Local_Orbital_Charge()
 
 
 
-void Local_Orbital_Charge::allocate_dm_wfc(const Grid_Technique &gt)
+void Local_Orbital_Charge::allocate_dm_wfc(const Grid_Technique &gt, Wfc_Dm_2d &wfc_dm_2d)
 {
-    ModuleBase::TITLE("Local_Orbital_Charge","allocate_dm_wfc");
+    ModuleBase::TITLE("Local_Orbital_Charge", "allocate_dm_wfc");
+    this->wfc_dm_2d = &wfc_dm_2d;
 
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
@@ -87,7 +88,7 @@ void Local_Orbital_Charge::allocate_dm_wfc(const Grid_Technique &gt)
 	}
 	else
 	{
-		GlobalC::LOWF.allocate_k(gt);
+		GlobalC::LOWF.allocate_k(gt, wfc_dm_2d.wfc_k);
 		this->allocate_DM_k();
 	}
 
@@ -124,9 +125,9 @@ void Local_Orbital_Charge::sum_bands(void)
             //density matrix has already been calculated.
             ModuleBase::timer::tick("LCAO_Charge","cal_dm_2d");
 
-            wfc_dm_2d.cal_dm(GlobalC::wf.wg,
-                wfc_dm_2d.wfc_gamma,
-                wfc_dm_2d.dm_gamma);        // Peize Lin test 2019-01-16
+            wfc_dm_2d->cal_dm(GlobalC::wf.wg,
+                wfc_dm_2d->wfc_gamma,
+                wfc_dm_2d->dm_gamma);        // Peize Lin test 2019-01-16
 
             ModuleBase::timer::tick("LCAO_Charge","cal_dm_2d");
 
@@ -143,9 +144,9 @@ void Local_Orbital_Charge::sum_bands(void)
         this->cal_dk_k( GlobalC::GridT );
         if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")        // Peize Lin test 2019-05-15
 		{
-            wfc_dm_2d.cal_dm(GlobalC::wf.wg,
-            wfc_dm_2d.wfc_k, 
-            wfc_dm_2d.dm_k);
+            wfc_dm_2d->cal_dm(GlobalC::wf.wg,
+            wfc_dm_2d->wfc_k, 
+            wfc_dm_2d->dm_k);
         }
     }
 

@@ -24,6 +24,7 @@ Force_LCAO_k::~Force_LCAO_k ()
 void Force_LCAO_k::ftable_k (
 		const bool isforce,
 		const bool isstress,
+        Wfc_Dm_2d &wfc_dm_2d,
 		ModuleBase::matrix& foverlap,
 		ModuleBase::matrix& ftvnl_dphi,
 		ModuleBase::matrix& fvnl_dbeta,	
@@ -46,7 +47,7 @@ void Force_LCAO_k::ftable_k (
 
 	// calculate the energy density matrix
 	// and the force related to overlap matrix and energy density matrix.
-	this->cal_foverlap_k(isforce, isstress, foverlap, soverlap);
+	this->cal_foverlap_k(isforce, isstress, wfc_dm_2d, foverlap, soverlap);
 
 	// calculate the density matrix
 	double** dm2d = new double*[GlobalV::NSPIN];
@@ -59,8 +60,8 @@ void Force_LCAO_k::ftable_k (
 
     Record_adj RA;
     RA.for_2d();
-    GlobalC::LOC.wfc_dm_2d.cal_dm_R(
-        GlobalC::LOC.wfc_dm_2d.dm_k,
+    wfc_dm_2d.cal_dm_R(
+        wfc_dm_2d.dm_k,
         RA, dm2d);
     
     this->cal_ftvnl_dphi_k(dm2d, isforce, isstress, ftvnl_dphi, stvnl_dphi);
@@ -76,7 +77,7 @@ void Force_LCAO_k::ftable_k (
 #ifdef __DEEPKS
     if (GlobalV::deepks_scf)
     {
-		GlobalC::ld.cal_projected_DM_k(GlobalC::LOC.wfc_dm_2d.dm_k,
+		GlobalC::ld.cal_projected_DM_k(wfc_dm_2d.dm_k,
 			GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
@@ -85,7 +86,7 @@ void Force_LCAO_k::ftable_k (
     	GlobalC::ld.cal_descriptor();
 		GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
 
-        GlobalC::ld.cal_f_delta_k(GlobalC::LOC.wfc_dm_2d.dm_k,
+        GlobalC::ld.cal_f_delta_k(wfc_dm_2d.dm_k,
 			GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
@@ -237,8 +238,9 @@ void Force_LCAO_k::finish_k(void)
 
 void Force_LCAO_k::cal_foverlap_k(
 	const bool isforce, 
-	const bool isstress, 
-	ModuleBase::matrix& foverlap, 
+    const bool isstress,
+    Wfc_Dm_2d &wfc_dm_2d,
+    ModuleBase::matrix& foverlap,
 	ModuleBase::matrix& soverlap)
 {
 	ModuleBase::TITLE("Force_LCAO_k","cal_foverlap_k");
@@ -273,10 +275,10 @@ void Force_LCAO_k::cal_foverlap_k(
         }
     }
     std::vector<ModuleBase::ComplexMatrix> edm_k(GlobalC::kv.nks);
-    GlobalC::LOC.wfc_dm_2d.cal_dm(wgEkb,
-        GlobalC::LOC.wfc_dm_2d.wfc_k,
+    wfc_dm_2d.cal_dm(wgEkb,
+        wfc_dm_2d.wfc_k,
         edm_k);
-    GlobalC::LOC.wfc_dm_2d.cal_dm_R(edm_k,
+    wfc_dm_2d.cal_dm_R(edm_k,
         RA, edm2d);
     ModuleBase::timer::tick("Force_LCAO_k", "cal_edm_2d");
 

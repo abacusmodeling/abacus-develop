@@ -41,7 +41,8 @@ class ELEC_evolve
 
 	private:
 
-	static void evolve_psi(const int &istep, LCAO_Hamilt &uhm);
+    static void evolve_psi(const int& istep, LCAO_Hamilt& uhm,
+    vector<ModuleBase::ComplexMatrix> &wfc_k);
 
 };
 

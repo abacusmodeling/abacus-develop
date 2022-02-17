@@ -20,7 +20,7 @@ class LCAO_Hamilt
     void calculate_Hk( const int &ik);
     
     // used for Gamma only Hamiltonian matrix.
-    void calculate_Hgamma( const int &ik );						// Peize Lin add ik 2016-12-03
+    void calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> dm_gamma);						// Peize Lin add ik 2016-12-03
 
     void calculate_STN_R(void); //LiuXh add 2019-07-15
 
