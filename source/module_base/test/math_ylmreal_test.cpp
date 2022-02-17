@@ -2,8 +2,8 @@
 #include"../vector3.h"
 #include"../matrix.h"
 #include"gtest/gtest.h"
+#include<math.h>
 
-#define PI 3.141592653589793238462643383279502884197169399
 #define doublethreshold 1e-12
 
 /************************************************
@@ -49,31 +49,31 @@ class YlmRealTest : public testing::Test
     //https://formulasearchengine.com/wiki/Table_of_spherical_harmonics
     //multipy the Condon–Shortley phase (-1)^m
     inline double norm(const double &x, const double &y, const double &z) {return sqrt(x*x + y*y + z*z);}
-    double y00(const double &x, const double &y, const double &z)  {return 1.0/2.0/sqrt(PI);}
-    double y10(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return sqrt(3.0/(4.0*PI)) * z / r;}
-    double y11(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return -1.0*sqrt(3.0/(4.*PI)) * x / r;}
-    double y1m1(const double &x, const double &y, const double &z) {double r=norm(x,y,z); return -1.0*sqrt(3./(4.*PI)) * y / r;} // y1m1 means Y1,-1
-    double y20(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return 1./4. * sqrt(5./PI) * (-1.*x*x - y*y + 2.*z*z) / (r*r);}
-    double y21(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return -1.0*1./2. * sqrt(15./PI) * (z*x) / (r*r);}
-    double y2m1(const double &x, const double &y, const double &z) {double r=norm(x,y,z); return -1.0*1./2. * sqrt(15./PI) * (z*y) / (r*r);}
-    double y22(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return 1./4. * sqrt(15./PI) * (x*x - y*y) / (r*r);}
-    double y2m2(const double &x, const double &y, const double &z) {double r=norm(x,y,z); return 1./2. * sqrt(15./PI) * (x*y) / (r*r);}
-    double y30(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return 1./4. * sqrt(7./PI) * z*(2.*z*z-3.*x*x-3.*y*y) / (r*r*r);}
-    double y31(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return -1.0*1./4. * sqrt(21./2./PI) * x*(4.*z*z-x*x-y*y) / (r*r*r);}
-    double y3m1(const double &x, const double &y, const double &z) {double r=norm(x,y,z); return -1.0*1./4. * sqrt(21./2./PI) * y*(4.*z*z-x*x-y*y) / (r*r*r);}
-    double y32(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return 1./4. * sqrt(105./PI) * (x*x - y*y)*z / (r*r*r);}
-    double y3m2(const double &x, const double &y, const double &z) {double r=norm(x,y,z); return 1./2. * sqrt(105./PI) * x*y*z / (r*r*r);}
-    double y33(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return -1.0*1./4. * sqrt(35./2./PI) * x*(x*x - 3.*y*y) / (r*r*r);}
-    double y3m3(const double &x, const double &y, const double &z) {double r=norm(x,y,z); return -1.0*1./4. * sqrt(35./2./PI) * y*(3.*x*x - y*y) / (r*r*r);}
-    double y40(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return 3./16.*sqrt(1./PI) * (35.*z*z*z*z - 30.*z*z*r*r + 3*r*r*r*r) / (r*r*r*r);}
-    double y41(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return -1.0*3./4.*sqrt(5./2./PI) * x*z*(7.*z*z - 3*r*r) / (r*r*r*r);}
-    double y4m1(const double &x, const double &y, const double &z) {double r=norm(x,y,z); return -1.0*3./4.*sqrt(5./2./PI) * y*z*(7.*z*z - 3.*r*r) / (r*r*r*r);}
-    double y42(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return 3./8.*sqrt(5./PI) * (x*x-y*y)*(7.*z*z-r*r) / (r*r*r*r);}
-    double y4m2(const double &x, const double &y, const double &z) {double r=norm(x,y,z); return 3./4.*sqrt(5./PI) * x*y*(7.*z*z - r*r) / (r*r*r*r);}
-    double y43(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return -1.0*3./4.*sqrt(35./2./PI) * x*z*(x*x - 3.*y*y) / (r*r*r*r);}
-    double y4m3(const double &x, const double &y, const double &z) {double r=norm(x,y,z); return -1.0*3./4.*sqrt(35./2./PI) * y*z*(3.*x*x - y*y) / (r*r*r*r);}
-    double y44(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return 3./16.*sqrt(35./PI) * (x*x*(x*x - 3.*y*y) - y*y*(3.*x*x-y*y)) / (r*r*r*r);}
-    double y4m4(const double &x, const double &y, const double &z) {double r=norm(x,y,z); return 3./4.*sqrt(35./PI) * x*y*(x*x - y*y) / (r*r*r*r);}
+    double y00(const double &x, const double &y, const double &z)  {return 1.0/2.0/sqrt(M_PI);}
+    double y10(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return sqrt(3.0/(4.0*M_PI)) * z / r;}
+    double y11(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return -1.0*sqrt(3.0/(4.*M_PI)) * x / r;}
+    double y1m1(const double &x, const double &y, const double &z) {double r=norm(x,y,z); return -1.0*sqrt(3./(4.*M_PI)) * y / r;} // y1m1 means Y1,-1
+    double y20(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return 1./4. * sqrt(5./M_PI) * (-1.*x*x - y*y + 2.*z*z) / (r*r);}
+    double y21(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return -1.0*1./2. * sqrt(15./M_PI) * (z*x) / (r*r);}
+    double y2m1(const double &x, const double &y, const double &z) {double r=norm(x,y,z); return -1.0*1./2. * sqrt(15./M_PI) * (z*y) / (r*r);}
+    double y22(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return 1./4. * sqrt(15./M_PI) * (x*x - y*y) / (r*r);}
+    double y2m2(const double &x, const double &y, const double &z) {double r=norm(x,y,z); return 1./2. * sqrt(15./M_PI) * (x*y) / (r*r);}
+    double y30(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return 1./4. * sqrt(7./M_PI) * z*(2.*z*z-3.*x*x-3.*y*y) / (r*r*r);}
+    double y31(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return -1.0*1./4. * sqrt(21./2./M_PI) * x*(4.*z*z-x*x-y*y) / (r*r*r);}
+    double y3m1(const double &x, const double &y, const double &z) {double r=norm(x,y,z); return -1.0*1./4. * sqrt(21./2./M_PI) * y*(4.*z*z-x*x-y*y) / (r*r*r);}
+    double y32(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return 1./4. * sqrt(105./M_PI) * (x*x - y*y)*z / (r*r*r);}
+    double y3m2(const double &x, const double &y, const double &z) {double r=norm(x,y,z); return 1./2. * sqrt(105./M_PI) * x*y*z / (r*r*r);}
+    double y33(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return -1.0*1./4. * sqrt(35./2./M_PI) * x*(x*x - 3.*y*y) / (r*r*r);}
+    double y3m3(const double &x, const double &y, const double &z) {double r=norm(x,y,z); return -1.0*1./4. * sqrt(35./2./M_PI) * y*(3.*x*x - y*y) / (r*r*r);}
+    double y40(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return 3./16.*sqrt(1./M_PI) * (35.*z*z*z*z - 30.*z*z*r*r + 3*r*r*r*r) / (r*r*r*r);}
+    double y41(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return -1.0*3./4.*sqrt(5./2./M_PI) * x*z*(7.*z*z - 3*r*r) / (r*r*r*r);}
+    double y4m1(const double &x, const double &y, const double &z) {double r=norm(x,y,z); return -1.0*3./4.*sqrt(5./2./M_PI) * y*z*(7.*z*z - 3.*r*r) / (r*r*r*r);}
+    double y42(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return 3./8.*sqrt(5./M_PI) * (x*x-y*y)*(7.*z*z-r*r) / (r*r*r*r);}
+    double y4m2(const double &x, const double &y, const double &z) {double r=norm(x,y,z); return 3./4.*sqrt(5./M_PI) * x*y*(7.*z*z - r*r) / (r*r*r*r);}
+    double y43(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return -1.0*3./4.*sqrt(35./2./M_PI) * x*z*(x*x - 3.*y*y) / (r*r*r*r);}
+    double y4m3(const double &x, const double &y, const double &z) {double r=norm(x,y,z); return -1.0*3./4.*sqrt(35./2./M_PI) * y*z*(3.*x*x - y*y) / (r*r*r*r);}
+    double y44(const double &x, const double &y, const double &z)  {double r=norm(x,y,z); return 3./16.*sqrt(35./M_PI) * (x*x*(x*x - 3.*y*y) - y*y*(3.*x*x-y*y)) / (r*r*r*r);}
+    double y4m4(const double &x, const double &y, const double &z) {double r=norm(x,y,z); return 3./4.*sqrt(35./M_PI) * x*y*(x*x - y*y) / (r*r*r*r);}
 
     void SetUp()
     {
