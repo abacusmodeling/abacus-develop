@@ -48,6 +48,10 @@ AddTest(
   SOURCES sph_bessel_recursive_test.cpp ../sph_bessel_recursive-d1.cpp ../sph_bessel_recursive-d2.cpp
 )
 AddTest(
+  TARGET base_math_sphbes
+  SOURCES math_sphbes_test.cpp ../math_sphbes.cpp ../timer.cpp
+)
+AddTest(
   TARGET base_realarray
   SOURCES realarray_test.cpp ../realarray.cpp
 )
@@ -63,6 +67,10 @@ AddTest(
   TARGET base_mathzone
   LIBS ${math_libs}
   SOURCES mathzone_test.cpp ../mathzone.cpp ../matrix3.cpp ../matrix.cpp ../tool_quit.cpp ../global_variable.cpp ../global_file.cpp ../memory.cpp ../timer.cpp
+)
+AddTest(
+  TARGET base_math_polyint
+  SOURCES math_polyint_test.cpp ../math_polyint.cpp ../realarray.cpp ../timer.cpp
 )
 AddTest(
   TARGET base_mathzone_add1
