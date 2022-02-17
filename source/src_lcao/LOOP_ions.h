@@ -18,8 +18,7 @@ class LOOP_ions
 
 	LOOP_elec LOE;
 
-	void opt_ions(std::vector<ModuleBase::matrix> &wfc_gamma,
-        std::vector<ModuleBase::ComplexMatrix> &wfc_k); //output for dos
+	void opt_ions(); //output for dos
 	void output_HS_R(
         const std::string &SR_filename="data-SR-sparse_SPIN0.csr",
         const std::string &HR_filename_up="data-HR-sparse_SPIN0.csr",

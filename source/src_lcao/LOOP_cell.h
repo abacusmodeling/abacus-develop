@@ -11,8 +11,7 @@ class LOOP_cell
 	LOOP_cell();
 	~LOOP_cell();
 
-	void opt_cell(std::vector<ModuleBase::matrix> &wfc_gamma,
-    std::vector<ModuleBase::ComplexMatrix> &wfc_k);
+	void opt_cell();
 
 };
 

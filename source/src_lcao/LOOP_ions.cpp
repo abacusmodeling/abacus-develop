@@ -30,8 +30,7 @@ LOOP_ions::LOOP_ions()
 LOOP_ions::~LOOP_ions()
 {}
 
-void LOOP_ions::opt_ions(std::vector<ModuleBase::matrix> &wfc_gamma,
-    std::vector<ModuleBase::ComplexMatrix> &wfc_k)
+void LOOP_ions::opt_ions()
 {
     ModuleBase::TITLE("LOOP_ions","opt_ions");
     ModuleBase::timer::tick("LOOP_ions","opt_ions");
@@ -285,10 +284,8 @@ void LOOP_ions::opt_ions(std::vector<ModuleBase::matrix> &wfc_gamma,
 
     }
 
-    //copy wfc for dos
-    wfc_gamma = this->wfc_dm_2d.wfc_gamma;
-    wfc_k = this->wfc_dm_2d.wfc_k;
-    
+    GlobalC::en.perform_dos(this->wfc_dm_2d.wfc_gamma, this->wfc_dm_2d.wfc_k);
+
     ModuleBase::timer::tick("LOOP_ions", "opt_ions");
     return;
 }

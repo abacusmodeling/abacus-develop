@@ -21,9 +21,6 @@ void Run_lcao::lcao_line(void)
 {
     ModuleBase::TITLE("Run_lcao","lcao_line");
     ModuleBase::timer::tick("Run_lcao", "lcao_line");
-
-    std::vector<ModuleBase::matrix> wfc_gamma;
-    std::vector<ModuleBase::ComplexMatrix> wfc_k;
     
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
@@ -190,9 +187,7 @@ void Run_lcao::lcao_line(void)
 	{
         LOOP_cell lc;
         //keep wfc_gamma or wfc_k remaining
-        lc.opt_cell(wfc_gamma, wfc_k);
-
-        GlobalC::en.perform_dos(wfc_gamma, wfc_k);
+        lc.opt_cell();
 	}
 
 	ModuleBase::timer::tick("Run_lcao","lcao_line");
