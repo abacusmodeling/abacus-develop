@@ -72,3 +72,8 @@ AddTest(
   TARGET base_math_polyint
   SOURCES math_polyint_test.cpp ../math_polyint.cpp ../realarray.cpp ../timer.cpp
 )
+AddTest(
+  TARGET base_math_ylmreal
+  LIBS ${math_libs}
+  SOURCES math_ylmreal_test.cpp ../math_ylmreal.cpp ../realarray.cpp ../timer.cpp ../matrix.cpp 
+)
