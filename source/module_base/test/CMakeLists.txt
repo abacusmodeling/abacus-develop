@@ -68,3 +68,7 @@ AddTest(
   LIBS ${math_libs}
   SOURCES mathzone_test.cpp ../mathzone.cpp ../matrix3.cpp ../matrix.cpp ../tool_quit.cpp ../global_variable.cpp ../global_file.cpp ../memory.cpp ../timer.cpp
 )
+AddTest(
+  TARGET base_math_polyint
+  SOURCES math_polyint_test.cpp ../math_polyint.cpp ../realarray.cpp ../timer.cpp
+)
