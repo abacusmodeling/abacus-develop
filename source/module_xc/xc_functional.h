@@ -78,6 +78,9 @@ class XC_Functional
 	static void gcxc(const double &rho, const double &grho,
 			double &sxc, double &v1xc, double &v2xc);
 
+	static void gcxc_libxc(const double &rho, const double &grho,
+			double &sxc, double &v1xc, double &v2xc);
+
 	// spin polarized GGA
 	static void gcx_spin(double rhoup, double rhodw, double grhoup2, double grhodw2,
             double &sx, double &v1xup, double &v1xdw, double &v2xup,

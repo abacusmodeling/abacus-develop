@@ -9,7 +9,7 @@ void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 	if(func_type == 0 || func_type == 1) return; // none or LDA functional
 
 	bool igcc_is_lyp = false;
-	if( func_id[1] == 131) igcc_is_lyp = true;
+	if( func_id[1] == XC_GGA_C_LYP) igcc_is_lyp = true;
 
 	int nspin0 = GlobalV::NSPIN;
 	if(GlobalV::NSPIN==4) nspin0 =1;
@@ -134,26 +134,38 @@ void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 		{
 			const double arho = std::abs( rhotmp1[ir] );
 			h1[ir].x = h1[ir].y = h1[ir].z = 0.0;
+
 			if(arho > epsr)
 			{
 				grho2a = gdr1[ir].norm2();
-				if( grho2a > epsg )
-				{
+				//if( grho2a > epsg )
+				//{
 					if( rhotmp1[ir] >= 0.0 ) segno = 1.0;
 					if( rhotmp1[ir] < 0.0 ) segno = -1.0;
 					
-					XC_Functional::gcxc( arho, grho2a, sxc, v1xc, v2xc);
-					// first term of the gradient correction:
-					// D(rho*Exc)/D(rho)
-					v(0, ir) += ModuleBase::e2 * v1xc;
-					
-					// h contains
-					// D(rho*Exc) / D(|grad rho|) * (grad rho) / |grad rho|
-					h1[ir] = ModuleBase::e2 * v2xc * gdr1[ir];
-					
-					vtxcgc += ModuleBase::e2* v1xc * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] );
-					etxcgc += ModuleBase::e2* sxc  * segno;
-				}
+					if(use_libxc)
+					{
+						XC_Functional::gcxc_libxc( arho, grho2a, sxc, v1xc, v2xc );
+						v(0,ir) = ModuleBase::e2 * v1xc;
+						h1[ir] = ModuleBase::e2 * 2.0 * v2xc * gdr1[ir];
+						etxcgc += ModuleBase::e2* sxc * arho * segno;
+						vtxcgc += ModuleBase::e2* v1xc * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] );
+					}
+					else
+					{
+						XC_Functional::gcxc( arho, grho2a, sxc, v1xc, v2xc);
+						// first term of the gradient correction:
+						// D(rho*Exc)/D(rho)
+						v(0, ir) += ModuleBase::e2 * v1xc;
+						
+						// h contains
+						// D(rho*Exc) / D(|grad rho|) * (grad rho) / |grad rho|
+						h1[ir] = ModuleBase::e2 * v2xc * gdr1[ir];
+						
+						vtxcgc += ModuleBase::e2* v1xc * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] );
+						etxcgc += ModuleBase::e2* sxc  * segno;
+					}
+				//}
 			} // end arho > epsr
 		}
 	}// end nspin0 == 1

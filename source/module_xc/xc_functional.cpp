@@ -34,7 +34,14 @@ void XC_Functional::set_xc_type(const std::string xc_func_in)
         func_id.push_back(XC_LDA_C_PZ);
         func_type = 1;
         use_libxc = false;
-	}	
+	}
+    else if (xc_func == "PWLDA")
+    {
+        func_id.push_back(XC_LDA_X);
+        func_id.push_back(XC_LDA_C_PW);
+        func_type = 1;
+        //use_libxc = false;
+    }
 	else if ( xc_func == "PBE" || xc_func == "SLAPWPBXPBC") //PBX+PBC
 	{
         func_id.push_back(XC_GGA_X_PBE);
@@ -182,7 +189,7 @@ void XC_Functional::xc(const double &rho, double &exc, double &vxc)
                 break;
 
             // Correlation functionals containing PW correlation
-            case XC_GGA_C_PBE: case XC_GGA_C_PBE_SOL:
+            case XC_GGA_C_PBE: case XC_GGA_C_PBE_SOL: case XC_GGA_C_PW91: case XC_LDA_C_PW:
             //   PBC,PBCsol
                 XC_Functional::pw(rs, 0, e, v);break;
 
@@ -805,12 +812,13 @@ double &sx, double &v1x, double &v2x)
     
 	// numerical coefficients (NB: c2=(3 pi^2)^(1/3) )
     const double third = 1.0 / 3.0;
-    const double c1 = 0.750 / ModuleBase::PI;
+    const double pi = 3.14159265358979323846;
+    const double c1 = 0.750 / pi;
     const double c2 = 3.0936677262801360;
     const double c5 = 4.0 * third;
     // parameters of the functional
     double k[3] = { 0.8040, 1.24500, 0.8040 };
-    const double mu[3] = {0.2195149727645171, 0.2195149727645171, 0.12345679012345679012} ;//modified by zhengdy, to ensure the same parameters with another dft code.
+    const double mu[3] = {0.2195149727645171, 0.2195149727645171, 0.12345679012345679} ;//modified by zhengdy, to ensure the same parameters with another dft code.
 
     const double agrho = sqrt(grho);
     const double kf = c2 * pow(rho, third);
@@ -987,8 +995,8 @@ void XC_Functional::pbec(const double &rho, const double &grho, const int &iflag
 	// PBE correlation (without LDA part)
 	// iflag=0: J.P.Perdew, K.Burke, M.Ernzerhof, PRL 77, 3865 (1996).
 	// iflag=1: J.P.Perdew et al., PRL 100, 136406 (2008).
-	const double ga = 0.0310910;
-	const double be[2] = {0.0667250, 0.046};
+	const double ga = 0.0310906908696548950;
+	const double be[2] = {0.06672455060314922, 0.046};
 	
 	const double third = 1.0 / 3.0;
 	const double pi34 = 0.62035049089940;
@@ -1216,6 +1224,29 @@ void XC_Functional::gcxc(const double &rho, const double &grho, double &sxc,
     }
 
     return;
+}
+
+void XC_Functional::gcxc_libxc(const double &rho, const double &grho, double &sxc,
+          double &v1xc, double &v2xc)
+{
+
+    double s,v1,v2;
+    sxc = v1xc = v2xc = 0.0;
+
+	std::vector<xc_func_type> funcs = init_func(XC_UNPOLARIZED);
+
+    for(xc_func_type &func : funcs)
+    {
+        if( func.info->family == XC_FAMILY_GGA || func.info->family == XC_FAMILY_HYB_GGA)
+        {
+            // call Libxc function: xc_gga_exc_vxc
+            xc_gga_exc_vxc( &func, 1, &rho, &grho, &s, &v1, &v2);
+        }
+        sxc += s;
+        v1xc += v1;
+        v2xc += v2;
+    }
+	return;
 }
 
 void XC_Functional::optx(const double rho, const double grho, double &sx, double &v1x, double &v2x)

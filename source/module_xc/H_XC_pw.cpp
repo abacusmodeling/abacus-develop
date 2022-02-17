@@ -51,12 +51,10 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc
             {
                 if(use_libxc)
                 {
-                    std::cout << "xc_libxc" << std::endl;
                     XC_Functional::xc_libxc(arhox, exc, vxc[0]);
                 }
                 else
                 {
-                    std::cout << "xc" << std::endl;
                     XC_Functional::xc(arhox, exc, vxc[0]);
                 }
                 v(0,ir) = e2 * vxc[0];
@@ -87,14 +85,12 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc
                 // call
                 if(use_libxc)
                 {
-                    std::cout << "xc_libxc" << std::endl;
                     double rhoup = arhox * (1.0+zeta) / 2.0;
                     double rhodw = arhox * (1.0-zeta) / 2.0;
                     XC_Functional::xc_spin_libxc(rhoup, rhodw, exc, vxc[0], vxc[1]);
                 }
                 else
                 {
-                    std::cout << "xc" << std::endl;
                     double rhoup = arhox * (1.0+zeta) / 2.0;
                     double rhodw = arhox * (1.0-zeta) / 2.0;
                     XC_Functional::xc_spin(arhox, zeta, exc, vxc[0], vxc[1]);
@@ -132,14 +128,12 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc
 
                 if(use_libxc)
                 {
-                    std::cout << "xc_libxc" << std::endl;
                     double rhoup = arhox * (1.0+zeta) / 2.0;
                     double rhodw = arhox * (1.0-zeta) / 2.0;
                     XC_Functional::xc_spin_libxc(rhoup, rhodw, exc, vxc[0], vxc[1]);
                 }
                 else
                 {
-                    std::cout << "xc" << std::endl;
                     double rhoup = arhox * (1.0+zeta) / 2.0;
                     double rhodw = arhox * (1.0-zeta) / 2.0;
                     XC_Functional::xc_spin(arhox, zeta, exc, vxc[0], vxc[1]);
