@@ -156,7 +156,7 @@ inline int localIndex(int globalIndex, int nblk, int nprocs, int& myproc)
     return int(globalIndex/(nblk*nprocs))*nblk+globalIndex%nblk;
 }
 
-
+#ifdef __MPI
 //------------------------------------------------------------------
 // mohan add notes: 2021-03-11
 // this subroutine is used to transform data from grid integrals
@@ -303,7 +303,7 @@ inline int setBufferParameter(
 
     return 0;
 }
-
+#endif
 
 // for calculation of < phi_i | Vlocal | phi_j >
 // Input:	vlocal[ir]
@@ -446,7 +446,9 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "temp variables are deleted");
     ModuleBase::timer::tick("Gint_Gamma","gamma_vlocal");
+#ifdef __MPI
     MPI_Barrier(MPI_COMM_WORLD);
+#endif
     ModuleBase::timer::tick("Gint_Gamma","distri_vl");
 	
 	return GridVlocal;

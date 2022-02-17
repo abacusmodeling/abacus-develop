@@ -14,6 +14,7 @@
 #include <memory>
 #include <atomic>
 
+#ifdef __MPI
 class Exx_Abfs::Parallel::Communicate::DM3
 {
 public:
@@ -90,5 +91,6 @@ private:
 public:
 	Allreduce allreduce;
 };
+#endif
 
 #endif

@@ -72,14 +72,26 @@ void Wfc_Dm_2d::cal_dm(const ModuleBase::matrix& wg,
         const int one_int=1;
         const char N_char='N', T_char='T';
         dm_gamma[is].create( wfc_gamma[is].nr, wfc_gamma[is].nc );
+    #ifdef __MPI
         pdgemm_(
-            &N_char, &T_char,
+            &N_char, &T_char, 
             &GlobalV::NLOCAL, &GlobalV::NLOCAL, &wg.nc,
             &one_float,
             wg_wfc.c, &one_int, &one_int, GlobalC::ParaO.desc,
             wfc_gamma[is].c, &one_int, &one_int, GlobalC::ParaO.desc,
             &zero_float,
             dm_gamma[is].c, &one_int, &one_int, GlobalC::ParaO.desc);
+    #else
+        const int lda=GlobalV::NLOCAL;
+        dgemm_(
+            &N_char, &T_char, 
+            &GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
+            &one_float,
+            wg_wfc.c, &lda,
+            wfc_gamma[is].c, &lda,
+            &zero_float,
+            dm_gamma[is].c, &lda);
+    #endif    
     }
     #ifdef TEST_DIAG
     static int istep=0;
@@ -131,6 +143,7 @@ void Wfc_Dm_2d::cal_dm(const ModuleBase::matrix& wg,    // wg(ik,ib), cal all dm
         const int one_int=1;
         const char N_char='N', T_char='T';
         dm_k[ik].create( wfc_k[ik].nr, wfc_k[ik].nc );
+    #ifdef __MPI
         pzgemm_(
             &N_char, &T_char,
             &GlobalV::NLOCAL, &GlobalV::NLOCAL, &wg.nc,
@@ -139,6 +152,18 @@ void Wfc_Dm_2d::cal_dm(const ModuleBase::matrix& wg,    // wg(ik,ib), cal all dm
             wfc_k[ik].c, &one_int, &one_int, GlobalC::ParaO.desc,
             &zero_float,
             dm_k[ik].c, &one_int, &one_int, GlobalC::ParaO.desc);
+    #else
+        const int lda=GlobalV::NLOCAL;
+        const complex<double> one_complex={1.0,0.0}, zero_complex={0.0,0.0};
+        zgemm_(
+            &N_char, &T_char, 
+            &GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
+            &one_complex,
+            wg_wfc.c, &lda,
+            wfc_k[ik].c, &lda,
+            &zero_complex,
+            dm_k[ik].c, &lda);
+    #endif
     }
 	
 	#ifdef TEST_DIAG

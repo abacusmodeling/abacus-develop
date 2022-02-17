@@ -14,6 +14,7 @@
 #include "../src_external/src_test/test_function.h"
 //#include <gperftools/profiler.h>
 
+#ifdef __MPI
 void Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D( 
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &HR_exx,
 	const std::pair<bool,bool> &io_HR_a2D )
@@ -76,7 +77,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D(
 	}*/
 //ofs_time.close();
 }
-
+#endif
 /*
 std::map<size_t,std::map<size_t,matrix>> Exx_Abfs::Parallel::Communicate::Hexx::R_to_K( 
 	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>> & HR) const

@@ -850,8 +850,9 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
     {
         for (int j=i; j<GlobalV::NLOCAL; j++)
         {
-            g1 << " " << H[i*GlobalV::NLOCAL+j];
-            g2 << " " << S[i*GlobalV::NLOCAL+j];
+            // not correct for serial version; need change 
+            //g1 << " " << H[i*GlobalV::NLOCAL+j];
+            //g2 << " " << S[i*GlobalV::NLOCAL+j];
         }
     }
     g1.close();

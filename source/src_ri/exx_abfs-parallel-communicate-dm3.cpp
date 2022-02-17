@@ -94,7 +94,7 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<ModuleBase::Compl
 }
 */
 
-
+#ifdef __MPI
 void Exx_Abfs::Parallel::Communicate::DM3::cal_DM(const double threshold_D)
 {
 	ModuleBase::TITLE("Exx_Abfs::Parallel::Communicate::DM3::cal_DM");
@@ -109,3 +109,4 @@ void Exx_Abfs::Parallel::Communicate::DM3::cal_DM(const double threshold_D)
 		ofs<<DMr<<std::endl;
 	}*/	
 }
+#endif

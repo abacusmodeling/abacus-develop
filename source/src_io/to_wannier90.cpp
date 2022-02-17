@@ -1726,9 +1726,11 @@ void toWannier90::getUnkFromLcao()
 	delete[] lcao_wfc_global;
 	
 	delete[] orbital_in_G;
-	
+
+#ifdef __MPI
 	MPI_Barrier(MPI_COMM_WORLD);
-	
+#endif
+
 	return;
 }
 
@@ -1737,7 +1739,9 @@ void toWannier90::get_lcao_wfc_global_ik(std::complex<double> **ctot, std::compl
 {
 	std::complex<double>* ctot_send = new std::complex<double>[GlobalV::NBANDS*GlobalV::NLOCAL];
 
+#ifdef __MPI
 	MPI_Status status;
+#endif
 
 	for (int i=0; i<GlobalV::DSIZE; i++)
 	{

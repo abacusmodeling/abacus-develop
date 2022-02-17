@@ -15,7 +15,7 @@
 
 #include "../src_external/src_test/test_function.h"
 
-
+#ifdef __MPI
 void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init(
 	const MPI_Comm &mpi_comm_in,
 	const std::map<std::set<size_t>,std::set<size_t>> &H_atom_pairs_group)
@@ -613,3 +613,4 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::insert_data(
 		}
 	}
 }
+#endif
