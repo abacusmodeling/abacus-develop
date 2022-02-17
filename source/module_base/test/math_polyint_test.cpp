@@ -30,23 +30,25 @@ class bessell0 : public testing::Test
     double interval = 0.01;
     ModuleBase::realArray table3,table4;
     ModuleBase::realArray y3;
-    double *tablex = new double[TableLength];
-    double *tabley = new double[TableLength];
+    double *tablex;
+    double *tabley;
 
-    double Func(double x) {return sin(x)/x;}
+    double sinc(double x) {return sin(x)/x;}
 
     void SetUp()
     {
+        tablex = new double[TableLength];
+        tabley = new double[TableLength];
         table3.create(1,1,TableLength);
         table4.create(1,1,1,TableLength);
         y3.create(1,1,TableLength);
 
         for(int i=1;i<TableLength;++i) 
         {
-            table3(0,0,i) = Func(i * interval);
-            table4(0,0,0,i) = Func(i * interval); 
+            table3(0,0,i) = sinc(i * interval);
+            table4(0,0,0,i) = sinc(i * interval); 
             tablex[i] = i * interval;
-            tabley[i] = Func(i * interval);
+            tabley[i] = sinc(i * interval);
         }
     }
 
@@ -66,11 +68,11 @@ TEST_F(bessell0,PolynomialInterpolationThreeDimensionY)
     ModuleBase::PolyInt::Polynomial_Interpolation(table3,0,0,y3,4,TableLength,interval,3.005);
     ModuleBase::PolyInt::Polynomial_Interpolation(table3,0,0,y3,5,TableLength,interval,3.505);
 
-    EXPECT_NEAR(y3(0,0,1),Func(0.1),doublethreshold);
-    EXPECT_NEAR(y3(0,0,2),Func(1.005),doublethreshold);
-    EXPECT_NEAR(y3(0,0,3),Func(2.005),doublethreshold);
-    EXPECT_NEAR(y3(0,0,4),Func(3.005),doublethreshold);
-    EXPECT_NEAR(y3(0,0,5),Func(3.505),doublethreshold);
+    EXPECT_NEAR(y3(0,0,1),sinc(0.1),doublethreshold);
+    EXPECT_NEAR(y3(0,0,2),sinc(1.005),doublethreshold);
+    EXPECT_NEAR(y3(0,0,3),sinc(2.005),doublethreshold);
+    EXPECT_NEAR(y3(0,0,4),sinc(3.005),doublethreshold);
+    EXPECT_NEAR(y3(0,0,5),sinc(3.505),doublethreshold);
 }
 
 TEST_F(bessell0,PolynomialInterpolationThreeDimension)
@@ -81,11 +83,11 @@ TEST_F(bessell0,PolynomialInterpolationThreeDimension)
     double y4 = ModuleBase::PolyInt::Polynomial_Interpolation(table3,0,0,TableLength,interval,3.005);
     double y5 = ModuleBase::PolyInt::Polynomial_Interpolation(table3,0,0,TableLength,interval,3.505);
 
-    EXPECT_NEAR(y1,Func(0.1),doublethreshold);
-    EXPECT_NEAR(y2,Func(1.005),doublethreshold);
-    EXPECT_NEAR(y3,Func(2.005),doublethreshold);
-    EXPECT_NEAR(y4,Func(3.005),doublethreshold);
-    EXPECT_NEAR(y5,Func(3.505),doublethreshold);
+    EXPECT_NEAR(y1,sinc(0.1),doublethreshold);
+    EXPECT_NEAR(y2,sinc(1.005),doublethreshold);
+    EXPECT_NEAR(y3,sinc(2.005),doublethreshold);
+    EXPECT_NEAR(y4,sinc(3.005),doublethreshold);
+    EXPECT_NEAR(y5,sinc(3.505),doublethreshold);
 }
 
 TEST_F(bessell0,PolynomialInterpolationFourDimension)
@@ -96,11 +98,11 @@ TEST_F(bessell0,PolynomialInterpolationFourDimension)
     double y4 = ModuleBase::PolyInt::Polynomial_Interpolation(table4,0,0,0,TableLength,interval,3.005);
     double y5 = ModuleBase::PolyInt::Polynomial_Interpolation(table4,0,0,0,TableLength,interval,3.505);
 
-    EXPECT_NEAR(y1,Func(0.1),doublethreshold);
-    EXPECT_NEAR(y2,Func(1.005),doublethreshold);
-    EXPECT_NEAR(y3,Func(2.005),doublethreshold);
-    EXPECT_NEAR(y4,Func(3.005),doublethreshold);
-    EXPECT_NEAR(y5,Func(3.505),doublethreshold);
+    EXPECT_NEAR(y1,sinc(0.1),doublethreshold);
+    EXPECT_NEAR(y2,sinc(1.005),doublethreshold);
+    EXPECT_NEAR(y3,sinc(2.005),doublethreshold);
+    EXPECT_NEAR(y4,sinc(3.005),doublethreshold);
+    EXPECT_NEAR(y5,sinc(3.505),doublethreshold);
 }
 
 TEST_F(bessell0,PolynomialInterpolation)
@@ -111,11 +113,11 @@ TEST_F(bessell0,PolynomialInterpolation)
     double y4 = ModuleBase::PolyInt::Polynomial_Interpolation(tabley,TableLength,interval,3.005);
     double y5 = ModuleBase::PolyInt::Polynomial_Interpolation(tabley,TableLength,interval,3.505);
 
-    EXPECT_NEAR(y1,Func(0.1),doublethreshold);
-    EXPECT_NEAR(y2,Func(1.005),doublethreshold);
-    EXPECT_NEAR(y3,Func(2.005),doublethreshold);
-    EXPECT_NEAR(y4,Func(3.005),doublethreshold);
-    EXPECT_NEAR(y5,Func(3.505),doublethreshold);
+    EXPECT_NEAR(y1,sinc(0.1),doublethreshold);
+    EXPECT_NEAR(y2,sinc(1.005),doublethreshold);
+    EXPECT_NEAR(y3,sinc(2.005),doublethreshold);
+    EXPECT_NEAR(y4,sinc(3.005),doublethreshold);
+    EXPECT_NEAR(y5,sinc(3.505),doublethreshold);
 }
 
 TEST_F(bessell0,PolynomialInterpolationXY)
@@ -126,9 +128,9 @@ TEST_F(bessell0,PolynomialInterpolationXY)
     double y4 = ModuleBase::PolyInt::Polynomial_Interpolation_xy(tablex,tabley,TableLength,3.005);
     double y5 = ModuleBase::PolyInt::Polynomial_Interpolation_xy(tablex,tabley,TableLength,3.505);
 
-    EXPECT_NEAR(y1,Func(0.1),doublethreshold);
-    EXPECT_NEAR(y2,Func(1.005),doublethreshold);
-    EXPECT_NEAR(y3,Func(2.005),doublethreshold);
-    EXPECT_NEAR(y4,Func(3.005),doublethreshold);
-    EXPECT_NEAR(y5,Func(3.505),doublethreshold);
+    EXPECT_NEAR(y1,sinc(0.1),doublethreshold);
+    EXPECT_NEAR(y2,sinc(1.005),doublethreshold);
+    EXPECT_NEAR(y3,sinc(2.005),doublethreshold);
+    EXPECT_NEAR(y4,sinc(3.005),doublethreshold);
+    EXPECT_NEAR(y5,sinc(3.505),doublethreshold);
 }
