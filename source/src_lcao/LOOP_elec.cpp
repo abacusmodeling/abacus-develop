@@ -216,7 +216,7 @@ void LOOP_elec::solver(const int& istep,
 				for( size_t hybrid_step=0; hybrid_step!=GlobalC::exx_global.info.hybrid_step; ++hybrid_step )
 				{
 					GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
-					GlobalC::exx_lcao.cal_exx_elec();
+					GlobalC::exx_lcao.cal_exx_elec(wfc_dm_2d.dm_gamma, wfc_dm_2d.dm_k);
 					
 					ELEC_scf es;
 					es.scf(istep-1, wfc_dm_2d.wfc_gamma, wfc_dm_2d.dm_gamma, wfc_dm_2d.wfc_k, wfc_dm_2d.dm_k);

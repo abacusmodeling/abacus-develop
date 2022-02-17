@@ -18,7 +18,9 @@
 class Exx_Abfs::Parallel::Communicate::DM3
 {
 public:
-	void cal_DM(const double threshold_D);
+    void cal_DM(const double threshold_D,
+        std::vector<ModuleBase::matrix> &dm_gamma,
+        std::vector<ModuleBase::ComplexMatrix> &dm_k);
 
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> DMr;
 

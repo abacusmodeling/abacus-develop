@@ -37,7 +37,8 @@ public:
 public:
 	void init();
 	void cal_exx_ions();
-	void cal_exx_elec();
+	void cal_exx_elec(std::vector<ModuleBase::matrix> &dm_gamma,
+        std::vector<ModuleBase::ComplexMatrix> &dm_k);
 	void cal_exx_elec_nscf();
 	void add_Hexx(const size_t ik, const double alpha) const;
 private:
