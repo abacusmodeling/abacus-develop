@@ -11,7 +11,6 @@
 #include "../src_lcao/local_orbital_charge.h"
 #include "../src_lcao/LCAO_matrix.h"
 #include "../src_lcao/global_fp.h"
-#include "../src_lcao/wfc_dm_2d.h"
 #include "../module_neighbor/sltk_atom_arrange.h"//qifeng-2019-01-21
 #endif
 #include "../module_base/blas_connector.h"
@@ -226,27 +225,6 @@ void energy::perform_dos( std::vector<ModuleBase::matrix> &wfc_gamma,
 		const int npoints = static_cast<int>(std::floor ( ( emax - emin ) / de_ev ));
 
 		int NUM=GlobalV::NLOCAL*npoints;
-		Wfc_Dm_2d D;
-        D.init();
-        
-        if (GlobalV::GAMMA_ONLY_LOCAL)
-		{
-			for(int in=0;in<GlobalV::NSPIN;in++)
-			{
-
-				D.wfc_gamma[in]=wfc_gamma[in];
-			}
-
-		}
-		else 
-		{
-
-			for(int in=0;in<GlobalC::kv.nks;in++)
-			{
-
-				D.wfc_k[in] = wfc_k[in];
-			}
-		}
 
 
 		const int np=npoints;
@@ -285,7 +263,7 @@ void energy::perform_dos( std::vector<ModuleBase::matrix> &wfc_gamma,
 				Mulk[0].create(GlobalC::ParaO.ncol,GlobalC::ParaO.nrow);
 
 
-				ModuleBase::matrix Dwf = D.wfc_gamma[is];
+				ModuleBase::matrix Dwf = wfc_gamma[is];
 				for (int i=0; i<GlobalV::NBANDS; ++i)		  
 				{     
 					ModuleBase::GlobalFunc::ZEROS(waveg, GlobalV::NLOCAL);
@@ -325,7 +303,7 @@ void energy::perform_dos( std::vector<ModuleBase::matrix> &wfc_gamma,
 
 							const int ir = GlobalC::ParaO.trace_loc_row[j];
 							const int ic = GlobalC::ParaO.trace_loc_col[i];
-							waveg[j] = Mulk[0](ic,ir)*D.wfc_gamma[is](ic,ir);
+							waveg[j] = Mulk[0](ic,ir)*wfc_gamma[is](ic,ir);
 							const double x = waveg[j].real();
 							BlasConnector::axpy(np , x,Gauss, 1,pdosk[is].c+j*pdosk[is].nc,1);
 						}
@@ -401,7 +379,7 @@ void energy::perform_dos( std::vector<ModuleBase::matrix> &wfc_gamma,
 						GlobalC::LNNR.folding_fixedH(ik);
 
 
-						ModuleBase::ComplexMatrix Dwfc = conj(D.wfc_k[ik]);
+						ModuleBase::ComplexMatrix Dwfc = conj(wfc_k[ik]);
 
 						for (int i=0; i<GlobalV::NBANDS; ++i)		  
 						{     
@@ -447,7 +425,7 @@ void energy::perform_dos( std::vector<ModuleBase::matrix> &wfc_gamma,
 									const int ir = GlobalC::ParaO.trace_loc_row[j];
 									const int ic = GlobalC::ParaO.trace_loc_col[i];
 
-									waveg[j] = Mulk[0](ic,ir)*D.wfc_k[ik](ic,ir);
+									waveg[j] = Mulk[0](ic,ir)*wfc_k[ik](ic,ir);
 									const double x = waveg[j].real();
 									BlasConnector::axpy(np , x,Gauss, 1,pdosk[is].c+j*pdosk[is].nc,1);
 

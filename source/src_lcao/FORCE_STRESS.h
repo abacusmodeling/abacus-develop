@@ -43,7 +43,10 @@ class Force_Stress_LCAO
 		const bool isstress, 
 		const bool istestf, 
         const bool istests,
-        Wfc_Dm_2d &wfc_dm_2d,
+        vector<ModuleBase::matrix>& wfc_gamma,
+        vector<ModuleBase::matrix>& dm_gamma,
+        vector<ModuleBase::ComplexMatrix>& wfc_k,
+        vector<ModuleBase::ComplexMatrix>& dm_k,
         ModuleBase::matrix& fcs,
 		ModuleBase::matrix &scs);
 
@@ -59,7 +62,10 @@ class Force_Stress_LCAO
 		const bool isGammaOnly,
 		const bool isforce,
         const bool isstress,
-        Wfc_Dm_2d &wfc_dm_2d,
+        vector<ModuleBase::matrix>& wfc_gamma,
+        vector<ModuleBase::matrix>& dm_gamma,
+        vector<ModuleBase::ComplexMatrix>& wfc_k,
+        vector<ModuleBase::ComplexMatrix>& dm_k,
         ModuleBase::matrix& foverlap,
 		ModuleBase::matrix &ftvnl_dphi,
 		ModuleBase::matrix &fvnl_dbeta,	
@@ -73,6 +79,8 @@ class Force_Stress_LCAO
 #else
 		ModuleBase::matrix& svl_dphi);
 #endif
+    
+
 
 	void calStressPwPart(
 		ModuleBase::matrix &sigmadvl,

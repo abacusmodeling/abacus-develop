@@ -17,7 +17,8 @@ Force_LCAO_gamma::~Force_LCAO_gamma ()
 void Force_LCAO_gamma::ftable_gamma (
 	const bool isforce,
     const bool isstress,
-    Wfc_Dm_2d& wfc_dm_2d,
+    vector<ModuleBase::matrix>& wfc_gamma,
+    vector<ModuleBase::matrix>& dm_gamma,
     ModuleBase::matrix& foverlap,
 	ModuleBase::matrix& ftvnl_dphi,
 	ModuleBase::matrix& fvnl_dbeta,	
@@ -40,24 +41,24 @@ void Force_LCAO_gamma::ftable_gamma (
     this->allocate_gamma();
 
     // calculate the 'energy density matrix' here.
-    this->cal_foverlap(isforce, isstress, wfc_dm_2d, foverlap, soverlap);
+    this->cal_foverlap(isforce, isstress, wfc_gamma, foverlap, soverlap);
 
-    this->cal_ftvnl_dphi(wfc_dm_2d.dm_gamma, isforce, isstress, ftvnl_dphi, stvnl_dphi);
-    this->calFvnlDbeta(wfc_dm_2d.dm_gamma, isforce, isstress, fvnl_dbeta, svnl_dbeta, GlobalV::vnl_method);
-    this->cal_fvl_dphi(wfc_dm_2d.dm_gamma, isforce, isstress, fvl_dphi, svl_dphi);
+    this->cal_ftvnl_dphi(dm_gamma, isforce, isstress, ftvnl_dphi, stvnl_dphi);
+    this->calFvnlDbeta(dm_gamma, isforce, isstress, fvnl_dbeta, svnl_dbeta, GlobalV::vnl_method);
+    this->cal_fvl_dphi(dm_gamma, isforce, isstress, fvl_dphi, svl_dphi);
     
     //caoyu add for DeePKS
 #ifdef __DEEPKS
     if (GlobalV::deepks_scf)
     {
-		GlobalC::ld.cal_projected_DM(wfc_dm_2d.dm_gamma[0],
+		GlobalC::ld.cal_projected_DM(dm_gamma[0],
             GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
             GlobalC::ParaO);
     	GlobalC::ld.cal_descriptor();
         GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
-        GlobalC::ld.cal_f_delta_gamma(wfc_dm_2d.dm_gamma[0],
+        GlobalC::ld.cal_f_delta_gamma(dm_gamma[0],
             GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
