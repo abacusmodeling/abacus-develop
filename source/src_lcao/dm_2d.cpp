@@ -103,7 +103,7 @@ void Local_Orbital_Charge::cal_dm(const ModuleBase::matrix& wg,
 //for multi-k
 void Local_Orbital_Charge::cal_dm(const ModuleBase::matrix& wg,    // wg(ik,ib), cal all dm 
     std::vector<ModuleBase::ComplexMatrix>& wfc_k,
-    std::vector<ModuleBase::ComplexMatrix> &dm_k_in)
+    std::vector<ModuleBase::ComplexMatrix> &dm_k)
 {
 	ModuleBase::TITLE("Local_Orbital_Charge", "cal_dm");
 	
@@ -140,7 +140,7 @@ void Local_Orbital_Charge::cal_dm(const ModuleBase::matrix& wg,    // wg(ik,ib),
         const double one_float=1.0, zero_float=0.0;
         const int one_int=1;
         const char N_char='N', T_char='T';
-        dm_k_in[ik].create( wfc_k[ik].nr, wfc_k[ik].nc );
+        dm_k[ik].create( wfc_k[ik].nr, wfc_k[ik].nc );
     #ifdef __MPI
         pzgemm_(
             &N_char, &T_char,
@@ -149,7 +149,7 @@ void Local_Orbital_Charge::cal_dm(const ModuleBase::matrix& wg,    // wg(ik,ib),
             wg_wfc.c, &one_int, &one_int, GlobalC::ParaO.desc,
             wfc_k[ik].c, &one_int, &one_int, GlobalC::ParaO.desc,
             &zero_float,
-            dm_k_in[ik].c, &one_int, &one_int, GlobalC::ParaO.desc);
+            dm_k[ik].c, &one_int, &one_int, GlobalC::ParaO.desc);
     #else
         const int lda=GlobalV::NLOCAL;
         const complex<double> one_complex={1.0,0.0}, zero_complex={0.0,0.0};
@@ -160,14 +160,14 @@ void Local_Orbital_Charge::cal_dm(const ModuleBase::matrix& wg,    // wg(ik,ib),
             wg_wfc.c, &lda,
             wfc_k[ik].c, &lda,
             &zero_complex,
-            dm_k_in[ik].c, &lda);
+            dm_k[ik].c, &lda);
     #endif
     }
 	
 	#ifdef TEST_DIAG
     static int istep=0;
     std::ofstream ofs("dm_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
-    ofs<<dm_k_in<<std::endl;
+    ofs<<dm_k<<std::endl;
 	#endif
 
 	return;
@@ -175,12 +175,12 @@ void Local_Orbital_Charge::cal_dm(const ModuleBase::matrix& wg,    // wg(ik,ib),
 
 //must cal cal_dm first
 void Local_Orbital_Charge::cal_dm_R(
-    std::vector<ModuleBase::ComplexMatrix> &dm_k_in,
+    std::vector<ModuleBase::ComplexMatrix> &dm_k,
     Record_adj& ra,    //ra.for_2d();
     double** dm2d)
 {
     ModuleBase::TITLE("Local_Orbital_Charge", "cal_dm_R");
-    assert(dm_k_in[0].nr > 0 && dm_k_in[0].nc > 0); //must call cal_dm first
+    assert(dm_k[0].nr > 0 && dm_k[0].nc > 0); //must call cal_dm first
 
     for (int ik = 0;ik < GlobalC::kv.nks;++ik)
     {
@@ -225,7 +225,7 @@ void Local_Orbital_Charge::cal_dm_R(
                             int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
                             if (nu < 0)continue;
                             //Caution: output of pzgemm_ : col first in **each** proc itself !!
-                            dm2d[ispin][irrstart + count] += (dm_k_in[ik](nu, mu) * phase).real();
+                            dm2d[ispin][irrstart + count] += (dm_k[ik](nu, mu) * phase).real();
                             ++count;
                         }//iw2
                     }//iw1
