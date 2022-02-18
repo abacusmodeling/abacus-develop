@@ -88,6 +88,10 @@ class XC_Functional
 	static void gcc_spin(double rho, double &zeta, double grho, double &sc,
             double &v1cup, double &v1cdw, double &v2c);
 
+	static void gcxc_spin_libxc(double rhoup, double rhodw, 
+		ModuleBase::Vector3<double> gdr1, ModuleBase::Vector3<double> gdr2,
+        double &sxc, double &v1xcup, double &v1xcdw, double &v2xcup, double &v2xcdw, double &v2xcud);
+
 	static void gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v);
 	static void grad_rho( const std::complex<double> *rhog, ModuleBase::Vector3<double> *gdr );
 	static void grad_wfc( const std::complex<double> *rhog, const int ik, std::complex<double> **grad, const int npw );

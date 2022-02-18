@@ -138,102 +138,116 @@ void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 			if(arho > epsr)
 			{
 				grho2a = gdr1[ir].norm2();
-				//if( grho2a > epsg )
-				//{
-					if( rhotmp1[ir] >= 0.0 ) segno = 1.0;
-					if( rhotmp1[ir] < 0.0 ) segno = -1.0;
+
+				if( rhotmp1[ir] >= 0.0 ) segno = 1.0;
+				if( rhotmp1[ir] < 0.0 ) segno = -1.0;
+				
+				if(use_libxc)
+				{
+					XC_Functional::gcxc_libxc( arho, grho2a, sxc, v1xc, v2xc );
+					v(0,ir) += ModuleBase::e2 * v1xc;
+					h1[ir] = ModuleBase::e2 * 2.0 * v2xc * gdr1[ir];
+					etxcgc += ModuleBase::e2* sxc * arho * segno;
+					vtxcgc += ModuleBase::e2* v1xc * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] );
+				}
+				else
+				{
+					XC_Functional::gcxc( arho, grho2a, sxc, v1xc, v2xc);
+					// first term of the gradient correction:
+					// D(rho*Exc)/D(rho)
+					v(0, ir) += ModuleBase::e2 * v1xc;
 					
-					if(use_libxc)
-					{
-						XC_Functional::gcxc_libxc( arho, grho2a, sxc, v1xc, v2xc );
-						v(0,ir) = ModuleBase::e2 * v1xc;
-						h1[ir] = ModuleBase::e2 * 2.0 * v2xc * gdr1[ir];
-						etxcgc += ModuleBase::e2* sxc * arho * segno;
-						vtxcgc += ModuleBase::e2* v1xc * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] );
-					}
-					else
-					{
-						XC_Functional::gcxc( arho, grho2a, sxc, v1xc, v2xc);
-						// first term of the gradient correction:
-						// D(rho*Exc)/D(rho)
-						v(0, ir) += ModuleBase::e2 * v1xc;
-						
-						// h contains
-						// D(rho*Exc) / D(|grad rho|) * (grad rho) / |grad rho|
-						h1[ir] = ModuleBase::e2 * v2xc * gdr1[ir];
-						
-						vtxcgc += ModuleBase::e2* v1xc * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] );
-						etxcgc += ModuleBase::e2* sxc  * segno;
-					}
-				//}
+					// h contains
+					// D(rho*Exc) / D(|grad rho|) * (grad rho) / |grad rho|
+					h1[ir] = ModuleBase::e2 * v2xc * gdr1[ir];
+					
+					vtxcgc += ModuleBase::e2* v1xc * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] );
+					etxcgc += ModuleBase::e2* sxc  * segno;
+				}
 			} // end arho > epsr
 		}
 	}// end nspin0 == 1
 	else // spin polarized case
 	{
-		double v1cup = 0.0;
-		double v1cdw = 0.0;
-		double v2cup = 0.0;
-		double v2cdw = 0.0;
-		double v1xup = 0.0;
-		double v1xdw = 0.0;
-		double v2xup = 0.0;
-		double v2xdw = 0.0;
-		double v2cud = 0.0;
-		double v2c = 0.0;
-		double sx = 0.0;
-		double sc = 0.0;
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			double rh = rhotmp1[ir] + rhotmp2[ir]; 
-			grho2a = gdr1[ir].norm2();
-			grho2b = gdr2[ir].norm2();
-			XC_Functional::gcx_spin(rhotmp1[ir], rhotmp2[ir], grho2a, grho2b,
-				sx, v1xup, v1xdw, v2xup, v2xdw);
-			
-			if(rh > epsr)
+			if(use_libxc)
 			{
-				if(igcc_is_lyp)
-				{
-					ModuleBase::WARNING_QUIT("XC_Functional","igcc_is_lyp is not available now.");
-				}
-				else
-				{
-					double zeta = ( rhotmp1[ir] - rhotmp2[ir] ) / rh;
-					if(GlobalV::NSPIN==4&&(GlobalV::DOMAG||GlobalV::DOMAG_Z)) zeta = fabs(zeta) * neg[ir];
-					const double grh2 = (gdr1[ir]+gdr2[ir]).norm2();
-					XC_Functional::gcc_spin(rh, zeta, grh2, sc, v1cup, v1cdw, v2c);
-					v2cup = v2c;
-					v2cdw = v2c;
-					v2cud = v2c;
-				}
+				double sxc, v1xcup, v1xcdw, v2xcup, v2xcdw, v2xcud;
+				XC_Functional::gcxc_spin_libxc(rhotmp1[ir], rhotmp2[ir], gdr1[ir], gdr2[ir], 
+					sxc, v1xcup, v1xcdw, v2xcup, v2xcdw, v2xcud);
+				// first term of the gradient correction : D(rho*Exc)/D(rho)
+				v(0,ir) += ModuleBase::e2 * v1xcup;
+				v(1,ir) += ModuleBase::e2 * v1xcdw;
+			
+				// h contains D(rho*Exc)/D(|grad rho|) * (grad rho) / |grad rho|
+				h1[ir] += ModuleBase::e2 * ( v2xcup * gdr1[ir] + v2xcud * gdr2[ir] );
+				h2[ir] += ModuleBase::e2 * ( v2xcdw * gdr2[ir] + v2xcud * gdr1[ir] );
+
+				vtxcgc = vtxcgc + ModuleBase::e2 * v1xcup * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] * fac );
+				vtxcgc = vtxcgc + ModuleBase::e2 * v1xcdw * ( rhotmp2[ir] - GlobalC::CHR.rho_core[ir] * fac );
+				etxcgc = etxcgc + ModuleBase::e2 * sxc;
 			}
 			else
 			{
-				sc = 0.0;
-				v1cup = 0.0;
-				v1cdw = 0.0;
-				v2c = 0.0;
-				v2cup = 0.0;
-				v2cdw = 0.0;
-				v2cud = 0.0;
+				double v1cup = 0.0;
+				double v1cdw = 0.0;
+				double v2cup = 0.0;
+				double v2cdw = 0.0;
+				double v1xup = 0.0;
+				double v1xdw = 0.0;
+				double v2xup = 0.0;
+				double v2xdw = 0.0;
+				double v2cud = 0.0;
+				double v2c = 0.0;
+				double sx = 0.0;
+				double sc = 0.0;
+				double rh = rhotmp1[ir] + rhotmp2[ir];
+				grho2a = gdr1[ir].norm2();
+				grho2b = gdr2[ir].norm2();
+				XC_Functional::gcx_spin(rhotmp1[ir], rhotmp2[ir], grho2a, grho2b,
+					sx, v1xup, v1xdw, v2xup, v2xdw);
+				
+				if(rh > epsr)
+				{
+					if(igcc_is_lyp)
+					{
+						ModuleBase::WARNING_QUIT("XC_Functional","igcc_is_lyp is not available now.");
+					}
+					else
+					{
+						double zeta = ( rhotmp1[ir] - rhotmp2[ir] ) / rh;
+						if(GlobalV::NSPIN==4&&(GlobalV::DOMAG||GlobalV::DOMAG_Z)) zeta = fabs(zeta) * neg[ir];
+						const double grh2 = (gdr1[ir]+gdr2[ir]).norm2();
+						XC_Functional::gcc_spin(rh, zeta, grh2, sc, v1cup, v1cdw, v2c);
+						v2cup = v2c;
+						v2cdw = v2c;
+						v2cud = v2c;
+					}
+				}
+				else
+				{
+					sc = 0.0;
+					v1cup = 0.0;
+					v1cdw = 0.0;
+					v2c = 0.0;
+					v2cup = 0.0;
+					v2cdw = 0.0;
+					v2cud = 0.0;
+				}
+
+				// first term of the gradient correction : D(rho*Exc)/D(rho)
+				v(0,ir) = v(0,ir) + ModuleBase::e2 * ( v1xup + v1cup );
+				v(1,ir) = v(1,ir) + ModuleBase::e2 * ( v1xdw + v1cdw );
+			
+				// h contains D(rho*Exc)/D(|grad rho|) * (grad rho) / |grad rho|
+				h1[ir] = ModuleBase::e2 * ( ( v2xup + v2cup ) * gdr1[ir] + v2cud * gdr2[ir] );
+				h2[ir] = ModuleBase::e2 * ( ( v2xdw + v2cdw ) * gdr2[ir] + v2cud * gdr1[ir] );
+
+				vtxcgc = vtxcgc + ModuleBase::e2 * ( v1xup + v1cup ) * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] * fac );
+				vtxcgc = vtxcgc + ModuleBase::e2 * ( v1xdw + v1cdw ) * ( rhotmp2[ir] - GlobalC::CHR.rho_core[ir] * fac );
+				etxcgc = etxcgc + ModuleBase::e2 * ( sx + sc );
 			}
-
-			// first term of the gradient correction : D(rho*Exc)/D(rho)
-			v(0,ir) = v(0,ir) + ModuleBase::e2 * ( v1xup + v1cup );
-			v(1,ir) = v(1,ir) + ModuleBase::e2 * ( v1xdw + v1cdw );
-
-//			continue; //mohan tmp
-			
-			// h contains D(rho*Exc)/D(|grad rho|) * (grad rho) / |grad rho|
-			h1[ir] = ModuleBase::e2 * ( ( v2xup + v2cup ) * gdr1[ir] + v2cud * gdr2[ir] );
-			h2[ir] = ModuleBase::e2 * ( ( v2xdw + v2cdw ) * gdr2[ir] + v2cud * gdr1[ir] );
-
-			vtxcgc = vtxcgc + ModuleBase::e2 * ( v1xup + v1cup ) * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] * fac );
-			vtxcgc = vtxcgc + ModuleBase::e2 * ( v1xdw + v1cdw ) * ( rhotmp2[ir] - GlobalC::CHR.rho_core[ir] * fac );
-			etxcgc = etxcgc + ModuleBase::e2 * ( sx + sc );
-			
-
 		}// end ir
 
 	}
