@@ -264,7 +264,6 @@ write_HS.o\
 write_HS_R.o\
 write_dm.o\
 write_wfc_realspace.o\
-potential_libxc.o \
 potential_libxc_meta.o \
 efield.o \
 magnetism.o\

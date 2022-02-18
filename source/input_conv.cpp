@@ -571,16 +571,6 @@ void Input_Conv::Convert(void)
 	// mohan add 2021-02-16
 	berryphase::berry_phase_flag = INPUT.berry_phase;
 
-	// wenfei 2021-7-28
-	if (GlobalV::DFT_FUNCTIONAL == "scan")
-	{
-		if (GlobalV::BASIS_TYPE != "pw")
-		{
-			ModuleBase::WARNING_QUIT("Input_conv", "add metaGGA for pw first");
-		}
-		GlobalV::DFT_META = 1;
-	}
-
 	ModuleBase::timer::tick("Input_Conv", "Convert");
 //-----------------------------------------------
 // caoyu add for DeePKS

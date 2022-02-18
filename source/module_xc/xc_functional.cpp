@@ -110,12 +110,12 @@ void XC_Functional::set_xc_type(const std::string xc_func_in)
         func_id.push_back(XC_MGGA_X_SCAN);
         func_id.push_back(XC_MGGA_C_SCAN);
         func_type = 3;
-		GlobalV::DFT_META = 1;
 	}
    	else if( xc_func == "PBE0")
 	{
         func_id.push_back(XC_HYB_GGA_XC_PBEH);
         func_type = 4;
+        use_libxc = false;
 	}
     else if( xc_func == "HF" || xc_func == "OPT_ORB" ||  xc_func == "NONE")
     {
@@ -132,15 +132,25 @@ void XC_Functional::set_xc_type(const std::string xc_func_in)
         std::cout << "functional name not recognized!" << std::endl;
     }
 
-	if (func_id[0] == 110)
+	if (func_id[0] == XC_GGA_X_OPTX)
 	{
 		std::cerr << "\n OPTX untested please test,";
 	}
+
+    if(func_type ==3 && GlobalV::BASIS_TYPE != "pw")
+    {
+        ModuleBase::WARNING_QUIT("set_xc_type","mGGA not realized for LCAO yet");
+    }
+
+#ifndef USE_LIBXC
+    use_libxc = false;
+#endif
+
 }
 
 void XC_Functional::xc_libxc(const double &rho, double &exc, double &vxc)
 {
-
+#ifdef USE_LIBXC
     double e,v;
     exc = vxc = 0.00;
 
@@ -157,7 +167,9 @@ void XC_Functional::xc_libxc(const double &rho, double &exc, double &vxc)
         vxc += v;
     }
 	return;
+#endif 
 }
+
 
 void XC_Functional::xc(const double &rho, double &exc, double &vxc)
 {
@@ -220,7 +232,7 @@ void XC_Functional::xc(const double &rho, double &exc, double &vxc)
 void XC_Functional::xc_spin_libxc(const double &rhoup, const double &rhodw,
 		double &exc, double &vxcup, double &vxcdw)
 {
-
+#ifdef USE_LIBXC
     double e, vup, vdw;
     double *rho_ud, *vxc_ud;
     exc = vxcup = vxcdw = 0.0;
@@ -247,6 +259,7 @@ void XC_Functional::xc_spin_libxc(const double &rhoup, const double &rhodw,
 
     delete[] rho_ud;
     delete[] vxc_ud;
+#endif 
 }
 
 void XC_Functional::xc_spin(const double &rho, const double &zeta,
@@ -1229,7 +1242,7 @@ void XC_Functional::gcxc(const double &rho, const double &grho, double &sxc,
 void XC_Functional::gcxc_libxc(const double &rho, const double &grho, double &sxc,
           double &v1xc, double &v2xc)
 {
-
+#ifdef USE_LIBXC
     double s,v1,v2;
     sxc = v1xc = v2xc = 0.0;
 
@@ -1247,6 +1260,7 @@ void XC_Functional::gcxc_libxc(const double &rho, const double &grho, double &sx
         v2xc += v2;
     }
 	return;
+#endif
 }
 
 void XC_Functional::optx(const double rho, const double grho, double &sx, double &v1x, double &v2x)
@@ -1589,6 +1603,7 @@ void XC_Functional::gcxc_spin_libxc(double rhoup, double rhodw,
         ModuleBase::Vector3<double> gdr1, ModuleBase::Vector3<double> gdr2,
         double &sxc, double &v1xcup, double &v1xcdw, double &v2xcup, double &v2xcdw, double &v2xcud)
 {
+#ifdef USE_LIBXC
 	std::vector<xc_func_type> funcs = init_func(XC_POLARIZED);
     double *rho, *grho, *v1xc, *v2xc, *sgn, s;
     sxc = v1xcup = v1xcdw = 0.0;
@@ -1637,7 +1652,8 @@ void XC_Functional::gcxc_spin_libxc(double rhoup, double rhodw,
     delete[] sgn;
 
     return;
-}
+#endif
+} 
 
 //-----------------------------------------------------------------------
 void XC_Functional::gcx_spin(double rhoup, double rhodw, double grhoup2, double grhodw2,
@@ -2084,3 +2100,47 @@ void XC_Functional::pbec_spin(double rho, double zeta, double grho, const int &i
     v2c = ddh0;
     return;
 } // end subroutine pbec_spin
+
+#ifdef USE_LIBXC
+std::vector<xc_func_type> XC_Functional::init_func(const int xc_polarized)
+{
+	// 'funcs' is the return value
+	std::vector<xc_func_type> funcs;
+
+	//-------------------------------------------
+	// define a function named 'add_func', which 
+	// initialize a functional according to its ID
+	//-------------------------------------------
+	auto add_func = [&]( const int func_id )
+	{
+		funcs.push_back({});
+		// 'xc_func_init' is defined in Libxc
+		xc_func_init( &funcs.back(), func_id, xc_polarized );
+	};
+
+	for(int id : func_id)
+	{
+		if( id == 406 ) // PBE0
+		{
+			add_func( XC_HYB_GGA_XC_PBEH );		
+			double parameter_hse[3] = { GlobalC::exx_global.info.hybrid_alpha, 
+				GlobalC::exx_global.info.hse_omega, 
+				GlobalC::exx_global.info.hse_omega };
+			xc_func_set_ext_params(&funcs.back(), parameter_hse);	
+		}
+		else if( id == 428 ) // HSE06 hybrid functional
+		{
+			add_func( XC_HYB_GGA_XC_HSE06 );	
+			double parameter_hse[3] = { GlobalC::exx_global.info.hybrid_alpha, 
+				GlobalC::exx_global.info.hse_omega, 
+				GlobalC::exx_global.info.hse_omega };
+			xc_func_set_ext_params(&funcs.back(), parameter_hse);
+		}
+		else
+		{
+			add_func( id );
+		}
+	}
+	return funcs;
+}
+#endif

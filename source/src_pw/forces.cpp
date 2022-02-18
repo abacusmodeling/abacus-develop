@@ -6,7 +6,6 @@
 // new
 #include "../module_xc/xc_functional.h"
 #include "../module_base/math_integral.h"
-#include "../module_xc/potential_libxc.h"
 #include "../src_parallel/parallel_reduce.h"
 #include "../module_base/timer.h"
 
@@ -561,13 +560,14 @@ void Forces::cal_force_cc(ModuleBase::matrix& forcecc)
 	
     ModuleBase::matrix v(GlobalV::NSPIN,GlobalC::pw.nrxx);
 
-	#ifdef USE_LIBXC
-	if(GlobalV::DFT_META)
+	if(XC_Functional::get_func_type() == 3)
 	{
+#ifdef USE_LIBXC
     	const auto etxc_vtxc_v = XC_Functional::v_xc_meta(GlobalC::CHR.rho, GlobalC::CHR.rho_core, GlobalC::CHR.kin_r);
         GlobalC::en.etxc = std::get<0>(etxc_vtxc_v);
         GlobalC::en.vtxc = std::get<1>(etxc_vtxc_v);
         v = std::get<2>(etxc_vtxc_v);
+#endif
 	}
 	else
 	{	
@@ -576,12 +576,6 @@ void Forces::cal_force_cc(ModuleBase::matrix& forcecc)
         GlobalC::en.vtxc = std::get<1>(etxc_vtxc_v);
 	    v = std::get<2>(etxc_vtxc_v);
 	}
-	#else
-    const auto etxc_vtxc_v = XC_Functional::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, GlobalC::CHR.rho, GlobalC::CHR.rho_core);
-    GlobalC::en.etxc = std::get<0>(etxc_vtxc_v);
-    GlobalC::en.vtxc = std::get<1>(etxc_vtxc_v);
-	v = std::get<2>(etxc_vtxc_v);
-	#endif
 
 	const ModuleBase::matrix vxc = v;
     std::complex<double> * psiv = new std::complex<double> [GlobalC::pw.nrxx];

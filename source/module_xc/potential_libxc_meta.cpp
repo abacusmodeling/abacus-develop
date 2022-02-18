@@ -6,7 +6,6 @@
 
 #ifdef USE_LIBXC
 
-#include "potential_libxc.h"
 #include "../src_pw/global.h"
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
@@ -92,9 +91,6 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> XC_Functional::v_xc_m
 	vector<vector<ModuleBase::Vector3<double>>> h;
 	vector<vector<double>> kedtaur;
 
-	//ifstream ifs_rho("rho");
-	//ifstream ifs_tau("tau");
-
 	//rho : from double** to vector<double>
 	rho.resize(GlobalV::NSPIN);
 	for( int is=0; is!=GlobalV::NSPIN; ++is )
@@ -103,7 +99,6 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> XC_Functional::v_xc_m
 		for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 		{
 			rho[is][ir] = rho_in[is][ir] + (1.0/GlobalV::NSPIN)*rho_core_in[ir]; 
-			//ifs_rho >> rho[is][ir];
 		}
 	}
 
@@ -128,7 +123,6 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> XC_Functional::v_xc_m
 			for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 			{
 				kin_r[is][ir] = kin_r_in[is][ir];
-				//ifs_tau >> kin_r[is][ir];
 			}
 		}	
 	}

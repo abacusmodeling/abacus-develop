@@ -532,7 +532,7 @@ void Hamilt_PW::h_psi(const std::complex<double> *psi_in, std::complex<double> *
 	// (4) the metaGGA part
 	//------------------------------------
 	ModuleBase::timer::tick("Hamilt_PW","meta");
-	if(GlobalV::DFT_META)
+	if(XC_Functional::get_func_type() == 3)
 	{
 		tmhpsi = hpsi;
 		tmpsi_in = psi_in;

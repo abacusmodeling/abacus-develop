@@ -66,7 +66,7 @@ void Stress_PW::cal_stress(ModuleBase::matrix& sigmatot)
        sigmaxc(i,i) = - (GlobalC::en.etxc - GlobalC::en.vtxc) / GlobalC::ucell.omega;
     }
     stress_gga(sigmaxc);
-    if(GlobalV::DFT_META) stress_mgga(sigmaxc);
+    if(XC_Functional::get_func_type() == 3) stress_mgga(sigmaxc);
 
     //local contribution
     stress_loc(sigmaloc, 1);

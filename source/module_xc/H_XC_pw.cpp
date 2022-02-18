@@ -15,7 +15,7 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc
     ModuleBase::timer::tick("H_XC_pw","v_xc");
 
 	#ifndef USE_LIBXC
-	if(GlobalV::DFT_META)
+	if(XC_Functional::get_func_type() == 3)
 	{
 		ModuleBase::WARNING_QUIT("Potential::v_of_rho","to use metaGGA, please link LIBXC");
 	}

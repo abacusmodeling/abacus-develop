@@ -90,7 +90,6 @@ void Stress_Func::stress_gga(ModuleBase::matrix& sigma)
 
 	if(nspin_in==1||nspin_in==4)
 	{
-		//double segno;
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
 			const double arho = std::abs( rhotmp1[ir] );
@@ -99,9 +98,7 @@ void Stress_Func::stress_gga(ModuleBase::matrix& sigma)
 				grho2a = gdr1[ir].norm2();
 				if( grho2a > epsg )
 				{
-					//if( rhotmp1[ir] >= 0.0 ) segno = 1.0;
-					//if( rhotmp1[ir] < 0.0 ) segno = -1.0;
-					if(GlobalV::DFT_META)
+					if(XC_Functional::get_func_type() == 3)
 					{
 #ifdef USE_LIBXC
 						atau = GlobalC::CHR.kin_r[0][ir]/2.0;
@@ -141,7 +138,7 @@ void Stress_Func::stress_gga(ModuleBase::matrix& sigma)
 		double v2c = 0.0;
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			if(GlobalV::DFT_META)
+			if(XC_Functional::get_func_type() == 3)
 			{
 				ModuleBase::WARNING_QUIT("stress_gga","stress mGGA not ready for nspin=2");
 			}
