@@ -69,8 +69,10 @@ class Charge_Pulay: public Charge_Mixing
 	void Modified_Broyden_mixing();
 
 #ifdef __EXX
-	friend class Exx_Abfs::DM;
-	friend class Exx_Abfs::Parallel::Communicate::Hexx;
+    friend class Exx_Abfs::DM;
+    #ifdef __MPI
+    friend class Exx_Abfs::Parallel::Communicate::Hexx;
+    #endif
 #endif
 
 };
