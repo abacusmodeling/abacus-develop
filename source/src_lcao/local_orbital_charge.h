@@ -48,7 +48,7 @@ class Local_Orbital_Charge
 	double** DM_R;
 
 	// whether to printout density matrix
-	int out_dm; // output density matrix or not.
+    static int out_dm; // output density matrix or not.
 
 	void write_dm(const int &is, const int &iter, const std::string &fn, const int &precision);
 

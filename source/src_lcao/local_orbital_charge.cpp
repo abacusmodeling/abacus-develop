@@ -16,6 +16,8 @@ extern "C"
     int Cblacs_pnum(int icontxt, int prow, int pcol);
 }
 
+int Local_Orbital_Charge::out_dm = 0;
+
 Local_Orbital_Charge::Local_Orbital_Charge()
 {
     // for gamma algorithms.
@@ -25,9 +27,6 @@ Local_Orbital_Charge::Local_Orbital_Charge()
 
     // for k-dependent algorithms.
     this->init_DM_R = false;
-
-	// whether to printout density matrix
-    this->out_dm = 0;
 
     //xiaohui add 2014-06-19
     //band_local = nullptr;
