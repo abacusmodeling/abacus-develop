@@ -150,7 +150,7 @@ void LOOP_ions::opt_ions()
 
 		// solve electronic structures in terms of LCAO
 		// mohan add 2021-02-09
-		LOE.solve_elec_stru(this->istep, this->wfc_gamma, GlobalC::LOC.dm_gamma, this->wfc_k, GlobalC::LOC.dm_k);
+		LOE.solve_elec_stru(this->istep, this->wfc_gamma, this->wfc_k, this->LOC);
 
 
 		time_t eend = time(NULL);
@@ -194,7 +194,7 @@ void LOOP_ions::opt_ions()
         {
             if(GlobalV::GAMMA_ONLY_LOCAL)
             {
-                GlobalC::ld.cal_projected_DM(GlobalC::LOC.dm_gamma[0],
+                GlobalC::ld.cal_projected_DM(this->LOC.dm_gamma[0],
                     GlobalC::ucell,
                     GlobalC::ORB,
                     GlobalC::GridD,
@@ -202,7 +202,7 @@ void LOOP_ions::opt_ions()
             }
             else
             {
-                GlobalC::ld.cal_projected_DM_k(GlobalC::LOC.dm_k,
+                GlobalC::ld.cal_projected_DM_k(this->LOC.dm_k,
                     GlobalC::ucell,
                     GlobalC::ORB,
                     GlobalC::GridD,
@@ -218,11 +218,11 @@ void LOOP_ions::opt_ions()
             {
                 if(GlobalV::GAMMA_ONLY_LOCAL)
                 {
-                    GlobalC::ld.cal_e_delta_band(GlobalC::LOC.dm_gamma, GlobalC::ParaO);
+                    GlobalC::ld.cal_e_delta_band(this->LOC.dm_gamma, GlobalC::ParaO);
                 }
                 else
                 {
-                    GlobalC::ld.cal_e_delta_band_k(GlobalC::LOC.dm_k, GlobalC::ParaO, GlobalC::kv.nks);
+                    GlobalC::ld.cal_e_delta_band_k(this->LOC.dm_k, GlobalC::ParaO, GlobalC::kv.nks);
                 }
                 std::cout << "E_delta_band = " << std::setprecision(8) << GlobalC::ld.e_delta_band << " Ry" << " = " << std::setprecision(8) << GlobalC::ld.e_delta_band * ModuleBase::Ry_to_eV << " eV" << std::endl;
                 std::cout << "E_delta_NN= "<<std::setprecision(8) << GlobalC::ld.E_delta << " Ry" << " = "<<std::setprecision(8)<<GlobalC::ld.E_delta*ModuleBase::Ry_to_eV<<" eV"<<std::endl;
@@ -315,8 +315,7 @@ bool LOOP_ions::force_stress(
     FSL.allocate();
     FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS,
         GlobalV::TEST_FORCE, GlobalV::TEST_STRESS,
-        this->wfc_gamma, GlobalC::LOC.dm_gamma,
-         this->wfc_k, GlobalC::LOC.dm_k, fcs, scs);
+        this->wfc_gamma, this->wfc_k, this->LOC, fcs, scs);
 
 	//--------------------------------------------------
 	// only forces are needed, no stresses are needed
@@ -561,7 +560,7 @@ void LOOP_ions::final_scf(void)
     // this information is used to calculate
     // the force.
 
-	GlobalC::LOC.allocate_dm_wfc(GlobalC::GridT, this->wfc_gamma, this->wfc_k);
+	this->LOC.allocate_dm_wfc(GlobalC::GridT, this->wfc_gamma, this->wfc_k);
 
     GlobalC::UHM.set_lcao_matrices();
 	//------------------------------------------------------------------
@@ -585,7 +584,7 @@ void LOOP_ions::final_scf(void)
 
 
 	ELEC_scf es;
-	es.scf(0, wfc_gamma,GlobalC::LOC.dm_gamma, wfc_k, GlobalC::LOC.dm_k);
+	es.scf(0, wfc_gamma, wfc_k, this->LOC);
 
     if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
     {

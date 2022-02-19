@@ -5,6 +5,7 @@
 #include "../module_base/global_variable.h"
 #include "../module_base/matrix.h"
 #include "LCAO_matrix.h" 
+#include "src_lcao/local_orbital_charge.h"
 
 class Force_LCAO_gamma
 {
@@ -22,7 +23,7 @@ class Force_LCAO_gamma
 		const bool isforce,
         const bool isstress,
         vector<ModuleBase::matrix>& wfc_gamma,
-        vector<ModuleBase::matrix>& dm_gamma,
+        Local_Orbital_Charge &loc, 
         ModuleBase::matrix& foverlap,
 		ModuleBase::matrix& ftvnl_dphi,
 		ModuleBase::matrix& fvnl_dbeta,	
@@ -57,6 +58,7 @@ class Force_LCAO_gamma
 		const bool isforce, 
         const bool isstress,
         vector<ModuleBase::matrix>& wfc_gamma,
+        Local_Orbital_Charge &loc,
         ModuleBase::matrix& foverlap,
 		ModuleBase::matrix& soverlap);	
 

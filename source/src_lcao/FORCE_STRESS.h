@@ -44,9 +44,8 @@ class Force_Stress_LCAO
 		const bool istestf, 
         const bool istests,
         vector<ModuleBase::matrix>& wfc_gamma,
-        vector<ModuleBase::matrix>& dm_gamma,
         vector<ModuleBase::ComplexMatrix>& wfc_k,
-        vector<ModuleBase::ComplexMatrix>& dm_k,
+        Local_Orbital_Charge &loc,
         ModuleBase::matrix& fcs,
 		ModuleBase::matrix &scs);
 
@@ -63,9 +62,8 @@ class Force_Stress_LCAO
 		const bool isforce,
         const bool isstress,
         vector<ModuleBase::matrix>& wfc_gamma,
-        vector<ModuleBase::matrix>& dm_gamma,
         vector<ModuleBase::ComplexMatrix>& wfc_k,
-        vector<ModuleBase::ComplexMatrix>& dm_k,
+        Local_Orbital_Charge &loc, 
         ModuleBase::matrix& foverlap,
 		ModuleBase::matrix &ftvnl_dphi,
 		ModuleBase::matrix &fvnl_dbeta,	

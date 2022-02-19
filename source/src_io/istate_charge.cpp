@@ -7,10 +7,10 @@
 #include "../module_base/blas_connector.h"
 
 IState_Charge::IState_Charge(
-    std::vector<ModuleBase::matrix>* wfc_gamma_in,
-    std::vector<ModuleBase::matrix>* dm_gamma_in) :
-    wfc_gamma(wfc_gamma_in),
-    dm_gamma(dm_gamma_in)
+    std::vector<ModuleBase::matrix>& wfc_gamma_in,
+    Local_Orbital_Charge& loc_in) :
+    wfc_gamma(&wfc_gamma_in),
+    loc(&loc_in)
 {}
 
 IState_Charge::~IState_Charge(){}
@@ -120,7 +120,7 @@ void IState_Charge::begin(void)
 			// (1)
 			// This has been done once in LOOP_ions.
 			// but here we need to done for each band.
-			//GlobalC::LOC.allocate_gamma(GridT);	
+			//this->loc->allocate_gamma(GridT);	
 			
 			// (2) calculate the density matrix for a partuclar 
 			// band, whenever it is occupied or not.
@@ -136,7 +136,7 @@ void IState_Charge::begin(void)
 			
 			// (4) calculate charge density for a particular 
 			// band.
-   			GlobalC::UHM.GG.cal_rho(GlobalC::LOC.DM);
+   			GlobalC::UHM.GG.cal_rho(this->loc->DM);
 			GlobalC::CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09
 			std::stringstream ss;
 			std::stringstream ss1;
@@ -169,7 +169,7 @@ void IState_Charge::idmatrix(const int &ib)
 			if ( mu_local >= 0)
 			{
 				// set a pointer.
-				//double *alpha = GlobalC::LOC.DM[is][mu_local];
+				//double *alpha = this->loc->DM[is][mu_local];
 				for (int j=i; j<GlobalV::NLOCAL; j++)
 				{
 					const int nu_local = GlobalC::GridT.trace_lo[j];
@@ -224,21 +224,21 @@ void IState_Charge::idmatrix(const int &ib)
 			const double one_float=1.0, zero_float=0.0;
 			const int one_int=1;
 			const char N_char='N', T_char='T';
-			this->dm_gamma->at(is).create( wg_wfc.nr, wg_wfc.nc );
+			this->loc->dm_gamma.at(is).create( wg_wfc.nr, wg_wfc.nc );
 
 			pdgemm_(
 				&N_char, &T_char,
 				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalC::wf.wg.nc,
 				&one_float,
 				wg_wfc.c, &one_int, &one_int, GlobalC::ParaO.desc,
-				wfc_gamma->at(is).c, &one_int, &one_int, GlobalC::ParaO.desc,
+				this->wfc_gamma->at(is).c, &one_int, &one_int, GlobalC::ParaO.desc,
 				&zero_float,
-				dm_gamma->at(is).c, &one_int, &one_int, GlobalC::ParaO.desc);
+				this->loc->dm_gamma.at(is).c, &one_int, &one_int, GlobalC::ParaO.desc);
 		}
 
 		std::cout << " finished calc dm_2d : " << std::endl;
 
-		GlobalC::LOC.cal_dk_gamma_from_2D_pub();
+		this->loc->cal_dk_gamma_from_2D_pub();
 		
 		std::cout << " finished convert : " << std::endl;
 

@@ -35,10 +35,12 @@ Local_Orbital_Charge::Local_Orbital_Charge()
     sender_2D_index = nullptr;
     sender_size_process = nullptr;
     sender_displacement_process = nullptr;
+    sender_buffer = nullptr;
 
     receiver_local_index = nullptr;
     receiver_size_process = nullptr;
     receiver_displacement_process = nullptr;
+    receiver_buffer = nullptr;
 }
 
 Local_Orbital_Charge::~Local_Orbital_Charge()
@@ -164,12 +166,12 @@ void Local_Orbital_Charge::sum_bands(void)
 
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {
-        GlobalC::UHM.GG.cal_rho(GlobalC::LOC.DM);
+        GlobalC::UHM.GG.cal_rho(this->DM);
     }
     else
     {
         ModuleBase::GlobalFunc::NOTE("Calculate the charge on real space grid!");
-        GlobalC::UHM.GK.cal_rho_k();
+        GlobalC::UHM.GK.cal_rho_k(this->DM_R);
     }
 
      time_t end = time(NULL);

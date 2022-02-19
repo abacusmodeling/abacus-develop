@@ -56,7 +56,7 @@ int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt
     sender_size_process=new int[nprocs];
     delete[] sender_displacement_process;
     sender_displacement_process=new int[nprocs];
-
+    GlobalV::ofs_running << "checkpoint 2" << std::endl;
     // ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"lgd_now",lgd_now);
     
     receiver_size=lgd_now*lgd_now;

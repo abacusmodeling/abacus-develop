@@ -16,7 +16,8 @@ class LOOP_ions
 	LOOP_ions();
 	~LOOP_ions();
 
-	LOOP_elec LOE;
+    LOOP_elec LOE;
+    Local_Orbital_Charge LOC;
 
 	void opt_ions(); //output for dos
 	void output_HS_R(
