@@ -49,10 +49,10 @@ void Local_Orbital_Charge::allocate_DM_k(void)
     }
 
 	// Peize Lin test 2019-01-16 
-    wfc_dm_2d->init();
+    this->init_dm_2d();
 	if(GlobalC::wf.start_wfc=="file")
 	{
-		this->kpt_file(GlobalC::GridT, wfc_dm_2d->wfc_k);
+		this->kpt_file(GlobalC::GridT, *this->wfc_k);
 	}
 
     return;

@@ -8,7 +8,7 @@
 void Force_LCAO_gamma::cal_foverlap(
 	const bool isforce, 
     const bool isstress,
-    Wfc_Dm_2d &wfc_dm_2d,
+    vector<ModuleBase::matrix>& wfc_gamma,
     ModuleBase::matrix& foverlap,
 	ModuleBase::matrix& soverlap)
 {
@@ -29,8 +29,8 @@ void Force_LCAO_gamma::cal_foverlap(
     }
 
     std::vector<ModuleBase::matrix> edm_gamma(GlobalV::NSPIN);
-    wfc_dm_2d.cal_dm(wgEkb,
-        wfc_dm_2d.wfc_gamma,
+    GlobalC::LOC.cal_dm(wgEkb,
+        wfc_gamma,
         edm_gamma);
 
     ModuleBase::timer::tick("Force_LCAO_gamma","cal_edm_2d");

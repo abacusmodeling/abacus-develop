@@ -24,7 +24,10 @@
 
 LOOP_ions::LOOP_ions()
 {
-    this->wfc_dm_2d.init();
+    if (GlobalV::GAMMA_ONLY_LOCAL)
+        this->wfc_gamma.resize(GlobalV::NSPIN);
+    else
+        this->wfc_k.resize(GlobalC::kv.nks);
 }
 
 LOOP_ions::~LOOP_ions()
@@ -147,7 +150,7 @@ void LOOP_ions::opt_ions()
 
 		// solve electronic structures in terms of LCAO
 		// mohan add 2021-02-09
-		LOE.solve_elec_stru(this->istep, this->wfc_dm_2d);
+		LOE.solve_elec_stru(this->istep, this->wfc_gamma, GlobalC::LOC.dm_gamma, this->wfc_k, GlobalC::LOC.dm_k);
 
 
 		time_t eend = time(NULL);
@@ -177,7 +180,7 @@ void LOOP_ions::opt_ions()
         this->output_SR("outputs_to_DMFT/overlap_matrix/SR.csr");
         
         // Output wave functions, bands, k-points information, and etc.
-        GlobalC::dmft.out_to_dmft(this->wfc_dm_2d.wfc_k);
+        GlobalC::dmft.out_to_dmft(this->wfc_k);
         }
 
         if(GlobalC::ParaO.out_hsR)
@@ -191,7 +194,7 @@ void LOOP_ions::opt_ions()
         {
             if(GlobalV::GAMMA_ONLY_LOCAL)
             {
-                GlobalC::ld.cal_projected_DM(this->wfc_dm_2d.dm_gamma[0],
+                GlobalC::ld.cal_projected_DM(GlobalC::LOC.dm_gamma[0],
                     GlobalC::ucell,
                     GlobalC::ORB,
                     GlobalC::GridD,
@@ -199,7 +202,7 @@ void LOOP_ions::opt_ions()
             }
             else
             {
-                GlobalC::ld.cal_projected_DM_k(this->wfc_dm_2d.dm_k,
+                GlobalC::ld.cal_projected_DM_k(GlobalC::LOC.dm_k,
                     GlobalC::ucell,
                     GlobalC::ORB,
                     GlobalC::GridD,
@@ -215,11 +218,11 @@ void LOOP_ions::opt_ions()
             {
                 if(GlobalV::GAMMA_ONLY_LOCAL)
                 {
-                    GlobalC::ld.cal_e_delta_band(this->wfc_dm_2d.dm_gamma, GlobalC::ParaO);
+                    GlobalC::ld.cal_e_delta_band(GlobalC::LOC.dm_gamma, GlobalC::ParaO);
                 }
                 else
                 {
-                    GlobalC::ld.cal_e_delta_band_k(this->wfc_dm_2d.dm_k, GlobalC::ParaO, GlobalC::kv.nks);
+                    GlobalC::ld.cal_e_delta_band_k(GlobalC::LOC.dm_k, GlobalC::ParaO, GlobalC::kv.nks);
                 }
                 std::cout << "E_delta_band = " << std::setprecision(8) << GlobalC::ld.e_delta_band << " Ry" << " = " << std::setprecision(8) << GlobalC::ld.e_delta_band * ModuleBase::Ry_to_eV << " eV" << std::endl;
                 std::cout << "E_delta_NN= "<<std::setprecision(8) << GlobalC::ld.E_delta << " Ry" << " = "<<std::setprecision(8)<<GlobalC::ld.E_delta*ModuleBase::Ry_to_eV<<" eV"<<std::endl;
@@ -284,7 +287,7 @@ void LOOP_ions::opt_ions()
 
     }
 
-    GlobalC::en.perform_dos(this->wfc_dm_2d.wfc_gamma, this->wfc_dm_2d.wfc_k);
+    GlobalC::en.perform_dos(this->wfc_gamma, this->wfc_k);
 
     ModuleBase::timer::tick("LOOP_ions", "opt_ions");
     return;
@@ -310,7 +313,10 @@ bool LOOP_ions::force_stress(
 	ModuleBase::matrix scs;
     Force_Stress_LCAO FSL;
     FSL.allocate();
-	FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS, GlobalV::TEST_FORCE, GlobalV::TEST_STRESS, this->wfc_dm_2d, fcs, scs);
+    FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS,
+        GlobalV::TEST_FORCE, GlobalV::TEST_STRESS,
+        this->wfc_gamma, GlobalC::LOC.dm_gamma,
+         this->wfc_k, GlobalC::LOC.dm_k, fcs, scs);
 
 	//--------------------------------------------------
 	// only forces are needed, no stresses are needed
@@ -555,7 +561,7 @@ void LOOP_ions::final_scf(void)
     // this information is used to calculate
     // the force.
 
-	GlobalC::LOC.allocate_dm_wfc(GlobalC::GridT, wfc_dm_2d);
+	GlobalC::LOC.allocate_dm_wfc(GlobalC::GridT, this->wfc_gamma, this->wfc_k);
 
     GlobalC::UHM.set_lcao_matrices();
 	//------------------------------------------------------------------
@@ -579,7 +585,7 @@ void LOOP_ions::final_scf(void)
 
 
 	ELEC_scf es;
-	es.scf(0, wfc_dm_2d.wfc_gamma, wfc_dm_2d.dm_gamma, wfc_dm_2d.wfc_k, wfc_dm_2d.dm_k);
+	es.scf(0, wfc_gamma,GlobalC::LOC.dm_gamma, wfc_k, GlobalC::LOC.dm_k);
 
     if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
     {

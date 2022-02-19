@@ -6,7 +6,6 @@
 #include "../module_base/matrix.h"
 #include "LCAO_matrix.h" 
 #include "FORCE_gamma.h"
-#include "wfc_dm_2d.h"
 
 class Force_LCAO_k : public Force_LCAO_gamma
 {
@@ -23,7 +22,8 @@ class Force_LCAO_k : public Force_LCAO_gamma
 	void ftable_k (
 		const bool isforce,
         const bool isstress,
-        Wfc_Dm_2d &wfc_dm_2d,
+        std::vector<ModuleBase::ComplexMatrix>& wfc_k,
+        std::vector<ModuleBase::ComplexMatrix>& dm_k,
         ModuleBase::matrix& foverlap,
 		ModuleBase::matrix& ftvnl_dphi,
 		ModuleBase::matrix& fvnl_dbeta,	
@@ -48,7 +48,7 @@ class Force_LCAO_k : public Force_LCAO_gamma
 	void cal_ftvnl_dphi_k(double** dm2d, const bool isforce, const bool isstress, ModuleBase::matrix& ftvnl_dphi, ModuleBase::matrix& stvnl_dphi);
 
 	// calculate the overlap force
-	void cal_foverlap_k(const bool isforce, const bool isstress, Wfc_Dm_2d &wfc_dm_2d, ModuleBase::matrix& foverlap, ModuleBase::matrix& soverlap);
+	void cal_foverlap_k(const bool isforce, const bool isstress, std::vector<ModuleBase::ComplexMatrix>& wfc_k, ModuleBase::matrix& foverlap, ModuleBase::matrix& soverlap);
 
 	// calculate the force due to < phi | Vlocal | dphi >
 	void cal_fvl_dphi_k(double** dm2d, const bool isforce, const bool isstress, ModuleBase::matrix& fvl_dphi, ModuleBase::matrix& svl_dphi);

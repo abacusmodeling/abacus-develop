@@ -213,7 +213,7 @@ exx_abfs-screen-cauchy.o \
 exx_lcao.o \
 exx_opt_orb.o \
 exx_opt_orb-print.o \
-wfc_dm_2d.o \
+dm_2d.o \
 unk_overlap_lcao.o \
 cal_r_overlap_R.o \
 bessel_basis.o\

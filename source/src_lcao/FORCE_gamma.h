@@ -5,7 +5,6 @@
 #include "../module_base/global_variable.h"
 #include "../module_base/matrix.h"
 #include "LCAO_matrix.h" 
-#include "wfc_dm_2d.h"
 
 class Force_LCAO_gamma
 {
@@ -22,7 +21,8 @@ class Force_LCAO_gamma
 	void ftable_gamma (
 		const bool isforce,
         const bool isstress,
-        Wfc_Dm_2d &wfc_dm_2d,
+        vector<ModuleBase::matrix>& wfc_gamma,
+        vector<ModuleBase::matrix>& dm_gamma,
         ModuleBase::matrix& foverlap,
 		ModuleBase::matrix& ftvnl_dphi,
 		ModuleBase::matrix& fvnl_dbeta,	
@@ -56,7 +56,7 @@ class Force_LCAO_gamma
 	void cal_foverlap(
 		const bool isforce, 
         const bool isstress,
-        Wfc_Dm_2d &wfc_dm_2d,
+        vector<ModuleBase::matrix>& wfc_gamma,
         ModuleBase::matrix& foverlap,
 		ModuleBase::matrix& soverlap);	
 

@@ -49,7 +49,8 @@ DFTU_RELAX::DFTU_RELAX(){}
 
 DFTU_RELAX::~DFTU_RELAX(){}
 
-void DFTU_RELAX::force_stress(Wfc_Dm_2d &wfc_dm_2d)
+void DFTU_RELAX::force_stress(std::vector<ModuleBase::matrix>& dm_gamma,
+    std::vector<ModuleBase::ComplexMatrix>& dm_k)
 {
 	ModuleBase::TITLE("DFTU_RELAX", "force_stress");
 	ModuleBase::timer::tick("DFTU_RELAX", "force_stress");
@@ -94,7 +95,7 @@ void DFTU_RELAX::force_stress(Wfc_Dm_2d &wfc_dm_2d)
 			pdgemm_(&transT, &transN,
 					    &GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 					    &alpha, 
-					    wfc_dm_2d.dm_gamma[spin].c, &one_int, &one_int, GlobalC::ParaO.desc, 
+					    dm_gamma[spin].c, &one_int, &one_int, GlobalC::ParaO.desc, 
 					    VU, &one_int, &one_int, GlobalC::ParaO.desc,
 					    &beta,
 					    &rho_VU[0], &one_int, &one_int, GlobalC::ParaO.desc);
@@ -123,7 +124,7 @@ void DFTU_RELAX::force_stress(Wfc_Dm_2d &wfc_dm_2d)
 			pzgemm_(&transT, &transN,
 					    &GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 					    &alpha, 
-					    wfc_dm_2d.dm_k[ik].c, &one_int, &one_int, GlobalC::ParaO.desc, 
+					    dm_k[ik].c, &one_int, &one_int, GlobalC::ParaO.desc, 
 					    VU, &one_int, &one_int, GlobalC::ParaO.desc,
 					    &beta,
 					    &rho_VU[0], &one_int, &one_int, GlobalC::ParaO.desc);

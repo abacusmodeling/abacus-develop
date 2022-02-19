@@ -8,8 +8,6 @@
 #include <vector>
 #include "dftu_yukawa.h"
 #include "../module_base/complexmatrix.h"
-#include "wfc_dm_2d.h"
-
 using namespace std;
 
 //==========================================================
@@ -25,7 +23,8 @@ public:
     DFTU_RELAX();
     ~DFTU_RELAX();
 
-    void force_stress(Wfc_Dm_2d &wfc_dm_2d);
+    void force_stress(std::vector<ModuleBase::matrix>& dm_gamma,
+        std::vector<ModuleBase::ComplexMatrix>& dm_k);
     void cal_force_k(const int ik, const std::complex<double>* rho_VU);
     void cal_stress_k(const int ik, const std::complex<double>* rho_VU);
     void cal_force_gamma(const double* rho_VU);

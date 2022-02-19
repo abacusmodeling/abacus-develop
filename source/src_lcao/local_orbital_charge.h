@@ -3,9 +3,11 @@
 
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
+#include "../module_base/matrix.h"
+#include "../module_base/complexmatrix.h"
 #include "../src_parallel/parallel_common.h"
 #include "grid_technique.h"
-#include "wfc_dm_2d.h"
+#include "src_lcao/record_adj.h"
 
 class Local_Orbital_Charge
 {
@@ -16,12 +18,14 @@ class Local_Orbital_Charge
 	~Local_Orbital_Charge();
 
 	// mohan added 2021-02-08
-	void allocate_dm_wfc(const Grid_Technique &gt, Wfc_Dm_2d &wfc_dm_2d);
+    void allocate_dm_wfc(const Grid_Technique& gt,
+        std::vector<ModuleBase::matrix>& wfc_gamma,
+        std::vector<ModuleBase::ComplexMatrix>& wfc_k);
 	// sum bands to compute the electron charge density
 	void sum_bands(void);
 
 	//-----------------
-	// in DM_gamma.h
+	// in DM_gamma.cpp
 	//-----------------
 	void allocate_gamma(const Grid_Technique &gt);
 
@@ -31,7 +35,7 @@ class Local_Orbital_Charge
 
 
 	//-----------------
-	// in DM_k.h
+	// in DM_k.cpp
 	//-----------------
 	void allocate_DM_k(void);
 	
@@ -49,9 +53,36 @@ class Local_Orbital_Charge
 	void write_dm(const int &is, const int &iter, const std::string &fn, const int &precision);
 
 	void read_dm(const int &is, const std::string &fn);
-	
-    Wfc_Dm_2d* wfc_dm_2d;		// Peize Lin test 2019-01-16 
-    //trying to change it to pointer
+
+    
+    //-----------------
+	// in dm_2d.cpp
+    //-----------------
+    //2d wfc, pointers to LOOP_ions::wfc_gamma, LOOP_ions::wfc_k
+    std::vector<ModuleBase::matrix>* wfc_gamma;			// dm_gamma[is](iw1,iw2);
+    std::vector<ModuleBase::ComplexMatrix>* wfc_k;		// dm_k[ik](iw1,iw2);
+    
+    // dm stands for density matrix
+    std::vector<ModuleBase::matrix> dm_gamma;			// dm_gamma[is](iw1,iw2);
+    std::vector<ModuleBase::ComplexMatrix> dm_k;		// dm_k[ik](iw1,iw2);
+
+    void init_dm_2d(void);
+    
+    // dm = wfc.T * wg * wfc.conj(); used in gamma_only
+    void cal_dm(const ModuleBase::matrix& wg,   // wg(ik,ib), cal all dm 
+        std::vector<ModuleBase::matrix>& wfc_gamma,
+        std::vector<ModuleBase::matrix>& dm_gamma);
+
+    // in multi-k,  it is dm(k)
+    void cal_dm(const ModuleBase::matrix& wg,    // wg(ik,ib), cal all dm 
+        std::vector<ModuleBase::ComplexMatrix>& wfc_k,
+        std::vector<ModuleBase::ComplexMatrix>& dm_k);
+
+    // dm(R) = wfc.T * wg * wfc.conj()*kphase, only used in multi-k 
+    void cal_dm_R(
+        std::vector<ModuleBase::ComplexMatrix>& dm_k,
+        Record_adj& ra,
+        double** dm2d);     //output, dm2d[NSPIN][LNNR]
 
 private:
 
