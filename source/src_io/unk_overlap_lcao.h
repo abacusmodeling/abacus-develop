@@ -54,7 +54,7 @@ public:
 	~unkOverlap_lcao();
 	
 	
-	void init(std::complex<double>*** WFC_K);
+	void init(std::complex<double>*** wfc_k_grid);
 	int iw2it(int iw);
 	int iw2ia(int iw);
 	int iw2iL(int iw);
@@ -69,7 +69,7 @@ public:
         const ModuleBase::Vector3<double> dk, const int occ_bands,
         std::vector<ModuleBase::ComplexMatrix>* wfc_k);
 
-	void test(std::complex<double>*** WFC_K);
+	void test(std::complex<double>*** wfc_k_grid);
 	
 	
 };

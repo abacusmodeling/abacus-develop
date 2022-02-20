@@ -25,7 +25,7 @@ namespace GlobalC
 Chi0_hilbert chi0_hilbert;
 }
 
-std::complex<double> *** Chi0_hilbert::WFC_K = nullptr;
+std::complex<double> *** Chi0_hilbert::wfc_k_grid = nullptr;
 Chi0_hilbert::Chi0_hilbert()
          :init_finish(false)
 {
@@ -1178,7 +1178,7 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 					{
 						for(int ir=0; ir<Rmax[iw1][iw2]; ir++)
 						{
-							b[ig][ib1][ib2] += conj(this->WFC_K[ik][ib1][iw1]) * this->WFC_K[iqk][ib2][iw2] * overlap[iw1][iw2][ig][ir] * phase[iw1][iw2][ir];
+							b[ig][ib1][ib2] += conj(this->wfc_k_grid[ik][ib1][iw1]) * this->wfc_k_grid[iqk][ib2][iw2] * overlap[iw1][iw2][ig][ir] * phase[iw1][iw2][ir];
 						}
 					}
 				}
@@ -1203,7 +1203,7 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 				{
 					for(int ir=0; ir<Rmax[iw1][iw2]; ir++)
 					{
-						left[ib1][r] = conj(this->WFC_K[ik][ib1][iw1]) * overlap[iw1][iw2][ig][ir] * phase[iw1][iw2][ir];
+						left[ib1][r] = conj(this->wfc_k_grid[ik][ib1][iw1]) * overlap[iw1][iw2][ig][ir] * phase[iw1][iw2][ir];
 						r++;
 					}
 				}
@@ -1219,7 +1219,7 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 				{
 					for(int ir=0; ir<Rmax[iw1][iw2]; ir++)
 					{
-						right[r][ib2] = this->WFC_K[iqk][ib2][iw2];
+						right[r][ib2] = this->wfc_k_grid[iqk][ib2][iw2];
 						r++;
 					}
 				}

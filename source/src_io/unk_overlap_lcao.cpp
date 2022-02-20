@@ -55,7 +55,7 @@ unkOverlap_lcao::~unkOverlap_lcao()
 }
 
 
-void unkOverlap_lcao::init(std::complex<double>*** WFC_K)
+void unkOverlap_lcao::init(std::complex<double>*** wfc_k_grid)
 {	
 	//std::cout << "unkOverlap_lcao::init start" << std::endl;
 
@@ -121,7 +121,7 @@ void unkOverlap_lcao::init(std::complex<double>*** WFC_K)
 	//获取每个cpu核的原子轨道系数
 	for(int ik = 0; ik < kpoints_number; ik++)
 	{
-		get_lcao_wfc_global_ik(lcao_wfc_global[ik], WFC_K[ik]);
+		get_lcao_wfc_global_ik(lcao_wfc_global[ik], wfc_k_grid[ik]);
 	}
 	
 #ifdef __MPI
@@ -792,9 +792,9 @@ std::complex<double> unkOverlap_lcao::det_berryphase(const int ik_L, const int i
 	return det;
 }
 
-void unkOverlap_lcao::test(std::complex<double>*** WFC_K)
+void unkOverlap_lcao::test(std::complex<double>*** wfc_k_grid)
 {
-	this->init(WFC_K);
+	this->init(wfc_k_grid);
 	this->cal_R_number();
 	this->cal_orb_overlap();
 
@@ -843,7 +843,7 @@ void unkOverlap_lcao::test(std::complex<double>*** WFC_K)
 	double result = 0;
 	for(int iw = 0; iw < GlobalV::NLOCAL; iw++)
 	{
-		std::cout << "the wfc 11 is " << GlobalC::LOWF.WFC_K[11][13][iw] << " and the 23 is " << GlobalC::LOWF.WFC_K[23][13][iw] << std::endl;
+		std::cout << "the wfc 11 is " << GlobalC::LOWF.wfc_k_grid[11][13][iw] << " and the 23 is " << GlobalC::LOWF.wfc_k_grid[23][13][iw] << std::endl;
 	}
 	*/
 }

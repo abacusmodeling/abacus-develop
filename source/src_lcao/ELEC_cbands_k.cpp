@@ -140,10 +140,10 @@ void ELEC_cbands_k::cal_bands(const int& istep, LCAO_Hamilt& uhm,
 			GlobalC::restart.save_disk("H", ik);
 		}
 
-		// write the wave functions into WFC_K[ik].
+		// write the wave functions into wfc_k_grid[ik].
 		ModuleBase::timer::tick("Efficience","diago_k");
 		Diago_LCAO_Matrix DLM;
-		DLM.solve_complex_matrix(ik, lowf.WFC_K[ik], lowf.wfc_k[ik]);
+		DLM.solve_complex_matrix(ik, lowf.wfc_k_grid[ik], lowf.wfc_k[ik]);
 		ModuleBase::timer::tick("Efficience","diago_k");
 
 		ModuleBase::timer::tick("Efficience","each_k");

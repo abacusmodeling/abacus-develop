@@ -16,9 +16,9 @@ toWannier90::toWannier90(int num_kpts, ModuleBase::Matrix3 recip_lattice)
 
 }
 
-toWannier90::toWannier90(int num_kpts, ModuleBase::Matrix3 recip_lattice, std::complex<double>*** WFC_K_in)
+toWannier90::toWannier90(int num_kpts, ModuleBase::Matrix3 recip_lattice, std::complex<double>*** wfc_k_grid_in)
 {
-    this->WFC_K = WFC_K_in;
+    this->wfc_k_grid = wfc_k_grid_in;
     this->num_kpts = num_kpts;
 	this->recip_lattice = recip_lattice;
 	if(GlobalV::NSPIN==1 || GlobalV::NSPIN==4) this->cal_num_kpts = this->num_kpts;
@@ -1675,7 +1675,7 @@ void toWannier90::getUnkFromLcao()
 	for(int ik = 0; ik < num_kpts; ik++)
 	{
 		// ��ȡȫ�ֵ�lcao�Ĳ�����ϵ��
-		get_lcao_wfc_global_ik(lcao_wfc_global[ik], this->WFC_K[ik]);
+		get_lcao_wfc_global_ik(lcao_wfc_global[ik], this->wfc_k_grid[ik]);
 	
 		int npw = GlobalC::kv.ngk[ik];
 		unk_inLcao[ik].create(GlobalV::NBANDS,GlobalC::wf.npwx);

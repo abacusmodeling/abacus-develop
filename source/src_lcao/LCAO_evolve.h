@@ -16,7 +16,7 @@ class Evolve_LCAO_Matrix
 
 	private:
 
-	void using_LAPACK_complex(const int &ik, std::complex<double>*** WFC_K, std::complex<double> **c_init)const;
+	void using_LAPACK_complex(const int &ik, std::complex<double>*** wfc_k_grid, std::complex<double> **c_init)const;
 #ifdef __MPI
 	int using_ScaLAPACK_complex(const int &ik, ModuleBase::ComplexMatrix &wfc_2d)const;
 #endif

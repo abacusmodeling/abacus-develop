@@ -101,7 +101,7 @@ void Exx_Abfs::Parallel::Communicate::DM::cal_DM(
 	const Abfs::Vector3_Order<int> &Born_von_Karman_period,
 	const set<std::pair<size_t,size_t>> &H_atom_pairs_core,
     const double threshold,
-    complex<double>*** WFC_K,
+    complex<double>*** wfc_k_grid,
     double*** DM,
     double** DM_R)
 {
@@ -134,7 +134,7 @@ ofs_matrixes( "DM_grid_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK), DM
 				
 		Exx_Abfs::DM dm_my;
 		dm_my.flag_mix = false;
-		dm_my.cal_DM( H_atom_pairs_core, Born_von_Karman_boxes, WFC_K );
+		dm_my.cal_DM( H_atom_pairs_core, Born_von_Karman_boxes, wfc_k_grid );
 		
 		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> DM_grid(GlobalV::NSPIN);
 		for( const auto &DMrA : dm_my.DMr )

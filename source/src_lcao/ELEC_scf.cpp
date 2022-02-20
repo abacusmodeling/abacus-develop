@@ -183,7 +183,7 @@ void ELEC_scf::scf(const int& istep,
 			case 5:    case 6:   case 9:
 				if( !GlobalC::exx_global.info.separate_loop )
 				{
-					GlobalC::exx_lcao.cal_exx_elec(loc, lowf.WFC_K);
+					GlobalC::exx_lcao.cal_exx_elec(loc, lowf.wfc_k_grid);
 				}
 				break;
 		}
@@ -280,7 +280,7 @@ void ELEC_scf::scf(const int& istep,
 			if(GlobalC::restart.info_load.load_H && GlobalC::restart.info_load.load_H_finish && !GlobalC::restart.info_load.restart_exx)
 			{
 				GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
-				GlobalC::exx_lcao.cal_exx_elec(loc, lowf.WFC_K);
+				GlobalC::exx_lcao.cal_exx_elec(loc, lowf.wfc_k_grid);
 				GlobalC::restart.info_load.restart_exx = true;
 			}
 		}
@@ -457,7 +457,7 @@ void ELEC_scf::scf(const int& istep,
 				std::cout <<"nomega = "<<GlobalC::chi0_hilbert.nomega<<std::endl;
 				std::cout <<"dim = "<<GlobalC::chi0_hilbert.dim<<std::endl;
                 //std::cout <<"oband = "<<GlobalC::chi0_hilbert.oband<<std::endl;
-                GlobalC::chi0_hilbert.WFC_K = lowf.WFC_K;
+                GlobalC::chi0_hilbert.wfc_k_grid = lowf.wfc_k_grid;
                 GlobalC::chi0_hilbert.Chi();
 			}
 

@@ -24,17 +24,17 @@ Local_Orbital_wfc::~Local_Orbital_wfc()
 		{
 			//for(int j=0; j<GlobalV::NBANDS; j++)
 			//{
-			//	delete[] this->WFC_K[i][j];
+			//	delete[] this->wfc_k_grid[i][j];
 			//}
-			delete[] this->WFC_K[i];
-			//std::cout<<"delete WFC_K["<<i<<"] success"<<std::endl;
+			delete[] this->wfc_k_grid[i];
+			//std::cout<<"delete wfc_k_grid["<<i<<"] success"<<std::endl;
 		}
-		delete[] this->WFC_K;
-		//std::cout<<"delete WFC_K success"<<std::endl;
+		delete[] this->wfc_k_grid;
+		//std::cout<<"delete wfc_k_grid success"<<std::endl;
 		if(GlobalV::NLOCAL!= 0 )
 		{
-			delete[] this->WFC_K_POOL;
-			//std::cout<<"delete WFC_K_POOL success"<<std::endl;
+			delete[] this->wfc_k_grid2;
+			//std::cout<<"delete wfc_k_grid2 success"<<std::endl;
 		}
 	}
 
@@ -53,17 +53,17 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique& gt,
 	// allocate the first part (only once!).
 	if(this->wfck_flag == false)
 	{
-		this->WFC_K = new std::complex<double>**[GlobalC::kv.nks];
+		this->wfc_k_grid = new std::complex<double>**[GlobalC::kv.nks];
 		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
-			this->WFC_K[ik] = new std::complex<double>*[GlobalV::NBANDS];
+			this->wfc_k_grid[ik] = new std::complex<double>*[GlobalV::NBANDS];
 		}
 		this->wfck_flag = true;
 	}
 	
 	if(this->complex_flag)
 	{
-		delete[] this->WFC_K_POOL;
+		delete[] this->wfc_k_grid2;
 		this->complex_flag = false;
 	}
 	// allocate the second part.
@@ -73,19 +73,19 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique& gt,
 	{
 		//std::cout<<"gt.lgd="<<gt.lgd<<" ; GlobalV::NLOCAL="<<GlobalV::NLOCAL<<std::endl; //delete 2015-09-06, xiaohui
 		const int page=GlobalV::NBANDS*gt.lgd;
-		this->WFC_K_POOL=new std::complex<double> [GlobalC::kv.nks*page];
-		ModuleBase::GlobalFunc::ZEROS(WFC_K_POOL, GlobalC::kv.nks*page);
+		this->wfc_k_grid2=new std::complex<double> [GlobalC::kv.nks*page];
+		ModuleBase::GlobalFunc::ZEROS(wfc_k_grid2, GlobalC::kv.nks*page);
 		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
 			for(int ib=0; ib<GlobalV::NBANDS; ib++)
 			{
-				this->WFC_K[ik][ib] = &WFC_K_POOL[ik*page+ib*gt.lgd];
-				//std::cout<<"ik="<<ik<<" ib="<<ib<<std::endl<<"WFC_K address: "<<WFC_K[ik][ib]<<" WFC_K_POOL address: "<<&WFC_K_POOL[ik*page+ib*gt.lgd]<<std::endl;
+				this->wfc_k_grid[ik][ib] = &wfc_k_grid2[ik*page+ib*gt.lgd];
+				//std::cout<<"ik="<<ik<<" ib="<<ib<<std::endl<<"wfc_k_grid address: "<<wfc_k_grid[ik][ib]<<" wfc_k_grid2 address: "<<&wfc_k_grid2[ik*page+ib*gt.lgd]<<std::endl;
 			}
-			//std::cout<<"set WFC_K pointer success, ik: "<<ik<<std::endl;
-			ModuleBase::Memory::record("LocalOrbital_Coef","WFC_K",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
+			//std::cout<<"set wfc_k_grid pointer success, ik: "<<ik<<std::endl;
+			ModuleBase::Memory::record("LocalOrbital_Coef","wfc_k_grid",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
 			//ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"MemoryForWaveFunctions (MB)",mem);
-			//std::cout<<"WFC_K["<<ik<<"] use "<<mem<<" MB"<<std::endl;
+			//std::cout<<"wfc_k_grid["<<ik<<"] use "<<mem<<" MB"<<std::endl;
 			this->complex_flag = true;
 		}
 	}
@@ -101,7 +101,7 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique& gt,
 		for(int ik=0; ik<GlobalC::kv.nkstot; ++ik)
 		{
 			GlobalV::ofs_running << " Read in wave functions " << ik + 1 << std::endl;
-			error = WF_Local::read_lowf_complex( this->WFC_K[ik], ik, &wfc_k);
+			error = WF_Local::read_lowf_complex( this->wfc_k_grid[ik], ik, &wfc_k);
 		}
 #ifdef __MPI
 		Parallel_Common::bcast_int(error);

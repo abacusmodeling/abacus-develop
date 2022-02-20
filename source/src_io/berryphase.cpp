@@ -38,7 +38,7 @@ void berryphase::lcao_init()
 {
 	#ifdef __LCAO
 	ModuleBase::TITLE("berryphase","lcao_init");
-	lcao_method.init(this->lowf->WFC_K);
+	lcao_method.init(this->lowf->wfc_k_grid);
 	lcao_method.cal_R_number();
 	lcao_method.cal_orb_overlap();
 	#endif

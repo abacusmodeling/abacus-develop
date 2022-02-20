@@ -65,7 +65,7 @@ public:
 
 
     toWannier90(int num_kpts, ModuleBase::Matrix3 recip_lattice);
-    toWannier90(int num_kpts,ModuleBase::Matrix3 recip_lattice, std::complex<double>*** WFC_K_in);
+    toWannier90(int num_kpts,ModuleBase::Matrix3 recip_lattice, std::complex<double>*** wfc_k_grid_in);
     ~toWannier90();
 
 	//void kmesh_supercell_sort(); //������ԭ��ľ����С��������lmn
@@ -96,7 +96,7 @@ public:
     void get_lcao_wfc_global_ik(std::complex<double>** ctot, std::complex<double>** cc);
 
 private:
-    std::complex<double>*** WFC_K;
+    std::complex<double>*** wfc_k_grid;
 
 };
 
