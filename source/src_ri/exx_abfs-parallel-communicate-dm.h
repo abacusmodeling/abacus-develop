@@ -22,7 +22,8 @@ public:
 	void cal_DM( 
 		const Abfs::Vector3_Order<int> &Born_von_Karman_period,
 		const set<std::pair<size_t,size_t>> &H_atom_pairs_core,
-		const double threshold,
+        const double threshold,
+        complex<double>*** WFC_K,
         double*** DM,
         double** DM_R );
 

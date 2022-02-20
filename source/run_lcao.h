@@ -7,6 +7,7 @@
 
 #include "module_base/global_function.h"
 #include "module_base/global_variable.h"
+#include "module_orbital/ORB_control.h"
 #include "input.h"
 
 class Run_lcao

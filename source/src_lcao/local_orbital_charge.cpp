@@ -79,7 +79,8 @@ Local_Orbital_Charge::~Local_Orbital_Charge()
 
 void Local_Orbital_Charge::allocate_dm_wfc(const Grid_Technique& gt,
     std::vector<ModuleBase::matrix>& wfc_gamma,
-    std::vector<ModuleBase::ComplexMatrix>& wfc_k)
+    std::vector<ModuleBase::ComplexMatrix>& wfc_k,
+    Local_Orbital_wfc &lowf)
 {
     ModuleBase::TITLE("Local_Orbital_Charge", "allocate_dm_wfc");
     this->wfc_gamma = &wfc_gamma;
@@ -91,12 +92,14 @@ void Local_Orbital_Charge::allocate_dm_wfc(const Grid_Technique& gt,
 		this->allocate_gamma(gt);
 	}
 	else
-	{
-		GlobalC::LOWF.allocate_k(gt, wfc_k);
+    {
+		lowf.allocate_k(gt, wfc_k);
 		this->allocate_DM_k();
 	}
 
-	return;
+    this->LOWF = &lowf;
+    
+    return;
 }
 
 

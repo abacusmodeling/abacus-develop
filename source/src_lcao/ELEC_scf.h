@@ -32,7 +32,8 @@ class ELEC_scf: private Threshold_Elec
     void scf(const int& istep,
         std::vector<ModuleBase::matrix>& wfc_gamma,
         std::vector<ModuleBase::ComplexMatrix>& wfc_k,
-        Local_Orbital_Charge &loc);
+        Local_Orbital_Charge& loc,
+        std::complex<double>*** WFC_K);
 
 	static int iter;
 

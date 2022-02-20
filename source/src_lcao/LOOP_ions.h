@@ -5,6 +5,8 @@
 #include "../src_ions/ions_move_methods.h"
 #include "../src_pw/charge_extra.h"
 #include "../src_ions/lattice_change_methods.h"
+#include "src_lcao/local_orbital_wfc.h"
+#include "module_orbital/ORB_control.h"
 
 #include <fstream>
 
@@ -13,10 +15,11 @@ class LOOP_ions
 
 	public:
 
-	LOOP_ions();
+	LOOP_ions(ORB_control &orb_con_in);
 	~LOOP_ions();
 
     LOOP_elec LOE;
+    Local_Orbital_wfc LOWF;
     Local_Orbital_Charge LOC;
 
 	void opt_ions(); //output for dos

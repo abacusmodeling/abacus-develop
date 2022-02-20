@@ -29,7 +29,8 @@ class ELEC_nscf
         std::vector<ModuleBase::matrix>& wfc_gamma,
         std::vector<ModuleBase::matrix>& dm_gamma,
         std::vector<ModuleBase::ComplexMatrix>& wfc_k,
-        std::vector<ModuleBase::ComplexMatrix>& dm_k);
+        std::vector<ModuleBase::ComplexMatrix>& dm_k,
+        std::complex<double>*** WFC_K);
 
 
 };

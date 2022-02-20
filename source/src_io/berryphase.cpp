@@ -7,8 +7,10 @@ berryphase::berryphase()
 	GDIR = INPUT.gdir;
 }
 
-berryphase::berryphase(std::vector<ModuleBase::ComplexMatrix>* wfc_k_in) :
-    wfc_k(wfc_k_in)
+berryphase::berryphase(std::vector<ModuleBase::ComplexMatrix>* wfc_k_in,
+    std::complex<double>*** WFC_K_in) :
+    wfc_k(wfc_k_in),
+    WFC_K(WFC_K_in)
 {
 	GDIR = INPUT.gdir;
 }
@@ -38,7 +40,7 @@ void berryphase::lcao_init()
 {
 	#ifdef __LCAO
 	ModuleBase::TITLE("berryphase","lcao_init");
-	lcao_method.init();
+	lcao_method.init(this->WFC_K);
 	lcao_method.cal_R_number();
 	lcao_method.cal_orb_overlap();
 	#endif

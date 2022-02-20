@@ -55,7 +55,7 @@ unkOverlap_lcao::~unkOverlap_lcao()
 }
 
 
-void unkOverlap_lcao::init()
+void unkOverlap_lcao::init(std::complex<double>*** WFC_K)
 {	
 	//std::cout << "unkOverlap_lcao::init start" << std::endl;
 
@@ -121,7 +121,7 @@ void unkOverlap_lcao::init()
 	//获取每个cpu核的原子轨道系数
 	for(int ik = 0; ik < kpoints_number; ik++)
 	{
-		get_lcao_wfc_global_ik(lcao_wfc_global[ik],GlobalC::LOWF.WFC_K[ik]);
+		get_lcao_wfc_global_ik(lcao_wfc_global[ik], WFC_K[ik]);
 	}
 	
 #ifdef __MPI
@@ -792,9 +792,9 @@ std::complex<double> unkOverlap_lcao::det_berryphase(const int ik_L, const int i
 	return det;
 }
 
-void unkOverlap_lcao::test()
+void unkOverlap_lcao::test(std::complex<double>*** WFC_K)
 {
-	this->init();
+	this->init(WFC_K);
 	this->cal_R_number();
 	this->cal_orb_overlap();
 

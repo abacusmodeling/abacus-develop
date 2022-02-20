@@ -15,7 +15,8 @@ void ELEC_nscf::nscf(LCAO_Hamilt& uhm,
     std::vector<ModuleBase::matrix>& wfc_gamma,
     std::vector<ModuleBase::matrix>& dm_gamma,
     std::vector<ModuleBase::ComplexMatrix>& wfc_k,
-    std::vector<ModuleBase::ComplexMatrix>& dm_k)
+    std::vector<ModuleBase::ComplexMatrix>& dm_k,
+    std::complex<double>*** WFC_K)
 {
 	ModuleBase::TITLE("ELEC_nscf","nscf");
 
@@ -44,7 +45,7 @@ void ELEC_nscf::nscf(LCAO_Hamilt& uhm,
 	}
 	else
 	{
-		ELEC_cbands_k::cal_bands(istep, uhm, wfc_k, dm_k);
+		ELEC_cbands_k::cal_bands(istep, uhm, wfc_k, dm_k, WFC_K);
 	}
 
 	time_t time_finish=std::time(NULL);
@@ -91,7 +92,7 @@ void ELEC_nscf::nscf(LCAO_Hamilt& uhm,
 	// add by jingan
 	if (berryphase::berry_phase_flag && ModuleSymmetry::Symmetry::symm_flag == 0)
     {
-    	berryphase bp(&wfc_k);
+    	berryphase bp(&wfc_k, WFC_K);
 		bp.Macroscopic_polarization();
     }
 

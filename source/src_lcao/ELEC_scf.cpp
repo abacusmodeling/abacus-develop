@@ -26,7 +26,8 @@ int ELEC_scf::iter=0;
 void ELEC_scf::scf(const int& istep,
     std::vector<ModuleBase::matrix>& wfc_gamma,
     std::vector<ModuleBase::ComplexMatrix>& wfc_k,
-    Local_Orbital_Charge &loc)
+    Local_Orbital_Charge &loc,
+    std::complex<double>*** WFC_K)
 {
 	ModuleBase::TITLE("ELEC_scf","scf");
 	ModuleBase::timer::tick("ELEC_scf","scf");
@@ -184,7 +185,7 @@ void ELEC_scf::scf(const int& istep,
 			case 5:    case 6:   case 9:
 				if( !GlobalC::exx_global.info.separate_loop )
 				{
-					GlobalC::exx_lcao.cal_exx_elec(loc);
+					GlobalC::exx_lcao.cal_exx_elec(loc, WFC_K);
 				}
 				break;
 		}
@@ -204,11 +205,11 @@ void ELEC_scf::scf(const int& istep,
 		{
 			if(ELEC_evolve::tddft && istep >= 1 && iter > 1)
 			{
-				ELEC_evolve::evolve_psi(istep, GlobalC::UHM, wfc_k);
+				ELEC_evolve::evolve_psi(istep, GlobalC::UHM, wfc_k, WFC_K);
 			}
 			else
 			{
-				ELEC_cbands_k::cal_bands(istep, GlobalC::UHM, wfc_k, loc.dm_k);
+				ELEC_cbands_k::cal_bands(istep, GlobalC::UHM, wfc_k, loc.dm_k, WFC_K);
 			}
 		}
 
@@ -281,7 +282,7 @@ void ELEC_scf::scf(const int& istep,
 			if(GlobalC::restart.info_load.load_H && GlobalC::restart.info_load.load_H_finish && !GlobalC::restart.info_load.restart_exx)
 			{
 				GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
-				GlobalC::exx_lcao.cal_exx_elec(loc);
+				GlobalC::exx_lcao.cal_exx_elec(loc, WFC_K);
 				GlobalC::restart.info_load.restart_exx = true;
 			}
 		}
@@ -457,8 +458,9 @@ void ELEC_scf::scf(const int& istep,
 				std::cout <<"domega = "<<GlobalC::chi0_hilbert.domega<<std::endl;
 				std::cout <<"nomega = "<<GlobalC::chi0_hilbert.nomega<<std::endl;
 				std::cout <<"dim = "<<GlobalC::chi0_hilbert.dim<<std::endl;
-				//std::cout <<"oband = "<<GlobalC::chi0_hilbert.oband<<std::endl;
-				GlobalC::chi0_hilbert.Chi();
+                //std::cout <<"oband = "<<GlobalC::chi0_hilbert.oband<<std::endl;
+                GlobalC::chi0_hilbert.WFC_K = WFC_K;
+                GlobalC::chi0_hilbert.Chi();
 			}
 
 			//quxin add for DFT+U for nscf calculation

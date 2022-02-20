@@ -21,7 +21,8 @@ void Run_lcao::lcao_line(void)
 {
     ModuleBase::TITLE("Run_lcao","lcao_line");
     ModuleBase::timer::tick("Run_lcao", "lcao_line");
-    
+    ORB_control orb_con;
+
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
     // cell relaxation. b) put GlobalV::NLOCAL and GlobalV::NBANDS as input parameters
@@ -83,7 +84,7 @@ void Run_lcao::lcao_line(void)
 
     // * reading the localized orbitals/projectors
 	// * construct the interpolation tables.
-	GlobalC::LOWF.orb_con.read_orb_first(
+	orb_con.read_orb_first(
 		GlobalV::ofs_running,
 		GlobalC::ORB,
 		GlobalC::ucell.ntype,
@@ -104,7 +105,7 @@ void Run_lcao::lcao_line(void)
 		GlobalC::ORB
 	);
 
-	GlobalC::LOWF.orb_con.set_orb_tables(
+	orb_con.set_orb_tables(
 		GlobalV::ofs_running,
 		GlobalC::UOT,
 		GlobalC::ORB,
@@ -181,13 +182,13 @@ void Run_lcao::lcao_line(void)
 	if(GlobalV::CALCULATION=="md")
 	{
 		Run_MD_LCAO run_md_lcao;
-		run_md_lcao.opt_cell();
+		run_md_lcao.opt_cell(orb_con);
 	}
 	else // cell relaxations
 	{
         LOOP_cell lc;
         //keep wfc_gamma or wfc_k remaining
-        lc.opt_cell();
+        lc.opt_cell(orb_con);
 	}
 
 	ModuleBase::timer::tick("Run_lcao","lcao_line");

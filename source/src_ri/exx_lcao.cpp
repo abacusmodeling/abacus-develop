@@ -915,7 +915,7 @@ ofs_mpi.close();
 	#endif
 }
 
-void Exx_Lcao::cal_exx_elec(Local_Orbital_Charge &loc)
+void Exx_Lcao::cal_exx_elec(Local_Orbital_Charge &loc, complex<double>*** WFC_K)
 {
 	ModuleBase::TITLE("Exx_Lcao","cal_exx_elec");
 
@@ -938,7 +938,7 @@ gettimeofday( &t_start_all, NULL);
 
 #if EXX_DM==1
 gettimeofday( &t_start, NULL);
-	this->DM_para.cal_DM( Born_von_Karman_period, H_atom_pairs_core, info.dm_threshold, loc.DM, loc.DM_R );
+	this->DM_para.cal_DM( Born_von_Karman_period, H_atom_pairs_core, info.dm_threshold, loc.DM, loc.DM_R, WFC_K,);
 ofs_mpi<<"TIME@ Exx_Lcao::cal_DM\t"<<time_during(t_start)<<std::endl;
 #elif EXX_DM==2
 gettimeofday( &t_start, NULL);
@@ -1057,7 +1057,7 @@ ofs_mpi.close();
 		}
 	};
 	
-	auto print_WFC = [&]()
+	auto print_WFC = [&](std::complex<double>*** WFC_K)
 	{
 		if( GlobalV::GAMMA_ONLY_LOCAL )
 		{
@@ -1089,7 +1089,7 @@ ofs_mpi.close();
 				for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
 				{
 					for( size_t iwt=0; iwt!=GlobalV::NLOCAL; ++iwt )
-						ofs<<GlobalC::LOWF.WFC_K[ik][ib][iwt]<<"\t";
+						ofs<<WFC_K[ik][ib][iwt]<<"\t";
 					ofs<<std::endl;
 				}
 				ofs.close();

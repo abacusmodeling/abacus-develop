@@ -10,7 +10,7 @@
 LOOP_cell::LOOP_cell(){}
 LOOP_cell::~LOOP_cell(){}
 
-void LOOP_cell::opt_cell()
+void LOOP_cell::opt_cell(ORB_control &orb_con)
 {
 	ModuleBase::TITLE("LOOP_cell","opt_cell");
 
@@ -66,11 +66,11 @@ void LOOP_cell::opt_cell()
 
   if(INPUT.dft_plus_dmft) GlobalC::dmft.init(INPUT, GlobalC::ucell);
 
-	LOOP_ions ions;
+	LOOP_ions ions(orb_con);
     ions.opt_ions();
 
 	// mohan update 2021-02-10
-    GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
+    orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
 	
 	return;
 }

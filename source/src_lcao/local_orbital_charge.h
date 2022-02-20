@@ -8,6 +8,7 @@
 #include "../src_parallel/parallel_common.h"
 #include "grid_technique.h"
 #include "src_lcao/record_adj.h"
+#include "src_lcao/local_orbital_wfc.h"
 
 class Local_Orbital_Charge
 {
@@ -20,8 +21,9 @@ class Local_Orbital_Charge
 	// mohan added 2021-02-08
     void allocate_dm_wfc(const Grid_Technique& gt,
         std::vector<ModuleBase::matrix>& wfc_gamma,
-        std::vector<ModuleBase::ComplexMatrix>& wfc_k);
-	// sum bands to compute the electron charge density
+        std::vector<ModuleBase::ComplexMatrix>& wfc_k,
+        Local_Orbital_wfc &lowf);
+    // sum bands to compute the electron charge density
 	void sum_bands(void);
 
 	//-----------------
@@ -58,10 +60,6 @@ class Local_Orbital_Charge
     //-----------------
 	// in dm_2d.cpp
     //-----------------
-    //2d wfc, pointers to LOOP_ions::wfc_gamma, LOOP_ions::wfc_k
-    std::vector<ModuleBase::matrix>* wfc_gamma;			// dm_gamma[is](iw1,iw2);
-    std::vector<ModuleBase::ComplexMatrix>* wfc_k;		// dm_k[ik](iw1,iw2);
-    
     // dm stands for density matrix
     std::vector<ModuleBase::matrix> dm_gamma;			// dm_gamma[is](iw1,iw2);
     std::vector<ModuleBase::ComplexMatrix> dm_k;		// dm_k[ik](iw1,iw2);
@@ -83,6 +81,14 @@ class Local_Orbital_Charge
         std::vector<ModuleBase::ComplexMatrix>& dm_k,
         Record_adj& ra,
         double** dm2d);     //output, dm2d[NSPIN][LNNR]
+
+    //-----------------
+	// wavefunctions' pointer
+    //-----------------
+    //2d wfc, pointers to LOOP_ions::wfc_gamma, LOOP_ions::wfc_k
+    std::vector<ModuleBase::matrix>* wfc_gamma;			// dm_gamma[is](iw1,iw2);
+    std::vector<ModuleBase::ComplexMatrix>* wfc_k;		// dm_k[ik](iw1,iw2);
+    Local_Orbital_wfc *LOWF;
 
 private:
 

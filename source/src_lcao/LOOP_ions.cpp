@@ -22,12 +22,13 @@
 #include "../module_deepks/LCAO_deepks.h"    //caoyu add 2021-07-26
 #endif
 
-LOOP_ions::LOOP_ions()
+LOOP_ions::LOOP_ions(ORB_control &orb_con_in)
 {
     if (GlobalV::GAMMA_ONLY_LOCAL)
         this->wfc_gamma.resize(GlobalV::NSPIN);
     else
         this->wfc_k.resize(GlobalC::kv.nks);
+    this->LOWF.orb_con = &orb_con_in;
 }
 
 LOOP_ions::~LOOP_ions()
@@ -150,7 +151,7 @@ void LOOP_ions::opt_ions()
 
 		// solve electronic structures in terms of LCAO
 		// mohan add 2021-02-09
-		LOE.solve_elec_stru(this->istep, this->wfc_gamma, this->wfc_k, this->LOC);
+		LOE.solve_elec_stru(this->istep, this->wfc_gamma, this->wfc_k, this->LOC, this->LOWF);
 
 
 		time_t eend = time(NULL);
@@ -287,7 +288,7 @@ void LOOP_ions::opt_ions()
 
     }
 
-    GlobalC::en.perform_dos(this->wfc_gamma, this->wfc_k);
+    GlobalC::en.perform_dos(this->wfc_gamma, this->wfc_k, this->LOWF);
 
     ModuleBase::timer::tick("LOOP_ions", "opt_ions");
     return;
@@ -560,7 +561,7 @@ void LOOP_ions::final_scf(void)
     // this information is used to calculate
     // the force.
 
-	this->LOC.allocate_dm_wfc(GlobalC::GridT, this->wfc_gamma, this->wfc_k);
+	this->LOC.allocate_dm_wfc(GlobalC::GridT, this->wfc_gamma, this->wfc_k, this->LOWF);
 
     GlobalC::UHM.set_lcao_matrices();
 	//------------------------------------------------------------------
@@ -584,7 +585,7 @@ void LOOP_ions::final_scf(void)
 
 
 	ELEC_scf es;
-	es.scf(0, wfc_gamma, wfc_k, this->LOC);
+	es.scf(0, wfc_gamma, wfc_k, this->LOC,this->LOWF.WFC_K);
 
     if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
     {

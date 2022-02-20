@@ -17,7 +17,8 @@ ELEC_cbands_k::~ELEC_cbands_k(){};
 
 void ELEC_cbands_k::cal_bands(const int& istep, LCAO_Hamilt& uhm,
     std::vector<ModuleBase::ComplexMatrix>& wfc_k,
-    std::vector<ModuleBase::ComplexMatrix>& dm_k)
+    std::vector<ModuleBase::ComplexMatrix>& dm_k,
+    std::complex<double>*** WFC_K)
 {
 	ModuleBase::TITLE("ELEC_cbands_k","cal_bands");
 	ModuleBase::timer::tick("ELEC_cbands_k","cal_bands");
@@ -139,10 +140,10 @@ void ELEC_cbands_k::cal_bands(const int& istep, LCAO_Hamilt& uhm,
 			GlobalC::restart.save_disk("H", ik);
 		}
 
-		// write the wave functions into GlobalC::LOWF.WFC_K[ik].
+		// write the wave functions into WFC_K[ik].
 		ModuleBase::timer::tick("Efficience","diago_k");
 		Diago_LCAO_Matrix DLM;
-		DLM.solve_complex_matrix(ik, GlobalC::LOWF.WFC_K[ik], wfc_k[ik]);
+		DLM.solve_complex_matrix(ik, WFC_K[ik], wfc_k[ik]);
 		ModuleBase::timer::tick("Efficience","diago_k");
 
 		ModuleBase::timer::tick("Efficience","each_k");

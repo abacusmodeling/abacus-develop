@@ -25,7 +25,8 @@
 #include <sys/time.h>
 
 void energy::perform_dos( std::vector<ModuleBase::matrix> &wfc_gamma,
-    std::vector<ModuleBase::ComplexMatrix> &wfc_k)
+    std::vector<ModuleBase::ComplexMatrix>& wfc_k,
+    Local_Orbital_wfc &lowf)
 {
 	ModuleBase::TITLE("energy","perform_dos");
 
@@ -179,7 +180,7 @@ void energy::perform_dos( std::vector<ModuleBase::matrix> &wfc_gamma,
 	if(GlobalV::mulliken == 1)
 	{
 		Mulliken_Charge   MC(&wfc_gamma, &wfc_k);
-		MC.stdout_mulliken();			
+		MC.stdout_mulliken(*lowf.orb_con);			
 	}//qifeng add 2019/9/10
 #endif
 
@@ -328,7 +329,7 @@ void energy::perform_dos( std::vector<ModuleBase::matrix> &wfc_gamma,
 					GlobalV::test_atom_input);//qifeng-2019-01-21
 
 				// mohan update 2021-04-16
-				GlobalC::LOWF.orb_con.read_orb_first(
+				lowf.orb_con->read_orb_first(
 					GlobalV::ofs_running,
 					GlobalC::ORB,
 					GlobalC::ucell.ntype,
@@ -349,7 +350,7 @@ void energy::perform_dos( std::vector<ModuleBase::matrix> &wfc_gamma,
 					GlobalC::ORB
 				);
 
-				GlobalC::LOWF.orb_con.set_orb_tables(
+				lowf.orb_con->set_orb_tables(
 					GlobalV::ofs_running,
 					GlobalC::UOT,
 					GlobalC::ORB,
@@ -447,7 +448,7 @@ void energy::perform_dos( std::vector<ModuleBase::matrix> &wfc_gamma,
 					GlobalV::test_atom_input);
 #endif
 				// mohan update 2021-02-10
-				GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
+				lowf.orb_con->clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
 			}//else
 
 		 MPI_Reduce(pdosk[is].c, pdos[is].c , NUM , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);
