@@ -20,8 +20,6 @@ class Local_Orbital_Charge
 
 	// mohan added 2021-02-08
     void allocate_dm_wfc(const Grid_Technique& gt,
-        std::vector<ModuleBase::matrix>& wfc_gamma,
-        std::vector<ModuleBase::ComplexMatrix>& wfc_k,
         Local_Orbital_wfc &lowf);
     // sum bands to compute the electron charge density
 	void sum_bands(void);
@@ -85,9 +83,6 @@ class Local_Orbital_Charge
     //-----------------
 	// wavefunctions' pointer
     //-----------------
-    //2d wfc, pointers to LOOP_ions::wfc_gamma, LOOP_ions::wfc_k
-    std::vector<ModuleBase::matrix>* wfc_gamma;			// dm_gamma[is](iw1,iw2);
-    std::vector<ModuleBase::ComplexMatrix>* wfc_k;		// dm_k[ik](iw1,iw2);
     Local_Orbital_wfc *LOWF;
 
 private:

@@ -122,7 +122,7 @@ void ELEC_evolve::evolve_psi(
 		}		
 		ModuleBase::timer::tick("Efficience","evolve_k");
 		Evolve_LCAO_Matrix ELM;
-		ELM.evolve_complex_matrix(ik, WFC_K[ik], wfc_k[ik], WFC_K);
+		ELM.evolve_complex_matrix(ik, WFC_K, wfc_k[ik]);
 		ModuleBase::timer::tick("Efficience","evolve_k");
 	} // end k
 

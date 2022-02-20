@@ -24,10 +24,8 @@ ELEC_scf::~ELEC_scf(){}
 int ELEC_scf::iter=0;
 
 void ELEC_scf::scf(const int& istep,
-    std::vector<ModuleBase::matrix>& wfc_gamma,
-    std::vector<ModuleBase::ComplexMatrix>& wfc_k,
     Local_Orbital_Charge &loc,
-    std::complex<double>*** WFC_K)
+    Local_Orbital_wfc &lowf)
 {
 	ModuleBase::TITLE("ELEC_scf","scf");
 	ModuleBase::timer::tick("ELEC_scf","scf");
@@ -185,7 +183,7 @@ void ELEC_scf::scf(const int& istep,
 			case 5:    case 6:   case 9:
 				if( !GlobalC::exx_global.info.separate_loop )
 				{
-					GlobalC::exx_lcao.cal_exx_elec(loc, WFC_K);
+					GlobalC::exx_lcao.cal_exx_elec(loc, lowf.WFC_K);
 				}
 				break;
 		}
@@ -199,17 +197,17 @@ void ELEC_scf::scf(const int& istep,
 		// mohan add 2021-02-09
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			ELEC_cbands_gamma::cal_bands(istep, GlobalC::UHM, wfc_gamma, loc.dm_gamma);
+			ELEC_cbands_gamma::cal_bands(istep, GlobalC::UHM, lowf.wfc_gamma, loc.dm_gamma);
 		}
 		else
 		{
 			if(ELEC_evolve::tddft && istep >= 1 && iter > 1)
 			{
-				ELEC_evolve::evolve_psi(istep, GlobalC::UHM, wfc_k, WFC_K);
+				ELEC_evolve::evolve_psi(istep, GlobalC::UHM, lowf.wfc_k, lowf.WFC_K);
 			}
 			else
 			{
-				ELEC_cbands_k::cal_bands(istep, GlobalC::UHM, wfc_k, loc.dm_k, WFC_K);
+				ELEC_cbands_k::cal_bands(istep, GlobalC::UHM, lowf.wfc_k, loc.dm_k, lowf.WFC_K);
 			}
 		}
 
@@ -282,7 +280,7 @@ void ELEC_scf::scf(const int& istep,
 			if(GlobalC::restart.info_load.load_H && GlobalC::restart.info_load.load_H_finish && !GlobalC::restart.info_load.restart_exx)
 			{
 				GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
-				GlobalC::exx_lcao.cal_exx_elec(loc, WFC_K);
+				GlobalC::exx_lcao.cal_exx_elec(loc, lowf.WFC_K);
 				GlobalC::restart.info_load.restart_exx = true;
 			}
 		}
@@ -459,7 +457,7 @@ void ELEC_scf::scf(const int& istep,
 				std::cout <<"nomega = "<<GlobalC::chi0_hilbert.nomega<<std::endl;
 				std::cout <<"dim = "<<GlobalC::chi0_hilbert.dim<<std::endl;
                 //std::cout <<"oband = "<<GlobalC::chi0_hilbert.oband<<std::endl;
-                GlobalC::chi0_hilbert.WFC_K = WFC_K;
+                GlobalC::chi0_hilbert.WFC_K = lowf.WFC_K;
                 GlobalC::chi0_hilbert.Chi();
 			}
 

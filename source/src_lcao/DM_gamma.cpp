@@ -274,7 +274,7 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
 
 	if(GlobalC::wf.start_wfc=="file")
 	{
-		this->gamma_file(gt, *(this->wfc_gamma));
+		this->gamma_file(gt, this->LOWF->wfc_gamma);
 	}
 
     return;

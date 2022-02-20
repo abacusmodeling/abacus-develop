@@ -27,9 +27,7 @@ class energy
     energy();
     ~energy();
 
-	void perform_dos(std::vector<ModuleBase::matrix> &wfc_gamma,
-        std::vector<ModuleBase::ComplexMatrix>& wfc_k,
-        Local_Orbital_wfc &lowf);
+	void perform_dos(Local_Orbital_wfc &lowf);
     void perform_dos_pw(void);
 
     double etot;    	   // the total energy of the solid

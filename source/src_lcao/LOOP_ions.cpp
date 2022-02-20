@@ -25,9 +25,9 @@
 LOOP_ions::LOOP_ions(ORB_control &orb_con_in)
 {
     if (GlobalV::GAMMA_ONLY_LOCAL)
-        this->wfc_gamma.resize(GlobalV::NSPIN);
+        this->LOWF.wfc_gamma.resize(GlobalV::NSPIN);
     else
-        this->wfc_k.resize(GlobalC::kv.nks);
+        this->LOWF.wfc_k.resize(GlobalC::kv.nks);
     this->LOWF.orb_con = &orb_con_in;
 }
 
@@ -151,7 +151,7 @@ void LOOP_ions::opt_ions()
 
 		// solve electronic structures in terms of LCAO
 		// mohan add 2021-02-09
-		LOE.solve_elec_stru(this->istep, this->wfc_gamma, this->wfc_k, this->LOC, this->LOWF);
+		LOE.solve_elec_stru(this->istep, this->LOC, this->LOWF);
 
 
 		time_t eend = time(NULL);
@@ -181,7 +181,7 @@ void LOOP_ions::opt_ions()
         this->output_SR("outputs_to_DMFT/overlap_matrix/SR.csr");
         
         // Output wave functions, bands, k-points information, and etc.
-        GlobalC::dmft.out_to_dmft(this->wfc_k);
+        GlobalC::dmft.out_to_dmft(this->LOWF.wfc_k);
         }
 
         if(GlobalC::ParaO.out_hsR)
@@ -288,7 +288,7 @@ void LOOP_ions::opt_ions()
 
     }
 
-    GlobalC::en.perform_dos(this->wfc_gamma, this->wfc_k, this->LOWF);
+    GlobalC::en.perform_dos(this->LOWF);
 
     ModuleBase::timer::tick("LOOP_ions", "opt_ions");
     return;
@@ -316,7 +316,7 @@ bool LOOP_ions::force_stress(
     FSL.allocate();
     FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS,
         GlobalV::TEST_FORCE, GlobalV::TEST_STRESS,
-        this->wfc_gamma, this->wfc_k, this->LOC, fcs, scs);
+        this->LOC, this->LOWF, fcs, scs);
 
 	//--------------------------------------------------
 	// only forces are needed, no stresses are needed
@@ -561,7 +561,7 @@ void LOOP_ions::final_scf(void)
     // this information is used to calculate
     // the force.
 
-	this->LOC.allocate_dm_wfc(GlobalC::GridT, this->wfc_gamma, this->wfc_k, this->LOWF);
+	this->LOC.allocate_dm_wfc(GlobalC::GridT, this->LOWF);
 
     GlobalC::UHM.set_lcao_matrices();
 	//------------------------------------------------------------------
@@ -585,7 +585,7 @@ void LOOP_ions::final_scf(void)
 
 
 	ELEC_scf es;
-	es.scf(0, wfc_gamma, wfc_k, this->LOC,this->LOWF.WFC_K);
+	es.scf(0, this->LOC,this->LOWF);
 
     if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
     {

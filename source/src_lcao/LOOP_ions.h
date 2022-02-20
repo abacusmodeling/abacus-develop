@@ -37,9 +37,6 @@ class LOOP_ions
 	Ions_Move_Methods IMM;
 
     Lattice_Change_Methods LCM;
-
-    vector<ModuleBase::matrix> wfc_gamma;
-    vector<ModuleBase::ComplexMatrix> wfc_k;
 	
 	// PLEASE move 'force_stress()'  function to other places, such as FORCE_STRESS.cpp or
 	// you might think to create a new file, it is because 'force_stress' do not

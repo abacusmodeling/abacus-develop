@@ -234,25 +234,22 @@ void Run_MD_LCAO::md_force_virial(
         GlobalC::en.evdw = vdwd3.get_energy();
     }
 
-    std::vector<ModuleBase::matrix> wfc_gamma_md;
-    std::vector<ModuleBase::ComplexMatrix> wfc_k_md;
+    Local_Orbital_wfc LOWF_md;
+    Local_Orbital_Charge LOC_md;
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {
-        wfc_gamma_md.resize(GlobalV::NSPIN);
+        LOWF_md.wfc_gamma.resize(GlobalV::NSPIN);
 	}
 	else
 	{
-        wfc_k_md.resize(GlobalC::kv.nks);
+        LOWF_md.wfc_k.resize(GlobalC::kv.nks);
     }
-
-    Local_Orbital_wfc LOWF_md;
-    Local_Orbital_Charge LOC_md;
 
     LOC_md.init_dm_2d();
     // solve electronic structures in terms of LCAO
     // mohan add 2021-02-09
     LOOP_elec LOE;
-    LOE.solve_elec_stru(istep + 1, wfc_gamma_md,wfc_k_md, LOC_md, LOWF_md);
+    LOE.solve_elec_stru(istep + 1, LOC_md, LOWF_md);
 
     //to call the force of each atom
 	ModuleBase::matrix fcs;//temp force matrix
@@ -260,7 +257,7 @@ void Run_MD_LCAO::md_force_virial(
 	FSL.allocate (); 
     FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS,
         GlobalV::TEST_FORCE, GlobalV::TEST_STRESS,
-        wfc_gamma_md, wfc_k_md, LOC_md, fcs, virial);
+        LOC_md, LOWF_md, fcs, virial);
 
 	for(int ion=0; ion<numIon; ++ion)
     {

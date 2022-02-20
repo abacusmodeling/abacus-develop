@@ -12,11 +12,9 @@ ELEC_nscf::ELEC_nscf(){}
 ELEC_nscf::~ELEC_nscf(){}
 
 void ELEC_nscf::nscf(LCAO_Hamilt& uhm,
-    std::vector<ModuleBase::matrix>& wfc_gamma,
     std::vector<ModuleBase::matrix>& dm_gamma,
-    std::vector<ModuleBase::ComplexMatrix>& wfc_k,
     std::vector<ModuleBase::ComplexMatrix>& dm_k,
-    std::complex<double>*** WFC_K)
+    Local_Orbital_wfc &lowf)
 {
 	ModuleBase::TITLE("ELEC_nscf","nscf");
 
@@ -41,11 +39,11 @@ void ELEC_nscf::nscf(LCAO_Hamilt& uhm,
 	int istep=0; 
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		ELEC_cbands_gamma::cal_bands(istep, uhm, wfc_gamma, dm_gamma);
+		ELEC_cbands_gamma::cal_bands(istep, uhm, lowf.wfc_gamma, dm_gamma);
 	}
 	else
 	{
-		ELEC_cbands_k::cal_bands(istep, uhm, wfc_k, dm_k, WFC_K);
+		ELEC_cbands_k::cal_bands(istep, uhm, lowf.wfc_k, dm_k, lowf.WFC_K);
 	}
 
 	time_t time_finish=std::time(NULL);
@@ -92,7 +90,7 @@ void ELEC_nscf::nscf(LCAO_Hamilt& uhm,
 	// add by jingan
 	if (berryphase::berry_phase_flag && ModuleSymmetry::Symmetry::symm_flag == 0)
     {
-    	berryphase bp(&wfc_k, WFC_K);
+    	berryphase bp(&lowf.wfc_k, lowf.WFC_K);
 		bp.Macroscopic_polarization();
     }
 

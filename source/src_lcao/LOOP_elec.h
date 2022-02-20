@@ -17,8 +17,6 @@ class LOOP_elec
 
 	// mohan add 2021-02-09
     void solve_elec_stru(const int& istep,
-        std::vector<ModuleBase::matrix>& wfc_gamma,
-        std::vector<ModuleBase::ComplexMatrix>& wfc_k,
         Local_Orbital_Charge& loc,
         Local_Orbital_wfc& lowf);
 
@@ -28,16 +26,12 @@ class LOOP_elec
 	void set_matrix_grid(void);
 
     void before_solver(const int& istep,
-        std::vector<ModuleBase::matrix>& wfc_gamma,
-        std::vector<ModuleBase::ComplexMatrix>& wfc_k,
         Local_Orbital_Charge& loc,
         Local_Orbital_wfc &lowf);
 
     void solver(const int& istep,
-        std::vector<ModuleBase::matrix>& wfc_gamma,
-        std::vector<ModuleBase::ComplexMatrix>& wfc_k,
         Local_Orbital_Charge& loc,
-        std::complex<double>*** WFC_K);
+        Local_Orbital_wfc &lowf);
 
 };
 

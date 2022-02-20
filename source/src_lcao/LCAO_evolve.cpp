@@ -10,7 +10,7 @@
 Evolve_LCAO_Matrix::Evolve_LCAO_Matrix(){}
 Evolve_LCAO_Matrix::~Evolve_LCAO_Matrix(){}
 
-void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, std::complex<double>** c, ModuleBase::ComplexMatrix &wfc_2d, std::complex<double>*** WFC_K)const
+void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, std::complex<double>*** WFC_K, ModuleBase::ComplexMatrix &wfc_2d)const
 {
 	ModuleBase::TITLE("Evolve_LCAO_Matrix","evolve_complex_matrix");
 	time_t time_start = time(NULL);
@@ -20,12 +20,12 @@ void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, std::complex<doubl
 	{
 ///*
 #ifdef __MPI
-		this->using_ScaLAPACK_complex(ik, c, wfc_2d);
+		this->using_ScaLAPACK_complex(ik, wfc_2d);
 #else
-		//this->using_LAPACK_complex(ik, c, wfc_2d);
+		//this->using_LAPACK_complex(ik, WFC_K, wfc_2d);
 #endif
 //*/
-		//this->using_ScaLAPACK_complex(ik, c, wfc_2d);
+		//this->using_ScaLAPACK_complex(ik, WFC_K, wfc_2d);
 	}
 	else
 	{
@@ -38,8 +38,7 @@ void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, std::complex<doubl
 	return;
 }
 
-void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double>** c, std::complex<double>** c_init,
-    std::complex<double>*** WFC_K)const
+void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double>*** WFC_K, std::complex<double>** c_init)const
 {
     ModuleBase::TITLE("Evolve_LCAO_Matrix","using_LAPACK_complex");
 
@@ -201,7 +200,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
 	{
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			std::cout << c[i][j] << "\t";
+			std::cout << WFC_K[ik][i][j] << "\t";
 		}
 		std::cout <<std::endl;
 	}
@@ -232,7 +231,6 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
 		}
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			c[i][j] = ccc[j];
 			WFC_K[ik][i][j] = ccc[j];
 		}	
 	}
@@ -252,7 +250,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
         {
                 for(int j=0; j<GlobalV::NLOCAL; j++)
                 {
-                        std::cout << c[i][j] <<"\t";
+                        std::cout << WFC_K[ik][i][j] <<"\t";
                 }
                 std::cout <<std::endl;
         }
@@ -263,7 +261,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
         {
                 for(int j=0; j<GlobalV::NLOCAL; j++)
                 {
-                        std::cout << c[i][j] << "\t";
+                        std::cout << WFC_K[ik][i][j] << "\t";
                 }
                 std::cout <<std::endl;
         }
@@ -277,7 +275,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
 }
 
 #ifdef __MPI
-int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, complex<double>** c, ModuleBase::ComplexMatrix &wfc_2d)const
+int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, ModuleBase::ComplexMatrix &wfc_2d)const
 {
 	ModuleBase::TITLE("Evolve_LCAO_Matrix","using_ScaLAPACK_complex");
 

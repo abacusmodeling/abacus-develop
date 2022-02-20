@@ -78,14 +78,9 @@ Local_Orbital_Charge::~Local_Orbital_Charge()
 
 
 void Local_Orbital_Charge::allocate_dm_wfc(const Grid_Technique& gt,
-    std::vector<ModuleBase::matrix>& wfc_gamma,
-    std::vector<ModuleBase::ComplexMatrix>& wfc_k,
     Local_Orbital_wfc &lowf)
 {
     ModuleBase::TITLE("Local_Orbital_Charge", "allocate_dm_wfc");
-    this->wfc_gamma = &wfc_gamma;
-    this->wfc_k = &wfc_k;
-
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
 		// here we reset the density matrix dimension.
@@ -93,7 +88,7 @@ void Local_Orbital_Charge::allocate_dm_wfc(const Grid_Technique& gt,
 	}
 	else
     {
-		lowf.allocate_k(gt, wfc_k);
+		lowf.allocate_k(gt, lowf.wfc_k);
 		this->allocate_DM_k();
 	}
 
@@ -134,7 +129,7 @@ void Local_Orbital_Charge::sum_bands(void)
 
             //caution:wfc and dm 
             this->cal_dm(GlobalC::wf.wg,
-                *wfc_gamma, this->dm_gamma);        // Peize Lin test 2019-01-16
+                this->LOWF->wfc_gamma, this->dm_gamma);        // Peize Lin test 2019-01-16
 
             ModuleBase::timer::tick("LCAO_Charge","cal_dm_2d");
 
@@ -152,7 +147,7 @@ void Local_Orbital_Charge::sum_bands(void)
         if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")        // Peize Lin test 2019-05-15
 		{
             this->cal_dm(GlobalC::wf.wg,
-                *wfc_k, this->dm_k);
+                this->LOWF->wfc_k, this->dm_k);
         }
     }
 
