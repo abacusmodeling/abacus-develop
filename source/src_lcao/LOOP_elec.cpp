@@ -27,10 +27,8 @@
 #endif
 
 void LOOP_elec::solve_elec_stru(const int& istep,
-    std::vector<ModuleBase::matrix>& wfc_gamma,
-    std::vector<ModuleBase::matrix>& dm_gamma,
-    std::vector<ModuleBase::ComplexMatrix>& wfc_k,
-    std::vector<ModuleBase::ComplexMatrix>& dm_k)
+    Local_Orbital_Charge& loc,
+    Local_Orbital_wfc& lowf)
 {
     ModuleBase::TITLE("LOOP_elec","solve_elec_stru"); 
     ModuleBase::timer::tick("LOOP_elec","solve_elec_stru"); 
@@ -38,9 +36,9 @@ void LOOP_elec::solve_elec_stru(const int& istep,
 	// prepare HS matrices, prepare grid integral
 	this->set_matrix_grid();
 	// density matrix extrapolation and prepare S,T,VNL matrices 
-	this->before_solver(istep, wfc_gamma, wfc_k);
+	this->before_solver(istep, loc, lowf);
 	// do self-interaction calculations / nscf/ tddft, etc. 
-	this->solver(istep, wfc_gamma, dm_gamma, wfc_k, dm_k);
+	this->solver(istep, loc, lowf);
 
     ModuleBase::timer::tick("LOOP_elec","solve_elec_stru"); 
 	return;
@@ -99,8 +97,8 @@ void LOOP_elec::set_matrix_grid(void)
 
 
 void LOOP_elec::before_solver(const int& istep,
-    std::vector<ModuleBase::matrix>& wfc_gamma,
-    std::vector<ModuleBase::ComplexMatrix>& wfc_k)
+    Local_Orbital_Charge& loc,
+    Local_Orbital_wfc& lowf)
 {
     ModuleBase::TITLE("LOOP_elec","before_solver"); 
     ModuleBase::timer::tick("LOOP_elec","before_solver"); 
@@ -111,7 +109,7 @@ void LOOP_elec::before_solver(const int& istep,
 	// the force.
 
 	// init density kernel and wave functions.
-	GlobalC::LOC.allocate_dm_wfc(GlobalC::GridT, wfc_gamma, wfc_k);
+	loc.allocate_dm_wfc(GlobalC::GridT, lowf);
 
 	//======================================
 	// do the charge extrapolation before the density matrix is regenerated.
@@ -132,17 +130,17 @@ void LOOP_elec::before_solver(const int& istep,
 			std::stringstream ssd;
 			ssd << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DM" ;
 			// reading density matrix,
-			GlobalC::LOC.read_dm(is, ssd.str() );
+			loc.read_dm(is, ssd.str() );
 		}
 
 		// calculate the charge density
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			GlobalC::UHM.GG.cal_rho(GlobalC::LOC.DM);
+			GlobalC::UHM.GG.cal_rho(loc.DM);
 		}
 		else
 		{
-			GlobalC::UHM.GK.cal_rho_k();
+			GlobalC::UHM.GK.cal_rho_k(loc.DM_R);
 		}
 
 		// renormalize the charge density
@@ -176,10 +174,8 @@ void LOOP_elec::before_solver(const int& istep,
 }
 
 void LOOP_elec::solver(const int& istep,
-    std::vector<ModuleBase::matrix>& wfc_gamma,
-    std::vector<ModuleBase::matrix>& dm_gamma,
-    std::vector<ModuleBase::ComplexMatrix>& wfc_k,
-    std::vector<ModuleBase::ComplexMatrix>& dm_k)
+    Local_Orbital_Charge& loc,
+    Local_Orbital_wfc& lowf)
 {
     ModuleBase::TITLE("LOOP_elec","solver"); 
     ModuleBase::timer::tick("LOOP_elec","solver"); 
@@ -207,8 +203,7 @@ void LOOP_elec::solver(const int& istep,
 		if( Exx_Global::Hybrid_Type::No==GlobalC::exx_global.info.hybrid_type  )
 		{
 			ELEC_scf es;
-            es.scf(istep - 1, wfc_gamma, dm_gamma,
-                wfc_k, dm_k);
+            es.scf(istep - 1, loc, lowf);
         }
 		else if( Exx_Global::Hybrid_Type::Generate_Matrix == GlobalC::exx_global.info.hybrid_type )
 		{
@@ -218,16 +213,16 @@ void LOOP_elec::solver(const int& istep,
 		else    // Peize Lin add 2016-12-03
 		{
 			ELEC_scf es;
-            es.scf(istep - 1, wfc_gamma, dm_gamma, wfc_k, dm_k);
-            if (GlobalC::exx_global.info.separate_loop)
+            es.scf(istep - 1, loc, lowf);
+            if (GlobalC::exx_global.info.separate_loop, lowf.WFC_K)
 			{
 				for( size_t hybrid_step=0; hybrid_step!=GlobalC::exx_global.info.hybrid_step; ++hybrid_step )
 				{
 					GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
-					GlobalC::exx_lcao.cal_exx_elec(dm_gamma, dm_k);
+					GlobalC::exx_lcao.cal_exx_elec(loc, lowf.WFC_K);
 					
 					ELEC_scf es;
-					es.scf(istep-1, wfc_gamma, dm_gamma, wfc_k, dm_k);
+					es.scf(istep-1, loc, lowf);
 					if(ELEC_scf::iter==1)     // exx converge
 					{
 						break;
@@ -239,18 +234,17 @@ void LOOP_elec::solver(const int& istep,
 				GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
 
 				ELEC_scf es;
-				es.scf(istep-1, wfc_gamma, dm_gamma,
-                wfc_k, dm_k);
+				es.scf(istep-1, loc, lowf);
 			}
 		}
 	}
 	else if (GlobalV::CALCULATION=="nscf")
 	{
-		ELEC_nscf::nscf(GlobalC::UHM, wfc_gamma, dm_gamma, wfc_k, dm_k);
+		ELEC_nscf::nscf(GlobalC::UHM, loc.dm_gamma, loc.dm_k, lowf);
 	}
 	else if (GlobalV::CALCULATION=="istate")
 	{
-		IState_Charge ISC(&wfc_gamma, &dm_gamma);
+		IState_Charge ISC(lowf.wfc_gamma, loc);
 		ISC.begin();
 	}
 	else if (GlobalV::CALCULATION=="ienvelope")

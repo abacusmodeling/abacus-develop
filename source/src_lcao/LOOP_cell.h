@@ -3,6 +3,7 @@
 #include<vector>
 #include "module_base/matrix.h"
 #include "module_base/complexmatrix.h"
+#include "module_orbital/ORB_control.h"
 
 class LOOP_cell
 {
@@ -11,7 +12,7 @@ class LOOP_cell
 	LOOP_cell();
 	~LOOP_cell();
 
-	void opt_cell();
+	void opt_cell(ORB_control &orb_con);
 
 };
 

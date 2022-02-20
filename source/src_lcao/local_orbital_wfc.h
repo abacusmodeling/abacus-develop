@@ -13,12 +13,17 @@ class Local_Orbital_wfc
 	Local_Orbital_wfc();
 	~Local_Orbital_wfc();
 
-	// used to generate density matrix: GlobalC::LOC.DM_R,
+    //grid WFC
+    // used to generate density matrix: LOC.DM_R,
 	// which is used to calculate the charge density. 
 	// which is got after the diagonalization of 
 	// std::complex Hamiltonian matrix.
 	std::complex<double>*** WFC_K; // [NK, GlobalV::NBANDS, GlobalV::NLOCAL]	
-	std::complex<double>* WFC_K_POOL; // [NK*GlobalV::NBANDS*GlobalV::NLOCAL]
+    std::complex<double>* WFC_K_POOL; // [NK*GlobalV::NBANDS*GlobalV::NLOCAL]
+    
+    //2d wfc, pointers to LOOP_ions::wfc_gamma, LOOP_ions::wfc_k
+    std::vector<ModuleBase::matrix> wfc_gamma;			// dm_gamma[is](iw1,iw2);
+    std::vector<ModuleBase::ComplexMatrix> wfc_k;		// dm_k[ik](iw1,iw2);
 
 
     void allocate_k(const Grid_Technique& gt,
@@ -32,7 +37,7 @@ class Local_Orbital_wfc
 	// void init_Cij(const bool change_c = 1);
 
 	// mohan move orb_con here, 2021-05-24 
-	ORB_control orb_con;
+	ORB_control* orb_con=nullptr;
 	
 	private:
 

@@ -2,6 +2,7 @@
 #define ENERGY_H
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
+#include "src_lcao/local_orbital_wfc.h"
 
 class energy
 {
@@ -26,9 +27,8 @@ class energy
     energy();
     ~energy();
 
-	void perform_dos(std::vector<ModuleBase::matrix> &wfc_gamma,
-    std::vector<ModuleBase::ComplexMatrix> &wfc_k);
-	void perform_dos_pw(void);
+	void perform_dos(Local_Orbital_wfc &lowf);
+    void perform_dos_pw(void);
 
     double etot;    	   // the total energy of the solid
     double ef;             // the fermi energy

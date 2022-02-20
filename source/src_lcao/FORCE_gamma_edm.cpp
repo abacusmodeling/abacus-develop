@@ -9,6 +9,7 @@ void Force_LCAO_gamma::cal_foverlap(
 	const bool isforce, 
     const bool isstress,
     vector<ModuleBase::matrix>& wfc_gamma,
+    Local_Orbital_Charge &loc,
     ModuleBase::matrix& foverlap,
 	ModuleBase::matrix& soverlap)
 {
@@ -29,7 +30,7 @@ void Force_LCAO_gamma::cal_foverlap(
     }
 
     std::vector<ModuleBase::matrix> edm_gamma(GlobalV::NSPIN);
-    GlobalC::LOC.cal_dm(wgEkb,
+    loc.cal_dm(wgEkb,
         wfc_gamma,
         edm_gamma);
 

@@ -5,6 +5,8 @@
 #include "../module_base/global_variable.h"
 #include "module_base/matrix.h"
 #include "module_base/complexmatrix.h"
+#include "src_lcao/local_orbital_charge.h"
+#include "src_lcao/local_orbital_wfc.h"
 
 class LOOP_elec
 {
@@ -15,10 +17,8 @@ class LOOP_elec
 
 	// mohan add 2021-02-09
     void solve_elec_stru(const int& istep,
-        std::vector<ModuleBase::matrix>& wfc_gamma,
-        std::vector<ModuleBase::matrix>& dm_gamma,
-        std::vector<ModuleBase::ComplexMatrix>& wfc_k,
-        std::vector<ModuleBase::ComplexMatrix>& dm_k);
+        Local_Orbital_Charge& loc,
+        Local_Orbital_wfc& lowf);
 
 	private:
 
@@ -26,14 +26,12 @@ class LOOP_elec
 	void set_matrix_grid(void);
 
     void before_solver(const int& istep,
-        std::vector<ModuleBase::matrix>& wfc_gamma,
-        std::vector<ModuleBase::ComplexMatrix>& wfc_k);
+        Local_Orbital_Charge& loc,
+        Local_Orbital_wfc &lowf);
 
     void solver(const int& istep,
-        std::vector<ModuleBase::matrix>& wfc_gamma,
-        std::vector<ModuleBase::matrix>& dm_gamma,
-        std::vector<ModuleBase::ComplexMatrix>& wfc_k,
-        std::vector<ModuleBase::ComplexMatrix>& dm_k);
+        Local_Orbital_Charge& loc,
+        Local_Orbital_wfc &lowf);
 
 };
 

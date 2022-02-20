@@ -5,6 +5,7 @@
 #include "../module_base/global_variable.h"
 #ifdef __LCAO
 #include "../module_orbital/ORB_gen_tables.h"
+#include "module_orbital/ORB_control.h"
 #include "../module_neighbor/sltk_grid_driver.h"
 #include "../src_lcao/LCAO_matrix.h"
 #include "../src_lcao/global_fp.h"
@@ -34,9 +35,9 @@ class Mulliken_Charge
 
 	std::complex<double> *mug;
 
-	void cal_mulliken(void);
+	void cal_mulliken(ORB_control &orb_con);
 
-	void stdout_mulliken(void);
+	void stdout_mulliken(ORB_control &orb_con);
 
 	private:
 

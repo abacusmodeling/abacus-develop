@@ -47,10 +47,8 @@ void Force_Stress_LCAO::getForceStress(
 	const bool isstress,
 	const bool istestf,
     const bool istests,
-    vector<ModuleBase::matrix>& wfc_gamma,
-    vector<ModuleBase::matrix>& dm_gamma,
-    vector<ModuleBase::ComplexMatrix>& wfc_k,
-    vector<ModuleBase::ComplexMatrix>& dm_k,
+    Local_Orbital_Charge& loc,
+    Local_Orbital_wfc& lowf,
     ModuleBase::matrix& fcs,
 	ModuleBase::matrix &scs)
 {
@@ -139,10 +137,8 @@ void Force_Stress_LCAO::getForceStress(
 				GlobalV::GAMMA_ONLY_LOCAL,
 				isforce,
 				isstress,
-                wfc_gamma,
-                dm_gamma,
-                wfc_k,
-                dm_k,
+                loc,
+                lowf,
                 foverlap,
 				ftvnl_dphi,
 				fvnl_dbeta,
@@ -216,7 +212,7 @@ void Force_Stress_LCAO::getForceStress(
 	if (INPUT.dft_plus_u)
 	{
 		// Quxin add for DFT+U on 20201029
-		GlobalC::dftu.force_stress(dm_gamma, dm_k);
+		GlobalC::dftu.force_stress(loc.dm_gamma, loc.dm_k);
 		
         if (isforce) {
             force_dftu.create(nat, 3);
@@ -328,7 +324,7 @@ void Force_Stress_LCAO::getForceStress(
 
 				if(GlobalV::GAMMA_ONLY_LOCAL)
 				{
-    				GlobalC::ld.cal_gdmx(dm_gamma[0],
+    				GlobalC::ld.cal_gdmx(loc.dm_gamma[0],
 						GlobalC::ucell,
 						GlobalC::ORB,
 						GlobalC::GridD,
@@ -336,7 +332,7 @@ void Force_Stress_LCAO::getForceStress(
 				}
 				else
 				{			
-					GlobalC::ld.cal_gdmx_k(dm_k,
+					GlobalC::ld.cal_gdmx_k(loc.dm_k,
 						GlobalC::ucell,
 						GlobalC::ORB,
 						GlobalC::GridD,
@@ -731,10 +727,8 @@ void Force_Stress_LCAO::calForceStressIntegralPart(
 	const bool isGammaOnly,
 	const bool isforce,
     const bool isstress,
-    vector<ModuleBase::matrix>& wfc_gamma,
-    vector<ModuleBase::matrix>& dm_gamma,
-    vector<ModuleBase::ComplexMatrix>& wfc_k,
-    vector<ModuleBase::ComplexMatrix>& dm_k,
+    Local_Orbital_Charge& loc,
+    Local_Orbital_wfc& lowf,
     ModuleBase::matrix& foverlap,
 	ModuleBase::matrix& ftvnl_dphi,
 	ModuleBase::matrix& fvnl_dbeta,
@@ -754,8 +748,8 @@ void Force_Stress_LCAO::calForceStressIntegralPart(
     	flk.ftable_gamma(
 				isforce,
 				isstress,
-                wfc_gamma,
-                dm_gamma,
+                lowf.wfc_gamma,
+                loc,
                 foverlap,
 				ftvnl_dphi,
 				fvnl_dbeta,
@@ -775,8 +769,8 @@ void Force_Stress_LCAO::calForceStressIntegralPart(
 		flk.ftable_k(
 				isforce,
 				isstress,
-                wfc_k,
-                dm_k,
+                lowf.wfc_k,
+                loc,
                 foverlap,
 				ftvnl_dphi,
 				fvnl_dbeta,

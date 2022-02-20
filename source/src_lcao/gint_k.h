@@ -96,7 +96,7 @@ class Gint_k : public Gint_k_init
     // in gint_k_rho.cpp 
     //------------------------------------------------------
     // calculate the charge density via grid integrals
-    void cal_rho_k(void);
+    void cal_rho_k(double** DM_R_in);
 
     //------------------------------------------------------
     // in gint_k_fvl.cpp 
@@ -261,6 +261,8 @@ class Gint_k : public Gint_k_init
     // just pointer.
     bool pvpR_alloc_flag;
     bool reduced;
+
+    double** DM_R; //pointer to Local_Orbital_Charge::DM_R
 };
 
 #endif

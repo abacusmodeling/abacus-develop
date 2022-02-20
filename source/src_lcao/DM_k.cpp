@@ -52,7 +52,7 @@ void Local_Orbital_Charge::allocate_DM_k(void)
     this->init_dm_2d();
 	if(GlobalC::wf.start_wfc=="file")
 	{
-		this->kpt_file(GlobalC::GridT, *this->wfc_k);
+		this->kpt_file(GlobalC::GridT, this->LOWF->wfc_k);
 	}
 
     return;
@@ -110,8 +110,9 @@ inline void cal_DM_ATOM(
  	const int ia1, 
 	const int iw1_lo, 
 	const int nw1, 
-	const int gstart, 
-	std::complex<double> *WFC_PHASE, 
+    const int gstart,
+    std::complex<double>*** WFC_K,
+    std::complex<double>* WFC_PHASE,
 	std::complex<double> **DM_ATOM)
 {
 
@@ -122,7 +123,7 @@ inline void cal_DM_ATOM(
 
     for(int ik=0; ik<GlobalC::kv.nks; ik++)
     {
-        std::complex<double> **wfc = GlobalC::LOWF.WFC_K[ik];
+        std::complex<double> **wfc = WFC_K[ik];
         const int ispin = GlobalC::kv.isk[ik];
         int atom2start=0;
 
@@ -182,8 +183,9 @@ inline void cal_DM_ATOM_nc(
 	const int ia1, 
 	const int iw1_lo, 
 	const int nw1, 
-	const int gstart, 
-	std::complex<double> *WFC_PHASE, 
+    const int gstart,
+    std::complex<double>*** WFC_K,
+    std::complex<double>* WFC_PHASE,
 	std::complex<double> **DM_ATOM)
 {
 
@@ -204,7 +206,7 @@ inline void cal_DM_ATOM_nc(
         {
             for(int ik=0; ik<GlobalC::kv.nks; ik++)
             {
-                std::complex<double> **wfc = GlobalC::LOWF.WFC_K[ik];
+                std::complex<double> **wfc = WFC_K[ik];
                 int atom2start=0;
 
                 for (int ia2 = 0; ia2 < RA.na_each[ia1]; ++ia2)
@@ -317,11 +319,11 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
                 ModuleBase::GlobalFunc::ZEROS(WFC_PHASE, GlobalV::NBANDS*nw1);
                 if(GlobalV::NSPIN!=4)
 				{
-					cal_DM_ATOM(gt, fac, RA, ca, iw1_lo, nw1, gstart, WFC_PHASE, DM_ATOM);
+					cal_DM_ATOM(gt, fac, RA, ca, iw1_lo, nw1, gstart, this->LOWF->WFC_K, WFC_PHASE, DM_ATOM);
 				}
                 else 
 				{
-					cal_DM_ATOM_nc(gt, fac, RA, ca, iw1_lo, nw1, gstart, WFC_PHASE, DM_ATOM);
+					cal_DM_ATOM_nc(gt, fac, RA, ca, iw1_lo, nw1, gstart, this->LOWF->WFC_K, WFC_PHASE, DM_ATOM);
 				}
                 ++ca;
 

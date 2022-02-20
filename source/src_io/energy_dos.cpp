@@ -24,8 +24,7 @@
 #endif
 #include <sys/time.h>
 
-void energy::perform_dos( std::vector<ModuleBase::matrix> &wfc_gamma,
-    std::vector<ModuleBase::ComplexMatrix> &wfc_k)
+void energy::perform_dos(Local_Orbital_wfc &lowf)
 {
 	ModuleBase::TITLE("energy","perform_dos");
 
@@ -178,8 +177,8 @@ void energy::perform_dos( std::vector<ModuleBase::matrix> &wfc_gamma,
 #ifdef __LCAO
 	if(GlobalV::mulliken == 1)
 	{
-		Mulliken_Charge   MC(&wfc_gamma, &wfc_k);
-		MC.stdout_mulliken();			
+		Mulliken_Charge   MC(&lowf.wfc_gamma, &lowf.wfc_k);
+		MC.stdout_mulliken(*lowf.orb_con);			
 	}//qifeng add 2019/9/10
 #endif
 
@@ -263,7 +262,7 @@ void energy::perform_dos( std::vector<ModuleBase::matrix> &wfc_gamma,
 				Mulk[0].create(GlobalC::ParaO.ncol,GlobalC::ParaO.nrow);
 
 
-				ModuleBase::matrix Dwf = wfc_gamma[is];
+				ModuleBase::matrix Dwf = lowf.wfc_gamma[is];
 				for (int i=0; i<GlobalV::NBANDS; ++i)		  
 				{     
 					ModuleBase::GlobalFunc::ZEROS(waveg, GlobalV::NLOCAL);
@@ -303,7 +302,7 @@ void energy::perform_dos( std::vector<ModuleBase::matrix> &wfc_gamma,
 
 							const int ir = GlobalC::ParaO.trace_loc_row[j];
 							const int ic = GlobalC::ParaO.trace_loc_col[i];
-							waveg[j] = Mulk[0](ic,ir)*wfc_gamma[is](ic,ir);
+							waveg[j] = Mulk[0](ic,ir)*lowf.wfc_gamma[is](ic,ir);
 							const double x = waveg[j].real();
 							BlasConnector::axpy(np , x,Gauss, 1,pdosk[is].c+j*pdosk[is].nc,1);
 						}
@@ -328,7 +327,7 @@ void energy::perform_dos( std::vector<ModuleBase::matrix> &wfc_gamma,
 					GlobalV::test_atom_input);//qifeng-2019-01-21
 
 				// mohan update 2021-04-16
-				GlobalC::LOWF.orb_con.read_orb_first(
+				lowf.orb_con->read_orb_first(
 					GlobalV::ofs_running,
 					GlobalC::ORB,
 					GlobalC::ucell.ntype,
@@ -349,7 +348,7 @@ void energy::perform_dos( std::vector<ModuleBase::matrix> &wfc_gamma,
 					GlobalC::ORB
 				);
 
-				GlobalC::LOWF.orb_con.set_orb_tables(
+				lowf.orb_con->set_orb_tables(
 					GlobalV::ofs_running,
 					GlobalC::UOT,
 					GlobalC::ORB,
@@ -379,7 +378,7 @@ void energy::perform_dos( std::vector<ModuleBase::matrix> &wfc_gamma,
 						GlobalC::LNNR.folding_fixedH(ik);
 
 
-						ModuleBase::ComplexMatrix Dwfc = conj(wfc_k[ik]);
+						ModuleBase::ComplexMatrix Dwfc = conj(lowf.wfc_k[ik]);
 
 						for (int i=0; i<GlobalV::NBANDS; ++i)		  
 						{     
@@ -425,7 +424,7 @@ void energy::perform_dos( std::vector<ModuleBase::matrix> &wfc_gamma,
 									const int ir = GlobalC::ParaO.trace_loc_row[j];
 									const int ic = GlobalC::ParaO.trace_loc_col[i];
 
-									waveg[j] = Mulk[0](ic,ir)*wfc_k[ik](ic,ir);
+									waveg[j] = Mulk[0](ic,ir)*lowf.wfc_k[ik](ic,ir);
 									const double x = waveg[j].real();
 									BlasConnector::axpy(np , x,Gauss, 1,pdosk[is].c+j*pdosk[is].nc,1);
 
@@ -447,7 +446,7 @@ void energy::perform_dos( std::vector<ModuleBase::matrix> &wfc_gamma,
 					GlobalV::test_atom_input);
 #endif
 				// mohan update 2021-02-10
-				GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
+				lowf.orb_con->clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
 			}//else
 
 		 MPI_Reduce(pdosk[is].c, pdos[is].c , NUM , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);

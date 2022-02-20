@@ -29,7 +29,8 @@ class ELEC_cbands_k
 
     static void cal_bands(const int& istep, LCAO_Hamilt& uhm,
         std::vector<ModuleBase::ComplexMatrix>& wfc_k,
-        std::vector<ModuleBase::ComplexMatrix>& dm_k);
+        std::vector<ModuleBase::ComplexMatrix>& dm_k,
+        std::complex<double>*** WFC_K);
 
 
 };
