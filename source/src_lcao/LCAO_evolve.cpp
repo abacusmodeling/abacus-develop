@@ -10,7 +10,7 @@
 Evolve_LCAO_Matrix::Evolve_LCAO_Matrix(){}
 Evolve_LCAO_Matrix::~Evolve_LCAO_Matrix(){}
 
-void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, std::complex<double>*** WFC_K, ModuleBase::ComplexMatrix &wfc_2d)const
+void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, Local_Orbital_wfc &lowf)const
 {
 	ModuleBase::TITLE("Evolve_LCAO_Matrix","evolve_complex_matrix");
 	time_t time_start = time(NULL);
@@ -20,12 +20,12 @@ void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, std::complex<doubl
 	{
 ///*
 #ifdef __MPI
-		this->using_ScaLAPACK_complex(ik, wfc_2d);
+		this->using_ScaLAPACK_complex(ik, lowf.wfc_k[ik]);
 #else
-		//this->using_LAPACK_complex(ik, WFC_K, wfc_2d);
+		//this->using_LAPACK_complex(ik, lowf.WFC_K, lowf.wfc_k[ik]);
 #endif
 //*/
-		//this->using_ScaLAPACK_complex(ik, WFC_K, wfc_2d);
+		//this->using_ScaLAPACK_complex(ik, lowf.WFC_K, lowf.wfc_k[ik]);
 	}
 	else
 	{

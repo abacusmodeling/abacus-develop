@@ -4,6 +4,7 @@
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
 #include "../module_base/complexmatrix.h"
+#include "src_lcao/local_orbital_wfc.h"
 
 class Evolve_LCAO_Matrix
 {
@@ -11,7 +12,7 @@ class Evolve_LCAO_Matrix
 	Evolve_LCAO_Matrix();
 	~Evolve_LCAO_Matrix();
 	
-    void evolve_complex_matrix(const int& ik, std::complex<double>*** WFC_K, ModuleBase::ComplexMatrix& wfc_2d)const;
+    void evolve_complex_matrix(const int& ik, Local_Orbital_wfc &lowf)const;
 
 	private:
 

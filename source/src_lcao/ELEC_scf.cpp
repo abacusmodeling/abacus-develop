@@ -203,11 +203,11 @@ void ELEC_scf::scf(const int& istep,
 		{
 			if(ELEC_evolve::tddft && istep >= 1 && iter > 1)
 			{
-				ELEC_evolve::evolve_psi(istep, GlobalC::UHM, lowf.wfc_k, lowf.WFC_K);
+				ELEC_evolve::evolve_psi(istep, GlobalC::UHM, lowf);
 			}
 			else
 			{
-				ELEC_cbands_k::cal_bands(istep, GlobalC::UHM, lowf.wfc_k, loc.dm_k, lowf.WFC_K);
+				ELEC_cbands_k::cal_bands(istep, GlobalC::UHM, lowf, loc.dm_k);
 			}
 		}
 

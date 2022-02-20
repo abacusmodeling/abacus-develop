@@ -43,7 +43,7 @@ void ELEC_nscf::nscf(LCAO_Hamilt& uhm,
 	}
 	else
 	{
-		ELEC_cbands_k::cal_bands(istep, uhm, lowf.wfc_k, dm_k, lowf.WFC_K);
+		ELEC_cbands_k::cal_bands(istep, uhm, lowf, dm_k);
 	}
 
 	time_t time_finish=std::time(NULL);
@@ -90,7 +90,7 @@ void ELEC_nscf::nscf(LCAO_Hamilt& uhm,
 	// add by jingan
 	if (berryphase::berry_phase_flag && ModuleSymmetry::Symmetry::symm_flag == 0)
     {
-    	berryphase bp(&lowf.wfc_k, lowf.WFC_K);
+    	berryphase bp(lowf);
 		bp.Macroscopic_polarization();
     }
 

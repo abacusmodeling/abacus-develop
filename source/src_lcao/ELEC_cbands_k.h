@@ -4,6 +4,7 @@
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
 #include "LCAO_hamilt.h"
+#include "src_lcao/local_orbital_wfc.h"
 
 //-----------------------------------------------------------
 // mohan add 2021-02-09
@@ -28,9 +29,8 @@ class ELEC_cbands_k
 	private:
 
     static void cal_bands(const int& istep, LCAO_Hamilt& uhm,
-        std::vector<ModuleBase::ComplexMatrix>& wfc_k,
-        std::vector<ModuleBase::ComplexMatrix>& dm_k,
-        std::complex<double>*** WFC_K);
+        Local_Orbital_wfc &lowf,
+        std::vector<ModuleBase::ComplexMatrix>& dm_k);
 
 
 };
