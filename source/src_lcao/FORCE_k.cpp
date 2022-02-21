@@ -34,16 +34,16 @@ void Force_LCAO_k::ftable_k (
 		ModuleBase::matrix& svnl_dbeta,
 #ifdef __DEEPKS
 		ModuleBase::matrix& svl_dphi,
-		ModuleBase::matrix& svnl_dalpha
+		ModuleBase::matrix& svnl_dalpha,
 #else
-		ModuleBase::matrix& svl_dphi
+		ModuleBase::matrix& svl_dphi,
 #endif
-		)
+		LCAO_Hamilt &uhm)
 {
     ModuleBase::TITLE("Force_LCAO_k", "ftable_k");
 	ModuleBase::timer::tick("Force_LCAO_k","ftable_k");
 	
-	this->allocate_k();
+	this->allocate_k(uhm.genH);
 
 	// calculate the energy density matrix
 	// and the force related to overlap matrix and energy density matrix.
@@ -68,7 +68,7 @@ void Force_LCAO_k::ftable_k (
     // ---------------------------------------
     // doing on the real space grid.
     // ---------------------------------------
-    this->cal_fvl_dphi_k(dm2d, isforce, isstress, fvl_dphi, svl_dphi);
+    this->cal_fvl_dphi_k(dm2d, isforce, isstress, uhm.GK, fvl_dphi, svl_dphi);
 
     this->calFvnlDbeta(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta, GlobalV::vnl_method);
 
@@ -144,7 +144,7 @@ void Force_LCAO_k::ftable_k (
     return;
 }
 
-void Force_LCAO_k::allocate_k(void)
+void Force_LCAO_k::allocate_k(LCAO_gen_fixedH &genH)
 {
 	ModuleBase::TITLE("Force_LCAO_k","allocate_k");
 	ModuleBase::timer::tick("Force_LCAO_k","allocate_k");
@@ -184,7 +184,7 @@ void Force_LCAO_k::allocate_k(void)
 	//-----------------------------
     // tips: build_ST_new --> GlobalC::ParaO.set_force 
 	bool cal_deri = true;
-	GlobalC::UHM.genH.build_ST_new ('S', cal_deri, GlobalC::ucell);
+	genH.build_ST_new ('S', cal_deri, GlobalC::ucell);
 
 	//-----------------------------------------
 	// (2) allocate for <phi | T + Vnl | dphi>
@@ -199,11 +199,11 @@ void Force_LCAO_k::allocate_k(void)
     
     // calculate dT=<phi|kin|dphi> in LCAO
     // calculate T + VNL(P1) in LCAO basis
-    GlobalC::UHM.genH.build_ST_new ('T', cal_deri, GlobalC::ucell);
+    genH.build_ST_new ('T', cal_deri, GlobalC::ucell);
 	//test(GlobalC::LM.DHloc_fixedR_x,"GlobalC::LM.DHloc_fixedR_x T part");
    
    	// calculate dVnl=<phi|dVnl|dphi> in LCAO 
-	this->NonlocalDphi(GlobalV::NSPIN, GlobalV::vnl_method, cal_deri);
+	this->NonlocalDphi(GlobalV::NSPIN, GlobalV::vnl_method, cal_deri, genH);
 	//test(GlobalC::LM.DHloc_fixedR_x,"GlobalC::LM.DHloc_fixedR_x Vnl part");
 
 	ModuleBase::timer::tick("Force_LCAO_k","allocate_k");
@@ -1068,8 +1068,9 @@ void Force_LCAO_k::cal_fvnl_dbeta_k_new(
 void Force_LCAO_k::cal_fvl_dphi_k(
 	double** dm2d, 
 	const bool isforce, 
-	const bool isstress, 
-	ModuleBase::matrix& fvl_dphi, 
+    const bool isstress,
+    Gint_k &gk,
+    ModuleBase::matrix& fvl_dphi,
 	ModuleBase::matrix& svl_dphi)
 {
 	ModuleBase::TITLE("Force_LCAO_k","cal_fvl_dphi_k");
@@ -1109,11 +1110,11 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 		// fvl_dphi can not be set to zero here if Vna is used
 		if(isstress||isforce) 
 		{
-			GlobalC::UHM.GK.svl_k_RealSpace(isforce, isstress, fvl_dphi,svl_dphi,GlobalC::pot.vr_eff1);
+			gk.svl_k_RealSpace(isforce, isstress, fvl_dphi,svl_dphi,GlobalC::pot.vr_eff1);
 		}
 		else if(isforce) 
 		{
-			GlobalC::UHM.GK.fvl_k_RealSpace(fvl_dphi,GlobalC::pot.vr_eff1);
+			gk.fvl_k_RealSpace(fvl_dphi,GlobalC::pot.vr_eff1);
 		}
 	}
 

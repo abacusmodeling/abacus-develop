@@ -16,7 +16,7 @@ IState_Charge::IState_Charge(
 IState_Charge::~IState_Charge(){}
 
 
-void IState_Charge::begin(void)
+void IState_Charge::begin(Gint_Gamma &gg)
 {
 	ModuleBase::TITLE("IState_Charge","begin");
 
@@ -136,7 +136,7 @@ void IState_Charge::begin(void)
 			
 			// (4) calculate charge density for a particular 
 			// band.
-   			GlobalC::UHM.GG.cal_rho(this->loc->DM);
+   			gg.cal_rho(this->loc->DM);
 			GlobalC::CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09
 			std::stringstream ss;
 			std::stringstream ss1;

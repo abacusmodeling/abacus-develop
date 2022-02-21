@@ -45,6 +45,7 @@ class Force_Stress_LCAO
         const bool istests,
         Local_Orbital_Charge& loc,
         Local_Orbital_wfc& lowf,
+        LCAO_Hamilt &uhm,
         ModuleBase::matrix& fcs,
 		ModuleBase::matrix &scs);
 
@@ -71,10 +72,11 @@ class Force_Stress_LCAO
 		ModuleBase::matrix &svnl_dbeta,
 #if __DEEPKS
 		ModuleBase::matrix& svl_dphi,
-		ModuleBase::matrix& svnl_dalpha);
+	    ModuleBase::matrix& svnl_dalpha,
 #else
-		ModuleBase::matrix& svl_dphi);
+	    ModuleBase::matrix& svl_dphi,
 #endif
+        LCAO_Hamilt &uhm);
     
 
 

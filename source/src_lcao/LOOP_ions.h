@@ -7,6 +7,7 @@
 #include "../src_ions/lattice_change_methods.h"
 #include "src_lcao/local_orbital_wfc.h"
 #include "module_orbital/ORB_control.h"
+#include "src_lcao/LCAO_hamilt.h"
 
 #include <fstream>
 
@@ -21,6 +22,7 @@ class LOOP_ions
     LOOP_elec LOE;
     Local_Orbital_wfc LOWF;
     Local_Orbital_Charge LOC;
+    LCAO_Hamilt UHM;
 
 	void opt_ions(); //output for dos
 	void output_HS_R(

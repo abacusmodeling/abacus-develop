@@ -5,8 +5,9 @@
 void Force_LCAO_gamma::cal_fvl_dphi(
 	ModuleBase::matrix& dm2d, 
 	const bool isforce, 
-	const bool isstress, 
-	ModuleBase::matrix& fvl_dphi, 
+    const bool isstress,
+    Gint_Gamma &gg,
+    ModuleBase::matrix& fvl_dphi,
 	ModuleBase::matrix& svl_dphi)
 {   
     ModuleBase::TITLE("Force_LCAO_gamma","cal_fvl_dphi");
@@ -69,7 +70,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
         //  ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DHloc_fixed_x,GlobalC::ParaO.nloc);
         //  ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DHloc_fixed_y,GlobalC::ParaO.nloc);
         //  ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DHloc_fixed_z,GlobalC::ParaO.nloc);
-        GlobalC::UHM.GG.cal_force(GlobalC::pot.vr_eff1);
+        gg.cal_force(GlobalC::pot.vr_eff1);
 
 
         for(int i=0; i<GlobalV::NLOCAL; i++)
@@ -148,8 +149,9 @@ void Force_LCAO_gamma::cal_fvl_dphi(
 void Force_LCAO_gamma::cal_fvl_dphi(
 	const std::vector<ModuleBase::matrix> &dm2d, 
 	const bool isforce, 
-	const bool isstress, 
-	ModuleBase::matrix& fvl_dphi, 
+    const bool isstress,
+    Gint_Gamma &gg,
+    ModuleBase::matrix& fvl_dphi,
 	ModuleBase::matrix& svl_dphi)
 {   
     ModuleBase::TITLE("Force_LCAO_gamma","cal_fvl_dphi");
@@ -208,7 +210,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
         //ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DHloc_fixed_x,GlobalC::ParaO.nloc);
         //ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DHloc_fixed_y,GlobalC::ParaO.nloc);
         //ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DHloc_fixed_z,GlobalC::ParaO.nloc);
-        GlobalC::UHM.GG.cal_force(GlobalC::pot.vr_eff1);
+        gg.cal_force(GlobalC::pot.vr_eff1);
 
         for(int i=0; i<GlobalV::NLOCAL; i++)
         {

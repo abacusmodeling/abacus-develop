@@ -102,7 +102,7 @@ Mulliken_Charge::~Mulliken_Charge()
 }
 
   
-void Mulliken_Charge::cal_mulliken(ORB_control &orb_con)
+void Mulliken_Charge::cal_mulliken(ORB_control &orb_con, LCAO_gen_fixedH &genH)
 {
 	ModuleBase::TITLE("Mulliken_Charge","cal_mulliken");
 
@@ -211,8 +211,8 @@ void Mulliken_Charge::cal_mulliken(ORB_control &orb_con)
 
 			GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
 			GlobalC::LM.zeros_HSR('S');
-			GlobalC::UHM.genH.calculate_S_no();
-			GlobalC::UHM.genH.build_ST_new('S', false, GlobalC::ucell);
+			genH.calculate_S_no();
+			genH.build_ST_new('S', false, GlobalC::ucell);
 
 			for(int ik=0;ik<GlobalC::kv.nks;ik++)
 			{
@@ -299,8 +299,8 @@ void Mulliken_Charge::cal_mulliken(ORB_control &orb_con)
 	return;                									
 }				   
 
-void Mulliken_Charge::stdout_mulliken(ORB_control &orb_con)
-{                    this->cal_mulliken(orb_con);
+void Mulliken_Charge::stdout_mulliken(ORB_control &orb_con, LCAO_gen_fixedH &genH)
+{                    this->cal_mulliken(orb_con, genH);
 	if(GlobalV::MY_RANK == 0)
 	{
 		ModuleBase::TITLE("Dos","calculate_Mulliken");

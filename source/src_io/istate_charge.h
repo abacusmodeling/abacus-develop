@@ -4,6 +4,7 @@
 #include<module_base/matrix.h>
 #include<module_base/complexmatrix.h>
 #include "src_lcao/local_orbital_charge.h"
+#include "src_lcao/gint_gamma.h"
 
 class IState_Charge
 {
@@ -12,7 +13,7 @@ public:
         Local_Orbital_Charge &loc_in);
     ~IState_Charge();
 
-	void begin();
+	void begin(Gint_Gamma &gg);
 
 private:
 

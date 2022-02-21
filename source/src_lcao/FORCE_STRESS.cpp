@@ -49,6 +49,7 @@ void Force_Stress_LCAO::getForceStress(
     const bool istests,
     Local_Orbital_Charge& loc,
     Local_Orbital_wfc& lowf,
+    LCAO_Hamilt &uhm,
     ModuleBase::matrix& fcs,
 	ModuleBase::matrix &scs)
 {
@@ -148,11 +149,12 @@ void Force_Stress_LCAO::getForceStress(
 				svnl_dbeta,
 #ifdef __DEEPKS
 				svl_dphi,
-				svnl_dalpha);
+				svnl_dalpha,
 #else
-				svl_dphi);
+				svl_dphi,
 #endif
-	//implement vdw force or stress here
+                uhm);
+    //implement vdw force or stress here
 	// Peize Lin add 2014-04-04, update 2021-03-09
 	ModuleBase::matrix force_vdw;
 	ModuleBase::matrix stress_vdw;
@@ -738,10 +740,11 @@ void Force_Stress_LCAO::calForceStressIntegralPart(
 	ModuleBase::matrix& svnl_dbeta,
 #if __DEEPKS
 	ModuleBase::matrix& svl_dphi,
-	ModuleBase::matrix& svnl_dalpha)
+	ModuleBase::matrix& svnl_dalpha,
 #else
-	ModuleBase::matrix& svl_dphi)
+	ModuleBase::matrix& svl_dphi,
 #endif
+    LCAO_Hamilt &uhm)
 {
 	if(isGammaOnly)
 	{
@@ -759,11 +762,12 @@ void Force_Stress_LCAO::calForceStressIntegralPart(
 				svnl_dbeta,
 #if __DEEPKS
 				svl_dphi,
-				svnl_dalpha);
+				svnl_dalpha,
 #else
-				svl_dphi);
+				svl_dphi,
 #endif
-	}
+                uhm);
+    }
 	else
 	{
 		flk.ftable_k(
@@ -780,11 +784,12 @@ void Force_Stress_LCAO::calForceStressIntegralPart(
 				svnl_dbeta,
 #if __DEEPKS
 				svl_dphi,
-				svnl_dalpha);
+				svnl_dalpha,
 #else
-				svl_dphi);
+				svl_dphi,
 #endif
-	}
+                uhm);
+    }
 	return;
 }
 

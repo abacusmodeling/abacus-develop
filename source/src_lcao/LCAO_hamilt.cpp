@@ -291,7 +291,7 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 // available for all k points.
 void LCAO_Hamilt::calculate_STNR_k(void)
 {
-    ModuleBase::TITLE("Hamilt_Linear","calculate_STBR_k");
+    ModuleBase::TITLE("LCAO_Hamilt","calculate_STNR_k");
 
     //--------------------------------------------
     // set S(R) to zero.

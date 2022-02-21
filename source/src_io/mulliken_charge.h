@@ -35,9 +35,9 @@ class Mulliken_Charge
 
 	std::complex<double> *mug;
 
-	void cal_mulliken(ORB_control &orb_con);
+	void cal_mulliken(ORB_control &orb_con, LCAO_gen_fixedH &genH);
 
-	void stdout_mulliken(ORB_control &orb_con);
+	void stdout_mulliken(ORB_control &orb_con, LCAO_gen_fixedH &genH);
 
 	private:
 

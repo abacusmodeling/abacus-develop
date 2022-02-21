@@ -28,10 +28,13 @@
 
 void LOOP_elec::solve_elec_stru(const int& istep,
     Local_Orbital_Charge& loc,
-    Local_Orbital_wfc& lowf)
+    Local_Orbital_wfc& lowf,
+    LCAO_Hamilt& uhm_in)
 {
     ModuleBase::TITLE("LOOP_elec","solve_elec_stru"); 
-    ModuleBase::timer::tick("LOOP_elec","solve_elec_stru"); 
+    ModuleBase::timer::tick("LOOP_elec", "solve_elec_stru");
+
+    this->UHM = &uhm_in;
 
 	// prepare HS matrices, prepare grid integral
 	this->set_matrix_grid();
@@ -136,11 +139,11 @@ void LOOP_elec::before_solver(const int& istep,
 		// calculate the charge density
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			GlobalC::UHM.GG.cal_rho(loc.DM);
+			this->UHM->GG.cal_rho(loc.DM);
 		}
 		else
 		{
-			GlobalC::UHM.GK.cal_rho_k(loc.DM_R);
+			this->UHM->GK.cal_rho_k(loc.DM_R);
 		}
 
 		// renormalize the charge density
@@ -152,7 +155,7 @@ void LOOP_elec::before_solver(const int& istep,
 
 
 	// (9) compute S, T, Vnl, Vna matrix.
-    GlobalC::UHM.set_lcao_matrices();
+    this->UHM->set_lcao_matrices();
 
 #ifdef __DEEPKS
     //for each ionic step, the overlap <psi|alpha> must be rebuilt
@@ -203,7 +206,7 @@ void LOOP_elec::solver(const int& istep,
 		if( Exx_Global::Hybrid_Type::No==GlobalC::exx_global.info.hybrid_type  )
 		{
 			ELEC_scf es;
-            es.scf(istep - 1, loc, lowf);
+            es.scf(istep - 1, loc, lowf, *this->UHM);
         }
 		else if( Exx_Global::Hybrid_Type::Generate_Matrix == GlobalC::exx_global.info.hybrid_type )
 		{
@@ -213,7 +216,7 @@ void LOOP_elec::solver(const int& istep,
 		else    // Peize Lin add 2016-12-03
 		{
 			ELEC_scf es;
-            es.scf(istep - 1, loc, lowf);
+            es.scf(istep - 1, loc, lowf, *this->UHM);
             if (GlobalC::exx_global.info.separate_loop, lowf.wfc_k_grid)
 			{
 				for( size_t hybrid_step=0; hybrid_step!=GlobalC::exx_global.info.hybrid_step; ++hybrid_step )
@@ -222,7 +225,7 @@ void LOOP_elec::solver(const int& istep,
 					GlobalC::exx_lcao.cal_exx_elec(loc, lowf.wfc_k_grid);
 					
 					ELEC_scf es;
-					es.scf(istep-1, loc, lowf);
+					es.scf(istep-1, loc, lowf, *this->UHM);
 					if(ELEC_scf::iter==1)     // exx converge
 					{
 						break;
@@ -234,18 +237,18 @@ void LOOP_elec::solver(const int& istep,
 				GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
 
 				ELEC_scf es;
-				es.scf(istep-1, loc, lowf);
+				es.scf(istep-1, loc, lowf, *this->UHM);
 			}
 		}
 	}
 	else if (GlobalV::CALCULATION=="nscf")
 	{
-		ELEC_nscf::nscf(GlobalC::UHM, loc.dm_gamma, loc.dm_k, lowf);
+		ELEC_nscf::nscf(*this->UHM, loc.dm_gamma, loc.dm_k, lowf);
 	}
 	else if (GlobalV::CALCULATION=="istate")
 	{
 		IState_Charge ISC(lowf.wfc_gamma, loc);
-		ISC.begin();
+		ISC.begin(this->UHM->GG);
 	}
 	else if (GlobalV::CALCULATION=="ienvelope")
 	{

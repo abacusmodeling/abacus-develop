@@ -9,6 +9,7 @@
 #include "grid_technique.h"
 #include "src_lcao/record_adj.h"
 #include "src_lcao/local_orbital_wfc.h"
+#include "src_lcao/LCAO_hamilt.h"
 
 class Local_Orbital_Charge
 {
@@ -22,7 +23,7 @@ class Local_Orbital_Charge
     void allocate_dm_wfc(const Grid_Technique& gt,
         Local_Orbital_wfc &lowf);
     // sum bands to compute the electron charge density
-	void sum_bands(void);
+	void sum_bands(LCAO_Hamilt &UHM);
 
 	//-----------------
 	// in DM_gamma.cpp

@@ -98,7 +98,7 @@ void Local_Orbital_Charge::allocate_dm_wfc(const Grid_Technique& gt,
 }
 
 
-void Local_Orbital_Charge::sum_bands(void)
+void Local_Orbital_Charge::sum_bands(LCAO_Hamilt &uhm)
 {
     ModuleBase::TITLE("Local_Orbital_Charge","sum_bands");
     ModuleBase::timer::tick("Local_Orbital_Cha","sum_bands");
@@ -164,12 +164,12 @@ void Local_Orbital_Charge::sum_bands(void)
 
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {
-        GlobalC::UHM.GG.cal_rho(this->DM);
+        uhm.GG.cal_rho(this->DM);
     }
     else
     {
         ModuleBase::GlobalFunc::NOTE("Calculate the charge on real space grid!");
-        GlobalC::UHM.GK.cal_rho_k(this->DM_R);
+        uhm.GK.cal_rho_k(this->DM_R);
     }
 
      time_t end = time(NULL);

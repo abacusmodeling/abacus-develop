@@ -24,7 +24,7 @@
 #endif
 #include <sys/time.h>
 
-void energy::perform_dos(Local_Orbital_wfc &lowf)
+void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 {
 	ModuleBase::TITLE("energy","perform_dos");
 
@@ -178,7 +178,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf)
 	if(GlobalV::mulliken == 1)
 	{
 		Mulliken_Charge   MC(&lowf.wfc_gamma, &lowf.wfc_k);
-		MC.stdout_mulliken(*lowf.orb_con);			
+		MC.stdout_mulliken(*lowf.orb_con, uhm.genH);			
 	}//qifeng add 2019/9/10
 #endif
 
@@ -361,8 +361,8 @@ void energy::perform_dos(Local_Orbital_wfc &lowf)
 
 				GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
 				GlobalC::LM.zeros_HSR('S');
-				GlobalC::UHM.genH.calculate_S_no();
-				GlobalC::UHM.genH.build_ST_new('S', false, GlobalC::ucell);
+				uhm.genH.calculate_S_no();
+				uhm.genH.build_ST_new('S', false, GlobalC::ucell);
 				std::vector<ModuleBase::ComplexMatrix> Mulk;
 				Mulk.resize(1);
 				Mulk[0].create(GlobalC::ParaO.ncol,GlobalC::ParaO.nrow);
@@ -738,7 +738,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf)
 		{
 			std::stringstream sp;
 			sp << GlobalV::global_out_dir << "Mulliken.dat";
-			Dos::calculate_Mulliken(sp.str());
+			Dos::calculate_Mulliken(sp.str(), uhm.GG);
 		}
 	
 		if(nspin0==1)

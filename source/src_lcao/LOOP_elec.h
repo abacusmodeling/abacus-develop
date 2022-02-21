@@ -7,6 +7,7 @@
 #include "module_base/complexmatrix.h"
 #include "src_lcao/local_orbital_charge.h"
 #include "src_lcao/local_orbital_wfc.h"
+#include "src_lcao/LCAO_hamilt.h"
 
 class LOOP_elec
 {
@@ -18,7 +19,8 @@ class LOOP_elec
 	// mohan add 2021-02-09
     void solve_elec_stru(const int& istep,
         Local_Orbital_Charge& loc,
-        Local_Orbital_wfc& lowf);
+        Local_Orbital_wfc& low,
+        LCAO_Hamilt& uhm_in);
 
 	private:
 
@@ -27,11 +29,13 @@ class LOOP_elec
 
     void before_solver(const int& istep,
         Local_Orbital_Charge& loc,
-        Local_Orbital_wfc &lowf);
+        Local_Orbital_wfc& lowf);
 
     void solver(const int& istep,
         Local_Orbital_Charge& loc,
-        Local_Orbital_wfc &lowf);
+        Local_Orbital_wfc& lowf);
+
+    LCAO_Hamilt* UHM;
 
 };
 

@@ -29,6 +29,7 @@ LOOP_ions::LOOP_ions(ORB_control &orb_con_in)
     else
         this->LOWF.wfc_k.resize(GlobalC::kv.nks);
     this->LOWF.orb_con = &orb_con_in;
+    this->UHM.LM = &GlobalC::LM;
 }
 
 LOOP_ions::~LOOP_ions()
@@ -151,7 +152,7 @@ void LOOP_ions::opt_ions()
 
 		// solve electronic structures in terms of LCAO
 		// mohan add 2021-02-09
-		LOE.solve_elec_stru(this->istep, this->LOC, this->LOWF);
+		LOE.solve_elec_stru(this->istep, this->LOC, this->LOWF, this->UHM);
 
 
 		time_t eend = time(NULL);
@@ -288,7 +289,7 @@ void LOOP_ions::opt_ions()
 
     }
 
-    GlobalC::en.perform_dos(this->LOWF);
+    GlobalC::en.perform_dos(this->LOWF,this->UHM);
 
     ModuleBase::timer::tick("LOOP_ions", "opt_ions");
     return;
@@ -316,7 +317,7 @@ bool LOOP_ions::force_stress(
     FSL.allocate();
     FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS,
         GlobalV::TEST_FORCE, GlobalV::TEST_STRESS,
-        this->LOC, this->LOWF, fcs, scs);
+        this->LOC, this->LOWF, this->UHM, fcs, scs);
 
 	//--------------------------------------------------
 	// only forces are needed, no stresses are needed
@@ -563,7 +564,7 @@ void LOOP_ions::final_scf(void)
 
 	this->LOC.allocate_dm_wfc(GlobalC::GridT, this->LOWF);
 
-    GlobalC::UHM.set_lcao_matrices();
+    this->UHM.set_lcao_matrices();
 	//------------------------------------------------------------------
 
 
@@ -585,7 +586,7 @@ void LOOP_ions::final_scf(void)
 
 
 	ELEC_scf es;
-	es.scf(0, this->LOC,this->LOWF);
+	es.scf(0, this->LOC,this->LOWF, this->UHM);
 
     if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
     {

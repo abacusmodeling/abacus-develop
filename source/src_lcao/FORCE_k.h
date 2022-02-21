@@ -7,6 +7,7 @@
 #include "LCAO_matrix.h" 
 #include "FORCE_gamma.h"
 #include "src_lcao/local_orbital_charge.h"
+#include "src_lcao/LCAO_hamilt.h"
 
 class Force_LCAO_k : public Force_LCAO_gamma
 {
@@ -34,14 +35,14 @@ class Force_LCAO_k : public Force_LCAO_gamma
 		ModuleBase::matrix& svnl_dbeta,
 #ifdef __DEEPKS
 		ModuleBase::matrix& svl_dphi,
-		ModuleBase::matrix& svnl_dalpha
+		ModuleBase::matrix& svnl_dalpha,
 #else
-		ModuleBase::matrix& svl_dphi
+		ModuleBase::matrix& svl_dphi,
 #endif
-		);
+		LCAO_Hamilt &uhm);
 
 	// get the ds, dt, dvnl.
-	void allocate_k(void);
+	void allocate_k(LCAO_gen_fixedH &genH);
 
 	void finish_k(void);
 	
@@ -53,7 +54,7 @@ class Force_LCAO_k : public Force_LCAO_gamma
         Local_Orbital_Charge& loc, ModuleBase::matrix& foverlap, ModuleBase::matrix& soverlap);
 
 	// calculate the force due to < phi | Vlocal | dphi >
-	void cal_fvl_dphi_k(double** dm2d, const bool isforce, const bool isstress, ModuleBase::matrix& fvl_dphi, ModuleBase::matrix& svl_dphi);
+	void cal_fvl_dphi_k(double** dm2d, const bool isforce, const bool isstress, Gint_k &gk, ModuleBase::matrix& fvl_dphi, ModuleBase::matrix& svl_dphi);
 
 	// old method to calculate the force due to < phi | dbeta > < beta | phi >
 	void cal_fvnl_dbeta_k(double** dm2d, const bool isforce, const bool isstress, ModuleBase::matrix& fvnl_dbeta, ModuleBase::matrix& svnl_dbeta);

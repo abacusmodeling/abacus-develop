@@ -33,14 +33,14 @@ class Force_LCAO_gamma
 		ModuleBase::matrix& svnl_dbeta,
 #ifdef __DEEPKS
 		ModuleBase::matrix& svl_dphi,
-		ModuleBase::matrix& svnl_dalpha
+		ModuleBase::matrix& svnl_dalpha,
 #else
-		ModuleBase::matrix& svl_dphi
+		ModuleBase::matrix& svl_dphi,
 #endif
-		);
+		LCAO_Hamilt &uhm);
 
 	// get the ds, dt, dvnl.
-	void allocate_gamma(void);
+	void allocate_gamma(LCAO_gen_fixedH &genH);
 
 	void finish_ftable_gamma(void);
 
@@ -113,15 +113,17 @@ class Force_LCAO_gamma
 	void cal_fvl_dphi(
 		ModuleBase::matrix& dm2d, 
 		const bool isforce, 
-		const bool isstress, 
-		ModuleBase::matrix& fvl_dphi, 
+        const bool isstress,
+        Gint_Gamma &gg,
+        ModuleBase::matrix& fvl_dphi,
 		ModuleBase::matrix& svl_dphi);
 
 	void cal_fvl_dphi(
 		const std::vector<ModuleBase::matrix> &dm2d, 
 		const bool isforce, 
-		const bool isstress, 
-		ModuleBase::matrix& fvl_dphi, 
+        const bool isstress,
+        Gint_Gamma &gg,
+        ModuleBase::matrix& fvl_dphi,
 		ModuleBase::matrix& svl_dphi);
 
 	void calFvnlDbeta(
@@ -134,7 +136,8 @@ class Force_LCAO_gamma
 
 	public:
 	// calculate dVnl=<phi|dVnl|dphi> in LCAO
-	void NonlocalDphi(const int& nspin, const int& vnl_method, const bool& cal_deri);
+    void NonlocalDphi(const int& nspin, const int& vnl_method, const bool& cal_deri,
+        LCAO_gen_fixedH &genH);
 };
 
 // this namespace used to store global function for some stress operation
