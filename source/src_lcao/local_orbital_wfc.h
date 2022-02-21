@@ -13,15 +13,23 @@ class Local_Orbital_wfc
 	Local_Orbital_wfc();
 	~Local_Orbital_wfc();
 
-    //grid WFC
-    // used to generate density matrix: LOC.DM_R,
-	// which is used to calculate the charge density. 
-	// which is got after the diagonalization of 
-	// std::complex Hamiltonian matrix.
-	std::complex<double>*** WFC_K; // [NK, GlobalV::NBANDS, GlobalV::NLOCAL]	
-    std::complex<double>* WFC_K_POOL; // [NK*GlobalV::NBANDS*GlobalV::NLOCAL]
-    
-    //2d wfc, pointers to LOOP_ions::wfc_gamma, LOOP_ions::wfc_k
+    ///=========================================
+    /// grid wfc 
+    /// used to generate density matrix: LOC.DM_R,
+	/// which is used to calculate the charge density. 
+	/// which is got after the diagonalization of 
+    /// std::complex Hamiltonian matrix.
+    ///=========================================
+    //( Old Name: WFC_K)
+    std::complex<double>*** wfc_k_grid; // [NK, GlobalV::NBANDS, GlobalV::NLOCAL]	
+    //( Old Name: WFC_K_POOL)
+    std::complex<double>* wfc_k_grid2; // [NK*GlobalV::NBANDS*GlobalV::NLOCAL]
+
+    ///=========================================
+    /// 2d wfc
+    /// directly output from elpa interface
+    /// used to calculate density matrix LOC.dm_gamma and LOC.dm_k
+    ///=========================================
     std::vector<ModuleBase::matrix> wfc_gamma;			// dm_gamma[is](iw1,iw2);
     std::vector<ModuleBase::ComplexMatrix> wfc_k;		// dm_k[ik](iw1,iw2);
 

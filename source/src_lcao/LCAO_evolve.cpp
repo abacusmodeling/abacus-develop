@@ -10,7 +10,7 @@
 Evolve_LCAO_Matrix::Evolve_LCAO_Matrix(){}
 Evolve_LCAO_Matrix::~Evolve_LCAO_Matrix(){}
 
-void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, std::complex<double>*** WFC_K, ModuleBase::ComplexMatrix &wfc_2d)const
+void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, Local_Orbital_wfc &lowf)const
 {
 	ModuleBase::TITLE("Evolve_LCAO_Matrix","evolve_complex_matrix");
 	time_t time_start = time(NULL);
@@ -20,12 +20,12 @@ void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, std::complex<doubl
 	{
 ///*
 #ifdef __MPI
-		this->using_ScaLAPACK_complex(ik, wfc_2d);
+		this->using_ScaLAPACK_complex(ik, lowf.wfc_k[ik]);
 #else
-		//this->using_LAPACK_complex(ik, WFC_K, wfc_2d);
+		//this->using_LAPACK_complex(ik, lowf.wfc_k_grid, lowf.wfc_k[ik]);
 #endif
 //*/
-		//this->using_ScaLAPACK_complex(ik, WFC_K, wfc_2d);
+		//this->using_ScaLAPACK_complex(ik, lowf.wfc_k_grid, lowf.wfc_k[ik]);
 	}
 	else
 	{
@@ -38,7 +38,7 @@ void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, std::complex<doubl
 	return;
 }
 
-void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double>*** WFC_K, std::complex<double>** c_init)const
+void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double>*** wfc_k_grid, std::complex<double>** c_init)const
 {
     ModuleBase::TITLE("Evolve_LCAO_Matrix","using_LAPACK_complex");
 
@@ -200,7 +200,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
 	{
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			std::cout << WFC_K[ik][i][j] << "\t";
+			std::cout << wfc_k_grid[ik][i][j] << "\t";
 		}
 		std::cout <<std::endl;
 	}
@@ -211,7 +211,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
 	{
                 for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			std::cout << WFC_K[ik][i][j] << "\t";
+			std::cout << wfc_k_grid[ik][i][j] << "\t";
 		}
 		std::cout <<std::endl;
 	}
@@ -231,7 +231,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
 		}
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			WFC_K[ik][i][j] = ccc[j];
+			wfc_k_grid[ik][i][j] = ccc[j];
 		}	
 	}
 
@@ -239,7 +239,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
 	{
                 for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			std::cout << WFC_K[ik][i][j] << "\t";
+			std::cout << wfc_k_grid[ik][i][j] << "\t";
 		}
 		std::cout <<std::endl;
 	}
@@ -250,7 +250,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
         {
                 for(int j=0; j<GlobalV::NLOCAL; j++)
                 {
-                        std::cout << WFC_K[ik][i][j] <<"\t";
+                        std::cout << wfc_k_grid[ik][i][j] <<"\t";
                 }
                 std::cout <<std::endl;
         }
@@ -261,7 +261,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
         {
                 for(int j=0; j<GlobalV::NLOCAL; j++)
                 {
-                        std::cout << WFC_K[ik][i][j] << "\t";
+                        std::cout << wfc_k_grid[ik][i][j] << "\t";
                 }
                 std::cout <<std::endl;
         }

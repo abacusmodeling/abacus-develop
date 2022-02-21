@@ -214,12 +214,12 @@ void LOOP_elec::solver(const int& istep,
 		{
 			ELEC_scf es;
             es.scf(istep - 1, loc, lowf);
-            if (GlobalC::exx_global.info.separate_loop, lowf.WFC_K)
+            if (GlobalC::exx_global.info.separate_loop, lowf.wfc_k_grid)
 			{
 				for( size_t hybrid_step=0; hybrid_step!=GlobalC::exx_global.info.hybrid_step; ++hybrid_step )
 				{
 					GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
-					GlobalC::exx_lcao.cal_exx_elec(loc, lowf.WFC_K);
+					GlobalC::exx_lcao.cal_exx_elec(loc, lowf.wfc_k_grid);
 					
 					ELEC_scf es;
 					es.scf(istep-1, loc, lowf);

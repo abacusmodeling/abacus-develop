@@ -11,8 +11,7 @@ class berryphase
 public:
 
     berryphase();   //for pw-line
-    berryphase(std::vector<ModuleBase::ComplexMatrix>* wfc_k_in,
-        std::complex<double>*** WFC_K);   //for lcao-line
+    berryphase(Local_Orbital_wfc &lowf_in);   //for lcao-line
     ~berryphase();
 
 	// mohan add 2021-02-16
@@ -29,8 +28,7 @@ public:
 	int occ_nbands;
     int GDIR;
 
-    std::vector<ModuleBase::ComplexMatrix>* wfc_k;
-    std::complex<double>*** WFC_K;
+    Local_Orbital_wfc* lowf;
 
 	void get_occupation_bands();
 

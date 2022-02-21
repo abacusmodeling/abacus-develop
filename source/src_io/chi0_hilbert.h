@@ -16,7 +16,7 @@ class Chi0_hilbert
 	Chi0_hilbert();
     ~Chi0_hilbert();
     
-    static std::complex<double>*** WFC_K;
+    static std::complex<double>*** wfc_k_grid;
 
 	bool epsilon;           // calculate epsilon or not
 	std::string kernel_type;      // the type of kernel

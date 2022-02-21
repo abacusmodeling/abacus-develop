@@ -23,22 +23,22 @@ public:
 	void cal_DM(
 		const std::set<std::pair<size_t,size_t>> &atom_pairs,
         const std::vector<Abfs::Vector3_Order<int>>& Born_von_Karman_boxes,
-        std::complex<double>*** WFC_K);
-    std::map<size_t, std::map<size_t, std::vector<ModuleBase::ComplexMatrix>>> cal_DMk_raw(const std::set<std::pair<size_t, size_t>>& atom_pairs, std::complex<double>*** WFC_K) const;
+        std::complex<double>*** wfc_k_grid);
+    std::map<size_t, std::map<size_t, std::vector<ModuleBase::ComplexMatrix>>> cal_DMk_raw(const std::set<std::pair<size_t, size_t>>& atom_pairs, std::complex<double>*** wfc_k_grid) const;
 		
 private:
 	void cal_DMk_mixing(
 		const Charge_Broyden &charge,
         const std::set<std::pair<size_t, size_t>>& atom_pairs,
-        std::complex<double>*** WFC_K);
+        std::complex<double>*** wfc_k_grid);
     void plain_mixing(
 		const Charge_Broyden &charge,
         const std::set<std::pair<size_t, size_t>>& atom_pairs,
-        std::complex<double>*** WFC_K);
+        std::complex<double>*** wfc_k_grid);
     void pulay_mixing(
 		const Charge_Broyden &charge,
         const std::set<std::pair<size_t, size_t>>& atom_pairs,
-        complex<double>*** WFC_K);
+        complex<double>*** wfc_k_grid);
 
 //	double cal_DM_delta();
 

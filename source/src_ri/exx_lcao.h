@@ -38,7 +38,7 @@ public:
 public:
 	void init();
 	void cal_exx_ions();
-	void cal_exx_elec(Local_Orbital_Charge &loc, complex<double>*** WFC_K);
+	void cal_exx_elec(Local_Orbital_Charge &loc, complex<double>*** wfc_k_grid);
 	void cal_exx_elec_nscf();
 	void add_Hexx(const size_t ik, const double alpha) const;
 private:

@@ -7,10 +7,8 @@ berryphase::berryphase()
 	GDIR = INPUT.gdir;
 }
 
-berryphase::berryphase(std::vector<ModuleBase::ComplexMatrix>* wfc_k_in,
-    std::complex<double>*** WFC_K_in) :
-    wfc_k(wfc_k_in),
-    WFC_K(WFC_K_in)
+berryphase::berryphase(Local_Orbital_wfc &lowf_in) :
+    lowf(&lowf_in)
 {
 	GDIR = INPUT.gdir;
 }
@@ -40,7 +38,7 @@ void berryphase::lcao_init()
 {
 	#ifdef __LCAO
 	ModuleBase::TITLE("berryphase","lcao_init");
-	lcao_method.init(this->WFC_K);
+	lcao_method.init(this->lowf->wfc_k_grid);
 	lcao_method.cal_R_number();
 	lcao_method.cal_orb_overlap();
 	#endif
@@ -326,7 +324,7 @@ double berryphase::stringPhase(int index_str, int nbands)
 			if(GlobalV::NSPIN!=4)
 			{
 				//std::complex<double> my_det = lcao_method.det_berryphase(ik_1,ik_2,dk,nbands);
-				zeta = zeta * lcao_method.det_berryphase(ik_1,ik_2,dk,nbands, this->wfc_k);
+				zeta = zeta * lcao_method.det_berryphase(ik_1,ik_2,dk,nbands, &this->lowf->wfc_k);
 				// test by jingan
 				//GlobalV::ofs_running << "methon 1: det = " << my_det << std::endl;
 				// test by jingan

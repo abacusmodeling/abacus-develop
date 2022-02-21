@@ -50,7 +50,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, std::complex<double>
 
 	GlobalC::ParaO.diago_complex_begin(ik, wfc, wfc_2d, GlobalC::LM.Hloc2.data(), GlobalC::LM.Sloc2.data(), GlobalC::wf.ekb[ik]);
 
-	//added by zhengdy-soc, rearrange the WFC_K from [up,down,up,down...] to [up,up...down,down...], 
+	//added by zhengdy-soc, rearrange the wfc_k_grid from [up,down,up,down...] to [up,up...down,down...], 
 	if(GlobalV::NSPIN==4)
 	{
 		int row = GlobalC::GridT.lgd;
