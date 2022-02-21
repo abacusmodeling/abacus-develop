@@ -3,9 +3,9 @@
 
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
-#include "../src_pdiag/pdiag_double.h"
+#include "src_pdiag/pdiag_common.h"
 
-class Parallel_Orbitals : public Pdiag_Double
+class Parallel_Orbitals
 {
     public:
 
@@ -37,6 +37,67 @@ class Parallel_Orbitals : public Pdiag_Double
     int *receiver_size_process;
     int *receiver_displacement_process;
     double* receiver_buffer;
+    
+    LocalMatrix MatrixInfo;
+
+	int nrow;
+	int ncol;
+	long nloc;
+
+#ifdef __MPI
+    int blacs_ctxt;
+	int mpi_comm_rows, mpi_comm_cols;
+    int desc[9];
+#endif
+	// be called
+	void divide_HS_2d
+	(
+#ifdef __MPI
+		MPI_Comm DIAG_WORLD
+#endif
+	);
+
+#ifdef __MPI
+	MPI_Comm comm_2D;
+#endif
+
+	int nb;
+	int dim0;
+    int dim1;
+
+    // mohan add 2010-09-10
+	// output local wave functions.
+	// put it here because if we 
+	// use HPSEPS, the wave functions
+	// is needed to be collected first.
+    int out_lowf;
+    double** Z_LOC; //xiaohui add 2014-06-19
+    
+protected: //also used in diago
+    int testpb;
+    bool alloc_Z_LOC; //xiaohui add 2014-12-22
+    int lastband_in_proc;
+	int lastband_number; 
+	int* loc_sizes;
+    int loc_size;
+
+    void set_parameters(void);
+
+#ifdef __MPI
+	void mpi_creat_cart(MPI_Comm *comm_2D, int prow, int pcol);
+
+	void mat_2d(MPI_Comm vu, const int &M_A, const int &N_A, const int & NB, LocalMatrix &loc_A);
+
+	void data_distribution(
+		MPI_Comm comm_2D, 
+		const std::string &file,
+		const int &n,
+		const int &NB,
+		double *A,
+		const LocalMatrix &loc_A);
+
+#endif
+
 };
 
 #endif

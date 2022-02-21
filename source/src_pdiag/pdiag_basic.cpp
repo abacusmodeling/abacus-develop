@@ -1,33 +1,15 @@
-#include "pdiag_basic.h"
 #include "../src_parallel/parallel_common.h"
+#include "src_parallel/parallel_orbitals.h"
+#include "src_pdiag/pdiag_double.h"
 #include "../src_pw/global.h"
 #include "../src_io/wf_local.h"
 #include "../module_base/lapack_connector.h"
 #include "../module_base/memory.h"
 
-Pdiag_Basic::Pdiag_Basic()
-{
-    loc_sizes = new int[1];
-	testpb = 0;//mohan add 2011-03-16
-	alloc_Z_LOC = false; //xiaohui add 2014-12-22
-}
 
-Pdiag_Basic::~Pdiag_Basic()
+void Parallel_Orbitals::set_parameters(void)
 {
-    delete[] loc_sizes;
-	if(alloc_Z_LOC)//xiaohui add 2014-12-22
-	{
-		for(int is=0; is<GlobalV::NSPIN; is++)
-		{
-			delete[] Z_LOC[is];
-		}
-		delete[] Z_LOC;
-	}
-}
-
-void Pdiag_Basic::set_parameters(void)
-{
-    ModuleBase::TITLE("Pdiag_Basic","set_parameters");
+    ModuleBase::TITLE("Parallel_Orbitals","set_parameters");
 
     // set loc_size
 	if(GlobalV::GAMMA_ONLY_LOCAL)//xiaohui add 2014-12-21
@@ -38,7 +20,7 @@ void Pdiag_Basic::set_parameters(void)
 		if(loc_size==0)
 		{
 			GlobalV::ofs_warning << " loc_size=0" << " in proc " << GlobalV::MY_RANK+1 << std::endl;
-			ModuleBase::WARNING_QUIT("Pdiag_Basic::set_parameters","NLOCAL < GlobalV::DSIZE");
+			ModuleBase::WARNING_QUIT("Parallel_Orbitals::set_parameters","NLOCAL < GlobalV::DSIZE");
 		}
 
 		if (GlobalV::DRANK<GlobalV::NBANDS%GlobalV::DSIZE) loc_size=loc_size+1;
@@ -80,7 +62,7 @@ void Pdiag_Basic::set_parameters(void)
 		if(loc_size==0)
 		{
 			GlobalV::ofs_warning << " loc_size=0" << " in proc " << GlobalV::MY_RANK+1 << std::endl;
-			ModuleBase::WARNING_QUIT("Pdiag_Basic::set_parameters","NLOCAL < GlobalV::DSIZE");
+			ModuleBase::WARNING_QUIT("Parallel_Orbitals::set_parameters","NLOCAL < GlobalV::DSIZE");
 		}
 
 		if (GlobalV::DRANK<GlobalV::NLOCAL%GlobalV::DSIZE) 
@@ -138,9 +120,9 @@ void Pdiag_Basic::set_parameters(void)
 
 #ifdef __MPI
 // creat the 'comm_2D' stratege.
-void Pdiag_Basic::mpi_creat_cart(MPI_Comm *comm_2D, int prow, int pcol)
+void Parallel_Orbitals::mpi_creat_cart(MPI_Comm *comm_2D, int prow, int pcol)
 {
-    ModuleBase::TITLE("Pdiag_Basic","mpi_creat_cart");
+    ModuleBase::TITLE("Parallel_Orbitals","mpi_creat_cart");
     // the matrix is divided as ( dim[0] * dim[1] )
     int dim[2];
     int period[2]={1,1};
@@ -156,13 +138,13 @@ void Pdiag_Basic::mpi_creat_cart(MPI_Comm *comm_2D, int prow, int pcol)
 #endif
 
 #ifdef __MPI
-void Pdiag_Basic::mat_2d(MPI_Comm vu,
+void Parallel_Orbitals::mat_2d(MPI_Comm vu,
                          const int &M_A,
                          const int &N_A,
                          const int &nb,
                          LocalMatrix &LM)
 {
-    ModuleBase::TITLE("Pdiag_Basic","mat_2d");
+    ModuleBase::TITLE("Parallel_Orbitals","mat_2d");
     int dim[2];
     int period[2];
     int coord[2];
@@ -191,7 +173,7 @@ void Pdiag_Basic::mat_2d(MPI_Comm vu,
 	{
 		GlobalV::ofs_warning << " cpu 2D distribution : " << dim[0] << "*" << dim[1] << std::endl;
 		GlobalV::ofs_warning << " but, the number of row blocks is " << block << std::endl;
-		ModuleBase::WARNING_QUIT("Pdiag_Basic::mat_2d","some processor has no row blocks, try a smaller 'nb2d' parameter.");
+		ModuleBase::WARNING_QUIT("Parallel_Orbitals::mat_2d","some processor has no row blocks, try a smaller 'nb2d' parameter.");
 	}
 
     // (2.1) row_b : how many blocks for this processor. (at least)
@@ -260,7 +242,7 @@ void Pdiag_Basic::mat_2d(MPI_Comm vu,
 	{
 		GlobalV::ofs_warning << " cpu 2D distribution : " << dim[0] << "*" << dim[1] << std::endl;
 		GlobalV::ofs_warning << " but, the number of column blocks is " << block << std::endl;
-		ModuleBase::WARNING_QUIT("Pdiag_Basic::mat_2d","some processor has no column blocks.");
+		ModuleBase::WARNING_QUIT("Parallel_Orbitals::mat_2d","some processor has no column blocks.");
 	}
 
     LM.col_b=block/dim[1];
@@ -313,7 +295,7 @@ void Pdiag_Basic::mat_2d(MPI_Comm vu,
 
 #ifdef __MPI
 // A : contains total matrix element in processor.
-void Pdiag_Basic::data_distribution(
+void Parallel_Orbitals::data_distribution(
     MPI_Comm comm_2D,
     const std::string &file,
     const int &n,
@@ -321,7 +303,7 @@ void Pdiag_Basic::data_distribution(
     double *A,
     const LocalMatrix &LM)
 {
-    ModuleBase::TITLE("Pdiag_Basic","data_distribution");
+    ModuleBase::TITLE("Parallel_Orbitals","data_distribution");
     MPI_Comm comm_row;
     MPI_Comm comm_col;
     MPI_Status status;
@@ -498,7 +480,7 @@ void Pdiag_Basic::data_distribution(
 
     if (!find)
     {
-        ModuleBase::WARNING_QUIT("Pdiag_Basic::data_distribution","Can't find the H/S file");
+        ModuleBase::WARNING_QUIT("Parallel_Orbitals::data_distribution","Can't find the H/S file");
     }
 
     return;
@@ -507,9 +489,9 @@ void Pdiag_Basic::data_distribution(
 
 #ifdef __MPI
 #include "../src_pw/occupy.h"
-void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **cc,std::complex<double> *Z, const int &ik)
+void Pdiag_Double::gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **cc,std::complex<double> *Z, const int &ik)
 {
-    ModuleBase::TITLE("Pdiag_Basic","gath_eig_complex");
+    ModuleBase::TITLE("Pdiag_Double","gath_eig_complex");
     time_t time_start = time(NULL);
     //GlobalV::ofs_running << " Start gath_eig_complex Time : " << ctime(&time_start);
 
@@ -540,7 +522,7 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **cc
         	ctot[i] = new std::complex<double>[GlobalV::NLOCAL];
         	ModuleBase::GlobalFunc::ZEROS(ctot[i], GlobalV::NLOCAL);
     	}
-    	ModuleBase::Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
+    	ModuleBase::Memory::record("Pdiag_Double","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
 	}
 
 	k=0;
@@ -680,9 +662,9 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **cc
 #endif
 
 #ifdef __MPI
-void Pdiag_Basic::gath_full_eig(MPI_Comm comm,int n,double **c,double *Z)
+void Pdiag_Double::gath_full_eig(MPI_Comm comm,int n,double **c,double *Z)
 {
-    ModuleBase::TITLE("Pdiag_Basic","gath_full_eig");
+    ModuleBase::TITLE("Pdiag_Double","gath_full_eig");
 
     time_t time_start = time(NULL);
     //GlobalV::ofs_running << " Start gath_full_eig Time : " << ctime(&time_start);
@@ -784,9 +766,9 @@ void Pdiag_Basic::gath_full_eig(MPI_Comm comm,int n,double **c,double *Z)
     return;
 }
 
-void Pdiag_Basic::gath_full_eig_complex(MPI_Comm comm,int n,std::complex<double> **c,std::complex<double> *Z)
+void Pdiag_Double::gath_full_eig_complex(MPI_Comm comm,int n,std::complex<double> **c,std::complex<double> *Z)
 {
-    ModuleBase::TITLE("Pdiag_Basic","gath_full_eig_complex");
+    ModuleBase::TITLE("Pdiag_Double","gath_full_eig_complex");
 
     time_t time_start = time(NULL);
     //GlobalV::ofs_running << " Start gath_full_eig_complex Time : " << ctime(&time_start);
@@ -893,9 +875,9 @@ void Pdiag_Basic::gath_full_eig_complex(MPI_Comm comm,int n,std::complex<double>
 //LiuXh add 2021-09-06, clear memory, totwfc and WFC_GAMMA_aug not used now
 #ifdef __MPI
 #include "../src_pw/occupy.h"
-void Pdiag_Basic::gath_eig(MPI_Comm comm,int n,double *Z)
+void Pdiag_Double::gath_eig(MPI_Comm comm,int n,double *Z)
 {
-    ModuleBase::TITLE("Pdiag_Basic","gath_eig");
+    ModuleBase::TITLE("Pdiag_Double","gath_eig");
     time_t time_start = time(NULL);
 //  GlobalV::ofs_running << " Start gath_eig Time : " << ctime(&time_start);
 
@@ -926,7 +908,7 @@ void Pdiag_Basic::gath_eig(MPI_Comm comm,int n,double *Z)
         	ctot[i] = new double[GlobalV::NLOCAL];
         	ModuleBase::GlobalFunc::ZEROS(ctot[i], GlobalV::NLOCAL);
     	}
-    	ModuleBase::Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"double");
+    	ModuleBase::Memory::record("Pdiag_Double","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"double");
 	}
 
     k=0;

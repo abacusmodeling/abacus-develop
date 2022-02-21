@@ -3,7 +3,7 @@
 
 #include "../module_neighbor/sltk_grid_driver.h"
 #include "grid_technique.h"
-#include "../src_parallel/parallel_orbitals.h"
+#include "src_pdiag/pdiag_double.h"
 #include "local_orbital_wfc.h"
 #include "local_orbital_charge.h"
 #include "LCAO_matrix.h"
@@ -17,7 +17,7 @@
 namespace GlobalC
 {
 extern Grid_Driver GridD;
-extern Parallel_Orbitals ParaO;
+extern Pdiag_Double ParaO;
 extern LCAO_Matrix LM;
 extern LCAO_Hamilt UHM;
 extern SubGrid_oper SGO; //mohan add 2012-01-12

@@ -38,39 +38,6 @@ inline int localIndex(int globalIndex, int nblk, int nprocs, int& myproc)
     return int(globalIndex/(nblk*nprocs))*nblk+globalIndex%nblk;
 }
 
-#ifdef __MPI
-inline int cart2blacs(
-	MPI_Comm comm_2D,
-	int nprows,
-	int npcols,
-	int N,
-	int nblk,
-	int lld,
-	int *desc)
-{
-    int my_blacs_ctxt;
-    int myprow, mypcol;
-    int *usermap=new int[nprows*npcols];
-    int info=0;
-    for(int i=0; i<nprows; ++i)
-    {
-        for(int j=0; j<npcols; ++j)
-        {
-            int pcoord[2]={i, j};
-            MPI_Cart_rank(comm_2D, pcoord, &usermap[i+j*nprows]);
-        }
-    }
-    MPI_Fint comm_2D_f = MPI_Comm_c2f(comm_2D);
-    Cblacs_get(comm_2D_f, 0, &my_blacs_ctxt);
-    Cblacs_gridmap(&my_blacs_ctxt, usermap, nprows, nprows, npcols);
-    Cblacs_gridinfo(my_blacs_ctxt, &nprows, &npcols, &myprow, &mypcol);
-    delete[] usermap;
-    int ISRC=0;
-    descinit_(desc, &N, &N, &nblk, &nblk, &ISRC, &ISRC, &my_blacs_ctxt, &lld, &info);
-
-    return my_blacs_ctxt;
-}
-#endif
 
 #ifdef __MPI
 inline int set_elpahandle(elpa_t &handle, int *desc, int local_nrows, int local_ncols)
@@ -199,7 +166,9 @@ inline bool ifElpaHandle(const bool& newIteration, const bool& ifNSCF)
 
 Pdiag_Double::Pdiag_Double()
 {
-	// default value of nb is 1,
+	testpb = 0;//mohan add 2011-03-16
+	alloc_Z_LOC = false; //xiaohui add 2014-12-22
+    // default value of nb is 1,
 	// but can change to larger value from input.
     nb = 1;
 	MatrixInfo.row_set = new int[1];
@@ -208,105 +177,18 @@ Pdiag_Double::Pdiag_Double()
 
 Pdiag_Double::~Pdiag_Double()
 {
-	delete[] MatrixInfo.row_set;
+	if(alloc_Z_LOC)//xiaohui add 2014-12-22
+	{
+		for(int is=0; is<GlobalV::NSPIN; is++)
+		{
+			delete[] Z_LOC[is];
+		}
+		delete[] Z_LOC;
+	}
+    delete[] MatrixInfo.row_set;
 	delete[] MatrixInfo.col_set;
 }
 
-void Pdiag_Double::divide_HS_2d
-(
-#ifdef __MPI
-	MPI_Comm DIAG_WORLD
-#endif
-)
-{
-	ModuleBase::TITLE("Pdiag_Double","divide_HS_2d");
-	assert(GlobalV::NLOCAL>0);
-	assert(GlobalV::DSIZE>0);
-
-#ifdef __MPI
-	DIAG_HPSEPS_WORLD=DIAG_WORLD;
-#endif
-
-	if(GlobalV::DCOLOR!=0) return; // mohan add 2012-01-13
-
-	// get the 2D index of computer.
-	this->dim0 = (int)sqrt((double)GlobalV::DSIZE); //mohan update 2012/01/13
-	//while (GlobalV::NPROC_IN_POOL%dim0!=0)
-	while (GlobalV::DSIZE%dim0!=0)
-	{
-		this->dim0 = dim0 - 1;
-	}
-	assert(dim0 > 0);
-	this->dim1=GlobalV::DSIZE/dim0;
-
-	if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"dim0",dim0);
-	if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"dim1",dim1);
-
-#ifdef __MPI
-	// mohan add 2011-04-16
-	if(GlobalV::NB2D==0)
-	{
-		if(GlobalV::NLOCAL>0) this->nb = 1;
-		if(GlobalV::NLOCAL>500) this->nb = 32;
-		if(GlobalV::NLOCAL>1000) this->nb = 64;
-	}
-	else if(GlobalV::NB2D>0)
-	{
-		this->nb = GlobalV::NB2D; // mohan add 2010-06-28
-	}
-	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nb2d",nb);
-
-	this->set_parameters();
-
-	// call mpi_creat_cart
-	this->mpi_creat_cart(&this->comm_2D,this->dim0,this->dim1);
-
-	// call mat_2d
-	this->mat_2d(this->comm_2D, GlobalV::NLOCAL, GlobalV::NLOCAL, this->nb, this->MatrixInfo);
-
-	// mohan add 2010-06-29
-	this->nrow = this->MatrixInfo.row_num;
-	this->ncol = this->MatrixInfo.col_num;
-	this->nloc = MatrixInfo.col_num * MatrixInfo.row_num;
-
-	// init blacs context for genelpa
-    if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")
-    {
-        blacs_ctxt=cart2blacs(comm_2D, dim0, dim1, GlobalV::NLOCAL, nb, nrow, desc);
-    }
-#else // single processor used.
-	this->nb = GlobalV::NLOCAL;
-	this->nrow = GlobalV::NLOCAL;
-	this->ncol = GlobalV::NLOCAL;
-	this->nloc = GlobalV::NLOCAL * GlobalV::NLOCAL;
-	this->set_parameters();
-	MatrixInfo.row_b = 1;
-	MatrixInfo.row_num = GlobalV::NLOCAL;
-	delete[] MatrixInfo.row_set;
-	MatrixInfo.row_set = new int[GlobalV::NLOCAL];
-	for(int i=0; i<GlobalV::NLOCAL; i++)
-	{
-		MatrixInfo.row_set[i]=i;
-	}
-	MatrixInfo.row_pos=0;
-
-	MatrixInfo.col_b = 1;
-	MatrixInfo.col_num = GlobalV::NLOCAL;
-	delete[] MatrixInfo.col_set;
-	MatrixInfo.col_set = new int[GlobalV::NLOCAL];
-	for(int i=0; i<GlobalV::NLOCAL; i++)
-	{
-		MatrixInfo.col_set[i]=i;
-	}
-	MatrixInfo.col_pos=0;
-#endif
-
-	assert(nloc>0);
-	if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"MatrixInfo.row_num",MatrixInfo.row_num);
-	if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"MatrixInfo.col_num",MatrixInfo.col_num);
-	if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nloc",nloc);
-	return;
-}
 
 void Pdiag_Double::diago_double_begin(
 	const int &ik, // k-point index
