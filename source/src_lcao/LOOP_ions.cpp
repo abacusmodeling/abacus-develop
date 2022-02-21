@@ -22,13 +22,12 @@
 #include "../module_deepks/LCAO_deepks.h"    //caoyu add 2021-07-26
 #endif
 
-LOOP_ions::LOOP_ions(ORB_control &orb_con_in)
+LOOP_ions::LOOP_ions()
 {
     if (GlobalV::GAMMA_ONLY_LOCAL)
         this->LOWF.wfc_gamma.resize(GlobalV::NSPIN);
     else
         this->LOWF.wfc_k.resize(GlobalC::kv.nks);
-    this->LOWF.orb_con = &orb_con_in;
     this->UHM.LM = &GlobalC::LM;
 }
 

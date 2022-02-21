@@ -44,8 +44,6 @@ class Local_Orbital_wfc
     //=========================================
 	// void init_Cij(const bool change_c = 1);
 
-	// mohan move orb_con here, 2021-05-24 
-	ORB_control* orb_con=nullptr;
 	
 	private:
 

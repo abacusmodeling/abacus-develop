@@ -178,7 +178,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 	if(GlobalV::mulliken == 1)
 	{
 		Mulliken_Charge   MC(&lowf.wfc_gamma, &lowf.wfc_k);
-		MC.stdout_mulliken(*lowf.orb_con, uhm.genH);			
+		MC.stdout_mulliken(uhm.genH);			
 	}//qifeng add 2019/9/10
 #endif
 
@@ -326,39 +326,6 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 					GlobalV::SEARCH_RADIUS, 
 					GlobalV::test_atom_input);//qifeng-2019-01-21
 
-				// mohan update 2021-04-16
-				lowf.orb_con->read_orb_first(
-					GlobalV::ofs_running,
-					GlobalC::ORB,
-					GlobalC::ucell.ntype,
-					GlobalC::ucell.lmax,
-					INPUT.lcao_ecut,
-					INPUT.lcao_dk,
-					INPUT.lcao_dr,
-					INPUT.lcao_rmax,
-					GlobalV::out_descriptor,
-					INPUT.out_r_matrix,
-					GlobalV::FORCE,
-					GlobalV::MY_RANK);
-					
-				GlobalC::ucell.infoNL.setupNonlocal(
-					GlobalC::ucell.ntype,
-					GlobalC::ucell.atoms,
-					GlobalV::ofs_running,
-					GlobalC::ORB
-				);
-
-				lowf.orb_con->set_orb_tables(
-					GlobalV::ofs_running,
-					GlobalC::UOT,
-					GlobalC::ORB,
-					GlobalC::ucell.lat0,
-					GlobalV::out_descriptor,
-					Exx_Abfs::Lmax,
-					GlobalC::ucell.infoNL.nprojmax,
-					GlobalC::ucell.infoNL.nproj,
-					GlobalC::ucell.infoNL.Beta);
-
 				GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
 				GlobalC::LM.zeros_HSR('S');
 				uhm.genH.calculate_S_no();
@@ -445,8 +412,6 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 					GlobalV::SEARCH_RADIUS, 
 					GlobalV::test_atom_input);
 #endif
-				// mohan update 2021-02-10
-				lowf.orb_con->clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
 			}//else
 
 		 MPI_Reduce(pdosk[is].c, pdos[is].c , NUM , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);

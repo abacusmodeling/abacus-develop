@@ -66,7 +66,7 @@ void LOOP_cell::opt_cell(ORB_control &orb_con)
 
   if(INPUT.dft_plus_dmft) GlobalC::dmft.init(INPUT, GlobalC::ucell);
 
-	LOOP_ions ions(orb_con);
+	LOOP_ions ions;
     ions.opt_ions();
 
 	// mohan update 2021-02-10

@@ -102,7 +102,7 @@ Mulliken_Charge::~Mulliken_Charge()
 }
 
   
-void Mulliken_Charge::cal_mulliken(ORB_control &orb_con, LCAO_gen_fixedH &genH)
+void Mulliken_Charge::cal_mulliken(LCAO_gen_fixedH &genH)
 {
 	ModuleBase::TITLE("Mulliken_Charge","cal_mulliken");
 
@@ -174,40 +174,6 @@ void Mulliken_Charge::cal_mulliken(ORB_control &orb_con, LCAO_gen_fixedH &genH)
 				GlobalV::SEARCH_RADIUS,
 				GlobalV::test_atom_input);//qifeng-2019-01-21
 
-			// 2021-04-16
-				orb_con.read_orb_first(
-					GlobalV::ofs_running,
-					GlobalC::ORB,
-					GlobalC::ucell.ntype,
-					GlobalC::ucell.lmax,
-					INPUT.lcao_ecut,
-					INPUT.lcao_dk,
-					INPUT.lcao_dr,
-					INPUT.lcao_rmax,
-					GlobalV::out_descriptor,
-					INPUT.out_r_matrix,
-					GlobalV::FORCE,
-					GlobalV::MY_RANK);
-					
-				GlobalC::ucell.infoNL.setupNonlocal(
-					GlobalC::ucell.ntype,
-					GlobalC::ucell.atoms,
-					GlobalV::ofs_running,
-					GlobalC::ORB
-				);
-
-				orb_con.set_orb_tables(
-					GlobalV::ofs_running,
-					GlobalC::UOT,
-					GlobalC::ORB,
-					GlobalC::ucell.lat0,
-					GlobalV::out_descriptor,
-					Exx_Abfs::Lmax,
-					GlobalC::ucell.infoNL.nprojmax,
-					GlobalC::ucell.infoNL.nproj,
-					GlobalC::ucell.infoNL.Beta);
-
-
 
 			GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
 			GlobalC::LM.zeros_HSR('S');
@@ -272,7 +238,6 @@ void Mulliken_Charge::cal_mulliken(ORB_control &orb_con, LCAO_gen_fixedH &genH)
 				GlobalV::SEARCH_RADIUS, 
 				GlobalV::test_atom_input);
 #endif
-			orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
 
 		}//else                     
 		MPI_Reduce(MecMulP[is], DecMulP[is] , GlobalV::NLOCAL , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);
@@ -299,8 +264,8 @@ void Mulliken_Charge::cal_mulliken(ORB_control &orb_con, LCAO_gen_fixedH &genH)
 	return;                									
 }				   
 
-void Mulliken_Charge::stdout_mulliken(ORB_control &orb_con, LCAO_gen_fixedH &genH)
-{                    this->cal_mulliken(orb_con, genH);
+void Mulliken_Charge::stdout_mulliken(LCAO_gen_fixedH &genH)
+{                    this->cal_mulliken(genH);
 	if(GlobalV::MY_RANK == 0)
 	{
 		ModuleBase::TITLE("Dos","calculate_Mulliken");

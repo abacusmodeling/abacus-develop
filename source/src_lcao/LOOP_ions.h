@@ -16,7 +16,7 @@ class LOOP_ions
 
 	public:
 
-	LOOP_ions(ORB_control &orb_con_in);
+	LOOP_ions();
 	~LOOP_ions();
 
     LOOP_elec LOE;
