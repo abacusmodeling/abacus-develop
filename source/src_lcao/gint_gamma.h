@@ -66,7 +66,25 @@ private:
 	double* x03;
 	int *iq;
 
-	void save_atoms_on_grid(const Grid_Technique &gt);
+    ///===============================
+    /// Use MPI_Alltoallv to convert a grid distributed matrix
+    /// to 2D - block cyclic distributed matrix.
+    ///===============================
+    int sender_index_size;
+    int *sender_local_index;
+    int sender_size;
+    int *sender_size_process;
+    int *sender_displacement_process;
+    double* sender_buffer;
+
+    int receiver_index_size;
+    int *receiver_global_index;
+    int receiver_size;
+    int *receiver_size_process;
+    int *receiver_displacement_process;
+    double* receiver_buffer;
+    
+    void save_atoms_on_grid(const Grid_Technique& gt);
 
 	// for calculation of < phi_i | Vlocal | phi_j >
 	// Input:	vlocal[ir]
@@ -116,7 +134,8 @@ private:
 	
 	// extract the local potentials.
 	// vldr3[GlobalC::pw.bxyz]
-	double* get_vldr3(const double*const vlocal, const int ncyz, const int ibx, const int jby, const int kbz) const;
+    double* get_vldr3(const double* const vlocal, const int ncyz, const int ibx, const int jby, const int kbz) const;
+    void vl_grid_to_2D(const Gint_Tools::Array_Pool<double>& GridVlocal, LCAO_Matrix& lm);
 };
 
 #endif

@@ -314,7 +314,6 @@ bool LOOP_ions::force_stress(
 	// set stress matrix
 	ModuleBase::matrix scs;
     Force_Stress_LCAO FSL;
-    FSL.allocate();
     FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS,
         GlobalV::TEST_FORCE, GlobalV::TEST_STRESS,
         this->LOC, this->LOWF, this->UHM, fcs, scs);

@@ -17,30 +17,6 @@ double Force_Stress_LCAO::output_acc = 1.0e-8;
 Force_Stress_LCAO::Force_Stress_LCAO (){}
 Force_Stress_LCAO::~Force_Stress_LCAO (){}
 
-
-void Force_Stress_LCAO::allocate(void)
-{
-    ModuleBase::TITLE("Force_Stress_LCAO","allocate");
-
-    // reduce memory occupy by vlocal
-    delete[] GlobalC::ParaO.sender_local_index;
-    delete[] GlobalC::ParaO.sender_size_process;
-    delete[] GlobalC::ParaO.sender_displacement_process;
-    delete[] GlobalC::ParaO.receiver_global_index;
-    delete[] GlobalC::ParaO.receiver_size_process;
-    delete[] GlobalC::ParaO.receiver_displacement_process;
-
-    GlobalC::ParaO.sender_local_index = new int[1];
-    GlobalC::ParaO.sender_size_process = new int[1];
-    GlobalC::ParaO.sender_displacement_process = new int[1];
-    GlobalC::ParaO.receiver_global_index = new int[1];
-    GlobalC::ParaO.receiver_size_process = new int[1];
-    GlobalC::ParaO.receiver_displacement_process = new int[1];
-
-    return;
-}
-
-
 #include "../src_pw/efield.h"
 void Force_Stress_LCAO::getForceStress(
 	const bool isforce,

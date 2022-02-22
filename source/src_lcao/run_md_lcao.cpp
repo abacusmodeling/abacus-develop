@@ -259,7 +259,6 @@ void Run_MD_LCAO::md_force_virial(
     //to call the force of each atom
 	ModuleBase::matrix fcs;//temp force matrix
 	Force_Stress_LCAO FSL;
-	FSL.allocate (); 
     FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS,
         GlobalV::TEST_FORCE, GlobalV::TEST_STRESS,
         LOC_md, LOWF_md, UHM_md, fcs, virial);

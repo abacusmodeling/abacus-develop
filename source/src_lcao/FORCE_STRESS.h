@@ -31,9 +31,6 @@ class Force_Stress_LCAO
 //	Force_LCAO_gamma flg;
 	Stress_Func sc_pw;
 	Forces f_pw;
-
-	void allocate (void);
-	void destroy (void);
 	
 	void print_force(const std::string &name, ModuleBase::matrix& f, const bool screen, bool ry)const;
 	void printforce_total (const bool ry, const bool istestf, ModuleBase::matrix& fcs);
