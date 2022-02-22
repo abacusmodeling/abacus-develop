@@ -922,7 +922,7 @@ void Gint_k::folding_vl_k(const int &ik)
                 continue;
             }
             // set the matrix value.
-            GlobalC::LM.set_HSk(i,j,tmp[j],'L');
+            this->LM->set_HSk(i,j,tmp[j],'L');
         }
         delete[] tmp;
     }
@@ -1236,7 +1236,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
                 continue;
             }
             // set the matrix value.
-            GlobalC::LM.set_HSk(i,j,tmp[j],'L');
+            this->LM->set_HSk(i,j,tmp[j],'L');
         }
         delete[] tmp;
     }
@@ -1546,9 +1546,9 @@ void Gint_k::distribute_pvpR_tr(void)
                         }
                         else
                         {
-                            //GlobalC::LM.set_HSk(i,j,tmp[j],'L');
-                            if(GlobalV::NSPIN!=4) GlobalC::LM.set_HR_tr(ix,iy,iz,i,j,tmp[j]);
-                            else GlobalC::LM.set_HR_tr_soc(ix,iy,iz,i,j,tmp_soc[j]);
+                            //this->LM->set_HSk(i,j,tmp[j],'L');
+                            if(GlobalV::NSPIN!=4) this->LM->set_HR_tr(ix,iy,iz,i,j,tmp[j]);
+                            else this->LM->set_HR_tr_soc(ix,iy,iz,i,j,tmp_soc[j]);
                         }
                     }
                     if(GlobalV::NSPIN!=4) delete[] tmp;
@@ -1705,13 +1705,13 @@ void Gint_k::distribute_pvpR_sparseMatrix(
 {
     ModuleBase::TITLE("Gint_k","distribute_pvpR_sparseMatrix");
 
-    int total_R_num = GlobalC::LM.all_R_coor.size();
+    int total_R_num = this->LM->all_R_coor.size();
     int *nonzero_num = new int[total_R_num];
     int *minus_nonzero_num = new int[total_R_num];
     ModuleBase::GlobalFunc::ZEROS(nonzero_num, total_R_num);
     ModuleBase::GlobalFunc::ZEROS(minus_nonzero_num, total_R_num);
     int count = 0;
-    for (auto &R_coor : GlobalC::LM.all_R_coor)
+    for (auto &R_coor : this->LM->all_R_coor)
     {
         auto iter = pvpR_sparseMatrix.find(R_coor);
         if (iter != pvpR_sparseMatrix.end())
@@ -1745,7 +1745,7 @@ void Gint_k::distribute_pvpR_sparseMatrix(
     tmp = new double[GlobalV::NLOCAL];
 
     count = 0;
-    for (auto &R_coor : GlobalC::LM.all_R_coor)
+    for (auto &R_coor : this->LM->all_R_coor)
     {
         if (nonzero_num[count] != 0 || minus_nonzero_num[count] != 0)
         {
@@ -1803,11 +1803,11 @@ void Gint_k::distribute_pvpR_sparseMatrix(
                         {
                             if (std::abs(tmp[col]) > sparse_threshold)
                             {
-                                double &value = GlobalC::LM.HR_sparse[current_spin][R_coor][row][col];
+                                double &value = this->LM->HR_sparse[current_spin][R_coor][row][col];
                                 value += tmp[col];
                                 if (std::abs(value) <= sparse_threshold)
                                 {
-                                    GlobalC::LM.HR_sparse[current_spin][R_coor][row].erase(col);
+                                    this->LM->HR_sparse[current_spin][R_coor][row].erase(col);
                                 }
                             }
                         }
@@ -1838,13 +1838,13 @@ void Gint_k::distribute_pvpR_soc_sparseMatrix(
 {
     ModuleBase::TITLE("Gint_k","distribute_pvpR_soc_sparseMatrix");
 
-    int total_R_num = GlobalC::LM.all_R_coor.size();
+    int total_R_num = this->LM->all_R_coor.size();
     int *nonzero_num = new int[total_R_num];
     int *minus_nonzero_num = new int[total_R_num];
     ModuleBase::GlobalFunc::ZEROS(nonzero_num, total_R_num);
     ModuleBase::GlobalFunc::ZEROS(minus_nonzero_num, total_R_num);
     int count = 0;
-    for (auto &R_coor : GlobalC::LM.all_R_coor)
+    for (auto &R_coor : this->LM->all_R_coor)
     {
         auto iter = pvpR_soc_sparseMatrix.find(R_coor);
         if (iter != pvpR_soc_sparseMatrix.end())
@@ -1878,7 +1878,7 @@ void Gint_k::distribute_pvpR_soc_sparseMatrix(
     tmp_soc = new std::complex<double>[GlobalV::NLOCAL];
 
     count = 0;
-    for (auto &R_coor : GlobalC::LM.all_R_coor)
+    for (auto &R_coor : this->LM->all_R_coor)
     {
         if (nonzero_num[count] != 0 || minus_nonzero_num[count] != 0)
         {
@@ -1935,11 +1935,11 @@ void Gint_k::distribute_pvpR_soc_sparseMatrix(
                         {
                             if (std::abs(tmp_soc[col]) > sparse_threshold)
                             {
-                                std::complex<double> &value = GlobalC::LM.HR_soc_sparse[R_coor][row][col];
+                                std::complex<double> &value = this->LM->HR_soc_sparse[R_coor][row][col];
                                 value += tmp_soc[col];
                                 if (std::abs(value) <= sparse_threshold)
                                 {
-                                    GlobalC::LM.HR_soc_sparse[R_coor][row].erase(col);
+                                    this->LM->HR_soc_sparse[R_coor][row].erase(col);
                                 }
                             }
                         }

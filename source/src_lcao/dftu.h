@@ -31,10 +31,11 @@ public:
 
 	// initialize the input terms of  U, J, double_counting etc
     void init(UnitCell_pseudo &cell, // unitcell class
-		Parallel_Orbitals &po // parallel orbitals parameters
+		Parallel_Orbitals &po, // parallel orbitals parameters
+        LCAO_Matrix &lm
 	);
     
-    static void folding_overlap_matrix(const int ik, std::complex<double>* Sk);
+    static void folding_overlap_matrix(const int ik, std::complex<double>* Sk, LCAO_Matrix &lm);
     
     //calculate the local occupation number matrix
     void cal_occup_m_k(const int iter,  std::vector<ModuleBase::ComplexMatrix> &dm_k);
@@ -62,7 +63,10 @@ public:
 
     double EU;
     int iter_dftu;
-   
+
+private:
+    LCAO_Matrix* LM;
+
 };
 }
 namespace GlobalC

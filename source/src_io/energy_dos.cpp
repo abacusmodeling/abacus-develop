@@ -178,7 +178,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 	if(GlobalV::mulliken == 1)
 	{
 		Mulliken_Charge   MC(&lowf.wfc_gamma, &lowf.wfc_k);
-		MC.stdout_mulliken(uhm.genH);			
+		MC.stdout_mulliken(uhm);			
 	}//qifeng add 2019/9/10
 #endif
 
@@ -288,7 +288,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 							&T_char,
 							&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 							&one_float,
-							GlobalC::LM.Sloc.data(), &one_int, &one_int, GlobalC::ParaO.desc,
+							uhm.LM->Sloc.data(), &one_int, &one_int, GlobalC::ParaO.desc,
 							Dwf.c, &one_int, &NB, GlobalC::ParaO.desc, &one_int,
 							&zero_float,
 							Mulk[0].c, &one_int, &NB, GlobalC::ParaO.desc,
@@ -326,8 +326,8 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 					GlobalV::SEARCH_RADIUS, 
 					GlobalV::test_atom_input);//qifeng-2019-01-21
 
-				GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
-				GlobalC::LM.zeros_HSR('S');
+				uhm.LM->allocate_HS_R(GlobalC::LNNR.nnr);
+				uhm.LM->zeros_HSR('S');
 				uhm.genH.calculate_S_no();
 				uhm.genH.build_ST_new('S', false, GlobalC::ucell);
 				std::vector<ModuleBase::ComplexMatrix> Mulk;
@@ -340,9 +340,9 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 
 					if(is == GlobalC::kv.isk[ik])
 					{
-						GlobalC::LM.allocate_HS_k(GlobalC::ParaO.nloc);
-						GlobalC::LM.zeros_HSk('S');
-						GlobalC::LNNR.folding_fixedH(ik);
+						uhm.LM->allocate_HS_k(GlobalC::ParaO.nloc);
+						uhm.LM->zeros_HSk('S');
+						GlobalC::LNNR.folding_fixedH(ik, *uhm.LM);
 
 
 						ModuleBase::ComplexMatrix Dwfc = conj(lowf.wfc_k[ik]);
@@ -374,7 +374,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 									&T_char,
 									&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 									&one_float,
-									GlobalC::LM.Sloc2.data(), &one_int, &one_int, GlobalC::ParaO.desc,
+									uhm.LM->Sloc2.data(), &one_int, &one_int, GlobalC::ParaO.desc,
 									Dwfc.c, &one_int, &NB, GlobalC::ParaO.desc, &one_int,
 									&zero_float,
 									Mulk[0].c, &one_int, &NB, GlobalC::ParaO.desc,

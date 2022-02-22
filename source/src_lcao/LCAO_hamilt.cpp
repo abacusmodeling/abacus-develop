@@ -36,7 +36,7 @@ void LCAO_Hamilt::set_lcao_matrices(void)
     {
         // mohan add 2012-03-29
         // calculate the grid integration of 'Vl' matrix for gamma algorithms.
-        this->GG.prepare(GlobalC::ucell.latvec, GlobalC::ucell.lat0);
+        this->GG.prepare(GlobalC::ucell.latvec, GlobalC::ucell.lat0, this->LM);
     
         // calulate the 'S', 'T' and 'Vnl' matrix for gamma algorithms.
         this->calculate_STNR_gamma();	
@@ -48,7 +48,7 @@ void LCAO_Hamilt::set_lcao_matrices(void)
         this->calculate_STNR_k();
 
         // calculate the grid integration of 'Vl' matrix for l-points algorithms.
-        this->GK.init(GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbzp, GlobalC::pw.nbzp_start, GlobalC::pw.ncxyz);
+        this->GK.init(GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbzp, GlobalC::pw.nbzp_start, GlobalC::pw.ncxyz, this->LM);
 
     }
 
@@ -67,7 +67,7 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> d
     ModuleBase::timer::tick("LCAO_Hamilt","cal_Hgamma");
 
     // Set the matrix 'H' to zero.
-    GlobalC::LM.zeros_HSgamma('H'); // 3 stands for Hloc.
+    this->LM->zeros_HSgamma('H'); // 3 stands for Hloc.
 
     bool local_pw = false;
 
@@ -75,7 +75,7 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> d
     {
         std::cout << "\n Call build_H in plane wave basis!" << std::endl;
          // Use plane wave basis to calculate 'Vl' matrix. 
-        Build_ST_pw bsp;
+        Build_ST_pw bsp(this->LM);
         // 0 stands for, 0 stands for k point.
         bsp.set_local(0);
     }
@@ -91,15 +91,15 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> d
             // Peize Lin add 2016-12-03
             if( 5==GlobalC::xcf.iexch_now && 0==GlobalC::xcf.igcx_now )				// HF
             {
-                GlobalC::exx_lcao.add_Hexx(ik,1);
+                GlobalC::exx_lcao.add_Hexx(ik,1, *this->LM);
             }
             else if( 6==GlobalC::xcf.iexch_now && 8==GlobalC::xcf.igcx_now )			// PBE0
             {
-                GlobalC::exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
+                GlobalC::exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha, *this->LM);
             }
             else if( 9==GlobalC::xcf.iexch_now && 12==GlobalC::xcf.igcx_now )			// HSE
             {
-                GlobalC::exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
+                GlobalC::exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha, *this->LM);
             }
         }
 
@@ -124,21 +124,21 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> d
             GlobalC::ParaO);
         for(int iic=0;iic<GlobalC::ParaO.nloc;iic++)
         {
-            GlobalC::LM.Hloc[iic] += GlobalC::ld.H_V_delta[iic];
+            this->LM->Hloc[iic] += GlobalC::ld.H_V_delta[iic];
         }
 	}
 	
 #endif
 	
 	//add T+VNL+Vl matrix.
-	GlobalC::LM.update_Hloc();
+	this->LM->update_Hloc();
 
 	//test
 	if(GlobalV::NURSE)
 	{
-		GlobalC::LM.print_HSgamma('S'); // S
-		GlobalC::LM.print_HSgamma('T');
-		GlobalC::LM.print_HSgamma('H');
+		this->LM->print_HSgamma('S'); // S
+		this->LM->print_HSgamma('T');
+		this->LM->print_HSgamma('H');
 	//	ModuleBase::WARNING_QUIT("LCAO_Hamilt::calculate_Hgamma","print the H,S matrix");
 //		ModuleBase::QUIT();
     }
@@ -160,24 +160,24 @@ void LCAO_Hamilt::calculate_STNR_gamma(void)
     // because some basic parameters should be initialized
     // in GlobalC::UHM.GG.init();
 
-    GlobalC::LM.zeros_HSgamma('S');    	
+    this->LM->zeros_HSgamma('S');    	
 
     this->genH.calculate_S_no();	
 
-    //GlobalC::LM.print_HSgamma('S');
+    //this->LM->print_HSgamma('S');
 
     //-------------------------------------
     // test using plane wave calculations.
-    // all the matrixs are stored in GlobalC::LM.
-    // GlobalC::LM.allocate_HS_k(GlobalC::ParaO.nloc);
+    // all the matrixs are stored in this->LM->
+    // this->LM->allocate_HS_k(GlobalC::ParaO.nloc);
     // Build_ST_pw bsp;
     // bsp.set_ST(0, 'S');
-    // GlobalC::LM.print_HSk('S','R',1.0e-5);
+    // this->LM->print_HSk('S','R',1.0e-5);
     //-------------------------------------
 
     // set T and Vnl matrix to zero.
-    // 2 stands for GlobalC::LM.Hloc_fixed matrix.
-    GlobalC::LM.zeros_HSgamma('T'); 
+    // 2 stands for this->LM->Hloc_fixed matrix.
+    this->LM->zeros_HSgamma('T'); 
 
     //add nonlocal pseudopotential matrix element
     time_t time_vnl_start = time(NULL);
@@ -194,12 +194,12 @@ void LCAO_Hamilt::calculate_STNR_gamma(void)
     if(GlobalV::T_IN_H)
     {
         genH.calculate_T_no();
-//		GlobalC::LM.print_HSgamma('T');
+//		this->LM->print_HSgamma('T');
     }
     time_t time_t_end = time(NULL);
 
     //	GlobalV::ofs_running << " T+Vnl matrix" << std::endl;
-    //GlobalC::LM.print_HSgamma('T');
+    //this->LM->print_HSgamma('T');
 
     ModuleBase::GlobalFunc::OUT_TIME("kinetical matrix",time_t_start, time_t_end);
     ModuleBase::GlobalFunc::OUT_TIME("vnl matrix",time_vnl_start, time_vnl_end);
@@ -217,7 +217,7 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 
     // whether you want to calculate the local potential
     // or not, you need to set this matrix to 0.
-    GlobalC::LM.zeros_HSk('H');
+    this->LM->zeros_HSk('H');
 
     if(GlobalV::VL_IN_H)
     {
@@ -227,7 +227,7 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
         //-------------------------
 //		Build_ST_pw bsp;
 //		bsp.set_local(ik);	
-//		GlobalC::LM.print_HSk('H','C',1.0e-5);
+//		this->LM->print_HSk('H','C',1.0e-5);
 
         //--------------------------
         // set the local potential
@@ -246,15 +246,15 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
         // Peize Lin add 2016-12-03
         if( 5==GlobalC::xcf.iexch_now && 0==GlobalC::xcf.igcx_now )				// HF
         {
-            GlobalC::exx_lcao.add_Hexx(ik,1);
+            GlobalC::exx_lcao.add_Hexx(ik, 1, *this->LM);
         }
         else if( 6==GlobalC::xcf.iexch_now && 8==GlobalC::xcf.igcx_now )			// PBE0
         {
-            GlobalC::exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
+            GlobalC::exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha, *this->LM);
         }
         else if( 9==GlobalC::xcf.iexch_now && 12==GlobalC::xcf.igcx_now )			// HSE
         {
-            GlobalC::exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
+            GlobalC::exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha, *this->LM);
         }
     }
 
@@ -264,22 +264,22 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
     // folding matrix here: T(k)+Vnl(k)
     // (Hloc_fixed->Hloc_fixed2)
     //-----------------------------------------
-    GlobalC::LM.zeros_HSk('S');
-    GlobalC::LM.zeros_HSk('T');
+    this->LM->zeros_HSk('S');
+    this->LM->zeros_HSk('T');
 //	std::cout << " after folding Hfixed k." << std::endl;
-    GlobalC::LNNR.folding_fixedH(ik);
+    GlobalC::LNNR.folding_fixedH(ik, *this->LM);
 
     //------------------------------------------
     // Add T(k)+Vnl(k)+Vlocal(k)
     // (Hloc2 += Hloc_fixed2), (std::complex matrix)
     //------------------------------------------
 //	std::cout << " Folding matrix here." << std::endl;
-	GlobalC::LM.update_Hloc2(ik);
+	this->LM->update_Hloc2(ik);
 /*
     if(GlobalV::NURSE)
     {
-        GlobalC::LM.print_HSk('H','R',1.0e-5);
-//		GlobalC::LM.print_HSk('S','R',1.0e-5);
+        this->LM->print_HSk('H','R',1.0e-5);
+//		this->LM->print_HSk('S','R',1.0e-5);
     }
     */
     
@@ -297,17 +297,17 @@ void LCAO_Hamilt::calculate_STNR_k(void)
     // set S(R) to zero.
     // the total value of S(R) in this processor
     // is GlobalC::LNNR.nnr.
-    // and store in GlobalC::LM.SlocR.
+    // and store in this->LM->SlocR.
     //--------------------------------------------
-    GlobalC::LM.zeros_HSR('S');
+    this->LM->zeros_HSR('S');
     this->genH.calculate_S_no();	
 
     //------------------------------
     // set T(R) and Vnl(R) to zero.
     // and then calculate it
-    // and store in GlobalC::LM.Hloc_fixedR.
+    // and store in this->LM->Hloc_fixedR.
     //------------------------------
-    GlobalC::LM.zeros_HSR('T');
+    this->LM->zeros_HSR('T');
     
 
 
@@ -332,7 +332,7 @@ void LCAO_Hamilt::calculate_STNR_k(void)
     //-----------------------------------
     
     // check in plane wave basis.	
-    Build_ST_pw bsp;
+    Build_ST_pw bsp(this->LM);
     for(int ik=0; ik<GlobalC::kv.nks; ik++)
     {
         std::cout << " ik=" << ik << " ------------------------------------------" << std::endl;
@@ -340,49 +340,49 @@ void LCAO_Hamilt::calculate_STNR_k(void)
         //----------------------------------------------
         // Check the matrix in plane wave basis.
         //----------------------------------------------
-        GlobalC::LM.zeros_HSk('S');
-        GlobalC::LM.zeros_HSk('T');
+        this->LM->zeros_HSk('S');
+        this->LM->zeros_HSk('T');
 
         bsp.set_ST(ik, 'S');
         bsp.set_ST(ik, 'T');
 
         std::cout << " --> PW S" << std::endl;
-        GlobalC::LM.print_HSk('S','R',1.0e-5);
+        this->LM->print_HSk('S','R',1.0e-5);
         std::cout << " --> PW T" << std::endl;
-        GlobalC::LM.print_HSk('T','R',1.0e-5);
+        this->LM->print_HSk('T','R',1.0e-5);
 
         std::string fn = "Sloc2pw.dat";
-        GlobalC::LM.output_HSk('S', fn);
+        this->LM->output_HSk('S', fn);
         
         //------------------------------------------
         // folding the SlocR and Hloc_fixedR matrix
         // into Sloc2 and Hloc_fixed2 matrix.
         //------------------------------------------
-        GlobalC::LM.zeros_HSk('S');
-        GlobalC::LM.zeros_HSk('T');
-        GlobalC::LNNR.folding_fixedH(ik);
+        this->LM->zeros_HSk('S');
+        this->LM->zeros_HSk('T');
+        GlobalC::LNNR.folding_fixedH(ik, *this->LM);
         std::cout << " --> LCAO S" << std::endl;
-        GlobalC::LM.print_HSk('S','R',1.0e-5);	
+        this->LM->print_HSk('S','R',1.0e-5);	
         std::cout << " --> LCAO T+Vnl" << std::endl;
-        GlobalC::LM.print_HSk('T','R',1.0e-5);	
+        this->LM->print_HSk('T','R',1.0e-5);	
 
         std::string fn2 = "Sloc2lcao.dat";
-        GlobalC::LM.output_HSk('S',fn2);
+        this->LM->output_HSk('S',fn2);
 
         //----------------
         // test gamma Vnl	
         //----------------
 //		GlobalV::GAMMA_ONLY_LOCAL = true;
-//		GlobalC::LM.allocate_HS_gamma(GlobalC::ParaO.nloc);
-//		GlobalC::LM.zeros_HSgamma('H');
+//		this->LM->allocate_HS_gamma(GlobalC::ParaO.nloc);
+//		this->LM->zeros_HSgamma('H');
 //		GlobalC::UHM.genH.calculate_NL_no( nstart );
 //		GlobalV::GAMMA_ONLY_LOCAL = false;
 //		std::cout << " Correct LCAO Vnl " << std::endl;
-//		GlobalC::LM.print_HSgamma('H');		
+//		this->LM->print_HSgamma('H');		
 //		GlobalC::UHM.genH.calculate_NL_no( nstart );
 //		GlobalV::GAMMA_ONLY_LOCAL = false;
 //		std::cout << " Correct LCAO Vnl " << std::endl;
-//		GlobalC::LM.print_HSgamma('H');		
+//		this->LM->print_HSgamma('H');		
         
     }
     
@@ -399,9 +399,9 @@ void LCAO_Hamilt::calculate_STN_R(void)
     ModuleBase::Vector3<double> dtau, tau1, tau2;
     ModuleBase::Vector3<double> dtau1, dtau2, tau0;
 
-    GlobalC::LM.allocate_Hloc_fixedR_tr();
-    GlobalC::LM.allocate_HR_tr();
-    GlobalC::LM.allocate_SlocR_tr();
+    this->LM->allocate_Hloc_fixedR_tr();
+    this->LM->allocate_HR_tr();
+    this->LM->allocate_SlocR_tr();
 
     double R_minX = GlobalC::GridD.getD_minX();
     double R_minY = GlobalC::GridD.getD_minY();
@@ -498,13 +498,13 @@ void LCAO_Hamilt::calculate_STN_R(void)
 
                             if(GlobalV::NSPIN!=4)
                             {
-                                GlobalC::LM.SlocR_tr[R_x][R_y][R_z][iic] = GlobalC::LM.SlocR[index];
-                                GlobalC::LM.Hloc_fixedR_tr[R_x][R_y][R_z][iic] = GlobalC::LM.Hloc_fixedR[index];
+                                this->LM->SlocR_tr[R_x][R_y][R_z][iic] = this->LM->SlocR[index];
+                                this->LM->Hloc_fixedR_tr[R_x][R_y][R_z][iic] = this->LM->Hloc_fixedR[index];
                             }
                             else
                             {
-                                GlobalC::LM.SlocR_tr_soc[R_x][R_y][R_z][iic] = GlobalC::LM.SlocR_soc[index];
-                                GlobalC::LM.Hloc_fixedR_tr_soc[R_x][R_y][R_z][iic] = GlobalC::LM.Hloc_fixedR_soc[index];
+                                this->LM->SlocR_tr_soc[R_x][R_y][R_z][iic] = this->LM->SlocR_soc[index];
+                                this->LM->Hloc_fixedR_tr_soc[R_x][R_y][R_z][iic] = this->LM->Hloc_fixedR_soc[index];
                             }
 
                             ++index;
@@ -535,7 +535,7 @@ void LCAO_Hamilt::set_R_range_sparse()
             for(int iz = 0; iz < R_z; iz++)
             {
                 Abfs::Vector3_Order<int> temp_R(ix+R_minX, iy+R_minY, iz+R_minZ);
-                GlobalC::LM.all_R_coor.insert(temp_R);
+                this->LM->all_R_coor.insert(temp_R);
             }
         }
     }
@@ -626,31 +626,31 @@ void LCAO_Hamilt::calculate_STN_R_sparse(const int &current_spin, const double &
                             {
                                 if (current_spin == 0)
                                 {
-                                    temp_value_double = GlobalC::LM.SlocR[index];
+                                    temp_value_double = this->LM->SlocR[index];
                                     if (std::abs(temp_value_double) > sparse_threshold)
                                     {
-                                        GlobalC::LM.SR_sparse[dR][iw1_all][iw2_all] = temp_value_double;
+                                        this->LM->SR_sparse[dR][iw1_all][iw2_all] = temp_value_double;
                                     }
                                 }
 
-                                temp_value_double = GlobalC::LM.Hloc_fixedR[index];
+                                temp_value_double = this->LM->Hloc_fixedR[index];
                                 if (std::abs(temp_value_double) > sparse_threshold)
                                 {
-                                    GlobalC::LM.HR_sparse[current_spin][dR][iw1_all][iw2_all] = temp_value_double;
+                                    this->LM->HR_sparse[current_spin][dR][iw1_all][iw2_all] = temp_value_double;
                                 }
                             }
                             else
                             {
-                                temp_value_complex = GlobalC::LM.SlocR_soc[index];
+                                temp_value_complex = this->LM->SlocR_soc[index];
                                 if(std::abs(temp_value_complex) > sparse_threshold)
                                 {
-                                    GlobalC::LM.SR_soc_sparse[dR][iw1_all][iw2_all] = temp_value_complex;
+                                    this->LM->SR_soc_sparse[dR][iw1_all][iw2_all] = temp_value_complex;
                                 }
 
-                                temp_value_complex = GlobalC::LM.Hloc_fixedR_soc[index];
+                                temp_value_complex = this->LM->Hloc_fixedR_soc[index];
                                 if(std::abs(temp_value_complex) > sparse_threshold)
                                 {
-                                    GlobalC::LM.HR_soc_sparse[dR][iw1_all][iw2_all] = temp_value_complex;
+                                    this->LM->HR_soc_sparse[dR][iw1_all][iw2_all] = temp_value_complex;
                                 }
                             }
 
@@ -747,18 +747,18 @@ void LCAO_Hamilt::calculate_STN_R_sparse_for_S(const double &sparse_threshold)
 
                             if(GlobalV::NSPIN!=4)
                             {
-                                temp_value_double = GlobalC::LM.SlocR[index];
+                                temp_value_double = this->LM->SlocR[index];
                                 if (std::abs(temp_value_double) > sparse_threshold)
                                 {
-                                    GlobalC::LM.SR_sparse[dR][iw1_all][iw2_all] = temp_value_double;
+                                    this->LM->SR_sparse[dR][iw1_all][iw2_all] = temp_value_double;
                                 }
                             }
                             else
                             {
-                                temp_value_complex = GlobalC::LM.SlocR_soc[index];
+                                temp_value_complex = this->LM->SlocR_soc[index];
                                 if(std::abs(temp_value_complex) > sparse_threshold)
                                 {
-                                    GlobalC::LM.SR_soc_sparse[dR][iw1_all][iw2_all] = temp_value_complex;
+                                    this->LM->SR_soc_sparse[dR][iw1_all][iw2_all] = temp_value_complex;
                                 }
                             }
 
@@ -818,14 +818,14 @@ void LCAO_Hamilt::calculat_HR_dftu_sparse(const int &current_spin, const double 
     ModuleBase::TITLE("LCAO_Hamilt","calculat_HR_dftu_sparse");
     ModuleBase::timer::tick("LCAO_Hamilt","calculat_HR_dftu_sparse");
 
-    int total_R_num = GlobalC::LM.all_R_coor.size();
+    int total_R_num = this->LM->all_R_coor.size();
     int *nonzero_num = new int[total_R_num];
     ModuleBase::GlobalFunc::ZEROS(nonzero_num, total_R_num);
     int count = 0;
-    for (auto &R_coor : GlobalC::LM.all_R_coor)
+    for (auto &R_coor : this->LM->all_R_coor)
     {
-        auto iter = GlobalC::LM.SR_sparse.find(R_coor);
-        if (iter != GlobalC::LM.SR_sparse.end())
+        auto iter = this->LM->SR_sparse.find(R_coor);
+        if (iter != this->LM->SR_sparse.end())
         {
             for (auto &row_loop : iter->second)
             {
@@ -843,18 +843,18 @@ void LCAO_Hamilt::calculat_HR_dftu_sparse(const int &current_spin, const double 
     int ir;
     int ic;
     int iic;
-    auto &temp_HR_sparse = GlobalC::LM.HR_sparse[current_spin];
+    auto &temp_HR_sparse = this->LM->HR_sparse[current_spin];
 
     count = 0;
-    for (auto &R_coor : GlobalC::LM.all_R_coor)
+    for (auto &R_coor : this->LM->all_R_coor)
     {
         if (nonzero_num[count] != 0)
         {
             ModuleBase::GlobalFunc::ZEROS(HR_tmp, GlobalC::ParaO.nloc);
             ModuleBase::GlobalFunc::ZEROS(SR_tmp, GlobalC::ParaO.nloc);
 
-            auto iter = GlobalC::LM.SR_sparse.find(R_coor);
-            if (iter != GlobalC::LM.SR_sparse.end())
+            auto iter = this->LM->SR_sparse.find(R_coor);
+            if (iter != this->LM->SR_sparse.end())
             {
                 for (auto &row_loop : iter->second)
                 {
@@ -931,14 +931,14 @@ void LCAO_Hamilt::calculat_HR_dftu_soc_sparse(const int &current_spin, const dou
     ModuleBase::TITLE("LCAO_Hamilt","calculat_HR_dftu_soc_sparse");
     ModuleBase::timer::tick("LCAO_Hamilt","calculat_HR_dftu_soc_sparse");
 
-    int total_R_num = GlobalC::LM.all_R_coor.size();
+    int total_R_num = this->LM->all_R_coor.size();
     int *nonzero_num = new int[total_R_num];
     ModuleBase::GlobalFunc::ZEROS(nonzero_num, total_R_num);
     int count = 0;
-    for (auto &R_coor : GlobalC::LM.all_R_coor)
+    for (auto &R_coor : this->LM->all_R_coor)
     {
-        auto iter = GlobalC::LM.SR_soc_sparse.find(R_coor);
-        if (iter != GlobalC::LM.SR_soc_sparse.end())
+        auto iter = this->LM->SR_soc_sparse.find(R_coor);
+        if (iter != this->LM->SR_soc_sparse.end())
         {
             for (auto &row_loop : iter->second)
             {
@@ -958,15 +958,15 @@ void LCAO_Hamilt::calculat_HR_dftu_soc_sparse(const int &current_spin, const dou
     int iic;
 
     count = 0;
-    for (auto &R_coor : GlobalC::LM.all_R_coor)
+    for (auto &R_coor : this->LM->all_R_coor)
     {
         if (nonzero_num[count] != 0)
         {
             ModuleBase::GlobalFunc::ZEROS(HR_soc_tmp, GlobalC::ParaO.nloc);
             ModuleBase::GlobalFunc::ZEROS(SR_soc_tmp, GlobalC::ParaO.nloc);
 
-            auto iter = GlobalC::LM.SR_soc_sparse.find(R_coor);
-            if (iter != GlobalC::LM.SR_soc_sparse.end())
+            auto iter = this->LM->SR_soc_sparse.find(R_coor);
+            if (iter != this->LM->SR_soc_sparse.end())
             {
                 for (auto &row_loop : iter->second)
                 {
@@ -1010,11 +1010,11 @@ void LCAO_Hamilt::calculat_HR_dftu_soc_sparse(const int &current_spin, const dou
 
                             if (std::abs(HR_soc_tmp[iic]) > sparse_threshold)
                             {
-                                std::complex<double> &value = GlobalC::LM.HR_soc_sparse[R_coor][i][j];
+                                std::complex<double> &value = this->LM->HR_soc_sparse[R_coor][i][j];
                                 value += HR_soc_tmp[iic];
                                 if (std::abs(value) <= sparse_threshold)
                                 {
-                                    GlobalC::LM.HR_soc_sparse[R_coor][i].erase(j);
+                                    this->LM->HR_soc_sparse[R_coor][i].erase(j);
                                 }
                             }
                         }
@@ -1088,7 +1088,7 @@ void LCAO_Hamilt::calculate_HR_exx_sparse(const int &current_spin, const double 
 				{
 					if(GlobalV::NSPIN==1 || GlobalV::NSPIN==2)
 					{
-						auto &HR_sparse_ptr = GlobalC::LM.HR_sparse[current_spin][R][iwt1_global];
+						auto &HR_sparse_ptr = this->LM->HR_sparse[current_spin][R][iwt1_global];
 						auto &HR_sparse = HR_sparse_ptr[iwt2_global];
 						HR_sparse += HexxR(iwt1_local,iwt2_local);
 						if(std::abs(HR_sparse) < sparse_threshold)
@@ -1096,7 +1096,7 @@ void LCAO_Hamilt::calculate_HR_exx_sparse(const int &current_spin, const double 
 					}
 					else
 					{
-						auto &HR_sparse_ptr = GlobalC::LM.HR_soc_sparse[R][iwt1_global];
+						auto &HR_sparse_ptr = this->LM->HR_soc_sparse[R][iwt1_global];
 						auto &HR_sparse = HR_sparse_ptr[iwt2_global];
 						HR_sparse += HexxR(iwt1_local,iwt2_local);
 						if(std::abs(HR_sparse) < sparse_threshold)
@@ -1108,7 +1108,7 @@ void LCAO_Hamilt::calculate_HR_exx_sparse(const int &current_spin, const double 
 	}
 
     // In the future it should be changed to mpi communication, since some Hexx(R) of R in Rs may be zeros
-    GlobalC::LM.all_R_coor.insert(Rs.begin(),Rs.end());
+    this->LM->all_R_coor.insert(Rs.begin(),Rs.end());
     
 	ModuleBase::timer::tick("LCAO_Hamilt","calculate_HR_exx_sparse");	
 }
@@ -1119,7 +1119,7 @@ void LCAO_Hamilt::clear_zero_elements(const int &current_spin, const double &spa
 {
     if(GlobalV::NSPIN != 4)
     {
-        for (auto &R_loop : GlobalC::LM.HR_sparse[current_spin])
+        for (auto &R_loop : this->LM->HR_sparse[current_spin])
         {
             for (auto &row_loop : R_loop.second)
             {
@@ -1139,7 +1139,7 @@ void LCAO_Hamilt::clear_zero_elements(const int &current_spin, const double &spa
             }
         }
 
-        for (auto &R_loop : GlobalC::LM.SR_sparse)
+        for (auto &R_loop : this->LM->SR_sparse)
         {
             for (auto &row_loop : R_loop.second)
             {
@@ -1162,7 +1162,7 @@ void LCAO_Hamilt::clear_zero_elements(const int &current_spin, const double &spa
     }
     else
     {
-        for (auto &R_loop : GlobalC::LM.HR_soc_sparse)
+        for (auto &R_loop : this->LM->HR_soc_sparse)
         {
             for (auto &row_loop : R_loop.second)
             {
@@ -1182,7 +1182,7 @@ void LCAO_Hamilt::clear_zero_elements(const int &current_spin, const double &spa
             }
         }
 
-        for (auto &R_loop : GlobalC::LM.SR_soc_sparse)
+        for (auto &R_loop : this->LM->SR_soc_sparse)
         {
             for (auto &row_loop : R_loop.second)
             {
@@ -1208,5 +1208,5 @@ void LCAO_Hamilt::clear_zero_elements(const int &current_spin, const double &spa
 
 void LCAO_Hamilt::destroy_all_HSR_sparse(void)
 {
-	GlobalC::LM.destroy_HS_R_sparse();
+	this->LM->destroy_HS_R_sparse();
 }

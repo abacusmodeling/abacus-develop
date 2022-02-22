@@ -40,7 +40,7 @@ public:
 	void cal_exx_ions();
 	void cal_exx_elec(Local_Orbital_Charge &loc, complex<double>*** wfc_k_grid);
 	void cal_exx_elec_nscf();
-	void add_Hexx(const size_t ik, const double alpha) const;
+	void add_Hexx(const size_t ik, const double alpha, LCAO_Matrix &lm) const;
 private:
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> cal_Hexx() const;
 	double cal_energy(

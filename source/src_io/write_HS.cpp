@@ -648,7 +648,7 @@ void HS_Matrix::save_HS_complex(std::complex<double> *H, std::complex<double> *S
 }
 
 //void HS_Matrix::save_HSR_tr(const int Rx, const int Ry, const int Rz, const double *H, const double *S)
-void HS_Matrix::save_HSR_tr(const int current_spin)
+void HS_Matrix::save_HSR_tr(const int current_spin, LCAO_Matrix &lm)
 //void HS_Matrix::save_HSR_tr(void)
 {
     ModuleBase::TITLE("HS_Matrix","save_HSR_tr");
@@ -750,13 +750,13 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
                                 }
                                 if(GlobalV::NSPIN!=4)
                                 {
-                                    lineH[j] = GlobalC::LM.HR_tr[ix][iy][iz][iic];
-                                    lineS[j] = GlobalC::LM.SlocR_tr[ix][iy][iz][iic];
+                                    lineH[j] = lm.HR_tr[ix][iy][iz][iic];
+                                    lineS[j] = lm.SlocR_tr[ix][iy][iz][iic];
                                 }
                                 else
                                 {
-                                    lineH_soc[j] = GlobalC::LM.HR_tr_soc[ix][iy][iz][iic];
-                                    lineS_soc[j] = GlobalC::LM.SlocR_tr_soc[ix][iy][iz][iic];
+                                    lineH_soc[j] = lm.HR_tr_soc[ix][iy][iz][iic];
+                                    lineS_soc[j] = lm.SlocR_tr_soc[ix][iy][iz][iic];
                                 }
                             }
                         }
@@ -864,7 +864,8 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
 }
 
 void HS_Matrix::save_HSR_sparse(
-    const double &sparse_threshold, 
+    LCAO_Matrix &lm,
+    const double& sparse_threshold,
     const bool &binary,  
     const std::string &SR_filename, 
     const std::string &HR_filename_up, 
@@ -874,11 +875,11 @@ void HS_Matrix::save_HSR_sparse(
     ModuleBase::TITLE("HS_Matrix","save_HSR_sparse");
     ModuleBase::timer::tick("HS_Matrix","save_HSR_sparse");
 
-    auto &all_R_coor_ptr = GlobalC::LM.all_R_coor;
-    auto &HR_sparse_ptr = GlobalC::LM.HR_sparse;
-    auto &SR_sparse_ptr = GlobalC::LM.SR_sparse;
-    auto &HR_soc_sparse_ptr = GlobalC::LM.HR_soc_sparse;
-    auto &SR_soc_sparse_ptr = GlobalC::LM.SR_soc_sparse;
+    auto &all_R_coor_ptr = lm.all_R_coor;
+    auto &HR_sparse_ptr = lm.HR_sparse;
+    auto &SR_sparse_ptr = lm.SR_sparse;
+    auto &HR_soc_sparse_ptr = lm.HR_soc_sparse;
+    auto &SR_soc_sparse_ptr = lm.SR_soc_sparse;
 
     int total_R_num = all_R_coor_ptr.size();
     int output_R_number = 0;
@@ -1148,7 +1149,8 @@ void HS_Matrix::save_HSR_sparse(
 }
 
 void HS_Matrix::save_SR_sparse(
-    const double &sparse_threshold, 
+    LCAO_Matrix &lm,
+    const double& sparse_threshold,
     const bool &binary,  
     const std::string &SR_filename
 )
@@ -1156,9 +1158,9 @@ void HS_Matrix::save_SR_sparse(
     ModuleBase::TITLE("HS_Matrix","save_SR_sparse");
     ModuleBase::timer::tick("HS_Matrix","save_SR_sparse");
 
-    auto &all_R_coor_ptr = GlobalC::LM.all_R_coor;
-    auto &SR_sparse_ptr = GlobalC::LM.SR_sparse;
-    auto &SR_soc_sparse_ptr = GlobalC::LM.SR_soc_sparse;
+    auto &all_R_coor_ptr = lm.all_R_coor;
+    auto &SR_sparse_ptr = lm.SR_sparse;
+    auto &SR_soc_sparse_ptr = lm.SR_soc_sparse;
 
     int total_R_num = all_R_coor_ptr.size();
     int output_R_number = 0;

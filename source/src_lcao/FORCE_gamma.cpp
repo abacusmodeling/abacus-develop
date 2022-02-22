@@ -37,17 +37,19 @@ void Force_LCAO_gamma::ftable_gamma (
 {
     ModuleBase::TITLE("Force_LCAO_gamma", "ftable");
     ModuleBase::timer::tick("Force_LCAO_gamma","ftable_gamma");
+
+    this->UHM = &uhm;
     
     // allocate DSloc_x, DSloc_y, DSloc_z
     // allocate DHloc_fixed_x, DHloc_fixed_y, DHloc_fixed_z
-    this->allocate_gamma(uhm.genH);
+    this->allocate_gamma();
 
     // calculate the 'energy density matrix' here.
     this->cal_foverlap(isforce, isstress, wfc_gamma, loc, foverlap, soverlap);
 
     this->cal_ftvnl_dphi(loc.dm_gamma, isforce, isstress, ftvnl_dphi, stvnl_dphi);
     this->calFvnlDbeta(loc.dm_gamma, isforce, isstress, fvnl_dbeta, svnl_dbeta, GlobalV::vnl_method);
-    this->cal_fvl_dphi(loc.dm_gamma, isforce, isstress, uhm.GG, fvl_dphi, svl_dphi);
+    this->cal_fvl_dphi(loc.dm_gamma, isforce, isstress, fvl_dphi, svl_dphi);
     
     //caoyu add for DeePKS
 #ifdef __DEEPKS
@@ -100,7 +102,7 @@ void Force_LCAO_gamma::ftable_gamma (
     return;
 }
 
-void Force_LCAO_gamma::allocate_gamma(LCAO_gen_fixedH &genH)
+void Force_LCAO_gamma::allocate_gamma()
 {
     ModuleBase::TITLE("Force_LCAO_gamma","allocate_gamma");
     ModuleBase::timer::tick("Force_LCAO_gamma","allocate_gamma");
@@ -112,44 +114,44 @@ void Force_LCAO_gamma::allocate_gamma(LCAO_gen_fixedH &genH)
     //liaochen add on 2010/7/12
     //save the results in dense matrix by now.
     //GlobalC::ParaO.nloc: number of H elements in this proc.
-    GlobalC::LM.DSloc_x = new double [GlobalC::ParaO.nloc];
-    GlobalC::LM.DSloc_y = new double [GlobalC::ParaO.nloc];
-    GlobalC::LM.DSloc_z = new double [GlobalC::ParaO.nloc];
-    ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_x, GlobalC::ParaO.nloc);
-    ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_y, GlobalC::ParaO.nloc);
-    ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_z, GlobalC::ParaO.nloc);
+    this->UHM->LM->DSloc_x = new double [GlobalC::ParaO.nloc];
+    this->UHM->LM->DSloc_y = new double [GlobalC::ParaO.nloc];
+    this->UHM->LM->DSloc_z = new double [GlobalC::ParaO.nloc];
+    ModuleBase::GlobalFunc::ZEROS(this->UHM->LM->DSloc_x, GlobalC::ParaO.nloc);
+    ModuleBase::GlobalFunc::ZEROS(this->UHM->LM->DSloc_y, GlobalC::ParaO.nloc);
+    ModuleBase::GlobalFunc::ZEROS(this->UHM->LM->DSloc_z, GlobalC::ParaO.nloc);
     //allocate stress part in gamma_only-line, added by zhengdy-stress
     if(GlobalV::STRESS)
     {
-        GlobalC::LM.DSloc_11 = new double [GlobalC::ParaO.nloc];
-        GlobalC::LM.DSloc_12 = new double [GlobalC::ParaO.nloc];
-        GlobalC::LM.DSloc_13 = new double [GlobalC::ParaO.nloc];
-        GlobalC::LM.DSloc_22 = new double [GlobalC::ParaO.nloc];
-        GlobalC::LM.DSloc_23 = new double [GlobalC::ParaO.nloc];
-        GlobalC::LM.DSloc_33 = new double [GlobalC::ParaO.nloc];
-        ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_11, GlobalC::ParaO.nloc);
-        ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_12, GlobalC::ParaO.nloc);
-        ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_13, GlobalC::ParaO.nloc);
-        ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_22, GlobalC::ParaO.nloc);
-        ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_23, GlobalC::ParaO.nloc);
-        ModuleBase::GlobalFunc::ZEROS(GlobalC::LM.DSloc_33, GlobalC::ParaO.nloc);
-        GlobalC::LM.DHloc_fixed_11 = new double [GlobalC::ParaO.nloc];
-        GlobalC::LM.DHloc_fixed_12 = new double [GlobalC::ParaO.nloc];
-        GlobalC::LM.DHloc_fixed_13 = new double [GlobalC::ParaO.nloc];
-        GlobalC::LM.DHloc_fixed_22 = new double [GlobalC::ParaO.nloc];
-        GlobalC::LM.DHloc_fixed_23 = new double [GlobalC::ParaO.nloc];
-        GlobalC::LM.DHloc_fixed_33 = new double [GlobalC::ParaO.nloc];
-        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_11, GlobalC::ParaO.nloc);
-        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_12, GlobalC::ParaO.nloc);
-        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_13, GlobalC::ParaO.nloc);
-        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_22, GlobalC::ParaO.nloc);
-        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_23, GlobalC::ParaO.nloc);
-        ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_33, GlobalC::ParaO.nloc);
+        this->UHM->LM->DSloc_11 = new double [GlobalC::ParaO.nloc];
+        this->UHM->LM->DSloc_12 = new double [GlobalC::ParaO.nloc];
+        this->UHM->LM->DSloc_13 = new double [GlobalC::ParaO.nloc];
+        this->UHM->LM->DSloc_22 = new double [GlobalC::ParaO.nloc];
+        this->UHM->LM->DSloc_23 = new double [GlobalC::ParaO.nloc];
+        this->UHM->LM->DSloc_33 = new double [GlobalC::ParaO.nloc];
+        ModuleBase::GlobalFunc::ZEROS(this->UHM->LM->DSloc_11, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS(this->UHM->LM->DSloc_12, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS(this->UHM->LM->DSloc_13, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS(this->UHM->LM->DSloc_22, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS(this->UHM->LM->DSloc_23, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS(this->UHM->LM->DSloc_33, GlobalC::ParaO.nloc);
+        this->UHM->LM->DHloc_fixed_11 = new double [GlobalC::ParaO.nloc];
+        this->UHM->LM->DHloc_fixed_12 = new double [GlobalC::ParaO.nloc];
+        this->UHM->LM->DHloc_fixed_13 = new double [GlobalC::ParaO.nloc];
+        this->UHM->LM->DHloc_fixed_22 = new double [GlobalC::ParaO.nloc];
+        this->UHM->LM->DHloc_fixed_23 = new double [GlobalC::ParaO.nloc];
+        this->UHM->LM->DHloc_fixed_33 = new double [GlobalC::ParaO.nloc];
+        ModuleBase::GlobalFunc::ZEROS (this->UHM->LM->DHloc_fixed_11, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (this->UHM->LM->DHloc_fixed_12, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (this->UHM->LM->DHloc_fixed_13, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (this->UHM->LM->DHloc_fixed_22, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (this->UHM->LM->DHloc_fixed_23, GlobalC::ParaO.nloc);
+        ModuleBase::GlobalFunc::ZEROS (this->UHM->LM->DHloc_fixed_33, GlobalC::ParaO.nloc);
     }
     //calculate dS in LCAO basis
     // tips: build_ST_new --> GlobalC::ParaO.set_force 
     //ModuleBase::timer::tick("Force_LCAO_gamma","build_S_new");
-    genH.build_ST_new ('S', cal_deri, GlobalC::ucell);
+    this->UHM->genH.build_ST_new ('S', cal_deri, GlobalC::ucell);
     //ModuleBase::timer::tick("Force_LCAO_gamma","build_S_new");
 
     ModuleBase::Memory::record("force_lo", "dS", GlobalC::ParaO.nloc*3, "double");
@@ -157,25 +159,25 @@ void Force_LCAO_gamma::allocate_gamma(LCAO_gen_fixedH &genH)
     //calculate dT in LCAP
     //allocation dt
     //liaochen add on 2010/7/12
-    GlobalC::LM.DHloc_fixed_x = new double [GlobalC::ParaO.nloc];
-    GlobalC::LM.DHloc_fixed_y = new double [GlobalC::ParaO.nloc];
-    GlobalC::LM.DHloc_fixed_z = new double [GlobalC::ParaO.nloc];
-    ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_x, GlobalC::ParaO.nloc);
-    ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_y, GlobalC::ParaO.nloc);
-    ModuleBase::GlobalFunc::ZEROS (GlobalC::LM.DHloc_fixed_z, GlobalC::ParaO.nloc);
+    this->UHM->LM->DHloc_fixed_x = new double [GlobalC::ParaO.nloc];
+    this->UHM->LM->DHloc_fixed_y = new double [GlobalC::ParaO.nloc];
+    this->UHM->LM->DHloc_fixed_z = new double [GlobalC::ParaO.nloc];
+    ModuleBase::GlobalFunc::ZEROS (this->UHM->LM->DHloc_fixed_x, GlobalC::ParaO.nloc);
+    ModuleBase::GlobalFunc::ZEROS (this->UHM->LM->DHloc_fixed_y, GlobalC::ParaO.nloc);
+    ModuleBase::GlobalFunc::ZEROS (this->UHM->LM->DHloc_fixed_z, GlobalC::ParaO.nloc);
     
     //calculate dT
     //calculate T + VNL(P1) in LCAO basis
     //ModuleBase::timer::tick("Force_LCAO_gamma","build_T_new");
-    genH.build_ST_new ('T', cal_deri, GlobalC::ucell);
+    this->UHM->genH.build_ST_new ('T', cal_deri, GlobalC::ucell);
     //ModuleBase::timer::tick("Force_LCAO_gamma","build_T_new");
-    //test_gamma(GlobalC::LM.DHloc_fixed_x, "dHloc_fixed_x T part");
+    //test_gamma(this->UHM->LM->DHloc_fixed_x, "dHloc_fixed_x T part");
     
     //genH.build_Nonlocal_beta (cal_deri);
     //ModuleBase::timer::tick("Force_LCAO_gamma","build_Nonlocal_mu");
-	this->NonlocalDphi(GlobalV::NSPIN, GlobalV::vnl_method, cal_deri, genH);
+	this->NonlocalDphi(GlobalV::NSPIN, GlobalV::vnl_method, cal_deri, this->UHM->genH);
     //ModuleBase::timer::tick("Force_LCAO_gamma","build_Nonlocal_mu");
-    //test_gamma(GlobalC::LM.DHloc_fixed_x, "dHloc_fixed_x Vnl part");
+    //test_gamma(this->UHM->LM->DHloc_fixed_x, "dHloc_fixed_x Vnl part");
 
     ModuleBase::Memory::record("force_lo", "dTVNL", GlobalC::ParaO.nloc*3, "double");
 
@@ -185,26 +187,26 @@ void Force_LCAO_gamma::allocate_gamma(LCAO_gen_fixedH &genH)
 
 void Force_LCAO_gamma::finish_ftable_gamma(void)
 {
-    delete [] GlobalC::LM.DSloc_x;
-    delete [] GlobalC::LM.DSloc_y;
-    delete [] GlobalC::LM.DSloc_z;
-    delete [] GlobalC::LM.DHloc_fixed_x;
-    delete [] GlobalC::LM.DHloc_fixed_y;
-    delete [] GlobalC::LM.DHloc_fixed_z;
+    delete [] this->UHM->LM->DSloc_x;
+    delete [] this->UHM->LM->DSloc_y;
+    delete [] this->UHM->LM->DSloc_z;
+    delete [] this->UHM->LM->DHloc_fixed_x;
+    delete [] this->UHM->LM->DHloc_fixed_y;
+    delete [] this->UHM->LM->DHloc_fixed_z;
     if(GlobalV::STRESS)//added by zhengdy-stress
     {
-        delete [] GlobalC::LM.DSloc_11;
-        delete [] GlobalC::LM.DSloc_12;
-        delete [] GlobalC::LM.DSloc_13;
-        delete [] GlobalC::LM.DHloc_fixed_11;
-        delete [] GlobalC::LM.DHloc_fixed_12;
-        delete [] GlobalC::LM.DHloc_fixed_13;
-        delete [] GlobalC::LM.DSloc_22;
-        delete [] GlobalC::LM.DSloc_23;
-        delete [] GlobalC::LM.DSloc_33;
-        delete [] GlobalC::LM.DHloc_fixed_22;
-        delete [] GlobalC::LM.DHloc_fixed_23;
-        delete [] GlobalC::LM.DHloc_fixed_33;
+        delete [] this->UHM->LM->DSloc_11;
+        delete [] this->UHM->LM->DSloc_12;
+        delete [] this->UHM->LM->DSloc_13;
+        delete [] this->UHM->LM->DHloc_fixed_11;
+        delete [] this->UHM->LM->DHloc_fixed_12;
+        delete [] this->UHM->LM->DHloc_fixed_13;
+        delete [] this->UHM->LM->DSloc_22;
+        delete [] this->UHM->LM->DSloc_23;
+        delete [] this->UHM->LM->DSloc_33;
+        delete [] this->UHM->LM->DHloc_fixed_22;
+        delete [] this->UHM->LM->DHloc_fixed_23;
+        delete [] this->UHM->LM->DHloc_fixed_33;
     }
     return;
 }

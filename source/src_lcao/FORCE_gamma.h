@@ -6,6 +6,7 @@
 #include "../module_base/matrix.h"
 #include "LCAO_matrix.h" 
 #include "src_lcao/local_orbital_charge.h"
+#include "src_lcao/LCAO_hamilt.h"
 
 class Force_LCAO_gamma
 {
@@ -16,8 +17,10 @@ class Force_LCAO_gamma
 	Force_LCAO_gamma ();
 	~Force_LCAO_gamma ();
 
-	private:
-	
+private:
+
+    LCAO_Hamilt *UHM;
+
 	//orthonormal force + contribution from T and VNL
 	void ftable_gamma (
 		const bool isforce,
@@ -40,7 +43,7 @@ class Force_LCAO_gamma
 		LCAO_Hamilt &uhm);
 
 	// get the ds, dt, dvnl.
-	void allocate_gamma(LCAO_gen_fixedH &genH);
+	void allocate_gamma();
 
 	void finish_ftable_gamma(void);
 
@@ -114,7 +117,6 @@ class Force_LCAO_gamma
 		ModuleBase::matrix& dm2d, 
 		const bool isforce, 
         const bool isstress,
-        Gint_Gamma &gg,
         ModuleBase::matrix& fvl_dphi,
 		ModuleBase::matrix& svl_dphi);
 
@@ -122,7 +124,6 @@ class Force_LCAO_gamma
 		const std::vector<ModuleBase::matrix> &dm2d, 
 		const bool isforce, 
         const bool isstress,
-        Gint_Gamma &gg,
         ModuleBase::matrix& fvl_dphi,
 		ModuleBase::matrix& svl_dphi);
 

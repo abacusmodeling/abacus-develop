@@ -3,6 +3,7 @@
 
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
+#include "src_lcao/LCAO_matrix.h"
 
 // mohan add this file 2010-09-10
 namespace HS_Matrix
@@ -13,18 +14,20 @@ namespace HS_Matrix
 
     void save_HS_complex(const std::complex<double> *H, const std::complex<double> *S, bool bit);
 
-    void save_HSR_tr(const int current_spin); //LiuXh add 2019-07-15
+    void save_HSR_tr(const int current_spin, LCAO_Matrix &lm); //LiuXh add 2019-07-15
 
     // jingan add 2021-6-4, modify 2021-12-2
     void save_HSR_sparse(
-        const double &sparse_threshold, 
+        LCAO_Matrix &lm,
+        const double& sparse_threshold,
         const bool &binary,  
         const std::string &SR_filename, 
         const std::string &HR_filename_up, 
         const std::string &HR_filename_down
     );
     void save_SR_sparse(
-        const double &sparse_threshold, 
+        LCAO_Matrix &lm,
+        const double& sparse_threshold,
         const bool &binary,  
         const std::string &SR_filename
     );

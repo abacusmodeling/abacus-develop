@@ -1258,7 +1258,7 @@ ofs_mpi.close();
 	return energy;
 }
 
-void Exx_Lcao::add_Hexx( const size_t ik, const double alpha ) const
+void Exx_Lcao::add_Hexx( const size_t ik, const double alpha, LCAO_Matrix &lm) const
 {
 	ModuleBase::TITLE("Exx_Lcao","add_Hexx");
 	
@@ -1267,7 +1267,7 @@ void Exx_Lcao::add_Hexx( const size_t ik, const double alpha ) const
 		const ModuleBase::matrix & H = Hexx_para.HK_Gamma_m2D[ik];
 		for( size_t i=0; i<H.nr*H.nc; ++i )
 		{
-			GlobalC::LM.Hloc[i] += alpha * H.c[i];
+			lm.Hloc[i] += alpha * H.c[i];
 		}
 	}
 	else
@@ -1275,7 +1275,7 @@ void Exx_Lcao::add_Hexx( const size_t ik, const double alpha ) const
 		const ModuleBase::ComplexMatrix & H = Hexx_para.HK_K_m2D[ik];
 		for( size_t i=0; i<H.nr*H.nc; ++i )
 		{
-			GlobalC::LM.Hloc2[i] += alpha * H.c[i];
+			lm.Hloc2[i] += alpha * H.c[i];
 		}
 	}
 }

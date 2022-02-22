@@ -194,8 +194,9 @@ void Pdiag_Double::diago_double_begin(
 	const int &ik, // k-point index
 	ModuleBase::matrix &wfc_2d, // wave functions in 2d
 	double* h_mat, // hamiltonian matrix
-	double* s_mat, // overlap matrix
-	double* ekb) // eigenvalues for each k-point and band
+    double* s_mat, // overlap matrix
+    double* Stmp, 	// because the output Stmp will be different from Sloc2, so we need to copy that.
+    double* ekb) // eigenvalues for each k-point and band
 {
 	#ifdef TEST_DIAG
 	{
@@ -257,8 +258,6 @@ void Pdiag_Double::diago_double_begin(
 	// H | psi > = S | psi >
 	// problem.
 	int loc_pos;
-
-	double* Stmp = GlobalC::LM.Sdiag.data();
 
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"start solver, ks_solver",GlobalV::KS_SOLVER);
     if(GlobalV::KS_SOLVER=="hpseps")
@@ -522,8 +521,9 @@ void Pdiag_Double::diago_complex_begin(
 	std::complex<double> **wfc,
 	ModuleBase::ComplexMatrix &wfc_2d,
 	std::complex<double>* ch_mat,
-	std::complex<double>* cs_mat,
-	double *ekb)
+    std::complex<double>* cs_mat,
+    std::complex<double>* Stmp, 	// because the output Stmp will be different from Sloc2, so we need to copy that.
+    double* ekb)
 {
     #ifdef TEST_DIAG
    	{
@@ -605,9 +605,6 @@ void Pdiag_Double::diago_complex_begin(
 	// H | psi > = S | psi >
 	// problem.
 	int loc_pos;
-
-	// because the output Stmp will be different from Sloc2, so we need to copy that.
-	std::complex<double>* Stmp = GlobalC::LM.Sdiag2.data();
 
 	if(GlobalV::KS_SOLVER=="hpseps")
 	{

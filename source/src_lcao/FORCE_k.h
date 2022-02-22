@@ -18,8 +18,10 @@ class Force_LCAO_k : public Force_LCAO_gamma
 	Force_LCAO_k ();
 	~Force_LCAO_k ();
 
-	private:
-	
+private:
+    
+    LCAO_Hamilt* UHM;
+
 	//orthonormal force + contribution from T and VNL
 	void ftable_k (
 		const bool isforce,
@@ -42,7 +44,7 @@ class Force_LCAO_k : public Force_LCAO_gamma
 		LCAO_Hamilt &uhm);
 
 	// get the ds, dt, dvnl.
-	void allocate_k(LCAO_gen_fixedH &genH);
+	void allocate_k();
 
 	void finish_k(void);
 	
@@ -54,7 +56,7 @@ class Force_LCAO_k : public Force_LCAO_gamma
         Local_Orbital_Charge& loc, ModuleBase::matrix& foverlap, ModuleBase::matrix& soverlap);
 
 	// calculate the force due to < phi | Vlocal | dphi >
-	void cal_fvl_dphi_k(double** dm2d, const bool isforce, const bool isstress, Gint_k &gk, ModuleBase::matrix& fvl_dphi, ModuleBase::matrix& svl_dphi);
+	void cal_fvl_dphi_k(double** dm2d, const bool isforce, const bool isstress, ModuleBase::matrix& fvl_dphi, ModuleBase::matrix& svl_dphi);
 
 	// old method to calculate the force due to < phi | dbeta > < beta | phi >
 	void cal_fvnl_dbeta_k(double** dm2d, const bool isforce, const bool isstress, ModuleBase::matrix& fvnl_dbeta, ModuleBase::matrix& svnl_dbeta);

@@ -93,7 +93,7 @@ void LOOP_ions::output_HS_R(
         }
     }
 
-    HS_Matrix::save_HSR_sparse(sparse_threshold, binary, SR_filename, HR_filename_up, HR_filename_down);
+    HS_Matrix::save_HSR_sparse(*this->UHM.LM, sparse_threshold, binary, SR_filename, HR_filename_up, HR_filename_down);
     this->UHM.destroy_all_HSR_sparse();
 
     if(!GlobalV::GAMMA_ONLY_LOCAL) //LiuXh 20181011
@@ -112,7 +112,7 @@ void LOOP_ions::output_SR(const std::string &SR_filename, const bool &binary, co
     ModuleBase::timer::tick("LOOP_ions","output_SR"); 
 
     this->UHM.calculate_SR_sparse(sparse_threshold);
-    HS_Matrix::save_SR_sparse(sparse_threshold, binary, SR_filename);
+    HS_Matrix::save_SR_sparse(*this->UHM.LM, sparse_threshold, binary, SR_filename);
     this->UHM.destroy_all_HSR_sparse();
 
     ModuleBase::timer::tick("LOOP_ions","output_SR");

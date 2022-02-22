@@ -454,7 +454,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 	return GridVlocal;
 }
 	
-void vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal)
+void vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal, LCAO_Matrix &lm)
 {
     // setup send buffer and receive buffer size
     // OUT(GlobalV::ofs_running, "Start transforming vlocal from grid distribute to 2D block");
@@ -514,7 +514,7 @@ void vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal)
         //     OUT(GlobalV::ofs_running, "g_col:", g_col);
         //     OUT(GlobalV::ofs_running, "g_col:", g_col);
         // }
-        GlobalC::LM.set_HSgamma(g_row,g_col,GlobalC::ParaO.receiver_buffer[i/2],'L');
+        lm.set_HSgamma(g_row,g_col,GlobalC::ParaO.receiver_buffer[i/2],'L');
     }
 
     ModuleBase::timer::tick("Gint_Gamma","distri_vl_value");
@@ -533,7 +533,7 @@ void Gint_Gamma::cal_vlocal(
     this->save_atoms_on_grid(GlobalC::GridT);
 
     const Gint_Tools::Array_Pool<double> GridVlocal = this->gamma_vlocal(vlocal);
-	vl_grid_to_2D(GridVlocal);
+	vl_grid_to_2D(GridVlocal, *LM);
 
     ModuleBase::timer::tick("Gint_Gamma","cal_vlocal");
 }

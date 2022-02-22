@@ -2,6 +2,7 @@
 #define LCAO_NNR_H
 
 #include "grid_technique.h"
+#include "src_lcao/LCAO_matrix.h"
 
 class LCAO_nnr
 {
@@ -39,7 +40,7 @@ class LCAO_nnr
 
 	// folding the fixed Hamiltonian (T+Vnl) if
 	// k-point algorithm is used.
-	void folding_fixedH(const int &ik);
+	void folding_fixedH(const int &ik, LCAO_Matrix &lm);
 
 	int cal_RindexAtom(const int &u1, const int &u2, const int &u3, const int &iat2);
 

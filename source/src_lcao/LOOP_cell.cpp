@@ -7,8 +7,13 @@
 // delete in near future
 #include "../src_pw/global.h"
 
-LOOP_cell::LOOP_cell(){}
-LOOP_cell::~LOOP_cell(){}
+LOOP_cell::LOOP_cell()
+{
+    // * allocate H and S matrices according to computational resources
+	// * set the 'trace' between local H/S and global H/S
+	this->LM.divide_HS_in_frag(GlobalV::GAMMA_ONLY_LOCAL, GlobalC::ParaO);
+}
+LOOP_cell::~LOOP_cell() {}
 
 void LOOP_cell::opt_cell(ORB_control &orb_con)
 {
@@ -61,12 +66,12 @@ void LOOP_cell::opt_cell(ORB_control &orb_con)
 	// Quxin added for DFT+U
 	if(INPUT.dft_plus_u) 
 	{
-		GlobalC::dftu.init(GlobalC::ucell, GlobalC::ParaO);
+		GlobalC::dftu.init(GlobalC::ucell, GlobalC::ParaO, this->LM);
 	}
 
   if(INPUT.dft_plus_dmft) GlobalC::dmft.init(INPUT, GlobalC::ucell);
 
-	LOOP_ions ions;
+	LOOP_ions ions(this->LM); 
     ions.opt_ions();
 
 	// mohan update 2021-02-10

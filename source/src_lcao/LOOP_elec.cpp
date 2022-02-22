@@ -84,7 +84,7 @@ void LOOP_elec::set_matrix_grid(void)
 		// For each atom, calculate the adjacent atoms in different cells
 		// and allocate the space for H(R) and S(R).
 		GlobalC::LNNR.cal_nnr();
-		GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
+		this->UHM->LM->allocate_HS_R(GlobalC::LNNR.nnr);
 #ifdef __DEEPKS
 		GlobalC::ld.allocate_V_deltaR(GlobalC::LNNR.nnr);
 #endif

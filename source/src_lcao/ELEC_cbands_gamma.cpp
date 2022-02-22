@@ -60,19 +60,19 @@ void ELEC_cbands_gamma::cal_bands(const int& istep, LCAO_Hamilt& uhm,
 
 			const int spin = GlobalC::kv.isk[ik];
 			for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
-				GlobalC::LM.Hloc[irc] += eff_pot[irc];
+				uhm.LM->Hloc[irc] += eff_pot[irc];
         
 		}
 
 		// Peize Lin add at 2020.04.04
 		if(GlobalC::restart.info_load.load_H && !GlobalC::restart.info_load.load_H_finish)
 		{
-			GlobalC::restart.load_disk("H", ik);
+			GlobalC::restart.load_disk( *uhm.LM, "H", ik);
 			GlobalC::restart.info_load.load_H_finish = true;
 		}			
 		if(GlobalC::restart.info_save.save_H)
 		{
-			GlobalC::restart.save_disk("H", ik);
+			GlobalC::restart.save_disk( *uhm.LM, "H", ik);
 		}
 
 		// SGO: sub_grid_operation
@@ -83,7 +83,7 @@ void ELEC_cbands_gamma::cal_bands(const int& istep, LCAO_Hamilt& uhm,
 		//--------------------------------------
 		if(GlobalV::DCOLOR==0)
 		{
-			Diago_LCAO_Matrix DLM;
+			Diago_LCAO_Matrix DLM(uhm.LM);
 			// the temperary array totwfc only have one spin direction.
 			//DLM.solve_double_matrix(ik, GlobalC::SGO.totwfc[0], wfc_gamma[ik]);
 			DLM.solve_double_matrix(ik, wfc_gamma[ik]); //LiuXh modify 2021-09-06, clear memory, totwfc not used now

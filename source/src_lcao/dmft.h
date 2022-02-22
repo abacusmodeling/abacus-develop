@@ -8,6 +8,7 @@
 #include "../input.h"
 #include "../module_cell/unitcell_pseudo.h"
 #include "../module_base/complexmatrix.h"
+#include "src_lcao/LCAO_matrix.h"
 
 #include <string>
 #include <vector>
@@ -22,7 +23,8 @@ namespace ModuleDMFT
 
     public:
     void init(Input& in, UnitCell_pseudo &cell);
-    void out_to_dmft( std::vector<ModuleBase::ComplexMatrix> wfc_k);
+    void out_to_dmft(std::vector<ModuleBase::ComplexMatrix> wfc_k,
+        LCAO_Matrix &lm);
     void out_kvector();
     void out_correlated_atom_info();
     void out_eigen_vector(const std::vector<ModuleBase::ComplexMatrix>& wfc);
@@ -30,7 +32,7 @@ namespace ModuleDMFT
     static int mag_num2m_index(const int m);
 
     //TESTS
-    void out_Sk();
+    void out_Sk(LCAO_Matrix &lm);
 
     private:
     void out_k_weight();

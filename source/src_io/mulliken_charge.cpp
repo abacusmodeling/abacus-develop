@@ -102,7 +102,7 @@ Mulliken_Charge::~Mulliken_Charge()
 }
 
   
-void Mulliken_Charge::cal_mulliken(LCAO_gen_fixedH &genH)
+void Mulliken_Charge::cal_mulliken(LCAO_Hamilt &uhm)
 {
 	ModuleBase::TITLE("Mulliken_Charge","cal_mulliken");
 
@@ -129,7 +129,7 @@ void Mulliken_Charge::cal_mulliken(LCAO_gen_fixedH &genH)
 						&T_char,
 						&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 						&one_float,
-						GlobalC::LM.Sloc.data(), &one_int, &one_int, GlobalC::ParaO.desc,
+						uhm.LM->Sloc.data(), &one_int, &one_int, GlobalC::ParaO.desc,
 						Dwf.c, &one_int, &NB, GlobalC::ParaO.desc, &one_int,
 						&zero_float,
 						mud[0].c, &one_int, &NB, GlobalC::ParaO.desc,
@@ -175,18 +175,18 @@ void Mulliken_Charge::cal_mulliken(LCAO_gen_fixedH &genH)
 				GlobalV::test_atom_input);//qifeng-2019-01-21
 
 
-			GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
-			GlobalC::LM.zeros_HSR('S');
-			genH.calculate_S_no();
-			genH.build_ST_new('S', false, GlobalC::ucell);
+			uhm.LM->allocate_HS_R(GlobalC::LNNR.nnr);
+			uhm.LM->zeros_HSR('S');
+			uhm.genH.calculate_S_no();
+			uhm.genH.build_ST_new('S', false, GlobalC::ucell);
 
 			for(int ik=0;ik<GlobalC::kv.nks;ik++)
 			{
 				if(is == GlobalC::kv.isk[ik])
 				{
-					GlobalC::LM.allocate_HS_k(GlobalC::ParaO.nloc);
-					GlobalC::LM.zeros_HSk('S');
-					GlobalC::LNNR.folding_fixedH(ik);
+					uhm.LM->allocate_HS_k(GlobalC::ParaO.nloc);
+					uhm.LM->zeros_HSk('S');
+					GlobalC::LNNR.folding_fixedH(ik, *uhm.LM);
 					ModuleBase::ComplexMatrix Dwf = conj(this->wfc_k->at(ik));
 
 					for (int i=0; i<GlobalV::NBANDS; ++i)		  
@@ -205,7 +205,7 @@ void Mulliken_Charge::cal_mulliken(LCAO_gen_fixedH &genH)
 								&T_char,
 								&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 								&one_float,
-								GlobalC::LM.Sloc2.data(), &one_int, &one_int, GlobalC::ParaO.desc,
+								uhm.LM->Sloc2.data(), &one_int, &one_int, GlobalC::ParaO.desc,
 								Dwf.c, &one_int, &NB, GlobalC::ParaO.desc, &one_int,
 								&zero_float,
 								mud[0].c, &one_int, &NB, GlobalC::ParaO.desc,
@@ -264,8 +264,8 @@ void Mulliken_Charge::cal_mulliken(LCAO_gen_fixedH &genH)
 	return;                									
 }				   
 
-void Mulliken_Charge::stdout_mulliken(LCAO_gen_fixedH &genH)
-{                    this->cal_mulliken(genH);
+void Mulliken_Charge::stdout_mulliken(LCAO_Hamilt &uhm)
+{                    this->cal_mulliken(uhm);
 	if(GlobalV::MY_RANK == 0)
 	{
 		ModuleBase::TITLE("Dos","calculate_Mulliken");

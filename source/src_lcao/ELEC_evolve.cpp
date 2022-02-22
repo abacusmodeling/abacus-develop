@@ -106,21 +106,21 @@ void ELEC_evolve::evolve_psi(
 			GlobalC::dftu.cal_eff_pot_mat_complex(ik, istep, &eff_pot[0]);
 
 			for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
-				GlobalC::LM.Hloc2[irc] += eff_pot[irc];
+				uhm.LM->Hloc2[irc] += eff_pot[irc];
 		}
 
 		// Peize Lin add at 2020.04.04
 		if(GlobalC::restart.info_load.load_H && !GlobalC::restart.info_load.load_H_finish)
 		{
-			GlobalC::restart.load_disk("H", ik);
+			GlobalC::restart.load_disk(*uhm.LM, "H", ik);
 			GlobalC::restart.info_load.load_H_finish = true;
 		}
 		if(GlobalC::restart.info_save.save_H)
 		{
-			GlobalC::restart.save_disk("H", ik);
+			GlobalC::restart.save_disk(*uhm.LM, "H", ik);
 		}		
 		ModuleBase::timer::tick("Efficience","evolve_k");
-		Evolve_LCAO_Matrix ELM;
+		Evolve_LCAO_Matrix ELM(uhm.LM);
 		ELM.evolve_complex_matrix(ik, lowf);
 		ModuleBase::timer::tick("Efficience","evolve_k");
 	} // end k

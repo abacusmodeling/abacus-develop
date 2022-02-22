@@ -35,18 +35,18 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(
 
 				if(isforce)
 				{
-					ftvnl_dphi(iat,0) += sum * GlobalC::LM.DHloc_fixed_x[index];
-					ftvnl_dphi(iat,1) += sum * GlobalC::LM.DHloc_fixed_y[index];
-					ftvnl_dphi(iat,2) += sum * GlobalC::LM.DHloc_fixed_z[index];
+					ftvnl_dphi(iat,0) += sum * this->UHM->LM->DHloc_fixed_x[index];
+					ftvnl_dphi(iat,1) += sum * this->UHM->LM->DHloc_fixed_y[index];
+					ftvnl_dphi(iat,2) += sum * this->UHM->LM->DHloc_fixed_z[index];
 				}
                 if(isstress)
                 {
-                    stvnl_dphi(0,0) += sum/2.0 * GlobalC::LM.DHloc_fixed_11[index];
-                    stvnl_dphi(0,1) += sum/2.0 * GlobalC::LM.DHloc_fixed_12[index];
-                    stvnl_dphi(0,2) += sum/2.0 * GlobalC::LM.DHloc_fixed_13[index];
-                    stvnl_dphi(1,1) += sum/2.0 * GlobalC::LM.DHloc_fixed_22[index];
-                    stvnl_dphi(1,2) += sum/2.0 * GlobalC::LM.DHloc_fixed_23[index];
-                    stvnl_dphi(2,2) += sum/2.0 * GlobalC::LM.DHloc_fixed_33[index];   
+                    stvnl_dphi(0,0) += sum/2.0 * this->UHM->LM->DHloc_fixed_11[index];
+                    stvnl_dphi(0,1) += sum/2.0 * this->UHM->LM->DHloc_fixed_12[index];
+                    stvnl_dphi(0,2) += sum/2.0 * this->UHM->LM->DHloc_fixed_13[index];
+                    stvnl_dphi(1,1) += sum/2.0 * this->UHM->LM->DHloc_fixed_22[index];
+                    stvnl_dphi(1,2) += sum/2.0 * this->UHM->LM->DHloc_fixed_23[index];
+                    stvnl_dphi(2,2) += sum/2.0 * this->UHM->LM->DHloc_fixed_33[index];   
                 }
             }
         }
@@ -681,18 +681,18 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(
 
                 if(isforce)
 				{
-					ftvnl_dphi(iat,0) += sum * GlobalC::LM.DHloc_fixed_x[index];
-					ftvnl_dphi(iat,1) += sum * GlobalC::LM.DHloc_fixed_y[index];
-					ftvnl_dphi(iat,2) += sum * GlobalC::LM.DHloc_fixed_z[index];
+					ftvnl_dphi(iat,0) += sum * this->UHM->LM->DHloc_fixed_x[index];
+					ftvnl_dphi(iat,1) += sum * this->UHM->LM->DHloc_fixed_y[index];
+					ftvnl_dphi(iat,2) += sum * this->UHM->LM->DHloc_fixed_z[index];
 				}
                 if(isstress)
                 {
-                    stvnl_dphi(0,0) += sum/2.0 * GlobalC::LM.DHloc_fixed_11[index];
-                    stvnl_dphi(0,1) += sum/2.0 * GlobalC::LM.DHloc_fixed_12[index];
-                    stvnl_dphi(0,2) += sum/2.0 * GlobalC::LM.DHloc_fixed_13[index];
-                    stvnl_dphi(1,1) += sum/2.0 * GlobalC::LM.DHloc_fixed_22[index];
-                    stvnl_dphi(1,2) += sum/2.0 * GlobalC::LM.DHloc_fixed_23[index];
-                    stvnl_dphi(2,2) += sum/2.0 * GlobalC::LM.DHloc_fixed_33[index];   
+                    stvnl_dphi(0,0) += sum/2.0 * this->UHM->LM->DHloc_fixed_11[index];
+                    stvnl_dphi(0,1) += sum/2.0 * this->UHM->LM->DHloc_fixed_12[index];
+                    stvnl_dphi(0,2) += sum/2.0 * this->UHM->LM->DHloc_fixed_13[index];
+                    stvnl_dphi(1,1) += sum/2.0 * this->UHM->LM->DHloc_fixed_22[index];
+                    stvnl_dphi(1,2) += sum/2.0 * this->UHM->LM->DHloc_fixed_23[index];
+                    stvnl_dphi(2,2) += sum/2.0 * this->UHM->LM->DHloc_fixed_33[index];   
                 }
             }
         }

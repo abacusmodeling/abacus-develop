@@ -92,7 +92,8 @@ namespace ModuleDMFT
     return;
   }
 
-  void DFT_DMFT_interface::out_to_dmft( std::vector<ModuleBase::ComplexMatrix> wfc_k)
+  void DFT_DMFT_interface::out_to_dmft(std::vector<ModuleBase::ComplexMatrix> wfc_k,
+      LCAO_Matrix &lm)
   {
     ModuleBase::TITLE("DFT_DMFT_interface", "out_to_dmft");
     
@@ -364,7 +365,7 @@ namespace ModuleDMFT
     return;
   } 
 
-  void DFT_DMFT_interface::out_Sk()
+  void DFT_DMFT_interface::out_Sk(LCAO_Matrix &lm)
   {
     //output overlap matrix on k points, used for test
 
@@ -375,7 +376,7 @@ namespace ModuleDMFT
     for(int ik=0; ik<nks_tot; ik++)
     {
       std::vector<std::complex<double>> Sk_loc(GlobalC::ParaO.nloc);
-      ModuleDFTU::DFTU::folding_overlap_matrix(ik, &Sk_loc[0]);
+      ModuleDFTU::DFTU::folding_overlap_matrix(ik, &Sk_loc[0], lm);
 
       std::vector<std::complex<double>> Sk_tmp(GlobalV::NLOCAL*GlobalV::NLOCAL, zero);
       for(int ir=0; ir<GlobalC::ParaO.nrow; ir++)

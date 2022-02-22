@@ -16,7 +16,7 @@ class LOOP_ions
 
 	public:
 
-	LOOP_ions();
+	LOOP_ions(LCAO_Matrix &lm);
 	~LOOP_ions();
 
     LOOP_elec LOE;

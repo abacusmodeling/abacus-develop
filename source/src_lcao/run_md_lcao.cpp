@@ -26,6 +26,9 @@
 Run_MD_LCAO::Run_MD_LCAO()
 {
     cellchange = false;
+    // * allocate H and S matrices according to computational resources
+	// * set the 'trace' between local H/S and global H/S
+	this->LM_md.divide_HS_in_frag(GlobalV::GAMMA_ONLY_LOCAL, GlobalC::ParaO);
 }
 
 Run_MD_LCAO::~Run_MD_LCAO(){}
@@ -249,6 +252,7 @@ void Run_MD_LCAO::md_force_virial(
     // solve electronic structures in terms of LCAO
     // mohan add 2021-02-09
     LCAO_Hamilt UHM_md;
+    UHM_md.genH.LM = UHM_md.LM = &this->LM_md;
     LOOP_elec LOE;
     LOE.solve_elec_stru(istep + 1, LOC_md, LOWF_md, UHM_md);
 

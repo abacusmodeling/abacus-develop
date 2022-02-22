@@ -564,7 +564,7 @@ int LCAO_nnr::cal_RindexAtom(const int &u1, const int &u2, const int &u3, const 
 
 
 // be called in LCAO_Hamilt::calculate_Hk.
-void LCAO_nnr::folding_fixedH(const int &ik)
+void LCAO_nnr::folding_fixedH(const int &ik, LCAO_Matrix &lm)
 {
 	ModuleBase::TITLE("LCAO_nnr","folding_fixedH");
 	ModuleBase::timer::tick("LCAO_nnr","folding_fixedH");
@@ -685,12 +685,12 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 
 							//########################### EXPLAIN ###############################
 							// 1. overlap matrix with k point
-							// GlobalC::LM.SlocR = < phi_0i | phi_Rj >, where 0, R are the cell index
+							// lm.SlocR = < phi_0i | phi_Rj >, where 0, R are the cell index
 							// while i,j are the orbital index.
 
 							// 2. H_fixed=T+Vnl matrix element with k point (if Vna is not used).
 							// H_fixed=T+Vnl+Vna matrix element with k point (if Vna is used).
-							// GlobalC::LM.Hloc_fixed = < phi_0i | H_fixed | phi_Rj>
+							// lm.Hloc_fixed = < phi_0i | H_fixed | phi_Rj>
 
 							// 3. H(k) |psi(k)> = S(k) | psi(k)> 
 							// Sloc2 is used to diagonalize for a give k point.
@@ -699,8 +699,8 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 							
 							if(GlobalV::NSPIN!=4)
 							{
-								GlobalC::LM.Sloc2[iic] += GlobalC::LM.SlocR[index] * kphase;
-								GlobalC::LM.Hloc_fixed2[iic] += GlobalC::LM.Hloc_fixedR[index] * kphase;
+								lm.Sloc2[iic] += lm.SlocR[index] * kphase;
+								lm.Hloc_fixed2[iic] += lm.Hloc_fixedR[index] * kphase;
 #ifdef __DEEPKS
 								if(GlobalV::deepks_scf)
 								{
@@ -710,8 +710,8 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 							}
 							else
 							{
-								GlobalC::LM.Sloc2[iic] += GlobalC::LM.SlocR_soc[index] * kphase;
-								GlobalC::LM.Hloc_fixed2[iic] += GlobalC::LM.Hloc_fixedR_soc[index] * kphase;
+								lm.Sloc2[iic] += lm.SlocR_soc[index] * kphase;
+								lm.Hloc_fixed2[iic] += lm.Hloc_fixedR_soc[index] * kphase;
 							}
 							++index;
 

@@ -343,7 +343,7 @@ void ELEC_scf::scf(const int& istep,
 		{
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{
-				GlobalC::restart.save_disk("charge", is);
+				GlobalC::restart.save_disk(*uhm.LM, "charge", is);
 			}
 		}
 

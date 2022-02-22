@@ -116,9 +116,6 @@ void Run_lcao::lcao_line(void)
 		GlobalC::ucell.infoNL.nproj,
 		GlobalC::ucell.infoNL.Beta);
 
-	// * allocate H and S matrices according to computational resources
-	// * set the 'trace' between local H/S and global H/S
-	GlobalC::LM.divide_HS_in_frag(GlobalV::GAMMA_ONLY_LOCAL, GlobalC::ParaO);
 
 //--------------------------------------
 // cell relaxation should begin here

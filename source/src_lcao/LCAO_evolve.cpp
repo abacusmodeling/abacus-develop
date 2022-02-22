@@ -7,8 +7,10 @@
 #include "../module_base/scalapack_connector.h"
 //fuxiang add 2016-10-28
 
-Evolve_LCAO_Matrix::Evolve_LCAO_Matrix(){}
-Evolve_LCAO_Matrix::~Evolve_LCAO_Matrix(){}
+Evolve_LCAO_Matrix::Evolve_LCAO_Matrix(LCAO_Matrix* lm) :
+    LM(lm)
+{}
+Evolve_LCAO_Matrix::~Evolve_LCAO_Matrix() {}
 
 void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, Local_Orbital_wfc &lowf)const
 {
@@ -50,8 +52,8 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int& ik, std::complex<double
         {
         	for(int j=0; j<GlobalV::NLOCAL; j++)
                 {
-                	Htmp(i,j) = GlobalC::LM.Hloc2[i*GlobalV::NLOCAL+j];
-                        Stmp(i,j) = GlobalC::LM.Sloc2[i*GlobalV::NLOCAL+j];
+                	Htmp(i,j) = this->LM->Hloc2[i*GlobalV::NLOCAL+j];
+                        Stmp(i,j) = this->LM->Sloc2[i*GlobalV::NLOCAL+j];
                 }
         }
 
@@ -309,10 +311,10 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, ModuleBase::Compl
 	//MPI_Comm_rank(comm_2D, &myid);
 
 	int loc_pos;
-	//complex<double>* Stmp = GlobalC::LM.Sdiag2;
-	//complex<double>* Htmp1 = GlobalC::LM.Hdiag2;
-	//complex<double>* Htmp2 = GlobalC::LM.Sdiag2;
-	//complex<double>* Htmp3 = GlobalC::LM.Sdiag2;
+	//complex<double>* Stmp = this->LM->Sdiag2;
+	//complex<double>* Htmp1 = this->LM->Hdiag2;
+	//complex<double>* Htmp2 = this->LM->Sdiag2;
+	//complex<double>* Htmp3 = this->LM->Sdiag2;
 
 	complex<double>* Stmp = new complex<double> [GlobalC::ParaO.nloc];
 	complex<double>* Htmp1 = new complex<double> [GlobalC::ParaO.nloc];
@@ -323,7 +325,7 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, ModuleBase::Compl
 	ModuleBase::GlobalFunc::ZEROS(Htmp2,GlobalC::ParaO.nloc);
 	ModuleBase::GlobalFunc::ZEROS(Htmp3,GlobalC::ParaO.nloc);
 	
-	//cout << "GlobalC::LM.Hloc2" << *GlobalC::LM.Hloc2 << endl;
+	//cout << "this->LM->Hloc2" << *this->LM->Hloc2 << endl;
 	//cout << "*Htmp2: " << *Htmp2 << endl;
 
         double *eigen = new double[GlobalV::NLOCAL];
@@ -338,10 +340,10 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, ModuleBase::Compl
         //complex<double>* Z = new complex<double>[this->loc_size * NLOCAL];
         //ModuleBase::GlobalFunc::ZEROS(Z, this->loc_size * NLOCAL);
 
-	zcopy_(&GlobalC::ParaO.nloc, GlobalC::LM.Sloc2.data(), &inc, Stmp, &inc);
-	zcopy_(&GlobalC::ParaO.nloc, GlobalC::LM.Hloc2.data(), &inc, Htmp1, &inc);
-	zcopy_(&GlobalC::ParaO.nloc, GlobalC::LM.Hloc2.data(), &inc, Htmp2, &inc);
-	zcopy_(&GlobalC::ParaO.nloc, GlobalC::LM.Hloc2.data(), &inc, Htmp3, &inc);
+	zcopy_(&GlobalC::ParaO.nloc, this->LM->Sloc2.data(), &inc, Stmp, &inc);
+	zcopy_(&GlobalC::ParaO.nloc, this->LM->Hloc2.data(), &inc, Htmp1, &inc);
+	zcopy_(&GlobalC::ParaO.nloc, this->LM->Hloc2.data(), &inc, Htmp2, &inc);
+	zcopy_(&GlobalC::ParaO.nloc, this->LM->Hloc2.data(), &inc, Htmp3, &inc);
 
 	//cout << "*Htmp2: " << *Htmp2 << endl;
 

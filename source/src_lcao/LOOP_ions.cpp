@@ -18,17 +18,18 @@
 #include "../src_pw/vdwd2_parameters.h"
 #include "../src_pw/vdwd3_parameters.h"
 #include "dmft.h"
+#include "src_lcao/LCAO_matrix.h"
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"    //caoyu add 2021-07-26
 #endif
 
-LOOP_ions::LOOP_ions()
+LOOP_ions::LOOP_ions(LCAO_Matrix &lm)
 {
     if (GlobalV::GAMMA_ONLY_LOCAL)
         this->LOWF.wfc_gamma.resize(GlobalV::NSPIN);
     else
         this->LOWF.wfc_k.resize(GlobalC::kv.nks);
-    this->UHM.LM = &GlobalC::LM;
+    this->UHM.genH.LM = this->UHM.LM = &lm;
 }
 
 LOOP_ions::~LOOP_ions()
@@ -181,7 +182,7 @@ void LOOP_ions::opt_ions()
         this->output_SR("outputs_to_DMFT/overlap_matrix/SR.csr");
         
         // Output wave functions, bands, k-points information, and etc.
-        GlobalC::dmft.out_to_dmft(this->LOWF.wfc_k);
+        GlobalC::dmft.out_to_dmft(this->LOWF.wfc_k, *this->UHM.LM);
         }
 
         if(GlobalC::ParaO.out_hsR)
@@ -540,7 +541,7 @@ void LOOP_ions::final_scf(void)
         // For each atom, calculate the adjacent atoms in different cells
         // and allocate the space for H(R) and S(R).
         GlobalC::LNNR.cal_nnr();
-        GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
+        this->UHM.LM->allocate_HS_R(GlobalC::LNNR.nnr);
 #ifdef __DEEPKS
 		GlobalC::ld.allocate_V_deltaR(GlobalC::LNNR.nnr);
 #endif

@@ -74,13 +74,15 @@ DFTU::~DFTU(){}
 
 void DFTU::init(
 	UnitCell_pseudo &cell, // unitcell class
-	Parallel_Orbitals &po // parallel orbitals parameters
-)
+    Parallel_Orbitals& po, // parallel orbitals parameters
+    LCAO_Matrix &lm
+    )
 {
     ModuleBase::TITLE("DFTU", "init");
 
-
-	// needs reconstructions in future
+    this->LM = &lm;
+    
+    // needs reconstructions in future
 	// global parameters, need to be removed in future
 	const int npol = GlobalV::NPOL; // number of polarization directions
 	const int nlocal = GlobalV::NLOCAL; // number of total local orbitals
@@ -327,7 +329,7 @@ void DFTU::cal_occup_m_k(const int iter,  std::vector<ModuleBase::ComplexMatrix>
 	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
 		// srho(mu,nu) = \sum_{iw} S(mu,iw)*dm_k(iw,nu)
-        this->folding_overlap_matrix(ik, &Sk[0]);
+        this->folding_overlap_matrix(ik, &Sk[0], *this->LM);
 
 		pzgemm_(&transN, &transT,
 				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
@@ -530,7 +532,7 @@ void DFTU::cal_occup_m_gamma(const int iter,  std::vector<ModuleBase::matrix> &d
 		pdgemm_(&transN, &transT,
 				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 				&alpha, 
-				GlobalC::LM.Sloc.data(), &one_int, &one_int, GlobalC::ParaO.desc, 
+				this->LM->Sloc.data(), &one_int, &one_int, GlobalC::ParaO.desc, 
 				dm_gamma.at(is).c, &one_int, &one_int, GlobalC::ParaO.desc,
 				&beta,
 				&srho[0], &one_int, &one_int, GlobalC::ParaO.desc);
@@ -1177,7 +1179,7 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, std::complex<d
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 		&half, 
 		ModuleBase::GlobalFunc::VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc,
-		GlobalC::LM.Sloc2.data(), &one_int, &one_int, GlobalC::ParaO.desc,
+		this->LM->Sloc2.data(), &one_int, &one_int, GlobalC::ParaO.desc,
 		&zero,
 		eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
 
@@ -1264,7 +1266,7 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 		&half, 
 		ModuleBase::GlobalFunc::VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc, 
-		GlobalC::LM.Sloc.data(), &one_int, &one_int, GlobalC::ParaO.desc,
+		this->LM->Sloc.data(), &one_int, &one_int, GlobalC::ParaO.desc,
 		&beta,
 		eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
 
@@ -1495,7 +1497,8 @@ void DFTU::cal_eff_pot_mat_R_complex_double(
     return;
 }
 
-void DFTU::folding_overlap_matrix(const int ik, std::complex<double>* Sk)
+void DFTU::folding_overlap_matrix(const int ik, std::complex<double>* Sk,
+    LCAO_Matrix &lm)
 {
   	ModuleBase::TITLE("DFTU","folding_overlap_matrix"); 
 	ModuleBase::timer::tick("DFTU","folding_overlap_matrix");
@@ -1611,12 +1614,12 @@ void DFTU::folding_overlap_matrix(const int ik, std::complex<double>* Sk)
 
 							//########################### EXPLAIN ###############################
 							// 1. overlap matrix with k point
-							// GlobalC::LM.SlocR = < phi_0i | phi_Rj >, where 0, R are the cell index
+							// this->LM->SlocR = < phi_0i | phi_Rj >, where 0, R are the cell index
 							// while i,j are the orbital index.
 
 							// 2. H_fixed=T+Vnl matrix element with k point (if Vna is not used).
 							// H_fixed=T+Vnl+Vna matrix element with k point (if Vna is used).
-							// GlobalC::LM.Hloc_fixed = < phi_0i | H_fixed | phi_Rj>
+							// this->LM->Hloc_fixed = < phi_0i | H_fixed | phi_Rj>
 
 							// 3. H(k) |psi(k)> = S(k) | psi(k)> 
 							// Sloc2 is used to diagonalize for a give k point.
@@ -1625,11 +1628,11 @@ void DFTU::folding_overlap_matrix(const int ik, std::complex<double>* Sk)
 							
 							if(GlobalV::NSPIN!=4)
 							{
-								Sk[iic] += GlobalC::LM.SlocR[index] * kphase;
+								Sk[iic] += lm.SlocR[index] * kphase;
 							}
 							else
 							{
-								Sk[iic] += GlobalC::LM.SlocR_soc[index] * kphase;
+								Sk[iic] += lm.SlocR_soc[index] * kphase;
 							}
 							++index;
 

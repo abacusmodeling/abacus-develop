@@ -157,7 +157,7 @@ void Gint_k::fvl_k_RealSpace(ModuleBase::matrix& fvl_dphi, const double *vl)
 	//---------------------------------------
 
 
-	//GlobalC::LM.DHloc_fixedR_x
+	//this->LM->DHloc_fixedR_x
 	this->folding_force(fvl_dphi,pvdpx, pvdpy, pvdpz);
 
 	delete[] pvdpx;
@@ -394,7 +394,7 @@ void Gint_k::svl_k_RealSpace(
 	// Folding R here
 	//---------------------------------------
 
-	//GlobalC::LM.DHloc_fixedR_x
+	//this->LM->DHloc_fixedR_x
 	this->folding_stress(isforce, isstress, fvl_dphi, svl_dphi, pvdpx, pvdpy, pvdpz,
 			pvdp11, pvdp22, pvdp33, pvdp12, pvdp13, pvdp23);
 
