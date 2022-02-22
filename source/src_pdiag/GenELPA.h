@@ -126,8 +126,3 @@ int pzSolveEigen2(int nev, int nFull, int narows, int nacols, int *desc,
                  MPI_Comm mpi_comm_world, int mpi_comm_rows, int mpi_comm_cols,
                  int method, int THIS_REAL_ELPA_KERNEL_API,
                  bool wantEigenVector, bool wantDebug);
-
-
-int globalIndex(int localIndex, int nblk, int nproc, int myproc);
-
-int localIndex(int globalIndex, int nblk, int nproc, int& myproc);

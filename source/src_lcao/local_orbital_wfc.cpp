@@ -131,4 +131,101 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique& gt,
 
 	return;
 }
+int Local_Orbital_wfc::globalIndex(int localindex, int nblk, int nprocs, int myproc)
+{
+    int iblock, gIndex;
+    iblock=localindex/nblk;
+    gIndex=(iblock*nprocs+myproc)*nblk+localindex%nblk;
+    return gIndex;
+}
 
+
+int Local_Orbital_wfc::localIndex(int globalindex, int nblk, int nprocs, int& myproc)
+{
+    myproc=int((globalindex%(nblk*nprocs))/nblk);
+    return int(globalindex/(nblk*nprocs))*nblk+globalindex%nblk;
+}
+
+int  Local_Orbital_wfc::q2CTOT(
+	int myid,
+	int naroc[2],
+	int nb,
+	int dim0,
+	int dim1,
+	int iprow,
+	int ipcol,
+	int loc_size,
+	double* work,
+	double** CTOT)
+{
+    for(int j=0; j<naroc[1]; ++j)
+    {
+        int igcol=globalIndex(j, nb, dim1, ipcol);
+        if(igcol>=GlobalV::NBANDS) continue;
+        for(int i=0; i<naroc[0]; ++i)
+        {
+            int igrow=globalIndex(i, nb, dim0, iprow);
+            if(myid==0) CTOT[igcol][igrow]=work[j*naroc[0]+i];
+        }
+    }
+    return 0;
+}
+
+
+int  Local_Orbital_wfc::q2WFC_complex(
+	int naroc[2],
+	int nb,
+	int dim0,
+	int dim1,
+	int iprow,
+	int ipcol,
+	std::complex<double>* work,
+	std::complex<double>** WFC)
+{
+    for(int j=0; j<naroc[1]; ++j)
+    {
+        int igcol=globalIndex(j, nb, dim1, ipcol);
+        if(igcol>=GlobalV::NBANDS) continue;
+        for(int i=0; i<naroc[0]; ++i)
+        {
+            int igrow=globalIndex(i, nb, dim0, iprow);
+	        int mu_local=GlobalC::GridT.trace_lo[igrow];
+            if(mu_local>=0)
+            {
+                WFC[igcol][mu_local]=work[j*naroc[0]+i];
+            }
+        }
+    }
+    return 0;
+}
+
+
+int  Local_Orbital_wfc::q2WFC_CTOT_complex(
+	int myid,
+	int naroc[2],
+	int nb,
+	int dim0,
+	int dim1,
+	int iprow,
+	int ipcol,
+	std::complex<double>* work,
+	std::complex<double>** WFC,
+	std::complex<double>** CTOT)
+{
+    for(int j=0; j<naroc[1]; ++j)
+    {
+        int igcol=globalIndex(j, nb, dim1, ipcol);
+        if(igcol>=GlobalV::NBANDS) continue;
+        for(int i=0; i<naroc[0]; ++i)
+        {
+            int igrow=globalIndex(i, nb, dim0, iprow);
+	        int mu_local=GlobalC::GridT.trace_lo[igrow];
+            if(mu_local>=0)
+            {
+                WFC[igcol][mu_local]=work[j*naroc[0]+i];
+            }
+            if(myid==0) CTOT[igcol][igrow]=work[j*naroc[0]+i];
+        }
+    }
+    return 0;
+}

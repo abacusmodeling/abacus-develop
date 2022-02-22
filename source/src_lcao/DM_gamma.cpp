@@ -15,23 +15,6 @@ extern "C"
     int Cblacs_pnum(int icontxt, int prow, int pcol);
 }
 
-// setup buffer parameters for tranforming 2D block-cyclic distributed DM matrix 
-inline int globalIndex(int localIndex, int nblk, int nprocs, int myproc)
-{
-    int iblock, gIndex;
-    iblock=localIndex/nblk;
-    gIndex=(iblock*nprocs+myproc)*nblk+localIndex%nblk;
-    return gIndex;
-    //return (localIndex/nblk*nprocs+myproc)*nblk+localIndex%nblk;
-}
-
-
-inline int localIndex(int globalIndex, int nblk, int nprocs, int& myproc)
-{
-    myproc=int((globalIndex%(nblk*nprocs))/nblk);
-    return int(globalIndex/(nblk*nprocs))*nblk+globalIndex%nblk;
-}
-
 #ifdef __MPI
 int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt, int nblk)
 {
@@ -97,10 +80,10 @@ int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt
         {
             //trace_global[iLocalGrid]=iGlobal;
             int p;
-            trace_2D_row[iLocalGrid]=localIndex(iGlobal, nblk, nprows, p);
+            trace_2D_row[iLocalGrid]=Local_Orbital_wfc::localIndex(iGlobal, nblk, nprows, p);
             trace_2D_prow[iLocalGrid]=p;
             nRow_in_proc[trace_2D_prow[iLocalGrid]]++;
-            trace_2D_col[iLocalGrid]=localIndex(iGlobal, nblk, npcols, p);
+            trace_2D_col[iLocalGrid]=Local_Orbital_wfc::localIndex(iGlobal, nblk, npcols, p);
             trace_2D_pcol[iLocalGrid]=p;
             nCol_in_proc[trace_2D_pcol[iLocalGrid]]++;
         }

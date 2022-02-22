@@ -39,7 +39,7 @@ void ELEC_nscf::nscf(LCAO_Hamilt& uhm,
 	int istep=0; 
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		ELEC_cbands_gamma::cal_bands(istep, uhm, lowf.wfc_gamma, dm_gamma);
+		ELEC_cbands_gamma::cal_bands(istep, uhm, lowf, dm_gamma);
 	}
 	else
 	{

@@ -8,7 +8,7 @@
 
 class Local_Orbital_wfc
 {
-	public:
+public:
 
 	Local_Orbital_wfc();
 	~Local_Orbital_wfc();
@@ -44,8 +44,56 @@ class Local_Orbital_wfc
     //=========================================
 	// void init_Cij(const bool change_c = 1);
 
-	
-	private:
+
+    ///=========================================
+    ///Parallel: map of index in 2D distribution: global<->local
+    ///=========================================
+    static int globalIndex(int localindex, int nblk, int nprocs, int myproc);
+    static int localIndex(int globalindex, int nblk, int nprocs, int& myproc);
+    
+    ///=========================================
+    ///Parallel: convert the distribution of wavefunction from 2D to grid
+    ///=========================================
+    //name will be changed
+    
+    ///for gamma_only, with output
+    int q2CTOT(
+        int myid,
+        int naroc[2],
+        int nb,
+        int dim0,
+        int dim1,
+        int iprow,
+        int ipcol,
+        int loc_size,
+        double* work,
+        double** CTOT);
+    
+    ///for multi-k, no output
+    int q2WFC_complex(
+        int naroc[2],
+        int nb,
+        int dim0,
+        int dim1,
+        int iprow,
+        int ipcol,
+        std::complex<double>* work,
+        std::complex<double>** WFC);
+    
+    ///for multi-k, with output
+    int q2WFC_CTOT_complex(
+        int myid,
+        int naroc[2],
+        int nb,
+        int dim0,
+        int dim1,
+        int iprow,
+        int ipcol,
+        std::complex<double>* work,
+        std::complex<double>** WFC,
+        std::complex<double>** CTOT);
+        
+private:
 
 	bool wfck_flag; 
 	bool complex_flag;

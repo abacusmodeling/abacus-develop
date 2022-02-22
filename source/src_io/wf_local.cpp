@@ -3,15 +3,6 @@
 #include "../src_parallel/parallel_common.h"
 #include "../module_base/timer.h"
 
-inline int globalIndex(int localIndex, int nblk, int nprocs, int myproc)
-{
-    int iblock, gIndex;
-    iblock=localIndex/nblk;
-    gIndex=(iblock*nprocs+myproc)*nblk+localIndex%nblk;
-    return gIndex;
-    //return (localIndex/nblk*nprocs+myproc)*nblk+localIndex%nblk;
-}
-
 inline int CTOT2q(
 	int myid,
 	int naroc[2],
@@ -25,11 +16,11 @@ inline int CTOT2q(
 {
     for(int j=0; j<naroc[1]; ++j)
     {
-        int igcol=globalIndex(j, nb, dim1, ipcol);
+        int igcol=Local_Orbital_wfc::globalIndex(j, nb, dim1, ipcol);
         if(igcol>=GlobalV::NBANDS) continue;
         for(int i=0; i<naroc[0]; ++i)
         {
-            int igrow=globalIndex(i, nb, dim0, iprow);
+            int igrow=Local_Orbital_wfc::globalIndex(i, nb, dim0, iprow);
 			//GlobalV::ofs_running << "i,j,igcol,igrow" << i<<" "<<j<<" "<<igcol<<" "<<igrow<<std::endl;
             if(myid==0) work[j*naroc[0]+i]=CTOT[igcol][igrow];
         }
@@ -50,11 +41,11 @@ inline int CTOT2q_c(
 {
     for(int j=0; j<naroc[1]; ++j)
     {
-        int igcol=globalIndex(j, nb, dim1, ipcol);
+        int igcol=Local_Orbital_wfc::globalIndex(j, nb, dim1, ipcol);
         if(igcol>=GlobalV::NBANDS) continue;
         for(int i=0; i<naroc[0]; ++i)
         {
-            int igrow=globalIndex(i, nb, dim0, iprow);
+            int igrow=Local_Orbital_wfc::globalIndex(i, nb, dim0, iprow);
 			//ofs_running << "i,j,igcol,igrow" << i<<" "<<j<<" "<<igcol<<" "<<igrow<<std::endl;
             if(myid==0) work[j*naroc[0]+i]=CTOT[igcol][igrow];
         }

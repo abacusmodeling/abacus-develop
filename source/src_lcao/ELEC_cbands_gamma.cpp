@@ -13,7 +13,7 @@ ELEC_cbands_gamma::~ELEC_cbands_gamma(){};
 
 
 void ELEC_cbands_gamma::cal_bands(const int& istep, LCAO_Hamilt& uhm,
-    std::vector<ModuleBase::matrix>& wfc_gamma,
+    Local_Orbital_wfc &lowf,
     std::vector<ModuleBase::matrix>& dm_gamma)
 {
 	ModuleBase::TITLE("ELEC_cbands_gamma","cal_bands");
@@ -86,7 +86,7 @@ void ELEC_cbands_gamma::cal_bands(const int& istep, LCAO_Hamilt& uhm,
 			Diago_LCAO_Matrix DLM(uhm.LM);
 			// the temperary array totwfc only have one spin direction.
 			//DLM.solve_double_matrix(ik, GlobalC::SGO.totwfc[0], wfc_gamma[ik]);
-			DLM.solve_double_matrix(ik, wfc_gamma[ik]); //LiuXh modify 2021-09-06, clear memory, totwfc not used now
+			DLM.solve_double_matrix(ik, lowf); //LiuXh modify 2021-09-06, clear memory, totwfc not used now
 		}
 		else
 		{

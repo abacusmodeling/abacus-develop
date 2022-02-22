@@ -141,21 +141,6 @@ void Gint_Gamma::cal_meshball_vlocal(
 	}
 }
 
-inline int globalIndex(int localIndex, int nblk, int nprocs, int myproc)
-{
-    int iblock, gIndex;
-    iblock=localIndex/nblk;
-    gIndex=(iblock*nprocs+myproc)*nblk+localIndex%nblk;
-    return gIndex;
-    //return (localIndex/nblk*nprocs+myproc)*nblk+localIndex%nblk;
-}
-
-inline int localIndex(int globalIndex, int nblk, int nprocs, int& myproc)
-{
-    myproc=int((globalIndex%(nblk*nprocs))/nblk);
-    return int(globalIndex/(nblk*nprocs))*nblk+globalIndex%nblk;
-}
-
 #ifdef __MPI
 //------------------------------------------------------------------
 // mohan add notes: 2021-03-11
@@ -231,14 +216,14 @@ inline int setBufferParameter(
 		// in each pro based on 2D block cyclic distribution
         for(int irow=0, grow=0; grow<GlobalV::NLOCAL; ++irow)
         {
-            grow=globalIndex(irow, nblk, nprows, iprow);
+            grow=Local_Orbital_wfc::globalIndex(irow, nblk, nprows, iprow);
             int lrow=GlobalC::GridT.trace_lo[grow];
 
             if(lrow < 0 || grow >= GlobalV::NLOCAL) continue;
 
             for(int icol=0, gcol=0; gcol<GlobalV::NLOCAL; ++icol)
             {
-                gcol=globalIndex(icol,nblk, npcols, ipcol);
+                gcol=Local_Orbital_wfc::globalIndex(icol,nblk, npcols, ipcol);
                 int lcol=GlobalC::GridT.trace_lo[gcol];
                 if(lcol < 0 || gcol >= GlobalV::NLOCAL) continue;
                 // if(pos<0 || pos >= current_s_index_siz)

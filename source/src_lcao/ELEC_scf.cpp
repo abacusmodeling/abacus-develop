@@ -198,7 +198,7 @@ void ELEC_scf::scf(const int& istep,
 		// mohan add 2021-02-09
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			ELEC_cbands_gamma::cal_bands(istep, uhm, lowf.wfc_gamma, loc.dm_gamma);
+			ELEC_cbands_gamma::cal_bands(istep, uhm, lowf, loc.dm_gamma);
 		}
 		else
 		{
