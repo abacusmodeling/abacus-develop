@@ -137,12 +137,15 @@ void Ions::opt_ions_pw(void)
         if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")  // pengfei 2014-10-13
         {
 #ifdef __LCAO
+#ifdef __MPI
 			if( Exx_Global::Hybrid_Type::No==GlobalC::exx_global.info.hybrid_type  )
 			{	
+#endif
 #endif		
 				elec.self_consistent(istep-1);
 				eiter = elec.iter;
 #ifdef __LCAO
+#ifdef __MPI
 			}
 			else if( Exx_Global::Hybrid_Type::Generate_Matrix == GlobalC::exx_global.info.hybrid_type )
 			{
@@ -171,6 +174,7 @@ void Ions::opt_ions_pw(void)
 					eiter += elec.iter;
 				}
 			}
+#endif
 #endif
         }
         else if(GlobalV::CALCULATION=="nscf")

@@ -179,6 +179,7 @@ void ELEC_scf::scf(const int& istep,
 			}
 		}
 
+#ifdef __MPI
 		// calculate exact-exchange
 		switch(GlobalC::xcf.iexch_now)						// Peize Lin add 2018-10-30
 		{
@@ -189,6 +190,7 @@ void ELEC_scf::scf(const int& istep,
 				}
 				break;
 		}
+#endif
 
 		if(INPUT.dft_plus_u)
 		{
@@ -270,6 +272,7 @@ void ELEC_scf::scf(const int& istep,
 		// using density matrix.
 		GlobalC::LOC.sum_bands();
 
+#ifdef __MPI
 		// add exx
 		// Peize Lin add 2016-12-03
 		GlobalC::en.set_exx();
@@ -286,7 +289,7 @@ void ELEC_scf::scf(const int& istep,
 				GlobalC::restart.info_load.restart_exx = true;
 			}
 		}
-
+#endif
 
 		// if DFT+U calculation is needed, this function will calculate
 		// the local occupation number matrix and energy correction

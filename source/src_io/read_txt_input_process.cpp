@@ -23,7 +23,9 @@ namespace Read_Txt_Input
 			this->default_2();
 			this->out(GlobalV::global_out_dir + file_name);
 		}
+	#ifdef __MPI
 		this->bcast();
+	#endif
 		this->convert();
 	}
 
