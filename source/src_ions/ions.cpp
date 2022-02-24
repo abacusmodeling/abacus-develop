@@ -174,8 +174,8 @@ void Ions::opt_ions_pw(void)
 					eiter += elec.iter;
 				}
 			}
-#endif
-#endif
+#endif //__MPI
+#endif //__LCAO
         }
         else if(GlobalV::CALCULATION=="nscf")
         {

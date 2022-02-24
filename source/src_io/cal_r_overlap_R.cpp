@@ -63,7 +63,7 @@ void cal_r_overlap_R::init()
 		GlobalC::ORB.get_dR(),// delta R, for making radial table
 		GlobalC::ORB.get_dk()); // delta k, for integration in k space
 		
-#ifdef __MPI //liyuanbo 2022/2/23
+#ifdef __MPI 
 	MOT.init_Table_Spherical_Bessel (2, 3, Lmax_used, Lmax, Exx_Abfs::Lmax,GlobalC::ORB, GlobalC::ucell.infoNL.Beta);
 #endif
 

@@ -213,7 +213,7 @@ void Run_MD_PW::md_cells_pw()
         GlobalC::wf.wfcinit();
     }
 #ifdef __LCAO
-#ifdef __MPI //liyuanbo 2022/2/23
+#ifdef __MPI 
     switch (GlobalC::exx_global.info.hybrid_type) // Peize Lin add 2019-03-09
     {
     case Exx_Global::Hybrid_Type::HF:
@@ -321,8 +321,8 @@ void Run_MD_PW::md_force_virial(
                 eiter += elec.iter;
             }
         }
-#endif
-#endif
+#endif // __MPI
+#endif // __LCAO
     }
     // mohan added 2021-01-28, perform stochastic calculations
     else if (GlobalV::CALCULATION == "md-sto")

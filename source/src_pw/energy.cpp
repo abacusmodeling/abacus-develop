@@ -547,5 +547,5 @@ void energy::set_exx()
 
 	return;
 }
-#endif
-#endif
+#endif //__MPI
+#endif //_LCAO

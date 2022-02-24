@@ -1,4 +1,4 @@
-#ifdef __MPI   // liyuanbo 2022/2/23
+#ifdef __MPI   
 #include "exx_lcao.h"
 
 #include "../src_pw/global.h"
@@ -1798,4 +1798,4 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Mo
 	
 	return HexxR;
 }
-#endif
+#endif //__MPI

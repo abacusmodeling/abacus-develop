@@ -35,7 +35,7 @@ void LOOP_cell::opt_cell()
     int ion_step=0;
     GlobalC::pot.init_pot(ion_step, GlobalC::pw.strucFac);
 
-#ifdef __MPI  //liyuanbo 2022/2/23
+#ifdef __MPI  
 	// PLEASE simplify the Exx_Global interface
 	// mohan add 2021-03-25
 	// Peize Lin 2016-12-03
