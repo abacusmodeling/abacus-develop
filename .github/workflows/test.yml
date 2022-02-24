@@ -8,6 +8,7 @@ on:
       - ABACUS_2.2.0_beta
       - deepks
       - planewave
+      - pw_refactor
 jobs:
 
   test:
