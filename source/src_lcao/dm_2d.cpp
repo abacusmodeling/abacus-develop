@@ -69,7 +69,7 @@ void Local_Orbital_Charge::cal_dm(const ModuleBase::matrix& wg,
         const double one_float=1.0, zero_float=0.0;
         const int one_int=1;
         const char N_char='N', T_char='T';
-        dm_gamma[is].create( wfc_gamma[is].nr, wfc_gamma[is].nc );
+        dm_gamma[is].create( this->ParaV->ncol, this->ParaV->nrow );
     #ifdef __MPI
         pdgemm_(
             &N_char, &T_char, 
@@ -83,7 +83,7 @@ void Local_Orbital_Charge::cal_dm(const ModuleBase::matrix& wg,
         const int lda=GlobalV::NLOCAL;
         dgemm_(
             &N_char, &T_char, 
-            &GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
+            &GlobalV::NLOCAL, &GlobalV::NLOCAL, &wg.nc,
             &one_float,
             wg_wfc.c, &lda,
             wfc_gamma[is].c, &lda,
@@ -135,19 +135,18 @@ void Local_Orbital_Charge::cal_dm(const ModuleBase::matrix& wg,    // wg(ik,ib),
         {
             BlasConnector::scal( wg_wfc.nc, wg_local[ir], wg_wfc.c+ir*wg_wfc.nc, 1 );
         }
-
         // C++: dm(iw1,iw2) = wfc(ib,iw1).T * wg_wfc(ib,iw2)
         const double one_float=1.0, zero_float=0.0;
         const int one_int=1;
         const char N_char='N', T_char='T';
-        dm_k[ik].create( wfc_k[ik].nr, wfc_k[ik].nc );
-    #ifdef __MPI
+        dm_k[ik].create( this->ParaV->ncol, this->ParaV->nrow );
+#ifdef __MPI
         pzgemm_(
             &N_char, &T_char,
             &GlobalV::NLOCAL, &GlobalV::NLOCAL, &wg.nc,
             &one_float,
-            wg_wfc.c, &one_int, &one_int, this->ParaV->desc,
-            wfc_k[ik].c, &one_int, &one_int, this->ParaV->desc,
+            wg_wfc.c, &one_int, &one_int, this->ParaV->desc_wfc,
+            wfc_k[ik].c, &one_int, &one_int, this->ParaV->desc_wfc,
             &zero_float,
             dm_k[ik].c, &one_int, &one_int, this->ParaV->desc);
     #else
@@ -155,7 +154,7 @@ void Local_Orbital_Charge::cal_dm(const ModuleBase::matrix& wg,    // wg(ik,ib),
         const complex<double> one_complex={1.0,0.0}, zero_complex={0.0,0.0};
         zgemm_(
             &N_char, &T_char, 
-            &GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
+            &GlobalV::NLOCAL, &GlobalV::NLOCAL, &wg.nc,
             &one_complex,
             wg_wfc.c, &lda,
             wfc_k[ik].c, &lda,

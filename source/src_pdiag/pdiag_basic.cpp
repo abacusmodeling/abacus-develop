@@ -234,12 +234,6 @@ void ORB_control::mat_2d(MPI_Comm vu,
     }
 
     // the same procedures for columns.
-    block=N_A/nb;
-    if (block*nb<N_A)
-    {
-        block++;
-    }
-
     if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Total Col Blocks Number",block);
 
 	if(dim[1]>block)
@@ -270,7 +264,7 @@ void ORB_control::mat_2d(MPI_Comm vu,
 
     if (coord[1]==end_id)
     {
-        LM.col_num=(LM.col_b-1)*nb+(N_A-(block-1)*nb);
+        LM.col_num=(LM.col_b-1)*nb+(M_A-(block-1)*nb);
     }
     else
     {
@@ -285,13 +279,51 @@ void ORB_control::mat_2d(MPI_Comm vu,
     j=0;
     for (i=0; i<LM.col_b; i++)
     {
-        for (k=0; k<nb&&(coord[1]*nb+i*nb*dim[1]+k<N_A); k++,j++)
+        for (k=0; k<nb&&(coord[1]*nb+i*nb*dim[1]+k<M_A); k++,j++)
         {
             LM.col_set[j]=coord[1]*nb+i*nb*dim[1]+k;
         }
     }
     LM.col_pos=0;
-    LM.row_pos=0;
+    LM.row_pos = 0;
+
+    // for wavefuncton , calculate nbands_loc
+    block=N_A/nb;
+    if (block*nb<N_A)
+    {
+        block++;
+    }
+    if(dim[1]>block)
+	{
+		GlobalV::ofs_warning << " cpu 2D distribution : " << dim[0] << "*" << dim[1] << std::endl;
+		GlobalV::ofs_warning << " but, the number of bands-row-block is " << block << std::endl;
+		ModuleBase::WARNING_QUIT("ORB_control::mat_2d","some processor has no bands-row-blocks.");
+    }
+    int col_b_bands = block / dim[1];
+    if (coord[1] < block % dim[1])
+    {
+        col_b_bands++;
+    }
+    if (block%dim[1]==0)
+    {
+        end_id=dim[1]-1;
+    }
+    else
+    {
+        end_id=block%dim[1]-1;
+    }
+    if (coord[1]==end_id)
+    {
+        pv->ncol_bands=(col_b_bands-1)*nb+(N_A-(block-1)*nb);
+    }
+    else
+    {
+        pv->ncol_bands=col_b_bands*nb;
+    }
+    pv->nloc_wfc = pv->ncol_bands * LM.row_num;
+
+    std::cout << pv->nloc_wfc << " " << pv->ncol_bands << " " << LM.row_num << std::endl;
+
     return;
 }
 #endif

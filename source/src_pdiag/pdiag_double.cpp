@@ -25,7 +25,7 @@ extern "C"
 
 
 #ifdef __MPI
-inline int set_elpahandle(elpa_t &handle, const int *desc,const int local_nrows,const int local_ncols)
+inline int set_elpahandle(elpa_t &handle, const int *desc,const int local_nrows,const int local_ncols, const int nbands)
 {
   int error;
   int nprows, npcols, myprow, mypcol;
@@ -33,7 +33,7 @@ inline int set_elpahandle(elpa_t &handle, const int *desc,const int local_nrows,
   elpa_init(20210430);
   handle = elpa_allocate(&error);
   elpa_set_integer(handle, "na", desc[2], &error);
-  elpa_set_integer(handle, "nev", desc[2], &error);
+  elpa_set_integer(handle, "nev", nbands, &error);
 
   elpa_set_integer(handle, "local_nrows", local_nrows, &error);
 
@@ -194,15 +194,15 @@ void Pdiag_Double::diago_double_begin(
         ModuleBase::GlobalFunc::ZEROS(eigen, GlobalV::NLOCAL);
 
         long maxnloc; // maximum number of elements in local matrix
-        MPI_Reduce(&pv->nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, pv->comm_2D);
+        MPI_Reduce(&pv->nloc_wfc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, pv->comm_2D);
         MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, pv->comm_2D);
         lowf.wfc_gamma[ik].create(pv->ncol, pv->nrow);			// Fortran order
-
+        
         static elpa_t handle;
         static bool has_set_elpa_handle = false;
         if(! has_set_elpa_handle)
         {
-            set_elpahandle(handle, pv->desc, pv->nrow, pv->ncol);
+            set_elpahandle(handle, pv->desc, pv->nrow, pv->ncol, GlobalV::NBANDS);
             has_set_elpa_handle = true;
         }
 
@@ -221,8 +221,10 @@ void Pdiag_Double::diago_double_begin(
 
         ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_solve");
         int elpa_error;
+        std::cout << "before elpa" << std::endl;
         elpa_generalized_eigenvectors_d(handle, h_mat, Stmp, eigen, lowf.wfc_gamma[ik].c, is_already_decomposed, &elpa_error);
-        ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_solve");
+        std::cout << "after elpa" << std::endl;
+        ModuleBase::timer::tick("Diago_LCAO_Matrix", "elpa_solve");
 
     	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"K-S equation was solved by genelpa2");
         BlasConnector::copy(GlobalV::NBANDS, eigen, inc, ekb, inc);
@@ -264,9 +266,9 @@ void Pdiag_Double::diago_double_begin(
 				MPI_Cart_rank(pv->comm_2D, coord, &src_rank);
 				if(myid==src_rank)
 				{
-					BlasConnector::copy(pv->nloc, lowf.wfc_gamma[ik].c, inc, work, inc);
+					BlasConnector::copy(pv->nloc_wfc, lowf.wfc_gamma[ik].c, inc, work, inc);
 					naroc[0]=pv->nrow;
-					naroc[1]=pv->ncol;
+					naroc[1]=pv->ncol_bands;
 				}
 				info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, pv->comm_2D);
 				info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, src_rank, pv->comm_2D);
@@ -299,7 +301,7 @@ void Pdiag_Double::diago_double_begin(
 	} // GenELPA method
 	else if(GlobalV::KS_SOLVER=="lapack_gv")
 	{
-		lowf.wfc_gamma[ik].create(pv->ncol, pv->nrow, false);
+		lowf.wfc_gamma[ik].create(pv->ncol_bands, pv->nrow, false);
 		memcpy( lowf.wfc_gamma[ik].c, h_mat, sizeof(double)*pv->ncol*pv->nrow );
 		ModuleBase::matrix s_tmp(pv->ncol, pv->nrow, false);
 		memcpy( s_tmp.c, s_mat, sizeof(double)*pv->ncol*pv->nrow );
@@ -526,15 +528,15 @@ void Pdiag_Double::diago_complex_begin(
         double *eigen = new double[GlobalV::NLOCAL];
         ModuleBase::GlobalFunc::ZEROS(eigen, GlobalV::NLOCAL);
         long maxnloc; // maximum number of elements in local matrix
-        MPI_Reduce(&pv->nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, pv->comm_2D);
+        MPI_Reduce(&pv->nloc_wfc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, pv->comm_2D);
         MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, pv->comm_2D);
-        lowf.wfc_k[ik].create(pv->ncol,pv->nrow);            // Fortran order
+        lowf.wfc_k[ik].create(pv->ncol_bands, pv->nrow);            // Fortran order
 
         static elpa_t handle;
         static bool has_set_elpa_handle = false;
         if(! has_set_elpa_handle)
         {
-            set_elpahandle(handle, pv->desc, pv->nrow, pv->ncol);
+            set_elpahandle(handle, pv->desc, pv->nrow, pv->ncol, GlobalV::NBANDS);
             has_set_elpa_handle = true;
         }
 
@@ -565,9 +567,9 @@ void Pdiag_Double::diago_complex_begin(
                 MPI_Cart_rank(pv->comm_2D, coord, &src_rank);
                 if(myid==src_rank)
                 {
-                    BlasConnector::copy(pv->nloc, lowf.wfc_k[ik].c, inc, work, inc);
+                    BlasConnector::copy(pv->nloc_wfc, lowf.wfc_k[ik].c, inc, work, inc);
                     naroc[0]=pv->nrow;
-                    naroc[1]=pv->ncol;
+                    naroc[1]=pv->ncol_bands;
                 }
                 info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, pv->comm_2D);
                 info=MPI_Bcast(work, maxnloc, MPI_DOUBLE_COMPLEX, src_rank, pv->comm_2D);
@@ -626,7 +628,7 @@ void Pdiag_Double::diago_complex_begin(
 
 			int info;
 			long maxnloc; // maximum number of elements in local matrix
-			info=MPI_Reduce(&pv->nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, pv->comm_2D);
+			info=MPI_Reduce(&pv->nloc_wfc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, pv->comm_2D);
 			info=MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, pv->comm_2D);
 			std::complex<double> *work=new std::complex<double>[maxnloc]; // work/buffer matrix
 
@@ -640,9 +642,9 @@ void Pdiag_Double::diago_complex_begin(
 					info=MPI_Cart_rank(pv->comm_2D, coord, &src_rank);
 					if(myid==src_rank)
 					{
-						BlasConnector::copy(pv->nloc, lowf.wfc_k[ik].c, inc, work, inc);
+						BlasConnector::copy(pv->nloc_wfc, lowf.wfc_k[ik].c, inc, work, inc);
 						naroc[0]=pv->nrow;
-						naroc[1]=pv->ncol;
+						naroc[1]=pv->ncol_bands;
 					}
 					info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, pv->comm_2D);
 					info=MPI_Bcast(work, maxnloc, MPI_DOUBLE_COMPLEX, src_rank, pv->comm_2D);

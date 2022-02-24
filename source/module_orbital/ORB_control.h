@@ -46,6 +46,7 @@ class ORB_control
 		const int &out_descriptor,
         const int* nproj_);
 
+    ///set 2D-block-cyclic division according to the basis
     void setup_2d_division(void);
     
 #ifdef __MPI

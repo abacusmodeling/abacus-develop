@@ -22,6 +22,13 @@ struct Parallel_Orbitals
 	int ncol;
     long nloc;
 
+    /// local size of bands, used for 2d wavefunction
+    /// must divided on dim1 because of elpa interface
+    int ncol_bands;
+    
+    /// ncol_bands*nrow
+    long nloc_wfc;
+
     /// block size
     int nb;
 
@@ -35,7 +42,8 @@ struct Parallel_Orbitals
 #ifdef __MPI
     /// blacs info
     int blacs_ctxt;
-    int desc[9];
+    int desc[9];    //for matrix, nlocal*nlocal
+    int desc_wfc[9]; //for wfc, nlocal*nbands
     /// communicator for 2D-block
     MPI_Comm comm_2D;
 #endif

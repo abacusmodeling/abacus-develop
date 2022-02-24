@@ -143,10 +143,12 @@ inline int cart2blacs(
 	MPI_Comm comm_2D,
 	int nprows,
 	int npcols,
-	int N,
-	int nblk,
+    int Nlocal,
+    int Nbands, 
+    int nblk,
 	int lld,
-	int *desc)
+    int* desc,
+    int* desc_wfc)
 {
     int my_blacs_ctxt;
     int myprow, mypcol;
@@ -166,7 +168,8 @@ inline int cart2blacs(
     Cblacs_gridinfo(my_blacs_ctxt, &nprows, &npcols, &myprow, &mypcol);
     delete[] usermap;
     int ISRC=0;
-    descinit_(desc, &N, &N, &nblk, &nblk, &ISRC, &ISRC, &my_blacs_ctxt, &lld, &info);
+    descinit_(desc, &Nlocal, &Nlocal, &nblk, &nblk, &ISRC, &ISRC, &my_blacs_ctxt, &lld, &info);
+    descinit_(desc_wfc, &Nlocal, &Nbands, &nblk, &nblk, &ISRC, &ISRC, &my_blacs_ctxt, &lld, &info);
 
     return my_blacs_ctxt;
 }
@@ -223,7 +226,7 @@ void ORB_control::divide_HS_2d
 	this->mpi_creat_cart(&pv->comm_2D,pv->dim0,pv->dim1);
 
 	// call mat_2d
-	this->mat_2d(pv->comm_2D, GlobalV::NLOCAL, GlobalV::NLOCAL, pv->nb, pv->MatrixInfo);
+	this->mat_2d(pv->comm_2D, GlobalV::NLOCAL, GlobalV::NBANDS, pv->nb, pv->MatrixInfo);
 
 	// mohan add 2010-06-29
 	pv->nrow = pv->MatrixInfo.row_num;
@@ -233,7 +236,7 @@ void ORB_control::divide_HS_2d
 	// init blacs context for genelpa
     if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")
     {
-        pv->blacs_ctxt=cart2blacs(pv->comm_2D, pv->dim0, pv->dim1, GlobalV::NLOCAL, pv->nb, pv->nrow, pv->desc);
+        pv->blacs_ctxt=cart2blacs(pv->comm_2D, pv->dim0, pv->dim1, GlobalV::NLOCAL, GlobalV::NBANDS, pv->nb, pv->nrow, pv->desc, pv->desc_wfc);
     }
 #else // single processor used.
 	pv->nb = GlobalV::NLOCAL;
