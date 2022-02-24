@@ -316,14 +316,14 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, ModuleBase::Compl
 	//complex<double>* Htmp2 = this->LM->Sdiag2;
 	//complex<double>* Htmp3 = this->LM->Sdiag2;
 
-	complex<double>* Stmp = new complex<double> [GlobalC::ParaO.nloc];
-	complex<double>* Htmp1 = new complex<double> [GlobalC::ParaO.nloc];
-	complex<double>* Htmp2 = new complex<double> [GlobalC::ParaO.nloc];
-	complex<double>* Htmp3 = new complex<double> [GlobalC::ParaO.nloc];
-	ModuleBase::GlobalFunc::ZEROS(Stmp,GlobalC::ParaO.nloc);
-	ModuleBase::GlobalFunc::ZEROS(Htmp1,GlobalC::ParaO.nloc);
-	ModuleBase::GlobalFunc::ZEROS(Htmp2,GlobalC::ParaO.nloc);
-	ModuleBase::GlobalFunc::ZEROS(Htmp3,GlobalC::ParaO.nloc);
+	complex<double>* Stmp = new complex<double> [this->LM->ParaV->nloc];
+	complex<double>* Htmp1 = new complex<double> [this->LM->ParaV->nloc];
+	complex<double>* Htmp2 = new complex<double> [this->LM->ParaV->nloc];
+	complex<double>* Htmp3 = new complex<double> [this->LM->ParaV->nloc];
+	ModuleBase::GlobalFunc::ZEROS(Stmp,this->LM->ParaV->nloc);
+	ModuleBase::GlobalFunc::ZEROS(Htmp1,this->LM->ParaV->nloc);
+	ModuleBase::GlobalFunc::ZEROS(Htmp2,this->LM->ParaV->nloc);
+	ModuleBase::GlobalFunc::ZEROS(Htmp3,this->LM->ParaV->nloc);
 	
 	//cout << "this->LM->Hloc2" << *this->LM->Hloc2 << endl;
 	//cout << "*Htmp2: " << *Htmp2 << endl;
@@ -332,7 +332,7 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, ModuleBase::Compl
         ModuleBase::GlobalFunc::ZEROS(eigen, GlobalV::NLOCAL);
 
 	//cout << "GlobalV::NLOCAL : " << GlobalV::NLOCAL << endl;
-	//cout << "GlobalC::ParaO.nloc : " << GlobalC::ParaO.nloc << endl;
+	//cout << "nloc : " << this->LM->ParaV->nloc << endl;
 
 	//cout << "begin02:" <<endl;
 
@@ -340,10 +340,10 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, ModuleBase::Compl
         //complex<double>* Z = new complex<double>[this->loc_size * NLOCAL];
         //ModuleBase::GlobalFunc::ZEROS(Z, this->loc_size * NLOCAL);
 
-	zcopy_(&GlobalC::ParaO.nloc, this->LM->Sloc2.data(), &inc, Stmp, &inc);
-	zcopy_(&GlobalC::ParaO.nloc, this->LM->Hloc2.data(), &inc, Htmp1, &inc);
-	zcopy_(&GlobalC::ParaO.nloc, this->LM->Hloc2.data(), &inc, Htmp2, &inc);
-	zcopy_(&GlobalC::ParaO.nloc, this->LM->Hloc2.data(), &inc, Htmp3, &inc);
+	zcopy_(&this->LM->ParaV->nloc, this->LM->Sloc2.data(), &inc, Stmp, &inc);
+	zcopy_(&this->LM->ParaV->nloc, this->LM->Hloc2.data(), &inc, Htmp1, &inc);
+	zcopy_(&this->LM->ParaV->nloc, this->LM->Hloc2.data(), &inc, Htmp2, &inc);
+	zcopy_(&this->LM->ParaV->nloc, this->LM->Hloc2.data(), &inc, Htmp3, &inc);
 
 	//cout << "*Htmp2: " << *Htmp2 << endl;
 
@@ -359,9 +359,9 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, ModuleBase::Compl
 		&transa,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL,
 		&alpha,
-		Stmp, &one_int, &one_int, GlobalC::ParaO.desc,
+		Stmp, &one_int, &one_int, this->LM->ParaV->desc,
                 &beta,
-		Htmp1, &one_int, &one_int, GlobalC::ParaO.desc);
+		Htmp1, &one_int, &one_int, this->LM->ParaV->desc);
 
 	//beta = (0.0, 0.5)*INPUT.md_dt;
 	beta = {0.0, 0.5*0.02*41.34}; // this need modify
@@ -373,12 +373,12 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, ModuleBase::Compl
 		&transa,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL,
 		&alpha,
-		Stmp, &one_int, &one_int, GlobalC::ParaO.desc, 
+		Stmp, &one_int, &one_int, this->LM->ParaV->desc, 
 		&beta,
-		Htmp2, &one_int, &one_int, GlobalC::ParaO.desc);
+		Htmp2, &one_int, &one_int, this->LM->ParaV->desc);
 
 	//Next, invert the denominator
-	int *ipiv = new int[ GlobalC::ParaO.nloc ];
+	int *ipiv = new int[ this->LM->ParaV->nloc ];
 	int info;
 
 	//cout << "*Htmp2: " << *Htmp2 << endl;
@@ -386,7 +386,7 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, ModuleBase::Compl
 
 	pzgetrf_(
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
-		Htmp2, &one_int, &one_int, GlobalC::ParaO.desc,
+		Htmp2, &one_int, &one_int, this->LM->ParaV->desc,
 		ipiv,  &info);
 
 	int LWORK=-1, liWORK=-1;
@@ -398,7 +398,7 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, ModuleBase::Compl
 
 	pzgetri_(
 		&GlobalV::NLOCAL, 
-		Htmp2, &one_int, &one_int, GlobalC::ParaO.desc,
+		Htmp2, &one_int, &one_int, this->LM->ParaV->desc,
 		ipiv,  WORK.data(),  &LWORK, iWORK.data(), &liWORK, &info);
 
 	LWORK = WORK[0].real();
@@ -408,7 +408,7 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, ModuleBase::Compl
 
 	pzgetri_(
 		&GlobalV::NLOCAL, 
-		Htmp2, &one_int, &one_int, GlobalC::ParaO.desc,
+		Htmp2, &one_int, &one_int, this->LM->ParaV->desc,
 		ipiv,  WORK.data(),  &LWORK, iWORK.data(), &liWORK, &info);
 
 	//alpha = (1.0, 0.0);
@@ -427,10 +427,10 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, ModuleBase::Compl
 		&transa, &transb,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 		&alpha_1,
-		Htmp2, &one_int, &one_int, GlobalC::ParaO.desc,
-		Htmp1, &one_int, &one_int, GlobalC::ParaO.desc, 
+		Htmp2, &one_int, &one_int, this->LM->ParaV->desc,
+		Htmp1, &one_int, &one_int, this->LM->ParaV->desc, 
 		&beta_1,
-		Htmp3, &one_int, &one_int, GlobalC::ParaO.desc);
+		Htmp3, &one_int, &one_int, this->LM->ParaV->desc);
 
 	
 
@@ -440,10 +440,10 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, ModuleBase::Compl
 		&transa,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
 		&alpha_1,
-		Htmp3, &one_int, &one_int, GlobalC::ParaO.desc,
-		wfc_2d.c, &one_int, &one_int, GlobalC::ParaO.desc, &one_int, 
+		Htmp3, &one_int, &one_int, this->LM->ParaV->desc,
+		wfc_2d.c, &one_int, &one_int, this->LM->ParaV->desc, &one_int, 
 		&beta_1,
-		wfc_2d.c, &one_int, &one_int, GlobalC::ParaO.desc, &one_int
+		wfc_2d.c, &one_int, &one_int, this->LM->ParaV->desc, &one_int
         );
 
 

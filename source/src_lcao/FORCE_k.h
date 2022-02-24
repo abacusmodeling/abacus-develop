@@ -21,6 +21,7 @@ class Force_LCAO_k : public Force_LCAO_gamma
 private:
     
     LCAO_Hamilt* UHM;
+    const Parallel_Orbitals* ParaV;
 
 	//orthonormal force + contribution from T and VNL
 	void ftable_k (
@@ -44,7 +45,7 @@ private:
 		LCAO_Hamilt &uhm);
 
 	// get the ds, dt, dvnl.
-	void allocate_k();
+	void allocate_k(const Parallel_Orbitals &pv);
 
 	void finish_k(void);
 	

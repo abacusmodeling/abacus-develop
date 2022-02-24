@@ -303,11 +303,11 @@ void ELEC_scf::scf(const int& istep,
 		{
 			if(GlobalV::GAMMA_ONLY_LOCAL)
 			{
-				GlobalC::ld.cal_e_delta_band(loc.dm_gamma,GlobalC::ParaO);
+				GlobalC::ld.cal_e_delta_band(loc.dm_gamma,*lowf.ParaV);
 			}
 			else
 			{
-				GlobalC::ld.cal_e_delta_band_k(loc.dm_k,GlobalC::ParaO,GlobalC::kv.nks);
+				GlobalC::ld.cal_e_delta_band_k(loc.dm_k,*lowf.ParaV,GlobalC::kv.nks);
 			}
 		}
 #endif

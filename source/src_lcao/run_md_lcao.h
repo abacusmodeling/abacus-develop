@@ -10,7 +10,7 @@ class Run_MD_LCAO
 
 	public:
 
-	Run_MD_LCAO();
+	Run_MD_LCAO(const Parallel_Orbitals &pv);
 	~Run_MD_LCAO();
 
 	void opt_cell(ORB_control &orb_con);

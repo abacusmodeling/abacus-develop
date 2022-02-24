@@ -22,7 +22,7 @@ void LOOP_ions::output_HS_R(
     if(INPUT.out_r_matrix)
     {
         cal_r_overlap_R r_matrix;
-        r_matrix.init();
+        r_matrix.init(*this->LOWF.ParaV);
         r_matrix.out_r_overlap_R(GlobalV::NSPIN);
     }
 

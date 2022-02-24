@@ -83,7 +83,7 @@ void LOOP_elec::set_matrix_grid(void)
 	{
 		// For each atom, calculate the adjacent atoms in different cells
 		// and allocate the space for H(R) and S(R).
-		GlobalC::LNNR.cal_nnr();
+		GlobalC::LNNR.cal_nnr(*this->UHM->LM->ParaV);
 		this->UHM->LM->allocate_HS_R(GlobalC::LNNR.nnr);
 #ifdef __DEEPKS
 		GlobalC::ld.allocate_V_deltaR(GlobalC::LNNR.nnr);
@@ -167,7 +167,7 @@ void LOOP_elec::before_solver(const int& istep,
 			GlobalC::ucell,
 			GlobalC::ORB,
 			GlobalC::GridD,
-			GlobalC::ParaO,
+			*lowf.ParaV,
 			GlobalC::UOT);
     }
 #endif
@@ -193,7 +193,7 @@ void LOOP_elec::solver(const int& istep,
 			case Exx_Global::Hybrid_Type::HF:
 			case Exx_Global::Hybrid_Type::PBE0:
 			case Exx_Global::Hybrid_Type::HSE:
-				GlobalC::exx_lcao.cal_exx_ions();
+				GlobalC::exx_lcao.cal_exx_ions(*lowf.ParaV);
 				break;
 			case Exx_Global::Hybrid_Type::No:
 			case Exx_Global::Hybrid_Type::Generate_Matrix:

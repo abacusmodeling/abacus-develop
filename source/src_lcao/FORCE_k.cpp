@@ -45,7 +45,7 @@ void Force_LCAO_k::ftable_k (
 
     this->UHM = &uhm;
     
-    this->allocate_k();
+    this->allocate_k(*loc.ParaV);
 
 	// calculate the energy density matrix
 	// and the force related to overlap matrix and energy density matrix.
@@ -61,7 +61,7 @@ void Force_LCAO_k::ftable_k (
     ModuleBase::Memory::record ("Force_LCAO_k", "dm2d", GlobalV::NSPIN*GlobalC::LNNR.nnr, "double");	
 
     Record_adj RA;
-    RA.for_2d();
+    RA.for_2d(*loc.ParaV);
     loc.cal_dm_R(loc.dm_k, RA, dm2d);
     
     this->cal_ftvnl_dphi_k(dm2d, isforce, isstress, ftvnl_dphi, stvnl_dphi);
@@ -81,7 +81,7 @@ void Force_LCAO_k::ftable_k (
 			GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            GlobalC::ParaO,
+            *this->ParaV,
 			GlobalC::kv);
     	GlobalC::ld.cal_descriptor();
 		GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
@@ -90,7 +90,7 @@ void Force_LCAO_k::ftable_k (
 			GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            GlobalC::ParaO,
+            *this->ParaV,
 			GlobalC::kv,
 			isstress,svnl_dalpha);
 #ifdef __MPI
@@ -146,12 +146,13 @@ void Force_LCAO_k::ftable_k (
     return;
 }
 
-void Force_LCAO_k::allocate_k()
+void Force_LCAO_k::allocate_k(const Parallel_Orbitals &pv)
 {
 	ModuleBase::TITLE("Force_LCAO_k","allocate_k");
 	ModuleBase::timer::tick("Force_LCAO_k","allocate_k");
 
-	const int nnr = GlobalC::LNNR.nnr;
+    this->ParaV = &pv;
+    const int nnr = GlobalC::LNNR.nnr;
 	//--------------------------------
     // (1) allocate for dSx dSy & dSz
 	//--------------------------------
@@ -184,7 +185,6 @@ void Force_LCAO_k::allocate_k()
 	//-----------------------------
 	// calculate dS = <phi | dphi> 
 	//-----------------------------
-    // tips: build_ST_new --> GlobalC::ParaO.set_force 
 	bool cal_deri = true;
 	this->UHM->genH.build_ST_new ('S', cal_deri, GlobalC::ucell);
 
@@ -258,7 +258,7 @@ void Force_LCAO_k::cal_foverlap_k(
     }
     
     Record_adj RA;
-	RA.for_2d();
+	RA.for_2d(*loc.ParaV);
 
 	//--------------------------------------------	
 	// calculate the energy density matrix here.
@@ -312,7 +312,7 @@ void Force_LCAO_k::cal_foverlap_k(
 					const int iw1_all = start1 + jj; 
 
 					// HPSEPS
-					const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
+					const int mu = this->ParaV->trace_loc_row[iw1_all];
 					if(mu<0)continue;
 
 					for(int kk=0; kk<atom2->nw; kk++)
@@ -320,7 +320,7 @@ void Force_LCAO_k::cal_foverlap_k(
 						const int iw2_all = start2 + kk;
 
 						// HPSEPS
-						const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
+						const int nu = this->ParaV->trace_loc_col[iw2_all];
 						if(nu<0)continue;
 						//==============================================================
 						// here we use 'minus', but in GlobalV::GAMMA_ONLY_LOCAL we use 'plus',
@@ -394,7 +394,7 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(
 
 //	GlobalV::ofs_running << " calculate the ftvnl_dphi_k force" << std::endl;
 	Record_adj RA;
-	RA.for_2d();
+	RA.for_2d(*this->UHM->LM->ParaV);
 
 	int irr = 0;
     for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
@@ -414,12 +414,12 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(
 				for(int jj=0; jj<atom1->nw; ++jj)
 				{
 					const int iw1_all = start1 + jj; 
-					const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
+					const int mu = this->ParaV->trace_loc_row[iw1_all];
 					if(mu<0)continue;
 					for(int kk=0; kk<atom2->nw; ++kk)
 					{
 						const int iw2_all = start2 + kk;
-						const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
+						const int nu = this->ParaV->trace_loc_col[iw2_all];
 						if(nu<0)continue;
 						//==============================================================
 						// here we use 'minus', but in GlobalV::GAMMA_ONLY_LOCAL we use 'plus',
@@ -477,7 +477,7 @@ void Force_LCAO_k::test(double* mmm, const std::string &name)
 
 	GlobalV::ofs_running << " Calculate the test in Force_LCAO_k" << std::endl;
 	Record_adj RA;
-	RA.for_2d();
+	RA.for_2d(*this->UHM->LM->ParaV);
 	
 	double *test;
 	test = new double[GlobalV::NLOCAL * GlobalV::NLOCAL];
@@ -622,12 +622,12 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 					for (int j=0; j<atom1->nw; ++j)
 					{
 						const int iw1_all = start1 + j;
-						const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
+						const int mu = this->ParaV->trace_loc_row[iw1_all];
 						if(mu < 0)continue;
 						for (int k=0; k<atom2->nw; ++k)
 						{
 							const int iw2_all = start2 + k;
-							const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
+							const int nu = this->ParaV->trace_loc_col[iw2_all];
 							if(nu < 0)continue;
 							
 							for (int ad0=0; ad0 < GlobalC::GridD.getAdjacentNum()+1 ; ++ad0)
@@ -805,8 +805,8 @@ void Force_LCAO_k::cal_fvnl_dbeta_k_new(
 			for (int iw1=0; iw1<nw1_tot; ++iw1)
 			{
 				const int iw1_all = start1 + iw1;
-				const int iw1_local = GlobalC::ParaO.trace_loc_row[iw1_all];
-				const int iw2_local = GlobalC::ParaO.trace_loc_col[iw1_all];
+				const int iw1_local = this->ParaV->trace_loc_row[iw1_all];
+				const int iw2_local = this->ParaV->trace_loc_col[iw1_all];
 				if(iw1_local < 0 && iw2_local < 0)continue;
 				const int iw1_0 = iw1/GlobalV::NPOL;
 				std::vector<std::vector<double>> nlm;
@@ -921,12 +921,12 @@ void Force_LCAO_k::cal_fvnl_dbeta_k_new(
 						for (int j=0; j<atom1->nw; ++j)
 						{
 							const int iw1_all = start1 + j;
-							const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
+							const int mu = this->ParaV->trace_loc_row[iw1_all];
 							if(mu < 0)continue;
 							for (int k=0; k<atom2->nw; ++k)
 							{
 								const int iw2_all = start2 + k;
-								const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
+								const int nu = this->ParaV->trace_loc_col[iw2_all];
 								if(nu < 0)continue;
 								
 								for (int ad0=0; ad0 < GlobalC::GridD.getAdjacentNum()+1 ; ++ad0)

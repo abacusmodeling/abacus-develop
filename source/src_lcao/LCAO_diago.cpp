@@ -43,10 +43,10 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, Local_Orbital_wfc &l
 {
 	ModuleBase::TITLE("Diago_LCAO_Matrix","using_HPSEPS_complex");
 
-	//GlobalC::ParaO.out_hs=1;//zhengdy-soc-test
+	//lowf.ParaV->out_hs=1;//zhengdy-soc-test
 	bool bit = false; //LiuXh, 2017-03-21
 	//if set bit = true, there would be error in soc-multi-core calculation, noted by zhengdy-soc
-	HS_Matrix::saving_HS_complex(this->LM->Hloc2.data(), this->LM->Sloc2.data(), bit, GlobalC::ParaO.out_hs); //LiuXh, 2017-03-21
+	HS_Matrix::saving_HS_complex(this->LM->Hloc2.data(), this->LM->Sloc2.data(), bit, GlobalC::ParaO.out_hs, *lowf.ParaV); //LiuXh, 2017-03-21
 	GlobalV::ofs_running << std::setprecision(6); //LiuXh, 2017-03-21
 
 	GlobalC::ParaO.diago_complex_begin(ik, lowf, this->LM->Hloc2.data(), this->LM->Sloc2.data(), this->LM->Sdiag2.data(), GlobalC::wf.ekb[ik]);
@@ -135,7 +135,7 @@ void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, std::complex<double>
 }
 
 
-void Diago_LCAO_Matrix::using_LAPACK(const int &ik, double** wfc)const
+void Diago_LCAO_Matrix::using_LAPACK(const int &ik, Local_Orbital_wfc &lowf)const
 {
 	ModuleBase::TITLE("Diago_LCAO_Matrix","using_LAPACK");
 	assert(GlobalV::NLOCAL>0);
@@ -143,7 +143,7 @@ void Diago_LCAO_Matrix::using_LAPACK(const int &ik, double** wfc)const
 	// save H and S matrix to disk.
 //	bool bit = false;
 	bool bit = true;//zhengdy-soc
-	HS_Matrix::saving_HS(this->LM->Hloc.data(), this->LM->Sloc.data(), bit, GlobalC::ParaO.out_hs);
+	HS_Matrix::saving_HS(this->LM->Hloc.data(), this->LM->Sloc.data(), bit, GlobalC::ParaO.out_hs, *lowf.ParaV);
 
 	ModuleBase::matrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	ModuleBase::matrix Stmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
@@ -188,7 +188,7 @@ void Diago_LCAO_Matrix::using_LAPACK(const int &ik, double** wfc)const
 		GlobalC::wf.ekb[ik][i] = w[i]; 
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			wfc[i][j] = Htmp(j,i);
+			lowf.wfc_k_grid[ik][i][j] = Htmp(j,i);
 		}
 	}
 	
@@ -258,7 +258,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_double(const int &ik, Local_Orbital_wfc &lo
 
 	// save H and S matrix to disk.
 	bool bit = false;
-	HS_Matrix::saving_HS(this->LM->Hloc.data(), this->LM->Sloc.data(), bit, GlobalC::ParaO.out_hs);
+	HS_Matrix::saving_HS(this->LM->Hloc.data(), this->LM->Sloc.data(), bit, GlobalC::ParaO.out_hs, *lowf.ParaV);
 	GlobalV::ofs_running << std::setprecision(6);
 
 	// Distribution of matrix for 

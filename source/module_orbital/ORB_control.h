@@ -1,6 +1,8 @@
 #ifndef ORB_CONTROL_H 
 #define ORB_CONTROL_H 
 
+#include "src_parallel/parallel_orbitals.h"
+#include "src_parallel/parallel_global.h"
 #include "ORB_gen_tables.h"
 #include "ORB_read.h"
 
@@ -42,7 +44,47 @@ class ORB_control
 		ORB_gen_tables &OGT, 
 		LCAO_Orbitals &orb,
 		const int &out_descriptor,
-		const int* nproj_);
+        const int* nproj_);
+
+    void setup_2d_division(void);
+    
+#ifdef __MPI
+    void readin(const std::string& fa, const std::string& fb, const int& nlocal, double* eigen, double* eigvr);
+#endif
+
+    Parallel_Orbitals ParaV;
+
+private:
+
+    void divide_HS_2d
+	(
+#ifdef __MPI
+		MPI_Comm DIAG_WORLD
+#endif
+    );
+    
+#ifdef __MPI
+	int mpi_comm_rows, mpi_comm_cols;
+#endif
+    
+    void set_parameters(void);
+    
+    void set_trace(void);
+
+#ifdef __MPI
+	void mpi_creat_cart(MPI_Comm *comm_2D, int prow, int pcol);
+
+	void mat_2d(MPI_Comm vu, const int &M_A, const int &N_A, const int & NB, LocalMatrix &loc_A);
+
+	void data_distribution(
+		MPI_Comm comm_2D, 
+		const std::string &file,
+		const int &n,
+		const int &NB,
+		double *A,
+		const LocalMatrix &loc_A);
+
+#endif
 
 };
 #endif

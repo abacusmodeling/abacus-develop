@@ -20,9 +20,11 @@ class LCAO_Matrix
     LCAO_Matrix();
     ~LCAO_Matrix();
 
-    void divide_HS_in_frag(const bool isGamma, Parallel_Orbitals &po);
+    void divide_HS_in_frag(const bool isGamma, const Parallel_Orbitals& pv);
 
-    private:
+    const Parallel_Orbitals *ParaV;
+
+private:
 
     void allocate_HS_gamma(const long &nloc);
 

@@ -4,15 +4,22 @@
 #include "MD_parameters.h"
 #include "../module_cell/unitcell_pseudo.h"
 #include "../module_base/matrix.h"
+#ifdef __LCAO
+#include "../src_parallel/parallel_orbitals.h"
+#endif
 
 class MD_func
 {
     public:
 
     MD_func(){};
-    ~MD_func(){};
+    ~MD_func() {};
+    
+#ifdef __LCAO
+    static const Parallel_Orbitals* ParaV;
+#endif
 
-	static double gaussrand();
+    static double gaussrand();
 	
 	static void InitPos( const UnitCell_pseudo &unit_in, ModuleBase::Vector3<double>* pos);
 

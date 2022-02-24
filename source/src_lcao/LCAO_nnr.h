@@ -34,7 +34,7 @@ class LCAO_nnr
 	int *nlocdim;
 	int *nlocstart;
 
-	void cal_nnr();	
+	void cal_nnr(const Parallel_Orbitals &pv);	
 	void cal_nnrg(const Grid_Technique &GT);
 
 

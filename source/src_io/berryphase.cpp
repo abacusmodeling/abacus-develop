@@ -324,7 +324,7 @@ double berryphase::stringPhase(int index_str, int nbands)
 			if(GlobalV::NSPIN!=4)
 			{
 				//std::complex<double> my_det = lcao_method.det_berryphase(ik_1,ik_2,dk,nbands);
-				zeta = zeta * lcao_method.det_berryphase(ik_1,ik_2,dk,nbands, &this->lowf->wfc_k);
+				zeta = zeta * lcao_method.det_berryphase(ik_1,ik_2,dk,nbands, *this->lowf);
 				// test by jingan
 				//GlobalV::ofs_running << "methon 1: det = " << my_det << std::endl;
 				// test by jingan

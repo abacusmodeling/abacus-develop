@@ -447,7 +447,7 @@ void Gint_Gamma::vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal,
     {
         ModuleBase::timer::tick("Gint_Gamma","distri_vl_index");
         #ifdef __MPI
-        setBufferParameter(GlobalC::ParaO.comm_2D, GlobalC::ParaO.blacs_ctxt, GlobalC::ParaO.nb,
+        setBufferParameter(lm.ParaV->comm_2D, lm.ParaV->blacs_ctxt, lm.ParaV->nb,
                            this->sender_index_size, this->sender_local_index,
                            this->sender_size_process, this->sender_displacement_process,
                            this->sender_size, this->sender_buffer,
@@ -483,7 +483,7 @@ void Gint_Gamma::vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal,
     #ifdef __MPI
     MPI_Alltoallv(this->sender_buffer, this->sender_size_process, this->sender_displacement_process, MPI_DOUBLE,
                   this->receiver_buffer, this->receiver_size_process,
-					this->receiver_displacement_process, MPI_DOUBLE, GlobalC::ParaO.comm_2D);
+					this->receiver_displacement_process, MPI_DOUBLE, lm.ParaV->comm_2D);
     #endif
     ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running, "vlocal data are exchanged, received size(M):", this->receiver_size*8/1024/1024);
 

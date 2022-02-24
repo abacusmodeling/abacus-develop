@@ -34,7 +34,7 @@ void ELEC_cbands_k::cal_bands(const int& istep, LCAO_Hamilt& uhm,
 			GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            GlobalC::ParaO,
+            *lowf.ParaV,
 			GlobalC::kv);
     	GlobalC::ld.cal_descriptor();
 		//calculate dE/dD
@@ -44,7 +44,7 @@ void ELEC_cbands_k::cal_bands(const int& istep, LCAO_Hamilt& uhm,
 		GlobalC::ld.add_v_delta_k(GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            GlobalC::ParaO,
+            *lowf.ParaV,
 			GlobalC::LNNR.nnr);
 	}
 #endif
@@ -120,10 +120,10 @@ void ELEC_cbands_k::cal_bands(const int& istep, LCAO_Hamilt& uhm,
 		// Effective potential of DFT+U is added to total Hamiltonian here; Quxin adds on 20201029
 		if(INPUT.dft_plus_u)
 		{
-      std::vector<std::complex<double>> eff_pot(GlobalC::ParaO.nloc);
+      std::vector<std::complex<double>> eff_pot(lowf.ParaV->nloc);
 			GlobalC::dftu.cal_eff_pot_mat_complex(ik, istep, &eff_pot[0]);
       
-			for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
+			for(int irc=0; irc<lowf.ParaV->nloc; irc++)
 				uhm.LM->Hloc2[irc] += eff_pot[irc];					
 		}
 

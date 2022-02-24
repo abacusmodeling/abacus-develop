@@ -14,6 +14,7 @@
 
 #ifdef __LCAO
 #include "../src_lcao/run_md_lcao.h"
+const Parallel_Orbitals* MD_func::ParaV = nullptr;
 #endif
 
 
@@ -283,7 +284,7 @@ void MD_func::force_virial(const int &istep,
 #ifdef __LCAO
 		else if(GlobalV::BASIS_TYPE=="lcao")
 		{
-			Run_MD_LCAO md_lcao;
+			Run_MD_LCAO md_lcao(*ParaV);
 			md_lcao.md_force_virial(istep, unit_in.nat, potential, force, stress);
 		}
 #endif

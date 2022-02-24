@@ -793,7 +793,7 @@ ofs_mpi.close();
 	};
 }
 
-void Exx_Lcao::cal_exx_ions()
+void Exx_Lcao::cal_exx_ions(const Parallel_Orbitals &pv)
 {
 	ModuleBase::TITLE("Exx_Lcao","cal_exx_ions");
 std::ofstream ofs_mpi(test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
@@ -885,11 +885,11 @@ ofs_mpi<<"TIME@ cauchy::init\t"<<time_during(t_start)<<std::endl;
 	#if EXX_DM==2
 	DM_para.init( H_atom_pairs_core, info.dm_threshold );
 	#elif EXX_DM==3
-	DM_para.allreduce.init( MPI_COMM_WORLD, Abfs::get_H_pairs_core_group( atom_pairs_core ) );
+	DM_para.allreduce.init( MPI_COMM_WORLD, Abfs::get_H_pairs_core_group( atom_pairs_core ), pv);
 	#endif
 	
 	#if EXX_H_COMM==2
-	Hexx_para.allreduce2.init(MPI_COMM_WORLD, H_atom_pairs_core);
+	Hexx_para.allreduce2.init(MPI_COMM_WORLD, H_atom_pairs_core, pv);
 	#endif
 	
 ofs_mpi<<"TIME@ Exx_Lcao::cal_exx_ions\t"<<time_during(t_start_all)<<std::endl;
@@ -947,7 +947,7 @@ gettimeofday( &t_start, NULL);
 ofs_mpi<<"TIME@ Exx_Lcao::cal_DM\t"<<time_during(t_start)<<std::endl;
 #elif EXX_DM==3
 gettimeofday( &t_start, NULL);
-	this->DM_para.cal_DM(info.dm_threshold, loc.dm_gamma, loc.dm_k);
+	this->DM_para.cal_DM(info.dm_threshold, loc);
 ofs_mpi<<"TIME@ Exx_Lcao::cal_DM\t"<<time_during(t_start)<<std::endl;
 #endif
 
@@ -968,7 +968,7 @@ gettimeofday( &t_start, NULL);
 ofs_mpi<<"TIME@ Exx_Lcao::cal_energy\t"<<time_during(t_start)<<std::endl;
 
 gettimeofday( &t_start, NULL);
-	Hexx_para.Rexx_to_Km2D( HexxR, {GlobalC::pot.start_pot=="file",GlobalC::CHR.out_charge} );
+	Hexx_para.Rexx_to_Km2D(*loc.ParaV, HexxR, {GlobalC::pot.start_pot=="file",GlobalC::CHR.out_charge} );
 ofs_mpi<<"TIME@ Hexx_para.Rexx_to_Km2D\t"<<time_during(t_start)<<std::endl;
 
 ofs_mpi<<"sizeof_Hexx2D\t"<<get_sizeof(Hexx_para.HK_Gamma_m2D)+get_sizeof(Hexx_para.HK_K_m2D)<<std::endl;
@@ -1170,10 +1170,10 @@ ofs_mpi.close();
 //		<<Exx_Abfs::Screen::Cauchy::num_cal<<std::endl;
 }
 
-void Exx_Lcao::cal_exx_elec_nscf()
+void Exx_Lcao::cal_exx_elec_nscf(const Parallel_Orbitals &pv)
 {
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> HexxR;
-	Hexx_para.Rexx_to_Km2D( HexxR, {GlobalC::pot.start_pot=="file",GlobalC::CHR.out_charge} );
+	Hexx_para.Rexx_to_Km2D(pv, HexxR, {GlobalC::pot.start_pot=="file",GlobalC::CHR.out_charge} );
 }
 
 /*

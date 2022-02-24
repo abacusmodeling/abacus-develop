@@ -28,7 +28,7 @@ void ELEC_nscf::nscf(LCAO_Hamilt& uhm,
 		case Exx_Global::Hybrid_Type::HF:
 		case Exx_Global::Hybrid_Type::PBE0:
 		case Exx_Global::Hybrid_Type::HSE:
-			GlobalC::exx_lcao.cal_exx_elec_nscf();
+			GlobalC::exx_lcao.cal_exx_elec_nscf(*lowf.ParaV);
 			break;
 	}
 

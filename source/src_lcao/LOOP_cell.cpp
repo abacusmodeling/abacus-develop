@@ -7,11 +7,11 @@
 // delete in near future
 #include "../src_pw/global.h"
 
-LOOP_cell::LOOP_cell()
+LOOP_cell::LOOP_cell(const Parallel_Orbitals &pv)
 {
     // * allocate H and S matrices according to computational resources
-	// * set the 'trace' between local H/S and global H/S
-	this->LM.divide_HS_in_frag(GlobalV::GAMMA_ONLY_LOCAL, GlobalC::ParaO);
+    // * set the 'trace' between local H/S and global H/S
+    this->LM.divide_HS_in_frag(GlobalV::GAMMA_ONLY_LOCAL, pv);
 }
 LOOP_cell::~LOOP_cell() {}
 
@@ -66,7 +66,7 @@ void LOOP_cell::opt_cell(ORB_control &orb_con)
 	// Quxin added for DFT+U
 	if(INPUT.dft_plus_u) 
 	{
-		GlobalC::dftu.init(GlobalC::ucell, GlobalC::ParaO, this->LM);
+		GlobalC::dftu.init(GlobalC::ucell, this->LM);
 	}
 
   if(INPUT.dft_plus_dmft) GlobalC::dmft.init(INPUT, GlobalC::ucell);

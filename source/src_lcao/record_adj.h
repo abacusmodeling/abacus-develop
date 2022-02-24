@@ -2,6 +2,7 @@
 #define RECORD_ADJ_H
 
 #include "grid_technique.h"
+#include "src_parallel/parallel_orbitals.h"
 
 
 //---------------------------------------------------
@@ -18,7 +19,7 @@ class Record_adj
 	// This will record the orbitals according to
 	// HPSEPS's 2D block division.
 	//--------------------------------------------
-	void for_2d();
+	void for_2d(const Parallel_Orbitals &pv);
 
 	//--------------------------------------------
 	// This will record the orbitals according to

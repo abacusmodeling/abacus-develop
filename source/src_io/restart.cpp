@@ -56,9 +56,9 @@ void Restart::save_disk(LCAO_Matrix &lm, const std::string mode, const int i) co
 	if("H"==mode)
 	{
 		if(GlobalV::GAMMA_ONLY_LOCAL)
-			write_file2(folder+"Hgamma_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK)+"_"+ModuleBase::GlobalFunc::TO_STRING(i), lm.Hloc.data(), GlobalC::ParaO.nloc*sizeof(double));
+			write_file2(folder+"Hgamma_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK)+"_"+ModuleBase::GlobalFunc::TO_STRING(i), lm.Hloc.data(), lm.ParaV->nloc*sizeof(double));
 		else
-			write_file2(folder+"Hk_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK)+"_"+ModuleBase::GlobalFunc::TO_STRING(i), lm.Hloc2.data(), GlobalC::ParaO.nloc*sizeof(std::complex<double>));
+			write_file2(folder+"Hk_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK)+"_"+ModuleBase::GlobalFunc::TO_STRING(i), lm.Hloc2.data(), lm.ParaV->nloc*sizeof(std::complex<double>));
 	}
 }
 
@@ -69,8 +69,8 @@ void Restart::load_disk(LCAO_Matrix &lm, const std::string mode, const int i) co
 	if("H"==mode)
 	{
 		if(GlobalV::GAMMA_ONLY_LOCAL)
-			read_file2(folder+"Hgamma_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK)+"_"+ModuleBase::GlobalFunc::TO_STRING(i), lm.Hloc.data(), GlobalC::ParaO.nloc*sizeof(double));
+			read_file2(folder+"Hgamma_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK)+"_"+ModuleBase::GlobalFunc::TO_STRING(i), lm.Hloc.data(), lm.ParaV->nloc*sizeof(double));
 		else
-			read_file2(folder+"Hk_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK)+"_"+ModuleBase::GlobalFunc::TO_STRING(i), lm.Hloc2.data(), GlobalC::ParaO.nloc*sizeof(std::complex<double>));
+			read_file2(folder+"Hk_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK)+"_"+ModuleBase::GlobalFunc::TO_STRING(i), lm.Hloc2.data(), lm.ParaV->nloc*sizeof(std::complex<double>));
 	}
 }

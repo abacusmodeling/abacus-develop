@@ -5,84 +5,58 @@
 #include "../module_base/global_variable.h"
 #include "src_pdiag/pdiag_common.h"
 
-class Parallel_Orbitals
+/// These stucture packs the information of 2D-block-cyclic 
+/// parallel distribution of basis, wavefunction and matrix.
+struct Parallel_Orbitals
 {
-    public:
 
     Parallel_Orbitals();
     ~Parallel_Orbitals();
-
-    // type : Sloc(1) Hloc(2) Hloc_fixed(3)
-    bool in_this_processor(const int &iw1_all, const int &iw2_all);
-
+    
+    /// map from global-index to local-index
     int* trace_loc_row;
     int* trace_loc_col;
-    int out_hs; // mohan add 2010-09-02
-    int out_hsR; // LiuXh add 2019-07-16
 
-    void set_trace(void);
-
-    
-    LocalMatrix MatrixInfo;
-
-	int nrow;
+    /// local size (nloc = nrow * ncol)
+    int nrow;
 	int ncol;
-	long nloc;
+    long nloc;
 
-#ifdef __MPI
-    int blacs_ctxt;
-	int mpi_comm_rows, mpi_comm_cols;
-    int desc[9];
-#endif
-	// be called
-	void divide_HS_2d
-	(
-#ifdef __MPI
-		MPI_Comm DIAG_WORLD
-#endif
-	);
+    /// block size
+    int nb;
 
-#ifdef __MPI
-	MPI_Comm comm_2D;
-#endif
-
-	int nb;
-	int dim0;
+    /// the number of processors in each dimension of MPI_Cart structure
+    int dim0;
     int dim1;
-
-    // mohan add 2010-09-10
-	// output local wave functions.
-	// put it here because if we 
-	// use HPSEPS, the wave functions
-	// is needed to be collected first.
-    int out_lowf;
-    double** Z_LOC; //xiaohui add 2014-06-19
     
-protected: //also used in diago
-    int testpb;
-    bool alloc_Z_LOC; //xiaohui add 2014-12-22
     int lastband_in_proc;
 	int lastband_number; 
-	int* loc_sizes;
-    int loc_size;
-
-    void set_parameters(void);
-
+    
 #ifdef __MPI
-	void mpi_creat_cart(MPI_Comm *comm_2D, int prow, int pcol);
-
-	void mat_2d(MPI_Comm vu, const int &M_A, const int &N_A, const int & NB, LocalMatrix &loc_A);
-
-	void data_distribution(
-		MPI_Comm comm_2D, 
-		const std::string &file,
-		const int &n,
-		const int &NB,
-		double *A,
-		const LocalMatrix &loc_A);
-
+    /// blacs info
+    int blacs_ctxt;
+    int desc[9];
+    /// communicator for 2D-block
+    MPI_Comm comm_2D;
 #endif
 
+    /// only used in hpseps-diago
+	int* loc_sizes;
+    int loc_size;
+    bool alloc_Z_LOC; //xiaohui add 2014-12-22
+    double** Z_LOC; //xiaohui add 2014-06-19
+
+    /// used in hpseps, dftu and exx
+    LocalMatrix MatrixInfo;
+
+    // test parameter
+    int testpb;
+    
+    /// check whether a basis element is in this processor
+    /// (check whether local-index > 0 )
+   bool in_this_processor(const int& iw1_all, const int& iw2_all) const;
+
 };
+
 
 #endif

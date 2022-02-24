@@ -10,7 +10,7 @@ class LOOP_cell
 {
 	public:
 
-	LOOP_cell();
+	LOOP_cell(const Parallel_Orbitals &pv);
 	~LOOP_cell();
 
 	void opt_cell(ORB_control &orb_con);

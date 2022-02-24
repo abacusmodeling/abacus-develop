@@ -47,7 +47,7 @@ LCAO_nnr::~LCAO_nnr()
 }
 
 // be called in LOOP_ions.cpp
-void LCAO_nnr::cal_nnr(void)
+void LCAO_nnr::cal_nnr(const Parallel_Orbitals &pv)
 {
 	ModuleBase::TITLE("LCAO_nnr","cal_nnr");
 
@@ -107,13 +107,13 @@ void LCAO_nnr::cal_nnr(void)
 						// the index of orbitals in this processor
 						// according to HPSEPS's division method.
 						const int iw1_all = start1 + ii;
-						const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
+						const int mu = pv.trace_loc_row[iw1_all];
 						if(mu<0)continue;
 
 						for(int jj=0; jj<nw2; jj++)
 						{
 							const int iw2_all = start2 + jj;
-							const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
+							const int nu = pv.trace_loc_col[iw2_all];
 							if(nu<0)continue;
 
 							// orbital numbers for this atom (iat),
@@ -152,13 +152,13 @@ void LCAO_nnr::cal_nnr(void)
 							for(int ii=0; ii<nw1; ++ii)
 							{
 								const int iw1_all = start1 + ii;
-								const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
+								const int mu = pv.trace_loc_row[iw1_all];
 								if(mu<0)continue;
 
 								for(int jj=0; jj<nw2; ++jj)
 								{
 									const int iw2_all = start2 + jj;
-									const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
+									const int nu = pv.trace_loc_col[iw2_all];
 									if(nu<0)continue;
 
 									// orbital numbers for this atom (iat),
@@ -567,7 +567,8 @@ int LCAO_nnr::cal_RindexAtom(const int &u1, const int &u2, const int &u3, const 
 void LCAO_nnr::folding_fixedH(const int &ik, LCAO_Matrix &lm)
 {
 	ModuleBase::TITLE("LCAO_nnr","folding_fixedH");
-	ModuleBase::timer::tick("LCAO_nnr","folding_fixedH");
+    ModuleBase::timer::tick("LCAO_nnr", "folding_fixedH");
+    const Parallel_Orbitals* pv = lm.ParaV;
 
 	int iat = 0;
 	int index = 0;
@@ -582,7 +583,7 @@ void LCAO_nnr::folding_fixedH(const int &ik, LCAO_Matrix &lm)
 #ifdef __DEEPKS
 	if (GlobalV::deepks_scf)
     {
-		ModuleBase::GlobalFunc::ZEROS(GlobalC::ld.H_V_delta_k[ik], GlobalC::ParaO.nloc);
+		ModuleBase::GlobalFunc::ZEROS(GlobalC::ld.H_V_delta_k[ik], pv->nloc);
 	}
 #endif
 
@@ -663,24 +664,24 @@ void LCAO_nnr::folding_fixedH(const int &ik, LCAO_Matrix &lm)
 					{
 						// the index of orbitals in this processor
 						const int iw1_all = start + ii;
-						const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
+						const int mu = pv->trace_loc_row[iw1_all];
 						if(mu<0)continue;
 
 						for(int jj=0; jj<atom2->nw*GlobalV::NPOL; jj++)
 						{
 							int iw2_all = start2 + jj;
-							const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
+							const int nu = pv->trace_loc_col[iw2_all];
 
 							if(nu<0)continue;
-							//const int iic = mu*GlobalC::ParaO.ncol+nu;
+							//const int iic = mu*pv->ncol+nu;
                             int iic;
                             if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                             {
-                                iic=mu+nu*GlobalC::ParaO.nrow;
+                                iic=mu+nu*pv->nrow;
                             }
                             else
                             {
-                                iic=mu*GlobalC::ParaO.ncol+nu;
+                                iic=mu*pv->ncol+nu;
                             }
 
 							//########################### EXPLAIN ###############################

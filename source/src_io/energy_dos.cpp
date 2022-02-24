@@ -28,6 +28,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 {
 	ModuleBase::TITLE("energy","perform_dos");
 
+    const Parallel_Orbitals* pv = uhm.LM->ParaV;
 
     if(out_dos !=0 || out_band !=0)
     {
@@ -259,7 +260,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 			{
 				std::vector<ModuleBase::matrix>   Mulk;
 				Mulk.resize(1);
-				Mulk[0].create(GlobalC::ParaO.ncol,GlobalC::ParaO.nrow);
+				Mulk[0].create(pv->ncol,pv->nrow);
 
 
 				ModuleBase::matrix Dwf = lowf.wfc_gamma[is];
@@ -288,20 +289,20 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 							&T_char,
 							&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 							&one_float,
-							uhm.LM->Sloc.data(), &one_int, &one_int, GlobalC::ParaO.desc,
-							Dwf.c, &one_int, &NB, GlobalC::ParaO.desc, &one_int,
+							uhm.LM->Sloc.data(), &one_int, &one_int, pv->desc,
+							Dwf.c, &one_int, &NB, pv->desc, &one_int,
 							&zero_float,
-							Mulk[0].c, &one_int, &NB, GlobalC::ParaO.desc,
+							Mulk[0].c, &one_int, &NB, pv->desc,
 							&one_int);
 
 					for (int j=0; j<GlobalV::NLOCAL; ++j)
 					{
 
-						if ( GlobalC::ParaO.in_this_processor(j,i) )
+						if ( pv->in_this_processor(j,i) )
 						{
 
-							const int ir = GlobalC::ParaO.trace_loc_row[j];
-							const int ic = GlobalC::ParaO.trace_loc_col[i];
+							const int ir = pv->trace_loc_row[j];
+							const int ic = pv->trace_loc_col[i];
 							waveg[j] = Mulk[0](ic,ir)*lowf.wfc_gamma[is](ic,ir);
 							const double x = waveg[j].real();
 							BlasConnector::axpy(np , x,Gauss, 1,pdosk[is].c+j*pdosk[is].nc,1);
@@ -332,7 +333,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 				uhm.genH.build_ST_new('S', false, GlobalC::ucell);
 				std::vector<ModuleBase::ComplexMatrix> Mulk;
 				Mulk.resize(1);
-				Mulk[0].create(GlobalC::ParaO.ncol,GlobalC::ParaO.nrow);
+				Mulk[0].create(pv->ncol,pv->nrow);
 
 
 				for(int ik=0;ik<GlobalC::kv.nks;ik++)
@@ -340,7 +341,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 
 					if(is == GlobalC::kv.isk[ik])
 					{
-						uhm.LM->allocate_HS_k(GlobalC::ParaO.nloc);
+						uhm.LM->allocate_HS_k(pv->nloc);
 						uhm.LM->zeros_HSk('S');
 						GlobalC::LNNR.folding_fixedH(ik, *uhm.LM);
 
@@ -374,10 +375,10 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 									&T_char,
 									&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 									&one_float,
-									uhm.LM->Sloc2.data(), &one_int, &one_int, GlobalC::ParaO.desc,
-									Dwfc.c, &one_int, &NB, GlobalC::ParaO.desc, &one_int,
+									uhm.LM->Sloc2.data(), &one_int, &one_int, pv->desc,
+									Dwfc.c, &one_int, &NB, pv->desc, &one_int,
 									&zero_float,
-									Mulk[0].c, &one_int, &NB, GlobalC::ParaO.desc,
+									Mulk[0].c, &one_int, &NB, pv->desc,
 									&one_int);
 
 
@@ -385,11 +386,11 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 							for (int j=0; j<GlobalV::NLOCAL; ++j)
 							{
 
-								if ( GlobalC::ParaO.in_this_processor(j,i) )
+								if ( pv->in_this_processor(j,i) )
 								{
 
-									const int ir = GlobalC::ParaO.trace_loc_row[j];
-									const int ic = GlobalC::ParaO.trace_loc_col[i];
+									const int ir = pv->trace_loc_row[j];
+									const int ic = pv->trace_loc_col[i];
 
 									waveg[j] = Mulk[0](ic,ir)*lowf.wfc_k[ik](ic,ir);
 									const double x = waveg[j].real();

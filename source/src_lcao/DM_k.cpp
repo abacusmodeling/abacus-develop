@@ -52,14 +52,14 @@ void Local_Orbital_Charge::allocate_DM_k(void)
     this->init_dm_2d();
 	if(GlobalC::wf.start_wfc=="file")
 	{
-		this->kpt_file(GlobalC::GridT, this->LOWF->wfc_k);
+		this->kpt_file(GlobalC::GridT, *this->LOWF);
 	}
 
     return;
 }
 
 void Local_Orbital_Charge::kpt_file(const Grid_Technique& gt,
-    std::vector<ModuleBase::ComplexMatrix> &wfc_k)
+    Local_Orbital_wfc &lowf)
 {
 	ModuleBase::TITLE("Local_Orbital_Charge","kpt_file");
 
@@ -71,11 +71,11 @@ void Local_Orbital_Charge::kpt_file(const Grid_Technique& gt,
 	for(int ik=0; ik<GlobalC::kv.nkstot; ++ik)
 	{
 
-		wfc_k[ik].create(GlobalC::ParaO.ncol, GlobalC::ParaO.nrow);
-		wfc_k[ik].zero_out();
+		lowf.wfc_k[ik].create(this->ParaV->ncol, this->ParaV->nrow);
+		lowf.wfc_k[ik].zero_out();
 
 		GlobalV::ofs_running << " Read in wave functions " << ik + 1 << std::endl;
-		error = WF_Local::read_lowf_complex( ctot , ik, &wfc_k);
+		error = WF_Local::read_lowf_complex( ctot , ik, lowf);
 
 #ifdef __MPI
 		Parallel_Common::bcast_int(error);

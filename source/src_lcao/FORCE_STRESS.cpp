@@ -306,7 +306,7 @@ void Force_Stress_LCAO::getForceStress(
 						GlobalC::ucell,
 						GlobalC::ORB,
 						GlobalC::GridD,
-						GlobalC::ParaO);
+						*loc.ParaV);
 				}
 				else
 				{			
@@ -314,7 +314,7 @@ void Force_Stress_LCAO::getForceStress(
 						GlobalC::ucell,
 						GlobalC::ORB,
 						GlobalC::GridD,
-						GlobalC::ParaO,
+						*loc.ParaV,
 						GlobalC::kv);	
 				}
 				GlobalC::ld.cal_gvx(GlobalC::ucell.nat);

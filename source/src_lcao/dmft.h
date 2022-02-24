@@ -9,6 +9,7 @@
 #include "../module_cell/unitcell_pseudo.h"
 #include "../module_base/complexmatrix.h"
 #include "src_lcao/LCAO_matrix.h"
+#include "src_lcao/local_orbital_charge.h"
 
 #include <string>
 #include <vector>
@@ -23,11 +24,11 @@ namespace ModuleDMFT
 
     public:
     void init(Input& in, UnitCell_pseudo &cell);
-    void out_to_dmft(std::vector<ModuleBase::ComplexMatrix> wfc_k,
+    void out_to_dmft(Local_Orbital_wfc &lowf,
         LCAO_Matrix &lm);
     void out_kvector();
     void out_correlated_atom_info();
-    void out_eigen_vector(const std::vector<ModuleBase::ComplexMatrix>& wfc);
+    void out_eigen_vector(Local_Orbital_wfc &lowf);
 
     static int mag_num2m_index(const int m);
 

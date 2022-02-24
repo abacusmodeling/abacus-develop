@@ -3,6 +3,7 @@
 #define EXX_ABFS_PARALLEL_COMMUNICATE_FUNCTION_H
 
 #include "exx_abfs-parallel.h"
+#include "src_parallel/parallel_orbitals.h"
 #include <vector>
 #include <utility>
 #ifdef __MPI
@@ -14,7 +15,7 @@ class Exx_Abfs::Parallel::Communicate::Function
 {
 public:
 #ifdef __MPI
-	static std::vector<std::pair<std::vector<bool>,std::vector<bool>>> get_atom_in_2D_list(const MPI_Comm &mpi_comm);
+	static std::vector<std::pair<std::vector<bool>,std::vector<bool>>> get_atom_in_2D_list(const MPI_Comm &mpi_comm, const Parallel_Orbitals &pv);
 #endif
 };
 

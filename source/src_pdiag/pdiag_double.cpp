@@ -25,7 +25,7 @@ extern "C"
 
 
 #ifdef __MPI
-inline int set_elpahandle(elpa_t &handle, int *desc, int local_nrows, int local_ncols)
+inline int set_elpahandle(elpa_t &handle, const int *desc,const int local_nrows,const int local_ncols)
 {
   int error;
   int nprows, npcols, myprow, mypcol;
@@ -65,30 +65,9 @@ inline bool ifElpaHandle(const bool& newIteration, const bool& ifNSCF)
 	return doHandle;
 }
 
-Pdiag_Double::Pdiag_Double()
-{
-	testpb = 0;//mohan add 2011-03-16
-	alloc_Z_LOC = false; //xiaohui add 2014-12-22
-    // default value of nb is 1,
-	// but can change to larger value from input.
-    nb = 1;
-	MatrixInfo.row_set = new int[1];
-	MatrixInfo.col_set = new int[1];
-}
+Pdiag_Double::Pdiag_Double(){}
 
-Pdiag_Double::~Pdiag_Double()
-{
-	if(alloc_Z_LOC)//xiaohui add 2014-12-22
-	{
-		for(int is=0; is<GlobalV::NSPIN; is++)
-		{
-			delete[] Z_LOC[is];
-		}
-		delete[] Z_LOC;
-	}
-    delete[] MatrixInfo.row_set;
-	delete[] MatrixInfo.col_set;
-}
+Pdiag_Double::~Pdiag_Double(){}
 
 
 void Pdiag_Double::diago_double_begin(
@@ -99,17 +78,19 @@ void Pdiag_Double::diago_double_begin(
     double* Stmp, 	// because the output Stmp will be different from Sloc2, so we need to copy that.
     double* ekb) // eigenvalues for each k-point and band
 {
-	#ifdef TEST_DIAG
+    const Parallel_Orbitals* pv = this->ParaV = lowf.ParaV;
+    
+#ifdef TEST_DIAG
 	{
 		static int istep = 0;
 		auto print_matrix_C = [&](const std::string &file_name, double*m)
 		{
 			std::ofstream ofs(file_name+"-C_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
-			for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
+			for(int ic=0; ic<pv->ncol; ++ic)
 			{
-				for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
+				for(int ir=0; ir<pv->nrow; ++ir)
 				{
-					const int index=ic*GlobalC::ParaO.nrow+ir;
+					const int index=ic*pv->nrow+ir;
 					if(abs(m[index])>1E-10)
 						ofs<<m[index]<<"\t";
 					else
@@ -121,11 +102,11 @@ void Pdiag_Double::diago_double_begin(
 		auto print_matrix_F = [&](const std::string &file_name, double*m)
 		{
 			std::ofstream ofs(file_name+"-F_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
-			for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
+			for(int ir=0; ir<pv->nrow; ++ir)
 			{
-				for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
+				for(int ic=0; ic<pv->ncol; ++ic)
 				{
-					const int index=ic*GlobalC::ParaO.nrow+ir;
+					const int index=ic*pv->nrow+ir;
 					if(abs(m[index])>1E-10)
 						ofs<<m[index]<<"\t";
 					else
@@ -144,7 +125,7 @@ void Pdiag_Double::diago_double_begin(
 
 #ifdef __MPI
 	ModuleBase::TITLE("Pdiag_Double","diago_begin");
-	assert(this->loc_size > 0);
+	assert(pv->loc_size > 0);
 	assert(GlobalV::NLOCAL > 0);
 
 	char uplo='U';
@@ -152,8 +133,8 @@ void Pdiag_Double::diago_double_begin(
 
     int nprocs, myid;
     MPI_Status status;
-    MPI_Comm_size(comm_2D, &nprocs);
-    MPI_Comm_rank(comm_2D, &myid);
+    MPI_Comm_size(pv->comm_2D, &nprocs);
+    MPI_Comm_rank(pv->comm_2D, &myid);
 
 	// parallel diagonalize the
 	// H | psi > = S | psi >
@@ -166,22 +147,23 @@ void Pdiag_Double::diago_double_begin(
         double *eigen = new double[GlobalV::NLOCAL];
         ModuleBase::GlobalFunc::ZEROS(eigen, GlobalV::NLOCAL);
 
-        double* Z = new double[this->loc_size * GlobalV::NLOCAL];
-        ModuleBase::GlobalFunc::ZEROS(Z, this->loc_size * GlobalV::NLOCAL);
+        double* Z = new double[pv->loc_size * GlobalV::NLOCAL];
+        ModuleBase::GlobalFunc::ZEROS(Z, pv->loc_size * GlobalV::NLOCAL);
 
-        ModuleBase::Memory::record("Pdiag_Double","Z",loc_size * GlobalV::NLOCAL,"double");
+        ModuleBase::Memory::record("Pdiag_Double","Z", pv->loc_size * GlobalV::NLOCAL,"double");
         ModuleBase::timer::tick("Diago_LCAO_Matrix","pdgseps");
-		BlasConnector::copy(nloc, s_mat, inc, Stmp, inc);
-		pdgseps(comm_2D, GlobalV::NLOCAL, nb, h_mat, Stmp, Z, eigen, this->MatrixInfo, uplo, this->loc_size, loc_pos);
+        BlasConnector::copy(pv->nloc, s_mat, inc, Stmp, inc);
+        int loc_size = pv->loc_size;
+        pdgseps(pv->comm_2D, GlobalV::NLOCAL, pv->nb, h_mat, Stmp, Z, eigen, pv->MatrixInfo, uplo, loc_size, loc_pos);
         ModuleBase::timer::tick("Diago_LCAO_Matrix","pdgseps");
 
-        if(myid <= lastband_in_proc)
+        if(myid <= pv->lastband_in_proc)
         {
-            for(int i=0; i<loc_sizes[myid]; i++)
+            for(int i=0; i<pv->loc_sizes[myid]; i++)
             {
                 for(int n=0; n<GlobalV::NLOCAL; n++)
                 {
-                    Z_LOC[ik][n*loc_sizes[myid] + i] = Z[n*loc_sizes[myid] + i];
+                    pv->Z_LOC[ik][n*pv->loc_sizes[myid] + i] = Z[n*pv->loc_sizes[myid] + i];
                 }
             }
         }
@@ -208,15 +190,15 @@ void Pdiag_Double::diago_double_begin(
         ModuleBase::GlobalFunc::ZEROS(eigen, GlobalV::NLOCAL);
 
         long maxnloc; // maximum number of elements in local matrix
-        MPI_Reduce(&nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, comm_2D);
-        MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, comm_2D);
-		lowf.wfc_gamma[ik].create(this->ncol,this->nrow);			// Fortran order
+        MPI_Reduce(&pv->nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, pv->comm_2D);
+        MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, pv->comm_2D);
+        lowf.wfc_gamma[ik].create(pv->ncol, pv->nrow);			// Fortran order
 
         static elpa_t handle;
         static bool has_set_elpa_handle = false;
         if(! has_set_elpa_handle)
         {
-            set_elpahandle(handle, desc, nrow, ncol);
+            set_elpahandle(handle, pv->desc, pv->nrow, pv->ncol);
             has_set_elpa_handle = true;
         }
 
@@ -224,7 +206,7 @@ void Pdiag_Double::diago_double_begin(
         if(ifElpaHandle(GlobalC::CHR.get_new_e_iteration(), (GlobalV::CALCULATION=="nscf")))
         {
             ModuleBase::timer::tick("Diago_LCAO_Matrix","decompose_S");
-            BlasConnector::copy(nloc, s_mat, inc, Stmp, inc);
+            BlasConnector::copy(pv->nloc, s_mat, inc, Stmp, inc);
             is_already_decomposed=0;
             ModuleBase::timer::tick("Diago_LCAO_Matrix","decompose_S");
         }
@@ -251,7 +233,7 @@ void Pdiag_Double::diago_double_begin(
 		int pos=0;
 		for(int i=0; i<myid; ++i)
 		{
-			pos+=loc_sizes[i];
+			pos+=pv->loc_sizes[i];
 		}
 		int naroc[2]; // maximum number of row or column
 		double **ctot;
@@ -269,26 +251,26 @@ void Pdiag_Double::diago_double_begin(
 
         double *work=new double[maxnloc]; // work/buffer matrix
         int info;
-		for(int iprow=0; iprow<dim0; ++iprow)
+		for(int iprow=0; iprow<pv->dim0; ++iprow)
 		{
-			for(int ipcol=0; ipcol<dim1; ++ipcol)
+			for(int ipcol=0; ipcol<pv->dim1; ++ipcol)
 			{
 				const int coord[2]={iprow, ipcol};
 				int src_rank;
-				MPI_Cart_rank(comm_2D, coord, &src_rank);
+				MPI_Cart_rank(pv->comm_2D, coord, &src_rank);
 				if(myid==src_rank)
 				{
-					BlasConnector::copy(nloc, lowf.wfc_gamma[ik].c, inc, work, inc);
-					naroc[0]=nrow;
-					naroc[1]=ncol;
+					BlasConnector::copy(pv->nloc, lowf.wfc_gamma[ik].c, inc, work, inc);
+					naroc[0]=pv->nrow;
+					naroc[1]=pv->ncol;
 				}
-				info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, comm_2D);
-				info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, src_rank, comm_2D);
+				info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, pv->comm_2D);
+				info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, src_rank, pv->comm_2D);
 
 				if(out_lowf)
 				{
-                    info=lowf.q2CTOT(myid, naroc, nb,
-                        dim0, dim1, iprow, ipcol, this->loc_size,
+                    info=lowf.q2CTOT(myid, naroc, pv->nb,
+                        pv->dim0, pv->dim1, iprow, ipcol, pv->loc_size,
                         work, ctot);
 				}//out_lowf
 			}//loop ipcol
@@ -313,10 +295,10 @@ void Pdiag_Double::diago_double_begin(
 	} // GenELPA method
 	else if(GlobalV::KS_SOLVER=="lapack_gv")
 	{
-		lowf.wfc_gamma[ik].create(this->ncol, this->nrow, false);
-		memcpy( lowf.wfc_gamma[ik].c, h_mat, sizeof(double)*this->ncol*this->nrow );
-		ModuleBase::matrix s_tmp(this->ncol, this->nrow, false);
-		memcpy( s_tmp.c, s_mat, sizeof(double)*this->ncol*this->nrow );
+		lowf.wfc_gamma[ik].create(pv->ncol, pv->nrow, false);
+		memcpy( lowf.wfc_gamma[ik].c, h_mat, sizeof(double)*pv->ncol*pv->nrow );
+		ModuleBase::matrix s_tmp(pv->ncol, pv->nrow, false);
+		memcpy( s_tmp.c, s_mat, sizeof(double)*pv->ncol*pv->nrow );
 		std::vector<double> ekb_tmp(GlobalV::NLOCAL,0);
 
 		const char jobz='V', uplo='U';
@@ -346,11 +328,11 @@ void Pdiag_Double::diago_double_begin(
 	}
 	else if(GlobalV::KS_SOLVER=="lapack_gvx")
 	{
-		ModuleBase::matrix h_tmp(this->ncol, this->nrow, false);
-		memcpy( h_tmp.c, h_mat, sizeof(double)*this->ncol*this->nrow );
-		ModuleBase::matrix s_tmp(this->ncol, this->nrow, false);
-		memcpy( s_tmp.c, s_mat, sizeof(double)*this->ncol*this->nrow );
-		lowf.wfc_gamma[ik].create(this->ncol, this->nrow, false);
+		ModuleBase::matrix h_tmp(pv->ncol, pv->nrow, false);
+		memcpy( h_tmp.c, h_mat, sizeof(double)*pv->ncol*pv->nrow );
+		ModuleBase::matrix s_tmp(pv->ncol, pv->nrow, false);
+		memcpy( s_tmp.c, s_mat, sizeof(double)*pv->ncol*pv->nrow );
+		lowf.wfc_gamma[ik].create(pv->ncol, pv->nrow, false);
 
 		const char jobz='V', range='I', uplo='U';
 		const int itype=1, il=1, iu=GlobalV::NBANDS;
@@ -387,7 +369,7 @@ void Pdiag_Double::diago_double_begin(
 	}
 	else if(GlobalV::KS_SOLVER=="scalapack_gvx")
 	{
-		diag_scalapack_gvx.pdsygvx_diag(this->desc, this->ncol, this->nrow, h_mat, s_mat, ekb, lowf.wfc_gamma[ik]);		// Peize Lin add 2021.11.02
+		diag_scalapack_gvx.pdsygvx_diag(pv->desc, pv->ncol, pv->nrow, h_mat, s_mat, ekb, lowf.wfc_gamma[ik]);		// Peize Lin add 2021.11.02
 	}
     //delete[] Stmp; //LiuXh 20171109
 #endif
@@ -425,17 +407,19 @@ void Pdiag_Double::diago_complex_begin(
     std::complex<double>* Stmp, 	// because the output Stmp will be different from Sloc2, so we need to copy that.
     double* ekb)
 {
-    #ifdef TEST_DIAG
+    const Parallel_Orbitals* pv = this->ParaV = lowf.ParaV;
+    
+#ifdef TEST_DIAG
    	{
 		static int istep = 0;
 		auto print_matrix_C = [&](const std::string &file_name, std::complex<double>*m)
 		{
 			std::ofstream ofs(file_name+"-C_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
-			for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
+			for(int ic=0; ic<pv->ncol; ++ic)
 			{
-				for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
+				for(int ir=0; ir<pv->nrow; ++ir)
 				{
-					const int index=ic*GlobalC::ParaO.nrow+ir;
+					const int index=ic*pv->nrow+ir;
 					if(std::norm(m[index])>1E-10)
                     {
                         if(std::imag(m[index])>1E-10)
@@ -458,11 +442,11 @@ void Pdiag_Double::diago_complex_begin(
 		auto print_matrix_F = [&](const std::string &file_name, std::complex<double>*m)
 		{
 			std::ofstream ofs(file_name+"-F_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
-			for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
+			for(int ir=0; ir<pv->nrow; ++ir)
 			{
-				for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
+				for(int ic=0; ic<pv->ncol; ++ic)
 				{
-					const int index=ic*GlobalC::ParaO.nrow+ir;
+					const int index=ic*pv->nrow+ir;
 					if(std::norm(m[index])>1E-10)
                     {
                         if(std::imag(m[index])>1E-10)
@@ -498,8 +482,8 @@ void Pdiag_Double::diago_complex_begin(
 
     int nprocs, myid;
     MPI_Status status;
-    MPI_Comm_size(comm_2D, &nprocs);
-    MPI_Comm_rank(comm_2D, &myid);
+    MPI_Comm_size(pv->comm_2D, &nprocs);
+    MPI_Comm_rank(pv->comm_2D, &myid);
 
 	// parallel diagonalize the
 	// H | psi > = S | psi >
@@ -511,15 +495,16 @@ void Pdiag_Double::diago_complex_begin(
         double *eigen = new double[GlobalV::NLOCAL];
         ModuleBase::GlobalFunc::ZEROS(eigen, GlobalV::NLOCAL);
 
-        assert(loc_size > 0);
-        std::complex<double>* Z = new std::complex<double>[this->loc_size * GlobalV::NLOCAL];
-        ModuleBase::GlobalFunc::ZEROS(Z, this->loc_size * GlobalV::NLOCAL);
+        assert(pv->loc_size > 0);
+        std::complex<double>* Z = new std::complex<double>[pv->loc_size * GlobalV::NLOCAL];
+        ModuleBase::GlobalFunc::ZEROS(Z, pv->loc_size * GlobalV::NLOCAL);
 
-        ModuleBase::Memory::record("Pdiag_Double","Z",loc_size * GlobalV::NLOCAL,"cdouble");
+        ModuleBase::Memory::record("Pdiag_Double","Z",pv->loc_size * GlobalV::NLOCAL,"cdouble");
 		int nbands_tmp = GlobalV::NBANDS;
         ModuleBase::timer::tick("Diago_LCAO_Matrix","pzgseps");
-		BlasConnector::copy(nloc, cs_mat, inc, Stmp, inc);
-    	pzgseps(comm_2D, GlobalV::NLOCAL, nb, nbands_tmp, ch_mat, Stmp, Z, eigen, this->MatrixInfo, uplo, this->loc_size, loc_pos);
+        BlasConnector::copy(pv->nloc, cs_mat, inc, Stmp, inc);
+        int loc_size = pv->loc_size;
+        pzgseps(pv->comm_2D, GlobalV::NLOCAL, pv->nb, nbands_tmp, ch_mat, Stmp, Z, eigen, pv->MatrixInfo, uplo, loc_size, loc_pos);
         ModuleBase::timer::tick("Diago_LCAO_Matrix","pzgseps");
         // the eigenvalues.
         BlasConnector::copy(GlobalV::NBANDS, eigen, inc, ekb, inc);
@@ -537,19 +522,19 @@ void Pdiag_Double::diago_complex_begin(
         double *eigen = new double[GlobalV::NLOCAL];
         ModuleBase::GlobalFunc::ZEROS(eigen, GlobalV::NLOCAL);
         long maxnloc; // maximum number of elements in local matrix
-        MPI_Reduce(&nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, comm_2D);
-        MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, comm_2D);
-        lowf.wfc_k[ik].create(this->ncol,this->nrow);            // Fortran order
+        MPI_Reduce(&pv->nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, pv->comm_2D);
+        MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, pv->comm_2D);
+        lowf.wfc_k[ik].create(pv->ncol,pv->nrow);            // Fortran order
 
         static elpa_t handle;
         static bool has_set_elpa_handle = false;
         if(! has_set_elpa_handle)
         {
-            set_elpahandle(handle, desc, nrow, ncol);
+            set_elpahandle(handle, pv->desc, pv->nrow, pv->ncol);
             has_set_elpa_handle = true;
         }
 
-        BlasConnector::copy(nloc, cs_mat, inc, Stmp, inc);
+        BlasConnector::copy(pv->nloc, cs_mat, inc, Stmp, inc);
 
         ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_solve");
         int elpa_derror;
@@ -567,21 +552,21 @@ void Pdiag_Double::diago_complex_begin(
         std::complex<double> *work=new std::complex<double>[maxnloc]; // work/buffer matrix
         int naroc[2]; // maximum number of row or column
         int info;
-        for(int iprow=0; iprow<dim0; ++iprow)
+        for(int iprow=0; iprow<pv->dim0; ++iprow)
         {
-            for(int ipcol=0; ipcol<dim1; ++ipcol)
+            for(int ipcol=0; ipcol<pv->dim1; ++ipcol)
             {
                 const int coord[2]={iprow, ipcol};
                 int src_rank;
-                MPI_Cart_rank(comm_2D, coord, &src_rank);
+                MPI_Cart_rank(pv->comm_2D, coord, &src_rank);
                 if(myid==src_rank)
                 {
-                    BlasConnector::copy(nloc, lowf.wfc_k[ik].c, inc, work, inc);
-                    naroc[0]=nrow;
-                    naroc[1]=ncol;
+                    BlasConnector::copy(pv->nloc, lowf.wfc_k[ik].c, inc, work, inc);
+                    naroc[0]=pv->nrow;
+                    naroc[1]=pv->ncol;
                 }
-                info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, comm_2D);
-                info=MPI_Bcast(work, maxnloc, MPI_DOUBLE_COMPLEX, src_rank, comm_2D);
+                info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, pv->comm_2D);
+                info=MPI_Bcast(work, maxnloc, MPI_DOUBLE_COMPLEX, src_rank, pv->comm_2D);
 
                 if(this->out_lowf)
                 {
@@ -597,8 +582,8 @@ void Pdiag_Double::diago_complex_begin(
                         ModuleBase::Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
                     }
 					// mohan update 2021-02-12, delete BFIELD option
-					info=lowf.q2WFC_CTOT_complex(myid, naroc, nb,
-							dim0, dim1, iprow, ipcol,
+					info=lowf.q2WFC_CTOT_complex(myid, naroc, pv->nb,
+							pv->dim0, pv->dim1, iprow, ipcol,
 							work, lowf.wfc_k_grid[ik], ctot);
                     std::stringstream ss;
 	                ss << GlobalV::global_out_dir << "LOWF_K_" << ik+1 << ".dat";
@@ -617,8 +602,8 @@ void Pdiag_Double::diago_complex_begin(
                 else
                 {
 					// mohan update 2021-02-12, delte BFIELD option
-					info=lowf.q2WFC_complex(naroc, nb,
-							dim0, dim1, iprow, ipcol,
+					info=lowf.q2WFC_complex(naroc, pv->nb,
+							pv->dim0, pv->dim1, iprow, ipcol,
 							work, lowf.wfc_k_grid[ik]);
 				}
             }
@@ -628,7 +613,7 @@ void Pdiag_Double::diago_complex_begin(
     } // GenELPA method
 	else if(GlobalV::KS_SOLVER=="scalapack_gvx")
 	{
-		diag_scalapack_gvx.pzhegvx_diag(this->desc, this->ncol, this->nrow, ch_mat, cs_mat, ekb, lowf.wfc_k[ik]);		// Peize Lin add 2021.11.02
+		diag_scalapack_gvx.pzhegvx_diag(pv->desc, pv->ncol, pv->nrow, ch_mat, cs_mat, ekb, lowf.wfc_k[ik]);		// Peize Lin add 2021.11.02
 
 		// the follow will be deleted after finish newdm
 		{
@@ -637,26 +622,26 @@ void Pdiag_Double::diago_complex_begin(
 
 			int info;
 			long maxnloc; // maximum number of elements in local matrix
-			info=MPI_Reduce(&nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, comm_2D);
-			info=MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, comm_2D);
+			info=MPI_Reduce(&pv->nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, pv->comm_2D);
+			info=MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, pv->comm_2D);
 			std::complex<double> *work=new std::complex<double>[maxnloc]; // work/buffer matrix
 
 			int naroc[2]; // maximum number of row or column
-			for(int iprow=0; iprow<dim0; ++iprow)
+			for(int iprow=0; iprow<pv->dim0; ++iprow)
 			{
-				for(int ipcol=0; ipcol<dim1; ++ipcol)
+				for(int ipcol=0; ipcol<pv->dim1; ++ipcol)
 				{
 					const int coord[2]={iprow, ipcol};
 					int src_rank;
-					info=MPI_Cart_rank(comm_2D, coord, &src_rank);
+					info=MPI_Cart_rank(pv->comm_2D, coord, &src_rank);
 					if(myid==src_rank)
 					{
-						BlasConnector::copy(nloc, lowf.wfc_k[ik].c, inc, work, inc);
-						naroc[0]=nrow;
-						naroc[1]=ncol;
+						BlasConnector::copy(pv->nloc, lowf.wfc_k[ik].c, inc, work, inc);
+						naroc[0]=pv->nrow;
+						naroc[1]=pv->ncol;
 					}
-					info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, comm_2D);
-					info=MPI_Bcast(work, maxnloc, MPI_DOUBLE_COMPLEX, src_rank, comm_2D);
+					info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, pv->comm_2D);
+					info=MPI_Bcast(work, maxnloc, MPI_DOUBLE_COMPLEX, src_rank, pv->comm_2D);
 
 					if(this->out_lowf)
 					{
@@ -672,8 +657,8 @@ void Pdiag_Double::diago_complex_begin(
 							ModuleBase::Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
 						}
 						// mohan update 2021-02-12, delete BFIELD option
-						info=lowf.q2WFC_CTOT_complex(myid, naroc, nb,
-								dim0, dim1, iprow, ipcol,
+						info=lowf.q2WFC_CTOT_complex(myid, naroc, pv->nb,
+								pv->dim0, pv->dim1, iprow, ipcol,
 								work, lowf.wfc_k_grid[ik], ctot);
 						std::stringstream ss;
 						ss << GlobalV::global_out_dir << "LOWF_K_" << ik+1 << ".dat";
@@ -692,8 +677,8 @@ void Pdiag_Double::diago_complex_begin(
 					else
 					{
 						// mohan update 2021-02-12, delte BFIELD option
-						info=lowf.q2WFC_complex(naroc, nb,
-								dim0, dim1, iprow, ipcol,
+						info=lowf.q2WFC_complex(naroc, pv->nb,
+								pv->dim0, pv->dim1, iprow, ipcol,
 								work, lowf.wfc_k_grid[ik]);
 					}
 				}
@@ -708,78 +693,3 @@ void Pdiag_Double::diago_complex_begin(
 }
 
 
-
-#ifdef __MPI
-void Pdiag_Double::readin(
-	const std::string &fa,
-	const std::string &fb,
-	const int &nlocal_tot,
-	double *eigen,
-	double *eigvr)
-{
-    ModuleBase::TITLE("Pdiag_Double","readin");
-
-    int coord[2];
-    int dim[2];
-    int period[2];
-    int i,j,tmp1,tmp2;
-    int k,loc_size,loc_pos;
-    double time1,time2;
-
-    MPI_Comm comm=DIAG_HPSEPS_WORLD,comm_2D,comm_col,comm_row,newcomm;
-
-    dim[0]=(int)sqrt((double)GlobalV::DSIZE);
-
-    while (GlobalV::DSIZE%dim[0]!=0)
-    {
-        dim[0]=dim[0]-1;
-    }
-    dim[1]=GlobalV::DSIZE/dim[0];
-
-    // call mpi_creat_cart
-    this->mpi_creat_cart(&comm_2D,dim[0],dim[1]);
-
-    // call mat_2d
-    this->mat_2d(comm_2D,nlocal_tot,nlocal_tot,nb,MatrixInfo);
-
-    loc_size=nlocal_tot/GlobalV::DSIZE;
-    if (GlobalV::DRANK<nlocal_tot%GlobalV::DSIZE) loc_size=loc_size+1;
-
-    GlobalV::ofs_running << " loc_size = " << loc_size;
-
-    /*Distribute the matrix*/
-    const long nloc = MatrixInfo.col_num * MatrixInfo.row_num;
-
-    double *A = new double[nloc];
-    double *B = new double[nloc];
-    double *Z = new double[loc_size*nlocal_tot];
-    ModuleBase::GlobalFunc::ZEROS(A, nloc);
-    ModuleBase::GlobalFunc::ZEROS(B, nloc);
-    ModuleBase::GlobalFunc::ZEROS(Z, loc_size * nlocal_tot);
-
-    GlobalV::ofs_running << "\n Data distribution of H." << std::endl;
-    this->data_distribution(comm_2D,fa,nlocal_tot,nb,A,MatrixInfo);
-    GlobalV::ofs_running << "\n Data distribution of S." << std::endl;
-    this->data_distribution(comm_2D,fb,nlocal_tot,nb,B,MatrixInfo);
-
-    time1=MPI_Wtime();
-    // call pdgseps
-    char uplo = 'U';
-    pdgseps(comm_2D,nlocal_tot,nb,A,B,Z,eigen,MatrixInfo,uplo,loc_size,loc_pos);
-    time2=MPI_Wtime();
-    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"time1",time1);
-    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"time2",time2);
-
-    //this->gath_eig(comm,n,eigvr,Z);
-
-    GlobalV::ofs_running << "\n " << std::setw(6) << "Band" << std::setw(25) << "Ry" << std::setw(25) << " eV" << std::endl;
-    for(int i=0; i<nlocal_tot; i++)
-    {
-        GlobalV::ofs_running << " " << std::setw(6) << i << std::setw(25) << eigen[i] << std::setw(25)<< eigen[i] * 13.6058 << std::endl;
-    }
-
-    delete[] A;
-    delete[] B;
-    delete[] Z;
-}
-#endif

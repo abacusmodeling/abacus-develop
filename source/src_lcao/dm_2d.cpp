@@ -48,10 +48,10 @@ void Local_Orbital_Charge::cal_dm(const ModuleBase::matrix& wg,
     assert(wg.nr==GlobalV::NSPIN);
     for(int is=0; is!=GlobalV::NSPIN; ++is)
     {
-        std::vector<double> wg_local(GlobalC::ParaO.ncol,0.0);
+        std::vector<double> wg_local(this->ParaV->ncol,0.0);
         for(int ib_global=0; ib_global!=wg.nc; ++ib_global)
         {
-            const int ib_local = GlobalC::ParaO.trace_loc_col[ib_global];
+            const int ib_local = this->ParaV->trace_loc_col[ib_global];
             if(ib_local>=0)
             {
                 wg_local[ib_local] = wg(is,ib_global);
@@ -75,10 +75,10 @@ void Local_Orbital_Charge::cal_dm(const ModuleBase::matrix& wg,
             &N_char, &T_char, 
             &GlobalV::NLOCAL, &GlobalV::NLOCAL, &wg.nc,
             &one_float,
-            wg_wfc.c, &one_int, &one_int, GlobalC::ParaO.desc,
-            wfc_gamma[is].c, &one_int, &one_int, GlobalC::ParaO.desc,
+            wg_wfc.c, &one_int, &one_int, this->ParaV->desc,
+            wfc_gamma[is].c, &one_int, &one_int, this->ParaV->desc,
             &zero_float,
-            dm_gamma[is].c, &one_int, &one_int, GlobalC::ParaO.desc);
+            dm_gamma[is].c, &one_int, &one_int, this->ParaV->desc);
     #else
         const int lda=GlobalV::NLOCAL;
         dgemm_(
@@ -119,10 +119,10 @@ void Local_Orbital_Charge::cal_dm(const ModuleBase::matrix& wg,    // wg(ik,ib),
     assert(wg.nr==GlobalC::kv.nks);
     for(int ik=0; ik!=GlobalC::kv.nks; ++ik)
     {
-        std::vector<double> wg_local(GlobalC::ParaO.ncol,0.0);
+        std::vector<double> wg_local(this->ParaV->ncol,0.0);
         for(int ib_global=0; ib_global!=wg.nc; ++ib_global)
         {
-            const int ib_local = GlobalC::ParaO.trace_loc_col[ib_global];
+            const int ib_local = this->ParaV->trace_loc_col[ib_global];
             if(ib_local>=0)
             {
                 wg_local[ib_local] = wg(ik,ib_global);
@@ -146,10 +146,10 @@ void Local_Orbital_Charge::cal_dm(const ModuleBase::matrix& wg,    // wg(ik,ib),
             &N_char, &T_char,
             &GlobalV::NLOCAL, &GlobalV::NLOCAL, &wg.nc,
             &one_float,
-            wg_wfc.c, &one_int, &one_int, GlobalC::ParaO.desc,
-            wfc_k[ik].c, &one_int, &one_int, GlobalC::ParaO.desc,
+            wg_wfc.c, &one_int, &one_int, this->ParaV->desc,
+            wfc_k[ik].c, &one_int, &one_int, this->ParaV->desc,
             &zero_float,
-            dm_k[ik].c, &one_int, &one_int, GlobalC::ParaO.desc);
+            dm_k[ik].c, &one_int, &one_int, this->ParaV->desc);
     #else
         const int lda=GlobalV::NLOCAL;
         const complex<double> one_complex={1.0,0.0}, zero_complex={0.0,0.0};
@@ -217,12 +217,12 @@ void Local_Orbital_Charge::cal_dm_R(
                     for (int iw1 = 0;iw1 < GlobalC::ucell.atoms[T1].nw;++iw1)
                     {
                         int iw1_all = start1 + iw1;
-                        int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
+                        int mu = this->ParaV->trace_loc_row[iw1_all];
                         if (mu < 0)continue;
                         for (int iw2 = 0;iw2 < GlobalC::ucell.atoms[T2].nw;++iw2)
                         {
                             int iw2_all = start2 + iw2;
-                            int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
+                            int nu = this->ParaV->trace_loc_col[iw2_all];
                             if (nu < 0)continue;
                             //Caution: output of pzgemm_ : col first in **each** proc itself !!
                             dm2d[ispin][irrstart + count] += (dm_k[ik](nu, mu) * phase).real();

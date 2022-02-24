@@ -30,6 +30,7 @@ LOOP_ions::LOOP_ions(LCAO_Matrix &lm)
     else
         this->LOWF.wfc_k.resize(GlobalC::kv.nks);
     this->UHM.genH.LM = this->UHM.LM = &lm;
+    this->LOC.ParaV = this->LOWF.ParaV = lm.ParaV;
 }
 
 LOOP_ions::~LOOP_ions()
@@ -182,7 +183,7 @@ void LOOP_ions::opt_ions()
         this->output_SR("outputs_to_DMFT/overlap_matrix/SR.csr");
         
         // Output wave functions, bands, k-points information, and etc.
-        GlobalC::dmft.out_to_dmft(this->LOWF.wfc_k, *this->UHM.LM);
+        GlobalC::dmft.out_to_dmft(this->LOWF, *this->UHM.LM);
         }
 
         if(GlobalC::ParaO.out_hsR)
@@ -200,7 +201,7 @@ void LOOP_ions::opt_ions()
                     GlobalC::ucell,
                     GlobalC::ORB,
                     GlobalC::GridD,
-                    GlobalC::ParaO);
+                    *this->LOWF.ParaV);
             }
             else
             {
@@ -208,7 +209,7 @@ void LOOP_ions::opt_ions()
                     GlobalC::ucell,
                     GlobalC::ORB,
                     GlobalC::GridD,
-                    GlobalC::ParaO,
+                    *this->LOWF.ParaV,
                     GlobalC::kv);
             }
 
@@ -220,11 +221,11 @@ void LOOP_ions::opt_ions()
             {
                 if(GlobalV::GAMMA_ONLY_LOCAL)
                 {
-                    GlobalC::ld.cal_e_delta_band(this->LOC.dm_gamma, GlobalC::ParaO);
+                    GlobalC::ld.cal_e_delta_band(this->LOC.dm_gamma, *this->LOWF.ParaV);
                 }
                 else
                 {
-                    GlobalC::ld.cal_e_delta_band_k(this->LOC.dm_k, GlobalC::ParaO, GlobalC::kv.nks);
+                    GlobalC::ld.cal_e_delta_band_k(this->LOC.dm_k, *this->LOWF.ParaV, GlobalC::kv.nks);
                 }
                 std::cout << "E_delta_band = " << std::setprecision(8) << GlobalC::ld.e_delta_band << " Ry" << " = " << std::setprecision(8) << GlobalC::ld.e_delta_band * ModuleBase::Ry_to_eV << " eV" << std::endl;
                 std::cout << "E_delta_NN= "<<std::setprecision(8) << GlobalC::ld.E_delta << " Ry" << " = "<<std::setprecision(8)<<GlobalC::ld.E_delta*ModuleBase::Ry_to_eV<<" eV"<<std::endl;
@@ -539,7 +540,7 @@ void LOOP_ions::final_scf(void)
     {
         // For each atom, calculate the adjacent atoms in different cells
         // and allocate the space for H(R) and S(R).
-        GlobalC::LNNR.cal_nnr();
+        GlobalC::LNNR.cal_nnr(*this->UHM.LM->ParaV);
         this->UHM.LM->allocate_HS_R(GlobalC::LNNR.nnr);
 #ifdef __DEEPKS
 		GlobalC::ld.allocate_V_deltaR(GlobalC::LNNR.nnr);

@@ -31,7 +31,7 @@ class Local_Orbital_Charge
 	void allocate_gamma(const Grid_Technique &gt);
 
     void gamma_file(const Grid_Technique& gt,
-        std::vector<ModuleBase::matrix> &wfc_gamma);
+        Local_Orbital_wfc &lowf);
     void cal_dk_gamma_from_2D_pub(void);
 
 
@@ -41,7 +41,7 @@ class Local_Orbital_Charge
 	void allocate_DM_k(void);
 	
     void kpt_file(const Grid_Technique& gt,
-        std::vector<ModuleBase::ComplexMatrix> &wfc_k);
+        Local_Orbital_wfc &lowf);
 
 	// liaochen modify on 2010-3-23 
 	// change its state from private to public
@@ -84,7 +84,11 @@ class Local_Orbital_Charge
     //-----------------
 	// wavefunctions' pointer
     //-----------------
-    Local_Orbital_wfc *LOWF;
+    Local_Orbital_wfc* LOWF;
+    //-----------------
+	// Parallel Variables' pointer
+    //-----------------
+    const Parallel_Orbitals* ParaV;
 
 private:
 

@@ -33,9 +33,11 @@ public:
     std::vector<ModuleBase::matrix> wfc_gamma;			// dm_gamma[is](iw1,iw2);
     std::vector<ModuleBase::ComplexMatrix> wfc_k;		// dm_k[ik](iw1,iw2);
 
+    const Parallel_Orbitals *ParaV;
+
 
     void allocate_k(const Grid_Technique& gt,
-        std::vector<ModuleBase::ComplexMatrix> &wfc_k);
+        Local_Orbital_wfc &lowf);
 
     //=========================================
     // Init Cij, make it satisfy 2 conditions:

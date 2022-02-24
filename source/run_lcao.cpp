@@ -114,7 +114,9 @@ void Run_lcao::lcao_line(void)
 		Exx_Abfs::Lmax,
 		GlobalC::ucell.infoNL.nprojmax,
 		GlobalC::ucell.infoNL.nproj,
-		GlobalC::ucell.infoNL.Beta);
+        GlobalC::ucell.infoNL.Beta);
+
+    orb_con.setup_2d_division();
 
 
 //--------------------------------------
@@ -178,12 +180,12 @@ void Run_lcao::lcao_line(void)
 
 	if(GlobalV::CALCULATION=="md")
 	{
-		Run_MD_LCAO run_md_lcao;
+		Run_MD_LCAO run_md_lcao(orb_con.ParaV);
 		run_md_lcao.opt_cell(orb_con);
 	}
 	else // cell relaxations
 	{
-        LOOP_cell lc;
+        LOOP_cell lc(orb_con.ParaV);
         //keep wfc_gamma or wfc_k remaining
         lc.opt_cell(orb_con);
 	}

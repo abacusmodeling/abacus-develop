@@ -41,7 +41,7 @@ Local_Orbital_wfc::~Local_Orbital_wfc()
 }
 
 void Local_Orbital_wfc::allocate_k(const Grid_Technique& gt,
-    std::vector<ModuleBase::ComplexMatrix>& wfc_k)
+    Local_Orbital_wfc &lowf)
 {
 	ModuleBase::TITLE("Local_Orbital_wfc","allocate_k");
 	if(GlobalV::NLOCAL < GlobalV::NBANDS)
@@ -101,7 +101,7 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique& gt,
 		for(int ik=0; ik<GlobalC::kv.nkstot; ++ik)
 		{
 			GlobalV::ofs_running << " Read in wave functions " << ik + 1 << std::endl;
-			error = WF_Local::read_lowf_complex( this->wfc_k_grid[ik], ik, &wfc_k);
+			error = WF_Local::read_lowf_complex( this->wfc_k_grid[ik], ik, lowf);
 		}
 #ifdef __MPI
 		Parallel_Common::bcast_int(error);
@@ -158,7 +158,8 @@ int  Local_Orbital_wfc::q2CTOT(
 	double* work,
 	double** CTOT)
 {
-    for(int j=0; j<naroc[1]; ++j)
+    ModuleBase::TITLE(" Local_Orbital_wfc","q2CTOT");
+    for (int j = 0; j < naroc[1]; ++j)
     {
         int igcol=globalIndex(j, nb, dim1, ipcol);
         if(igcol>=GlobalV::NBANDS) continue;
@@ -182,7 +183,8 @@ int  Local_Orbital_wfc::q2WFC_complex(
 	std::complex<double>* work,
 	std::complex<double>** WFC)
 {
-    for(int j=0; j<naroc[1]; ++j)
+    ModuleBase::TITLE(" Local_Orbital_wfc","q2WFC_complex");
+    for (int j = 0; j < naroc[1]; ++j)
     {
         int igcol=globalIndex(j, nb, dim1, ipcol);
         if(igcol>=GlobalV::NBANDS) continue;
@@ -212,7 +214,8 @@ int  Local_Orbital_wfc::q2WFC_CTOT_complex(
 	std::complex<double>** WFC,
 	std::complex<double>** CTOT)
 {
-    for(int j=0; j<naroc[1]; ++j)
+    ModuleBase::TITLE(" Local_Orbital_wfc","q2WFC_CTOT_complex");
+    for (int j = 0; j < naroc[1]; ++j)
     {
         int igcol=globalIndex(j, nb, dim1, ipcol);
         if(igcol>=GlobalV::NBANDS) continue;

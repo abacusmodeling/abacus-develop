@@ -115,14 +115,14 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> d
             GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            GlobalC::ParaO);
+            *this->LM->ParaV);
     	GlobalC::ld.cal_descriptor();        
 		GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
 		GlobalC::ld.add_v_delta(GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            GlobalC::ParaO);
-        for(int iic=0;iic<GlobalC::ParaO.nloc;iic++)
+            *this->LM->ParaV);
+        for(int iic=0;iic<this->LM->ParaV->nloc;iic++)
         {
             this->LM->Hloc[iic] += GlobalC::ld.H_V_delta[iic];
         }
@@ -169,7 +169,7 @@ void LCAO_Hamilt::calculate_STNR_gamma(void)
     //-------------------------------------
     // test using plane wave calculations.
     // all the matrixs are stored in this->LM->
-    // this->LM->allocate_HS_k(GlobalC::ParaO.nloc);
+    // this->LM->allocate_HS_k(this->LM->ParaV->nloc);
     // Build_ST_pw bsp;
     // bsp.set_ST(0, 'S');
     // this->LM->print_HSk('S','R',1.0e-5);
@@ -373,7 +373,7 @@ void LCAO_Hamilt::calculate_STNR_k(void)
         // test gamma Vnl	
         //----------------
 //		GlobalV::GAMMA_ONLY_LOCAL = true;
-//		this->LM->allocate_HS_gamma(GlobalC::ParaO.nloc);
+//		this->LM->allocate_HS_gamma(this->LM->ParaV->nloc);
 //		this->LM->zeros_HSgamma('H');
 //		GlobalC::UHM.genH.calculate_NL_no( nstart );
 //		GlobalV::GAMMA_ONLY_LOCAL = false;
@@ -475,25 +475,25 @@ void LCAO_Hamilt::calculate_STN_R(void)
                     for(int ii=0; ii<atom1->nw*GlobalV::NPOL; ii++)
                     {
                         const int iw1_all = start + ii;
-                        const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
+                        const int mu = this->LM->ParaV->trace_loc_row[iw1_all];
 
                         if(mu<0)continue;
 
                         for(int jj=0; jj<atom2->nw*GlobalV::NPOL; jj++)
                         {
                             int iw2_all = start2 + jj;
-                            const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
+                            const int nu = this->LM->ParaV->trace_loc_col[iw2_all];
 
                             if(nu<0)continue;
 
                             int iic;
                             if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                             {
-                                iic=mu+nu*GlobalC::ParaO.nrow;
+                                iic=mu+nu*this->LM->ParaV->nrow;
                             }
                             else
                             {
-                                iic=mu*GlobalC::ParaO.ncol+nu;
+                                iic=mu*this->LM->ParaV->ncol+nu;
                             }
 
                             if(GlobalV::NSPIN!=4)
@@ -611,14 +611,14 @@ void LCAO_Hamilt::calculate_STN_R_sparse(const int &current_spin, const double &
                     for(int ii=0; ii<atom1->nw*GlobalV::NPOL; ii++)
                     {
                         const int iw1_all = start + ii;
-                        const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
+                        const int mu = this->LM->ParaV->trace_loc_row[iw1_all];
 
                         if(mu<0)continue;
 
                         for(int jj=0; jj<atom2->nw*GlobalV::NPOL; jj++)
                         {
                             int iw2_all = start2 + jj;
-                            const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
+                            const int nu = this->LM->ParaV->trace_loc_col[iw2_all];
 
                             if(nu<0)continue;
 
@@ -734,14 +734,14 @@ void LCAO_Hamilt::calculate_STN_R_sparse_for_S(const double &sparse_threshold)
                     for(int ii=0; ii<atom1->nw*GlobalV::NPOL; ii++)
                     {
                         const int iw1_all = start + ii;
-                        const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
+                        const int mu = this->LM->ParaV->trace_loc_row[iw1_all];
 
                         if(mu<0)continue;
 
                         for(int jj=0; jj<atom2->nw*GlobalV::NPOL; jj++)
                         {
                             int iw2_all = start2 + jj;
-                            const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
+                            const int nu = this->LM->ParaV->trace_loc_col[iw2_all];
 
                             if(nu<0)continue;
 
@@ -837,8 +837,8 @@ void LCAO_Hamilt::calculat_HR_dftu_sparse(const int &current_spin, const double 
 
     Parallel_Reduce::reduce_int_all(nonzero_num, total_R_num);
 
-    double *HR_tmp = new double[GlobalC::ParaO.nloc];
-    double *SR_tmp = new double[GlobalC::ParaO.nloc];
+    double *HR_tmp = new double[this->LM->ParaV->nloc];
+    double *SR_tmp = new double[this->LM->ParaV->nloc];
 
     int ir;
     int ic;
@@ -850,25 +850,25 @@ void LCAO_Hamilt::calculat_HR_dftu_sparse(const int &current_spin, const double 
     {
         if (nonzero_num[count] != 0)
         {
-            ModuleBase::GlobalFunc::ZEROS(HR_tmp, GlobalC::ParaO.nloc);
-            ModuleBase::GlobalFunc::ZEROS(SR_tmp, GlobalC::ParaO.nloc);
+            ModuleBase::GlobalFunc::ZEROS(HR_tmp, this->LM->ParaV->nloc);
+            ModuleBase::GlobalFunc::ZEROS(SR_tmp, this->LM->ParaV->nloc);
 
             auto iter = this->LM->SR_sparse.find(R_coor);
             if (iter != this->LM->SR_sparse.end())
             {
                 for (auto &row_loop : iter->second)
                 {
-                    ir = GlobalC::ParaO.trace_loc_row[row_loop.first];
+                    ir = this->LM->ParaV->trace_loc_row[row_loop.first];
                     for (auto &col_loop : row_loop.second)
                     {
-                        ic = GlobalC::ParaO.trace_loc_col[col_loop.first];
+                        ic = this->LM->ParaV->trace_loc_col[col_loop.first];
                         if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                         {
-                            iic = ir + ic * GlobalC::ParaO.nrow;
+                            iic = ir + ic * this->LM->ParaV->nrow;
                         }
                         else
                         {
-                            iic = ir * GlobalC::ParaO.ncol + ic;
+                            iic = ir * this->LM->ParaV->ncol + ic;
                         }
                         SR_tmp[iic] = col_loop.second;
                     }
@@ -879,21 +879,21 @@ void LCAO_Hamilt::calculat_HR_dftu_sparse(const int &current_spin, const double 
 
             for (int i = 0; i < GlobalV::NLOCAL; ++i)
             {
-                ir = GlobalC::ParaO.trace_loc_row[i];
+                ir = this->LM->ParaV->trace_loc_row[i];
                 if (ir >= 0)
                 {
                     for (int j = 0; j < GlobalV::NLOCAL; ++j)
                     {
-                        ic = GlobalC::ParaO.trace_loc_col[j];
+                        ic = this->LM->ParaV->trace_loc_col[j];
                         if (ic >= 0)
                         {
                             if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                             {
-                                iic = ir + ic * GlobalC::ParaO.nrow;
+                                iic = ir + ic * this->LM->ParaV->nrow;
                             }
                             else
                             {
-                                iic = ir * GlobalC::ParaO.ncol + ic;
+                                iic = ir * this->LM->ParaV->ncol + ic;
                             }
 
                             if (std::abs(HR_tmp[iic]) > sparse_threshold)
@@ -950,8 +950,8 @@ void LCAO_Hamilt::calculat_HR_dftu_soc_sparse(const int &current_spin, const dou
 
     Parallel_Reduce::reduce_int_all(nonzero_num, total_R_num);
 
-    std::complex<double> *HR_soc_tmp = new std::complex<double>[GlobalC::ParaO.nloc];
-    std::complex<double> *SR_soc_tmp = new std::complex<double>[GlobalC::ParaO.nloc];
+    std::complex<double> *HR_soc_tmp = new std::complex<double>[this->LM->ParaV->nloc];
+    std::complex<double> *SR_soc_tmp = new std::complex<double>[this->LM->ParaV->nloc];
 
     int ir;
     int ic;
@@ -962,25 +962,25 @@ void LCAO_Hamilt::calculat_HR_dftu_soc_sparse(const int &current_spin, const dou
     {
         if (nonzero_num[count] != 0)
         {
-            ModuleBase::GlobalFunc::ZEROS(HR_soc_tmp, GlobalC::ParaO.nloc);
-            ModuleBase::GlobalFunc::ZEROS(SR_soc_tmp, GlobalC::ParaO.nloc);
+            ModuleBase::GlobalFunc::ZEROS(HR_soc_tmp, this->LM->ParaV->nloc);
+            ModuleBase::GlobalFunc::ZEROS(SR_soc_tmp, this->LM->ParaV->nloc);
 
             auto iter = this->LM->SR_soc_sparse.find(R_coor);
             if (iter != this->LM->SR_soc_sparse.end())
             {
                 for (auto &row_loop : iter->second)
                 {
-                    ir = GlobalC::ParaO.trace_loc_row[row_loop.first];
+                    ir = this->LM->ParaV->trace_loc_row[row_loop.first];
                     for (auto &col_loop : row_loop.second)
                     {
-                        ic = GlobalC::ParaO.trace_loc_col[col_loop.first];
+                        ic = this->LM->ParaV->trace_loc_col[col_loop.first];
                         if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                         {
-                            iic = ir + ic * GlobalC::ParaO.nrow;
+                            iic = ir + ic * this->LM->ParaV->nrow;
                         }
                         else
                         {
-                            iic = ir * GlobalC::ParaO.ncol + ic;
+                            iic = ir * this->LM->ParaV->ncol + ic;
                         }
                         SR_soc_tmp[iic] = col_loop.second;
                     }
@@ -991,21 +991,21 @@ void LCAO_Hamilt::calculat_HR_dftu_soc_sparse(const int &current_spin, const dou
 
             for (int i = 0; i < GlobalV::NLOCAL; ++i)
             {
-                ir = GlobalC::ParaO.trace_loc_row[i];
+                ir = this->LM->ParaV->trace_loc_row[i];
                 if (ir >= 0)
                 {
                     for (int j = 0; j < GlobalV::NLOCAL; ++j)
                     {
-                        ic = GlobalC::ParaO.trace_loc_col[j];
+                        ic = this->LM->ParaV->trace_loc_col[j];
                         if (ic >= 0)
                         {
                             if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                             {
-                                iic = ir + ic * GlobalC::ParaO.nrow;
+                                iic = ir + ic * this->LM->ParaV->nrow;
                             }
                             else
                             {
-                                iic = ir * GlobalC::ParaO.ncol + ic;
+                                iic = ir * this->LM->ParaV->ncol + ic;
                             }
 
                             if (std::abs(HR_soc_tmp[iic]) > sparse_threshold)
@@ -1077,13 +1077,13 @@ void LCAO_Hamilt::calculate_HR_exx_sparse(const int &current_spin, const double 
 		for(int iwt1_local=0; iwt1_local<HexxR.nr; ++iwt1_local)
 		{
 			const int iwt1_global = (GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")
-				? GlobalC::ParaO.MatrixInfo.col_set[iwt1_local]
-				: GlobalC::ParaO.MatrixInfo.row_set[iwt1_local];
+				? this->LM->ParaV->MatrixInfo.col_set[iwt1_local]
+				: this->LM->ParaV->MatrixInfo.row_set[iwt1_local];
 			for(int iwt2_local=0; iwt2_local<HexxR.nc; ++iwt2_local)
 			{
 				const int iwt2_global = (GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")
-					? GlobalC::ParaO.MatrixInfo.row_set[iwt2_local]
-					: GlobalC::ParaO.MatrixInfo.col_set[iwt2_local];
+					? this->LM->ParaV->MatrixInfo.row_set[iwt2_local]
+					: this->LM->ParaV->MatrixInfo.col_set[iwt2_local];
 				if(std::abs(HexxR(iwt1_local,iwt2_local)) > sparse_threshold)
 				{
 					if(GlobalV::NSPIN==1 || GlobalV::NSPIN==2)

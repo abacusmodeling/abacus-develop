@@ -31,7 +31,6 @@ public:
 
 	// initialize the input terms of  U, J, double_counting etc
     void init(UnitCell_pseudo &cell, // unitcell class
-		Parallel_Orbitals &po, // parallel orbitals parameters
         LCAO_Matrix &lm
 	);
     

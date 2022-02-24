@@ -9,7 +9,7 @@
 #include "src_parallel/parallel_orbitals.h"
 #include "src_lcao/local_orbital_wfc.h"
 
-class Pdiag_Double : public Parallel_Orbitals
+class Pdiag_Double
 {
 	public:
 	Pdiag_Double();
@@ -27,15 +27,22 @@ class Pdiag_Double : public Parallel_Orbitals
         std::complex<double>* ch_mat, std::complex<double>* cs_mat,
         std::complex<double>* Stmp, double* ekb);			// Peize Lin add wfc_2d 2019-01-17
 
-#ifdef __MPI
-    void readin(const std::string& fa, const std::string& fb, const int& nlocal, double* eigen, double* eigvr);
-#endif
-
     Diag_Scalapack_gvx diag_scalapack_gvx;			// Peize Lin add 2021.11.02
 
+    /// output control parameters in diago
+    // mohan add 2010-09-10
+	// output local wave functions.
+	// put it here because if we 
+	// use HPSEPS, the wave functions
+	// is needed to be collected first.
+    int out_lowf;
+    int out_hs; // mohan add 2010-09-02
+    int out_hsR; // LiuXh add 2019-07-16
 
 private:
 
+    const Parallel_Orbitals* ParaV;
+    
 #ifdef __MPI
 	//void gath_eig(MPI_Comm comm,int n,double **c,double *Z);
 	void gath_eig(MPI_Comm comm,int n,double *Z); //LiuXh add 2021-09-06, clear memory, totwfc not used now
