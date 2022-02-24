@@ -11,10 +11,15 @@
 
 class Pdiag_Double
 {
-	public:
-	Pdiag_Double();
-	~Pdiag_Double();
 
+public:
+    static int out_lowf;
+    static int out_hs; // mohan add 2010-09-02
+    static int out_hsR; // LiuXh add 2019-07-16
+    Pdiag_Double();
+    ~Pdiag_Double();
+    
+protected:
 	// this subroutine needs reconstruction in near future -- mohan note 2021-03
 	//void diago_double_begin(const int &ik, double **wfc, ModuleBase::matrix &wfc_2d,
 	//	double *h_mat, double *s_mat, double *ekb);			// Peize Lin add wfc_2d 2019-01-17
@@ -35,9 +40,6 @@ class Pdiag_Double
 	// put it here because if we 
 	// use HPSEPS, the wave functions
 	// is needed to be collected first.
-    static int out_lowf;
-    static int out_hs; // mohan add 2010-09-02
-    static int out_hsR; // LiuXh add 2019-07-16
 
 private:
 
