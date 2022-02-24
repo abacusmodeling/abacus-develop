@@ -65,7 +65,11 @@ inline bool ifElpaHandle(const bool& newIteration, const bool& ifNSCF)
 	return doHandle;
 }
 
-Pdiag_Double::Pdiag_Double(){}
+int Pdiag_Double::out_hs = 0;
+int Pdiag_Double::out_hsR = 0;
+int Pdiag_Double::out_lowf = 0;
+
+Pdiag_Double::Pdiag_Double() {}
 
 Pdiag_Double::~Pdiag_Double(){}
 

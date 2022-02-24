@@ -186,7 +186,7 @@ void LOOP_ions::opt_ions()
         GlobalC::dmft.out_to_dmft(this->LOWF, *this->UHM.LM);
         }
 
-        if(GlobalC::ParaO.out_hsR)
+        if(Pdiag_Double::out_hsR)
 		{
 			this->output_HS_R(); //LiuXh add 2019-07-15
 		}

@@ -29,15 +29,15 @@ class Pdiag_Double
 
     Diag_Scalapack_gvx diag_scalapack_gvx;			// Peize Lin add 2021.11.02
 
-    /// output control parameters in diago
+    /// output control parameters in diago (static)
     // mohan add 2010-09-10
 	// output local wave functions.
 	// put it here because if we 
 	// use HPSEPS, the wave functions
 	// is needed to be collected first.
-    int out_lowf;
-    int out_hs; // mohan add 2010-09-02
-    int out_hsR; // LiuXh add 2019-07-16
+    static int out_lowf;
+    static int out_hs; // mohan add 2010-09-02
+    static int out_hsR; // LiuXh add 2019-07-16
 
 private:
 

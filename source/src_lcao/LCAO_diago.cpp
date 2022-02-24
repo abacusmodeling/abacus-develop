@@ -46,7 +46,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, Local_Orbital_wfc &l
 	//lowf.ParaV->out_hs=1;//zhengdy-soc-test
 	bool bit = false; //LiuXh, 2017-03-21
 	//if set bit = true, there would be error in soc-multi-core calculation, noted by zhengdy-soc
-	HS_Matrix::saving_HS_complex(this->LM->Hloc2.data(), this->LM->Sloc2.data(), bit, GlobalC::ParaO.out_hs, *lowf.ParaV); //LiuXh, 2017-03-21
+	HS_Matrix::saving_HS_complex(this->LM->Hloc2.data(), this->LM->Sloc2.data(), bit, Pdiag_Double::out_hs, *lowf.ParaV); //LiuXh, 2017-03-21
 	GlobalV::ofs_running << std::setprecision(6); //LiuXh, 2017-03-21
 
 	GlobalC::ParaO.diago_complex_begin(ik, lowf, this->LM->Hloc2.data(), this->LM->Sloc2.data(), this->LM->Sdiag2.data(), GlobalC::wf.ekb[ik]);
@@ -143,7 +143,7 @@ void Diago_LCAO_Matrix::using_LAPACK(const int &ik, Local_Orbital_wfc &lowf)cons
 	// save H and S matrix to disk.
 //	bool bit = false;
 	bool bit = true;//zhengdy-soc
-	HS_Matrix::saving_HS(this->LM->Hloc.data(), this->LM->Sloc.data(), bit, GlobalC::ParaO.out_hs, *lowf.ParaV);
+	HS_Matrix::saving_HS(this->LM->Hloc.data(), this->LM->Sloc.data(), bit, Pdiag_Double::out_hs, *lowf.ParaV);
 
 	ModuleBase::matrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	ModuleBase::matrix Stmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
@@ -258,7 +258,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_double(const int &ik, Local_Orbital_wfc &lo
 
 	// save H and S matrix to disk.
 	bool bit = false;
-	HS_Matrix::saving_HS(this->LM->Hloc.data(), this->LM->Sloc.data(), bit, GlobalC::ParaO.out_hs, *lowf.ParaV);
+	HS_Matrix::saving_HS(this->LM->Hloc.data(), this->LM->Sloc.data(), bit, Pdiag_Double::out_hs, *lowf.ParaV);
 	GlobalV::ofs_running << std::setprecision(6);
 
 	// Distribution of matrix for 
