@@ -15,7 +15,9 @@
 #include "src_pw/occupy.h"
 #include "module_base/global_function.h"
 #include "module_base/global_variable.h"
+#ifdef __EXX
 #include "src_ri/exx_abfs-jle.h"
+#endif
 #ifdef __LCAO
 #include "module_orbital/ORB_read.h"
 #include "src_lcao/ELEC_evolve.h"
@@ -446,6 +448,7 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------
 // about exx, Peize Lin add 2018-06-20
 //----------------------------------------------------------
+#ifdef __MPI // liyuanbo 2022/2/23
 #ifdef __LCAO
 	if (INPUT.exx_hybrid_type == "no")
 	{
@@ -503,7 +506,7 @@ void Input_Conv::Convert(void)
 		Exx_Abfs::Jle::tolerence = INPUT.exx_opt_orb_tolerence;
 	}
 #endif
-
+#endif
 	GlobalC::ppcell.cell_factor = INPUT.cell_factor; // LiuXh add 20180619
 
 

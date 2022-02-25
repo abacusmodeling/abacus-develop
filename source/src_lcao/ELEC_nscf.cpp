@@ -22,6 +22,7 @@ void ELEC_nscf::nscf(LCAO_Hamilt& uhm,
 	
 	time_t time_start= std::time(NULL);
 
+#ifdef __MPI
 	// Peize Lin add 2018-08-14
 	switch(GlobalC::exx_lcao.info.hybrid_type)
 	{
@@ -31,6 +32,7 @@ void ELEC_nscf::nscf(LCAO_Hamilt& uhm,
 			GlobalC::exx_lcao.cal_exx_elec_nscf(*lowf.ParaV);
 			break;
 	}
+#endif
 
 	// mohan add 2021-02-09
 	// in LOOP_ions, istep starts from 1,

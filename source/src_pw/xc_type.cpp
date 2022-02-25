@@ -293,6 +293,7 @@ void xcfunc::copy_to_now()
 void xcfunc::hybrid_first()
 {
 #ifdef __LCAO
+#ifdef __MPI
 	// may do something
 	ModuleBase::WARNING("functional","file "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__)+" may error ");
 	if(Exx_Global::Hybrid_Type::HF==GlobalC::exx_global.info.hybrid_type)
@@ -310,5 +311,6 @@ void xcfunc::hybrid_first()
 		iexch_now = 1;
 		igcx_now = 3;
 	}
+#endif
 #endif
 }

@@ -183,6 +183,7 @@ void LOOP_elec::solver(const int& istep,
     ModuleBase::TITLE("LOOP_elec","solver"); 
     ModuleBase::timer::tick("LOOP_elec","solver"); 
 
+#ifdef __MPI
 	// self consistent calculations for electronic ground state
 	if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md"
 			|| GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") //pengfei 2014-10-13
@@ -259,6 +260,7 @@ void LOOP_elec::solver(const int& istep,
 	{
 		ModuleBase::WARNING_QUIT("LOOP_elec::solver","CALCULATION type not supported");
 	}
+#endif
 
     ModuleBase::timer::tick("LOOP_elec","solver"); 
 	return;

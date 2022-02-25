@@ -60,6 +60,7 @@ void Cell_PW::opt_cells_pw()
     }
 
 #ifdef __LCAO
+#ifdef __MPI //liyuanbo 2022/2/23
     switch (GlobalC::exx_global.info.hybrid_type) // Peize Lin add 2019-03-09
     {
     case Exx_Global::Hybrid_Type::HF:
@@ -73,6 +74,7 @@ void Cell_PW::opt_cells_pw()
     default:
         throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__) + ModuleBase::GlobalFunc::TO_STRING(__LINE__));
     }
+#endif
 #endif
 
     ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT BASIS");

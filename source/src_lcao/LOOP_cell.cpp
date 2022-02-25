@@ -40,7 +40,7 @@ void LOOP_cell::opt_cell(ORB_control &orb_con)
     int ion_step=0;
     GlobalC::pot.init_pot(ion_step, GlobalC::pw.strucFac);
 
-
+#ifdef __MPI  
 	// PLEASE simplify the Exx_Global interface
 	// mohan add 2021-03-25
 	// Peize Lin 2016-12-03
@@ -60,6 +60,7 @@ void LOOP_cell::opt_cell(ORB_control &orb_con)
 				throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
 		}
 	}	
+#endif
 
 	// PLEASE do not use INPUT global variable
 	// mohan add 2021-03-25

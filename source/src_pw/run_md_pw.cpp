@@ -213,6 +213,7 @@ void Run_MD_PW::md_cells_pw()
         GlobalC::wf.wfcinit();
     }
 #ifdef __LCAO
+#ifdef __MPI 
     switch (GlobalC::exx_global.info.hybrid_type) // Peize Lin add 2019-03-09
     {
     case Exx_Global::Hybrid_Type::HF:
@@ -226,6 +227,7 @@ void Run_MD_PW::md_cells_pw()
     default:
         throw std::invalid_argument(ModuleBase::GlobalFunc::TO_STRING(__FILE__) + ModuleBase::GlobalFunc::TO_STRING(__LINE__));
     }
+#endif
 #endif
 
     ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "INIT BASIS");
@@ -282,12 +284,15 @@ void Run_MD_PW::md_force_virial(
     {
         Electrons elec;
 #ifdef __LCAO
+#ifdef __MPI
         if (Exx_Global::Hybrid_Type::No == GlobalC::exx_global.info.hybrid_type)
         {
+#endif
 #endif
             elec.self_consistent(istep);
             eiter = elec.iter;
 #ifdef __LCAO
+#ifdef __MPI
         }
         else if (Exx_Global::Hybrid_Type::Generate_Matrix == GlobalC::exx_global.info.hybrid_type)
         {
@@ -316,7 +321,8 @@ void Run_MD_PW::md_force_virial(
                 eiter += elec.iter;
             }
         }
-#endif
+#endif // __MPI
+#endif // __LCAO
     }
     // mohan added 2021-01-28, perform stochastic calculations
     else if (GlobalV::CALCULATION == "md-sto")

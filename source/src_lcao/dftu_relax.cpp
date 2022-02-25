@@ -95,6 +95,8 @@ void DFTU_RELAX::force_stress(std::vector<ModuleBase::matrix>& dm_gamma,
 			double* VU = new double [this->LM->ParaV->nloc];
 			this->cal_VU_pot_mat_real(spin, false, VU);
 			ModuleBase::timer::tick("DFTU_RELAX", "cal_rho_VU");
+		
+		#ifdef __MPI
 			pdgemm_(&transT, &transN,
 					    &GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 					    &alpha, 
@@ -102,6 +104,7 @@ void DFTU_RELAX::force_stress(std::vector<ModuleBase::matrix>& dm_gamma,
 					    VU, &one_int, &one_int, this->LM->ParaV->desc,
 					    &beta,
 					    &rho_VU[0], &one_int, &one_int, this->LM->ParaV->desc);
+		#endif
 
       		delete [] VU;
 			ModuleBase::timer::tick("DFTU_RELAX", "cal_rho_VU");
@@ -124,6 +127,8 @@ void DFTU_RELAX::force_stress(std::vector<ModuleBase::matrix>& dm_gamma,
 			std::complex<double>* VU = new std::complex<double> [this->LM->ParaV->nloc];
 			this->cal_VU_pot_mat_complex(spin, false, VU);
 			ModuleBase::timer::tick("DFTU_RELAX", "cal_rho_VU");
+		
+		#ifdef __MPI
 			pzgemm_(&transT, &transN,
 					    &GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 					    &alpha, 
@@ -131,6 +136,7 @@ void DFTU_RELAX::force_stress(std::vector<ModuleBase::matrix>& dm_gamma,
 					    VU, &one_int, &one_int, this->LM->ParaV->desc,
 					    &beta,
 					    &rho_VU[0], &one_int, &one_int, this->LM->ParaV->desc);
+		#endif
 
       		delete [] VU;
 	  		ModuleBase::timer::tick("DFTU_RELAX", "cal_rho_VU");
@@ -140,6 +146,7 @@ void DFTU_RELAX::force_stress(std::vector<ModuleBase::matrix>& dm_gamma,
     	}//ik
   	}
 
+#ifdef __MPI
 	if(GlobalV::FORCE)
 	{
 		for(int iat=0; iat<GlobalC::ucell.nat; iat++)
@@ -148,9 +155,11 @@ void DFTU_RELAX::force_stress(std::vector<ModuleBase::matrix>& dm_gamma,
 			MPI_Allreduce(&tmp[0], &this->force_dftu[iat][0], 3, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 		}
 	}
+#endif
 
   	if(GlobalV::STRESS)
   	{
+	#ifdef __MPI
     	for(int dim1=0; dim1<3; dim1++)
 	  	{
 	  		for(int dim2=dim1; dim2<3; dim2++)
@@ -159,6 +168,7 @@ void DFTU_RELAX::force_stress(std::vector<ModuleBase::matrix>& dm_gamma,
         		MPI_Allreduce(&val_tmp, &stress_dftu[dim1][dim2], 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
       		}
     	}
+	#endif
 
 		for(int i=0; i<3; i++)
 		{
@@ -198,6 +208,7 @@ void DFTU_RELAX::cal_force_k(const int ik, const std::complex<double>* rho_VU)
 	{
     	this->fold_dSm_k(ik, dim, &dSm_k[0]);
     
+	#ifdef __MPI
 		pzgemm_(&transN, &transC,
 			&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 			&one, 
@@ -205,6 +216,7 @@ void DFTU_RELAX::cal_force_k(const int ik, const std::complex<double>* rho_VU)
 			rho_VU, &one_int, &one_int, this->LM->ParaV->desc,
 			&zero,
 			&dm_VU_dSm[0], &one_int, &one_int, this->LM->ParaV->desc);
+	#endif
 
     	for(int ir=0; ir<this->LM->ParaV->nrow; ir++)
 		{
@@ -221,6 +233,7 @@ void DFTU_RELAX::cal_force_k(const int ik, const std::complex<double>* rho_VU)
 			}//end ic
 		}//end ir
 
+	#ifdef __MPI
     	pzgemm_(&transN, &transN,
 			&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 			&one, 
@@ -228,6 +241,7 @@ void DFTU_RELAX::cal_force_k(const int ik, const std::complex<double>* rho_VU)
 			rho_VU, &one_int, &one_int, this->LM->ParaV->desc,
 			&zero,
 			&dm_VU_dSm[0], &one_int, &one_int, this->LM->ParaV->desc);
+	#endif
 
     	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	  	{
@@ -300,6 +314,7 @@ void DFTU_RELAX::cal_stress_k(const int ik, const std::complex<double>* rho_VU)
 		{
 			this->fold_dSR_k(ik, dim1, dim2, &dSR_k[0]);
 
+		#ifdef __MPI
 			pzgemm_(&transN, &transN,
 				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 				&minus_half, 
@@ -307,6 +322,7 @@ void DFTU_RELAX::cal_stress_k(const int ik, const std::complex<double>* rho_VU)
 				&dSR_k[0], &one_int, &one_int, this->LM->ParaV->desc,
 				&zero,
 				&dm_VU_sover[0], &one_int, &one_int, this->LM->ParaV->desc);
+		#endif
 
 			for(int ir=0; ir<this->LM->ParaV->nrow; ir++)
 			{
@@ -344,6 +360,7 @@ void DFTU_RELAX::cal_force_gamma(const double* rho_VU)
 		else if(dim==1) tmp_ptr = this->LM->DSloc_y;
 		else if(dim==2) tmp_ptr = this->LM->DSloc_z;
 
+	#ifdef __MPI
 		pdgemm_(&transN, &transT,
 			&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 			&one, 
@@ -351,6 +368,7 @@ void DFTU_RELAX::cal_force_gamma(const double* rho_VU)
 			rho_VU, &one_int, &one_int, this->LM->ParaV->desc,
 			&zero,
 			&dm_VU_dSm[0], &one_int, &one_int, this->LM->ParaV->desc);
+	#endif
 
     	for(int ir=0; ir<this->LM->ParaV->nrow; ir++)
 		{
@@ -367,6 +385,7 @@ void DFTU_RELAX::cal_force_gamma(const double* rho_VU)
 			}//end ic
 		}//end ir
 
+	#ifdef __MPI
     	pdgemm_(&transN, &transT,
 			&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 			&one, 
@@ -374,6 +393,7 @@ void DFTU_RELAX::cal_force_gamma(const double* rho_VU)
 			rho_VU, &one_int, &one_int, this->LM->ParaV->desc,
 			&zero,
 			&dm_VU_dSm[0], &one_int, &one_int, this->LM->ParaV->desc);
+	#endif
 
     	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	  	{
@@ -446,6 +466,7 @@ void DFTU_RELAX::cal_stress_gamma(const double* rho_VU)
 		{	
       		this->fold_dSR_gamma(dim1, dim2, &dSR_gamma[0]);
 
+		#ifdef __MPI
 			pdgemm_(&transN, &transN,
 				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 				&minus_half, 
@@ -453,6 +474,7 @@ void DFTU_RELAX::cal_stress_gamma(const double* rho_VU)
 				&dSR_gamma[0], &one_int, &one_int, this->LM->ParaV->desc,
 				&zero,
 				&dm_VU_sover[0], &one_int, &one_int, this->LM->ParaV->desc);
+		#endif
 
 			for(int ir=0; ir<this->LM->ParaV->nrow; ir++)
 			{

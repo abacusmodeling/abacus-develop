@@ -123,7 +123,7 @@ void Mulliken_Charge::cal_mulliken(LCAO_Hamilt &uhm)
 				const double one_float=1.0, zero_float=0.0;
 				const int one_int=1;
 
-
+			#ifdef __MPI
 				const char T_char='T';		
 				pdgemv_(
 						&T_char,
@@ -134,6 +134,7 @@ void Mulliken_Charge::cal_mulliken(LCAO_Hamilt &uhm)
 						&zero_float,
 						mud[0].c, &one_int, &NB, pv->desc,
 						&one_int);
+			#endif
 
 				for (int j=0; j<GlobalV::NLOCAL; ++j)
 				{
@@ -201,6 +202,7 @@ void Mulliken_Charge::cal_mulliken(LCAO_Hamilt &uhm)
 
 						const char T_char='T';		// N_char='N',U_char='U'
 
+					#ifdef __MPI
 						pzgemv_(
 								&T_char,
 								&GlobalV::NLOCAL,&GlobalV::NLOCAL,
@@ -210,6 +212,7 @@ void Mulliken_Charge::cal_mulliken(LCAO_Hamilt &uhm)
 								&zero_float,
 								mud[0].c, &one_int, &NB, pv->desc,
 								&one_int);
+					#endif
 
 						for (int j=0; j<GlobalV::NLOCAL; ++j)
 						{
@@ -239,9 +242,10 @@ void Mulliken_Charge::cal_mulliken(LCAO_Hamilt &uhm)
 				GlobalV::test_atom_input);
 #endif
 
-		}//else                     
+		}//else          
+	#ifdef __MPI           
 		MPI_Reduce(MecMulP[is], DecMulP[is] , GlobalV::NLOCAL , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);
-
+	#endif
 		if(GlobalV::MY_RANK == 0)
 		{
 			for (int i=0; i<GlobalC::ucell.nat; i++)
@@ -464,6 +468,7 @@ void Mulliken_Charge::stdout_mulliken(LCAO_Hamilt &uhm)
 
 	return;
 }
+
 
 
 

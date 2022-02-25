@@ -119,7 +119,9 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 		}
 		for(int ip=0; ip<GlobalV::NPOOL; ip++)
 		{
+		#ifdef __MPI
 			MPI_Barrier(MPI_COMM_WORLD);
+		#endif
 			if( GlobalV::MY_POOL == ip )
 			{
 				if( GlobalV::RANK_IN_POOL != 0 ) continue;
@@ -282,7 +284,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 					const double one_float=1.0, zero_float=0.0;
 					const int one_int=1;
 
-
+				#ifdef __MPI
 					const char T_char='T';		
 					pdgemv_(
 							&T_char,
@@ -293,6 +295,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 							&zero_float,
 							Mulk[0].c, &one_int, &NB, pv->desc,
 							&one_int);
+				#endif
 
 					for (int j=0; j<GlobalV::NLOCAL; ++j)
 					{
@@ -370,6 +373,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 							//   const int two_int=2;
 							const char T_char='T';		// N_char='N',U_char='U'
 
+						#ifdef __MPI
 							pzgemv_(
 									&T_char,
 									&GlobalV::NLOCAL,&GlobalV::NLOCAL,
@@ -379,7 +383,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 									&zero_float,
 									Mulk[0].c, &one_int, &NB, pv->desc,
 									&one_int);
-
+						#endif
 
 
 							for (int j=0; j<GlobalV::NLOCAL; ++j)
@@ -413,8 +417,9 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 					GlobalV::test_atom_input);
 #endif
 			}//else
-
+		#ifdef __MPI
 		 MPI_Reduce(pdosk[is].c, pdos[is].c , NUM , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);
+		#endif
 	 }//is                                              
 	 delete[] pdosk;                                               
 	 delete[] waveg;
@@ -763,3 +768,4 @@ void energy::perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm)
 	}
 	return;
 }
+

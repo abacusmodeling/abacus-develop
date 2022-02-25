@@ -106,6 +106,7 @@ void Run_lcao::lcao_line(void)
 		GlobalC::ORB
 	);
 
+#ifdef __MPI   
 	orb_con.set_orb_tables(
 		GlobalV::ofs_running,
 		GlobalC::UOT,
@@ -116,10 +117,9 @@ void Run_lcao::lcao_line(void)
 		GlobalC::ucell.infoNL.nprojmax,
 		GlobalC::ucell.infoNL.nproj,
         GlobalC::ucell.infoNL.Beta);
+#endif
 
     orb_con.setup_2d_division();
-
-
 //--------------------------------------
 // cell relaxation should begin here
 //--------------------------------------
@@ -154,6 +154,7 @@ void Run_lcao::lcao_line(void)
 
 
 	// Peize Lin add 2018-11-30
+#ifdef __MPI 
 	if(GlobalV::CALCULATION=="nscf")
 	{
 		switch(GlobalC::exx_global.info.hybrid_type)
@@ -165,6 +166,7 @@ void Run_lcao::lcao_line(void)
 				break;
 		}
 	}
+#endif
 
 #ifdef __DEEPKS
 	//wenfei 2021-12-19
