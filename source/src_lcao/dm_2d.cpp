@@ -15,7 +15,6 @@
 
 #include "src_lcao/local_orbital_charge.h"
 
-#include "./LCAO_nnr.h"
 void Local_Orbital_Charge::init_dm_2d()
 {
 	if(GlobalV::GAMMA_ONLY_LOCAL)
@@ -196,7 +195,7 @@ void Local_Orbital_Charge::cal_dm_R(
                 const int iat = GlobalC::ucell.itia2iat(T1, I1);
                 const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
                 //irr: number of adjacent orbital pairs int this proc
-                const int irrstart = GlobalC::LNNR.nlocstart[iat];
+                const int irrstart = this->ParaV->nlocstart[iat];
 
                 int count = 0;
                 for (int cb = 0;cb < ra.na_each[iat];++cb)
@@ -229,7 +228,7 @@ void Local_Orbital_Charge::cal_dm_R(
                         }//iw2
                     }//iw1
                 }//TI2(cb)
-                assert(count == GlobalC::LNNR.nlocdim[iat]);
+                assert(count == this->ParaV->nlocdim[iat]);
             }//I1
         }//T1
     }//ik

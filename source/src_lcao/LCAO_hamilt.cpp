@@ -208,7 +208,6 @@ void LCAO_Hamilt::calculate_STNR_gamma(void)
 }
 
 
-#include "LCAO_nnr.h"
 // be called in LOOP_elec::cal_bands(). 
 void LCAO_Hamilt::calculate_Hk(const int &ik)
 {
@@ -267,7 +266,7 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
     this->LM->zeros_HSk('S');
     this->LM->zeros_HSk('T');
 //	std::cout << " after folding Hfixed k." << std::endl;
-    GlobalC::LNNR.folding_fixedH(ik, *this->LM);
+    this->LM->folding_fixedH(ik);
 
     //------------------------------------------
     // Add T(k)+Vnl(k)+Vlocal(k)
@@ -360,7 +359,7 @@ void LCAO_Hamilt::calculate_STNR_k(void)
         //------------------------------------------
         this->LM->zeros_HSk('S');
         this->LM->zeros_HSk('T');
-        GlobalC::LNNR.folding_fixedH(ik, *this->LM);
+        this->LM->folding_fixedH(ik);
         std::cout << " --> LCAO S" << std::endl;
         this->LM->print_HSk('S','R',1.0e-5);	
         std::cout << " --> LCAO T+Vnl" << std::endl;

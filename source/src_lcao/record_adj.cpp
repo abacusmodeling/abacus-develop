@@ -27,7 +27,6 @@ void Record_adj::delete_grid(void)
 // This will record the orbitals according to
 // HPSEPS's 2D block division.
 //--------------------------------------------
-#include "LCAO_nnr.h"
 void Record_adj::for_2d(const Parallel_Orbitals &pv)
 {
 	ModuleBase::TITLE("Record_adj","for_2d");
@@ -129,7 +128,7 @@ void Record_adj::for_2d(const Parallel_Orbitals &pv)
 
  	//xiaohui add "OUT_LEVEL", 2015-09-16
 	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"irr",irr);
-	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"LNNR.nnr",GlobalC::LNNR.nnr);
+	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"LNNR.nnr",pv.nnr);
 
 
 

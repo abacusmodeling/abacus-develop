@@ -7,7 +7,7 @@
 // delete in near future
 #include "../src_pw/global.h"
 
-LOOP_cell::LOOP_cell(const Parallel_Orbitals &pv)
+LOOP_cell::LOOP_cell(Parallel_Orbitals &pv)
 {
     // * allocate H and S matrices according to computational resources
     // * set the 'trace' between local H/S and global H/S

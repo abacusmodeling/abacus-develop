@@ -14,7 +14,7 @@
 
 #ifdef __LCAO
 #include "../src_lcao/run_md_lcao.h"
-const Parallel_Orbitals* MD_func::ParaV = nullptr;
+Parallel_Orbitals* MD_func::ParaV = nullptr;
 #endif
 
 

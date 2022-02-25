@@ -21,7 +21,13 @@ Parallel_Orbitals::Parallel_Orbitals()
 	// but can change to larger value from input.
     nb = 1;
 	MatrixInfo.row_set = new int[1];
-	MatrixInfo.col_set = new int[1];
+    MatrixInfo.col_set = new int[1];
+
+    //in multi-k, 2D-block-division variables for FT (R<->k)
+    nnr = 1;
+    nlocdim = new int[1];	
+	nlocstart = new int[1];
+
 }
 
 Parallel_Orbitals::~Parallel_Orbitals()
@@ -39,8 +45,11 @@ Parallel_Orbitals::~Parallel_Orbitals()
 		delete[] Z_LOC;
 	}
     delete[] MatrixInfo.row_set;
-	delete[] MatrixInfo.col_set;
-
+    delete[] MatrixInfo.col_set;
+    
+    delete[] nlocdim;
+	delete[] nlocstart;
+    
 }
 
 bool Parallel_Orbitals::in_this_processor(const int &iw1_all, const int &iw2_all) const

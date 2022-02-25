@@ -24,7 +24,6 @@
 #include "../src_pw/magnetism.h"
 #include "../module_orbital/ORB_gen_tables.h"
 #include "../src_pw/charge.h"
-#include "LCAO_nnr.h"
 #include "../module_base/timer.h"
 
 extern "C"
@@ -1643,7 +1642,7 @@ void DFTU::folding_overlap_matrix(const int ik, std::complex<double>* Sk,
 		}// end I1
 	} // end T1
 
-	assert(index==GlobalC::LNNR.nnr);
+	assert(index==lm.ParaV->nnr);
 
   	ModuleBase::timer::tick("DFTU","folding_overlap_matrix");
 	return;

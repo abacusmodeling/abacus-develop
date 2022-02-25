@@ -38,6 +38,14 @@ struct Parallel_Orbitals
     
     int lastband_in_proc;
 	int lastband_number; 
+
+    //---------------------------------------
+    // number of elements in H or S matrix,
+	// nnr -> 2D block distribution;
+	//---------------------------------------
+	int nnr; 
+	int *nlocdim;
+	int *nlocstart;
     
 #ifdef __MPI
     /// blacs info
@@ -62,7 +70,11 @@ struct Parallel_Orbitals
     
     /// check whether a basis element is in this processor
     /// (check whether local-index > 0 )
-   bool in_this_processor(const int& iw1_all, const int& iw2_all) const;
+    bool in_this_processor(const int& iw1_all, const int& iw2_all) const;
+
+    /// number of elements(basis-pairs) in this processon
+    /// on all adjacent atoms-pairs(2D division)
+    void cal_nnr();
 
 };
 

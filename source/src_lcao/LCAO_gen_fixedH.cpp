@@ -1,7 +1,6 @@
 #include "LCAO_gen_fixedH.h"
 #include "../src_pw/global.h"
 #include "../src_pw/wavefunc.h"
-#include "LCAO_nnr.h"
 #include "global_fp.h"
 #include <vector>
 #include <unordered_map>
@@ -288,10 +287,10 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri, con
 
 	if(!GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		if(nnr != GlobalC::LNNR.nnr)
+		if(nnr != pv->nnr)
 		{
-			std::cout << " nnr=" << nnr << " LNNR.nnr=" << GlobalC::LNNR.nnr << std::endl;
-			GlobalV::ofs_running << " nnr=" << nnr << " LNNR.nnr=" << GlobalC::LNNR.nnr << std::endl;
+			std::cout << " nnr=" << nnr << " LNNR.nnr=" << pv->nnr << std::endl;
+			GlobalV::ofs_running << " nnr=" << nnr << " LNNR.nnr=" << pv->nnr << std::endl;
 			ModuleBase::WARNING_QUIT("LCAO_gen_fixedH::build_ST_new","nnr != LNNR.nnr");
 		}
 	}
@@ -852,10 +851,10 @@ void LCAO_gen_fixedH::build_Nonlocal_mu_new(const bool &calc_deri)
 	if(!GlobalV::GAMMA_ONLY_LOCAL)
 	{
 	//		std::cout << " nr="  << nnr << std::endl;
-	//		std::cout << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << std::endl;
+	//		std::cout << " pv->nnr=" << pv->nnr << std::endl;
 	//		GlobalV::ofs_running << " nr="  << nnr << std::endl;
-	//		GlobalV::ofs_running << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << std::endl;
-		if( nnr!=GlobalC::LNNR.nnr)
+	//		GlobalV::ofs_running << " pv->nnr=" << pv->nnr << std::endl;
+		if( nnr!=pv->nnr)
 		{
 			ModuleBase::WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_mu_new","nnr!=LNNR.nnr");
 		}
@@ -1120,10 +1119,10 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 	if(!GlobalV::GAMMA_ONLY_LOCAL)
 	{
 //		std::cout << " nr="  << nnr << std::endl;
-//		std::cout << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << std::endl;
+//		std::cout << " pv->nnr=" << pv->nnr << std::endl;
 //		GlobalV::ofs_running << " nr="  << nnr << std::endl;
-//		GlobalV::ofs_running << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << std::endl;
-		if( nnr!=GlobalC::LNNR.nnr)
+//		GlobalV::ofs_running << " pv->nnr=" << pv->nnr << std::endl;
+		if( nnr!=pv->nnr)
 		{
 			ModuleBase::WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_mu","nnr!=LNNR.nnr");
 		}
@@ -1403,7 +1402,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 								//	else
 								//	{
 								//		ModuleBase::WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_beta","not consistent with k point algorithm.");
-//										assert( nnr < GlobalC::LNNR.nnr );
+//										assert( nnr < pv->nnr );
 //										this->LM->Hloc_fixedR[ nnr ] += nlm[0];
 //										++nnr;
 								//	}

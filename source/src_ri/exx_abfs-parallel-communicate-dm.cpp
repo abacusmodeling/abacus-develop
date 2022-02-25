@@ -274,7 +274,7 @@ ofs_LOC_DM<<std::endl<<std::endl;
 	for( int iw1=0; iw1!=nw1; ++iw1 )
 	{
 		for( int iw2=0; iw2!=nw2; ++iw2 )
-			ofs_LOC_DM<<DM_R[is][GlobalC::LNNR.nlocstartg[iat1]+iw_index+iw1*nw2+iw2]<<"\t";
+			ofs_LOC_DM<<DM_R[is][GlobalC::GridT.nlocstartg[iat1]+iw_index+iw1*nw2+iw2]<<"\t";
 		ofs_LOC_DM<<std::endl;
 	}
 	ofs_LOC_DM<<std::endl;
@@ -282,7 +282,7 @@ ofs_LOC_DM<<std::endl<<std::endl;
 					if( !ModuleBase::GlobalFunc::MAP_EXIST( DM_grid[is], iat1, iat2, boxp2 ) )
 					{					
 						ModuleBase::matrix DM_grid_2D(nw1,nw2,false);
-						memcpy( DM_grid_2D.c, DM_R[is]+GlobalC::LNNR.nlocstartg[iat1]+iw_index, sizeof(double)*(nw1*nw2) );
+						memcpy( DM_grid_2D.c, DM_R[is]+GlobalC::GridT.nlocstartg[iat1]+iw_index, sizeof(double)*(nw1*nw2) );
 						if( DM_grid_2D.absmax() * SPIN_multiple >= threshold )
 							DM_grid[is][iat1][iat2][boxp2] = DM_grid_2D * SPIN_multiple;
 						else

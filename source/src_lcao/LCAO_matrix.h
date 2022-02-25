@@ -20,9 +20,13 @@ class LCAO_Matrix
     LCAO_Matrix();
     ~LCAO_Matrix();
 
-    void divide_HS_in_frag(const bool isGamma, const Parallel_Orbitals& pv);
+    void divide_HS_in_frag(const bool isGamma, Parallel_Orbitals& pv);
+    
+    // folding the fixed Hamiltonian (T+Vnl) if
+	// k-point algorithm is used.
+	void folding_fixedH(const int &ik);
 
-    const Parallel_Orbitals *ParaV;
+    Parallel_Orbitals *ParaV;
 
 private:
 

@@ -16,7 +16,7 @@ class MD_func
     ~MD_func() {};
     
 #ifdef __LCAO
-    static const Parallel_Orbitals* ParaV;
+    static Parallel_Orbitals* ParaV;
 #endif
 
     static double gaussrand();

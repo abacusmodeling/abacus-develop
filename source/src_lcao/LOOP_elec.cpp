@@ -8,7 +8,6 @@
 #include "dftu.h"
 //
 #include "../module_neighbor/sltk_atom_arrange.h"
-#include "LCAO_nnr.h"
 #include "../src_io/istate_charge.h"
 #include "../src_io/istate_envelope.h"
 #include "ELEC_scf.h"
@@ -82,16 +81,17 @@ void LOOP_elec::set_matrix_grid(void)
 	if(!GlobalV::GAMMA_ONLY_LOCAL)
 	{
 		// For each atom, calculate the adjacent atoms in different cells
-		// and allocate the space for H(R) and S(R).
-		GlobalC::LNNR.cal_nnr(*this->UHM->LM->ParaV);
-		this->UHM->LM->allocate_HS_R(GlobalC::LNNR.nnr);
+        // and allocate the space for H(R) and S(R).
+        Parallel_Orbitals* pv = this->UHM->LM->ParaV;
+        pv->cal_nnr();
+		this->UHM->LM->allocate_HS_R(pv->nnr);
 #ifdef __DEEPKS
-		GlobalC::ld.allocate_V_deltaR(GlobalC::LNNR.nnr);
+		GlobalC::ld.allocate_V_deltaR(pv->nnr);
 #endif
 
 		// need to first calculae lgd.
 		// using GlobalC::GridT.init.
-		GlobalC::LNNR.cal_nnrg(GlobalC::GridT);
+		GlobalC::GridT.cal_nnrg();
 	}
 
     ModuleBase::timer::tick("LOOP_elec","set_matrix_grid"); 

@@ -7,7 +7,6 @@
 #include "dftu.h"
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"
-#include "LCAO_nnr.h"
 #endif
 #include "../module_base/timer.h"
 #include "src_lcao/local_orbital_wfc.h"
@@ -45,7 +44,7 @@ void ELEC_cbands_k::cal_bands(const int& istep, LCAO_Hamilt& uhm,
             GlobalC::ORB,
             GlobalC::GridD,
             *lowf.ParaV,
-			GlobalC::LNNR.nnr);
+			lowf.ParaV->nnr);
 	}
 #endif
 

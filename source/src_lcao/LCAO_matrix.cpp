@@ -13,7 +13,7 @@ LCAO_Matrix::~LCAO_Matrix()
 }
 
 
-void LCAO_Matrix::divide_HS_in_frag(const bool isGamma, const Parallel_Orbitals &pv)
+void LCAO_Matrix::divide_HS_in_frag(const bool isGamma, Parallel_Orbitals &pv)
 {
     ModuleBase::TITLE("LCAO_Matrix","divide_HS_in_frag");
 

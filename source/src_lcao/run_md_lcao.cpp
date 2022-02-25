@@ -1,6 +1,5 @@
 #include "run_md_lcao.h"
 #include "LOOP_elec.h"
-#include "LCAO_nnr.h"
 #include "FORCE_STRESS.h"
 #include "../src_pw/global.h"
 #include "../src_pw/vdwd2.h"
@@ -23,7 +22,7 @@
 #include "../module_md/NVT_NHC.h"
 #include "../module_md/Langevin.h"
 
-Run_MD_LCAO::Run_MD_LCAO(const Parallel_Orbitals &pv)
+Run_MD_LCAO::Run_MD_LCAO(Parallel_Orbitals &pv)
 {
     cellchange = false;
     this->LM_md.ParaV = &pv;
