@@ -921,8 +921,7 @@ ofs_mpi.close();
 	#endif
 }
 
-void Exx_Lcao::cal_exx_elec(std::vector<ModuleBase::matrix> &dm_gamma,
-    std::vector<ModuleBase::ComplexMatrix> &dm_k)
+void Exx_Lcao::cal_exx_elec(Local_Orbital_Charge &loc, complex<double>*** wfc_k_grid)
 {
 	ModuleBase::TITLE("Exx_Lcao","cal_exx_elec");
 
@@ -945,7 +944,7 @@ gettimeofday( &t_start_all, NULL);
 
 #if EXX_DM==1
 gettimeofday( &t_start, NULL);
-	this->DM_para.cal_DM( Born_von_Karman_period, H_atom_pairs_core, info.dm_threshold );
+	this->DM_para.cal_DM( Born_von_Karman_period, H_atom_pairs_core, info.dm_threshold, loc.DM, loc.DM_R, wfc_k_grid,);
 ofs_mpi<<"TIME@ Exx_Lcao::cal_DM\t"<<time_during(t_start)<<std::endl;
 #elif EXX_DM==2
 gettimeofday( &t_start, NULL);
@@ -954,7 +953,7 @@ gettimeofday( &t_start, NULL);
 ofs_mpi<<"TIME@ Exx_Lcao::cal_DM\t"<<time_during(t_start)<<std::endl;
 #elif EXX_DM==3
 gettimeofday( &t_start, NULL);
-	this->DM_para.cal_DM(info.dm_threshold, dm_gamma, dm_k);
+	this->DM_para.cal_DM(info.dm_threshold, loc.dm_gamma, loc.dm_k);
 ofs_mpi<<"TIME@ Exx_Lcao::cal_DM\t"<<time_during(t_start)<<std::endl;
 #endif
 
@@ -1015,7 +1014,7 @@ ofs_mpi.close();
 	{
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			std::ofstream ofs("GlobalC::LOC.DM.dat",std::ofstream::app);
+			std::ofstream ofs("LOC.DM.dat",std::ofstream::app);
 			const int it1=0, it2=0;
 			for( size_t ia1=0; ia1!=GlobalC::ucell.atoms[it1].na; ++ia1 )
 				for( size_t ia2=0; ia2!=GlobalC::ucell.atoms[it2].na; ++ia2 )
@@ -1025,7 +1024,7 @@ ofs_mpi.close();
 						for( size_t iw1=0; iw1!=GlobalC::ucell.atoms[it1].nw; ++iw1 )
 						{
 							for( size_t iw2=0; iw2!=GlobalC::ucell.atoms[it2].nw; ++iw2 )
-								ofs<<GlobalC::LOC.DM[is][GlobalC::ucell.itiaiw2iwt(it1,ia1,iw1)][GlobalC::ucell.itiaiw2iwt(it2, ia2, iw2)]<<"\t";
+								ofs<<loc.DM[is][GlobalC::ucell.itiaiw2iwt(it1,ia1,iw1)][GlobalC::ucell.itiaiw2iwt(it2, ia2, iw2)]<<"\t";
 							ofs<<std::endl;
 						}
 						ofs<<std::endl;
@@ -1039,7 +1038,7 @@ ofs_mpi.close();
 			static int istep=0;
 			for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 			{
-				std::ofstream ofs("GlobalC::LOC.DM_"+ModuleBase::GlobalFunc::TO_STRING(istep++)+"_"+ModuleBase::GlobalFunc::TO_STRING(is));
+				std::ofstream ofs("LOC.DM_"+ModuleBase::GlobalFunc::TO_STRING(istep++)+"_"+ModuleBase::GlobalFunc::TO_STRING(is));
 				for(int T1=0; T1<GlobalC::ucell.ntype; T1++)
 				{
 					for(int I1=0; I1<GlobalC::ucell.atoms[T1].na; I1++)
@@ -1057,7 +1056,7 @@ ofs_mpi.close();
 								{
 									for( int iw2=0; iw2!=GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw; ++iw2 )
 									{
-										ofs<<GlobalC::LOC.DM_R[is][GlobalC::LNNR.nlocstartg[iat1]+iv]<<"\t";
+										ofs<<loc.DM_R[is][GlobalC::LNNR.nlocstartg[iat1]+iv]<<"\t";
 										++iv;
 									}
 									ofs<<std::endl;
@@ -1073,7 +1072,7 @@ ofs_mpi.close();
 		}
 	};
 	
-	auto print_WFC = [&]()
+	auto print_WFC = [&](std::complex<double>*** wfc_k_grid)
 	{
 		if( GlobalV::GAMMA_ONLY_LOCAL )
 		{
@@ -1101,11 +1100,11 @@ ofs_mpi.close();
 		{
 			for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 			{
-				std::ofstream ofs("GlobalC::LOWF.WFC_K_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(ik));
+				std::ofstream ofs("LOWF.wfc_k_grid_"+ModuleBase::GlobalFunc::TO_STRING(istep)+"_"+ModuleBase::GlobalFunc::TO_STRING(ik));
 				for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
 				{
 					for( size_t iwt=0; iwt!=GlobalV::NLOCAL; ++iwt )
-						ofs<<GlobalC::LOWF.WFC_K[ik][ib][iwt]<<"\t";
+						ofs<<wfc_k_grid[ik][ib][iwt]<<"\t";
 					ofs<<std::endl;
 				}
 				ofs.close();

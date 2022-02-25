@@ -12,6 +12,7 @@
 #include "../module_base/element_basis_index.h"
 #include "../src_pw/xc_type.h"
 #include "../src_pw/exx_global.h"
+#include "src_lcao/local_orbital_charge.h"
 
 #if EXX_DM==1
 #include "exx_abfs-parallel-communicate-dm.h"
@@ -37,8 +38,7 @@ public:
 public:
 	void init();
 	void cal_exx_ions();
-	void cal_exx_elec(std::vector<ModuleBase::matrix> &dm_gamma,
-        std::vector<ModuleBase::ComplexMatrix> &dm_k);
+	void cal_exx_elec(Local_Orbital_Charge &loc, complex<double>*** wfc_k_grid);
 	void cal_exx_elec_nscf();
 	void add_Hexx(const size_t ik, const double alpha) const;
 private:

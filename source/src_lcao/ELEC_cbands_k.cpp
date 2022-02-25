@@ -10,13 +10,14 @@
 #include "LCAO_nnr.h"
 #endif
 #include "../module_base/timer.h"
+#include "src_lcao/local_orbital_wfc.h"
 
 ELEC_cbands_k::ELEC_cbands_k(){};
 ELEC_cbands_k::~ELEC_cbands_k(){};
 
 
 void ELEC_cbands_k::cal_bands(const int& istep, LCAO_Hamilt& uhm,
-    std::vector<ModuleBase::ComplexMatrix>& wfc_k,
+    Local_Orbital_wfc &lowf,
     std::vector<ModuleBase::ComplexMatrix>& dm_k)
 {
 	ModuleBase::TITLE("ELEC_cbands_k","cal_bands");
@@ -139,10 +140,10 @@ void ELEC_cbands_k::cal_bands(const int& istep, LCAO_Hamilt& uhm,
 			GlobalC::restart.save_disk("H", ik);
 		}
 
-		// write the wave functions into GlobalC::LOWF.WFC_K[ik].
+		// write the wave functions into wfc_k_grid[ik].
 		ModuleBase::timer::tick("Efficience","diago_k");
 		Diago_LCAO_Matrix DLM;
-		DLM.solve_complex_matrix(ik, GlobalC::LOWF.WFC_K[ik], wfc_k[ik]);
+		DLM.solve_complex_matrix(ik, lowf.wfc_k_grid[ik], lowf.wfc_k[ik]);
 		ModuleBase::timer::tick("Efficience","diago_k");
 
 		ModuleBase::timer::tick("Efficience","each_k");

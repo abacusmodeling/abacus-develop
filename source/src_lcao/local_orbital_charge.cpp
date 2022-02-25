@@ -16,6 +16,8 @@ extern "C"
     int Cblacs_pnum(int icontxt, int prow, int pcol);
 }
 
+int Local_Orbital_Charge::out_dm = 0;
+
 Local_Orbital_Charge::Local_Orbital_Charge()
 {
     // for gamma algorithms.
@@ -26,9 +28,6 @@ Local_Orbital_Charge::Local_Orbital_Charge()
     // for k-dependent algorithms.
     this->init_DM_R = false;
 
-	// whether to printout density matrix
-    this->out_dm = 0;
-
     //xiaohui add 2014-06-19
     //band_local = nullptr;
     //Z_wg = nullptr;
@@ -36,10 +35,12 @@ Local_Orbital_Charge::Local_Orbital_Charge()
     sender_2D_index = nullptr;
     sender_size_process = nullptr;
     sender_displacement_process = nullptr;
+    sender_buffer = nullptr;
 
     receiver_local_index = nullptr;
     receiver_size_process = nullptr;
     receiver_displacement_process = nullptr;
+    receiver_buffer = nullptr;
 }
 
 Local_Orbital_Charge::~Local_Orbital_Charge()
@@ -77,25 +78,23 @@ Local_Orbital_Charge::~Local_Orbital_Charge()
 
 
 void Local_Orbital_Charge::allocate_dm_wfc(const Grid_Technique& gt,
-    std::vector<ModuleBase::matrix>& wfc_gamma,
-    std::vector<ModuleBase::ComplexMatrix>& wfc_k)
+    Local_Orbital_wfc &lowf)
 {
     ModuleBase::TITLE("Local_Orbital_Charge", "allocate_dm_wfc");
-    this->wfc_gamma = &wfc_gamma;
-    this->wfc_k = &wfc_k;
-
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
 		// here we reset the density matrix dimension.
 		this->allocate_gamma(gt);
 	}
 	else
-	{
-		GlobalC::LOWF.allocate_k(gt, wfc_k);
+    {
+		lowf.allocate_k(gt, lowf.wfc_k);
 		this->allocate_DM_k();
 	}
 
-	return;
+    this->LOWF = &lowf;
+    
+    return;
 }
 
 
@@ -130,7 +129,7 @@ void Local_Orbital_Charge::sum_bands(void)
 
             //caution:wfc and dm 
             this->cal_dm(GlobalC::wf.wg,
-                *wfc_gamma, this->dm_gamma);        // Peize Lin test 2019-01-16
+                this->LOWF->wfc_gamma, this->dm_gamma);        // Peize Lin test 2019-01-16
 
             ModuleBase::timer::tick("LCAO_Charge","cal_dm_2d");
 
@@ -148,7 +147,7 @@ void Local_Orbital_Charge::sum_bands(void)
         if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")        // Peize Lin test 2019-05-15
 		{
             this->cal_dm(GlobalC::wf.wg,
-                *wfc_k, this->dm_k);
+                this->LOWF->wfc_k, this->dm_k);
         }
     }
 
@@ -165,12 +164,12 @@ void Local_Orbital_Charge::sum_bands(void)
 
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {
-        GlobalC::UHM.GG.cal_rho(GlobalC::LOC.DM);
+        GlobalC::UHM.GG.cal_rho(this->DM);
     }
     else
     {
         ModuleBase::GlobalFunc::NOTE("Calculate the charge on real space grid!");
-        GlobalC::UHM.GK.cal_rho_k();
+        GlobalC::UHM.GK.cal_rho_k(this->DM_R);
     }
 
      time_t end = time(NULL);

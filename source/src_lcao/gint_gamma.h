@@ -31,7 +31,7 @@ class Gint_Gamma : public Grid_Base_Beta
 	void cal_vlocal( const double*const vlocal);
 
 	// (2) calculate charge density
-	double cal_rho(const double*const*const*const DM);
+	double cal_rho(double*** DM_in);
 
 	// (3) calcualte the forces related to grid
 	void cal_force( const double*const vlocal);
@@ -43,9 +43,10 @@ class Gint_Gamma : public Grid_Base_Beta
 	void cal_mulliken(double** mulliken);
 
 
-	private:	
+private:
 
-	double* transformer;
+    double***  DM;   //pointer to LOC.DM
+    double* transformer;
 	double psiv1;
 	double psiv2;
 	double* ylm1;

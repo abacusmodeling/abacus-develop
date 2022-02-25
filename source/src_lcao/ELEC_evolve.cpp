@@ -29,7 +29,7 @@ int ELEC_evolve::td_dipoleout;
 void ELEC_evolve::evolve_psi(
 	const int &istep,
     LCAO_Hamilt& uhm,
-    vector<ModuleBase::ComplexMatrix> &wfc_k)
+    Local_Orbital_wfc &lowf)
 {
 	ModuleBase::TITLE("ELEC_evolve","eveolve_psi");
 	ModuleBase::timer::tick("ELEC_evolve","evolve_psi");
@@ -121,7 +121,7 @@ void ELEC_evolve::evolve_psi(
 		}		
 		ModuleBase::timer::tick("Efficience","evolve_k");
 		Evolve_LCAO_Matrix ELM;
-		ELM.evolve_complex_matrix(ik, GlobalC::LOWF.WFC_K[ik], wfc_k[ik]);
+		ELM.evolve_complex_matrix(ik, lowf);
 		ModuleBase::timer::tick("Efficience","evolve_k");
 	} // end k
 

@@ -31,7 +31,7 @@ Run_MD_LCAO::Run_MD_LCAO()
 Run_MD_LCAO::~Run_MD_LCAO(){}
 
 
-void Run_MD_LCAO::opt_cell(void)
+void Run_MD_LCAO::opt_cell(ORB_control &orb_con)
 {
 	ModuleBase::TITLE("Run_MD_LCAO","opt_cell");
 
@@ -56,8 +56,11 @@ void Run_MD_LCAO::opt_cell(void)
     GlobalC::pot.init_pot(ion_step, GlobalC::pw.strucFac);
 
 	
-	opt_ions();
-	return;
+    opt_ions();
+    
+    orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
+    
+    return;
 }
 
 
@@ -191,7 +194,6 @@ void Run_MD_LCAO::opt_ions(void)
     GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
 	// mohan update 2021-02-10
-    GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
 
     ModuleBase::timer::tick("Run_MD_LCAO","opt_ions"); 
     return;
@@ -232,21 +234,22 @@ void Run_MD_LCAO::md_force_virial(
         GlobalC::en.evdw = vdwd3.get_energy();
     }
 
-    std::vector<ModuleBase::matrix> wfc_gamma_md;
-    std::vector<ModuleBase::ComplexMatrix> wfc_k_md;
+    Local_Orbital_wfc LOWF_md;
+    Local_Orbital_Charge LOC_md;
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {
-        wfc_gamma_md.resize(GlobalV::NSPIN);
+        LOWF_md.wfc_gamma.resize(GlobalV::NSPIN);
 	}
 	else
 	{
-        wfc_k_md.resize(GlobalC::kv.nks);
+        LOWF_md.wfc_k.resize(GlobalC::kv.nks);
     }
-    GlobalC::LOC.init_dm_2d();
+
+    LOC_md.init_dm_2d();
     // solve electronic structures in terms of LCAO
     // mohan add 2021-02-09
     LOOP_elec LOE;
-    LOE.solve_elec_stru(istep + 1, wfc_gamma_md, GlobalC::LOC.dm_gamma, wfc_k_md, GlobalC::LOC.dm_k);
+    LOE.solve_elec_stru(istep + 1, LOC_md, LOWF_md);
 
     //to call the force of each atom
 	ModuleBase::matrix fcs;//temp force matrix
@@ -254,7 +257,7 @@ void Run_MD_LCAO::md_force_virial(
 	FSL.allocate (); 
     FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS,
         GlobalV::TEST_FORCE, GlobalV::TEST_STRESS,
-        wfc_gamma_md, GlobalC::LOC.dm_gamma, wfc_k_md, GlobalC::LOC.dm_k, fcs, virial);
+        LOC_md, LOWF_md, fcs, virial);
 
 	for(int ion=0; ion<numIon; ++ion)
     {

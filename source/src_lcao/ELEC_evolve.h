@@ -4,6 +4,7 @@
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
 #include "LCAO_hamilt.h"
+#include "src_lcao/local_orbital_wfc.h"
 
 //-----------------------------------------------------------
 // mohan add 2021-02-09
@@ -42,7 +43,7 @@ class ELEC_evolve
 	private:
 
     static void evolve_psi(const int& istep, LCAO_Hamilt& uhm,
-    vector<ModuleBase::ComplexMatrix> &wfc_k);
+    Local_Orbital_wfc &lowf);
 
 };
 

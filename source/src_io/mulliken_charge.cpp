@@ -102,7 +102,7 @@ Mulliken_Charge::~Mulliken_Charge()
 }
 
   
-void Mulliken_Charge::cal_mulliken(void)
+void Mulliken_Charge::cal_mulliken(ORB_control &orb_con)
 {
 	ModuleBase::TITLE("Mulliken_Charge","cal_mulliken");
 
@@ -176,7 +176,7 @@ void Mulliken_Charge::cal_mulliken(void)
 				GlobalV::test_atom_input);//qifeng-2019-01-21
 
 			// 2021-04-16
-				GlobalC::LOWF.orb_con.read_orb_first(
+				orb_con.read_orb_first(
 					GlobalV::ofs_running,
 					GlobalC::ORB,
 					GlobalC::ucell.ntype,
@@ -198,7 +198,7 @@ void Mulliken_Charge::cal_mulliken(void)
 				);
 
 			#ifdef __MPI
-				GlobalC::LOWF.orb_con.set_orb_tables(
+				orb_con.set_orb_tables(
 					GlobalV::ofs_running,
 					GlobalC::UOT,
 					GlobalC::ORB,
@@ -276,7 +276,7 @@ void Mulliken_Charge::cal_mulliken(void)
 				GlobalV::SEARCH_RADIUS, 
 				GlobalV::test_atom_input);
 #endif
-			GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
+			orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
 
 		}//else          
 	#ifdef __MPI           
@@ -304,8 +304,8 @@ void Mulliken_Charge::cal_mulliken(void)
 	return;                									
 }				   
 
-void Mulliken_Charge::stdout_mulliken(void)
-{                    this->cal_mulliken();
+void Mulliken_Charge::stdout_mulliken(ORB_control &orb_con)
+{                    this->cal_mulliken(orb_con);
 	if(GlobalV::MY_RANK == 0)
 	{
 		ModuleBase::TITLE("Dos","calculate_Mulliken");

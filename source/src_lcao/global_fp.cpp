@@ -5,8 +5,6 @@ namespace GlobalC
 {
 Grid_Driver GridD(GlobalV::test_deconstructor, GlobalV::test_grid_driver,GlobalV::test_grid);
 Parallel_Orbitals ParaO;
-Local_Orbital_Charge LOC;
-Local_Orbital_wfc LOWF;
 LCAO_Matrix LM;
 LCAO_Hamilt UHM;
 SubGrid_oper SGO; //mohan add 2012-01-12

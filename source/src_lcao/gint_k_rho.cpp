@@ -155,7 +155,8 @@ inline void cal_band_rho(
 	double** psir_DM, 
 	double* psir_DM_pool, 
 	int* vindex, 
-	bool** cal_flag)
+    bool** cal_flag,
+    double** DM_R)
 {
 	char trans='N';
 	double alpha_diag=1;
@@ -224,7 +225,7 @@ inline void cal_band_rho(
 				
 				const int DM_start = GlobalC::LNNR.nlocstartg[iat1]+ GlobalC::LNNR.find_R2st[iat1][offset];					
 				dgemm_(&trans, &trans, &block_size[ia1], &GlobalC::pw.bxyz, &block_size[ia1], &alpha_diag,
-					&GlobalC::LOC.DM_R[is][DM_start], &block_size[ia1], 
+					&DM_R[is][DM_start], &block_size[ia1], 
 					&psir_ylm[0][idx1], &LD_pool,  
 					&beta, &psir_DM[0][idx1], &LD_pool);
 			}
@@ -267,7 +268,7 @@ inline void cal_band_rho(
     				if(cal_flag[ib][ia1])
     				{
         				dgemv_(&trans, &block_size[ia1], &block_size[ia1], &alpha_diag,
-					            &GlobalC::LOC.DM_R[is][DM_start], &block_size[ia1], 
+					            &DM_R[is][DM_start], &block_size[ia1], 
 					            &psir_ylm[ib][idx1], &inc,  
 					            &beta, &psir_DM[ib][idx1], &inc);
     				}
@@ -327,7 +328,7 @@ inline void cal_band_rho(
     				const int DM_start = GlobalC::LNNR.nlocstartg[iat1]+ GlobalC::LNNR.find_R2st[iat1][offset];
 
     				dgemm_(&trans, &trans, &block_size[ia2], &GlobalC::pw.bxyz, &block_size[ia1], &alpha_nondiag,
-    					&GlobalC::LOC.DM_R[is][DM_start], &block_size[ia2], 
+    					&DM_R[is][DM_start], &block_size[ia2], 
     					&psir_ylm[0][idx1], &LD_pool,
     					&beta, &psir_DM[0][idx2], &LD_pool);
 				}
@@ -379,7 +380,7 @@ inline void cal_band_rho(
         				if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
         				{
             				dgemv_(&trans, &block_size[ia2], &block_size[ia1], &alpha_nondiag,
-            					&GlobalC::LOC.DM_R[is][DM_start], &block_size[ia2], 
+            					&DM_R[is][DM_start], &block_size[ia2], 
             					&psir_ylm[ib][idx1], &inc,
             					&beta, &psir_DM[ib][idx2], &inc);
         				}
@@ -400,10 +401,12 @@ inline void cal_band_rho(
 }
 
 
-void Gint_k::cal_rho_k(void)
+void Gint_k::cal_rho_k(double** DM_R_in)
 {
 	ModuleBase::TITLE("Gint_k","cal_rho_k");
-	ModuleBase::timer::tick("Gint_k","cal_rho_k");
+    ModuleBase::timer::tick("Gint_k", "cal_rho_k");
+
+    this->DM_R = DM_R_in;
 
 #ifdef __MKL
     const int mkl_threads = mkl_get_max_threads();
@@ -508,7 +511,8 @@ void Gint_k::cal_rho_k(void)
 					psir_DM, 
 					psir_DM_pool, 
 					vindex, 
-					cal_flag);
+                    cal_flag,
+                    this->DM_R);
 
 			}// int k
 		}// int j
@@ -688,7 +692,7 @@ void Gint_k::evaluate_pDMp(
 				
 				for(int is=0; is<GlobalV::NSPIN; is++)
 				{
-					dm = GlobalC::LOC.DM_R[is];
+					dm = this->DM_R[is];
 					tchgs = tchg[is];
 					for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
 					{
