@@ -512,6 +512,7 @@ void energy::print_band(const int &ik)
 
 // Peize Lin add 2016-12-03
 #ifdef __LCAO
+#ifdef __MPI
 void energy::set_exx()
 {
 	ModuleBase::TITLE("energy", "set_exx");
@@ -546,4 +547,5 @@ void energy::set_exx()
 
 	return;
 }
-#endif
+#endif //__MPI
+#endif //_LCAO

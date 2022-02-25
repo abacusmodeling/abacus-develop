@@ -88,6 +88,7 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> d
         {	
             this->GG.cal_vlocal(GlobalC::pot.vr_eff1);
 
+        #ifdef __MPI //liyuanbo 2022/2/23
             // Peize Lin add 2016-12-03
             if( 5==GlobalC::xcf.iexch_now && 0==GlobalC::xcf.igcx_now )				// HF
             {
@@ -101,6 +102,7 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik , vector<ModuleBase::matrix> d
             {
                 GlobalC::exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
             }
+        #endif
         }
 
         time_t time_vlocal_end = time(NULL);
@@ -243,6 +245,7 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
             this->GK.folding_vl_k_nc(ik);
         }
 
+    #ifdef __MPI //liyuanbo 2022/2/23
         // Peize Lin add 2016-12-03
         if( 5==GlobalC::xcf.iexch_now && 0==GlobalC::xcf.igcx_now )				// HF
         {
@@ -256,6 +259,7 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
         {
             GlobalC::exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
         }
+    #endif
     }
 
 
@@ -795,12 +799,14 @@ void LCAO_Hamilt::calculate_HSR_sparse(const int &current_spin, const double &sp
         }
     }
 
+#ifdef __MPI
     if (GlobalC::exx_global.info.hybrid_type==Exx_Global::Hybrid_Type::HF
         || GlobalC::exx_global.info.hybrid_type==Exx_Global::Hybrid_Type::PBE0
         || GlobalC::exx_global.info.hybrid_type==Exx_Global::Hybrid_Type::HSE)
     {
         calculate_HR_exx_sparse(current_spin, sparse_threshold);
     }
+#endif
 
     clear_zero_elements(current_spin, sparse_threshold);
 

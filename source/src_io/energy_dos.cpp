@@ -119,7 +119,9 @@ void energy::perform_dos(Local_Orbital_wfc &lowf)
 		}
 		for(int ip=0; ip<GlobalV::NPOOL; ip++)
 		{
+		#ifdef __MPI
 			MPI_Barrier(MPI_COMM_WORLD);
+		#endif
 			if( GlobalV::MY_POOL == ip )
 			{
 				if( GlobalV::RANK_IN_POOL != 0 ) continue;
@@ -282,7 +284,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf)
 					const double one_float=1.0, zero_float=0.0;
 					const int one_int=1;
 
-
+				#ifdef __MPI
 					const char T_char='T';		
 					pdgemv_(
 							&T_char,
@@ -293,6 +295,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf)
 							&zero_float,
 							Mulk[0].c, &one_int, &NB, GlobalC::ParaO.desc,
 							&one_int);
+				#endif
 
 					for (int j=0; j<GlobalV::NLOCAL; ++j)
 					{
@@ -348,6 +351,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf)
 					GlobalC::ORB
 				);
 
+			#ifdef __MPI
 				lowf.orb_con->set_orb_tables(
 					GlobalV::ofs_running,
 					GlobalC::UOT,
@@ -358,6 +362,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf)
 					GlobalC::ucell.infoNL.nprojmax,
 					GlobalC::ucell.infoNL.nproj,
 					GlobalC::ucell.infoNL.Beta);
+			#endif
 
 				GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
 				GlobalC::LM.zeros_HSR('S');
@@ -403,6 +408,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf)
 							//   const int two_int=2;
 							const char T_char='T';		// N_char='N',U_char='U'
 
+						#ifdef __MPI
 							pzgemv_(
 									&T_char,
 									&GlobalV::NLOCAL,&GlobalV::NLOCAL,
@@ -412,7 +418,7 @@ void energy::perform_dos(Local_Orbital_wfc &lowf)
 									&zero_float,
 									Mulk[0].c, &one_int, &NB, GlobalC::ParaO.desc,
 									&one_int);
-
+						#endif
 
 
 							for (int j=0; j<GlobalV::NLOCAL; ++j)
@@ -448,8 +454,9 @@ void energy::perform_dos(Local_Orbital_wfc &lowf)
 				// mohan update 2021-02-10
 				lowf.orb_con->clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
 			}//else
-
+		#ifdef __MPI
 		 MPI_Reduce(pdosk[is].c, pdos[is].c , NUM , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);
+		#endif
 	 }//is                                              
 	 delete[] pdosk;                                               
 	 delete[] waveg;
@@ -798,3 +805,4 @@ void energy::perform_dos(Local_Orbital_wfc &lowf)
 	}
 	return;
 }
+

@@ -1,4 +1,4 @@
-#ifdef __MPI
+#ifdef __MPI   
 #include "exx_lcao.h"
 
 #include "../src_pw/global.h"
@@ -531,6 +531,7 @@ gettimeofday( &t_start_all, NULL);
 //	DM.flag_mix = info.separate_loop ? false : true;
 //	DM.flag_mix = false;		// Peize Lin test
 
+#ifdef __MPI
 	if(GlobalC::exx_global.info.separate_loop)
 	{
 		Hexx_para.mixing_mode = Exx_Abfs::Parallel::Communicate::Hexx::Mixing_Mode::No;
@@ -552,13 +553,16 @@ gettimeofday( &t_start_all, NULL);
 		}
 		Hexx_para.mixing_beta = GlobalC::CHR.mixing_beta;
 	}
+#endif
 
 gettimeofday( &t_start, NULL);
 	this->lcaos = Exx_Abfs::Construct_Orbs::change_orbs( GlobalC::ORB, this->kmesh_times );
 ofs_mpi<<"TIME@ Exx_Abfs::Construct_Orbs::change_orbs\t"<<time_during(t_start)<<std::endl;
 
 ofs_mpi<<info.files_abfs<<std::endl;
+#ifdef __MPI
 	Exx_Abfs::Util::bcast( info.files_abfs, 0, MPI_COMM_WORLD );
+#endif
 ofs_mpi<<info.files_abfs<<std::endl;
 
 gettimeofday( &t_start, NULL);
@@ -812,6 +816,7 @@ gettimeofday( &t_start_all, NULL);
 	};
 	
 gettimeofday( &t_start, NULL);
+#ifdef __MPI
 	if(atom_pairs_core_origin.empty())
 		switch(this->info.distribute_type)
 		{
@@ -827,6 +832,7 @@ gettimeofday( &t_start, NULL);
 				throw std::domain_error(ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));  break;
 				//throw std::domain_error(ModuleBase::GlobalFunc::TO_STRING(static_cast<std::underlying_type<Exx_Lcao::Distribute_Type>::type>(info.distribute_type))+"\t"+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));	break;
 		}
+#endif
 ofs_mpi<<"atom_pairs_core_origin\t"<<atom_pairs_core_origin.size()<<std::endl;
 ofs_mpi<<"TIME@ Htime::distribute\t"<<time_during(t_start)<<std::endl;
 //std::ofstream ofs_atom_pair("atom_pair+"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
@@ -952,10 +958,13 @@ ofs_mpi<<"TIME@ Exx_Lcao::cal_DM\t"<<time_during(t_start)<<std::endl;
 #endif
 
 gettimeofday( &t_start, NULL);
+#ifdef __MPI
 	cauchy.cal_norm_D_max( DM_para.DMr );
+#endif
 ofs_mpi<<"TIME@ cauchy.cal_norm_D_max\t"<<time_during(t_start)<<std::endl;
+#ifdef __MPI
 ofs_mpi<<"sizeof_DM\t"<<get_sizeof(DM_para.DMr)<<std::endl;
-
+#endif
 gettimeofday( &t_start, NULL);
 	// HexxR[is][iat1][iat2][box2]
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> HexxR = cal_Hexx();
@@ -968,14 +977,19 @@ gettimeofday( &t_start, NULL);
 ofs_mpi<<"TIME@ Exx_Lcao::cal_energy\t"<<time_during(t_start)<<std::endl;
 
 gettimeofday( &t_start, NULL);
+#ifdef __MPI
 	Hexx_para.Rexx_to_Km2D( HexxR, {GlobalC::pot.start_pot=="file",GlobalC::CHR.out_charge} );
+#endif
 ofs_mpi<<"TIME@ Hexx_para.Rexx_to_Km2D\t"<<time_during(t_start)<<std::endl;
 
+#ifdef __MPI
 ofs_mpi<<"sizeof_Hexx2D\t"<<get_sizeof(Hexx_para.HK_Gamma_m2D)+get_sizeof(Hexx_para.HK_K_m2D)<<std::endl;
+#endif
 
 ofs_mpi<<"TIME@ Exx_Lcao::cal_exx_elec\t"<<time_during(t_start_all)<<std::endl;
 ofs_mpi.close();
 
+#ifdef __MPI
 	auto print_Hexxk = [&]()
 	{
 		std::ofstream ofs("Hexxk_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK));
@@ -986,6 +1000,7 @@ ofs_mpi.close();
 		};
 		ofs.close();
 	};
+#endif
 
 	#if TEST_EXX_LCAO==1
 		ofs_matrixes("DMk_"+ModuleBase::GlobalFunc::TO_STRING(istep)+".dat",DM.DMk);
@@ -1097,6 +1112,7 @@ ofs_mpi.close();
 		}
 	};
 
+#ifdef __MPI
 	auto print_Hexx=[&]()		// Peize Lin test 2019-11-14
 	{
 		if(GlobalV::GAMMA_ONLY_LOCAL)
@@ -1116,6 +1132,7 @@ ofs_mpi.close();
 			}
 		}
 	};
+#endif
 
 	auto print_wfc=[&](std::vector<ModuleBase::matrix>& wfc_gamma,
         std::vector<ModuleBase::ComplexMatrix>& wfc_k)		// Peize Lin test 2019-11-14
@@ -1173,7 +1190,9 @@ ofs_mpi.close();
 void Exx_Lcao::cal_exx_elec_nscf()
 {
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> HexxR;
+#ifdef __MPI
 	Hexx_para.Rexx_to_Km2D( HexxR, {GlobalC::pot.start_pot=="file",GlobalC::CHR.out_charge} );
+#endif
 }
 
 /*
@@ -1778,4 +1797,4 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Mo
 	
 	return HexxR;
 }
-#endif
+#endif //__MPI

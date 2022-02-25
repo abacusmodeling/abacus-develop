@@ -295,7 +295,10 @@ namespace ModuleDMFT
               wfc_iks[GlobalC::ParaO.MatrixInfo.row_set[ir]] = wfc[ik+nks_tot*is](ib_local, ir);
           
           std::vector<std::complex<double>> tmp = wfc_iks;
+
+        #ifdef __MPI
           MPI_Allreduce(&tmp[0], &wfc_iks[0], GlobalV::NLOCAL, MPI_DOUBLE_COMPLEX, MPI_SUM, MPI_COMM_WORLD);
+        #endif
 
           for(int iw=0; iw<GlobalV::NLOCAL; iw++)
             ofs << std::setw(2) << GlobalC::kv.isk[ik+nks_tot*is]
@@ -389,9 +392,12 @@ namespace ModuleDMFT
       }
 
       std::vector<std::complex<double>> Sk(GlobalV::NLOCAL*GlobalV::NLOCAL, zero);
+    
+    #ifdef __MPI
       MPI_Allreduce( &Sk_tmp[0], &Sk[0], GlobalV::NLOCAL*GlobalV::NLOCAL,
 	  								 MPI_DOUBLE_COMPLEX, MPI_SUM, MPI_COMM_WORLD );
-      
+    #endif
+
       if(GlobalV::MY_RANK==0)
       {
         std::stringstream ss;

@@ -329,6 +329,7 @@ void DFTU::cal_occup_m_k(const int iter,  std::vector<ModuleBase::ComplexMatrix>
 		// srho(mu,nu) = \sum_{iw} S(mu,iw)*dm_k(iw,nu)
         this->folding_overlap_matrix(ik, &Sk[0]);
 
+	#ifdef __MPI
 		pzgemm_(&transN, &transT,
 				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 				&alpha, 
@@ -336,6 +337,7 @@ void DFTU::cal_occup_m_k(const int iter,  std::vector<ModuleBase::ComplexMatrix>
 				dm_k.at(ik).c, &one_int, &one_int, GlobalC::ParaO.desc,
 				&beta, 
 				&srho[0], &one_int, &one_int, GlobalC::ParaO.desc);
+	#endif
 
     	const int spin = GlobalC::kv.isk[ik];
     	for(int it=0; it<GlobalC::ucell.ntype; it++)
@@ -438,6 +440,7 @@ void DFTU::cal_occup_m_k(const int iter,  std::vector<ModuleBase::ComplexMatrix>
 					if(n!=0) continue;
 					// set the local occupation mumber matrix of spin up and down zeros
 
+				#ifdef __MPI
 					if(GlobalV::NSPIN==1 || GlobalV::NSPIN==4)
 					{
 						ModuleBase::matrix temp(locale[iat][l][n][0]);
@@ -454,7 +457,8 @@ void DFTU::cal_occup_m_k(const int iter,  std::vector<ModuleBase::ComplexMatrix>
 						MPI_Allreduce( &temp1(0,0), &locale[iat][l][n][1](0,0), (2*l+1)*(2*l+1),
 												MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 					}
-				
+				#endif
+
 					// for the case spin independent calculation
 					switch(GlobalV::NSPIN)
 					{
@@ -527,6 +531,8 @@ void DFTU::cal_occup_m_gamma(const int iter,  std::vector<ModuleBase::matrix> &d
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		// srho(mu,nu) = \sum_{iw} S(mu,iw)*dm_gamma(iw,nu)
+	
+	#ifdef __MPI
 		pdgemm_(&transN, &transT,
 				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 				&alpha, 
@@ -534,6 +540,7 @@ void DFTU::cal_occup_m_gamma(const int iter,  std::vector<ModuleBase::matrix> &d
 				dm_gamma.at(is).c, &one_int, &one_int, GlobalC::ParaO.desc,
 				&beta,
 				&srho[0], &one_int, &one_int, GlobalC::ParaO.desc);
+	#endif
 
     for(int it=0; it<GlobalC::ucell.ntype; it++)
 	  {
@@ -603,8 +610,11 @@ void DFTU::cal_occup_m_gamma(const int iter,  std::vector<ModuleBase::matrix> &d
 	  				}
 
 	  				ModuleBase::matrix temp(locale[iat][l][n][is]);
+					
+				#ifdef __MPI
 	  				MPI_Allreduce( &temp(0,0), &locale[iat][l][n][is](0,0), (2*l+1)*GlobalV::NPOL*(2*l+1)*GlobalV::NPOL,
 	  								      MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
+				#endif
 
 	  				// for the case spin independent calculation
 	  				switch(GlobalV::NSPIN)
@@ -942,7 +952,8 @@ void DFTU::local_occup_bcast()
 				{
 					// if(!Yukawa && n!=0) continue;
 					if(n!=0) continue;
-										
+
+				#ifdef __MPI				
 					if(GlobalV::NSPIN==1 || GlobalV::NSPIN==2)
 					{
 						for(int spin=0; spin<2; spin++)
@@ -975,7 +986,8 @@ void DFTU::local_occup_bcast()
 								}
 							}											
 						}
-					}					
+					}		
+				#endif			
 				}
 			}
 		}
@@ -1173,6 +1185,7 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, std::complex<d
 	std::vector<std::complex<double>> VU(GlobalC::ParaO.nloc);
   	this->cal_VU_pot_mat_complex(spin, true, &VU[0]);
 
+#ifdef __MPI
 	pzgemm_(&transN, &transN,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 		&half, 
@@ -1180,16 +1193,20 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, std::complex<d
 		GlobalC::LM.Sloc2.data(), &one_int, &one_int, GlobalC::ParaO.desc,
 		&zero,
 		eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
+#endif
 
   	for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
     VU[irc] = eff_pot[irc];
   
   	//pztranc(m, n, alpha, a, ia, ja, desca, beta, c, ic, jc, descc)
+
+#ifdef __MPI
   	pztranc_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
 		&one, 
 		&VU[0], &one_int, &one_int, GlobalC::ParaO.desc, 
 		&one, 
 		eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
+#endif
 
 	//code for testing whther the effective potential is Hermitian
 	/*
@@ -1260,6 +1277,7 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 	std::vector<double> VU(GlobalC::ParaO.nloc);
   	this->cal_VU_pot_mat_real(spin, 1, &VU[0]);
 
+#ifdef __MPI
 	pdgemm_(&transN, &transN,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 		&half, 
@@ -1267,16 +1285,20 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 		GlobalC::LM.Sloc.data(), &one_int, &one_int, GlobalC::ParaO.desc,
 		&beta,
 		eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
+#endif
 
   	for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
     	VU[irc] = eff_pot[irc];
   
 	// pdtran(m, n, alpha, a, ia, ja, desca, beta, c, ic, jc, descc)
+
+#ifdef __MPI
 	pdtran_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
 		&one, 
 		&VU[0], &one_int, &one_int, GlobalC::ParaO.desc, 
 		&one, 
 		eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
+#endif
 
 	//code for testing whther the effective potential is Hermitian
 	/*
@@ -1446,6 +1468,7 @@ void DFTU::cal_eff_pot_mat_R_double(const int ispin, double* SR, double* HR)
 	std::vector<double> VU(GlobalC::ParaO.nloc);
 	this->cal_VU_pot_mat_real(ispin, 1, &VU[0]);
 
+#ifdef __MPI
   pdgemm_(&transN, &transN,
     &GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
     &half, 
@@ -1461,6 +1484,7 @@ void DFTU::cal_eff_pot_mat_R_double(const int ispin, double* SR, double* HR)
     ModuleBase::GlobalFunc::VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc,
     &one,
     HR, &one_int, &one_int, GlobalC::ParaO.desc);
+#endif
 
   return;
 }
@@ -1476,6 +1500,7 @@ void DFTU::cal_eff_pot_mat_R_complex_double(
   std::vector<std::complex<double>> VU(GlobalC::ParaO.nloc);
   this->cal_VU_pot_mat_complex(ispin, 1, &VU[0]);
 
+#ifdef __MPI
   pzgemm_(&transN, &transN,
     &GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
     &half, 
@@ -1491,6 +1516,7 @@ void DFTU::cal_eff_pot_mat_R_complex_double(
     ModuleBase::GlobalFunc::VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc,
     &one,
     HR, &one_int, &one_int, GlobalC::ParaO.desc);
+#endif
 
     return;
 }
