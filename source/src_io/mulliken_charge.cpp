@@ -123,7 +123,7 @@ void Mulliken_Charge::cal_mulliken(void)
 				const double one_float=1.0, zero_float=0.0;
 				const int one_int=1;
 
-
+			#ifdef __MPI
 				const char T_char='T';		
 				pdgemv_(
 						&T_char,
@@ -134,6 +134,7 @@ void Mulliken_Charge::cal_mulliken(void)
 						&zero_float,
 						mud[0].c, &one_int, &NB, GlobalC::ParaO.desc,
 						&one_int);
+			#endif
 
 				for (int j=0; j<GlobalV::NLOCAL; ++j)
 				{
@@ -196,6 +197,7 @@ void Mulliken_Charge::cal_mulliken(void)
 					GlobalC::ORB
 				);
 
+			#ifdef __MPI
 				GlobalC::LOWF.orb_con.set_orb_tables(
 					GlobalV::ofs_running,
 					GlobalC::UOT,
@@ -206,7 +208,7 @@ void Mulliken_Charge::cal_mulliken(void)
 					GlobalC::ucell.infoNL.nprojmax,
 					GlobalC::ucell.infoNL.nproj,
 					GlobalC::ucell.infoNL.Beta);
-
+			#endif
 
 
 			GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
@@ -235,6 +237,7 @@ void Mulliken_Charge::cal_mulliken(void)
 
 						const char T_char='T';		// N_char='N',U_char='U'
 
+					#ifdef __MPI
 						pzgemv_(
 								&T_char,
 								&GlobalV::NLOCAL,&GlobalV::NLOCAL,
@@ -244,6 +247,7 @@ void Mulliken_Charge::cal_mulliken(void)
 								&zero_float,
 								mud[0].c, &one_int, &NB, GlobalC::ParaO.desc,
 								&one_int);
+					#endif
 
 						for (int j=0; j<GlobalV::NLOCAL; ++j)
 						{
@@ -274,9 +278,10 @@ void Mulliken_Charge::cal_mulliken(void)
 #endif
 			GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
 
-		}//else                     
+		}//else          
+	#ifdef __MPI           
 		MPI_Reduce(MecMulP[is], DecMulP[is] , GlobalV::NLOCAL , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);
-
+	#endif
 		if(GlobalV::MY_RANK == 0)
 		{
 			for (int i=0; i<GlobalC::ucell.nat; i++)
@@ -499,6 +504,7 @@ void Mulliken_Charge::stdout_mulliken(void)
 
 	return;
 }
+
 
 
 
