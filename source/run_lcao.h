@@ -8,6 +8,7 @@
 #include "module_base/global_function.h"
 #include "module_base/global_variable.h"
 #include "input.h"
+#include "module_ensolver/en_solver.h"
 
 class Run_lcao
 {
@@ -18,7 +19,7 @@ class Run_lcao
     ~Run_lcao();
 
 	// perform Linear Combination of Atomic Orbitals (LCAO) calculations
-    static void lcao_line(void);
+    static void lcao_line(ModuleEnSover::En_Solver *p_ensolver);
 
 };
 

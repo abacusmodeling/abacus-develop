@@ -1,18 +1,10 @@
 #include "ions.h"
-#include "../src_pw/forces.h"
-#include "../src_pw/stress_pw.h"
 #include "../src_pw/global.h" // use chr.
-#include "../src_pw/vdwd2.h"
-#include "../src_pw/vdwd3.h"
-#include "../src_pw/vdwd2_parameters.h"
-#include "../src_pw/vdwd3_parameters.h"
-#include "../src_pw/pw_complement.h"
-#include "../src_pw/pw_basis.h"
 #include "../src_io/print_info.h"
 #include "variable_cell.h" // mohan add 2021-02-01
 #include "src_io/write_wfc_realspace.h"
 
-void Ions::opt_ions_pw(void)
+void Ions::opt_ions_pw(ModuleEnSover::En_Solver *p_ensolver)
 {
 	ModuleBase::TITLE("Ions","opt_ions_pw");
 	ModuleBase::timer::tick("Ions","opt_ions_pw");
@@ -140,7 +132,8 @@ void Ions::opt_ions_pw(void)
 			if( Exx_Global::Hybrid_Type::No==GlobalC::exx_global.info.hybrid_type  )
 			{	
 #endif		
-				elec.self_consistent(istep-1);
+				p_ensolver->Run(istep,GlobalC::ucell);
+				p_ensolver->cal_Energy(GlobalC::en);
 				eiter = elec.iter;
 #ifdef __LCAO
 			}
@@ -178,12 +171,6 @@ void Ions::opt_ions_pw(void)
             elec.non_self_consistent(istep-1);
 			eiter = elec.iter;
         }
-		// mohan added 2021-01-28, perform stochastic calculations
-		else if(GlobalV::CALCULATION=="scf-sto" || GlobalV::CALCULATION=="relax-sto" || GlobalV::CALCULATION=="md-sto")
-		{
-			elec_sto.scf_stochastic(istep-1);
-			eiter = elec_sto.iter;
-		}
 
 		if(GlobalC::pot.out_potential == 2)
 		{
@@ -200,7 +187,7 @@ void Ions::opt_ions_pw(void)
 
         if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
         {
-			stop = this->after_scf(istep, force_step, stress_step);    // pengfei Li 2018-05-14
+			stop = this->after_scf(p_ensolver, istep, force_step, stress_step);    // pengfei Li 2018-05-14
 		}
 		time_t fend = time(NULL);
 
@@ -251,20 +238,20 @@ void Ions::opt_ions_pw(void)
     return;
 }
 
-bool Ions::after_scf(const int &istep, int &force_step, int &stress_step)
+bool Ions::after_scf(ModuleEnSover::En_Solver *p_ensolver, const int &istep, int &force_step, int &stress_step)
 {
 	ModuleBase::TITLE("Ions","after_scf");
 	//calculate and gather all parts of total ionic forces
 	ModuleBase::matrix force;
 	if(GlobalV::FORCE)
 	{
-		this->gather_force_pw(force);
+		this->gather_force_pw(p_ensolver, force);
 	}
 	//calculate and gather all parts of stress
 	ModuleBase::matrix stress;
 	if(GlobalV::STRESS)
 	{
-		this->gather_stress_pw(stress);
+		this->gather_stress_pw(p_ensolver, stress);
 	}
 	//stop in last step
 	if(istep==GlobalV::NSTEP)
@@ -299,18 +286,21 @@ bool Ions::after_scf(const int &istep, int &force_step, int &stress_step)
 
     return 1;
 }
-void Ions::gather_force_pw(ModuleBase::matrix &force)
+void Ions::gather_force_pw(ModuleEnSover::En_Solver *p_ensolver, ModuleBase::matrix &force)
 {
 	ModuleBase::TITLE("Ions","gather_force_pw");
-	Forces fcs;
-	fcs.init(force);
+	// Forces fcs;
+	// fcs.init(force);
+	p_ensolver->cal_Force(force);
 }
-void Ions::gather_stress_pw(ModuleBase::matrix& stress)
+
+void Ions::gather_stress_pw(ModuleEnSover::En_Solver *p_ensolver, ModuleBase::matrix& stress)
 {
 	ModuleBase::TITLE("Ions","gather_stress_pw");
 	//basic stress
-	Stress_PW ss;
-	ss.cal_stress(stress);
+	// Stress_PW ss;
+	// ss.cal_stress(stress);
+	p_ensolver->cal_Stress(stress);
 	//external stress
 	double unit_transform = 0.0;
 	unit_transform = ModuleBase::RYDBERG_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;

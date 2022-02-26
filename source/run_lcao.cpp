@@ -17,7 +17,7 @@ Run_lcao::Run_lcao(){}
 Run_lcao::~Run_lcao(){}
 
 
-void Run_lcao::lcao_line(void)
+void Run_lcao::lcao_line(ModuleEnSover::En_Solver *p_ensolver)
 {
     ModuleBase::TITLE("Run_lcao","lcao_line");
 	ModuleBase::timer::tick("Run_lcao","lcao_line");
@@ -181,7 +181,7 @@ void Run_lcao::lcao_line(void)
 	if(GlobalV::CALCULATION=="md")
 	{
 		Run_MD_LCAO run_md_lcao;
-		run_md_lcao.opt_cell();
+		run_md_lcao.opt_cell(p_ensolver);
 	}
 	else // cell relaxations
 	{

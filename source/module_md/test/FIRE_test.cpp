@@ -14,7 +14,8 @@ protected:
         Setcell::parameters();
         verlet = new FIRE(INPUT.mdp, ucell);
 
-        verlet->setup();
+        ModuleEnSover::En_Solver *p_ensolver;
+        verlet->setup(p_ensolver);
     }
 
     void TearDown()

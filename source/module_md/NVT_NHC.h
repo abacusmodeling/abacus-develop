@@ -9,7 +9,7 @@ public:
     NVT_NHC(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in);
     ~NVT_NHC();
 
-    void setup();
+    void setup(ModuleEnSover::En_Solver *p_ensolve);
     void first_half();
     void second_half();
     void outputMD();
