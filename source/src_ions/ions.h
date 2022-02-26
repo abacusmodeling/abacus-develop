@@ -9,6 +9,7 @@
 #include "../src_pw/sto_elec.h" //mohan added 2021-01-28
 #include "ions_move_methods.h"
 #include "lattice_change_methods.h"
+#include "module_ensolver/en_solver.h"
 
 class Ions
 {
@@ -18,7 +19,7 @@ class Ions
     Ions(){};
     ~Ions(){};
 
-    void opt_ions_pw(void);
+    void opt_ions_pw(ModuleEnSover::En_Solver *p_ensolver);
 
 	private:
 
@@ -41,9 +42,9 @@ class Ions
 	Lattice_Change_Methods LCM;
 
 	//seperate force_stress function first
-	bool after_scf(const int &istep, int &force_step, int &stress_step);
-	void gather_force_pw(ModuleBase::matrix &force);
-	void gather_stress_pw(ModuleBase::matrix& stress);
+	bool after_scf(ModuleEnSover::En_Solver *p_ensolver,const int &istep, int &force_step, int &stress_step);
+	void gather_force_pw(ModuleEnSover::En_Solver *p_ensolver, ModuleBase::matrix &force);
+	void gather_stress_pw(ModuleEnSover::En_Solver *p_ensolver, ModuleBase::matrix& stress);
 	bool if_do_relax();
 	bool if_do_cellrelax();
 	bool do_relax(const int& istep, int& jstep, const ModuleBase::matrix& ionic_force, const double& total_energy);

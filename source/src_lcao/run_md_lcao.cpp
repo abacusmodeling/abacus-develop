@@ -34,7 +34,7 @@ Run_MD_LCAO::Run_MD_LCAO(Parallel_Orbitals &pv)
 Run_MD_LCAO::~Run_MD_LCAO(){}
 
 
-void Run_MD_LCAO::opt_cell(ORB_control &orb_con)
+void Run_MD_LCAO::opt_cell(ORB_control &orb_con, ModuleEnSover::En_Solver *p_ensolver)
 {
 	ModuleBase::TITLE("Run_MD_LCAO","opt_cell");
 
@@ -58,16 +58,14 @@ void Run_MD_LCAO::opt_cell(ORB_control &orb_con)
     int ion_step=0;
     GlobalC::pot.init_pot(ion_step, GlobalC::pw.strucFac);
 
-	
-    opt_ions();
-    
+    opt_ions(p_ensolver);
     orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
     
     return;
 }
 
 
-void Run_MD_LCAO::opt_ions(void)
+void Run_MD_LCAO::opt_ions(ModuleEnSover::En_Solver *p_ensolver)
 {
     ModuleBase::TITLE("Run_MD_LCAO","opt_ions"); 
     ModuleBase::timer::tick("Run_MD_LCAO","opt_ions"); 
@@ -121,7 +119,7 @@ void Run_MD_LCAO::opt_ions(void)
         if(verlet->step_ == 0)
         {
             MD_func::ParaV = this->LM_md.ParaV;
-            verlet->setup();
+            verlet->setup(p_ensolver);
         }
         else
         {
@@ -150,7 +148,7 @@ void Run_MD_LCAO::opt_ions(void)
             GlobalC::pot.init_pot(verlet->step_, GlobalC::pw.strucFac);
 
             // update force and virial due to the update of atom positions
-            MD_func::force_virial(verlet->step_, verlet->mdp, verlet->ucell, verlet->potential, verlet->force, verlet->virial);
+            MD_func::force_virial(p_ensolver, verlet->step_, verlet->mdp, verlet->ucell, verlet->potential, verlet->force, verlet->virial);
 
             verlet->second_half();
 
@@ -204,6 +202,7 @@ void Run_MD_LCAO::opt_ions(void)
 }
 
 void Run_MD_LCAO::md_force_virial(
+    ModuleEnSover::En_Solver *p_ensolver,
     const int &istep,
     const int& numIon, 
     double &potential, 

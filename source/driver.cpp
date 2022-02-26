@@ -85,21 +85,27 @@ void Driver::reading(void)
 void Driver::atomic_world(void)
 {
 	ModuleBase::TITLE("Driver","atomic_world");
-
 	//--------------------------------------------------
 	// choose basis sets:
 	// pw: plane wave basis set
 	// lcao_in_pw: LCAO expaned by plane wave basis set
 	// lcao: linear combination of atomic orbitals
 	//--------------------------------------------------
+	string use_ensol;
+	ModuleEnSover::En_Solver *p_ensolver;
 	if(GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 	{
-		Run_pw::plane_wave_line();
+		use_ensol = "ksdft_pw"; 
+		//We set it temporarily
+		//Finally, we have ksdft_pw, ksdft_lcao, sdft_pw, ofdft, lj, eam, etc.
+		ModuleEnSover::init_esolver(p_ensolver, use_ensol);
+		Run_pw::plane_wave_line(p_ensolver);
+		ModuleEnSover::clean_esolver(p_ensolver);
 	}
 #ifdef __LCAO
 	else if(GlobalV::BASIS_TYPE=="lcao")
 	{
-		Run_lcao::lcao_line();
+		Run_lcao::lcao_line(p_ensolver);
 	}
 #endif
 
