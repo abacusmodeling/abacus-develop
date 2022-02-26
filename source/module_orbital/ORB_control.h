@@ -49,9 +49,9 @@ class ORB_control
     ///set 2D-block-cyclic division according to the basis
     void setup_2d_division(void);
     
-#ifdef __MPI
-    void readin(const std::string& fa, const std::string& fb, const int& nlocal, double* eigen, double* eigvr);
-#endif
+// #ifdef __MPI
+//     void readin(const std::string& fa, const std::string& fb, const int& nlocal, double* eigen, double* eigvr);
+// #endif
 
     Parallel_Orbitals ParaV;
 

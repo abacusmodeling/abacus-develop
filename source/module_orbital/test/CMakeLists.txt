@@ -36,7 +36,6 @@ list(APPEND depend_files
   ../ORB_gen_tables.cpp
   ../../src_lcao/center2_orb-orb11.cpp
   ../../src_parallel/parallel_orbitals.cpp
-  ../../src_pdiag/pdiag_basic.cpp
   )
 AddTest(
   TARGET orbital_equal_test
