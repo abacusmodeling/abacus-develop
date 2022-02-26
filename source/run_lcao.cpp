@@ -117,6 +117,18 @@ void Run_lcao::lcao_line(void)
 		GlobalC::ucell.infoNL.nprojmax,
 		GlobalC::ucell.infoNL.nproj,
         GlobalC::ucell.infoNL.Beta);
+#else
+	int Lmax=0;
+	orb_con.set_orb_tables(
+		GlobalV::ofs_running,
+		GlobalC::UOT,
+		GlobalC::ORB,
+		GlobalC::ucell.lat0,
+		GlobalV::out_descriptor,
+		Lmax,
+		GlobalC::ucell.infoNL.nprojmax,
+		GlobalC::ucell.infoNL.nproj,
+        GlobalC::ucell.infoNL.Beta);
 #endif
 
     orb_con.setup_2d_division();
