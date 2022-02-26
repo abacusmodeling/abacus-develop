@@ -1,7 +1,6 @@
 #include "../src_parallel/parallel_common.h"
 #include "src_parallel/parallel_orbitals.h"
 #include "src_pdiag/pdiag_double.h"
-#include "../src_pw/global.h"
 #include "../src_io/wf_local.h"
 #include "../module_base/lapack_connector.h"
 #include "../module_base/memory.h"
