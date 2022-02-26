@@ -45,6 +45,8 @@ class LCAO_Hamilt
     // use overlap matrix to generate fixed Hamiltonian
     LCAO_gen_fixedH genH;
 
+    LCAO_Matrix* LM;
+    
     // init S (overlap matrix) flag.
     bool init_s;
 

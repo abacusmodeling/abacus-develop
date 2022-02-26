@@ -7,7 +7,6 @@
 #include "dftu.h"
 #ifdef __DEEPKS
 #include "../module_deepks/LCAO_deepks.h"
-#include "LCAO_nnr.h"
 #endif
 #include "../module_base/timer.h"
 #include "src_lcao/local_orbital_wfc.h"
@@ -34,7 +33,7 @@ void ELEC_cbands_k::cal_bands(const int& istep, LCAO_Hamilt& uhm,
 			GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            GlobalC::ParaO,
+            *lowf.ParaV,
 			GlobalC::kv);
     	GlobalC::ld.cal_descriptor();
 		//calculate dE/dD
@@ -44,8 +43,8 @@ void ELEC_cbands_k::cal_bands(const int& istep, LCAO_Hamilt& uhm,
 		GlobalC::ld.add_v_delta_k(GlobalC::ucell,
             GlobalC::ORB,
             GlobalC::GridD,
-            GlobalC::ParaO,
-			GlobalC::LNNR.nnr);
+            *lowf.ParaV,
+			lowf.ParaV->nnr);
 	}
 #endif
 
@@ -120,11 +119,11 @@ void ELEC_cbands_k::cal_bands(const int& istep, LCAO_Hamilt& uhm,
 		// Effective potential of DFT+U is added to total Hamiltonian here; Quxin adds on 20201029
 		if(INPUT.dft_plus_u)
 		{
-      std::vector<std::complex<double>> eff_pot(GlobalC::ParaO.nloc);
+      std::vector<std::complex<double>> eff_pot(lowf.ParaV->nloc);
 			GlobalC::dftu.cal_eff_pot_mat_complex(ik, istep, &eff_pot[0]);
       
-			for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
-				GlobalC::LM.Hloc2[irc] += eff_pot[irc];					
+			for(int irc=0; irc<lowf.ParaV->nloc; irc++)
+				uhm.LM->Hloc2[irc] += eff_pot[irc];					
 		}
 
 		ModuleBase::timer::tick("Efficience","H_k");
@@ -132,25 +131,25 @@ void ELEC_cbands_k::cal_bands(const int& istep, LCAO_Hamilt& uhm,
 		// Peize Lin add at 2020.04.04
 		if(GlobalC::restart.info_load.load_H && !GlobalC::restart.info_load.load_H_finish)
 		{
-			GlobalC::restart.load_disk("H", ik);
+			GlobalC::restart.load_disk(*uhm.LM, "H", ik);
 			GlobalC::restart.info_load.load_H_finish = true;
 		}
 		if(GlobalC::restart.info_save.save_H)
 		{
-			GlobalC::restart.save_disk("H", ik);
+			GlobalC::restart.save_disk(*uhm.LM, "H", ik);
 		}
 
 		// write the wave functions into wfc_k_grid[ik].
 		ModuleBase::timer::tick("Efficience","diago_k");
-		Diago_LCAO_Matrix DLM;
-		DLM.solve_complex_matrix(ik, lowf.wfc_k_grid[ik], lowf.wfc_k[ik]);
+		Diago_LCAO_Matrix DLM(uhm.LM);
+		DLM.solve_complex_matrix(ik, lowf);
 		ModuleBase::timer::tick("Efficience","diago_k");
 
 		ModuleBase::timer::tick("Efficience","each_k");
 	} // end k
 			
 	// LiuXh modify 2019-07-15*/
-	if(!GlobalC::ParaO.out_hsR)
+	if(!Pdiag_Double::out_hsR)
 	{
 		uhm.GK.destroy_pvpR();
 	}

@@ -1,6 +1,5 @@
 #include "run_md_lcao.h"
 #include "LOOP_elec.h"
-#include "LCAO_nnr.h"
 #include "FORCE_STRESS.h"
 #include "../src_pw/global.h"
 #include "../src_pw/vdwd2.h"
@@ -23,9 +22,13 @@
 #include "../module_md/NVT_NHC.h"
 #include "../module_md/Langevin.h"
 
-Run_MD_LCAO::Run_MD_LCAO()
+Run_MD_LCAO::Run_MD_LCAO(Parallel_Orbitals &pv)
 {
     cellchange = false;
+    this->LM_md.ParaV = &pv;
+    // * allocate H and S matrices according to computational resources
+	// * set the 'trace' between local H/S and global H/S
+	this->LM_md.divide_HS_in_frag(GlobalV::GAMMA_ONLY_LOCAL, pv);
 }
 
 Run_MD_LCAO::~Run_MD_LCAO(){}
@@ -117,6 +120,7 @@ void Run_MD_LCAO::opt_ions(void)
     {
         if(verlet->step_ == 0)
         {
+            MD_func::ParaV = this->LM_md.ParaV;
             verlet->setup();
         }
         else
@@ -236,7 +240,8 @@ void Run_MD_LCAO::md_force_virial(
 
     Local_Orbital_wfc LOWF_md;
     Local_Orbital_Charge LOC_md;
-    if(GlobalV::GAMMA_ONLY_LOCAL)
+    LOC_md.ParaV = LOWF_md.ParaV = this->LM_md.ParaV;
+    if (GlobalV::GAMMA_ONLY_LOCAL)
     {
         LOWF_md.wfc_gamma.resize(GlobalV::NSPIN);
 	}
@@ -248,16 +253,17 @@ void Run_MD_LCAO::md_force_virial(
     LOC_md.init_dm_2d();
     // solve electronic structures in terms of LCAO
     // mohan add 2021-02-09
+    LCAO_Hamilt UHM_md;
+    UHM_md.genH.LM = UHM_md.LM = &this->LM_md;
     LOOP_elec LOE;
-    LOE.solve_elec_stru(istep + 1, LOC_md, LOWF_md);
+    LOE.solve_elec_stru(istep + 1, LOC_md, LOWF_md, UHM_md);
 
     //to call the force of each atom
 	ModuleBase::matrix fcs;//temp force matrix
 	Force_Stress_LCAO FSL;
-	FSL.allocate (); 
     FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS,
         GlobalV::TEST_FORCE, GlobalV::TEST_STRESS,
-        LOC_md, LOWF_md, fcs, virial);
+        LOC_md, LOWF_md, UHM_md, fcs, virial);
 
 	for(int ion=0; ion<numIon; ++ion)
     {

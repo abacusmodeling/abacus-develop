@@ -4,7 +4,7 @@
 #include "gint_k_init.h"
 #include "../module_orbital/ORB_atomic_lm.h"
 #include "grid_technique.h"
-//#include "LCAO_matrix.h"
+#include "LCAO_matrix.h"
 
 // add by jingan for map<> in 2021-12-2, will be deleted in the future
 #include "../src_ri/abfs-vector3_order.h"

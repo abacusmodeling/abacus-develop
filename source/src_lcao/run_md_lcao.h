@@ -3,13 +3,14 @@
 
 #include "../src_pw/charge_extra.h"
 #include "module_orbital/ORB_control.h"
+#include "src_lcao/LCAO_matrix.h"
 
 class Run_MD_LCAO
 {
 
 	public:
 
-	Run_MD_LCAO();
+	Run_MD_LCAO(Parallel_Orbitals &pv);
 	~Run_MD_LCAO();
 
 	void opt_cell(ORB_control &orb_con);
@@ -24,7 +25,8 @@ class Run_MD_LCAO
 
 	// electron charge density extropolation method
 	Charge_Extra CE;
-	bool cellchange;
+    bool cellchange;
+    LCAO_Matrix LM_md;
 };
 
 #endif

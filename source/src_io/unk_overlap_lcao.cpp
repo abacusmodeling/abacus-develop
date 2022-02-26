@@ -1,5 +1,4 @@
 #include "unk_overlap_lcao.h"
-#include "../src_lcao/LCAO_nnr.h"
 #include "ctime"
 #include "../module_base/scalapack_connector.h"
 
@@ -463,7 +462,7 @@ void unkOverlap_lcao::cal_orb_overlap()
 	{
 		for(int iw2 = 0; iw2 < GlobalV::NLOCAL; iw2++)
 		{
-			//if ( !GlobalC::ParaO.in_this_processor(iw1,iw2) ) continue;
+			//if ( !pv.in_this_processor(iw1,iw2) ) continue;
 			
 			// iw1 和 iw2 永远没有overlap
 			if( orb1_orb2_R[iw1][iw2].empty() ) continue;
@@ -504,7 +503,7 @@ std::complex<double> unkOverlap_lcao::unkdotp_LCAO(const int ik_L, const int ik_
 	{
 		for(int iw2 = 0; iw2 < GlobalV::NLOCAL; iw2++)
 		{
-			//if ( !GlobalC::ParaO.in_this_processor(iw1,iw2) ) continue;
+			//if ( !pv.in_this_processor(iw1,iw2) ) continue;
 			if( !cal_tag[iw1][iw2] ) 
 			{
 				//GlobalV::ofs_running << "the no calculate iw1 and iw2 is " << iw1 << "," << iw2 << std::endl;
@@ -692,21 +691,21 @@ void unkOverlap_lcao::get_lcao_wfc_global_ik(std::complex<double> **ctot, std::c
 	return;
 }
 
-void unkOverlap_lcao::prepare_midmatrix_pblas(const int ik_L, const int ik_R, const ModuleBase::Vector3<double> dk, std::complex<double> *&midmatrix)
+void unkOverlap_lcao::prepare_midmatrix_pblas(const int ik_L, const int ik_R, const ModuleBase::Vector3<double> dk, std::complex<double> *&midmatrix, const Parallel_Orbitals &pv)
 {
 	//ModuleBase::Vector3<double> dk = GlobalC::kv.kvec_c[ik_R] - GlobalC::kv.kvec_c[ik_L];
-	midmatrix = new std::complex<double>[GlobalC::ParaO.nloc];
-	ModuleBase::GlobalFunc::ZEROS(midmatrix,GlobalC::ParaO.nloc);
+	midmatrix = new std::complex<double>[pv.nloc];
+	ModuleBase::GlobalFunc::ZEROS(midmatrix,pv.nloc);
 	for (int iw_row = 0; iw_row < GlobalV::NLOCAL; iw_row++) // global
 	{
 		for (int iw_col = 0; iw_col < GlobalV::NLOCAL; iw_col++) // global
 		{
-			int ir = GlobalC::ParaO.trace_loc_row[ iw_row ]; // local
-			int ic = GlobalC::ParaO.trace_loc_col[ iw_col ]; // local
+			int ir = pv.trace_loc_row[ iw_row ]; // local
+			int ic = pv.trace_loc_col[ iw_col ]; // local
 			
 			if(ir >= 0 && ic >= 0)
 			{
-				int index = ic*GlobalC::ParaO.nrow+ir;
+				int index = ic*pv.nrow+ir;
 				ModuleBase::Vector3<double> tau1 = GlobalC::ucell.atoms[ iw2it(iw_row) ].tau[ iw2ia(iw_row) ];		
 				for(int iR = 0; iR < orb1_orb2_R[iw_row][iw_col].size(); iR++)
 				{
@@ -723,17 +722,17 @@ void unkOverlap_lcao::prepare_midmatrix_pblas(const int ik_L, const int ik_R, co
 
 std::complex<double> unkOverlap_lcao::det_berryphase(const int ik_L, const int ik_R,
     const ModuleBase::Vector3<double> dk, const int occ_bands,
-    std::vector<ModuleBase::ComplexMatrix>* wfc_k)
+    Local_Orbital_wfc &lowf)
 {
 	const std::complex<double> minus = std::complex<double>(-1.0,0.0);
 	std::complex<double> det = std::complex<double>(1.0,0.0);
 	std::complex<double> *midmatrix = NULL;
-	std::complex<double> *C_matrix = new std::complex<double>[GlobalC::ParaO.nloc];
-	std::complex<double> *out_matrix = new std::complex<double>[GlobalC::ParaO.nloc];
-	ModuleBase::GlobalFunc::ZEROS(C_matrix,GlobalC::ParaO.nloc);
-	ModuleBase::GlobalFunc::ZEROS(out_matrix,GlobalC::ParaO.nloc);
+	std::complex<double> *C_matrix = new std::complex<double>[lowf.ParaV->nloc];
+	std::complex<double> *out_matrix = new std::complex<double>[lowf.ParaV->nloc];
+	ModuleBase::GlobalFunc::ZEROS(C_matrix,lowf.ParaV->nloc);
+	ModuleBase::GlobalFunc::ZEROS(out_matrix,lowf.ParaV->nloc);
 	
-	this->prepare_midmatrix_pblas(ik_L,ik_R,dk,midmatrix);
+	this->prepare_midmatrix_pblas(ik_L,ik_R,dk,midmatrix, *lowf.ParaV);
 	
 	char transa = 'C';
 	char transb = 'N';
@@ -743,29 +742,29 @@ std::complex<double> unkOverlap_lcao::det_berryphase(const int ik_L, const int i
 	int one = 1;
 #ifdef __MPI
 	pzgemm_(&transa,&transb,&occBands,&nlocal,&nlocal,&alpha,
-			wfc_k->at(ik_L).c,&one,&one,GlobalC::ParaO.desc,
-							  midmatrix,&one,&one,GlobalC::ParaO.desc,
+			lowf.wfc_k.at(ik_L).c,&one,&one,lowf.ParaV->desc,
+							  midmatrix,&one,&one,lowf.ParaV->desc,
 													   &beta,
-							   C_matrix,&one,&one,GlobalC::ParaO.desc);
+							   C_matrix,&one,&one,lowf.ParaV->desc);
 							   
 	pzgemm_(&transb,&transb,&occBands,&occBands,&nlocal,&alpha,
-								 C_matrix,&one,&one,GlobalC::ParaO.desc,
-			wfc_k->at(ik_R).c,&one,&one,GlobalC::ParaO.desc,
+								 C_matrix,&one,&one,lowf.ParaV->desc,
+			lowf.wfc_k.at(ik_R).c,&one,&one,lowf.ParaV->desc,
 														 &beta,
-							   out_matrix,&one,&one,GlobalC::ParaO.desc);	
+							   out_matrix,&one,&one,lowf.ParaV->desc);	
 
-	//int *ipiv = new int[ GlobalC::ParaO.nrow+GlobalC::ParaO.desc[4] ];
-	int *ipiv = new int[ GlobalC::ParaO.nrow ];
+	//int *ipiv = new int[ lowf.ParaV->nrow+lowf.ParaV->desc[4] ];
+	int *ipiv = new int[ lowf.ParaV->nrow ];
 	int info;
-	pzgetrf_(&occBands,&occBands,out_matrix,&one,&one,GlobalC::ParaO.desc,ipiv,&info);
+	pzgetrf_(&occBands,&occBands,out_matrix,&one,&one,lowf.ParaV->desc,ipiv,&info);
 
 	for(int i = 0; i < occBands; i++) // global
 	{	
-		int ir = GlobalC::ParaO.trace_loc_row[ i ]; // local
-		int ic = GlobalC::ParaO.trace_loc_col[ i ]; // local
+		int ir = lowf.ParaV->trace_loc_row[ i ]; // local
+		int ic = lowf.ParaV->trace_loc_col[ i ]; // local
 		if(ir >= 0 && ic >= 0)
 		{
-			int index = ic*GlobalC::ParaO.nrow+ir;
+			int index = ic*lowf.ParaV->nrow+ir;
 			if(ipiv[ir] != (i+1))
 			{
 				det = minus * det * out_matrix[index];

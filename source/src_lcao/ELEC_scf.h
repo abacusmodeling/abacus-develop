@@ -31,7 +31,8 @@ class ELEC_scf: private Threshold_Elec
 
     void scf(const int& istep,
         Local_Orbital_Charge& loc,
-        Local_Orbital_wfc& lowf);
+        Local_Orbital_wfc& lowf,
+        LCAO_Hamilt& uhm);
 
 	static int iter;
 

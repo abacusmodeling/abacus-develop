@@ -31,9 +31,6 @@ class Force_Stress_LCAO
 //	Force_LCAO_gamma flg;
 	Stress_Func sc_pw;
 	Forces f_pw;
-
-	void allocate (void);
-	void destroy (void);
 	
 	void print_force(const std::string &name, ModuleBase::matrix& f, const bool screen, bool ry)const;
 	void printforce_total (const bool ry, const bool istestf, ModuleBase::matrix& fcs);
@@ -45,6 +42,7 @@ class Force_Stress_LCAO
         const bool istests,
         Local_Orbital_Charge& loc,
         Local_Orbital_wfc& lowf,
+        LCAO_Hamilt &uhm,
         ModuleBase::matrix& fcs,
 		ModuleBase::matrix &scs);
 
@@ -71,10 +69,11 @@ class Force_Stress_LCAO
 		ModuleBase::matrix &svnl_dbeta,
 #if __DEEPKS
 		ModuleBase::matrix& svl_dphi,
-		ModuleBase::matrix& svnl_dalpha);
+	    ModuleBase::matrix& svnl_dalpha,
 #else
-		ModuleBase::matrix& svl_dphi);
+	    ModuleBase::matrix& svl_dphi,
 #endif
+        LCAO_Hamilt &uhm);
     
 
 

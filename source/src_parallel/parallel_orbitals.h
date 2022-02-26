@@ -3,40 +3,80 @@
 
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
-#include "../src_pdiag/pdiag_double.h"
+#include "src_pdiag/pdiag_common.h"
 
-class Parallel_Orbitals : public Pdiag_Double
+/// These stucture packs the information of 2D-block-cyclic 
+/// parallel distribution of basis, wavefunction and matrix.
+struct Parallel_Orbitals
 {
-    public:
 
     Parallel_Orbitals();
     ~Parallel_Orbitals();
-
-    // type : Sloc(1) Hloc(2) Hloc_fixed(3)
-    bool in_this_processor(const int &iw1_all, const int &iw2_all);
     
+    /// map from global-index to local-index
     int* trace_loc_row;
     int* trace_loc_col;
-    int out_hs; // mohan add 2010-09-02
-    int out_hsR; // LiuXh add 2019-07-16
 
-    void set_trace(void);
+    /// local size (nloc = nrow * ncol)
+    int nrow;
+	int ncol;
+    long nloc;
 
-    // use MPI_Alltoallv to convert a orbital distributed matrix to 2D-block cyclic distributed matrix
-    // here are the parameters which will be used
-    int sender_index_size;
-    int *sender_local_index;
-    int sender_size;
-    int *sender_size_process;
-    int *sender_displacement_process;
-    double* sender_buffer;
+    /// local size of bands, used for 2d wavefunction
+    /// must divided on dim1 because of elpa interface
+    int ncol_bands;
+    
+    /// ncol_bands*nrow
+    long nloc_wfc;
 
-    int receiver_index_size;
-    int *receiver_global_index;
-    int receiver_size;
-    int *receiver_size_process;
-    int *receiver_displacement_process;
-    double* receiver_buffer;
+    /// block size
+    int nb;
+
+    /// the number of processors in each dimension of MPI_Cart structure
+    int dim0;
+    int dim1;
+    
+    int lastband_in_proc;
+	int lastband_number; 
+
+    //---------------------------------------
+    // number of elements in H or S matrix,
+	// nnr -> 2D block distribution;
+	//---------------------------------------
+	int nnr; 
+	int *nlocdim;
+	int *nlocstart;
+    
+#ifdef __MPI
+    /// blacs info
+    int blacs_ctxt;
+    int desc[9];    //for matrix, nlocal*nlocal
+    int desc_wfc[9]; //for wfc, nlocal*nbands
+    /// communicator for 2D-block
+    MPI_Comm comm_2D;
+#endif
+
+    /// only used in hpseps-diago
+	int* loc_sizes;
+    int loc_size;
+    bool alloc_Z_LOC; //xiaohui add 2014-12-22
+    double** Z_LOC; //xiaohui add 2014-06-19
+
+    /// used in hpseps, dftu and exx
+    LocalMatrix MatrixInfo;
+
+    // test parameter
+    int testpb;
+    
+    /// check whether a basis element is in this processor
+    /// (check whether local-index > 0 )
+    bool in_this_processor(const int& iw1_all, const int& iw2_all) const;
+
+    /// number of elements(basis-pairs) in this processon
+    /// on all adjacent atoms-pairs(2D division)
+    void cal_nnr();
+
 };
+
 
 #endif

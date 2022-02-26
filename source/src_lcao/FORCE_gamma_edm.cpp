@@ -41,11 +41,11 @@ void Force_LCAO_gamma::cal_foverlap(
         const int iat = GlobalC::ucell.iwt2iat[i];
         for(int j=0; j<GlobalV::NLOCAL; j++)
         {
-            const int mu = GlobalC::ParaO.trace_loc_row[j];
-            const int nu = GlobalC::ParaO.trace_loc_col[i];
+            const int mu = loc.ParaV->trace_loc_row[j];
+            const int nu = loc.ParaV->trace_loc_col[i];
             if(mu>=0 && nu>=0)
             {
-                const int index = mu * GlobalC::ParaO.ncol + nu;
+                const int index = mu * loc.ParaV->ncol + nu;
                 double sum = 0.0;
                 for(int is=0; is<GlobalV::NSPIN; ++is)
                 {
@@ -55,19 +55,19 @@ void Force_LCAO_gamma::cal_foverlap(
 
                 if(isforce)
                 {
-                    foverlap(iat,0) += sum * GlobalC::LM.DSloc_x[index];
-                    foverlap(iat,1) += sum * GlobalC::LM.DSloc_y[index];
-                    foverlap(iat,2) += sum * GlobalC::LM.DSloc_z[index];
+                    foverlap(iat,0) += sum * this->UHM->LM->DSloc_x[index];
+                    foverlap(iat,1) += sum * this->UHM->LM->DSloc_y[index];
+                    foverlap(iat,2) += sum * this->UHM->LM->DSloc_z[index];
                 }
 
                 if(isstress)
                 {
-                    soverlap(0,0) += sum/2.0 * GlobalC::LM.DSloc_11[index];
-                    soverlap(0,1) += sum/2.0 * GlobalC::LM.DSloc_12[index];
-                    soverlap(0,2) += sum/2.0 * GlobalC::LM.DSloc_13[index];
-                    soverlap(1,1) += sum/2.0 * GlobalC::LM.DSloc_22[index];
-                    soverlap(1,2) += sum/2.0 * GlobalC::LM.DSloc_23[index];
-                    soverlap(2,2) += sum/2.0 * GlobalC::LM.DSloc_33[index];
+                    soverlap(0,0) += sum/2.0 * this->UHM->LM->DSloc_11[index];
+                    soverlap(0,1) += sum/2.0 * this->UHM->LM->DSloc_12[index];
+                    soverlap(0,2) += sum/2.0 * this->UHM->LM->DSloc_13[index];
+                    soverlap(1,1) += sum/2.0 * this->UHM->LM->DSloc_22[index];
+                    soverlap(1,2) += sum/2.0 * this->UHM->LM->DSloc_23[index];
+                    soverlap(2,2) += sum/2.0 * this->UHM->LM->DSloc_33[index];
                 }
             }
 

@@ -4,9 +4,6 @@
 namespace GlobalC
 {
 Grid_Driver GridD(GlobalV::test_deconstructor, GlobalV::test_grid_driver,GlobalV::test_grid);
-Parallel_Orbitals ParaO;
-LCAO_Matrix LM;
-LCAO_Hamilt UHM;
 SubGrid_oper SGO; //mohan add 2012-01-12
 
 #ifdef __MPI //liyuanbo 2022/2/23

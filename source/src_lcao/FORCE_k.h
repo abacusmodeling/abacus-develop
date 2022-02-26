@@ -7,6 +7,7 @@
 #include "LCAO_matrix.h" 
 #include "FORCE_gamma.h"
 #include "src_lcao/local_orbital_charge.h"
+#include "src_lcao/LCAO_hamilt.h"
 
 class Force_LCAO_k : public Force_LCAO_gamma
 {
@@ -17,8 +18,11 @@ class Force_LCAO_k : public Force_LCAO_gamma
 	Force_LCAO_k ();
 	~Force_LCAO_k ();
 
-	private:
-	
+private:
+    
+    LCAO_Hamilt* UHM;
+    const Parallel_Orbitals* ParaV;
+
 	//orthonormal force + contribution from T and VNL
 	void ftable_k (
 		const bool isforce,
@@ -34,14 +38,14 @@ class Force_LCAO_k : public Force_LCAO_gamma
 		ModuleBase::matrix& svnl_dbeta,
 #ifdef __DEEPKS
 		ModuleBase::matrix& svl_dphi,
-		ModuleBase::matrix& svnl_dalpha
+		ModuleBase::matrix& svnl_dalpha,
 #else
-		ModuleBase::matrix& svl_dphi
+		ModuleBase::matrix& svl_dphi,
 #endif
-		);
+		LCAO_Hamilt &uhm);
 
 	// get the ds, dt, dvnl.
-	void allocate_k(void);
+	void allocate_k(const Parallel_Orbitals &pv);
 
 	void finish_k(void);
 	

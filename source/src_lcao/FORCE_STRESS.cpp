@@ -17,30 +17,6 @@ double Force_Stress_LCAO::output_acc = 1.0e-8;
 Force_Stress_LCAO::Force_Stress_LCAO (){}
 Force_Stress_LCAO::~Force_Stress_LCAO (){}
 
-
-void Force_Stress_LCAO::allocate(void)
-{
-    ModuleBase::TITLE("Force_Stress_LCAO","allocate");
-
-    // reduce memory occupy by vlocal
-    delete[] GlobalC::ParaO.sender_local_index;
-    delete[] GlobalC::ParaO.sender_size_process;
-    delete[] GlobalC::ParaO.sender_displacement_process;
-    delete[] GlobalC::ParaO.receiver_global_index;
-    delete[] GlobalC::ParaO.receiver_size_process;
-    delete[] GlobalC::ParaO.receiver_displacement_process;
-
-    GlobalC::ParaO.sender_local_index = new int[1];
-    GlobalC::ParaO.sender_size_process = new int[1];
-    GlobalC::ParaO.sender_displacement_process = new int[1];
-    GlobalC::ParaO.receiver_global_index = new int[1];
-    GlobalC::ParaO.receiver_size_process = new int[1];
-    GlobalC::ParaO.receiver_displacement_process = new int[1];
-
-    return;
-}
-
-
 #include "../src_pw/efield.h"
 void Force_Stress_LCAO::getForceStress(
 	const bool isforce,
@@ -49,6 +25,7 @@ void Force_Stress_LCAO::getForceStress(
     const bool istests,
     Local_Orbital_Charge& loc,
     Local_Orbital_wfc& lowf,
+    LCAO_Hamilt &uhm,
     ModuleBase::matrix& fcs,
 	ModuleBase::matrix &scs)
 {
@@ -148,11 +125,12 @@ void Force_Stress_LCAO::getForceStress(
 				svnl_dbeta,
 #ifdef __DEEPKS
 				svl_dphi,
-				svnl_dalpha);
+				svnl_dalpha,
 #else
-				svl_dphi);
+				svl_dphi,
 #endif
-	//implement vdw force or stress here
+                uhm);
+    //implement vdw force or stress here
 	// Peize Lin add 2014-04-04, update 2021-03-09
 	ModuleBase::matrix force_vdw;
 	ModuleBase::matrix stress_vdw;
@@ -212,7 +190,7 @@ void Force_Stress_LCAO::getForceStress(
 	if (INPUT.dft_plus_u)
 	{
 		// Quxin add for DFT+U on 20201029
-		GlobalC::dftu.force_stress(loc.dm_gamma, loc.dm_k);
+		GlobalC::dftu.force_stress(loc.dm_gamma, loc.dm_k, *uhm.LM);
 		
         if (isforce) {
             force_dftu.create(nat, 3);
@@ -328,7 +306,7 @@ void Force_Stress_LCAO::getForceStress(
 						GlobalC::ucell,
 						GlobalC::ORB,
 						GlobalC::GridD,
-						GlobalC::ParaO);
+						*loc.ParaV);
 				}
 				else
 				{			
@@ -336,7 +314,7 @@ void Force_Stress_LCAO::getForceStress(
 						GlobalC::ucell,
 						GlobalC::ORB,
 						GlobalC::GridD,
-						GlobalC::ParaO,
+						*loc.ParaV,
 						GlobalC::kv);	
 				}
 				GlobalC::ld.cal_gvx(GlobalC::ucell.nat);
@@ -738,10 +716,11 @@ void Force_Stress_LCAO::calForceStressIntegralPart(
 	ModuleBase::matrix& svnl_dbeta,
 #if __DEEPKS
 	ModuleBase::matrix& svl_dphi,
-	ModuleBase::matrix& svnl_dalpha)
+	ModuleBase::matrix& svnl_dalpha,
 #else
-	ModuleBase::matrix& svl_dphi)
+	ModuleBase::matrix& svl_dphi,
 #endif
+    LCAO_Hamilt &uhm)
 {
 	if(isGammaOnly)
 	{
@@ -759,11 +738,12 @@ void Force_Stress_LCAO::calForceStressIntegralPart(
 				svnl_dbeta,
 #if __DEEPKS
 				svl_dphi,
-				svnl_dalpha);
+				svnl_dalpha,
 #else
-				svl_dphi);
+				svl_dphi,
 #endif
-	}
+                uhm);
+    }
 	else
 	{
 		flk.ftable_k(
@@ -780,11 +760,12 @@ void Force_Stress_LCAO::calForceStressIntegralPart(
 				svnl_dbeta,
 #if __DEEPKS
 				svl_dphi,
-				svnl_dalpha);
+				svnl_dalpha,
 #else
-				svl_dphi);
+				svl_dphi,
 #endif
-	}
+                uhm);
+    }
 	return;
 }
 

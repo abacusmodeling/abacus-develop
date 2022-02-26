@@ -1,118 +1,101 @@
-#include "pdiag_basic.h"
 #include "../src_parallel/parallel_common.h"
+#include "src_parallel/parallel_orbitals.h"
+#include "src_pdiag/pdiag_double.h"
 #include "../src_pw/global.h"
 #include "../src_io/wf_local.h"
 #include "../module_base/lapack_connector.h"
 #include "../module_base/memory.h"
 
-Pdiag_Basic::Pdiag_Basic()
-{
-    loc_sizes = new int[1];
-	testpb = 0;//mohan add 2011-03-16
-	alloc_Z_LOC = false; //xiaohui add 2014-12-22
-}
 
-Pdiag_Basic::~Pdiag_Basic()
+void ORB_control::set_parameters(void)
 {
-    delete[] loc_sizes;
-	if(alloc_Z_LOC)//xiaohui add 2014-12-22
-	{
-		for(int is=0; is<GlobalV::NSPIN; is++)
-		{
-			delete[] Z_LOC[is];
-		}
-		delete[] Z_LOC;
-	}
-}
+    ModuleBase::TITLE("ORB_control","set_parameters");
 
-void Pdiag_Basic::set_parameters(void)
-{
-    ModuleBase::TITLE("Pdiag_Basic","set_parameters");
-
+    Parallel_Orbitals* pv = &this->ParaV;
     // set loc_size
 	if(GlobalV::GAMMA_ONLY_LOCAL)//xiaohui add 2014-12-21
 	{
-		loc_size=GlobalV::NBANDS/GlobalV::DSIZE;
+		pv->loc_size=GlobalV::NBANDS/GlobalV::DSIZE;
 
 		// mohan add 2012-03-29
-		if(loc_size==0)
+		if(pv->loc_size==0)
 		{
 			GlobalV::ofs_warning << " loc_size=0" << " in proc " << GlobalV::MY_RANK+1 << std::endl;
-			ModuleBase::WARNING_QUIT("Pdiag_Basic::set_parameters","NLOCAL < GlobalV::DSIZE");
+			ModuleBase::WARNING_QUIT("ORB_control::set_parameters","NLOCAL < GlobalV::DSIZE");
 		}
 
-		if (GlobalV::DRANK<GlobalV::NBANDS%GlobalV::DSIZE) loc_size=loc_size+1;
-		if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"local size",loc_size);
+		if (GlobalV::DRANK<GlobalV::NBANDS%GlobalV::DSIZE) pv->loc_size+=1;
+		if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"local size",pv->loc_size);
 
 		// set loc_sizes
-		delete[] loc_sizes;
-		loc_sizes = new int[GlobalV::DSIZE];
-		ModuleBase::GlobalFunc::ZEROS(loc_sizes, GlobalV::DSIZE);
+		delete[] pv->loc_sizes;
+		pv->loc_sizes = new int[GlobalV::DSIZE];
+		ModuleBase::GlobalFunc::ZEROS(pv->loc_sizes, GlobalV::DSIZE);
 
-		this->lastband_in_proc = 0;
-		this->lastband_number = 0;
+		pv->lastband_in_proc = 0;
+		pv->lastband_number = 0;
 		int count_bands = 0;
 		for (int i=0; i<GlobalV::DSIZE; i++)
 		{
 			if (i<GlobalV::NBANDS%GlobalV::DSIZE)
 			{
 				// mohan modify 2010-07-05
-				loc_sizes[i]=GlobalV::NBANDS/GlobalV::DSIZE+1;
+				pv->loc_sizes[i]=GlobalV::NBANDS/GlobalV::DSIZE+1;
 			}
 			else
 			{
-				loc_sizes[i]=GlobalV::NBANDS/GlobalV::DSIZE;
+				pv->loc_sizes[i]=GlobalV::NBANDS/GlobalV::DSIZE;
 			}
-			count_bands += loc_sizes[i];
+			count_bands += pv->loc_sizes[i];
 			if (count_bands >= GlobalV::NBANDS)
 			{
-				lastband_in_proc = i;
-				lastband_number = GlobalV::NBANDS - (count_bands - loc_sizes[i]);
+				pv->lastband_in_proc = i;
+				pv->lastband_number = GlobalV::NBANDS - (count_bands - pv->loc_sizes[i]);
 				break;
 			}
 		}
 	}
 	else
 	{
-		loc_size=GlobalV::NLOCAL/GlobalV::DSIZE;
+		pv->loc_size=GlobalV::NLOCAL/GlobalV::DSIZE;
 
 		// mohan add 2012-03-29
-		if(loc_size==0)
+		if(pv->loc_size==0)
 		{
 			GlobalV::ofs_warning << " loc_size=0" << " in proc " << GlobalV::MY_RANK+1 << std::endl;
-			ModuleBase::WARNING_QUIT("Pdiag_Basic::set_parameters","NLOCAL < GlobalV::DSIZE");
+			ModuleBase::WARNING_QUIT("ORB_control::set_parameters","NLOCAL < GlobalV::DSIZE");
 		}
 
 		if (GlobalV::DRANK<GlobalV::NLOCAL%GlobalV::DSIZE) 
 		{
-			loc_size=loc_size+1;
-		}
-		if(testpb) ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"local size",loc_size);
+            pv->loc_size += 1;
+        }
+		if(pv->testpb) ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"local size",pv->loc_size);
 
 		// set loc_sizes
-		delete[] loc_sizes;
-		loc_sizes = new int[GlobalV::DSIZE];
-		ModuleBase::GlobalFunc::ZEROS(loc_sizes, GlobalV::DSIZE);
+		delete[] pv->loc_sizes;
+		pv->loc_sizes = new int[GlobalV::DSIZE];
+		ModuleBase::GlobalFunc::ZEROS(pv->loc_sizes, GlobalV::DSIZE);
 
-		this->lastband_in_proc = 0;
-		this->lastband_number = 0;
+		pv->lastband_in_proc = 0;
+		pv->lastband_number = 0;
 		int count_bands = 0;
 		for (int i=0; i<GlobalV::DSIZE; i++)
 		{
 			if (i<GlobalV::NLOCAL%GlobalV::DSIZE)
 			{
 				// mohan modify 2010-07-05
-				loc_sizes[i]=GlobalV::NLOCAL/GlobalV::DSIZE+1;
+				pv->loc_sizes[i]=GlobalV::NLOCAL/GlobalV::DSIZE+1;
 			}
 			else
 			{
-				loc_sizes[i]=GlobalV::NLOCAL/GlobalV::DSIZE;
+				pv->loc_sizes[i]=GlobalV::NLOCAL/GlobalV::DSIZE;
 			}
-			count_bands += loc_sizes[i];
+			count_bands += pv->loc_sizes[i];
 			if (count_bands >= GlobalV::NBANDS)
 			{
-				lastband_in_proc = i;
-				lastband_number = GlobalV::NBANDS - (count_bands - loc_sizes[i]);
+				pv->lastband_in_proc = i;
+				pv->lastband_number = GlobalV::NBANDS - (count_bands - pv->loc_sizes[i]);
 				break;
 			}
 		}
@@ -120,17 +103,17 @@ void Pdiag_Basic::set_parameters(void)
 
     if (GlobalV::KS_SOLVER=="hpseps") //LiuXh add 2021-09-06, clear memory, Z_LOC only used in hpseps solver
     {
-	    Z_LOC = new double*[GlobalV::NSPIN];
+	    pv->Z_LOC = new double*[GlobalV::NSPIN];
 	    for(int is=0; is<GlobalV::NSPIN; is++)
 	    {
-		    Z_LOC[is] = new double[loc_size * GlobalV::NLOCAL];
-		    ModuleBase::GlobalFunc::ZEROS(Z_LOC[is], loc_size * GlobalV::NLOCAL);
+		    pv->Z_LOC[is] = new double[pv->loc_size * GlobalV::NLOCAL];
+		    ModuleBase::GlobalFunc::ZEROS(pv->Z_LOC[is], pv->loc_size * GlobalV::NLOCAL);
 	    }
-	    alloc_Z_LOC = true;//xiaohui add 2014-12-22
+	    pv->alloc_Z_LOC = true;//xiaohui add 2014-12-22
     }
 
-    if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"lastband_in_proc",lastband_in_proc);
-    if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"lastband_number",lastband_number);
+    if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"lastband_in_proc", pv->lastband_in_proc);
+    if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"lastband_number", pv->lastband_number);
 
     return;
 }
@@ -138,9 +121,9 @@ void Pdiag_Basic::set_parameters(void)
 
 #ifdef __MPI
 // creat the 'comm_2D' stratege.
-void Pdiag_Basic::mpi_creat_cart(MPI_Comm *comm_2D, int prow, int pcol)
+void ORB_control::mpi_creat_cart(MPI_Comm *comm_2D, int prow, int pcol)
 {
-    ModuleBase::TITLE("Pdiag_Basic","mpi_creat_cart");
+    ModuleBase::TITLE("ORB_control","mpi_creat_cart");
     // the matrix is divided as ( dim[0] * dim[1] )
     int dim[2];
     int period[2]={1,1};
@@ -148,7 +131,7 @@ void Pdiag_Basic::mpi_creat_cart(MPI_Comm *comm_2D, int prow, int pcol)
     dim[0]=prow;
     dim[1]=pcol;
 
-    if(testpb)GlobalV::ofs_running << " dim = " << dim[0] << " * " << dim[1] << std::endl;
+    if(this->ParaV.testpb)GlobalV::ofs_running << " dim = " << dim[0] << " * " << dim[1] << std::endl;
 
     MPI_Cart_create(DIAG_WORLD,2,dim,period,reorder,comm_2D);
     return;
@@ -156,13 +139,16 @@ void Pdiag_Basic::mpi_creat_cart(MPI_Comm *comm_2D, int prow, int pcol)
 #endif
 
 #ifdef __MPI
-void Pdiag_Basic::mat_2d(MPI_Comm vu,
+void ORB_control::mat_2d(MPI_Comm vu,
                          const int &M_A,
                          const int &N_A,
                          const int &nb,
                          LocalMatrix &LM)
 {
-    ModuleBase::TITLE("Pdiag_Basic","mat_2d");
+    ModuleBase::TITLE("ORB_control", "mat_2d");
+    
+    Parallel_Orbitals* pv = &this->ParaV;
+    
     int dim[2];
     int period[2];
     int coord[2];
@@ -184,14 +170,14 @@ void Pdiag_Basic::mat_2d(MPI_Comm vu,
         block++;
     }
 
-    if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Total Row Blocks Number",block);
+    if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Total Row Blocks Number",block);
 
 	// mohan add 2010-09-12
 	if(dim[0]>block)
 	{
 		GlobalV::ofs_warning << " cpu 2D distribution : " << dim[0] << "*" << dim[1] << std::endl;
 		GlobalV::ofs_warning << " but, the number of row blocks is " << block << std::endl;
-		ModuleBase::WARNING_QUIT("Pdiag_Basic::mat_2d","some processor has no row blocks, try a smaller 'nb2d' parameter.");
+		ModuleBase::WARNING_QUIT("ORB_control::mat_2d","some processor has no row blocks, try a smaller 'nb2d' parameter.");
 	}
 
     // (2.1) row_b : how many blocks for this processor. (at least)
@@ -204,7 +190,7 @@ void Pdiag_Basic::mat_2d(MPI_Comm vu,
         LM.row_b++;
     }
 
-    if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Local Row Block Number",LM.row_b);
+    if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Local Row Block Number",LM.row_b);
 
     // (3) end_id indicates the last block belong to
     // which processor.
@@ -217,7 +203,7 @@ void Pdiag_Basic::mat_2d(MPI_Comm vu,
         end_id=block%dim[0]-1;
     }
 
-    if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Ending Row Block in processor",end_id);
+    if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Ending Row Block in processor",end_id);
 
     // (4) row_num : how many rows in this processors :
     // the one owns the last block is different.
@@ -230,7 +216,7 @@ void Pdiag_Basic::mat_2d(MPI_Comm vu,
         LM.row_num=LM.row_b*nb;
     }
 
-    if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Local rows (including nb)",LM.row_num);
+    if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Local rows (including nb)",LM.row_num);
 
     // (5) row_set, it's a global index :
     // save explicitly : every row in this processor
@@ -248,19 +234,13 @@ void Pdiag_Basic::mat_2d(MPI_Comm vu,
     }
 
     // the same procedures for columns.
-    block=N_A/nb;
-    if (block*nb<N_A)
-    {
-        block++;
-    }
-
-    if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Total Col Blocks Number",block);
+    if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Total Col Blocks Number",block);
 
 	if(dim[1]>block)
 	{
 		GlobalV::ofs_warning << " cpu 2D distribution : " << dim[0] << "*" << dim[1] << std::endl;
 		GlobalV::ofs_warning << " but, the number of column blocks is " << block << std::endl;
-		ModuleBase::WARNING_QUIT("Pdiag_Basic::mat_2d","some processor has no column blocks.");
+		ModuleBase::WARNING_QUIT("ORB_control::mat_2d","some processor has no column blocks.");
 	}
 
     LM.col_b=block/dim[1];
@@ -269,7 +249,7 @@ void Pdiag_Basic::mat_2d(MPI_Comm vu,
         LM.col_b++;
     }
 
-    if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Local Row Block Number",LM.col_b);
+    if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Local Row Block Number",LM.col_b);
 
     if (block%dim[1]==0)
     {
@@ -280,18 +260,18 @@ void Pdiag_Basic::mat_2d(MPI_Comm vu,
         end_id=block%dim[1]-1;
     }
 
-    if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Ending Row Block in processor",end_id);
+    if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Ending Row Block in processor",end_id);
 
     if (coord[1]==end_id)
     {
-        LM.col_num=(LM.col_b-1)*nb+(N_A-(block-1)*nb);
+        LM.col_num=(LM.col_b-1)*nb+(M_A-(block-1)*nb);
     }
     else
     {
         LM.col_num=LM.col_b*nb;
     }
 
-    if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Local columns (including nb)",LM.row_num);
+    if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Local columns (including nb)",LM.row_num);
 
     delete[] LM.col_set;
     LM.col_set = new int[LM.col_num];
@@ -299,13 +279,51 @@ void Pdiag_Basic::mat_2d(MPI_Comm vu,
     j=0;
     for (i=0; i<LM.col_b; i++)
     {
-        for (k=0; k<nb&&(coord[1]*nb+i*nb*dim[1]+k<N_A); k++,j++)
+        for (k=0; k<nb&&(coord[1]*nb+i*nb*dim[1]+k<M_A); k++,j++)
         {
             LM.col_set[j]=coord[1]*nb+i*nb*dim[1]+k;
         }
     }
     LM.col_pos=0;
-    LM.row_pos=0;
+    LM.row_pos = 0;
+
+    // for wavefuncton , calculate nbands_loc
+    block=N_A/nb;
+    if (block*nb<N_A)
+    {
+        block++;
+    }
+    if(dim[1]>block)
+	{
+		GlobalV::ofs_warning << " cpu 2D distribution : " << dim[0] << "*" << dim[1] << std::endl;
+		GlobalV::ofs_warning << " but, the number of bands-row-block is " << block << std::endl;
+		ModuleBase::WARNING_QUIT("ORB_control::mat_2d","some processor has no bands-row-blocks.");
+    }
+    int col_b_bands = block / dim[1];
+    if (coord[1] < block % dim[1])
+    {
+        col_b_bands++;
+    }
+    if (block%dim[1]==0)
+    {
+        end_id=dim[1]-1;
+    }
+    else
+    {
+        end_id=block%dim[1]-1;
+    }
+    if (coord[1]==end_id)
+    {
+        pv->ncol_bands=(col_b_bands-1)*nb+(N_A-(block-1)*nb);
+    }
+    else
+    {
+        pv->ncol_bands=col_b_bands*nb;
+    }
+    pv->nloc_wfc = pv->ncol_bands * LM.row_num;
+
+    std::cout << pv->nloc_wfc << " " << pv->ncol_bands << " " << LM.row_num << std::endl;
+
     return;
 }
 #endif
@@ -313,7 +331,7 @@ void Pdiag_Basic::mat_2d(MPI_Comm vu,
 
 #ifdef __MPI
 // A : contains total matrix element in processor.
-void Pdiag_Basic::data_distribution(
+void ORB_control::data_distribution(
     MPI_Comm comm_2D,
     const std::string &file,
     const int &n,
@@ -321,7 +339,8 @@ void Pdiag_Basic::data_distribution(
     double *A,
     const LocalMatrix &LM)
 {
-    ModuleBase::TITLE("Pdiag_Basic","data_distribution");
+    ModuleBase::TITLE("ORB_control", "data_distribution");
+    Parallel_Orbitals* pv = &this->ParaV;
     MPI_Comm comm_row;
     MPI_Comm comm_col;
     MPI_Status status;
@@ -331,9 +350,9 @@ void Pdiag_Basic::data_distribution(
     int coord[2];
     MPI_Cart_get(comm_2D,2,dim,period,coord);
 
-    if(testpb) GlobalV::ofs_running << "\n dim = " << dim[0] << " * " << dim[1] << std::endl;
-    if(testpb) GlobalV::ofs_running << " coord = ( " << coord[0] << " , " << coord[1] << ")." << std::endl;
-    if(testpb) GlobalV::ofs_running << " n = " << n << std::endl;
+    if(pv->testpb) GlobalV::ofs_running << "\n dim = " << dim[0] << " * " << dim[1] << std::endl;
+    if(pv->testpb) GlobalV::ofs_running << " coord = ( " << coord[0] << " , " << coord[1] << ")." << std::endl;
+    if(pv->testpb) GlobalV::ofs_running << " n = " << n << std::endl;
 
     mpi_sub_col(comm_2D,&comm_col);
     mpi_sub_row(comm_2D,&comm_row);
@@ -498,7 +517,7 @@ void Pdiag_Basic::data_distribution(
 
     if (!find)
     {
-        ModuleBase::WARNING_QUIT("Pdiag_Basic::data_distribution","Can't find the H/S file");
+        ModuleBase::WARNING_QUIT("ORB_control::data_distribution","Can't find the H/S file");
     }
 
     return;
@@ -507,11 +526,12 @@ void Pdiag_Basic::data_distribution(
 
 #ifdef __MPI
 #include "../src_pw/occupy.h"
-void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **cc,std::complex<double> *Z, const int &ik)
+void Pdiag_Double::gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **cc,std::complex<double> *Z, const int &ik)
 {
-    ModuleBase::TITLE("Pdiag_Basic","gath_eig_complex");
+    ModuleBase::TITLE("Pdiag_Double","gath_eig_complex");
     time_t time_start = time(NULL);
     //GlobalV::ofs_running << " Start gath_eig_complex Time : " << ctime(&time_start);
+    const Parallel_Orbitals* pv = this->ParaV;
 
     int i,j,k;
     int nprocs,myid;
@@ -524,7 +544,7 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **cc
 	// mohan add 2010-07-03
 	// the occupied bands are useless
 	// for calculating charge density.
-	if(GlobalV::DRANK>lastband_in_proc)
+	if(GlobalV::DRANK> pv->lastband_in_proc)
 	{
 		delete[] Z;
 	}
@@ -540,7 +560,7 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **cc
         	ctot[i] = new std::complex<double>[GlobalV::NLOCAL];
         	ModuleBase::GlobalFunc::ZEROS(ctot[i], GlobalV::NLOCAL);
     	}
-    	ModuleBase::Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
+    	ModuleBase::Memory::record("Pdiag_Double","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
 	}
 
 	k=0;
@@ -548,7 +568,7 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **cc
     {
         // mohan add nbnd0 2010-07-02
         int nbnd0 = -1;
-        if (GlobalV::NBANDS < loc_sizes[0])
+        if (GlobalV::NBANDS < pv->loc_sizes[0])
         {
 			// means all bands in this processor
 			// is needed ( is occupied)
@@ -558,9 +578,9 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **cc
         {
 			// means this processor only save
 			// part of GlobalV::NBANDS.
-            nbnd0 = loc_sizes[0];
+            nbnd0 = pv->loc_sizes[0];
         }
-        if(testpb)GlobalV::ofs_running << " nbnd in processor 0 is " << nbnd0 << std::endl;
+        if(pv->testpb)GlobalV::ofs_running << " nbnd in processor 0 is " << nbnd0 << std::endl;
 
         for (i=0; i<nbnd0; i++)
         {
@@ -568,7 +588,7 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **cc
             {
 				// change the order in processor 0.
 				// the contribution from processor 0.
-                ctot[k][j]=Z[j*loc_sizes[0]+i];
+                ctot[k][j]=Z[j*pv->loc_sizes[0]+i];
             }
             k++;
         }
@@ -577,23 +597,23 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **cc
     }
     MPI_Barrier(comm);
 
-	for (i=1; i<= this->lastband_in_proc; i++)
+	for (i=1; i<= pv->lastband_in_proc; i++)
     {
         // mohan fix bug 2010-07-02
         // rows indicates the data structure of Z.
         // mpi_times indicates the data distribution
         // time, each time send a band.
-        int rows = loc_sizes[i];
+        int rows = pv->loc_sizes[i];
         int mpi_times;
-        if (i==lastband_in_proc)
+        if (i==pv->lastband_in_proc)
         {
-            mpi_times = lastband_number;
+            mpi_times = pv->lastband_number;
         }
         else
         {
-            mpi_times = loc_sizes[i];
+            mpi_times = pv->loc_sizes[i];
         }
-        if(testpb)GlobalV::ofs_running << " nbnd in processor " << i << " is " << mpi_times << std::endl;
+        if(pv->testpb)GlobalV::ofs_running << " nbnd in processor " << i << " is " << mpi_times << std::endl;
         if (myid==i)
         {
             for (j=0; j<mpi_times; j++)
@@ -643,7 +663,7 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **cc
         }
         //MPI_Barrier(comm);
     }
-    if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Final k",k);
+    if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Final k",k);
 
 	// output the wave function if required.
 	// this is a bad position to output wave functions.
@@ -680,9 +700,9 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **cc
 #endif
 
 #ifdef __MPI
-void Pdiag_Basic::gath_full_eig(MPI_Comm comm,int n,double **c,double *Z)
+void Pdiag_Double::gath_full_eig(MPI_Comm comm,int n,double **c,double *Z)
 {
-    ModuleBase::TITLE("Pdiag_Basic","gath_full_eig");
+    ModuleBase::TITLE("Pdiag_Double","gath_full_eig");
 
     time_t time_start = time(NULL);
     //GlobalV::ofs_running << " Start gath_full_eig Time : " << ctime(&time_start);
@@ -784,9 +804,9 @@ void Pdiag_Basic::gath_full_eig(MPI_Comm comm,int n,double **c,double *Z)
     return;
 }
 
-void Pdiag_Basic::gath_full_eig_complex(MPI_Comm comm,int n,std::complex<double> **c,std::complex<double> *Z)
+void Pdiag_Double::gath_full_eig_complex(MPI_Comm comm,int n,std::complex<double> **c,std::complex<double> *Z)
 {
-    ModuleBase::TITLE("Pdiag_Basic","gath_full_eig_complex");
+    ModuleBase::TITLE("Pdiag_Double","gath_full_eig_complex");
 
     time_t time_start = time(NULL);
     //GlobalV::ofs_running << " Start gath_full_eig_complex Time : " << ctime(&time_start);
@@ -893,13 +913,15 @@ void Pdiag_Basic::gath_full_eig_complex(MPI_Comm comm,int n,std::complex<double>
 //LiuXh add 2021-09-06, clear memory, totwfc and WFC_GAMMA_aug not used now
 #ifdef __MPI
 #include "../src_pw/occupy.h"
-void Pdiag_Basic::gath_eig(MPI_Comm comm,int n,double *Z)
+void Pdiag_Double::gath_eig(MPI_Comm comm,int n,double *Z)
 {
-    ModuleBase::TITLE("Pdiag_Basic","gath_eig");
+    ModuleBase::TITLE("Pdiag_Double","gath_eig");
     time_t time_start = time(NULL);
 //  GlobalV::ofs_running << " Start gath_eig Time : " << ctime(&time_start);
 
-    int i,j,k;
+    const Parallel_Orbitals* pv = this->ParaV;
+    
+    int i, j, k;
     int nprocs,myid;
     MPI_Status status;
     MPI_Comm_size(comm,&nprocs);
@@ -910,7 +932,7 @@ void Pdiag_Basic::gath_eig(MPI_Comm comm,int n,double *Z)
 	// mohan add 2010-07-03
 	// the occupied bands are useless
 	// for calculating charge density.
-	if(GlobalV::DRANK>lastband_in_proc)
+	if(GlobalV::DRANK > pv->lastband_in_proc)
 	{
 		delete[] Z;
 	}
@@ -926,7 +948,7 @@ void Pdiag_Basic::gath_eig(MPI_Comm comm,int n,double *Z)
         	ctot[i] = new double[GlobalV::NLOCAL];
         	ModuleBase::GlobalFunc::ZEROS(ctot[i], GlobalV::NLOCAL);
     	}
-    	ModuleBase::Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"double");
+    	ModuleBase::Memory::record("Pdiag_Double","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"double");
 	}
 
     k=0;
@@ -934,7 +956,7 @@ void Pdiag_Basic::gath_eig(MPI_Comm comm,int n,double *Z)
     {
         // mohan add nbnd0 2010-07-02
         int nbnd0 = -1;
-        if (GlobalV::NBANDS < loc_sizes[0])
+        if (GlobalV::NBANDS < pv->loc_sizes[0])
         {
 			// means all bands in this processor
 			// is needed ( is occupied)
@@ -944,9 +966,9 @@ void Pdiag_Basic::gath_eig(MPI_Comm comm,int n,double *Z)
         {
 			// means this processor only save
 			// part of GlobalV::NBANDS.
-            nbnd0 = loc_sizes[0];
+            nbnd0 = pv->loc_sizes[0];
         }
-        if(testpb) GlobalV::ofs_running << " nbnd in processor 0 is " << nbnd0 << std::endl;
+        if(pv->testpb) GlobalV::ofs_running << " nbnd in processor 0 is " << nbnd0 << std::endl;
 
 //printf("from 0 to %d\n",nbnd0-1);
         for (i=0; i<nbnd0; i++)
@@ -955,7 +977,7 @@ void Pdiag_Basic::gath_eig(MPI_Comm comm,int n,double *Z)
             {
 				// change the order in processor 0.
 				// the contribution from processor 0.
-                ctot[k][j]=Z[j*loc_sizes[0]+i];
+                ctot[k][j]=Z[j*pv->loc_sizes[0]+i];
             }
             k++;
         }
@@ -965,23 +987,23 @@ void Pdiag_Basic::gath_eig(MPI_Comm comm,int n,double *Z)
     MPI_Barrier(comm);
 
 
-    for (i=1; i<= this->lastband_in_proc; i++)
+    for (i=1; i<= pv->lastband_in_proc; i++)
     {
         // mohan fix bug 2010-07-02
         // rows indicates the data structure of Z.
         // mpi_times indicates the data distribution
         // time, each time send a band.
-        int rows = loc_sizes[i];
+        int rows = pv->loc_sizes[i];
         int mpi_times;
-        if (i==lastband_in_proc)
+        if (i==pv->lastband_in_proc)
         {
-            mpi_times = lastband_number;
+            mpi_times = pv->lastband_number;
         }
         else
         {
-            mpi_times = loc_sizes[i];
+            mpi_times = pv->loc_sizes[i];
         }
-        if(testpb)GlobalV::ofs_running << " nbnd in processor " << i << " is " << mpi_times << std::endl;
+        if(pv->testpb)GlobalV::ofs_running << " nbnd in processor " << i << " is " << mpi_times << std::endl;
         if (myid==i)
         {
             for (j=0; j<mpi_times; j++)
@@ -1031,7 +1053,7 @@ void Pdiag_Basic::gath_eig(MPI_Comm comm,int n,double *Z)
         }
         //MPI_Barrier(comm);
     }
-    if(testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Final k",k);
+    if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Final k",k);
 /*
 if(myid==0){
 	double *vect=new double[GlobalV::NLOCAL*GlobalV::NBANDS];

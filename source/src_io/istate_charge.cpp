@@ -16,7 +16,7 @@ IState_Charge::IState_Charge(
 IState_Charge::~IState_Charge(){}
 
 
-void IState_Charge::begin(void)
+void IState_Charge::begin(Gint_Gamma &gg)
 {
 	ModuleBase::TITLE("IState_Charge","begin");
 
@@ -136,7 +136,7 @@ void IState_Charge::begin(void)
 			
 			// (4) calculate charge density for a particular 
 			// band.
-   			GlobalC::UHM.GG.cal_rho(this->loc->DM);
+   			gg.cal_rho(this->loc->DM);
 			GlobalC::CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09
 			std::stringstream ss;
 			std::stringstream ss1;
@@ -194,8 +194,8 @@ void IState_Charge::idmatrix(const int &ib)
 		assert(GlobalC::wf.wg.nr==GlobalV::NSPIN);
 		for(int is=0; is!=GlobalV::NSPIN; ++is)
 		{
-			std::vector<double> wg_local(GlobalC::ParaO.ncol,0.0);
-			const int ib_local = GlobalC::ParaO.trace_loc_col[ib];
+			std::vector<double> wg_local(this->loc->ParaV->ncol,0.0);
+			const int ib_local = this->loc->ParaV->trace_loc_col[ib];
 
 			int fermi_band=0;
 			fermi_band = static_cast<int>( (GlobalC::CHR.nelec+1)/2 + 1.0e-8 ) ;
@@ -230,10 +230,10 @@ void IState_Charge::idmatrix(const int &ib)
 				&N_char, &T_char,
 				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalC::wf.wg.nc,
 				&one_float,
-				wg_wfc.c, &one_int, &one_int, GlobalC::ParaO.desc,
-				this->wfc_gamma->at(is).c, &one_int, &one_int, GlobalC::ParaO.desc,
+				wg_wfc.c, &one_int, &one_int, this->loc->ParaV->desc,
+				this->wfc_gamma->at(is).c, &one_int, &one_int, this->loc->ParaV->desc,
 				&zero_float,
-				this->loc->dm_gamma.at(is).c, &one_int, &one_int, GlobalC::ParaO.desc);
+				this->loc->dm_gamma.at(is).c, &one_int, &one_int, this->loc->ParaV->desc);
 		}
 
 		std::cout << " finished calc dm_2d : " << std::endl;

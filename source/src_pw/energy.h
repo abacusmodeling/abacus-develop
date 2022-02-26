@@ -3,6 +3,7 @@
 #include "../module_base/global_function.h"
 #include "../module_base/global_variable.h"
 #include "src_lcao/local_orbital_wfc.h"
+#include "src_lcao/LCAO_hamilt.h"
 
 class energy
 {
@@ -27,7 +28,7 @@ class energy
     energy();
     ~energy();
 
-	void perform_dos(Local_Orbital_wfc &lowf);
+	void perform_dos(Local_Orbital_wfc &lowf, LCAO_Hamilt &uhm);
     void perform_dos_pw(void);
 
     double etot;    	   // the total energy of the solid

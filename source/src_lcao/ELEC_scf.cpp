@@ -25,7 +25,8 @@ int ELEC_scf::iter=0;
 
 void ELEC_scf::scf(const int& istep,
     Local_Orbital_Charge &loc,
-    Local_Orbital_wfc &lowf)
+    Local_Orbital_wfc& lowf,
+    LCAO_Hamilt& uhm)
 {
 	ModuleBase::TITLE("ELEC_scf","scf");
 	ModuleBase::timer::tick("ELEC_scf","scf");
@@ -141,7 +142,7 @@ void ELEC_scf::scf(const int& istep,
 
 				// calculate the density matrix using read in wave functions
 				// and the ncalculate the charge density on grid.
-				loc.sum_bands();
+				loc.sum_bands(uhm);
 				// calculate the local potential(rho) again.
 				// the grid integration will do in later grid integration.
 
@@ -199,17 +200,17 @@ void ELEC_scf::scf(const int& istep,
 		// mohan add 2021-02-09
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			ELEC_cbands_gamma::cal_bands(istep, GlobalC::UHM, lowf.wfc_gamma, loc.dm_gamma);
+			ELEC_cbands_gamma::cal_bands(istep, uhm, lowf, loc.dm_gamma);
 		}
 		else
 		{
 			if(ELEC_evolve::tddft && istep >= 1 && iter > 1)
 			{
-				ELEC_evolve::evolve_psi(istep, GlobalC::UHM, lowf);
+				ELEC_evolve::evolve_psi(istep, uhm, lowf);
 			}
 			else
 			{
-				ELEC_cbands_k::cal_bands(istep, GlobalC::UHM, lowf, loc.dm_k);
+				ELEC_cbands_k::cal_bands(istep, uhm, lowf, loc.dm_k);
 			}
 		}
 
@@ -268,7 +269,7 @@ void ELEC_scf::scf(const int& istep,
 
 		// if selinv is used, we need this to calculate the charge
 		// using density matrix.
-		loc.sum_bands();
+		loc.sum_bands(uhm);
 
 #ifdef __MPI
 		// add exx
@@ -305,11 +306,11 @@ void ELEC_scf::scf(const int& istep,
 		{
 			if(GlobalV::GAMMA_ONLY_LOCAL)
 			{
-				GlobalC::ld.cal_e_delta_band(loc.dm_gamma,GlobalC::ParaO);
+				GlobalC::ld.cal_e_delta_band(loc.dm_gamma,*lowf.ParaV);
 			}
 			else
 			{
-				GlobalC::ld.cal_e_delta_band_k(loc.dm_k,GlobalC::ParaO,GlobalC::kv.nks);
+				GlobalC::ld.cal_e_delta_band_k(loc.dm_k,*lowf.ParaV,GlobalC::kv.nks);
 			}
 		}
 #endif
@@ -345,7 +346,7 @@ void ELEC_scf::scf(const int& istep,
 		{
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{
-				GlobalC::restart.save_disk("charge", is);
+				GlobalC::restart.save_disk(*uhm.LM, "charge", is);
 			}
 		}
 

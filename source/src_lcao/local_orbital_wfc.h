@@ -8,7 +8,7 @@
 
 class Local_Orbital_wfc
 {
-	public:
+public:
 
 	Local_Orbital_wfc();
 	~Local_Orbital_wfc();
@@ -33,9 +33,11 @@ class Local_Orbital_wfc
     std::vector<ModuleBase::matrix> wfc_gamma;			// dm_gamma[is](iw1,iw2);
     std::vector<ModuleBase::ComplexMatrix> wfc_k;		// dm_k[ik](iw1,iw2);
 
+    const Parallel_Orbitals *ParaV;
+
 
     void allocate_k(const Grid_Technique& gt,
-        std::vector<ModuleBase::ComplexMatrix> &wfc_k);
+        Local_Orbital_wfc &lowf);
 
     //=========================================
     // Init Cij, make it satisfy 2 conditions:
@@ -44,10 +46,56 @@ class Local_Orbital_wfc
     //=========================================
 	// void init_Cij(const bool change_c = 1);
 
-	// mohan move orb_con here, 2021-05-24 
-	ORB_control* orb_con=nullptr;
-	
-	private:
+
+    ///=========================================
+    ///Parallel: map of index in 2D distribution: global<->local
+    ///=========================================
+    static int globalIndex(int localindex, int nblk, int nprocs, int myproc);
+    static int localIndex(int globalindex, int nblk, int nprocs, int& myproc);
+    
+    ///=========================================
+    ///Parallel: convert the distribution of wavefunction from 2D to grid
+    ///=========================================
+    //name will be changed
+    
+    ///for gamma_only, with output
+    int q2CTOT(
+        int myid,
+        int naroc[2],
+        int nb,
+        int dim0,
+        int dim1,
+        int iprow,
+        int ipcol,
+        int loc_size,
+        double* work,
+        double** CTOT);
+    
+    ///for multi-k, no output
+    int q2WFC_complex(
+        int naroc[2],
+        int nb,
+        int dim0,
+        int dim1,
+        int iprow,
+        int ipcol,
+        std::complex<double>* work,
+        std::complex<double>** WFC);
+    
+    ///for multi-k, with output
+    int q2WFC_CTOT_complex(
+        int myid,
+        int naroc[2],
+        int nb,
+        int dim0,
+        int dim1,
+        int iprow,
+        int ipcol,
+        std::complex<double>* work,
+        std::complex<double>** WFC,
+        std::complex<double>** CTOT);
+        
+private:
 
 	bool wfck_flag; 
 	bool complex_flag;

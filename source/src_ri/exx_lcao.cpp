@@ -42,7 +42,6 @@
 #include "../src_external/src_test/src_global/sph_bessel-unittest.h"
 #include "../src_external/src_test/src_ri/exx_lcao-test.h"
 #include "../src_external/src_test/src_ri/abfs-test.h"
-#include "../src_lcao/LCAO_nnr.h"
 
 /*
 // m_new( i2*n1+i1, i3 ) = m( i1*n2+i2, i3 )
@@ -797,7 +796,7 @@ ofs_mpi.close();
 	};
 }
 
-void Exx_Lcao::cal_exx_ions()
+void Exx_Lcao::cal_exx_ions(const Parallel_Orbitals &pv)
 {
 	ModuleBase::TITLE("Exx_Lcao","cal_exx_ions");
 std::ofstream ofs_mpi(test_dir.process+"time_"+ModuleBase::GlobalFunc::TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
@@ -891,11 +890,11 @@ ofs_mpi<<"TIME@ cauchy::init\t"<<time_during(t_start)<<std::endl;
 	#if EXX_DM==2
 	DM_para.init( H_atom_pairs_core, info.dm_threshold );
 	#elif EXX_DM==3
-	DM_para.allreduce.init( MPI_COMM_WORLD, Abfs::get_H_pairs_core_group( atom_pairs_core ) );
+	DM_para.allreduce.init( MPI_COMM_WORLD, Abfs::get_H_pairs_core_group( atom_pairs_core ), pv);
 	#endif
 	
 	#if EXX_H_COMM==2
-	Hexx_para.allreduce2.init(MPI_COMM_WORLD, H_atom_pairs_core);
+	Hexx_para.allreduce2.init(MPI_COMM_WORLD, H_atom_pairs_core, pv);
 	#endif
 	
 ofs_mpi<<"TIME@ Exx_Lcao::cal_exx_ions\t"<<time_during(t_start_all)<<std::endl;
@@ -953,7 +952,7 @@ gettimeofday( &t_start, NULL);
 ofs_mpi<<"TIME@ Exx_Lcao::cal_DM\t"<<time_during(t_start)<<std::endl;
 #elif EXX_DM==3
 gettimeofday( &t_start, NULL);
-	this->DM_para.cal_DM(info.dm_threshold, loc.dm_gamma, loc.dm_k);
+	this->DM_para.cal_DM(info.dm_threshold, loc);
 ofs_mpi<<"TIME@ Exx_Lcao::cal_DM\t"<<time_during(t_start)<<std::endl;
 #endif
 
@@ -978,7 +977,7 @@ ofs_mpi<<"TIME@ Exx_Lcao::cal_energy\t"<<time_during(t_start)<<std::endl;
 
 gettimeofday( &t_start, NULL);
 #ifdef __MPI
-	Hexx_para.Rexx_to_Km2D( HexxR, {GlobalC::pot.start_pot=="file",GlobalC::CHR.out_charge} );
+	Hexx_para.Rexx_to_Km2D(*loc.ParaV, HexxR, {GlobalC::pot.start_pot=="file",GlobalC::CHR.out_charge} );
 #endif
 ofs_mpi<<"TIME@ Hexx_para.Rexx_to_Km2D\t"<<time_during(t_start)<<std::endl;
 
@@ -1187,11 +1186,11 @@ ofs_mpi.close();
 //		<<Exx_Abfs::Screen::Cauchy::num_cal<<std::endl;
 }
 
-void Exx_Lcao::cal_exx_elec_nscf()
+void Exx_Lcao::cal_exx_elec_nscf(const Parallel_Orbitals &pv)
 {
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> HexxR;
 #ifdef __MPI
-	Hexx_para.Rexx_to_Km2D( HexxR, {GlobalC::pot.start_pot=="file",GlobalC::CHR.out_charge} );
+	Hexx_para.Rexx_to_Km2D(pv, HexxR, {GlobalC::pot.start_pot=="file",GlobalC::CHR.out_charge} );
 #endif
 }
 
@@ -1277,7 +1276,7 @@ ofs_mpi.close();
 	return energy;
 }
 
-void Exx_Lcao::add_Hexx( const size_t ik, const double alpha ) const
+void Exx_Lcao::add_Hexx( const size_t ik, const double alpha, LCAO_Matrix &lm) const
 {
 	ModuleBase::TITLE("Exx_Lcao","add_Hexx");
 	
@@ -1286,7 +1285,7 @@ void Exx_Lcao::add_Hexx( const size_t ik, const double alpha ) const
 		const ModuleBase::matrix & H = Hexx_para.HK_Gamma_m2D[ik];
 		for( size_t i=0; i<H.nr*H.nc; ++i )
 		{
-			GlobalC::LM.Hloc[i] += alpha * H.c[i];
+			lm.Hloc[i] += alpha * H.c[i];
 		}
 	}
 	else
@@ -1294,7 +1293,7 @@ void Exx_Lcao::add_Hexx( const size_t ik, const double alpha ) const
 		const ModuleBase::ComplexMatrix & H = Hexx_para.HK_K_m2D[ik];
 		for( size_t i=0; i<H.nr*H.nc; ++i )
 		{
-			GlobalC::LM.Hloc2[i] += alpha * H.c[i];
+			lm.Hloc2[i] += alpha * H.c[i];
 		}
 	}
 }

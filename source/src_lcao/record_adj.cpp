@@ -27,8 +27,7 @@ void Record_adj::delete_grid(void)
 // This will record the orbitals according to
 // HPSEPS's 2D block division.
 //--------------------------------------------
-#include "LCAO_nnr.h"
-void Record_adj::for_2d(void)
+void Record_adj::for_2d(const Parallel_Orbitals &pv)
 {
 	ModuleBase::TITLE("Record_adj","for_2d");
 	ModuleBase::timer::tick("Record_adj","for_2d");
@@ -109,13 +108,13 @@ void Record_adj::for_2d(void)
 					{
 						// the index of orbitals in this processor
 						const int iw1_all = start1 + ii;
-						const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
+						const int mu = pv.trace_loc_row[iw1_all];
 						if(mu<0)continue;
 
 						for(int jj=0; jj<GlobalC::ucell.atoms[T2].nw * GlobalV::NPOL; ++jj)
 						{
 							const int iw2_all = start2 + jj;
-							const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
+							const int nu = pv.trace_loc_col[iw2_all];
 							if(nu<0)continue;
 							
 							++irr;
@@ -129,7 +128,7 @@ void Record_adj::for_2d(void)
 
  	//xiaohui add "OUT_LEVEL", 2015-09-16
 	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"irr",irr);
-	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"LNNR.nnr",GlobalC::LNNR.nnr);
+	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"LNNR.nnr",pv.nnr);
 
 
 

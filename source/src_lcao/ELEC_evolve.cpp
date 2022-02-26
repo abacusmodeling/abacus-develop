@@ -102,31 +102,31 @@ void ELEC_evolve::evolve_psi(
 		// Effective potential of DFT+U is added to total Hamiltonian here; Quxin adds on 20201029
 		if(INPUT.dft_plus_u)
 		{
-      std::vector<std::complex<double>> eff_pot(GlobalC::ParaO.nloc);
+      std::vector<std::complex<double>> eff_pot(lowf.ParaV->nloc);
 			GlobalC::dftu.cal_eff_pot_mat_complex(ik, istep, &eff_pot[0]);
 
-			for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
-				GlobalC::LM.Hloc2[irc] += eff_pot[irc];
+			for(int irc=0; irc<lowf.ParaV->nloc; irc++)
+				uhm.LM->Hloc2[irc] += eff_pot[irc];
 		}
 
 		// Peize Lin add at 2020.04.04
 		if(GlobalC::restart.info_load.load_H && !GlobalC::restart.info_load.load_H_finish)
 		{
-			GlobalC::restart.load_disk("H", ik);
+			GlobalC::restart.load_disk(*uhm.LM, "H", ik);
 			GlobalC::restart.info_load.load_H_finish = true;
 		}
 		if(GlobalC::restart.info_save.save_H)
 		{
-			GlobalC::restart.save_disk("H", ik);
+			GlobalC::restart.save_disk(*uhm.LM, "H", ik);
 		}		
 		ModuleBase::timer::tick("Efficience","evolve_k");
-		Evolve_LCAO_Matrix ELM;
+		Evolve_LCAO_Matrix ELM(uhm.LM);
 		ELM.evolve_complex_matrix(ik, lowf);
 		ModuleBase::timer::tick("Efficience","evolve_k");
 	} // end k
 
 	// LiuXh modify 2019-07-15*/
-	if(!GlobalC::ParaO.out_hsR)
+	if(!Pdiag_Double::out_hsR)
 	{
 		uhm.GK.destroy_pvpR();
 	}

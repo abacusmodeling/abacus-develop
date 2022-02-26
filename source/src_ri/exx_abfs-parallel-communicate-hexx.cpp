@@ -15,7 +15,7 @@
 //#include <gperftools/profiler.h>
 
 #ifdef __MPI
-void Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D( 
+void Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D(const Parallel_Orbitals &pv, 
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ModuleBase::matrix>>>> &HR_exx,
 	const std::pair<bool,bool> &io_HR_a2D )
 {
@@ -63,9 +63,9 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D(
 	}*/
 
 	if(GlobalV::GAMMA_ONLY_LOCAL)
-		Ra2D_to_Km2D_mixing(HR_a2D, HK_Gamma_m2D, HK_Gamma_m2D_pulay_seq);
+		Ra2D_to_Km2D_mixing(pv, HR_a2D, HK_Gamma_m2D, HK_Gamma_m2D_pulay_seq);
 	else
-		Ra2D_to_Km2D_mixing(HR_a2D, HK_K_m2D, HK_K_m2D_pulay_seq);
+		Ra2D_to_Km2D_mixing(pv, HR_a2D, HK_K_m2D, HK_K_m2D_pulay_seq);
 
 	/*{
 		static int istep=0;
