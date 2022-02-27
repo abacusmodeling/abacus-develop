@@ -19,7 +19,7 @@ class Record_adj
 	// This will record the orbitals according to
 	// HPSEPS's 2D block division.
 	//--------------------------------------------
-	void for_2d(const Parallel_Orbitals &pv);
+	void for_2d(Parallel_Orbitals &pv, bool gamma_only);
 
 	//--------------------------------------------
 	// This will record the orbitals according to

@@ -149,10 +149,10 @@ void LOOP_ions::opt_ions()
             GlobalC::en.evdw = vdwd3.get_energy();
         }
 
-
+        Record_adj RA;
 		// solve electronic structures in terms of LCAO
 		// mohan add 2021-02-09
-		LOE.solve_elec_stru(this->istep, this->LOC, this->LOWF, this->UHM);
+		LOE.solve_elec_stru(this->istep, RA, this->LOC, this->LOWF, this->UHM);
 
 
 		time_t eend = time(NULL);
@@ -234,10 +234,10 @@ void LOOP_ions::opt_ions()
         time_t fstart = time(NULL);
         if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
         {
-            stop = this->force_stress(istep, force_step, stress_step);
+            stop = this->force_stress(istep, force_step, stress_step, RA);
         }
         time_t fend = time(NULL);
-
+        RA.delete_grid();
 		// PLEASE move the details of CE to other places
 		// mohan add 2021-03-25
         //xiaohui add 2014-07-07, for second-order extrapolation
@@ -299,7 +299,8 @@ void LOOP_ions::opt_ions()
 bool LOOP_ions::force_stress(
 	const int &istep,
 	int &force_step,
-	int &stress_step)
+    int& stress_step,
+    Record_adj &ra)
 {
     ModuleBase::TITLE("LOOP_ions","force_stress");
 
@@ -313,7 +314,7 @@ bool LOOP_ions::force_stress(
 	ModuleBase::matrix fcs;
 	// set stress matrix
 	ModuleBase::matrix scs;
-    Force_Stress_LCAO FSL;
+    Force_Stress_LCAO FSL(ra);
     FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS,
         GlobalV::TEST_FORCE, GlobalV::TEST_STRESS,
         this->LOC, this->LOWF, this->UHM, fcs, scs);
@@ -535,12 +536,13 @@ void LOOP_ions::final_scf(void)
         GlobalC::pw.nbxx, GlobalC::pw.nbzp_start, GlobalC::pw.nbzp);
 
     // (2) If k point is used here, allocate HlocR after atom_arrange.
-    if(!GlobalV::GAMMA_ONLY_LOCAL)
+    Parallel_Orbitals* pv = this->UHM.LM->ParaV;
+    Record_adj RA;
+    RA.for_2d(*pv, GlobalV::GAMMA_ONLY_LOCAL);
+    if (!GlobalV::GAMMA_ONLY_LOCAL)
     {
         // For each atom, calculate the adjacent atoms in different cells
         // and allocate the space for H(R) and S(R).
-        Parallel_Orbitals* pv = this->UHM.LM->ParaV;
-        pv->cal_nnr();
         this->UHM.LM->allocate_HS_R(pv->nnr);
 #ifdef __DEEPKS
 		GlobalC::ld.allocate_V_deltaR(pv->nnr);

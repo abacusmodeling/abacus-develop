@@ -18,6 +18,7 @@ class LOOP_elec
 
 	// mohan add 2021-02-09
     void solve_elec_stru(const int& istep,
+        Record_adj &ra,
         Local_Orbital_Charge& loc,
         Local_Orbital_wfc& low,
         LCAO_Hamilt& uhm_in);
@@ -25,7 +26,7 @@ class LOOP_elec
 	private:
 
 	// set matrix and grid integral
-	void set_matrix_grid(void);
+	void set_matrix_grid(Record_adj &ra);
 
     void before_solver(const int& istep,
         Local_Orbital_Charge& loc,

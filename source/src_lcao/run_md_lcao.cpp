@@ -254,16 +254,19 @@ void Run_MD_LCAO::md_force_virial(
     // mohan add 2021-02-09
     LCAO_Hamilt UHM_md;
     UHM_md.genH.LM = UHM_md.LM = &this->LM_md;
+    
+    Record_adj RA_md;
+
     LOOP_elec LOE;
-    LOE.solve_elec_stru(istep + 1, LOC_md, LOWF_md, UHM_md);
+    LOE.solve_elec_stru(istep + 1, RA_md, LOC_md, LOWF_md, UHM_md);
 
     //to call the force of each atom
 	ModuleBase::matrix fcs;//temp force matrix
-	Force_Stress_LCAO FSL;
+	Force_Stress_LCAO FSL(RA_md);
     FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS,
         GlobalV::TEST_FORCE, GlobalV::TEST_STRESS,
         LOC_md, LOWF_md, UHM_md, fcs, virial);
-
+    RA_md.delete_grid();
 	for(int ion=0; ion<numIon; ++ion)
     {
 		force[ion].x = fcs(ion, 0)/2.0;

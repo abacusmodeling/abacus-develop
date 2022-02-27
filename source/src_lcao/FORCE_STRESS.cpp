@@ -14,8 +14,9 @@
 double Force_Stress_LCAO::force_invalid_threshold_ev = 0.00;
 double Force_Stress_LCAO::output_acc = 1.0e-8;
 
-Force_Stress_LCAO::Force_Stress_LCAO (){}
-Force_Stress_LCAO::~Force_Stress_LCAO (){}
+Force_Stress_LCAO::Force_Stress_LCAO(Record_adj& ra) :
+    RA(&ra){}
+Force_Stress_LCAO::~Force_Stress_LCAO() {}
 
 #include "../src_pw/efield.h"
 void Force_Stress_LCAO::getForceStress(
@@ -749,6 +750,7 @@ void Force_Stress_LCAO::calForceStressIntegralPart(
 		flk.ftable_k(
 				isforce,
 				isstress,
+                *this->RA,
                 lowf.wfc_k,
                 loc,
                 foverlap,

@@ -46,7 +46,7 @@ class LOOP_ions
 	// the renew of structure factors, etc. should be ran in other places
 	// the 'IMM' and 'LCM' objects should be passed to force_stress() via parameters list
 	// mohan note 2021-03-23
-	bool force_stress(const int &istep, int &force_step, int &stress_step);
+	bool force_stress(const int &istep, int &force_step, int &stress_step, Record_adj &ra);
 
 	int istep;
 

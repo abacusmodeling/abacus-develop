@@ -22,6 +22,7 @@ Force_LCAO_k::~Force_LCAO_k ()
 void Force_LCAO_k::ftable_k (
 		const bool isforce,
 		const bool isstress,
+        Record_adj &ra, 
         std::vector<ModuleBase::ComplexMatrix>& wfc_k,
         Local_Orbital_Charge &loc, 
 		ModuleBase::matrix& foverlap,
@@ -49,7 +50,7 @@ void Force_LCAO_k::ftable_k (
 
 	// calculate the energy density matrix
 	// and the force related to overlap matrix and energy density matrix.
-    this->cal_foverlap_k(isforce, isstress, wfc_k, loc, foverlap, soverlap);
+    this->cal_foverlap_k(isforce, isstress, ra, wfc_k, loc, foverlap, soverlap);
 
 	// calculate the density matrix
 	double** dm2d = new double*[GlobalV::NSPIN];
@@ -60,11 +61,9 @@ void Force_LCAO_k::ftable_k (
 	}
     ModuleBase::Memory::record ("Force_LCAO_k", "dm2d", GlobalV::NSPIN*pv->nnr, "double");	
 
-    Record_adj RA;
-    RA.for_2d(*pv);
-    loc.cal_dm_R(loc.dm_k, RA, dm2d);
+    loc.cal_dm_R(loc.dm_k, ra, dm2d);
     
-    this->cal_ftvnl_dphi_k(dm2d, isforce, isstress, ftvnl_dphi, stvnl_dphi);
+    this->cal_ftvnl_dphi_k(dm2d, isforce, isstress, ra, ftvnl_dphi, stvnl_dphi);
 
 
     // ---------------------------------------
@@ -237,6 +236,7 @@ void Force_LCAO_k::finish_k(void)
 void Force_LCAO_k::cal_foverlap_k(
 	const bool isforce, 
     const bool isstress,
+    Record_adj &ra, 
     std::vector<ModuleBase::ComplexMatrix>& wfc_k,
     Local_Orbital_Charge &loc,
     ModuleBase::matrix& foverlap,
@@ -255,9 +255,6 @@ void Force_LCAO_k::cal_foverlap_k(
 		edm2d[is] = new double[pv->nnr];
 		ModuleBase::GlobalFunc::ZEROS(edm2d[is], pv->nnr);
     }
-    
-    Record_adj RA;
-	RA.for_2d(*pv);
 
 	//--------------------------------------------	
 	// calculate the energy density matrix here.
@@ -279,7 +276,7 @@ void Force_LCAO_k::cal_foverlap_k(
         wfc_k,
         edm_k);
     loc.cal_dm_R(edm_k,
-        RA, edm2d);
+        ra, edm2d);
     ModuleBase::timer::tick("Force_LCAO_k", "cal_edm_2d");
 
 	//--------------------------------------------
@@ -298,10 +295,10 @@ void Force_LCAO_k::cal_foverlap_k(
         for(int I1=0; I1<atom1->na; ++I1)
         {
 			const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);
-			for (int cb = 0; cb < RA.na_each[iat]; ++cb)
+			for (int cb = 0; cb < ra.na_each[iat]; ++cb)
 			{
-				const int T2 = RA.info[iat][cb][3];
-				const int I2 = RA.info[iat][cb][4];
+				const int T2 = ra.info[iat][cb][3];
+				const int I2 = ra.info[iat][cb][4];
 				const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 
 				Atom* atom2 = &GlobalC::ucell.atoms[T2];
@@ -374,7 +371,6 @@ void Force_LCAO_k::cal_foverlap_k(
 	}
 	delete[] edm2d;
 
-	RA.delete_grid();//xiaohui add 2015-02-04
 	ModuleBase::timer::tick("Force_LCAO_k","cal_foverlap_k");
 	return;
 }
@@ -382,8 +378,9 @@ void Force_LCAO_k::cal_foverlap_k(
 void Force_LCAO_k::cal_ftvnl_dphi_k(
 	double** dm2d, 
 	const bool isforce, 
-	const bool isstress, 
-	ModuleBase::matrix& ftvnl_dphi, 
+    const bool isstress,
+    Record_adj &ra, 
+    ModuleBase::matrix& ftvnl_dphi,
 	ModuleBase::matrix& stvnl_dphi)
 {	
 	ModuleBase::TITLE("Force_LCAO_k","cal_ftvnl_dphi");
@@ -393,8 +390,6 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(
     // get the adjacent atom's information.
 
 //	GlobalV::ofs_running << " calculate the ftvnl_dphi_k force" << std::endl;
-	Record_adj RA;
-	RA.for_2d(*this->UHM->LM->ParaV);
 
 	int irr = 0;
     for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
@@ -404,10 +399,10 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(
         {
 			const int iat = GlobalC::ucell.itia2iat(T1,I1);
 			const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);
-			for (int cb = 0; cb < RA.na_each[iat]; ++cb)
+			for (int cb = 0; cb < ra.na_each[iat]; ++cb)
 			{
-				const int T2 = RA.info[iat][cb][3];
-				const int I2 = RA.info[iat][cb][4];
+				const int T2 = ra.info[iat][cb][3];
+				const int I2 = ra.info[iat][cb][4];
 				const int start2 = GlobalC::ucell.itiaiw2iwt(T2,I2,0);
 				Atom* atom2 = &GlobalC::ucell.atoms[T2];
 
@@ -461,7 +456,6 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(
 		StressTools::stress_fill(GlobalC::ucell.lat0, GlobalC::ucell.omega, stvnl_dphi);
 	}
 
-	RA.delete_grid();//xiaohui add 2015-02-04
 	ModuleBase::timer::tick("Force_LCAO_k","cal_ftvnl_dphi");
 	return;
 }
@@ -478,7 +472,7 @@ void Force_LCAO_k::test(double* mmm, const std::string &name)
 
 	GlobalV::ofs_running << " Calculate the test in Force_LCAO_k" << std::endl;
 	Record_adj RA;
-	RA.for_2d(*this->UHM->LM->ParaV);
+	RA.for_2d(*this->UHM->LM->ParaV, GlobalV::GAMMA_ONLY_LOCAL);
 	
 	double *test;
 	test = new double[GlobalV::NLOCAL * GlobalV::NLOCAL];
