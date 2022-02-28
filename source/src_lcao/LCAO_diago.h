@@ -24,7 +24,7 @@ private:
     LCAO_Matrix* LM;
 
 	void using_LAPACK(const int &ik, Local_Orbital_wfc &lowf)const;
-	void using_LAPACK_complex(const int &ik, std::complex<double> **wfc)const;
+	void using_LAPACK_complex(const int &ik, std::complex<double> **wfc_k_grid ,ModuleBase::ComplexMatrix &wfc_k)const;
 	void using_CG(const int &ik, double **c)const;
 
 #ifdef __MPI

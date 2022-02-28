@@ -46,6 +46,8 @@ void Run_lcao::lcao_line(ModuleEnSover::En_Solver *p_ensolver)
 			GlobalV::test_atom_input,
 			INPUT.test_just_neighbor);
     }
+
+
     // the symmetry of a variety of systems.
     if (GlobalV::CALCULATION == "test")
     {
@@ -128,6 +130,18 @@ void Run_lcao::Init_Basis_lcao(ORB_control& orb_con, Input& inp, UnitCell_pseudo
 		Exx_Abfs::Lmax,
 		ucell.infoNL.nprojmax,
 		ucell.infoNL.nproj,
+        ucell.infoNL.Beta);
+#else
+	int Lmax=0;
+	orb_con.set_orb_tables(
+		GlobalV::ofs_running,
+		GlobalC::UOT,
+		GlobalC::ORB,
+		ucell.lat0,
+		GlobalV::out_descriptor,
+		Lmax,
+		ucell.infoNL.nprojmax,
+	    ucell.infoNL.nproj,
         ucell.infoNL.Beta);
 #endif
 

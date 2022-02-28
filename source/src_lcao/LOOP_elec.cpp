@@ -184,11 +184,11 @@ void LOOP_elec::solver(const int& istep,
     ModuleBase::TITLE("LOOP_elec","solver"); 
     ModuleBase::timer::tick("LOOP_elec","solver"); 
 
-#ifdef __MPI
 	// self consistent calculations for electronic ground state
 	if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md"
 			|| GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") //pengfei 2014-10-13
 	{
+	#ifdef __MPI
 		//Peize Lin add 2016-12-03
 		switch(GlobalC::exx_lcao.info.hybrid_type)
 		{
@@ -217,8 +217,10 @@ void LOOP_elec::solver(const int& istep,
 		}
 		else    // Peize Lin add 2016-12-03
 		{
+		#endif // __MPI
 			ELEC_scf es;
             es.scf(istep - 1, loc, lowf, *this->UHM);
+		#ifdef __MPI
             if (GlobalC::exx_global.info.separate_loop, lowf.wfc_k_grid)
 			{
 				for( size_t hybrid_step=0; hybrid_step!=GlobalC::exx_global.info.hybrid_step; ++hybrid_step )
@@ -242,6 +244,7 @@ void LOOP_elec::solver(const int& istep,
 				es.scf(istep-1, loc, lowf, *this->UHM);
 			}
 		}
+		#endif // __MPI
 	}
 	else if (GlobalV::CALCULATION=="nscf")
 	{
@@ -261,7 +264,6 @@ void LOOP_elec::solver(const int& istep,
 	{
 		ModuleBase::WARNING_QUIT("LOOP_elec::solver","CALCULATION type not supported");
 	}
-#endif
 
     ModuleBase::timer::tick("LOOP_elec","solver"); 
 	return;

@@ -20,7 +20,7 @@ void Diago_LCAO_Matrix::solve_complex_matrix(
 
 	if(GlobalV::KS_SOLVER=="lapack")
 	{
-		this->using_LAPACK_complex(ik, lowf.wfc_k_grid[ik]);
+		this->using_LAPACK_complex(ik, lowf.wfc_k_grid[ik], lowf.wfc_k[ik]);
 	}
 	else
 	{
@@ -74,7 +74,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, Local_Orbital_wfc &l
 }
 #endif
 
-void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, std::complex<double> **wfc)const
+void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, std::complex<double> **wfc_k_grid ,ModuleBase::ComplexMatrix &wfc_k)const
 {
 	ModuleBase::TITLE("Diago_LCAO_Matrix","using_LAPACK_complex");
 
@@ -103,13 +103,15 @@ void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, std::complex<double>
 	ModuleBase::ComplexMatrix hvec(GlobalV::NLOCAL, GlobalV::NBANDS);
 	GlobalC::hm.diagH_LAPACK(GlobalV::NLOCAL, GlobalV::NBANDS, Htmp, Stmp, GlobalV::NLOCAL, en, hvec);
 
+	wfc_k.create(GlobalV::NBANDS,GlobalV::NLOCAL);
 	if(GlobalV::NSPIN!=4)
 	{
 		for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
 			for(int iw=0; iw<GlobalV::NLOCAL; iw++)
 			{
-				wfc[ib][iw] = hvec(iw,ib);
+				wfc_k_grid[ib][iw] = hvec(iw,ib);
+				wfc_k.c[ib*GlobalV::NLOCAL+iw]=wfc_k_grid[ib][iw];
 			}
 		}
 	}
@@ -119,8 +121,8 @@ void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, std::complex<double>
 		{
 			for(int iw=0; iw<GlobalV::NLOCAL / GlobalV::NPOL; iw++)
 			{
-				wfc[ib][iw] = hvec(iw * GlobalV::NPOL, ib);
-				wfc[ib][iw + GlobalV::NLOCAL / GlobalV::NPOL] = hvec(iw * GlobalV::NPOL + 1, ib);
+				wfc_k_grid[ib][iw] = hvec(iw * GlobalV::NPOL, ib);
+				wfc_k_grid[ib][iw + GlobalV::NLOCAL / GlobalV::NPOL] = hvec(iw * GlobalV::NPOL + 1, ib);
 			}
 		}
 	}
