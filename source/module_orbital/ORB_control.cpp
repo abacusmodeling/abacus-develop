@@ -508,8 +508,6 @@ void ORB_control::mat_2d(MPI_Comm vu,
     }
     pv->nloc_wfc = pv->ncol_bands * LM.row_num;
 
-    std::cout << pv->nloc_wfc << " " << pv->ncol_bands << " " << LM.row_num << std::endl;
-
     return;
 }
 #endif

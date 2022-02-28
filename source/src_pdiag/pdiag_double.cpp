@@ -221,9 +221,7 @@ void Pdiag_Double::diago_double_begin(
 
         ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_solve");
         int elpa_error;
-        std::cout << "before elpa" << std::endl;
         elpa_generalized_eigenvectors_d(handle, h_mat, Stmp, eigen, lowf.wfc_gamma[ik].c, is_already_decomposed, &elpa_error);
-        std::cout << "after elpa" << std::endl;
         ModuleBase::timer::tick("Diago_LCAO_Matrix", "elpa_solve");
 
     	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"K-S equation was solved by genelpa2");
