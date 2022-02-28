@@ -8,9 +8,35 @@
 
 //#include "build_st_pw.h"
 
+ORB_control::ORB_control(
+    const bool& gamma_only_in,
+    const int& nlocal_in,
+    const int& nbands_in,
+    const int& nspin_in,
+    const int& dsize_in,
+    const int& nb2d_in,
+    const int& dcolor_in,
+    const int& drank_in,
+    const int& myrank_in,
+    const std::string& calculation_in,
+    const std::string& ks_solver_in) :
+    gamma_only(gamma_only_in),
+    nlocal(nlocal_in),
+    nbands(nbands_in),
+    nspin(nspin_in),
+    dsize(dsize_in),
+    nb2d(nb2d_in),
+    dcolor(dcolor_in),
+    drank(drank_in),
+    myrank(myrank_in),
+    calculation(calculation_in),
+    ks_solver(ks_solver_in)
+{
+    this->ParaV.nspin = nspin_in;
+}
+
 ORB_control::ORB_control()
 {}
-
 ORB_control::~ORB_control()
 {}
 
@@ -83,7 +109,7 @@ void ORB_control::set_orb_tables(
 #ifdef __NORMAL
 
 #else
-	if(GlobalV::CALCULATION=="test")
+	if(calculation=="test")
 	{
 		ModuleBase::timer::tick("ORB_control","set_orb_tables");
 		return;
@@ -131,20 +157,21 @@ void ORB_control::clear_after_ions(
 }
 
 
-void ORB_control::setup_2d_division(void)
+void ORB_control::setup_2d_division(std::ofstream& ofs_running,
+    std::ofstream& ofs_warning)
 {
     ModuleBase::TITLE("ORB_control","setup_2d_division");
-    GlobalV::ofs_running << "\n SETUP THE DIVISION OF H/S MATRIX" << std::endl;
+    ofs_running << "\n SETUP THE DIVISION OF H/S MATRIX" << std::endl;
     
     // (1) calculate nrow, ncol, nloc.
-    if (GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="hpseps" || GlobalV::KS_SOLVER=="scalpack" 
-        || GlobalV::KS_SOLVER=="selinv" || GlobalV::KS_SOLVER=="scalapack_gvx")
+    if (ks_solver=="genelpa" || ks_solver=="hpseps" || ks_solver=="scalpack" 
+        || ks_solver=="selinv" || ks_solver=="scalapack_gvx")
     {
-        GlobalV::ofs_running << " divide the H&S matrix using 2D block algorithms." << std::endl;
+        ofs_running << " divide the H&S matrix using 2D block algorithms." << std::endl;
 #ifdef __MPI
         // storage form of H and S matrices on each processor
         // is determined in 'divide_HS_2d' subroutine
-        this->divide_HS_2d(DIAG_WORLD);
+        this->divide_HS_2d(DIAG_WORLD, ofs_running, ofs_warning);
 #else
         ModuleBase::WARNING_QUIT("LCAO_Matrix::init","diago method is not ready.");
 #endif
@@ -152,123 +179,124 @@ void ORB_control::setup_2d_division(void)
 	else
 	{
 		// the full matrix
-		this->ParaV.nloc = GlobalV::NLOCAL * GlobalV::NLOCAL;
+		this->ParaV.nloc = nlocal * nlocal;
 	}
 
 	// (2) set the trace, then we can calculate the nnr.
 	// for 2d: calculate po.nloc first, then trace_loc_row and trace_loc_col
 	// for O(N): calculate the three together.
-	this->set_trace();
+	this->set_trace(ofs_running);
 }
 
 
-void ORB_control::set_parameters(void)
+void ORB_control::set_parameters(std::ofstream& ofs_running,
+        std::ofstream& ofs_warning)
 {
     ModuleBase::TITLE("ORB_control","set_parameters");
 
     Parallel_Orbitals* pv = &this->ParaV;
     // set loc_size
-	if(GlobalV::GAMMA_ONLY_LOCAL)//xiaohui add 2014-12-21
+	if(gamma_only)//xiaohui add 2014-12-21
 	{
-		pv->loc_size=GlobalV::NBANDS/GlobalV::DSIZE;
+		pv->loc_size=nbands/dsize;
 
 		// mohan add 2012-03-29
 		if(pv->loc_size==0)
 		{
-			GlobalV::ofs_warning << " loc_size=0" << " in proc " << GlobalV::MY_RANK+1 << std::endl;
-			ModuleBase::WARNING_QUIT("ORB_control::set_parameters","NLOCAL < GlobalV::DSIZE");
+			ofs_warning << " loc_size=0" << " in proc " << myrank+1 << std::endl;
+			ModuleBase::WARNING_QUIT("ORB_control::set_parameters","NLOCAL < dsize");
 		}
 
-		if (GlobalV::DRANK<GlobalV::NBANDS%GlobalV::DSIZE) pv->loc_size+=1;
-		if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"local size",pv->loc_size);
+		if (drank<nbands%dsize) pv->loc_size+=1;
+		if(pv->testpb)ModuleBase::GlobalFunc::OUT(ofs_running,"local size",pv->loc_size);
 
 		// set loc_sizes
 		delete[] pv->loc_sizes;
-		pv->loc_sizes = new int[GlobalV::DSIZE];
-		ModuleBase::GlobalFunc::ZEROS(pv->loc_sizes, GlobalV::DSIZE);
+		pv->loc_sizes = new int[dsize];
+		ModuleBase::GlobalFunc::ZEROS(pv->loc_sizes, dsize);
 
 		pv->lastband_in_proc = 0;
 		pv->lastband_number = 0;
 		int count_bands = 0;
-		for (int i=0; i<GlobalV::DSIZE; i++)
+		for (int i=0; i<dsize; i++)
 		{
-			if (i<GlobalV::NBANDS%GlobalV::DSIZE)
+			if (i<nbands%dsize)
 			{
 				// mohan modify 2010-07-05
-				pv->loc_sizes[i]=GlobalV::NBANDS/GlobalV::DSIZE+1;
+				pv->loc_sizes[i]=nbands/dsize+1;
 			}
 			else
 			{
-				pv->loc_sizes[i]=GlobalV::NBANDS/GlobalV::DSIZE;
+				pv->loc_sizes[i]=nbands/dsize;
 			}
 			count_bands += pv->loc_sizes[i];
-			if (count_bands >= GlobalV::NBANDS)
+			if (count_bands >= nbands)
 			{
 				pv->lastband_in_proc = i;
-				pv->lastband_number = GlobalV::NBANDS - (count_bands - pv->loc_sizes[i]);
+				pv->lastband_number = nbands - (count_bands - pv->loc_sizes[i]);
 				break;
 			}
 		}
 	}
 	else
 	{
-		pv->loc_size=GlobalV::NLOCAL/GlobalV::DSIZE;
+		pv->loc_size=nlocal/dsize;
 
 		// mohan add 2012-03-29
 		if(pv->loc_size==0)
 		{
-			GlobalV::ofs_warning << " loc_size=0" << " in proc " << GlobalV::MY_RANK+1 << std::endl;
-			ModuleBase::WARNING_QUIT("ORB_control::set_parameters","NLOCAL < GlobalV::DSIZE");
+			ofs_warning << " loc_size=0" << " in proc " << myrank+1 << std::endl;
+			ModuleBase::WARNING_QUIT("ORB_control::set_parameters","NLOCAL < DSIZE");
 		}
 
-		if (GlobalV::DRANK<GlobalV::NLOCAL%GlobalV::DSIZE) 
+		if (drank<nlocal%dsize) 
 		{
             pv->loc_size += 1;
         }
-		if(pv->testpb) ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"local size",pv->loc_size);
+		if(pv->testpb) ModuleBase::GlobalFunc::OUT(ofs_running,"local size",pv->loc_size);
 
 		// set loc_sizes
 		delete[] pv->loc_sizes;
-		pv->loc_sizes = new int[GlobalV::DSIZE];
-		ModuleBase::GlobalFunc::ZEROS(pv->loc_sizes, GlobalV::DSIZE);
+		pv->loc_sizes = new int[dsize];
+		ModuleBase::GlobalFunc::ZEROS(pv->loc_sizes, dsize);
 
 		pv->lastband_in_proc = 0;
 		pv->lastband_number = 0;
 		int count_bands = 0;
-		for (int i=0; i<GlobalV::DSIZE; i++)
+		for (int i=0; i<dsize; i++)
 		{
-			if (i<GlobalV::NLOCAL%GlobalV::DSIZE)
+			if (i<nlocal%dsize)
 			{
 				// mohan modify 2010-07-05
-				pv->loc_sizes[i]=GlobalV::NLOCAL/GlobalV::DSIZE+1;
+				pv->loc_sizes[i]=nlocal/dsize+1;
 			}
 			else
 			{
-				pv->loc_sizes[i]=GlobalV::NLOCAL/GlobalV::DSIZE;
+				pv->loc_sizes[i]=nlocal/dsize;
 			}
 			count_bands += pv->loc_sizes[i];
-			if (count_bands >= GlobalV::NBANDS)
+			if (count_bands >= nbands)
 			{
 				pv->lastband_in_proc = i;
-				pv->lastband_number = GlobalV::NBANDS - (count_bands - pv->loc_sizes[i]);
+				pv->lastband_number = nbands - (count_bands - pv->loc_sizes[i]);
 				break;
 			}
 		}
 	}//xiaohui add 2014-12-21
 
-    if (GlobalV::KS_SOLVER=="hpseps") //LiuXh add 2021-09-06, clear memory, Z_LOC only used in hpseps solver
+    if (ks_solver=="hpseps") //LiuXh add 2021-09-06, clear memory, Z_LOC only used in hpseps solver
     {
-	    pv->Z_LOC = new double*[GlobalV::NSPIN];
-	    for(int is=0; is<GlobalV::NSPIN; is++)
+	    pv->Z_LOC = new double*[nspin];
+	    for(int is=0; is<nspin; is++)
 	    {
-		    pv->Z_LOC[is] = new double[pv->loc_size * GlobalV::NLOCAL];
-		    ModuleBase::GlobalFunc::ZEROS(pv->Z_LOC[is], pv->loc_size * GlobalV::NLOCAL);
+		    pv->Z_LOC[is] = new double[pv->loc_size * nlocal];
+		    ModuleBase::GlobalFunc::ZEROS(pv->Z_LOC[is], pv->loc_size * nlocal);
 	    }
 	    pv->alloc_Z_LOC = true;//xiaohui add 2014-12-22
     }
 
-    if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"lastband_in_proc", pv->lastband_in_proc);
-    if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"lastband_number", pv->lastband_number);
+    if(pv->testpb)ModuleBase::GlobalFunc::OUT(ofs_running,"lastband_in_proc", pv->lastband_in_proc);
+    if(pv->testpb)ModuleBase::GlobalFunc::OUT(ofs_running,"lastband_number", pv->lastband_number);
 
     return;
 }
@@ -276,7 +304,8 @@ void ORB_control::set_parameters(void)
 
 #ifdef __MPI
 // creat the 'comm_2D' stratege.
-void ORB_control::mpi_creat_cart(MPI_Comm *comm_2D, int prow, int pcol)
+void ORB_control::mpi_creat_cart(MPI_Comm* comm_2D,
+    int prow, int pcol, std::ofstream& ofs_running)
 {
     ModuleBase::TITLE("ORB_control","mpi_creat_cart");
     // the matrix is divided as ( dim[0] * dim[1] )
@@ -286,7 +315,7 @@ void ORB_control::mpi_creat_cart(MPI_Comm *comm_2D, int prow, int pcol)
     dim[0]=prow;
     dim[1]=pcol;
 
-    if(this->ParaV.testpb)GlobalV::ofs_running << " dim = " << dim[0] << " * " << dim[1] << std::endl;
+    if(this->ParaV.testpb) ofs_running << " dim = " << dim[0] << " * " << dim[1] << std::endl;
 
     MPI_Cart_create(DIAG_WORLD,2,dim,period,reorder,comm_2D);
     return;
@@ -295,10 +324,12 @@ void ORB_control::mpi_creat_cart(MPI_Comm *comm_2D, int prow, int pcol)
 
 #ifdef __MPI
 void ORB_control::mat_2d(MPI_Comm vu,
-                         const int &M_A,
-                         const int &N_A,
-                         const int &nb,
-                         LocalMatrix &LM)
+    const int &M_A,
+    const int &N_A,
+    const int &nb,
+    LocalMatrix &LM,
+    std::ofstream& ofs_running,
+    std::ofstream& ofs_warning)
 {
     ModuleBase::TITLE("ORB_control", "mat_2d");
     
@@ -325,13 +356,13 @@ void ORB_control::mat_2d(MPI_Comm vu,
         block++;
     }
 
-    if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Total Row Blocks Number",block);
+    if(pv->testpb)ModuleBase::GlobalFunc::OUT(ofs_running,"Total Row Blocks Number",block);
 
 	// mohan add 2010-09-12
 	if(dim[0]>block)
 	{
-		GlobalV::ofs_warning << " cpu 2D distribution : " << dim[0] << "*" << dim[1] << std::endl;
-		GlobalV::ofs_warning << " but, the number of row blocks is " << block << std::endl;
+		ofs_warning << " cpu 2D distribution : " << dim[0] << "*" << dim[1] << std::endl;
+		ofs_warning << " but, the number of row blocks is " << block << std::endl;
 		ModuleBase::WARNING_QUIT("ORB_control::mat_2d","some processor has no row blocks, try a smaller 'nb2d' parameter.");
 	}
 
@@ -345,7 +376,7 @@ void ORB_control::mat_2d(MPI_Comm vu,
         LM.row_b++;
     }
 
-    if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Local Row Block Number",LM.row_b);
+    if(pv->testpb)ModuleBase::GlobalFunc::OUT(ofs_running,"Local Row Block Number",LM.row_b);
 
     // (3) end_id indicates the last block belong to
     // which processor.
@@ -358,7 +389,7 @@ void ORB_control::mat_2d(MPI_Comm vu,
         end_id=block%dim[0]-1;
     }
 
-    if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Ending Row Block in processor",end_id);
+    if(pv->testpb)ModuleBase::GlobalFunc::OUT(ofs_running,"Ending Row Block in processor",end_id);
 
     // (4) row_num : how many rows in this processors :
     // the one owns the last block is different.
@@ -371,7 +402,7 @@ void ORB_control::mat_2d(MPI_Comm vu,
         LM.row_num=LM.row_b*nb;
     }
 
-    if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Local rows (including nb)",LM.row_num);
+    if(pv->testpb)ModuleBase::GlobalFunc::OUT(ofs_running,"Local rows (including nb)",LM.row_num);
 
     // (5) row_set, it's a global index :
     // save explicitly : every row in this processor
@@ -384,17 +415,17 @@ void ORB_control::mat_2d(MPI_Comm vu,
         for (k=0; k<nb&&(coord[0]*nb+i*nb*dim[0]+k<M_A); k++,j++)
         {
             LM.row_set[j]=coord[0]*nb+i*nb*dim[0]+k;
-           // GlobalV::ofs_running << " j=" << j << " row_set=" << LM.row_set[j] << std::endl;
+           // ofs_running << " j=" << j << " row_set=" << LM.row_set[j] << std::endl;
         }
     }
 
     // the same procedures for columns.
-    if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Total Col Blocks Number",block);
+    if(pv->testpb)ModuleBase::GlobalFunc::OUT(ofs_running,"Total Col Blocks Number",block);
 
 	if(dim[1]>block)
 	{
-		GlobalV::ofs_warning << " cpu 2D distribution : " << dim[0] << "*" << dim[1] << std::endl;
-		GlobalV::ofs_warning << " but, the number of column blocks is " << block << std::endl;
+		ofs_warning << " cpu 2D distribution : " << dim[0] << "*" << dim[1] << std::endl;
+		ofs_warning << " but, the number of column blocks is " << block << std::endl;
 		ModuleBase::WARNING_QUIT("ORB_control::mat_2d","some processor has no column blocks.");
 	}
 
@@ -404,7 +435,7 @@ void ORB_control::mat_2d(MPI_Comm vu,
         LM.col_b++;
     }
 
-    if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Local Row Block Number",LM.col_b);
+    if(pv->testpb)ModuleBase::GlobalFunc::OUT(ofs_running,"Local Row Block Number",LM.col_b);
 
     if (block%dim[1]==0)
     {
@@ -415,7 +446,7 @@ void ORB_control::mat_2d(MPI_Comm vu,
         end_id=block%dim[1]-1;
     }
 
-    if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Ending Row Block in processor",end_id);
+    if(pv->testpb)ModuleBase::GlobalFunc::OUT(ofs_running,"Ending Row Block in processor",end_id);
 
     if (coord[1]==end_id)
     {
@@ -426,7 +457,7 @@ void ORB_control::mat_2d(MPI_Comm vu,
         LM.col_num=LM.col_b*nb;
     }
 
-    if(pv->testpb)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Local columns (including nb)",LM.row_num);
+    if(pv->testpb)ModuleBase::GlobalFunc::OUT(ofs_running,"Local columns (including nb)",LM.row_num);
 
     delete[] LM.col_set;
     LM.col_set = new int[LM.col_num];
@@ -450,8 +481,8 @@ void ORB_control::mat_2d(MPI_Comm vu,
     }
     if(dim[1]>block)
 	{
-		GlobalV::ofs_warning << " cpu 2D distribution : " << dim[0] << "*" << dim[1] << std::endl;
-		GlobalV::ofs_warning << " but, the number of bands-row-block is " << block << std::endl;
+		ofs_warning << " cpu 2D distribution : " << dim[0] << "*" << dim[1] << std::endl;
+		ofs_warning << " but, the number of bands-row-block is " << block << std::endl;
 		ModuleBase::WARNING_QUIT("ORB_control::mat_2d","some processor has no bands-row-blocks.");
     }
     int col_b_bands = block / dim[1];
@@ -505,9 +536,9 @@ void ORB_control::data_distribution(
     int coord[2];
     MPI_Cart_get(comm_2D,2,dim,period,coord);
 
-    if(pv->testpb) GlobalV::ofs_running << "\n dim = " << dim[0] << " * " << dim[1] << std::endl;
-    if(pv->testpb) GlobalV::ofs_running << " coord = ( " << coord[0] << " , " << coord[1] << ")." << std::endl;
-    if(pv->testpb) GlobalV::ofs_running << " n = " << n << std::endl;
+    if(pv->testpb) ofs_running << "\n dim = " << dim[0] << " * " << dim[1] << std::endl;
+    if(pv->testpb) ofs_running << " coord = ( " << coord[0] << " , " << coord[1] << ")." << std::endl;
+    if(pv->testpb) ofs_running << " n = " << n << std::endl;
 
     mpi_sub_col(comm_2D,&comm_col);
     mpi_sub_row(comm_2D,&comm_row);
@@ -542,10 +573,10 @@ void ORB_control::data_distribution(
     for (int i=1; i<dim[1]; i++)
     {
         fpt[i]=fpt[i-1]+sends[i-1];
-//      GlobalV::ofs_running << " col_pro = " << i << " start_col = " << fpt[i] << std::endl;
+//      ofs_running << " col_pro = " << i << " start_col = " << fpt[i] << std::endl;
     }
 
-//    GlobalV::ofs_running << "\n myid = " << myid << std::endl;
+//    ofs_running << "\n myid = " << myid << std::endl;
 
     int cur_i = 0;
 
@@ -567,14 +598,14 @@ void ORB_control::data_distribution(
         }
         else
         {
-            GlobalV::ofs_running << " Open file : " << file << std::endl;
+            ofs_running << " Open file : " << file << std::endl;
             int dim = 0;
             fread(&dim,sizeof(int),1,fp);
             if (dim!=n)
             {
                 find = false;
             }
-            GlobalV::ofs_running << " Read in dimension = " << dim << std::endl;
+            ofs_running << " Read in dimension = " << dim << std::endl;
         }
         int nrow = 0;
         while (nrow<n && !feof(fp))
@@ -583,13 +614,13 @@ void ORB_control::data_distribution(
             ModuleBase::GlobalFunc::ZEROS(val, n);
 
             // read om one row elements.
-//            GlobalV::ofs_running << "\n nrow = " << nrow << std::endl;
+//            ofs_running << "\n nrow = " << nrow << std::endl;
 
             for (int i=nrow; i<n; i++)
             {
-                //if ((i-nrow)%8==0)GlobalV::ofs_running << std::endl;
+                //if ((i-nrow)%8==0)ofs_running << std::endl;
                 fread(&ele_val[i],sizeof(double),1,fp);
-                //			GlobalV::ofs_running << " " << ele_val[i];
+                //			ofs_running << " " << ele_val[i];
             }
 
             // start position of col_pro.
@@ -616,7 +647,7 @@ void ORB_control::data_distribution(
                 BlasConnector::copy(LM.col_num,val,incx,&A[ai*LM.col_num],incx);
                 for (int i=1; i<dim[1]; i++)
                 {
-//					GlobalV::ofs_running << " send to processor " << iarow*dim[1]+i << std::endl;
+//					ofs_running << " send to processor " << iarow*dim[1]+i << std::endl;
                     MPI_Send(&val[fpt[i]],sends[i],MPI_DOUBLE,iarow*dim[1]+i,tag,DIAG_WORLD);
                 }
             }
@@ -624,7 +655,7 @@ void ORB_control::data_distribution(
             {
                 for (int i=0; i<dim[1]; i++)
                 {
-//					GlobalV::ofs_running << " else, send to processor " << iarow*dim[1]+i << std::endl;
+//					ofs_running << " else, send to processor " << iarow*dim[1]+i << std::endl;
                     MPI_Send(&val[fpt[i]],sends[i],MPI_DOUBLE,iarow*dim[1]+i,tag,DIAG_WORLD);
                 }
             }
@@ -637,7 +668,7 @@ void ORB_control::data_distribution(
     {
         for (int j=0; j<LM.row_num; j++)
         {
-//			GlobalV::ofs_running << " receive row = " <<  j << std::endl;
+//			ofs_running << " receive row = " <<  j << std::endl;
             MPI_Recv(&A[j*LM.col_num],LM.col_num,MPI_DOUBLE,0,tag,DIAG_WORLD,&status);
         }
     }
@@ -645,11 +676,11 @@ void ORB_control::data_distribution(
     /*
     for (int i=0; i<LM.row_num; i++)
     {
-        GlobalV::ofs_running << "\n\n Row = " << i << std::endl;
+        ofs_running << "\n\n Row = " << i << std::endl;
         for (int j=0; j<LM.col_num; j++)
         {
-            if (j%8==0) GlobalV::ofs_running << std::endl;
-            GlobalV::ofs_running << " " << A[j*LM.col_num+i];
+            if (j%8==0) ofs_running << std::endl;
+            ofs_running << " " << A[j*LM.col_num+i];
         }
     }
     */
@@ -668,7 +699,7 @@ void ORB_control::data_distribution(
     Parallel_Common::bcast_bool(find);
 #endif
 
-    //ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"Find the H/S file",find);
+    //ModuleBase::GlobalFunc::OUT(ofs_running,"Find the H/S file",find);
 
     if (!find)
     {
@@ -702,13 +733,13 @@ void ORB_control::readin(
 
     MPI_Comm comm=DIAG_HPSEPS_WORLD,comm_2D,comm_col,comm_row,newcomm;
 
-    dim[0]=(int)sqrt((double)GlobalV::DSIZE);
+    dim[0]=(int)sqrt((double)dsize);
 
-    while (GlobalV::DSIZE%dim[0]!=0)
+    while (dsize%dim[0]!=0)
     {
         dim[0]=dim[0]-1;
     }
-    dim[1]=GlobalV::DSIZE/dim[0];
+    dim[1]=dsize/dim[0];
 
     // call mpi_creat_cart
     this->mpi_creat_cart(&pv->comm_2D,dim[0],dim[1]);
@@ -716,10 +747,10 @@ void ORB_control::readin(
     // call mat_2d
     this->mat_2d(pv->comm_2D, nlocal_tot,nlocal_tot,pv->nb,pv->MatrixInfo);
 
-    pv->loc_size=nlocal_tot/GlobalV::DSIZE;
-    if (GlobalV::DRANK<nlocal_tot%GlobalV::DSIZE) loc_size=loc_size+1;
+    pv->loc_size=nlocal_tot/dsize;
+    if (drank<nlocal_tot%dsize) loc_size=loc_size+1;
 
-    GlobalV::ofs_running << " loc_size = " << loc_size;
+    ofs_running << " loc_size = " << loc_size;
 
     //Distribute the matrix
     const long nloc = pv->MatrixInfo.col_num * pv->MatrixInfo.row_num;
@@ -731,9 +762,9 @@ void ORB_control::readin(
     ModuleBase::GlobalFunc::ZEROS(B, nloc);
     ModuleBase::GlobalFunc::ZEROS(Z, loc_size * nlocal_tot);
 
-    GlobalV::ofs_running << "\n Data distribution of H." << std::endl;
+    ofs_running << "\n Data distribution of H." << std::endl;
     this->data_distribution(pv->comm_2D,fa,nlocal_tot,pv->nb,A,pv->MatrixInfo);
-    GlobalV::ofs_running << "\n Data distribution of S." << std::endl;
+    ofs_running << "\n Data distribution of S." << std::endl;
     this->data_distribution(pv->comm_2D,fb,nlocal_tot,pv->nb,B,pv->MatrixInfo);
 
     time1=MPI_Wtime();
@@ -741,15 +772,15 @@ void ORB_control::readin(
     char uplo = 'U';
     pdgseps(pv->comm_2D,nlocal_tot,pv->nb,A,B,Z,eigen,pv->MatrixInfo,uplo,pv->loc_size,loc_pos);
     time2=MPI_Wtime();
-    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"time1",time1);
-    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"time2",time2);
+    ModuleBase::GlobalFunc::OUT(ofs_running,"time1",time1);
+    ModuleBase::GlobalFunc::OUT(ofs_running,"time2",time2);
 
     //this->gath_eig(comm,n,eigvr,Z);
 
-    GlobalV::ofs_running << "\n " << std::setw(6) << "Band" << std::setw(25) << "Ry" << std::setw(25) << " eV" << std::endl;
+    ofs_running << "\n " << std::setw(6) << "Band" << std::setw(25) << "Ry" << std::setw(25) << " eV" << std::endl;
     for(int i=0; i<nlocal_tot; i++)
     {
-        GlobalV::ofs_running << " " << std::setw(6) << i << std::setw(25) << eigen[i] << std::setw(25)<< eigen[i] * 13.6058 << std::endl;
+        ofs_running << " " << std::setw(6) << i << std::setw(25) << eigen[i] << std::setw(25)<< eigen[i] * 13.6058 << std::endl;
     }
 
     delete[] A;

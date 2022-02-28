@@ -83,7 +83,13 @@ void Run_lcao::lcao_line(ModuleEnSover::En_Solver *p_ensolver)
 
     // * reading the localized orbitals/projectors
     // * construct the interpolation tables.
-    ORB_control orb_con;
+    ORB_control orb_con(
+        GlobalV::GAMMA_ONLY_LOCAL,
+        GlobalV::NLOCAL, GlobalV::NBANDS,
+        GlobalV::NSPIN, GlobalV::DSIZE,
+        GlobalV::NB2D, GlobalV::DCOLOR,
+        GlobalV::DRANK, GlobalV::MY_RANK,
+        GlobalV::CALCULATION, GlobalV::KS_SOLVER);
     
     orb_con.read_orb_first(
 		GlobalV::ofs_running,
@@ -119,7 +125,7 @@ void Run_lcao::lcao_line(ModuleEnSover::En_Solver *p_ensolver)
         GlobalC::ucell.infoNL.Beta);
 #endif
 
-    orb_con.setup_2d_division();
+    orb_con.setup_2d_division(GlobalV::ofs_running, GlobalV::ofs_warning);
 //--------------------------------------
 // cell relaxation should begin here
 //--------------------------------------
