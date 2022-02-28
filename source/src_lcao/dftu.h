@@ -11,7 +11,7 @@
 #include "dftu_relax.h"
 
 #include "../module_cell/unitcell_pseudo.h"
-#include "../src_parallel/parallel_orbitals.h"
+#include "../module_orbital/parallel_orbitals.h"
 
 using namespace std;
 

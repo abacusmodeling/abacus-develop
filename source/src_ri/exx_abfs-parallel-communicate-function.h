@@ -3,7 +3,7 @@
 #define EXX_ABFS_PARALLEL_COMMUNICATE_FUNCTION_H
 
 #include "exx_abfs-parallel.h"
-#include "src_parallel/parallel_orbitals.h"
+#include "module_orbital/parallel_orbitals.h"
 #include <vector>
 #include <utility>
 #ifdef __MPI

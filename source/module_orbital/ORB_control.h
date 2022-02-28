@@ -1,8 +1,7 @@
 #ifndef ORB_CONTROL_H 
 #define ORB_CONTROL_H 
 
-#include "src_parallel/parallel_orbitals.h"
-#include "src_parallel/parallel_global.h"
+#include "parallel_orbitals.h"
 #include "ORB_gen_tables.h"
 #include "ORB_read.h"
 

@@ -11,7 +11,6 @@ struct Parallel_Orbitals
 {
 
     Parallel_Orbitals();
-    Parallel_Orbitals(const int& nspin_in);
     ~Parallel_Orbitals();
     
     /// map from global-index to local-index
@@ -58,7 +57,7 @@ struct Parallel_Orbitals
 #endif
 
     /// only used in hpseps-diago
-    int nspin;
+    int nspin = 1;
     int* loc_sizes;
     int loc_size;
     bool alloc_Z_LOC; //xiaohui add 2014-12-22

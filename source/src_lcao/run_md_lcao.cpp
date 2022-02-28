@@ -5,7 +5,7 @@
 #include "../src_pw/vdwd2.h"
 #include "../src_pw/vdwd2_parameters.h"
 #include "../src_pw/vdwd3_parameters.h"
-#include "../src_parallel/parallel_orbitals.h"
+#include "../module_orbital/parallel_orbitals.h"
 #include "../src_pdiag/pdiag_double.h"
 #include "../src_io/write_HS.h"
 #include "../src_io/cal_r_overlap_R.h"

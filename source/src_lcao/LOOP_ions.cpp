@@ -1,6 +1,6 @@
 #include "LOOP_ions.h"
 #include "../src_pw/global.h"
-#include "../src_parallel/parallel_orbitals.h"
+#include "../module_orbital/parallel_orbitals.h"
 #include "../src_pdiag/pdiag_double.h"
 #include "FORCE_STRESS.h"
 #include "../module_base/global_function.h"

@@ -5,7 +5,7 @@
 #include "../module_cell/unitcell_pseudo.h"
 #include "../module_base/matrix.h"
 #ifdef __LCAO
-#include "../src_parallel/parallel_orbitals.h"
+#include "../module_orbital/parallel_orbitals.h"
 #endif
 
 #include "module_ensolver/en_solver.h"
