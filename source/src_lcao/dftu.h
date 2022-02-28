@@ -62,10 +62,6 @@ public:
 
     double EU;
     int iter_dftu;
-
-private:
-    LCAO_Matrix* LM;
-
 };
 }
 namespace GlobalC
