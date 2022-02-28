@@ -1,6 +1,8 @@
 #ifndef ORB_CONTROL_H 
 #define ORB_CONTROL_H 
 
+#include "input.h"
+#include "module_cell/unitcell_pseudo.h"
 #include "parallel_orbitals.h"
 #include "ORB_gen_tables.h"
 #include "ORB_read.h"
@@ -29,6 +31,8 @@ public:
     ORB_control();
     
     ~ORB_control();
+
+    void Init(Input &inp, UnitCell_pseudo &ucell);
 
 	//first step: read orbital file
 	void read_orb_first(
@@ -72,6 +76,8 @@ public:
 // #endif
 
     Parallel_Orbitals ParaV;
+
+    bool setup_2d = false;
 
 private:
     const bool gamma_only = 1;

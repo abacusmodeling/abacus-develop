@@ -30,12 +30,14 @@ ORB_control::ORB_control(
     drank(drank_in),
     myrank(myrank_in),
     calculation(calculation_in),
-    ks_solver(ks_solver_in)
+    ks_solver(ks_solver_in),
+    setup_2d(true)
 {
     this->ParaV.nspin = nspin_in;
 }
 
-ORB_control::ORB_control()
+ORB_control::ORB_control() :
+    setup_2d(false)
 {}
 ORB_control::~ORB_control()
 {}
