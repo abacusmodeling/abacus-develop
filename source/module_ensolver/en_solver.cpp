@@ -1,5 +1,6 @@
 #include "en_solver.h"
 #include "FP/KSDFT/PW/ks_scf_pw.h"
+#include "FP/KSDFT/LCAO/ks_scf_lcao.h"
 #include "FP/OFDFT/ofdft.h"
 #include "stdio.h"
 namespace ModuleEnSover
@@ -17,7 +18,11 @@ void init_esolver(En_Solver *&p_ensolver, const string use_esol)
      {
          p_ensolver = new KS_SCF_PW();
      }
-    //  else if(use_esol == "sdft_pw")
+    else if(use_esol == "ksdft_lcao")
+     {
+         p_ensolver = new KS_SCF_LCAO();
+     }
+     //  else if(use_esol == "sdft_pw")
     //  {
     //      p_ensolver = new KS_SCF_PW(true);
     //  }

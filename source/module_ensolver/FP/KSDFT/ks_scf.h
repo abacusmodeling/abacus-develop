@@ -1,3 +1,5 @@
+#ifndef KS_SCF_H
+#define KS_SCF_H
 #include "../ab_initio.h"
 // #include "estates.h"
 // #include "h2e.h"
@@ -12,3 +14,4 @@ class KS_SCF: public ab_initio
         // H2E *p_h2e; 
 };
 }
+#endif
