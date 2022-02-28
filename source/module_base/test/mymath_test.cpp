@@ -56,8 +56,8 @@ TEST_F(MymathTest,Hpsort)
 	index[0] = 0;
 	//for (int i=0;i<number;i++)
 	//	std::cout << i << " " << rr[i] << std::endl;
-	//ModuleBase::hpsort(number,rr,index);
-	std::sort(rr,rr+number);
+	ModuleBase::hpsort(number,rr,index);
+	//std::sort(rr,rr+number);
 	for (int i=0;i<number-1;i++)
 	{
 		//std::cout << i << " " << rr[i] << std::endl;
