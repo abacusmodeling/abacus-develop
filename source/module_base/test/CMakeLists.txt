@@ -82,3 +82,7 @@ AddTest(
   LIBS ${math_libs}
   SOURCES mathzone_add1_test.cpp ../mathzone_add1.cpp ../math_sphbes.cpp ../mathzone.cpp ../matrix3.cpp ../matrix.cpp ../tool_quit.cpp ../global_variable.cpp ../global_file.cpp ../memory.cpp ../timer.cpp
 )
+AddTest(
+  TARGET base_math_bspline
+  SOURCES math_bspline_test.cpp ../math_bspline.cpp
+)
