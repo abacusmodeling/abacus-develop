@@ -26,6 +26,7 @@
 #endif
 
 void LOOP_elec::solve_elec_stru(const int& istep,
+    Record_adj &ra,
     Local_Orbital_Charge& loc,
     Local_Orbital_wfc& lowf,
     LCAO_Hamilt& uhm_in)
@@ -36,7 +37,7 @@ void LOOP_elec::solve_elec_stru(const int& istep,
     this->UHM = &uhm_in;
 
 	// prepare HS matrices, prepare grid integral
-	this->set_matrix_grid();
+	this->set_matrix_grid(ra);
 	// density matrix extrapolation and prepare S,T,VNL matrices 
 	this->before_solver(istep, loc, lowf);
 	// do self-interaction calculations / nscf/ tddft, etc. 
@@ -47,7 +48,7 @@ void LOOP_elec::solve_elec_stru(const int& istep,
 }
 
 
-void LOOP_elec::set_matrix_grid(void)
+void LOOP_elec::set_matrix_grid(Record_adj &ra)
 {
     ModuleBase::TITLE("LOOP_elec","set_matrix_grid"); 
     ModuleBase::timer::tick("LOOP_elec","set_matrix_grid"); 
@@ -77,13 +78,13 @@ void LOOP_elec::set_matrix_grid(void)
 			GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbz,
 			GlobalC::pw.nbxx, GlobalC::pw.nbzp_start, GlobalC::pw.nbzp);
 
-	// (2) If k point is used here, allocate HlocR after atom_arrange.
+    // (2)For each atom, calculate the adjacent atoms in different cells
+    // and allocate the space for H(R) and S(R).
+    // If k point is used here, allocate HlocR after atom_arrange.
+    Parallel_Orbitals* pv = this->UHM->LM->ParaV;
+    ra.for_2d(*pv, GlobalV::GAMMA_ONLY_LOCAL);
 	if(!GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		// For each atom, calculate the adjacent atoms in different cells
-        // and allocate the space for H(R) and S(R).
-        Parallel_Orbitals* pv = this->UHM->LM->ParaV;
-        pv->cal_nnr();
 		this->UHM->LM->allocate_HS_R(pv->nnr);
 #ifdef __DEEPKS
 		GlobalC::ld.allocate_V_deltaR(pv->nnr);

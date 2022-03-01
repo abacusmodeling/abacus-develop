@@ -5,9 +5,10 @@
 #include "../module_cell/unitcell_pseudo.h"
 #include "../module_base/matrix.h"
 #ifdef __LCAO
-#include "../src_parallel/parallel_orbitals.h"
+#include "../module_orbital/parallel_orbitals.h"
 #endif
 
+#include "module_ensolver/en_solver.h"
 class MD_func
 {
     public:
@@ -43,6 +44,7 @@ class MD_func
 		ModuleBase::Vector3<double>* vel);
 
 	static void force_virial(
+		ModuleEnSover::En_Solver *p_ensolver,
 		const int &istep,
 		const MD_parameters &mdp,
 		const UnitCell_pseudo &unit_in,

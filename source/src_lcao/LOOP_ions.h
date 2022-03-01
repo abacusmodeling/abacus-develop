@@ -8,6 +8,7 @@
 #include "src_lcao/local_orbital_wfc.h"
 #include "module_orbital/ORB_control.h"
 #include "src_lcao/LCAO_hamilt.h"
+#include "module_ensolver/en_solver.h"
 
 #include <fstream>
 
@@ -24,7 +25,7 @@ class LOOP_ions
     Local_Orbital_Charge LOC;
     LCAO_Hamilt UHM;
 
-	void opt_ions(); //output for dos
+	void opt_ions(ModuleEnSover::En_Solver *p_ensolver); //output for dos
 	void output_HS_R(
         const std::string &SR_filename="data-SR-sparse_SPIN0.csr",
         const std::string &HR_filename_up="data-HR-sparse_SPIN0.csr",
@@ -46,7 +47,7 @@ class LOOP_ions
 	// the renew of structure factors, etc. should be ran in other places
 	// the 'IMM' and 'LCM' objects should be passed to force_stress() via parameters list
 	// mohan note 2021-03-23
-	bool force_stress(const int &istep, int &force_step, int &stress_step);
+	bool force_stress(const int &istep, int &force_step, int &stress_step, Record_adj &ra);
 
 	int istep;
 

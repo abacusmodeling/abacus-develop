@@ -15,7 +15,7 @@ LOOP_cell::LOOP_cell(Parallel_Orbitals &pv)
 }
 LOOP_cell::~LOOP_cell() {}
 
-void LOOP_cell::opt_cell(ORB_control &orb_con)
+void LOOP_cell::opt_cell(ORB_control &orb_con, ModuleEnSover::En_Solver *p_ensolver)
 {
 	ModuleBase::TITLE("LOOP_cell","opt_cell");
 
@@ -73,7 +73,7 @@ void LOOP_cell::opt_cell(ORB_control &orb_con)
   if(INPUT.dft_plus_dmft) GlobalC::dmft.init(INPUT, GlobalC::ucell);
 
 	LOOP_ions ions(this->LM); 
-    ions.opt_ions();
+    ions.opt_ions(p_ensolver);
 
 	// mohan update 2021-02-10
     orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);

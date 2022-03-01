@@ -1,0 +1,15 @@
+VPATH:=$(VPATH)\
+:./module_ensolver\
+:./module_ensolver/FP\
+:./module_ensolver/FP/KSDFT\
+:./module_ensolver/FP/KSDFT/PW\
+:./module_ensolver/FP/KSDFT/LCAO\
+
+OBJS_ENSOLVER=en_solver.o\
+ab_initio.o\
+ks_scf.o\
+ks_scf_pw.o\
+ks_scf_lcao.o
+
+OBJS_FIRST_PRINCIPLES:= ${OBJS_FIRST_PRINCIPLES} \
+${OBJS_ENSOLVER}

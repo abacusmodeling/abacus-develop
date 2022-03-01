@@ -39,11 +39,11 @@ struct Parallel_Orbitals
     int lastband_in_proc;
 	int lastband_number; 
 
-    //---------------------------------------
-    // number of elements in H or S matrix,
-	// nnr -> 2D block distribution;
-	//---------------------------------------
-	int nnr; 
+    ///---------------------------------------
+    /// number of elements(basis-pairs) in this processon
+    /// on all adjacent atoms-pairs(2D division)
+    ///---------------------------------------
+    int nnr;
 	int *nlocdim;
 	int *nlocstart;
     
@@ -57,7 +57,8 @@ struct Parallel_Orbitals
 #endif
 
     /// only used in hpseps-diago
-	int* loc_sizes;
+    int nspin = 1;
+    int* loc_sizes;
     int loc_size;
     bool alloc_Z_LOC; //xiaohui add 2014-12-22
     double** Z_LOC; //xiaohui add 2014-06-19
@@ -67,14 +68,10 @@ struct Parallel_Orbitals
 
     // test parameter
     int testpb;
-    
+
     /// check whether a basis element is in this processor
     /// (check whether local-index > 0 )
     bool in_this_processor(const int& iw1_all, const int& iw2_all) const;
-
-    /// number of elements(basis-pairs) in this processon
-    /// on all adjacent atoms-pairs(2D division)
-    void cal_nnr();
 
 };
 

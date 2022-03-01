@@ -5,7 +5,7 @@
 #include "../src_pw/vdwd2.h"
 #include "../src_pw/vdwd2_parameters.h"
 #include "../src_pw/vdwd3_parameters.h"
-#include "../src_parallel/parallel_orbitals.h"
+#include "../module_orbital/parallel_orbitals.h"
 #include "../src_pdiag/pdiag_double.h"
 #include "../src_io/write_HS.h"
 #include "../src_io/cal_r_overlap_R.h"
@@ -34,7 +34,7 @@ Run_MD_LCAO::Run_MD_LCAO(Parallel_Orbitals &pv)
 Run_MD_LCAO::~Run_MD_LCAO(){}
 
 
-void Run_MD_LCAO::opt_cell(ORB_control &orb_con)
+void Run_MD_LCAO::opt_cell(ORB_control &orb_con, ModuleEnSover::En_Solver *p_ensolver)
 {
 	ModuleBase::TITLE("Run_MD_LCAO","opt_cell");
 
@@ -58,16 +58,14 @@ void Run_MD_LCAO::opt_cell(ORB_control &orb_con)
     int ion_step=0;
     GlobalC::pot.init_pot(ion_step, GlobalC::pw.strucFac);
 
-	
-    opt_ions();
-    
+    opt_ions(p_ensolver);
     orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
     
     return;
 }
 
 
-void Run_MD_LCAO::opt_ions(void)
+void Run_MD_LCAO::opt_ions(ModuleEnSover::En_Solver *p_ensolver)
 {
     ModuleBase::TITLE("Run_MD_LCAO","opt_ions"); 
     ModuleBase::timer::tick("Run_MD_LCAO","opt_ions"); 
@@ -121,7 +119,7 @@ void Run_MD_LCAO::opt_ions(void)
         if(verlet->step_ == 0)
         {
             MD_func::ParaV = this->LM_md.ParaV;
-            verlet->setup();
+            verlet->setup(p_ensolver);
         }
         else
         {
@@ -150,7 +148,7 @@ void Run_MD_LCAO::opt_ions(void)
             GlobalC::pot.init_pot(verlet->step_, GlobalC::pw.strucFac);
 
             // update force and virial due to the update of atom positions
-            MD_func::force_virial(verlet->step_, verlet->mdp, verlet->ucell, verlet->potential, verlet->force, verlet->virial);
+            MD_func::force_virial(p_ensolver, verlet->step_, verlet->mdp, verlet->ucell, verlet->potential, verlet->force, verlet->virial);
 
             verlet->second_half();
 
@@ -204,6 +202,7 @@ void Run_MD_LCAO::opt_ions(void)
 }
 
 void Run_MD_LCAO::md_force_virial(
+    ModuleEnSover::En_Solver *p_ensolver,
     const int &istep,
     const int& numIon, 
     double &potential, 
@@ -255,16 +254,19 @@ void Run_MD_LCAO::md_force_virial(
     // mohan add 2021-02-09
     LCAO_Hamilt UHM_md;
     UHM_md.genH.LM = UHM_md.LM = &this->LM_md;
+    
+    Record_adj RA_md;
+
     LOOP_elec LOE;
-    LOE.solve_elec_stru(istep + 1, LOC_md, LOWF_md, UHM_md);
+    LOE.solve_elec_stru(istep + 1, RA_md, LOC_md, LOWF_md, UHM_md);
 
     //to call the force of each atom
 	ModuleBase::matrix fcs;//temp force matrix
-	Force_Stress_LCAO FSL;
+	Force_Stress_LCAO FSL(RA_md);
     FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS,
         GlobalV::TEST_FORCE, GlobalV::TEST_STRESS,
         LOC_md, LOWF_md, UHM_md, fcs, virial);
-
+    RA_md.delete_grid();
 	for(int ion=0; ion<numIon; ++ion)
     {
 		force[ion].x = fcs(ion, 0)/2.0;

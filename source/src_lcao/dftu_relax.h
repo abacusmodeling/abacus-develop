@@ -64,7 +64,7 @@ public:
     //locale_save: the input local occupation number matrix of correlated electrons in the current electronic step
     std::vector<std::vector<std::vector<std::vector<ModuleBase::matrix>>>> locale;            // locale[iat][l][n][spin](m1,m2)
     std::vector<std::vector<std::vector<std::vector<ModuleBase::matrix>>>> locale_save;       // locale_save[iat][l][n][spin](m1,m2)
-private:
+protected:
     LCAO_Matrix* LM;
 };
 }

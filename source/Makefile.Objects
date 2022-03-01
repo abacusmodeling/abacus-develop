@@ -176,7 +176,6 @@ FORCE_k.o\
 parallel_orbitals.o \
 global_fp.o \
 pdiag_double.o \
-pdiag_basic.o \
 pdiag_common.o \
 diag_scalapack_gvx.o \
 subgrid_oper.o \
