@@ -124,7 +124,7 @@ If Libxc is not installed in standard path (i.e. installed with a custom prefix 
 cmake -B build -DLibxc_DIR=~/libxc
 ```
 
-To build tests for abacus, define `BUILD_TESTING` flag.
+To build tests for abacus, define `BUILD_TESTING` flag. You can also specify path to local installation of [Googletest](https://github.com/google/googletest) by setting `GTEST_DIR` flags. If not found in local, the configuration process will try to download it automatically.
 
 ```bash
 cmake -B build -DBUILD_TESTING=1
@@ -138,6 +138,8 @@ After configuring, start build and install by:
 cmake --build build -j9
 cmake --install build
 ```
+
+`-j9` specifies the number of jobs to run simultaneously. You can change the number on your need: set to the number of CPU cores to gain the best performance.
 
 [back to top](#download-and-install)
 

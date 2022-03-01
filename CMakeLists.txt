@@ -225,7 +225,7 @@ IF (BUILD_TESTING)
   enable_testing()
   find_package(Threads)
   set(CMAKE_CXX_STANDARD_REQUIRED ON)
-  find_package(GTest HINTS /usr/local/lib/ PATHS ${GTEST_DIR})
+  find_package(GTest HINTS /usr/local/lib/ ${GTEST_DIR})
   if(NOT ${GTEST_FOUND})
     include(FetchContent)
     FetchContent_Declare(
