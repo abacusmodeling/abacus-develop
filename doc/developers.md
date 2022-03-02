@@ -11,9 +11,9 @@
   - [Code Formatting style](#code-formatting-style)
     [back to main page](../README.md)
 
-## Raising issues on GitHub
+## Creating issues on GitHub
 
-Raising issues on GitHub is a convernient way to notify the develper team about bugs and feature requests of the ABACUS code. We provide a few templates for issues.
+Creating issues on GitHub is a convernient way to notify the develper team about bugs and feature requests of the ABACUS code. We provide a few templates for issues.
 
 [back to top](#for-developers)
 
@@ -23,7 +23,7 @@ The ABACUS code is refactored to several self-contained modules. A description o
 
 ### Add a unit test
 
-If there are currently no unit tests provided for the module, do as follows. `module_base` provides a simple demonstration.
+We use GoogleTest as our test framework. Write your test under the corresponding module folder at `abacus-develop/tests`, then append the test to `tests/CMakeLists.txt`. If there are currently no unit tests provided for the module, do as follows. `module_base` provides a simple demonstration.
 
 - Add a folder named `test` under the module.
 - Append the content below to `CMakeLists.txt` of the module:
@@ -106,9 +106,6 @@ After your pull request is merged, you can safely delete your branch and pull th
     git pull --ff upstream develop
     ```
 
-### Providing unit tests
-
-We use GoogleTest as our test framework. Write your test under the corresponding module folder at `abacus-develop/tests`, then append the test to `tests/CMakeLists.txt`. To build tests for abacus, set `BUILD_TESTING=1` when configuring with CMake. Executables of test programs will be under `build/tests`.
 
 ### Updating documentation
 
