@@ -264,7 +264,7 @@ class Input
 // molecular dynamics
 // added by Daye Zheng
 //==========================================================
-/*    int md_mdtype;                   //choose ensemble
+/*    int md_type;                   //choose ensemble
 	double md_tauthermo;
 	double md_taubaro;
 	double md_dt;                    //time step
@@ -277,7 +277,7 @@ class Input
 	std::string md_mdoutpath;                //output path for md
 	bool md_domsd;                   //whether compute <r(t)-r(0)>
 	bool md_domsdatom;                //whether compute msd for each atom
-	int md_rstmd;                    //whether restart;
+	int md_restart;                    //whether restart;
 	int md_outputstressperiod;      //period to output stress
 	int md_fixtemperature;          //period to change temperature
 	int md_msdstartTime;            //choose which step that msd be calculated */

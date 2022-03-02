@@ -97,9 +97,9 @@ public:
     static void neighbor(Grid_Driver &grid_neigh, UnitCell_pseudo &ucell)
     {
         GlobalV::SEARCH_RADIUS = 8.5 * ModuleBase::ANGSTROM_AU;
-        INPUT.mdp.rcut_lj = 8.5 * ModuleBase::ANGSTROM_AU;
-        INPUT.mdp.epsilon_lj = 0.01032 / ModuleBase::Hartree_to_eV;
-        INPUT.mdp.sigma_lj = 3.405 * ModuleBase::ANGSTROM_AU;
+        INPUT.mdp.lj_rcut = 8.5 * ModuleBase::ANGSTROM_AU;
+        INPUT.mdp.lj_epsilon = 0.01032 / ModuleBase::Hartree_to_eV;
+        INPUT.mdp.lj_sigma = 3.405 * ModuleBase::ANGSTROM_AU;
         atom_arrange::search(1, GlobalV::ofs_running, grid_neigh, ucell, GlobalV::SEARCH_RADIUS, 0, 0);
     };
 
@@ -108,25 +108,25 @@ public:
         GlobalV::SEARCH_RADIUS = 8.5 * ModuleBase::ANGSTROM_AU;
         //ModuleBase::Global_File::open_log(GlobalV::ofs_running, "run.log");
 
-        INPUT.mdp.rstMD = 0;
-        INPUT.mdp.dt = 1;
-        INPUT.mdp.tfirst = INPUT.mdp.tlast = 300;
+        INPUT.mdp.md_restart = 0;
+        INPUT.mdp.md_dt = 1;
+        INPUT.mdp.md_tfirst = INPUT.mdp.md_tlast = 300;
 
-        INPUT.mdp.md_potential = "LJ";
-        INPUT.mdp.rcut_lj = 8.5;
-        INPUT.mdp.epsilon_lj = 0.01032;
-        INPUT.mdp.sigma_lj = 3.405;
+        INPUT.mdp.md_ensolver = "LJ";
+        INPUT.mdp.lj_rcut = 8.5;
+        INPUT.mdp.lj_epsilon = 0.01032;
+        INPUT.mdp.lj_sigma = 3.405;
 
-        INPUT.mdp.direction = 2;
-        INPUT.mdp.Qmass = 1;
-        INPUT.mdp.velocity = 0;
-        INPUT.mdp.viscosity = 0;
-        INPUT.mdp.tscale = 0.01;
+        INPUT.mdp.msst_direction = 2;
+        INPUT.mdp.msst_qmass = 1;
+        INPUT.mdp.msst_vel = 0;
+        INPUT.mdp.msst_vis = 0;
+        INPUT.mdp.msst_tscale = 0.01;
 
-        INPUT.mdp.tfreq = 1;
-        INPUT.mdp.MNHC = 4;
+        INPUT.mdp.md_tfreq = 1;
+        INPUT.mdp.md_mnhc = 4;
 
-        INPUT.mdp.damp = 1;
+        INPUT.mdp.md_damp = 1;
     };
 };
 

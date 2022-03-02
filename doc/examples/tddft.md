@@ -25,11 +25,11 @@ out_charge 1
 gamma_only 0
 nstep 2000
 dr2 1.0e-6
-md_mdtype 0
+md_type 0
 md_dt 0.01
 md_tfirst 30
 md_mdoutpath mdtest
-md_rstmd 0
+md_restart 0
 md_fixtemperature 20000
 md_nresn 3
 md_nyosh 3

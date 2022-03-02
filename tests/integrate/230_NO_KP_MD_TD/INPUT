@@ -21,7 +21,7 @@ dr2			1.0e-6
 
 tddft			1
 
-md_mdtype		0
+md_type		    0
 md_dt			0.01
 md_tfirst       0
 

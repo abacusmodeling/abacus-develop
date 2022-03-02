@@ -33,10 +33,10 @@ basis_type          lcao
 mixing_beta         0.4
 charge_extrap       second-order
 
-md_mdtype           1    //choose ensemble
+md_type           1    //choose ensemble
 md_dt               1    //time step
 md_tfirst           700  //the first target temperature
-md_rstmd            0    //whether restart md
+md_restart            0    //whether restart md
 md_qmass            1    //mass of themostat
 md_dumpfred       10   //The period to dump MD information for monitoring and restarting MD
 ```
@@ -45,10 +45,10 @@ These MD parameters means that ABACUS will use NVT ensemble with Nosé-hoover th
 
 Note: *Please turn off symmetry when do MD simulation.*
 
-- md_mdtype : 0, NVE; 1, NVT; 2, velocity scaling
+- md_type : -1, FIRE; 0, NVE; 1, NHC; 2, LGV; 3, ADS; 4, MSST
 - md_dt : time step in md simulation (fs)
 - md_tfirst : target temperature in md simulation(K), you should set parameter md_tlast and md_fixtemperature when you want to change temperature during md simulation.
-- md_rstmd : 0, no need of restart ; 1, restart with restart file, you must repalce STRU file with STRU_MD before you run the restart task.
+- md_restart : 0, no need of restart ; 1, restart with restart file, you must repalce STRU file with STRU_MD before you run the restart task.
 - md_qmass : mass of thermostat, set by experience, if you don’t know how to set, set it to 0 will have a number autosetted by ABACUS
 - md_dumpfred : frequency for output consequence of md simulation
 
