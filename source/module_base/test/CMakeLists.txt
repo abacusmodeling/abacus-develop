@@ -95,3 +95,7 @@ AddTest(
   TARGET base_mymath
   SOURCES mymath_test.cpp ../mymath3.cpp ../timer.cpp
 )
+AddTest(
+  TARGET base_container
+  SOURCES container_operator_test.cpp ../container_operator.h
+)
