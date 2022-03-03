@@ -314,3 +314,34 @@ ModuleBase::Vector3<double> Grid_Driver::Calculate_adjacent_site
 
 	return adjacent_site;
 }
+
+#include "../src_pw/global.h"
+std::vector<std::tuple<int, int, ModuleBase::Vector3<int>, ModuleBase::Vector3<double>>> Grid_Driver::get_adjs(const size_t &iat)
+{
+    const int it = GlobalC::ucell.iat2it[iat];
+    const int ia = GlobalC::ucell.iat2ia[iat];
+    const ModuleBase::Vector3<double> &tau = GlobalC::ucell.atoms[it].tau[ia];
+
+    std::vector<std::tuple<int, int, ModuleBase::Vector3<int>, ModuleBase::Vector3<double>>> adjs;
+    GlobalC::GridD.Find_atom(GlobalC::ucell, tau, it, ia);
+    for(int ad=0; ad<GlobalC::GridD.getAdjacentNum()+1; ad++)
+    {
+        const size_t it_ad = GlobalC::GridD.getType(ad);
+        const size_t ia_ad = GlobalC::GridD.getNatom(ad);
+        const ModuleBase::Vector3<int> box_ad = GlobalC::GridD.getBox(ad);
+        const ModuleBase::Vector3<double> tau_ad = GlobalC::GridD.getAdjacentTau(ad);
+
+        adjs.push_back(std::make_tuple(it_ad, ia_ad, box_ad, tau_ad));
+    }
+    return adjs;
+}
+
+std::vector<std::vector<std::tuple<int, int, ModuleBase::Vector3<int>, ModuleBase::Vector3<double>>>> Grid_Driver::get_adjs()
+{
+    std::vector<std::vector<std::tuple<int, int, ModuleBase::Vector3<int>, ModuleBase::Vector3<double>>>> adjs(GlobalC::ucell.nat);
+    for(size_t iat=0; iat<GlobalC::ucell.nat; iat++)
+    {
+        adjs[iat] = Grid_Driver::get_adjs(iat);
+    }
+    return adjs;
+}

@@ -513,141 +513,211 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
         DGridV_z[i] = &DGridV_pool[i*GlobalC::GridT.lgd+2*DGridV_Size];
     }
     ModuleBase::Memory::record("Gint_Gamma","DGridV",3*GlobalC::GridT.lgd*GlobalC::GridT.lgd,"double");
-    //OUT(GlobalV::ofs_running,"DGridV was allocated");
-
-    // it's a uniform grid to save orbital values, so the delta_r is a constant.
-    const double delta_r = GlobalC::ORB.dr_uniform;
-
-    int LD_pool=max_size*GlobalC::ucell.nwmax;
-    double* dphi_pool;
-    
-    double** dphix;
-    double** dphiy;
-    double** dphiz;
-
-    bool** cal_flag;
-
-    const int ncyz=GlobalC::pw.ncy*GlobalC::pw.nczp;
-
-/*    if(max_size<=0 || GlobalC::GridT.lgd <= 0) 
+#ifdef _OPENMP
+    #pragma omp parallel
     {
-      //OUT(GlobalV::ofs_running,"max_size", max_size);
-      //OUT(GlobalV::ofs_running,"GlobalC::GridT.lgd", GlobalC::GridT.lgd);
-        goto ENDandRETURN;
-    }*/
-    if(max_size>0 && GlobalC::GridT.lgd > 0)
-    {    
-        dphi_pool=new double [3*GlobalC::pw.bxyz*LD_pool];
-        ModuleBase::GlobalFunc::ZEROS(dphi_pool, 3*GlobalC::pw.bxyz*LD_pool);
-        dphix = new double*[GlobalC::pw.bxyz];
-        dphiy = new double*[GlobalC::pw.bxyz];
-        dphiz = new double*[GlobalC::pw.bxyz];    
-        
-        cal_flag=new bool*[GlobalC::pw.bxyz];
-        for(int i=0; i<GlobalC::pw.bxyz; i++)
-        {
-            dphix[i] = &dphi_pool[i*LD_pool];
-            dphiy[i] = &dphi_pool[i*LD_pool+GlobalC::pw.bxyz*LD_pool];
-            dphiz[i] = &dphi_pool[i*LD_pool+2*GlobalC::pw.bxyz*LD_pool];
-            cal_flag[i] = new bool[max_size];
-        }
+        double *DGridV_pool_thread=new double[3*DGridV_Size];
+        ModuleBase::GlobalFunc::ZEROS(DGridV_pool_thread, 3*DGridV_Size);
 
-        ModuleBase::realArray drr;//rewrite drr form by zhengdy-2019-04-02
+        double** DGridV_x_thread = new double*[GlobalC::GridT.lgd];
+        double** DGridV_y_thread = new double*[GlobalC::GridT.lgd];
+        double** DGridV_z_thread = new double*[GlobalC::GridT.lgd];
+        double* DGridV_stress_pool_thread;
+        double** DGridV_11_thread;
+        double** DGridV_12_thread;
+        double** DGridV_13_thread;
+        double** DGridV_22_thread;
+        double** DGridV_23_thread;
+        double** DGridV_33_thread;
+
         if(GlobalV::STRESS)
         {
-            drr.create(max_size, GlobalC::pw.bxyz, 3);
-            drr.zero_out();
-        }    
-/*        double ***drr;//store dr for stress calculate, added by zhengdy
-        if(GlobalV::STRESS)//added by zhengdy-stress
-        {
-    		drr = new double**[max_size];
-    		for(int id=0; id<max_size; id++)
-    		{
-    			drr[id] = new double*[GlobalC::pw.bxyz];
-    			for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
-    			{
-    				drr[id][ib] = new double[3];
-    				ModuleBase::GlobalFunc::ZEROS(drr[id][ib],3);
-    			}
-    		}
-        }*/
-        //OUT(GlobalV::ofs_running,"Data were prepared");
-        //ModuleBase::timer::tick("Gint_Gamma","prepare");
-        for (int i=0; i< GlobalC::GridT.nbx; i++)
-        {
-            const int ibx = i*GlobalC::pw.bx; 
+            DGridV_stress_pool_thread = new double[6*DGridV_Size];
+            ModuleBase::GlobalFunc::ZEROS(DGridV_stress_pool_thread, 6*DGridV_Size);
+            DGridV_11_thread = new double*[GlobalC::GridT.lgd];
+            DGridV_12_thread = new double*[GlobalC::GridT.lgd];
+            DGridV_13_thread = new double*[GlobalC::GridT.lgd];
+            DGridV_22_thread = new double*[GlobalC::GridT.lgd];
+            DGridV_23_thread = new double*[GlobalC::GridT.lgd];
+            DGridV_33_thread = new double*[GlobalC::GridT.lgd];
 
-            for (int j=0; j< GlobalC::GridT.nby; j++)
+            for(int i=0; i<GlobalC::GridT.lgd; ++i)
             {
-                const int jby = j*GlobalC::pw.by;
+                DGridV_11_thread[i] = &DGridV_stress_pool_thread[i*GlobalC::GridT.lgd];
+                DGridV_12_thread[i] = &DGridV_stress_pool_thread[i*GlobalC::GridT.lgd+DGridV_Size];
+                DGridV_13_thread[i] = &DGridV_stress_pool_thread[i*GlobalC::GridT.lgd+2*DGridV_Size];
+                DGridV_22_thread[i] = &DGridV_stress_pool_thread[i*GlobalC::GridT.lgd+3*DGridV_Size];
+                DGridV_23_thread[i] = &DGridV_stress_pool_thread[i*GlobalC::GridT.lgd+4*DGridV_Size];
+                DGridV_33_thread[i] = &DGridV_stress_pool_thread[i*GlobalC::GridT.lgd+5*DGridV_Size];
+            }
+            ModuleBase::Memory::record("Gint_Gamma","DGridV_stress_thread",6*GlobalC::GridT.lgd*GlobalC::GridT.lgd,"double");
+        }
 
-                for (int k= GlobalC::GridT.nbzp_start; k< GlobalC::GridT.nbzp_start+GlobalC::GridT.nbzp; k++)
+        for(int i=0; i<GlobalC::GridT.lgd; ++i)
+        {
+            DGridV_x_thread[i] = &DGridV_pool_thread[i*GlobalC::GridT.lgd];
+            DGridV_y_thread[i] = &DGridV_pool_thread[i*GlobalC::GridT.lgd+DGridV_Size];
+            DGridV_z_thread[i] = &DGridV_pool_thread[i*GlobalC::GridT.lgd+2*DGridV_Size];
+        }
+        ModuleBase::Memory::record("Gint_Gamma","DGridV_thread",3*GlobalC::GridT.lgd*GlobalC::GridT.lgd,"double");
+#endif
+        // it's a uniform grid to save orbital values, so the delta_r is a constant.
+        const double delta_r = GlobalC::ORB.dr_uniform;
+
+        int LD_pool=max_size*GlobalC::ucell.nwmax;
+        double* dphi_pool;
+
+        double** dphix;
+        double** dphiy;
+        double** dphiz;
+
+        bool** cal_flag;
+        const int ncyz=GlobalC::pw.ncy*GlobalC::pw.nczp;
+
+        if(max_size>0 && GlobalC::GridT.lgd > 0)
+        {
+            dphi_pool=new double [3*GlobalC::pw.bxyz*LD_pool];
+            ModuleBase::GlobalFunc::ZEROS(dphi_pool, 3*GlobalC::pw.bxyz*LD_pool);
+            dphix = new double*[GlobalC::pw.bxyz];
+            dphiy = new double*[GlobalC::pw.bxyz];
+            dphiz = new double*[GlobalC::pw.bxyz];
+
+            cal_flag=new bool*[GlobalC::pw.bxyz];
+            for(int i=0; i<GlobalC::pw.bxyz; i++)
+            {
+                dphix[i] = &dphi_pool[i*LD_pool];
+                dphiy[i] = &dphi_pool[i*LD_pool+GlobalC::pw.bxyz*LD_pool];
+                dphiz[i] = &dphi_pool[i*LD_pool+2*GlobalC::pw.bxyz*LD_pool];
+                cal_flag[i] = new bool[max_size];
+            }
+
+            ModuleBase::realArray drr;//rewrite drr form by zhengdy-2019-04-02
+            if(GlobalV::STRESS)
+            {
+                drr.create(max_size, GlobalC::pw.bxyz, 3);
+                drr.zero_out();
+            }
+#ifdef _OPENMP
+            //#pragma omp for schedule(dynamic)
+            #pragma omp for
+#endif
+            for(int i=0; i< GlobalC::GridT.nbx; i++)
+            {
+                const int ibx = i*GlobalC::pw.bx;
+                for(int j=0; j< GlobalC::GridT.nby; j++)
                 {
-                    const int kbz = k*GlobalC::pw.bz-GlobalC::pw.nczp_start; 
-                    const int grid_index = (k-GlobalC::GridT.nbzp_start) + j * GlobalC::GridT.nbzp + i * GlobalC::GridT.nby * GlobalC::GridT.nbzp;
-                    const int na_grid = GlobalC::GridT.how_many_atoms[ grid_index ];
-                    if(na_grid==0)continue;
-                    
-					//------------------------------------------------------------------
-					// extract the local potentials.
-					//------------------------------------------------------------------
-					double *vldr3 = get_vldr3(vlocal, ncyz, ibx, jby, kbz);
-					
-					//------------------------------------------------------
-					// index of wave functions for each block
-					//------------------------------------------------------
-					int *block_iw = Gint_Tools::get_block_iw(na_grid, grid_index, this->max_size);
-					
-					int* block_index = Gint_Tools::get_block_index(na_grid, grid_index);
-					
-					//------------------------------------------------------
-					// band size: number of columns of a band
-					//------------------------------------------------------------------
-					int* block_size = Gint_Tools::get_block_size(na_grid, grid_index);
+                    const int jby = j*GlobalC::pw.by;
+                    for(int k= GlobalC::GridT.nbzp_start; k< GlobalC::GridT.nbzp_start+GlobalC::GridT.nbzp; k++)
+                    {
+                        const int kbz = k*GlobalC::pw.bz-GlobalC::pw.nczp_start;
+                        const int grid_index = (k-GlobalC::GridT.nbzp_start) + j * GlobalC::GridT.nbzp + i * GlobalC::GridT.nby * GlobalC::GridT.nbzp;
+                        const int na_grid = GlobalC::GridT.how_many_atoms[ grid_index ];
+                        if(na_grid==0) continue;
 
-					Gint_Tools::Array_Pool<double> psir_vlbr3(GlobalC::pw.bxyz, LD_pool);
-					Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
-    
-                    cal_psir_ylm_dphi(na_grid, grid_index, delta_r, 
+                        //------------------------------------------------------------------
+                        // extract the local potentials.
+                        //------------------------------------------------------------------
+                        double *vldr3 = get_vldr3(vlocal, ncyz, ibx, jby, kbz);
+
+                        //------------------------------------------------------
+                        // index of wave functions for each block
+                        //------------------------------------------------------
+                        int *block_iw = Gint_Tools::get_block_iw(na_grid, grid_index, this->max_size);
+                        int* block_index = Gint_Tools::get_block_index(na_grid, grid_index);
+
+                        //------------------------------------------------------
+                        // band size: number of columns of a band
+                        //------------------------------------------------------
+                        int* block_size = Gint_Tools::get_block_size(na_grid, grid_index);
+
+                        Gint_Tools::Array_Pool<double> psir_vlbr3(GlobalC::pw.bxyz, LD_pool);
+                        Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
+
+                        cal_psir_ylm_dphi(na_grid, grid_index, delta_r,
                             block_index, block_size, cal_flag, psir_ylm.ptr_2D, dphix, dphiy, dphiz, drr);
-    
-                    cal_meshball_DGridV(na_grid, GlobalC::GridT.lgd, LD_pool, block_index, block_iw, block_size, cal_flag, vldr3, 
-                                psir_ylm.ptr_2D, psir_vlbr3.ptr_2D, dphix,  dphiy, dphiz, 
-                                DGridV_x, DGridV_y, DGridV_z,
-                                DGridV_11, DGridV_12, DGridV_13,
-                                DGridV_22, DGridV_23, DGridV_33, drr);
-								
-					free(vldr3);		vldr3=nullptr;
-					free(block_iw);		block_iw=nullptr;
-					free(block_index);	block_index=nullptr;
-					free(block_size);	block_size=nullptr;
-                }// k
-            }// j
-        }// i
-    
-        //OUT(GlobalV::ofs_running,"DGridV was calculated");
-        delete[] dphix;
-        delete[] dphiy;
-        delete[] dphiz;
-        delete[] dphi_pool;
-        for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
-		{
-            delete[] cal_flag[ib];
-		}
-        delete[] cal_flag;
-        //OUT(GlobalV::ofs_running,"temp variables were deleted");
 
-    }//end if, replace goto line
-//ENDandRETURN:
+#ifdef _OPENMP
+                        cal_meshball_DGridV(na_grid, GlobalC::GridT.lgd, LD_pool, block_index, block_iw, block_size, cal_flag, vldr3,
+                            psir_ylm.ptr_2D, psir_vlbr3.ptr_2D, dphix,  dphiy, dphiz,
+                            DGridV_x_thread, DGridV_y_thread, DGridV_z_thread,
+                            DGridV_11_thread, DGridV_12_thread, DGridV_13_thread,
+                            DGridV_22_thread, DGridV_23_thread, DGridV_33_thread, drr);
+#else
+                        cal_meshball_DGridV(na_grid, GlobalC::GridT.lgd, LD_pool, block_index, block_iw, block_size, cal_flag, vldr3,
+                            psir_ylm.ptr_2D, psir_vlbr3.ptr_2D, dphix,  dphiy, dphiz,
+                            DGridV_x, DGridV_y, DGridV_z,
+                            DGridV_11, DGridV_12, DGridV_13,
+                            DGridV_22, DGridV_23, DGridV_33, drr);
+#endif
+
+                        free(vldr3);        vldr3=nullptr;
+                        free(block_iw);     block_iw=nullptr;
+                        free(block_index);  block_index=nullptr;
+                        free(block_size);   block_size=nullptr;
+                    }// k
+                }// j
+            }// i
+
+            delete[] dphix;
+            delete[] dphiy;
+            delete[] dphiz;
+            delete[] dphi_pool;
+            for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
+            {
+                delete[] cal_flag[ib];
+            }
+            delete[] cal_flag;
+        }
+#ifdef _OPENMP
+        #pragma omp critical(cal_fvl)
+        {
+            for(int i=0; i<GlobalC::GridT.lgd; i++)
+            {
+                for(int j=0; j<GlobalC::GridT.lgd; j++)
+                {
+                    DGridV_x[i][j] += DGridV_x_thread[i][j];
+                    DGridV_y[i][j] += DGridV_y_thread[i][j];
+                    DGridV_z[i][j] += DGridV_z_thread[i][j];
+
+                    if(GlobalV::STRESS)
+                    {
+                        DGridV_11[i][j] += DGridV_11_thread[i][j];
+                        DGridV_12[i][j] += DGridV_12_thread[i][j];
+                        DGridV_13[i][j] += DGridV_13_thread[i][j];
+                        DGridV_22[i][j] += DGridV_22_thread[i][j];
+                        DGridV_23[i][j] += DGridV_23_thread[i][j];
+                        DGridV_33[i][j] += DGridV_33_thread[i][j];
+                    }
+                }
+            }
+
+            delete [] DGridV_x_thread;
+            delete [] DGridV_y_thread;
+            delete [] DGridV_z_thread;
+            if(GlobalV::STRESS)
+            {
+                delete [] DGridV_11_thread;
+                delete [] DGridV_12_thread;
+                delete [] DGridV_13_thread;
+                delete [] DGridV_22_thread;
+                delete [] DGridV_23_thread;
+                delete [] DGridV_33_thread;
+                delete [] DGridV_stress_pool_thread;
+            }
+            delete [] DGridV_pool_thread;
+        }
+#endif
+#ifdef _OPENMP
+    }
+#endif
+
     ModuleBase::timer::tick("Gint_Gamma","gamma_force");
 #ifdef __MPI
     ModuleBase::timer::tick("Gint_Gamma","gamma_force_wait");
-	MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
     ModuleBase::timer::tick("Gint_Gamma","gamma_force_wait");
 #endif
     ModuleBase::timer::tick("Gint_Gamma","gamma_force2");
-
 
     //OUT(GlobalV::ofs_running,"Start reduce DGridV");
 
