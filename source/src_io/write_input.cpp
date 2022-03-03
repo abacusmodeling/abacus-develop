@@ -195,7 +195,6 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"vl_in_h", vl_in_h,"calculate the local potential or not");
 	ModuleBase::GlobalFunc::OUTP(ofs,"vnl_in_h", vnl_in_h,"calculate the nonlocal potential or not");
 	ModuleBase::GlobalFunc::OUTP(ofs,"vh_in_h", vh_in_h,"calculate the hartree potential or not");
-	ModuleBase::GlobalFunc::OUTP(ofs,"vxc_in_h", vxc_in_h,"calculate the xc potential or not");
 	ModuleBase::GlobalFunc::OUTP(ofs,"vion_in_h", vion_in_h,"calculate the local ionic potential or not");
 	ModuleBase::GlobalFunc::OUTP(ofs,"test_force", test_force, "test the force");
 	ModuleBase::GlobalFunc::OUTP(ofs,"test_stress", test_stress, "test the force");

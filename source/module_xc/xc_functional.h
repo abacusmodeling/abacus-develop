@@ -39,16 +39,23 @@ class XC_Functional
 		const double*const*const rho_in, 
 		const double*const rho_core); // core charge density
 
+    static std::tuple<double,double,ModuleBase::matrix> v_xc_libxc(
+		const int &nrxx, // number of real-space grid
+		const int &ncxyz, // total number of charge grid
+		const double &omega, // volume of cell
+		const double*const*const rho_in,  
+		const double*const rho_core); // core charge density
+
 	static std::tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> v_xc_meta(
+		const int &nrxx, // number of real-space grid
+		const int &ncxyz, // total number of charge grid
+		const double &omega, // volume of cell
 		const double * const * const rho_in,
 		const double * const rho_core_in,
 		const double * const * const kin_r_in);
 
 	// GGA
 	static void gcxc(const double &rho, const double &grho,
-			double &sxc, double &v1xc, double &v2xc);
-
-	static void gcxc_libxc(const double &rho, const double &grho,
 			double &sxc, double &v1xc, double &v2xc);
 
 	// spin polarized GGA
@@ -103,12 +110,11 @@ class XC_Functional
 
 	static void set_xc_type(const std::string xc_func_in);
 #ifdef USE_LIBXC
+	static void set_xc_type_libxc(const std::string xc_func_in);
 	static std::vector<xc_func_type> init_func(const int xc_polarized);
 #endif
 	// LDA
 	static void xc(const double &rho, double &exc, double &vxc);
-	static void xc_libxc(const double &rho, double &exc, double &vxc);
-
 
 	// LSDA
 	static void xc_spin(const double &rho, const double &zeta,

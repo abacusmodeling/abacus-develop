@@ -214,7 +214,6 @@ void Input::Default(void)
 	vl_in_h = 1;
 	vnl_in_h = 1;
 	vh_in_h = 1;
-	vxc_in_h = 1;
 	vion_in_h = 1;
 	test_force = 0;
 	test_stress = 0;
@@ -891,10 +890,6 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("vh_in_h", word) == 0)
         {
             read_value(ifs, vh_in_h);
-        }
-        else if (strcmp("vxc_in_h", word) == 0)
-        {
-            read_value(ifs, vxc_in_h);
         }
         else if (strcmp("vion_in_h", word) == 0)
         {
@@ -2059,7 +2054,6 @@ void Input::Bcast()
 	Parallel_Common::bcast_int( vl_in_h );
 	Parallel_Common::bcast_int( vnl_in_h );
 	Parallel_Common::bcast_int( vh_in_h );
-	Parallel_Common::bcast_int( vxc_in_h );
 	Parallel_Common::bcast_int( vion_in_h );
 
 	Parallel_Common::bcast_int( test_force );

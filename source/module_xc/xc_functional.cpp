@@ -110,7 +110,7 @@ void XC_Functional::set_xc_type(const std::string xc_func_in)
         func_type = 4;
         use_libxc = false;
 	}
-    else if( xc_func == "HF" || xc_func == "OPT_ORB" ||  xc_func == "NONE")
+    else if( xc_func == "HF" || xc_func == "OPT_ORB" ||  xc_func == "NONE" || xc_func == "NOX+NOC")
     {
         // not doing anything
         if(xc_func == "HF") func_type = 4;
@@ -122,7 +122,12 @@ void XC_Functional::set_xc_type(const std::string xc_func_in)
     }
     else
     {
+#ifdef USE_LIBXC
+        //see if it matches libxc functionals
+        set_xc_type_libxc(xc_func);
+#else
         std::cout << "functional name not recognized!" << std::endl;
+#endif
     }
 
 	if (func_id[0] == XC_GGA_X_OPTX)
@@ -130,9 +135,13 @@ void XC_Functional::set_xc_type(const std::string xc_func_in)
 		std::cerr << "\n OPTX untested please test,";
 	}
 
-    if(func_type ==3 && GlobalV::BASIS_TYPE != "pw")
+    if(func_type == 2 && GlobalV::BASIS_TYPE != "pw")
     {
         ModuleBase::WARNING_QUIT("set_xc_type","mGGA not realized for LCAO yet");
+    }
+    if(func_type == 4 && GlobalV::BASIS_TYPE == "pw")
+    {
+        ModuleBase::WARNING_QUIT("set_xc_type","hybrid functional not realized for planewave yet");
     }
 
 #ifndef USE_LIBXC
@@ -141,28 +150,36 @@ void XC_Functional::set_xc_type(const std::string xc_func_in)
 
 }
 
-void XC_Functional::xc_libxc(const double &rho, double &exc, double &vxc)
-{
 #ifdef USE_LIBXC
-    double e,v;
-    exc = vxc = 0.00;
+void XC_Functional::set_xc_type_libxc(std::string xc_func_in)
+{
 
-	std::vector<xc_func_type> funcs = init_func(XC_UNPOLARIZED);
+    // determine the type (lda/gga/mgga)
+    func_type = 1;
+    if(xc_func_in.find("GGA") != std::string::npos) func_type = 2;
+    if(xc_func_in.find("MGGA") != std::string::npos) func_type = 3;
+    if(xc_func_in.find("HYB") != std::string::npos) func_type =4;
 
-    for(xc_func_type &func : funcs)
+    // determine the id
+    int pos = 0;
+    std::string delimiter = "+";
+    std::string token;
+    while ((pos = xc_func_in.find(delimiter)) != std::string::npos)
     {
-        if( func.info->family == XC_FAMILY_LDA)
-        {
-            // call Libxc function: xc_lda_exc_vxc
-            xc_lda_exc_vxc( &func, 1, &rho, &e, &v);
-        }
-        exc += e;
-        vxc += v;
+        token = xc_func_in.substr(0, pos);
+        int id = xc_functional_get_number(token.c_str());
+        std::cout << "func,id" << token << " " << id << std::endl;
+        if (id == -1) ModuleBase::WARNING_QUIT("XC_Functional::set_xc_type_libxc","functional name not recognized!");
+        func_id.push_back(id);
+        xc_func_in.erase(0, pos + delimiter.length());
     }
-	return;
-#endif 
-}
+    int id = xc_functional_get_number(xc_func_in.c_str());
+    std::cout << "func,id" << xc_func_in << " " << id << std::endl;
+    if (id == -1) ModuleBase::WARNING_QUIT("XC_Functional::set_xc_type_libxc","functional name not recognized!");
+    func_id.push_back(id);
 
+}
+#endif
 
 void XC_Functional::xc(const double &rho, double &exc, double &vxc)
 {
@@ -502,30 +519,6 @@ void XC_Functional::gcxc(const double &rho, const double &grho, double &sxc,
     }
 
     return;
-}
-
-void XC_Functional::gcxc_libxc(const double &rho, const double &grho, double &sxc,
-          double &v1xc, double &v2xc)
-{
-#ifdef USE_LIBXC
-    double s,v1,v2;
-    sxc = v1xc = v2xc = 0.0;
-
-	std::vector<xc_func_type> funcs = init_func(XC_UNPOLARIZED);
-
-    for(xc_func_type &func : funcs)
-    {
-        if( func.info->family == XC_FAMILY_GGA || func.info->family == XC_FAMILY_HYB_GGA)
-        {
-            // call Libxc function: xc_gga_exc_vxc
-            xc_gga_exc_vxc( &func, 1, &rho, &grho, &s, &v1, &v2);
-        }
-        sxc += s;
-        v1xc += v1;
-        v2xc += v2;
-    }
-	return;
-#endif
 }
 
 void XC_Functional::gcxc_spin_libxc(double rhoup, double rhodw, 

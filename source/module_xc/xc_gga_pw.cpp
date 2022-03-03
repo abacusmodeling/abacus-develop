@@ -142,28 +142,17 @@ void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 				if( rhotmp1[ir] >= 0.0 ) segno = 1.0;
 				if( rhotmp1[ir] < 0.0 ) segno = -1.0;
 				
-				if(use_libxc)
-				{
-					XC_Functional::gcxc_libxc( arho, grho2a, sxc, v1xc, v2xc );
-					v(0,ir) += ModuleBase::e2 * v1xc;
-					h1[ir] = ModuleBase::e2 * 2.0 * v2xc * gdr1[ir];
-					etxcgc += ModuleBase::e2* sxc * arho * segno;
-					vtxcgc += ModuleBase::e2* v1xc * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] );
-				}
-				else
-				{
-					XC_Functional::gcxc( arho, grho2a, sxc, v1xc, v2xc);
-					// first term of the gradient correction:
-					// D(rho*Exc)/D(rho)
-					v(0, ir) += ModuleBase::e2 * v1xc;
-					
-					// h contains
-					// D(rho*Exc) / D(|grad rho|) * (grad rho) / |grad rho|
-					h1[ir] = ModuleBase::e2 * v2xc * gdr1[ir];
-					
-					vtxcgc += ModuleBase::e2* v1xc * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] );
-					etxcgc += ModuleBase::e2* sxc  * segno;
-				}
+				XC_Functional::gcxc( arho, grho2a, sxc, v1xc, v2xc);
+				// first term of the gradient correction:
+				// D(rho*Exc)/D(rho)
+				v(0, ir) += ModuleBase::e2 * v1xc;
+				
+				// h contains
+				// D(rho*Exc) / D(|grad rho|) * (grad rho) / |grad rho|
+				h1[ir] = ModuleBase::e2 * v2xc * gdr1[ir];
+				
+				vtxcgc += ModuleBase::e2* v1xc * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] );
+				etxcgc += ModuleBase::e2* sxc  * segno;
 			} // end arho > epsr
 		}
 	}// end nspin0 == 1

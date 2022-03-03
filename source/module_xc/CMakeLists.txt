@@ -1,7 +1,6 @@
 list(APPEND objects
-    H_XC_pw.cpp
-    potential_libxc_meta.cpp
     xc_functional.cpp
+    xc_functional_vxc.cpp
     xc_gga_pw.cpp
     xc_funct_exch_lda.cpp
     xc_funct_corr_lda.cpp
