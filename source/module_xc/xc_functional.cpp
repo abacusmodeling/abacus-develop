@@ -135,7 +135,7 @@ void XC_Functional::set_xc_type(const std::string xc_func_in)
 		std::cerr << "\n OPTX untested please test,";
 	}
 
-    if(func_type == 2 && GlobalV::BASIS_TYPE != "pw")
+    if(func_type == 3 && GlobalV::BASIS_TYPE != "pw")
     {
         ModuleBase::WARNING_QUIT("set_xc_type","mGGA not realized for LCAO yet");
     }
