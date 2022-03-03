@@ -4,14 +4,13 @@
 //=======================
 
 #include "read_txt_input_list.h"
-#include "module_base/tool_title.h"
 
 namespace Read_Txt_Input
 {
 	void Input_List::add_item(const Input_Item &input_item)
 	{
-		this->list.insert(make_pair(input_item.label, input_item));
-		this->output_labels.push_back(input_item.label);
+		list.insert(make_pair(input_item.label, input_item));
+		output_labels.push_back(input_item.label);
 	}
 
 	/*
@@ -34,10 +33,9 @@ namespace Read_Txt_Input
 
 	void Input_List::set_items()
 	{
-		ModuleBase::TITLE("Input_List","set_items");
-		this->set_items_general();
-		this->set_items_pw();
-		this->set_items_spectrum();
+		set_items_general();
+		set_items_pw();
+		set_items_spectrum();
 	}
 
 }

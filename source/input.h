@@ -179,6 +179,7 @@ class Input
 //==========================================================
 // iteration
 //==========================================================
+    double dr2;				// \sum |rhog_out - rhog_in |^2
     int niter;				// number of max elec iter
     int nstep;				// number of max ionic iter
 	int out_stru;			// outut stru file each ion step

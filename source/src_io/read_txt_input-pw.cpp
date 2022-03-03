@@ -17,7 +17,7 @@ namespace Read_Txt_Input
 	{
 		this->output_labels.push_back("Parameters (2.Pw)");
 
-		/*{
+		{
 			Input_Item item("ecutwfc");
 			item.default_1(100.0,"Ry");
 			item.check_values_size(1,2);
@@ -37,22 +37,6 @@ namespace Read_Txt_Input
 			item.convert = [](const Input_Item &self)
 			{
 				// ?? GlobalC::pw.set()
-			};
-			this->add_item(item);
-		}*/
-
-		{	// \sum |rhog_out - rhog_in |^2
-			Input_Item item("dr2");
-			item.default_1(1.0e-9);
-			item.annotation = "charge density error";
-			item.check_transform = [](Input_Item &self)
-			{
-				if(self.values[0].getd()<=0)
-					throw std::invalid_argument("dr2 must > 0");
-			};
-			item.convert = [](const Input_Item &self)
-			{
-				GlobalV::DRHO2 = self.values[0].getd();
 			};
 			this->add_item(item);
 		}
