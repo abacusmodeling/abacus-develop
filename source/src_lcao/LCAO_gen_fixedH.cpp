@@ -1148,7 +1148,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta_new() //update by liuyu 2021-04-07
     mkl_set_num_threads(1);
 #endif
 
-    const std::vector<std::vector<std::tuple<int, int, ModuleBase::Vector3<int>, ModuleBase::Vector3<double>>>> adjs_all = GlobalC::GridD.get_adjs();
+    const std::vector<std::vector<std::tuple<int, int, ModuleBase::Vector3<int>, ModuleBase::Vector3<double>>>> adjs_all = GlobalC::GridD.get_adjs(GlobalC::ucell);
 
 #ifdef _OPENMP
     #pragma omp parallel
