@@ -3,6 +3,10 @@
 
 #include "exx_abfs-parallel.h"
 #include "abfs-vector3_order.h"
+#include "../module_base/complexmatrix.h"
+#ifdef __MPI
+#include "mpi.h"
+#endif
 
 #include <vector>
 #include <map>

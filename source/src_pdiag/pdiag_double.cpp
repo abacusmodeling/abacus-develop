@@ -5,12 +5,14 @@
 #include "../src_pw/global.h"
 #include "../src_lcao/local_orbital_charge.h"
 #include "../src_io/wf_local.h"
+#include "../module_base/memory.h"
+#include "../module_base/timer.h"
 
 
 #ifdef __MPI
 extern "C"
 {
-    #include "Cblacs.h"
+    #include "../module_base/blacs_connector.h"
     #include "my_elpa.h"
 	#include "../module_base/scalapack_connector.h"
 }
@@ -610,9 +612,9 @@ void Pdiag_Double::diago_double_begin(
 	// problem.
 	int loc_pos;
 
-	double* Stmp = GlobalC::LM.Sdiag;
+	double* Stmp = GlobalC::LM.Sdiag.data();
 
-    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"start solver, GlobalV::KS_SOLVER",GlobalV::KS_SOLVER);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"start solver, ks_solver",GlobalV::KS_SOLVER);
     if(GlobalV::KS_SOLVER=="hpseps")
     {
         double *eigen = new double[GlobalV::NLOCAL];
@@ -623,7 +625,7 @@ void Pdiag_Double::diago_double_begin(
 
         ModuleBase::Memory::record("Pdiag_Double","Z",loc_size * GlobalV::NLOCAL,"double");
         ModuleBase::timer::tick("Diago_LCAO_Matrix","pdgseps");
-		LapackConnector::copy(nloc, s_mat, inc, Stmp, inc);
+		BlasConnector::copy(nloc, s_mat, inc, Stmp, inc);
 		pdgseps(comm_2D, GlobalV::NLOCAL, nb, h_mat, Stmp, Z, eigen, this->MatrixInfo, uplo, this->loc_size, loc_pos);
         ModuleBase::timer::tick("Diago_LCAO_Matrix","pdgseps");
 
@@ -640,7 +642,7 @@ void Pdiag_Double::diago_double_begin(
 
         // the eigenvalues.
         //xiaohui modify 2014-06-15, move to the top
-        LapackConnector::copy(GlobalV::NBANDS, eigen, inc, ekb, inc);
+        BlasConnector::copy(GlobalV::NBANDS, eigen, inc, ekb, inc);
         delete[] eigen;
         //=====================================
         // gather the eigenvectors and
@@ -676,7 +678,7 @@ void Pdiag_Double::diago_double_begin(
         if(ifElpaHandle(GlobalC::CHR.get_new_e_iteration(), (GlobalV::CALCULATION=="nscf")))
         {
             ModuleBase::timer::tick("Diago_LCAO_Matrix","decompose_S");
-            LapackConnector::copy(nloc, s_mat, inc, Stmp, inc);
+            BlasConnector::copy(nloc, s_mat, inc, Stmp, inc);
             is_already_decomposed=0;
             ModuleBase::timer::tick("Diago_LCAO_Matrix","decompose_S");
         }
@@ -691,7 +693,7 @@ void Pdiag_Double::diago_double_begin(
         ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_solve");
 
     	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"K-S equation was solved by genelpa2");
-        LapackConnector::copy(GlobalV::NBANDS, eigen, inc, ekb, inc);
+        BlasConnector::copy(GlobalV::NBANDS, eigen, inc, ekb, inc);
         delete[] eigen;
 	    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"eigenvalues were copied to ekb");
 
@@ -730,7 +732,7 @@ void Pdiag_Double::diago_double_begin(
 				MPI_Cart_rank(comm_2D, coord, &src_rank);
 				if(myid==src_rank)
 				{
-					LapackConnector::copy(nloc, wfc_2d.c, inc, work, inc);
+					BlasConnector::copy(nloc, wfc_2d.c, inc, work, inc);
 					naroc[0]=nrow;
 					naroc[1]=ncol;
 				}
@@ -989,7 +991,7 @@ void Pdiag_Double::diago_complex_begin(
 	int loc_pos;
 
 	// because the output Stmp will be different from Sloc2, so we need to copy that.
-	std::complex<double>* Stmp = GlobalC::LM.Sdiag2;
+	std::complex<double>* Stmp = GlobalC::LM.Sdiag2.data();
 
 	if(GlobalV::KS_SOLVER=="hpseps")
 	{
@@ -1003,11 +1005,11 @@ void Pdiag_Double::diago_complex_begin(
         ModuleBase::Memory::record("Pdiag_Double","Z",loc_size * GlobalV::NLOCAL,"cdouble");
 		int nbands_tmp = GlobalV::NBANDS;
         ModuleBase::timer::tick("Diago_LCAO_Matrix","pzgseps");
-		LapackConnector::copy(nloc, cs_mat, inc, Stmp, inc);
+		BlasConnector::copy(nloc, cs_mat, inc, Stmp, inc);
     	pzgseps(comm_2D, GlobalV::NLOCAL, nb, nbands_tmp, ch_mat, Stmp, Z, eigen, this->MatrixInfo, uplo, this->loc_size, loc_pos);
         ModuleBase::timer::tick("Diago_LCAO_Matrix","pzgseps");
         // the eigenvalues.
-        LapackConnector::copy(GlobalV::NBANDS, eigen, inc, ekb, inc);
+        BlasConnector::copy(GlobalV::NBANDS, eigen, inc, ekb, inc);
         delete[] eigen;
 
         // Z is delete in gath_eig
@@ -1034,7 +1036,7 @@ void Pdiag_Double::diago_complex_begin(
             has_set_elpa_handle = true;
         }
 
-        LapackConnector::copy(nloc, cs_mat, inc, Stmp, inc);
+        BlasConnector::copy(nloc, cs_mat, inc, Stmp, inc);
 
         ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_solve");
         int elpa_derror;
@@ -1044,7 +1046,7 @@ void Pdiag_Double::diago_complex_begin(
         ModuleBase::timer::tick("Diago_LCAO_Matrix","elpa_solve");
 
         // the eigenvalues.
-        LapackConnector::copy(GlobalV::NBANDS, eigen, inc, ekb, inc);
+        BlasConnector::copy(GlobalV::NBANDS, eigen, inc, ekb, inc);
         delete[] eigen;
 
         //change eigenvector matrix from block-cycle distribute matrix to column-divided distribute matrix
@@ -1061,7 +1063,7 @@ void Pdiag_Double::diago_complex_begin(
                 MPI_Cart_rank(comm_2D, coord, &src_rank);
                 if(myid==src_rank)
                 {
-                    LapackConnector::copy(nloc, wfc_2d.c, inc, work, inc);
+                    BlasConnector::copy(nloc, wfc_2d.c, inc, work, inc);
                     naroc[0]=nrow;
                     naroc[1]=ncol;
                 }
@@ -1138,7 +1140,7 @@ void Pdiag_Double::diago_complex_begin(
 					info=MPI_Cart_rank(comm_2D, coord, &src_rank);
 					if(myid==src_rank)
 					{
-						LapackConnector::copy(nloc, wfc_2d.c, inc, work, inc);
+						BlasConnector::copy(nloc, wfc_2d.c, inc, work, inc);
 						naroc[0]=nrow;
 						naroc[1]=ncol;
 					}

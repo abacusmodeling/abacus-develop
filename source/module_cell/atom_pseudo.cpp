@@ -1,5 +1,4 @@
 #include "atom_pseudo.h"
-#include "../src_pw/tools.h"
 
 Atom_pseudo::Atom_pseudo()
 {
@@ -150,6 +149,7 @@ void Atom_pseudo::print_atom(std::ofstream &ofs)
 	return;
 }
 
+#include "../src_parallel/parallel_common.h"
 #ifdef __MPI
 void Atom_pseudo::bcast_atom_pseudo(const int &na)
 {

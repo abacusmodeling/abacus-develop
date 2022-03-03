@@ -1,13 +1,14 @@
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../src_parallel/parallel_reduce.h"
 #include "global.h"
 #include "energy.h"
 #include "../module_base/mymath.h"
 #include <vector>
 #ifdef __MPI
-#include <mpi.h>
+#include "mpi.h"
 #endif
 #include <sys/time.h>
-#include "tools.h"
 #ifdef __LCAO
 #include "../src_lcao/dftu.h"  //Quxin adds for DFT+U on 20201029
 #endif
@@ -17,7 +18,7 @@
 #include "H_Hartree_pw.h"
 #include "H_XC_pw.h"
 #ifdef __DEEPKS
-#include "../src_lcao/LCAO_descriptor.h"
+#include "../src_lcao/../module_deepks/LCAO_deepks.h"
 #endif
 
 
@@ -71,7 +72,14 @@ void energy::calculate_harris(const int &flag)
         if(GlobalV::deepks_scf) 
 		{
 			this->etot_harris += GlobalC::ld.E_delta;  //caoyu add 2021-08-10
-			GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma);
+			if(GlobalV::GAMMA_ONLY_LOCAL)
+			{
+				GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma,GlobalC::ParaO);
+			}
+			else
+			{
+				GlobalC::ld.cal_e_delta_band_k(GlobalC::LOC.wfc_dm_2d.dm_k,GlobalC::ParaO,GlobalC::kv.nks);
+			}
 			this->etot_harris -= GlobalC::ld.e_delta_band;
 		}
 #endif
@@ -119,7 +127,14 @@ void energy::calculate_etot(void)
 	if (GlobalV::deepks_scf)
 	{
 		this->etot += GlobalC::ld.E_delta;
-        GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma);
+		if(GlobalV::GAMMA_ONLY_LOCAL)
+		{
+			GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma, GlobalC::ParaO);
+		}
+		else
+		{
+			GlobalC::ld.cal_e_delta_band_k(GlobalC::LOC.wfc_dm_2d.dm_k,GlobalC::ParaO,GlobalC::kv.nks);
+		}
         this->etot -= GlobalC::ld.e_delta_band;
 	}
 #endif

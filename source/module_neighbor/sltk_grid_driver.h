@@ -6,7 +6,9 @@
 #include "sltk_atom.h"
 #include "sltk_atom_input.h"
 #include "sltk_grid.h"
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../module_base/vector3.h"
 #include "../src_pw/pw_basis.h"
 #include <tuple>
 

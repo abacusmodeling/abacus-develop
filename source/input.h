@@ -63,8 +63,6 @@ class Input
 	std::string NNKP;            // add by jingan for wannier90
 	std::string wannier_spin;    // add by jingan for wannier90
 
-	bool mlwf_flag; 		// add by mohan
-
 //==========================================================
 // Stochastic DFT
 //==========================================================
@@ -89,7 +87,6 @@ class Input
 //==========================================================
 	bool opt_epsilon2;		// true : calculate the dielectric functions
 	int  opt_nbands;		// number of bands for optical transition matrix
-    bool lda_plus_u;		// true : lda plus u calculation
 
 //==========================================================
 // electrons / spin
@@ -276,15 +273,13 @@ class Input
 	double md_qmass;                   //mass of thermostat
 	double md_tfirst;                    //temperature begin
 	double md_tlast;                    //temperature end
-	int md_dumpmdfred;                  //The period to dump MD information for monitoring and restarting MD
+	int md_dumpfred;                  //The period to dump MD information for monitoring and restarting MD
 	std::string md_mdoutpath;                //output path for md
 	bool md_domsd;                   //whether compute <r(t)-r(0)>
 	bool md_domsdatom;                //whether compute msd for each atom
 	int md_rstmd;                    //whether restart;
 	int md_outputstressperiod;      //period to output stress
 	int md_fixtemperature;          //period to change temperature
-	double md_ediff;             //parameter for constraining total energy change
-	double md_ediffg;             //parameter for constraining max force change
 	int md_msdstartTime;            //choose which step that msd be calculated */
 	MD_parameters mdp;
 
@@ -359,8 +354,6 @@ class Input
 	bool lspinorb;
 	double soc_lambda;
 
-	//	bool starting_spin_angle;
-	vector<double> angle1={0}, angle2={0};
 
 
 //==========================================================

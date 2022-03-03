@@ -1,5 +1,6 @@
 #include "../input.h"
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 
 void Input::Print(const std::string &fn)const
 {
@@ -98,6 +99,9 @@ void Input::Print(const std::string &fn)const
 	// for deepks
 	ModuleBase::GlobalFunc::OUTP(ofs,"out_descriptor",out_descriptor,">0 compute descriptor for deepks");
 	ModuleBase::GlobalFunc::OUTP(ofs,"lmax_descriptor",lmax_descriptor,">0 lmax used in descriptor for deepks");
+	ModuleBase::GlobalFunc::OUTP(ofs,"deepks_scf",deepks_scf,">0 load a model and mix int in SCF");
+	ModuleBase::GlobalFunc::OUTP(ofs,"model_file",model_file,"file dir of traced pytorch model: 'model.ptg");
+
 
 	ofs << "\n#Parameters (4.LCAO)" << std::endl;
 	ModuleBase::GlobalFunc::OUTP(ofs,"basis_type",basis_type,"PW; LCAO in pw; LCAO");
@@ -161,17 +165,19 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_qmass",mdp.Qmass,"mass of thermostat");
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_tfirst",mdp.tfirst,"temperature first");
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_tlast",mdp.tlast,"temperature last");
-	ModuleBase::GlobalFunc::OUTP(ofs,"md_dumpmdfred",mdp.recordFreq,"The period to dump MD information for monitoring and restarting MD");
-	ModuleBase::GlobalFunc::OUTP(ofs,"md_mdoutpath",mdp.mdoutputpath,"output path of md");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_dumpfred",mdp.dumpfreq,"The period to dump MD information");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_dumpfred",mdp.rstfreq,"The period to output MD restart information");
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_rstmd",mdp.rstMD,"whether restart");
-	ModuleBase::GlobalFunc::OUTP(ofs,"md_fixtemperature",mdp.fixTemperature,"period to change temperature");
-	ModuleBase::GlobalFunc::OUTP(ofs,"md_ediff",mdp.ediff,"parameter for constraining total energy change");
-	ModuleBase::GlobalFunc::OUTP(ofs,"md_ediffg",mdp.ediffg,"parameter for constraining max force change");
-	ModuleBase::GlobalFunc::OUTP(ofs,"NVT_tau",mdp.NVT_tau,"parameter for adjust effect of thermostat");
-	ModuleBase::GlobalFunc::OUTP(ofs,"NVT_control",mdp.NVT_control,"choose which thermostat used in NVT ensemble");
 	ModuleBase::GlobalFunc::OUTP(ofs,"rcut_lj",mdp.rcut_lj,"cutoff radius of LJ potential");
 	ModuleBase::GlobalFunc::OUTP(ofs,"epsilon_lj",mdp.epsilon_lj,"the value of epsilon for LJ potential");
 	ModuleBase::GlobalFunc::OUTP(ofs,"sigma_lj",mdp.sigma_lj,"the value of sigma for LJ potential");
+	ModuleBase::GlobalFunc::OUTP(ofs,"direction",mdp.direction,"the direction of shock wave");
+	ModuleBase::GlobalFunc::OUTP(ofs,"velocity",mdp.velocity,"the velocity of shock wave");
+	ModuleBase::GlobalFunc::OUTP(ofs,"viscosity",mdp.viscosity,"artificial viscosity");
+	ModuleBase::GlobalFunc::OUTP(ofs,"tscale",mdp.tscale,"reduction in initial temperature");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_tfreq",mdp.tfreq,"oscillation frequency, used to determine Qmass of NHC");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_damp",mdp.damp,"damping parameter (time units) used to add force in Langevin method");
+
 
 	ofs << "\n#Parameters (11.Efield)" << std::endl;
 	ModuleBase::GlobalFunc::OUTP(ofs,"efield",efield,"add electric field");
@@ -195,7 +201,6 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"test_stress", test_stress, "test the force");
 	
 	ofs << "\n#Parameters (13.Other Methods)" << std::endl;
-	ModuleBase::GlobalFunc::OUTP(ofs,"mlwf_flag",mlwf_flag,"turn MLWF on or off");
 	ModuleBase::GlobalFunc::OUTP(ofs,"opt_epsilon2",opt_epsilon2,"calculate the dielectic function");
 	ModuleBase::GlobalFunc::OUTP(ofs,"opt_nbands",opt_nbands,"number of bands for optical calculation");
 	
@@ -307,7 +312,7 @@ void Input::Print(const std::string &fn)const
 	
 	ofs << "\n#Parameters (18.berry_wannier)" << std::endl;
 	ModuleBase::GlobalFunc::OUTP(ofs,"berry_phase",berry_phase,"calculate berry phase or not");
-	ModuleBase::GlobalFunc::OUTP(ofs,"gdir",gdir,"calculate the polarization in the direction of the lattice std::vector");
+	ModuleBase::GlobalFunc::OUTP(ofs,"gdir",gdir,"calculate the polarization in the direction of the lattice vector");
 	ModuleBase::GlobalFunc::OUTP(ofs,"towannier90",towannier90,"use wannier90 code interface or not");
 	ModuleBase::GlobalFunc::OUTP(ofs,"nnkpfile",NNKP,"the wannier90 code nnkp file name");
 	ModuleBase::GlobalFunc::OUTP(ofs,"wannier_spin",wannier_spin,"calculate spin in wannier90 code interface");

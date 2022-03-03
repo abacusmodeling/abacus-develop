@@ -3,6 +3,10 @@
 //#include "../src_pw/global.h"
 //#include "symm_other.h"
 
+#include "../module_base/mathzone.h"
+#include "../module_base/constants.h"
+#include "../module_base/timer.h"
+
 namespace ModuleSymmetry
 {
 Symmetry::Symmetry()
@@ -20,7 +24,7 @@ Symmetry::~Symmetry()
 bool Symmetry::symm_flag=false;
 
 
-void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, std::ofstream &ofs_running)
+void Symmetry::analy_sys(const UnitCell_pseudo &ucell, std::ofstream &ofs_running)
 {
     if (available == false) return;
     ModuleBase::TITLE("Symmetry","init");
@@ -75,7 +79,7 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, std::o
 //  std::cout << "a1 = " << a2.x << " " << a2.y << " " << a2.z <<std::endl;
 //  std::cout << "a1 = " << a3.x << " " << a3.y << " " << a3.z <<std::endl;
 
-	out.printM3(ofs_running,"LATTICE VECTORS: (CARTESIAN COORDINATE: IN UNIT OF A0)",latvec1);
+	output::printM3(ofs_running,"LATTICE VECTORS: (CARTESIAN COORDINATE: IN UNIT OF A0)",latvec1);
 
     int count = 0;
     istart[0] = 0;
@@ -123,7 +127,7 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, std::o
 	new_lat.e11=a1.x; new_lat.e12=a1.y; new_lat.e13=a1.z;
 	new_lat.e21=a2.x; new_lat.e22=a2.y; new_lat.e23=a2.z;
 	new_lat.e31=a3.x; new_lat.e32=a3.y; new_lat.e33=a3.z;
-	out.printM3(ofs_running,"STANDARD LATTICE VECTORS: (CARTESIAN COORDINATE: IN UNIT OF A0)",new_lat);
+	output::printM3(ofs_running,"STANDARD LATTICE VECTORS: (CARTESIAN COORDINATE: IN UNIT OF A0)",new_lat);
 
 	int iat=0;
 	for(int it=0; it<ucell.ntype; ++it)
@@ -746,7 +750,7 @@ void Symmetry::lattice_type(
         ss << GlobalV::global_out_dir << "STRU_SIMPLE.cif";
 
         std::ofstream ofs( ss.str().c_str() );
-        ofs << "Lattice std::vector  : " << std::endl;
+        ofs << "Lattice vector  : " << std::endl;
         ofs << q1.x <<"   "<<q1.y<<"  "<<q1.z<< std::endl;
         ofs << q2.x <<"   "<<q2.y<<"  "<<q2.z<< std::endl;
         ofs << q3.x <<"   "<<q3.y<<"  "<<q3.z<< std::endl;

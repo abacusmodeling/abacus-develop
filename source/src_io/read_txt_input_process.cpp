@@ -116,7 +116,7 @@ namespace Read_Txt_Input
 							ofs<<"false"<<" ";
 					}
 					else
-						throw invalid_argument("Input_Process::out() value_type["+std::to_string(i)+"]="+item.values_type[i]);
+						throw std::invalid_argument("Input_Process::out() value_type["+std::to_string(i)+"]="+item.values_type[i]);
 				}
 				ofs<<"\t# "<<item.annotation<<std::endl;
 			}

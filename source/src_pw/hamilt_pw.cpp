@@ -1,9 +1,12 @@
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../src_parallel/parallel_reduce.h"
 #include "global.h"
 #include "hamilt_pw.h"
 #include "../module_base/blas_connector.h"
 #include "../src_io/optical.h" // only get judgement to calculate optical matrix or not.
 #include "myfunc.h"
+#include "../module_base/timer.h"
 
 int Hamilt_PW::moved = 0;
 
@@ -960,100 +963,3 @@ void Hamilt_PW::cal_err
     ModuleBase::timer::tick("Hamilt_PW", "cal_err") ;
     return;
 }
-
-double Hamilt_PW::ddot_real
-(
-    const int &dim,
-    const std::complex<double>* psi_L,
-    const std::complex<double>* psi_R
-)const
-{
-    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    //qianrui modify 2021-3-14
-    //Note that  ddot_(2*dim,a,1,b,1) = REAL( zdotc_(dim,a,1,b,1) )
-    int dim2=2*dim;
-    double *pL,*pR;
-    pL=(double *)psi_L;
-    pR=(double *)psi_R;
-    double result=LapackConnector::dot(dim2,pL,1,pR,1);
-    Parallel_Reduce::reduce_double_pool( result );
-    return result;
-    //======================================================================
-    /*std::complex<double> result(0,0);
-    for (int i=0;i<dim;i++)
-    {
-        result += conj( psi_L[i] ) * psi_R[i];
-    }
-    Parallel_Reduce::reduce_complex_double_pool( result );
-    return result.real();*/
-    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-}
-
-std::complex<double> Hamilt_PW::ddot(
-    const int & dim,
-    const std::complex<double> * psi_L,
-    const std::complex<double> * psi_R
-)const
-{
-	std::complex<double> result = ModuleBase::ZERO;
-	const int incx = 1;
-	const int incy = 1;
-	// mohan add 2010-10-11
-	zdotc_(&result, &dim, psi_L, &incx, psi_R, &incy);
-
-	if(GlobalV::NPROC_IN_POOL>1)
-	{
-		Parallel_Reduce::reduce_complex_double_pool( result );
-	}
-    return result;
-}
-
-std::complex<double> Hamilt_PW::just_ddot(
-    const int & dim,
-    const std::complex<double> * psi_L,
-    const std::complex<double> * psi_R
-)const
-{
-	std::complex<double> result = ModuleBase::ZERO;
-
-	// mohan add 2010-10-11
-//	zdotc_(&result, &dim, psi_L, &incx, psi_R, &incy);
-
-	// mohan update 2011-09-21
-	static int warn_about_zdotc=true;
-	if(warn_about_zdotc)
-	{
-		GlobalV::ofs_warning << " in Hamilt_PW::just_ddot, sometimes zdotc is not available due to GNU compiler!!!" << std::endl;
-		GlobalV::ofs_warning << " So here I use simple for cicle to replace zdotc, but it will affect the speed." << std::endl;
-		warn_about_zdotc=false;
-	}
-	for(int i=0; i<dim; ++i)
-	{
-		result += conj(psi_L[i])*psi_R[i];
-	}
-
-    return result;
-}
-
-
-
-// this return <psi(m)|psik>
-std::complex<double> Hamilt_PW::ddot(
-    const int & dim,
-    const ModuleBase::ComplexMatrix &psi,
-    const int & m,
-    const std::complex<double> *psik
-)const
-{
-    std::complex<double> result(0, 0);
-    assert(dim > 0) ;
-
-    for (int i = 0; i < dim ; i++)
-    {
-        result += conj(psi(m, i)) *  psik[i] ;
-    }
-
-    Parallel_Reduce::reduce_complex_double_pool( result );
-
-    return result;
-}  // end of ddot

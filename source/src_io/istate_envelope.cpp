@@ -1,6 +1,7 @@
 #include "istate_envelope.h"
 #include "../src_pw/global.h"
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 
 IState_Envelope::IState_Envelope()
 {}
@@ -17,7 +18,7 @@ void IState_Envelope::begin(void)
 
 	if(!GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		ModuleBase::WARNING_QUIT("IState_Envelope::begin","Only available for GlobalV::GAMMA_ONLY_LOCAL now.");
+		ModuleBase::WARNING_QUIT("IState_Envelope::begin","Only available for GAMMA_ONLY_LOCAL now.");
 	}
 
 	// (1) 
@@ -25,7 +26,7 @@ void IState_Envelope::begin(void)
 
 	// (1.2) read in LOWF_GAMMA.dat
 
-	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"GlobalC::LOWF.allocate_flag",GlobalC::LOWF.get_allocate_flag());	
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"LOWF.allocate_flag",GlobalC::LOWF.get_allocate_flag());	
 
 	// mohan update 2011-03-21
 	// if ucell is odd, it's correct,
@@ -80,7 +81,7 @@ void IState_Envelope::begin(void)
 				// we need to fix this function in near future.
 				// -- mohan add 2021-02-09
 				//---------------------------------------------------------
-				ModuleBase::WARNING_QUIT("IState_Charge::idmatrix","need to update GlobalC::LOWF.WFC_GAMMA");
+				ModuleBase::WARNING_QUIT("IState_Charge::idmatrix","need to update LOWF.WFC_GAMMA");
 
 				//GlobalC::UHM.GG.cal_env( GlobalC::LOWF.WFC_GAMMA[is][ib], GlobalC::CHR.rho[is] );
 

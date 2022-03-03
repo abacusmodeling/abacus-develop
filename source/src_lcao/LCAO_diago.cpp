@@ -2,6 +2,7 @@
 #include "../src_pw/global.h"
 #include "../src_pdiag/pdiag_double.h"
 #include "../src_io/write_HS.h"
+#include "../module_base/timer.h"
 //xiaohui modified 2013-03-23
 //#include "../src_develop/src_siao/selinv.h"
 
@@ -44,10 +45,10 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, std::complex<double>
 	//GlobalC::ParaO.out_hs=1;//zhengdy-soc-test
 	bool bit = false; //LiuXh, 2017-03-21
 	//if set bit = true, there would be error in soc-multi-core calculation, noted by zhengdy-soc
-	HS_Matrix::saving_HS_complex(GlobalC::LM.Hloc2, GlobalC::LM.Sloc2, bit, GlobalC::ParaO.out_hs); //LiuXh, 2017-03-21
+	HS_Matrix::saving_HS_complex(GlobalC::LM.Hloc2.data(), GlobalC::LM.Sloc2.data(), bit, GlobalC::ParaO.out_hs); //LiuXh, 2017-03-21
 	GlobalV::ofs_running << std::setprecision(6); //LiuXh, 2017-03-21
 
-	GlobalC::ParaO.diago_complex_begin(ik, wfc, wfc_2d, GlobalC::LM.Hloc2, GlobalC::LM.Sloc2, GlobalC::wf.ekb[ik]);
+	GlobalC::ParaO.diago_complex_begin(ik, wfc, wfc_2d, GlobalC::LM.Hloc2.data(), GlobalC::LM.Sloc2.data(), GlobalC::wf.ekb[ik]);
 
 	//added by zhengdy-soc, rearrange the WFC_K from [up,down,up,down...] to [up,up...down,down...], 
 	if(GlobalV::NSPIN==4)
@@ -141,7 +142,7 @@ void Diago_LCAO_Matrix::using_LAPACK(const int &ik, double** wfc)const
 	// save H and S matrix to disk.
 //	bool bit = false;
 	bool bit = true;//zhengdy-soc
-	HS_Matrix::saving_HS(GlobalC::LM.Hloc, GlobalC::LM.Sloc, bit, GlobalC::ParaO.out_hs);
+	HS_Matrix::saving_HS(GlobalC::LM.Hloc.data(), GlobalC::LM.Sloc.data(), bit, GlobalC::ParaO.out_hs);
 
 	ModuleBase::matrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	ModuleBase::matrix Stmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
@@ -237,7 +238,7 @@ void Diago_LCAO_Matrix::solve_double_matrix(
 	else
 	{
 		std::cout << " Diago_LCAO_Matrix, diago_type = " << GlobalV::KS_SOLVER << std::endl; 
-		ModuleBase::WARNING_QUIT("Diago_LCAO_Matrix::init","Check GlobalV::KS_SOLVER.");
+		ModuleBase::WARNING_QUIT("Diago_LCAO_Matrix::init","Check ks_solver.");
 	}
 
 	time_t time_end = time(NULL);
@@ -256,12 +257,12 @@ void Diago_LCAO_Matrix::using_HPSEPS_double(const int &ik, ModuleBase::matrix &w
 
 	// save H and S matrix to disk.
 	bool bit = false;
-	HS_Matrix::saving_HS(GlobalC::LM.Hloc, GlobalC::LM.Sloc, bit, GlobalC::ParaO.out_hs);
+	HS_Matrix::saving_HS(GlobalC::LM.Hloc.data(), GlobalC::LM.Sloc.data(), bit, GlobalC::ParaO.out_hs);
 	GlobalV::ofs_running << std::setprecision(6);
 
 	// Distribution of matrix for 
 	// prallel eigensolver.
-	GlobalC::ParaO.diago_double_begin(ik, wfc_2d, GlobalC::LM.Hloc, GlobalC::LM.Sloc, GlobalC::wf.ekb[ik]);
+	GlobalC::ParaO.diago_double_begin(ik, wfc_2d, GlobalC::LM.Hloc.data(), GlobalC::LM.Sloc.data(), GlobalC::wf.ekb[ik]);
 
 	return;
 }

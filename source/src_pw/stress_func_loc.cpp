@@ -1,5 +1,6 @@
 #include "stress_func.h"
 #include "../module_base/math_integral.h"
+#include "../module_base/timer.h"
 
 //calculate local pseudopotential stress in PW or VL_dVL stress in LCAO
 void Stress_Func::stress_loc(ModuleBase::matrix& sigma, const bool is_pw)

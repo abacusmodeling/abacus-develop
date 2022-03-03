@@ -1,6 +1,7 @@
 #include "sltk_grid_driver.h"
-#include "../src_pw/tools.h"
-#include "../src_pw/global.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../module_base/timer.h"
 
 Grid_Driver::Grid_Driver(
 	const int &test_d_in, 
@@ -314,6 +315,7 @@ ModuleBase::Vector3<double> Grid_Driver::Calculate_adjacent_site
 	return adjacent_site;
 }
 
+#include "../src_pw/global.h"
 std::vector<std::tuple<int, int, ModuleBase::Vector3<int>, ModuleBase::Vector3<double>>> Grid_Driver::get_adjs(const size_t &iat)
 {
     const int it = GlobalC::ucell.iat2it[iat];

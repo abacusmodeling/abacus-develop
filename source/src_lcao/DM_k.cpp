@@ -2,6 +2,9 @@
 #include "../src_pw/global.h"
 #include "../src_io/wf_local.h"
 #include "../module_base/blas_connector.h"
+#include "../src_parallel/parallel_common.h"
+#include "../module_base/memory.h"
+#include "../module_base/timer.h"
 
 #include "LCAO_nnr.h"
 void Local_Orbital_Charge::allocate_DM_k(void)
@@ -79,7 +82,7 @@ void Local_Orbital_Charge::kpt_file(const Grid_Technique &gt)
 		GlobalV::ofs_running << " Error=" << error << std::endl;
 		if(error==1)
 		{
-			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: GlobalC::LOWF.dat");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: LOWF.dat");
 		}
 		else if(error==2)
 		{

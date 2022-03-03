@@ -17,7 +17,7 @@ sigma			0.02
 basis_type		lcao
 out_charge		1
 gamma_only		0
-nstep			2
+nstep			1
 
 stress                  1
 stress_thr              1e-6

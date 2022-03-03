@@ -5,7 +5,7 @@
 //=========================================================
 
 #include "wfc_dm_2d.h"
-#include "../module_base/lapack_connector.h"
+#include "../module_base/blas_connector.h"
 #include "../module_base/scalapack_connector.h"
 #include "global_fp.h"
 #include "../src_pw/global.h"
@@ -69,7 +69,7 @@ void Wfc_Dm_2d::cal_dm(const ModuleBase::matrix &wg)
 			ModuleBase::matrix wg_wfc(wfc_gamma[is]);
 			for(int ir=0; ir!=wg_wfc.nr; ++ir)
 			{
-				LapackConnector::scal( wg_wfc.nc, wg_local[ir], wg_wfc.c+ir*wg_wfc.nc, 1 );
+				BlasConnector::scal( wg_wfc.nc, wg_local[ir], wg_wfc.c+ir*wg_wfc.nc, 1 );
 			}
 
 			// C++: dm(iw1,iw2) = wfc(ib,iw1).T * wg_wfc(ib,iw2)
@@ -106,7 +106,7 @@ void Wfc_Dm_2d::cal_dm(const ModuleBase::matrix &wg)
 			ModuleBase::ComplexMatrix wg_wfc = conj(wfc_k[ik]);
 			for(int ir=0; ir!=wg_wfc.nr; ++ir)
 			{
-				LapackConnector::scal( wg_wfc.nc, wg_local[ir], wg_wfc.c+ir*wg_wfc.nc, 1 );
+				BlasConnector::scal( wg_wfc.nc, wg_local[ir], wg_wfc.c+ir*wg_wfc.nc, 1 );
 			}
 
 			// C++: dm(iw1,iw2) = wfc(ib,iw1).T * wg_wfc(ib,iw2)

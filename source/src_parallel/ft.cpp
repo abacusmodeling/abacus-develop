@@ -1,6 +1,7 @@
 #include "ft.h"
 #include "parallel_pw.h"
 #include "parallel_global.h"
+#include "../module_base/timer.h"
 //#include "../src_algorithms/mymath.h"
 //#include "fftw.h"
 
@@ -68,7 +69,7 @@ void FFT::FFT3D(std::complex<double> *psi,const int sign)
 	ModuleBase::timer::tick("FFT","FFT3D");
 
 #ifdef __MPI
-#ifdef __CUDA
+#if ((defined __CUDA) || (defined __ROCM))
 	SFFT3D(psi,sign);
 #else
 	P3DFFT(psi,sign);

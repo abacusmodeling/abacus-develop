@@ -1,4 +1,6 @@
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../module_base/memory.h"
 #include "global.h"
 #include "potential.h"
 #include "xc_functional.h"
@@ -12,6 +14,7 @@
 #ifdef __LCAO
 #include "../src_lcao/ELEC_evolve.h"
 #endif
+#include "../module_base/timer.h"
 
 Potential::Potential()
 {
@@ -24,6 +27,9 @@ Potential::~Potential()
 {
     delete[] vltot;
     delete[] vr_eff1;
+#ifdef __CUDA
+	cudaFree(d_vr_eff1);
+#endif
 }
 
 void Potential::allocate(const int nrxx)
@@ -48,6 +54,9 @@ void Potential::allocate(const int nrxx)
 
     delete[] this->vr_eff1;
     this->vr_eff1 = new double[nrxx];
+#ifdef __CUDA
+	cudaMalloc((void**)&this->d_vr_eff1, nrxx * sizeof(double));
+#endif
     ModuleBase::Memory::record("Potential","vr_eff1",nrxx,"double");
 
     this->vnew.create(GlobalV::NSPIN,nrxx);
@@ -468,5 +477,9 @@ void Potential::newd(void)
 			}
 		}
 	}
+#ifdef __CUDA
+	cudaMemcpy(GlobalC::ppcell.d_deeq, GlobalC::ppcell.deeq.ptr, 
+	GlobalV::NSPIN*GlobalC::ucell.nat*GlobalC::ppcell.nhm*GlobalC::ppcell.nhm*sizeof(double), cudaMemcpyHostToDevice);
+#endif
 	return;
 } // end subroutine newd

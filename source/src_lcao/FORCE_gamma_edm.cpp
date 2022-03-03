@@ -1,5 +1,7 @@
 #include "FORCE_gamma.h"
 #include "../src_pw/global.h"
+#include "../src_parallel/parallel_reduce.h"
+#include "../module_base/timer.h"
 
 double Force_LCAO_gamma::set_EDM_element(
     const int &ii, const int &jj, 
@@ -779,14 +781,7 @@ void Force_LCAO_gamma::cal_foverlap(
 
     if(isstress)
     {
-        for(int i=0;i<3;i++)
-        {
-            for(int j=0;j<3;j++)
-            {
-                if(i<j) soverlap(j,i) = soverlap(i,j);
-				soverlap(i,j) *=  GlobalC::ucell.lat0 / GlobalC::ucell.omega;
-            }
-        }
+		StressTools::stress_fill(GlobalC::ucell.lat0, GlobalC::ucell.omega, soverlap);
     }
     ModuleBase::timer::tick("Force_LCAO_gamma","cal_foverlap");
     return;

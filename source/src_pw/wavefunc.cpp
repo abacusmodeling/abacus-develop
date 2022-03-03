@@ -3,6 +3,8 @@
 #include "../src_lcao/wavefunc_in_pw.h"
 #include "../src_io/winput.h"
 #include "../src_io/chi0_hilbert.h"
+#include "../module_base/memory.h"
+#include "../module_base/timer.h"
 
 wavefunc::wavefunc()
 {
@@ -65,6 +67,10 @@ void wavefunc::allocate(const int nks)
 	// allocate for kinetic energy
 	delete[] g2kin;
 	this->g2kin = new double[npwx];
+#ifdef __CUDA
+	cudaFree(this->d_g2kin);
+	cudaMalloc((void**)&this->d_g2kin, npwx*sizeof(double));
+#endif
 	ModuleBase::GlobalFunc::ZEROS(g2kin, npwx);
 	ModuleBase::Memory::record("wavefunc","g2kin",npwx,"double");
 
@@ -160,7 +166,7 @@ void wavefunc::wfcinit(void)
 	}
     if (GlobalV::test_wf>2)
     {
-        GlobalC::out.printrm(GlobalV::ofs_running, " wg  ",  wg);
+        output::printrm(GlobalV::ofs_running, " wg  ",  wg);
         this->check_psi(evc);
     }
 
@@ -297,7 +303,7 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ModuleBase::ComplexMatrix &wvf)
 	}
 	else if(start_wfc=="random")
 	{
-			this->random(wfcatom,0,GlobalV::NBANDS,ik);
+		this->random(wfcatom,0,GlobalV::NBANDS,ik);
 	}
 
 	// (7) Diago with cg method.
@@ -772,7 +778,11 @@ void wavefunc::init_after_vc(const int nks)
 
     delete[] g2kin;
     this->g2kin = new double[npwx];   // [npw],kinetic energy
-    ModuleBase::GlobalFunc::ZEROS(g2kin, npwx);
+#ifdef __CUDA
+	cudaFree(this->d_g2kin);
+	cudaMalloc((void**)&this->d_g2kin, npwx*sizeof(double));
+#endif
+	ModuleBase::GlobalFunc::ZEROS(g2kin, npwx);
     ModuleBase::Memory::record("wavefunc","g2kin",npwx,"double");
     if(GlobalV::test_wf)ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"g2kin allocation","Done");
 

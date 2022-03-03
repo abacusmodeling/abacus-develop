@@ -1,6 +1,4 @@
-add_library(
-    lcao
-    OBJECT
+list(APPEND objects
     DM_gamma.cpp
     DM_k.cpp
     ELEC_cbands_gamma.cpp
@@ -62,6 +60,8 @@ add_library(
     dmft.cpp
 )
 
-if(ENABLE_DEEPKS)
-    target_sources(lcao PRIVATE LCAO_descriptor.cpp)
-endif()
+add_library(
+    lcao
+    OBJECT
+    ${objects}
+)

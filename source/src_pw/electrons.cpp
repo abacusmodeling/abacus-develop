@@ -1,4 +1,5 @@
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "global.h"
 #include "electrons.h"
 #include "../src_pw/symmetry_rho.h"
@@ -292,9 +293,9 @@ void Electrons::self_consistent(const int &istep)
                     GlobalV::ofs_running << " dr2=" << dr2 << " < diago_error=" << diago_error << std::endl;
 
                     // update GlobalV::ETHR.
-                    GlobalV::ofs_running << " Origin GlobalV::ETHR = " << GlobalV::ETHR << std::endl;
+                    GlobalV::ofs_running << " Origin ETHR = " << GlobalV::ETHR << std::endl;
                     GlobalV::ETHR = 0.1 * dr2 / GlobalC::CHR.nelec;
-                    GlobalV::ofs_running << " New    GlobalV::ETHR = " << GlobalV::ETHR << std::endl;
+                    GlobalV::ofs_running << " New    ETHR = " << GlobalV::ETHR << std::endl;
                     //goto first_iter_again;
                     goto scf_step;
                 }

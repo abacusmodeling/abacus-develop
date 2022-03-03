@@ -5,6 +5,11 @@
 #include "../src_pw/symmetry_rho.h"
 #include "LCAO_evolve.h"
 #include "dftu.h"
+#ifdef __DEEPKS
+#include "../module_deepks/LCAO_deepks.h"
+#include "LCAO_nnr.h"
+#endif
+#include "../module_base/timer.h"
 
 ELEC_cbands_k::ELEC_cbands_k(){};
 ELEC_cbands_k::~ELEC_cbands_k(){};
@@ -18,7 +23,29 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 	int start_spin = -1;
 	uhm.GK.reset_spin(start_spin);
 	uhm.GK.allocate_pvpR();
-						
+
+#ifdef __DEEPKS
+	if (GlobalV::deepks_scf)
+    {
+		GlobalC::ld.cal_projected_DM_k(GlobalC::LOC.wfc_dm_2d.dm_k,
+			GlobalC::ucell,
+            GlobalC::ORB,
+            GlobalC::GridD,
+            GlobalC::ParaO,
+			GlobalC::kv);
+    	GlobalC::ld.cal_descriptor();
+		//calculate dE/dD
+		GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
+
+		//calculate H_V_deltaR from saved <alpha(0)|psi(R)>
+		GlobalC::ld.add_v_delta_k(GlobalC::ucell,
+            GlobalC::ORB,
+            GlobalC::GridD,
+            GlobalC::ParaO,
+			GlobalC::LNNR.nnr);
+	}
+#endif
+
 	// pool parallization in future -- mohan note 2021-02-09
 	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{	

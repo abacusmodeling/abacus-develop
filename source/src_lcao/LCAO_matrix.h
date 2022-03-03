@@ -1,7 +1,10 @@
 #ifndef LCAO_MATRIX_H
 #define LCAO_MATRIX_H
 
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../module_base/vector3.h"
+#include "../module_base/complexmatrix.h"
 #include "../src_parallel/parallel_orbitals.h"
 
 // add by jingan for map<> in 2021-12-2, will be deleted in the future
@@ -33,10 +36,10 @@ class LCAO_Matrix
     // thse matrix are used to
     // diagonalize.
     //------------------------------
-    double* Hloc;
-    double* Sloc;
-    double* Hloc_fixed;
-    double* Sdiag; // used in pdiag_double.cpp
+    std::vector<double> Hloc;
+    std::vector<double> Sloc;
+    std::vector<double> Hloc_fixed;
+    std::vector<double> Sdiag; // used in pdiag_double.cpp
 
     //------------------------------
     // 1. Hamiltonian(vl),
@@ -46,10 +49,10 @@ class LCAO_Matrix
     // these matrix are used to
     // diagonalize.
     //------------------------------
-    std::complex<double> *Hloc2;
-    std::complex<double> *Sloc2;
-    std::complex<double> *Hloc_fixed2;
-    std::complex<double> *Sdiag2; // used in pdiag_double.cpp
+    std::vector<std::complex<double>> Hloc2;
+    std::vector<std::complex<double>> Sloc2;
+    std::vector<std::complex<double>> Hloc_fixed2;
+    std::vector<std::complex<double>> Sdiag2; // used in pdiag_double.cpp
     //with soc, zhengdy-soc
 /*	ModuleBase::ComplexMatrix Hloc2_soc;
     ModuleBase::ComplexMatrix Sloc2_soc;
@@ -66,14 +69,12 @@ class LCAO_Matrix
     // HlocR -> Hloc2,
     // SlocR -> Sloc2,
     //------------------------------
-    double* HlocR;
-    double* SlocR;
-    double* Hloc_fixedR;
+    std::vector<double> SlocR;
+    std::vector<double> Hloc_fixedR;
 
     //with soc, zhengdy-soc
-    complex<double>* HlocR_soc;
-    complex<double>* SlocR_soc;
-    complex<double>* Hloc_fixedR_soc;
+    std::vector<std::complex<double>> SlocR_soc;
+    std::vector<std::complex<double>> Hloc_fixedR_soc;
 
     //LiuXh add 2019-07-15
     double ****Hloc_fixedR_tr;
@@ -81,9 +82,9 @@ class LCAO_Matrix
     double ****HR_tr;
 
 
-    complex<double> ****Hloc_fixedR_tr_soc;
-    complex<double> ****SlocR_tr_soc;
-    complex<double> ****HR_tr_soc;
+    std::complex<double> ****Hloc_fixedR_tr_soc;
+    std::complex<double> ****SlocR_tr_soc;
+    std::complex<double> ****HR_tr_soc;
 
     // jingan add 2021-6-4, modify 2021-12-2
     // Sparse form of HR and SR, the format is [R_direct_coor][orbit_row][orbit_col]
@@ -179,12 +180,12 @@ class LCAO_Matrix
 
     void zeros_HSgamma(const char &mtype);
     void zeros_HSk(const char &mtype);
-    void zeros_HSR(const char &mtype, const int &nnr);
+    void zeros_HSR(const char &mtype);
 
     void print_HSgamma(const char &mtype, std::ostream &os=std::cout);
     void print_HSk(const char &mtype, const char &vtype = 'C', const double &accuracy = 1.0e-5, std::ostream &os=std::cout);
     void update_Hloc(void);
-    void update_Hloc2(void);
+    void update_Hloc2(const int &ik);
 
     void allocate_HS_R(const int &nnr);
 

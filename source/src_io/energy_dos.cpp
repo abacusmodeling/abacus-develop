@@ -1,5 +1,6 @@
 #include "dos.h"
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "../src_pw/global.h"
 #include "../src_pw/energy.h"
 #include "../src_pw/wavefunc.h"
@@ -13,10 +14,11 @@
 #include "../src_lcao/wfc_dm_2d.h"
 #include "../module_neighbor/sltk_atom_arrange.h"//qifeng-2019-01-21
 #endif
-#include "../module_base/lapack_connector.h"
+#include "../module_base/blas_connector.h"
 #include "../module_base/scalapack_connector.h"
 #include "../module_base/matrix.h"
 #include "../module_base/complexmatrix.h"
+#include "../src_parallel/parallel_reduce.h"
 #include <vector>
 #ifdef __MPI
 #include<mpi.h>
@@ -307,7 +309,7 @@ void energy::perform_dos(void)
 							&T_char,
 							&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 							&one_float,
-							GlobalC::LM.Sloc, &one_int, &one_int, GlobalC::ParaO.desc,
+							GlobalC::LM.Sloc.data(), &one_int, &one_int, GlobalC::ParaO.desc,
 							Dwf.c, &one_int, &NB, GlobalC::ParaO.desc, &one_int,
 							&zero_float,
 							Mulk[0].c, &one_int, &NB, GlobalC::ParaO.desc,
@@ -323,7 +325,7 @@ void energy::perform_dos(void)
 							const int ic = GlobalC::ParaO.trace_loc_col[i];
 							waveg[j] = Mulk[0](ic,ir)*D.wfc_gamma[is](ic,ir);
 							const double x = waveg[j].real();
-							LapackConnector::axpy(np , x,Gauss, 1,pdosk[is].c+j*pdosk[is].nc,1);
+							BlasConnector::axpy(np , x,Gauss, 1,pdosk[is].c+j*pdosk[is].nc,1);
 						}
 					} 
 				}//ib
@@ -379,7 +381,7 @@ void energy::perform_dos(void)
 					GlobalC::ucell.infoNL.Beta);
 
 				GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
-				GlobalC::LM.zeros_HSR('S', GlobalC::LNNR.nnr);
+				GlobalC::LM.zeros_HSR('S');
 				GlobalC::UHM.genH.calculate_S_no();
 				GlobalC::UHM.genH.build_ST_new('S', false, GlobalC::ucell);
 				std::vector<ModuleBase::ComplexMatrix> Mulk;
@@ -426,7 +428,7 @@ void energy::perform_dos(void)
 									&T_char,
 									&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 									&one_float,
-									GlobalC::LM.Sloc2, &one_int, &one_int, GlobalC::ParaO.desc,
+									GlobalC::LM.Sloc2.data(), &one_int, &one_int, GlobalC::ParaO.desc,
 									Dwfc.c, &one_int, &NB, GlobalC::ParaO.desc, &one_int,
 									&zero_float,
 									Mulk[0].c, &one_int, &NB, GlobalC::ParaO.desc,
@@ -445,7 +447,7 @@ void energy::perform_dos(void)
 
 									waveg[j] = Mulk[0](ic,ir)*D.wfc_k[ik](ic,ir);
 									const double x = waveg[j].real();
-									LapackConnector::axpy(np , x,Gauss, 1,pdosk[is].c+j*pdosk[is].nc,1);
+									BlasConnector::axpy(np , x,Gauss, 1,pdosk[is].c+j*pdosk[is].nc,1);
 
 								}
 							}                             

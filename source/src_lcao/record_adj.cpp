@@ -1,5 +1,6 @@
 #include "record_adj.h"
 #include "../src_pw/global.h"
+#include "../module_base/timer.h"
 
 Record_adj::Record_adj(){}
 Record_adj::~Record_adj(){}
@@ -128,7 +129,7 @@ void Record_adj::for_2d(void)
 
  	//xiaohui add "OUT_LEVEL", 2015-09-16
 	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"irr",irr);
-	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"GlobalC::LNNR.nnr",GlobalC::LNNR.nnr);
+	if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"LNNR.nnr",GlobalC::LNNR.nnr);
 
 
 

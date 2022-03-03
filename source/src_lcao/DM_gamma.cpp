@@ -2,6 +2,10 @@
 #include "../src_pw/global.h"
 #include "../module_base/blas_connector.h"
 #include "../src_io/wf_local.h"
+#include "../src_parallel/parallel_reduce.h"
+#include "../src_parallel/parallel_common.h"
+#include "../module_base/memory.h"
+#include "../module_base/timer.h"
 
 extern "C"
 {
@@ -300,7 +304,7 @@ void Local_Orbital_Charge::gamma_file(const Grid_Technique &gt)
 		GlobalV::ofs_running << " Error=" << error << std::endl;
 		if(error==1)
 		{
-			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: GlobalC::LOWF.dat");
+			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: LOWF.dat");
 		}
 		else if(error==2)
 		{
@@ -329,7 +333,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D_pub(void)
 void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
 {
     ModuleBase::timer::tick("LCAO_Charge","dm_2dTOgrid");
-    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"cal_dk_gamma_from_2D, GlobalV::NSPIN", GlobalV::NSPIN);
+    ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"cal_dk_gamma_from_2D, NSPIN", GlobalV::NSPIN);
 
     for(int is=0; is<GlobalV::NSPIN; ++is)
     {
@@ -570,7 +574,7 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 				//      for(int ib=0; ib<band_local; ib++)
 				//          rho_row_col(i_row,i_col) += Z_row(i_row,ib) * Z_col(i_col,ib);
 
-				LapackConnector::gemm(
+				BlasConnector::gemm(
 						'N', 'T', 
 						row_remain, col_remain, band_local,
 						1, Z_row.c, band_local, Z_col.c, band_local,

@@ -1,6 +1,7 @@
 #include "FORCE_gamma.h"
 #include "../src_pw/global.h"
 #include <unordered_map>
+#include "../module_base/timer.h"
 
 
 void Force_LCAO_gamma::cal_ftvnl_dphi(
@@ -51,14 +52,7 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(
         }
     }
     if(isstress){
-        for(int i=0;i<3;i++)
-        {
-            for(int j=0;j<3;j++)
-            {
-                if(i<j) stvnl_dphi(j,i) = stvnl_dphi(i,j);
-				stvnl_dphi(i,j) *=  GlobalC::ucell.lat0 / GlobalC::ucell.omega;
-            }
-        }
+        StressTools::stress_fill(GlobalC::ucell.lat0, GlobalC::ucell.omega, stvnl_dphi);
     }
     ModuleBase::timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
     return;
@@ -260,9 +254,10 @@ void Force_LCAO_gamma::cal_fvnl_dbeta_new(
                         {
                             for(int ipol=0;ipol<3;ipol++)
 							{
-                                svnl_dbeta(0,ipol) += sum/2.0 * (nlm[0] * r0[ipol] + nlm_t[0] * r1[ipol]);
-                                svnl_dbeta(1,ipol) += sum/2.0 * (nlm[1] * r0[ipol] + nlm_t[1] * r1[ipol]);
-                                svnl_dbeta(2,ipol) += sum/2.0 * (nlm[2] * r0[ipol] + nlm_t[2] * r1[ipol]);
+                                for(int jpol=ipol;jpol<3;jpol++)
+                                {
+                                    svnl_dbeta(ipol, jpol) += sum/2.0 * (nlm[ipol] * r0[jpol] + nlm_t[ipol] * r1[jpol]);
+                                }
                             }
                         }
                     }//iw2
@@ -273,13 +268,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta_new(
 
     if(isstress)
     {
-        for(int i=0;i<3;i++)
-        {
-            for(int j=0;j<3;j++)
-            {
-                svnl_dbeta(i,j) *=  GlobalC::ucell.lat0 / GlobalC::ucell.omega;
-            }
-        }
+        StressTools::stress_fill(GlobalC::ucell.lat0, GlobalC::ucell.omega, svnl_dbeta);
     }
     ModuleBase::timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta_new");
 }
@@ -479,9 +468,10 @@ void Force_LCAO_gamma::cal_fvnl_dbeta_new(
                         {
                             for(int ipol=0;ipol<3;ipol++)
 							{
-                                svnl_dbeta(0,ipol) -= sum/2.0 * (nlm[0] * r0[ipol] + nlm_t[0] * r1[ipol])* -1;
-                                svnl_dbeta(1,ipol) -= sum/2.0 * (nlm[1] * r0[ipol] + nlm_t[1] * r1[ipol])* -1;
-                                svnl_dbeta(2,ipol) -= sum/2.0 * (nlm[2] * r0[ipol] + nlm_t[2] * r1[ipol])* -1;
+                                for(int jpol=ipol;jpol<3;jpol++)
+                                {
+                                    svnl_dbeta(ipol, jpol) += sum/2.0 * (nlm[ipol] * r0[jpol] + nlm_t[ipol] * r1[jpol]);
+                                }
                             }
                         }
                     }//iw2
@@ -491,13 +481,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta_new(
     }//iat
     if(isstress)
     {
-        for(int i=0;i<3;i++)
-        {
-            for(int j=0;j<3;j++)
-            {
-                svnl_dbeta(i,j) *=  GlobalC::ucell.lat0 / GlobalC::ucell.omega;
-            }
-        }
+        StressTools::stress_fill(GlobalC::ucell.lat0, GlobalC::ucell.omega, svnl_dbeta);
     }
     ModuleBase::timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta_new");
 }
@@ -643,10 +627,11 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
                         {
                             for(int ipol=0;ipol<3;ipol++)
 							{
-								// mohan update 2021-03-19
-                                svnl_dbeta(0,ipol) += sum/2.0 * (nlm[0] * r0[ipol] + nlm1[0] * r1[ipol]);
-                                svnl_dbeta(1,ipol) += sum/2.0 * (nlm[1] * r0[ipol] + nlm1[1] * r1[ipol]);
-                                svnl_dbeta(2,ipol) += sum/2.0 * (nlm[2] * r0[ipol] + nlm1[2] * r1[ipol]);
+                                for(int jpol=ipol;jpol<3;jpol++)
+                                {
+								    // mohan update 2021-03-19
+                                    svnl_dbeta(ipol, jpol) += sum * (nlm[ipol] * r0[jpol] + nlm1[ipol] * r1[jpol]);
+                                }
                             }
                         }
                     }//!kk
@@ -657,13 +642,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
 
     if(isstress)
     {
-        for(int i=0;i<3;i++)
-        {
-            for(int j=0;j<3;j++)
-            {
-                svnl_dbeta(i,j) *=  GlobalC::ucell.lat0 / GlobalC::ucell.omega;
-            }
-        }
+        StressTools::stress_fill(GlobalC::ucell.lat0, GlobalC::ucell.omega, svnl_dbeta);
     }
     ModuleBase::timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
     return;
@@ -719,14 +698,7 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(
         }
     }
     if(isstress){
-        for(int i=0;i<3;i++)
-        {
-            for(int j=0;j<3;j++)
-            {
-                if(i<j) stvnl_dphi(j,i) = stvnl_dphi(i,j);
-				stvnl_dphi(i,j) *=  GlobalC::ucell.lat0 / GlobalC::ucell.omega;
-            }
-        }
+        StressTools::stress_fill(GlobalC::ucell.lat0, GlobalC::ucell.omega, stvnl_dphi);
     }
     ModuleBase::timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
     return;
@@ -871,9 +843,10 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
                         {
                             for(int ipol=0;ipol<3;ipol++)
 							{
-                                svnl_dbeta(0,ipol) -= sum/2.0 * (nlm[0] * r0[ipol] + nlm1[0] * r1[ipol])* -1;
-                                svnl_dbeta(1,ipol) -= sum/2.0 * (nlm[1] * r0[ipol] + nlm1[1] * r1[ipol])* -1;
-                                svnl_dbeta(2,ipol) -= sum/2.0 * (nlm[2] * r0[ipol] + nlm1[2] * r1[ipol])* -1;
+                                for(int jpol=ipol;jpol<3;jpol++)
+                                {
+                                    svnl_dbeta(ipol,jpol) += sum * (nlm[ipol] * r0[jpol] + nlm1[ipol] * r1[jpol]);
+                                }
                             }
                         }
                     }//!kk
@@ -883,13 +856,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
     }//!iat
     if(isstress)
     {
-        for(int i=0;i<3;i++)
-        {
-            for(int j=0;j<3;j++)
-            {
-                svnl_dbeta(i,j) *=  GlobalC::ucell.lat0 / GlobalC::ucell.omega;
-            }
-        }
+        StressTools::stress_fill(GlobalC::ucell.lat0, GlobalC::ucell.omega, svnl_dbeta);
     }
     ModuleBase::timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
     return;

@@ -4,6 +4,7 @@
 #include "ORB_atomic_lm.h"
 #include "ORB_read.h" 
 #include "../module_base/sph_bessel_recursive.h"
+#include "../module_base/intarray.h"
 
 //caoyu add 2021-03-17
 

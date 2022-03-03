@@ -2,6 +2,7 @@
 #ifdef __LCAO
 #include "../module_orbital/ORB_read.h" // to use 'ORB' -- mohan 2021-01-30
 #endif
+#include "../module_base/timer.h"
 
 #ifndef __CELL
 #include "../src_pw/global.h"
@@ -349,6 +350,7 @@ int UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_ru
 	return 0;
 }
 
+#include "../module_base/mathzone.h"
 // Read atomic positions
 // return 1: no problem.
 // return 0: some problems.
@@ -425,41 +427,6 @@ bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &o
 			ModuleBase::GlobalFunc::READ_VALUE(ifpos, magnet.start_magnetization[it] );
 
 #ifndef __SYMMETRY
-/*
-			if(GlobalV::NSPIN==4)//added by zhengdy-soc
-			{
-				if(GlobalV::NONCOLIN)
-				{
-					magnet.m_loc_[it].x = magnet.start_magnetization[it] *
-							sin(magnet.angle1_[it]) * cos(magnet.angle2_[it]);
-					magnet.m_loc_[it].y = magnet.start_magnetization[it] *
-							sin(magnet.angle1_[it]) * sin(magnet.angle2_[it]);
-					magnet.m_loc_[it].z = magnet.start_magnetization[it] *
-							cos(magnet.angle1_[it]);
-				}
-				else
-				{
-					magnet.m_loc_[it].x = 0;
-					magnet.m_loc_[it].y = 0;
-					magnet.m_loc_[it].z = magnet.start_magnetization[it];
-				}
-
-				ModuleBase::GlobalFunc::OUT(ofs_running, "noncollinear magnetization_x",magnet.m_loc_[it].x);
-				ModuleBase::GlobalFunc::OUT(ofs_running, "noncollinear magnetization_y",magnet.m_loc_[it].y);
-				ModuleBase::GlobalFunc::OUT(ofs_running, "noncollinear magnetization_z",magnet.m_loc_[it].z);
-
-				ModuleBase::GlobalFunc::ZEROS(magnet.ux_ ,3);
-			}
-			else if(GlobalV::NSPIN==2)
-			{
-				magnet.m_loc_[it].x = magnet.start_magnetization[it];
-				ModuleBase::GlobalFunc::OUT(ofs_running, "start magnetization",magnet.start_magnetization[it]);
-			}
-			else if(GlobalV::NSPIN==1)
-			{
-				ModuleBase::GlobalFunc::OUT(ofs_running, "start magnetization","FALSE");
-			}
-*/
 			//===========================================
 			// (2) read in numerical orbital information
 			// int atoms[it].nwl
@@ -925,9 +892,9 @@ bool UnitCell_pseudo::check_tau(void)const
 }
 
 #ifdef __LCAO
-void UnitCell_pseudo::print_stru_file(const LCAO_Orbitals &orb, const std::string &fn, const int &type)const
+void UnitCell_pseudo::print_stru_file(const LCAO_Orbitals &orb, const std::string &fn, const int &type, const int &level)const
 #else
-void UnitCell_pseudo::print_stru_file(const std::string &fn, const int &type)const
+void UnitCell_pseudo::print_stru_file(const std::string &fn, const int &type, const int &level)const
 #endif
 {
 	ModuleBase::TITLE("UnitCell_pseudo","print_stru_file");
@@ -987,19 +954,29 @@ void UnitCell_pseudo::print_stru_file(const std::string &fn, const int &type)con
 			ofs << "0" << " #magnetism" << std::endl;
 #endif
 
-			//2015-05-07, modify
-			//ofs << atoms[it].nwl << " #max angular momentum" << std::endl;
-			//xiaohui modify 2015-03-15
-			//for(int l=0; l<=atoms[it].nwl; l++)
-			//{
-			//	ofs << atoms[it].l_nchi[l] << " #number of zeta for l=" << l << std::endl;
-			//}
 			ofs << atoms[it].na << " #number of atoms" << std::endl;
 			for(int ia=0; ia<atoms[it].na; ia++)
 			{
-				ofs << atoms[it].tau[ia].x << " " << atoms[it].tau[ia].y << " " << atoms[it].tau[ia].z << " " 
-					<< atoms[it].mbl[ia].x << " " << atoms[it].mbl[ia].y << " " << atoms[it].mbl[ia].z << " "
-					<< atoms[it].vel[ia].x << " " << atoms[it].vel[ia].y << " " << atoms[it].vel[ia].z << std::endl;
+				ofs << atoms[it].tau[ia].x << "  " << atoms[it].tau[ia].y << "  " << atoms[it].tau[ia].z
+					<< "  m  " << atoms[it].mbl[ia].x << "  " << atoms[it].mbl[ia].y << "  " << atoms[it].mbl[ia].z;
+
+				if(level == 1)
+				{
+					// output velocity
+					ofs << "  v  " << atoms[it].vel[ia].x << "  " << atoms[it].vel[ia].y << "  " << atoms[it].vel[ia].z << std::endl;
+				}
+				else if(level == 2)
+				{
+					// output magnetic information
+				}
+				else if(level == 3)
+				{
+					// output velocity and magnetic information
+				}
+				else
+				{
+					ofs << std::endl;
+				}
 			}
 		}
 	}
@@ -1015,18 +992,30 @@ void UnitCell_pseudo::print_stru_file(const std::string &fn, const int &type)con
 #else
 			ofs << "0" << " #magnetism" << std::endl;
 #endif
-			//ofs << atoms[it].nwl << " #max angular momentum" << std::endl;
-			//xiaohui modify 2015-03-15
-			//for(int l=0; l<=atoms[it].nwl; l++)
-			//{
-			//	ofs << atoms[it].l_nchi[l] << " #number of zeta for l=" << l << std::endl;
-			//}
+			
 			ofs << atoms[it].na << " #number of atoms" << std::endl;
 			for(int ia=0; ia<atoms[it].na; ia++)
 			{
-				ofs << atoms[it].taud[ia].x << " " << atoms[it].taud[ia].y << " " << atoms[it].taud[ia].z << " " 
-					<< atoms[it].mbl[ia].x << " " << atoms[it].mbl[ia].y << " " << atoms[it].mbl[ia].z << " "
-					<< atoms[it].vel[ia].x << " " << atoms[it].vel[ia].y << " " << atoms[it].vel[ia].z << std::endl;
+				ofs << atoms[it].taud[ia].x << "  " << atoms[it].taud[ia].y << "  " << atoms[it].taud[ia].z
+					<< "  m  " << atoms[it].mbl[ia].x << "  " << atoms[it].mbl[ia].y << "  " << atoms[it].mbl[ia].z;
+
+				if(level == 1)
+				{
+					// output velocity
+					ofs << "  v  " << atoms[it].vel[ia].x << "  " << atoms[it].vel[ia].y << "  " << atoms[it].vel[ia].z << std::endl;
+				}
+				else if(level == 2)
+				{
+					// output magnetic information
+				}
+				else if(level == 3)
+				{
+					// output velocity and magnetic information
+				}
+				else
+				{
+					ofs << std::endl;
+				}
 			}
 		}
 	}

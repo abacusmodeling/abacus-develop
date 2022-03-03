@@ -32,12 +32,16 @@ void Symmetry_rho::psymm(double* rho_part, const PW_Basis &pw, Parallel_Grid &Pg
 {
 #ifdef __MPI
 	// (1) reduce all rho from the first pool.
-	double* rhotot = new double[pw.ncxyz];
-	ModuleBase::GlobalFunc::ZEROS(rhotot, pw.ncxyz);
+	double* rhotot;
+	if(GlobalV::MY_RANK == 0)
+	{
+		rhotot = new double[pw.ncxyz];
+		ModuleBase::GlobalFunc::ZEROS(rhotot, pw.ncxyz);
+	}
 	Pgrid.reduce_to_fullrho(rhotot, rho_part);
 
 	// (2)
-	if(GlobalV::RANK_IN_POOL==0)
+	if(GlobalV::MY_RANK==0)
 	{
 		symm.rho_symmetry(rhotot, pw.ncx, pw.ncy, pw.ncz);
 		/*
@@ -81,7 +85,7 @@ void Symmetry_rho::psymm(double* rho_part, const PW_Basis &pw, Parallel_Grid &Pg
 		Pgrid.zpiece_to_all(zpiece,iz, rho_part);
 	}
 
-	delete[] rhotot;
+	if(GlobalV::MY_RANK==0)		delete[] rhotot;
 	delete[] zpiece;
 #endif
 	return;

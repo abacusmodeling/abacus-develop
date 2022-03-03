@@ -19,7 +19,7 @@
 #include "../src_pw/vdwd3_parameters.h"
 #include "dmft.h"
 #ifdef __DEEPKS
-#include "LCAO_descriptor.h"    //caoyu add 2021-07-26
+#include "../module_deepks/LCAO_deepks.h"    //caoyu add 2021-07-26
 #endif
 
 LOOP_ions::LOOP_ions()
@@ -60,8 +60,6 @@ void LOOP_ions::opt_ions(void)
         // allocate arrays related to changes of lattice vectors
         LCM.allocate();
     }
-
-
 
     this->istep = 1;
     int force_step = 1;
@@ -171,14 +169,14 @@ void LOOP_ions::opt_ions(void)
             GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
         }
 
-    if(INPUT.dft_plus_dmft)
-    {
-      // Output sparse overlap matrix S(R)
-      this->output_SR("outputs_to_DMFT/overlap_matrix/SR.csr");
-      
-      // Output wave functions, bands, k-points information, and etc.
-      GlobalC::dmft.out_to_dmft();
-    }
+        if(INPUT.dft_plus_dmft)
+        {
+        // Output sparse overlap matrix S(R)
+        this->output_SR("outputs_to_DMFT/overlap_matrix/SR.csr");
+        
+        // Output wave functions, bands, k-points information, and etc.
+        GlobalC::dmft.out_to_dmft();
+        }
 
         if(GlobalC::ParaO.out_hsR)
 		{
@@ -189,15 +187,38 @@ void LOOP_ions::opt_ions(void)
 #ifdef __DEEPKS
         if (GlobalV::out_descriptor)
         {
-            //ld.init(ORB.get_lmax_d(), ORB.get_nchimax_d(), ucell.nat* ORB.Alpha[0].getTotal_nchi());
-            //ld.build_S_descriptor(0);  //cal overlap, no need dm
-            GlobalC::ld.cal_projected_DM(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);  //need dm
+            if(GlobalV::GAMMA_ONLY_LOCAL)
+            {
+                GlobalC::ld.cal_projected_DM(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],
+                    GlobalC::ucell,
+                    GlobalC::ORB,
+                    GlobalC::GridD,
+                    GlobalC::ParaO);
+            }
+            else
+            {
+                GlobalC::ld.cal_projected_DM_k(GlobalC::LOC.wfc_dm_2d.dm_k,
+                    GlobalC::ucell,
+                    GlobalC::ORB,
+                    GlobalC::GridD,
+                    GlobalC::ParaO,
+                    GlobalC::kv);
+            }
+
             GlobalC::ld.cal_descriptor();    //final descriptor
-            GlobalC::ld.save_npy_d();            //libnpy needed
+            GlobalC::ld.print_descriptor(GlobalC::ucell.nat);
+            GlobalC::ld.save_npy_d(GlobalC::ucell.nat);            //libnpy needed
+            
             if (GlobalV::deepks_scf)
             {
-                //ld.print_H_V_delta();   //final H_delta
-                GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma);
+                if(GlobalV::GAMMA_ONLY_LOCAL)
+                {
+                    GlobalC::ld.cal_e_delta_band(GlobalC::LOC.wfc_dm_2d.dm_gamma, GlobalC::ParaO);
+                }
+                else
+                {
+                    GlobalC::ld.cal_e_delta_band_k(GlobalC::LOC.wfc_dm_2d.dm_k, GlobalC::ParaO, GlobalC::kv.nks);
+                }
                 std::cout << "E_delta_band = " << std::setprecision(8) << GlobalC::ld.e_delta_band << " Ry" << " = " << std::setprecision(8) << GlobalC::ld.e_delta_band * ModuleBase::Ry_to_eV << " eV" << std::endl;
                 std::cout << "E_delta_NN= "<<std::setprecision(8) << GlobalC::ld.E_delta << " Ry" << " = "<<std::setprecision(8)<<GlobalC::ld.E_delta*ModuleBase::Ry_to_eV<<" eV"<<std::endl;
             }
@@ -310,6 +331,7 @@ bool LOOP_ions::force_stress(
 
             if(IMM.get_converged() || (istep==GlobalV::NSTEP))
             {
+                ModuleBase::timer::tick("LOOP_ions","force_stress");
                 return 1; // 1 means converged
             }
             else // ions are not converged
@@ -325,10 +347,12 @@ bool LOOP_ions::force_stress(
                     GlobalC::pot.init_pot( istep, GlobalC::pw.strucFac );
                 }
             }
+            ModuleBase::timer::tick("LOOP_ions","force_stress");
             return 0;
         }
         else
         {
+            ModuleBase::timer::tick("LOOP_ions","force_stress");
             return 1;
         }
 
@@ -378,6 +402,7 @@ xiaohui modify 2014-08-09*/
            	converged_stress = LCM.get_converged();
            	if(converged_stress)
            	{
+                ModuleBase::timer::tick("LOOP_ions","force_stress");
                	return 1;
            	}
            	else
@@ -386,11 +411,13 @@ xiaohui modify 2014-08-09*/
                	GlobalC::pot.init_pot(stress_step, GlobalC::pw.strucFac);
 
                	++stress_step;
+                ModuleBase::timer::tick("LOOP_ions","force_stress");
                	return 0;
            	}
 		}
         else
         {
+            ModuleBase::timer::tick("LOOP_ions","force_stress");
             return 1;
         }
 	}
@@ -420,6 +447,7 @@ xiaohui modify 2014-08-09*/
             	    converged_stress = LCM.get_converged();
             	    if(converged_stress)
             	    {
+                        ModuleBase::timer::tick("LOOP_ions","force_stress");
                 	    return 1;
             	    }
             	    else
@@ -428,11 +456,13 @@ xiaohui modify 2014-08-09*/
                 	    GlobalC::pot.init_pot(stress_step, GlobalC::pw.strucFac);
 
                 	    ++stress_step;
+                        ModuleBase::timer::tick("LOOP_ions","force_stress");
                 	    return 0;
                     }
                 }
                 else
                 {
+                    ModuleBase::timer::tick("LOOP_ions","force_stress");
                     return 1;
                 }
 
@@ -450,18 +480,18 @@ xiaohui modify 2014-08-09*/
                     GlobalC::pot.init_pot( istep, GlobalC::pw.strucFac );
                 }
                 ++force_step;
+                ModuleBase::timer::tick("LOOP_ions","force_stress");
                 return 0;
             }
         }
         else
         {
+            ModuleBase::timer::tick("LOOP_ions","force_stress");
             return 1;
         }
     }
-
-    return 0;
-
     ModuleBase::timer::tick("LOOP_ions","force_stress");
+    return 0;
 }
 
 void LOOP_ions::final_scf(void)
@@ -502,6 +532,9 @@ void LOOP_ions::final_scf(void)
         // and allocate the space for H(R) and S(R).
         GlobalC::LNNR.cal_nnr();
         GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
+#ifdef __DEEPKS
+		GlobalC::ld.allocate_V_deltaR(GlobalC::LNNR.nnr);
+#endif
 
 		// need to first calculae lgd.
         // using GlobalC::GridT.init.

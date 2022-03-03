@@ -3,7 +3,9 @@
 #include <cassert>
 #include "../module_base/math_integral.h"
 #include "../module_base/tool_check.h"
+#include "../src_parallel/parallel_common.h"
 #include <algorithm>
+#include "../module_base/timer.h"
 //#include "../src_pw/soc.h"
 using namespace std;
 

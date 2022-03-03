@@ -1,7 +1,10 @@
 #include "istate_charge.h"
 #include "../src_pw/global.h"
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../src_parallel/parallel_common.h"
 #include "../module_base/scalapack_connector.h"
+#include "../module_base/blas_connector.h"
 
 IState_Charge::IState_Charge(){}
 
@@ -16,7 +19,7 @@ void IState_Charge::begin(void)
 
 	if(!GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		ModuleBase::WARNING_QUIT("IState_Charge::begin","Only available for GlobalV::GAMMA_ONLY_LOCAL now.");
+		ModuleBase::WARNING_QUIT("IState_Charge::begin","Only available for GAMMA_ONLY_LOCAL now.");
 	}
 
 	int mode = 0;
@@ -39,7 +42,7 @@ void IState_Charge::begin(void)
 	// (1.1) allocate the space for GlobalC::LOWF.WFC_GAMMA
 
 	// (1.2) read in LOWF_GAMMA.dat
-	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"GlobalC::LOWF.allocate_flag",GlobalC::LOWF.get_allocate_flag());	
+	ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"LOWF.allocate_flag",GlobalC::LOWF.get_allocate_flag());	
 	std::cout << " number of electrons = " << GlobalC::CHR.nelec << std::endl;
 
 	// mohan update 2011-03-21
@@ -208,7 +211,7 @@ void IState_Charge::idmatrix(const int &ib)
 	
 			for(int ir=0; ir!=wg_wfc.nr; ++ir)
 			{
-				LapackConnector::scal( wg_wfc.nc, wg_local[ir], wg_wfc.c+ir*wg_wfc.nc, 1 );
+				BlasConnector::scal( wg_wfc.nc, wg_local[ir], wg_wfc.c+ir*wg_wfc.nc, 1 );
 			}
 
 			// C++: dm(iw1,iw2) = wfc(ib,iw1).T * wg_wfc(ib,iw2)

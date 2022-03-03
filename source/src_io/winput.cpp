@@ -1,5 +1,5 @@
 #ifdef __MPI
-	#include <mpi.h>
+	#include "mpi.h"
 #endif
 #include <cstring>
 #include <iostream>
@@ -623,6 +623,7 @@ void winput::Print(const std::string &fn)
 	return;
 }
 
+#include "../src_parallel/parallel_common.h"
 #ifdef __MPI
 void winput::Bcast(void)
 {

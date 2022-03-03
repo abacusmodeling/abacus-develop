@@ -1,4 +1,6 @@
 #include "cal_r_overlap_R.h"
+#include "../src_parallel/parallel_reduce.h"
+#include "../module_base/timer.h"
 
 cal_r_overlap_R::cal_r_overlap_R(){}
 
@@ -391,7 +393,7 @@ center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distan
 							if(i==0 && j==0)
 							{
 								out_r << dRx << " " << dRy << " " << dRz  
-								<< "    //R std::vector(R2 - R1,unit: lattice std::vector)" <<std::endl;
+								<< "    //R std::vector(R2 - R1,unit: lattice vector)" <<std::endl;
 							}
 							
 							out_r << std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << liner_x[j] << " "

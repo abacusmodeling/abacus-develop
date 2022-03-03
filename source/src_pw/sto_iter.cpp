@@ -1,8 +1,10 @@
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "global.h"
 #include "sto_iter.h"
 #include "occupy.h"
-#include "diago_cg.h" 
+#include "diago_cg.h"
+#include "../module_base/timer.h" 
 
 double Stochastic_Iter:: mu;
 double Stochastic_Iter:: mu0;
@@ -294,7 +296,7 @@ double Stochastic_Iter::calne()
     KS_ne = 0;
     for(int ikk = 0; ikk < nkk; ++ikk)
     {
-        double stok_ne = LapackConnector::dot(norder,stoche.coef,1,spolyv,1);
+        double stok_ne = BlasConnector::dot(norder,stoche.coef,1,spolyv,1);
         //double stok_ne = 0;
         //for(int ior = 0; ior < norder; ++ior)
         //{
@@ -338,7 +340,7 @@ void Stochastic_Iter::sum_stoband()
 
     for(int ikk = 0; ikk < nkk; ++ikk)
     {
-        double stok_demet = LapackConnector::dot(norder,stoche.coef,1,spolyv,1);
+        double stok_demet = BlasConnector::dot(norder,stoche.coef,1,spolyv,1);
         //double stok_demet=0;
         //for(int ior = 0; ior < norder; ++ior)
         //{

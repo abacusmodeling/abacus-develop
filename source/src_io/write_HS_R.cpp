@@ -2,6 +2,7 @@
 #include "cal_r_overlap_R.h"
 #include "../src_pw/global.h"
 #include "write_HS.h"
+#include "../module_base/timer.h"
 
 // if 'binary=true', output binary file.
 // The 'sparse_threshold' is the accuracy of the sparse matrix. 

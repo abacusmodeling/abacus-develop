@@ -1,5 +1,6 @@
 #include "FORCE_gamma.h"
 #include "../src_pw/global.h"
+#include "../module_base/timer.h"
 
 void Force_LCAO_gamma::cal_fvl_dphi(
 	ModuleBase::matrix& dm2d, 
@@ -260,14 +261,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
 
     if(isstress)
     {
-        for(int i=0;i<3;i++)
-        {
-            for(int j=0;j<3;j++)
-            {
-                if(i<j) svl_dphi(j,i) = svl_dphi(i,j);
-				svl_dphi(i,j) /= GlobalC::ucell.omega;
-            }
-        }
+        StressTools::stress_fill(1.0, GlobalC::ucell.omega, svl_dphi);
     }
 
     delete[] tmpDHx;

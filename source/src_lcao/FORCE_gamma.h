@@ -1,7 +1,9 @@
 #ifndef FORCE_LCAO_GAMMA_H
 #define FORCE_LCAO_GAMMA_H
 
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../module_base/matrix.h"
 #include "LCAO_matrix.h" 
 
 class Force_LCAO_gamma
@@ -26,7 +28,12 @@ class Force_LCAO_gamma
 		ModuleBase::matrix& soverlap,
 		ModuleBase::matrix& stvnl_dphi,
 		ModuleBase::matrix& svnl_dbeta,
+#ifdef __DEEPKS
+		ModuleBase::matrix& svl_dphi,
+		ModuleBase::matrix& svnl_dalpha
+#else
 		ModuleBase::matrix& svl_dphi
+#endif
 		);
 
 	// get the ds, dt, dvnl.
@@ -128,4 +135,13 @@ class Force_LCAO_gamma
 	// calculate dVnl=<phi|dVnl|dphi> in LCAO
 	void NonlocalDphi(const int& nspin, const int& vnl_method, const bool& cal_deri);
 };
+
+// this namespace used to store global function for some stress operation
+namespace StressTools{
+	//set upper matrix to whole matrix
+	void stress_fill( 
+		const double& lat0_, 
+		const double& omega_,
+		ModuleBase::matrix& stress_matrix);
+}
 #endif

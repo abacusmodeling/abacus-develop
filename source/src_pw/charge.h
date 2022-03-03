@@ -1,7 +1,9 @@
 #ifndef CHARGE_H
 #define CHARGE_H
 
-#include "tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
+#include "../module_base/complexmatrix.h"
 #include "../src_parallel/parallel_global.h"
 
 //==========================================================

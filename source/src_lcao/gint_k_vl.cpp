@@ -1,4 +1,5 @@
-#include "../src_pw/tools.h"
+#include "../module_base/global_function.h"
+#include "../module_base/global_variable.h"
 #include "gint_k.h"
 #include "LCAO_nnr.h"
 #include "../module_orbital/ORB_read.h"
@@ -6,6 +7,7 @@
 #include "../module_base/ylm.h"
 #include "../src_pw/global.h"
 #include "../module_base/blas_connector.h"
+#include "../module_base/timer.h"
 //#include <mkl_cblas.h>
 
 #ifdef _OPENMP

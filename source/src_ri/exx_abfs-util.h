@@ -2,6 +2,9 @@
 #define EXX_ABFS_UTIL_H
 
 #include "exx_abfs.h"
+#ifdef __MPI
+#include "mpi.h"
+#endif
 
 #include <vector>
 #include <string>

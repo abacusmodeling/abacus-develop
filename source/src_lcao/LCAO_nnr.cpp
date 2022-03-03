@@ -1,7 +1,10 @@
 #include "LCAO_nnr.h"
 #include "../src_pw/global.h"
 #include "record_adj.h" //mohan add 2012-07-06
-
+#include "../module_base/timer.h"
+#ifdef __DEEPKS
+#include "../module_deepks/LCAO_deepks.h"
+#endif
 //----------------------------
 // define a global class obj.
 //----------------------------
@@ -576,6 +579,13 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 	ModuleBase::Vector3<double> dtau2;
 	ModuleBase::Vector3<double> tau0;
 
+#ifdef __DEEPKS
+	if (GlobalV::deepks_scf)
+    {
+		ModuleBase::GlobalFunc::ZEROS(GlobalC::ld.H_V_delta_k[ik], GlobalC::ParaO.nloc);
+	}
+#endif
+
 	for (int T1 = 0; T1 < GlobalC::ucell.ntype; ++T1)
 	{
 		Atom* atom1 = &GlobalC::ucell.atoms[T1];
@@ -691,6 +701,12 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 							{
 								GlobalC::LM.Sloc2[iic] += GlobalC::LM.SlocR[index] * kphase;
 								GlobalC::LM.Hloc_fixed2[iic] += GlobalC::LM.Hloc_fixedR[index] * kphase;
+#ifdef __DEEPKS
+								if(GlobalV::deepks_scf)
+								{
+									GlobalC::ld.H_V_delta_k[ik][iic] += GlobalC::ld.H_V_deltaR[index] * kphase;
+								}
+#endif
 							}
 							else
 							{

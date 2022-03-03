@@ -2,6 +2,7 @@
 
 #include "../src_pw/global.h"
 #include "../module_base/global_function.h"
+#include "../src_parallel/parallel_reduce.h"
 
 #include "conv_coulomb_pot.h"
 #include "conv_coulomb_pot-inl.h"
@@ -98,7 +99,7 @@ Exx_Lcao::Exx_Lcao( const Exx_Global::Exx_Info &info_global )
 		{
 			const ModuleBase::matrix m1=init_matrix(1,3,10), m2=init_matrix(3,2,0);
 			ModuleBase::matrix m3(m1.nr,m2.nc);
-			LapackConnector::gemm(
+			BlasConnector::gemm(
 				'N', 'N', 
 				m3.nr, m3.nc, m1.nc,
 				1, m1.c, m1.nc, m2.c, m2.nc,
@@ -108,7 +109,7 @@ Exx_Lcao::Exx_Lcao( const Exx_Global::Exx_Info &info_global )
 		{
 			const ModuleBase::matrix m1=transpose(init_matrix(1,3,10)), m2=init_matrix(3,2,0);
 			ModuleBase::matrix m3(m1.nc,m2.nc);
-			LapackConnector::gemm(
+			BlasConnector::gemm(
 				'T', 'N', 
 				m3.nr, m3.nc, m1.nr,
 				1, m1.c, m1.nc, m2.c, m2.nc,
@@ -118,7 +119,7 @@ Exx_Lcao::Exx_Lcao( const Exx_Global::Exx_Info &info_global )
 		{
 			const ModuleBase::matrix m1=transpose(init_matrix(1,3,10)), m2=init_matrix(3,2,0);
 			ModuleBase::matrix m3(m1.nc,m2.nc);
-			LapackConnector::gemm(
+			BlasConnector::gemm(
 				'N', 'T', 
 				m3.nr, m3.nc, m1.nr,
 				1, m1.c, m1.nc, m2.c, m2.nc,
@@ -128,7 +129,7 @@ Exx_Lcao::Exx_Lcao( const Exx_Global::Exx_Info &info_global )
 		{
 			const ModuleBase::matrix m1=init_matrix(1,3,10), m2=transpose(init_matrix(3,2,0));
 			ModuleBase::matrix m3(m1.nr,m2.nr);
-			LapackConnector::gemm(
+			BlasConnector::gemm(
 				'N','T',
 				m3.nr, m3.nc, m1.nc,
 				1, m1.c, m1.nc, m2.c, m2.nc,
@@ -138,7 +139,7 @@ Exx_Lcao::Exx_Lcao( const Exx_Global::Exx_Info &info_global )
 		{
 			const ModuleBase::matrix m1=init_matrix(1,3,10), m2=transpose(init_matrix(3,2,0));
 			ModuleBase::matrix m3(m1.nr,m2.nr);
-			LapackConnector::gemm(
+			BlasConnector::gemm(
 				'T','N',
 				m3.nr, m3.nc, m1.nc,
 				1, m1.c, m1.nc, m2.c, m2.nc,
@@ -156,19 +157,19 @@ Exx_Lcao::Exx_Lcao( const Exx_Global::Exx_Info &info_global )
 		gettimeofday(&time, NULL);
 		
 		for(int s=0; s<S; ++s)
-			LapackConnector::gemm('N', 'N', N, N, N, 1, m1.c, N, m2.c, N, 0, m3.c, N);
+			BlasConnector::gemm('N', 'N', N, N, N, 1, m1.c, N, m2.c, N, 0, m3.c, N);
 		std::cout<<"NN\t"<<cut_time(time)<<std::endl;
 		
 		for(int s=0; s<S; ++s)
-			LapackConnector::gemm('N', 'T', N, N, N, 1, m1.c, N, m2.c, N, 0, m3.c, N);
+			BlasConnector::gemm('N', 'T', N, N, N, 1, m1.c, N, m2.c, N, 0, m3.c, N);
 		std::cout<<"NT\t"<<cut_time(time)<<std::endl;
 		
 		for(int s=0; s<S; ++s)
-			LapackConnector::gemm('T', 'N', N, N, N, 1, m1.c, N, m2.c, N, 0, m3.c, N);
+			BlasConnector::gemm('T', 'N', N, N, N, 1, m1.c, N, m2.c, N, 0, m3.c, N);
 		std::cout<<"TN\t"<<cut_time(time)<<std::endl;
 		
 		for(int s=0; s<S; ++s)
-			LapackConnector::gemm('T', 'T', N, N, N, 1, m1.c, N, m2.c, N, 0, m3.c, N);
+			BlasConnector::gemm('T', 'T', N, N, N, 1, m1.c, N, m2.c, N, 0, m3.c, N);
 		std::cout<<"TT\t"<<cut_time(time)<<std::endl;
 	};
 
@@ -511,11 +512,11 @@ void Exx_Lcao::init()
 	auto test_nrm2 = []()
 	{
 		std::vector<double> x = {1,2,3};
-		std::cout<<LapackConnector::nrm2( x.size(), ModuleBase::GlobalFunc::VECTOR_TO_PTR(x), 1 )<<std::endl;
+		std::cout<<BlasConnector::nrm2( x.size(), ModuleBase::GlobalFunc::VECTOR_TO_PTR(x), 1 )<<std::endl;
 		std::vector<std::complex<double>> y = { {1.1,2.2}, {3.3,-4.4}, {-5.5,-6.6} };
-		std::cout<<LapackConnector::nrm2( y.size(), ModuleBase::GlobalFunc::VECTOR_TO_PTR(y), 1 )<<std::endl;
+		std::cout<<BlasConnector::nrm2( y.size(), ModuleBase::GlobalFunc::VECTOR_TO_PTR(y), 1 )<<std::endl;
 		std::vector<double> z = {1,2,3,4,5,6};
-		std::cout<<LapackConnector::nrm2( 3, ModuleBase::GlobalFunc::VECTOR_TO_PTR(z), 2 )<<std::endl;
+		std::cout<<BlasConnector::nrm2( 3, ModuleBase::GlobalFunc::VECTOR_TO_PTR(z), 2 )<<std::endl;
 	};
 
 	ModuleBase::TITLE("Exx_Lcao","init");
@@ -1238,7 +1239,7 @@ gettimeofday( &t_start, NULL);
 						const ModuleBase::matrix & H = HC.second;
 						assert(DMr_ptr->nr == H.nr);
 						assert(DMr_ptr->nc == H.nc);
-						energy += LapackConnector::dot( H.nr*H.nc, DMr_ptr->c,1, H.c,1 );
+						energy += BlasConnector::dot( H.nr*H.nc, DMr_ptr->c,1, H.c,1 );
 					}
 				}
 			}
@@ -1487,7 +1488,7 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Mo
 			const ModuleBase::matrix & B) -> ModuleBase::matrix
 		{
 			ModuleBase::matrix C(M,N,false);
-			LapackConnector::gemm(
+			BlasConnector::gemm(
 				transA, transB,
 				M, N, K,
 				alpha,

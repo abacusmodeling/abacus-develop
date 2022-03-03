@@ -1,5 +1,6 @@
 #include "./stress_func.h"
 #include "./H_Ewald_pw.h"
+#include "../module_base/timer.h"
 
 //calcualte the Ewald stress term in PW and LCAO
 void Stress_Func::stress_ewa(ModuleBase::matrix& sigma, const bool is_pw)
@@ -150,7 +151,7 @@ void Stress_Func::stress_ewa(ModuleBase::matrix& sigma, const bool is_pw)
 	delete[] r2;
 	delete[] irr;
 	// this->print(GlobalV::ofs_running, "ewald stress", stression);
-	ModuleBase::timer::tick("Force_Func","stress_ew");
+	ModuleBase::timer::tick("Stress_Func","stress_ew");
 
 	return;
 }

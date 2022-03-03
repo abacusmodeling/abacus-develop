@@ -4,9 +4,11 @@
 #include "../module_neighbor/sltk_atom_arrange.h"
 #include "global_fp.h" // mohan add 2021-01-30
 #include "dftu.h"
+#include "../src_parallel/parallel_reduce.h"
 #ifdef __DEEPKS
-#include "LCAO_descriptor.h"	//caoyu add 2021-07-26
+#include "../module_deepks/LCAO_deepks.h"	//caoyu add 2021-07-26
 #endif
+#include "../module_base/timer.h"
 
 LCAO_Hamilt::LCAO_Hamilt()
 { 
@@ -107,33 +109,37 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-
     
 #ifdef __DEEPKS	//caoyu add 2021-07-26 for DeePKS
 
-    if (GlobalV::deepks_scf)
+	if (GlobalV::deepks_scf)
     {
-        //========method 1========
-        //ld.cal_v_delta(LOC.wfc_dm_2d.dm_gamma[0]);
-
-        //========method 2========
-        //ld.cal_gedm(LOC.wfc_dm_2d.dm_gamma[0]);
-        //ld.build_v_delta_alpha(0);
-        GlobalC::ld.cal_gedm(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
-        GlobalC::ld.build_v_delta_mu(0);
-        
-        GlobalC::ld.add_v_delta();
-    }
-    
+		GlobalC::ld.cal_projected_DM(GlobalC::LOC.wfc_dm_2d.dm_gamma[0],
+            GlobalC::ucell,
+            GlobalC::ORB,
+            GlobalC::GridD,
+            GlobalC::ParaO);
+    	GlobalC::ld.cal_descriptor();        
+		GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
+		GlobalC::ld.add_v_delta(GlobalC::ucell,
+            GlobalC::ORB,
+            GlobalC::GridD,
+            GlobalC::ParaO);
+        for(int iic=0;iic<GlobalC::ParaO.nloc;iic++)
+        {
+            GlobalC::LM.Hloc[iic] += GlobalC::ld.H_V_delta[iic];
+        }
+	}
+	
 #endif
-    
-    //add T+VNL+Vl matrix.
-    GlobalC::LM.update_Hloc();
+	
+	//add T+VNL+Vl matrix.
+	GlobalC::LM.update_Hloc();
 
-
-    //test
-    if(GlobalV::NURSE)
-    {
-        GlobalC::LM.print_HSgamma('S'); // S
-        GlobalC::LM.print_HSgamma('T');
-        GlobalC::LM.print_HSgamma('H');
-    //	ModuleBase::WARNING_QUIT("LCAO_Hamilt::calculate_Hgamma","print the H,S matrix");
+	//test
+	if(GlobalV::NURSE)
+	{
+		GlobalC::LM.print_HSgamma('S'); // S
+		GlobalC::LM.print_HSgamma('T');
+		GlobalC::LM.print_HSgamma('H');
+	//	ModuleBase::WARNING_QUIT("LCAO_Hamilt::calculate_Hgamma","print the H,S matrix");
 //		ModuleBase::QUIT();
     }
 
@@ -227,7 +233,6 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
         // set the local potential
         // in LCAO basis.
         //--------------------------
-        GlobalC::LM.zeros_HSR('H', GlobalC::LNNR.nnr);
 
         if(GlobalV::NSPIN!=4) 
         {
@@ -269,8 +274,7 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
     // (Hloc2 += Hloc_fixed2), (std::complex matrix)
     //------------------------------------------
 //	std::cout << " Folding matrix here." << std::endl;
-    GlobalC::LM.update_Hloc2();
-
+	GlobalC::LM.update_Hloc2(ik);
 /*
     if(GlobalV::NURSE)
     {
@@ -295,7 +299,7 @@ void LCAO_Hamilt::calculate_STNR_k(void)
     // is GlobalC::LNNR.nnr.
     // and store in GlobalC::LM.SlocR.
     //--------------------------------------------
-    GlobalC::LM.zeros_HSR('S', GlobalC::LNNR.nnr);
+    GlobalC::LM.zeros_HSR('S');
     this->genH.calculate_S_no();	
 
     //------------------------------
@@ -303,7 +307,7 @@ void LCAO_Hamilt::calculate_STNR_k(void)
     // and then calculate it
     // and store in GlobalC::LM.Hloc_fixedR.
     //------------------------------
-    GlobalC::LM.zeros_HSR('T', GlobalC::LNNR.nnr);
+    GlobalC::LM.zeros_HSR('T');
     
 
 
@@ -1202,5 +1206,5 @@ void LCAO_Hamilt::clear_zero_elements(const int &current_spin, const double &spa
 
 void LCAO_Hamilt::destroy_all_HSR_sparse(void)
 {
-    GlobalC::LM.destroy_HS_R_sparse();
+	GlobalC::LM.destroy_HS_R_sparse();
 }

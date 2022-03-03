@@ -7,8 +7,6 @@
     - [Link LIBXC](#link-libxc)
 - [Structure of the package](#structure-of-the-package)
   - [Structure of source code](#structure-of-source-code)
-
-  - [Building the program](#building-the-program)
 - [Installation with DeePKS](#installation-with-deepks)
   - [Extra prerequisites](#extra-prerequisites)
   - [Extra settings for building](#extra-settings-for-building)
@@ -78,6 +76,15 @@ If you use Intel toolchain, don't forget to [set environment variables](https://
 
 [back to top](#download-and-install)
 
+### Container Deployment
+
+We offer a pre-built docker image containing all the requirements - you only need to clone and compile `abacus` in the container. Please refer to our [Package Page](https://github.com/deepmodeling/abacus-develop/pkgs/container/abacus-development-kit).
+
+The project is ready for VS Code development container. Please refer to [Developing inside a Container](https://code.visualstudio.com/docs/remote/containers#_quick-start-try-a-development-container). Choose `Open a Remote Window -> Clone a Repository in Container Volume` in VS Code command palette, and put the [git address](https://github.com/deepmodeling/abacus-develop.git) of `ABACUS` when prompted.
+
+We also support [gitpod](https://www.gitpod.io/) to offer an ready-to-use online development environment.
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/deepmodeling/abacus-develop)
+
 ### Build and install ABACUS with CMake
 
 #### Configure
@@ -117,6 +124,12 @@ If Libxc is not installed in standard path (i.e. installed with a custom prefix 
 cmake -B build -DLibxc_DIR=~/libxc
 ```
 
+To build tests for abacus, define `BUILD_TESTING` flag. You can also specify path to local installation of [Googletest](https://github.com/google/googletest) by setting `GTEST_DIR` flags. If not found in local, the configuration process will try to download it automatically.
+
+```bash
+cmake -B build -DBUILD_TESTING=1
+```
+
 #### Build and Install
 
 After configuring, start build and install by:
@@ -125,6 +138,8 @@ After configuring, start build and install by:
 cmake --build build -j9
 cmake --install build
 ```
+
+`-j9` specifies the number of jobs to run simultaneously. You can change the number on your need: set to the number of CPU cores to gain the best performance.
 
 [back to top](#download-and-install)
 

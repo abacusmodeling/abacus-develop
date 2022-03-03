@@ -7,6 +7,8 @@
 #include "H_XC_pw.h"
 #include "../module_base/math_integral.h"
 #include "potential_libxc.h"
+#include "../src_parallel/parallel_reduce.h"
+#include "../module_base/timer.h"
 
 double Forces::output_acc = 1.0e-8; // (Ryd/angstrom).	
 
@@ -16,6 +18,7 @@ Forces::Forces()
 
 Forces::~Forces() {}
 
+#include "../module_base/mathzone.h"
 #include "efield.h"
 void Forces::init(ModuleBase::matrix& force)
 {
@@ -655,6 +658,8 @@ void Forces::cal_force_cc(ModuleBase::matrix& forcecc)
 	return;
 }
 
+#include "../module_base/complexarray.h"
+#include "../module_base/complexmatrix.h"
 void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
 {
 	ModuleBase::TITLE("Forces","cal_force_nl");
@@ -724,6 +729,10 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
 			}
             for (int ib=0; ib<GlobalV::NBANDS; ib++)
             {
+                ///
+                ///only occupied band should be calculated.
+                ///
+                if(GlobalC::wf.wg(ik, ib) < 1.0e-8) continue;
                 for (int i=0; i<nkb; i++)
                 {
                     for (int ig=0; ig<GlobalC::wf.npw; ig++)
@@ -742,6 +751,10 @@ void Forces::cal_force_nl(ModuleBase::matrix& forcenl)
 //		ModuleBase::GlobalFunc::ZEROS(cf, GlobalC::ucell.nat);
 		for (int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
+            ///
+			///only occupied band should be calculated.
+			///
+            if(GlobalC::wf.wg(ik, ib) < 1.0e-8) continue;
 			double fac = GlobalC::wf.wg(ik, ib) * 2.0 * GlobalC::ucell.tpiba;
         	int iat = 0;
         	int sum = 0;
