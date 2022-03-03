@@ -226,7 +226,7 @@ IF (BUILD_TESTING)
   find_package(Threads)
   set(CMAKE_CXX_STANDARD_REQUIRED ON)
   find_package(GTest HINTS /usr/local/lib/ ${GTEST_DIR})
-  if(NOT DEFINED ${GTest_FOUND})
+  if(NOT DEFINED GTest_FOUND)
     include(FetchContent)
     FetchContent_Declare(
       googletest
