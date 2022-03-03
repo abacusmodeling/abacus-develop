@@ -52,7 +52,16 @@ TEST(ContainerOperator,VectorMultiply)
 		EXPECT_EQ(c[i],20.0);
 }
 
-TEST(ContainerOperator,LengthCheck)
+TEST(ContainerOperator,VectorLengthCheck)
+{
+	std::vector<double> a(20,10.0);
+	std::vector<double> b(19,1.0);
+	std::vector<double> c(20);
+	EXPECT_DEATH(c=a+b,"");
+	EXPECT_DEATH(c=a-b,"");
+}
+
+TEST(ContainerOperator,MapLengthCheck)
 {
 	std::map<int,double> a;
 	std::map<int,double> b;
