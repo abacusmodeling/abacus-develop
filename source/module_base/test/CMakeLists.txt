@@ -78,6 +78,11 @@ AddTest(
   SOURCES math_ylmreal_test.cpp ../math_ylmreal.cpp ../ylm.cpp ../realarray.cpp ../timer.cpp ../matrix.cpp ../vector3.h 
 )
 AddTest(
+  TARGET base_gram_schmidt_orth
+  LIBS ${math_libs}
+  SOURCES gram_schmidt_orth_test.cpp ../gram_schmidt_orth.h ../gram_schmidt_orth-inl.h ../global_function.h ../mathzone.h ../math_integral.cpp
+)
+AddTest(
   TARGET base_mathzone_add1
   LIBS ${math_libs}
   SOURCES mathzone_add1_test.cpp ../mathzone_add1.cpp ../math_sphbes.cpp ../mathzone.cpp ../matrix3.cpp ../matrix.cpp ../tool_quit.cpp ../global_variable.cpp ../global_file.cpp ../memory.cpp ../timer.cpp
