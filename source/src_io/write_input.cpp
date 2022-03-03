@@ -52,6 +52,7 @@ void Input::Print(const std::string &fn)const
 		ModuleBase::GlobalFunc::OUTP(ofs,"diago_david_ndim",diago_david_ndim,"max dimension for davidson");
 	}
 	ModuleBase::GlobalFunc::OUTP(ofs,"ethr",ethr,"threshold for eigenvalues is cg electron iterations");
+	ModuleBase::GlobalFunc::OUTP(ofs,"dr2",dr2,"charge density error");
 	ModuleBase::GlobalFunc::OUTP(ofs,"start_wfc",start_wfc,"start wave functions are from 'atomic' or 'file'");
 	ModuleBase::GlobalFunc::OUTP(ofs,"start_charge",start_pot,"start charge is from 'atomic' or file");
 	ModuleBase::GlobalFunc::OUTP(ofs,"charge_extrap",charge_extrap,"atomic; first-order; second-order; dm:coefficients of SIA");

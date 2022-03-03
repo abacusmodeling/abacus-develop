@@ -18,7 +18,7 @@ namespace Read_Txt_Input
 	{
 		this->output_labels.push_back("Parameters (1.General)");
 
-		/*{	// LDA ; LSDA ; non-linear spin
+		{
 			Input_Item item("nspin");
 			item.default_1(1);
 			item.annotation = "1: single spin; 2: up and down spin; 4: noncollinear spin";
@@ -32,9 +32,9 @@ namespace Read_Txt_Input
 				GlobalV::NSPIN = self.values[0].geti();
 			};
 			this->add_item(item);
-		}*/
+		}
 
-		/*{	// number of atom types
+		{
 			Input_Item item("ntype");
 			item.default_1(0);
 			item.annotation = "atom species number";
@@ -48,9 +48,9 @@ namespace Read_Txt_Input
 				GlobalC::ucell.ntype = self.values[0].geti();
 			};
 			this->add_item(item);
-		}*/
+		}
 
-		/*{	// turn on symmetry or not
+		{
 			Input_Item item("symmetry");
 			item.default_1(false);
 			item.annotation = "turn symmetry on or off";
@@ -59,6 +59,6 @@ namespace Read_Txt_Input
 				ModuleSymmetry::Symmetry::symm_flag = self.values[0].getb();
 			};
 			this->add_item(item);
-		}*/
+		}
 	}
 }
