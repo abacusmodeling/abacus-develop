@@ -5,7 +5,6 @@
 #include <vector>
 #include <map>
 
-
 template< typename T>
 std::vector<T> operator + ( const std::vector<T> & x1, const std::vector<T> & x2 )
 {
@@ -29,6 +28,7 @@ std::vector<T> operator - ( const std::vector<T> & x1, const std::vector<T> & x2
 template< typename T1, typename T2 >
 std::map<T1,T2> operator + ( const std::map<T1,T2> & x1, const std::map<T1,T2> & x2 )
 {
+	assert(x1.size()==x2.size());
 	std::map<T1,T2> x;
 	for( const auto &x1i : x1 )
 		x.insert(std::make_pair( x1i.first, x1i.second + x2.at(x1i.first) ));
@@ -38,6 +38,7 @@ std::map<T1,T2> operator + ( const std::map<T1,T2> & x1, const std::map<T1,T2> &
 template< typename T1, typename T2 >
 std::map<T1,T2> operator - ( const std::map<T1,T2> & x1, const std::map<T1,T2> & x2 )
 {
+	assert(x1.size()==x2.size());
 	std::map<T1,T2> x;
 	for( const auto &x1i : x1 )
 		x.insert(std::make_pair( x1i.first, x1i.second - x2.at(x1i.first) ));
