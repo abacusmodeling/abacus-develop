@@ -46,7 +46,7 @@ std::vector<std::vector<Func_Type>> Gram_Schmidt_Orth<Func_Type,R_Type>::cal_ort
 		//use CGS2 algorithm to do twice orthogonalization 
 		//DOI 10.1007/s00211-005-0615-4
 		std::vector<Func_Type> func_try = func[if1];
-		for(int niter=0;niter<2;niter++)
+		for(int niter=0;niter<3;niter++)
 		{
 			std::vector<Func_Type> func_tmp = func_try;
 			for( size_t if_minus=0; if_minus!=func_new.size(); ++if_minus )
