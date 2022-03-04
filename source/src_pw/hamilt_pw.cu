@@ -1553,7 +1553,7 @@ void Hamilt_PW::add_nonlocal_pp_cuda(
             hpsi_in,
             GlobalC::wf.npwx));
 	}
-	if(m == 1)
+	if(m != 1)
 	{
 		CHECK_CUDA(cudaFree(ps));
 	}

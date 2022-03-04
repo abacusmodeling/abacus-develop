@@ -992,7 +992,7 @@ This part of variables are relevant when using hybrid functionals
 
 - exx_hybrid_type<a id="exx-hybrid-type"></a>
     - *Type*: String
-    - *Description*: Type of hybrid functional used. Options are "hf" (pure Hartree-Fock), "pbe0"(PBE0), "hse" (Note: in order to use HSE functional, LIBXC is required).
+    - *Description*: Type of hybrid functional used. Options are "hf" (pure Hartree-Fock), "pbe0"(PBE0), "hse" (Note: in order to use HSE functional, LIBXC is required). Note also that HSE has been tested while PBE0 has NOT been fully tested yet, and the maxmum parallel cpus for running exx is Nx(N+1)/2, with N being the number of atoms.
 
     
         If set to "no", then no hybrid functional is used (i.e.,Fock exchange is not included.)
@@ -1023,7 +1023,7 @@ adial integration for pseudopotentials, in Bohr.
 
 - exx_pca_threshold<a id="exx-pca-threshold"></a>
     - *Type*: Real
-    - *Description*: To accelerate the evaluation of four-center integrals (ik|jl), the product of atomic orbitals are expanded in the basis of auxiliary basis functions (ABF): &phi;<sub>i</sub>&phi;<sub>j</sub>~C<sup>k</sup><sub>ij</sub>P<sub>k</sub>. The size of the ABF (i.e. number of P<sub>k</sub>) is reduced using principal component analysis. When a large PCA threshold is used, the number of ABF will be reduced, hence the calculations becomes faster. However this comes at the cost of computational accuracy. A relatively safe choice of the value is 1d-3.
+    - *Description*: To accelerate the evaluation of four-center integrals (ik|jl), the product of atomic orbitals are expanded in the basis of auxiliary basis functions (ABF): &phi;<sub>i</sub>&phi;<sub>j</sub>~C<sup>k</sup><sub>ij</sub>P<sub>k</sub>. The size of the ABF (i.e. number of P<sub>k</sub>) is reduced using principal component analysis. When a large PCA threshold is used, the number of ABF will be reduced, hence the calculations becomes faster. However this comes at the cost of computational accuracy. A relatively safe choice of the value is 1d-4.
     - *Default*: 0
 
     [back to top](#input-file)
@@ -1044,21 +1044,21 @@ adial integration for pseudopotentials, in Bohr.
 
 - exx_dm_threshold<a id="exx-dm-threshold"></a>
     - *Type*: Real
-    - *Description*: The Fock exchange can be expressed as &Sigma;<sub>k,l</sub>(ik|jl)D<sub>kl</sub> where D is the density matrix. Smaller values of the density matrix can be truncated to accelerate calculation. The larger the threshold is, the faster the calculation and the lower the accuracy. A relatively safe choice of the value is 1d-3.
+    - *Description*: The Fock exchange can be expressed as &Sigma;<sub>k,l</sub>(ik|jl)D<sub>kl</sub> where D is the density matrix. Smaller values of the density matrix can be truncated to accelerate calculation. The larger the threshold is, the faster the calculation and the lower the accuracy. A relatively safe choice of the value is 1d-4.
     - *Default*: 0
 
     [back to top](#input-file)
 
 - exx_schwarz_threshold<a id="exx-schwarz-threshold"></a>
     - *Type*: Real
-    - *Description*: In practice the four-center integrals are sparse, and using Cauchy-Schwartz inequality, we can find an upper bound of each integral before carrying out explicit evaluations. Those that are smaller than exx_schwarz_threshold will be truncated. The larger the threshold is, the faster the calculation and the lower the accuracy. A relatively safe choice of the value is 1d-4.
+    - *Description*: In practice the four-center integrals are sparse, and using Cauchy-Schwartz inequality, we can find an upper bound of each integral before carrying out explicit evaluations. Those that are smaller than exx_schwarz_threshold will be truncated. The larger the threshold is, the faster the calculation and the lower the accuracy. A relatively safe choice of the value is 1d-5.
     - *Default*: 0
 
     [back to top](#input-file)
 
 - exx_cauchy_threshold<a id="exx-cauchy-threshold"></a>
     - *Type*: Real
-    - *Description*: In practice the Fock exchange matrix is sparse, and using Cauchy-Schwartz inequality, we can find an upper bound of each matrix element before carrying out explicit evaluations. Those that are smaller than exx_cauchy_threshold will be truncated. The larger the threshold is, the faster the calculation and the lower the accuracy. A relatively safe choice of the value is 1d-6.
+    - *Description*: In practice the Fock exchange matrix is sparse, and using Cauchy-Schwartz inequality, we can find an upper bound of each matrix element before carrying out explicit evaluations. Those that are smaller than exx_cauchy_threshold will be truncated. The larger the threshold is, the faster the calculation and the lower the accuracy. A relatively safe choice of the value is 1d-7.
     - *Default*: 0
 
     [back to top](#input-file)
