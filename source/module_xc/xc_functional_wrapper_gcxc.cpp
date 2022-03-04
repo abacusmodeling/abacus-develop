@@ -48,37 +48,43 @@ void XC_Functional::gcxc(const double &rho, const double &grho, double &sxc,
     {
         switch( id )
         {
-            case 106: //B88
+            case XC_GGA_X_B88: //B88
                 XC_Functional::becke88(rho, grho, s, v1, v2);break;
-            case 109: //PW91_X
+            case XC_GGA_X_PW91: //PW91_X
                 XC_Functional::ggax(rho, grho, s, v1, v2);break;
-            case 101: //PBX
+            case XC_GGA_X_PBE: //PBX
                 XC_Functional::pbex(rho, grho, 0, s, v1, v2);break;
-            case 117: //revised PBX
+            case XC_GGA_X_RPBE: //revised PBX
                 XC_Functional::pbex(rho, grho, 1, s, v1, v2);break;
-            case 34: //HCTH_X
+            case XC_GGA_X_HCTH_A: //HCTH_X
                 XC_Functional::hcth(rho, grho, s, v1, v2);break; //XC together
-            case 97: //HCTH_C
+            case XC_GGA_C_HCTH_A: //HCTH_C
                 s = 0.0; v1 = 0.0; v2 = 0.0;break;
-            case 110: //OPTX
+            case XC_GGA_X_OPTX: //OPTX
                 XC_Functional::optx(rho, grho, s, v1, v2);break;
-            case 406: //PBE0
-                XC_Functional::pbex(rho, grho, 0, s, v1, v2);
-                s *= 0.75; v1 *= 0.75; v2 *= 0.75;break;
-            case 116: //PBXsol
+            case XC_GGA_X_PBE_SOL: //PBXsol
                 XC_Functional::pbex(rho, grho, 2, s, v1, v2);break;
-            case 118: //Wu-Cohen
+            case XC_GGA_X_WC: //Wu-Cohen
                 XC_Functional::wcx (rho, grho, s, v1, v2);break;
-            case 132: //P86
+            case XC_GGA_C_P86: //P86
                 XC_Functional::perdew86(rho, grho, s, v1, v2);break;
-            case 134: //PW91_C
+            case XC_GGA_C_PW91: //PW91_C
                 XC_Functional::ggac(rho, grho, s, v1, v2);break;
-            case 130: //PBC
+            case XC_GGA_C_PBE: //PBC
                 XC_Functional::pbec(rho, grho, 0, s, v1, v2);break;
-            case 133: //PBCsol
+            case XC_GGA_C_PBE_SOL: //PBCsol
                 XC_Functional::pbec(rho, grho, 1, s, v1, v2);break;
-            case 131: //BLYP
+            case XC_GGA_C_LYP: //BLYP
                 XC_Functional::glyp(rho, grho, s, v1, v2); break;
+            case XC_HYB_GGA_XC_PBEH: //PBE0
+                double sx, v1x, v2x, sc, v1c, v2c;
+                XC_Functional::pbex(rho, grho, 0, sx, v1x, v2x);
+                sx *= 0.75; v1x *= 0.75; v2x *= 0.75;
+                XC_Functional::pbec(rho, grho, 0, sc, v1c, v2c);
+                s = sx + sc;
+                v1 = v1x + v1c;
+                v2 = v2x + v2c;
+                break;
             default: //SCAN_X,SCAN_C,HSE, and so on
                 throw std::domain_error("functional unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
         }
@@ -137,7 +143,7 @@ void XC_Functional::gcx_spin(double rhoup, double rhodw, double grhoup2, double 
         int id = func_id[0];
         switch( id )
         {
-            case 106: //B88
+            case XC_GGA_X_B88: //B88
                 if (rhoup > small && sqrt(fabs(grhoup2)) > small)
                 {
                     XC_Functional::becke88_spin(rhoup, grhoup2, sxup, v1xup, v2xup);
@@ -147,7 +153,7 @@ void XC_Functional::gcx_spin(double rhoup, double rhodw, double grhoup2, double 
                     XC_Functional::becke88_spin(rhodw, grhodw2, sxdw, v1xdw, v2xdw);
                 }
                 break;
-            case 101: //PBX
+            case XC_GGA_X_PBE: //PBX
                 if (rhoup > small && sqrt(fabs(grhoup2)) > small)
                 {
                     XC_Functional::pbex(2.0 * rhoup, 4.0 * grhoup2, 0, sxup, v1xup, v2xup);
@@ -157,7 +163,7 @@ void XC_Functional::gcx_spin(double rhoup, double rhodw, double grhoup2, double 
                     XC_Functional::pbex(2.0 * rhodw, 4.0 * grhodw2, 0, sxdw, v1xdw, v2xdw);
                 }
                 break;
-            case 117: //revised PBX
+            case XC_GGA_X_RPBE: //revised PBX
                 if (rhoup > small && sqrt(fabs(grhoup2)) > small)
                 {
                     XC_Functional::pbex(2.0 * rhoup, 4.0 * grhoup2, 1, sxup, v1xup, v2xup);
@@ -167,7 +173,7 @@ void XC_Functional::gcx_spin(double rhoup, double rhodw, double grhoup2, double 
                     XC_Functional::pbex(2.0 * rhodw, 4.0 * grhodw2, 1, sxdw, v1xdw, v2xdw);
                 }
                 break;
-            case 406: //PBE0
+            case XC_HYB_GGA_XC_PBEH: //PBE0
                 if (rhoup > small && sqrt(fabs(grhoup2)) > small)
                 {
                     XC_Functional::pbex(2.0 * rhoup, 4.0 * grhoup2, 0, sxup, v1xup, v2xup);
@@ -179,7 +185,7 @@ void XC_Functional::gcx_spin(double rhoup, double rhodw, double grhoup2, double 
         	    	sxdw *= 0.75; v1xdw *= 0.75; v2xdw *= 0.75;            
                 }
                 break;
-            case 116: //PBXsol
+            case XC_GGA_X_PBE_SOL: //PBXsol
                 if (rhoup > small && sqrt(fabs(grhoup2)) > small)
                 {
                     XC_Functional::pbex(2.0 * rhoup, 4.0 * grhoup2, 2, sxup, v1xup, v2xup);
@@ -253,20 +259,27 @@ void XC_Functional::gcc_spin(double rho, double &zeta, double grho, double &sc,
 		}
     } //endif
 
+    if(func_id[0]==XC_HYB_GGA_XC_PBEH)
+    {
+        XC_Functional::pbec_spin(rho, zeta, grho, 1, sc, v1cup, v1cdw, v2c);
+        return;
+    }
+
     //for(int id : func_id)
     //{
         int id = func_id[1];
         switch( id )
         {          
-            case 132: //P86
+            case XC_GGA_C_P86: //P86
                 XC_Functional::perdew86_spin(rho, zeta, grho, sc, v1cup, v1cdw, v2c);break;
-            case 134: //PW91_C
+            case XC_GGA_C_PW91: //PW91_C
                 XC_Functional::ggac_spin(rho, zeta, grho, sc, v1cup, v1cdw, v2c);break;
-            case 130: //PBC
+            case XC_GGA_C_PBE: //PBC
                 XC_Functional::pbec_spin(rho, zeta, grho, 1, sc, v1cup, v1cdw, v2c);break;
-            case 133: //PBCsol
+            case XC_GGA_C_PBE_SOL: //PBCsol
                 XC_Functional::pbec_spin(rho, zeta, grho, 2, sc, v1cup, v1cdw, v2c);break;
         }
+
     //}
     return;
 } //end subroutine gcc_spin

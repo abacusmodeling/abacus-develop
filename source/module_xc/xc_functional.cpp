@@ -147,6 +147,10 @@ void XC_Functional::set_xc_type(const std::string xc_func_in)
     }
 
 #ifndef USE_LIBXC
+    if(xc_func == "SCAN" || xc_func == "HSE")
+    {
+        ModuleBase::WARNING_QUIT("set_xc_type","to use SCAN or HSE, LIBXC is required");
+    }
     use_libxc = false;
 #endif
 

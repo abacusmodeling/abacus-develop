@@ -165,10 +165,9 @@ void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v, 
 				if(func_type == 3 && is_stress) //the gradcorr part to stress of mGGA
 				{
 #ifdef USE_LIBXC
-					double sx, sc, v1x, v2x, v3x, v1c, v2c, v3c;
+					double v3xc;
 					double atau = GlobalC::CHR.kin_r[0][ir]/2.0;
-					XC_Functional::tau_xc( arho, grho2a, atau, sx, sc, v1x, v2x, v3x, v1c, v2c, v3c);
-					v2xc = v2x + v2c;
+					XC_Functional::tau_xc( arho, grho2a, atau, sxc, v1xc, v2xc, v3xc);
 #endif
 				}
 				else

@@ -1,8 +1,8 @@
+// This file is a list of functionals that we have realized
 #define  XC_LDA_X                         1  /*Exchange                                                              */
 #define  XC_LDA_C_PZ                      9  /*Perdew & Zunger                                                       */
 #define  XC_LDA_C_PW                     12  /*Perdew & Wang                                                         */
 #define  XC_HYB_GGA_XC_PBEH             406  /*aka PBE0 or PBE1PBE                                                   */
-#define  XC_HYB_GGA_XC_HSE06            428  /* the 2006 version of the screened hybrid HSE                          */
 #define  XC_GGA_X_HCTH_A                 34  /*HCTH-A                                                                */
 #define  XC_GGA_C_HCTH_A                 97  /*HCTH-A                                                                */
 #define  XC_GGA_X_PBE                   101  /*Perdew, Burke & Ernzerhof exchange                                    */
@@ -17,5 +17,3 @@
 #define  XC_GGA_C_P86                   132  /*Perdew 86                                                             */
 #define  XC_GGA_C_PBE_SOL               133  /* Perdew, Burke & Ernzerhof correlation SOL                            */
 #define  XC_GGA_C_PW91                  134  /*Perdew & Wang 91                                                      */
-#define  XC_MGGA_X_SCAN                 263  /*SCAN exchange of Sun, Ruzsinszky, and Perdew                          */
-#define  XC_MGGA_C_SCAN                 267  /*SCAN correlation                                                      */
