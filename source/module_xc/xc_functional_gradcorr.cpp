@@ -1,3 +1,13 @@
+// This file contains subroutines realted to gradient calculations
+// it contains 5 subroutines:
+// 1. gradcorr, which calculates gradient correction
+// 2. grad_wfc, which calculates gradient of wavefunction
+//		it is used in stress_func_mgga.cpp
+// 3. grad_rho, which calculates gradient of density
+// 4. grad_dot, which calculates divergence of something
+// 5. noncolin_rho, which diagonalizes the spin density matrix
+//  and gives the spin up and spin down components of the charge.
+
 #include "../src_pw/global.h"
 #include "xc_functional.h"
 

@@ -219,7 +219,11 @@ class XC_Functional
 // it contains 5 subroutines:
 // 1. gradcorr, which calculates gradient correction
 // 2. grad_wfc, which calculates gradient of wavefunction
-// 
+//		it is used in stress_func_mgga.cpp
+// 3. grad_rho, which calculates gradient of density
+// 4. grad_dot, which calculates divergence of something
+// 5. noncolin_rho, which diagonalizes the spin density matrix
+//  and gives the spin up and spin down components of the charge.
 
 	public:
 
@@ -227,10 +231,26 @@ class XC_Functional
 	static void grad_wfc( const std::complex<double> *rhog, const int ik, std::complex<double> **grad, const int npw );
 
 	private:
-	
+
 	static void grad_rho( const std::complex<double> *rhog, ModuleBase::Vector3<double> *gdr );
 	static void grad_dot( const ModuleBase::Vector3<double> *h, double *dh);
 	static void noncolin_rho(double *rhoout1,double *rhoout2,double *seg);
+
+//-------------------
+//  xc_funct_exch_lda.cpp
+//-------------------
+
+// This file contains realization of LDA exchange functionals
+// Spin unpolarized ones:
+//  1. slater: ordinary Slater exchange with alpha=2/3
+//  2. slater1: Slater exchange with alpha=1
+//  3. slater_rxc : Slater exchange with alpha=2/3 and Relativistic exchange
+// And their spin polarized counterparts:
+//  1. slater_spin
+//  2. slater1_spin
+//  3. slater_rxc_spin
+
+	private:
 
 	// For LDA exchange energy
 	static void slater(const double &rs, double &ex, double &vx);
@@ -245,58 +265,108 @@ class XC_Functional
 	static void slater_rxc_spin( const double &rho, const double &z,
 		double &ex, double &vxup, double &vxdw);
 
+//-------------------
+//  xc_funct_corr_lda.cpp
+//-------------------
+
+// This file contains realization of LDA correlation functionals
+// Spin unpolarized ones:
+//  1. pw : Perdew-Wang LDA correlation
+//  2. pz : Perdew-Zunger LDA correlation
+//  3. lyp : Lee-Yang-Parr correlation
+//  4. vwn : Vosko-Wilk-Nusair LDA correlation
+//  5. wigner : Wigner
+//  6. hl : Hedin-Lunqvist
+//  7. gl : Gunnarson-Lunqvist
+// And some of their spin polarized counterparts:
+//  1. pw_spin
+//  2. pz_spin, which calls pz_polarized
+
+	private:
+
 	// For LDA correlation energy
-	static void pz(const double &rs, const int &iflag, double &ec, double &vc);
-	static void vwn(const double &rs, double &ec, double &vc);
 	static void pw(const double &rs, const int &iflag, double &ec, double &vc);
+	static void pz(const double &rs, const int &iflag, double &ec, double &vc);
 	static void lyp(const double &rs, double &ec, double &vc);
+	static void vwn(const double &rs, double &ec, double &vc);
 	static void wigner(const double &rs, double &ec, double &vc);
 	static void hl(const double &rs, double &ec, double &vc);
 	static void gl(const double &rs, double &ec, double &vc);
 
 	// For LSDA correlation energy
-	// pz and pz_polarized should be put together
+	static void pw_spin( const double &rs, const double &zeta,
+        double &ec, double &vcup, double &vcdw);
 	static void pz_spin( const double &rs, const double &zeta,
     	double &ec, double &vcup, double &vcdw);
 	static void pz_polarized( const double &rs, double &ec, double &vc);
-	static void pw_spin( const double &rs, const double &zeta,
-        double &ec, double &vcup, double &vcdw);
 
-	// PBEx, PBEc
+//-------------------
+//  xc_funct_exch_gga.cpp
+//-------------------
+
+// This file contains realizations of gradient correction to exchange part
+// Spin unpolarized ones:
+//  1. becke88 : Becke88 exchange
+//  2. ggax : PW91 exchange
+//  3. pbex : PBE exchange (and revPBE)
+//  4. optx : OPTX, Handy et al.
+//  5. wcx : Wu-Cohen exchange
+// And some of their spin polarized counterparts:
+//  1. becke88_spin
+
+	private:
+
+	static void becke88(const double &rho, const double &grho, double &sx, double &v1x, double &v2x);
+	static void ggax(const double &rho, const double &grho, double &sx, double &v1x, double &v2x);
 	static void pbex(const double &rho, const double &grho, const int &iflag,
 		double &sx, double &v1x, double &v2x);
-
-	static void pbec(const double &rho, const double &grho, const int &flag,
-		double &sc, double &v1c, double &v2c);
-
-	// some GGA functionals
-	static void hcth(const double rho, const double grho, double &sx, double &v1x, double &v2x);
-	static void pwcorr(const double r, const double c[], double &g, double &dg);
 	static void optx(const double rho, const double grho, double &sx, double &v1x, double &v2x);
-	
-	// For PW86 correlation functional
-	static void perdew86(const double rho, const double grho, double &sc, double &v1c, double &v2c);
-
-	// For PW91
-	static void ggax(const double &rho, const double &grho, double &sx, double &v1x, double &v2x);
-	static void ggac(const double &rho,const double &grho, double &sc, double &v1c, double &v2c);
-
-	// For Wu-Cohen
 	static void wcx(const double &rho,const double &grho, double &sx, double &v1x, double &v2x);
 
-	// For BLYP
-	static void becke88(const double &rho, const double &grho, double &sx, double &v1x, double &v2x);
+	static void becke88_spin(double rho, double grho, double &sx, double &v1x,
+		double &v2x);
+
+//-------------------
+//  xc_funct_corr_gga.cpp
+//-------------------
+
+// This file contains realizations of gradient correction to correlation part
+// Spin unpolarized ones:
+//  1. perdew86 : P86
+//  2. ggac : PW91
+//  3. pbec
+//  4. glyp
+// And some of their spin polarized counterparts:
+//  1. perdew86_spin
+//  2. ggac_spin
+//  3. pbec_spin
+
+	private:
+	
+	static void perdew86(const double rho, const double grho, double &sc, double &v1c, double &v2c);
+	static void ggac(const double &rho,const double &grho, double &sc, double &v1c, double &v2c);
+	static void pbec(const double &rho, const double &grho, const int &flag,
+		double &sc, double &v1c, double &v2c);
 	static void glyp(const double &rho, const double &grho, double &sc, double &v1c, double &v2c);
 
-	// spin-polarized GGA
-	static void becke88_spin(double rho, double grho, double &sx, double &v1x,
-			double &v2x);
 	static void perdew86_spin(double rho, double zeta, double grho, double &sc,
-			double &v1cup, double &v1cdw, double &v2c);
+		double &v1cup, double &v1cdw, double &v2c);
 	static void ggac_spin(double rho, double zeta, double grho, double &sc,
-			double &v1cup, double &v1cdw, double &v2c);
+		double &v1cup, double &v1cdw, double &v2c);
 	static void pbec_spin(double rho, double zeta, double grho, const int &flag, double &sc,
-			double &v1cup, double &v1cdw, double &v2c);
+		double &v1cup, double &v1cdw, double &v2c);
+
+//-------------------
+//  xc_funct_hcth.cpp
+//-------------------
+// This file contains realizations of the HCTH GGA functional
+// hcth calls pwcorr
+
+	private:
+	
+	static void hcth(const double rho, const double grho, double &sx, double &v1x, double &v2x);
+	static void pwcorr(const double r, const double c[], double &g, double &dg);
+
 };
 
 #endif //XC_FUNCTION_H
