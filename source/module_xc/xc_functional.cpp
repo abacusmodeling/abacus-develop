@@ -141,6 +141,10 @@ void XC_Functional::set_xc_type(const std::string xc_func_in)
     {
         ModuleBase::WARNING_QUIT("set_xc_type","hybrid functional not realized for planewave yet");
     }
+    if(func_type == 3 && GlobalV::STRESS == 1 && GlobalV::NSPIN!=1)
+    {
+        ModuleBase::WARNING_QUIT("set_xc_type","mgga stress not implemented for polarized case yet");
+    }
 
 #ifndef USE_LIBXC
     use_libxc = false;
