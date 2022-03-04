@@ -69,7 +69,7 @@ class XC_Functional
 		ModuleBase::Vector3<double> gdr1, ModuleBase::Vector3<double> gdr2,
         double &sxc, double &v1xcup, double &v1xcdw, double &v2xcup, double &v2xcdw, double &v2xcud);
 
-	static void gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v);
+	static void gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v, std::vector<double> &stress_gga, const bool is_stress = 0);
 	static void grad_rho( const std::complex<double> *rhog, ModuleBase::Vector3<double> *gdr );
 	static void grad_wfc( const std::complex<double> *rhog, const int ik, std::complex<double> **grad, const int npw );
 	static void grad_dot( const ModuleBase::Vector3<double> *h, double *dh);

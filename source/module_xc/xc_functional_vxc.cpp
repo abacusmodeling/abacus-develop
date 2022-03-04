@@ -160,7 +160,11 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc(
 
     // add gradient corrections (if any)
     // mohan modify 2009-12-15
-    gradcorr(etxc, vtxc, v);
+
+    // the dummy variable dum contains gradient correction to stress
+    // which is not used here
+    std::vector<double> dum;
+    gradcorr(etxc, vtxc, v, dum);
 
     // parallel code : collect vtxc,etxc
     // mohan add 2008-06-01

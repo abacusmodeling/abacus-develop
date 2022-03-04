@@ -2,7 +2,7 @@
 #include "xc_functional.h"
 
 // from gradcorr.f90
-void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
+void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v, std::vector<double> &stress_gga, const bool is_stress)
 {
 	ModuleBase::TITLE("XC_Functional","gradcorr");
 	
@@ -18,6 +18,15 @@ void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 
 	assert(nspin0>0);
 	const double fac = 1.0/ nspin0;
+
+	if(is_stress)
+	{
+		stress_gga.resize(9);
+		for(int i=0;i<9;i++)
+		{
+			stress_gga[i] = 0.0;
+		}
+	}
 
 	// doing FFT to get rho in G space: rhog1 
     GlobalC::CHR.set_rhog(GlobalC::CHR.rho[0], GlobalC::CHR.rhog[0]);
@@ -51,7 +60,7 @@ void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 	for(int ig=0; ig<GlobalC::pw.ngmc; ig++) rhogsum1[ig] = GlobalC::CHR.rhog[0][ig] + fac * GlobalC::CHR.rhog_core[ig];
 
 	gdr1 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
-	h1 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
+	if(!is_stress)	h1 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
 	
 	XC_Functional::grad_rho( rhogsum1 , gdr1 );
 
@@ -67,7 +76,7 @@ void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 		for(int ig=0; ig<GlobalC::pw.ngmc; ig++) rhogsum2[ig] = GlobalC::CHR.rhog[1][ig] + fac * GlobalC::CHR.rhog_core[ig];
 
 		gdr2 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
-		h2 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
+		if(!is_stress) h2 = new ModuleBase::Vector3<double>[GlobalC::pw.nrxx];
 		
 		XC_Functional::grad_rho( rhogsum2 , gdr2 );
 	}
@@ -80,17 +89,19 @@ void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 		ModuleBase::GlobalFunc::ZEROS(rhotmp2, GlobalC::pw.nrxx);
  		neg = new double [GlobalC::pw.nrxx];
 		ModuleBase::GlobalFunc::ZEROS(neg, GlobalC::pw.nrxx);
-		vsave = new double* [GlobalV::NSPIN];
-		for(int is = 0;is<GlobalV::NSPIN;is++) {
-			vsave[is]= new double [GlobalC::pw.nrxx];
-			for(int ir =0;ir<GlobalC::pw.nrxx;ir++){
-				vsave[is][ir] = v(is,ir);
-				v(is,ir) = 0;
+		if(!is_stress)
+		{
+			vsave = new double* [GlobalV::NSPIN];
+			for(int is = 0;is<GlobalV::NSPIN;is++) {
+				vsave[is]= new double [GlobalC::pw.nrxx];
+				for(int ir =0;ir<GlobalC::pw.nrxx;ir++){
+					vsave[is][ir] = v(is,ir);
+					v(is,ir) = 0;
+				}
 			}
+			vgg = new double* [nspin0];
+			for(int is = 0;is<nspin0;is++)vgg[is] = new double[GlobalC::pw.nrxx];
 		}
-		vgg = new double* [nspin0];
-		for(int is = 0;is<nspin0;is++)vgg[is] = new double[GlobalC::pw.nrxx];
-
 		noncolin_rho(rhotmp1,rhotmp2,neg);
 
 		rhogsum2 = new std::complex<double>[GlobalC::pw.ngmc];
@@ -133,7 +144,7 @@ void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
 			const double arho = std::abs( rhotmp1[ir] );
-			h1[ir].x = h1[ir].y = h1[ir].z = 0.0;
+			if(!is_stress) h1[ir].x = h1[ir].y = h1[ir].z = 0.0;
 
 			if(arho > epsr)
 			{
@@ -143,16 +154,34 @@ void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 				if( rhotmp1[ir] < 0.0 ) segno = -1.0;
 				
 				XC_Functional::gcxc( arho, grho2a, sxc, v1xc, v2xc);
-				// first term of the gradient correction:
-				// D(rho*Exc)/D(rho)
-				v(0, ir) += ModuleBase::e2 * v1xc;
-				
-				// h contains
-				// D(rho*Exc) / D(|grad rho|) * (grad rho) / |grad rho|
-				h1[ir] = ModuleBase::e2 * v2xc * gdr1[ir];
-				
-				vtxcgc += ModuleBase::e2* v1xc * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] );
-				etxcgc += ModuleBase::e2* sxc  * segno;
+				if(is_stress)
+				{
+					double tt[3];
+					tt[0] = gdr1[ir].x;
+					tt[1] = gdr1[ir].y;
+					tt[2] = gdr1[ir].z;
+					for(int l = 0;l< 3;l++)
+					{
+						for(int m = 0;m< l+1;m++)
+						{
+							int ind = l*3 + m;
+							stress_gga[ind] += tt[l] * tt[m] * ModuleBase::e2 * v2xc;
+						}
+					}
+				}
+				else
+				{
+					// first term of the gradient correction:
+					// D(rho*Exc)/D(rho)
+					v(0, ir) += ModuleBase::e2 * v1xc;
+					
+					// h contains
+					// D(rho*Exc) / D(|grad rho|) * (grad rho) / |grad rho|
+					h1[ir] = ModuleBase::e2 * v2xc * gdr1[ir];
+					
+					vtxcgc += ModuleBase::e2* v1xc * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] );
+					etxcgc += ModuleBase::e2* sxc  * segno;
+				}
 			} // end arho > epsr
 		}
 	}// end nspin0 == 1
@@ -165,17 +194,43 @@ void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 				double sxc, v1xcup, v1xcdw, v2xcup, v2xcdw, v2xcud;
 				XC_Functional::gcxc_spin_libxc(rhotmp1[ir], rhotmp2[ir], gdr1[ir], gdr2[ir], 
 					sxc, v1xcup, v1xcdw, v2xcup, v2xcdw, v2xcud);
-				// first term of the gradient correction : D(rho*Exc)/D(rho)
-				v(0,ir) += ModuleBase::e2 * v1xcup;
-				v(1,ir) += ModuleBase::e2 * v1xcdw;
-			
-				// h contains D(rho*Exc)/D(|grad rho|) * (grad rho) / |grad rho|
-				h1[ir] += ModuleBase::e2 * ( v2xcup * gdr1[ir] + v2xcud * gdr2[ir] );
-				h2[ir] += ModuleBase::e2 * ( v2xcdw * gdr2[ir] + v2xcud * gdr1[ir] );
+				if(is_stress)
+				{
+					double tt1[3],tt2[3];
+					{
+						tt1[0] = gdr1[ir].x;
+						tt1[1] = gdr1[ir].y;
+						tt1[2] = gdr1[ir].z;
+						tt2[0] = gdr2[ir].x;
+						tt2[1] = gdr2[ir].y;
+						tt2[2] = gdr2[ir].z;
+					}
+					for(int l = 0;l< 3;l++)
+					{
+						for(int m = 0;m< l+1;m++)
+						{
+							int ind = l*3 + m;
+							stress_gga [ind] += ( tt1[l] * tt1[m] * v2xcup + 
+									tt2[l] * tt2[m] * v2xcdw + 
+									(tt1[l] * tt2[m] +
+									tt2[l] * tt1[m] ) * v2xcud ) * ModuleBase::e2;
+						}
+					}
+				}
+				else
+				{
+					// first term of the gradient correction : D(rho*Exc)/D(rho)
+					v(0,ir) += ModuleBase::e2 * v1xcup;
+					v(1,ir) += ModuleBase::e2 * v1xcdw;
+				
+					// h contains D(rho*Exc)/D(|grad rho|) * (grad rho) / |grad rho|
+					h1[ir] += ModuleBase::e2 * ( v2xcup * gdr1[ir] + v2xcud * gdr2[ir] );
+					h2[ir] += ModuleBase::e2 * ( v2xcdw * gdr2[ir] + v2xcud * gdr1[ir] );
 
-				vtxcgc = vtxcgc + ModuleBase::e2 * v1xcup * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] * fac );
-				vtxcgc = vtxcgc + ModuleBase::e2 * v1xcdw * ( rhotmp2[ir] - GlobalC::CHR.rho_core[ir] * fac );
-				etxcgc = etxcgc + ModuleBase::e2 * sxc;
+					vtxcgc = vtxcgc + ModuleBase::e2 * v1xcup * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] * fac );
+					vtxcgc = vtxcgc + ModuleBase::e2 * v1xcdw * ( rhotmp2[ir] - GlobalC::CHR.rho_core[ir] * fac );
+					etxcgc = etxcgc + ModuleBase::e2 * sxc;
+				}
 			}
 			else
 			{
@@ -225,17 +280,47 @@ void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 					v2cud = 0.0;
 				}
 
-				// first term of the gradient correction : D(rho*Exc)/D(rho)
-				v(0,ir) = v(0,ir) + ModuleBase::e2 * ( v1xup + v1cup );
-				v(1,ir) = v(1,ir) + ModuleBase::e2 * ( v1xdw + v1cdw );
-			
-				// h contains D(rho*Exc)/D(|grad rho|) * (grad rho) / |grad rho|
-				h1[ir] = ModuleBase::e2 * ( ( v2xup + v2cup ) * gdr1[ir] + v2cud * gdr2[ir] );
-				h2[ir] = ModuleBase::e2 * ( ( v2xdw + v2cdw ) * gdr2[ir] + v2cud * gdr1[ir] );
+				if(is_stress)
+				{
+					double tt1[3],tt2[3];
+					{
+						tt1[0] = gdr1[ir].x;
+						tt1[1] = gdr1[ir].y;
+						tt1[2] = gdr1[ir].z;
+						tt2[0] = gdr2[ir].x;
+						tt2[1] = gdr2[ir].y;
+						tt2[2] = gdr2[ir].z;
+					}
+					for(int l = 0;l< 3;l++)
+					{
+						for(int m = 0;m< l+1;m++)
+						{
+							int ind = l*3 + m;
+							//    exchange
+							stress_gga [ind] += tt1[l] * tt1[m] * ModuleBase::e2 * v2xup + 
+									tt2[l] * tt2[m] * ModuleBase::e2 * v2xdw;
+							//    correlation
+							stress_gga [ind] += ( tt1[l] * tt1[m] * v2cup + 
+									tt2[l] * tt2[m] * v2cdw + 
+									(tt1[l] * tt2[m] +
+									tt2[l] * tt1[m] ) * v2cud ) * ModuleBase::e2;
+						}
+					}
+				}
+				else
+				{
+					// first term of the gradient correction : D(rho*Exc)/D(rho)
+					v(0,ir) = v(0,ir) + ModuleBase::e2 * ( v1xup + v1cup );
+					v(1,ir) = v(1,ir) + ModuleBase::e2 * ( v1xdw + v1cdw );
+				
+					// h contains D(rho*Exc)/D(|grad rho|) * (grad rho) / |grad rho|
+					h1[ir] = ModuleBase::e2 * ( ( v2xup + v2cup ) * gdr1[ir] + v2cud * gdr2[ir] );
+					h2[ir] = ModuleBase::e2 * ( ( v2xdw + v2cdw ) * gdr2[ir] + v2cud * gdr1[ir] );
 
-				vtxcgc = vtxcgc + ModuleBase::e2 * ( v1xup + v1cup ) * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] * fac );
-				vtxcgc = vtxcgc + ModuleBase::e2 * ( v1xdw + v1cdw ) * ( rhotmp2[ir] - GlobalC::CHR.rho_core[ir] * fac );
-				etxcgc = etxcgc + ModuleBase::e2 * ( sx + sc );
+					vtxcgc = vtxcgc + ModuleBase::e2 * ( v1xup + v1cup ) * ( rhotmp1[ir] - GlobalC::CHR.rho_core[ir] * fac );
+					vtxcgc = vtxcgc + ModuleBase::e2 * ( v1xdw + v1cdw ) * ( rhotmp2[ir] - GlobalC::CHR.rho_core[ir] * fac );
+					etxcgc = etxcgc + ModuleBase::e2 * ( sx + sc );
+				}
 			}
 		}// end ir
 
@@ -244,86 +329,91 @@ void XC_Functional::gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v)
 	//std::cout << "\n vtxcgc=" << vtxcgc;
 	//std::cout << "\n etxcgc=" << etxcgc << std::endl;
 
-	for(int ir=0; ir<GlobalC::pw.nrxx; ir++) rhotmp1[ir] -= fac * GlobalC::CHR.rho_core[ir];
-	if(nspin0==2) for(int ir=0; ir<GlobalC::pw.nrxx; ir++) rhotmp2[ir] -= fac * GlobalC::CHR.rho_core[ir];
-	
-	// second term of the gradient correction :
-	// \sum_alpha (D / D r_alpha) ( D(rho*Exc)/D(grad_alpha rho) )
-
-	// dh is in real sapce.
-	double* dh = new double[GlobalC::pw.nrxx];
-
-	for(int is=0; is<nspin0; is++)
+	if(!is_stress)
 	{
-		ModuleBase::GlobalFunc::ZEROS(dh, GlobalC::pw.nrxx);
-		if(is==0)XC_Functional::grad_dot(h1,dh);
-		if(is==1)XC_Functional::grad_dot(h2,dh);
-
-		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
-			v(is, ir) -= dh[ir];
+		for(int ir=0; ir<GlobalC::pw.nrxx; ir++) rhotmp1[ir] -= fac * GlobalC::CHR.rho_core[ir];
+		if(nspin0==2) for(int ir=0; ir<GlobalC::pw.nrxx; ir++) rhotmp2[ir] -= fac * GlobalC::CHR.rho_core[ir];
 		
-		double sum = 0.0;
-		if(is==0)
-			for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
-				sum += dh[ir] * rhotmp1[ir];
-		else if(is==1)
-			for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
-				sum += dh[ir] * rhotmp2[ir];
-		
-		vtxcgc -= sum;
-	}
+		// second term of the gradient correction :
+		// \sum_alpha (D / D r_alpha) ( D(rho*Exc)/D(grad_alpha rho) )
 
-	delete[] dh;
+		// dh is in real sapce.
+		double* dh = new double[GlobalC::pw.nrxx];
 
-	vtxc += vtxcgc;
-	etxc += etxcgc;
-
-	if(GlobalV::NSPIN == 4 && (GlobalV::DOMAG||GlobalV::DOMAG_Z))
-	{
-		for(int is=0;is<GlobalV::NSPIN;is++)
+		for(int is=0; is<nspin0; is++)
 		{
+			ModuleBase::GlobalFunc::ZEROS(dh, GlobalC::pw.nrxx);
+			if(is==0)XC_Functional::grad_dot(h1,dh);
+			if(is==1)XC_Functional::grad_dot(h2,dh);
+
+			for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
+				v(is, ir) -= dh[ir];
+		
+			double sum = 0.0;
+			if(is==0)
+				for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
+					sum += dh[ir] * rhotmp1[ir];
+			else if(is==1)
+				for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
+					sum += dh[ir] * rhotmp2[ir];
+			
+			vtxcgc -= sum;
+		}
+		
+		delete[] dh;
+
+		vtxc += vtxcgc;
+		etxc += etxcgc;
+
+		if(GlobalV::NSPIN == 4 && (GlobalV::DOMAG||GlobalV::DOMAG_Z))
+		{
+			for(int is=0;is<GlobalV::NSPIN;is++)
+			{
+				for(int ir=0;ir<GlobalC::pw.nrxx;ir++)
+				{
+					if(is<nspin0) vgg[is][ir] = v(is,ir);
+					v(is,ir) = vsave[is][ir];
+				}
+			}
 			for(int ir=0;ir<GlobalC::pw.nrxx;ir++)
 			{
-				if(is<nspin0) vgg[is][ir] = v(is,ir);
-				v(is,ir) = vsave[is][ir];
-			}
-		}
-		for(int ir=0;ir<GlobalC::pw.nrxx;ir++)
-		{
-			v(0,ir) += 0.5 * (vgg[0][ir] + vgg[1][ir]);
-			double amag = sqrt(pow(GlobalC::CHR.rho[1][ir],2)+pow(GlobalC::CHR.rho[2][ir],2)+pow(GlobalC::CHR.rho[3][ir],2));
-			if(amag>1e-12)
-			{
-				for(int i=1;i<4;i++)
-					v(i,ir)+= neg[ir] * 0.5 *(vgg[0][ir]-vgg[1][ir])*GlobalC::CHR.rho[i][ir]/amag;
+				v(0,ir) += 0.5 * (vgg[0][ir] + vgg[1][ir]);
+				double amag = sqrt(pow(GlobalC::CHR.rho[1][ir],2)+pow(GlobalC::CHR.rho[2][ir],2)+pow(GlobalC::CHR.rho[3][ir],2));
+				if(amag>1e-12)
+				{
+					for(int i=1;i<4;i++)
+						v(i,ir)+= neg[ir] * 0.5 *(vgg[0][ir]-vgg[1][ir])*GlobalC::CHR.rho[i][ir]/amag;
+				}
 			}
 		}
 	}
-	
 	// deacllocate
 	delete[] rhotmp1;
 	delete[] rhogsum1;
 	delete[] gdr1;
-	delete[] h1;
+	if(!is_stress) delete[] h1;
 
 	if(GlobalV::NSPIN==2)
 	{
 		delete[] rhotmp2;
 		delete[] rhogsum2;
 		delete[] gdr2;
-		delete[] h2;
+		if(!is_stress) delete[] h2;
 	}
 	if(GlobalV::NSPIN == 4 && (GlobalV::DOMAG||GlobalV::DOMAG_Z))
 	{
 		delete[] neg;
-		for(int i=0; i<nspin0; i++) delete[] vgg[i];
-		delete[] vgg;
-		for(int i=0; i<GlobalV::NSPIN; i++) delete[] vsave[i];
-		delete[] vsave;
+		if(!is_stress) 
+		{
+			for(int i=0; i<nspin0; i++) delete[] vgg[i];
+			delete[] vgg;
+			for(int i=0; i<GlobalV::NSPIN; i++) delete[] vsave[i];
+			delete[] vsave;
+			delete[] h2;
+		}
 		delete[] rhotmp2;
 		delete[] rhogsum2;
 		delete[] gdr2;
-		delete[] h2;
 	}
 
 	return;
