@@ -21,16 +21,13 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc(
     ModuleBase::TITLE("XC_Functional","v_xc");
     ModuleBase::timer::tick("XC_Functional","v_xc");
 
-#ifndef USE_LIBXC
-    if(func_type == 3)
+    if( (GlobalV::NSPIN == 1 || GlobalV::NSPIN == 2) && use_libxc)
     {
-        ModuleBase::WARNING_QUIT("Potential::v_of_rho","to use metaGGA, please link LIBXC");
-    }
-#endif
-
-    if((GlobalV::NSPIN == 1 || GlobalV::NSPIN == 2) && use_libxc)
-    {
+#ifdef USE_LIBXC
         return v_xc_libxc(nrxx, ncxyz, omega, rho_in, rho_core);
+#else
+        ModuleBase::WARNING_QUIT("v_xc","compile with LIBXC");
+#endif
     }
 
     //Exchange-Correlation potential Vxc(r) from n(r)
@@ -51,11 +48,6 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc(
     int ir, is;
 
     double vanishing_charge = 1.0e-10;
-
-    if( (GlobalV::NSPIN == 1 || GlobalV::NSPIN == 2) && use_libxc)
-    {
-        return v_xc_libxc(nrxx, ncxyz, omega, rho_in, rho_core);
-    }
 
     if (GlobalV::NSPIN == 1 || ( GlobalV::NSPIN ==4 && !GlobalV::DOMAG && !GlobalV::DOMAG_Z))
     {

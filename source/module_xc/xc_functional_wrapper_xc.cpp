@@ -51,12 +51,7 @@ void XC_Functional::xc(const double &rho, double &exc, double &vxc)
             case XC_GGA_C_LYP:
             //  BLYP
                 XC_Functional::lyp(rs, e, v);break;
-
-            // Functionals that are realized only using LIBXC
-            case XC_HYB_GGA_XC_HSE06: case XC_MGGA_X_SCAN: case XC_MGGA_C_SCAN:
-            //  HSE,SCAN_X,SCAN_C
-                throw std::domain_error("functional unfinished in "+ModuleBase::GlobalFunc::TO_STRING(__FILE__)+" line "+ModuleBase::GlobalFunc::TO_STRING(__LINE__));
-            
+                            
             default:
                 e = v = 0.0;
         }

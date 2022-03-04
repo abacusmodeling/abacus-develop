@@ -96,12 +96,14 @@ void XC_Functional::set_xc_type(const std::string xc_func_in)
         func_type = 2;
         use_libxc = false;
 	}
+#ifdef USE_LIBXC
 	else if ( xc_func == "SCAN")
 	{
         func_id.push_back(XC_MGGA_X_SCAN);
         func_id.push_back(XC_MGGA_C_SCAN);
         func_type = 3;
 	}
+#endif
    	else if( xc_func == "PBE0")
 	{
         func_id.push_back(XC_HYB_GGA_XC_PBEH);
@@ -113,11 +115,13 @@ void XC_Functional::set_xc_type(const std::string xc_func_in)
         // not doing anything
         if(xc_func == "HF") func_type = 4;
     }
+#ifdef USE_LIBXC
     else if( xc_func == "HSE")
     {
         func_id.push_back(XC_HYB_GGA_XC_HSE06);
         func_type = 4;
     }
+#endif
     else
     {
 #ifdef USE_LIBXC

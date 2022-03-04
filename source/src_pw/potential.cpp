@@ -326,11 +326,15 @@ ModuleBase::matrix Potential::v_of_rho(
 	
 	if(XC_Functional::get_func_type() == 3)
 	{
+#ifdef USE_LIBXC
     	const std::tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> etxc_vtxc_v = XC_Functional::v_xc_meta(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, rho_in, GlobalC::CHR.rho_core, GlobalC::CHR.kin_r);
 		GlobalC::en.etxc = std::get<0>(etxc_vtxc_v);
 		GlobalC::en.vtxc = std::get<1>(etxc_vtxc_v);
 		v            += std::get<2>(etxc_vtxc_v);
 		vofk		  = std::get<3>(etxc_vtxc_v);
+#else
+        ModuleBase::WARNING_QUIT("v_of_rho","to use mGGA, compile with LIBXC");
+#endif
 	}
 	else
 	{	
