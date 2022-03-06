@@ -58,7 +58,7 @@ void Driver_classic::convert(UnitCell_pseudo &ucell_c)
     GlobalV::CALCULATION = INPUT.calculation;
 	GlobalV::BASIS_TYPE = INPUT.basis_type;
     GlobalV::OUT_LEVEL = INPUT.out_level;
-    GlobalV::SEARCH_RADIUS = max(INPUT.search_radius,(INPUT.mdp.rcut_lj+2)*ModuleBase::ANGSTROM_AU);
+    GlobalV::SEARCH_RADIUS = max(INPUT.search_radius,(INPUT.mdp.lj_rcut+2)*ModuleBase::ANGSTROM_AU);
 	GlobalV::SEARCH_PBC = INPUT.search_pbc;
     GlobalV::NSTEP = INPUT.nstep;
 

@@ -28,7 +28,7 @@ dr2			1.0e-6
 
 tddft			1
 
-md_mdtype		0
+md_type		    0
 md_dt			0.01
 ocp                     1
 ocp_set                 5*2 2*0 1*2 4*0
