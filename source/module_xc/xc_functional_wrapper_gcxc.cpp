@@ -129,6 +129,7 @@ void XC_Functional::gcx_spin(double rhoup, double rhodw, double grhoup2, double 
     sx = 0.00;
     v1xup = 0.00; v2xup = 0.00;
     v1xdw = 0.00; v2xdw = 0.00;
+    sxup  = 0.00; sxdw  = 0.00;
 
     if (rho <= small)
     {
