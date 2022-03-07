@@ -106,9 +106,9 @@ void Driver::atomic_world(void)
 	else if(GlobalV::BASIS_TYPE=="lcao")
     {
         use_ensol = "ksdft_lcao";
-        ModuleEnSover::init_esolver(p_esolver, use_ensol);
+        ModuleESolver::init_esolver(p_esolver, use_ensol);
         Run_lcao::lcao_line(p_esolver);
-        ModuleEnSover::clean_esolver(p_esolver);
+        ModuleESolver::clean_esolver(p_esolver);
     }
 #endif
 

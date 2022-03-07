@@ -15,7 +15,7 @@ LOOP_cell::LOOP_cell(Parallel_Orbitals &pv)
 }
 LOOP_cell::~LOOP_cell() {}
 
-void LOOP_cell::opt_cell(ORB_control &orb_con, ModuleEnSover::En_Solver *p_esolver)
+void LOOP_cell::opt_cell(ORB_control &orb_con, ModuleESolver::ESolver *p_esolver)
 {
 	ModuleBase::TITLE("LOOP_cell","opt_cell");
 

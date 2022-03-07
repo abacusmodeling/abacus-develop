@@ -1,0 +1,43 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/pdiag.dir/diag_scalapack_gvx.o"
+  "CMakeFiles/pdiag.dir/diag_scalapack_gvx.o.d"
+  "CMakeFiles/pdiag.dir/pdgseps.o"
+  "CMakeFiles/pdiag.dir/pdgseps.o.d"
+  "CMakeFiles/pdiag.dir/pdiag_common.o"
+  "CMakeFiles/pdiag.dir/pdiag_common.o.d"
+  "CMakeFiles/pdiag.dir/pdiag_double.o"
+  "CMakeFiles/pdiag.dir/pdiag_double.o.d"
+  "CMakeFiles/pdiag.dir/pdst2g.o"
+  "CMakeFiles/pdiag.dir/pdst2g.o.d"
+  "CMakeFiles/pdiag.dir/pdstebz.o"
+  "CMakeFiles/pdiag.dir/pdstebz.o.d"
+  "CMakeFiles/pdiag.dir/pdsteiz.o"
+  "CMakeFiles/pdiag.dir/pdsteiz.o.d"
+  "CMakeFiles/pdiag.dir/pdsyg2st.o"
+  "CMakeFiles/pdiag.dir/pdsyg2st.o.d"
+  "CMakeFiles/pdiag.dir/pdsytrd.o"
+  "CMakeFiles/pdiag.dir/pdsytrd.o.d"
+  "CMakeFiles/pdiag.dir/pdt2s.o"
+  "CMakeFiles/pdiag.dir/pdt2s.o.d"
+  "CMakeFiles/pdiag.dir/pdtrsm.o"
+  "CMakeFiles/pdiag.dir/pdtrsm.o.d"
+  "CMakeFiles/pdiag.dir/pzgseps.o"
+  "CMakeFiles/pdiag.dir/pzgseps.o.d"
+  "CMakeFiles/pdiag.dir/pzheg2st.o"
+  "CMakeFiles/pdiag.dir/pzheg2st.o.d"
+  "CMakeFiles/pdiag.dir/pzhetrd.o"
+  "CMakeFiles/pdiag.dir/pzhetrd.o.d"
+  "CMakeFiles/pdiag.dir/pzhtrsm.o"
+  "CMakeFiles/pdiag.dir/pzhtrsm.o.d"
+  "CMakeFiles/pdiag.dir/pzst2g.o"
+  "CMakeFiles/pdiag.dir/pzst2g.o.d"
+  "CMakeFiles/pdiag.dir/pzsteiz.o"
+  "CMakeFiles/pdiag.dir/pzsteiz.o.d"
+  "CMakeFiles/pdiag.dir/pzt2s.o"
+  "CMakeFiles/pdiag.dir/pzt2s.o.d"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/pdiag.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

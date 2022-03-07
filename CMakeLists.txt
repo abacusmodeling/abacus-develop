@@ -272,7 +272,7 @@ target_link_libraries(${ABACUS_BIN_NAME}
     pw
     ri
     driver
-    en_solver
+    esolver
     -lm
 )
 

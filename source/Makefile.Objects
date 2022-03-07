@@ -228,9 +228,16 @@ parallel_pw.o\
 ft.o\
 parallel_grid.o\
 
+OBJS_ESOLVER=esolver.o\
+    esolver_ks.o\
+    esolver_fp.o\
+    esolver_ks_pw.o\
+    esolver_ks_lcao.o
+
 OBJS_FIRST_PRINCIPLES=$(OBJS_MAIN)\
 $(OBJS_PW)\
 $(OBJS_LCAO)\
+$(OBJS_ESOLVER)\
 charge.o \
 charge_mixing.o \
 charge_pulay.o \

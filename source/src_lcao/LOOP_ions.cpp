@@ -35,7 +35,7 @@ LOOP_ions::LOOP_ions(LCAO_Matrix &lm)
 LOOP_ions::~LOOP_ions()
 {}
 
-void LOOP_ions::opt_ions(ModuleEnSover::En_Solver *p_esolver)
+void LOOP_ions::opt_ions(ModuleESolver::ESolver *p_esolver)
 {
     ModuleBase::TITLE("LOOP_ions","opt_ions");
     ModuleBase::timer::tick("LOOP_ions","opt_ions");

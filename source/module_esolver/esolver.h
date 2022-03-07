@@ -5,6 +5,9 @@
 #include "../module_cell/unitcell_pseudo.h"
 #include "../src_pw/energy.h"
 #include "../module_base/matrix.h"
+#ifdef __LCAO
+#include "src_lcao/LOOP_elec.h"
+#endif
 namespace ModuleESolver
 {
 
