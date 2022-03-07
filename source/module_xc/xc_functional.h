@@ -129,7 +129,7 @@ class XC_Functional
 // on the entire grid. I'm having xc_spin_libxc because v_xc_libxc
 // does not support nspin = 4.
 
-	public :
+	private :
 
 	// LDA
 	static void xc(const double &rho, double &exc, double &vxc);
@@ -155,7 +155,7 @@ class XC_Functional
 // LIBXC, and the reason for not having gcxc_libxc is explained
 // in the NOTE in the comment for xc_functional_wrapper_wc.cpp part
 
-	public:
+	private:
 
 	// GGA
 	static void gcxc(const double &rho, const double &grho,
@@ -183,7 +183,7 @@ class XC_Functional
 // NOTE : mGGA is realized through LIBXC
 
 #ifdef USE_LIBXC
-	public:
+	private:
 	
 	// mGGA
 	static void tau_xc(const double &rho, const double &grho, const double &atau, double &sxc,
