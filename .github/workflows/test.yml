@@ -9,6 +9,7 @@ on:
       - deepks
       - planewave
       - pw_refactor
+      - TDDFT
 jobs:
 
   test:
