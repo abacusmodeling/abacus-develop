@@ -144,7 +144,7 @@ void Input::Default(void)
 //----------------------------------------------------------
 // electrons / spin
 //----------------------------------------------------------
-	dft_functional = "none";
+	dft_functional = "default";
     nspin = 1;
     nelec = 0.0;
     lmaxmax = 2;
@@ -354,7 +354,6 @@ void Input::Default(void)
 //----------------------------------------------------------
 // exx										//Peize Lin add 2018-06-20
 //----------------------------------------------------------
-	dft_functional = "default";
 
 	exx_hybrid_alpha = 0.25;
 	exx_hse_omega = 0.11;
