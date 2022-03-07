@@ -23,6 +23,7 @@ namespace GlobalFunc
 
 void NOTE(const std::string &words)
 {
+    return;
     if (GlobalV::ofs_running)
     {
         // GlobalV::ofs_running << " *********************************************************************************"
@@ -33,7 +34,6 @@ void NOTE(const std::string &words)
         GlobalV::ofs_running << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
                              << std::endl;
     }
-    return;
 }
 
 void NEW_PART(const std::string &words)
@@ -115,8 +115,7 @@ void DONE(std::ofstream &ofs, const std::string &description, const bool only_ra
 void TEST_LEVEL(const std::string &name)
 {
     bool disable = true;
-    if (disable)
-        return;
+    if (disable) return;
 
     if (name == "none")
     {
@@ -253,8 +252,7 @@ size_t MemAvailable()
             mem_sum += std::stol(size);
             ++i;
         }
-        if (i == 3)
-            return mem_sum;
+        if (i == 3) return mem_sum;
     }
     throw std::runtime_error("read /proc/meminfo error in " + TO_STRING(__FILE__) + " line " + TO_STRING(__LINE__));
 }

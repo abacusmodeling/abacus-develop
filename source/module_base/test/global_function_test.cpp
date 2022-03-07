@@ -13,8 +13,6 @@
 
 /**
  * - Tested Function
- * - Note
- *   - print out warning info in running.log file
  * - NewPart
  *   - note the start of new calculation part
  * - OutV1
@@ -45,6 +43,8 @@
  *   - copy vector
  * - VectorToPointer
  *   - get the first pointer of (const) vector or valarray
+ * - Note
+ *   - print out warning info in running.log file
  */
 
 inline void EXPECT_COMPLEX_EQ(const std::complex<double>& a, const std::complex<double>& b)
@@ -75,18 +75,6 @@ class GlobalFunctionTest : public testing::Test
         remove("tmp");
     }
 };
-
-TEST_F(GlobalFunctionTest, Note)
-{
-    ModuleBase::GlobalFunc::NOTE("Wrong Settings!");
-    GlobalV::ofs_running.close();
-    ifs.open("running.log");
-    getline(ifs, output);
-    getline(ifs, output);
-    // output in runnint.log file
-    EXPECT_THAT(output, testing::HasSubstr("Wrong Settings!"));
-    ifs.close();
-}
 
 TEST_F(GlobalFunctionTest, NewPart)
 {
@@ -296,3 +284,17 @@ TEST_F(GlobalFunctionTest, VectorToPointer)
     const std::valarray<double> dd(1.0, size);
     EXPECT_EQ(ModuleBase::GlobalFunc::VECTOR_TO_PTR(dd), &dd[0]);
 }
+
+/*
+TEST_F(GlobalFunctionTest, Note)
+{
+    ModuleBase::GlobalFunc::NOTE("Wrong Settings!");
+    GlobalV::ofs_running.close();
+    ifs.open("running.log");
+    getline(ifs, output);
+    getline(ifs, output);
+    // output in runnint.log file
+    EXPECT_THAT(output, testing::HasSubstr("Wrong Settings!"));
+    ifs.close();
+}
+*/
