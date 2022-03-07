@@ -226,7 +226,7 @@ void MD_func::InitPos(
 
 //calculate potential, force and virial
 void MD_func::force_virial(
-		ModuleEnSover::En_Solver *p_ensolver,
+		ModuleESolver::ESolver *p_ensolver,
 		const int &istep,
 		const MD_parameters &mdp,
 		const UnitCell_pseudo &unit_in,

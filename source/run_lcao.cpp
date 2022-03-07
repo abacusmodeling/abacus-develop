@@ -17,7 +17,7 @@ Run_lcao::Run_lcao(){}
 Run_lcao::~Run_lcao(){}
 
 
-void Run_lcao::lcao_line(ModuleEnSover::En_Solver *p_ensolver)
+void Run_lcao::lcao_line(ModuleESolver::ESolver *p_ensolver)
 {
     ModuleBase::TITLE("Run_lcao","lcao_line");
 	ModuleBase::timer::tick("Run_lcao","lcao_line");

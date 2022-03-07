@@ -25,7 +25,7 @@ VPATH=./src_global\
 :./src_ri\
 :./\
 
-include module_ensolver/Makefile.ensolver
+include module_esolver/Makefile.ensolver
 
 #==========================
 # Define HONG

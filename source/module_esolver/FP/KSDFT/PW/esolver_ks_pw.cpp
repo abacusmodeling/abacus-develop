@@ -1,4 +1,4 @@
-#include "ks_scf_pw.h"
+#include "esolver_ks_pw.h"
 
 //--------------temporary----------------------------
 #include "../../../../src_pw/global.h"
@@ -17,7 +17,7 @@
 #include "../../../../src_pw/stress_pw.h"
 //---------------------------------------------------
 
-namespace ModuleEnSover
+namespace ModuleESolver
 {
 
 void KS_SCF_PW::Init(Input &inp, UnitCell_pseudo &ucell)
@@ -183,6 +183,11 @@ void KS_SCF_PW::cal_Stress(ModuleBase::matrix &stress)
 {
 	Stress_PW ss;
 	ss.cal_stress(stress);
+}
+
+int KS_SCF_PW:: getiter()
+{
+    return this->elec.iter;
 }
 
 }

@@ -17,7 +17,7 @@ Run_MD_PW::Run_MD_PW()
 
 Run_MD_PW::~Run_MD_PW(){}
 
-void Run_MD_PW::md_ions_pw(ModuleEnSover::En_Solver *p_ensolver)
+void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_ensolver)
 {
     ModuleBase::TITLE("Run_MD_PW", "md_ions_pw");
     ModuleBase::timer::tick("Run_MD_PW", "md_ions_pw");
@@ -151,7 +151,7 @@ void Run_MD_PW::md_ions_pw(ModuleEnSover::En_Solver *p_ensolver)
     return;
 }
 
-void Run_MD_PW::md_cells_pw(ModuleEnSover::En_Solver *p_ensolver)
+void Run_MD_PW::md_cells_pw(ModuleESolver::ESolver *p_ensolver)
 {
     ModuleBase::TITLE("Run_MD_PW", "md_cells_pw");
     ModuleBase::timer::tick("Run_MD_PW", "md_cells_pw");
@@ -169,7 +169,7 @@ void Run_MD_PW::md_cells_pw(ModuleEnSover::En_Solver *p_ensolver)
 }
 
 void Run_MD_PW::md_force_virial(
-    ModuleEnSover::En_Solver *p_ensolver,
+    ModuleESolver::ESolver *p_ensolver,
     const int &istep,
     const int& numIon, 
     double &potential, 

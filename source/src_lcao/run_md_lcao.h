@@ -2,7 +2,7 @@
 #define RUN_MD_LCAO_H 
 
 #include "../src_pw/charge_extra.h"
-#include "module_ensolver/en_solver.h"
+#include "module_esolver/esolver.h"
 
 class Run_MD_LCAO
 {
@@ -12,9 +12,9 @@ class Run_MD_LCAO
 	Run_MD_LCAO();
 	~Run_MD_LCAO();
 
-	void opt_cell(ModuleEnSover::En_Solver *p_ensolver);
-	void opt_ions(ModuleEnSover::En_Solver *p_ensolver);
-	void md_force_virial(ModuleEnSover::En_Solver *p_ensolver,
+	void opt_cell(ModuleESolver::ESolver *p_ensolver);
+	void opt_ions(ModuleESolver::ESolver *p_ensolver);
+	void md_force_virial(ModuleESolver::ESolver *p_ensolver,
 		const int &istep,
         const int& numIon, 
         double &potential, 

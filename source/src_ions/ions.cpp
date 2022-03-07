@@ -4,7 +4,7 @@
 #include "variable_cell.h" // mohan add 2021-02-01
 #include "src_io/write_wfc_realspace.h"
 
-void Ions::opt_ions_pw(ModuleEnSover::En_Solver *p_ensolver)
+void Ions::opt_ions_pw(ModuleESolver::ESolver *p_ensolver)
 {
 	ModuleBase::TITLE("Ions","opt_ions_pw");
 	ModuleBase::timer::tick("Ions","opt_ions_pw");
@@ -134,7 +134,7 @@ void Ions::opt_ions_pw(ModuleEnSover::En_Solver *p_ensolver)
 #endif		
 				p_ensolver->Run(istep,GlobalC::ucell);
 				p_ensolver->cal_Energy(GlobalC::en);
-				eiter = elec.iter;
+				eiter = p_ensolver->getiter();
 #ifdef __LCAO
 			}
 			else if( Exx_Global::Hybrid_Type::Generate_Matrix == GlobalC::exx_global.info.hybrid_type )
@@ -238,7 +238,7 @@ void Ions::opt_ions_pw(ModuleEnSover::En_Solver *p_ensolver)
     return;
 }
 
-bool Ions::after_scf(ModuleEnSover::En_Solver *p_ensolver, const int &istep, int &force_step, int &stress_step)
+bool Ions::after_scf(ModuleESolver::ESolver *p_ensolver, const int &istep, int &force_step, int &stress_step)
 {
 	ModuleBase::TITLE("Ions","after_scf");
 	//calculate and gather all parts of total ionic forces
@@ -286,7 +286,7 @@ bool Ions::after_scf(ModuleEnSover::En_Solver *p_ensolver, const int &istep, int
 
     return 1;
 }
-void Ions::gather_force_pw(ModuleEnSover::En_Solver *p_ensolver, ModuleBase::matrix &force)
+void Ions::gather_force_pw(ModuleESolver::ESolver *p_ensolver, ModuleBase::matrix &force)
 {
 	ModuleBase::TITLE("Ions","gather_force_pw");
 	// Forces fcs;
@@ -294,7 +294,7 @@ void Ions::gather_force_pw(ModuleEnSover::En_Solver *p_ensolver, ModuleBase::mat
 	p_ensolver->cal_Force(force);
 }
 
-void Ions::gather_stress_pw(ModuleEnSover::En_Solver *p_ensolver, ModuleBase::matrix& stress)
+void Ions::gather_stress_pw(ModuleESolver::ESolver *p_ensolver, ModuleBase::matrix& stress)
 {
 	ModuleBase::TITLE("Ions","gather_stress_pw");
 	//basic stress

@@ -4,7 +4,7 @@
 #include "mpi.h"
 #endif
 #include "../module_base/timer.h"
-#include "module_ensolver/en_solver.h"
+#include "module_esolver/esolver.h"
 
 Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     mdp(MD_para_in),
@@ -47,7 +47,7 @@ Verlet::~Verlet()
     delete []force;
 }
 
-void Verlet::setup(ModuleEnSover::En_Solver *p_ensolver)
+void Verlet::setup(ModuleESolver::ESolver *p_ensolver)
 {
     if(mdp.rstMD)
     {

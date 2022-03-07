@@ -4,7 +4,7 @@
 #include "mpi.h"
 #endif
 #include "../module_base/timer.h"
-#include "module_ensolver/en_solver.h"
+#include "module_esolver/esolver.h"
 
 MSST::MSST(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in) : Verlet(MD_para_in, unit_in)
 {
@@ -33,7 +33,7 @@ MSST::~MSST()
     delete []old_v;
 }
 
-void MSST::setup(ModuleEnSover::En_Solver *p_ensolver)
+void MSST::setup(ModuleESolver::ESolver *p_ensolver)
 {
     ModuleBase::TITLE("MSST", "setup");
     ModuleBase::timer::tick("MSST", "setup");

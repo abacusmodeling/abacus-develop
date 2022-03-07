@@ -1,6 +1,6 @@
 #ifndef KS_SCF_PW_H
 #define KS_SCF_PW_H
-#include "../ks_scf.h"
+#include "../esolver_ks.h"
 // #include "Basis_PW.h"
 // #include "Estate_PW.h"
 // #include "Hamilton_PW.h"
@@ -8,7 +8,7 @@
 
 #include "../../../../src_pw/electrons.h"
 
-namespace ModuleEnSover
+namespace ModuleESolver
 {
 
 class KS_SCF_PW: public KS_SCF
@@ -27,6 +27,7 @@ public:
 //--------------temporary----------------------------
     Electrons elec;
 //---------------------------------------------------
+    int getiter();
 
     // KS_SCF_PW(bool use_sdft)
     // {

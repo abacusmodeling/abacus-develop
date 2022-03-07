@@ -31,7 +31,7 @@ Run_MD_LCAO::Run_MD_LCAO()
 Run_MD_LCAO::~Run_MD_LCAO(){}
 
 
-void Run_MD_LCAO::opt_cell(ModuleEnSover::En_Solver *p_ensolver)
+void Run_MD_LCAO::opt_cell(ModuleESolver::ESolver *p_ensolver)
 {
 	ModuleBase::TITLE("Run_MD_LCAO","opt_cell");
 
@@ -61,7 +61,7 @@ void Run_MD_LCAO::opt_cell(ModuleEnSover::En_Solver *p_ensolver)
 }
 
 
-void Run_MD_LCAO::opt_ions(ModuleEnSover::En_Solver *p_ensolver)
+void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver *p_ensolver)
 {
     ModuleBase::TITLE("Run_MD_LCAO","opt_ions"); 
     ModuleBase::timer::tick("Run_MD_LCAO","opt_ions"); 
@@ -198,7 +198,7 @@ void Run_MD_LCAO::opt_ions(ModuleEnSover::En_Solver *p_ensolver)
 }
 
 void Run_MD_LCAO::md_force_virial(
-    ModuleEnSover::En_Solver *p_ensolver,
+    ModuleESolver::ESolver *p_ensolver,
     const int &istep,
     const int& numIon, 
     double &potential, 

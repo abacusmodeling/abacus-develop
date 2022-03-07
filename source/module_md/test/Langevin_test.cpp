@@ -14,7 +14,7 @@ protected:
         Setcell::parameters();
         verlet = new Langevin(INPUT.mdp, ucell);
 
-        ModuleEnSover::En_Solver *p_ensolver;
+        ModuleESolver::ESolver *p_ensolver;
         verlet->setup(p_ensolver);
     }
 

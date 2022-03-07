@@ -1,10 +1,10 @@
 #ifndef AB_INITIO_H
 #define AB_INITIO_H
-#include "../en_solver.h"
+#include "../esolver.h"
 // #include "hamilt.h"
-namespace ModuleEnSover
+namespace ModuleESolver
 {
-class ab_initio: public En_Solver
+class ESolver_FP: public ESolver
 {
     public: 
         // Hamilt* phamilt;

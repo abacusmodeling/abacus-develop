@@ -1,10 +1,10 @@
-#include "../ab_initio.h"
+#include "../esolver_fp.h"
 // #include "estates.h"
 // #include "h2e.h"
-namespace ModuleEnSover
+namespace ModuleESolver
 {
 
-class KS_SCF: public ab_initio
+class ESolver_KS: public ab_initio
 {
     public:
         // Psi *p_wf; 

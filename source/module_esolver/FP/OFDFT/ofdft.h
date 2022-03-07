@@ -1,5 +1,5 @@
 #include "../ab_initio.h"
-namespace ModuleEnSover
+namespace ModuleESolver
 {
 class OFDFT: public ab_initio
 {

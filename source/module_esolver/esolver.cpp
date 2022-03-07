@@ -1,17 +1,17 @@
-#include "en_solver.h"
+#include "esolver.h"
 #include "FP/KSDFT/PW/ks_scf_pw.h"
 #include "FP/OFDFT/ofdft.h"
 #include "stdio.h"
-namespace ModuleEnSover
+namespace ModuleESolver
 {
-void En_Solver:: printag()
+void ESolver:: printag()
 {
     std::cout<<tag<<std::endl;
 }
 
 
 //Some API to operate E_Solver
-void init_esolver(En_Solver *&p_ensolver, const string use_esol)
+void init_esolver(ESolver *&p_ensolver, const string use_esol)
 {
      if(use_esol == "ksdft_pw")
      {
@@ -27,7 +27,7 @@ void init_esolver(En_Solver *&p_ensolver, const string use_esol)
     //  }    
 }
 
-void clean_esolver(En_Solver *&pesolver)
+void clean_esolver(ESolver *&pesolver)
 {
     if(pesolver!=NULL) 
     {
