@@ -1,3 +1,5 @@
+#ifndef KS_SCF_H
+#define KS_SCF_H
 #include "../esolver_fp.h"
 // #include "estates.h"
 // #include "h2e.h"
@@ -12,3 +14,4 @@ class ESolver_KS: public ab_initio
         // H2E *p_h2e; 
 };
 }
+#endif

@@ -14,7 +14,7 @@ public:
     Cell_PW(){};
     ~Cell_PW(){};
     
-    void opt_cells_pw(ModuleESolver::ESolver *p_ensolver);
+    void opt_cells_pw(ModuleESolver::ESolver *p_esolver);
 };
 
 #endif

@@ -12,7 +12,7 @@ public:
     Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in);
     virtual ~Verlet();
 
-    virtual void setup(ModuleESolver::ESolver *p_ensolver);
+    virtual void setup(ModuleESolver::ESolver *p_esolver);
     virtual void first_half();
     virtual void second_half();
     virtual void outputMD();

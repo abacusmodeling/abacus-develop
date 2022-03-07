@@ -14,8 +14,8 @@ protected:
         Setcell::parameters();
         verlet = new NVT_NHC(INPUT.mdp, ucell);
 
-        ModuleESolver::ESolver *p_ensolver;
-        verlet->setup(p_ensolver);
+        ModuleESolver::ESolver *p_esolver;
+        verlet->setup(p_esolver);
     }
 
     void TearDown()

@@ -19,7 +19,7 @@ void Run_MD_CLASSIC::classic_md_line(void)
 {
 	ModuleBase::TITLE("Run_MD_CLASSIC", "classic_md_line");
     ModuleBase::timer::tick("Run_MD_CLASSIC", "classic_md_line");
-    ModuleESolver::ESolver* p_ensolver; //qianrui add it temporarily
+    ModuleESolver::ESolver* p_esolver; //qianrui add it temporarily
 
 	// Setup the unitcell.
 #ifdef __LCAO
@@ -61,14 +61,14 @@ void Run_MD_CLASSIC::classic_md_line(void)
     {
         if(verlet->step_ == 0)
         {
-            verlet->setup(p_ensolver);
+            verlet->setup(p_esolver);
         }
         else
         {
             verlet->first_half();
 
             // update force and virial due to the update of atom positions
-            MD_func::force_virial(p_ensolver, verlet->step_, verlet->mdp, verlet->ucell, verlet->potential, verlet->force, verlet->virial);
+            MD_func::force_virial(p_esolver, verlet->step_, verlet->mdp, verlet->ucell, verlet->potential, verlet->force, verlet->virial);
 
             verlet->second_half();
 

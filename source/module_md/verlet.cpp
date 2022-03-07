@@ -47,14 +47,14 @@ Verlet::~Verlet()
     delete []force;
 }
 
-void Verlet::setup(ModuleESolver::ESolver *p_ensolver)
+void Verlet::setup(ModuleESolver::ESolver *p_esolver)
 {
     if(mdp.rstMD)
     {
         restart();
     }
 
-    MD_func::force_virial(p_ensolver, step_, mdp, ucell, potential, force, virial);
+    MD_func::force_virial(p_esolver, step_, mdp, ucell, potential, force, virial);
     MD_func::kinetic_stress(ucell, vel, allmass, kinetic, stress);
     stress += virial;
 

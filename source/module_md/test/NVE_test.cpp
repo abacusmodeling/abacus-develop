@@ -15,9 +15,9 @@ protected:
         Setcell::setupcell(ucell);
         Setcell::parameters();
         verlet = new NVE(INPUT.mdp, ucell);
-        ModuleESolver::ESolver *p_ensolver;
+        ModuleESolver::ESolver *p_esolver;
 
-        verlet->setup(p_ensolver);
+        verlet->setup(p_esolver);
     }
 
     void TearDown()

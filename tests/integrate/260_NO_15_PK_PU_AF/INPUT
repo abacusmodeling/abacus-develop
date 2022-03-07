@@ -31,7 +31,6 @@ basis_type    lcao
 gamma_only    1
 symmetry    0
 nspin    2
-newdm   1
 
 #Parameter DFT+U
 dft_plus_u    1

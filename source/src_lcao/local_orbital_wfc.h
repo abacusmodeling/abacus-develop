@@ -8,33 +8,36 @@
 
 class Local_Orbital_wfc
 {
-	public:
+public:
 
 	Local_Orbital_wfc();
 	~Local_Orbital_wfc();
 
-	// used to generate density matrix: GlobalC::LOC.DM_R,
-	// which is used to calculate the charge density. 
-	// which is got after the diagonalization of 
-	// std::complex Hamiltonian matrix.
-	std::complex<double>*** WFC_K; // [NK, GlobalV::NBANDS, GlobalV::NLOCAL]	
-	std::complex<double>* WFC_K_POOL; // [NK*GlobalV::NBANDS*GlobalV::NLOCAL]
+    ///=========================================
+    /// grid wfc 
+    /// used to generate density matrix: LOC.DM_R,
+	/// which is used to calculate the charge density. 
+	/// which is got after the diagonalization of 
+    /// std::complex Hamiltonian matrix.
+    ///=========================================
+    //( Old Name: WFC_K)
+    std::complex<double>*** wfc_k_grid; // [NK, GlobalV::NBANDS, GlobalV::NLOCAL]	
+    //( Old Name: WFC_K_POOL)
+    std::complex<double>* wfc_k_grid2; // [NK*GlobalV::NBANDS*GlobalV::NLOCAL]
 
-	// augmented wave functions to 'c',
-	// used to generate density matrix 
-	// according to 2D data block.
-	// mohan add 2010-09-26
-	// daug means : dimension of augmented wave functions
-	double*** WFC_GAMMA_aug; // [GlobalV::NSPIN, GlobalV::NBANDS, daug];
-	std::complex<double>*** WFC_K_aug; // [NK, GlobalV::NBANDS, daug];
-	int* trace_aug;
-	
-	// how many elements are missing. 
-	int daug;
+    ///=========================================
+    /// 2d wfc
+    /// directly output from elpa interface
+    /// used to calculate density matrix LOC.dm_gamma and LOC.dm_k
+    ///=========================================
+    std::vector<ModuleBase::matrix> wfc_gamma;			// dm_gamma[is](iw1,iw2);
+    std::vector<ModuleBase::ComplexMatrix> wfc_k;		// dm_k[ik](iw1,iw2);
 
-	void allocate_k(const Grid_Technique &gt);
-	void set_trace_aug(const Grid_Technique &gt);
-	bool get_allocate_aug_flag(void)const{return allocate_aug_flag;}
+    const Parallel_Orbitals *ParaV;
+
+
+    void allocate_k(const Grid_Technique& gt,
+        Local_Orbital_wfc &lowf);
 
     //=========================================
     // Init Cij, make it satisfy 2 conditions:
@@ -42,17 +45,61 @@ class Local_Orbital_wfc
     // (2) Orthogonal <i|S|j>= \delta{ij}
     //=========================================
 	// void init_Cij(const bool change_c = 1);
-	bool get_allocate_flag(void)const{return allocate_flag;}	
 
-	// mohan move orb_con here, 2021-05-24 
-	ORB_control orb_con;
-	
-	private:
+
+    ///=========================================
+    ///Parallel: map of index in 2D distribution: global<->local
+    ///=========================================
+    static int globalIndex(int localindex, int nblk, int nprocs, int myproc);
+    static int localIndex(int globalindex, int nblk, int nprocs, int& myproc);
+    
+    ///=========================================
+    ///Parallel: convert the distribution of wavefunction from 2D to grid
+    ///=========================================
+    //name will be changed
+    
+    ///for gamma_only, with output
+    int q2CTOT(
+        int myid,
+        int naroc[2],
+        int nb,
+        int dim0,
+        int dim1,
+        int iprow,
+        int ipcol,
+        int loc_size,
+        double* work,
+        double** CTOT);
+    
+    ///for multi-k, no output
+    int q2WFC_complex(
+        int naroc[2],
+        int nb,
+        int dim0,
+        int dim1,
+        int iprow,
+        int ipcol,
+        std::complex<double>* work,
+        std::complex<double>** WFC);
+    
+    ///for multi-k, with output
+    int q2WFC_CTOT_complex(
+        int myid,
+        int naroc[2],
+        int nb,
+        int dim0,
+        int dim1,
+        int iprow,
+        int ipcol,
+        std::complex<double>* work,
+        std::complex<double>** WFC,
+        std::complex<double>** CTOT);
+        
+private:
 
 	bool wfck_flag; 
 	bool complex_flag;
 	bool allocate_flag;
-	bool allocate_aug_flag;
 
 };
 

@@ -15,7 +15,9 @@
 #include "src_pw/occupy.h"
 #include "module_base/global_function.h"
 #include "module_base/global_variable.h"
+#ifdef __EXX
 #include "src_ri/exx_abfs-jle.h"
+#endif
 #ifdef __LCAO
 #include "module_orbital/ORB_read.h"
 #include "src_lcao/ELEC_evolve.h"
@@ -446,6 +448,7 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------
 // about exx, Peize Lin add 2018-06-20
 //----------------------------------------------------------
+#ifdef __MPI // liyuanbo 2022/2/23
 #ifdef __LCAO
 	if (INPUT.exx_hybrid_type == "no")
 	{
@@ -503,10 +506,9 @@ void Input_Conv::Convert(void)
 		Exx_Abfs::Jle::tolerence = INPUT.exx_opt_orb_tolerence;
 	}
 #endif
-
+#endif
 	GlobalC::ppcell.cell_factor = INPUT.cell_factor; // LiuXh add 20180619
 
-	//    NEW_DM=INPUT.new_dm;  // Shen Yu add 2019/5/9
 
 	//----------------------------------------------------------
 	// main parameters / electrons / spin ( 2/16 )
@@ -545,10 +547,10 @@ void Input_Conv::Convert(void)
 	GlobalC::en.out_dos = INPUT.out_dos;
 	GlobalC::en.out_band = INPUT.out_band;
 #ifdef __LCAO
-	GlobalC::LOC.out_dm = INPUT.out_dm;
-	GlobalC::ParaO.out_hs = INPUT.out_hs;
-	GlobalC::ParaO.out_hsR = INPUT.out_hs2; // LiuXh add 2019-07-16
-	GlobalC::ParaO.out_lowf = INPUT.out_lowf;
+	Local_Orbital_Charge::out_dm = INPUT.out_dm;
+	Pdiag_Double::out_hs = INPUT.out_hs;
+	Pdiag_Double::out_hsR = INPUT.out_hs2; // LiuXh add 2019-07-16
+	Pdiag_Double::out_lowf = INPUT.out_lowf;
 #endif
 
 	GlobalC::en.dos_emin_ev = INPUT.dos_emin_ev;

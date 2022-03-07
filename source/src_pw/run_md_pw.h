@@ -11,10 +11,10 @@ public:
     Run_MD_PW();
     ~Run_MD_PW();
 
-    void md_ions_pw(ModuleESolver::ESolver *p_ensolver);
-    void md_cells_pw(ModuleESolver::ESolver *p_ensolver);
+    void md_ions_pw(ModuleESolver::ESolver *p_esolver);
+    void md_cells_pw(ModuleESolver::ESolver *p_esolver);
     void md_force_virial(
-        ModuleESolver::ESolver *p_ensolver,
+        ModuleESolver::ESolver *p_esolver,
         const int &istep,
         const int& numIon, 
         double &potential, 

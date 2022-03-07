@@ -2,6 +2,8 @@
 #define RUN_MD_LCAO_H 
 
 #include "../src_pw/charge_extra.h"
+#include "module_orbital/ORB_control.h"
+#include "src_lcao/LCAO_matrix.h"
 #include "module_esolver/esolver.h"
 
 class Run_MD_LCAO
@@ -9,12 +11,12 @@ class Run_MD_LCAO
 
 	public:
 
-	Run_MD_LCAO();
+	Run_MD_LCAO(Parallel_Orbitals &pv);
 	~Run_MD_LCAO();
 
-	void opt_cell(ModuleESolver::ESolver *p_ensolver);
-	void opt_ions(ModuleESolver::ESolver *p_ensolver);
-	void md_force_virial(ModuleESolver::ESolver *p_ensolver,
+	void opt_cell(ORB_control &orb_con, ModuleESolver::ESolver *p_esolver);
+	void opt_ions(ModuleESolver::ESolver *p_esolver);
+	void md_force_virial(ModuleESolver::ESolver *p_esolver,
 		const int &istep,
         const int& numIon, 
         double &potential, 
@@ -25,7 +27,8 @@ class Run_MD_LCAO
 
 	// electron charge density extropolation method
 	Charge_Extra CE;
-	bool cellchange;
+    bool cellchange;
+    LCAO_Matrix LM_md;
 };
 
 #endif

@@ -6,12 +6,11 @@
 #include "../module_base/memory.h"
 #include "../module_base/timer.h"
 
-#include "LCAO_nnr.h"
 void Local_Orbital_Charge::allocate_DM_k(void)
 {
     ModuleBase::TITLE("Local_Orbital_Charge","allocate_k");
 
-    this->nnrg_now = GlobalC::LNNR.nnrg;
+    this->nnrg_now = GlobalC::GridT.nnrg;
     //xiaohui add 'GlobalV::OUT_LEVEL' line, 2015-09-16
     if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nnrg_last",nnrg_last);
     if(GlobalV::OUT_LEVEL != "m") ModuleBase::GlobalFunc::OUT(GlobalV::ofs_running,"nnrg_now",nnrg_now);
@@ -49,16 +48,17 @@ void Local_Orbital_Charge::allocate_DM_k(void)
     }
 
 	// Peize Lin test 2019-01-16 
-    wfc_dm_2d.init();
+    this->init_dm_2d();
 	if(GlobalC::wf.start_wfc=="file")
 	{
-		this->kpt_file(GlobalC::GridT);
+		this->kpt_file(GlobalC::GridT, *this->LOWF);
 	}
 
     return;
 }
 
-void Local_Orbital_Charge::kpt_file(const Grid_Technique &gt)
+void Local_Orbital_Charge::kpt_file(const Grid_Technique& gt,
+    Local_Orbital_wfc &lowf)
 {
 	ModuleBase::TITLE("Local_Orbital_Charge","kpt_file");
 
@@ -70,11 +70,11 @@ void Local_Orbital_Charge::kpt_file(const Grid_Technique &gt)
 	for(int ik=0; ik<GlobalC::kv.nkstot; ++ik)
 	{
 
-		GlobalC::LOC.wfc_dm_2d.wfc_k[ik].create(GlobalC::ParaO.ncol, GlobalC::ParaO.nrow);
-		GlobalC::LOC.wfc_dm_2d.wfc_k[ik].zero_out();
+		lowf.wfc_k[ik].create(this->ParaV->ncol_bands, this->ParaV->nrow);
+		lowf.wfc_k[ik].zero_out();
 
 		GlobalV::ofs_running << " Read in wave functions " << ik + 1 << std::endl;
-		error = WF_Local::read_lowf_complex( ctot , ik , 1);
+		error = WF_Local::read_lowf_complex( ctot , ik, lowf);
 
 #ifdef __MPI
 		Parallel_Common::bcast_int(error);
@@ -109,8 +109,9 @@ inline void cal_DM_ATOM(
  	const int ia1, 
 	const int iw1_lo, 
 	const int nw1, 
-	const int gstart, 
-	std::complex<double> *WFC_PHASE, 
+    const int gstart,
+    std::complex<double>*** wfc_k_grid,
+    std::complex<double>* WFC_PHASE,
 	std::complex<double> **DM_ATOM)
 {
 
@@ -121,7 +122,7 @@ inline void cal_DM_ATOM(
 
     for(int ik=0; ik<GlobalC::kv.nks; ik++)
     {
-        std::complex<double> **wfc = GlobalC::LOWF.WFC_K[ik];
+        std::complex<double> **wfc = wfc_k_grid[ik];
         const int ispin = GlobalC::kv.isk[ik];
         int atom2start=0;
 
@@ -181,8 +182,9 @@ inline void cal_DM_ATOM_nc(
 	const int ia1, 
 	const int iw1_lo, 
 	const int nw1, 
-	const int gstart, 
-	std::complex<double> *WFC_PHASE, 
+    const int gstart,
+    std::complex<double>*** wfc_k_grid,
+    std::complex<double>* WFC_PHASE,
 	std::complex<double> **DM_ATOM)
 {
 
@@ -203,7 +205,7 @@ inline void cal_DM_ATOM_nc(
         {
             for(int ik=0; ik<GlobalC::kv.nks; ik++)
             {
-                std::complex<double> **wfc = GlobalC::LOWF.WFC_K[ik];
+                std::complex<double> **wfc = wfc_k_grid[ik];
                 int atom2start=0;
 
                 for (int ia2 = 0; ia2 < RA.na_each[ia1]; ++ia2)
@@ -292,8 +294,8 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
             if(gt.in_this_processor[iat])
             {
                 const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);
-                const int gstart = GlobalC::LNNR.nlocstartg[iat];
-                const int ng = GlobalC::LNNR.nlocdimg[iat];
+                const int gstart = GlobalC::GridT.nlocstartg[iat];
+                const int ng = GlobalC::GridT.nlocdimg[iat];
                 const int iw1_lo=gt.trace_lo[start1]/GlobalV::NPOL;
                 const int nw1=atom1->nw;
 
@@ -316,11 +318,11 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
                 ModuleBase::GlobalFunc::ZEROS(WFC_PHASE, GlobalV::NBANDS*nw1);
                 if(GlobalV::NSPIN!=4)
 				{
-					cal_DM_ATOM(gt, fac, RA, ca, iw1_lo, nw1, gstart, WFC_PHASE, DM_ATOM);
+					cal_DM_ATOM(gt, fac, RA, ca, iw1_lo, nw1, gstart, this->LOWF->wfc_k_grid, WFC_PHASE, DM_ATOM);
 				}
                 else 
 				{
-					cal_DM_ATOM_nc(gt, fac, RA, ca, iw1_lo, nw1, gstart, WFC_PHASE, DM_ATOM);
+					cal_DM_ATOM_nc(gt, fac, RA, ca, iw1_lo, nw1, gstart, this->LOWF->wfc_k_grid, WFC_PHASE, DM_ATOM);
 				}
                 ++ca;
 

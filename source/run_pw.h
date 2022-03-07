@@ -19,7 +19,7 @@ class Run_pw
     ~Run_pw();
 
 	// perform plane wave basis calculations
-    static void plane_wave_line(ModuleESolver::ESolver *p_ensolver);
+    static void plane_wave_line(ModuleESolver::ESolver *p_esolver);
 
 };
 
