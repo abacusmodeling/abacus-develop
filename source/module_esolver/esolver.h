@@ -5,9 +5,13 @@
 #include "../module_cell/unitcell_pseudo.h"
 #include "../src_pw/energy.h"
 #include "../module_base/matrix.h"
-//-------------temperary-------------------------
-#include "src_lcao/LOOP_elec.h"
-//------It should be moved as fast as possible---
+//--------------temporary----------------------------
+#include "src_lcao/record_adj.h"
+#include "src_lcao/local_orbital_charge.h"
+#include "src_lcao/local_orbital_wfc.h"
+#include "src_lcao/LCAO_hamilt.h"
+//--------------\temporary----------------------------
+//------It should be moved as fast as possible------
 
 namespace ModuleESolver
 {
