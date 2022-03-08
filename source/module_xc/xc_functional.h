@@ -27,6 +27,8 @@ class XC_Functional
 	friend class LOOP_elec;
 	friend class Run_MD_PW;
 	friend class XCTest_PBE;
+	friend class XCTest_PZ;
+	friend class XCTest_PWLDA;
 
 	XC_Functional();
 	~XC_Functional();
