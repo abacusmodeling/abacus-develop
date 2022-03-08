@@ -245,8 +245,8 @@ void ELEC_evolve::using_LAPACK_complex(const int &ik, std::complex<double>** c, 
 	double delta_t;
 	//      delta_t = 0.2;	//identity: fs;
 	ModuleBase::ComplexMatrix Numerator(GlobalV::NLOCAL,GlobalV::NLOCAL);
-	Numerator = Idmat - 0.5*INPUT.mdp.dt*41.34*Denominator;
-	Denominator = Idmat + 0.5*INPUT.mdp.dt*41.34*Denominator;
+	Numerator = Idmat - 0.5*INPUT.mdp.md_dt*41.34*Denominator;
+	Denominator = Idmat + 0.5*INPUT.mdp.md_dt*41.34*Denominator;
 
 	int info;
 	int lwork=3*GlobalV::NLOCAL-1; //tmp
@@ -384,8 +384,8 @@ void ELEC_evolve::using_LAPACK_complex_2(
 	double delta_t=0.0;
 
 	ModuleBase::ComplexMatrix Numerator(GlobalV::NLOCAL,GlobalV::NLOCAL);
-	Numerator = Idmat - 0.5*INPUT.mdp.dt*41.34*Denominator;
-	Denominator = Idmat + 0.5*INPUT.mdp.dt*41.34*Denominator;
+	Numerator = Idmat - 0.5*INPUT.mdp.md_dt*41.34*Denominator;
+	Denominator = Idmat + 0.5*INPUT.mdp.md_dt*41.34*Denominator;
 
 	int info=0;
 	int lwork=3*GlobalV::NLOCAL-1; //tmp

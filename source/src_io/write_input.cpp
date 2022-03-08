@@ -158,25 +158,25 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"selinv_niter",selinv_niter,"max number of steps to update mu");
 
 	ofs << "\n#Parameters (10.Molecular dynamics)" << std::endl;
-	ModuleBase::GlobalFunc::OUTP(ofs,"md_mdtype",mdp.mdtype,"choose ensemble");
-	ModuleBase::GlobalFunc::OUTP(ofs,"md_potential",mdp.md_potential,"choose potential");
-	ModuleBase::GlobalFunc::OUTP(ofs,"md_dt",mdp.dt,"time step");
-	ModuleBase::GlobalFunc::OUTP(ofs,"mnhc",mdp.MNHC,"number of Nose-Hoover chains");
-	ModuleBase::GlobalFunc::OUTP(ofs,"md_qmass",mdp.Qmass,"mass of thermostat");
-	ModuleBase::GlobalFunc::OUTP(ofs,"md_tfirst",mdp.tfirst,"temperature first");
-	ModuleBase::GlobalFunc::OUTP(ofs,"md_tlast",mdp.tlast,"temperature last");
-	ModuleBase::GlobalFunc::OUTP(ofs,"md_dumpfred",mdp.dumpfreq,"The period to dump MD information");
-	ModuleBase::GlobalFunc::OUTP(ofs,"md_dumpfred",mdp.rstfreq,"The period to output MD restart information");
-	ModuleBase::GlobalFunc::OUTP(ofs,"md_rstmd",mdp.rstMD,"whether restart");
-	ModuleBase::GlobalFunc::OUTP(ofs,"rcut_lj",mdp.rcut_lj,"cutoff radius of LJ potential");
-	ModuleBase::GlobalFunc::OUTP(ofs,"epsilon_lj",mdp.epsilon_lj,"the value of epsilon for LJ potential");
-	ModuleBase::GlobalFunc::OUTP(ofs,"sigma_lj",mdp.sigma_lj,"the value of sigma for LJ potential");
-	ModuleBase::GlobalFunc::OUTP(ofs,"direction",mdp.direction,"the direction of shock wave");
-	ModuleBase::GlobalFunc::OUTP(ofs,"velocity",mdp.velocity,"the velocity of shock wave");
-	ModuleBase::GlobalFunc::OUTP(ofs,"viscosity",mdp.viscosity,"artificial viscosity");
-	ModuleBase::GlobalFunc::OUTP(ofs,"tscale",mdp.tscale,"reduction in initial temperature");
-	ModuleBase::GlobalFunc::OUTP(ofs,"md_tfreq",mdp.tfreq,"oscillation frequency, used to determine Qmass of NHC");
-	ModuleBase::GlobalFunc::OUTP(ofs,"md_damp",mdp.damp,"damping parameter (time units) used to add force in Langevin method");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_type",mdp.md_type,"choose ensemble");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_ensolver",mdp.md_ensolver,"choose potential");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_dt",mdp.md_dt,"time step");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_mnhc",mdp.md_mnhc,"number of Nose-Hoover chains");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_tfirst",mdp.md_tfirst,"temperature first");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_tlast",mdp.md_tlast,"temperature last");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_dumpfreq",mdp.md_dumpfreq,"The period to dump MD information");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_restartfreq",mdp.md_restartfreq,"The period to output MD restart information");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_restart",mdp.md_restart,"whether restart");
+	ModuleBase::GlobalFunc::OUTP(ofs,"lj_rcut",mdp.lj_rcut,"cutoff radius of LJ potential");
+	ModuleBase::GlobalFunc::OUTP(ofs,"lj_epsilon",mdp.lj_epsilon,"the value of epsilon for LJ potential");
+	ModuleBase::GlobalFunc::OUTP(ofs,"lj_sigma",mdp.lj_sigma,"the value of sigma for LJ potential");
+	ModuleBase::GlobalFunc::OUTP(ofs,"msst_direction",mdp.msst_direction,"the direction of shock wave");
+	ModuleBase::GlobalFunc::OUTP(ofs,"msst_vel",mdp.msst_vel,"the velocity of shock wave");
+	ModuleBase::GlobalFunc::OUTP(ofs,"msst_vis",mdp.msst_vis,"artificial viscosity");
+	ModuleBase::GlobalFunc::OUTP(ofs,"msst_tscale",mdp.msst_tscale,"reduction in initial temperature");
+	ModuleBase::GlobalFunc::OUTP(ofs,"msst_qmass",mdp.msst_qmass,"mass of thermostat");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_tfreq",mdp.md_tfreq,"oscillation frequency, used to determine msst_qmass of NHC");
+	ModuleBase::GlobalFunc::OUTP(ofs,"md_damp",mdp.md_damp,"damping parameter (time units) used to add force in Langevin method");
 
 
 	ofs << "\n#Parameters (11.Efield)" << std::endl;

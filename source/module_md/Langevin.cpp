@@ -6,7 +6,7 @@
 Langevin::Langevin(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in) : Verlet(MD_para_in, unit_in)
 {
     // convert to a.u. unit
-    mdp.damp /= ModuleBase::AU_to_FS;
+    mdp.md_damp /= ModuleBase::AU_to_FS;
 }
 
 Langevin::~Langevin(){}
@@ -68,10 +68,10 @@ void Langevin::post_force()
     {
         for(int i=0; i<ucell.nat; ++i)
         {
-            force[i] -= allmass[i] * vel[i] / mdp.damp;
+            force[i] -= allmass[i] * vel[i] / mdp.md_damp;
             for(int j=0; j<3; ++j)
             {
-                force[i][j] += sqrt(24.0 * t_target * allmass[i] / mdp.damp / mdp.dt) * (rand()/double(RAND_MAX) - 0.5);
+                force[i][j] += sqrt(24.0 * t_target * allmass[i] / mdp.md_damp / mdp.md_dt) * (rand()/double(RAND_MAX) - 0.5);
             }
         }
     }
@@ -84,5 +84,5 @@ void Langevin::post_force()
 void Langevin::temp_target()
 {
     double delta = (double)(step_ + step_rst_) / GlobalV::NSTEP;
-    t_target = mdp.tfirst + delta * (mdp.tlast - mdp.tfirst);
+    t_target = mdp.md_tfirst + delta * (mdp.md_tlast - mdp.md_tfirst);
 }

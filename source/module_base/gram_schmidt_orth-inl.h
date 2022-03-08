@@ -43,15 +43,21 @@ std::vector<std::vector<Func_Type>> Gram_Schmidt_Orth<Func_Type,R_Type>::cal_ort
 	
 	for( size_t if1=0; if1!=func.size(); ++if1 )
 	{
+		//use CGS2 algorithm to do twice orthogonalization 
+		//DOI 10.1007/s00211-005-0615-4
 		std::vector<Func_Type> func_try = func[if1];
-		for( size_t if_minus=0; if_minus!=func_new.size(); ++if_minus )
+		for(int niter=0;niter<3;niter++)
 		{
-			// (hn,ei)
-			const std::vector<Func_Type> && mul_func = Mathzone::Pointwise_Product( func[if1], func_new[if_minus] );
-			const Func_Type in_product = cal_norm(mul_func);
+			std::vector<Func_Type> func_tmp = func_try;
+			for( size_t if_minus=0; if_minus!=func_new.size(); ++if_minus )
+			{
+				// (hn,ei)
+				const std::vector<Func_Type> && mul_func = Mathzone::Pointwise_Product( func_tmp, func_new[if_minus] );
+				const Func_Type in_product = cal_norm(mul_func);
 
-			// hn - (hn,ei)ei
-			BlasConnector::axpy( mul_func.size(), -in_product, ModuleBase::GlobalFunc::VECTOR_TO_PTR(func_new[if_minus]), 1, ModuleBase::GlobalFunc::VECTOR_TO_PTR(func_try), 1);
+				// hn - (hn,ei)ei
+				BlasConnector::axpy( mul_func.size(), -in_product, ModuleBase::GlobalFunc::VECTOR_TO_PTR(func_new[if_minus]), 1, ModuleBase::GlobalFunc::VECTOR_TO_PTR(func_try), 1);
+			}
 		}
 		
 		// ||gn||

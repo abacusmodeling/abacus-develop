@@ -37,16 +37,16 @@ void Print_Info::setup_parameters(UnitCell_pseudo &ucell, K_Vectors &kv, xcfunc 
 
 			std::cout << " ---------------------------------------------------------" << std::endl;
 
-			if(INPUT.mdp.mdtype ==1 || INPUT.mdp.mdtype==2)
+			if(INPUT.mdp.md_type ==1 || INPUT.mdp.md_type==3)
 			{
 				std::cout << " ENSEMBLE                 : " << "NVT" << std::endl;
 			}
-			else if(INPUT.mdp.mdtype==0)
+			else if(INPUT.mdp.md_type==0)
 			{
 				std::cout << " ENSEMBLE                 : " << "NVE" << std::endl;
 			}
 			
-			std::cout << " Time interval(fs)        : " << INPUT.mdp.dt << std::endl;
+			std::cout << " Time interval(fs)        : " << INPUT.mdp.md_dt << std::endl;
 		}
 		std::cout << " ---------------------------------------------------------" << std::endl;
 
