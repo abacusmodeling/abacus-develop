@@ -4,7 +4,7 @@
 #include "mpi.h"
 #endif
 #include "../module_base/timer.h"
-#include "module_ensolver/en_solver.h"
+#include "module_esolver/esolver.h"
 
 MSST::MSST(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in) : Verlet(MD_para_in, unit_in)
 {
@@ -33,14 +33,14 @@ MSST::~MSST()
     delete []old_v;
 }
 
-void MSST::setup(ModuleEnSover::En_Solver *p_ensolver)
+void MSST::setup(ModuleESolver::ESolver *p_esolver)
 {
     ModuleBase::TITLE("MSST", "setup");
     ModuleBase::timer::tick("MSST", "setup");
 
     int sd = mdp.direction;
 
-    MD_func::force_virial(p_ensolver, step_, mdp, ucell, potential, force, virial);
+    MD_func::force_virial(p_esolver, step_, mdp, ucell, potential, force, virial);
     MD_func::kinetic_stress(ucell, vel, allmass, kinetic, stress);
     stress += virial;
 

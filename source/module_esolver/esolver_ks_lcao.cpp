@@ -1,12 +1,12 @@
-#include "ks_scf_lcao.h"
+#include "esolver_ks_lcao.h"
 
 //--------------temporary----------------------------
-#include "../../../../src_pw/global.h"
-#include "../../../../module_base/global_function.h"
-#include "src_io/print_info.h"
+#include "../src_pw/global.h"
+#include "../module_base/global_function.h"
+#include "../src_io/print_info.h"
 
 #ifdef __DEEPKS
-#include "module_deepks/LCAO_deepks.h"
+#include "../module_deepks/LCAO_deepks.h"
 #endif
 //-----force-------------------
 
@@ -14,10 +14,10 @@
 
 //---------------------------------------------------
 
-namespace ModuleEnSover
+namespace ModuleESolver
 {
 
-void KS_SCF_LCAO::Init(Input &inp, UnitCell_pseudo &ucell)
+void ESolver_KS_LCAO::Init(Input &inp, UnitCell_pseudo &ucell)
 {
 
 	// setup GlobalV::NBANDS
@@ -108,7 +108,7 @@ void KS_SCF_LCAO::Init(Input &inp, UnitCell_pseudo &ucell)
 
 }
 
-void KS_SCF_LCAO::Run(
+void ESolver_KS_LCAO::Run(
     int istep, 
     Record_adj& ra,
     Local_Orbital_Charge& loc,
@@ -119,16 +119,16 @@ void KS_SCF_LCAO::Run(
     return ;
 }
 
-void KS_SCF_LCAO::cal_Energy(energy &en)
+void ESolver_KS_LCAO::cal_Energy(energy &en)
 {
 
 }
 
-void KS_SCF_LCAO::cal_Force(ModuleBase::matrix &force)
+void ESolver_KS_LCAO::cal_Force(ModuleBase::matrix &force)
 {
 
 }
-void KS_SCF_LCAO::cal_Stress(ModuleBase::matrix &stress)
+void ESolver_KS_LCAO::cal_Stress(ModuleBase::matrix &stress)
 {
 
 }

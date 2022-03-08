@@ -1,12 +1,12 @@
-#ifndef KS_SCF_H
-#define KS_SCF_H
-#include "../ab_initio.h"
+#ifndef ESOLVER_KS_H
+#define ESOLVER_KS_H
+#include "./esolver_fp.h"
 // #include "estates.h"
 // #include "h2e.h"
-namespace ModuleEnSover
+namespace ModuleESolver
 {
 
-class KS_SCF: public ab_initio
+class ESolver_KS: public ESolver_FP
 {
     public:
         // Psi *p_wf; 

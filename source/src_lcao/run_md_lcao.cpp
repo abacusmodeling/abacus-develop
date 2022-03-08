@@ -34,7 +34,7 @@ Run_MD_LCAO::Run_MD_LCAO(Parallel_Orbitals &pv)
 Run_MD_LCAO::~Run_MD_LCAO(){}
 
 
-void Run_MD_LCAO::opt_cell(ORB_control &orb_con, ModuleEnSover::En_Solver *p_ensolver)
+void Run_MD_LCAO::opt_cell(ORB_control &orb_con, ModuleESolver::ESolver *p_esolver)
 {
 	ModuleBase::TITLE("Run_MD_LCAO","opt_cell");
 
@@ -58,14 +58,14 @@ void Run_MD_LCAO::opt_cell(ORB_control &orb_con, ModuleEnSover::En_Solver *p_ens
     int ion_step=0;
     GlobalC::pot.init_pot(ion_step, GlobalC::pw.strucFac);
 
-    opt_ions(p_ensolver);
+    opt_ions(p_esolver);
     orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, GlobalV::out_descriptor, GlobalC::ucell.infoNL.nproj);
     
     return;
 }
 
 
-void Run_MD_LCAO::opt_ions(ModuleEnSover::En_Solver *p_ensolver)
+void Run_MD_LCAO::opt_ions(ModuleESolver::ESolver *p_esolver)
 {
     ModuleBase::TITLE("Run_MD_LCAO","opt_ions"); 
     ModuleBase::timer::tick("Run_MD_LCAO","opt_ions"); 
@@ -119,7 +119,7 @@ void Run_MD_LCAO::opt_ions(ModuleEnSover::En_Solver *p_ensolver)
         if(verlet->step_ == 0)
         {
             MD_func::ParaV = this->LM_md.ParaV;
-            verlet->setup(p_ensolver);
+            verlet->setup(p_esolver);
         }
         else
         {
@@ -148,7 +148,7 @@ void Run_MD_LCAO::opt_ions(ModuleEnSover::En_Solver *p_ensolver)
             GlobalC::pot.init_pot(verlet->step_, GlobalC::pw.strucFac);
 
             // update force and virial due to the update of atom positions
-            MD_func::force_virial(p_ensolver, verlet->step_, verlet->mdp, verlet->ucell, verlet->potential, verlet->force, verlet->virial);
+            MD_func::force_virial(p_esolver, verlet->step_, verlet->mdp, verlet->ucell, verlet->potential, verlet->force, verlet->virial);
 
             verlet->second_half();
 
@@ -202,7 +202,7 @@ void Run_MD_LCAO::opt_ions(ModuleEnSover::En_Solver *p_ensolver)
 }
 
 void Run_MD_LCAO::md_force_virial(
-    ModuleEnSover::En_Solver *p_ensolver,
+    ModuleESolver::ESolver *p_esolver,
     const int &istep,
     const int& numIon, 
     double &potential, 

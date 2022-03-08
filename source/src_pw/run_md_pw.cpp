@@ -17,7 +17,7 @@ Run_MD_PW::Run_MD_PW()
 
 Run_MD_PW::~Run_MD_PW(){}
 
-void Run_MD_PW::md_ions_pw(ModuleEnSover::En_Solver *p_ensolver)
+void Run_MD_PW::md_ions_pw(ModuleESolver::ESolver *p_esolver)
 {
     ModuleBase::TITLE("Run_MD_PW", "md_ions_pw");
     ModuleBase::timer::tick("Run_MD_PW", "md_ions_pw");
@@ -73,7 +73,7 @@ void Run_MD_PW::md_ions_pw(ModuleEnSover::En_Solver *p_ensolver)
     {
         if(verlet->step_ == 0)
         {
-            verlet->setup(p_ensolver);
+            verlet->setup(p_esolver);
         }
         else
         {
@@ -105,7 +105,7 @@ void Run_MD_PW::md_ions_pw(ModuleEnSover::En_Solver *p_ensolver)
             GlobalC::wf.wfcinit();
 
             // update force and virial due to the update of atom positions
-            MD_func::force_virial(p_ensolver, verlet->step_, verlet->mdp, verlet->ucell, verlet->potential, verlet->force, verlet->virial);
+            MD_func::force_virial(p_esolver, verlet->step_, verlet->mdp, verlet->ucell, verlet->potential, verlet->force, verlet->virial);
 
             verlet->second_half();
 
@@ -151,14 +151,14 @@ void Run_MD_PW::md_ions_pw(ModuleEnSover::En_Solver *p_ensolver)
     return;
 }
 
-void Run_MD_PW::md_cells_pw(ModuleEnSover::En_Solver *p_ensolver)
+void Run_MD_PW::md_cells_pw(ModuleESolver::ESolver *p_esolver)
 {
     ModuleBase::TITLE("Run_MD_PW", "md_cells_pw");
     ModuleBase::timer::tick("Run_MD_PW", "md_cells_pw");
 
     // ion optimization begins
     // electron density optimization is included in ion optimization
-    this->md_ions_pw(p_ensolver);
+    this->md_ions_pw(p_esolver);
 
     GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
     GlobalV::ofs_running << std::setprecision(16);
@@ -169,7 +169,7 @@ void Run_MD_PW::md_cells_pw(ModuleEnSover::En_Solver *p_ensolver)
 }
 
 void Run_MD_PW::md_force_virial(
-    ModuleEnSover::En_Solver *p_ensolver,
+    ModuleESolver::ESolver *p_esolver,
     const int &istep,
     const int& numIon, 
     double &potential, 
@@ -259,7 +259,7 @@ void Run_MD_PW::md_force_virial(
     ModuleBase::matrix fcs;
 	// Forces ff;
 	// ff.init(fcs);
-    p_ensolver->cal_Force(fcs);
+    p_esolver->cal_Force(fcs);
 
 	for(int ion=0;ion<numIon;ion++)
     {
@@ -272,7 +272,7 @@ void Run_MD_PW::md_force_virial(
 	{
 		// Stress_PW ss;
 		// ss.cal_stress(virial);
-        p_ensolver->cal_Stress(virial);
+        p_esolver->cal_Stress(virial);
         virial = 0.5 * virial;
 	}
 

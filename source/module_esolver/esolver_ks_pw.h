@@ -1,22 +1,22 @@
-#ifndef KS_SCF_PW_H
-#define KS_SCF_PW_H
-#include "../ks_scf.h"
+#ifndef ESOLVER_KS_PW_H
+#define ESOLVER_KS_PW_H
+#include "./esolver_ks.h"
 // #include "Basis_PW.h"
 // #include "Estate_PW.h"
 // #include "Hamilton_PW.h"
 // #include "H2E_pw.h"
 
-#include "../../../../src_pw/electrons.h"
+#include "../src_pw/electrons.h"
 
-namespace ModuleEnSover
+namespace ModuleESolver
 {
 
-class KS_SCF_PW: public KS_SCF
+class ESolver_KS_PW: public ESolver_KS
 {
 public:
-    KS_SCF_PW()
+    ESolver_KS_PW()
     {
-        tag = "KS_SCF_PW";
+        tag = "ESolver_KS_PW";
     }
     void Init(Input &inp, UnitCell_pseudo &cell) override;
     void Run(int istep, UnitCell_pseudo& cell) override;
@@ -32,8 +32,9 @@ public:
 //--------------temporary----------------------------
     Electrons elec;
 //---------------------------------------------------
+    int getiter();
 
-    // KS_SCF_PW(bool use_sdft)
+    // ESolver_KS_PW(bool use_sdft)
     // {
     //     if(use_sdft)    
     //     {

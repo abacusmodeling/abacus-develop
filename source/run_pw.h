@@ -8,7 +8,7 @@
 #include "module_base/global_function.h"
 #include "module_base/global_variable.h"
 #include "input.h"
-#include "module_ensolver/en_solver.h"
+#include "module_esolver/esolver.h"
 
 class Run_pw
 {
@@ -19,7 +19,7 @@ class Run_pw
     ~Run_pw();
 
 	// perform plane wave basis calculations
-    static void plane_wave_line(ModuleEnSover::En_Solver *p_ensolver);
+    static void plane_wave_line(ModuleESolver::ESolver *p_esolver);
 
 };
 

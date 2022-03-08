@@ -13,7 +13,7 @@ Run_lcao::Run_lcao(){}
 Run_lcao::~Run_lcao(){}
 
 
-void Run_lcao::lcao_line(ModuleEnSover::En_Solver *p_ensolver)
+void Run_lcao::lcao_line(ModuleESolver::ESolver *p_esolver)
 {
     ModuleBase::TITLE("Run_lcao","lcao_line");
     ModuleBase::timer::tick("Run_lcao", "lcao_line");
@@ -58,8 +58,8 @@ void Run_lcao::lcao_line(ModuleEnSover::En_Solver *p_ensolver)
 
 
     //------------------------------------------------------------
-    //---------------------Init En_Solver-------------------------
-    p_ensolver->Init(INPUT, GlobalC::ucell);
+    //---------------------Init ESolver-------------------------
+    p_esolver->Init(INPUT, GlobalC::ucell);
     //------------------------------------------------------------
 
     //------------------init Basis_lcao----------------------
@@ -82,13 +82,13 @@ void Run_lcao::lcao_line(ModuleEnSover::En_Solver *p_ensolver)
     if (GlobalV::CALCULATION == "md")
 	{
 		Run_MD_LCAO run_md_lcao(orb_con.ParaV);
-		run_md_lcao.opt_cell(orb_con, p_ensolver);
+		run_md_lcao.opt_cell(orb_con, p_esolver);
 	}
 	else // cell relaxations
 	{
         LOOP_cell lc(orb_con.ParaV);
         //keep wfc_gamma or wfc_k remaining
-        lc.opt_cell(orb_con, p_ensolver);
+        lc.opt_cell(orb_con, p_esolver);
     }
     //---------------------------MD/Relax------------------
 

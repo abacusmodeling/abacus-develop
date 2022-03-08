@@ -4,7 +4,7 @@
 #include "variable_cell.h" // mohan add 2021-02-01
 #include "src_io/write_wfc_realspace.h"
 
-void Ions::opt_ions_pw(ModuleEnSover::En_Solver *p_ensolver)
+void Ions::opt_ions_pw(ModuleESolver::ESolver *p_esolver)
 {
 	ModuleBase::TITLE("Ions","opt_ions_pw");
 	ModuleBase::timer::tick("Ions","opt_ions_pw");
@@ -134,9 +134,9 @@ void Ions::opt_ions_pw(ModuleEnSover::En_Solver *p_ensolver)
 			{	
 #endif
 #endif		
-				p_ensolver->Run(istep,GlobalC::ucell);
-				p_ensolver->cal_Energy(GlobalC::en);
-				eiter = elec.iter;
+				p_esolver->Run(istep,GlobalC::ucell);
+				p_esolver->cal_Energy(GlobalC::en);
+				eiter = p_esolver->getiter();
 #ifdef __LCAO
 #ifdef __MPI
 			}
@@ -191,7 +191,7 @@ void Ions::opt_ions_pw(ModuleEnSover::En_Solver *p_ensolver)
 
         if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
         {
-			stop = this->after_scf(p_ensolver, istep, force_step, stress_step);    // pengfei Li 2018-05-14
+			stop = this->after_scf(p_esolver, istep, force_step, stress_step);    // pengfei Li 2018-05-14
 		}
 		time_t fend = time(NULL);
 
@@ -242,20 +242,20 @@ void Ions::opt_ions_pw(ModuleEnSover::En_Solver *p_ensolver)
     return;
 }
 
-bool Ions::after_scf(ModuleEnSover::En_Solver *p_ensolver, const int &istep, int &force_step, int &stress_step)
+bool Ions::after_scf(ModuleESolver::ESolver *p_esolver, const int &istep, int &force_step, int &stress_step)
 {
 	ModuleBase::TITLE("Ions","after_scf");
 	//calculate and gather all parts of total ionic forces
 	ModuleBase::matrix force;
 	if(GlobalV::FORCE)
 	{
-		this->gather_force_pw(p_ensolver, force);
+		this->gather_force_pw(p_esolver, force);
 	}
 	//calculate and gather all parts of stress
 	ModuleBase::matrix stress;
 	if(GlobalV::STRESS)
 	{
-		this->gather_stress_pw(p_ensolver, stress);
+		this->gather_stress_pw(p_esolver, stress);
 	}
 	//stop in last step
 	if(istep==GlobalV::NSTEP)
@@ -290,21 +290,21 @@ bool Ions::after_scf(ModuleEnSover::En_Solver *p_ensolver, const int &istep, int
 
     return 1;
 }
-void Ions::gather_force_pw(ModuleEnSover::En_Solver *p_ensolver, ModuleBase::matrix &force)
+void Ions::gather_force_pw(ModuleESolver::ESolver *p_esolver, ModuleBase::matrix &force)
 {
 	ModuleBase::TITLE("Ions","gather_force_pw");
 	// Forces fcs;
 	// fcs.init(force);
-	p_ensolver->cal_Force(force);
+	p_esolver->cal_Force(force);
 }
 
-void Ions::gather_stress_pw(ModuleEnSover::En_Solver *p_ensolver, ModuleBase::matrix& stress)
+void Ions::gather_stress_pw(ModuleESolver::ESolver *p_esolver, ModuleBase::matrix& stress)
 {
 	ModuleBase::TITLE("Ions","gather_stress_pw");
 	//basic stress
 	// Stress_PW ss;
 	// ss.cal_stress(stress);
-	p_ensolver->cal_Stress(stress);
+	p_esolver->cal_Stress(stress);
 	//external stress
 	double unit_transform = 0.0;
 	unit_transform = ModuleBase::RYDBERG_SI / pow(ModuleBase::BOHR_RADIUS_SI,3) * 1.0e-8;

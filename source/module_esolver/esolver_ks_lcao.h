@@ -1,18 +1,18 @@
-#ifndef KS_SCF_LCAO_H
-#define KS_SCF_LCAO_H
-#include "../ks_scf.h"
+#ifndef ESOLVER_KS_LCAO_H
+#define ESOLVER_KS_LCAO_H
+#include "./esolver_ks.h"
 
-#include "src_lcao/LOOP_elec.h"
+#include "../src_lcao/LOOP_elec.h"
 
-namespace ModuleEnSover
+namespace ModuleESolver
 {
 
-class KS_SCF_LCAO: public KS_SCF
+class ESolver_KS_LCAO: public ESolver_KS
 {
 public:
-    KS_SCF_LCAO()
+    ESolver_KS_LCAO()
     {
-        tag = "KS_SCF_LCAO";
+        tag = "ESolver_KS_LCAO";
     }
     void Init(Input& inp, UnitCell_pseudo& cell) override;
     

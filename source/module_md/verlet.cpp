@@ -4,7 +4,7 @@
 #include "mpi.h"
 #endif
 #include "../module_base/timer.h"
-#include "module_ensolver/en_solver.h"
+#include "module_esolver/esolver.h"
 
 Verlet::Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     mdp(MD_para_in),
@@ -47,14 +47,14 @@ Verlet::~Verlet()
     delete []force;
 }
 
-void Verlet::setup(ModuleEnSover::En_Solver *p_ensolver)
+void Verlet::setup(ModuleESolver::ESolver *p_esolver)
 {
     if(mdp.rstMD)
     {
         restart();
     }
 
-    MD_func::force_virial(p_ensolver, step_, mdp, ucell, potential, force, virial);
+    MD_func::force_virial(p_esolver, step_, mdp, ucell, potential, force, virial);
     MD_func::kinetic_stress(ucell, vel, allmass, kinetic, stress);
     stress += virial;
 

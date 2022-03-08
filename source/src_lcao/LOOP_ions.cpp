@@ -35,7 +35,7 @@ LOOP_ions::LOOP_ions(LCAO_Matrix &lm)
 LOOP_ions::~LOOP_ions()
 {}
 
-void LOOP_ions::opt_ions(ModuleEnSover::En_Solver *p_ensolver)
+void LOOP_ions::opt_ions(ModuleESolver::ESolver *p_esolver)
 {
     ModuleBase::TITLE("LOOP_ions","opt_ions");
     ModuleBase::timer::tick("LOOP_ions","opt_ions");
@@ -152,7 +152,7 @@ void LOOP_ions::opt_ions(ModuleEnSover::En_Solver *p_ensolver)
         Record_adj RA;
 		// solve electronic structures in terms of LCAO
         // mohan add 2021-02-09
-        p_ensolver->Run(this->istep, RA, this->LOC, this->LOWF, this->UHM);
+        p_esolver->Run(this->istep, RA, this->LOC, this->LOWF, this->UHM);
 
 		time_t eend = time(NULL);
 

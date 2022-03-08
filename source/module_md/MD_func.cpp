@@ -227,7 +227,7 @@ void MD_func::InitPos(
 
 //calculate potential, force and virial
 void MD_func::force_virial(
-		ModuleEnSover::En_Solver *p_ensolver,
+		ModuleESolver::ESolver *p_esolver,
 		const int &istep,
 		const MD_parameters &mdp,
 		const UnitCell_pseudo &unit_in,
@@ -280,13 +280,13 @@ void MD_func::force_virial(
 		if(GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{
 			Run_MD_PW md_pw;
-			md_pw.md_force_virial(p_ensolver, istep, unit_in.nat, potential, force, stress);
+			md_pw.md_force_virial(p_esolver, istep, unit_in.nat, potential, force, stress);
 		}
 #ifdef __LCAO
 		else if(GlobalV::BASIS_TYPE=="lcao")
 		{
 			Run_MD_LCAO md_lcao(*ParaV);
-			md_lcao.md_force_virial(p_ensolver,istep, unit_in.nat, potential, force, stress);
+			md_lcao.md_force_virial(p_esolver,istep, unit_in.nat, potential, force, stress);
 		}
 #endif
 	}

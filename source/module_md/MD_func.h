@@ -8,7 +8,7 @@
 #include "../module_orbital/parallel_orbitals.h"
 #endif
 
-#include "module_ensolver/en_solver.h"
+#include "module_esolver/esolver.h"
 class MD_func
 {
     public:
@@ -44,7 +44,7 @@ class MD_func
 		ModuleBase::Vector3<double>* vel);
 
 	static void force_virial(
-		ModuleEnSover::En_Solver *p_ensolver,
+		ModuleESolver::ESolver *p_esolver,
 		const int &istep,
 		const MD_parameters &mdp,
 		const UnitCell_pseudo &unit_in,

@@ -1,5 +1,5 @@
-#ifndef EN_SOLVER_H
-#define EN_SOLVER_H
+#ifndef ESOLVER_H
+#define ESOLVER_H
 
 #include "../input.h"
 #include "../module_cell/unitcell_pseudo.h"
@@ -11,20 +11,29 @@
 #include "src_lcao/local_orbital_wfc.h"
 #include "src_lcao/LCAO_hamilt.h"
 //--------------\temporary----------------------------
-namespace ModuleEnSover
+//------It should be moved as fast as possible------
+
+namespace ModuleESolver
 {
 
-class En_Solver
+class ESolver
 {
+// protected:
+//     ModuleBase::matrix lattice_v;
 public:
-    En_Solver(){
-        tag = "En_Solver";
+    ESolver(){
+        tag = "ESolver";
     }
-    // virtual ~En_Solver() = 0;
+    // virtual ~ESolver() = 0;
 
     //virtual void Init(Input_EnSolver &inp, matrix &lattice_v)=0
     virtual void Init(Input &inp, UnitCell_pseudo &cell)=0;
 
+    // They shoud be add after atom class is refactored
+    // virtual void UpdateLatAtom(ModuleBase::matrix &lat_in, Atom &atom_in);
+    // virtual void UpdateLat(ModuleBase::matrix &lat_in);
+    // virtual void UpdateAtom(Atom &atom_in);
+   
     /// These two virtual `Run` will be merged in the future.
     //virtual void Run(int istep, Atom &atom) = 0;
     virtual void Run(int istep, UnitCell_pseudo& cell) = 0;
@@ -33,16 +42,20 @@ public:
         Local_Orbital_Charge& loc /**< EState*/,
         Local_Orbital_wfc& lowf /**< Psi*/,
         LCAO_Hamilt& uhm /**< Hamilt*/) = 0;
-
+    
     virtual void cal_Energy(energy &en) = 0; 
     virtual void cal_Force(ModuleBase::matrix &force) = 0;
     virtual void cal_Stress(ModuleBase::matrix &stress) = 0;
+    
+    //Print current classname.
     virtual void printag();
+    //get elec.iter
+    virtual int getiter(){return 0;}
     string tag;
 };
 
-void init_esolver(En_Solver* &p_ensolver, const string use_esol);
-void clean_esolver(En_Solver* &pesolver);
+void init_esolver(ESolver* &p_esolver, const string use_esol);
+void clean_esolver(ESolver* &pesolver);
 
 }
 

@@ -5,7 +5,7 @@
 #include "module_base/complexmatrix.h"
 #include "module_orbital/ORB_control.h"
 #include "src_lcao/LCAO_matrix.h"
-#include "module_ensolver/en_solver.h"
+#include "module_esolver/esolver.h"
 
 class LOOP_cell
 {
@@ -14,7 +14,7 @@ class LOOP_cell
 	LOOP_cell(Parallel_Orbitals &pv);
 	~LOOP_cell();
 
-	void opt_cell(ORB_control &orb_con, ModuleEnSover::En_Solver *p_ensolver);
+	void opt_cell(ORB_control &orb_con, ModuleESolver::ESolver *p_esolver);
 
 private:
     LCAO_Matrix LM;

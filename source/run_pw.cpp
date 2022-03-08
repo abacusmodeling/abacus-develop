@@ -12,7 +12,7 @@
 Run_pw::Run_pw(){}
 Run_pw::~Run_pw(){}
 
-void Run_pw::plane_wave_line(ModuleEnSover::En_Solver *p_ensolver)
+void Run_pw::plane_wave_line(ModuleESolver::ESolver *p_esolver)
 {
     ModuleBase::TITLE("Run_pw","plane_wave_line");
 	ModuleBase::timer::tick("Run_pw","plane_wave_line");
@@ -35,21 +35,21 @@ void Run_pw::plane_wave_line(ModuleEnSover::En_Solver *p_ensolver)
     }
 
     //------------------------------------------------------------
-    //---------------------Init En_Solver-------------------------
+    //---------------------Init ESolver-------------------------
     //------------------------------------------------------------
-    p_ensolver->Init(INPUT, GlobalC::ucell);
+    p_esolver->Init(INPUT, GlobalC::ucell);
 
     
 
     if(GlobalV::CALCULATION == "md")
     {
         Run_MD_PW run_md_pw;
-        run_md_pw.md_cells_pw(p_ensolver);
+        run_md_pw.md_cells_pw(p_esolver);
     }
     else
     {
         Cell_PW cpws;
-        cpws.opt_cells_pw(p_ensolver);
+        cpws.opt_cells_pw(p_esolver);
     }
 
     // cout<<"cpws SUCCESS"<<endl;

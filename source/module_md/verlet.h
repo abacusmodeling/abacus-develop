@@ -4,7 +4,7 @@
 #include "MD_parameters.h"
 #include "../module_cell/unitcell_pseudo.h"
 #include "../module_base/matrix.h"
-#include "module_ensolver/en_solver.h"
+#include "module_esolver/esolver.h"
 
 class Verlet
 {
@@ -12,7 +12,7 @@ public:
     Verlet(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in);
     virtual ~Verlet();
 
-    virtual void setup(ModuleEnSover::En_Solver *p_ensolver);
+    virtual void setup(ModuleESolver::ESolver *p_esolver);
     virtual void first_half();
     virtual void second_half();
     virtual void outputMD();

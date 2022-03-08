@@ -15,6 +15,7 @@ VPATH=./src_global\
 :./module_base\
 :./module_md\
 :./module_deepks\
+:./module_esolver\
 :./src_pw\
 :./src_lcao\
 :./src_ions\
@@ -25,7 +26,6 @@ VPATH=./src_global\
 :./src_ri\
 :./\
 
-include module_ensolver/Makefile.ensolver
 
 #==========================
 # Define HONG

@@ -1,26 +1,26 @@
-#include "ks_scf_pw.h"
+#include "esolver_ks_pw.h"
 
 //--------------temporary----------------------------
-#include "../../../../src_pw/global.h"
-#include "../../../../module_base/global_function.h"
-#include "../../../../module_symmetry/symmetry.h"
-#include "../../../../src_pw/vdwd2.h"
-#include "../../../../src_pw/vdwd3.h"
-#include "../../../../src_pw/vdwd2_parameters.h"
-#include "../../../../src_pw/vdwd3_parameters.h"
-#include "../../../../src_pw/pw_complement.h"
-#include "../../../../src_pw/pw_basis.h"
-#include "../../../../src_io/print_info.h"
+#include "../src_pw/global.h"
+#include "../module_base/global_function.h"
+#include "../module_symmetry/symmetry.h"
+#include "../src_pw/vdwd2.h"
+#include "../src_pw/vdwd3.h"
+#include "../src_pw/vdwd2_parameters.h"
+#include "../src_pw/vdwd3_parameters.h"
+#include "../src_pw/pw_complement.h"
+#include "../src_pw/pw_basis.h"
+#include "../src_io/print_info.h"
 //-----force-------------------
-#include "../../../../src_pw/forces.h"
+#include "../src_pw/forces.h"
 //-----stress------------------
-#include "../../../../src_pw/stress_pw.h"
+#include "../src_pw/stress_pw.h"
 //---------------------------------------------------
 
-namespace ModuleEnSover
+namespace ModuleESolver
 {
 
-void KS_SCF_PW::Init(Input &inp, UnitCell_pseudo &ucell)
+void ESolver_KS_PW::Init(Input &inp, UnitCell_pseudo &ucell)
 {
     // setup GlobalV::NBANDS 
 	// Yu Liu add 2021-07-03
@@ -165,26 +165,31 @@ void KS_SCF_PW::Init(Input &inp, UnitCell_pseudo &ucell)
 
 }
 
-void KS_SCF_PW::Run(int istep,UnitCell_pseudo &ucell)
+void ESolver_KS_PW::Run(int istep,UnitCell_pseudo &ucell)
 {
     elec.self_consistent(istep-1);
     return ;
 }
 
-void KS_SCF_PW::cal_Energy(energy &en)
+void ESolver_KS_PW::cal_Energy(energy &en)
 {
 
 }
 
-void KS_SCF_PW::cal_Force(ModuleBase::matrix &force)
+void ESolver_KS_PW::cal_Force(ModuleBase::matrix &force)
 {
 	Forces ff;
 	ff.init(force);
 }
-void KS_SCF_PW::cal_Stress(ModuleBase::matrix &stress)
+void ESolver_KS_PW::cal_Stress(ModuleBase::matrix &stress)
 {
 	Stress_PW ss;
 	ss.cal_stress(stress);
+}
+
+int ESolver_KS_PW:: getiter()
+{
+    return this->elec.iter;
 }
 
 }
