@@ -5,16 +5,16 @@
 #include "../module_cell/unitcell_pseudo.h"
 #include "../src_pw/energy.h"
 #include "../module_base/matrix.h"
-#ifdef __LCAO
+//-------------temperary-------------------------
 #include "src_lcao/LOOP_elec.h"
-#endif
+//------It should be moved as fast as possible---
+
 namespace ModuleESolver
 {
 
 class ESolver
 {
 // protected:
-//     Atom atom;
 //     ModuleBase::matrix lattice_v;
 public:
     ESolver(){
@@ -46,7 +46,7 @@ public:
     //Print current classname.
     virtual void printag();
     //get elec.iter
-    virtual int getiter(){};
+    virtual int getiter(){return 0;}
     string tag;
 };
 
