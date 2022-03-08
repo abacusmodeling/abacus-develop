@@ -69,18 +69,6 @@ void Input_Conv::Convert(void)
 	GlobalV::PSEUDORCUT = INPUT.pseudo_rcut;
 	GlobalV::RENORMWITHMESH = INPUT.renormwithmesh;
 
-
-	// Electrical Field
-	GlobalV::EFIELD = INPUT.efield;
-	Efield::edir = INPUT.edir;
-	Efield::emaxpos = INPUT.emaxpos;
-	Efield::eopreg = INPUT.eopreg;
-	Efield::eamp = INPUT.eamp;
-
-	// optical
-	Optical::opt_epsilon2 = INPUT.opt_epsilon2; // mohan add 2010-03-24
-	Optical::opt_nbands = INPUT.opt_nbands; // number of bands for optical transition.
-
 	GlobalV::DFT_FUNCTIONAL = INPUT.dft_functional;
 	GlobalV::NSPIN = INPUT.nspin;
 	GlobalV::CURRENT_SPIN = 0;
@@ -171,105 +159,6 @@ void Input_Conv::Convert(void)
 	GlobalC::wf.mem_saver = INPUT.mem_saver; // mohan add 2010-09-07
 	GlobalC::en.printe = INPUT.printe; // mohan add 2011-03-16
 
-//----------------------------------------------------------
-// about spectrum, pengfei 2016-12-14
-//----------------------------------------------------------
-#ifdef __LCAO
-	if ((INPUT.spectral_type == "eels" && INPUT.eels_method == 0)
-		|| (INPUT.spectral_type == "None" && INPUT.eels_method == 0 && INPUT.kmesh_interpolation))
-	{
-		if (INPUT.spectral_type == "eels")
-		{
-			GlobalC::chi0_hilbert.epsilon = true;
-		}
-		else if (INPUT.spectral_type == "None")
-		{
-			GlobalC::chi0_hilbert.epsilon = false;
-		}
-		// GlobalC::chi0_hilbert.epsilon = INPUT.epsilon;
-		GlobalC::chi0_hilbert.kernel_type = INPUT.kernel_type;
-		GlobalC::chi0_hilbert.system = INPUT.system_type;
-		GlobalC::chi0_hilbert.eta = INPUT.eta;
-		GlobalC::chi0_hilbert.domega = INPUT.domega;
-		GlobalC::chi0_hilbert.nomega = INPUT.nomega;
-		GlobalC::chi0_hilbert.dim = INPUT.ecut_chi;
-		// GlobalC::chi0_hilbert.oband = INPUT.oband;
-
-		GlobalC::chi0_hilbert.q_start[0] = INPUT.q_start[0];
-		GlobalC::chi0_hilbert.q_start[1] = INPUT.q_start[1];
-		GlobalC::chi0_hilbert.q_start[2] = INPUT.q_start[2];
-
-		GlobalC::chi0_hilbert.direct[0] = INPUT.q_direct[0];
-		GlobalC::chi0_hilbert.direct[1] = INPUT.q_direct[1];
-		GlobalC::chi0_hilbert.direct[2] = INPUT.q_direct[2];
-
-		// GlobalC::chi0_hilbert.start_q = INPUT.start_q;
-		// GlobalC::chi0_hilbert.interval_q = INPUT.interval_q;
-		GlobalC::chi0_hilbert.nq = INPUT.nq;
-		GlobalC::chi0_hilbert.out_epsilon = INPUT.out_epsilon;
-		GlobalC::chi0_hilbert.out_chi = INPUT.out_chi;
-		GlobalC::chi0_hilbert.out_chi0 = INPUT.out_chi0;
-		GlobalC::chi0_hilbert.fermi_level = INPUT.fermi_level;
-		GlobalC::chi0_hilbert.coulomb_cutoff = INPUT.coulomb_cutoff;
-		GlobalC::chi0_hilbert.kmesh_interpolation = INPUT.kmesh_interpolation;
-		for (int i = 0; i < 100; i++)
-		{
-			GlobalC::chi0_hilbert.qcar[i][0] = INPUT.qcar[i][0];
-			GlobalC::chi0_hilbert.qcar[i][1] = INPUT.qcar[i][1];
-			GlobalC::chi0_hilbert.qcar[i][2] = INPUT.qcar[i][2];
-		}
-		GlobalC::chi0_hilbert.lcao_box[0] = INPUT.lcao_box[0];
-		GlobalC::chi0_hilbert.lcao_box[1] = INPUT.lcao_box[1];
-		GlobalC::chi0_hilbert.lcao_box[2] = INPUT.lcao_box[2];
-	}
-#endif
-
-	// if( INPUT.epsilon && (INPUT.epsilon_choice == 1))
-	if (INPUT.spectral_type == "eels" && INPUT.eels_method == 1)
-	{
-		// GlobalC::chi0_standard.epsilon = INPUT.epsilon;
-		GlobalC::chi0_standard.epsilon = true;
-		GlobalC::chi0_standard.system = INPUT.system_type;
-		GlobalC::chi0_standard.eta = INPUT.eta;
-		GlobalC::chi0_standard.domega = INPUT.domega;
-		GlobalC::chi0_standard.nomega = INPUT.nomega;
-		GlobalC::chi0_standard.dim = INPUT.ecut_chi;
-		// GlobalC::chi0_standard.oband = INPUT.oband;
-		GlobalC::chi0_standard.q_start[0] = INPUT.q_start[0];
-		GlobalC::chi0_standard.q_start[1] = INPUT.q_start[1];
-		GlobalC::chi0_standard.q_start[2] = INPUT.q_start[2];
-		GlobalC::chi0_standard.direct[0] = INPUT.q_direct[0];
-		GlobalC::chi0_standard.direct[1] = INPUT.q_direct[1];
-		GlobalC::chi0_standard.direct[2] = INPUT.q_direct[2];
-		// GlobalC::chi0_standard.start_q = INPUT.start_q;
-		// GlobalC::chi0_standard.interval_q = INPUT.interval_q;
-		GlobalC::chi0_standard.nq = INPUT.nq;
-		GlobalC::chi0_standard.out_epsilon = INPUT.out_epsilon;
-	}
-
-	// if( INPUT.epsilon0 && (INPUT.epsilon0_choice == 1) )
-	if (INPUT.spectral_type == "absorption" && INPUT.absorption_method == 1)
-	{
-		// GlobalC::epsilon0_pwscf.epsilon = INPUT.epsilon0;
-		GlobalC::epsilon0_pwscf.epsilon = true;
-		GlobalC::epsilon0_pwscf.intersmear = INPUT.eta;
-		GlobalC::epsilon0_pwscf.intrasmear = INPUT.intrasmear;
-		GlobalC::epsilon0_pwscf.domega = INPUT.domega;
-		GlobalC::epsilon0_pwscf.nomega = INPUT.nomega;
-		GlobalC::epsilon0_pwscf.shift = INPUT.shift;
-		GlobalC::epsilon0_pwscf.metalcalc = INPUT.metalcalc;
-		GlobalC::epsilon0_pwscf.degauss = INPUT.eps_degauss;
-	}
-
-	// if( INPUT.epsilon0 && (INPUT.epsilon0_choice == 0))
-	if (INPUT.spectral_type == "absorption" && INPUT.absorption_method == 0)
-	{
-		// GlobalC::epsilon0_vasp.epsilon = INPUT.epsilon0;
-		GlobalC::epsilon0_vasp.epsilon = true;
-		GlobalC::epsilon0_vasp.domega = INPUT.domega;
-		GlobalC::epsilon0_vasp.nomega = INPUT.nomega;
-		GlobalC::epsilon0_vasp.eta = INPUT.eta;
-	}
 
 	if (INPUT.dft_plus_u)
 	{

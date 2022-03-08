@@ -74,21 +74,6 @@ class Input
 	int nbands_sto;			// number of stochastic bands //qianrui 2021-2-5
 
 //==========================================================
-// E field 
-//==========================================================
-    int efield;				// add electrical field
-	int edir;
-	double emaxpos;
-	double eopreg;
-	double eamp;
-
-//==========================================================
-// Optical properties
-//==========================================================
-	bool opt_epsilon2;		// true : calculate the dielectric functions
-	int  opt_nbands;		// number of bands for optical transition matrix
-
-//==========================================================
 // electrons / spin
 //==========================================================
     std::string dft_functional;	// input DFT functional.
@@ -248,17 +233,6 @@ class Input
 	bool search_pbc; // 11.2
 
 
-//==========================================================
-// selected inversion method
-//==========================================================
-	// selinv method parameter (cooperate with LinLin)
-	int selinv_npole;
-	double selinv_temp;
-	double selinv_gap;
-	double selinv_deltae;
-	double selinv_mu;
-	double selinv_threshold;
-	int selinv_niter;
 
 //==========================================================
 // molecular dynamics
@@ -305,47 +279,8 @@ class Input
 	std::string vdw_model;			//"period" or "radius"
 	ModuleBase::Vector3<int> vdw_period;
 
-//==========================================================
-// Spectrum
-// pengfei Li add 2016-11-23
-//==========================================================
-	//bool     epsilon;               // calculate epsilon or not
-	std::string   spectral_type;          // the type of the calculated spectrum
-	int      spectral_method;        // 0: tddft(linear response)
-	int      eels_method;            // 0: hilbert_transform method; 1: standard method
-	int      absorption_method;      // 0: vasp's method  1: pwscf's method
-	//int		 epsilon_choice;         // 0: hilbert_transform method; 1: standard method
-	std::string   kernel_type;           // the kernel type: rpa, tdlda ...
-	std::string system_type;                 // bulk or surface
-	double  eta;                   // unit(Ry)
-	double  domega;                // unit(Ry)
-	int     nomega;
-	int     ecut_chi;                   // the dimension of G
-	//int     oband;                 // the number of "occupied" bands
-	double  q_start[3];            // the position of the first q point in direct coordinate
-	double  q_direct[3];             // the q direction
-	//int     start_q;               // the serial number of the start qpoint
-	//int     interval_q;            // the interval of the qpoints
-	int     nq;                    // the total number of qpoints for calculation
-	bool     out_epsilon;           // output epsilon or not
-	bool     out_chi;               // output chi or not
-	bool     out_chi0;              // output chi0 or not
-	double  fermi_level;            // the change the fermi level(Ry)
-	bool     coulomb_cutoff;         // turn on or off the Coulomb_cutoff 0/1
-	//bool     epsilon0;              // calculate the macroscopic dielectric constant or not
-	//double   intersmear;            // eta
-	double   intrasmear;            // Eta
-	double   shift;
-	bool     metalcalc;             // metal or not
-	double   eps_degauss;            // degauss
-	//int	epsilon0_choice;             // 0: vasp's method  1: pwscf's method
-	bool     kmesh_interpolation;          // calculting <i,0|j,R>
-	double  qcar[100][3];          // the Cartesian position of q points(unit: 2*PI/lat0)
 	int ocp;
-	//int ocp_n;
 	std::string ocp_set;
-	//double  ocp_kb[10000];
-	int     lcao_box[3];           // the scale for searching the existence of the overlap <i,0|j,R>
 	int    mulliken;//qifeng add 2019-9-10
 	double* atom_mag;
 	int n_mag_at;

@@ -148,16 +148,8 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"mem_saver",mem_saver,"memory saver for many k points used");
 	ModuleBase::GlobalFunc::OUTP(ofs,"printe",printe,"print band energy for selectively ionic steps");
 
-	ofs << "\n#Parameters (9.SIAO)" << std::endl;
-	ModuleBase::GlobalFunc::OUTP(ofs,"selinv_npole",selinv_npole,"number of selected poles");
-	ModuleBase::GlobalFunc::OUTP(ofs,"selinv_temp",selinv_temp,"temperature for Fermi-Dirac distribution");
-	ModuleBase::GlobalFunc::OUTP(ofs,"selinv_gap",selinv_gap,"supposed gap in the calculation");
-	ModuleBase::GlobalFunc::OUTP(ofs,"selinv_deltae",selinv_deltae,"expected energy range");
-	ModuleBase::GlobalFunc::OUTP(ofs,"selinv_mu",selinv_mu,"chosen mu as Fermi energy");
-	ModuleBase::GlobalFunc::OUTP(ofs,"selinv_threshold",selinv_threshold,"threshold for calculated electron number");
-	ModuleBase::GlobalFunc::OUTP(ofs,"selinv_niter",selinv_niter,"max number of steps to update mu");
 
-	ofs << "\n#Parameters (10.Molecular dynamics)" << std::endl;
+	ofs << "\n#Parameters (9.Molecular dynamics)" << std::endl;
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_type",mdp.md_type,"choose ensemble");
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_ensolver",mdp.md_ensolver,"choose potential");
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_dt",mdp.md_dt,"time step");
@@ -179,15 +171,7 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"md_damp",mdp.md_damp,"damping parameter (time units) used to add force in Langevin method");
 
 
-	ofs << "\n#Parameters (11.Efield)" << std::endl;
-	ModuleBase::GlobalFunc::OUTP(ofs,"efield",efield,"add electric field");
-	ModuleBase::GlobalFunc::OUTP(ofs,"edir",edir,"add electric field");
-	ModuleBase::GlobalFunc::OUTP(ofs,"emaxpos",emaxpos,"maximal position of efield [0,1)");
-	ModuleBase::GlobalFunc::OUTP(ofs,"eopreg",eopreg,"where sawlike potential decrease");
-	ModuleBase::GlobalFunc::OUTP(ofs,"eamp",eamp,"amplitute of the efield, unit is a.u.");
-	ModuleBase::GlobalFunc::OUTP(ofs,"eamp_v",eamp*51.44,"amplitute of the efield, unit is V/A");
-
-	ofs << "\n#Parameters (12.Test)" << std::endl;
+	ofs << "\n#Parameters (11.Test)" << std::endl;
 	ModuleBase::GlobalFunc::OUTP(ofs,"out_alllog",out_alllog,"output information for each processor, when parallel");
 	ModuleBase::GlobalFunc::OUTP(ofs,"nurse", nurse,"for coders");
 	ModuleBase::GlobalFunc::OUTP(ofs,"colour", colour,"for coders, make their live colourful");
@@ -200,11 +184,7 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"test_force", test_force, "test the force");
 	ModuleBase::GlobalFunc::OUTP(ofs,"test_stress", test_stress, "test the force");
 	
-	ofs << "\n#Parameters (13.Other Methods)" << std::endl;
-	ModuleBase::GlobalFunc::OUTP(ofs,"opt_epsilon2",opt_epsilon2,"calculate the dielectic function");
-	ModuleBase::GlobalFunc::OUTP(ofs,"opt_nbands",opt_nbands,"number of bands for optical calculation");
-	
-	ofs << "\n#Parameters (14.VdW Correction)" << std::endl;								
+	ofs << "\n#Parameters (13.VdW Correction)" << std::endl;								
 	ModuleBase::GlobalFunc::OUTP(ofs,"vdw_method",vdw_method,"the method of calculating vdw (none ; d2 ; d3_0 ; d3_bj");
 	ModuleBase::GlobalFunc::OUTP(ofs,"vdw_s6",vdw_s6,"scale parameter of d2/d3_0/d3_bj");
     ModuleBase::GlobalFunc::OUTP(ofs,"vdw_s8",vdw_s8,"scale parameter of d3_0/d3_bj");
@@ -226,55 +206,17 @@ void Input::Print(const std::string &fn)const
 			<< vdw_period.z<< " #periods of periodic structure" << std::endl;
 	
 	
-	ofs << "\n#Parameters (15.spectrum)" << std::endl;              // pengfei Li add 2016-11-23
-	ModuleBase::GlobalFunc::OUTP(ofs,"spectral_type",spectral_type,"the type of the calculated spectrum");
-	ModuleBase::GlobalFunc::OUTP(ofs,"spectral_method",spectral_method,"0: tddft(linear response)");
-	ModuleBase::GlobalFunc::OUTP(ofs,"kernel_type",kernel_type,"the kernel type: rpa, tdlda ...");
-	ModuleBase::GlobalFunc::OUTP(ofs,"eels_method",eels_method,"0: hilbert_transform method; 1: standard method");
-	ModuleBase::GlobalFunc::OUTP(ofs,"absorption_method",absorption_method,"0: vasp's method  1: pwscf's method");
-	ModuleBase::GlobalFunc::OUTP(ofs,"system",system_type,"the calculate system");
-	ModuleBase::GlobalFunc::OUTP(ofs,"eta",eta,"eta(Ry)");
-	ModuleBase::GlobalFunc::OUTP(ofs,"domega",domega,"domega(Ry)");
-	ModuleBase::GlobalFunc::OUTP(ofs,"nomega",nomega,"nomega");
-	ModuleBase::GlobalFunc::OUTP(ofs,"ecut_chi",ecut_chi,"the dimension of chi matrix");
-	ofs << std::setw(20) <<"q_start"<<q_start[0]<<"   "
-		<<q_start[1]<<"   "<<q_start[2]
-		<<"  #the position of the first q point in direct coordinate" <<std::endl;
-	ofs << std::setw(20) <<"q_direction"<<q_direct[0]<<"   "<<q_direct[1]<<"   "<<q_direct[2]<<"  #the q direction" <<std::endl;
-	ModuleBase::GlobalFunc::OUTP(ofs,"nq",nq,"the total number of qpoints for calculation");
-	ModuleBase::GlobalFunc::OUTP(ofs,"out_epsilon",out_epsilon,"output epsilon or not");
-	ModuleBase::GlobalFunc::OUTP(ofs,"out_chi",out_chi,"output chi or not");
-	ModuleBase::GlobalFunc::OUTP(ofs,"out_chi0",out_chi0,"output chi0 or not");
-	ModuleBase::GlobalFunc::OUTP(ofs,"fermi_level",fermi_level,"the change of the fermi_level(Ry)");
-	ModuleBase::GlobalFunc::OUTP(ofs,"coulomb_cutoff",coulomb_cutoff," turn on the coulomb_cutoff or not");
-	ModuleBase::GlobalFunc::OUTP(ofs,"kmesh_interpolation",kmesh_interpolation,"calculting <i,0|j,R>");
-	for(int i=0; i<nq; i++)
-	{
-		ofs << std::setw(20) <<"qcar" << qcar[i][0] <<"   "<< qcar[i][1] <<"   "<<qcar[i][2]<<"  #(unit: 2PI/lat0)" << std::endl;
-	}
+	ofs << "\n#Parameters (14.spectrum)" << std::endl;              // pengfei Li add 2016-11-23
 	ModuleBase::GlobalFunc::OUTP(ofs,"ocp",GlobalV::ocp,"change occupation or not");
 	ModuleBase::GlobalFunc::OUTP(ofs,"ocp_set",GlobalV::ocp_set,"set occupation");
-	//ModuleBase::GlobalFunc::OUTP(ofs,"ocp_n",ocp_n,"number of occupation");
-	// for(int i=0; i<ocp_n; i++)
-	// {
-		// ofs << std::setw(20) <<"ocp_kb" << GlobalV::ocp_kb[i]<< std::endl;
-	// }
-	ofs << std::setw(20) <<"lcao_box"<<lcao_box[0]
-		<<"   "<<lcao_box[1]<<"   "
-		<<lcao_box[2]<<"  #the scale for searching the existence of the overlap <i,0|j,R>" <<std::endl;
-	ModuleBase::GlobalFunc::OUTP(ofs," mulliken", GlobalV::mulliken," mulliken  charge or not");//qifeng add 2019/9/10
-	
-	//ModuleBase::GlobalFunc::OUTP(ofs,"epsilon0",epsilon0,"calculate the macroscopic dielectric constant or not");
-	ModuleBase::GlobalFunc::OUTP(ofs,"intrasmear",intrasmear,"Eta");
-	ModuleBase::GlobalFunc::OUTP(ofs,"shift",shift,"shift");
-	ModuleBase::GlobalFunc::OUTP(ofs,"metalcalc",metalcalc,"metal or not");
-	ModuleBase::GlobalFunc::OUTP(ofs,"eps_degauss",eps_degauss,"degauss in calculating epsilon0");
+	ModuleBase::GlobalFunc::OUTP(ofs,"mulliken", GlobalV::mulliken," mulliken  charge or not");//qifeng add 2019/9/10
+
+
 	ModuleBase::GlobalFunc::OUTP(ofs,"noncolin",noncolin,"using non-collinear-spin");
 	ModuleBase::GlobalFunc::OUTP(ofs,"lspinorb",lspinorb,"consider the spin-orbit interaction");
 	
-	//ModuleBase::GlobalFunc::OUTP(ofs,"epsilon0_choice",epsilon0_choice,"0: vasp's method  1: pwscf's method");
 	
-	ofs << "\n#Parameters (17.exx)" << std::endl;
+	ofs << "\n#Parameters (15.exx)" << std::endl;
 	ModuleBase::GlobalFunc::OUTP(ofs,"exx_hybrid_type",exx_hybrid_type,"no, hf, pbe0, hse or opt_orb");
 	ModuleBase::GlobalFunc::OUTP(ofs,"exx_hybrid_alpha",exx_hybrid_alpha,"");
 	ModuleBase::GlobalFunc::OUTP(ofs,"exx_hse_omega",exx_hse_omega,"");
@@ -294,7 +236,7 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"exx_opt_orb_ecut",exx_opt_orb_ecut,"");
 	ModuleBase::GlobalFunc::OUTP(ofs,"exx_opt_orb_tolerence",exx_opt_orb_tolerence,"");
 
-	ofs << "\n#Parameters (17.tddft)" << std::endl;
+	ofs << "\n#Parameters (16.tddft)" << std::endl;
 	ModuleBase::GlobalFunc::OUTP(ofs,"tddft",tddft,"calculate tddft or not");
 	ModuleBase::GlobalFunc::OUTP(ofs,"td_dr2",td_dr2,"threshold for electronic iteration of tddft");
 	ModuleBase::GlobalFunc::OUTP(ofs,"td_dt",td_dt,"time of ion step");
@@ -310,7 +252,7 @@ void Input::Print(const std::string &fn)const
 	ModuleBase::GlobalFunc::OUTP(ofs,"td_dipoleout",td_dipoleout,"output dipole or not");
 
 	
-	ofs << "\n#Parameters (18.berry_wannier)" << std::endl;
+	ofs << "\n#Parameters (17.berry_wannier)" << std::endl;
 	ModuleBase::GlobalFunc::OUTP(ofs,"berry_phase",berry_phase,"calculate berry phase or not");
 	ModuleBase::GlobalFunc::OUTP(ofs,"gdir",gdir,"calculate the polarization in the direction of the lattice vector");
 	ModuleBase::GlobalFunc::OUTP(ofs,"towannier90",towannier90,"use wannier90 code interface or not");
