@@ -160,9 +160,10 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc(
 
     // parallel code : collect vtxc,etxc
     // mohan add 2008-06-01
+#ifdef __MPI
     Parallel_Reduce::reduce_double_pool( etxc );
     Parallel_Reduce::reduce_double_pool( vtxc );
-
+#endif
     etxc *= omega / ncxyz;
     vtxc *= omega / ncxyz;
 
@@ -374,8 +375,10 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc_libxc(
     //-------------------------------------------------
     // for MPI, reduce the exchange-correlation energy
     //-------------------------------------------------
+#ifdef __MPI
     Parallel_Reduce::reduce_double_pool( etxc );
     Parallel_Reduce::reduce_double_pool( vtxc );
+#endif
 
     etxc *= omega / ncxyz;
     vtxc *= omega / ncxyz;
@@ -607,8 +610,10 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> XC_Functional::v_xc_m
 	//-------------------------------------------------
 	// for MPI, reduce the exchange-correlation energy
 	//-------------------------------------------------
+#ifdef __MPI
 	Parallel_Reduce::reduce_double_pool( etxc );
 	Parallel_Reduce::reduce_double_pool( vtxc );
+#endif
 
     etxc *= omega / ncxyz;
     vtxc *= omega / ncxyz;
