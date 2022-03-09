@@ -3,6 +3,7 @@
 #include "esolver_ks_lcao.h"
 #include "esolver_of.h"
 #include "esolver_lj.h"
+#include "esolver_dp.h"
 
 namespace ModuleESolver
 {
@@ -34,6 +35,10 @@ void init_esolver(ESolver *&p_esolver, const string use_esol)
     else if(use_esol == "lj_pot")
     {
         p_esolver = new ESolver_LJ();
+    }
+    else if(use_esol == "dp_pot")
+    {
+        p_esolver = new ESolver_DP();
     }
 }
 

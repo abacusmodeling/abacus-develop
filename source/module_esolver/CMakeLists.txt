@@ -7,6 +7,7 @@ add_library(
     esolver_ks_pw.cpp
     esolver_ks_lcao.cpp
     esolver_lj.cpp
+    esolver_dp.cpp
 )
 
 
