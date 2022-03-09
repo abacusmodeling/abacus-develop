@@ -212,10 +212,10 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc_libxc(
 
     // converting rho
     std::vector<double> rho;
-    rho.resize(GlobalC::pw.nrxx*nspin);
+    rho.resize(nrxx*nspin);
     for( int is=0; is!=nspin; ++is )
     {
-        for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
+        for( int ir=0; ir!=nrxx; ++ir )
         {
             rho[ir*nspin+is] = rho_in[is][ir] + 1.0/nspin*rho_core_in[ir];
         }
@@ -229,8 +229,8 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc_libxc(
         gdr.resize( nspin );
         for( int is=0; is!=nspin; ++is )
         {
-            std::vector<double> rhor(GlobalC::pw.nrxx);
-            for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
+            std::vector<double> rhor(nrxx);
+            for(int ir=0; ir<nrxx; ++ir)
             {
                 rhor[ir] = rho[ir*nspin+is];
             }
@@ -245,7 +245,7 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc_libxc(
             // compute the gradient of charge density and
             // store the gradient in gdr[is]
             //-------------------------------------------
-            gdr[is].resize(GlobalC::pw.nrxx);
+            gdr[is].resize(nrxx);
             XC_Functional::grad_rho(rhog.data(), gdr[is].data());
         }
 
@@ -254,14 +254,14 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc_libxc(
 
         if( 1==nspin )
         {
-            for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
+            for( int ir=0; ir!=nrxx; ++ir )
             {
                 sigma[ir] = gdr[0][ir]*gdr[0][ir];
             } 
         }
         else
         {
-            for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
+            for( int ir=0; ir!=nrxx; ++ir )
             {
                 sigma[ir*3]   = gdr[0][ir]*gdr[0][ir];
                 sigma[ir*3+1] = gdr[0][ir]*gdr[1][ir];
@@ -286,7 +286,7 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc_libxc(
         // a cutoff for grho is required to ensure that libxc gives reasonable results
         if(nspin==2 && func.info->family != XC_FAMILY_LDA && func.info->kind==XC_CORRELATION)
         {
-            for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
+            for( size_t ir=0; ir!=nrxx; ++ir )
             {
                 if ( rho[ir*2]<rho_threshold || sqrt(abs(sigma[ir*3]))<grho_threshold )
                     sgn[ir*2] = 0.0;
@@ -354,7 +354,7 @@ std::tuple<double,double,ModuleBase::matrix> XC_Functional::v_xc_libxc(
                 }
             }
 
-            // define two dimensional array dh [ nspin, GlobalC::pw.nrxx ]
+            // define two dimensional array dh [ nspin, nrxx ]
             std::vector<std::vector<double>> dh(nspin, std::vector<double>( nrxx));
             for( int is=0; is!=nspin; ++is )
             {
@@ -435,10 +435,10 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> XC_Functional::v_xc_m
 
     // converting rho
     std::vector<double> rho;
-    rho.resize(GlobalC::pw.nrxx*nspin);
+    rho.resize(nrxx*nspin);
     for( int is=0; is!=nspin; ++is )
     {
-        for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
+        for( int ir=0; ir!=nrxx; ++ir )
         {
             rho[ir*nspin+is] = rho_in[is][ir] + 1.0/nspin*rho_core_in[ir];
         }
@@ -451,8 +451,8 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> XC_Functional::v_xc_m
     gdr.resize( nspin );
     for( int is=0; is!=nspin; ++is )
     {
-        std::vector<double> rhor(GlobalC::pw.nrxx);
-        for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
+        std::vector<double> rhor(nrxx);
+        for(int ir=0; ir<nrxx; ++ir)
         {
             rhor[ir] = rho[ir*nspin+is];
         }
@@ -467,7 +467,7 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> XC_Functional::v_xc_m
         // compute the gradient of charge density and
         // store the gradient in gdr[is]
         //-------------------------------------------
-        gdr[is].resize(GlobalC::pw.nrxx);
+        gdr[is].resize(nrxx);
         XC_Functional::grad_rho(rhog.data(), gdr[is].data());
     }
 
@@ -476,14 +476,14 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> XC_Functional::v_xc_m
 
     if( 1==nspin )
     {
-        for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
+        for( int ir=0; ir!=nrxx; ++ir )
         {
             sigma[ir] = gdr[0][ir]*gdr[0][ir];
         } 
     }
     else
     {
-        for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
+        for( int ir=0; ir!=nrxx; ++ir )
         {
             sigma[ir*3]   = gdr[0][ir]*gdr[0][ir];
             sigma[ir*3+1] = gdr[0][ir]*gdr[1][ir];
@@ -493,10 +493,10 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> XC_Functional::v_xc_m
 
     //converting kin_r
     std::vector<double> kin_r;
-    kin_r.resize(GlobalC::pw.nrxx*nspin);
+    kin_r.resize(nrxx*nspin);
     for( int is=0; is!=nspin; ++is )
     {
-        for( int ir=0; ir!=GlobalC::pw.nrxx; ++ir )
+        for( int ir=0; ir!=nrxx; ++ir )
         {
             kin_r[ir*nspin+is] = kin_r_in[is][ir] / 2.0;
         }
@@ -516,7 +516,7 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> XC_Functional::v_xc_m
 
     if(nspin == 1)
     {
-        for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
+        for( size_t ir=0; ir!=nrxx; ++ir )
         {
             if ( rho[ir]<rho_th || sqrt(abs(sigma[ir]))<grho_th || abs(kin_r[ir]<tau_th))
             {
@@ -526,7 +526,7 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> XC_Functional::v_xc_m
     }
     else
     {
-        for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
+        for( size_t ir=0; ir!=nrxx; ++ir )
         {
             if ( rho[ir*2]<rho_th || sqrt(abs(sigma[ir*3]))<grho_th || abs(kin_r[ir*2]<tau_th))
                 sgn[ir*2] = 0.0;
@@ -581,7 +581,7 @@ tuple<double,double,ModuleBase::matrix,ModuleBase::matrix> XC_Functional::v_xc_m
             }
         }
 
-        // define two dimensional array dh [ nspin, GlobalC::pw.nrxx ]
+        // define two dimensional array dh [ nspin, nrxx ]
         std::vector<std::vector<double>> dh(nspin, std::vector<double>( nrxx));
         for( int is=0; is!=nspin; ++is )
         {
