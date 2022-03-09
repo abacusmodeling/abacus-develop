@@ -20,17 +20,6 @@ class XC_Functional
 {
 	public:
 
-	friend class Run_lcao;
-	friend class Run_pw;
-	friend class Ions;
-	friend class ELEC_scf;
-	friend class LOOP_elec;
-	friend class Run_MD_PW;
-	friend class XCTest_PBE;
-	friend class XCTest_PZ;
-	friend class XCTest_PWLDA;
-	friend class XCTest_BP;
-
 	XC_Functional();
 	~XC_Functional();
 
@@ -96,15 +85,16 @@ class XC_Functional
 	public:
 
 	static int get_func_type();
-
-	private:
-
 	static void set_xc_type(const std::string xc_func_in);
 #ifdef USE_LIBXC
 	static void set_xc_type_libxc(const std::string xc_func_in);
-	static std::vector<xc_func_type> init_func(const int xc_polarized);
 #endif
 
+	private:
+
+#ifdef USE_LIBXC
+	static std::vector<xc_func_type> init_func(const int xc_polarized);
+#endif
 	static std::vector<int> func_id; // libxc id of functional
 	static int func_type; //0:none, 1:lda, 2:gga, 3:mgga, 4:hybrid
 	static bool use_libxc;
