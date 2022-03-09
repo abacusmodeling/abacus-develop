@@ -88,13 +88,11 @@ class XC_Functional
 	static void set_xc_type(const std::string xc_func_in);
 #ifdef USE_LIBXC
 	static void set_xc_type_libxc(const std::string xc_func_in);
+	static std::vector<xc_func_type> init_func(const int xc_polarized);
 #endif
 
 	private:
 
-#ifdef USE_LIBXC
-	static std::vector<xc_func_type> init_func(const int xc_polarized);
-#endif
 	static std::vector<int> func_id; // libxc id of functional
 	static int func_type; //0:none, 1:lda, 2:gga, 3:mgga, 4:hybrid
 	static bool use_libxc;
@@ -123,7 +121,7 @@ class XC_Functional
 // on the entire grid. I'm having xc_spin_libxc because v_xc_libxc
 // does not support nspin = 4.
 
-	private :
+	public:
 
 	// LDA
 	static void xc(const double &rho, double &exc, double &vxc);
@@ -149,7 +147,7 @@ class XC_Functional
 // LIBXC, and the reason for not having gcxc_libxc is explained
 // in the NOTE in the comment for xc_functional_wrapper_wc.cpp part
 
-	private:
+	public:
 
 	// GGA
 	static void gcxc(const double &rho, const double &grho,
@@ -177,7 +175,7 @@ class XC_Functional
 // NOTE : mGGA is realized through LIBXC
 
 #ifdef USE_LIBXC
-	private:
+	public:
 	
 	// mGGA
 	static void tau_xc(const double &rho, const double &grho, const double &atau, double &sxc,
@@ -202,9 +200,6 @@ class XC_Functional
 
 	static void gradcorr(double &etxc, double &vtxc, ModuleBase::matrix &v, std::vector<double> &stress_gga, const bool is_stress = 0);
 	static void grad_wfc( const std::complex<double> *rhog, const int ik, std::complex<double> **grad, const int npw );
-
-	private:
-
 	static void grad_rho( const std::complex<double> *rhog, ModuleBase::Vector3<double> *gdr );
 	static void grad_dot( const ModuleBase::Vector3<double> *h, double *dh);
 	static void noncolin_rho(double *rhoout1,double *rhoout2,double *seg);
@@ -223,7 +218,7 @@ class XC_Functional
 //  2. slater1_spin
 //  3. slater_rxc_spin
 
-	private:
+	public:
 
 	// For LDA exchange energy
 	static void slater(const double &rs, double &ex, double &vx);
@@ -255,7 +250,7 @@ class XC_Functional
 //  1. pw_spin
 //  2. pz_spin, which calls pz_polarized
 
-	private:
+	public:
 
 	// For LDA correlation energy
 	static void pw(const double &rs, const int &iflag, double &ec, double &vc);
@@ -287,7 +282,7 @@ class XC_Functional
 // And some of their spin polarized counterparts:
 //  1. becke88_spin
 
-	private:
+	public:
 
 	static void becke88(const double &rho, const double &grho, double &sx, double &v1x, double &v2x);
 	static void ggax(const double &rho, const double &grho, double &sx, double &v1x, double &v2x);
@@ -314,7 +309,7 @@ class XC_Functional
 //  2. ggac_spin
 //  3. pbec_spin
 
-	private:
+	public:
 	
 	static void perdew86(const double rho, const double grho, double &sc, double &v1c, double &v2c);
 	static void ggac(const double &rho,const double &grho, double &sc, double &v1c, double &v2c);
@@ -335,7 +330,7 @@ class XC_Functional
 // This file contains realizations of the HCTH GGA functional
 // hcth calls pwcorr
 
-	private:
+	public:
 
 	static void hcth(const double rho, const double grho, double &sx, double &v1x, double &v2x);
 	static void pwcorr(const double r, const double c[], double &g, double &dg);
