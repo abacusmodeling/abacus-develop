@@ -39,9 +39,6 @@ class Local_Orbital_Charge
 	// in DM_k.cpp
 	//-----------------
 	void allocate_DM_k(void);
-	
-    void kpt_file(const Grid_Technique& gt,
-        Local_Orbital_wfc &lowf);
 
 	// liaochen modify on 2010-3-23 
 	// change its state from private to public

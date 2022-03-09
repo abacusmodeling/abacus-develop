@@ -54,14 +54,13 @@ inline int CTOT2q_c(
 }
 
 // be called in local_orbital_wfc::allocate_k
-int WF_Local::read_lowf_complex(std::complex<double>** c, const int& ik, 
+int WF_Local::read_lowf_complex(std::complex<double>** ctot, const int& ik, 
     Local_Orbital_wfc &lowf)
 {
     ModuleBase::TITLE("WF_Local","read_lowf_complex");
     ModuleBase::timer::tick("WF_Local","read_lowf_complex");
 
-    std::complex<double> **ctot;
-
+    lowf.wfc_k[ik].create(lowf.ParaV->ncol_bands, lowf.ParaV->nrow);
     std::stringstream ss;
 	// read wave functions
 	// write is in ../src_pdiag/pdiag_basic.cpp
@@ -212,14 +211,12 @@ int WF_Local::read_lowf_complex(std::complex<double>** c, const int& ik,
 	return 0;
 }
 
-int WF_Local::read_lowf(double** c, const int& is,
+int WF_Local::read_lowf(double** ctot, const int& is,
     Local_Orbital_wfc &lowf)
 {
     ModuleBase::TITLE("WF_Local","read_lowf");
-    ModuleBase::timer::tick("WF_Local","read_lowf");
-
-    double **ctot;
-
+    ModuleBase::timer::tick("WF_Local", "read_lowf");
+    
     std::stringstream ss;
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
@@ -498,7 +495,7 @@ void WF_Local::distri_lowf_complex_new(std::complex<double>** ctot, const int& i
 //1. alloc work array; set some parameters
 
 	long maxnloc; // maximum number of elements in local matrix
-	MPI_Reduce(&lowf.ParaV->nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, lowf.ParaV->comm_2D);
+	MPI_Reduce(&lowf.ParaV->nloc_wfc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, lowf.ParaV->comm_2D);
 	MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, lowf.ParaV->comm_2D);
 	//reduce and bcast could be replaced by allreduce
 	
@@ -533,7 +530,7 @@ void WF_Local::distri_lowf_complex_new(std::complex<double>** ctot, const int& i
 			if(myid==src_rank)
 			{
 				naroc[0]=lowf.ParaV->nrow;
-				naroc[1]=lowf.ParaV->ncol;
+				naroc[1]=lowf.ParaV->ncol_bands;
 			}
 			info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, lowf.ParaV->comm_2D);
 
@@ -547,10 +544,11 @@ void WF_Local::distri_lowf_complex_new(std::complex<double>** ctot, const int& i
 			//}
 			//ofs_running << std::endl;
 //2.3 copy from work to wfc_k
-			const int inc=1;
+            std::cout << "2.2 ok" << std::endl;
+            const int inc = 1;
 			if(myid==src_rank)
 			{
-				BlasConnector::copy(lowf.ParaV->nloc, work, inc, lowf.wfc_k.at(ik).c, inc);
+				BlasConnector::copy(lowf.ParaV->nloc_wfc, work, inc, lowf.wfc_k.at(ik).c, inc);
 			}
 		}//loop ipcol
 	}//loop	iprow

@@ -101,28 +101,28 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique& gt,
 		for(int ik=0; ik<GlobalC::kv.nkstot; ++ik)
 		{
 			GlobalV::ofs_running << " Read in wave functions " << ik + 1 << std::endl;
-			error = WF_Local::read_lowf_complex( this->wfc_k_grid[ik], ik, lowf);
-		}
+            error = WF_Local::read_lowf_complex(this->wfc_k_grid[ik], ik, lowf);
 #ifdef __MPI
-		Parallel_Common::bcast_int(error);
+            Parallel_Common::bcast_int(error);
 #endif
-		GlobalV::ofs_running << " Error=" << error << std::endl;
-		if(error==1)
-		{
-			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: LOWF.dat");
-		}
-		else if(error==2)
-		{
-			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In wave function file, band number doesn't match");
-		}
-		else if(error==3)
-		{
-			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In wave function file, nlocal doesn't match");
-		}
-		else if(error==4)
-		{
-			ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In k-dependent wave function file, k point is not correct");
-		}
+            GlobalV::ofs_running << " Error=" << error << std::endl;
+            if(error==1)
+            {
+                ModuleBase::WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: LOWF.dat");
+            }
+            else if(error==2)
+            {
+                ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In wave function file, band number doesn't match");
+            }
+            else if(error==3)
+            {
+                ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In wave function file, nlocal doesn't match");
+            }
+            else if(error==4)
+            {
+                ModuleBase::WARNING_QUIT("Local_Orbital_wfc","In k-dependent wave function file, k point is not correct");
+            }
+        }
 	}
 	else
 	{
