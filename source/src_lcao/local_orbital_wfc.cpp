@@ -172,6 +172,35 @@ int  Local_Orbital_wfc::q2CTOT(
     return 0;
 }
 
+int  Local_Orbital_wfc::q2WFC(
+	int myid,
+	int naroc[2],
+	int nb,
+	int dim0,
+	int dim1,
+	int iprow,
+	int ipcol,
+	int loc_size,
+	double* work,
+	double** WFC)
+{
+    ModuleBase::TITLE(" Local_Orbital_wfc","q2WFC");
+    for (int j = 0; j < naroc[1]; ++j)
+    {
+        int igcol=globalIndex(j, nb, dim1, ipcol);
+        if(igcol>=GlobalV::NBANDS) continue;
+        for(int i=0; i<naroc[0]; ++i)
+        {
+            int igrow = globalIndex(i, nb, dim0, iprow);
+            int mu_local = GlobalC::GridT.trace_lo[igrow];
+            if (mu_local >= 0 )
+            {
+                WFC[igcol][mu_local]=work[j*naroc[0]+i];
+            }
+        }
+    }
+    return 0;
+}
 
 int  Local_Orbital_wfc::q2WFC_complex(
 	int naroc[2],

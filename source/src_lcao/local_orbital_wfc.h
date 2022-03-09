@@ -58,7 +58,7 @@ public:
     ///=========================================
     //name will be changed
     
-    ///for gamma_only, with output
+    ///for gamma_only, output total wfc
     int q2CTOT(
         int myid,
         int naroc[2],
@@ -70,8 +70,21 @@ public:
         int loc_size,
         double* work,
         double** CTOT);
-    
-    ///for multi-k, no output
+
+    //for gamma_only, 2d-to-grid without output
+    int  q2WFC(
+        int myid,
+        int naroc[2],
+        int nb,
+        int dim0,
+        int dim1,
+        int iprow,
+        int ipcol,
+        int loc_size,
+        double* work,
+        double** WFC);
+
+    ///for multi-k, 2d-to-grid without output
     int q2WFC_complex(
         int naroc[2],
         int nb,
@@ -82,7 +95,7 @@ public:
         std::complex<double>* work,
         std::complex<double>** WFC);
     
-    ///for multi-k, with output
+    ///for multi-k, 2d-to-grid with output
     int q2WFC_CTOT_complex(
         int myid,
         int naroc[2],
