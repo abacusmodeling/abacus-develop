@@ -29,6 +29,7 @@ class XC_Functional
 	friend class XCTest_PBE;
 	friend class XCTest_PZ;
 	friend class XCTest_PWLDA;
+	friend class XCTest_BP;
 
 	XC_Functional();
 	~XC_Functional();
