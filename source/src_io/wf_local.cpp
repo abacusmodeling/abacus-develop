@@ -544,7 +544,6 @@ void WF_Local::distri_lowf_complex_new(std::complex<double>** ctot, const int& i
 			//}
 			//ofs_running << std::endl;
 //2.3 copy from work to wfc_k
-            std::cout << "2.2 ok" << std::endl;
             const int inc = 1;
 			if(myid==src_rank)
 			{
