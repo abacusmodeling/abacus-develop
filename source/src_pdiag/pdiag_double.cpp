@@ -272,10 +272,11 @@ void Pdiag_Double::diago_double_begin(
 				info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, src_rank, pv->comm_2D);
 
 				if(out_lowf)
-				{
-                    info=lowf.q2CTOT(myid, naroc, pv->nb,
+                {
+                    double** wfc = nullptr;
+                    info = lowf.set_wfc_grid(naroc, pv->nb,
                         pv->dim0, pv->dim1, iprow, ipcol,
-                        work, ctot);
+                        work, wfc, myid, ctot);
 				}//out_lowf
 			}//loop ipcol
 		}//loop iprow
@@ -586,9 +587,9 @@ void Pdiag_Double::diago_complex_begin(
                         ModuleBase::Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
                     }
 					// mohan update 2021-02-12, delete BFIELD option
-					info=lowf.q2WFC_CTOT_complex(myid, naroc, pv->nb,
+					info=lowf.set_wfc_grid(naroc, pv->nb,
 							pv->dim0, pv->dim1, iprow, ipcol,
-							work, lowf.wfc_k_grid[ik], ctot);
+							work, lowf.wfc_k_grid[ik], myid, ctot);
                     std::stringstream ss;
 	                ss << GlobalV::global_out_dir << "LOWF_K_" << ik+1 << ".dat";
                     // mohan add 2012-04-03, because we need the occupations for the
@@ -605,8 +606,8 @@ void Pdiag_Double::diago_complex_begin(
                 }
                 else
                 {
-					// mohan update 2021-02-12, delte BFIELD option
-					info=lowf.q2WFC_complex(naroc, pv->nb,
+                    // mohan update 2021-02-12, delte BFIELD option
+                    info = lowf.set_wfc_grid(naroc, pv->nb,
 							pv->dim0, pv->dim1, iprow, ipcol,
 							work, lowf.wfc_k_grid[ik]);
 				}
@@ -661,9 +662,9 @@ void Pdiag_Double::diago_complex_begin(
 							ModuleBase::Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
 						}
 						// mohan update 2021-02-12, delete BFIELD option
-						info=lowf.q2WFC_CTOT_complex(myid, naroc, pv->nb,
+						info=lowf.set_wfc_grid(naroc, pv->nb,
 								pv->dim0, pv->dim1, iprow, ipcol,
-								work, lowf.wfc_k_grid[ik], ctot);
+								work, lowf.wfc_k_grid[ik], myid, ctot);
 						std::stringstream ss;
 						ss << GlobalV::global_out_dir << "LOWF_K_" << ik+1 << ".dat";
 						// mohan add 2012-04-03, because we need the occupations for the
@@ -680,8 +681,8 @@ void Pdiag_Double::diago_complex_begin(
 					}
 					else
 					{
-						// mohan update 2021-02-12, delte BFIELD option
-						info=lowf.q2WFC_complex(naroc, pv->nb,
+                        // mohan update 2021-02-12, delte BFIELD option
+                        info = lowf.set_wfc_grid(naroc, pv->nb,
 								pv->dim0, pv->dim1, iprow, ipcol,
 								work, lowf.wfc_k_grid[ik]);
 					}

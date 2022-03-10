@@ -56,55 +56,23 @@ public:
     ///=========================================
     ///Parallel: convert the distribution of wavefunction from 2D to grid
     ///=========================================
-    //name will be changed
-    
-    ///for gamma_only, output total wfc
-    int q2CTOT(
-        int myid,
+    /// For gamma_only, T = double; 
+    /// For multi-k, T = complex<double>;
+    /// Set myid and ctot when output is needed;
+    /// Set wfc as nullptr when 2d-to-grid convertion is not needed.
+    template <typename T>
+    int set_wfc_grid(
         int naroc[2],
         int nb,
         int dim0,
         int dim1,
         int iprow,
         int ipcol,
-        double* work,
-        double** CTOT);
+        T* work,
+        T** wfc,
+        int myid = -1,
+        T** ctot = nullptr);
 
-    //for gamma_only, 2d-to-grid without output
-    int  q2WFC(
-        int naroc[2],
-        int nb,
-        int dim0,
-        int dim1,
-        int iprow,
-        int ipcol,
-        double* work,
-        double** WFC);
-
-    ///for multi-k, 2d-to-grid without output
-    int q2WFC_complex(
-        int naroc[2],
-        int nb,
-        int dim0,
-        int dim1,
-        int iprow,
-        int ipcol,
-        std::complex<double>* work,
-        std::complex<double>** WFC);
-    
-    ///for multi-k, 2d-to-grid with output
-    int q2WFC_CTOT_complex(
-        int myid,
-        int naroc[2],
-        int nb,
-        int dim0,
-        int dim1,
-        int iprow,
-        int ipcol,
-        std::complex<double>* work,
-        std::complex<double>** WFC,
-        std::complex<double>** CTOT);
-        
 private:
 
 	bool wfck_flag; 
@@ -112,5 +80,38 @@ private:
 	bool allocate_flag;
 
 };
+
+template <typename T>
+int Local_Orbital_wfc::set_wfc_grid(
+    int naroc[2],
+    int nb,
+    int dim0,
+    int dim1,
+    int iprow,
+    int ipcol,
+    T* work,
+    T** wfc,
+    int myid,
+    T** ctot)
+{
+    ModuleBase::TITLE(" Local_Orbital_wfc","set_wfc_grid");
+    for (int j = 0; j < naroc[1]; ++j)
+    {
+        int igcol=globalIndex(j, nb, dim1, ipcol);
+        if(igcol>=GlobalV::NBANDS) continue;
+        for(int i=0; i<naroc[0]; ++i)
+        {
+            int igrow=globalIndex(i, nb, dim0, iprow);
+	        int mu_local=GlobalC::GridT.trace_lo[igrow];
+            if (wfc != nullptr && mu_local >= 0)
+            {
+                wfc[igcol][mu_local]=work[j*naroc[0]+i];
+            }
+            if (ctot != nullptr && myid == 0)
+                ctot[igcol][igrow] = work[j * naroc[0] + i];
+        }
+    }
+    return 0;
+}
 
 #endif
